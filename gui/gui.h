@@ -446,15 +446,8 @@ public:
 
 
 #ifdef USE_SWFTREE
-    // TODO: use a tree-like structure (tree.hh?)
-    typedef std::pair<std::string, std::string> StringPair;
-    typedef tree<StringPair> InfoTree;
-
-    /// \brief
-    /// Return a tree containing informations about the movie
-    /// currently being played (or NULL, if the VM isn't initialized yet)
-    ///
-    std::auto_ptr<InfoTree> getMovieInfo() const;
+    /// Return a tree containing information about the movie playing.
+    std::auto_ptr<movie_root::InfoTree> getMovieInfo() const;
 #endif
 
     typedef std::map<std::string, std::string> VariableMap;

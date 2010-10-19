@@ -114,9 +114,7 @@ DisplayObjectContainer::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
     std::ostringstream os;
     os << _displayList.size();
     InfoTree::iterator localIter = tr.append_child(selfIt,
-            StringPair(_("Children"), os.str()));            
-    //localIter = tr.append_child(localIter, StringPair("child1", "fake"));
-    //localIter = tr.append_child(localIter, StringPair("child2", "fake"));
+            std::make_pair(_("Children"), os.str()));            
 
     MovieInfoVisitor v(tr, localIter);
     _displayList.visitAll(v);

@@ -1089,24 +1089,24 @@ Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 
 #ifdef USE_SWFTREE
 
-std::auto_ptr<Gui::InfoTree>
+std::auto_ptr<movie_root::InfoTree>
 Gui::getMovieInfo() const
 {
-    std::auto_ptr<InfoTree> tr;
+    std::auto_ptr<movie_root::InfoTree> tr;
 
     if (!_stage) {
         return tr;
     }
 
-    tr.reset(new InfoTree());
+    tr.reset(new movie_root::InfoTree());
 
     // Top nodes for the tree:
     // 1. VM information
     // 2. "Stage" information
     // 3. ...
 
-    InfoTree::iterator topIter = tr->begin();
-    InfoTree::iterator firstLevelIter;
+    movie_root::InfoTree::iterator topIter = tr->begin();
+    movie_root::InfoTree::iterator firstLevelIter;
 
     VM& vm = _stage->getVM();
 
@@ -1116,14 +1116,14 @@ Gui::getMovieInfo() const
     /// VM top level
     //
     os << "SWF " << vm.getSWFVersion();
-    topIter = tr->insert(topIter, StringPair("VM version", os.str()));
+    topIter = tr->insert(topIter, std::make_pair("VM version", os.str()));
 
     // This short-cut is to avoid a bug in movie_root's getMovieInfo,
     // which relies on the availability of a _rootMovie for doing
     // it's work, while we don't set it if we didn't start..
     // 
     if (! _started) {
-        topIter = tr->insert(topIter, StringPair("Stage properties", 
+        topIter = tr->insert(topIter, std::make_pair("Stage properties", 
                     "not constructed yet"));
         return tr;
     }
@@ -1134,7 +1134,7 @@ Gui::getMovieInfo() const
     //
     /// Mouse entities
     //
-    topIter = tr->insert(topIter, StringPair("Mouse Entities", ""));
+    topIter = tr->insert(topIter, std::make_pair("Mouse Entities", ""));
 
     const DisplayObject* ch;
     ch = stage.getActiveEntityUnderPointer();
@@ -1144,7 +1144,7 @@ Gui::getMovieInfo() const
            << " - depth:" << ch->get_depth()
            << " - useHandCursor:" << ch->allowHandCursor()
            << ")";
-    	firstLevelIter = tr->append_child(topIter, StringPair("Active entity under mouse pointer", ss.str()));
+    	firstLevelIter = tr->append_child(topIter, std::make_pair("Active entity under mouse pointer", ss.str()));
     }
 
     ch = stage.getEntityUnderPointer();
@@ -1153,7 +1153,7 @@ Gui::getMovieInfo() const
         ss << ch->getTarget() << " (" + typeName(*ch) 
            << " - depth:" << ch->get_depth()
            << ")";
-	firstLevelIter = tr->append_child(topIter, StringPair("Topmost entity under mouse pointer", ss.str()));
+	firstLevelIter = tr->append_child(topIter, std::make_pair("Topmost entity under mouse pointer", ss.str()));
     }
     
     ch = stage.getDraggingCharacter();
@@ -1161,13 +1161,13 @@ Gui::getMovieInfo() const
         std::stringstream ss;
         ss << ch->getTarget() << " (" + typeName(*ch) 
            << " - depth:" << ch->get_depth() << ")";
-    	firstLevelIter = tr->append_child(topIter, StringPair("Dragging character: ", ss.str()));
+    	firstLevelIter = tr->append_child(topIter, std::make_pair("Dragging character: ", ss.str()));
     }
 
     //
     /// GC row
     //
-    topIter = tr->insert(topIter, StringPair("GC Statistics", ""));
+    topIter = tr->insert(topIter, std::make_pair("GC Statistics", ""));
     GC::CollectablesCount cc;
     _stage->gc().countCollectables(cc);
     
@@ -1177,7 +1177,7 @@ Gui::getMovieInfo() const
         std::ostringstream ss;
         ss << i->second;
         firstLevelIter = tr->append_child(topIter,
-                            StringPair(lbl + typ, ss.str()));
+                    std::make_pair(lbl + typ, ss.str()));
     }
 
     tr->sort(firstLevelIter.begin(), firstLevelIter.end());

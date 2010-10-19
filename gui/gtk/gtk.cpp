@@ -798,10 +798,10 @@ GtkGui::createWindow(const char *title, int width, int height,
 
 // This creates a GtkTree model for displaying movie info.
 GtkTreeModel*
-GtkGui::makeTreeModel (std::auto_ptr<InfoTree> treepointer)
+GtkGui::makeTreeModel(std::auto_ptr<movie_root::InfoTree> treepointer)
 {
 
-    InfoTree& info = *treepointer;
+    const movie_root::InfoTree& info = *treepointer;
 
     enum
     {
@@ -822,9 +822,9 @@ GtkGui::makeTreeModel (std::auto_ptr<InfoTree> treepointer)
     int depth = 0;    
 
     assert(info.depth(info.begin()) == 0); // seems assumed in the code below
-    for (InfoTree::iterator i=info.begin(), e=info.end(); i!=e; ++i)
+    for (movie_root::InfoTree::iterator i = info.begin(), e = info.end(); i!=e; ++i)
     {
-        StringPair& p = *i;
+        const movie_root::InfoTree::value_type& p = *i;
 
         std::ostringstream os;
         os << info.depth(i);  
@@ -840,11 +840,10 @@ GtkGui::makeTreeModel (std::auto_ptr<InfoTree> treepointer)
         if (newdepth < depth) {
             int gap = depth-newdepth;
             depth = newdepth;
-            while(gap--)
-            {
+            while (gap--) {
                 gtk_tree_model_iter_parent (GTK_TREE_MODEL(model), &parent_iter, &iter);  
                 iter = parent_iter;
-        }
+            }
         }
 
         //Read in data from present node
@@ -1700,7 +1699,7 @@ GtkGui::showPropertiesDialog()
 
 #ifdef USE_SWFTREE
 
-    std::auto_ptr<InfoTree> infoptr = getMovieInfo();
+    std::auto_ptr<movie_root::InfoTree> infoptr = getMovieInfo();
 
     GtkWidget *scrollwindow1 = gtk_scrolled_window_new(0, 0);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollwindow1),
@@ -1809,7 +1808,8 @@ GtkGui::showAboutDialog()
         NULL
     };
 
-    std::string comments = _("Gnash is the GNU SWF Player based on GameSWF.");
+    std::string comments =
+        _("Gnash is the GNU SWF Player based on GameSWF.");
 
     media::MediaHandler* m = _runResources.mediaHandler();
 

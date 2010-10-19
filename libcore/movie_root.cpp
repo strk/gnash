@@ -977,8 +977,7 @@ movie_root::display()
             frame_size.get_x_min(), frame_size.get_x_max(),
             frame_size.get_y_min(), frame_size.get_y_max());
 
-    for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
-    {
+    for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i) {
         MovieClip* movie = i->second;
 
         movie->clear_invalidated();
@@ -2214,74 +2213,65 @@ movie_root::setScriptLimits(boost::uint16_t recursion, boost::uint16_t timeout)
 
 #ifdef USE_SWFTREE
 void
-movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it)
+movie_root::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 {
 
-    tree<StringPair>::iterator localIter;
-
-    //
-    /// Stage
-    //
+    // Stage
     const movie_definition* def = _rootMovie->definition();
     assert(def);
 
-    it = tr.insert(it, StringPair("Stage Properties", ""));
+    it = tr.insert(it, std::make_pair("Stage Properties", ""));
 
-    localIter = tr.append_child(it, StringPair("Root VM version",
+    InfoTree::iterator localIter =  tr.append_child(it,
+            std::make_pair("Root VM version",
                 def->isAS3() ? "AVM2 (unsupported)" : "AVM1"));
     
     std::ostringstream os;
     os << "SWF " << def->get_version();
-    localIter = tr.append_child(it, StringPair("Root SWF version", os.str()));
-    localIter = tr.append_child(it, StringPair("URL", def->get_url()));
+    localIter = tr.append_child(it, std::make_pair("Root SWF version",
+                os.str()));
+    localIter = tr.append_child(it, std::make_pair("URL", def->get_url()));
 
     // TODO: format this better?
-    localIter = tr.append_child(it, StringPair("Descriptive metadata",
+    localIter = tr.append_child(it, std::make_pair("Descriptive metadata",
                                         def->getDescriptiveMetadata()));
  
     /// Stage: real dimensions.
     os.str("");
     os << def->get_width_pixels() <<
         "x" << def->get_height_pixels();
-    localIter = tr.append_child(it, StringPair("Real dimensions", os.str()));
+    localIter = tr.append_child(it, std::make_pair("Real dimensions",
+                os.str()));
 
     /// Stage: rendered dimensions.
     os.str("");
     os << _stageWidth << "x" << _stageHeight;
-    localIter = tr.append_child(it, StringPair("Rendered dimensions", os.str()));
-
-#if 0
-    /// Stage: scaling allowed.
-    localIter = tr.append_child(it, StringPair("Scaling allowed",
-                _allowRescale ? yes : no));
-
-    //  TODO: add _scaleMode, _valign and _haling info
-#endif
+    localIter = tr.append_child(it, std::make_pair("Rendered dimensions",
+                os.str()));
 
     // Stage: scripts state (enabled/disabled)
-    localIter = tr.append_child(it, StringPair("Scripts",
+    localIter = tr.append_child(it, std::make_pair("Scripts",
                 _disableScripts ? " disabled" : "enabled"));
      
     getCharacterTree(tr, it);    
 }
 
 void
-movie_root::getCharacterTree(tree<StringPair>& tr,
-        tree<StringPair>::iterator it)
+movie_root::getCharacterTree(InfoTree& tr, InfoTree::iterator it)
 {
 
-    tree<StringPair>::iterator localIter;
+    InfoTree::iterator localIter;
 
-    /// Stage: number of live DisplayObjects
+    /// Stage: number of live MovieClips.
     std::ostringstream os;
     os << _liveChars.size();
-    localIter = tr.append_child(it, StringPair(_("Live DisplayObjects"),
+    localIter = tr.append_child(it, std::make_pair(_("Live MovieClips"),
                 os.str()));
 
-    /// Live DisplayObjects tree
-    for (LiveChars::const_iterator i = _liveChars.begin(), e = _liveChars.end();
+    /// DisplayObject tree
+    for (Levels::const_iterator i = _movies.begin(), e = _movies.end();
             i != e; ++i) {
-        (*i)->getMovieInfo(tr, localIter);
+        i->second->getMovieInfo(tr, localIter);
     }
 
 }
