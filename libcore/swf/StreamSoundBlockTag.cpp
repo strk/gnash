@@ -128,5 +128,5 @@ StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:
