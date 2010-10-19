@@ -177,18 +177,6 @@ PropertyList::delProperty(const ObjectURI& uri)
 }
 
 void
-PropertyList::dump(std::map<std::string, as_value>& to) 
-{
-    ObjectURI::Logger l(getStringTable(_owner));
-
-	for (const_iterator i=_props.begin(), ie=_props.end();
-            i != ie; ++i)
-	{
-		to.insert(std::make_pair(l(i->uri()), i->getValue(_owner)));
-	}
-}
-
-void
 PropertyList::visitKeys(KeyVisitor& visitor, PropertyTracker& donelist)
     const
 {

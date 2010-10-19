@@ -213,7 +213,7 @@ public:
     ///                 an inherited property.
     /// @returns        A property if found and visible, NULL if not found or
     ///                 not visible in current VM version
-    Property* findProperty(const ObjectURI& uri, as_object **owner = NULL);
+    Property* findProperty(const ObjectURI& uri, as_object** owner = 0);
 
     /// Return a reference to this as_object's global object.
     VM& vm() const {
@@ -228,15 +228,6 @@ public:
     //
     /// Only use this function for temporary debugging!
     void dump_members();
-
-    /// Dump all properties into the given container
-    //
-    /// Note that it is very likely that this will result in changes to the
-    /// object, as accessing getter/setters or destructive properties can
-    /// modify properties.
-    //
-    /// Only use this function for temporary debugging!
-    void dump_members(std::map<std::string, as_value>& to);
 
     /// Set a member value
     //

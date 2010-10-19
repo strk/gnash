@@ -481,7 +481,7 @@ as_object::get_super()
 }
 
 Property*
-as_object::findProperty(const ObjectURI& uri, as_object **owner)
+as_object::findProperty(const ObjectURI& uri, as_object** owner)
 {
 
     const int version = getSWFVersion(*this);
@@ -863,12 +863,6 @@ as_object::dump_members()
     log_debug(_("%d members of object %p follow"), _members.size(),
             static_cast<const void*>(this));
     _members.dump();
-}
-
-void
-as_object::dump_members(std::map<std::string, as_value>& to)
-{
-    _members.dump(to);
 }
 
 void

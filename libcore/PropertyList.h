@@ -294,13 +294,6 @@ public:
     /// lexicographically by property.
     void dump();
 
-    /// Dump all members into the given map
-    //
-    /// This does not reflect the normal enumeration order. It is sorted
-    /// lexicographically by property.
-    ///
-    void dump(std::map<std::string, as_value>& to);
-
     /// Mark all properties reachable
     //
     /// This can be called very frequently, so is inlined to allow the
