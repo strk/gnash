@@ -55,86 +55,45 @@
 namespace gnash {
 
 namespace {
-as_value externalInterfaceConstructor(const fn_call& fn);
-
-as_value externalinterface_addCallback(const fn_call& fn);
-as_value externalinterface_call(const fn_call& fn);
-as_value externalinterface_available(const fn_call& fn);
-as_value externalinterface_objectID(const fn_call& fn);
-
-as_value externalinterface_uArgumentsToXML(const fn_call& fn);
-as_value externalinterface_uArgumentsToAS(const fn_call& fn);
-as_value externalinterface_uAddCallback(const fn_call& fn);
-as_value externalinterface_uArrayToAS(const fn_call& fn);
-as_value externalinterface_uArrayToJS(const fn_call& fn);
-as_value externalinterface_uArrayToXML(const fn_call& fn);
-as_value externalinterface_uCallIn(const fn_call& fn);
-as_value externalinterface_uCallOut(const fn_call& fn);
-as_value externalinterface_uEscapeXML(const fn_call& fn);
-as_value externalinterface_uEvalJS(const fn_call& fn);
-as_value externalinterface_uInitJS(const fn_call& fn);
-as_value externalinterface_uJsQuoteString(const fn_call& fn);
-as_value externalinterface_uObjectID(const fn_call& fn);
-as_value externalinterface_uObjectToAS(const fn_call& fn);
-as_value externalinterface_uObjectToJS(const fn_call& fn);
-as_value externalinterface_uObjectToXML(const fn_call& fn);
-as_value externalinterface_uToAS(const fn_call& fn);
-as_value externalinterface_uToJS(const fn_call& fn);
-as_value externalinterface_uToXML(const fn_call& fn);
-as_value externalinterface_uUnescapeXML(const fn_call& fn);
-as_value externalinterface_ctor(const fn_call& fn);
-
-void attachExternalInterfaceStaticInterface(as_object& o);
+    as_value externalInterfaceConstructor(const fn_call& fn);
+    as_value externalinterface_addCallback(const fn_call& fn);
+    as_value externalinterface_call(const fn_call& fn);
+    as_value externalinterface_available(const fn_call& fn);
+    as_value externalinterface_objectID(const fn_call& fn);
+    as_value externalinterface_uArgumentsToXML(const fn_call& fn);
+    as_value externalinterface_uArgumentsToAS(const fn_call& fn);
+    as_value externalinterface_uAddCallback(const fn_call& fn);
+    as_value externalinterface_uArrayToAS(const fn_call& fn);
+    as_value externalinterface_uArrayToJS(const fn_call& fn);
+    as_value externalinterface_uArrayToXML(const fn_call& fn);
+    as_value externalinterface_uCallIn(const fn_call& fn);
+    as_value externalinterface_uCallOut(const fn_call& fn);
+    as_value externalinterface_uEscapeXML(const fn_call& fn);
+    as_value externalinterface_uEvalJS(const fn_call& fn);
+    as_value externalinterface_uInitJS(const fn_call& fn);
+    as_value externalinterface_uJsQuoteString(const fn_call& fn);
+    as_value externalinterface_uObjectID(const fn_call& fn);
+    as_value externalinterface_uObjectToAS(const fn_call& fn);
+    as_value externalinterface_uObjectToJS(const fn_call& fn);
+    as_value externalinterface_uObjectToXML(const fn_call& fn);
+    as_value externalinterface_uToAS(const fn_call& fn);
+    as_value externalinterface_uToJS(const fn_call& fn);
+    as_value externalinterface_uToXML(const fn_call& fn);
+    as_value externalinterface_uUnescapeXML(const fn_call& fn);
+    as_value externalinterface_ctor(const fn_call& fn);
 }
 
 namespace {
 
-/// Class used to serialize properties of an object to a buffer
-class PropsSerializer : public PropertyVisitor
+class Enumerator : public KeyVisitor
 {
-
 public:
-    
-    PropsSerializer(VM& vm)
-        : _st(vm.getStringTable()),
-          _error(false)
-        { /* do nothing */}
-    
-    bool success() const { return !_error; }
-
-    bool accept(const ObjectURI& uri, const as_value& val) {
-        if (_error) return true;
-
-        const string_table::key key = getName(uri);
-
-        if (key == NSV::PROP_uuPROTOuu || key == NSV::PROP_CONSTRUCTOR) {
-            log_debug(" skip serialization of specially-named property %s",
-                      _st.value(key));
-            return true;
-        }
-
-        // write property name
-        const std::string& id = _st.value(key);
-
-//        log_debug(" serializing property %s", id);
-        
-        _xml << "<property id=\"" << id << "\">";
-        _xml << ExternalInterface::toXML(val);
-        _xml << "</property>";
-
-        _noprops.push_back(val);
-            
-        return true;
+    Enumerator(std::vector<ObjectURI>& uris) : _uris(uris) {}
+    void operator()(const ObjectURI& u) {
+        _uris.push_back(u);
     }
-
-    std::string getXML() { return _xml.str(); };
-    std::vector<as_value> getArgs() { return _noprops; };
-    
 private:
-    string_table&       _st;
-    mutable bool        _error;
-    std::stringstream   _xml;
-    std::vector<as_value>   _noprops;
+    std::vector<ObjectURI>& _uris;
 };
 
 }
@@ -565,16 +524,44 @@ externalinterface_uObjectToJS(const fn_call& /*fn*/)
 as_value
 externalinterface_uObjectToXML(const fn_call& fn)
 {
-    // GNASH_REPORT_FUNCTION;
-    
-    as_object *obj = 0;
+    VM& vm = getVM(fn);
+
+    as_value ret("<object>");
 
     if (fn.nargs) {
-        obj = toObject(fn.arg(0), getVM(fn));
+        as_object* obj = toObject(fn.arg(0), getVM(fn));
+
+        if (obj) {
+
+            string_table& st = getStringTable(fn);
+
+            typedef std::vector<ObjectURI> URIs;
+            URIs uris;
+
+            // Fake AS enumeration.
+            Enumerator en(uris);
+            obj->visitKeys(en);
+
+            for (URIs::const_reverse_iterator i = uris.rbegin(), e = uris.rend();
+                    i != e; ++i) {
+                const std::string& id = i->toString(st);
+
+                newAdd(ret, "<property id=\"", vm);
+                newAdd(ret, id, vm);
+                newAdd(ret, "\">", vm);
+
+                as_object* ei = 
+                    fn.env().find_object("flash.external.ExternalInterface");
+                const as_value& val = getMember(*obj, *i); 
+                newAdd(ret, callMethod(ei, st.find("_toXML"), val), vm);
+                newAdd(ret, "</property>", vm);
+            }
+        }
     }
-    
-    const std::string& str = ExternalInterface::objectToXML(obj);
-    return as_value(str);
+
+    newAdd(ret, "</object>", vm);
+    return ret;
+
 }
 
 as_value
