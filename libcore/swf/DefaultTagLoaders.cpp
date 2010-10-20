@@ -20,8 +20,12 @@
 #include "gnashconfig.h"
 #endif
 
-#include "SWF.h"
 #include "DefaultTagLoaders.h"
+
+#include <boost/assign.hpp>
+#include <set>
+
+#include "SWF.h"
 #include "TagLoadersTable.h"
 #include "tag_loaders.h" 
 #include "ScriptLimitsTag.h"
@@ -42,6 +46,7 @@
 #include "SetTabIndexTag.h"
 #include "StartSoundTag.h"
 #include "StreamSoundBlockTag.h"
+#include "DefineBitsTag.h"
 #include "DefineButtonSoundTag.h"
 #include "DefineMorphShapeTag.h"
 #include "DefineVideoStreamTag.h"
@@ -54,9 +59,6 @@
 # include "DoABCTag.h"
 # include "DefineSceneAndFrameLabelDataTag.h"
 #endif
-
-#include <boost/assign.hpp>
-#include <boost/bind.hpp>
 
 namespace gnash {
 namespace SWF {
