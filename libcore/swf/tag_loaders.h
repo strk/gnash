@@ -37,9 +37,6 @@ namespace SWF {
 /// Silently ignore the contents of this tag.
 void null_loader(SWFStream&, TagType, movie_definition&, const RunResources&);
 
-/// This is like null_loader except it prints a message to nag us to fix it.
-void fixme_loader(SWFStream&, TagType, movie_definition&, const RunResources&);
-
 /// \brief
 /// Load JPEG compression tables that can be used to load
 /// images further along in the SWFStream. (SWF::JPEGTABLES)
@@ -75,15 +72,6 @@ void define_bits_lossless_2_loader(SWFStream&, TagType, movie_definition&,
 /// Handles a SWF::DEFINESPRITE tag
 ///
 void sprite_loader(SWFStream&, TagType, movie_definition&, const RunResources&);
-
-// end_tag doesn't actually need to exist.
-// TODO: drop this loader ?
-inline void end_loader(SWFStream& in, TagType tag, movie_definition&,
-        const RunResources&)
-{
-    assert(tag == SWF::END); // 0
-    assert(in.tell() == in.get_tag_end_position());
-}
 
 void remove_object_2_loader(SWFStream&, TagType, movie_definition&,
 		const RunResources&);

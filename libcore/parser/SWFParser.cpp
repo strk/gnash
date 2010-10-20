@@ -98,7 +98,8 @@ SWFParser::read(std::streamsize bytes)
             }
             else {
                 // no tag loader for this tag type.
-                log_error(_("*** no tag loader for type %d (movie)"), _tag);
+                log_error(_("Encountered unknown tag %d. These usually store "
+                        "creation tool data and do not affect playback"), _tag);
                 IF_VERBOSE_PARSE(
                     std::ostringstream ss;
                     dumpTagBytes(_stream, ss);
