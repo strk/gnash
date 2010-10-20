@@ -50,7 +50,11 @@
 namespace gnash {
 namespace SWF {
 
-/// Anonymous namespace
+// Forward declarations
+namespace {
+    void inflateWrapper(SWFStream& in, void* buffer, int buffer_bytes);
+}
+
 namespace {
 
 /// Provide an IOChannel interface around a SWFStream for reading 
@@ -295,87 +299,6 @@ define_bits_jpeg2_loader(SWFStream& in, TagType tag, movie_definition& m,
 
 }
 
-#ifdef HAVE_ZLIB_H
-void inflate_wrapper(SWFStream& in, void* buffer, int buffer_bytes)
-    // Wrapper function -- uses Zlib to uncompress in_bytes worth
-    // of data from the input file into buffer_bytes worth of data
-    // into *buffer.
-{
-    assert(buffer);
-    assert(buffer_bytes > 0);
-
-    z_stream d_stream; /* decompression SWFStream */
-
-    d_stream.zalloc = (alloc_func)0;
-    d_stream.zfree = (free_func)0;
-    d_stream.opaque = (voidpf)0;
-
-    d_stream.next_in  = 0;
-    d_stream.avail_in = 0;
-
-    d_stream.next_out = static_cast<Byte*>(buffer);
-    d_stream.avail_out = static_cast<uInt>(buffer_bytes);
-
-    int err = inflateInit(&d_stream);
-    if (err != Z_OK) {
-        IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("inflate_wrapper() inflateInit() returned %d (%s)"),
-                err, d_stream.msg);
-        );
-        return;
-    }
-
-    const size_t CHUNKSIZE = 256;
-
-    boost::uint8_t buf[CHUNKSIZE];
-    unsigned long endTagPos = in.get_tag_end_position();
-
-    for (;;) {
-        unsigned int chunkSize = CHUNKSIZE;
-        assert(in.tell() <= endTagPos);
-        unsigned int availableBytes =  endTagPos - in.tell();
-        if (availableBytes < chunkSize) {
-            if (!availableBytes) {
-                // nothing more to read
-                IF_VERBOSE_MALFORMED_SWF(
-                    log_swferror(_("inflate_wrapper(): no end of zstream "
-                        "found within swf tag boundaries"));
-                );
-                break;
-            }
-            chunkSize = availableBytes;
-        }
-    
-        BOOST_STATIC_ASSERT(sizeof(char) == sizeof(boost::uint8_t));
-
-        // Fill the buffer    
-        in.read(reinterpret_cast<char*>(buf), chunkSize);
-        d_stream.next_in = &buf[0];
-        d_stream.avail_in = chunkSize;
-
-        err = inflate(&d_stream, Z_SYNC_FLUSH);
-        if (err == Z_STREAM_END) {
-            // correct end
-            break;
-        }
-
-        if (err != Z_OK) {
-            IF_VERBOSE_MALFORMED_SWF(
-                log_swferror(_("inflate_wrapper() inflate() returned %d (%s)"),
-                    err, d_stream.msg);
-            );
-            break;
-        }
-    }
-
-    err = inflateEnd(&d_stream);
-    if (err != Z_OK) {
-        log_error(_("inflate_wrapper() inflateEnd() return %d (%s)"),
-                err, d_stream.msg);
-    }
-}
-#endif // HAVE_ZLIB_H
-
 
 // loads a define_bits_jpeg3 tag. This is a jpeg file with an alpha
 // channel using zlib compression.
@@ -419,7 +342,7 @@ define_bits_jpeg3_loader(SWFStream& in, TagType tag, movie_definition& m,
 
     boost::scoped_array<boost::uint8_t> buffer(new boost::uint8_t[bufferLength]);
 
-    inflate_wrapper(in, buffer.get(), bufferLength);
+    inflateWrapper(in, buffer.get(), bufferLength);
 
     // TESTING:
     // magical trevor contains this tag
@@ -537,7 +460,7 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
     const size_t bufSize = colorTableSize * channels + pitch * height;
     boost::scoped_array<boost::uint8_t> buffer(new boost::uint8_t[bufSize]);
 
-    inflate_wrapper(in, buffer.get(), bufSize);
+    inflateWrapper(in, buffer.get(), bufSize);
     assert(in.tell() <= in.get_tag_end_position());
 
     switch (bitmap_format) {
@@ -628,7 +551,93 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
 
 }
 
-} // namespace gnash::SWF
+namespace {
+
+#ifdef HAVE_ZLIB_H
+// Wrapper function -- uses Zlib to uncompress in_bytes worth
+// of data from the input file into buffer_bytes worth of data
+// into *buffer.
+void
+inflateWrapper(SWFStream& in, void* buffer, int buffer_bytes)
+{
+    assert(buffer);
+    assert(buffer_bytes > 0);
+
+    z_stream d_stream; /* decompression SWFStream */
+
+    d_stream.zalloc = (alloc_func)0;
+    d_stream.zfree = (free_func)0;
+    d_stream.opaque = (voidpf)0;
+
+    d_stream.next_in  = 0;
+    d_stream.avail_in = 0;
+
+    d_stream.next_out = static_cast<Byte*>(buffer);
+    d_stream.avail_out = static_cast<uInt>(buffer_bytes);
+
+    int err = inflateInit(&d_stream);
+    if (err != Z_OK) {
+        IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("inflateWrapper() inflateInit() returned %d (%s)"),
+                err, d_stream.msg);
+        );
+        return;
+    }
+
+    const size_t CHUNKSIZE = 256;
+
+    boost::uint8_t buf[CHUNKSIZE];
+    unsigned long endTagPos = in.get_tag_end_position();
+
+    for (;;) {
+        unsigned int chunkSize = CHUNKSIZE;
+        assert(in.tell() <= endTagPos);
+        unsigned int availableBytes =  endTagPos - in.tell();
+        if (availableBytes < chunkSize) {
+            if (!availableBytes) {
+                // nothing more to read
+                IF_VERBOSE_MALFORMED_SWF(
+                    log_swferror(_("inflateWrapper(): no end of zstream "
+                        "found within swf tag boundaries"));
+                );
+                break;
+            }
+            chunkSize = availableBytes;
+        }
+    
+        BOOST_STATIC_ASSERT(sizeof(char) == sizeof(boost::uint8_t));
+
+        // Fill the buffer    
+        in.read(reinterpret_cast<char*>(buf), chunkSize);
+        d_stream.next_in = &buf[0];
+        d_stream.avail_in = chunkSize;
+
+        err = inflate(&d_stream, Z_SYNC_FLUSH);
+        if (err == Z_STREAM_END) {
+            // correct end
+            break;
+        }
+
+        if (err != Z_OK) {
+            IF_VERBOSE_MALFORMED_SWF(
+                log_swferror(_("inflateWrapper() inflate() returned %d (%s)"),
+                    err, d_stream.msg);
+            );
+            break;
+        }
+    }
+
+    err = inflateEnd(&d_stream);
+    if (err != Z_OK) {
+        log_error(_("inflateWrapper() inflateEnd() return %d (%s)"),
+                err, d_stream.msg);
+    }
+}
+#endif // HAVE_ZLIB_H
+
+} // unnamed namespace
+
+} // namespace SWF
 } // namespace gnash
 
 // Local Variables:
