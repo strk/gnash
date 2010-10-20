@@ -54,11 +54,6 @@
 #error Dump gui requires sys/time.h header (POSIX)
 #endif
 
-// For gettimeofday  TODO:  Use something better for main loop;
-//                          something that works on Windows?
-#include <sys/time.h>
-#include <unistd.h>
-
 // Only include signal handlers on OS' that support it
 #ifdef HAVE_SIGNAL_H
 #include <signal.h>
