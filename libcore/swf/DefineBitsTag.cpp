@@ -53,7 +53,7 @@ namespace SWF {
 
 // Forward declarations
 namespace {
-    void inflateWrapper(SWFStream& in, void* buffer, int buffer_bytes);
+    void inflateWrapper(SWFStream& in, void* buffer, size_t buffer_bytes);
 
     std::auto_ptr<image::GnashImage> readDefineBitsJpeg(SWFStream& in,
             movie_definition& m);
@@ -281,37 +281,56 @@ readDefineBitsJpeg(SWFStream& /*in*/, movie_definition& m)
     return im;
 }
 
-
-std::auto_ptr<image::GnashImage>
-readDefineBitsJpeg2(SWFStream& in)
+/// Check the file type of the stream
+//
+/// This peeks at the first three bytes. The stream position after
+/// the function returns is the same as at the call time.
+//
+/// If the stream is too short to determine the type, a ParserException
+/// is thrown.
+FileType
+checkFileType(SWFStream& in)
 {
+#ifndef NDEBUG
+    const size_t start = in.tell();
+#endif
 
-    char buf[3];
-    if (in.read(buf, 3) < 3) {
-        log_swferror(_("DEFINEBITS data too short to read type header"));
-        return std::auto_ptr<image::GnashImage>();
+    const size_t bytes = 3;
+    char buf[bytes];
+
+    const size_t read = in.read(buf, bytes);
+    in.seek(in.tell() - read);
+
+    if (read < bytes) {
+        throw ParserException("DefineBits data is much too short!");
     }
-    in.seek(in.tell() - 3);
-
-    FileType ft = GNASH_FILETYPE_JPEG;  
 
     // Check the data type. The pp version 9,0,115,0 supports PNG and GIF
     // in DefineBits tags, though it is not documented. The version makes
     // no difference.
     if (std::equal(buf, buf + 3, "\x89PN")) {
-        ft = GNASH_FILETYPE_PNG;
+        return GNASH_FILETYPE_PNG;
     }
-    else if (std::equal(buf, buf + 3, "GIF")) {
-        ft = GNASH_FILETYPE_GIF;
+
+    if (std::equal(buf, buf + 3, "GIF")) {
+        return GNASH_FILETYPE_GIF;
     }
+    return GNASH_FILETYPE_JPEG;  
+
+    assert(in.tell() == start);
+}
+
+
+std::auto_ptr<image::GnashImage>
+readDefineBitsJpeg2(SWFStream& in)
+{
+    const FileType ft = checkFileType(in);
 
     // Read the image data.
     boost::shared_ptr<IOChannel> ad(StreamAdapter::getFile(in,
                 in.get_tag_end_position()).release());
 
-    std::auto_ptr<image::GnashImage> im(image::Input::readImageData(ad, ft));
-    return im;
-
+    return image::Input::readImageData(ad, ft);
 }
 
 
@@ -322,6 +341,20 @@ readDefineBitsJpeg3(SWFStream& in)
 {
     in.ensureBytes(4);
     const boost::uint32_t jpeg_size = in.read_u32();
+
+    const FileType ft = checkFileType(in);
+
+    // If the image doesn't contain JPEG data, it also has no alpha
+    // data.
+    if (ft != GNASH_FILETYPE_JPEG) {
+        log_debug("TESTING: non-JPEG data in DefineBitsJpeg3");
+        // Read the image data.
+        boost::shared_ptr<IOChannel> ad(StreamAdapter::getFile(in,
+                    in.get_tag_end_position()).release());
+        return image::Input::readImageData(ad, ft);
+    }
+
+    // We assume it's a JPEG with alpha data.
     const boost::uint32_t alpha_position = in.tell() + jpeg_size;
 
 #ifndef HAVE_ZLIB_H
@@ -531,17 +564,15 @@ readLossless(SWFStream& in, TagType tag)
 // of data from the input file into buffer_bytes worth of data
 // into *buffer.
 void
-inflateWrapper(SWFStream& in, void* buffer, int buffer_bytes)
+inflateWrapper(SWFStream& in, void* buffer, size_t buffer_bytes)
 {
     assert(buffer);
-    assert(buffer_bytes > 0);
 
-    z_stream d_stream; /* decompression SWFStream */
+    z_stream d_stream;
 
-    d_stream.zalloc = (alloc_func)0;
-    d_stream.zfree = (free_func)0;
-    d_stream.opaque = (voidpf)0;
-
+    d_stream.zalloc = 0;
+    d_stream.zfree = 0;
+    d_stream.opaque = 0;
     d_stream.next_in  = 0;
     d_stream.avail_in = 0;
 
@@ -565,7 +596,8 @@ inflateWrapper(SWFStream& in, void* buffer, int buffer_bytes)
     for (;;) {
         unsigned int chunkSize = CHUNKSIZE;
         assert(in.tell() <= endTagPos);
-        unsigned int availableBytes =  endTagPos - in.tell();
+        const size_t availableBytes =  endTagPos - in.tell();
+
         if (availableBytes < chunkSize) {
             if (!availableBytes) {
                 // nothing more to read
