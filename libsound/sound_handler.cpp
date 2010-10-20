@@ -22,15 +22,17 @@
 #include "InputStream.h" // for use
 #include "EmbedSoundInst.h" // for upcasting to InputStream
 #include "log.h" // for use
+#include "WallClockTimer.h" // for debugging
 
 #include <boost/cstdint.hpp> // For C99 int types
 #include <vector> // for use
+#include <cmath> // for floor (debugging)
 
 // Debug create_sound/delete_sound/playSound/stop_sound, loops
 //#define GNASH_DEBUG_SOUNDS_MANAGEMENT
 
 // Debug samples fetching
-//#define GNASH_DEBUG_SAMPLES_FETCHING
+//#define GNASH_DEBUG_SAMPLES_FETCHING 1
 
 namespace gnash {
 namespace sound {
@@ -543,6 +545,21 @@ sound_handler::unplugAllInputStreams()
 void
 sound_handler::fetchSamples (boost::int16_t* to, unsigned int nSamples)
 {
+#ifdef GNASH_DEBUG_SAMPLES_FETCHING 
+    // should we use SystemClock for checking this ?
+    static WallClockTimer timerTotal;
+    static WallClockTimer timerLocal;
+    static size_t fetched = 0;
+    fetched += nSamples;
+    boost::uint32_t tl = timerLocal.elapsed();
+    if ( tl > 1000 ) {
+        boost::uint32_t tt = timerTotal.elapsed();
+        log_debug("Samples fetch frequency: %d KHz (expected 44.100)",
+            floor(fetched*500.0/tt)/1000);
+        timerLocal.restart();
+    }
+#endif
+
     if ( isPaused() ) return;
 
     float finalVolumeFact = getFinalVolume()/100.0;
@@ -555,8 +572,8 @@ sound_handler::fetchSamples (boost::int16_t* to, unsigned int nSamples)
         // A buffer to fetch InputStream samples into
         boost::scoped_array<boost::int16_t> buf ( new boost::int16_t[nSamples] );
 
-#ifdef GNASH_DEBUG_SAMPLES_FETCHING
-        log_debug("Fetching %d samples for %d input streams", nSamples, _inputStreams.size());
+#if GNASH_DEBUG_SAMPLES_FETCHING > 1
+        log_debug("Fetching %d samples from each of %d input streams", nSamples, _inputStreams.size());
 #endif
 
         // Loop through the aux streamers sounds
@@ -573,7 +590,7 @@ sound_handler::fetchSamples (boost::int16_t* to, unsigned int nSamples)
                 std::fill(buf.get()+wrote, buf.get()+nSamples, 0);
             }
 
-#ifdef GNASH_DEBUG_SAMPLES_FETCHING
+#if GNASH_DEBUG_SAMPLES_FETCHING > 1
             log_debug("  fetched %d/%d samples from input stream %p"
                     " (%d samples fetchehd in total)",
                     wrote, nSamples, is, is->samplesFetched());
