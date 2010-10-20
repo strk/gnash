@@ -1,4 +1,4 @@
-// tag_loaders.cpp: SWF tags loaders, for Gnash.
+// DefineBitsTag.cpp: bitmap tag loading for Gnash.
 //
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
 //   Foundation, Inc
@@ -22,11 +22,12 @@
 #include "gnashconfig.h" // HAVE_ZLIB_H, USE_SWFTREE
 #endif
 
-#include "tag_loaders.h"
+#include "DefineBitsTag.h"
 
 #include <limits>
 #include <cassert>
 #include <boost/static_assert.hpp>
+#include <boost/scoped_array.hpp>
 
 #include "IOChannel.h"
 #include "utility.h"
@@ -53,6 +54,13 @@ namespace SWF {
 // Forward declarations
 namespace {
     void inflateWrapper(SWFStream& in, void* buffer, int buffer_bytes);
+
+    std::auto_ptr<image::GnashImage> readDefineBitsJpeg(SWFStream& in,
+            movie_definition& m);
+    std::auto_ptr<image::GnashImage> readDefineBitsJpeg2(SWFStream& in);
+    std::auto_ptr<image::GnashImage> readDefineBitsJpeg3(SWFStream& in);
+    std::auto_ptr<image::GnashImage> readLossless(SWFStream& in, TagType tag);
+
 }
 
 namespace {
@@ -185,16 +193,12 @@ jpeg_tables_loader(SWFStream& in, TagType tag, movie_definition& m,
     m.set_jpeg_loader(input);
 }
 
-// A JPEG image without included tables; those should be in an
-// existing image::JpegInput object stored in the movie.
 void
-define_bits_jpeg_loader(SWFStream& in, TagType tag, movie_definition& m,
-		const RunResources& r)
+DefineBitsTag::loader(SWFStream& in, TagType tag, movie_definition& m,
+        const RunResources& r)
 {
-    assert(tag == SWF::DEFINEBITS); // 6
-
     in.ensureBytes(2);
-    boost::uint16_t id = in.read_u16();
+    const boost::uint16_t id = in.read_u16();
 
     if (m.getBitmap(id)) {
         IF_VERBOSE_MALFORMED_SWF(
@@ -204,30 +208,29 @@ define_bits_jpeg_loader(SWFStream& in, TagType tag, movie_definition& m,
         return;
     }
 
-    // Read the image data.
-    image::JpegInput* j_in = m.get_jpeg_loader();
-    if (!j_in) {
-        IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("DEFINEBITS: No jpeg loader registered in movie "
-                    "definition - discarding bitmap DisplayObject %d"), id);
-        );
-        return;
+    std::auto_ptr<image::GnashImage> im;
+
+    switch (tag) {
+        case SWF::DEFINEBITS:
+            im = readDefineBitsJpeg(in, m);
+            break;
+        case SWF::DEFINEBITSJPEG2:
+            im = readDefineBitsJpeg2(in);
+            break;
+        case SWF::DEFINEBITSJPEG3:
+            im = readDefineBitsJpeg3(in);
+            break;
+        case SWF::DEFINELOSSLESS:
+        case SWF::DEFINELOSSLESS2:
+            im = readLossless(in, tag);
+            break;
+
+        default:
+            std::abort();
     }
 
-    j_in->discardPartialBuffer();
-    
-    std::auto_ptr<image::GnashImage> im;
-    try {
-        im = image::JpegInput::readSWFJpeg2WithTables(*j_in);
-    }
-    catch (const std::exception& e) {
-        IF_VERBOSE_MALFORMED_SWF(
-            log_swferror("Error reading jpeg2 with headers for DisplayObject "
-                "id %d: %s", id, e.what());
-        );
-        return;
-    }
-    
+    if (!im.get()) return;
+
     Renderer* renderer = r.renderer();
     if (!renderer) {
         IF_VERBOSE_PARSE(log_parse(_("No renderer, not adding bitmap")));
@@ -239,33 +242,49 @@ define_bits_jpeg_loader(SWFStream& in, TagType tag, movie_definition& m,
     m.addBitmap(id, bi);
 }
 
+namespace {
 
-void
-define_bits_jpeg2_loader(SWFStream& in, TagType tag, movie_definition& m,
-		const RunResources& r)
+// A JPEG image without included tables; those should be in an
+// existing image::JpegInput object stored in the movie.
+std::auto_ptr<image::GnashImage>
+readDefineBitsJpeg(SWFStream& /*in*/, movie_definition& m)
 {
-    assert(tag == SWF::DEFINEBITSJPEG2); // 21
+    std::auto_ptr<image::GnashImage> im;
 
-    in.ensureBytes(2);
-    boost::uint16_t id = in.read_u16();
-
-    IF_VERBOSE_PARSE(
-        log_parse(_("  define_bits_jpeg2_loader: charid = %d pos = %ld"),
-              id, in.tell());
-    );
-    
-    if (m.getBitmap(id)) {
+    // Read the image data.
+    image::JpegInput* j_in = m.get_jpeg_loader();
+    if (!j_in) {
         IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("DEFINEBITSJPEG2: Duplicate id (%d) for bitmap "
-                    "DisplayObject - discarding it"), id);
+            log_swferror(_("DEFINEBITS: No jpeg loader registered in movie "
+                    "definition - discarding bitmap"));
         );
-        return;
+        return im;
     }
+
+    j_in->discardPartialBuffer();
+    
+    try {
+        im = image::JpegInput::readSWFJpeg2WithTables(*j_in);
+    }
+    catch (const std::exception& e) {
+        IF_VERBOSE_MALFORMED_SWF(
+            log_swferror("Error reading jpeg2 with headers for DisplayObject "
+                "%s", e.what());
+        );
+    }
+    
+    return im;
+}
+
+
+std::auto_ptr<image::GnashImage>
+readDefineBitsJpeg2(SWFStream& in)
+{
 
     char buf[3];
     if (in.read(buf, 3) < 3) {
         log_swferror(_("DEFINEBITS data too short to read type header"));
-        return;
+        return std::auto_ptr<image::GnashImage>();
     }
     in.seek(in.tell() - 3);
 
@@ -286,43 +305,23 @@ define_bits_jpeg2_loader(SWFStream& in, TagType tag, movie_definition& m,
                 in.get_tag_end_position()).release());
 
     std::auto_ptr<image::GnashImage> im(image::Input::readImageData(ad, ft));
-
-    Renderer* renderer = r.renderer();
-    if (!renderer) {
-        IF_VERBOSE_PARSE(log_parse(_("No renderer, not adding bitmap")));
-        return;
-    }    
-    boost::intrusive_ptr<CachedBitmap> bi = renderer->createCachedBitmap(im);
-
-    // add bitmap to movie under DisplayObject id.
-    m.addBitmap(id, bi);
+    return im;
 
 }
 
 
 // loads a define_bits_jpeg3 tag. This is a jpeg file with an alpha
 // channel using zlib compression.
-void
-define_bits_jpeg3_loader(SWFStream& in, TagType tag, movie_definition& m,
-		const RunResources& r)
+std::auto_ptr<image::GnashImage>
+readDefineBitsJpeg3(SWFStream& in)
 {
-    assert(tag == SWF::DEFINEBITSJPEG3); // 35
-
-    in.ensureBytes(2);
-    const boost::uint16_t id = in.read_u16();
-
-    IF_VERBOSE_PARSE(
-        log_parse(_("  define_bits_jpeg3_loader: charid = %d pos = %lx"),
-              id, in.tell());
-    );
-
     in.ensureBytes(4);
     const boost::uint32_t jpeg_size = in.read_u32();
     const boost::uint32_t alpha_position = in.tell() + jpeg_size;
 
 #ifndef HAVE_ZLIB_H
     log_error(_("gnash is not linked to zlib -- can't load jpeg3 image data"));
-    return;
+    return std::auto_ptr<image::GnashImage>();
 #else
 
     // Read rgb data.
@@ -331,7 +330,7 @@ define_bits_jpeg3_loader(SWFStream& in, TagType tag, movie_definition& m,
     std::auto_ptr<image::ImageRGBA> im = image::Input::readSWFJpeg3(ad);
     
     /// Failure to read the jpeg.
-    if (!im.get()) return;
+    if (!im.get()) return std::auto_ptr<image::GnashImage>();
 
     // Read alpha channel.
     in.seek(alpha_position);
@@ -349,28 +348,16 @@ define_bits_jpeg3_loader(SWFStream& in, TagType tag, movie_definition& m,
     //  ea8bbad50ccbc52dd734dfc93a7f06a7  6964trev3c.swf
     image::mergeAlpha(*im, buffer.get(), bufferLength);
 
-    Renderer* renderer = r.renderer();
-    if (!renderer) {
-        IF_VERBOSE_PARSE(log_parse(_("No renderer, not adding bitmap")));
-        return;
-    }    
-    boost::intrusive_ptr<CachedBitmap> bi = renderer->createCachedBitmap(
-            static_cast<std::auto_ptr<image::GnashImage> >(im));
-
-    // add bitmap to movie under DisplayObject id.
-    m.addBitmap(id, bi);
 #endif
+    return static_cast<std::auto_ptr<image::GnashImage> >(im);
 }
 
 
-void
-define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
-		const RunResources& r)
+std::auto_ptr<image::GnashImage>
+readLossless(SWFStream& in, TagType tag)
 {
     assert(tag == SWF::DEFINELOSSLESS || tag == SWF::DEFINELOSSLESS2);
-    in.ensureBytes(2 + 2 + 2 + 1); // the initial header 
-
-    const boost::uint16_t id = in.read_u16();
+    in.ensureBytes(2 + 2 + 1); // the initial header 
 
     // 3 == 8 bit, 4 == 16 bit, 5 == 32 bit
     const boost::uint8_t bitmap_format = in.read_u8();
@@ -378,34 +365,25 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
     const boost::uint16_t height = in.read_u16();
 
     IF_VERBOSE_PARSE(
-        log_parse(_("  defbitslossless2: tag = %d, id = %d, fmt = %d, "
-                "w = %d, h = %d"), tag, id, bitmap_format, width, height);
+        log_parse(_("  defbitslossless2: tag = %d, fmt = %d, "
+                "w = %d, h = %d"), tag, bitmap_format, width, height);
     );
 
     if (!width || !height) {
          IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("Bitmap DisplayObject %d has a height or width of 0"),
-                id);
+            log_swferror(_("Bitmap DisplayObject has a height or width of 0"));
         );   
-        return;  
-    }
-
-    // No need to parse any further if it already exists, as we aren't going
-    // to add it.
-    if (m.getBitmap(id)) {
-        IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("DEFINEBITSLOSSLESS: Duplicate id (%d) "
-                           "for bitmap DisplayObject - discarding it"), id);
-        );
-    }
+        return std::auto_ptr<image::GnashImage>();  
+    } 
+    
+    std::auto_ptr<image::GnashImage> image;
 
 #ifndef HAVE_ZLIB_H
     log_error(_("gnash is not linked to zlib -- can't load zipped image data"));
-    return;
+    return image;
 #else
 
     unsigned short channels;
-    std::auto_ptr<image::GnashImage> image;
     bool alpha = false;
 
     try {
@@ -429,7 +407,7 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
         // size. This isn't usually from operator new.
         log_error(_("Will not allocate %1%x%2% image in DefineBitsLossless "
                 "tag"), width, height);
-        return;
+        return image;
     }
 
     unsigned short bytes_per_pixel;
@@ -453,7 +431,7 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
 
         default:
             log_error(_("Unknown bitmap format. Ignoring"));
-            return;
+            return std::auto_ptr<image::GnashImage>();
     }
 
     const size_t pitch = (width * bytes_per_pixel + 3) &~ 3;
@@ -538,20 +516,11 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
 
     }
 
-    Renderer* renderer = r.renderer();
-    if (!renderer) {
-        IF_VERBOSE_PARSE(log_parse(_("No renderer, not adding bitmap")));
-        return;
-    }    
-    boost::intrusive_ptr<CachedBitmap> bi = renderer->createCachedBitmap(image);
-
-    // add bitmap to movie under DisplayObject id.
-    m.addBitmap(id, bi);
 #endif // HAVE_ZLIB_H
+    
+    return image;
 
 }
-
-namespace {
 
 #ifdef HAVE_ZLIB_H
 // Wrapper function -- uses Zlib to uncompress in_bytes worth

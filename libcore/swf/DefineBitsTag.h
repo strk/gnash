@@ -35,17 +35,13 @@ namespace SWF {
 void jpeg_tables_loader(SWFStream&, TagType, movie_definition&,
 		const RunResources&);
 
-void define_bits_jpeg_loader(SWFStream&, TagType, movie_definition&,
-		const RunResources&);
+class DefineBitsTag
+{
+public:
+    static void loader(SWFStream&, TagType, movie_definition&,
+            const RunResources&);
 
-void define_bits_jpeg2_loader(SWFStream&, TagType, movie_definition&,
-		const RunResources&);
-
-void define_bits_jpeg3_loader(SWFStream&, TagType, movie_definition&,
-		const RunResources&);
-
-void define_bits_lossless_2_loader(SWFStream&, TagType, movie_definition&,
-		const RunResources&);
+};
 
 } // namespace SWF
 } // namespace gnash
