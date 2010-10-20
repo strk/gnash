@@ -577,12 +577,10 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
 
     // No need to parse any further if it already exists, as we aren't going
     // to add it.
-    if (m.getBitmap(id))
-    {
+    if (m.getBitmap(id)) {
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("DEFINEBITSLOSSLESS: Duplicate id (%d) "
-                           "for bitmap DisplayObject - discarding it"),
-                id);
+                           "for bitmap DisplayObject - discarding it"), id);
         );
     }
 
@@ -595,20 +593,29 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
     std::auto_ptr<image::GnashImage> image;
     bool alpha = false;
 
-    switch (tag)
-    {
-        case SWF::DEFINELOSSLESS:
-            image.reset(new image::ImageRGB(width, height));
-            channels = 3;
-            break;
-        case SWF::DEFINELOSSLESS2:
-            image.reset(new image::ImageRGBA(width, height));
-            channels = 4;
-            alpha = true;
-            break;
-        default:
-            // This is already asserted.
-            std::abort();
+    try {
+
+        switch (tag) {
+            case SWF::DEFINELOSSLESS:
+                image.reset(new image::ImageRGB(width, height));
+                channels = 3;
+                break;
+            case SWF::DEFINELOSSLESS2:
+                image.reset(new image::ImageRGBA(width, height));
+                channels = 4;
+                alpha = true;
+                break;
+            default:
+                // This is already asserted.
+                std::abort();
+        }
+    }
+    catch (const std::bad_alloc&) {
+        // Image constructors will throw bad_alloc if they don't like the
+        // size. This isn't usually from operator new.
+        log_error(_("Will not allocate %1%x%2% image in DefineBitsLossless "
+                "tag"), width, height);
+        return;
     }
 
     unsigned short bytes_per_pixel;
