@@ -77,15 +77,14 @@ public:
     /// @param rgbData  The buffer for writing raw RGB data to.
     void readScanline(unsigned char* rgb_data);
 
-
     /// Create a GifInput and transfer ownership to the caller.
     //
     /// @param in   The IOChannel to read GIF data from.
     DSOEXPORT static std::auto_ptr<Input> create(
             boost::shared_ptr<IOChannel> in)
     {
-        std::auto_ptr<Input> ret ( new GifInput(in) );
-        if ( ret.get() ) ret->read();
+        std::auto_ptr<Input> ret(new GifInput(in));
+        if (ret.get()) ret->read();
         return ret;
     }
 
@@ -93,6 +92,11 @@ private:
     
     /// Initialize gif_lib
     void init();
+
+    /// Process a single image record
+    //
+    /// @return     false if no image was parsed, true if we have an image.
+    bool processRecord(GifRecordType record);
 
     // State needed for input.
     GifFileType* _gif;

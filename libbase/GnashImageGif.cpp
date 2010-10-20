@@ -103,6 +103,109 @@ GifInput::readScanline(unsigned char* rgbData)
 
 }
 
+bool
+GifInput::processRecord(GifRecordType record)
+{
+    switch (record) {
+
+        case IMAGE_DESC_RECORD_TYPE:
+        {
+            // Fill the _gif->Image fields 
+            if (DGifGetImageDesc(_gif) != GIF_OK) {
+                throw ParserException(_("GIF: Error retrieving image "
+                            "description"));
+            }
+            const int backgroundColor = _gif->SBackGroundColor;
+
+            // Set the height dimension of the array
+            _gifData.reset(new PixelRow[getHeight()]);
+            
+            // The GIF 'screen' width and height
+            const size_t screenWidth = getWidth();
+            const size_t screenHeight = getHeight();
+
+            // Set all the pixels to the background colour.
+            for (size_t i = 0; i < screenHeight; ++i) {
+                // Set the width dimension of the array
+                _gifData[i].reset(new GifPixelType[screenWidth]);
+                // Fill all the pixels with the background color.
+                std::fill_n(_gifData[i].get(), screenWidth,
+                        backgroundColor);
+            }
+            
+            // The position of the image on the GIF 'screen'
+            const size_t imageHeight = _gif->Image.Height;
+            const size_t imageWidth = _gif->Image.Width;
+            const size_t imageTop = _gif->Image.Top;
+            const size_t imageLeft = _gif->Image.Left;
+            
+            if (imageHeight + imageTop > screenHeight ||
+                imageWidth + imageLeft > screenWidth) {
+                throw ParserException(_("GIF: invalid image data "
+                            "(bounds outside GIF screen)"));
+            }
+
+            // Handle interlaced data in four passes.
+            if (_gif->Image.Interlace) {
+                log_debug(_("Found interlaced GIF (%d x %d)"),
+                        screenWidth, screenHeight);
+
+                // The order of interlaced GIFs.
+                const int interlacedOffsets[] = { 0, 4, 2, 1 };
+                const int interlacedJumps[] = { 8, 8, 4, 2 };
+
+                for (size_t i = 0; i < 4; ++i) {
+
+                    for (size_t j = imageTop + interlacedOffsets[i];
+                                j < imageTop + imageHeight;
+                                j += interlacedJumps[i]) {
+
+                        if (DGifGetLine(_gif, &_gifData[j][imageLeft],
+                                    imageWidth) != GIF_OK) {
+
+                            throw ParserException(_("GIF: failed reading "
+                                        "pixel data"));
+
+                        }
+                    }
+                }
+                // One record is enough.
+                return true;
+            }
+
+            // Non-interlaced data.
+            log_debug(_("Found non-interlaced GIF (%d x %d)"),
+                    screenWidth, screenHeight);
+
+            for (size_t i = imageTop; i < imageHeight; ++i) {
+                // Read the gif data into the gif array.
+                if (DGifGetLine(_gif, &_gifData[i][imageLeft], imageWidth)
+                        != GIF_OK) {
+                    throw ParserException(_("GIF: failed reading "
+                                "pixel data"));
+                }                    
+            }
+            // One record is enough.
+            return true;
+        }
+
+        case EXTENSION_RECORD_TYPE:
+            // Skip all extension records.
+            GifByteType* extension;
+            int extCode;
+            DGifGetExtension(_gif, &extCode, &extension);
+            while (extension) {
+                if (DGifGetExtensionNext(_gif, &extension) == GIF_ERROR) {
+                    break;
+                }
+            }
+            break;         
+        default:
+            break;
+    }
+    return false;
+}
+
 void
 GifInput::read()
 {
@@ -119,101 +222,8 @@ GifInput::read()
         if (DGifGetRecordType(_gif, &record) != GIF_OK) {
             throw ParserException(_("GIF: Error retrieving record type"));
         }
-        
-        switch (record) {
-
-            case IMAGE_DESC_RECORD_TYPE:
-            {
-                // Fill the _gif->Image fields 
-                if (DGifGetImageDesc(_gif) != GIF_OK) {
-                    throw ParserException(_("GIF: Error retrieving image "
-                                "description"));
-                }
-                const int backgroundColor = _gif->SBackGroundColor;
-
-                // Set the height dimension of the array
-                _gifData.reset(new PixelRow[getHeight()]);
-                
-                // The GIF 'screen' width and height
-                const size_t screenWidth = getWidth();
-                const size_t screenHeight = getHeight();
-
-                // Set all the pixels to the background colour.
-                for (size_t i = 0; i < screenHeight; ++i) {
-                    // Set the width dimension of the array
-                    _gifData[i].reset(new GifPixelType[screenWidth]);
-                    // Fill all the pixels with the background color.
-                    std::fill_n(_gifData[i].get(), screenWidth,
-                            backgroundColor);
-                }
-                
-                // The position of the image on the GIF 'screen'
-                const size_t imageHeight = _gif->Image.Height;
-                const size_t imageWidth = _gif->Image.Width;
-                const size_t imageTop = _gif->Image.Top;
-                const size_t imageLeft = _gif->Image.Left;
-                
-                if (imageHeight + imageTop > screenHeight ||
-                    imageWidth + imageLeft > screenWidth) {
-                    throw ParserException(_("GIF: invalid image data "
-                                "(bounds outside GIF screen)"));
-                }
-
-                // Handle interlaced data in four passes.
-                if (_gif->Image.Interlace) {
-                    log_debug(_("Found interlaced GIF (%d x %d)"),
-                            screenWidth, screenHeight);
-
-                    // The order of interlaced GIFs.
-                    const int interlacedOffsets[] = { 0, 4, 2, 1 };
-                    const int interlacedJumps[] = { 8, 8, 4, 2 };
-
-                    for (size_t i = 0; i < 4; ++i) {
-
-                        for (size_t j = imageTop + interlacedOffsets[i];
-                                    j < imageTop + imageHeight;
-                                    j += interlacedJumps[i]) {
-
-                            if (DGifGetLine(_gif, &_gifData[j][imageLeft],
-                                        imageWidth) != GIF_OK) {
-
-                                throw ParserException(_("GIF: failed reading "
-                                            "pixel data"));
-
-                            }
-                        }
-                    }
-                    break;
-                }
-
-                // Non-interlaced data.
-                log_debug(_("Found non-interlaced GIF (%d x %d)"),
-                        screenWidth, screenHeight);
-
-                for (size_t i = imageTop; i < imageHeight; ++i) {
-                    // Read the gif data into the gif array.
-                    if (DGifGetLine(_gif, &_gifData[i][imageLeft], imageWidth)
-                            != GIF_OK) {
-                        throw ParserException(_("GIF: failed reading "
-                                    "pixel data"));
-                    }                    
-                }
-                break;
-            }
-            case EXTENSION_RECORD_TYPE:
-                // Skip all extension records.
-                GifByteType* extension;
-                int extCode;
-                DGifGetExtension(_gif, &extCode, &extension);
-                while (extension) {
-                    if (DGifGetExtensionNext(_gif, &extension) == GIF_ERROR) {
-                        break;
-                    }
-                }
-                break;         
-            default:
-                break;
-        }
+        if (processRecord(record)) break;
+            
     } while (record != TERMINATE_RECORD_TYPE);
 
     // Set the type to RGB
