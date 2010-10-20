@@ -348,6 +348,7 @@ readDefineBitsJpeg3(SWFStream& in, TagType tag)
     const boost::uint32_t jpeg_size = in.read_u32();
 
     if (tag == DEFINEBITSJPEG4) {
+        in.ensureBytes(2);
         const float deblocking = in.read_short_ufixed();
         IF_VERBOSE_PARSE(
             log_parse("DefineBitsJpeg4 deblocking: %1%", deblocking);
