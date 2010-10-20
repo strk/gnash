@@ -153,7 +153,9 @@ bool
 DumpGui::run()
 {
 
-    log_debug("DumpGui entering main loop with interval of %d", _interval);
+    log_debug("DumpGui entering main loop with interval of %d ms", _interval);
+
+    size_t usecs_interval = _interval*1000;
 
     WallClockTimer timer;
 
@@ -167,7 +169,7 @@ DumpGui::run()
             writeFrame();
         }
   
-        gnashSleep(_interval);
+        gnashSleep(usecs_interval);
 
         // check if we've reached a timeout
         if (_timeout && timer.elapsed() > _timeout ) {
