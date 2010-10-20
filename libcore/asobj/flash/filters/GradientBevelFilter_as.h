@@ -16,8 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __GNASH_ASOBJ_GRADIENTBEVELFILTER_H__
-#define __GNASH_ASOBJ_GRADIENTBEVELFILTER_H__
+#ifndef GNASH_ASOBJ_GRADIENTBEVELFILTER_H
+#define GNASH_ASOBJ_GRADIENTBEVELFILTER_H
 
 namespace gnash {
 
@@ -29,6 +29,5 @@ void gradientbevelfilter_class_init(as_object& where, const ObjectURI& uri);
 
 } // end of gnash namespace
 
-// __GNASH_ASOBJ_GRADIENTBEVELFILTER_H__
 #endif
 

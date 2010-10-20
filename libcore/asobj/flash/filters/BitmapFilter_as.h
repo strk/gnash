@@ -19,19 +19,19 @@
 #ifndef GNASH_ASOBJ_BITMAPFILTER_H
 #define GNASH_ASOBJ_BITMAPFILTER_H
 
-
 #include "Global_as.h"
 
 namespace gnash {
+    class as_object;
+    struct ObjectURI;
+}
 
-class as_object;
-struct ObjectURI;
+namespace gnash {
 
 /// Initialize the global BitmapFilter class
 void bitmapfilter_class_init(as_object& where, const ObjectURI& uri);
 
 void registerBitmapFilterNative(as_object& global);
-
 
 /// Convenience function only for BitmapFilter subclasses.
 //

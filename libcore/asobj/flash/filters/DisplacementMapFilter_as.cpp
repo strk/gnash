@@ -20,6 +20,7 @@
 
 
 #include "DisplacementMapFilter_as.h"
+
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -27,6 +28,7 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "BitmapFilter_as.h"
+#include "Filters.h"
 
 #include <sstream>
 

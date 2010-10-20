@@ -17,18 +17,10 @@
 
 
 #include "filter_factory.h"
-#include "BitmapFilter.h"
-#include "BlurFilter.h"
-#include "DropShadowFilter.h"
-#include "GlowFilter.h"
-#include "BevelFilter.h"
-#include "GradientGlowFilter.h"
-#include "ConvolutionFilter.h"
-#include "ColorMatrixFilter.h"
-#include "GradientBevelFilter.h"
 
 #include "log.h"
 #include "SWFStream.h"
+#include "Filters.h"
 
 namespace gnash {
 
@@ -102,7 +94,7 @@ filter_factory::read(SWFStream& in, bool read_multiple, Filters* store)
         }
 
         // Protect against exceptions and such by storing before we read.
-        Filter p(the_filter);
+        boost::shared_ptr<BitmapFilter> p(the_filter);
         if (!p->read(in))
         {
             IF_VERBOSE_MALFORMED_SWF(

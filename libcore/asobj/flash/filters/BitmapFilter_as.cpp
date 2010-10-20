@@ -15,14 +15,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+#include "BitmapFilter_as.h"
 
 #include "namedStrings.h"
 #include "as_object.h"
-#include "BitmapFilter.h"
 #include "VM.h"
 #include "builtin_function.h"
 #include "NativeFunction.h"
 #include "Global_as.h"
+#include "Filters.h"
 
 namespace gnash {
 
