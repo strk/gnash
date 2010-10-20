@@ -62,7 +62,6 @@ EXTENSIONS_API = \
 	CallStack.h \
 	SafeStack.h \
 	VM.h \
-	Machine.h \
 	$(NULL)
 
 if ENABLE_AVM2

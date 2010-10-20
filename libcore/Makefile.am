@@ -154,7 +154,7 @@ noinst_HEADERS = \
 	debugger.h \
 	TextField.h \
 	Filters.h \
-        parser/filter_factory.h \
+	parser/filter_factory.h \
 	Font.h \
 	fontlib.h \
 	Shape.h \
