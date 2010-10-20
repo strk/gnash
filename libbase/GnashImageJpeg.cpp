@@ -232,8 +232,6 @@ JpegInput::JpegInput(boost::shared_ptr<IOChannel> in)
 
 JpegInput::~JpegInput()
 {
-    finishImage();
-
     rw_source_IOChannel* src =
         reinterpret_cast<rw_source_IOChannel*>(m_cinfo.src);
 
@@ -405,8 +403,14 @@ JpegInput::readScanline(unsigned char* rgb_data)
     assert(_compressorOpened);
     assert(m_cinfo.output_scanline < m_cinfo.output_height);
 
-    const int lines_read = jpeg_read_scanlines(&m_cinfo, &rgb_data, 1);
-    assert(lines_read == 1);
+    // C and its unsigned variables...
+    const int toRead = 1;
+    const int lines_read = jpeg_read_scanlines(&m_cinfo, &rgb_data, toRead);
+
+    // This happens in real cases.
+    if (lines_read != toRead) {
+        throw ParserException("Could not read JPEG scanline");
+    }
 
     // Expand grayscale to RGB
     if (m_cinfo.out_color_space == JCS_GRAYSCALE) {
