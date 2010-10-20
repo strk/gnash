@@ -233,11 +233,16 @@ DefineBitsTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 
     Renderer* renderer = r.renderer();
     if (!renderer) {
-        IF_VERBOSE_PARSE(log_parse(_("No renderer, not adding bitmap")));
+        IF_VERBOSE_PARSE(
+            log_parse(_("No renderer, not adding bitmap %1%"), id)
+        );
         return;
     }    
     boost::intrusive_ptr<CachedBitmap> bi = renderer->createCachedBitmap(im);
 
+    IF_VERBOSE_PARSE(
+        log_parse(_("Adding bitmap id %1%"), id);
+    );
     // add bitmap to movie under DisplayObject id.
     m.addBitmap(id, bi);
 }
@@ -369,15 +374,14 @@ readLossless(SWFStream& in, TagType tag)
                 "w = %d, h = %d"), tag, bitmap_format, width, height);
     );
 
+    std::auto_ptr<image::GnashImage> image;  
     if (!width || !height) {
          IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("Bitmap DisplayObject has a height or width of 0"));
-        );   
-        return std::auto_ptr<image::GnashImage>();  
+            log_swferror(_("Bitmap has a height or width of 0"));
+        );
+        return image;
     } 
     
-    std::auto_ptr<image::GnashImage> image;
-
 #ifndef HAVE_ZLIB_H
     log_error(_("gnash is not linked to zlib -- can't load zipped image data"));
     return image;
