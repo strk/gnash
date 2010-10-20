@@ -37,7 +37,10 @@ using std::endl;
 namespace gnash {
 
 // Forward declarations
-static float convert_float_little(const void *p);
+namespace {
+    float convert_float_little(const void *p);
+    double convert_double_wacky(const void *p);
+}
 
 action_buffer::action_buffer(const movie_definition& md)
     :
@@ -392,20 +395,21 @@ disasm_instruction(const unsigned char* instruction_data,
                        << " arg count = " << argCount
                        << " register count = " << static_cast<int>(registerCount);
                 
-                boost::uint16_t flags = (instruction_data[3 + i]) | (instruction_data[3 + i + 1] << 8);
+                const boost::uint16_t flags =
+                    (instruction_data[3 + i]) |
+                    (instruction_data[3 + i + 1] << 8);
+
                 i += 2;
                 
-                // @@ What is the difference between "super" and "_parent"?
-                
-                bool preload_global = (flags & 0x100) != 0;
-                bool preload_parent = (flags & 0x80) != 0;
-                bool preload_root   = (flags & 0x40) != 0;
-                bool suppress_super = (flags & 0x20) != 0;
-                bool preload_super  = (flags & 0x10) != 0;
-                bool suppress_args  = (flags & 0x08) != 0;
-                bool preload_args   = (flags & 0x04) != 0;
-                bool suppress_this  = (flags & 0x02) != 0;
-                bool preload_this   = (flags & 0x01) != 0;
+                const bool preload_global = (flags & 0x100);
+                const bool preload_parent = (flags & 0x80);
+                const bool preload_root   = (flags & 0x40);
+                const bool suppress_super = (flags & 0x20);
+                const bool preload_super  = (flags & 0x10);
+                const bool suppress_args  = (flags & 0x08);
+                const bool preload_args   = (flags & 0x04);
+                const bool suppress_this  = (flags & 0x02);
+                const bool preload_this   = (flags & 0x01);
                 
                 ss << " pg=" << preload_global
                 << " pp=" << preload_parent
@@ -417,8 +421,8 @@ disasm_instruction(const unsigned char* instruction_data,
                 << " st=" << suppress_this
                 << " pt=" << preload_this;
 
-                for (size_t argi = 0; argi < argCount; ++argi)
-                {
+                for (size_t argi = 0; argi < argCount; ++argi) {
+
                     // Make sure not to read past the end of the
                     // instruction.
                     if (i >= length) break;
@@ -428,8 +432,7 @@ disasm_instruction(const unsigned char* instruction_data,
 
                     std::string argName;
                     // Signature info for a function2 opcode.
-                    while (instruction_data[3 + i] && i <= length)
-                    {
+                    while (instruction_data[3 + i] && i <= length) {
                         argName.push_back(instruction_data[3 + i]);
                         i++;
                     }
@@ -467,6 +470,32 @@ action_buffer::disasm(size_t pc) const
     return disasm_instruction(&m_buffer[pc], maxBufferLength);
 }
 
+float
+action_buffer::read_float_little(size_t pc) const
+{
+    return convert_float_little(&m_buffer[pc]);
+}
+
+double
+action_buffer::read_double_wacky(size_t pc) const
+{
+    return convert_double_wacky(&m_buffer[pc]);
+}
+
+const std::string&
+action_buffer::getDefinitionURL() const
+{
+    return _src.get_url();
+}
+
+int
+action_buffer::getDefinitionVersion() const
+{
+    return _src.get_version();
+}
+
+namespace {
+
 // Endian conversion routines.
 //
 // Flash format stores integers as little-endian,
@@ -482,12 +511,12 @@ action_buffer::disasm(size_t pc) const
 
 // Read a little-endian 32-bit float from m_buffer[pc]
 // and return it as a host-endian float.
-static float
+float
 convert_float_little(const void *p)
 {
     // Hairy union for endian detection and munging
     union {
-        float    f;
+        float f;
         boost::uint32_t i;
         struct {    // for endian detection
             boost::uint16_t s0;
@@ -503,25 +532,27 @@ convert_float_little(const void *p)
 
     u.f = 1.0;
     switch (u.s.s0) {
-    case 0x0000:    // little-endian host
-        memcpy(&u.i, p, 4);
-        break;
-    case 0x3f80:    // big-endian host
+
+        case 0x0000:    // little-endian host
+            std::memcpy(&u.i, p, 4);
+            break;
+        case 0x3f80:    // big-endian host
         {
-        const boost::uint8_t *cp = static_cast<const boost::uint8_t *>(p);
-        u.c.c0 = cp[3];
-        u.c.c1 = cp[2];
-        u.c.c2 = cp[1];
-        u.c.c3 = cp[0];
+            const boost::uint8_t *cp = static_cast<const boost::uint8_t*>(p);
+            u.c.c0 = cp[3];
+            u.c.c1 = cp[2];
+            u.c.c2 = cp[1];
+            u.c.c3 = cp[0];
+            break;
         }
-        break;
-    default:
-        log_error(_("Native floating point format not recognised"));
-        abort();
+        default:
+            log_error(_("Native floating point format not recognised"));
+            std::abort();
     }
     
     return u.f;
 }
+
 
 // Read a 64-bit double from memory, stored in word-swapped little-endian
 // format and return it as a host-endian double.
@@ -529,10 +560,10 @@ convert_float_little(const void *p)
 double
 convert_double_wacky(const void *p)
 {
-    const boost::uint8_t *cp = static_cast<const boost::uint8_t *>(p);    // Handy uchar version
+    const boost::uint8_t *cp = static_cast<const boost::uint8_t*>(p);
     union {
-        double    d;
-        boost::uint64_t    i;
+        double d;
+        boost::uint64_t i;
         struct {
             boost::uint32_t l0;
             boost::uint32_t l1;
@@ -564,8 +595,8 @@ convert_double_wacky(const void *p)
     u.d = static_cast<double>(0x11223344);
     switch (u.s.s0) {
     case 0x0000:    // pure little-endian host: swap words only.
-        memcpy(&u.l.l1, cp, 4);
-        memcpy(&u.l.l0, cp + 4, 4);
+        std::memcpy(&u.l.l1, cp, 4);
+        std::memcpy(&u.l.l0, cp + 4, 4);
         break;
     case 0x41b1:    // pure big-endian host: swap contents of 32-bit words
         u.c.c0 = cp[3];
@@ -579,7 +610,7 @@ convert_double_wacky(const void *p)
         break;
     case 0x2233:    // word-swapped little-endian host (PDP / ARM FPA)
             // is the same as wacky format.
-        memcpy(&u.i, cp, 8);
+        std::memcpy(&u.i, cp, 8);
         break;
     case 0x4400:    // word-swapped big-endian host: does this exist?
         u.c.c0 = cp[7];
@@ -599,28 +630,6 @@ convert_double_wacky(const void *p)
     return u.d;
 }
 
-float
-action_buffer::read_float_little(size_t pc) const
-{
-    return(convert_float_little(&m_buffer[pc]));
-}
-
-double
-action_buffer::read_double_wacky(size_t pc) const
-{
-    return(convert_double_wacky(&m_buffer[pc]));
-}
-
-const std::string&
-action_buffer::getDefinitionURL() const
-{
-    return _src.get_url();
-}
-
-int
-action_buffer::getDefinitionVersion() const
-{
-    return _src.get_version();
 }
 
 }

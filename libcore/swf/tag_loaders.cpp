@@ -45,12 +45,12 @@
 namespace gnash {
 namespace SWF {
 
-/// Anonymous namespace
+// Anonymous namespace
 namespace {
 
 const boost::uint32_t samplerates[] = { 5512, 11025, 22050, 44100 };
 
-} // anonymous namespace
+} 
 
 // Label the current frame of m with the name from the SWFStream.
 void

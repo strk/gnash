@@ -35,12 +35,7 @@ namespace gnash {
 	class SWFStream; // for read signature
 }
 
-
 namespace gnash {
-
-class ActionExec;
-
-double convert_double_wacky(const void *p);
 
 /// A code segment.
 //
@@ -53,7 +48,6 @@ double convert_double_wacky(const void *p);
 class action_buffer : boost::noncopyable
 {
 public:
-	friend class ActionExec;
 
 	action_buffer(const movie_definition& md);
 
