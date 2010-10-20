@@ -1664,7 +1664,8 @@ ActionMbChr(ActionExec& thread)
     }
 
     // Cut to uint16, as characters above 65535 'wrap around'
-    const boost::uint16_t i = static_cast<boost::uint16_t> (toInt(env.top(0), getVM(env)));
+    const boost::uint16_t i = 
+        static_cast<boost::uint16_t>(toInt(env.top(0), getVM(env)));
     
     std::string out = utf8::encodeUnicodeCharacter(i);
     
