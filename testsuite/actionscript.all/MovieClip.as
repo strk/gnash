@@ -127,7 +127,7 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(1058); // SWF8+
+	check_totals(1060); // SWF8+
 #endif
 
 	play();
@@ -1160,6 +1160,20 @@ check_equals(typeof(this.$version), 'undefined');
     xcheck_equals(_root.filters.toString(),
         "[object Object],[object Object],[object Object]");
 
+    backup = _global.Array;
+
+    called = 0;
+
+    // It uses [], not new Array().
+    _global.Array = function() { this.test = "passed"; };
+    ch = _root.filters;
+    check_equals(ch.test, undefined);
+    ch.toString = backup.prototype.toString;
+    check_equals(ch.toString(), 
+        "[object Object],[object Object],[object Object]");
+    
+    _global.Array = backup;
+    
     _root.filters = "";
     xcheck_equals(_root.filters.length, 0);
 
