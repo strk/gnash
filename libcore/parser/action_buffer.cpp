@@ -19,20 +19,15 @@
 //
 
 #include "action_buffer.h"
-#include "log.h"
-#include "SWFStream.h"
-#include "SWF.h"
-#include "ASHandlers.h"
-#include "as_environment.h"
-#include "movie_definition.h"
-
-#include <typeinfo> 
 
 #include <string>
 #include <boost/static_assert.hpp>
 
-using std::string;
-using std::endl;
+#include "log.h"
+#include "SWFStream.h"
+#include "SWF.h"
+#include "ASHandlers.h"
+#include "movie_definition.h"
 
 namespace gnash {
 
@@ -56,10 +51,10 @@ action_buffer::read(SWFStream& in, unsigned long endPos)
     assert(endPos <= in.get_tag_end_position());
     unsigned size = endPos-startPos;
 
-    if ( ! size )
-    {
+    if (!size) {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("Empty action buffer starting at offset %lu"), startPos);
+            log_swferror(_("Empty action buffer starting at offset %lu"),
+                startPos);
         );
         return;
     }
@@ -89,36 +84,31 @@ action_buffer::read(SWFStream& in, unsigned long endPos)
     // NOTE: it is common to find such movies, swfmill is known to write
     //       DoAction w/out the terminating END tag
     //
-    if ( m_buffer.back() != SWF::ACTION_END )
-    {
+    if (m_buffer.back() != SWF::ACTION_END) {
         // Add a null terminator so read_string won't read off
         // the end of the buffer.
         m_buffer.push_back(0x00);
 
         IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("Action buffer starting at offset %lu doesn't end with an END tag"),
-                startPos);
+            log_swferror(_("Action buffer starting at offset %lu doesn't "
+                    "end with an END tag"), startPos);
         );
     }
     
 }
 
-/*public*/
 void
 action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
 {
     assert(stop_pc <= m_buffer.size());
-    
-
     // Skip if we've already processed this decl_dict, but make sure
     // the size is the same.
     if (static_cast<size_t>(m_decl_dict_processed_at) == start_pc) {
         const int dictSize = read_int16(start_pc + 3);
-        if (static_cast<int>(m_dictionary.size()) != dictSize)
-        {
+        if (static_cast<int>(m_dictionary.size()) != dictSize) {
             /// TODO: is it possible to continue?
             throw ActionParserException(_("Constant pool size "
-                        "mismatch. This is probably a very malformed SWF"));
+                "mismatch. This is probably a very malformed SWF"));
         }
         return;
     }
@@ -127,8 +117,8 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
     
     // Actual processing.
     size_t i = start_pc;
-    boost::uint16_t length = boost::uint16_t(read_int16(i+1));
-    boost::uint16_t count = boost::uint16_t(read_int16(i+3)); 
+    const boost::uint16_t length = read_uint16(i + 1);
+    const boost::uint16_t count = read_uint16(i + 3); 
     i += 2;
     
     assert(start_pc + 3 + length == stop_pc);
@@ -180,16 +170,16 @@ disasm_instruction(const unsigned char* instruction_data,
 
     // Show instruction.
     if (action_id > ash.lastType()) {
-        ss << "<unknown>[0x]" <<  action_id << endl;
+        ss << "<unknown>[0x]" <<  action_id << "\n";
     }
     else {
         ss << ash[action_id].getType();
     }
     
     // Show instruction argument(s).
-    if (action_id & 0x80)
-    {
-        assert (maxBufferLength >= 3);
+    if (action_id & 0x80) {
+
+        assert(maxBufferLength >= 3);
         ss << " (";
         fmt = ash[action_id].getArgFormat();
         
@@ -197,10 +187,10 @@ disasm_instruction(const unsigned char* instruction_data,
         
         // Assert that length without the three initial bytes
         // is always within the buffer.
-        assert (length <= maxBufferLength - 3);
+        assert(length <= maxBufferLength - 3);
 
-        switch (fmt)
-        {
+        switch (fmt) {
+
             case ARG_NONE:
                 break;
 
@@ -630,9 +620,8 @@ convert_double_wacky(const void *p)
     return u.d;
 }
 
-}
-
-}
+} // unnamed namespace
+} // namespace gnash
 
 // Local Variables:
 // mode: C++
