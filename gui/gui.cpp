@@ -934,7 +934,7 @@ Gui::advanceMovie()
 {
 
     if (isStopped()) {
-        return true;
+        return false;
     }
 
     if (!_started) {
@@ -949,7 +949,7 @@ Gui::advanceMovie()
     
 #ifndef REVIEW_ALL_FRAMES
     // Advance movie by one frame
-    bool advanced = m->advance();
+    const bool advanced = m->advance();
 #else
     const size_t cur_frame = m->getRootMovie()->get_current_frame();
     const size_t tot_frames = m->getRootMovie()->get_frame_count();
@@ -1014,7 +1014,7 @@ Gui::advanceMovie()
         ++_advances;
     }
 
-	return true;
+	return advanced;
 }
 
 void
