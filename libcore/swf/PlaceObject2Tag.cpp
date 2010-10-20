@@ -386,8 +386,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
         m_clip_depth = DisplayObject::noClipDepthValue;
     }
 
-    if ( hasFilters() )
-    {
+    if (hasFilters()) {
         Filters v; // TODO: Attach the filters to the display object.
         filter_factory::read(in, true, &v);
 	    // at time of writing no renderer supports bitmap filters

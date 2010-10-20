@@ -127,7 +127,7 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(1033); // SWF8+
+	check_totals(1060); // SWF8+
 #endif
 
 	play();
@@ -1085,6 +1085,99 @@ this.$version = "fake version";
 check_equals(this.$version, 'fake version');
 check(delete $version);
 check_equals(typeof(this.$version), 'undefined');
+
+// Test filters
+
+// A new array is returned each time; each element is recreated each time.
+// Non-filter objects passed to the setter in the array are ignored.
+// Assigning a non-array also clears the filters.
+// A fake array works.
+
+#if OUTPUT_VERSION > 7
+    xcheck_equals(typeof(_root.filters), "object");
+    xcheck(_root.filters.hasOwnProperty("length"));
+    xcheck_equals(_root.filters.length, 0);
+
+    _root.filters = 7;
+    xcheck_equals(typeof(_root.filters), "object");
+
+    _root.filters.push(7);
+    xcheck_equals(_root.filters.toString(), "");
+
+    _root.filters.push(new Object());
+    xcheck_equals(_root.filters.toString(), "");
+
+    _root.filters.push(new Date(0));
+    xcheck_equals(_root.filters.toString(), "");
+
+    _root.filters.length = 4;
+    xcheck_equals(_root.filters.toString(), "");
+    xcheck_equals(_root.filters.length, 0);
+
+    _root.filters.push(new flash.filters.ConvolutionFilter());
+    xcheck_equals(_root.filters.toString(), "");
+
+    _root.filters = [ 1, 3, 4, 5 ];
+    xcheck_equals(_root.filters.length, 0);
+    xcheck_equals(_root.filters.toString(), "");
+
+    _root.filters = [ new flash.filters.ConvolutionFilter() ];
+    xcheck_equals(_root.filters.length, 1);
+    xcheck_equals(_root.filters.toString(), "[object Object]");
+
+    _root.filters = [ new flash.filters.ConvolutionFilter(),
+                      new flash.filters.DropShadowFilter() ];
+    xcheck_equals(_root.filters.length, 2);
+    xcheck_equals(_root.filters.toString(), "[object Object],[object Object]");
+
+    // The filters are recreated every time.
+    tmp1 = _root.filters;
+    tmp2 = _root.filters;
+    xcheck(tmp1[0] !== tmp2[0]);
+    
+    _root.filters = [ new flash.filters.ConvolutionFilter(),
+                      new flash.filters.DropShadowFilter(),
+                      "boh!" ];
+    xcheck_equals(_root.filters.length, 2);
+    xcheck_equals(_root.filters.toString(), "[object Object],[object Object]");
+
+    _root.filters = [ new flash.filters.ConvolutionFilter(),
+                      "boh!",
+                      new flash.filters.BlurFilter() ];
+    xcheck_equals(_root.filters.length, 2);
+    xcheck_equals(_root.filters.toString(), "[object Object],[object Object]");
+    
+    _root.filters = 34;
+    xcheck_equals(_root.filters.length, 0);
+
+    fake = {};
+    fake.length = 3;
+    fake[0] = new flash.filters.ConvolutionFilter();
+    fake[1] = new flash.filters.DisplacementMapFilter();
+    fake[2] = new flash.filters.ConvolutionFilter();
+    _root.filters = fake;
+    xcheck_equals(_root.filters.length, 3);
+    xcheck_equals(_root.filters.toString(),
+        "[object Object],[object Object],[object Object]");
+
+    backup = _global.Array;
+
+    called = 0;
+
+    // It uses [], not new Array().
+    _global.Array = function() { this.test = "passed"; };
+    ch = _root.filters;
+    check_equals(ch.test, undefined);
+    ch.toString = backup.prototype.toString;
+    xcheck_equals(ch.toString(), 
+        "[object Object],[object Object],[object Object]");
+    
+    _global.Array = backup;
+    
+    _root.filters = "";
+    xcheck_equals(_root.filters.length, 0);
+
+#endif
 
 //------------------------------------------------
 // Test getProperty 

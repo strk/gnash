@@ -153,16 +153,8 @@ noinst_HEADERS = \
 	Button.h \
 	debugger.h \
 	TextField.h \
-        BitmapFilter.h \
-        BlurFilter.h \
-        BevelFilter.h \
-        GradientBevelFilter.h \
-        GlowFilter.h \
-        GradientGlowFilter.h \
-        DropShadowFilter.h \
-        ConvolutionFilter.h \
-        ColorMatrixFilter.h \
-        parser/filter_factory.h \
+	Filters.h \
+	parser/filter_factory.h \
 	Font.h \
 	fontlib.h \
 	Shape.h \

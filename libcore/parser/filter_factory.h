@@ -19,13 +19,16 @@
 #define GNASH_FILTER_FACTORY_H
 
 #include <vector>
-#include "BitmapFilter.h"
+#include <boost/shared_ptr.hpp>
+
+namespace gnash {
+    class SWFStream;
+    class BitmapFilter;
+}
 
 namespace gnash {
 
-class SWFStream;
-
-typedef std::vector<Filter> Filters;
+typedef std::vector<boost::shared_ptr<BitmapFilter> > Filters;
 
 class filter_factory
 {
