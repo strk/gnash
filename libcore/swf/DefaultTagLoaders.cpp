@@ -20,8 +20,12 @@
 #include "gnashconfig.h"
 #endif
 
-#include "SWF.h"
 #include "DefaultTagLoaders.h"
+
+#include <boost/assign.hpp>
+#include <set>
+
+#include "SWF.h"
 #include "TagLoadersTable.h"
 #include "tag_loaders.h" 
 #include "ScriptLimitsTag.h"
@@ -42,6 +46,7 @@
 #include "SetTabIndexTag.h"
 #include "StartSoundTag.h"
 #include "StreamSoundBlockTag.h"
+#include "DefineBitsTag.h"
 #include "DefineButtonSoundTag.h"
 #include "DefineMorphShapeTag.h"
 #include "DefineVideoStreamTag.h"
@@ -54,9 +59,6 @@
 # include "DoABCTag.h"
 # include "DefineSceneAndFrameLabelDataTag.h"
 #endif
-
-#include <boost/assign.hpp>
-#include <boost/bind.hpp>
 
 namespace gnash {
 namespace SWF {
@@ -118,7 +120,7 @@ addDefaultLoaders(TagLoadersTable& table)
         (TagPair(SWF::FREECHARACTER, unexpected)) 
         (TagPair(SWF::PLACEOBJECT, PlaceObject2Tag::loader))
         (TagPair(SWF::REMOVEOBJECT, RemoveObjectTag::loader)) // 05
-        (TagPair(SWF::DEFINEBITS, define_bits_jpeg_loader))
+        (TagPair(SWF::DEFINEBITS, DefineBitsTag::loader))
         (TagPair(SWF::DEFINEBUTTON, DefineButtonTag::loader))
         (TagPair(SWF::JPEGTABLES, jpeg_tables_loader))
         (TagPair(SWF::SETBACKGROUNDCOLOR, SetBackgroundColorTag::loader))
@@ -135,8 +137,8 @@ addDefaultLoaders(TagLoadersTable& table)
         (TagPair(SWF::SOUNDSTREAMHEAD, sound_stream_head_loader))
         // 19
         (TagPair(SWF::SOUNDSTREAMBLOCK, StreamSoundBlockTag::loader))
-        (TagPair(SWF::DEFINELOSSLESS, define_bits_lossless_2_loader))
-        (TagPair(SWF::DEFINEBITSJPEG2, define_bits_jpeg2_loader))
+        (TagPair(SWF::DEFINELOSSLESS, DefineBitsTag::loader))
+        (TagPair(SWF::DEFINEBITSJPEG2, DefineBitsTag::loader))
         (TagPair(SWF::DEFINESHAPE2, DefineShapeTag::loader))
         (TagPair(SWF::DEFINEBUTTONCXFORM, DefineButtonCxformTag::loader)) // 23
         (TagPair(SWF::PROTECT, ignore))
@@ -150,8 +152,8 @@ addDefaultLoaders(TagLoadersTable& table)
         (TagPair(SWF::DEFINETEXT2, DefineText2Tag::loader))
         // 37
         (TagPair(SWF::DEFINEBUTTON2, DefineButton2Tag::loader))
-        (TagPair(SWF::DEFINEBITSJPEG3, define_bits_jpeg3_loader))
-        (TagPair(SWF::DEFINELOSSLESS2, define_bits_lossless_2_loader))
+        (TagPair(SWF::DEFINEBITSJPEG3, DefineBitsTag::loader))
+        (TagPair(SWF::DEFINELOSSLESS2, DefineBitsTag::loader))
         (TagPair(SWF::DEFINEEDITTEXT, DefineEditTextTag::loader))
         (TagPair(SWF::DEFINEVIDEO, unexpected)) // 38
         (TagPair(SWF::DEFINESPRITE, sprite_loader))
@@ -222,6 +224,8 @@ addDefaultLoaders(TagLoadersTable& table)
         (TagPair(SWF::DEFINEFONTNAME, DefineFontNameTag::loader))
         // 89
         (TagPair(SWF::STARTSOUND2, StartSound2Tag::loader))
+        // 90
+        (TagPair(SWF::DEFINEBITSJPEG4, DefineBitsTag::loader))
         // 777
         (TagPair(SWF::REFLEX, reflex_loader))
 #ifdef ENABLE_AVM2

@@ -99,6 +99,7 @@ libgnashcore_la_SOURCES = \
 	swf/SoundInfoRecord.cpp \
 	swf/TextRecord.cpp \
 	swf/tag_loaders.cpp \
+	swf/DefineBitsTag.cpp \
 	swf/DefineFontAlignZonesTag.cpp \
 	swf/DefineShapeTag.cpp \
 	swf/DefineScalingGridTag.cpp \
@@ -166,6 +167,7 @@ noinst_HEADERS = \
 	MovieLibrary.h \
 	ExternalInterface.h \
 	swf/tag_loaders.h \
+	swf/DefineBitsTag.h \
 	swf/DefaultTagLoaders.h \
 	swf/ImportAssetsTag.h \
 	swf/ExportAssetsTag.h \
