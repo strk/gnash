@@ -64,7 +64,7 @@ plugindir = $(bindir)
 
 plugin_LTLIBRARIES = libnpgnash.la
 
-libnpgnash_la_SOURCES = plugin.cpp
+libnpgnash_la_SOURCES = plugin.cpp plugin.h
 libnpgnash_la_LDFLAGS = -shared -no-undefined -version-info 0:0:0 \
 	-o libnpgnash.so 
 

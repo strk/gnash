@@ -200,6 +200,7 @@ buf_add(gpointer buf, gpointer data)
 }
 
 
+/* private */
 boost::uint8_t* 
 AudioDecoderGst::pullBuffers(boost::uint32_t&  outputSize)
 {
