@@ -725,11 +725,6 @@ sprite_loader(SWFStream& in, TagType tag, movie_definition& m,
     m.addDisplayObject(id, ch);
 }
 
-
-//
-// Sound
-//
-
 // Common data
 
 /// Sample rate table for DEFINESOUNDHEAD tags
