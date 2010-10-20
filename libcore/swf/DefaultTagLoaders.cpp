@@ -224,6 +224,8 @@ addDefaultLoaders(TagLoadersTable& table)
         (TagPair(SWF::DEFINEFONTNAME, DefineFontNameTag::loader))
         // 89
         (TagPair(SWF::STARTSOUND2, StartSound2Tag::loader))
+        // 90
+        (TagPair(SWF::DEFINEBITSJPEG4, DefineBitsTag::loader))
         // 777
         (TagPair(SWF::REFLEX, reflex_loader))
 #ifdef ENABLE_AVM2

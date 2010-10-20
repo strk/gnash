@@ -58,7 +58,8 @@ namespace {
     std::auto_ptr<image::GnashImage> readDefineBitsJpeg(SWFStream& in,
             movie_definition& m);
     std::auto_ptr<image::GnashImage> readDefineBitsJpeg2(SWFStream& in);
-    std::auto_ptr<image::GnashImage> readDefineBitsJpeg3(SWFStream& in);
+    /// DefineBitsJpeg3, also DefineBitsJpeg4!
+    std::auto_ptr<image::GnashImage> readDefineBitsJpeg3(SWFStream& in, TagType tag);
     std::auto_ptr<image::GnashImage> readLossless(SWFStream& in, TagType tag);
 
 }
@@ -218,18 +219,23 @@ DefineBitsTag::loader(SWFStream& in, TagType tag, movie_definition& m,
             im = readDefineBitsJpeg2(in);
             break;
         case SWF::DEFINEBITSJPEG3:
-            im = readDefineBitsJpeg3(in);
+        case SWF::DEFINEBITSJPEG4:
+            im = readDefineBitsJpeg3(in, tag);
             break;
         case SWF::DEFINELOSSLESS:
         case SWF::DEFINELOSSLESS2:
             im = readLossless(in, tag);
             break;
-
         default:
             std::abort();
     }
 
-    if (!im.get()) return;
+    if (!im.get()) {
+        IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("Failed to parse bitmap for character %1%"), id);
+        );
+        return;
+    }
 
     Renderer* renderer = r.renderer();
     if (!renderer) {
@@ -334,13 +340,19 @@ readDefineBitsJpeg2(SWFStream& in)
 }
 
 
-// loads a define_bits_jpeg3 tag. This is a jpeg file with an alpha
-// channel using zlib compression.
+/// Parse a DefineBitsJpeg3 or 4 tag.
 std::auto_ptr<image::GnashImage>
-readDefineBitsJpeg3(SWFStream& in)
+readDefineBitsJpeg3(SWFStream& in, TagType tag)
 {
     in.ensureBytes(4);
     const boost::uint32_t jpeg_size = in.read_u32();
+
+    if (tag == DEFINEBITSJPEG4) {
+        const float deblocking = in.read_short_ufixed();
+        IF_VERBOSE_PARSE(
+            log_parse("DefineBitsJpeg4 deblocking: %1%", deblocking);
+        );
+    }
 
     const FileType ft = checkFileType(in);
 
