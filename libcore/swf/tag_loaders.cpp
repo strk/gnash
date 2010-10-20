@@ -145,12 +145,6 @@ const boost::uint32_t samplerates[] = { 5512, 11025, 22050, 44100 };
 
 } // anonymous namespace
 
-// Silently ignore the contents of this tag.
-void null_loader(SWFStream& /*in*/, TagType /*tag*/, movie_definition& /*m*/,
-        const RunResources& /*r*/)
-{
-}
-
 // Label the current frame of m with the name from the SWFStream.
 void
 frame_label_loader(SWFStream& in, TagType tag, movie_definition& m,
@@ -690,17 +684,6 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
     m.addBitmap(id, bi);
 #endif // HAVE_ZLIB_H
 
-}
-
-// This is like null_loader except it prints a message to nag us to fix it.
-void
-fixme_loader(SWFStream& /*in*/, TagType tag, movie_definition& /*m*/,
-		const RunResources& /*r*/)
-{
-    static std::set<TagType> warned;
-    if (warned.insert(tag).second) {
-        log_unimpl(_("  FIXME: tagtype = %d"), tag);
-    }
 }
 
 // Create and initialize a sprite, and add it to the movie.
