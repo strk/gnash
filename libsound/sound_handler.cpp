@@ -405,11 +405,8 @@ sound_handler::playSound(int sound_handle,
         return;
     }
 
-    // Make a "EmbedSoundInst" for this sound which is later placed
-    // on the vector of instances of this sound being played
-    //
-    // @todo: plug the returned EmbedSoundInst to the set
-    //        of InputStream channels !
+    // Make a "EmbedSoundInst" for this sound and plug it into  
+    // the set of InputStream channels
     //
     std::auto_ptr<InputStream> sound ( sounddata.createInstance(
 
