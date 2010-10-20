@@ -44,7 +44,6 @@
 #include "swf/TagLoadersTable.h"
 #include "URL.h"
 #include "GnashException.h"
-#include "swf/DefineVideoStreamTag.h"
 #include "sound_definition.h"
 #include "SoundInfo.h"
 #include "MediaHandler.h"
@@ -64,7 +63,6 @@
 namespace gnash {
 
 namespace SWF {
-
 
 /// Anonymous namespace
 namespace {
@@ -88,16 +86,12 @@ class StreamAdapter : public IOChannel
         assert(endPos > startPos);
     }
 
-    virtual ~StreamAdapter()
-    {
-    }
+    virtual ~StreamAdapter() {}
 
-    virtual std::streamsize read(void* dst, std::streamsize bytes) 
-    {
+    virtual std::streamsize read(void* dst, std::streamsize bytes) {
         std::streamsize bytesLeft = endPos - currPos;
-        if ( bytesLeft < bytes )
-        {
-            if ( ! bytesLeft ) return 0;
+        if (bytesLeft < bytes) {
+            if (!bytesLeft) return 0;
             //log_debug("Requested to read past end of stream range");
             bytes = bytesLeft;
         }
@@ -106,40 +100,33 @@ class StreamAdapter : public IOChannel
         return actuallyRead;
     }
 
-    virtual void go_to_end()
-    {
+    virtual void go_to_end() {
         s.seek(endPos);
     }
 
-    virtual bool eof() const
-    {
+    virtual bool eof() const {
         return (currPos == endPos);
     }
 
     // Return false on failure, true on success
-    virtual bool seek(std::streampos pos)
-    {
+    virtual bool seek(std::streampos pos) {
         // SWFStream::seek() returns true on success
-        if (s.seek(pos))
-        {
+        if (s.seek(pos)) {
             currPos = pos;
             return true;
         }
         return false;
     }
 
-    virtual size_t size() const
-    {
+    virtual size_t size() const {
         return (endPos - startPos);
     }
 
-    virtual std::streampos tell() const
-    {
+    virtual std::streampos tell() const {
         return currPos;
     }
     
-    virtual bool bad() const
-    {
+    virtual bool bad() const {
         // Is there any point in this?
         return false;
     }
@@ -148,20 +135,15 @@ public:
 
     /// Get an IOChannel from a gnash::SWFStream
     static std::auto_ptr<IOChannel> getFile(SWFStream& str,
-            unsigned long endPos)
-    {
+            unsigned long endPos) {
         std::auto_ptr<IOChannel> ret (new StreamAdapter(str, endPos));
         return ret;
     }
 };
 
+const boost::uint32_t samplerates[] = { 5512, 11025, 22050, 44100 };
+
 } // anonymous namespace
-
-
-//
-// Tag loaders
-//
-
 
 // Silently ignore the contents of this tag.
 void null_loader(SWFStream& /*in*/, TagType /*tag*/, movie_definition& /*m*/,
@@ -195,20 +177,17 @@ frame_label_loader(SWFStream& in, TagType tag, movie_definition& m,
     //
     size_t end_tag = in.get_tag_end_position();
     size_t curr_pos = in.tell();
-    if ( end_tag != curr_pos )
-    {
-    if ( end_tag == curr_pos + 1 )
-    {
-        log_unimpl(_("anchor-labeled frame not supported"));
-    }
-    else
-    {
-        IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("frame_label_loader end position %d, "
-                   "read up to %d"),
-                 end_tag, curr_pos);
-        );
-    }
+    if (end_tag != curr_pos) {
+        if (end_tag == curr_pos + 1) {
+            log_unimpl(_("anchor-labeled frame not supported"));
+        }
+        else {
+            IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("frame_label_loader end position %d, "
+                       "read up to %d"),
+                     end_tag, curr_pos);
+            );
+        }
     }
 }
 
@@ -218,11 +197,9 @@ void
 jpeg_tables_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunResources& /*r*/)
 {
-    //GNASH_REPORT_FUNCTION;
     assert(tag == SWF::JPEGTABLES);
 
-    IF_VERBOSE_PARSE
-    (
+    IF_VERBOSE_PARSE(
         log_parse(_("  jpeg_tables_loader"));
     );
 
@@ -233,31 +210,28 @@ jpeg_tables_loader(SWFStream& in, TagType tag, movie_definition& m,
 
     const unsigned long jpegHeaderSize = endPos - currPos;
 
-    if ( ! jpegHeaderSize )
-    {
+    if (!jpegHeaderSize) {
         log_debug(_("No bytes to read in JPEGTABLES tag at offset %d"),
                 currPos);
     }
 
     std::auto_ptr<image::JpegInput> input;
 
-    try
-    {
-    // NOTE: we cannot limit input SWFStream here as the same jpeg::input
-    // instance will be used for reading subsequent DEFINEBITS and similar
-    // tags, which are *different* tags, so have different boundaries !!
-    //
-    // Anyway the actual reads are limited to currently opened tag as 
-    // of gnash::SWFStream::read(), so this is not a problem.
-    //
+    try {
+        // NOTE: we cannot limit input SWFStream here as the same jpeg::input
+        // instance will be used for reading subsequent DEFINEBITS and similar
+        // tags, which are *different* tags, so have different boundaries !!
+        //
+        // Anyway the actual reads are limited to currently opened tag as 
+        // of gnash::SWFStream::read(), so this is not a problem.
+        //
         boost::shared_ptr<IOChannel> ad(StreamAdapter::getFile(in,
                     std::numeric_limits<std::streamsize>::max()).release());
         //  transfer ownership to the image::JpegInput
         input = image::JpegInput::createSWFJpeg2HeaderOnly(ad, jpegHeaderSize);
 
     }
-    catch (std::exception& e)
-    {
+    catch (const std::exception& e) {
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror("Error creating header-only jpeg2 input: %s",
                 e.what());
@@ -281,22 +255,20 @@ define_bits_jpeg_loader(SWFStream& in, TagType tag, movie_definition& m,
     in.ensureBytes(2);
     boost::uint16_t id = in.read_u16();
 
-    if (m.getBitmap(id))
-    {
+    if (m.getBitmap(id)) {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("DEFINEBITS: Duplicate id (%d) for bitmap DisplayObject "
-                "- discarding it"), id);
+            log_swferror(_("DEFINEBITS: Duplicate id (%d) for bitmap "
+                    "DisplayObject - discarding it"), id);
         );
         return;
     }
 
     // Read the image data.
     image::JpegInput* j_in = m.get_jpeg_loader();
-    if ( ! j_in )
-    {
+    if (!j_in) {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("DEFINEBITS: No jpeg loader registered in movie "
-                "definition - discarding bitmap DisplayObject %d"), id);
+            log_swferror(_("DEFINEBITS: No jpeg loader registered in movie "
+                    "definition - discarding bitmap DisplayObject %d"), id);
         );
         return;
     }
@@ -307,10 +279,10 @@ define_bits_jpeg_loader(SWFStream& in, TagType tag, movie_definition& m,
     try {
         im = image::JpegInput::readSWFJpeg2WithTables(*j_in);
     }
-    catch (std::exception& e) {
+    catch (const std::exception& e) {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror("Error reading jpeg2 with headers for DisplayObject "
-            "id %d: %s", id, e.what());
+            log_swferror("Error reading jpeg2 with headers for DisplayObject "
+                "id %d: %s", id, e.what());
         );
         return;
     }
@@ -336,18 +308,15 @@ define_bits_jpeg2_loader(SWFStream& in, TagType tag, movie_definition& m,
     in.ensureBytes(2);
     boost::uint16_t id = in.read_u16();
 
-    IF_VERBOSE_PARSE
-    (
-    log_parse(_("  define_bits_jpeg2_loader: charid = %d pos = %ld"),
-          id, in.tell());
+    IF_VERBOSE_PARSE(
+        log_parse(_("  define_bits_jpeg2_loader: charid = %d pos = %ld"),
+              id, in.tell());
     );
-
     
-    if ( m.getBitmap(id) )
-    {
+    if (m.getBitmap(id)) {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("DEFINEBITSJPEG2: Duplicate id (%d) for bitmap "
-                "DisplayObject - discarding it"), id);
+            log_swferror(_("DEFINEBITSJPEG2: Duplicate id (%d) for bitmap "
+                    "DisplayObject - discarding it"), id);
         );
         return;
     }
@@ -373,9 +342,9 @@ define_bits_jpeg2_loader(SWFStream& in, TagType tag, movie_definition& m,
 
     // Read the image data.
     boost::shared_ptr<IOChannel> ad(StreamAdapter::getFile(in,
-                in.get_tag_end_position()).release() );
+                in.get_tag_end_position()).release());
 
-    std::auto_ptr<image::GnashImage> im (image::Input::readImageData(ad, ft));
+    std::auto_ptr<image::GnashImage> im(image::Input::readImageData(ad, ft));
 
     Renderer* renderer = r.renderer();
     if (!renderer) {
@@ -425,19 +394,16 @@ void inflate_wrapper(SWFStream& in, void* buffer, int buffer_bytes)
     boost::uint8_t buf[CHUNKSIZE];
     unsigned long endTagPos = in.get_tag_end_position();
 
-    for (;;)
-    {
+    for (;;) {
         unsigned int chunkSize = CHUNKSIZE;
         assert(in.tell() <= endTagPos);
         unsigned int availableBytes =  endTagPos - in.tell();
-        if ( availableBytes < chunkSize )
-        {
-            if ( ! availableBytes )
-            {
+        if (availableBytes < chunkSize) {
+            if (!availableBytes) {
                 // nothing more to read
                 IF_VERBOSE_MALFORMED_SWF(
-                log_swferror(_("inflate_wrapper(): no end of zstream found "
-                        "within swf tag boundaries"));
+                    log_swferror(_("inflate_wrapper(): no end of zstream "
+                        "found within swf tag boundaries"));
                 );
                 break;
             }
@@ -452,25 +418,22 @@ void inflate_wrapper(SWFStream& in, void* buffer, int buffer_bytes)
         d_stream.avail_in = chunkSize;
 
         err = inflate(&d_stream, Z_SYNC_FLUSH);
-        if (err == Z_STREAM_END)
-        {
+        if (err == Z_STREAM_END) {
             // correct end
             break;
         }
 
-        if (err != Z_OK)
-        {
+        if (err != Z_OK) {
             IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("inflate_wrapper() inflate() returned %d (%s)"),
-                err, d_stream.msg);
+                log_swferror(_("inflate_wrapper() inflate() returned %d (%s)"),
+                    err, d_stream.msg);
             );
             break;
         }
     }
 
     err = inflateEnd(&d_stream);
-    if (err != Z_OK)
-    {
+    if (err != Z_OK) {
         log_error(_("inflate_wrapper() inflateEnd() return %d (%s)"),
                 err, d_stream.msg);
     }
@@ -487,25 +450,21 @@ define_bits_jpeg3_loader(SWFStream& in, TagType tag, movie_definition& m,
     assert(tag == SWF::DEFINEBITSJPEG3); // 35
 
     in.ensureBytes(2);
-    boost::uint16_t id = in.read_u16();
+    const boost::uint16_t id = in.read_u16();
 
-    IF_VERBOSE_PARSE
-    (
-    log_parse(_("  define_bits_jpeg3_loader: charid = %d pos = %lx"),
-          id, in.tell());
+    IF_VERBOSE_PARSE(
+        log_parse(_("  define_bits_jpeg3_loader: charid = %d pos = %lx"),
+              id, in.tell());
     );
 
     in.ensureBytes(4);
-    boost::uint32_t    jpeg_size = in.read_u32();
-    boost::uint32_t    alpha_position = in.tell() + jpeg_size;
+    const boost::uint32_t jpeg_size = in.read_u32();
+    const boost::uint32_t alpha_position = in.tell() + jpeg_size;
 
 #ifndef HAVE_ZLIB_H
     log_error(_("gnash is not linked to zlib -- can't load jpeg3 image data"));
     return;
 #else
-    //
-    // Read the image data.
-    //
 
     // Read rgb data.
     boost::shared_ptr<IOChannel> ad(StreamAdapter::getFile(in,
@@ -522,7 +481,7 @@ define_bits_jpeg3_loader(SWFStream& in, TagType tag, movie_definition& m,
     const size_t imHeight = im->height();
     const size_t bufferLength = imWidth * imHeight;
 
-    boost::scoped_array<boost::uint8_t> buffer (new boost::uint8_t[bufferLength]);
+    boost::scoped_array<boost::uint8_t> buffer(new boost::uint8_t[bufferLength]);
 
     inflate_wrapper(in, buffer.get(), bufferLength);
 
@@ -549,22 +508,19 @@ void
 define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunResources& r)
 {
-    // tags 20 || 36
     assert(tag == SWF::DEFINELOSSLESS || tag == SWF::DEFINELOSSLESS2);
+    in.ensureBytes(2 + 2 + 2 + 1); // the initial header 
 
-    in.ensureBytes(2+2+2+1); // the initial header 
-
-    boost::uint16_t id = in.read_u16();
+    const boost::uint16_t id = in.read_u16();
 
     // 3 == 8 bit, 4 == 16 bit, 5 == 32 bit
-    boost::uint8_t bitmap_format = in.read_u8();
-    boost::uint16_t width = in.read_u16();
-    boost::uint16_t height = in.read_u16();
+    const boost::uint8_t bitmap_format = in.read_u8();
+    const boost::uint16_t width = in.read_u16();
+    const boost::uint16_t height = in.read_u16();
 
     IF_VERBOSE_PARSE(
-        log_parse(_("  defbitslossless2: tag = %d, id = %d, "
-            "fmt = %d, w = %d, h = %d"),
-            tag, id, bitmap_format, width, height);
+        log_parse(_("  defbitslossless2: tag = %d, id = %d, fmt = %d, "
+                "w = %d, h = %d"), tag, id, bitmap_format, width, height);
     );
 
     if (!width || !height) {
@@ -594,7 +550,6 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
     bool alpha = false;
 
     try {
-
         switch (tag) {
             case SWF::DEFINELOSSLESS:
                 image.reset(new image::ImageRGB(width, height));
@@ -621,8 +576,7 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
     unsigned short bytes_per_pixel;
     int colorTableSize = 0;
 
-    switch (bitmap_format)
-    {
+    switch (bitmap_format) {
         case 3:
             bytes_per_pixel = 1;
             in.ensureBytes(1);
@@ -657,14 +611,12 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
             // 8-bit data, preceded by a palette.
             boost::uint8_t* colorTable = buffer.get();
 
-            for (int j = 0; j < height; j++)
-            {
+            for (size_t j = 0; j < height; ++j) {
                 boost::uint8_t* inRow = buffer.get() + 
                     colorTableSize * channels + j * pitch;
 
                 boost::uint8_t* outRow = scanline(*image, j);
-                for (int i = 0; i < width; i++)
-                {
+                for (size_t i = 0; i < width; ++i) {
                     boost::uint8_t pixel = inRow[i * bytes_per_pixel];
                     outRow[i * channels + 0] = colorTable[pixel * channels + 0];
                     outRow[i * channels + 1] = colorTable[pixel * channels + 1];
@@ -681,13 +633,12 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
         case 4:
             // 16 bits / pixel
 
-            for (int j = 0; j < height; j++)
-            {
+            for (size_t j = 0; j < height; ++j) {
+
                 boost::uint8_t* inRow = buffer.get() + j * pitch;
                 boost::uint8_t* outRow = scanline(*image, j);
-                for (int i = 0; i < width; i++)
-                {
-                    boost::uint16_t pixel = inRow[i * 2] |
+                for (size_t i = 0; i < width; ++i) {
+                    const boost::uint16_t pixel = inRow[i * 2] |
                         (inRow[i * 2 + 1] << 8);
 
                     // How is the data packed??? Whoever wrote this was
@@ -708,14 +659,12 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
 
         case 5:
             // Need to re-arrange ARGB into RGB or RGBA.
-            for (int j = 0; j < height; j++)
-            {
+            for (size_t j = 0; j < height; ++j) {
                 boost::uint8_t* inRow = buffer.get() + j * pitch;
                 boost::uint8_t* outRow = scanline(*image, j);
                 const int inChannels = 4;
 
-                for (int i = 0; i < width; ++i)
-                {
+                for (size_t i = 0; i < width; ++i) {
                     // Copy pixels 1-3.
                     std::copy(&inRow[i * inChannels + 1],
                             &inRow[i * inChannels + 4], &outRow[i * channels]);
@@ -764,9 +713,8 @@ sprite_loader(SWFStream& in, TagType tag, movie_definition& m,
     in.ensureBytes(2);
     const boost::uint16_t id = in.read_u16();
 
-    IF_VERBOSE_PARSE
-    (
-    log_parse(_("  sprite:  char id = %d"), id);
+    IF_VERBOSE_PARSE(
+        log_parse(_("  sprite:  char id = %d"), id);
     );
 
     // A DEFINESPRITE tag as part of a DEFINESPRITE
@@ -776,7 +724,7 @@ sprite_loader(SWFStream& in, TagType tag, movie_definition& m,
         try {
             dynamic_cast<SWFMovieDefinition&>(m);
         }
-        catch (std::bad_cast& e) {
+        catch (const std::bad_cast&) {
             log_swferror(_("Nested DEFINESPRITE tags. Will add to "
                            "top-level DisplayObjects dictionary."));
         }
@@ -790,7 +738,6 @@ sprite_loader(SWFStream& in, TagType tag, movie_definition& m,
             log_swferror(_("Sprite %d advertise no frames"), id);
         }
     );
-
 
     m.addDisplayObject(id, ch);
 }
@@ -809,9 +756,6 @@ sprite_loader(SWFStream& in, TagType tag, movie_definition& m,
 /// NOTE that the first element of this table lacks the .5
 /// portion of the actual value. Dunno what consequences 
 /// it could have...
-///
-static int s_sample_rate_table[] = { 5512, 11025, 22050, 44100 };
-static unsigned int s_sample_rate_table_len = 4;
 
 // @@ There are two sets of code to decode/expand/byteswap audio here.
 // @@ There should be one (search for ADPCM).
@@ -827,27 +771,26 @@ define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
 
     in.ensureBytes(2+4+1+4); // DisplayObject id + flags + sample count
 
-    boost::uint16_t    id = in.read_u16();
+    const boost::uint16_t id = in.read_u16();
 
     media::audioCodecType format = static_cast<media::audioCodecType>(
             in.read_uint(4));
-    unsigned sample_rate_in = in.read_uint(2); // see s_sample_rate_table
-    if ( sample_rate_in >= s_sample_rate_table_len ) 
-    {
+
+    boost::uint8_t sample_rate_in = in.read_uint(2);
+
+    if (sample_rate_in >= arraySize(samplerates)) {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("DEFINESOUNDLOADER: sound sample rate %d (expected "
-                "0 to %u"), 
-            sample_rate_in, s_sample_rate_table_len);
+            log_swferror(_("DEFINESOUNDLOADER: sound sample rate %d (expected "
+                    "0 to %u"), +sample_rate_in, arraySize(samplerates));
         );
         sample_rate_in = 0;
     }
-    int sample_rate = s_sample_rate_table[sample_rate_in];
+    const boost::uint32_t sample_rate = samplerates[sample_rate_in];
 
+    const bool sample_16bit = in.read_bit(); 
+    const bool stereo = in.read_bit(); 
 
-    bool    sample_16bit = in.read_bit(); 
-    bool    stereo = in.read_bit(); 
-
-    unsigned int    sample_count = in.read_u32();
+    const boost::uint32_t sample_count = in.read_u32();
 
     boost::int16_t delaySeek = 0;
 
@@ -856,18 +799,15 @@ define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
         delaySeek = in.read_s16();
     }
 
-    IF_VERBOSE_PARSE
-    (
-        log_parse(_("define sound: ch=%d, format=%s, "
-            "rate=%d, 16=%d, stereo=%d, ct=%d, delay=%d"),
-              id, format, sample_rate,
-              int(sample_16bit), int(stereo), sample_count, delaySeek);
+    IF_VERBOSE_PARSE(
+        log_parse(_("define sound: ch=%d, format=%s, rate=%d, 16=%d, "
+            "stereo=%d, ct=%d, delay=%d"), id, format, sample_rate,
+            sample_16bit, stereo, sample_count, delaySeek);
     );
 
     // If we have a sound_handler, ask it to init this sound.
 
-    if (handler)
-    {
+    if (handler) {
         // First it is the amount of data from file,
         // then the amount allocated at *data (it may grow)
         const unsigned dataLength = in.get_tag_end_position() - in.tell();
@@ -878,7 +818,7 @@ define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
         media::MediaHandler* mh = r.mediaHandler();
         if (mh) allocSize += mh->getInputPaddingSize();
 
-        std::auto_ptr<SimpleBuffer> data( new SimpleBuffer(allocSize) );
+        std::auto_ptr<SimpleBuffer> data(new SimpleBuffer(allocSize));
 
         // dataLength is already calculated from the end of the tag, which
         // should be inside the end of the file. TODO: check that this is 
@@ -886,8 +826,8 @@ define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
         const unsigned int bytesRead = in.read(
                 reinterpret_cast<char*>(data->data()), dataLength);
         data->resize(bytesRead); // in case it's shorter...
-        if (bytesRead < dataLength)
-        {
+
+        if (bytesRead < dataLength) {
             throw ParserException(_("Tag boundary reported past end of "
                         "SWFStream!"));
         }
@@ -899,22 +839,19 @@ define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
 
         // Stores the sounddata in the soundhandler, and the ID returned
         // can be used to starting, stopping and deleting that sound
-        int    handler_id = handler->create_sound(data, sinfo);
+        const int handler_id = handler->create_sound(data, sinfo);
 
-        if (handler_id >= 0)
-        {
-        sound_sample* sam = new sound_sample(handler_id, r);
-        m.add_sound_sample(id, sam);
+        if (handler_id >= 0) {
+            sound_sample* sam = new sound_sample(handler_id, r);
+            m.add_sound_sample(id, sam);
         }
 
     }
-    else
-    {
+    else {
         // is this nice to do?
         log_error(_("There is no sound handler currently active, "
             "so DisplayObject with id %d will not be added to "
-            "the dictionary"),
-              id);
+            "the dictionary"), id);
     }
 }
 
@@ -923,7 +860,6 @@ void
 sound_stream_head_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunResources& r)
 {
-
     // 18 || 45
     assert(tag == SWF::SOUNDSTREAMHEAD || tag == SWF::SOUNDSTREAMHEAD2);
 
@@ -944,87 +880,80 @@ sound_stream_head_loader(SWFStream& in, TagType tag, movie_definition& m,
     // These are all unused by current implementation
     int reserved = in.read_uint(4); UNUSED(reserved);
 
-    unsigned int pbSoundRate = in.read_uint(2);
-    if ( pbSoundRate >= s_sample_rate_table_len )
-    {
+    boost::uint8_t pbSoundRate = in.read_uint(2);
+    if (pbSoundRate >= arraySize(samplerates)) {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror("SOUNDSTREAMHEAD: playback sound rate %d (expected 0 to %d)",
-            pbSoundRate, s_sample_rate_table_len);
+            log_swferror("SOUNDSTREAMHEAD: playback sound rate %d (expected "
+                "0 to %d)", +pbSoundRate, arraySize(samplerates));
         );
         pbSoundRate=0;
     }
-    int playbackSoundRate = s_sample_rate_table[pbSoundRate];
-    bool playbackSound16bit = in.read_bit();
-    bool playbackSoundStereo = in.read_bit();
+    const boost::uint32_t playbackSoundRate = samplerates[pbSoundRate];
+    const bool playbackSound16bit = in.read_bit();
+    const bool playbackSoundStereo = in.read_bit();
 
     // These are the used ones
-    media::audioCodecType format = static_cast<media::audioCodecType>(in.read_uint(4)); // TODO: check input !
-    unsigned int stSoundRate = in.read_uint(2);
-    if ( stSoundRate >= s_sample_rate_table_len )
-    {
+    media::audioCodecType format =
+        static_cast<media::audioCodecType>(in.read_uint(4)); // TODO: check input !
+    boost::uint8_t stSoundRate = in.read_uint(2);
+
+    if (stSoundRate >= arraySize(samplerates)) {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("SOUNDSTREAMHEAD: stream sample rate %d (expected 0 to %u)"),
-            stSoundRate, s_sample_rate_table_len);
+            log_swferror(_("SOUNDSTREAMHEAD: stream sample rate %d (expected "
+                "0 to %u)"), +stSoundRate, arraySize(samplerates));
         );
         stSoundRate=0;
     }
-    int streamSoundRate = s_sample_rate_table[stSoundRate];
-    bool streamSound16bit = in.read_bit(); 
-    bool streamSoundStereo = in.read_bit(); 
+    const boost::uint32_t streamSoundRate = samplerates[stSoundRate];
+    const bool streamSound16bit = in.read_bit(); 
+    const bool streamSoundStereo = in.read_bit(); 
 
-    if ( playbackSoundRate != streamSoundRate )
-    {
-        LOG_ONCE(
-            log_unimpl(_("Different stream/playback sound rate (%d/%d). "
+    if (playbackSoundRate != streamSoundRate) {
+        LOG_ONCE(log_unimpl(_("Different stream/playback sound rate (%d/%d). "
                 "This seems common in SWF files, so we'll warn only once."),
-                streamSoundRate,playbackSoundRate)
+                streamSoundRate, playbackSoundRate)
         );
     }
 
-    if ( playbackSound16bit != streamSound16bit )
-    {
-        LOG_ONCE(
-            log_unimpl(_("Different stream/playback sample size (%d/%d). "
+    if (playbackSound16bit != streamSound16bit) {
+        LOG_ONCE(log_unimpl(_("Different stream/playback sample size (%d/%d). "
             "This seems common in SWF files, so we'll warn only once."),
-            streamSound16bit ? 16 : 32,
-            playbackSound16bit ? 16 : 32 )
+            streamSound16bit ? 16 : 32, playbackSound16bit ? 16 : 32 )
         );
     }
-    if ( playbackSoundStereo != streamSoundStereo )
-    {
-        LOG_ONCE(
-            log_unimpl(_("Different stream/playback channels (%s/%s). "
+    if (playbackSoundStereo != streamSoundStereo) {
+        LOG_ONCE(log_unimpl(_("Different stream/playback channels (%s/%s). "
             "This seems common in SWF files, so we'll warn only once."),
-                streamSoundStereo ? "stereo" : "mono",
-                playbackSoundStereo ? "stereo":"mono")
+            streamSoundStereo ? "stereo" : "mono",
+            playbackSoundStereo ? "stereo" : "mono")
         );
     }
 
     // checks if this is a new streams header or just one in the row
-    if (format == 0 && streamSoundRate == 0 && !streamSound16bit && !streamSoundStereo) return;
-
-    // 2 bytes here
-    unsigned int sampleCount = in.read_u16();
-
-    if ( ! sampleCount )
-    {
-    // this seems common too, we'd need to reproduce with a custom
-    // testcase to really tell if it's a problem or not...
-    IF_VERBOSE_MALFORMED_SWF(
-        LOG_ONCE( log_swferror(_("No samples advertised for sound stream, pretty common so will warn only once")) );
-    );
+    if (format == 0 && streamSoundRate == 0 &&
+            !streamSound16bit && !streamSoundStereo) {
+        return;
     }
 
-    int latency = 0;
-    if (format == media::AUDIO_CODEC_MP3)
-    {
-        try
-        {
+    // 2 bytes here
+    const boost::uint16_t sampleCount = in.read_u16();
+
+    if (!sampleCount) {
+        // this seems common too, we'd need to reproduce with a custom
+        // testcase to really tell if it's a problem or not...
+        IF_VERBOSE_MALFORMED_SWF(
+            LOG_ONCE(log_swferror(_("No samples advertised for sound stream, "
+                        "pretty common so will warn only once")));
+        );
+    }
+
+    boost::int16_t latency = 0;
+    if (format == media::AUDIO_CODEC_MP3) {
+        try {
             in.ensureBytes(2);
             latency = in.read_s16(); 
         }
-        catch (ParserException& ex)
-        {
+        catch (const ParserException&) {
             // See https://savannah.gnu.org/bugs/?21729 for an example 
             // triggering this.
             IF_VERBOSE_MALFORMED_SWF(
@@ -1034,24 +963,26 @@ sound_stream_head_loader(SWFStream& in, TagType tag, movie_definition& m,
     }
 
     // Check if we did read everything in this tag...
-    unsigned long curPos=in.tell(), endTag=in.get_tag_end_position();
-    if ( curPos < endTag ) {
+    unsigned long curPos = in.tell(), endTag=in.get_tag_end_position();
+    if (curPos < endTag) {
         log_unimpl("SOUNDSTREAMHEAD contains %d unparsed bytes", endTag-curPos);
     }
 
-
     IF_VERBOSE_PARSE(
-        log_parse(_("sound stream head: format=%s, rate=%d, 16=%d, stereo=%d, ct=%d, latency=%d"),
-          format, streamSoundRate, int(streamSound16bit), int(streamSoundStereo), sampleCount, latency);
+        log_parse(_("sound stream head: format=%s, rate=%d, 16=%d, "
+            "stereo=%d, ct=%d, latency=%d"), format, streamSoundRate,
+            +streamSound16bit, +streamSoundStereo, +sampleCount, +latency);
     );
 
     // Store all the data in a SoundInfo object
     std::auto_ptr<media::SoundInfo> sinfo;
-    sinfo.reset(new media::SoundInfo(format, streamSoundStereo, streamSoundRate, sampleCount, streamSound16bit, latency));
+    sinfo.reset(new media::SoundInfo(format, streamSoundStereo,
+                streamSoundRate, sampleCount, streamSound16bit, latency));
 
     // Stores the sounddata in the soundhandler, and the ID returned
     // can be used to starting, stopping and deleting that sound
-    int handler_id = handler->create_sound(std::auto_ptr<SimpleBuffer>(0), sinfo);
+    const int handler_id =
+        handler->create_sound(std::auto_ptr<SimpleBuffer>(0), sinfo);
 
     m.set_loading_sound_stream_id(handler_id);
 }
@@ -1082,8 +1013,7 @@ file_attributes_loader(SWFStream& in, TagType tag, movie_definition& m,
     flags.network = in.read_bit(); 
     flags.reserved3 = in.read_uint(24);
 
-    IF_VERBOSE_PARSE
-    (
+    IF_VERBOSE_PARSE(
         log_parse(_("File attributes: metadata=%s network=%s"),
               flags.metadata ? _("true") : _("false"),
               flags.network ? _("true") : _("false"))
@@ -1126,7 +1056,7 @@ metadata_loader(SWFStream& in, TagType tag, movie_definition& m,
     std::string metadata;
     in.read_string(metadata);
 
-    IF_VERBOSE_PARSE (
+    IF_VERBOSE_PARSE(
         log_parse(_("  RDF metadata (information only): [[\n%s\n]]"),
             metadata);
     );
@@ -1166,24 +1096,25 @@ serialnumber_loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
 
     in.ensureBytes(26);
 
-    double id = in.read_u32();
-    double edition = in.read_u32();
-    int major = in.read_u8();
-    int minor = in.read_u8();
+    const boost::uint32_t id = in.read_u32();
+    const boost::uint32_t edition = in.read_u32();
+    const boost::uint8_t major = in.read_u8();
+    const boost::uint8_t minor = in.read_u8();
 
-    boost::uint32_t buildL = in.read_u32();
-    boost::uint32_t buildH = in.read_u32();
-    boost::uint64_t build = (((boost::uint64_t)buildH) << 32) + buildL;
+    const boost::uint32_t buildL = in.read_u32();
+    const boost::uint32_t buildH = in.read_u32();
+    const boost::uint64_t build =
+        (static_cast<boost::uint64_t>(buildH) << 32) + buildL;
 
-    boost::uint32_t timestampL = in.read_u32();
-    boost::uint32_t timestampH = in.read_u32();
+    const boost::uint32_t timestampL = in.read_u32();
+    const boost::uint32_t timestampH = in.read_u32();
     // This timestamp is number of milliseconds since 1 Jan 1970 (epoch)
-    boost::uint64_t timestamp = (((boost::uint64_t)timestampH) << 32)
-        + timestampL;
+    boost::uint64_t timestamp = 
+        (static_cast<boost::uint64_t>(timestampH) << 32) + timestampL;
 
     std::stringstream ss;
     ss << "SERIALNUMBER: Version " << id << "." << edition 
-        << "." << major << "." << minor;
+        << "." << +major << "." << +minor;
     ss << " - Build " << build;
     ss << " - Timestamp " << timestamp;
 
@@ -1199,17 +1130,13 @@ reflex_loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
     assert(tag == SWF::REFLEX); // 777
 
     in.ensureBytes(3);
-    boost::uint8_t first = in.read_u8();
-    boost::uint8_t second = in.read_u8();
-    boost::uint8_t third = in.read_u8();
+    const boost::uint8_t first = in.read_u8();
+    const boost::uint8_t second = in.read_u8();
+    const boost::uint8_t third = in.read_u8();
 
-    IF_VERBOSE_PARSE (
-    log_parse(_("  reflex = \"%c%c%c\""), first, second, third);
+    IF_VERBOSE_PARSE(
+        log_parse(_("  reflex = \"%c%c%c\""), first, second, third);
     );
-
-    log_unimpl(_("REFLEX tag parsed (\"%c%c%c\") but unused"),
-            first, second, third);
-
 }
 
 } // namespace gnash::SWF
