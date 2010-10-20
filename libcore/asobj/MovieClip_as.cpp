@@ -368,8 +368,19 @@ as_value
 movieclip_filters(const fn_call& fn)
 {
     MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
+    
     UNUSED(movieclip);
+
     LOG_ONCE(log_unimpl(_("MovieClip.filters()")));
+
+    if (!fn.nargs) {
+        // Getter
+        Global_as& gl = getGlobal(fn);
+        as_object* array = gl.createArray();
+        return as_value(array);
+    }
+
+    // Setter
     return as_value();
 }
 

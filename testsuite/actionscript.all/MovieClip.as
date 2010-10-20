@@ -1094,32 +1094,32 @@ check_equals(typeof(this.$version), 'undefined');
 // A fake array works.
 
 #if OUTPUT_VERSION > 7
-    xcheck_equals(typeof(_root.filters), "object");
-    xcheck(_root.filters.hasOwnProperty("length"));
-    xcheck_equals(_root.filters.length, 0);
+    check_equals(typeof(_root.filters), "object");
+    check(_root.filters.hasOwnProperty("length"));
+    check_equals(_root.filters.length, 0);
 
     _root.filters = 7;
-    xcheck_equals(typeof(_root.filters), "object");
+    check_equals(typeof(_root.filters), "object");
 
     _root.filters.push(7);
-    xcheck_equals(_root.filters.toString(), "");
+    check_equals(_root.filters.toString(), "");
 
     _root.filters.push(new Object());
-    xcheck_equals(_root.filters.toString(), "");
+    check_equals(_root.filters.toString(), "");
 
     _root.filters.push(new Date(0));
-    xcheck_equals(_root.filters.toString(), "");
+    check_equals(_root.filters.toString(), "");
 
     _root.filters.length = 4;
-    xcheck_equals(_root.filters.toString(), "");
-    xcheck_equals(_root.filters.length, 0);
+    check_equals(_root.filters.toString(), "");
+    check_equals(_root.filters.length, 0);
 
     _root.filters.push(new flash.filters.ConvolutionFilter());
-    xcheck_equals(_root.filters.toString(), "");
+    check_equals(_root.filters.toString(), "");
 
     _root.filters = [ 1, 3, 4, 5 ];
-    xcheck_equals(_root.filters.length, 0);
-    xcheck_equals(_root.filters.toString(), "");
+    check_equals(_root.filters.length, 0);
+    check_equals(_root.filters.toString(), "");
 
     _root.filters = [ new flash.filters.ConvolutionFilter() ];
     xcheck_equals(_root.filters.length, 1);
@@ -1148,7 +1148,7 @@ check_equals(typeof(this.$version), 'undefined');
     xcheck_equals(_root.filters.toString(), "[object Object],[object Object]");
     
     _root.filters = 34;
-    xcheck_equals(_root.filters.length, 0);
+    check_equals(_root.filters.length, 0);
 
     fake = {};
     fake.length = 3;
@@ -1175,7 +1175,7 @@ check_equals(typeof(this.$version), 'undefined');
     _global.Array = backup;
     
     _root.filters = "";
-    xcheck_equals(_root.filters.length, 0);
+    check_equals(_root.filters.length, 0);
 
 #endif
 
