@@ -57,7 +57,6 @@
 
 #include "Range2d.h"
 
-#include "gnash.h"
 #include "smart_ptr.h"
 #include "movie_definition.h" 
 #include "log.h"
@@ -374,7 +373,7 @@ Kde4Gui::qtToGnashKey(QKeyEvent *event)
 
     // Gnash uses its own keycodes to map key events
     // to the three sometimes weird and confusing values that flash movies
-    // can refer to. See gnash.h for the keycodes and map.
+    // can refer to. See GnashKey.h for the keycodes and map.
     //
     // Gnash's keycodes are gnash::key::code. They are mainly in ascii order.
     // Standard ascii characters (32-127) have the same value. Extended ascii

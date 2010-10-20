@@ -25,7 +25,6 @@
 
 #include <fltk/Widget.h>
 
-#include "gnash.h"
 #include "log.h"
 #include "gui.h"
 

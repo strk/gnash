@@ -99,7 +99,6 @@
 # undef ENABLE_TSLIB
 #endif
 
-#include "gnash.h"
 #include "gui.h"
 #include "fbsup.h"
 #include "log.h"

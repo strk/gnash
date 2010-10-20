@@ -31,7 +31,6 @@ extern "C"{
 # endif
 }
 
-#include "gnash.h"
 #include "aquasup.h"
 #include "log.h"
 #include "movie_root.h"

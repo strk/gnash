@@ -27,7 +27,7 @@
 
 #include "smart_ptr.h"
 #include "swf/ShapeRecord.h"
-#include "gnash.h"
+#include "GnashEnums.h"
 #include "RGBA.h"
 #include "GnashImage.h"
 #include "GnashTexture.h"

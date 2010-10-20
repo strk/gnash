@@ -153,7 +153,7 @@ AGG resources
 #include <agg_gradient_lut.h>
 #include <agg_alpha_mask_u8.h>
 
-#include "gnash.h"
+#include "GnashEnums.h"
 #include "CachedBitmap.h"
 #include "RGBA.h"
 #include "GnashImage.h"

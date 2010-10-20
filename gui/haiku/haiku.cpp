@@ -25,7 +25,6 @@
 
 #include <boost/format.hpp>
 
-#include "gnash.h"
 #include "adipe.h"
 #include "haikusup.h"
 

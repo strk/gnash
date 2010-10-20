@@ -16,8 +16,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __PLUGIN_H__
-#define __PLUGIN_H__
+#ifndef GNASH_W32_PLUGIN_H
+#define GNASH_W32_PLUGIN_H
  
 #include <string>
 #include "pluginbase.h"
@@ -29,7 +29,6 @@
 #include "prerror.h"
 #include "prthread.h"
 
-#include "gnash.h"
 #include "log.h"
 #include "rc.h"
 #include "Player.h"

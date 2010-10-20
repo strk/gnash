@@ -149,8 +149,7 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 
-#include "FileTypes.h"
-#include "gnash.h" // Quality
+#include "GnashEnums.h" 
 #include "Range2d.h"
 #include "Point2d.h"
 #include "RGBA.h"

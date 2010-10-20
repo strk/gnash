@@ -84,7 +84,7 @@
 #include "drag_state.h" // for composition
 #include "GnashKey.h" // key::code
 #include "Movie.h"
-#include "gnash.h" // Quality
+#include "GnashEnums.h" 
 #include "MovieClip.h"
 #include "SimpleBuffer.h" // for LoadCallback
 #include "MovieLoader.h"

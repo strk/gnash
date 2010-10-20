@@ -38,7 +38,7 @@
 #include "GnashException.h" 
 #include "ExecutableCode.h"
 #include "namedStrings.h"
-#include "gnash.h" // Quality
+#include "GnashEnums.h" 
 #include "GnashNumeric.h"
 #include "Global_as.h"
 #include "Renderer.h"

@@ -52,7 +52,7 @@
 #include "Renderer.h"
 #include "RunResources.h"
 #include "VM.h"
-#include "gnash.h" // Quality
+#include "GnashEnums.h"
 #include "gtk_canvas.h"
 
 #ifdef HAVE_VA_VA_H

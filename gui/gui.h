@@ -23,13 +23,12 @@
 #include "gnashconfig.h"
 #endif
 
-#include "SWFRect.h"  // for composition
 #include "snappingrange.h"  // for InvalidatedRanges
-#include "GnashKey.h" // for gnash::key::code type
-#include "Renderer.h" // for gnash::key::code type
+#include "GnashKey.h"
+#include "Renderer.h" 
 #include "VirtualClock.h"
 #include "SystemClock.h"
-#include "gnash.h" // for Quality
+#include "GnashEnums.h" 
 #include "movie_root.h"
 
 #ifdef USE_SWFTREE
@@ -65,8 +64,8 @@
 #define ENABLE_KEYBOARD_MOUSE_MOVEMENTS 1
 
 // Forward declarations
-namespace gnash
-{
+namespace gnash {
+    class SWFRect;
     class RunResources;
     class movie_root;
     class movie_definition;

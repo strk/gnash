@@ -247,7 +247,6 @@ EXTENSIONS_API = \
 	GnashKey.h \
 	Movie.h \
 	RunResources.h \
-	gnash.h	\
 	DisplayObjectContainer.h \
 	DisplayObject.h \
 	MovieClip.h \

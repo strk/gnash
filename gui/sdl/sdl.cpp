@@ -23,7 +23,6 @@
 
 #include <cstdio>
 
-#include "gnash.h"
 #include "log.h"
 #include "sdlsup.h"
 #include "Range2d.h" // for Intersection of inv bounds

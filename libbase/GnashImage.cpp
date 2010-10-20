@@ -33,7 +33,7 @@
 #ifdef USE_GIF
 # include "GnashImageGif.h"
 #endif
-#include "FileTypes.h"
+#include "GnashEnums.h"
 #include "GnashImageJpeg.h"
 #include "IOChannel.h"
 #include "log.h"
@@ -190,7 +190,7 @@ Output::writeImageData(FileType type,
 
 }
 
-// See gnash.h for file types.
+// See GnashEnums.h for file types.
 std::auto_ptr<GnashImage>
 Input::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
 {

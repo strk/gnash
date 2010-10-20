@@ -19,7 +19,6 @@
 //
 
 #include "aos4_cairo_glue.h"
-#include "gnash.h"
 #include "log.h"
 #undef ACTION_END
 #include "Renderer.h"

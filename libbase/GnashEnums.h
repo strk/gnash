@@ -31,6 +31,14 @@ enum FileType {
     GNASH_FILETYPE_UNKNOWN
 };
 
+enum Quality
+{
+    QUALITY_LOW,
+    QUALITY_MEDIUM,
+    QUALITY_HIGH,
+    QUALITY_BEST
+};
+
 }
 
 #endif

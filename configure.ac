@@ -17,7 +17,7 @@ dnl
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, master)
-AC_CONFIG_SRCDIR([libcore/gnash.h])
+AC_CONFIG_SRCDIR([libcore/as_object.h])
 AC_CONFIG_HEADERS([gnashconfig.h])
 
 dnl AC_CONFIG_SUBDIRS(libltdl)

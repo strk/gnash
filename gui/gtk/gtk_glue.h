@@ -19,8 +19,6 @@
 #ifndef GNASH_GTK_GLUE_H
 #define GNASH_GTK_GLUE_H
 
-#include "gnash.h"
-
 #include <cassert>
 
 #include <gtk/gtk.h>

@@ -30,7 +30,7 @@
 #include <boost/scoped_array.hpp>
 #include <memory> 
 
-#include "FileTypes.h"
+#include "GnashEnums.h"
 #include "log.h"
 #include "dsodefs.h"
 
@@ -366,7 +366,7 @@ public:
 
     /// Write the given image to the given IOChannel in a specified format.
     //
-    /// @param type     The image format to write in (see libcore/gnash.h)
+    /// @param type     The image format to write in (see GnashEnums.h)
     /// @param out      The IOChannel to write to.
     /// @param image    The image to write.
     /// @param quality  The quality of the image output (not used for all

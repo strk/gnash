@@ -39,7 +39,6 @@
 #endif
 
 #include "ClockTime.h"
-#include "gnash.h"
 #include "movie_definition.h"
 #include "MovieClip.h"
 #include "movie_root.h"

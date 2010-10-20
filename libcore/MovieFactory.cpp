@@ -19,7 +19,12 @@
 
 #include "MovieFactory.h"
 
-#include "FileTypes.h"
+#include <string>
+#include <map>
+#include <memory> 
+#include <algorithm>
+
+#include "GnashEnums.h"
 #include "GnashImage.h"
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "IOChannel.h"
@@ -32,11 +37,6 @@
 #include "StreamProvider.h"
 #include "MovieLibrary.h"
 #include "fontlib.h"
-
-#include <string>
-#include <map>
-#include <memory> // for auto_ptr
-#include <algorithm>
 
 namespace gnash
 {

@@ -229,13 +229,13 @@ public:
 
 	/// Notify key press
 	//
-	/// See key codes in namespace gnash::key (gnash.h)
+	/// See key codes in namespace gnash::key (GnashKey.h)
 	///
 	void pressKey(key::code k);
 
 	/// Notify key release
 	//
-	/// See key codes in namespace gnash::key (gnash.h)
+	/// See key codes in namespace gnash::key (GnashKey.h)
 	///
 	void releaseKey(key::code k);
 

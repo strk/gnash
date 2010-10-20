@@ -38,7 +38,7 @@
 #include "VM.h"
 #include "DisplayObject.h"
 #include "tu_file.h"
-#include "gnash.h"
+#include "GnashEnums.h"
 #include "RunResources.h"
 #include "StreamProvider.h"
 
@@ -1307,8 +1307,8 @@ void
 Gui::setQuality(Quality q)
 {
     if (!_stage) {
-	log_error("Gui::setQuality called before a movie_root was available");
-	return;
+        log_error("Gui::setQuality called before a movie_root was available");
+        return;
     }
     _stage->setQuality(q);
 }

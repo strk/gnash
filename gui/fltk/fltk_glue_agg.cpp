@@ -22,10 +22,7 @@
 
 #include <fltk/draw.h>
 
-
-
 #include "fltk_glue_agg.h"
-#include "gnash.h"
 
 #include "Renderer.h"
 #include "Renderer_agg.h"

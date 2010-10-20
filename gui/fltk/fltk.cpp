@@ -36,7 +36,6 @@
 #include <fltk/file_chooser.h>
 
 #include "fltksup.h"
-#include "gnash.h"
 #include "gui.h"
 #include "VM.h"
 #include "RunResources.h"

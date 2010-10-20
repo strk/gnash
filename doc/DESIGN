@@ -30,19 +30,7 @@ Component connectors
 --------------------
 
  {A} --- [gnash_core] to [sound_handler] connector 
-         Is setup with gnash::set_sound_handler()
-         and retrived with gnash::get_sound_handler().
-         Both currently exposed in server/gnash.h.
 
  {B} --- [gnash_core] to [render_handler] connector 
-         Is setup with gnash::set_render_handler()
-         exposed in gnash.h.
-         Can be retrived with gnash::get_render_handler()
-         exposed in server/render.h, or used trough
-         wrappers in the gnash::render namespace
-         (still in server/render.h)
 
  {C} --- [gnash_core] to [MediaHandler] connector 
-         Is setup with gnash::media::MediaHandler::set
-         and retrived with gnash::media::MediaHandler::get,
-         both currently exposed in libmedia/MediaHandler.h

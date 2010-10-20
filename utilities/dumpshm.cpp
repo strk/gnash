@@ -67,7 +67,6 @@ extern char *optarg;
 #include "log.h"
 #include "rc.h"
 #include "shm.h"
-#include "gnash.h"
 #include "amf.h"
 #include "lcshm.h"
 

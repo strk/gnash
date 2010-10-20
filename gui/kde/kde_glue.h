@@ -20,8 +20,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include "gnash.h"
-
 #if GNASH_QT_VERSION == 4
 # include <Qt/qwidget.h>
 #else
@@ -29,8 +27,7 @@
 #endif
 #include "snappingrange.h"
 
-namespace gnash
-{
+namespace gnash {
 
 class Renderer; 
 class KdeGlue

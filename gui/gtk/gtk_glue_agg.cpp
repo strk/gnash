@@ -29,7 +29,6 @@
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 
-#include "gnash.h"
 #include "log.h"
 #include "Renderer.h"
 #include "Renderer_agg.h"
