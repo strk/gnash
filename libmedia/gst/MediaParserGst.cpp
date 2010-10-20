@@ -139,9 +139,10 @@ MediaParserGst::parseNextChunk()
     
     emitEncodedFrames();
 
-    // FIXME: do we need to check this here?
+    // FIXME: our caller check for _parsingComplete prior
+    //        to call parseNextChunk
     if (_stream->eof()) {
-        log_debug (_("Stream EOF, emitting!"));
+        //log_debug (_("Stream EOF, emitting!"));
         _parsingComplete = true;
         return false;
     }
