@@ -29,6 +29,7 @@
 
 #include "log.h"
 
+#include "WallClockTimer.h"
 #include "gui.h"
 #include "rc.h"
 #include "sound_handler.h"
@@ -152,71 +153,33 @@ bool
 DumpGui::run()
 {
 
-    struct timeval tv;
+    log_debug("DumpGui entering main loop with interval of %d", _interval);
 
-    // TODO:  Polling is awful; should be an OS-agnostic u-sec callback
-    //        timer system for C++ out there (boost?).   This code is
-    //        from the fb gui, and made a bit nicer by lengthening the
-    //        usleep values with educated guesses.  It's possible for
-    //        slow systems to fall behind with this code, which would
-    //        cause the audio stream to get out of sync (bad?).
+    WallClockTimer timer;
 
-    double timer_start;
-    unsigned int sleep_usecs;
-
-    if (gettimeofday(&tv, NULL) == 0) {
-        timer_start = static_cast<double>(tv.tv_sec) +
-	static_cast<double>(tv.tv_usec) / 1000000.0;
-    }
-    else {
-        log_error(_("Unable to call gettimeofday."));
-        return false;
-    }
-    
     _terminate_request = false;
 
-    // first frame
-    Gui::advance_movie(this);
-    writeFrame();
-
-    double timer_current = timer_start;
-    double timer_nextframe = timer_start;
-    double interval_s = static_cast<double>(_interval) / 1000.0;
-    double timer_exit = timer_start + (static_cast<double>(_timeout) / 1000.0);
-
     while (!_terminate_request) {
-  
-        timer_nextframe += interval_s;
-
-        // polling loop
-        while (timer_current < timer_nextframe) {
-            // sleep for 95% of remaining usecs, floored at 50
-            sleep_usecs = static_cast<int>(((timer_nextframe - timer_current) * 950000.0));
-            gnashSleep((sleep_usecs < 50) ? 50 : sleep_usecs);
-            if (gettimeofday(&tv, NULL) == 0) {
-                timer_current = static_cast<double>(tv.tv_sec) +
-		static_cast<double>(tv.tv_usec) / 1000000.0;
-            } else {
-                log_error(_("Unable to call gettimeofday."));
-                return false;
-            }
-        }
 
         // advance movie now
-        Gui::advance_movie(this);
-        writeFrame();
+        if ( advanceMovie() ) {
+            ++_framecount;
+            writeFrame();
+        }
+  
+        gnashSleep(_interval);
 
         // check if we've reached a timeout
-        if (_timeout && (timer_current > timer_exit)) {
+        if (_timeout && timer.elapsed() > _timeout ) {
             _terminate_request = true;
         }
     }
 
-    if ((timer_current - timer_start) != 0.0) {
-        std::cout << "TIME=" << (timer_current - timer_start) << std::endl;
-        std::cout << "FPS_ACTUAL=" << 
-            (static_cast<double>((_framecount-1)) / (timer_current - timer_start)) << std::endl;
-    }
+    boost::uint32_t total_time = timer.elapsed();
+    double fps = _framecount*1000.0 / total_time;
+
+    std::cout << "TIME=" << total_time << std::endl;
+    std::cout << "FPS_ACTUAL=" << fps << std::endl;
     
     // In this Gui, quit() does not exit, but it is necessary to catch the
     // last frame for screenshots.
@@ -256,7 +219,6 @@ DumpGui::writeFrame()
 
     _fileStream.write(reinterpret_cast<char*>(_offscreenbuf.get()),
             _offscreenbuf_size);
-    ++_framecount;
 }
 
 void

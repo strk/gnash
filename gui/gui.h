@@ -328,13 +328,26 @@ public:
     void updateStageMatrix();
 
     /// \brief
-    /// Advances the movie to the next frame. This is to take place after the
+    /// Give movie an heart-beat.
+    //
+    /// This is to take place after the
     /// interval specified in the call to setInterval().
+    ///
+    /// Wheter or not this beat advanced the movie to the next frame
+    /// depends on elapsed time since last advancement.
+    ///
+    /// @return true if this beat resulted in actual frame advancement.
+    ///
     bool advanceMovie();
 
     /// Convenience static wrapper around advanceMovie for callbacks happiness.
+    //
+    /// NOTE: this function always return TRUE, for historical reasons.
+    /// TODO: bring code up-to-date to drop this legacy return code..
+    ///       
     static bool advance_movie(Gui* gui) {
-        return gui->advanceMovie();
+        gui->advanceMovie();
+        return true;
     }
 
     /// Force immediate redraw
