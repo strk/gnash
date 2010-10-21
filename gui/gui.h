@@ -476,6 +476,11 @@ public:
     /// Set the stage to advance/display
     void setStage(movie_root* stage);
 
+    /// Set the name of a file to dump audio to
+    void setAudioDump(const std::string& fname) {
+        _audioDump = fname;
+    }
+
     /// The root movie, or "Stage"
     movie_root* getStage() { return _stage; };
     
@@ -590,6 +595,9 @@ protected:
     
     /// Counter to keep track of frame advances
     unsigned long _advances;
+
+    /// Name of a file to dump audio to
+    std::string _audioDump;
 
     /// Called by Gui::stop().  This can be used by GUIs to implement pause
     /// widgets (so that resuming a stopped animation is more user-friendly)
