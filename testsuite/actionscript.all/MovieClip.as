@@ -115,7 +115,7 @@ check(!MovieClip.prototype.hasOwnProperty("_global"));
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(338); // SWF5
+	check_totals(347); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
@@ -2477,6 +2477,7 @@ check_equals(r._quality, "HIGH");
 check_equals(typeof(r._quality), "string");
 check_equals(r._highquality, 1);
 check_equals(_root._highquality, 1);
+#endif
 
 // Check the old toggle quality action
 check_equals(_root._quality, "HIGH");
@@ -2505,7 +2506,6 @@ check_equals(_root._quality, "LOW");
 toggleQuality();
 check_equals(_root._quality, "HIGH");
 
-#endif 
 //_root.loadVariables(MEDIA(vars.txt), "GET");
 
 
