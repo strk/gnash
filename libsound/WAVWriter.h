@@ -21,6 +21,7 @@
 #define GNASH_SOUND_WAVWRITER_H
 
 #include <fstream> // for composition (file_stream)
+#include <boost/cstdint.hpp>
 
 namespace gnash {
 namespace sound {
@@ -51,7 +52,7 @@ public:
     ///           to give interpretation of what comes back (how many
     ///           bytes per channel, which format).
     ///
-    virtual void pushSamples(boost::int16_t* from, unsigned int nSamples);
+    void pushSamples(boost::int16_t* from, unsigned int nSamples);
 
 private:
 

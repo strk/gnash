@@ -17,8 +17,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+#include "WAVWriter.h"
+#include "GnashException.h" // for SoundException
+#include "log.h" // will import boost::format too
+
+#include <cstring> // for strncpy
 #include <boost/cstdint.hpp>
 #include <fstream> // for composition (file_stream)
+#include <iostream>
 
 
 namespace gnash {
@@ -52,12 +58,13 @@ typedef struct{
 } // end of anonymous namespace
 
 /* public */
-WAVWRiter::WAVWriter(const std::string& fname)
+WAVWriter::WAVWriter(const std::string& wavefile)
 {
         file_stream.open(wavefile.c_str());
         if (file_stream.fail()) {
-            std::cerr << "Unable to write file '" << wavefile << std::endl;
-            std::exit(EXIT_FAILURE);
+            boost::format fmt = boost::format(_("Unable to write file %1%"))
+                % wavefile;
+            throw SoundException(fmt.str());
         } 
         else {
             write_wave_header(file_stream);
@@ -67,7 +74,7 @@ WAVWRiter::WAVWriter(const std::string& fname)
 }
 
 /* public */
-WAVWRiter::~WAVWriter()
+WAVWriter::~WAVWriter()
 {
     if (file_stream) file_stream.close();
 }
