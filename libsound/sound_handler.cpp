@@ -669,15 +669,6 @@ sound_handler::hasInputStreams() const
     return !_inputStreams.empty();
 }
 
-void
-sound_handler::mix(boost::int16_t* outSamples, boost::int16_t* inSamples,
-                unsigned int nSamples, float /*volume*/)
-{
-    /// @todo implement a better mixer !
-    // cheating, just copy input to output!
-    std::copy(outSamples, outSamples+nSamples, inSamples);
-}
-
 bool
 sound_handler::is_muted() const
 {

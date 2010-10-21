@@ -23,6 +23,7 @@
 
 #include "sound_handler.h" // for inheritance
 #include "dsodefs.h" // for DSOEXPORT
+#include <boost/shared_ptr.hpp> 
 
 namespace gnash {
 
@@ -36,7 +37,27 @@ namespace sound {
 class DSOEXPORT NullSoundHandler : public sound_handler
 {
 public:
-    NullSoundHandler(media::MediaHandler* m) : sound_handler(m) {}
+
+    boost::shared_ptr<sound_handler> _mixer;
+
+    NullSoundHandler(media::MediaHandler* m, boost::shared_ptr<sound_handler> mixer=boost::shared_ptr<sound_handler>((sound_handler*)0))
+        :
+        sound_handler(m),
+        _mixer(mixer)
+    {}
+
+    // If a _mixer was given, let it do the mixing!
+    void mix(boost::int16_t* outSamples, boost::int16_t* inSamples,
+                unsigned int nSamples, float volume)
+    {
+        if ( _mixer ) _mixer->mix(outSamples, inSamples, nSamples, volume);
+        else {
+            // cheating, just copy input to output, which in NO WAY
+            // can be considered "mixing"
+            std::copy(outSamples, outSamples+nSamples, inSamples);
+        }
+    }
+
 
 };
 	

@@ -409,6 +409,34 @@ public:
     ///
     virtual void fetchSamples(boost::int16_t* to, unsigned int nSamples);
 
+    /// Mix nSamples from inSamples to outSamples, with given volume
+    //
+    /// @param outSamples
+    ///     The output samples buffer, to mix to.
+    ///     Must be big enough to contain nSamples.
+    ///     Can be larger.
+    ///
+    /// @param inSamples
+    ///     The input samples buffer, to mix in.
+    ///     It is non-const as this method *is* allowed
+    ///     to mess with content, for example to apply
+    ///     volume.
+    ///     TODO: why not applying volume upstream ?!
+    ///
+    /// @param nSamples
+    ///     The amount of samples to mix in.
+    ///
+    /// @param volume
+    ///     The volume to apply to input samples, as a fraction (0..1)
+    ///
+    /// TODO: this interface says nothing about how many channels we're
+    ///       going to mix. It should, to be a sane interface.
+    ///       Maybe, a Mixer instance should be created, initialized
+    ///       with number of channels, at each fetching.
+    ///
+    virtual void mix(boost::int16_t* outSamples, boost::int16_t* inSamples,
+                unsigned int nSamples, float volume) = 0;
+
 protected:
 
 
@@ -437,34 +465,6 @@ protected:
 
     /// Does the mixer have input streams ?
     bool hasInputStreams() const;
-
-    /// Mix nSamples from inSamples to outSamples, with given volume
-    //
-    /// @param outSamples
-    ///     The output samples buffer, to mix to.
-    ///     Must be big enough to contain nSamples.
-    ///     Can be larger.
-    ///
-    /// @param inSamples
-    ///     The input samples buffer, to mix in.
-    ///     It is non-const as this method *is* allowed
-    ///     to mess with content, for example to apply
-    ///     volume.
-    ///     TODO: why not applying volume upstream ?!
-    ///
-    /// @param nSamples
-    ///     The amount of samples to mix in.
-    ///
-    /// @param volume
-    ///     The volume to apply to input samples, as a fraction (0..1)
-    ///
-    /// TODO: this interface says nothing about how many channels we're
-    ///       going to mix. It should, to be a sane interface.
-    ///       Maybe, a Mixer instance should be created, initialized
-    ///       with number of channels, at each fetching.
-    ///
-    virtual void mix(boost::int16_t* outSamples, boost::int16_t* inSamples,
-                unsigned int nSamples, float volume);
 
 private:
 
