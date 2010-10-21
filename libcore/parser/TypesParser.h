@@ -57,8 +57,10 @@ typedef std::pair<FillStyle, boost::optional<FillStyle> > OptionalFillPair;
 OptionalFillPair readFills(SWFStream& in, SWF::TagType t, movie_definition& m,
         bool readMorph);
 
+/// Read a RGB CxForm from the input stream
 SWFCxForm readCxFormRGB(SWFStream& in);
 
+/// Read a CxForm with alpha from the input stream
 SWFCxForm readCxFormRGBA(SWFStream& in);
 
 } // namespace gnash
