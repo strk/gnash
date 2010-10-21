@@ -24,8 +24,7 @@ bin_PROGRAMS += dump-gnash
 dump_gnash_SOURCES = $(GUI_SRCS) gui_dump.cpp dump.cpp dump.h
 dump_gnash_CPPFLAGS = -DGUI_DUMP -DGUI_CONFIG=\"DUMP\" \
 	$(AM_CPPFLAGS) $(DUMP_CFLAGS) $(AGG_CFLAGS)
-dump_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS) \
-	$(top_builddir)/librender/libgnashrender.la \
-	$(GNASH_LIBS) $(DUMP_LIBS) $(AGG_LIBS) $(CAIRO_LIBS)
+dump_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS) 
+dump_gnash_LDADD = $(GNASH_LIBS) $(DUMP_LIBS) $(AGG_LIBS) $(CAIRO_LIBS)
 endif				# BUILD_AGG_RENDERER
 endif				# BUILD_DUMP_GUI

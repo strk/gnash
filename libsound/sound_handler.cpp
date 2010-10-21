@@ -556,7 +556,7 @@ sound_handler::fetchSamples (boost::int16_t* to, unsigned int nSamples)
         boost::uint32_t tt = timerTotal.elapsed();
         boost::uint32_t exptime = fetched*1000/88200;
         log_debug("Samples fetch frequency: %d KHz (%dms late)",
-            floor(fetched*500.0/tt)/1000, (long)exptime-tt);
+            floor(fetched*500.0/tt)/1000, (long)tt-exptime);
         timerLocal.restart();
     }
 #endif
