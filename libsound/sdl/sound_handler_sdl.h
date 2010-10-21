@@ -23,12 +23,13 @@
 
 
 #include "sound_handler.h" // for inheritance
+#include "WAVWriter.h" // for dtor visibility 
 
 #include <string>
 #include <set> // for composition (InputStreams)
-#include <fstream> // for composition (file_stream)
 #include <SDL_audio.h>
 #include <boost/thread/mutex.hpp>
+#include <boost/scoped_ptr.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -50,6 +51,8 @@ private:
     /// The SDL_audio specs
     SDL_AudioSpec audioSpec;
 
+    boost::scoped_ptr<WAVWriter> _wavWriter;
+
     /// Initialize audio card
     void initAudio();
 
@@ -64,15 +67,6 @@ private:
 
     /// Mutex protecting _muted (defined in base class)
     mutable boost::mutex _mutedMutex;
-
-    /// File stream for dump file
-    //
-    /// TODO: move to base class ?
-    ///
-    std::ofstream file_stream;
-
-    // write a .WAV file header
-    void write_wave_header(std::ofstream& outfile);
 
     // See dox in sound_handler.h
     void mix(boost::int16_t* outSamples, boost::int16_t* inSamples,

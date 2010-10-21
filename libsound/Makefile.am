@@ -41,6 +41,7 @@ libgnashsound_la_SOURCES = \
 	sound_handler.cpp \
 	EmbedSound.cpp \
 	EmbedSoundInst.cpp \
+	WAVWriter.cpp \
 	$(NULL)
 
 noinst_HEADERS = \
@@ -50,7 +51,8 @@ noinst_HEADERS = \
 	InputStream.h \
 	EmbedSound.h \
 	EmbedSoundInst.h \
-        AuxStream.h
+	AuxStream.h \
+	WAVWriter.h \
 	$(NULL)
 
 if USE_SOUND_SDL
