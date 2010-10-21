@@ -119,15 +119,15 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(910); // SWF6
+	check_totals(919); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(943); // SWF7
+	check_totals(952); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(1060); // SWF8+
+	check_totals(1069); // SWF8+
 #endif
 
 	play();
@@ -2477,8 +2477,37 @@ check_equals(r._quality, "HIGH");
 check_equals(typeof(r._quality), "string");
 check_equals(r._highquality, 1);
 check_equals(_root._highquality, 1);
+
+// Check the old toggle quality action
+check_equals(_root._quality, "HIGH");
+
+toggleQuality();
+check_equals(_root._quality, "LOW");
+
+toggleQuality();
+check_equals(_root._quality, "HIGH");
+
+_root._quality = "medium";
+check_equals(_root._quality, "MEDIUM");
+
+toggleQuality();
+check_equals(_root._quality, "HIGH");
+
+_root._quality = "medium";
+check_equals(_root._quality, "MEDIUM");
+
+toggleQuality();
+check_equals(_root._quality, "HIGH");
+
+toggleQuality();
+check_equals(_root._quality, "LOW");
+
+toggleQuality();
+check_equals(_root._quality, "HIGH");
+
 #endif 
 //_root.loadVariables(MEDIA(vars.txt), "GET");
+
 
 // Can't rely on this to call onData!
 
