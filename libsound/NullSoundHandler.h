@@ -32,10 +32,7 @@ namespace media {
 
 namespace sound {
 
-/// Null sound_handler, for testing 
-//
-/// @todo start a thread to fetch samples ?
-///
+/// Null sound_handler, for testing or manual fetching of samples
 class DSOEXPORT NullSoundHandler : public sound_handler
 {
 public:
