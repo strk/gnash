@@ -24,7 +24,7 @@
 #if defined(_WIN32) || defined(WIN32)
 # include <windows.h>
 #else
-# include <unistd.h>
+# include <time.h>
 #endif
 
 namespace gnash {
@@ -37,7 +37,9 @@ inline void gnashSleep(size_t useconds)
 #if defined(_WIN32) || defined(WIN32)
     Sleep(useconds / 1000);
 #else
-    usleep(useconds);
+    const size_t m = 1000000;
+    const struct timespec t = { useconds / m, (useconds % m) * 1000 };
+    ::nanosleep(&t, 0);
 #endif
 }
 
