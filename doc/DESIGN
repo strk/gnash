@@ -9,28 +9,28 @@ $Id: DESIGN,v 1.6 2008/06/03 16:30:33 strk Exp $
     [sound_handler] <--------{A}
                               |
                               |
-           (inputs) --> [gnash_core] <---{C}---> [MediaHandler]
+               (inputs) --> [core] <---{C}---> [MediaHandler]
                               |
                               |
-      [render_handler] <-----{B}
-            |
-            v
-       (screen,file) 
+            [Renderer] <-----{B}
+                 |
+                 v
+           (screen,file) 
 
 
 Components 
 ----------
 
-     [gnash_core] -- Gnash core lib (swf parser, VM, builtin objects)
+           [core] -- Gnash core lib (swf parser, VM, builtin objects)
   [sound_handler] -- Sound mixer, can be modular (only SDL currently available)
- [render_handler] -- Renderer, can be modular (available: agg/ogl/cairo)
+       [Renderer] -- Renderer, can be modular (available: agg/ogl/cairo)
    [MediaHandler] -- Factory for media parsers and decoders, can be modular (agailable: gst/ffmpeg)
 
 Component connectors 
 --------------------
 
- {A} --- [gnash_core] to [sound_handler] connector 
+ {A} --- [core] to [sound_handler] connector 
 
- {B} --- [gnash_core] to [render_handler] connector 
+ {B} --- [core] to [Renderer] connector 
 
- {C} --- [gnash_core] to [MediaHandler] connector 
+ {C} --- [core] to [MediaHandler] connector 
