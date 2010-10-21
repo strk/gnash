@@ -60,20 +60,20 @@ SWFCxForm::transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& b,
         boost::uint8_t& a) const
 {
     // force conversion to int16 first, kind of optimization.
-    boost::int16_t rt = (boost::int16_t)r;
-    boost::int16_t gt = (boost::int16_t)g;
-    boost::int16_t bt = (boost::int16_t)b;
-    boost::int16_t at = (boost::int16_t)a;
+    boost::int16_t rt = r;
+    boost::int16_t gt = g;
+    boost::int16_t bt = b;
+    boost::int16_t at = a;
     
     rt = (rt * ra >> 8) + rb;
     gt = (gt * ga >> 8) + gb;
     bt = (bt * ba >> 8) + bb;
     at = (at * aa >> 8) + ab;
 
-    r = (boost::uint8_t)(clamp<boost::int16_t>(rt, 0, 255));
-    g = (boost::uint8_t)(clamp<boost::int16_t>(gt, 0, 255));
-    b = (boost::uint8_t)(clamp<boost::int16_t>(bt, 0, 255));
-    a = (boost::uint8_t)(clamp<boost::int16_t>(at, 0, 255));
+    r = clamp<boost::int16_t>(rt, 0, 255);
+    g = clamp<boost::int16_t>(gt, 0, 255);
+    b = clamp<boost::int16_t>(bt, 0, 255);
+    a = clamp<boost::int16_t>(at, 0, 255);
 }
 
 std::ostream&
