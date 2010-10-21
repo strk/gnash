@@ -44,6 +44,7 @@ check_PROGRAMS = \
 	DisplayListTest \
 	ClassSizes \
 	SafeStackTest \
+	CxFormTest \
 	$(NULL)
 
 if ENABLE_AVM2
@@ -110,6 +111,9 @@ ClassSizes_LDADD = $(AM_LDFLAGS)
 
 SafeStackTest_SOURCES = SafeStackTest.cpp
 SafeStackTest_LDADD = $(AM_LDFLAGS)
+
+CxFormTest_SOURCES = CxFormTest.cpp
+CxFormTest_LDADD = $(AM_LDFLAGS)
 
 CodeStreamTest_SOURCES = CodeStreamTest.cpp
 CodeStreamTest_LDADD = $(AM_LDFLAGS)
