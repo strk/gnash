@@ -532,9 +532,14 @@ ActionStop(ActionExec& thread)
 }
 
 void
-ActionToggleQuality(ActionExec&)
+ActionToggleQuality(ActionExec& thread)
 {
-    LOG_ONCE(log_unimpl("ActionToggleQuality"));
+    movie_root& mr = getRoot(thread.env);
+    if (mr.getQuality() != QUALITY_HIGH) {
+        mr.setQuality(QUALITY_HIGH);
+        return;
+    }
+    mr.setQuality(QUALITY_LOW);
 }
 
 void
