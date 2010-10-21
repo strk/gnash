@@ -37,13 +37,6 @@ namespace {
 #include "utility.h"
 #include "GnashAlgorithm.h"
 
-/*
-  TODO: use sigaction();
- */
-#ifndef sighandler_t
-	typedef void (*sighandler_t)(int);
-#endif
-
 namespace gnash {
 
 Socket::Socket()
@@ -328,9 +321,21 @@ Socket::write(const void* src, std::streamsize num)
 
     const char* buf = static_cast<const char*>(src);
 
+#ifndef _WIN32
+    // Prevent sigpipe (which isn't a standard C signal)
+    // until leaving this function.
+    const struct SignalSetter
+    {
+        typedef void(*SigHandler)(int);
+        SignalSetter() : _h(std::signal(SIGPIPE, SIG_IGN)) {}
+        ~SignalSetter() { std::signal(SIGPIPE, _h); }
+    private:
+        const SigHandler _h;
+    } setter;
+#endif
+
     // For broken pipe we prefer being notified with
     // a return of -1 from ::send.
-    sighandler_t oldSig = std::signal(SIGPIPE, SIG_IGN);
 
     while (toWrite > 0) {
         bytesSent = ::send(_socket, buf, toWrite, 0);
@@ -338,7 +343,6 @@ Socket::write(const void* src, std::streamsize num)
             const int err = errno;
             log_error("Socket send error %s", std::strerror(err));
             _error = true;
-            std::signal(SIGPIPE, oldSig);
             return 0;
         }
 
@@ -346,7 +350,6 @@ Socket::write(const void* src, std::streamsize num)
         toWrite -= bytesSent;
         buf += bytesSent;
     }
-    std::signal(SIGPIPE, oldSig);
     return num - toWrite;
 }
 
