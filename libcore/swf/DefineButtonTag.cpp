@@ -23,6 +23,8 @@
 
 #include "DefineButtonTag.h"
 
+#include <string>
+
 #include "TypesParser.h"
 #include "RunResources.h"
 #include "smart_ptr.h" // GNASH_USE_GC
@@ -432,7 +434,7 @@ ButtonRecord::read(SWFStream& in, TagType t,
     _matrix = readSWFMatrix(in);
 
     if (t == SWF::DEFINEBUTTON2) {
-        _cxform.read_rgba(in);
+        _cxform = readCxFormRGBA(in);
     }
 
     if (buttonHasFilterList) {

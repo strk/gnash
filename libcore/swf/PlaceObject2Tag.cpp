@@ -60,7 +60,7 @@ PlaceObject2Tag::readPlaceObject(SWFStream& in)
         m_has_flags2 |= HAS_MATRIX_MASK;
         if (in.tell() < in.get_tag_end_position())
         {
-            m_color_transform.read_rgb(in);
+            m_color_transform = readCxFormRGB(in);
             m_has_flags2 |= HAS_CXFORM_MASK;
         }
     }
@@ -279,7 +279,7 @@ PlaceObject2Tag::readPlaceObject2(SWFStream& in)
 
     if ( hasCxform() )
     {
-        m_color_transform.read_rgba(in);
+        m_color_transform = readCxFormRGBA(in);
     }
 
     if ( hasRatio() )
@@ -366,7 +366,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
     }
 
     if (hasCxform()) {
-        m_color_transform.read_rgba(in);
+        m_color_transform = readCxFormRGBA(in);
     }
 
     if (hasRatio()) {

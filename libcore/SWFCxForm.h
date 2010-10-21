@@ -26,7 +26,6 @@
 
 namespace gnash {
 	class rgba;
-	class SWFStream;
 }
 
 namespace gnash {
@@ -73,12 +72,6 @@ public:
     void transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& b,
             boost::uint8_t& a) const;    
     
-    /// Read RGB from the SWF input stream.
-    void read_rgb(SWFStream& in);
-
-    /// Read RGBA from the SWF input stream.
-    void read_rgba(SWFStream& in);
-
 };
 
 inline bool

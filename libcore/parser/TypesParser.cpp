@@ -28,6 +28,7 @@
 #include "RGBA.h"
 #include "SWFMatrix.h"
 #include "SWFRect.h"
+#include "SWFCxForm.h"
 #include "FillStyle.h"
 #include "log.h"
 #include "movie_definition.h"
@@ -307,6 +308,74 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
         }
     }
 }
+
+SWFCxForm
+readCxFormRGB(SWFStream& in)
+{
+    in.align();
+
+    in.ensureBits(6);
+    const boost::uint8_t field =  in.read_uint(6);
+    const bool has_add = field & (1 << 5);
+    const bool has_mult = field & (1 << 4);
+    const boost::uint8_t nbits = field & 0x0f;
+    const size_t reads = has_mult + has_add; // 0, 1 or 2
+
+    SWFCxForm ret;
+
+    if (!reads) return ret;
+
+    if (has_mult) {
+        ret.ra = in.read_sint(nbits);
+        ret.ga = in.read_sint(nbits);
+        ret.ba = in.read_sint(nbits);
+        // aa is already 256.
+    }
+
+    if (has_add) {
+        ret.rb = in.read_sint(nbits);
+        ret.gb = in.read_sint(nbits);
+        ret.bb = in.read_sint(nbits);
+        // ab is already 0.
+    }
+    return ret;
+}
+
+SWFCxForm
+readCxFormRGBA(SWFStream& in)
+{
+    in.align();
+
+    in.ensureBits(6);
+    const boost::uint8_t field =  in.read_uint(6);
+    const bool has_add = field & (1 << 5);
+    const bool has_mult = field & (1 << 4);
+    const boost::uint8_t nbits = field & 0x0f;
+    const size_t reads = has_mult + has_add; // 0, 1 or 2
+
+    SWFCxForm ret;
+
+    if (!reads) return ret;
+    
+    in.ensureBits(nbits * reads * 4);
+
+    // Default is 256 for these values.
+    if (has_mult) {
+        ret.ra = in.read_sint(nbits);
+        ret.ga = in.read_sint(nbits);
+        ret.ba = in.read_sint(nbits);
+        ret.aa = in.read_sint(nbits);
+    }
+
+    if (has_add) {
+        ret.rb = in.read_sint(nbits);
+        ret.gb = in.read_sint(nbits);
+        ret.bb = in.read_sint(nbits);
+        ret.ab = in.read_sint(nbits);
+    }
+    return ret;
+}
+
 
 namespace {
 

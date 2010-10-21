@@ -16,15 +16,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-
 #include "SWFCxForm.h"
+
+#include <iomanip>
+
 #include "RGBA.h" 
-#include "SWFStream.h" // for reading from SWF
 #include "log.h"
 #include "GnashNumeric.h"
-#include <iomanip>
 
 namespace gnash {
 
@@ -76,86 +74,6 @@ SWFCxForm::transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& b,
     g = (boost::uint8_t)(clamp<boost::int16_t>(gt, 0, 255));
     b = (boost::uint8_t)(clamp<boost::int16_t>(bt, 0, 255));
     a = (boost::uint8_t)(clamp<boost::int16_t>(at, 0, 255));
-}
-
-void
-SWFCxForm::read_rgb(SWFStream& in)
-{
-    in.align();
-
-    in.ensureBits(6);
-    int  field =  in.read_uint(6);
-    bool has_add  =  field & (1 << 5);
-    bool has_mult =  field & (1 << 4);
-    int  nbits = field & 0x0f;
-
-    int reads = has_mult + has_add; // 0, 1 or 2
-    assert(reads <= 2);
-    if ( reads ) {
-        in.ensureBits(nbits*reads*3);
-    }
-    else {
-        return;
-    }
-
-    if (has_mult) {
-        ra = in.read_sint(nbits);
-        ga = in.read_sint(nbits);
-        ba = in.read_sint(nbits);
-        aa = 256;
-    }
-    else {
-        ra = ga = ba = aa = 256; 
-    }
-    if (has_add) {
-        rb = in.read_sint(nbits);
-        gb = in.read_sint(nbits);
-        bb = in.read_sint(nbits);
-        ab = 0;
-    }
-    else {
-        rb = gb = bb = ab = 0; 
-    }
-}
-
-void
-SWFCxForm::read_rgba(SWFStream& in)
-{
-    in.align();
-
-    in.ensureBits(6);
-    int  field =  in.read_uint(6);
-    bool has_add  =  field & (1 << 5);
-    bool has_mult =  field & (1 << 4);
-    int  nbits = field & 0x0f;
-
-    int reads = has_mult + has_add; // 0, 1 or 2
-    assert(reads <= 2);
-    if ( reads ) {
-        in.ensureBits(nbits*reads*4);
-    }
-    else {
-        return;
-    }
-
-    if (has_mult) {
-        ra = in.read_sint(nbits);
-        ga = in.read_sint(nbits);
-        ba = in.read_sint(nbits);
-        aa = in.read_sint(nbits);
-    }
-    else {
-        ra = ga = ba = aa = 256; 
-    }
-    if (has_add) {
-        rb = in.read_sint(nbits);
-        gb = in.read_sint(nbits);
-        bb = in.read_sint(nbits);
-        ab = in.read_sint(nbits);
-    }
-    else {
-        rb = gb = bb = ab = 0; 
-    }
 }
 
 std::ostream&

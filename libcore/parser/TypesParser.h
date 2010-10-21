@@ -20,7 +20,6 @@
 #ifndef GNASH_TYPESPARSER_H
 #define GNASH_TYPESPARSER_H
 
-
 #include <boost/optional.hpp>
 
 #include "SWF.h"
@@ -29,6 +28,7 @@ namespace gnash {
     class SWFStream;
     class SWFMatrix;
     class SWFRect;
+    class SWFCxForm;
     class rgba;
     class movie_definition;
     class FillStyle;
@@ -57,6 +57,9 @@ typedef std::pair<FillStyle, boost::optional<FillStyle> > OptionalFillPair;
 OptionalFillPair readFills(SWFStream& in, SWF::TagType t, movie_definition& m,
         bool readMorph);
 
+SWFCxForm readCxFormRGB(SWFStream& in);
+
+SWFCxForm readCxFormRGBA(SWFStream& in);
 
 } // namespace gnash
 
