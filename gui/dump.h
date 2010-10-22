@@ -25,9 +25,11 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 #include "gui.h" // for inheritance
+
 #include <string>
 #include <fstream>
 #include <boost/scoped_array.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace gnash
 {
@@ -67,6 +69,7 @@ class DSOEXPORT DumpGui : public Gui
     bool want_multiple_regions() { return true; }
     bool want_redraw() { return false; }
     void writeFrame();
+    void writeSamples();
 
 private:
     
@@ -82,6 +85,7 @@ private:
 
     unsigned int _timeout;              /* maximum length of movie */
     unsigned int _framecount;           /* number of frames rendered */
+    unsigned int _samplesFetched;       /* number of samples fetched */
 
     unsigned int _bpp;                  /* bits per pixel */
     std::string _pixelformat;              /* colorspace name (eg, "RGB24") */
@@ -89,6 +93,8 @@ private:
     std::string _fileOutput;                 /* path to output file */
     std::ofstream _fileStream;        /* stream for output file */
     void init_dumpfile();               /* convenience method to create dump file */
+
+    boost::shared_ptr<sound::sound_handler> _soundHandler;
 
 
 

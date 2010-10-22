@@ -37,6 +37,7 @@
 #include "VM.h"
 #include "GnashSleep.h"
 #include "RunResources.h"
+#include "NullSoundHandler.h"
 
 #include <iostream>
 #include <string>
@@ -138,6 +139,11 @@ DumpGui::init(int argc, char **argv[])
     _renderer.reset(create_Renderer_agg(_pixelformat.c_str()));
     _runResources.setRenderer(_renderer);
 
+    sound_handler* mixer = _runResources.soundHandler();
+    MediaHandler* mh = _runResources.mediaHandler();
+    _soundHandler.reset(new NullSoundHandler(mh, mixer));
+    _runResources.setSoundHandler(_soundHandler);
+
     // We know what type of renderer it is.
     _agg_renderer = static_cast<Renderer_agg_base*>(_renderer.get());
     
@@ -152,10 +158,9 @@ DumpGui::run()
 
     size_t usecs_interval = _interval*1000;
 
-    WallClockTimer timer;
+    VirtualClock& timer = getClock();
 
     _terminate_request = false;
-
     while (!_terminate_request) {
 
         // advance movie now
@@ -163,13 +168,16 @@ DumpGui::run()
             ++_framecount;
             writeFrame();
         }
-  
-        gnashSleep(usecs_interval);
+
+        writeSamples();
 
         // check if we've reached a timeout
         if (_timeout && timer.elapsed() > _timeout ) {
-            _terminate_request = true;
+            break;
         }
+
+        gnashSleep(usecs_interval);
+
     }
 
     boost::uint32_t total_time = timer.elapsed();
@@ -217,6 +225,44 @@ DumpGui::writeFrame()
     _fileStream.write(reinterpret_cast<char*>(_offscreenbuf.get()),
             _offscreenbuf_size);
 }
+
+void
+DumpGui::writeSamples()
+{
+    VirtualClock& timer = getClock();
+    sound::sound_handler* sh = _runResources.soundHandler();
+
+    unsigned int ms = timer.elapsed();
+
+    // We need to fetch as many samples
+    // as needed for a theoretical 44100hz loop.
+    // That is 44100 samples each second.
+    // 44100/1000 = x/ms
+    //  x = (44100*ms) / 1000
+    unsigned int nSamples = (441*ms) / 10;
+
+    // We double because sound_handler interface takes
+    // "mono" samples... (eh.. would be wise to change)
+    unsigned int toFetch = nSamples*2;
+
+    // Now substract what we fetched already
+    toFetch -= _samplesFetched;
+
+    // And update _samplesFetched..
+    _samplesFetched += toFetch;
+
+    //log_debug("DumpGui::writeSamples(%d) fetching %d samples", ms, toFetch);
+
+    boost::int16_t samples[1024];
+    while (toFetch) {
+        unsigned int n = std::min(toFetch, 1024u);
+        // Fetching samples should trigger writing to file
+        sh->fetchSamples(samples, n);
+        toFetch -= n;
+    }
+
+}
+
 
 void
 DumpGui::init_dumpfile()
