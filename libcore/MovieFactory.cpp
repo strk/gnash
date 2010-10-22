@@ -312,7 +312,6 @@ void
 MovieFactory::clear()
 {
     movieLibrary.clear();
-    fontlib::clear();
 }
 
 } // namespace gnash
