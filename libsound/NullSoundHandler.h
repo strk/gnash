@@ -23,7 +23,6 @@
 
 #include "sound_handler.h" // for inheritance
 #include "dsodefs.h" // for DSOEXPORT
-#include <boost/shared_ptr.hpp> 
 
 namespace gnash {
 
@@ -38,9 +37,9 @@ class DSOEXPORT NullSoundHandler : public sound_handler
 {
 public:
 
-    boost::shared_ptr<sound_handler> _mixer;
+    sound_handler* _mixer;
 
-    NullSoundHandler(media::MediaHandler* m, boost::shared_ptr<sound_handler> mixer=boost::shared_ptr<sound_handler>((sound_handler*)0))
+    NullSoundHandler(media::MediaHandler* m, sound_handler* mixer=0)
         :
         sound_handler(m),
         _mixer(mixer)
