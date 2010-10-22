@@ -23,13 +23,11 @@
 
 
 #include "sound_handler.h" // for inheritance
-#include "WAVWriter.h" // for dtor visibility 
 
 #include <string>
 #include <set> // for composition (InputStreams)
 #include <SDL_audio.h>
 #include <boost/thread/mutex.hpp>
-#include <boost/scoped_ptr.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -50,8 +48,6 @@ private:
 
     /// The SDL_audio specs
     SDL_AudioSpec audioSpec;
-
-    boost::scoped_ptr<WAVWriter> _wavWriter;
 
     /// Initialize audio card
     void initAudio();

@@ -68,58 +68,18 @@ audioTaskWrapper()
 	return obj->audioTask();
 }
 
-namespace { // anonymous
-
-// Header of a wave file
-// http://ftp.iptel.org/pub/sems/doc/full/current/wav__hdr_8c-source.html
-typedef struct{
-     char rID[4];            // 'RIFF'
-     long int rLen;
-     char wID[4];            // 'WAVE'
-     char fId[4];            // 'fmt '
-     long int pcm_header_len;   // varies...
-     short int wFormatTag;
-     short int nChannels;      // 1,2 for stereo data is (l,r) pairs
-     long int nSamplesPerSec;
-     long int nAvgBytesPerSec;
-     short int nBlockAlign;
-     short int nBitsPerSample;
-} WAV_HDR;
-
-// Chunk of wave file
-// http://ftp.iptel.org/pub/sems/doc/full/current/wav__hdr_8c-source.html
-typedef struct{
-    char dId[4];            // 'data' or 'fact'
-    long int dLen;
-} CHUNK_HDR;
-
-} // end of anonymous namespace
-
 namespace gnash {
 namespace sound {
 
 AOS4_sound_handler::AOS4_sound_handler(media::MediaHandler* m,
 		const std::string& wavefile)
     :
-    sound_handler(m),
+    sound_handler(m, wavefile),
     _audioOpened(false),
 	_closing(false)
 {
 
     initAudio();
-
-    if (! wavefile.empty() ) {
-        file_stream.open(wavefile.c_str());
-        if (file_stream.fail()) {
-            std::cerr << "Unable to write file '" << wavefile << std::endl;
-            exit(EXIT_FAILURE);
-        } else {
-                write_wave_header(file_stream);
-                std::cout << "# Created 44100 16Mhz stereo wave file:" << std::endl <<
-                    "AUDIOFILE=" << wavefile << std::endl;
-        }
-    }
-
 }
 
 AOS4_sound_handler::AOS4_sound_handler(media::MediaHandler* m)
@@ -327,43 +287,6 @@ create_sound_handler_aos4(media::MediaHandler* m, const std::string& wave_file)
 }
 
 void
-AOS4_sound_handler::write_wave_header(std::ofstream& outfile)
-{
-
-  // allocate wav header
-  WAV_HDR wav;
-  CHUNK_HDR chk;
-
-  // setup wav header
-  std::strncpy(wav.rID, "RIFF", 4);
-  std::strncpy(wav.wID, "WAVE", 4);
-  std::strncpy(wav.fId, "fmt ", 4);
-
-  wav.nBitsPerSample = 16;
-  wav.nSamplesPerSec = 44100;
-  wav.nAvgBytesPerSec = 44100;
-  wav.nAvgBytesPerSec *= wav.nBitsPerSample / 8;
-  wav.nAvgBytesPerSec *= 2;
-  wav.nChannels = 2;
-
-  wav.pcm_header_len = 16;
-  wav.wFormatTag = 1;
-  wav.rLen = sizeof(WAV_HDR) + sizeof(CHUNK_HDR);
-  wav.nBlockAlign = 2 * wav.nBitsPerSample / 8;
-
-  // setup chunk header
-  std::strncpy(chk.dId, "data", 4);
-  chk.dLen = 0;
-
-  /* write riff/wav header */
-  outfile.write((char *)&wav, sizeof(WAV_HDR));
-
-  /* write chunk header */
-  outfile.write((char *)&chk, sizeof(CHUNK_HDR));
-
-}
-
-void
 AOS4_sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
 {
 	if (!_closing)
@@ -379,19 +302,6 @@ AOS4_sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
 		else		
 			return;
 		
-	    // TODO: move this to base class !
-    	if (file_stream)
-	    {
-    	    // NOTE: if muted, the samples will be silent already
-        	boost::uint8_t* stream = reinterpret_cast<boost::uint8_t*>(to);
-	        unsigned int len = nSamples*2;
-
-    	    file_stream.write((char*) stream, len);
-
-        	// now, mute all audio
-	        std::fill(to, to+nSamples, 0);
-    	}
-
 		//memcpy(BufferPointer, inSamples, nBytes);
 		memcpy(BufferPointer, to, nSamples*2);
 

@@ -68,9 +68,6 @@ class Mkit_sound_handler : public sound_handler
     ///
     std::ofstream file_stream;
 
-    // write a .WAV file header
-    void write_wave_header(std::ofstream& outfile);
-
     // See dox in sound_handler.h
     void mix(boost::int16_t* outSamples, boost::int16_t* inSamples,
                 unsigned int nSamples, float volume);

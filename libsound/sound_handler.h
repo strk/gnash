@@ -33,6 +33,7 @@
 #include "MediaHandler.h" // for inlined ctor
 #include "SoundEnvelope.h" // for SoundEnvelopes typedef
 #include "AuxStream.h" // for aux_stramer_ptr typedef
+#include "WAVWriter.h" // for dtor visibility 
 
 #include <string>
 #include <vector>
@@ -41,6 +42,7 @@
 #include <cstring>
 #include <limits>
 #include <set> // for composition
+#include <boost/scoped_ptr.hpp>
 
 namespace gnash {
     namespace media {
@@ -453,6 +455,22 @@ protected:
     {
     }
 
+    sound_handler(media::MediaHandler* m, const std::string& wavefile)
+        :
+        _soundsStarted(0),
+        _soundsStopped(0),
+        _paused(false),
+        _muted(false),
+        _volume(100),
+        _sounds(),
+        _inputStreams(),
+        _mediaHandler(m)
+    {
+        if (!wavefile.empty()) {
+            _wavWriter.reset(new WAVWriter(wavefile));
+        }
+    }
+
     /// Plug an InputStream to the mixer
     //
     /// @param in
@@ -565,6 +583,8 @@ private:
     ///
     unsigned int swfToOutSamples(const media::SoundInfo& sinfo,
                                           unsigned int swfSamples);
+
+    boost::scoped_ptr<WAVWriter> _wavWriter;
 
 };
 

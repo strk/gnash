@@ -603,6 +603,15 @@ sound_handler::fetchSamples (boost::int16_t* to, unsigned int nSamples)
         unplugCompletedInputStreams();
     }
 
+    // TODO: move this to base class !
+    if (_wavWriter.get())
+    {
+        _wavWriter->pushSamples(to, nSamples);
+
+        // now, mute all audio
+        std::fill(to, to+nSamples, 0);
+    }
+
     // Now, after having "consumed" all sounds, blank out
     // the buffer if muted..
     if ( is_muted() )

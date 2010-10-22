@@ -107,15 +107,11 @@ SDL_sound_handler::closeAudio()
 SDL_sound_handler::SDL_sound_handler(media::MediaHandler* m,
         const std::string& wavefile)
     :
-    sound_handler(m),
+    sound_handler(m, wavefile),
     _audioOpened(false)
 {
 
     initAudio();
-
-    if (!wavefile.empty()) {
-	_wavWriter.reset(new WAVWriter(wavefile));
-    }
 
 }
 
@@ -250,15 +246,6 @@ SDL_sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
 {
     boost::mutex::scoped_lock lock(_mutex);
     sound_handler::fetchSamples(to, nSamples);
-
-    // TODO: move this to base class !
-    if (_wavWriter.get())
-    {
-	_wavWriter->pushSamples(to, nSamples);
-
-        // now, mute all audio
-        std::fill(to, to+nSamples, 0);
-    }
 
     // If nothing is left to play there is no reason to keep polling.
     if ( ! hasInputStreams() )
