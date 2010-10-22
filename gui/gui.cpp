@@ -912,14 +912,20 @@ Gui::start()
     bool background = true; // ??
     _stage->set_background_alpha(background ? 1.0f : 0.05f);
 
+    // to properly update stageMatrix if scaling is given  
+    resize_view(_width, _height); 
+
     // @todo since we registered the sound handler, shouldn't we know
     //       already what it is ?!
     sound::sound_handler* s = _stage->runResources().soundHandler();
-    if ( s ) s->unpause();
+    if ( s ) {
+        if ( ! _audioDump.empty() ) {
+            s->setAudioDump(_audioDump);
+        }
+        s->unpause();
+    }
     _started = true;
     
-    // to properly update stageMatrix if scaling is given  
-    resize_view(_width, _height); 
 
     log_debug("Starting virtual clock");
     _virtualClock.resume();

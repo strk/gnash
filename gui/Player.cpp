@@ -177,11 +177,6 @@ Player::init_sound()
             return;
 #endif
 
-            if (! _audioDump.empty()) {
-                // TODO: notify tu Gui instead
-                _soundHandler->setAudioDump(_audioDump);
-            }
-
         } catch (SoundException& ex) {
             log_error(_("Could not create sound handler: %s."
                 " Will continue w/out sound."), ex.what());
@@ -198,6 +193,7 @@ Player::init_gui()
         _gui.reset(new NullGui(_doLoop, *_runResources));
     }
 
+    _gui->setAudioDump(_audioDump);
     _gui->setMaxAdvances(_maxAdvances);
 
 #ifdef GNASH_FPS_DEBUG
