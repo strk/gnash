@@ -16,8 +16,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-//
-
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h" // USE_DEBUGGER
@@ -34,7 +32,6 @@
 #include "SWF.h"
 #include "ASHandlers.h"
 #include "as_environment.h"
-#include "debugger.h"
 #include "SystemClock.h"
 #include "CallStack.h"
 
@@ -59,13 +56,7 @@
 
 #endif
 
-
 namespace gnash {
-
-//static LogFile& dbglogfile = LogFile::getDefaultInstance();
-#ifdef USE_DEBUGGER
-static Debugger& debugger = Debugger::getDefaultInstance();
-#endif
 
 ActionExec::ActionExec(const Function& func, as_environment& newEnv,
         as_value* nRetVal, as_object* this_ptr)
@@ -288,16 +279,6 @@ ActionExec::operator()()
                 break;
             }
 
-
-#ifdef USE_DEBUGGER
-            debugger.setFramePointer(code.getFramePointer(pc));
-            debugger.setEnvStack(&env);
-            if (debugger.isTracing())
-            {
-                debugger.disassemble();
-            }
-#endif
-        
 #if DEBUG_STACK
             IF_VERBOSE_ACTION (
                 log_action(_("After execution: PC %d, next PC %d, "
@@ -310,15 +291,13 @@ ActionExec::operator()()
 
 
             // Do some housecleaning on branch back
-            if ( next_pc <= pc )
-            {
+            if (next_pc <= pc) {
                 // Check for script limits hit. 
                 // See: http://www.gnashdev.org/wiki/index.php/ScriptLimits
                 if (clock.elapsed() > maxTime) {
                     boost::format fmt(_("Time exceeded"));
                     throw ActionLimitException(fmt.str());
                 }
-
                 // TODO: Run garbage collector ? If stack isn't too big ?
             }
 
@@ -327,14 +306,14 @@ ActionExec::operator()()
 
         }
     }
-    catch (ActionLimitException& ex) {
+    catch (const ActionLimitException&) {
         // Class execution should stop (for this frame only?)
         // Here's were we should pop-up a window to prompt user about
         // what to do next (abort or not ?)
         cleanupAfterRun(); // we expect inconsistencies here
         throw;
     }
-    catch (ActionScriptException& ex) {
+    catch (const ActionScriptException&) {
         // An unhandled ActionScript exception was thrown.
         cleanupAfterRun();
 
@@ -346,7 +325,6 @@ ActionExec::operator()()
 
         return;
     }
-    // TODO: catch other exceptions ?
 
     cleanupAfterRun();
 
@@ -374,25 +352,22 @@ bool
 ActionExec::processExceptions(TryBlock& t)
 {
 
-    switch (t._tryState)
-    {
-
+    switch (t._tryState) {
         case TryBlock::TRY_TRY:
         {
-            if (env.stack_size() && env.top(0).is_exception())
-            {
+            if (env.stack_size() && env.top(0).is_exception()) {
 #ifdef GNASH_DEBUG_TRY
                 as_value ex = env.top(0);
                 ex.unflag_exception();
-                log_debug("TRY block: Encountered exception (%s). Set PC to catch.", ex);
+                log_debug("TRY block: Encountered exception (%s). "
+                        "Set PC to catch.", ex);
 #endif
                 // We have an exception. Don't execute any more of the try
                 // block and process exception.
                 pc = t._catchOffset;
                 t._tryState = TryBlock::TRY_CATCH;
               
-                if (!t._hasName)
-                {
+                if (!t._hasName) {
                     // Used when exceptions are thrown in functions.
                     // Tests in misc-mtasc.all/exception.as
                     as_value ex = env.pop();
@@ -401,8 +376,7 @@ ActionExec::processExceptions(TryBlock& t)
                     getVM(env).setRegister(t._registerIndex, ex);
                 }
             }
-            else
-            {
+            else {
 #ifdef GNASH_DEBUG_TRY 
                 log_debug("TRY block: No exception, continuing as normal.");
 #endif
@@ -431,8 +405,7 @@ ActionExec::processExceptions(TryBlock& t)
             // If we are here, there should have been an exception
             // in 'try'. 
             
-            if (env.stack_size() && env.top(0).is_exception())
-            {
+            if (env.stack_size() && env.top(0).is_exception()) {
                 // This was thrown in "try". Remove it from
                 // the stack and remember it so that
                 // further exceptions can be caught.
@@ -444,8 +417,7 @@ ActionExec::processExceptions(TryBlock& t)
                 log_debug("CATCH block: top of stack is an exception (%s)", ex);
 #endif
 
-                if (t._hasName && !t._name.empty())
-                {
+                if (t._hasName && !t._name.empty()) {
                     // If name isn't empty, it means we have a catch block.
                     // We should set its argument to the exception value.
                     setLocalVariable(t._name, ex);
@@ -472,8 +444,7 @@ ActionExec::processExceptions(TryBlock& t)
             log_debug("FINALLY: TryBlock name = %s", t._name);                 
 #endif
             // If the exception is here, we have thrown in catch.
-            if (env.stack_size() && env.top(0).is_exception())
-            {
+            if (env.stack_size() && env.top(0).is_exception()) {
                  
                 t._lastThrow = env.pop();
 #ifdef GNASH_DEBUG_TRY 
@@ -501,8 +472,7 @@ ActionExec::processExceptions(TryBlock& t)
             // If there's no exception here, we can execute the
             // rest of the code. If there is, it will be caught
             // by the next TryBlock or stop execution.
-            if (env.stack_size() && env.top(0).is_exception())
-            {
+            if (env.stack_size() && env.top(0).is_exception()) {
                 // Check for exception handlers straight away
                 stop_pc = t._afterTriedOffset;
 #ifdef GNASH_DEBUG_TRY
@@ -514,8 +484,7 @@ ActionExec::processExceptions(TryBlock& t)
                 _tryList.pop_back();
                 return true;
             }
-            else if (t._lastThrow.is_exception())
-            {
+            else if (t._lastThrow.is_exception()) {
                 // Check for exception handlers straight away
                 stop_pc = t._afterTriedOffset;                
 #ifdef GNASH_DEBUG_TRY
@@ -562,18 +531,15 @@ ActionExec::cleanupAfterRun()
 
     vm.setSWFVersion(_origExecSWFVersion);
 
-    IF_VERBOSE_MALFORMED_SWF
-    (
+    IF_VERBOSE_MALFORMED_SWF(
         // check if the stack was smashed
-        if ( _initialStackSize > env.stack_size() )
-        {
+        if (_initialStackSize > env.stack_size()) {
             log_swferror(_("Stack smashed (ActionScript compiler bug, or "
-                    "obfuscated SWF).Taking no action to fix (as expected)."));
+                "obfuscated SWF).Taking no action to fix (as expected)."));
         }
-        else if ( _initialStackSize < env.stack_size() )
-        {
-           log_swferror(_("%d elements left on the stack after block execution.  "),
-                 env.stack_size() - _initialStackSize);
+        else if (_initialStackSize < env.stack_size()) {
+           log_swferror(_("%d elements left on the stack after block "
+                   "execution."), env.stack_size() - _initialStackSize);
         }
     );
 
@@ -586,14 +552,11 @@ void
 ActionExec::skip_actions(size_t offset)
 {
 
-    for(size_t i=0; i<offset; ++i)
-    {
-#if 1
+    for (size_t i = 0; i < offset; ++i) {
         // we need to check at every iteration because
         // an action can be longer then a single byte
-        if ( next_pc >= stop_pc )
-        {
-            IF_VERBOSE_MALFORMED_SWF (
+        if (next_pc >= stop_pc) {
+            IF_VERBOSE_MALFORMED_SWF(
                 log_swferror(_("End of DoAction block hit while skipping "
                   "%d action tags (pc:%d, stop_pc:%d) "
                   "(WaitForFrame, probably)"), offset, next_pc,
@@ -602,23 +565,20 @@ ActionExec::skip_actions(size_t offset)
             next_pc = stop_pc;
             return;
         }
-#endif
 
         // Get the opcode.
-        boost::uint8_t action_id = code[next_pc];
+        const boost::uint8_t action_id = code[next_pc];
 
         // Set default next_pc offset, control flow action handlers
         // will be able to reset it.
-        if ((action_id & 0x80) == 0)
-        {
+        if ((action_id & 0x80) == 0) {
             // action with no extra data
-            next_pc++;
+            ++next_pc;
         }
-        else
-        {
+        else {
             // action with extra data
-            boost::int16_t length = code.read_int16(next_pc+1);
-            assert( length >= 0 );
+            const boost::int16_t length = code.read_int16(next_pc + 1);
+            assert(length >= 0);
             next_pc += length + 3;
         }
     }
@@ -706,14 +666,12 @@ ActionExec::pushTryBlock(TryBlock t)
     stop_pc = t._catchOffset;
 
     _tryList.push_back(t);
-
 }
 
 void
 ActionExec::pushReturn(const as_value& t)
 {
-    if (retval)
-    {
+    if (retval) {
         *retval = t;
     }
     _returning = true;
@@ -724,7 +682,8 @@ ActionExec::adjustNextPC(int offset)
 {
     const int tagPos = offset + static_cast<int>(pc);
     if (tagPos < 0) {
-        log_unimpl(_("Jump outside DoAction tag requested (offset %d before tag start)"), -tagPos);
+        log_unimpl(_("Jump outside DoAction tag requested (offset %d "
+            "before tag start)"), -tagPos);
         return;
     }
     next_pc += offset;
@@ -734,23 +693,22 @@ void
 ActionExec::dumpActions(size_t from, size_t to, std::ostream& os)
 {
     size_t lpc = from;
-    while (lpc < to)
-    {
+    while (lpc < to) {
         // Get the opcode.
-        boost::uint8_t action_id = code[lpc];
+        const boost::uint8_t action_id = code[lpc];
 
         os << " PC:" << lpc << " - EX: " <<  code.disasm(lpc) << std::endl;
 
         // Set default next_pc offset, control flow action handlers
         // will be able to reset it.
-        if ((action_id & 0x80) == 0)
-        {
+        if ((action_id & 0x80) == 0) {
             // action with no extra data
-            lpc++;
-        } else {
+            ++lpc;
+        } 
+        else {
             // action with extra data
-            boost::int16_t length = code.read_int16(lpc+1);
-            assert( length >= 0 );
+            const boost::int16_t length = code.read_int16(lpc + 1);
+            assert(length >= 0);
             lpc += length + 3;
         }
 

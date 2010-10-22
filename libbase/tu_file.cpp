@@ -6,56 +6,61 @@
 // A file class that can be customized with callbacks.
 
 #include "tu_file.h"
-#include "log.h"
 
 #include <boost/format.hpp>
 #include <cerrno>
 #include <cstdio>
-#include "GnashFileUtilities.h"
 
-//
-// tu_file functions using FILE
-//
+#include "GnashFileUtilities.h"
+#include "log.h"
 
 namespace gnash {
 
-
-std::streamsize
-tu_file::read(void* dst, std::streamsize bytes) 
-// Return the number of bytes actually read.  EOF or an error would
-// cause that to not be equal to "bytes".
+//// Create a file from a standard file pointer.
+tu_file::tu_file(FILE* fp, bool autoclose = false)
+    :
+    _data(fp),
+    _autoclose(autoclose)
 {
-//    GNASH_REPORT_FUNCTION;
-    
-    assert(dst);
-    return fread( dst, 1, bytes, static_cast<FILE*>(m_data) );
 }
 
+tu_file::~tu_file()
+{
+    // Close this file when destroyed unless not requested.
+    if (_autoclose) close();
+}
+
+
+// Return the number of bytes actually read.  EOF or an error would
+// cause that to not be equal to "bytes".
+std::streamsize
+tu_file::read(void* dst, std::streamsize bytes) 
+{
+    assert(dst);
+    return std::fread(dst, 1, bytes, _data);
+}
+
+// Return the number of bytes actually written.
 std::streamsize
 tu_file::write(const void* src, std::streamsize bytes)
-// Return the number of bytes actually written.
 {
     assert(src);
-    return std::fwrite(src, 1, bytes, static_cast<FILE*>(m_data));
+    return std::fwrite(src, 1, bytes, _data);
 }
 
 bool
 tu_file::seek(std::streampos pos)
 {
-
     // TODO: optimize this by caching total stream size ?
     if (static_cast<size_t>(pos) > size()) return false;
 
-    FILE* file = static_cast<FILE*>(m_data);
-
-    std::clearerr(file); // make sure EOF flag is cleared.
-    int	result = std::fseek(file, pos, SEEK_SET);
+    std::clearerr(_data); // make sure EOF flag is cleared.
+    const int result = std::fseek(_data, pos, SEEK_SET);
     if (result == EOF) {
-        // @@ TODO should set m_error to something relevant based on errno.
         return false;
     }
 
-    assert (std::ftell(file) == pos);
+    assert (std::ftell(_data) == pos);
 
     return true;
 }
@@ -63,11 +68,10 @@ tu_file::seek(std::streampos pos)
 void
 tu_file::go_to_end()
 {
-    int err = std::fseek(static_cast<FILE*>(m_data), 0, SEEK_END);
-    if (-1 == err ) {
+    const int err = std::fseek(_data, 0, SEEK_END);
+    if (err == -1) {
         boost::format fmt = boost::format(
-                    _("Error while seeking to end: %1%")
-                ) % strerror(errno);
+                _("Error while seeking to end: %1%")) % strerror(errno);
         throw IOException(fmt.str());
     }
 }
@@ -75,9 +79,7 @@ tu_file::go_to_end()
 std::streampos
 tu_file::tell() const
 {
-    FILE* f = static_cast<FILE*>(m_data);
-
-    std::streampos ret = std::ftell(f);
+    std::streampos ret = std::ftell(_data);
     if (ret < 0) throw IOException("Error getting stream position");
 
     assert(static_cast<size_t>(ret) <= size());
@@ -87,25 +89,23 @@ tu_file::tell() const
 bool
 tu_file::eof() const
 {
-    return std::feof(static_cast<FILE*>(m_data));
+    return std::feof(_data);
 }
 
 bool
 tu_file::bad() const
 {
-    if (!m_data) return true;
-    return std::ferror(static_cast<FILE*>(m_data));
+    if (!_data) return true;
+    return std::ferror(_data);
 }
 
 size_t
 tu_file::size() const
 {
-    assert(m_data);
-
-    FILE* f = static_cast<FILE*>(m_data);
+    assert(_data);
 
     struct stat statbuf;
-    if (fstat(fileno(f), &statbuf) < 0)
+    if (fstat(fileno(_data), &statbuf) < 0)
     {
 	    log_error("Could not fstat file");
 	    return static_cast<size_t>(-1);
@@ -116,31 +116,10 @@ tu_file::size() const
 
 void
 tu_file::close()
-// Return 0 on success, or TU_FILE_CLOSE_ERROR on failure.
 {
-    assert(m_data);
-    int	result = std::fclose(static_cast<FILE*>(m_data));
-    if (result == EOF) {
-	    // @@ TODO should set m_error to something relevant based on errno.
-    }
+    assert(_data);
+    std::fclose(_data);
 }
-
-
-//// Create a file from a standard file pointer.
-tu_file::tu_file(FILE* fp, bool autoclose=false) :
-    m_data(fp),
-    _autoclose(autoclose)
-{
-    //GNASH_REPORT_FUNCTION;
-}
-
-
-tu_file::~tu_file()
-// Close this file when destroyed.
-{
-    if (_autoclose) close();
-}
-
 
 } // end namespace gnash
 

@@ -9,6 +9,8 @@
 #ifndef TU_FILE_H
 #define TU_FILE_H
 
+#include <cstdio>
+
 #include "dsodefs.h" // DSOEXPORT
 #include "utility.h"
 #include "IOChannel.h" // for inheritance
@@ -16,10 +18,7 @@
 
 namespace gnash {
 
-// a file abstraction that can be customized with callbacks.
-// Designed to be easy to hook up to FILE*, SDL_RWops*, or
-// whatever stream type(s) you might use in your game or
-// libraries.
+/// An IOChannel that works on a C stdio file.
 class DSOEXPORT tu_file : public gnash::IOChannel
 {
 public:
@@ -129,7 +128,7 @@ private:
     
     void close();
     
-    void *	m_data;
+    FILE* _data;
 
     bool _autoclose;
 
