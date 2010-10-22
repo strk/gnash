@@ -106,7 +106,6 @@ MovieFactory::makeMovie(std::auto_ptr<IOChannel> in, const std::string& url,
 // Try to load a movie from the given url, if we haven't
 // loaded it already.  Add it to our library on success, and
 // return a pointer to it.
-//
 boost::intrusive_ptr<movie_definition>
 MovieFactory::makeMovie(const URL& url, const RunResources& runResources,
         const char* real_url, bool startLoaderThread,
