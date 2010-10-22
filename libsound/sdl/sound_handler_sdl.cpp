@@ -104,17 +104,6 @@ SDL_sound_handler::closeAudio()
 }
 
 
-SDL_sound_handler::SDL_sound_handler(media::MediaHandler* m,
-        const std::string& wavefile)
-    :
-    sound_handler(m, wavefile),
-    _audioOpened(false)
-{
-
-    initAudio();
-
-}
-
 SDL_sound_handler::SDL_sound_handler(media::MediaHandler* m)
     :
     sound_handler(m),
@@ -233,12 +222,6 @@ sound_handler*
 create_sound_handler_sdl(media::MediaHandler* m)
 {
     return new SDL_sound_handler(m);
-}
-
-sound_handler*
-create_sound_handler_sdl(media::MediaHandler* m, const std::string& wave_file)
-{
-    return new SDL_sound_handler(m, wave_file);
 }
 
 void

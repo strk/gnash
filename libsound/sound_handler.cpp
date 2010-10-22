@@ -34,6 +34,18 @@
 // Debug samples fetching
 //#define GNASH_DEBUG_SAMPLES_FETCHING 1
 
+namespace {
+
+unsigned int silentStream(void*, boost::int16_t* stream, unsigned int len, bool& atEOF)
+{
+    std::fill(stream, stream+len, 0);
+    atEOF=false;
+    return len;
+}
+
+}
+
+
 namespace gnash {
 namespace sound {
 
@@ -561,7 +573,7 @@ sound_handler::fetchSamples (boost::int16_t* to, unsigned int nSamples)
     }
 #endif
 
-    if ( isPaused() ) return;
+    if ( isPaused() ) return; // should we write wav file anyway ?
 
     float finalVolumeFact = getFinalVolume()/100.0;
 
@@ -617,6 +629,25 @@ sound_handler::fetchSamples (boost::int16_t* to, unsigned int nSamples)
     if ( is_muted() )
     {
         std::fill(to, to+nSamples, 0);
+    }
+}
+
+/*public*/
+void
+sound_handler::setAudioDump(const std::string& wavefile)
+{
+    bool wasDumping = (_wavWriter.get() != 0);
+
+    if (!wavefile.empty()) {
+        _wavWriter.reset(new WAVWriter(wavefile));
+    }
+
+    // TODO: just avoid pausing instead ...
+    if ( ! wasDumping ) {
+        // add a silent stream to the audio pool so that our
+        // output file is homogenous;  we actually want silent
+        // wave data when no sounds are playing on the stage
+        attach_aux_streamer(silentStream, (void*) this);
     }
 }
 

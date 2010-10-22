@@ -71,17 +71,6 @@ audioTaskWrapper()
 namespace gnash {
 namespace sound {
 
-AOS4_sound_handler::AOS4_sound_handler(media::MediaHandler* m,
-		const std::string& wavefile)
-    :
-    sound_handler(m, wavefile),
-    _audioOpened(false),
-	_closing(false)
-{
-
-    initAudio();
-}
-
 AOS4_sound_handler::AOS4_sound_handler(media::MediaHandler* m)
     :
     sound_handler(m),
@@ -277,13 +266,6 @@ create_sound_handler_aos4(media::MediaHandler* m)
 // Factory.
 {
     return new AOS4_sound_handler(m);
-}
-
-sound_handler*
-create_sound_handler_aos4(media::MediaHandler* m, const std::string& wave_file)
-// Factory.
-{
-    return new AOS4_sound_handler(m, wave_file);
 }
 
 void

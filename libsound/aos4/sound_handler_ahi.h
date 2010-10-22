@@ -22,7 +22,6 @@
 
 #include "sound_handler.h" // for inheritance
 
-#include <string>
 #include <set> // for composition (InputStreams)
 #include <boost/thread/mutex.hpp>
 
@@ -101,8 +100,6 @@ private:
 public:
 
     AOS4_sound_handler(media::MediaHandler* m);
-
-    AOS4_sound_handler(media::MediaHandler* m, const std::string& wave_file);
 
     ~AOS4_sound_handler();
 

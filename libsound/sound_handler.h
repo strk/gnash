@@ -439,6 +439,14 @@ public:
     virtual void mix(boost::int16_t* outSamples, boost::int16_t* inSamples,
                 unsigned int nSamples, float volume) = 0;
 
+
+    /// Request to dump audio to the given filename
+    //
+    /// Every call to this function starts recording
+    /// to a new file, closing any existing other dump.
+    ///
+    void setAudioDump(const std::string& wavefile);
+
 protected:
 
 
@@ -453,22 +461,6 @@ protected:
         _inputStreams(),
         _mediaHandler(m)
     {
-    }
-
-    sound_handler(media::MediaHandler* m, const std::string& wavefile)
-        :
-        _soundsStarted(0),
-        _soundsStopped(0),
-        _paused(false),
-        _muted(false),
-        _volume(100),
-        _sounds(),
-        _inputStreams(),
-        _mediaHandler(m)
-    {
-        if (!wavefile.empty()) {
-            _wavWriter.reset(new WAVWriter(wavefile));
-        }
     }
 
     /// Plug an InputStream to the mixer
@@ -593,25 +585,12 @@ private:
 #ifdef SOUND_SDL
 /// @throw a SoundException if fails to initialize audio card.
 DSOEXPORT sound_handler* create_sound_handler_sdl(media::MediaHandler* m);
-
-/// @throw a SoundException if fails to initialize audio card.
-DSOEXPORT sound_handler* create_sound_handler_sdl(media::MediaHandler* m,
-        const std::string& wave_file);
 #elif defined(SOUND_AHI)
 /// @throw a SoundException if fails to initialize audio card.
 DSOEXPORT sound_handler* create_sound_handler_aos4(media::MediaHandler* m);
-
-/// @throw a SoundException if fails to initialize audio card.
-DSOEXPORT sound_handler* create_sound_handler_aos4(media::MediaHandler* m,
-        const std::string& wave_file);
-
 #elif defined(SOUND_MKIT)
 /// @throw a SoundException if fails to create node.
 DSOEXPORT sound_handler* create_sound_handler_mkit(media::MediaHandler* m);
-
-/// @throw a SoundException if fails to create node.
-DSOEXPORT sound_handler* create_sound_handler_mkit(media::MediaHandler* m,
-        const std::string& wave_file);
 #endif
 
 } // gnash.sound namespace 

@@ -157,14 +157,6 @@ Player::init_logfile()
 
 }
 
-unsigned int
-Player::silentStream(void* /*udata*/, boost::int16_t* stream, unsigned int len, bool& atEOF)
-{
-    std::fill(stream, stream+len, 0);
-    atEOF=false;
-    return len;
-}
-
 void
 Player::init_sound()
 {
@@ -173,24 +165,21 @@ Player::init_sound()
         try {
 #ifdef SOUND_SDL
             _soundHandler.reset(sound::create_sound_handler_sdl(
-                        _mediaHandler.get(), _audioDump));
+                        _mediaHandler.get()));
 #elif defined(SOUND_AHI)
             _soundHandler.reset(sound::create_sound_handler_aos4(
-                        _mediaHandler.get(), _audioDump));
+                        _mediaHandler.get()));
 #elif defined(SOUND_MKIT)
             _soundHandler.reset(sound::create_sound_handler_mkit(
-                        _mediaHandler.get(), _audioDump));
+                        _mediaHandler.get()));
 #else
             log_error(_("Sound requested but no sound support compiled in"));
             return;
 #endif
 
             if (! _audioDump.empty()) {
-                // TODO: move this logic into GUI
-                // add a silent stream to the audio pool so that our
-                // output file is homogenous;  we actually want silent
-                // wave data when no sounds are playing on the stage
-                _soundHandler->attach_aux_streamer(silentStream, (void*) this);
+                // TODO: notify tu Gui instead
+                _soundHandler->setAudioDump(_audioDump);
             }
 
         } catch (SoundException& ex) {

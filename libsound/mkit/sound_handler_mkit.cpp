@@ -54,13 +54,6 @@ Mkit_sound_handler::Mkit_sound_handler(media::MediaHandler* m)
 {
 }
 
-Mkit_sound_handler::Mkit_sound_handler(media::MediaHandler* m, const std::string& wavefile)
-    :
-    sound_handler(m, wavefile),
-    _audioopen(false)
-{
-}
-
 void
 Mkit_sound_handler::openAudio()
 {
@@ -370,23 +363,6 @@ create_sound_handler_mkit(media::MediaHandler* m)
 {
     return new Mkit_sound_handler(m);
 }
-
-sound_handler*
-create_sound_handler_mkit(media::MediaHandler* m, const std::string& wave_file)
-// Factory.
-{
-    return new Mkit_sound_handler(m, wave_file);
-}
-
-
-
-
-
-
-
-
-
-
 
 } // gnash.sound namespace 
 } // namespace gnash

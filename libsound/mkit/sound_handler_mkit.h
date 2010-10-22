@@ -22,7 +22,6 @@
 
 #include "sound_handler.h" // for inheritance
 
-#include <string>
 #include <set> // for composition (InputStreams)
 #include <boost/thread/mutex.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -69,8 +68,6 @@ class Mkit_sound_handler : public sound_handler
 
 public:
     Mkit_sound_handler(media::MediaHandler* m);
-
-    Mkit_sound_handler(media::MediaHandler* m, const std::string& wave_file);
 
     ~Mkit_sound_handler();
 
