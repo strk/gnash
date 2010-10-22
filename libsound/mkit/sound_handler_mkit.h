@@ -24,7 +24,6 @@
 
 #include <string>
 #include <set> // for composition (InputStreams)
-#include <fstream> // for composition (file_stream)
 #include <boost/thread/mutex.hpp>
 #include <boost/scoped_ptr.hpp>
 
@@ -61,12 +60,6 @@ class Mkit_sound_handler : public sound_handler
 
     /// Mutex protecting _muted (defined in base class)
     mutable boost::mutex _mutedMutex;
-
-    /// File stream for dump file
-    //
-    /// TODO: move to base class ?
-    ///
-    std::ofstream file_stream;
 
     // See dox in sound_handler.h
     void mix(boost::int16_t* outSamples, boost::int16_t* inSamples,
