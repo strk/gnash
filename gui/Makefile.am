@@ -214,6 +214,7 @@ GUI_SRCS = gnash.cpp \
 	gui.cpp gui.h \
 	Player.cpp Player.h \
 	NullGui.cpp NullGui.h \
+	ScreenShotter.cpp ScreenShotter.h \
 	$(NULL)
 
 if BUILD_AQUA_GUI
