@@ -82,8 +82,8 @@ AudioInputGst::AudioInputGst()
     audioCreateSaveBin(_globalAudio);
 }
 
-AudioInputGst::~AudioInputGst() {
-    log_unimpl("Audio Input destructor");
+AudioInputGst::~AudioInputGst()
+{
 }
 
 void
