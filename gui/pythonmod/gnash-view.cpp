@@ -217,7 +217,7 @@ gnash_view_init(GnashView *view)
 #ifdef SOUND_SDL
     try {
         view->sound_handler.reset(gnash::sound::create_sound_handler_sdl(
-                view->media_handler.get(), ""));
+                view->media_handler.get()));
     } catch (gnash::SoundException& ex) {
         gnash::log_error(_("Could not create sound handler: %s."
                            " Will continue w/out sound."), ex.what());
