@@ -44,7 +44,7 @@
 namespace gnash {
 	class SWFCxForm;
 	class Renderer;
-	class ObjectURI;
+	struct ObjectURI;
 }
 
 namespace gnash {
