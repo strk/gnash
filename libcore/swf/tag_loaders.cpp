@@ -413,12 +413,8 @@ file_attributes_loader(SWFStream& in, TagType tag, movie_definition& m,
     }
 
     if (flags.as3) {
-        log_debug("This SWF uses AVM2");
-#ifndef ENABLE_AVM2
-        /// Log an error if this build can't interpret AS3.
-        log_error(_("This SWF file requires AVM2, which was not enabled at "
-                    "compile time."));
-#endif
+        log_unimpl(_("This SWF file requires AVM2: there will be no "
+                    "ActionScript interpretation"));
     }
     else log_debug("This SWF uses AVM1");
 
