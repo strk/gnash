@@ -204,28 +204,6 @@ gnash: gnash.in
 	cp $< $@
 	chmod +x $@
 
-# These are used to handle input events from a keyboard, mouse, or
-# touchscreen. These are only used by the Framebuffer GUI, as without
-# X11, it has no event handling. We do it this way so the optionally
-# built source files still get included in the source tarball.
-DEVICES =
-if ENABLE_INPUT_DEVICES
-DEVICES += InputDevice.cpp InputDevice.h
-
-# Touchscreen
-if ENABLE_TSLIB
-DEVICES += TouchDevice.cpp
-endif
-# PS/2 Mouse
-if ENABLE_MOUSE
-DEVICES += MouseDevice.cpp
-endif
-# Linux input events
-if ENABLE_INPUT_EVENTS
-DEVICES += EventDevice.cpp
-endif
-endif
-
 # Always include the device files in the source tarball
 EXTRA_DIST += \
 	TouchDevice.cpp \
@@ -236,7 +214,6 @@ GUI_SRCS = gnash.cpp \
 	gui.cpp gui.h \
 	Player.cpp Player.h \
 	NullGui.cpp NullGui.h \
-	$(DEVICES) \
 	$(NULL)
 
 if BUILD_AQUA_GUI
