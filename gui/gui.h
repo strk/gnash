@@ -506,7 +506,7 @@ protected:
     /// Desired window height.
     int _height;
 
-    /// Desired colour depth in bits.
+    /// Per-run resources
     RunResources& _runResources;
 
     /// Main loop interval: the time between successive advance_movie calls.
