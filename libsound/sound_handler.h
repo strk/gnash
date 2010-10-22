@@ -301,7 +301,7 @@ public:
     /// gnash calls this to unpause audio
     virtual void unpause() { _paused=false; }
 
-    /// gnash calls this to unpause audio
+    /// return true if audio is paused
     bool isPaused() const { return _paused; }
 
     /// Plug an external InputStream into the mixer
