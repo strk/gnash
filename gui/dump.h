@@ -25,6 +25,7 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 #include "gui.h" // for inheritance
+#include "sound_handler.h" // for dtor visibility
 
 #include <string>
 #include <fstream>
