@@ -139,9 +139,9 @@ DumpGui::init(int argc, char **argv[])
     _renderer.reset(create_Renderer_agg(_pixelformat.c_str()));
     _runResources.setRenderer(_renderer);
 
-    sound_handler* mixer = _runResources.soundHandler();
-    MediaHandler* mh = _runResources.mediaHandler();
-    _soundHandler.reset(new NullSoundHandler(mh, mixer));
+    sound::sound_handler* mixer = _runResources.soundHandler();
+    media::MediaHandler* mh = _runResources.mediaHandler();
+    _soundHandler.reset(new sound::NullSoundHandler(mh, mixer));
     _runResources.setSoundHandler(_soundHandler);
 
     // We know what type of renderer it is.
