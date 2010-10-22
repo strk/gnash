@@ -38,11 +38,130 @@
 #include "MovieLibrary.h"
 #include "fontlib.h"
 
-namespace gnash
-{
+namespace gnash {
 
-namespace // anonymous
+namespace {
+    /// Get type of file looking at first bytes
+    FileType getFileType(IOChannel& in);
+
+    boost::intrusive_ptr<SWFMovieDefinition> createSWFMovie(
+            std::auto_ptr<IOChannel> in, const std::string& url,
+            const RunResources& runResources, bool startLoaderThread);
+
+    boost::intrusive_ptr<BitmapMovieDefinition> createBitmapMovie(
+            std::auto_ptr<IOChannel> in, const std::string& url,
+            const RunResources& r, FileType type);
+
+    boost::intrusive_ptr<movie_definition> createNonLibraryMovie(
+            const URL& url, const RunResources& runResources,
+            const char* reset_url, bool startLoaderThread,
+            const std::string* postdata);
+}
+
+MovieLibrary MovieFactory::movieLibrary;
+
+boost::intrusive_ptr<movie_definition>
+MovieFactory::makeMovie(std::auto_ptr<IOChannel> in, const std::string& url,
+        const RunResources& runResources, bool startLoaderThread)
 {
+    boost::intrusive_ptr<movie_definition> ret;
+
+    assert(in.get());
+
+    // see if it's a jpeg or an swf
+    FileType type = getFileType(*in);
+
+    switch (type) {
+        case GNASH_FILETYPE_JPEG:
+        case GNASH_FILETYPE_PNG:
+        case GNASH_FILETYPE_GIF:
+        {
+            if (!startLoaderThread) {
+              log_unimpl(_("Requested to keep from completely loading "
+                           "a movie, but the movie in question is an "
+                           "image, for which we don't yet have the "
+                           "concept of a 'loading thread'"));
+            }
+            ret = createBitmapMovie(in, url, runResources, type);
+            break;
+        }
+
+
+        case GNASH_FILETYPE_SWF:
+            ret = createSWFMovie(in, url, runResources, startLoaderThread);
+            break;
+
+        case GNASH_FILETYPE_FLV:
+            log_unimpl(_("FLV can't be loaded directly as a movie"));
+            return ret;
+
+        default:
+            log_error(_("unknown file type (%s)"), type);
+            break;
+    }
+
+    return ret;
+}
+
+// Try to load a movie from the given url, if we haven't
+// loaded it already.  Add it to our library on success, and
+// return a pointer to it.
+//
+boost::intrusive_ptr<movie_definition>
+MovieFactory::makeMovie(const URL& url, const RunResources& runResources,
+        const char* real_url, bool startLoaderThread,
+        const std::string* postdata)
+{
+    boost::intrusive_ptr<movie_definition> mov;
+
+    // Use real_url as label for cache if available 
+    const std::string& cache_label = real_url ? URL(real_url).str() : url.str();
+
+    // Is the movie already in the library? (don't check if we have post data!)
+    if (!postdata) {
+        if (movieLibrary.get(cache_label, &mov)) {
+            log_debug(_("Movie %s already in library"), cache_label);
+            return mov;
+        }
+    }
+
+    // Try to open a file under the filename, but DO NOT start
+    // the loader thread now to avoid IMPORT tag loaders from 
+    // calling createMovie() again and NOT finding
+    // the just-created movie.
+    mov = createNonLibraryMovie(url, runResources, real_url, false, postdata);
+
+    if (!mov) {
+        log_error(_("Couldn't load library movie '%s'"), url.str());
+        return mov;
+    }
+
+    // Movie is good, add to the library, but not if we used POST
+    if (!postdata) {
+        movieLibrary.add(cache_label, mov.get());
+        log_debug(_("Movie %s (SWF%d) added to library"),
+                cache_label, mov->get_version());
+    }
+    else {
+        log_debug(_("Movie %s (SWF%d) NOT added to library (resulted from "
+                    "a POST)"), cache_label, mov->get_version());
+    }
+
+    /// Now complete the load if the movie is an SWF movie
+    // 
+    /// This is a no-op except for SWF movies.
+    if (startLoaderThread) mov->completeLoad();
+
+    return mov;
+}
+
+void
+MovieFactory::clear()
+{
+    movieLibrary.clear();
+}
+
+namespace {
 
 /// Get type of file looking at first bytes
 FileType
@@ -117,7 +236,6 @@ getFileType(IOChannel& in)
 
 // Create a SWFMovieDefinition from an SWF stream
 // NOTE: this method assumes this *is* an SWF stream
-//
 boost::intrusive_ptr<SWFMovieDefinition>
 createSWFMovie(std::auto_ptr<IOChannel> in, const std::string& url,
         const RunResources& runResources, bool startLoaderThread)
@@ -207,112 +325,7 @@ createNonLibraryMovie(const URL& url, const RunResources& runResources,
   
 }
 
-
-} // anonymous namespace
-
-
-MovieLibrary MovieFactory::movieLibrary;
-
-boost::intrusive_ptr<movie_definition>
-MovieFactory::makeMovie(std::auto_ptr<IOChannel> in, const std::string& url,
-        const RunResources& runResources, bool startLoaderThread)
-{
-    boost::intrusive_ptr<movie_definition> ret;
-
-    assert(in.get());
-
-    // see if it's a jpeg or an swf
-    FileType type = getFileType(*in);
-
-    switch (type) {
-        case GNASH_FILETYPE_JPEG:
-        case GNASH_FILETYPE_PNG:
-        case GNASH_FILETYPE_GIF:
-        {
-            if (!startLoaderThread) {
-              log_unimpl(_("Requested to keep from completely loading "
-                           "a movie, but the movie in question is an "
-                           "image, for which we don't yet have the "
-                           "concept of a 'loading thread'"));
-            }
-            ret = createBitmapMovie(in, url, runResources, type);
-            break;
-        }
-
-
-        case GNASH_FILETYPE_SWF:
-            ret = createSWFMovie(in, url, runResources, startLoaderThread);
-            break;
-
-        case GNASH_FILETYPE_FLV:
-            log_unimpl(_("FLV can't be loaded directly as a movie"));
-            return ret;
-
-        default:
-            log_error(_("unknown file type (%s)"), type);
-            break;
-    }
-
-    return ret;
-}
-
-// Try to load a movie from the given url, if we haven't
-// loaded it already.  Add it to our library on success, and
-// return a pointer to it.
-//
-boost::intrusive_ptr<movie_definition>
-MovieFactory::makeMovie(const URL& url, const RunResources& runResources,
-        const char* real_url, bool startLoaderThread,
-        const std::string* postdata)
-{
-    boost::intrusive_ptr<movie_definition>  mov;
-
-    // Use real_url as label for cache if available 
-    std::string cache_label = real_url ? URL(real_url).str() : url.str();
-
-    // Is the movie already in the library? (don't check if we have post data!)
-    if (!postdata) {
-        if (movieLibrary.get(cache_label, &mov)) {
-            log_debug(_("Movie %s already in library"), cache_label);
-            return mov;
-        }
-    }
-
-    // Try to open a file under the filename, but DO NOT start
-    // the loader thread now to avoid IMPORT tag loaders from 
-    // calling createMovie() again and NOT finding
-    // the just-created movie.
-    mov = createNonLibraryMovie(url, runResources, real_url, false, postdata);
-
-    if (!mov) {
-        log_error(_("Couldn't load library movie '%s'"), url.str());
-        return mov;
-    }
-
-    // Movie is good, add to the library, but not if we used POST
-    if (!postdata) {
-        movieLibrary.add(cache_label, mov.get());
-        log_debug(_("Movie %s (SWF%d) added to library"),
-                cache_label, mov->get_version());
-    }
-    else {
-        log_debug(_("Movie %s (SWF%d) NOT added to library (resulted from "
-                    "a POST)"), cache_label, mov->get_version());
-    }
-
-    /// Now complete the load if the movie is an SWF movie
-    // 
-    /// This is a no-op except for SWF movies.
-    if (startLoaderThread) mov->completeLoad();
-
-    return mov;
-}
-
-void
-MovieFactory::clear()
-{
-    movieLibrary.clear();
-}
+} // unnamed namespace
 
 } // namespace gnash
 
