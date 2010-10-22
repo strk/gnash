@@ -285,24 +285,17 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
 
     m_version = (header >> 24) & 255;
     if ((header & 0x0FFFFFF) != 0x00535746
-        && (header & 0x0FFFFFF) != 0x00535743)
-        {
+        && (header & 0x0FFFFFF) != 0x00535743) {
         // ERROR
         log_error(_("gnash::SWFMovieDefinition::read() -- "
             "file does not start with a SWF header"));
         return false;
-        }
+    }
     const bool compressed = (header & 255) == 'C';
 
     IF_VERBOSE_PARSE(
         log_parse(_("version: %d, file_length: %d"), m_version, m_file_length);
-    )
-
-    if (m_version > 7)
-    {
-        log_unimpl(_("SWF%d is not fully supported, trying anyway "
-            "but don't expect it to work"), m_version);
-    }
+    );
 
     if (compressed) {
 #ifndef HAVE_ZLIB_H
