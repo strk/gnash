@@ -26,7 +26,7 @@
 
 // Forward declarations
 namespace gnash {
-    class ObjectURI;
+    struct ObjectURI;
 }
 
 namespace gnash {
