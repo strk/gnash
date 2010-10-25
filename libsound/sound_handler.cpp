@@ -557,22 +557,6 @@ sound_handler::unplugAllInputStreams()
 void
 sound_handler::fetchSamples (boost::int16_t* to, unsigned int nSamples)
 {
-#ifdef GNASH_DEBUG_SAMPLES_FETCHING 
-    // should we use SystemClock for checking this ?
-    static WallClockTimer timerTotal;
-    static WallClockTimer timerLocal;
-    static size_t fetched = 0;
-    fetched += nSamples;
-    boost::uint32_t tl = timerLocal.elapsed();
-    if ( tl > 1000 ) {
-        boost::uint32_t tt = timerTotal.elapsed();
-        boost::uint32_t exptime = fetched*1000/88200;
-        log_debug("Samples fetch frequency: %d KHz (%dms late)",
-            floor(fetched*500.0/tt)/1000, (long)tt-exptime);
-        timerLocal.restart();
-    }
-#endif
-
     if ( isPaused() ) return; // should we write wav file anyway ?
 
     float finalVolumeFact = getFinalVolume()/100.0;
@@ -585,7 +569,7 @@ sound_handler::fetchSamples (boost::int16_t* to, unsigned int nSamples)
         // A buffer to fetch InputStream samples into
         boost::scoped_array<boost::int16_t> buf ( new boost::int16_t[nSamples] );
 
-#if GNASH_DEBUG_SAMPLES_FETCHING > 1
+#ifdef GNASH_DEBUG_SAMPLES_FETCHING 
         log_debug("Fetching %d samples from each of %d input streams", nSamples, _inputStreams.size());
 #endif
 
