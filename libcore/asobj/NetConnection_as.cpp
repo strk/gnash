@@ -183,7 +183,6 @@ ConnectionHandler::getStream(const std::string&)
 ///
 class HTTPRemotingHandler : public ConnectionHandler
 {
-
 public:
 
     /// Create an handler for HTTP remoting
@@ -197,8 +196,7 @@ public:
     HTTPRemotingHandler(NetConnection_as& nc, const URL& url);
 
     // See dox in ConnectionHandler
-    virtual bool hasPendingCalls() const
-    {
+    virtual bool hasPendingCalls() const {
         return _connection || queued_count;
     }
 
@@ -206,13 +204,9 @@ public:
     virtual bool advance();
 
     // See dox in ConnectionHandler
-    virtual void setReachable() const
-    {
-        for (CallbacksMap::const_iterator i=callbacks.begin(),
-                e=callbacks.end(); i!=e; ++i)
-        {
-            i->second->setReachable();
-        }
+    virtual void setReachable() const {
+        foreachSecond(callbacks.begin(), callbacks.end(),
+                std::mem_fun(&as_object::setReachable));
     }
 
     // See dox in NetworkHandler class
@@ -239,39 +233,35 @@ private:
     //
     NetworkAdapter::RequestHeaders _headers;
 
-    void push_amf(const SimpleBuffer &amf) 
-    {
+    void push_amf(const SimpleBuffer &amf) {
         //GNASH_REPORT_FUNCTION;
 
         _postdata.append(amf.data(), amf.size());
         queued_count++;
     }
 
-    void push_callback(const std::string& id, as_object* callback)
-    {
+    void push_callback(const std::string& id, as_object* callback) {
         callbacks[id] = callback;
     }
 
-    as_object* pop_callback(const std::string& id)
-    {
+    as_object* pop_callback(const std::string& id) {
         CallbacksMap::iterator it = callbacks.find(id);
         if (it != callbacks.end()) {
             as_object* callback = it->second;
             callbacks.erase(it);
             return callback;
         }
-        else return 0;
+        return 0;
     }
 
     void enqueue(const SimpleBuffer &amf, const std::string& identifier,
-                 as_object* callback)
-    {
+                 as_object* callback) {
+
         push_amf(amf);
         push_callback(identifier, callback);
     }
 
-    void enqueue(const SimpleBuffer &amf)
-    {
+    void enqueue(const SimpleBuffer &amf) {
         push_amf(amf);
     }
     
@@ -309,7 +299,7 @@ HTTPRemotingHandler::advance()
 
         // Fill last chunk before reading in the next
         size_t toRead = reply.capacity() - reply.size();
-        if (! toRead) toRead = NCCALLREPLYCHUNK;
+        if (!toRead) toRead = NCCALLREPLYCHUNK;
 
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("Attempt to read %d bytes", toRead);
@@ -325,9 +315,9 @@ HTTPRemotingHandler::advance()
 
 #ifdef GNASH_DEBUG_REMOTING
             log_debug("NetConnection.call: reply buffer capacity (%d) "
-                      "is too small to accept next %d bytes of chunk "
-                      "(current size is %d). Reserving %d bytes.",
-                reply.capacity(), toRead, reply.size(), newCapacity);
+                    "is too small to accept next %d bytes of chunk "
+                    "(current size is %d). Reserving %d bytes.",
+                    reply.capacity(), toRead, reply.size(), newCapacity);
 #endif
 
             reply.reserve(newCapacity);
@@ -464,8 +454,8 @@ HTTPRemotingHandler::advance()
                             // Reply message is: '/id/methodName'
 
                             int ns = 1; // next slash position
-                            while (ns<si-1 && *(b+ns) != '/') ++ns;
-                            if ( ns >= si-1 ) {
+                            while (ns < si-1 && *(b + ns) != '/') ++ns;
+                            if (ns >= si-1) {
                                 std::string msg(
                                         reinterpret_cast<const char*>(b), si);
                                 log_error("NetConnection::call(): invalid "
@@ -483,9 +473,9 @@ HTTPRemotingHandler::advance()
                             b += si;
 
                             // parse past unused string in header
-                            if(b + 2 > end) break;
+                            if (b + 2 > end) break;
                             si = readNetworkShort(b); b += 2; // reply length
-                            if(b + si > end) break;
+                            if (b + si > end) break;
                             b += si;
 
                             // this field is supposed to hold the
@@ -494,7 +484,7 @@ HTTPRemotingHandler::advance()
                             // openstreetmap.org (which works great
                             // in the adobe player) sends
                             // 0xffffffff. So we just ignore it
-                            if(b + 4 > end) break;
+                            if (b + 4 > end) break;
                             li = readNetworkLong(b); b += 4; // reply length
 
 #ifdef GNASH_DEBUG_REMOTING
@@ -557,8 +547,7 @@ HTTPRemotingHandler::advance()
                     }
                 }
             }
-            else
-            {
+            else {
                 log_error("Response from remoting service < 8 bytes");
             }
 
@@ -571,16 +560,18 @@ HTTPRemotingHandler::advance()
         }
     }
 
-    if(!_connection && queued_count > 0) {
-//#ifdef GNASH_DEBUG_REMOTING
+    if (!_connection && queued_count > 0) {
         log_debug("creating connection");
-//#endif
         // set the "number of bodies" header
 
-        (reinterpret_cast<boost::uint16_t*>(_postdata.data() + 4))[0] = htons(queued_count);
-        std::string postdata_str(reinterpret_cast<char*>(_postdata.data()), _postdata.size());
+        (reinterpret_cast<boost::uint16_t*>(_postdata.data() + 4))[0] =
+            htons(queued_count);
+
+        std::string postdata_str(reinterpret_cast<char*>(_postdata.data()),
+                _postdata.size());
 #ifdef GNASH_DEBUG_REMOTING
-        log_debug("NetConnection.call(): encoded args from %1% calls: %2%", queued_count, hexify(postdata.data(), postdata.size(), false));
+        log_debug("NetConnection.call(): encoded args from %1% calls: %2%",
+                queued_count, hexify(postdata.data(), postdata.size(), false));
 #endif
         queued_count = 0;
 
