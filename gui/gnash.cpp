@@ -225,6 +225,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         { 261, "hwaccel",           Arg_parser::yes },
         { 262, "flash-version",     Arg_parser::no },
         { 'D', 0,                   Arg_parser::yes }, // Handled in dump gui
+        { 'S', 0,                   Arg_parser::yes }, // Handled in dump gui
         {   0, 0,                   Arg_parser::no  }
     };
 

@@ -101,6 +101,8 @@ private:
 
     ManualClock _manualClock;
 
+    unsigned long _sleepUS; // micro-seconds sleep between iterations
+
 
 };
 
