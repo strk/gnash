@@ -16,7 +16,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
 #ifndef GNASH_NETCONNECTION_H
 #define GNASH_NETCONNECTION_H
 
@@ -58,7 +57,8 @@ public:
     };
 
     NetConnection_as(as_object* owner);
-    ~NetConnection_as();
+
+    virtual ~NetConnection_as();
 
     /// Process connection stuff
     virtual void update();
@@ -98,10 +98,6 @@ public:
     void markReachableResources() const;
 
 private:
-
-    typedef std::pair<std::string, std::string> NetConnectionStatus;
-
-    void getStatusCodeInfo(StatusCode code, NetConnectionStatus& info);
 
     /// Extend the URL to be used for playing
     void addToURL(const std::string& url);

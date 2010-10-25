@@ -23,8 +23,14 @@
 #include "gnashconfig.h"
 #endif
 
-#include "GnashSystemNetHeaders.h"
 #include "NetConnection_as.h"
+
+#include <iostream>
+#include <string>
+#include <boost/scoped_ptr.hpp>
+#include <utility>
+
+#include "GnashSystemNetHeaders.h"
 #include "log.h"
 #include "GnashException.h"
 #include "builtin_function.h"
@@ -42,10 +48,6 @@
 #include "RunResources.h"
 #include "IOChannel.h"
 
-#include <iostream>
-#include <string>
-#include <boost/scoped_ptr.hpp>
-
 //#define GNASH_DEBUG_REMOTING
 
 // Forward declarations.
@@ -62,6 +64,8 @@ namespace {
     as_value netconnection_call(const fn_call& fn);
     as_value netconnection_addHeader(const fn_call& fn);
     as_value netconnection_new(const fn_call& fn);
+    std::pair<std::string, std::string>
+        getStatusCodeInfo(NetConnection_as::StatusCode code);
 
 }
 
@@ -728,8 +732,7 @@ NetConnection_as::validateURL() const
 void
 NetConnection_as::notifyStatus(StatusCode code)
 {
-    std::pair<std::string, std::string> info;
-    getStatusCodeInfo(code, info);
+    std::pair<std::string, std::string> info = getStatusCodeInfo(code);
 
     /// This is a new normal object each time (see NetConnection.as)
     as_object* o = createObject(getGlobal(owner()));
@@ -740,49 +743,6 @@ NetConnection_as::notifyStatus(StatusCode code)
     o->init_member("level", info.second, flags);
 
     callMethod(&owner(), NSV::PROP_ON_STATUS, o);
-
-}
-
-void
-NetConnection_as::getStatusCodeInfo(StatusCode code, NetConnectionStatus& info)
-{
-    /// The Call statuses do exist, but this implementation is a guess.
-    switch (code)
-    {
-        case CONNECT_SUCCESS:
-            info.first = "NetConnection.Connect.Success";
-            info.second = "status";
-            return;
-
-        case CONNECT_FAILED:
-            info.first = "NetConnection.Connect.Failed";
-            info.second = "error";
-            return;
-
-        case CONNECT_APPSHUTDOWN:
-            info.first = "NetConnection.Connect.AppShutdown";
-            info.second = "error";
-            return;
-
-        case CONNECT_REJECTED:
-            info.first = "NetConnection.Connect.Rejected";
-            info.second = "error";
-            return;
-
-        case CALL_FAILED:
-            info.first = "NetConnection.Call.Failed";
-            info.second = "error";
-            return;
-
-        case CALL_BADVERSION:
-            info.first = "NetConnection.Call.BadVersion";
-            info.second = "status";
-            return;
-
-        case CONNECT_CLOSED:
-            info.first = "NetConnection.Connect.Closed";
-            info.second = "status";
-    }
 
 }
 
@@ -1174,8 +1134,33 @@ netconnection_addHeader(const fn_call& fn)
     return as_value();
 }
 
-} // anonymous namespace
+std::pair<std::string, std::string>
+getStatusCodeInfo(NetConnection_as::StatusCode code)
+{
+    /// The Call statuses do exist, but this implementation is a guess.
+    switch (code) {
+        case NetConnection_as::CONNECT_SUCCESS:
+            return std::make_pair("NetConnection.Connect.Success", "status");
+        case NetConnection_as::CONNECT_FAILED:
+            return std::make_pair("NetConnection.Connect.Failed", "error");
+        case NetConnection_as::CONNECT_APPSHUTDOWN:
+            return std::make_pair("NetConnection.Connect.AppShutdown", "error");
+        case NetConnection_as::CONNECT_REJECTED:
+            return std::make_pair("NetConnection.Connect.Rejected", "error");
+        case NetConnection_as::CALL_FAILED:
+            return std::make_pair("NetConnection.Call.Failed", "error");
+        case NetConnection_as::CALL_BADVERSION:
+            return std::make_pair("NetConnection.Call.BadVersion", "status");
+        case NetConnection_as::CONNECT_CLOSED:
+            return std::make_pair("NetConnection.Connect.Closed", "status");
+        default:
+            std::abort();
+    }
 
+}
+
+
+} // anonymous namespace
 } // end of gnash namespace
 
 // local Variables:
