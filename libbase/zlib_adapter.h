@@ -32,14 +32,6 @@ namespace zlib_adapter
     DSOEXPORT std::auto_ptr<IOChannel>
         make_inflater(std::auto_ptr<IOChannel> in);
 
-    /// \brief
-    /// Returns a write-only IOChannel stream that deflates the remaining
-    /// content of the given input stream.
-    //
-    /// TODO: take and return by auto_ptr
-    ///
-    DSOEXPORT IOChannel* make_deflater(IOChannel* out);
-
 } // namespace gnash.zlib_adapter
 } // namespace gnash
 
