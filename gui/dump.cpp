@@ -88,7 +88,8 @@ DumpGui::DumpGui(unsigned long xid, float scale, bool loop, RunResources& r) :
     _framecount(0),
     _samplesFetched(0),
     _bpp(32),
-    _pixelformat("BGRA32")
+    _pixelformat("BGRA32"),
+    _sleepUS(0)
 {
     if (loop) {
         std::cerr << "# WARNING:  Gnash was told to loop the movie\n";
@@ -116,7 +117,7 @@ DumpGui::init(int argc, char **argv[])
     optind = 0;
     opterr = 0;
     char c;
-    while ((c = getopt (argc, *argv, "D:")) != -1) {
+    while ((c = getopt (argc, *argv, "D:S:")) != -1) {
         if (c == 'D') {
             // Terminate if no filename is given.
             if (!optarg) {
@@ -126,6 +127,16 @@ DumpGui::init(int argc, char **argv[])
                 return false;
             }      
             _fileOutput = optarg;
+        }
+        else if (c == 'S') {
+            // Terminate if no filename is given.
+            if (!optarg) {
+                std::cout << 
+                    _("# FATAL:  No sleep ms value given with -S argument.") <<
+                    std::endl;      
+                return false;
+            }      
+            _sleepUS = atoi(optarg)*1000; // we take milliseconds
         }
     }
     opterr = origopterr;
@@ -157,29 +168,32 @@ DumpGui::run()
 
     log_debug("DumpGui entering main loop with interval of %d ms", _interval);
 
-    size_t usecs_interval = _interval*1000;
+    // heart-beat interval, in milliseconds
+    // TODO: extract this value from the swf's FPS
+    //       by default and allow overriding it
+    //
+    unsigned int clockAdvance = _interval;
 
     VirtualClock& timer = getClock();
 
     _terminate_request = false;
     while (!_terminate_request) {
 
-	_manualClock.advance(_interval); 
+        _manualClock.advance(clockAdvance); 
 
         // advance movie now
         if ( advanceMovie() ) {
             ++_framecount;
             writeFrame();
+            writeSamples();
         }
-
-        writeSamples();
 
         // check if we've reached a timeout
         if (_timeout && timer.elapsed() > _timeout ) {
             break;
         }
 
-        gnashSleep(usecs_interval);
+        if ( _sleepUS ) gnashSleep(_sleepUS);
 
     }
 
