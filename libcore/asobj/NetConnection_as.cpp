@@ -133,6 +133,10 @@ public:
 
     virtual ~ConnectionHandler() {}
 
+    size_t callNo() {
+        return ++_numCalls;
+    }
+
 protected:
 
     /// Construct a connection handler bound to the given NetConnection object
@@ -143,11 +147,16 @@ protected:
     /// need to mark it reachable.
     ConnectionHandler(NetConnection_as& nc)
         :
-        _nc(nc)
+        _nc(nc),
+        _numCalls(0)
     {}
 
     // Object handling connection status messages
     NetConnection_as& _nc;
+
+private:
+
+    size_t _numCalls;
 };
 
 std::auto_ptr<IOChannel>
@@ -223,7 +232,6 @@ private:
     SimpleBuffer reply;
     int reply_start;
     int queued_count;
-    unsigned int _numCalls; // === queued_count ?
 
     // Quick hack to send Content-Type: application/x-amf
     // TODO: check if we should take headers on a per-call basis
@@ -277,8 +285,7 @@ HTTPRemotingHandler::HTTPRemotingHandler(NetConnection_as& nc, const URL& url)
         _connection(0),
         reply(),
         reply_start(0),
-        queued_count(0),
-        _numCalls(0) // TODO: replace by queued count ?
+        queued_count(0)
 {
     // leave space for header
     _postdata.append("\000\000\000\000\000\000", 6);
@@ -614,7 +621,7 @@ HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
     os << "/";
     // Call number is not used if the callback is undefined
     if (asCallback) {
-        os << ++_numCalls; 
+        os << callNo(); 
     }
     const std::string callNumberString = os.str();
 
@@ -631,8 +638,7 @@ HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
     // STRICT_ARRAY encoding is allowed for remoting
     amf::Writer w(buf, true);
 
-    for (unsigned int i = firstArg; i < args.size(); ++i)
-    {
+    for (size_t i = firstArg; i < args.size(); ++i) {
         const as_value& arg = args[i];
         if (!arg.writeAMF0(w)) {
             log_error("Could not serialize NetConnection.call argument %d",
@@ -867,11 +873,10 @@ NetConnection_as::connect(const std::string& uri)
 void
 NetConnection_as::close()
 {
-    bool needSendClosedStatus = _currentConnection.get() || _isConnected;
+    const bool needSendClosedStatus = _currentConnection.get() || _isConnected;
 
     /// Queue the current call queue if it has pending calls
-    if ( _currentConnection.get() && _currentConnection->hasPendingCalls() )
-    {
+    if (_currentConnection.get() && _currentConnection->hasPendingCalls()) {
         _queuedConnections.push_back(_currentConnection.release());
     }
 
@@ -879,8 +884,7 @@ NetConnection_as::close()
     /// NetStream object be interrupted?
     _isConnected = false;
 
-    if ( needSendClosedStatus )
-    {
+    if (needSendClosedStatus) {
         notifyStatus(CONNECT_CLOSED);
     }
 }
@@ -897,8 +901,7 @@ void
 NetConnection_as::call(as_object* asCallback, const std::string& methodName,
         const std::vector<as_value>& args, size_t firstArg)
 {
-    if ( ! _currentConnection.get() )
-    {
+    if (!_currentConnection.get()) {
         log_aserror("NetConnection.call: can't call while not connected");
         return;
     }
@@ -951,7 +954,6 @@ void
 NetConnection_as::update()
 {
     // Advance
-
 #ifdef GNASH_DEBUG_REMOTING
     log_debug("NetConnection_as::advance: %d calls to advance",
             _queuedConnections.size());
@@ -1007,10 +1009,8 @@ readNetworkLong(const boost::uint8_t* buf) {
 }
 
 
-/// Anonymous namespace for NetConnection interface implementation.
-
+// Anonymous namespace for NetConnection interface implementation.
 namespace {
-
 
 /// NetConnection.call()
 //
