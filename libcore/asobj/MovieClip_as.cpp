@@ -1895,18 +1895,15 @@ movieclip_startDrag(const fn_call& fn)
 {
     MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
-    drag_state st;
-    st.setCharacter(movieclip);
+    DragState st(movieclip);
 
     // mark this DisplayObject is transformed.
     movieclip->transformedByScript();
 
-    if ( fn.nargs )
-    {
+    if (fn.nargs) {
         st.setLockCentered(toBool(fn.arg(0), getVM(fn)));
 
-        if ( fn.nargs >= 5)
-        {
+        if (fn.nargs > 4) {
             double x0 = toNumber(fn.arg(1), getVM(fn));
             double y0 = toNumber(fn.arg(2), getVM(fn));
             double x1 = toNumber(fn.arg(3), getVM(fn));
@@ -1934,7 +1931,7 @@ movieclip_startDrag(const fn_call& fn)
             IF_VERBOSE_ASCODING_ERRORS(
                 if (gotinf || swapped) {
                     std::stringstream ss; fn.dump_args(ss);
-                    if ( swapped ) { 
+                    if (swapped) { 
                         log_aserror(_("min/max bbox values in "
                             "MovieClip.startDrag(%s) swapped, fixing"),
                             ss.str());
@@ -1953,7 +1950,7 @@ movieclip_startDrag(const fn_call& fn)
         }
     }
 
-    getRoot(fn).set_drag_state(st);
+    getRoot(fn).setDragState(st);
 
     return as_value();
 }

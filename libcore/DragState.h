@@ -16,42 +16,32 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
-
 #ifndef GNASH_DRAG_STATE_H
 #define GNASH_DRAG_STATE_H
 
-#include "SWFRect.h" // for composition
-
-namespace gnash
-{
+#include "SWFRect.h"
+#include "DisplayObject.h"
 
 // Forward declarations
-class DisplayObject;
+namespace gnash {
+    class DisplayObject;
+}
 
+namespace gnash {
 
 /// What is being dragged and how
-class drag_state
+class DragState
 {
-
-	bool _hasbounds;
-
-	/// Boundaries to constrain the drag into.
-	/// Coordinates in TWIPS.
-	SWFRect _bounds;
-
-	DisplayObject* _displayObject;
-
-	bool	_lock_centered;
-
-	/// Offsets of displacement from DisplayObject origin
-	/// at time of drag start. These are used for non
-	/// lock-centered dragging.
-	/// Coordinates are in stage space (TWIPS)
-	boost::int32_t  _xoffset;
-	boost::int32_t  _yoffset;
-
 public:
+
+	DragState(DisplayObject* d)
+		:
+		_hasbounds(false),
+		_bounds(),
+		_displayObject(d),
+		_lock_centered(false)
+	{
+	}
 
 	bool isLockCentered() const {
 		return _lock_centered;
@@ -65,8 +55,7 @@ public:
 	/// at time of drag start.
 	/// Coordinates are in stage space (twips)
 	///
-	void setOffset(boost::int32_t x, boost::int32_t y)
-	{
+	void setOffset(boost::int32_t x, boost::int32_t y) {
 		_xoffset = x;
 		_yoffset = y;
 	}
@@ -74,7 +63,9 @@ public:
 	boost::int32_t xOffset() const { return _xoffset; }
 	boost::int32_t yOffset() const { return _yoffset; }
 
-	bool hasBounds() const {return _hasbounds; }
+	bool hasBounds() const {
+        return _hasbounds;
+    }
 
 	/// \brief
 	/// Get the boundaries to constraint
@@ -106,34 +97,38 @@ public:
 		return _displayObject;
 	}
 
-	/// Stores DisplayObject in an intrusive pointer
-	void setCharacter(DisplayObject* ch) {
-		_displayObject = ch;
-	}
-
 	/// Reset drag state to its initial condition
-	void reset()
-	{
-		_displayObject = NULL;
+	void reset() {
+		_displayObject = 0;
 		_hasbounds = false;
 		_bounds.set_null();
 		_lock_centered = false;
 	}
 
-	drag_state()
-		:
-		_hasbounds(false),
-		_bounds(),
-		_displayObject(0),
-		_lock_centered(false)
-	{
-	}
-
 	/// Mark DisplayObject as reachable (if any)
-	void markReachableResources() const
-	{
+	void markReachableResources() const {
 		if (_displayObject) _displayObject->setReachable();
 	}
+
+private:
+
+	bool _hasbounds;
+
+	/// Boundaries to constrain the drag into.
+	/// Coordinates in TWIPS.
+	SWFRect _bounds;
+
+	DisplayObject* _displayObject;
+
+	bool _lock_centered;
+
+	/// Offsets of displacement from DisplayObject origin
+	/// at time of drag start. These are used for non
+	/// lock-centered dragging.
+	/// Coordinates are in stage space (TWIPS)
+	boost::int32_t _xoffset;
+	boost::int32_t _yoffset;
+
 };
 
 

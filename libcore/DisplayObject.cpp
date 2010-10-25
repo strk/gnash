@@ -32,9 +32,8 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_root.h"
 #include "MovieClip.h"
-#include "drag_state.h" // for do_mouse_drag (to be moved in movie_root)
-#include "VM.h" // for do_mouse_drag (to be moved in movie_root)
-#include "fn_call.h" // for shared ActionScript getter-setters
+#include "VM.h" 
+#include "fn_call.h"
 #include "GnashException.h" 
 #include "ExecutableCode.h"
 #include "namedStrings.h"
