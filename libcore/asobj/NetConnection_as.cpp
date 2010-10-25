@@ -27,8 +27,9 @@
 
 #include <iostream>
 #include <string>
-#include <boost/scoped_ptr.hpp>
 #include <utility>
+#include <boost/scoped_ptr.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "GnashSystemNetHeaders.h"
 #include "log.h"
@@ -47,6 +48,7 @@
 #include "smart_ptr.h"
 #include "RunResources.h"
 #include "IOChannel.h"
+#include "RTMP.h"
 
 //#define GNASH_DEBUG_REMOTING
 
@@ -86,6 +88,8 @@ namespace {
 class ConnectionHandler
 {
 public:
+    
+    typedef std::map<size_t, as_object*> CallbacksMap;
 
     /// @param methodName
     ///     A string identifying the remote procedure to call
@@ -103,7 +107,7 @@ public:
     /// @return true if the call is queued, false otherwise
     ///
     virtual void call(as_object* asCallback, const std::string& methodName,
-            const std::vector<as_value>& args, size_t firstArg)=0;
+            const std::vector<as_value>& args, size_t firstArg) = 0;
 
     /// Get an stream by name
     //
@@ -124,7 +128,10 @@ public:
     /// ConnectionHandlers may store references to as_objects
     //
     /// These include callback objects.
-    virtual void setReachable() const = 0;
+    void setReachable() const {
+        foreachSecond(_callbacks.begin(), _callbacks.end(),
+                std::mem_fun(&as_object::setReachable));
+    }
 
     /// Return true if the connection has pending calls 
     //
@@ -154,6 +161,22 @@ protected:
         _nc(nc),
         _numCalls(0)
     {}
+
+    void pushCallback(size_t id, as_object* callback) {
+        _callbacks[id] = callback;
+    }
+
+    as_object* popCallback(size_t id) {
+        CallbacksMap::iterator it = _callbacks.find(id);
+        if (it != _callbacks.end()) {
+            as_object* callback = it->second;
+            _callbacks.erase(it);
+            return callback;
+        }
+        return 0;
+    }
+
+    CallbacksMap _callbacks;
 
     // Object handling connection status messages
     NetConnection_as& _nc;
@@ -207,12 +230,6 @@ public:
     // See dox in ConnectionHandler
     virtual bool advance();
 
-    // See dox in ConnectionHandler
-    virtual void setReachable() const {
-        foreachSecond(callbacks.begin(), callbacks.end(),
-                std::mem_fun(&as_object::setReachable));
-    }
-
     // See dox in NetworkHandler class
     virtual void call(as_object* asCallback, const std::string& methodName,
             const std::vector<as_value>& args, size_t firstArg);
@@ -220,9 +237,6 @@ public:
 private:
 
     static const int NCCALLREPLYCHUNK=1024*200;
-
-    typedef std::map<std::string, as_object* > CallbacksMap;
-    CallbacksMap callbacks;
 
     SimpleBuffer _postdata;
     URL _url;
@@ -238,31 +252,13 @@ private:
     NetworkAdapter::RequestHeaders _headers;
 
     void push_amf(const SimpleBuffer &amf) {
-        //GNASH_REPORT_FUNCTION;
-
         _postdata.append(amf.data(), amf.size());
-        queued_count++;
+        ++queued_count;
     }
 
-    void push_callback(const std::string& id, as_object* callback) {
-        callbacks[id] = callback;
-    }
-
-    as_object* pop_callback(const std::string& id) {
-        CallbacksMap::iterator it = callbacks.find(id);
-        if (it != callbacks.end()) {
-            as_object* callback = it->second;
-            callbacks.erase(it);
-            return callback;
-        }
-        return 0;
-    }
-
-    void enqueue(const SimpleBuffer &amf, const std::string& identifier,
-                 as_object* callback) {
-
+    void enqueue(const SimpleBuffer &amf, size_t id, as_object* callback) {
         push_amf(amf);
-        push_callback(identifier, callback);
+        pushCallback(id, callback);
     }
 
     void enqueue(const SimpleBuffer &amf) {
@@ -458,8 +454,8 @@ HTTPRemotingHandler::advance()
                             // Reply message is: '/id/methodName'
 
                             int ns = 1; // next slash position
-                            while (ns < si-1 && *(b + ns) != '/') ++ns;
-                            if (ns >= si-1) {
+                            while (ns < si - 1 && *(b + ns) != '/') ++ns;
+                            if (ns >= si - 1) {
                                 std::string msg(
                                         reinterpret_cast<const char*>(b), si);
                                 log_error("NetConnection::call(): invalid "
@@ -467,8 +463,16 @@ HTTPRemotingHandler::advance()
                                 break;
                             }
 
-                            std::string id(reinterpret_cast<const char*>(b),
-                                    ns);
+                            std::string id(reinterpret_cast<const char*>(b + 1),
+                                    ns - 1);
+                            log_debug("ID: %s", id);
+                            size_t callbackID = 0;
+                            try {
+                                callbackID = boost::lexical_cast<size_t>(id);
+                            }
+                            catch (const boost::bad_lexical_cast&) {
+                                break;
+                            }
 
                             std::string methodName(
                                     reinterpret_cast<const char*>(b+ns+1),
@@ -514,7 +518,7 @@ HTTPRemotingHandler::advance()
 
                             // if actionscript specified a callback object,
                             // call it
-                            as_object* callback = pop_callback(id);
+                            as_object* callback = popCallback(callbackID);
                             if (callback) {
 
                                 string_table::key methodKey;
@@ -610,13 +614,15 @@ HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
     buf.appendNetworkShort(methodName.size());
     buf.append(methodName.c_str(), methodName.size());
 
+    const size_t callID = callNo();
+
     // client id (result number) as counted string
     // the convention seems to be / followed by a unique (ascending) number
     std::ostringstream os;
     os << "/";
     // Call number is not used if the callback is undefined
     if (asCallback) {
-        os << callNo(); 
+        os << callID; 
     }
     const std::string callNumberString = os.str();
 
@@ -654,7 +660,7 @@ HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("calling enqueue with callback");
 #endif
-        enqueue(buf, callNumberString, asCallback);
+        enqueue(buf, callID, asCallback);
     }
     
     else {
@@ -664,6 +670,38 @@ HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
         enqueue(buf);
     }
 }
+
+class RTMPRemotingHandler : public ConnectionHandler
+{
+public:
+
+    RTMPRemotingHandler(NetConnection_as& nc, const URL& url)
+        :
+        ConnectionHandler(nc)
+    {
+        _rtmp.connect(url);
+    }
+
+    virtual void call(as_object* asCallback, const std::string& methodName,
+            const std::vector<as_value>& args, size_t firstArg)
+    {
+        // Infofield1?
+        SimpleBuffer buf;
+        amf::Writer aw(buf);
+        aw.writeString(methodName);
+        aw.writeNumber(callNo());
+        buf.appendByte(amf::NULL_AMF0);
+        for (size_t i = firstArg; i < args.size(); ++i) {
+            args[i].writeAMF0(aw);
+        }
+        _rtmp.call(buf);
+    }
+
+private:
+
+    rtmp::RTMP _rtmp;
+
+};
 
 //----- NetConnection_as ----------------------------------------------------
 
@@ -776,35 +814,33 @@ NetConnection_as::connect(const std::string& uri)
     const RunResources& r = getRunResources(owner());
     URL url(_uri, r.streamProvider().originalURL());
 
-    if ((url.protocol() != "rtmp")
-        && (url.protocol() != "rtmpt")
-        && (url.protocol() != "rtmpts")
-        && (url.protocol() != "https")
-        && (url.protocol() != "http")) {
+    if (!r.streamProvider().allow(url)) {
+        log_security(_("Gnash is not allowed to connect " "to %s"), url);
+        notifyStatus(CONNECT_FAILED);
+        return;
+    }
 
-        IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("NetConnection.connect(%s): invalid connection "
+    // Attempt connection.
+    if (url.protocol() == "https" || url.protocol() == "http") {
+        _currentConnection.reset(new HTTPRemotingHandler(*this, url));
+    }
+    else if (url.protocol() == "rtmp") {
+        // TODO: fix this to work properly.
+        _currentConnection.reset(new HTTPRemotingHandler(*this, url));
+    }
+    else if (url.protocol() == "rtmpt" || url.protocol() == "rtmpts") {
+        log_unimpl("NetConnection.connect(%s): unsupported connection "
                  "protocol", url);
-        );
+        notifyStatus(CONNECT_FAILED);
+        return;
+    }
+    else {
+        log_error("NetConnection.connect(%s): unknown connection "
+             "protocol", url);
         notifyStatus(CONNECT_FAILED);
         return;
     }
     
-    // This is for HTTP remoting
-
-    if (!r.streamProvider().allow(url)) {
-        log_security(_("Gnash is not allowed to NetConnection.connect "
-                    "to %s"), url);
-        notifyStatus(CONNECT_FAILED);
-        return;
-    }
-
-    _currentConnection.reset(new HTTPRemotingHandler(*this, url));
-
-    // FIXME: We should attempt a connection here (this is called when an
-    // argument is passed to NetConnection.connect(url).
-    // Would probably return true on success and set isConnected.
-    //
     // Under certain circumstances, an an immediate failure notification
     // happens. These are:
     // a) sandbox restriction
