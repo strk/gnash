@@ -16,15 +16,20 @@
 # 
 
 #
-# Build the DUMP gui
+# Build the RISCOS gui
 #
-if BUILD_DUMP_GUI
+if BUILD_RISCOS_GUI
+bin_PROGRAMS += riscos-gnash
+riscos_gnash_SOURCES = $(GUI_SRCS) riscos/gui_riscos.cpp riscos/riscos.cpp riscos/riscos_glue.h riscos/riscossup.h
+riscos_gnash_CPPFLAGS = -DGUI_FB -DGUI_CONFIG=\"FB\" \
+	$(AM_CPPFLAGS) 
+riscos_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
+#riscos_gnash_DEPENDENCIES = .configline
+
 if BUILD_AGG_RENDERER
-bin_PROGRAMS += dump-gnash
-dump_gnash_SOURCES = $(GUI_SRCS) gui_dump.cpp dump.cpp dump.h
-dump_gnash_CPPFLAGS = -DGUI_DUMP -DGUI_CONFIG=\"DUMP\" \
-	$(AM_CPPFLAGS) $(DUMP_CFLAGS) $(AGG_CFLAGS)
-dump_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS) 
-dump_gnash_LDADD = $(GNASH_LIBS) $(DUMP_LIBS) $(AGG_LIBS) $(CAIRO_LIBS)
+riscos_gnash_CPPFLAGS += $(AGG_CFLAGS)
+riscos_gnash_SOURCES += riscos/riscos_glue_agg.cpp  riscos/riscos_glue_agg.h   
+riscos_gnash_LDADD = $(top_builddir)/librender/libgnashagg.la \
+		$(GNASH_LIBS) $(AGG_LIBS)
 endif				# BUILD_AGG_RENDERER
-endif				# BUILD_DUMP_GUI
+endif				# BUILD_FB_GUI

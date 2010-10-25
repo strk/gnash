@@ -22,19 +22,19 @@
 # built source files still get included in the source tarball.
 DEVICES =
 if ENABLE_INPUT_DEVICES
-DEVICES += InputDevice.cpp InputDevice.h
+DEVICES += fb/InputDevice.cpp fb/InputDevice.h
 
 # Touchscreen
 if ENABLE_TSLIB
-DEVICES += TouchDevice.cpp
+DEVICES += fb/TouchDevice.cpp
 endif
 # PS/2 Mouse
 if ENABLE_MOUSE
-DEVICES += MouseDevice.cpp
+DEVICES += fb/MouseDevice.cpp
 endif
 # Linux input events
 if ENABLE_INPUT_EVENTS
-DEVICES += EventDevice.cpp
+DEVICES += fb/EventDevice.cpp
 endif
 endif
 

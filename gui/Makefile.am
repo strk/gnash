@@ -148,24 +148,6 @@ endif
 
 # endif # DYNAMIC_GUI
 
-# AQUA Toolkit
-if BUILD_AQUA_GUI
-#OS X stuff goes here...
-GUI_CPPFLAGS += -DGUI_AQUA
-
-bundle_name = Gnash.app
-
-if  HAVE_OPENGL
-noinst_LTLIBRARIES += libgnashaqua_ogl.la
-libgnashaqua_ogl_la_CPPFLAGS = $(AM_CPPFLAGS) \
-	$(OPENGL_CFLAGS)
-libgnashaqua_ogl_la_SOURCES = \
-	aqua_ogl_glue.cpp aqua_ogl_glue.h \
-	aqua.cpp aquasup.h aqua_glue.h
-libgnashaqua_ogl_la_LDFLAGS = $(LIB_FLAGS)
-libgnashaqua_ogl_la_LIBADD = 
-endif # HAVE_OPENGL
-endif # BUILD_AQUA_GUI
 
 if USE_FFMPEG_ENGINE
 AM_LDFLAGS += $(FFMPEG_LIBS) $(LIBVA_LIBS) $(LIBVA_X11_LIBS) 
@@ -262,7 +244,7 @@ endif
 
 # Build the AQUA gui
 if BUILD_AQUA_GUI
-include $(srcdir)/am-frag/aqua.am
+include $(srcdir)/aqua/aqua.am
 endif
 
 # Build the GTK gui
@@ -272,7 +254,7 @@ endif
 
 # Build the DUMP gui
 if BUILD_DUMP_GUI
-include $(srcdir)/am-frag/dump.am
+include $(srcdir)/dump/dump.am
 endif
 
 # Build the FB gui
@@ -282,7 +264,7 @@ endif
 
 # Build the RISCOS gui
 if BUILD_RISCOS_GUI
-include $(srcdir)/am-frag/riscos.am
+include $(srcdir)/riscos/riscos.am
 endif
 
 CLEANFILES = klash3.moc Kde4Gui.moc Kde4Glue.moc .configline gnash
