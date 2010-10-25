@@ -241,7 +241,7 @@ EXTENSIONS_API = \
 	as_environment.h \
 	movie_root.h \
 	MouseButtonState.h \
-	drag_state.h \
+	DragState.h \
 	InteractiveObject.h \
 	SWFRect.h \
 	GnashKey.h \

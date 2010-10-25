@@ -81,7 +81,7 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "dsodefs.h" // DSOEXPORT
 #include "MouseButtonState.h" // for composition
-#include "drag_state.h" // for composition
+#include "DragState.h" // for composition
 #include "GnashKey.h" // key::code
 #include "Movie.h"
 #include "GnashEnums.h" 
@@ -300,13 +300,10 @@ public:
     /// Coordinates are in PIXELS, NOT TWIPS.
     void get_mouse_state(boost::int32_t& x, boost::int32_t& y);
 
-    void get_drag_state(drag_state& st);
-
-    void set_drag_state(const drag_state& st);
+    void setDragState(const DragState& st);
 
     /// @return the originating root movie (not necessarely _level0)
-    const Movie& getRootMovie() const
-    {
+    const Movie& getRootMovie() const {
         return *_rootMovie;
     }
 
@@ -315,8 +312,7 @@ public:
     /// TODO: create MovieClips without this and drop. It's deliberately
     /// different from getRootMovie() so it doesn't end up getting used
     /// in the same way.
-    Movie* topLevelMovie() const
-    {
+    Movie* topLevelMovie() const {
         return _rootMovie;
     }
 
@@ -327,9 +323,8 @@ public:
         return _rootMovie->frameRate();
     }
 
-    void stop_drag()
-    {
-        m_drag_state.reset();
+    void stop_drag() {
+        _dragState.reset();
     }
 
     /// Add an interval timer
@@ -1078,7 +1073,7 @@ private:
     DisplayObject* _currentFocus;
 
     /// @todo fold this into m_mouse_button_state?
-    drag_state m_drag_state;
+    DragState _dragState;
 
     typedef std::map<int, MovieClip*> Levels;
 

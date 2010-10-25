@@ -142,7 +142,7 @@ movie_root::movie_root(const movie_definition& def,
     _lastTimerId(0),
     _lastKeyEvent(key::INVALID),
     _currentFocus(0),
-    m_drag_state(),
+    _dragState(0),
     _movies(),
     _rootMovie(0),
     _invalidated(true),
@@ -743,22 +743,11 @@ movie_root::get_mouse_state(boost::int32_t& x, boost::int32_t& y)
 }
 
 void
-movie_root::get_drag_state(drag_state& st)
+movie_root::setDragState(const DragState& st)
 {
-    assert(testInvariant());
-
-    st = m_drag_state;
-
-    assert(testInvariant());
-}
-
-void
-movie_root::set_drag_state(const drag_state& st)
-{
-    m_drag_state = st;
+    _dragState = st;
     DisplayObject* ch = st.getCharacter();
-    if ( ch && ! st.isLockCentered() )
-    {
+    if (ch && !st.isLockCentered()) {
         // Get coordinates of the DisplayObject's origin
         point origin(0, 0);
         SWFMatrix chmat = getWorldMatrix(*ch);
@@ -771,7 +760,7 @@ movie_root::set_drag_state(const drag_state& st)
         boost::int32_t xoffset = world_mouse.x - world_origin.x;
         boost::int32_t yoffset = world_mouse.y - world_origin.y;
 
-        m_drag_state.setOffset(xoffset, yoffset);
+        _dragState.setOffset(xoffset, yoffset);
     }
     assert(testInvariant());
 }
@@ -784,7 +773,7 @@ movie_root::doMouseDrag()
 
     if (dragChar->unloaded()) {
         // Reset drag state if dragging char was unloaded
-        m_drag_state.reset();
+        _dragState.reset();
         return; 
     }
 
@@ -796,16 +785,16 @@ movie_root::doMouseDrag()
         parent_world_mat = getWorldMatrix(*p);
     }
 
-    if (!m_drag_state.isLockCentered()) {
-        world_mouse.x -= m_drag_state.xOffset();
-        world_mouse.y -= m_drag_state.yOffset();
+    if (!_dragState.isLockCentered()) {
+        world_mouse.x -= _dragState.xOffset();
+        world_mouse.y -= _dragState.yOffset();
     }
 
-    if (m_drag_state.hasBounds()) {
+    if (_dragState.hasBounds()) {
         SWFRect bounds;
         // bounds are in local coordinate space
         bounds.enclose_transformed_rect(parent_world_mat,
-                m_drag_state.getBounds());
+                _dragState.getBounds());
         // Clamp mouse coords within a defined SWFRect.
         bounds.clamp(world_mouse);
     }
@@ -1109,7 +1098,7 @@ movie_root::getActiveEntityUnderPointer() const
 DisplayObject*
 movie_root::getDraggingCharacter() const
 {
-    return m_drag_state.getCharacter();
+    return _dragState.getCharacter();
 }
 
 const DisplayObject*
@@ -1737,7 +1726,7 @@ movie_root::markReachableResources() const
     if (_currentFocus) _currentFocus->setReachable();
 
     // Mark DisplayObject being dragged, if any
-    m_drag_state.markReachableResources();
+    _dragState.markReachableResources();
 
     // NOTE: cleanupDisplayList() should have cleaned up all
     // unloaded live characters. The remaining ones should be marked

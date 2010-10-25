@@ -40,9 +40,9 @@
 #include "URL.h"
 #include "action_buffer.h"
 #include "as_object.h"
-#include "drag_state.h"
+#include "DragState.h"
 #include "VM.h" // for getting the root
-#include "movie_root.h" // for set_drag_state (ActionStartDragMovie)
+#include "movie_root.h" // for set_DragState (ActionStartDragMovie)
 #include "sound_handler.h"
 #include "namedStrings.h"
 #include "utf8.h"
@@ -1208,18 +1208,17 @@ ActionStartDragMovie(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_STARTDRAGMOVIE));
 #endif
 
-    drag_state st;
     DisplayObject* tgt = env.find_target(env.top(0).to_string());
     if (tgt) {
         // mark this DisplayObject as script transformed.
         tgt->transformedByScript();
-        st.setCharacter( tgt );
     }
     else {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("startDrag: unknown target '%s'"), env.top(0));
         );
     }
+    DragState st(tgt);
 
     st.setLockCentered(toBool(env.top(1), getVM(env)));
 
@@ -1256,7 +1255,7 @@ ActionStartDragMovie(ActionExec& thread)
 
     if (tgt) {
         VM& vm = getVM(env);
-        vm.getRoot().set_drag_state(st);
+        vm.getRoot().setDragState(st);
     }
 }
 
@@ -1265,8 +1264,8 @@ ActionStopDragMovie(ActionExec& thread)
 {
     as_environment& env = thread.env;
     DisplayObject* tgtch = env.get_target();
-    MovieClip *root_movie = tgtch ? tgtch->get_root() : 0;
-    if ( root_movie ) root_movie->stop_drag();
+    MovieClip* root_movie = tgtch ? tgtch->get_root() : 0;
+    if (root_movie) root_movie->stop_drag();
     else log_debug(_("ActionStopDragMovie: as_environment target is null or not a sprite"));
 }
 
