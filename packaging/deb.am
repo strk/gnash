@@ -138,21 +138,30 @@ deb-edit-utilities:
 	   sed -e '/webcam/d' -e '/microphone/d' $(BUILD_DIR)/debian/gnash-tools.manpages.orig > $(BUILD_DIR)/debian/gnash-tools.manpages; \
 	fi;
 
-# Python is at different revisions and paths depending on the Distribution and release
+# Python is at different revisions and paths depending on the Distribution
+# and release. Debian uses site-packages, while Ubuntu uses dist-packages.
 deb-edit-python:
 	@release=`lsb_release -i | sed -e 's/.*:[ \t]//'`; \
-	version=`python --version  2>&1 | tr -d '.' | cut -d ' ' -f 2i | sed -e 's:rc[0-9]*::'`; \
-	 if test x"$${release}" = x"Ubuntu"; then \
-	   echo "Editing $(BUILD_DIR)/debian/gtk-plugin-gnash.install for Ubuntu"; \
-	   if test -e $(BUILD_DIR)/debian/python-gtk-gnash.install; then \
-	     mv -f $(BUILD_DIR)/debian/python-gtk-gnash.install $(BUILD_DIR)/debian/python-gtk-gnash.install.orig; \
-	   fi; \
-	   sed -e 's:python2.5/site:python2.6/dist:' $(BUILD_DIR)/debian/python-gtk-gnash.install.orig > $(BUILD_DIR)/debian/python-gtk-gnash.install; \
-	   if test -e $(BUILD_DIR)/debian/python-gtk-gnash.dirs; then \
-	     mv -f $(BUILD_DIR)/debian/python-gtk-gnash.dirs $(BUILD_DIR)/debian/python-gtk-gnash.dirs.orig; \
-	   fi; \
-	   sed -e "s:python2.5/site:python2.6/dist:" $(BUILD_DIR)/debian/python-gtk-gnash.dirs.orig > $(BUILD_DIR)/debian/python-gtk-gnash.dirs; \
-	fi;
+	version=`python --version  2>&1 | tr -d '.' | cut -d ' ' -f 2 | sed -e 's:rc[0-9]*::'`; \
+	if test $${version} -gt 260; then \
+	  pdir=2.6; \
+	else \
+	  pdir=2.5; \
+	fi; \
+	if test x"$${release}" = x"Ubuntu"; then \
+	  packages="dist-packages"; \
+	else \
+	  packages="site-packages"; \
+	fi; \
+	echo "Editing $(BUILD_DIR)/debian/gtk-plugin-gnash.install for Ubuntu"; \
+	if test -e $(BUILD_DIR)/debian/python-gtk-gnash.install; then \
+	  mv -f $(BUILD_DIR)/debian/python-gtk-gnash.install $(BUILD_DIR)/debian/python-gtk-gnash.install.orig; \
+	fi; \
+	sed -e "s:python2.X/site-packages:python$${pdir}/$${packages}:" $(BUILD_DIR)/debian/python-gtk-gnash.install.orig > $(BUILD_DIR)/debian/python-gtk-gnash.install; \
+	if test -e $(BUILD_DIR)/debian/python-gtk-gnash.dirs; then \
+	  mv -f $(BUILD_DIR)/debian/python-gtk-gnash.dirs $(BUILD_DIR)/debian/python-gtk-gnash.dirs.orig; \
+	fi; \
+	sed -e "s:python2.X/site-packages:python$${pdir}/$${packages}:" $(BUILD_DIR)/debian/python-gtk-gnash.dirs.orig > $(BUILD_DIR)/debian/python-gtk-gnash.dirs;
 
 deb-edit-browser:
 	@if test `echo $(FIREFOX_PLUGINS) | grep -c mozilla` -eq 0; then \
