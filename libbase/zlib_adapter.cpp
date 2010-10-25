@@ -28,10 +28,6 @@ namespace zlib_adapter
     std::auto_ptr<IOChannel> make_inflater(std::auto_ptr<IOChannel> /*in*/) {
         std::abort(); 
     }
-
-    IOChannel* make_deflater(IOChannel* /*out*/) {
-        std::abort(); 
-    }
 }
 
 #else // HAVE_ZLIB_H
@@ -316,7 +312,7 @@ InflaterIOChannel::InflaterIOChannel(std::auto_ptr<IOChannel> in)
 std::auto_ptr<IOChannel> make_inflater(std::auto_ptr<IOChannel> in)
 {
     assert(in.get());
-    return std::auto_ptr<IOChannel> (new InflaterIOChannel(in));
+    return std::auto_ptr<IOChannel>(new InflaterIOChannel(in));
 }
 
 }

@@ -23,8 +23,14 @@
 #include "gnashconfig.h"
 #endif
 
-#include "GnashSystemNetHeaders.h"
 #include "NetConnection_as.h"
+
+#include <iostream>
+#include <string>
+#include <boost/scoped_ptr.hpp>
+#include <utility>
+
+#include "GnashSystemNetHeaders.h"
 #include "log.h"
 #include "GnashException.h"
 #include "builtin_function.h"
@@ -42,10 +48,6 @@
 #include "RunResources.h"
 #include "IOChannel.h"
 
-#include <iostream>
-#include <string>
-#include <boost/scoped_ptr.hpp>
-
 //#define GNASH_DEBUG_REMOTING
 
 // Forward declarations.
@@ -62,6 +64,8 @@ namespace {
     as_value netconnection_call(const fn_call& fn);
     as_value netconnection_addHeader(const fn_call& fn);
     as_value netconnection_new(const fn_call& fn);
+    std::pair<std::string, std::string>
+        getStatusCodeInfo(NetConnection_as::StatusCode code);
 
 }
 
@@ -133,6 +137,10 @@ public:
 
     virtual ~ConnectionHandler() {}
 
+    size_t callNo() {
+        return ++_numCalls;
+    }
+
 protected:
 
     /// Construct a connection handler bound to the given NetConnection object
@@ -143,11 +151,16 @@ protected:
     /// need to mark it reachable.
     ConnectionHandler(NetConnection_as& nc)
         :
-        _nc(nc)
+        _nc(nc),
+        _numCalls(0)
     {}
 
     // Object handling connection status messages
     NetConnection_as& _nc;
+
+private:
+
+    size_t _numCalls;
 };
 
 std::auto_ptr<IOChannel>
@@ -174,7 +187,6 @@ ConnectionHandler::getStream(const std::string&)
 ///
 class HTTPRemotingHandler : public ConnectionHandler
 {
-
 public:
 
     /// Create an handler for HTTP remoting
@@ -188,8 +200,7 @@ public:
     HTTPRemotingHandler(NetConnection_as& nc, const URL& url);
 
     // See dox in ConnectionHandler
-    virtual bool hasPendingCalls() const
-    {
+    virtual bool hasPendingCalls() const {
         return _connection || queued_count;
     }
 
@@ -197,13 +208,9 @@ public:
     virtual bool advance();
 
     // See dox in ConnectionHandler
-    virtual void setReachable() const
-    {
-        for (CallbacksMap::const_iterator i=callbacks.begin(),
-                e=callbacks.end(); i!=e; ++i)
-        {
-            i->second->setReachable();
-        }
+    virtual void setReachable() const {
+        foreachSecond(callbacks.begin(), callbacks.end(),
+                std::mem_fun(&as_object::setReachable));
     }
 
     // See dox in NetworkHandler class
@@ -223,7 +230,6 @@ private:
     SimpleBuffer reply;
     int reply_start;
     int queued_count;
-    unsigned int _numCalls; // === queued_count ?
 
     // Quick hack to send Content-Type: application/x-amf
     // TODO: check if we should take headers on a per-call basis
@@ -231,39 +237,35 @@ private:
     //
     NetworkAdapter::RequestHeaders _headers;
 
-    void push_amf(const SimpleBuffer &amf) 
-    {
+    void push_amf(const SimpleBuffer &amf) {
         //GNASH_REPORT_FUNCTION;
 
         _postdata.append(amf.data(), amf.size());
         queued_count++;
     }
 
-    void push_callback(const std::string& id, as_object* callback)
-    {
+    void push_callback(const std::string& id, as_object* callback) {
         callbacks[id] = callback;
     }
 
-    as_object* pop_callback(const std::string& id)
-    {
+    as_object* pop_callback(const std::string& id) {
         CallbacksMap::iterator it = callbacks.find(id);
         if (it != callbacks.end()) {
             as_object* callback = it->second;
             callbacks.erase(it);
             return callback;
         }
-        else return 0;
+        return 0;
     }
 
     void enqueue(const SimpleBuffer &amf, const std::string& identifier,
-                 as_object* callback)
-    {
+                 as_object* callback) {
+
         push_amf(amf);
         push_callback(identifier, callback);
     }
 
-    void enqueue(const SimpleBuffer &amf)
-    {
+    void enqueue(const SimpleBuffer &amf) {
         push_amf(amf);
     }
     
@@ -277,8 +279,7 @@ HTTPRemotingHandler::HTTPRemotingHandler(NetConnection_as& nc, const URL& url)
         _connection(0),
         reply(),
         reply_start(0),
-        queued_count(0),
-        _numCalls(0) // TODO: replace by queued count ?
+        queued_count(0)
 {
     // leave space for header
     _postdata.append("\000\000\000\000\000\000", 6);
@@ -302,7 +303,7 @@ HTTPRemotingHandler::advance()
 
         // Fill last chunk before reading in the next
         size_t toRead = reply.capacity() - reply.size();
-        if (! toRead) toRead = NCCALLREPLYCHUNK;
+        if (!toRead) toRead = NCCALLREPLYCHUNK;
 
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("Attempt to read %d bytes", toRead);
@@ -318,9 +319,9 @@ HTTPRemotingHandler::advance()
 
 #ifdef GNASH_DEBUG_REMOTING
             log_debug("NetConnection.call: reply buffer capacity (%d) "
-                      "is too small to accept next %d bytes of chunk "
-                      "(current size is %d). Reserving %d bytes.",
-                reply.capacity(), toRead, reply.size(), newCapacity);
+                    "is too small to accept next %d bytes of chunk "
+                    "(current size is %d). Reserving %d bytes.",
+                    reply.capacity(), toRead, reply.size(), newCapacity);
 #endif
 
             reply.reserve(newCapacity);
@@ -457,8 +458,8 @@ HTTPRemotingHandler::advance()
                             // Reply message is: '/id/methodName'
 
                             int ns = 1; // next slash position
-                            while (ns<si-1 && *(b+ns) != '/') ++ns;
-                            if ( ns >= si-1 ) {
+                            while (ns < si-1 && *(b + ns) != '/') ++ns;
+                            if (ns >= si-1) {
                                 std::string msg(
                                         reinterpret_cast<const char*>(b), si);
                                 log_error("NetConnection::call(): invalid "
@@ -476,9 +477,9 @@ HTTPRemotingHandler::advance()
                             b += si;
 
                             // parse past unused string in header
-                            if(b + 2 > end) break;
+                            if (b + 2 > end) break;
                             si = readNetworkShort(b); b += 2; // reply length
-                            if(b + si > end) break;
+                            if (b + si > end) break;
                             b += si;
 
                             // this field is supposed to hold the
@@ -487,7 +488,7 @@ HTTPRemotingHandler::advance()
                             // openstreetmap.org (which works great
                             // in the adobe player) sends
                             // 0xffffffff. So we just ignore it
-                            if(b + 4 > end) break;
+                            if (b + 4 > end) break;
                             li = readNetworkLong(b); b += 4; // reply length
 
 #ifdef GNASH_DEBUG_REMOTING
@@ -550,8 +551,7 @@ HTTPRemotingHandler::advance()
                     }
                 }
             }
-            else
-            {
+            else {
                 log_error("Response from remoting service < 8 bytes");
             }
 
@@ -564,16 +564,18 @@ HTTPRemotingHandler::advance()
         }
     }
 
-    if(!_connection && queued_count > 0) {
-//#ifdef GNASH_DEBUG_REMOTING
+    if (!_connection && queued_count > 0) {
         log_debug("creating connection");
-//#endif
         // set the "number of bodies" header
 
-        (reinterpret_cast<boost::uint16_t*>(_postdata.data() + 4))[0] = htons(queued_count);
-        std::string postdata_str(reinterpret_cast<char*>(_postdata.data()), _postdata.size());
+        (reinterpret_cast<boost::uint16_t*>(_postdata.data() + 4))[0] =
+            htons(queued_count);
+
+        std::string postdata_str(reinterpret_cast<char*>(_postdata.data()),
+                _postdata.size());
 #ifdef GNASH_DEBUG_REMOTING
-        log_debug("NetConnection.call(): encoded args from %1% calls: %2%", queued_count, hexify(postdata.data(), postdata.size(), false));
+        log_debug("NetConnection.call(): encoded args from %1% calls: %2%",
+                queued_count, hexify(postdata.data(), postdata.size(), false));
 #endif
         queued_count = 0;
 
@@ -614,7 +616,7 @@ HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
     os << "/";
     // Call number is not used if the callback is undefined
     if (asCallback) {
-        os << ++_numCalls; 
+        os << callNo(); 
     }
     const std::string callNumberString = os.str();
 
@@ -631,8 +633,7 @@ HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
     // STRICT_ARRAY encoding is allowed for remoting
     amf::Writer w(buf, true);
 
-    for (unsigned int i = firstArg; i < args.size(); ++i)
-    {
+    for (size_t i = firstArg; i < args.size(); ++i) {
         const as_value& arg = args[i];
         if (!arg.writeAMF0(w)) {
             log_error("Could not serialize NetConnection.call argument %d",
@@ -731,8 +732,7 @@ NetConnection_as::validateURL() const
 void
 NetConnection_as::notifyStatus(StatusCode code)
 {
-    std::pair<std::string, std::string> info;
-    getStatusCodeInfo(code, info);
+    std::pair<std::string, std::string> info = getStatusCodeInfo(code);
 
     /// This is a new normal object each time (see NetConnection.as)
     as_object* o = createObject(getGlobal(owner()));
@@ -743,49 +743,6 @@ NetConnection_as::notifyStatus(StatusCode code)
     o->init_member("level", info.second, flags);
 
     callMethod(&owner(), NSV::PROP_ON_STATUS, o);
-
-}
-
-void
-NetConnection_as::getStatusCodeInfo(StatusCode code, NetConnectionStatus& info)
-{
-    /// The Call statuses do exist, but this implementation is a guess.
-    switch (code)
-    {
-        case CONNECT_SUCCESS:
-            info.first = "NetConnection.Connect.Success";
-            info.second = "status";
-            return;
-
-        case CONNECT_FAILED:
-            info.first = "NetConnection.Connect.Failed";
-            info.second = "error";
-            return;
-
-        case CONNECT_APPSHUTDOWN:
-            info.first = "NetConnection.Connect.AppShutdown";
-            info.second = "error";
-            return;
-
-        case CONNECT_REJECTED:
-            info.first = "NetConnection.Connect.Rejected";
-            info.second = "error";
-            return;
-
-        case CALL_FAILED:
-            info.first = "NetConnection.Call.Failed";
-            info.second = "error";
-            return;
-
-        case CALL_BADVERSION:
-            info.first = "NetConnection.Call.BadVersion";
-            info.second = "status";
-            return;
-
-        case CONNECT_CLOSED:
-            info.first = "NetConnection.Connect.Closed";
-            info.second = "status";
-    }
 
 }
 
@@ -810,8 +767,7 @@ NetConnection_as::connect(const std::string& uri)
     close();
 
     // TODO: check for other kind of invalidities here...
-    if ( uri.empty() )
-    {
+    if (uri.empty()) {
         _isConnected = false;
         notifyStatus(CONNECT_FAILED);
         return;
@@ -827,9 +783,9 @@ NetConnection_as::connect(const std::string& uri)
         && (url.protocol() != "http")) {
 
         IF_VERBOSE_ASCODING_ERRORS(
-		 log_aserror("NetConnection.connect(%s): invalid connection "
-			     "protocol", url);
-				   );
+            log_aserror("NetConnection.connect(%s): invalid connection "
+                 "protocol", url);
+        );
         notifyStatus(CONNECT_FAILED);
         return;
     }
@@ -844,7 +800,6 @@ NetConnection_as::connect(const std::string& uri)
     }
 
     _currentConnection.reset(new HTTPRemotingHandler(*this, url));
-
 
     // FIXME: We should attempt a connection here (this is called when an
     // argument is passed to NetConnection.connect(url).
@@ -867,11 +822,10 @@ NetConnection_as::connect(const std::string& uri)
 void
 NetConnection_as::close()
 {
-    bool needSendClosedStatus = _currentConnection.get() || _isConnected;
+    const bool needSendClosedStatus = _currentConnection.get() || _isConnected;
 
     /// Queue the current call queue if it has pending calls
-    if ( _currentConnection.get() && _currentConnection->hasPendingCalls() )
-    {
+    if (_currentConnection.get() && _currentConnection->hasPendingCalls()) {
         _queuedConnections.push_back(_currentConnection.release());
     }
 
@@ -879,8 +833,7 @@ NetConnection_as::close()
     /// NetStream object be interrupted?
     _isConnected = false;
 
-    if ( needSendClosedStatus )
-    {
+    if (needSendClosedStatus) {
         notifyStatus(CONNECT_CLOSED);
     }
 }
@@ -897,8 +850,7 @@ void
 NetConnection_as::call(as_object* asCallback, const std::string& methodName,
         const std::vector<as_value>& args, size_t firstArg)
 {
-    if ( ! _currentConnection.get() )
-    {
+    if (!_currentConnection.get()) {
         log_aserror("NetConnection.call: can't call while not connected");
         return;
     }
@@ -951,7 +903,6 @@ void
 NetConnection_as::update()
 {
     // Advance
-
 #ifdef GNASH_DEBUG_REMOTING
     log_debug("NetConnection_as::advance: %d calls to advance",
             _queuedConnections.size());
@@ -1007,10 +958,8 @@ readNetworkLong(const boost::uint8_t* buf) {
 }
 
 
-/// Anonymous namespace for NetConnection interface implementation.
-
+// Anonymous namespace for NetConnection interface implementation.
 namespace {
-
 
 /// NetConnection.call()
 //
@@ -1021,8 +970,7 @@ netconnection_call(const fn_call& fn)
 {
     NetConnection_as* ptr = ensure<ThisIsNative<NetConnection_as> >(fn);
 
-    if (fn.nargs < 1)
-    {
+    if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("NetConnection.call(): needs at least one argument"));
         );
@@ -1063,9 +1011,7 @@ as_value
 netconnection_close(const fn_call& fn)
 {
     NetConnection_as* ptr = ensure<ThisIsNative<NetConnection_as> >(fn);
-
     ptr->close();
-
     return as_value();
 }
 
@@ -1075,7 +1021,6 @@ as_value
 netconnection_isConnected(const fn_call& fn)
 {
     NetConnection_as* ptr = ensure<ThisIsNative<NetConnection_as> >(fn);
-
     return as_value(ptr->isConnected());
 }
 
@@ -1083,7 +1028,6 @@ as_value
 netconnection_uri(const fn_call& fn)
 {
     NetConnection_as* ptr = ensure<ThisIsNative<NetConnection_as> >(fn);
-
     return as_value(ptr->getURI());
 }
 
@@ -1111,8 +1055,7 @@ attachProperties(as_object& o)
 as_value
 netconnection_new(const fn_call& fn)
 {
-
-    as_object* obj = fn.this_ptr;
+    as_object* obj = ensure<ValidThis>(fn);
     obj->setRelay(new NetConnection_as(obj));
     attachProperties(*obj);
     return as_value();
@@ -1137,8 +1080,7 @@ netconnection_connect(const fn_call& fn)
 
     NetConnection_as* ptr = ensure<ThisIsNative<NetConnection_as> >(fn);
     
-    if (fn.nargs < 1)
-    {
+    if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("NetConnection.connect(): needs at least "
                     "one argument"));
@@ -1159,8 +1101,7 @@ netconnection_connect(const fn_call& fn)
         ptr->connect();
     }
     else {
-        if ( fn.nargs > 1 )
-        {
+        if (fn.nargs > 1) {
             std::stringstream ss; fn.dump_args(ss);
             log_unimpl("NetConnection.connect(%s): args after the first are "
                     "not supported", ss.str());
@@ -1183,8 +1124,33 @@ netconnection_addHeader(const fn_call& fn)
     return as_value();
 }
 
-} // anonymous namespace
+std::pair<std::string, std::string>
+getStatusCodeInfo(NetConnection_as::StatusCode code)
+{
+    /// The Call statuses do exist, but this implementation is a guess.
+    switch (code) {
+        case NetConnection_as::CONNECT_SUCCESS:
+            return std::make_pair("NetConnection.Connect.Success", "status");
+        case NetConnection_as::CONNECT_FAILED:
+            return std::make_pair("NetConnection.Connect.Failed", "error");
+        case NetConnection_as::CONNECT_APPSHUTDOWN:
+            return std::make_pair("NetConnection.Connect.AppShutdown", "error");
+        case NetConnection_as::CONNECT_REJECTED:
+            return std::make_pair("NetConnection.Connect.Rejected", "error");
+        case NetConnection_as::CALL_FAILED:
+            return std::make_pair("NetConnection.Call.Failed", "error");
+        case NetConnection_as::CALL_BADVERSION:
+            return std::make_pair("NetConnection.Call.BadVersion", "status");
+        case NetConnection_as::CONNECT_CLOSED:
+            return std::make_pair("NetConnection.Connect.Closed", "status");
+        default:
+            std::abort();
+    }
 
+}
+
+
+} // anonymous namespace
 } // end of gnash namespace
 
 // local Variables:
