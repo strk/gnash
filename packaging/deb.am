@@ -140,8 +140,9 @@ deb-edit-utilities:
 
 # Python is at different revisions and paths depending on the Distribution and release
 deb-edit-python:
-	@version=`python --version  2>&1 | tr -d '.' | cut -d ' ' -f 2`; \
-	 if test $${version} -gt 260; then \
+	@release=`lsb_release -i | sed -e 's/.*:[ \t]//'`; \
+	version=`python --version  2>&1 | tr -d '.' | cut -d ' ' -f 2i | sed -e 's:rc[0-9]*::'`; \
+	 if test x"$${release}" = x"Ubuntu"; then \
 	   echo "Editing $(BUILD_DIR)/debian/gtk-plugin-gnash.install for Ubuntu"; \
 	   if test -e $(BUILD_DIR)/debian/python-gtk-gnash.install; then \
 	     mv -f $(BUILD_DIR)/debian/python-gtk-gnash.install $(BUILD_DIR)/debian/python-gtk-gnash.install.orig; \
