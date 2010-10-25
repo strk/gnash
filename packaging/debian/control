@@ -30,13 +30,12 @@ Build-Depends: dpkg-dev (>= 1.13.19),
 	       libsdl1.2-dev,
 	       intltool, 
 	       intltool-debian,
-	       x11proto-video-dev,
-	       libxv-dev,
 	       libmysqlclient-dev,
 	       libavformat-dev,
 	       libavcodec-dev,
 	       libavutil-dev,
-	       libswscale-dev
+	       libswscale-dev,
+	       lsb-release
 # OpenGL packages are disabled for now
 # libgl1-mesa-dev, libglu1-mesa-dev, libgtkglext1-dev, libqt4-opengl-dev, 
 Standards-Version: 3.8.4
