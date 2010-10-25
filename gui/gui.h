@@ -119,7 +119,7 @@ public:
     /// The Gui clock will be paused when the gui is put
     /// in pause mode and resumed when gui playback is resumed.
     ///
-    VirtualClock& getClock() { return _virtualClock; }
+    virtual VirtualClock& getClock() { return _virtualClock; }
 
     /// Set the time in milliseconds after which the programme should exit.
     virtual void setTimeout(unsigned int timeout) = 0;

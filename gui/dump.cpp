@@ -163,6 +163,8 @@ DumpGui::run()
     _terminate_request = false;
     while (!_terminate_request) {
 
+	_manualClock.advance(_interval); 
+
         // advance movie now
         if ( advanceMovie() ) {
             ++_framecount;
