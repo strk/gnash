@@ -28,6 +28,9 @@ rcsid="$Id: Global.as,v 1.51 2008/03/31 23:48:33 strk Exp $";
 
 check_equals(typeof(Button), 'function'); // random check
 
+// Check that CustomActions isn't recognized by the player.
+check_equals(typeof(_global.CustomActions), "undefined");
+
 #if OUTPUT_VERSION > 5
 check_equals(typeof(_global.updateAfterEvent), 'function');
 check( ! _global.hasOwnProperty('updateAfterEvent') );
@@ -503,15 +506,15 @@ check_equals(r, "l,j,k,");
 
 
 #if OUTPUT_VERSION == 5
-	check_totals(158); // SWF5
+	check_totals(159); // SWF5
 #else
 # if OUTPUT_VERSION == 6
-	check_totals(192); // SWF6
+	check_totals(193); // SWF6
 # else
 #  if OUTPUT_VERSION == 7
-	check_totals(174); // SWF7
+	check_totals(175); // SWF7
 #  else
-	check_totals(161); // SWF8+
+	check_totals(162); // SWF8+
 #  endif
 # endif
 #endif

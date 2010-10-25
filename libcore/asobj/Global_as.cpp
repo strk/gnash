@@ -32,7 +32,6 @@
 #include "AsBroadcaster.h"
 #include "Boolean_as.h"
 #include "Color_as.h"
-#include "CustomActions.h"
 #include "Date_as.h" 
 #include "Array_as.h" 
 #include "Error_as.h"
@@ -395,7 +394,6 @@ avm1Classes()
         (N(sharedobject_class_init, NSV::CLASS_SHARED_OBJECT, 5))
         (N(loadvars_class_init, NSV::CLASS_LOAD_VARS, 5))
         (N(localconnection_class_init, NSV::CLASS_LOCALCONNECTION, 6))
-        (N(customactions_class_init, NSV::CLASS_CUSTOM_ACTIONS, 6))
         (N(netconnection_class_init, NSV::CLASS_NET_CONNECTION, 6))
         (N(netstream_class_init, NSV::CLASS_NET_STREAM, 6))
         (N(contextmenu_class_init, NSV::CLASS_CONTEXTMENU, 5))

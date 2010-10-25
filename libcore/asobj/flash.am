@@ -31,7 +31,6 @@ libgnashasobjs_la_SOURCES = \
 	asobj/Array_as.cpp \
 	asobj/Boolean_as.cpp \
 	asobj/Color_as.cpp \
-	asobj/CustomActions.cpp\
 	asobj/Date_as.cpp \
 	asobj/Error_as.cpp \
 	asobj/Global_as.cpp \
@@ -71,7 +70,6 @@ inst_HEADERS = \
 	asobj/AsBroadcaster.h \
 	asobj/Boolean_as.h \
 	asobj/Color_as.h	\
-	asobj/CustomActions.h	\
 	asobj/Date_as.h \
 	asobj/Error_as.h	\
 	asobj/Math_as.h	\

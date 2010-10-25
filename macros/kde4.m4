@@ -209,9 +209,9 @@ AC_DEFUN([GNASH_PATH_KDE4],
       KDE4_SERVICESDIR="${KDE4_PREFIX}/share/kde4/services"
     fi
     if test x"${KDE4_CONFIGDIR}" != x ; then 
-      KDE4_CONFIGDIR="${KDE4_CONFIGDIR}}/share/kde4/config"
+      KDE4_CONFIGDIR="${KDE4_CONFIGDIR}/share/kde4/config"
     else
-      KDE4_CONFIGDIR="${KDE4_PREFIX}}/share/kde4/config"
+      KDE4_CONFIGDIR="${KDE4_PREFIX}/share/kde4/config"
     fi
     if test x"${KDE4_APPSDATADIR}" != x ; then 
       KDE4_APPSDATADIR="${KDE4_APPSDATADIR}/share/kde4/apps/klash"

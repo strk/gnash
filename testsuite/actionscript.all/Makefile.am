@@ -84,7 +84,6 @@ ASTESTS =			\
 	Color.as		\
 	ColorTransform.as 	\
 	ContextMenu.as		\
-	CustomActions.as	\
 	Date.as			\
 	Error.as		\
 	ExternalInterface.as	\
