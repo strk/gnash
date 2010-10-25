@@ -86,6 +86,7 @@ DumpGui::DumpGui(unsigned long xid, float scale, bool loop, RunResources& r) :
     _offscreenbuf_size(-1),
     _timeout(0),
     _framecount(0),
+    _samplesFetched(0),
     _bpp(32),
     _pixelformat("BGRA32")
 {
