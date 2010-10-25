@@ -26,6 +26,7 @@
 #include "dsodefs.h" // for DSOEXPORT
 #include "gui.h" // for inheritance
 #include "sound_handler.h" // for dtor visibility
+#include "ManualClock.h"
 
 #include <string>
 #include <fstream>
@@ -71,6 +72,7 @@ class DSOEXPORT DumpGui : public Gui
     bool want_redraw() { return false; }
     void writeFrame();
     void writeSamples();
+    VirtualClock& getClock() { return _manualClock; }
 
 private:
     
@@ -97,6 +99,7 @@ private:
 
     boost::shared_ptr<sound::sound_handler> _soundHandler;
 
+    ManualClock _manualClock;
 
 
 };
