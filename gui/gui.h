@@ -176,14 +176,6 @@ public:
     // does not need to be implemented (optional feature),
     // but still needs to be available.
     //
-    // Why "SWFRect" (floats)? Because the gui does not really
-    // know about the scale the renderer currently uses... 
-    //
-    // <strk> but it does not about the "semantic" of the TWIPS
-    //        coordinate space, which is integer values...
-    //        The question really is: why floats for TWIPS ?
-    //        (guess this goes deep in the core/server libs)
-    //
     virtual void setInvalidatedRegion(const SWFRect& bounds);
     virtual void setInvalidatedRegions(const InvalidatedRanges& ranges);
     
@@ -241,9 +233,11 @@ public:
     /// Key event notification to be called when a key is pressed or depressed
     //
     /// @param k The key code.
-    /// @param modifier Modifier key identifiers from gnash::key::modifier ORed together
-    /// @param pressed Determines whether the key is being
-    ///           pressed (true) or being released (false)
+    /// @param modifier
+    ///   Modifier key identifiers from gnash::key::modifier ORed together
+    /// @param pressed
+    ///   Determines whether the key is being pressed (true)
+    ///   or being released (false)
     ///
     void notify_key_event(gnash::key::code k, int modifier, bool pressed);
 
