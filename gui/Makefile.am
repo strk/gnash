@@ -36,8 +36,7 @@ BUILT_SOURCES = .configline
 EXTRA_DIST = gnash.in \
 	kde/klash3.moc.in \
 	kde/Kde4Gui.moc.in \
-	kde/Kde4Glue.moc.in \
-	am-frag
+	kde/Kde4Glue.moc.in
 
 # If python support is enabled, built that too
 if HAS_PYTHON
@@ -67,7 +66,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libmedia/ffmpeg \
 	-I$(top_srcdir)/libmedia/gst \
 	-I$(top_srcdir)/libmedia/haiku \
-    -DLOCALEDIR=\"$(localedir)\" \
+        -DLOCALEDIR=\"$(localedir)\" \
 	-DPLUGINSDIR=\"$(pluginsdir)\" \
 	-DLIBAVCODEC_IDENT=\"$(LIBAVCODEC_IDENT)\" \
 	$(GLIB_CFLAGS) \
@@ -188,9 +187,9 @@ gnash: gnash.in
 
 # Always include the device files in the source tarball
 EXTRA_DIST += \
-	TouchDevice.cpp \
-	MouseDevice.cpp \
-	EventDevice.cpp
+	fb/TouchDevice.cpp \
+	fb/MouseDevice.cpp \
+	fb/EventDevice.cpp
 
 GUI_SRCS = gnash.cpp \
 	gui.cpp gui.h \
