@@ -28,6 +28,8 @@ CLEANFILES =  \
 	testrun.sum \
 	testrun.log
 
+SUBDIRS = loop 
+
 EXTRA_DIST = \
 	empty.as \
 	VarAndCharClashTest.as \
@@ -109,18 +111,6 @@ check_PROGRAMS = \
 	timeline_var_test \
 	root_stop_test \
 	root_stop_testrunner \
-	loop_test \
-	loop_test2 \
-	loop_test2runner \
-	loop_test3 \
-	loop_test4 \
-	loop_test5 \
-	loop_test6 \
-	loop_test7 \
-	loop_test8 \
-	loop_test9 \
-	loop_test10 \
-	loop_test-Runner \
 	place_object_test \
 	place_object_test2 \
 	move_object_test \
@@ -152,8 +142,6 @@ check_PROGRAMS = \
 	consecutive_goto_frame_test \
 	matrix_test \
 	multi_doactions_and_goto_frame_test \
-	simple_loop_test \
-	simple_loop_testrunner \
 	action_execution_order_test \
 	action_execution_order_extend_test \
 	action_execution_order_test1 \
@@ -323,15 +311,7 @@ check_SCRIPTS = \
 	static_vs_dynamic1_testrunner \
 	static_vs_dynamic2_testrunner \
 	getTimer_testrunner \
-	loop_test3runner \
-	loop_test4runner \
-	loop_test5runner \
-	loop_test6runner \
-	loop_test7runner \
-	loop_test8runner \
-	loop_test9runner \
 	DepthLimitsTestrunner \
-	loop_test10runner \
 	shape_testrunner \
 	LoadVarsTestRunner \
 	DefineEditTextVariableNameTest-Runner \
@@ -656,130 +636,6 @@ root_stop_testrunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	root_stop_test.swf      \
 	$(NULL)
-
-loop_test_SOURCES = loop_test.c	
-loop_test_LDADD = libgnashmingutils.la
-
-loop_test.swf: loop_test
-	./loop_test $(abs_mediadir)
-
-loop_test_Runner_SOURCES = loop_test-Runner.cpp 
-loop_test_Runner_LDADD = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(AM_LDFLAGS) \
-	$(NULL)
-
-loop_test_Runner_CXXFLAGS = \
-	-DSRCDIR='"$(srcdir)"' \
-	-DTGTDIR='"$(abs_builddir)"' \
-	$(NULL)
-
-loop_test_Runner_DEPENDENCIES = \
-	loop_test.swf \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(NULL)
-
-loop_test2_SOURCES = loop_test2.c	
-loop_test2_LDADD = libgnashmingutils.la
-
-loop_test2.swf: loop_test2
-	./loop_test2 $(abs_mediadir)
-
-loop_test2runner_SOURCES = \
-	loop_test2runner.cpp \
-	$(NULL)
-loop_test2runner_CXXFLAGS = \
-	-DTGTDIR='"$(abs_builddir)"' \
-	$(NULL)
-loop_test2runner_LDADD = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(AM_LDFLAGS) \
-	$(NULL)
-loop_test2runner_DEPENDENCIES = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	loop_test2.swf      \
-	$(NULL)
-
-loop_test3_SOURCES = loop_test3.c
-loop_test3_LDADD = libgnashmingutils.la
-
-loop_test3.swf: loop_test3
-	./loop_test3 $(abs_mediadir)
-
-loop_test3runner: $(srcdir)/../generic-testrunner.sh loop_test3.swf
-	sh $< -f20 $(top_builddir) loop_test3.swf > $@
-	chmod 755 $@
-
-loop_test4_SOURCES = loop_test4.c
-loop_test4_LDADD = libgnashmingutils.la
-
-loop_test4.swf: loop_test4
-	./loop_test4 $(abs_mediadir)
-
-loop_test4runner: $(srcdir)/../generic-testrunner.sh loop_test4.swf
-	sh $< -f20 $(top_builddir) loop_test4.swf > $@
-	chmod 755 $@
-
-loop_test5_SOURCES = loop_test5.c
-loop_test5_LDADD = libgnashmingutils.la
-
-loop_test5.swf: loop_test5
-	./loop_test5 $(abs_mediadir)
-
-loop_test5runner: $(srcdir)/../generic-testrunner.sh loop_test5.swf
-	sh $< -f20 $(top_builddir) loop_test5.swf > $@
-	chmod 755 $@
-
-loop_test6_SOURCES = loop_test6.c
-loop_test6_LDADD = libgnashmingutils.la
-
-loop_test6.swf: loop_test6
-	./loop_test6 $(abs_mediadir)
-
-loop_test6runner: $(srcdir)/../generic-testrunner.sh loop_test6.swf
-	sh $< -f20 $(top_builddir) loop_test6.swf > $@
-	chmod 755 $@
-
-loop_test7_SOURCES = loop_test7.c
-loop_test7_LDADD = libgnashmingutils.la
-
-loop_test7.swf: loop_test7
-	./loop_test7 $(abs_mediadir)
-
-loop_test7runner: $(srcdir)/../generic-testrunner.sh loop_test7.swf
-	sh $< -f20 $(top_builddir) loop_test7.swf > $@
-	chmod 755 $@
-
-loop_test8_SOURCES = loop_test8.c
-loop_test8_LDADD = libgnashmingutils.la
-
-loop_test8.swf: loop_test8
-	./loop_test8 $(abs_mediadir)
-
-loop_test8runner: $(srcdir)/../generic-testrunner.sh loop_test8.swf
-	sh $< -f20 $(top_builddir) loop_test8.swf > $@
-	chmod 755 $@
-
-loop_test9_SOURCES = loop_test9.c
-loop_test9_LDADD = libgnashmingutils.la
-
-loop_test9.swf: loop_test9
-	./loop_test9 $(abs_mediadir)
-
-loop_test9runner: $(srcdir)/../generic-testrunner.sh loop_test9.swf Makefile
-	sh $< -r10 -f20 -c "#total tests" $(top_builddir) loop_test9.swf > $@
-	chmod 755 $@
-
-
-loop_test10_SOURCES = loop_test10.c
-loop_test10_LDADD = libgnashmingutils.la
-
-loop_test10.swf: loop_test10
-	./loop_test10 $(abs_mediadir)
-
-loop_test10runner: $(srcdir)/../generic-testrunner.sh loop_test10.swf Makefile
-	sh $<  -f10 -c "#total tests" $(top_builddir) loop_test10.swf > $@
-	chmod 755 $@
 
 shape_test_SOURCES = shape_test.c
 shape_test_LDADD = libgnashmingutils.la
@@ -1341,31 +1197,6 @@ attachExtImported.swf: Dejagnu.swf $(srcdir)/attachExtImported.as attachImported
 attachExtImported-Runner: $(srcdir)/../generic-testrunner.sh attachExtImported.swf Makefile
 	sh $< -r5 -c "END_OF_TEST" $(top_builddir) attachExtImported.swf > $@
 	chmod 755 $@
-
-simple_loop_test_SOURCES =	\
-	simple_loop_test.c	\
-	$(NULL)
-simple_loop_test_LDADD = libgnashmingutils.la
-
-simple_loop_test.swf: simple_loop_test
-	./simple_loop_test $(abs_mediadir)
-
-simple_loop_testrunner_SOURCES = \
-	simple_loop_testrunner.cpp \
-	$(NULL)
-simple_loop_testrunner_LDADD = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(AM_LDFLAGS) \
-	$(NULL)
-simple_loop_testrunner_CXXFLAGS = \
-	-DSRCDIR='"$(srcdir)"' \
-	-DTGTDIR='"$(abs_builddir)"' \
-	$(NULL)
-simple_loop_testrunner_DEPENDENCIES = \
-	simple_loop_test.swf \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(NULL)
-
 
 goto_frame_test_SOURCES =	\
 	goto_frame_test.c	\
@@ -2294,7 +2125,6 @@ TEST_CASES = \
 	ResolveEventsTest-Runner \
 	timeline_var_test-Runner \
 	root_stop_testrunner \
-	loop_test-Runner \
 	place_object_testrunner \
 	place_object_test2runner \
 	move_object_testrunner \
@@ -2309,7 +2139,6 @@ TEST_CASES = \
 	registerClassTestRunner \
 	action_execution_order_testrunner \
 	action_execution_order_extend_testrunner \
-	simple_loop_testrunner \
 	loadMovieTestRunner \
 	XMLSocketTester \
 	LCTestRunner \
@@ -2355,15 +2184,6 @@ TEST_CASES = \
 	getTimer_testrunner \
 	Video-EmbedSquareTestRunner \
 	NetStream-SquareTestRunner \
-	loop_test2runner \
-	loop_test3runner \
-	loop_test4runner \
-	loop_test5runner \
-	loop_test6runner \
-	loop_test7runner \
-	loop_test8runner \
-	loop_test9runner \
-	loop_test10runner \
 	shape_testrunner \
 	morph_test1runner \
 	runtime_vm_stack_testrunner \

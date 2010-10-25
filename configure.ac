@@ -2851,6 +2851,7 @@ testsuite/actionscript.all/Makefile
 testsuite/samples/Makefile
 testsuite/swfdec/Makefile
 testsuite/misc-ming.all/Makefile
+testsuite/misc-ming.all/loop/Makefile
 testsuite/misc-mtasc.all/Makefile
 testsuite/misc-haxe.all/Makefile
 testsuite/misc-haxe.all/classes.all/Makefile
