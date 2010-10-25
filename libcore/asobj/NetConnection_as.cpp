@@ -767,8 +767,7 @@ NetConnection_as::connect(const std::string& uri)
     close();
 
     // TODO: check for other kind of invalidities here...
-    if ( uri.empty() )
-    {
+    if (uri.empty()) {
         _isConnected = false;
         notifyStatus(CONNECT_FAILED);
         return;
@@ -784,9 +783,9 @@ NetConnection_as::connect(const std::string& uri)
         && (url.protocol() != "http")) {
 
         IF_VERBOSE_ASCODING_ERRORS(
-		 log_aserror("NetConnection.connect(%s): invalid connection "
+		    log_aserror("NetConnection.connect(%s): invalid connection "
 			     "protocol", url);
-				   );
+        );
         notifyStatus(CONNECT_FAILED);
         return;
     }
@@ -801,7 +800,6 @@ NetConnection_as::connect(const std::string& uri)
     }
 
     _currentConnection.reset(new HTTPRemotingHandler(*this, url));
-
 
     // FIXME: We should attempt a connection here (this is called when an
     // argument is passed to NetConnection.connect(url).
@@ -972,8 +970,7 @@ netconnection_call(const fn_call& fn)
 {
     NetConnection_as* ptr = ensure<ThisIsNative<NetConnection_as> >(fn);
 
-    if (fn.nargs < 1)
-    {
+    if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("NetConnection.call(): needs at least one argument"));
         );
@@ -1014,9 +1011,7 @@ as_value
 netconnection_close(const fn_call& fn)
 {
     NetConnection_as* ptr = ensure<ThisIsNative<NetConnection_as> >(fn);
-
     ptr->close();
-
     return as_value();
 }
 
@@ -1026,7 +1021,6 @@ as_value
 netconnection_isConnected(const fn_call& fn)
 {
     NetConnection_as* ptr = ensure<ThisIsNative<NetConnection_as> >(fn);
-
     return as_value(ptr->isConnected());
 }
 
@@ -1034,7 +1028,6 @@ as_value
 netconnection_uri(const fn_call& fn)
 {
     NetConnection_as* ptr = ensure<ThisIsNative<NetConnection_as> >(fn);
-
     return as_value(ptr->getURI());
 }
 
@@ -1062,8 +1055,7 @@ attachProperties(as_object& o)
 as_value
 netconnection_new(const fn_call& fn)
 {
-
-    as_object* obj = fn.this_ptr;
+    as_object* obj = ensure<ValidThis>(fn);
     obj->setRelay(new NetConnection_as(obj));
     attachProperties(*obj);
     return as_value();
@@ -1088,8 +1080,7 @@ netconnection_connect(const fn_call& fn)
 
     NetConnection_as* ptr = ensure<ThisIsNative<NetConnection_as> >(fn);
     
-    if (fn.nargs < 1)
-    {
+    if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("NetConnection.connect(): needs at least "
                     "one argument"));
@@ -1110,8 +1101,7 @@ netconnection_connect(const fn_call& fn)
         ptr->connect();
     }
     else {
-        if ( fn.nargs > 1 )
-        {
+        if (fn.nargs > 1) {
             std::stringstream ss; fn.dump_args(ss);
             log_unimpl("NetConnection.connect(%s): args after the first are "
                     "not supported", ss.str());
