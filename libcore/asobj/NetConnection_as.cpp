@@ -122,12 +122,9 @@ public:
     /// callbacks when needed. 
     ///
     /// Return true if wants to be advanced again, false otherwise.
-    ///
     virtual bool advance() = 0;
 
     /// ConnectionHandlers may store references to as_objects
-    //
-    /// These include callback objects.
     void setReachable() const {
         foreachSecond(_callbacks.begin(), _callbacks.end(),
                 std::mem_fun(&as_object::setReachable));
@@ -139,7 +136,6 @@ public:
     /// connection has pending calls to process it will be
     /// queued and only really dropped when advance returns
     /// false
-    ///
     virtual bool hasPendingCalls() const = 0;
 
     virtual ~ConnectionHandler() {}
@@ -288,14 +284,7 @@ bool
 HTTPRemotingHandler::advance()
 {
 
-#ifdef GNASH_DEBUG_REMOTING
-    log_debug("advancing HTTPRemotingHandler");
-#endif
     if (_connection) {
-
-#ifdef GNASH_DEBUG_REMOTING
-        log_debug("have connection");
-#endif
 
         // Fill last chunk before reading in the next
         size_t toRead = reply.capacity() - reply.size();
@@ -651,22 +640,11 @@ HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
     *(reinterpret_cast<uint32_t*>(buf.data() + total_size_offset)) = 
         htonl(buf.size() - 4 - total_size_offset);
 
-#ifdef GNASH_DEBUG_REMOTING
-    log_debug(_("NetConnection.call(): encoded args: %s"),
-            hexify(buf.data(), buf.size(), false));
-#endif
-
     if (asCallback) {
-#ifdef GNASH_DEBUG_REMOTING
-        log_debug("calling enqueue with callback");
-#endif
         enqueue(buf, callID, asCallback);
     }
     
     else {
-#ifdef GNASH_DEBUG_REMOTING
-        log_debug("calling enqueue without callback");
-#endif
         enqueue(buf);
     }
 }
@@ -689,12 +667,36 @@ public:
         SimpleBuffer buf;
         amf::Writer aw(buf);
         aw.writeString(methodName);
-        aw.writeNumber(callNo());
+        const size_t id = asCallback ? callNo() : 0;
+        aw.writeNumber(id);
         buf.appendByte(amf::NULL_AMF0);
+
         for (size_t i = firstArg; i < args.size(); ++i) {
             args[i].writeAMF0(aw);
         }
         _rtmp.call(buf);
+        if (asCallback) {
+            pushCallback(id, asCallback);
+        }
+    }
+
+    bool hasPendingCalls() const {
+        // Nothing is going to come back...
+        if (!_rtmp.connected()) return false;
+        // TODO: implement this.
+        return false;
+    }
+
+    bool advance() {
+        _rtmp.update();
+
+        // Nothing to do yet, but we don't want to be dropped.
+        if (!_rtmp.connected()) return true;
+
+        boost::shared_ptr<SimpleBuffer> m = _rtmp.getMessage();
+        if (!m) return true;
+
+        return true;
     }
 
 private:
@@ -826,7 +828,7 @@ NetConnection_as::connect(const std::string& uri)
     }
     else if (url.protocol() == "rtmp") {
         // TODO: fix this to work properly.
-        _currentConnection.reset(new HTTPRemotingHandler(*this, url));
+        _currentConnection.reset(new RTMPRemotingHandler(*this, url));
     }
     else if (url.protocol() == "rtmpt" || url.protocol() == "rtmpts") {
         log_unimpl("NetConnection.connect(%s): unsupported connection "
@@ -893,12 +895,7 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 
     _currentConnection->call(asCallback, methodName, args, firstArg);
 
-#ifdef GNASH_DEBUG_REMOTING
-    log_debug("called enqueue");
-#endif
-
     startAdvanceTimer();
-
 }
 
 std::auto_ptr<IOChannel>
@@ -1173,12 +1170,12 @@ getStatusCodeInfo(NetConnection_as::StatusCode code)
             return std::make_pair("NetConnection.Connect.AppShutdown", "error");
         case NetConnection_as::CONNECT_REJECTED:
             return std::make_pair("NetConnection.Connect.Rejected", "error");
+        case NetConnection_as::CONNECT_CLOSED:
+            return std::make_pair("NetConnection.Connect.Closed", "status");
         case NetConnection_as::CALL_FAILED:
             return std::make_pair("NetConnection.Call.Failed", "error");
         case NetConnection_as::CALL_BADVERSION:
             return std::make_pair("NetConnection.Call.BadVersion", "status");
-        case NetConnection_as::CONNECT_CLOSED:
-            return std::make_pair("NetConnection.Connect.Closed", "status");
         default:
             std::abort();
     }
