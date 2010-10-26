@@ -86,6 +86,11 @@ FBAggGlue::init (int argc, char ***argv)
     _fbmem.reset(static_cast<boost::uint8_t *>(mmap(0, _fix_screeninfo.smem_len,
                                           PROT_READ|PROT_WRITE, MAP_SHARED,
                                           _fd, 0)));
+
+    if (!_fbmem) {
+        log_error("Couldn't mmap() %d bytes of memory!",
+                  _fix_screeninfo.smem_len);
+    }
     
 #ifdef ENABLE_DOUBLE_BUFFERING
     // allocate offscreen buffer
