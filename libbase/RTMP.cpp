@@ -216,7 +216,7 @@ RTMP::connect(const URL& url)
         try {
             port = boost::lexical_cast<boost::uint16_t>(p);
         }
-        catch (boost::bad_lexical_cast&) {}
+        catch (const boost::bad_lexical_cast&) {}
     }
 
     // Basic connection attempt.
