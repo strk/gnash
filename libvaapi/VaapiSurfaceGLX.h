@@ -20,14 +20,17 @@
 #ifndef GNASH_VAAPISURFACEGLX_H
 #define GNASH_VAAPISURFACEGLX_H
 
+#include <GL/gl.h>
+
+#include "dsodefs.h"
 #include "vaapi_common.h"
 #include "VaapiSurface.h"
-#include <GL/gl.h>
 
 namespace gnash {
 
 /// VA/GLX surface abstraction
-class VaapiSurfaceGLX {
+class DSOEXPORT VaapiSurfaceGLX 
+{
     std::auto_ptr<VaapiSurfaceImplBase> _impl;
 
 public:

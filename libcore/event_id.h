@@ -22,8 +22,12 @@
 #define GNASH_EVENT_ID_H
 
 #include <string>
-#include "string_table.h"
 #include "GnashKey.h"
+
+// Forward declarations
+namespace gnash {
+    struct ObjectURI;
+}
 
 namespace gnash {
 
@@ -120,32 +124,13 @@ public:
         else _keyCode = static_cast<key::code>(i);
     }
 
-    /// Return whether two event_ids are equal
-    //
-    /// event_ids are equal if both id and keycode match. Keycode is only
-    /// relevant for keyboard events, and must be key::INVALID for other
-    /// event types.
-    bool operator==(const event_id& id) const {
-        return _id == id._id && _keyCode == id._keyCode;
-    }
-
-    /// Comparator for use in stdlib containers.
-    bool operator< (const event_id& id) const {
-        if ( _id < id._id ) return true;
-        if ( _id > id._id ) return false;
-
-        // Same event, check key code
-        if (_keyCode < id._keyCode ) return true;
-        return false;
-    }
-
     /// Return the name of a method-handler function
     /// corresponding to this event.
     const std::string& functionName() const;
 
-    /// Return the string_table key of a method-handler function
+    /// Return the ObjectURI of a method-handler function
     /// corresponding to this event.
-    string_table::key functionKey() const;
+    const ObjectURI& functionURI() const;
     
     /// Return the keycode associated with this event_id.
     //
@@ -168,6 +153,25 @@ private:
 
 
 };
+
+/// Return whether two event_ids are equal
+//
+/// event_ids are equal if both id and keycode match. Keycode is only
+/// relevant for keyboard events, and must be key::INVALID for other
+/// event types.
+inline bool
+operator==(const event_id& a, const event_id& b)
+{
+    return a.id() == b.id() && a.keyCode() == b.keyCode();
+}
+
+/// Comparator for use in stdlib containers.
+inline bool
+operator<(const event_id& a, const event_id& b)
+{
+    if (a.id() == b.id()) return a.keyCode() < b.keyCode();
+    return a.id() < b.id();
+}
 
 
 /// Check whether an event is a button-like event.

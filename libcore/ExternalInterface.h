@@ -24,37 +24,34 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 #include <boost/shared_ptr.hpp>
 
 #include "dsodefs.h" /* For DSOEXPORT */
 
 namespace gnash {
-
-class as_object;
-class as_value;
-struct ObjectURI;
-class Global_as;
-class movie_root;
-class IOChannel;
+    class as_object;
+    class as_value;
+    struct ObjectURI;
+    class Global_as;
+    class movie_root;
+    class IOChannel;
 }
 
 namespace gnash {
 
 struct DSOEXPORT ExternalInterface
 {
-    typedef struct DSOLOCAL {
+    struct DSOLOCAL invoke_t {
         std::string name;
         std::string type;
         std::vector<as_value> args;
-    } invoke_t;
+    };
 
     // Some of these appear to be undocumented helper functions of this class
     // that while probably designed to be used internally, get used
     // by ActionScript coders.
 
-    /// Convert an AS object to an XML string.
-    DSOEXPORT static std::string toXML(const as_value &obj);
-    
     /// Convert an XML string to an AS value.
     DSOEXPORT static as_value toAS(Global_as& as, const std::string &xml);
 
@@ -62,26 +59,19 @@ struct DSOEXPORT ExternalInterface
     DSOEXPORT static std::map<std::string, as_value> propertiesToAS(Global_as& gl,
                                                    std::string &xml);
     
-    DSOEXPORT static as_value argumentsToXML(std::vector<as_value> &args);
-//    as_value argumentsToAS();
-    
-    DSOEXPORT static std::string objectToXML(as_object *obj);
     DSOEXPORT static as_value objectToAS(Global_as& gl, const std::string &xml);
-//  std::string objectToJS(as_object &obj);
-//  as_value toJS(const std::string &xml);;
+
+    static std::string objectToXML(as_object *obj) {
+        ExternalInterface ei;
+        return ei._objectToXML(obj);
+    }
     
-    DSOEXPORT static std::string arrayToXML(as_object *obj);
-
-//  static std::string arrayToJS();
-//  static as_value arrayToAS();
-
-//  static std::string jsQuoteString();
-//  static void initJS();
-//  static bool evalJS();
+    /// Convert an AS object to an XML string.
+    static std::string toXML(const as_value &obj) {
+        ExternalInterface ei;
+        return ei._toXML(obj);
+    }
     
-//  static callOut"));
-//  static callIn"));
-
     static std::string escapeXML(as_object &obj);
     static std::string unescapeXML(as_object &obj);
 
@@ -113,11 +103,18 @@ struct DSOEXPORT ExternalInterface
 
     DSOEXPORT static size_t writeBrowser(int fd, const std::string &xml);
     DSOEXPORT static std::string readBrowser(int fd);
+
+private:
+
+    DSOEXPORT std::string _toXML(const as_value &obj);
+    DSOEXPORT std::string _objectToXML(as_object* obj);
+    DSOEXPORT std::string _arrayToXML(as_object *obj);
+
+    std::set<as_object*> _visited;
 };
 
 } // end of gnash namespace
 
-// __GNASH_ASOBJ_EXTERNALINTERFACE_H__
 #endif
 
 // local Variables:

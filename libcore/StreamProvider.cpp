@@ -36,12 +36,18 @@
 
 namespace gnash {
 
-StreamProvider::StreamProvider(std::auto_ptr<NamingPolicy> np)
+StreamProvider::StreamProvider(const URL& url, std::auto_ptr<NamingPolicy> np)
     :
-    _namingPolicy(np)
+    _namingPolicy(np),
+    _url(url)
 {
 }
-
+    
+bool
+StreamProvider::allow(const URL& url) const
+{
+    return URLAccessManager::allow(url, _url);
+}
 
 std::auto_ptr<IOChannel>
 StreamProvider::getStream(const URL& url, bool namedCacheFile) const
@@ -69,7 +75,7 @@ StreamProvider::getStream(const URL& url, bool namedCacheFile) const
 		else
 		{
             // check security here !!
-		    if (!URLAccessManager::allow(url)) return stream;
+		    if (!allow(url)) return stream;
 
 			FILE *newin = std::fopen(path.c_str(), "rb");
 			if (!newin)  { 
@@ -82,7 +88,7 @@ StreamProvider::getStream(const URL& url, bool namedCacheFile) const
 	}
 	else
 	{
-		if (URLAccessManager::allow(url)) {
+		if (allow(url)) {
 			stream = NetworkAdapter::makeStream(url.str(), 
                     namedCacheFile ? namingPolicy()(url) : "");
 		}
@@ -108,7 +114,7 @@ StreamProvider::getStream(const URL& url, const std::string& postdata,
         return getStream(url, postdata);
     }
 
-	if ( URLAccessManager::allow(url) ) {
+	if (allow(url) ) {
 		return NetworkAdapter::makeStream(url.str(), postdata, headers,
                     namedCacheFile ? namingPolicy()(url) : "");
 	}
@@ -140,7 +146,7 @@ StreamProvider::getStream(const URL& url, const std::string& postdata,
 		}
 		else
 		{
-			if ( ! URLAccessManager::allow(url) ) return stream;
+			if (!allow(url)) return stream;
 
 			FILE *newin = std::fopen(path.c_str(), "rb");
 			if (!newin)  { 
@@ -152,7 +158,7 @@ StreamProvider::getStream(const URL& url, const std::string& postdata,
 	}
 	else
 	{
-		if (URLAccessManager::allow(url)) {
+		if (allow(url)) {
 			stream = NetworkAdapter::makeStream(url.str(), postdata,
                     namedCacheFile ? namingPolicy()(url) : "");
 		}

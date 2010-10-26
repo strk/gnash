@@ -129,7 +129,7 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg(const VideoInfo& info)
 
     CodecID codec_id = CODEC_ID_NONE;
 
-    if ( info.type == FLASH )
+    if ( info.type == CODEC_TYPE_FLASH )
     {
         codec_id = flashToFfmpegCodec(static_cast<videoCodecType>(info.codec));
     }
@@ -236,7 +236,7 @@ VideoDecoderFfmpeg::height() const
     return _videoCodecCtx->getContext()->height;
 }
 
-std::auto_ptr<GnashImage>
+std::auto_ptr<image::GnashImage>
 VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
                                  const AVFrame& srcFrameRef)
 {
@@ -253,7 +253,7 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
     PixelFormat pixFmt = PIX_FMT_RGB24;
 #endif 
 
-    std::auto_ptr<GnashImage> im;
+    std::auto_ptr<image::GnashImage> im;
 
 #ifdef HAVE_VA_VA_H
     VaapiContextFfmpeg * const vactx = get_vaapi_context(srcCtx);
@@ -263,7 +263,7 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
             im.reset();
             return im;
         }
-        im.reset(new GnashVaapiImage(vaSurface->get(), GNASH_IMAGE_RGBA));
+        im.reset(new GnashVaapiImage(vaSurface->get(), image::TYPE_RGBA));
         return im;
     }
 #endif
@@ -300,11 +300,11 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
 // As of libavcodec 0.svn20080206-17 it is a define
 #ifdef PIX_FMT_RGBA
         case PIX_FMT_RGBA:
-            im.reset(new ImageRGBA(width, height));
+            im.reset(new image::ImageRGBA(width, height));
             break;
 #endif
         case PIX_FMT_RGB24:
-            im.reset(new ImageRGB(width, height));
+            im.reset(new image::ImageRGB(width, height));
             break;
         default:
             log_error("Pixel format not handled");
@@ -343,7 +343,7 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
 
 }
 
-std::auto_ptr<GnashImage>
+std::auto_ptr<image::GnashImage>
 VideoDecoderFfmpeg::decode(const boost::uint8_t* input,
         boost::uint32_t input_size)
 {
@@ -351,7 +351,7 @@ VideoDecoderFfmpeg::decode(const boost::uint8_t* input,
     // do anything anyway.
     assert(_videoCodecCtx.get());
 
-    std::auto_ptr<GnashImage> ret;
+    std::auto_ptr<image::GnashImage> ret;
 
     AVFrame* frame = avcodec_alloc_frame();
     if ( ! frame ) {
@@ -384,10 +384,10 @@ VideoDecoderFfmpeg::push(const EncodedVideoFrame& buffer)
     _video_frames.push_back(&buffer);
 }
 
-std::auto_ptr<GnashImage>
+std::auto_ptr<image::GnashImage>
 VideoDecoderFfmpeg::pop()
 {
-    std::auto_ptr<GnashImage> ret;
+    std::auto_ptr<image::GnashImage> ret;
 
     for (std::vector<const EncodedVideoFrame*>::iterator it =
              _video_frames.begin(), end = _video_frames.end(); it != end; ++it) {

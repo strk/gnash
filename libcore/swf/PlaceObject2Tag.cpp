@@ -18,11 +18,15 @@
 //
 
 #ifdef HAVE_CONFIG_H
-#include "RunResources.h"
 #include "gnashconfig.h" // HAVE_ZLIB_H, USE_SWFTREE
 #endif
 
 #include "PlaceObject2Tag.h"
+
+#include <string>
+
+#include "TypesParser.h"
+#include "RunResources.h"
 #include "DisplayObject.h"
 #include "MovieClip.h"
 #include "swf_event.h"
@@ -56,7 +60,7 @@ PlaceObject2Tag::readPlaceObject(SWFStream& in)
         m_has_flags2 |= HAS_MATRIX_MASK;
         if (in.tell() < in.get_tag_end_position())
         {
-            m_color_transform.read_rgb(in);
+            m_color_transform = readCxFormRGB(in);
             m_has_flags2 |= HAS_CXFORM_MASK;
         }
     }
@@ -67,7 +71,7 @@ PlaceObject2Tag::readPlaceObject(SWFStream& in)
             	_depth, _depth - DisplayObject::staticDepthOffset,
             	_id);
             if (hasMatrix()) log_parse("  SWFMatrix: %s", m_matrix);
-            if (hasCxform()) log_parse(_("  cxform: %s"), m_color_transform);
+            if (hasCxform()) log_parse(_("  SWFCxForm: %s"), m_color_transform);
     );
 
     
@@ -275,7 +279,7 @@ PlaceObject2Tag::readPlaceObject2(SWFStream& in)
 
     if ( hasCxform() )
     {
-        m_color_transform.read_rgba(in);
+        m_color_transform = readCxFormRGBA(in);
     }
 
     if ( hasRatio() )
@@ -314,7 +318,7 @@ PlaceObject2Tag::readPlaceObject2(SWFStream& in)
         }
         if ( hasCxform() )
         {
-            log_parse(_("  cxform: %s"), m_color_transform);
+            log_parse(_("  SWFCxForm: %s"), m_color_transform);
         }
         if ( hasRatio() ) log_parse(_("  ratio: %d"), _ratio);
         if ( hasName() ) log_parse(_("  name = %s"), m_name.c_str());
@@ -362,7 +366,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
     }
 
     if (hasCxform()) {
-        m_color_transform.read_rgba(in);
+        m_color_transform = readCxFormRGBA(in);
     }
 
     if (hasRatio()) {
@@ -382,8 +386,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
         m_clip_depth = DisplayObject::noClipDepthValue;
     }
 
-    if ( hasFilters() )
-    {
+    if (hasFilters()) {
         Filters v; // TODO: Attach the filters to the display object.
         filter_factory::read(in, true, &v);
 	    // at time of writing no renderer supports bitmap filters
@@ -422,7 +425,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
             _depth - DisplayObject::staticDepthOffset);
         if (hasCharacter()) log_parse(_("  char id = %d"), _id);
         if (hasMatrix()) log_parse(_("  SWFMatrix: %s"), m_matrix);
-        if (hasCxform()) log_parse(_("  cxform: %d"), m_color_transform);
+        if (hasCxform()) log_parse(_("  SWFCxForm: %d"), m_color_transform);
         if (hasRatio()) log_parse(_("  ratio: %d"), _ratio);
         if (hasName()) log_parse(_("  name = %s"), m_name);
         if (hasClassName()) log_parse(_("  class name = %s"), className);
@@ -440,16 +443,13 @@ PlaceObject2Tag::read(SWFStream& in, TagType tag)
 
     m_TagType = tag;
 
-    if (tag == SWF::PLACEOBJECT)
-    {
+    if (tag == SWF::PLACEOBJECT) {
         readPlaceObject(in);
     }
-    else if ( tag == SWF::PLACEOBJECT2 )
-    {
+    else if (tag == SWF::PLACEOBJECT2) {
         readPlaceObject2(in);
     }
-    else
-    {
+    else {
         readPlaceObject3(in);
     }
 }
@@ -485,12 +485,12 @@ PlaceObject2Tag::~PlaceObject2Tag()
     deleteChecked(_actionBuffers.begin(), _actionBuffers.end());
 }
 
-/* public static */
 void
 PlaceObject2Tag::loader(SWFStream& in, TagType tag, movie_definition& m,
         const RunResources& /*r*/)
 {
-    assert(tag == SWF::PLACEOBJECT || tag == SWF::PLACEOBJECT2 || tag == SWF::PLACEOBJECT3);
+    assert(tag == SWF::PLACEOBJECT || tag == SWF::PLACEOBJECT2 ||
+            tag == SWF::PLACEOBJECT3);
 
     // TODO: who owns and is going to remove this tag ?
     PlaceObject2Tag* ch = new PlaceObject2Tag(m);

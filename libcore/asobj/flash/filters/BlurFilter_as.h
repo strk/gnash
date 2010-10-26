@@ -29,6 +29,5 @@ void blurfilter_class_init(as_object& where, const ObjectURI& uri);
 
 } // end of gnash namespace
 
-// __GNASH_ASOBJ_BLURFILTER_H__
 #endif
 

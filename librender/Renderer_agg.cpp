@@ -111,30 +111,13 @@ AGG resources
 #include "gnashconfig.h"
 #endif
 
+#include "Renderer_agg.h" 
+
 #include <vector>
 #include <cmath>
-
-#include "gnash.h"
-#include "RGBA.h"
-#include "GnashImage.h"
-#include "log.h"
-#include "Renderer.h"
-#include "Renderer_agg.h" 
-#include "Range2d.h"
-#include "smart_ptr.h"
-#include "swf/ShapeRecord.h" 
-#include "DefineShapeTag.h" 
-#include "GnashNumeric.h"
-#include "GC.h"
-#include "cxform.h"
-#include "FillStyle.h"
-
-#ifdef HAVE_VA_VA_H
-#include "GnashVaapiImage.h"
-#include "GnashVaapiImageProxy.h"
-#endif
-
 #include <climits>
+#include <boost/scoped_array.hpp>
+#include <boost/bind.hpp>
 #include <agg_rendering_buffer.h>
 #include <agg_renderer_base.h>
 #include <agg_pixfmt_rgb.h>
@@ -170,11 +153,29 @@ AGG resources
 #include <agg_gradient_lut.h>
 #include <agg_alpha_mask_u8.h>
 
+#include "GnashEnums.h"
+#include "CachedBitmap.h"
+#include "RGBA.h"
+#include "GnashImage.h"
+#include "log.h"
+#include "Range2d.h"
+#include "smart_ptr.h"
+#include "swf/ShapeRecord.h" 
+#include "DefineShapeTag.h" 
+#include "GnashNumeric.h"
+#include "GC.h"
+#include "SWFCxForm.h"
+#include "FillStyle.h"
+#include "Transform.h"
+
+#ifdef HAVE_VA_VA_H
+#include "GnashVaapiImage.h"
+#include "GnashVaapiImageProxy.h"
+#endif
+
 #include "Renderer_agg_bitmap.h"
 #include "Renderer_agg_style.h"
 
-#include <boost/scoped_array.hpp>
-#include <boost/bind.hpp>
 #ifndef round
 #  define round(x) rint(x)
 #endif
@@ -580,7 +581,7 @@ public:
 
     typedef agg::trans_affine Matrix;
 
-    VideoRenderer(const ClipBounds& clipbounds, GnashImage& frame,
+    VideoRenderer(const ClipBounds& clipbounds, image::GnashImage& frame,
             Matrix& mat, Quality quality, bool smooth)
         :
         _buf(frame.begin(), frame.width(), frame.height(),
@@ -687,10 +688,15 @@ class Renderer_agg : public Renderer_agg_base
   
 public:
 
+    std::string description() const {
+        // TODO: make an effort to express pixel format
+        return "AGG";
+    }
+
     // Given an image, returns a pointer to a bitmap_info class
     // that can later be passed to FillStyleX_bitmap(), to set a
     // bitmap fill style.
-    gnash::CachedBitmap* createCachedBitmap(std::auto_ptr<GnashImage> im)
+    gnash::CachedBitmap* createCachedBitmap(std::auto_ptr<image::GnashImage> im)
     {        
         return new agg_bitmap_info(im);
     }
@@ -699,7 +705,7 @@ public:
             FileType type) const
     {
         log_debug("New image: %sx%s", xres, yres);
-        ImageRGBA im(xres, yres);
+        image::ImageRGBA im(xres, yres);
         for (int x = 0; x < xres; ++x) {
             for (int y = 0; y < yres; ++y) {
                 typename PixelFormat::color_type t = m_pixf->pixel(x, y);
@@ -707,11 +713,11 @@ public:
             }
         }
         
-        ImageOutput::writeImageData(type, io, im, 100);
+        image::Output::writeImageData(type, io, im, 100);
     }
 
     template<typename SourceFormat, typename Matrix>
-    void renderVideo(GnashImage& frame, Matrix& img_mtx,
+    void renderVideo(image::GnashImage& frame, Matrix& img_mtx,
             agg::path_storage path, bool smooth)
     {
 
@@ -735,7 +741,7 @@ public:
         vr.render(path, rbase, _alphaMasks);
     }
 
-    void drawVideoFrame(GnashImage* frame, const SWFMatrix* source_mat, 
+    void drawVideoFrame(image::GnashImage* frame, const Transform& xform,
         const SWFRect* bounds, bool smooth)
     {
     
@@ -743,7 +749,7 @@ public:
         // TODO: keep heavy instances alive accross frames for performance!
         // TODO: Maybe implement specialization for 1:1 scaled videos
         SWFMatrix mat = stage_matrix;
-        mat.concatenate(*source_mat);
+        mat.concatenate(xform.matrix);
         
         // compute video scaling relative to video object size
         double vscaleX = bounds->width() /
@@ -778,7 +784,7 @@ public:
         path.line_to(a.x, a.y);
 
 #ifdef HAVE_VA_VA_H
-        if (frame->location() == GNASH_IMAGE_GPU) {
+        if (frame->location() == image::GNASH_IMAGE_GPU) {
             RenderImage image;
             image.reset(new GnashVaapiImageProxy(
                             static_cast<GnashVaapiImage *>(frame),
@@ -793,10 +799,10 @@ public:
 
         switch (frame->type())
         {
-            case GNASH_IMAGE_RGBA:
+            case image::TYPE_RGBA:
                 renderVideo<agg::pixfmt_rgba32_pre>(*frame, mtx, path, smooth);
                 break;
-            case GNASH_IMAGE_RGB:
+            case image::TYPE_RGB:
                 renderVideo<agg::pixfmt_rgb24_pre>(*frame, mtx, path, smooth);
                 break;
             default:
@@ -847,15 +853,10 @@ public:
     
     // by default allow drawing everywhere
     set_invalidated_region_world();
-    
-    log_debug(_("Initialized AGG buffer <%p>, %d bytes, %dx%d, "
-                "rowsize is %d bytes"), 
-      (void*)mem, size, x, y, rowstride);
   }
   
 
-  void begin_display(
-      const gnash::rgba& bg,
+  void begin_display(const gnash::rgba& bg,
       int /*viewport_width*/, int /*viewport_height*/,
       float /*x0*/, float /*x1*/, float /*y0*/, float /*y1*/)
   {
@@ -882,6 +883,33 @@ public:
     m_drawing_mask = false;
   }
   
+ 
+    virtual Renderer* startInternalRender(image::GnashImage& im) {
+    
+        std::auto_ptr<Renderer_agg_base> in;
+    
+        switch (im.type()) {
+            case image::TYPE_RGB:
+                in.reset(new Renderer_agg<typename RGB::PixelFormat>(24));
+                break;
+            case image::TYPE_RGBA:
+                in.reset(new Renderer_agg<typename RGBA::PixelFormat>(32));
+                break;
+        }
+ 
+        const size_t width = im.width();
+        const size_t height = im.height();
+        const size_t stride = width * (im.type() == image::TYPE_RGBA ? 4 : 3);
+
+        in->init_buffer(im.begin(), width * height, width, height, stride);
+        _external.reset(in.release());
+        return _external.get();
+    }
+
+    virtual void endInternalRender() {
+        _external.reset();
+    }
+
     // renderer_base.clear() does no clipping which clears the
     // whole framebuffer even if we update just a small portion
     // of the screen. The result would be still correct, but slower. 
@@ -1036,7 +1064,7 @@ public:
 
     // prepare style handler
     StyleHandler sh;
-    build_agg_styles(sh, v, mat, cxform());
+    build_agg_styles(sh, v, mat, SWFCxForm());
     
     draw_shape(-1, paths, agg_paths, sh, false);
     
@@ -1096,13 +1124,12 @@ public:
     }
   }
 
-    void drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
-            const SWFMatrix& worldMat)
+    void drawShape(const SWF::ShapeRecord& shape, const Transform& xform)
     {
         // check if the character needs to be rendered at all
         SWFRect cur_bounds;
 
-        cur_bounds.expand_to_transformed_rect(worldMat, shape.getBounds());
+        cur_bounds.expand_to_transformed_rect(xform.matrix, shape.getBounds());
                 
         if (!Renderer::bounds_in_clipping_area(cur_bounds))
         {
@@ -1114,16 +1141,17 @@ public:
         const SWF::ShapeRecord::Paths& paths = shape.paths();
         
         // select ranges
-        select_clipbounds(shape.getBounds(), worldMat);
+        select_clipbounds(shape.getBounds(), xform.matrix);
 
         // render the DisplayObject's shape.
-        drawShape(fillStyles, lineStyles, paths, worldMat, cx);
+        drawShape(fillStyles, lineStyles, paths, xform.matrix,
+                xform.colorTransform);
     }
 
     void drawShape(const std::vector<FillStyle>& FillStyles,
         const std::vector<LineStyle>& line_styles,
         const std::vector<Path>& objpaths, const SWFMatrix& mat,
-        const cxform& cx)
+        const SWFCxForm& cx)
     {
 
         bool have_shape, have_outline;
@@ -1389,7 +1417,7 @@ public:
     // Initializes the internal styles class for AGG renderer
     void build_agg_styles(StyleHandler& sh,
         const std::vector<FillStyle>& FillStyles,
-        const SWFMatrix& fillstyle_matrix, const cxform& cx) {
+        const SWFMatrix& fillstyle_matrix, const SWFCxForm& cx) {
     
         SWFMatrix inv_stage_matrix = stage_matrix;
         inv_stage_matrix.invert();
@@ -1474,7 +1502,7 @@ public:
     // Target renderer
     renderer_base& rbase = *m_rbase;
 
-    typedef agg::rasterizer_compound_aa<agg::rasterizer_sl_clip_dbl> ras_type;
+    typedef agg::rasterizer_compound_aa<agg::rasterizer_sl_clip_int> ras_type;
     ras_type rasc;  // flash-like renderer
 
     agg::renderer_scanline_aa_solid<
@@ -1588,7 +1616,7 @@ public:
     sh_type sh;                   
        
     // compound rasterizer used for flash shapes
-    typedef agg::rasterizer_compound_aa<agg::rasterizer_sl_clip_dbl> rasc_type;  
+    typedef agg::rasterizer_compound_aa<agg::rasterizer_sl_clip_int> rasc_type;
     rasc_type rasc;
     
 
@@ -1641,7 +1669,7 @@ public:
   /// Just like draw_shapes() except that it draws an outline.
   void draw_outlines(int subshape_id, const GnashPaths &paths,
     const AggPaths& agg_paths,
-    const std::vector<LineStyle> &line_styles, const cxform& cx,
+    const std::vector<LineStyle> &line_styles, const SWFCxForm& cx,
     const SWFMatrix& linestyle_matrix) {
     
     if (_alphaMasks.empty()) {
@@ -1675,7 +1703,7 @@ public:
   template <class scanline_type>
   void draw_outlines_impl(int subshape_id, const GnashPaths &paths,
     const AggPaths& agg_paths,
-    const std::vector<LineStyle> &line_styles, const cxform& cx, 
+    const std::vector<LineStyle> &line_styles, const SWFCxForm& cx, 
     const SWFMatrix& linestyle_matrix, scanline_type& sl) {
     
     assert(m_pixf.get());
@@ -1960,16 +1988,6 @@ public:
     set_invalidated_regions(ranges);
   }
   
-  virtual void set_invalidated_region(const SWFRect& bounds) {
-  
-    // NOTE: Both single and multi ranges are supported by AGG renderer.
-    
-    InvalidatedRanges ranges;
-    ranges.add(bounds.getRange());
-    set_invalidated_regions(ranges);
-  
-  }
-    
   virtual void set_invalidated_regions(const InvalidatedRanges& ranges) {
     using gnash::geometry::Range2d;
     
@@ -2052,7 +2070,10 @@ private:  // private variables
     typedef agg::renderer_base<PixelFormat> renderer_base;
 
     // renderer base
-    std::auto_ptr<renderer_base> m_rbase;
+    boost::scoped_ptr<renderer_base> m_rbase;
+ 
+    // An external renderer.   
+    boost::scoped_ptr<Renderer> _external;
 
     int xres;
     int yres;

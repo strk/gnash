@@ -22,15 +22,29 @@
 #include "InputStream.h" // for use
 #include "EmbedSoundInst.h" // for upcasting to InputStream
 #include "log.h" // for use
+#include "WallClockTimer.h" // for debugging
 
 #include <boost/cstdint.hpp> // For C99 int types
 #include <vector> // for use
+#include <cmath> // for floor (debugging)
 
 // Debug create_sound/delete_sound/playSound/stop_sound, loops
 //#define GNASH_DEBUG_SOUNDS_MANAGEMENT
 
 // Debug samples fetching
-//#define GNASH_DEBUG_SAMPLES_FETCHING
+//#define GNASH_DEBUG_SAMPLES_FETCHING 1
+
+namespace {
+
+unsigned int silentStream(void*, boost::int16_t* stream, unsigned int len, bool& atEOF)
+{
+    std::fill(stream, stream+len, 0);
+    atEOF=false;
+    return len;
+}
+
+}
+
 
 namespace gnash {
 namespace sound {
@@ -365,6 +379,7 @@ sound_handler::swfToOutSamples(const media::SoundInfo& sinfo,
 
 
 
+/* private */
 void
 sound_handler::playSound(int sound_handle,
         int loopCount, unsigned int inPoint, unsigned int outPoint,
@@ -404,11 +419,8 @@ sound_handler::playSound(int sound_handle,
         return;
     }
 
-    // Make a "EmbedSoundInst" for this sound which is later placed
-    // on the vector of instances of this sound being played
-    //
-    // @todo: plug the returned EmbedSoundInst to the set
-    //        of InputStream channels !
+    // Make a "EmbedSoundInst" for this sound and plug it into  
+    // the set of InputStream channels
     //
     std::auto_ptr<InputStream> sound ( sounddata.createInstance(
 
@@ -545,7 +557,7 @@ sound_handler::unplugAllInputStreams()
 void
 sound_handler::fetchSamples (boost::int16_t* to, unsigned int nSamples)
 {
-    if ( isPaused() ) return;
+    if ( isPaused() ) return; // should we write wav file anyway ?
 
     float finalVolumeFact = getFinalVolume()/100.0;
 
@@ -557,8 +569,8 @@ sound_handler::fetchSamples (boost::int16_t* to, unsigned int nSamples)
         // A buffer to fetch InputStream samples into
         boost::scoped_array<boost::int16_t> buf ( new boost::int16_t[nSamples] );
 
-#ifdef GNASH_DEBUG_SAMPLES_FETCHING
-        log_debug("Fetching %d samples for %d input streams", nSamples, _inputStreams.size());
+#ifdef GNASH_DEBUG_SAMPLES_FETCHING 
+        log_debug("Fetching %d samples from each of %d input streams", nSamples, _inputStreams.size());
 #endif
 
         // Loop through the aux streamers sounds
@@ -575,7 +587,7 @@ sound_handler::fetchSamples (boost::int16_t* to, unsigned int nSamples)
                 std::fill(buf.get()+wrote, buf.get()+nSamples, 0);
             }
 
-#ifdef GNASH_DEBUG_SAMPLES_FETCHING
+#if GNASH_DEBUG_SAMPLES_FETCHING > 1
             log_debug("  fetched %d/%d samples from input stream %p"
                     " (%d samples fetchehd in total)",
                     wrote, nSamples, is, is->samplesFetched());
@@ -587,11 +599,39 @@ sound_handler::fetchSamples (boost::int16_t* to, unsigned int nSamples)
         unplugCompletedInputStreams();
     }
 
+    // TODO: move this to base class !
+    if (_wavWriter.get())
+    {
+        _wavWriter->pushSamples(to, nSamples);
+
+        // now, mute all audio
+        std::fill(to, to+nSamples, 0);
+    }
+
     // Now, after having "consumed" all sounds, blank out
     // the buffer if muted..
     if ( is_muted() )
     {
         std::fill(to, to+nSamples, 0);
+    }
+}
+
+/*public*/
+void
+sound_handler::setAudioDump(const std::string& wavefile)
+{
+    bool wasDumping = (_wavWriter.get() != 0);
+
+    if (!wavefile.empty()) {
+        _wavWriter.reset(new WAVWriter(wavefile));
+    }
+
+    // TODO: just avoid pausing instead ...
+    if ( ! wasDumping ) {
+        // add a silent stream to the audio pool so that our
+        // output file is homogenous;  we actually want silent
+        // wave data when no sounds are playing on the stage
+        attach_aux_streamer(silentStream, (void*) this);
     }
 }
 
@@ -651,15 +691,6 @@ bool
 sound_handler::hasInputStreams() const
 {
     return !_inputStreams.empty();
-}
-
-void
-sound_handler::mix(boost::int16_t* outSamples, boost::int16_t* inSamples,
-                unsigned int nSamples, float /*volume*/)
-{
-    /// @todo implement a better mixer !
-    // cheating, just copy input to output!
-    std::copy(outSamples, outSamples+nSamples, inSamples);
 }
 
 bool

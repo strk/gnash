@@ -66,7 +66,7 @@ attachErrorInterface(as_object& o)
 as_value
 error_toString(const fn_call& fn)
 {
- 	boost::intrusive_ptr<as_object> ptr = ensure<ThisIs<as_object> >(fn);
+ 	as_object* ptr = ensure<ValidThis>(fn);
 
     string_table& st = getStringTable(*ptr);
     as_value message;

@@ -162,7 +162,6 @@ inst_HEADERS = \
 	jemtree.h \
 	GnashSleep.h \
 	gmemory.h \
-	ogl.h \
 	SharedMem.h \
 	sharedlib.h \
 	tree.hh \
@@ -195,7 +194,8 @@ endif
 
 EXTENSIONS_API = \
 	StringPredicates.h \
-	FileTypes.h \
+	Stats.h \
+	GnashEnums.h \
 	smart_ptr.h \
 	string_table.h \
 	ref_counted.h \
@@ -217,6 +217,7 @@ EXTENSIONS_API = \
 	GnashImageJpeg.h \
 	CachedBitmap.h \
 	GnashImage.h \
+	ImageIterators.h \
 	$(NULL)
 
 instdir = $(includedir)/gnash

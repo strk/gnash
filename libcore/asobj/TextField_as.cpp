@@ -90,7 +90,7 @@ namespace {
 as_object*
 createTextFieldObject(Global_as& gl)
 {
-    as_value tf(gl.getMember(NSV::CLASS_TEXT_FIELD));
+    as_value tf(getMember(gl, NSV::CLASS_TEXT_FIELD));
     as_function* ctor = tf.to_function();
     if (!ctor) return 0;
     fn_call::Args args;
@@ -108,7 +108,7 @@ textfield_class_init(as_object& where, const ObjectURI& uri)
 {
 
     Global_as& gl = getGlobal(where);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     as_object* cl = gl.createClass(&textfield_ctor, proto);
 
     attachTextFieldInterface(*proto);
@@ -226,11 +226,11 @@ textfield_createTextField(const fn_call& fn)
     }
 
     const std::string& name = fn.arg(0).to_string();
-    const int depth = toInt(fn.arg(1));
-    const int x = toInt(fn.arg(2));
-    const int y = toInt(fn.arg(3));
+    const int depth = toInt(fn.arg(1), getVM(fn));
+    const int x = toInt(fn.arg(2), getVM(fn));
+    const int y = toInt(fn.arg(3), getVM(fn));
     
-    int width = toInt(fn.arg(4));
+    int width = toInt(fn.arg(4), getVM(fn));
     if (width < 0) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("createTextField: negative width (%d)"
@@ -239,7 +239,7 @@ textfield_createTextField(const fn_call& fn)
         width = -width;
     }
 
-    int height = toInt(fn.arg(5));
+    int height = toInt(fn.arg(5), getVM(fn));
     if ( height < 0 )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -286,7 +286,7 @@ textfield_background(const fn_call& fn)
         return as_value(ptr->getDrawBackground());
     }
     else {
-        ptr->setDrawBackground(fn.arg(0).to_bool());
+        ptr->setDrawBackground(toBool(fn.arg(0), getVM(fn)));
     }
 
     return as_value();
@@ -301,7 +301,7 @@ textfield_border(const fn_call& fn)
         return as_value(ptr->getDrawBorder());
     }
     else {
-        ptr->setDrawBorder(fn.arg(0).to_bool());
+        ptr->setDrawBorder(toBool(fn.arg(0), getVM(fn)));
     }
 
     return as_value();
@@ -317,7 +317,7 @@ textfield_backgroundColor(const fn_call& fn)
     }
     else {
         rgba newColor;
-        newColor.parseRGB(static_cast<boost::uint32_t>(toInt(fn.arg(0))));
+        newColor.parseRGB(static_cast<boost::uint32_t>(toInt(fn.arg(0), getVM(fn))));
         ptr->setBackgroundColor(newColor);
     }
 
@@ -334,7 +334,7 @@ textfield_borderColor(const fn_call& fn)
     }
     else {
         rgba newColor;
-        newColor.parseRGB(static_cast<boost::uint32_t>(fn.arg(0).to_number()));
+        newColor.parseRGB(static_cast<boost::uint32_t>(toNumber(fn.arg(0), getVM(fn))));
         ptr->setBorderColor(newColor);
     }
 
@@ -354,7 +354,7 @@ textfield_textColor(const fn_call& fn)
 
     // Setter
     rgba newColor;
-    newColor.parseRGB(static_cast<boost::uint32_t>(fn.arg(0).to_number()));
+    newColor.parseRGB(static_cast<boost::uint32_t>(toNumber(fn.arg(0), getVM(fn))));
     ptr->setTextColor(newColor);
 
     return as_value();
@@ -371,7 +371,7 @@ textfield_embedFonts(const fn_call& fn)
     }
 
     // Setter
-    ptr->setEmbedFonts(fn.arg(0).to_bool());
+    ptr->setEmbedFonts(toBool(fn.arg(0), getVM(fn)));
     return as_value();
 }
 
@@ -384,7 +384,7 @@ textfield_wordWrap(const fn_call& fn)
         return as_value(ptr->doWordWrap());
     }
     else {
-        ptr->setWordWrap(fn.arg(0).to_bool());
+        ptr->setWordWrap(toBool(fn.arg(0), getVM(fn)));
     }
 
     return as_value();
@@ -399,7 +399,7 @@ textfield_html(const fn_call& fn)
         return as_value(ptr->doHtml());
     }
     else {
-        ptr->setHtml( fn.arg(0).to_bool() );
+        ptr->setHtml( toBool(fn.arg(0), getVM(fn)) );
     }
 
     return as_value();
@@ -416,7 +416,7 @@ textfield_selectable(const fn_call& fn)
     }
     else // setter
     {
-        ptr->setSelectable( fn.arg(0).to_bool() );
+        ptr->setSelectable( toBool(fn.arg(0), getVM(fn)) );
     }
 
     return as_value();
@@ -508,7 +508,7 @@ textfield_autoSize(const fn_call& fn)
     {
         const as_value& arg = fn.arg(0);
         if (arg.is_bool()) {
-            if (arg.to_bool()) {
+            if (toBool(arg, getVM(fn))) {
                 // True equates to left, every other bool to none.
                 ptr->setAutoSize(TextField::AUTOSIZE_LEFT);
             }
@@ -624,7 +624,7 @@ textfield_getTextFormat(const fn_call& fn)
     TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
     Global_as& gl = getGlobal(fn);
-    as_function* ctor = gl.getMember(NSV::CLASS_TEXT_FORMAT).to_function();
+    as_function* ctor = getMember(gl, NSV::CLASS_TEXT_FORMAT).to_function();
 
     if (!ctor) return as_value();
 
@@ -687,7 +687,7 @@ textfield_setTextFormat(const fn_call& fn)
     }
 
     TextFormat_as* tf;
-    if (!isNativeType(fn.arg(0).to_object(getGlobal(fn)), tf)) {
+    if (!isNativeType(toObject(fn.arg(0), getVM(fn)), tf)) {
 
         IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss; fn.dump_args(ss);
@@ -744,7 +744,7 @@ textfield_password(const fn_call& fn)
         return as_value(text->password());
     }
     // Setter
-    text->password(fn.arg(0).to_bool());
+    text->password(toBool(fn.arg(0), getVM(fn)));
     return as_value();
 }
 
@@ -758,7 +758,7 @@ textfield_multiline(const fn_call& fn)
         return as_value(text->multiline());
     }
     // Setter
-    text->multiline(fn.arg(0).to_bool());
+    text->multiline(toBool(fn.arg(0), getVM(fn)));
     return as_value();
 }
 
@@ -797,7 +797,7 @@ textfield_bottomScroll(const fn_call& fn)
         return as_value(1 + text->getBottomScroll());
     }
     // Setter
-    //text->setBottomScroll(int(fn.arg(0).to_number())); READ-ONLY
+    //text->setBottomScroll(int(toNumber(fn.arg(0), getVM(fn)))); READ-ONLY
 
     return as_value();
 }
@@ -817,7 +817,7 @@ textfield_maxhscroll(const fn_call& fn)
         return as_value(text->getMaxHScroll());
     }
     // Setter
-    //text->setMaxHScroll(int(fn.arg(0).to_number())); READ-ONLY
+    //text->setMaxHScroll(int(toNumber(fn.arg(0), getVM(fn)))); READ-ONLY
 
     return as_value();
 }
@@ -845,7 +845,7 @@ textfield_maxChars(const fn_call& fn)
         return as_value(maxChars);
     }
     // Setter
-    text->maxChars(toInt(fn.arg(0)));
+    text->maxChars(toInt(fn.arg(0), getVM(fn)));
     return as_value();
 }
 
@@ -935,7 +935,7 @@ textfield_scroll(const fn_call& fn)
         return as_value(1 + text->getScroll());
     }
     // Setter
-    text->setScroll(int(fn.arg(0).to_number()) - 1); 
+    text->setScroll(int(toNumber(fn.arg(0), getVM(fn))) - 1); 
 
     return as_value();
 }
@@ -953,7 +953,7 @@ textfield_hscroll(const fn_call& fn)
         return as_value(text->getHScroll());
     }
     // Setter
-    text->setHScroll(int(fn.arg(0).to_number()));
+    text->setHScroll(int(toNumber(fn.arg(0), getVM(fn))));
 
     return as_value();
 }
@@ -989,7 +989,7 @@ textfield_replaceText(const fn_call& fn)
         return as_value();
     }
 
-    int userEnd = toInt(fn.arg(1));
+    int userEnd = toInt(fn.arg(1), getVM(fn));
     if ( userEnd < 0 )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1000,7 +1000,7 @@ textfield_replaceText(const fn_call& fn)
         return as_value();
     }
 
-    wstring::size_type start = toInt(fn.arg(0));
+    wstring::size_type start = toInt(fn.arg(0), getVM(fn));
     wstring::size_type end = userEnd;
 
     int version = getSWFVersion(fn);

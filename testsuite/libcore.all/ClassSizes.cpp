@@ -74,7 +74,7 @@ using namespace gnash::SWF;
 (int) (float) (long) (double) \
 (Property*) (auto_ptr<Property>) (scoped_ptr<Property>) \
 (shared_ptr<Property>) (intrusive_ptr<as_object>) (GcResource) \
-(rgba) (SWFMatrix) (SWFRect) (LineStyle) (FillStyle) (cxform) \
+(rgba) (SWFMatrix) (SWFRect) (LineStyle) (FillStyle) (SWFCxForm) \
 (as_value) \
 (DynamicShape)(ShapeRecord)(TextRecord) \
 (Property) (PropertyList) \
@@ -82,7 +82,7 @@ using namespace gnash::SWF;
 (as_object) \
 (DisplayObject) (StaticText) (MorphShape) (Shape) \
 (InteractiveObject) (MovieClip) (TextField) (Button) (Movie) \
-(movie_root) 
+(movie_root) (PropFlags) (ObjectURI)
 
 int
 main(int /*argc*/, char** /*argv*/)

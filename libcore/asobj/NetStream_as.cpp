@@ -195,7 +195,7 @@ NetStream_as::newFrameReady()
     return false;
 }
 
-std::auto_ptr<GnashImage>
+std::auto_ptr<image::GnashImage>
 NetStream_as::get_video()
 {
     boost::mutex::scoped_lock lock(image_mutex);
@@ -263,7 +263,7 @@ NetStream_as::getStatusObject(StatusCode code)
     // Enumerable and deletable.
     const int flags = 0;
 
-    as_object* o = getGlobal(owner()).createObject();
+    as_object* o = createObject(getGlobal(owner()));
     o->init_member("code",  info.first, flags);
     o->init_member("level", info.second, flags);
 
@@ -273,7 +273,7 @@ NetStream_as::getStatusObject(StatusCode code)
 void
 NetStream_as::setAudioController(DisplayObject* ch)
 {
-    _audioController.reset(new CharacterProxy(ch));
+    _audioController.reset(new CharacterProxy(ch, getRoot(owner())));
 }
 
 #ifdef GNASH_USE_GC
@@ -311,8 +311,6 @@ void adjust_volume(boost::int16_t* data, int size, int volume)
 
 NetStream_as::~NetStream_as()
 {
-    // close will also detach from sound handler
-    close();
 }
 
 
@@ -406,7 +404,7 @@ NetStream_as::play(const std::string& c_url)
     // Reset any previously active playback
     close();
 
-    log_security( _("Connecting to movie: %s"), url );
+    log_security(_("Connecting to movie: %s"), url);
 
     _inputStream = _netCon->getStream(url); 
 
@@ -440,7 +438,7 @@ NetStream_as::initVideoDecoder(const media::VideoInfo& info)
                 "video consumer");
         _playHead.setVideoConsumerAvailable();
     }
-    catch (MediaException& e) {
+    catch (const MediaException& e) {
         log_error("NetStream: Could not create Video decoder: %s", e.what());
 
         // This is important enough to let the user know.
@@ -468,7 +466,7 @@ NetStream_as::initAudioDecoder(const media::AudioInfo& info)
                 "audio consumer");
         _playHead.setAudioConsumerAvailable();
     }
-    catch (MediaException& e) {
+    catch (const MediaException& e) {
         log_error("Could not create Audio decoder: %s", e.what());
 
         // This is important enough to let the user know.
@@ -556,12 +554,12 @@ NetStream_as::startPlayback()
 }
 
 
-std::auto_ptr<GnashImage> 
+std::auto_ptr<image::GnashImage> 
 NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
 {
     assert(_videoDecoder.get()); 
 
-    std::auto_ptr<GnashImage> video;
+    std::auto_ptr<image::GnashImage> video;
 
     assert(m_parser.get());
     if ( ! m_parser.get() )
@@ -642,10 +640,10 @@ NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
         return video;
     }
 
-    std::auto_ptr<GnashImage> 
+    std::auto_ptr<image::GnashImage> 
     NetStream_as::decodeNextVideoFrame()
     {
-        std::auto_ptr<GnashImage> video;
+        std::auto_ptr<image::GnashImage> video;
 
         if ( ! m_parser.get() )
         {
@@ -1042,7 +1040,7 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
         if ( ! audio->m_size )
         {
             // Don't bother pushing an empty frame
-            // to the audio queue...
+            // to the audio Queue...
             log_debug("pushDecodedAudioFrames(%d): Decoded audio frame "
                     "contains no samples");
             delete audio;
@@ -1169,7 +1167,7 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
 #endif 
 
     // Get next decoded video frame from parser, will have the lowest timestamp
-    std::auto_ptr<GnashImage> video = getDecodedVideoFrame(curPos);
+    std::auto_ptr<image::GnashImage> video = getDecodedVideoFrame(curPos);
 
     // to be decoded or we're out of data
     if (!video.get())
@@ -1620,7 +1618,7 @@ netstream_new(const fn_call& fn)
     if (fn.nargs) {
 
         NetConnection_as* nc;
-        if (isNativeType(fn.arg(0).to_object(getGlobal(fn)), nc)) {
+        if (isNativeType(toObject(fn.arg(0), getVM(fn)), nc)) {
             ns->setNetCon(nc);
         }
         else {
@@ -1654,10 +1652,9 @@ netstream_pause(const fn_call& fn)
     
     // mode: -1 ==> toogle, 0==> pause, 1==> play
     NetStream_as::PauseMode mode = NetStream_as::pauseModeToggle;
-    if (fn.nargs > 0)
-    {
-        mode = fn.arg(0).to_bool() ? NetStream_as::pauseModePause :
-                                     NetStream_as::pauseModeUnPause;
+    if (fn.nargs > 0) {
+        mode = toBool(fn.arg(0), getVM(fn)) ? NetStream_as::pauseModePause :
+                                              NetStream_as::pauseModeUnPause;
     }
     
     // Toggle pause mode
@@ -1699,7 +1696,7 @@ netstream_seek(const fn_call& fn)
     boost::uint32_t time = 0;
     if (fn.nargs > 0)
     {
-        time = static_cast<boost::uint32_t>(fn.arg(0).to_number());
+        time = static_cast<boost::uint32_t>(toNumber(fn.arg(0), getVM(fn)));
     }
     ns->seek(time);
 
@@ -1719,7 +1716,7 @@ netstream_setbuffertime(const fn_call& fn)
     double time = 0;
     if (fn.nargs > 0)
     {
-        time = fn.arg(0).to_number();
+        time = toNumber(fn.arg(0), getVM(fn));
     }
 
     // TODO: don't allow a limit < 100 

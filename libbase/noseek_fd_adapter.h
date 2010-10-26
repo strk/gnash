@@ -31,8 +31,7 @@ class IOChannel;
 /// Code to use volatile (non-back-seekable) streams as IOChannel
 /// objects (which are seekable by definition) by storing read bytes
 /// in a temporary file.
-namespace noseek_fd_adapter
-{
+namespace noseek_fd_adapter {
 
 /// \brief
 /// Returns a read-only IOChannel that fetches data

@@ -36,8 +36,7 @@ BUILT_SOURCES = .configline
 EXTRA_DIST = gnash.in \
 	kde/klash3.moc.in \
 	kde/Kde4Gui.moc.in \
-	kde/Kde4Glue.moc.in \
-	am-frag
+	kde/Kde4Glue.moc.in
 
 # If python support is enabled, built that too
 if HAS_PYTHON
@@ -46,24 +45,28 @@ endif
 DIST_SUBDIRS = pythonmod
 
 noinst_HEADERS =
-noinst_LTLIBRARIES = #libgnashgui.la
+noinst_LTLIBRARIES = 
+
+# top_builddir and top_srcdir are for revno.h; its location depends on
+# whether we're building from a snapshot or a checkout.
 AM_CPPFLAGS = \
-        -I../.. \
-        -I$(top_srcdir)/libnet \
-        -I$(top_srcdir)/libcore \
-        -I$(top_srcdir)/libcore/swf \
-        -I$(top_srcdir)/libcore/parser \
-        -I$(top_srcdir)/libcore/vm \
-        -I$(top_srcdir)/libcore/asobj \
+	-I$(top_builddir) \
+	-I$(top_srcdir) \
+	-I$(top_srcdir)/libnet \
+	-I$(top_srcdir)/libcore \
+	-I$(top_srcdir)/libcore/swf \
+	-I$(top_srcdir)/libcore/parser \
+	-I$(top_srcdir)/libcore/vm \
+	-I$(top_srcdir)/libcore/asobj \
 	-I$(top_srcdir)/libltdl \
-        -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/librender \
+	-I$(top_srcdir)/libbase \
+	-I$(top_srcdir)/librender \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
 	-I$(top_srcdir)/libmedia/ffmpeg \
 	-I$(top_srcdir)/libmedia/gst \
 	-I$(top_srcdir)/libmedia/haiku \
-       -DLOCALEDIR=\"$(localedir)\" \
+        -DLOCALEDIR=\"$(localedir)\" \
 	-DPLUGINSDIR=\"$(pluginsdir)\" \
 	-DLIBAVCODEC_IDENT=\"$(LIBAVCODEC_IDENT)\" \
 	$(GLIB_CFLAGS) \
@@ -114,10 +117,12 @@ AM_LDFLAGS =  \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 
+
 GNASH_LIBS = \
-	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libcore/libgnashcore.la \
+	$(top_builddir)/librender/libgnashrender.la \
 	$(top_builddir)/libsound/libgnashsound.la \
+	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libbase/libgnashbase.la
 
 if LIBLTDL2
@@ -142,24 +147,6 @@ endif
 
 # endif # DYNAMIC_GUI
 
-# AQUA Toolkit
-if BUILD_AQUA_GUI
-#OS X stuff goes here...
-GUI_CPPFLAGS += -DGUI_AQUA
-
-bundle_name = Gnash.app
-
-if  HAVE_OPENGL
-noinst_LTLIBRARIES += libgnashaqua_ogl.la
-libgnashaqua_ogl_la_CPPFLAGS = $(AM_CPPFLAGS) \
-	$(OPENGL_CFLAGS)
-libgnashaqua_ogl_la_SOURCES = \
-	aqua_ogl_glue.cpp aqua_ogl_glue.h \
-	aqua.cpp aquasup.h aqua_glue.h
-libgnashaqua_ogl_la_LDFLAGS = $(LIB_FLAGS)
-libgnashaqua_ogl_la_LIBADD = 
-endif # HAVE_OPENGL
-endif # BUILD_AQUA_GUI
 
 if USE_FFMPEG_ENGINE
 AM_LDFLAGS += $(FFMPEG_LIBS) $(LIBVA_LIBS) $(LIBVA_X11_LIBS) 
@@ -198,39 +185,17 @@ gnash: gnash.in
 	cp $< $@
 	chmod +x $@
 
-# These are used to handle input events from a keyboard, mouse, or
-# touchscreen. These are only used by the Framebuffer GUI, as without
-# X11, it has no event handling. We do it this way so the optionally
-# built source files still get included in the source tarball.
-DEVICES =
-if ENABLE_INPUT_DEVICES
-DEVICES += InputDevice.cpp InputDevice.h
-
-# Touchscreen
-if ENABLE_TSLIB
-DEVICES += TouchDevice.cpp
-endif
-# PS/2 Mouse
-if ENABLE_MOUSE
-DEVICES += MouseDevice.cpp
-endif
-# Linux input events
-if ENABLE_INPUT_EVENTS
-DEVICES += EventDevice.cpp
-endif
-endif
-
 # Always include the device files in the source tarball
 EXTRA_DIST += \
-	TouchDevice.cpp \
-	MouseDevice.cpp \
-	EventDevice.cpp
+	fb/TouchDevice.cpp \
+	fb/MouseDevice.cpp \
+	fb/EventDevice.cpp
 
 GUI_SRCS = gnash.cpp \
 	gui.cpp gui.h \
 	Player.cpp Player.h \
 	NullGui.cpp NullGui.h \
-	$(DEVICES) \
+	ScreenShotter.cpp ScreenShotter.h \
 	$(NULL)
 
 if BUILD_AQUA_GUI
@@ -278,7 +243,7 @@ endif
 
 # Build the AQUA gui
 if BUILD_AQUA_GUI
-include $(srcdir)/am-frag/aqua.am
+include $(srcdir)/aqua/aqua.am
 endif
 
 # Build the GTK gui
@@ -286,24 +251,9 @@ if BUILD_GTK_GUI
 include $(srcdir)/gtk/gtk.am
 endif
 
-# if ALP				# Access Linux Platform
-# gtk_gnash_LDFLAGS += "-shared -Xlinker -z -Xlinker defs $(GTK2_LIBS)"
-# gtk_gnash_LDADD += $(ALP_LIBS)
-# endif
-#
-# Build the GTK/ALP gui
-if BUILD_ALP_GUI
-include $(srcdir)/am-frag/alp.am
-endif
-
-# Build the GTK/HILDON gui
-if BUILD_HILDON_GUI
-include $(srcdir)/am-frag/hildon.am
-endif
-
 # Build the DUMP gui
 if BUILD_DUMP_GUI
-include $(srcdir)/am-frag/dump.am
+include $(srcdir)/dump/dump.am
 endif
 
 # Build the FB gui
@@ -313,7 +263,7 @@ endif
 
 # Build the RISCOS gui
 if BUILD_RISCOS_GUI
-include $(srcdir)/am-frag/riscos.am
+include $(srcdir)/riscos/riscos.am
 endif
 
 CLEANFILES = klash3.moc Kde4Gui.moc Kde4Glue.moc .configline gnash

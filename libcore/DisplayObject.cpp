@@ -16,35 +16,35 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-// 
 
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h" // USE_SWFTREE
 #endif
 
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "DisplayObject.h"
-#include "movie_root.h"
-#include "MovieClip.h"
-#include "drag_state.h" // for do_mouse_drag (to be moved in movie_root)
-#include "VM.h" // for do_mouse_drag (to be moved in movie_root)
-#include "fn_call.h" // for shared ActionScript getter-setters
-#include "GnashException.h" 
-#include "ExecutableCode.h"
-#include "namedStrings.h"
-#include "gnash.h" // Quality
-#include "GnashNumeric.h"
-#include "Global_as.h"
-#include "Renderer.h"
-
-#ifdef USE_SWFTREE
-# include "tree.hh"
-#endif
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/bind.hpp>
+#include <utility>
+
+#include "smart_ptr.h" // GNASH_USE_GC
+#include "movie_root.h"
+#include "MovieClip.h"
+#include "VM.h" 
+#include "fn_call.h"
+#include "GnashException.h" 
+#include "ExecutableCode.h"
+#include "namedStrings.h"
+#include "GnashEnums.h" 
+#include "GnashNumeric.h"
+#include "Global_as.h"
+#include "Renderer.h"
+#include "GnashAlgorithm.h"
+#ifdef USE_SWFTREE
+# include "tree.hh"
+#endif
 
 #undef set_invalidated
 
@@ -60,16 +60,20 @@ namespace {
             const std::string& mode);
     
     typedef as_value(*Getter)(DisplayObject&);
-    typedef std::map<string_table::key, Getter> Getters;
     typedef void(*Setter)(DisplayObject&, const as_value&);
-    typedef std::map<string_table::key, Setter> Setters;
+    typedef std::pair<Getter, Setter> GetterSetter;
 
-    const Getters displayObjectGetters();
-    const Setters displayObjectSetters();
+    bool doSet(const ObjectURI& uri, DisplayObject& o, const as_value& val);
+    bool doGet(const ObjectURI& uri, DisplayObject& o, as_value& val);
+    const GetterSetter& getGetterSetterByIndex(size_t index);
 
-    bool doSet(string_table::key prop, DisplayObject& o, const as_value& val);
-    bool doGet(string_table::key prop, DisplayObject& o, as_value& val);
-    string_table::key getPropertyByIndex(size_t index);
+    // NOTE: comparison will be case-insensitive
+    const GetterSetter& getGetterSetterByURI(const ObjectURI& uri,
+            string_table& st);
+
+    // Convenience function to create a const URI-to-function map
+    template<typename Map> const Map getURIMap(
+            const typename Map::key_compare& cmp);
 }
 
 // Define static const members.
@@ -82,6 +86,7 @@ const int DisplayObject::noClipDepthValue;
 DisplayObject::DisplayObject(movie_root& mr, as_object* object,
         DisplayObject* parent)
     :
+    GcResource(mr.gc()),
     _name(),
     _parent(parent),
     _object(object),
@@ -109,19 +114,7 @@ DisplayObject::DisplayObject(movie_root& mr, as_object* object,
     // This informs the core that the object is a DisplayObject.
     if (_object) _object->setDisplayObject(this);
 }
-
-as_object*
-DisplayObject::object() const
-{
-    return _object;
-}
     
-bool
-DisplayObject::unloaded() const
-{
-    return _unloaded;
-}
-
 void
 DisplayObject::getLoadedMovie(Movie* extern_movie)
 {
@@ -148,18 +141,6 @@ DisplayObject::getNextUnnamedInstanceName()
 }
 
 
-SWFMatrix
-DisplayObject::getWorldMatrix(bool includeRoot) const
-{
-	SWFMatrix m;
-	if (_parent) {
-	    m = _parent->getWorldMatrix(includeRoot);
-	}
-    if (_parent || includeRoot) m.concatenate(getMatrix());
-
-	return m;
-}
-
 int
 DisplayObject::getWorldVolume() const
 {
@@ -172,32 +153,25 @@ DisplayObject::getWorldVolume() const
 	return volume;
 }
 
-cxform
-DisplayObject::get_world_cxform() const
-{
-	cxform	m;
-	if (_parent != NULL)
-	{
-	    m = _parent->get_world_cxform();
-	}
-	m.concatenate(get_cxform());
-
-	return m;
-}
-
 
 as_object*
-DisplayObject::pathElement(string_table::key key)
+DisplayObject::pathElement(const ObjectURI& uri)
 {
     as_object* obj = getObject(this);
     if (!obj) return 0;
 
+    string_table::key key = getName(uri);
+
     string_table& st = stage().getVM().getStringTable();
-    if (key == st.find("..")) return getObject(get_parent());
+
+    // TODO: put ".." and "." in namedStrings
+    if (key == st.find("..")) return getObject(parent());
 	if (key == st.find(".")) return obj;
     
     // The check is case-insensitive for SWF6 and below.
-    if (equal(st, key, NSV::PROP_THIS, caseless(*obj))) {
+    // TODO: cache ObjectURI(NSV::PROP_THIS) [as many others...]
+    if (ObjectURI::CaseEquals(st, caseless(*obj))
+            (uri, ObjectURI(NSV::PROP_THIS))) {
         return obj;
     }
 	return 0;
@@ -254,7 +228,7 @@ DisplayObject::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
     if (visible() && (_invalidated||force))
     {
         SWFRect bounds;        
-        bounds.expand_to_transformed_rect(getWorldMatrix(), getBounds());
+        bounds.expand_to_transformed_rect(getWorldMatrix(*this), getBounds());
         ranges.add(bounds.getRange());                        
     }        
 }
@@ -312,7 +286,7 @@ DisplayObject::blendMode(const fn_call& fn)
 
     // Numeric argument.
     if (bm.is_number()) {
-        double mode = bm.to_number();
+        double mode = toNumber(bm, getVM(fn));
 
         // Hardlight is the last known value. This also performs range checking
         // for float-to-int conversion.
@@ -372,7 +346,7 @@ DisplayObject::setWidth(double newwidth)
     const double xscale = oldwidth ? (newwidth / oldwidth) : 0; 
     const double rotation = _rotation * PI / 180.0;
 
-    SWFMatrix m = getMatrix();
+    SWFMatrix m = getMatrix(*this);
     const double yscale = m.get_y_scale(); 
     m.set_scale_rotation(xscale, yscale, rotation);
     setMatrix(m, true); 
@@ -382,7 +356,7 @@ as_value
 getHeight(DisplayObject& o)
 {
 	SWFRect bounds = o.getBounds();
-    const SWFMatrix m = o.getMatrix();
+    const SWFMatrix m = getMatrix(o);
     m.transform(bounds);
     return twipsToPixels(bounds.height());      
 }
@@ -390,7 +364,7 @@ getHeight(DisplayObject& o)
 void
 setHeight(DisplayObject& o, const as_value& val)
 {
-    const double newheight = pixelsToTwips(val.to_number());
+    const double newheight = pixelsToTwips(toNumber(val, getVM(*getObject(&o))));
     if (newheight <= 0) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Setting _height=%g of DisplayObject %s (%s)"),
@@ -411,7 +385,7 @@ DisplayObject::setHeight(double newheight)
     const double yscale = oldheight ? (newheight / oldheight) : 0;
     const double rotation = _rotation * PI / 180.0;
 
-    SWFMatrix m = getMatrix();
+    SWFMatrix m = getMatrix(*this);
     const double xscale = m.get_x_scale();
     m.set_scale_rotation(xscale, yscale, rotation);
     setMatrix(m, true);
@@ -421,18 +395,17 @@ void
 DisplayObject::setMatrix(const SWFMatrix& m, bool updateCache)
 {
 
-    if (m == m_matrix) return;
+    if (m == _transform.matrix) return;
 
     //log_debug("setting SWFMatrix to: %s", m);
     set_invalidated(__FILE__, __LINE__);
-    m_matrix = m;
+    _transform.matrix = m;
 
     // don't update caches if SWFMatrix wasn't updated too
-    if (updateCache) 
-    {
-        _xscale = m_matrix.get_x_scale() * 100.0;
-        _yscale = m_matrix.get_y_scale() * 100.0;
-        _rotation = m_matrix.get_rotation() * 180.0 / PI;
+    if (updateCache) {
+        _xscale = _transform.matrix.get_x_scale() * 100.0;
+        _yscale = _transform.matrix.get_y_scale() * 100.0;
+        _rotation = _transform.matrix.get_rotation() * 180.0 / PI;
     }
 
 }
@@ -522,9 +495,9 @@ DisplayObject::hasEventHandler(const event_id& id) const
 
     if (!_object) return false;
 
-    as_value tmp;
-	if (_object->get_member(id.functionKey(), &tmp)) {
-		return tmp.to_function();
+    // Don't check resolve!
+	if (Property* prop = _object->findProperty(id.functionURI())) {
+		return prop->getValue(*_object).to_function();
 	}
 	return false;
 
@@ -553,7 +526,7 @@ DisplayObject::set_x_scale(double scale_percent)
     // we don't need to recompute the SWFMatrix from the 
     // caches.
 
-	SWFMatrix m = getMatrix();
+	SWFMatrix m = getMatrix(*this);
 
     m.set_x_scale(xscale);
 
@@ -575,9 +548,9 @@ DisplayObject::set_rotation(double rot)
 
 	double rotation = rot * PI / 180.0;
 
-    if (_xscale < 0 ) rotation += PI; 
+    if (_xscale < 0) rotation += PI; 
 
-	SWFMatrix m = getMatrix();
+	SWFMatrix m = getMatrix(*this);
     m.set_rotation(rotation);
 
     // Update the matrix from the cached x scale to avoid accumulating
@@ -609,7 +582,7 @@ DisplayObject::set_y_scale(double scale_percent)
 
 	_yscale = scale_percent;
 
-	SWFMatrix m = getMatrix();
+	SWFMatrix m = getMatrix(*this);
     m.set_y_scale(yscale);
 	setMatrix(m); // we updated the cache ourselves
 
@@ -634,7 +607,7 @@ DisplayObject::getTargetPath() const
     string_table& st = getStringTable(*getObject(this));
 	for (;;)
 	{
-		const DisplayObject* parent = ch->get_parent();
+		const DisplayObject* parent = ch->parent();
 
 		// Don't push the _root name on the stack
 		if (!parent) {
@@ -642,7 +615,7 @@ DisplayObject::getTargetPath() const
 			break;
 		}
 
-		path.push_back(st.value(ch->get_name()));
+		path.push_back(ch->get_name().toString(st));
 		ch = parent;
 	} 
 
@@ -687,7 +660,7 @@ DisplayObject::getTarget() const
     string_table& st = stage().getVM().getStringTable();
 	for (;;)
 	{
-		const DisplayObject* parent = ch->get_parent();
+		const DisplayObject* parent = ch->parent();
 
 		// Don't push the _root name on the stack
 		if (!parent) {
@@ -710,7 +683,7 @@ DisplayObject::getTarget() const
 			break;
 		}
 
-		path.push_back(st.value(ch->get_name()));
+		path.push_back(ch->get_name().toString(st));
 		ch = parent;
 	} 
 
@@ -763,19 +736,24 @@ DisplayObject::markReachableResources() const
 /// 1. Only AS-referenceable objects may use a hand cursor (TODO: check
 ///    Video). 
 /// 2. Only objects with a release event may use a hand cursor.
+///    CANNOT CONFIRM THE ABOVE, SEE ButtonEventsTest.swf in misc-ming.all
 /// 3. The default value (if the property is not defined) is true.
 bool
 DisplayObject::allowHandCursor() const
 {
-    if (!getObject(this)) return false;
+    as_object* obj = getObject(this);
+    if (!obj) return false;
 
-    if (!hasEventHandler(event_id::RELEASE)) return false;
+    // Checking for RELEASE breaks ButtonEventsTest.
+    // I guess such an event would influence wheter or not this
+    // character would become an active one, despite hand cursor
+    //if (!hasEventHandler(event_id::RELEASE)) return false;
 
     as_value val;
-    if (!getObject(this)->get_member(NSV::PROP_USEHANDCURSOR, &val)) {
+    if (!obj->get_member(NSV::PROP_USEHANDCURSOR, &val)) {
          return true;
     }
-    return val.to_bool();
+    return toBool(val, getVM(*obj));
 }
 
 void
@@ -839,10 +817,10 @@ DisplayObject::setMaskee(DisplayObject* maskee)
 bool 
 DisplayObject::boundsInClippingArea(Renderer& renderer) const 
 {
-  SWFRect mybounds = getBounds();
-  getWorldMatrix().transform(mybounds);
+    SWFRect mybounds = getBounds();
+    getWorldMatrix(*this).transform(mybounds);
   
-  return renderer.bounds_in_clipping_area(mybounds.getRange());  
+    return renderer.bounds_in_clipping_area(mybounds.getRange());  
 }
 
 #ifdef USE_SWFTREE
@@ -852,46 +830,48 @@ DisplayObject::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 	const std::string yes = _("yes");
 	const std::string no = _("no");
 
-	it = tr.append_child(it, StringPair(getTarget(), typeName(*this)));
+	it = tr.append_child(it, std::make_pair(getTarget(), typeName(*this)));
 
 	std::ostringstream os;
 	os << get_depth();
-	tr.append_child(it, StringPair(_("Depth"), os.str()));
+	tr.append_child(it, std::make_pair(_("Depth"), os.str()));
 
     /// Don't add if the DisplayObject has no ratio value
     if (get_ratio() >= 0)
     {
         os.str("");
         os << get_ratio();
-        tr.append_child(it, StringPair(_("Ratio"), os.str()));
+        tr.append_child(it, std::make_pair(_("Ratio"), os.str()));
     }	    
 
     /// Don't add if it's not a real clipping depth
-    if (int cd = get_clip_depth() != noClipDepthValue)
-    {
+    const int cd = get_clip_depth();
+    if (cd != noClipDepthValue) {
 		os.str("");
 		if (_maskee) os << "Dynamic mask";
 		else os << cd;
 
-		tr.append_child(it, StringPair(_("Clipping depth"), os.str()));	    
+		tr.append_child(it, std::make_pair(_("Clipping depth"), os.str()));	    
     }
 
     os.str("");
     os << getBounds().width() << "x" << getBounds().height();
-	tr.append_child(it, StringPair(_("Dimensions"), os.str()));	
+	tr.append_child(it, std::make_pair(_("Dimensions"), os.str()));	
 
-	tr.append_child(it, StringPair(_("Dynamic"), isDynamic() ? yes : no));	
-	tr.append_child(it, StringPair(_("Mask"), isMaskLayer() ? yes : no));	    
-	tr.append_child(it, StringPair(_("Destroyed"), isDestroyed() ? yes : no));
-	tr.append_child(it, StringPair(_("Unloaded"), unloaded() ? yes : no));
+	tr.append_child(it, std::make_pair(_("Dynamic"), isDynamic() ? yes : no));	
+	tr.append_child(it, std::make_pair(_("Mask"), isMaskLayer() ? yes : no));	    
+	tr.append_child(it, std::make_pair(_("Destroyed"),
+                isDestroyed() ? yes : no));
+	tr.append_child(it, std::make_pair(_("Unloaded"), unloaded() ? yes : no));
 	
     os.str("");
     os << _blendMode;
-    tr.append_child(it, StringPair(_("Blend mode"), os.str()));
+    tr.append_child(it, std::make_pair(_("Blend mode"), os.str()));
 #ifndef NDEBUG
     // This probably isn't interesting for non-developers
-    tr.append_child(it, StringPair(_("Invalidated"), _invalidated ? yes : no));
-    tr.append_child(it, StringPair(_("Child invalidated"),
+    tr.append_child(it, std::make_pair(_("Invalidated"),
+                _invalidated ? yes : no));
+    tr.append_child(it, std::make_pair(_("Child invalidated"),
                 _child_invalidated ? yes : no));
 #endif
 	return it;
@@ -907,20 +887,29 @@ DisplayObject::getAsRoot()
 void
 setIndexedProperty(size_t index, DisplayObject& o, const as_value& val)
 {
-    string_table::key prop = getPropertyByIndex(index);
-    if (!prop) return;
-    doSet(prop, o, val);
+    const Setter s = getGetterSetterByIndex(index).second;
+    if (!s) return; // read-only (warn?)
+
+    if (val.is_undefined() || val.is_null()) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Attempt to set property to %s, refused"),
+                o.getTarget(), val);
+        );
+        return;
+    }
+
+    (*s)(o, val);
 }
 
 void
 getIndexedProperty(size_t index, DisplayObject& o, as_value& val)
 {
-    string_table::key prop = getPropertyByIndex(index);
-    if (!prop) {
+    const Getter s = getGetterSetterByIndex(index).first;
+    if (!s) {
         val.set_undefined();
         return;
     }
-    doGet(prop, o, val);
+    val = (*s)(o);
 }
 
 
@@ -940,7 +929,7 @@ getIndexedProperty(size_t index, DisplayObject& o, as_value& val)
 ///    way to do it, but as it is done like this, this must be called here.
 ///    It will cause an infinite recursion otherwise.
 bool
-getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
+getDisplayObjectProperty(DisplayObject& obj, const ObjectURI& uri,
         as_value& val)
 {
     
@@ -948,7 +937,7 @@ getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
     assert(o);
 
     string_table& st = getStringTable(*o);
-    const std::string& propname = st.value(key);
+    const std::string& propname = uri.toString(st);
 
     // Check _level0.._level9
     movie_root& mr = getRoot(*getObject(&obj));
@@ -964,19 +953,19 @@ getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
     
     MovieClip* mc = dynamic_cast<MovieClip*>(&obj);
     if (mc) {
-        DisplayObject* ch = mc->getDisplayListObject(key);
+        DisplayObject* ch = mc->getDisplayListObject(uri);
         if (ch) {
            val = getObject(ch);
            return true;
         }
     }
 
-    const string_table::key noCaseKey = st.noCase(key);
+    const string_table::key noCaseKey = uri.noCase(st);
 
     // These properties have normal case-sensitivity.
     // They are tested to exist for TextField, MovieClip, and Button
     // but do not belong to the inheritance chain.
-    switch (caseless(*o) ? noCaseKey : key)
+    switch (caseless(*o) ? noCaseKey : getName(uri))
     {
         default:
             break;
@@ -993,23 +982,43 @@ getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
     }
 
     // These magic properties are case insensitive in all versions!
-    if (doGet(noCaseKey, obj, val)) return true;
+    if (doGet(uri, obj, val)) return true;
 
     // Check MovieClip such as TextField variables.
     // TODO: check if there's a better way to find these properties.
-    if (mc && mc->getTextFieldVariables(key, val)) return true;
+    if (mc && mc->getTextFieldVariables(uri, val)) return true;
 
     return false;
 }
     
 
 bool
-setDisplayObjectProperty(DisplayObject& obj, string_table::key key, 
+setDisplayObjectProperty(DisplayObject& obj, const ObjectURI& uri,
         const as_value& val)
 {
     // These magic properties are case insensitive in all versions!
-    string_table& st = getStringTable(*getObject(&obj));
-    return doSet(st.noCase(key), obj, val);
+    return doSet(uri, obj, val);
+}
+    
+DisplayObject::MaskRenderer::MaskRenderer(Renderer& r, const DisplayObject& o)
+    :
+    _renderer(r),
+    _mask(o.visible() && o.getMask() && !o.getMask()->unloaded() ? o.getMask()
+                                                                 : 0)
+{
+    if (!_mask) return;
+
+    _renderer.begin_submit_mask();
+    DisplayObject* p = _mask->parent();
+    const Transform tr = p ?
+        Transform(getWorldMatrix(*p), getWorldCxForm(*p)) : Transform(); 
+    _mask->display(_renderer, tr);
+    _renderer.end_submit_mask();
+}
+
+DisplayObject::MaskRenderer::~MaskRenderer()
+{
+    if (_mask) _renderer.disable_mask();
 }
 
 namespace {
@@ -1087,7 +1096,7 @@ setHighQuality(DisplayObject& o, const as_value& val)
 {
     movie_root& mr = getRoot(*getObject(&o));
 
-    const double q = val.to_number();
+    const double q = toNumber(val, getVM(*getObject(&o)));
 
     if (q < 0) mr.setQuality(QUALITY_HIGH);
     else if (q > 2) mr.setQuality(QUALITY_BEST);
@@ -1113,7 +1122,7 @@ void
 setY(DisplayObject& o, const as_value& val)
 {
 
-    const double newy = val.to_number();
+    const double newy = toNumber(val, getVM(*getObject(&o)));
 
     // NaN is skipped, Infinite isn't
     if (isNaN(newy))
@@ -1126,7 +1135,7 @@ setY(DisplayObject& o, const as_value& val)
         return;
     }
 
-    SWFMatrix m = o.getMatrix();
+    SWFMatrix m = getMatrix(o);
     // NOTE: infinite_to_zero is wrong here, see actionscript.all/setProperty.as
     m.set_y_translation(pixelsToTwips(infinite_to_zero(newy)));
     o.setMatrix(m); 
@@ -1136,7 +1145,7 @@ setY(DisplayObject& o, const as_value& val)
 as_value
 getY(DisplayObject& o)
 {
-    SWFMatrix m = o.getMatrix();
+    const SWFMatrix m = getMatrix(o);
     return twipsToPixels(m.get_y_translation());
 }
 
@@ -1144,7 +1153,7 @@ void
 setX(DisplayObject& o, const as_value& val)
 {
 
-    const double newx = val.to_number();
+    const double newx = toNumber(val, getVM(*getObject(&o)));
 
     // NaN is skipped, Infinite isn't
     if (isNaN(newx))
@@ -1157,7 +1166,7 @@ setX(DisplayObject& o, const as_value& val)
         return;
     }
 
-    SWFMatrix m = o.getMatrix();
+    SWFMatrix m = getMatrix(o);
     // NOTE: infinite_to_zero is wrong here, see actionscript.all/setProperty.as
     m.set_x_translation(pixelsToTwips(infinite_to_zero(newx)));
     o.setMatrix(m); 
@@ -1167,7 +1176,7 @@ setX(DisplayObject& o, const as_value& val)
 as_value
 getX(DisplayObject& o)
 {
-    SWFMatrix m = o.getMatrix();
+    const SWFMatrix m = getMatrix(o);
     return twipsToPixels(m.get_x_translation());
 }
 
@@ -1175,11 +1184,10 @@ void
 setScaleX(DisplayObject& o, const as_value& val)
 {
 
-    const double scale_percent = val.to_number();
+    const double scale_percent = toNumber(val, getVM(*getObject(&o)));
 
     // NaN is skipped, Infinite is not, see actionscript.all/setProperty.as
-    if (isNaN(scale_percent))
-    {
+    if (isNaN(scale_percent)) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Attempt to set %s._xscale to %s "
             "(evaluating to number %g) refused"),
@@ -1203,11 +1211,10 @@ void
 setScaleY(DisplayObject& o, const as_value& val)
 {
 
-    const double scale_percent = val.to_number();
+    const double scale_percent = toNumber(val, getVM(*getObject(&o)));
 
     // NaN is skipped, Infinite is not, see actionscript.all/setProperty.as
-    if (isNaN(scale_percent))
-    {
+    if (isNaN(scale_percent)) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Attempt to set %s._yscale to %s "
             "(evaluating to number %g) refused"),
@@ -1241,7 +1248,7 @@ setVisible(DisplayObject& o, const as_value& val)
     /// cast to bool, as string "0" should be converted to
     /// its numeric equivalent, not interpreted as 'true', which
     /// SWF7+ does for strings.
-    double d = val.to_number();
+    const double d = toNumber(val, getVM(*getObject(&o)));
 
     // Infinite or NaN is skipped
     if (isInf(d) || isNaN(d)) {
@@ -1261,7 +1268,7 @@ setVisible(DisplayObject& o, const as_value& val)
 as_value
 getAlpha(DisplayObject& o)
 {
-    return as_value(o.get_cxform().aa / 2.56);
+    return as_value(getCxForm(o).aa / 2.56);
 }
 
 void
@@ -1271,7 +1278,7 @@ setAlpha(DisplayObject& o, const as_value& val)
     // The new internal alpha value is input / 100.0 * 256.
     // We test for finiteness later, but the multiplication
     // won't make any difference.
-    const double newAlpha = val.to_number() * 2.56;
+    const double newAlpha = toNumber(val, getVM(*getObject(&o))) * 2.56;
 
     // NaN is skipped, Infinite is not, see actionscript.all/setProperty.as
     if (isNaN(newAlpha)) {
@@ -1283,7 +1290,7 @@ setAlpha(DisplayObject& o, const as_value& val)
         return;
     }
 
-    cxform cx = o.get_cxform();
+    SWFCxForm cx = getCxForm(o);
 
     // Overflows are *not* truncated, but set to -32768.
     if (newAlpha > std::numeric_limits<boost::int16_t>::max() ||
@@ -1294,7 +1301,7 @@ setAlpha(DisplayObject& o, const as_value& val)
         cx.aa = static_cast<boost::int16_t>(newAlpha);
     }
 
-    o.set_cxform(cx);
+    o.setCxForm(cx);
     o.transformedByScript();  
 
 }
@@ -1306,7 +1313,7 @@ getMouseX(DisplayObject& o)
 	boost::int32_t x, y;
 	getRoot(*getObject(&o)).get_mouse_state(x, y);
 
-	SWFMatrix m = o.getWorldMatrix();
+	SWFMatrix m = getWorldMatrix(o);
     point a(pixelsToTwips(x), pixelsToTwips(y));
     
     m.invert().transform(a);
@@ -1320,7 +1327,7 @@ getMouseY(DisplayObject& o)
 	boost::int32_t x, y;
 	getRoot(*getObject(&o)).get_mouse_state(x, y);
 
-	SWFMatrix m = o.getWorldMatrix();
+	SWFMatrix m = getWorldMatrix(o);
     point a(pixelsToTwips(x), pixelsToTwips(y));
     m.invert().transform(a);
     return as_value(twipsToPixels(a.y));
@@ -1338,11 +1345,10 @@ setRotation(DisplayObject& o, const as_value& val)
 {
 
     // input is in degrees
-    const double rotation_val = val.to_number();
+    const double rotation_val = toNumber(val, getVM(*getObject(&o)));
 
     // NaN is skipped, Infinity isn't
-    if (isNaN(rotation_val))
-    {
+    if (isNaN(rotation_val)) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Attempt to set %s._rotation to %s "
             "(evaluating to number %g) refused"),
@@ -1357,7 +1363,7 @@ setRotation(DisplayObject& o, const as_value& val)
 as_value
 getParent(DisplayObject& o)
 {
-    as_object* p = getObject(o.get_parent());
+    as_object* p = getObject(o.parent());
     return p ? p : as_value();
 }
 
@@ -1371,7 +1377,7 @@ as_value
 getNameProperty(DisplayObject& o)
 {
     string_table& st = getStringTable(*getObject(&o));
-    const std::string& name = st.value(o.get_name());
+    const std::string& name = o.get_name().toString(st);
     if (getSWFVersion(*getObject(&o)) < 6 && name.empty()) return as_value(); 
     return as_value(name);
 }
@@ -1399,7 +1405,7 @@ as_value
 getWidth(DisplayObject& o)
 {
 	SWFRect bounds = o.getBounds();
-    const SWFMatrix& m = o.getMatrix();
+    const SWFMatrix& m = getMatrix(o);
     m.transform(bounds);
     return twipsToPixels(bounds.width());
 }
@@ -1407,7 +1413,7 @@ getWidth(DisplayObject& o)
 void
 setWidth(DisplayObject& o, const as_value& val)
 {
-    const double newwidth = pixelsToTwips(val.to_number());
+    const double newwidth = pixelsToTwips(toNumber(val, getVM(*getObject(&o))));
     if (newwidth <= 0) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Setting _width=%g of DisplayObject %s (%s)"),
@@ -1456,7 +1462,7 @@ getFramesLoaded(DisplayObject& o)
     // This property only applies to MovieClips.
     MovieClip* mc = dynamic_cast<MovieClip*>(&o);
     if (!mc) return as_value();
-    return as_value(mc->get_frame_count());
+    return as_value(mc->get_loaded_frames());
 }
 
 as_value
@@ -1465,55 +1471,89 @@ getTotalFrames(DisplayObject& o)
     // This property only applies to MovieClips.
     MovieClip* mc = dynamic_cast<MovieClip*>(&o);
     if (!mc) return as_value();
-    return as_value(mc->get_loaded_frames());
+    return as_value(mc->get_frame_count());
 }
 
 
-string_table::key
-getPropertyByIndex(size_t index)
+/// @param uri     The property to search for. Note that all special
+///                properties are lower-case.
+///
+/// NOTE that all properties have getters so you can recognize a 
+/// 'not-found' condition by checking .first = 0
+const GetterSetter&
+getGetterSetterByURI(const ObjectURI& uri, string_table& st)
 {
+    typedef std::map<ObjectURI, GetterSetter, ObjectURI::CaseLessThan> 
+        GetterSetters;
 
-    // This is a magic number; defining it here makes sure that the
-    // table is really this size.
-    const size_t size = 22;
+    static const GetterSetters gs =
+        getURIMap<GetterSetters>(ObjectURI::CaseLessThan(st, true));
 
-    if (index >= size) return 0;
+    const GetterSetters::const_iterator it = gs.find(uri);
 
-    static const string_table::key props[size] = {
-        NSV::PROP_uX,
-        NSV::PROP_uY,
-        NSV::PROP_uXSCALE,
-        NSV::PROP_uYSCALE,
-        NSV::PROP_uCURRENTFRAME,
-        NSV::PROP_uTOTALFRAMES,
-        NSV::PROP_uALPHA,
-        NSV::PROP_uVISIBLE,
-        NSV::PROP_uWIDTH,
-        NSV::PROP_uHEIGHT,
-        NSV::PROP_uROTATION, 
-        NSV::PROP_uTARGET, 
-        NSV::PROP_uFRAMESLOADED, 
-        NSV::PROP_uNAME, 
-        NSV::PROP_uDROPTARGET, 
-        NSV::PROP_uURL, 
-        NSV::PROP_uHIGHQUALITY, 
-        NSV::PROP_uFOCUSRECT, 
-        NSV::PROP_uSOUNDBUFTIME, 
-        NSV::PROP_uQUALITY, 
-        NSV::PROP_uXMOUSE, 
-        NSV::PROP_uYMOUSE 
+    if (it == gs.end()) {
+        static const GetterSetter none(0, 0);
+        return none;
+    }
+
+    return it->second;
+}
+
+
+const GetterSetter&
+getGetterSetterByIndex(size_t index)
+{
+    const Setter n = 0;
+
+    static const GetterSetter props[] = {
+        GetterSetter(&getX, &setX),
+        GetterSetter(&getY, &setY),
+        GetterSetter(&getScaleX, &setScaleX),
+        GetterSetter(&getScaleY, &setScaleY),
+
+        GetterSetter(&getCurrentFrame, n),
+        GetterSetter(&getTotalFrames, n),
+        GetterSetter(&getAlpha, &setAlpha),
+        GetterSetter(&getVisible, &setVisible),
+
+        GetterSetter(&getWidth, &setWidth),
+        GetterSetter(&getHeight, &setHeight),
+        GetterSetter(&getRotation, &setRotation),
+        GetterSetter(&getTarget, n),
+
+        GetterSetter(&getFramesLoaded, n),
+        GetterSetter(&getNameProperty, &setName),
+        GetterSetter(&getDropTarget, n),
+        GetterSetter(&getURL, n),
+
+        GetterSetter(&getHighQuality, &setHighQuality),
+        GetterSetter(&getFocusRect, &setFocusRect),
+        GetterSetter(&getSoundBufTime, &setSoundBufTime),
+        GetterSetter(&getQuality, &setQuality),
+
+        GetterSetter(&getMouseX, n),
+        GetterSetter(&getMouseY, n)
+
     };
+
+    if (index >= arraySize(props)) {
+        const Getter ng = 0;
+        static const GetterSetter none(ng, n);
+        return none;
+    }
+
     return props[index];
 }
 
-bool
-doGet(string_table::key prop, DisplayObject& o, as_value& val)
-{
-    const Getters& getters = displayObjectGetters();
-    const Getters::const_iterator it = getters.find(prop);
-    if (it == getters.end()) return false;
 
-    val = (*it->second)(o);
+bool
+doGet(const ObjectURI& uri, DisplayObject& o, as_value& val)
+{
+    string_table& st = getStringTable(*getObject(&o));
+    const Getter s = getGetterSetterByURI(uri, st).first;
+    if (!s) return false;
+
+    val = (*s)(o);
     return true;
 }
 
@@ -1523,23 +1563,27 @@ doGet(string_table::key prop, DisplayObject& o, as_value& val)
 /// Return true if the property is a DisplayObject property, regardless of
 /// whether it was successfully set or not.
 //
-/// @param prop     The property to search for. Note that all special
-///                 properties are lower-case, so for a caseless check
-///                 it is sufficient for prop to be caseless.
+/// @param uri     The property to search for. Note that all special
+///                properties are lower-case, so for a caseless check
+///                it is sufficient for prop to be caseless.
 bool
-doSet(string_table::key prop, DisplayObject& o, const as_value& val)
+doSet(const ObjectURI& uri, DisplayObject& o, const as_value& val)
 {
-    const Setters& setters = displayObjectSetters();
-    const Setters::const_iterator it = setters.find(prop);
-    if (it == setters.end()) return false;
+    string_table& st = getStringTable(*getObject(&o));
 
-    const Setter s = it->second;
+    const GetterSetter gs = getGetterSetterByURI(uri, st);
+     
+    // not found (all props have getters)
+    if (!gs.first) return false;
 
-    // Read-only.
+    const Setter s = gs.second;
+
+    // read-only (TODO: aserror ?)
     if (!s) return true;
-    
+
     if (val.is_undefined() || val.is_null()) {
         IF_VERBOSE_ASCODING_ERRORS(
+            // TODO: add property  name to this log...
             log_aserror(_("Attempt to set property to %s, refused"),
                 o.getTarget(), val);
         );
@@ -1548,68 +1592,6 @@ doSet(string_table::key prop, DisplayObject& o, const as_value& val)
 
     (*s)(o, val);
     return true;
-}
-
-const Getters
-displayObjectGetters()
-{
-    static const Getters getters = boost::assign::map_list_of
-        (NSV::PROP_uX, &getX)
-        (NSV::PROP_uY, &getY)
-        (NSV::PROP_uXSCALE, &getScaleX)
-        (NSV::PROP_uYSCALE, &getScaleY)
-        (NSV::PROP_uROTATION, &getRotation)
-        (NSV::PROP_uHIGHQUALITY, &getHighQuality)
-        (NSV::PROP_uQUALITY, &getQuality)
-        (NSV::PROP_uALPHA, &getAlpha)
-        (NSV::PROP_uWIDTH, &getWidth)
-        (NSV::PROP_uURL, &getURL)
-        (NSV::PROP_uHEIGHT, &getHeight)
-        (NSV::PROP_uNAME, &getNameProperty)
-        (NSV::PROP_uVISIBLE, &getVisible)
-        (NSV::PROP_uSOUNDBUFTIME, &getSoundBufTime)
-        (NSV::PROP_uFOCUSRECT, &getFocusRect)
-        (NSV::PROP_uDROPTARGET, &getDropTarget)
-        (NSV::PROP_uCURRENTFRAME, &getCurrentFrame)
-        (NSV::PROP_uFRAMESLOADED, &getFramesLoaded)
-        (NSV::PROP_uTOTALFRAMES, &getTotalFrames)
-        (NSV::PROP_uPARENT, &getParent)
-        (NSV::PROP_uTARGET, &getTarget)
-        (NSV::PROP_uXMOUSE, &getMouseX)
-        (NSV::PROP_uYMOUSE, &getMouseY);
-    return getters;
-}
-
-const Setters
-displayObjectSetters()
-{
-    const Setter n = 0;
-
-    static const Setters setters = boost::assign::map_list_of
-        (NSV::PROP_uX, &setX)
-        (NSV::PROP_uY, &setY)
-        (NSV::PROP_uXSCALE, &setScaleX)
-        (NSV::PROP_uYSCALE, &setScaleY)
-        (NSV::PROP_uROTATION, &setRotation)
-        (NSV::PROP_uHIGHQUALITY, &setHighQuality)
-        (NSV::PROP_uQUALITY, &setQuality)
-        (NSV::PROP_uALPHA, &setAlpha)
-        (NSV::PROP_uWIDTH, &setWidth)
-        (NSV::PROP_uHEIGHT, &setHeight)
-        (NSV::PROP_uNAME, &setName)
-        (NSV::PROP_uVISIBLE, &setVisible)
-        (NSV::PROP_uSOUNDBUFTIME, &setSoundBufTime)
-        (NSV::PROP_uFOCUSRECT, &setFocusRect)
-        (NSV::PROP_uDROPTARGET, n)
-        (NSV::PROP_uCURRENTFRAME, n)
-        (NSV::PROP_uFRAMESLOADED, n)
-        (NSV::PROP_uTOTALFRAMES, n)
-        (NSV::PROP_uPARENT, n)
-        (NSV::PROP_uURL, n)
-        (NSV::PROP_uTARGET, n)
-        (NSV::PROP_uXMOUSE, n)
-        (NSV::PROP_uYMOUSE, n);
-    return setters;
 }
 
 
@@ -1638,6 +1620,7 @@ getBlendModeMap()
     return bm;
 }
 
+
 // Match a blend mode to its string.
 bool
 blendModeMatches(const BlendModeMap::value_type& val, const std::string& mode)
@@ -1647,7 +1630,60 @@ blendModeMatches(const BlendModeMap::value_type& val, const std::string& mode)
     return (val.second == mode);
 }
 
+/// Return a const map of property URI to function.
+//
+/// This function takes advantage of NRVO to allow the map to
+/// be constructed in the caller.
+template<typename Map>
+const Map
+getURIMap(const typename Map::key_compare& cmp)
+{
+    const Setter n = 0;
+
+    Map ret(cmp);
+    ret.insert(std::make_pair(NSV::PROP_uX, GetterSetter(&getX, &setX)));
+    ret.insert(std::make_pair(NSV::PROP_uY, GetterSetter(&getY, &setY)));
+    ret.insert(std::make_pair(NSV::PROP_uXSCALE,
+                GetterSetter(&getScaleX, &setScaleX)));
+    ret.insert(std::make_pair(NSV::PROP_uYSCALE,
+                GetterSetter(&getScaleY, &setScaleY)));
+    ret.insert(std::make_pair(NSV::PROP_uROTATION,
+                GetterSetter(&getRotation, &setRotation)));
+    ret.insert(std::make_pair(NSV::PROP_uHIGHQUALITY,
+                GetterSetter(&getHighQuality, &setHighQuality)));
+    ret.insert(std::make_pair(NSV::PROP_uQUALITY,
+                GetterSetter(&getQuality, &setQuality)));
+    ret.insert(std::make_pair(NSV::PROP_uALPHA,
+                GetterSetter(&getAlpha, &setAlpha)));
+    ret.insert(std::make_pair(NSV::PROP_uWIDTH,
+                GetterSetter(&getWidth, &setWidth)));
+    ret.insert(std::make_pair(NSV::PROP_uHEIGHT,
+                GetterSetter(&getHeight, &setHeight)));
+    ret.insert(std::make_pair(NSV::PROP_uNAME,
+                GetterSetter(&getNameProperty, &setName)));
+    ret.insert(std::make_pair(NSV::PROP_uVISIBLE,
+                GetterSetter(&getVisible, &setVisible)));
+    ret.insert(std::make_pair(NSV::PROP_uSOUNDBUFTIME,
+                GetterSetter(&getSoundBufTime, &setSoundBufTime)));
+    ret.insert(std::make_pair(NSV::PROP_uFOCUSRECT,
+                GetterSetter(&getFocusRect, &setFocusRect)));
+    ret.insert(std::make_pair(NSV::PROP_uDROPTARGET,
+                GetterSetter(&getDropTarget, n)));
+    ret.insert(std::make_pair(NSV::PROP_uCURRENTFRAME,
+                GetterSetter(&getCurrentFrame, n)));
+    ret.insert(std::make_pair(NSV::PROP_uFRAMESLOADED,
+                GetterSetter(&getFramesLoaded, n)));
+    ret.insert(std::make_pair(NSV::PROP_uTOTALFRAMES,
+                GetterSetter(&getTotalFrames, n)));
+    ret.insert(std::make_pair(NSV::PROP_uURL, GetterSetter(&getURL, n)));
+    ret.insert(std::make_pair(NSV::PROP_uTARGET, GetterSetter(&getTarget, n)));
+    ret.insert(std::make_pair(NSV::PROP_uXMOUSE, GetterSetter(&getMouseX, n)));
+    ret.insert(std::make_pair(NSV::PROP_uYMOUSE, GetterSetter(&getMouseY, n)));
+    ret.insert(std::make_pair(NSV::PROP_uPARENT, GetterSetter(&getParent, n)));
+    return ret;
 }
+
+} // anonymous namespace
 
 std::ostream&
 operator<<(std::ostream& o, DisplayObject::BlendMode bm)
@@ -1655,7 +1691,6 @@ operator<<(std::ostream& o, DisplayObject::BlendMode bm)
     const BlendModeMap& bmm = getBlendModeMap();
     return (o << bmm.find(bm)->second);
 }
-
 
 } // namespace gnash
 

@@ -31,17 +31,14 @@ namespace gnash {
     class SWFStream;
     class RunResources;
     class StaticText;
+    class Transform;
 }
 
 namespace gnash {
 namespace SWF {
 
 
-/// StaticText DisplayObject 
-//
-/// This is either read from SWF stream 
-/// or (hopefully) created with scripting
-///
+/// Static text definition tag
 class DefineTextTag : public DefinitionTag
 {
 public:
@@ -50,7 +47,7 @@ public:
             const RunResources& r);
 
 	/// Draw the string.
-	void display(Renderer& renderer, const StaticText& inst) const;
+    void display(Renderer& renderer, const Transform& xform) const;
 	
 	const SWFRect& bounds() const {
         // TODO: There is a _matrix field in the definition(!) that's

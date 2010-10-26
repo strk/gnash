@@ -24,17 +24,6 @@
 #include "gnashconfig.h" // USE_SWFTREE
 #endif
 
-#include "event_id.h" // for inlines
-#include "SWFRect.h" // for composition (invalidated bounds)
-#include "SWFMatrix.h" // for composition
-#include "cxform.h" // for composition
-#include "dsodefs.h" //for DSOEXPORT
-#include "snappingrange.h"
-#include "VM.h"
-#ifdef USE_SWFTREE
-# include "tree.hh"
-#endif
-
 #include <vector>
 #include <map>
 #include <string>
@@ -42,11 +31,27 @@
 #include <boost/cstdint.hpp> // For C99 int types
 #include <boost/noncopyable.hpp>
 
+#include "ObjectURI.h" 
+#include "GC.h"
+#include "Transform.h"
+#include "event_id.h" 
+#include "SWFRect.h"
+#include "SWFMatrix.h"
+#include "SWFCxForm.h"
+#include "dsodefs.h" 
+#include "snappingrange.h"
+#ifdef USE_SWFTREE
+# include "tree.hh"
+#endif
+
+
 //#define DEBUG_SET_INVALIDATED 1
 
 // Forward declarations
 namespace gnash {
     class MovieClip;
+    class movie_root;
+    class fn_call;
     class Movie;
     class ExecutableCode;
     class action_buffer;
@@ -57,6 +62,8 @@ namespace gnash {
     class as_object;
     class as_value;
     class as_environment;
+    class DisplayObject;
+    class KeyVisitor;
     namespace SWF {
         class TextRecord;
     }
@@ -77,7 +84,7 @@ bool isReferenceable(const DisplayObject& d);
 /// @param obj      The DisplayObject whose property should be set
 /// @param val      An as_value representing the new value of the property.
 ///                 Some values may be rejected.
-bool setDisplayObjectProperty(DisplayObject& obj, string_table::key key,
+bool setDisplayObjectProperty(DisplayObject& obj, const ObjectURI& uri,
         const as_value& val);
 
 /// Get special properties
@@ -85,10 +92,10 @@ bool setDisplayObjectProperty(DisplayObject& obj, string_table::key key,
 /// This gets the magic properties of DisplayObjects and handles special
 /// MovieClip properties such as DisplayList members.
 //
-/// @param key      The string table key of the property to get.
+/// @param key      The uri of the property to get.
 /// @param obj      The DisplayObject whose property should be got
 /// @param val      An as_value to be set to the value of the property.
-bool getDisplayObjectProperty(DisplayObject& obj, string_table::key key,
+bool getDisplayObjectProperty(DisplayObject& obj, const ObjectURI& uri,
         as_value& val);
 
 /// Get a property by its numeric index.
@@ -115,6 +122,21 @@ void setIndexedProperty(size_t index, DisplayObject& o, const as_value& val);
 /// @param from     The DisplayObject to copy from
 /// @param to       The DisplayObject to copy to.
 void copyMatrix(const DisplayObject& from, DisplayObject& to);
+
+/// Get concatenated SWFMatrix (all ancestor transforms and our SWFMatrix)
+//
+/// Maps from our local space into "world" space
+/// (i.e. root movie space).
+//
+/// @param includeRoot      Whether the transform of the Stage (_root)
+///                         should be concatenated. This is required to be
+///                         false for pointInBounds.
+SWFMatrix getWorldMatrix(const DisplayObject& d, bool includeRoot = true);
+
+/// Get concatenated color transform of a DisplayObject
+//
+/// Maps from our local space into normal color space.
+SWFCxForm getWorldCxForm(const DisplayObject& d);
 
 /// DisplayObject is the base class for all DisplayList objects.
 //
@@ -220,18 +242,16 @@ public:
 
     /// Enumerate any non-proper properties
     //
-    /// This function is called by enumerateProperties(as_environment&) 
-    /// to allow for enumeration of properties that are derived from the
-    /// DisplayObject type, e.g. DisplayList members.
+    /// This function allows enumeration of properties that are
+    /// derived from the DisplayObject type, e.g. DisplayList members.
     ///
     /// The default implementation adds nothing
-    ///
-    virtual void enumerateNonProperties(as_environment&) const {}
+    virtual void visitNonProperties(KeyVisitor&) const {}
 
     /// \brief
     /// Return the parent of this DisplayObject, or NULL if
     /// the DisplayObject has no parent.
-    DisplayObject* get_parent() const
+    DisplayObject* parent() const
     {
         return _parent;
     }
@@ -270,9 +290,11 @@ public:
     virtual int getDefinitionVersion() const {
         return -1;
     }
+    
+    const Transform& transform() const {
+        return _transform;
+    }
 
-    /// Get local transform SWFMatrix for this DisplayObject
-    const SWFMatrix& getMatrix() const { return m_matrix; }
 
     /// Set local transform SWFMatrix for this DisplayObject
     //
@@ -329,21 +351,18 @@ public:
     ///
     virtual void setHeight(double height);
 
-    const cxform& get_cxform() const { return m_color_transform; }
-
-    void set_cxform(const cxform& cx) 
+    void setCxForm(const SWFCxForm& cx) 
     {       
-        if (cx != m_color_transform) {
-            set_invalidated(__FILE__, __LINE__);
-            m_color_transform = cx;
+        if (_transform.colorTransform != cx) {
+            set_invalidated();
+            _transform.colorTransform = cx;
         }
     }
 
     int get_ratio() const { return _ratio; }
 
-    void set_ratio(int r)
-    {
-        if (r != _ratio) set_invalidated(__FILE__, __LINE__); 
+    void set_ratio(int r) {
+        if (r != _ratio) set_invalidated(); 
         _ratio = r;       
     }
 
@@ -408,30 +427,11 @@ public:
     void setMask(DisplayObject* mask);
 
     /// Set DisplayObject name, initializing the original target member
-    void set_name(string_table::key name) {
-        _name = name;
+    void set_name(const ObjectURI& uri) {
+        _name = uri;
     }
 
-    string_table::key get_name() const { return _name; }
-
-    /// \brief
-    /// Get our concatenated SWFMatrix (all our ancestor transforms,
-    /// times our SWFMatrix). 
-    ///
-    /// Maps from our local space into "world" space
-    /// (i.e. root movie space).
-    //
-    /// @param includeRoot      Whether the transform of the Stage (_root)
-    ///                         should be concatenated. This is required to be
-    ///                         false for pointInBounds.
-    DSOEXPORT SWFMatrix getWorldMatrix(bool includeRoot = true) const;
-
-    /// \brief
-    /// Get our concatenated color transform (all our ancestor transforms,
-    /// times our cxform). 
-    ///
-    /// Maps from our local space into normal color space.
-    virtual cxform get_world_cxform() const;
+    const ObjectURI& get_name() const { return _name; }
 
     /// Get the built-in function handlers code for the given event
     //
@@ -467,7 +467,7 @@ public:
     /// Render the DisplayObject.
     //
     /// All DisplayObjects must have a display() function.
-	virtual void display(Renderer& renderer) = 0;
+	virtual void display(Renderer& renderer, const Transform& xform) = 0;
 
     /// Search for StaticText objects
     //
@@ -490,7 +490,7 @@ public:
     bool pointInBounds(boost::int32_t x, boost::int32_t y) const
     {
         SWFRect bounds = getBounds();
-        SWFMatrix wm = getWorldMatrix(false);
+        const SWFMatrix wm = getWorldMatrix(*this, false);
         wm.transform(bounds);
         return bounds.point_test(x, y);
     }
@@ -531,7 +531,7 @@ public:
     /// against this DisplayObject's parent.
     ///
     virtual Movie* get_root() const {
-        return get_parent()->get_root();
+        return parent()->get_root();
     }
 
     /// Return the _root ActionScript property of this DisplayObject.
@@ -560,7 +560,7 @@ public:
     /// In ActionScript 1.0, everything seems to be CASE
     /// INSENSITIVE.
     ///
-    virtual as_object* pathElement(string_table::key key);
+    virtual as_object* pathElement(const ObjectURI& uri);
 
     /// \brief
     /// Return true if PlaceObjects tag are allowed to move
@@ -795,7 +795,9 @@ public:
     virtual void getLoadedMovie(Movie* newMovie);
 
     /// Return true if this DisplayObject was unloaded from the stage
-    bool unloaded() const;
+    bool unloaded() const {
+        return _unloaded;
+    }
 
     /// Mark this DisplayObject as destroyed
     //
@@ -862,8 +864,7 @@ public:
     bool DSOEXPORT allowHandCursor() const;
 
 #ifdef USE_SWFTREE
-    typedef std::pair<std::string, std::string> StringPair; 
-    typedef tree<StringPair> InfoTree; 
+    typedef tree<std::pair<std::string, std::string> > InfoTree; 
     /// Append DisplayObject info in the tree
     //
     /// @param tr
@@ -873,8 +874,6 @@ public:
     /// The iterator to append info to.
     ///
     /// @return iterator the appended subtree
-    ///
-    // TODO: use a typedef for tree<StringPair> ?
     virtual InfoTree::iterator getMovieInfo(InfoTree& tr,
             InfoTree::iterator it);
 #endif
@@ -942,7 +941,9 @@ public:
         return _yscale;
     }
 
-    as_object* object() const;
+    as_object* object() const {
+        return _object;
+    }
 
     /// Getter-setter for blendMode.
     static as_value blendMode(const fn_call& fn);
@@ -961,6 +962,24 @@ public:
 
 protected:
     
+    /// Render a dynamic mask for a specified DisplayObject
+    //
+    /// Dynamic masks are rendered out-of-turn when the object they are masking
+    /// is drawn. 
+    //
+    /// A MaskRenderer object should be constructed at the beginning of
+    /// relevant display() functions; it then takes care of rendering the
+    /// mask with the appropriate transform and cleaning up afterwards.
+    class MaskRenderer
+    {
+    public:
+        MaskRenderer(Renderer& r, const DisplayObject& o);
+        ~MaskRenderer();
+    private:
+        Renderer& _renderer;
+        DisplayObject* _mask;
+    };
+
     virtual bool unloadChildren() { return false; }
 
     /// Get the movie_root to which this DisplayObject belongs.
@@ -979,7 +998,6 @@ protected:
         _origTarget=getTarget();
     }
 
-
     const Events& get_event_handlers() const
     {
         return _event_handlers;
@@ -988,7 +1006,7 @@ protected:
     void set_event_handlers(const Events& copyfrom);
 
     /// Name of this DisplayObject (if any)
-    string_table::key _name;
+    ObjectURI _name; 
 
     DisplayObject* _parent;
 
@@ -1026,9 +1044,7 @@ private:
     /// The movie_root to which this DisplayObject belongs.
     movie_root& _stage;
 
-    cxform m_color_transform;
-    
-    SWFMatrix m_matrix;
+    Transform _transform;
     
     Events _event_handlers;
 
@@ -1100,6 +1116,37 @@ private:
 
 
 };
+
+/// Get local transform SWFMatrix for this DisplayObject
+inline const SWFMatrix&
+getMatrix(const DisplayObject& o)
+{ 
+    return o.transform().matrix;
+}
+
+inline const SWFCxForm&
+getCxForm(const DisplayObject& o) 
+{
+    return o.transform().colorTransform;
+}
+
+inline SWFMatrix
+getWorldMatrix(const DisplayObject& d, bool includeRoot)
+{
+    SWFMatrix m = d.parent() ?
+        getWorldMatrix(*d.parent(), includeRoot) : SWFMatrix();
+
+    if (d.parent() || includeRoot) m.concatenate(getMatrix(d));
+    return m;
+}
+
+inline SWFCxForm
+getWorldCxForm(const DisplayObject& d)
+{
+    SWFCxForm cx = d.parent() ? getWorldCxForm(*d.parent()) : SWFCxForm();
+    cx.concatenate(getCxForm(d));
+    return cx;
+}
 
 inline bool
 isReferenceable(const DisplayObject& d)

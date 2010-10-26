@@ -17,14 +17,21 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+#include "LocalConnection_as.h"
+
+#include <boost/shared_ptr.hpp>
+#include <cerrno>
+#include <cstring>
+#include <boost/cstdint.hpp> // for boost::?int??_t
+#include <boost/assign/list_of.hpp>
+#include <boost/bind.hpp>
+
 #include "GnashSystemIOHeaders.h"
 
 #include "VM.h"
 #include "movie_root.h"
-#include "URLAccessManager.h"
 #include "URL.h"
 #include "log.h"
-#include "LocalConnection_as.h"
 #include "fn_call.h"
 #include "Global_as.h"
 #include "builtin_function.h"
@@ -36,13 +43,9 @@
 #include "AMFConverter.h"
 #include "ClockTime.h"
 #include "GnashAlgorithm.h"
+#include "RunResources.h"
+#include "StreamProvider.h"
 
-#include <boost/shared_ptr.hpp>
-#include <cerrno>
-#include <cstring>
-#include <boost/cstdint.hpp> // for boost::?int??_t
-#include <boost/assign/list_of.hpp>
-#include <boost/bind.hpp>
 
 /// From observing the behaviour of the pp, the following seem to be true.
 //
@@ -204,9 +207,7 @@ public:
     /// @param owner    The as_object that owns this Relay.
     LocalConnection_as(as_object* owner);
     
-    virtual ~LocalConnection_as() {
-        close();
-    }
+    virtual ~LocalConnection_as() {}
 
     /// Remove ourself as a listener (if connected).
     void close();
@@ -867,11 +868,10 @@ executeAMFFunction(as_object& o, amf::Reader& rd)
         if (rd(a)) log_debug("First Number: %s", a);
 
         // Handle negative numbers.
-        const size_t count = std::max<int>(0, toInt(a));
+        const size_t count = std::max<int>(0, toInt(a, getVM(o)));
 
         // We don't know what the second number signifies.
         if (rd(a)) log_debug("Second Number: %s", a);
-
 
         for (size_t i = 0; i < count; ++i) {
             if (!rd(a)) {
@@ -896,7 +896,7 @@ executeAMFFunction(as_object& o, amf::Reader& rd)
 
     // Call the method on this LocalConnection object.
     string_table& st = getStringTable(o);
-    as_function* f = o.getMember(st.find(meth)).to_function();
+    as_function* f = getMember(o, st.find(meth)).to_function();
 
     invoke(f, as_environment(getVM(o)), &o, args);
 }
@@ -935,7 +935,7 @@ std::string
 getDomain(as_object& o)
 {
     
-    URL url(getRoot(o).getOriginalURL());
+    const URL& url = getRunResources(o).streamProvider().originalURL();
 
     if (url.hostname().empty()) {
         return "localhost";

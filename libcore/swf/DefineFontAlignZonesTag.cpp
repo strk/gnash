@@ -107,7 +107,7 @@ DefineFontAlignZonesTag::loader(SWFStream& in, TagType tag,
 			
     }
 	in.skip_to_tag_end();
-	LOG_ONCE(log_unimpl(_("*** DefineFontAlignZoneTag")));
+	LOG_ONCE(log_unimpl(_("DefineFontAlignZoneTag")));
 
 }
 

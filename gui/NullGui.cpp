@@ -53,13 +53,15 @@ NullGui::run()
 
     if ( _timeout && now > _timeout)
     {
-        break;
+        log_debug("NullGui: exiting on timeout");
+        return false;
     }
     
     prevtime = now;
 
   }
 
+  log_debug("NullGui: exiting on quit");
   return false;
 }
 

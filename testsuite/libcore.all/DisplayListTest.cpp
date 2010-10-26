@@ -30,6 +30,7 @@
 #include "movie_definition.h"
 #include "ManualClock.h"
 #include "RunResources.h"
+#include "StreamProvider.h"
 
 #include <iostream>
 #include <sstream>
@@ -48,9 +49,10 @@ main(int /*argc*/, char** /*argv*/)
     dbglogfile.setVerbosity();
     
     // Initialize gnash lib
-    gnashInit();
     
-    RunResources ri("");
+    RunResources ri;
+    ri.setStreamProvider(
+            boost::shared_ptr<StreamProvider>(new StreamProvider(URL(""))));
     
     // Initialize a VM
     boost::intrusive_ptr<movie_definition> md5(new DummyMovieDefinition(ri, 5));
@@ -75,8 +77,8 @@ main(int /*argc*/, char** /*argv*/)
     MovieClip* root = const_cast<Movie*>(&stage.getRootMovie());
     
     // just a couple of DisplayObjects
-    as_object* ob1 = getGlobal(*getObject(root)).createObject();
-    as_object* ob2 = getGlobal(*getObject(root)).createObject();
+    as_object* ob1 = createObject(getGlobal(*getObject(root)));
+    as_object* ob2 = createObject(getGlobal(*getObject(root)));
     
     boost::intrusive_ptr<DisplayObject> ch1 ( new DummyCharacter(ob1, root) );
     boost::intrusive_ptr<DisplayObject> ch2 ( new DummyCharacter(ob2, root) );
@@ -89,11 +91,6 @@ main(int /*argc*/, char** /*argv*/)
     dlist2.placeDisplayObject( ch2.get(), 1);
     dlist2.placeDisplayObject( ch1.get(), 2);
     
-    // Resort dlist1 as depth of it's chars has been changed
-    // by placeDisplayObject calls above :/
-    dlist1.sort();
-    
-    check_equals(dlist1, dlist2);
     
 }
 

@@ -20,10 +20,8 @@
 #include "URL.h"
 #include "log.h"
 #include "StringPredicates.h" 
-#include "VM.h" 
-#include "movie_root.h" 
 #include "rc.h" // for rcfile
-#include "GnashSystemIOHeaders.h"
+#include "GnashSystemNetHeaders.h"
 
 #include <cerrno> 
 #include <iostream>
@@ -67,7 +65,7 @@ accessPolicyString(AccessPolicy policy)
 //static AccessPolicy defaultAccessPolicy = GRANT;
 
 /// A cache of AccessPolicy defined for URLs
-typedef std::map< std::string, AccessPolicy > AccessPolicyCache;
+typedef std::map<std::string, AccessPolicy> AccessPolicyCache;
 
 /// A global AccessPolicyCache
 static AccessPolicyCache policyCache;
@@ -83,14 +81,13 @@ host_check_blackwhite_lists(const std::string& host)
 
 	RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
-	vector<string>::iterator it;
 
-	vector<string> whitelist = rcfile.getWhiteList();
-	if ( whitelist.size() )
-	{
+	const std::vector<std::string>& whitelist = rcfile.getWhiteList();
+	if (!whitelist.empty()) {
 		// TODO: case-insensitive matching ? 
-		it = std::find(whitelist.begin(), whitelist.end(), host);
-		if ( it != whitelist.end() ) {
+        std::vector<std::string>::const_iterator it =
+            std::find(whitelist.begin(), whitelist.end(), host);
+		if (it != whitelist.end()) {
 			log_security(_("Load from host %s granted (whitelisted)"),
 				host);
 			return true;
@@ -104,18 +101,19 @@ host_check_blackwhite_lists(const std::string& host)
 		return false;
 	}
 
-	vector<string> blacklist = rcfile.getBlackList();
+    const std::vector<std::string>& blacklist = rcfile.getBlackList();
+
 	// TODO: case-insensitive matching ? 
-	it = std::find(blacklist.begin(), blacklist.end(), host);
-	if ( it != blacklist.end() )
-	{
+    std::vector<std::string>::const_iterator it =
+        std::find(blacklist.begin(), blacklist.end(), host);
+
+	if (it != blacklist.end()) {
 		log_security(_("Load from host %s forbidden (blacklisted)"),
 			host);
 		return false;
 	}
 
-	log_security(_("Load from host %s granted (default)"),
-		host);
+	log_security(_("Load from host %s granted (default)"), host);
 	return true;
 }
 
@@ -139,24 +137,19 @@ pathIsUnderDir(const std::string& path, const std::string& dir)
 /// Return true if we allow load of the local resource, false otherwise.
 //
 static bool
-local_check(const std::string& path)
+local_check(const std::string& path, const URL& baseUrl)
 {
 //    GNASH_REPORT_FUNCTION;
 
     assert( ! path.empty() );
 
     // Don't allow local access if starting movie is a network resource.
-    if ( VM::isInitialized() )
-    {
-       URL baseUrl(VM::get().getRoot().getOriginalURL());
-       if ( baseUrl.protocol() != "file" )
-       {
-          log_security(_("Load of file %s forbidden"
-              " (starting url %s is not a local resource)"),
-              path, baseUrl.str());
-          return false;
-       }
-    } // else we didn't start yet, so path *is* the starting movie
+   if (baseUrl.protocol() != "file") {
+      log_security(_("Load of file %s forbidden"
+          " (starting url %s is not a local resource)"),
+          path, baseUrl.str());
+      return false;
+   }
 
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
     
@@ -214,17 +207,17 @@ host_check(const std::string& host)
 
     #define MAXHOSTNAMELEN 200
     char name[MAXHOSTNAMELEN];
-    if ( -1 == gethostname(name, MAXHOSTNAMELEN) )
+    if (::gethostname(name, MAXHOSTNAMELEN) == -1)
     {
         // FIXME: strerror is NOT thread-safe
-        log_error(_("gethostname failed: %s"), strerror(errno)); 
+        log_error(_("gethostname failed: %s"), std::strerror(errno)); 
         return host_check_blackwhite_lists(host);
     }
     // From GETHOSTNAME(2): 
     // In case the NUL-terminated hostname does not fit,
     // no  error is returned, but the hostname is truncated. It is unspecified
     // whether the truncated hostname will be NUL-terminated.
-    name[MAXHOSTNAMELEN-1] = '\0'; // unlikely, still worth making sure...
+    name[MAXHOSTNAMELEN - 1] = '\0'; // unlikely, still worth making sure...
 
     // ok, let's use std::strings... we're a C++ program after all !
     std::string hostname(name); // the hostname
@@ -275,7 +268,7 @@ allowXMLSocket(const std::string& host, short port)
 
 
 bool
-allow(const URL& url)
+allow(const URL& url, const URL& baseurl)
 {
 	log_security(_("Checking security of URL '%s'"), url);
 
@@ -292,7 +285,7 @@ allow(const URL& url)
             log_error(_("Network connection without hostname requested"));
             return false;
         }
-		return local_check(url.path());
+		return local_check(url.path(), baseurl);
 	}
 	return host_check(host);
 }

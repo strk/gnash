@@ -32,7 +32,7 @@
 #include "dbus_ext.h"
 #include "fn_call.h"
 #include "as_object.h"
-#include "Globals.h"
+#include "Global_as.h"
 #include "builtin_function.h" // need builtin_function
 
 using namespace std;
@@ -108,7 +108,7 @@ void
 dbus_class_init(as_object &obj)
 {
     Global_as& gl = getGlobal(obj);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     attachInterface(*proto);
     as_object* cl = gl.createClass(&dbus_ctor, proto);
 	

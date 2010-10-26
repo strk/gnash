@@ -51,7 +51,6 @@ namespace gnash {
     class TextField;
     class BitmapData_as;
     class CachedBitmap;
-    class GnashImage;
     namespace SWF {
         class PlaceObject2Tag;
     }
@@ -262,9 +261,15 @@ public:
     /// Look up the labeled frame, and jump to it.
     bool goto_labeled_frame(const std::string& label);
         
-    /// Display (render?) this Sprite/MovieClip, unless invisible
-    void display(Renderer& renderer);
+    /// Render this MovieClip.
+    virtual void display(Renderer& renderer, const Transform& xform);
     
+    /// Draw this MovieClip
+    //
+    /// This is effectively the same as display(), but uses only the passed
+    /// transform.
+    void draw(Renderer& renderer, const Transform& xform);
+
     void omit_display();
 
     /// Swap depth of the given DisplayObjects in the DisplayList
@@ -454,13 +459,13 @@ public:
     /// MovieClip object. They take priority over DisplayObject magic
     /// properties and inherited properties, but not over own properties.
     //
-    /// @param name     The name of the object. This function handles
+    /// @param name     Object identifier. This function handles
     ///                 case-sensitivity.
     /// @return         The object if found, otherwise 0.
-    DisplayObject* getDisplayListObject(string_table::key name);
+    DisplayObject* getDisplayListObject(const ObjectURI& uri);
 
     /// Overridden to look in DisplayList for a match
-    as_object* pathElement(string_table::key key);
+    as_object* pathElement(const ObjectURI& uri);
 
     /// Execute the actions for the specified frame. 
     //
@@ -549,16 +554,6 @@ public:
     /// testsuite/misc-ming.all/displaylist_depths_test.swf
     void removeMovieClip();
 
-    /// Render this MovieClip to a GnashImage using the passed transform
-    //
-    /// @return     The GnashImage with the MovieClip drawn onto it.
-    virtual std::auto_ptr<GnashImage> drawToBitmap(
-            const SWFMatrix& mat = SWFMatrix(), 
-            const cxform& cx = cxform(),
-            DisplayObject::BlendMode bm = DisplayObject::BLENDMODE_NORMAL,
-            const SWFRect& clipRect = SWFRect(),
-            bool smooth = false);
-
     /// Direct access to the Graphics object for drawing.
     DynamicShape& graphics() {
         set_invalidated();
@@ -577,9 +572,8 @@ public:
 
     /// Enumerate child DisplayObjects
     //
-    /// See as_object::enumerateNonProperties(as_environment&) for more info.
-    ///
-    virtual void enumerateNonProperties(as_environment&) const;
+    /// See DisplayObject::enumerateNonProperties for more info.
+    virtual void visitNonProperties(KeyVisitor& v) const;
 
     /// Delete DisplayObjects removed from the stage
     /// from the display lists

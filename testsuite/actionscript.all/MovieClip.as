@@ -115,19 +115,19 @@ check(!MovieClip.prototype.hasOwnProperty("_global"));
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(338); // SWF5
+	check_totals(347); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(910); // SWF6
+	check_totals(919); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(943); // SWF7
+	check_totals(952); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(1033); // SWF8+
+	check_totals(1069); // SWF8+
 #endif
 
 	play();
@@ -1085,6 +1085,99 @@ this.$version = "fake version";
 check_equals(this.$version, 'fake version');
 check(delete $version);
 check_equals(typeof(this.$version), 'undefined');
+
+// Test filters
+
+// A new array is returned each time; each element is recreated each time.
+// Non-filter objects passed to the setter in the array are ignored.
+// Assigning a non-array also clears the filters.
+// A fake array works.
+
+#if OUTPUT_VERSION > 7
+    check_equals(typeof(_root.filters), "object");
+    check(_root.filters.hasOwnProperty("length"));
+    check_equals(_root.filters.length, 0);
+
+    _root.filters = 7;
+    check_equals(typeof(_root.filters), "object");
+
+    _root.filters.push(7);
+    check_equals(_root.filters.toString(), "");
+
+    _root.filters.push(new Object());
+    check_equals(_root.filters.toString(), "");
+
+    _root.filters.push(new Date(0));
+    check_equals(_root.filters.toString(), "");
+
+    _root.filters.length = 4;
+    check_equals(_root.filters.toString(), "");
+    check_equals(_root.filters.length, 0);
+
+    _root.filters.push(new flash.filters.ConvolutionFilter());
+    check_equals(_root.filters.toString(), "");
+
+    _root.filters = [ 1, 3, 4, 5 ];
+    check_equals(_root.filters.length, 0);
+    check_equals(_root.filters.toString(), "");
+
+    _root.filters = [ new flash.filters.ConvolutionFilter() ];
+    xcheck_equals(_root.filters.length, 1);
+    xcheck_equals(_root.filters.toString(), "[object Object]");
+
+    _root.filters = [ new flash.filters.ConvolutionFilter(),
+                      new flash.filters.DropShadowFilter() ];
+    xcheck_equals(_root.filters.length, 2);
+    xcheck_equals(_root.filters.toString(), "[object Object],[object Object]");
+
+    // The filters are recreated every time.
+    tmp1 = _root.filters;
+    tmp2 = _root.filters;
+    xcheck(tmp1[0] !== tmp2[0]);
+    
+    _root.filters = [ new flash.filters.ConvolutionFilter(),
+                      new flash.filters.DropShadowFilter(),
+                      "boh!" ];
+    xcheck_equals(_root.filters.length, 2);
+    xcheck_equals(_root.filters.toString(), "[object Object],[object Object]");
+
+    _root.filters = [ new flash.filters.ConvolutionFilter(),
+                      "boh!",
+                      new flash.filters.BlurFilter() ];
+    xcheck_equals(_root.filters.length, 2);
+    xcheck_equals(_root.filters.toString(), "[object Object],[object Object]");
+    
+    _root.filters = 34;
+    check_equals(_root.filters.length, 0);
+
+    fake = {};
+    fake.length = 3;
+    fake[0] = new flash.filters.ConvolutionFilter();
+    fake[1] = new flash.filters.DisplacementMapFilter();
+    fake[2] = new flash.filters.ConvolutionFilter();
+    _root.filters = fake;
+    xcheck_equals(_root.filters.length, 3);
+    xcheck_equals(_root.filters.toString(),
+        "[object Object],[object Object],[object Object]");
+
+    backup = _global.Array;
+
+    called = 0;
+
+    // It uses [], not new Array().
+    _global.Array = function() { this.test = "passed"; };
+    ch = _root.filters;
+    check_equals(ch.test, undefined);
+    ch.toString = backup.prototype.toString;
+    xcheck_equals(ch.toString(), 
+        "[object Object],[object Object],[object Object]");
+    
+    _global.Array = backup;
+    
+    _root.filters = "";
+    check_equals(_root.filters.length, 0);
+
+#endif
 
 //------------------------------------------------
 // Test getProperty 
@@ -2384,8 +2477,37 @@ check_equals(r._quality, "HIGH");
 check_equals(typeof(r._quality), "string");
 check_equals(r._highquality, 1);
 check_equals(_root._highquality, 1);
-#endif 
+#endif
+
+// Check the old toggle quality action
+check_equals(_root._quality, "HIGH");
+
+toggleQuality();
+check_equals(_root._quality, "LOW");
+
+toggleQuality();
+check_equals(_root._quality, "HIGH");
+
+_root._quality = "medium";
+check_equals(_root._quality, "MEDIUM");
+
+toggleQuality();
+check_equals(_root._quality, "HIGH");
+
+_root._quality = "medium";
+check_equals(_root._quality, "MEDIUM");
+
+toggleQuality();
+check_equals(_root._quality, "HIGH");
+
+toggleQuality();
+check_equals(_root._quality, "LOW");
+
+toggleQuality();
+check_equals(_root._quality, "HIGH");
+
 //_root.loadVariables(MEDIA(vars.txt), "GET");
+
 
 // Can't rely on this to call onData!
 

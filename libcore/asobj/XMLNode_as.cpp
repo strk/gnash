@@ -44,12 +44,14 @@ namespace gnash {
 
 // Function Prototypes
 namespace {
+    typedef std::pair<std::string, std::string> StringPair;
+    typedef std::vector<StringPair> StringPairs;
     void enumerateAttributes(const XMLNode_as& node,
-            as_object::SortedPropertyList& attributes);
-    bool prefixMatches(const as_object::SortedPropertyList::value_type& val,
+            StringPairs& attributes);
+    bool prefixMatches(const StringPairs::value_type& val,
             const std::string& prefix);
     bool namespaceMatches(
-            const as_object::SortedPropertyList::value_type& val,
+            const StringPairs::value_type& val,
             const std::string& ns);    
 
     as_value xmlnode_new(const fn_call& fn);
@@ -75,7 +77,6 @@ namespace {
     as_value xmlnode_localName(const fn_call& fn);
     as_value xmlnode_prefix(const fn_call& fn);
     void attachXMLNodeInterface(as_object& o);
-    void attachXMLNodeStaticInterface(as_object& o);
 }
 
 XMLNode_as::XMLNode_as(Global_as& gl)
@@ -123,11 +124,11 @@ XMLNode_as::object()
     // but not quite. There is no __constructor__ property, and when we
     // override _global.XMLNode, we can show that it is not called.
     if (!_object) {
-        as_object* o = _global.createObject();
+        as_object* o = createObject(_global);
         as_object* xn =
-            _global.getMember(NSV::CLASS_XMLNODE).to_object(_global);
+            toObject(getMember(_global, NSV::CLASS_XMLNODE), getVM(_global));
         if (xn) {
-            o->set_prototype(xn->getMember(NSV::PROP_PROTOTYPE));
+            o->set_prototype(getMember(*xn, NSV::PROP_PROTOTYPE));
             o->init_member(NSV::PROP_CONSTRUCTOR, xn);
         }
         o->setRelay(this);
@@ -300,8 +301,8 @@ bool
 XMLNode_as::getPrefixForNamespace(const std::string& ns, std::string& prefix)
 {
     XMLNode_as* node = this;
-    as_object::SortedPropertyList::const_iterator it; 
-    as_object::SortedPropertyList attrs;
+    StringPairs::const_iterator it; 
+    StringPairs attrs;
     
     while (node) {
         enumerateAttributes(*node, attrs);
@@ -337,8 +338,8 @@ void
 XMLNode_as::getNamespaceForPrefix(const std::string& prefix, std::string& ns)
 {
     XMLNode_as* node = this;
-    as_object::SortedPropertyList::const_iterator it; 
-    as_object::SortedPropertyList attrs;
+    StringPairs::const_iterator it; 
+    StringPairs attrs;
     
     while (node) {
 
@@ -412,11 +413,11 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
         xmlout << "<" << nodeName;
     
         // Process the attributes, if any
-        as_object::SortedPropertyList attrs;
+        StringPairs attrs;
         enumerateAttributes(xml, attrs);
         if (!attrs.empty()) {
 
-            for (as_object::SortedPropertyList::iterator i = 
+            for (StringPairs::iterator i = 
                     attrs.begin(), e = attrs.end(); i != e; ++i) { 
                 escapeXML(i->second);
                 xmlout << " " << i->first << "=\"" << i->second << "\"";
@@ -465,6 +466,11 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
 void
 XMLNode_as::setReachable() 
 {
+    // If there is a parent, make sure its object is reachable. This goes
+    // up towards the root node of tree without marking the XMLNode
+    // resources (which would cause infinite recursion).
+    if (_parent && _parent->_object) _parent->_object->setReachable();
+
 	// Mark children
     std::for_each(_children.begin(), _children.end(),
             boost::mem_fn(&XMLNode_as::setReachable));
@@ -475,6 +481,7 @@ XMLNode_as::setReachable()
     if (_object) _object->setReachable();
 
     if (_childNodes) _childNodes->setReachable();
+
 }
 
 void
@@ -495,7 +502,7 @@ void
 xmlnode_class_init(as_object& where, const ObjectURI& uri)
 {
     Global_as& gl = getGlobal(where);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     attachXMLNodeInterface(*proto);
     as_object* cl = gl.createClass(&xmlnode_new, proto);
 
@@ -526,26 +533,25 @@ attachXMLNodeInterface(as_object& o)
     const int protectedFlags = 0;
 
     // Just the protected flag:
-    o.init_property("nodeValue", &xmlnode_nodeValue, 
-            &xmlnode_nodeValue, protectedFlags);
-    o.init_property("nodeName", &xmlnode_nodeName, 
-            &xmlnode_nodeName, protectedFlags);
 
+    o.init_readonly_property("attributes", &xmlnode_attributes, protectedFlags);
+    o.init_readonly_property("childNodes", &xmlnode_childNodes, protectedFlags);
     o.init_readonly_property("firstChild", &xmlnode_firstChild, protectedFlags);
     o.init_readonly_property("lastChild", &xmlnode_lastChild, protectedFlags);
+    o.init_readonly_property("nextSibling", 
+            &xmlnode_nextSibling, protectedFlags);
+    o.init_property("nodeName", &xmlnode_nodeName, 
+            &xmlnode_nodeName, protectedFlags);
+    o.init_readonly_property("nodeType", &xmlnode_nodeType, protectedFlags);
+    o.init_property("nodeValue", &xmlnode_nodeValue, 
+            &xmlnode_nodeValue, protectedFlags);
+    o.init_readonly_property("parentNode", &xmlnode_parentNode, protectedFlags);
+    o.init_readonly_property("previousSibling", 
+            &xmlnode_previousSibling, protectedFlags);
+    o.init_readonly_property("prefix", &xmlnode_prefix, protectedFlags);
     o.init_readonly_property("localName", &xmlnode_localName, protectedFlags);
     o.init_readonly_property("namespaceURI", 
             &xmlnode_namespaceURI, protectedFlags);
-    o.init_readonly_property("nextSibling", 
-            &xmlnode_nextSibling, protectedFlags);
-    o.init_readonly_property("prefix", &xmlnode_prefix, protectedFlags);
-    o.init_readonly_property("previousSibling", 
-            &xmlnode_previousSibling, protectedFlags);
-    o.init_readonly_property("nodeType", &xmlnode_nodeType, protectedFlags);
-    o.init_readonly_property("attributes", &xmlnode_attributes, protectedFlags);
-    o.init_readonly_property("childNodes", &xmlnode_childNodes, protectedFlags);
-    o.init_readonly_property("parentNode", &xmlnode_parentNode, protectedFlags);
-
 }
 
 
@@ -560,7 +566,7 @@ xmlnode_new(const fn_call& fn)
     }
 
     std::auto_ptr<XMLNode_as> xml(new XMLNode_as(getGlobal(fn)));
-    xml->nodeTypeSet(XMLNode_as::NodeType(toInt(fn.arg(0))));
+    xml->nodeTypeSet(XMLNode_as::NodeType(toInt(fn.arg(0), getVM(fn))));
 
     if (fn.nargs > 1) {
         const std::string& str = fn.arg(1).to_string();
@@ -598,7 +604,7 @@ xmlnode_appendChild(const fn_call& fn)
 	}
 
 	XMLNode_as* node;
-    if (!isNativeType(fn.arg(0).to_object(getGlobal(fn)), node)) {
+    if (!isNativeType(toObject(fn.arg(0), getVM(fn)), node)) {
 		IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("First argument to XMLNode::appendChild() is not "
                     "an XMLNode"));
@@ -622,7 +628,7 @@ xmlnode_cloneNode(const fn_call& fn)
     XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
 
     bool deep = false;
-    if (fn.nargs > 0) deep = fn.arg(0).to_bool();
+    if (fn.nargs > 0) deep = toBool(fn.arg(0), getVM(fn));
 
     as_object* newnode = ptr->cloneNode(deep)->object();
     return as_value(newnode);
@@ -646,7 +652,7 @@ xmlnode_insertBefore(const fn_call& fn)
 
 	XMLNode_as* newnode;
 
-    if (!isNativeType(fn.arg(0).to_object(getGlobal(fn)), newnode)) {
+    if (!isNativeType(toObject(fn.arg(0), getVM(fn)), newnode)) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
 		log_aserror(_("First argument to XMLNode.insertBefore(%s) is not "
@@ -657,7 +663,7 @@ xmlnode_insertBefore(const fn_call& fn)
 
 	XMLNode_as* pos;
 
-    if (!isNativeType(fn.arg(1).to_object(getGlobal(fn)), pos)) {
+    if (!isNativeType(toObject(fn.arg(1), getVM(fn)), pos)) {
 		IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
 		log_aserror(_("Second argument to XMLNode.insertBefore(%s) is not "
@@ -971,7 +977,7 @@ xmlnode_parentNode(const fn_call& fn)
     rv.set_null();
 
     XMLNode_as* ptr = ensure<ThisIsNative<XMLNode_as> >(fn);
-    XMLNode_as *node = ptr->getParent();
+    XMLNode_as* node = ptr->getParent();
     if (node) {
         rv = node->object();
     }
@@ -987,13 +993,20 @@ xmlnode_childNodes(const fn_call& fn)
 
 
 void
-enumerateAttributes(const XMLNode_as& node,
-        as_object::SortedPropertyList& attrs)
+enumerateAttributes(const XMLNode_as& node, StringPairs& pairs)
 {
-    attrs.clear();
+    pairs.clear();
+
     as_object* obj = node.getAttributes();
     if (obj) {
-        enumerateProperties(*obj, attrs);
+        string_table& st = getStringTable(*obj);
+        SortedPropertyList attrs = enumerateProperties(*obj);
+        for (SortedPropertyList::const_reverse_iterator i = attrs.rbegin(), 
+                e = attrs.rend(); i != e; ++i) {
+            // TODO: second argument should take version.
+            pairs.push_back(
+                std::make_pair(i->first.toString(st), i->second.to_string()));
+        }
     }
 
 }
@@ -1001,7 +1014,7 @@ enumerateAttributes(const XMLNode_as& node,
 /// Return true if this attribute is a namespace specifier and the
 /// namespace matches.
 bool
-namespaceMatches(const as_object::SortedPropertyList::value_type& val,
+namespaceMatches(const StringPairs::value_type& val,
         const std::string& ns)
 {
     StringNoCaseEqual noCaseCompare;
@@ -1011,7 +1024,7 @@ namespaceMatches(const as_object::SortedPropertyList::value_type& val,
 
 
 bool
-prefixMatches(const as_object::SortedPropertyList::value_type& val,
+prefixMatches(const StringPairs::value_type& val,
         const std::string& prefix)
 {
     const std::string& name = val.first;

@@ -15,13 +15,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+#include "ConvolutionFilter_as.h"
 
 #include "as_object.h"
-#include "ConvolutionFilter.h"
 #include "VM.h"
 #include "Global_as.h"
-#include "BitmapFilter_as.h"
 #include "builtin_function.h"
+#include "BitmapFilter_as.h"
+#include "Filters.h"
 
 namespace gnash {
 
@@ -166,7 +167,7 @@ convolutionfilter_matrix(const fn_call& fn)
 as_value
 convolutionfilter_new(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
+    boost::intrusive_ptr<as_object> obj = ensure<ValidThis>(fn);
     obj->setRelay(new ConvolutionFilter_as);
     return as_value();
 }

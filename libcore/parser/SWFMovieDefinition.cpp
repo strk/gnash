@@ -30,15 +30,14 @@
 #include <iomanip>
 #include <memory>
 #include <string>
-#include <algorithm> // std::make_pair
+#include <algorithm> 
 
 #include "GnashSleep.h"
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "movie_definition.h" // for inheritance
+#include "movie_definition.h" 
 #include "zlib_adapter.h"
-#include "IOChannel.h" // for use
+#include "IOChannel.h"
 #include "SWFStream.h"
-#include "GnashImageJpeg.h"
 #include "RunResources.h"
 #include "Font.h"
 #include "VM.h"
@@ -53,6 +52,8 @@
 #include "namedStrings.h"
 #include "as_function.h"
 #include "CachedBitmap.h"
+#include "TypesParser.h"
+#include "GnashImageJpeg.h"
 
 // Debug frames load
 #undef DEBUG_FRAMES_LOAD
@@ -166,7 +167,7 @@ SWFMovieDefinition::SWFMovieDefinition(const RunResources& runResources)
 
 SWFMovieDefinition::~SWFMovieDefinition()
 {
-    // Request cancelation of the loading thread
+    // Request cancellation of the loading thread
     _loadingCanceled = true;
 }
 
@@ -284,24 +285,17 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
 
     m_version = (header >> 24) & 255;
     if ((header & 0x0FFFFFF) != 0x00535746
-        && (header & 0x0FFFFFF) != 0x00535743)
-        {
+        && (header & 0x0FFFFFF) != 0x00535743) {
         // ERROR
         log_error(_("gnash::SWFMovieDefinition::read() -- "
             "file does not start with a SWF header"));
         return false;
-        }
+    }
     const bool compressed = (header & 255) == 'C';
 
     IF_VERBOSE_PARSE(
         log_parse(_("version: %d, file_length: %d"), m_version, m_file_length);
-    )
-
-    if (m_version > 7)
-    {
-        log_unimpl(_("SWF%d is not fully supported, trying anyway "
-            "but don't expect it to work"), m_version);
-    }
+    );
 
     if (compressed) {
 #ifndef HAVE_ZLIB_H
@@ -322,12 +316,12 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
 
     _str.reset(new SWFStream(_in.get()));
 
-    m_frame_size.read(*_str);
+    m_frame_size = readRect(*_str);
+
     // If the SWFRect is malformed, SWFRect::read would already 
     // print an error. We check again here just to give 
     // the error are better context.
-    if ( m_frame_size.is_null() )
-    {
+    if (m_frame_size.is_null()) {
         IF_VERBOSE_MALFORMED_SWF(
         log_swferror("non-finite movie bounds");
         );
@@ -486,7 +480,7 @@ SWFMovieDefinition::read_all_swf()
         while (left) {
 
             if (_loadingCanceled) {
-                log_debug("Loading thread cancelation requested, "
+                log_debug("Loading thread cancellation requested, "
                         "returning from read_all_swf");
                 return;
             }
@@ -608,6 +602,22 @@ SWFMovieDefinition::get_labeled_frame(const std::string& label,
     return true;
 }
 
+void
+SWFMovieDefinition::set_jpeg_loader(std::auto_ptr<image::JpegInput> j_in)
+{
+    if (m_jpeg_in.get()) {
+        /// There should be only one JPEGTABLES tag in an SWF (see: 
+        /// http://www.m2osw.com/en/swf_alexref.html#tag_jpegtables)
+        /// Discard any subsequent attempts to set the jpeg loader
+        /// to avoid crashing on very malformed SWFs. (No conclusive tests
+        /// for pp behaviour, though one version also crashes out on the
+        /// malformed SWF that triggers this assert in Gnash).
+        log_swferror(_("More than one JPEGTABLES tag found: not "
+                    "resetting JPEG loader"));
+        return;
+    }
+    m_jpeg_in = j_in;
+}
 
 boost::uint16_t
 SWFMovieDefinition::exportID(const std::string& symbol) const

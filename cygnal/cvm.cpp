@@ -39,7 +39,6 @@
 #endif
 
 #include "ClockTime.h"
-#include "gnash.h"
 #include "movie_definition.h"
 #include "MovieClip.h"
 #include "movie_root.h"
@@ -212,9 +211,6 @@ FsCommandExecutor execFsCommand;
 int
 vm_main(int argc, char *argv[])
 {
-    /// Initialize gnash core library
-    gnashInit();
-
     // Enable native language support, i.e. internationalization
 #ifdef ENABLE_NLS
     std::setlocale (LC_ALL, "");
@@ -554,7 +550,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
     }
  
     // Clear resources.
-    gnash::clear();
+    MovieFactory::clear();
     
     return md;
 }

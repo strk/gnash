@@ -22,8 +22,11 @@
 # include "gnashconfig.h" // GNASH_USE_GC, USE_SWFTREE
 #endif
 
-#include "DisplayList.h" // DisplayList 
 #include "DisplayObjectContainer.h"
+
+#include <utility>
+
+#include "DisplayList.h" // DisplayList 
 #include "InteractiveObject.h"
 #include "log.h"
 #include "dsodefs.h" // for DSOEXPORT
@@ -56,7 +59,7 @@ DisplayObjectContainer::addChild(DisplayObject* obj)
 {
     // TODO: parent should be a DisplayObjectContainer; remove dynamic_cast.
     DisplayObjectContainer* parent =
-        dynamic_cast<DisplayObjectContainer*>(obj->get_parent());
+        dynamic_cast<DisplayObjectContainer*>(obj->parent());
     if (parent) parent->removeChild(obj);
 
     _displayList.addDisplayObject(obj);
@@ -70,7 +73,7 @@ DisplayObjectContainer::addChildAt(DisplayObject* obj, int index)
 {
     // TODO: parent should be a DisplayObjectContainer; remove dynamic_cast.
     DisplayObjectContainer* parent =
-        dynamic_cast<DisplayObjectContainer*>(obj->get_parent());
+        dynamic_cast<DisplayObjectContainer*>(obj->parent());
     if (parent) parent->removeChild(obj);
     
     _displayList.insertDisplayObject(obj, index);
@@ -114,9 +117,7 @@ DisplayObjectContainer::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
     std::ostringstream os;
     os << _displayList.size();
     InfoTree::iterator localIter = tr.append_child(selfIt,
-            StringPair(_("Children"), os.str()));            
-    //localIter = tr.append_child(localIter, StringPair("child1", "fake"));
-    //localIter = tr.append_child(localIter, StringPair("child2", "fake"));
+            std::make_pair(_("Children"), os.str()));            
 
     MovieInfoVisitor v(tr, localIter);
     _displayList.visitAll(v);

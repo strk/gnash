@@ -31,6 +31,7 @@
 #include "namedStrings.h"
 #include "ExecutableCode.h"
 #include "RunResources.h"
+#include "StreamProvider.h"
 
 #include <memory> // for auto_ptr
 #include <boost/bind.hpp>
@@ -433,7 +434,7 @@ MovieLoader::loadMovie(const std::string& urlstr,
 
     /// URL security is checked in StreamProvider::getStream() down the
     /// chain.
-    URL url(urlstr, _movieRoot.runResources().baseURL());
+    URL url(urlstr, _movieRoot.runResources().streamProvider().originalURL());
 
     /// If the method is MovieClip::METHOD_NONE, we send no data.
     if (method == MovieClip::METHOD_GET)

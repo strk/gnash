@@ -20,23 +20,25 @@
 #ifndef GNASH_GLOBAL_H
 #define GNASH_GLOBAL_H
 
-#include "as_object.h" // for inheritance
-#include "fn_call.h"
-#include "log.h"
-
 #include <string>
 #include <boost/preprocessor/arithmetic/inc.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 #include <boost/preprocessor/seq/for_each.hpp>
+#include <boost/scoped_ptr.hpp>
+
+#include "as_object.h" 
+#include "fn_call.h"
+#include "log.h"
+#include "ClassHierarchy.h"
 
 // Forward declarations
 namespace gnash {
-	class builtin_function;
-	class as_value;
-	class VM;
-	class ClassHierarchy;
+    class builtin_function;
+    class as_value;
+    class VM;
+    class Extension;
 }
 
 namespace gnash {
@@ -56,69 +58,46 @@ public:
     typedef as_value(*ASFunction)(const fn_call& fn);
     typedef void(*Properties)(as_object&);
 
-    virtual const ClassHierarchy& classHierarchy() const = 0;
-    virtual ClassHierarchy& classHierarchy() = 0;
+	explicit Global_as(VM& vm);
+	virtual ~Global_as();
+    
+    void registerClasses();
 
-    explicit Global_as(VM& vm)
-        :
-        as_object(vm)
-    {}
+    as_object* createArray();
 
+    VM& getVM() const {
+        return vm();
+    }
+    
     /// Create an ActionScript function
-    virtual builtin_function* createFunction(ASFunction function) = 0;
+    builtin_function* createFunction(Global_as::ASFunction function);
 
     /// Create an ActionScript class
     //
-    /// The type of a class is different in AS2 and AS3. In AS2 it is generally
-    /// a function (the constructor) with a prototype. In AS3 it is generally
-    /// an object (the prototype) with a constructor.
-    virtual as_object* createClass(ASFunction ctor, as_object* prototype) = 0;
+    /// An AS2 class is generally a function (the constructor) with a
+    /// prototype.
+    as_object* createClass(Global_as::ASFunction ctor,
+            as_object* prototype);
 
-    /// Create a String object
-    //
-    /// This calls the String constructor. If that has been changed, this
-    /// function may not produce a String object. This is generally
-    /// expected behaviour.
-    virtual as_object* createString(const std::string& s) = 0;
+    void makeObject(as_object& o) const;
 
-    /// Create a Number object
-    //
-    /// This calls the Number constructor. If that has been changed, this
-    /// function may not produce a Number object. This is generally
-    /// expected behaviour.
-    virtual as_object* createNumber(double d) = 0;
+protected:
+    
+    virtual void markReachableResources() const;
 
-    /// Create a Boolean object
-    //
-    /// This calls the Boolean constructor. If that has been changed, this
-    /// function may not produce a Boolean object. This is generally
-    /// expected behaviour.
-    virtual as_object* createBoolean(bool b) = 0;
+private:
 
-    /// Create an Array object
-    //
-    /// This creates an Array object without calling the Array constructor.
-    virtual as_object* createArray() = 0;
+    void loadExtensions();
+    boost::scoped_ptr<Extension> _et;
 
-    /// Create an Object
-    //
-    /// This function returns an Object with Object.prototype as its
-    /// __proto__ member. It should probably call the Object constructor,
-    /// but Gnash creates some of its classes on demand. If the Object class
-    /// has changed before this happens, Gnash's behaviour would differ from
-    /// the reference player's.
-    //
-    /// TODO: think whether it's better to return the original Object class,
-    /// a possibly altered one, or allow both.
-    virtual as_object* createObject() = 0;
+    ClassHierarchy _classes;
+    
+    as_object* _objectProto;
 
-    virtual Global_as& global() {
-        return *this;
-    }
-
-    virtual VM& getVM() const = 0;
 };
 
+as_object* createObject(const Global_as& gl);
+    
 
 /// Register a built-in object
 //
@@ -143,7 +122,7 @@ registerBuiltinObject(as_object& where, Global_as::Properties p,
 
     // This is going to be the global Mouse "class"/"function"
     Global_as& gl = getGlobal(where);
-    as_object* obj = gl.createObject();
+    as_object* obj = createObject(gl);
     if (p) p(*obj);
     
     where.init_member(uri, obj, as_object::DefaultFlags);
@@ -173,7 +152,7 @@ registerBuiltinClass(as_object& where, Global_as::ASFunction ctor,
         Global_as::Properties p, Global_as::Properties c, const ObjectURI& uri)
 {
     Global_as& gl = getGlobal(where);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     as_object* cl = gl.createClass(ctor, proto);
  
     // Attach class properties to class
@@ -202,7 +181,7 @@ invoke(const as_value& method, const as_environment& env, as_object* this_ptr,
     call.callerDef = callerDef;
 
 	try {
-		if (as_object* func = method.to_object(getGlobal(env))) {
+		if (as_object* func = toObject(method, getVM(env))) {
             // Call function.
 		    val = func->call(call);
 		}
@@ -231,7 +210,7 @@ invoke(const as_value& method, const as_environment& env, as_object* this_ptr,
 /// This is a macro to cope with a varying number of arguments. The function
 /// signature is as follows:
 //
-/// as_value callMethod(as_object* obj, string_table::key key,
+/// as_value callMethod(as_object* obj, const ObjectURI& uri,
 ///     const as_value& arg1, ..., const as_value& argN);
 //
 /// If the member function exists and is a function, invoke() is called on
@@ -247,11 +226,11 @@ invoke(const as_value& method, const as_environment& env, as_object* this_ptr,
 /// @return             The return value of the call (possibly undefined).
 #define CALL_METHOD(x, n, t) \
 inline as_value \
-callMethod(as_object* obj, string_table::key key BOOST_PP_COMMA_IF(n)\
+callMethod(as_object* obj, const ObjectURI& uri BOOST_PP_COMMA_IF(n)\
         BOOST_PP_REPEAT(n, VALUE_ARG, const as_value&)) {\
     if (!obj) return as_value();\
     as_value func;\
-    if (!obj->get_member(key, &func)) return as_value();\
+    if (!obj->get_member(uri, &func)) return as_value();\
     fn_call::Args args;\
     BOOST_PP_EXPR_IF(n, (args += BOOST_PP_REPEAT(n, VALUE_ARG, ));)\
     return invoke(func, as_environment(getVM(*obj)), obj, args);\

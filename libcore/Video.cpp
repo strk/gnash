@@ -34,6 +34,7 @@
 #include "Global_as.h"
 #include "Renderer.h"
 #include "RunResources.h"
+#include "Transform.h"
 
 // Define this to get debug logging during embedded video decoding
 //#define DEBUG_EMBEDDED_VIDEO_DECODING
@@ -41,7 +42,6 @@
 namespace gnash {
 
 namespace {    
-    as_object* getVideoInterface(as_object& where);
     void attachPrototypeProperties(as_object& o);
     void attachVideoInterface(as_object& o);
     as_value video_ctor(const fn_call& fn);
@@ -83,7 +83,7 @@ Video::Video(as_object* object,
     try {
 	    _decoder = mh->createVideoDecoder(*info);
 	}
-	catch (MediaException &e) {
+	catch (const MediaException& e) {
 	    log_error("Could not create Video Decoder: %s", e.what());
 	}
 }
@@ -118,23 +118,24 @@ Video::clear()
 }
 
 void
-Video::display(Renderer& renderer)
+Video::display(Renderer& renderer, const Transform& base)
 {
 	assert(m_def);
 
-	SWFMatrix m = getWorldMatrix();
+    const DisplayObject::MaskRenderer mr(renderer, *this);
+
+    const Transform xform = base * transform();
 	const SWFRect& bounds = m_def->bounds();
 
-	GnashImage* img = getVideoFrame();
-	if (img)
-	{
-		renderer.drawVideoFrame(img, &m, &bounds, _smoothing);
+    image::GnashImage* img = getVideoFrame();
+	if (img) {
+		renderer.drawVideoFrame(img, xform, &bounds, _smoothing);
 	}
 
 	clear_invalidated();
 }
 
-GnashImage*
+image::GnashImage*
 Video::getVideoFrame()
 {
 
@@ -143,7 +144,7 @@ Video::getVideoFrame()
     // frame from there.
 	if (_ns)
 	{
-		std::auto_ptr<GnashImage> tmp = _ns->get_video();
+		std::auto_ptr<image::GnashImage> tmp = _ns->get_video();
 		if ( tmp.get() ) _lastDecodedVideoFrame = tmp;
 	}
 
@@ -246,7 +247,7 @@ Video::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 	assert (m_def);
 
 	SWFRect bounds;	
-	bounds.expand_to_transformed_rect(getWorldMatrix(), m_def->bounds());
+	bounds.expand_to_transformed_rect(getWorldMatrix(*this), m_def->bounds());
 	
 	ranges.add(bounds.getRange());            
 }
@@ -264,7 +265,7 @@ video_class_init(as_object& global, const ObjectURI& uri)
 {
 	// This is going to be the global Video "class"/"function"
     Global_as& gl = getGlobal(global);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     as_object* cl = gl.createClass(&video_ctor, proto);
     attachVideoInterface(*proto);
 
@@ -348,7 +349,7 @@ video_attach(const fn_call& fn)
 		return as_value();
 	}
 
-    as_object* obj = fn.arg(0).to_object(getGlobal(fn));
+    as_object* obj = toObject(fn.arg(0), getVM(fn));
 	NetStream_as* ns;
 
     if (isNativeType(obj, ns)) {
@@ -380,8 +381,7 @@ video_smoothing(const fn_call& fn)
 
     if (!fn.nargs) return as_value(video->smoothing());
 
-    bool smooth = fn.arg(0).to_bool();
-
+    const bool smooth = toBool(fn.arg(0), getVM(fn));
     video->setSmoothing(smooth);
 
     return as_value();

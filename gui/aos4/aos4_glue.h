@@ -18,8 +18,6 @@
 #ifndef __AOS4_GLUE_H__
 #define __AOS4_GLUE_H__
 
-#include "gnash.h"
-
 #include <boost/cstdint.hpp> // for boost::?int??_t 
 
 #include "Renderer.h"

@@ -20,27 +20,105 @@
 #ifndef GNASH_PROPERTY_H
 #define GNASH_PROPERTY_H
 
+#include <boost/variant.hpp>
+#include <cassert>
+#include <boost/bind.hpp>
+#include <typeinfo>
+
 #include "PropFlags.h"
 #include "as_value.h"
 #include "ObjectURI.h"
 
-#include <boost/variant.hpp>
-#include <cassert>
+namespace gnash {
+    typedef as_value (*as_c_function_ptr)(const fn_call& fn);
+    class as_function;
+}
 
 namespace gnash {
-
-typedef as_value (*as_c_function_ptr)(const fn_call& fn);
-
-class as_function;
-class PropertyList;
 
 /// Holder for getter/setter functions
 //
 /// Getter setter can be user-defined or native ones.
 /// This class abstracts the two.
-///
 class GetterSetter
 {
+    class NativeGetterSetter;
+
+    // The following helper structs define common operations on the 
+    // Two types of GetterSetter. Some operations are applicable only to
+    // one type.
+
+    /// Get or set a GetterSetter
+    //
+    /// @tparam S   A type that determines what operation to call on the
+    ///             GetterSetter
+    /// @param Arg  The type of the argument to the get or set function.
+    template<typename Arg, typename S>
+    struct GetSetVisitor : boost::static_visitor<typename S::result_type>
+    {
+        GetSetVisitor(const Arg& arg) : _arg(arg) {}
+        template<typename T> typename S::result_type operator()(T& t) const {
+            return S()(t, _arg);
+        };
+    private:
+        const Arg& _arg;
+    };
+
+    /// Set a GetterSetter
+    struct Set
+    {
+        typedef void result_type;
+        template<typename T, typename Arg>
+        result_type operator()(T& t, Arg& a) const {
+            t.set(a);
+        }
+    };
+				
+    /// Get a GetterSetter
+    struct Get
+    {
+        typedef as_value result_type;
+        template<typename T, typename Arg>
+        result_type operator()(T& t, Arg& a) const {
+            return t.get(a);
+        }
+    };
+
+    /// Set the underlying value of a GetterSetter
+    //
+    /// This does not apply to NativeGetterSetters.
+    struct SetUnderlying : boost::static_visitor<>
+    {
+        template<typename T>
+        result_type operator()(T& gs, const as_value& val) const {
+            gs.setUnderlying(val);
+        }
+        result_type operator()(NativeGetterSetter&, const as_value&) const {}
+    };
+    
+    /// Get the underlying value of a GetterSetter
+    //
+    /// This does not apply to NativeGetterSetters.
+    struct GetUnderlying : boost::static_visitor<as_value>
+    {
+        template<typename T>
+        result_type operator()(const T& gs) const {
+            return gs.getUnderlying();
+        }
+        result_type operator()(const NativeGetterSetter&) const {
+            return result_type();
+        }
+    };
+    
+    /// Mark a GetterSetter reachable
+    struct MarkReachable : boost::static_visitor<>
+    {
+        template<typename T>
+        result_type operator()(const T& gs) const {
+            gs.markReachableResources();
+        }
+    };
+
 public:
 
 	/// Construct a user-defined getter-setter
@@ -56,67 +134,29 @@ public:
 	{}
 
 	/// Invoke the getter
-	as_value get(fn_call& fn) const
-	{
-		switch ( _getset.which() )
-		{
-			case 0: // user-defined
-				return boost::get<UserDefinedGetterSetter>(_getset).get(fn);
-				break;
-			case 1: // native 
-				return boost::get<NativeGetterSetter>(_getset).get(fn);
-				break;
-		}
-		return as_value(); // not reached (TODO: log error ? assert ?)
+	as_value get(fn_call& fn) const {
+        GetSetVisitor<const fn_call, Get> s(fn);
+        return boost::apply_visitor(s, _getset);
 	}
 
 	/// Invoke the setter
-	void set(fn_call& fn)
-	{
-		switch ( _getset.which() )
-		{
-			case 0: // user-defined
-				boost::get<UserDefinedGetterSetter>(_getset).set(fn);
-				break;
-			case 1: // native 
-				boost::get<NativeGetterSetter>(_getset).set(fn);
-				break;
-		}
+	void set(const fn_call& fn) {
+        GetSetVisitor<fn_call, Set> s(fn);
+        boost::apply_visitor(s, _getset);
 	}
 
 	/// Set the cache value (for user-defined getter-setters)
-	void setCache(const as_value& v)
-	{
-		switch ( _getset.which() )
-		{
-			case 0: // user-defined
-				boost::get<UserDefinedGetterSetter>(_getset).setUnderlying(v);
-				break;
-			case 1: // native 
-				// nothing to do for native
-				break;
-		}
-	}
+	void setCache(const as_value& v) {
+        boost::apply_visitor(boost::bind(SetUnderlying(), _1, v), _getset);
+    }
 
 	/// Get the cache value (for user-defined getter-setters)
-	const as_value& getCache() const
-	{
-		switch (_getset.which())
-		{
-			case 0: // user-defined
-				return boost::get<UserDefinedGetterSetter>(
-                        _getset).getUnderlying();
-		}
-		static as_value undefVal;
-		return undefVal;
+	as_value getCache() const {
+        return boost::apply_visitor(GetUnderlying(), _getset);
 	}
 
-	void markReachableResources() const
-	{
-		if (_getset.which() == 0) {
-			boost::get<UserDefinedGetterSetter>(
-                    _getset).markReachableResources();
-		}
+	void markReachableResources() const {
+        boost::apply_visitor(MarkReachable(), _getset);
 	}
 
 private:
@@ -135,10 +175,10 @@ private:
 		{}
 
 		/// Invoke the getter
-		as_value get(fn_call& fn) const;
+		as_value get(const fn_call& fn) const;
 
 		/// Invoke the setter
-		void set(fn_call& fn);
+		void set(const fn_call& fn);
 
 		/// Get the underlying value
 		const as_value& getUnderlying() const { return _underlyingValue; }
@@ -150,13 +190,6 @@ private:
 
 	private:
 
-		as_function* _getter;
-		as_function* _setter;
-
-		as_value _underlyingValue;
-
-		mutable bool _beingAccessed;
-
 		/// For SWF6 (not higher) a user-defined getter-setter would not
         /// be invoked while being set. This ScopedLock helps marking a
         /// Getter-Setter as being invoked in an exception-safe manner.
@@ -167,7 +200,7 @@ private:
         {
 		public:
 
-			ScopedLock(const UserDefinedGetterSetter& na)
+			explicit ScopedLock(const UserDefinedGetterSetter& na)
                 :
                 _a(na),
                 _obtainedLock(_a._beingAccessed ? false : true)
@@ -193,11 +226,16 @@ private:
 			bool _obtainedLock;
 
         };
+
+		as_function* _getter;
+		as_function* _setter;
+		as_value _underlyingValue;
+		mutable bool _beingAccessed;
     };
 
 	/// Native GetterSetter
-	class NativeGetterSetter {
-
+	class NativeGetterSetter 
+    {
 	public:
 
 		NativeGetterSetter(as_c_function_ptr get, as_c_function_ptr set)
@@ -205,19 +243,19 @@ private:
 			_getter(get), _setter(set) {}
 
 		/// Invoke the getter
-		as_value get(fn_call& fn) const
-		{
+		as_value get(const fn_call& fn) const {
 			return _getter(fn);
 		}
 
 		/// Invoke the setter
-		void set(fn_call& fn)
-		{
+		void set(const fn_call& fn) {
 			_setter(fn);
 		}
 
-	private:
+        /// Nothing to do for native setters.
+        void markReachableResources() const {}
 
+	private:
 		as_c_function_ptr _getter;
 		as_c_function_ptr _setter;
 	};
@@ -235,60 +273,56 @@ private:
 /// changed.
 class Property
 {
+
+    /// Mark the stored value reachable.
+    struct SetReachable : boost::static_visitor<>
+    {
+        result_type operator()(const as_value& val) const {
+            val.setReachable();
+        }
+        result_type operator()(const GetterSetter& gs) const {
+            return gs.markReachableResources();
+        }
+    };
+
 public:
-	/// Default constructor
-	Property(const ObjectURI& uri)
-        : 
-		_bound(as_value()),
-        _destructive(false),
-        _uri(uri)
-	{}
 
 	Property(const ObjectURI& uri, const as_value& value,
-            const PropFlags& flags = PropFlags())
+            const PropFlags& flags)
         :
-		_flags(flags),
         _bound(value),
-        _destructive(false),
-		_uri(uri)
+		_uri(uri),
+		_flags(flags),
+        _destructive(false)
 	{}
 
 	Property(const ObjectURI& uri,
-		as_function *getter, as_function *setter, 
+		as_function* getter, as_function* setter, 
 		const PropFlags& flags, bool destroy = false)
         :
+        _bound(GetterSetter(getter, setter)),
+        _uri(uri),
 		_flags(flags), 
-        _bound(GetterSetter(getter, setter)),
-		_destructive(destroy),
-        _uri(uri)
-	{}
-
-	Property(const ObjectURI& uri, as_function *getter, as_function *setter,
-            bool destroy = false)
-        :
-		_flags(),
-        _bound(GetterSetter(getter, setter)),
-        _destructive(destroy),
-        _uri(uri)
+		_destructive(destroy)
 	{}
 
 	Property(const ObjectURI& uri, as_c_function_ptr getter,
             as_c_function_ptr setter, const PropFlags& flags,
             bool destroy = false)
 		:
-		_flags(flags),
         _bound(GetterSetter(getter, setter)),
-        _destructive(destroy),
-        _uri(uri)
+        _uri(uri),
+		_flags(flags),
+        _destructive(destroy)
 	{}
-	
+
     /// Copy constructor
 	Property(const Property& p)
         :
-		_flags(p._flags),
         _bound(p._bound),
-        _destructive(p._destructive),
-        _uri(p._uri)
+        _uri(p._uri),
+		_flags(p._flags),
+        _destructive(p._destructive)
 	{}
 
 	/// accessor to the properties flags
@@ -317,7 +351,7 @@ public:
 	/// to watch for infinitely recurse on calling the getter
 	/// or setter; Native getter-setter has no cache,
 	/// undefined will be returned for them.
-	const as_value& getCache() const;
+	as_value getCache() const;
 
 	/// Set internal cached value of this property
 	//
@@ -347,11 +381,8 @@ public:
 
 	/// Is this a getter/setter property?
 	bool isGetterSetter() const {
-        return _bound.which() == TYPE_GETTER_SETTER;
+        return _bound.type() == typeid(GetterSetter);
     }
-
-	/// is this a destructive property ?
-	bool isDestructive() const { return _destructive; }
 
 	/// Clear visibility flags
 	void clearVisible(int swfVersion) { _flags.clear_visible(swfVersion); }
@@ -362,38 +393,28 @@ public:
     }
 
 	/// Mark this property as being reachable (for the GC)
-	void setReachable() const;
+	void setReachable() const {
+        return boost::apply_visitor(SetReachable(), _bound);
+    }
 
 private:
-	
-    /// Get a value from a getter function.
-	as_value getDelayedValue(const as_object& this_ptr) const;
-
-	/// Set a value using a setter function.
-	void setDelayedValue(as_object& this_ptr, const as_value& value) const;
-
-    enum Type {
-        TYPE_EMPTY,
-        TYPE_VALUE,
-        TYPE_GETTER_SETTER
-    };
-
-	/// Properties flags
-	mutable PropFlags _flags;
 
 	// Store the various types of things that can be held.
-	typedef boost::variant<boost::blank, as_value, GetterSetter> BoundType;
+	typedef boost::variant<as_value, GetterSetter> BoundType;
 
     /// The value of the property.
 	mutable BoundType _bound;
+	
+    /// The property identifier (name).
+    ObjectURI _uri;
+
+	/// Properties flags
+	mutable PropFlags _flags;
 
 	// If true, as soon as getValue has been invoked once, the
 	// returned value becomes a fixed return (though it can be
 	// overwritten if not readOnly)
 	mutable bool _destructive;
-	
-    // TODO: this should be const, but the assignment operator is still needed 
-    ObjectURI _uri;
 
 };
 	

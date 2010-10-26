@@ -33,6 +33,7 @@
 #include "MediaHandler.h" // for inlined ctor
 #include "SoundEnvelope.h" // for SoundEnvelopes typedef
 #include "AuxStream.h" // for aux_stramer_ptr typedef
+#include "WAVWriter.h" // for dtor visibility 
 
 #include <string>
 #include <vector>
@@ -41,6 +42,7 @@
 #include <cstring>
 #include <limits>
 #include <set> // for composition
+#include <boost/scoped_ptr.hpp>
 
 namespace gnash {
     namespace media {
@@ -299,7 +301,7 @@ public:
     /// gnash calls this to unpause audio
     virtual void unpause() { _paused=false; }
 
-    /// gnash calls this to unpause audio
+    /// return true if audio is paused
     bool isPaused() const { return _paused; }
 
     /// Plug an external InputStream into the mixer
@@ -409,6 +411,42 @@ public:
     ///
     virtual void fetchSamples(boost::int16_t* to, unsigned int nSamples);
 
+    /// Mix nSamples from inSamples to outSamples, with given volume
+    //
+    /// @param outSamples
+    ///     The output samples buffer, to mix to.
+    ///     Must be big enough to contain nSamples.
+    ///     Can be larger.
+    ///
+    /// @param inSamples
+    ///     The input samples buffer, to mix in.
+    ///     It is non-const as this method *is* allowed
+    ///     to mess with content, for example to apply
+    ///     volume.
+    ///     TODO: why not applying volume upstream ?!
+    ///
+    /// @param nSamples
+    ///     The amount of samples to mix in.
+    ///
+    /// @param volume
+    ///     The volume to apply to input samples, as a fraction (0..1)
+    ///
+    /// TODO: this interface says nothing about how many channels we're
+    ///       going to mix. It should, to be a sane interface.
+    ///       Maybe, a Mixer instance should be created, initialized
+    ///       with number of channels, at each fetching.
+    ///
+    virtual void mix(boost::int16_t* outSamples, boost::int16_t* inSamples,
+                unsigned int nSamples, float volume) = 0;
+
+
+    /// Request to dump audio to the given filename
+    //
+    /// Every call to this function starts recording
+    /// to a new file, closing any existing other dump.
+    ///
+    void setAudioDump(const std::string& wavefile);
+
 protected:
 
 
@@ -437,34 +475,6 @@ protected:
 
     /// Does the mixer have input streams ?
     bool hasInputStreams() const;
-
-    /// Mix nSamples from inSamples to outSamples, with given volume
-    //
-    /// @param outSamples
-    ///     The output samples buffer, to mix to.
-    ///     Must be big enough to contain nSamples.
-    ///     Can be larger.
-    ///
-    /// @param inSamples
-    ///     The input samples buffer, to mix in.
-    ///     It is non-const as this method *is* allowed
-    ///     to mess with content, for example to apply
-    ///     volume.
-    ///     TODO: why not applying volume upstream ?!
-    ///
-    /// @param nSamples
-    ///     The amount of samples to mix in.
-    ///
-    /// @param volume
-    ///     The volume to apply to input samples, as a fraction (0..1)
-    ///
-    /// TODO: this interface says nothing about how many channels we're
-    ///       going to mix. It should, to be a sane interface.
-    ///       Maybe, a Mixer instance should be created, initialized
-    ///       with number of channels, at each fetching.
-    ///
-    virtual void mix(boost::int16_t* outSamples, boost::int16_t* inSamples,
-                unsigned int nSamples, float volume);
 
 private:
 
@@ -566,6 +576,8 @@ private:
     unsigned int swfToOutSamples(const media::SoundInfo& sinfo,
                                           unsigned int swfSamples);
 
+    boost::scoped_ptr<WAVWriter> _wavWriter;
+
 };
 
 // TODO: move to appropriate specific sound handlers
@@ -573,25 +585,12 @@ private:
 #ifdef SOUND_SDL
 /// @throw a SoundException if fails to initialize audio card.
 DSOEXPORT sound_handler* create_sound_handler_sdl(media::MediaHandler* m);
-
-/// @throw a SoundException if fails to initialize audio card.
-DSOEXPORT sound_handler* create_sound_handler_sdl(media::MediaHandler* m,
-        const std::string& wave_file);
 #elif defined(SOUND_AHI)
 /// @throw a SoundException if fails to initialize audio card.
 DSOEXPORT sound_handler* create_sound_handler_aos4(media::MediaHandler* m);
-
-/// @throw a SoundException if fails to initialize audio card.
-DSOEXPORT sound_handler* create_sound_handler_aos4(media::MediaHandler* m,
-        const std::string& wave_file);
-
 #elif defined(SOUND_MKIT)
 /// @throw a SoundException if fails to create node.
 DSOEXPORT sound_handler* create_sound_handler_mkit(media::MediaHandler* m);
-
-/// @throw a SoundException if fails to create node.
-DSOEXPORT sound_handler* create_sound_handler_mkit(media::MediaHandler* m,
-        const std::string& wave_file);
 #endif
 
 } // gnash.sound namespace 

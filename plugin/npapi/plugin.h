@@ -91,6 +91,10 @@ public:
 private:
     void startProc();
     std::vector<std::string> getCmdLine(int hostfd, int controlfd);
+
+    void setupCookies(const std::string& pageURL);
+    void setupProxy(const std::string& pageURL);
+
     static bool handlePlayerRequestsWrapper(GIOChannel* iochan, GIOCondition cond, nsPluginInstance* plugin);
 
     bool handlePlayerRequests(GIOChannel* iochan, GIOCondition cond);

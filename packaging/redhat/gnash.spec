@@ -1,6 +1,6 @@
 Name:           gnash
 # This next field gets edited by "make gnash.spec" when building an rpm
-Version:        trunk
+Version:        master
 Release:        0
 Epoch: 		1
 # This next field gets edited by "make gnash.spec" when building an rpm
@@ -113,7 +113,7 @@ application.
 %package fileio-extension
 Summary:   Fileio extension for Gnash
 Group:     Applications/Multimedia
-Requires:  gnash-commo
+Requires:  gnash-common
 
 %description fileio-extension
 This extension allows SWF files being played within Gnash to have direct access
@@ -248,7 +248,7 @@ sh ./configure \
 	--disable-dependency-tracking \
 	--disable-testsuite \
 	--disable-rpath \
-	--enable-renderers=agg,cairo \
+	--enable-renderer=agg,cairo \
 	--enable-cygnal \
 	--enable-python \
 	--with-plugins-install=system \

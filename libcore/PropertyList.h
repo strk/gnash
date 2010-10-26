@@ -19,10 +19,9 @@
 #ifndef GNASH_PROPERTYLIST_H
 #define GNASH_PROPERTYLIST_H
 
-#include "Property.h" // for templated functions
-
 #include <set> 
 #include <map> 
+#include <vector> 
 #include <string> // for use within map 
 #include <cassert> // for inlines
 #include <utility> // for std::pair
@@ -32,6 +31,10 @@
 #include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index/key_extractors.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/bind.hpp>
+#include <algorithm>
+
+#include "Property.h" // for templated functions
 
 // Forward declaration
 namespace gnash {
@@ -43,6 +46,25 @@ namespace gnash {
 }
 
 namespace gnash {
+
+/// An abstract property visitor
+class PropertyVisitor {
+public:
+
+    /// This function should return false if no further visits are needed.
+    virtual bool accept(const ObjectURI& uri, const as_value& val) = 0;
+    virtual ~PropertyVisitor() {}
+};
+
+/// An abstract key visitor
+class KeyVisitor {
+public:
+
+    /// This function should return false if no further visits are needed.
+    virtual void operator()(const ObjectURI& uri) = 0;
+    virtual ~KeyVisitor() {}
+};
+
 
 /// Set of properties associated with an ActionScript object.
 //
@@ -60,48 +82,57 @@ namespace gnash {
 /// owner.
 class PropertyList : boost::noncopyable
 {
-
 public:
 
-    typedef std::set<ObjectURI> PropertyTracker;
-    typedef std::pair<Property, string_table::key> value_type;
+    typedef std::set<ObjectURI, ObjectURI::LessThan> PropertyTracker;
+    typedef Property value_type;
 
-    struct NameExtractor
+    /// Identifier for the sequenced index
+    struct CreationOrder {};
+
+    /// The sequenced index in creation order.
+    typedef boost::multi_index::sequenced<
+        boost::multi_index::tag<CreationOrder> > SequencedIndex;
+    
+    struct KeyExtractor
     {
-        typedef ObjectURI result_type;
-        const result_type& operator()(const value_type& r) const {
-            return r.first.uri();
-        }
-        const result_type& operator()(value_type& r) {
-            return r.first.uri();
+        typedef const ObjectURI& result_type;
+        result_type operator()(const Property& p) const {
+            return p.uri();
         }
     };
-    
-    typedef boost::multi_index::member<value_type, value_type::second_type,
-            &value_type::second> KeyExtractor;
 
+    /// Identifier for the case-sensitive index
+    struct Case {};
+    
+    /// The case-sensitive index
+    typedef boost::multi_index::ordered_unique<
+        boost::multi_index::tag<Case>,
+        KeyExtractor,
+        ObjectURI::LessThan> CaseIndex;
+
+    /// Identifier for the case-insensitive index
+    struct NoCase {};
+    
+    /// The case-insensitive index
+    typedef boost::multi_index::ordered_non_unique<
+        boost::multi_index::tag<NoCase>,
+        KeyExtractor,
+        ObjectURI::CaseLessThan> NoCaseIndex;
+
+    /// The container of the Properties.
     typedef boost::multi_index_container<
         value_type,
-        boost::multi_index::indexed_by<
-            boost::multi_index::sequenced<>,
-            boost::multi_index::ordered_unique<NameExtractor>,
-            boost::multi_index::ordered_non_unique<KeyExtractor>
-            >
+        boost::multi_index::indexed_by<SequencedIndex, CaseIndex, NoCaseIndex>
         > container;
+
     typedef container::iterator iterator;
     typedef container::const_iterator const_iterator;
 
     /// Construct the PropertyList 
     //
     /// @param obj      The as_object to which this PropertyList belongs.
-    ///                 This object is not fully constructed at this stage,
-    ///                 so this constructor should not do anything with it!
-    PropertyList(as_object& obj)
-        :
-        _props(),
-        _owner(obj)
-    {
-    }
+    PropertyList(as_object& obj);
 
     /// Visit properties 
     //
@@ -127,9 +158,9 @@ public:
         for (const_iterator it = _props.begin(), ie = _props.end();
                 it != ie; ++it)
         {
-            if (!cmp(it->first)) continue;
-            as_value val = it->first.getValue(_owner);
-            if (!visitor.accept(it->first.uri(), val)) return;
+            if (!cmp(*it)) continue;
+            as_value val = it->getValue(_owner);
+            if (!visitor.accept(it->uri(), val)) return;
         }
     }
 
@@ -142,7 +173,7 @@ public:
     ///
     /// @param donelist     Don't enumerate properties in donelist.
     ///                     Enumerated properties are added to donelist.
-    void enumerateKeys(as_environment& env, PropertyTracker& donelist) const;
+    void visitKeys(KeyVisitor& v, PropertyTracker& donelist) const;
 
     /// Set the value of a property, creating a new one if it doesn't exist.
     //
@@ -150,14 +181,11 @@ public:
     /// will be invoked using the given as_object as 'this' pointer.
     /// If the property is not found a SimpleProperty will be created.
     ///
-    /// @param key
-    ///    Name of the property. Search is case-*sensitive*
+    /// @param uri
+    ///    Name of the property.
     /// @param value
     ///    a const reference to the as_value to use for setting
     ///    or creating the property. 
-    /// @param namespaceId
-    ///    The namespace in which this should be entered. If 0 is given,
-    ///    this will use the first value found, if it exists.
     /// @param flagsIfMissing
     ///    Flags to associate to the property if a new one is created.
     /// @return true if the value was successfully set, false
@@ -167,8 +195,7 @@ public:
 
     /// Get a property if it exists.
     //
-    /// @param key  Name of the property. Search is case-*sensitive*
-    /// @param nsId The id of the namespace to search
+    /// @param uri  Name of the property. 
     /// @return     A Property or 0, if no such property exists.
     ///             All Property objects are owned by this PropertyList. Do
     ///             not delete them.
@@ -177,8 +204,7 @@ public:
     /// Delete a Property, if existing and not protected from deletion.
     //
     ///
-    /// @param key      Name of the property.
-    /// @param nsId     Name of the namespace
+    /// @param uri      Name of the property.
     /// @return         a pair of boolean values expressing whether the property
     ///                 was found (first) and whether it was deleted (second).
     ///                 Of course a pair(false, true) would be invalid (deleted
@@ -192,7 +218,7 @@ public:
     //
     /// TODO: this function has far too many arguments.
     //
-    /// @param key      Name of the property. Search is case-*sensitive*
+    /// @param uri      Name of the property. 
     /// @param getter   A function to invoke when this property value is
     ///                 requested. 
     /// @param setter   A function to invoke when setting this property's value.
@@ -208,7 +234,7 @@ public:
 
     /// Add a getter/setter property, if not already existing
     //
-    /// @param key      Name of the property.
+    /// @param uri      Name of the property.
     /// @param getter   A function to invoke when this property value is
     ///                 requested.
     /// @param setter   A function to invoke when setting this property's value.
@@ -219,7 +245,7 @@ public:
 
     /// Add a destructive getter property, if not already existant.
     //
-    /// @param key      Name of the property.
+    /// @param uri      Name of the property.
     /// @param getter   A function to invoke when this property value is
     ///                 requested.
     /// @param flagsIfMissing Flags to associate to the property if a new
@@ -230,7 +256,7 @@ public:
 
     /// Add a destructive getter property, if not already existant.
     ///
-    /// @param key      Name of the property. Case-sensitive search.
+    /// @param uri      Name of the property. 
     /// @param getter   A function to invoke when this property value is
     ///                 requested.
     ///
@@ -243,7 +269,7 @@ public:
 
     /// Set the flags of a property.
     //
-    /// @param key      Name of the property. Search is case-*sensitive*
+    /// @param uri      Name of the property. 
     /// @param setTrue  The set of flags to set
     /// @param setFalse The set of flags to clear
     void setFlags(const ObjectURI& uri, int setTrue, int setFalse);
@@ -268,16 +294,14 @@ public:
     /// lexicographically by property.
     void dump();
 
-    /// Dump all members into the given map
+    /// Mark all properties reachable
     //
-    /// This does not reflect the normal enumeration order. It is sorted
-    /// lexicographically by property.
-    ///
-    void dump(std::map<std::string, as_value>& to);
-
-    /// Mark all simple properties, getters and setters
-    /// as being reachable (for the GC)
-    void setReachable() const;
+    /// This can be called very frequently, so is inlined to allow the
+    /// compiler to optimize it.
+    void setReachable() const {
+        std::for_each(_props.begin(), _props.end(),
+                boost::mem_fn(&Property::setReachable));
+    }
 
 private:
 

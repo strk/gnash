@@ -112,7 +112,9 @@ public:
 
     /// Return true if the end of the stream has been reached.
     //
-    /// Not implemented for Socket.
+    /// EOF is when remote end closed the connection and
+    /// we have no more cached data to read
+    ///
     virtual bool eof() const;
 
 private:
@@ -123,7 +125,7 @@ private:
     mutable bool _connected;
 
     /// A cache for received data.
-    boost::uint8_t _cache[16384];
+    char _cache[16384];
 
     /// The socket ID.
     int _socket;

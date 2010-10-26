@@ -69,7 +69,7 @@ AC_DEFUN([GNASH_PATH_CURL],
     AC_CACHE_VAL(ac_cv_path_curl_lib,[
     if test x"${with_curl_lib}" != x ; then # {
       if test -f ${with_curl_lib}/libcurl.a -o -f ${with_curl_lib}/libcurl.${shlibext}; then # {
-        ac_cv_path_curl_lib="-L`(cd ${with_curl_lib}; pwd)`"
+        ac_cv_path_curl_lib="-L`(cd ${with_curl_lib}; pwd)` -lcurl"
       else # }{
         AC_MSG_ERROR([${with_curl_lib} directory doesn't contain libcurl.])
       fi # }
@@ -109,6 +109,10 @@ AC_DEFUN([GNASH_PATH_CURL],
     CURL_CFLAGS="${ac_cv_path_curl_incl}"
   else
     CURL_CFLAGS=""
+  fi
+
+  if ${ENABLE_STATIC}; then
+    CURL_CFLAGS+=" -DCURL_STATICLIB"
   fi
 
   if test x"${ac_cv_path_curl_lib}" != x ; then

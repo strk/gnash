@@ -52,7 +52,7 @@ AudioDecoderGst::AudioDecoderGst(const AudioInfo& info)
 
     GstCaps* srccaps=0;
 
-    if (info.type == FLASH && info.codec == AUDIO_CODEC_MP3)
+    if (info.type == CODEC_TYPE_FLASH && info.codec == AUDIO_CODEC_MP3)
     {
         srccaps = gst_caps_new_simple ("audio/mpeg",
 		"mpegversion", G_TYPE_INT, 1,
@@ -63,7 +63,7 @@ AudioDecoderGst::AudioDecoderGst(const AudioInfo& info)
         return;
     }
     
-    if (info.type == FLASH && info.codec == AUDIO_CODEC_NELLYMOSER)
+    if (info.type == CODEC_TYPE_FLASH && info.codec == AUDIO_CODEC_NELLYMOSER)
     {
         srccaps = gst_caps_new_simple ("audio/x-nellymoser",
 		"rate", G_TYPE_INT, info.sampleRate,
@@ -72,7 +72,7 @@ AudioDecoderGst::AudioDecoderGst(const AudioInfo& info)
         return;
     }
 
-    if (info.type == FLASH && info.codec == AUDIO_CODEC_AAC)
+    if (info.type == CODEC_TYPE_FLASH && info.codec == AUDIO_CODEC_AAC)
     {
         srccaps = gst_caps_new_simple ("audio/mpeg",
             "mpegversion", G_TYPE_INT, 4,
@@ -95,7 +95,7 @@ AudioDecoderGst::AudioDecoderGst(const AudioInfo& info)
     }
 
 
-    if (info.type == FLASH) {
+    if (info.type == CODEC_TYPE_FLASH) {
 		boost::format err = boost::format(
                 _("AudioDecoderGst: cannot handle codec %d (%s)")) %
                 info.codec %
@@ -200,6 +200,7 @@ buf_add(gpointer buf, gpointer data)
 }
 
 
+/* private */
 boost::uint8_t* 
 AudioDecoderGst::pullBuffers(boost::uint32_t&  outputSize)
 {

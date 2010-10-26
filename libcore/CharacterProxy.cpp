@@ -26,27 +26,17 @@
 
 #include <string>
 
-namespace gnash
-{
-
-/* static private */
-DisplayObject*
-CharacterProxy::findDisplayObjectByTarget(const std::string& tgtstr)
-{
-	if ( tgtstr.empty() ) return NULL;
-
-	return VM::get().getRoot().findCharacterByTarget(tgtstr);
-}
+namespace gnash {
 
 void
 CharacterProxy::checkDangling() const
 {
-	if ( _ptr && _ptr->isDestroyed() ) 
-	{
+	if (_ptr && _ptr->isDestroyed()) {
 		_tgt = _ptr->getOrigTarget();
 #ifdef GNASH_DEBUG_SOFT_REFERENCES
-		log_debug("char %s (%s) was destroyed, stored it's orig target (%s) for later rebinding", _ptr->getTarget(),
-			typeName(*_ptr), _tgt);
+		log_debug("char %s (%s) was destroyed, stored its orig target "
+                "(%s) for later rebinding", _ptr->getTarget(), typeName(*_ptr),
+                _tgt);
 #endif
 		_ptr = 0;
 	}
@@ -55,9 +45,10 @@ CharacterProxy::checkDangling() const
 std::string
 CharacterProxy::getTarget() const
 {
-	checkDangling(); // set _ptr to NULL and _tgt to original target if destroyed
+    // set _ptr to NULL and _tgt to original target if destroyed
+	checkDangling(); 
 	if ( _ptr ) return _ptr->getTarget();
-	else return _tgt;
+	return _tgt;
 }
 
 void
@@ -67,6 +58,12 @@ CharacterProxy::setReachable() const
 	if ( _ptr ) _ptr->setReachable();
 }
 
+DisplayObject*
+findDisplayObjectByTarget(const std::string& tgtstr, movie_root& mr)
+{
+	if (tgtstr.empty()) return 0;
+	return mr.findCharacterByTarget(tgtstr);
+}
 
 } // namespace gnash
 

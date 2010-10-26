@@ -14,7 +14,7 @@
 // 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA    02110-1301    USA
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
 //
@@ -149,8 +149,7 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 
-#include "FileTypes.h"
-#include "gnash.h" // Quality
+#include "GnashEnums.h" 
 #include "Range2d.h"
 #include "Point2d.h"
 #include "RGBA.h"
@@ -160,12 +159,15 @@
 
 // Forward declarations.
 namespace gnash {
+    class IOChannel;
     class CachedBitmap;
     class rgba;
+    class Transform;
     class SWFMatrix;
-    class cxform;
     class FillStyle;
     class LineStyle;
+    class Shape;
+    class MorphShape;
 
     // XXX: GnashImageProxy (delayed image rendering)
     class GnashVaapiImageProxy;
@@ -173,11 +175,9 @@ namespace gnash {
     namespace SWF {
         class ShapeRecord;
     }
-
-    class Shape;
-    class MorphShape;
-
-    class GnashImage;
+    namespace image {
+        class GnashImage;
+    }
 }
 
 namespace gnash {
@@ -198,6 +198,9 @@ public:
     {}
 
     virtual ~Renderer() {}
+
+    /// Return a description of this renderer.
+    virtual std::string description() const = 0;
 
     /// ==================================================================
     /// Interfaces for adjusting renderer output.
@@ -221,7 +224,8 @@ public:
     /// Given an image, returns a pointer to a bitmap_info class
     /// that can later be passed to FillStyleX_bitmap(), to set a
     /// bitmap fill style.
-    virtual CachedBitmap* createCachedBitmap(std::auto_ptr<GnashImage> im) = 0;
+    virtual CachedBitmap* createCachedBitmap(
+            std::auto_ptr<image::GnashImage> im) = 0;
 
 
     /// ==================================================================
@@ -249,8 +253,8 @@ public:
     ///   The width and height determine the size of the Flash video instance
     ///   on the stage (in TWIPS) prior to SWFMatrix transformations.         
     ///
-    virtual void drawVideoFrame(GnashImage* frame, const SWFMatrix* mat,
-            const SWFRect* bounds, bool smooth) = 0;
+    virtual void drawVideoFrame(image::GnashImage* frame,
+            const Transform& xform, const SWFRect* bounds, bool smooth) = 0;
 
     /// Draw a line-strip directly, using a thin, solid line.
     //
@@ -285,8 +289,8 @@ public:
         const rgba& fill, const rgba& outline, const SWFMatrix& mat,
         bool masked) = 0;
         
-    virtual void drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
-            const SWFMatrix& worldMat) = 0;
+    virtual void drawShape(const SWF::ShapeRecord& shape,
+            const Transform& xform) = 0;
         
     /// \brief
     /// Draws a glyph (font character).
@@ -304,7 +308,6 @@ public:
     /// @param color
     virtual void drawGlyph(const SWF::ShapeRecord& rec, const rgba& color,
            const SWFMatrix& mat) = 0;
-
 
     /// Draw the current rendering buffer to an image file.
     //
@@ -340,33 +343,9 @@ public:
     /// Parameters are world coordinates (TWIPS).
     ///
     /// For more info see page \ref region_update.
-    ///
-    virtual void set_invalidated_region(const SWFRect& /*bounds*/) {}
-
     virtual void set_invalidated_regions(const InvalidatedRanges& /*ranges*/)
     {        
     }
-    
-    /// Bracket the displaying of a frame from a movie.
-    //
-    /// Set up to render a full frame from a movie and fills the
-    /// background. Sets up necessary transforms, to scale the
-    /// movie to fit within the given dimensions.    Call
-    /// end_display() when you're done.
-    ///
-    /// The rectangle (viewport_x0, viewport_y0, viewport_x0 +
-    /// viewport_width, viewport_y0 + viewport_height) defines the
-    /// window coordinates taken up by the movie.
-    ///
-    /// The rectangle (x0, y0, x1, y1) defines the pixel
-    /// coordinates of the movie that correspond to the viewport
-    /// bounds.
-    ///
-    virtual void begin_display(const rgba& background_color, 
-                    int viewport_width, int viewport_height,
-                    float x0, float x1, float y0, float y1) = 0;
-
-    virtual void end_display() = 0;
 
     /// ==================================================================
     /// Machinery for delayed images rendering (e.g. Xv with YV12 or VAAPI)
@@ -592,6 +571,54 @@ public:
     
 #endif
 
+    class External 
+    {
+    public:
+        /// Prepare the renderer for external rendering
+        //
+        /// Note that all arguments except the background colour are useless
+        /// outside the ogl renderer.
+        External(Renderer& r, const rgba& c, int w = 0, int h = 0,
+                float x0 = 0, float x1 = 0, float y0 = 0, float y1 = 0)
+            :
+            _r(r)
+        {
+            _r.begin_display(c, w, h, x0, x1, y0, y1);
+        }
+
+        ~External() {
+            _r.end_display();
+        }
+
+    private:
+        Renderer& _r;
+    };
+    
+    class Internal 
+    {
+    public:
+
+        /// Prepare the renderer for internal rendering
+        Internal(Renderer& r, image::GnashImage& im)
+            :
+            _r(r),
+            _ext(_r.startInternalRender(im))
+        {
+        }
+
+        Renderer* renderer() const {
+            return _ext;
+        }
+
+        ~Internal() {
+            _r.endInternalRender();
+        }
+
+    private:
+        Renderer& _r;
+        Renderer* _ext;
+    };
+
 protected:
 
     /// Kept in parallel with movie_root's setting.
@@ -599,6 +626,37 @@ protected:
 
     // Delayed imaged to render
     RenderImages _render_images;
+
+private:
+
+    /// Bracket the displaying of a frame from a movie.
+    //
+    /// Set up to render a full frame from a movie and fills the
+    /// background. Sets up necessary transforms, to scale the
+    /// movie to fit within the given dimensions.    Call
+    /// end_display() when you're done.
+    //
+    /// Most of the arguments are only for the ogl renderer. See documentation
+    /// in that class. Do not use these arguments for new renderers!
+    virtual void begin_display(const rgba& background_color, 
+                    int viewport_width, int viewport_height,
+                    float x0, float x1, float y0, float y1) = 0;
+
+    virtual void end_display() = 0;
+
+    /// Setup the renderer to draw to an internal buffer.
+    //
+    /// Implementations are free to return a new renderer if they choose.
+    //
+    /// @return         0 if the renderer does not support this.
+    virtual Renderer* startInternalRender(image::GnashImage& buffer) = 0;
+
+    /// Finish internal rendering.
+    //
+    /// Any rendering after this function has been called must apply to the
+    /// external buffer.
+    virtual void endInternalRender() = 0;
+
 }; 
 
 } // namespace gnash

@@ -20,10 +20,12 @@
 #ifndef GNASH_VAAPIIMAGE_H
 #define GNASH_VAAPIIMAGE_H
 
-#include "vaapi_common.h"
-#include "VaapiImageFormat.h"
 #include <boost/scoped_array.hpp>
 #include <memory>
+
+#include "dsodefs.h"
+#include "vaapi_common.h"
+#include "VaapiImageFormat.h"
 
 // Forward declarations
 struct SwsContext;
@@ -36,7 +38,8 @@ class VAImageWrapper;
 class SwsContextWrapper;
 
 /// VA image abstraction
-class VaapiImage {
+class DSOEXPORT VaapiImage
+{
     VaapiImageFormat    _format;
     VAImage             _image;
     boost::uint8_t *    _image_data;

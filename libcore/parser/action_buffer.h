@@ -20,12 +20,12 @@
 #define GNASH_ACTION_BUFFER_H
 
 #include <string>
+#include <vector> 
 #include <boost/noncopyable.hpp>
-#include <boost/cstdint.hpp> // for boost::uint8_t
-#include <vector> // for composition
+#include <boost/cstdint.hpp> 
 
 #include "GnashException.h"
-#include "log.h" // For gettext macro
+#include "log.h"
 
 // Forward declarations
 namespace gnash {
@@ -35,12 +35,7 @@ namespace gnash {
 	class SWFStream; // for read signature
 }
 
-
 namespace gnash {
-
-class ActionExec;
-
-double convert_double_wacky(const void *p);
 
 /// A code segment.
 //
@@ -53,7 +48,6 @@ double convert_double_wacky(const void *p);
 class action_buffer : boost::noncopyable
 {
 public:
-	friend class ActionExec;
 
 	action_buffer(const movie_definition& md);
 

@@ -19,21 +19,21 @@
 #ifndef GNASH_GTK_GLUE_H
 #define GNASH_GTK_GLUE_H
 
-#include "gnash.h"
-
 #include <cassert>
 
 #include <gtk/gtk.h>
-#if !defined(_WIN32) && !defined(__MACH__)
+#if !defined(_WIN32) && !defined(__APPLE__)
 #include <gdk/gdkx.h>
 #else
 #include <gdk/gdk.h>
 #endif
 
-namespace gnash
-{
+namespace gnash {
+    class Renderer;
+    class movie_root;
+}
 
-class Renderer;
+namespace gnash {
 
 class GtkGlue
 {
@@ -71,7 +71,7 @@ class GtkGlue
     virtual void configure(GtkWidget *const widget,
             GdkEventConfigure *const event) = 0;
     
-    virtual void beforeRendering() {};
+    virtual void beforeRendering(movie_root*) {};
 
   protected:
     GtkWidget *_drawing_area;

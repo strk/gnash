@@ -9,40 +9,28 @@ $Id: DESIGN,v 1.6 2008/06/03 16:30:33 strk Exp $
     [sound_handler] <--------{A}
                               |
                               |
-           (inputs) --> [gnash_core] <---{C}---> [MediaHandler]
+               (inputs) --> [core] <---{C}---> [MediaHandler]
                               |
                               |
-      [render_handler] <-----{B}
-            |
-            v
-       (screen,file) 
+            [Renderer] <-----{B}
+                 |
+                 v
+           (screen,file) 
 
 
 Components 
 ----------
 
-     [gnash_core] -- Gnash core lib (swf parser, VM, builtin objects)
+           [core] -- Gnash core lib (swf parser, VM, builtin objects)
   [sound_handler] -- Sound mixer, can be modular (only SDL currently available)
- [render_handler] -- Renderer, can be modular (available: agg/ogl/cairo)
+       [Renderer] -- Renderer, can be modular (available: agg/ogl/cairo)
    [MediaHandler] -- Factory for media parsers and decoders, can be modular (agailable: gst/ffmpeg)
 
 Component connectors 
 --------------------
 
- {A} --- [gnash_core] to [sound_handler] connector 
-         Is setup with gnash::set_sound_handler()
-         and retrived with gnash::get_sound_handler().
-         Both currently exposed in server/gnash.h.
+ {A} --- [core] to [sound_handler] connector 
 
- {B} --- [gnash_core] to [render_handler] connector 
-         Is setup with gnash::set_render_handler()
-         exposed in gnash.h.
-         Can be retrived with gnash::get_render_handler()
-         exposed in server/render.h, or used trough
-         wrappers in the gnash::render namespace
-         (still in server/render.h)
+ {B} --- [core] to [Renderer] connector 
 
- {C} --- [gnash_core] to [MediaHandler] connector 
-         Is setup with gnash::media::MediaHandler::set
-         and retrived with gnash::media::MediaHandler::get,
-         both currently exposed in libmedia/MediaHandler.h
+ {C} --- [core] to [MediaHandler] connector 

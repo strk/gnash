@@ -27,7 +27,7 @@
 
 #include "smart_ptr.h"
 #include "swf/ShapeRecord.h"
-#include "gnash.h"
+#include "GnashEnums.h"
 #include "RGBA.h"
 #include "GnashImage.h"
 #include "GnashTexture.h"
@@ -35,8 +35,9 @@
 #include "log.h"
 #include "utility.h"
 #include "Range2d.h"
-#include "cxform.h"
+#include "SWFCxForm.h"
 #include "FillStyle.h"
+#include "Transform.h"
 
 #if defined(_WIN32) || defined(WIN32)
 #  include <Windows.h>
@@ -128,7 +129,7 @@ public:
       WRAP_CLAMP
     };
 
-    bitmap_info_ogl(std::auto_ptr<GnashImage> image, GLenum pixelformat,
+    bitmap_info_ogl(std::auto_ptr<image::GnashImage> image, GLenum pixelformat,
                     bool ogl_accessible);
 
     ~bitmap_info_ogl();
@@ -142,14 +143,14 @@ public:
         return _disposed;
     }
 
-    virtual GnashImage& image() {
+    virtual image::GnashImage& image() {
         if (_cache.get()) return *_cache;
         switch (_pixel_format) {
             case GL_RGB:
-                _cache.reset(new ImageRGB(_orig_width, _orig_height));
+                _cache.reset(new image::ImageRGB(_orig_width, _orig_height));
                 break;
             case GL_RGBA:
-                _cache.reset(new ImageRGBA(_orig_width, _orig_height));
+                _cache.reset(new image::ImageRGBA(_orig_width, _orig_height));
                 break;
             default:
                 std::abort();
@@ -165,8 +166,8 @@ private:
     void setup() const;    
     void upload(boost::uint8_t* data, size_t width, size_t height) const;
     
-    mutable boost::scoped_ptr<GnashImage> _img;
-    mutable boost::scoped_ptr<GnashImage> _cache;
+    mutable boost::scoped_ptr<image::GnashImage> _img;
+    mutable boost::scoped_ptr<image::GnashImage> _cache;
     GLenum _pixel_format;
     GLenum _ogl_img_type;
     mutable bool _ogl_accessible;  
@@ -181,7 +182,7 @@ private:
 /// Transfer FillStyles to the ogl renderer.
 struct StyleHandler : boost::static_visitor<>
 {
-    StyleHandler(const cxform& c, Renderer& r)
+    StyleHandler(const SWFCxForm& c, Renderer& r)
         :
         _cx(c),
         _renderer(r)
@@ -209,7 +210,7 @@ struct StyleHandler : boost::static_visitor<>
     }
 
 private:
-    const cxform& _cx;
+    const SWFCxForm& _cx;
     Renderer& _renderer;
 };  
 
@@ -548,7 +549,7 @@ bool isEven(const size_t& n)
 }
 
 
-bitmap_info_ogl::bitmap_info_ogl(std::auto_ptr<GnashImage> image,
+bitmap_info_ogl::bitmap_info_ogl(std::auto_ptr<image::GnashImage> image,
         GLenum pixelformat, bool ogl_accessible)
 :
   _img(image.release()),
@@ -714,6 +715,8 @@ public:
       _drawing_mask(false)
   {
   }
+
+  std::string description() const { return "OpenGL"; }
   
   void init()
   {
@@ -781,40 +784,40 @@ public:
 #endif
   }    
 
-  virtual CachedBitmap* createCachedBitmap(std::auto_ptr<GnashImage> im)
+  virtual CachedBitmap* createCachedBitmap(std::auto_ptr<image::GnashImage> im)
   {
       switch (im->type()) {
-          case GNASH_IMAGE_RGB:
+          case image::TYPE_RGB:
           {
-              std::auto_ptr<GnashImage> rgba(
-                      new ImageRGBA(im->width(), im->height()));
+              std::auto_ptr<image::GnashImage> rgba(
+                      new image::ImageRGBA(im->width(), im->height()));
 
-              GnashImage::iterator it = rgba->begin();
+              image::GnashImage::iterator it = rgba->begin();
               for (size_t i = 0; i < im->size(); ++i) {
                   *it++ = *(im->begin() + i);
                   if (!(i % 3)) *it++ = 0xff;
               }
               im = rgba;
           }
-          case GNASH_IMAGE_RGBA:
+          case image::TYPE_RGBA:
                 return new bitmap_info_ogl(im, GL_RGBA, ogl_accessible());
           default:
                 std::abort();
       }
   }
 
-  boost::shared_ptr<GnashTexture> getCachedTexture(GnashImage *frame)
+  boost::shared_ptr<GnashTexture> getCachedTexture(image::GnashImage *frame)
   {
       boost::shared_ptr<GnashTexture> texture;
       GnashTextureFormat frameFormat(frame->type());
       unsigned int frameFlags;
 
       switch (frame->location()) {
-      case GNASH_IMAGE_CPU:
+      case image::GNASH_IMAGE_CPU:
           frameFlags = 0;
           break;
 #ifdef HAVE_VA_VA_GLX_H
-      case GNASH_IMAGE_GPU:
+      case image::GNASH_IMAGE_GPU:
           frameFlags = GNASH_TEXTURE_VAAPI;
           break;
 #endif
@@ -847,12 +850,12 @@ public:
           _cached_textures.clear();
 
           switch (frame->location()) {
-          case GNASH_IMAGE_CPU:
+          case image::GNASH_IMAGE_CPU:
               texture.reset(new GnashTexture(frame->width(),
                                              frame->height(),
                                              frame->type()));
               break;
-          case GNASH_IMAGE_GPU:
+          case image::GNASH_IMAGE_GPU:
               // This case should never be reached if vaapi is not
               // enabled; but has to be handled to keep the compiler
               // happy.
@@ -878,7 +881,7 @@ public:
   // anti-aliased with the rest of the drawing. Since display lists cannot be
   // concatenated this means we'll add up with several display lists for normal
   // drawing operations.
-  virtual void drawVideoFrame(GnashImage* frame, const SWFMatrix* m,
+  virtual void drawVideoFrame(image::GnashImage* frame, const Transform& xform,
           const SWFRect* bounds, bool /*smooth*/)
   {
     GLint index;
@@ -898,11 +901,11 @@ public:
         return;
 
     switch (frame->location()) {
-    case GNASH_IMAGE_CPU:
+    case image::GNASH_IMAGE_CPU:
         texture->update(frame->begin());
         break;
 #ifdef HAVE_VA_VA_GLX_H
-    case GNASH_IMAGE_GPU:
+    case image::GNASH_IMAGE_GPU:
         dynamic_cast<GnashVaapiTexture *>(texture.get())->update(dynamic_cast<GnashVaapiImage *>(frame)->surface());
         break;
 #endif
@@ -919,7 +922,7 @@ public:
     glNewList(index, GL_COMPILE);
     _render_indices.push_back(index);
 
-    reallyDrawVideoFrame(texture, m, bounds);
+    reallyDrawVideoFrame(texture, &xform.matrix, bounds);
 
     glEndList();
 
@@ -977,6 +980,13 @@ private:
   }
 
 public:
+      
+    virtual Renderer* startInternalRender(image::GnashImage& /*im*/) {
+        return 0;
+    }
+
+    virtual void endInternalRender() {}
+
   virtual void  begin_display(
     const rgba& bg_color,
     int viewport_width, int viewport_height,
@@ -1212,7 +1222,7 @@ public:
   void
   add_paths(const PathVec& path_vec)
   {
-    cxform dummy_cx;
+    SWFCxForm dummy_cx;
     std::vector<FillStyle> dummy_fs;
     
     FillStyle coloring = FillStyle(SolidFill(rgba(0, 0, 0, 0)));
@@ -1417,7 +1427,7 @@ public:
     }    
   }
 
-  void apply_FillStyle(const FillStyle& style, const SWFMatrix& /* mat */, const cxform& cx)
+  void apply_FillStyle(const FillStyle& style, const SWFMatrix& /* mat */, const SWFCxForm& cx)
   {
       const StyleHandler st(cx, *this);
       boost::apply_visitor(st, style.fill);
@@ -1425,7 +1435,7 @@ public:
   
   
   
-  bool apply_line_style(const LineStyle& style, const cxform& cx, const SWFMatrix& mat)
+  bool apply_line_style(const LineStyle& style, const SWFCxForm& cx, const SWFMatrix& mat)
   {
   //  GNASH_REPORT_FUNCTION;
      
@@ -1526,7 +1536,7 @@ public:
     
   void
   draw_outlines(const PathVec& path_vec, const PathPointMap& pathpoints,
-		const SWFMatrix& mat, const cxform& cx,
+		const SWFMatrix& mat, const SWFCxForm& cx,
 		const std::vector<FillStyle>& /* FillStyles */,
                 const std::vector<LineStyle>& line_styles)
   {
@@ -1690,7 +1700,7 @@ public:
   void
   draw_subshape(const PathVec& path_vec,
     const SWFMatrix& mat,
-    const cxform& cx,
+    const SWFCxForm& cx,
     const std::vector<FillStyle>& FillStyles,
     const std::vector<LineStyle>& line_styles)
   {
@@ -1769,9 +1779,7 @@ public:
 // 4. ...
 // 5. Profit!
 
-  virtual void
-  drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
-          const SWFMatrix& mat)
+  virtual void drawShape(const SWF::ShapeRecord& shape, const Transform& xform)
   {
   
     const PathVec& path_vec = shape.paths();
@@ -1784,7 +1792,7 @@ public:
     if (_drawing_mask) {
       PathVec scaled_path_vec = path_vec;
       
-      apply_matrix_to_paths(scaled_path_vec, mat);
+      apply_matrix_to_paths(scaled_path_vec, xform.matrix);
       draw_mask(scaled_path_vec); 
       return;
     }    
@@ -1797,7 +1805,7 @@ public:
       return; // invisible character
     }    
     
-    oglScopeMatrix scope_mat(mat);
+    oglScopeMatrix scope_mat(xform.matrix);
 
     std::vector<PathVec::const_iterator> subshapes = find_subshapes(path_vec);
     
@@ -1813,8 +1821,8 @@ public:
         subshape_paths.push_back(*subshapes[i]);
       }
       
-      draw_subshape(subshape_paths, mat, cx, FillStyles,
-                    line_styles);
+      draw_subshape(subshape_paths, xform.matrix, xform.colorTransform,
+              FillStyles, line_styles);
     }
   }
 
@@ -1822,7 +1830,7 @@ public:
          const SWFMatrix& mat)
   {
     if (_drawing_mask) abort();
-    cxform dummy_cx;
+    SWFCxForm dummy_cx;
     std::vector<FillStyle> glyph_fs;
     
     FillStyle coloring = FillStyle(SolidFill(c));
@@ -1966,13 +1974,13 @@ sampleGradient(const GradientFill& fill, boost::uint8_t ratio)
 const CachedBitmap*
 createGradientBitmap(const GradientFill& gf, Renderer& renderer)
 {
-    std::auto_ptr<ImageRGBA> im;
+    std::auto_ptr<image::ImageRGBA> im;
 
     switch (gf.type())
     {
         case GradientFill::LINEAR:
             // Linear gradient.
-            im.reset(new ImageRGBA(256, 1));
+            im.reset(new image::ImageRGBA(256, 1));
 
             for (size_t i = 0; i < im->width(); i++) {
 
@@ -1984,7 +1992,7 @@ createGradientBitmap(const GradientFill& gf, Renderer& renderer)
 
         case GradientFill::RADIAL:
             // Focal gradient.
-            im.reset(new ImageRGBA(64, 64));
+            im.reset(new image::ImageRGBA(64, 64));
 
             for (size_t j = 0; j < im->height(); j++)
             {
@@ -2009,7 +2017,7 @@ createGradientBitmap(const GradientFill& gf, Renderer& renderer)
     }
 
     const CachedBitmap* bi = renderer.createCachedBitmap(
-                    static_cast<std::auto_ptr<GnashImage> >(im));
+                    static_cast<std::auto_ptr<image::GnashImage> >(im));
 
     return bi;
 }

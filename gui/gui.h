@@ -23,13 +23,13 @@
 #include "gnashconfig.h"
 #endif
 
-#include "SWFRect.h"  // for composition
 #include "snappingrange.h"  // for InvalidatedRanges
-#include "GnashKey.h" // for gnash::key::code type
-#include "Renderer.h" // for gnash::key::code type
+#include "ScreenShotter.h"
+#include "GnashKey.h"
+#include "Renderer.h" 
 #include "VirtualClock.h"
 #include "SystemClock.h"
-#include "gnash.h" // for Quality
+#include "GnashEnums.h" 
 #include "movie_root.h"
 
 #ifdef USE_SWFTREE
@@ -65,8 +65,8 @@
 #define ENABLE_KEYBOARD_MOUSE_MOVEMENTS 1
 
 // Forward declarations
-namespace gnash
-{
+namespace gnash {
+    class SWFRect;
     class RunResources;
     class movie_root;
     class movie_definition;
@@ -79,72 +79,6 @@ enum gnash_cursor_type {
   CURSOR_HAND,
   CURSOR_NORMAL,
   CURSOR_INPUT
-};
-
-
-/// Handles screen dumps.
-class ScreenShotter
-{
-public:
-
-    typedef std::vector<size_t> FrameList;
-
-    /// Create a ScreenShotter with renderer and output name.
-    ScreenShotter(boost::shared_ptr<Renderer> r, const std::string& fileName)
-        :
-        _renderer(r),
-        _immediate(false),
-        _fileName(fileName),
-        _last(false)
-    {}
-
-    /// Take a screenshot at the next possible moment.
-    void now() {
-        _immediate = true;
-    }
-
-    /// Take a screenshot when the last frame is reached.
-    void lastFrame() {
-        _last = true;
-    }
-
-    /// Called on the last frame before exit.
-    //
-    /// Which frame is last depends on the execution path of the SWF, whether
-    /// the SWF loops, whether a timeout was requested or a maximum number of
-    /// advances set. Those conditions are not knowable in advance, so
-    /// the last frame is a special case.
-    void last() const;
-
-    /// Takes a screenshot if required.
-    //
-    /// Called on each advance.
-    //
-    /// @param frameAdvance     used to check whether a screenshot is required
-    ///                         as well as to construct the filename.
-    void screenShot(size_t frameAdvance);
-
-    /// Request a list of frames to be rendered to image files.
-    void setFrames(const FrameList& frames);
-
-private:
-
-    /// Take the screenshot.
-    void saveImage(const std::string& filename) const;
-
-    boost::shared_ptr<Renderer> _renderer;
-
-    /// If true, the next call to screenshot will take a screenshot
-    bool _immediate;
-
-    /// Name used to generate output file.
-    const std::string _fileName;
-
-    /// Whether to take a screenshot on the last frame.
-    bool _last;
-
-    FrameList _frames;
-
 };
 
 /// Parent class from which all GUI implementations will depend.
@@ -185,7 +119,7 @@ public:
     /// The Gui clock will be paused when the gui is put
     /// in pause mode and resumed when gui playback is resumed.
     ///
-    VirtualClock& getClock() { return _virtualClock; }
+    virtual VirtualClock& getClock() { return _virtualClock; }
 
     /// Set the time in milliseconds after which the programme should exit.
     virtual void setTimeout(unsigned int timeout) = 0;
@@ -241,14 +175,6 @@ public:
     ///
     // does not need to be implemented (optional feature),
     // but still needs to be available.
-    //
-    // Why "SWFRect" (floats)? Because the gui does not really
-    // know about the scale the renderer currently uses... 
-    //
-    // <strk> but it does not about the "semantic" of the TWIPS
-    //        coordinate space, which is integer values...
-    //        The question really is: why floats for TWIPS ?
-    //        (guess this goes deep in the core/server libs)
     //
     virtual void setInvalidatedRegion(const SWFRect& bounds);
     virtual void setInvalidatedRegions(const InvalidatedRanges& ranges);
@@ -307,9 +233,11 @@ public:
     /// Key event notification to be called when a key is pressed or depressed
     //
     /// @param k The key code.
-    /// @param modifier Modifier key identifiers from gnash::key::modifier ORed together
-    /// @param pressed Determines whether the key is being
-    ///           pressed (true) or being released (false)
+    /// @param modifier
+    ///   Modifier key identifiers from gnash::key::modifier ORed together
+    /// @param pressed
+    ///   Determines whether the key is being pressed (true)
+    ///   or being released (false)
     ///
     void notify_key_event(gnash::key::code k, int modifier, bool pressed);
 
@@ -328,13 +256,26 @@ public:
     void updateStageMatrix();
 
     /// \brief
-    /// Advances the movie to the next frame. This is to take place after the
+    /// Give movie an heart-beat.
+    //
+    /// This is to take place after the
     /// interval specified in the call to setInterval().
+    ///
+    /// Wheter or not this beat advanced the movie to the next frame
+    /// depends on elapsed time since last advancement.
+    ///
+    /// @return true if this beat resulted in actual frame advancement.
+    ///
     bool advanceMovie();
 
     /// Convenience static wrapper around advanceMovie for callbacks happiness.
+    //
+    /// NOTE: this function always return TRUE, for historical reasons.
+    /// TODO: bring code up-to-date to drop this legacy return code..
+    ///       
     static bool advance_movie(Gui* gui) {
-        return gui->advanceMovie();
+        gui->advanceMovie();
+        return true;
     }
 
     /// Force immediate redraw
@@ -446,15 +387,8 @@ public:
 
 
 #ifdef USE_SWFTREE
-    // TODO: use a tree-like structure (tree.hh?)
-    typedef std::pair<std::string, std::string> StringPair;
-    typedef tree<StringPair> InfoTree;
-
-    /// \brief
-    /// Return a tree containing informations about the movie
-    /// currently being played (or NULL, if the VM isn't initialized yet)
-    ///
-    std::auto_ptr<InfoTree> getMovieInfo() const;
+    /// Return a tree containing information about the movie playing.
+    std::auto_ptr<movie_root::InfoTree> getMovieInfo() const;
 #endif
 
     typedef std::map<std::string, std::string> VariableMap;
@@ -471,8 +405,13 @@ public:
     /// Set the stage to advance/display
     void setStage(movie_root* stage);
 
+    /// Set the name of a file to dump audio to
+    void setAudioDump(const std::string& fname) {
+        _audioDump = fname;
+    }
+
     /// The root movie, or "Stage"
-    movie_root *getStage() { return _stage; };
+    movie_root* getStage() { return _stage; };
     
     /// Handle error message from the core
     //
@@ -561,7 +500,7 @@ protected:
     /// Desired window height.
     int _height;
 
-    /// Desired colour depth in bits.
+    /// Per-run resources
     RunResources& _runResources;
 
     /// Main loop interval: the time between successive advance_movie calls.
@@ -585,6 +524,9 @@ protected:
     
     /// Counter to keep track of frame advances
     unsigned long _advances;
+
+    /// Name of a file to dump audio to
+    std::string _audioDump;
 
     /// Called by Gui::stop().  This can be used by GUIs to implement pause
     /// widgets (so that resuming a stopped animation is more user-friendly)

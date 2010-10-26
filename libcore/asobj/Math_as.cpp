@@ -99,15 +99,14 @@ namespace {
 //
 
 // If it is called with two arguments, the valueOf method
-// (i.e. to_number()) of the second method is called, but 
-// not used. Strange, but true.
+// of the second method is called, but not used. Strange, but true.
 template<UnaryMathFunc Func>
 as_value
 unaryFunction(const fn_call& fn)
 {
     if (fn.nargs < 1) return as_value(NaN);
-    double arg = fn.arg(0).to_number();	
-    if (fn.nargs > 1) fn.arg(1).to_number();
+    double arg = toNumber(fn.arg(0), getVM(fn));	
+    if (fn.nargs > 1) toNumber(fn.arg(1), getVM(fn));
     return as_value(Func(arg));
 }
 
@@ -124,8 +123,8 @@ as_value
 binaryFunction(const fn_call& fn)
 {
     if (fn.nargs < 2) return as_value(NaN);
-    double arg0 = fn.arg(0).to_number();	
-    double arg1 = fn.arg(1).to_number();
+    double arg0 = toNumber(fn.arg(0), getVM(fn));	
+    double arg1 = toNumber(fn.arg(1), getVM(fn));
     return as_value(Func(arg0, arg1));
 }
 
@@ -139,14 +138,14 @@ binaryFunction<std::pow>(const fn_call& fn)
 {
     if (!fn.nargs) return as_value(NaN);
     
-    double arg0 = fn.arg(0).to_number();
+    double arg0 = toNumber(fn.arg(0), getVM(fn));
 
     if (fn.nargs < 2) {
         if (arg0 == 1) return as_value(1);
         return as_value(NaN);
     }
 
-    double arg1 = fn.arg(1).to_number();
+    double arg1 = toNumber(fn.arg(1), getVM(fn));
     return as_value(isFinite(arg0) ? std::pow(arg0, arg1) : NaN );
 }
 
@@ -160,8 +159,8 @@ math_min(const fn_call& fn)
 
 	if (fn.nargs < 2) return as_value(NaN);
 
-	double arg0 = fn.arg(0).to_number();
-	double arg1 = fn.arg(1).to_number();
+	double arg0 = toNumber(fn.arg(0), getVM(fn));
+	double arg1 = toNumber(fn.arg(1), getVM(fn));
 
 	if (isNaN(arg0) || isNaN(arg1))
 	{
@@ -182,8 +181,8 @@ math_max(const fn_call& fn)
 	
     if (fn.nargs < 2) return as_value(NaN);
 
-	double arg0 = fn.arg(0).to_number();
-	double arg1 = fn.arg(1).to_number();
+	double arg0 = toNumber(fn.arg(0), getVM(fn));
+	double arg1 = toNumber(fn.arg(1), getVM(fn));
 
 	if (isNaN(arg0) || isNaN(arg1))
 	{
@@ -201,8 +200,8 @@ as_value
 math_random(const fn_call& fn)
 {
 
-    if (fn.nargs) fn.arg(0).to_number();
-    if (fn.nargs > 1) fn.arg(1).to_number();
+    if (fn.nargs) toNumber(fn.arg(0), getVM(fn));
+    if (fn.nargs > 1) toNumber(fn.arg(1), getVM(fn));
 
 	VM::RNG& rnd = getVM(fn).randomNumberGenerator();
 

@@ -33,10 +33,13 @@ SUBDIRS += npapi
 if WIN32
 SUBDIRS += win32
 endif
+if AMIGAOS4
+SUBDIRS += aos4
+endif
 endif # NPAPI
 
 # make sure these files make it into the distribution tarball.
-DIST_SUBDIRS = klash klash4 npapi win32
+DIST_SUBDIRS = klash klash4 npapi win32 aos4
 
 install-plugin install-plugins: $(plugin_LTLIBRARIES) $(PKGLIB)
 if !WIN32

@@ -15,12 +15,36 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
+
+# These are used to handle input events from a keyboard, mouse, or
+# touchscreen. These are only used by the Framebuffer GUI, as without
+# X11, it has no event handling. We do it this way so the optionally
+# built source files still get included in the source tarball.
+DEVICES =
+if ENABLE_INPUT_DEVICES
+DEVICES += fb/InputDevice.cpp fb/InputDevice.h
+
+# Touchscreen
+if ENABLE_TSLIB
+DEVICES += fb/TouchDevice.cpp
+endif
+# PS/2 Mouse
+if ENABLE_MOUSE
+DEVICES += fb/MouseDevice.cpp
+endif
+# Linux input events
+if ENABLE_INPUT_EVENTS
+DEVICES += fb/EventDevice.cpp
+endif
+endif
+
 #
 # Build the FB gui
 #
 if BUILD_FB_GUI
 bin_PROGRAMS += fb-gnash
 fb_gnash_SOURCES = $(GUI_SRCS) \
+    $(DEVICES) \
 	fb/gui_fb.cpp \
 	fb/fb.cpp \
 	fb/fbsup.h

@@ -58,11 +58,11 @@ cat << EOF
 outlog=${top_builddir}/testoutlog.\$$
 (
     echo "Running first process"
-    $perl ${top_srcdir}/testsuite/XmlSocketServer.pl
+    $perl ${top_srcdir}/testsuite/XmlSocketServer.pl \$@
 ) &
 (
     echo "Running second process"
-    ${top_builddir}/gui/gnash -v -r0 ${swf} -t ${timeout} > \${outlog}
+    ${top_builddir}/gui/gnash -d100 -v -r0 ${swf} -t ${timeout} > \${outlog}
     cat \${outlog}
 	if test "x${endtagpat}" != x; then
 		lasttrace=\`grep TRACE \${outlog} | tail -1 | sed 's/.*TRACE: //'\`

@@ -47,6 +47,7 @@
 #include "MouseButtonState.h"
 #include "Global_as.h"
 #include "Renderer.h"
+#include "Transform.h"
 
 #include <algorithm> 
 #include <string>
@@ -127,7 +128,7 @@ TextField::TextField(as_object* object, DisplayObject* parent,
     if (!f) f = fontlib::get_default_font(); 
     setFont(f);
 
-    int version = getSWFVersion(*object);
+    const int version = getSWFVersion(*object);
     
     // set default text *before* calling registerTextVariable
     // (if the textvariable already exist and has a value
@@ -225,15 +226,14 @@ TextField::removeTextField()
         return;
     }
 
-    DisplayObject* parent = get_parent();
-    assert(parent); // every TextField must have a parent, right ?
+    DisplayObject* p = parent();
+    assert(p); // every TextField must have a parent, right ?
 
-    MovieClip* parentSprite = parent->to_movie();
+    MovieClip* parentSprite = p->to_movie();
 
-    if (!parentSprite)
-    {
+    if (!parentSprite) {
         log_error("FIXME: attempt to remove a TextField being a child of a %s",
-                typeName(*parent));
+                typeName(*p));
         return;
     }
 
@@ -287,17 +287,22 @@ TextField::cursorRecord()
 }
 
 void
-TextField::display(Renderer& renderer)
+TextField::display(Renderer& renderer, const Transform& base)
 {
+    const DisplayObject::MaskRenderer mr(renderer, *this);
+
     registerTextVariable();
 
     const bool drawBorder = getDrawBorder();
     const bool drawBackground = getDrawBackground();
 
-    const SWFMatrix& wmat = getWorldMatrix();
+    Transform xform = base * transform();
 
-    if ((drawBorder || drawBackground) && !_bounds.is_null())
-    {
+    // This is a hack to handle device fonts, which are not affected by
+    // color transform.
+    if (!getEmbedFonts()) xform.colorTransform = SWFCxForm();
+
+    if ((drawBorder || drawBackground) && !_bounds.is_null()) {
 
         std::vector<point> coords(4);
 
@@ -315,7 +320,7 @@ TextField::display(Renderer& renderer)
         rgba backgroundColor = drawBackground ? getBackgroundColor() :
                                                 rgba(0,0,0,0);
 
-        cxform cx = get_world_cxform();
+        SWFCxForm cx = xform.colorTransform;
             
         if (drawBorder) borderColor = cx.transform(borderColor);
          
@@ -326,7 +331,7 @@ TextField::display(Renderer& renderer)
 #endif
 
         renderer.draw_poly(&coords.front(), 4, backgroundColor, 
-                borderColor, wmat, true);
+                borderColor, xform.matrix, true);
         
     }
 
@@ -335,10 +340,9 @@ TextField::display(Renderer& renderer)
     // A cleaner implementation is likely correctly setting the
     // _xOffset and _yOffset memebers in glyph records.
     // Anyway, see bug #17954 for a testcase.
-    SWFMatrix m = getWorldMatrix();
-
     if (!_bounds.is_null()) {
-        m.concatenate_translation(_bounds.get_x_min(), _bounds.get_y_min()); 
+        xform.matrix.concatenate_translation(_bounds.get_x_min(),
+                _bounds.get_y_min()); 
     }
 
     _displayRecords.clear();
@@ -352,7 +356,8 @@ TextField::display(Renderer& renderer)
     for (size_t i = 0; i < _textRecords.size(); ++i) {
         recordline = 0;
         //find the line the record is on
-        while (recordline < _line_starts.size() && _line_starts[recordline] <= _recordStarts[i]) {
+        while (recordline < _line_starts.size() && 
+                _line_starts[recordline] <= _recordStarts[i]) {
             ++recordline;
         }
         //offset the line
@@ -364,24 +369,23 @@ TextField::display(Renderer& renderer)
         }
     }
         
-    SWF::TextRecord::displayRecords(renderer, m, get_world_cxform(),
-            _displayRecords, _embedFonts);
+    SWF::TextRecord::displayRecords(renderer, xform, _displayRecords,
+            _embedFonts);
 
-    if (m_has_focus && !isReadOnly()) show_cursor(renderer, wmat);
+    if (m_has_focus && !isReadOnly()) show_cursor(renderer, xform.matrix);
     
     clear_invalidated();
 }
 
 
 void
-TextField::add_invalidated_bounds(InvalidatedRanges& ranges, 
-    bool force)
+TextField::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 {
     if (!force && !invalidated()) return; // no need to redraw
     
     ranges.add(m_old_invalidated_ranges);
 
-    const SWFMatrix& wm = getWorldMatrix();
+    const SWFMatrix& wm = getWorldMatrix(*this);
 
     SWFRect bounds = getBounds();
     bounds.expand_to_rect(m_text_bounding_box); 
@@ -527,7 +531,7 @@ TextField::notifyEvent(const event_id& ev)
             boost::int32_t x_mouse, y_mouse;
             root.get_mouse_state(x_mouse, y_mouse);
 			
-			SWFMatrix m = getMatrix();
+			SWFMatrix m = getMatrix(*this);
 			
 			x_mouse -= m.get_x_translation();
 			y_mouse -= m.get_y_translation();
@@ -776,7 +780,7 @@ TextField::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
     // Not selectable, so don't catch mouse events!
     if (!_selectable) return 0;
 
-    SWFMatrix m = getMatrix();
+    SWFMatrix m = getMatrix(*this);
     point p(x, y);
     m.invert().transform(p);
 
@@ -788,7 +792,7 @@ TextField::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 void
 TextField::updateText(const std::string& str)
 {
-    int version = getSWFVersion(*getObject(this));
+    const int version = getSWFVersion(*getObject(this));
     const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
     updateText(wstr);
 }
@@ -846,7 +850,7 @@ TextField::setHtmlTextValue(const std::wstring& wstr)
         as_object* tgt = ref.first;
         if ( tgt )
         {
-            int version = getSWFVersion(*getObject(this));
+            const int version = getSWFVersion(*getObject(this));
             // we shouldn't truncate, right?
             tgt->set_member(ref.second, utf8::encodeCanonicalString(wstr,
                         version)); 
@@ -879,7 +883,7 @@ TextField::setTextValue(const std::wstring& wstr)
         as_object* tgt = ref.first;
         if ( tgt )
         {
-            int version = getSWFVersion(*getObject(this));
+            const int version = getSWFVersion(*getObject(this));
             // we shouldn't truncate, right?
             tgt->set_member(ref.second, utf8::encodeCanonicalString(wstr,
                         version)); 
@@ -915,7 +919,7 @@ std::string
 TextField::get_htmltext_value() const
 {
     const_cast<TextField*>(this)->registerTextVariable();
-    int version = getSWFVersion(*getObject(const_cast<TextField*>(this)));
+    const int version = getSWFVersion(*getObject(const_cast<TextField*>(this)));
     return utf8::encodeCanonicalString(_htmlText, version);
 }
 
@@ -1102,7 +1106,6 @@ TextField::format_text()
     // FIXME: I don't think we should query the definition
     // to find the appropriate font to use, as ActionScript
     // code should be able to change the font of a TextField
-    //
     if (!_font) {
         log_error(_("No font for TextField!"));
         return;
@@ -1453,7 +1456,6 @@ TextField::handleChar(std::wstring::const_iterator& it,
                     bool selfclosing = false;
                     bool complete = parseHTML(discard, attributes, it, e, selfclosing);
                     std::string s(discard.begin(), discard.end());
-                    s.assign(discard.begin(), discard.end());
 
                     std::map<std::string,std::string>::const_iterator attloc;
                     
@@ -2097,8 +2099,6 @@ TextField::parseHTML(std::wstring& tag,
         const std::wstring::const_iterator& e,
         bool& selfclosing) const
 {
-    std::string attname;
-    std::string attvalue;
     while (it != e && *it != ' ') {
         if (*it == '/') {
             ++it;
@@ -2148,6 +2148,10 @@ TextField::parseHTML(std::wstring& tag,
             return false;
         }
     }
+
+    std::string attname;
+    std::string attvalue;
+
     //attributes
     while (it != e && *it != '>') {
         while (it != e && *it != '=' && *it != ' ') {
@@ -2170,19 +2174,18 @@ TextField::parseHTML(std::wstring& tag,
         while (it != e && (*it == ' ' || *it == '=')) {
             ++it; //skip over spaces and '='
         }
-        if (it != e) {
-            if (*it != '"') { //make sure attribute value is opened with '"'
-                log_error("attribute value must be opened with \'\"\' "
-                        "(did you remember escape char?)");
-                while (it != e) {
-                    ++it;
-                }
-                return false;
-            } else {
-                ++it; //skip (")
-            }
+
+        if (it == e) return false;
+        const char q = *it;
+        if (q != '"' && q != '\'') { 
+            // This is not an attribute.
+            while (it != e) ++it;
+            return false;
         }
-        while (it != e && *it != '"') { //get attribute value
+
+        // Advance past attribute opener    
+        ++it; 
+        while (it != e && *it != q) {
 
             if (*it == 0) {
                 log_error("found NULL character in htmlText");
@@ -2192,21 +2195,21 @@ TextField::parseHTML(std::wstring& tag,
             attvalue.push_back(std::toupper(*it));
             ++it;
         }
-        if (it != e) {
-            if (*it != '"') { //make sure attribute value is closed with '"'
-                log_error("attribute value must be closed with \'\"\' "
-                        "(did you remember escape char?)");
-                while (it != e) {
-                    ++it;
-                }
-                return false;
-            } else {
-                ++it; //skip (")
-            }
-        }
+        
+        if (it == e) return false;
+    
+        if (*it != q) { 
+            while (it != e) ++it;
+            return false;
+        } 
+
+        // Skip attribute closer.
+        ++it;
+
         attributes.insert(std::make_pair(attname, attvalue));
-        attname = "";
-        attvalue = "";
+        attname.clear();
+        attvalue.clear();
+
         if ((*it != ' ') && (*it != '/') && (*it != '>')) {
             log_error("malformed HTML tag, invalid attribute value");
             while (it != e) {
@@ -2276,9 +2279,9 @@ TextField::set_variable_name(const std::string& newname)
 bool
 TextField::pointInShape(boost::int32_t x, boost::int32_t y) const
 {
-    SWFMatrix wm = getWorldMatrix();
+    const SWFMatrix wm = getWorldMatrix(*this).invert();
     point lp(x, y);
-    wm.invert().transform(lp);
+    wm.transform(lp);
     return _bounds.point_test(lp.x, lp.y);
 }
 
@@ -2378,19 +2381,6 @@ TextField::setWordWrap(bool wrap)
         _wordWrap = wrap;
         format_text();
     }
-}
-
-cxform    
-TextField::get_world_cxform() const
-{
-    // This is not automatically tested. See testsuite/samples/input-fields.swf
-    // for a manual check.
-
-    // If using a device font (PP compatibility), do not take parent cxform
-    // into account.
-    if (!getEmbedFonts()) return cxform();
-
-    return DisplayObject::get_world_cxform();
 }
 
 void

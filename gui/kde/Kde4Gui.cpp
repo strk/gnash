@@ -57,7 +57,6 @@
 
 #include "Range2d.h"
 
-#include "gnash.h"
 #include "smart_ptr.h"
 #include "movie_definition.h" 
 #include "log.h"
@@ -374,7 +373,7 @@ Kde4Gui::qtToGnashKey(QKeyEvent *event)
 
     // Gnash uses its own keycodes to map key events
     // to the three sometimes weird and confusing values that flash movies
-    // can refer to. See gnash.h for the keycodes and map.
+    // can refer to. See GnashKey.h for the keycodes and map.
     //
     // Gnash's keycodes are gnash::key::code. They are mainly in ascii order.
     // Standard ascii characters (32-127) have the same value. Extended ascii
@@ -466,8 +465,8 @@ Kde4Gui::showProperties()
             SIGNAL(clicked()), SLOT(close()));
 
 #ifdef USE_SWFTREE
-    std::auto_ptr<InfoTree> infoptr = getMovieInfo();
-    InfoTree& info = *infoptr;
+    std::auto_ptr<movie_root::InfoTree> infoptr = getMovieInfo();
+    const movie_root::InfoTree& info = *infoptr;
 
     QTreeWidget *tree = new QTreeWidget();
     tree->setColumnCount(2);
@@ -480,8 +479,10 @@ Kde4Gui::showProperties()
 
     int prevDepth = 0;
     QStack<QTreeWidgetItem*> stack;
-    for (InfoTree::iterator i=info.begin(), e=info.end(); i!=e; ++i) {
-        StringPair& p = *i;
+    for (movie_root::InfoTree::iterator i = info.begin(), e = info.end();
+            i != e; ++i) {
+
+        const movie_root::InfoTree::value_type& p = *i;
 
         QStringList cols;
         cols.append(p.first.c_str());

@@ -22,8 +22,12 @@
 #include "gnashconfig.h" // USE_SWF_TREE
 #endif
 
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "Button.h"
+
+#include <boost/bind.hpp>
+#include <utility>
+
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "DefineButtonTag.h"
 #include "as_value.h"
 #include "Button.h"
@@ -41,8 +45,7 @@
 #include "Global_as.h" 
 #include "RunResources.h"
 #include "sound_definition.h"
-
-#include <boost/bind.hpp>
+#include "Transform.h"
 
 /** \page buttons Buttons and mouse behaviour
 
@@ -225,15 +228,15 @@ private:
 namespace {
     void addInstanceProperty(Button& b, DisplayObject* d) {
         if (!d) return;
-        const string_table::key name = d->get_name();
-        if (!name) return;
+        const ObjectURI& name = d->get_name();
+        if (name.empty()) return;
         getObject(&b)->init_member(name, getObject(d), 0);
     }
 
     void removeInstanceProperty(Button& b, DisplayObject* d) {
         if (!d) return;
-        const string_table::key name = d->get_name();
-        if (!name) return;
+        const ObjectURI& name = d->get_name();
+        if (name.empty()) return;
         getObject(&b)->delProperty(name);
     }
 }
@@ -309,10 +312,13 @@ bool
 Button::trackAsMenu()
 {
     // TODO: check whether the AS or the tag value takes precedence.
+    as_object* obj = getObject(this);
+    assert(obj);
+
     as_value track;
-    string_table& st = getStringTable(*getObject(this));
-    if (getObject(this)->get_member(st.find("trackAsMenu"), &track)) {
-        return track.to_bool();
+    string_table& st = getStringTable(*obj);
+    if (obj->get_member(st.find("trackAsMenu"), &track)) {
+        return toBool(track, getVM(*obj));
     }
     if (_def) return _def->trackAsMenu();
     return false;
@@ -321,10 +327,13 @@ Button::trackAsMenu()
 bool 
 Button::isEnabled()
 {
-    as_value enabled;
-    if (!getObject(this)->get_member(NSV::PROP_ENABLED, &enabled)) return false;
+    as_object* obj = getObject(this);
+    assert(obj);
 
-    return enabled.to_bool();
+    as_value enabled;
+    if (!obj->get_member(NSV::PROP_ENABLED, &enabled)) return false;
+
+    return toBool(enabled, getVM(*obj));
 }
 
 
@@ -355,8 +364,11 @@ Button::handleFocus() {
 
 
 void
-Button::display(Renderer& renderer)
+Button::display(Renderer& renderer, const Transform& base)
 {
+    const DisplayObject::MaskRenderer mr(renderer, *this);
+
+    const Transform xform = base * transform();
 
     DisplayObjects actChars;
     getActiveCharacters(actChars);
@@ -366,7 +378,7 @@ Button::display(Renderer& renderer)
 
     for (DisplayObjects::iterator it = actChars.begin(), e = actChars.end();
             it != e; ++it) {
-        (*it)->display(renderer);
+        (*it)->display(renderer, xform);
     }
 
     clear_invalidated();
@@ -394,7 +406,7 @@ Button::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
     {
         std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
 
-        SWFMatrix  m = getMatrix();
+        SWFMatrix m = getMatrix(*this);
         point  p(x, y);
         m.invert().transform(p);
 
@@ -415,13 +427,12 @@ Button::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
     // Find hit DisplayObjects
     if ( _hitCharacters.empty() ) return 0;
 
-    // point is in parent's space,
+    // point is in p's space,
     // we need to convert it in world space
     point  wp(x,y);
-    DisplayObject* parent = get_parent();
-    if ( parent )
-    {
-        parent->getWorldMatrix().transform(wp);
+    DisplayObject* p = parent();
+    if (p) {
+        getWorldMatrix(*p).transform(wp);
     }
 
     for (DisplayObjects::const_iterator i = _hitCharacters.begin(),
@@ -558,12 +569,12 @@ Button::mouseEvent(const event_id& event)
     _def->forEachTrigger(event, xec);
 
     // check for built-in event handler.
-    std::auto_ptr<ExecutableCode> code ( get_event_handler(event) );
+    std::auto_ptr<ExecutableCode> code (get_event_handler(event));
     if (code.get()) {
         mr.pushAction(code, movie_root::PRIORITY_DOACTION);
     }
 
-    callMethod(getObject(this), event.functionKey());
+    sendEvent(*getObject(this), get_environment(), event.functionURI());
 }
 
 
@@ -754,7 +765,7 @@ Button::getBounds() const
         const DisplayObject* ch = *i;
         // Child bounds need be transformed in our coordinate space
         SWFRect lclBounds = ch->getBounds();
-        SWFMatrix m = ch->getMatrix();
+        SWFMatrix m = getMatrix(*ch);
         allBounds.expand_to_transformed_rect(m, lclBounds);
     }
 
@@ -916,7 +927,7 @@ button_class_init(as_object& global, const ObjectURI& uri)
 {
     // This is going to be the global Button "class"/"function"
     Global_as& gl = getGlobal(global);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     as_object* cl = gl.createClass(&button_ctor, proto);
     attachButtonInterface(*proto);
 
@@ -951,11 +962,11 @@ Button::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
     os << actChars.size() << " active DisplayObjects for state " <<
         mouseStateName(_mouseState);
     InfoTree::iterator localIter = tr.append_child(selfIt,
-            StringPair(_("Button state"), os.str()));
+            std::make_pair(_("Button state"), os.str()));
 
     os.str("");
     os << std::boolalpha << isEnabled();
-    localIter = tr.append_child(selfIt, StringPair(_("Enabled"), os.str()));
+    localIter = tr.append_child(selfIt, std::make_pair(_("Enabled"), os.str()));
 
     std::for_each(actChars.begin(), actChars.end(),
             boost::bind(&DisplayObject::getMovieInfo, _1, tr, localIter)); 

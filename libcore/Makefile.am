@@ -67,7 +67,7 @@ libgnashcore_la_SOURCES = \
 	DisplayObjectContainer.cpp \
 	DisplayObject.cpp \
 	CharacterProxy.cpp \
-	cxform.cpp \
+	SWFCxForm.cpp \
 	Geometry.cpp \
 	DynamicShape.cpp	\
 	Bitmap.cpp \
@@ -75,15 +75,7 @@ libgnashcore_la_SOURCES = \
 	MorphShape.cpp \
 	StaticText.cpp \
 	TextField.cpp \
-        BlurFilter.cpp \
-        GlowFilter.cpp \
-        DropShadowFilter.cpp \
-        ConvolutionFilter.cpp \
-        ColorMatrixFilter.cpp \
-        GradientGlowFilter.cpp \
-        BevelFilter.cpp \
-        GradientBevelFilter.cpp \
-        parser/filter_factory.cpp \
+	parser/filter_factory.cpp \
 	InteractiveObject.cpp \
 	ExternalInterface.cpp \
 	SWFMatrix.cpp \
@@ -107,6 +99,7 @@ libgnashcore_la_SOURCES = \
 	swf/SoundInfoRecord.cpp \
 	swf/TextRecord.cpp \
 	swf/tag_loaders.cpp \
+	swf/DefineBitsTag.cpp \
 	swf/DefineFontAlignZonesTag.cpp \
 	swf/DefineShapeTag.cpp \
 	swf/DefineScalingGridTag.cpp \
@@ -127,7 +120,6 @@ libgnashcore_la_SOURCES = \
 	FillStyle.cpp \
 	Font.cpp \
 	fontlib.cpp \
-	impl.cpp \
 	LoadVariablesThread.cpp \
 	SWFStream.cpp \
 	LineStyle.cpp \
@@ -158,19 +150,12 @@ noinst_HEADERS = \
 	ManualClock.h \
 	Bitmap.h \
 	BitmapMovie.h \
+	Transform.h \
 	Button.h \
 	debugger.h \
 	TextField.h \
-        BitmapFilter.h \
-        BlurFilter.h \
-        BevelFilter.h \
-        GradientBevelFilter.h \
-        GlowFilter.h \
-        GradientGlowFilter.h \
-        DropShadowFilter.h \
-        ConvolutionFilter.h \
-        ColorMatrixFilter.h \
-        parser/filter_factory.h \
+	Filters.h \
+	parser/filter_factory.h \
 	Font.h \
 	fontlib.h \
 	Shape.h \
@@ -182,6 +167,7 @@ noinst_HEADERS = \
 	MovieLibrary.h \
 	ExternalInterface.h \
 	swf/tag_loaders.h \
+	swf/DefineBitsTag.h \
 	swf/DefaultTagLoaders.h \
 	swf/ImportAssetsTag.h \
 	swf/ExportAssetsTag.h \
@@ -255,20 +241,19 @@ EXTENSIONS_API = \
 	as_environment.h \
 	movie_root.h \
 	MouseButtonState.h \
-	drag_state.h \
+	DragState.h \
 	InteractiveObject.h \
 	SWFRect.h \
 	GnashKey.h \
 	Movie.h \
 	RunResources.h \
-	gnash.h	\
 	DisplayObjectContainer.h \
 	DisplayObject.h \
 	MovieClip.h \
 	StreamProvider.h \
 	event_id.h \
 	SWFMatrix.h \
-	cxform.h \
+	SWFCxForm.h \
 	DisplayList.h	\
 	DynamicShape.h	\
 	swf/ControlTag.h \
@@ -294,11 +279,11 @@ instdir = $(includedir)/gnash/asobj
 inst_HEADERS += $(EXTENSIONS_API)
 
 libgnashcore_la_LIBADD = \
-	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libcore/parser/libgnashparser.la \
 	$(top_builddir)/libcore/vm/libgnashvm.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libsound/libgnashsound.la \
+	$(top_builddir)/libbase/libgnashbase.la \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(FREETYPE2_LIBS) \
@@ -323,27 +308,6 @@ endif
 
 #libserver_la_LIBDADD =  #@DL_LIB@
 libgnashcore_la_LDFLAGS = -release $(VERSION) -export-dynamic
-
-# if WIN32
-#   libgnashcore_la_LDFLAGS += -no-undefined
-#   libgnashcore_la_LIBADD += \
-# 	$(top_builddir)/libmedia/libgnashmedia_la-MediaParser.lo \
-# 	$(top_builddir)/libmedia/libgnashmedia_la-MediaHandler.lo \
-# 	$(top_builddir)/libmedia/libgnashmedia_la-FLVParser.lo \
-# if USE_FFMPEG_ENGINE
-# 	$(top_builddir)/libmedia/libgnashmedia_la-AudioInput.lo \
-# endif
-# 	$(top_builddir)/libmedia/libgnashmedia_la-AudioDecoderNellymoser.lo \
-# 	$(top_builddir)/libmedia/libgnashmedia_la-AudioDecoderSimple.lo \
-# 	$(top_builddir)/libmedia/libgnashmedia_la-AudioResampler.lo 
-# if HAVE_SPEEX
-#   libgnashcore_la_LIBADD += \
-# 	$(top_builddir)/libmedia/libgnashmedia_la-AudioDecoderSpeex.lo
-# endif
-# else
-#   libgnashcore_la_LIBADD += $(top_builddir)/libmedia/libgnashmedia.la \
-# 	$(top_builddir)/libsound/libgnashsound.la
-# endif
 
 if HAIKU
   libgnashcore_la_LIBADD += $(HAIKU_LIBS)

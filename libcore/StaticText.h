@@ -68,7 +68,7 @@ public:
     virtual StaticText* getStaticText(std::vector<const SWF::TextRecord*>& to,
             size_t& numChars);
 
-	virtual void display(Renderer& renderer);
+	virtual void display(Renderer& renderer, const Transform& xform);
 
     void setSelected(size_t pos, bool selected) {
         _selectedText.set(pos, selected);

@@ -4,7 +4,6 @@ Maintainer: Rob Savoye (Rollinsville, CO) <rob@welcomehome.org>
 Build-Depends: dpkg-dev (>= 1.13.19),
 	       debhelper (>= 7.0.0), 
 	       autoconf, automake, libtool,
-	       libltdl3-dev | libltdl-dev, libltdl3 | libltdl7,
 	       libxmu-dev,
 	       autotools-dev,
 	       libjpeg-dev,
@@ -18,7 +17,10 @@ Build-Depends: dpkg-dev (>= 1.13.19),
 	       libgtk2.0-dev, 
 	       libatk1.0-dev,
 	       python2.6-dev | python2.5-dev,
-	       kdelibs5-dev, python-gtk2-dev,
+	       kdelibs5-dev | kdelibs-dev,
+	       kdelibs-bin,
+	       libqt4-dev,
+	       python-gtk2-dev,
 	       qt4-qmake,
 	       docbook,
 	       docbook2x,
@@ -28,25 +30,31 @@ Build-Depends: dpkg-dev (>= 1.13.19),
 	       libsdl1.2-dev,
 	       intltool, 
 	       intltool-debian,
-	       x11proto-video-dev,
-	       libxv-dev,
-	       libmysqlclient-dev
+	       libmysqlclient-dev,
+	       libavformat-dev,
+	       libavcodec-dev,
+	       libavutil-dev,
+	       libswscale-dev,
+	       lsb-release
 # OpenGL packages are disabled for now
 # libgl1-mesa-dev, libglu1-mesa-dev, libgtkglext1-dev, libqt4-opengl-dev, 
 Standards-Version: 3.8.4
 Section: utils
 Homepage: http://www.gnu.org/software/gnash/
 
+
 Package: gnash-common
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends},
- gstreamer-plugins-base | libgstreamer-plugins-base0.10-0, gstreamer0.10-plugins-bad, gstreamer0.10-fluendo-mp3, gstreamer0.10-ffmpeg, libxv1, libgtkglext1
-Suggests: mozilla-plugin-gnash (= ${binary:Version}), gnash-lirc-extension (= ${binary:Version}),  gnash-fileio-extension (= ${binary:Version}),  gnash-mysql-extension (= ${binary:Version})
+ gstreamer-plugins-base | libgstreamer-plugins-base0.10-0, gstreamer0.10-plugins-bad, gstreamer0.10-fluendo-mp3, gstreamer0.10-ffmpeg, libxv1
+# OpenGL packages are disabled for now
+# libgtkglext1
+Suggests: browser-plugin-gnash (= ${binary:Version}), gnash-lirc-extension (= ${binary:Version}),  gnash-fileio-extension (= ${binary:Version}),  gnash-mysql-extension (= ${binary:Version})
 Conflicts: libgnash0 (<< 0.8.1~), gnash (<< 0.8.1~), libklash0 (<< 0.8.1~), gnash-common-opengl
 Description: free SWF movie player - common files/libraries
  Gnash is a free Flash movie player, which works either standalone, or as
- plugin for Firefox/Mozilla or Konqueror.
+ plugin for Firefox/Mozilla, Konqueror, or Chromium.
  .
  This package includes the common, gui-independent files/libraries
 
@@ -58,7 +66,7 @@ Depends: gnash-common (= ${binary:Version}),
  ${shlibs:Depends}, ${misc:Depends}
 Description: free SWF movie player
  Gnash is a free Flash movie player, which works either standalone, or as
- plugin for Firefox/Mozilla or Konqueror. Currently it is in a beta state.
+ plugin for Firefox/Mozilla, Konqueror, or Chromium. Currently it is in a beta state.
  .
  Gnash supports the majority of Flash opcodes up to SWF version 8, and
  a wide sampling of ActionScript classes for SWF version 9 and 10. All the
@@ -76,7 +84,7 @@ Depends: gnash-common (= ${binary:Version}),
  ${shlibs:Depends}, ${misc:Depends}
 Description: free SWF movie player - standalone player for KDE
  Gnash is a free Flash movie player, which works either standalone, or as
- plugin for Firefox/Mozilla or Konqueror. Currently it is in a beta state.
+ plugin for Firefox/Mozilla, Konqueror, or Chromium. Currently it is in a beta state.
  .
  Gnash supports the majority of Flash opcodes up to SWF version 8, and
  a wide sampling of ActionScript classes for SWF version 9 and 10. All the
@@ -92,7 +100,7 @@ Depends: gnash-common (= ${binary:Version}),
  ${shlibs:Depends}, ${misc:Depends}
 Description: free SWF movie player - Command-line Tools
  Gnash is a free Flash movie player, which works either standalone, or as
- plugin for Firefox/Mozilla or Konqueror. Currently it is in a beta state.
+ plugin for Firefox/Mozilla, Konqueror, or Chromium. Currently it is in a beta state.
  .
  Gnash supports the majority of Flash opcodes up to SWF version 8, and
  a wide sampling of ActionScript classes for SWF version 9 and 10. All the
@@ -108,7 +116,7 @@ Depends: gnash-common (= ${binary:Version}),
  ${shlibs:Depends}, ${misc:Depends}
 Description: free SWF movie player - Media server
  Gnash is a free Flash movie player, which works either standalone, or as
- plugin for Firefox/Mozilla or Konqueror. Currently it is in a beta state.
+ plugin for Firefox/Mozilla, Konqueror, or Chromium. Currently it is in a beta state.
  .
  Gnash supports the majority of Flash opcodes up to SWF version 8, and
  a wide sampling of ActionScript classes for SWF version 9 and 10. All the
@@ -117,9 +125,10 @@ Description: free SWF movie player - Media server
  .
  Cygnal is Gnash's media server.
 
-Package: mozilla-plugin-gnash
+Package: browser-plugin-gnash
 Section: utils
 Architecture: any
+Conflicts: mozilla-plugin-gnash
 Depends: gnash (= ${binary:Version}),
  ${shlibs:Depends}, ${misc:Depends}
 Xb-Npp-Applications: ec8030f7-c20a-464f-9b0e-13a3a9e97384,92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a,aa5ca914-c309-495d-91cf-3141bbb04115
@@ -127,9 +136,9 @@ Xb-Npp-MimeType: application/x-shockwave-flash
 Xb-Npp-Name: Gnash SWF Player
 Description: free SWF movie player - Plugin for Mozilla and derivatives
  Gnash is a free Flash movie player, which works either standalone, or as
- plugin for Firefox/Mozilla or Konqueror.
+ plugin for Firefox/Mozilla, Konqueror, or Chromium.
  .
- This package includes the plugin for Firefox/Mozilla Web Browser.
+ This package includes the plugin for Firefox/Mozilla/Chromium Web Browser.
 
 Package: konqueror-plugin-gnash
 Section: utils
@@ -138,13 +147,14 @@ Depends: klash (= ${binary:Version}),
  ${shlibs:Depends}, ${misc:Depends}
 Description: free SWF movie player - Plugin for Konqueror
  Gnash is a free Flash movie player, which works either standalone, or as
- plugin for Firefox/Mozilla or Konqueror.
+ plugin for Firefox/Mozilla, Konqueror, or Chromium.
  .
  This package includes the plugin for Konqueror.
 
-Package: gtk-plugin-gnash
-Section: libs
+Package: python-gtk-gnash
+Section: utils
 Architecture: any
+Conflicts: gtk-plugin-gnash
 Depends: gnash-common (= ${binary:Version}),
  ${shlibs:Depends},  ${misc:Depends}
 Xb-Npp-Applications: ec8030f7-c20a-464f-9b0e-13a3a9e97384,92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a,aa5ca914-c309-495d-91cf-3141bbb04115
@@ -154,6 +164,22 @@ Description: free SWF movie player - Plugin for Gtk and PyGtk donated by Sugar L
  .
  This package includes the plugin for Gtk and PyGtk..
 
+Package: gnash-dev
+Section: utils
+Architecture: any
+Depends: gnash-common (= ${binary:Version}),
+ ${shlibs:Depends}, ${misc:Depends}
+Description: free SWF movie player - Development files
+ Gnash is a free Flash movie player, which works either standalone, or as
+ plugin for Firefox/Mozilla, Konqueror, or Chromium. Currently it is in a beta state.
+ .
+ Gnash supports the majority of Flash opcodes up to SWF version 8, and
+ a wide sampling of ActionScript classes for SWF version 9 and 10. All the
+ core ones are implemented, and many of the newer ones work, but may be
+ missing some of their methods.
+ .
+ This package includes the header files used for gnash development.
+
 Package: gnash-dbg
 Architecture: any
 Section: debug
@@ -162,7 +188,7 @@ Depends: gnash-common (= ${binary:Version}),
  ${shlibs:Depends}, ${misc:Depends}
 Description: Debug symbols for Gnash
  Gnash is a free Flash movie player, which works either standalone, or as
- plugin for Firefox/Mozilla or Konqueror. Currently it is in a beta state.
+ plugin for Firefox/Mozilla, Konqueror, or Chromium. Currently it is in a beta state.
  The plugins are under heavy development at this time.
  .
  Gnash supports the majority of Flash opcodes up to SWF version 7, and
@@ -177,7 +203,7 @@ Description: Debug symbols for Gnash
 
 Package: gnash-fileio-extension
 Architecture: any
-Section: debug
+Section: utils
 Priority: extra
 Depends: gnash-common (= ${binary:Version}),
  ${shlibs:Depends}, ${misc:Depends}
@@ -187,17 +213,17 @@ Description: Fileio extension for Gnash
 
 Package: gnash-mysql-extension
 Architecture: any
-Section: debug
+Section: utils
 Priority: extra
 Depends: gnash-common (= ${binary:Version}),
- ${shlibs:Depends}, ${misc:Depends}, libmysqlclient
+ ${shlibs:Depends}, ${misc:Depends}
 Description: MySQL extension for Gnash
  This extension allows SWF files being played within Gnash to have direct access
  to a MySQL database. The API is similar to the standard MySQL one.
 
 Package: gnash-lirc-extension
 Architecture: any
-Section: debug
+Section: utils
 Priority: extra
 Depends: gnash-common (= ${binary:Version}),
  ${shlibs:Depends}, ${misc:Depends}

@@ -129,7 +129,7 @@ point_add(const fn_call& fn)
         }
         );
         const as_value& arg1 = fn.arg(0);
-        as_object* o = arg1.to_object(getGlobal(fn));
+        as_object* o = toObject(arg1, getVM(fn));
         if ( ! o )
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -200,7 +200,7 @@ point_equals(const fn_call& fn)
         );
         return as_value(false);
     }
-    as_object* o = arg1.to_object(getGlobal(fn));
+    as_object* o = toObject(arg1, getVM(fn));
     assert(o);
     if (!o->instanceOf(getClassConstructor(fn, "flash.geom.Point")))
     {
@@ -220,7 +220,7 @@ point_equals(const fn_call& fn)
     o->get_member(NSV::PROP_X, &x1);
     o->get_member(NSV::PROP_Y, &y1);
 
-    return as_value(x.equals(x1) && y.equals(y1));
+    return as_value(equals(x, x1, getVM(fn)) && equals(y, y1, getVM(fn)));
 }
 
 as_value
@@ -252,15 +252,15 @@ point_normalize(const fn_call& fn)
 
     // newlen may be NaN, and we'd still be updating x/y
     // see actionscript.all/Point.as
-    double newlen = argval.to_number();
+    double newlen = toNumber(argval, getVM(fn));
 
     as_value xval, yval;
     ptr->get_member(NSV::PROP_X, &xval);
     ptr->get_member(NSV::PROP_Y, &yval);
 
-    double x = xval.to_number();
+    double x = toNumber(xval, getVM(fn));
     if (!isFinite(x)) return as_value();
-    double y = yval.to_number();
+    double y = toNumber(yval, getVM(fn));
     if (!isFinite(y)) return as_value();
 
     if ( x == 0 && y == 0 ) return as_value();
@@ -269,8 +269,8 @@ point_normalize(const fn_call& fn)
     double fact = newlen/curlen;
 
 
-    xval.set_double( xval.to_number() * fact );
-    yval.set_double( yval.to_number() * fact );
+    xval.set_double( toNumber(xval, getVM(fn)) * fact );
+    yval.set_double( toNumber(yval, getVM(fn)) * fact );
     ptr->set_member(NSV::PROP_X, xval);
     ptr->set_member(NSV::PROP_Y, yval);
 
@@ -330,7 +330,7 @@ point_subtract(const fn_call& fn)
         }
         );
         const as_value& arg1 = fn.arg(0);
-        as_object* o = arg1.to_object(getGlobal(fn));
+        as_object* o = toObject(arg1, getVM(fn));
         if ( ! o )
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -359,8 +359,8 @@ point_subtract(const fn_call& fn)
         }
     }
 
-    x.set_double(x.to_number() - x1.to_number());
-    y.set_double(y.to_number() - y1.to_number());
+    x.set_double(toNumber(x, getVM(fn)) - toNumber(x1, getVM(fn)));
+    y.set_double(toNumber(y, getVM(fn)) - toNumber(y1, getVM(fn)));
 
     return constructPoint(fn, x, y);
 }
@@ -395,8 +395,8 @@ point_length(const fn_call& fn)
         as_value xval, yval;
         ptr->get_member(NSV::PROP_X, &xval);
         ptr->get_member(NSV::PROP_Y, &yval);
-        double x = xval.to_number();
-        double y = yval.to_number();
+        double x = toNumber(xval, getVM(fn));
+        double y = toNumber(yval, getVM(fn));
 
         double l = std::sqrt(x*x+y*y);
         return as_value(l);
@@ -440,7 +440,7 @@ point_distance(const fn_call& fn)
         );
         return as_value();
     }
-    as_object* o1 = arg1.to_object(getGlobal(fn));
+    as_object* o1 = toObject(arg1, getVM(fn));
     assert(o1);
     if (!o1->instanceOf(getClassConstructor(fn, "flash.geom.Point")))
     {
@@ -452,28 +452,28 @@ point_distance(const fn_call& fn)
     }
 
     const as_value& arg2 = fn.arg(1);
-    as_object* o2 = arg2.to_object(getGlobal(fn));
+    as_object* o2 = toObject(arg2, getVM(fn));
     assert(o2);
     // it seems there's no need to check arg2 (see actionscript.all/Point.as)
 
     as_value x1val;
     o1->get_member(NSV::PROP_X, &x1val);
-    double x1 = x1val.to_number();
+    double x1 = toNumber(x1val, getVM(fn));
     //if ( ! isFinite(x1) ) return as_value(NaN);
 
     as_value y1val;
     o1->get_member(NSV::PROP_Y, &y1val);
-    double y1 = y1val.to_number();
+    double y1 = toNumber(y1val, getVM(fn));
     //if ( ! isFinite(y1) ) return as_value(NaN);
 
     as_value x2val;
     o2->get_member(NSV::PROP_X, &x2val);
-    double x2 = x2val.to_number();
+    double x2 = toNumber(x2val, getVM(fn));
     //if ( ! isFinite(x2) ) return as_value(NaN);
 
     as_value y2val;
     o2->get_member(NSV::PROP_Y, &y2val);
-    double y2 = y2val.to_number();
+    double y2 = toNumber(y2val, getVM(fn));
     //if ( ! utility::isFinite(y2) ) return as_value(NaN);
 
     double hside = x2 - x1; // p1.x - p0.x;
@@ -512,7 +512,7 @@ point_interpolate(const fn_call& fn)
         );
 
         const as_value& p0val = fn.arg(0);
-        as_object* p0 = p0val.to_object(getGlobal(fn));
+        as_object* p0 = toObject(p0val, getVM(fn));
         if ( ! p0 )
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -527,7 +527,7 @@ point_interpolate(const fn_call& fn)
         }
 
         const as_value& p1val = fn.arg(1);
-        as_object* p1 = p1val.to_object(getGlobal(fn));
+        as_object* p1 = toObject(p1val, getVM(fn));
         if ( ! p1 )
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -545,11 +545,11 @@ point_interpolate(const fn_call& fn)
     }
 
 
-    double x0 = x0val.to_number();
-    double y0 = y0val.to_number();
-    double x1 = x1val.to_number();
-    double y1 = y1val.to_number();
-    double mu = muval.to_number();
+    double x0 = toNumber(x0val, getVM(fn));
+    double y0 = toNumber(y0val, getVM(fn));
+    double x1 = toNumber(x1val, getVM(fn));
+    double y1 = toNumber(y1val, getVM(fn));
+    double mu = toNumber(muval, getVM(fn));
 
     as_value xoff = mu * (x0 - x1);
     as_value yoff = mu * (y0 - y1);
@@ -591,8 +591,8 @@ point_polar(const fn_call& fn)
         );
     }
     
-    double len = lval.to_number();
-    double angle = aval.to_number();
+    double len = toNumber(lval, getVM(fn));
+    double angle = toNumber(aval, getVM(fn));
 
     double x = len * std::cos(angle);
     double y = len * std::sin(angle);
@@ -625,7 +625,7 @@ get_flash_geom_point_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.Point class");
     Global_as& gl = getGlobal(fn);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     as_object* cl = gl.createClass(&point_ctor, proto);
     attachPointInterface(*proto);
     attachPointStaticProperties(*cl);

@@ -19,14 +19,13 @@
 //
 
 #include "MorphShape.h"
-#include "VM.h"
+
 #include "swf/ShapeRecord.h"
 #include "Geometry.h"
 #include "SWFMatrix.h"
+#include "Transform.h"
 
-namespace gnash
-{
-
+namespace gnash {
 
 MorphShape::MorphShape(movie_root& mr, as_object* object,
         const SWF::DefineMorphShapeTag* def, DisplayObject* parent)
@@ -40,10 +39,9 @@ MorphShape::MorphShape(movie_root& mr, as_object* object,
 bool
 MorphShape::pointInShape(boost::int32_t x, boost::int32_t y) const
 {
-    SWFMatrix wm = getWorldMatrix();
-    SWFMatrix wm_inverse = wm.invert();
+    const SWFMatrix wm = getWorldMatrix(*this).invert();
     point lp(x, y);
-    wm_inverse.transform(lp);
+    wm.transform(lp);
     
     // FIXME: if the shape contains non-scaled strokes
     //        we can't rely on boundary itself for a quick
@@ -62,10 +60,13 @@ MorphShape::pointInShape(boost::int32_t x, boost::int32_t y) const
 }
 
 void  
-MorphShape::display(Renderer& renderer)
+MorphShape::display(Renderer& renderer, const Transform& base)
 {
     morph();
-    _def->display(renderer, *this); 
+
+    const Transform xform = base * transform();
+
+    _def->display(renderer, _shape, xform); 
     clear_invalidated();
 }
 

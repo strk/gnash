@@ -33,14 +33,6 @@
 #include "gtk_gnash.h"
 #endif
 
-#ifdef USE_HILDON
-#include "hildon_gnash.h"
-#endif
-
-#ifdef USE_ALP
-#include "alp_gnash.h"
-#endif
-
 #ifdef USE_KDE
 #include "kde_gnash.h"
 #endif

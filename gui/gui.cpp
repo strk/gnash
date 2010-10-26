@@ -22,28 +22,27 @@
 #include "gnashconfig.h"
 #endif
 
-#include "MovieClip.h"
 #include "gui.h"
-#include "Renderer.h"
-#include "sound_handler.h"
-#include "movie_root.h"
-#include "VM.h"
-#include "DisplayObject.h"
-#include "tu_file.h"
-#include "gnash.h"
-#include "RunResources.h"
-
-#ifdef GNASH_FPS_DEBUG
-#include "ClockTime.h"
-#include <boost/format.hpp>
-#endif
 
 #include <vector>
 #include <cstdio>
 #include <cstring>
 #include <algorithm> 
-#include <boost/algorithm/string/replace.hpp>
-#include <boost/lexical_cast.hpp>
+
+#include "MovieClip.h"
+#include "Renderer.h"
+#include "sound_handler.h"
+#include "movie_root.h"
+#include "VM.h"
+#include "DisplayObject.h"
+#include "GnashEnums.h"
+#include "RunResources.h"
+#include "StreamProvider.h"
+
+#ifdef GNASH_FPS_DEBUG
+#include "ClockTime.h"
+#include <boost/format.hpp>
+#endif
 
 /// Define this to make sure each frame is fully rendered from ground up
 /// even if no motion has been detected in the movie.
@@ -263,7 +262,7 @@ Gui::restart()
 void
 Gui::updateStageMatrix()
 {
-    if ( ! VM::isInitialized() ) {
+    if (!_stage) {
         // When VM initializes, we'll get a call to resize_view, which
         // would call us again.
         //log_debug("Can't update stage matrix till VM is initialized");
@@ -421,14 +420,9 @@ Gui::resize_view(int width, int height)
 	assert(width>0);
 	assert(height>0);
 
-	if ( VM::isInitialized() )
-	{
-
-		if (_stage && _started) {
-			_stage->setDimensions(width, height);
-		}
-
-	}
+    if (_stage && _started) {
+        _stage->setDimensions(width, height);
+    }
 
 	_width = width;
 	_height = height;
@@ -918,14 +912,20 @@ Gui::start()
     bool background = true; // ??
     _stage->set_background_alpha(background ? 1.0f : 0.05f);
 
+    // to properly update stageMatrix if scaling is given  
+    resize_view(_width, _height); 
+
     // @todo since we registered the sound handler, shouldn't we know
     //       already what it is ?!
     sound::sound_handler* s = _stage->runResources().soundHandler();
-    if ( s ) s->unpause();
+    if ( s ) {
+        if ( ! _audioDump.empty() ) {
+            s->setAudioDump(_audioDump);
+        }
+        s->unpause();
+    }
     _started = true;
     
-    // to properly update stageMatrix if scaling is given  
-    resize_view(_width, _height); 
 
     log_debug("Starting virtual clock");
     _virtualClock.resume();
@@ -937,7 +937,7 @@ Gui::advanceMovie()
 {
 
     if (isStopped()) {
-        return true;
+        return false;
     }
 
     if (!_started) {
@@ -952,7 +952,7 @@ Gui::advanceMovie()
     
 #ifndef REVIEW_ALL_FRAMES
     // Advance movie by one frame
-    bool advanced = m->advance();
+    const bool advanced = m->advance();
 #else
     const size_t cur_frame = m->getRootMovie()->get_current_frame();
     const size_t tot_frames = m->getRootMovie()->get_frame_count();
@@ -1017,7 +1017,7 @@ Gui::advanceMovie()
         ++_advances;
     }
 
-	return true;
+	return advanced;
 }
 
 void
@@ -1026,7 +1026,7 @@ Gui::takeScreenShot()
     if (!_screenShotter.get()) {
         // If no ScreenShotter exists, none was requested at startup.
         // We use a default filename pattern.
-        URL url(_runResources.baseURL());
+        URL url(_runResources.streamProvider().originalURL());
         std::string::size_type p = url.path().rfind('/');
         const std::string& name = (p == std::string::npos) ? url.path() :
             url.path().substr(p + 1);
@@ -1092,24 +1092,24 @@ Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 
 #ifdef USE_SWFTREE
 
-std::auto_ptr<Gui::InfoTree>
+std::auto_ptr<movie_root::InfoTree>
 Gui::getMovieInfo() const
 {
-    std::auto_ptr<InfoTree> tr;
+    std::auto_ptr<movie_root::InfoTree> tr;
 
-    if (! VM::isInitialized()) {
+    if (!_stage) {
         return tr;
     }
 
-    tr.reset(new InfoTree());
+    tr.reset(new movie_root::InfoTree());
 
     // Top nodes for the tree:
     // 1. VM information
     // 2. "Stage" information
     // 3. ...
 
-    InfoTree::iterator topIter = tr->begin();
-    InfoTree::iterator firstLevelIter;
+    movie_root::InfoTree::iterator topIter = tr->begin();
+    movie_root::InfoTree::iterator firstLevelIter;
 
     VM& vm = _stage->getVM();
 
@@ -1119,14 +1119,14 @@ Gui::getMovieInfo() const
     /// VM top level
     //
     os << "SWF " << vm.getSWFVersion();
-    topIter = tr->insert(topIter, StringPair("VM version", os.str()));
+    topIter = tr->insert(topIter, std::make_pair("VM version", os.str()));
 
     // This short-cut is to avoid a bug in movie_root's getMovieInfo,
     // which relies on the availability of a _rootMovie for doing
     // it's work, while we don't set it if we didn't start..
     // 
     if (! _started) {
-        topIter = tr->insert(topIter, StringPair("Stage properties", 
+        topIter = tr->insert(topIter, std::make_pair("Stage properties", 
                     "not constructed yet"));
         return tr;
     }
@@ -1137,7 +1137,7 @@ Gui::getMovieInfo() const
     //
     /// Mouse entities
     //
-    topIter = tr->insert(topIter, StringPair("Mouse Entities", ""));
+    topIter = tr->insert(topIter, std::make_pair("Mouse Entities", ""));
 
     const DisplayObject* ch;
     ch = stage.getActiveEntityUnderPointer();
@@ -1147,7 +1147,8 @@ Gui::getMovieInfo() const
            << " - depth:" << ch->get_depth()
            << " - useHandCursor:" << ch->allowHandCursor()
            << ")";
-    	firstLevelIter = tr->append_child(topIter, StringPair("Active entity under mouse pointer", ss.str()));
+    	firstLevelIter = tr->append_child(topIter, 
+                std::make_pair("Active entity under mouse pointer", ss.str()));
     }
 
     ch = stage.getEntityUnderPointer();
@@ -1156,7 +1157,8 @@ Gui::getMovieInfo() const
         ss << ch->getTarget() << " (" + typeName(*ch) 
            << " - depth:" << ch->get_depth()
            << ")";
-	firstLevelIter = tr->append_child(topIter, StringPair("Topmost entity under mouse pointer", ss.str()));
+        firstLevelIter = tr->append_child(topIter, 
+            std::make_pair("Topmost entity under mouse pointer", ss.str()));
     }
     
     ch = stage.getDraggingCharacter();
@@ -1164,15 +1166,16 @@ Gui::getMovieInfo() const
         std::stringstream ss;
         ss << ch->getTarget() << " (" + typeName(*ch) 
            << " - depth:" << ch->get_depth() << ")";
-    	firstLevelIter = tr->append_child(topIter, StringPair("Dragging character: ", ss.str()));
+    	firstLevelIter = tr->append_child(topIter,
+                std::make_pair("Dragging character: ", ss.str()));
     }
 
     //
     /// GC row
     //
-    topIter = tr->insert(topIter, StringPair("GC Statistics", ""));
+    topIter = tr->insert(topIter, std::make_pair("GC Statistics", ""));
     GC::CollectablesCount cc;
-    GC::get().countCollectables(cc);
+    _stage->gc().countCollectables(cc);
     
     const std::string lbl = "GC managed ";
     for (GC::CollectablesCount::iterator i=cc.begin(), e=cc.end(); i!=e; ++i) {
@@ -1180,7 +1183,7 @@ Gui::getMovieInfo() const
         std::ostringstream ss;
         ss << i->second;
         firstLevelIter = tr->append_child(topIter,
-                            StringPair(lbl + typ, ss.str()));
+                    std::make_pair(lbl + typ, ss.str()));
     }
 
     tr->sort(firstLevelIter.begin(), firstLevelIter.end());
@@ -1307,8 +1310,8 @@ void
 Gui::setQuality(Quality q)
 {
     if (!_stage) {
-	log_error("Gui::setQuality called before a movie_root was available");
-	return;
+        log_error("Gui::setQuality called before a movie_root was available");
+        return;
     }
     _stage->setQuality(q);
 }
@@ -1350,48 +1353,6 @@ Gui::callCallback(int fd)
     f();
 }
 
-void
-ScreenShotter::saveImage(const std::string& id) const
-{
-    // Replace all "%f" in the filename with the frameAdvance.
-    std::string outfile(_fileName);
-    boost::replace_all(outfile, "%f", id);
-    
-    FILE* f = std::fopen(outfile.c_str(), "wb");
-    if (f) {
-        boost::shared_ptr<IOChannel> t(new tu_file(f, true));
-        _renderer->renderToImage(t, GNASH_FILETYPE_PNG);
-    } else {
-        log_error("Failed to open screenshot file \"%s\"!", outfile);
-    }
-}
-
-void
-ScreenShotter::screenShot(size_t frameAdvance)
-{
-    // Save an image if an spontaneous screenshot was requested or the
-    // frame is in the list of requested frames.
-    if (_immediate || std::binary_search(_frames.begin(), _frames.end(),
-                frameAdvance)) {
-        saveImage(boost::lexical_cast<std::string>(frameAdvance));
-        _immediate = false;
-    }
-}
-
-void
-ScreenShotter::last() const
-{
-    if (_last) {
-	saveImage("last");
-    }
-}
-
-void
-ScreenShotter::setFrames(const FrameList& frames)
-{
-    _frames = frames;
-    std::sort(_frames.begin(), _frames.end());
-}
 
 // end of namespace
 }

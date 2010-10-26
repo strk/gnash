@@ -112,12 +112,13 @@ main(int /*argc*/, char** /*argv*/)
 
 	for (int i=0; i<3; ++i) tester.advance(); // get to the end
 
-	string_table& st = VM::get().getStringTable();
+	string_table& st = tester.vm().getStringTable();
+
 	as_value eot;
 	bool endOfTestFound = getObject(root)->get_member(st.find("endoftest"), &eot);
-	xcheck(endOfTestFound);
-	xcheck(eot.is_bool());
-	xcheck(eot.to_bool());
+	check(endOfTestFound);
+	check(eot.is_bool());
+	check(eot.to_bool(8));
 
 	// TODO: use check_pixel for checking bacground colors
 }

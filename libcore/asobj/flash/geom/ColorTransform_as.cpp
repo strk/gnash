@@ -54,7 +54,6 @@ namespace {
 }
 
 
-
 ColorTransform_as::ColorTransform_as(double rm, double gm,
                                      double bm, double am,
                                      double ro, double go,
@@ -112,6 +111,7 @@ registerColorTransformNative(as_object& global)
     vm.registerNative(colortransform_rgb, 1105, 109);
 }
 
+
 namespace {
 
 void
@@ -158,7 +158,7 @@ colortransform_alphaMultiplier(const fn_call& fn)
         return as_value(relay->getAlphaMultiplier());
     }
     
-    relay->setAlphaMultiplier(fn.arg(0).to_number());
+    relay->setAlphaMultiplier(toNumber(fn.arg(0), getVM(fn)));
 	return as_value();
 }
 
@@ -170,7 +170,7 @@ colortransform_alphaOffset(const fn_call& fn)
         return as_value(relay->getAlphaOffset());
     }
     
-    relay->setAlphaOffset(fn.arg(0).to_number());
+    relay->setAlphaOffset(toNumber(fn.arg(0), getVM(fn)));
 	return as_value();
 }
 
@@ -182,7 +182,7 @@ colortransform_blueMultiplier(const fn_call& fn)
         return as_value(relay->getBlueMultiplier());
     }
     
-    relay->setBlueMultiplier(fn.arg(0).to_number());
+    relay->setBlueMultiplier(toNumber(fn.arg(0), getVM(fn)));
 	return as_value();
 }
 
@@ -194,7 +194,7 @@ colortransform_blueOffset(const fn_call& fn)
         return as_value(relay->getBlueOffset());
     }
     
-    relay->setBlueOffset(fn.arg(0).to_number());
+    relay->setBlueOffset(toNumber(fn.arg(0), getVM(fn)));
 	return as_value();
 }
 
@@ -206,7 +206,7 @@ colortransform_greenMultiplier(const fn_call& fn)
         return as_value(relay->getGreenMultiplier());
     }
     
-    relay->setGreenMultiplier(fn.arg(0).to_number());
+    relay->setGreenMultiplier(toNumber(fn.arg(0), getVM(fn)));
 	return as_value();
 }
 
@@ -219,7 +219,7 @@ colortransform_greenOffset(const fn_call& fn)
         return as_value(relay->getGreenOffset());
     }
     
-    relay->setGreenOffset(fn.arg(0).to_number());
+    relay->setGreenOffset(toNumber(fn.arg(0), getVM(fn)));
 	return as_value();
 }
 
@@ -232,7 +232,7 @@ colortransform_redMultiplier(const fn_call& fn)
         return as_value(relay->getRedMultiplier());
     }
     
-    relay->setRedMultiplier(fn.arg(0).to_number());
+    relay->setRedMultiplier(toNumber(fn.arg(0), getVM(fn)));
 	return as_value();
 }
 
@@ -247,7 +247,7 @@ colortransform_redOffset(const fn_call& fn)
     }
     
     // Setter
-    relay->setRedOffset(fn.arg(0).to_number());
+    relay->setRedOffset(toNumber(fn.arg(0), getVM(fn)));
 	return as_value();
 }
 
@@ -261,7 +261,7 @@ colortransform_concat(const fn_call& fn)
         // Log error
         return as_value();
     }
-    as_object* o = fn.arg(0).to_object(getGlobal(fn));
+    as_object* o = toObject(fn.arg(0), getVM(fn));
     ColorTransform_as* tr;
     if (!isNativeType(o, tr)) {
         return as_value();
@@ -280,14 +280,14 @@ colortransform_toString(const fn_call& fn)
 
     string_table& st = getStringTable(fn);
 
-    const as_value& am = ptr->getMember(st.find("alphaMultiplier"));
-    const as_value& ao = ptr->getMember(st.find("alphaOffset"));
-    const as_value& bm = ptr->getMember(st.find("blueMultiplier"));
-    const as_value& bo = ptr->getMember(st.find("blueOffset"));
-    const as_value& gm = ptr->getMember(st.find("greenMultiplier"));
-    const as_value& go = ptr->getMember(st.find("greenOffset"));
-    const as_value& rm = ptr->getMember(st.find("redMultiplier"));
-    const as_value& ro = ptr->getMember(st.find("redOffset"));
+    const as_value& am = getMember(*ptr, st.find("alphaMultiplier"));
+    const as_value& ao = getMember(*ptr, st.find("alphaOffset"));
+    const as_value& bm = getMember(*ptr, st.find("blueMultiplier"));
+    const as_value& bo = getMember(*ptr, st.find("blueOffset"));
+    const as_value& gm = getMember(*ptr, st.find("greenMultiplier"));
+    const as_value& go = getMember(*ptr, st.find("greenOffset"));
+    const as_value& rm = getMember(*ptr, st.find("redMultiplier"));
+    const as_value& ro = getMember(*ptr, st.find("redOffset"));
    
     VM& vm = getVM(fn);
 
@@ -339,7 +339,7 @@ colortransform_rgb(const fn_call& fn)
 
     // Setter
 
-    boost::uint32_t rgb = toInt(fn.arg(0));
+    boost::uint32_t rgb = toInt(fn.arg(0), getVM(fn));
     relay->setRedOffset((rgb & 0xFF0000) >> 16);
     relay->setGreenOffset((rgb & 0x00FF00) >> 8);
     relay->setBlueOffset(rgb & 0x0000FF);
@@ -386,14 +386,14 @@ colortransform_ctor(const fn_call& fn)
         );
     }
 
-	obj->setRelay(new ColorTransform_as(fn.arg(0).to_number(),
-                                        fn.arg(1).to_number(),
-                                        fn.arg(2).to_number(),
-                                        fn.arg(3).to_number(),
-                                        fn.arg(4).to_number(),
-                                        fn.arg(5).to_number(),
-                                        fn.arg(6).to_number(),
-                                        fn.arg(7).to_number()));
+	obj->setRelay(new ColorTransform_as(toNumber(fn.arg(0), getVM(fn)),
+                                        toNumber(fn.arg(1), getVM(fn)),
+                                        toNumber(fn.arg(2), getVM(fn)),
+                                        toNumber(fn.arg(3), getVM(fn)),
+                                        toNumber(fn.arg(4), getVM(fn)),
+                                        toNumber(fn.arg(5), getVM(fn)),
+                                        toNumber(fn.arg(6), getVM(fn)),
+                                        toNumber(fn.arg(7), getVM(fn))));
 
     return as_value();
 }
@@ -404,7 +404,7 @@ get_flash_geom_color_transform_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.ColorTransform class");
     Global_as& gl = getGlobal(fn);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     as_object* cl = gl.createClass(&colortransform_ctor, proto);
     attachColorTransformInterface(*proto);
     return cl;

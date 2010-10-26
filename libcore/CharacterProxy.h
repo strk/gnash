@@ -21,13 +21,19 @@
 #define GNASH_CHARACTER_PROXY_H
 
 #include <string>
+#include <cassert>
+#include "dsodefs.h"
 
 // Forward declarations
 namespace gnash {
 	class DisplayObject;
+    class movie_root;
 }
 
 namespace gnash {
+
+DisplayObject* findDisplayObjectByTarget(const std::string& target,
+            movie_root& mr);
 
 /// A proxy for DisplayObject pointers.
 //
@@ -35,24 +41,15 @@ namespace gnash {
 /// DisplayObject is destroyed, in which case it will only store the original
 /// target path of it and always use that for rebinding when needed.
 ///
-class CharacterProxy {
-
-	mutable DisplayObject* _ptr;
-
-	mutable std::string _tgt;
-
-	static DisplayObject* findDisplayObjectByTarget(const std::string& target);
-
-	/// If we still have a sprite pointer check if it was destroyed
-	/// in which case we drop the pointer and only keep the target.
-	void checkDangling() const;
-
+class CharacterProxy
+{
 public:
 
 	/// Construct a CharacterProxy pointing to the given sprite
-	CharacterProxy(DisplayObject* sp)
+	CharacterProxy(DisplayObject* sp, movie_root& mr)
 		:
-		_ptr(sp)
+		_ptr(sp),
+        _mr(&mr)
 	{
 		checkDangling();
 	}
@@ -68,10 +65,12 @@ public:
 	///	      as in CharacterProxy newProxy(oldProxy.get())
 	///
 	CharacterProxy(const CharacterProxy& sp)
+        :
+        _mr(sp._mr)
 	{
 		sp.checkDangling();
-		_ptr=sp._ptr;
-		if ( ! _ptr ) _tgt=sp._tgt;
+		_ptr = sp._ptr;
+		if (!_ptr) _tgt = sp._tgt;
 	}
 
 	/// Make this proxy a copy of the given one
@@ -83,12 +82,12 @@ public:
 	///	      create a non-dangling proxy you can
 	///           use the constructor taking a DisplayObject
 	///	      as in CharacterProxy newProxy(oldProxy.get())
-	///
 	CharacterProxy& operator=(const CharacterProxy& sp)
 	{
 		sp.checkDangling();
-		_ptr=sp._ptr;
-		if ( ! _ptr ) _tgt=sp._tgt;
+		_ptr = sp._ptr;
+		if (!_ptr) _tgt = sp._tgt;
+        _mr = sp._mr;
 		return *this;
 	}
 
@@ -96,14 +95,14 @@ public:
 	//
 	/// @return the currently bound sprite, NULL if none
 	///
-	DisplayObject* get(bool skipRebinding=false) const
+	DisplayObject* get(bool skipRebinding = false) const
 	{
-		if ( skipRebinding ) return _ptr;
+		if (skipRebinding) return _ptr;
 
         // set _ptr to NULL and _tgt to original target if destroyed
 		checkDangling(); 
-		if ( _ptr ) return _ptr;
-		else return findDisplayObjectByTarget(_tgt);
+		if (_ptr) return _ptr;
+		return findDisplayObjectByTarget(_tgt, *_mr);
 	}
 
 	/// Get the sprite target, either current (if not dangling) or
@@ -138,6 +137,19 @@ public:
 	///       alive.
 	///
 	void setReachable() const;
+
+private:
+
+	/// If we still have a sprite pointer check if it was destroyed
+	/// in which case we drop the pointer and only keep the target.
+	DSOEXPORT void checkDangling() const;
+
+	mutable DisplayObject* _ptr;
+
+	mutable std::string _tgt;
+
+    movie_root* _mr;
+
 };
 
 } // end namespace gnash

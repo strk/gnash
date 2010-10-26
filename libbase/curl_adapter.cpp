@@ -22,7 +22,7 @@
 #include "gnashconfig.h"
 #endif
 
-#ifdef _ANDROID
+#ifdef ANDROID
 #include <sys/select.h>
 #endif
 
@@ -74,7 +74,10 @@ NetworkAdapter::makeStream(const std::string& url,
 
 #else // def USE_CURL
 
+extern "C" {
 #include <curl/curl.h>
+}
+
 #include "utility.h"
 #include "GnashException.h"
 #include "rc.h"
@@ -211,16 +214,14 @@ CurlSession::~CurlSession()
 
     CURLSHcode code;
     int retries=0;
-    while ( (code=curl_share_cleanup(_shandle)) != CURLSHE_OK )
-    {
-        if ( ++retries > 10 )
-        {
+    while ( (code=curl_share_cleanup(_shandle)) != CURLSHE_OK ) {
+        if ( ++retries > 10 ) {
             log_error("Failed cleaning up share handle: %s. Giving up after "
-                    "%d retries.", curl_share_strerror(code), retries);
+		      "%d retries.", curl_share_strerror(code), retries);
             break;
         }
         log_error("Failed cleaning up share handle: %s. Will try again in "
-                "a second.", curl_share_strerror(code));
+		  "a second.", curl_share_strerror(code));
         gnashSleep(1000000);
     }
     _shandle = 0;
@@ -301,36 +302,35 @@ CurlSession::lockSharedHandle(CURL* handle, curl_lock_data data,
     // TODO: see if we may make use of the 'access' parameter
     UNUSED(access);
 
-    switch (data)
-    {
-        case CURL_LOCK_DATA_DNS:
-            //log_debug("Locking DNS cache mutex");
-            _dnscacheMutexLock.lock();
-            //log_debug("DNS cache mutex locked");
+    switch (data) {
+    case CURL_LOCK_DATA_DNS:
+	//log_debug("Locking DNS cache mutex");
+	_dnscacheMutexLock.lock();
+	//log_debug("DNS cache mutex locked");
+	break;
+    case CURL_LOCK_DATA_COOKIE:
+	//log_debug("Locking cookies mutex");
+	_cookieMutexLock.lock(); 
+	//log_debug("Cookies mutex locked");
             break;
-        case CURL_LOCK_DATA_COOKIE:
-            //log_debug("Locking cookies mutex");
-            _cookieMutexLock.lock(); 
-            //log_debug("Cookies mutex locked");
-            break;
-        case CURL_LOCK_DATA_SHARE:
-            //log_debug("Locking share mutex");
-            _shareMutexLock.lock(); 
-            //log_debug("Share mutex locked");
-            break;
-        case CURL_LOCK_DATA_SSL_SESSION:
-            log_error("lockSharedHandle: SSL session locking "
-                    "unsupported");
-            break;
-        case CURL_LOCK_DATA_CONNECT:
-            log_error("lockSharedHandle: connect locking unsupported");
-            break;
-        case CURL_LOCK_DATA_LAST:
-            log_error("lockSharedHandle: last locking unsupported ?!");
-            break;
-        default:
-            log_error("lockSharedHandle: unknown shared data %d", data);
-            break;
+    case CURL_LOCK_DATA_SHARE:
+	//log_debug("Locking share mutex");
+	_shareMutexLock.lock(); 
+	//log_debug("Share mutex locked");
+	break;
+    case CURL_LOCK_DATA_SSL_SESSION:
+	log_error("lockSharedHandle: SSL session locking "
+		  "unsupported");
+	break;
+    case CURL_LOCK_DATA_CONNECT:
+	log_error("lockSharedHandle: connect locking unsupported");
+	break;
+    case CURL_LOCK_DATA_LAST:
+	log_error("lockSharedHandle: last locking unsupported ?!");
+	break;
+    default:
+	log_error("lockSharedHandle: unknown shared data %d", data);
+	break;
     }
 }
 
@@ -341,34 +341,33 @@ CurlSession::unlockSharedHandle(CURL* handle, curl_lock_data data)
 
     // data defines what data libcurl wants to lock, and you must make
     // sure that only one lock is given at any time for each kind of data.
-    switch (data)
-    {
-        case CURL_LOCK_DATA_DNS:
-            //log_debug("Unlocking DNS cache mutex");
-            _dnscacheMutexLock.unlock();
-            break;
-        case CURL_LOCK_DATA_COOKIE:
-            //log_debug("Unlocking cookies mutex");
-            _cookieMutexLock.unlock();
-            break;
-        case CURL_LOCK_DATA_SHARE:
-            //log_debug("Unlocking share mutex");
-            _shareMutexLock.unlock();
-            break;
-        case CURL_LOCK_DATA_SSL_SESSION:
-            log_error("unlockSharedHandle: SSL session locking "
-                    "unsupported");
-            break;
-        case CURL_LOCK_DATA_CONNECT:
-            log_error("unlockSharedHandle: connect locking unsupported");
-            break;
-        case CURL_LOCK_DATA_LAST:
-            log_error("unlockSharedHandle: last locking unsupported ?!");
-            break;
-        default:
-            std::cerr << "unlockSharedHandle: unknown shared data " <<
-                data << std::endl;
-            break;
+    switch (data) {
+    case CURL_LOCK_DATA_DNS:
+	//log_debug("Unlocking DNS cache mutex");
+	_dnscacheMutexLock.unlock();
+	break;
+    case CURL_LOCK_DATA_COOKIE:
+	//log_debug("Unlocking cookies mutex");
+	_cookieMutexLock.unlock();
+	break;
+    case CURL_LOCK_DATA_SHARE:
+	//log_debug("Unlocking share mutex");
+	_shareMutexLock.unlock();
+	break;
+    case CURL_LOCK_DATA_SSL_SESSION:
+	log_error("unlockSharedHandle: SSL session locking "
+		  "unsupported");
+	break;
+    case CURL_LOCK_DATA_CONNECT:
+	log_error("unlockSharedHandle: connect locking unsupported");
+	break;
+    case CURL_LOCK_DATA_LAST:
+	log_error("unlockSharedHandle: last locking unsupported ?!");
+	break;
+    default:
+	std::cerr << "unlockSharedHandle: unknown shared data " <<
+	    data << std::endl;
+	break;
     }
 }
 
@@ -537,9 +536,7 @@ CurlStreamFile::cache(void *from, std::streamsize size)
     std::fseek(_cache, 0, SEEK_END);
 
     std::streamsize wrote = std::fwrite(from, 1, size, _cache);
-    if ( wrote < 1 )
-    {
-
+    if ( wrote < 1 ) {
         boost::format fmt = boost::format("writing to cache file: requested "
                                           "%d, wrote %d (%s)") %
                                           size % wrote % std::strerror(errno);
@@ -559,8 +556,7 @@ CurlStreamFile::cache(void *from, std::streamsize size)
 void
 CurlStreamFile::fillCacheNonBlocking()
 {
-    if ( ! _running )
-    {
+    if ( ! _running ) {
 #if GNASH_CURL_VERBOSE
         log_debug("Not running: fillCacheNonBlocking returning");
 #endif
@@ -569,13 +565,11 @@ CurlStreamFile::fillCacheNonBlocking()
 
     CURLMcode mcode;
 
-    do
-    {
+    do {
         mcode = curl_multi_perform(_mhandle, &_running);
     } while (mcode == CURLM_CALL_MULTI_PERFORM); // && _running ?
 
-    if (mcode != CURLM_OK)
-    {
+    if (mcode != CURLM_OK) {
         throw GnashException(curl_multi_strerror(mcode));
     }
 
@@ -621,19 +615,22 @@ CurlStreamFile::fillCache(std::streamsize size)
 #endif
 
     WallClockTimer lastProgress; // timer since last progress
-    while (_running)
-    {
-
+    while (_running) {
         fillCacheNonBlocking(); // NOTE: will handle 404
-
+	
         // Do this here to avoid calling select()
         // when we have enough bytes anyway, or
         // we reached EOF
         if (_cached >= static_cast<size_t>(size) || !_running) break; 
-
+	
 #if GNASH_CURL_VERBOSE
         //log_debug("cached: %d, size: %d", _cached, size);
 #endif
+	
+        // Zero these out _before_ calling curl_multi_fdset!
+        FD_ZERO(&readfd);
+        FD_ZERO(&writefd);
+        FD_ZERO(&exceptfd);
 
         mcode = curl_multi_fdset(_mhandle, &readfd, &writefd, 
                 &exceptfd, &maxfd);
@@ -651,14 +648,21 @@ CurlStreamFile::fillCache(std::streamsize size)
         // A value of -1 means no file descriptors were added.
         if (maxfd < 0) {
 #if GNASH_CURL_VERBOSE
-            log_debug("No filedescriptors; breaking");
+            log_debug("curl_multi_fdset: maxfd == %1%", maxfd);
 #endif
-            break;
+	    // As of libcurl 7.21.x, the DNS resolving appears to be going
+	    // on in the background, so curl_multi_fdset fails to return
+	    // anything useful. So we use the user timeout value to
+	    // give DNS enough time to resolve the lookup.
+            if (userTimeout && lastProgress.elapsed() > userTimeout) {
+                log_error(_("FIXME: Timeout (%u milliseconds) while loading "
+			    "from url %s"), userTimeout, _url);
+                // TODO: should we set _error here ?
+                return;
+            } else {
+                continue;
+            }
         }
-
-        FD_ZERO(&readfd);
-        FD_ZERO(&writefd);
-        FD_ZERO(&exceptfd);
 
         tv.tv_sec = 0;
         tv.tv_usec = maxSleepUsec;
@@ -673,20 +677,16 @@ CurlStreamFile::fillCache(std::streamsize size)
 
 // select() will always fail on OS/2 and AmigaOS4 as we can't select
 // on file descriptors, only on sockets
-#if !defined(__OS2__) && !defined(__amigaos4__)
-        if ( ret == -1 )
-        {
-            if ( errno == EINTR )
-            {
-                // we got interupted by a signal
+#if !defined(__OS2__) && !defined(__amigaos4__) && !defined(WIN32)
+        if ( ret == -1 ) {
+            if ( errno == EINTR ) {
+                // we got interrupted by a signal
                 // let's consider this as a timeout
 #ifdef GNASH_CURL_VERBOSE
                 log_debug("select() was interrupted by a signal");
 #endif
                 ret = 0;
-            }
-            else
-            {
+            } else {
                 // something unexpected happened
                 boost::format fmt = boost::format(
                     "error polling data from connection to %s: %s ")
@@ -695,34 +695,26 @@ CurlStreamFile::fillCache(std::streamsize size)
             }
         }
 #endif
-        if ( ! ret )
-        {
-            // timeout
+        if ( ! ret ) {
+            // Timeout, check the clock to see
+            // if we expired the user Timeout
 #ifdef GNASH_CURL_VERBOSE
             log_debug("select() timed out, elapsed is %u",
-                    lastProgress.elapsed());
+		      lastProgress.elapsed());
 #endif
-            if (userTimeout && lastProgress.elapsed() > userTimeout)
-            {
+            if (userTimeout && lastProgress.elapsed() > userTimeout) {
                 log_error(_("Timeout (%u milliseconds) while loading "
                             "from url %s"), userTimeout, _url);
                 // TODO: should we set _error here ?
                 return;
             }
-        }
-        else
-        {
+        } else {
+            // Activity, reset the timer...
 #ifdef GNASH_CURL_VERBOSE
             log_debug("FD activity, resetting progress timer");
 #endif
             lastProgress.restart();
         }
-
-
-        // TODO: check if we timedout or got some data
-        //       if we did timeout, check the clock to see
-        //       if we expired the user Timeout, otherwise
-        //       reset the timer...
 
     }
 
@@ -740,35 +732,30 @@ CurlStreamFile::processMessages()
     
     // The number of messages left in the queue (not used by us).
     int msgs;
-    while ((curl_msg = curl_multi_info_read(_mhandle, &msgs)))
-    {
-
+    while ((curl_msg = curl_multi_info_read(_mhandle, &msgs))) {
         // Only for completed transactions
         if (curl_msg->msg == CURLMSG_DONE) {
-
+	    
             // HTTP transaction succeeded
             if (curl_msg->data.result == CURLE_OK) {
-
+		
                 long code;
-
+		
                 // Check HTTP response
                 curl_easy_getinfo(curl_msg->easy_handle,
-                          CURLINFO_RESPONSE_CODE, &code);
-
+				  CURLINFO_RESPONSE_CODE, &code);
+		
                 if ( code >= 400 ) {
                     log_error ("HTTP response %ld from url %s",
                                         code, _url);
                     _error = true;
                     _running = false;
-                }
-                else {
+                } else {
                     log_debug ("HTTP response %ld from url %s",
-                                        code, _url);
+			       code, _url);
                 }
 
-            }
-            else {
-
+            } else {
                 // Transaction failed, pass on curl error.
                 log_error("CURL: %s", curl_easy_strerror(
                                     curl_msg->data.result));
@@ -807,8 +794,9 @@ CurlStreamFile::init(const std::string& url, const std::string& cachefile)
                     "a temporary file instead");
             _cache = std::tmpfile();
         }
+    } else {
+	_cache = std::tmpfile();
     }
-    else _cache = std::tmpfile();
 
     if ( ! _cache ) {
         throw GnashException("Could not create temporary cache file");
@@ -820,16 +808,15 @@ CurlStreamFile::init(const std::string& url, const std::string& cachefile)
     // Override cURL's default verification of SSL certificates
     // This is insecure, so log security warning.
     // Equivalent to curl -k or curl --insecure.
-    if (rcfile.insecureSSL())
-    {
+    if (rcfile.insecureSSL()) {
         log_security(_("Allowing connections to SSL sites with invalid "
-         "certificates"));        
-
+		       "certificates"));        
+	
         ccode = curl_easy_setopt(_handle, CURLOPT_SSL_VERIFYPEER, 0);
         if ( ccode != CURLE_OK ) {
             throw GnashException(curl_easy_strerror(ccode));
         }
-
+	
         ccode = curl_easy_setopt(_handle, CURLOPT_SSL_VERIFYHOST, 0);
         if ( ccode != CURLE_OK ) {
             throw GnashException(curl_easy_strerror(ccode));
@@ -998,8 +985,7 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars,
     _customHeaders = curl_slist_append(_customHeaders, "Expect:");
 
     for (NetworkAdapter::RequestHeaders::const_iterator i = headers.begin(),
-         e = headers.end(); i != e; ++i)
-    {
+	     e = headers.end(); i != e; ++i) {
         // Check here to see whether header name is allowed.
         if (!NetworkAdapter::isHeaderAllowed(i->first)) continue;
         std::ostringstream os;
@@ -1088,17 +1074,15 @@ CurlStreamFile::readNonBlocking(void *dst, std::streamsize bytes)
     if ( eof() || _error ) return 0;
 
     fillCacheNonBlocking();
-    if ( _error )
-    {
+    if ( _error ) {
         // I guess an exception would be thrown in this case ?
         log_error("curl adaptor's fillCacheNonBlocking set _error "
-                "rather then throwing an exception");
+		  "rather then throwing an exception");
         return 0; 
     }
 
     std::streamsize actuallyRead = std::fread(dst, 1, bytes, _cache);
-    if ( _running )
-    {
+    if ( _running ) {
         // if we're still running drop any eof flag
         // on the cache
         clearerr(_cache);
@@ -1152,10 +1136,9 @@ CurlStreamFile::seek(std::streampos pos)
     fillCache(pos);
     if (_error) return false; // error can be set by fillCache
 
-    if (_cached < static_cast<size_t>(pos))
-    {
+    if (_cached < static_cast<size_t>(pos)) {
         log_error ("Warning: could not cache anough bytes on seek: %d "
-                "requested, %d cached", pos, _cached);
+		   "requested, %d cached", pos, _cached);
         return false; 
     }
 
@@ -1173,22 +1156,18 @@ void
 CurlStreamFile::go_to_end()
 {
     CURLMcode mcode;
-    while (_running > 0)
-    {
-        do
-        {
+    while (_running > 0) {
+        do {
             mcode=curl_multi_perform(_mhandle, &_running);
         } while ( mcode == CURLM_CALL_MULTI_PERFORM );
 
-        if ( mcode != CURLM_OK )
-        {
+        if ( mcode != CURLM_OK ) {
             throw IOException(curl_multi_strerror(mcode));
         }
-
+	
         long code;
         curl_easy_getinfo(_handle, CURLINFO_RESPONSE_CODE, &code);
-        if (code == 404) // file not found!
-        {
+        if (code == 404) {	// file not found!
             throw IOException("File not found");
         }
 
@@ -1203,8 +1182,7 @@ CurlStreamFile::go_to_end()
 size_t
 CurlStreamFile::size() const
 {
-    if ( ! _size )
-    {
+    if ( ! _size ) {
         double size;
         CURLcode ret = curl_easy_getinfo(_handle,
                 CURLINFO_CONTENT_LENGTH_DOWNLOAD, &size);
@@ -1433,5 +1411,5 @@ NetworkAdapter::reservedNames()
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: null
 // End:

@@ -18,8 +18,11 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-#include "log.h"
 #include "TextFormat_as.h"
+
+#include <boost/optional.hpp>
+
+#include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
 #include "builtin_function.h" 
@@ -60,7 +63,7 @@ PositiveTwips : SetBase
 {
     PositiveTwips(const fn_call& fn) : SetBase(fn) {}
     int operator()(const as_value& val) const {
-        return pixelsToTwips(std::max<int>(toInt(val), 0));
+        return pixelsToTwips(std::max<int>(toInt(val, getVM(fn())), 0));
     }
 };
 
@@ -70,7 +73,7 @@ PixelsToTwips : SetBase
 {
     PixelsToTwips(const fn_call& fn) : SetBase(fn) {}
     boost::int32_t operator()(const as_value& val) const {
-        return pixelsToTwips(val.to_number());
+        return pixelsToTwips(toNumber(val, getVM(fn())));
     }
 };
 
@@ -80,7 +83,7 @@ ToBool : SetBase
 {
     ToBool(const fn_call& fn) : SetBase(fn) {}
     bool operator()(const as_value& val) const {
-        return val.to_bool();
+        return toBool(val, getVM(fn()));
     }
 };
 
@@ -126,7 +129,7 @@ TwipsToPixels
 /// @tparam F       The function to call to store the value.
 /// @tparam P       A function object to be applied to the argument before
 ///                 storing the value.
-template<typename T, typename U, void(T::*F)(const Optional<U>&), typename P>
+template<typename T, typename U, void(T::*F)(const boost::optional<U>&), typename P>
 struct Set
 {
     static as_value set(const fn_call& fn) {
@@ -139,7 +142,7 @@ struct Set
         // Undefined doesn't do anything.
 
         if (arg.is_undefined() || arg.is_null()) {
-            (relay->*F)(Optional<U>());
+            (relay->*F)(boost::optional<U>());
             return as_value();
         }
 
@@ -159,13 +162,13 @@ struct Set
 /// @tparam F       The function to call to retrieve the value.
 /// @tparam P       A function object to be applied to the argument before
 ///                 returning the value.
-template<typename T, typename U, const Optional<U>&(T::*F)() const,
+template<typename T, typename U, const boost::optional<U>&(T::*F)() const,
     typename P = Nothing>
 struct Get
 {
     static as_value get(const fn_call& fn) {
         T* relay = ensure<ThisIsNative<T> >(fn);
-        const Optional<U>& opt = (relay->*F)();
+        const boost::optional<U>& opt = (relay->*F)();
 		if (opt) return as_value(P()(*opt));
 		
         as_value null;
@@ -179,12 +182,13 @@ class
 PushToVector
 {
 public:
-    PushToVector(std::vector<int>& v) : _v(v) {}
+    PushToVector(std::vector<int>& v, const fn_call& fn) : _v(v), _fn(fn) {}
     void operator()(const as_value& val) {
-        _v.push_back(val.to_number());
+        _v.push_back(toNumber(val, getVM(_fn)));
     }
 private:
     std::vector<int>& _v;
+    const fn_call& _fn;
 };
 
 
@@ -196,7 +200,6 @@ namespace {
     void attachTextFormatInterface(as_object& o);
     const char* getAlignString(TextField::TextAlignment a);
 	const char* getDisplayString(TextField::TextFormatDisplay a);
-	TextField::TextAlignment parseAlignString(const std::string& align);
 	TextField::TextFormatDisplay parseDisplayString(const std::string& display);
 
     /// Align works a bit differently, so is currently not a template.
@@ -372,7 +375,7 @@ textformat_class_init(as_object& global, const ObjectURI& uri)
 {
 
     Global_as& gl = getGlobal(global);
-    as_object* proto = gl.createObject();;
+    as_object* proto = createObject(gl);;
     as_object* cl = gl.createClass(&textformat_new, proto);
 
 	global.init_member(uri, cl, as_object::DefaultFlags);
@@ -404,13 +407,13 @@ textformat_new(const fn_call& fn)
 	    default:
 	        log_error(_("Too many args (%d) passed to TextFormat"), args);
 	    case 13:
-	        tf->leadingSet(pixelsToTwips(toInt(fn.arg(12))));
+	        tf->leadingSet(pixelsToTwips(toInt(fn.arg(12), getVM(fn))));
 	    case 12:
-	        tf->indentSet(pixelsToTwips(toInt(fn.arg(11))));
+	        tf->indentSet(pixelsToTwips(toInt(fn.arg(11), getVM(fn))));
 	    case 11:
-	        tf->rightMarginSet(pixelsToTwips(toInt(fn.arg(10))));
+	        tf->rightMarginSet(pixelsToTwips(toInt(fn.arg(10), getVM(fn))));
 	    case 10:
-	        tf->leftMarginSet(pixelsToTwips(toInt(fn.arg(9))));
+	        tf->leftMarginSet(pixelsToTwips(toInt(fn.arg(9), getVM(fn))));
 	    case 9:
 	        tf->alignSet(fn.arg(8).to_string());
 	    case 8:
@@ -418,19 +421,19 @@ textformat_new(const fn_call& fn)
 	    case 7:
 	        tf->urlSet(fn.arg(6).to_string());
 	    case 6:
-	        tf->underlinedSet(fn.arg(5).to_bool());
+	        tf->underlinedSet(toBool(fn.arg(5), getVM(fn)));
 	    case 5:
-	        tf->italicSet(fn.arg(4).to_bool());
+	        tf->italicSet(toBool(fn.arg(4), getVM(fn)));
 	    case 4:
-	        tf->boldSet(fn.arg(3).to_bool());
+	        tf->boldSet(toBool(fn.arg(3), getVM(fn)));
 	    case 3:
 	    {
 	        rgba col;
-	        col.parseRGB(toInt(fn.arg(2)));
+	        col.parseRGB(toInt(fn.arg(2), getVM(fn)));
 	        tf->colorSet(col);
 	    }
 	    case 2:
-	        tf->sizeSet(pixelsToTwips(toInt(fn.arg(1))));
+	        tf->sizeSet(pixelsToTwips(toInt(fn.arg(1), getVM(fn))));
 	    case 1:
 	        tf->fontSet(fn.arg(0).to_string());
 	        break;
@@ -485,12 +488,12 @@ textformat_tabStops(const fn_call& fn)
         return null;
 	}
 	
-    as_object* arg = fn.arg(0).to_object(getGlobal(fn));
+    as_object* arg = toObject(fn.arg(0), getVM(fn));
     if (!arg) return as_value();
 
 	std::vector<int> tabStops;
 
-    PushToVector pv(tabStops);
+    PushToVector pv(tabStops, fn);
     foreachArray(*arg, pv);
 
     relay->tabStopsSet(tabStops);
@@ -511,7 +514,7 @@ textformat_color(const fn_call& fn)
 	}
 	else {
 		rgba newcolor;
-		newcolor.parseRGB(toInt(fn.arg(0)));
+		newcolor.parseRGB(toInt(fn.arg(0), getVM(fn)));
 		relay->colorSet(newcolor);
 	}
 
@@ -572,7 +575,8 @@ textformat_getTextExtent(const fn_call& fn)
     const bool limitWidth = (fn.nargs > 1);
     
     // Everything must be in twips here.
-    const double tfw = limitWidth ? pixelsToTwips(fn.arg(1).to_number()) : 0;
+    const double tfw = limitWidth ?
+        pixelsToTwips(toNumber(fn.arg(1), getVM(fn))) : 0;
 
     const bool bold = relay->bold() ? *relay->bold() : false;
     const bool italic = relay->italic() ? *relay->italic() : false;

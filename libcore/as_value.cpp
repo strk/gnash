@@ -63,11 +63,15 @@
 namespace gnash {
 
 namespace {
-    bool objectEqualsPrimitive(const as_value& obj, const as_value& prim);
-    bool stringEqualsNumber(const as_value& str, const as_value& num);
-    bool compareBoolean(const as_value& boolean, const as_value& other);
+    bool objectEqualsPrimitive(const as_value& obj, const as_value& prim,
+            int version);
+    bool stringEqualsNumber(const as_value& str, const as_value& num,
+            int version);
+    bool compareBoolean(const as_value& boolean, const as_value& other,
+            int version);
     inline bool findMethod(as_object& obj, string_table::key m, as_value& ret);
-    boost::int32_t truncateToInt(double d);
+    template<typename T> as_object* constructObject(VM& vm, const T& arg,
+            string_table::key className);
 }
 
 namespace {
@@ -246,29 +250,6 @@ as_value::to_string(int version) const
     
 }
 
-/// This is only used in AVM2.
-primitive_types
-as_value::ptype() const
-{
-
-    switch (_type)
-    {
-        case STRING:
-            return PTYPE_STRING;
-        case NUMBER: 
-        case UNDEFINED:
-        case NULLTYPE:
-        case DISPLAYOBJECT:
-        case OBJECT:
-            return PTYPE_NUMBER;
-        case BOOLEAN:
-            return PTYPE_BOOLEAN;
-        default:
-            break;
-    }
-    return PTYPE_NUMBER;
-}
-
 as_value::AsType
 as_value::defaultPrimitive(int version) const
 {
@@ -336,21 +317,18 @@ as_value::to_primitive(AsType hint) const
 }
 
 double
-as_value::to_number() const
+as_value::to_number(const int version) const
 {
 
-    const int swfversion = VM::get().getSWFVersion();
-
-    switch (_type)
-    {
+    switch (_type) {
         case STRING:
         {
             const std::string& s = getStr();
             if ( s.empty() ) {
-                return swfversion >= 5 ? NaN : 0.0;
+                return version >= 5 ? NaN : 0.0;
             }
             
-            if (swfversion <= 4)
+            if (version <= 4)
             {
                 // For SWF4, any valid number before non-numerical
                 // DisplayObjects is returned, including exponent, positive
@@ -363,7 +341,7 @@ as_value::to_number() const
 
             try {
 
-                if (swfversion > 5) {
+                if (version > 5) {
                     double d;
                     // Will throw if invalid.
                     if (parseNonDecimalInt(s, d)) return d;
@@ -396,7 +374,7 @@ as_value::to_number() const
         {
             // Evan: from my tests
             // Martin: FlashPlayer6 gives 0; FP9 gives NaN.
-            return (swfversion >= 7 ? NaN : 0);
+            return (version >= 7 ? NaN : 0);
         }
 
         case BOOLEAN: 
@@ -414,7 +392,7 @@ as_value::to_number() const
             // Arrays and Movieclips should return NaN.
             try {
                 as_value ret = to_primitive(NUMBER);
-                return ret.to_number();
+                return ret.to_number(version);
             }
             catch (ActionTypeError& e)
             {
@@ -422,7 +400,7 @@ as_value::to_number() const
                 log_debug(_("to_primitive(%s, NUMBER) threw an "
                             "ActionTypeError %s"), *this, e.what());
 #endif
-                if (is_function() && swfversion < 6) {
+                if (is_function() && version < 6) {
                     return 0;
                 }
                 
@@ -443,18 +421,16 @@ as_value::to_number() const
     }
 }
 
-
 // Conversion to boolean 
 bool
-as_value::to_bool() const
+as_value::to_bool(const int version) const
 {
-    const int version = VM::get().getSWFVersion();
     switch (_type)
     {
         case STRING:
         {
             if (version >= 7) return !getStr().empty();
-            const double num = to_number();
+            const double num = to_number(version);
             return num && !isNaN(num);
         }
         case NUMBER:
@@ -477,8 +453,9 @@ as_value::to_bool() const
 
 // Return value as an object.
 as_object*
-as_value::to_object(Global_as& global) const
+as_value::to_object(VM& vm) const
 {
+
     switch (_type)
     {
         case OBJECT:
@@ -488,13 +465,13 @@ as_value::to_object(Global_as& global) const
             return getObject(toDisplayObject());
 
         case STRING:
-            return global.createString(getStr());
+            return constructObject(vm, getStr(), NSV::CLASS_STRING);
 
         case NUMBER:
-            return global.createNumber(getNum());
+            return constructObject(vm, getNum(), NSV::CLASS_NUMBER);
 
         case BOOLEAN:
-            return global.createBoolean(getBool());
+            return constructObject(vm, getBool(), NSV::CLASS_BOOLEAN);
 
         default:
             // Invalid to convert exceptions.
@@ -505,17 +482,17 @@ as_value::to_object(Global_as& global) const
 MovieClip*
 as_value::toMovieClip(bool allowUnloaded) const
 {
-    if ( _type != DISPLAYOBJECT ) return 0;
+    if (_type != DISPLAYOBJECT) return 0;
 
     DisplayObject *ch = getCharacter(allowUnloaded);
-    if ( ! ch ) return 0;
+    if (!ch) return 0;
     return ch->to_movie();
 }
 
 DisplayObject*
 as_value::toDisplayObject(bool allowUnloaded) const
 {
-    if (_type != DISPLAYOBJECT) return NULL;
+    if (_type != DISPLAYOBJECT) return 0;
     return getCharacter(allowUnloaded);
 }
 
@@ -526,6 +503,16 @@ as_value::to_function() const
 {
     if (_type == OBJECT) {
         return getObj()->to_function();
+    }
+
+    return 0;
+}
+
+as_object*
+as_value::get_object() const
+{
+    if (_type == OBJECT) {
+        return getObj();
     }
 
     return 0;
@@ -548,7 +535,7 @@ as_value::set_null()
 void
 as_value::set_as_object(as_object* obj)
 {
-    if ( ! obj )
+    if (!obj)
     {
         set_null();
         return;
@@ -557,7 +544,7 @@ as_value::set_as_object(as_object* obj)
         // The static cast is fine as long as the as_object is genuinely
         // a DisplayObject.
         _type = DISPLAYOBJECT;
-        _value = CharacterProxy(obj->displayObject());
+        _value = CharacterProxy(obj->displayObject(), getRoot(*obj));
         return;
     }
 
@@ -568,24 +555,24 @@ as_value::set_as_object(as_object* obj)
 }
 
 bool
-as_value::equals(const as_value& v) const
+as_value::equals(const as_value& v, int version) const
 {
 
     // First compare values of the same type.
     if (_type == v._type) return equalsSameType(v);
     
     // Then compare booleans.
-    if (is_bool()) return compareBoolean(*this, v);
-    if (v.is_bool()) return compareBoolean(v, *this);
+    if (is_bool()) return compareBoolean(*this, v, version);
+    if (v.is_bool()) return compareBoolean(v, *this, version);
 
     // Then compare any other primitive, including null and undefined, with
     // an object.
     if (!is_object() && v.is_object()) {
-        return objectEqualsPrimitive(v, *this);
+        return objectEqualsPrimitive(v, *this, version);
     }
 
     if (is_object() && !v.is_object()) {
-        return objectEqualsPrimitive(*this, v);
+        return objectEqualsPrimitive(*this, v, version);
     }
 
     // Remaining null or undefined values only equate to other null or
@@ -595,8 +582,12 @@ as_value::equals(const as_value& v) const
     if (null || v_null) return null == v_null;
 
     // Now compare a number with a string.
-    if (is_number() && v.is_string()) return stringEqualsNumber(v, *this);
-    if (is_string() && v.is_number()) return stringEqualsNumber(*this, v);
+    if (is_number() && v.is_string()) {
+        return stringEqualsNumber(v, *this, version);
+    }
+    if (is_string() && v.is_number()) {
+        return stringEqualsNumber(*this, v, version);
+    }
     
     // Finally compare non-identical objects.
     as_value p = *this;
@@ -617,7 +608,7 @@ as_value::equals(const as_value& v) const
         return false;
     }
     
-    return p.equals(vp);
+    return p.equals(vp, version);
 }
     
 const char*
@@ -699,70 +690,6 @@ as_value::strictly_equals(const as_value& v) const
     return equalsSameType(v);
 }
 
-std::string
-as_value::toDebugString() const
-{
-    boost::format ret;
-
-    switch (_type)
-    {
-        case UNDEFINED:
-            return "[undefined]";
-        case NULLTYPE:
-            return "[null]";
-        case BOOLEAN:
-            ret = boost::format("[bool:%s]") % (getBool() ? "true" : "false");
-            return ret.str();
-        case OBJECT:
-        {
-            as_object* obj = getObj();
-            ret = boost::format("[object(%s):%p]") % typeName(*obj) %
-                                              static_cast<void*>(obj);
-            return ret.str();
-        }
-        case STRING:
-            return "[string:" + getStr() + "]";
-        case NUMBER:
-        {
-            std::stringstream stream;
-            stream << getNum();
-            return "[number:" + stream.str() + "]";
-        }
-        case DISPLAYOBJECT:
-        {
-            const CharacterProxy& sp = getCharacterProxy();
-            if (sp.isDangling()) {
-                DisplayObject* rebound = sp.get();
-                if (rebound) {
-                    ret = boost::format("[rebound %s(%s):%p]") % 
-                        typeName(*rebound) % sp.getTarget() %
-                        static_cast<void*>(rebound);
-                }
-                else {
-                    ret = boost::format("[dangling DisplayObject:%s]") % 
-                        sp.getTarget();
-                }
-            }
-            else {
-                DisplayObject* ch = sp.get();
-                ret = boost::format("[%s(%s):%p]") % typeName(*ch) %
-                                sp.getTarget() % static_cast<void*>(ch);
-            }
-            return ret.str();
-        }
-        default:
-            if (is_exception()) return "[exception]";
-            std::abort();
-    }
-}
-
-void
-as_value::operator=(const as_value& v)
-{
-    _type = v._type;
-    _value = v._value;
-}
-
 void
 as_value::setReachable() const
 {
@@ -825,48 +752,6 @@ as_value::set_bool(bool val)
     _value = val;
 }
 
-as_value::as_value()
-    :
-    _type(UNDEFINED),
-    _value(boost::blank())
-{
-}
-
-as_value::as_value(const as_value& v)
-    :
-    _type(v._type),
-    _value(v._value)
-{
-}
-
-as_value::as_value(const char* str)
-    :
-    _type(STRING),
-    _value(std::string(str))
-{
-}
-
-as_value::as_value(const std::string& str)
-    :
-    _type(STRING),
-    _value(str)
-{
-}
-
-as_value::as_value(double num)
-    :
-    _type(NUMBER),
-    _value(num)
-{
-}
-
-as_value::as_value(as_object* obj)
-    :
-    _type(UNDEFINED)
-{
-    set_as_object(obj);
-}
-
 bool
 as_value::is_function() const
 {
@@ -905,17 +790,6 @@ as_value::writeAMF0(amf::Writer& w) const
         case BOOLEAN:
             return w.writeBoolean(getBool());
     }
-}
-
-
-boost::int32_t
-toInt(const as_value& val) 
-{
-    const double d = val.to_number();
-
-    if (!isFinite(d)) return 0;
-
-    return truncateToInt(d);
 }
 
 bool
@@ -1062,38 +936,6 @@ doubleToString(double val, int radix)
     return str;
 }
 
-/// Force type to number.
-as_value&
-convertToNumber(as_value& v, VM& /*vm*/)
-{
-    v.set_double(v.to_number());
-    return v;
-}
-
-/// Force type to string.
-as_value&
-convertToString(as_value& v, VM& vm)
-{
-    v.set_string(v.to_string(vm.getSWFVersion()));
-    return v;
-}
-
-/// Force type to bool.
-as_value&
-convertToBoolean(as_value& v, VM& /*vm*/)
-{
-    v.set_bool(v.to_bool());
-    return v;
-}
-
-as_value&
-convertToPrimitive(as_value& v, VM& vm)
-{
-    const as_value::AsType t(v.defaultPrimitive(vm.getSWFVersion()));
-    v = v.to_primitive(t);
-    return v;
-}
-
 namespace {
 
 /// Checks for equality between an object value and a primitive value
@@ -1105,7 +947,7 @@ namespace {
 //
 /// This is a function try-block.
 bool
-objectEqualsPrimitive(const as_value& obj, const as_value& prim)
+objectEqualsPrimitive(const as_value& obj, const as_value& prim, int version)
 try {
 
     assert(obj.is_object());
@@ -1113,7 +955,7 @@ try {
 
     as_value tmp = obj.to_primitive(as_value::NUMBER);
     if (obj.strictly_equals(tmp)) return false;
-    return tmp.equals(prim);
+    return tmp.equals(prim, version);
 }
 catch (const ActionTypeError&) {
     return false;
@@ -1122,17 +964,18 @@ catch (const ActionTypeError&) {
 /// @param boolean      A boolean as_value
 /// @param other        An as_value of any type.
 bool
-compareBoolean(const as_value& boolean, const as_value& other)
+compareBoolean(const as_value& boolean, const as_value& other, int version)
 {
     assert(boolean.is_bool());
-    return as_value(boolean.to_number()).equals(other); 
+    return as_value(boolean.to_number(version)).equals(other, version); 
 }
 
 bool
-stringEqualsNumber(const as_value& str, const as_value& num) {
+stringEqualsNumber(const as_value& str, const as_value& num, int version)
+{
     assert(num.is_number());
     assert(str.is_string());
-    const double n = str.to_number();
+    const double n = str.to_number(version);
     if (!isFinite(n)) return false;
     return num.strictly_equals(n);
 }
@@ -1145,23 +988,106 @@ findMethod(as_object& obj, string_table::key m, as_value& ret)
     return obj.get_member(m, &ret) && ret.is_object();
 }
 
-/// Truncates a double to a 32-bit unsigned int.
+/// Construct an instance of the specified global class.
 //
-/// In fact, it is a 32-bit unsigned int with an additional sign, cast
-/// to an unsigned int. Not sure what the sense is, but that's how it works:
+/// If the class is not present or is not a constructor function, this
+/// function throws an ActionTypeError.
 //
-/// 0xffffffff is interpreted as -1, -0xffffffff as 1.
-boost::int32_t
-truncateToInt(double d)
+/// TODO: consider whether ActionTypeError is an appropriate exception.
+/// TODO: test the other failure cases.
+template<typename T>
+as_object*
+constructObject(VM& vm, const T& arg, string_table::key className)
 {
-    if (d < 0) {   
-        return - static_cast<boost::uint32_t>(std::fmod(-d, 4294967296.0));
+
+    as_object& gl = *vm.getGlobal();
+
+    as_value clval;
+
+    // This is tested in actionscript.all/Object.as to return an 
+    // undefined value. We throw the exception back to the VM, which pushes
+    // an undefined value onto the stack.
+    if (!gl.get_member(className, &clval) ) {
+        throw ActionTypeError();
     }
     
-    return static_cast<boost::uint32_t>(std::fmod(d, 4294967296.0));
+    // This is not properly tested.
+    if (!clval.is_function()) {
+        throw ActionTypeError();
+    }
+    
+    as_function* ctor = clval.to_function();
+
+    // This is also not properly tested.
+    if (!ctor) throw ActionTypeError();
+
+    fn_call::Args args;
+    args += arg;
+
+    as_environment env(vm);
+    as_object* ret = constructInstance(*ctor, env, args);
+
+    return ret;
+
 }
 
 } // unnamed namespace
+
+std::ostream&
+operator<<(std::ostream& o, const as_value& v)
+{
+
+    switch (v._type)
+    {
+        case as_value::UNDEFINED:
+            return o << "[undefined]";
+        case as_value::NULLTYPE:
+            return o << "[null]";
+        case as_value::BOOLEAN:
+        {
+            return o << "[bool:" << std::boolalpha << v.getBool() << "]";
+        }
+        case as_value::OBJECT:
+        {
+            as_object* obj = v.getObj();
+            assert(obj);
+            const std::string desc = obj->array() ? "array" :
+                obj->relay() ? typeName(*obj->relay()) : typeName(*obj);
+            return o << "[object(" << desc << "):" << static_cast<void*>(obj)
+                                                       << "]";
+        }
+        case as_value::STRING:
+            return o << "[string:" + v.getStr() + "]";
+        case as_value::NUMBER:
+            return o << "[number:" << v.getNum() << "]";
+        case as_value::DISPLAYOBJECT:
+        {
+            boost::format ret;
+            const CharacterProxy& sp = v.getCharacterProxy();
+            if (sp.isDangling()) {
+                DisplayObject* rebound = sp.get();
+                if (rebound) {
+                    ret = boost::format("[rebound %s(%s):%p]") % 
+                        typeName(*rebound) % sp.getTarget() %
+                        static_cast<void*>(rebound);
+                }
+                else {
+                    ret = boost::format("[dangling DisplayObject:%s]") % 
+                        sp.getTarget();
+                }
+            }
+            else {
+                DisplayObject* ch = sp.get();
+                ret = boost::format("[%s(%s):%p]") % typeName(*ch) %
+                                sp.getTarget() % static_cast<void*>(ch);
+            }
+            return o << ret.str();
+        }
+        default:
+            assert(v.is_exception());
+            return o << "[exception]";
+    }
+}
 
 
 } // namespace gnash

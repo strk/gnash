@@ -34,6 +34,7 @@
 #include "SWF.h"
 #include "Renderer.h"
 #include "Global_as.h"
+#include "Transform.h"
 
 #include <algorithm>
 
@@ -89,9 +90,9 @@ DefineShapeTag::DefineShapeTag(SWFStream& in, TagType tag,
 }
 
 void
-DefineShapeTag::display(Renderer& renderer, const DisplayObject& inst) const
+DefineShapeTag::display(Renderer& renderer, const Transform& xform) const
 {
-    renderer.drawShape(_shape, inst.get_world_cxform(), inst.getWorldMatrix());
+    renderer.drawShape(_shape, xform);
 }
 
 } // namespace SWF

@@ -68,17 +68,29 @@
 #include "gnashconfig.h" //USE_SWFTREE
 #endif
 
+#include <map>
+#include <string>
+#include <vector>
+#include <deque>
+#include <list>
+#include <set>
+#include <bitset>
+#include <boost/noncopyable.hpp>
+#include <boost/thread/thread.hpp>
+
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "dsodefs.h" // DSOEXPORT
 #include "MouseButtonState.h" // for composition
-#include "drag_state.h" // for composition
+#include "DragState.h" // for composition
 #include "GnashKey.h" // key::code
 #include "Movie.h"
-#include "gnash.h" // Quality
+#include "GnashEnums.h" 
 #include "MovieClip.h"
 #include "SimpleBuffer.h" // for LoadCallback
 #include "MovieLoader.h"
 #include "ExternalInterface.h"
+#include "GC.h"
+#include "VM.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -93,16 +105,6 @@
 # define GNASH_PARANOIA_LEVEL 1
 #endif
 
-#include <map>
-#include <string>
-#include <vector>
-#include <deque>
-#include <list>
-#include <set>
-#include <bitset>
-#include <boost/noncopyable.hpp>
-#include <boost/thread/thread.hpp>
-
 // Forward declarations
 namespace gnash {
     class ExecutableCode; // for ActionQueue
@@ -113,16 +115,16 @@ namespace gnash {
     class IOChannel;
     class RunResources;
     class Button;
+    class VM;
 }
 
-namespace gnash
-{
+namespace gnash {
 
 struct DepthComparator
 {
     typedef MovieClip* LevelMovie;
 
-    bool operator() (const LevelMovie& d1, const LevelMovie& d2)
+    bool operator()(const LevelMovie& d1, const LevelMovie& d2) const
     {
         return d1->get_depth() < d2->get_depth();
     }
@@ -144,7 +146,7 @@ struct DepthComparator
 /// hosting application.
 //
 /// The _root object is provided by getAsRoot().
-class DSOEXPORT movie_root : boost::noncopyable
+class DSOEXPORT movie_root : public GcRoot, boost::noncopyable
 {
 public:
     
@@ -298,13 +300,10 @@ public:
     /// Coordinates are in PIXELS, NOT TWIPS.
     void get_mouse_state(boost::int32_t& x, boost::int32_t& y);
 
-    void get_drag_state(drag_state& st);
-
-    void set_drag_state(const drag_state& st);
+    void setDragState(const DragState& st);
 
     /// @return the originating root movie (not necessarely _level0)
-    const Movie& getRootMovie() const
-    {
+    const Movie& getRootMovie() const {
         return *_rootMovie;
     }
 
@@ -313,8 +312,7 @@ public:
     /// TODO: create MovieClips without this and drop. It's deliberately
     /// different from getRootMovie() so it doesn't end up getting used
     /// in the same way.
-    Movie* topLevelMovie() const
-    {
+    Movie* topLevelMovie() const {
         return _rootMovie;
     }
 
@@ -325,9 +323,8 @@ public:
         return _rootMovie->frameRate();
     }
 
-    void stop_drag()
-    {
-        m_drag_state.reset();
+    void stop_drag() {
+        _dragState.reset();
     }
 
     /// Add an interval timer
@@ -562,11 +559,6 @@ public:
     /// current gui
     void setShowMenuState(bool state);
 
-    // This is a flag that specifies whether exceptions in ActionScript
-    // should be propogated to JavaScript in the browser.
-    void setMarshallExceptions(bool x) { _marshallExceptions = x; };
-    bool getMarshallExceptions() { return _marshallExceptions; };
-    
     /// Sets the Stage object's align mode.
     void setStageScaleMode(ScaleMode sm);
     
@@ -633,13 +625,6 @@ public:
 #endif
         _liveChars.push_front(ch);
     }
-
-    /// Cleanup all resources and run the GC collector
-    //
-    /// This method should be invoked before calling setRootMovie again
-    /// for a clean restart.
-    ///
-    void clear();
 
     /// Reset stage to its initial state
     void reset();
@@ -861,16 +846,10 @@ public:
     }
 
 #ifdef USE_SWFTREE
-    typedef std::pair<std::string, std::string> StringPair;
-    void getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it);
-    void getCharacterTree(tree<StringPair>& tr, tree<StringPair>::iterator it);
+    typedef tree<std::pair<std::string, std::string> > InfoTree;
+    void getMovieInfo(InfoTree& tr, InfoTree::iterator it);
+    void getCharacterTree(InfoTree& tr, InfoTree::iterator it);
 #endif
-
-    /// Get URL of the SWF movie used to initialize this VM
-    //
-    /// This information will be used for security checks
-    ///
-    const std::string& getOriginalURL() const { return _originalURL; }
 
     const RunResources& runResources() const { return _runResources; }
 
@@ -892,6 +871,10 @@ public:
     /// whether it should be removed, for instance by checking for an 
     /// onUnload handler.
     void removeQueuedConstructor(DisplayObject* target);
+
+    GC& gc() {
+        return _gc;
+    }
 
 private:
 
@@ -927,24 +910,6 @@ private:
     /// by the event requires redraw, see \ref events_handling for
     /// more info.
     bool fire_mouse_event();
-
-    const RunResources& _runResources; 
-
-    /// The URL of the original root movie.
-    //
-    /// This is a runtime constant because it must not change during a 
-    /// run.
-    const std::string _originalURL;
-
-    /// This initializes a SharedObjectLibrary, which requires 
-    /// _originalURL, so that must be initialized first.
-    VM& _vm;
-
-    /// Registered Interface command handler, if any
-    AbstractIfaceCallback* _interfaceHandler;
-
-    /// Registered FsCommand handler, if any
-    AbstractFsCallback* _fsCommandHandler;
 
     /// Take care of dragging, if needed
     void doMouseDrag();
@@ -1031,6 +996,30 @@ private:
 
     void handleActionLimitHit(const std::string& ref);
 
+    /// Buttons listening for key events
+    //
+    /// Note that Buttons (the only key listeners left) deregister themselves
+    /// on destruction. This isn't correct behaviour and also requires that
+    /// _keyListeners be alive longer than _gc so that deregistration doesn't
+    /// access a destroyed object.
+    //
+    /// TODO: fix it.
+    Listeners _keyListeners;
+
+    GC _gc;
+
+    const RunResources& _runResources; 
+
+    /// This initializes a SharedObjectLibrary, which requires 
+    /// _originalURL, so that must be initialized first.
+    VM _vm;
+
+    /// Registered Interface command handler, if any
+    AbstractIfaceCallback* _interfaceHandler;
+
+    /// Registered FsCommand handler, if any
+    AbstractFsCallback* _fsCommandHandler;
+
     /// A list of AdvanceableCharacters
     //
     /// This is a list (not a vector) as we want to allow
@@ -1080,14 +1069,11 @@ private:
 
     key::code _lastKeyEvent;
 
-    /// Characters for listening key events
-    Listeners _keyListeners;
-
     /// The DisplayObject currently holding focus, or 0 if no focus.
     DisplayObject* _currentFocus;
 
     /// @todo fold this into m_mouse_button_state?
-    drag_state m_drag_state;
+    DragState _dragState;
 
     typedef std::map<int, MovieClip*> Levels;
 
@@ -1127,7 +1113,6 @@ private:
     std::bitset<4u> _alignMode;
 
     AllowScriptAccessMode _allowScriptAccess;
-    bool _marshallExceptions;
 
     /// Whether to show the menu or not.
     bool _showMenu;

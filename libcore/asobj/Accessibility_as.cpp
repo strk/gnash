@@ -31,13 +31,9 @@ namespace gnash {
 
 // Forward declarations
 namespace {
-    as_value accessibility_ctor(const fn_call& fn);
     void attachAccessibilityStaticInterface(as_object& o);
-    void attachAccessibilityAS3StaticInterface(as_object& o);
-    as_object* getAccessibilityInterface();
 
     as_value accessibility_isActive(const fn_call& fn);
-    as_value accessibility_active(const fn_call& fn);
     as_value accessibility_updateProperties(const fn_call& fn);
     as_value accessibility_sendEvent(const fn_call& fn);
 }
@@ -52,9 +48,9 @@ accessibility_class_init(as_object& where, const ObjectURI& uri)
     const int flags = as_object::DefaultFlags | PropFlags::readOnly;
 
     // This object has unusual properties.
-    as_object* obj = gl.createObject();
+    as_object* obj = createObject(gl);
     obj->set_member_flags(NSV::PROP_uuPROTOuu, flags);
-    obj->init_member(NSV::PROP_CONSTRUCTOR, gl.getMember(NSV::CLASS_OBJECT),
+    obj->init_member(NSV::PROP_CONSTRUCTOR, getMember(gl, NSV::CLASS_OBJECT),
             flags);
 
     attachAccessibilityStaticInterface(*obj);
@@ -75,13 +71,6 @@ registerAccessibilityNative(as_object& global)
 namespace {
 
 void
-attachAccessibilityAS3StaticInterface(as_object& o)
-{
-    Global_as& gl = getGlobal(o);
-    o.init_member("active", gl.createFunction(accessibility_active));
-}
-
-void
 attachAccessibilityStaticInterface(as_object& o)
 {
     const int flags = PropFlags::dontDelete |
@@ -99,13 +88,6 @@ accessibility_isActive(const fn_call& /*fn*/)
 {
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
-}
-
-as_value
-accessibility_active(const fn_call& /*fn*/)
-{
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
-    return as_value(false);
 }
 
 as_value

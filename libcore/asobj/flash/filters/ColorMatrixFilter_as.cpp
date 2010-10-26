@@ -15,13 +15,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+#include "ColorMatrixFilter_as.h"
 
 #include "as_object.h"
-#include "ColorMatrixFilter.h"
 #include "VM.h"
 #include "builtin_function.h"
 #include "Global_as.h"
 #include "BitmapFilter_as.h"
+#include "Filters.h"
 
 namespace gnash {
 
@@ -69,7 +70,7 @@ colormatrixfilter_matrix(const fn_call& fn)
 as_value
 colormatrixfilter_new(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
+    boost::intrusive_ptr<as_object> obj = ensure<ValidThis>(fn);
     obj->setRelay(new ColorMatrixFilter_as);
     return as_value();
 }

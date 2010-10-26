@@ -62,53 +62,53 @@ enum SortFlags {
     SORT_NUMERIC = (1<<4) // 16
 };
 
-struct indexed_as_value;
+    struct indexed_as_value;
 
-typedef boost::function2<bool, const as_value&, const as_value&> as_cmp_fn;
+    typedef boost::function2<bool, const as_value&, const as_value&> as_cmp_fn;
 
-as_object* getArrayInterface();
-void attachArrayInterface(as_object& proto);
-void attachArrayStatics(as_object& proto);
+    void attachArrayInterface(as_object& proto);
+    void attachArrayStatics(as_object& proto);
 
-as_value join(as_object* array, const std::string& separator);
+    as_value join(as_object* array, const std::string& separator);
 
-as_value array_new(const fn_call& fn);
-as_value array_slice(const fn_call& fn);
-as_value array_concat(const fn_call& fn);
-as_value array_toString(const fn_call& fn);
-as_value array_join(const fn_call& fn);
-as_value array_reverse(const fn_call& fn);
-as_value array_shift(const fn_call& fn);
-as_value array_pop(const fn_call& fn);
-as_value array_unshift(const fn_call& fn);
-as_value array_push(const fn_call& fn);
-as_value array_sortOn(const fn_call& fn);
-as_value array_sort(const fn_call& fn);
-as_value array_splice(const fn_call& fn);
+    as_value array_new(const fn_call& fn);
+    as_value array_slice(const fn_call& fn);
+    as_value array_concat(const fn_call& fn);
+    as_value array_toString(const fn_call& fn);
+    as_value array_join(const fn_call& fn);
+    as_value array_reverse(const fn_call& fn);
+    as_value array_shift(const fn_call& fn);
+    as_value array_pop(const fn_call& fn);
+    as_value array_unshift(const fn_call& fn);
+    as_value array_push(const fn_call& fn);
+    as_value array_sortOn(const fn_call& fn);
+    as_value array_sort(const fn_call& fn);
+    as_value array_splice(const fn_call& fn);
 
-string_table::key getKey(const fn_call& fn, size_t i);
-int isIndex(const std::string& name);
+    string_table::key getKey(const fn_call& fn, size_t i);
+    int isIndex(const std::string& name);
 
-/// Implementation of foreachArray that takes a start and end range.
-template<typename T> void foreachArray(as_object& array, int start,
-				       int end, T& pred);
+    /// Implementation of foreachArray that takes a start and end range.
+    template<typename T> void foreachArray(as_object& array, int start,
+                           int end, T& pred);
 
-inline bool int_lt_or_eq (int a) {
-    return a <= 0;
-}
+    inline bool int_lt_or_eq (int a) {
+        return a <= 0;
+    }
 
-inline bool int_gt (int a) {
-    return a > 0;
-}
+    inline bool int_gt (int a) {
+        return a > 0;
+    }
 
-void getIndexedElements(as_object& array, std::vector<indexed_as_value>& v);
+    void getIndexedElements(as_object& array, std::vector<indexed_as_value>& v);
 
-void pushIndices(as_object& o, const std::vector<indexed_as_value>& index);
+    void pushIndices(as_object& o, const std::vector<indexed_as_value>& index);
 
-/// Set the length property of an object only if it is a genuine array.
-void setArrayLength(as_object& o, const int size);
+    /// Set the length property of an object only if it is a genuine array.
+    void setArrayLength(as_object& o, const int size);
 
     void resizeArray(as_object& o, const int size);
+
 }
 
 /// Function objects for foreachArray()
@@ -306,73 +306,72 @@ sortIndexed(as_object& array, AVCMP avc)
 // string comparison, ascending (default sort method)
 struct as_value_lt
 {
-    int _version;
+    as_value_lt(const fn_call& fn) : _fn(fn) {}
 
-    as_value_lt(int version) : _version(version) {}
-
-    inline int str_cmp(const as_value& a, const as_value& b)
+    int str_cmp(const as_value& a, const as_value& b) const 
     {
-        std::string s = a.to_string(_version);
-        return s.compare(b.to_string(_version));
+        std::string s = a.to_string(getSWFVersion(_fn));
+        return s.compare(b.to_string(getSWFVersion(_fn)));
     }
 
-    inline int str_nocase_cmp(const as_value& a, const as_value& b)
+    int str_nocase_cmp(const as_value& a, const as_value& b) const
     {
         using namespace boost::algorithm;
 
-        std::string c = to_upper_copy(a.to_string(_version));
-        std::string d = to_upper_copy(b.to_string(_version));
+        std::string c = to_upper_copy(a.to_string(getSWFVersion(_fn)));
+        std::string d = to_upper_copy(b.to_string(getSWFVersion(_fn)));
         return c.compare(d);
     }
 
-    inline bool as_value_numLT (const as_value& a, const as_value& b)
+    bool as_value_numLT(const as_value& a, const as_value& b) const
     {
         if (a.is_undefined()) return false;
         if (b.is_undefined()) return true;
         if (a.is_null()) return false;
         if (b.is_null()) return true;
-        double aval = a.to_number();
-        double bval = b.to_number();
+        const double aval = toNumber(a, getVM(_fn));
+        const double bval = toNumber(b, getVM(_fn));
         if (isNaN(aval)) return false;
         if (isNaN(bval)) return true;
         return aval < bval;
     }
 
-    inline bool as_value_numGT (const as_value& a, const as_value& b)
+    bool as_value_numGT(const as_value& a, const as_value& b) const
     {
         if (b.is_undefined()) return false;
         if (a.is_undefined()) return true;
         if (b.is_null()) return false;
         if (a.is_null()) return true;
-        double aval = a.to_number();
-        double bval = b.to_number();
+        const double aval = toNumber(a, getVM(_fn));
+        const double bval = toNumber(b, getVM(_fn));
         if (isNaN(bval)) return false;
         if (isNaN(aval)) return true;
         return aval > bval;
     }
 
-    inline bool as_value_numEQ (const as_value& a, const as_value& b)
+    inline bool as_value_numEQ(const as_value& a, const as_value& b) const
     {
         if (a.is_undefined() && b.is_undefined()) return true;
         if (a.is_null() && b.is_null()) return true;
-        double aval = a.to_number();
-        double bval = b.to_number();
+        double aval = toNumber(a, getVM(_fn));
+        double bval = toNumber(b, getVM(_fn));
         if (isNaN(aval) && isNaN(bval)) return true;
         return aval == bval;
     }
 
-    bool operator() (const as_value& a, const as_value& b)
+    bool operator()(const as_value& a, const as_value& b) const
     {
         return str_cmp(a, b) < 0;
     }
+private:
+    const fn_call& _fn;
 };
 
 // string comparison, descending
 struct as_value_gt : public as_value_lt 
 {
-    as_value_gt(int version) : as_value_lt(version) {}
-    bool operator() (const as_value& a, const as_value& b)
-    {
+    as_value_gt(const fn_call& fn) : as_value_lt(fn) {}
+    bool operator()(const as_value& a, const as_value& b) const {
         return str_cmp(a, b) > 0;
     }
 };
@@ -380,8 +379,8 @@ struct as_value_gt : public as_value_lt
 // string equality
 struct as_value_eq : public as_value_lt
 {
-    as_value_eq(int version) : as_value_lt(version) {}
-    bool operator() (const as_value& a, const as_value& b)
+    as_value_eq(const fn_call& fn) : as_value_lt(fn) {}
+    bool operator()(const as_value& a, const as_value& b) const
     {
         return str_cmp(a, b) == 0;
     }
@@ -390,8 +389,8 @@ struct as_value_eq : public as_value_lt
 // case-insensitive string comparison, ascending
 struct as_value_nocase_lt : public as_value_lt
 {
-    as_value_nocase_lt(int version) : as_value_lt(version) {}
-    bool operator() (const as_value& a, const as_value& b)
+    as_value_nocase_lt(const fn_call& fn) : as_value_lt(fn) {}
+    bool operator()(const as_value& a, const as_value& b) const
     {
         return str_nocase_cmp(a, b) < 0;
     }
@@ -400,8 +399,8 @@ struct as_value_nocase_lt : public as_value_lt
 // case-insensitive string comparison, descending
 struct as_value_nocase_gt : public as_value_lt
 {
-    as_value_nocase_gt(int version) : as_value_lt(version) {}
-    bool operator() (const as_value& a, const as_value& b)
+    as_value_nocase_gt(const fn_call& fn) : as_value_lt(fn) {}
+    bool operator()(const as_value& a, const as_value& b) const
     {
         return str_nocase_cmp(a, b) > 0;
     }
@@ -410,8 +409,8 @@ struct as_value_nocase_gt : public as_value_lt
 // case-insensitive string equality
 struct as_value_nocase_eq : public as_value_lt
 {
-    as_value_nocase_eq(int version) : as_value_lt(version) {}
-    bool operator() (const as_value& a, const as_value& b)
+    as_value_nocase_eq(const fn_call& fn) : as_value_lt(fn) {}
+    bool operator()(const as_value& a, const as_value& b) const
     {
         return str_nocase_cmp(a, b) == 0;
     }
@@ -420,11 +419,10 @@ struct as_value_nocase_eq : public as_value_lt
 // numeric comparison, ascending
 struct as_value_num_lt : public as_value_lt
 {
-    as_value_num_lt(int version) : as_value_lt(version) {}
-    bool operator() (const as_value& a, const as_value& b)
+    as_value_num_lt(const fn_call& fn) : as_value_lt(fn) {}
+    bool operator()(const as_value& a, const as_value& b) const
     {
-        if (a.is_string() || b.is_string())
-            return str_cmp(a, b) < 0;
+        if (a.is_string() || b.is_string()) return str_cmp(a, b) < 0;
         return as_value_numLT(a, b);
     }
 };
@@ -432,11 +430,10 @@ struct as_value_num_lt : public as_value_lt
 // numeric comparison, descending
 struct as_value_num_gt : public as_value_lt
 {
-    as_value_num_gt(int version) : as_value_lt(version) {}
-    bool operator() (const as_value& a, const as_value& b)
+    as_value_num_gt(const fn_call& fn) : as_value_lt(fn) {}
+    bool operator()(const as_value& a, const as_value& b) const
     {
-        if (a.is_string() || b.is_string())
-            return str_cmp(a, b) > 0;
+        if (a.is_string() || b.is_string()) return str_cmp(a, b) > 0;
         return as_value_numGT(a, b);
     }
 };
@@ -444,11 +441,10 @@ struct as_value_num_gt : public as_value_lt
 // numeric equality
 struct as_value_num_eq : public as_value_lt
 {
-    as_value_num_eq(int version) : as_value_lt(version) {}
-    bool operator() (const as_value& a, const as_value& b)
+    as_value_num_eq(const fn_call& fn) : as_value_lt(fn) {}
+    bool operator()(const as_value& a, const as_value& b) const
     {
-        if (a.is_string() || b.is_string())
-            return str_cmp(a, b) == 0;
+        if (a.is_string() || b.is_string()) return str_cmp(a, b) == 0;
         return as_value_numEQ(a, b);
     }
 };
@@ -456,11 +452,10 @@ struct as_value_num_eq : public as_value_lt
 // case-insensitive numeric comparison, ascending
 struct as_value_num_nocase_lt : public as_value_lt
 {
-    as_value_num_nocase_lt(int version) : as_value_lt(version) {}
-    bool operator() (const as_value& a, const as_value& b)
+    as_value_num_nocase_lt(const fn_call& fn) : as_value_lt(fn) {}
+    bool operator()(const as_value& a, const as_value& b) const
     {
-        if (a.is_string() || b.is_string())
-            return str_nocase_cmp(a, b) < 0;
+        if (a.is_string() || b.is_string()) return str_nocase_cmp(a, b) < 0;
         return as_value_numLT(a, b);
     }
 };
@@ -468,11 +463,10 @@ struct as_value_num_nocase_lt : public as_value_lt
 // case-insensitive numeric comparison, descending
 struct as_value_num_nocase_gt : public as_value_lt
 {
-    as_value_num_nocase_gt(int version) : as_value_lt(version) {}
-    bool operator() (const as_value& a, const as_value& b)
+    as_value_num_nocase_gt(const fn_call& fn) : as_value_lt(fn) {}
+    bool operator()(const as_value& a, const as_value& b) const
     {
-        if (a.is_string() || b.is_string())
-            return str_nocase_cmp(a, b) > 0;
+        if (a.is_string() || b.is_string()) return str_nocase_cmp(a, b) > 0;
         return as_value_numGT(a, b);
     }
 };
@@ -480,11 +474,10 @@ struct as_value_num_nocase_gt : public as_value_lt
 // case-insensitive numeric equality
 struct as_value_num_nocase_eq : public as_value_lt
 {
-    as_value_num_nocase_eq(int version) : as_value_lt(version) {}
-    bool operator() (const as_value& a, const as_value& b)
+    as_value_num_nocase_eq(const fn_call& fn) : as_value_lt(fn) {}
+    bool operator() (const as_value& a, const as_value& b) const
     {
-        if (a.is_string() || b.is_string())
-            return str_nocase_cmp(a, b) == 0;
+        if (a.is_string() || b.is_string()) return str_nocase_cmp(a, b) == 0;
         return as_value_numEQ(a, b);
     }
 };
@@ -493,7 +486,7 @@ struct as_value_num_nocase_eq : public as_value_lt
 // Note:
 // SORT_UNIQUE and SORT_RETURN_INDEX must first be stripped from the flag
 as_cmp_fn
-get_basic_cmp(boost::uint8_t flags, int version)
+get_basic_cmp(boost::uint8_t flags, const fn_call& fn)
 {
     as_cmp_fn f;
 
@@ -504,44 +497,44 @@ get_basic_cmp(boost::uint8_t flags, int version)
     switch ( flags )
     {
         case 0: // default string comparison
-            f = as_value_lt(version);
+            f = as_value_lt(fn);
             return f;
 
         case SORT_DESCENDING:
-            f = as_value_gt(version);
+            f = as_value_gt(fn);
             return f;
 
         case SORT_CASE_INSENSITIVE: 
-            f = as_value_nocase_lt(version);
+            f = as_value_nocase_lt(fn);
             return f;
 
         case SORT_CASE_INSENSITIVE | 
                 SORT_DESCENDING:
-            f = as_value_nocase_gt(version);
+            f = as_value_nocase_gt(fn);
             return f;
 
         case SORT_NUMERIC: 
-            f = as_value_num_lt(version);
+            f = as_value_num_lt(fn);
             return f;
 
         case SORT_NUMERIC | SORT_DESCENDING:
-            f = as_value_num_gt(version);
+            f = as_value_num_gt(fn);
             return f;
 
         case SORT_CASE_INSENSITIVE | 
                 SORT_NUMERIC:
-            f = as_value_num_nocase_lt(version);
+            f = as_value_num_nocase_lt(fn);
             return f;
 
         case SORT_CASE_INSENSITIVE | 
                 SORT_NUMERIC |
                 SORT_DESCENDING:
-            f = as_value_num_nocase_gt(version);
+            f = as_value_num_nocase_gt(fn);
             return f;
 
         default:
-            log_unimpl(_("Unhandled sort flags: %d (0x%X)"), (int)flags, (int)flags);
-            f = as_value_lt(version);
+            log_unimpl(_("Unhandled sort flags: %d (0x%X)"), +flags, +flags);
+            f = as_value_lt(fn);
             return f;
     }
 }
@@ -550,32 +543,32 @@ get_basic_cmp(boost::uint8_t flags, int version)
 // Note:
 // SORT_UNIQUE and SORT_RETURN_INDEX must first be stripped from the flag
 as_cmp_fn
-get_basic_eq(boost::uint8_t flags, int version)
+get_basic_eq(boost::uint8_t flags, const fn_call& fn)
 {
     as_cmp_fn f;
     flags &= ~(SORT_DESCENDING);
 
-    switch ( flags )
+    switch (flags)
     {
         case 0: // default string comparison
-            f = as_value_eq(version);
+            f = as_value_eq(fn);
             return f;
 
         case SORT_CASE_INSENSITIVE: 
-            f = as_value_nocase_eq(version);
+            f = as_value_nocase_eq(fn);
             return f;
 
         case SORT_NUMERIC: 
-            f = as_value_num_eq(version);
+            f = as_value_num_eq(fn);
             return f;
 
         case SORT_CASE_INSENSITIVE | 
                 SORT_NUMERIC:
-            f = as_value_num_nocase_eq(version);
+            f = as_value_num_nocase_eq(fn);
             return f;
 
         default:
-            f = as_value_eq(version);
+            f = as_value_eq(fn);
             return f;
     }
 }
@@ -607,7 +600,7 @@ public:
         args += b, a;
         ret = invoke(cmp_method, _env, _object, args);
 
-        return (*_zeroCmp)(toInt(ret));
+        return (*_zeroCmp)(toInt(ret, getVM(_env)));
     }
 };
 
@@ -625,16 +618,18 @@ public:
     {
     }
 
-    bool operator() (const as_value& a, const as_value& b)
-    {
-        as_value av, bv;
+    bool operator()(const as_value& a, const as_value& b) const {
 
         // why do we cast ao/bo to objects here ?
-        boost::intrusive_ptr<as_object> ao = a.to_object(getGlobal(_obj));
-        boost::intrusive_ptr<as_object> bo = b.to_object(getGlobal(_obj));
+        as_object* ao = toObject(a, getVM(_obj));
+        as_object* bo = toObject(b, getVM(_obj));
+
+        assert(ao);
+        assert(bo);
         
-        ao->get_member(_prop, &av);
-        bo->get_member(_prop, &bv);
+        const as_value& av = getOwnProperty(*ao, _prop);
+        const as_value& bv = getOwnProperty(*bo, _prop);
+
         return _comp(av, bv);
     }
 private:
@@ -672,8 +667,8 @@ public:
         std::vector<as_cmp_fn>::iterator cmp = _cmps.begin();
 
         // why do we cast ao/bo to objects here ?
-        as_object* ao = a.to_object(getGlobal(_obj));
-        as_object* bo = b.to_object(getGlobal(_obj));
+        as_object* ao = toObject(a, getVM(_obj));
+        as_object* bo = toObject(b, getVM(_obj));
 
         // TODO: this may not be correct, but it is better than accessing
         // null pointers.
@@ -681,10 +676,9 @@ public:
         
         for (Props::iterator pit = _prps.begin(), pend = _prps.end();
                 pit != pend; ++pit, ++cmp) {
-            as_value av, bv;
-
-            ao->get_member(*pit, &av);
-            bo->get_member(*pit, &bv);
+            
+            const as_value& av = getOwnProperty(*ao, *pit);
+            const as_value& bv = getOwnProperty(*bo, *pit);
 
             if ((*cmp)(av, bv)) return true;
             if ((*cmp)(bv, av)) return false;
@@ -708,24 +702,22 @@ public:
     {
     }
 
-    bool operator() (const as_value& a, const as_value& b)
-    {
-        if ( _cmps.empty() ) return false;
+    bool operator()(const as_value& a, const as_value& b) const {
+        if (_cmps.empty()) return false;
 
         Comps::const_iterator cmp = _cmps.begin();
 
         // why do we cast ao/bo to objects here ?
-        as_object* ao = a.to_object(getGlobal(_obj));
-        as_object* bo = b.to_object(getGlobal(_obj));
+        as_object* ao = toObject(a, getVM(_obj));
+        as_object* bo = toObject(b, getVM(_obj));
 
         for (Props::iterator pit = _prps.begin(), pend = _prps.end();
                 pit != pend; ++pit, ++cmp)
         {
-            as_value av, bv;
-            ao->get_member(*pit, &av);
-            bo->get_member(*pit, &bv);
+            const as_value& av = getOwnProperty(*ao, *pit);
+            const as_value& bv = getOwnProperty(*bo, *pit);
 
-            if ( !(*cmp)(av, bv) ) return false;
+            if (!(*cmp)(av, bv)) return false;
         }
         
         return true;
@@ -772,23 +764,26 @@ private:
 class GetMultiFlags
 {
 public:
-    GetMultiFlags(std::vector<boost::uint8_t>& v)
+    GetMultiFlags(std::vector<boost::uint8_t>& v, const fn_call& fn)
         :
         _v(v),
         _i(0),
         _uniq(false),
-        _index(false)
+        _index(false),
+        _fn(fn)
     {}
     void operator()(const as_value& val) {
         // extract SORT_UNIQUE and SORT_RETURN_INDEX from first flag
         if (!_i) {
-            boost::uint8_t flag = static_cast<boost::uint8_t>(val.to_number());
+            boost::uint8_t flag =
+                static_cast<boost::uint8_t>(toNumber(val, getVM(_fn)));
             flag = flag_preprocess(flag, &_uniq, &_index);
             _v.push_back(flag);
             ++_i;
             return;
         }
-        boost::uint8_t flag = static_cast<boost::uint8_t>(val.to_number());
+        boost::uint8_t flag = 
+                static_cast<boost::uint8_t>(toNumber(val, getVM(_fn)));
         flag &= ~(SORT_RETURN_INDEX);
         flag &= ~(SORT_UNIQUE);
         _v.push_back(flag);
@@ -802,6 +797,7 @@ private:
     size_t _i;
     bool _uniq;
     bool _index;
+    const fn_call& _fn;
 };
 
 }
@@ -820,7 +816,7 @@ checkArrayLength(as_object& array, const ObjectURI& uri, const as_value& val)
 {
     const string_table::key name = getName(uri);
     if (name == NSV::PROP_LENGTH) {
-        resizeArray(array, toInt(val));
+        resizeArray(array, toInt(val, getVM(array)));
         return;
     }
 
@@ -837,10 +833,11 @@ checkArrayLength(as_object& array, const ObjectURI& uri, const as_value& val)
 size_t
 arrayLength(as_object& array)
 {
-    as_value length;
-    if (!array.get_member(NSV::PROP_LENGTH, &length)) return 0;
+    // Only the length property of the array object itself counts.
+    const as_value& length = getOwnProperty(array, NSV::PROP_LENGTH);
+    if (length.is_undefined()) return 0;
     
-    const int size = toInt(length);
+    const int size = toInt(length, getVM(array));
     if (size < 0) return 0;
     return size;
 }
@@ -872,7 +869,7 @@ array_class_init(as_object& where, const ObjectURI& uri)
     VM& vm = getVM(where);
     Global_as& gl = getGlobal(where);
 
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
 
     as_object* cl = vm.getNative(252, 0);
 
@@ -898,7 +895,7 @@ namespace {
 void
 attachArrayStatics(as_object& proto)
 {
-    int flags = 0; // these are not protected
+    const int flags = 0; // these are not protected
     proto.init_member("CASEINSENSITIVE", SORT_CASE_INSENSITIVE, flags);
     proto.init_member("DESCENDING", SORT_DESCENDING, flags);
     proto.init_member("UNIQUESORT", SORT_UNIQUE, flags);
@@ -944,7 +941,7 @@ array_splice(const fn_call& fn)
     // Get start offset
     //----------------
 
-    int start = toInt(fn.arg(0));
+    int start = toInt(fn.arg(0), getVM(fn));
     if (start < 0) start = size + start; 
     start = clamp<int>(start, 0, size);
 
@@ -952,7 +949,7 @@ array_splice(const fn_call& fn)
     size_t remove = size - start;
     
     if (fn.nargs > 1) {
-        int remval = toInt(fn.arg(1));
+        int remval = toInt(fn.arg(1), getVM(fn));
         if (remval < 0) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("Array.splice(%d,%d): negative length "
@@ -979,7 +976,7 @@ array_splice(const fn_call& fn)
     // Push removed elements to the new array.
     for (size_t i = 0; i < remove; ++i) {
         const size_t key = getKey(fn, start + i);
-        callMethod(ret, NSV::PROP_PUSH, array->getMember(key));
+        callMethod(ret, NSV::PROP_PUSH, getOwnProperty(*array, key));
     }
 
     // Shift elements in 'this' array by simple assignment, not delete
@@ -1007,10 +1004,8 @@ array_sort(const fn_call& fn)
 {
     as_object* array = ensure<ValidThis>(fn);
     
-    const int version = getSWFVersion(*array);
-    
     if (!fn.nargs) {
-        sort(*array, as_value_lt(version));
+        sort(*array, as_value_lt(fn));
         return as_value(array);
     }
     
@@ -1019,7 +1014,7 @@ array_sort(const fn_call& fn)
     boost::uint8_t flags = 0;
 
     if (fn.nargs == 1 && fn.arg(0).is_number()) {
-        flags = static_cast<boost::uint8_t>(fn.arg(0).to_number());
+        flags = static_cast<boost::uint8_t>(toNumber(fn.arg(0), getVM(fn)));
     }
     else if (fn.arg(0).is_function()) {
         // Get comparison function
@@ -1030,7 +1025,7 @@ array_sort(const fn_call& fn)
         bool (*icmp)(int);
     
         if (fn.nargs == 2 && fn.arg(1).is_number()) {
-            flags=static_cast<boost::uint8_t>(fn.arg(1).to_number());
+            flags=static_cast<boost::uint8_t>(toNumber(fn.arg(1), getVM(fn)));
         }
 
         if (flags & SORT_DESCENDING) icmp = &int_lt_or_eq;
@@ -1060,10 +1055,10 @@ array_sort(const fn_call& fn)
 
     bool do_unique, do_index;
     flags = flag_preprocess(flags, &do_unique, &do_index);
-    as_cmp_fn comp = get_basic_cmp(flags, version);
+    as_cmp_fn comp = get_basic_cmp(flags, fn);
 
     if (do_unique) {
-        as_cmp_fn eq = get_basic_eq(flags, version);
+        as_cmp_fn eq = get_basic_eq(flags, fn);
         if (do_index) return sortIndexed(*array, comp, eq);
         return sort(*array, comp, eq) ? as_value(array) : as_value(0.0);
     }
@@ -1092,15 +1087,15 @@ array_sortOn(const fn_call& fn)
             st.find(fn.arg(0).to_string(version));
 
         if (fn.nargs > 1 && fn.arg(1).is_number()) {
-            flags = static_cast<boost::uint8_t>(fn.arg(1).to_number());
+            flags = static_cast<boost::uint8_t>(toNumber(fn.arg(1), getVM(fn)));
             flags = flag_preprocess(flags, &do_unique, &do_index);
         }
 
-        as_value_prop avc(propField, get_basic_cmp(flags, version),
+        as_value_prop avc(propField, get_basic_cmp(flags, fn),
                 getGlobal(fn));
 
         if (do_unique) {
-            as_value_prop ave(propField, get_basic_eq(flags, version), 
+            as_value_prop ave(propField, get_basic_eq(flags, fn), 
                     getGlobal(fn));
             if (do_index)
                 return sortIndexed(*array, avc, ave);
@@ -1118,7 +1113,7 @@ array_sortOn(const fn_call& fn)
     // case: sortOn(["prop1", "prop2"] ...)
     if (fn.arg(0).is_object()) 
     {
-        as_object* props = fn.arg(0).to_object(getGlobal(fn));
+        as_object* props = toObject(fn.arg(0), getVM(fn));
         assert(props);
 
         std::vector<string_table::key> prp;
@@ -1134,19 +1129,19 @@ array_sortOn(const fn_call& fn)
         // case: sortOn(["prop1", "prop2"])
         if (fn.nargs == 1) {
             // assign each cmp function to the standard cmp fn
-            as_cmp_fn c = get_basic_cmp(0, version);
+            as_cmp_fn c = get_basic_cmp(0, fn);
             cmp.assign(optnum, c);
         }
         // case: sortOn(["prop1", "prop2"], [Array.FLAG1, Array.FLAG2])
         else if (fn.arg(1).is_object()) {
 
-            as_object* farray = fn.arg(1).to_object(getGlobal(fn));
+            as_object* farray = toObject(fn.arg(1), getVM(fn));
 
             // Only an array will do for this case.
             if (farray->array() && arrayLength(*farray) == optnum) {
 
                 std::vector<boost::uint8_t> flgs;
-                GetMultiFlags mf(flgs);
+                GetMultiFlags mf(flgs, fn);
                 foreachArray(*farray, mf);
                 do_unique = mf.unique();
                 do_index = mf.index();
@@ -1155,31 +1150,31 @@ array_sortOn(const fn_call& fn)
                     flgs.begin();
 
                 while (it != flgs.end()) {
-                    cmp.push_back(get_basic_cmp(*it++, version));
+                    cmp.push_back(get_basic_cmp(*it++, fn));
                 }
 
                 if (do_unique) {
                     it = flgs.begin();
                     while (it != flgs.end())
-                        eq.push_back(get_basic_eq(*it++, version));
+                        eq.push_back(get_basic_eq(*it++, fn));
                 }
             }
             else {
-                as_cmp_fn c = get_basic_cmp(0, version);
+                as_cmp_fn c = get_basic_cmp(0, fn);
                 cmp.assign(optnum, c);
             }
         }
         // case: sortOn(["prop1", "prop2"], Array.FLAG)
         else {
             boost::uint8_t flags = 
-                static_cast<boost::uint8_t>(toInt(fn.arg(1)));
+                static_cast<boost::uint8_t>(toInt(fn.arg(1), getVM(fn)));
             flags = flag_preprocess(flags, &do_unique, &do_index);
-            as_cmp_fn c = get_basic_cmp(flags, version);
+            as_cmp_fn c = get_basic_cmp(flags, fn);
 
             cmp.assign(optnum, c);
             
             if (do_unique) {
-                as_cmp_fn e = get_basic_eq(flags, version);
+                as_cmp_fn e = get_basic_eq(flags, fn);
                 eq.assign(optnum, e);
             }
         }
@@ -1235,14 +1230,11 @@ array_unshift(const fn_call& fn)
 
     const size_t size = arrayLength(*array);
 
-    string_table& st = getStringTable(fn);
-    as_value ret = array->getMember(st.find("0"));
-    
     for (size_t i = size + shift - 1; i >= shift ; --i) {
         const string_table::key nextkey = getKey(fn, i - shift);
         const string_table::key currentkey = getKey(fn, i);
         array->delProperty(currentkey);
-        array->set_member(currentkey, array->getMember(nextkey));
+        array->set_member(currentkey, getOwnProperty(*array, nextkey));
     }
 
     for (size_t i = shift; i > 0; --i) {
@@ -1266,7 +1258,7 @@ array_pop(const fn_call& fn)
     if (size < 1) return as_value();
 
     const string_table::key ind = getKey(fn, size - 1);
-    as_value ret = array->getMember(ind);
+    as_value ret = getOwnProperty(*array, ind);
     array->delProperty(ind);
     
     setArrayLength(*array, size - 1);
@@ -1284,13 +1276,13 @@ array_shift(const fn_call& fn)
     // An array with no elements has nothing to return.
     if (size < 1) return as_value();
 
-    as_value ret = array->getMember(getKey(fn, 0));
+    as_value ret = getOwnProperty(*array, getKey(fn, 0));
 
     for (size_t i = 0; i < static_cast<size_t>(size - 1); ++i) {
         const string_table::key nextkey = getKey(fn, i + 1);
         const string_table::key currentkey = getKey(fn, i);
         array->delProperty(currentkey);
-        array->set_member(currentkey, array->getMember(nextkey));
+        array->set_member(currentkey, getOwnProperty(*array, nextkey));
     }
     
     setArrayLength(*array, size - 1);
@@ -1311,8 +1303,8 @@ array_reverse(const fn_call& fn)
     for (size_t i = 0; i < static_cast<size_t>(size) / 2; ++i) {
         const string_table::key bottomkey = getKey(fn, i);
         const string_table::key topkey = getKey(fn, size - i - 1);
-        const as_value top = array->getMember(topkey);
-        const as_value bottom = array->getMember(bottomkey);
+        const as_value top = getOwnProperty(*array, topkey);
+        const as_value bottom = getOwnProperty(*array, bottomkey);
         array->delProperty(topkey);
         array->delProperty(bottomkey);
         array->set_member(bottomkey, top);
@@ -1363,8 +1355,7 @@ array_concat(const fn_call& fn)
         // The type is checked using instanceOf.
         const as_value& arg = fn.arg(i);
 
-        Global_as& gl = getGlobal(fn);
-        as_object* other = arg.to_object(gl);
+        as_object* other = toObject(arg, getVM(fn));
 
         if (other) {
             // If it's not an array, we want to carry on and add it as an
@@ -1396,10 +1387,10 @@ array_slice(const fn_call& fn)
         );
     }
 
-    int startindex = fn.nargs ? toInt(fn.arg(0)) : 0;
+    int startindex = fn.nargs ? toInt(fn.arg(0), getVM(fn)) : 0;
 
     // if we sent at least two arguments, setup endindex
-    int endindex = fn.nargs > 1 ? toInt(fn.arg(1)) :
+    int endindex = fn.nargs > 1 ? toInt(fn.arg(1), getVM(fn)) :
         std::numeric_limits<int>::max();
 
     Global_as& gl = getGlobal(fn);
@@ -1429,7 +1420,7 @@ array_new(const fn_call& fn)
     }
 
     if (fn.nargs == 1 && fn.arg(0).is_number()) {
-        int newSize = toInt(fn.arg(0));
+        int newSize = toInt(fn.arg(0), getVM(fn));
         if (newSize < 0) newSize = 0;
         else {
             ao->set_member(NSV::PROP_LENGTH, newSize);
@@ -1459,11 +1450,9 @@ join(as_object* array, const std::string& separator)
     const int version = getSWFVersion(*array);
 
     for (size_t i = 0; i < size; ++i) {
-        std::ostringstream os;
-        os << i;
         if (i) s += separator;
-        as_value el;
-        array->get_member(st.find(os.str()), &el);
+        const std::string& index = boost::lexical_cast<std::string>(i);
+        const as_value& el = getOwnProperty(*array, st.find(index));
         s += el.to_string(version);
     }
     return as_value(s);
@@ -1497,7 +1486,7 @@ void foreachArray(as_object& array, int start, int end, T& pred)
     string_table& st = getStringTable(array);
 
     for (size_t i = start; i < static_cast<size_t>(end); ++i) {
-        pred(array.getMember(arrayKey(st, i)));
+        pred(getOwnProperty(array, arrayKey(st, i)));
     }
 }
 

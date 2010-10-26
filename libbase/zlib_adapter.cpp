@@ -8,16 +8,16 @@
 
 
 #include "zlib_adapter.h"
-#include "IOChannel.h" // for inheritance
-#include "log.h"
-#include "GnashException.h"
-#include <algorithm> // std::min
 
+#include <algorithm>
 #include <sstream>
 #include <memory>
 
-namespace gnash {
+#include "IOChannel.h" // for inheritance
+#include "log.h"
+#include "GnashException.h"
 
+namespace gnash {
 
 #ifndef HAVE_ZLIB_H
 
@@ -25,28 +25,18 @@ namespace gnash {
 // Stubs, in case client doesn't want to link to zlib.
 namespace zlib_adapter
 {
-    std::auto_ptr<IOChannel> make_inflater(std::auto_ptr<IOChannel> /*in*/)
-    {
-        abort(); // callers should check this themselves
-        return std::auto_ptr<IOChannel>(NULL);
-    }
-
-    IOChannel* make_deflater(IOChannel* /*out*/)
-    {
-        abort(); // callers should check this themselves
-        return NULL;
+    std::auto_ptr<IOChannel> make_inflater(std::auto_ptr<IOChannel> /*in*/) {
+        std::abort(); 
     }
 }
 
-
 #else // HAVE_ZLIB_H
 
+extern "C" {
+# include <zlib.h>
+}
 
-#include <zlib.h>
-
-
-namespace zlib_adapter
-{
+namespace zlib_adapter {
 
 class InflaterIOChannel : public IOChannel 
 {
@@ -64,8 +54,7 @@ public:
     virtual bool seek(std::streampos pos);
 
     // See dox in IOChannel
-    virtual std::streamsize read(void* dst, std::streamsize bytes)
-    {
+    virtual std::streamsize read(void* dst, std::streamsize bytes) {
         if (m_error) return 0;
         return inflate_from_stream(dst, bytes);
     }
@@ -74,20 +63,17 @@ public:
     virtual void go_to_end();
 
     // See dox in IOChannel
-    virtual std::streampos tell() const
-    {
+    virtual std::streampos tell() const {
         return m_logical_stream_pos;
     }
 
     // See dox in IOChannel
-    virtual bool eof() const
-    {
+    virtual bool eof() const {
         return m_at_eof;
     }
 
     // See dox in IOChannel
-    virtual bool bad() const
-    {
+    virtual bool bad() const {
         return m_error;
     }
 
@@ -133,10 +119,9 @@ const int InflaterIOChannel::ZBUF_SIZE;
 void
 InflaterIOChannel::rewind_unused_bytes()
 {
-    if (m_zstream.avail_in > 0)
-    {
-        int    pos = m_in->tell();
-        int    rewound_pos = pos - m_zstream.avail_in;
+    if (m_zstream.avail_in > 0) {
+        const int pos = m_in->tell();
+        const int rewound_pos = pos - m_zstream.avail_in;
         assert(pos >= 0);
         assert(pos >= m_initial_stream_pos);
         assert(rewound_pos >= 0);
@@ -151,7 +136,7 @@ InflaterIOChannel::reset()
 {
     m_error = 0;
     m_at_eof = 0;
-    int    err = inflateReset(&m_zstream);
+    const int err = inflateReset(&m_zstream);
     if (err != Z_OK) {
         log_error("inflater_impl::reset() inflateReset() returned %d", err);
         m_error = 1;
@@ -187,73 +172,59 @@ InflaterIOChannel::inflate_from_stream(void* dst, std::streamsize bytes)
     m_zstream.next_out = static_cast<unsigned char*>(dst);
     m_zstream.avail_out = bytes;
 
-    for (;;)
-    {
-        if (m_zstream.avail_in == 0)
-        {
+    for (;;) {
+        if (m_zstream.avail_in == 0) {
             // Get more raw data.
-            int    new_bytes = m_in->read(m_rawdata, ZBUF_SIZE);
-            if (new_bytes == 0)
-            {
+            const int new_bytes = m_in->read(m_rawdata, ZBUF_SIZE);
+            if (new_bytes == 0) {
                 // The cupboard is bare!  We have nothing to feed to inflate().
                 break;
             }
-            else
-            {
+            else {
                 m_zstream.next_in = m_rawdata;
                 m_zstream.avail_in = new_bytes;
             }
         }
 
-        int    err = inflate(&m_zstream, Z_SYNC_FLUSH);
-        if (err == Z_STREAM_END)
-        {
+        const int err = inflate(&m_zstream, Z_SYNC_FLUSH);
+        if (err == Z_STREAM_END) {
             m_at_eof = true;
             break;
         }
-        if (err == Z_BUF_ERROR)
-        {
+        if (err == Z_BUF_ERROR) {
             std::ostringstream ss;
             ss << __FILE__ << ":" << __LINE__ << ": " << m_zstream.msg;
             log_error("%s", ss.str());
             break;
         }
-        if (err == Z_DATA_ERROR)
-        {
+        if (err == Z_DATA_ERROR) {
             std::ostringstream ss;
             ss << __FILE__ << ":" << __LINE__ << ": " << m_zstream.msg;
             throw ParserException(ss.str());
             break;
         }
-        if (err == Z_MEM_ERROR)
-        {
+        if (err == Z_MEM_ERROR) {
             std::ostringstream ss;
             ss << __FILE__ << ":" << __LINE__ << ": " << m_zstream.msg;
             throw ParserException(ss.str());
             break;
         }
-        if (err != Z_OK)
-        {
+        if (err != Z_OK) {
             // something's wrong.
             std::ostringstream ss;
             ss << __FILE__ << ":" << __LINE__ << ": " << m_zstream.msg;
             throw ParserException(ss.str());
-            //m_error = 1;
             break;
         }
 
-        if (m_zstream.avail_out == 0)
-        {
+        if (m_zstream.avail_out == 0) {
             break;
         }
     }
 
-    if (m_error)
-    {
-        return 0;
-    }
+    if (m_error) return 0;
 
-    int    bytes_read = bytes - m_zstream.avail_out;
+    const int bytes_read = bytes - m_zstream.avail_out;
     m_logical_stream_pos += bytes_read;
 
     return bytes_read;
@@ -262,21 +233,19 @@ InflaterIOChannel::inflate_from_stream(void* dst, std::streamsize bytes)
 void
 InflaterIOChannel::go_to_end()
 {
-    if (m_error)
-    {
-        throw IOException("InflaterIOChannel is in error condition, can't seek to end");
+    if (m_error) {
+        throw IOException("InflaterIOChannel is in error condition, "
+                "can't seek to end");
     }
 
     // Keep reading until we can't read any more.
 
-    unsigned char    temp[ZBUF_SIZE];
+    unsigned char temp[ZBUF_SIZE];
 
     // Seek forwards.
-    for (;;)
-    {
-        std::streamsize bytes_read = inflate_from_stream(temp, ZBUF_SIZE);
-        if (bytes_read == 0)
-        {
+    for (;;) {
+        const std::streamsize bytes_read = inflate_from_stream(temp, ZBUF_SIZE);
+        if (!bytes_read) {
             // We've seeked as far as we can.
             break;
         }
@@ -286,15 +255,13 @@ InflaterIOChannel::go_to_end()
 bool
 InflaterIOChannel::seek(std::streampos pos)
 {
-    if (m_error)
-    {
+    if (m_error) {
         log_debug("Inflater is in error condition");
         return false;
     }
 
     // If we're seeking backwards, then restart from the beginning.
-    if (pos < m_logical_stream_pos)
-    {
+    if (pos < m_logical_stream_pos) {
         log_debug("inflater reset due to seek back from %d to %d",
                 m_logical_stream_pos, pos );
         reset();
@@ -303,8 +270,7 @@ InflaterIOChannel::seek(std::streampos pos)
     unsigned char temp[ZBUF_SIZE];
 
     // Now seek forwards, by just reading data in blocks.
-    while (m_logical_stream_pos < pos)
-    {
+    while (m_logical_stream_pos < pos) {
         std::streamsize to_read = pos - m_logical_stream_pos;
         assert(to_read > 0);
 
@@ -313,12 +279,9 @@ InflaterIOChannel::seek(std::streampos pos)
 
         std::streamsize bytes_read = inflate_from_stream(temp, readNow);
         assert(bytes_read <= readNow);
-        if (bytes_read == 0)
-        {
-            // Trouble; can't seek any further.
+        if (bytes_read == 0) {
             log_debug("Trouble: can't seek any further.. ");
             return false;
-            break;
         }
     }
 
@@ -331,43 +294,26 @@ InflaterIOChannel::InflaterIOChannel(std::auto_ptr<IOChannel> in)
     :
     m_in(in),
     m_initial_stream_pos(m_in->tell()),
+    m_zstream(),
     m_logical_stream_pos(m_initial_stream_pos),
     m_at_eof(false),
     m_error(0)
 {
     assert(m_in.get());
 
-    m_zstream.zalloc = (alloc_func)0;
-    m_zstream.zfree = (free_func)0;
-    m_zstream.opaque = (voidpf)0;
-
-    m_zstream.next_in  = 0;
-    m_zstream.avail_in = 0;
-
-    m_zstream.next_out = 0;
-    m_zstream.avail_out = 0;
-
-    int    err = inflateInit(&m_zstream);
+    const int err = inflateInit(&m_zstream);
     if (err != Z_OK) {
-        log_error("inflater_impl::ctor() inflateInit() returned %d", err);
+        log_error("inflateInit() returned %d", err);
         m_error = 1;
         return;
     }
-
-    // Ready to go!
 }
-
-
 
 std::auto_ptr<IOChannel> make_inflater(std::auto_ptr<IOChannel> in)
 {
     assert(in.get());
-    return std::auto_ptr<IOChannel> (new InflaterIOChannel(in));
+    return std::auto_ptr<IOChannel>(new InflaterIOChannel(in));
 }
-
-
-// @@ TODO
-// IOChannel*    make_deflater(IOChannel* out) { ... }
 
 }
 

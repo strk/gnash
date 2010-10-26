@@ -247,7 +247,7 @@ microphone_get(const fn_call& fn)
 
     // Properties are attached to the prototype (not __proto__) when get() is
     // called. 
-    as_object* proto = ptr->getMember(NSV::PROP_PROTOTYPE).to_object(getGlobal(fn));
+    as_object* proto = toObject(getMember(*ptr, NSV::PROP_PROTOTYPE), getVM(fn));
     attachMicrophoneProperties(*proto);
  
     // TODO: this should return the same object when the same device is
@@ -272,7 +272,7 @@ microphone_get(const fn_call& fn)
     // Normally the VM would furnish us with a newly instantiated object, if
     // a constructor were used. But we're in a factory, so we have to build
     // one for ourselves.
-    as_object* mic_obj = getGlobal(fn).createObject();
+    as_object* mic_obj = createObject(getGlobal(fn));
     mic_obj->set_prototype(proto);
     attachMicrophoneInterface(*mic_obj);
     attachMicrophoneProperties(*mic_obj);
@@ -294,7 +294,7 @@ microphone_setgain(const fn_call& fn)
         return as_value();
     } 
 
-    const boost::int32_t gain = clamp<boost::int32_t>(toInt(fn.arg(0)), 0, 100);
+    const boost::int32_t gain = clamp<boost::int32_t>(toInt(fn.arg(0), getVM(fn)), 0, 100);
     ptr->setGain(gain);
     return as_value();
 }
@@ -309,7 +309,7 @@ microphone_setrate(const fn_call& fn)
         log_error("Microphone.setRate: wrong number of parameters passed");
         return as_value();
     }
-    ptr->setRate(toInt(fn.arg(0)));
+    ptr->setRate(toInt(fn.arg(0), getVM(fn)));
     return as_value();
 }
 
@@ -446,12 +446,12 @@ microphone_setsilencelevel(const fn_call& fn)
         return as_value();
     }
 
-    const double level = clamp<double>(fn.arg(0).to_number(), 0, 100);
+    const double level = clamp<double>(toNumber(fn.arg(0), getVM(fn)), 0, 100);
     ptr->setSilenceLevel(level);
     
     if (numargs > 1) {
         // If it's less than 0, it's set to 0.
-        const int timeout = std::max<boost::int32_t>(toInt(fn.arg(1)), 0);
+        const int timeout = std::max<boost::int32_t>(toInt(fn.arg(1), getVM(fn)), 0);
         ptr->setSilenceTimeout(timeout);
     }
     return as_value();
@@ -465,7 +465,7 @@ microphone_setuseechosuppression(const fn_call& fn)
     if (!fn.nargs) {
         return as_value();
     }
-    ptr->setUseEchoSuppression(fn.arg(0).to_bool());
+    ptr->setUseEchoSuppression(toBool(fn.arg(0), getVM(fn)));
     return as_value();
 }
 

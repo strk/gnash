@@ -10,7 +10,6 @@
   <!ENTITY appname "Gnash">
   <!ENTITY actionscript "ActionScript">
   <!ENTITY fn_call "<emphasis>fn_call</emphasis>">
-  <!ENTITY gen_asclass "<emphasis>gen-asclass.sh</emphasis>">
   <!ENTITY version "0.8.8">
 
   <!ENTITY main SYSTEM "actionscript/main.xml">

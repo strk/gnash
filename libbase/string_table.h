@@ -99,7 +99,7 @@ public:
     /// @param key  The key of the string to return. 
 	/// @return     The string which matches key or "" if an invalid key is
     ///             given.
-	const std::string& value(key to_find)
+	const std::string& value(key to_find) const
 	{
 		if (_table.empty() || !to_find) return _empty;
 
@@ -130,7 +130,8 @@ public:
 	/// Construct the empty string_table
 	string_table()
         :
-		_highestKey(0)
+		_highestKey(0),
+		_highestKnownLowercase(0)
 	{}
 
     /// Return a caseless equivalent of the passed key.
@@ -140,6 +141,10 @@ public:
     ///             same key will be returned.
     key noCase(key a) const;
 
+    /// Set the highest key value known to correspond to a lowercase name
+    //
+    void setHighestKnownLowercase(std::size_t k);
+
 private:
 
 	table _table;
@@ -148,6 +153,7 @@ private:
 	std::size_t _highestKey;
 
     std::map<key, key> _caseTable;
+    key _highestKnownLowercase;
 };
 
 /// Check whether two keys are equivalent
@@ -164,7 +170,7 @@ private:
 /// @param b        The other key to check
 /// @param caseless Whether to compare in a case-insensitive way.
 /// @return         True if the keys are equivalent.
-bool equal(string_table& st, string_table::key a, string_table::key b,
+DSOEXPORT bool equal(string_table& st, string_table::key a, string_table::key b,
         bool caseless);
 
 }

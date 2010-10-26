@@ -18,16 +18,16 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "ExternalInterface_as.h"
+
 #include <map>
 #include <vector>
 #include <sstream>
-#include <sys/ioctl.h>
-#include <sys/types.h>
 #include <boost/algorithm/string/erase.hpp>
 #include <algorithm>
+#include "GnashSystemNetHeaders.h"
 
 #include "ExternalInterface.h"
-#include "ExternalInterface_as.h"
 #include "NativeFunction.h"
 #include "StringPredicates.h"
 #include "as_object.h" // for inheritance
@@ -36,7 +36,6 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
-#include "URLAccessManager.h"
 #include "VM.h"
 #include "rc.h"
 #include "as_value.h"
@@ -45,94 +44,112 @@
 #include "Array_as.h"
 #include "namedStrings.h"
 #include "Global_as.h"
-#include "Globals.h"
 #include "PropertyList.h"
 #include "movie_root.h"
 #include "log.h"
+#include "RunResources.h"
+#include "StreamProvider.h"
+
+#define MAXHOSTNAMELEN 256 // max hostname size. However this is defined in netdb.h
 
 namespace gnash {
 
 namespace {
-as_value externalInterfaceConstructor(const fn_call& fn);
-
-as_value externalinterface_addCallback(const fn_call& fn);
-as_value externalinterface_call(const fn_call& fn);
-as_value externalinterface_available(const fn_call& fn);
-as_value externalinterface_marshallExceptions(const fn_call& fn);
-as_value externalinterface_objectID(const fn_call& fn);
-
-as_value externalinterface_uArgumentsToXML(const fn_call& fn);
-as_value externalinterface_uArgumentsToAS(const fn_call& fn);
-as_value externalinterface_uAddCallback(const fn_call& fn);
-as_value externalinterface_uArrayToAS(const fn_call& fn);
-as_value externalinterface_uArrayToJS(const fn_call& fn);
-as_value externalinterface_uArrayToXML(const fn_call& fn);
-as_value externalinterface_uCallIn(const fn_call& fn);
-as_value externalinterface_uCallOut(const fn_call& fn);
-as_value externalinterface_uEscapeXML(const fn_call& fn);
-as_value externalinterface_uEvalJS(const fn_call& fn);
-as_value externalinterface_uInitJS(const fn_call& fn);
-as_value externalinterface_uJsQuoteString(const fn_call& fn);
-as_value externalinterface_uObjectID(const fn_call& fn);
-as_value externalinterface_uObjectToAS(const fn_call& fn);
-as_value externalinterface_uObjectToJS(const fn_call& fn);
-as_value externalinterface_uObjectToXML(const fn_call& fn);
-as_value externalinterface_uToAS(const fn_call& fn);
-as_value externalinterface_uToJS(const fn_call& fn);
-as_value externalinterface_uToXML(const fn_call& fn);
-as_value externalinterface_uUnescapeXML(const fn_call& fn);
-as_value externalinterface_ctor(const fn_call& fn);
-
-void attachExternalInterfaceStaticInterface(as_object& o);
+    as_value externalInterfaceConstructor(const fn_call& fn);
+    as_value externalinterface_addCallback(const fn_call& fn);
+    as_value externalinterface_call(const fn_call& fn);
+    as_value externalinterface_available(const fn_call& fn);
+    as_value externalinterface_objectID(const fn_call& fn);
+    as_value externalinterface_uArgumentsToXML(const fn_call& fn);
+    as_value externalinterface_uArgumentsToAS(const fn_call& fn);
+    as_value externalinterface_uAddCallback(const fn_call& fn);
+    as_value externalinterface_uArrayToAS(const fn_call& fn);
+    as_value externalinterface_uArrayToJS(const fn_call& fn);
+    as_value externalinterface_uArrayToXML(const fn_call& fn);
+    as_value externalinterface_uCallIn(const fn_call& fn);
+    as_value externalinterface_uCallOut(const fn_call& fn);
+    as_value externalinterface_uEscapeXML(const fn_call& fn);
+    as_value externalinterface_uEvalJS(const fn_call& fn);
+    as_value externalinterface_uInitJS(const fn_call& fn);
+    as_value externalinterface_uJsQuoteString(const fn_call& fn);
+    as_value externalinterface_uObjectID(const fn_call& fn);
+    as_value externalinterface_uObjectToAS(const fn_call& fn);
+    as_value externalinterface_uObjectToJS(const fn_call& fn);
+    as_value externalinterface_uObjectToXML(const fn_call& fn);
+    as_value externalinterface_uToAS(const fn_call& fn);
+    as_value externalinterface_uToJS(const fn_call& fn);
+    as_value externalinterface_uToXML(const fn_call& fn);
+    as_value externalinterface_uUnescapeXML(const fn_call& fn);
+    as_value externalinterface_ctor(const fn_call& fn);
 }
 
-/// Class used to serialize properties of an object to a buffer
-class PropsSerializer : public AbstractPropertyVisitor
+namespace {
+
+class Enumerator : public KeyVisitor
 {
-
 public:
-    
-    PropsSerializer(VM& vm)
-        : _st(vm.getStringTable()),
-          _error(false)
-        { /* do nothing */}
-    
-    bool success() const { return !_error; }
-
-    bool accept(const ObjectURI& uri, const as_value& val) {
-        if (_error) return true;
-
-        const string_table::key key = getName(uri);
-
-        if (key == NSV::PROP_uuPROTOuu || key == NSV::PROP_CONSTRUCTOR) {
-            log_debug(" skip serialization of specially-named property %s",
-                      _st.value(key));
-            return true;
-        }
-
-        // write property name
-        const std::string& id = _st.value(key);
-
-//        log_debug(" serializing property %s", id);
-        
-        _xml << "<property id=\"" << id << "\">";
-        _xml << ExternalInterface::toXML(val);
-        _xml << "</property>";
-
-        _noprops.push_back(val);
-            
-        return true;
+    Enumerator(std::vector<ObjectURI>& uris) : _uris(uris) {}
+    void operator()(const ObjectURI& u) {
+        _uris.push_back(u);
     }
-
-    std::string getXML() { return _xml.str(); };
-    std::vector<as_value> getArgs() { return _noprops; };
-    
 private:
-    string_table&       _st;
-    mutable bool        _error;
-    std::stringstream   _xml;
-    std::vector<as_value>   _noprops;
+    std::vector<ObjectURI>& _uris;
 };
+
+class ArrayToXML
+{
+public:
+    ArrayToXML(as_value& ret, const fn_call& fn)
+        :
+        _ret(ret),
+        _fn(fn),
+        _count(0)
+    {}
+
+    void operator()(const as_value& val) {
+        VM& vm = getVM(_fn);
+        string_table& st = getStringTable(_fn);
+
+        newAdd(_ret, "<property id=\"", vm);
+        newAdd(_ret, static_cast<double>(_count), vm);
+        newAdd(_ret, "\">", vm);
+        as_object* ei = 
+            _fn.env().find_object("flash.external.ExternalInterface");
+        const as_value& x = callMethod(ei, st.find("_toXML"), val);
+        newAdd(_ret, x, vm);
+        newAdd(_ret, "</property>", vm);
+        ++_count;
+    }
+private:
+    as_value& _ret;
+    const fn_call& _fn;
+    size_t _count;
+};
+
+class ArgsToXML
+{
+public:
+    ArgsToXML(as_value& ret, const fn_call& fn)
+        :
+        _ret(ret),
+        _fn(fn)
+    {}
+
+    void operator()(const as_value& val) {
+        VM& vm = getVM(_fn);
+        as_object* ei = 
+            _fn.env().find_object("flash.external.ExternalInterface");
+        string_table& st = getStringTable(_fn);
+        const as_value& x = callMethod(ei, st.find("_toXML"), val);
+        newAdd(_ret, x, vm);
+    }
+private:
+    as_value& _ret;
+    const fn_call& _fn;
+};
+
+
+}
 
 void
 registerExternalInterfaceNative(as_object& global)
@@ -230,7 +247,9 @@ attachExternalInterfaceStaticInterface(as_object& o)
     callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, &o, null, 7);
 }
 
-// This adds a function that can be called from javascript.
+/// This adds a function that can be called from javascript.
+//
+/// TODO: addCallback takes three arguments; only two are handled here.
 as_value
 externalinterface_addCallback(const fn_call& fn)
 {
@@ -245,18 +264,15 @@ externalinterface_addCallback(const fn_call& fn)
     if (fn.nargs > 1) {
         const as_value& name_as = fn.arg(0);
         std::string name = name_as.to_string();
-        boost::intrusive_ptr<as_object> asCallback;
-        if (fn.arg(2).is_object()) {
+        if (fn.arg(1).is_object()) {
             log_debug("adding callback %s", name);
-            asCallback = (fn.arg(2).to_object(getGlobal(fn)));
-            mr.addExternalCallback(fn.this_ptr, name, asCallback.get());
+            as_object* asCallback = toObject(fn.arg(1), getVM(fn));
+            mr.addExternalCallback(fn.this_ptr, name, asCallback);
         }
-     }
+    }
 
-    // This function doesn't actually have a return value, but we do this
-    // to quiet warnings about not returning anything, as the return
-    // value should never be checked anyway.
-    return as_value(false);    
+    // Returns true unless unavailable (which we checked above)
+    return as_value(true);    
 }
 
 // This calls a Javascript function in the browser.
@@ -267,7 +283,13 @@ externalinterface_call(const fn_call& fn)
     movie_root& mr = getRoot(fn);
     as_value val;
 
-    if (fn.nargs >= 2) {
+    if (mr.getControlFD() <= 0) {
+        log_debug("ExternalInterface not accessible on call.");
+        val.set_null();
+        return as_value(val);
+    }
+
+    if (fn.nargs > 1) {
         const as_value& methodName_as = fn.arg(0);
         const std::string methodName = methodName_as.to_string();
         const std::vector<as_value>& args = fn.getArgs();
@@ -278,12 +300,10 @@ externalinterface_call(const fn_call& fn)
             // There was an error trying to Invoke the callback
             if (result == ExternalInterface::makeString("Error")
                 || (result == ExternalInterface::makeString("SecurityError"))) {
-                val.set_null();
+                log_trace("VAL: %s", val);
+                val.set_undefined();
             }
-        } else {
-            // We got nothing back from the Invoke, so return an error
-            val.set_null();
-        }
+        } 
     }
     
     return val;
@@ -310,12 +330,12 @@ externalinterface_available(const fn_call& fn)
           
       case movie_root::SCRIPT_ACCESS_SAME_DOMAIN:
       {
-          const std::string& baseurl = m.getOriginalURL();
-          const int MAXHOSTNAMELEN = 128;
+          const RunResources& r = m.runResources();
+          const std::string& baseurl = r.streamProvider().originalURL().str();
           char hostname[MAXHOSTNAMELEN];
-          memset(hostname, 0, MAXHOSTNAMELEN);
+          std::memset(hostname, 0, MAXHOSTNAMELEN);
           
-          if (gethostname(hostname, MAXHOSTNAMELEN) != 0) {
+          if (::gethostname(hostname, MAXHOSTNAMELEN) != 0) {
               mode = false;
           }
           
@@ -323,7 +343,7 @@ externalinterface_available(const fn_call& fn)
           // a terminal, so we can assume the default of sameDomain applies.
           URL localPath(hostname, baseurl);
           // If the URL has a file protocol, then 
-          if (URLAccessManager::allow(localPath)) {
+          if (r.streamProvider().allow(localPath)) {
               return as_value(true);
           }
           if (localPath.hostname().empty()) {
@@ -347,21 +367,6 @@ externalinterface_available(const fn_call& fn)
     }
     
     return as_value(mode);
-}
-
-as_value
-externalinterface_marshallExceptions(const fn_call& fn)
-{
-//    GNASH_REPORT_FUNCTION;
-    
-    movie_root& m = getRoot(fn);
-    if (fn.nargs) {
-        m.setMarshallExceptions(fn.arg(0).to_bool());
-    } else {
-        return as_value(m.getMarshallExceptions());
-    }
-    
-    return as_value(true);
 }
 
 as_value
@@ -411,7 +416,7 @@ externalInterfaceConstructor(const fn_call& fn)
 {
     log_debug("Loading flash.external.ExternalInterface class");
     Global_as& gl = getGlobal(fn);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     as_object* cl = gl.createClass(&externalinterface_ctor, proto);
 
     attachExternalInterfaceStaticInterface(*cl);
@@ -421,48 +426,30 @@ externalInterfaceConstructor(const fn_call& fn)
 as_value
 externalinterface_uArgumentsToXML(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
+    as_value ret("<arguments>");
 
-    std::stringstream ss;
-    
-    if (fn.nargs == 2) {
-        std::vector<as_value> args;
-        if (fn.arg(0).is_object()) {
-            as_object *obj = fn.arg(0).to_object(getGlobal(fn));
-            VM& vm = getVM(*obj);    
-            PropsSerializer props(vm);
-            obj->visitProperties<IsEnumerable>(props);
-            if (!props.success()) {
-                log_error("Could not serialize object");
-                return false;
-            }
-            args = props.getArgs();
-            // For some reason the pp drops the first element of the array,
-            // so we do too.
-            args.erase(args.begin());
-        } else {
-            for (size_t i=0; i<fn.nargs; i++) {
-                args.push_back(fn.arg(i));
+    if (fn.nargs) {
+        as_object *obj = toObject(fn.arg(0), getVM(fn));
+        if (obj) {
+            ArgsToXML tx(ret, fn);
+            size_t size = arrayLength(*obj);
+            string_table& st = getStringTable(*obj);
+            if (size) {
+                for (size_t i = 1; i < static_cast<size_t>(size); ++i) {
+                    tx(getOwnProperty(*obj, arrayKey(st, i)));
+                }
             }
         }
-        return ExternalInterface::argumentsToXML(args);
     }
     
-    return as_value();
+    newAdd(ret, "</arguments>", getVM(fn));
+    return ret;
 }
 
 as_value
 externalinterface_uArgumentsToAS(const fn_call& /*fn*/)
 {
-    // GNASH_REPORT_FUNCTION;
     LOG_ONCE( log_unimpl (__FUNCTION__) );
-#if 0
-    std::string str(fn.arg(0).to_string());
-    if (fn.nargs > 0) {
-        return ExternalInterface::argumentsToAS();
-    }
-#endif
-
     return as_value();
 }
 
@@ -494,15 +481,18 @@ externalinterface_uArrayToJS(const fn_call& /*fn*/)
 as_value
 externalinterface_uArrayToXML(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
-    
-    if (fn.nargs == 1) {
-        as_object *obj = fn.arg(0).to_object(getGlobal(fn));
-        std::string str = ExternalInterface::arrayToXML(obj);
-        return as_value(str);
+    as_value ret("<array>");
+
+    if (fn.nargs) {
+        as_object *obj = toObject(fn.arg(0), getVM(fn));
+        if (obj) {
+            ArrayToXML tx(ret, fn);
+            foreachArray(*obj, tx);
+        }
     }
     
-    return as_value();
+    newAdd(ret, "</array>", getVM(fn));
+    return ret;
 }
 
 as_value
@@ -574,19 +564,44 @@ externalinterface_uObjectToJS(const fn_call& /*fn*/)
 as_value
 externalinterface_uObjectToXML(const fn_call& fn)
 {
-    // GNASH_REPORT_FUNCTION;
-    
-    if (fn.nargs == 1) {
-        if (!fn.arg(0).is_null() && !fn.arg(0).is_undefined()) {
-            as_object *obj = fn.arg(0).to_object(getGlobal(fn));
-            std::string str = ExternalInterface::objectToXML(obj);
-            return as_value(str);
-        } else {
-            return as_value("<object></object>");
+    VM& vm = getVM(fn);
+
+    as_value ret("<object>");
+
+    if (fn.nargs) {
+        as_object* obj = toObject(fn.arg(0), getVM(fn));
+
+        if (obj) {
+
+            string_table& st = getStringTable(fn);
+
+            typedef std::vector<ObjectURI> URIs;
+            URIs uris;
+
+            // Fake AS enumeration.
+            Enumerator en(uris);
+            obj->visitKeys(en);
+
+            for (URIs::const_reverse_iterator i = uris.rbegin(), e = uris.rend();
+                    i != e; ++i) {
+                const std::string& id = i->toString(st);
+
+                newAdd(ret, "<property id=\"", vm);
+                newAdd(ret, id, vm);
+                newAdd(ret, "\">", vm);
+
+                as_object* ei = 
+                    fn.env().find_object("flash.external.ExternalInterface");
+                const as_value& val = getMember(*obj, *i); 
+                newAdd(ret, callMethod(ei, st.find("_toXML"), val), vm);
+                newAdd(ret, "</property>", vm);
+            }
         }
     }
-    
-    return as_value();
+
+    newAdd(ret, "</object>", vm);
+    return ret;
+
 }
 
 as_value
@@ -599,15 +614,47 @@ externalinterface_uToJS(const fn_call& /*fn*/)
 as_value
 externalinterface_uToXML(const fn_call& fn)
 {
-//  GNASH_REPORT_FUNCTION;
 
-    if (fn.nargs == 1) {
-        as_value val = fn.arg(0);
-        std::string str = ExternalInterface::toXML(val);
-        return as_value(str);
+    // Probably implemented with switch(typeof value)
+    if (fn.nargs) {
+
+        as_object* ei = 
+            fn.env().find_object("flash.external.ExternalInterface");
+        string_table& st = getStringTable(fn);
+        VM& vm = getVM(fn);
+
+        const as_value& val = fn.arg(0);
+        if (val.is_string()) {
+            as_value ret = "<string>";
+            newAdd(ret, callMethod(ei, st.find("_escapeXML"), val), vm);
+            newAdd(ret, "</string>", vm);
+            return ret;
+        }
+        if (val.is_undefined()) {
+            return as_value("<undefined/>");
+        }
+        if (val.is_number()) {
+            as_value ret = "<number>";
+            newAdd(ret, val, vm);
+            newAdd(ret, "</number>", vm);
+            return ret;
+        }
+        if (val.is_null()) {
+            return as_value("<null/>");
+        }
+        if (val.is_bool()) {
+            return toBool(val, vm) ? as_value("<true/>") : as_value("<false/>");
+        }
+        if (val.is_object()) {
+            as_object* obj = toObject(val, vm);
+            assert(obj);
+            if (hasOwnProperty(*obj, NSV::PROP_LENGTH)) {
+                return callMethod(ei, st.find("_arrayToXML"), val);
+            }
+            return callMethod(ei, st.find("_objectToXML"), val);
+        }
     }
-    
-    return as_value();
+    return as_value("<null/>");
 }
 
 as_value
@@ -616,7 +663,8 @@ externalinterface_uToAS(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     
     if (fn.nargs == 1) {
-        as_value val = ExternalInterface::toAS(getGlobal(fn), fn.arg(0).to_string());
+        as_value val = ExternalInterface::toAS(getGlobal(fn),
+                fn.arg(0).to_string());
         return val;
     }
     

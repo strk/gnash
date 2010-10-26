@@ -16,8 +16,8 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
 AC_PREREQ(2.50)
-AC_INIT(gnash, trunk)
-AC_CONFIG_SRCDIR([libcore/gnash.h])
+AC_INIT(gnash, master)
+AC_CONFIG_SRCDIR([libcore/as_object.h])
 AC_CONFIG_HEADERS([gnashconfig.h])
 
 dnl AC_CONFIG_SUBDIRS(libltdl)
@@ -106,6 +106,10 @@ case "${host}" in
     DEFAULT_FLASH_PLATFORM_ID="HAIKU"
     DEFAULT_FLASH_SYSTEM_OS="Haiku"
     ;;    
+  *-gnu*)
+    DEFAULT_FLASH_PLATFORM_ID="GNU"
+    DEFAULT_FLASH_SYSTEM_OS="GNU/HURD"
+    ;;    
   *)
     DEFAULT_FLASH_PLATFORM_ID="UNK"
     DEFAULT_FLASH_SYSTEM_OS="Unknown"
@@ -180,12 +184,17 @@ case "${host}" in
     haiku=yes
     AC_DEFINE([HAIKU_HOST], [1], [this is a Haiku platform])
     ;;
+  *-gnu*)
+    gnu=yes
+    AC_DEFINE([GNU_HOST], [1], [this is a GNU platform])
+    ;;
 esac
 
 
 AM_CONDITIONAL(PLUGIN_LINK_UNDEFINED, test x$openbsd_os = xopenbsd)
 AM_CONDITIONAL(WIN32, test x$windows = xyes)
 AM_CONDITIONAL(HAIKU, test x$haiku = xyes)
+AM_CONDITIONAL(AMIGAOS4, test x$amigaos4 = xyes)
 
 dnl Get build date for helping us debugging
 BUILDDATE="`date +%Y%m%d`"
@@ -330,6 +339,7 @@ buffers=no
 que=no
 memory=no
 cache=yes
+stat_proplookup=no
 AC_ARG_WITH(statistics,
   AC_HELP_STRING([--with-statistics=], [Specify which statistics features to enable]),
   if test -n ${withval}; then
@@ -362,14 +372,19 @@ AC_ARG_WITH(statistics,
         cache=yes
         nstatistics=$((nstatistics+1))
         ;;
+      proplookup)
+        stat_proplookup=yes
+        nstatistics=$((nstatistics+1))
+        ;;
       all|ALL)
         buffers=yes
         memory=yes
         queu=yes
         cache=yes
-        nstatistics=4           dnl this must be incremented if you add anything
+        stat_proplookup=yes
+        nstatistics=5           dnl this must be incremented if you add anything
         ;;
-      *) AC_MSG_ERROR([invalid statistics feature specified: ${withval} given (accept: buffers|que|memory|all)])
+      *) AC_MSG_ERROR([invalid statistics feature specified: ${withval} given (accept: buffers|que|memory|cache|proplookup|all)])
         ;;
       esac]
     withval=`echo ${withval} | cut -d ' ' -f 2-6`
@@ -398,6 +413,13 @@ fi
 if test x${cache} = xyes; then
   statistics_list="${statistics_list} cache"
   AC_DEFINE(USE_STATS_CACHE, [1], [Support statistics collecting for the cache])
+fi
+
+if test x${stat_proplookup} = xyes; then
+  statistics_list="${statistics_list} proplookup"
+  AC_DEFINE(GNASH_STATS_OBJECT_URI_NOCASE, [1], [Collecting and report stats about ObjectURI case lookups])
+  AC_DEFINE(GNASH_STATS_PROPERTY_LOOKUPS, [1], [Collecting and report stats about property lookups])
+  AC_DEFINE(GNASH_STATS_STRING_TABLE_NOCASE, [1], [Collecting and report stats about string_table::key case lookups])
 fi
 
 dnl this is just so Makefile can print the same list
@@ -613,15 +635,6 @@ AC_ARG_ENABLE(gui,
   while test -n "${enableval}" ; do
     val=`echo ${enableval} | cut -d ' ' -f 1`
     case "${val}" in
-      hildon|HILDON|hildon2|HILDON2)
-        build_hildon=yes
-        AC_DEFINE(USE_HILDON, [1], [Use the Hildon mobile framework])
-        build_gtk=yes
-        ;;
-      alp|ALP|alp|ALP)
-        build_alp=yes
-        build_gtk=yes
-        ;;
       gtk|GTK|gtk2|GTK2)
         build_gtk=yes
         ;;
@@ -681,7 +694,7 @@ AC_ARG_ENABLE(gui,
         build_qt4=yes
         build_sdl=yes
         ;;
-      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde3|kde4|fltk|sdl|riscos|aqua|fb|hildon|alp|qtopia3|qtopia4|dump|aos4|haiku)])
+      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde3|kde4|fltk|sdl|riscos|aqua|fb|qtopia3|qtopia4|dump|aos4|haiku)])
          ;;
       esac
     enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
@@ -1108,15 +1121,14 @@ dnl NOTE: it is possible to use Gnash/VAAPI on platforms with an Intel
 dnl GMA500 but you currently will have to build the AGG renderer
 dnl instead of the OGL (OpenGL) one. 
 
-build_xv=yes
 build_vaapi=yes
-hwaccel_list="VAAPI XVideo"
-nhwaccel=2
+hwaccel_list="VAAPI"
+nhwaccel=1
 AC_ARG_ENABLE(hwaccel,
   AC_HELP_STRING([--enable-hwaccel], [Specify which accleration to support to enable (none,vaapi,omap)]),
   if test -z ${enableval}; then
       hwaccel_list="none"
-      nhwaccel=1
+      nhwaccel=0
       enableval=""
   fi
   while test -n "${enableval}" ; do
@@ -1126,7 +1138,6 @@ AC_ARG_ENABLE(hwaccel,
         hwaccel_list="none"
         build_vaapi=no
         build_omap=no
-        dnl build_xv=no
         nhwaccel=0
         ;;
       va*|VA*)
@@ -1134,17 +1145,11 @@ AC_ARG_ENABLE(hwaccel,
         build_vaapi=yes
         nhwaccel=$((nhwaccel+1))
         ;;
-      xv*|XV*|Xv*)
-        hwaccel_list="${hwaccel_list} XVideo"
-        dnl build_xv=yes
-        nhwaccel=$((nhwaccel+1))
-        ;;
       all|ALL)
-        hwaccel_list="XVideo VAAPI OMAP"
-        nhwaccel=3
+        hwaccel_list="VAAPI OMAP"
+        nhwaccel=2
         build_omap=yes
         build_vaapi=yes
-        dnl build_xv=yes
         ;;
       omap*|OMAP*)
         hwaccel_list="${hwaccel_list} omap"
@@ -1165,8 +1170,8 @@ if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${build_vaapi}" = x"yes"; then
   use_libva=no
   use_libva_x11=no
   use_libva_glx=no
-  dnl if the version of ffmpeg is recent enough, (r20957, 52.45.0), then
-  dnl look for VAAPI support so we can use use the VAAPI enabled ffmpeg.
+  dnl if the version of FFmpeg is recent enough, (r20957, 52.45.0), then
+  dnl look for VAAPI support so we can use use the VAAPI enabled FFmpeg.
   if test x"${have_ffmpeg_vaapi}" = xyes; then
     use_libva=yes
     GNASH_PKG_FIND([libva],
@@ -1201,23 +1206,23 @@ dnl generate better error handling if it's not found.
 AM_CONDITIONAL(BUILD_OMAP, test x"${build_omap}" = xyes)
 AM_CONDITIONAL(USE_VAAPI, test x"${use_libva}" = xyes)
 
-dnl Only build the vaapi support if we have a version of ffmpeg that
+dnl Only build the vaapi support if we have a version of FFmpeg that
 dnl supports it.
 if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${found_libva_incl}" = xyes; then
   build_vaapi=yes
-  hwaccel_list="VAAPI XVideo"
-  nhwaccel=2
+  hwaccel_list="VAAPI"
+  nhwaccel=1
 else
   build_vaapi=no
-  hwaccel_list="XVideo"
-  nhwaccel=1
+  hwaccel_list=""
+  nhwaccel=0
 fi
 
-dnl Until the hwaccel patches in ffmpeg wind up in the ffmpeg-plugin,
-dnl restrict using HW Accel to using ffmpeg directly.
+dnl Until the hwaccel patches in FFmpeg wind up in the ffmpeg-plugin,
+dnl restrict using HW Accel to using FFmpeg directly.
 dnl test xyes = xyes -a ( x != xyes -o x != xyes )
 if test x"${build_vaapi}" = x"yes" -a x"${have_ffmpeg}" != x"yes"; then
-  AC_MSG_ERROR(["Hardware acceleration currently not supported unless using ffmpeg."])
+  AC_MSG_ERROR(["Hardware acceleration currently not supported unless using FFmpeg."])
 fi
 
 AM_CONDITIONAL(HAVE_VAAPI, test x"${found_libva_incl}" = xyes)
@@ -1372,18 +1377,19 @@ AC_SUBST(SOLDIR)
 dnl --------------------------------------------------------
 dnl AVM2
 dnl --------------------------------------------------------
-AC_ARG_ENABLE(avm2,
-  AC_HELP_STRING([--enable-avm2], [Enable support for AS3]),
-  [case "${enableval}" in
-    yes) avm2=yes ;;
-    no)  avm2=no ;;
-    *)   AC_MSG_ERROR([bad value ${enableval} for enable-avm2 option]) ;;
-  esac], avm2=no
-)
-AM_CONDITIONAL(ENABLE_AVM2, [test x"$avm2" = xyes])
-if test x$avm2 = xyes; then
-    AC_DEFINE(ENABLE_AVM2, [1], [Enable AVM2 code])
-fi
+dnl AC_ARG_ENABLE(avm2,
+dnl   AC_HELP_STRING([--enable-avm2], [Enable support for AS3]),
+dnl   [case "${enableval}" in
+dnl     yes) avm2=yes ;;
+dnl     no)  avm2=no ;;
+dnl     *)   AC_MSG_ERROR([bad value ${enableval} for enable-avm2 option]) ;;
+dnl   esac], avm2=no
+dnl )
+dnl AM_CONDITIONAL(ENABLE_AVM2, [test x"$avm2" = xyes])
+dnl if test x$avm2 = xyes; then
+dnl     AC_DEFINE(ENABLE_AVM2, [1], [Enable AVM2 code])
+dnl fi
+AM_CONDITIONAL(ENABLE_AVM2, false)
 
 dnl This option is only used if you want Gnash to interwork with 
 dnl the Adobe player using the LocalConnection class.
@@ -1400,9 +1406,6 @@ else
 fi
 LC_KEY=${lckey}
 AC_SUBST(LC_KEY)
-
-dnl FIXME: this should go away when gtk.cpp is cleaned up..
-AC_DEFINE([BUILD_CANVAS], [], [Build GTK Canvas support for the GTK Widget ])
 
 AC_ARG_ENABLE(python,
   AC_HELP_STRING([--enable-python],[Enable python for the python wrapper]),
@@ -1432,7 +1435,7 @@ esac],jemalloc=yes)
 
 dnl There is some weird stuff going on with NetBSD and jemalloc, so don't 
 dnl build it for now.
-if test x"${netbsd}" = x"yes" -o x"${windows}" = x"yes" -o x"${freebsd}" = x"yes" -o x"${haiku}" = x"yes"; then
+if test x"${netbsd}" = x"yes" -o x"${windows}" = x"yes" -o x"${freebsd}" = x"yes" -o x"${haiku}" = x"yes" -o x"${gnu}" = x"yes"; then
   jemalloc=no
 fi
 dnl If the compiler doesn't have local thread storage enabled, don't try to
@@ -1748,24 +1751,8 @@ sbox=no
 if test x"${SBOX_REDIRECT_FROM_DIRS}" != x; then
   sbox=yes
 fi
-if test x"${build_alp}" = xyes; then
-  GNASH_PATH_ALP
-  if test x"${have_alp}" = x"yes"; then
-    AC_DEFINE([HAVE_ALP], 1, [Access Linux Platform framework])
-  fi
-  dnl @@ It makes NO sense to set cross_compiling here,
-  dnl @@ *after* it is used in conditionals above
-  dnl @@ (AM_CONDITIONAL and directories search)
-  dnl cross_compiling=yes
-dnl  build_gtk=yes
-  build_kde3=no
-  build_ogl=no
-  build_gles1=no
-  build_gles2=no
-  build_agg=yes
-fi
 
-if test x$build_gtk = xyes -o $build_alp = xyes -o x$build_hildon = xyes; then
+if test x$build_gtk = xyes -o $build_alp = xyes; then
    GNASH_PATH_GTK2
    GNASH_PATH_PANGO
    GNASH_PKG_FIND(atk, [atk/atk.h], [atk library], atk_focus_tracker_init, [1.0])
@@ -1775,13 +1762,6 @@ if test x$build_gtk = xyes -o $build_alp = xyes -o x$build_hildon = xyes; then
    if test x"${build_cairo}" = xyes; then
       GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
    fi
-fi
-if test x"${build_hildon}" = xyes; then
-  GNASH_PATH_HILDON
-  build_gtk=yes
-  build_kde3=no
-dnl   build_ogl=no
-dnl   build_agg=yes
 fi
 dnl TODO: add checks for all other GUIs
 
@@ -2224,6 +2204,8 @@ AM_CONDITIONAL(MING_SUPPORTS_SWFBUTTON_SET_DEPTH,
         [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040006 ])
 AM_CONDITIONAL(MING_VERSION_0_4_3,
         [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040300 ])
+AM_CONDITIONAL(MING_VERSION_0_4_4,
+        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040400 ])
 
 if test x$cross_compiling = xno; then
   AC_ARG_WITH([swfdec_testsuite],
@@ -2389,8 +2371,6 @@ AM_CONDITIONAL(BUILD_QT4_GUI,      [ test x$build_qt4 = xyes ])
 AM_CONDITIONAL(BUILD_KDE3_GUI,     [ test x$build_kde3 = xyes ])
 AM_CONDITIONAL(BUILD_KDE4_GUI,     [ test x$build_kde4 = xyes ])
 
-AM_CONDITIONAL(BUILD_ALP_GUI,      [ test x$build_alp = xyes ])
-AM_CONDITIONAL(BUILD_HILDON_GUI,   [ test x$build_hildon = xyes ])
 AM_CONDITIONAL(BUILD_GTK_GUI,      [ test x$build_gtk = xyes ])
 AM_CONDITIONAL(BUILD_FLTK_GUI,     [ test x$build_fltk = xyes ])
 AM_CONDITIONAL(BUILD_SDL_GUI,      [ test x$build_sdl = xyes ])
@@ -2481,7 +2461,7 @@ if test x"$build_media_gst" = "xyes"; then
   fi
   if test "x$GST_INSPECT" != "x" -a x"${darwin}" = xno ; then
     dnl FIXME: there may be multiple acceptable plugins that are acceptable for
-    dnl our use. For example, mad or ffmpeg will play mp3.
+    dnl our use. For example, mad or FFmpeg will play mp3.
     codecs="ffdec_flv ffdec_flashsv ffdec_vp6f ffdec_flashsv mad vorbisdec ffdec_vp6"
     for i in $codecs; do
        hits="`$GST_INSPECT $i | grep -c 'Long name'`"
@@ -2747,7 +2727,6 @@ AC_DEFUN([CHECK_VISIBILITY_GCC_BUG],
 
 CHECK_VISIBILITY_GCC_BUG
 
-
 if test x$ac_cv_gcc_visibility_bug = xno; then
   AC_LANG_PUSH(C++)
   AC_MSG_CHECKING([whether $CXX supports -fvisibility=hidden])
@@ -2785,8 +2764,8 @@ AC_SUBST(HWACCEL_CONFIG)
 
 dnl check for missing libraries and disable them.
 if test x"$BOOST_LIBS" != x; then
-  if test x"${extra_missing_libs}" != x; then
-    for i in ${extra_missing_libs}; do
+  if test x"${cygnal_missing_libs}" != x; then
+    for i in ${cygnal_missing_libs}; do
       if test $i = serialization; then
         AC_DEFINE([BOOST_MULTI_INDEX_DISABLE_SERIALIZATION], ["1"], [if the library is missing, don't use it.])
       fi
@@ -2882,6 +2861,7 @@ testsuite/actionscript.all/Makefile
 testsuite/samples/Makefile
 testsuite/swfdec/Makefile
 testsuite/misc-ming.all/Makefile
+testsuite/misc-ming.all/loop/Makefile
 testsuite/misc-mtasc.all/Makefile
 testsuite/misc-haxe.all/Makefile
 testsuite/misc-haxe.all/classes.all/Makefile
@@ -2908,6 +2888,7 @@ plugin/npapi/Makefile
 plugin/klash/Makefile
 plugin/klash4/Makefile
 plugin/win32/Makefile
+plugin/aos4/Makefile
 cygnal/Makefile
 cygnal/libnet/Makefile
 cygnal/libamf/Makefile
@@ -3209,23 +3190,6 @@ if test x$build_gtk = xyes -a x$build_ogl = xyes ; then
 fi
 
 
-if test x$build_hildon = xyes; then #{
-  if test x"$HILDON_LIBS" != x; then
-    if test x"$HILDON_CFLAGS" != x; then
-      echo "        HILDON flags are: $HILDON_CFLAGS"
-    else
-      echo "        HILDON flags are: default include path"
-    fi
-      echo "        HILDON libs are: $HILDON_LIBS"
-  else
-    echo "        ERROR: No HILDON development package installed!" >&3
-    echo "               Install it from http://gtk.org" >&3
-    #echo "               or .deb users: apt-get install libhildon.0-dev" >&3
-    echo "               or .deb users: apt-get install libhildon-1-dev" >&3
-    echo "               or .rpm users: yum install hildon-devel" >&3
-  fi
-fi
-
 if test x$build_gtk = xyes; then #{
   if test x"$GTK2_LIBS" != x; then
     if test x"$GTK2_CFLAGS" != x; then
@@ -3319,9 +3283,9 @@ fi
 
   if test x"${build_media_ffmpeg}" = x"yes"; then
     if test x"$FFMPEG_LIBS" != x; then
-      echo "        MP3 and video support enabled through ffmpeg"
+      echo "        MP3 and video support enabled through FFmpeg"
       if test x"${ffmpeg_version_check}" != xok; then
-        echo "        ERROR: You have version ${ffmpeg_version} of ffmpeg installed," >&3
+        echo "        ERROR: You have version ${ffmpeg_version} of FFmpeg installed," >&3
         if test x"${have_ffmpeg_swscale}" = "xno"; then
           echo "               with no swscale enabled." >&3
         else
@@ -3333,24 +3297,24 @@ fi
         echo "               or .deb users: apt-get install libswscale-dev" >&3
       else
 	if test x"${avformat_h}" = x; then
-          echo "        ERROR: FFMPEG's libavcodec header is installed but not libavformat." >&3
-          echo "               You can install FFMPEG from http://ffmpeg.mplayerhq.hu" >&3
+          echo "        ERROR: FFmpeg's libavcodec header is installed but not libavformat." >&3
+          echo "               You can install FFmpeg from http://ffmpeg.org" >&3
           echo "               or .deb users: apt-get install libavformat-dev" >&3
           echo "               or YaST users: yast -i libavformat-api (but currently installs into /usr/lib64)" >&3
           echo "               or explicitly set the path using --with-ffmpeg-incl=" >&5
           echo "               or reconfigure with --enable-media=gst" >&3
 	else
           if test x"$FFMPEG_CFLAGS" != x; then
-            echo "        FFMPEG flags are: $FFMPEG_CFLAGS"
+            echo "        FFmpeg flags are: $FFMPEG_CFLAGS"
           else
-            echo "        FFMPEG flags are: default include path"
+            echo "        FFmpeg flags are: default include path"
           fi
-          echo "        FFMPEG libs are: $FFMPEG_LIBS"
+          echo "        FFmpeg libs are: $FFMPEG_LIBS"
 	fi
       fi
     else
-      echo "        ERROR: No FFMPEG development package installed!" >&3
-      echo "               You can install FFMPEG from http://ffmpeg.mplayerhq.hu" >&3
+      echo "        ERROR: No FFmpeg development package installed!" >&3
+      echo "               You can install FFmpeg from http://ffmpeg.org" >&3
       echo "               or .deb users: apt-get install libavformat-dev" >&3
       echo "               or .rpm users: yum install ffmpeg-devel" >&3
       echo "               or reconfigure with --enable-media=gst" >&3
@@ -3552,32 +3516,31 @@ if test x$build_agg = xyes; then # {
 fi # }
 
 if test x"$BOOST_LIBS" != x; then
-    dnl Only cygnal requires date_time at present, so it's OK if either
-    dnl you don't want cygnal or do have date_time installed.
-    dnl if test x"$cygnal" = xno; then
 	echo "        BOOST flags are: $BOOST_CFLAGS"
 	echo "        BOOST libs are: $BOOST_LIBS"
-	echo "        BOOST Extra libs are: $BOOST_EXTRA_LIBS"
+	echo "        BOOST libs for cygnal are: $BOOST_CYGNAL_LIBS"
     dnl fi
     if test x"${missing_headers}" != x; then
       for i in ${missing_headers}; do
-	# They have some boost libs but no date_time and want to compile cygnal.
 	echo "        ERROR: The BOOST $i header file is needed!" >&3
 	echo "               Install it from http://boost.org" >&3
 	echo "               or from a Boost development package" >&3
       done
     fi
-    if test x"${extra_missing_libs}" != x; then
-      for i in ${extra_missing_libs}; do
-	echo "        WARNING: The BOOST $i library is recommended!" >&4
-        echo "                 Install it from http://www.boost.org" >&4
-        echo "                 or .deb users: apt-get install libboost-"`echo ${i} | sed 's/_/-/g'`"-dev" >&4
-        echo "                 Gnash will compile anyway, but not all tests will work." >&4
-      done
+
+    if test x"${cygnal}" = x"yes"; then
+        if test x"${cygnal_missing_libs}" != x; then
+          for i in ${cygnal_missing_libs}; do
+            echo "          ERROR: The BOOST $i library is required for cygnal!" >&4
+            echo "                 Either configure with --disable-cygnal or" >&4
+            echo "                 install it from http://www.boost.org" >&4
+            echo "                 or .deb users: apt-get install libboost-"`echo ${i} | sed 's/_/-/g'`"-dev" >&4
+          done
+        fi
     fi
+
     if test x"${missing_libs}" != x; then
       for i in ${missing_libs}; do
-	# They have some boost libs but no date_time and want to compile cygnal.
 	echo "        ERROR: The BOOST $i library is needed!" >&3
 	echo "               Install it from http://boost.org" >&3
 	echo "               or .deb users: apt-get install libboost-"`echo ${i} | sed 's/_/-/g'`"-dev" >&3
@@ -3821,16 +3784,6 @@ else
   echo "                 Install it from http://www.gnu.org/software/dejagnu/" >&4
   echo "                 or .deb users: apt-get install dejagnu" >&4
   echo "                 or .rpm users: yum install dejagnu" >&4
-fi
-
-dnl Access Linux Platform
-if test x"${build_alp}" = xyes; then
-  if test x"${ALP_CFLAGS}" != x; then
-    echo "        ALP flags are: $ALP_CFLAGS"
-    echo "        ALP libs are: $ALP_LIBS"
-  else
-    echo "        ERROR: No ALP development package is installed." >&3
-  fi
 fi
 
 dnl Haiku

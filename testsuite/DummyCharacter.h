@@ -50,7 +50,7 @@ public:
 	{
 	}
 
-    virtual void display(Renderer& /*renderer*/) {}
+    virtual void display(Renderer& /*renderer*/, const Transform&) {}
 
     virtual SWFRect getBounds() const { return SWFRect(); }
 

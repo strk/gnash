@@ -107,7 +107,6 @@ Player::Player()
     _startFullscreen(false),
     _hideMenu(false)
 {
-    init();
 }
 
 float
@@ -116,14 +115,6 @@ Player::setScale(float newscale)
     float oldscale = _scale;
     _scale = newscale;
     return oldscale;
-}
-
-void
-Player::init()
-{
-    /// Initialize gnash core library
-    gnashInit();
-
 }
 
 void
@@ -166,14 +157,6 @@ Player::init_logfile()
 
 }
 
-unsigned int
-Player::silentStream(void* /*udata*/, boost::int16_t* stream, unsigned int len, bool& atEOF)
-{
-    std::fill(stream, stream+len, 0);
-    atEOF=false;
-    return len;
-}
-
 void
 Player::init_sound()
 {
@@ -182,26 +165,21 @@ Player::init_sound()
         try {
 #ifdef SOUND_SDL
             _soundHandler.reset(sound::create_sound_handler_sdl(
-                        _mediaHandler.get(), _audioDump));
+                        _mediaHandler.get()));
 #elif defined(SOUND_AHI)
             _soundHandler.reset(sound::create_sound_handler_aos4(
-                        _mediaHandler.get(), _audioDump));
+                        _mediaHandler.get()));
 #elif defined(SOUND_MKIT)
             _soundHandler.reset(sound::create_sound_handler_mkit(
-                        _mediaHandler.get(), _audioDump));
+                        _mediaHandler.get()));
 #else
             log_error(_("Sound requested but no sound support compiled in"));
             return;
 #endif
+
         } catch (SoundException& ex) {
             log_error(_("Could not create sound handler: %s."
                 " Will continue w/out sound."), ex.what());
-        }
-        if (! _audioDump.empty()) {
-            // add a silent stream to the audio pool so that our output file
-            // is homogenous;  we actually want silent wave data when no sounds
-            // are playing on the stage
-            _soundHandler->attach_aux_streamer(silentStream, (void*) this);
         }
     }
 }
@@ -215,6 +193,7 @@ Player::init_gui()
         _gui.reset(new NullGui(_doLoop, *_runResources));
     }
 
+    _gui->setAudioDump(_audioDump);
     _gui->setMaxAdvances(_maxAdvances);
 
 #ifdef GNASH_FPS_DEBUG
@@ -318,18 +297,20 @@ Player::run(int argc, char* argv[], const std::string& infile,
     const URL baseURL = (it == _params.end()) ? _baseurl :
                                                URL(it->second, _baseurl);
     /// The RunResources should be populated before parsing.
-    _runResources.reset(new RunResources(baseURL.str()));
+    _runResources.reset(new RunResources());
 
     boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
     addDefaultLoaders(*loaders);
     _runResources->setTagLoaders(loaders);
 
     std::auto_ptr<NamingPolicy> np(new IncrementalRename(_baseurl));
-    boost::shared_ptr<StreamProvider> sp(new StreamProvider(np));
+
+    /// The StreamProvider uses the actual URL of the loaded movie.
+    boost::shared_ptr<StreamProvider> sp(new StreamProvider(baseURL, np));
 
     _runResources->setStreamProvider(sp);
 
-    // Set the Hardware video decoding resources. none, vaapi, xv, omap
+    // Set the Hardware video decoding resources. none, vaapi, omap
     _runResources->setHWAccelBackend(_hwaccel);
     // Set the Renderer resource, opengl, agg, or cairo
     _runResources->setRenderBackend(_renderer);
@@ -367,19 +348,6 @@ Player::run(int argc, char* argv[], const std::string& infile,
         setFlashVars(fv->second);
     }
 
-#if 0
-    // Add Scriptable Variables. These values become the default, but
-    // they can be reset from JavaScript via ExternalInterface. These
-    // are passed to Gnash using the '-P' option, and have nothing to
-    // to do with 'flashVars'.
-    fv = _params.begin();
-    for (fv=_params.begin(); fv != _params.end(); fv++) {
-        if (fv->first != "flashvars") {
-            setScriptableVar(fv->first, fv->second);
-        }
-    }
-#endif
-    
     // Load the actual movie.
     _movieDef = load_movie();
     if (!_movieDef) {
@@ -387,8 +355,8 @@ Player::run(int argc, char* argv[], const std::string& infile,
     }
 
     // Get info about the width & height of the movie.
-    int movie_width = static_cast<int>(_movieDef->get_width_pixels());
-    int movie_height = static_cast<int>(_movieDef->get_height_pixels());
+    const size_t movie_width = _movieDef->get_width_pixels();
+    const size_t movie_height = _movieDef->get_height_pixels();
 
     if (! _width) {
         _width = static_cast<size_t>(movie_width * _scale);
@@ -397,7 +365,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
         _height = static_cast<size_t>(movie_height * _scale);
     }
 
-    if (! _width || ! _height) {
+    if (!_width || !_height) {
         log_debug(_("Input movie has collapsed dimensions "
                     "%d/%d. Setting to 1/1 and going on."),
                      _width, _height);
@@ -432,7 +400,6 @@ Player::run(int argc, char* argv[], const std::string& infile,
     
     if (_controlfd != -1) {
         root.setControlFD(_controlfd);        
-//        _gui->setFDCallback(_controlfd, boost::bind(&Gui::quit, boost::ref(_gui)));
     }
 
     _gui->setStage(&root);
@@ -547,7 +514,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
 
         // Use default if filename is empty.
         if (_screenshotFile.empty()) {
-            URL url(_runResources->baseURL());
+            URL url(_runResources->streamProvider().originalURL());
             std::string::size_type p = url.path().rfind('/');
             const std::string& name = (p == std::string::npos) ? url.path() :
                 url.path().substr(p + 1);
@@ -562,7 +529,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
     log_debug("Main loop ended, cleaning up");
 
     // Clean up as much as possible, so valgrind will help find actual leaks.
-    gnash::clear();
+    MovieFactory::clear();
 
 }
 

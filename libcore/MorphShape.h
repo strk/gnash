@@ -54,7 +54,7 @@ public:
     MorphShape(movie_root& mr, as_object* object,
             const SWF::DefineMorphShapeTag* def, DisplayObject* parent);
 
-	virtual void display(Renderer& renderer);
+    virtual void display(Renderer& renderer, const Transform& xform);
 
     virtual SWFRect getBounds() const;
     

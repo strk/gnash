@@ -26,14 +26,14 @@ BUILT_SOURCES =
 # pkglib_LTLIBRARIES += libgnashasobjs.la 
 
 libgnashasobjs_la_SOURCES = \
+	asobj/ASConversions.cpp \
 	asobj/AsBroadcaster.cpp \
 	asobj/Array_as.cpp \
 	asobj/Boolean_as.cpp \
 	asobj/Color_as.cpp \
-	asobj/CustomActions.cpp\
 	asobj/Date_as.cpp \
 	asobj/Error_as.cpp \
-	asobj/Globals.cpp \
+	asobj/Global_as.cpp \
 	asobj/LoadVars_as.cpp \
 	asobj/Math_as.cpp \
 	asobj/Number_as.cpp \
@@ -66,15 +66,14 @@ libgnashasobjs_la_SOURCES = \
 	asobj/Object.cpp
 
 inst_HEADERS = \
+	asobj/ASConversions.h \
 	asobj/AsBroadcaster.h \
 	asobj/Boolean_as.h \
 	asobj/Color_as.h	\
-	asobj/CustomActions.h	\
 	asobj/Date_as.h \
 	asobj/Error_as.h	\
 	asobj/Math_as.h	\
 	asobj/Global_as.h\
-	asobj/Globals.h\
 	asobj/LoadVars_as.h \
 	asobj/MovieClipLoader.h \
 	asobj/Number_as.h \

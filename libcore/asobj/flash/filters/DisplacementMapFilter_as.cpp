@@ -20,6 +20,7 @@
 
 
 #include "DisplacementMapFilter_as.h"
+
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -27,6 +28,7 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "BitmapFilter_as.h"
+#include "Filters.h"
 
 #include <sstream>
 
@@ -186,7 +188,7 @@ displacementmapfilter_scaleY(const fn_call& fn)
 as_value
 displacementmapfilter_ctor(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
+	boost::intrusive_ptr<as_object> obj = ensure<ValidThis>(fn);
 	obj->setRelay(new DisplacementMapFilter_as);
     return as_value(); 
 }

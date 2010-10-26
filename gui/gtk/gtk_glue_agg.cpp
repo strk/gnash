@@ -29,7 +29,6 @@
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 
-#include "gnash.h"
 #include "log.h"
 #include "Renderer.h"
 #include "Renderer_agg.h"
@@ -128,7 +127,7 @@ GtkAggGlue::setRenderHandlerSize(int width, int height)
 }
 
 void 
-GtkAggGlue::beforeRendering()
+GtkAggGlue::beforeRendering(movie_root*)
 {
     if (_offscreenbuf && _offscreenbuf->type == GDK_IMAGE_SHARED) {
          gdk_flush();

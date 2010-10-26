@@ -67,7 +67,6 @@ extern char *optarg;
 #include "log.h"
 #include "rc.h"
 #include "shm.h"
-#include "gnash.h"
 #include "amf.h"
 #include "lcshm.h"
 
@@ -319,9 +318,9 @@ list_lcs()
             log_debug(_("Found it! \"set LCShmKey %s\" in your ~/.gnashrc"),
                         boost::io::group(hex, showbase,
                             shmseg.shm_perm.IPC_PERM_KEY));
-            log_debug(_("Last changed on: %s"), ctime(&shmseg.shm_ctime))));
-            log_debug(_("Last attached on: %s"), ctime(&shmseg.shm_atime))));
-            log_debug(_("Last detached on: %s"), ctime(&shmseg.shm_dtime))));
+            log_debug(_("Last changed on: %s"), ctime(&shmseg.shm_ctime));
+            log_debug(_("Last attached on: %s"), ctime(&shmseg.shm_atime));
+            log_debug(_("Last detached on: %s"), ctime(&shmseg.shm_dtime));
             return shmseg.shm_perm.IPC_PERM_KEY;
         }
 #endif    // end of IPC_PERM_KEY

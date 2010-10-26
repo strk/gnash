@@ -22,9 +22,7 @@
 
 #include "sound_handler.h" // for inheritance
 
-#include <string>
 #include <set> // for composition (InputStreams)
-#include <fstream> // for composition (file_stream)
 #include <boost/thread/mutex.hpp>
 
 #include <proto/dos.h>
@@ -93,15 +91,6 @@ private:
     /// Mutex protecting _muted (defined in base class)
     mutable boost::mutex _mutedMutex;
 
-    /// File stream for dump file
-    //
-    /// TODO: move to base class ?
-    ///
-    std::ofstream file_stream;
-
-    // write a .WAV file header
-    void write_wave_header(std::ofstream& outfile);
-
     // See dox in sound_handler.h
     void mix(boost::int16_t* outSamples, boost::int16_t* inSamples,
                 unsigned int nSamples, float volume);
@@ -111,8 +100,6 @@ private:
 public:
 
     AOS4_sound_handler(media::MediaHandler* m);
-
-    AOS4_sound_handler(media::MediaHandler* m, const std::string& wave_file);
 
     ~AOS4_sound_handler();
 

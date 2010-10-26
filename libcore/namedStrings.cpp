@@ -31,6 +31,7 @@ static const string_table::svt preload_names[] =
     string_table::svt( "a", NSV::PROP_A ),
     string_table::svt( "addListener", NSV::PROP_ADD_LISTENER ),
     string_table::svt( "align", NSV::PROP_ALIGN ),
+    string_table::svt( "arguments", NSV::PROP_ARGUMENTS ),
     string_table::svt( "ASnative", NSV::PROP_AS_NATIVE ),
     string_table::svt( "ASSetPropFlags", NSV::PROP_AS_SET_PROP_FLAGS ),
     string_table::svt( "_alpha", NSV::PROP_uALPHA ),
@@ -209,7 +210,6 @@ static const string_table::svt preload_names[] =
     string_table::svt( "SharedObject", NSV::CLASS_SHARED_OBJECT ),
     string_table::svt( "LoadVars", NSV::CLASS_LOAD_VARS ),
     string_table::svt( "LocalConnection", NSV::CLASS_LOCALCONNECTION ),
-    string_table::svt( "CustomActions", NSV::CLASS_CUSTOM_ACTIONS ),
     string_table::svt( "QName", NSV::CLASS_QNAME ),
     string_table::svt( "Namespace", NSV::CLASS_NAMESPACE ),
     string_table::svt( "NetConnection", NSV::CLASS_NET_CONNECTION ),
@@ -243,13 +243,15 @@ static const string_table::svt preload_names[] =
     string_table::svt( "adobe.utils", NSV::NS_ADOBE_UTILS ),
     string_table::svt( "", NSV::INTERNAL_TYPE ),
     string_table::svt( "", NSV::INTERNAL_STACK_PARENT ),
-    string_table::svt( "", NSV::INTERNAL_INTERFACES )
+    string_table::svt( "", NSV::INTERNAL_INTERFACES ),
+    string_table::svt( "", NSV::INTERNAL_HIGHEST_LOWERCASE )
 };
 
 void
 loadStrings(string_table& table)
 {
     table.insert_group(preload_names, arraySize(preload_names));
+    table.setHighestKnownLowercase(NSV::INTERNAL_HIGHEST_LOWERCASE);
 }
 
 } // namespace NSV

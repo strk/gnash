@@ -16,25 +16,24 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-//
-
 
 #include "Transform_as.h"
-#include "as_object.h" // for inheritance
+
+#include <sstream>
+
+#include "as_object.h"
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
+#include "smart_ptr.h" 
+#include "builtin_function.h" 
+#include "GnashException.h"
 #include "VM.h"
-#include "MovieClip.h" // For MovieClip
+#include "MovieClip.h"
 #include "ColorTransform_as.h"
+#include "ASConversions.h"
 #include "GnashNumeric.h"
-
 #include "namedStrings.h"
-#include <sstream>
-#include <limits>
 
 namespace gnash {
 
@@ -47,21 +46,8 @@ namespace {
     as_value transform_pixelBounds(const fn_call& fn);
     as_value transform_ctor(const fn_call& fn);
     void attachTransformInterface(as_object& o);
-    as_object* getTransformInterface();
     as_value get_flash_geom_transform_constructor(const fn_call& fn);
     
-    // Handle overflows from AS ColorTransform double.
-    inline boost::int16_t
-    truncateDouble(double d)
-    {
-
-        if (d > std::numeric_limits<boost::int16_t>::max() ||
-            d < std::numeric_limits<boost::int16_t>::min())
-        {
-           return std::numeric_limits<boost::int16_t>::min();
-        }
-        return static_cast<boost::int16_t>(d);
-    }
 }
 
 
@@ -76,18 +62,24 @@ public:
         _movieClip(movieClip)
     {}
 
-    SWFMatrix getWorldMatrix() const {
-        return _movieClip.getWorldMatrix();
+    SWFMatrix worldMatrix() const {
+        return getWorldMatrix(_movieClip);
     }
-    const SWFMatrix& getMatrix() const { return _movieClip.getMatrix(); }
-    const cxform& getColorTransform() const { return _movieClip.get_cxform(); }
+    
+    const SWFMatrix& matrix() const {
+        return getMatrix(_movieClip);
+    }
+    
+    const SWFCxForm& colorTransform() const {
+        return getCxForm(_movieClip);
+    }
 
-    cxform getWorldColorTransform() const {
-        return _movieClip.get_world_cxform();
+    SWFCxForm worldColorTransform() const {
+        return getWorldCxForm(_movieClip);
     }
 
     void setMatrix(const SWFMatrix& mat) { _movieClip.setMatrix(mat); }
-    void setColorTransform(const cxform& cx) { _movieClip.set_cxform(cx); }
+    void setColorTransform(const SWFCxForm& cx) { _movieClip.setCxForm(cx); }
 
 protected:
 
@@ -136,8 +128,8 @@ transform_colorTransform(const fn_call& fn)
             return as_value();
         }
 
-        // Construct a ColorTransform from the sprite cxform.
-        const cxform& c = relay->getColorTransform();
+        // Construct a ColorTransform from the sprite SWFCxForm.
+        const SWFCxForm& c = relay->colorTransform();
 
         fn_call::Args args;
         args += c.ra / factor, c.ga / factor, c.ba / factor, c.aa / factor,
@@ -161,9 +153,8 @@ transform_colorTransform(const fn_call& fn)
         );
     }
 
-    as_object* obj = fn.arg(0).to_object(getGlobal(fn));
-    if (!obj)
-    {
+    as_object* obj = toObject(fn.arg(0), getVM(fn));
+    if (!obj) {
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
@@ -187,17 +178,8 @@ transform_colorTransform(const fn_call& fn)
         );
         return as_value();
     }
-    
-    cxform c;
-    c.ra = truncateDouble(transform->getRedMultiplier() * factor);
-    c.ga = truncateDouble(transform->getGreenMultiplier() * factor);
-    c.ba = truncateDouble(transform->getBlueMultiplier() * factor);
-    c.aa = truncateDouble(transform->getAlphaMultiplier() * factor);
-    c.rb = truncateDouble(transform->getRedOffset());
-    c.gb = truncateDouble(transform->getGreenOffset());
-    c.bb = truncateDouble(transform->getBlueOffset());
-    c.ab = truncateDouble(transform->getAlphaOffset());
   
+    const SWFCxForm c = toCxForm(*transform);
     relay->setColorTransform(c);
     
     return as_value();
@@ -222,8 +204,8 @@ transform_concatenatedColorTransform(const fn_call& fn)
             return as_value();
         }
 
-        // Construct a ColorTransform from the sprite cxform.
-        const cxform& c = relay->getWorldColorTransform();
+        // Construct a ColorTransform from the sprite SWFCxForm.
+        const SWFCxForm& c = relay->worldColorTransform();
 
         fn_call::Args args;
         args += c.ra / factor, c.ga / factor, c.ba / factor, c.aa / factor,
@@ -259,7 +241,7 @@ transform_concatenatedMatrix(const fn_call& fn)
             return as_value();
         }
 
-        const SWFMatrix& m = relay->getWorldMatrix();
+        const SWFMatrix& m = relay->worldMatrix();
 
         fn_call::Args args;
         args += m.sx / factor,
@@ -303,7 +285,7 @@ transform_matrix(const fn_call& fn)
             return as_value();
         }
 
-        const SWFMatrix& m = relay->getMatrix();
+        const SWFMatrix& m = relay->matrix();
 
         fn_call::Args args;
         args += m.sx / factor,
@@ -331,7 +313,7 @@ transform_matrix(const fn_call& fn)
     }
 
 
-    as_object* obj = fn.arg(0).to_object(getGlobal(fn));
+    as_object* obj = toObject(fn.arg(0), getVM(fn));
     if (!obj)
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -343,24 +325,8 @@ transform_matrix(const fn_call& fn)
         return as_value();
     }
     
-    // TODO: does this have to be an AS matrix or can it be any object
-    // (more likely)? 
-    as_value a, b, c, d, tx, ty;
-    obj->get_member(NSV::PROP_A, &a);
-    obj->get_member(NSV::PROP_B, &b);
-    obj->get_member(NSV::PROP_C, &c);
-    obj->get_member(NSV::PROP_D, &d);
-    obj->get_member(NSV::PROP_TX, &tx);
-    obj->get_member(NSV::PROP_TY, &ty);
 
-    SWFMatrix m;
-    m.sx = a.to_number() * factor;
-    m.shx = b.to_number() * factor;
-    m.shy = c.to_number() * factor;
-    m.sy = d.to_number() * factor;
-    m.set_x_translation(pixelsToTwips(tx.to_number()));
-    m.set_y_translation(pixelsToTwips(ty.to_number()));
-
+    const SWFMatrix m = toSWFMatrix(*obj);
     relay->setMatrix(m);
 
     return as_value();
@@ -403,7 +369,7 @@ transform_ctor(const fn_call& fn)
     }
 
     // TODO: does this have to be a MovieClip or can it be any DisplayObject?
-    as_object* o = fn.arg(0).to_object(getGlobal(fn));
+    as_object* o = toObject(fn.arg(0), getVM(fn));
     MovieClip* mc = get<MovieClip>(o);
 
     if (!mc) return as_value();
@@ -418,7 +384,7 @@ get_flash_geom_transform_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.Transform class");
     Global_as& gl = getGlobal(fn);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     attachTransformInterface(*proto);
     return gl.createClass(&transform_ctor, proto);
 }

@@ -433,58 +433,59 @@ MediaParserFfmpeg::initializeParser()
     
     // Create VideoInfo
     if ( _videoStream) {
-	int codec = static_cast<int>(_videoStream->codec->codec_id); // originally an enum CodecID 
-	boost::uint16_t width = _videoStream->codec->width;
-	boost::uint16_t height = _videoStream->codec->height;
-	boost::uint16_t frameRate = static_cast<boost::uint16_t>(as_double(_videoStream->r_frame_rate));
+        const int codec = static_cast<int>(_videoStream->codec->codec_id); 
+        boost::uint16_t width = _videoStream->codec->width;
+        boost::uint16_t height = _videoStream->codec->height;
+        boost::uint16_t frameRate = static_cast<boost::uint16_t>(as_double(_videoStream->r_frame_rate));
 #if !defined(HAVE_LIBAVFORMAT_AVFORMAT_H) && !defined(HAVE_FFMPEG_AVCODEC_H)
-	boost::uint64_t duration = _videoStream->codec_info_duration;
+        boost::uint64_t duration = _videoStream->codec_info_duration;
 #else
-	boost::uint64_t duration = _videoStream->duration;
+        boost::uint64_t duration = _videoStream->duration;
 #endif
-        if ( duration == AV_NOPTS_VALUE ) {
-	    log_error("Duration of video stream unknown");
-	    duration=0; // TODO: guess!
+        if (duration == AV_NOPTS_VALUE) {
+            log_error("Duration of video stream unknown");
+            duration=0; // TODO: guess!
         } else {
-	    duration = duration / as_double(_videoStream->time_base); // TODO: check this
+            duration = duration / as_double(_videoStream->time_base); // TODO: check this
         }
 	
-	_videoInfo.reset( new VideoInfo(codec, width, height, frameRate, duration, CUSTOM /*codec type*/) );
+        _videoInfo.reset(new VideoInfo(codec, width, height, frameRate,
+                    duration, CODEC_TYPE_CUSTOM /*codec type*/));
 	
-	_videoInfo->extra.reset(new ExtraVideoInfoFfmpeg(
-							 // NOTE: AVCodecContext.extradata : void* for 51.11.0, uint8_t* for 51.38.0
-							 (uint8_t*)_videoStream->codec->extradata,
-							 _videoStream->codec->extradata_size));
+        // NOTE: AVCodecContext.extradata : void* for 51.11.0, uint8_t* for 51.38.0
+        _videoInfo->extra.reset(new ExtraVideoInfoFfmpeg(
+                     (uint8_t*)_videoStream->codec->extradata,
+                     _videoStream->codec->extradata_size));
 	
-	//log_debug("EXTRA: %d bytes of video extra data", _videoStream->codec->extradata_size);
     }
     
     // Create AudioInfo
     if ( _audioStream) {
-	int codec = static_cast<int>(_audioStream->codec->codec_id); // originally an enum CodecID 
-	boost::uint16_t sampleRate = _audioStream->codec->sample_rate;
-	boost::uint16_t sampleSize = SampleFormatToSampleSize(_audioStream->codec->sample_fmt);
-	bool stereo = (_audioStream->codec->channels == 2);
+        const int codec = static_cast<int>(_audioStream->codec->codec_id); 
+        boost::uint16_t sampleRate = _audioStream->codec->sample_rate;
+        boost::uint16_t sampleSize = SampleFormatToSampleSize(_audioStream->codec->sample_fmt);
+        bool stereo = (_audioStream->codec->channels == 2);
 #if !defined(HAVE_LIBAVFORMAT_AVFORMAT_H) && !defined(HAVE_FFMPEG_AVCODEC_H)
-	boost::uint64_t duration = _audioStream->codec_info_duration;
+        boost::uint64_t duration = _audioStream->codec_info_duration;
 #else
-	boost::uint64_t duration = _audioStream->duration;
+        boost::uint64_t duration = _audioStream->duration;
 #endif
-        if ( duration == AV_NOPTS_VALUE ) {
-	    log_error("Duration of audio stream unknown to ffmpeg");
-	    duration=0; // TODO: guess!
-	} else {
-	    duration = duration / as_double(_audioStream->time_base); // TODO: check this
-	}
+        if (duration == AV_NOPTS_VALUE) {
+            log_error("Duration of audio stream unknown to ffmpeg");
+            duration=0; // TODO: guess!
+        } 
+        else {
+            duration = duration / as_double(_audioStream->time_base); // TODO: check this
+        }
 	
-	_audioInfo.reset( new AudioInfo(codec, sampleRate, sampleSize, stereo, duration, CUSTOM /*codec type*/) );
+        _audioInfo.reset(new AudioInfo(codec, sampleRate, sampleSize, stereo,
+                    duration, CODEC_TYPE_CUSTOM /*codec type*/));
+        
+        // NOTE: AVCodecContext.extradata : void* for 51.11.0, uint8_t* for 51.38.0
+        _audioInfo->extra.reset(new ExtraAudioInfoFfmpeg(
+                     (uint8_t*)_audioStream->codec->extradata,
+                     _audioStream->codec->extradata_size));
 	
-	_audioInfo->extra.reset(new ExtraAudioInfoFfmpeg(
-							 // NOTE: AVCodecContext.extradata : void* for 51.11.0, uint8_t* for 51.38.0
-							 (uint8_t*)_audioStream->codec->extradata,
-							 _audioStream->codec->extradata_size));
-	
-	//log_debug("EXTRA: %d bytes of audio extra data", _videoStream->codec->extradata_size);
     }
     
     
@@ -497,7 +498,7 @@ MediaParserFfmpeg::~MediaParserFfmpeg()
 	if ( _formatCtx )
 	{
 		// TODO: check if this is correct (should we create RIIA classes for ffmpeg stuff?)
-		//av_close_input_file(_formatCtx); // NOTE: this one triggers a mismatched free/delete on _byteIOBuffer !
+		//av_close_input_file(_formatCtx); // NOTE: this one triggers a mismatched free/delete on _byteIOBuffer with libavformat.so.52 !
 		av_free(_formatCtx);
 	}
 

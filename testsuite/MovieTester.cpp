@@ -75,16 +75,13 @@ MovieTester::MovieTester(const std::string& url)
     _forceRedraw(true)
 {
     
-    // Initialize gnash code lib
-    gnashInit();
-    
     // Initialize the testing media handlers
     initTestingMediaHandlers();
     
     // Initialize the sound handler(s)
     initTestingSoundHandlers();
     
-    _runResources.reset(new RunResources(url));
+    _runResources.reset(new RunResources());
     _runResources->setSoundHandler(_sound_handler);
     _runResources->setMediaHandler(_mediaHandler);
     
@@ -93,8 +90,9 @@ MovieTester::MovieTester(const std::string& url)
     
     _runResources->setTagLoaders(loaders);
     
-    _runResources->setStreamProvider(boost::shared_ptr<StreamProvider>(
-						       new StreamProvider));
+    boost::shared_ptr<StreamProvider> sp(new StreamProvider(url));
+
+    _runResources->setStreamProvider(sp);
 
     if ( url == "-" ) {
 	std::auto_ptr<IOChannel> in (
@@ -449,6 +447,21 @@ MovieTester::isMouseOverMouseEntity()
     return (_movie_root->getActiveEntityUnderPointer());
 }
 
+bool
+MovieTester::usingHandCursor()
+{
+	DisplayObject* activeEntity = _movie_root->getActiveEntityUnderPointer();
+	if ( ! activeEntity ) return false;
+
+    if ( activeEntity->isSelectableTextField() ) {
+        return false; // setCursor(CURSOR_INPUT);
+    } else if ( activeEntity->allowHandCursor() ) {
+        return true; // setCursor(CURSOR_HAND);
+    } else {
+        return false; // setCursor(CURSOR_NORMAL);
+    }
+}
+
 geometry::SnappingRanges2d<int>
 MovieTester::getInvalidatedRanges() const
 {
@@ -584,7 +597,7 @@ MovieTester::initTestingMediaHandlers()
 void
 MovieTester::restart() 
 {
-    _movie_root->clear(); // restart();
+    _movie_root->reset(); 
     MovieClip::MovieVariables v;
     // We pass 'v' twice, as the second one is for scriptable
     // Variables, which isn't fully implemented yet.

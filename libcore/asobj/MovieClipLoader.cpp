@@ -69,7 +69,7 @@ moviecliploader_class_init(as_object& where, const ObjectURI& uri)
 	// This is going to be the where Number "class"/"function"
     Global_as& gl = getGlobal(where);
 
-    as_object* proto = gl.createObject();;
+    as_object* proto = createObject(gl);;
 
     as_object* cl = gl.createClass(&moviecliploader_new, proto);
     attachMovieClipLoaderInterface(*proto);
@@ -181,7 +181,7 @@ moviecliploader_getProgress(const fn_call& fn)
 		return as_value();
 	}
 
-	as_object* target = fn.arg(0).to_object(getGlobal(fn));
+	as_object* target = toObject(fn.arg(0), getVM(fn));
   
 	if (!target) {
 		IF_VERBOSE_ASCODING_ERRORS(

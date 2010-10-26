@@ -77,8 +77,8 @@ main(int /*argc*/, char** /*argv*/)
 
 	if ( endOfTestFound )
 	{
-		cerr << eot.toDebugString() << endl;
-		check_equals(eot.to_bool(), true);
+		cerr << eot << endl;
+		check_equals(eot.to_bool(8), true);
 	}
 	else
 	{

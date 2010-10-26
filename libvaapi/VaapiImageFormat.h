@@ -20,6 +20,7 @@
 #ifndef GNASH_VAAPIIMAGEFORMAT_H
 #define GNASH_VAAPIIMAGEFORMAT_H
 
+#include "dsodefs.h"
 #include "vaapi_common.h"
 
 /// Color spaces
@@ -54,7 +55,8 @@ enum VaapiImageFormat {
 };
 
 /// Get colorspace for the specified image format
-VaapiColorspace vaapi_image_format_get_colorspace(VaapiImageFormat format);
+VaapiColorspace DSOEXPORT
+vaapi_image_format_get_colorspace(VaapiImageFormat format);
 
 /// Check whether image format is RGB
 static inline bool vaapi_image_format_is_rgb(VaapiImageFormat format)

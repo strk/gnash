@@ -47,7 +47,7 @@ namespace amf {
 namespace {
 
 /// Class used to serialize properties of an object to a buffer
-class ObjectSerializer : public AbstractPropertyVisitor
+class ObjectSerializer : public PropertyVisitor
 {
 
 public:
@@ -210,7 +210,7 @@ Writer::writeObject(as_object* obj)
 
                 as_value elem;
                 for (size_t i = 0; i < len; ++i) {
-                    elem = obj->getMember(arrayKey(st, i));
+                    elem = getMember(*obj, arrayKey(st, i));
                     if (!elem.writeAMF0(*this)) {
                         log_error("Problems serializing strict array "
                                 "member %d=%s", i, elem);
@@ -392,7 +392,7 @@ as_value
 Reader::readXML()
 {
     as_value str = readLongString(_pos, _end);
-    as_function* ctor = _global.getMember(NSV::CLASS_XML).to_function();
+    as_function* ctor = getMember(_global, NSV::CLASS_XML).to_function();
     
     as_value xml;
     if (ctor) {
@@ -517,7 +517,7 @@ Reader::readObject()
 {
 
     string_table& st = getStringTable(_global);
-    as_object* obj = _global.createObject(); 
+    as_object* obj = createObject(_global); 
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
     log_debug("amf0 starting read of OBJECT");
@@ -594,7 +594,7 @@ Reader::readDate()
     log_debug("amf0 read date: %e", dub);
 #endif
 
-    as_function* ctor = _global.getMember(NSV::CLASS_DATE).to_function();
+    as_function* ctor = getMember(_global, NSV::CLASS_DATE).to_function();
     VM& vm = getVM(_global);
 
     as_value date;

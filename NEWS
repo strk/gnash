@@ -1,7 +1,29 @@
-Gnash 0.8.8
+Gnash 0.8.9
 YYYY/MM/DD
 
+Improvements since 0.8.8 release are:
+
+ * Fixed swapped _framesloaded and _framestotal properties
+ * Improved ActionScript performance processing, especially
+   for interactive applications.
+
+Gnash 0.8.8
+2010/08/17
+
 Improvements since 0.8.7 release are:
+
+ * Renderers are able to be switched at runtime between Cairo,
+   OpenGL, and AGG. 
+ * Media handlers can be switched at runtime between ffmpeg and
+   Gstreamer.
+ * Hardware video decoding support via VAAPI for Nvidia, ATI, and
+   Intel GPUs. 
+ * Android specific support.
+ * Gnash now compiles faster due to reduce internal dependencies.
+ * Mostly complete Scriptable Plugin support which works with the
+   ExternalInterface class.
+ * Improved input device handling when using a raw framebuffer.
+ * 100% of all YouTube videos should work 
 
 Gnash 0.8.7
 2010/02/15
@@ -27,6 +49,7 @@ Improvements since 0.8.6 release are:
    (Benjamin Wolsey)
 
 Gnash 0.8.6
+2009/09/15
 
 Improvements since 0.8.5 release are:
 

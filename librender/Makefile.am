@@ -29,15 +29,15 @@ pluginsdir = $(libdir)/gnash/plugins
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 
 AM_CPPFLAGS = -I.. \
-        -I$(srcdir) \
-        -I$(top_srcdir) \
-        -I$(top_srcdir)/libcore \
-        -I$(top_srcdir)/libcore/parser \
-        -I$(top_srcdir)/libcore/swf \
-        -I$(top_srcdir)/libbase \
+	-I$(srcdir) \
+	-I$(top_srcdir) \
+	-I$(top_srcdir)/libcore \
+	-I$(top_srcdir)/libcore/parser \
+	-I$(top_srcdir)/libcore/swf \
+	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/librender \
 	$(PTHREAD_CFLAGS) \
-        $(SDL_CFLAGS) \
+	$(SDL_CFLAGS) \
 	$(PANGO_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(ATK_CFLAGS) \
@@ -52,8 +52,8 @@ AM_CPPFLAGS = -I.. \
 	$(NULL)
 
 GNASH_LIBS = \
-	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/libcore/libgnashcore.la
+	$(top_builddir)/libcore/libgnashcore.la \
+	$(top_builddir)/libbase/libgnashbase.la 
 
 noinst_HEADERS = \
 	Renderer.h \
@@ -69,6 +69,7 @@ noinst_HEADERS = \
 pkglib_LTLIBRARIES = libgnashrender.la
 libgnashrender_la_LIBADD = $(LIBVA_LIBS) $(LIBVA_X11_LIBS) $(LIBVA_GLX_LIBS)
 libgnashrender_la_SOURCES = PathParser.cpp
+libgnashrender_la_LDFLAGS =  -release $(VERSION) 
 
 if BUILD_OGL_RENDERER
 libgnashrender_la_SOURCES += Renderer_ogl.cpp
@@ -82,17 +83,17 @@ endif
 
 if  BUILD_OVG_RENDERER
 libgnashrender_la_SOURCES += Renderer_ovg.cpp 
-libgnashrender_la_LIBADD += $(AGG_LIBS) $(LIBVA)
+libgnashrender_la_LIBADD += $(OPENVG_LIBS)
 endif
 
 if  BUILD_GLES1_RENDERER
 libgnashrender_la_SOURCES += Renderer_gles1.cpp 
-libgnashrender_la_LIBADD += $(AGG_LIBS) $(LIBVA)
+libgnashrender_la_LIBADD += $(GLES1_LIBS)
 endif
 
 if  BUILD_GLES2_RENDERER
 libgnashrender_la_SOURCES += Renderer_gles2.cpp 
-libgnashrender_la_LIBADD += $(AGG_LIBS) $(LIBVA)
+libgnashrender_la_LIBADD += $(GLES2_LIBS)
 endif
 
 if  BUILD_CAIRO_RENDERER
@@ -111,3 +112,12 @@ clean-hook:
 if ENABLE_PCH
 AM_CXXFLAGS = $(PCH_FLAGS)
 endif
+
+bin_PROGRAMS = testr
+testr_SOURCES = testr.cpp
+testr_CPPFLAGS = $(AM_CPPFLAGS) $(GTK2_CFLAGS)
+testr_LDADD = ../libbase/libgnashbase.la \
+	libgnashrender.la \
+	$(GNASH_LIBS) \
+	$(GTK2_LIBS)
+

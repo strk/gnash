@@ -127,8 +127,6 @@ XMLSocket_as::XMLSocket_as(as_object* owner)
 
 XMLSocket_as::~XMLSocket_as()
 {
-    // Remove advance callback and close network connections.
-    close();
 }
 
 void
@@ -255,7 +253,7 @@ XMLSocket_as::checkForIncomingData()
         callMethod(&owner(), NSV::PROP_ON_DATA, *it);
     }
     
-    if (_socket.bad()) {
+    if (_socket.eof()) {
         callMethod(&owner(), NSV::PROP_ON_CLOSE);
         close();
         return;
@@ -321,7 +319,7 @@ xmlsocket_connect(const fn_call& fn)
     
     as_value hostval = fn.arg(0);
     const std::string& host = hostval.to_string();
-    const double port = fn.arg(1).to_number();
+    const double port = toNumber(fn.arg(1), getVM(fn));
     
     // Port numbers above 65535 are rejected always, but not port numbers below
     // 0. It's not clear what happens with them.
@@ -403,7 +401,7 @@ xmlsocket_onData(const fn_call& fn)
 
 
     Global_as& gl = getGlobal(fn);
-    as_function* ctor = gl.getMember(NSV::CLASS_XML).to_function();
+    as_function* ctor = getMember(gl, NSV::CLASS_XML).to_function();
 
     fn_call::Args args;
     args += xmlin;

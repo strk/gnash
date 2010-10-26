@@ -32,14 +32,31 @@ namespace media {
 
 namespace sound {
 
-/// Null sound_handler, for testing 
-//
-/// @todo start a thread to fetch samples ?
-///
+/// Null sound_handler, for testing or manual fetching of samples
 class DSOEXPORT NullSoundHandler : public sound_handler
 {
 public:
-    NullSoundHandler(media::MediaHandler* m) : sound_handler(m) {}
+
+    sound_handler* _mixer;
+
+    NullSoundHandler(media::MediaHandler* m, sound_handler* mixer=0)
+        :
+        sound_handler(m),
+        _mixer(mixer)
+    {}
+
+    // If a _mixer was given, let it do the mixing!
+    void mix(boost::int16_t* outSamples, boost::int16_t* inSamples,
+                unsigned int nSamples, float volume)
+    {
+        if ( _mixer ) _mixer->mix(outSamples, inSamples, nSamples, volume);
+        else {
+            // cheating, just copy input to output, which in NO WAY
+            // can be considered "mixing"
+            std::copy(outSamples, outSamples+nSamples, inSamples);
+        }
+    }
+
 
 };
 	

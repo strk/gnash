@@ -56,7 +56,7 @@ patch: patch-stamp
 patch-stamp:
 	dh_testdir
 	printf "\n == APPLYING PATCHES == \n\n"
-	printf "we have no patches, we're the developers!"
+#	"we have no patches, we're the developers!"
 #	$(MAKE) -f /usr/share/quilt/quilt.make patch
 	printf "\n ---- End of APPLYING PATCHES ---- \n\n"
 	touch $@
@@ -82,8 +82,6 @@ ifneq (,$(findstring ogl,$(DEB_BUILD_OPTIONS)))
 	BUILD_DIRECTORY = _build.ogl
 	BUILD_DEBUG = -opengl
 	BUILD_VERSION = $(MAIN_VERSION).ogl.$(BUILD_VERSION)
-else
-	BUILD_FLAGS += --enable-renderer=all
 endif
 
 # Optionally build an ffmpeg enabled package, Gstreamer is the default
@@ -99,7 +97,7 @@ else
 	BUILD_DEBUG = -ffmpeg
 endif
 else
-	BUILD_FLAGS += --enable-media=gst
+	BUILD_FLAGS += --enable-media=gst,ffmpeg
 endif
 
 # Optionally build the older kde3 package, KDE4 is the default
@@ -118,15 +116,6 @@ else
 	BUILD_FLAGS += --enable-gui=gtk,kde4
 endif
 
-# Optionally build an VA API enabled package, which is very experimental,
-# so it's not enabled by default.
-ifneq (,$(findstring vaapi,$(DEB_BUILD_OPTIONS)))
-	BUILD_FLAGS += --enable-media=ffmpeg
-	BUILD_DIRECTORY = _build.vaapi
-	BUILD_VERSION = $(MAIN_VERSION).vaapi.$(BUILD_VERSION)
-	BUILD_DEBUG = -vaapi
-endif
-
 # Configure Gnash. We use a different set of options, as when building
 # packages, we want to enable everything that Gnash can do, like
 # python support, the SDK cygnal, etc... These are not enabled by
@@ -141,14 +130,14 @@ CONFIGURE_FLAGS = CFLAGS="$(CFLAGS)" \
 	--sysconfdir=/etc \
 	--mandir=/usr/share/man \
 	--infodir=/usr/share/info \
-	--disable-testsuite \
-	--disable-rpath \
-	--enable-renderer=agg,cairo \
-	--enable-cygnal \
-	--enable-python \
 	--with-plugins-install=system \
 	--disable-dependency-tracking \
-	--enable-extensions=all \
+	--disable-testsuite \
+	--disable-rpath \
+	--enable-cygnal \
+	--enable-python \
+	--enable-renderer=agg,cairo \
+	--enable-extensions=fileio,lirc,mysql \
 	$(BUILD_FLAGS)
 
 config: config-stamp
@@ -228,7 +217,7 @@ clean:
 	rm -fr $(BUILD_DIRECTORY)
 
 	@printf "\n == CLEANING PATCHES ==\n\n"
-#	 we have no patches, we're the developers!
+	echo " we have no patches, we're the developers!"
 #	$(MAKE) -f /usr/share/quilt/quilt.make unpatch
 	@printf "\n ---- End of CLEANING PATCHES ---- \n\n"
 
@@ -330,16 +319,15 @@ VERSION_DATE = $(shell /bin/date --utc +%0Y%0m%0d.%0k%0M)
 BRANCH_NICK   = `grep "NICK" $(BUILD_DIRECTORY)/revno.h | cut -d '"' -f 2`
 BRANCH_REVNO  = `grep "REVNO" $(BUILD_DIRECTORY)/revno.h | cut -d '"' -f 2`
 #VERSION_ID = 0.8.8+bzr.trunk$(VERSION_DATE)
-VERSION_ID = 0.8.8+bzr.$(BRANCH_NICK)$(BRANCH_REVNO)
-get-bzr-source:
-	echo Downloading gnash $(VERSION_ID) from bzr...
-#	test -e gnashd && exit
-	bzr branch http://bzr.savannah.gnu.org/r/gnash/$(BRANCH_NICK) gnash
-#	cd gnash; rm -rf `find . -name CVS`
+VERSION_ID = 0.8.8+git.$(BRANCH_NICK)$(BRANCH_REVNO)
+get-git-source:
+	echo Downloading gnash $(VERSION_ID) from git...
+	git clone git://git.sv.gnu.org/gnash.git
+#	cd gnash; rm -rf `find . -name .git`
 	tar cvfz "gnash_$(VERSION_ID).orig.tar.gz" gnash
 	mv gnash "gnash-$(VERSION_ID)"
 	cp debian "gnash-$(VERSION_ID)" -a
-	cd "gnash-$(VERSION_ID)"; dch -v "$(VERSION_ID)-1" "New Upstream Release. Downloaded from Bazaar."
+	cd "gnash-$(VERSION_ID)"; dch -v "$(VERSION_ID)-1" "New Upstream Release. Downloaded from Git."
 
 binary: binary-indep binary-arch
-.PHONY: config build clean binary-indep binary-arch binary install get-bzr-source patch
+.PHONY: config build clean binary-indep binary-arch binary install get-git-source patch

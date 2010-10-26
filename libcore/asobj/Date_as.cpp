@@ -207,7 +207,7 @@ date_class_init(as_object& global, const ObjectURI& uri)
 {
 
     Global_as& gl = getGlobal(global);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     as_object* cl = gl.createClass(&date_new, proto);
     attachDateInterface(*proto);
     
@@ -377,7 +377,7 @@ attachDateInterface(as_object& o)
     o.init_member("setUTCMilliseconds", vm.getNative(103, 143));
 
     string_table& st = getStringTable(o);
-    o.init_member("valueOf", o.getMember(st.find("getTime")));
+    o.init_member("valueOf", getMember(o, st.find("getTime")));
 
 }   
 
@@ -413,7 +413,7 @@ date_new(const fn_call& fn)
     // date.
     if (!fn.isInstantiation()) {
         Global_as& gl = getGlobal(fn);
-        as_function* ctor = gl.getMember(NSV::CLASS_DATE).to_function();
+        as_function* ctor = getMember(gl, NSV::CLASS_DATE).to_function();
         if (!ctor) return as_value();
         fn_call::Args args;
         return constructInstance(*ctor, fn.env(), args);
@@ -435,7 +435,7 @@ date_new(const fn_call& fn)
     }
     else if (fn.nargs == 1) {
         // Set the value in milliseconds since 1970 UTC
-        obj->setRelay(new Date_as(fn.arg(0).to_number()));
+        obj->setRelay(new Date_as(toNumber(fn.arg(0), getVM(fn))));
     }
     else {
         // Create a time from the supplied (at least 2) arguments.
@@ -446,9 +446,9 @@ date_new(const fn_call& fn)
         gt.minute = 0;
         gt.hour = 0;
         gt.monthday = 1;
-        gt.month = toInt(fn.arg(1));
+        gt.month = toInt(fn.arg(1), getVM(fn));
     
-        int year = toInt(fn.arg(0));
+        int year = toInt(fn.arg(0), getVM(fn));
         
         // GnashTime.year is the value since 1900 (like struct tm)
         // negative value is a year before 1900. A year between 0
@@ -467,15 +467,15 @@ date_new(const fn_call& fn)
                 )
             case 7:
                 // fractions of milliseconds are ignored
-                gt.millisecond = toInt(fn.arg(6));
+                gt.millisecond = toInt(fn.arg(6), getVM(fn));
             case 6:
-                gt.second = toInt(fn.arg(5));
+                gt.second = toInt(fn.arg(5), getVM(fn));
             case 5:
-                gt.minute = toInt(fn.arg(4));
+                gt.minute = toInt(fn.arg(4), getVM(fn));
             case 4:
-                gt.hour = toInt(fn.arg(3));
+                gt.hour = toInt(fn.arg(3), getVM(fn));
             case 3:
-                gt.monthday = toInt(fn.arg(2));
+                gt.monthday = toInt(fn.arg(2), getVM(fn));
             case 2:
                 break;
                 // Done already
@@ -729,7 +729,7 @@ date_setTime(const fn_call& fn)
     else {
         // returns a double
         const double magicMaxValue = 8.64e+15;
-        double d = fn.arg(0).to_number();
+        double d = toNumber(fn.arg(0), getVM(fn));
 
         if (!isFinite(d) || std::abs(d) > magicMaxValue) {
             date->setTimeValue(NaN);
@@ -843,9 +843,9 @@ date_setfullyear(const fn_call& fn)
     else {
         GnashTime gt;
         dateToGnashTime(*date, gt, utc);
-        gt.year = toInt(fn.arg(0)) - 1900;
-        if (fn.nargs >= 2) gt.month = toInt(fn.arg(1));
-        if (fn.nargs >= 3) gt.monthday = toInt(fn.arg(2));
+        gt.year = toInt(fn.arg(0), getVM(fn)) - 1900;
+        if (fn.nargs >= 2) gt.month = toInt(fn.arg(1), getVM(fn));
+        if (fn.nargs >= 3) gt.monthday = toInt(fn.arg(2), getVM(fn));
         gnashTimeToDate(gt, *date, utc);
   }
   return as_value(date->getTimeValue());
@@ -887,13 +887,13 @@ date_setYear(const fn_call& fn)
 
         // TODO: Should truncation be done before or after subtracting 1900?
         
-        double year = fn.arg(0).to_number();
+        double year = toNumber(fn.arg(0), getVM(fn));
         if (year < 0 || year > 100) year -= 1900;
 
         truncateDouble(gt.year, year);
 
-        if (fn.nargs >= 2) gt.month = toInt(fn.arg(1));
-        if (fn.nargs >= 3) gt.monthday = toInt(fn.arg(2));
+        if (fn.nargs >= 2) gt.month = toInt(fn.arg(1), getVM(fn));
+        if (fn.nargs >= 3) gt.monthday = toInt(fn.arg(2), getVM(fn));
         if (fn.nargs > 3) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("Date.setYear was called with more than three "
@@ -943,13 +943,13 @@ date_setmonth(const fn_call& fn)
 
         // It seems odd, but FlashPlayer takes all bad month values to mean
         // January
-        double monthvalue =  fn.arg(0).to_number();
+        double monthvalue =  toNumber(fn.arg(0), getVM(fn));
         if (isNaN(monthvalue) || isInf(monthvalue)) monthvalue = 0.0;
         truncateDouble(gt.month, monthvalue);
 
         // If the day-of-month value is invalid instead, the result is NaN.
         if (fn.nargs >= 2) {
-            double mdayvalue = fn.arg(1).to_number();
+            double mdayvalue = toNumber(fn.arg(1), getVM(fn));
             if (isNaN(mdayvalue) || isInf(mdayvalue)) {
                 date->setTimeValue(NaN);
                 return as_value(date->getTimeValue());
@@ -991,7 +991,7 @@ date_setDate(const fn_call& fn)
     GnashTime gt;
 
     dateToGnashTime(*date, gt, utc);
-    gt.monthday = toInt(fn.arg(0));
+    gt.monthday = toInt(fn.arg(0), getVM(fn));
     gnashTimeToDate(gt, *date, utc);
   }
   if (fn.nargs > 1) {
@@ -1036,10 +1036,10 @@ date_setHours(const fn_call& fn)
         GnashTime gt;
 
         dateToGnashTime(*date, gt, utc);
-        gt.hour = toInt(fn.arg(0));
-        if (fn.nargs >= 2) gt.minute = toInt(fn.arg(1));
-        if (fn.nargs >= 3) gt.second = toInt(fn.arg(2));
-        if (fn.nargs >= 4) gt.millisecond = toInt(fn.arg(3));
+        gt.hour = toInt(fn.arg(0), getVM(fn));
+        if (fn.nargs >= 2) gt.minute = toInt(fn.arg(1), getVM(fn));
+        if (fn.nargs >= 3) gt.second = toInt(fn.arg(2), getVM(fn));
+        if (fn.nargs >= 4) gt.millisecond = toInt(fn.arg(3), getVM(fn));
         if (fn.nargs > 4) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("Date.set%sHours was called with more than "
@@ -1081,9 +1081,9 @@ date_setMinutes(const fn_call& fn)
         GnashTime gt;
 
         dateToGnashTime(*date, gt, utc);
-        gt.minute = toInt(fn.arg(0));
-        if (fn.nargs >= 2) gt.second = toInt(fn.arg(1));
-        if (fn.nargs >= 3) gt.millisecond = toInt(fn.arg(2));
+        gt.minute = toInt(fn.arg(0), getVM(fn));
+        if (fn.nargs >= 2) gt.second = toInt(fn.arg(1), getVM(fn));
+        if (fn.nargs >= 3) gt.millisecond = toInt(fn.arg(2), getVM(fn));
         if (fn.nargs > 3) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("Date.set%sMinutes was called with more than "
@@ -1125,8 +1125,8 @@ date_setSeconds(const fn_call& fn)
         GnashTime gt;
 
         dateToGnashTime(*date, gt, utc);
-        gt.second = toInt(fn.arg(0));
-        if (fn.nargs >= 2) gt.millisecond = toInt(fn.arg(1));
+        gt.second = toInt(fn.arg(0), getVM(fn));
+        if (fn.nargs >= 2) gt.millisecond = toInt(fn.arg(1), getVM(fn));
         if (fn.nargs > 2) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("Date.set%sMinutes was called with more than "
@@ -1160,7 +1160,7 @@ date_setMilliseconds(const fn_call& fn)
         GnashTime gt;
 
         dateToGnashTime(*date, gt, utc);
-        truncateDouble(gt.millisecond, fn.arg(0).to_number());
+        truncateDouble(gt.millisecond, toNumber(fn.arg(0), getVM(fn)));
 
         if (fn.nargs > 1) {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -1254,20 +1254,20 @@ date_UTC(const fn_call& fn) {
             )
         case 7:
             // millisecs is double, but fractions of millisecs are ignored.
-            gt.millisecond = toInt(fn.arg(6));
+            gt.millisecond = toInt(fn.arg(6), getVM(fn));
         case 6:
-            gt.second = toInt(fn.arg(5));
+            gt.second = toInt(fn.arg(5), getVM(fn));
         case 5:
-            gt.minute = toInt(fn.arg(4));
+            gt.minute = toInt(fn.arg(4), getVM(fn));
         case 4:
-            gt.hour = toInt(fn.arg(3));
+            gt.hour = toInt(fn.arg(3), getVM(fn));
         case 3:
-            gt.monthday = toInt(fn.arg(2));
+            gt.monthday = toInt(fn.arg(2), getVM(fn));
         case 2:   // these last two are always performed
-            gt.month = toInt(fn.arg(1));
+            gt.month = toInt(fn.arg(1), getVM(fn));
             {
                 boost::int32_t year = 0;
-                truncateDouble(year, fn.arg(0).to_number());
+                truncateDouble(year, toNumber(fn.arg(0), getVM(fn)));
                 if (year < 100) gt.year = year;
                 else gt.year = year - 1900;
             }
@@ -1296,7 +1296,7 @@ rogue_date_args(const fn_call& fn, unsigned maxargs)
     if (fn.nargs < maxargs) maxargs = fn.nargs;
 
     for (unsigned int i = 0; i < maxargs; i++) {
-        double arg = fn.arg(i).to_number();
+        double arg = toNumber(fn.arg(i), getVM(fn));
 
         if (isNaN(arg)) return(NaN);
 

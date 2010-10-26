@@ -18,10 +18,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __GNASH_ASOBJ_DISPLACEMENTMAPFILTER_H__
-#define __GNASH_ASOBJ_DISPLACEMENTMAPFILTER_H__
-
-
+#ifndef GNASH_ASOBJ_DISPLACEMENTMAPFILTER_H
+#define GNASH_ASOBJ_DISPLACEMENTMAPFILTER_H
 
 namespace gnash {
 
@@ -31,10 +29,6 @@ struct ObjectURI;
 /// Initialize the global DisplacementMapFilter class
 void displacementmapfilter_class_init(as_object& where, const ObjectURI& uri);
 
-/// Return a DisplacementMapFilter instance (in case the core lib needs it)
-//std::auto_ptr<as_object> init_DisplacementMapFilter_instance();
-
 } // end of gnash namespace
 
-// __GNASH_ASOBJ_DISPLACEMENTMAPFILTER_H__
 #endif

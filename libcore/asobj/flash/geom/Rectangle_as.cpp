@@ -207,19 +207,19 @@ Rectangle_contains(const fn_call& fn)
 
     as_value ret = newLessThan(x_as, rect_x_as, vm);
     if ( ret.is_undefined() ) return as_value();
-    if ( ret.to_bool() ) return as_value(false); 
+    if ( toBool(ret, vm) ) return as_value(false); 
 
     ret = newLessThan(x_as, rect_x1_as, vm);
     if ( ret.is_undefined() ) return as_value();
-    if ( ! ret.to_bool() ) return as_value(false); 
+    if ( ! toBool(ret, vm) ) return as_value(false); 
 
     ret = newLessThan(y_as, rect_y_as, vm);
     if ( ret.is_undefined() ) return as_value();
-    if ( ret.to_bool() ) return as_value(false); 
+    if ( toBool(ret, vm) ) return as_value(false); 
 
     ret = newLessThan(y_as, rect_y1_as, vm);
     if ( ret.is_undefined() ) return as_value();
-    if ( ! ret.to_bool() ) return as_value(false); 
+    if ( ! toBool(ret, vm) ) return as_value(false); 
 
     return as_value(true);
 
@@ -232,7 +232,7 @@ Rectangle_containsPoint(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
 
-    as_object* arg = (fn.nargs > 0) ? fn.arg(0).to_object(getGlobal(fn)) : 0;
+    as_object* arg = (fn.nargs > 0) ? toObject(fn.arg(0), getVM(fn)) : 0;
     
     VM& vm = getVM(fn);
 
@@ -244,7 +244,7 @@ Rectangle_containsPoint(const fn_call& fn)
     // argx >= thisx
     as_value ret = newLessThan(argx, thisx, vm);
     if (ret.is_undefined()) return as_value(); 
-    if (ret.to_bool()) return as_value(false); 
+    if (toBool(ret, vm)) return as_value(false); 
 
     as_value thisw;
     ptr->get_member(NSV::PROP_WIDTH, &thisw);
@@ -252,7 +252,7 @@ Rectangle_containsPoint(const fn_call& fn)
     newAdd(thisx, thisw, vm);
     ret = newLessThan(argx, thisx, vm);
     if (ret.is_undefined()) return as_value(); 
-    if (!ret.to_bool()) return as_value(false); 
+    if (!toBool(ret, vm)) return as_value(false); 
  
     as_value thisy;
     ptr->get_member(NSV::PROP_Y, &thisy);
@@ -262,7 +262,7 @@ Rectangle_containsPoint(const fn_call& fn)
     // argy >= thisy
     ret = newLessThan(argy, thisy, vm);
     if (ret.is_undefined()) return as_value(); 
-    if (ret.to_bool()) return as_value(false); 
+    if (toBool(ret, vm)) return as_value(false); 
 
     as_value thish;
     ptr->get_member(NSV::PROP_HEIGHT, &thish);
@@ -270,7 +270,7 @@ Rectangle_containsPoint(const fn_call& fn)
     newAdd(thisy, thish, vm);
     ret = newLessThan(argy, thisy, vm);
     if (ret.is_undefined()) return as_value(); 
-    if (!ret.to_bool()) return as_value(false); 
+    if (!toBool(ret, vm)) return as_value(false); 
 
     return as_value(true);
 
@@ -344,10 +344,10 @@ Rectangle_isEmpty(const fn_call& fn)
     ptr->get_member(NSV::PROP_HEIGHT, &h);
     if ( h.is_undefined() || h.is_null() ) return as_value(true);
 
-    double wn = w.to_number();
+    double wn = toNumber(w, getVM(fn));
     if (!isFinite(wn) || wn <= 0) return as_value(true);
 
-    double hn = h.to_number();
+    double hn = toNumber(h, getVM(fn));
     if (!isFinite(hn) || hn <= 0) return as_value(true);
 
     log_debug("Width: %g, Height: %g", wn, hn);
@@ -677,7 +677,7 @@ get_flash_geom_rectangle_constructor(const fn_call& fn)
 {
     log_debug("Loading flash.geom.Rectangle class");
     Global_as& gl = getGlobal(fn);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     attachRectangleInterface(*proto);
     return gl.createClass(&Rectangle_ctor, proto);
 }

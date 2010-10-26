@@ -18,7 +18,19 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "string_table.h"
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h" // GNASH_STATS_STRING_TABLE_NOCASE
+#endif
+
 #include <boost/algorithm/string/case_conv.hpp>
+
+//#define DEBUG_STRING_TABLE 1
+//#define GNASH_STATS_STRING_TABLE_NOCASE 1
+//#define GNASH_PARANOIA_LEVEL 3
+
+#ifdef GNASH_STATS_STRING_TABLE_NOCASE
+# include "Stats.h"
+#endif
 
 namespace gnash {
 
@@ -79,6 +91,10 @@ string_table::insert_group(const svt* l, std::size_t size)
             _caseTable[s.id] = already_locked_insert(t);
         }
     }
+#ifdef DEBUG_STRING_TABLE
+    std::cerr << "string_table group insert end -- size is " << _table.size() << " _caseTable size is " << _caseTable.size() << std::endl; 
+#endif
+
 
 }
 
@@ -86,6 +102,12 @@ string_table::key
 string_table::already_locked_insert(const std::string& to_insert)
 {
 	const key ret = _table.insert(svt(to_insert, ++_highestKey)).first->id;
+
+#ifdef DEBUG_STRING_TABLE
+    int tscp = 100; // table size checkpoint
+    size_t ts = _table.size();
+    if ( ! (ts % tscp) ) { std::cerr << "string_table size grew to " << ts << std::endl; }
+#endif
 
     const std::string lower = boost::to_lower_copy(to_insert);
 
@@ -100,6 +122,11 @@ string_table::already_locked_insert(const std::string& to_insert)
         const key nocase = (it == _table.end()) ? 
             _table.insert(svt(lower, ++_highestKey)).first->id : it->id;
 
+#ifdef DEBUG_STRING_TABLE
+        ++ts;
+        if ( ! (ts % tscp) ) { std::cerr << "string_table size grew to " << ts << std::endl; }
+#endif // DEBUG_STRING_TABLE
+
         _caseTable[ret] = nocase;
 
     }
@@ -107,11 +134,40 @@ string_table::already_locked_insert(const std::string& to_insert)
     return ret;
 }
 
+void
+string_table::setHighestKnownLowercase(key k)
+{
+    _highestKnownLowercase = k;
+}
+
 string_table::key
 string_table::noCase(key a) const
 {
+#ifdef GNASH_STATS_STRING_TABLE_NOCASE
+    static stats::KeyLookup kcl("string_table::noCase(maplookups)", *this);
+#endif // GNASH_STATS_STRING_TABLE_NOCASE
+
+    // Avoid checking keys known to be lowercase
+    if ( a <= _highestKnownLowercase ) {
+#if GNASH_PARANOIA_LEVEL > 2
+        assert(_caseTable.find(a) == _caseTable.end());
+#endif
+        return a;
+    }
+
+// MOVE this block around for special needs
+#ifdef GNASH_STATS_STRING_TABLE_NOCASE
+    kcl.check(a);
+#endif 
+
+    // TODO: an even/odd based rule to tell what's lowercase already
+    //       would speed things up even for unknown 
+    //       strings.
+
     std::map<key, key>::const_iterator i = _caseTable.find(a);
-    return i == _caseTable.end() ? a : i->second;
+    if ( i != _caseTable.end() ) return i->second;
+
+    return a;
 }
 
 bool

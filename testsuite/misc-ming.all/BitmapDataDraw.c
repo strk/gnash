@@ -121,11 +121,11 @@ main(int argc, char** argv)
     check_equals(mo, "b.getPixel(1, 1)", "0xffffff");
     check_equals(mo, "b.getPixel(8, 8)", "0xffffff");
     // Cyan square
-    xcheck_equals(mo, "b.getPixel(12, 12)", "0x00ffff");
-    xcheck_equals(mo, "b.getPixel(12, 98)", "0x00ffff");
-    xcheck_equals(mo, "b.getPixel(98, 12)", "0x00ffff");
+    check_equals(mo, "b.getPixel(12, 12)", "0x00ffff");
+    check_equals(mo, "b.getPixel(12, 98)", "0x00ffff");
+    check_equals(mo, "b.getPixel(98, 12)", "0x00ffff");
     // Magenta square
-    xcheck_equals(mo, "b.getPixel(82, 82)", "0xff00ff");
+    check_equals(mo, "b.getPixel(82, 82)", "0xff00ff");
 
     // Do the same with double width and height.
     add_actions(mo,
@@ -148,7 +148,7 @@ main(int argc, char** argv)
     // (10 * 2 + 34)
     check_equals(mo, "b.getPixel(12, 12)", "0xffffff");
     check_equals(mo, "b.getPixel(52, 52)", "0xffffff");
-    xcheck_equals(mo, "b.getPixel(56, 56)", "0x00ffff");
+    check_equals(mo, "b.getPixel(56, 56)", "0x00ffff");
     // Magenta square isn't there because it doesn't fit.
 
     // Add with a different matrix
@@ -175,16 +175,16 @@ main(int argc, char** argv)
     check_equals(mo, "b.getPixel(1, 1)", "0xffffff");
     check_equals(mo, "b.getPixel(8, 8)", "0xffffff");
     // Cyan square
-    xcheck_equals(mo, "b.getPixel(12, 12)", "0x00ffff");
-    xcheck_equals(mo, "b.getPixel(12, 98)", "0x00ffff");
-    xcheck_equals(mo, "b.getPixel(98, 12)", "0x00ffff");
+    check_equals(mo, "b.getPixel(12, 12)", "0x00ffff");
+    check_equals(mo, "b.getPixel(12, 98)", "0x00ffff");
+    check_equals(mo, "b.getPixel(98, 12)", "0x00ffff");
     check_equals(mo, "b.getPixel(12, 102)", "0xffffff");
     check_equals(mo, "b.getPixel(102, 12)", "0xffffff");
     // Magenta square
-    xcheck_equals(mo, "b.getPixel(82, 82)", "0xff00ff");
-    xcheck_equals(mo, "b.getPixel(128, 128)", "0xff00ff");
+    check_equals(mo, "b.getPixel(82, 82)", "0xff00ff");
+    check_equals(mo, "b.getPixel(128, 128)", "0xff00ff");
     check_equals(mo, "b.getPixel(132, 132)", "0xffffff");
-    xcheck_equals(mo, "b.getPixel(78, 78)", "0x00ffff");
+    check_equals(mo, "b.getPixel(78, 78)", "0x00ffff");
 
     SWFMovie_nextFrame(mo);
     
@@ -214,21 +214,21 @@ main(int argc, char** argv)
     check_equals(mo, "b.getPixel(1, 1)", "0xffffff");
     check_equals(mo, "b.getPixel(8, 8)", "0xffffff");
     // Cyan square top left corner
-    xcheck_equals(mo, "b.getPixel(25, 28)", "0x00ffff");
+    check_equals(mo, "b.getPixel(25, 28)", "0x00ffff");
     check_equals(mo, "b.getPixel(20, 30)", "0xffffff");
     check_equals(mo, "b.getPixel(25, 25)", "0xffffff");
     // Cyan square bottom left (Check that it's rotated).
-    xcheck_equals(mo, "b.getPixel(18, 68)", "0x00ffff");
+    check_equals(mo, "b.getPixel(18, 68)", "0x00ffff");
     // Cyan square top right 
-    xcheck_equals(mo, "b.getPixel(64, 36)", "0x00ffff");
+    check_equals(mo, "b.getPixel(64, 36)", "0x00ffff");
     check_equals(mo, "b.getPixel(64, 32)", "0xffffff");
     // Magenta square top left
-    xcheck_equals(mo, "b.getPixel(54, 71)", "0xff00ff");
-    xcheck_equals(mo, "b.getPixel(54, 67)", "0x00ffff");
-    xcheck_equals(mo, "b.getPixel(50, 71)", "0x00ffff");
+    check_equals(mo, "b.getPixel(54, 71)", "0xff00ff");
+    check_equals(mo, "b.getPixel(54, 67)", "0x00ffff");
+    check_equals(mo, "b.getPixel(50, 71)", "0x00ffff");
     // Magenta square bottom right
     check_equals(mo, "b.getPixel(74, 94)", "0xffffff");
-    xcheck_equals(mo, "b.getPixel(70, 94)", "0xff00ff");
+    check_equals(mo, "b.getPixel(70, 94)", "0xff00ff");
     
     SWFMovie_nextFrame(mo);
 
@@ -269,16 +269,36 @@ main(int argc, char** argv)
     // but not sure how accurate Gnash will be.
     xcheck_equals(mo, "b.getPixel(27, 30)", "0x000010");
     // Cyan square bottom left
-    xcheck_equals(mo, "b.getPixel(18, 68)", "0x00ffff");
+    check_equals(mo, "b.getPixel(18, 68)", "0x00ffff");
     // Cyan square top right 
     xcheck_equals(mo, "b.getPixel(65, 36)", "0xfffffd");
     // Magenta square top left
     xcheck_equals(mo, "b.getPixel(62, 71)", "0x1000f");
-    xcheck_equals(mo, "b.getPixel(50, 71)", "0x00ffff");
+    check_equals(mo, "b.getPixel(50, 71)", "0x00ffff");
     // Magenta square bottom right
     check_equals(mo, "b.getPixel(74, 94)", "0xffffff");
-    xcheck_equals(mo, "b.getPixel(70, 94)", "0xff00ff");
+    check_equals(mo, "b.getPixel(70, 94)", "0xff00ff");
     
+    // Test color transform
+    add_actions(mo,
+            "b = new flash.display.BitmapData(100, 100, false);"
+            "cx = new flash.geom.ColorTransform(0.5, 0, 0, 1, -255, 255, 0, 0);"
+            "trace(cx);"
+            "b.draw(mc1, new flash.geom.Matrix(2, 0, 0, 2, 34, 34), cx);"
+            "_root.createEmptyMovieClip('dynmc87', 333);"
+            "_root.dynmc87._x = 400;"
+            "_root.dynmc87._y = 400;"
+            "_root.dynmc87.attachBitmap(b, 1200);"
+            );
+
+    // Pixel checking
+    // Top left corner is white
+    check_equals(mo, "b.getPixel(1, 1)", "0xffffff");
+    check_equals(mo, "b.getPixel(8, 8)", "0xffffff");
+    // Cyan square is now green.
+    check_equals(mo, "b.getPixel(12, 12)", "0xffffff");
+    check_equals(mo, "b.getPixel(52, 52)", "0xffffff");
+    check_equals(mo, "b.getPixel(56, 56)", "0x00ff00");
     add_actions(mo, "stop();");
 
     // Output movie

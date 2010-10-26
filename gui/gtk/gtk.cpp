@@ -22,66 +22,38 @@
 #include "gnashconfig.h"
 #endif
 
-#include "log.h"
+#include "gtksup.h"
 
+#include <iostream>
+#include <string>
+#include <utility>
+#include <gtk/gtk.h>
+#include <gdk/gdk.h>
+#include <gdk/gdkkeysyms.h>
+#ifdef HAVE_VA_VA_H
+# include <va/va.h>
+# include "vaapi_utils.h"
+#endif
+#ifdef HAVE_VA_VA_X11_H
+# include <va/va_x11.h>
+#endif
+#ifdef HAVE_X11
+# include <X11/keysym.h>
+# include <gdk/gdkx.h>
+# include <X11/Xlib.h>
+# include <X11/extensions/Xv.h>
+# include <X11/extensions/Xvlib.h>
+#endif
+
+#include "log.h"
 #include "gui.h"
 #include "rc.h"
-#include "gtksup.h"
 #include "sound_handler.h"
 #include "Renderer.h"
 #include "RunResources.h"
 #include "VM.h"
-#ifdef USE_LIRC
-#include "lirc.h"
-#endif
-#include "gnash.h" // Quality
-
-#include <iostream>
-
-#ifdef HAVE_VA_VA_H
-#include <va/va.h>
-#include "vaapi_utils.h"
-#endif
-#ifdef HAVE_VA_VA_X11_H
-#include <va/va_x11.h>
-#endif
-
-#ifdef HAVE_X11
-#include <X11/keysym.h>
-#include <gdk/gdkx.h>
-#include <X11/Xlib.h>
-#include <X11/extensions/Xv.h>
-#include <X11/extensions/Xvlib.h>
-#endif
-
-#include <gtk/gtk.h>
-#include <gdk/gdk.h>
-#include <gdk/gdkkeysyms.h>
-#include <string>
-
-#ifdef BUILD_CANVAS
+#include "GnashEnums.h"
 #include "gtk_canvas.h"
-#endif
-
-#ifdef HAVE_FFMPEG_AVCODEC_H
-extern "C" {
-# include "ffmpeg/avcodec.h" // Only for the version number
-}
-#endif
-
-#ifdef HAVE_LIBAVCODEC_AVCODEC_H
-extern "C" {
-# include "libavcodec/avcodec.h" // Only for the version number
-}
-#endif
-
-#ifdef HAVE_GST_GST_H
-# include "gst/gstversion.h" // Only for the version number
-#endif
-
-#ifdef GUI_HILDON
-# include <hildon/hildon.h>
-#endif
 
 #ifdef HAVE_VA_VA_H
 extern VAStatus va_getDriverName(VADisplay dpy, char **driver_name);
@@ -166,9 +138,6 @@ GtkGui::~GtkGui()
 GtkGui::GtkGui(unsigned long xid, float scale, bool loop, RunResources& r)
     :
     Gui(xid, scale, loop, r)
-#ifdef GUI_HILDON
-    ,_hildon_program(0)
-#endif
     ,_window(0)
     ,_resumeButton(0)
     ,_overlay(0)
@@ -191,10 +160,6 @@ GtkGui::init(int argc, char **argv[])
 
     gtk_init(&argc, argv);
 
-#ifdef GUI_HILDON
-    _hildon_program = hildon_program_get_instance();
-#endif
-
     addPixmapDirectory (PKGDATADIR);
 
     if (_xid) {
@@ -205,12 +170,7 @@ GtkGui::init(int argc, char **argv[])
 #endif
         log_debug (_("Created XEmbedded window"));
     } else {
-#ifdef GUI_HILDON
-        _window = hildon_window_new();
-        hildon_program_add_window(_hildon_program, HILDON_WINDOW(_window));
-#else
         _window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-#endif
         log_debug (_("Created top level window"));
     }
     
@@ -256,18 +216,11 @@ GtkGui::init(int argc, char **argv[])
         }
     }
 
-#ifdef BUILD_CANVAS
     _canvas = gnash_canvas_new();
     gnash_canvas_setup(GNASH_CANVAS(_canvas), hwaccel, renderer, argc, argv);
     // Increase reference count to prevent its destruction (which could happen
     // later if we remove it from its container).
     g_object_ref(G_OBJECT(_canvas));
-#else
-    _drawingArea = gtk_drawing_area_new();
-    // Increase reference count to prevent its destruction (which could happen
-    // later if we remove it from its container).
-    g_object_ref(G_OBJECT(_drawingArea));
-#endif
 
     _resumeButton = gtk_button_new();
     gtk_container_add(GTK_CONTAINER(_resumeButton),
@@ -288,41 +241,21 @@ GtkGui::init(int argc, char **argv[])
     gtk_widget_show(_vbox);
     gtk_container_add(GTK_CONTAINER(_window), _vbox);
 
-#if defined(USE_MENUS) && !defined(GUI_HILDON)
+#if defined(USE_MENUS) 
     if ( ! _xid ) {
         createMenuBar();
     }
 #endif
 
-#ifdef BUILD_CANVAS
     gtk_box_pack_start(GTK_BOX(_vbox), _canvas, TRUE, TRUE, 0);
-#else
-    gtk_box_pack_start(GTK_BOX(_vbox), _drawingArea, TRUE, TRUE, 0);
-#endif
 
     setupEvents();
 
     gtk_widget_realize(_window);
-#ifdef BUILD_CANVAS
     gtk_widget_show(_canvas);
-#else
-    gtk_widget_show(_drawingArea);
-#endif
     gtk_widget_show(_window);
     
-#ifdef USE_LIRC
-    lirc = new Lirc();
-    if (!lirc->init("/dev/lircd")) {
-        log_debug(_("LIRC daemon not running"));
-    }
-#endif
-
-#ifdef BUILD_CANVAS
     _renderer = gnash_canvas_get_renderer(GNASH_CANVAS(_canvas));
-#else
-    _renderer.reset(_glue->createRenderHandler());
-    if (!_renderer.get()) return false;
-#endif
     _runResources.setRenderer(_renderer);
 
     // The first time stop() was called, stopHook() might not have had a chance
@@ -718,13 +651,7 @@ GtkGui::createMenuBar()
 {
     _menubar = gtk_menu_bar_new();
     gtk_widget_show(_menubar);
-#ifdef GUI_HILDON
-//     _hildon_toolbar = create_hildon_toolbar(_hildon_program);
-//     hildon_window_add_toolbar(HILDON_WINDOW(_window),
-//                               GTK_TOOLBAR(_hildon_toolbar));
-#else
     gtk_box_pack_start(GTK_BOX(_vbox), _menubar, FALSE, FALSE, 0);
-#endif
 
     createFileMenu(_menubar);
     createEditMenu(_menubar);
@@ -774,12 +701,6 @@ GtkGui::createMenu()
     gtk_container_add(GTK_CONTAINER(_popup_menu), quit);
     g_signal_connect(quit, "activate", G_CALLBACK(menuQuit), this);
 
-#ifdef GUI_HILDON
-     hildon_window_set_menu(HILDON_WINDOW(_window),
-                               GTK_MENU(_popup_menu));
-     gtk_widget_show_all(GTK_WIDGET(_popup_menu));   
-#endif
-
     return true;
 }
 
@@ -805,12 +726,6 @@ GtkGui::createMenuAlt()
     gtk_widget_show(quit);
     gtk_container_add(GTK_CONTAINER(_popup_menu_alt), quit);
     g_signal_connect(quit, "activate", G_CALLBACK(menuQuit), this);
-
-#ifdef GUI_HILDON
-     hildon_window_set_menu(HILDON_WINDOW(_window),
-                               GTK_MENU(_popup_menu_alt));
-     gtk_widget_show_all(GTK_WIDGET(_popup_menu_alt));   
-#endif
 
     return true;
 }
@@ -864,10 +779,10 @@ GtkGui::createWindow(const char *title, int width, int height,
 
 // This creates a GtkTree model for displaying movie info.
 GtkTreeModel*
-GtkGui::makeTreeModel (std::auto_ptr<InfoTree> treepointer)
+GtkGui::makeTreeModel(std::auto_ptr<movie_root::InfoTree> treepointer)
 {
 
-    InfoTree& info = *treepointer;
+    const movie_root::InfoTree& info = *treepointer;
 
     enum
     {
@@ -877,8 +792,7 @@ GtkGui::makeTreeModel (std::auto_ptr<InfoTree> treepointer)
     };
     
     GtkTreeStore *model = gtk_tree_store_new (NUM_COLUMNS,
-                         G_TYPE_STRING,
-                         G_TYPE_STRING);
+                         G_TYPE_STRING, G_TYPE_STRING);
     
     GtkTreeIter iter;
     GtkTreeIter child_iter;
@@ -888,9 +802,10 @@ GtkGui::makeTreeModel (std::auto_ptr<InfoTree> treepointer)
     int depth = 0;    
 
     assert(info.depth(info.begin()) == 0); // seems assumed in the code below
-    for (InfoTree::iterator i=info.begin(), e=info.end(); i!=e; ++i)
-    {
-        StringPair& p = *i;
+    for (movie_root::InfoTree::iterator i = info.begin(), e = info.end();
+            i != e; ++i) {
+
+        const movie_root::InfoTree::value_type& p = *i;
 
         std::ostringstream os;
         os << info.depth(i);  
@@ -904,23 +819,23 @@ GtkGui::makeTreeModel (std::auto_ptr<InfoTree> treepointer)
         }
 
         if (newdepth < depth) {
-            int gap = depth-newdepth;
+            int gap = depth - newdepth;
             depth = newdepth;
-            while(gap--)
-            {
-                gtk_tree_model_iter_parent (GTK_TREE_MODEL(model), &parent_iter, &iter);  
+            while (gap--) {
+                gtk_tree_model_iter_parent(GTK_TREE_MODEL(model),
+                        &parent_iter, &iter);  
                 iter = parent_iter;
-        }
+            }
         }
 
         //Read in data from present node
-        if (depth == 0) gtk_tree_store_append (model, &child_iter, NULL);
-        else gtk_tree_store_append (model, &child_iter, &iter);
+        if (depth == 0) gtk_tree_store_append(model, &child_iter, NULL);
+        else gtk_tree_store_append(model, &child_iter, &iter);
 
-        gtk_tree_store_set (model, &child_iter,
-                           STRING1_COLUMN, p.first.c_str(),   // "Variable"
-                           STRING2_COLUMN, p.second.c_str(),  // "Value"
-                           -1);
+        gtk_tree_store_set(model, &child_iter,
+                          STRING1_COLUMN, p.first.c_str(),   // "Variable"
+                          STRING2_COLUMN, p.second.c_str(),  // "Value"
+                          -1);
 
     }
 
@@ -956,7 +871,7 @@ GtkGui::createWindow(int width, int height)
 void
 GtkGui::beforeRendering()
 {
-    gnash_canvas_before_rendering(GNASH_CANVAS(_canvas));
+    gnash_canvas_before_rendering(GNASH_CANVAS(_canvas), getStage());
 }
 
 void
@@ -1766,7 +1681,7 @@ GtkGui::showPropertiesDialog()
 
 #ifdef USE_SWFTREE
 
-    std::auto_ptr<InfoTree> infoptr = getMovieInfo();
+    std::auto_ptr<movie_root::InfoTree> infoptr = getMovieInfo();
 
     GtkWidget *scrollwindow1 = gtk_scrolled_window_new(0, 0);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollwindow1),
@@ -1800,8 +1715,8 @@ GtkGui::showPropertiesDialog()
     gtk_tree_view_set_headers_clickable(GTK_TREE_VIEW(treeview), TRUE);
 
     gint coloffset;
-    GtkCellRenderer *renderer;
-    GtkTreeViewColumn *column;
+    GtkCellRenderer* renderer;
+    GtkTreeViewColumn* column;
 
     // Add columns:
     
@@ -1875,12 +1790,13 @@ GtkGui::showAboutDialog()
         NULL
     };
 
-    std::string comments = _("Gnash is the GNU SWF Player based on GameSWF.");
+    std::string comments =
+        _("Gnash is the GNU SWF Player based on GameSWF.");
 
     media::MediaHandler* m = _runResources.mediaHandler();
 
     comments.append(_("\nRenderer: "));
-    comments.append(RENDERER_CONFIG);
+    comments.append(_renderer->description());
     comments.append(_("\nHardware Acceleration: "));
     comments.append(HWACCEL_CONFIG);
     comments.append(_("\nGUI: "));

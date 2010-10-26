@@ -21,6 +21,7 @@
 #define BACKEND_RENDER_HANDLER_AGG_H
 
 #include "dsodefs.h"
+#include "Renderer.h"
 
 namespace gnash {
 
@@ -37,7 +38,7 @@ public:
 
   // virtual classes should have virtual destructors
   virtual ~Renderer_agg_base() {}
-  
+
   // these methods need to be accessed from outside:
   virtual void init_buffer(unsigned char *mem, int size, int x, int y, int rowstride)=0;
 

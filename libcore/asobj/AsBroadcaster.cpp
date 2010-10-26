@@ -26,6 +26,13 @@
 #include "NativeFunction.h" 
 #include "Global_as.h"
 #include "namedStrings.h"
+#include "ObjectURI.h"
+
+//#define GNASH_DEBUG_BROADCASTER 1
+
+#ifdef GNASH_DEBUG_BROADCASTER
+# include "Stats.h"
+#endif
 
 namespace gnash {
 
@@ -42,24 +49,38 @@ namespace {
 /// Helper for notifying listeners
 namespace {
 
+#ifdef GNASH_DEBUG_BROADCASTER
+struct BroadcasterStats {
+    typedef std::map<string_table::key, unsigned long int> Stat;
+    Stat stat;
+    const string_table& _st;
+    BroadcasterStats(const string_table& st) : _st(st) {}
+    void check(string_table::key k) {
+        if ( ! (++stat[k] % 100) ) dump();
+    }
+    void dump() {
+        using namespace std;
+        typedef std::map<unsigned long int, string_table::key> Sorted;
+        Sorted sorted;
+        for (Stat::iterator i=stat.begin(), e=stat.end(); i!=e; ++i)
+            sorted[i->second] = i->first;
+        cerr << "Broadcaster stats follow:" << endl;
+        for (Sorted::reverse_iterator i=sorted.rbegin(), e=sorted.rend();
+                i!=e; ++i)
+            std::cerr
+                      << std::setw(10)
+                      << i->first
+                      << ":"
+                      << _st.value(i->second) << "("
+                      << i->second << ")"
+                      << std::endl;
+        
+    }
+};
+#endif // GNASH_DEBUG_BROADCASTER
+
 class BroadcasterVisitor
 {
-    
-    /// Name of the event being broadcasted
-    /// appropriately cased based on SWF version
-    /// of the current VM
-    std::string _eventName;
-    string_table::key _eventKey;
-
-    // These two will be needed for consistency checking
-    //size_t _origEnvStackSize;
-    //size_t _origEnvCallStackSize;
-
-    /// Number of event dispatches
-    unsigned int _dispatched;
-
-    fn_call _fn;
-
 public:
 
     /// @param eName name of event, will be converted to lowercase if needed
@@ -68,39 +89,52 @@ public:
     ///
     BroadcasterVisitor(const fn_call& fn)
         :
-        _eventName(),
-        _eventKey(0),
+        _eventURI(getStringTable(fn).find(fn.arg(0).to_string())),
         _dispatched(0),
         _fn(fn)
     {
-        _eventName = fn.arg(0).to_string();
-        _eventKey = getStringTable(fn).find(_eventName);
         _fn.drop_bottom();
     }
 
     /// Call a method on the given value
     void operator()(const as_value& v)
     {
-        boost::intrusive_ptr<as_object> o = v.to_object(getGlobal(_fn));
-        if ( ! o ) return;
 
+        as_object* o = toObject(v, getVM(_fn));
+        if (!o) return;
+
+#ifdef GNASH_DEBUG_BROADCASTER
+        static stats::KeyLookup stats("BroadcasterVisitor call operator",
+            getStringTable(_fn), 1);
+        stats.check(_eventURI.name);
+#endif
         as_value method;
-        o->get_member(_eventKey, &method);
-        _fn.super = o->get_super(_eventKey);
+        o->get_member(_eventURI, &method);
 
         if (method.is_function()) {
-            _fn.this_ptr = o.get();
+            _fn.super = o->get_super(_eventURI);
+            _fn.this_ptr = o;
             method.to_function()->call(_fn);
         }
 
         ++_dispatched;
     }
 
-    /// Return number of events dispached since last reset()
-    unsigned int eventsDispatched() const { return _dispatched; }
+    /// Return number of events dispatched.
+    size_t eventsDispatched() const { return _dispatched; }
 
-    /// Reset count od dispatched events
-    void reset() { _dispatched=0; }
+private:
+    
+    /// Name of the event being broadcasted
+    /// appropriately cased based on SWF version
+    /// of the current VM
+    const ObjectURI& _eventURI;
+
+    /// Number of event dispatches
+    size_t _dispatched;
+
+    fn_call _fn;
+
 };
 
 }
@@ -114,8 +148,8 @@ AsBroadcaster::initialize(as_object& o)
     Global_as& gl = getGlobal(o);
 
     // Find _global.AsBroadcaster.
-    as_object* asb =
-        gl.getMember(NSV::CLASS_AS_BROADCASTER).to_object(gl);
+    as_object* asb = toObject(
+            getMember(gl, NSV::CLASS_AS_BROADCASTER), getVM(o));
 
     // If it's not an object, these are left undefined, but they are
     // always attached to the initialized object.
@@ -124,8 +158,8 @@ AsBroadcaster::initialize(as_object& o)
     const int flags = as_object::DefaultFlags;
 
     if (asb) {
-        al = asb->getMember(NSV::PROP_ADD_LISTENER);
-        rl = asb->getMember(NSV::PROP_REMOVE_LISTENER);
+        al = getMember(*asb, NSV::PROP_ADD_LISTENER);
+        rl = getMember(*asb, NSV::PROP_REMOVE_LISTENER);
     }
     
     o.set_member(NSV::PROP_ADD_LISTENER, al);
@@ -214,7 +248,7 @@ asbroadcaster_initialize(const fn_call& fn)
         return as_value();
     }
 
-    boost::intrusive_ptr<as_object> tgt = tgtval.to_object(getGlobal(fn));
+    boost::intrusive_ptr<as_object> tgt = toObject(tgtval, getVM(fn));
     if ( ! tgt )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -267,7 +301,7 @@ asbroadcaster_addListener(const fn_call& fn)
         return as_value(false); 
     }
 
-    as_object* listeners = listenersValue.to_object(getGlobal(fn));
+    as_object* listeners = toObject(listenersValue, getVM(fn));
 
     // We checked is_object() above.
     assert(listeners); 
@@ -312,7 +346,7 @@ asbroadcaster_removeListener(const fn_call& fn)
         return as_value(false); // TODO: check this
     }
 
-    as_object* listeners = listenersValue.to_object(getGlobal(fn));
+    as_object* listeners = toObject(listenersValue, getVM(fn));
     assert(listeners);
 
     as_value listenerToRemove; 
@@ -324,15 +358,16 @@ asbroadcaster_removeListener(const fn_call& fn)
     
     // This is an ActionScript-like implementation, which is why it looks
     // like poor C++.
-    const int length = toInt(listeners->getMember(NSV::PROP_LENGTH));
+    const int length = toInt(getMember(*listeners, NSV::PROP_LENGTH),
+            getVM(fn));
     int i = 0;
     string_table& st = getStringTable(fn);
 
     while (i < length) {
         std::ostringstream s;
         s << i;
-        as_value el = listeners->getMember(st.find(s.str()));
-        if (el.equals(listenerToRemove)) {
+        as_value el = getMember(*listeners, st.find(s.str()));
+        if (equals(el, listenerToRemove, getVM(fn))) {
             callMethod(listeners, NSV::PROP_SPLICE, s.str(), 1);
             return as_value(true);
         }
@@ -375,7 +410,7 @@ asbroadcaster_broadcastMessage(const fn_call& fn)
         return as_value(); // TODO: check this
     }
 
-    as_object* listeners = listenersValue.to_object(getGlobal(fn));
+    as_object* listeners = toObject(listenersValue, getVM(fn));
 
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(

@@ -31,6 +31,7 @@
 #include "PropFlags.h"
 #include "ManualClock.h"
 #include "RunResources.h"
+#include "StreamProvider.h"
 
 #include <iostream>
 #include <sstream>
@@ -64,11 +65,10 @@ main(int /*argc*/, char** /*argv*/)
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity();
 
-	// Initialize gnash lib
-	gnashInit();
-
     // We don't care about the base URL.
-    RunResources runResources("");
+    RunResources runResources;
+    runResources.setStreamProvider(
+            boost::shared_ptr<StreamProvider>(new StreamProvider(URL(""))));
 	
     boost::intrusive_ptr<movie_definition> md5(
             new DummyMovieDefinition(runResources, 5));
@@ -90,8 +90,8 @@ main(int /*argc*/, char** /*argv*/)
 
 	log_debug("VM version %d", vm.getSWFVersion());
 
-	as_object obj(getGlobal(vm));
-	PropertyList props(obj);
+	as_object* obj = new as_object(getGlobal(vm));
+	PropertyList props(*obj);
 
 	as_value val("value");
 	as_value val2("value2");
@@ -106,22 +106,22 @@ main(int /*argc*/, char** /*argv*/)
 		check ( props.setValue(st.find("Var0"), val) );
 		check_equals(props.size(), 1);
 
-		check (getVal(props, st.find("Var0"), ret, obj) );
+		check (getVal(props, st.find("Var0"), ret, *obj) );
 		check_strictly_equals ( ret, val );
 
 		// search should be case-sensitive
-		check (!getVal(props, st.find("var0"), ret, obj) );
+		check (!getVal(props, st.find("var0"), ret, *obj) );
 
 		// new value overrides existing value
 		check ( props.setValue(st.find("Var0"), val2) );
 		check_equals(props.size(), 1);
-		check (getVal(props, st.find("Var0"), ret, obj) );
+		check (getVal(props, st.find("Var0"), ret, *obj) );
 		check_strictly_equals ( ret, val2 );
 
 		// case-sensitive setting value doesn't overrides existing value
 		check ( props.setValue(st.find("var0"), val3) );
 		check_equals(props.size(), 2);
-		check (!getVal(props, st.find("vAr0"), ret, obj) );
+		check (!getVal(props, st.find("vAr0"), ret, *obj) );
 
 		// Now add some new labels
 		check ( props.setValue(st.find("var1"), val) );
@@ -160,23 +160,23 @@ main(int /*argc*/, char** /*argv*/)
 		check ( props.setValue(st.find("Var0"), val) );
 		check_equals(props.size(), 1);
 
-		check (getVal(props, st.find("Var0"), ret, obj) );
+		check (getVal(props, st.find("Var0"), ret, *obj) );
 		check_strictly_equals ( ret, val );
 
 		// search should be case-insensitive
-		check (getVal(props, st.find("var0"), ret, obj) );
+		check (getVal(props, st.find("var0"), ret, *obj) );
 		check_strictly_equals ( ret, val );
 
 		// new value overrides existing value
 		check ( props.setValue(st.find("Var0"), val2) );
 		check_equals(props.size(), 1);
-		check (getVal(props, st.find("Var0"), ret, obj) );
+		check (getVal(props, st.find("Var0"), ret, *obj) );
 		check_strictly_equals ( ret, val2 );
 
 		// case-insensitive setting value should override existing value
 		check ( props.setValue(st.find("var0"), val3) );
 		check_equals(props.size(), 1);
-		check (getVal(props, st.find("vAr0"), ret, obj) );
+		check (getVal(props, st.find("vAr0"), ret, *obj) );
 		check_strictly_equals ( ret, val3 );
 
 		// Now add some new labels

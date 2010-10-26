@@ -133,10 +133,9 @@ Function::call(const fn_call& fn)
 
     // Add 'arguments'
     as_object* args = getGlobal(fn).createArray();
-    string_table& st = getStringTable(fn);
 
     // Put 'arguments' in a local var.
-    setLocal(cf, st.find("arguments"), getArguments(*this, *args, fn, caller));
+    setLocal(cf, NSV::PROP_ARGUMENTS, getArguments(*this, *args, fn, caller));
 
 	// Execute the actions.
 	// Do this in a try block to proper drop the pushed call frame 
@@ -172,7 +171,7 @@ Function::markReachableResources() const
 	_env.markReachableResources();
 
 	// Invoke parent class marker
-	markAsObjectReachable(); 
+    as_object::markReachableResources(); 
 }
 
 as_object*

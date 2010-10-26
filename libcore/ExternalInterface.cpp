@@ -18,18 +18,20 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "ExternalInterface.h"
+
 #include <map>
 #include <vector>
 #include <sstream>
-#include <sys/ioctl.h>
-#include <sys/types.h>
 #include <boost/algorithm/string/erase.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_array.hpp>
 #include <algorithm>
 
+#include "GnashSystemNetHeaders.h"
+#include "GnashSystemFDHeaders.h"
+
 #include "StringPredicates.h"
-#include "ExternalInterface.h"
 #include "fn_call.h"
 #include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
@@ -41,96 +43,59 @@
 #include "Array_as.h"
 #include "namedStrings.h"
 #include "Global_as.h"
-#include "Globals.h"
 #include "PropertyList.h"
 #include "movie_root.h"
 #include "log.h"
 
 namespace gnash {
 
-/// Class used to serialize properties of an object to a buffer
-class PropsSerializer : public AbstractPropertyVisitor
+namespace {
+
+class Enumerator : public KeyVisitor
 {
-
 public:
-    
-    PropsSerializer(VM& vm)
-        : _st(vm.getStringTable()),
-          _error(false)
-        { /* do nothing */}
-    
-    bool success() const { return !_error; }
-
-    bool accept(const ObjectURI& uri, const as_value& val) {
-        if (_error) return true;
-
-        const string_table::key key = getName(uri);
-
-        if (key == NSV::PROP_uuPROTOuu || key == NSV::PROP_CONSTRUCTOR) {
-            log_debug(" skip serialization of specially-named property %s",
-                      _st.value(key));
-            return true;
-        }
-
-        // write property name
-        const std::string& id = _st.value(key);
-
-//        log_debug(" serializing property %s", id);
-        
-        _xml << "<property id=\"" << id << "\">";
-        _xml << ExternalInterface::toXML(val);
-        _xml << "</property>";
-
-        _noprops.push_back(val);
-            
-        return true;
+    Enumerator(std::vector<ObjectURI>& uris) : _uris(uris) {}
+    void operator()(const ObjectURI& u) {
+        _uris.push_back(u);
     }
-
-    std::string getXML() { return _xml.str(); };
-    std::vector<as_value> getArgs() { return _noprops; };
-    
 private:
-    string_table&       _st;
-    mutable bool        _error;
-    std::stringstream   _xml;
-    std::vector<as_value>   _noprops;
+    std::vector<ObjectURI>& _uris;
 };
 
-#if 0
-class ExternalExecutor: public movie_root::AbstractExternalCallback {
-public:
-	void notify()
-	{
-	    log_debug(_("external_callback()"));
-	}
-};
-#endif
+}
 
 /// Convert an AS object to an XML string.
 std::string
-ExternalInterface::objectToXML(as_object *obj)
+ExternalInterface::_objectToXML(as_object *obj)
 {
     // GNASH_REPORT_FUNCTION;
+
+    if ( ! _visited.insert(obj).second ) { 
+        return "<circular/>";
+    }
     
     std::stringstream ss;
 
-    if (obj == 0) {
-        //log_error("Need a valid AS Object!");
-        return ss.str();
+    ss << "<object>";
+
+    if (obj) {
+        // Get all the properties
+        VM& vm = getVM(*obj);
+        string_table& st = vm.getStringTable();
+        typedef std::vector<ObjectURI> URIs;
+        URIs uris;
+        Enumerator en(uris);
+        obj->visitKeys(en);
+        for (URIs::const_reverse_iterator i = uris.rbegin(), e = uris.rend();
+                i != e; ++i) {
+            as_value val = getMember(*obj, *i); 
+            const std::string& id = i->toString(st);
+            ss << "<property id=\"" << id << "\">";
+            ss << _toXML(val);
+            ss << "</property>";
+        }
     }
 
-    VM& vm = getVM(*obj);
-    
-    ss << "<object>";
-    
-    // Get all the properties
-    PropsSerializer props(vm);
-    obj->visitProperties<IsEnumerable>(props);
-    if (!props.success()) {
-        log_error("Could not serialize object");
-    } else {
-        std::vector<as_value> properties = props.getArgs();
-    }
     ss << "</object>";
     
     return ss.str();
@@ -138,33 +103,7 @@ ExternalInterface::objectToXML(as_object *obj)
 
 /// Convert an AS object to an XML string.
 std::string
-ExternalInterface::arrayToXML(as_object *obj)
-{
-    // GNASH_REPORT_FUNCTION;
-    std::stringstream ss;
-    if (obj == 0) {
-        //log_error("Need a valid AS Object!");
-        return ss.str();
-    }
-
-    VM& vm = getVM(*obj);    
-    
-    ss << "<array>";
-    PropsSerializer props(vm);
-    obj->visitProperties<IsEnumerable>(props);
-    if (!props.success()) {
-        log_error("Could not serialize object");
-    }
-    ss << props.getXML();
-    
-    ss << "</array>";
-    
-    return ss.str();
-}
-
-/// Convert an AS object to an XML string.
-std::string
-ExternalInterface::toXML(const as_value &val)
+ExternalInterface::_toXML(const as_value &val)
 {
     // GNASH_REPORT_FUNCTION;
     
@@ -183,14 +122,14 @@ ExternalInterface::toXML(const as_value &val)
     } else if (val.is_exception()) {
         ss << "<exception>" << val.to_string()<< "</exception>";
     } else if (val.is_bool()) {
-        ss << (val.to_bool() ? "<true/>" : "<false/>");
+        ss << (val.to_bool(8) ? "<true/>" : "<false/>");
         // Function also isn't listed, but it's the only other type
         // supported by as_value, so leaving it out doesn't seem right.
     } else if (val.is_function()) {
         ss << "<function>" << val.to_string() << "</function>";
     } else if (val.is_object()) {
-//        as_object *obj = (as_object *)&val;
-//         ss << "<object></object>";
+        as_object *obj = val.get_object();
+        ss << _objectToXML(obj);
     } else {
         log_error("Can't convert unknown type %d", val.to_string());
     }
@@ -263,24 +202,6 @@ ExternalInterface::toAS(Global_as& /*gl*/, const std::string &xml)
     return val;
 }
 
-as_value
-ExternalInterface::argumentsToXML(std::vector<as_value> &args)
-{
-    // GNASH_REPORT_FUNCTION;
-
-    std::vector<as_value>::iterator it;
-    std::stringstream ss;
-
-    ss << "<arguments>";
-    for (it=args.begin(); it != args.end(); it++) {
-        as_value val = *it;
-        ss << toXML(val);
-    }
-    ss << "</arguments>";
-    
-    return as_value(ss.str());
-}
-
 std::map<std::string, as_value>
 ExternalInterface::propertiesToAS(Global_as& gl, std::string &xml)
 {
@@ -347,11 +268,7 @@ ExternalInterface::ExternalEventCheck(int fd)
 #endif
         
         int bytes = 0;
-#ifndef _WIN32
-        ioctl(fd, FIONREAD, &bytes);
-#else
         ioctlSocket(fd, FIONREAD, &bytes);
-#endif
         if (bytes == 0) {
             return error;
         }
@@ -361,7 +278,7 @@ ExternalInterface::ExternalEventCheck(int fd)
         // some memory to read the data.
         // terminate incase we want to treat the data like a string.
         buffer[bytes+1] = 0;
-        int ret = ::read(fd, buffer.get(), bytes);
+        const int ret = ::read(fd, buffer.get(), bytes);
         if (ret) {
             return parseInvoke(buffer.get());
         }
@@ -516,7 +433,8 @@ ExternalInterface::makeInvoke (const std::string &method,
     ss << "<invoke name=\"" << method << "\" returntype=\"xml\">";
     ss << "<arguments>";
     for (it=args.begin(); it != args.end(); ++it) {
-        ss << ExternalInterface::toXML(*it);
+        // Should we avoid re-serializing the same object ?
+        ss << toXML(*it);
     }
     
     ss << "</arguments>";
@@ -663,6 +581,7 @@ ExternalInterface::readBrowser(int fd)
     std::string empty;
     // Wait for some data from the player
     int bytes = 0;
+
     fd_set fdset;
     FD_ZERO(&fdset);
     FD_SET(fd, &fdset);
@@ -670,13 +589,9 @@ ExternalInterface::readBrowser(int fd)
     tval.tv_sec = 10;
     tval.tv_usec = 0;
     // log_debug("Waiting for data... ");
-    if (select(fd+1, &fdset, NULL, NULL, &tval)) {
+    if (::select(fd + 1, &fdset, NULL, NULL, &tval)) {
         // log_debug("There is data in the network");
-#ifndef _WIN32
-        ioctl(fd, FIONREAD, &bytes);
-#else
         ioctlSocket(fd, FIONREAD, &bytes);
-#endif
     }  
 
     // No data yet
@@ -688,7 +603,7 @@ ExternalInterface::readBrowser(int fd)
 
     std::string buf(bytes, '\0');
 
-    int ret = ::read(fd, &buf[0], bytes);
+    const int ret = ::read(fd, &buf[0], bytes);
     if (ret <= 0) {
         return empty;
     }

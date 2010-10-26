@@ -18,24 +18,38 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h" // GNASH_STATS_PROPERTY_LOOKUPS
+#endif
+
 #include "PropertyList.h"
+
+#include <utility> 
+#include <boost/bind.hpp> 
+#include <boost/tuple/tuple.hpp>
+
 #include "Property.h" 
 #include "as_environment.h"
 #include "log.h"
 #include "as_function.h"
-#include "as_value.h" // for enumerateValues
-#include "VM.h" // For string_table
+#include "as_value.h" 
+#include "VM.h" 
 #include "string_table.h"
 #include "GnashAlgorithm.h"
-
-#include <utility> // for std::make_pair
-#include <boost/bind.hpp> 
 
 // Define the following to enable printing address of each property added
 //#define DEBUG_PROPERTY_ALLOC
 
 // Define this to get verbosity of properties insertion and flags setting
 //#define GNASH_DEBUG_PROPERTY 1
+
+// Define this to get stats of property lookups 
+//#define GNASH_STATS_PROPERTY_LOOKUPS 1
+
+#ifdef GNASH_STATS_PROPERTY_LOOKUPS
+# include "Stats.h"
+# include "namedStrings.h"
+#endif
 
 namespace gnash {
 
@@ -45,18 +59,35 @@ inline
 PropertyList::const_iterator
 iterator_find(const PropertyList::container& p, const ObjectURI& uri, VM& vm)
 {
-    
     const bool caseless = vm.getSWFVersion() < 7;
 
     if (!caseless) {
-        return p.project<0>(p.get<1>().find(uri));
+        return p.project<PropertyList::CreationOrder>(
+                p.get<PropertyList::Case>().find(uri));
     }
         
-    string_table& st = vm.getStringTable();
-    const string_table::key nocase = st.noCase(uri.name);
-    return p.project<0>(p.get<2>().find(nocase));
+    return p.project<PropertyList::CreationOrder>(
+            p.get<PropertyList::NoCase>().find(uri));
 }
 
+}
+    
+PropertyList::PropertyList(as_object& obj)
+    :
+    _props(boost::make_tuple(
+                boost::tuple<>(),
+                boost::make_tuple(
+                    KeyExtractor(),
+                    ObjectURI::LessThan()
+                ),
+                boost::make_tuple(
+                    KeyExtractor(),
+                    ObjectURI::CaseLessThan(getStringTable(obj), true)
+                )
+            )
+        ),
+    _owner(obj)
+{
 }
 
 bool
@@ -65,14 +96,11 @@ PropertyList::setValue(const ObjectURI& uri, const as_value& val,
 {
 	const_iterator found = iterator_find(_props, uri, getVM(_owner));
 	
-    string_table& st = getStringTable(_owner);
-
-	if (found == _props.end())
-	{
+	if (found == _props.end()) {
 		// create a new member
 		Property a(uri, val, flagsIfMissing);
 		// Non slot properties are negative ordering in insertion order
-		_props.push_back(std::make_pair(a, st.noCase(uri.name)));
+		_props.push_back(a);
 #ifdef GNASH_DEBUG_PROPERTY
         ObjectURI::Logger l(getStringTable(_owner));
 		log_debug("Simple AS property %s inserted with flags %s",
@@ -81,9 +109,8 @@ PropertyList::setValue(const ObjectURI& uri, const as_value& val,
 		return true;
 	}
 
-	const Property& prop = found->first;
-	if (readOnly(prop) && ! prop.isDestructive())
-	{
+	const Property& prop = *found;
+	if (readOnly(prop)) {
         ObjectURI::Logger l(getStringTable(_owner));
 		log_error(_("Property %s is read-only %s, not setting it to %s"), 
 			l(uri), prop.getFlags(), val);
@@ -100,9 +127,9 @@ PropertyList::setFlags(const ObjectURI& uri, int setFlags, int clearFlags)
 {
 	iterator found = iterator_find(_props, uri, getVM(_owner));
 	if (found == _props.end()) return;
-    PropFlags f = found->first.getFlags();
+    PropFlags f = found->getFlags();
     f.set_flags(setFlags, clearFlags);
-	found->first.setFlags(f);
+	found->setFlags(f);
 
 }
 
@@ -110,18 +137,25 @@ void
 PropertyList::setFlagsAll(int setFlags, int clearFlags)
 {
     for (const_iterator it = _props.begin(); it != _props.end(); ++it) {
-        PropFlags f = it->first.getFlags();
+        PropFlags f = it->getFlags();
         f.set_flags(setFlags, clearFlags);
-        it->first.setFlags(f);
+        it->setFlags(f);
     }
 }
 
 Property*
 PropertyList::getProperty(const ObjectURI& uri) const
 {
+#ifdef GNASH_STATS_PROPERTY_LOOKUPS
+    // HINT: can add a final arg to KeyLookup ctor, like NSV::PROP_ON_MOUSE_MOVE
+    //       to have *that* property lookup drive dump triggers
+    static stats::KeyLookup kcl("getProperty",
+        getStringTable(_owner), 10000000, NSV::PROP_uuPROTOuu, 10);
+    kcl.check(uri.name);
+#endif // GNASH_STATS_PROPERTY_LOOKUPS
 	iterator found = iterator_find(_props, uri, getVM(_owner));
 	if (found == _props.end()) return 0;
-	return const_cast<Property*>(&(found->first));
+	return const_cast<Property*>(&(*found));
 }
 
 std::pair<bool,bool>
@@ -134,7 +168,7 @@ PropertyList::delProperty(const ObjectURI& uri)
 	}
 
 	// check if member is protected from deletion
-	if (found->first.getFlags().get_dont_delete()) {
+	if (found->getFlags().get_dont_delete()) {
 		return std::make_pair(true, false);
 	}
 
@@ -143,34 +177,19 @@ PropertyList::delProperty(const ObjectURI& uri)
 }
 
 void
-PropertyList::dump(std::map<std::string, as_value>& to) 
-{
-    ObjectURI::Logger l(getStringTable(_owner));
-
-	for (const_iterator i=_props.begin(), ie=_props.end();
-            i != ie; ++i)
-	{
-		to.insert(std::make_pair(l(i->first.uri()), i->first.getValue(_owner)));
-	}
-}
-
-void
-PropertyList::enumerateKeys(as_environment& env, PropertyTracker& donelist)
+PropertyList::visitKeys(KeyVisitor& visitor, PropertyTracker& donelist)
     const
 {
-	string_table& st = getStringTable(_owner);
-
     // We should enumerate in order of creation, not lexicographically.
 	for (const_iterator i = _props.begin(),
             ie = _props.end(); i != ie; ++i) {
 
-		if (i->first.getFlags().get_dont_enum()) continue;
+		if (i->getFlags().get_dont_enum()) continue;
 
-        const ObjectURI& uri = i->first.uri();
+        const ObjectURI& uri = i->uri();
 
 		if (donelist.insert(uri).second) {
-            const std::string& qname = st.value(getName(uri));
-			env.push(qname);
+			visitor(uri);
 		}
 	}
 }
@@ -181,7 +200,7 @@ PropertyList::dump()
     ObjectURI::Logger l(getStringTable(_owner));
 	for (const_iterator it=_props.begin(), itEnd=_props.end();
             it != itEnd; ++it) {
-		log_debug("  %s: %s", l(it->first.uri()), it->first.getValue(_owner));
+		log_debug("  %s: %s", l(it->uri()), it->getValue(_owner));
 	}
 }
 
@@ -193,13 +212,11 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_function& getter,
 	Property a(uri, &getter, setter, flagsIfMissing);
 	iterator found = iterator_find(_props, uri, getVM(_owner));
     
-    string_table& st = getStringTable(_owner);
-	if (found != _props.end())
-	{
+	if (found != _props.end()) {
 		// copy flags from previous member (even if it's a normal member ?)
-		a.setFlags(found->first.getFlags());
-		a.setCache(found->first.getCache());
-		_props.replace(found, std::make_pair(a, st.noCase(uri.name)));
+		a.setFlags(found->getFlags());
+		a.setCache(found->getCache());
+		_props.replace(found, a);
 
 #ifdef GNASH_DEBUG_PROPERTY
         ObjectURI::Logger l(getStringTable(_owner));
@@ -208,10 +225,9 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_function& getter,
 #endif
 
 	}
-	else
-	{
+	else {
 		a.setCache(cacheVal);
-		_props.push_back(std::make_pair(a, st.noCase(uri.name)));
+		_props.push_back(a);
 #ifdef GNASH_DEBUG_PROPERTY
         ObjectURI::Logger l(getStringTable(_owner));
 		log_debug("AS GetterSetter %s inserted with flags %s", l(uri),
@@ -228,13 +244,12 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_c_function_ptr getter,
 {
 	Property a(uri, getter, setter, flagsIfMissing);
 
-    string_table& st = getStringTable(_owner);
 	const_iterator found = iterator_find(_props, uri, getVM(_owner));
 	if (found != _props.end())
 	{
 		// copy flags from previous member (even if it's a normal member ?)
-		a.setFlags(found->first.getFlags());
-		_props.replace(found, std::make_pair(a, st.noCase(uri.name)));
+		a.setFlags(found->getFlags());
+		_props.replace(found, a);
 
 #ifdef GNASH_DEBUG_PROPERTY
         ObjectURI::Logger l(getStringTable(_owner));
@@ -245,7 +260,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_c_function_ptr getter,
 	}
 	else
 	{
-		_props.push_back(std::make_pair(a, st.noCase(uri.name)));
+		_props.push_back(a);
 #ifdef GNASH_DEBUG_PROPERTY
 		string_table& st = getStringTable(_owner);
 		log_debug("Native GetterSetter %s in namespace %s inserted with "
@@ -269,11 +284,10 @@ PropertyList::addDestructiveGetter(const ObjectURI& uri, as_function& getter,
 		return false; // Already exists.
 	}
 
-	// destructive getter don't need a setter
-	Property a(uri, &getter, (as_function*)0, flagsIfMissing, true);
+	// destructive getter doesn't need a setter
+	Property a(uri, &getter, 0, flagsIfMissing, true);
 
-    string_table& st = getStringTable(_owner);
-	_props.push_back(std::make_pair(a, st.noCase(uri.name)));
+	_props.push_back(a);
 
 #ifdef GNASH_DEBUG_PROPERTY
     ObjectURI::Logger l(getStringTable(_owner));
@@ -291,10 +305,9 @@ PropertyList::addDestructiveGetter(const ObjectURI& uri,
 	iterator found = iterator_find(_props, uri, getVM(_owner));
 	if (found != _props.end()) return false; 
 
-	// destructive getter don't need a setter
-	Property a(uri, getter, (as_c_function_ptr)0, flagsIfMissing, true);
-    string_table& st = getStringTable(_owner);
-	_props.push_back(std::make_pair(a, st.noCase(uri.name)));
+	// destructive getter doesn't need a setter
+	Property a(uri, getter, 0, flagsIfMissing, true);
+	_props.push_back(a);
 
 #ifdef GNASH_DEBUG_PROPERTY
     ObjectURI::Logger l(getStringTable(_owner));
@@ -308,13 +321,6 @@ void
 PropertyList::clear()
 {
 	_props.clear();
-}
-
-void
-PropertyList::setReachable() const
-{
-    foreachFirst(_props.begin(), _props.end(),
-            boost::mem_fn(&Property::setReachable));
 }
 
 } // namespace gnash

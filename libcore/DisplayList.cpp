@@ -24,6 +24,7 @@
 #include "Renderer.h"
 #include "StringPredicates.h"
 #include "MovieClip.h"
+#include "ObjectURI.h"
 
 #include <typeinfo>
 #include <iostream>
@@ -45,15 +46,11 @@ namespace {
     DisplayList::const_iterator beginNonRemoved(
             const DisplayList::container_type& c);
 
-	/// Return an iterator succeeding the last element in zone
-    /// (-16384, 0xffff-16384)
+    /// Return the first element in the DisplayList whose depth exceeds
+    /// 65535 (-16384).
     DisplayList::iterator dlistTagsEffectiveZoneEnd(
             DisplayList::container_type& c);
 	
-	/// Return an constant iterator succeeding the last element
-    /// in (-16384, 0xffff-16384)
-    DisplayList::const_iterator dlistTagsEffectiveZoneEnd(
-            const DisplayList::container_type& c);
 }
 
 /// Anonymous namespace for generic algorithm functors.
@@ -65,25 +62,25 @@ public:
 
     DepthEquals(int depth) : _depth(depth) {}
 
-    bool operator() (const DisplayObject* item) {
+    bool operator() (const DisplayObject* item) const {
         if (!item) return false;
         return item->get_depth() == _depth;
     }
 
 private:
-    int _depth;
+    const int _depth;
 };
 
 struct DepthGreaterThan
 {
-    bool operator()(const DisplayObject* a, const DisplayObject* b) {
+    bool operator()(const DisplayObject* a, const DisplayObject* b) const {
         return a->get_depth() > b->get_depth();
     }
 };
 
 struct DepthLessThan
 {
-    bool operator()(const DisplayObject* a, const DisplayObject* b) {
+    bool operator()(const DisplayObject* a, const DisplayObject* b) const {
         return a->get_depth() < b->get_depth();
     }
 };
@@ -94,23 +91,22 @@ public:
 
     DepthGreaterOrEqual(int depth) : _depth(depth) {}
 
-    bool operator() (const DisplayObject* item) {
+    bool operator() (const DisplayObject* item) const {
         if (!item) return false;
         return item->get_depth() >= _depth;
     }
 private:
-    int _depth;
+    const int _depth;
 };
 
 
 class NameEquals
 {
 public:
-    NameEquals(string_table& st, string_table::key name, bool caseless)
+    NameEquals(string_table& st, const ObjectURI& uri, bool caseless)
         :
-        _st(st),
-        _caseless(caseless),
-        _name(caseless ? _st.noCase(name) : name)
+        _ce(st, caseless),
+        _name(uri)
     {}
 
     bool operator() (const DisplayObject* item) {
@@ -123,17 +119,12 @@ public:
         // destroyed DisplayObjects in the DisplayList.
         if (item->isDestroyed()) return false;
         
-        const string_table::key itname =
-            _caseless ? _st.noCase(item->get_name()) : item->get_name();
-
-        return itname == _name;
-
+        return _ce(item->get_name(), _name);
     }
 
 private:
-    string_table& _st;
-    const bool _caseless;
-    const string_table::key _name;
+    const ObjectURI::CaseEquals _ce;
+    const ObjectURI& _name;
 };
 
 } // anonymous namespace
@@ -149,7 +140,7 @@ DisplayList::getNextHighestDepth() const
 
         DisplayObject* ch = *it;
 
-        int chdepth = ch->get_depth();
+        const int chdepth = ch->get_depth();
         if (chdepth >= nexthighestdepth) {
             nexthighestdepth = chdepth+1;
         }
@@ -183,7 +174,7 @@ DisplayList::getDisplayObjectAtDepth(int depth) const
 
 
 DisplayObject*
-DisplayList::getDisplayObjectByName(string_table& st, string_table::key name,
+DisplayList::getDisplayObjectByName(string_table& st, const ObjectURI& uri,
         bool caseless) const
 {
     testInvariant();
@@ -191,7 +182,7 @@ DisplayList::getDisplayObjectByName(string_table& st, string_table::key name,
     const container_type::const_iterator e = _charsByDepth.end();
 
     container_type::const_iterator it =
-        std::find_if(_charsByDepth.begin(), e, NameEquals(st, name, caseless));
+        std::find_if(_charsByDepth.begin(), e, NameEquals(st, uri, caseless));
 
     if (it == e) return 0;
     
@@ -241,7 +232,7 @@ DisplayList::placeDisplayObject(DisplayObject* ch, int depth)
 void
 DisplayList::add(DisplayObject* ch, bool replace)
 {
-    int depth = ch->get_depth();
+    const int depth = ch->get_depth();
 
     container_type::iterator it =
         std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
@@ -281,13 +272,13 @@ DisplayList::replaceDisplayObject(DisplayObject* ch, int depth,
         InvalidatedRanges old_ranges;
     
         if (use_old_cxform) {
-            // Use the cxform from the old DisplayObject.
-            ch->set_cxform(oldch->get_cxform());
+            // Use the SWFCxForm from the old DisplayObject.
+            ch->setCxForm(getCxForm(*oldch));
         }
 
         if (use_old_matrix) {
             // Use the SWFMatrix from the old DisplayObject.
-            ch->setMatrix(oldch->getMatrix(), true); 
+            ch->setMatrix(getMatrix(*oldch), true); 
         }
         
         // remember bounds of old char
@@ -320,7 +311,7 @@ DisplayList::replaceDisplayObject(DisplayObject* ch, int depth,
 // Updates the transform properties of the DisplayObject at
 // the specified depth.
 void
-DisplayList::moveDisplayObject( int depth, const cxform* color_xform,
+DisplayList::moveDisplayObject( int depth, const SWFCxForm* color_xform,
         const SWFMatrix* mat, int* ratio, int* /* clip_depth */)
 {
     testInvariant();
@@ -347,7 +338,7 @@ DisplayList::moveDisplayObject( int depth, const cxform* color_xform,
         return;
     }
 
-    if (color_xform) ch->set_cxform(*color_xform);
+    if (color_xform) ch->setCxForm(*color_xform);
     if (mat) ch->setMatrix(*mat, true);
     if (ratio) ch->set_ratio(*ratio);
 
@@ -631,7 +622,7 @@ DisplayList::destroy()
 // Display the referenced DisplayObjects. Lower depths
 // are obscured by higher depths.
 void
-DisplayList::display(Renderer& renderer)
+DisplayList::display(Renderer& renderer, const Transform& base)
 {
     testInvariant();
 
@@ -645,24 +636,6 @@ DisplayList::display(Renderer& renderer)
         DisplayObject* ch = *it;
         assert(!ch->isDestroyed());
 
-        DisplayObject* mask = ch->getMask();
-        if (mask && ch->visible() && ! mask->unloaded())
-        {
-            renderer.begin_submit_mask();
-            
-            if (mask->boundsInClippingArea(renderer)) mask->display(renderer);
-            else mask->omit_display();
-              
-            renderer.end_submit_mask();
-            
-            if (ch->boundsInClippingArea(renderer)) ch->display(renderer);
-            else ch->omit_display();
-              
-            renderer.disable_mask();
-            
-            continue;
-        }
-
         // Don't display dynamic masks
         if (ch->isDynamicMask()) continue;
 
@@ -672,12 +645,12 @@ DisplayList::display(Renderer& renderer)
         // Characters acting as masks should always be rendered to the
         // mask buffer despite their visibility.
         //
-        DisplayObject* parent = ch->get_parent();
+        DisplayObject* p = ch->parent();
         bool renderAsMask = ch->isMaskLayer();
 
-        while (!renderAsMask && parent) {
-            renderAsMask = parent->isMaskLayer();
-            parent = parent->get_parent();
+        while (!renderAsMask && p) {
+            renderAsMask = p->isMaskLayer();
+            p = p->parent();
         }
         
         // check for non-mask hiden DisplayObjects
@@ -687,7 +660,7 @@ DisplayList::display(Renderer& renderer)
             continue;
         }
     
-        int depth = ch->get_depth();
+        const int depth = ch->get_depth();
         // Discard useless masks
         while (!clipDepthStack.empty() && (depth > clipDepthStack.top())) {
             clipDepthStack.pop();
@@ -696,12 +669,14 @@ DisplayList::display(Renderer& renderer)
 
         // Push a new mask to the masks stack
     	if (ch->isMaskLayer()) {
-            int clipDepth = ch->get_clip_depth();
+            const int clipDepth = ch->get_clip_depth();
             clipDepthStack.push(clipDepth);
             renderer.begin_submit_mask();
         }
         
-        if (ch->boundsInClippingArea(renderer)) ch->display(renderer);
+        if (ch->boundsInClippingArea(renderer)) {
+            ch->display(renderer, base);
+        }
         else ch->omit_display();
         
         // Notify the renderer that mask drawing has finished.
@@ -732,6 +707,11 @@ DisplayList::dump() const
 {
     //testInvariant();
 
+    if ( _charsByDepth.empty() ) return;
+
+    string_table& st = getStringTable(*getObject(_charsByDepth.front()));
+    ObjectURI::Logger l(st);
+
     int num=0;
     for (const_iterator it = _charsByDepth.begin(),
             endIt = _charsByDepth.end(); it != endIt; ++it) {
@@ -739,7 +719,7 @@ DisplayList::dump() const
         const DisplayObject* dobj = *it;
         log_debug(_("Item %d(%s) at depth %d (char name %s, type %s)"
                     "Destroyed: %s, unloaded: %s"),
-            num, dobj, dobj->get_depth(), dobj->get_name(), typeName(*dobj),
+            num, dobj, dobj->get_depth(), l.debug(dobj->get_name()), typeName(*dobj),
             dobj->isDestroyed(), dobj->unloaded());
         num++;
     }
@@ -875,13 +855,7 @@ DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 }
 
 void
-DisplayList::sort()
-{
-    _charsByDepth.sort(DepthLessThan());
-}
-
-void
-DisplayList::mergeDisplayList(DisplayList & newList)
+DisplayList::mergeDisplayList(DisplayList& newList)
 {
     testInvariant();
 
@@ -889,13 +863,17 @@ DisplayList::mergeDisplayList(DisplayList & newList)
     iterator itNew = beginNonRemoved(newList._charsByDepth);
 
     iterator itOldEnd = dlistTagsEffectiveZoneEnd(_charsByDepth);
-    iterator itNewEnd = newList._charsByDepth.end(); 
-    assert(itNewEnd == dlistTagsEffectiveZoneEnd(newList._charsByDepth) );
+
+    // There used to be an assertion here that no character in the new list
+    // is at depth 65535 or higher. There's no reason why the tags executed
+    // on the new list shouldn't do this though. Bug #29282 does this.
+    // TODO: check whether we should be ignoring that character.
+    iterator itNewEnd = dlistTagsEffectiveZoneEnd(newList._charsByDepth); 
 
     // step1. 
     // starting scanning both lists.
-    while (itOld != itOldEnd)
-    {
+    while (itOld != itOldEnd) {
+
         iterator itOldBackup = itOld;
         
         DisplayObject* chOld = *itOldBackup;
@@ -947,8 +925,8 @@ DisplayList::mergeDisplayList(DisplayList & newList)
                     // replace the transformation SWFMatrix if the old
                     // DisplayObject accepts static transformation.
                     if (chOld->get_accept_anim_moves()) {
-                        chOld->setMatrix(chNew->getMatrix(), true); 
-                        chOld->set_cxform(chNew->get_cxform());
+                        chOld->setMatrix(getMatrix(*chNew), true); 
+                        chOld->setCxForm(getCxForm(*chNew));
                     }
                     chNew->unload();
                     chNew->destroy();
@@ -1066,14 +1044,6 @@ DisplayList::removeUnloaded()
     testInvariant();
 }
 
-bool
-DisplayList::isSorted() const
-{
-    if (_charsByDepth.empty()) return true;
-    return std::adjacent_find(_charsByDepth.begin(), _charsByDepth.end(),
-            DepthGreaterThan()) == _charsByDepth.end();
-}
-
 
 #if GNASH_PARANOIA_LEVEL > 1 && !defined(NDEBUG)
 DisplayList::const_iterator
@@ -1110,13 +1080,6 @@ dlistTagsEffectiveZoneEnd(DisplayList::container_type& c)
              DepthGreaterOrEqual(0xffff + DisplayObject::staticDepthOffset));
 }
 
-DisplayList::const_iterator
-dlistTagsEffectiveZoneEnd(const DisplayList::container_type& c)
-{
-    return std::find_if(c.begin(), c.end(), 
-             DepthGreaterOrEqual(0xffff + DisplayObject::staticDepthOffset));
-}
-
 } // anonymous namespace
 
 
@@ -1124,12 +1087,18 @@ std::ostream&
 operator<< (std::ostream& os, const DisplayList& dl)
 {
     os << "By depth: ";
+
+    if ( dl._charsByDepth.empty() ) return os;
+
+    string_table& st = getStringTable(*getObject(dl._charsByDepth.front()));
+    ObjectURI::Logger l(st);
+
     for (DisplayList::const_iterator it = dl._charsByDepth.begin(),
             itEnd = dl._charsByDepth.end(); it != itEnd; ++it) {
 
         const DisplayObject* item = *it; 
         if (it != dl._charsByDepth.begin()) os << " | ";
-        os << " name:" << item->get_name()
+        os << " name:" << l.debug(item->get_name())
            << " depth:" << item->get_depth();
     }
 

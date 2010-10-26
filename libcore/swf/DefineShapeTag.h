@@ -15,11 +15,12 @@
 
 namespace gnash {
 	class SWFStream;
-	class cxform;
+	class SWFCxForm;
     class Shape;
 	class SWFMatrix;
 	class RunResources;
 	class Renderer;
+    class Transform;
 }
 
 namespace gnash {
@@ -35,19 +36,24 @@ public:
     static void loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunResources& r);
 
-    virtual ~DefineShapeTag() {};
-
     // Display a Shape character.
-    virtual void display(Renderer& renderer, const DisplayObject& inst) const;
+    void display(Renderer& renderer, const Transform& xform) const;
 
     // Create a Shape DisplayObject.
-	virtual DisplayObject* createDisplayObject(Global_as& gl,
+    // Inherited from DefinitionTag, see dox there
+    DisplayObject* createDisplayObject(Global_as& gl,
             DisplayObject* parent) const;
 	
     /// Get cached bounds of this shape.
     const SWFRect& bounds() const { return _shape.getBounds(); }
 
-    virtual bool pointTestLocal(boost::int32_t x, boost::int32_t y, 
+    /// Check if the given point is inside this shape.
+    //
+    /// Coordinates are given in the definition scale, but
+    /// a matrix is given to allow computing proper line
+    /// thickness based on display scale.
+    ///
+    bool pointTestLocal(boost::int32_t x, boost::int32_t y, 
             const SWFMatrix& wm) const;
 
 protected:

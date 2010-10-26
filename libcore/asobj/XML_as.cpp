@@ -521,10 +521,13 @@ XML_as::ignoreWhite()
     const string_table::key propnamekey =
         getStringTable(_global).find("ignoreWhite");
     as_value val;
-    if (!object()->get_member(propnamekey, &val)) {
+
+    as_object* obj = object();
+
+    if (!obj->get_member(propnamekey, &val)) {
         return false;
     }
-    return val.to_bool();
+    return toBool(val, getVM(*obj));
 }
 
 // XML.prototype is assigned after the class has been constructed, so it
@@ -537,7 +540,7 @@ xml_class_init(as_object& where, const ObjectURI& uri)
     Global_as& gl = getGlobal(where);
     as_object* cl = gl.createClass(&xml_new, 0);
 
-    as_function* ctor = gl.getMember(NSV::CLASS_XMLNODE).to_function();
+    as_function* ctor = getMember(gl, NSV::CLASS_XMLNODE).to_function();
 
     if (ctor) {
         // XML.prototype is an XMLNode(1, "");
@@ -572,14 +575,14 @@ attachXMLProperties(as_object& o)
     as_object* proto = o.get_prototype();
     if (!proto) return;
     const int flags = 0;
-    proto->init_member("ignoreWhite", false, flags);
     proto->init_member("contentType", "application/x-www-form-urlencoded",
             flags);
-    proto->init_property("xmlDecl", &xml_xmlDecl, &xml_xmlDecl, flags);
     proto->init_property("docTypeDecl", &xml_docTypeDecl, &xml_docTypeDecl,
             flags);
+    proto->init_member("ignoreWhite", false, flags);
     proto->init_property("loaded", xml_loaded, xml_loaded);
-    proto->init_property("status", xml_status, xml_status);
+    proto->init_property("status", xml_status, xml_status, flags);
+    proto->init_property("xmlDecl", &xml_xmlDecl, &xml_xmlDecl, flags);
 
 }
 
@@ -619,7 +622,7 @@ xml_new(const fn_call& fn)
 
         // Copy constructor clones nodes.
         if (fn.arg(0).is_object()) {
-            as_object* other = fn.arg(0).to_object(getGlobal(fn));
+            as_object* other = toObject(fn.arg(0), getVM(fn));
             XML_as* xml;
             if (isNativeType(other, xml)) {
                 as_object* clone = xml->cloneNode(true)->object();
@@ -658,7 +661,7 @@ xml_loaded(const fn_call& fn)
         return as_value(static_cast<bool>(ls));
     }
     ptr->setLoaded(
-            static_cast<XML_as::LoadStatus>(fn.arg(0).to_bool()));
+            static_cast<XML_as::LoadStatus>(toBool(fn.arg(0), getVM(fn))));
     return as_value();
 }
 
@@ -671,7 +674,7 @@ xml_status(const fn_call& fn)
         return as_value(ptr->status());
     }
 
-    const double status = fn.arg(0).to_number();
+    const double status = toNumber(fn.arg(0), getVM(fn));
     if (isNaN(status) ||
             status > std::numeric_limits<boost::int32_t>::max() ||
             status < std::numeric_limits<boost::int32_t>::min()) {

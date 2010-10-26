@@ -74,7 +74,7 @@ key_is_down(const fn_call& fn)
         return as_value();
     }
 
-    const int keycode = toInt(fn.arg(0));
+    const int keycode = toInt(fn.arg(0), getVM(fn));
     if (keycode < 0 || keycode >= key::KEYCOUNT) {
         // AS coding error !
         IF_VERBOSE_ASCODING_ERRORS(

@@ -1,11 +1,11 @@
-'\" -*- coding: us-ascii -*-
+.\" -*- coding: us-ascii -*-
 .if \n(.g .ds T< \\FC
 .if \n(.g .ds T> \\F[\n[.fam]]
 .de URL
 \\$2 \(la\\$1\(ra\\$3
 ..
 .if \n(.g .mso www.tmac
-.TH findwebcams 1 "10 February 2010" "" ""
+.TH findwebcams 1 "22 August 2010" "" ""
 .SH NAME
 findwebcams \- Gnash Utility For finding webcams on computer.
 .SH Synopsis

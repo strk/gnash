@@ -23,26 +23,16 @@
 #include "gnashconfig.h"
 #endif
 
-
-#ifdef ENABLE_AVM2
-# include "SafeStack.h"
-# include "Class.h"
-# include "Namespace.h"
-# include "BoundValues.h"
-# include "asException.h"
-# include "Method.h"
-#endif
-
-#include <map>
 #include <string>
-#include <list>
 #include <vector>
-#include <ostream>
+#include <iosfwd>
 
 namespace gnash {
+    class Extension;
+    class as_object;
+}
 
-class Extension;
-class as_object;
+namespace gnash {
 
 /// Register all of the ActionScript classes, with their dependencies.
 class ClassHierarchy
@@ -129,18 +119,12 @@ public:
 	void declareAll(const NativeClasses& classes);
 
 	/// Mark objects for garbage collector.
-	void markReachableResources() const;
+	void markReachableResources() const {}
 
 private:
 	as_object* mGlobal;
 	Extension* mExtension;
 };
-
-std::ostream&
-operator<< (std::ostream& os, const ClassHierarchy::NativeClass& c);
-
-std::ostream&
-operator<< (std::ostream& os, const ClassHierarchy::ExtensionClass& c);
 
 } 
 #endif 

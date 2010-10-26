@@ -128,11 +128,36 @@ public:
     };
     
     /// Construct an undefined value
-    DSOEXPORT as_value();
+    DSOEXPORT as_value()
+        :
+        _type(UNDEFINED),
+        _value(boost::blank())
+    {
+    }
+    
+    /// Copy constructor.
+    DSOEXPORT as_value(const as_value& v)
+        :
+        _type(v._type),
+        _value(v._value)
+    {
+    }
+
+    ~as_value() {}
     
     /// Construct a primitive String value 
-    DSOEXPORT as_value(const char* str);
-    DSOEXPORT as_value(const std::string& str);
+    DSOEXPORT as_value(const char* str)
+        :
+        _type(STRING),
+        _value(std::string(str))
+    {}
+
+    /// Construct a primitive String value 
+    DSOEXPORT as_value(const std::string& str)
+        :
+        _type(STRING),
+        _value(std::string(str))
+    {}
     
     /// Construct a primitive Boolean value
     template <typename T>
@@ -142,25 +167,35 @@ public:
         _type(BOOLEAN),
         _value(val)
 	{
-            UNUSED(dummy);
+        UNUSED(dummy);
 	}
     
     /// Construct a primitive Number value
-    as_value(double val);
+    as_value(double num)
+        :
+        _type(NUMBER),
+        _value(num)
+    {}
     
     /// Construct a null, Object, or DisplayObject value
-    as_value(as_object* obj);
+    as_value(as_object* obj)
+        :
+        _type(UNDEFINED)
+    {
+        set_as_object(obj);
+    }
     
-    /// Copy constructor.
-    DSOEXPORT as_value(const as_value& value);
+    /// Assign to an as_value.
+    DSOEXPORT void operator=(const as_value& v)
+    {
+        _type = v._type;
+        _value = v._value;
+    }
+
+    friend std::ostream& operator<<(std::ostream& o, const as_value&);
     
     /// Return the primitive type of this value as a string.
     const char* typeOf() const;
-    
-    /// Get the primitive type of this value
-    //
-    /// Only used in AVM2
-    primitive_types ptype() const;
     
     /// Return true if this value is a function
     bool is_function() const;
@@ -200,12 +235,12 @@ public:
     /// Get a number representation for this value
     //
     /// This function performs conversion if necessary.
-    double to_number() const;
+    double to_number(int version) const;
     
     /// Conversion to boolean.
     //
     /// This function performs conversion if necessary.
-    bool to_bool() const;
+    bool to_bool(int version) const;
     
     /// Return value as an object, converting primitive values as needed.
     //
@@ -221,7 +256,13 @@ public:
     /// @param global   The global object object for the conversion. This
     ///                 contains the prototypes or constructors necessary for
     ///                 conversion.
-    as_object* to_object(Global_as& global) const;
+    as_object* to_object(VM& vm) const;
+
+    /// Return the value as an as_object only if it is an as_object.
+    //
+    /// Note that this performs no conversion, so returns 0 if the as_value
+    /// is not an object.
+    as_object* get_object() const;
     
     /// Returns value as a MovieClip if it is a MovieClip.
     //
@@ -254,10 +295,6 @@ public:
     /// Note that this performs no conversion, so returns 0 if the as_value
     /// is not a function.
     as_function* to_function() const;
-
-    // Used for operator<< to give useful information about an
-    // as_value object.
-    DSOEXPORT std::string toDebugString() const;
     
     AsType defaultPrimitive(int version) const;
     
@@ -292,8 +329,6 @@ public:
     
     /// Set this value to the NULL value
     void set_null();
-    
-    DSOEXPORT void operator=(const as_value& v);
     
     bool is_undefined() const {
         return (_type == UNDEFINED);
@@ -345,7 +380,7 @@ public:
     ///	  evaluation of A and B.
     ///
     /// @param v     The as_value to compare to
-    bool equals(const as_value& v) const;
+    bool equals(const as_value& v, int version) const;
     
     /// Set any object value as reachable (for the GC)
     //
@@ -400,15 +435,6 @@ private:
     ///
     bool equalsSameType(const as_value& v) const;
     
-    /// Conversion to boolean for SWF7 and up
-    bool to_bool_v7() const;
-    
-    /// Conversion to boolean for SWF6
-    bool to_bool_v6() const;
-    
-    /// Conversion to boolean up to SWF5
-    bool to_bool_v5() const;
-    
     AsType _type;
     
     AsValueType _value;
@@ -454,21 +480,8 @@ private:
     
 };
 
-/// Force type to number.
-as_value& convertToNumber(as_value& v, VM& vm);
-
-/// Force type to string.
-as_value& convertToString(as_value& v, VM& vm);
-
-/// Force type to bool.
-as_value& convertToBoolean(as_value& v, VM& vm);
-
-/// Convert to primitive type
-as_value& convertToPrimitive(as_value& v, VM& vm);
-
-inline std::ostream& operator<< (std::ostream& os, const as_value& v) {
-	return os << v.toDebugString();
-}
+/// Stream operator.
+std::ostream& operator<<(std::ostream& os, const as_value& v);
 
 /// Convert numeric value to string value, following ECMA-262 specification
 //
@@ -502,15 +515,6 @@ std::string doubleToString(double val, int radix = 10);
 /// @return       True if the string was non-decimal and successfully
 ///               parsed.
 bool parseNonDecimalInt(const std::string& s, double& d, bool whole = true);
-
-/// AS2-compatible conversion to 32bit integer
-//
-/// This truncates large numbers to fit in the 32-bit space. It is not a 
-/// proper function of as_value because it is simply a further operation on
-/// the stored number type.
-//
-/// This function calls to_number(), so performs a conversion if necessary.
-boost::int32_t toInt(const as_value& val);
 
 /// Set a value to NaN
 inline void

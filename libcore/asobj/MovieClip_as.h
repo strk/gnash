@@ -27,6 +27,7 @@ namespace gnash {
 class as_object;
 struct ObjectURI;
 class DisplayObject;
+class SWFMatrix;
 
 /// Initialize the global MovieClip class
 void movieclip_class_init(as_object& where, const ObjectURI& uri);

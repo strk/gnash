@@ -37,7 +37,6 @@ namespace gnash {
 /// An interval timer.
 //
 /// This is constructed when _global.setInterval() is called.
-/// Instances of this class will be stored in the movie_root singleton.
 ///
 /// A timer has a function to call, a context in which to call it, a
 /// list of arguments and an interval specifying how often the function must be

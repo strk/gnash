@@ -79,7 +79,9 @@ main(int /*argc*/, char** /*argv*/)
 	// check that the pixel under the mouse is white
 	check_pixel(100, 30, 2, rgba(255,255,255,255), 2);
 
-	string_table& st = VM::get().getStringTable();
+	VM& vm = tester.vm();
+
+	string_table& st = vm.getStringTable();
 
 	getObject(root)->get_member(st.find("mousedown"), &tmp);
 	check(tmp.is_undefined());
@@ -90,15 +92,15 @@ main(int /*argc*/, char** /*argv*/)
 	tester.pressMouseButton();
 
 	getObject(root)->get_member(st.find("mousedown"), &tmp);
-	check_equals(tmp.to_number(), 1);
+	check_equals(toNumber(tmp, vm), 1);
 	check ( ! getObject(root)->get_member(st.find("mouseup"), &tmp) );
 
 	tester.depressMouseButton();
 
 	getObject(root)->get_member(st.find("mousedown"), &tmp);
-	check_equals(tmp.to_number(), 1);
+	check_equals(toNumber(tmp, vm), 1);
 	getObject(root)->get_member(st.find("mouseup"), &tmp);
-	check_equals(tmp.to_number(), 1);
+	check_equals(toNumber(tmp, vm), 1);
 
 	tester.advance();
 
@@ -155,7 +157,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester.pressMouseButton();
 
 	getObject(root)->get_member(st.find("mousedown"), &tmp);
-	check_equals(tmp.to_number(), 5);
+	check_equals(toNumber(tmp, vm), 5);
 
 }
 

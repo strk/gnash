@@ -29,7 +29,6 @@
 #include <boost/utility.hpp>
 #include <boost/bind.hpp>
 
-#include "gnash.h"
 #include "log.h"
 #include "RGBA.h"
 #include "smart_ptr.h"
@@ -39,7 +38,7 @@
 #include "log.h"
 #include "utility.h"
 #include "Range2d.h"
-#include "cxform.h"
+#include "SWFCxForm.h"
 #include "Renderer_ovg.h"
 #include "Renderer_ovg_bitmap.h"
 #include "SWFMatrix.h"
@@ -154,7 +153,7 @@ preparepath(VGPath path, const std::vector<Edge>& edges,
 
 // Use the image class copy constructor; it's not important any more
 // what kind of image it is.
-bitmap_info_ovg::bitmap_info_ovg(GnashImage* img, VGImageFormat pixelformat, VGPaint paint) 
+bitmap_info_ovg::bitmap_info_ovg(image::GnashImage* img, VGImageFormat pixelformat, VGPaint paint) 
     :
     _img(img),
     _pixel_format(pixelformat),
@@ -317,7 +316,7 @@ public:
     // anti-aliased with the rest of the drawing. Since display lists cannot be
     // concatenated this means we'll add up with several display lists for normal
     // drawing operations.
-    void drawVideoFrame(GnashImage* /* frame */, const SWFMatrix* /* m */,
+    void drawVideoFrame(image::GnashImage* /* frame */, const SWFMatrix* /* m */,
                                 const SWFRect* /* bounds */, bool /*smooth*/)
     {
         log_unimpl("drawVideoFrame");  
@@ -579,7 +578,7 @@ public:
   
     void add_paths(const PathVec& path_vec)
     {
-        cxform dummy_cx;
+        SWFCxForm dummy_cx;
 #if 0
       FIXME:
         
@@ -746,7 +745,7 @@ public:
     }
     
     void apply_fill_style(const FillStyle& style, const SWFMatrix& /* mat */,
-                          const cxform& cx)
+                          const SWFCxForm& cx)
     {
 #if 0
         FIXME fill_style changed to FillStyle
@@ -805,7 +804,7 @@ public:
 #endif
     }
   
-    bool apply_line_style(const LineStyle& style, const cxform& cx, const SWFMatrix& mat)
+    bool apply_line_style(const LineStyle& style, const SWFCxForm& cx, const SWFMatrix& mat)
     {
     
         bool rv = true;
@@ -883,7 +882,7 @@ public:
     typedef std::vector<const Path*> PathPtrVec;
   
     void draw_outlines(const PathVec& path_vec, const SWFMatrix& mat,
-                      const cxform& cx, const std::vector<LineStyle>& line_styles)
+                      const SWFCxForm& cx, const std::vector<LineStyle>& line_styles)
     {
         for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
              it != end; ++it) {
@@ -1026,7 +1025,7 @@ public:
 
     void draw_subshape(const PathVec& path_vec,
                       const SWFMatrix& mat,
-                      const cxform& cx,
+                      const SWFCxForm& cx,
                       const std::vector<FillStyle>& fill_styles,
                       const std::vector<LineStyle>& line_styles)
     {
@@ -1075,7 +1074,7 @@ public:
 
     void draw_submask(const PathVec& path_vec,
                       const SWFMatrix& /* mat */,
-                      const cxform& /* cx */,
+                      const SWFCxForm& /* cx */,
                       const FillStyle& /* f_style */)
     {
 
@@ -1126,7 +1125,7 @@ public:
 //  c. Feed the contours in the tesselator. (Render.)
 //  d. Draw outlines for every path in the subshape with a line style.
 
-    void drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
+    void drawShape(const SWF::ShapeRecord& shape, const SWFCxForm& cx,
                   const SWFMatrix& mat)
     {
         const PathVec& path_vec = shape.paths();
@@ -1180,7 +1179,7 @@ public:
             return;
         }
     
-        cxform dummy_cx;
+        SWFCxForm dummy_cx;
         std::vector<FillStyle> glyph_fs;
 
 #if 0

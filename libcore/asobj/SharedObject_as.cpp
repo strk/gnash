@@ -22,13 +22,18 @@
 #include "gnashconfig.h" 
 #endif
 
+#include "SharedObject_as.h"
+
+#include <boost/scoped_array.hpp>
+#include <boost/shared_ptr.hpp>
+#include <cstdio>
+
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_root.h"
 #include "GnashSystemNetHeaders.h"
 #include "GnashFileUtilities.h" // stat
 #include "SimpleBuffer.h"
 #include "as_value.h"
-#include "SharedObject_as.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -39,18 +44,14 @@
 #include "Property.h"
 #include "string_table.h"
 #include "rc.h" // for use of rcfile
-#include "URLAccessManager.h"
 #include "URL.h"
 #include "NetConnection_as.h"
 #include "Object.h"
 #include "AMFConverter.h"
 #include "GnashAlgorithm.h"
 #include "RunResources.h"
+#include "StreamProvider.h"
 #include "namedStrings.h"
-
-#include <boost/scoped_array.hpp>
-#include <boost/shared_ptr.hpp>
-#include <cstdio>
 
 namespace {
     gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
@@ -104,7 +105,7 @@ namespace {
 namespace { 
 
 /// Class used to serialize properties of an object to a buffer in SOL format
-class SOLPropsBufSerializer : public AbstractPropertyVisitor
+class SOLPropsBufSerializer : public PropertyVisitor
 {
 
 public:
@@ -423,9 +424,7 @@ SharedObjectLibrary::SharedObjectLibrary(VM& vm)
     // by the 'base' attribute of OBJECT or EMBED tags trough
     // -P base=xxx
     const movie_root& mr = _vm.getRoot();
-    const std::string& swfURL = mr.getOriginalURL();
-
-    URL url(swfURL);
+    const URL& url = mr.runResources().streamProvider().originalURL();
 
     // Remember the hostname of our SWF URL. This can be empty if loaded
     // from the filesystem
@@ -506,7 +505,8 @@ SharedObjectLibrary::getLocal(const std::string& objName,
     if (!root.empty()) {
 
         const movie_root& mr = _vm.getRoot();
-        const std::string& swfURL = mr.getOriginalURL();
+
+        const URL& swfURL = mr.runResources().streamProvider().originalURL();
         // The specified root may or may not have a domain. If it doesn't,
         // this constructor will add the SWF's domain.
         URL localPath(root, swfURL);
@@ -596,7 +596,7 @@ void
 sharedobject_class_init(as_object& where, const ObjectURI& uri)
 {
     Global_as& gl = getGlobal(where);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     attachSharedObjectInterface(*proto);
     as_object* cl = gl.createClass(&sharedobject_ctor, proto);
     attachSharedObjectStaticInterface(*cl);
@@ -758,7 +758,7 @@ sharedobject_flush(const fn_call& fn)
 
     int space = 0;
     if (fn.nargs) {
-        space = toInt(fn.arg(0));
+        space = toInt(fn.arg(0), getVM(fn));
     }
 
     /// If there is no data member, returns undefined.
@@ -890,7 +890,7 @@ readSOL(VM& vm, const std::string& filespec)
     // The 'data' member is initialized only on getLocal() (and probably
     // getRemote()): i.e. when there is some data, or when it's ready to
     // be added.
-    as_object* data = gl.createObject();
+    as_object* data = createObject(gl);
 
     struct stat st;
 
@@ -1005,7 +1005,7 @@ flushSOL(SharedObjectLibrary::SoLib::value_type& sol)
 SharedObject_as*
 createSharedObject(Global_as& gl)
 {
-    as_function* ctor = gl.getMember(NSV::CLASS_SHARED_OBJECT).to_function();
+    as_function* ctor = getMember(gl, NSV::CLASS_SHARED_OBJECT).to_function();
     if (!ctor) return 0;
     as_environment env(getVM(gl));
     fn_call::Args args;

@@ -16,10 +16,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// The SWFMovieDefinition is the 'root' definition of a SWF movie, including
-// movies loaded into another SWF file. Each self-contained SWF file has exactly
-// one SWFMovieDefinition.
-
 #include "SWFStream.h"
 #include "movie_definition.h"
 #include "RunResources.h"
@@ -102,7 +98,8 @@ SWFParser::read(std::streamsize bytes)
             }
             else {
                 // no tag loader for this tag type.
-                log_error(_("*** no tag loader for type %d (movie)"), _tag);
+                log_error(_("Encountered unknown tag %d. These usually store "
+                        "creation tool data and do not affect playback"), _tag);
                 IF_VERBOSE_PARSE(
                     std::ostringstream ss;
                     dumpTagBytes(_stream, ss);

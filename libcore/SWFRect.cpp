@@ -17,45 +17,19 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "SWFRect.h"
-#include "log.h"
-#include "SWFStream.h"
+
+#include <sstream> 
+
 #include "SWFMatrix.h"
 #include "Point2d.h"
 #include "GnashNumeric.h" // for flerp, clamp...
 
-#include <sstream> // for ::print and ::toString
 
 namespace gnash {
 
 const boost::int32_t SWFRect::rectNull;
 const boost::int32_t SWFRect::rectMax;
 
-void
-SWFRect::read(SWFStream& in)
-{
-    in.align();
-    in.ensureBits(5);
-    int nbits = in.read_uint(5);
-    in.ensureBits(nbits*4);
-    
-    _xMin = in.read_sint(nbits);
-    _xMax = in.read_sint(nbits);
-    _yMin = in.read_sint(nbits);
-    _yMax = in.read_sint(nbits);
-
-    // Check if this SWFRect is valid.
-    if (_xMax < _xMin || _yMax < _yMin)
-    {
-        // We set invalid rectangles to NULL, but we might instead
-        // want to actually swap the values if the proprietary player
-        // does so. TODO: check it out.
-        IF_VERBOSE_MALFORMED_SWF(
-        log_swferror("Invalid rectangle: "
-            "xMin=%g xMax=%g yMin=%g yMax=%g", _xMin, _xMax, _yMin, _yMax);
-        );
-        set_null();
-    } 
-}
 
 // Set ourself to bound a rectangle that has been transformed by m.  
 void
@@ -102,31 +76,30 @@ SWFRect::expand_to_rect(const SWFRect& r)
 
 void
 SWFRect::expand_to_transformed_rect(const SWFMatrix& m, const SWFRect& r)
-// Expand ourself to a transformed SWFRect.
 {   
-    if ( r.is_null() )
-    {
+    if (r.is_null()) {
          return;
     }
 
-    boost::int32_t  x1 = r.get_x_min();
-    boost::int32_t  y1 = r.get_y_min();
-    boost::int32_t  x2 = r.get_x_max();
-    boost::int32_t  y2 = r.get_y_max();
+    const boost::int32_t x1 = r.get_x_min();
+    const boost::int32_t y1 = r.get_y_min();
+    const boost::int32_t x2 = r.get_x_max();
+    const boost::int32_t y2 = r.get_y_max();
 
-    point  p0(x1, y1);
-    point  p1(x2, y1);
-    point  p2(x2, y2);
-    point  p3(x1, y2);
+    point p0(x1, y1);
+    point p1(x2, y1);
+    point p2(x2, y2);
+    point p3(x1, y2);
     
     m.transform(p0);
     m.transform(p1);
     m.transform(p2);
     m.transform(p3);
 
-    if( is_null() ) {
+    if (is_null()) {
         set_to_point(p0.x, p0.y);   
-    }else {
+    }
+    else {
         expand_to(p0.x, p0.y);
     }
     expand_to(p1.x, p1.y);

@@ -40,63 +40,19 @@ namespace gnash {
 namespace {
     as_value function_apply(const fn_call& fn);
     as_value function_call(const fn_call& fn);
-    as_object* getFunctionPrototype();
     as_value function_ctor(const fn_call& fn);
 }
-
-// This function returns the singleton
-// instance of the ActionScript Function object
-// prototype, which is what the AS Function class
-// exports, thus what each AS function instance inherit.
-// 
-// The returned object can be accessed by ActionScript
-// code through Function.__proto__.prototype.
-// User AS code can add or modify members of this object
-// to modify behaviour of all Function AS instances.
-// 
-// FIXME: do not use a static specifier for the proto
-// object, as multiple runs of a single movie should
-// each use a 'clean', unmodified, version of the
-// prototype. What should really happen is that this
-// prototype gets initializated by initialization of
-// the Function class itself, which would be a member
-// of the _global object for each movie instance.
 
 as_function::as_function(Global_as& gl)
 	:
 	as_object(gl)
 {
-	int flags = PropFlags::dontDelete |
-	            PropFlags::dontEnum | 
-	            PropFlags::onlySWF6Up;
-	init_member(NSV::PROP_uuPROTOuu, as_value(getFunctionPrototype()), flags);
 }
 
-const std::string&
+std::string
 as_function::stringValue() const
 {
-    // TODO: find out what AS3 functions return.
-    static const std::string str("[type Function]");
-    return str;
-}
-
-
-NativeFunction*
-as_function::getFunctionConstructor()
-{
-	static NativeFunction* func = 0;
-	if ( ! func )
-	{
-        Global_as& gl = *VM::get().getGlobal();
-		func = new NativeFunction(gl, function_ctor);
-        as_object* proto = getFunctionPrototype();
-
-        func->init_member(NSV::PROP_PROTOTYPE, proto);
-        func->init_member(NSV::PROP_CONSTRUCTOR, func);
-		proto->init_member(NSV::PROP_CONSTRUCTOR, func); 
-		VM::get().addStatic(func);
-	}
-	return func;
+    return "[type Function]";
 }
 
 as_object*
@@ -160,7 +116,7 @@ as_function::construct(as_object& newobj, const as_environment& env,
     // 'this' pointer. Others return a new object. This is to handle those
     // cases.
     if (isBuiltin() && ret.is_object()) {
-        as_object* fakeobj = ret.to_object(getGlobal(env));
+        as_object* fakeobj = toObject(ret, getVM(env));
 
         fakeobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this),
                 flags);
@@ -186,48 +142,31 @@ registerFunctionNative(as_object& global)
 }
 
 void
-function_class_init(as_object& global, const ObjectURI& uri)
+function_class_init(as_object& where, const ObjectURI& uri)
 {
-    NativeFunction* func = as_function::getFunctionConstructor();
+    Global_as& gl = getGlobal(where);
+
+    NativeFunction* func = new NativeFunction(gl, function_ctor);
+    as_object* proto = createObject(gl);
+
+    func->init_member(NSV::PROP_PROTOTYPE, proto);
+    func->init_member(NSV::PROP_CONSTRUCTOR, func);
+    proto->init_member(NSV::PROP_CONSTRUCTOR, func); 
 
 	// Register _global.Function, only visible for SWF6 up
-	int swf6flags = PropFlags::dontEnum | 
-                    PropFlags::dontDelete | 
-                    PropFlags::onlySWF6Up;
-	global.init_member(uri, func, swf6flags);
+	const int swf6flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
+	func->init_member(NSV::PROP_uuPROTOuu, proto, swf6flags);
+	where.init_member(uri, func, swf6flags);
+    
+    VM& vm = getVM(where);
+
+    // Note: these are the first functions created, and they need the
+    // Function class to be registered.
+    proto->init_member("call", vm.getNative(101, 10), swf6flags);
+    proto->init_member("apply", vm.getNative(101, 11), swf6flags);
 }
 
 namespace {
-
-as_object*
-getFunctionPrototype()
-{
-
-	static boost::intrusive_ptr<as_object> proto;
-
-	if (proto.get() == NULL) {
-
-		// Initialize Function prototype
-        proto = VM::get().getGlobal()->createObject();
-        
-		// We initialize the __proto__ member separately, as getObjectInterface
-		// will end up calling getFunctionPrototype again and we want that
-		// call to return the still-not-completely-constructed prototype rather
-		// then create a new one. 
-
-        VM& vm = VM::get();
-
-		vm.addStatic(proto.get());
-
-		const int flags = as_object::DefaultFlags | PropFlags::onlySWF6Up; 
-
-		proto->init_member("call", vm.getNative(101, 10), flags);
-		proto->init_member("apply", vm.getNative(101, 11), flags);
-	}
-
-	return proto.get();
-
-}
 
 as_value
 function_ctor(const fn_call& /*fn*/)
@@ -268,7 +207,7 @@ function_apply(const fn_call& fn)
 	else
 	{
 		// Get the object to use as 'this' reference
-		as_object* obj = fn.arg(0).to_object(getGlobal(fn));
+		as_object* obj = toObject(fn.arg(0), getVM(fn));
 
         if (!obj) obj = new as_object(getGlobal(fn)); 
 
@@ -295,7 +234,7 @@ function_apply(const fn_call& fn)
 			);
 
 			boost::intrusive_ptr<as_object> arg1 = 
-                fn.arg(1).to_object(getGlobal(fn));
+                toObject(fn.arg(1), getVM(fn));
 
             if (arg1) {
                 PushFunctionArgs pa(new_fn_call);
@@ -309,7 +248,7 @@ function_apply(const fn_call& fn)
 
     return rv;
 }
-
+    
 as_value
 function_call(const fn_call& fn)
 {
@@ -325,7 +264,7 @@ function_call(const fn_call& fn)
     if (!fn.nargs || fn.arg(0).is_undefined() || fn.arg(0).is_null()) {
         tp = new as_object(getGlobal(fn));
     }
-    else tp = fn.arg(0).to_object(getGlobal(fn));
+    else tp = toObject(fn.arg(0), getVM(fn));
 
     new_fn_call.this_ptr = tp;
     new_fn_call.super = 0;

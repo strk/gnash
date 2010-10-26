@@ -27,7 +27,8 @@
 #include <iostream>
 #include <memory>
 #include <boost/random.hpp> // for random generator
-#include <cstdlib> // std::getenv
+#include <cstdlib> 
+#include <cmath>
 #ifdef HAVE_SYS_UTSNAME_H
 # include <sys/utsname.h> // For system information
 #endif
@@ -38,12 +39,11 @@
 #include "movie_definition.h"
 #include "Movie.h"
 #include "movie_root.h"
-#include "Globals.h"
 #include "Global_as.h"
 #include "rc.h" 
 #include "namedStrings.h"
 #include "VirtualClock.h" // for getTime()
-
+#include "GnashNumeric.h"
 
 namespace {
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
@@ -51,51 +51,18 @@ gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 
 namespace gnash {
 
-// Pointer to our singleton
-std::auto_ptr<VM> VM::_singleton;
-
-VM&
-VM::init(int version, movie_root& root, VirtualClock& clock)
-{
-	// Don't call more then once !
-	assert(!_singleton.get());
-
-	_singleton.reset(new VM(version, root, clock));
-
-	assert(_singleton.get());
-	NSV::loadStrings(_singleton->_stringTable);
-
-    AVM1Global* gl(new AVM1Global(*_singleton));
-
-	_singleton->setGlobal(gl);
-    gl->registerClasses();
-
-	return *_singleton;
-}
-
-VM&
-VM::get()
-{
-	// Did you call VM::init ?
-	assert(_singleton.get());
-	return *_singleton;
-}
-
-bool
-VM::isInitialized()
-{
-	return _singleton.get();
-}
-
 VM::VM(int version, movie_root& root, VirtualClock& clock)
 	:
 	_rootMovie(root),
-	_global(0),
+	_global(new Global_as(*this)),
 	_swfversion(version),
 	_clock(clock),
 	_stack(),
-    _shLib(new SharedObjectLibrary(*this))
+    _shLib(new SharedObjectLibrary(*this)),
+    _rng(clock.elapsed())
 {
+	NSV::loadStrings(_stringTable);
+    _global->registerClasses();
 	_clock.restart();
 }
 
@@ -104,30 +71,15 @@ VM::~VM()
 }
 
 void
-VM::clear()
-{
-    /// Reset the SharedObjectLibrary, so that SOLs are flushed.
-    _shLib.reset();
-}
-
-int
-VM::getSWFVersion() const
-{
-	return _swfversion;
-}
-
-void
 VM::setSWFVersion(int v) 
 {
-	_swfversion=v;
+	_swfversion = v;
 }
 
 VM::RNG&
-VM::randomNumberGenerator() const
+VM::randomNumberGenerator() 
 {
-
-	static RNG rnd(_clock.elapsed());
-	return rnd;
+	return _rng;
 }
 
 const std::string&
@@ -138,24 +90,22 @@ VM::getPlayerVersion() const
 	return version;
 }
 
-const std::string
-VM::getOSName()
+std::string
+VM::getOSName() const
 {
 
 	// The directive in gnashrc must override OS detection.
-	if (rcfile.getFlashSystemOS() != "")
-	{
+	if (rcfile.getFlashSystemOS() != "") {
 		return rcfile.getFlashSystemOS();
 	}
-	else
-	{
+	else {
 #ifdef HAVE_SYS_UTSNAME_H
 // For Linux- or UNIX-based systems (POSIX 4.4 conformant)
 
 		struct utsname osname;
 		std::string tmp;
 		
-		uname (&osname);
+		uname(&osname);
 		
 		tmp = osname.sysname;
 		tmp += " ";
@@ -170,8 +120,8 @@ VM::getOSName()
 	}
 }
 
-const std::string
-VM::getSystemLanguage()
+std::string
+VM::getSystemLanguage() const
 {
 
 	char *loc;
@@ -181,20 +131,12 @@ VM::getSystemLanguage()
 	// This should work on most UNIX-like systems.
 	// Callers should work out what to do with it.
 	// TODO: Other OSs.
-	if ((loc = std::getenv("LANG")) ||
-		(loc = std::getenv("LANGUAGE")) ||
-		(loc = std::getenv("LC_MESSAGES"))
-		)
-	{
-		std::string lang = loc;
-		return lang;
+	if ((loc = std::getenv("LANG")) || (loc = std::getenv("LANGUAGE")) ||
+		(loc = std::getenv("LC_MESSAGES"))) {
+        return loc;
 	}
 	
-	else
-	{
-		// No string found
-		return "";
-	}
+    return std::string();
 }
 
 movie_root&
@@ -209,13 +151,6 @@ VM::getGlobal() const
 	return _global;
 }
 
-void
-VM::setGlobal(Global_as* o)
-{
-	assert(!_global);
-	_global = o;
-}
-
 unsigned long int
 VM::getTime() const
 {
@@ -228,15 +163,7 @@ VM::markReachableResources() const
     std::for_each(_globalRegisters.begin(), _globalRegisters.end(), 
             std::mem_fun_ref(&as_value::setReachable));
 
-	_rootMovie.markReachableResources();
-
 	_global->setReachable();
-
-	/// Mark all static GcResources
-	for (ResVect::const_iterator i=_statics.begin(), e=_statics.end(); i!=e; ++i)
-	{
-		(*i)->setReachable();
-	}
 
     if (_shLib.get()) _shLib->markReachableResources();
 
@@ -338,12 +265,6 @@ VM::popCallFrame()
 }
 
 void
-VmGcRoot::markReachableResources() const
-{
-	_vm.markReachableResources();
-}
-
-void
 VM::registerNative(Global_as::ASFunction fun, unsigned int x, unsigned int y)
 {
     assert(fun);
@@ -361,8 +282,16 @@ VM::getNative(unsigned int x, unsigned int y) const
     Global_as::ASFunction fun = col->second;
 
     NativeFunction* f = new NativeFunction(*_global, fun);
-    f->init_member(NSV::PROP_CONSTRUCTOR,
-            as_function::getFunctionConstructor());
+    
+    Global_as& gl = *_global;
+
+    as_function* func = getOwnProperty(gl, NSV::CLASS_FUNCTION).to_function();
+    if (func) {
+        const int flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
+        f->init_member(NSV::PROP_uuPROTOuu, getMember(*func,
+                    NSV::PROP_PROTOTYPE), flags);
+        f->init_member(NSV::PROP_CONSTRUCTOR, func);
+    }
     return f;
 }
 
@@ -420,7 +349,7 @@ VM::dumpState(std::ostream& out, size_t limit)
 ///////////////////////////////////////////////////////////////////////
 
 void
-newAdd(as_value& op1, const as_value& op2, VM& vm)
+newAdd(as_value& op1, const as_value& op2, const VM& vm)
 {
     // We can't change the original value.
     as_value r(op2);
@@ -449,22 +378,22 @@ newAdd(as_value& op1, const as_value& op2, VM& vm)
 	}
 
     // Otherwise use numeric semantic
-    const double num1 = op1.to_number();
-    const double num2 = r.to_number();
+    const double num1 = toNumber(op1, vm);
+    const double num2 = toNumber(r, vm);
     op1.set_double(num2 + num1); 
 
 }
 
 void
-subtract(as_value& op1, const as_value& op2, VM& /*vm*/)
+subtract(as_value& op1, const as_value& op2, const VM& vm)
 {
-	const double num2 = op2.to_number();
-	const double num1 = op1.to_number();
+	const double num2 = toNumber(op2, vm);
+	const double num1 = toNumber(op1, vm);
 	op1.set_double(num1 - num2);
 }
 
 as_value
-newLessThan(const as_value& op1, const as_value& op2, VM& /*vm*/)
+newLessThan(const as_value& op1, const as_value& op2, const VM& vm)
 {
 
     as_value operand1(op1);
@@ -501,14 +430,85 @@ newLessThan(const as_value& op1, const as_value& op2, VM& /*vm*/)
         return as_value(s1 < s2);
     }
 
-    const double num1 = operand1.to_number();
-    const double num2 = operand2.to_number();
+    const double num1 = toNumber(operand1, vm);
+    const double num2 = toNumber(operand2, vm);
 
     if (isNaN(num1) || isNaN(num2)) {
         return as_value();
     }
     return as_value(num1 < num2);
 }
+
+bool
+equals(const as_value& a, const as_value& b, const VM& vm)
+{
+    return a.equals(b, vm.getSWFVersion());
+}
+
+bool
+toBool(const as_value& v, const VM& vm)
+{
+    return v.to_bool(vm.getSWFVersion());
+}
+
+double
+toNumber(const as_value& v, const VM& vm)
+{
+    return v.to_number(vm.getSWFVersion());
+}
+
+as_object*
+toObject(const as_value& v, VM& vm)
+{
+    return v.to_object(vm);
+}
+
+boost::int32_t
+toInt(const as_value& v, const VM& vm)
+{
+    const double d = v.to_number(vm.getSWFVersion());
+
+    if (!isFinite(d)) return 0;
+
+    if (d < 0) {   
+        return - static_cast<boost::uint32_t>(std::fmod(-d, 4294967296.0));
+    }
+    
+    return static_cast<boost::uint32_t>(std::fmod(d, 4294967296.0));
+}
+
+/// Force type to number.
+as_value&
+convertToNumber(as_value& v, const VM& vm)
+{
+    v.set_double(v.to_number(vm.getSWFVersion()));
+    return v;
+}
+
+/// Force type to string.
+as_value&
+convertToString(as_value& v, const VM& vm)
+{
+    v.set_string(v.to_string(vm.getSWFVersion()));
+    return v;
+}
+
+/// Force type to bool.
+as_value&
+convertToBoolean(as_value& v, const VM& vm)
+{
+    v.set_bool(v.to_bool(vm.getSWFVersion()));
+    return v;
+}
+
+as_value&
+convertToPrimitive(as_value& v, const VM& vm)
+{
+    const as_value::AsType t(v.defaultPrimitive(vm.getSWFVersion()));
+    v = v.to_primitive(t);
+    return v;
+}
+
 
 } // end of namespace gnash
 

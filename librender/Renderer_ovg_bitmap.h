@@ -24,9 +24,11 @@
 
 #include "Geometry.h"
 //#include "BitmapInfo.h"
+#include "GnashImage.h"
 #include "Renderer.h"
 
 namespace gnash {
+
 
 /// The class itself uses a template. Currently this is unnecessary and it may
 /// be removed but an older implementation required this method and it may be
@@ -43,7 +45,7 @@ public:
         WRAP_CLAMP
     };
     
-    bitmap_info_ovg(GnashImage* img, VGImageFormat pixelformat, VGPaint paint);
+    bitmap_info_ovg(image::GnashImage* img, VGImageFormat pixelformat, VGPaint paint);
     ~bitmap_info_ovg();
 
     void apply(const gnash::SWFMatrix& bitmap_matrix,
@@ -54,7 +56,7 @@ public:
 
 private:
     
-    mutable GnashImage *_img;
+    mutable image::GnashImage *_img;
     VGImageFormat   _pixel_format;
     mutable VGImage _image;
     VGPaint         _paint;

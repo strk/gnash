@@ -66,9 +66,11 @@ main(int /*argc*/, char** /*argv*/)
 
 	const DisplayObject* loaded = tester.findDisplayItemByDepth(*root, 0); // depends on getNextHighestDepth
 	check(loaded);
-	check_equals(loaded->get_parent(), root);
+	check_equals(loaded->parent(), root);
 
-	string_table& st = VM::get().getStringTable();
+    VM& vm = tester.vm();
+
+	string_table& st = vm.getStringTable();
 	string_table::key xscale = st.find("_xscale");
 	string_table::key yscale = st.find("_yscale");
 	// we need a const_cast as get_member *might* eventually
@@ -97,25 +99,25 @@ main(int /*argc*/, char** /*argv*/)
 	tester.depressMouseButton();
 	check_equals(string(text->get_text_value()), "48");
 	check(obj->get_member(xscale, &tmp));
-	check_equals(round(tmp.to_number()), 48);
+	check_equals(round(toNumber(tmp, vm)), 48);
 	check(obj->get_member(yscale, &tmp));
-	check_equals(round(tmp.to_number()), 48);
+	check_equals(round(toNumber(tmp, vm)), 48);
 	tester.pressMouseButton();
 	check_equals(string(text->get_text_value()), "48");
 	tester.depressMouseButton();
 	check_equals(string(text->get_text_value()), "46");
 	check(obj->get_member(xscale, &tmp));
-	check_equals(round(tmp.to_number()), 46);
+	check_equals(round(toNumber(tmp, vm)), 46);
 	check(obj->get_member(yscale, &tmp));
-	check_equals(round(tmp.to_number()), 46);
+	check_equals(round(toNumber(tmp, vm)), 46);
 	tester.pressMouseButton();
 	check_equals(string(text->get_text_value()), "46");
 	tester.depressMouseButton();
 	check_equals(string(text->get_text_value()), "44");
 	check(obj->get_member(xscale, &tmp));
-	check_equals(round(tmp.to_number()), 44);
+	check_equals(round(toNumber(tmp, vm)), 44);
 	check(obj->get_member(yscale, &tmp));
-	check_equals(round(tmp.to_number()), 44);
+	check_equals(round(toNumber(tmp, vm)), 44);
 
 	// click some on the "larger" button
 	tester.movePointerTo(580, 18);
@@ -125,33 +127,33 @@ main(int /*argc*/, char** /*argv*/)
 	tester.depressMouseButton();
 	check_equals(string(text->get_text_value()), "46");
 	check(obj->get_member(xscale, &tmp));
-	check_equals(round(tmp.to_number()), 46);
+	check_equals(round(toNumber(tmp, vm)), 46);
 	check(obj->get_member(yscale, &tmp));
-	check_equals(round(tmp.to_number()), 46);
+	check_equals(round(toNumber(tmp, vm)), 46);
 	tester.pressMouseButton();
 	check_equals(string(text->get_text_value()), "46");
 	tester.depressMouseButton();
 	check_equals(string(text->get_text_value()), "48");
 	check(obj->get_member(xscale, &tmp));
-	check_equals(round(tmp.to_number()), 48);
+	check_equals(round(toNumber(tmp, vm)), 48);
 	check(obj->get_member(yscale, &tmp));
-	check_equals(round(tmp.to_number()), 48);
+	check_equals(round(toNumber(tmp, vm)), 48);
 	tester.pressMouseButton();
 	check_equals(string(text->get_text_value()), "48");
 	tester.depressMouseButton();
 	check_equals(string(text->get_text_value()), "50");
 	check(obj->get_member(xscale, &tmp));
-	check_equals(round(tmp.to_number()), 50);
+	check_equals(round(toNumber(tmp, vm)), 50);
 	check(obj->get_member(yscale, &tmp));
-	check_equals(round(tmp.to_number()), 50);
+	check_equals(round(toNumber(tmp, vm)), 50);
 	tester.pressMouseButton();
 	check_equals(string(text->get_text_value()), "50");
 	tester.depressMouseButton();
 	check_equals(string(text->get_text_value()), "52");
 	check(obj->get_member(xscale, &tmp));
-	check_equals(round(tmp.to_number()), 52);
+	check_equals(round(toNumber(tmp, vm)), 52);
 	check(obj->get_member(yscale, &tmp));
-	check_equals(round(tmp.to_number()), 52);
+	check_equals(round(toNumber(tmp, vm)), 52);
 
 
 }

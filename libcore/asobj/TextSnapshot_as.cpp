@@ -240,7 +240,7 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, as_object& ri) const
             e = _textFields.end(); field != e; ++field) {
 
         const Records& rec = field->second;
-        const SWFMatrix& mat = field->first->getMatrix();
+        const SWFMatrix& mat = getMatrix(*field->first);
         const boost::dynamic_bitset<>& selected = field->first->getSelected();
 
         const std::string::size_type fieldStartIndex = pos;
@@ -499,8 +499,10 @@ textsnapshot_getTextRunInfo(const fn_call& fn)
         return as_value();
     }
 
-    size_t start = std::max<boost::int32_t>(0, toInt(fn.arg(0)));
-    size_t end = std::max<boost::int32_t>(start + 1, toInt(fn.arg(1)));
+    const size_t start = std::max<boost::int32_t>(0,
+            toInt(fn.arg(0), getVM(fn)));
+    const size_t end = std::max<boost::int32_t>(start + 1,
+            toInt(fn.arg(1), getVM(fn)));
 
     Global_as& gl = getGlobal(fn);
     as_object* ri = gl.createArray();
@@ -524,12 +526,12 @@ textsnapshot_findText(const fn_call& fn)
         return as_value();
     }
 
-    boost::int32_t start = toInt(fn.arg(0));
+    boost::int32_t start = toInt(fn.arg(0), getVM(fn));
     const std::string& text = fn.arg(1).to_string();
 
     /// Yes, the pp is case-insensitive by default. We don't write
     /// functions like that here.
-    bool ignoreCase = !fn.arg(2).to_bool();
+    const bool ignoreCase = !toBool(fn.arg(2), getVM(fn));
 
     return ts->findText(start, text, ignoreCase);
 }
@@ -563,8 +565,10 @@ textsnapshot_getSelected(const fn_call& fn)
         return as_value();
     }
 
-    size_t start = std::max<boost::int32_t>(0, toInt(fn.arg(0)));
-    size_t end = std::max<boost::int32_t>(start + 1, toInt(fn.arg(1)));
+    const size_t start = std::max<boost::int32_t>(0,
+            toInt(fn.arg(0), getVM(fn)));
+    const size_t end = std::max<boost::int32_t>(start + 1,
+            toInt(fn.arg(1), getVM(fn)));
 
     return as_value(ts->getSelected(start, end));
 }
@@ -581,7 +585,7 @@ textsnapshot_getSelectedText(const fn_call& fn)
         return as_value();
     }
 
-    bool newlines = fn.nargs ? fn.arg(0).to_bool() : false;
+    const bool newlines = fn.nargs ? toBool(fn.arg(0), getVM(fn)) : false;
 
     return as_value(ts->getSelectedText(newlines));
 }
@@ -602,10 +606,10 @@ textsnapshot_getText(const fn_call& fn)
         return as_value();
     }
 
-    boost::int32_t start = toInt(fn.arg(0));
-    boost::int32_t end = toInt(fn.arg(1));
+    const boost::int32_t start = toInt(fn.arg(0), getVM(fn));
+    const boost::int32_t end = toInt(fn.arg(1), getVM(fn));
 
-    const bool newline = (fn.nargs > 2) ? fn.arg(2).to_bool() : false;
+    const bool newline = (fn.nargs > 2) ? toBool(fn.arg(2), getVM(fn)) : false;
 
     return ts->getText(start, end, newline);
 
@@ -647,10 +651,12 @@ textsnapshot_setSelected(const fn_call& fn)
         return as_value();
     }
 
-    size_t start = std::max<boost::int32_t>(0, toInt(fn.arg(0)));
-    size_t end = std::max<boost::int32_t>(start, toInt(fn.arg(1)));
+    const size_t start = std::max<boost::int32_t>(0,
+            toInt(fn.arg(0), getVM(fn)));
+    const size_t end = std::max<boost::int32_t>(start,
+            toInt(fn.arg(1), getVM(fn)));
 
-    bool selected = (fn.nargs > 2) ? fn.arg(2).to_bool() : true;
+    const bool selected = (fn.nargs > 2) ? toBool(fn.arg(2), getVM(fn)) : true;
 
     ts->setSelected(start, end, selected);
 

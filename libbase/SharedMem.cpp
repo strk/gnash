@@ -21,11 +21,11 @@
 #endif
 
 #include <sys/types.h>
-#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__) && !defined(HAIKU_HOST) && !defined(_ANDROID)
+#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__) && !defined(HAIKU_HOST) && !defined(ANDROID)
 # include <sys/shm.h>
 # include <sys/sem.h>
 # include <sys/ipc.h>
-#elif !defined(__riscos__) && !defined(__OS2__) && !defined(_ANDROID)
+#elif !defined(__riscos__) && !defined(__OS2__) && !defined(ANDROID)
 # include <windows.h>
 # include <process.h>
 # include <io.h>
@@ -34,7 +34,7 @@
 #include <vector>
 #include <cerrno>
 
-#ifdef _ANDROID
+#ifdef ANDROID
 # include <linux/shm.h>
 # include <linux/sem.h>
 extern int shmctl (int __shmid, int __cmd, struct shmid_ds *__buf);
@@ -49,7 +49,7 @@ extern int semctl (int __semid, int __semnum, int __cmd, ...);
 #include "log.h"
 #include "SharedMem.h"
 
-#if (defined(USE_SYSV_SHM) && defined(HAVE_SHMGET)) || defined(_WIN32) || defined(_ANDROID)
+#if (defined(USE_SYSV_SHM) && defined(HAVE_SHMGET)) || defined(_WIN32) || defined(ANDROID)
 # define ENABLE_SHARED_MEM 1
 #else
 # undef ENABLE_SHARED_MEM
@@ -88,6 +88,7 @@ SharedMem::~SharedMem()
         log_error("Error during stat of shared memory segment: %s",
                 std::strerror(err));
     }
+#ifndef __amigaos4__
     else {
         // Note that this isn't completely reliable.
         if (!ds.shm_nattch) {
@@ -95,6 +96,7 @@ SharedMem::~SharedMem()
             ::shmctl(_shmid, IPC_RMID, 0);
         }
     }
+#endif
 #else
     // Windows code here.
 #endif
@@ -150,12 +152,14 @@ SharedMem::attach()
 
     // First get semaphore.
     
+#ifndef __amigaos4__
     // Struct for semctl
     union semun {
         int val;
         struct semi_ds* buf;
         unsigned short* array;
     };
+#endif
 
     // Check if it exists already.
     _semid = semget(_shmkey, 1, 0600);

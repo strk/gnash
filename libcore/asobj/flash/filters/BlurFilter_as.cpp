@@ -15,13 +15,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+#include "BlurFilter_as.h"
 
 #include "as_object.h"
-#include "BlurFilter.h"
 #include "VM.h"
 #include "builtin_function.h"
 #include "Global_as.h"
 #include "BitmapFilter_as.h"
+#include "Filters.h"
 
 namespace gnash {
 
@@ -67,7 +68,7 @@ blurfilter_blurX(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_blurX );
     }
-    float sp_blurX = fn.arg(0).to_number ();
+    float sp_blurX = toNumber(fn.arg(0), getVM(fn));
     ptr->m_blurX = sp_blurX;
     return as_value();
 }
@@ -79,7 +80,7 @@ blurfilter_blurY(const fn_call& fn)
     if (fn.nargs == 0) {
 		return as_value(ptr->m_blurY );
     }
-    float sp_blurY = fn.arg(0).to_number ();
+    float sp_blurY = toNumber(fn.arg(0), getVM(fn));
     ptr->m_blurY = sp_blurY;
     return as_value();
 }
@@ -91,7 +92,7 @@ blurfilter_quality(const fn_call& fn)
     if (fn.nargs == 0) {
 		return as_value(ptr->m_quality );
     }
-    boost::uint8_t sp_quality = fn.arg(0).to_number ();
+    boost::uint8_t sp_quality = toNumber(fn.arg(0), getVM(fn));
     ptr->m_quality = sp_quality;
     return as_value();
 }
@@ -99,7 +100,7 @@ blurfilter_quality(const fn_call& fn)
 as_value
 blurfilter_new(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
+    as_object* obj = ensure<ValidThis>(fn);
     obj->setRelay(new BlurFilter_as);
     return as_value();
 }

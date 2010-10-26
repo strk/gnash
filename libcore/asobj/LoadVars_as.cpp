@@ -47,8 +47,6 @@ namespace {
     as_value loadvars_tostring(const fn_call& fn);
     as_value loadvars_ctor(const fn_call& fn);
 	as_value loadvars_onLoad(const fn_call& fn);
-	as_value loadvars_getBytesLoaded(const fn_call& fn);
-	as_value loadvars_getBytesTotal(const fn_call& fn);
 	as_value loadvars_onData(const fn_call& fn);
 	void attachLoadVarsInterface(as_object& o);
 }
@@ -126,23 +124,23 @@ loadvars_tostring(const fn_call& fn)
 {
 	as_object* ptr = ensure<ValidThis>(fn);
 
-	typedef as_object::SortedPropertyList VarMap;
-	VarMap vars;
-
-	enumerateProperties(*ptr, vars);
+	SortedPropertyList vars = enumerateProperties(*ptr);
 
     as_object* global = &getGlobal(*ptr);
     std::ostringstream o;
     
-    // LoadVars.toString() calls _global.escape().
-	for (VarMap::const_iterator it=vars.begin(), itEnd=vars.end();
-			it != itEnd; ++it) {
+    const int ver = getSWFVersion(fn);
+    string_table& st = getStringTable(fn);
 
-        if (it != vars.begin()) o << "&";
+    // LoadVars.toString() calls _global.escape().
+	for (SortedPropertyList::const_reverse_iterator it = vars.rbegin(),
+            itEnd = vars.rend(); it != itEnd; ++it) {
+
+        if (it != vars.rbegin()) o << "&";
         const std::string& var = 
-            callMethod(global, NSV::PROP_ESCAPE, it->first).to_string();
-        const std::string& val = 
-            callMethod(global, NSV::PROP_ESCAPE, it->second).to_string();
+            callMethod(global, NSV::PROP_ESCAPE, it->first.toString(st)).to_string();
+        const std::string& val = callMethod(global, NSV::PROP_ESCAPE,
+            it->second.to_string(ver)).to_string();
         o << var << "=" << val;
 	}
     return as_value(o.str()); 

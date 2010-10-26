@@ -85,7 +85,14 @@
 #include <cstdlib> // getenv
 
 #include "GnashSystemIOHeaders.h"
-#include "gnash.h"
+#ifdef HAVE_TSLIB_H
+# include <tslib.h>
+#endif
+#if defined(ENABLE_TSLIB) && !defined(HAVE_TSLIB_H)
+# warning "No tslib.h! Disabling touchscreen support"
+# undef ENABLE_TSLIB
+#endif
+
 #include "gui.h"
 #include "fbsup.h"
 #include "log.h"

@@ -18,9 +18,22 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-#include "GnashSystemIOHeaders.h" // write()
-
 #include "movie_root.h"
+
+#include <boost/algorithm/string/erase.hpp>
+#include <boost/algorithm/string/replace.hpp>
+#include <utility>
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <map>
+#include <bitset>
+#include <cassert>
+#include <functional>
+#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/bind.hpp>
+
+#include "GnashSystemIOHeaders.h" // write()
 #include "log.h"
 #include "MovieClip.h"
 #include "Movie.h" // for implicit upcast to MovieClip
@@ -43,21 +56,8 @@
 #include "ExternalInterface.h"
 #include "TextField.h"
 #include "Button.h"
-
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <boost/algorithm/string/erase.hpp>
-#include <boost/algorithm/string/replace.hpp>
-#include <utility>
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <map>
-#include <bitset>
-#include <cassert>
-#include <functional> // std::bind2nd, std::equal_to
-#include <boost/algorithm/string/case_conv.hpp>
-#include <boost/bind.hpp>
+#include "Transform.h"
+#include "StreamProvider.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -128,9 +128,9 @@ private:
 movie_root::movie_root(const movie_definition& def,
         VirtualClock& clock, const RunResources& runResources)
     :
+    _gc(*this),
     _runResources(runResources),
-    _originalURL(def.get_url()),
-    _vm(VM::init(def.get_version(), *this, clock)),
+    _vm(def.get_version(), *this, clock),
     _interfaceHandler(0),
     _fsCommandHandler(0),
     _stageWidth(1),
@@ -142,7 +142,7 @@ movie_root::movie_root(const movie_definition& def,
     _lastTimerId(0),
     _lastKeyEvent(key::INVALID),
     _currentFocus(0),
-    m_drag_state(),
+    _dragState(0),
     _movies(),
     _rootMovie(0),
     _invalidated(true),
@@ -153,7 +153,6 @@ movie_root::movie_root(const movie_definition& def,
     _quality(QUALITY_HIGH),
     _alignMode(0),
     _allowScriptAccess(SCRIPT_ACCESS_SAME_DOMAIN),
-    _marshallExceptions(false),
     _showMenu(true),
     _scaleMode(SCALEMODE_SHOWALL),
     _displayState(DISPLAYSTATE_NORMAL),
@@ -286,7 +285,7 @@ movie_root::cleanupAndCollect()
     _vm.getStack().clear();
 
     cleanupDisplayList();
-    GC::get().fuzzyCollect();
+    _gc.fuzzyCollect();
 }
 
 /* private */
@@ -503,16 +502,10 @@ movie_root::reset()
 {
     sound::sound_handler* sh = _runResources.soundHandler();
     if (sh) sh->reset();
-    clear();
-    _disableScripts = false;
-}
 
-void
-movie_root::clear()
-{
     // reset background color, to allow 
     // next load to set it again.
-    m_background_color.set(255,255,255,255);
+    m_background_color.set(255, 255, 255, 255);
     m_background_color_set = false;
 
     // wipe out live chars
@@ -538,10 +531,12 @@ movie_root::clear()
 
 #ifdef GNASH_USE_GC
     // Run the garbage collector again
-    GC::get().fuzzyCollect();
+    _gc.fuzzyCollect();
 #endif
 
     setInvalidated();
+
+    _disableScripts = false;
 }
 
 void
@@ -748,25 +743,14 @@ movie_root::get_mouse_state(boost::int32_t& x, boost::int32_t& y)
 }
 
 void
-movie_root::get_drag_state(drag_state& st)
+movie_root::setDragState(const DragState& st)
 {
-    assert(testInvariant());
-
-    st = m_drag_state;
-
-    assert(testInvariant());
-}
-
-void
-movie_root::set_drag_state(const drag_state& st)
-{
-    m_drag_state = st;
+    _dragState = st;
     DisplayObject* ch = st.getCharacter();
-    if ( ch && ! st.isLockCentered() )
-    {
+    if (ch && !st.isLockCentered()) {
         // Get coordinates of the DisplayObject's origin
         point origin(0, 0);
-        SWFMatrix chmat = ch->getWorldMatrix();
+        SWFMatrix chmat = getWorldMatrix(*ch);
         point world_origin;
         chmat.transform(&world_origin, origin);
 
@@ -776,7 +760,7 @@ movie_root::set_drag_state(const drag_state& st)
         boost::int32_t xoffset = world_mouse.x - world_origin.x;
         boost::int32_t yoffset = world_mouse.y - world_origin.y;
 
-        m_drag_state.setOffset(xoffset, yoffset);
+        _dragState.setOffset(xoffset, yoffset);
     }
     assert(testInvariant());
 }
@@ -785,35 +769,32 @@ void
 movie_root::doMouseDrag()
 {
     DisplayObject* dragChar = getDraggingCharacter(); 
-    if ( ! dragChar ) return; // nothing to do
+    if (!dragChar) return; // nothing to do
 
-    if ( dragChar->unloaded() )
-    {
+    if (dragChar->unloaded()) {
         // Reset drag state if dragging char was unloaded
-        m_drag_state.reset();
+        _dragState.reset();
         return; 
     }
 
     point world_mouse(pixelsToTwips(_mouseX), pixelsToTwips(_mouseY));
 
-    SWFMatrix    parent_world_mat;
-    DisplayObject* parent = dragChar->get_parent();
-    if (parent != NULL)
-    {
-        parent_world_mat = parent->getWorldMatrix();
+    SWFMatrix parent_world_mat;
+    DisplayObject* p = dragChar->parent();
+    if (p) {
+        parent_world_mat = getWorldMatrix(*p);
     }
 
-    if (! m_drag_state.isLockCentered())
-    {
-        world_mouse.x -= m_drag_state.xOffset();
-        world_mouse.y -= m_drag_state.yOffset();
+    if (!_dragState.isLockCentered()) {
+        world_mouse.x -= _dragState.xOffset();
+        world_mouse.y -= _dragState.yOffset();
     }
 
-    if ( m_drag_state.hasBounds() )
-    {
+    if (_dragState.hasBounds()) {
         SWFRect bounds;
         // bounds are in local coordinate space
-        bounds.enclose_transformed_rect(parent_world_mat, m_drag_state.getBounds());
+        bounds.enclose_transformed_rect(parent_world_mat,
+                _dragState.getBounds());
         // Clamp mouse coords within a defined SWFRect.
         bounds.clamp(world_mouse);
     }
@@ -822,11 +803,12 @@ movie_root::doMouseDrag()
     // Place our origin so that it coincides with the mouse coords
     // in our parent frame.
     // TODO: add a DisplayObject::set_translation ?
-    SWFMatrix    local = dragChar->getMatrix();
+    SWFMatrix local = getMatrix(*dragChar);
     local.set_translation(world_mouse.x, world_mouse.y);
-    dragChar->setMatrix(local); //no need to update caches when only changing translation
+     
+    // no need to update caches when only changing translation
+    dragChar->setMatrix(local);
 }
-
 
 unsigned int
 movie_root::add_interval_timer(std::auto_ptr<Timer> timer)
@@ -979,13 +961,12 @@ movie_root::display()
     Renderer* renderer = _runResources.renderer();
     if (!renderer) return;
 
-    renderer->begin_display(m_background_color, _stageWidth, _stageHeight,
-                            frame_size.get_x_min(), frame_size.get_x_max(),
-                            frame_size.get_y_min(), frame_size.get_y_max());
+    Renderer::External ex(*renderer, m_background_color,
+            _stageWidth, _stageHeight,
+            frame_size.get_x_min(), frame_size.get_x_max(),
+            frame_size.get_y_min(), frame_size.get_y_max());
 
-
-    for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
-    {
+    for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i) {
         MovieClip* movie = i->second;
 
         movie->clear_invalidated();
@@ -995,17 +976,14 @@ movie_root::display()
         // null frame size ? don't display !
         const SWFRect& sub_frame_size = movie->get_frame_size();
 
-        if ( sub_frame_size.is_null() )
-        {
+        if (sub_frame_size.is_null()) {
             log_debug("_level%u has null frame size, skipping", i->first);
             continue;
         }
 
-        movie->display(*renderer);
+        movie->display(*renderer, Transform());
 
     }
-
-    renderer->end_display();
 }
 
 bool
@@ -1120,7 +1098,7 @@ movie_root::getActiveEntityUnderPointer() const
 DisplayObject*
 movie_root::getDraggingCharacter() const
 {
-    return m_drag_state.getCharacter();
+    return _dragState.getCharacter();
 }
 
 const DisplayObject*
@@ -1713,6 +1691,8 @@ movie_root::executeTimers()
 void
 movie_root::markReachableResources() const
 {
+    _vm.markReachableResources();
+
     foreachSecond(_movies.rbegin(), _movies.rend(), &MovieClip::setReachable);
 
     // Mark original top-level movie
@@ -1746,7 +1726,7 @@ movie_root::markReachableResources() const
     if (_currentFocus) _currentFocus->setReachable();
 
     // Mark DisplayObject being dragged, if any
-    m_drag_state.markReachableResources();
+    _dragState.markReachableResources();
 
     // NOTE: cleanupDisplayList() should have cleaned up all
     // unloaded live characters. The remaining ones should be marked
@@ -2105,9 +2085,10 @@ movie_root::findCharacterByTarget(const std::string& tgtstr) const
         std::string part(tgtstr, from, to - from);
 
         // TODO: there is surely a cleaner way to implement path finding.
+        ObjectURI uri(st.find(part));
         o = o->displayObject() ?
-            o->displayObject()->pathElement(st.find(part)) :
-            o->get_path_element(st.find(part));
+            o->displayObject()->pathElement(uri) :
+            getPathElement(*o, uri);
 
         if (!o) {
 #ifdef GNASH_DEBUG_TARGET_RESOLUTION
@@ -2133,7 +2114,7 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
         /// If there is no hosting application, call the URL launcher. For
         /// safety, we resolve the URL against the base URL for this run.
         /// The data is not sent at all.
-        URL url(urlstr, _runResources.baseURL());
+        URL url(urlstr, _runResources.streamProvider().originalURL());
 
         gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
         std::string command = rcfile.getURLOpenerFormat();
@@ -2221,74 +2202,65 @@ movie_root::setScriptLimits(boost::uint16_t recursion, boost::uint16_t timeout)
 
 #ifdef USE_SWFTREE
 void
-movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it)
+movie_root::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 {
 
-    tree<StringPair>::iterator localIter;
-
-    //
-    /// Stage
-    //
+    // Stage
     const movie_definition* def = _rootMovie->definition();
     assert(def);
 
-    it = tr.insert(it, StringPair("Stage Properties", ""));
+    it = tr.insert(it, std::make_pair("Stage Properties", ""));
 
-    localIter = tr.append_child(it, StringPair("Root VM version",
+    InfoTree::iterator localIter =  tr.append_child(it,
+            std::make_pair("Root VM version",
                 def->isAS3() ? "AVM2 (unsupported)" : "AVM1"));
     
     std::ostringstream os;
     os << "SWF " << def->get_version();
-    localIter = tr.append_child(it, StringPair("Root SWF version", os.str()));
-    localIter = tr.append_child(it, StringPair("URL", def->get_url()));
+    localIter = tr.append_child(it, std::make_pair("Root SWF version",
+                os.str()));
+    localIter = tr.append_child(it, std::make_pair("URL", def->get_url()));
 
     // TODO: format this better?
-    localIter = tr.append_child(it, StringPair("Descriptive metadata",
+    localIter = tr.append_child(it, std::make_pair("Descriptive metadata",
                                         def->getDescriptiveMetadata()));
  
     /// Stage: real dimensions.
     os.str("");
     os << def->get_width_pixels() <<
         "x" << def->get_height_pixels();
-    localIter = tr.append_child(it, StringPair("Real dimensions", os.str()));
+    localIter = tr.append_child(it, std::make_pair("Real dimensions",
+                os.str()));
 
     /// Stage: rendered dimensions.
     os.str("");
     os << _stageWidth << "x" << _stageHeight;
-    localIter = tr.append_child(it, StringPair("Rendered dimensions", os.str()));
-
-#if 0
-    /// Stage: scaling allowed.
-    localIter = tr.append_child(it, StringPair("Scaling allowed",
-                _allowRescale ? yes : no));
-
-    //  TODO: add _scaleMode, _valign and _haling info
-#endif
+    localIter = tr.append_child(it, std::make_pair("Rendered dimensions",
+                os.str()));
 
     // Stage: scripts state (enabled/disabled)
-    localIter = tr.append_child(it, StringPair("Scripts",
+    localIter = tr.append_child(it, std::make_pair("Scripts",
                 _disableScripts ? " disabled" : "enabled"));
      
     getCharacterTree(tr, it);    
 }
 
 void
-movie_root::getCharacterTree(tree<StringPair>& tr,
-        tree<StringPair>::iterator it)
+movie_root::getCharacterTree(InfoTree& tr, InfoTree::iterator it)
 {
 
-    tree<StringPair>::iterator localIter;
+    InfoTree::iterator localIter;
 
-    /// Stage: number of live DisplayObjects
+    /// Stage: number of live MovieClips.
     std::ostringstream os;
     os << _liveChars.size();
-    localIter = tr.append_child(it, StringPair(_("Live DisplayObjects"),
+    localIter = tr.append_child(it, std::make_pair(_("Live MovieClips"),
                 os.str()));
 
-    /// Live DisplayObjects tree
-    for (LiveChars::const_iterator i = _liveChars.begin(), e = _liveChars.end();
+    /// DisplayObject tree
+    for (Levels::const_iterator i = _movies.begin(), e = _movies.end();
             i != e; ++i) {
-        (*i)->getMovieInfo(tr, localIter);
+        i->second->getMovieInfo(tr, localIter);
     }
 
 }
@@ -2575,7 +2547,7 @@ getNearestObject(const DisplayObject* o)
     while (1) {
         assert(o);
         if (isReferenceable(*o)) return o;
-        o = o->get_parent();
+        o = o->parent();
     }
 }
 
@@ -2586,7 +2558,7 @@ getBuiltinObject(movie_root& mr, string_table::key cl)
 
     as_value val;
     if (!gl.get_member(cl, &val)) return 0;
-    return val.to_object(gl);
+    return toObject(val, mr.getVM());
 }
 
 void

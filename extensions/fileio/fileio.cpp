@@ -35,7 +35,7 @@
 #include "fn_call.h"
 #include "as_object.h"
 #include "builtin_function.h" // need builtin_function
-#include "Globals.h"
+#include "Global_as.h"
 #include "fileio.h"
 #include "Array_as.h"  // used by scandir()
 
@@ -470,7 +470,7 @@ fileio_fputc(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     FileIO* ptr = ensure<ThisIsNative<FileIO> >(fn);
     assert(ptr);    
-    int c = (int) fn.arg(0).to_number();
+    int c = (int) toNumber(fn.arg(0), getVM(fn));
     return as_value(ptr->fputc(c));
 }
 
@@ -518,7 +518,7 @@ fileio_fseek(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     FileIO* ptr = ensure<ThisIsNative<FileIO> >(fn);
     assert(ptr);    
-    long c = static_cast<long>(fn.arg(0).to_number());
+    long c = static_cast<long>(toNumber(fn.arg(0), getVM(fn)));
     return as_value(ptr->fseek(c));
 }
 
@@ -538,7 +538,7 @@ fileio_asyncmode(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     FileIO* ptr = ensure<ThisIsNative<FileIO> >(fn);
     assert(ptr);
-    bool b = (bool) fn.arg(0).to_bool();
+    bool b = toBool(fn.arg(0), getVM(fn));
     return as_value(ptr->asyncmode(b));
 }
 
@@ -603,7 +603,7 @@ fileio_class_init(as_object& where, const ObjectURI& /* uri */)
     //	GNASH_REPORT_FUNCTION;
     Global_as& gl = getGlobal(where);
 
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     attachInterface(*proto);
     as_object* cl = gl.createClass(&fileio_ctor, proto);
     

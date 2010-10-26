@@ -72,7 +72,7 @@ number_toString(const fn_call& fn)
 
     if ( fn.nargs ) 
     {
-        int userRadix = toInt(fn.arg(0));
+        int userRadix = toInt(fn.arg(0), getVM(fn));
         if ( userRadix >= 2 && userRadix <= 36 ) radix=userRadix;
         else
         {
@@ -101,13 +101,11 @@ as_value
 number_ctor(const fn_call& fn)
 {
     double val = 0;
-    if (fn.nargs > 0)
-    {
-        val = fn.arg(0).to_number();
+    if (fn.nargs > 0) {
+        val = toNumber(fn.arg(0), getVM(fn));
     }
 
-    if ( ! fn.isInstantiation() )
-    {
+    if (!fn.isInstantiation()) {
         return as_value(val);
     }
 
@@ -155,7 +153,7 @@ number_class_init(as_object& where, const ObjectURI& uri)
     VM& vm = getVM(where);
     Global_as& gl = getGlobal(where);
 
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     as_object* cl = vm.getNative(106, 2);
     cl->init_member(NSV::PROP_PROTOTYPE, proto);
     proto->init_member(NSV::PROP_CONSTRUCTOR, cl);

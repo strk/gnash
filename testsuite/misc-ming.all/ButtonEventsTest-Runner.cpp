@@ -51,6 +51,7 @@ test_mouse_activity(MovieTester& tester, const TextField* text, const TextField*
 	// the textfield value, if enabled
 	tester.movePointerTo(60, 60);
 	if ( enabled ) {
+		check(tester.usingHandCursor());
 		check_equals(string(text->get_text_value()), string("MouseOver"));
 		check_equals(string(text2->get_text_value()), string("RollOver"));
 		check(tester.isMouseOverMouseEntity());
@@ -69,6 +70,7 @@ test_mouse_activity(MovieTester& tester, const TextField* text, const TextField*
 			check_pixel(72, 64, 2, dark_yellow, 2); 
 		}
 	} else {
+		check(!tester.usingHandCursor());
 		check_equals(string(text->get_text_value()), string("MouseUpOutside"));
 		check_equals(string(text2->get_text_value()), string("ReleaseOutside"));
 		check(!tester.isMouseOverMouseEntity());
@@ -262,6 +264,8 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(mc1->get_depth(), 2+DisplayObject::staticDepthOffset);
 
 	check(!tester.isMouseOverMouseEntity());
+	check(!tester.usingHandCursor());
+
 	// check that pixel @ 60,60 is red !
 	rgba red(255,0,0,255);
 	check_pixel(60, 60, 2, red, 2);
@@ -272,8 +276,13 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_current_frame(), 2); // need to roll out
 
 	tester.movePointerTo(60, 60); // roll over the square
+	check(tester.isMouseOverMouseEntity());
+	check(tester.usingHandCursor());
 	check_equals(root->get_current_frame(), 2); // need to roll out
+
 	tester.movePointerTo(0, 0); // roll out, should go to next frame
+	check(!tester.isMouseOverMouseEntity());
+	check(!tester.usingHandCursor());
 	check_equals(root->get_current_frame(), 3); 
 
 	for (size_t fno=root->get_current_frame(); fno<root->get_frame_count(); fno++)

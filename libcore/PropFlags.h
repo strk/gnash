@@ -20,19 +20,13 @@
 #define GNASH_AS_PROP_FLAGS_H
 
 #include <ostream>
+#include <boost/cstdint.hpp>
 
 namespace gnash {
 
 /// Flags defining the level of protection of a member
 class PropFlags
 {
-
-	/// Numeric flags
-	int _flags;
-
-	/// if true, this value is protected (internal to gnash)
-	//bool _protected;
-
 public:
 
 	/// Actual flags
@@ -65,7 +59,9 @@ public:
 	};
 
 	/// Default constructor
-	PropFlags() : _flags(0)
+	PropFlags()
+        :
+        _flags(0)
 	{
 	}
 
@@ -80,24 +76,22 @@ public:
 	}
 
 	/// Constructor, from numerical value
-	PropFlags(const int flags)
-		: _flags(flags)
+	PropFlags(boost::uint16_t flags)
+		:
+        _flags(flags)
 	{
 	}
 
-	bool operator== (const PropFlags& o) const
-	{
-		return ( _flags == o._flags );
+	bool operator==(const PropFlags& o) const {
+		return (_flags == o._flags);
 	}
 
-	bool operator!= (const PropFlags& o) const
-	{
-		return ( _flags != o._flags );
+	bool operator!=(const PropFlags& o) const {
+        return !(*this == o);
 	}
 
 	/// Get "read-only" flag 
-	bool get_read_only() const
-	{
+	bool get_read_only() const {
 	    return (_flags & readOnly);
 	}
 
@@ -120,8 +114,7 @@ public:
 	void clear_dont_delete() { _flags &= ~dontDelete; }
 
 	/// Get "don't enum" flag
-	bool get_dont_enum() const
-	{
+	bool get_dont_enum() const {
 	    return (_flags & dontEnum);
 	}
 
@@ -157,8 +150,8 @@ public:
 		
 	}
 
-	/// accesor to the numerical flags value
-	int get_flags() const { return _flags; }
+	/// accessor to the numerical flags value
+    boost::uint16_t get_flags() const { return _flags; }
 
 	/// set the numerical flags value (return the new value )
 	/// If unlocked is false, you cannot un-protect from over-write,
@@ -173,12 +166,18 @@ public:
 	///
 	/// @return true on success, false on failure (is protected)
 	///
-	bool set_flags(const int setTrue, const int setFalse = 0)
+	bool set_flags(boost::uint16_t setTrue, boost::uint16_t setFalse = 0)
 	{
 		_flags &= ~setFalse;
 		_flags |= setTrue;
 		return true;
 	}
+
+private:
+
+	/// Numeric flags
+    boost::uint16_t _flags;
+
 };
 
 inline std::ostream&

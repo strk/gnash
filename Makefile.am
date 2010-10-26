@@ -84,6 +84,8 @@ endif
 # man_MANS = doc/gnash.1 doc/gprocessor.1 doc/dumpshm.1 soldumper.1
 
 EXTRA_DIST =  \
+	README \
+	README.git \
 	autogen.sh \
 	config.rpath \
 	macros/incllist macros/libslist \
@@ -92,6 +94,10 @@ EXTRA_DIST =  \
 	ChangeLog-0.8.2 \
 	ChangeLog-0.8.3 \
 	ChangeLog-0.8.4 \
+	ChangeLog-0.8.5 \
+	ChangeLog-0.8.6 \
+	ChangeLog-0.8.7 \
+	ChangeLog-0.8.8 \
 	packaging/deb.am \
 	packaging/snapshot.am \
 	packaging/alp.am \
@@ -124,7 +130,6 @@ CLEANFILES =
 CLEANFILES += revno.h
 BUILT_SOURCES = revno.h
 revno.h: Makefile.in
-	@echo "Generating revno.h"
 	-@if test -d $(srcdir)/.bzr; then \
 	  status=`which bzr 2>&1 | grep -c " no bzr"`; \
 	  if test x"$${status}" = x"0"; then \
@@ -133,31 +138,33 @@ revno.h: Makefile.in
 	    revno=`(cd $(srcdir) && bzr revno)`; \
 	    nick=`basename $(top_srcdir)`; \
 	  else \
-	    revno="${NOW}"; \
+	    revno="$(NOW)"; \
 	  fi; \
 	else \
-	  if test -d $(srcdir)/.git; then \
+	  if test -d $(top_srcdir)/.git; then \
             status=`which git 2>&1 | grep -c " no git"`; \
             if test x"$${status}" = x"0"; then \
               echo "Generating revno.h"; \
               $(RM) -f revno.h; \
-              revno="`(cd $(srcdir) && git describe --tags | cut -d '-' -f 2-3 | tr a- a.)`"; \
-              nick="`basename $(top_srcdir) | tr a_ a.`"; \
+              revno="`(cd $(top_srcdir) && git describe --tags | cut -d '-' -f 2-3 | tr a- a.)`"; \
+              nick="`(cd $(top_srcdir) && git branch | grep "\*" | cut -d ' ' -f 2)`"; \
 	    fi; \
           else \
-            revno="${NOW}"; \
+            revno="$(NOW)"; \
             nick="none"; \
 	  fi; \
+	  if test x$$revno = x; then \
+	    revno="$(NOW)"; \
+	  fi; \
 	fi; \
-	echo "static const char *BRANCH_REVNO  = \"$${revno}\";" > revno.h; \
-	echo "static const char *BRANCH_NICK = \"$${nick}\";" >> revno.h;
+	echo "static const char* BRANCH_REVNO  = \"$${revno}\";" > revno.h; \
+	echo "static const char* BRANCH_NICK = \"$${nick}\";" >> revno.h;
 
 # The branch nickname and revision number must be set before including
 # the other Makefile fragments used for package building, as they use
 # these values.
-BRANCH_REVNO  := $(shell grep "REVNO" revno.h | cut -d '"' -f 2)
+BRANCH_REVNO  := $(shell grep "REVNO" revno.h | cut -d '"' -f 2 | cut -d '.' -f 1)
 BRANCH_NICK   := $(shell grep "NICK" revno.h | cut -d '"' -f 2)
-
 
 # Extract info from the repository to include in the build. If
 # GIT (git) isn't installed, just print stubs, as this is only
@@ -309,14 +316,6 @@ if BUILD_GTK_GUI
 	@echo "	ATK_CFLAGS is $(ATK_CFLAGS)"
 	@echo "	ATK_LIBS is $(ATK_LIBS)"
 endif
-if BUILD_HILDON_GUI
-	@echo "	HILDON_CFLAGS is $(HILDON_CFLAGS)"
-	@echo "	HILDON_LIBS is $(HILDON_LIBS)"
-endif
-if BUILD_ALP_GUI
-	@echo " ALP_CFLAGS is $(ALP_CFLAGS)"
-	@echo "	ALP_LIBS is $(ALP_LIBS)"
-endif
 	@echo "	X11_CFLAGS is $(X11_CFLAGS)"
 	@echo "	X11_LIBS is $(X11_LIBS)"
 	@echo "Support libraries..."
@@ -345,8 +344,8 @@ endif
 	@echo "	CURL_LIBS is $(CURL_LIBS)"
 	@echo "	BOOST_CFLAGS is $(BOOST_CFLAGS)"
 	@echo "	BOOST_LIBS is $(BOOST_LIBS)"
-	@if test -n $(BOOST_EXTRA_LIBS); then \
-	  echo "	BOOST_EXTRA_LIBS is $(BOOST_EXTRA_LIBS)"; \
+	@if test -n $(BOOST_CYGNAL_LIBS); then \
+	  echo "	BOOST_CYGNAL_LIBS is $(BOOST_CYGNAL_LIBS)"; \
 	fi
 if ENABLE_MING
 	@echo "	MING_VERSION_CODE $(MING_VERSION_CODE) "
@@ -430,14 +429,8 @@ else
 	@echo "	Supported GUI: GTK"
 endif
 endif
-if BUILD_HILDON_GUI
-	@echo "	Supported GUI: HILDON"
-endif
 if BUILD_DUMP_GUI
 	@echo "	Supported GUI: Dump"
-endif
-if BUILD_ALP_GUI
-	@echo "	Supported GUI: ALP/Hiker"
 endif
 if BUILD_KDE3_GUI
 	@echo "	Supported GUI: KDE3"

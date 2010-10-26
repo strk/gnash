@@ -21,26 +21,21 @@
 #include "gnashconfig.h"
 #endif
 
-#include "namedStrings.h"
-#include <cstdarg>
+#include "mysql_db.h"
 
+#include "namedStrings.h"
 #include <mysql/errmsg.h>
 #include <mysql/mysql.h>
-#include <iostream>
 #include <vector>
 
 #include "log.h"
 #include "Array_as.h"
 #include "as_value.h"
 #include "fn_call.h"
-#include "mysql_db.h"
-#include "Globals.h"
+#include "Global_as.h"
 #include "builtin_function.h" // need builtin_function
 
-using namespace std;
-
-namespace gnash
-{
+namespace gnash {
 
 as_value mysql_connect(const fn_call& fn);
 as_value mysql_qetData(const fn_call& fn);
@@ -273,7 +268,7 @@ MySQL::getData(const char *sql, query_t &qresult)
 #endif
     
     while((_row = mysql_fetch_row(_result))) {
-	vector<const char *> row_vec;
+	std::vector<const char *> row_vec;
 	for (size_t i=0; i<mysql_num_fields(_result); i++) {
 //	    log_debug("Column[%d] is: \"%s\"", i, row[i]);
 	    row_vec.push_back(_row[i]);
@@ -306,10 +301,10 @@ mysql_connect(const fn_call& fn)
     MySQL* ptr = ensure<ThisIsNative<MySQL> >(fn);
 
     if (fn.nargs == 4) {
-        string host = fn.arg(0).to_string();
-        string db = fn.arg(1).to_string();
-        string user = fn.arg(2).to_string();
-        string passwd = fn.arg(3).to_string();	
+        std::string host = fn.arg(0).to_string();
+        std::string db = fn.arg(1).to_string();
+        std::string user = fn.arg(2).to_string();
+        std::string passwd = fn.arg(3).to_string();	
         return as_value(ptr->connect(host.c_str(), db.c_str(),
                          user.c_str(), passwd.c_str()));
     } 
@@ -323,13 +318,13 @@ mysql_qetData(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
 
     if (fn.nargs > 0) {
-        string sql = fn.arg(0).to_string();
-	    as_object* arr = fn.arg(1).to_object(getGlobal(fn));
+        std::string sql = fn.arg(0).to_string();
+	    as_object* arr = toObject(fn.arg(1), getVM(fn));
 
         MySQL::query_t qresult;
 
         for (size_t i=0; i<qresult.size(); i++) {
-            vector<const char *> row;
+            std::vector<const char *> row;
             row = qresult[i];
             for (size_t j=0; j< row.size(); j++) {
                 as_value entry = row[j];
@@ -390,7 +385,7 @@ mysql_query(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     MySQL* ptr = ensure<ThisIsNative<MySQL> >(fn);
     if (fn.nargs > 0) {
-        string sql = fn.arg(0).to_string();
+        std::string sql = fn.arg(0).to_string();
         return as_value(ptr->guery(sql.c_str()));
     }
     log_aserror("Missing arguments to MySQL.query");
@@ -409,7 +404,7 @@ extern "C" {
 void mysql_class_init(as_object &obj)
 {
     Global_as& gl = getGlobal(obj);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
 	as_object *cl = gl.createClass(&mysql_ctor, proto);
     attachInterface(*proto);
 	obj.init_member("MySQL", cl);

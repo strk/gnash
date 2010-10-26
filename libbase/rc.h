@@ -30,7 +30,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/tokenizer.hpp>
 
-#if !defined(_WIN32) && !defined(__HAIKU__) && !defined(_ANDROID)
+#if !defined(_WIN32) && !defined(__HAIKU__) && !defined(ANDROID)
 #include <sys/shm.h>
 #else
 #ifdef _WIN32

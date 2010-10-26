@@ -246,8 +246,8 @@ camera_get(const fn_call& fn)
 
     // Properties are attached to the prototype (not __proto__) when get() is
     // called. 
-    as_object* proto =
-        ptr->getMember(NSV::PROP_PROTOTYPE).to_object(getGlobal(fn));
+    as_object* proto = toObject(
+        getMember(*ptr, NSV::PROP_PROTOTYPE), getVM(fn));
 
     attachCameraProperties(*proto);
 
@@ -279,7 +279,7 @@ camera_get(const fn_call& fn)
     // Normally the VM would furnish us with a newly instantiated object, if
     // a constructor were used. But we're in a factory, so we have to build
     // one for ourselves.
-    as_object* cam_obj = getGlobal(fn).createObject();
+    as_object* cam_obj = createObject(getGlobal(fn));
     cam_obj->set_prototype(proto);
     attachCameraInterface(*cam_obj);
     attachCameraProperties(*cam_obj);
@@ -296,10 +296,10 @@ camera_setmode(const fn_call& fn)
 
     const size_t nargs = fn.nargs;
 
-    const double width = nargs ? fn.arg(0).to_number() : 160;
-    const double height = nargs > 1 ? fn.arg(1).to_number() : 120;
-    const double fps = nargs >  2? fn.arg(2).to_number() : 15;
-    const bool favorArea = nargs > 3 ? fn.arg(3).to_bool() : true;
+    const double width = nargs ? toNumber(fn.arg(0), getVM(fn)) : 160;
+    const double height = nargs > 1 ? toNumber(fn.arg(1), getVM(fn)) : 120;
+    const double fps = nargs >  2? toNumber(fn.arg(2), getVM(fn)) : 15;
+    const bool favorArea = nargs > 3 ? toBool(fn.arg(3), getVM(fn)) : true;
 
     // TODO: handle overflow
     const size_t reqWidth = std::max<double>(width, 0);
@@ -318,8 +318,8 @@ camera_setmotionlevel(const fn_call& fn)
     
     const size_t nargs = fn.nargs;
 
-    const double ml = nargs > 0 ? fn.arg(0).to_number() : 50;
-    const double mt = nargs > 1 ? fn.arg(1).to_number() : 2000;
+    const double ml = nargs > 0 ? toNumber(fn.arg(0), getVM(fn)) : 50;
+    const double mt = nargs > 1 ? toNumber(fn.arg(1), getVM(fn)) : 2000;
 
     const size_t motionLevel = (ml >= 0 && ml <= 100) ? ml : 100;
 
@@ -337,8 +337,8 @@ camera_setquality(const fn_call& fn)
 
     const size_t nargs = fn.nargs;
 
-    const double b = nargs > 0 ? fn.arg(0).to_number() : 16384;
-    const double q = nargs > 1 ? fn.arg(1).to_number() : 0;
+    const double b = nargs > 0 ? toNumber(fn.arg(0), getVM(fn)) : 16384;
+    const double q = nargs > 1 ? toNumber(fn.arg(1), getVM(fn)) : 0;
 
     size_t quality = (q < 0 || q > 100) ? 100 : q;
 
@@ -586,7 +586,7 @@ camera_setLoopback(const fn_call& fn)
         log_aserror("%s: Too many arguments", "Camera.setLoopback");
     }
 
-    ptr->setLoopback(fn.arg(0).to_bool());
+    ptr->setLoopback(toBool(fn.arg(0), getVM(fn)));
     
     return as_value();
 }

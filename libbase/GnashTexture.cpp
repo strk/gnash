@@ -116,25 +116,31 @@ static bool check_extension(const char *name, const char *ext)
     return false;
 }
 
-GnashTextureFormat::GnashTextureFormat(ImageType type)
+GnashTextureFormat::GnashTextureFormat(image::ImageType type)
 {
     switch (type) {
-    case GNASH_IMAGE_RGB:
-        _internal_format = GL_RGB;
-        _format = GL_RGB;
-        break;
-    case GNASH_IMAGE_RGBA:
-        _internal_format = GL_RGBA;
-        _format = GL_BGRA;
-        break;
-    default:
-        assert(0);
-        break;
+        case image::TYPE_RGB:
+            _internal_format = GL_RGB;
+            _format = GL_RGB;
+            break;
+        case image::TYPE_RGBA:
+            _internal_format = GL_RGBA;
+            _format = GL_BGRA;
+            break;
+        default:
+            assert(0);
+            break;
     }
 }
 
-GnashTexture::GnashTexture(unsigned int width, unsigned int height, ImageType type)
-    : _width(width), _height(height), _texture(0), _format(type), _flags(0)
+GnashTexture::GnashTexture(unsigned int width, unsigned int height,
+        image::ImageType type)
+    : 
+    _width(width),
+    _height(height),
+    _texture(0),
+    _format(type),
+    _flags(0)
 {
     D(bug("GnashTexture::GnashTexture()\n"));
 

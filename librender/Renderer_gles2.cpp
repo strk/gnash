@@ -46,15 +46,15 @@
 
 #include <smart_ptr.h>
 #include "swf/ShapeRecord.h"
-#include "gnash.h"
 #include "RGBA.h"
 #include "GnashImage.h"
 #include "GnashTexture.h"
 #include "GnashNumeric.h"
+#include "GnashImage.h"
 #include "log.h"
 #include "utility.h"
 #include "Range2d.h"
-#include "cxform.h"
+//#include "cxform.h"
 
 #include "Renderer_gles1.h"
 

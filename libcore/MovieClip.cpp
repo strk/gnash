@@ -22,9 +22,15 @@
 #include "gnashconfig.h" // USE_SWFTREE 
 #endif
 
-#include "MovieFactory.h"
-#include "log.h" 
 #include "MovieClip.h"
+
+#include <vector>
+#include <string>
+#include <algorithm> // for std::swap
+#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/bind.hpp>
+
+#include "log.h" 
 #include "movie_definition.h"
 #include "as_value.h"
 #include "as_function.h"
@@ -57,13 +63,7 @@
 #include "DisplayObjectContainer.h"
 #include "Global_as.h"
 #include "RunResources.h"
-#include "GnashImage.h"
-
-#include <vector>
-#include <string>
-#include <algorithm> // for std::swap
-#include <boost/algorithm/string/case_conv.hpp>
-#include <boost/bind.hpp>
+#include "Transform.h"
 
 namespace gnash {
 
@@ -339,16 +339,156 @@ class BoundsFinder
 public:
     explicit BoundsFinder(SWFRect& b) : _bounds(b) {}
 
-    void operator() (DisplayObject* ch) {
+    void operator()(DisplayObject* ch) {
         // don't include bounds of unloaded DisplayObjects
-        if ( ch->unloaded() ) return;
+        if (ch->unloaded()) return;
         SWFRect chb = ch->getBounds();
-        SWFMatrix m = ch->getMatrix();
+        SWFMatrix m = getMatrix(*ch);
         _bounds.expand_to_transformed_rect(m, chb);
     }
 
 private:
     SWFRect& _bounds;
+};
+
+struct ReachableMarker
+{
+    void operator()(DisplayObject *ch) const {
+        ch->setReachable();
+    }
+};
+
+/// Find the first visible DisplayObject whose shape contain the point
+/// and is not the DisplayObject being dragged or any of its childs
+//
+/// Point coordinates in world TWIPS
+///
+class DropTargetFinder {
+
+    /// Highest depth hidden by a mask
+    //
+    /// This will be -1 initially, and set
+    /// the the depth of a mask when the mask
+    /// doesn't contain the query point, while
+    /// scanning a DisplayList bottom-up
+    ///
+    int _highestHiddenDepth;
+
+    boost::int32_t _x;
+    boost::int32_t _y;
+    DisplayObject* _dragging;
+    mutable const DisplayObject* _dropch;
+
+    typedef std::vector<const DisplayObject*> Candidates;
+    Candidates _candidates;
+
+    mutable bool _checked;
+
+public:
+
+    DropTargetFinder(boost::int32_t x, boost::int32_t y, DisplayObject* dragging)
+        :
+        _highestHiddenDepth(std::numeric_limits<int>::min()),
+        _x(x),
+        _y(y),
+        _dragging(dragging),
+        _dropch(0),
+        _candidates(),
+        _checked(false)
+    {}
+
+    void operator() (const DisplayObject* ch)
+    {
+        assert(!_checked);
+        if ( ch->get_depth() <= _highestHiddenDepth )
+        {
+            if ( ch->isMaskLayer() )
+            {
+                log_debug(_("CHECKME: nested mask in DropTargetFinder. "
+                        "This mask is %s at depth %d outer mask masked "
+                        "up to depth %d."),
+                        ch->getTarget(), ch->get_depth(), _highestHiddenDepth);
+                // Hiding mask still in effect...
+            }
+            return;
+        }
+
+        if ( ch->isMaskLayer() )
+        {
+            if ( ! ch->visible() )
+            {
+                log_debug(_("FIXME: invisible mask in MouseEntityFinder."));
+            }
+            if ( ! ch->pointInShape(_x, _y) )
+            {
+#ifdef DEBUG_MOUSE_ENTITY_FINDING
+                log_debug(_("Character %s at depth %d is a mask not hitting "
+                        "the query point %g,%g and masking up to depth %d"),
+                    ch->getTarget(), ch->get_depth(), _x, _y,
+                    ch->get_clip_depth());
+#endif 
+                _highestHiddenDepth = ch->get_clip_depth();
+            }
+            else
+            {
+#ifdef DEBUG_MOUSE_ENTITY_FINDING
+                log_debug(_("Character %s at depth %d is a mask "
+                            "hitting the query point %g,%g"),
+                            ch->getTarget(), ch->get_depth(), _x, _y);
+#endif
+            }
+
+            return;
+        }
+
+        _candidates.push_back(ch);
+
+    }
+
+    void checkCandidates() const
+    {
+        if ( _checked ) return;
+        for (Candidates::const_reverse_iterator i=_candidates.rbegin(),
+                        e=_candidates.rend(); i!=e; ++i)
+        {
+            const DisplayObject* ch = *i;
+            const DisplayObject* dropChar = ch->findDropTarget(_x, _y, _dragging);
+            if ( dropChar )
+            {
+                _dropch = dropChar;
+                break;
+            }
+        }
+        _checked = true;
+    }
+
+    const DisplayObject* getDropChar() const
+    {
+        checkCandidates();
+        return _dropch;
+    }
+};
+
+class DisplayListVisitor
+{
+public:
+    DisplayListVisitor(KeyVisitor& v) : _v(v) {}
+
+    void operator()(DisplayObject* ch) const {
+         if (!isReferenceable(*ch)) return;
+         // Don't enumerate unloaded DisplayObjects
+         if (ch->unloaded()) return;
+          
+         const ObjectURI& name = ch->get_name();
+         // Don't enumerate unnamed DisplayObjects
+         if (name.empty()) return;
+          
+         // Referenceable DisplayObject always have an object.
+         assert(getObject(ch));
+         _v(name);
+    }
+private:
+    KeyVisitor& _v;
 };
 
 } // anonymous namespace
@@ -460,18 +600,15 @@ MovieClip::get_frame_number(const as_value& frame_spec, size_t& frameno) const
 
     as_value str(fspecStr);
 
-    double num = str.to_number();
-
-    //log_debug("get_frame_number(%s), num: %g", frame_spec, num);
+    const double num = toNumber(str, getVM(*getObject(this)));
 
     if (!isFinite(num) || int(num) != num || num == 0)
     {
         bool ret = _def->get_labeled_frame(fspecStr, frameno);
-        //log_debug("get_labeled_frame(%s) returned %d, frameno is %d", fspecStr, ret, frameno);
         return ret;
     }
 
-    if ( num < 0 ) return false;
+    if (num < 0) return false;
 
     // all frame numbers > 0 are valid, but a valid frame number may still
     // reference a non-exist frame(eg. frameno > total_frames).
@@ -537,7 +674,7 @@ MovieClip*
 MovieClip::duplicateMovieClip(const std::string& newname, int depth,
         as_object* initObject)
 {
-    DisplayObject* parent_ch = get_parent();
+    DisplayObject* parent_ch = parent();
     if (!parent_ch) {
         log_error(_("Can't clone root of the movie"));
         return NULL;
@@ -567,8 +704,8 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
     // Copy drawable
     newmovieclip->_drawable = _drawable;
     
-    newmovieclip->set_cxform(get_cxform());    
-    newmovieclip->setMatrix(getMatrix(), true); 
+    newmovieclip->setCxForm(getCxForm(*this));
+    newmovieclip->setMatrix(getMatrix(*this), true); 
     newmovieclip->set_ratio(get_ratio());    
     newmovieclip->set_clip_depth(get_clip_depth());    
     
@@ -652,7 +789,7 @@ MovieClip::notifyEvent(const event_id& id)
         do
         {
             // we don't skip calling user-defined onLoad for top-level movies 
-            if ( ! get_parent() ) break;
+            if ( ! parent() ) break;
             // nor if there are clip-defined handler
             if ( ! get_event_handlers().empty() ) break; 
             // nor if it's dynamic  
@@ -664,11 +801,11 @@ MovieClip::notifyEvent(const event_id& id)
             // must be a loaded movie (loadMovie doesn't mark it as 
             // "dynamic" - should it? no, or getBytesLoaded will always
             // return 0)  
-            if ( ! def ) break;
+            if (!def) break;
 
             // if it has a registered class it can have an onLoad 
             // in prototype...
-            if ( def->getRegisteredClass() ) break;
+            if (def->getRegisteredClass()) break;
 
 #ifdef GNASH_DEBUG
             log_debug(_("Sprite %s (depth %d) won't check for user-defined "
@@ -681,26 +818,21 @@ MovieClip::notifyEvent(const event_id& id)
             
     }
 
-    // Check for member function.
+    // Call the appropriate member function.
     if (!isKeyEvent(id)) {
-        callMethod(getObject(this), id.functionKey());
+        sendEvent(*getObject(this), get_environment(), id.functionURI());
     }
-
-    // TODO: if this was UNLOAD release as much memory as possible ?
-    // Verify if this is possible, in particular check order in
-    // which unload handlers of parent and childs is performed
-    // and whether unload of child can access members of parent.
 
 }
 
 as_object*
-MovieClip::pathElement(string_table::key key)
+MovieClip::pathElement(const ObjectURI& uri)
 {
-    as_object* obj = DisplayObject::pathElement(key);
+    as_object* obj = DisplayObject::pathElement(uri);
     if (obj) return obj;
 
     // See if we have a match on the display list.
-    obj = getObject(getDisplayListObject(key));
+    obj = getObject(getDisplayListObject(uri));
     if (obj) return obj;
 
     obj = getObject(this);
@@ -708,7 +840,7 @@ MovieClip::pathElement(string_table::key key)
 
     // See if it's a member
     as_value tmp;
-    if (!obj->as_object::get_member(key, &tmp)) {
+    if (!obj->as_object::get_member(uri, &tmp)) {
         return NULL;
     }
     if (!tmp.is_object()) {
@@ -719,7 +851,7 @@ MovieClip::pathElement(string_table::key key)
         return getObject(tmp.toDisplayObject(true));
     }
 
-    return tmp.to_object(getGlobal(*getObject(this)));
+    return toObject(tmp, getVM(*getObject(this)));
 }
 
 bool
@@ -742,7 +874,7 @@ MovieClip::setTextFieldVariables(const ObjectURI& uri, const as_value& val)
     if (!etc) return false;
 
     for (TextFields::iterator i=etc->begin(), e=etc->end(); i!=e; ++i) {
-        (*i)->updateText(val.to_string());
+        (*i)->updateText(val.to_string(getSWFVersion(*getObject(this))));
     }
     return true;
 }
@@ -1080,24 +1212,27 @@ MovieClip::goto_labeled_frame(const std::string& label)
 }
 
 void
-MovieClip::display(Renderer& renderer)
+MovieClip::draw(Renderer& renderer, const Transform& xform)
 {
+    const DisplayObject::MaskRenderer mr(renderer, *this);
 
-    // Note: 
-    // DisplayList::Display() will take care of the visibility checking.
+    _drawable.finalize();
+    _drawable.display(renderer, xform);
+    _displayList.display(renderer, xform);
+}
+
+void
+MovieClip::display(Renderer& renderer, const Transform& base)
+{
+    // Note: DisplayList::display() will take care of the visibility checking.
     //
     // Whether a DisplayObject should be rendered or not is dependent
     // on its parent: i.e. if its parent is a mask, this DisplayObject
     // should be rendered to the mask buffer even it is invisible.
     
-    // render drawable (ActionScript generated graphics)
-    _drawable.finalize();
-    _drawable.display(renderer, *this);
-    
-    
-    // descend the display list
-    _displayList.display(renderer);
-     
+    // Draw everything with our own transform.
+    const Transform xform = base * transform();
+    draw(renderer, xform);
     clear_invalidated();
 }
 
@@ -1116,14 +1251,6 @@ MovieClip::attachCharacter(DisplayObject& newch, int depth, as_object* initObj)
 
     // FIXME: check return from placeDisplayObject above ?
     return true; 
-}
-
-std::auto_ptr<GnashImage>
-MovieClip::drawToBitmap(const SWFMatrix& /* mat */, const cxform& /* cx */,
-            DisplayObject::BlendMode /* bm */, const SWFRect& /* clipRect */,
-            bool /* smooth */)
-{
-    return std::auto_ptr<GnashImage>();
 }
 
 DisplayObject*
@@ -1176,7 +1303,7 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     }
 
     // TODO: check if we should check those has_xxx flags first.
-    ch->set_cxform(tag->getCxform());
+    ch->setCxForm(tag->getCxform());
     ch->setMatrix(tag->getMatrix(), true); // update caches
     ch->set_ratio(tag->getRatio());
     ch->set_clip_depth(tag->getClipDepth());
@@ -1252,7 +1379,7 @@ MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
         ch->set_ratio(tag->getRatio());
     }
     if (tag->hasCxform()) {
-        ch->set_cxform(tag->getCxform());
+        ch->setCxForm(tag->getCxform());
     }
     if (tag->hasMatrix()) {
         ch->setMatrix(tag->getMatrix(), true); 
@@ -1295,12 +1422,15 @@ bool
 MovieClip::handleFocus()
 {
 
+    as_object* obj = getObject(this);
+    assert(obj);
+
     // For SWF6 and above: the MovieClip can always receive focus if
     // focusEnabled evaluates to true.
-    if (getSWFVersion(*getObject(this)) > 5) {
+    if (getSWFVersion(*obj) > 5) {
         as_value focusEnabled;
-        if (getObject(this)->get_member(NSV::PROP_FOCUS_ENABLED, &focusEnabled)) {
-            if (focusEnabled.to_bool() == true) return true; 
+        if (obj->get_member(NSV::PROP_FOCUS_ENABLED, &focusEnabled)) {
+            if (toBool(focusEnabled, getVM(*obj))) return true; 
         }
     }
         
@@ -1350,8 +1480,7 @@ MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
 inline bool
 MovieClip::hitTestDrawable(boost::int32_t x, boost::int32_t y) const
 {
-    SWFMatrix wm = getWorldMatrix();
-    wm.invert();
+    const SWFMatrix wm = getWorldMatrix(*this).invert();
     point lp(x, y);
     wm.transform(lp);
     if (!_drawable.getBounds().point_test(lp.x, lp.y)) return false;
@@ -1382,15 +1511,14 @@ MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 
     // point is in parent's space, we need to convert it in world space
     point wp(x, y);
-    DisplayObject* parent = get_parent();
-    if ( parent ) 
-    {
+    DisplayObject* p = parent();
+    if (p) {
         // WARNING: if we have NO parent, our parent is the Stage (movie_root)
         //          so, in case we'll add a "stage" matrix, we'll need to take
         //          it into account here.
         // TODO: actually, why are we insisting in using parent's
         //          coordinates for this method at all ?
-        parent->getWorldMatrix().transform(wp);
+        getWorldMatrix(*p).transform(wp);
     }
 
     if (mouseEnabled())
@@ -1399,9 +1527,10 @@ MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
         else return NULL;
     }
 
-    SWFMatrix    m = getMatrix();
-    point    pp(x, y);
-    m.invert().transform(pp);
+    SWFMatrix m = getMatrix(*this);
+    m.invert();
+    point pp(x, y);
+    m.transform(pp);
 
     MouseEntityFinder finder(wp, pp);
     _displayList.visitAll(finder);
@@ -1411,117 +1540,6 @@ MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
     // not an InteractiveObject.
     return ch; 
 }
-
-/// Find the first visible DisplayObject whose shape contain the point
-/// and is not the DisplayObject being dragged or any of its childs
-//
-/// Point coordinates in world TWIPS
-///
-class DropTargetFinder {
-
-    /// Highest depth hidden by a mask
-    //
-    /// This will be -1 initially, and set
-    /// the the depth of a mask when the mask
-    /// doesn't contain the query point, while
-    /// scanning a DisplayList bottom-up
-    ///
-    int _highestHiddenDepth;
-
-    boost::int32_t _x;
-    boost::int32_t _y;
-    DisplayObject* _dragging;
-    mutable const DisplayObject* _dropch;
-
-    typedef std::vector<const DisplayObject*> Candidates;
-    Candidates _candidates;
-
-    mutable bool _checked;
-
-public:
-
-    DropTargetFinder(boost::int32_t x, boost::int32_t y, DisplayObject* dragging)
-        :
-        _highestHiddenDepth(std::numeric_limits<int>::min()),
-        _x(x),
-        _y(y),
-        _dragging(dragging),
-        _dropch(0),
-        _candidates(),
-        _checked(false)
-    {}
-
-    void operator() (const DisplayObject* ch)
-    {
-        assert(!_checked);
-        if ( ch->get_depth() <= _highestHiddenDepth )
-        {
-            if ( ch->isMaskLayer() )
-            {
-                log_debug(_("CHECKME: nested mask in DropTargetFinder. "
-                        "This mask is %s at depth %d outer mask masked "
-                        "up to depth %d."),
-                        ch->getTarget(), ch->get_depth(), _highestHiddenDepth);
-                // Hiding mask still in effect...
-            }
-            return;
-        }
-
-        if ( ch->isMaskLayer() )
-        {
-            if ( ! ch->visible() )
-            {
-                log_debug(_("FIXME: invisible mask in MouseEntityFinder."));
-            }
-            if ( ! ch->pointInShape(_x, _y) )
-            {
-#ifdef DEBUG_MOUSE_ENTITY_FINDING
-                log_debug(_("Character %s at depth %d is a mask not hitting "
-                        "the query point %g,%g and masking up to depth %d"),
-                    ch->getTarget(), ch->get_depth(), _x, _y,
-                    ch->get_clip_depth());
-#endif 
-                _highestHiddenDepth = ch->get_clip_depth();
-            }
-            else
-            {
-#ifdef DEBUG_MOUSE_ENTITY_FINDING
-                log_debug(_("Character %s at depth %d is a mask "
-                            "hitting the query point %g,%g"),
-                            ch->getTarget(), ch->get_depth(), _x, _y);
-#endif
-            }
-
-            return;
-        }
-
-        _candidates.push_back(ch);
-
-    }
-
-    void checkCandidates() const
-    {
-        if ( _checked ) return;
-        for (Candidates::const_reverse_iterator i=_candidates.rbegin(),
-                        e=_candidates.rend(); i!=e; ++i)
-        {
-            const DisplayObject* ch = *i;
-            const DisplayObject* dropChar = ch->findDropTarget(_x, _y, _dragging);
-            if ( dropChar )
-            {
-                _dropch = dropChar;
-                break;
-            }
-        }
-        _checked = true;
-    }
-
-    const DisplayObject* getDropChar() const
-    {
-        checkCandidates();
-        return _dropch;
-    }
-};
 
 const DisplayObject*
 MovieClip::findDropTarget(boost::int32_t x, boost::int32_t y,
@@ -1552,9 +1570,14 @@ MovieClip::findDropTarget(boost::int32_t x, boost::int32_t y,
 bool
 MovieClip::trackAsMenu()
 {
+    as_object* obj = getObject(this);
+    assert(obj);
+
+    string_table& st = getStringTable(*obj);
+
     as_value track;
-    string_table& st = getStringTable(*getObject(this));
-    return (getObject(this)->get_member(st.find("trackAsMenu"), &track) && track.to_bool());
+    return (obj->get_member(st.find("trackAsMenu"), &track) &&
+            toBool(track, getVM(*obj)));
 }
 
 bool
@@ -1646,7 +1669,7 @@ MovieClip::get_textfield_variable(const std::string& name)
 
 
 DisplayObject*
-MovieClip::getDisplayListObject(string_table::key key)
+MovieClip::getDisplayListObject(const ObjectURI& uri)
 {
 
     as_object* obj = getObject(this);
@@ -1655,7 +1678,7 @@ MovieClip::getDisplayListObject(string_table::key key)
     string_table& st = getStringTable(*obj);
 
     // Try items on our display list.
-    DisplayObject* ch = _displayList.getDisplayObjectByName(st, key,
+    DisplayObject* ch = _displayList.getDisplayObjectByName(st, uri,
             caseless(*obj));
 
     if (!ch) return 0;
@@ -1671,36 +1694,31 @@ MovieClip::getDisplayListObject(string_table::key key)
 }
 
 void 
-MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges, 
-    bool force)
+MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 {
 
     // nothing to do if this movieclip is not visible
-    if (!visible() || get_cxform().is_invisible() )
-    {
-        ranges.add(m_old_invalidated_ranges); // (in case we just hided)
+    if (!visible() || invisible(getCxForm(*this))) {
+        ranges.add(m_old_invalidated_ranges); 
         return;
     }
 
-    if ( ! invalidated() && ! childInvalidated() && ! force )
-    {
-        return;
-    }
+    if (!invalidated() && !childInvalidated() && !force) return;
     
  
     // m_child_invalidated does not require our own bounds
-    if (invalidated() || force)            
-    {
+    if (invalidated() || force) {
         // Add old invalidated bounds
         ranges.add(m_old_invalidated_ranges); 
     }
-    
     
     _displayList.add_invalidated_bounds(ranges, force || invalidated());
 
     /// Add drawable.
     SWFRect bounds;
-    bounds.expand_to_transformed_rect(getWorldMatrix(), _drawable.getBounds());
+    bounds.expand_to_transformed_rect(getWorldMatrix(*this),
+            _drawable.getBounds());
+
     ranges.add(bounds.getRange());
 
 }
@@ -1714,7 +1732,7 @@ MovieClip::constructAsScriptObject()
     // A MovieClip should always have an associated object.
     assert(mc);
 
-    if (!get_parent()) {
+    if (!parent()) {
         mc->init_member("$version", getVM(*mc).getPlayerVersion(), 0); 
     }
 
@@ -1775,7 +1793,7 @@ MovieClip::construct(as_object* initObj)
     // See misc-ming.all/action_execution_order_test4.{c,swf}
     //
     assert(!_callingFrameActions); // or will not be queuing actions
-    if (!get_parent()) {
+    if (!parent()) {
         executeFrameTags(0, _displayList, SWF::ControlTag::TAG_DLIST |
                 SWF::ControlTag::TAG_ACTION);
         if (getSWFVersion(*getObject(this)) > 5) {
@@ -1857,10 +1875,9 @@ MovieClip::unloadChildren()
 void
 MovieClip::getLoadedMovie(Movie* extern_movie)
 {
-    DisplayObject* parent = get_parent();
-    if (parent)
-    {
-        extern_movie->set_parent(parent);
+    DisplayObject* p = parent();
+    if (p) {
+        extern_movie->set_parent(p);
 
         // Copy own lockroot value
         extern_movie->setLockRoot(getLockRoot());
@@ -1874,8 +1891,8 @@ MovieClip::getLoadedMovie(Movie* extern_movie)
 
         // Copy own name
         // TODO: check empty != none...
-        const string_table::key name = get_name();
-        if (name) extern_movie->set_name(name);
+        const ObjectURI& name = get_name();
+        if (!name.empty()) extern_movie->set_name(name);
 
         // Copy own clip depth (TODO: check this)
         extern_movie->set_clip_depth(get_clip_depth());
@@ -1885,7 +1902,7 @@ MovieClip::getLoadedMovie(Movie* extern_movie)
         //       could as well be a button I guess...
         //       At most we should require it to be a
         //       DisplayObjectContainer and log an error if it's not.
-        MovieClip* parent_sp = parent->to_movie();
+        MovieClip* parent_sp = p->to_movie();
         assert(parent_sp);
         parent_sp->_displayList.replaceDisplayObject(extern_movie, get_depth(),
                 true, true);
@@ -1907,28 +1924,27 @@ MovieClip::loadVariables(const std::string& urlstr,
     // (down by getStream, that is)
     
     const movie_root& mr = stage();
-    URL url(urlstr, mr.runResources().baseURL());
+    URL url(urlstr, mr.runResources().streamProvider().originalURL());
 
     std::string postdata;
     
     // Encode our vars for sending.
-    if (sendVarsMethod != METHOD_NONE) getURLEncodedVars(*getObject(this), postdata);
+    if (sendVarsMethod != METHOD_NONE) {
+        postdata = getURLEncodedVars(*getObject(this));
+    }
 
-    try 
-    {
-        const StreamProvider& sp = getRunResources(*getObject(this)).streamProvider();
+    try {
+        const StreamProvider& sp = 
+            getRunResources(*getObject(this)).streamProvider();
         
-        if (sendVarsMethod == METHOD_POST)
-        {
+        if (sendVarsMethod == METHOD_POST) {
             // use POST method
             _loadVariableRequests.push_back(
                     new LoadVariablesThread(sp, url, postdata));
         }
-        else
-        {
+        else {
             // use GET method
-            if (sendVarsMethod == METHOD_GET)
-            {
+            if (sendVarsMethod == METHOD_GET) {
                 // Append variables
                 std::string qs = url.querystring();
                 if (qs.empty()) url.set_querystring(postdata);
@@ -2005,15 +2021,13 @@ MovieClip::removeMovieClip()
         return;
     }
 
-    MovieClip* parent = dynamic_cast<MovieClip*>(get_parent());
-    if (parent)
-    {
+    MovieClip* p = dynamic_cast<MovieClip*>(parent());
+    if (p) {
         // second argument is arbitrary, see comments above
         // the function declaration in MovieClip.h
-        parent->remove_display_object(depth, 0);
+        p->remove_display_object(depth, 0);
     }
-    else
-    {
+    else {
         // removing _level#
         stage().dropLevel(depth);
         // I guess this can only happen if someone uses 
@@ -2037,65 +2051,32 @@ MovieClip::getBounds() const
 bool
 MovieClip::isEnabled() const
 {
+    as_object* obj = getObject(this);
+    assert(obj);
+
     as_value enabled;
-    if (!getObject(this)->get_member(NSV::PROP_ENABLED, &enabled)) {
+    if (!obj->get_member(NSV::PROP_ENABLED, &enabled)) {
          // We're enabled if there's no 'enabled' member...
          return true;
     }
-    return enabled.to_bool();
+    return toBool(enabled, getVM(*obj));
 }
 
-class EnumerateVisitor {
-
-    as_environment& _env;
-
-public:
-    explicit EnumerateVisitor(as_environment& env)
-        :
-        _env(env)
-    {}
-
-    void operator() (DisplayObject* ch) {
-
-        if (!isReferenceable(*ch)) return;
-
-        // Don't enumerate unloaded DisplayObjects
-        if (ch->unloaded()) return;
-        
-        string_table::key name = ch->get_name();
-        // Don't enumerate unnamed DisplayObjects
-        if (!name) return;
-        
-        // Referenceable DisplayObject always have an object.
-        assert(getObject(ch));
-        string_table& st = getStringTable(*getObject(ch));
-        _env.push(st.value(name));
-    }
-};
 
 void
-MovieClip::enumerateNonProperties(as_environment& env) const
+MovieClip::visitNonProperties(KeyVisitor& v) const
 {
-    EnumerateVisitor visitor(env);
-    _displayList.visitAll(visitor);
+    DisplayListVisitor dv(v);
+    _displayList.visitAll(dv);
 }
 
 void
 MovieClip::cleanupDisplayList()
 {
-    //log_debug("%s.cleanDisplayList() called, current dlist is %p", 
-    //getTarget(), (void*)&_displayList);
     _displayList.removeUnloaded();
-
     cleanup_textfield_variables();
 }
 
-struct ReachableMarker {
-    void operator() (DisplayObject *ch)
-    {
-        ch->setReachable();
-    }
-};
 void
 MovieClip::markOwnResources() const
 {
@@ -2150,8 +2131,8 @@ MovieClip::getAsRoot()
     //                then recursion.
     //                
 
-    DisplayObject* parent = get_parent();
-    if ( ! parent ) return this; // no parent, we're the root
+    DisplayObject* p = parent();
+    if (!p) return this; // no parent, we're the root
 
     // If we have a parent, we descend to it unless 
     // our _lockroot is true AND our or the VM's
@@ -2162,7 +2143,7 @@ MovieClip::getAsRoot()
         if (getLockRoot()) return this;
     }
 
-    return parent->getAsRoot();
+    return p->getAsRoot();
 }
 
 

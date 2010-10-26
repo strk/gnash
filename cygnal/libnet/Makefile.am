@@ -34,6 +34,8 @@ AM_LDFLAGS = \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 
+libgnashnet_la_LDFLAGS =  -release $(VERSION)
+
 localedir = $(datadir)/locale
 
 INCLUDES = \

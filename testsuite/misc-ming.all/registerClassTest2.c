@@ -133,7 +133,7 @@ main(int argc, char** argv)
 #if OUTPUT_VERSION > 6
   // succeed in swf7 and swf8
   check_equals(mo, "clip1.constructor", "MovieClip");
-#else if OUTPUT_VERSION == 6
+#elif OUTPUT_VERSION == 6
   check_equals(mo, "clip1.constructor", "theClass1");
 #endif
   check_equals(mo, "clip1.__constructor__", "theClass1");

@@ -17,8 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef _NULLGUI_H_
-#define _NULLGUI_H_
+#ifndef NULLGUI_H
+#define NULLGUI_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -30,36 +30,38 @@ namespace gnash
 {
 
 /// Null GUI, used when rendering is disabled
-class NullGui : public Gui {
-
+class NullGui : public Gui
+{
 public: 
 
 	NullGui(bool do_loop, RunResources& r)
 		:
-		Gui(0,0,do_loop, r),
+		Gui(0, 0, do_loop, r),
 		_timeout(0),
 		_quit(false)
 	{}
 
 	~NullGui() {}
-	void setInterval(unsigned int interval)
-	{
+
+    void setInterval(unsigned int interval) {
 		_interval=interval;
 	}
-	void setTimeout(unsigned int to)
-	{
+
+	void setTimeout(unsigned int to) {
 		_timeout=to;
 	}
+
 	bool init(int, char ***) { return true; }
-	bool createWindow(const char* /*title*/, int /*width*/, int /*height*/,
-	                  int /*yPosition*/, int /*xPosition*/)
-	{
+	
+    bool createWindow(const char* /*title*/, int /*width*/, int /*height*/,
+	                  int /*yPosition*/, int /*xPosition*/) {
 		return true;
 	}
+
 	bool run();
-	bool createMenu()  { return true; }
-	bool setupEvents()  { return true; }
-	void renderBuffer()  { }
+	bool createMenu() { return true; }
+	bool setupEvents() { return true; }
+	void renderBuffer() { }
 
 	void quitUI() { _quit = true; }
 
@@ -72,7 +74,6 @@ private:
 	bool _quit;
 };
 
-} // end of gnash namespace
+} // namespace gnash
 
-// end of _NULLGUI_H_
 #endif

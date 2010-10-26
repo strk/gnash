@@ -26,7 +26,7 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "NativeFunction.h" 
-#include "cxform.h" // for composition
+#include "SWFCxForm.h" // for composition
 #include "VM.h"
 #include "MovieClip.h"
 
@@ -68,8 +68,8 @@ color_class_init(as_object& where, const ObjectURI& uri)
     as_object* cl = registerBuiltinClass(where, color_ctor,
             attachColorInterface, 0, uri);
 
-    as_object* proto =
-        cl->getMember(NSV::PROP_PROTOTYPE).to_object(getGlobal(where));
+    as_object* proto = toObject(
+        getMember(*cl, NSV::PROP_PROTOTYPE), getVM(where));
 
     if (!proto) return;
 
@@ -106,7 +106,7 @@ color_getrgb(const fn_call& fn)
     MovieClip* sp = getTarget(obj, fn);
     if (!sp) return as_value();
 
-	const cxform& trans = sp->get_cxform();
+	const SWFCxForm& trans = getCxForm(*sp);
 
     const int r = trans.rb;
     const int g = trans.gb;
@@ -125,12 +125,12 @@ color_gettransform(const fn_call& fn)
     MovieClip* sp = getTarget(obj, fn);
     if (!sp) return as_value();
 
-	const cxform& cx = sp->get_cxform();
+	const SWFCxForm& cx = getCxForm(*sp);
 
 	// Convert to as_object
 
     Global_as& gl = getGlobal(fn);
-	as_object* ret = gl.createObject();
+	as_object* ret = createObject(gl);
 
 	ret->init_member("ra", double(cx.ra / 2.56));
 	ret->init_member("ga", double(cx.ga / 2.56));
@@ -160,13 +160,13 @@ color_setrgb(const fn_call& fn)
     MovieClip* sp = getTarget(obj, fn);
     if (!sp) return as_value();
 
-	boost::int32_t color = toInt(fn.arg(0));
+	boost::int32_t color = toInt(fn.arg(0), getVM(fn));
 
 	const int r = (color & 0xff0000) >> 16;
 	const int g = (color & 0x00ff00) >> 8;
 	const int b = (color & 0x0000ff);
 
-	cxform newTrans = sp->get_cxform();
+	SWFCxForm newTrans = getCxForm(*sp);
 	newTrans.rb = static_cast<boost::int16_t>(r);
 	newTrans.gb = static_cast<boost::int16_t>(g);
 	newTrans.bb = static_cast<boost::int16_t>(b);
@@ -174,7 +174,7 @@ color_setrgb(const fn_call& fn)
 	newTrans.ga = 0;
 	newTrans.ba = 0;
 
-    sp->set_cxform(newTrans);
+    sp->setCxForm(newTrans);
 
 	return as_value();
 }
@@ -190,7 +190,7 @@ color_settransform(const fn_call& fn)
 		return as_value();
 	}
 
-	as_object* trans = fn.arg(0).to_object(getGlobal(fn));
+	as_object* trans = toObject(fn.arg(0), getVM(fn));
 
     if (!trans) {
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -206,7 +206,7 @@ color_settransform(const fn_call& fn)
 
 	string_table& st = getStringTable(*obj);
 
-	cxform newTrans = sp->get_cxform();
+	SWFCxForm newTrans = getCxForm(*sp);
 
 	// multipliers
 	parseColorTransProp(*trans, st.find("ra"), newTrans.ra, true);
@@ -220,7 +220,7 @@ color_settransform(const fn_call& fn)
 	parseColorTransProp(*trans, st.find("bb"), newTrans.bb, false);
 	parseColorTransProp(*trans, st.find("ab"), newTrans.ab, false);
 
-	sp->set_cxform(newTrans);
+	sp->setCxForm(newTrans);
 
 	return as_value();
 }
@@ -252,14 +252,14 @@ color_ctor(const fn_call& fn)
 }
 
 inline void
-parseColorTransProp (as_object& obj, string_table::key key, boost::int16_t&
+parseColorTransProp(as_object& obj, string_table::key key, boost::int16_t&
         target, bool scale)
 {
 	as_value tmp;
 	if (!obj.get_member(key, &tmp)) return;
     
-	const double d = tmp.to_number();
-	if ( scale ) {   
+	const double d = toNumber(tmp, getVM(obj));
+	if (scale) {   
         target = static_cast<boost::int16_t>(d * 2.56);
     }
 	else {
@@ -272,7 +272,7 @@ parseColorTransProp (as_object& obj, string_table::key key, boost::int16_t&
 inline MovieClip*
 getTarget(as_object* obj, const fn_call& fn)
 {
-    const as_value& target = obj->getMember(NSV::PROP_TARGET);
+    const as_value& target = getMember(*obj, NSV::PROP_TARGET);
     MovieClip* sp = target.toMovieClip();
     if (sp) return sp;
     DisplayObject* o = fn.env().find_target(target.to_string());

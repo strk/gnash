@@ -89,7 +89,8 @@ public:
 	// called from keypress listener only
 	void notifyEvent(const event_id& id);
 
-	void display(Renderer& renderer);
+    /// Render this Button.
+	virtual void display(Renderer& renderer, const Transform& xform);
 	
 	void set_current_state(MouseState new_state);
 

@@ -40,7 +40,6 @@
 
 #include "fltksup.h"
 #include "fltk_glue_cairo.h"
-#include "gnash.h"
 #include "log.h"
 #include "gui.h"
 

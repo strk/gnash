@@ -6,7 +6,7 @@ Gnash is a player for animated "movies" in the Macromedia Shockwave Flash
 plugin, or as a library used by other programs.  It is not yet complete;
 it does not correctly handle every SWF file.
 
-This is the README file for the Gnash-0.8.7 release (or snapshot).
+This is the README file for the Gnash-0.8.8 release (or snapshot).
 
 Gnash is originally based on the code of GameSWF, by Thatcher Ulrich.
 GameSWF was the most advanced among free SWF players; it implemented a
@@ -29,7 +29,7 @@ SWF movies that are used for browser navigation may fail. Almost all
 SWF-based web-site navigation should work.
 
 Gnash supports practically all SWF opcodes and most ActionScript classes up
-to SWF version 8. There is currently no real support for ActionScript
+to SWF version 9. There is currently no real support for ActionScript
 3 (ABC blocks) and AVM2, which were introduced in SWF version
 9. Despite this, Gnash can play most SWF8 and many SWF9 movies,
 because not all rely on unimplemented features.
@@ -86,7 +86,7 @@ Building Gnash:
 
 See the generic installation instructions in the file called "INSTALL".
 (If you are building from a fresh bzr checkout, first see the file
-"README_bzr" for additional instructions.)
+"README.git" for additional instructions.)
 
 Depending on chosen functionality, CPU architecture, and OS the temporary
 files needed when Gnash compiles require as much as 1 GB of storage space.
@@ -106,14 +106,14 @@ the rendering library, or you can select which ones you want:
 or --enable-renderer=all (default)
 
 Gnash can use different multimedia back-ends for sound and/or
-video. By default it'll build both ffmpeg and Gstreamer, which you
+video. By default it'll build both FFmpeg and Gstreamer, which you
 can select at runtime. To select only one media handler use:
 
    --enable-media=GST			Gstreamer (default)
-or --enable-media=ffmpeg		Ffmpeg/SDL
+or --enable-media=ffmpeg		FFmpeg/SDL
 
 In some countries, the codecs needed to display audio and video are patented.
-The ffmpeg library implements these codecs.  If you link them directly into
+The FFmpeg library implements these codecs.  If you link them directly into
 Gnash, you will create an executable which contains patented software and
 requires a license for redistribution in those countries.  If, instead,
 you build using gstreamer, the user installs the codecs of their choice.
@@ -151,9 +151,9 @@ If you select gstreamer as the media backend, gnash requires version 0.10
 because earlier versions wouldn't let you insert clips into an existing
 sound stream, as Gnash needs to do. If you compile gnash to use
 Gstreamer, users who want to view Flash videos while running gnash 
-will need to install the ffmpeg plugin for gstreamer. Flash uses
+will need to install the FFmpeg plugin for gstreamer. Flash uses
 MPEG4, MP3, FLV, ACC, and Sorenson primarily. Gnash supports any codec
-supported by ffmpeg and Gstreamer.
+supported by FFmpeg and Gstreamer.
 
 Building the Gnash plugin for browsers:
 --------------------------------------
@@ -191,7 +191,7 @@ lists are stored at http://mail.gnu.org/pipermail/:
       http://mail.gnu.org/mailman/listinfo/gnash and register. Volume is
       typically very low.
     * gnash-commit@gnu.org is where summaries of changes commited to
-      the bzr repository are automatically posted. Register at
+      the git repository are automatically posted. Register at
       http://mail.gnu.org/mailman/listinfo/gnash-commit to be informed of
       these changes as they happen. Volume may be high.
       
@@ -218,6 +218,6 @@ you should file as complete a report as possible at
 https://savannah.gnu.org/bugs/?group=gnash.  Please include the operating
 system name and version, and which gnash version you are using, in your
 bug reports. Please try to reproduce your bug reports with the most
-recent version of Gnash in bzr, as bugs are fixed there that may be
+recent version of Gnash in git, as bugs are fixed there that may be
 broken in a standard release.
 

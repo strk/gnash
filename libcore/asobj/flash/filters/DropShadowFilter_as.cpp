@@ -15,13 +15,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+#include "DropShadowFilter_as.h"
 
 #include "as_object.h"
-#include "DropShadowFilter.h"
 #include "VM.h"
 #include "Global_as.h"
-#include "BitmapFilter_as.h"
 #include "builtin_function.h"
+#include "BitmapFilter_as.h"
+#include "Filters.h"
 
 namespace gnash {
 
@@ -97,7 +98,7 @@ dropshadowfilter_distance(const fn_call& fn)
         return as_value(ptr->m_distance );
     }
     
-    float sp_distance = fn.arg(0).to_number();
+    float sp_distance = toNumber(fn.arg(0), getVM(fn));
     ptr->m_distance = sp_distance;
     return as_value();
 }
@@ -109,7 +110,7 @@ dropshadowfilter_color(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_color);
     }
-    double sp_color = fn.arg(0).to_number();
+    double sp_color = toNumber(fn.arg(0), getVM(fn));
     ptr->m_color = sp_color;
     return as_value();
 }
@@ -121,7 +122,7 @@ dropshadowfilter_alpha(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_alpha);
     }
-    double sp_alpha = fn.arg(0).to_number();
+    double sp_alpha = toNumber(fn.arg(0), getVM(fn));
     ptr->m_alpha = sp_alpha;
     return as_value();
 }
@@ -133,7 +134,7 @@ dropshadowfilter_angle(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_angle);
     }
-    double sp_angle = fn.arg(0).to_number();
+    double sp_angle = toNumber(fn.arg(0), getVM(fn));
     ptr->m_angle = sp_angle;
     return as_value();
 }
@@ -145,7 +146,7 @@ dropshadowfilter_blurX(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_blurX );
     }
-    float sp_blurX = fn.arg(0).to_number ();
+    float sp_blurX = toNumber(fn.arg(0), getVM(fn));
     ptr->m_blurX = sp_blurX;
     return as_value();
 }
@@ -157,7 +158,7 @@ dropshadowfilter_blurY(const fn_call& fn)
     if (fn.nargs == 0) {
 		return as_value(ptr->m_blurY );
     }
-    float sp_blurY = fn.arg(0).to_number ();
+    float sp_blurY = toNumber(fn.arg(0), getVM(fn));
     ptr->m_blurY = sp_blurY;
     return as_value();
 }
@@ -169,7 +170,7 @@ dropshadowfilter_strength(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_strength );
     }
-    float sp_strength = fn.arg(0).to_number ();
+    float sp_strength = toNumber(fn.arg(0), getVM(fn));
     ptr->m_strength = sp_strength;
     return as_value();
 }
@@ -181,7 +182,7 @@ dropshadowfilter_quality(const fn_call& fn)
     if (fn.nargs == 0) {
 		return as_value(ptr->m_quality );
     }
-    boost::uint8_t sp_quality = fn.arg(0).to_number ();
+    boost::uint8_t sp_quality = toNumber(fn.arg(0), getVM(fn));
     ptr->m_quality = sp_quality;
     return as_value();
 }
@@ -193,7 +194,7 @@ dropshadowfilter_knockout(const fn_call& fn)
     if (fn.nargs == 0) {
 		return as_value(ptr->m_knockout );
     }
-    bool sp_knockout = fn.arg(0).to_bool ();
+    const bool sp_knockout = toBool(fn.arg(0), getVM(fn));
     ptr->m_knockout = sp_knockout;
     return as_value();
 }
@@ -205,7 +206,7 @@ dropshadowfilter_inner(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_inner );
     }
-    bool sp_inner = fn.arg(0).to_bool ();
+    const bool sp_inner = toBool(fn.arg(0), getVM(fn));
     ptr->m_inner = sp_inner;
     return as_value();
 }
@@ -218,7 +219,7 @@ dropshadowfilter_hideObject(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_hideObject );
     }
-    bool sp_hideObject = fn.arg(0).to_bool ();
+    const bool sp_hideObject = toBool(fn.arg(0), getVM(fn));
     ptr->m_hideObject = sp_hideObject;
     return as_value();
 }
@@ -226,7 +227,7 @@ dropshadowfilter_hideObject(const fn_call& fn)
 as_value
 dropshadowfilter_new(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
+    boost::intrusive_ptr<as_object> obj = ensure<ValidThis>(fn);
     obj->setRelay(new DropShadowFilter_as);
     return as_value();
 }

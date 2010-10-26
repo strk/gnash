@@ -57,17 +57,6 @@ namespace gnash {
 
 namespace gnash {
 
-/// A GC root used to mark all reachable collectable pointers
-class VmGcRoot : public GcRoot 
-{
-public:
-	VmGcRoot(VM& vm) : _vm(vm) {}
-	virtual void markReachableResources() const;
-
-private:
-    VM& _vm;
-};
-
 /// The AVM1 virtual machine
 //
 /// The VM class has no code for execution, but rather stores the resources
@@ -81,35 +70,27 @@ private:
 //
 /// This header also contains a few utility functions for ActionScript
 /// operations.
-//
-/// Currently the VM is a singleton, but this usage is deprecated. In future
-/// is should be fully re-entrant.
 class DSOEXPORT VM : boost::noncopyable
 {
-
 public:
 
 	typedef as_value (*as_c_function_ptr)(const fn_call& fn);
+	
+	/// Initializes the VM
+    //
+    /// @param version      The initial version of the VM
+    /// @param root         The movie_root that owns this VM
+    /// @param clock        The clock to use for advances.
+	VM(int version, movie_root& root, VirtualClock& clock);
 
-    /// \brief
-	/// Initialize the virtual machine singleton with the given
-	/// movie definition and return a reference to it.
-	//
-	/// The given movie will be only used to fetch SWF version from.
-	///
-	/// Don't call this function twice, and make sure you have
-	/// called this *before* you call VM::get()
-	///
-	/// @param movie
-	///	The definition for the root movie, only
-	///	used to fetch SWF version from.
-	///	TODO: take SWF version directly ?
-	///
-	/// @param clock
-	///	Virtual clock used as system time.
-	///
-	static VM& init(int version, movie_root& root, VirtualClock& clock);
+	~VM();
 
+    /// Initialize VM resources
+	void init();
+
+    /// Accessor for the VM's stack
+    //
+    /// TODO: drop
 	SafeStack<as_value>& getStack() {
 		return _stack;
 	}
@@ -120,13 +101,9 @@ public:
     /// but maybe accessing it trough VM isn't the best idea.
     /// TODO: consider making this accessible trough RunResources
     /// instead.
-    ///
     VirtualClock& getClock() {
         return _clock;
     }
-
-	/// Return true if the singleton VM has been initialized
-	static bool isInitialized();
 
     /// Resets any VM members that must be cleared before the GC cleans up
     //
@@ -139,20 +116,13 @@ public:
     /// dtor.
     void clear();
 
-	/// Get the singleton instance of the virtual machine
-	//
-	/// Make sure you called VM::init() before trying to
-	/// get the singleton (an assertion would fail otherwise)
-	///
-	/// Use isInitialized() if you're unsure.
-	///
-	static VM& get();
-
 	/// Get SWF version context for the currently running actions.
 	//
 	/// This information will drive operations of the virtual machine
 	///
-	int getSWFVersion() const;
+	int getSWFVersion() const {
+        return _swfversion;
+    }
 
 	/// Set SWF version of the currently executing code
 	void setSWFVersion(int v);
@@ -174,12 +144,12 @@ public:
 	/// defined in gnashrc, that takes precedence. For Linux, the string
 	/// includes the kernel version (unname -sr). Only works for systems
 	/// with sys/utsname.h (POSIX 4.4).
-	const std::string getOSName();
+	std::string getOSName() const;
 	
 	/// Return the current language of the system. This is used for
 	/// System.capabilities.language. Only works for systems with 
 	/// a language environment variable.
-	const std::string getSystemLanguage();
+	std::string getSystemLanguage() const;
 	
 	// The boost Random Number Generator to use.
 	//
@@ -200,12 +170,7 @@ public:
 
 	// Get a pointer to the random number generator for
 	// use by Math.random() and random().
-	//
-	// The seed is the system time in milliseconds at the first call
-	// to a random function. This allows a potentially variable amount
-	// of time to elapse between starting gnash and initialization of
-	// the generator, so decreasing predictability.
-	RNG& randomNumberGenerator() const;
+	RNG& randomNumberGenerator();
 
 	/// Get a pointer to this VM's Root movie (stage)
 	movie_root& getRoot() const;
@@ -226,7 +191,6 @@ public:
 	//
 	/// - root movie / stage (_rootMovie)
 	/// - Global object (_global)
-	/// - registered static GcResources (_statics)
 	/// - Class Hierarchy object
 	///
 	///
@@ -302,35 +266,7 @@ public:
     /// Print stack, call stack, and registers to the specified ostream
     void dumpState(std::ostream& o, size_t limit = 0);
 
-#ifdef GNASH_USE_GC
-	void addStatic(GcResource* res)
-	{
-		_statics.push_back(res);
-	}
-#else  // ndef GNASH_USE_GC
-	// placeholder to avoid adding lots of
-	// compile-time switches in callers
-	void addStatic(as_object*) {}
-#endif
-
 private:
-
-	friend class VmGcRoot;
-
-	/// Use VM::get() to access the singleton
-	//
-	/// Initializes the GC singleton
-	///
-	VM(int version, movie_root& root, VirtualClock& clock);
-
-	/// Should deinitialize the GC singleton
-	/// If it doesn't is just because it corrupts memory :)
-	~VM();
-
-	// We use an auto_ptr here to allow constructing
-	// the singleton when the init() function is called.
-	friend class std::auto_ptr<VM>;
-	static std::auto_ptr<VM> _singleton;
 
 	/// Stage associated with this VM
 	movie_root& _rootMovie;
@@ -340,22 +276,6 @@ private:
 
 	/// Target SWF version
 	int _swfversion;
-
-	/// Set the _global Object for actions run by Virtual Machine
-	//
-	/// Will be called by the init() function
-	/// 
-	void setGlobal(Global_as*);
-
-#ifdef GNASH_USE_GC
-	/// A vector of static GcResources (typically used for built-in
-    /// class constructors)
-	//
-	/// The resources in this list will always be marked as reachable
-	///
-	typedef std::vector< boost::intrusive_ptr<GcResource> > ResVect;
-	ResVect _statics;
-#endif
 
 	typedef std::map<unsigned int, as_c_function_ptr> FuncMap;
 	typedef std::map<unsigned int, FuncMap> AsNativeTable;
@@ -375,6 +295,8 @@ private:
 
 	/// Library of SharedObjects. Owned by the VM.
     std::auto_ptr<SharedObjectLibrary> _shLib;
+
+    RNG _rng;
 
 };
 
@@ -429,25 +351,102 @@ private:
 /// TODO:           Consider whether it would be better to pass something
 ///                 other than the VM. But it is a VM operation, so it
 ///                 is logically sound.
-void newAdd(as_value& op1, const as_value& op2, VM& vm);
+void newAdd(as_value& op1, const as_value& op2, const VM& vm);
 
 /// Carry out ActionSubtract
 //
 /// @param op1      The as_value to subtract from.
 /// @param op2      The as_value to subtract.
 /// @param vm       The VM executing the operation.
-void subtract(as_value& op1, const as_value& op2, VM& vm);
+void subtract(as_value& op1, const as_value& op2, const VM& vm);
 
 /// Carry out ActionSubtract
 //
 /// @param op1      The first comparand.
 /// @param op2      The second comparand.
 /// @param vm       The VM executing the operation.
-as_value newLessThan(const as_value& op1, const as_value& op2, VM& vm);
+as_value newLessThan(const as_value& op1, const as_value& op2, const VM& vm);
+
+/// Check if two values are equal
+//
+/// Note that conversions are performed as necessary, which can result in
+/// function calls, which can have any conceivable side effect. The order of
+/// the values affects the order the conversions are performed in, so can
+/// under some circumstances change the result of the comparison.
+//
+/// Equality comparisons depend strongly on the SWF version.
+//
+/// @param a    The first value to compare
+/// @param b    The second value to compare
+/// @param vm   The VM to use for the comparison.
+/// @return     Whether the values are considered equal.
+bool equals(const as_value& a, const as_value& b, const VM& vm);
+
+/// Convert an as_value to boolean type
+//
+/// @param val  The value to return as a boolean
+/// @param vm   The VM to use for the conversion.
+/// @return     The boolean value of the passed as_value.
+bool toBool(const as_value& v, const VM& vm);
+
+/// Convert an as_value to a double
+//
+/// @param val  The value to return as a double
+/// @param vm   The VM to use for the conversion.
+/// @return     The double value of the passed as_value.
+double toNumber(const as_value& v, const VM& vm);
+
+/// Convert an as_value to an object
+//
+/// @param val  The value to return as an object
+/// @param vm   The VM to use for the conversion.
+/// @return     The Object representation value of the passed as_value.
+as_object* toObject(const as_value& v, VM& vm);
+
+/// AS2-compatible conversion to 32bit integer
+//
+/// This truncates large numbers to fit in the 32-bit space. It is not a 
+/// proper function of as_value because it is simply a further operation on
+/// the stored number type.
+//
+/// This function calls to_number(), so performs a conversion if necessary.
+//
+/// @param val  The value to return as an int.
+/// @param vm   The VM to use for the conversion.
+/// @return     The integer value of the passed as_value.
+boost::int32_t toInt(const as_value& val, const VM& vm);
+
+/// Force type to number.
+//
+/// @param v    The value to change to a number type.
+/// @param vm   The VM to use for the conversion.
+/// @return     The value passed as v.
+as_value& convertToNumber(as_value& v, const VM& vm);
+
+/// Force type to string.
+//
+/// @param v    The value to change to a string type.
+/// @param vm   The VM to use for the conversion.
+/// @return     The value passed as v.
+as_value& convertToString(as_value& v, const VM& vm);
+
+/// Force type to bool.
+//
+/// @param v    The value to change to a bool type.
+/// @param vm   The VM to use for the conversion.
+/// @return     The value passed as v.
+as_value& convertToBoolean(as_value& v, const VM& vm);
+
+/// Convert to the appropriate primitive type
+//
+/// @param v    The value to change to a primitive type.
+/// @param vm   The VM to use for the conversion.
+/// @return     The value passed as v.
+as_value& convertToPrimitive(as_value& v, const VM& vm);
 
 } // namespace gnash
 
-#endif // GNASH_VM_H
+#endif
 
 // Local Variables:
 // mode: C++

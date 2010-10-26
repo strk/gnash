@@ -17,28 +17,27 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/times.h>
-#include <netdb.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <fcntl.h>
 
 #include <boost/cstdint.hpp>
+
+namespace {
+}
+            
+#include "GnashSystemNetHeaders.h"
+#include "GnashSystemFDHeaders.h"
+
 #include <cstring>
 #include <cerrno>
+#include <csignal>
 #include <boost/lexical_cast.hpp>
 
 #include "URL.h"
 #include "Socket.h"
 #include "log.h"
+#include "utility.h"
 #include "GnashAlgorithm.h"
 
-namespace gnash
-{
+namespace gnash {
 
 Socket::Socket()
     :
@@ -67,15 +66,18 @@ Socket::connected() const
         tval.tv_sec = 0;
         tval.tv_usec = 103;
             
-        const int ret = select(_socket + 1, NULL, &fdset, NULL, &tval);
+        const int ret = ::select(_socket + 1, NULL, &fdset, NULL, &tval);
         
         // Select timeout
         if (ret == 0) continue;
            
         if (ret > 0) {
-            boost::uint32_t val = 0;
+            int val = 0;
             socklen_t len = sizeof(val);
-            if (::getsockopt(_socket, SOL_SOCKET, SO_ERROR, &val, &len) < 0) {
+            // NB: the cast to char* is needed for windows and is harmless
+            // for POSIX.
+            if (::getsockopt(_socket, SOL_SOCKET, SO_ERROR,
+                        reinterpret_cast<char*>(&val), &len) < 0) {
                 log_debug("Error");
                 _error = true;
                 return false;
@@ -157,33 +159,43 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
         _socket = 0;
         return false;
     }
-
+#ifndef _WIN32
     // Set non-blocking.
     const int flag = ::fcntl(_socket, F_GETFL, 0);
     ::fcntl(_socket, F_SETFL, flag | O_NONBLOCK);
+#endif
 
     const struct sockaddr* a = reinterpret_cast<struct sockaddr*>(&addr);
 
     // Attempt connection
     if (::connect(_socket, a, sizeof(struct sockaddr)) < 0) {
         const int err = errno;
+#ifndef _WIN32
         if (err != EINPROGRESS) {
             log_error("Failed to connect socket: %s", std::strerror(err));
             _socket = 0;
             return false;
         }
+#else
+        return false;
+#endif
     }
 
     // Magic timeout number. Use rcfile ?
-    struct timeval tv = { 120, 0 };
+    const struct timeval tv = { 120, 0 };
 
+    // NB: the cast to const char* is needed for windows and is harmless
+    // for POSIX.
     if (::setsockopt(_socket, SOL_SOCKET, SO_RCVTIMEO,
-                reinterpret_cast<unsigned char*>(&tv), sizeof(tv))) {
+                reinterpret_cast<const char*>(&tv), sizeof(tv))) {
         log_error("Setting socket timeout failed");
     }
 
-    const boost::int32_t on = 1;
-    ::setsockopt(_socket, IPPROTO_TCP, TCP_NODELAY, &on, sizeof(on));
+    const int on = 1;
+    // NB: the cast to const char* is needed for windows and is harmless
+    // for POSIX.
+    ::setsockopt(_socket, IPPROTO_TCP, TCP_NODELAY,
+            reinterpret_cast<const char*>(&on), sizeof(on));
 
     assert(_socket);
     return true;
@@ -204,13 +216,13 @@ Socket::fillCache()
     size_t end = (start + completeRead) % cacheSize;
     if (end == 0) end = cacheSize;
 
-    boost::uint8_t* startpos = _cache + start;
+    char* startpos = _cache + start;
 
     while (1) {
 
         // The end pos is either the end of the cache or the first 
         // unprocessed byte.
-        boost::uint8_t* endpos = _cache + ((startpos < _cache + _pos) ?
+        char* endpos = _cache + ((startpos < _cache + _pos) ?
                 _pos : cacheSize);
 
         const int thisRead = endpos - startpos;
@@ -219,14 +231,16 @@ Socket::fillCache()
         const int bytesRead = ::recv(_socket, startpos, thisRead, 0);
         
         if (bytesRead == -1) {
-            
             const int err = errno;
+#ifndef _WIN32 
             if (err == EWOULDBLOCK || err == EAGAIN) {
                 // Nothing to read. Carry on.
                 return;
             }
+#endif
             log_error("Socket receive error %s", std::strerror(err));
             _error = true;
+            return;
         }
 
 
@@ -264,7 +278,7 @@ Socket::readNonBlocking(void* dst, std::streamsize num)
 {
     if (bad()) return 0;
     
-    boost::uint8_t* ptr = static_cast<boost::uint8_t*>(dst);
+    char* ptr = static_cast<char*>(dst);
     
     if (!_size && !_error) {
         fillCache();
@@ -305,7 +319,23 @@ Socket::write(const void* src, std::streamsize num)
     int bytesSent = 0;
     int toWrite = num;
 
-    const boost::uint8_t* buf = static_cast<const boost::uint8_t*>(src);
+    const char* buf = static_cast<const char*>(src);
+
+#ifndef _WIN32
+    // Prevent sigpipe (which isn't a standard C signal)
+    // until leaving this function.
+    const struct SignalSetter
+    {
+        typedef void(*SigHandler)(int);
+        SignalSetter() : _h(std::signal(SIGPIPE, SIG_IGN)) {}
+        ~SignalSetter() { std::signal(SIGPIPE, _h); }
+    private:
+        const SigHandler _h;
+    } setter;
+#endif
+
+    // For broken pipe we prefer being notified with
+    // a return of -1 from ::send.
 
     while (toWrite > 0) {
         bytesSent = ::send(_socket, buf, toWrite, 0);
@@ -346,8 +376,7 @@ Socket::go_to_end()
 bool
 Socket::eof() const
 {
-    log_error("eof() called for Socket");
-    return false;
+    return !_size && bad();
 }
 
 } // namespace gnash

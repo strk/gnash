@@ -62,8 +62,7 @@ public:
     CopyMenuItems(string_table::key c, as_object& nc) : _c(c), _target(nc) {}
 
     void operator()(const as_value& val) {
-        Global_as& gl = getGlobal(_target);
-        as_object* obj = val.to_object(gl);
+        as_object* obj = toObject(val, getVM(_target));
         as_value cp = callMethod(obj, _c);
         callMethod(&_target, NSV::PROP_PUSH, cp);
     }
@@ -109,7 +108,7 @@ contextmenu_hideBuiltInItems(const fn_call& fn)
     string_table& st = getStringTable(fn);
 
     Global_as& gl = getGlobal(fn);
-    as_object* builtIns = gl.createObject();
+    as_object* builtIns = createObject(gl);
     setBuiltInItems(*builtIns, false);
     ptr->set_member(st.find("builtInItems"), builtIns);
     return as_value();
@@ -123,7 +122,7 @@ contextmenu_copy(const fn_call& fn)
 
     Global_as& gl = getGlobal(fn);
 
-    as_function* ctor = gl.getMember(NSV::CLASS_CONTEXTMENU).to_function();
+    as_function* ctor = getMember(gl, NSV::CLASS_CONTEXTMENU).to_function();
     if (!ctor) {
         return as_value();
     }
@@ -159,7 +158,7 @@ contextmenu_copy(const fn_call& fn)
         if (arr) {
             as_object* customs;
             if (customItems.is_object() &&
-                    (customs = customItems.to_object(getGlobal(fn)))) {
+                    (customs = toObject(customItems, getVM(fn)))) {
                 string_table::key copykey = getStringTable(fn).find("copy");
                 CopyMenuItems c(copykey, *arr);
                 foreachArray(*customs, c);
@@ -185,7 +184,7 @@ contextmenu_ctor(const fn_call& fn)
     
     string_table& st = getStringTable(fn);
     Global_as& gl = getGlobal(fn);
-    as_object* builtInItems = gl.createObject();
+    as_object* builtInItems = createObject(gl);
     setBuiltInItems(*builtInItems, true);
     obj->set_member(st.find("builtInItems"), builtInItems);
 

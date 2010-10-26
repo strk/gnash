@@ -1000,8 +1000,8 @@ check(f.__proto__ === backup);
 
 // Native function __proto__ is _global.Function.prototype
 f = ASnative(1, 0);
-xcheck(f.__proto__ === _global.Function.prototype);
-xcheck(f.__proto__ === 8);
+check(f.__proto__ === _global.Function.prototype);
+check(f.__proto__ === 8);
 
 funbackup = _global.Function;
 
@@ -1023,20 +1023,20 @@ _global.Function.constructor = 6;
 //    regardless of visibility.
 
 f = ASnative(1, 0);
-xcheck(f.__proto__  === o);
+check(f.__proto__  === o);
 
 // Inherited property.
-xcheck(f.p === "hi");
-xcheck(f instanceOf _global.Function);
-xcheck(f.constructor === _global.Function);
+check(f.p === "hi");
+check(f instanceOf _global.Function);
+check(f.constructor === _global.Function);
 check(f.constructor !== _global.Function.prototype.constructor);
 
 
 // SWF-defined functions:
 // __proto__ is _global.Function.prototype
 uf = function() {};
-xcheck(uf.p === "hi");
-xcheck(uf.__proto__ === _global.Function.prototype);
+check(uf.p === "hi");
+check(uf.__proto__ === _global.Function.prototype);
 
 // uf.prototype is a new object.
 check(uf.prototype.constructor === uf);
@@ -1047,8 +1047,8 @@ _global.Function = 8;
 f = ASnative(1, 0);
 check_equals(typeof(f), "function");
 f.hasOwnProperty = Object.prototype.hasOwnProperty;
-xcheck(!f.hasOwnProperty("__proto__"));
-xcheck(!f.hasOwnProperty("constructor"));
+check(!f.hasOwnProperty("__proto__"));
+check(!f.hasOwnProperty("constructor"));
 
 
 _global.Function = {};
@@ -1057,8 +1057,8 @@ _global.Function = {};
 f = ASnative(1, 0);
 check_equals(typeof(f), "function");
 f.hasOwnProperty = Object.prototype.hasOwnProperty;
-xcheck(!f.hasOwnProperty("__proto__"));
-xcheck(!f.hasOwnProperty("constructor"));
+check(!f.hasOwnProperty("__proto__"));
+check(!f.hasOwnProperty("constructor"));
 
 called = 0;
 _global.Function = function() { ++called; };

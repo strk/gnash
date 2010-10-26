@@ -75,6 +75,8 @@
 
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string/join.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 #include <boost/format.hpp>
 #include <sys/param.h>
 #include <csignal>
@@ -954,6 +956,88 @@ create_standalone_launcher(const std::string& page_url, const std::string& swf_u
 #endif
 }
 
+void
+nsPluginInstance::setupCookies(const std::string& pageurl)
+{
+    // In pre xulrunner 1.9, (Firefox 3.1) this function does not exist,
+    // so we can't use it to read the cookie file. For older browsers
+    // like IceWeasel on Debian lenny, which pre dates the cookie support
+    // in NPAPI, you have to block all Cookie for sites like YouTube to
+    // allow Gnash to work.
+    if (!NPNFuncs.getvalueforurl) return;
+
+    // Cookie appear to drop anything past the domain, so we strip
+    // that off.
+    std::string::size_type pos;
+    pos = pageurl.find("/", pageurl.find("//", 0) + 2) + 1;
+    std::string url = pageurl.substr(0, pos);
+    
+    char *cookie = 0;
+    uint32_t length = 0;
+    NPN_GetValueForURL(_instance, NPNURLVCookie, url.c_str(),
+                       &cookie, &length);
+    if (cookie) {
+        std::string ncookie (cookie, length);
+        gnash::log_debug("The Cookie for %s is %s", url, ncookie);
+        std::ofstream cookiefile;
+        std::stringstream ss;
+        ss << "/tmp/gnash-cookies." << getpid(); 
+        
+        cookiefile.open(ss.str().c_str(), std::ios::out | std::ios::trunc);
+        cookiefile << "Set-Cookie: " << ncookie << std::endl;
+        cookiefile.close();
+        
+        if (setenv("GNASH_COOKIES_IN", ss.str().c_str(), 1) < 0) {
+            gnash::log_error(
+                "Couldn't set environment variable GNASH_COOKIES_IN to %s",
+                ncookie);
+        }
+        NPN_MemFree(cookie);
+    } else {
+        gnash::log_debug("No stored Cookie for %s", url);
+    }    
+}
+
+void
+nsPluginInstance::setupProxy(const std::string& url)
+{
+    // In pre xulrunner 1.9, (Firefox 3.1) this function does not exist,
+    // so we can't use it to read the proxy information.
+    if (!NPNFuncs.getvalueforurl) return;
+
+    char *proxy = 0;
+    uint32_t length = 0;
+    NPN_GetValueForURL(_instance, NPNURLVProxy, url.c_str(),
+                       &proxy, &length);
+    if (!proxy) {
+        gnash::log_debug("No proxy setting for %s", url);
+        return;
+    }
+
+    std::string nproxy (proxy, length);
+    NPN_MemFree(proxy);
+
+    gnash::log_debug("Proxy setting for %s is %s", url, nproxy);
+
+    std::vector<std::string> parts;
+    boost::split(parts, nproxy,
+        boost::is_any_of(" "), boost::token_compress_on);
+    if ( parts[0] == "DIRECT" ) {
+        // no proxy
+    }
+    else if ( parts[0] == "PROXY" ) {
+        if (setenv("http_proxy", parts[1].c_str(), 1) < 0) {
+            gnash::log_error(
+                "Couldn't set environment variable http_proxy to %s",
+                nproxy);
+        }
+    }
+    else {
+        gnash::log_error("Unknown proxy type: %s", nproxy);
+    }
+
+}
+
 std::vector<std::string>
 nsPluginInstance::getCmdLine(int hostfd, int controlfd)
 {
@@ -977,43 +1061,8 @@ nsPluginInstance::getCmdLine(int hostfd, int controlfd)
         arg_vec.push_back(pageurl);
     }
 
-    // In pre xulrunner 1.9, (Firefox 3.1) this function does not exist,
-    // so we can't use it to read the cookie file. For older browsers
-    // like IceWeasel on Debian lenny, which pre dates the cookie support
-    // in NPAPI, you have to block all Cookie for sites like YouTube to
-    // allow Gnash to work.
-    if (NPNFuncs.getvalueforurl) {
-        // Cookie appear to drop anything past the domain, so we strip
-        // that off.
-        std::string::size_type pos;
-        pos = pageurl.find("/", pageurl.find("//", 0) + 2) + 1;
-        std::string url = pageurl.substr(0, pos);
-        
-        char *cookie = 0;
-        uint32_t length = 0;
-        NPN_GetValueForURL(_instance, NPNURLVCookie, url.c_str(),
-                           &cookie, &length);
-        std::string ncookie (cookie, length);
-        if (cookie) {
-            gnash::log_debug("The Cookie for %s is %s", url, ncookie);
-            std::ofstream cookiefile;
-            std::stringstream ss;
-            ss << "/tmp/gnash-cookies." << getpid(); 
-            
-            cookiefile.open(ss.str().c_str(), std::ios::out | std::ios::trunc);
-            cookiefile << "Set-Cookie: " << ncookie << std::endl;
-            cookiefile.close();
-            
-            if (setenv("GNASH_COOKIES_IN", ss.str().c_str(), 1) < 0) {
-                gnash::log_error(
-                    "Couldn't set environment variable GNASH_COOKIES_IN to %s",
-                    ncookie);
-            }
-            NPN_MemFree(cookie);
-        } else {
-            gnash::log_debug("No stored Cookie for %s", url);
-        }    
-    }
+    setupCookies(pageurl);
+    setupProxy(pageurl);
 
     std::stringstream pars;
     pars << "-x "  <<  _window          // X window ID to render into

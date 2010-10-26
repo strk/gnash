@@ -394,7 +394,6 @@ nsPluginInstance::threadMain(void)
 	PR_Lock(playerLock);
 
     // Initialize Gnash core library.
-    gnash::gnashInit();
     DBG("Gnash core initialized.\n");
  
     // Init logfile.

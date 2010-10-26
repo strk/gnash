@@ -24,7 +24,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include "gnash.h" 
 #include "sound_handler.h"
 #include "MediaHandler.h" 
 #include "gui.h"

@@ -17,9 +17,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "TextRecord.h"
+
+#include <boost/assign/list_of.hpp>
+#include <vector>
+
+#include "TypesParser.h"
 #include "SWFStream.h"
 #include "SWFMatrix.h"
-#include "cxform.h"
+#include "SWFCxForm.h"
 #include "smart_ptr.h"
 #include "movie_definition.h"
 #include "DisplayObject.h"
@@ -28,8 +33,6 @@
 #include "Font.h"
 #include "Renderer.h"
 
-#include <boost/assign/list_of.hpp>
-#include <vector>
 
 namespace gnash {
 namespace SWF {    
@@ -159,9 +162,12 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
 /// The proprietary player does not display rotated or skewed device fonts.
 /// Gnash does.
 void
-TextRecord::displayRecords(Renderer& renderer, const SWFMatrix& mat,
-        const cxform& cx, const TextRecords& records, bool embedded)
+TextRecord::displayRecords(Renderer& renderer, const Transform& xform,
+        const TextRecords& records, bool embedded)
 {
+
+    const SWFCxForm& cx = xform.colorTransform;
+    const SWFMatrix& mat = xform.matrix;
 
     // Starting positions.
     double x = 0.0;

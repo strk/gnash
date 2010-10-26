@@ -38,7 +38,6 @@
 #include "swf/TagLoadersTable.h"
 #include "swf/DefaultTagLoaders.h"
 #include "ClockTime.h"
-#include "gnash.h"
 #include "movie_definition.h"
 #include "MovieClip.h"
 #include "movie_root.h"
@@ -56,6 +55,11 @@
 #include "GnashSleep.h" // for usleep comptibility.
 #include "StreamProvider.h"
 #include "RunResources.h"
+
+#ifdef RENDERER_AGG
+#include "Renderer.h"
+#include "Renderer_agg.h"
+#endif
 
 extern "C"{
 #ifdef HAVE_GETOPT_H
@@ -111,8 +115,8 @@ gnash::Debugger& debugger = gnash::Debugger::getDefaultInstance();
 #endif
 }
 
-static bool play_movie(
-        const std::string& filename, const RunResources& runResources);
+static bool play_movie(const std::string& filename,
+        const RunResources& runResources);
 
 static bool s_stop_on_errors = true;
 
@@ -219,9 +223,6 @@ int
 main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
-
-    /// Initialize gnash core library
-    gnashInit();
 
     // Enable native language support, i.e. internationalization
 #ifdef ENABLE_NLS
@@ -340,16 +341,6 @@ main(int argc, char *argv[])
 	    exit(EXIT_FAILURE);
     }
 
-    if (infiles.size() > 1)
-    {
-        // We're not ready for multiple runs yet.
-        std::cerr << "Multiple input files not supported." << std::endl;
-        usage(argv[0]);
-        dbglogfile.removeLog();
-        exit(EXIT_FAILURE);
-    }
-
-
     boost::shared_ptr<gnash::media::MediaHandler> mediaHandler;
     boost::shared_ptr<sound::sound_handler> soundHandler;
 
@@ -357,22 +348,37 @@ main(int argc, char *argv[])
     mediaHandler.reset(media::MediaFactory::instance().get(mh));
     soundHandler.reset(new sound::NullSoundHandler(mediaHandler.get()));
 
-    boost::shared_ptr<StreamProvider> sp(new StreamProvider);
 
 
     boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
     addDefaultLoaders(*loaders);
+
+#ifdef RENDERER_AGG
+    boost::shared_ptr<Renderer_agg_base> r(create_Renderer_agg("RGBA32"));
+
+    // Yes, this leaks. On some systems (e.g. Debian Lenny) the data is
+    // evidently accessed after main() returns. Rather than bothering to
+    // work out why, we let this byte leak, as it's returned to the system on
+    // exit anyway.
+    unsigned char* buf = new unsigned char[8];
+    r->init_buffer(buf, 1, 1, 1, 1);
+#endif
 
     // Play through all the movies.
     for (std::vector<std::string>::const_iterator i = infiles.begin(), 
             e = infiles.end(); i != e; ++i)
     {
 
-        RunResources runResources(*i);
+        RunResources runResources;
         runResources.setSoundHandler(soundHandler);
         runResources.setMediaHandler(mediaHandler);
-        runResources.setStreamProvider(sp);
         runResources.setTagLoaders(loaders);
+        boost::shared_ptr<StreamProvider> sp(new StreamProvider(*i));
+        runResources.setStreamProvider(sp);
+
+#ifdef RENDERER_AGG
+        runResources.setRenderer(r);
+#endif
 
 	    bool success = play_movie(*i, runResources);
 	    if (!success) {
@@ -400,7 +406,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
     quitrequested = false;
 
     URL url(filename);
-
+    
     try
     {
       if (filename == "-")
@@ -436,7 +442,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
         std::cerr << "error: can't play movie: "<< filename << std::endl;
 	    return false;
     }
-
+    
     float fps = md->get_frame_rate();
     long fpsDelay = long(1000000/fps);
     long clockAdvance = fpsDelay/1000;
@@ -577,22 +583,15 @@ play_movie(const std::string& filename, const RunResources& runResources)
     // destruction when core gnash doesn't need it anymore
     md = 0;
 
-    log_debug("-- Clearning movie_root");
-
-    // clear movie_root (shouldn't have bad consequences on itself)
-    m.clear();
-
-    log_debug("-- Clearning gnash");
+    log_debug("-- Cleaning gnash");
  
     // Clear resources.
     // Forces run of GC, which in turn may invoke
     // destuctors of (say) MovieClip which would try
     // to access the movie_root to unregister self
     //
-    // This means that movie_root must be available
-    // while gnash::clear() runs
-    // 
-    gnash::clear();
+    // This means that movie_root must be available.
+    MovieFactory::clear();
 
     return true;
 }

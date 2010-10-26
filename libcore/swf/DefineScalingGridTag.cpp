@@ -19,6 +19,8 @@
 //
 
 #include "DefineScalingGridTag.h"
+
+#include "TypesParser.h"
 #include "SWFStream.h"
 #include "movie_definition.h"
 #include "MovieClip.h"
@@ -33,14 +35,13 @@ DefineScalingGridTag::loader(SWFStream& in, TagType /*tag*/,
         movie_definition& /*md*/, const RunResources& /*r*/)
 {
     in.ensureBytes(2);
-    boost::uint16_t id = in.read_u16();
+    const boost::uint16_t id = in.read_u16();
 
     IF_VERBOSE_PARSE(
-            log_parse("DefineScalingGridTag: id = %d", id);
+        log_parse("DefineScalingGridTag: id = %d", id);
     );
 
-    SWFRect inner;
-    inner.read(in);
+    const SWFRect inner = readRect(in);
 
     log_unimpl("DefineScalingGridTag");
 

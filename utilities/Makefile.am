@@ -28,6 +28,7 @@ GNASH_LIBS = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libsound/libgnashsound.la \
+	$(top_builddir)/librender/libgnashrender.la \
 	$(NULL)
 
 if LIBLTDL2
@@ -105,15 +106,18 @@ AM_CPPFLAGS += \
 	-I$(top_srcdir)/cygnal/libnet
 bin_PROGRAMS += soldumper flvdumper
 
+CYGNAL_LIBS = \
+	$(top_builddir)/cygnal/libamf/libgnashamf.la \
+	$(top_builddir)/cygnal/libnet/libgnashnet.la \
+	$(BOOST_CYGNAL_LIBS) \
+	$(NULL)
+
 soldumper_SOURCES = soldumper.cpp
-soldumper_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
+soldumper_LDADD = $(GNASH_LIBS) $(CYGNAL_LIBS) $(AM_LDFLAGS)
 
 flvdumper_SOURCES = flvdumper.cpp
-flvdumper_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
+flvdumper_LDADD = $(GNASH_LIBS) $(CYGNAL_LIBS) $(AM_LDFLAGS)
 
-GNASH_LIBS += \
-	$(top_builddir)/cygnal/libamf/libgnashamf.la \
-	$(top_builddir)/cygnal/libnet/libgnashnet.la
 endif
 
 #check_PROGRAMS = gdebug.swf
@@ -138,7 +142,13 @@ rtmpget_LDADD =  $(GNASH_LIBS) $(AM_LDFLAGS)
 #dumpshm_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
 
 if USE_GST_ENGINE
- GST_STUFF = $(GSTPBUTILS_LIBS) $(GSTREAMER_PLUGINS_BASE_LIBS) $(GSTREAMER_LIBS) 
+ GST_STUFF = \
+	$(GSTPBUTILS_LIBS) \
+	$(GSTREAMER_PLUGINS_BASE_LIBS) \
+	$(GSTREAMER_LIBS) \
+	$(GSTAPP_CFLAGS) \
+	$(NULL)
+
  findwebcams_SOURCES = findwebcams.cpp
  findwebcams_LDADD = $(GST_STUFF) $(GNASH_LIBS) $(AM_LDFLAGS)
 

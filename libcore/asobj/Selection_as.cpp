@@ -212,7 +212,7 @@ selection_setFocus(const fn_call& fn)
     }
     else {
         /// Try converting directly to DisplayObject.
-        as_object* obj = focus.to_object(getGlobal(fn));
+        as_object* obj = toObject(focus, getVM(fn));
         ch = get<DisplayObject>(obj);
     }
 
@@ -245,8 +245,8 @@ selection_setSelection(const fn_call& fn)
         return as_value();
     }
 
-    int start = toInt(fn.arg(0));
-    int end = toInt(fn.arg(1));
+    int start = toInt(fn.arg(0), getVM(fn));
+    int end = toInt(fn.arg(1), getVM(fn));
 
     tf->setSelection(start, end);
 

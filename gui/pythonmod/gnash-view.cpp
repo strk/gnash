@@ -108,8 +108,7 @@ gnash_view_call (GnashView *view, const gchar *func_name, const gchar *input_dat
     gnash::string_table& st = vm.getStringTable();
 	gnash::as_value obj;
 
-    gnash::as_value func = getObject(view->movie)->getMember(
-            st.find(func_name));
+    gnash::as_value func = getMember(*getObject(view->movie), st.find(func_name));
 
     if( !func.is_function() ) {
         return NULL;
@@ -207,7 +206,6 @@ gnash_view_init(GnashView *view)
 
     // Initializations that can happen before realization come here. The rest
     // come after realize, in gnash_view_realize_cb.
-    gnash::gnashInit();
     gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
     dbglogfile.setVerbosity(3);
 
@@ -219,7 +217,7 @@ gnash_view_init(GnashView *view)
 #ifdef SOUND_SDL
     try {
         view->sound_handler.reset(gnash::sound::create_sound_handler_sdl(
-                view->media_handler.get(), ""));
+                view->media_handler.get()));
     } catch (gnash::SoundException& ex) {
         gnash::log_error(_("Could not create sound handler: %s."
                            " Will continue w/out sound."), ex.what());
@@ -424,11 +422,12 @@ gnash_view_load_movie(GnashView *view, const gchar *uri)
     gnash::URL url(uri);
 
     // The RunResources should be populated before parsing.
-    view->run_info.reset(new gnash::RunResources(url.str()));
+    view->run_info.reset(new gnash::RunResources());
     view->run_info->setSoundHandler(view->sound_handler);
 
     std::auto_ptr<gnash::NamingPolicy> np(new gnash::IncrementalRename(url));
-    boost::shared_ptr<gnash::StreamProvider> sp(new gnash::StreamProvider(np));
+    boost::shared_ptr<gnash::StreamProvider> sp(
+	    new gnash::StreamProvider(url, np));
     view->run_info->setStreamProvider(sp);
 
     gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
@@ -456,6 +455,7 @@ gnash_view_load_movie(GnashView *view, const gchar *uri)
     view->system_clock.reset(new gnash::SystemClock());
     view->virtual_clock.reset(new gnash::InterruptableVirtualClock(*view->system_clock));
     view->stage.reset(new gnash::movie_root(*view->movie_definition, *view->virtual_clock, *view->run_info));
+    
     view->movie_definition->completeLoad();
 
     view->advance_timer = g_timeout_add_full(G_PRIORITY_LOW, 10,
@@ -505,7 +505,7 @@ gnash_view_display(GnashView *view)
     renderer->set_invalidated_regions(changed_ranges);
     gdk_window_invalidate_rect(GTK_WIDGET(view->canvas)->window, NULL, false);
 
-    gnash_canvas_before_rendering(view->canvas);
+    gnash_canvas_before_rendering(view->canvas, view->stage.get());
 	view->stage->display();
 
     gdk_window_process_updates(GTK_WIDGET(view->canvas)->window, false);

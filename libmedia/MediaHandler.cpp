@@ -80,7 +80,7 @@ MediaHandler::createMediaParser(std::auto_ptr<IOChannel> stream)
 std::auto_ptr<AudioDecoder>
 MediaHandler::createFlashAudioDecoder(const AudioInfo& info)
 {
-    assert ( info.type == FLASH );
+    assert (info.type == CODEC_TYPE_FLASH );
 
     audioCodecType codec = static_cast<audioCodecType>(info.codec);
     switch (codec)
@@ -104,7 +104,7 @@ MediaHandler::createFlashAudioDecoder(const AudioInfo& info)
         {
             boost::format err = boost::format(
                 _("MediaHandler::createFlashAudioDecoder:"
-                  " no available FLASH decoders for codec %d (%s)")) %
+                  " no available flash decoders for codec %d (%s)")) %
                 (int)codec % codec;
             throw MediaException(err.str());
         }

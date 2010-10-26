@@ -22,7 +22,6 @@
 #endif
 
 #include <cstdio>
-#include "gnash.h"
 #include "rc.h"
 
 #include <proto/asl.h>

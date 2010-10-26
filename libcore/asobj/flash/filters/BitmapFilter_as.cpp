@@ -15,14 +15,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+#include "BitmapFilter_as.h"
 
 #include "namedStrings.h"
 #include "as_object.h"
-#include "BitmapFilter.h"
 #include "VM.h"
 #include "builtin_function.h"
 #include "NativeFunction.h"
 #include "Global_as.h"
+#include "Filters.h"
 
 namespace gnash {
 
@@ -79,7 +80,7 @@ registerBitmapClass(as_object& where, Global_as::ASFunction ctor,
     // it, so entering infinite recursion, we'll cheat and assume that
     // the object 'where' is the filters package.
     as_function* constructor =
-        where.getMember(st.find("BitmapFilter")).to_function();
+        getMember(where, st.find("BitmapFilter")).to_function();
     
     as_object* proto;
     if (constructor) {
@@ -89,7 +90,7 @@ registerBitmapClass(as_object& where, Global_as::ASFunction ctor,
     }
     else proto = 0;
 
-    as_object* cl = gl.createClass(ctor, gl.createObject());
+    as_object* cl = gl.createClass(ctor, createObject(gl));
     if (proto) p(*proto);
 
     // The startup script overwrites the prototype assigned by ASconstructor,
@@ -117,7 +118,7 @@ getBitmapFilterConstructor(const fn_call& fn)
     Global_as& gl = getGlobal(fn);
     VM& vm = getVM(fn);
     
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     as_object* cl = vm.getNative(1112, 0);
     cl->init_member(NSV::PROP_PROTOTYPE, proto);
     proto->init_member(NSV::PROP_CONSTRUCTOR, cl);
@@ -129,7 +130,7 @@ getBitmapFilterConstructor(const fn_call& fn)
 as_value
 bitmapfilter_new(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensure<ThisIs<as_object> >(fn);
+    as_object* obj = ensure<ValidThis>(fn);
     obj->setRelay(new BitmapFilter_as);
     return as_value();
 }

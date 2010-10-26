@@ -23,20 +23,6 @@
 
 #include <cstdio>
 
-#if defined(_WIN32) || defined(WIN32)
-# include "getopt_win32.h"
-#else
-extern "C"{
-# ifdef HAVE_GETOPT_H
-#  include <getopt.h>
-# endif
-# ifndef __GNUC__
-  extern int getopt(int, char *const *, const char *);
-# endif
-}
-#endif // Win32
-
-#include "gnash.h"
 #include "log.h"
 #include "sdlsup.h"
 #include "Range2d.h" // for Intersection of inv bounds
@@ -57,13 +43,11 @@ SDLGui::SDLGui(unsigned long xid, float scale, bool loop, RunResources& r)
 
 SDLGui::~SDLGui()
 {
-    GNASH_REPORT_FUNCTION;
 }
 
 bool
 SDLGui::run()
 {
-    GNASH_REPORT_FUNCTION;
     int x_old = -1;
     int y_old = -1;
     int button_state_old = -1;
@@ -156,15 +140,8 @@ SDLGui::setTimeout(unsigned int timeout)
 bool
 SDLGui::init(int argc, char **argv[])
 {
-    GNASH_REPORT_FUNCTION;
 
-    int c;
-    while ((c = getopt (argc, *argv, "m:c")) != -1) {
-        switch (c) {
-        case 'c':
-            disableCoreTrap();
-        }
-    }
+    disableCoreTrap();
 
     if (_xid) {
         char SDL_windowhack[32];
@@ -197,7 +174,6 @@ bool
 SDLGui::createWindow(const char *title, int width, int height,
                      int /*xPosition*/, int /*yPosition*/)
 {
-    GNASH_REPORT_FUNCTION;
     _width = width;
     _height = height;
 
@@ -236,8 +212,6 @@ SDLGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 void
 SDLGui::renderBuffer()
 {
-    //GNASH_REPORT_FUNCTION;
-
     _glue.render();
 }
 
@@ -250,14 +224,12 @@ SDLGui::setInterval(unsigned int interval)
 bool
 SDLGui::createMenu()
 {
-    GNASH_REPORT_FUNCTION;
     return false;
 }
 
 bool
 SDLGui::setupEvents()
 {
-    GNASH_REPORT_FUNCTION;
     return false;
 }
 

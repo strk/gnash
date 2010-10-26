@@ -69,7 +69,6 @@ namespace {
     as_value sound_start(const fn_call& fn);
     as_value sound_stop(const fn_call& fn);
     as_value checkPolicyFile_getset(const fn_call& fn);
-    as_value sound_ctor(const fn_call& fn);
     void attachSoundInterface(as_object& o);
 }
 
@@ -266,10 +265,7 @@ Sound_as::Sound_as(as_object* owner)
 
 Sound_as::~Sound_as()
 {
-
     // Just in case...
-    stopProbeTimer();
-
     if (_inputStream && _soundHandler) {
         _soundHandler->unplugInputStream(_inputStream);
         _inputStream=0;
@@ -283,7 +279,7 @@ sound_class_init(as_object& where, const ObjectURI& uri)
 {
 
     Global_as& gl = getGlobal(where);
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     as_object* cl = gl.createClass(&sound_new, proto);
     attachSoundInterface(*proto);
     proto->set_member_flags(NSV::PROP_CONSTRUCTOR, PropFlags::readOnly);
@@ -378,7 +374,7 @@ Sound_as::probeAudio()
         try {
             _inputStream = attachAuxStreamerIfNeeded();
         } 
-        catch (MediaException& e) {
+        catch (const MediaException& e) {
             assert(!_inputStream);
             assert(!_audioDecoder.get());
             log_error(_("Could not create audio decoder: %s"), e.what());
@@ -422,7 +418,7 @@ Sound_as::markSoundCompleted(bool completed)
 void
 Sound_as::attachCharacter(DisplayObject* attachTo) 
 {
-    _attachedCharacter.reset(new CharacterProxy(attachTo));
+    _attachedCharacter.reset(new CharacterProxy(attachTo, getRoot(owner())));
 }
 
 void
@@ -532,7 +528,7 @@ Sound_as::loadSound(const std::string& file, bool streaming)
     _startTime=0;
 
     const RunResources& rr = getRunResources(owner());
-    URL url(file, rr.baseURL());
+    URL url(file, rr.streamProvider().originalURL());
 
     const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
@@ -920,7 +916,7 @@ sound_new(const fn_call& fn)
 
         if (!arg0.is_null() && !arg0.is_undefined()) {
 
-            as_object* obj = arg0.to_object(getGlobal(fn));
+            as_object* obj = toObject(arg0, getVM(fn));
             DisplayObject* ch = get<DisplayObject>(obj);
             IF_VERBOSE_ASCODING_ERRORS(
                 if (!ch) {
@@ -950,10 +946,10 @@ sound_start(const fn_call& fn)
     double secondOffset = 0;
 
     if (fn.nargs > 0) {
-        secondOffset = fn.arg(0).to_number();
+        secondOffset = toNumber(fn.arg(0), getVM(fn));
 
         if (fn.nargs > 1) {
-            loop = (int) fn.arg(1).to_number() - 1;
+            loop = (int) toNumber(fn.arg(1), getVM(fn)) - 1;
 
             // -1 means infinite playing of sound
             // sanity check
@@ -1158,7 +1154,7 @@ sound_loadsound(const fn_call& fn)
 
     bool streaming = false;
     if ( fn.nargs > 1 ) {
-        streaming = fn.arg(1).to_bool();
+        streaming = toBool(fn.arg(1), getVM(fn));
 
         IF_VERBOSE_ASCODING_ERRORS(
         if ( fn.nargs > 2 )
@@ -1200,7 +1196,7 @@ sound_setvolume(const fn_call& fn)
     }
 
     Sound_as* so = ensure<ThisIsNative<Sound_as> >(fn);
-    int volume = (int) fn.arg(0).to_number();
+    int volume = (int) toNumber(fn.arg(0), getVM(fn));
 
     so->setVolume(volume);
     return as_value();
@@ -1223,14 +1219,6 @@ sound_areSoundsInaccessible(const fn_call& /*fn*/)
     // naive test shows this always being undefined..
     //
     LOG_ONCE( log_unimpl ("Sound.areSoundsInaccessible()") );
-    return as_value();
-}
-
-as_value
-sound_ctor(const fn_call& fn)
-{
-    as_object* obj = fn.this_ptr;
-    obj->setRelay(new Sound_as(obj));
     return as_value();
 }
 

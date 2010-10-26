@@ -23,13 +23,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include "string_table.h"
-#include "GC.h" // for inheritance from GcResource (to complete)
-#include "PropertyList.h"
-#include "PropFlags.h"
-#include "Relay.h"
-#include "ObjectURI.h"
-
 #include <map>
 #include <vector>
 #include <cmath>
@@ -38,7 +31,13 @@
 #include <sstream>
 #include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
-#include <deque>
+
+#include "string_table.h"
+#include "GC.h" // for inheritance from GcResource (to complete)
+#include "PropertyList.h"
+#include "PropFlags.h"
+#include "Relay.h"
+#include "ObjectURI.h"
 
 // Forward declarations
 namespace gnash {
@@ -56,15 +55,6 @@ namespace gnash {
 
 namespace gnash {
 
-
-/// An abstract property visitor
-class AbstractPropertyVisitor {
-public:
-
-    /// This function should return false if no further visits are needed.
-    virtual bool accept(const ObjectURI& uri, const as_value& val) = 0;
-    virtual ~AbstractPropertyVisitor() {}
-};
 
 /// A trigger that can be associated with a property name
 class Trigger
@@ -174,24 +164,15 @@ class as_object : public GcResource, boost::noncopyable
 
 public:
     
-    typedef std::pair<std::string, std::string> KeyValuePair;
-
-    /// This is used to hold an intermediate copy of an as_object's properties.
-    //
-    /// AS enumerates in reverse order of creation. In order to make sure
-    /// that the properties are in the correct order, the first element of
-    /// a SortedPropertyList should hold the last created property.
-    //
-    /// We use a deque because we push to the front in order to preserve the
-    /// ordering for the copy.
-    typedef std::deque<KeyValuePair> SortedPropertyList;
-    
     /// Construct an ActionScript object with no prototype associated.
     //
     /// @param  global  A reference to the Global object the new
     ///                 object ultimately belongs to. The created object
     ///                 uses the resources of the Global object.
-    explicit as_object(Global_as& global);
+    explicit as_object(const Global_as& global);
+
+    /// The as_object dtor does nothing special.
+    virtual ~as_object() {}
 
     /// Function dispatch
     //
@@ -204,7 +185,7 @@ public:
     //
     /// This is dependent on the VM version and the type of object, function,
     /// or class.
-    virtual const std::string& stringValue() const;
+    virtual std::string stringValue() const;
 
     /// The most common flags for built-in properties.
     //
@@ -219,7 +200,7 @@ public:
     ///                 an inherited property.
     /// @returns        A property if found and visible, NULL if not found or
     ///                 not visible in current VM version
-    Property* findProperty(const ObjectURI& uri, as_object **owner = NULL);
+    Property* findProperty(const ObjectURI& uri, as_object** owner = 0);
 
     /// Return a reference to this as_object's global object.
     VM& vm() const {
@@ -234,15 +215,6 @@ public:
     //
     /// Only use this function for temporary debugging!
     void dump_members();
-
-    /// Dump all properties into the given container
-    //
-    /// Note that it is very likely that this will result in changes to the
-    /// object, as accessing getter/setters or destructive properties can
-    /// modify properties.
-    //
-    /// Only use this function for temporary debugging!
-    void dump_members(std::map<std::string, as_value>& to);
 
     /// Set a member value
     //
@@ -383,7 +355,7 @@ public:
     /// it destroys itself after setting its property to the return value of
     /// getValue.
     //
-    /// @param uri      name/namespace property identifier.
+    /// @param uri      Property identifier.
     /// @param getter   A function to invoke when this property value is
     ///                 requested.
     /// @param flags    Flags for the new member. By default dontEnum.
@@ -406,9 +378,6 @@ public:
     void init_readonly_property(const std::string& key, as_function& getter,
             int flags = DefaultFlags);
 
-    void init_readonly_property(const ObjectURI& uri,
-            as_function& getter, int flags = DefaultFlags);
-
     /// Use this method for read-only properties.
     //
     /// This method achieves the same as the above init_property method.
@@ -425,23 +394,9 @@ public:
     void init_readonly_property(const std::string& key,
             as_c_function_ptr getter, int flags = DefaultFlags);
 
-    void init_readonly_property(const ObjectURI& uri,
-            as_c_function_ptr getter, int flags = DefaultFlags);
-
-    /// Enumerate all non-hidden property keys to the given as_environment.
-    //
-    /// NB: this function does not access the property values, so callers
-    /// can be certain no values will be changed.
-    //
-    /// The enumeration recurses through the prototype chain. This
-    /// implementation will keep track of visited object to avoid infinite
-    /// loops in the prototype chain.  NOTE: the MM player just chokes in
-    /// this case.
-    void enumeratePropertyKeys(as_environment& env) const;
-
     /// Add a watch trigger, overriding any other defined for same name.
     //
-    /// @param uri      property namespace.
+    /// @param uri      property identifier
     /// @param trig     A function to invoke when this property value is
     ///                 assigned to. The function will be called with old
     ///                 val, new val and the custom value below. Its
@@ -458,10 +413,12 @@ public:
     ///                 otherwise (no such trigger exists).
     bool unwatch(const ObjectURI& uri);
 
-    /// Get a member as_value by name
+    /// Get a property by name if it exists.
     //
-    /// NOTE that this method is non-const because accessing a getter/setter
-    ///      property may modify the object.
+    /// NOTE: accessing a getter/setter property may modify the object.
+    //
+    /// See getMember() for a property accessor that corresponds to
+    /// ActionScript behaviour.
     //
     /// @param uri      Property identifier.
     /// @param val      Variable to assign an existing value to.
@@ -470,45 +427,20 @@ public:
     /// @return         true if the named property was found, false otherwise.
     virtual bool get_member(const ObjectURI& uri, as_value* val);
 
-    /// Resolve the given relative path component
-    //
-    /// Path components are only objects, if the given string
-    /// points to a non-object member, NULL is returned.
-    ///
-    /// Main use if for getvariable and settarget resolution,
-    /// currently implemented in as_environment.
-    virtual as_object* get_path_element(string_table::key key);
-
     /// Get the super object of this object.
     ///
     /// The super should be __proto__ if this is a prototype object
     /// itself, or __proto__.__proto__ if this is not a prototype
     /// object. This is only conceptual however, and may be more
     /// convoluted to obtain the actual super.
-    virtual as_object* get_super(string_table::key fname = 0);
-
-    /// Get a member as_value by name in an AS-compatible way
-    //
-    /// NOTE that this method is non-const becase a property
-    ///      could also be a getter/setter and we can't promise
-    ///      that the 'getter' won't change this object trough
-    ///      use of the 'this' reference. 
-    //
-    /// @param uri      Property identifier. Note that
-    ///                 if you do not care about the namespace (AS2 does not),
-    ///                 you can call this function with the name key only.
-    /// @return         Value of the member (possibly undefined),
-    ///                 or undefined if not found. Use get_member if you
-    ///                 need to know whether it was found or not.
-    as_value getMember(const ObjectURI& uri);
+    virtual as_object* get_super(const ObjectURI& fname);
+    as_object* get_super();
 
     /// Delete a property of this object, unless protected from deletion.
     //
     /// This function does *not* recurse in this object's prototype.
     //
-    /// @param uri      Property identifier. Note that
-    ///                 if you do not care about the namespace (AS2 does not),
-    ///                 you can call this function with the name key only.
+    /// @param uri      Property identifier. 
     /// @return         a pair of boolean values expressing whether the property
     ///                 was found (first) and whether it was deleted (second).
     ///                 Of course a pair(false, true) would be invalid (deleted
@@ -522,21 +454,10 @@ public:
     //
     /// This function does *not* recurse in this object's prototype.
     //
-    /// @param uri      The name and namespace of the property. Note that
-    ///                 if you do not care about the namespace (AS2 does not),
-    ///                 you can call this function with the name key only.
+    /// @param uri      Property identifier. 
     /// @return         A Property pointer, or NULL if this object doesn't
     ///                 contain the named property.
     Property* getOwnProperty(const ObjectURI& uri);
-
-    /// Return true if this object has the named property
-    //
-    /// @param uri      Name and namespace of the property. Note that
-    ///                 if you do not care about the namespace (AS2 does not),
-    ///                 you can call this function with the name key only.
-    ///
-    /// @return         true if the object has the property, false otherwise.
-    bool hasOwnProperty(const ObjectURI& uri);
 
     /// Set member flags (probably used by ASSetPropFlags)
     //
@@ -626,13 +547,26 @@ public:
     /// change the object.
     //
     /// @param visitor  The visitor function. Will be invoked for each property
-    ///                 of this object with a string_table::key
-    ///                 reference as first argument and a const as_value
-    ///                 reference as second argument.
+    ///                 of this object with an ObjectURI as first argument and
+    ///                 a const as_value as second argument.
     template<typename T>
-    void visitProperties(AbstractPropertyVisitor& visitor) const {
+    void visitProperties(PropertyVisitor& visitor) const {
         _members.visitValues<T>(visitor);
     }
+
+    /// Visit all visible property identifiers.
+    //
+    /// NB: this function does not access the property values, so callers
+    /// can be certain no values will be changed.
+    //
+    /// The enumeration recurses through the prototype chain. This
+    /// implementation will keep track of visited object to avoid infinite
+    /// loops in the prototype chain.  NOTE: the MM player just chokes in
+    /// this case.
+    //
+    /// @param visitor  The visitor function. Will be invoked for each property
+    ///                 of this object with an ObjectURI as the only argument.
+    void visitKeys(KeyVisitor& visitor) const;
 
     /// Add a getter/setter property if no member already has that name.
     //
@@ -729,21 +663,14 @@ protected:
     /// @param vm The VM to associate the newly created as_object with.
     explicit as_object(VM& vm);
 
-
     /// Mark all reachable resources, override from GcResource.
     //
     /// The default implementation marks all properties
-    /// as being reachable, calling markAsObjectReachable().
     ///
     /// If a derived class provides access to more GC-managed
-    /// resources, it should override this method and call 
-    /// markAsObjectReachable() as the last step.
-    virtual void markReachableResources() const {
-        markAsObjectReachable();
-    }
-
-    /// Mark properties and triggers list as reachable (for the GC)
-    void markAsObjectReachable() const;
+    /// resources, it should override this function and call 
+    /// this function directly as the last step.
+    virtual void markReachableResources() const;
 
 private:
 
@@ -799,9 +726,64 @@ private:
     /// interfaces is generally small and the opcode rarely used anyway.
     std::vector<as_object*> _interfaces;
 
-    typedef std::map<ObjectURI, Trigger> TriggerContainer;
+    typedef std::map<ObjectURI, Trigger, ObjectURI::LessThan> TriggerContainer;
     boost::scoped_ptr<TriggerContainer> _trigs;
 };
+
+/// Send a system event
+//
+/// This is used for broadcasting system events. The prototype search is
+/// carried out, but there is no call to __resolve and triggers
+/// are not processed.
+//
+/// The function is called with no arguments.
+//
+/// @param o    The object to send the event to.
+/// @param env  The environment to use, generally provided by the calling
+///             DisplayObject
+/// @param name The name of the function to call.
+void sendEvent(as_object& o, const as_environment& env, const ObjectURI& name);
+
+/// Get a member of an object using AS lookup rules
+//
+/// This is a wrapper round as_object::get_member that returns undefined if
+/// the member is not found.
+//
+/// Note: this is the only full lookup process available in ActionScript code.
+//
+//
+/// @param uri      Property identifier. 
+/// @param o        The object whose member is required.
+/// @return         Value of the member (possibly undefined),
+///                 or undefined if not found. Use get_member if you
+///                 need to know whether it was found or not.
+inline as_value
+getMember(as_object& o, const ObjectURI& uri)
+{
+    as_value ret;
+    o.get_member(uri, &ret);
+    return ret;
+}
+
+/// Get an own member of an object.
+//
+/// This is a wrapper round as_object::getOwnProperty that returns undefined if
+/// the member is not found.
+//
+/// Note: this requires two steps in ActionScript (hasOwnProperty + lookup), so
+/// is probably only for use in native functions.
+//
+/// @param uri      Property identifier.
+/// @param o        The object whose own member is required.
+/// @return         Value of the member (possibly undefined),
+///                 or undefined if not found. Use get_member if you
+///                 need to know whether it was found or not.
+inline as_value
+getOwnProperty(as_object& o, const ObjectURI& uri)
+{
+    Property* p = o.getOwnProperty(uri);
+    return p ? p->getValue(o) : as_value();
+}
 
 /// Function objects for visiting properties.
 class IsVisible
@@ -841,9 +823,18 @@ public:
 /// as non-enumerable ones.
 //
 /// @param o        The object whose properties should be encoded.
-/// @param data     Output parameter, will be set to the url-encoded
-///                 variables string without any leading delimiter.
-void getURLEncodedVars(as_object& o, std::string& data);
+/// @return         the url-encoded variables string without any leading
+///                 delimiter.
+std::string getURLEncodedVars(as_object& o);
+
+/// Resolve the given relative path component
+//
+/// Path components are only objects, if the given string
+/// points to a non-object member, NULL is returned.
+///
+/// Main use if for getvariable and settarget resolution,
+/// currently implemented in as_environment.
+as_object* getPathElement(as_object& o, const ObjectURI& uri);
 
 
 /// Extract the DisplayObject attached to an object
@@ -857,6 +848,17 @@ get(as_object* o)
 {
     if (!o) return 0;
     return dynamic_cast<T*>(o->displayObject());
+}
+
+/// Return true if this object has the named property
+//
+/// @param o        The object whose property should be searched for.
+/// @param uri      Property identifier. 
+/// @return         true if the object has the property, false otherwise.
+inline bool
+hasOwnProperty(as_object& o, const ObjectURI& uri)
+{
+    return (o.getOwnProperty(uri));
 }
 
 as_object* getObjectWithPrototype(Global_as& gl, string_table::key c);
@@ -882,15 +884,28 @@ isNativeType(as_object* obj, T*& relay)
     return relay;
 }
 
+/// This is used to hold an intermediate copy of an as_object's properties.
+//
+/// AS enumerates in reverse order of creation because these values are
+/// pushed to the stack. The first value to be popped is then the oldest
+/// property.
+typedef std::vector<std::pair<ObjectURI, as_value> > SortedPropertyList;
+    
 /// Enumerate all non-hidden properties to the passed container
 //
 /// NB: it is likely that this call will change the object, as accessing
-/// propertyproperty  values may call getter-setters.
+/// property values may call getter-setters.
 //
 /// The enumeration recurses through the prototype chain. This implementation
 /// will keep track of visited object to avoid infinite loops in the
-/// prototype chain.  NOTE: the MM player just chokes in this case.
-void enumerateProperties(as_object& o, as_object::SortedPropertyList& to);
+/// prototype chain.  NOTE: the Adobe player just chokes in this case.
+//
+/// Note that the last element of the returned container is the oldest
+/// property, so iterate in reverse to mimic AS behaviour.
+//
+/// @param o        The object whose properties should be enumerated.
+/// @return         A list of properties in reverse creation order.
+SortedPropertyList enumerateProperties(as_object& o);
 
 /// Get the VM from an as_object.
 VM& getVM(const as_object& o);

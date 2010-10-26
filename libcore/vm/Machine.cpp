@@ -865,7 +865,7 @@ Machine::execute()
                     if (!_stack.top(0).is_number()) throw ASException();
 
                     boost::uint32_t index =
-                        _stack.top(0).to_number();
+                        toNumber(_stack.top(0), getVM(fn));
                     _stack.drop(1);
 
                     mStream->seekBy(3); // Skip the intial offset.
@@ -954,7 +954,7 @@ Machine::execute()
                     ENSURE_OBJECT(_stack.top(1));
                     as_object *obj = _stack.top(1).to_object(*_global);
                     const boost::uint32_t index =
-                        _stack.top(0).to_number();
+                        toNumber(_stack.top(0), getVM(fn));
                     
                     if (!obj) {
                         // TODO: check what to do here.
@@ -986,7 +986,7 @@ Machine::execute()
                     ENSURE_OBJECT(_stack.top(1));
                     as_object *obj = _stack.top(1).to_object(*_global);
                     boost::uint32_t index =
-                        _stack.top(0).to_number();
+                        toNumber(_stack.top(0), getVM(fn));
                     _stack.drop(1);
                     assert(obj);
                     _stack.top(0) = obj->nextIndex(index);
@@ -1026,7 +1026,7 @@ Machine::execute()
                     ENSURE_OBJECT(_stack.top(1));
                     as_object *obj = _stack.top(1).to_object(*_global);
                     const boost::uint32_t index =
-                        _stack.top(0).to_number();
+                        toNumber(_stack.top(0), getVM(fn));
                     const Property *b = obj->getByIndex(index);
                     _stack.drop(1);
                     if (!b) _stack.top(0).set_undefined();
@@ -1441,7 +1441,7 @@ Machine::execute()
                     else {
 
                         as_value property =
-                            object->getMember(a.getGlobalName());
+                            getMember(*object, a.getGlobalName());
                     
                         if (!property.is_undefined() && !property.is_null()) {
                             log_abc("Calling method %s on object %s",
@@ -1552,7 +1552,7 @@ Machine::execute()
                         throw ASException();
                     }
 
-                    as_value c = super->getMember(NSV::PROP_CONSTRUCTOR);
+                    as_value c = getMember(*super, NSV::PROP_CONSTRUCTOR);
                     pushCall(c.to_function(), super, mIgnoreReturn,
                             argc, -1);
                     break;
@@ -1596,7 +1596,7 @@ Machine::execute()
                     string_table::key ns = a.getNamespace() ?
                         a.getNamespace()->getURI() : 0;
 
-                    as_value c = object->getMember(
+                    as_value c = getMember(*object, 
                             ObjectURI(a.getGlobalName(), ns));
 
                     // TODO: don't do this. Scriptes should not be functions;
@@ -2228,7 +2228,7 @@ Machine::execute()
                 case SWF::ABC_ACTION_CONVERT_U:
                 case SWF::ABC_ACTION_COERCE_U:
                     _stack.top(0) = static_cast<boost::uint32_t>(
-                            _stack.top(0).to_number());
+                            toNumber(_stack.top(0), getVM(fn)));
                     break;
 
                 /// 0x75 ABC_ACTION_CONVERT_D
@@ -2239,7 +2239,7 @@ Machine::execute()
                 ///  double_value -- value as a double object
                 case SWF::ABC_ACTION_CONVERT_D:
                 case SWF::ABC_ACTION_COERCE_D:
-                    _stack.top(0) = _stack.top(0).to_number();
+                    _stack.top(0) = toNumber(_stack.top(0), getVM(fn));
                     break;
 
                 /// 0x76 ABC_ACTION_CONVERT_B
@@ -2391,7 +2391,7 @@ Machine::execute()
             ///  negdouble -- -1.0 * (double) obj
                 case SWF::ABC_ACTION_NEGATE:
                 {
-                    _stack.top(0) = -_stack.top(0).to_number();
+                    _stack.top(0) = -toNumber(_stack.top(0), getVM(fn));
                     break;
                 }
             /// 0x91 ABC_ACTION_INCREMENT
@@ -2412,7 +2412,7 @@ Machine::execute()
                 case SWF::ABC_ACTION_INCLOCAL:
                 {
                     boost::uint32_t foff = mStream->read_V32();
-                    setRegister(foff, getRegister(foff).to_number() + 1);
+                    setRegister(foff, toNumber(getRegister(foff), getVM(fn)) + 1);
                     break;
                 }
 
@@ -2423,7 +2423,7 @@ Machine::execute()
                 ///  num - 1
                 case SWF::ABC_ACTION_DECREMENT:
                 {
-                    _stack.top(0) = _stack.top(0).to_number() - 1;
+                    _stack.top(0) = toNumber(_stack.top(0), getVM(fn)) - 1;
                     break;
                 }
 
@@ -2433,7 +2433,7 @@ Machine::execute()
                 case SWF::ABC_ACTION_DECLOCAL:
                 {
                     const boost::uint32_t foff = mStream->read_V32();
-                    setRegister(foff, getRegister(foff).to_number() - 1);
+                    setRegister(foff, toNumber(getRegister(foff), getVM(fn)) - 1);
                     break;
                 }
 
@@ -2493,7 +2493,7 @@ Machine::execute()
                 /// Stack Out:
                 ///  a * b (double)
                 case SWF::ABC_ACTION_MULTIPLY:
-                    _stack.top(1) = _stack.top(1).to_number() * _stack.top(0).to_number();
+                    _stack.top(1) = toNumber(_stack.top(1), getVM(fn)) * toNumber(_stack.top(0), getVM(fn));
                     _stack.drop(1);
                     break;
 
@@ -2504,7 +2504,7 @@ Machine::execute()
                 /// Stack Out:
                 ///  a / b (double)
                 case SWF::ABC_ACTION_DIVIDE:
-                    _stack.top(1) = _stack.top(1).to_number() / _stack.top(0).to_number();
+                    _stack.top(1) = toNumber(_stack.top(1), getVM(fn)) / toNumber(_stack.top(0), getVM(fn));
                     _stack.drop(1);
                     break;
 
@@ -2517,10 +2517,10 @@ Machine::execute()
                 case SWF::ABC_ACTION_MODULO:
                 {
                     // TODO: test this properly and fix the UB (overflow).
-                    double result = _stack.top(1).to_number() / _stack.top(0).to_number();
+                    double result = toNumber(_stack.top(1), getVM(fn)) / toNumber(_stack.top(0), getVM(fn));
                     int trunc_result = static_cast<int> (result);
-                    _stack.top(1) = _stack.top(1).to_number() - 
-                        (trunc_result * _stack.top(0).to_number());
+                    _stack.top(1) = toNumber(_stack.top(1), getVM(fn)) - 
+                        (trunc_result * toNumber(_stack.top(0), getVM(fn)));
                     _stack.drop(1);
                     break;
                 }
@@ -2560,7 +2560,7 @@ Machine::execute()
                 case SWF::ABC_ACTION_URSHIFT:
                 {
                     _stack.top(1) =
-                        static_cast<boost::uint32_t>(_stack.top(1).to_number())
+                        static_cast<boost::uint32_t>(toNumber(_stack.top(1), getVM(fn)))
                         >> toInt(_stack.top(0));
                     _stack.drop(1);
                     break;

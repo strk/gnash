@@ -28,7 +28,6 @@
 #include "Movie.h"
 #include "MovieClip.h"
 #include "SWFStream.h"
-#include "MovieFactory.h"
 #include "log.h"
 
 namespace gnash {

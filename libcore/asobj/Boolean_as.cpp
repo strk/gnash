@@ -36,7 +36,6 @@ namespace {
     as_value boolean_valueof(const fn_call& fn);
     as_value boolean_ctor(const fn_call& fn);
     void attachBooleanInterface(as_object& o);
-    as_object* getBooleanInterface();
 }
 
 class Boolean_as: public Relay
@@ -65,7 +64,7 @@ boolean_class_init(as_object& where, const ObjectURI& uri)
     VM& vm = getVM(where);
     Global_as& gl = getGlobal(where);
 
-    as_object* proto = gl.createObject();
+    as_object* proto = createObject(gl);
     as_object* cl = vm.getNative(107, 2);
     cl->init_member(NSV::PROP_PROTOTYPE, proto);
     proto->init_member(NSV::PROP_CONSTRUCTOR, cl);
@@ -119,10 +118,10 @@ boolean_ctor(const fn_call& fn)
 
     if (!fn.isInstantiation()) {
         if (!fn.nargs) return as_value();
-        return as_value(fn.arg(0).to_bool());
+        return as_value(toBool(fn.arg(0), getVM(fn)));
     }
 
-    const bool val = fn.nargs ? fn.arg(0).to_bool() : false;
+    const bool val = fn.nargs ? toBool(fn.arg(0), getVM(fn)) : false;
 
     as_object* obj = fn.this_ptr;
     obj->setRelay(new Boolean_as(val));

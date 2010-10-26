@@ -28,6 +28,8 @@
 #include <ios>
 #include <boost/format.hpp>
 #include <boost/algorithm/string/join.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 #include <cstdlib>
 #include <sys/types.h>
 #include <fcntl.h>
@@ -62,16 +64,6 @@ extern "C" {
 # include "gst/gstversion.h"
 #endif
 
-#ifdef GUI_ALP
-#include <alp/title.h>
-#include <alp/menubar.h>
-#include <alp/bundlemgr.h>
-#include <alp/appmgr.h>
-# define gnash_main alp_main
-#else
-# define gnash_main main
-#endif
-
 using std::cerr;
 using std::endl;
 using std::cout;
@@ -93,6 +85,10 @@ usage()
     std::vector<std::string> handlers;
     gnash::media::MediaFactory::instance().listKeys(back_inserter(handlers));
 
+    std::vector<std::string> renderers;
+    boost::split(renderers, RENDERER_CONFIG,
+        boost::is_any_of(" "), boost::token_compress_on);
+
     cout << _("Usage: gnash [options] movie_file.swf\n")
     << "\n"
     << _("Plays a SWF (Shockwave Flash) movie\n")
@@ -101,8 +97,7 @@ usage()
     << _("  -h,  --help              Print this help and exit\n")
     << _("  -V,  --version           Print version information and exit\n") 
     << _("  -s,  --scale <factor>    Scale the movie by the specified factor\n") 
-    << _("  -c                       Produce a core file instead of letting SDL trap it\n") 
-    << _("  -d,  --delay num         Number of milliseconds to delay in main loop\n") 
+    << _("  -d,  --delay <num>       Number of milliseconds to delay in main loop\n") 
     << _("  -v,  --verbose           Produce verbose output\n") 
 #if VERBOSE_ACTION
     << _("  -va                      Be (very) verbose about action execution\n") 
@@ -111,8 +106,8 @@ usage()
     << _("  -vp                      Be (very) verbose about parsing\n") 
 #endif
     << _("  -A <file>                Audio dump file (wave format)\n") 
-    << _("  --hwaccel <none|vaapi|xv> Hardware Video Accelerator to use\n") 
-    << _("                           none|vaapi|xv|omap (default: none)\n") 
+    << _("  --hwaccel <none|vaapi> Hardware Video Accelerator to use\n") 
+    << _("                           none|vaapi|omap (default: none)\n") 
     << _("  -x,  --xid <ID>          X11 Window ID for display\n") 
     << _("  -w,  --writelog          Produce the disk based debug log\n") 
     << _("  -j,  --width <width>     Set window width\n") 
@@ -129,20 +124,10 @@ usage()
     << _("                           3 enable rendering and sound (default)\n") 
     << _("  -M,  --media <") << boost::join(handlers, "|") << ">\n"
     << _("                           The media handler to use")
-    << " (default " << handlers.front() << ")\n"
-    // Only list the renderers that were configured in for this build
-    << _("  -R,  --renderer <")
-#ifdef RENDERER_OPENGL
-     << _(" opengl")
-#endif
-#ifdef RENDERER_CAIRO
-     << _(" cairo")
-#endif
-#ifdef RENDERER_AGG
-    << _(" agg > (default: agg)\n")
-#else
-    << " >\n"
-#endif
+    << " (default: " << handlers.front() << ")\n"
+    << _("  -R,  --renderer <") << boost::join(renderers, "|") << ">\n"
+    << _("                           The renderer to use")
+    << " (default: agg)\n"
     << _("  -t,  --timeout <sec>     Exit after the specified number of "
             "seconds\n") 
     << _("  -u,  --real-url <url>    Set \"real\" URL of the movie\n") 
@@ -153,10 +138,10 @@ usage()
     << _("  -F,  --fd <fd>:<fd>      Filedescriptor to use for external "
             "communications\n") 
 #ifdef GNASH_FPS_DEBUG
-    << _("  -f,  --debug-fps num     Print FPS every num seconds (float)\n") 
+    << _("  -f,  --debug-fps <num>   Print FPS every num seconds (float)\n") 
 #endif // def GNASH_FPS_DEBUG
     
-    << _("  --max-advances num       Exit after specified number of frame "
+    << _("  --max-advances <num>     Exit after specified number of frame "
             "advances\n") 
     << _("  --fullscreen             Start in fullscreen mode\n") 
     << _("  --hide-menubar           Start without displaying the menu bar\n") 
@@ -215,7 +200,6 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         { 256, "max-advances",      Arg_parser::yes },
         { 257, "fullscreen",        Arg_parser::no  },
         { 258, "hide-menubar",      Arg_parser::no  },                
-        { 'c', 0,                   Arg_parser::no  },
         { 'd', "delay",             Arg_parser::yes },
         { 'x', "xid",               Arg_parser::yes },
         { 'R', "renderer",          Arg_parser::yes },
@@ -241,6 +225,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         { 261, "hwaccel",           Arg_parser::yes },
         { 262, "flash-version",     Arg_parser::no },
         { 'D', 0,                   Arg_parser::yes }, // Handled in dump gui
+        { 'S', 0,                   Arg_parser::yes }, // Handled in dump gui
         {   0, 0,                   Arg_parser::no  }
     };
 
@@ -393,9 +378,6 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                         case 'v':
                             player.setHWAccel("vaapi");
                             break;
-                        case 'x':
-                            player.setHWAccel("xv");
-                            break;
                         case 'n':
                         default:
                             player.setHWAccel("none");
@@ -529,7 +511,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
 }
 
 int
-gnash_main(int argc, char *argv[])
+main(int argc, char *argv[])
 {
     
     std::ios::sync_with_stdio(false);

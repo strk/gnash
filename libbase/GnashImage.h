@@ -29,27 +29,28 @@
 #include <boost/cstdint.hpp>
 #include <boost/scoped_array.hpp>
 #include <memory> 
-#include <boost/iterator/iterator_facade.hpp>
-#include <iterator>
 
-#include "FileTypes.h"
+#include "GnashEnums.h"
 #include "log.h"
 #include "dsodefs.h"
 
 // Forward declarations
 namespace gnash {
     class IOChannel;
-    class JpegImageInput;
+    class JpegInput;
 }
 
 namespace gnash {
+
+/// Image handling functions and classes.
+namespace image {
 
 /// The types of images handled in Gnash.
 enum ImageType
 {
     GNASH_IMAGE_INVALID,
-    GNASH_IMAGE_RGB,
-    GNASH_IMAGE_RGBA
+    TYPE_RGB,
+    TYPE_RGBA
 };
 
 /// The locations of images handled in Gnash.
@@ -63,106 +64,14 @@ inline size_t
 numChannels(ImageType t)
 {
     switch (t) {
-        case GNASH_IMAGE_RGBA:
+        case TYPE_RGBA:
             return 4;
-        case GNASH_IMAGE_RGB:
+        case TYPE_RGB:
             return 3;
         default:
             std::abort();
     }
 }
-
-template<typename Iterator>
-class ARGB
-{
-public:
-
-    ARGB(Iterator i, ImageType t)
-        :
-        _it(i),
-        _t(t)
-    {}
-    
-    /// Writes a 32-bit unsigned value in ARGB byte order to the image
-    //
-    /// Take note of the different byte order!
-    ARGB& operator=(boost::uint32_t pixel) {
-        switch (_t) {
-            case GNASH_IMAGE_RGBA:
-                // alpha
-                *(_it + 3) = (pixel & 0xff000000) >> 24;
-            case GNASH_IMAGE_RGB:
-                *_it = (pixel & 0x00ff0000) >> 16;
-                *(_it + 1) = (pixel & 0x0000ff00) >> 8;
-                *(_it + 2) = (pixel & 0x000000ff);
-            default:
-                break;
-        }
-        return *this;
-    }
-
-private:
-    Iterator _it;
-    ImageType _t;
-};
-
-template<typename Iterator, typename Pixel>
-struct pixel_iterator : public boost::iterator_facade<
-                            pixel_iterator<Iterator, Pixel>,
-                            boost::uint32_t,
-                            std::random_access_iterator_tag,
-                            Pixel>
-{
-
-    typedef std::ptrdiff_t difference_type;
-
-    pixel_iterator(Iterator it, ImageType t)
-        :
-        _it(it),
-        _t(t)
-    {}
- 
-    boost::uint32_t toARGB() const {
-        boost::uint32_t ret = 0xff000000;
-        switch (_t) {
-            case GNASH_IMAGE_RGBA:
-                // alpha
-                ret = *(_it + 3) << 24;
-            case GNASH_IMAGE_RGB:
-                ret |= (*_it << 16 | *(_it + 1) << 8 | *(_it + 2));
-            default:
-                break;
-        }
-        return ret;
-    }
-
-private:
-
-    friend class boost::iterator_core_access;
-
-    Pixel dereference() const {
-        return Pixel(_it, _t);
-    }
-
-    void increment() {
-        _it += numChannels(_t);
-    }
-
-    bool equal(const pixel_iterator& o) const {
-        return o._it == _it;
-    }
-
-    difference_type distance_to(const pixel_iterator& o) const {
-        return (o._it - _it) / numChannels(_t);
-    }
-
-    void advance(difference_type n) {
-        _it += n * numChannels(_t);
-    }
-
-    Iterator _it;
-    ImageType _t;
-};
 
 /// Base class for different types of bitmaps
 //
@@ -176,8 +85,6 @@ public:
     typedef boost::scoped_array<value_type> container_type;
     typedef value_type* iterator;
     typedef const value_type* const_iterator;
-
-    typedef pixel_iterator<iterator, ARGB<iterator> > argb_iterator;
 
     virtual ~GnashImage() {}
 
@@ -266,16 +173,6 @@ public:
         return begin() + size();
     }
 
-    /// An iterator to write data in ARGB format to the bitmap
-    argb_iterator argb_begin() {
-        return argb_iterator(begin(), _type);
-    }
-    
-    /// An argb_iterator to the end of the data.
-    argb_iterator argb_end() {
-        return argb_iterator(end(), _type);
-    }
-
 protected:
 
     /// Construct a GnashImage from a data buffer, taking ownership of the data.
@@ -298,7 +195,6 @@ protected:
     /// @param type     The ImageType of the image.
     GnashImage(size_t width, size_t height, ImageType type,
                ImageLocation location = GNASH_IMAGE_CPU);
-
 
     /// The type of the image: RGBA or RGB.
     const ImageType _type;
@@ -330,7 +226,7 @@ public:
     /// Create an ImageRGB taking ownership of the data.
     ImageRGB(iterator data, size_t width, size_t height)
         :
-        GnashImage(data, width, height, GNASH_IMAGE_RGB)
+        GnashImage(data, width, height, TYPE_RGB)
     {}
 
     virtual ~ImageRGB();
@@ -349,7 +245,7 @@ public:
 
     ImageRGBA(iterator data, size_t width, size_t height)
         :
-        GnashImage(data, width, height, GNASH_IMAGE_RGBA)
+        GnashImage(data, width, height, TYPE_RGBA)
     {}
     
     ~ImageRGBA();
@@ -360,28 +256,25 @@ public:
     ///
     void setPixel(size_t x, size_t y, value_type r, value_type g, value_type b,
             value_type a);
-
-    void mergeAlpha(const_iterator alphaData, const size_t bufferLength);
-
 };
 
 /// The base class for reading image data. 
-class ImageInput : boost::noncopyable
+class Input : boost::noncopyable
 {
 public:
 
-    /// Construct an ImageInput object to read from an IOChannel.
+    /// Construct an Input object to read from an IOChannel.
     //
     /// @param in   The stream to read data from. Ownership is shared
-    ///             between caller and ImageInput, so it is freed
+    ///             between caller and Input, so it is freed
     ///             automatically when the last owner is destroyed.
-    ImageInput(boost::shared_ptr<IOChannel> in)
+    Input(boost::shared_ptr<IOChannel> in)
         :
         _inStream(in),
         _type(GNASH_IMAGE_INVALID)
     {}
 
-    virtual ~ImageInput() {}
+    virtual ~Input() {}
 
     /// Begin processing the image data.
     virtual void read() = 0;
@@ -438,25 +331,25 @@ protected:
 };
 
 // Base class for writing image data.
-class ImageOutput : boost::noncopyable
+class Output : boost::noncopyable
 {
 
 public:
 
-    /// Construct an ImageOutput for writing to an IOChannel
+    /// Construct an Output for writing to an IOChannel
     //
     /// @param out      The gnash::IOChannel to write the image to. Ownership
     ///                 is shared.
     /// @param width    The width of the resulting image
     /// @param height   The height of the resulting image.
-    ImageOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height)
+    Output(boost::shared_ptr<IOChannel> out, size_t width, size_t height)
         :
         _width(width),
         _height(height),
         _outStream(out)
     {}
 
-    virtual ~ImageOutput() {}
+    virtual ~Output() {}
     
     /// Write RGB image data using the parameters supplied at construction.
     //
@@ -473,7 +366,7 @@ public:
 
     /// Write the given image to the given IOChannel in a specified format.
     //
-    /// @param type     The image format to write in (see libcore/gnash.h)
+    /// @param type     The image format to write in (see GnashEnums.h)
     /// @param out      The IOChannel to write to.
     /// @param image    The image to write.
     /// @param quality  The quality of the image output (not used for all
@@ -514,6 +407,10 @@ scanline(const GnashImage& im, size_t row)
     return im.begin() + im.stride() * row;
 }
 
+DSOEXPORT void mergeAlpha(ImageRGBA& im, GnashImage::const_iterator alphaData,
+        const size_t bufferLength);
+
+} // namespace image
 } // namespace gnash
 
 #endif

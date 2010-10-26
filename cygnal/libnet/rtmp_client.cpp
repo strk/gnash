@@ -347,7 +347,7 @@ RTMPClient::connectToServer(const std::string &url)
 	    boost::shared_ptr<RTMPMsg> msg = msgque.front();
 	    msgque.pop_front();
 	    if (msg->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
-		log_network("Sent NetConnection Connect message sucessfully");
+		log_network("Sent NetConnection Connect message successfully");
 	    }		    
 	    if (msg->getStatus() ==  RTMPMsg::NC_CONNECT_FAILED) {
 		log_error("Couldn't send NetConnection Connect message,");
@@ -703,7 +703,7 @@ RTMPClient::clientFinish(cygnal::Buffer &data)
 	_connected = false;
     }
 
-    // Since the handshake completed sucessfully, we're connected.
+    // Since the handshake completed successfully, we're connected.
     _connected = true;
 
     return handshake1;

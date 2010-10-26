@@ -53,6 +53,8 @@
 
 namespace gnash {
 
+class GnashImage;
+
 typedef std::vector<const Path*> PathRefs;
 
 struct oglVertex {

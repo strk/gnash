@@ -21,19 +21,20 @@
 #ifndef GNASH_SWF_DEFINEBUTTONTAG_H
 #define GNASH_SWF_DEFINEBUTTONTAG_H
 
-#include "DefinitionTag.h"
-#include "SWFMatrix.h" // for composition
-#include "cxform.h" // for composition
-#include "action_buffer.h" // for composition of ButtonAction
-#include "filter_factory.h" // for Filters (composition of button_record)
-#include "DefineButtonSoundTag.h"
-#include "SWF.h"
-#include "Button.h"
-
 #include <vector>
 #include <boost/scoped_ptr.hpp>
 #include <boost/cstdint.hpp> 
 #include <memory>
+
+#include "DefinitionTag.h"
+#include "SWFMatrix.h" 
+#include "SWFCxForm.h" 
+#include "action_buffer.h" 
+#include "filter_factory.h" 
+#include "TypesParser.h"
+#include "DefineButtonSoundTag.h"
+#include "SWF.h"
+#include "Button.h"
 
 // Forward declarations
 namespace gnash {
@@ -74,12 +75,12 @@ public:
     ///                 Button::MouseState.
     bool hasState(Button::MouseState st) const;
 
-    /// Read an RGB cxform for this record.
+    /// Read an RGB SWFCxForm for this record.
     //
     /// Cxform is stored in a different tag for SWF2 Buttons
     /// (DEFINEBUTTON tag)
     void readRGBTransform(SWFStream& in) {
-        _cxform.read_rgb(in);
+        _cxform = readCxFormRGB(in);
     }
 
     /// Read a ButtonRecord from the SWF stream.
@@ -127,7 +128,7 @@ private:
 
     SWFMatrix _matrix;
 
-    cxform _cxform;
+    SWFCxForm _cxform;
 
 };
     

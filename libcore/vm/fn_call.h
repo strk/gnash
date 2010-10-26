@@ -204,8 +204,8 @@ public:
     /// Dump arguments to given output stream
     void dump_args(std::ostream& os) const {
         for (size_t i = 0; i < nargs; ++i) {
-            if ( i ) os << ", ";
-            os << arg(i).toDebugString();
+            if (i) os << ", ";
+            os << arg(i);
         }
 	}
     
@@ -230,19 +230,6 @@ private:
     
     bool _new;
     
-};
-
-
-/// Check that the 'this' pointer is a particular type
-//
-/// NB: this function and is deprecated.
-template<typename T>
-struct ThisIs
-{
-    typedef T value_type;
-    value_type* operator()(as_object* o) const {
-        return dynamic_cast<value_type*>(o);
-    }
 };
 
 

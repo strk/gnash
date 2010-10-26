@@ -39,6 +39,7 @@ class VaapiSubpicture;
 class VaapiRectangle;
 class VaapiVideoWindow;
 class Renderer_agg_base;
+class movie_root;
 
 class GtkAggVaapiGlue : public GtkGlue
 {
@@ -50,7 +51,7 @@ public:
     void prepDrawingArea(GtkWidget *drawing_area);
     Renderer* createRenderHandler();
     void setRenderHandlerSize(int width, int height);
-    void beforeRendering();
+    virtual void beforeRendering(movie_root* stage);
     void render();
     void render(GdkRegion * const);
     void configure(GtkWidget *const widget, GdkEventConfigure *const event);

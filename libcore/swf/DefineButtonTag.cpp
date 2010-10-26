@@ -21,9 +21,13 @@
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
+#include "DefineButtonTag.h"
+
+#include <string>
+
+#include "TypesParser.h"
 #include "RunResources.h"
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "DefineButtonTag.h"
 #include "DisplayObject.h"
 #include "Button.h" // for createDisplayObject()
 #include "DefineButtonCxformTag.h"
@@ -54,8 +58,7 @@ DefineButtonTag::DefineButtonTag(SWFStream& in, movie_definition& m,
     _trackAsMenu(false),
     _movieDef(m)
 {
-    switch (tag)
-    {
+    switch (tag) {
         default:
             std::abort();
             break;
@@ -340,7 +343,7 @@ ButtonRecord::instantiate(Button* button, bool name) const
     DisplayObject* o = _definitionTag->createDisplayObject(gl, button);
 
     o->setMatrix(_matrix, true);
-    o->set_cxform(_cxform);
+    o->setCxForm(_cxform);
     o->set_depth(_buttonLayer + DisplayObject::staticDepthOffset + 1);
     if (name && isReferenceable(*o)) {
         o->set_name(button->getNextUnnamedInstanceName());
@@ -431,7 +434,7 @@ ButtonRecord::read(SWFStream& in, TagType t,
     _matrix = readSWFMatrix(in);
 
     if (t == SWF::DEFINEBUTTON2) {
-        _cxform.read_rgba(in);
+        _cxform = readCxFormRGBA(in);
     }
 
     if (buttonHasFilterList) {
