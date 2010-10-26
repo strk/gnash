@@ -49,7 +49,6 @@
 #include "RunResources.h"
 #include "IOChannel.h"
 #include "RTMP.h"
-#include "NativeFunction.h"
 
 //#define GNASH_DEBUG_REMOTING
 
@@ -438,12 +437,12 @@ HTTPRemotingHandler::advance()
 
                             std::string id(reinterpret_cast<const char*>(b + 1),
                                     ns - 1);
-                            log_debug("ID: %s", id);
                             size_t callbackID = 0;
                             try {
                                 callbackID = boost::lexical_cast<size_t>(id);
                             }
                             catch (const boost::bad_lexical_cast&) {
+                                log_error(_("Callback ID was not a number"));
                                 break;
                             }
 
@@ -691,7 +690,6 @@ public:
             if (!_rtmp.connected()) return true;
             
             _connectionComplete = true;
-
             log_debug("Initial connection complete");
 
             const RunResources& r = getRunResources(_nc.owner());
@@ -702,8 +700,9 @@ public:
             const int flags = 0;
             o->init_member("app", _url.path().substr(1), flags);
 
-            // TODO: use $version.
-            o->init_member("flashVer", "LNX 10,0,22,87", flags);
+            // TODO: check where it gets these data from.
+            o->init_member("flashVer", getVM(_nc.owner()).getPlayerVersion(),
+                    flags);
             o->init_member("swfUrl", r.streamProvider().originalURL().str(),
                     flags);
             o->init_member("tcUrl", _url.str(), flags);
@@ -717,18 +716,18 @@ public:
             o->init_member("pageUrl", as_value(), flags);
 
             const size_t id = callNo();
-            log_debug("Call %s", id);
             SimpleBuffer buf;
 
+            // Write the connect object.
             amf::Writer aw(buf);
             aw.writeString("connect");
             aw.writeNumber(id);
             aw.writeObject(o);
 
+            // Set up the callback object.
             as_object* cb = createObject(getGlobal(_nc.owner()));
-            log_debug("Object cb: %s", cb);
             cb->init_member(NSV::PROP_ON_RESULT,
-                    new NativeFunction(gl, local_onResult), 0);
+                    gl.createFunction(local_onResult), 0);
 
             cb->init_member("_conn", &_nc.owner(), 0);
 
@@ -737,12 +736,17 @@ public:
             pushCallback(id, cb);
             _rtmp.call(buf);
 
-            // Send bandwidth check; this seems to be required.
+            // Send bandwidth check; the pp appears to do this
+            // automatically.
             sendServerBW(_rtmp);
 
         }
         
         boost::shared_ptr<SimpleBuffer> b = _rtmp.getMessage();
+
+        if (b && !_nc.isConnected()) {
+            _nc.setConnected();
+        }
 
         /// Retrieve messages.
         while (b.get()) {
@@ -851,9 +855,6 @@ RTMPRemotingHandler::handleInvoke(const boost::uint8_t* payload,
     callMethod(&_nc.owner(), methodname);
     
 }
-
-
-//----- NetConnection_as ----------------------------------------------------
 
 NetConnection_as::NetConnection_as(as_object* owner)
     :
@@ -1325,7 +1326,6 @@ netconnection_addHeader(const fn_call& fn)
 /// We don't know if this is the best way to do it, but:
 //
 /// 1. the connect call *does* return a callback ID.
-/// 2. if it is done like this, it has to be a native function.
 as_value
 local_onResult(const fn_call& fn)
 {
@@ -1337,10 +1337,6 @@ local_onResult(const fn_call& fn)
         as_value f = getMember(*obj, conn);
         as_object* nc = toObject(f, getVM(fn));
         if (nc) {
-            NetConnection_as* co;
-            if (isNativeType(nc, co)) {
-                co->setConnected();
-            }
         }
         const as_value arg = fn.nargs ? fn.arg(0) : as_value();
         callMethod(nc, NSV::PROP_ON_STATUS, arg);
