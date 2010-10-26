@@ -150,14 +150,11 @@ public:
     ///                 Scan is by enumeration order and stops when accept()
     ///                 returns false.
     template <class U, class V>
-    void visitValues(V& visitor, U cmp = U()) const
-    {
-        // The template keyword is not required by the Standard here, but the
-        // OpenBSD compiler needs it. Use of the template keyword where it is
-        // not necessary is not an error.
+    void visitValues(V& visitor, U cmp = U()) const {
+
         for (const_iterator it = _props.begin(), ie = _props.end();
-                it != ie; ++it)
-        {
+                it != ie; ++it) {
+
             if (!cmp(*it)) continue;
             as_value val = it->getValue(_owner);
             if (!visitor.accept(it->uri(), val)) return;
