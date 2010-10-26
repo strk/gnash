@@ -47,23 +47,26 @@
 namespace gnash
 {
 
-FBgles2Glue::FBgles2Glue()
+FBgles2Glue::FBgles2Glue(int fd)
+    : _fd(fd)
 {
 }
 
-FBgles2Glue::~FBgles2Glue () {
+FBgles2Glue::~FBgles2Glue ()
+{
 }
 
 bool
 FBgles2Glue::init(int /*argc*/, char *** /*argv*/)
 {
-
+    return false;
 }
 
 Renderer*
 FBgles2Glue::createRenderHandler()
 {
-
+    Renderer *rend = 0;
+    return rend;
 }
 
 int 
