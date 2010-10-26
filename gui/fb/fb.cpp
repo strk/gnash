@@ -212,17 +212,19 @@ FBGui::~FBGui()
     if (_fd > 0) {
 	enable_terminal();
 	log_debug(_("Closing framebuffer device"));
-	close(_fd);
+	::close(_fd);
+        _fd = -1;
     }
     
-    close(input_fd);
+    ::close(input_fd);
+    input_fd = -1;
     
-#ifdef ENABLE_DOUBLE_BUFFERING
-    if (_buffer) {
-	log_debug(_("Free'ing offscreen buffer"));
-	delete[] _buffer;
-    }
-#endif
+// #ifdef ENABLE_DOUBLE_BUFFERING
+//     if (_buffer) {
+// 	log_debug(_("Free'ing offscreen buffer"));
+// 	delete[] _buffer;
+//     }
+// #endif
 }
     
 bool
@@ -264,66 +266,54 @@ FBGui::init(int argc, char ***argv)
 #ifdef RENDERER_OPENVG
         // Use OpenVG, which uses EGL as the display API. This works with
         // Mesa on desktop unix systems, and on ARM based devices running
-        // Linux, often with manufacturer provided SDKs.
+        // GNU/Linux, often with manufacturer provided SDKs.
         if (renderer == "openvg") {
-            // FIXME: canvas->glue.reset(new gnash::GtkEGLGlue);
-            // Set the renderer to the next one to try if initializing
-            // fails.
 //            fb_glue.reset(new gnash::GtkEGLGlue);
+            initialized_renderer = true;
             break;
         }
 #endif
 #ifdef RENDERER_GLES1
         // Use OpenGLES 1. This works with Mesa on desktop unix
-        // systems, and on ARM based devices running Linux, often with
+        // systems, and on ARM based devices running GNU/Linux, often with
         // manufacturer provided SDKs.
         if (renderer == "gles1") {
-            // Set the renderer to the next one to try if initializing
-            // fails.
-            fb_glue.reset(new gnash::FBgles1Glue(_fd));
+            _fb_glue.reset(new gnash::FBgles1Glue(_fd));
+            initialized_renderer = true;
             break;
         }
 #endif
 #ifdef RENDERER_GLES2
         // Use OpenGLES 2. This works with Mesa on desktop unix
-        // systems, and on ARM based devices running Linux, often with
+        // systems, and on ARM based devices running GNU/Linux, often with
         // manufacturer provided SDKs.
         if (renderer == "gles2") {
-            // FIXME: canvas->glue.reset(new gnash::GtkEGLGlue);
-            // Set the renderer to the next one to try if initializing
-            // fails.
-            fb_glue.reset(new FBgles2Glue(_fd));
+            _fb_glue.reset(new FBgles2Glue(_fd));
+            initialized_renderer = true;
             break;
         }
 #endif
 #ifdef RENDERER_AGG
-        // Use OpenVG, which uses EGL as the display API. This works with
-        // Mesa on desktop unix systems, and on ARM based devices running
-        // Linux, often with manufacturer provided SDKs.
         if (renderer == "agg") {
-            // FIXME: canvas->glue.reset(new gnash::GtkEGLGlue);
-            // Set the renderer to the next one to try if initializing
-            // fails.
-            fb_glue.reset(new FBAggGlue(_fd));
+            _fb_glue.reset(new FBAggGlue(_fd));
             initialized_renderer = true;
+            break;
         }
 #endif
     }
-
-    fb_glue->init(argc, argv);
     
-    if (fb_glue) {
+    if (!_fb_glue) {
         log_error("No renderer created!");
-        //     return false;
-        // } else if (!fb_glue->init(argc, argv)) {
-        //     return false;
+        return false;
+    } else if (!_fb_glue->init(argc, argv)) {
+        return false;
     }
     
-    m_stage_width = fb_glue->width();
-    m_stage_height = fb_glue->height();
+    m_stage_width = _fb_glue->width();
+    m_stage_height = _fb_glue->height();
     _validbounds.setTo(0, 0, m_stage_width-1, m_stage_height-1);
 
-    _renderer.reset(fb_glue->createRenderHandler());
+    _renderer.reset(_fb_glue->createRenderHandler());
     _runResources.setRenderer(_renderer);
     
     disable_terminal();
@@ -339,18 +329,17 @@ FBGui::run()
     struct timeval tv;
     double start_timer;
     
-    if (!gettimeofday(&tv, NULL))
+    if (!gettimeofday(&tv, NULL)) {
 	start_timer = static_cast<double>(tv.tv_sec) +
 	    static_cast<double>(tv.tv_usec) / 1000000.0;
-    else
+    } else {
 	start_timer = 0.0;
-    
+    }
     
     // let the GUI recompute the x/y scale factors to best fit the whole screen
     resize_view(_validbounds.width(), _validbounds.height());
     
-    while (!terminate_request) {
-	
+    while (!terminate_request) {	
 	// wait the "heartbeat" inteval
 	gnashSleep(_interval * 1000);    
 	// TODO: Do we need to check the real time slept or is it OK when we woke
@@ -371,7 +360,7 @@ FBGui::run()
 
 void FBGui::renderBuffer()
 {
-    fb_glue->render();
+    _fb_glue->render();
 }
 
 bool
@@ -490,7 +479,7 @@ FBGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 char *
 FBGui::find_accessible_tty(int no)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     
     char* fn;
     
@@ -527,7 +516,7 @@ FBGui::find_accessible_tty(const char* format, int no)
 bool
 FBGui::disable_terminal() 
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     original_kd = -1;
     
@@ -682,9 +671,7 @@ FBGui::enable_terminal()
 	    log_debug(_("WARNING: Error waiting for VT %d becoming active"), original_vt);
 	    //close(tty);
 	    //return false;   don't abort
-	}
-
-  
+	}  
   
 	// Restore keyboard
   
@@ -769,7 +756,8 @@ FBGui::enable_terminal()
 	unsigned char buf[10];
 
 	if (fcntl(input_fd, F_SETFL, fcntl(input_fd, F_GETFL) | O_NONBLOCK)<0) {
-	    log_error("Could not set non-blocking mode for touchpad device: %s", strerror(errno));
+	    log_error("Could not set non-blocking mode for touchpad device: %s",
+                      strerror(errno));
 	    close(input_fd);
 	    input_fd=-1;
 	    return false; 
@@ -830,10 +818,10 @@ FBGui::enable_terminal()
 	    */
     
     
-	    new_x = static_cast<int>(((static_cast<double>(new_x )- 355) / (1702 - 355)
-				      * 1536 + 256));
-	    new_y = static_cast<int>(((static_cast<double>(new_y) - 482) / (1771 - 482)
-				      * 1536 + 256));
+	    new_x = static_cast<int>(((static_cast<double>
+                                       (new_x )- 355) / (1702 - 355) * 1536 + 256));
+	    new_y = static_cast<int>(((static_cast<double>
+                                       (new_y) - 482) / (1771 - 482) * 1536 + 256));
     
     
 	    new_x = new_x * m_stage_width / 2048;
