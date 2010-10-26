@@ -78,6 +78,10 @@ public:
     /// Carry out the connect(null) method.
     void connect();
 
+    void setConnected() {
+        _isConnected = true;
+    }
+
     bool isConnected() const {
         return _isConnected;
     }

@@ -651,17 +651,22 @@ replyBWCheck(rtmp::RTMP& r, double txn)
 as_value
 local_onResult(const fn_call& fn)
 {
+    log_debug("local onResult called");
     as_object* obj = fn.this_ptr;
     string_table& st = getStringTable(fn);
-    const ObjectURI _conn(st.find("_conn"));
+    const ObjectURI conn(st.find("_conn"));
 
     if (obj) {
-        as_value f = getMember(*obj, _conn);
+        as_value f = getMember(*obj, conn);
         as_object* nc = toObject(f, getVM(fn));
         if (nc) {
-            nc->set_member(st.find("isConnected"), true);
+            NetConnection_as* co;
+            if (isNativeType(nc, co)) {
+                co->setConnected();
+            }
         }
-        callMethod(nc, NSV::PROP_ON_STATUS, "oh");
+        const as_value arg = fn.nargs ? fn.arg(0) : as_value();
+        callMethod(nc, NSV::PROP_ON_STATUS, arg);
     }
     return as_value();
 }
@@ -701,20 +706,19 @@ public:
     }
 
     bool hasPendingCalls() const {
-        return true;
+        return false;
     }
 
     virtual bool advance() {
 
         _rtmp.update();
 
-        if (_rtmp.error()) {
-            if (!_connectionComplete) {
-                _nc.notifyStatus(NetConnection_as::CONNECT_FAILED);
-            }
-            else {
-                _nc.notifyStatus(NetConnection_as::CONNECT_CLOSED);
-            }
+        if (_rtmp.error() && !_connectionComplete) {
+            _nc.notifyStatus(NetConnection_as::CONNECT_FAILED);
+            return false;
+        }
+        if (_connectionComplete && _rtmp.error()) {
+            _nc.notifyStatus(NetConnection_as::CONNECT_CLOSED);
             return false;
         }
 
@@ -759,13 +763,19 @@ public:
             aw.writeObject(o);
 
             as_object* cb = createObject(getGlobal(_nc.owner()));
-            cb->init_member("onResult", gl.createFunction(local_onResult), 0);
+            log_debug("Object cb: %s", cb);
+            cb->init_member(NSV::PROP_ON_RESULT,
+                    gl.createFunction(local_onResult), 0);
+
             cb->init_member("_conn", &_nc.owner(), 0);
 
             // When this call returns, the onResult function of the callback
             // handles onStatus etc.
             pushCallback(id, cb);
             _rtmp.call(buf);
+
+            // Send bandwidth check; this seems to be required.
+            sendServerBW(_rtmp);
 
         }
         
@@ -796,8 +806,6 @@ RTMPRemotingHandler::handleInvoke(const boost::uint8_t* payload,
         const boost::uint8_t* end)
 {
 
-    GNASH_REPORT_FUNCTION;
-
     assert(payload != end);
 
     // make sure it is a string method name we start with
@@ -824,8 +832,19 @@ RTMPRemotingHandler::handleInvoke(const boost::uint8_t* payload,
         const double id = amf::readNumber(payload, end);
         log_debug("Received result for method call %s",
                 boost::io::group(std::setprecision(15), id));
+
+        as_value arg;
+
+        amf::Reader rd(payload, end, getGlobal(_nc.owner()));
+
+        // TODO: use all args and check the order! We currently only use
+        // the last one!
+        while (rd(arg)) {
+            log_debug("Value: %s", arg);
+        }
+
         as_object* o = popCallback(id);
-        callMethod(o, NSV::PROP_ON_RESULT);
+        callMethod(o, NSV::PROP_ON_RESULT, arg);
         return;
     }
     
