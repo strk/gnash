@@ -47,8 +47,6 @@
 #endif
 #endif
 
-// #include <glues.h>
-
 namespace gnash {
 
 typedef GLfloat oglCoord;
@@ -60,7 +58,7 @@ typedef GLfloat oglCoord;
 class OglGlue;
 class render_handler;
 
-render_handler* create_render_handler_ogl (bool init, OglGlue* glue);
+render_handler* create_render_handler_gles1 (bool init, OglGlue* glue);
 
 } // namespace gnash
 
