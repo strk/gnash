@@ -49,6 +49,7 @@
 #include "RunResources.h"
 #include "IOChannel.h"
 #include "RTMP.h"
+#include "NativeFunction.h"
 
 //#define GNASH_DEBUG_REMOTING
 
@@ -66,6 +67,7 @@ namespace {
     as_value netconnection_call(const fn_call& fn);
     as_value netconnection_addHeader(const fn_call& fn);
     as_value netconnection_new(const fn_call& fn);
+    as_value local_onResult(const fn_call& fn);
     std::pair<std::string, std::string>
         getStatusCodeInfo(NetConnection_as::StatusCode code);
 
@@ -632,29 +634,6 @@ replyBWCheck(rtmp::RTMP& r, double txn)
     r.call(buf);
 }
 
-as_value
-local_onResult(const fn_call& fn)
-{
-    log_debug("local onResult called");
-    as_object* obj = fn.this_ptr;
-    string_table& st = getStringTable(fn);
-    const ObjectURI conn(st.find("_conn"));
-
-    if (obj) {
-        as_value f = getMember(*obj, conn);
-        as_object* nc = toObject(f, getVM(fn));
-        if (nc) {
-            NetConnection_as* co;
-            if (isNativeType(nc, co)) {
-                co->setConnected();
-            }
-        }
-        const as_value arg = fn.nargs ? fn.arg(0) : as_value();
-        callMethod(nc, NSV::PROP_ON_STATUS, arg);
-    }
-    return as_value();
-}
-
 class RTMPRemotingHandler : public ConnectionHandler
 {
 public:
@@ -749,7 +728,7 @@ public:
             as_object* cb = createObject(getGlobal(_nc.owner()));
             log_debug("Object cb: %s", cb);
             cb->init_member(NSV::PROP_ON_RESULT,
-                    gl.createFunction(local_onResult), 0);
+                    new NativeFunction(gl, local_onResult), 0);
 
             cb->init_member("_conn", &_nc.owner(), 0);
 
@@ -1227,8 +1206,7 @@ netconnection_close(const fn_call& fn)
     return as_value();
 }
 
-
-/// Read-only
+// Read-only
 as_value
 netconnection_isConnected(const fn_call& fn)
 {
@@ -1335,6 +1313,41 @@ netconnection_addHeader(const fn_call& fn)
     log_unimpl("NetConnection.addHeader()");
     return as_value();
 }
+
+/// This creates a local callback function to handle the return from connect()
+//
+/// NetStream does this using a builtin function, but this is more complicated
+/// because it needs the native NetConnection type.
+//
+/// This stores the NetConnection object so that it can be updated when
+/// connect returns.
+//
+/// We don't know if this is the best way to do it, but:
+//
+/// 1. the connect call *does* return a callback ID.
+/// 2. if it is done like this, it has to be a native function.
+as_value
+local_onResult(const fn_call& fn)
+{
+    as_object* obj = fn.this_ptr;
+
+    if (obj) {
+        string_table& st = getStringTable(fn);
+        const ObjectURI conn(st.find("_conn"));
+        as_value f = getMember(*obj, conn);
+        as_object* nc = toObject(f, getVM(fn));
+        if (nc) {
+            NetConnection_as* co;
+            if (isNativeType(nc, co)) {
+                co->setConnected();
+            }
+        }
+        const as_value arg = fn.nargs ? fn.arg(0) : as_value();
+        callMethod(nc, NSV::PROP_ON_STATUS, arg);
+    }
+    return as_value();
+}
+
 
 std::pair<std::string, std::string>
 getStatusCodeInfo(NetConnection_as::StatusCode code)
