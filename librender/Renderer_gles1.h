@@ -23,6 +23,8 @@
 #include "gnashconfig.h"
 #endif
 
+#include <vector>
+
 // gles-1.0c for Linux
 #ifdef HAVE_GLES1_GL_H
 # include <GLES/gl.h>
@@ -44,8 +46,6 @@
 #endif
 #endif
 
-#include <vector>
-
 #include "Renderer.h"
 #include "Geometry.h"
 
@@ -54,6 +54,10 @@
 namespace gnash {
 
 class GnashImage;
+
+namespace renderer {
+
+namespace gles1 {
 
 typedef std::vector<const Path*> PathRefs;
 
@@ -102,7 +106,7 @@ public:
         return shape;
     }
 private:
-  std::vector<PathRefs> shape;
+    std::vector<PathRefs> shape;
 };
 
     class bitmap_info_ogl //: public BitmapInfo
@@ -136,8 +140,10 @@ private:
     size_t _orig_height;
 };
 
-DSOEXPORT Renderer* create_Renderer_gles(bool init = true);
+  DSOEXPORT Renderer* create_handler(const char *pixelformat);
 
+} // namespace gnash::renderer::gles1
+} // namespace gnash::renderer
 } // namespace gnash
 
 #endif // __RENDER_HANDLER_GLES1_H__

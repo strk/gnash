@@ -83,7 +83,11 @@
 
 namespace gnash {
 
-Renderer* create_Renderer_gles(bool init)
+namespace renderer {
+
+namespace gles1 {
+
+Renderer* create_handler(const char *pixelformat)
 {
 #if 0
   Renderer_gles* renderer = new Renderer_gles;
@@ -96,6 +100,8 @@ Renderer* create_Renderer_gles(bool init)
   return 0;
 }  
 
+} // namespace gnash::renderer::gles1
+} // namespace gnash::renderer
 } // end of gnash namespace
 
 // local Variables:

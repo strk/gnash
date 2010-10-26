@@ -51,6 +51,14 @@
 
 namespace gnash {
 
+namespace renderer {
+
+namespace gles2 {
+
+  DSOEXPORT Renderer* create_handler(const char *pixelformat);
+
+} // namespace gnash::renderer::gles2
+} // namespace gnash::renderer
 } // namespace gnash
 
 #endif // __RENDER_HANDLER_GLES2_H__
