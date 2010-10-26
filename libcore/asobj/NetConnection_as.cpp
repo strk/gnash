@@ -45,6 +45,7 @@
 #include "fn_call.h"
 #include "Global_as.h"
 #include "AMFConverter.h"
+#include "AMF.h"
 #include "smart_ptr.h"
 #include "RunResources.h"
 #include "IOChannel.h"
@@ -69,13 +70,6 @@ namespace {
     as_value local_onResult(const fn_call& fn);
     std::pair<std::string, std::string>
         getStatusCodeInfo(NetConnection_as::StatusCode code);
-
-}
-
-namespace {
-
-    boost::uint16_t readNetworkShort(const boost::uint8_t* buf);
-    boost::uint32_t readNetworkLong(const boost::uint8_t* buf);
 
 }
 
@@ -351,7 +345,7 @@ HTTPRemotingHandler::advance()
                 b += 2; // skip version indicator and client id
 
                 // NOTE: this looks much like parsing of an OBJECT_AMF0
-                boost::int16_t si = readNetworkShort(b);
+                boost::int16_t si = amf::readNetworkShort(b);
                 b += 2; // number of headers
                 uint8_t headers_ok = 1;
                 if (si != 0) {
@@ -366,7 +360,7 @@ HTTPRemotingHandler::advance()
                             headers_ok = 0;
                             break;
                         }
-                        si = readNetworkShort(b); b += 2; // name length
+                        si = amf::readNetworkShort(b); b += 2; // name length
                         if(b + si > end) {
                             headers_ok = 0;
                             break;
@@ -405,7 +399,7 @@ HTTPRemotingHandler::advance()
 
                 if(headers_ok == 1) {
 
-                    si = readNetworkShort(b); b += 2; // number of replies
+                    si = amf::readNetworkShort(b); b += 2; // number of replies
 
                     // TODO consider counting number of replies we
                     // actually parse and doing something if it
@@ -415,7 +409,8 @@ HTTPRemotingHandler::advance()
                         // we reach the end of the buffer
                         while(b < end) {
                             if(b + 2 > end) break;
-                            si = readNetworkShort(b); b += 2; // reply length
+                            si = amf::readNetworkShort(b);
+                            b += 2; // reply length
                             if(si < 4) { // shorted valid response is '/1/a'
                                 log_error("NetConnection::call(): "
                                         "reply message name too short");
@@ -454,7 +449,8 @@ HTTPRemotingHandler::advance()
 
                             // parse past unused string in header
                             if (b + 2 > end) break;
-                            si = readNetworkShort(b); b += 2; // reply length
+                            si = amf::readNetworkShort(b);
+                            b += 2; // reply length
                             if (b + si > end) break;
                             b += si;
 
@@ -465,7 +461,8 @@ HTTPRemotingHandler::advance()
                             // in the adobe player) sends
                             // 0xffffffff. So we just ignore it
                             if (b + 4 > end) break;
-                            li = readNetworkLong(b); b += 4; // reply length
+                            li = amf::readNetworkLong(b);
+                            b += 4; // reply length
 
                             // this updates b to point to the next unparsed byte
                             as_value replyval;
@@ -1125,26 +1122,6 @@ NetConnection_as::update()
 #endif
     }
 }
-
-/// Anonymous namespace for NetConnection AMF-reading helper functions
-/// (shouldn't be here).
-
-namespace {
-
-boost::uint16_t
-readNetworkShort(const boost::uint8_t* buf) {
-    boost::uint16_t s = buf[0] << 8 | buf[1];
-    return s;
-}
-
-boost::uint32_t
-readNetworkLong(const boost::uint8_t* buf) {
-    boost::uint32_t s = buf[0] << 24 | buf[1] << 16 | buf[2] << 8 | buf[3];
-    return s;
-}
-
-}
-
 
 // Anonymous namespace for NetConnection interface implementation.
 namespace {
