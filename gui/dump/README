@@ -1,0 +1,17 @@
+
+The dump-gnash utility records audio and video coming out
+from playing an SWF into a raw data for video and WAV file
+for audio.
+
+Switches supported in addition to the one reported by 
+gnash --help are:
+
+ -S <ms>
+   Sleep for the given amount of milliseconds for each heart-beat.
+   By default there's no sleep.
+   You may want to add some sleeping IFF the SWF file you are willing
+   to record doesn't contain proper loading code (ie: _assumes_ loads
+   will happen within a given number of frames advancements).
+
+ -D <filename>
+   Name of a file to dump video frames to.
