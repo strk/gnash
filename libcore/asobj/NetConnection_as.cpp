@@ -240,15 +240,6 @@ private:
         _postdata.append(amf.data(), amf.size());
         ++queued_count;
     }
-
-    void enqueue(const SimpleBuffer &amf, size_t id, as_object* callback) {
-        push_amf(amf);
-        pushCallback(id, callback);
-    }
-
-    void enqueue(const SimpleBuffer &amf) {
-        push_amf(amf);
-    }
     
 };
 
@@ -419,15 +410,17 @@ HTTPRemotingHandler::advance()
                     // actually parse and doing something if it
                     // doesn't match this value (does it matter?
                     if(si > 0) {
-                        // parse replies until we get a parse error or we reach the end of the buffer
+                        // parse replies until we get a parse error or
+                        // we reach the end of the buffer
                         while(b < end) {
                             if(b + 2 > end) break;
                             si = readNetworkShort(b); b += 2; // reply length
                             if(si < 4) { // shorted valid response is '/1/a'
-                                log_error("NetConnection::call(): reply message name too short");
+                                log_error("NetConnection::call(): "
+                                        "reply message name too short");
                                 break;
                             }
-                            if(b + si > end) break;
+                            if (b + si > end) break;
 
                             // Reply message is: '/id/methodName'
 
@@ -473,9 +466,6 @@ HTTPRemotingHandler::advance()
                             if (b + 4 > end) break;
                             li = readNetworkLong(b); b += 4; // reply length
 
-#ifdef GNASH_DEBUG_REMOTING
-                            log_debug("about to parse amf value");
-#endif
                             // this updates b to point to the next unparsed byte
                             as_value replyval;
                             if (!rd(replyval)) {
@@ -487,9 +477,6 @@ HTTPRemotingHandler::advance()
                                 // don't know how to parse
                                 break;
                             }
-#ifdef GNASH_DEBUG_REMOTING
-                            log_debug("parsed amf");
-#endif
 
                             // update variable to show how much we've parsed
                             reply_start = b - reply.data();
@@ -603,7 +590,6 @@ HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
         os << callID; 
     }
     const std::string callNumberString = os.str();
-
     buf.appendNetworkShort(callNumberString.size());
     buf.append(callNumberString.c_str(), callNumberString.size());
 
@@ -628,12 +614,10 @@ HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
     *(reinterpret_cast<uint32_t*>(buf.data() + total_size_offset)) = 
         htonl(buf.size() - 4 - total_size_offset);
 
+    push_amf(buf);
+
     if (asCallback) {
-        enqueue(buf, callID, asCallback);
-    }
-    
-    else {
-        enqueue(buf);
+        pushCallback(callID, asCallback);
     }
 }
 
@@ -848,7 +832,7 @@ RTMPRemotingHandler::handleInvoke(const boost::uint8_t* payload,
         return;
     }
     
-    /// These are remote function calls initiated by the server .
+    /// These are remote function calls initiated by the server.
     const double id = amf::readNumber(payload, end);
     log_debug("Received server call %s %s",
             boost::io::group(std::setprecision(15), id),
