@@ -44,7 +44,6 @@
 #endif
 
 #include "fbsup.h"
-//#include "render_handler_gles.h"
 
 namespace gnash
 {
