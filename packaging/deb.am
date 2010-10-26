@@ -144,16 +144,14 @@ deb-edit-python:
 	@release=`lsb_release -i | sed -e 's/.*:[ \t]//'`; \
 	version=`python --version  2>&1 | tr -d '.' | cut -d ' ' -f 2 | sed -e 's:rc[0-9]*::'`; \
 	if test $${version} -gt 260; then \
+	  echo "Editing $(BUILD_DIR)/debian/gtk-plugin-gnash.install for Python 2.6"; \
 	  pdir=2.6; \
-	else \
-	  pdir=2.5; \
-	fi; \
-	if test x"$${release}" = x"Ubuntu"; then \
 	  packages="dist-packages"; \
 	else \
+	  echo "Editing $(BUILD_DIR)/debian/gtk-plugin-gnash.install for Python 2.5"; \
+	  pdir=2.5; \
 	  packages="site-packages"; \
 	fi; \
-	echo "Editing $(BUILD_DIR)/debian/gtk-plugin-gnash.install for Ubuntu"; \
 	if test -e $(BUILD_DIR)/debian/python-gtk-gnash.install; then \
 	  mv -f $(BUILD_DIR)/debian/python-gtk-gnash.install $(BUILD_DIR)/debian/python-gtk-gnash.install.orig; \
 	fi; \
@@ -167,7 +165,7 @@ deb-edit-browser:
 	@if test `echo $(FIREFOX_PLUGINS) | grep -c mozilla` -eq 0; then \
 	   echo "Adjusting plugin path for a NPAPI compliant browser"; \
 	   if test -e $(BUILD_DIR)/debian/browser-plugin-gnash.dirs; then \
-	     mv -f $(BUILD_DIR)/debian/browser-plugin-gnash.dirs $(BUILD_DIR)/debian/python-gtk-gnash.install.orig; \
+	     mv -f $(BUILD_DIR)/debian/browser-plugin-gnash.dirs $(BUILD_DIR)/debian/browser-plugin-gnash.orig; \
 	   fi; \
 	   echo $(FIREFOX_PLUGINS) | sed -e 's:/::' > $(BUILD_DIR)/debian/browser-plugin-gnash.dirs; \
 	fi;
