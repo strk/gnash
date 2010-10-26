@@ -872,11 +872,9 @@ textfield_text(const fn_call& fn)
 as_value
 textfield_htmlText(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
 
     TextField* ptr = ensure<IsDisplayObject<TextField> >(fn);
-    if (!fn.nargs)
-    {
+    if (!fn.nargs) {
         // Getter
         return as_value(ptr->get_htmltext_value());
     }
