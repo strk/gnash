@@ -648,6 +648,24 @@ replyBWCheck(rtmp::RTMP& r, double txn)
     r.call(buf);
 }
 
+as_value
+local_onResult(const fn_call& fn)
+{
+    as_object* obj = fn.this_ptr;
+    string_table& st = getStringTable(fn);
+    const ObjectURI _conn(st.find("_conn"));
+
+    if (obj) {
+        as_value f = getMember(*obj, _conn);
+        as_object* nc = toObject(f, getVM(fn));
+        if (nc) {
+            nc->set_member(st.find("isConnected"), true);
+        }
+        callMethod(nc, NSV::PROP_ON_STATUS, "oh");
+    }
+    return as_value();
+}
+
 class RTMPRemotingHandler : public ConnectionHandler
 {
 public:
@@ -659,9 +677,8 @@ public:
         _url(url)
     {
         // Throw exception if this fails.
-        GNASH_REPORT_FUNCTION;
         const bool ret = _rtmp.connect(url);
-        log_debug("ConnectioN: %s", ret);
+        if (!ret) throw GnashException("Connection failed");
     }
 
     virtual void call(as_object* asCallback, const std::string& methodName,
@@ -692,7 +709,12 @@ public:
         _rtmp.update();
 
         if (_rtmp.error()) {
-            _nc.notifyStatus(NetConnection_as::CONNECT_CLOSED);
+            if (!_connectionComplete) {
+                _nc.notifyStatus(NetConnection_as::CONNECT_FAILED);
+            }
+            else {
+                _nc.notifyStatus(NetConnection_as::CONNECT_CLOSED);
+            }
             return false;
         }
 
@@ -703,33 +725,48 @@ public:
             
             _connectionComplete = true;
 
-            log_debug("Connection complete");
-            const RunResources& r = getRunResources(_nc.owner());
+            log_debug("Initial connection complete");
 
-            as_object* o = createObject(getGlobal(_nc.owner()));
+            const RunResources& r = getRunResources(_nc.owner());
+            Global_as& gl = getGlobal(_nc.owner());
+            
+            as_object* o = createObject(gl);
+
             const int flags = 0;
             o->init_member("app", _url.path().substr(1), flags);
+
+            // TODO: use $version.
             o->init_member("flashVer", "LNX 10,0,22,87", flags);
             o->init_member("swfUrl", r.streamProvider().originalURL().str(),
                     flags);
             o->init_member("tcUrl", _url.str(), flags);
+
+            // TODO: implement this properly
             o->init_member("fpad", false, flags);
             o->init_member("capabilities", 15.0, flags);
             o->init_member("audioCodecs", 3191.0, flags);
             o->init_member("videoCodecs", 252.0, flags);
+            o->init_member("videoFunction", 1.0, flags);
+            o->init_member("pageUrl", as_value(), flags);
 
             const size_t id = callNo();
+            log_debug("Call %s", id);
             SimpleBuffer buf;
 
-            amf::write(buf, "connect");
-            amf::write(buf, static_cast<double>(id));
-
-            log_debug("Buf size: %s", buf.size());
             amf::Writer aw(buf);
+            aw.writeString("connect");
+            aw.writeNumber(id);
             aw.writeObject(o);
-            log_debug("Buf size: %s", buf.size());
+
+            as_object* cb = createObject(getGlobal(_nc.owner()));
+            cb->init_member("onResult", gl.createFunction(local_onResult), 0);
+            cb->init_member("_conn", &_nc.owner(), 0);
+
+            // When this call returns, the onResult function of the callback
+            // handles onStatus etc.
+            pushCallback(id, cb);
             _rtmp.call(buf);
-            pushCallback(id, &_nc.owner());
+
         }
         
         boost::shared_ptr<SimpleBuffer> b = _rtmp.getMessage();
@@ -758,6 +795,9 @@ void
 RTMPRemotingHandler::handleInvoke(const boost::uint8_t* payload,
         const boost::uint8_t* end)
 {
+
+    GNASH_REPORT_FUNCTION;
+
     assert(payload != end);
 
     // make sure it is a string method name we start with
@@ -820,6 +860,7 @@ RTMPRemotingHandler::handleInvoke(const boost::uint8_t* payload,
     }
 
     if (method ==  "_error") {
+        _nc.notifyStatus(NetConnection_as::CALL_FAILED);
         log_error( "rtmp server sent error");
         return;
     }
@@ -952,7 +993,14 @@ NetConnection_as::connect(const std::string& uri)
         _currentConnection.reset(new HTTPRemotingHandler(*this, url));
     }
     else if (url.protocol() == "rtmp") {
-        _currentConnection.reset(new RTMPRemotingHandler(*this, url));
+        try {
+            _currentConnection.reset(new RTMPRemotingHandler(*this, url));
+        }
+        catch (const GnashException&) {
+            // This happens if the connect cannot even be attempted.
+            notifyStatus(CONNECT_FAILED);
+            return;
+        }
         startAdvanceTimer();
     }
     else if (url.protocol() == "rtmpt" || url.protocol() == "rtmpts") {
@@ -1084,7 +1132,7 @@ NetConnection_as::update()
     // Advancement of a connection might trigger creation
     // of a new connection, so we won't stop the advance
     // timer in that case
-    if (_queuedConnections.empty() && ! _currentConnection.get()) {
+    if (_queuedConnections.empty() && !_currentConnection.get()) {
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("stopping advance timer");
 #endif

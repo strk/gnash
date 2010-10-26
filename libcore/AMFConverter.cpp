@@ -39,7 +39,7 @@
 //#define GNASH_DEBUG_AMF_DESERIALIZE 1
 
 // Define this macto to make AMF writing verbose
- #define GNASH_DEBUG_AMF_SERIALIZE 1
+// #define GNASH_DEBUG_AMF_SERIALIZE 1
 
 namespace gnash {
 namespace amf {
