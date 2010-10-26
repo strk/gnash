@@ -67,7 +67,7 @@ public:
 	std::string validateURL() const;
 
     void call(as_object* asCallback, const std::string& methodName,
-            const std::vector<as_value>& args, size_t firstArg);
+            const std::vector<as_value>& args);
 
     /// Process the close() method.
     void close();
@@ -77,6 +77,10 @@ public:
 
     /// Carry out the connect(null) method.
     void connect();
+
+    void setConnected() {
+        _isConnected = true;
+    }
 
     bool isConnected() const {
         return _isConnected;

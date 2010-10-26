@@ -45,9 +45,6 @@ namespace {
 
     bool sendBytesReceived(RTMP* r);
 
-    // Not sure we ever want to do this.
-    bool sendServerBW(RTMP& r);
-
     void handleMetadata(RTMP& r, const boost::uint8_t *payload,
             unsigned int len);
     void handleChangeChunkSize(RTMP& r, const RTMPPacket& packet);
@@ -216,7 +213,7 @@ RTMP::connect(const URL& url)
         try {
             port = boost::lexical_cast<boost::uint16_t>(p);
         }
-        catch (boost::bad_lexical_cast&) {}
+        catch (const boost::bad_lexical_cast&) {}
     }
 
     // Basic connection attempt.
@@ -369,7 +366,7 @@ RTMP::readSocket(boost::uint8_t* buffer, int n)
 
     const std::streamsize bytesRead = _socket.read(buffer, n);
     
-    if (_socket.bad()) {
+    if (_socket.bad() || _socket.eof() || !_socket.connected()) {
         _error = true;
         return 0;
     }
@@ -402,6 +399,24 @@ RTMP::play(const SimpleBuffer& buf, int streamID)
     packet.buffer->append(buf.data(), buf.size());
     sendPacket(packet);
 }
+
+/// Send the server bandwidth.
+//
+/// Why would we want to send this?
+bool
+sendServerBW(RTMP& r)
+{
+    RTMPPacket packet(4);
+  
+    packet.header.channel = CHANNEL_CONTROL1;
+    packet.header.packetType = PACKET_TYPE_SERVERBW;
+  
+    SimpleBuffer& buf = *packet.buffer;
+  
+    buf.appendNetworkLong(r.serverBandwidth());
+    return r.sendPacket(packet);
+}
+
 
 /// Fills a pre-existent RTMPPacket with information.
 //
@@ -1057,23 +1072,6 @@ sendCtrl(RTMP& r, ControlType t, unsigned int nObject, unsigned int nTime)
 }
 
 namespace {
-
-/// Send the server bandwidth.
-//
-/// Why would we want to send this?
-bool
-sendServerBW(RTMP& r)
-{
-    RTMPPacket packet(4);
-  
-    packet.header.channel = CHANNEL_CONTROL1;
-    packet.header.packetType = PACKET_TYPE_SERVERBW;
-  
-    SimpleBuffer& buf = *packet.buffer;
-  
-    buf.appendNetworkLong(r.serverBandwidth());
-    return r.sendPacket(packet);
-}
 
 
 bool

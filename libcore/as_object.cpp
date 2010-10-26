@@ -245,7 +245,8 @@ public:
     PropsCopier(as_object& tgt)
         :
         _tgt(tgt)
-	{ /* do nothing */ }
+	{
+    }
 
     /// Set *inherited* properties of the given target object
     bool accept(const ObjectURI& uri, const as_value& val) {
