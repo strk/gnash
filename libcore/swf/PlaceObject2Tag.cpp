@@ -393,13 +393,13 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
 	    LOG_ONCE( log_unimpl("Bitmap filters") );
     }
 
-    if ( hasBlendMode() )
-    {
+    if (hasBlendMode()) {
         in.ensureBytes(1);
         _blendMode = in.read_u8();
+        LOG_ONCE(log_unimpl("Blend mode in PlaceObject tag"));
     }
 
-    if ( hasBitmapCaching() ) {
+    if (hasBitmapCaching()) {
         // cacheAsBitmap is a boolean value, so the flag itself ought to be
         // enough. Alexis' SWF reference is unsure about this, but suggests
         // reading a byte here. The official SWF format spec doesn't mention
@@ -412,7 +412,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
         // TODO: set object property
         in.ensureBytes(1);
         bitmask = in.read_u8();
-	    LOG_ONCE( log_unimpl("Bitmap caching") );
+	    LOG_ONCE(log_unimpl("Bitmap caching"));
     }
 
     if ( hasClipActions() ) {
