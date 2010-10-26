@@ -91,23 +91,12 @@ public:
     
     typedef std::map<size_t, as_object*> CallbacksMap;
 
-    /// @param methodName
-    ///     A string identifying the remote procedure to call
-    ///
-    /// @param responseHandler
-    ///     Object to invoke response methods on.
-    ///
-    /// @param args
-    ///     A vector of arguments
-    ///
-    /// @param firstArg
-    ///     Index of first argument in the args vector
-    ///
-    ///
+    /// @param methodName      A string identifying the remote procedure to call
+    /// @param responseHandler  Object to invoke response methods on.
+    /// @param args             A vector of arguments
     /// @return true if the call is queued, false otherwise
-    ///
     virtual void call(as_object* asCallback, const std::string& methodName,
-            const std::vector<as_value>& args, size_t firstArg) = 0;
+            const std::vector<as_value>& args) = 0;
 
     /// Get an stream by name
     //
@@ -228,7 +217,7 @@ public:
 
     // See dox in NetworkHandler class
     virtual void call(as_object* asCallback, const std::string& methodName,
-            const std::vector<as_value>& args, size_t firstArg);
+            const std::vector<as_value>& args);
 
 private:
 
@@ -568,7 +557,7 @@ HTTPRemotingHandler::advance()
                 _postdata.size());
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("NetConnection.call(): encoded args from %1% calls: %2%",
-                queued_count, hexify(postdata.data(), postdata.size(), false));
+                queued_count, hexify(_postdata.data(), _postdata.size(), false));
 #endif
         queued_count = 0;
 
@@ -595,7 +584,7 @@ HTTPRemotingHandler::advance()
 
 void
 HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
-            const std::vector<as_value>& args, size_t firstArg)
+            const std::vector<as_value>& args)
 {
     SimpleBuffer buf(32);
 
@@ -623,16 +612,15 @@ HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
 
     // encode array of arguments to remote method
     buf.appendByte(amf::STRICT_ARRAY_AMF0);
-    buf.appendNetworkLong(args.size() - firstArg);
+    buf.appendNetworkLong(args.size());
 
     // STRICT_ARRAY encoding is allowed for remoting
     amf::Writer w(buf, true);
 
-    for (size_t i = firstArg; i < args.size(); ++i) {
+    for (size_t i = 0; i < args.size(); ++i) {
         const as_value& arg = args[i];
         if (!arg.writeAMF0(w)) {
-            log_error("Could not serialize NetConnection.call argument %d",
-                    i);
+            log_error("Could not serialize NetConnection.call argument %d", i);
         }
     }
 
@@ -649,21 +637,36 @@ HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
     }
 }
 
+void
+replyBWCheck(rtmp::RTMP& r, double txn)
+{
+    SimpleBuffer buf;
+    amf::write(buf, "_result");
+    amf::write(buf, txn);
+    buf.appendByte(amf::NULL_AMF0);
+    amf::write(buf, 0.0);
+    r.call(buf);
+}
+
 class RTMPRemotingHandler : public ConnectionHandler
 {
 public:
 
     RTMPRemotingHandler(NetConnection_as& nc, const URL& url)
         :
-        ConnectionHandler(nc)
+        ConnectionHandler(nc),
+        _connectionComplete(false),
+        _url(url)
     {
-        _rtmp.connect(url);
+        // Throw exception if this fails.
+        GNASH_REPORT_FUNCTION;
+        const bool ret = _rtmp.connect(url);
+        log_debug("ConnectioN: %s", ret);
     }
 
     virtual void call(as_object* asCallback, const std::string& methodName,
-            const std::vector<as_value>& args, size_t firstArg)
+            const std::vector<as_value>& args)
     {
-        // Infofield1?
         SimpleBuffer buf;
         amf::Writer aw(buf);
         aw.writeString(methodName);
@@ -671,7 +674,7 @@ public:
         aw.writeNumber(id);
         buf.appendByte(amf::NULL_AMF0);
 
-        for (size_t i = firstArg; i < args.size(); ++i) {
+        for (size_t i = 0; i < args.size(); ++i) {
             args[i].writeAMF0(aw);
         }
         _rtmp.call(buf);
@@ -681,29 +684,151 @@ public:
     }
 
     bool hasPendingCalls() const {
-        // Nothing is going to come back...
-        if (!_rtmp.connected()) return false;
-        // TODO: implement this.
-        return false;
+        return true;
     }
 
-    bool advance() {
+    virtual bool advance() {
+
         _rtmp.update();
 
-        // Nothing to do yet, but we don't want to be dropped.
-        if (!_rtmp.connected()) return true;
+        if (_rtmp.error()) {
+            _nc.notifyStatus(NetConnection_as::CONNECT_CLOSED);
+            return false;
+        }
 
-        boost::shared_ptr<SimpleBuffer> m = _rtmp.getMessage();
-        if (!m) return true;
+        // Nothing to do yet, but we don't want to be dropped.
+        if (!_connectionComplete) {
+
+            if (!_rtmp.connected()) return true;
+            
+            _connectionComplete = true;
+
+            log_debug("Connection complete");
+            const RunResources& r = getRunResources(_nc.owner());
+
+            as_object* o = createObject(getGlobal(_nc.owner()));
+            const int flags = 0;
+            o->init_member("app", _url.path().substr(1), flags);
+            o->init_member("flashVer", "LNX 10,0,22,87", flags);
+            o->init_member("swfUrl", r.streamProvider().originalURL().str(),
+                    flags);
+            o->init_member("tcUrl", _url.str(), flags);
+            o->init_member("fpad", false, flags);
+            o->init_member("capabilities", 15.0, flags);
+            o->init_member("audioCodecs", 3191.0, flags);
+            o->init_member("videoCodecs", 252.0, flags);
+
+            const size_t id = callNo();
+            SimpleBuffer buf;
+
+            amf::write(buf, "connect");
+            amf::write(buf, static_cast<double>(id));
+
+            log_debug("Buf size: %s", buf.size());
+            amf::Writer aw(buf);
+            aw.writeObject(o);
+            log_debug("Buf size: %s", buf.size());
+            _rtmp.call(buf);
+            pushCallback(id, &_nc.owner());
+        }
+        
+        boost::shared_ptr<SimpleBuffer> b = _rtmp.getMessage();
+
+        /// Retrieve messages.
+        while (b.get()) {
+            handleInvoke(b->data() + rtmp::RTMPHeader::headerSize,
+                    b->data() + b->size());
+            b = _rtmp.getMessage();
+        }
 
         return true;
     }
 
 private:
 
+    void handleInvoke(const boost::uint8_t* payload, const boost::uint8_t* end);
+
     rtmp::RTMP _rtmp;
+    bool _connectionComplete;
+    const URL _url;
 
 };
+
+void
+RTMPRemotingHandler::handleInvoke(const boost::uint8_t* payload,
+        const boost::uint8_t* end)
+{
+    assert(payload != end);
+
+    // make sure it is a string method name we start with
+    if (payload[0] != 0x02) {
+        log_error( "Sanity failed. no string method in invoke packet");
+        return;
+    }
+
+    ++payload;
+    std::string method = amf::readString(payload, end);
+
+    log_debug("Invoke: read method string %s", method);
+    if (*payload != amf::NUMBER_AMF0) return;
+    ++payload;
+
+    log_debug( "Server invoking <%s>", method);
+    
+    string_table& st = getStringTable(_nc.owner());
+    const ObjectURI methodname(st.find(method));
+
+    // _result means it's the answer to a remote method call initiated
+    // by us.
+    if (method == "_result") {
+        const double id = amf::readNumber(payload, end);
+        log_debug("Received result for method call %s",
+                boost::io::group(std::setprecision(15), id));
+        as_object* o = popCallback(id);
+        callMethod(o, NSV::PROP_ON_RESULT);
+        return;
+    }
+    
+    /// These are remote function calls initiated by the server .
+    const double id = amf::readNumber(payload, end);
+    log_debug("Received server call %s %s",
+            boost::io::group(std::setprecision(15), id),
+            id ? "" : "(no reply expected)");
+
+    /// If the server sends this, we reply (the call should contain a
+    /// callback object!).
+    if (method == "_onbwcheck") {
+        if (id) replyBWCheck(_rtmp, id);
+        else {
+            log_error("Server called _onbwcheck without a callback");
+        }
+        return;
+    }
+
+    if (method == "_onbwdone") {
+
+        if (*payload != amf::NULL_AMF0) return;
+        ++payload;
+#if GNASH_DEBUG_REMOTING
+        log_debug("AMF buffer for _onbwdone: %s\n",
+                hexify(payload, end - payload, false));
+#endif
+        double latency = amf::readNumber(payload, end);
+        double bandwidth = amf::readNumber(payload, end);
+        log_debug("Latency: %s, bandwidth %s", latency, bandwidth);
+        return;
+    }
+
+    if (method ==  "_error") {
+        log_error( "rtmp server sent error");
+        return;
+    }
+    
+    // Call method on the NetConnection object.    
+    callMethod(&_nc.owner(), methodname);
+    
+}
+
 
 //----- NetConnection_as ----------------------------------------------------
 
@@ -827,8 +952,8 @@ NetConnection_as::connect(const std::string& uri)
         _currentConnection.reset(new HTTPRemotingHandler(*this, url));
     }
     else if (url.protocol() == "rtmp") {
-        // TODO: fix this to work properly.
         _currentConnection.reset(new RTMPRemotingHandler(*this, url));
+        startAdvanceTimer();
     }
     else if (url.protocol() == "rtmpt" || url.protocol() == "rtmpts") {
         log_unimpl("NetConnection.connect(%s): unsupported connection "
@@ -886,14 +1011,14 @@ NetConnection_as::setURI(const std::string& uri)
 
 void
 NetConnection_as::call(as_object* asCallback, const std::string& methodName,
-        const std::vector<as_value>& args, size_t firstArg)
+        const std::vector<as_value>& args)
 {
     if (!_currentConnection.get()) {
         log_aserror("NetConnection.call: can't call while not connected");
         return;
     }
 
-    _currentConnection->call(asCallback, methodName, args, firstArg);
+    _currentConnection->call(asCallback, methodName, args);
 
     startAdvanceTimer();
 }
@@ -935,10 +1060,9 @@ NetConnection_as::stopAdvanceTimer()
 void
 NetConnection_as::update()
 {
-    // Advance
 #ifdef GNASH_DEBUG_REMOTING
     log_debug("NetConnection_as::advance: %d calls to advance",
-            _queuedConnections.size());
+            _queuedConnections.size() + _currentConnection.get() ? 1 : 0);
 #endif
 
     while (!_queuedConnections.empty()) {
@@ -1034,8 +1158,12 @@ netconnection_call(const fn_call& fn)
         }
     }
 
-    const std::vector<as_value>& args = fn.getArgs();
-    ptr->call(asCallback.get(), methodName, args, 2);
+    std::vector<as_value> args;
+    if (fn.nargs > 2) {
+        args = std::vector<as_value>(fn.getArgs().begin() + 2,
+                fn.getArgs().end());
+    }
+    ptr->call(asCallback.get(), methodName, args);
 
     return as_value();
 }
