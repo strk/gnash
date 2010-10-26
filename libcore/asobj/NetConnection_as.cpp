@@ -30,6 +30,7 @@
 #include <utility>
 #include <boost/scoped_ptr.hpp>
 #include <boost/lexical_cast.hpp>
+#include <iomanip>
 
 #include "GnashSystemNetHeaders.h"
 #include "log.h"
