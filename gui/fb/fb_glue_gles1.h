@@ -46,11 +46,9 @@
 #include <boost/scoped_ptr.hpp>
 
 #include "fbsup.h"
-//#include "render_handler_gles.h"
 
 namespace gnash
 {
-class render_handler;
 class Renderer;
 
 class FBgles1Glue: public FBGlue
@@ -75,7 +73,6 @@ protected:
     int         _fd;
 
 private:
-    render_handler *_render_handler;
     boost::scoped_ptr<Renderer> _renderer;
     EGLDisplay  _display;
     EGLConfig   _config;
