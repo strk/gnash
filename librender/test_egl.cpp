@@ -85,23 +85,29 @@ test_egl(EGLDevice &egl, EGLDevice::rtype_t rtype)
 {
     cout << "Testing " << estrs[rtype] << endl;
 
+    // There isn't a whole lot to test, if init works, most
+    // everything else has to be correct.
     if (egl.init(rtype)) {
         runtest.pass("EGLDevice::init()");
     } else {
         runtest.fail("EGLDevice::init()");
     }
 
+    // If there are more than zero configurations, something beyond
+    // initializing is working
+    if (egl.queryEGLConfig()) {
+        runtest.pass("EGLDevice::queryEGLConfig()");
+    } else {
+        runtest.fail("EGLDevice::queryEGLConfig()");
+    }
+
+    // This is a utility method for converting integer error codes to
+    // something human readable for debugging.
     string result = "EGL_BAD_CONFIG";
     if (egl.getErrorString(EGL_BAD_CONFIG) == result) {
         runtest.pass("EGLDevice::getErrorString()");
     } else {
         runtest.fail("EGLDevice::getErrorString()");
-    }
-
-    if (egl.queryEGLConfig()) {
-        runtest.pass("EGLDevice::queryEGLConfig()");
-    } else {
-        runtest.fail("EGLDevice::queryEGLConfig()");
     }
     
 }
