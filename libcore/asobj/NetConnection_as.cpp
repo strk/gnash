@@ -348,6 +348,8 @@ HTTPRemotingHandler::advance()
     
     if (_connection->eof()) {
 
+        // If it's less than 8 we didn't expect a response, so just ignore
+        // it.
         if (_reply.size() > 8) {
 
 #ifdef GNASH_DEBUG_REMOTING
@@ -543,9 +545,6 @@ HTTPRemotingHandler::advance()
                     }
                 }
             }
-        }
-        else {
-            log_error("Response from remoting service < 8 bytes");
         }
 
 #ifdef GNASH_DEBUG_REMOTING
