@@ -285,7 +285,7 @@ public:
     /// When masked==false, then any potential mask currently active will be
     /// ignored, otherwise it is respected.
     ///
-    virtual void draw_poly(const point* corners, size_t corner_count, 
+    virtual void drawPoly(const point* corners, size_t corner_count, 
         const rgba& fill, const rgba& outline, const SWFMatrix& mat,
         bool masked) = 0;
         
@@ -481,7 +481,10 @@ public:
         abort();        
         return false; // avoid compiler warning        
     }
-    
+
+    void addRenderImage(boost::shared_ptr<GnashVaapiImageProxy> image) {
+        _render_images.push_back(image);
+    }
     
     /// Returns the average RGB color for a square block on the stage. The 
     /// width and height of the block is defined by "radius" and x/y refer
@@ -666,5 +669,5 @@ private:
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:
