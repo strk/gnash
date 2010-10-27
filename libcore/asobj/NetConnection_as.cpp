@@ -482,8 +482,10 @@ HTTPRemotingHandler::advance()
                         // in the adobe player) sends
                         // 0xffffffff. So we just ignore it
                         if (b + 4 > end) break;
+#if GNASH_DEBUG_REMOTING
                         const boost::uint32_t len = amf::readNetworkLong(b);
                         log_debug("Reported reply length %s", len);
+#endif
                         b += 4; // reply length
 
                         // this updates b to point to the next unparsed byte
