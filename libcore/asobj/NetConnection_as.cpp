@@ -327,7 +327,7 @@ HTTPRemotingHandler::advance()
         _reply.resize(_reply.size() + read);
     }
 
-    // There is no way to tell if we have a whole amf _reply without
+    // There is no way to tell if we have a whole amf reply without
     // parsing everything
     //
     // The reply format has a header field which specifies the
@@ -376,13 +376,12 @@ HTTPRemotingHandler::advance()
             if (numheaders != 0) {
 
 #ifdef GNASH_DEBUG_REMOTING
-                log_debug("NetConnection::call(): amf headers "
-                        "section parsing");
+                log_debug("NetConnection::call(): amf headers section parsing");
 #endif
                 as_value tmp;
                 for (size_t i = numheaders; i > 0; --i) {
-                    if(b + 2 > end) {
-                        headers_ok = 0;
+                    if (b + 2 > end) {
+                        headers_ok = false;
                         break;
                     }
                     const boost::uint16_t namelength = amf::readNetworkShort(b);
@@ -413,8 +412,7 @@ HTTPRemotingHandler::advance()
                     string_table& st = vm.getStringTable();
                     string_table::key key = st.find(headerName);
 #ifdef GNASH_DEBUG_REMOTING
-                    log_debug("Calling NetConnection.%s(%s)",
-                            headerName, tmp);
+                    log_debug("Calling NetConnection.%s(%s)", headerName, tmp);
 #endif
                     callMethod(&_nc.owner(), key, tmp);
                 }
@@ -448,14 +446,13 @@ HTTPRemotingHandler::advance()
                         if (b + replylength > end) break;
 
                         // Reply message is: '/id/methodName'
-
                         int ns = 1; // next slash position
                         while (ns < replylength - 1 && *(b + ns) != '/') ++ns;
                         if (ns >= replylength - 1) {
                             std::string msg(reinterpret_cast<const char*>(b),
                                     replylength);
                             log_error("NetConnection::call(): invalid "
-                                    "_reply message name (%s)", msg);
+                                    "reply message name (%s)", msg);
                             break;
                         }
 
@@ -471,22 +468,23 @@ HTTPRemotingHandler::advance()
                         }
 
                         std::string methodName(
-                                reinterpret_cast<const char*>(b+ns+1),
+                                reinterpret_cast<const char*>(b + ns + 1),
                                 replylength - ns - 1);
 
                         b += replylength;
 
                         // parse past unused string in header
                         if (b + 2 > end) break;
-                        const boost::uint16_t unusedlength
-                            = amf::readNetworkShort(b);
+                        const boost::uint16_t unusedlength =
+                            amf::readNetworkShort(b);
+
                         b += 2; 
                         if (b + unusedlength > end) break;
                         b += unusedlength;
 
                         // this field is supposed to hold the
                         // total number of bytes in the rest of
-                        // this particular _reply value, but
+                        // this particular reply value, but
                         // openstreetmap.org (which works great
                         // in the adobe player) sends
                         // 0xffffffff. So we just ignore it
