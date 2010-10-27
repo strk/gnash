@@ -222,14 +222,13 @@ private:
     SimpleBuffer _postdata;
     URL _url;
     boost::scoped_ptr<IOChannel> _connection;
-    SimpleBuffer reply;
-    int reply_start;
+    SimpleBuffer _reply;
+    int _reply_start;
     int queued_count;
 
     // Quick hack to send Content-Type: application/x-amf
     // TODO: check if we should take headers on a per-call basis
     //       due to NetConnection.addHeader.
-    //
     NetworkAdapter::RequestHeaders _headers;
 
     void push_amf(const SimpleBuffer &amf) {
@@ -245,13 +244,13 @@ HTTPRemotingHandler::HTTPRemotingHandler(NetConnection_as& nc, const URL& url)
         _postdata(),
         _url(url),
         _connection(0),
-        reply(),
-        reply_start(0),
+        _reply(),
+        _reply_start(0),
         queued_count(0)
 {
     // leave space for header
     _postdata.append("\000\000\000\000\000\000", 6);
-    assert(reply.size() == 0);
+    assert(_reply.size() == 0);
 
     _headers["Content-Type"] = "application/x-amf";
 }
@@ -263,7 +262,7 @@ HTTPRemotingHandler::advance()
     if (_connection) {
 
         // Fill last chunk before reading in the next
-        size_t toRead = reply.capacity() - reply.size();
+        size_t toRead = _reply.capacity() - _reply.size();
         if (!toRead) toRead = NCCALLREPLYCHUNK;
 
 #ifdef GNASH_DEBUG_REMOTING
@@ -272,45 +271,41 @@ HTTPRemotingHandler::advance()
 
         // See if we need to allocate more bytes for the next
         // read chunk
-        if (reply.capacity() < reply.size() + toRead) {
+        if (_reply.capacity() < _reply.size() + toRead) {
             // if _connection->size() >= 0, reserve for it, so
             // if HTTP Content-Length response header is correct
             // we'll be allocating only once for all.
-            const size_t newCapacity = reply.size() + toRead;
+            const size_t newCapacity = _reply.size() + toRead;
 
 #ifdef GNASH_DEBUG_REMOTING
             log_debug("NetConnection.call: reply buffer capacity (%d) "
                     "is too small to accept next %d bytes of chunk "
                     "(current size is %d). Reserving %d bytes.",
-                    reply.capacity(), toRead, reply.size(), newCapacity);
+                    _reply.capacity(), toRead, _reply.size(), newCapacity);
 #endif
 
-            reply.reserve(newCapacity);
-
-#ifdef GNASH_DEBUG_REMOTING
-            log_debug(" after reserve, new capacity is %d", reply.capacity());
-#endif
+            _reply.reserve(newCapacity);
         }
 
         const int read =
-            _connection->readNonBlocking(reply.data() + reply.size(), toRead);
+            _connection->readNonBlocking(_reply.data() + _reply.size(), toRead);
 
         if (read > 0) {
 #ifdef GNASH_DEBUG_REMOTING
             log_debug("read '%1%' bytes: %2%", read, 
-                    hexify(reply.data() + reply.size(), read, false));
+                    hexify(_reply.data() + _reply.size(), read, false));
 #endif
-            reply.resize(reply.size() + read);
+            _reply.resize(_reply.size() + read);
         }
 
-        // There is no way to tell if we have a whole amf reply without
+        // There is no way to tell if we have a whole amf _reply without
         // parsing everything
         //
-        // The reply format has a header field which specifies the
-        // number of bytes in the reply, but potlatch sends 0xffffffff
+        // The _reply format has a header field which specifies the
+        // number of bytes in the _reply, but potlatch sends 0xffffffff
         // and works fine in the proprietary player
         //
-        // For now we just wait until we have the full reply.
+        // For now we just wait until we have the full _reply.
         //
         // FIXME make this parse on other conditions, including: 1) when
         // the buffer is full, 2) when we have a "length in bytes" value
@@ -319,8 +314,8 @@ HTTPRemotingHandler::advance()
         if (_connection->bad()) {
             log_debug("connection is in error condition, calling "
                     "NetConnection.onStatus");
-            reply.resize(0);
-            reply_start = 0;
+            _reply.resize(0);
+            _reply_start = 0;
             // reset connection before calling the callback
             _connection.reset();
 
@@ -330,15 +325,15 @@ HTTPRemotingHandler::advance()
         }
         else if (_connection->eof()) {
 
-            if (reply.size() > 8) {
+            if (_reply.size() > 8) {
 
 
 #ifdef GNASH_DEBUG_REMOTING
                 log_debug("hit eof");
 #endif
                 boost::uint16_t li;
-                const boost::uint8_t *b = reply.data() + reply_start;
-                const boost::uint8_t *end = reply.data() + reply.size();
+                const boost::uint8_t *b = _reply.data() + _reply_start;
+                const boost::uint8_t *end = _reply.data() + _reply.size();
                 
                 amf::Reader rd(b, end, getGlobal(_nc.owner()));
 
@@ -411,10 +406,10 @@ HTTPRemotingHandler::advance()
                         while(b < end) {
                             if(b + 2 > end) break;
                             si = amf::readNetworkShort(b);
-                            b += 2; // reply length
+                            b += 2; // _reply length
                             if(si < 4) { // shorted valid response is '/1/a'
                                 log_error("NetConnection::call(): "
-                                        "reply message name too short");
+                                        "_reply message name too short");
                                 break;
                             }
                             if (b + si > end) break;
@@ -427,7 +422,7 @@ HTTPRemotingHandler::advance()
                                 std::string msg(
                                         reinterpret_cast<const char*>(b), si);
                                 log_error("NetConnection::call(): invalid "
-                                        "reply message name (%s)", msg);
+                                        "_reply message name (%s)", msg);
                                 break;
                             }
 
@@ -451,23 +446,23 @@ HTTPRemotingHandler::advance()
                             // parse past unused string in header
                             if (b + 2 > end) break;
                             si = amf::readNetworkShort(b);
-                            b += 2; // reply length
+                            b += 2; // _reply length
                             if (b + si > end) break;
                             b += si;
 
                             // this field is supposed to hold the
                             // total number of bytes in the rest of
-                            // this particular reply value, but
+                            // this particular _reply value, but
                             // openstreetmap.org (which works great
                             // in the adobe player) sends
                             // 0xffffffff. So we just ignore it
                             if (b + 4 > end) break;
                             li = amf::readNetworkLong(b);
-                            b += 4; // reply length
+                            b += 4; // _reply length
 
                             // this updates b to point to the next unparsed byte
-                            as_value replyval;
-                            if (!rd(replyval)) {
+                            as_value _replyval;
+                            if (!rd(_replyval)) {
                                 log_error("parse amf failed");
                                 // this will happen if we get
                                 // bogus data, or if the data runs
@@ -478,7 +473,7 @@ HTTPRemotingHandler::advance()
                             }
 
                             // update variable to show how much we've parsed
-                            reply_start = b - reply.data();
+                            _reply_start = b - _reply.data();
 
                             // if actionscript specified a callback object,
                             // call it
@@ -508,7 +503,7 @@ HTTPRemotingHandler::advance()
 #endif
                                 // FIXME check if above line can fail and we
                                 // have to react
-                                callMethod(callback, methodKey, replyval);
+                                callMethod(callback, methodKey, _replyval);
 #ifdef GNASH_DEBUG_REMOTING
                                 log_debug("callback called");
 #endif
@@ -527,8 +522,8 @@ HTTPRemotingHandler::advance()
             log_debug("deleting connection");
 #endif
             _connection.reset();
-            reply.resize(0);
-            reply_start = 0;
+            _reply.resize(0);
+            _reply_start = 0;
         }
     }
 
@@ -1076,14 +1071,12 @@ void
 NetConnection_as::startAdvanceTimer() 
 {
     getRoot(owner()).addAdvanceCallback(this);
-    log_debug("startAdvanceTimer: registered NetConnection timer");
 }
 
 void
 NetConnection_as::stopAdvanceTimer() 
 {
     getRoot(owner()).removeAdvanceCallback(this);
-    log_debug("stopAdvanceTimer: deregistered NetConnection timer");
 }
 
 void
@@ -1103,7 +1096,7 @@ NetConnection_as::update()
             delete ch;
         }
 
-        else break; // queues handling is serialized
+        else break; 
     }
 
     if (_currentConnection.get()) {
@@ -1114,13 +1107,7 @@ NetConnection_as::update()
     // of a new connection, so we won't stop the advance
     // timer in that case
     if (_queuedConnections.empty() && !_currentConnection.get()) {
-#ifdef GNASH_DEBUG_REMOTING
-        log_debug("stopping advance timer");
-#endif
         stopAdvanceTimer();
-#ifdef GNASH_DEBUG_REMOTING
-        log_debug("advance timer stopped");
-#endif
     }
 }
 
