@@ -33,27 +33,16 @@
 #include <GLES/egl.h>
 #endif
 
-#if 0
-// Mali Developer Tools for ARM 1.x
-#ifdef HAVE_EGL_EGL_H
-# include <EGL/egl.h>
-# include <EGL/eglext.h>
-#endif
-// Mali Developer Tools for ARM 2.x and Android 2.1
-#ifdef HAVE_GLES2_GL2_H
-# include <GLES2/gl2.h>
-# include <GLES2/gl2ext.h>
-#endif
-#endif
-
 #include "Renderer.h"
 #include "Geometry.h"
+#include "eglDevice.h"
 
 #include <map>
 
 namespace gnash {
 
 class GnashImage;
+class SWFCxForm;
 
 namespace renderer {
 
@@ -140,7 +129,65 @@ private:
     size_t _orig_height;
 };
 
-  DSOEXPORT Renderer* create_handler(const char *pixelformat);
+class  DSOEXPORT Renderer_gles1: public Renderer, public EGLDevice
+{
+public:
+    std::string description() const { return "OpenGLES1"; }
+    Renderer_gles1();
+    ~Renderer_gles1();
+        
+    void init(float x, float y);
+    CachedBitmap *createCachedBitmap(std::auto_ptr<image::GnashImage> im);
+
+    void world_to_pixel(int& x, int& y, float world_x, float world_y);
+    gnash::geometry::Range2d<int> world_to_pixel(const gnash::SWFRect& wb);
+    geometry::Range2d<int> world_to_pixel(const geometry::Range2d<float>& wb);
+    gnash::point pixel_to_world(int, int);
+
+    void begin_display(const gnash::rgba&, int, int, float,
+                                        float, float, float);
+    // // This is from the patch
+    // void begin_display(const rgba& bg_color, int viewport_x0,
+    //                    int viewport_y0, int viewport_width,
+    //                    int viewport_height, float x0, float x1,
+    //                    float y0, float y1);
+    void end_display();
+    void drawLine(const std::vector<point>& coords, const rgba& fill,
+                  const SWFMatrix& mat);
+    void drawVideoFrame(gnash::image::GnashImage *frame, const gnash::Transform& tx,
+                        const gnash::SWFRect *bounds, bool smooth);
+    void drawPoly(const point* corners, size_t corner_count, 
+                  const rgba& fill, const rgba& outline,
+                  const SWFMatrix& mat, bool masked);
+    void drawShape(const gnash::SWF::ShapeRecord&, const gnash::Transform&);
+    void drawGlyph(const SWF::ShapeRecord& rec, const rgba& c,
+                   const SWFMatrix& mat);
+
+    void set_antialiased(bool enable);
+    void begin_submit_mask();
+    void end_submit_mask();
+    void apply_mask();
+    void disable_mask();
+        
+    void set_scale(float xscale, float yscale);
+    void set_invalidated_regions(const InvalidatedRanges &ranges);
+
+    // These weren't in the patch
+    Renderer *startInternalRender(gnash::image::GnashImage&);
+    void endInternalRender();
+
+    unsigned int getBitsPerPixel();
+    bool initTestBuffer(unsigned width, unsigned height);
+
+    // These methods are only for debugging and development
+    void printVGParams();
+    void printVGHardware();
+    void printVGPath();
+  private:
+    unsigned char *_testBuffer; // buffer used by initTestBuffer() only
+};    
+
+DSOEXPORT Renderer* create_handler(const char *pixelformat);
 
 } // namespace gnash::renderer::gles1
 } // namespace gnash::renderer

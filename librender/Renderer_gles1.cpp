@@ -54,6 +54,8 @@
 #include "log.h"
 #include "utility.h"
 #include "Range2d.h"
+#include "SWFMatrix.h"
+#include "swf/ShapeRecord.h"
 
 #include "Renderer_gles1.h"
 
@@ -87,15 +89,220 @@ namespace renderer {
 
 namespace gles1 {
 
-Renderer* create_handler(const char *pixelformat)
+Renderer_gles1::Renderer_gles1()
+{
+    if (!initDevice(EGLDevice::OPENVG)) {
+        log_error("Couldn't initialize EGL Device!");
+    }
+}
+
+Renderer_gles1::~Renderer_gles1()
+{
+
+}
+
+void
+Renderer_gles1::init(float x, float y)
+{
+    GNASH_REPORT_FUNCTION;
+}
+
+CachedBitmap *
+Renderer_gles1::createCachedBitmap(std::auto_ptr<gnash::image::GnashImage>)
+{
+
+}
+
+void
+Renderer_gles1::drawVideoFrame(image::GnashImage* /* frame */,
+                               const gnash::Transform& t/* m */,
+                               const SWFRect* /* bounds */, bool /*smooth*/)
+{
+    log_unimpl("drawVideoFrame");  
+}
+
+
+
+void
+Renderer_gles1::world_to_pixel(int& x, int& y, float world_x, float world_y)
 {
 #if 0
-  Renderer_gles* renderer = new Renderer_gles;
-  if (init) {
-    renderer->init();
-  }
-  return renderer;
+    // negative pixels seems ok here... we don't
+    // clip to valid range, use world_to_pixel(rect&)
+    // and Intersect() against valid range instead.
+    point p(world_x, world_y);
+    stage_matrix.transform(p);
+    x = (int)p.x;
+    y = (int)p.y;
 #endif
+}
+
+geometry::Range2d<int>
+Renderer_gles1::world_to_pixel(const SWFRect& wb)
+{
+    using namespace gnash::geometry;
+    
+    if ( wb.is_null() ) return Range2d<int>(nullRange);
+    if ( wb.is_world() ) return Range2d<int>(worldRange);
+    
+    int xmin, ymin, xmax, ymax;
+    
+    world_to_pixel(xmin, ymin, wb.get_x_min(), wb.get_y_min());
+    world_to_pixel(xmax, ymax, wb.get_x_max(), wb.get_y_max());
+    
+    return Range2d<int>(xmin, ymin, xmax, ymax);
+}
+
+geometry::Range2d<int>
+Renderer_gles1::world_to_pixel(const geometry::Range2d<float>& wb)
+{
+    if (wb.isNull() || wb.isWorld()) return wb;
+    
+    int xmin, ymin, xmax, ymax;
+    
+    world_to_pixel(xmin, ymin, wb.getMinX(), wb.getMinY());
+    world_to_pixel(xmax, ymax, wb.getMaxX(), wb.getMaxY());
+    
+    return geometry::Range2d<int>(xmin, ymin, xmax, ymax);
+}
+
+point
+Renderer_gles1::pixel_to_world(int x, int y)
+{
+#if 0
+    point p(x, y);
+    SWFMatrix mat = stage_matrix;
+    mat.invert().transform(p);
+    return p;
+#endif
+};
+
+void
+Renderer_gles1::begin_display(const gnash::rgba&, int, int, float,
+                                        float, float, float)
+{
+    GNASH_REPORT_FUNCTION;
+}
+
+void
+Renderer_gles1::end_display()
+{
+    GNASH_REPORT_FUNCTION;
+}
+
+void
+Renderer_gles1::drawLine(const std::vector<point>& coords, const rgba& fill,
+                       const SWFMatrix& mat)
+{
+    GNASH_REPORT_FUNCTION;
+}
+void
+Renderer_gles1::drawPoly(const point* corners, size_t corner_count, 
+                       const rgba& fill, const rgba& /* outline */,
+                       const SWFMatrix& mat, bool /* masked */)
+{
+    GNASH_REPORT_FUNCTION;
+}
+void
+Renderer_gles1::drawShape(const gnash::SWF::ShapeRecord&, const gnash::Transform&)
+{
+    GNASH_REPORT_FUNCTION;
+}
+// void
+// Renderer_gles1::drawShape(const SWF::ShapeRecord& shape, const SWFCxForm& cx,
+//                         const SWFMatrix& mat)
+// {
+//     GNASH_REPORT_FUNCTION;
+// }
+void
+Renderer_gles1::drawGlyph(const SWF::ShapeRecord& rec, const rgba& c,
+                        const SWFMatrix& mat)
+{
+    GNASH_REPORT_FUNCTION;
+}
+
+void
+Renderer_gles1::set_antialiased(bool /* enable */)
+{
+    log_unimpl("set_antialiased");
+}
+
+void
+Renderer_gles1::begin_submit_mask()
+{
+#if 0
+    PathVec mask;
+    _masks.push_back(mask);
+    
+    _drawing_mask = true;
+#endif
+}
+
+void
+Renderer_gles1::end_submit_mask()
+{
+#if 0
+    _drawing_mask = false;
+    apply_mask();
+#endif
+}
+void
+Renderer_gles1::apply_mask()
+{
+    GNASH_REPORT_FUNCTION;
+}
+void
+Renderer_gles1::disable_mask()
+{
+    GNASH_REPORT_FUNCTION;
+}
+void
+Renderer_gles1::set_scale(float xscale, float yscale)
+{
+#if 0
+    _xscale = xscale;
+    _yscale = yscale;
+    stage_matrix.set_identity();
+    stage_matrix.set_scale(xscale/20.0f, yscale/20.0f);
+#endif
+}
+
+void
+Renderer_gles1::set_invalidated_regions(const InvalidatedRanges& /* ranges */)
+{
+}
+
+bool
+Renderer_gles1::initTestBuffer(unsigned int width, unsigned int height)
+{
+#if 0
+    int size = width * height; // * getBytesPerPixel();
+    
+    _testBuffer = static_cast<unsigned char *>(realloc(_testBuffer, size));
+    memset(_testBuffer, 0, size);
+    printf("\tRenderer Test memory at: %p\n", _testBuffer);
+#endif
+//    init_buffer(_testBuffer, size, width, height, width * getBytesPerPixel());
+//    init(width, height);
+    
+    return true;
+}
+
+Renderer *
+Renderer_gles1::startInternalRender(gnash::image::GnashImage&)
+{
+}
+
+void
+Renderer_gles1::endInternalRender()
+{
+}
+
+Renderer *
+create_handler(const char *pixelformat)
+{
+  Renderer_gles1 *renderer = new Renderer_gles1;
+  return renderer;
 
   return 0;
 }  
