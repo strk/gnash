@@ -224,7 +224,6 @@ DumpGui::run()
     }
 
     boost::uint32_t total_time = timer.elapsed();
-    double fps = _framecount*1000.0 / total_time;
 
     std::cout << "TIME=" << total_time << std::endl;
     std::cout << "FPS_ACTUAL=" << _fileOutputFPS << std::endl;
