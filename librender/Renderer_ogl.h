@@ -56,15 +56,13 @@
 
 #include <map>
 
-
 namespace gnash {
 
+namespace renderer {
 
+namespace opengl {
 
-
-typedef std::vector<const Path*> PathRefs;
-
-
+  typedef std::vector<const Path*> PathRefs;
 
 struct oglVertex {
   oglVertex(double x, double y, double z = 0.0)
@@ -105,10 +103,7 @@ public:
   error(GLenum error);
 
   static void combine(GLdouble coords [3], void *vertex_data[4],
-                      GLfloat weight[4], void **outData, void* userdata);
-  
-
-  
+                      GLfloat weight[4], void **outData, void* userdata);  
 private:
   std::vector<GLdouble*> _vertices;
   GLUtesselator* _tessobj;
@@ -149,16 +144,16 @@ private:
   std::vector<PathRefs> shape;
 
 };
+ 
+DSOEXPORT Renderer* create_handler(bool init = true);
 
-
-
-
-DSOEXPORT Renderer* create_Renderer_ogl(bool init = true);
-
-
-
+} // namespace gnash::renderer::opengl
+} // namespace gnash::renderer
 } // namespace gnash
-
 
 #endif
 
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:

@@ -111,6 +111,10 @@
 
 namespace gnash {
 
+namespace renderer {
+
+namespace opengl {
+
 namespace {
     const CachedBitmap* createGradientBitmap(const GradientFill& gf,
             Renderer& renderer);
@@ -215,7 +219,6 @@ private:
 };  
 
 }
-
 
 #ifdef OSMESA_TESTING
 
@@ -806,10 +809,10 @@ public:
       }
   }
 
-  boost::shared_ptr<GnashTexture> getCachedTexture(image::GnashImage *frame)
+  boost::shared_ptr<gnash::GnashTexture> getCachedTexture(image::GnashImage *frame)
   {
       boost::shared_ptr<GnashTexture> texture;
-      GnashTextureFormat frameFormat(frame->type());
+      gnash::GnashTextureFormat frameFormat(frame->type());
       unsigned int frameFlags;
 
       switch (frame->location()) {
@@ -851,7 +854,7 @@ public:
 
           switch (frame->location()) {
           case image::GNASH_IMAGE_CPU:
-              texture.reset(new GnashTexture(frame->width(),
+              texture.reset(new gnash::GnashTexture(frame->width(),
                                              frame->height(),
                                              frame->type()));
               break;
@@ -896,7 +899,7 @@ public:
 
     glEndList();
 
-    boost::shared_ptr<GnashTexture> texture = getCachedTexture(frame);
+    boost::shared_ptr<gnash::GnashTexture> texture = getCachedTexture(frame);
     if (!texture.get())
         return;
 
@@ -933,7 +936,7 @@ public:
   }
 
 private:  
-  void reallyDrawVideoFrame(boost::shared_ptr<GnashTexture> texture, const SWFMatrix* m, const SWFRect* bounds)
+  void reallyDrawVideoFrame(boost::shared_ptr<gnash::GnashTexture> texture, const SWFMatrix* m, const SWFRect* bounds)
   {
     glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);
     glPushMatrix();
@@ -1902,15 +1905,15 @@ private:
   bool _drawing_mask;
   
   std::vector<boost::uint8_t> _render_indices;
-  std::vector< boost::shared_ptr<GnashTexture> > _render_textures;
-  std::list< boost::shared_ptr<GnashTexture> > _cached_textures;
+  std::vector< boost::shared_ptr<gnash::GnashTexture> > _render_textures;
+  std::list< boost::shared_ptr<gnash::GnashTexture> > _cached_textures;
   
 #ifdef OSMESA_TESTING
   std::auto_ptr<OSRenderMesa> _offscreen;
 #endif
 }; // class Renderer_ogl
   
-Renderer* create_Renderer_ogl(bool init)
+Renderer* create_handler(bool init)
 // Factory.
 {
   Renderer_ogl* renderer = new Renderer_ogl;
@@ -2024,5 +2027,11 @@ createGradientBitmap(const GradientFill& gf, Renderer& renderer)
 
 } 
   
+} // namespace gnash::renderer::opengl
+} // namespace gnash::renderer
 } // namespace gnash
 
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:
