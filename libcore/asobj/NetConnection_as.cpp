@@ -259,277 +259,13 @@ bool
 HTTPRemotingHandler::advance()
 {
 
-    if (_connection) {
+    // If there is no active connection, check whether messages are waiting
+    if (!_connection) {
 
-        // Fill last chunk before reading in the next
-        size_t toRead = _reply.capacity() - _reply.size();
-        if (!toRead) toRead = NCCALLREPLYCHUNK;
+        // If there is nothing to send, there's no more to do.
+        if (!queued_count) return false;
 
-#ifdef GNASH_DEBUG_REMOTING
-        log_debug("Attempt to read %d bytes", toRead);
-#endif
-
-        // See if we need to allocate more bytes for the next
-        // read chunk
-        if (_reply.capacity() < _reply.size() + toRead) {
-            // if _connection->size() >= 0, reserve for it, so
-            // if HTTP Content-Length response header is correct
-            // we'll be allocating only once for all.
-            const size_t newCapacity = _reply.size() + toRead;
-
-#ifdef GNASH_DEBUG_REMOTING
-            log_debug("NetConnection.call: reply buffer capacity (%d) "
-                    "is too small to accept next %d bytes of chunk "
-                    "(current size is %d). Reserving %d bytes.",
-                    _reply.capacity(), toRead, _reply.size(), newCapacity);
-#endif
-
-            _reply.reserve(newCapacity);
-        }
-
-        const int read =
-            _connection->readNonBlocking(_reply.data() + _reply.size(), toRead);
-
-        if (read > 0) {
-#ifdef GNASH_DEBUG_REMOTING
-            log_debug("read '%1%' bytes: %2%", read, 
-                    hexify(_reply.data() + _reply.size(), read, false));
-#endif
-            _reply.resize(_reply.size() + read);
-        }
-
-        // There is no way to tell if we have a whole amf _reply without
-        // parsing everything
-        //
-        // The _reply format has a header field which specifies the
-        // number of bytes in the _reply, but potlatch sends 0xffffffff
-        // and works fine in the proprietary player
-        //
-        // For now we just wait until we have the full _reply.
-        //
-        // FIXME make this parse on other conditions, including: 1) when
-        // the buffer is full, 2) when we have a "length in bytes" value
-        // thas is satisfied
-
-        if (_connection->bad()) {
-            log_debug("connection is in error condition, calling "
-                    "NetConnection.onStatus");
-            _reply.resize(0);
-            _reply_start = 0;
-            // reset connection before calling the callback
-            _connection.reset();
-
-            // This is just a guess, but is better than sending
-            // 'undefined'
-            _nc.notifyStatus(NetConnection_as::CALL_FAILED);
-        }
-        else if (_connection->eof()) {
-
-            if (_reply.size() > 8) {
-
-
-#ifdef GNASH_DEBUG_REMOTING
-                log_debug("hit eof");
-#endif
-                boost::uint16_t li;
-                const boost::uint8_t *b = _reply.data() + _reply_start;
-                const boost::uint8_t *end = _reply.data() + _reply.size();
-                
-                amf::Reader rd(b, end, getGlobal(_nc.owner()));
-
-                // parse header
-                b += 2; // skip version indicator and client id
-
-                // NOTE: this looks much like parsing of an OBJECT_AMF0
-                boost::int16_t si = amf::readNetworkShort(b);
-                b += 2; // number of headers
-                uint8_t headers_ok = 1;
-                if (si != 0) {
-
-#ifdef GNASH_DEBUG_REMOTING
-                    log_debug("NetConnection::call(): amf headers "
-                            "section parsing");
-#endif
-                    as_value tmp;
-                    for (size_t i = si; i > 0; --i) {
-                        if(b + 2 > end) {
-                            headers_ok = 0;
-                            break;
-                        }
-                        si = amf::readNetworkShort(b); b += 2; // name length
-                        if(b + si > end) {
-                            headers_ok = 0;
-                            break;
-                        }
-                        std::string headerName((char*)b, si); // end-b);
-#ifdef GNASH_DEBUG_REMOTING
-                        log_debug("Header name %s", headerName);
-#endif
-                        b += si;
-                        if ( b + 5 > end ) {
-                            headers_ok = 0;
-                            break;
-                        }
-                        b += 5; // skip past bool and length long
-                        if(!rd(tmp)) {
-                            headers_ok = 0;
-                            break;
-                        }
-#ifdef GNASH_DEBUG_REMOTING
-                        log_debug("Header value %s", tmp);
-#endif
-
-                        { // method call for each header
-                          // FIXME: it seems to me that the call should happen
-                            VM& vm = getVM(_nc.owner());
-                            string_table& st = vm.getStringTable();
-                            string_table::key key = st.find(headerName);
-#ifdef GNASH_DEBUG_REMOTING
-                            log_debug("Calling NetConnection.%s(%s)",
-                                    headerName, tmp);
-#endif
-                            callMethod(&_nc.owner(), key, tmp);
-                        }
-                    }
-                }
-
-                if(headers_ok == 1) {
-
-                    si = amf::readNetworkShort(b); b += 2; // number of replies
-
-                    // TODO consider counting number of replies we
-                    // actually parse and doing something if it
-                    // doesn't match this value (does it matter?
-                    if(si > 0) {
-                        // parse replies until we get a parse error or
-                        // we reach the end of the buffer
-                        while(b < end) {
-                            if(b + 2 > end) break;
-                            si = amf::readNetworkShort(b);
-                            b += 2; // _reply length
-                            if(si < 4) { // shorted valid response is '/1/a'
-                                log_error("NetConnection::call(): "
-                                        "_reply message name too short");
-                                break;
-                            }
-                            if (b + si > end) break;
-
-                            // Reply message is: '/id/methodName'
-
-                            int ns = 1; // next slash position
-                            while (ns < si - 1 && *(b + ns) != '/') ++ns;
-                            if (ns >= si - 1) {
-                                std::string msg(
-                                        reinterpret_cast<const char*>(b), si);
-                                log_error("NetConnection::call(): invalid "
-                                        "_reply message name (%s)", msg);
-                                break;
-                            }
-
-                            std::string id(reinterpret_cast<const char*>(b + 1),
-                                    ns - 1);
-                            size_t callbackID = 0;
-                            try {
-                                callbackID = boost::lexical_cast<size_t>(id);
-                            }
-                            catch (const boost::bad_lexical_cast&) {
-                                log_error(_("Callback ID was not a number"));
-                                break;
-                            }
-
-                            std::string methodName(
-                                    reinterpret_cast<const char*>(b+ns+1),
-                                    si-ns-1);
-
-                            b += si;
-
-                            // parse past unused string in header
-                            if (b + 2 > end) break;
-                            si = amf::readNetworkShort(b);
-                            b += 2; // _reply length
-                            if (b + si > end) break;
-                            b += si;
-
-                            // this field is supposed to hold the
-                            // total number of bytes in the rest of
-                            // this particular _reply value, but
-                            // openstreetmap.org (which works great
-                            // in the adobe player) sends
-                            // 0xffffffff. So we just ignore it
-                            if (b + 4 > end) break;
-                            li = amf::readNetworkLong(b);
-                            b += 4; // _reply length
-
-                            // this updates b to point to the next unparsed byte
-                            as_value _replyval;
-                            if (!rd(_replyval)) {
-                                log_error("parse amf failed");
-                                // this will happen if we get
-                                // bogus data, or if the data runs
-                                // off the end of the buffer
-                                // provided, or if we get data we
-                                // don't know how to parse
-                                break;
-                            }
-
-                            // update variable to show how much we've parsed
-                            _reply_start = b - _reply.data();
-
-                            // if actionscript specified a callback object,
-                            // call it
-                            as_object* callback = popCallback(callbackID);
-                            if (callback) {
-
-                                string_table::key methodKey;
-                                if ( methodName == "onResult" ) {
-                                    methodKey = NSV::PROP_ON_RESULT;
-                                }
-                                else if (methodName == "onStatus") {
-                                    methodKey = NSV::PROP_ON_STATUS;
-                                }
-                                else {
-                                    // NOTE: the pp is known to actually
-                                    // invoke the custom method, but with 7
-                                    // undefined arguments (?)
-                                    log_error("Unsupported HTTP Remoting "
-                                            "response callback: '%s' "
-                                            "(size %d)", methodName,
-                                            methodName.size());
-                                    continue;
-                                }
-
-#ifdef GNASH_DEBUG_REMOTING
-                                log_debug("calling onResult callback");
-#endif
-                                // FIXME check if above line can fail and we
-                                // have to react
-                                callMethod(callback, methodKey, _replyval);
-#ifdef GNASH_DEBUG_REMOTING
-                                log_debug("callback called");
-#endif
-                            } else {
-                                log_error("Unknown HTTP Remoting response identifier '%s'", id);
-                            }
-                        }
-                    }
-                }
-            }
-            else {
-                log_error("Response from remoting service < 8 bytes");
-            }
-
-#ifdef GNASH_DEBUG_REMOTING
-            log_debug("deleting connection");
-#endif
-            _connection.reset();
-            _reply.resize(0);
-            _reply_start = 0;
-        }
-    }
-
-    if (!_connection && queued_count > 0) {
         log_debug("creating connection");
-        // set the "number of bodies" header
 
         (reinterpret_cast<boost::uint16_t*>(_postdata.data() + 4))[0] =
             htons(queued_count);
@@ -550,14 +286,273 @@ HTTPRemotingHandler::advance()
         _connection.reset(sp.getStream(_url, postdata_str, _headers).release());
 
         _postdata.resize(6);
-#ifdef GNASH_DEBUG_REMOTING
-        log_debug("connection created");
-#endif
+
+        return true;
     }
 
-    if (_connection == 0) {
-        // nothing more to do
-        return false;
+    // Fill last chunk before reading in the next
+    size_t toRead = _reply.capacity() - _reply.size();
+    if (!toRead) toRead = NCCALLREPLYCHUNK;
+
+#ifdef GNASH_DEBUG_REMOTING
+    log_debug("Attempt to read %d bytes", toRead);
+#endif
+
+    // See if we need to allocate more bytes for the next
+    // read chunk
+    if (_reply.capacity() < _reply.size() + toRead) {
+        // if _connection->size() >= 0, reserve for it, so
+        // if HTTP Content-Length response header is correct
+        // we'll be allocating only once for all.
+        const size_t newCapacity = _reply.size() + toRead;
+
+#ifdef GNASH_DEBUG_REMOTING
+        log_debug("NetConnection.call: reply buffer capacity (%d) "
+                "is too small to accept next %d bytes of chunk "
+                "(current size is %d). Reserving %d bytes.",
+                _reply.capacity(), toRead, _reply.size(), newCapacity);
+#endif
+
+        _reply.reserve(newCapacity);
+    }
+
+    const int read =
+        _connection->readNonBlocking(_reply.data() + _reply.size(), toRead);
+
+    if (read > 0) {
+#ifdef GNASH_DEBUG_REMOTING
+        log_debug("read '%1%' bytes: %2%", read, 
+                hexify(_reply.data() + _reply.size(), read, false));
+#endif
+        _reply.resize(_reply.size() + read);
+    }
+
+    // There is no way to tell if we have a whole amf _reply without
+    // parsing everything
+    //
+    // The _reply format has a header field which specifies the
+    // number of bytes in the _reply, but potlatch sends 0xffffffff
+    // and works fine in the proprietary player
+    //
+    // For now we just wait until we have the full _reply.
+    //
+    // FIXME make this parse on other conditions, including: 1) when
+    // the buffer is full, 2) when we have a "length in bytes" value
+    // thas is satisfied
+
+    if (_connection->bad()) {
+        log_debug("connection is in error condition, calling "
+                "NetConnection.onStatus");
+        _reply.resize(0);
+        _reply_start = 0;
+        // reset connection before calling the callback
+        _connection.reset();
+
+        // This is just a guess, but is better than sending
+        // 'undefined'
+        _nc.notifyStatus(NetConnection_as::CALL_FAILED);
+    }
+    else if (_connection->eof()) {
+
+        if (_reply.size() > 8) {
+
+
+#ifdef GNASH_DEBUG_REMOTING
+            log_debug("hit eof");
+#endif
+            boost::uint16_t li;
+            const boost::uint8_t *b = _reply.data() + _reply_start;
+            const boost::uint8_t *end = _reply.data() + _reply.size();
+            
+            amf::Reader rd(b, end, getGlobal(_nc.owner()));
+
+            // parse header
+            b += 2; // skip version indicator and client id
+
+            // NOTE: this looks much like parsing of an OBJECT_AMF0
+            boost::int16_t si = amf::readNetworkShort(b);
+            b += 2; // number of headers
+            uint8_t headers_ok = 1;
+            if (si != 0) {
+
+#ifdef GNASH_DEBUG_REMOTING
+                log_debug("NetConnection::call(): amf headers "
+                        "section parsing");
+#endif
+                as_value tmp;
+                for (size_t i = si; i > 0; --i) {
+                    if(b + 2 > end) {
+                        headers_ok = 0;
+                        break;
+                    }
+                    si = amf::readNetworkShort(b); b += 2; // name length
+                    if(b + si > end) {
+                        headers_ok = 0;
+                        break;
+                    }
+                    std::string headerName((char*)b, si); // end-b);
+#ifdef GNASH_DEBUG_REMOTING
+                    log_debug("Header name %s", headerName);
+#endif
+                    b += si;
+                    if ( b + 5 > end ) {
+                        headers_ok = 0;
+                        break;
+                    }
+                    b += 5; // skip past bool and length long
+                    if(!rd(tmp)) {
+                        headers_ok = 0;
+                        break;
+                    }
+#ifdef GNASH_DEBUG_REMOTING
+                    log_debug("Header value %s", tmp);
+#endif
+
+                    { // method call for each header
+                      // FIXME: it seems to me that the call should happen
+                        VM& vm = getVM(_nc.owner());
+                        string_table& st = vm.getStringTable();
+                        string_table::key key = st.find(headerName);
+#ifdef GNASH_DEBUG_REMOTING
+                        log_debug("Calling NetConnection.%s(%s)",
+                                headerName, tmp);
+#endif
+                        callMethod(&_nc.owner(), key, tmp);
+                    }
+                }
+            }
+
+            if(headers_ok == 1) {
+
+                si = amf::readNetworkShort(b); b += 2; // number of replies
+
+                // TODO consider counting number of replies we
+                // actually parse and doing something if it
+                // doesn't match this value (does it matter?
+                if(si > 0) {
+                    // parse replies until we get a parse error or
+                    // we reach the end of the buffer
+                    while(b < end) {
+                        if(b + 2 > end) break;
+                        si = amf::readNetworkShort(b);
+                        b += 2; // _reply length
+                        if(si < 4) { // shorted valid response is '/1/a'
+                            log_error("NetConnection::call(): "
+                                    "_reply message name too short");
+                            break;
+                        }
+                        if (b + si > end) break;
+
+                        // Reply message is: '/id/methodName'
+
+                        int ns = 1; // next slash position
+                        while (ns < si - 1 && *(b + ns) != '/') ++ns;
+                        if (ns >= si - 1) {
+                            std::string msg(
+                                    reinterpret_cast<const char*>(b), si);
+                            log_error("NetConnection::call(): invalid "
+                                    "_reply message name (%s)", msg);
+                            break;
+                        }
+
+                        std::string id(reinterpret_cast<const char*>(b + 1),
+                                ns - 1);
+                        size_t callbackID = 0;
+                        try {
+                            callbackID = boost::lexical_cast<size_t>(id);
+                        }
+                        catch (const boost::bad_lexical_cast&) {
+                            log_error(_("Callback ID was not a number"));
+                            break;
+                        }
+
+                        std::string methodName(
+                                reinterpret_cast<const char*>(b+ns+1),
+                                si-ns-1);
+
+                        b += si;
+
+                        // parse past unused string in header
+                        if (b + 2 > end) break;
+                        si = amf::readNetworkShort(b);
+                        b += 2; // _reply length
+                        if (b + si > end) break;
+                        b += si;
+
+                        // this field is supposed to hold the
+                        // total number of bytes in the rest of
+                        // this particular _reply value, but
+                        // openstreetmap.org (which works great
+                        // in the adobe player) sends
+                        // 0xffffffff. So we just ignore it
+                        if (b + 4 > end) break;
+                        li = amf::readNetworkLong(b);
+                        b += 4; // _reply length
+
+                        // this updates b to point to the next unparsed byte
+                        as_value _replyval;
+                        if (!rd(_replyval)) {
+                            log_error("parse amf failed");
+                            // this will happen if we get
+                            // bogus data, or if the data runs
+                            // off the end of the buffer
+                            // provided, or if we get data we
+                            // don't know how to parse
+                            break;
+                        }
+
+                        // update variable to show how much we've parsed
+                        _reply_start = b - _reply.data();
+
+                        // if actionscript specified a callback object,
+                        // call it
+                        as_object* callback = popCallback(callbackID);
+                        if (callback) {
+
+                            string_table::key methodKey;
+                            if ( methodName == "onResult" ) {
+                                methodKey = NSV::PROP_ON_RESULT;
+                            }
+                            else if (methodName == "onStatus") {
+                                methodKey = NSV::PROP_ON_STATUS;
+                            }
+                            else {
+                                // NOTE: the pp is known to actually
+                                // invoke the custom method, but with 7
+                                // undefined arguments (?)
+                                log_error("Unsupported HTTP Remoting "
+                                        "response callback: '%s' "
+                                        "(size %d)", methodName,
+                                        methodName.size());
+                                continue;
+                            }
+
+#ifdef GNASH_DEBUG_REMOTING
+                            log_debug("calling onResult callback");
+#endif
+                            // FIXME check if above line can fail and we
+                            // have to react
+                            callMethod(callback, methodKey, _replyval);
+#ifdef GNASH_DEBUG_REMOTING
+                            log_debug("callback called");
+#endif
+                        } else {
+                            log_error("Unknown HTTP Remoting response identifier '%s'", id);
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            log_error("Response from remoting service < 8 bytes");
+        }
+
+#ifdef GNASH_DEBUG_REMOTING
+        log_debug("deleting connection");
+#endif
+        _connection.reset();
+        _reply.resize(0);
+        _reply_start = 0;
     }
 
     return true;
