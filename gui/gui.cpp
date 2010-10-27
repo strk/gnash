@@ -813,7 +813,7 @@ Gui::display(movie_root* m)
 				corners[3].x = xmin;
 				corners[3].y = ymax;
 				SWFMatrix no_transform;
-				_renderer->draw_poly(corners, 4,
+				_renderer->drawPoly(corners, 4,
 					rgba(0,0,0,0), rgba(255,0,0,255), no_transform, false);
 					
 			}
