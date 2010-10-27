@@ -76,7 +76,7 @@ public:
     void drawLine(const std::vector<point>& coords, const rgba& color,
                           const SWFMatrix& mat);
 
-    void draw_poly(const point* corners, size_t corner_count,
+    void drawPoly(const point* corners, size_t corner_count,
                            const rgba& fill, const rgba& outline,
                            const SWFMatrix& mat, bool masked);
 

@@ -701,7 +701,7 @@ Renderer_cairo::drawLine(const std::vector<point>& coords,
 }
   
 void
-Renderer_cairo::draw_poly(const point* corners, size_t corner_count, 
+Renderer_cairo::drawPoly(const point* corners, size_t corner_count, 
                                const rgba& fill, const rgba& outline,
                                const SWFMatrix& mat, bool /*masked*/)
 {
