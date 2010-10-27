@@ -330,7 +330,7 @@ TextField::display(Renderer& renderer, const Transform& base)
     log_debug("rendering a Pol composed by corners %s", _bounds);
 #endif
 
-        renderer.draw_poly(&coords.front(), 4, backgroundColor, 
+        renderer.drawPoly(&coords.front(), 4, backgroundColor, 
                 borderColor, xform.matrix, true);
         
     }
