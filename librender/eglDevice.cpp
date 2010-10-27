@@ -20,6 +20,7 @@
 #include "gnashconfig.h"
 #endif
 
+#include <iostream>
 #include <cerrno>
 #include <exception>
 
@@ -28,6 +29,11 @@
 #include "Renderer.h"
 #include "Renderer_ovg.h"
 #include "GnashException.h"
+#ifdef HAVE_GTK2
+#include "gdk/gdkx.h"
+#include "X11/Xlib.h"
+#include "X11/Xutil.h"
+#endif
 
 #ifdef HAVE_EGL_EGL_H
 # include <EGL/egl.h>
@@ -48,8 +54,11 @@ static const EGLint attrib32_list[] = {
     EGL_GREEN_SIZE,     8,
     EGL_BLUE_SIZE,      8,
     EGL_ALPHA_SIZE,     0,
-#ifdef RENDERER_GLES    
+#ifdef RENDERER_GLES1    
     EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
+#endif
+#ifdef RENDERER_GLES2
+    EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
 #endif
 #ifdef RENDERER_OPENVG
     EGL_RENDERABLE_TYPE, EGL_OPENVG_BIT,
@@ -65,8 +74,11 @@ static EGLint const attrib16_list[] = {
     EGL_GREEN_SIZE,     6,
     EGL_BLUE_SIZE,      5,
     EGL_ALPHA_SIZE,     0,
-#ifdef RENDERER_GLES    
+#ifdef RENDERER_GLES1
     EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
+#endif
+#ifdef RENDERER_GLES2
+    EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
 #endif
 #ifdef RENDERER_OPENVG
     EGL_RENDERABLE_TYPE, EGL_OPENVG_BIT,
@@ -136,6 +148,9 @@ const EGLint window_attrib_list[] = {
 // surfaces may, for the same reason, have restricted capabilities and
 // performance relative to window and pbuffer surfaces.
 
+// The debug log used by all the gnash libraries.
+static LogFile& dbglogfile = LogFile::getDefaultInstance();
+
 EGLDevice::EGLDevice()
     : _eglConfig(0),
       _eglContext(EGL_NO_CONTEXT),
@@ -154,11 +169,6 @@ EGLDevice::~EGLDevice()
 {
     GNASH_REPORT_FUNCTION;
 
-#ifdef ENABLE_EGL_OFFSCREEN
-    if (_offscreenbuf) {
-        gdk_image_destroy(_offscreenbuf);
-    }
-#endif    
     if (_eglDisplay != EGL_NO_DISPLAY) {  
         eglMakeCurrent(_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
         
@@ -173,53 +183,83 @@ EGLDevice::~EGLDevice()
         
         eglTerminate(_eglDisplay);
     }
+    
+#ifdef HAVE_GTK2
+    gdk_exit (0);
+#endif
 }
 
 bool
-EGLDevice::init(int /*argc*/, char ** /*argv*/[])
+EGLDevice::init(EGLDevice::rtype_t rtype)
 {
     GNASH_REPORT_FUNCTION;
-    
+
+    // // FIXME: for now, always run verbose till this supports command line args
+//    dbglogfile.setVerbosity();
+
+#ifdef HAVE_GTK2
+    // As gdk_init() wants the command line arguments, we have to create
+    // fake ones, as we don't care about the X11 options at this point.
+    int argc = 0;
+    char **argv = 0;
+    gdk_init(&argc, &argv);
+#endif
+
     EGLint major, minor;
     // see egl_config.c for a list of supported configs, this looks for
     // a 5650 (rgba) config, supporting OpenGL ES and windowed surfaces
 
     // step 1 - get an EGL display
-    
+
     // This can be called multiple times, and always returns the same display
-    _eglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY); // FIXME: gdk_display ?
+    _eglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if (EGL_NO_DISPLAY == _eglDisplay) {
         log_error( "eglGetDisplay() failed (error 0x%x)", eglGetError() );
         return false;
     }
-
+    
     // This can be called multiple times safely
     if (EGL_FALSE == eglInitialize(_eglDisplay, &major, &minor)) {
         log_error( "eglInitialize() failed (error %s)",
                    getErrorString(eglGetError()));
         return false;
     }
-    // log_debug("EGL_CLIENT_APIS = %s", eglQueryString(_eglDisplay, EGL_CLIENT_APIS));
-    // log_debug("EGL_EXTENSIONS = %s",  eglQueryString(_eglDisplay, EGL_EXTENSIONS));
+    log_debug("EGL_CLIENT_APIS = %s", eglQueryString(_eglDisplay, EGL_CLIENT_APIS));
+    log_debug("EGL_EXTENSIONS = %s",  eglQueryString(_eglDisplay, EGL_EXTENSIONS));
     log_debug("EGL_VERSION = %s, EGL_VENDOR = %s",
               eglQueryString(_eglDisplay, EGL_VERSION),
               eglQueryString(_eglDisplay, EGL_VENDOR));
 
     // step2 - bind to the wanted client API
-#ifdef  RENDERER_GLES
-    if(EGL_FALSE == eglBindAPI(EGL_OPENGL_ES_API)) {
-        log_error("eglBindAPI() failed to retrive the number of configs (error %s)",
-                  getErrorString(eglGetError()));
-        return false;
-    }
-#endif
-#ifdef RENDERER_OPENVG
-    if(EGL_FALSE == eglBindAPI(EGL_OPENVG_API)) {
-        log_error("eglBindAPI() failed to retrive the number of configs (error %s)",
-                  getErrorString(eglGetError()));
-        return false;
-    }
-#endif
+    switch (rtype) {
+      case OPENVG:
+          log_debug("Initializing EGL for OpenVG");
+          if(EGL_FALSE == eglBindAPI(EGL_OPENVG_API)) {
+              log_error("eglBindAPI() failed to retrive the number of configs (error %s)",
+                        getErrorString(eglGetError()));
+              return false;
+          }
+          break;
+      case OPENGLES1:
+          log_debug("Initializing EGL for OpenGLES1");
+          if(EGL_FALSE == eglBindAPI(EGL_OPENGL_ES_API)) {
+              log_error("eglBindAPI() failed to retrive the number of configs (error %s)",
+                        getErrorString(eglGetError()));
+              return false;
+          }
+          break;
+      case OPENGLES2:
+          log_debug("Initializing EGL for OpenGLES2");
+          if(EGL_FALSE == eglBindAPI(EGL_OPENGL_ES_API)) {
+              log_error("eglBindAPI() failed to retrive the number of configs (error %s)",
+                        getErrorString(eglGetError()));
+              return false;
+          }
+          break;
+      default:
+          log_error("No EGL device type specified!");
+          return false;
+    }    
 
 //    queryEGLConfig(_eglDisplay);
     
@@ -254,19 +294,22 @@ EGLDevice::init(int /*argc*/, char ** /*argv*/[])
         return false;
     }
 
-#if 0
+#ifdef HAVE_GTK2
+    Display *X11Display = XOpenDisplay(0);
     XVisualInfo *visInfo, visTemplate;
     int num_visuals;
     // The X window visual must match the EGL config
    visTemplate.visualid = vid;
-   visInfo = XGetVisualInfo(gdk_display, VisualIDMask, &visTemplate, &num_visuals);
+   visInfo = XGetVisualInfo(X11Display, VisualIDMask, &visTemplate, &num_visuals);
    if (!visInfo) {
        log_error("couldn't get X visual");
        return false;
    }
    XFree(visInfo);
 #endif
-   
+    
+    // printEGLConfig(_eglConfig);
+    
    if (!checkEGLConfig(_eglConfig)) {
        log_error("EGL configuration doesn't match!");
 //       return false;
@@ -274,24 +317,33 @@ EGLDevice::init(int /*argc*/, char ** /*argv*/[])
        //printEGLConfig(_eglConfig);
    }
 
-#if 0
+#if HAVE_GTK2
+   _nativeWindow = gdk_x11_get_default_root_xwindow();
+#endif
+
     // step4 - create a window surface
-    _nativeWindow = gdk_x11_get_default_root_xwindow();
-#endif    
-
-#ifdef  RENDERER_GLES
-    _eglSurface = eglCreateWindowSurface(_eglDisplay, &_eglConfig, _nativeWindow, NULL);
-#endif
-#ifdef  RENDERER_OPENVG
-    if (_nativeWindow) {
-        _eglSurface = eglCreateWindowSurface(_eglDisplay, _eglConfig,
-                                             _nativeWindow, 0); // was window_attrib_list
-    } else {
-        log_error("No native window!");
-        return false;
+    switch (rtype) {
+      case OPENVG:
+          log_debug("Initializing EGL Surface for OpenVG");
+          if (_nativeWindow) {
+              _eglSurface = eglCreateWindowSurface(_eglDisplay, _eglConfig,
+                                                   _nativeWindow, 0); // was window_attrib_list
+          } else {
+              log_error("No native window!");
+              return false;
+          }
+          break;
+      case OPENGLES1:
+      case OPENGLES2:
+          log_debug("Initializing EGL Surface for OpenGLES");
+          _eglSurface = eglCreateWindowSurface(_eglDisplay, &_eglConfig, _nativeWindow, NULL);
+          break;
+      default:
+          log_error("No EGL device type specified!");
+          return false;
     }
-#endif
-
+    
+    
     if (EGL_NO_SURFACE == _eglSurface) {
         log_error("eglCreateWindowSurface failed (error %s)", 
                   getErrorString(eglGetError()));
@@ -318,13 +370,13 @@ EGLDevice::init(int /*argc*/, char ** /*argv*/[])
     }       // begin user code
 
 #if 0
-#if 1
+#if 0
     eglSwapInterval(_eglDisplay, 0);
 #else
     eglSwapBuffers(_eglDisplay, _eglSurface);
 #endif
 
-    log_debug("Gnash EGL Frame width %d height %d bpp %d \n", _width, _height, _bpp);
+//    log_debug("Gnash EGL Frame width %d height %d bpp %d \n", _width, _height, _bpp);
 #endif
     
     return true;
@@ -463,11 +515,13 @@ EGLDevice::queryEGLConfig(EGLDisplay display)
                    getErrorString(eglGetError()));
          return 0;
      }
+#if 0
      for (int i=0; i<max_num_config; i++ ) {
          log_debug("Config[%d] is:", i);
          printEGLConfig(configs[i]);
      }
-
+#endif
+     
      return max_num_config;
 }
 
@@ -479,27 +533,32 @@ EGLDevice::printEGLConfig(EGLConfig config)
     eglGetConfigAttrib(_eglDisplay, config, EGL_RED_SIZE, &red);
     eglGetConfigAttrib(_eglDisplay, config, EGL_GREEN_SIZE, &green);
     eglGetConfigAttrib(_eglDisplay, config, EGL_BLUE_SIZE, &blue);
-    log_debug("\tConfig has RED = %d, GREEN = %d, BLUE = %d", red, green, blue);
+    std::cerr << "\tConfig has RED = " << red << ", GREEN = " << green
+              << ", BLUE = " << blue  << std::endl;
     
     eglGetConfigAttrib(_eglDisplay, config, EGL_ALPHA_SIZE, &value);
-    log_debug("\tEGL_ALPHA_SIZE is %d", value);
+    std::cerr << "\tEGL_ALPHA_SIZE is " << value  << std::endl;
     eglGetConfigAttrib(_eglDisplay, config, EGL_STENCIL_SIZE, &value);
-    log_debug("\tEGL_STENCIL_SIZE is %d", value);
+    std::cerr << "\tEGL_STENCIL_SIZE is " << value  << std::endl;
     eglGetConfigAttrib(_eglDisplay, config, EGL_SAMPLES, &value);
-    log_debug("\tEGL_SAMPLES is %d", value);
+    std::cerr << "\tEGL_SAMPLES is " << value  << std::endl;
     eglGetConfigAttrib(_eglDisplay, config, EGL_DEPTH_SIZE, &value);
-    log_debug("\tEGL_DEPTH_SIZE is %d", value);
+    std::cerr << "\tEGL_DEPTH_SIZE is " << value  << std::endl;
     eglGetConfigAttrib(_eglDisplay, config, EGL_MAX_SWAP_INTERVAL, &value);
-    log_debug("\tEGL_MAX_SWAP_INTERVAL is %d", value);
+    std::cerr << "\tEGL_MAX_SWAP_INTERVAL is " << value << std::endl;
     eglGetConfigAttrib(_eglDisplay, config, EGL_MIN_SWAP_INTERVAL, &value);
-    log_debug("\tEGL_MIN_SWAP_INTERVAL is %d", value);
+    std::cerr << "\tEGL_MIN_SWAP_INTERVAL is " << value << std::endl;
     eglGetConfigAttrib(_eglDisplay, config, EGL_NATIVE_RENDERABLE, &value);
-    log_debug("\tEGL_NATIVE_RENDERABLE is %s", (value)? "true" : "false");
+    std::string val = (value)? "true" : "false";
+    std::cerr << "\tEGL_NATIVE_RENDERABLE is " << val << std::endl;
     eglGetConfigAttrib(_eglDisplay, config, EGL_SAMPLE_BUFFERS, &value);
-    log_debug("\tEGL_SAMPLE_BUFFERS is %d", value);
+    std::cerr << "\tEGL_SAMPLE_BUFFERS is " << value << std::endl;
     eglGetConfigAttrib(_eglDisplay, config, EGL_RENDERABLE_TYPE, &value);
     if (value > 0) {
         std::string str;
+        if (value & EGL_OPENGL_ES2_BIT) {
+            str += " OpenGL-ES 2.0";
+        }
         if (value & EGL_OPENGL_ES_BIT) {
             str += " OpenGL-ES 1.1";
         }
@@ -509,9 +568,9 @@ EGLDevice::printEGLConfig(EGLConfig config)
         if (value & EGL_OPENGL_BIT) {
             str += " OpenGL";
         }
-        log_debug("\tEGL_RENDERABLE_TYPE = %s", str);
+        std::cerr <<"\tEGL_RENDERABLE_TYPE = " << str << std::endl;
     } else {
-        log_debug("\tEGL_RENDERABLE_TYPE (default)");
+        std::cerr <<"\tEGL_RENDERABLE_TYPE (default)" << std::endl;
     }
     eglGetConfigAttrib(_eglDisplay, config, EGL_SURFACE_TYPE, &value);
     if (value > 0) {
@@ -525,9 +584,9 @@ EGLDevice::printEGLConfig(EGLConfig config)
         if (value & EGL_PBUFFER_BIT) {
             str += " Pbuffer";
         }
-        log_debug("\tEGL_SURFACE_TYPE = %s", str);
+        std::cerr <<"\tEGL_SURFACE_TYPE = " << str  << std::endl;
     } else {
-        log_debug("\tEGL_SURFACE_TYPE (default)");
+          std::cerr <<"\tEGL_SURFACE_TYPE (default)" << std::endl;
     }
 }
 

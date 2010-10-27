@@ -23,6 +23,10 @@
 
 #include <boost/scoped_array.hpp>
 
+#ifdef HAVE_GTK2
+#include "X11/Xlib.h"
+#include "X11/Xutil.h"
+#endif
 #ifdef HAVE_EGL_EGL_H
 # include <EGL/egl.h>
 #else
@@ -37,11 +41,14 @@ namespace renderer {
 class EGLDevice
 {
   public:
+    // the list of supported renders that use EGL
+    typedef enum {OPENVG, OPENGLES1, OPENGLES2} rtype_t;
+    
     EGLDevice();
     ~EGLDevice();
 
     // Initialize EGL
-    bool init(int argc, char **argv[]);
+    bool init(rtype_t);
 
     // Utility methods not in the base class
     /// Return a string with the error code as text, instead of a numeric value
@@ -49,11 +56,15 @@ class EGLDevice
     /// Check the requested EGl configuration against the current one
     bool checkEGLConfig(EGLConfig config);
     /// Query the system for all supported configs
+    int queryEGLConfig() { return queryEGLConfig(_eglDisplay); };
     int queryEGLConfig(EGLDisplay display);
+    void printEGLConfig() { return printEGLConfig(_eglConfig); };
     void printEGLConfig(EGLConfig config);
+    void printEGLContext() { return printEGLContext(_eglContext); };
     void printEGLContext(EGLContext context);
+    void printEGLSurface() { return printEGLSurface(_eglSurface); };
     void printEGLSurface(EGLSurface surface);
-
+    
   private:
     EGLConfig           _eglConfig;
     EGLContext          _eglContext;
