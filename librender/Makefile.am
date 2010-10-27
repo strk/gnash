@@ -40,6 +40,7 @@ AM_CPPFLAGS = -I.. \
 	$(SDL_CFLAGS) \
 	$(PANGO_CFLAGS) \
 	$(GLIB_CFLAGS) \
+	$(GTK2_CFLAGS) \
 	$(ATK_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
 	$(PNG_CFLAGS) \
@@ -64,12 +65,18 @@ noinst_HEADERS = \
 	Renderer_agg_style.h \
 	Renderer_cairo.h \
 	Renderer_ogl.h \
+	eglDevice.h \
         PathParser.h
 
 pkglib_LTLIBRARIES = libgnashrender.la
 libgnashrender_la_LIBADD = $(LIBVA_LIBS) $(LIBVA_X11_LIBS) $(LIBVA_GLX_LIBS)
 libgnashrender_la_SOURCES = PathParser.cpp
 libgnashrender_la_LDFLAGS =  -release $(VERSION) 
+
+if BUILD_EGL_DEVICE
+libgnashrender_la_SOURCES += eglDevice.cpp
+libgnashrender_la_LIBADD += $(EGL_LIBS) $(GTK2_LIBS)
+endif
 
 if BUILD_OGL_RENDERER
 libgnashrender_la_SOURCES += Renderer_ogl.cpp
@@ -113,11 +120,19 @@ if ENABLE_PCH
 AM_CXXFLAGS = $(PCH_FLAGS)
 endif
 
-bin_PROGRAMS = testr
-testr_SOURCES = testr.cpp
-testr_CPPFLAGS = $(AM_CPPFLAGS) $(GTK2_CFLAGS)
-testr_LDADD = ../libbase/libgnashbase.la \
+bin_PROGRAMS =  test_egl testr
+# this tests the low level EGL interface, used by OpenVG, OpenGLES1,
+# and OpenGLES2.
+test_egl_SOURCES = test_egl.cpp
+test_egl_CPPFLAGS = $(AM_CPPFLAGS)
+test_egl_LDADD = ../libbase/libgnashbase.la \
 	libgnashrender.la \
 	$(GNASH_LIBS) \
 	$(GTK2_LIBS)
+
+testr_SOURCES = testr.cpp
+testr_CPPFLAGS = $(AM_CPPFLAGS) # -DUSE_TESTSUITE
+testr_LDADD = ../libbase/libgnashbase.la \
+	libgnashrender.la \
+	$(GNASH_LIBS)
 
