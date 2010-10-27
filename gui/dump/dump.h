@@ -93,8 +93,11 @@ private:
     unsigned int _bpp;                  /* bits per pixel */
     std::string _pixelformat;              /* colorspace name (eg, "RGB24") */
 
-    std::string _fileOutput;                 /* path to output file */
-    std::ofstream _fileStream;        /* stream for output file */
+    std::string _fileOutput;           /* path to video output file */
+    unsigned int _fileOutputFPS;       /* requested FPS of video output file */
+    unsigned int _fileOutputAdvance;   /* ms of time between video dump frms */
+    unsigned long _lastVideoFrameDump; /* time of last video frame dump */
+    std::ofstream _fileStream;         /* stream for output file */
     void init_dumpfile();               /* convenience method to create dump file */
 
     boost::shared_ptr<sound::sound_handler> _soundHandler;
@@ -102,6 +105,8 @@ private:
     ManualClock _manualClock;
 
     unsigned long _sleepUS; // micro-seconds sleep between iterations
+
+    unsigned int _videoDumpFPS;
 
 
 };

@@ -15,3 +15,12 @@ gnash --help are:
 
  -D <filename>
    Name of a file to dump video frames to.
+   By default the frequency of video frames dump is driven by
+   the heart-beat (defaults to 10ms per beat [100FPS],
+   you can change using the -d switch).
+   You can override video output FPS by appending a @<value> to
+   the filename. This will be independent to heart-beating, which
+   would be always best to be a submultiple of SWF and video output
+   FPSs. Example:
+
+    dump-gui -D out.raw@12 input.swf
