@@ -73,9 +73,15 @@ public:
     void close();
 
     /// Process the connect(uri) method.
-    void connect(const std::string& uri);
+    //
+    /// Return false if the connection is disallowed or invalid,
+    /// true if a connection will be attempted.
+    bool connect(const std::string& uri);
 
     /// Carry out the connect(null) method.
+    //
+    /// There is no return because this attempt is always considered
+    /// be be successful.
     void connect();
 
     void setConnected() {

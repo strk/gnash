@@ -340,9 +340,9 @@ HTTPRemotingHandler::advance()
         // reset connection before calling the callback
         _connection.reset();
 
-        // This is just a guess, but is better than sending
-        // 'undefined'
-        _nc.notifyStatus(NetConnection_as::CALL_FAILED);
+        // If the connection fails, it is manually verified
+        // that the pp calls onStatus with 1 undefined argument.
+        callMethod(&_nc.owner(), NSV::PROP_ON_STATUS, as_value());
         return false;
     }
     
@@ -929,17 +929,18 @@ NetConnection_as::connect()
 }
 
 
-void
+bool
 NetConnection_as::connect(const std::string& uri)
 {
-    // Close any current connections. (why?) Because that's what happens.
+    // Close any current connections. 
     close();
+
+    assert(!_isConnected);
 
     // TODO: check for other kind of invalidities here...
     if (uri.empty()) {
-        _isConnected = false;
         notifyStatus(CONNECT_FAILED);
-        return;
+        return false;
     }
     
     const RunResources& r = getRunResources(owner());
@@ -948,7 +949,7 @@ NetConnection_as::connect(const std::string& uri)
     if (!r.streamProvider().allow(url)) {
         log_security(_("Gnash is not allowed to connect " "to %s"), url);
         notifyStatus(CONNECT_FAILED);
-        return;
+        return false;
     }
 
     // Attempt connection.
@@ -962,7 +963,7 @@ NetConnection_as::connect(const std::string& uri)
         catch (const GnashException&) {
             // This happens if the connect cannot even be attempted.
             notifyStatus(CONNECT_FAILED);
-            return;
+            return false;
         }
         startAdvanceTimer();
     }
@@ -970,24 +971,15 @@ NetConnection_as::connect(const std::string& uri)
         log_unimpl("NetConnection.connect(%s): unsupported connection "
                  "protocol", url);
         notifyStatus(CONNECT_FAILED);
-        return;
+        return false;
     }
     else {
         log_error("NetConnection.connect(%s): unknown connection "
              "protocol", url);
         notifyStatus(CONNECT_FAILED);
-        return;
+        return false;
     }
-    
-    // Under certain circumstances, an an immediate failure notification
-    // happens. These are:
-    // a) sandbox restriction
-    // b) invalid URL? NetConnection.connect(5) fails straight away, but
-    //    could be either because a URL has to be absolute, perhaps including
-    //    a protocol, or because the load is attempted from the filesystem
-    //    and fails immediately.
-    // TODO: modify validateURL for doing this.
-    _isConnected = false;
+    return true;
 }
 
 
@@ -1242,17 +1234,16 @@ netconnection_connect(const fn_call& fn)
     // Check first arg for validity 
     if (uri.is_null() || (getSWFVersion(fn) > 6 && uri.is_undefined())) {
         ptr->connect();
-    }
-    else {
-        if (fn.nargs > 1) {
-            std::stringstream ss; fn.dump_args(ss);
-            log_unimpl("NetConnection.connect(%s): args after the first are "
-                    "not supported", ss.str());
-        }
-        ptr->connect(uriStr);
+        return as_value(true);
     }
 
-    return as_value(ptr->isConnected());
+    if (fn.nargs > 1) {
+        std::stringstream ss; fn.dump_args(ss);
+        log_unimpl("NetConnection.connect(%s): args after the first are "
+                "not supported", ss.str());
+    }
+
+    return as_value(ptr->connect(uriStr));
 
 }
 
