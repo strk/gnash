@@ -2391,6 +2391,7 @@ if test x"${build_gles1}" = xyes -o x"${build_gles2}" = xyes; then
   GNASH_PKG_FIND(EGL, [EGL/egl.h], [EGL library], eglGetDisplay)
   GNASH_PATH_GLES
 fi
+AM_CONDITIONAL(BUILD_EGL_DEVICE, [test x"${build_gles1}" = xyes -o  x"${build_gles2}" = xyes -o  x"${build_ovg}" = xyes])
 
 if test x"${build_ovg}" = xyes; then
   GNASH_PKG_FIND(EGL, [EGL/egl.h], [EGL library], eglGetDisplay)
