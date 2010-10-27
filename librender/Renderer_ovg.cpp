@@ -419,6 +419,8 @@ void
 Renderer_ovg::drawLine(const std::vector<point>& coords, const rgba& fill,
                        const SWFMatrix& mat)
 {
+    GNASH_REPORT_FUNCTION;
+    
     VGubyte     gseg[MAX_SEG];
     VGfloat     gdata[MAX_SEG*3*2];
     int         scount = 0;
@@ -1492,7 +1494,8 @@ Renderer_ovg::initTestBuffer(unsigned int width, unsigned int height)
 {
     int size = width * height; // * getBytesPerPixel();
     
-    _testBuffer = static_cast<unsigned char *>(realloc(_testBuffer, size));
+    // _testBuffer = static_cast<unsigned char *>(realloc(_testBuffer, size));
+    _testBuffer = new unsigned char[size];
     memset(_testBuffer, 0, size);
     printf("\tRenderer Test memory at: %p\n", _testBuffer);
     
@@ -1538,122 +1541,6 @@ Renderer_ovg::getBitsPerPixel()
     return 0;
 }
 
-#if 0
-void
-Renderer_ovg::printVGHardware()
-{
-}
-
-void
-Renderer_ovg::printVGPath()
-{
-}
-
-void
-Renderer_ovg::set_scale(float xscale, float yscale)
-{
-}
-
-void
-Renderer_ovg::set_translation(float, float)
-{  
-}
-
-CachedBitmap *
-Renderer_ovg::createCachedBitmap(std::auto_ptr<gnash::image::GnashImage>)
-{
-}
-
-void
-Renderer_ovg::drawLine(const std::vector<point>& coords, const rgba& color,
-                            const SWFMatrix& mat)
-{
-}
-
-void
-Renderer_ovg::draw_poly(const point* corners, size_t corner_count,
-                           const rgba& fill, const rgba& outline,
-                           const SWFMatrix& mat, bool masked)
-{
-}    
-
-void
-Renderer_ovg::drawGlyph(const SWF::ShapeRecord& rec, const rgba& color,
-                   const SWFMatrix& mat)
-{
-}
-
-void
-Renderer_ovg::drawVideoFrame(gnash::image::GnashImage*, gnash::Transform const&,
-                                  gnash::SWFRect const*, bool)
-{
-}
-
-void
-Renderer_ovg::drawShape(gnash::SWF::ShapeRecord const&, gnash::Transform const&)
-{
-}
-
-void
-Renderer_ovg::renderToImage(boost::shared_ptr<IOChannel> io,FileType type)
-{
-}
-void
-Renderer_ovg::set_invalidated_regions(const InvalidatedRanges& ranges)
-{
-}
-void
-Renderer_ovg::begin_submit_mask()
-{
-}
-void
-Renderer_ovg::end_submit_mask()
-{
-}
-void
-Renderer_ovg::disable_mask()
-{
-}
-gnash::geometry::Range2d<int>
-Renderer_ovg::world_to_pixel(const gnash::SWFRect&)
-{
-}
-gnash::point
-Renderer_ovg::pixel_to_world(int, int)
-{
-}
-void
-Renderer_ovg::end_display()
-{
-}
-
-void
-Renderer_ovg::begin_display(gnash::rgba const&, int, int, float,
-                                 float, float, float)
-{
-}
-
-Renderer *
-Renderer_ovg::startInternalRender(gnash::image::GnashImage&)
-{
-}
-
-void
-Renderer_ovg::endInternalRender()
-{
-}
-
-unsigned int
-Renderer_ovg::getBitsPerPixel()
-{
-}
-
-bool
-Renderer_ovg::getPixel(gnash::rgba&, int, int)
-{
-}
-
-#endif
 
 } // namespace gnash::renderer::gles1
 } // namespace gnash::renderer
