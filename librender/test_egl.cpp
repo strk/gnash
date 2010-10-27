@@ -41,27 +41,70 @@
 
 TestState runtest;
 
+using namespace gnash;
 using namespace std;
+using namespace renderer;
 
-namespace gnash {
-
-namespace renderer {
+void test_egl(EGLDevice &egl, EGLDevice::rtype_t);
 
 // The debug log used by all the gnash libraries.
 static LogFile& dbglogfile = LogFile::getDefaultInstance();
 
+const char *estrs[] = {
+    "OpenVG",
+    "OpenGLES1",
+    "OpenGLES2"
+};
+    
 int
 main(int argc, char *argv[])
 {
     // FIXME: for now, always run verbose till this supports command line args
     dbglogfile.setVerbosity();
     
-    EGLDevice egl;
-    egl.init(argc, &argv);
+    EGLDevice egl1, egl2, egl3;
+
+#ifdef RENDERER_OPENVG
+    test_egl(egl1, EGLDevice::OPENVG);
+    egl1.printEGLConfig();
+#endif
+    
+#ifdef RENDERER_GLES1
+    test_egl(egl2, EGLDevice::OPENGLES1);
+//    egl2.printEGLConfig();
+#endif
+    
+#ifdef RENDERER_GLES2
+    test_egl(egl3, EGLDevice::OPENGLES2);
+//    egl3.printEGLConfig();
+#endif
 }
 
-} // namespace renderer
-} // namespace gnash
+void
+test_egl(EGLDevice &egl, EGLDevice::rtype_t rtype)
+{
+    cout << "Testing " << estrs[rtype] << endl;
+
+    if (egl.init(rtype)) {
+        runtest.pass("EGLDevice::init()");
+    } else {
+        runtest.fail("EGLDevice::init()");
+    }
+
+    string result = "EGL_BAD_CONFIG";
+    if (egl.getErrorString(EGL_BAD_CONFIG) == result) {
+        runtest.pass("EGLDevice::getErrorString()");
+    } else {
+        runtest.fail("EGLDevice::getErrorString()");
+    }
+
+    if (egl.queryEGLConfig()) {
+        runtest.pass("EGLDevice::queryEGLConfig()");
+    } else {
+        runtest.fail("EGLDevice::queryEGLConfig()");
+    }
+    
+}
 
 // Local Variables:
 // mode: C++
