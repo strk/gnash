@@ -54,6 +54,7 @@ static const EGLint attrib32_list[] = {
     EGL_GREEN_SIZE,     8,
     EGL_BLUE_SIZE,      8,
     EGL_ALPHA_SIZE,     0,
+    EGL_DEPTH_SIZE,     24,
 #ifdef RENDERER_GLES1    
     EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
 #endif
@@ -62,7 +63,6 @@ static const EGLint attrib32_list[] = {
 #endif
 #ifdef RENDERER_OPENVG
     EGL_RENDERABLE_TYPE, EGL_OPENVG_BIT,
-    EGL_DEPTH_SIZE,     24,
     EGL_STENCIL_SIZE,   8,
 #endif
     EGL_SURFACE_TYPE,   EGL_WINDOW_BIT,
@@ -309,66 +309,54 @@ EGLDevice::init(EGLDevice::rtype_t rtype)
 #endif
     
     // printEGLConfig(_eglConfig);
-    
+#if 0
    if (!checkEGLConfig(_eglConfig)) {
        log_error("EGL configuration doesn't match!");
 //       return false;
    } else {
        //printEGLConfig(_eglConfig);
    }
-
+#endif
+   
 #if HAVE_GTK2
    _nativeWindow = gdk_x11_get_default_root_xwindow();
 #endif
-
-    // step4 - create a window surface
-    switch (rtype) {
-      case OPENVG:
-          log_debug("Initializing EGL Surface for OpenVG");
-          if (_nativeWindow) {
-              _eglSurface = eglCreateWindowSurface(_eglDisplay, _eglConfig,
-                                                   _nativeWindow, 0); // was window_attrib_list
-          } else {
-              log_error("No native window!");
-              return false;
-          }
-          break;
-      case OPENGLES1:
-      case OPENGLES2:
-          log_debug("Initializing EGL Surface for OpenGLES");
-          _eglSurface = eglCreateWindowSurface(_eglDisplay, &_eglConfig, _nativeWindow, NULL);
-          break;
-      default:
-          log_error("No EGL device type specified!");
-          return false;
-    }
+   
+   // step4 - create a window surface
+   log_debug("Initializing EGL Surface");
+   if (_nativeWindow) {
+       _eglSurface = eglCreateWindowSurface(_eglDisplay, _eglConfig,
+                                            _nativeWindow, 0); // was window_attrib_list
+   } else {
+       log_error("No native window!");
+       return false;
+   }
+   
+   if (EGL_NO_SURFACE == _eglSurface) {
+       log_error("eglCreateWindowSurface failed (error %s)", 
+                 getErrorString(eglGetError()));
+       return false;
+   } else {
+       //printEGLSurface(_eglSurface);
+   }
+   
+   // step5 - create a context
+   _eglContext = eglCreateContext(_eglDisplay, _eglConfig, EGL_NO_CONTEXT, NULL);
+   if (EGL_NO_CONTEXT == _eglContext) {
+       log_error("eglCreateContext failed (error %s)",
+                 getErrorString(eglGetError()));
+       return false;
+   } else {
+       printEGLContext(_eglContext);
+   }
     
-    
-    if (EGL_NO_SURFACE == _eglSurface) {
-        log_error("eglCreateWindowSurface failed (error %s)", 
-                  getErrorString(eglGetError()));
-        return false;
-    } else {
-        //printEGLSurface(_eglSurface);
-    }
-
-    // step5 - create a context
-    _eglContext = eglCreateContext(_eglDisplay, _eglConfig, EGL_NO_CONTEXT, NULL);
-    if (EGL_NO_CONTEXT == _eglContext) {
-        log_error("eglCreateContext failed (error %s)",
-                   getErrorString(eglGetError()));
-        return false;
-    } else {
-        printEGLContext(_eglContext);
-    }
-    
-    // step6 - make the context and surface current
-    if (EGL_FALSE == eglMakeCurrent(_eglDisplay, _eglSurface, _eglSurface, _eglContext)) {
-        log_error("eglMakeCurrent failed (error %s)",
-                  getErrorString(eglGetError()));
-        return false;
-    }       // begin user code
-
+   // step6 - make the context and surface current
+   if (EGL_FALSE == eglMakeCurrent(_eglDisplay, _eglSurface, _eglSurface, _eglContext)) {
+       log_error("eglMakeCurrent failed (error %s)",
+                 getErrorString(eglGetError()));
+       return false;
+   }       // begin user code
+   
 #if 0
 #if 0
     eglSwapInterval(_eglDisplay, 0);
@@ -515,9 +503,11 @@ EGLDevice::queryEGLConfig(EGLDisplay display)
                    getErrorString(eglGetError()));
          return 0;
      }
+     
 #if 0
+     // This prints out all the configurations, so it can be quite large
      for (int i=0; i<max_num_config; i++ ) {
-         log_debug("Config[%d] is:", i);
+         std::cerr << "Config[" << i << "] is:" << i << std::endl;
          printEGLConfig(configs[i]);
      }
 #endif
