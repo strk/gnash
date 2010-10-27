@@ -839,8 +839,8 @@ public:
   /// This method *must* be called prior to any other method of the class!
   void init_buffer(unsigned char *mem, int size, int x, int y, int rowstride)
   {
-        assert(x > 0);
-        assert(y > 0);
+      assert(x > 0);
+      assert(y > 0);
 
     xres    = x;
     yres    = y;
@@ -1902,7 +1902,7 @@ public:
   } //draw_poly_impl
   
   
-  void draw_poly(const point* corners, size_t corner_count, const rgba& fill, 
+  void drawPoly(const point* corners, size_t corner_count, const rgba& fill, 
     const rgba& outline, const SWFMatrix& mat, bool masked) {
     
     if (masked && !_alphaMasks.empty()) {
