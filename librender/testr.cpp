@@ -32,7 +32,7 @@
 // FIXME: this should be a command line option
 #undef GTK_TEST_RENDER
 
-#ifdef GTK_TEST_RENDER
+#ifdef HAVE_GTK2
 # include <gtk/gtk.h>
 # include <gdk/gdk.h>
 #endif
@@ -80,6 +80,10 @@ void test_renderer(Renderer *renderer, const std::string &type);
 void test_geometry(Renderer *renderer, const std::string &type);
 void test_iterators(Renderer *renderer, const std::string &type);
 
+#ifdef HAVE_GTK2
+GtkWidget *create_GTK_window(int argc, char *argv[]);
+#endif
+
 // The debug log used by all the gnash libraries.
 static LogFile& dbglogfile = LogFile::getDefaultInstance();
 
@@ -90,7 +94,11 @@ main(int argc, char *argv[])
     dbglogfile.setVerbosity();
 
     const char *pixelformat = "RGB24";
-    
+
+#ifdef HAVE_GTK2
+    create_GTK_window(argc, argv);
+#endif
+
 #ifdef GTK_TEST_RENDER
     // FIXME: GTK specific!
     GtkWidget *drawing_area = 0;
@@ -175,7 +183,13 @@ main(int argc, char *argv[])
     } else {
         cerr << "ERROR: No OpenGL renderer to test!" << endl;
     }
-#endif    
+#endif
+    
+#ifdef HAVE_GTK2
+    gtk_main();
+    gtk_main_quit();
+    gtk_exit(0);
+#endif
 
 }
 
@@ -211,14 +225,12 @@ test_renderer(Renderer *renderer, const std::string &type)
         runtest.fail("getBitsPerPixel()");
     }
 
-#if 1
     // Initializes the renderer for off-screen rendering used by the testsuite.
     if (renderer->initTestBuffer(10, 10)) {
         runtest.pass("initTestBuffer()");
     } else {
         runtest.fail("initTestBuffer()");
     }
-#endif
     
     /// @coords an array of 16-bit signed integer coordinates. Even indices
     ///         (and 0) are x coordinates, while uneven ones are y coordinates.
@@ -244,12 +256,14 @@ test_renderer(Renderer *renderer, const std::string &type)
     // }
     runtest.unresolved("drawLine()");
 
-//    drawVideoFrame(image::GnashImage* frame, const Transform& xform, const SWFRect* bounds, bool smooth);
+    //drawVideoFrame(image::GnashImage* frame, const Transform& xform, const SWFRect* bounds, bool smooth);
+#if 0
     image::GnashImage *frame;
     const Transform xform;
     const SWFRect bounds;
     bool smooth;
-//    renderer->drawVideoFrame(frame, xform, bounds, smooth);
+    renderer->drawVideoFrame(frame, xform, bounds, smooth);
+#endif
     runtest.unresolved("drawVideoFrame()");
 
     point *corners = 0;
@@ -258,10 +272,11 @@ test_renderer(Renderer *renderer, const std::string &type)
     rgba outline(0, 0, 0, 255);;
     bool masked = true;
     renderer->drawPoly(corners, corner_count, fill, outline, mat, masked);
-    runtest.unresolved("draw_poly()");
+    runtest.unresolved("drawPoly()");
     
 //    SWF::ShapeRecord shape;
     // Transform xform;
+    
 //    renderer->drawShape(shape, xform);
     runtest.unresolved("drawShape()");
 
@@ -270,10 +285,12 @@ test_renderer(Renderer *renderer, const std::string &type)
     // SWFMatrix mat;
 //    renderer->drawGlyph(rec, color, mat);
     runtest.unresolved("drawGlyph()");
- 
+
+#if 0
     boost::shared_ptr<IOChannel> io;
     FileType ftype;
-//    renderer->renderToImage(io, ftype);
+    renderer->renderToImage(io, ftype);
+#endif
     runtest.unresolved("renderToImage()");
 
     CachedBitmap *bitmap = 0;
@@ -372,7 +389,7 @@ test_iterators(Renderer *renderer, const std::string &type)
     geometry::Point2d c(3, 4);
     Renderer::RenderImage image;
     image::GnashImage *frame = new image::ImageRGBA(10, 10);
-    gnash::GnashVaapiImage *foo = static_cast<gnash::GnashVaapiImage *>(frame);
+    // gnash::GnashVaapiImage *foo = static_cast<gnash::GnashVaapiImage *>(frame);
     // gnash::GnashVaapiImageProxy *bar = new gnash::GnashVaapiImageProxy(foo, a.x, a.y, c.x - a.x, c.y - a.y);
     std::auto_ptr<image::GnashImage> rgba(frame);
 //    image.reset(new gnash::GnashVaapiImageProxy(foo, a.x, a.y, c.x - a.x, c.y - a.y));
