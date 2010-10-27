@@ -26,6 +26,8 @@
 #include <VG/openvg.h>
 #include <VG/vgu.h>
 #include <VG/vgext.h>
+#include <vector>
+#include <boost/scoped_array.hpp>
 
 #include "Geometry.h"
 //#include "BitmapInfo.h"
@@ -33,7 +35,16 @@
 
 namespace gnash {
 
+class SWFCxForm;
+
+namespace renderer {
+
+namespace openvg {
+
 typedef std::vector<const Path*> PathRefs;
+typedef std::vector<Path> PathVec;
+typedef std::vector<geometry::Range2d<int> > ClipBounds;
+typedef std::vector<const Path*> PathPtrVec;
 
 struct eglVertex {
     eglVertex(float x, float y)
@@ -50,28 +61,166 @@ struct eglVertex {
     VGfloat _y;
 };
 
-typedef std::map<const Path*, VGPath > PathPointMap;
+// typedef std::map<const Path*, VGPath > PathPointMap;
 
-class Renderer_ovg_base : public Renderer
+class  DSOEXPORT Renderer_ovg: public Renderer
 {
 public:
+    std::string description() const { return "OpenVG"; }
+    Renderer_ovg();
+    ~Renderer_ovg();
+        
+    void init(float x, float y);
+    CachedBitmap *createCachedBitmap(std::auto_ptr<image::GnashImage> im);
 
-    Renderer_ovg_base() { }
+    void drawVideoFrame(gnash::image::GnashImage*, const gnash::Transform&,
+                        const gnash::SWFRect*, bool);
 
-    // virtual classes should have virtual destructors
-    virtual ~Renderer_ovg_base() {}
+    void world_to_pixel(int& x, int& y, float world_x, float world_y);
+    gnash::geometry::Range2d<int> world_to_pixel(const gnash::SWFRect& wb);
+    geometry::Range2d<int> world_to_pixel(const geometry::Range2d<float>& wb);
+    gnash::point pixel_to_world(int, int);
 
-    // these methods need to be accessed from outside:
-    virtual void init(float x, float y)=0;
+    // this is in Render
+    void begin_display(const gnash::rgba&, int, int, float,
+                                        float, float, float);
+    // This is from the patch
+    void begin_display(const rgba& bg_color, int viewport_x0,
+                       int viewport_y0, int viewport_width,
+                       int viewport_height, float x0, float x1,
+                       float y0, float y1);
+    void end_display();
+    void drawLine(const std::vector<point>& coords, const rgba& fill,
+                  const SWFMatrix& mat);
+    void drawVideoFrame(image::GnashImage* frame, const SWFMatrix *m,
+                   const SWFRect* bounds, bool smooth);
+    void drawPoly(const point* corners, size_t corner_count, 
+                  const rgba& fill, const rgba& outline,
+                  const SWFMatrix& mat, bool masked);
+    // this is in Render
+    void drawShape(const gnash::SWF::ShapeRecord&,
+                                    const gnash::Transform&);
+    // This is from the patch
+    void drawShape(const SWF::ShapeRecord& shape, const SWFCxForm& cx,
+                   const SWFMatrix& mat);
+    void drawGlyph(const SWF::ShapeRecord& rec, const rgba& c,
+                   const SWFMatrix& mat);
+
+    void set_antialiased(bool enable);
+    void begin_submit_mask();
+    void end_submit_mask();
+    void apply_mask();
+    void disable_mask();
+        
+    void set_scale(float xscale, float yscale);
+    void set_invalidated_regions(const InvalidatedRanges &ranges);
+
+    // These weren't in the patch
+    Renderer *startInternalRender(gnash::image::GnashImage&);
+    void endInternalRender();
+
+    unsigned int getBitsPerPixel();
+    bool initTestBuffer(unsigned width, unsigned height);
 
     // These methods are only for debugging and development
     void printVGParams();
     void printVGHardware();
     void printVGPath();
+    
+#if 0
+    // These are all required by thr Render class
+    void set_scale(float xscale, float yscale);
+    void set_translation(float xoff, float yoff);
+    CachedBitmap *createCachedBitmap(std::auto_ptr<image::GnashImage> im);
+
+    void drawLine(const std::vector<point>& coords, const rgba& color,
+                          const SWFMatrix& mat);
+
+    void draw_poly(const point* corners, size_t corner_count,
+                           const rgba& fill, const rgba& outline,
+                           const SWFMatrix& mat, bool masked);
+    void drawGlyph(const SWF::ShapeRecord& rec, const rgba& color,
+                   const SWFMatrix& mat);
+    void drawVideoFrame(gnash::image::GnashImage*, const gnash::Transform&,
+                        const gnash::SWFRect*, bool);
+    void drawShape(const gnash::SWF::ShapeRecord&,
+                                    const gnash::Transform&);
+
+    void renderToImage(boost::shared_ptr<IOChannel> io,FileType type);
+    void set_invalidated_regions(const InvalidatedRanges& ranges);
+    
+    void begin_submit_mask();
+    void end_submit_mask();
+    void disable_mask();
+
+    gnash::geometry::Range2d<int> world_to_pixel(const gnash::SWFRect&);
+    gnash::point pixel_to_world(int, int);
+    void begin_display(const gnash::rgba&, int, int, float,
+                                        float, float, float);
+    void end_display();
+    Renderer *startInternalRender(gnash::image::GnashImage&);
+    void endInternalRender();
+    unsigned int getBitsPerPixel();
+
+    bool getPixel(rgba& color_return, int x, int y);
+
+    bool initTestBuffer(unsigned width, unsigned height);
+#endif
+  private:
+    void draw_mask(const PathVec& path_vec);
+    void add_paths(const PathVec& path_vec);
+    Path reverse_path(const Path& cur_path);
+    const Path* find_connecting_path(const Path& to_connect,
+                                     std::list<const Path*> path_refs);
+    PathVec normalize_paths(const PathVec &paths);
+    /// Analyzes a set of paths to detect real presence of fills and/or outlines
+    /// TODO: This should be something the character tells us and should be 
+    /// cached. 
+    void analyze_paths(const PathVec &paths, bool& have_shape,
+                       bool& have_outline);
+    void apply_fill_style(const FillStyle& style, const SWFMatrix& /* mat */,
+                          const SWFCxForm& cx);
+    bool apply_line_style(const LineStyle& style, const SWFCxForm& cx, const SWFMatrix& mat);
+    void draw_outlines(const PathVec& path_vec, const SWFMatrix& mat,
+                       const SWFCxForm& cx, const std::vector<LineStyle>& line_styles);
+    std::list<PathPtrVec> get_contours(const PathPtrVec &paths);
+    PathPtrVec paths_by_style(const PathVec& path_vec, unsigned int style);
+    std::vector<PathVec::const_iterator> find_subshapes(const PathVec& path_vec);
+    void apply_matrix_to_paths(std::vector<Path>& paths, const SWFMatrix& mat);
+    void draw_subshape(const PathVec& path_vec, const SWFMatrix& mat,
+                       const SWFCxForm& cx,
+                       const std::vector<FillStyle>& fill_styles,
+                       const std::vector<LineStyle>& line_styles);
+    void draw_submask(const PathVec& path_vec, const SWFMatrix& mat,
+                      const SWFCxForm& cx, const FillStyle& f_style);
+    
+    float _xscale;
+    float _yscale;
+    float _width; // Width of the movie, in world coordinates.
+    float _height;
+  
+    // Output size.
+    float m_display_width;
+    float m_display_height;
+  
+    std::vector<PathVec> _masks;
+    bool _drawing_mask;
+  
+    gnash::SWFMatrix stage_matrix;  // conversion from TWIPS to pixels
+    
+    VGPaint     m_fillpaint;
+    VGPaint     m_strokepaint;
+
+#ifdef OPENVG_VERSION_1_1    
+    VGMaskLayer m_mask;
+#endif
+    unsigned char *_testBuffer; // buffer used by initTestBuffer() only
 };
 
-DSOEXPORT Renderer_ovg_base* create_Renderer_ovg(const char *pixelformat);
+DSOEXPORT Renderer* create_handler(const char *pixelformat);
 
+} // namespace gnash::renderer::openvg
+} // namespace gnash::renderer
 } // namespace gnash
 
 #endif // __RENDER_HANDLER_OVG_H__
