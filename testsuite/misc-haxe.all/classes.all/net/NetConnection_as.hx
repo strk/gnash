@@ -134,10 +134,23 @@ class NetConnection_as {
         } else {
             DejaGnu.fail("NetConnection class doesn't exist");
         }
-		if(x2.connect("http://localhost:80") == false) {
+
+        // Note that the following test checks the validity of the URL
+        // and whether it is allowed by security settings, but does *not*
+        // check whether the connection was successful. This is because
+        // execution would block while waiting for a reply. Indeed in this
+        // case it doesn't even  attempt a connection, because it's an
+        // http remoting attempt.
+
+        // The flash player will return false with its default security
+        // settings because any network connection is forbidden to local
+        // files. Gnash deliberately doesn't have this restriction, so
+        // will return true (valid URL, allowed). Change Adobe's security
+        // settings if you want the pp to pass.
+		if(x2.connect("http://localhost:80") == true) {
 			DejaGnu.pass("NetConnection::connect successful!");
 		} else {
-			DejaGnu.fail("NetConnection::connect failed! (do you have localhost:80 open?)");
+			DejaGnu.fail("NetConnection::connect failed!");
 		}
 		
 	#end

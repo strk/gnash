@@ -72,6 +72,10 @@ namespace {
     std::pair<std::string, std::string>
         getStatusCodeInfo(NetConnection_as::StatusCode code);
 
+    /// Parse and send any invoke messages from an HTTP connection.
+    void handleAMFInvoke(amf::Reader& rd, const boost::uint8_t*& b,
+            const boost::uint8_t* end, as_object& owner);
+
 }
 
 //---- ConnectionHandler -------------------------------------------------
@@ -210,7 +214,18 @@ public:
 
 private:
 
-    static const int NCCALLREPLYCHUNK=1024*200;
+    void push_amf(const SimpleBuffer &amf) {
+        _postdata.append(amf.data(), amf.size());
+        ++queued_count;
+    }
+
+    /// Handle replies to server functions we invoked with a callback.
+    //
+    /// This needs access to the stored callbacks.
+    void handleAMFReplies(amf::Reader& rd, const boost::uint8_t*& b,
+            const boost::uint8_t* end);
+
+    static const size_t NCCALLREPLYCHUNK = 1024 * 200;
 
     SimpleBuffer _postdata;
     URL _url;
@@ -223,11 +238,6 @@ private:
     // TODO: check if we should take headers on a per-call basis
     //       due to NetConnection.addHeader.
     NetworkAdapter::RequestHeaders _headers;
-
-    void push_amf(const SimpleBuffer &amf) {
-        _postdata.append(amf.data(), amf.size());
-        ++queued_count;
-    }
     
 };
 
@@ -248,6 +258,120 @@ HTTPRemotingHandler::HTTPRemotingHandler(NetConnection_as& nc, const URL& url)
     _headers["Content-Type"] = "application/x-amf";
 }
 
+/// Process any replies to server functions we invoked.
+//
+/// Note that fatal errors will throw an amf::AMFException.
+void
+HTTPRemotingHandler::handleAMFReplies(amf::Reader& rd,
+        const boost::uint8_t*& b, const boost::uint8_t* end)
+{
+    const boost::uint16_t numreplies = amf::readNetworkShort(b);
+    b += 2; // number of replies
+
+    // TODO: test if this value is relevant at all.
+    if (!numreplies) return;
+
+    // There should be only three loop control mechanisms in this loop:
+    // 1. continue: there was an error, but parsing is still okay.
+    // 2. return: we've finished, but there was no problem.
+    // 3. amf::AMFException: parsing failed and we can do nothing more.
+    //
+    // We haven't tested this very rigorously.
+    while (b < end) {
+
+        if (b + 2 > end) return;
+
+        const boost::uint16_t replylength = amf::readNetworkShort(b);
+        b += 2; 
+
+        if (replylength < 4 || b + replylength > end) {
+            throw amf::AMFException("Reply message too short");
+        }
+
+        // Reply message is: '/id/methodName'
+        int ns = 1; // next slash position
+        while (ns < replylength - 1 && *(b + ns) != '/') ++ns;
+        if (ns >= replylength - 1) {
+            throw amf::AMFException("Invalid reply message name");
+        }
+
+        std::string id(reinterpret_cast<const char*>(b + 1), ns - 1);
+        size_t callbackID = 0;
+        try {
+            callbackID = boost::lexical_cast<size_t>(id);
+        }
+        catch (const boost::bad_lexical_cast&) {
+            // Do we need to abort parsing here?
+            throw amf::AMFException("Invalid callback ID");
+        }
+
+        const std::string methodName(reinterpret_cast<const char*>(b + ns + 1),
+                replylength - ns - 1);
+
+        b += replylength;
+
+        // parse past unused string in header
+        if (b + 2 > end) return;
+        const boost::uint16_t unusedlength = amf::readNetworkShort(b);
+
+        b += 2; 
+        if (b + unusedlength > end) return;
+        b += unusedlength;
+
+        // this field is supposed to hold the total number of bytes in the
+        // rest of this particular reply value, but openstreetmap.org
+        // (which works great in the adobe player) sends 0xffffffff.
+        // So we just ignore it.
+        if (b + 4 > end) break;
+        b += 4; 
+
+        // this updates b to point to the next unparsed byte
+        as_value replyval;
+        if (!rd(replyval)) {
+            throw amf::AMFException("Could not parse argument value");
+        }
+
+        // update variable to show how much we've parsed
+        _reply_start = b - _reply.data();
+
+        // if actionscript specified a callback object,
+        // call it
+        as_object* callback = popCallback(callbackID);
+
+        if (!callback) {
+            log_error("Unknown HTTP Remoting response identifier '%s'", id);
+            // There's no parsing error, so continue.
+            continue;
+        }
+
+        string_table::key methodKey;
+        if (methodName == "onResult") {
+            methodKey = NSV::PROP_ON_RESULT;
+        }
+        else if (methodName == "onStatus") {
+            methodKey = NSV::PROP_ON_STATUS;
+        }
+        else {
+            // NOTE: the pp is known to actually
+            // invoke the custom method, but with 7
+            // undefined arguments (?)
+            log_error("Unsupported HTTP Remoting response callback: '%s' "
+                    "(size %d)", methodName, methodName.size());
+            continue;
+        }
+
+#ifdef GNASH_DEBUG_REMOTING
+        log_debug("callback called");
+#endif
+
+        callMethod(callback, methodKey, replyval);
+    } 
+
+}
+
+/// An AMF remoting reply comprises two main sections: first the invoke
+/// commands to be called on the NetConnection object, and second the
+/// replies to any client invoke messages that requested a callback.
 bool
 HTTPRemotingHandler::advance()
 {
@@ -340,14 +464,16 @@ HTTPRemotingHandler::advance()
         // reset connection before calling the callback
         _connection.reset();
 
-        // This is just a guess, but is better than sending
-        // 'undefined'
-        _nc.notifyStatus(NetConnection_as::CALL_FAILED);
+        // If the connection fails, it is manually verified
+        // that the pp calls onStatus with 1 undefined argument.
+        callMethod(&_nc.owner(), NSV::PROP_ON_STATUS, as_value());
         return false;
     }
     
     if (_connection->eof()) {
 
+        // If it's less than 8 we didn't expect a response, so just ignore
+        // it.
         if (_reply.size() > 8) {
 
 #ifdef GNASH_DEBUG_REMOTING
@@ -357,195 +483,27 @@ HTTPRemotingHandler::advance()
             const boost::uint8_t *end = _reply.data() + _reply.size();
             
             amf::Reader rd(b, end, getGlobal(_nc.owner()));
+            
+            // skip version indicator and client id
+            b += 2; 
 
-            // parse header
-            b += 2; // skip version indicator and client id
+            try {
+                handleAMFInvoke(rd, b, end, _nc.owner());
+                handleAMFReplies(rd, b, end);
+            }
+            catch (const amf::AMFException& e) {
 
-            // NOTE: this looks much like parsing of an OBJECT_AMF0
-            const boost::uint16_t numheaders = amf::readNetworkShort(b);
-            b += 2; // number of headers
-
-            bool headers_ok = true;
-            if (numheaders != 0) {
-
-#ifdef GNASH_DEBUG_REMOTING
-                log_debug("NetConnection::call(): amf headers section parsing");
-#endif
-                as_value tmp;
-                for (size_t i = numheaders; i > 0; --i) {
-                    if (b + 2 > end) {
-                        headers_ok = false;
-                        break;
-                    }
-                    const boost::uint16_t namelength = amf::readNetworkShort(b);
-                    b += 2;
-                    if (b + namelength > end) {
-                        headers_ok = false;
-                        break;
-                    }
-                    std::string headerName((char*)b, namelength);
-#ifdef GNASH_DEBUG_REMOTING
-                    log_debug("Header name %s", headerName);
-#endif
-                    b += namelength;
-                    if (b + 5 > end) {
-                        headers_ok = false;
-                        break;
-                    }
-                    b += 5; // skip past bool and length long
-
-                    if (!rd(tmp)) {
-                        headers_ok = false;
-                        break;
-                    }
-#ifdef GNASH_DEBUG_REMOTING
-                    log_debug("Header value %s", tmp);
-#endif
-                    VM& vm = getVM(_nc.owner());
-                    string_table& st = vm.getStringTable();
-                    string_table::key key = st.find(headerName);
-#ifdef GNASH_DEBUG_REMOTING
-                    log_debug("Calling NetConnection.%s(%s)", headerName, tmp);
-#endif
-                    callMethod(&_nc.owner(), key, tmp);
-                }
+                // Any fatal error should be signalled by throwing an
+                // exception. In this case onStatus is called with an
+                // undefined argument.
+                log_error("Error parsing server AMF: %s", e.what());
+                _connection.reset();
+                _reply.resize(0);
+                _reply_start = 0;
+                callMethod(&_nc.owner(), NSV::PROP_ON_STATUS, as_value());
+                return false;
             }
 
-            if (headers_ok) {
-
-                const boost::uint16_t numreplies = amf::readNetworkShort(b);
-                b += 2; // number of replies
-
-                // TODO consider counting number of replies we
-                // actually parse and doing something if it
-                // doesn't match this value (does it matter?
-                if (numreplies > 0) {
-                    // parse replies until we get a parse error or
-                    // we reach the end of the buffer
-                    while (b < end) {
-
-                        if (b + 2 > end) break;
-
-                        const boost::uint16_t replylength =
-                            amf::readNetworkShort(b);
-                        b += 2; 
-
-                        if (replylength < 4) {
-                            // shortest valid response is '/1/a'
-                            log_error("NetConnection::call(): "
-                                    "reply message name too short");
-                            break;
-                        }
-                        if (b + replylength > end) break;
-
-                        // Reply message is: '/id/methodName'
-                        int ns = 1; // next slash position
-                        while (ns < replylength - 1 && *(b + ns) != '/') ++ns;
-                        if (ns >= replylength - 1) {
-                            std::string msg(reinterpret_cast<const char*>(b),
-                                    replylength);
-                            log_error("NetConnection::call(): invalid "
-                                    "reply message name (%s)", msg);
-                            break;
-                        }
-
-                        std::string id(reinterpret_cast<const char*>(b + 1),
-                                ns - 1);
-                        size_t callbackID = 0;
-                        try {
-                            callbackID = boost::lexical_cast<size_t>(id);
-                        }
-                        catch (const boost::bad_lexical_cast&) {
-                            log_error(_("Callback ID was not a number"));
-                            break;
-                        }
-
-                        const std::string methodName(
-                                reinterpret_cast<const char*>(b + ns + 1),
-                                replylength - ns - 1);
-
-                        b += replylength;
-
-                        // parse past unused string in header
-                        if (b + 2 > end) break;
-                        const boost::uint16_t unusedlength =
-                            amf::readNetworkShort(b);
-
-                        b += 2; 
-                        if (b + unusedlength > end) break;
-                        b += unusedlength;
-
-                        // this field is supposed to hold the
-                        // total number of bytes in the rest of
-                        // this particular reply value, but
-                        // openstreetmap.org (which works great
-                        // in the adobe player) sends
-                        // 0xffffffff. So we just ignore it
-                        if (b + 4 > end) break;
-#if GNASH_DEBUG_REMOTING
-                        const boost::uint32_t len = amf::readNetworkLong(b);
-                        log_debug("Reported reply length %s", len);
-#endif
-                        b += 4; // reply length
-
-                        // this updates b to point to the next unparsed byte
-                        as_value replyval;
-                        if (!rd(replyval)) {
-                            log_error("parse amf failed");
-                            // this will happen if we get
-                            // bogus data, or if the data runs
-                            // off the end of the buffer
-                            // provided, or if we get data we
-                            // don't know how to parse
-                            break;
-                        }
-
-                        // update variable to show how much we've parsed
-                        _reply_start = b - _reply.data();
-
-                        // if actionscript specified a callback object,
-                        // call it
-                        as_object* callback = popCallback(callbackID);
-                        if (callback) {
-
-                            string_table::key methodKey;
-                            if (methodName == "onResult") {
-                                methodKey = NSV::PROP_ON_RESULT;
-                            }
-                            else if (methodName == "onStatus") {
-                                methodKey = NSV::PROP_ON_STATUS;
-                            }
-                            else {
-                                // NOTE: the pp is known to actually
-                                // invoke the custom method, but with 7
-                                // undefined arguments (?)
-                                log_error("Unsupported HTTP Remoting "
-                                        "response callback: '%s' "
-                                        "(size %d)", methodName,
-                                        methodName.size());
-                                continue;
-                            }
-
-#ifdef GNASH_DEBUG_REMOTING
-                            log_debug("calling onResult callback");
-#endif
-                            // FIXME check if above line can fail and we
-                            // have to react
-                            callMethod(callback, methodKey, replyval);
-#ifdef GNASH_DEBUG_REMOTING
-                            log_debug("callback called");
-#endif
-                        } 
-                        else {
-                            log_error("Unknown HTTP Remoting response "
-                                    "identifier '%s'", id);
-                        }
-                    }
-                }
-            }
-        }
-        else {
-            log_error("Response from remoting service < 8 bytes");
         }
 
 #ifdef GNASH_DEBUG_REMOTING
@@ -815,7 +773,7 @@ RTMPRemotingHandler::handleInvoke(const boost::uint8_t* payload,
 
         if (*payload != amf::NULL_AMF0) return;
         ++payload;
-#if GNASH_DEBUG_REMOTING
+#ifdef GNASH_DEBUG_REMOTING
         log_debug("AMF buffer for _onbwdone: %s\n",
                 hexify(payload, end - payload, false));
 #endif
@@ -929,17 +887,18 @@ NetConnection_as::connect()
 }
 
 
-void
+bool
 NetConnection_as::connect(const std::string& uri)
 {
-    // Close any current connections. (why?) Because that's what happens.
+    // Close any current connections. 
     close();
+
+    assert(!_isConnected);
 
     // TODO: check for other kind of invalidities here...
     if (uri.empty()) {
-        _isConnected = false;
         notifyStatus(CONNECT_FAILED);
-        return;
+        return false;
     }
     
     const RunResources& r = getRunResources(owner());
@@ -948,7 +907,7 @@ NetConnection_as::connect(const std::string& uri)
     if (!r.streamProvider().allow(url)) {
         log_security(_("Gnash is not allowed to connect " "to %s"), url);
         notifyStatus(CONNECT_FAILED);
-        return;
+        return false;
     }
 
     // Attempt connection.
@@ -962,7 +921,7 @@ NetConnection_as::connect(const std::string& uri)
         catch (const GnashException&) {
             // This happens if the connect cannot even be attempted.
             notifyStatus(CONNECT_FAILED);
-            return;
+            return false;
         }
         startAdvanceTimer();
     }
@@ -970,24 +929,15 @@ NetConnection_as::connect(const std::string& uri)
         log_unimpl("NetConnection.connect(%s): unsupported connection "
                  "protocol", url);
         notifyStatus(CONNECT_FAILED);
-        return;
+        return false;
     }
     else {
         log_error("NetConnection.connect(%s): unknown connection "
              "protocol", url);
         notifyStatus(CONNECT_FAILED);
-        return;
+        return false;
     }
-    
-    // Under certain circumstances, an an immediate failure notification
-    // happens. These are:
-    // a) sandbox restriction
-    // b) invalid URL? NetConnection.connect(5) fails straight away, but
-    //    could be either because a URL has to be absolute, perhaps including
-    //    a protocol, or because the load is attempted from the filesystem
-    //    and fails immediately.
-    // TODO: modify validateURL for doing this.
-    _isConnected = false;
+    return true;
 }
 
 
@@ -1242,17 +1192,16 @@ netconnection_connect(const fn_call& fn)
     // Check first arg for validity 
     if (uri.is_null() || (getSWFVersion(fn) > 6 && uri.is_undefined())) {
         ptr->connect();
-    }
-    else {
-        if (fn.nargs > 1) {
-            std::stringstream ss; fn.dump_args(ss);
-            log_unimpl("NetConnection.connect(%s): args after the first are "
-                    "not supported", ss.str());
-        }
-        ptr->connect(uriStr);
+        return as_value(true);
     }
 
-    return as_value(ptr->isConnected());
+    if (fn.nargs > 1) {
+        std::stringstream ss; fn.dump_args(ss);
+        log_unimpl("NetConnection.connect(%s): args after the first are "
+                "not supported", ss.str());
+    }
+
+    return as_value(ptr->connect(uriStr));
 
 }
 
@@ -1318,6 +1267,53 @@ getStatusCodeInfo(NetConnection_as::StatusCode code)
             return std::make_pair("NetConnection.Call.BadVersion", "status");
         default:
             std::abort();
+    }
+
+}
+
+void
+handleAMFInvoke(amf::Reader& rd, const boost::uint8_t*& b,
+        const boost::uint8_t* end, as_object& owner)
+{
+
+    const boost::uint16_t invokecount = amf::readNetworkShort(b);
+    b += 2; 
+
+    if (!invokecount) return;
+
+    for (size_t i = invokecount; i > 0; --i) {
+        if (b + 2 > end) {
+            throw amf::AMFException("Invoke buffer too short");
+        }
+        const boost::uint16_t namelength = amf::readNetworkShort(b);
+        b += 2;
+        if (b + namelength > end) {
+            throw amf::AMFException("Invoke buffer too short");
+        }
+        std::string headerName((char*)b, namelength);
+
+#ifdef GNASH_DEBUG_REMOTING
+        log_debug("Invoke name %s", headerName);
+#endif
+        b += namelength;
+        if (b + 5 > end) {
+            throw amf::AMFException("Invoke buffer too short");
+        }
+        b += 5; // skip past bool and length long
+
+        // It seems there must be exactly one argument.
+        as_value arg;
+        if (!rd(arg)) {
+            throw amf::AMFException("Invoke argument not present");
+        }
+
+        VM& vm = getVM(owner);
+        string_table& st = vm.getStringTable();
+        string_table::key key = st.find(headerName);
+#ifdef GNASH_DEBUG_REMOTING
+        log_debug("Invoking %s(%s)", headerName, arg);
+#endif
+        callMethod(&owner, key, arg);
     }
 
 }
