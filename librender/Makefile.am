@@ -121,6 +121,8 @@ AM_CXXFLAGS = $(PCH_FLAGS)
 endif
 
 bin_PROGRAMS = testr
+
+if BUILD_EGL_DEVICE
 check_PROGRAMS =  test_egl
 # this tests the low level EGL interface, used by OpenVG, OpenGLES1,
 # and OpenGLES2.
@@ -130,6 +132,7 @@ test_egl_LDADD = ../libbase/libgnashbase.la \
 	libgnashrender.la \
 	$(GNASH_LIBS) \
 	$(GTK2_LIBS)
+endif
 
 testr_SOURCES = testr.cpp
 testr_CPPFLAGS = $(AM_CPPFLAGS) # -DUSE_TESTSUITE
