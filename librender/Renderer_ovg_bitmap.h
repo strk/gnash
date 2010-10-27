@@ -29,6 +29,9 @@
 
 namespace gnash {
 
+namespace renderer {
+
+namespace openvg {
 
 /// The class itself uses a template. Currently this is unnecessary and it may
 /// be removed but an older implementation required this method and it may be
@@ -62,6 +65,8 @@ private:
     VGPaint         _paint;
 };
 
+} // namespace gnash::renderer::openvg
+} // namespace gnash::renderer
 } // namespace gnash
 
 #endif // __RENDER_HANDLER_OVG_BITMAP_H__
