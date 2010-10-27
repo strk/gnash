@@ -369,33 +369,34 @@ HTTPRemotingHandler::advance()
             b += 2; // skip version indicator and client id
 
             // NOTE: this looks much like parsing of an OBJECT_AMF0
-            boost::int16_t si = amf::readNetworkShort(b);
+            const boost::uint16_t numheaders = amf::readNetworkShort(b);
             b += 2; // number of headers
 
             bool headers_ok = true;
-            if (si != 0) {
+            if (numheaders != 0) {
 
 #ifdef GNASH_DEBUG_REMOTING
                 log_debug("NetConnection::call(): amf headers "
                         "section parsing");
 #endif
                 as_value tmp;
-                for (size_t i = si; i > 0; --i) {
+                for (size_t i = numheaders; i > 0; --i) {
                     if(b + 2 > end) {
                         headers_ok = 0;
                         break;
                     }
-                    si = amf::readNetworkShort(b); b += 2; // name length
-                    if(b + si > end) {
+                    const boost::uint16_t namelength = amf::readNetworkShort(b);
+                    b += 2;
+                    if (b + namelength > end) {
                         headers_ok = false;
                         break;
                     }
-                    std::string headerName((char*)b, si); // end-b);
+                    std::string headerName((char*)b, namelength);
 #ifdef GNASH_DEBUG_REMOTING
                     log_debug("Header name %s", headerName);
 #endif
-                    b += si;
-                    if ( b + 5 > end ) {
+                    b += namelength;
+                    if (b + 5 > end) {
                         headers_ok = false;
                         break;
                     }
@@ -421,32 +422,38 @@ HTTPRemotingHandler::advance()
 
             if (headers_ok) {
 
-                si = amf::readNetworkShort(b); b += 2; // number of replies
+                const boost::uint16_t numreplies = amf::readNetworkShort(b);
+                b += 2; // number of replies
 
                 // TODO consider counting number of replies we
                 // actually parse and doing something if it
                 // doesn't match this value (does it matter?
-                if (si > 0) {
+                if (numreplies > 0) {
                     // parse replies until we get a parse error or
                     // we reach the end of the buffer
                     while (b < end) {
-                        if(b + 2 > end) break;
-                        si = amf::readNetworkShort(b);
-                        b += 2; // _reply length
-                        if(si < 4) { // shorted valid response is '/1/a'
+
+                        if (b + 2 > end) break;
+
+                        const boost::uint16_t replylength =
+                            amf::readNetworkShort(b);
+                        b += 2; 
+
+                        if (replylength < 4) {
+                            // shortest valid response is '/1/a'
                             log_error("NetConnection::call(): "
-                                    "_reply message name too short");
+                                    "reply message name too short");
                             break;
                         }
-                        if (b + si > end) break;
+                        if (b + replylength > end) break;
 
                         // Reply message is: '/id/methodName'
 
                         int ns = 1; // next slash position
-                        while (ns < si - 1 && *(b + ns) != '/') ++ns;
-                        if (ns >= si - 1) {
-                            std::string msg(
-                                    reinterpret_cast<const char*>(b), si);
+                        while (ns < replylength - 1 && *(b + ns) != '/') ++ns;
+                        if (ns >= replylength - 1) {
+                            std::string msg(reinterpret_cast<const char*>(b),
+                                    replylength);
                             log_error("NetConnection::call(): invalid "
                                     "_reply message name (%s)", msg);
                             break;
@@ -465,16 +472,17 @@ HTTPRemotingHandler::advance()
 
                         std::string methodName(
                                 reinterpret_cast<const char*>(b+ns+1),
-                                si-ns-1);
+                                replylength - ns - 1);
 
-                        b += si;
+                        b += replylength;
 
                         // parse past unused string in header
                         if (b + 2 > end) break;
-                        si = amf::readNetworkShort(b);
-                        b += 2; // _reply length
-                        if (b + si > end) break;
-                        b += si;
+                        const boost::uint16_t unusedlength
+                            = amf::readNetworkShort(b);
+                        b += 2; 
+                        if (b + unusedlength > end) break;
+                        b += unusedlength;
 
                         // this field is supposed to hold the
                         // total number of bytes in the rest of
