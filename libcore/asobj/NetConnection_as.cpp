@@ -174,7 +174,7 @@ ConnectionHandler::getStream(const std::string&)
     return std::auto_ptr<IOChannel>(0);
 }
 
-//---- HTTPRemotingHandler (HTTPConnectionHandler) -----------------------------------------------
+//---- HTTPRemotingHandler (HTTPConnectionHandler) ---
 
 /// Queue of remoting calls 
 //
@@ -193,25 +193,18 @@ class HTTPRemotingHandler : public ConnectionHandler
 {
 public:
 
-    /// Create an handler for HTTP remoting
+    /// Create a handler for HTTP remoting
     //
-    /// @param nc
-    ///     The NetConnection AS object to send status/error events to
-    ///
-    /// @param url
-    ///     URL to post calls to
-    ///
+    /// @param nc   The NetConnection AS object to send status/error events to
+    /// @param url  URL to post calls to
     HTTPRemotingHandler(NetConnection_as& nc, const URL& url);
 
-    // See dox in ConnectionHandler
     virtual bool hasPendingCalls() const {
         return _connection || queued_count;
     }
 
-    // See dox in ConnectionHandler
     virtual bool advance();
 
-    // See dox in NetworkHandler class
     virtual void call(as_object* asCallback, const std::string& methodName,
             const std::vector<as_value>& args);
 
@@ -224,7 +217,7 @@ private:
     boost::scoped_ptr<IOChannel> _connection;
     SimpleBuffer _reply;
     int _reply_start;
-    int queued_count;
+    size_t queued_count;
 
     // Quick hack to send Content-Type: application/x-amf
     // TODO: check if we should take headers on a per-call basis
@@ -1210,15 +1203,15 @@ netconnection_new(const fn_call& fn)
 }
 
 
-/// For rtmp, NetConnect.connect() takes an RTMP URL. For all other streams,
-/// it takes null or undefined.
+/// For remoting, NetConnection.connect() takes a URL. For all other streams,
+/// it takes null.
 //
-/// RTMP is untested.
-//
-/// For non-rtmp streams:
+/// For non-remoting streams:
 //
 /// Returns undefined if there are no arguments, true if the first
-/// argument is null, otherwise the result of the attempted connection.
+/// argument is null, otherwise whether the connection is allowed. The
+/// actual result of the connection is sent with an onStatus call later.
+//
 /// Undefined is also a valid argument for SWF7 and above.
 //
 /// The isConnected property is set to the result of connect().
