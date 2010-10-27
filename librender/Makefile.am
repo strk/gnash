@@ -135,7 +135,7 @@ test_egl_LDADD = ../libbase/libgnashbase.la \
 	$(GTK2_LIBS)
 endif
 
-testr_SOURCES = testr.cpp
+testr_SOURCES = testr.cpp testr_gtk.cpp
 testr_CPPFLAGS = $(AM_CPPFLAGS) # -DUSE_TESTSUITE
 testr_LDADD = ../libbase/libgnashbase.la \
 	libgnashrender.la \
