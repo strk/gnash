@@ -330,16 +330,15 @@ HTTPRemotingHandler::advance()
     // There is no way to tell if we have a whole amf _reply without
     // parsing everything
     //
-    // The _reply format has a header field which specifies the
-    // number of bytes in the _reply, but potlatch sends 0xffffffff
+    // The reply format has a header field which specifies the
+    // number of bytes in the reply, but potlatch sends 0xffffffff
     // and works fine in the proprietary player
     //
-    // For now we just wait until we have the full _reply.
+    // For now we just wait until we have the full reply.
     //
     // FIXME make this parse on other conditions, including: 1) when
     // the buffer is full, 2) when we have a "length in bytes" value
     // thas is satisfied
-
     if (_connection->bad()) {
         log_debug("connection is in error condition, calling "
                 "NetConnection.onStatus");
@@ -351,16 +350,16 @@ HTTPRemotingHandler::advance()
         // This is just a guess, but is better than sending
         // 'undefined'
         _nc.notifyStatus(NetConnection_as::CALL_FAILED);
+        return false;
     }
-    else if (_connection->eof()) {
+    
+    if (_connection->eof()) {
 
         if (_reply.size() > 8) {
-
 
 #ifdef GNASH_DEBUG_REMOTING
             log_debug("hit eof");
 #endif
-            boost::uint16_t li;
             const boost::uint8_t *b = _reply.data() + _reply_start;
             const boost::uint8_t *end = _reply.data() + _reply.size();
             
@@ -372,7 +371,8 @@ HTTPRemotingHandler::advance()
             // NOTE: this looks much like parsing of an OBJECT_AMF0
             boost::int16_t si = amf::readNetworkShort(b);
             b += 2; // number of headers
-            uint8_t headers_ok = 1;
+
+            bool headers_ok = true;
             if (si != 0) {
 
 #ifdef GNASH_DEBUG_REMOTING
@@ -387,7 +387,7 @@ HTTPRemotingHandler::advance()
                     }
                     si = amf::readNetworkShort(b); b += 2; // name length
                     if(b + si > end) {
-                        headers_ok = 0;
+                        headers_ok = false;
                         break;
                     }
                     std::string headerName((char*)b, si); // end-b);
@@ -396,43 +396,40 @@ HTTPRemotingHandler::advance()
 #endif
                     b += si;
                     if ( b + 5 > end ) {
-                        headers_ok = 0;
+                        headers_ok = false;
                         break;
                     }
                     b += 5; // skip past bool and length long
-                    if(!rd(tmp)) {
-                        headers_ok = 0;
+
+                    if (!rd(tmp)) {
+                        headers_ok = false;
                         break;
                     }
 #ifdef GNASH_DEBUG_REMOTING
                     log_debug("Header value %s", tmp);
 #endif
-
-                    { // method call for each header
-                      // FIXME: it seems to me that the call should happen
-                        VM& vm = getVM(_nc.owner());
-                        string_table& st = vm.getStringTable();
-                        string_table::key key = st.find(headerName);
+                    VM& vm = getVM(_nc.owner());
+                    string_table& st = vm.getStringTable();
+                    string_table::key key = st.find(headerName);
 #ifdef GNASH_DEBUG_REMOTING
-                        log_debug("Calling NetConnection.%s(%s)",
-                                headerName, tmp);
+                    log_debug("Calling NetConnection.%s(%s)",
+                            headerName, tmp);
 #endif
-                        callMethod(&_nc.owner(), key, tmp);
-                    }
+                    callMethod(&_nc.owner(), key, tmp);
                 }
             }
 
-            if(headers_ok == 1) {
+            if (headers_ok) {
 
                 si = amf::readNetworkShort(b); b += 2; // number of replies
 
                 // TODO consider counting number of replies we
                 // actually parse and doing something if it
                 // doesn't match this value (does it matter?
-                if(si > 0) {
+                if (si > 0) {
                     // parse replies until we get a parse error or
                     // we reach the end of the buffer
-                    while(b < end) {
+                    while (b < end) {
                         if(b + 2 > end) break;
                         si = amf::readNetworkShort(b);
                         b += 2; // _reply length
@@ -486,12 +483,13 @@ HTTPRemotingHandler::advance()
                         // in the adobe player) sends
                         // 0xffffffff. So we just ignore it
                         if (b + 4 > end) break;
-                        li = amf::readNetworkLong(b);
-                        b += 4; // _reply length
+                        const boost::uint32_t len = amf::readNetworkLong(b);
+                        log_debug("Reported reply length %s", len);
+                        b += 4; // reply length
 
                         // this updates b to point to the next unparsed byte
-                        as_value _replyval;
-                        if (!rd(_replyval)) {
+                        as_value replyval;
+                        if (!rd(replyval)) {
                             log_error("parse amf failed");
                             // this will happen if we get
                             // bogus data, or if the data runs
@@ -510,7 +508,7 @@ HTTPRemotingHandler::advance()
                         if (callback) {
 
                             string_table::key methodKey;
-                            if ( methodName == "onResult" ) {
+                            if (methodName == "onResult") {
                                 methodKey = NSV::PROP_ON_RESULT;
                             }
                             else if (methodName == "onStatus") {
@@ -532,12 +530,14 @@ HTTPRemotingHandler::advance()
 #endif
                             // FIXME check if above line can fail and we
                             // have to react
-                            callMethod(callback, methodKey, _replyval);
+                            callMethod(callback, methodKey, replyval);
 #ifdef GNASH_DEBUG_REMOTING
                             log_debug("callback called");
 #endif
-                        } else {
-                            log_error("Unknown HTTP Remoting response identifier '%s'", id);
+                        } 
+                        else {
+                            log_error("Unknown HTTP Remoting response "
+                                    "identifier '%s'", id);
                         }
                     }
                 }
