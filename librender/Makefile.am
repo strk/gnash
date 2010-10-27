@@ -120,7 +120,8 @@ if ENABLE_PCH
 AM_CXXFLAGS = $(PCH_FLAGS)
 endif
 
-bin_PROGRAMS =  test_egl testr
+bin_PROGRAMS = testr
+check_PROGRAMS =  test_egl
 # this tests the low level EGL interface, used by OpenVG, OpenGLES1,
 # and OpenGLES2.
 test_egl_SOURCES = test_egl.cpp
