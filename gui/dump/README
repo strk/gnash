@@ -1,12 +1,12 @@
-http://www.xmission.com/~ink/gnash/README.txt:
+http://www.xmission.com/~ink/gnash/gnash-dump/README.txt:
 
 Gnash stream dumper
 ===================
 
-This is an experimental build of gnash that allows the user to dump
-both the raw (BGRA24) video stream, and the raw (PCM/Wave) audio
-stream from a movie.  The "dump gui" is disabled by default, you'd
-need to compile it with something like this:
+The application allows the user to dump both the raw (BGRA24) video
+stream, and the raw (PCM/Wave) audio stream from a movie. 
+The "dump gui" is disabled by default, you'd need to compile it with
+something like this:
 
 ./configure \
     --prefix=/usr/local/gnash-dump \
@@ -17,14 +17,11 @@ need to compile it with something like this:
     --disable-nsapi \
     --disable-menus
 
-It *requires* AGG as the renderer and *FFmpeg* as the sound driver.
-Although audio and video are separate (you can dump video, even if you
+It *requires* AGG as the renderer.
+Audio and video are separate (you can dump video, even if you
 choose gstreamer for audio output).
 
-Two new command-line parameters are available:
-
-  -A <file>         
-   Audio dump file (wave format)
+Gui-specific switches supported are:
 
   -D <file>[@<fps>]  
    Name of a file to dump video frames to.
@@ -42,6 +39,11 @@ Two new command-line parameters are available:
    You may want to add some sleeping IFF the SWF file you are willing
    to record doesn't contain proper loading code (ie: _assumes_ loads
    will happen within a given number of frames advancements).
+
+You can use the generic -A switch for dumping audio:
+
+  -A <file>         
+   Audio dump file (wave format)
 
 Once invoked, gnash will output sh-friendly information about the
 results: 
@@ -65,13 +67,13 @@ $ /usr/local/gnash-dump/bin/dump-gnash -D blah.out@12 -A \
 One could then play the movie with mplayer:
 
 mplayer -demuxer rawvideo \
-	-rawvideo fps=12.0482:w=550:h=400:format=bgra blah.out \
+	-rawvideo fps=12:w=550:h=400:format=bgra blah.out \
 	-audiofile ./blah.wav 
 
 Or play it fullscreen, with hardware acceleration:
 
 mplayer -demuxer rawvideo \
-	-rawvideo fps=12.0482:w=550:h=400:format=bgra blah.out \
+	-rawvideo fps=12:w=550:h=400:format=bgra blah.out \
 	-audiofile ./blah.wav \
 	-fs \
 	-vo xv
