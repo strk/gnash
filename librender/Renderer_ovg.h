@@ -32,6 +32,7 @@
 #include "Geometry.h"
 //#include "BitmapInfo.h"
 #include "Renderer.h"
+#include "eglDevice.h"
 
 namespace gnash {
 
@@ -63,7 +64,7 @@ struct eglVertex {
 
 // typedef std::map<const Path*, VGPath > PathPointMap;
 
-class  DSOEXPORT Renderer_ovg: public Renderer
+class  DSOEXPORT Renderer_ovg: public Renderer, public EGLDevice
 {
 public:
     std::string description() const { return "OpenVG"; }

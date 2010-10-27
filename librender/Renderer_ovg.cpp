@@ -234,12 +234,17 @@ Renderer_ovg::Renderer_ovg()
       m_display_height(0.0),
       _drawing_mask(false)
 {
+
+    if (!initDevice(EGLDevice::OPENVG)) {
+        log_error("Couldn't initialize EGL Device!");
+    }
+    
     set_scale(1.0f, 1.0f);
     m_fillpaint = vgCreatePaint();
     m_strokepaint = vgCreatePaint();
 
-    // vgSetPaint (m_fillpaint,   VG_FILL_PATH);
-    // vgSetPaint (m_strokepaint, VG_STROKE_PATH);
+    vgSetPaint (m_fillpaint,   VG_FILL_PATH);
+    vgSetPaint (m_strokepaint, VG_STROKE_PATH);
 }
 
 void

@@ -115,17 +115,6 @@ main(int argc, char *argv[])
 
     Renderer *renderer = 0;
 
-    // Get a real device to draw into. This requires th etest_egl
-    // test case be run first to make sure the EGL devices work.
-    EGLDevice egl;
-    // There isn't a whole lot to test, if init works, most
-    // everything else has to be correct.
-    if (egl.initDevice(EGLDevice::OPENVG)) {
-        runtest.pass("EGLDevice::init()");
-    } else {
-        runtest.fail("EGLDevice::init()");
-    }
-    
 #ifdef RENDERER_AGG
     renderer = create_Renderer_agg(pixelformat);
     test_renderer(renderer, "AGG");
