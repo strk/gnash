@@ -274,7 +274,7 @@ HTTPRemotingHandler::advance()
                 _postdata.size());
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("NetConnection.call(): encoded args from %1% calls: %2%",
-                queued_count, hexify(_postdata.data(), _postdata.size(), false));
+            queued_count, hexify(_postdata.data(), _postdata.size(), false));
 #endif
         queued_count = 0;
 
@@ -467,7 +467,7 @@ HTTPRemotingHandler::advance()
                             break;
                         }
 
-                        std::string methodName(
+                        const std::string methodName(
                                 reinterpret_cast<const char*>(b + ns + 1),
                                 replylength - ns - 1);
 
@@ -688,7 +688,8 @@ public:
 
             const RunResources& r = getRunResources(_nc.owner());
             Global_as& gl = getGlobal(_nc.owner());
-            
+ 
+            // Connection object
             as_object* o = createObject(gl);
 
             const int flags = 0;
@@ -709,15 +710,6 @@ public:
             o->init_member("videoFunction", 1.0, flags);
             o->init_member("pageUrl", as_value(), flags);
 
-            const size_t id = callNo();
-            SimpleBuffer buf;
-
-            // Write the connect object.
-            amf::Writer aw(buf);
-            aw.writeString("connect");
-            aw.writeNumber(id);
-            aw.writeObject(o);
-
             // Set up the callback object.
             as_object* cb = createObject(getGlobal(_nc.owner()));
             cb->init_member(NSV::PROP_ON_RESULT,
@@ -725,10 +717,10 @@ public:
 
             cb->init_member("_conn", &_nc.owner(), 0);
 
-            // When this call returns, the onResult function of the callback
-            // handles onStatus etc.
-            pushCallback(id, cb);
-            _rtmp.call(buf);
+            std::vector<as_value> args;
+            args.push_back(o);
+
+            call(cb, "connect", args);
 
             // Send bandwidth check; the pp appears to do this
             // automatically.
@@ -797,7 +789,6 @@ RTMPRemotingHandler::handleInvoke(const boost::uint8_t* payload,
         as_value arg;
 
         amf::Reader rd(payload, end, getGlobal(_nc.owner()));
-
         // TODO: use all args and check the order! We currently only use
         // the last one!
         while (rd(arg)) {
