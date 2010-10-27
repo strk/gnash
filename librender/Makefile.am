@@ -130,6 +130,7 @@ test_egl_SOURCES = test_egl.cpp
 test_egl_CPPFLAGS = $(AM_CPPFLAGS)
 test_egl_LDADD = ../libbase/libgnashbase.la \
 	libgnashrender.la \
+	$(EGL_LIBS) \
 	$(GNASH_LIBS) \
 	$(GTK2_LIBS)
 endif
@@ -138,5 +139,7 @@ testr_SOURCES = testr.cpp
 testr_CPPFLAGS = $(AM_CPPFLAGS) # -DUSE_TESTSUITE
 testr_LDADD = ../libbase/libgnashbase.la \
 	libgnashrender.la \
-	$(GNASH_LIBS)
+	$(EGL_LIBS) \
+	$(GNASH_LIBS) \
+	$(GTK2_LIBS)
 
