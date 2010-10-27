@@ -17,6 +17,9 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#ifndef __EGL_DEVICE_H__
+#define __EGL_DEVICE_H__ 1
+
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
@@ -48,7 +51,7 @@ class EGLDevice
     ~EGLDevice();
 
     // Initialize EGL
-    bool init(rtype_t);
+    bool initDevice(rtype_t);
 
     // Utility methods not in the base class
     /// Return a string with the error code as text, instead of a numeric value
@@ -83,6 +86,8 @@ class EGLDevice
 
 } // namespace renderer
 } // namespace gnash
+
+#endif  // end of __EGL_DEVICE_H__
 
 // local Variables:
 // mode: C++

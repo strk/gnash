@@ -87,7 +87,7 @@ test_egl(EGLDevice &egl, EGLDevice::rtype_t rtype)
 
     // There isn't a whole lot to test, if init works, most
     // everything else has to be correct.
-    if (egl.init(rtype)) {
+    if (egl.initDevice(rtype)) {
         runtest.pass("EGLDevice::init()");
     } else {
         runtest.fail("EGLDevice::init()");

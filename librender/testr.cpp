@@ -63,10 +63,17 @@
 #ifdef RENDERER_CAIRO
 #include "Renderer_cairo.h"
 #endif
+#ifdef HAVE_EGL_EGL_H
+# include <EGL/egl.h>
+# include <eglDevice.h>
+#else
+# error "This file needs EGL"
+#endif
 
 TestState runtest;
 
 using namespace gnash; 
+using namespace renderer; 
 using namespace std; 
 
 void test_renderer(Renderer *renderer, const std::string &type);
@@ -107,6 +114,17 @@ main(int argc, char *argv[])
 #endif  // end of GTK_TEST_RENDER
 
     Renderer *renderer = 0;
+
+    // Get a real device to draw into. This requires th etest_egl
+    // test case be run first to make sure the EGL devices work.
+    EGLDevice egl;
+    // There isn't a whole lot to test, if init works, most
+    // everything else has to be correct.
+    if (egl.initDevice(EGLDevice::OPENVG)) {
+        runtest.pass("EGLDevice::init()");
+    } else {
+        runtest.fail("EGLDevice::init()");
+    }
     
 #ifdef RENDERER_AGG
     renderer = create_Renderer_agg(pixelformat);
@@ -123,17 +141,6 @@ main(int argc, char *argv[])
         test_iterators(renderer, "OpenVG");
     } else {
         cerr << "ERROR: No OpenVG renderer to test!" << endl;
-    }
-#endif
-    
-#ifdef RENDERER_OPENGL
-    renderer = renderer::opengl::create_handler(true);
-    if (renderer) {
-        test_renderer(renderer, "OpenGL");
-        test_geometry(renderer, "OpenGL");
-        test_iterators(renderer, "OpenGL");
-    } else {
-        cerr << "ERROR: No OpenGL renderer to test!" << endl;
     }
 #endif
     
@@ -169,6 +176,17 @@ main(int argc, char *argv[])
         cerr << "ERROR: No Cairo renderer to test!" << endl;
     }
 #endif
+    
+#ifdef RENDERER_OPENGL
+    renderer = renderer::opengl::create_handler(true);
+    if (renderer) {
+        test_renderer(renderer, "OpenGL");
+        test_geometry(renderer, "OpenGL");
+        test_iterators(renderer, "OpenGL");
+    } else {
+        cerr << "ERROR: No OpenGL renderer to test!" << endl;
+    }
+#endif    
 
 }
 
@@ -204,12 +222,14 @@ test_renderer(Renderer *renderer, const std::string &type)
         runtest.fail("getBitsPerPixel()");
     }
 
+#if 1
     // Initializes the renderer for off-screen rendering used by the testsuite.
     if (renderer->initTestBuffer(10, 10)) {
         runtest.pass("initTestBuffer()");
     } else {
         runtest.fail("initTestBuffer()");
     }
+#endif
     
     /// @coords an array of 16-bit signed integer coordinates. Even indices
     ///         (and 0) are x coordinates, while uneven ones are y coordinates.

@@ -190,7 +190,7 @@ EGLDevice::~EGLDevice()
 }
 
 bool
-EGLDevice::init(EGLDevice::rtype_t rtype)
+EGLDevice::initDevice(EGLDevice::rtype_t rtype)
 {
     GNASH_REPORT_FUNCTION;
 
