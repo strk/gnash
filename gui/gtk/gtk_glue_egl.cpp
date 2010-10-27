@@ -374,7 +374,7 @@ GtkEGLGlue::createRenderHandler()
 
     gdk_image_destroy(tmpimage);
 
-    _renderer = create_Renderer_ovg(pixelformat);
+    _renderer = create_handler(pixelformat);
     if (! _renderer) {
         boost::format fmt = boost::format(
             _("Could not create OPENVG renderer with pixelformat %s")
