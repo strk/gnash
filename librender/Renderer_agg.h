@@ -49,7 +49,9 @@ public:
     virtual bool initTestBuffer(unsigned width, unsigned height) {
         int size = width * height * getBytesPerPixel();
         
-        _testBuffer	= static_cast<unsigned char *>( realloc(_testBuffer, size) );
+        _testBuffer = static_cast<unsigned char *>(realloc(_testBuffer, size));
+        memset(_testBuffer, 0, size);
+        printf("Renderer Test memory at: %p\n", _testBuffer);
         
         init_buffer(_testBuffer, size, width, height, width * getBytesPerPixel());
         
@@ -68,14 +70,16 @@ DSOEXPORT Renderer_agg_base *create_Renderer_agg(const char *pixelformat);
 /// NULL is returned. Note that a successfully detected pixel format does
 /// not necessarily mean that the pixel format is available (compiled in).
 /// The bit offsets are assumed to be in host byte order!
-DSOEXPORT const char* agg_detect_pixel_format(unsigned int rofs, unsigned int rsize,
-                                              unsigned int gofs, unsigned int gsize,
-                                              unsigned int bofs, unsigned int bsize,
+DSOEXPORT const char *agg_detect_pixel_format(unsigned int rofs,
+                                              unsigned int rsize,
+                                              unsigned int gofs,
+                                              unsigned int gsize,
+                                              unsigned int bofs,
+                                              unsigned int bsize,
                                               unsigned int bpp);
   
 
 } // namespace gnash
-
 
 #endif // BACKEND_RENDER_HANDLER_AGG_H
 
