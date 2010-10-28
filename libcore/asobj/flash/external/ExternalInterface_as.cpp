@@ -149,7 +149,6 @@ private:
     const fn_call& _fn;
 };
 
-
 }
 
 void
@@ -172,10 +171,7 @@ registerExternalInterfaceNative(as_object& global)
 void
 externalinterface_class_init(as_object& where, const ObjectURI& uri)
 {
-//    GNASH_REPORT_FUNCTION;
-
     where.init_destructive_property(uri, externalInterfaceConstructor, 0);
-
 }
 
 namespace {
@@ -183,7 +179,6 @@ namespace {
 void
 attachExternalInterfaceStaticInterface(as_object& o)
 {    
-    // GNASH_REPORT_FUNCTION;
     
     const int swf8Flags = PropFlags::onlySWF8Up;
     
@@ -254,7 +249,6 @@ attachExternalInterfaceStaticInterface(as_object& o)
 as_value
 externalinterface_addCallback(const fn_call& fn)
 {
-    // GNASH_REPORT_FUNCTION;
     movie_root& mr = getRoot(fn);
 
     if (mr.getControlFD() <= 0) {
@@ -280,7 +274,6 @@ externalinterface_addCallback(const fn_call& fn)
 as_value
 externalinterface_call(const fn_call& fn)
 {
-    // GNASH_REPORT_FUNCTION;
     movie_root& mr = getRoot(fn);
     as_value val;
 
@@ -313,7 +306,6 @@ externalinterface_call(const fn_call& fn)
 as_value
 externalinterface_available(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
     
     movie_root& m = getRoot(fn);
     bool mode = false;
@@ -373,7 +365,6 @@ externalinterface_available(const fn_call& fn)
 as_value
 externalinterface_objectID(const fn_call& fn)
 {
-    // GNASH_REPORT_FUNCTION;
 
     movie_root& mr = getRoot(fn);
     MovieClip *mc = mr.getLevel(0);
@@ -386,13 +377,10 @@ externalinterface_objectID(const fn_call& fn)
     getObject(mc)->get_member(st.find("name"), &name);
 
     if (id.is_undefined() && !name.is_undefined()) {
-//        log_debug("ObjectdID name is: %s", name.to_string());
         return name;
     } else if (!id.is_undefined() && name.is_undefined()) {
-//        log_debug("ObjectdID id is: %s", id.to_string());
         return id;
     } else if (id.is_undefined() && name.is_undefined()) {
-//        log_debug("no objectID defined!");
         return as_value();
     }
     
@@ -457,8 +445,6 @@ externalinterface_uArgumentsToAS(const fn_call& /*fn*/)
 as_value
 externalinterface_uAddCallback(const fn_call& /*fn*/)
 {
-    // GNASH_REPORT_FUNCTION;
-    
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
@@ -466,7 +452,6 @@ externalinterface_uAddCallback(const fn_call& /*fn*/)
 as_value
 externalinterface_uArrayToAS(const fn_call& /*fn*/)
 {
-//    GNASH_REPORT_FUNCTION;
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
@@ -474,7 +459,6 @@ externalinterface_uArrayToAS(const fn_call& /*fn*/)
 as_value
 externalinterface_uArrayToJS(const fn_call& /*fn*/)
 {
-//    GNASH_REPORT_FUNCTION;
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
@@ -499,7 +483,6 @@ externalinterface_uArrayToXML(const fn_call& fn)
 as_value
 externalinterface_uCallIn(const fn_call& /*fn*/)
 {
-//    GNASH_REPORT_FUNCTION;
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
@@ -507,7 +490,6 @@ externalinterface_uCallIn(const fn_call& /*fn*/)
 as_value
 externalinterface_uCallOut(const fn_call& /*fn*/)
 {
-//    GNASH_REPORT_FUNCTION;
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
@@ -515,7 +497,6 @@ externalinterface_uCallOut(const fn_call& /*fn*/)
 as_value
 externalinterface_uEvalJS(const fn_call& /*fn*/)
 {
-//    GNASH_REPORT_FUNCTION;
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
@@ -523,7 +504,6 @@ externalinterface_uEvalJS(const fn_call& /*fn*/)
 as_value
 externalinterface_uInitJS(const fn_call& /*fn*/)
 {
-//    GNASH_REPORT_FUNCTION;
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
@@ -531,7 +511,6 @@ externalinterface_uInitJS(const fn_call& /*fn*/)
 as_value
 externalinterface_uJsQuoteString(const fn_call& /*fn*/)
 {
-//    GNASH_REPORT_FUNCTION;
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
@@ -539,13 +518,12 @@ externalinterface_uJsQuoteString(const fn_call& /*fn*/)
 as_value
 externalinterface_uObjectID(const fn_call& /*fn*/)
 {
-//    GNASH_REPORT_FUNCTION;
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 
 as_value
-externalinterface_uObjectToAS(const fn_call& fn)
+externalinterface_uObjectToAS(const fn_call& /*fn*/)
 {
     LOG_ONCE(log_unimpl("ExternalInterface._objectToAS"));
     return as_value();
@@ -720,8 +698,6 @@ externalinterface_uToAS(const fn_call& fn)
 as_value
 externalinterface_uEscapeXML(const fn_call& fn)
 {
-    // GNASH_REPORT_FUNCTION;
-    
     if (fn.nargs == 1) {
         std::string str(fn.arg(0).to_string());
         escapeXML(str);
@@ -734,8 +710,6 @@ externalinterface_uEscapeXML(const fn_call& fn)
 as_value
 externalinterface_uUnescapeXML(const fn_call& fn)
 {
-    // GNASH_REPORT_FUNCTION;
-
     if (fn.nargs == 1) {
         std::string str = fn.arg(0).to_string();
         gnash::unescapeXML(str);
