@@ -53,11 +53,6 @@ struct DSOEXPORT ExternalInterface
     // by ActionScript coders.
 
     DSOEXPORT static as_value objectToAS(Global_as& gl, const std::string &xml);
-
-    static std::string objectToXML(as_object *obj) {
-        ExternalInterface ei;
-        return ei._objectToXML(obj);
-    }
     
     /// Convert an AS object to an XML string.
     static std::string toXML(const as_value &obj) {
