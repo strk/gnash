@@ -21,14 +21,9 @@
 #ifndef GNASH_ASOBJ_EXTERNALINTERFACE_H
 #define GNASH_ASOBJ_EXTERNALINTERFACE_H
 
-
 namespace gnash {
-
-class as_object;
-class as_value;
-struct ObjectURI;
-class Global_as;
-class movie_root;
+    class as_object;
+    struct ObjectURI;
 }
 
 namespace gnash {
@@ -39,7 +34,7 @@ void externalinterface_class_init(gnash::as_object& where,
 
 void registerExternalInterfaceNative(as_object& global);
 
-} // end of gnash namespace
+} // namespace gnash 
 
 #endif
 
