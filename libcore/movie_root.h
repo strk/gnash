@@ -853,8 +853,8 @@ public:
 
     const RunResources& runResources() const { return _runResources; }
 
-    void addExternalCallback(as_object *obj, const std::string &name,
-                             as_object *callback);
+    /// Add an ExternalInterface callback object with an associated name.
+    void addExternalCallback(const std::string& name, as_object* callback);
 
     bool processInvoke(ExternalInterface::invoke_t *);
 

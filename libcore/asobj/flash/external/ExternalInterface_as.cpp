@@ -262,7 +262,7 @@ externalinterface_addCallback(const fn_call& fn)
         if (fn.arg(1).is_object()) {
             log_debug("adding callback %s", name);
             as_object* asCallback = toObject(fn.arg(1), getVM(fn));
-            mr.addExternalCallback(fn.this_ptr, name, asCallback);
+            mr.addExternalCallback(name, asCallback);
         }
     }
 

@@ -346,6 +346,13 @@ check_equals(typeof(EI._toAS(o)), "function");
 val = EI._objectToAS('<object><property id="b"><string>string</string></property><property id="a"><number>1</number></property></object>');
 xcheck_equals (typeOf(val), 'object');
 
+// Check what happens with addCallback
+
+// It doesn't add the callback as a member of ExternalInterface.
+o = {};
+EI.addCallback("func1", o);
+check_equals(EI.func1, undefined);
+
 #endif  // version > 7 }
 
 #endif // OUTPUT_VERSION >= 6 }
@@ -356,6 +363,6 @@ xcheck_equals (typeOf(val), 'object');
 #elif OUTPUT_VERSION < 8 // }{
 	check_totals(49);
 #else // SWF8+ }{
-	check_totals(111);
+	check_totals(112);
 # endif // }
 
