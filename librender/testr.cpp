@@ -262,7 +262,7 @@ void
 test_renderer(Renderer *renderer, const std::string &type)
 {
     cout << "Testing " << type << " Renderer" << endl;
-    Timer trend("Renderer Tests", true);
+//    Timer trend("Renderer Tests", true);
     
     if (!renderer) {
         runtest.unresolved("No renderer to test!");
