@@ -142,35 +142,6 @@ ExternalInterface::_toXML(const as_value &val)
     return ss.str();
 }
 
-std::map<std::string, as_value>
-ExternalInterface::propertiesToAS(std::string &xml)
-{
-    // GNASH_REPORT_FUNCTION;
-    std::map<std::string, as_value> props;
-
-    std::string::size_type start = 0;
-    std::string::size_type end;
-
-    std::string id;
-    start = xml.find(" id=");
-    while (start != std::string::npos) {
-        // Extract the id from the property tag
-        start++;
-        end = xml.find(">", start) - 1;
-        id = xml.substr(start, end-start);
-        id.erase(0, 4);
-
-        // Extract the data
-        start = end + 2;
-        end = xml.find("</property>", start) ;
-        std::string data = xml.substr(start, end-start);
-        props[id] = toAS(data);
-        start = xml.find(" id=", end);
-    }
-
-    return props;
-}
-
 as_value
 ExternalInterface::objectToAS(Global_as& /*gl*/, const std::string &/*xml*/)
 {
