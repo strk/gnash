@@ -49,6 +49,7 @@
 #include "log.h"
 #include "RunResources.h"
 #include "StreamProvider.h"
+#include "ObjectURI.h"
 
 #define MAXHOSTNAMELEN 256 // max hostname size. However this is defined in netdb.h
 
@@ -660,14 +661,63 @@ externalinterface_uToXML(const fn_call& fn)
 as_value
 externalinterface_uToAS(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
-    
-    if (fn.nargs == 1) {
-        as_value val = ExternalInterface::toAS(getGlobal(fn),
-                fn.arg(0).to_string());
-        return val;
+    if (!fn.nargs) return as_value();
+
+    as_value arg = fn.arg(0);
+    as_object* o = toObject(arg, getVM(fn));
+
+    if (!o) {
+        return as_value();
     }
-    
+    string_table& st = getStringTable(fn);
+    const ObjectURI nodeName(st.find("nodeName"));
+    const ObjectURI firstChild(st.find("firstChild"));
+
+    const as_value& nn = getMember(*o, nodeName);
+
+    if (equals(nn, as_value("number"), getVM(fn))) {
+        as_object* fc = toObject(getMember(*o, firstChild), getVM(fn));
+        const as_value v = callMethod(fc, NSV::PROP_TO_STRING);
+        // This should call Number(obj.firstChild.toString()), i.e. use
+        // the non-constructing number conversion function, but the extra
+        // code needed to implement that isn't worth it.
+        return as_value(toNumber(v, getVM(fn)));
+    }
+    if (equals(nn, as_value("string"), getVM(fn))) {
+        as_object* ei =
+            fn.env().find_object("flash.external.ExternalInterface");
+        as_value fc = getMember(*o, firstChild);
+        return callMethod(ei, st.find("_unescapeXML"),
+                fc.to_string(getSWFVersion(fn)));
+    }
+    if (equals(nn, as_value("false"), getVM(fn))) {
+        return as_value(false);
+    }
+    if (equals(nn, as_value("true"), getVM(fn))) {
+        return as_value(true);
+    }
+    if (equals(nn, as_value("null"), getVM(fn))) {
+        as_value null;
+        null.set_null();
+        return null;
+    }
+    if (equals(nn, as_value("undefined"), getVM(fn))) {
+        return as_value();
+    }
+    if (equals(nn, as_value("object"), getVM(fn))) {
+        as_object* ei =
+            fn.env().find_object("flash.external.ExternalInterface");
+        return callMethod(ei, st.find("_objectToXML"), o);
+    }
+    if (equals(nn, as_value("array"), getVM(fn))) {
+        as_object* ei =
+            fn.env().find_object("flash.external.ExternalInterface");
+        return callMethod(ei, st.find("_arrayToXML"), o);
+    }
+    if (equals(nn, as_value("class"), getVM(fn))) {
+        as_value fc = getMember(*o, firstChild);
+        return fn.env().find_object(fc.to_string(getSWFVersion(fn)));
+    }
     return as_value();
 }
 
