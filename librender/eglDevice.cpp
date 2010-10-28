@@ -294,7 +294,7 @@ EGLDevice::initDevice(EGLDevice::rtype_t rtype)
         return false;
     }
 
-#ifdef HAVE_GTK2
+#ifdef HAVE_GTK2_XX
     Display *X11Display = XOpenDisplay(0);
     XVisualInfo *visInfo, visTemplate;
     int num_visuals;
@@ -308,7 +308,7 @@ EGLDevice::initDevice(EGLDevice::rtype_t rtype)
    XFree(visInfo);
 #endif
     
-    // printEGLConfig(_eglConfig);
+   // printEGLConfig(_eglConfig);
 #if 0
    if (!checkEGLConfig(_eglConfig)) {
        log_error("EGL configuration doesn't match!");
@@ -317,58 +317,63 @@ EGLDevice::initDevice(EGLDevice::rtype_t rtype)
        //printEGLConfig(_eglConfig);
    }
 #endif
-   
-#if HAVE_GTK2
-   _nativeWindow = gdk_x11_get_default_root_xwindow();
-#endif
-   
-   // step4 - create a window surface
-   log_debug("Initializing EGL Surface");
-   if (_nativeWindow) {
-       _eglSurface = eglCreateWindowSurface(_eglDisplay, _eglConfig,
-                                            _nativeWindow, 0); // was window_attrib_list
-   } else {
-       log_error("No native window!");
-       return false;
-   }
-   
-   if (EGL_NO_SURFACE == _eglSurface) {
-       log_error("eglCreateWindowSurface failed (error %s)", 
-                 getErrorString(eglGetError()));
-       return false;
-   } else {
-       //printEGLSurface(_eglSurface);
-   }
-   
-   // step5 - create a context
-   _eglContext = eglCreateContext(_eglDisplay, _eglConfig, EGL_NO_CONTEXT, NULL);
-   if (EGL_NO_CONTEXT == _eglContext) {
-       log_error("eglCreateContext failed (error %s)",
-                 getErrorString(eglGetError()));
-       return false;
-   } else {
-       printEGLContext(_eglContext);
-   }
-    
-   // step6 - make the context and surface current
-   if (EGL_FALSE == eglMakeCurrent(_eglDisplay, _eglSurface, _eglSurface, _eglContext)) {
-       log_error("eglMakeCurrent failed (error %s)",
-                 getErrorString(eglGetError()));
-       return false;
-   }       // begin user code
-   
+
 #if 0
 #if 0
     eglSwapInterval(_eglDisplay, 0);
 #else
     eglSwapBuffers(_eglDisplay, _eglSurface);
 #endif
-
+    
 //    log_debug("Gnash EGL Frame width %d height %d bpp %d \n", _width, _height, _bpp);
 #endif
     
     return true;
 }
+
+bool
+EGLDevice::initEGL(EGLNativeWindowType window)
+{
+    
+    if (!window) {
+#if HAVE_GTK2
+        _nativeWindow = gdk_x11_get_default_root_xwindow();
+#endif
+    } else {
+        _nativeWindow = window;
+    }
+
+    log_debug("Initializing EGL Surface");
+    if (_nativeWindow) {
+        _eglSurface = eglCreateWindowSurface(_eglDisplay, _eglConfig, _nativeWindow, 0);
+    } else {
+        log_error("No native window!");
+    }
+    
+    if (EGL_NO_SURFACE == _eglSurface) {
+        log_error("eglCreateWindowSurface failed (error %s)", 
+                  getErrorString(eglGetError()));
+    } else {
+        printEGLSurface(_eglSurface);
+    }
+
+    // step5 - create a context
+    _eglContext = eglCreateContext(_eglDisplay, _eglConfig, EGL_NO_CONTEXT, NULL);
+    if (EGL_NO_CONTEXT == _eglContext) {
+        log_error("eglCreateContext failed (error %s)",
+                  getErrorString(eglGetError()));
+    } else {
+        printEGLContext(_eglContext);
+    }
+    
+    // step6 - make the context and surface current
+    if (EGL_FALSE == eglMakeCurrent(_eglDisplay, _eglSurface, _eglSurface, _eglContext)) {
+        log_error("eglMakeCurrent failed (error %s)",
+                  getErrorString(eglGetError()));
+    }       // begin user code
+    
+    return true;
+}   
 
 const char *
 EGLDevice::getErrorString(int error)
