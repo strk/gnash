@@ -48,12 +48,6 @@ struct DSOEXPORT ExternalInterface
         std::vector<as_value> args;
     };
 
-    // Some of these appear to be undocumented helper functions of this class
-    // that while probably designed to be used internally, get used
-    // by ActionScript coders.
-
-    DSOEXPORT static as_value objectToAS(Global_as& gl, const std::string &xml);
-    
     /// Convert an AS object to an XML string.
     static std::string toXML(const as_value &obj) {
         ExternalInterface ei;

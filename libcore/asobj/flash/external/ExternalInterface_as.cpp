@@ -547,11 +547,7 @@ externalinterface_uObjectID(const fn_call& /*fn*/)
 as_value
 externalinterface_uObjectToAS(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
-    if (fn.nargs == 1) {
-        return ExternalInterface::objectToAS(getGlobal(fn), fn.arg(0).to_string());
-    }
-    
+    LOG_ONCE(log_unimpl("ExternalInterface._objectToAS"));
     return as_value();
 }
 

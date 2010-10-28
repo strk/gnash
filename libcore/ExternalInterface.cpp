@@ -137,14 +137,6 @@ ExternalInterface::_toXML(const as_value &val)
     return ss.str();
 }
 
-as_value
-ExternalInterface::objectToAS(Global_as& /*gl*/, const std::string &/*xml*/)
-{
-    // GNASH_REPORT_FUNCTION;
-
-    return as_value();
-}
-
 boost::shared_ptr<ExternalInterface::invoke_t>
 ExternalInterface::ExternalEventCheck(int fd)
 {
