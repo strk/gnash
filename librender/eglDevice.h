@@ -50,9 +50,12 @@ class EGLDevice
     EGLDevice();
     ~EGLDevice();
 
-    // Initialize EGL
+    // Initialize EGL Device layer
     bool initDevice(rtype_t);
 
+    // Initialize EGL Window layer
+    bool initEGL(EGLNativeWindowType window);
+    
     // Utility methods not in the base class
     /// Return a string with the error code as text, instead of a numeric value
     const char *getErrorString(int error);
@@ -69,6 +72,7 @@ class EGLDevice
     void printEGLSurface(EGLSurface surface);
     
   private:
+    
     EGLConfig           _eglConfig;
     EGLContext          _eglContext;
     EGLSurface          _eglSurface;
