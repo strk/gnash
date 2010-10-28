@@ -93,6 +93,14 @@ test_egl(EGLDevice &egl, EGLDevice::rtype_t rtype)
         runtest.fail("EGLDevice::init()");
     }
 
+    // Init'ing to zero uses the root screen as the display. Otherwise
+    // the argument should be an EGLNativeWindowType.
+    if (egl.initEGL(0)) {
+        runtest.pass("EGLDevice::initEGL(0)");
+    } else {
+        runtest.fail("EGLDevice::initEGL(0)");
+    }
+
     // If there are more than zero configurations, something beyond
     // initializing is working
     if (egl.queryEGLConfig()) {
