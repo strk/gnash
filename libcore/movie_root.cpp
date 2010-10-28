@@ -1630,7 +1630,7 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
     }
 
     if (!ss.str().empty()) {
-	if (_hostfd) {
+	if (_hostfd >= 0) {
 	    log_debug(_("Attempt to write response to ExternalInterface requests fd %d"), _hostfd);
 	    int ret = write(_hostfd, ss.str().c_str(), ss.str().size());
 	    if (ret == -1) {
@@ -1639,7 +1639,7 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
 	    }
 	}
     } else {
-	log_debug("No response needed for %s request", invoke->name);
+        log_debug("No response needed for %s request", invoke->name);
     }
 
     return true;
@@ -1804,7 +1804,7 @@ movie_root::addExternalCallback(as_object *obj, const std::string &name,
 
     // When an external callback is added, we have to notify the plugin
     // that this method is available.
-    if (_hostfd) {
+    if (_hostfd >= 0) {
         std::vector<as_value> fnargs;
         fnargs.push_back(name);
         std::string msg = ExternalInterface::makeInvoke("addMethod", fnargs);
@@ -1839,7 +1839,7 @@ movie_root::callExternalJavascript(const std::string &name,
     std::string result;
     // If the browser is connected, we send an Invoke message to the
     // browser.
-    if (_controlfd && _hostfd) {
+    if (_controlfd >= 0 && _hostfd >= 0) {
         std::string msg = ExternalInterface::makeInvoke(name, fnargs);
         
         const size_t ret = ExternalInterface::writeBrowser(_hostfd, msg);
@@ -1900,7 +1900,7 @@ movie_root::callExternalCallback(const std::string &name,
         
     // If the browser is connected, we send an Invoke message to the
     // browser.
-    if (_hostfd) {
+    if (_hostfd >= 0) {
         const size_t ret = ExternalInterface::writeBrowser(_hostfd, result);
         if (ret != result.size()) {
             log_error(_("Could not write to browser fd #%d: %s"),
@@ -2110,7 +2110,7 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
 
     log_network("%s: HOSTFD is %d",  __FUNCTION__, _hostfd);
     
-    if (_hostfd == -1) {
+    if (_hostfd < 0) {
         /// If there is no hosting application, call the URL launcher. For
         /// safety, we resolve the URL against the base URL for this run.
         /// The data is not sent at all.
