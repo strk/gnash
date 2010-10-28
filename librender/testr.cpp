@@ -92,9 +92,21 @@ GtkWidget *create_GTK_window();
 // Simple class to do nanosecond based timing for performance analysis
 class Timer {
 public:
-    Timer(const std::string &name) { _name = name; start(); }
-    Timer() { start(); }
-    ~Timer() { /*cerr << "Total time for " << _name << " was: " << elapsed() << endl;*/ };
+    Timer(const std::string &name, bool flag)
+        {
+            _print = flag;
+            _name = name;
+            start();
+        }
+    Timer(const std::string &name) : _print(false) { _name = name; start(); }
+    Timer() : _print(false) { start(); }
+    ~Timer()
+        {
+            stop();
+            if (_print) {
+                cerr << "Total time for " << _name << " was: " << elapsed() << endl;
+            }
+        };
     
     void start() {
         _starttime = boost::posix_time::microsec_clock::local_time(); 
@@ -114,6 +126,7 @@ public:
     std::string &getName() { return _name; };
     
 private:
+    bool _print;
     std::string _name;
     boost::posix_time::ptime _starttime;
     boost::posix_time::ptime _stoptime;
@@ -249,6 +262,7 @@ void
 test_renderer(Renderer *renderer, const std::string &type)
 {
     cout << "Testing " << type << " Renderer" << endl;
+    Timer trend("Renderer Tests", true);
     
     if (!renderer) {
         runtest.unresolved("No renderer to test!");
