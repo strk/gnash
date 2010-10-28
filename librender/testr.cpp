@@ -24,10 +24,13 @@
 #include <string>
 #include <cstdlib>
 #include <vector>
+#include <sstream>
 #include <map>
 #include <cassert>
 #include <regex.h>
 #include <boost/assign/list_of.hpp>
+#include <boost/date_time/date.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 // FIXME: this should be a command line option
 #undef GTK_TEST_RENDER
@@ -44,6 +47,7 @@
 #include "Transform.h"
 #include "GnashVaapiImage.h"
 #include "GnashVaapiImageProxy.h"
+#include "boost/date_time/posix_time/posix_time.hpp"
 
 #ifdef RENDERER_AGG
 #include "Renderer_agg.h"
@@ -74,15 +78,46 @@ TestState runtest;
 
 using namespace gnash; 
 using namespace renderer; 
-using namespace std; 
+using namespace std;
+using namespace boost::posix_time;
 
 void test_renderer(Renderer *renderer, const std::string &type);
 void test_geometry(Renderer *renderer, const std::string &type);
 void test_iterators(Renderer *renderer, const std::string &type);
 
-#ifdef HAVE_GTK2
-GtkWidget *create_GTK_window(int argc, char *argv[]);
+#ifdef HAVE_GTK_XX
+GtkWidget *create_GTK_window();
 #endif
+
+// Simple class to do nanosecond based timing for performance analysis
+class Timer {
+public:
+    Timer(const std::string &name) { _name = name; start(); }
+    Timer() { start(); }
+    ~Timer() { /*cerr << "Total time for " << _name << " was: " << elapsed() << endl;*/ };
+    
+    void start() {
+        _starttime = boost::posix_time::microsec_clock::local_time(); 
+    }
+    
+    void stop() {
+        _stoptime = boost::posix_time::microsec_clock::local_time(); 
+    }
+
+    std::string elapsed() {
+        stringstream ss;
+        time_duration td = _stoptime - _starttime;
+        ss << td.total_nanoseconds() << "ns elapsed";
+        return ss.str();
+    }
+    void setName(const std::string &name) { _name = name; };
+    std::string &getName() { return _name; };
+    
+private:
+    std::string _name;
+    boost::posix_time::ptime _starttime;
+    boost::posix_time::ptime _stoptime;
+};
 
 // The debug log used by all the gnash libraries.
 static LogFile& dbglogfile = LogFile::getDefaultInstance();
@@ -95,8 +130,8 @@ main(int argc, char *argv[])
 
     const char *pixelformat = "RGB24";
 
-#ifdef HAVE_GTK2
-    create_GTK_window(argc, argv);
+#ifdef HAVE_GTK2_XX
+    GtkWidget *window = create_GTK_window();
 #endif
 
 #ifdef GTK_TEST_RENDER
@@ -124,13 +159,17 @@ main(int argc, char *argv[])
     Renderer *renderer = 0;
 
 #ifdef RENDERER_AGG
+    Timer tagg("AGG");
     renderer = create_Renderer_agg(pixelformat);
     test_renderer(renderer, "AGG");
     test_geometry(renderer, "AGG");
     test_iterators(renderer, "AGG");
+    tagg.stop();
+    cerr << "AGG tests took " << tagg.elapsed() << endl;
 #endif
-
-#ifdef RENDERER_OPENVG
+    
+#ifdef RENDERER_OPENVG 
+    Timer tovg("OpenVG");
     renderer = renderer::openvg::create_handler(pixelformat);
     if (renderer) {
         test_renderer(renderer, "OpenVG");
@@ -139,9 +178,12 @@ main(int argc, char *argv[])
     } else {
         cerr << "ERROR: No OpenVG renderer to test!" << endl;
     }
+    tovg.stop();
+    cerr << "OpenVG tests took " << tovg.elapsed() << endl;
 #endif
     
 #ifdef RENDERER_GLES1
+    Timer tgles1("OpenGLES1");
     renderer = renderer::gles1::create_handler(pixelformat);
     if (renderer) {
         test_renderer(renderer, "OpenGLES1");
@@ -150,9 +192,12 @@ main(int argc, char *argv[])
     } else {
         cerr << "ERROR: No OpenGLES1 renderer to test!" << endl;
     }
+    tgles1.stop();
+    cerr << "OpenGLES1 tests took " << tgles1.elapsed() << endl;
 #endif
 
 #ifdef RENDERER_GLES2
+    Timer tgles2("OpenGLES2");
     renderer =  renderer::gles2::create_handler(pixelformat);
     if (renderer) {
         test_renderer(renderer, "OpenGLES2");
@@ -161,9 +206,12 @@ main(int argc, char *argv[])
     } else {
         cerr << "ERROR: No OpenGLES2 renderer to test!" << endl;
     }
+    tgles2.stop();
+    cerr << "OpenGLES2 tests took " << tgles2.elapsed() << endl;
 #endif
 
-#ifdef RENDERER_CAIRO
+#ifdef RENDERER_CAIRO 
+    Timer tcairo("Cairo");
     renderer = renderer::cairo::create_handler();
     if (renderer) {
         test_renderer(renderer, "Cairo");
@@ -172,9 +220,12 @@ main(int argc, char *argv[])
     } else {
         cerr << "ERROR: No Cairo renderer to test!" << endl;
     }
+    tcairo.stop();
+    cerr << "Cairo tests took " << tcairo.elapsed() << endl;
 #endif
     
 #ifdef RENDERER_OPENGL
+    Timer tgl("OpenGL");
     renderer = renderer::opengl::create_handler(true);
     if (renderer) {
         test_renderer(renderer, "OpenGL");
@@ -183,14 +234,15 @@ main(int argc, char *argv[])
     } else {
         cerr << "ERROR: No OpenGL renderer to test!" << endl;
     }
+    tgl.stop();
+    cerr << "OpenGL tests took " << tgl.elapsed() << endl;
 #endif
     
-#ifdef HAVE_GTK2
+#ifdef HAVE_GTK2_XX
     gtk_main();
     gtk_main_quit();
     gtk_exit(0);
 #endif
-
 }
 
 void
@@ -248,13 +300,16 @@ test_renderer(Renderer *renderer, const std::string &type)
     SWFMatrix mat;
     mat.set_scale_rotation(1, 3, 0);
 
+    Timer tdrawline("drawline");
     renderer->drawLine(box, color, mat);
+    tdrawline.stop();
+    
     // if (1) {
     //     runtest.pass("drawLine()");
     // } else {
     //     runtest.fail("drawLine()");
     // }
-    runtest.unresolved("drawLine()");
+    runtest.unresolved(std::string("drawLine() ") + tdrawline.elapsed());
 
     //drawVideoFrame(image::GnashImage* frame, const Transform& xform, const SWFRect* bounds, bool smooth);
 #if 0
@@ -262,47 +317,58 @@ test_renderer(Renderer *renderer, const std::string &type)
     const Transform xform;
     const SWFRect bounds;
     bool smooth;
+    Timer tdrawvideo("drawVideoFrame");
     renderer->drawVideoFrame(frame, xform, bounds, smooth);
+    tdrawvideo.stop();
 #endif
-    runtest.unresolved("drawVideoFrame()");
+    runtest.untested("drawVideoFrame()");
 
     point *corners = 0;
     size_t corner_count = 0;
     rgba fill(0, 0, 0, 255);;
     rgba outline(0, 0, 0, 255);;
     bool masked = true;
+    Timer tdrawpoly("drawPoly");
     renderer->drawPoly(corners, corner_count, fill, outline, mat, masked);
-    runtest.unresolved("drawPoly()");
+    tdrawpoly.stop();
+    runtest.unresolved(std::string("drawPoly() ") + tdrawpoly.elapsed());
     
 //    SWF::ShapeRecord shape;
     // Transform xform;
     
+//    Timer drawshape("drawShape");
 //    renderer->drawShape(shape, xform);
-    runtest.unresolved("drawShape()");
-
+    runtest.untested("drawShape()");
+//    drawshape.stop();
+    
 //    SWF::ShapeRecord rec;
     // rgba color;
     // SWFMatrix mat;
+//    Timer drawGlyph("drawGlyph");
 //    renderer->drawGlyph(rec, color, mat);
-    runtest.unresolved("drawGlyph()");
+    runtest.untested("drawGlyph()");
+//   drawglyph.stop();
 
 #if 0
     boost::shared_ptr<IOChannel> io;
     FileType ftype;
+    Timer renderi("renderToImage");
     renderer->renderToImage(io, ftype);
+    renderi.stop();
 #endif
-    runtest.unresolved("renderToImage()");
+    runtest.untested("renderToImage()");
 
     CachedBitmap *bitmap = 0;
     image::GnashImage *frame2 = new image::ImageRGBA(10, 10);
     std::auto_ptr<image::GnashImage> im(frame2);
+    Timer cbit("createCachedBitmap");
     bitmap = renderer->createCachedBitmap(im);
+    cbit.stop();
     if (bitmap) {
-        runtest.pass("createCachedBitmap()");
+        runtest.pass(std::string("createCachedBitmap() ") + cbit.elapsed());
     } else {
-        runtest.fail("createCachedBitmap()");
+        runtest.fail(std::string("createCachedBitmap() ") + cbit.elapsed());
     }
-    runtest.unresolved("createCachedBitmap()");
     
 }
 void
@@ -321,44 +387,65 @@ test_geometry(Renderer *renderer, const std::string &type)
     geometry::Point2d z(x, y);
     geometry::Range2d<int> pixelbounds;
     geometry::Range2d<int> worldbounds;
+    Timer tpixtow("pixel_to_world(int, int)");
     z = renderer->pixel_to_world(x, y);
+    tpixtow.stop();
+    
     if ((z.x >= 199) || (z.y >= 199)) {
-        runtest.pass("pixel_to_world(int, int)");
+        runtest.pass(std::string("pixel_to_world(int, int) ") + tpixtow.elapsed());
     } else {
-        runtest.fail("pixel_to_world(int, int)");
-    }
-//    worldbounds = renderer->pixel_to_world(pixelbounds);
-    if (worldbounds.isNull()) {
-        runtest.pass("pixel_to_world(geometry::Range2d<int>)");
-    } else {
-        runtest.fail("pixel_to_world(geometry::Range2d<int>)");
+        runtest.fail(std::string("pixel_to_world(int, int) ") + tpixtow.elapsed());
     }
     
-    pixelbounds = renderer->world_to_pixel(worldbounds);
-    if (pixelbounds.isNull()) {
-        runtest.pass("world_to_pixel(geometry::Range2d<int>)");
+#if 0
+    Timer tpixtow2("pixel_to_world(pixelbounds)");
+    worldbounds = renderer->pixel_to_world(pixelbounds);
+    tpixtow2.stop();
+    if (worldbounds.isNull()) {
+        runtest.pass(std::string("pixel_to_world(geometry::Range2d<int>) ") + tpixtow2.elapsed());
     } else {
-        runtest.fail("world_to_pixel(geometry::Range2d<int>)");
+        runtest.fail(std::string("pixel_to_world(geometry::Range2d<int>) ") + tpixtow2.elapsed());
+    }
+#else
+    runtest.untested("pixel_to_world(geometry::Range2d<int>)");
+#endif
+    
+    Timer twtop("world_to_pixel(geometry::Range2d<int>)");
+    pixelbounds = renderer->world_to_pixel(worldbounds);
+    twtop.stop();
+    if (pixelbounds.isNull()) {
+        runtest.pass(std::string("world_to_pixel(geometry::Range2d<int>) ") + twtop.elapsed());
+    } else {
+        runtest.fail(std::string("world_to_pixel(geometry::Range2d<int>) ") + twtop.elapsed());
     }
     
     SWFRect bounds;
-    if (!renderer->bounds_in_clipping_area(bounds)) {
-        runtest.pass("bounds_in_clipping_area(SWFRect)");
+    Timer tbounds1("bounds_in_clipping_area(SWFRect)");
+    bool ret = renderer->bounds_in_clipping_area(bounds);
+    tbounds1.stop();
+    if (ret) {
+        runtest.pass(std::string("bounds_in_clipping_area(SWFRect) ") + tbounds1.elapsed());
     } else {
-        runtest.fail("bounds_in_clipping_area(SWFRect)");
+        runtest.fail(std::string("bounds_in_clipping_area(SWFRect) ") + tbounds1.elapsed());
     }
     
     InvalidatedRanges ranges;
-    if (!renderer->bounds_in_clipping_area(ranges)) {
-        runtest.pass("bounds_in_clipping_area(InvalidatedRanges)");
+    Timer tbounds2("bounds_in_clipping_area(InvalidatedRanges)");
+    ret = renderer->bounds_in_clipping_area(ranges);
+    tbounds2.stop();
+    if (!ret) {
+        runtest.pass(std::string("bounds_in_clipping_area(InvalidatedRanges) ") + tbounds2.elapsed());
     } else {
-        runtest.fail("bounds_in_clipping_area(InvalidatedRanges)");
+        runtest.fail(std::string("bounds_in_clipping_area(InvalidatedRanges) ") + tbounds2.elapsed());
     }
 
-    if (!renderer->bounds_in_clipping_area(pixelbounds)) {
-        runtest.pass("bounds_in_clipping_area(geometry::Range2d<int>)");
+    Timer tbounds3("bounds_in_clipping_area(geometry::Range2d<int>)");
+    ret = renderer->bounds_in_clipping_area(pixelbounds);
+    tbounds3.stop();
+    if (!ret) {
+        runtest.pass(std::string("bounds_in_clipping_area(geometry::Range2d<int>) ") + tbounds3.elapsed());
     } else {
-        runtest.fail("bounds_in_clipping_area(geometry::Range2d<int>)");
+        runtest.fail(std::string("bounds_in_clipping_area(geometry::Range2d<int>) ") + tbounds3.elapsed());
     }
 }
 
