@@ -19,16 +19,18 @@
 #ifndef GNASH_NETCONNECTION_H
 #define GNASH_NETCONNECTION_H
 
-#include "Relay.h" // for inheritance
 
 #include <vector>
 #include <string>
 #include <list>
 #include <memory>
+#include <boost/shared_ptr.hpp>
+
+#include "Relay.h"
 
 // Forward declarations
 namespace gnash {
-    class ConnectionHandler;
+    class Connection;
     class as_object;
     class as_value;
     class IOChannel;
@@ -112,20 +114,18 @@ private:
     /// Extend the URL to be used for playing
     void addToURL(const std::string& url);
 
+    typedef std::list<boost::shared_ptr<Connection> > Connections;
+
     /// Queue of call groups
     //
-    /// For HTTP based remoting, each element on this list
-    /// will perform a POST request containing all calls
-    /// to the same uri and dispatch results.
-    ///
-    std::list<ConnectionHandler*> _queuedConnections;
+    /// A queue of persisting closed connections. Because HTTP remoting
+    /// requests in particular can take time to send and receive data, they
+    /// can still be active after the connection was conceptually closed. This
+    /// stores those connections until they are finished.
+    Connections _oldConnections;
 
-    /// Queue of calls gathered during a single movie advancement
-    //
-    /// For HTTP based remoting, these calls will be performed
-    /// by a single POST operation.
-    ///
-    std::auto_ptr<ConnectionHandler> _currentConnection; 
+    /// The current conceptual network connection.
+    std::auto_ptr<Connection> _currentConnection; 
 
     /// the url prefix optionally passed to connect()
     std::string _uri;
