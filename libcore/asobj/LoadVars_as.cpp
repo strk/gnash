@@ -150,8 +150,6 @@ as_value
 loadvars_ctor(const fn_call& fn)
 {
 
-    if (!fn.isInstantiation()) return as_value();
-
     IF_VERBOSE_ASCODING_ERRORS(
         if (fn.nargs) {
             std::ostringstream ss;
