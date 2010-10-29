@@ -70,9 +70,66 @@ class EGLDevice
     void printEGLContext(EGLContext context);
     void printEGLSurface() { return printEGLSurface(_eglSurface); };
     void printEGLSurface(EGLSurface surface);
+
+    // Accessors for the setting needed by higher level code
+    EGLint getWidth() {
+        EGLint value;
+        eglQuerySurface(_eglDisplay, _eglSurface, EGL_WIDTH, &value);
+        return value;
+    };
+    EGLint getHeigth() {
+        EGLint value;
+        eglQuerySurface(_eglDisplay, _eglSurface, EGL_HEIGHT, &value);
+        return value;
+    }
+    EGLint getVerticalRes() {
+        EGLint value;
+        eglQuerySurface(_eglDisplay, _eglSurface, EGL_VERTICAL_RESOLUTION, &value);
+        return value;
+    }
+    EGLint getHorzRes() {
+        EGLint value;
+        eglQuerySurface(_eglDisplay, _eglSurface, EGL_HORIZONTAL_RESOLUTION, &value);
+        return value;
+    }
+    bool supportsRenderer(rtype_t rtype) {
+        EGLint value;
+        eglQuerySurface(_eglDisplay, _eglSurface, EGL_HEIGHT, &value);
+        eglGetConfigAttrib(_eglDisplay, _eglConfig, EGL_RENDERABLE_TYPE, &value);
+        if (value > 0) {
+            std::string str;
+            if ((value & EGL_OPENGL_ES2_BIT) && (rtype == EGLDevice::OPENGLES2)) {
+                return true;
+            }
+            if ((value & EGL_OPENGL_ES_BIT) && (rtype == EGLDevice::OPENGLES1)) {
+                return true;
+            }
+            if ((value & EGL_OPENVG_BIT) && (rtype == EGLDevice::OPENVG)){
+                return true;
+            }
+        }
+        return false;
+    }
+    bool isSingleBuffered() {
+        EGLint value;
+        eglQuerySurface(_eglDisplay, _eglSurface, EGL_SINGLE_BUFFER, &value);
+        if (value == EGL_SINGLE_BUFFER) {
+            return true;
+        }
+        return false;
+    }
     
-  private:
+    bool isBackBuffered() {
+        EGLint value;
+        eglQuerySurface(_eglDisplay, _eglSurface, EGL_BACK_BUFFER, &value);
+        if (value == EGL_BACK_BUFFER) {
+            return true;
+        }
+        return false;
+    }
+
     
+protected:
     EGLConfig           _eglConfig;
     EGLContext          _eglContext;
     EGLSurface          _eglSurface;

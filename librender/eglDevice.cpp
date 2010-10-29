@@ -295,17 +295,21 @@ EGLDevice::initDevice(EGLDevice::rtype_t rtype)
     }
 
 #ifdef HAVE_GTK2_XX
-    Display *X11Display = XOpenDisplay(0);
-    XVisualInfo *visInfo, visTemplate;
-    int num_visuals;
-    // The X window visual must match the EGL config
-   visTemplate.visualid = vid;
-   visInfo = XGetVisualInfo(X11Display, VisualIDMask, &visTemplate, &num_visuals);
-   if (!visInfo) {
-       log_error("couldn't get X visual");
-       return false;
-   }
-   XFree(visInfo);
+    GdkVisual* wvisual = gdk_drawable_get_visual(_drawing_area->window);
+
+    GdkImage* tmpimage = gdk_image_new (GDK_IMAGE_FASTEST, wvisual, 1, 1);
+
+    const GdkVisual* visual = tmpimage->visual;
+
+    // FIXME: we use bpp instead of depth, because depth doesn't appear to
+    // include the padding byte(s) the GdkImage actually has.
+    const char *pixelformat = agg_detect_pixel_format(
+        visual->red_shift, visual->red_prec,
+        visual->green_shift, visual->green_prec,
+        visual->blue_shift, visual->blue_prec,
+        tmpimage->bpp * 8);
+
+    gdk_image_destroy(tmpimage);
 #endif
     
    // printEGLConfig(_eglConfig);
@@ -337,6 +341,9 @@ EGLDevice::initEGL(EGLNativeWindowType window)
     
     if (!window) {
 #if HAVE_GTK2
+        // This renders to the root screen, instead of the canvas, but keeps
+        // the test case from core dumping, and doesn't really effect anything
+        // but seeing that you are rendering.
         _nativeWindow = gdk_x11_get_default_root_xwindow();
 #endif
     } else {
@@ -590,15 +597,16 @@ EGLDevice::printEGLContext(EGLContext context)
 {
     EGLint value;
     eglQueryContext(_eglDisplay, context, EGL_CONFIG_ID, &value);
-    log_debug("Context EGL_CONFIG_ID is %d", value);
+    std::cerr << "Context EGL_CONFIG_ID is " << value << std::endl;
     eglQueryContext(_eglDisplay, context, EGL_CONTEXT_CLIENT_TYPE, &value);
-    log_debug("\tEGL_CONTEXT_CLIENT_TYPE is %d", (value == EGL_OPENVG_API)
-              ? "EGL_OPENVG_API" : "EGL_OPENGL_ES_API");
+    std::cerr << "\tEGL_CONTEXT_CLIENT_TYPE is "
+              << std::string((value == EGL_OPENVG_API)
+              ? "EGL_OPENVG_API" : "EGL_OPENGL_ES_API") << std::endl;
     // eglQueryContext(_eglDisplay, context, EGL_CONTEXT_CLIENT_VERSION, &value);
     // log_debug("EGL_CONTEXT_CLIENT_VERSION is %d", value);
     eglQueryContext(_eglDisplay, context, EGL_RENDER_BUFFER, &value);
-    log_debug("\tEGL_RENDER_BUFFER is %s", (value == EGL_BACK_BUFFER)
-              ? "EGL_BACK_BUFFER" : "EGL_SINGLE_BUFFER");
+    std::cerr << "\tEGL_RENDER_BUFFER is " << std::string((value == EGL_BACK_BUFFER)
+              ? "EGL_BACK_BUFFER" : "EGL_SINGLE_BUFFER") << std::endl;
 }
 
 void
@@ -606,24 +614,26 @@ EGLDevice::printEGLSurface(EGLSurface surface)
 {
     EGLint value;
     eglQuerySurface(_eglDisplay, surface, EGL_CONFIG_ID, &value);
-    log_debug("Surface EGL_CONFIG_ID is %d", value);
+    std::cerr << "Surface EGL_CONFIG_ID is " << value << std::endl;
     eglQuerySurface(_eglDisplay, surface, EGL_HEIGHT, &value);
-    log_debug("\tEGL_HEIGHT is %d", value);
+    std::cerr << "\tEGL_HEIGHT is " << value<< std::endl;
     eglQuerySurface(_eglDisplay, surface, EGL_WIDTH, &value);
-    log_debug("\tEGL_WIDTH is %d", value);
+    std::cerr << "\tEGL_WIDTH is " << value << std::endl;
     eglQuerySurface(_eglDisplay, surface, EGL_RENDER_BUFFER, &value);
-    log_debug("\tEGL_RENDER_BUFFER is %s", (value == EGL_BACK_BUFFER)
-              ? "EGL_BACK_BUFFER" : "EGL_SINGLE_BUFFER");
+    std::cerr << "\tEGL_RENDER_BUFFER is " << std::string((value == EGL_BACK_BUFFER)
+              ? "EGL_BACK_BUFFER" : "EGL_SINGLE_BUFFER") << std::endl;
     eglQuerySurface(_eglDisplay, surface, EGL_VERTICAL_RESOLUTION, &value);
-    log_debug("\tEGL_VERTICAL_RESOLUTION is %d", value);
+    std::cerr << "\tEGL_VERTICAL_RESOLUTION is " << value << std::endl;
     eglQuerySurface(_eglDisplay, surface, EGL_HORIZONTAL_RESOLUTION, &value);
-    log_debug("\tEGL_HORIZONTAL_RESOLUTION is %d", value);
+    std::cerr << "\tEGL_HORIZONTAL_RESOLUTION is " << value << std::endl;
     eglQuerySurface(_eglDisplay, surface, EGL_SWAP_BEHAVIOR, &value);
-    log_debug("\tEGL_SWAP_BEHAVIOR is %d", (value == EGL_BUFFER_DESTROYED)
-              ? "EGL_BUFFER_DESTROYED" : "EGL_BUFFER_PRESERVED");
+    std::cerr << "\tEGL_SWAP_BEHAVIOR is "
+              << std::string((value == EGL_BUFFER_DESTROYED)
+                 ? "EGL_BUFFER_DESTROYED" : "EGL_BUFFER_PRESERVED") << std::endl;
     eglQuerySurface(_eglDisplay, surface, EGL_MULTISAMPLE_RESOLVE, &value);
-    log_debug("\tEGL_MULTISAMPLE_RESOLVE is %d", (value == EGL_MULTISAMPLE_RESOLVE_BOX)
-              ? "EGL_MULTISAMPLE_RESOLVE_BOX" : "EGL_MULTISAMPLE_RESOLVE_DEFAULT");
+    std::cerr << "\tEGL_MULTISAMPLE_RESOLVE is "
+              << std::string((value == EGL_MULTISAMPLE_RESOLVE_BOX)
+                 ? "EGL_MULTISAMPLE_RESOLVE_BOX" : "EGL_MULTISAMPLE_RESOLVE_DEFAULT") << std::endl;
 }
 
 } // namespace renderer
