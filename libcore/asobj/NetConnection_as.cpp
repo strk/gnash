@@ -141,7 +141,8 @@ protected:
         :
         _nc(nc),
         _numCalls(0)
-    {}
+    {
+    }
 
     void pushCallback(size_t id, as_object* callback) {
         _callbacks[id] = callback;
@@ -173,6 +174,45 @@ ConnectionHandler::getStream(const std::string&)
     log_unimpl("%s doesn't support fetching streams", typeName(*this));
     return std::auto_ptr<IOChannel>(0);
 }
+
+struct HTTPRequest
+{
+    HTTPRequest(ConnectionHandler& h)
+        :
+        _handler(h),
+        _calls(0)
+    {
+        // leave space for header
+        _data.append("\000\000\000\000\000\000", 6);
+        _headers["Content-Type"] = "application/x-amf";
+    }
+
+    /// Add AMF data to this request.
+    void addData(const SimpleBuffer& amf) {
+        _data.append(amf.data(), amf.size());
+        ++_calls;
+    }
+
+private:
+
+    ConnectionHandler& _handler;
+
+    /// The data to be sent by POST with this request.
+    SimpleBuffer _data;
+
+    /// A buffer for the reply.
+    SimpleBuffer _reply;
+
+    /// The number of separate remoting calls to be encoded in this request.
+    size_t _calls;
+
+    /// A single HTTP request.
+    boost::scoped_ptr<IOChannel> _request;
+    
+    /// Headers to be sent with this request.
+    NetworkAdapter::RequestHeaders _headers;
+
+};
 
 //---- HTTPRemotingHandler (HTTPConnectionHandler) ---
 
