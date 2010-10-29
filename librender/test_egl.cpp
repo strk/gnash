@@ -67,6 +67,8 @@ main(int argc, char *argv[])
 #ifdef RENDERER_OPENVG
     test_egl(egl1, EGLDevice::OPENVG);
     egl1.printEGLConfig();
+    egl1.printEGLContext();
+    egl1.printEGLSurface();
 #endif
     
 #ifdef RENDERER_GLES1
@@ -118,6 +120,41 @@ test_egl(EGLDevice &egl, EGLDevice::rtype_t rtype)
         runtest.fail("EGLDevice::getErrorString()");
     }
     
+    if (egl.getWidth()) {
+        runtest.pass("EGLDevice::getWidth()");
+    } else {
+        runtest.fail("EGLDevice::getWidth()");
+    }
+    
+    if (egl.getHeigth()) {
+        runtest.pass("EGLDevice::getHeigth()");
+    } else {
+        runtest.fail("EGLDevice::getHeigth()");
+    }
+    
+    if (egl.getVerticalRes()) {
+        runtest.pass("EGLDevice::getVerticalRes()");
+    } else {
+        runtest.fail("EGLDevice::getVerticalRes()");
+    }
+    
+    if (egl.getHorzRes()) {
+        runtest.pass("EGLDevice::getHorzRes()");
+    } else {
+        runtest.fail("EGLDevice::getHorzRes()");
+    }
+    
+    if (egl.supportsRenderer(EGLDevice::OPENVG)) {
+        runtest.pass("EGLDevice::supportsRenderer()");
+    } else {
+        runtest.fail("EGLDevice::supportsRenderer()");
+    }
+    
+    if (egl.isSingleBuffered() != egl.isBackBuffered()) {
+        runtest.pass("EGLDevice::isSingleBuffered()");
+    } else {
+        runtest.fail("EGLDevice::isSingleBuffered()");
+    }
 }
 
 // Local Variables:
