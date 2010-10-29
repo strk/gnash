@@ -79,14 +79,12 @@ error_toString(const fn_call& fn)
 as_value
 error_ctor(const fn_call& fn)
 {
-
-    if (!fn.isInstantiation()) return as_value();
-
     as_object* err = fn.this_ptr;
+    if (!err) return as_value();
 
     string_table& st = getStringTable(fn);
 
-    if (fn.nargs) {
+    if (fn.nargs && !fn.arg(0).is_undefined()) {
 		err->set_member(st.find("message"), fn.arg(0));
 	}
 
