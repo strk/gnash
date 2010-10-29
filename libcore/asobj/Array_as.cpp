@@ -1412,17 +1412,15 @@ array_new(const fn_call& fn)
 
     ao->setRelay(0);
     ao->setArray();
-
     ao->init_member(NSV::PROP_LENGTH, 0.0);
 
-    if (fn.nargs == 0) {
+    if (!fn.nargs) {
         return as_value(ao);
     }
 
     if (fn.nargs == 1 && fn.arg(0).is_number()) {
-        int newSize = toInt(fn.arg(0), getVM(fn));
-        if (newSize < 0) newSize = 0;
-        else {
+        const int newSize = std::max(toInt(fn.arg(0), getVM(fn)), 0);
+        if (newSize) {
             ao->set_member(NSV::PROP_LENGTH, newSize);
         }
         return as_value(ao);
@@ -1432,7 +1430,6 @@ array_new(const fn_call& fn)
     for (size_t i = 0; i < fn.nargs; i++) {
         callMethod(ao, NSV::PROP_PUSH, fn.arg(i));
     }
-    
 
     return as_value(ao);
 }
