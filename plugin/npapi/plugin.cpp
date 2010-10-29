@@ -1267,6 +1267,13 @@ nsPluginInstance::startProc()
 std::string
 nsPluginInstance::getCurrentPageURL() const
 {
+    // Return:
+    //  window.document.baseURI
+    //
+    // Was (bogus):
+    //  window.document.location.href
+    //
+
     NPP npp = _instance;
 
     NPIdentifier sDocument = NPN_GetStringIdentifier("document");
@@ -1279,20 +1286,21 @@ nsPluginInstance::getCurrentPageURL() const
     NPN_ReleaseObject(window);
 
     if (!NPVARIANT_IS_OBJECT(vDoc)) {
-        gnash::log_error("Can't get window object");
-        return NULL;
+        gnash::log_error("Can't get window.document object");
+        return std::string();
     }
     
     NPObject* npDoc = NPVARIANT_TO_OBJECT(vDoc);
 
+/*
     NPIdentifier sLocation = NPN_GetStringIdentifier("location");
     NPVariant vLoc;
     NPN_GetProperty(npp, npDoc, sLocation, &vLoc);
     NPN_ReleaseObject(npDoc);
 
     if (!NPVARIANT_IS_OBJECT(vLoc)) {
-        gnash::log_error("Can't get window.location object");
-        return NULL;
+        gnash::log_error("Can't get window.document.location object");
+        return std::string();
     }
 
     NPObject* npLoc = NPVARIANT_TO_OBJECT(vLoc);
@@ -1303,8 +1311,19 @@ nsPluginInstance::getCurrentPageURL() const
     NPN_ReleaseObject(npLoc);
 
     if (!NPVARIANT_IS_STRING(vProp)) {
-        gnash::log_error("Can't get window.location.href object");
-        return NULL;
+        gnash::log_error("Can't get window.document.location.href string");
+        return std::string();
+    }
+*/
+
+    NPIdentifier sProperty = NPN_GetStringIdentifier("baseURI");
+    NPVariant vProp;
+    NPN_GetProperty(npp, npDoc, sProperty, &vProp);
+    NPN_ReleaseObject(npDoc);
+
+    if (!NPVARIANT_IS_STRING(vProp)) {
+        gnash::log_error("Can't get window.document.baseURI string");
+        return std::string();
     }
 
     const NPString& propValue = NPVARIANT_TO_STRING(vProp);
