@@ -230,14 +230,26 @@ for_each(C& container, R (T::*pmf)(const A&),const A& arg)
 }
 
 Renderer_ovg::Renderer_ovg()
-    : m_display_width(0.0),
-      m_display_height(0.0),
+    : _display_width(0.0),
+      _display_height(0.0),
       _drawing_mask(false)
 {
 
     if (!initDevice(EGLDevice::OPENVG)) {
         log_error("Couldn't initialize EGL Device!");
     }
+#ifdef HAVE_GTK2 
+    if (!initEGL(0)) {
+        log_error("Couldn't initialize EGL Window!");
+    }
+    EGLint value;
+    eglQuerySurface(_eglDisplay, _eglSurface, EGL_WIDTH, &value);
+    _display_width = value;
+    eglQuerySurface(_eglDisplay, _eglSurface, EGL_HEIGHT, &value);
+    _display_height = value;
+#else
+#warning "Must initialize a native window!"
+#endif
     
     set_scale(1.0f, 1.0f);
     m_fillpaint = vgCreatePaint();
@@ -268,8 +280,8 @@ Renderer_ovg::init(float x, float y)
     vgSeti(VG_STROKE_JOIN_STYLE, VG_JOIN_ROUND);
     vgSetf(VG_STROKE_MITER_LIMIT, 4.0f);
 #else
-    m_display_width = x;
-    m_display_height = y;
+    _display_width = x;
+    _display_height = y;
     
     // Turn on alpha blending.
     vgSeti (VG_BLEND_MODE, VG_BLEND_SRC_OVER);
@@ -394,12 +406,12 @@ Renderer_ovg::begin_display(const rgba& /* bg_color */, int /* viewport_x0 */,
     
     float mat[9];
     memset(mat, 0, sizeof(mat));
-    mat[0] = (float)m_display_width / float(x1 - x0);  // scale sx
+    mat[0] = (float)_display_width / float(x1 - x0);  // scale sx
     mat[1] = 0; // shx
     mat[3] = 0; // shy
-    mat[4] = -((float)m_display_height / float(y1 - y0)); // scale sy
+    mat[4] = -((float)_display_height / float(y1 - y0)); // scale sy
     mat[6] = 0;   // shift tx
-    mat[7] = m_display_height;   // shift ty
+    mat[7] = _display_height;   // shift ty
     
     vgSeti (VG_MATRIX_MODE, VG_MATRIX_PATH_USER_TO_SURFACE);
     vgLoadMatrix (mat);
@@ -586,11 +598,11 @@ Renderer_ovg::apply_mask()
     mat[3] =  0.0f; // shy
     mat[4] =  -stage_matrix.get_x_scale(); // scale sy
     mat[6] =  0;    // shift tx
-    mat[7] =  m_display_height;   // shift ty
+    mat[7] =  _display_height;   // shift ty
     vgLoadMatrix(mat);
     
 #ifdef OPENVG_VERSION_1_1    
-    vgMask(m_mask, VG_FILL_MASK, 0, 0, m_display_width, m_display_height); FIXME
+    vgMask(m_mask, VG_FILL_MASK, 0, 0, _display_width, _display_height); FIXME
 #endif
 // Call add_paths for each mask.
     std::for_each(_masks.begin(), _masks.end(),
@@ -1492,27 +1504,64 @@ Renderer_ovg::printVGParams()
 bool
 Renderer_ovg::initTestBuffer(unsigned int width, unsigned int height)
 {
-    int size = width * height; // * getBytesPerPixel();
+    int size = width * height * getBitsPerPixel(); // FIXME was Bytes not bits
+
+#ifdef HAVE_GTK2
+    // new surface
+    // makeCurrentContext
+#else
     
     // _testBuffer = static_cast<unsigned char *>(realloc(_testBuffer, size));
     _testBuffer = new unsigned char[size];
     memset(_testBuffer, 0, size);
     printf("\tRenderer Test memory at: %p\n", _testBuffer);
+#endif
     
-//    init_buffer(_testBuffer, size, width, height, width * getBytesPerPixel());
+    initEGL(0);
+    
+    init_buffer(_testBuffer, size, width, height, width * getBitsPerPixel());
 //    init(width, height);
     
     return true;
 }
 
+  /// Initializes the rendering buffer. The memory pointed by "mem" is not
+  /// owned by the renderer and init_buffer() may be called multiple times
+  /// when the buffer size changes, for example. However, bits_per_pixel must
+  /// remain the same. 
+  /// rowstride is the size, in bytes, of one row.
+  /// This method *must* be called prior to any other method of the class!
+void
+Renderer_ovg::init_buffer(unsigned char *mem, int size, int x, int y, int rowstride)
+{
+#if 0
+    assert(x > 0);
+    assert(y > 0);
+    
+    xres    = x;
+    yres    = y;
+    
+    m_rbuf.attach(mem, xres, yres, rowstride);
+    
+    // allocate pixel format accessor and renderer_base
+    m_pixf.reset(new PixelFormat(m_rbuf));
+    m_rbase.reset(new renderer_base(*m_pixf));  
+    
+    // by default allow drawing everywhere
+    set_invalidated_region_world();
+#endif
+}
+  
 Renderer *
 Renderer_ovg::startInternalRender(gnash::image::GnashImage&)
 {
+    
 }
 
 void
 Renderer_ovg::endInternalRender()
 {
+    
 }
 
 void

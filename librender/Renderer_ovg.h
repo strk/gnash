@@ -122,6 +122,7 @@ public:
 
     unsigned int getBitsPerPixel();
     bool initTestBuffer(unsigned width, unsigned height);
+    void init_buffer(unsigned char *mem, int size, int x, int y, int rowstride);
 
     // These methods are only for debugging and development
     void printVGParams();
@@ -201,8 +202,8 @@ public:
     float _height;
   
     // Output size.
-    float m_display_width;
-    float m_display_height;
+    float _display_width;
+    float _display_height;
   
     std::vector<PathVec> _masks;
     bool _drawing_mask;
