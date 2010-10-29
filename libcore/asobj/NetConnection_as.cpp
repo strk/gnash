@@ -100,7 +100,7 @@ public:
     /// Get an stream by name
     //
     /// @param name     Stream identifier
-    virtual std::auto_ptr<IOChannel> getStream(const std::string& name) {
+    virtual std::auto_ptr<IOChannel> getStream(const std::string& /*name*/) {
         log_unimpl("%s doesn't support fetching streams", typeName(*this));
         return std::auto_ptr<IOChannel>(0);
     }
