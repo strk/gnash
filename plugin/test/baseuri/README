@@ -1,0 +1,11 @@
+These files are a test for resolution of relative urls
+with different mixes of <base> tags and "base" params
+and subdir layouts.
+
+The test is not automated, but if you build test.swf in both
+root and sub/ dirs (top line of test.as contains makeswf call)
+you'll have instructions about what to expect written in the
+html page.
+
+As a facility, some javascript code shows what's the supposed
+baseURI to use for resolving relative urls.
