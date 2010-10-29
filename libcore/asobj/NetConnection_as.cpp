@@ -106,8 +106,9 @@ public:
     //
     /// Handles all networking for NetConnection::call() and dispatches
     /// callbacks when needed. 
-    ///
-    /// Return true if wants to be advanced again, false otherwise.
+    //
+    /// @return         false if no further advance is needed. The only
+    ///                 case for this is an error.
     virtual bool advance() = 0;
 
     /// ConnectionHandlers may store references to as_objects
@@ -388,10 +389,6 @@ HTTPRequest::handleAMFReplies(amf::Reader& rd, const boost::uint8_t*& b,
 
 }
 
-/// An AMF remoting reply comprises two main sections: first the invoke
-/// commands to be called on the NetConnection object, and second the
-/// replies to any client invoke messages that requested a callback.
-
 bool
 HTTPRemotingHandler::advance()
 {
@@ -435,6 +432,10 @@ HTTPRequest::send(const URL& url, NetConnection_as& nc)
     _connection.reset(sp.getStream(url, postdata, _headers).release());
 }
 
+
+/// An AMF remoting reply comprises two main sections: first the invoke
+/// commands to be called on the NetConnection object, and second the
+/// replies to any client invoke messages that requested a callback.
 bool
 HTTPRequest::process(NetConnection_as& nc)
 {
@@ -1043,20 +1044,27 @@ NetConnection_as::update()
             _queuedConnections.size() + _currentConnection.get() ? 1 : 0);
 #endif
 
+    // Handle any persisting closed connections. Only HTTP connections
+    // should be here, as RTMP is closed immediately.
     while (!_queuedConnections.empty()) {
         ConnectionHandler* ch = _queuedConnections.front();
 
-        if (!ch->advance()) {
-            log_debug("ConnectionHandler done, dropping");
+        // It's finished if there's an error or if there are no pending
+        // calls.
+        if (!ch->advance() || !ch->hasPendingCalls()) {
             _queuedConnections.pop_front();
             delete ch;
         }
-
         else break; 
     }
 
+    // Advance current connection, but reset if there's an error.
+    //
+    // TODO: notify relevant status.
     if (_currentConnection.get()) {
-        _currentConnection->advance();
+        if (!_currentConnection->advance()) {
+            _currentConnection.reset();
+        }
     }
 
     // Advancement of a connection might trigger creation
