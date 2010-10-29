@@ -129,6 +129,17 @@ public:
 
     virtual ~ConnectionHandler() {}
 
+    as_object* popCallback(size_t id) {
+        CallbacksMap::iterator it = _callbacks.find(id);
+        if (it != _callbacks.end()) {
+            as_object* callback = it->second;
+            _callbacks.erase(it);
+            return callback;
+        }
+        return 0;
+    }
+
+
 protected:
 
     /// Construct a connection handler bound to the given NetConnection object
@@ -146,16 +157,6 @@ protected:
 
     void pushCallback(size_t id, as_object* callback) {
         _callbacks[id] = callback;
-    }
-
-    as_object* popCallback(size_t id) {
-        CallbacksMap::iterator it = _callbacks.find(id);
-        if (it != _callbacks.end()) {
-            as_object* callback = it->second;
-            _callbacks.erase(it);
-            return callback;
-        }
-        return 0;
     }
 
     // Object handling connection status messages
@@ -193,7 +194,19 @@ struct HTTPRequest
         ++_calls;
     }
 
+    void send(const URL& url, NetConnection_as& nc);
+
+    bool process(NetConnection_as& nc);
+
 private:
+
+    static const size_t NCCALLREPLYCHUNK = 1024 * 200;
+
+    /// Handle replies to server functions we invoked with a callback.
+    //
+    /// This needs access to the stored callbacks.
+    void handleAMFReplies(amf::Reader& rd, const boost::uint8_t*& b,
+            const boost::uint8_t* end);
 
     ConnectionHandler& _handler;
 
@@ -207,7 +220,7 @@ private:
     size_t _calls;
 
     /// A single HTTP request.
-    boost::scoped_ptr<IOChannel> _request;
+    boost::scoped_ptr<IOChannel> _connection;
     
     /// Headers to be sent with this request.
     NetworkAdapter::RequestHeaders _headers;
@@ -231,7 +244,6 @@ private:
 class HTTPRemotingHandler : public ConnectionHandler
 {
 public:
-
     /// Create a handler for HTTP remoting
     //
     /// @param nc   The NetConnection AS object to send status/error events to
@@ -239,66 +251,41 @@ public:
     HTTPRemotingHandler(NetConnection_as& nc, const URL& url);
 
     virtual bool hasPendingCalls() const {
-        return _connection || queued_count;
+        return _currentRequest.get() || !_requestQueue.empty();
     }
 
+    /// Queue current request, process all live requests.
     virtual bool advance();
 
+    /// Check if there is a current request. If not, make one.
     virtual void call(as_object* asCallback, const std::string& methodName,
             const std::vector<as_value>& args);
 
 private:
 
-    void push_amf(const SimpleBuffer& amf) {
-        _postdata.append(amf.data(), amf.size());
-        ++queued_count;
-    }
+    const URL _url;
 
-    /// Handle replies to server functions we invoked with a callback.
-    //
-    /// This needs access to the stored callbacks.
-    void handleAMFReplies(amf::Reader& rd, const boost::uint8_t*& b,
-            const boost::uint8_t* end);
+    /// The queue of sent requests.
+    std::vector<boost::shared_ptr<HTTPRequest> > _requestQueue;
 
-    static const size_t NCCALLREPLYCHUNK = 1024 * 200;
-
-    SimpleBuffer _postdata;
-    URL _url;
-    boost::scoped_ptr<IOChannel> _connection;
-    SimpleBuffer _reply;
-    int _reply_start;
-    size_t queued_count;
-
-    // Quick hack to send Content-Type: application/x-amf
-    // TODO: check if we should take headers on a per-call basis
-    //       due to NetConnection.addHeader.
-    NetworkAdapter::RequestHeaders _headers;
+    /// The current request.
+    boost::shared_ptr<HTTPRequest> _currentRequest;
     
 };
 
 HTTPRemotingHandler::HTTPRemotingHandler(NetConnection_as& nc, const URL& url)
         :
         ConnectionHandler(nc),
-        _postdata(),
-        _url(url),
-        _connection(0),
-        _reply(),
-        _reply_start(0),
-        queued_count(0)
+        _url(url)
 {
-    // leave space for header
-    _postdata.append("\000\000\000\000\000\000", 6);
-    assert(_reply.size() == 0);
-
-    _headers["Content-Type"] = "application/x-amf";
 }
 
 /// Process any replies to server functions we invoked.
 //
 /// Note that fatal errors will throw an amf::AMFException.
 void
-HTTPRemotingHandler::handleAMFReplies(amf::Reader& rd,
-        const boost::uint8_t*& b, const boost::uint8_t* end)
+HTTPRequest::handleAMFReplies(amf::Reader& rd, const boost::uint8_t*& b,
+        const boost::uint8_t* end)
 {
     const boost::uint16_t numreplies = amf::readNetworkShort(b);
     b += 2; // number of replies
@@ -366,12 +353,9 @@ HTTPRemotingHandler::handleAMFReplies(amf::Reader& rd,
             throw amf::AMFException("Could not parse argument value");
         }
 
-        // update variable to show how much we've parsed
-        _reply_start = b - _reply.data();
-
         // if actionscript specified a callback object,
         // call it
-        as_object* callback = popCallback(callbackID);
+        as_object* callback = _handler.popCallback(callbackID);
 
         if (!callback) {
             log_error("Unknown HTTP Remoting response identifier '%s'", id);
@@ -407,40 +391,54 @@ HTTPRemotingHandler::handleAMFReplies(amf::Reader& rd,
 /// An AMF remoting reply comprises two main sections: first the invoke
 /// commands to be called on the NetConnection object, and second the
 /// replies to any client invoke messages that requested a callback.
+
 bool
 HTTPRemotingHandler::advance()
 {
+    // If there is data waiting to be sent, send it and push it
+    // to the queue.
+    if (_currentRequest.get()) {
+        _currentRequest->send(_url, _nc);
+        _requestQueue.push_back(_currentRequest);
 
-    // If there is no active connection, check whether messages are waiting
-    if (!_connection) {
+        // Clear the current request for the next go.
+        _currentRequest.reset();
+    }
 
-        // If there is nothing to send, there's no more to do.
-        if (!queued_count) return false;
+    // Process all replies and clear finished requests.
+    for (std::vector<boost::shared_ptr<HTTPRequest> >::iterator i = 
+            _requestQueue.begin(); i != _requestQueue.end();) {
+        if (!(*i)->process(_nc)) i = _requestQueue.erase(i);
+        else ++i;
+    }
 
-        log_debug("creating connection");
+    return true;
+}
 
-        (reinterpret_cast<boost::uint16_t*>(_postdata.data() + 4))[0] =
-            htons(queued_count);
+void
+HTTPRequest::send(const URL& url, NetConnection_as& nc)
+{
+    // We should never have a request without any calls.
+    assert(_calls);
+    log_debug("creating connection");
 
-        std::string postdata_str(reinterpret_cast<char*>(_postdata.data()),
-                _postdata.size());
+    // Fill in header
+    (reinterpret_cast<boost::uint16_t*>(_data.data() + 4))[0] = htons(_calls);
+    std::string postdata(reinterpret_cast<char*>(_data.data()), _data.size());
+
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("NetConnection.call(): encoded args from %1% calls: %2%",
-            queued_count, hexify(_postdata.data(), _postdata.size(), false));
+            _calls, hexify(_data.data(), _data.size(), false));
 #endif
-        queued_count = 0;
 
-        // TODO: it might be useful for a Remoting Handler to have a 
-        // StreamProvider member
-        const StreamProvider& sp =
-            getRunResources(_nc.owner()).streamProvider();
+    const StreamProvider& sp = getRunResources(nc.owner()).streamProvider();
+    _connection.reset(sp.getStream(url, postdata, _headers).release());
+}
 
-        _connection.reset(sp.getStream(_url, postdata_str, _headers).release());
-
-        _postdata.resize(6);
-
-        return true;
-    }
+bool
+HTTPRequest::process(NetConnection_as& nc)
+{
+    assert(_connection);
 
     // Fill last chunk before reading in the next
     size_t toRead = _reply.capacity() - _reply.size();
@@ -453,9 +451,6 @@ HTTPRemotingHandler::advance()
     // See if we need to allocate more bytes for the next
     // read chunk
     if (_reply.capacity() < _reply.size() + toRead) {
-        // if _connection->size() >= 0, reserve for it, so
-        // if HTTP Content-Length response header is correct
-        // we'll be allocating only once for all.
         const size_t newCapacity = _reply.size() + toRead;
 
 #ifdef GNASH_DEBUG_REMOTING
@@ -468,8 +463,8 @@ HTTPRemotingHandler::advance()
         _reply.reserve(newCapacity);
     }
 
-    const int read =
-        _connection->readNonBlocking(_reply.data() + _reply.size(), toRead);
+    const int read = _connection->readNonBlocking(_reply.data() + _reply.size(),
+            toRead);
 
     if (read > 0) {
 #ifdef GNASH_DEBUG_REMOTING
@@ -494,73 +489,61 @@ HTTPRemotingHandler::advance()
     if (_connection->bad()) {
         log_debug("connection is in error condition, calling "
                 "NetConnection.onStatus");
-        _reply.resize(0);
-        _reply_start = 0;
-        // reset connection before calling the callback
-        _connection.reset();
 
         // If the connection fails, it is manually verified
         // that the pp calls onStatus with 1 undefined argument.
-        callMethod(&_nc.owner(), NSV::PROP_ON_STATUS, as_value());
+        callMethod(&nc.owner(), NSV::PROP_ON_STATUS, as_value());
         return false;
     }
-    
-    if (_connection->eof()) {
+ 
+    // Not all data was received, so carry on.
+    if (!_connection->eof()) return true;
 
-        // If it's less than 8 we didn't expect a response, so just ignore
-        // it.
-        if (_reply.size() > 8) {
+    // If it's less than 8 we didn't expect a response, so just ignore
+    // it.
+    if (_reply.size() > 8) {
 
 #ifdef GNASH_DEBUG_REMOTING
-            log_debug("hit eof");
+        log_debug("hit eof");
 #endif
-            const boost::uint8_t *b = _reply.data() + _reply_start;
-            const boost::uint8_t *end = _reply.data() + _reply.size();
-            
-            amf::Reader rd(b, end, getGlobal(_nc.owner()));
-            
-            // skip version indicator and client id
-            b += 2; 
+        const boost::uint8_t *b = _reply.data();
+        const boost::uint8_t *end = _reply.data() + _reply.size();
+        
+        amf::Reader rd(b, end, getGlobal(nc.owner()));
+        
+        // skip version indicator and client id
+        b += 2; 
 
-            try {
-                handleAMFInvoke(rd, b, end, _nc.owner());
-                handleAMFReplies(rd, b, end);
-            }
-            catch (const amf::AMFException& e) {
-
-                // Any fatal error should be signalled by throwing an
-                // exception. In this case onStatus is called with an
-                // undefined argument.
-                log_error("Error parsing server AMF: %s", e.what());
-                _connection.reset();
-                _reply.resize(0);
-                _reply_start = 0;
-                callMethod(&_nc.owner(), NSV::PROP_ON_STATUS, as_value());
-                return false;
-            }
-
+        try {
+            handleAMFInvoke(rd, b, end, nc.owner());
+            handleAMFReplies(rd, b, end);
         }
+        catch (const amf::AMFException& e) {
 
-#ifdef GNASH_DEBUG_REMOTING
-        log_debug("deleting connection");
-#endif
-        _connection.reset();
-        _reply.resize(0);
-        _reply_start = 0;
+            // Any fatal error should be signalled by throwing an
+            // exception. In this case onStatus is called with an
+            // undefined argument.
+            log_error("Error parsing server AMF: %s", e.what());
+            callMethod(&nc.owner(), NSV::PROP_ON_STATUS, as_value());
+        }
     }
 
-    return true;
+    // We've finished with this connection.
+    return false;
 }
 
 void
 HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
             const std::vector<as_value>& args)
 {
+    if (!_currentRequest.get()) {
+        _currentRequest.reset(new HTTPRequest(*this));
+    }
+
+    // Create AMF buffer for this call.
     SimpleBuffer buf(32);
 
-    // method name
-    buf.appendNetworkShort(methodName.size());
-    buf.append(methodName.c_str(), methodName.size());
+    amf::writePlainString(buf, methodName, amf::STRING_AMF0);
 
     const size_t callID = callNo();
 
@@ -569,9 +552,7 @@ HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
     std::ostringstream os;
     os << "/";
     // Call number is not used if the callback is undefined
-    if (asCallback) {
-        os << callID; 
-    }
+    if (asCallback) os << callID;
 
     // Encode callback number.
     amf::writePlainString(buf, os.str(), amf::STRING_AMF0);
@@ -597,8 +578,10 @@ HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
     *(reinterpret_cast<uint32_t*>(buf.data() + total_size_offset)) = 
         htonl(buf.size() - 4 - total_size_offset);
 
-    push_amf(buf);
+    // Add data to the current HTTPRequest.
+    _currentRequest->addData(buf);
 
+    // Remember the callback object.
     if (asCallback) {
         pushCallback(callID, asCallback);
     }
