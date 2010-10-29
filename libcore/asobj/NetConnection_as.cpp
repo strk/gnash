@@ -30,6 +30,7 @@
 #include <utility>
 #include <boost/scoped_ptr.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/noncopyable.hpp>
 #include <iomanip>
 
 #include "GnashSystemNetHeaders.h"
@@ -84,8 +85,7 @@ namespace {
 //
 /// This class abstract operations on network connections,
 /// specifically RPC and streams fetching.
-///
-class ConnectionHandler
+class ConnectionHandler : boost::noncopyable
 {
 public:
     
@@ -94,15 +94,12 @@ public:
     /// @param methodName      A string identifying the remote procedure to call
     /// @param responseHandler  Object to invoke response methods on.
     /// @param args             A vector of arguments
-    /// @return true if the call is queued, false otherwise
     virtual void call(as_object* asCallback, const std::string& methodName,
             const std::vector<as_value>& args) = 0;
 
     /// Get an stream by name
     //
-    /// @param name
-    ///     Stream identifier
-    ///
+    /// @param name     Stream identifier
     virtual std::auto_ptr<IOChannel> getStream(const std::string& name);
 
     /// Process pending traffic, out or in bound
@@ -123,15 +120,14 @@ public:
     //
     /// This will be used on NetConnection.close(): if current
     /// connection has pending calls to process it will be
-    /// queued and only really dropped when advance returns
-    /// false
+    /// queued and only really dropped when advance returns false
     virtual bool hasPendingCalls() const = 0;
-
-    virtual ~ConnectionHandler() {}
 
     size_t callNo() {
         return ++_numCalls;
     }
+
+    virtual ~ConnectionHandler() {}
 
 protected:
 
@@ -161,12 +157,12 @@ protected:
         return 0;
     }
 
-    CallbacksMap _callbacks;
-
     // Object handling connection status messages
     NetConnection_as& _nc;
 
 private:
+
+    CallbacksMap _callbacks;
 
     size_t _numCalls;
 };
@@ -192,7 +188,6 @@ ConnectionHandler::getStream(const std::string&)
 /// call enqueue with a SimpleBuffer containing an encoded AMF call. If action
 /// script specified a callback function, use the optional parameters to specify
 /// the identifier (which must be unique) and the callback object as an as_value
-///
 class HTTPRemotingHandler : public ConnectionHandler
 {
 public:
@@ -214,7 +209,7 @@ public:
 
 private:
 
-    void push_amf(const SimpleBuffer &amf) {
+    void push_amf(const SimpleBuffer& amf) {
         _postdata.append(amf.data(), amf.size());
         ++queued_count;
     }
@@ -537,9 +532,9 @@ HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
     if (asCallback) {
         os << callID; 
     }
-    const std::string callNumberString = os.str();
-    buf.appendNetworkShort(callNumberString.size());
-    buf.append(callNumberString.c_str(), callNumberString.size());
+
+    // Encode callback number.
+    amf::writePlainString(buf, os.str(), amf::STRING_AMF0);
 
     size_t total_size_offset = buf.size();
     buf.append("\000\000\000\000", 4); // total size to be filled in later
@@ -946,6 +941,7 @@ NetConnection_as::connect(const std::string& uri)
 void
 NetConnection_as::close()
 {
+    // Send close event if a connection is in progress or connected is true.
     const bool needSendClosedStatus = _currentConnection.get() || _isConnected;
 
     /// Queue the current call queue if it has pending calls
