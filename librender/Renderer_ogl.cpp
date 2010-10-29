@@ -809,7 +809,7 @@ public:
       }
   }
 
-  boost::shared_ptr<gnash::GnashTexture> getCachedTexture(image::GnashImage *frame)
+  boost::shared_ptr<GnashTexture> getCachedTexture(image::GnashImage *frame)
   {
       boost::shared_ptr<GnashTexture> texture;
       gnash::GnashTextureFormat frameFormat(frame->type());
@@ -1139,7 +1139,7 @@ public:
 
   // NOTE: this implementation can't handle complex polygons (such as concave
   // polygons.
-  virtual void  draw_poly(const point* corners, size_t corner_count, 
+  virtual void  drawPoly(const point* corners, size_t corner_count, 
     const rgba& fill, const rgba& outline, const SWFMatrix& mat, bool /* masked */)
   {
     if (corner_count < 1) {
