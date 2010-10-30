@@ -19,11 +19,13 @@
 //
 
 #include "ScreenShotter.h"
-#include "tu_file.h" // still here ?
 
 #include <cstdio>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/lexical_cast.hpp>
+
+#include "tu_file.h" 
+#include "IOChannel.h"
 
 namespace gnash {
 
@@ -36,7 +38,7 @@ ScreenShotter::saveImage(const std::string& id) const
     
     FILE* f = std::fopen(outfile.c_str(), "wb");
     if (f) {
-        boost::shared_ptr<IOChannel> t(new tu_file(f, true));
+        boost::shared_ptr<IOChannel> t(makeFileChannel(f, true).release());
         _renderer->renderToImage(t, GNASH_FILETYPE_PNG);
     } else {
         log_error("Failed to open screenshot file \"%s\"!", outfile);

@@ -55,11 +55,10 @@ StreamProvider::getStream(const URL& url, bool namedCacheFile) const
 
     std::auto_ptr<IOChannel> stream;
 
-	if (url.protocol() == "file")
-	{
+	if (url.protocol() == "file") {
+
 		std::string path = url.path();
-		if ( path == "-" )
-		{
+		if (path == "-") {
             // TODO: only allow this as the *very first* call ?
             //       Rationale is a movie might request load of
             //       standard input, being a security issue.
@@ -69,11 +68,10 @@ StreamProvider::getStream(const URL& url, bool namedCacheFile) const
 			FILE *newin = fdopen(dup(0), "rb");
 
 			// Close on destruction.
-			stream.reset(new tu_file(newin, true));
+			stream = makeFileChannel(newin, true);
 			return stream;
 		}
-		else
-		{
+		else {
             // check security here !!
 		    if (!allow(url)) return stream;
 
@@ -82,7 +80,7 @@ StreamProvider::getStream(const URL& url, bool namedCacheFile) const
 				return stream;
 			}
 			// Close on destruction
-			stream.reset(new tu_file(newin, true));
+			stream = makeFileChannel(newin, true);
 			return stream;
 		}
 	}
@@ -138,10 +136,9 @@ StreamProvider::getStream(const URL& url, const std::string& postdata,
                         "from file: uri"));
         }
 		std::string path = url.path();
-		if ( path == "-" )
-		{
+		if (path == "-") {
 			FILE *newin = fdopen(dup(0), "rb");
-			stream.reset(new tu_file(newin, false));
+			stream = makeFileChannel(newin, false);
 			return stream;
 		}
 		else
@@ -152,7 +149,7 @@ StreamProvider::getStream(const URL& url, const std::string& postdata,
 			if (!newin)  { 
 				return stream;
 			}
-			stream.reset(new tu_file(newin, false));
+			stream = makeFileChannel(newin, false);
 			return stream;
 		}
 	}
