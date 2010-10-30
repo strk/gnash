@@ -29,10 +29,6 @@
 
 //#define GNASH_DEBUG_AUDIO_DECODING
 
-/* SIMD versions of DSPContext.float_to_int16_interleave() needs input
-   and output buffers aligned to 16-byte boundaries */
-#define NEEDS_ALIGNED_MEMORY 1
-
 #ifdef FFMPEG_AUDIO2
 # define AVCODEC_DECODE_AUDIO avcodec_decode_audio2
 #else
@@ -527,20 +523,12 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 	// TODO: make this a private member, to reuse (see NetStreamFfmpeg in 0.8.3)
     boost::uint8_t* output;
 
-    if (NEEDS_ALIGNED_MEMORY)
-    {
 	output = reinterpret_cast<boost::uint8_t*>(av_malloc(bufsize));
-	if (output == NULL)
-	{
+	if (!output) {
 	    log_error(_("failed to allocate audio buffer."));
 	    outputSize = 0;
 	    return NULL;
 	}
-    }
-    else
-    {
-	output = new boost::uint8_t[bufsize];
-    }
 
     boost::int16_t* outPtr = reinterpret_cast<boost::int16_t*>(output);
 
@@ -565,36 +553,25 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 		    bufsize, inputSize, tmp, outSize);
 #endif
 
-	if (tmp < 0)
-	{
+	if (tmp < 0) {
 		log_error(_("avcodec_decode_audio returned %d. Upgrading "
                     "ffmpeg/libavcodec might fix this issue."), tmp);
 		outputSize = 0;
 
-		if (NEEDS_ALIGNED_MEMORY)
-		    av_free(output);
-		else
-		    delete [] output;
-		return NULL;
+        av_free(output);
 	}
 
-	if (outSize < 2)
-	{
+	if (outSize < 2) {
 		log_error(_("outputSize:%d after decoding %d bytes of input audio "
                     "data. Upgrading ffmpeg/libavcodec might fix this issue."),
 			        outputSize, inputSize);
 		outputSize = 0;
 
-		if (NEEDS_ALIGNED_MEMORY)
-		    av_free(output);
-		else
-		    delete [] output;
-		return NULL;
+        av_free(output);
 	}
 
 	// Resampling is needed.
-	if (_resampler.init(_audioCodecCtx))
-	{
+	if (_resampler.init(_audioCodecCtx)) {
 		// Resampling is needed.
 
 		// Compute new size based on frame_size and
@@ -629,15 +606,11 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 #endif
 
 		// make sure to set outPtr *after* we use it as input to the resampler
-        	outPtr = reinterpret_cast<boost::int16_t*>(resampledOutput);
+        outPtr = reinterpret_cast<boost::int16_t*>(resampledOutput);
 
-		if (NEEDS_ALIGNED_MEMORY)
-		    av_free(output);
-		else
-		    delete [] output;
+        av_free(output);
 
-		if (expectedMaxOutSamples < outSamples)
-		{
+		if (expectedMaxOutSamples < outSamples) {
 			log_error(" --- Computation of resampled samples (%d) < then the actual returned samples (%d)",
 				expectedMaxOutSamples, outSamples);
 
@@ -660,10 +633,9 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 		outSize = outSamples * 2 * 2;
 
 	}
-	else if (NEEDS_ALIGNED_MEMORY)
-	{
+	else {
 	    boost::uint8_t* newOutput = new boost::uint8_t[outSize];
-	    memcpy(newOutput, output, outSize);
+	    std::memcpy(newOutput, output, outSize);
 	    outPtr = reinterpret_cast<boost::int16_t*>(newOutput);
         av_free(output);
 	}
