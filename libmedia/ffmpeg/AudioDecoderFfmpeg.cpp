@@ -29,11 +29,7 @@
 
 //#define GNASH_DEBUG_AUDIO_DECODING
 
-#ifdef FFMPEG_AUDIO2
-# define AVCODEC_DECODE_AUDIO avcodec_decode_audio2
-#else
-# define AVCODEC_DECODE_AUDIO avcodec_decode_audio
-#endif
+#define AVCODEC_DECODE_AUDIO avcodec_decode_audio2
 
 namespace gnash {
 namespace media {
