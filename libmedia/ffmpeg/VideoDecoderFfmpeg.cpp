@@ -362,7 +362,7 @@ VideoDecoderFfmpeg::decode(const boost::uint8_t* input,
     int bytes = 0;    
     // no idea why avcodec_decode_video wants a non-const input...
     avcodec_decode_video(_videoCodecCtx->getContext(), frame, &bytes,
-            const_cast<boost::uint8_t*>(input), input_size);
+            input, input_size);
     
     if (!bytes) {
         log_error("Decoding of a video frame failed");
