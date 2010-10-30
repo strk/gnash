@@ -554,6 +554,7 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
         outputSize = 0;
 
         av_free(output);
+        return NULL;
     }
 
     if (outSize < 2) {
@@ -563,6 +564,7 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
         outputSize = 0;
 
         av_free(output);
+        return NULL;
     }
 
     // Resampling is needed.
