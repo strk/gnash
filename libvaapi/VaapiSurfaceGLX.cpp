@@ -80,6 +80,8 @@ static inline bool gl_check_error(void)
     return gl_do_check_error(1);
 }
 
+#if 0
+
 // glGetIntegerv() wrapper
 static bool gl_get_param(GLenum param, unsigned int *pval)
 {
@@ -103,8 +105,6 @@ struct TextureState {
     unsigned int was_enabled : 1;
     unsigned int was_bound   : 1;
 };
-
-#if 0
 
 /// Bind texture, preserve previous texture state
 static bool bind_texture(TextureState *ts, GLenum target, GLuint texture)
