@@ -200,8 +200,9 @@ MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
         //   mdb:93, lastbuf:0 skiping granule 0
         // When playing: http://downloads.bbc.co.uk/news/nol/shared/spl/hi/audio_slideshow/kenadamptw/slideshow_629.swf
         //
-        log_error("FIXME: FFMPEG packet decompression timestamp has no value, taking as zero");
-        dts=0;
+        LOG_ONCE(log_error("FIXME: FFmpeg packet decompression "
+                    "timestamp has no value, taking as zero"));
+        dts = 0;
     }
 	boost::uint64_t timestamp = static_cast<boost::uint64_t>(dts * as_double(_audioStream->time_base) * 1000.0); 
     //log_debug("On getting audio frame with timestamp %d, duration is %d", timestamp, _audioStream->duration);
