@@ -60,8 +60,6 @@ main(int /*argc*/, char** /*argv*/)
 	rgba green(0, 255, 0, 255);     // green circles fill color
 	rgba red(255, 0, 0, 255);       // red circles fill color
 
-	int cs = 20;             // circles size
-
 	point out(350, 100);  // out of any drawing
 
 	point rc1(50, 50);    // first red circle

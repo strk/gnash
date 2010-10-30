@@ -87,16 +87,9 @@ main(int argc, char** argv)
   SWFMovieClip mc1, mc2, dejagnuclip;
   SWFShape  sh1,sh2;
   SWFAction ac;
-  int i;
 
   const char *srcdir=".";
-  if ( argc>1 ) 
-    srcdir=argv[1];
-  else
-  {
-      //fprintf(stderr, "Usage: %s <mediadir>\n", argv[0]);
-      //return 1;
-  }
+  if (argc > 1) srcdir=argv[1];
 
   Ming_init();
   Ming_useSWFVersion (OUTPUT_VERSION);
@@ -107,19 +100,18 @@ main(int argc, char** argv)
 
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
-  //SWFMovie_nextFrame(mo); 
 
 
   sh1 = make_fill_square (300, 300, 60, 60, 255, 0, 0, 255, 0, 0);
   mc1 = newSWFMovieClip();
   SWFMovieClip_add(mc1, (SWFBlock)sh1); 
-  SWFMovieClip_add(mc1, newSWFAction("_root.mc1Executed++;"));
+  SWFMovieClip_add(mc1, (SWFBlock)newSWFAction("_root.mc1Executed++;"));
   SWFMovieClip_nextFrame(mc1);
   
   sh2 = make_fill_square (330, 270, 120, 120, 0, 0, 0, 0, 0, 0);
   mc2 = newSWFMovieClip();
   SWFMovieClip_add(mc2, (SWFBlock)sh2);  
-  SWFMovieClip_add(mc2, newSWFAction("_root.mc2Executed++;"));
+  SWFMovieClip_add(mc2, (SWFBlock)newSWFAction("_root.mc2Executed++;"));
   SWFMovieClip_nextFrame(mc2); 
 
   SWFDisplayItem it1, it2;

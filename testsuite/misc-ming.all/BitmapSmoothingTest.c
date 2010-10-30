@@ -37,8 +37,6 @@ main(int argc, char **argv)
 	SWFMovie mo;
 	SWFInput in;
 	SWFBitmap bitmap;
-	SWFFillStyle smtFill;
-	SWFFillStyle hrdFill;
 	SWFShape shpSmt;
 	SWFShape shpHrd;
 	SWFMovieClip mc;

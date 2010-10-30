@@ -37,7 +37,6 @@
 // Forward declarations
 namespace gnash {
     class IOChannel;
-    class JpegInput;
 }
 
 namespace gnash {

@@ -52,7 +52,6 @@ main(int argc, char** argv)
   int frames;
   SWFVideoStream stream;
   SWFDisplayItem item;
-  SWFMovieClip mc;
   SWFMovieClip dejagnuclip;
   FILE *flv, *font_file;
   SWFFont font;
