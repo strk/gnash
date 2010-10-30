@@ -540,8 +540,7 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 
     // older ffmpeg versions didn't accept a const input..
     int tmp = AVCODEC_DECODE_AUDIO(_audioCodecCtx, outPtr, &outSize,
-                                   const_cast<boost::uint8_t*>(input),
-                                   inputSize);
+                                   input, inputSize);
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
     log_debug(" avcodec_decode_audio[2](ctx, bufptr, %d, input, %d) "
