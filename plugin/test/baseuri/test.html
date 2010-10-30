@@ -25,6 +25,24 @@ src="test.swf" base="sub" (expect XML:sub)
 
 <embed type="application/x-shockwave-flash"
  border="1"
+ src="test.swf"
+ height="100" width="400"
+ base="sub/">
+src="test.swf" base="sub/" (expect XML:sub)
+
+<hr/>
+
+<embed type="application/x-shockwave-flash"
+ border="1"
+ src="test.swf"
+ height="100" width="400"
+ base="sub/nonex">
+src="test.swf" base="sub/nonex" (expect Loaded:false)
+
+<hr/>
+
+<embed type="application/x-shockwave-flash"
+ border="1"
  src="sub/test.swf"
  height="100" width="400">
 src="sub/test.swf" no base (expect XML:root)
