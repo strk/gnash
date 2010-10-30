@@ -3,10 +3,12 @@ YYYY/MM/DD
 
 Improvements since 0.8.8 release are:
 
- * Fixed swapped _framesloaded and _framestotal properties
+ * Fix swapped _framesloaded and _framestotal properties
  * Improved ActionScript performance processing, especially
    for interactive applications.
  * Improved dump-gui speed, sync and flexibility
+ * Fix relative urls resolution in presence of <base> tag
+   and "base" parameter.
 
 Gnash 0.8.8
 2010/08/17
