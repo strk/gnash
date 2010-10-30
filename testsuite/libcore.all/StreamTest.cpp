@@ -30,7 +30,7 @@
 
 #include <boost/thread/mutex.hpp>
 
-#include "tu_file.h"
+#include "IOChannel.h"
 #include "SWFStream.h"
 #include "log.h"
 

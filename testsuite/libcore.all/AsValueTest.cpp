@@ -40,13 +40,6 @@
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 
-#if 0
-#include "buffer.h"
-#include "network.h"
-#include "amf.h"
-#include "element.h"
-#endif
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -59,16 +52,8 @@ using namespace std;
 
 static void usage (void);
 
-// Prototypes for test cases
-#if 0                           // this needs libamf and libnet
-static void test_el();
-static void test_obj(const as_object* o);
-#endif
 static void test_isnan();
 static void test_conversion();
-
-// Enable the display of memory allocation and timing data
-static bool memdebug = false;
 
 TestState runtest;
 LogFile& dbglogfile = LogFile::getDefaultInstance();
@@ -126,14 +111,10 @@ main(int argc, char *argv[])
     MovieClip::MovieVariables v;
     // We pass 'v' twice, as the second one is for scriptable
     // Variables, which isn't fully implemented yet.
-    Movie* m = stage.init(md, v, v);
+    stage.init(md, v, v);
 
     // run the tests
     test_isnan();
-#if 0                           // this needs libamf and libnet
-    test_el();
-    test_obj(getObject(m));
-#endif
     test_conversion();
    
 }
@@ -201,8 +182,6 @@ void
 test_isnan()
 {
 	float num = 0;
-
-//	std::cout << "sizeof(as_value): " << (sizeof(as_value)) << std::endl;
 
 	if(!isNaN(num)) {
             runtest.pass("isNaN(0)");
