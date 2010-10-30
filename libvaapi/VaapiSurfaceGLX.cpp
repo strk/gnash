@@ -104,6 +104,8 @@ struct TextureState {
     unsigned int was_bound   : 1;
 };
 
+#if 0
+
 /// Bind texture, preserve previous texture state
 static bool bind_texture(TextureState *ts, GLenum target, GLuint texture)
 {
@@ -161,6 +163,8 @@ static void unbind_texture(TextureState *ts)
 
     gl_check_error();
 }
+
+#endif
 
 class VaapiSurfaceGLXImpl: public VaapiSurfaceImplBase {
     void *surface() const
