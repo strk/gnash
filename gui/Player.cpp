@@ -293,9 +293,12 @@ Player::run(int argc, char* argv[], const std::string& infile,
 
     // Parse player parameters. These are not passed to the SWF, but rather
     // control stage properties etc.
+    // NOTE: it is intentional to force a trailing slash to "base" argument
+    //       as it was tested that the "base" argument is always considered
+    //       a directory!
     Params::const_iterator it = _params.find("base");
     const URL baseURL = (it == _params.end()) ? _baseurl :
-                                               URL(it->second, _baseurl);
+                                               URL(it->second+"/", _baseurl);
     /// The RunResources should be populated before parsing.
     _runResources.reset(new RunResources());
 
