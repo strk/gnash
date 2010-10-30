@@ -62,8 +62,6 @@ main(int argc, char** argv)
   SWFMovieClip mc1, mc2, mc3, dejagnuclip;
   SWFShape  sh1, sh2, sh3;
   SWFDisplayItem it1, it2, it3;
-  SWFAction ac;
-  int i;
 
   const char *srcdir=".";
   if ( argc>1 ) 

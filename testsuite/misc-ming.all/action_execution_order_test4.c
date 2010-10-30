@@ -66,8 +66,8 @@ int
 main(int argc, char** argv)
 {
   SWFMovie mo;
-  SWFMovieClip  mc1, mc2, mc3, mc4, mc5, dejagnuclip;
-  SWFDisplayItem it1, it2, it3, it4, it5;
+  SWFMovieClip  mc1, mc2, mc3, dejagnuclip;
+  SWFDisplayItem it1, it2, it3;
   SWFShape  sh_red;
 
   const char *srcdir=".";

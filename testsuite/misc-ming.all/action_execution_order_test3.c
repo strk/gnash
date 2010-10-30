@@ -41,7 +41,7 @@ int
 main(int argc, char** argv)
 {
   SWFMovie mo;
-  SWFMovieClip  mc_red1, mc_red2, mc_red3, dejagnuclip;
+  SWFMovieClip  mc_red1, dejagnuclip;
   SWFShape  sh_red;
 
   const char *srcdir=".";
@@ -71,7 +71,7 @@ main(int argc, char** argv)
   SWFMovieClip_nextFrame(mc_red1); /* mc_red1, 1st frame */
    
   /* add mc_red1 to _root and name it as "mc_red1" */
-  SWFDisplayItem it_red1, it_red2, it_red3;
+  SWFDisplayItem it_red1, it_red2;
   it_red1 = SWFMovie_add(mo, (SWFBlock)mc_red1);  // PlaceObject2
   SWFDisplayItem_setDepth(it_red1, 10); 
   SWFDisplayItem_addAction(it_red1,

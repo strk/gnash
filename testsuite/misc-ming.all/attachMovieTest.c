@@ -35,6 +35,8 @@
 #define OUTPUT_VERSION 6
 #define OUTPUT_FILENAME "attachMovieTest.swf"
 
+void addRedSquareExport(SWFMovie mo);
+
 void
 addRedSquareExport(SWFMovie mo)
 {

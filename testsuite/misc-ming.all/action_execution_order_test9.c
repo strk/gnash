@@ -35,6 +35,8 @@
 #define OUTPUT_VERSION 6
 #define OUTPUT_FILENAME "action_execution_order_test9.swf"
 
+SWFDisplayItem add_static_mc(SWFMovie mo, const char* name,
+        const char* scripts, int depth);
 
 SWFDisplayItem
 add_static_mc(SWFMovie mo, const char* name, const char* scripts, int depth)

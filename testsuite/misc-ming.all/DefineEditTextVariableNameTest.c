@@ -63,6 +63,7 @@ void add_text_field(SWFMovieClip mo, SWFBlock font, const char* varname, const c
 void set_text(SWFMovie mo, const char* txt, const char* varname);
 void shift_horizontally(SWFMovie mo, const char* what, int howmuch);
 void set_x(SWFMovie mo, const char* what, int x);
+void setVariableName(SWFMovie mo, const char* txt, const char* varname);
 
 void
 shift_horizontally(SWFMovie mo, const char* what, int howmuch)

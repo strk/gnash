@@ -61,6 +61,9 @@
 #define OUTPUT_VERSION 6
 #define OUTPUT_FILENAME "goto_frame_test.swf"
 
+
+SWFDisplayItem add_static_mc(SWFMovie mo, const char* name, int depth);
+
 SWFDisplayItem
 add_static_mc(SWFMovie mo, const char* name, int depth)
 {

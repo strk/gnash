@@ -97,7 +97,6 @@ main(int argc, char** argv)
 {
   SWFMovie mo;
   SWFMovieClip dejagnuclip, static3;
-  int i;
   SWFDisplayItem it1;
 
 

@@ -66,7 +66,7 @@ SWFDisplayItem
 add_static_mc(SWFMovie mo, const char* name, int depth, int x, int y, int width, int height)
 {
   SWFShape sh;
-  SWFMovieClip mc, mc2;
+  SWFMovieClip mc;
   SWFDisplayItem it;
 
   sh = make_fill_square (-(width/2), -(height/2), width, height, 255, 0, 0, 255, 0, 0);
@@ -89,7 +89,6 @@ main(int argc, char** argv)
 {
   SWFMovie mo;
   SWFMovieClip dejagnuclip;
-  int i;
   SWFDisplayItem it1, it2;
 
 

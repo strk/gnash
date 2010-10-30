@@ -106,7 +106,6 @@ main(int argc, char** argv)
       perror(fdbfont);
       exit(1);
     }
-    SWFBrowserFont bfont = newSWFBrowserFont("_sans");
     SWFFont efont = loadSWFFontFromFile(font_file);
 
     it = add_text_field(mo, efont, "First text");

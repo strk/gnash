@@ -64,6 +64,8 @@
 #define OUTPUT_VERSION 6
 #define OUTPUT_FILENAME "loop_test8.swf"
 
+SWFDisplayItem
+add_static_mc(SWFMovie mo, const char* name, const char* color, int depth, float ratio);
 
 SWFDisplayItem
 add_static_mc(SWFMovie mo, const char* name, const char* color, int depth, float ratio)

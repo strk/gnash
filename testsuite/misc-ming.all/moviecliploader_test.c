@@ -38,6 +38,7 @@
 #define OUTPUT_VERSION 7
 #define OUTPUT_FILENAME "moviecliploader_test.swf"
 
+void add_clip(SWFMovie mo, char* file, char* name, char* url, int x, int y);
 
 void
 add_clip(SWFMovie mo, char* file, char* name,

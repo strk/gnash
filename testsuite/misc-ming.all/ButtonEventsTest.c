@@ -112,7 +112,7 @@ add_button(SWFMovie mo)
 	if ( ! ermc )
 	{
 		ermc = newSWFMovieClip();
-		SWFMovieClip_add(ermc, newSWFAction(
+		SWFMovieClip_add(ermc, (SWFBlock)newSWFAction(
 			"_global.dumpObj = function(o,indent) {"
 			"	var s = '';"
 			"	if ( typeof(o) == 'object' ) {"

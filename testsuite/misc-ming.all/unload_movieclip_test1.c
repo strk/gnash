@@ -34,11 +34,11 @@
 #define OUTPUT_VERSION 6
 #define OUTPUT_FILENAME "unload_movieclip_test1.swf"
 
+SWFDisplayItem add_static_mc(SWFMovie mo, const char* name, int depth);
 
 SWFDisplayItem
 add_static_mc(SWFMovie mo, const char* name, int depth)
 {
-  SWFShape sh;
   SWFMovieClip mc;
   SWFDisplayItem it;
    

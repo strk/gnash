@@ -88,10 +88,12 @@ main(int /*argc*/, char** /*argv*/)
 		{
 			// Frame X
 			tester.advance();
-			int framenum = root->get_current_frame();
+			size_t framenum = root->get_current_frame();
+            assert(framenum > 0);
+
 			cout << "---- Pixel checking in frame " << framenum+1 << " play state " << root->getPlayState() << endl;
 			
-			int i = (framenum-1)*10;
+			size_t i = (framenum-1)*10;
 
 			// Check the color in (5+i,5) - should be yellow
 			check_pixel((5 + i)*scale_x, 5, 2, yellow, 5);
@@ -108,8 +110,7 @@ main(int /*argc*/, char** /*argv*/)
 				check_pixel((45 + i)*scale_x, 5, 2, yellow, 5);
 			}
 
-			if ( framenum == framecount-2 )
-			{
+			if (framenum + 2 == framecount) {
 				// check we're playing, or we'll never get to next loop...
 				check_equals(root->getPlayState(), MovieClip::PLAYSTATE_PLAY);
 				break;
