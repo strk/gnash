@@ -1011,7 +1011,7 @@ private:
     const RunResources& _runResources; 
 
     /// This initializes a SharedObjectLibrary, which requires 
-    /// _originalURL, so that must be initialized first.
+    /// _baseURL, so that must be initialized first.
     VM _vm;
 
     /// Registered Interface command handler, if any

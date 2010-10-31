@@ -1924,7 +1924,7 @@ MovieClip::loadVariables(const std::string& urlstr,
     // (down by getStream, that is)
     
     const movie_root& mr = stage();
-    URL url(urlstr, mr.runResources().streamProvider().originalURL());
+    URL url(urlstr, mr.runResources().streamProvider().baseURL());
 
     std::string postdata;
     

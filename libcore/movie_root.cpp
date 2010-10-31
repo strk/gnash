@@ -2099,7 +2099,7 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
         /// If there is no hosting application, call the URL launcher. For
         /// safety, we resolve the URL against the base URL for this run.
         /// The data is not sent at all.
-        URL url(urlstr, _runResources.streamProvider().originalURL());
+        URL url(urlstr, _runResources.streamProvider().baseURL());
 
         gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
         std::string command = rcfile.getURLOpenerFormat();

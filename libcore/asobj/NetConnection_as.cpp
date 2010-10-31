@@ -339,7 +339,7 @@ public:
             // TODO: check where it gets these data from.
             o->init_member("flashVer", getVM(_nc.owner()).getPlayerVersion(),
                     flags);
-            o->init_member("swfUrl", r.streamProvider().originalURL().str(),
+            o->init_member("swfUrl", r.streamProvider().baseURL().str(),
                     flags);
             o->init_member("tcUrl", _url.str(), flags);
 
@@ -434,7 +434,7 @@ std::string
 NetConnection_as::validateURL() const
 {
     const RunResources& r = getRunResources(owner());
-    URL uri(_uri, r.streamProvider().originalURL());
+    URL uri(_uri, r.streamProvider().baseURL());
 
     std::string uriStr(uri.str());
     assert(uriStr.find("://") != std::string::npos);
@@ -494,7 +494,7 @@ NetConnection_as::connect(const std::string& uri)
     }
     
     const RunResources& r = getRunResources(owner());
-    URL url(_uri, r.streamProvider().originalURL());
+    URL url(_uri, r.streamProvider().baseURL());
 
     if (!r.streamProvider().allow(url)) {
         log_security(_("Gnash is not allowed to connect " "to %s"), url);
@@ -592,7 +592,7 @@ NetConnection_as::getStream(const std::string& name)
     // which should always be null in this case.
     const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
-    URL url(name, streamProvider.originalURL());
+    URL url(name, streamProvider.baseURL());
 
     return streamProvider.getStream(url, rcfile.saveStreamingMedia());
 

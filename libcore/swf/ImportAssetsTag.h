@@ -80,7 +80,7 @@ private:
         in.read_string(source_url);
 
         // Resolve relative urls against baseurl
-        URL abs_url(source_url, r.streamProvider().originalURL());
+        URL abs_url(source_url, r.streamProvider().baseURL());
 
         unsigned char import_version = 0;
 

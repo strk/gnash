@@ -434,7 +434,7 @@ MovieLoader::loadMovie(const std::string& urlstr,
 
     /// URL security is checked in StreamProvider::getStream() down the
     /// chain.
-    URL url(urlstr, _movieRoot.runResources().streamProvider().originalURL());
+    URL url(urlstr, _movieRoot.runResources().streamProvider().baseURL());
 
     /// If the method is MovieClip::METHOD_NONE, we send no data.
     if (method == MovieClip::METHOD_GET)

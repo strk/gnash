@@ -1025,7 +1025,7 @@ Gui::takeScreenShot()
     if (!_screenShotter.get()) {
         // If no ScreenShotter exists, none was requested at startup.
         // We use a default filename pattern.
-        URL url(_runResources.streamProvider().originalURL());
+        URL url(_runResources.streamProvider().baseURL());
         std::string::size_type p = url.path().rfind('/');
         const std::string& name = (p == std::string::npos) ? url.path() :
             url.path().substr(p + 1);

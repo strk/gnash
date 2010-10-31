@@ -114,8 +114,8 @@ public:
     //
     /// TODO: drop this if possible and handle all resolution in
     /// this class.
-    const URL& originalURL() const {
-        return _original;
+    const URL& baseURL() const {
+        return _base;
     }
 
 private:

@@ -935,7 +935,7 @@ std::string
 getDomain(as_object& o)
 {
     
-    const URL& url = getRunResources(o).streamProvider().originalURL();
+    const URL& url = getRunResources(o).streamProvider().baseURL();
 
     if (url.hostname().empty()) {
         return "localhost";

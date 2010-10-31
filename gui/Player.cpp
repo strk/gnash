@@ -226,11 +226,13 @@ Player::load_movie()
     }
 
     try {
-        if ( _infile == "-" ) {
+        if (_infile == "-") {
+            log_debug("Using filno");
             std::auto_ptr<IOChannel> in (
                 noseek_fd_adapter::make_stream(fileno(stdin)));
             md = MovieFactory::makeMovie(in, _url, *_runResources, false);
-        } else {
+        }
+        else {
             URL url(_infile);
             if ( url.protocol() == "file" ) {
                 std::string path = url.path();
@@ -249,12 +251,13 @@ Player::load_movie()
             md = MovieFactory::makeMovie(url, *_runResources, _url.c_str(),
                     false);
         }
-    } catch (const GnashException& er) {
+    }
+    catch (const GnashException& er) {
         std::cerr << er.what() << std::endl;
         md = NULL;
     }
 
-    if ( ! md ) {
+    if (!md) {
         fprintf(stderr, "Could not load movie '%s'\n", _infile.c_str());
         return NULL;
     }
@@ -517,7 +520,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
 
         // Use default if filename is empty.
         if (_screenshotFile.empty()) {
-            URL url(_runResources->streamProvider().originalURL());
+            URL url(_runResources->streamProvider().baseURL());
             std::string::size_type p = url.path().rfind('/');
             const std::string& name = (p == std::string::npos) ? url.path() :
                 url.path().substr(p + 1);
