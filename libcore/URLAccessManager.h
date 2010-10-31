@@ -34,7 +34,7 @@ namespace URLAccessManager {
 
 /// Return true if access to given url is allowed, false otherwise.
 //
-/// Will use rc file for whitelist/blacklist and localSendbox.
+/// Will use rc file for whitelist/blacklist and localSandbox.
 ///
 bool allow(const URL& url, const URL& baseurl);
 
