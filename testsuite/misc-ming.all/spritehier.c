@@ -33,6 +33,8 @@
 #include <stdio.h>
 #include <ming.h>
 
+#include "ming_utils.h"
+
 #define OUTPUT_FILENAME "spritehier.swf"
 
 static SWFAction frame_print(void);
