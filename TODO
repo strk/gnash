@@ -12,11 +12,6 @@
   - SVG support ?
   - Keep improving the plugin (+ add GTK1 support).
 
-Unimplemented opcodes:
-----------------------
-
-0x08:	// toggle quality
-
 Partially implemented classes are:
 ----------------------------------
 
