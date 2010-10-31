@@ -188,7 +188,6 @@ check_PROGRAMS = \
 	BitmapDataTest \
 	BitmapDataTestRunner \
 	BitmapDataDraw \
-	BitmapSmoothingTest \
 	$(NULL)
 	
 if MING_VERSION_0_4_4
@@ -203,6 +202,7 @@ check_PROGRAMS += \
 	EmbeddedSoundTest-Runner \
 	eventSoundTest1 \
 	eventSoundTest1-Runner \
+	BitmapSmoothingTest \
 	$(NULL)
 endif
 
