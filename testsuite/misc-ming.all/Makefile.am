@@ -2177,7 +2177,6 @@ TEST_CASES = \
 	event_handler_scope_testrunner \
 	masks_testrunner \
 	masks_test2runner \
-	KeyEventOrderRunner \
 	key_event_testrunner \
 	static_vs_dynamic1_testrunner \
 	static_vs_dynamic2_testrunner \
@@ -2247,6 +2246,7 @@ if MING_SUPPORTS_SWFBUTTON_SET_DEPTH
 TEST_CASES += \
 	ButtonPropertiesTestRunner \
 	ButtonEventsTest-Runner \
+	KeyEventOrderRunner \
 	$(NULL)
 endif
 
