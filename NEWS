@@ -9,6 +9,14 @@ Improvements since 0.8.8 release are:
  * Improved dump-gui speed, sync and flexibility
  * Fix relative urls resolution in presence of <base> tag
    and "base" parameter.
+ * Improved SWF8 support with BitmapData.draw, BitmapData.loadBitmap,
+   and other bitmap functions.
+ * Re-entrant core libraries.
+ * RTMP remoting support.
+ * Support for PNG and GIF files in all DefineBitsJpeg tags; support
+   for DefineBitsJpeg4 tags, and fix display of some GIFs with
+   multiple records.
+ * Restore support for mingw32.
 
 Gnash 0.8.8
 2010/08/17
@@ -22,11 +30,12 @@ Improvements since 0.8.7 release are:
  * Hardware video decoding support via VAAPI for Nvidia, ATI, and
    Intel GPUs. 
  * Android specific support.
- * Gnash now compiles faster due to reduce internal dependencies.
+ * Gnash now compiles faster due to reduced internal dependencies.
  * Mostly complete Scriptable Plugin support which works with the
    ExternalInterface class.
  * Improved input device handling when using a raw framebuffer.
- * 100% of all YouTube videos should work 
+ * 100% of all YouTube videos should work
+ * Support for MovieClip.beginBitmapFill() and gradient spread modes.
 
 Gnash 0.8.7
 2010/02/15
