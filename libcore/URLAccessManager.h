@@ -36,6 +36,14 @@ namespace URLAccessManager {
 //
 /// Will use rc file for whitelist/blacklist and localSandbox.
 ///
+/// @param url
+///   The url to check
+///
+/// @param baseurl
+///   The originating url, only used for local urls and only
+///   for protocol checking (ie: a non-local originating url
+///   will not be allowed to load a local url)
+///
 bool allow(const URL& url, const URL& baseurl);
 
 //bool allowHost(const std::string& str);
