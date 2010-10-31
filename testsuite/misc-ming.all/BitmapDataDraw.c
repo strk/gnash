@@ -46,6 +46,7 @@ main(int argc, char** argv)
     SWFFillStyle fill;
     SWFBitmap bp;
     SWFInput inp;
+    FILE* imgfile;
 
     if (argc > 1) mediadir = argv[1];
     else {
@@ -242,7 +243,16 @@ main(int argc, char** argv)
     strcpy(path, mediadir);
     strcat(path, file);
 
-    inp = newSWFInput_filename(path);
+    imgfile = fopen(path, "rb");
+    if (!imgfile) {
+        fprintf(stderr, "Failed to open bitmap file");
+        exit(EXIT_FAILURE);
+    }
+
+    // Note that recent ming version have the more convenient
+    // newSWFInput_filename() function, but we want to support
+    // older versions.
+    inp = newSWFInput_file(imgfile);
     bp = (SWFBitmap)newSWFJpegBitmap_fromInput(inp);
     
     // Image clip
@@ -304,6 +314,8 @@ main(int argc, char** argv)
     // Output movie
     puts("Saving " OUTPUT_FILENAME);
     SWFMovie_save(mo, OUTPUT_FILENAME);
+
+    fclose(imgfile);
 
     return EXIT_SUCCESS;
 }
