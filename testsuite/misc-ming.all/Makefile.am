@@ -167,9 +167,7 @@ check_PROGRAMS = \
 	duplicate_movie_clip_test2 \
 	event_handler_scope_test \
 	masks_testrunner \
-	KeyEventOrder \
 	key_event_test \
-	KeyEventOrderRunner \
 	key_event_testrunner \
 	static_vs_dynamic1 \
 	static_vs_dynamic2 \
@@ -251,6 +249,8 @@ endif
 
 if MING_SUPPORTS_SWFBUTTON_SET_DEPTH
 check_PROGRAMS += \
+	KeyEventOrder \
+	KeyEventOrderRunner \
 	ButtonPropertiesTest \
 	ButtonEventsTest \
 	ButtonPropertiesTestRunner \
