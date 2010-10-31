@@ -103,17 +103,17 @@ public:
     /// Check whether access to a URL is allowed
     //
     /// This is used by the core to check whether a connection can be
-    /// made before trying to make it.
+    /// made before trying to make it. It's useful currently for
+    /// some functions to decide what to return.
     //
     /// @param url      The url to check
     /// @return         true if allowed, false if not.
     bool allow(const URL& url) const;
 
-    /// The genuine original URL used for loading the first SWF.
+    /// The base URL that should be used to resolve all relative URLs.
     //
-    /// This is used to manage access to later URLs.
-    //
-    /// TODO: drop this if possible
+    /// TODO: drop this if possible and handle all resolution in
+    /// this class.
     const URL& originalURL() const {
         return _original;
     }
