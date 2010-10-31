@@ -42,6 +42,7 @@ main(int argc, char** argv)
     SWFMovieClip dejagnuclip;
     SWFBitmap bp;
     SWFInput inp;
+    FILE* imgfile;
 
     if (argc > 1) mediadir = argv[1];
     else {
@@ -72,8 +73,20 @@ main(int argc, char** argv)
     strcpy(path, mediadir);
     strcat(path, file);
 
-    inp = newSWFInput_filename(path);
-    bp = (SWFBitmap)newSWFJpegBitmap_fromInput(inp);
+    imgfile = fopen(MEDIADIR"/vstroke.png", "rb");
+    if (!imgfile) {
+        fprintf(stderr, "Failed to open bitmap file");
+        return EXIT_FAILURE;
+    }
+
+    // Note that recent ming version have the more convenient
+    // newSWFInput_filename() function, but we want to support
+    // older versions.
+    inp = newSWFInput_file(imgfile);
+	bp = newSWFBitmap_fromInput(inp);
+	if (!bp) {
+		return EXIT_FAILURE;
+	}
     SWFMovie_addExport(mo, (SWFBlock)bp, "img1");
 
     SWFMovie_writeExports(mo);
@@ -159,6 +172,8 @@ main(int argc, char** argv)
     // Output movie
     puts("Saving " OUTPUT_FILENAME);
     SWFMovie_save(mo, OUTPUT_FILENAME);
+
+    fclose(imgfile);
 
     return EXIT_SUCCESS;
 }
