@@ -35,13 +35,29 @@ namespace gnash {
 
 namespace gnash {
 
-/// Provide IOChannel streams for network or filesystem resources
+/// A StreamProvider makes IOChannels available to the core on request.
+//
+/// The current functions of this class are:
+/// 1. Inform users whether a connection to a certain URL is allowed.
+/// 2. Make a connection and return an IOChannel (this performs a separate
+///    access check).
+///
+/// The class should in future also:
+/// 3. Take relative URLs and resolve them against the base URL.
+//
+/// TODO: this class should become an abstract interface.
 class DSOEXPORT StreamProvider
 {
-
 public:
 
-	StreamProvider(const URL& url, std::auto_ptr<NamingPolicy> = 
+    /// Construct a StreamProvider
+    //
+    /// @param original     The original URL, used to decide whether to allow
+    ///                     connections.
+    /// @param base         The base URL, used to resolve URLs.
+    /// @param np           A policy to decide the name of cached files.
+	StreamProvider(const URL& original, const URL& base,
+            std::auto_ptr<NamingPolicy> np =
             std::auto_ptr<NamingPolicy>(new NamingPolicy));
 
 	virtual ~StreamProvider() {}
@@ -50,7 +66,6 @@ public:
 	//
 	/// On error NULL is returned
 	/// Derive from this for a CachingStreamProvider
-	///
 	virtual std::auto_ptr<IOChannel> getStream(const URL& url,
             bool namedCacheFile = false) const;
 
@@ -61,13 +76,8 @@ public:
 	/// On error NULL is returned
 	/// Derive from this for a CachingStreamProvider
 	///
-	/// @param url
-	///	The url to post to.
-	///
-	/// @param postdata
-	///	Post data in url-encoded form.
-	///
-	///
+	/// @param url      The url to post to.
+	/// @param postdata Post data in url-encoded form.
 	virtual std::auto_ptr<IOChannel> getStream(const URL& url,
             const std::string& postdata, bool namedCacheFile = false) const;
 	
@@ -90,14 +100,22 @@ public:
         return *_namingPolicy;
     }
 
-    /// Whether to allow access to a certain URL.
+    /// Check whether access to a URL is allowed
+    //
+    /// This is used by the core to check whether a connection can be
+    /// made before trying to make it.
+    //
+    /// @param url      The url to check
+    /// @return         true if allowed, false if not.
     bool allow(const URL& url) const;
 
     /// The genuine original URL used for loading the first SWF.
     //
     /// This is used to manage access to later URLs.
+    //
+    /// TODO: drop this if possible
     const URL& originalURL() const {
-        return _url;
+        return _original;
     }
 
 private:
@@ -105,7 +123,9 @@ private:
     /// The current naming policy for cache files.
     std::auto_ptr<NamingPolicy> _namingPolicy;
 
-    const URL _url;
+    const URL _base;
+
+    const URL _original;
 
 };
 

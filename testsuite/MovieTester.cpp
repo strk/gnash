@@ -90,7 +90,7 @@ MovieTester::MovieTester(const std::string& url)
     
     _runResources->setTagLoaders(loaders);
     
-    boost::shared_ptr<StreamProvider> sp(new StreamProvider(url));
+    boost::shared_ptr<StreamProvider> sp(new StreamProvider(url, url));
 
     _runResources->setStreamProvider(sp);
 

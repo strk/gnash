@@ -37,7 +37,6 @@
 #include "DisplayObject.h"
 #include "GnashEnums.h"
 #include "RunResources.h"
-#include "StreamProvider.h"
 
 #ifdef GNASH_FPS_DEBUG
 #include "ClockTime.h"

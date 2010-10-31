@@ -67,8 +67,9 @@ main(int /*argc*/, char** /*argv*/)
 
     // We don't care about the base URL.
     RunResources runResources;
+    const URL url("");
     runResources.setStreamProvider(
-            boost::shared_ptr<StreamProvider>(new StreamProvider(URL(""))));
+            boost::shared_ptr<StreamProvider>(new StreamProvider(url, url)));
 	
     boost::intrusive_ptr<movie_definition> md5(
             new DummyMovieDefinition(runResources, 5));

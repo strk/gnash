@@ -98,8 +98,10 @@ main(int argc, char *argv[])
     // Initialize gnash lib
     
     RunResources runResources;
+
+    const URL url("");
     runResources.setStreamProvider(
-            boost::shared_ptr<StreamProvider>(new StreamProvider(URL(""))));
+            boost::shared_ptr<StreamProvider>(new StreamProvider(url, url)));
 
     // Create a bogus movie with swf version 7 support
     movie_definition* md = new DummyMovieDefinition(runResources, 7);

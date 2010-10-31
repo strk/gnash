@@ -373,7 +373,7 @@ main(int argc, char *argv[])
         runResources.setSoundHandler(soundHandler);
         runResources.setMediaHandler(mediaHandler);
         runResources.setTagLoaders(loaders);
-        boost::shared_ptr<StreamProvider> sp(new StreamProvider(*i));
+        boost::shared_ptr<StreamProvider> sp(new StreamProvider(*i, *i));
         runResources.setStreamProvider(sp);
 
 #ifdef RENDERER_AGG

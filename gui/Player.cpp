@@ -309,7 +309,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
     std::auto_ptr<NamingPolicy> np(new IncrementalRename(_baseurl));
 
     /// The StreamProvider uses the actual URL of the loaded movie.
-    boost::shared_ptr<StreamProvider> sp(new StreamProvider(baseURL, np));
+    boost::shared_ptr<StreamProvider> sp(new StreamProvider(_url, baseURL, np));
 
     _runResources->setStreamProvider(sp);
 

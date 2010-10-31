@@ -51,8 +51,9 @@ main(int /*argc*/, char** /*argv*/)
     // Initialize gnash lib
     
     RunResources ri;
+    const URL url("");
     ri.setStreamProvider(
-            boost::shared_ptr<StreamProvider>(new StreamProvider(URL(""))));
+            boost::shared_ptr<StreamProvider>(new StreamProvider(url, url)));
     
     // Initialize a VM
     boost::intrusive_ptr<movie_definition> md5(new DummyMovieDefinition(ri, 5));

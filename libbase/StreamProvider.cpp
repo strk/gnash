@@ -36,17 +36,19 @@
 
 namespace gnash {
 
-StreamProvider::StreamProvider(const URL& url, std::auto_ptr<NamingPolicy> np)
+StreamProvider::StreamProvider(const URL& orig, const URL& base,
+        std::auto_ptr<NamingPolicy> np)
     :
     _namingPolicy(np),
-    _url(url)
+    _base(base),
+    _original(orig)
 {
 }
     
 bool
 StreamProvider::allow(const URL& url) const
 {
-    return URLAccessManager::allow(url, _url);
+    return URLAccessManager::allow(url, _original);
 }
 
 std::auto_ptr<IOChannel>
@@ -84,8 +86,7 @@ StreamProvider::getStream(const URL& url, bool namedCacheFile) const
 			return stream;
 		}
 	}
-	else
-	{
+	else {
 		if (allow(url)) {
 			stream = NetworkAdapter::makeStream(url.str(), 
                     namedCacheFile ? namingPolicy()(url) : "");
@@ -102,10 +103,8 @@ StreamProvider::getStream(const URL& url, const std::string& postdata,
         const
 {
 
-    if (url.protocol() == "file")
-    {
-        if (!headers.empty())
-        {
+    if (url.protocol() == "file") {
+        if (!headers.empty()) {
             log_error("Request Headers discarded while getting stream "
                     "from file: uri");
         }
@@ -128,10 +127,8 @@ StreamProvider::getStream(const URL& url, const std::string& postdata,
 
     std::auto_ptr<IOChannel> stream;
 
-	if (url.protocol() == "file")
-	{
-        if (!postdata.empty())
-        {    
+	if (url.protocol() == "file") {
+        if (!postdata.empty()) {    
 		    log_error(_("POST data discarded while getting a stream "
                         "from file: uri"));
         }
@@ -141,8 +138,7 @@ StreamProvider::getStream(const URL& url, const std::string& postdata,
 			stream = makeFileChannel(newin, false);
 			return stream;
 		}
-		else
-		{
+		else {
 			if (!allow(url)) return stream;
 
 			FILE *newin = std::fopen(path.c_str(), "rb");
@@ -153,8 +149,7 @@ StreamProvider::getStream(const URL& url, const std::string& postdata,
 			return stream;
 		}
 	}
-	else
-	{
+	else {
 		if (allow(url)) {
 			stream = NetworkAdapter::makeStream(url.str(), postdata,
                     namedCacheFile ? namingPolicy()(url) : "");

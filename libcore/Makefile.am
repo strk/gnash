@@ -54,7 +54,6 @@ libgnashcore_la_SOURCES = \
 	BitmapMovie.cpp \
 	Property.cpp \
 	PropertyList.cpp \
-	URLAccessManager.cpp \
 	SystemClock.cpp \
 	ClassHierarchy.cpp \
 	as_environment.cpp \
@@ -142,7 +141,6 @@ libgnashcore_la_SOURCES += \
 endif
 
 noinst_HEADERS = \
-	URLAccessManager.h \
 	VirtualClock.h \
 	SystemClock.h \
 	ClassHierarchy.h \
