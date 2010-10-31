@@ -114,7 +114,6 @@ libgnashcore_la_SOURCES = \
 	Function.cpp \
 	Function2.cpp \
 	Video.cpp \
-	StreamProvider.cpp \
 	Button.cpp \
 	DisplayList.cpp \
 	FillStyle.cpp \
@@ -250,7 +249,6 @@ EXTENSIONS_API = \
 	DisplayObjectContainer.h \
 	DisplayObject.h \
 	MovieClip.h \
-	StreamProvider.h \
 	event_id.h \
 	SWFMatrix.h \
 	SWFCxForm.h \

@@ -87,6 +87,7 @@ libgnashbase_la_SOURCES = \
 	GC.cpp \
 	BitsReader.cpp \
 	arg_parser.cpp \
+	StreamProvider.cpp \
 	$(NULL)
 
 
@@ -183,6 +184,7 @@ inst_HEADERS = \
 	getclocktime.hpp \
 	GnashAlgorithm.h \
 	GnashFactory.h \
+	StreamProvider.h \
 	$(NULL)
 
 if USE_PNG
