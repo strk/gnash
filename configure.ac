@@ -2772,12 +2772,6 @@ fi
 if test x$build_qtopia4 = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},qtopia4"
 fi
-if test x$build_hildon = xyes; then
-  SUPPORTED_GUIS="${SUPPORTED_GUIS},hildon"
-fi
-if test x$build_alp = xyes; then
-  SUPPORTED_GUIS="${SUPPORTED_GUIS},alp"
-fi
 if test x$build_fb = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},fb"
 fi
