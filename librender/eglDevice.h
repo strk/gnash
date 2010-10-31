@@ -112,7 +112,7 @@ class EGLDevice
     }
     bool isSingleBuffered() {
         EGLint value;
-        eglQuerySurface(_eglDisplay, _eglSurface, EGL_SINGLE_BUFFER, &value);
+        eglQuerySurface(_eglDisplay, _eglSurface, EGL_RENDER_BUFFER, &value);
         if (value == EGL_SINGLE_BUFFER) {
             return true;
         }
@@ -121,7 +121,7 @@ class EGLDevice
     
     bool isBackBuffered() {
         EGLint value;
-        eglQuerySurface(_eglDisplay, _eglSurface, EGL_BACK_BUFFER, &value);
+        eglQuerySurface(_eglDisplay, _eglSurface, EGL_RENDER_BUFFER, &value);
         if (value == EGL_BACK_BUFFER) {
             return true;
         }
