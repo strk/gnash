@@ -213,7 +213,7 @@ loop_test10.swf: loop_test10
 	./loop_test10 $(abs_mediadir)
 
 loop_test10runner: $(top_srcdir)/testsuite/generic-testrunner.sh loop_test10.swf Makefile
-	sh $<  -f10 -c "#total tests" $(top_builddir) loop_test10.swf > $@
+	sh $<  -f15 -c "#total tests" $(top_builddir) loop_test10.swf > $@
 	chmod 755 $@
 
 simple_loop_test_SOURCES =	\
