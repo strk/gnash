@@ -73,7 +73,7 @@ main(int argc, char** argv)
     strcpy(path, mediadir);
     strcat(path, file);
 
-    imgfile = fopen(MEDIADIR"/vstroke.png", "rb");
+    imgfile = fopen(path, "rb");
     if (!imgfile) {
         fprintf(stderr, "Failed to open bitmap file");
         return EXIT_FAILURE;
