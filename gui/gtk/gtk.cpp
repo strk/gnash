@@ -1804,7 +1804,6 @@ GtkGui::showAboutDialog()
     comments.append(_("\nMedia: "));
     comments.append(m ? m->description() : "no media handler");
 
-    gtk_about_dialog_set_url_hook(NULL, NULL, NULL);
     GdkPixbuf *logo_pixbuf = createPixbuf("GnashG.png");
 
 #if 1
