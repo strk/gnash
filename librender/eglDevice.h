@@ -59,11 +59,15 @@ class EGLDevice
     // Utility methods not in the base class
     /// Return a string with the error code as text, instead of a numeric value
     const char *getErrorString(int error);
+    
     /// Check the requested EGl configuration against the current one
     bool checkEGLConfig(EGLConfig config);
+    
     /// Query the system for all supported configs
     int queryEGLConfig() { return queryEGLConfig(_eglDisplay); };
     int queryEGLConfig(EGLDisplay display);
+
+    // Debugging utilities
     void printEGLConfig() { return printEGLConfig(_eglConfig); };
     void printEGLConfig(EGLConfig config);
     void printEGLContext() { return printEGLContext(_eglContext); };
@@ -71,16 +75,32 @@ class EGLDevice
     void printEGLSurface() { return printEGLSurface(_eglSurface); };
     void printEGLSurface(EGLSurface surface);
 
+    
+    // Create a Pbuffer for offscreen rendering
+    EGLSurface createPbuffer(int width, int height);
+    EGLSurface createPbuffer(int width, int height, EGLClientBuffer buf, EGLenum type);
+    EGLSurface createPixmap(int width, int height, NativePixmapType buf);
+    size_t totalPbuffers() { return _pbuffers.size(); };
+    EGLSurface &operator[](int index) { return _pbuffers[index]; };
+
     // Accessors for the settings needed by higher level code.
     // Surface accessors
     EGLint getWidth() {
+        return getWidth(_eglSurface);
+    }
+    
+    EGLint getWidth(EGLSurface surface) {
         EGLint value;
-        eglQuerySurface(_eglDisplay, _eglSurface, EGL_WIDTH, &value);
+        eglQuerySurface(_eglDisplay, surface, EGL_WIDTH, &value);
         return value;
     };
     EGLint getHeigth() {
+        return getHeigth(_eglSurface);
+    }
+    
+    EGLint getHeigth(EGLSurface surface) {
         EGLint value;
-        eglQuerySurface(_eglDisplay, _eglSurface, EGL_HEIGHT, &value);
+        eglQuerySurface(_eglDisplay, surface, EGL_HEIGHT, &value);
         return value;
     }
     EGLint getVerticalRes() {
@@ -94,8 +114,12 @@ class EGLDevice
         return value;
     }
     bool isSurfaceSingleBuffered() {
+        return isSurfaceSingleBuffered(_eglSurface);
+    }
+    
+    bool isSurfaceSingleBuffered(EGLSurface surface) {
         EGLint value;
-        eglQuerySurface(_eglDisplay, _eglSurface, EGL_RENDER_BUFFER, &value);
+        eglQuerySurface(_eglDisplay, surface, EGL_RENDER_BUFFER, &value);
         if (value == EGL_SINGLE_BUFFER) {
             return true;
         }
@@ -103,8 +127,11 @@ class EGLDevice
     }
     
     bool isSurfaceBackBuffered() {
+        return isSurfaceBackBuffered(_eglSurface);
+    }
+    bool isSurfaceBackBuffered(EGLSurface surface) {
         EGLint value;
-        eglQuerySurface(_eglDisplay, _eglSurface, EGL_RENDER_BUFFER, &value);
+        eglQuerySurface(_eglDisplay, surface, EGL_RENDER_BUFFER, &value);
         if (value == EGL_BACK_BUFFER) {
             return true;
         }
@@ -112,8 +139,11 @@ class EGLDevice
     }
 
     bool isBufferDestroyed() {
+        return isBufferDestroyed(_eglSurface);
+    }
+    bool isBufferDestroyed(EGLSurface surface) {
         EGLint value;
-        eglQuerySurface(_eglDisplay, _eglSurface, EGL_SWAP_BEHAVIOR, &value);
+        eglQuerySurface(_eglDisplay, surface, EGL_SWAP_BEHAVIOR, &value);
         if (value == EGL_BUFFER_DESTROYED) {
             return true;
         }
@@ -236,6 +266,7 @@ protected:
     unsigned int        _bpp;
     unsigned int        _width;
     unsigned int        _height;
+    std::vector<EGLSurface> _pbuffers;
 };
 
 #define DUMP_CURRENT_SURFACE printEGLSurface(eglGetCurrentSurface(EGL_DRAW))

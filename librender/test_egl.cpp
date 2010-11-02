@@ -229,7 +229,28 @@ test_egl(EGLDevice &egl, EGLDevice::rtype_t rtype)
     } else {
         runtest.fail("EGLDevice::getMinSwapInterval()");
     }
+
+    // Test Pbuffers
+    EGLSurface surf = egl.createPbuffer(200, 200);
+    if ((surf != EGL_NO_SURFACE) && (egl.getWidth(surf) == 200)) {
+        runtest.pass("EGLDevice::createPbuffer(int, int)");
+    } else {
+        runtest.fail("EGLDevice::createPbuffer(int, int)");
+    }
     
+    if (egl.totalPbuffers()) {
+        runtest.pass("EGLDevice::totalPbuffers()");
+    } else {
+        runtest.fail("EGLDevice::totalPbuffers()");
+    }
+    
+    EGLSurface surf1 = egl[0];
+    if ((surf1 != EGL_NO_SURFACE) && (egl.getWidth(surf1) == 200)
+        && (egl.getHeigth(surf1) == 200)) {
+        runtest.pass("EGLDevice::operator[]()");
+    } else {
+        runtest.fail("EGLDevice::operator[]()");
+    }
 
 
 }

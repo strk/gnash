@@ -66,6 +66,8 @@ static const EGLint attrib32_list[] = {
     EGL_STENCIL_SIZE,   8,
 #endif
     EGL_SURFACE_TYPE,   EGL_WINDOW_BIT,
+//    EGL_SAMPLE_BUFFERS, 1,
+    // EGL_RENDER_BUFFER, EGL_SINGLE_BUFFER
     EGL_NONE
 };
 
@@ -96,7 +98,7 @@ const EGLint window_attrib_list[] = {
     // EGL_SINGLE_BUFFER is by pixmap surfaces. With OpenVG, windows
     // can also be single buffered. eglCopyBuffers() can be used to copy
     // both back and single buffered surfaces to a pixmap.
-    EGL_RENDER_BUFFER, EGL_BACK_BUFFER,
+    EGL_RENDER_BUFFER, EGL_SINGLE_BUFFER,
     EGL_COLORSPACE,    EGL_COLORSPACE_sRGB,
     EGL_NONE
 };
@@ -171,6 +173,11 @@ EGLDevice::~EGLDevice()
 
     if (_eglDisplay != EGL_NO_DISPLAY) {  
         eglMakeCurrent(_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+
+        std::vector<EGLSurface>::iterator it;
+        for (it = _pbuffers.begin(); it != _pbuffers.end(); ++it) {
+            eglDestroySurface(_eglDisplay, *it);
+        }
         
         if (_eglContext != EGL_NO_CONTEXT)
             eglDestroyContext(_eglDisplay, _eglContext);
@@ -183,6 +190,7 @@ EGLDevice::~EGLDevice()
         
         eglTerminate(_eglDisplay);
     }
+
     
 #ifdef HAVE_GTK2
     gdk_exit (0);
@@ -195,7 +203,7 @@ EGLDevice::initDevice(EGLDevice::rtype_t rtype)
     GNASH_REPORT_FUNCTION;
 
     // // FIXME: for now, always run verbose till this supports command line args
-//    dbglogfile.setVerbosity();
+    // dbglogfile.setVerbosity();
 
 #ifdef HAVE_GTK2
     // As gdk_init() wants the command line arguments, we have to create
@@ -311,8 +319,8 @@ EGLDevice::initDevice(EGLDevice::rtype_t rtype)
 
     gdk_image_destroy(tmpimage);
 #endif
-    
-   // printEGLConfig(_eglConfig);
+
+    // printEGLConfig(_eglConfig);
 #if 0
    if (!checkEGLConfig(_eglConfig)) {
        log_error("EGL configuration doesn't match!");
@@ -352,7 +360,8 @@ EGLDevice::initEGL(EGLNativeWindowType window)
 
     log_debug("Initializing EGL Surface");
     if (_nativeWindow) {
-        _eglSurface = eglCreateWindowSurface(_eglDisplay, _eglConfig, _nativeWindow, 0);
+        _eglSurface = eglCreateWindowSurface(_eglDisplay, _eglConfig, _nativeWindow,
+            window_attrib_list);
     } else {
         log_error("No native window!");
     }
@@ -634,6 +643,70 @@ EGLDevice::printEGLSurface(EGLSurface surface)
     std::cerr << "\tEGL_MULTISAMPLE_RESOLVE is "
               << std::string((value == EGL_MULTISAMPLE_RESOLVE_BOX)
                  ? "EGL_MULTISAMPLE_RESOLVE_BOX" : "EGL_MULTISAMPLE_RESOLVE_DEFAULT") << std::endl;
+}
+
+// EGL WIDTH, EGL HEIGHT, EGL LARGEST PBUFFER, EGL TEXTURE FORMAT, 
+// EGL TEXTURE TARGET, EGL MIPMAP TEXTURE, EGL COLORSPACE, and EGL ALPHA FORMAT.
+EGLSurface
+EGLDevice::createPbuffer(int width, int height)
+{
+    const EGLint attribs[] = {
+        EGL_WIDTH,      width,
+        EGL_HEIGHT,     height,
+        EGL_NONE
+    };
+
+    EGLSurface pbuf = eglCreatePbufferSurface(_eglDisplay, _eglConfig, attribs);
+    if (pbuf == EGL_NO_SURFACE) {
+        log_error( "eglCreatePbufferSurface() failed (error 0x%x)", eglGetError());
+        return EGL_NO_SURFACE;
+    }
+
+    _pbuffers.push_back(pbuf);
+    
+    return pbuf;
+}
+EGLSurface
+EGLDevice::createPbuffer(int width, int height, EGLClientBuffer buf, EGLenum type)
+{
+    const EGLint attribs[] = {
+        EGL_WIDTH,      width,
+        EGL_HEIGHT,     height,
+        EGL_NONE
+    };
+
+    EGLSurface pbuf = eglCreatePbufferFromClientBuffer(_eglDisplay, type, buf,
+                                              _eglConfig, attribs);
+    if (pbuf == EGL_NO_SURFACE) {
+        log_error( "eglCreatePbufferFromClientBuffer() failed (error 0x%x)",
+                   eglGetError());
+        return EGL_NO_SURFACE;
+    }
+
+    _pbuffers.push_back(pbuf);
+    
+    return pbuf;
+}
+
+EGLSurface
+EGLDevice::createPixmap(int width, int height, NativePixmapType buf)
+{
+      const EGLint attribs[] = {
+        EGL_WIDTH,      width,
+        EGL_HEIGHT,     height,
+        EGL_NONE
+    };
+
+      EGLSurface pbuf = eglCreatePixmapSurface(_eglDisplay, _eglConfig, buf, attribs);
+    if (pbuf == EGL_NO_SURFACE) {
+        log_error( "eglCreatePbufferFromClientBuffer() failed (error 0x%x)",
+                   eglGetError());
+        return EGL_NO_SURFACE;
+    }
+
+    _pbuffers.push_back(pbuf);
+    
+    return pbuf;  
 }
 
 } // namespace renderer
