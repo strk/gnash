@@ -120,6 +120,13 @@ test_egl(EGLDevice &egl, EGLDevice::rtype_t rtype)
         runtest.fail("EGLDevice::getErrorString()");
     }
     
+    // Surface config info tests
+    if (egl.getSurfaceID()) {
+        runtest.pass("EGLDevice::getSurfaceID()");
+    } else {
+        runtest.fail("EGLDevice::getSurfaceID()");
+    }
+    
     if (egl.getWidth()) {
         runtest.pass("EGLDevice::getWidth()");
     } else {
@@ -144,17 +151,87 @@ test_egl(EGLDevice &egl, EGLDevice::rtype_t rtype)
         runtest.fail("EGLDevice::getHorzRes()");
     }
     
-    if (egl.supportsRenderer(EGLDevice::OPENVG)) {
+    if (egl.supportsRenderer(rtype)) {
         runtest.pass("EGLDevice::supportsRenderer()");
     } else {
         runtest.fail("EGLDevice::supportsRenderer()");
     }
     
-    if (egl.isSingleBuffered() != egl.isBackBuffered()) {
-        runtest.pass("EGLDevice::isSingleBuffered()");
+    if (egl.isSurfaceSingleBuffered() != egl.isSurfaceBackBuffered()) {
+        runtest.pass("EGLDevice::isSurface*Buffered()");
     } else {
-        runtest.fail("EGLDevice::isSingleBuffered()");
+        runtest.fail("EGLDevice::isSurface*Buffered()");
     }
+
+    if (egl.isBufferDestroyed()) {
+        runtest.pass("EGLDevice::isBufferDestroyed()");
+    } else {
+        runtest.fail("EGLDevice::isBufferDestroyed()");
+    }
+    
+    if (!egl.isMultiSample()) {
+        runtest.pass("EGLDevice::isMultiSample()");
+    } else {
+        runtest.fail("EGLDevice::isMultiSample()");
+    }
+
+    // Context accessor tests
+    if (egl.getContextID()) {
+        runtest.pass("EGLDevice::getContextID()");
+    } else {
+        runtest.fail("EGLDevice::getContextID()");
+    }
+    
+    if (egl.supportsClient(rtype)) {
+        runtest.pass("EGLDevice::supportsClient()");
+    } else {
+        runtest.fail("EGLDevice::supportsClient()");
+    }
+    
+    if (egl.isContextSingleBuffered() != egl.isContextBackBuffered()) {
+        runtest.pass("EGLDevice::isContext*Buffered()");
+    } else {
+        runtest.fail("EGLDevice::isContext*Buffered()");
+    }
+    
+    if (egl.isNativeRender()) {
+        runtest.pass("EGLDevice::isNativeRender()");
+    } else {
+        runtest.fail("EGLDevice::isNativeRender()");
+    }
+
+    if (egl.getSamples() == 0) {
+        runtest.pass("EGLDevice::getSamples()");
+    } else {
+        runtest.fail("EGLDevice::getSamples()");
+    }
+    
+    if (egl.getSampleBuffers() == 0) {
+        runtest.pass("EGLDevice::getSampleBuffers()");
+    } else {
+        runtest.fail("EGLDevice::getSampleBuffers()");
+    }
+    
+    if (egl.getDepth()) {
+        runtest.pass("EGLDevice::getDepth()");
+    } else {
+        runtest.fail("EGLDevice::getDepth()");
+    }
+    
+    if (egl.getMaxSwapInterval() == 0) {
+        runtest.pass("EGLDevice::getMaxSwapInterval()");
+    } else {
+        runtest.fail("EGLDevice::getMaxSwapInterval()");
+    }
+    
+    if (egl.getMinSwapInterval() == 0) {
+        runtest.pass("EGLDevice::getMinSwapInterval()");
+    } else {
+        runtest.fail("EGLDevice::getMinSwapInterval()");
+    }
+    
+
+
 }
 
 // Local Variables:
