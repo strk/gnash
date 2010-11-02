@@ -935,6 +935,8 @@ create_standalone_launcher(const std::string& page_url, const std::string& swf_u
     }
 
     saLauncher << "#!/bin/sh" << std::endl
+               << "export GNASH_COOKIES_IN="
+               << "/tmp/gnash-cookies." << getpid() << std::endl
                << getGnashExecutable() << " ";
 
     if (!page_url.empty()) {
