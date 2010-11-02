@@ -71,7 +71,8 @@ class EGLDevice
     void printEGLSurface() { return printEGLSurface(_eglSurface); };
     void printEGLSurface(EGLSurface surface);
 
-    // Accessors for the setting needed by higher level code
+    // Accessors for the settings needed by higher level code.
+    // Surface accessors
     EGLint getWidth() {
         EGLint value;
         eglQuerySurface(_eglDisplay, _eglSurface, EGL_WIDTH, &value);
@@ -92,10 +93,89 @@ class EGLDevice
         eglQuerySurface(_eglDisplay, _eglSurface, EGL_HORIZONTAL_RESOLUTION, &value);
         return value;
     }
+    bool isSurfaceSingleBuffered() {
+        EGLint value;
+        eglQuerySurface(_eglDisplay, _eglSurface, EGL_RENDER_BUFFER, &value);
+        if (value == EGL_SINGLE_BUFFER) {
+            return true;
+        }
+        return false;
+    }
+    
+    bool isSurfaceBackBuffered() {
+        EGLint value;
+        eglQuerySurface(_eglDisplay, _eglSurface, EGL_RENDER_BUFFER, &value);
+        if (value == EGL_BACK_BUFFER) {
+            return true;
+        }
+        return false;
+    }
+
+    bool isBufferDestroyed() {
+        EGLint value;
+        eglQuerySurface(_eglDisplay, _eglSurface, EGL_SWAP_BEHAVIOR, &value);
+        if (value == EGL_BUFFER_DESTROYED) {
+            return true;
+        }
+        return false;
+    }
+    bool isMultiSample() {
+        EGLint value;
+        eglQuerySurface(_eglDisplay, _eglSurface, EGL_MULTISAMPLE_RESOLVE, &value);
+        if (value == EGL_MULTISAMPLE_RESOLVE_BOX) {
+            return true;
+        }
+        return false;
+    }
+    EGLint getSurfaceID() {
+        EGLint value;
+        eglQuerySurface(_eglDisplay, _eglSurface, EGL_CONFIG_ID, &value);
+        return value;
+    }
+
+    // Context accessors
+    EGLint getContextID() {
+        EGLint value;
+        eglQueryContext(_eglDisplay, _eglContext, EGL_CONFIG_ID, &value);
+        return value;
+    }
+    bool supportsClient(rtype_t rtype) {
+        EGLint value;
+        eglQueryContext(_eglDisplay, _eglContext, EGL_CONTEXT_CLIENT_TYPE, &value);
+        std::string str;
+        if ((value == EGL_OPENGL_ES_API) && (rtype == EGLDevice::OPENGLES2)) {
+            return true;
+        }
+        if ((value == EGL_OPENGL_ES_API) && (rtype == EGLDevice::OPENGLES1)) {
+            return true;
+        }
+        if ((value == EGL_OPENVG_API) && (rtype == EGLDevice::OPENVG)){
+            return true;
+        }
+        return false;
+    }
+    bool isContextSingleBuffered() {
+        EGLint value;
+        eglQueryContext(_eglDisplay, _eglContext, EGL_RENDER_BUFFER, &value);
+        if (value == EGL_SINGLE_BUFFER) {
+            return true;
+        }
+        return false;
+    }
+    bool isContextBackBuffered() {
+        EGLint value;
+        eglQueryContext(_eglDisplay, _eglContext, EGL_RENDER_BUFFER, &value);
+        if (value == EGL_BACK_BUFFER) {
+            return true;
+        }
+        return false;
+    }
+
+    // Config accessors
     bool supportsRenderer(rtype_t rtype) {
         EGLint value;
-        eglQuerySurface(_eglDisplay, _eglSurface, EGL_HEIGHT, &value);
         eglGetConfigAttrib(_eglDisplay, _eglConfig, EGL_RENDERABLE_TYPE, &value);
+        
         if (value > 0) {
             std::string str;
             if ((value & EGL_OPENGL_ES2_BIT) && (rtype == EGLDevice::OPENGLES2)) {
@@ -110,24 +190,40 @@ class EGLDevice
         }
         return false;
     }
-    bool isSingleBuffered() {
+    bool isNativeRender() {
         EGLint value;
-        eglQuerySurface(_eglDisplay, _eglSurface, EGL_RENDER_BUFFER, &value);
-        if (value == EGL_SINGLE_BUFFER) {
-            return true;
-        }
-        return false;
+        eglGetConfigAttrib(_eglDisplay, _eglConfig, EGL_NATIVE_RENDERABLE, &value);
+        return value;
     }
-    
-    bool isBackBuffered() {
+    EGLint getSamples() {
         EGLint value;
-        eglQuerySurface(_eglDisplay, _eglSurface, EGL_RENDER_BUFFER, &value);
-        if (value == EGL_BACK_BUFFER) {
-            return true;
-        }
-        return false;
+        eglGetConfigAttrib(_eglDisplay, _eglConfig, EGL_SAMPLES, &value);
+        return value;
     }
-
+    EGLint getSampleBuffers() {
+        EGLint value; 
+        eglGetConfigAttrib(_eglDisplay, _eglConfig, EGL_SAMPLE_BUFFERS, &value);
+        return value;
+    }
+    EGLint getDepth() {
+        EGLint value;
+        eglGetConfigAttrib(_eglDisplay, _eglConfig, EGL_DEPTH_SIZE, &value);
+        return value;
+    }
+    EGLint getMaxSwapInterval() {
+        EGLint value;
+        eglGetConfigAttrib(_eglDisplay, _eglConfig, EGL_MAX_SWAP_INTERVAL, &value);
+        return value;
+    }
+    EGLint getMinSwapInterval() {
+        EGLint value;
+        eglGetConfigAttrib(_eglDisplay, _eglConfig, EGL_MIN_SWAP_INTERVAL, &value);
+        return value;
+    }
+    // bool i() {
+    //     EGLint value;
+    //     return value;
+    // }
     
 protected:
     EGLConfig           _eglConfig;
