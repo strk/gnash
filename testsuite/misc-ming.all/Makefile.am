@@ -28,7 +28,7 @@ CLEANFILES =  \
 	testrun.sum \
 	testrun.log
 
-SUBDIRS = loop displaylist_depths
+SUBDIRS = loop displaylist_depths action_order
 
 EXTRA_DIST = \
 	empty.as \
@@ -131,18 +131,6 @@ check_PROGRAMS = \
 	consecutive_goto_frame_test \
 	matrix_test \
 	multi_doactions_and_goto_frame_test \
-	action_execution_order_test \
-	action_execution_order_extend_test \
-	action_execution_order_test1 \
-	action_execution_order_test2 \
-	action_execution_order_test3 \
-	action_execution_order_test4 \
-	action_execution_order_test5 \
-	action_execution_order_test6 \
-	action_execution_order_test7 \
-	action_execution_order_test8 \
-	action_execution_order_test9 \
-	action_execution_order_test11 \
 	reverse_execute_PlaceObject2_test1 \
 	reverse_execute_PlaceObject2_test2 \
 	loadImageTest \
@@ -213,9 +201,6 @@ if MING_SUPPORTS_INIT_ACTIONS
 check_PROGRAMS += \
 	init_action_test \
 	InitActionTest2 \
-	ActionOrderTest3 \
-	ActionOrderTest4 \
-	ActionOrderTest5 \
 	RegisterClassTest4 \
 	RegisterClassTest3 \
 	registerClassTest2 \
@@ -264,19 +249,7 @@ check_SCRIPTS = \
 	goto_frame_testrunner \
 	consecutive_goto_frame_testrunner \
 	multi_doactions_and_goto_frame_testrunner \
-	action_execution_order_testrunner \
-	action_execution_order_extend_testrunner \
 	gotoFrame2Test-Runner \
-	action_execution_order_test1runner \
-	action_execution_order_test2runner \
-	action_execution_order_test3runner \
-	action_execution_order_test4runner \
-	action_execution_order_test5runner \
-	action_execution_order_test6runner \
-	action_execution_order_test7runner \
-	action_execution_order_test8runner \
-	action_execution_order_test9runner \
-	action_execution_order_test11runner \
 	reverse_execute_PlaceObject2_test1runner \
 	reverse_execute_PlaceObject2_test2runner \
 	frame_label_testrunner \
@@ -299,9 +272,6 @@ check_SCRIPTS = \
 	instanceNameTestRunner \
 	init_action_testrunner \
 	InitActionTest2Runner \
-	ActionOrderTest3Runner \
-	ActionOrderTest4Runner \
-	ActionOrderTest5Runner \
 	$(NULL)
 	
 if MING_VERSION_0_4_4
@@ -335,9 +305,6 @@ endif
 if MING_SUPPORTS_INIT_ACTIONS
 check_SCRIPTS += \
 	InitActionTest2Runner \
-	ActionOrderTest3Runner \
-	ActionOrderTest4Runner \
-	ActionOrderTest5Runner \
 	RegisterClassTest4Runner \
 	RegisterClassTest3Runner \
 	registerClassTest2runner \
@@ -1080,141 +1047,6 @@ multi_doactions_and_goto_frame_testrunner: $(srcdir)/../generic-testrunner.sh mu
 	sh $< $(top_builddir) multi_doactions_and_goto_frame_test.swf > $@
 	chmod 755 $@
 
-action_execution_order_test_SOURCES =	\
-	action_execution_order_test.c	\
-	$(NULL)
-action_execution_order_test_LDADD = libgnashmingutils.la
-
-action_execution_order_test.swf: action_execution_order_test
-	./action_execution_order_test $(abs_mediadir)
-
-action_execution_order_testrunner: $(srcdir)/../generic-testrunner.sh action_execution_order_test.swf
-	sh $< $(top_builddir) action_execution_order_test.swf > $@
-	chmod 755 $@
-
-action_execution_order_test1_SOURCES =	\
-	action_execution_order_test1.c	\
-	$(NULL)
-action_execution_order_test1_LDADD = libgnashmingutils.la
-
-action_execution_order_test1.swf: action_execution_order_test1
-	./action_execution_order_test1 $(abs_mediadir)
-
-action_execution_order_test1runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test1.swf
-	sh $< $(top_builddir) action_execution_order_test1.swf > $@
-	chmod 755 $@
-
-action_execution_order_test2_SOURCES =	\
-	action_execution_order_test2.c	\
-	$(NULL)
-action_execution_order_test2_LDADD = libgnashmingutils.la
-
-action_execution_order_test2.swf: action_execution_order_test2
-	./action_execution_order_test2 $(abs_mediadir)
-
-action_execution_order_test2runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test2.swf
-	sh $< $(top_builddir) action_execution_order_test2.swf > $@
-	chmod 755 $@
-
-action_execution_order_test3_SOURCES =	\
-	action_execution_order_test3.c	\
-	$(NULL)
-action_execution_order_test3_LDADD = libgnashmingutils.la
-
-action_execution_order_test3.swf: action_execution_order_test3
-	./action_execution_order_test3 $(abs_mediadir)
-
-action_execution_order_test3runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test3.swf
-	sh $< $(top_builddir) action_execution_order_test3.swf > $@
-	chmod 755 $@
-
-action_execution_order_test4_SOURCES =	\
-	action_execution_order_test4.c	\
-	$(NULL)
-action_execution_order_test4_LDADD = libgnashmingutils.la
-
-action_execution_order_test4.swf: action_execution_order_test4
-	./action_execution_order_test4 $(abs_mediadir)
-
-action_execution_order_test4runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test4.swf
-	sh $< $(top_builddir) action_execution_order_test4.swf > $@
-	chmod 755 $@
-
-action_execution_order_test5_SOURCES =	\
-	action_execution_order_test5.c	\
-	$(NULL)
-action_execution_order_test5_LDADD = libgnashmingutils.la
-
-action_execution_order_test5.swf: action_execution_order_test5
-	./action_execution_order_test5 $(abs_mediadir)
-
-action_execution_order_test5runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test5.swf
-	sh $< $(top_builddir) action_execution_order_test5.swf > $@
-	chmod 755 $@
-
-action_execution_order_test6_SOURCES =	\
-	action_execution_order_test6.c	\
-	$(NULL)
-action_execution_order_test6_LDADD = libgnashmingutils.la
-
-action_execution_order_test6.swf: action_execution_order_test6
-	./action_execution_order_test6 $(abs_mediadir)
-
-action_execution_order_test6runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test6.swf
-	sh $< $(top_builddir) action_execution_order_test6.swf > $@
-	chmod 755 $@
-
-action_execution_order_test7_SOURCES =	\
-	action_execution_order_test7.c	\
-	$(NULL)
-action_execution_order_test7_LDADD = libgnashmingutils.la
-
-action_execution_order_test7.swf: action_execution_order_test7
-	./action_execution_order_test7 $(abs_mediadir)
-
-action_execution_order_test7runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test7.swf
-	sh $< $(top_builddir) action_execution_order_test7.swf > $@
-	chmod 755 $@
-
-action_execution_order_test8_SOURCES =	\
-	action_execution_order_test8.c	\
-	$(NULL)
-action_execution_order_test8_LDADD = libgnashmingutils.la
-
-action_execution_order_test8-v6.swf: action_execution_order_test8
-	./action_execution_order_test8 $(abs_mediadir) 6
-
-action_execution_order_test8-v5.swf: action_execution_order_test8
-	./action_execution_order_test8 $(abs_mediadir) 5
-
-action_execution_order_test8runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test8-v5.swf action_execution_order_test8-v6.swf
-	sh $< -f8 $(top_builddir) action_execution_order_test8-v5.swf action_execution_order_test8-v6.swf > $@
-	chmod 755 $@
-
-action_execution_order_test9_SOURCES =	\
-	action_execution_order_test9.c	\
-	$(NULL)
-action_execution_order_test9_LDADD = libgnashmingutils.la
-
-action_execution_order_test9.swf: action_execution_order_test9
-	./action_execution_order_test9 $(abs_mediadir)
-
-action_execution_order_test9runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test9.swf
-	sh $< -f8 $(top_builddir) action_execution_order_test9.swf > $@
-	chmod 755 $@
-
-action_execution_order_test11_SOURCES =	\
-	action_execution_order_test11.c	\
-	$(NULL)
-action_execution_order_test11_LDADD = libgnashmingutils.la
-
-action_execution_order_test11.swf: action_execution_order_test11
-	./action_execution_order_test11 $(abs_mediadir)
-
-action_execution_order_test11runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test11.swf
-	sh $< -f10 $(top_builddir) action_execution_order_test11.swf > $@
-	chmod 755 $@
-
 reverse_execute_PlaceObject2_test1_SOURCES =	\
 	reverse_execute_PlaceObject2_test1.c	\
 	$(NULL)
@@ -1237,18 +1069,6 @@ reverse_execute_PlaceObject2_test2.swf: reverse_execute_PlaceObject2_test2
 
 reverse_execute_PlaceObject2_test2runner: $(srcdir)/../generic-testrunner.sh reverse_execute_PlaceObject2_test2.swf
 	sh $< $(top_builddir) reverse_execute_PlaceObject2_test2.swf > $@
-	chmod 755 $@
-
-action_execution_order_extend_test_SOURCES =	\
-	action_execution_order_extend_test.c	\
-	$(NULL)
-action_execution_order_extend_test_LDADD = libgnashmingutils.la
-
-action_execution_order_extend_test.swf: action_execution_order_extend_test
-	./action_execution_order_extend_test $(abs_mediadir)
-
-action_execution_order_extend_testrunner: $(srcdir)/../generic-testrunner.sh action_execution_order_extend_test.swf
-	sh $< $(top_builddir) action_execution_order_extend_test.swf > $@
 	chmod 755 $@
 
 BitmapDataTest_SOURCES = \
@@ -1622,42 +1442,6 @@ InitActionTest2Runner: $(srcdir)/../generic-testrunner.sh InitActionTest2.swf
 	sh $< $(top_builddir) InitActionTest2.swf > $@
 	chmod 755 $@
 
-ActionOrderTest3_SOURCES =	\
-	ActionOrderTest3.c	\
-	$(NULL)
-ActionOrderTest3_LDADD = libgnashmingutils.la
-
-ActionOrderTest3.swf: ActionOrderTest3
-	./ActionOrderTest3 $(abs_mediadir)
-
-ActionOrderTest3Runner: $(srcdir)/../generic-testrunner.sh ActionOrderTest3.swf
-	sh $< $(top_builddir) ActionOrderTest3.swf > $@
-	chmod 755 $@
-
-ActionOrderTest4_SOURCES =	\
-	ActionOrderTest4.c	\
-	$(NULL)
-ActionOrderTest4_LDADD = libgnashmingutils.la
-
-ActionOrderTest4.swf: ActionOrderTest4
-	./ActionOrderTest4 $(abs_mediadir)
-
-ActionOrderTest4Runner: $(srcdir)/../generic-testrunner.sh ActionOrderTest4.swf
-	sh $< $(top_builddir) ActionOrderTest4.swf > $@
-	chmod 755 $@
-
-ActionOrderTest5_SOURCES =	\
-	ActionOrderTest5.c	\
-	$(NULL)
-ActionOrderTest5_LDADD = libgnashmingutils.la
-
-ActionOrderTest5.swf: ActionOrderTest5
-	./ActionOrderTest5 $(abs_mediadir)
-
-ActionOrderTest5Runner: $(srcdir)/../generic-testrunner.sh ActionOrderTest5.swf
-	sh $< $(top_builddir) ActionOrderTest5.swf > $@
-	chmod 755 $@
-
 RegisterClassTest3_SOURCES =	\
 	RegisterClassTest3.c	\
 	$(NULL)
@@ -1983,23 +1767,11 @@ TEST_CASES = \
 	consecutive_goto_frame_testrunner \
 	multi_doactions_and_goto_frame_testrunner \
 	registerClassTestRunner \
-	action_execution_order_testrunner \
-	action_execution_order_extend_testrunner \
 	loadMovieTestRunner \
 	XMLSocketTester \
 	LCTestRunner \
 	DrawingApiTestRunner \
 	TextSnapshotTest-Runner \
-	action_execution_order_test1runner \
-	action_execution_order_test2runner \
-	action_execution_order_test3runner \
-	action_execution_order_test4runner \
-	action_execution_order_test5runner \
-	action_execution_order_test6runner \
-	action_execution_order_test7runner \
-	action_execution_order_test8runner \
-	action_execution_order_test9runner \
-	action_execution_order_test11runner \
 	reverse_execute_PlaceObject2_test1runner \
 	reverse_execute_PlaceObject2_test2runner \
 	DepthLimitsTestrunner \
@@ -2060,9 +1832,6 @@ TEST_CASES += \
 	registerClassTest2runner \
 	init_action_testrunner \
 	InitActionTest2Runner \
-	ActionOrderTest3Runner \
-	ActionOrderTest4Runner \
-	ActionOrderTest5Runner \
 	RegisterClassTest3Runner \
 	RegisterClassTest4Runner \
 	$(NULL)
