@@ -238,12 +238,6 @@ test_egl(EGLDevice &egl, EGLDevice::rtype_t rtype)
         runtest.fail("EGLDevice::createPbuffer(int, int)");
     }
     
-    if (egl.totalPbuffers()) {
-        runtest.pass("EGLDevice::totalPbuffers()");
-    } else {
-        runtest.fail("EGLDevice::totalPbuffers()");
-    }
-    
     EGLSurface surf1 = egl[0];
     if ((surf1 != EGL_NO_SURFACE) && (egl.getWidth(surf1) == 200)
         && (egl.getHeigth(surf1) == 200)) {
@@ -252,7 +246,48 @@ test_egl(EGLDevice &egl, EGLDevice::rtype_t rtype)
         runtest.fail("EGLDevice::operator[]()");
     }
 
+    EGLSurface surf2 = egl.createPbuffer(300, 300);
+    EGLSurface surf3 = egl.createPbuffer(400, 400);
 
+    if (egl.totalPbuffers() == 3) {
+        runtest.pass("EGLDevice::totalPbuffers(2)");
+    } else {
+        runtest.fail("EGLDevice::totalPbuffers(2)");
+    }
+
+    // Since we're EGL_SINGLE_BUFFER'd, this is a nop
+    if (egl.swapPbuffers()) {
+        runtest.pass("EGLDevice::swapPbuffers()");
+    } else {
+        runtest.fail("EGLDevice::swapPbuffers()");
+    }
+
+    egl.makePbufferCurrent(1);
+    EGLSurface surf4 = eglGetCurrentSurface(EGL_DRAW);
+    if ((egl.getWidth(surf4) == 300) && ((egl.getHeigth(surf4) == 300))) {
+        runtest.pass("EGLDevice::makePbufferCurrent(int)");
+    } else {
+        runtest.fail("EGLDevice::makePbufferCurrent(int)");
+    }
+
+    // This should trigger an error as the number is more than we
+    // have created
+    if (!egl.makePbufferCurrent(10)) {
+        runtest.pass("EGLDevice::makePbufferCurrent(maxed)");
+    } else {
+        runtest.fail("EGLDevice::makePbufferCurrent(maxed)");
+    }
+    
+#if 0
+    if (!egl.copyPbuffers(1)) {
+        runtest.pass("EGLDevice::copyPbuffers()");
+    } else {
+        runtest.fail("EGLDevice::copyPbuffers()");
+    }
+#endif
+    
+    // EGLSurface surf5 = eglGetCurrentSurface(EGL_DRAW);
+    // egl.printEGLSurface(surf5);
 }
 
 // Local Variables:

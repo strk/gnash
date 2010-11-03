@@ -74,15 +74,52 @@ class EGLDevice
     void printEGLContext(EGLContext context);
     void printEGLSurface() { return printEGLSurface(_eglSurface); };
     void printEGLSurface(EGLSurface surface);
-
     
-    // Create a Pbuffer for offscreen rendering
+    // Create Pbuffers for offscreen rendering
     EGLSurface createPbuffer(int width, int height);
     EGLSurface createPbuffer(int width, int height, EGLClientBuffer buf, EGLenum type);
     EGLSurface createPixmap(int width, int height, NativePixmapType buf);
     size_t totalPbuffers() { return _pbuffers.size(); };
     EGLSurface &operator[](int index) { return _pbuffers[index]; };
 
+    // Swapping Buffers makes the specified surface active on the display if
+    // EGL_RENDER_BUFFER is set to EGL_BACK_BUFFER. If it's set to
+    // EGL_SINGLE_BUFFER then this has no effect, as the display was drawn to
+    // directly.
+    // Swap to the default surface
+    bool swapPbuffers() {
+        return eglSwapBuffers(_eglDisplay, _eglSurface);
+    }
+    bool copyPbuffers(int x) {
+        if (x < _pbuffers.size()) {
+            NativePixmapType pix;
+            if (!eglCopyBuffers(_eglDisplay, _pbuffers[x], pix)) {
+                log_error( "eglCopyBuffers() failed (error 0x%x)", eglGetError());
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+    // Make one of the pbuffers the current one to draw into
+    bool makePbufferCurrent() {
+        if (!eglMakeCurrent(_eglDisplay, _eglSurface, _eglSurface, _eglContext)) {
+            log_error( "eglMakeCurrent() failed (error 0x%x)", eglGetError());
+            return false;
+        }
+    }
+    
+    bool makePbufferCurrent(int x) {
+        if (x < _pbuffers.size()) {
+            if (!eglMakeCurrent(_eglDisplay, _pbuffers[x], _pbuffers[x], _eglContext)) {
+                log_error( "eglMakeCurrent() failed (error 0x%x)", eglGetError());
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+    
     // Accessors for the settings needed by higher level code.
     // Surface accessors
     EGLint getWidth() {
