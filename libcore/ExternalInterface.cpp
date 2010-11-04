@@ -480,6 +480,7 @@ ExternalInterface::readBrowser(int fd)
     // Wait for some data from the player
     int bytes = 0;
 
+#if 0
     fd_set fdset;
     FD_ZERO(&fdset);
     FD_SET(fd, &fdset);
@@ -489,8 +490,10 @@ ExternalInterface::readBrowser(int fd)
     // log_debug("Waiting for data... ");
     if (::select(fd + 1, &fdset, NULL, NULL, &tval)) {
         // log_debug("There is data in the network");
-        ioctlSocket(fd, FIONREAD, &bytes);
     }  
+#endif
+
+    ioctlSocket(fd, FIONREAD, &bytes);
 
     // No data yet
     if (bytes == 0) {
