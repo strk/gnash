@@ -2176,26 +2176,26 @@ GNASH_PKG_FIND(fontconfig, [fontconfig/fontconfig.h], [fontconfig library], FcFo
 if test x$cross_compiling = xno; then
   AC_PATH_MING
 fi
-AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x ])
+AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040000 ])
 
 AM_CONDITIONAL(MING_VERSION_0_4,
-        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040000  ])
+        [ ENABLE_MING && test $MING_VERSION_CODE -ge 00040000  ])
 AM_CONDITIONAL(MAKESWF_SUPPORTS_PREBUILT_CLIPS,
-        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040002  ])
+        [ ENABLE_MING && test $MING_VERSION_CODE -ge 00040002  ])
 AM_CONDITIONAL(MING_SUPPORTS_INIT_ACTIONS,
-        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040004  ])
+        [ ENABLE_MING && test $MING_VERSION_CODE -ge 00040004  ])
 AM_CONDITIONAL(MING_SUPPORTS_REPLACE_TAG,
-        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040005 ])
+        [ ENABLE_MING && test $MING_VERSION_CODE -ge 00040005 ])
 AM_CONDITIONAL(MING_SUPPORTS_SWFBUTTON_ADD_CHARACTER,
-        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040005 ])
+        [ ENABLE_MING && test $MING_VERSION_CODE -ge 00040005 ])
 AM_CONDITIONAL(MING_SUPPORTS_STREAMING_SOUND,
-        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040006 ])
+        [ ENABLE_MING && test $MING_VERSION_CODE -ge 00040006 ])
 AM_CONDITIONAL(MING_SUPPORTS_SWFBUTTON_SET_DEPTH,
-        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040006 ])
+        [ ENABLE_MING && test $MING_VERSION_CODE -ge 00040006 ])
 AM_CONDITIONAL(MING_VERSION_0_4_3,
-        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040300 ])
+        [ ENABLE_MING && test $MING_VERSION_CODE -ge 00040300 ])
 AM_CONDITIONAL(MING_VERSION_0_4_4,
-        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040400 ])
+        [ ENABLE_MING && test $MING_VERSION_CODE -ge 00040400 ])
 
 if test x$cross_compiling = xno; then
   AC_ARG_WITH([swfdec_testsuite],
@@ -3548,7 +3548,8 @@ if test x"$testsuite" = x"yes"; then
       echo "        MAKESWF is $MAKESWF"
     else
       echo "        WARNING: You need to have the Ming utilities package" >&4
-      echo "                 installed to run most of the tests in Gnash testsuite." >&4
+      echo "                 version 0.4 or higher installed to run" >&4
+      echo "                 many of the tests in Gnash testsuite." >&4
       echo "                 Install it from http://www.libming.org" >&4
       echo "                 or .deb users: apt-get install libming-util" >&4
     fi
