@@ -2772,12 +2772,6 @@ fi
 if test x$build_qtopia4 = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},qtopia4"
 fi
-if test x$build_hildon = xyes; then
-  SUPPORTED_GUIS="${SUPPORTED_GUIS},hildon"
-fi
-if test x$build_alp = xyes; then
-  SUPPORTED_GUIS="${SUPPORTED_GUIS},alp"
-fi
 if test x$build_fb = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},fb"
 fi
@@ -2851,6 +2845,8 @@ testsuite/actionscript.all/Makefile
 testsuite/samples/Makefile
 testsuite/swfdec/Makefile
 testsuite/misc-ming.all/Makefile
+testsuite/misc-ming.all/action_order/Makefile
+testsuite/misc-ming.all/displaylist_depths/Makefile
 testsuite/misc-ming.all/loop/Makefile
 testsuite/misc-mtasc.all/Makefile
 testsuite/misc-haxe.all/Makefile

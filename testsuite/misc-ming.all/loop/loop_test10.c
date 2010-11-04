@@ -292,7 +292,7 @@ main(int argc, char** argv)
   SWFMovie_add(mo, mc5);
   SWFMovie_nextFrame(mo);  // frame 14
   
-  add_actions(mo, "totals(15); stop();");
+  add_actions(mo, "totals(16); stop();");
   SWFMovie_nextFrame(mo);  // frame 15
   //Output movie
   puts("Saving " OUTPUT_FILENAME );

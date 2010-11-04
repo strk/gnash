@@ -47,23 +47,6 @@
 #include "revno.h"
 #include "MediaHandler.h"
 
-#ifdef HAVE_FFMPEG_AVCODEC_H
-extern "C" {
-# include "ffmpeg/avcodec.h"
-}
-#endif
-
-#ifdef HAVE_LIBAVCODEC_AVCODEC_H
-extern "C" {
-# include "libavcodec/avcodec.h"
-}
-#endif
-
-#ifdef HAVE_GST_GST_H
-# include "gst/gst.h"
-# include "gst/gstversion.h"
-#endif
-
 using std::cerr;
 using std::endl;
 using std::cout;
