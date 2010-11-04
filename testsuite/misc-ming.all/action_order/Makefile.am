@@ -102,7 +102,7 @@ check_SCRIPTS = \
 	$(NULL)
 
 if MING_SUPPORTS_INIT_ACTIONS
-check_PROGRAMS += \
+check_SCRIPTS += \
 	ActionOrderTest3Runner \
 	ActionOrderTest4Runner \
 	ActionOrderTest5Runner \
