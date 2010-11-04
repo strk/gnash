@@ -227,7 +227,6 @@ Player::load_movie()
 
     try {
         if (_infile == "-") {
-            log_debug("Using filno");
             std::auto_ptr<IOChannel> in (
                 noseek_fd_adapter::make_stream(fileno(stdin)));
             md = MovieFactory::makeMovie(in, _url, *_runResources, false);
