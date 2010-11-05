@@ -63,9 +63,7 @@ main(int /*argc*/, char** /*argv*/)
     movie_root stage(*md5, clock, ri);
     
     MovieClip::MovieVariables v;
-    // We pass 'v' twice, as the second one is for scriptable
-    // Variables, which isn't fully implemented yet.
-    stage.init(md5.get(), v, v);
+    stage.init(md5.get(), v);
     
     DisplayList dlist1;
     
