@@ -145,26 +145,6 @@ ExternalInterface::ExternalEventCheck(int fd)
     boost::shared_ptr<ExternalInterface::invoke_t> error;
 
     if (fd > 0) {
-#if 0
-        fd_set fdset;
-        FD_ZERO(&fdset);
-        FD_SET(fd, &fdset);
-        struct timeval tval;
-        tval.tv_sec  = 0;
-        tval.tv_usec = 100;
-        errno = 0;
-        int ret1 = ::select(fd+1, &fdset, NULL, NULL, &tval);
-        if (ret1 == 0) {
-//            log_debug ("The pipe for fd #%d timed out waiting to read", fd);
-            return error;
-        } else if (ret1 == 1) {
-            log_debug ("The pipe for fd #%d is ready", fd);
-        } else {
-            log_error("The pipe has this error: %s", strerror(errno));
-            return error;
-        }
-#endif
-        
         int bytes = 0;
         ioctlSocket(fd, FIONREAD, &bytes);
         if (bytes == 0) {
@@ -479,19 +459,6 @@ ExternalInterface::readBrowser(int fd)
     std::string empty;
     // Wait for some data from the player
     int bytes = 0;
-
-#if 0
-    fd_set fdset;
-    FD_ZERO(&fdset);
-    FD_SET(fd, &fdset);
-    struct timeval tval;
-    tval.tv_sec = 10;
-    tval.tv_usec = 0;
-    // log_debug("Waiting for data... ");
-    if (::select(fd + 1, &fdset, NULL, NULL, &tval)) {
-        // log_debug("There is data in the network");
-    }  
-#endif
 
     ioctlSocket(fd, FIONREAD, &bytes);
 
