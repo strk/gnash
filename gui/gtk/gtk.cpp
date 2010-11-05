@@ -1812,6 +1812,7 @@ GtkGui::showAboutDialog()
     // See bug #24426.
 
     GtkWidget* aboutWidget = gtk_about_dialog_new();
+    addGnashIcon(GTK_WINDOW(aboutWidget)); 
     GtkAboutDialog* about = GTK_ABOUT_DIALOG(aboutWidget);
 
     gtk_about_dialog_set_name (about, "Gnash");
