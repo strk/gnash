@@ -73,12 +73,6 @@ Player::setFlashVars(const std::string& varstr)
     _gui->addFlashVars(vars);
 }
 
-void
-Player::setScriptableVar(const std::string &name, const std::string &value)
-{
-    _gui->addScriptableVar(name, value);
-}
-
 Player::Player()
     :
 #if defined(RENDERER_CAIRO)

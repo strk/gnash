@@ -904,9 +904,8 @@ Gui::start()
         return;
     }
 
-    // Initializes the stage with a Movie and the passed flash vars and
-    // Scriptable vars for ExternalInterface.
-    _stage->init(_movieDef.get(), _flashVars, _scriptableVars);
+    // Initializes the stage with a Movie and the passed flash vars.
+    _stage->init(_movieDef.get(), _flashVars);
 
     bool background = true; // ??
     _stage->set_background_alpha(background ? 1.0f : 0.05f);
@@ -1272,14 +1271,6 @@ Gui::addFlashVars(Gui::VariableMap& from)
     for (VariableMap::iterator i=from.begin(), ie=from.end(); i!=ie; ++i) {
         _flashVars[i->first] = i->second;
     }
-}
-
-void
-Gui::addScriptableVar(const std::string &name, const std::string &value)
-{
-    log_debug("Adding scriptable variable \"%s\" = %s",
-              name, value);
-    _scriptableVars[name] = value;
 }
 
 void

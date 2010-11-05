@@ -464,7 +464,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
     md->completeLoad();
 
     MovieClip::MovieVariables v;
-    m.init(md.get(), v, v);
+    m.init(md.get(), v);
 
     log_debug("iteration, timer: %lu, localDelay: %ld\n",
             cl.elapsed(), localDelay);

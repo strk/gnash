@@ -191,8 +191,7 @@ public:
     /// SWF playback, so for normal playback this pointer should not be
     /// used.
     Movie* init(movie_definition* def,
-            const MovieClip::MovieVariables& variables,
-            const MovieClip::MovieVariables& scriptables);
+            const MovieClip::MovieVariables& variables);
 
     /// Return the movie at the given level (0 if unloaded level).
     //

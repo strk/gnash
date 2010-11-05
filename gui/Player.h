@@ -276,8 +276,6 @@ private:
     
     void setFlashVars(const std::string& varstr);
 
-    void setScriptableVar(const std::string &name, const std::string& value);
-    
     typedef std::map<std::string, std::string, StringNoCaseLessThan> Params;
     
     // Movie parameters (for -P)

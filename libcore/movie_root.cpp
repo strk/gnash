@@ -212,12 +212,10 @@ movie_root::~movie_root()
 }
 
 Movie*
-movie_root::init(movie_definition* def, const MovieClip::MovieVariables& vars,
-                 const MovieClip::MovieVariables& scriptables)
+movie_root::init(movie_definition* def, const MovieClip::MovieVariables& vars)
 {
     Movie* mr = def->createMovie(*_vm.getGlobal());
     mr->setVariables(vars);
-    mr->setVariables(scriptables);
     setRootMovie(mr);
     return mr;
 }
