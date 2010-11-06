@@ -63,6 +63,32 @@ gnash::Debugger& debugger = gnash::Debugger::getDefaultInstance();
 }
 
 static void
+usage_gui_keys(std::ostream& os)
+{
+    os
+    << _("Keys:") << std::endl
+    << std::endl
+    << "  CTRL-Q, CTRL-W           "
+    << _("Quit")
+    << std::endl
+    << "  CTRL-F                   "
+    << _("Toggle fullscreen")
+    << std::endl 
+    << "  CTRL-P                   "
+    << _("Toggle pause") 
+    << std::endl 
+    << "  CTRL-R                   "
+    << _("Restart the movie") 
+    << std::endl 
+    << "  CTRL-O                   "
+    << _("Take a screenshot") 
+    << std::endl 
+    << "  CTRL-L                   "
+    << _("Force immediate redraw") 
+    << std::endl;
+}
+
+static void
 usage()
 {
     std::vector<std::string> handlers;
@@ -130,16 +156,13 @@ usage()
     << _("  --hide-menubar           Start without displaying the menu bar\n") 
     << _("  --screenshot <list>      List of frames to save as screenshots\n") 
     << _("  --screenshot-file <file> Filename pattern for screenshot images.\n")
-    << "\n"
-    << _("Keys:\n") 
-    << "\n"
-    << _("  CTRL-Q, CTRL-W           Quit\n") 
-    << _("  CTRL-F                   Toggle fullscreen\n") 
-    << _("  CTRL-P                   Toggle pause\n") 
-    << _("  CTRL-R                   Restart the movie\n") 
-    << _("  CTRL-O                   Take a screenshot\n") 
-    << _("  CTRL-L                   Force immediate redraw\n") 
-    << endl;
+    << "\n";
+
+    // Add gui keys
+    usage_gui_keys(cout);
+
+    cout << std::endl;
+
 }
 
 static void
