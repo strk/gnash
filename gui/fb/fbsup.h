@@ -108,6 +108,8 @@ private:
 
     struct fb_var_screeninfo var_screeninfo;
     struct fb_fix_screeninfo fix_screeninfo;
+
+    unsigned int _timeout; /* TODO: should we move this to base class ? */
     
     /// For 8 bit (palette / LUT) modes, sets a grayscale palette.
     //

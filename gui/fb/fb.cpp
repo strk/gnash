@@ -190,7 +190,8 @@ FBGui::FBGui(unsigned long xid, float scale, bool loop, RunResources& r)
       buffer(0),                // the real value is set by ENABLE_DOUBLE_BUFFERING
       m_stage_width(0),
       m_stage_height(0),
-      m_rowsize(0)
+      m_rowsize(0),
+      _timeout(0)
 {
     // initializing to zero helps with debugging and prevents weird bugs
 //    memset(mouse_buf, 0, 256);
@@ -390,22 +391,13 @@ bool
 FBGui::run()
 {
     GNASH_REPORT_FUNCTION;
-
-    struct timeval tv;
-
-    double start_timer;
   
 #ifdef USE_TSLIB
     int ts_loop_count;
 #endif
+
+    VirtualClock& timer = getClock();
     
-    if (!gettimeofday(&tv, NULL)) {
-        start_timer = static_cast<double>(tv.tv_sec) +
-            static_cast<double>(tv.tv_usec) / 1000000.0;
-    } else {
-        start_timer = 0.0;
-    }  
-  
     // let the GUI recompute the x/y scale factors to best fit the whole screen
     resize_view(_validbounds.width(), _validbounds.height());
 
@@ -426,6 +418,11 @@ FBGui::run()
         
         // advance movie  
         Gui::advance_movie(this);
+
+        // check if we've reached a timeout
+        if (_timeout && timer.elapsed() >= _timeout ) {
+            break;
+        }
     }
   
     return true;
@@ -497,9 +494,9 @@ FBGui::setInterval(unsigned int interval)
 }
 
 void
-FBGui::setTimeout(unsigned int /*timeout*/)
+FBGui::setTimeout(unsigned int timeout)
 {
-
+    _timeout = timeout;
 }
 
 void
