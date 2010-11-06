@@ -98,65 +98,126 @@ usage()
     boost::split(renderers, RENDERER_CONFIG,
         boost::is_any_of(" "), boost::token_compress_on);
 
-    cout << _("Usage: gnash [options] movie_file.swf\n")
-    << "\n"
-    << _("Plays a SWF (Shockwave Flash) movie\n")
-    << _("Options:\n")
-    << "\n"
-    << _("  -h,  --help              Print this help and exit\n")
-    << _("  -V,  --version           Print version information and exit\n") 
-    << _("  -s,  --scale <factor>    Scale the movie by the specified factor\n") 
-    << _("  -d,  --delay <num>       Number of milliseconds to delay in main loop\n") 
-    << _("  -v,  --verbose           Produce verbose output\n") 
+    cout
+
+    << _("Usage: gnash [options] movie_file.swf") << endl
+    << _("Plays a SWF (Shockwave Flash) movie") << endl
+    << _("Options:") << endl
+    << endl 
+
+    <<   "  -h,  --help              "
+    << _("Print this help and exit") << endl
+
+    <<   "  -V,  --version           "
+    << _("Print version information and exit") << endl
+
+    <<   "  -s,  --scale <factor>    "
+    << _("Scale the movie by the specified factor") << endl
+
+    <<   "  -d,  --delay <num>       "
+    << _("Number of milliseconds to delay in main loop") << endl
+
+    <<   "  -v,  --verbose           "
+    << _("Produce verbose output") << endl
+
 #if VERBOSE_ACTION
-    << _("  -va                      Be (very) verbose about action execution\n") 
+    <<   "  -va                      "
+    << _("Be (very) verbose about action execution") << endl
 #endif
+
 #if VERBOSE_PARSE
-    << _("  -vp                      Be (very) verbose about parsing\n") 
+    <<   "  -vp                      "
+    << _("Be (very) verbose about parsing") << endl
 #endif
-    << _("  -A <file>                Audio dump file (wave format)\n") 
-    << _("  --hwaccel <none|vaapi> Hardware Video Accelerator to use\n") 
-    << _("                           none|vaapi|omap (default: none)\n") 
-    << _("  -x,  --xid <ID>          X11 Window ID for display\n") 
-    << _("  -w,  --writelog          Produce the disk based debug log\n") 
-    << _("  -j,  --width <width>     Set window width\n") 
-    << _("  -k,  --height <height>   Set window height\n") 
-    << _("  -X,  --x-pos <x-pos>     Set window x position\n") 
-    << _("  -Y,  --y-pos <y-pos>     Set window y position\n") 
-    << _("  -1,  --once              Exit when/if movie reaches the last "
-            "frame\n") 
-    << _("  -g,  --debugger          Turn on the SWF debugger\n") 
-    << _("  -r,  --render-mode <0|1|2|3>\n") 
-    << _("                           0 disable rendering and sound\n") 
-    << _("                           1 enable rendering, disable sound\n") 
-    << _("                           2 enable sound, disable rendering\n") 
-    << _("                           3 enable rendering and sound (default)\n") 
-    << _("  -M,  --media <") << boost::join(handlers, "|") << ">\n"
-    << _("                           The media handler to use")
-    << " (default: " << handlers.front() << ")\n"
-    << _("  -R,  --renderer <") << boost::join(renderers, "|") << ">\n"
-    << _("                           The renderer to use")
-    << " (default: agg)\n"
-    << _("  -t,  --timeout <sec>     Exit after the specified number of "
-            "seconds\n") 
-    << _("  -u,  --real-url <url>    Set \"real\" URL of the movie\n") 
-    << _("  -U,  --base-url <url>    Set \"base\" URL for resolving relative "
-            "URLs\n") 
-    << _("  -P,  --param <param>     Set parameter (e.g. "
-            "\"FlashVars=A=1&b=2\")\n") 
-    << _("  -F,  --fd <fd>:<fd>      Filedescriptor to use for external "
-            "communications\n") 
+
+    <<   "  -A <file>                "
+    << _("Audio dump file (wave format)") << endl
+
+    <<   "  --hwaccel <none|vaapi>   "
+    << _("Hardware Video Accelerator to use") << endl
+    <<   "                           none|vaapi|omap (default: none)" 
+    << endl
+
+    <<   "  -x,  --xid <ID>          "
+    << _("X11 Window ID for display") << endl
+
+    <<   "  -w,  --writelog          "
+    << _("Produce the disk based debug log") << endl
+
+    <<   "  -j,  --width <width>     "
+    << _("Set window width") << endl
+
+    <<   "  -k,  --height <height>   "
+    << _("Set window height") << endl
+
+    <<   "  -X,  --x-pos <x-pos>     "
+    << _("Set window x position") << endl
+
+    <<   "  -Y,  --y-pos <y-pos>     "
+    << _("Set window y position") << endl
+
+    <<   "  -1,  --once              "
+    << _("Exit when/if movie reaches the last frame") << endl
+
+    <<   "  -g,  --debugger          "
+    << _("Turn on the SWF debugger") << endl
+
+    <<   "  -r,  --render-mode <0|1|2|3>" << endl 
+    <<   "                           0 "
+    << _("disable rendering and sound") << endl
+    <<   "                           1 "
+    << _("enable rendering, disable sound") << endl
+    <<   "                           2 "
+    << _("enable sound, disable rendering") << endl
+    <<   "                           3 "
+    << _("enable rendering and sound (default)") << endl
+
+    <<   "  -M,  --media <" << boost::join(handlers, "|") << ">" << endl
+    <<   "                           "
+    << _("The media handler to use")
+    << " (default: " << handlers.front() << ")" << endl
+
+    <<   "  -R,  --renderer <" << boost::join(renderers, "|") << ">" << endl
+    <<   "                           "
+    << _("The renderer to use")
+    << " (default: agg)" << endl
+
+    <<   "  -t,  --timeout <sec>     "
+    << _("Exit after the specified number of seconds") << endl
+
+    <<   "  -u,  --real-url <url>    "
+    << _("Set \"real\" URL of the movie")  << endl
+
+    <<   "  -U,  --base-url <url>    "
+    << _("Set \"base\" URL for resolving relative URLs") << endl
+
+    <<   "  -P,  --param <param>     "
+    << _("Set parameter (e.g. \"FlashVars=A=1&b=2\")") << endl
+
+    <<   "  -F,  --fd <fd>:<fd>      "
+    << _("Filedescriptor to use for external communications") << endl
+
 #ifdef GNASH_FPS_DEBUG
-    << _("  -f,  --debug-fps <num>   Print FPS every num seconds (float)\n") 
+    <<   "  -f,  --debug-fps <num>   "
+    << _("Print FPS every num seconds (float)") << endl
 #endif // def GNASH_FPS_DEBUG
     
-    << _("  --max-advances <num>     Exit after specified number of frame "
-            "advances\n") 
-    << _("  --fullscreen             Start in fullscreen mode\n") 
-    << _("  --hide-menubar           Start without displaying the menu bar\n") 
-    << _("  --screenshot <list>      List of frames to save as screenshots\n") 
-    << _("  --screenshot-file <file> Filename pattern for screenshot images.\n")
-    << "\n";
+    <<   "  --max-advances <num>     "
+    << _("Exit after specified number of frame advances") << endl
+
+    <<   "  --fullscreen             "
+    << _("Start in fullscreen mode") << endl
+
+    <<   "  --hide-menubar           "
+    << _("Start without displaying the menu bar") << endl
+
+    <<   "  --screenshot <list>      "
+    << _("List of frames to save as screenshots") << endl
+
+    <<   "  --screenshot-file <file> "
+    << _("Filename pattern for screenshot images.") << endl
+
+    << endl;
 
     // Add gui keys
     usage_gui_keys(cout);
@@ -189,7 +250,7 @@ build_options()
         
 	 << _("   Configured with: ") << CONFIG_CONFIG << endl
 	 << _("   CXXFLAGS: ") << CXXFLAGS << endl
-	 << "   Version: "  << BRANCH_NICK << ":" << BRANCH_REVNO << endl;
+	 << _("   Version: ")  << BRANCH_NICK << ":" << BRANCH_REVNO << endl;
 }
 
 static void
