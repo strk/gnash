@@ -321,8 +321,14 @@ FBGui::initialize_renderer()
 {
     GNASH_REPORT_FUNCTION;
 
-    const int width    = var_screeninfo.xres;
-    const int height   = var_screeninfo.yres;
+    // TODO: do not reset _width and _height
+    //       if they were set trough -j / -k
+
+    _width    = var_screeninfo.xres;
+    _height   = var_screeninfo.yres;
+
+    _validbounds.setTo(0, 0, _width - 1, _height - 1);    
+
     const int bpp = var_screeninfo.bits_per_pixel;
     const int size = fix_screeninfo.smem_len; 
 
@@ -372,7 +378,7 @@ FBGui::initialize_renderer()
   
     m_rowsize = var_screeninfo.xres_virtual*((bpp+7)/8);
   
-    agg_handler->init_buffer(mem, size, width, height, m_rowsize);
+    agg_handler->init_buffer(mem, size, _width, _height, m_rowsize);
   
     disable_terminal();
 
@@ -465,8 +471,6 @@ FBGui::createWindow(const char* /*title*/, int width, int height,
 
     _width = width;
     _height = height;
-
-    _validbounds.setTo(0, 0, width - 1, height - 1);    
 
     // Now initialize AGG
     return initialize_renderer();
