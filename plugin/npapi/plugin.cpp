@@ -99,6 +99,13 @@
 #define PATH_MAX 1024
 #endif
 
+// Macro to prevent repeated logging calls for the same
+// event
+#define LOG_ONCE(x) { \
+    static bool warned = false; \
+    if (!warned) { warned = true; x; } \
+}
+
 // For scriptable plugin support
 #include "pluginScriptObject.h"
 
@@ -966,7 +973,10 @@ nsPluginInstance::setupCookies(const std::string& pageurl)
     // like IceWeasel on Debian lenny, which pre dates the cookie support
     // in NPAPI, you have to block all Cookie for sites like YouTube to
     // allow Gnash to work.
-    if (!NPNFuncs.getvalueforurl) return;
+    if (!NPNFuncs.getvalueforurl) {
+        LOG_ONCE( gnash::log_debug("Browser doesn't support reading cookies") );
+        return;
+    }
 
     // Cookie appear to drop anything past the domain, so we strip
     // that off.
