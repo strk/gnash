@@ -100,8 +100,6 @@ private:
     
     std::vector< geometry::Range2d<int> > _drawbounds;
     
-    int m_stage_width;
-    int m_stage_height;
     unsigned m_rowsize;
     
     std::vector<boost::shared_ptr<InputDevice> > _inputs;

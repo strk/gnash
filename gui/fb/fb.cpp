@@ -188,8 +188,6 @@ FBGui::FBGui(unsigned long xid, float scale, bool loop, RunResources& r)
       own_vt(-1),
       fbmem(0),
       buffer(0),                // the real value is set by ENABLE_DOUBLE_BUFFERING
-      m_stage_width(0),
-      m_stage_height(0),
       m_rowsize(0),
       _timeout(0)
 {
@@ -315,8 +313,7 @@ FBGui::init(int /*argc*/, char *** /*argv*/)
     }
 #endif
 
-    // Ok, now initialize AGG
-    return initialize_renderer();
+    return true;
 }
 
 bool
@@ -332,11 +329,6 @@ FBGui::initialize_renderer()
     // TODO: should recalculate!  
     unsigned char* mem;
     Renderer_agg_base* agg_handler;
-  
-    m_stage_width = width;
-    m_stage_height = height;
-  
-    _validbounds.setTo(0, 0, width - 1, height - 1);    
   
 #ifdef ENABLE_DOUBLE_BUFFERING
     log_debug(_("Double buffering enabled"));
@@ -465,12 +457,19 @@ FBGui::renderBuffer()
 }
 
 bool
-FBGui::createWindow(const char* /*title*/, int /*width*/, int /*height*/,
+FBGui::createWindow(const char* /*title*/, int width, int height,
                      int /*xPosition*/, int /*yPosition*/)
 {
-    // Framebuffer has no windows... :-)
-    
-    return true;
+    assert(width>0);
+    assert(height>0);
+
+    _width = width;
+    _height = height;
+
+    _validbounds.setTo(0, 0, width - 1, height - 1);    
+
+    // Now initialize AGG
+    return initialize_renderer();
 }
 
 bool
@@ -529,7 +528,7 @@ FBGui::showMouse(bool /*show*/)
 int
 FBGui::valid_x(int x) {
     if (x < 0) x = 0;
-    if (x >= m_stage_width) x = m_stage_width - 1;
+    if (x >= _width) x = _width - 1;
     return x;
 }
 
@@ -537,7 +536,7 @@ int
 FBGui::valid_y(int y)
 {
     if (y < 0) y = 0;
-    if (y >= m_stage_height) y = m_stage_height - 1;
+    if (y >= _height) y = _height - 1;
     return y;
 }
 
