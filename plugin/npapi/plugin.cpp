@@ -689,7 +689,7 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 
     assert(cond & G_IO_IN);
 
-    gnash::log_debug("Checking player requests on fd #%d",
+    gnash::log_debug("Checking player requests on FD #%d",
               g_io_channel_unix_get_fd(iochan));
 
     GError* error = 0;
@@ -1152,20 +1152,20 @@ nsPluginInstance::startProc()
 
     int ret = socketpair(AF_UNIX, SOCK_STREAM, 0, p2c_pipe);
     if (ret == -1) {
-        gnash::log_error("ERROR: socketpair(p2c) failed: %s", strerror(errno));
+        gnash::log_error("socketpair(p2c) failed: %s", strerror(errno));
         return;
     }
     _streamfd = p2c_pipe[1];
 
     ret = socketpair(AF_UNIX, SOCK_STREAM, 0, c2p_pipe);
     if (ret == -1) {
-        gnash::log_error("ERROR: socketpair(c2p) failed: %s", strerror(errno));
+        gnash::log_error("socketpair(c2p) failed: %s", strerror(errno));
         return;
     }
 
     ret = socketpair(AF_UNIX, SOCK_STREAM, 0, p2c_controlpipe);
     if (ret == -1) {
-        gnash::log_error("ERROR: socketpair(control) failed: %s", strerror(errno));
+        gnash::log_error("socketpair(control) failed: %s", strerror(errno));
         return;
     }
 
@@ -1194,7 +1194,7 @@ nsPluginInstance::startProc()
     
     // If the fork failed, childpid is -1. So print out an error message.
     if (_childpid == -1) {
-        gnash::log_error("ERROR: dup2() failed: " + std::string(strerror(errno)));
+        gnash::log_error("dup2() failed: %s", strerror(errno));
         return;
     }
     
@@ -1205,7 +1205,7 @@ nsPluginInstance::startProc()
         ret = close (p2c_pipe[0]);
         if (ret == -1) {
             // this is not really a fatal error, so continue best as we can
-            gnash::log_error("ERROR: p2c_pipe[0] close() failed: %s",
+            gnash::log_error("p2c_pipe[0] close() failed: %s",
                              strerror(errno));
         }
         
@@ -1213,7 +1213,7 @@ nsPluginInstance::startProc()
         ret = close (c2p_pipe[1]);
         if (ret == -1) {
             // this is not really a fatal error, so continue best as we can
-            gnash::log_error("ERROR: c2p_pipe[1] close() failed: %s",
+            gnash::log_error("c2p_pipe[1] close() failed: %s",
                              strerror(errno));
             gnash::log_debug("Forked successfully but with ignorable errors.");
         } else {
@@ -1243,7 +1243,7 @@ nsPluginInstance::startProc()
     ret = dup2 (p2c_pipe[0], fileno(stdin));
 
     if (ret == -1) {
-        gnash::log_error("ERROR: dup2() failed: " + std::string(strerror(errno)));
+        gnash::log_error("dup2() failed: %s", strerror(errno));
     }
     
     // Close all of the browser's file descriptors that we just inherited
