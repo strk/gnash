@@ -22,8 +22,20 @@
 
 AUTOMAKE_OPTIONS = -Wno-portability
 
+DIST_SUBDIRS = pythonmod fb
+
 # Build the current directory first. It's hard to see, but there is a '.' dot here.
-SUBDIRS = .
+SUBDIRS = . fb
+
+if BUILD_FB_GUI
+SUBDIRS += fb
+endif
+
+# If python support is enabled, built that too
+if HAS_PYTHON
+SUBDIRS += pythonmod
+endif
+
 
 localedir = $(datadir)/locale
 
@@ -37,12 +49,6 @@ EXTRA_DIST = gnash.in \
 	kde/klash3.moc.in \
 	kde/Kde4Gui.moc.in \
 	kde/Kde4Glue.moc.in
-
-# If python support is enabled, built that too
-if HAS_PYTHON
-SUBDIRS += pythonmod
-endif
-DIST_SUBDIRS = pythonmod
 
 noinst_HEADERS =
 noinst_LTLIBRARIES = 
@@ -254,11 +260,6 @@ endif
 # Build the DUMP gui
 if BUILD_DUMP_GUI
 include $(srcdir)/dump/dump.am
-endif
-
-# Build the FB gui
-if BUILD_FB_GUI
-include $(srcdir)/fb/fb.am
 endif
 
 # Build the RISCOS gui
