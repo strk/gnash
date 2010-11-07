@@ -43,7 +43,7 @@ localedir = $(datadir)/locale
 pluginsdir = $(libdir)/gnash/plugins
 
 # noinst_LTLIBRARIES = libgnashgui.la
-BUILT_SOURCES = .configline
+BUILT_SOURCES =
 
 EXTRA_DIST = gnash.in \
 	kde/klash3.moc.in \
@@ -177,7 +177,7 @@ AM_CPPFLAGS += -DPKGDATADIR="\"$(pkgdatadir)\""
 AM_CPPFLAGS += -DRENDERER_CONFIG="\"$(RENDERER_CONFIG)\""
 AM_CPPFLAGS += -DHWACCEL_CONFIG="\"$(HWACCEL_CONFIG)\""
 AM_CPPFLAGS += -DMEDIA_CONFIG="\"$(MEDIA_CONFIG)\""
-AM_CPPFLAGS += -DCONFIG_CONFIG="\"$(shell cat .configline)\""
+AM_CPPFLAGS += -DCONFIG_CONFIG="\"$(shell cat ../.configline)\""
 AM_CPPFLAGS += -DCXXFLAGS="\"$(CXXFLAGS)\"" 
 
 dist_images_DATA = images/gnash_128_96.ico images/GnashG.png
@@ -267,7 +267,7 @@ if BUILD_RISCOS_GUI
 include $(srcdir)/riscos/riscos.am
 endif
 
-CLEANFILES = klash3.moc Kde4Gui.moc Kde4Glue.moc .configline gnash
+CLEANFILES = klash3.moc Kde4Gui.moc Kde4Glue.moc gnash
 
 bundle: Info.plist aqua-gnash
 	@echo " Building: $(bundle_name)" 
@@ -279,10 +279,6 @@ bundle: Info.plist aqua-gnash
 	cp -f aqua-gnash $(bundle_name)/Contents/MacOS/Gnash
 	cp -f images/GnashG.icns $(bundle_name)/Contents/Resources/
 
-
-.configline: ../config.log
-	-@rm -f .configline
-	@head ../config.log | grep " .*/configure " | sed -e 's:^  . .*configure ::' > .configline
 
 #noinst_PROGRAMS = guitest # klash flak
 #guitest_SOURCES = guitest.cpp #fltk.cpp #fltksup.h fltksupp.h gnash.cpp gtk.cpp 

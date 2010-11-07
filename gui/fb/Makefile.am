@@ -56,7 +56,7 @@ AM_CPPFLAGS += -DPKGDATADIR="\"$(pkgdatadir)\""
 AM_CPPFLAGS += -DRENDERER_CONFIG="\"$(RENDERER_CONFIG)\""
 AM_CPPFLAGS += -DHWACCEL_CONFIG="\"$(HWACCEL_CONFIG)\""
 AM_CPPFLAGS += -DMEDIA_CONFIG="\"$(MEDIA_CONFIG)\""
-AM_CPPFLAGS += -DCONFIG_CONFIG="\"$(shell cat ../.configline)\""
+AM_CPPFLAGS += -DCONFIG_CONFIG="\"$(shell cat ../../.configline)\""
 AM_CPPFLAGS += -DCXXFLAGS="\"$(CXXFLAGS)\"" 
 
 ## WARNING: make sure GLIB_LIBS appears first

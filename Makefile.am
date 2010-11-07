@@ -127,8 +127,8 @@ CLEANFILES =
 # so it'll be an improvement anyway. Bzr is amazing slow producing
 # the info, which is why we don't want to do it all the time.
 #
-CLEANFILES += revno.h
-BUILT_SOURCES = revno.h
+CLEANFILES += revno.h .configline
+BUILT_SOURCES = revno.h .configline
 revno.h: Makefile.in
 	-@if test -d $(srcdir)/.bzr; then \
 	  status=`which bzr 2>&1 | grep -c " no bzr"`; \
@@ -190,6 +190,10 @@ revno.h: Makefile.in
         echo "Generating revno.h"; \
         echo "static const char *BRANCH_REVNO  = \"$${revno}\";" > revno.h; \
         echo "static const char *BRANCH_NICK = \"$${nick}\";" >> revno.h;
+
+.configline: config.log
+	-@rm -f .configline
+	@head config.log | grep " .*/configure " | sed -e 's:^  . .*configure ::' > .configline
 
 #
 # Precompiled header support
