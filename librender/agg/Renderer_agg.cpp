@@ -115,6 +115,7 @@ AGG resources
 
 #include <vector>
 #include <cmath>
+#include <climits>
 #include <boost/scoped_array.hpp>
 #include <boost/bind.hpp>
 #include <agg_rendering_buffer.h>
