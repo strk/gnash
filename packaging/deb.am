@@ -206,13 +206,13 @@ deb-edit-configure:
 	@echo "Editing configure.ac in $(BUILD_VERSION)..."
 	@if test ! -f $(BUILD_DIR)/configure.ac.orig; then \
 	  mv -f $(BUILD_DIR)/configure.ac $(BUILD_DIR)/configure.ac.orig; \
-	  sed -e "s/AC_INIT(gnash, master)/AC_INIT(gnash, $(BUILD_VERSION))/" \
+	  sed -e "s/AC_INIT(gnash, [^)]*)/AC_INIT(gnash, $(BUILD_VERSION))/" \
 	    $(BUILD_DIR)/configure.ac.orig > $(BUILD_DIR)/configure.ac; \
 	fi
 	@echo "Editing configure in $(BUILD_VERSION)..."
 	@if test ! -f $(BUILD_DIR)/configure.orig; then \
 	  mv -f $(BUILD_DIR)/configure $(BUILD_DIR)/configure.orig; \
-	  sed -e "s/ VERSION='master'/ VERSION='$(BUILD_VERSION)'/" \
+	  sed -e "s/ VERSION='[^']*'/ VERSION='$(BUILD_VERSION)'/" \
 	    $(BUILD_DIR)/configure.orig > $(BUILD_DIR)/configure; \
 	   chmod u+x $(BUILD_DIR)/configure; \
 	fi
