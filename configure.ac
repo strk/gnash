@@ -2176,26 +2176,29 @@ GNASH_PKG_FIND(fontconfig, [fontconfig/fontconfig.h], [fontconfig library], FcFo
 if test x$cross_compiling = xno; then
   AC_PATH_MING
 fi
-AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040000 ])
+
+makeswf_installed=[test "$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040000 ]
+
+AM_CONDITIONAL(ENABLE_MING, $makeswf_installed)
 
 AM_CONDITIONAL(MING_VERSION_0_4,
-        [ ENABLE_MING && test $MING_VERSION_CODE -ge 00040000  ])
+        [ ${makeswf_installed} && test $MING_VERSION_CODE -ge 00040000  ])
 AM_CONDITIONAL(MAKESWF_SUPPORTS_PREBUILT_CLIPS,
-        [ ENABLE_MING && test $MING_VERSION_CODE -ge 00040002  ])
+        [ ${makeswf_installed} && test $MING_VERSION_CODE -ge 00040002  ])
 AM_CONDITIONAL(MING_SUPPORTS_INIT_ACTIONS,
-        [ ENABLE_MING && test $MING_VERSION_CODE -ge 00040004  ])
+        [ ${makeswf_installed} && test $MING_VERSION_CODE -ge 00040004  ])
 AM_CONDITIONAL(MING_SUPPORTS_REPLACE_TAG,
-        [ ENABLE_MING && test $MING_VERSION_CODE -ge 00040005 ])
+        [ ${makeswf_installed} && test $MING_VERSION_CODE -ge 00040005 ])
 AM_CONDITIONAL(MING_SUPPORTS_SWFBUTTON_ADD_CHARACTER,
-        [ ENABLE_MING && test $MING_VERSION_CODE -ge 00040005 ])
+        [ ${makeswf_installed} && test $MING_VERSION_CODE -ge 00040005 ])
 AM_CONDITIONAL(MING_SUPPORTS_STREAMING_SOUND,
-        [ ENABLE_MING && test $MING_VERSION_CODE -ge 00040006 ])
+        [ ${makeswf_installed} && test $MING_VERSION_CODE -ge 00040006 ])
 AM_CONDITIONAL(MING_SUPPORTS_SWFBUTTON_SET_DEPTH,
-        [ ENABLE_MING && test $MING_VERSION_CODE -ge 00040006 ])
+        [ ${makeswf_installed} && test $MING_VERSION_CODE -ge 00040006 ])
 AM_CONDITIONAL(MING_VERSION_0_4_3,
-        [ ENABLE_MING && test $MING_VERSION_CODE -ge 00040300 ])
+        [ ${makeswf_installed} && test $MING_VERSION_CODE -ge 00040300 ])
 AM_CONDITIONAL(MING_VERSION_0_4_4,
-        [ ENABLE_MING && test $MING_VERSION_CODE -ge 00040400 ])
+        [ ${makeswf_installed} && test $MING_VERSION_CODE -ge 00040400 ])
 
 if test x$cross_compiling = xno; then
   AC_ARG_WITH([swfdec_testsuite],
