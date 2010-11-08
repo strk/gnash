@@ -27,6 +27,7 @@
 #include <iterator>
 #include <ios>
 #include <boost/format.hpp>
+#include <boost/program_options.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -58,6 +59,145 @@ gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 }
 
+static boost::program_options::options_description
+getSupportedOptions()
+{
+    namespace po = boost::program_options;
+    using std::string;
+
+    std::vector<std::string> handlers;
+    gnash::media::MediaFactory::instance().listKeys(back_inserter(handlers));
+
+    std::vector<std::string> renderers;
+    boost::split(renderers, RENDERER_CONFIG,
+        boost::is_any_of(" "), boost::token_compress_on);
+
+    po::options_description desc("Options");
+
+    desc.add_options()
+
+    ( "help,h",
+        _("Print this help and exit") )
+
+    ( "version,V", 
+        _("Print version information and exit") )
+
+    ( "scale,s", po::value<float>(),
+        _("Scale the movie by the specified factor") )
+
+    ( "delay,d", po::value<int>(),
+        _("Number of milliseconds to delay in main loop") )
+
+
+    ( "verbose,v",
+        _("Produce verbose output") )
+
+#if VERBOSE_ACTION
+    ( "verbose-actions,a",
+        _("Be (very) verbose about action execution") )
+#endif
+
+#if VERBOSE_PARSE
+    ( "verbose-parsing,p",
+        _("Be (very) verbose about parsing") )
+#endif
+
+    ( "audio-dump,A", po::value<string>(),
+        _("Audio dump file (wave format)") )
+
+    ( "hwaccel", po::value<string>(),
+        ( string( _("Hardware Video Accelerator to use"))
+        + string( "\nnone|vaapi|omap (default: none)") ). c_str() ) 
+
+    ( "xid,x", po::value<long>(),
+        _("X11 Window ID for display") )
+
+    ( "writelog,w",
+        _("Produce the disk based debug log") )
+
+    ( "width,j", po::value<int>(),
+        _("Set window width") )
+
+    ( "height,k", po::value<int>(),
+        _("Set window height") )
+
+    ( "x-pos,X", po::value<int>(),
+        _("Set window x position") )
+
+    ( "y-pos,Y", po::value<int>(),
+        _("Set window y position") )
+
+    ( "once,1", 
+        _("Exit when/if movie reaches the last frame") )
+
+    ( "render-mode,r", po::value<int>(),
+        ( string("0 ")
+        + string(_("disable rendering and sound")) 
+        + string("\n1 ")
+        + string(_("enable rendering, disable sound"))
+        + string("\n2 ")
+        + string(_("enable sound, disable rendering"))
+        + string("\n3 ")
+        + string(_("enable rendering and sound (default)"))
+        ).c_str() )
+
+    ( "media,M", po::value<string>(),
+        ( string(_("The media handler to use"))
+        + string("\n") + boost::join(handlers, "|")
+        + string(" (default: ") + handlers.front() + string(")")
+        ).c_str() )
+
+    ( "renderer,R", po::value<string>(),
+        ( string(_("The renderer to use"))
+        + string("\n") + boost::join(renderers, "|")
+        + string(" (default: AGG)")
+        ).c_str() )
+
+    ( "timeout,t", po::value<int>(),
+        _("Exit after the specified number of seconds") )
+
+    ( "real-url,u", po::value<string>(),
+        _("Set \"real\" URL of the movie") )
+
+    ( "base-url,U", po::value<string>(),
+        _("Set \"base\" URL for resolving relative URLs") )
+
+    ( "param,P", po::value<string>(),
+        _("Set parameter (e.g. \"FlashVars=A=1&b=2\")") )
+
+    ( "fd,F", po::value<string>(),
+        ( string(_("Filedescriptor to use for external communications"))
+        + string(" <fd>:<fd>")
+        ).c_str() )
+
+#ifdef GNASH_FPS_DEBUG
+    ( "debug-fps,f", po::value<int>(),
+        _("Print FPS every num seconds (float)") )
+#endif // def GNASH_FPS_DEBUG
+
+    ( "max-advances", po::value<int>(),
+        _("Exit after specified number of frame advances") )
+
+    ( "fullscreen",
+        _("Start in fullscreen mode") )
+
+    // TODO: move to GUIs actually implementing this
+    ( "hide-menubar",
+        _("Start without displaying the menu bar") )
+
+    ( "screenshot", po::value<string>(),
+        _("List of frames to save as screenshots") )
+
+    ( "screenshot-file", po::value<string>(),
+        _("Filename pattern for screenshot images") )
+
+    ;
+
+
+    return desc;
+}
+
+
 static void
 usage_gui_keys(std::ostream& os)
 {
@@ -87,132 +227,19 @@ usage_gui_keys(std::ostream& os)
 static void
 usage()
 {
-    std::vector<std::string> handlers;
-    gnash::media::MediaFactory::instance().listKeys(back_inserter(handlers));
 
-    std::vector<std::string> renderers;
-    boost::split(renderers, RENDERER_CONFIG,
-        boost::is_any_of(" "), boost::token_compress_on);
+    namespace po = boost::program_options;
+    po::options_description opts = getSupportedOptions();
 
     cout
 
     << _("Usage: gnash [options] movie_file.swf") << endl
     << _("Plays a SWF (Shockwave Flash) movie") << endl
-    << _("Options:") << endl
-    << endl 
-
-    <<   "  -h,  --help              "
-    << _("Print this help and exit") << endl
-
-    <<   "  -V,  --version           "
-    << _("Print version information and exit") << endl
-
-    <<   "  -s,  --scale <factor>    "
-    << _("Scale the movie by the specified factor") << endl
-
-    <<   "  -d,  --delay <num>       "
-    << _("Number of milliseconds to delay in main loop") << endl
-
-    <<   "  -v,  --verbose           "
-    << _("Produce verbose output") << endl
-
-#if VERBOSE_ACTION
-    <<   "  -va                      "
-    << _("Be (very) verbose about action execution") << endl
-#endif
-
-#if VERBOSE_PARSE
-    <<   "  -vp                      "
-    << _("Be (very) verbose about parsing") << endl
-#endif
-
-    <<   "  -A <file>                "
-    << _("Audio dump file (wave format)") << endl
-
-    <<   "  --hwaccel <none|vaapi>   "
-    << _("Hardware Video Accelerator to use") << endl
-    <<   "                           none|vaapi|omap (default: none)" 
-    << endl
-
-    <<   "  -x,  --xid <ID>          "
-    << _("X11 Window ID for display") << endl
-
-    <<   "  -w,  --writelog          "
-    << _("Produce the disk based debug log") << endl
-
-    <<   "  -j,  --width <width>     "
-    << _("Set window width") << endl
-
-    <<   "  -k,  --height <height>   "
-    << _("Set window height") << endl
-
-    <<   "  -X,  --x-pos <x-pos>     "
-    << _("Set window x position") << endl
-
-    <<   "  -Y,  --y-pos <y-pos>     "
-    << _("Set window y position") << endl
-
-    <<   "  -1,  --once              "
-    << _("Exit when/if movie reaches the last frame") << endl
-
-    <<   "  -r,  --render-mode <0|1|2|3>" << endl 
-    <<   "                           0 "
-    << _("disable rendering and sound") << endl
-    <<   "                           1 "
-    << _("enable rendering, disable sound") << endl
-    <<   "                           2 "
-    << _("enable sound, disable rendering") << endl
-    <<   "                           3 "
-    << _("enable rendering and sound (default)") << endl
-
-    <<   "  -M,  --media <" << boost::join(handlers, "|") << ">" << endl
-    <<   "                           "
-    << _("The media handler to use")
-    << " (default: " << handlers.front() << ")" << endl
-
-    <<   "  -R,  --renderer <" << boost::join(renderers, "|") << ">" << endl
-    <<   "                           "
-    << _("The renderer to use")
-    << " (default: agg)" << endl
-
-    <<   "  -t,  --timeout <sec>     "
-    << _("Exit after the specified number of seconds") << endl
-
-    <<   "  -u,  --real-url <url>    "
-    << _("Set \"real\" URL of the movie")  << endl
-
-    <<   "  -U,  --base-url <url>    "
-    << _("Set \"base\" URL for resolving relative URLs") << endl
-
-    <<   "  -P,  --param <param>     "
-    << _("Set parameter (e.g. \"FlashVars=A=1&b=2\")") << endl
-
-    <<   "  -F,  --fd <fd>:<fd>      "
-    << _("Filedescriptor to use for external communications") << endl
-
-#ifdef GNASH_FPS_DEBUG
-    <<   "  -f,  --debug-fps <num>   "
-    << _("Print FPS every num seconds (float)") << endl
-#endif // def GNASH_FPS_DEBUG
-    
-    <<   "  --max-advances <num>     "
-    << _("Exit after specified number of frame advances") << endl
-
-    <<   "  --fullscreen             "
-    << _("Start in fullscreen mode") << endl
-
-    <<   "  --hide-menubar           "
-    << _("Start without displaying the menu bar") << endl
-
-    <<   "  --screenshot <list>      "
-    << _("List of frames to save as screenshots") << endl
-
-    <<   "  --screenshot-file <file> "
-    << _("Filename pattern for screenshot images.") << endl
-
+    << opts
     << endl;
 
     // Add gui keys
+    // TODO: stop printing these in here ?
     usage_gui_keys(cout);
 
     cout << std::endl;
@@ -247,9 +274,21 @@ build_options()
 }
 
 static void
+_parseCommandLine(int argc, char* argv[], gnash::Player& player)
+{
+    namespace po = boost::program_options;
+    po::options_description opts = getSupportedOptions();
+
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, opts), vm);
+    po::notify(vm);
+
+    // TODO: get this done :)
+}
+
+static void
 parseCommandLine(int argc, char* argv[], gnash::Player& player)
 {
-
     const Arg_parser::Option opts[] =
         {
         { 'h', "help",              Arg_parser::no  },
