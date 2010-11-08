@@ -115,15 +115,12 @@ AGG resources
 
 #include <vector>
 #include <cmath>
-#include <climits>
 #include <boost/scoped_array.hpp>
 #include <boost/bind.hpp>
 #include <agg_rendering_buffer.h>
 #include <agg_renderer_base.h>
-#include <agg_pixfmt_rgb.h>
-#include <agg_pixfmt_rgb_packed.h>
-#include <agg_pixfmt_rgba.h>
 #include <agg_pixfmt_gray.h>
+#include <agg_pixfmt_rgb_packed.h>
 #include <agg_color_rgba.h>
 #include <agg_color_gray.h>
 #include <agg_ellipse.h>
@@ -139,19 +136,11 @@ AGG resources
 #include <agg_path_storage.h>
 #include <agg_conv_curve.h>
 #include <agg_conv_stroke.h>
-#include <agg_vcgen_stroke.h>
-#include <agg_bezier_arc.h>
 #include <agg_renderer_primitives.h>
-#include <agg_gamma_functions.h>
-#include <agg_math_stroke.h>
-#include <agg_image_filters.h>
 #include <agg_image_accessors.h>
-#include <agg_span_image_filter_rgb.h>
-#include <agg_span_image_filter_rgba.h>
-#include <agg_span_interpolator_linear.h>
-#include <agg_span_gradient.h>
-#include <agg_gradient_lut.h>
 #include <agg_alpha_mask_u8.h>
+
+#include "Renderer_agg_style.h"
 
 #include "GnashEnums.h"
 #include "CachedBitmap.h"
@@ -159,11 +148,8 @@ AGG resources
 #include "GnashImage.h"
 #include "log.h"
 #include "Range2d.h"
-#include "smart_ptr.h"
 #include "swf/ShapeRecord.h" 
-#include "DefineShapeTag.h" 
 #include "GnashNumeric.h"
-#include "GC.h"
 #include "SWFCxForm.h"
 #include "FillStyle.h"
 #include "Transform.h"
@@ -174,7 +160,6 @@ AGG resources
 #endif
 
 #include "Renderer_agg_bitmap.h"
-#include "Renderer_agg_style.h"
 
 #ifndef round
 #  define round(x) rint(x)
