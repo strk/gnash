@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnash cvs20070405\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-10-28 16:31+0200\n"
+"POT-Creation-Date: 2010-11-08 10:57+0100\n"
 "PO-Revision-Date: 2007-04-05 20:35-0700\n"
 "Last-Translator: John Gilmore <gnu@gnash-translation.toad.com>\n"
 "Language-Team: Maximiliano Castañón <maximi89@gmail.com>, Espanol <ES@li."
@@ -125,6 +125,10 @@ msgstr ""
 msgid "XMLSocket: The socket was never available"
 msgstr ""
 
+#: libbase/StreamProvider.cpp:132
+msgid "POST data discarded while getting a stream from file: uri"
+msgstr ""
+
 #: libbase/GnashImagePng.cpp:40
 msgid "PNG error: "
 msgstr "Error PNG: "
@@ -180,9 +184,69 @@ msgid "rw_dest_IOChannel::term_destination couldn't write data."
 msgstr ""
 "jpeg::rw_dest_IOChannel::term_destination no puede escribir los archivos"
 
-#: libbase/tu_file.cpp:74
+#: libbase/tu_file.cpp:193
 msgid "Error while seeking to end: %1%"
 msgstr ""
+
+#: libbase/URLAccessManager.cpp:91
+#, c-format
+msgid "Load from host %s granted (whitelisted)"
+msgstr "Carga del dominio %s permitida (lista blanca)"
+
+#: libbase/URLAccessManager.cpp:97
+#, c-format
+msgid "Load from host %s forbidden (not in non-empty whitelist)"
+msgstr "Carga del dominio %s prohibida (no en lista blanca no vacía)"
+
+#: libbase/URLAccessManager.cpp:111
+#, c-format
+msgid "Load from host %s forbidden (blacklisted)"
+msgstr "Carga del dominio %s prohibida (lista negra)"
+
+#: libbase/URLAccessManager.cpp:116
+#, c-format
+msgid "Load from host %s granted (default)"
+msgstr "Carga desde el dominio %s permitida (por defecto)"
+
+#: libbase/URLAccessManager.cpp:148
+#, c-format
+msgid "Load of file %s forbidden (starting url %s is not a local resource)"
+msgstr ""
+"Carga de archivo %s prohibida (comenzando URL %s no es un recurso local)"
+
+#: libbase/URLAccessManager.cpp:165
+#, c-format
+msgid "Load of file %s granted (under local sandbox %s)"
+msgstr "Carga del archivo %s concedida (bajo sandbox local %s)"
+
+#: libbase/URLAccessManager.cpp:173
+#, c-format
+msgid "Load of file %s forbidden (not under local sandboxes)"
+msgstr "Carga del archivo %s prohibida (no está bajo sandboxes locales)"
+
+#: libbase/URLAccessManager.cpp:213
+#, c-format
+msgid "gethostname failed: %s"
+msgstr "obtención del nombre de dominio fallida: %s"
+
+#: libbase/URLAccessManager.cpp:235
+#, c-format
+msgid "Load from host %s forbidden (not in the local domain)"
+msgstr "Carga desde dominio %s prohibida (no está bajo el dominio local)"
+
+#: libbase/URLAccessManager.cpp:241
+#, c-format
+msgid "Load from host %s forbidden (not on the local host)"
+msgstr "Carga desde dominio %s prohibida (no está bajo el dominio local)"
+
+#: libbase/URLAccessManager.cpp:273
+#, c-format
+msgid "Checking security of URL '%s'"
+msgstr "Revisando seguridad de la URL '%s'"
+
+#: libbase/URLAccessManager.cpp:285
+msgid "Network connection without hostname requested"
+msgstr "Conexión de red sin petición de nombre de dominio"
 
 #: libbase/extension.cpp:140
 #, fuzzy, c-format
@@ -683,7 +747,7 @@ msgstr "MediaParserFfmpeg no puede leer datos examinados desde la entrada"
 msgid "%s: seeking failed"
 msgstr "%s: busqueda fallida"
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:263
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:264
 #, c-format
 msgid ""
 "MediaParserFfmpeg::parseNextFrame: Problems parsing next frame "
@@ -693,37 +757,37 @@ msgstr ""
 "(av_read_frame returned %d). Vamos a considerar el flujo totalmente "
 "analizado."
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:388
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:389
 #, c-format
 msgid "  Title:'%s'"
 msgstr "  Título:'%s'"
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:389
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:390
 #, c-format
 msgid "  Author:'%s'"
 msgstr "  Autor:'%s'"
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:390
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:391
 #, c-format
 msgid "  Copyright:'%s'"
 msgstr "  Derechos de autor:'%s'"
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:391
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:392
 #, c-format
 msgid "  Comment:'%s'"
 msgstr "  Comentario:'%s'"
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:392
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:393
 #, c-format
 msgid "  Album:'%s'"
 msgstr "  Álbum:'%s'"
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:414
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:415
 #, c-format
 msgid "  Using stream %d for audio: codec id %d"
 msgstr "  Usando stream %d para audio: id codec %d"
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:424
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:425
 #, c-format
 msgid "  Using stream %d for video: codec id %d"
 msgstr "  Usando stream %d para video: id codec %d"
@@ -738,7 +802,7 @@ msgid "libavcodec can't decode this video format"
 msgstr "libavcodec no puede decodificar este formáto de video"
 
 #: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:185
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:139
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:131
 msgid "libavcodec couldn't allocate context"
 msgstr "libavcodec no pudo asignar contexto"
 
@@ -756,17 +820,17 @@ msgstr "VideoDecoder: inicializado codec FFMPEG %s (%d)"
 msgid "Out of memory while allocating avcodec frame"
 msgstr "Fuera de memoria mientras asignaba cuadro avcodec"
 
-#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:431
+#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:429
 #, c-format
 msgid "Unsupported video codec %d"
 msgstr "Codec de video no soportado %d"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:56
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:48
 #, fuzzy, c-format
 msgid "AudioDecoderFfmpeg: initialized FFmpeg codec %d (%s)"
 msgstr "AudioDecoderFfmpeg: inicializado codec FFMPEG %d (%s)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:59
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:51
 #, fuzzy, c-format
 msgid ""
 "AudioDecoderFfmpeg: initialized FFmpeg codec %d (%s) for flash codec %d (%s)"
@@ -774,45 +838,45 @@ msgstr ""
 "AudioDecoderFfmpeg: codec FFMPEG inicializado %d (%s) para codec FLASH %d (%"
 "s)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:74
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:66
 #, fuzzy, c-format
 msgid "AudioDecoderFfmpeg: initialized FFmpeg codec %s (%d)"
 msgstr "AudioDecoderFfmpeg: inicializado codec FFMPEG %s (%d)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:113
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:105
 #, c-format
 msgid "Unsupported audio codec %d"
 msgstr "Codec de audio no soportado %d"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:122
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:114
 #, c-format
 msgid "libavcodec could not find a decoder for codec %d (%s)"
 msgstr "libavcodec no puede encontrar un decodificador para el codec %d (%s)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:132
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:124
 msgid "AudioDecoderFfmpeg can't initialize MP3 parser"
 msgstr "AudioDecoderFfmpeg no puede inicializar analizador de MP3"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:147
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:336
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:139
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:328
 #, fuzzy, c-format
 msgid ""
 "AudioDecoderFfmpeg: avcodec_open failed to initialize FFmpeg codec %s (%d)"
 msgstr ""
 "AudioDecoderFfmpeg: avcodec_open falló al inicializar codec FFMPEG %s (%d)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:221
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:213
 #, fuzzy, c-format
 msgid "AudioDecoderFfmpeg: unsupported flash audio codec %d (%s)"
 msgstr "AudioDecoderFfmpeg: codec FLASH de audio no soportado %d (%s)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:230
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:222
 #, c-format
 msgid "AudioDecoderFfmpeg: unknown codec type %d (should never happen)"
 msgstr ""
 "AudioDecoderFfmpeg: tipo de codec desconocido %d (nunca debería ocurrir)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:240
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:232
 #, c-format
 msgid ""
 "AudioDecoderFfmpeg: libavcodec could not find a decoder for codec %d (%s)"
@@ -820,7 +884,7 @@ msgstr ""
 "AudioDecoderFfmpeg: libavcodec no pudo encontrar un decodificador para el "
 "codec %d (%s)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:246
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:238
 #, c-format
 msgid ""
 "AudioDecoderFfmpeg: libavcodec could not find a decoder for ffmpeg codec id %"
@@ -829,7 +893,7 @@ msgstr ""
 "AudioDecoderFfmpeg: libavcodec no pudo encontrar un decodificador para codec "
 "ffmpeg id %s"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:263
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:255
 #, c-format
 msgid ""
 "AudioDecoderFfmpeg: could not initialize a parser for flash codec id %d (%s)"
@@ -837,18 +901,18 @@ msgstr ""
 "AudioDecoderFfmpeg: no pudo inicializar analizador para codec flash id %d (%"
 "s)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:268
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:260
 #, c-format
 msgid ""
 "AudioDecoderFfmpeg: could not initialize a parser for ffmpeg codec id %s"
 msgstr ""
 "AudioDecoderFfmpeg: no pudo inicializar analizador para codec ffmpeg id %s"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:281
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:273
 msgid "AudioDecoderFfmpeg: libavcodec couldn't allocate context"
 msgstr "AudioDecoderFfmpeg: libavcodec no pudo aignar contexto"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:390
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:382
 #, c-format
 msgid ""
 "av_parser_parse returned %d. Upgrading ffmpeg/libavcodec might fix this "
@@ -857,11 +921,11 @@ msgstr ""
 "av_parser_parse retornó %d. Actualizando ffmpeg/libavcodec podría corregir "
 "este problema."
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:535
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:524
 msgid "failed to allocate audio buffer."
 msgstr ""
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:570
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:552
 #, c-format
 msgid ""
 "avcodec_decode_audio returned %d. Upgrading ffmpeg/libavcodec might fix this "
@@ -870,7 +934,7 @@ msgstr ""
 "avcodec_decode_audio retornó %d. Actualizando ffmpeg/libavcodec podría "
 "corregir este problema."
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:583
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:561
 #, c-format
 msgid ""
 "outputSize:%d after decoding %d bytes of input audio data. Upgrading ffmpeg/"
@@ -1318,8 +1382,8 @@ msgid "FLV can't be loaded directly as a movie"
 msgstr "FLV no puede ser cargado directamente como una película"
 
 #: libcore/MovieFactory.cpp:99
-#, c-format
-msgid "unknown file type (%s)"
+#, fuzzy
+msgid "Unknown file type"
 msgstr "tipo de archivo desconocido (%s)"
 
 #: libcore/MovieFactory.cpp:122
@@ -1913,26 +1977,26 @@ msgstr "NetConnection.connect(): necesita al menos un argumento"
 msgid "Arguments to SharedObject.flush(%s) will be ignored"
 msgstr "Argumentos para SharedObject.flush(%s) serán ignorados"
 
-#: libcore/asobj/NetConnection_as.cpp:850
+#: libcore/asobj/NetConnection_as.cpp:444
 #, c-format
 msgid "Gnash is not allowed to open this url: %s"
 msgstr "Gnash no está permitido para abrir esta url: %s"
 
-#: libcore/asobj/NetConnection_as.cpp:854
+#: libcore/asobj/NetConnection_as.cpp:448
 #, c-format
 msgid "Connection to movie: %s"
 msgstr "Conexión a película: %s"
 
-#: libcore/asobj/NetConnection_as.cpp:908
+#: libcore/asobj/NetConnection_as.cpp:500
 #, fuzzy, c-format
 msgid "Gnash is not allowed to connect to %s"
 msgstr "Gnash no está permitido para Netconnection.connect a %s"
 
-#: libcore/asobj/NetConnection_as.cpp:1065
+#: libcore/asobj/NetConnection_as.cpp:660
 msgid "NetConnection.call(): needs at least one argument"
 msgstr "NetConnection.call(): necesita al menos un argumento"
 
-#: libcore/asobj/NetConnection_as.cpp:1178
+#: libcore/asobj/NetConnection_as.cpp:773
 msgid "NetConnection.connect(): needs at least one argument"
 msgstr "NetConnection.connect(): necesita al menos un argumento"
 
@@ -2034,103 +2098,103 @@ msgstr ""
 msgid "Attempt to set activity property of Microphone"
 msgstr "Intento de configurar propiedad de sólo lectura %s"
 
-#: libcore/asobj/Object.cpp:148
+#: libcore/asobj/Object.cpp:149
 msgid "Too many args to Object constructor"
 msgstr "Muchos argumentos para Objeto constructor"
 
-#: libcore/asobj/Object.cpp:196
+#: libcore/asobj/Object.cpp:193
 #, c-format
 msgid ""
 "Invalid call to Object.addProperty(%s) - expected 3 arguments (<name>, "
 "<getter>, <setter>)"
 msgstr ""
 
-#: libcore/asobj/Object.cpp:213
+#: libcore/asobj/Object.cpp:210
 msgid "Invalid call to Object.addProperty() - empty property name"
 msgstr ""
 
-#: libcore/asobj/Object.cpp:223
+#: libcore/asobj/Object.cpp:220
 msgid "Invalid call to Object.addProperty() - getter is not an AS function"
 msgstr ""
 
-#: libcore/asobj/Object.cpp:237
+#: libcore/asobj/Object.cpp:234
 #, c-format
 msgid ""
 "Invalid call to Object.addProperty() - setter is not null and not an AS "
 "function (%s)"
 msgstr ""
 
-#: libcore/asobj/Object.cpp:261
+#: libcore/asobj/Object.cpp:258
 #, c-format
 msgid ""
 "Invalid call to Object.registerClass(%s) - expected 2 arguments (<symbol>, "
 "<constructor>)"
 msgstr ""
 
-#: libcore/asobj/Object.cpp:279
+#: libcore/asobj/Object.cpp:276
 #, c-format
 msgid ""
 "Invalid call to Object.registerClass(%s) - first argument (symbol id) "
 "evaluates to empty string"
 msgstr ""
 
-#: libcore/asobj/Object.cpp:291
+#: libcore/asobj/Object.cpp:288
 #, c-format
 msgid ""
 "Invalid call to Object.registerClass(%s) - second argument (class) is not a "
 "function)"
 msgstr ""
 
-#: libcore/asobj/Object.cpp:318
+#: libcore/asobj/Object.cpp:315
 #, c-format
 msgid "Object.registerClass(%s, %s): can't find exported symbol"
 msgstr ""
 
-#: libcore/asobj/Object.cpp:331
+#: libcore/asobj/Object.cpp:328
 #, c-format
 msgid ""
 "Object.registerClass(%s, %s): exported symbol is not a MovieClip symbol "
 "(sprite_definition), but a %s"
 msgstr ""
 
-#: libcore/asobj/Object.cpp:352
+#: libcore/asobj/Object.cpp:349
 msgid "Object.hasOwnProperty() requires one arg"
 msgstr ""
 
-#: libcore/asobj/Object.cpp:361
+#: libcore/asobj/Object.cpp:358
 #, c-format
 msgid "Invalid call to Object.hasOwnProperty('%s')"
 msgstr ""
 
-#: libcore/asobj/Object.cpp:377
+#: libcore/asobj/Object.cpp:374
 msgid "Object.isPropertyEnumerable() requires one arg"
 msgstr ""
 
-#: libcore/asobj/Object.cpp:385
+#: libcore/asobj/Object.cpp:382
 #, c-format
 msgid "Invalid call to Object.isPropertyEnumerable('%s')"
 msgstr ""
 
-#: libcore/asobj/Object.cpp:408
+#: libcore/asobj/Object.cpp:405
 msgid "Object.isPrototypeOf() requires one arg"
 msgstr ""
 
-#: libcore/asobj/Object.cpp:416
+#: libcore/asobj/Object.cpp:413
 #, c-format
 msgid "First arg to Object.isPrototypeOf(%s) is not an object"
 msgstr ""
 
-#: libcore/asobj/Object.cpp:436
+#: libcore/asobj/Object.cpp:433
 #, c-format
 msgid "Object.watch(%s): missing arguments"
 msgstr ""
 
-#: libcore/asobj/Object.cpp:448
+#: libcore/asobj/Object.cpp:445
 #, c-format
 msgid "Object.watch(%s): second argument is not a function"
 msgstr ""
 
-#: libcore/asobj/Object.cpp:473
+#: libcore/asobj/Object.cpp:470
 #, c-format
 msgid "Object.unwatch(%s): missing argument"
 msgstr ""
@@ -2799,89 +2863,89 @@ msgstr ""
 msgid "Number.toString(%s): radix must be in the 2..36 range (%d is invalid)"
 msgstr ""
 
-#: libcore/movie_root.cpp:253
+#: libcore/movie_root.cpp:251
 #, c-format
 msgid "ActionLimits hit during setRootMovie: %s. Disable scripts?"
 msgstr ""
 
-#: libcore/movie_root.cpp:384 libcore/movie_root.cpp:394
+#: libcore/movie_root.cpp:382 libcore/movie_root.cpp:392
 #, c-format
 msgid ""
 "%s.swapDepth(%d): movie has a depth (%d) below static depth zone (%d), won't "
 "swap its depth"
 msgstr ""
 
-#: libcore/movie_root.cpp:461
+#: libcore/movie_root.cpp:459
 msgid "Original root movie can't be removed"
 msgstr ""
 
-#: libcore/movie_root.cpp:616
+#: libcore/movie_root.cpp:614
 #, c-format
 msgid "ActionLimits hit notifying key listeners: %s."
 msgstr ""
 
-#: libcore/movie_root.cpp:725
+#: libcore/movie_root.cpp:723
 #, c-format
 msgid "ActionLimits hit during mouse event processing: %s. Disable scripts ?"
 msgstr ""
 
-#: libcore/movie_root.cpp:892
+#: libcore/movie_root.cpp:890
 #, c-format
 msgid "Action limit hit during advance: %s"
 msgstr ""
 
-#: libcore/movie_root.cpp:896
+#: libcore/movie_root.cpp:894
 #, c-format
 msgid "Buffer overread during advance: %s"
 msgstr ""
 
-#: libcore/movie_root.cpp:1014
+#: libcore/movie_root.cpp:1012
 #, c-format
 msgid "ActionLimits hit notifying mouse events: %s."
 msgstr ""
 
-#: libcore/movie_root.cpp:1628
+#: libcore/movie_root.cpp:1626
 #, c-format
 msgid "Attempt to write response to ExternalInterface requests fd %d"
 msgstr ""
 
-#: libcore/movie_root.cpp:1632
+#: libcore/movie_root.cpp:1630
 #, c-format
 msgid "Could not write to user-provided host requests fd %d: %s"
 msgstr ""
 
-#: libcore/movie_root.cpp:1799 libcore/movie_root.cpp:1832
-#: libcore/movie_root.cpp:1891
+#: libcore/movie_root.cpp:1797 libcore/movie_root.cpp:1830
+#: libcore/movie_root.cpp:1889
 #, fuzzy, c-format
 msgid "Could not write to browser fd #%d: %s"
 msgstr "No puedo abrir %s: %s"
 
-#: libcore/movie_root.cpp:2117
+#: libcore/movie_root.cpp:2115
 #, c-format
 msgid "Launching URL: %s"
 msgstr ""
 
-#: libcore/movie_root.cpp:2120
+#: libcore/movie_root.cpp:2118
 #, c-format
 msgid "Fork failed launching url opener '%s'"
 msgstr ""
 
-#: libcore/movie_root.cpp:2161
+#: libcore/movie_root.cpp:2159
 #, c-format
 msgid "Attempt to write geturl requests fd #%d"
 msgstr ""
 
-#: libcore/movie_root.cpp:2167
+#: libcore/movie_root.cpp:2165
 #, c-format
 msgid "Could only write %d bytes to fd #%d"
 msgstr ""
 
-#: libcore/movie_root.cpp:2179
+#: libcore/movie_root.cpp:2177
 #, c-format
 msgid "Setting script limits: max recursion %d, timeout %d seconds"
 msgstr ""
 
-#: libcore/movie_root.cpp:2242
+#: libcore/movie_root.cpp:2240
 msgid "Live MovieClips"
 msgstr ""
 
@@ -2919,10 +2983,6 @@ msgstr ""
 msgid "%d members of object %p follow"
 msgstr ""
 
-#: libcore/StreamProvider.cpp:137
-msgid "POST data discarded while getting a stream from file: uri"
-msgstr ""
-
 #: libcore/as_function.cpp:203
 msgid "Function.apply() called with no args"
 msgstr ""
@@ -2932,44 +2992,6 @@ msgstr ""
 msgid ""
 "Function.apply() got %d args, expected at most 2 -- discarding the ones in "
 "excess"
-msgstr ""
-
-#: libcore/debugger.cpp:140
-msgid "Debugger enabled >> "
-msgstr ""
-
-#: libcore/debugger.cpp:354 libcore/debugger.cpp:395
-msgid "No format flag"
-msgstr ""
-
-#: libcore/debugger.cpp:464
-#, c-format
-msgid "Setting watchpoint for variable: \"%s\""
-msgstr ""
-
-#: libcore/debugger.cpp:511
-#, c-format
-msgid "Matched for variable \"%s\": \"%s\""
-msgstr ""
-
-#: libcore/debugger.cpp:526 libcore/debugger.cpp:545 libcore/debugger.cpp:558
-#: libcore/debugger.cpp:621
-#, c-format
-msgid "WARNING: environment not set in %s"
-msgstr ""
-
-#: libcore/debugger.cpp:562
-#, c-format
-msgid "Stack Dump of: %p"
-msgstr ""
-
-#: libcore/debugger.cpp:591
-#, c-format
-msgid "Stack Dump of 0x%p: empty"
-msgstr ""
-
-#: libcore/debugger.cpp:626
-msgid "Global Registers Dump:"
 msgstr ""
 
 #: libcore/SWFStream.cpp:285 libcore/parser/action_buffer.cpp:539
@@ -3880,66 +3902,6 @@ msgstr "Algunos errores abriendo fuente '%s'"
 msgid "Property %s is read-only %s, not setting it to %s"
 msgstr ""
 
-#: libcore/URLAccessManager.cpp:91
-#, c-format
-msgid "Load from host %s granted (whitelisted)"
-msgstr "Carga del dominio %s permitida (lista blanca)"
-
-#: libcore/URLAccessManager.cpp:97
-#, c-format
-msgid "Load from host %s forbidden (not in non-empty whitelist)"
-msgstr "Carga del dominio %s prohibida (no en lista blanca no vacía)"
-
-#: libcore/URLAccessManager.cpp:111
-#, c-format
-msgid "Load from host %s forbidden (blacklisted)"
-msgstr "Carga del dominio %s prohibida (lista negra)"
-
-#: libcore/URLAccessManager.cpp:116
-#, c-format
-msgid "Load from host %s granted (default)"
-msgstr "Carga desde el dominio %s permitida (por defecto)"
-
-#: libcore/URLAccessManager.cpp:148
-#, c-format
-msgid "Load of file %s forbidden (starting url %s is not a local resource)"
-msgstr ""
-"Carga de archivo %s prohibida (comenzando URL %s no es un recurso local)"
-
-#: libcore/URLAccessManager.cpp:165
-#, c-format
-msgid "Load of file %s granted (under local sandbox %s)"
-msgstr "Carga del archivo %s concedida (bajo sandbox local %s)"
-
-#: libcore/URLAccessManager.cpp:173
-#, c-format
-msgid "Load of file %s forbidden (not under local sandboxes)"
-msgstr "Carga del archivo %s prohibida (no está bajo sandboxes locales)"
-
-#: libcore/URLAccessManager.cpp:213
-#, c-format
-msgid "gethostname failed: %s"
-msgstr "obtención del nombre de dominio fallida: %s"
-
-#: libcore/URLAccessManager.cpp:235
-#, c-format
-msgid "Load from host %s forbidden (not in the local domain)"
-msgstr "Carga desde dominio %s prohibida (no está bajo el dominio local)"
-
-#: libcore/URLAccessManager.cpp:241
-#, c-format
-msgid "Load from host %s forbidden (not on the local host)"
-msgstr "Carga desde dominio %s prohibida (no está bajo el dominio local)"
-
-#: libcore/URLAccessManager.cpp:273
-#, c-format
-msgid "Checking security of URL '%s'"
-msgstr "Revisando seguridad de la URL '%s'"
-
-#: libcore/URLAccessManager.cpp:285
-msgid "Network connection without hostname requested"
-msgstr "Conexión de red sin petición de nombre de dominio"
-
 #: libcore/vm/Machine.cpp:894
 #, c-format
 msgid "Can't push a null value onto the scope stack (%s)."
@@ -4837,8 +4799,8 @@ msgstr ""
 msgid "Gnash soldumper version: %s, Gnash version: %s\n"
 msgstr ""
 
-#: utilities/soldumper.cpp:121 utilities/processor.cpp:281
-#: utilities/flvdumper.cpp:154 gui/gnash.cpp:254
+#: utilities/soldumper.cpp:121 utilities/processor.cpp:277
+#: utilities/flvdumper.cpp:154 gui/gnash.cpp:313
 msgid "Verbose output turned on"
 msgstr "Salida verbosa activada"
 
@@ -4850,45 +4812,37 @@ msgstr "forzando acceso sólo local al directorio"
 msgid "List .sol files in the default directory"
 msgstr ""
 
-#: utilities/processor.cpp:152
+#: utilities/processor.cpp:148
 #, c-format
 msgid "fs_callback(%p): %s %s"
 msgstr ""
 
-#: utilities/processor.cpp:165
+#: utilities/processor.cpp:161
 #, c-format
 msgid "eventCallback: %s %s"
 msgstr ""
 
-#: utilities/processor.cpp:242
+#: utilities/processor.cpp:238
 #, c-format
 msgid "Gnash gprocessor version: %s, Gnash version: %s\n"
 msgstr "Versión gprocessor de Gnash: %s, Versión Gnash: %s\n"
 
-#: utilities/processor.cpp:287 gui/gnash.cpp:340
-msgid "Setting debugger ON"
-msgstr "Configurando depurado ACTIVADO"
-
-#: utilities/processor.cpp:289
-msgid "The debugger has been disabled at configuration time"
-msgstr "El depurado ha sido desactivado al momento de configuración"
-
-#: utilities/processor.cpp:298
+#: utilities/processor.cpp:286
 msgid "Verbose actions disabled at compile time"
 msgstr "Acciones verbosas desactivadas al momento de compilado"
 
-#: utilities/processor.cpp:305
+#: utilities/processor.cpp:293
 msgid "Verbose parsing disabled at compile time"
 msgstr "Análisis verboso desactivado al momento de compilado"
 
-#: utilities/processor.cpp:427 utilities/processor.cpp:430 gui/Player.cpp:225
-#: gui/Player.cpp:245 gui/pythonmod/gnash-view.cpp:441
-#: gui/pythonmod/gnash-view.cpp:444
+#: utilities/processor.cpp:415 utilities/processor.cpp:418 gui/Player.cpp:219
+#: gui/Player.cpp:240 gui/pythonmod/gnash-view.cpp:440
+#: gui/pythonmod/gnash-view.cpp:443
 #, c-format
 msgid "%s appended to local sandboxes"
 msgstr ""
 
-#: utilities/processor.cpp:603
+#: utilities/processor.cpp:591
 #, c-format
 msgid ""
 "gprocessor -- an SWF processor for Gnash.\n"
@@ -4907,7 +4861,7 @@ msgstr ""
 "\n"
 "%s%s%s%s"
 
-#: utilities/processor.cpp:610
+#: utilities/processor.cpp:598
 msgid ""
 "options:\n"
 "\n"
@@ -4921,15 +4875,15 @@ msgstr ""
 "  --version   Imprime los números de versiones.\n"
 "  -v          Ser verboso; Ej. imprimir mensajes de registros a stdout\n"
 
-#: utilities/processor.cpp:617
+#: utilities/processor.cpp:605
 msgid "  -vp         Be verbose about movie parsing\n"
 msgstr "  -vp         Ser verboso con análisis de película\n"
 
-#: utilities/processor.cpp:622
+#: utilities/processor.cpp:610
 msgid "  -va         Be verbose about ActionScript\n"
 msgstr "  -va         Ser verboso con ActionScript\n"
 
-#: utilities/processor.cpp:627
+#: utilities/processor.cpp:615
 msgid ""
 "  -d [<ms>]\n"
 "              Milliseconds delay between advances (0 by default).\n"
@@ -4959,7 +4913,7 @@ msgstr ""
 msgid "Error parsing command line: "
 msgstr "Error analizando opciones de linea de comando: "
 
-#: utilities/flvdumper.cpp:172 gui/gnash.cpp:484
+#: utilities/flvdumper.cpp:172 gui/gnash.cpp:531
 msgid "Error parsing command line options: "
 msgstr "Error analizando opciones de linea de comando: "
 
@@ -4968,7 +4922,7 @@ msgstr "Error analizando opciones de linea de comando: "
 msgid "This is a Gnash flvdumper bug."
 msgstr "Este es un error de Gnash."
 
-#: utilities/flvdumper.cpp:178 gui/gnash.cpp:538
+#: utilities/flvdumper.cpp:178 gui/gnash.cpp:585
 msgid "Error: no input file was specified. Exiting."
 msgstr "Error: no se especificó un archivo. Saliendo."
 
@@ -5168,191 +5122,187 @@ msgstr "Sonido"
 msgid "GtkGui: Window resize request received"
 msgstr ""
 
-#: gui/gtk/gtk.cpp:1224 gui/kde/Kde4Gui.cpp:742
+#: gui/gtk/gtk.cpp:1218 gui/kde/Kde4Gui.cpp:742
 msgid "Gnash preferences"
 msgstr "Preferencias Gnash"
 
-#: gui/gtk/gtk.cpp:1259
+#: gui/gtk/gtk.cpp:1253
 msgid "_Network"
 msgstr "_Red"
 
-#: gui/gtk/gtk.cpp:1263 gui/kde/Kde4Gui.cpp:859
+#: gui/gtk/gtk.cpp:1257 gui/kde/Kde4Gui.cpp:859
 msgid "<b>Network preferences</b>"
 msgstr "<b>Preferencias de Red</b>"
 
-#: gui/gtk/gtk.cpp:1271
+#: gui/gtk/gtk.cpp:1265
 msgid "Network timeout in seconds (0 for no timeout):"
 msgstr "Tiempo para expirar red en segundos (0 para no expirar):"
 
-#: gui/gtk/gtk.cpp:1290
+#: gui/gtk/gtk.cpp:1284
 msgid "_Logging"
 msgstr "_Registrando"
 
-#: gui/gtk/gtk.cpp:1295 gui/kde/Kde4Gui.cpp:760
+#: gui/gtk/gtk.cpp:1289 gui/kde/Kde4Gui.cpp:760
 msgid "<b>Logging options</b>"
 msgstr "<b>Opciones de registro</b>"
 
-#: gui/gtk/gtk.cpp:1299
+#: gui/gtk/gtk.cpp:1293
 msgid "Verbosity level:"
 msgstr "Nivel verboso"
 
-#: gui/gtk/gtk.cpp:1312
+#: gui/gtk/gtk.cpp:1306
 msgid "Log to _file"
 msgstr "Registrar a _archivo"
 
-#: gui/gtk/gtk.cpp:1318
+#: gui/gtk/gtk.cpp:1312
 msgid "Logfile name:"
 msgstr "Nombre archivo de registro:"
 
-#: gui/gtk/gtk.cpp:1331
+#: gui/gtk/gtk.cpp:1325
 msgid "Log _parser output"
 msgstr "Registro a_nálisis de salida"
 
-#: gui/gtk/gtk.cpp:1339
+#: gui/gtk/gtk.cpp:1333
 msgid "Log SWF _actions"
 msgstr "Registro _acciones SWF"
 
-#: gui/gtk/gtk.cpp:1347
+#: gui/gtk/gtk.cpp:1341
 msgid "Log malformed SWF _errors"
 msgstr "Registro errores SWF malformados"
 
-#: gui/gtk/gtk.cpp:1355
+#: gui/gtk/gtk.cpp:1349
 msgid "Log ActionScript _coding errors"
 msgstr "Registro errores de _código en ActionScript"
 
 #: gui/gtk/gtk.cpp:1365
-msgid "Enable _debugger"
-msgstr "Activar _depurador"
-
-#: gui/gtk/gtk.cpp:1383
 msgid "_Security"
 msgstr "_Seguridad"
 
-#: gui/gtk/gtk.cpp:1390 gui/kde/Kde4Gui.cpp:811
+#: gui/gtk/gtk.cpp:1372 gui/kde/Kde4Gui.cpp:811
 msgid "<b>Network connections</b>"
 msgstr "<b>Conexiones de Red</b>"
 
-#: gui/gtk/gtk.cpp:1396
+#: gui/gtk/gtk.cpp:1378
 msgid "Connect only to local _host"
 msgstr "Conectar sólo a _anfitrión local"
 
-#: gui/gtk/gtk.cpp:1403
+#: gui/gtk/gtk.cpp:1385
 msgid "Connect only to local _domain"
 msgstr "Conectar sólo a _dominio local"
 
-#: gui/gtk/gtk.cpp:1410
+#: gui/gtk/gtk.cpp:1392
 msgid "Disable SSL _verification"
 msgstr "Desactivar _verificación SSL"
 
-#: gui/gtk/gtk.cpp:1417
+#: gui/gtk/gtk.cpp:1399
 msgid "_Whitelist"
 msgstr "_Bloqueados"
 
-#: gui/gtk/gtk.cpp:1426
+#: gui/gtk/gtk.cpp:1408
 msgid "_Blacklist"
 msgstr "_Permitidos"
 
-#: gui/gtk/gtk.cpp:1435 gui/kde/Kde4Gui.cpp:829
+#: gui/gtk/gtk.cpp:1417 gui/kde/Kde4Gui.cpp:829
 msgid "<b>Privacy</b>"
 msgstr "<b>Privacidad</b>"
 
-#: gui/gtk/gtk.cpp:1439 gui/kde/Kde4Gui.cpp:832
+#: gui/gtk/gtk.cpp:1421 gui/kde/Kde4Gui.cpp:832
 msgid "Shared objects directory:"
 msgstr "Directorio objetos compartidos:"
 
-#: gui/gtk/gtk.cpp:1451
+#: gui/gtk/gtk.cpp:1433
 msgid "Do _not write Shared Object files"
 msgstr "No escribir archivos Objeto Compartido"
 
-#: gui/gtk/gtk.cpp:1458
+#: gui/gtk/gtk.cpp:1440
 msgid "Only _access local Shared Object files"
 msgstr "Sólo _acceder a archivos locales de Objetos Compartidos"
 
-#: gui/gtk/gtk.cpp:1465
+#: gui/gtk/gtk.cpp:1447
 msgid "Disable Local _Connection object"
 msgstr "Desactivar Conexión Local de objetos"
 
-#: gui/gtk/gtk.cpp:1479
+#: gui/gtk/gtk.cpp:1461
 msgid "_Media"
 msgstr ""
 
-#: gui/gtk/gtk.cpp:1485 gui/kde/Kde4Gui.cpp:877
+#: gui/gtk/gtk.cpp:1467 gui/kde/Kde4Gui.cpp:877
 msgid "<b>Sound</b>"
 msgstr "<b>Sonido</b>"
 
-#: gui/gtk/gtk.cpp:1490
+#: gui/gtk/gtk.cpp:1472
 msgid "Use sound _handler"
 msgstr "Usar _manejador de sonido"
 
-#: gui/gtk/gtk.cpp:1498
+#: gui/gtk/gtk.cpp:1480
 msgid "<b>Media Streams</b>"
 msgstr "<b>Flujos Multimedia</b>"
 
-#: gui/gtk/gtk.cpp:1504 gui/kde/Kde4Gui.cpp:884
+#: gui/gtk/gtk.cpp:1486 gui/kde/Kde4Gui.cpp:884
 msgid "Save media streams to disk"
 msgstr "Grabar flujo media al disco"
 
-#: gui/gtk/gtk.cpp:1513 gui/kde/Kde4Gui.cpp:890
+#: gui/gtk/gtk.cpp:1495 gui/kde/Kde4Gui.cpp:890
 msgid "Save dynamically loaded media to disk"
 msgstr "Guardar dinámicamente al disco lo cargado"
 
-#: gui/gtk/gtk.cpp:1521 gui/kde/Kde4Gui.cpp:894
+#: gui/gtk/gtk.cpp:1503 gui/kde/Kde4Gui.cpp:894
 msgid "Saved media directory:"
 msgstr "Directorio de videos guardados:"
 
-#: gui/gtk/gtk.cpp:1541
+#: gui/gtk/gtk.cpp:1523
 msgid "_Player"
 msgstr "_Reproductor"
 
-#: gui/gtk/gtk.cpp:1547 gui/kde/Kde4Gui.cpp:906
+#: gui/gtk/gtk.cpp:1529 gui/kde/Kde4Gui.cpp:906
 msgid "<b>Player description</b>"
 msgstr "<b>Descripción del reproductor</b>"
 
-#: gui/gtk/gtk.cpp:1555 gui/kde/Kde4Gui.cpp:909
+#: gui/gtk/gtk.cpp:1537 gui/kde/Kde4Gui.cpp:909
 msgid "Player version:"
 msgstr "Version reproductor:"
 
-#: gui/gtk/gtk.cpp:1571 gui/kde/Kde4Gui.cpp:915
+#: gui/gtk/gtk.cpp:1553 gui/kde/Kde4Gui.cpp:915
 msgid "Operating system:"
 msgstr "Sistema operativo:"
 
-#: gui/gtk/gtk.cpp:1581
+#: gui/gtk/gtk.cpp:1563
 msgid "<i>If blank, Gnash will detect your OS</i>"
 msgstr "<i>Si está en blanco, Gnash detectará tu OS</i>"
 
-#: gui/gtk/gtk.cpp:1591 gui/kde/Kde4Gui.cpp:926
+#: gui/gtk/gtk.cpp:1573 gui/kde/Kde4Gui.cpp:926
 msgid "URL opener:"
 msgstr "Ejecutor URL:"
 
-#: gui/gtk/gtk.cpp:1603 gui/kde/Kde4Gui.cpp:933
+#: gui/gtk/gtk.cpp:1585 gui/kde/Kde4Gui.cpp:933
 msgid "<b>Performance</b>"
 msgstr "<b>Rendimiento</b>"
 
-#: gui/gtk/gtk.cpp:1617 gui/kde/Kde4Gui.cpp:936
+#: gui/gtk/gtk.cpp:1599 gui/kde/Kde4Gui.cpp:936
 msgid "Max size of movie library:"
 msgstr "Tamaño Máximo de la librería de la película"
 
-#: gui/gtk/gtk.cpp:1629
+#: gui/gtk/gtk.cpp:1611
 msgid "Start _Gnash in pause mode"
 msgstr "Iniciar _Gnash en modo pausado"
 
-#: gui/gtk/gtk.cpp:1653 gui/kde/Kde4Gui.cpp:455
+#: gui/gtk/gtk.cpp:1635 gui/kde/Kde4Gui.cpp:455
 msgid "Movie properties"
 msgstr "Propiedades de película"
 
-#: gui/gtk/gtk.cpp:1727 gui/kde/Kde4Gui.cpp:474
+#: gui/gtk/gtk.cpp:1709 gui/kde/Kde4Gui.cpp:474
 msgid "Variable"
 msgstr "Variable"
 
-#: gui/gtk/gtk.cpp:1740 gui/kde/Kde4Gui.cpp:475
+#: gui/gtk/gtk.cpp:1722 gui/kde/Kde4Gui.cpp:475
 msgid "Value"
 msgstr "Valor"
 
-#: gui/gtk/gtk.cpp:1794
+#: gui/gtk/gtk.cpp:1776
 msgid "Gnash is the GNU SWF Player based on GameSWF."
 msgstr "Gnash es el Reproductor GNU SWF basado en GameSWF"
 
-#: gui/gtk/gtk.cpp:1798
+#: gui/gtk/gtk.cpp:1780
 msgid ""
 "\n"
 "Renderer: "
@@ -5360,20 +5310,20 @@ msgstr ""
 "\n"
 "Renderizador: "
 
-#: gui/gtk/gtk.cpp:1800
+#: gui/gtk/gtk.cpp:1782
 #, fuzzy
 msgid ""
 "\n"
 "Hardware Acceleration: "
 msgstr "   Aceleración por Hardware: "
 
-#: gui/gtk/gtk.cpp:1802
+#: gui/gtk/gtk.cpp:1784
 msgid ""
 "\n"
 "GUI: "
 msgstr ""
 
-#: gui/gtk/gtk.cpp:1804
+#: gui/gtk/gtk.cpp:1786
 msgid ""
 "\n"
 "Media: "
@@ -5381,93 +5331,93 @@ msgstr ""
 "\n"
 "Audiovisual: "
 
-#: gui/gtk/gtk.cpp:1826 gui/gtk/gtk.cpp:1863
+#: gui/gtk/gtk.cpp:1808 gui/gtk/gtk.cpp:1845
 msgid "translator-credits"
 msgstr "Maximiliano Castañón Araneda"
 
-#: gui/gtk/gtk.cpp:1855
+#: gui/gtk/gtk.cpp:1837
 msgid "Gnash"
 msgstr ""
 
-#: gui/gtk/gtk.cpp:1898
+#: gui/gtk/gtk.cpp:1880
 msgid "_File"
 msgstr "_Archivo"
 
-#: gui/gtk/gtk.cpp:1951
+#: gui/gtk/gtk.cpp:1933
 msgid "_Edit"
 msgstr "_Editar"
 
-#: gui/gtk/gtk.cpp:1971
+#: gui/gtk/gtk.cpp:1953
 msgid "_Help"
 msgstr "_Ayuda"
 
-#: gui/gtk/gtk.cpp:1991
+#: gui/gtk/gtk.cpp:1973
 msgid "_View"
 msgstr "_Ver"
 
-#: gui/gtk/gtk.cpp:1999
+#: gui/gtk/gtk.cpp:1981
 msgid "Redraw"
 msgstr "Redibujar"
 
-#: gui/gtk/gtk.cpp:2009 gui/gtk/gtk.cpp:2014
+#: gui/gtk/gtk.cpp:1991 gui/gtk/gtk.cpp:1996 gui/gnash.cpp:71
 msgid "Toggle fullscreen"
 msgstr "Cambiar a pantalla completa"
 
-#: gui/gtk/gtk.cpp:2023
+#: gui/gtk/gtk.cpp:2005
 msgid "Show updated ranges"
 msgstr "Mostrar rangos actualizados"
 
-#: gui/gtk/gtk.cpp:2042
+#: gui/gtk/gtk.cpp:2024
 msgid "_Quality"
 msgstr "_Calidad"
 
-#: gui/gtk/gtk.cpp:2052
+#: gui/gtk/gtk.cpp:2034
 msgid "Low"
 msgstr "Baja"
 
-#: gui/gtk/gtk.cpp:2058
+#: gui/gtk/gtk.cpp:2040
 msgid "Medium"
 msgstr "Media"
 
-#: gui/gtk/gtk.cpp:2064
+#: gui/gtk/gtk.cpp:2046
 msgid "High"
 msgstr "Alta"
 
-#: gui/gtk/gtk.cpp:2070
+#: gui/gtk/gtk.cpp:2052
 msgid "Best"
 msgstr "La Mejor"
 
-#: gui/gtk/gtk.cpp:2083
+#: gui/gtk/gtk.cpp:2065
 msgid "Movie _Control"
 msgstr "_Control Película"
 
-#: gui/gtk/gtk.cpp:2094 gui/kde/Kde4Gui.cpp:578
+#: gui/gtk/gtk.cpp:2076 gui/kde/Kde4Gui.cpp:578
 msgid "Play"
 msgstr "Reproducir"
 
-#: gui/gtk/gtk.cpp:2105 gui/kde/Kde4Gui.cpp:582
+#: gui/gtk/gtk.cpp:2087 gui/kde/Kde4Gui.cpp:582
 msgid "Pause"
 msgstr "Pausar"
 
-#: gui/gtk/gtk.cpp:2115 gui/kde/Kde4Gui.cpp:586
+#: gui/gtk/gtk.cpp:2097 gui/kde/Kde4Gui.cpp:586
 msgid "Stop"
 msgstr "Parar"
 
-#: gui/gtk/gtk.cpp:2127 gui/kde/kde.cpp:416
+#: gui/gtk/gtk.cpp:2109 gui/kde/kde.cpp:416
 msgid "Restart Movie"
 msgstr "Reiniciar Película"
 
-#: gui/gtk/gtk.cpp:2214 gui/gtk/gtk.cpp:2215
+#: gui/gtk/gtk.cpp:2196 gui/gtk/gtk.cpp:2197
 #, c-format
 msgid "Couldn't find pixmap file: %s"
 msgstr "No puede encontrar el archivo pixmap: %s"
 
-#: gui/gtk/gtk.cpp:2221
+#: gui/gtk/gtk.cpp:2203
 #, c-format
 msgid "Failed to load pixbuf file: %s: %s"
 msgstr "Falló al abrir archivo pixbuf: %s: %s"
 
-#: gui/gtk/gtk.cpp:2511 gui/aos4/aos4.cpp:266
+#: gui/gtk/gtk.cpp:2493 gui/aos4/aos4.cpp:266
 #, c-format
 msgid ""
 "Attempting to open file %s.\n"
@@ -5476,7 +5426,7 @@ msgstr ""
 "Intentando abrir archivo %s.\n"
 "Nota: todavía no está implementado la funcionalidad de abrir el archivo!"
 
-#: gui/gtk/gtk.cpp:2528 gui/gtk/gtk.cpp:2541
+#: gui/gtk/gtk.cpp:2510 gui/gtk/gtk.cpp:2523
 msgid "Open file"
 msgstr "Abrir archivo"
 
@@ -5739,57 +5689,57 @@ msgstr "No puedo abrir %s: %s"
 msgid "Could not set non-blocking mode for pointing device: %s"
 msgstr "No puedo configurar modo sin bloqueo para dispositivo señalador: %s"
 
-#: gui/fb/fb.cpp:208
+#: gui/fb/fb.cpp:207
 msgid "Closing framebuffer device"
 msgstr ""
 
-#: gui/fb/fb.cpp:214
+#: gui/fb/fb.cpp:213
 msgid "Free'ing offscreen buffer"
 msgstr ""
 
-#: gui/fb/fb.cpp:228
+#: gui/fb/fb.cpp:227
 msgid "LUT8: Setting up colormap"
 msgstr ""
 
-#: gui/fb/fb.cpp:253
+#: gui/fb/fb.cpp:252
 #, c-format
 msgid "LUT8: Error setting colormap: %s"
 msgstr ""
 
-#: gui/fb/fb.cpp:294
+#: gui/fb/fb.cpp:293
 #, c-format
 msgid "Framebuffer device uses %d bytes of memory."
 msgstr ""
 
-#: gui/fb/fb.cpp:296
+#: gui/fb/fb.cpp:295
 #, c-format
 msgid "Video mode: %dx%d with %d bits per pixel."
 msgstr ""
 
-#: gui/fb/fb.cpp:341
+#: gui/fb/fb.cpp:340
 msgid "Double buffering enabled"
 msgstr ""
 
-#: gui/fb/fb.cpp:344
+#: gui/fb/fb.cpp:343
 msgid "Double buffering disabled"
 msgstr ""
 
-#: gui/fb/fb.cpp:352
+#: gui/fb/fb.cpp:351
 #, c-format
 msgid "red channel: %d / %d"
 msgstr "canal rojo: %d / %d"
 
-#: gui/fb/fb.cpp:354
+#: gui/fb/fb.cpp:353
 #, c-format
 msgid "green channel: %d / %d"
 msgstr "canal verde: %d / %d"
 
-#: gui/fb/fb.cpp:356
+#: gui/fb/fb.cpp:355
 #, c-format
 msgid "blue channel: %d / %d"
 msgstr "canal azul: %d / %d"
 
-#: gui/fb/fb.cpp:358
+#: gui/fb/fb.cpp:357
 #, c-format
 msgid "Total bits per pixel: %d"
 msgstr "Bits totales por pixeles: %d"
@@ -5922,31 +5872,31 @@ msgstr "ratón @ %d,%d"
 msgid "mouse_command: discarded %d bytes from input buffer"
 msgstr ""
 
-#: gui/Player.cpp:155
+#: gui/Player.cpp:149
 #, c-format
 msgid "Timer delay set to %d milliseconds"
 msgstr "Tiempo de retraso configurado a %d milisegundos"
 
-#: gui/Player.cpp:176 gui/pythonmod/gnash-view.cpp:225
+#: gui/Player.cpp:170 gui/pythonmod/gnash-view.cpp:225
 msgid "Sound requested but no sound support compiled in"
 msgstr "Sonido solicitado pero sin soporte de sonido compilado"
 
-#: gui/Player.cpp:181 gui/pythonmod/gnash-view.cpp:222
+#: gui/Player.cpp:175 gui/pythonmod/gnash-view.cpp:222
 #, c-format
 msgid "Could not create sound handler: %s. Will continue w/out sound."
 msgstr ""
 "No puedo crear manejador de sonido: %s. Podría continuar con/sin sonido."
 
-#: gui/Player.cpp:201
+#: gui/Player.cpp:195
 #, c-format
 msgid "Activating FPS debugging every %g seconds"
 msgstr "Activando depurado FPS cada %g segundos"
 
-#: gui/Player.cpp:322
+#: gui/Player.cpp:321
 msgid "Non-existent media handler %1% specified"
 msgstr ""
 
-#: gui/Player.cpp:369
+#: gui/Player.cpp:368
 #, c-format
 msgid ""
 "Input movie has collapsed dimensions %d/%d. Setting to 1/1 and going on."
@@ -5954,32 +5904,32 @@ msgstr ""
 "Entrada de película ha colapsado dimensiones %d/%d. Configurando 1/1 y "
 "continuando."
 
-#: gui/Player.cpp:671
+#: gui/Player.cpp:670
 #, c-format
 msgid "Unhandled callback %s with arguments %s"
 msgstr ""
 
-#: gui/Player.cpp:712
+#: gui/Player.cpp:711
 #, c-format
 msgid "Sent FsCommand '%s' to host fd %d"
 msgstr "FsCommand enviado '%s' a dominio fd %d"
 
-#: gui/Player.cpp:720
+#: gui/Player.cpp:719
 #, c-format
 msgid "Running as plugin: skipping internal handling of FsCommand %s%s."
 msgstr "Corriendo como extensión: saltando manejo interno de FsCommand %s%s."
 
-#: gui/Player.cpp:761
+#: gui/Player.cpp:760
 #, c-format
 msgid "FsCommand exec called with argument %s"
 msgstr ""
 
-#: gui/Player.cpp:778
+#: gui/Player.cpp:777
 #, c-format
 msgid "FsCommand trapallkeys called with argument %s"
 msgstr ""
 
-#: gui/Player.cpp:784
+#: gui/Player.cpp:783
 #, c-format
 msgid "FsCommand '%s(%s)' not handled internally"
 msgstr "FsCommand '%s(%s)' no manejado internamente"
@@ -6007,33 +5957,33 @@ msgstr ""
 msgid "# FATAL:  No filename given with -D argument."
 msgstr "# FATÁL: No entregó el nombre de archivo con el argumento -D."
 
-#: gui/gui.cpp:183 gui/gui.cpp:195
+#: gui/gui.cpp:182 gui/gui.cpp:194
 msgid "Fullscreen not yet supported in this GUI"
 msgstr "Pantalla completa todavía no soportada por esta GUI"
 
-#: gui/gui.cpp:189
+#: gui/gui.cpp:188
 #, fuzzy
 msgid "Window resize not yet supported in this GUI"
 msgstr "mostrar menú todavía no está soportado en esta GUI"
 
-#: gui/gui.cpp:214
+#: gui/gui.cpp:213
 msgid "Menu hiding not yet supported in this GUI"
 msgstr "Ocultar Menu todavía no soportado en esta GUI"
 
-#: gui/gui.cpp:220
+#: gui/gui.cpp:219
 msgid "Mouse show/hide not yet supported in this GUI"
 msgstr "Ratón mostrar/esconder todavía no soportado en esta GUI"
 
-#: gui/gui.cpp:227
+#: gui/gui.cpp:226
 msgid "menushow not yet supported in this GUI"
 msgstr "mostrar menú todavía no está soportado en esta GUI"
 
-#: gui/gui.cpp:468
+#: gui/gui.cpp:467
 #, c-format
 msgid "mouse @ %d,%d"
 msgstr "ratón @ %d,%d"
 
-#: gui/gui.cpp:964
+#: gui/gui.cpp:962
 #, c-format
 msgid "Frame %d"
 msgstr "Cuadro %d"
@@ -6052,233 +6002,236 @@ msgstr "# FATÁL: No entregó el nombre de archivo con el argumento -D."
 msgid "Unable to write file '%s'."
 msgstr "Incapaz de escribir archivo '%s'."
 
-#: gui/gnash.cpp:92
-msgid "Usage: gnash [options] movie_file.swf\n"
-msgstr "Uso: gnash [opción] archivo_pelicula.swf\n"
+#: gui/gnash.cpp:65
+#, fuzzy
+msgid "Keys:"
+msgstr "Llaves:\n"
 
-#: gui/gnash.cpp:94
-msgid "Plays a SWF (Shockwave Flash) movie\n"
-msgstr "Reproduce una película SWF (Shockwave Flash)\n"
+#: gui/gnash.cpp:68
+#, fuzzy
+msgid "Quit"
+msgstr "_Calidad"
 
-#: gui/gnash.cpp:95
-msgid "Options:\n"
-msgstr "Opciones:\n"
+#: gui/gnash.cpp:74
+#, fuzzy
+msgid "Toggle pause"
+msgstr "Cambiar a pantalla completa"
 
-#: gui/gnash.cpp:97
-msgid "  -h,  --help              Print this help and exit\n"
-msgstr "  -h,  --help              Imprime esta ayuda y sale\n"
+#: gui/gnash.cpp:77
+#, fuzzy
+msgid "Restart the movie"
+msgstr "Reiniciar Película"
 
-#: gui/gnash.cpp:98
-msgid "  -V,  --version           Print version information and exit\n"
-msgstr "  -V,  --version           Imprime información de la versión y sale\n"
+#: gui/gnash.cpp:80
+msgid "Take a screenshot"
+msgstr ""
+
+#: gui/gnash.cpp:83
+#, fuzzy
+msgid "Force immediate redraw"
+msgstr "  CTRL-L                   Forzar inmediato redibujo\n"
 
 #: gui/gnash.cpp:99
-msgid "  -s,  --scale <factor>    Scale the movie by the specified factor\n"
-msgstr ""
-"  -s,  --scale <factor>    Escala de la película por el factor especificado\n"
+#, fuzzy
+msgid "Usage: gnash [options] movie_file.swf"
+msgstr "Uso: gnash [opción] archivo_pelicula.swf\n"
 
 #: gui/gnash.cpp:100
 #, fuzzy
-msgid ""
-"  -d,  --delay <num>       Number of milliseconds to delay in main loop\n"
+msgid "Plays a SWF (Shockwave Flash) movie"
+msgstr "Reproduce una película SWF (Shockwave Flash)\n"
+
+#: gui/gnash.cpp:101
+#, fuzzy
+msgid "Options:"
+msgstr "Opciones:\n"
+
+#: gui/gnash.cpp:105
+#, fuzzy
+msgid "Print this help and exit"
+msgstr "  -h,  --help              Imprime esta ayuda y sale\n"
+
+#: gui/gnash.cpp:108
+#, fuzzy
+msgid "Print version information and exit"
+msgstr "  -V,  --version           Imprime información de la versión y sale\n"
+
+#: gui/gnash.cpp:111
+#, fuzzy
+msgid "Scale the movie by the specified factor"
+msgstr ""
+"  -s,  --scale <factor>    Escala de la película por el factor especificado\n"
+
+#: gui/gnash.cpp:114
+#, fuzzy
+msgid "Number of milliseconds to delay in main loop"
 msgstr ""
 "  -d,  --delay num         Número de milisegundos de retraso en el bucle "
 "principal\n"
 
-#: gui/gnash.cpp:101
-msgid "  -v,  --verbose           Produce verbose output\n"
-msgstr "  -v,  --verbose           Produce salida verbosa\n"
+#: gui/gnash.cpp:117
+#, fuzzy
+msgid "Produce verbose output"
+msgstr "Verbose [Español] output turned on"
 
-#: gui/gnash.cpp:103
-msgid "  -va                      Be (very) verbose about action execution\n"
+#: gui/gnash.cpp:121
+#, fuzzy
+msgid "Be (very) verbose about action execution"
 msgstr ""
 "  -va                      Ser (muy) verbosa sobre la ejecución de la "
 "acción\n"
 
-#: gui/gnash.cpp:106
-msgid "  -vp                      Be (very) verbose about parsing\n"
+#: gui/gnash.cpp:126
+#, fuzzy
+msgid "Be (very) verbose about parsing"
 msgstr "  -vp                      Ser (muy) verbosa sobre análisis\n"
 
-#: gui/gnash.cpp:108
-msgid "  -A <file>                Audio dump file (wave format)\n"
+#: gui/gnash.cpp:130
+#, fuzzy
+msgid "Audio dump file (wave format)"
 msgstr ""
 "  -A <archivo>             Archivo de volcado de audio (formato de onda)\n"
 
-#: gui/gnash.cpp:109
+#: gui/gnash.cpp:133
 #, fuzzy
-msgid "  --hwaccel <none|vaapi> Hardware Video Accelerator to use\n"
+msgid "Hardware Video Accelerator to use"
 msgstr "  --hwaccel <none|vaapi|xv> Acelerador Hardware de Video a usar\n"
 
-#: gui/gnash.cpp:110
+#: gui/gnash.cpp:138
 #, fuzzy
-msgid "                           none|vaapi|omap (default: none)\n"
-msgstr "                           none|vaapi|xv|omap (por defecto: ninguno)\n"
-
-#: gui/gnash.cpp:111
-msgid "  -x,  --xid <ID>          X11 Window ID for display\n"
+msgid "X11 Window ID for display"
 msgstr "  -x,  --xid <ID>          ID de Ventana X11 para visualización\n"
 
-#: gui/gnash.cpp:112
-msgid "  -w,  --writelog          Produce the disk based debug log\n"
+#: gui/gnash.cpp:141
+#, fuzzy
+msgid "Produce the disk based debug log"
 msgstr "  -w,  --writelog          Produce registro basado en el disco\n"
 
-#: gui/gnash.cpp:113
-msgid "  -j,  --width <width>     Set window width\n"
-msgstr "  -j,  --width <ancho>     Establece anchura de la ventana\n"
+#: gui/gnash.cpp:144
+#, fuzzy
+msgid "Set window width"
+msgstr "Estableciendo anchura a %d"
 
-#: gui/gnash.cpp:114
-msgid "  -k,  --height <height>   Set window height\n"
-msgstr "  -k,  --height <alto>     Establece altura de la ventana\n"
+#: gui/gnash.cpp:147
+#, fuzzy
+msgid "Set window height"
+msgstr "Estableciendo altura a %d"
 
-#: gui/gnash.cpp:115
-msgid "  -X,  --x-pos <x-pos>     Set window x position\n"
-msgstr "  -X,  --x-pos <x-pos>     Configura la posición X de la ventana\n"
+#: gui/gnash.cpp:150
+#, fuzzy
+msgid "Set window x position"
+msgstr "Estableciendo anchura a %d"
 
-#: gui/gnash.cpp:116
-msgid "  -Y,  --y-pos <y-pos>     Set window y position\n"
-msgstr "  -Y,  --y-pos <y-pos>     Configura la posición Y de la ventana\n"
+#: gui/gnash.cpp:153
+#, fuzzy
+msgid "Set window y position"
+msgstr "Estableciendo anchura a %d"
 
-#: gui/gnash.cpp:117
-msgid "  -1,  --once              Exit when/if movie reaches the last frame\n"
+#: gui/gnash.cpp:156
+#, fuzzy
+msgid "Exit when/if movie reaches the last frame"
 msgstr ""
 "  -1,  --once              Sale cuando/si la película llega al último "
 "cuadro\n"
 
-#: gui/gnash.cpp:119
-msgid "  -g,  --debugger          Turn on the SWF debugger\n"
-msgstr "  -g,  --debugger          Encender el depurador SWF\n"
-
-#: gui/gnash.cpp:120
-msgid "  -r,  --render-mode <0|1|2|3>\n"
-msgstr ""
-
-#: gui/gnash.cpp:121
-msgid "                           0 disable rendering and sound\n"
+#: gui/gnash.cpp:160
+#, fuzzy
+msgid "disable rendering and sound"
 msgstr "                           0 desactiva renderizado y sonido\n"
 
-#: gui/gnash.cpp:122
-msgid "                           1 enable rendering, disable sound\n"
+#: gui/gnash.cpp:162
+#, fuzzy
+msgid "enable rendering, disable sound"
 msgstr "                           1 activa renderizado, desactiva sonido\n"
 
-#: gui/gnash.cpp:123
-msgid "                           2 enable sound, disable rendering\n"
+#: gui/gnash.cpp:164
+#, fuzzy
+msgid "enable sound, disable rendering"
 msgstr "                           2 activa sonido, desactiva renderizado\n"
 
-#: gui/gnash.cpp:124
-msgid "                           3 enable rendering and sound (default)\n"
+#: gui/gnash.cpp:166
+#, fuzzy
+msgid "enable rendering and sound (default)"
 msgstr ""
 "                           3 activa renderizado y sonido (predeterminado)\n"
 
-#: gui/gnash.cpp:125
-msgid "  -M,  --media <"
-msgstr ""
-
-#: gui/gnash.cpp:126
+#: gui/gnash.cpp:170
 #, fuzzy
-msgid "                           The media handler to use"
-msgstr ""
-"                           El manejador de audio a usar (por defecto: )\n"
+msgid "The media handler to use"
+msgstr "   Manejador de Medios: "
 
-#: gui/gnash.cpp:128
+#: gui/gnash.cpp:175
 #, fuzzy
-msgid "  -R,  --renderer <"
+msgid "The renderer to use"
 msgstr "   Renderizadores: "
 
-#: gui/gnash.cpp:129
+#: gui/gnash.cpp:179
 #, fuzzy
-msgid "                           The renderer to use"
-msgstr "                           El renderizador a usar (por defecto: agg)\n"
-
-#: gui/gnash.cpp:131
-msgid "  -t,  --timeout <sec>     Exit after the specified number of seconds\n"
+msgid "Exit after the specified number of seconds"
 msgstr ""
 "  -t,  --timeout <sec>     Sale después del tiempo específicado en segundos\n"
 
-#: gui/gnash.cpp:133
-msgid "  -u,  --real-url <url>    Set \"real\" URL of the movie\n"
+#: gui/gnash.cpp:182
+#, fuzzy
+msgid "Set \"real\" URL of the movie"
 msgstr "  -u,  --real-url <url>    Establece URL \"real\" de la película\n"
 
-#: gui/gnash.cpp:134
-msgid ""
-"  -U,  --base-url <url>    Set \"base\" URL for resolving relative URLs\n"
+#: gui/gnash.cpp:185
+#, fuzzy
+msgid "Set \"base\" URL for resolving relative URLs"
 msgstr ""
 "  -U,  --base-url <url>    Establece URL \"base\" para resolver URLs "
 "relativas\n"
 
-#: gui/gnash.cpp:136
-msgid "  -P,  --param <param>     Set parameter (e.g. \"FlashVars=A=1&b=2\")\n"
+#: gui/gnash.cpp:188
+#, fuzzy
+msgid "Set parameter (e.g. \"FlashVars=A=1&b=2\")"
 msgstr ""
 "  -P,  --param <param>     Establece parámetro (ej. \"FlashVars=A=1&b=2\")\n"
 
-#: gui/gnash.cpp:138
-msgid ""
-"  -F,  --fd <fd>:<fd>      Filedescriptor to use for external "
-"communications\n"
+#: gui/gnash.cpp:191
+#, fuzzy
+msgid "Filedescriptor to use for external communications"
 msgstr ""
 "  -F,  --fd <fd>:<fd>      Descriptor de archivo a usar para comunicaciones "
 "externas\n"
 
-#: gui/gnash.cpp:141
+#: gui/gnash.cpp:195
 #, fuzzy
-msgid "  -f,  --debug-fps <num>   Print FPS every num seconds (float)\n"
+msgid "Print FPS every num seconds (float)"
 msgstr ""
 "  -f,  --debug-fps num     Imprime los FPS cada num segundos (float).\n"
 
-#: gui/gnash.cpp:144
+#: gui/gnash.cpp:199
 #, fuzzy
-msgid ""
-"  --max-advances <num>     Exit after specified number of frame advances\n"
+msgid "Exit after specified number of frame advances"
 msgstr ""
 "  --max-advances num       Sale después del número especificado de avances\n"
 
-#: gui/gnash.cpp:146
-msgid "  --fullscreen             Start in fullscreen mode\n"
-msgstr "  --fullscreen             Iniciar en modo pantalla completa\n"
+#: gui/gnash.cpp:202
+#, fuzzy
+msgid "Start in fullscreen mode"
+msgstr "Iniciar Gnash en modo pausado"
 
-#: gui/gnash.cpp:147
-msgid "  --hide-menubar           Start without displaying the menu bar\n"
+#: gui/gnash.cpp:205
+#, fuzzy
+msgid "Start without displaying the menu bar"
 msgstr "  --hide-menubar           Iniciar sin mostrar la barra menu\n"
 
-#: gui/gnash.cpp:148
-msgid "  --screenshot <list>      List of frames to save as screenshots\n"
+#: gui/gnash.cpp:208
+#, fuzzy
+msgid "List of frames to save as screenshots"
 msgstr ""
 "  --screenshot <lista>     Lista de imágenes a guardar como pantallazos\n"
 
-#: gui/gnash.cpp:149
-msgid "  --screenshot-file <file> Filename pattern for screenshot images.\n"
+#: gui/gnash.cpp:211
+#, fuzzy
+msgid "Filename pattern for screenshot images."
 msgstr ""
 "  --screenshot-file <archivo> Nombre del archivo patrón para los "
 "pantallazos.\n"
 
-#: gui/gnash.cpp:151
-msgid "Keys:\n"
-msgstr "Llaves:\n"
-
-#: gui/gnash.cpp:153
-msgid "  CTRL-Q, CTRL-W           Quit\n"
-msgstr "  CTRL-Q, CTRL-W           Salir\n"
-
-#: gui/gnash.cpp:154
-msgid "  CTRL-F                   Toggle fullscreen\n"
-msgstr "  CTRL-F                   Cambia a pantalla completa\n"
-
-#: gui/gnash.cpp:155
-msgid "  CTRL-P                   Toggle pause\n"
-msgstr "  CTRL-P                   Cambia a Pausa\n"
-
-#: gui/gnash.cpp:156
-msgid "  CTRL-R                   Restart the movie\n"
-msgstr "  CTRL-R                   Reinicia la película\n"
-
-#: gui/gnash.cpp:157
-msgid "  CTRL-O                   Take a screenshot\n"
-msgstr "  CTRL-O                   Tomar imágen de pantalla\n"
-
-#: gui/gnash.cpp:158
-msgid "  CTRL-L                   Force immediate redraw\n"
-msgstr "  CTRL-L                   Forzar inmediato redibujo\n"
-
-#: gui/gnash.cpp:167
+#: gui/gnash.cpp:227
 #, fuzzy
 msgid ""
 "Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, "
@@ -6292,107 +6245,108 @@ msgstr ""
 "Puedes redistribuir copias de Gnash bajo los términos de la Licencia \n"
 "Pública General GNU.  Para más información, vea el archivo llamado COPYING.\n"
 
-#: gui/gnash.cpp:178
+#: gui/gnash.cpp:238
 msgid "Build options "
 msgstr "Opciones de construcción "
 
-#: gui/gnash.cpp:179
+#: gui/gnash.cpp:239
 msgid "   Renderers: "
 msgstr "   Renderizadores: "
 
-#: gui/gnash.cpp:180
+#: gui/gnash.cpp:240
 msgid "   Hardware Acceleration: "
 msgstr "   Aceleración por Hardware: "
 
-#: gui/gnash.cpp:181
+#: gui/gnash.cpp:241
 msgid "   GUI: "
 msgstr ""
 
-#: gui/gnash.cpp:182
+#: gui/gnash.cpp:242
 msgid "   Media handlers: "
 msgstr "   Manejador de Medios: "
 
-#: gui/gnash.cpp:184
+#: gui/gnash.cpp:244
 msgid "   Configured with: "
 msgstr "   Configurado con: "
 
-#: gui/gnash.cpp:185
+#: gui/gnash.cpp:245
 msgid "   CXXFLAGS: "
 msgstr ""
 
-#: gui/gnash.cpp:262
+#: gui/gnash.cpp:246
+#, fuzzy
+msgid "   Version: "
+msgstr "   Renderizadores: "
+
+#: gui/gnash.cpp:321
 msgid "Logging to disk enabled"
 msgstr "Registro a disco activado"
 
-#: gui/gnash.cpp:268
+#: gui/gnash.cpp:327
 msgid "No verbose actions; disabled at compile time"
 msgstr "No acciones verbosa; desactivado al momento de compilación"
 
-#: gui/gnash.cpp:276
+#: gui/gnash.cpp:335
 msgid "No verbose parsing; disabled at compile time"
 msgstr "No análisis verboso;  desactivado al momento de compilación"
 
-#: gui/gnash.cpp:298
+#: gui/gnash.cpp:357
 #, c-format
 msgid "Setting root URL to %s"
 msgstr "Estableciendo URL root a %s"
 
-#: gui/gnash.cpp:303
+#: gui/gnash.cpp:362
 #, c-format
 msgid "Setting base URL to %s"
 msgstr "Estableciendo URL base a %s"
 
-#: gui/gnash.cpp:314
+#: gui/gnash.cpp:373
 #, c-format
 msgid "Host FD #%d, Control FD #%d\n"
 msgstr ""
 
-#: gui/gnash.cpp:317
+#: gui/gnash.cpp:376
 #, c-format
 msgid "Invalid host communication filedescriptor %d\n"
 msgstr ""
 
-#: gui/gnash.cpp:325
+#: gui/gnash.cpp:384
 #, c-format
 msgid "Invalid control communication filedescriptor %d\n"
 msgstr ""
 
-#: gui/gnash.cpp:335
+#: gui/gnash.cpp:394
 #, c-format
 msgid "Setting width to %d"
 msgstr "Estableciendo anchura a %d"
 
-#: gui/gnash.cpp:345
-msgid "No debugger; disabled at compile time, -g is invalid"
-msgstr "No depurar; desactivado al momento de compilación, -g es inválido"
-
-#: gui/gnash.cpp:353
+#: gui/gnash.cpp:400
 #, c-format
 msgid "Setting height to %d"
 msgstr "Estableciendo altura a %d"
 
-#: gui/gnash.cpp:359 gui/gnash.cpp:365
+#: gui/gnash.cpp:406 gui/gnash.cpp:412
 #, fuzzy, c-format
 msgid "Setting x position to %d"
 msgstr "Estableciendo anchura a %d"
 
-#: gui/gnash.cpp:434
+#: gui/gnash.cpp:481
 msgid "ERROR: -r must be followed by 0, 1, 2 or 3 "
 msgstr "ERROR: -r debe ser seguido por 0, 1, 2 o 3 "
 
-#: gui/gnash.cpp:446
+#: gui/gnash.cpp:493
 msgid "FPS debugging disabled at compile time, -f is invalid"
 msgstr "Depuración FPS desactivado al momento de compilar, -f es inválido"
 
-#: gui/gnash.cpp:486
+#: gui/gnash.cpp:533
 msgid "This is a Gnash bug."
 msgstr "Este es un error de Gnash."
 
-#: gui/gnash.cpp:491
+#: gui/gnash.cpp:538
 msgid "No rendering flags specified, using rcfile"
 msgstr "Banderas de renderización no especificadas, usando rcfile"
 
-#: gui/gnash.cpp:532
+#: gui/gnash.cpp:579
 msgid "Exception thrown during parseCommandLine"
 msgstr "Excepción lanzada durante parseCommandLine"
 
@@ -6424,6 +6378,73 @@ msgstr ""
 #, c-format
 msgid "Field name is: %s: "
 msgstr "Nombre del campo es: %s:"
+
+#~ msgid "Setting debugger ON"
+#~ msgstr "Configurando depurado ACTIVADO"
+
+#~ msgid "The debugger has been disabled at configuration time"
+#~ msgstr "El depurado ha sido desactivado al momento de configuración"
+
+#~ msgid "Enable _debugger"
+#~ msgstr "Activar _depurador"
+
+#~ msgid "  -v,  --verbose           Produce verbose output\n"
+#~ msgstr "  -v,  --verbose           Produce salida verbosa\n"
+
+#, fuzzy
+#~ msgid "                           none|vaapi|omap (default: none)\n"
+#~ msgstr ""
+#~ "                           none|vaapi|xv|omap (por defecto: ninguno)\n"
+
+#~ msgid "  -j,  --width <width>     Set window width\n"
+#~ msgstr "  -j,  --width <ancho>     Establece anchura de la ventana\n"
+
+#~ msgid "  -k,  --height <height>   Set window height\n"
+#~ msgstr "  -k,  --height <alto>     Establece altura de la ventana\n"
+
+#~ msgid "  -X,  --x-pos <x-pos>     Set window x position\n"
+#~ msgstr "  -X,  --x-pos <x-pos>     Configura la posición X de la ventana\n"
+
+#~ msgid "  -Y,  --y-pos <y-pos>     Set window y position\n"
+#~ msgstr "  -Y,  --y-pos <y-pos>     Configura la posición Y de la ventana\n"
+
+#~ msgid "  -g,  --debugger          Turn on the SWF debugger\n"
+#~ msgstr "  -g,  --debugger          Encender el depurador SWF\n"
+
+#, fuzzy
+#~ msgid "                           The media handler to use"
+#~ msgstr ""
+#~ "                           El manejador de audio a usar (por defecto: )\n"
+
+#, fuzzy
+#~ msgid "  -R,  --renderer <"
+#~ msgstr "   Renderizadores: "
+
+#, fuzzy
+#~ msgid "                           The renderer to use"
+#~ msgstr ""
+#~ "                           El renderizador a usar (por defecto: agg)\n"
+
+#~ msgid "  --fullscreen             Start in fullscreen mode\n"
+#~ msgstr "  --fullscreen             Iniciar en modo pantalla completa\n"
+
+#~ msgid "  CTRL-Q, CTRL-W           Quit\n"
+#~ msgstr "  CTRL-Q, CTRL-W           Salir\n"
+
+#~ msgid "  CTRL-F                   Toggle fullscreen\n"
+#~ msgstr "  CTRL-F                   Cambia a pantalla completa\n"
+
+#~ msgid "  CTRL-P                   Toggle pause\n"
+#~ msgstr "  CTRL-P                   Cambia a Pausa\n"
+
+#~ msgid "  CTRL-R                   Restart the movie\n"
+#~ msgstr "  CTRL-R                   Reinicia la película\n"
+
+#~ msgid "  CTRL-O                   Take a screenshot\n"
+#~ msgstr "  CTRL-O                   Tomar imágen de pantalla\n"
+
+#~ msgid "No debugger; disabled at compile time, -g is invalid"
+#~ msgstr "No depurar; desactivado al momento de compilación, -g es inválido"
 
 #~ msgid "Stream EOF, emitting!"
 #~ msgstr "emitiendo Flujo EOF!"
