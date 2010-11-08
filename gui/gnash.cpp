@@ -40,7 +40,6 @@
 #include "Player.h"
 #include "log.h"
 #include "rc.h" // for use of rcfile
-#include "debugger.h"
 #include "arg_parser.h"
 #include "GnashNumeric.h" // for clamp
 #include "GnashException.h"
@@ -57,9 +56,6 @@ std::string url;
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
-#ifdef USE_DEBUGGER
-gnash::Debugger& debugger = gnash::Debugger::getDefaultInstance();
-#endif
 }
 
 static void
@@ -158,9 +154,6 @@ usage()
 
     <<   "  -1,  --once              "
     << _("Exit when/if movie reaches the last frame") << endl
-
-    <<   "  -g,  --debugger          "
-    << _("Turn on the SWF debugger") << endl
 
     <<   "  -r,  --render-mode <0|1|2|3>" << endl 
     <<   "                           0 "
@@ -282,7 +275,6 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         { 'u', "real-url",          Arg_parser::yes },
         { 'P', "param",             Arg_parser::yes },
         { 'U', "base-url",          Arg_parser::yes },  
-        { 'g', "debugger",          Arg_parser::no  },
         { 'V', "version",           Arg_parser::no  },        
         { 'f', "debug-fps",         Arg_parser::yes },        
         { 'F', "fifo",              Arg_parser::yes },
@@ -401,18 +393,6 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     player.setWidth(parser.argument<long>(i));
                     gnash::log_debug(_("Setting width to %d"),
                              player.getWidth());
-                    break;
-                case 'g':
-#ifdef USE_DEBUGGER
-                    gnash::log_debug(_("Setting debugger ON"));
-                    debugger.enabled(true);
-                    //              debugger.startServer(&debugger);
-                    debugger.console();
-#else
-                    gnash::log_error(_("No debugger; disabled at compile "
-                                "time, -g is invalid"));
-                    exit(EXIT_FAILURE);
-#endif
                     break;
                 case 'k':
                     heightGiven = true;

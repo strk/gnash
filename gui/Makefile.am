@@ -67,12 +67,12 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libltdl \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/librender \
+	-I$(top_srcdir)/librender/agg \
+	-I$(top_srcdir)/librender/cairo \
+	-I$(top_srcdir)/librender/opengl \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
-	-I$(top_srcdir)/libmedia/ffmpeg \
-	-I$(top_srcdir)/libmedia/gst \
-	-I$(top_srcdir)/libmedia/haiku \
-        -DLOCALEDIR=\"$(localedir)\" \
+	-DLOCALEDIR=\"$(localedir)\" \
 	-DPLUGINSDIR=\"$(pluginsdir)\" \
 	-DLIBAVCODEC_IDENT=\"$(LIBAVCODEC_IDENT)\" \
 	$(GLIB_CFLAGS) \

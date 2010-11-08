@@ -20,8 +20,12 @@
 #define BACKEND_RENDER_HANDLER_AGG_BITMAP_H
 
 #include <boost/scoped_ptr.hpp>
+#include <memory>
+#include <boost/cstdint.hpp>
 
-// This include file used only to make Renderer_agg more readable.
+#include "GnashImage.h"
+#include "CachedBitmap.h"
+
 
 namespace gnash {
 

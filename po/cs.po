@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnash 146c5d78235f10cba0feec31f7fb5bf68edc6c41\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-10-28 16:31+0200\n"
+"POT-Creation-Date: 2010-11-08 10:57+0100\n"
 "PO-Revision-Date: 2010-09-08 23:13+0200\n"
 "Last-Translator: Petr Pisar <petr.pisar@atlas.cz>\n"
 "Language-Team: Czech <translation-team-cs@lists.sourceforge.net>\n"
@@ -124,6 +124,10 @@ msgstr "Socket byl přerušen systémovým voláním"
 msgid "XMLSocket: The socket was never available"
 msgstr "XMLSocket: Socket nikdy nebyl dostupný"
 
+#: libbase/StreamProvider.cpp:132
+msgid "POST data discarded while getting a stream from file: uri"
+msgstr "Protože proud pochází z URI „file:“, zahazuji data z POST."
+
 #: libbase/GnashImagePng.cpp:40
 msgid "PNG error: "
 msgstr "Chyba PNG: "
@@ -176,10 +180,69 @@ msgstr "rw_dest_IOChannel nemohla zapsat data."
 msgid "rw_dest_IOChannel::term_destination couldn't write data."
 msgstr "rw_dest_IOChannel::term_destination nemohla zapsat data."
 
-#: libbase/tu_file.cpp:74
+#: libbase/tu_file.cpp:193
 #, fuzzy
 msgid "Error while seeking to end: %1%"
 msgstr "Během rozebírání proudu SWF došlo k chybě."
+
+#: libbase/URLAccessManager.cpp:91
+#, c-format
+msgid "Load from host %s granted (whitelisted)"
+msgstr "Nahrávání ze stroje %s povoleno (na seznamu povolených)"
+
+#: libbase/URLAccessManager.cpp:97
+#, c-format
+msgid "Load from host %s forbidden (not in non-empty whitelist)"
+msgstr "Nahrávání ze stroje %s zakázáno (není v neprázdném seznamu povolených)"
+
+#: libbase/URLAccessManager.cpp:111
+#, c-format
+msgid "Load from host %s forbidden (blacklisted)"
+msgstr "Nahrávání ze stroje %s zakázáno (na seznamu zakázaných)"
+
+#: libbase/URLAccessManager.cpp:116
+#, c-format
+msgid "Load from host %s granted (default)"
+msgstr "Nahrávání ze stroje %s povoleno (implicitně)"
+
+#: libbase/URLAccessManager.cpp:148
+#, c-format
+msgid "Load of file %s forbidden (starting url %s is not a local resource)"
+msgstr "Načítání souboru %s zakázáno (uvozující URL %s není místním zdrojem)"
+
+#: libbase/URLAccessManager.cpp:165
+#, c-format
+msgid "Load of file %s granted (under local sandbox %s)"
+msgstr "Načítání souboru %s povoleno (v místním vyhrazeném prostoru %s)"
+
+#: libbase/URLAccessManager.cpp:173
+#, c-format
+msgid "Load of file %s forbidden (not under local sandboxes)"
+msgstr "Načítání souboru %s zakázáno (mimo místní vyhrazené prostory)"
+
+#: libbase/URLAccessManager.cpp:213
+#, c-format
+msgid "gethostname failed: %s"
+msgstr "gethostname selhala: %s"
+
+#: libbase/URLAccessManager.cpp:235
+#, c-format
+msgid "Load from host %s forbidden (not in the local domain)"
+msgstr "Nahrávání ze stroje %s zakázáno (není v místní doméně)"
+
+#: libbase/URLAccessManager.cpp:241
+#, c-format
+msgid "Load from host %s forbidden (not on the local host)"
+msgstr "Nahrávání ze stroje %s zakázáno (není na tomto stroji)"
+
+#: libbase/URLAccessManager.cpp:273
+#, c-format
+msgid "Checking security of URL '%s'"
+msgstr "Prověřuji bezpečnost URL „%s“"
+
+#: libbase/URLAccessManager.cpp:285
+msgid "Network connection without hostname requested"
+msgstr "Požadováno síťové spojení bez názvu stroje"
 
 #: libbase/extension.cpp:140
 #, c-format
@@ -698,7 +761,7 @@ msgstr "MediaParserFfmpeg nemohl ze vstupu přečíst zkušební data"
 msgid "%s: seeking failed"
 msgstr "%s: přeskakování selhalo"
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:263
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:264
 #, c-format
 msgid ""
 "MediaParserFfmpeg::parseNextFrame: Problems parsing next frame "
@@ -707,37 +770,37 @@ msgstr ""
 "MediaParserFfmpeg::parseNextFrame: Potíže s rozebíráním následujícího snímku "
 "(av_read_frame vrátil %d). Proud budeme považovat za zcela rozebraný."
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:388
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:389
 #, c-format
 msgid "  Title:'%s'"
 msgstr "  Název: „%s“"
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:389
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:390
 #, c-format
 msgid "  Author:'%s'"
 msgstr "  Autor: „%s“"
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:390
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:391
 #, c-format
 msgid "  Copyright:'%s'"
 msgstr "  Copyright: „%s“"
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:391
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:392
 #, c-format
 msgid "  Comment:'%s'"
 msgstr "  Komentář: „%s“"
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:392
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:393
 #, c-format
 msgid "  Album:'%s'"
 msgstr "  Album: „%s“"
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:414
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:415
 #, c-format
 msgid "  Using stream %d for audio: codec id %d"
 msgstr "  Pro zvuk používám proud %d: ID kodeku %d"
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:424
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:425
 #, c-format
 msgid "  Using stream %d for video: codec id %d"
 msgstr "  Pro video používám proud %d: ID kodeku %d"
@@ -752,7 +815,7 @@ msgid "libavcodec can't decode this video format"
 msgstr "libavcodec neumí dekódovat tento formát videa"
 
 #: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:185
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:139
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:131
 msgid "libavcodec couldn't allocate context"
 msgstr "libavcodec nemohl alokovat kontext"
 
@@ -770,17 +833,17 @@ msgstr "VideoDecoder: FFMPEG kodek %s (%d) inicializován"
 msgid "Out of memory while allocating avcodec frame"
 msgstr "Nedostatek paměti pro alokaci avcodecového rámce"
 
-#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:431
+#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:429
 #, c-format
 msgid "Unsupported video codec %d"
 msgstr "Nepodporovaný kodek videa %d"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:56
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:48
 #, fuzzy, c-format
 msgid "AudioDecoderFfmpeg: initialized FFmpeg codec %d (%s)"
 msgstr "AudioDecoderFfmpeg: FFMPEG kodek %d (%s) inicializován"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:59
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:51
 #, fuzzy, c-format
 msgid ""
 "AudioDecoderFfmpeg: initialized FFmpeg codec %d (%s) for flash codec %d (%s)"
@@ -788,27 +851,27 @@ msgstr ""
 "AudioDecoderFfmpeg: FFMPEG kodek %d (%s) inicializován pro FLASH kodek %d (%"
 "s)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:74
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:66
 #, fuzzy, c-format
 msgid "AudioDecoderFfmpeg: initialized FFmpeg codec %s (%d)"
 msgstr "AudioDecoderFfmpeg: FFMPEG kodek %s (%d) inicializován"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:113
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:105
 #, c-format
 msgid "Unsupported audio codec %d"
 msgstr "Nepodporovaný zvukový kodek %d"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:122
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:114
 #, c-format
 msgid "libavcodec could not find a decoder for codec %d (%s)"
 msgstr "libavcodec nemohl nalézt dekodér pro kodek %d (%s)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:132
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:124
 msgid "AudioDecoderFfmpeg can't initialize MP3 parser"
 msgstr "AudioDecoderFfmpeg: MP3 parser nemohl být inicializován"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:147
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:336
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:139
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:328
 #, fuzzy, c-format
 msgid ""
 "AudioDecoderFfmpeg: avcodec_open failed to initialize FFmpeg codec %s (%d)"
@@ -816,23 +879,23 @@ msgstr ""
 "AudioDecoderFfmpeg: avcodec_open selhal při inicializaci FFMPEG kodeku %s (%"
 "d)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:221
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:213
 #, fuzzy, c-format
 msgid "AudioDecoderFfmpeg: unsupported flash audio codec %d (%s)"
 msgstr "AudioDecoderFfmpeg: nepodporovaný FLASH zvukový kodek %d (%s)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:230
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:222
 #, c-format
 msgid "AudioDecoderFfmpeg: unknown codec type %d (should never happen)"
 msgstr "AudioDecoderFfmpeg: neznámý druh kodeku %d (nemělo by nikdy nastat)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:240
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:232
 #, c-format
 msgid ""
 "AudioDecoderFfmpeg: libavcodec could not find a decoder for codec %d (%s)"
 msgstr "AudioDecoderFfmpeg: libavcodec nedokázal najít dekodér kodeku %d (%s)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:246
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:238
 #, c-format
 msgid ""
 "AudioDecoderFfmpeg: libavcodec could not find a decoder for ffmpeg codec id %"
@@ -840,7 +903,7 @@ msgid ""
 msgstr ""
 "AudioDecoderFfmpeg: libavcodec nedokázal najít dekodér pro ffmpeg kodek ID %s"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:263
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:255
 #, c-format
 msgid ""
 "AudioDecoderFfmpeg: could not initialize a parser for flash codec id %d (%s)"
@@ -848,18 +911,18 @@ msgstr ""
 "AudioDecoderFfmpeg: parser pro flash kodek ID %d (%s) nemohl být "
 "inicializován"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:268
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:260
 #, c-format
 msgid ""
 "AudioDecoderFfmpeg: could not initialize a parser for ffmpeg codec id %s"
 msgstr ""
 "AudioDecoderFfmpeg: parser pro ffmpeg kodek ID %s nemohl být inicializován"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:281
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:273
 msgid "AudioDecoderFfmpeg: libavcodec couldn't allocate context"
 msgstr "AudioDecoderFfmpeg: libavcodec nemohl alokovat kontext"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:390
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:382
 #, c-format
 msgid ""
 "av_parser_parse returned %d. Upgrading ffmpeg/libavcodec might fix this "
@@ -867,11 +930,11 @@ msgid ""
 msgstr ""
 "av_parser_parse vrátil %d. Povýšení ffmpeg/libavcodecu by mohlo pomoci."
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:535
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:524
 msgid "failed to allocate audio buffer."
 msgstr "Alokace zvukového bufferu selhala."
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:570
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:552
 #, c-format
 msgid ""
 "avcodec_decode_audio returned %d. Upgrading ffmpeg/libavcodec might fix this "
@@ -879,7 +942,7 @@ msgid ""
 msgstr ""
 "avcodec_decode_audio vrátil %d. Povýšení ffmpeg/libavcodecu by mohlo pomoci."
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:583
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:561
 #, c-format
 msgid ""
 "outputSize:%d after decoding %d bytes of input audio data. Upgrading ffmpeg/"
@@ -1373,8 +1436,8 @@ msgid "FLV can't be loaded directly as a movie"
 msgstr "FLV nelze nahrávat přímo jako film"
 
 #: libcore/MovieFactory.cpp:99
-#, c-format
-msgid "unknown file type (%s)"
+#, fuzzy
+msgid "Unknown file type"
 msgstr "neznámý druh souboru (%s)"
 
 #: libcore/MovieFactory.cpp:122
@@ -1956,26 +2019,26 @@ msgstr "SharedObject.connect(): potřebuje alespoň jeden argument"
 msgid "Arguments to SharedObject.flush(%s) will be ignored"
 msgstr "Argumenty u SharedObject.flush(%s) budou ignorovány"
 
-#: libcore/asobj/NetConnection_as.cpp:850
+#: libcore/asobj/NetConnection_as.cpp:444
 #, c-format
 msgid "Gnash is not allowed to open this url: %s"
 msgstr "Gnash nemá dovoleno otevřít toto URL: %s"
 
-#: libcore/asobj/NetConnection_as.cpp:854
+#: libcore/asobj/NetConnection_as.cpp:448
 #, c-format
 msgid "Connection to movie: %s"
 msgstr "Spojení na film: %s"
 
-#: libcore/asobj/NetConnection_as.cpp:908
+#: libcore/asobj/NetConnection_as.cpp:500
 #, fuzzy, c-format
 msgid "Gnash is not allowed to connect to %s"
 msgstr "Gnash nemá dovoleno NetConnection.connect na %s"
 
-#: libcore/asobj/NetConnection_as.cpp:1065
+#: libcore/asobj/NetConnection_as.cpp:660
 msgid "NetConnection.call(): needs at least one argument"
 msgstr "NetConnection.call(): potřebuji alespoň jeden argument"
 
-#: libcore/asobj/NetConnection_as.cpp:1178
+#: libcore/asobj/NetConnection_as.cpp:773
 msgid "NetConnection.connect(): needs at least one argument"
 msgstr "NetConnection.connect(): potřebuji alespoň jeden argument"
 
@@ -2074,11 +2137,11 @@ msgstr "Neexistuje žádný MediaHandler! Objekt Microphone nelze vytvořit"
 msgid "Attempt to set activity property of Microphone"
 msgstr "Pokus nastavit vlastnost activity objektu Microphone"
 
-#: libcore/asobj/Object.cpp:148
+#: libcore/asobj/Object.cpp:149
 msgid "Too many args to Object constructor"
 msgstr "Příliš mnoho argumentů pro konstruktor Objektu"
 
-#: libcore/asobj/Object.cpp:196
+#: libcore/asobj/Object.cpp:193
 #, c-format
 msgid ""
 "Invalid call to Object.addProperty(%s) - expected 3 arguments (<name>, "
@@ -2087,15 +2150,15 @@ msgstr ""
 "Neplatné volání Object.addProperty(%s) – očekávány 3 argumenty (<název>, "
 "<getter>, <setter>)"
 
-#: libcore/asobj/Object.cpp:213
+#: libcore/asobj/Object.cpp:210
 msgid "Invalid call to Object.addProperty() - empty property name"
 msgstr "Neplatné volání Object.addProperty() – prázdný název vlastnost"
 
-#: libcore/asobj/Object.cpp:223
+#: libcore/asobj/Object.cpp:220
 msgid "Invalid call to Object.addProperty() - getter is not an AS function"
 msgstr "Neplatné volání Object.addProperty() – getter není AS funkce"
 
-#: libcore/asobj/Object.cpp:237
+#: libcore/asobj/Object.cpp:234
 #, c-format
 msgid ""
 "Invalid call to Object.addProperty() - setter is not null and not an AS "
@@ -2103,7 +2166,7 @@ msgid ""
 msgstr ""
 "Neplatné volání Object.addProperty() – setter není null a není AS funkce (%s)"
 
-#: libcore/asobj/Object.cpp:261
+#: libcore/asobj/Object.cpp:258
 #, c-format
 msgid ""
 "Invalid call to Object.registerClass(%s) - expected 2 arguments (<symbol>, "
@@ -2112,7 +2175,7 @@ msgstr ""
 "Neplatné volání Object.registerClass(%s) – očekávány 2 argumenty (<symbol>, "
 "<konstruktor>)"
 
-#: libcore/asobj/Object.cpp:279
+#: libcore/asobj/Object.cpp:276
 #, c-format
 msgid ""
 "Invalid call to Object.registerClass(%s) - first argument (symbol id) "
@@ -2121,7 +2184,7 @@ msgstr ""
 "Neplatné volání Object.registerClass(%s) – první argument (id symbolu) se "
 "vyhodnotí na prázdný řetězec"
 
-#: libcore/asobj/Object.cpp:291
+#: libcore/asobj/Object.cpp:288
 #, c-format
 msgid ""
 "Invalid call to Object.registerClass(%s) - second argument (class) is not a "
@@ -2129,12 +2192,12 @@ msgid ""
 msgstr ""
 "Neplatné volání Object.registerClass(%s) – druhý argument (třída) není funkce"
 
-#: libcore/asobj/Object.cpp:318
+#: libcore/asobj/Object.cpp:315
 #, c-format
 msgid "Object.registerClass(%s, %s): can't find exported symbol"
 msgstr "Object.registerClass(%s, %s): exportovaný symbol nelze nalézt"
 
-#: libcore/asobj/Object.cpp:331
+#: libcore/asobj/Object.cpp:328
 #, c-format
 msgid ""
 "Object.registerClass(%s, %s): exported symbol is not a MovieClip symbol "
@@ -2143,44 +2206,44 @@ msgstr ""
 "Object.registerClass(%s, %s): exportovaný symbol není MovieClip symbolem "
 "(sprite_definition), ale %s"
 
-#: libcore/asobj/Object.cpp:352
+#: libcore/asobj/Object.cpp:349
 msgid "Object.hasOwnProperty() requires one arg"
 msgstr "Object.hasOwnProperty() vyžaduje jede argument"
 
-#: libcore/asobj/Object.cpp:361
+#: libcore/asobj/Object.cpp:358
 #, c-format
 msgid "Invalid call to Object.hasOwnProperty('%s')"
 msgstr "Neplatné volání Object.hasOwnProperty(„%s“)"
 
-#: libcore/asobj/Object.cpp:377
+#: libcore/asobj/Object.cpp:374
 msgid "Object.isPropertyEnumerable() requires one arg"
 msgstr "Object.isPropertyEnumerable() vyžaduje jeden argument"
 
-#: libcore/asobj/Object.cpp:385
+#: libcore/asobj/Object.cpp:382
 #, c-format
 msgid "Invalid call to Object.isPropertyEnumerable('%s')"
 msgstr "Neplatné volání Object.isPropertyEnumerable(„%s)“"
 
-#: libcore/asobj/Object.cpp:408
+#: libcore/asobj/Object.cpp:405
 msgid "Object.isPrototypeOf() requires one arg"
 msgstr "Object.isPrototypeOf() vyžaduje jeden argument"
 
-#: libcore/asobj/Object.cpp:416
+#: libcore/asobj/Object.cpp:413
 #, c-format
 msgid "First arg to Object.isPrototypeOf(%s) is not an object"
 msgstr "První argument Object.isPrototypeOf(%s) není objekt"
 
-#: libcore/asobj/Object.cpp:436
+#: libcore/asobj/Object.cpp:433
 #, c-format
 msgid "Object.watch(%s): missing arguments"
 msgstr "Object.watch(%s): postrádám argument"
 
-#: libcore/asobj/Object.cpp:448
+#: libcore/asobj/Object.cpp:445
 #, c-format
 msgid "Object.watch(%s): second argument is not a function"
 msgstr "Object.watch(%s): druhý argument není funkce"
 
-#: libcore/asobj/Object.cpp:473
+#: libcore/asobj/Object.cpp:470
 #, c-format
 msgid "Object.unwatch(%s): missing argument"
 msgstr "Object.unwatch(%s): postrádám argument"
@@ -2893,12 +2956,12 @@ msgstr "NetStream.play(%s): proud není připojen"
 msgid "Number.toString(%s): radix must be in the 2..36 range (%d is invalid)"
 msgstr "Number.toString(%s): základ musí být v rozsahu 2–36 (%d není platný)"
 
-#: libcore/movie_root.cpp:253
+#: libcore/movie_root.cpp:251
 #, c-format
 msgid "ActionLimits hit during setRootMovie: %s. Disable scripts?"
 msgstr "Při setRootMovie dosaženy ActionLimits: %s. Vypnout skripty?"
 
-#: libcore/movie_root.cpp:384 libcore/movie_root.cpp:394
+#: libcore/movie_root.cpp:382 libcore/movie_root.cpp:392
 #, c-format
 msgid ""
 "%s.swapDepth(%d): movie has a depth (%d) below static depth zone (%d), won't "
@@ -2907,81 +2970,81 @@ msgstr ""
 "%s.swapDepth(%d): film má hloubku (%d) pod zónou statické hloubky (%d), jeho "
 "hloubka nebude zaměněna"
 
-#: libcore/movie_root.cpp:461
+#: libcore/movie_root.cpp:459
 msgid "Original root movie can't be removed"
 msgstr "Původní kořenový film nemůže být odstraněn"
 
-#: libcore/movie_root.cpp:616
+#: libcore/movie_root.cpp:614
 #, c-format
 msgid "ActionLimits hit notifying key listeners: %s."
 msgstr "Při obesílání posluchačů kláves dosaženy ActionLimits: %s."
 
-#: libcore/movie_root.cpp:725
+#: libcore/movie_root.cpp:723
 #, c-format
 msgid "ActionLimits hit during mouse event processing: %s. Disable scripts ?"
 msgstr ""
 "Při zpracování události myši dosaženy ActionLimits: %s. Vypnout skripty?"
 
-#: libcore/movie_root.cpp:892
+#: libcore/movie_root.cpp:890
 #, c-format
 msgid "Action limit hit during advance: %s"
 msgstr "Při advance dosažen Action limit: %s"
 
-#: libcore/movie_root.cpp:896
+#: libcore/movie_root.cpp:894
 #, c-format
 msgid "Buffer overread during advance: %s"
 msgstr "Při advance čten buffer za svými hranicemi: %s"
 
-#: libcore/movie_root.cpp:1014
+#: libcore/movie_root.cpp:1012
 #, c-format
 msgid "ActionLimits hit notifying mouse events: %s."
 msgstr "Při oznamování události myši dosaženy ActionLimits: %s."
 
-#: libcore/movie_root.cpp:1628
+#: libcore/movie_root.cpp:1626
 #, c-format
 msgid "Attempt to write response to ExternalInterface requests fd %d"
 msgstr "Pokus zapsat odpověď na deskriptor požadavků ExternalInterface %d"
 
-#: libcore/movie_root.cpp:1632
+#: libcore/movie_root.cpp:1630
 #, c-format
 msgid "Could not write to user-provided host requests fd %d: %s"
 msgstr ""
 "Nemohu zapsat požadavek na server do uživatelem dodaného deskriptoru %d: %s"
 
-#: libcore/movie_root.cpp:1799 libcore/movie_root.cpp:1832
-#: libcore/movie_root.cpp:1891
+#: libcore/movie_root.cpp:1797 libcore/movie_root.cpp:1830
+#: libcore/movie_root.cpp:1889
 #, c-format
 msgid "Could not write to browser fd #%d: %s"
 msgstr "Nebylo možné zapsat do deskriptoru prohlížeče č. %d: %s"
 
-#: libcore/movie_root.cpp:2117
+#: libcore/movie_root.cpp:2115
 #, c-format
 msgid "Launching URL: %s"
 msgstr "Spouštím URL: %s"
 
-#: libcore/movie_root.cpp:2120
+#: libcore/movie_root.cpp:2118
 #, c-format
 msgid "Fork failed launching url opener '%s'"
 msgstr "Služba fork při spouštění obsluhy URL „%s“ selhala"
 
-#: libcore/movie_root.cpp:2161
+#: libcore/movie_root.cpp:2159
 #, c-format
 msgid "Attempt to write geturl requests fd #%d"
 msgstr "Pokus zapsat požadavek geturl na deskriptor č. %d"
 
 # TODO: plural
-#: libcore/movie_root.cpp:2167
+#: libcore/movie_root.cpp:2165
 #, c-format
 msgid "Could only write %d bytes to fd #%d"
 msgstr "Pouze %d bajtů mohlo být zapsáno na deskriptor č. %d"
 
 # TODO: plural
-#: libcore/movie_root.cpp:2179
+#: libcore/movie_root.cpp:2177
 #, c-format
 msgid "Setting script limits: max recursion %d, timeout %d seconds"
 msgstr "Nastavuji limity skriptu: max. rekurze %d, časový limit %d sekund"
 
-#: libcore/movie_root.cpp:2242
+#: libcore/movie_root.cpp:2240
 msgid "Live MovieClips"
 msgstr ""
 
@@ -3022,10 +3085,6 @@ msgstr "Při volání isPrototypeOf zjištěna kruhová závislost"
 msgid "%d members of object %p follow"
 msgstr "následuje %d členů objektu %p"
 
-#: libcore/StreamProvider.cpp:137
-msgid "POST data discarded while getting a stream from file: uri"
-msgstr "Protože proud pochází z URI „file:“, zahazuji data z POST."
-
 #: libcore/as_function.cpp:203
 msgid "Function.apply() called with no args"
 msgstr "Function.apply() zavoláno bez argumentů"
@@ -3038,44 +3097,6 @@ msgid ""
 msgstr ""
 "Function.apply() dostala %d argumentů, očekávány nejvýše 2 – zahazuji "
 "přebytečné"
-
-#: libcore/debugger.cpp:140
-msgid "Debugger enabled >> "
-msgstr "Debugger zapnut >> "
-
-#: libcore/debugger.cpp:354 libcore/debugger.cpp:395
-msgid "No format flag"
-msgstr "Žádný formátovací příznak"
-
-#: libcore/debugger.cpp:464
-#, c-format
-msgid "Setting watchpoint for variable: \"%s\""
-msgstr "Nastavuji sledování proměnné: „%s“"
-
-#: libcore/debugger.cpp:511
-#, c-format
-msgid "Matched for variable \"%s\": \"%s\""
-msgstr "Souhlasí s proměnnou „%s“: „%s“"
-
-#: libcore/debugger.cpp:526 libcore/debugger.cpp:545 libcore/debugger.cpp:558
-#: libcore/debugger.cpp:621
-#, c-format
-msgid "WARNING: environment not set in %s"
-msgstr "VAROVÁNÍ: prostředí nenastaveno v %s"
-
-#: libcore/debugger.cpp:562
-#, c-format
-msgid "Stack Dump of: %p"
-msgstr "Výpis zásobníku pro: %p"
-
-#: libcore/debugger.cpp:591
-#, c-format
-msgid "Stack Dump of 0x%p: empty"
-msgstr "Výpis zásobníku 0x%p: prázdný"
-
-#: libcore/debugger.cpp:626
-msgid "Global Registers Dump:"
-msgstr "Výpis globálních registrů:"
 
 #: libcore/SWFStream.cpp:285 libcore/parser/action_buffer.cpp:539
 msgid "Native floating point format not recognised"
@@ -4061,65 +4082,6 @@ msgstr "Chyba při otevírání fontu „%s“"
 msgid "Property %s is read-only %s, not setting it to %s"
 msgstr "Vlastnost %s je %s jen pro čtení,  na %s nebude nastavena"
 
-#: libcore/URLAccessManager.cpp:91
-#, c-format
-msgid "Load from host %s granted (whitelisted)"
-msgstr "Nahrávání ze stroje %s povoleno (na seznamu povolených)"
-
-#: libcore/URLAccessManager.cpp:97
-#, c-format
-msgid "Load from host %s forbidden (not in non-empty whitelist)"
-msgstr "Nahrávání ze stroje %s zakázáno (není v neprázdném seznamu povolených)"
-
-#: libcore/URLAccessManager.cpp:111
-#, c-format
-msgid "Load from host %s forbidden (blacklisted)"
-msgstr "Nahrávání ze stroje %s zakázáno (na seznamu zakázaných)"
-
-#: libcore/URLAccessManager.cpp:116
-#, c-format
-msgid "Load from host %s granted (default)"
-msgstr "Nahrávání ze stroje %s povoleno (implicitně)"
-
-#: libcore/URLAccessManager.cpp:148
-#, c-format
-msgid "Load of file %s forbidden (starting url %s is not a local resource)"
-msgstr "Načítání souboru %s zakázáno (uvozující URL %s není místním zdrojem)"
-
-#: libcore/URLAccessManager.cpp:165
-#, c-format
-msgid "Load of file %s granted (under local sandbox %s)"
-msgstr "Načítání souboru %s povoleno (v místním vyhrazeném prostoru %s)"
-
-#: libcore/URLAccessManager.cpp:173
-#, c-format
-msgid "Load of file %s forbidden (not under local sandboxes)"
-msgstr "Načítání souboru %s zakázáno (mimo místní vyhrazené prostory)"
-
-#: libcore/URLAccessManager.cpp:213
-#, c-format
-msgid "gethostname failed: %s"
-msgstr "gethostname selhala: %s"
-
-#: libcore/URLAccessManager.cpp:235
-#, c-format
-msgid "Load from host %s forbidden (not in the local domain)"
-msgstr "Nahrávání ze stroje %s zakázáno (není v místní doméně)"
-
-#: libcore/URLAccessManager.cpp:241
-#, c-format
-msgid "Load from host %s forbidden (not on the local host)"
-msgstr "Nahrávání ze stroje %s zakázáno (není na tomto stroji)"
-
-#: libcore/URLAccessManager.cpp:273
-#, c-format
-msgid "Checking security of URL '%s'"
-msgstr "Prověřuji bezpečnost URL „%s“"
-
-#: libcore/URLAccessManager.cpp:285
-msgid "Network connection without hostname requested"
-msgstr "Požadováno síťové spojení bez názvu stroje"
-
 #: libcore/vm/Machine.cpp:894
 #, c-format
 msgid "Can't push a null value onto the scope stack (%s)."
@@ -5074,8 +5036,8 @@ msgstr "-l\tVypíše všechny soubory .sol v implicitním adresáři"
 msgid "Gnash soldumper version: %s, Gnash version: %s\n"
 msgstr "Verze gnashového soldumperu: %s, Verze Gnashe: %s\n"
 
-#: utilities/soldumper.cpp:121 utilities/processor.cpp:281
-#: utilities/flvdumper.cpp:154 gui/gnash.cpp:254
+#: utilities/soldumper.cpp:121 utilities/processor.cpp:277
+#: utilities/flvdumper.cpp:154 gui/gnash.cpp:313
 msgid "Verbose output turned on"
 msgstr "Zapnut upovídaný výstup"
 
@@ -5087,45 +5049,37 @@ msgstr "vynucuji přístup jen k místním adresářům"
 msgid "List .sol files in the default directory"
 msgstr "Vypsat soubory .sol v implicitním adresáři"
 
-#: utilities/processor.cpp:152
+#: utilities/processor.cpp:148
 #, c-format
 msgid "fs_callback(%p): %s %s"
 msgstr "fs_callback(%p): %s %s"
 
-#: utilities/processor.cpp:165
+#: utilities/processor.cpp:161
 #, c-format
 msgid "eventCallback: %s %s"
 msgstr "eventCallback: %s %s"
 
-#: utilities/processor.cpp:242
+#: utilities/processor.cpp:238
 #, c-format
 msgid "Gnash gprocessor version: %s, Gnash version: %s\n"
 msgstr "Verze gnashového gprocessoru: %s, verze Gnashe: %s\n"
 
-#: utilities/processor.cpp:287 gui/gnash.cpp:340
-msgid "Setting debugger ON"
-msgstr "ZAPÍNÁM debugger"
-
-#: utilities/processor.cpp:289
-msgid "The debugger has been disabled at configuration time"
-msgstr "Debugger byl zakázán při konfiguraci"
-
-#: utilities/processor.cpp:298
+#: utilities/processor.cpp:286
 msgid "Verbose actions disabled at compile time"
 msgstr "Upovídané akce zakázány při překladu"
 
-#: utilities/processor.cpp:305
+#: utilities/processor.cpp:293
 msgid "Verbose parsing disabled at compile time"
 msgstr "Upovídané rozebírání zakázáno při překladu"
 
-#: utilities/processor.cpp:427 utilities/processor.cpp:430 gui/Player.cpp:225
-#: gui/Player.cpp:245 gui/pythonmod/gnash-view.cpp:441
-#: gui/pythonmod/gnash-view.cpp:444
+#: utilities/processor.cpp:415 utilities/processor.cpp:418 gui/Player.cpp:219
+#: gui/Player.cpp:240 gui/pythonmod/gnash-view.cpp:440
+#: gui/pythonmod/gnash-view.cpp:443
 #, c-format
 msgid "%s appended to local sandboxes"
 msgstr "%s připojen k místním pískovištím (sandboxes)"
 
-#: utilities/processor.cpp:603
+#: utilities/processor.cpp:591
 #, c-format
 msgid ""
 "gprocessor -- an SWF processor for Gnash.\n"
@@ -5144,7 +5098,7 @@ msgstr ""
 "\n"
 "%s%s%s%s"
 
-#: utilities/processor.cpp:610
+#: utilities/processor.cpp:598
 msgid ""
 "options:\n"
 "\n"
@@ -5158,15 +5112,15 @@ msgstr ""
 "  --version   Vypíše čísla verzí.\n"
 "  -v          Bude upovídaný; tj. na standardní výstup vypisuje protokol\n"
 
-#: utilities/processor.cpp:617
+#: utilities/processor.cpp:605
 msgid "  -vp         Be verbose about movie parsing\n"
 msgstr "  -vp         Upovídané rozebírání filmu\n"
 
-#: utilities/processor.cpp:622
+#: utilities/processor.cpp:610
 msgid "  -va         Be verbose about ActionScript\n"
 msgstr "  -va         Upovídaný ActionScript\n"
 
-#: utilities/processor.cpp:627
+#: utilities/processor.cpp:615
 msgid ""
 "  -d [<ms>]\n"
 "              Milliseconds delay between advances (0 by default).\n"
@@ -5195,7 +5149,7 @@ msgstr ""
 msgid "Error parsing command line: "
 msgstr "Chyba při rozebírání příkazového řádku: "
 
-#: utilities/flvdumper.cpp:172 gui/gnash.cpp:484
+#: utilities/flvdumper.cpp:172 gui/gnash.cpp:531
 msgid "Error parsing command line options: "
 msgstr "Chyba při rozebírání přepínačů z příkazového řádku: "
 
@@ -5203,7 +5157,7 @@ msgstr "Chyba při rozebírání přepínačů z příkazového řádku: "
 msgid "This is a Gnash flvdumper bug."
 msgstr "Toto je chyba gnashového flvdumperu."
 
-#: utilities/flvdumper.cpp:178 gui/gnash.cpp:538
+#: utilities/flvdumper.cpp:178 gui/gnash.cpp:585
 msgid "Error: no input file was specified. Exiting."
 msgstr "Chyba: nebyl zadán žádný vstupní soubor. Končím."
 
@@ -5401,191 +5355,187 @@ msgstr "Zvuk"
 msgid "GtkGui: Window resize request received"
 msgstr "GtkGui: Obdržen požadavek na změnu velikosti okna"
 
-#: gui/gtk/gtk.cpp:1224 gui/kde/Kde4Gui.cpp:742
+#: gui/gtk/gtk.cpp:1218 gui/kde/Kde4Gui.cpp:742
 msgid "Gnash preferences"
 msgstr "Nastavení Gnashe"
 
-#: gui/gtk/gtk.cpp:1259
+#: gui/gtk/gtk.cpp:1253
 msgid "_Network"
 msgstr "_Síť"
 
-#: gui/gtk/gtk.cpp:1263 gui/kde/Kde4Gui.cpp:859
+#: gui/gtk/gtk.cpp:1257 gui/kde/Kde4Gui.cpp:859
 msgid "<b>Network preferences</b>"
 msgstr "<b>Předvolby sítě</b>"
 
-#: gui/gtk/gtk.cpp:1271
+#: gui/gtk/gtk.cpp:1265
 msgid "Network timeout in seconds (0 for no timeout):"
 msgstr "Časový limit sítě v sekundách (0 pro žádný limit):"
 
-#: gui/gtk/gtk.cpp:1290
+#: gui/gtk/gtk.cpp:1284
 msgid "_Logging"
 msgstr "Protoko_lování"
 
-#: gui/gtk/gtk.cpp:1295 gui/kde/Kde4Gui.cpp:760
+#: gui/gtk/gtk.cpp:1289 gui/kde/Kde4Gui.cpp:760
 msgid "<b>Logging options</b>"
 msgstr "<b>Volby protokolování</b>"
 
-#: gui/gtk/gtk.cpp:1299
+#: gui/gtk/gtk.cpp:1293
 msgid "Verbosity level:"
 msgstr "Úroveň upovídanosti:"
 
-#: gui/gtk/gtk.cpp:1312
+#: gui/gtk/gtk.cpp:1306
 msgid "Log to _file"
 msgstr "Zaznamenávat do _souboru"
 
-#: gui/gtk/gtk.cpp:1318
+#: gui/gtk/gtk.cpp:1312
 msgid "Logfile name:"
 msgstr "Jméno souboru s protokolem:"
 
-#: gui/gtk/gtk.cpp:1331
+#: gui/gtk/gtk.cpp:1325
 msgid "Log _parser output"
 msgstr "Zaznamenávat výstup _parseru"
 
-#: gui/gtk/gtk.cpp:1339
+#: gui/gtk/gtk.cpp:1333
 msgid "Log SWF _actions"
 msgstr "Zaznamenávat _akce SWF"
 
-#: gui/gtk/gtk.cpp:1347
+#: gui/gtk/gtk.cpp:1341
 msgid "Log malformed SWF _errors"
 msgstr "Zaznamenávat _chyby poškozeného SWF"
 
-#: gui/gtk/gtk.cpp:1355
+#: gui/gtk/gtk.cpp:1349
 msgid "Log ActionScript _coding errors"
 msgstr "Zaznamenávat chyby v _kódu ActionScriptu"
 
 #: gui/gtk/gtk.cpp:1365
-msgid "Enable _debugger"
-msgstr "Zapnout _ladění"
-
-#: gui/gtk/gtk.cpp:1383
 msgid "_Security"
 msgstr "_Bezpečnost"
 
-#: gui/gtk/gtk.cpp:1390 gui/kde/Kde4Gui.cpp:811
+#: gui/gtk/gtk.cpp:1372 gui/kde/Kde4Gui.cpp:811
 msgid "<b>Network connections</b>"
 msgstr "<b>Síťová spojení</b>"
 
-#: gui/gtk/gtk.cpp:1396
+#: gui/gtk/gtk.cpp:1378
 msgid "Connect only to local _host"
 msgstr "Připojovat se jen na _tento stroj"
 
-#: gui/gtk/gtk.cpp:1403
+#: gui/gtk/gtk.cpp:1385
 msgid "Connect only to local _domain"
 msgstr "Připojovat se jen do místní _domény"
 
-#: gui/gtk/gtk.cpp:1410
+#: gui/gtk/gtk.cpp:1392
 msgid "Disable SSL _verification"
 msgstr "Vypnout o_věřování SSL"
 
-#: gui/gtk/gtk.cpp:1417
+#: gui/gtk/gtk.cpp:1399
 msgid "_Whitelist"
 msgstr "Seznam _povolených"
 
-#: gui/gtk/gtk.cpp:1426
+#: gui/gtk/gtk.cpp:1408
 msgid "_Blacklist"
 msgstr "Seznam _zakázaných"
 
-#: gui/gtk/gtk.cpp:1435 gui/kde/Kde4Gui.cpp:829
+#: gui/gtk/gtk.cpp:1417 gui/kde/Kde4Gui.cpp:829
 msgid "<b>Privacy</b>"
 msgstr "<b>Soukromí</b>"
 
-#: gui/gtk/gtk.cpp:1439 gui/kde/Kde4Gui.cpp:832
+#: gui/gtk/gtk.cpp:1421 gui/kde/Kde4Gui.cpp:832
 msgid "Shared objects directory:"
 msgstr "Adresář se sdílenými objekty:"
 
-#: gui/gtk/gtk.cpp:1451
+#: gui/gtk/gtk.cpp:1433
 msgid "Do _not write Shared Object files"
 msgstr "_Nezapisovat soubory sdílených objektů"
 
-#: gui/gtk/gtk.cpp:1458
+#: gui/gtk/gtk.cpp:1440
 msgid "Only _access local Shared Object files"
 msgstr "_Zpřístupnit jen soubory s místními sdílenými objekty"
 
-#: gui/gtk/gtk.cpp:1465
+#: gui/gtk/gtk.cpp:1447
 msgid "Disable Local _Connection object"
 msgstr "Zakázat objekty místních spojení"
 
-#: gui/gtk/gtk.cpp:1479
+#: gui/gtk/gtk.cpp:1461
 msgid "_Media"
 msgstr "_Média"
 
-#: gui/gtk/gtk.cpp:1485 gui/kde/Kde4Gui.cpp:877
+#: gui/gtk/gtk.cpp:1467 gui/kde/Kde4Gui.cpp:877
 msgid "<b>Sound</b>"
 msgstr "<b>Zvuk</b>"
 
-#: gui/gtk/gtk.cpp:1490
+#: gui/gtk/gtk.cpp:1472
 msgid "Use sound _handler"
 msgstr "Použít obslu_hu zvuku"
 
-#: gui/gtk/gtk.cpp:1498
+#: gui/gtk/gtk.cpp:1480
 msgid "<b>Media Streams</b>"
 msgstr "<b>Proudy médií</b>"
 
-#: gui/gtk/gtk.cpp:1504 gui/kde/Kde4Gui.cpp:884
+#: gui/gtk/gtk.cpp:1486 gui/kde/Kde4Gui.cpp:884
 msgid "Save media streams to disk"
 msgstr "Ukládat na disk proudy médií"
 
-#: gui/gtk/gtk.cpp:1513 gui/kde/Kde4Gui.cpp:890
+#: gui/gtk/gtk.cpp:1495 gui/kde/Kde4Gui.cpp:890
 msgid "Save dynamically loaded media to disk"
 msgstr "Ukládat na disk dynamicky nahrávaná média"
 
-#: gui/gtk/gtk.cpp:1521 gui/kde/Kde4Gui.cpp:894
+#: gui/gtk/gtk.cpp:1503 gui/kde/Kde4Gui.cpp:894
 msgid "Saved media directory:"
 msgstr "Adresář s uloženými médii:"
 
-#: gui/gtk/gtk.cpp:1541
+#: gui/gtk/gtk.cpp:1523
 msgid "_Player"
 msgstr "_Přehrávač"
 
-#: gui/gtk/gtk.cpp:1547 gui/kde/Kde4Gui.cpp:906
+#: gui/gtk/gtk.cpp:1529 gui/kde/Kde4Gui.cpp:906
 msgid "<b>Player description</b>"
 msgstr "<b>Popis přehrávače</b>"
 
-#: gui/gtk/gtk.cpp:1555 gui/kde/Kde4Gui.cpp:909
+#: gui/gtk/gtk.cpp:1537 gui/kde/Kde4Gui.cpp:909
 msgid "Player version:"
 msgstr "Verze přehrávače:"
 
-#: gui/gtk/gtk.cpp:1571 gui/kde/Kde4Gui.cpp:915
+#: gui/gtk/gtk.cpp:1553 gui/kde/Kde4Gui.cpp:915
 msgid "Operating system:"
 msgstr "Operační systém:"
 
-#: gui/gtk/gtk.cpp:1581
+#: gui/gtk/gtk.cpp:1563
 msgid "<i>If blank, Gnash will detect your OS</i>"
 msgstr "<i>Není-li uvedeno, Gnash váš OS odhadne.</i>"
 
-#: gui/gtk/gtk.cpp:1591 gui/kde/Kde4Gui.cpp:926
+#: gui/gtk/gtk.cpp:1573 gui/kde/Kde4Gui.cpp:926
 msgid "URL opener:"
 msgstr "URL otevírat pomocí:"
 
-#: gui/gtk/gtk.cpp:1603 gui/kde/Kde4Gui.cpp:933
+#: gui/gtk/gtk.cpp:1585 gui/kde/Kde4Gui.cpp:933
 msgid "<b>Performance</b>"
 msgstr "<b>Výkon</b>"
 
-#: gui/gtk/gtk.cpp:1617 gui/kde/Kde4Gui.cpp:936
+#: gui/gtk/gtk.cpp:1599 gui/kde/Kde4Gui.cpp:936
 msgid "Max size of movie library:"
 msgstr "Maximální velikost knihovny filmu:"
 
-#: gui/gtk/gtk.cpp:1629
+#: gui/gtk/gtk.cpp:1611
 msgid "Start _Gnash in pause mode"
 msgstr "Spouštět _Gnash v režimu pozastaveného přehrávání"
 
-#: gui/gtk/gtk.cpp:1653 gui/kde/Kde4Gui.cpp:455
+#: gui/gtk/gtk.cpp:1635 gui/kde/Kde4Gui.cpp:455
 msgid "Movie properties"
 msgstr "Vlastnosti filmu"
 
-#: gui/gtk/gtk.cpp:1727 gui/kde/Kde4Gui.cpp:474
+#: gui/gtk/gtk.cpp:1709 gui/kde/Kde4Gui.cpp:474
 msgid "Variable"
 msgstr "Proměnná"
 
-#: gui/gtk/gtk.cpp:1740 gui/kde/Kde4Gui.cpp:475
+#: gui/gtk/gtk.cpp:1722 gui/kde/Kde4Gui.cpp:475
 msgid "Value"
 msgstr "Hodnota"
 
-#: gui/gtk/gtk.cpp:1794
+#: gui/gtk/gtk.cpp:1776
 msgid "Gnash is the GNU SWF Player based on GameSWF."
 msgstr "Gnash je GNU přehrávač SWF souborů založený na GameSWF."
 
-#: gui/gtk/gtk.cpp:1798
+#: gui/gtk/gtk.cpp:1780
 msgid ""
 "\n"
 "Renderer: "
@@ -5593,7 +5543,7 @@ msgstr ""
 "\n"
 "Vykreslování přes: "
 
-#: gui/gtk/gtk.cpp:1800
+#: gui/gtk/gtk.cpp:1782
 msgid ""
 "\n"
 "Hardware Acceleration: "
@@ -5601,7 +5551,7 @@ msgstr ""
 "\n"
 "Hardwarové urychlení: "
 
-#: gui/gtk/gtk.cpp:1802
+#: gui/gtk/gtk.cpp:1784
 msgid ""
 "\n"
 "GUI: "
@@ -5609,7 +5559,7 @@ msgstr ""
 "\n"
 "GUI: "
 
-#: gui/gtk/gtk.cpp:1804
+#: gui/gtk/gtk.cpp:1786
 msgid ""
 "\n"
 "Media: "
@@ -5617,93 +5567,93 @@ msgstr ""
 "\n"
 "Média: "
 
-#: gui/gtk/gtk.cpp:1826 gui/gtk/gtk.cpp:1863
+#: gui/gtk/gtk.cpp:1808 gui/gtk/gtk.cpp:1845
 msgid "translator-credits"
 msgstr "Petr Písař"
 
-#: gui/gtk/gtk.cpp:1855
+#: gui/gtk/gtk.cpp:1837
 msgid "Gnash"
 msgstr "Gnash"
 
-#: gui/gtk/gtk.cpp:1898
+#: gui/gtk/gtk.cpp:1880
 msgid "_File"
 msgstr "_Soubor"
 
-#: gui/gtk/gtk.cpp:1951
+#: gui/gtk/gtk.cpp:1933
 msgid "_Edit"
 msgstr "_Upravit"
 
-#: gui/gtk/gtk.cpp:1971
+#: gui/gtk/gtk.cpp:1953
 msgid "_Help"
 msgstr "_Nápověda"
 
-#: gui/gtk/gtk.cpp:1991
+#: gui/gtk/gtk.cpp:1973
 msgid "_View"
 msgstr "_Zobrazit"
 
-#: gui/gtk/gtk.cpp:1999
+#: gui/gtk/gtk.cpp:1981
 msgid "Redraw"
 msgstr "Překreslit"
 
-#: gui/gtk/gtk.cpp:2009 gui/gtk/gtk.cpp:2014
+#: gui/gtk/gtk.cpp:1991 gui/gtk/gtk.cpp:1996 gui/gnash.cpp:71
 msgid "Toggle fullscreen"
 msgstr "Přepnout celoobrazovkový režim"
 
-#: gui/gtk/gtk.cpp:2023
+#: gui/gtk/gtk.cpp:2005
 msgid "Show updated ranges"
 msgstr "Ukazovat změněné oblasti"
 
-#: gui/gtk/gtk.cpp:2042
+#: gui/gtk/gtk.cpp:2024
 msgid "_Quality"
 msgstr "_Kvalita"
 
-#: gui/gtk/gtk.cpp:2052
+#: gui/gtk/gtk.cpp:2034
 msgid "Low"
 msgstr "Nízká"
 
-#: gui/gtk/gtk.cpp:2058
+#: gui/gtk/gtk.cpp:2040
 msgid "Medium"
 msgstr "Střední"
 
-#: gui/gtk/gtk.cpp:2064
+#: gui/gtk/gtk.cpp:2046
 msgid "High"
 msgstr "Vysoká"
 
-#: gui/gtk/gtk.cpp:2070
+#: gui/gtk/gtk.cpp:2052
 msgid "Best"
 msgstr "Nejlepší"
 
-#: gui/gtk/gtk.cpp:2083
+#: gui/gtk/gtk.cpp:2065
 msgid "Movie _Control"
 msgstr "_Ovládání filmu"
 
-#: gui/gtk/gtk.cpp:2094 gui/kde/Kde4Gui.cpp:578
+#: gui/gtk/gtk.cpp:2076 gui/kde/Kde4Gui.cpp:578
 msgid "Play"
 msgstr "Přehrát"
 
-#: gui/gtk/gtk.cpp:2105 gui/kde/Kde4Gui.cpp:582
+#: gui/gtk/gtk.cpp:2087 gui/kde/Kde4Gui.cpp:582
 msgid "Pause"
 msgstr "Pozastavit"
 
-#: gui/gtk/gtk.cpp:2115 gui/kde/Kde4Gui.cpp:586
+#: gui/gtk/gtk.cpp:2097 gui/kde/Kde4Gui.cpp:586
 msgid "Stop"
 msgstr "Zastavit"
 
-#: gui/gtk/gtk.cpp:2127 gui/kde/kde.cpp:416
+#: gui/gtk/gtk.cpp:2109 gui/kde/kde.cpp:416
 msgid "Restart Movie"
 msgstr "Přehrát od začátku"
 
-#: gui/gtk/gtk.cpp:2214 gui/gtk/gtk.cpp:2215
+#: gui/gtk/gtk.cpp:2196 gui/gtk/gtk.cpp:2197
 #, c-format
 msgid "Couldn't find pixmap file: %s"
 msgstr "Nemohu najít soubor s pixmapu: %s"
 
-#: gui/gtk/gtk.cpp:2221
+#: gui/gtk/gtk.cpp:2203
 #, c-format
 msgid "Failed to load pixbuf file: %s: %s"
 msgstr "Selhalo načtení pixbuf souboru: %s: %s"
 
-#: gui/gtk/gtk.cpp:2511 gui/aos4/aos4.cpp:266
+#: gui/gtk/gtk.cpp:2493 gui/aos4/aos4.cpp:266
 #, c-format
 msgid ""
 "Attempting to open file %s.\n"
@@ -5712,7 +5662,7 @@ msgstr ""
 "Pokouším se otevřít soubor %s.\n"
 "POZNÁMKA: Schopnost otevírání souboru ještě nebyla implementována!"
 
-#: gui/gtk/gtk.cpp:2528 gui/gtk/gtk.cpp:2541
+#: gui/gtk/gtk.cpp:2510 gui/gtk/gtk.cpp:2523
 msgid "Open file"
 msgstr "Otevřít soubor"
 
@@ -5972,57 +5922,57 @@ msgstr "%s nebylo možné otevřít: %s"
 msgid "Could not set non-blocking mode for pointing device: %s"
 msgstr "Neblokující režim pro polohovací zařízení nebylo možné nastavit: %s"
 
-#: gui/fb/fb.cpp:208
+#: gui/fb/fb.cpp:207
 msgid "Closing framebuffer device"
 msgstr "Uzavírám zařízení framebufferu."
 
-#: gui/fb/fb.cpp:214
+#: gui/fb/fb.cpp:213
 msgid "Free'ing offscreen buffer"
 msgstr "Uvolňuji mimoobrazovkový buffer"
 
-#: gui/fb/fb.cpp:228
+#: gui/fb/fb.cpp:227
 msgid "LUT8: Setting up colormap"
 msgstr "LUT8: Nastavuji paletu"
 
-#: gui/fb/fb.cpp:253
+#: gui/fb/fb.cpp:252
 #, c-format
 msgid "LUT8: Error setting colormap: %s"
 msgstr "LUT8: Chyba při nastavování palety: %s"
 
-#: gui/fb/fb.cpp:294
+#: gui/fb/fb.cpp:293
 #, c-format
 msgid "Framebuffer device uses %d bytes of memory."
 msgstr "Zařízení framebufferu používá %d bajtů paměti."
 
-#: gui/fb/fb.cpp:296
+#: gui/fb/fb.cpp:295
 #, c-format
 msgid "Video mode: %dx%d with %d bits per pixel."
 msgstr "Videorežim: %d×%d s %d bity na pixel."
 
-#: gui/fb/fb.cpp:341
+#: gui/fb/fb.cpp:340
 msgid "Double buffering enabled"
 msgstr "Double bufferring zapnut"
 
-#: gui/fb/fb.cpp:344
+#: gui/fb/fb.cpp:343
 msgid "Double buffering disabled"
 msgstr "Double buffering vypnut"
 
-#: gui/fb/fb.cpp:352
+#: gui/fb/fb.cpp:351
 #, c-format
 msgid "red channel: %d / %d"
 msgstr "červený kanál: %d/%d"
 
-#: gui/fb/fb.cpp:354
+#: gui/fb/fb.cpp:353
 #, c-format
 msgid "green channel: %d / %d"
 msgstr "zelený kanál: %d/%d"
 
-#: gui/fb/fb.cpp:356
+#: gui/fb/fb.cpp:355
 #, c-format
 msgid "blue channel: %d / %d"
 msgstr "modrý kanál: %d/%d"
 
-#: gui/fb/fb.cpp:358
+#: gui/fb/fb.cpp:357
 #, c-format
 msgid "Total bits per pixel: %d"
 msgstr "Celkem bitů na pixel: %d"
@@ -6157,62 +6107,62 @@ msgstr "kliknutí myši! %d"
 msgid "mouse_command: discarded %d bytes from input buffer"
 msgstr "mouse_command: %d bajtů ze vstupního bufferu zahozeno"
 
-#: gui/Player.cpp:155
+#: gui/Player.cpp:149
 #, c-format
 msgid "Timer delay set to %d milliseconds"
 msgstr "Prodleva časovače nastaveno na %d milisekund(u/y)"
 
-#: gui/Player.cpp:176 gui/pythonmod/gnash-view.cpp:225
+#: gui/Player.cpp:170 gui/pythonmod/gnash-view.cpp:225
 msgid "Sound requested but no sound support compiled in"
 msgstr "Požadován zvuk, ale podpora zvuku nebyla zakompilována"
 
-#: gui/Player.cpp:181 gui/pythonmod/gnash-view.cpp:222
+#: gui/Player.cpp:175 gui/pythonmod/gnash-view.cpp:222
 #, c-format
 msgid "Could not create sound handler: %s. Will continue w/out sound."
 msgstr "Nebylo možné vytvořit obsluhu zvuku: %s. Bude se pokračovat bez zvuku."
 
-#: gui/Player.cpp:201
+#: gui/Player.cpp:195
 #, c-format
 msgid "Activating FPS debugging every %g seconds"
 msgstr "Aktivuji ladění FPS každých %g sekund"
 
-#: gui/Player.cpp:322
+#: gui/Player.cpp:321
 msgid "Non-existent media handler %1% specified"
 msgstr "Zadána neexistující obsluha médií %1%"
 
-#: gui/Player.cpp:369
+#: gui/Player.cpp:368
 #, c-format
 msgid ""
 "Input movie has collapsed dimensions %d/%d. Setting to 1/1 and going on."
 msgstr ""
 "Vstupní film má zřícené rozměry %d/%d. Nastavuje se na 1/1 a pokračuje se."
 
-#: gui/Player.cpp:671
+#: gui/Player.cpp:670
 #, c-format
 msgid "Unhandled callback %s with arguments %s"
 msgstr "Neobsloužené zpětné volání %s s argumenty %s"
 
-#: gui/Player.cpp:712
+#: gui/Player.cpp:711
 #, c-format
 msgid "Sent FsCommand '%s' to host fd %d"
 msgstr "FsCommand „%s“ odeslán na deskriptor stroje %d"
 
-#: gui/Player.cpp:720
+#: gui/Player.cpp:719
 #, c-format
 msgid "Running as plugin: skipping internal handling of FsCommand %s%s."
 msgstr "Běžím jako zásuvný modul: vynechávám vnitřní obsluhu fsCommand %s%s."
 
-#: gui/Player.cpp:761
+#: gui/Player.cpp:760
 #, c-format
 msgid "FsCommand exec called with argument %s"
 msgstr "Zavolán FsCommand exec s argumentem %s"
 
-#: gui/Player.cpp:778
+#: gui/Player.cpp:777
 #, c-format
 msgid "FsCommand trapallkeys called with argument %s"
 msgstr "Zavolán FcCmmand trapallkeys s argumentem %s"
 
-#: gui/Player.cpp:784
+#: gui/Player.cpp:783
 #, c-format
 msgid "FsCommand '%s(%s)' not handled internally"
 msgstr "FsCommand „%s(%s)“ není vnitřně obsluhován"
@@ -6238,32 +6188,32 @@ msgstr "volání send_data selhalo"
 msgid "# FATAL:  No filename given with -D argument."
 msgstr "# OSUDOVÉ: S argumentem -D nezadán žádný název souboru."
 
-#: gui/gui.cpp:183 gui/gui.cpp:195
+#: gui/gui.cpp:182 gui/gui.cpp:194
 msgid "Fullscreen not yet supported in this GUI"
 msgstr "Zobrazení přes celou obrazovku není v tomto GUI ještě podporováno"
 
-#: gui/gui.cpp:189
+#: gui/gui.cpp:188
 msgid "Window resize not yet supported in this GUI"
 msgstr "Změna velikosti okna není v tomto GUI ještě podporována"
 
-#: gui/gui.cpp:214
+#: gui/gui.cpp:213
 msgid "Menu hiding not yet supported in this GUI"
 msgstr "Skrývání nabídky není v tomto GUI ještě podporováno"
 
-#: gui/gui.cpp:220
+#: gui/gui.cpp:219
 msgid "Mouse show/hide not yet supported in this GUI"
 msgstr "Zobrazování/skrývání ukazatele není v tomto GUO ještě podporováno"
 
-#: gui/gui.cpp:227
+#: gui/gui.cpp:226
 msgid "menushow not yet supported in this GUI"
 msgstr "menushow není v tomto GUI ještě podporováno"
 
-#: gui/gui.cpp:468
+#: gui/gui.cpp:467
 #, c-format
 msgid "mouse @ %d,%d"
 msgstr "myš na %d,%d"
 
-#: gui/gui.cpp:964
+#: gui/gui.cpp:962
 #, c-format
 msgid "Frame %d"
 msgstr "Snímek %d"
@@ -6282,221 +6232,227 @@ msgstr "# OSUDOVÉ: S argumentem -D nezadán žádný název souboru."
 msgid "Unable to write file '%s'."
 msgstr "Do souboru „%s“ nelze zapsat."
 
-#: gui/gnash.cpp:92
-msgid "Usage: gnash [options] movie_file.swf\n"
-msgstr "Použití: gnash [PŘEPÍNAČE] SOUBOR_S_FILMEM.SWF\n"
+#: gui/gnash.cpp:65
+#, fuzzy
+msgid "Keys:"
+msgstr "Klávesy:\n"
 
-#: gui/gnash.cpp:94
-msgid "Plays a SWF (Shockwave Flash) movie\n"
-msgstr "Přehraje SWF (Shockwave Flash) film\n"
+#: gui/gnash.cpp:68
+#, fuzzy
+msgid "Quit"
+msgstr "_Kvalita"
 
-#: gui/gnash.cpp:95
-msgid "Options:\n"
-msgstr "Přepínače:\n"
+#: gui/gnash.cpp:74
+#, fuzzy
+msgid "Toggle pause"
+msgstr "Přepnout celoobrazovkový režim"
 
-#: gui/gnash.cpp:97
-msgid "  -h,  --help              Print this help and exit\n"
-msgstr "  -h,  --help              Vytiskne tuto nápovědu a skončí\n"
+#: gui/gnash.cpp:77
+#, fuzzy
+msgid "Restart the movie"
+msgstr "Přehrát od začátku"
 
-#: gui/gnash.cpp:98
-msgid "  -V,  --version           Print version information and exit\n"
-msgstr "  -V,  --version           Vytiskne informace o verzi a skončí\n"
+#: gui/gnash.cpp:80
+msgid "Take a screenshot"
+msgstr ""
+
+#: gui/gnash.cpp:83
+#, fuzzy
+msgid "Force immediate redraw"
+msgstr "  CTRL-L                   Vynutí okamžité překreslení\n"
 
 #: gui/gnash.cpp:99
-msgid "  -s,  --scale <factor>    Scale the movie by the specified factor\n"
-msgstr "  -s,  --scale <činitel>   Škáluje film podle zadaného činitele\n"
+#, fuzzy
+msgid "Usage: gnash [options] movie_file.swf"
+msgstr "Použití: gnash [PŘEPÍNAČE] SOUBOR_S_FILMEM.SWF\n"
 
 #: gui/gnash.cpp:100
 #, fuzzy
-msgid ""
-"  -d,  --delay <num>       Number of milliseconds to delay in main loop\n"
+msgid "Plays a SWF (Shockwave Flash) movie"
+msgstr "Přehraje SWF (Shockwave Flash) film\n"
+
+#: gui/gnash.cpp:101
+#, fuzzy
+msgid "Options:"
+msgstr "Přepínače:\n"
+
+#: gui/gnash.cpp:105
+#, fuzzy
+msgid "Print this help and exit"
+msgstr "  -h,  --help              Vytiskne tuto nápovědu a skončí\n"
+
+#: gui/gnash.cpp:108
+#, fuzzy
+msgid "Print version information and exit"
+msgstr "  -V,  --version           Vytiskne informace o verzi a skončí\n"
+
+#: gui/gnash.cpp:111
+#, fuzzy
+msgid "Scale the movie by the specified factor"
+msgstr "  -s,  --scale <činitel>   Škáluje film podle zadaného činitele\n"
+
+#: gui/gnash.cpp:114
+#, fuzzy
+msgid "Number of milliseconds to delay in main loop"
 msgstr ""
 "  -d,  --delay počet       Délka čekání v milisekundách v hlavní smyčce\n"
 
-#: gui/gnash.cpp:101
-msgid "  -v,  --verbose           Produce verbose output\n"
-msgstr "  -v,  --verbose           Způsobí upovídaný výstup\n"
+#: gui/gnash.cpp:117
+#, fuzzy
+msgid "Produce verbose output"
+msgstr "-v\tUpovídaný výstup"
 
-#: gui/gnash.cpp:103
-msgid "  -va                      Be (very) verbose about action execution\n"
+#: gui/gnash.cpp:121
+#, fuzzy
+msgid "Be (very) verbose about action execution"
 msgstr ""
 "  -va                      Bude (velmi) upovídaný ohledně provádění akcí\n"
 
-#: gui/gnash.cpp:106
-msgid "  -vp                      Be (very) verbose about parsing\n"
+#: gui/gnash.cpp:126
+#, fuzzy
+msgid "Be (very) verbose about parsing"
 msgstr "  -vp                      Bude (velmi) upovídaný ohledně rozebírání\n"
 
-#: gui/gnash.cpp:108
-msgid "  -A <file>                Audio dump file (wave format)\n"
+#: gui/gnash.cpp:130
+#, fuzzy
+msgid "Audio dump file (wave format)"
 msgstr "  -A <soubor>              Soubor pro uložení zvuku (formát wave)\n"
 
-#: gui/gnash.cpp:109
+#: gui/gnash.cpp:133
 #, fuzzy
-msgid "  --hwaccel <none|vaapi> Hardware Video Accelerator to use\n"
+msgid "Hardware Video Accelerator to use"
 msgstr "  --hwaccel <none|vaapi|xv>  Použít hardwarový akcelerátor videa\n"
 
-#: gui/gnash.cpp:110
+#: gui/gnash.cpp:138
 #, fuzzy
-msgid "                           none|vaapi|omap (default: none)\n"
-msgstr ""
-"                           none|vaapi|xv|omap (implicitní: none (žádný)\n"
-
-#: gui/gnash.cpp:111
-msgid "  -x,  --xid <ID>          X11 Window ID for display\n"
+msgid "X11 Window ID for display"
 msgstr ""
 "  -x,  --xid <ID>          Identifikátor X11 okna určeného pro zobrazování\n"
 
-#: gui/gnash.cpp:112
-msgid "  -w,  --writelog          Produce the disk based debug log\n"
+#: gui/gnash.cpp:141
+#, fuzzy
+msgid "Produce the disk based debug log"
 msgstr "  -w,  --writelog          Uloží ladicí protokol na disk\n"
 
-#: gui/gnash.cpp:113
-msgid "  -j,  --width <width>     Set window width\n"
-msgstr "  -j,  --width <šířka>     Nastaví šířku okna\n"
+#: gui/gnash.cpp:144
+#, fuzzy
+msgid "Set window width"
+msgstr "Nastavuji šířku na %d"
 
-#: gui/gnash.cpp:114
-msgid "  -k,  --height <height>   Set window height\n"
-msgstr "  -k,  --height <výška>    Nastaví výšku okna\n"
+#: gui/gnash.cpp:147
+#, fuzzy
+msgid "Set window height"
+msgstr "Nastavuji výšku na %d"
 
-#: gui/gnash.cpp:115
-msgid "  -X,  --x-pos <x-pos>     Set window x position\n"
-msgstr "  -X,  --x-pos <poloha-x>  Nastaví vodorovnou polohu okna\n"
+#: gui/gnash.cpp:150
+#, fuzzy
+msgid "Set window x position"
+msgstr "Nastavuji vodorovnou polohu na %d"
 
-#: gui/gnash.cpp:116
-msgid "  -Y,  --y-pos <y-pos>     Set window y position\n"
-msgstr "  -Y,  --y-pos <poloha-y>   Nastaví svislou polohu okna\n"
+#: gui/gnash.cpp:153
+#, fuzzy
+msgid "Set window y position"
+msgstr "Nastavuji vodorovnou polohu na %d"
 
-#: gui/gnash.cpp:117
-msgid "  -1,  --once              Exit when/if movie reaches the last frame\n"
+#: gui/gnash.cpp:156
+#, fuzzy
+msgid "Exit when/if movie reaches the last frame"
 msgstr "  -1,  --once              Skončí až film dosáhne posledního snímku\n"
 
-#: gui/gnash.cpp:119
-msgid "  -g,  --debugger          Turn on the SWF debugger\n"
-msgstr "  -g,  --debugger          Zapne debugger SWF\n"
-
-#: gui/gnash.cpp:120
-msgid "  -r,  --render-mode <0|1|2|3>\n"
-msgstr "  -r,  --render-mode <0|1|2|3>\n"
-
-#: gui/gnash.cpp:121
-msgid "                           0 disable rendering and sound\n"
+#: gui/gnash.cpp:160
+#, fuzzy
+msgid "disable rendering and sound"
 msgstr "                           0 vypne vykreslování a zvuk\n"
 
-#: gui/gnash.cpp:122
-msgid "                           1 enable rendering, disable sound\n"
+#: gui/gnash.cpp:162
+#, fuzzy
+msgid "enable rendering, disable sound"
 msgstr "                           1 zapne vykreslování, vypne zvuk\n"
 
-#: gui/gnash.cpp:123
-msgid "                           2 enable sound, disable rendering\n"
+#: gui/gnash.cpp:164
+#, fuzzy
+msgid "enable sound, disable rendering"
 msgstr "                           2 zapne zvuk, vypne vykreslování\n"
 
-#: gui/gnash.cpp:124
-msgid "                           3 enable rendering and sound (default)\n"
+#: gui/gnash.cpp:166
+#, fuzzy
+msgid "enable rendering and sound (default)"
 msgstr "                           3 zapne vykreslování i zvuk (implicitní)\n"
 
-#: gui/gnash.cpp:125
-msgid "  -M,  --media <"
-msgstr "  -M,  --media <"
+#: gui/gnash.cpp:170
+#, fuzzy
+msgid "The media handler to use"
+msgstr "   Obsluha médií: "
 
-#: gui/gnash.cpp:126
-msgid "                           The media handler to use"
-msgstr "                           Použít obsluhu médií"
+#: gui/gnash.cpp:175
+#, fuzzy
+msgid "The renderer to use"
+msgstr "Nastavit vykreslovací jádro"
 
-#: gui/gnash.cpp:128
-msgid "  -R,  --renderer <"
-msgstr "  -R,  --renderer <"
-
-#: gui/gnash.cpp:129
-msgid "                           The renderer to use"
-msgstr "                           Použít toto vykreslovací jádro"
-
-#: gui/gnash.cpp:131
-msgid "  -t,  --timeout <sec>     Exit after the specified number of seconds\n"
+#: gui/gnash.cpp:179
+#, fuzzy
+msgid "Exit after the specified number of seconds"
 msgstr "  -t,  --timeout <sekund>  Skončí po uplynutí zadaného počtu sekund\n"
 
-#: gui/gnash.cpp:133
-msgid "  -u,  --real-url <url>    Set \"real\" URL of the movie\n"
+#: gui/gnash.cpp:182
+#, fuzzy
+msgid "Set \"real\" URL of the movie"
 msgstr "  -u,  --real-url <url>    Nastaví „real“ (skutečné) URL filmu\n"
 
-#: gui/gnash.cpp:134
-msgid ""
-"  -U,  --base-url <url>    Set \"base\" URL for resolving relative URLs\n"
+#: gui/gnash.cpp:185
+#, fuzzy
+msgid "Set \"base\" URL for resolving relative URLs"
 msgstr ""
 "  -U,  --base-url <url>    Nastaví „base“ (základní) URL pro\n"
 "                           vyhodnocování relativních URL\n"
 
-#: gui/gnash.cpp:136
-msgid "  -P,  --param <param>     Set parameter (e.g. \"FlashVars=A=1&b=2\")\n"
+#: gui/gnash.cpp:188
+#, fuzzy
+msgid "Set parameter (e.g. \"FlashVars=A=1&b=2\")"
 msgstr ""
 "  -P,  --param <param>     Nastaví parametr (např. „FlashVars=A=1&b=2“)\n"
 
-#: gui/gnash.cpp:138
-msgid ""
-"  -F,  --fd <fd>:<fd>      Filedescriptor to use for external "
-"communications\n"
+#: gui/gnash.cpp:191
+#, fuzzy
+msgid "Filedescriptor to use for external communications"
 msgstr "  -F,  --fd <fd>:<fd>      Deskriptor souboru pro vnější komunikaci\n"
 
-#: gui/gnash.cpp:141
+#: gui/gnash.cpp:195
 #, fuzzy
-msgid "  -f,  --debug-fps <num>   Print FPS every num seconds (float)\n"
+msgid "Print FPS every num seconds (float)"
 msgstr ""
 "  -f,  --debug-fps počet   Vypíše FPS každých počet sekund (desetinné "
 "číslo)\n"
 
-#: gui/gnash.cpp:144
+#: gui/gnash.cpp:199
 #, fuzzy
-msgid ""
-"  --max-advances <num>     Exit after specified number of frame advances\n"
+msgid "Exit after specified number of frame advances"
 msgstr "  --max-advances počet     Skončí po zadaném počtu snímkových kroků\n"
 
-#: gui/gnash.cpp:146
-msgid "  --fullscreen             Start in fullscreen mode\n"
-msgstr "  --fullscreen             Spustí se přes celou obrazovku\n"
+#: gui/gnash.cpp:202
+#, fuzzy
+msgid "Start in fullscreen mode"
+msgstr "Spouštět Gnash v režimu pozastaveného přehrávání"
 
-#: gui/gnash.cpp:147
-msgid "  --hide-menubar           Start without displaying the menu bar\n"
+#: gui/gnash.cpp:205
+#, fuzzy
+msgid "Start without displaying the menu bar"
 msgstr "  --hide-menubar           Spustí se bez zobrazené nabídkové lišty\n"
 
-#: gui/gnash.cpp:148
-msgid "  --screenshot <list>      List of frames to save as screenshots\n"
+#: gui/gnash.cpp:208
+#, fuzzy
+msgid "List of frames to save as screenshots"
 msgstr ""
 "  --screenshots <seznam>   Seznam snímků, jejichž snímek se má uložit\n"
 
-#: gui/gnash.cpp:149
-msgid "  --screenshot-file <file> Filename pattern for screenshot images.\n"
+#: gui/gnash.cpp:211
+#, fuzzy
+msgid "Filename pattern for screenshot images."
 msgstr ""
 "  --screenshot-file <soubor>\n"
 "                           Vzor názvu souboru pro obrázky snímků\n"
 
-#: gui/gnash.cpp:151
-msgid "Keys:\n"
-msgstr "Klávesy:\n"
-
-#: gui/gnash.cpp:153
-msgid "  CTRL-Q, CTRL-W           Quit\n"
-msgstr "  CTRL-Q, CTRL-W           Konec\n"
-
-#: gui/gnash.cpp:154
-msgid "  CTRL-F                   Toggle fullscreen\n"
-msgstr "  CTRL-F                   Přepnout zobrazení přes celou obrazovku\n"
-
-#: gui/gnash.cpp:155
-msgid "  CTRL-P                   Toggle pause\n"
-msgstr "  CTRL-P                   Přepnout pauzu\n"
-
-#: gui/gnash.cpp:156
-msgid "  CTRL-R                   Restart the movie\n"
-msgstr "  CTRL-R                   Spustí film od začátku\n"
-
-#: gui/gnash.cpp:157
-msgid "  CTRL-O                   Take a screenshot\n"
-msgstr "  CTRL-O                   Vytvoří snímek\n"
-
-#: gui/gnash.cpp:158
-msgid "  CTRL-L                   Force immediate redraw\n"
-msgstr "  CTRL-L                   Vynutí okamžité překreslení\n"
-
-#: gui/gnash.cpp:167
+#: gui/gnash.cpp:227
 msgid ""
 "Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, "
 "Inc.\n"
@@ -6510,107 +6466,108 @@ msgstr ""
 "Kopie Gnashe smíte šířit podle podmínek GNU General Public Licence.\n"
 "Podrobnosti naleznete v souboru pojmenovaném COPYING.\n"
 
-#: gui/gnash.cpp:178
+#: gui/gnash.cpp:238
 msgid "Build options "
 msgstr "Volby při sestavení "
 
-#: gui/gnash.cpp:179
+#: gui/gnash.cpp:239
 msgid "   Renderers: "
 msgstr "   Vykreslování přes: "
 
-#: gui/gnash.cpp:180
+#: gui/gnash.cpp:240
 msgid "   Hardware Acceleration: "
 msgstr "   Hardwarové urychlení: "
 
-#: gui/gnash.cpp:181
+#: gui/gnash.cpp:241
 msgid "   GUI: "
 msgstr "   GUI: "
 
-#: gui/gnash.cpp:182
+#: gui/gnash.cpp:242
 msgid "   Media handlers: "
 msgstr "   Obsluha médií: "
 
-#: gui/gnash.cpp:184
+#: gui/gnash.cpp:244
 msgid "   Configured with: "
 msgstr "   Nakonfigurováno s: "
 
-#: gui/gnash.cpp:185
+#: gui/gnash.cpp:245
 msgid "   CXXFLAGS: "
 msgstr "   CXXFLAGS: "
 
-#: gui/gnash.cpp:262
+#: gui/gnash.cpp:246
+#, fuzzy
+msgid "   Version: "
+msgstr "Verze Abc: %d.%d"
+
+#: gui/gnash.cpp:321
 msgid "Logging to disk enabled"
 msgstr "Protokolování na disk zapnuto"
 
-#: gui/gnash.cpp:268
+#: gui/gnash.cpp:327
 msgid "No verbose actions; disabled at compile time"
 msgstr "Žádné upovídané akce; zakázáno při překladu"
 
-#: gui/gnash.cpp:276
+#: gui/gnash.cpp:335
 msgid "No verbose parsing; disabled at compile time"
 msgstr "Žádné upovídané rozebírání; zakázáno při překladu"
 
-#: gui/gnash.cpp:298
+#: gui/gnash.cpp:357
 #, c-format
 msgid "Setting root URL to %s"
 msgstr "Nastavuji kořenové URL na %s"
 
-#: gui/gnash.cpp:303
+#: gui/gnash.cpp:362
 #, c-format
 msgid "Setting base URL to %s"
 msgstr "Nastavuji základní (base) URL na %s"
 
-#: gui/gnash.cpp:314
+#: gui/gnash.cpp:373
 #, c-format
 msgid "Host FD #%d, Control FD #%d\n"
 msgstr "Deskriptor hostitele č. %d, řídicí deskriptor č. %d\n"
 
-#: gui/gnash.cpp:317
+#: gui/gnash.cpp:376
 #, c-format
 msgid "Invalid host communication filedescriptor %d\n"
 msgstr "Neplatný deskriptor %d pro komunikaci s hostitelem\n"
 
-#: gui/gnash.cpp:325
+#: gui/gnash.cpp:384
 #, c-format
 msgid "Invalid control communication filedescriptor %d\n"
 msgstr "Neplatný deskriptor %d pro řídicí komunikaci\n"
 
-#: gui/gnash.cpp:335
+#: gui/gnash.cpp:394
 #, c-format
 msgid "Setting width to %d"
 msgstr "Nastavuji šířku na %d"
 
-#: gui/gnash.cpp:345
-msgid "No debugger; disabled at compile time, -g is invalid"
-msgstr "Žádný debugger; zakázáno při překladu, přepínač -g je neplatný"
-
-#: gui/gnash.cpp:353
+#: gui/gnash.cpp:400
 #, c-format
 msgid "Setting height to %d"
 msgstr "Nastavuji výšku na %d"
 
-#: gui/gnash.cpp:359 gui/gnash.cpp:365
+#: gui/gnash.cpp:406 gui/gnash.cpp:412
 #, c-format
 msgid "Setting x position to %d"
 msgstr "Nastavuji vodorovnou polohu na %d"
 
-#: gui/gnash.cpp:434
+#: gui/gnash.cpp:481
 msgid "ERROR: -r must be followed by 0, 1, 2 or 3 "
 msgstr "CHYBA: -r musí být následováno 0, 1, 2, nebo 3 "
 
-#: gui/gnash.cpp:446
+#: gui/gnash.cpp:493
 msgid "FPS debugging disabled at compile time, -f is invalid"
 msgstr "Ladění FPS zakázáno při překladu, přepínač -f je neplatný"
 
-#: gui/gnash.cpp:486
+#: gui/gnash.cpp:533
 msgid "This is a Gnash bug."
 msgstr "Toto je chyba Gnashe."
 
-#: gui/gnash.cpp:491
+#: gui/gnash.cpp:538
 msgid "No rendering flags specified, using rcfile"
 msgstr "Nezadán žádný příznak vykreslování, použiji rcfile"
 
-#: gui/gnash.cpp:532
+#: gui/gnash.cpp:579
 msgid "Exception thrown during parseCommandLine"
 msgstr "Během parseCommandLine vyhozena výjimka."
 
@@ -6642,6 +6599,99 @@ msgstr ""
 #, c-format
 msgid "Field name is: %s: "
 msgstr " Jméno položky je: %s"
+
+#~ msgid "Debugger enabled >> "
+#~ msgstr "Debugger zapnut >> "
+
+#~ msgid "No format flag"
+#~ msgstr "Žádný formátovací příznak"
+
+#~ msgid "Setting watchpoint for variable: \"%s\""
+#~ msgstr "Nastavuji sledování proměnné: „%s“"
+
+#~ msgid "Matched for variable \"%s\": \"%s\""
+#~ msgstr "Souhlasí s proměnnou „%s“: „%s“"
+
+#~ msgid "WARNING: environment not set in %s"
+#~ msgstr "VAROVÁNÍ: prostředí nenastaveno v %s"
+
+#~ msgid "Stack Dump of: %p"
+#~ msgstr "Výpis zásobníku pro: %p"
+
+#~ msgid "Stack Dump of 0x%p: empty"
+#~ msgstr "Výpis zásobníku 0x%p: prázdný"
+
+#~ msgid "Global Registers Dump:"
+#~ msgstr "Výpis globálních registrů:"
+
+#~ msgid "Setting debugger ON"
+#~ msgstr "ZAPÍNÁM debugger"
+
+#~ msgid "The debugger has been disabled at configuration time"
+#~ msgstr "Debugger byl zakázán při konfiguraci"
+
+#~ msgid "Enable _debugger"
+#~ msgstr "Zapnout _ladění"
+
+#~ msgid "  -v,  --verbose           Produce verbose output\n"
+#~ msgstr "  -v,  --verbose           Způsobí upovídaný výstup\n"
+
+#, fuzzy
+#~ msgid "                           none|vaapi|omap (default: none)\n"
+#~ msgstr ""
+#~ "                           none|vaapi|xv|omap (implicitní: none (žádný)\n"
+
+#~ msgid "  -j,  --width <width>     Set window width\n"
+#~ msgstr "  -j,  --width <šířka>     Nastaví šířku okna\n"
+
+#~ msgid "  -k,  --height <height>   Set window height\n"
+#~ msgstr "  -k,  --height <výška>    Nastaví výšku okna\n"
+
+#~ msgid "  -X,  --x-pos <x-pos>     Set window x position\n"
+#~ msgstr "  -X,  --x-pos <poloha-x>  Nastaví vodorovnou polohu okna\n"
+
+#~ msgid "  -Y,  --y-pos <y-pos>     Set window y position\n"
+#~ msgstr "  -Y,  --y-pos <poloha-y>   Nastaví svislou polohu okna\n"
+
+#~ msgid "  -g,  --debugger          Turn on the SWF debugger\n"
+#~ msgstr "  -g,  --debugger          Zapne debugger SWF\n"
+
+#~ msgid "  -r,  --render-mode <0|1|2|3>\n"
+#~ msgstr "  -r,  --render-mode <0|1|2|3>\n"
+
+#~ msgid "  -M,  --media <"
+#~ msgstr "  -M,  --media <"
+
+#~ msgid "                           The media handler to use"
+#~ msgstr "                           Použít obsluhu médií"
+
+#~ msgid "  -R,  --renderer <"
+#~ msgstr "  -R,  --renderer <"
+
+#~ msgid "                           The renderer to use"
+#~ msgstr "                           Použít toto vykreslovací jádro"
+
+#~ msgid "  --fullscreen             Start in fullscreen mode\n"
+#~ msgstr "  --fullscreen             Spustí se přes celou obrazovku\n"
+
+#~ msgid "  CTRL-Q, CTRL-W           Quit\n"
+#~ msgstr "  CTRL-Q, CTRL-W           Konec\n"
+
+#~ msgid "  CTRL-F                   Toggle fullscreen\n"
+#~ msgstr ""
+#~ "  CTRL-F                   Přepnout zobrazení přes celou obrazovku\n"
+
+#~ msgid "  CTRL-P                   Toggle pause\n"
+#~ msgstr "  CTRL-P                   Přepnout pauzu\n"
+
+#~ msgid "  CTRL-R                   Restart the movie\n"
+#~ msgstr "  CTRL-R                   Spustí film od začátku\n"
+
+#~ msgid "  CTRL-O                   Take a screenshot\n"
+#~ msgstr "  CTRL-O                   Vytvoří snímek\n"
+
+#~ msgid "No debugger; disabled at compile time, -g is invalid"
+#~ msgstr "Žádný debugger; zakázáno při překladu, přepínač -g je neplatný"
 
 #~ msgid "Stream EOF, emitting!"
 #~ msgstr "EOF proudu, vysílám!"

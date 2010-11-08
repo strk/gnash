@@ -19,20 +19,28 @@
 #ifndef BACKEND_RENDER_HANDLER_AGG_STYLE_H
 #define BACKEND_RENDER_HANDLER_AGG_STYLE_H
 
-// This include file used only to make Renderer_agg more readable.
-
-
 // TODO: Instead of re-creating AGG fill styles again and again, they should
 // be cached somewhere.
 
+#include <vector>
+#include <agg_gradient_lut.h>
+#include <agg_color_rgba.h>
+#include <agg_color_gray.h>
+#include <agg_image_accessors.h>
+#include <agg_span_allocator.h>
+#include <agg_span_gradient.h>
+#include <agg_span_interpolator_linear.h>
+#include <agg_image_filters.h>
+#include <agg_span_image_filter_rgb.h>
+#include <agg_span_image_filter_rgba.h>
+#include <agg_pixfmt_rgb.h>
+#include <agg_pixfmt_rgba.h>
 
-// Enable this DEFINE to limit the alpha value of all colors to 50% at most.
-// This works only with solid and gradient fills (not bitmaps) and is used
-// for debugging hidden characters.
-//#define DEBUG_LIMIT_COLOR_ALPHA 
-
+#include "Renderer_agg_bitmap.h"
 #include "GnashAlgorithm.h"
 #include "FillStyle.h"
+#include "SWFCxForm.h"
+#include "SWFMatrix.h"
 
 namespace gnash {
 

@@ -170,7 +170,6 @@ inst_HEADERS = \
 	tu_file.h \
 	IOChannel.h \
 	Socket.h \
-	tu_opengl_includes.h \
 	GnashSystemFDHeaders.h \
 	GnashSystemNetHeaders.h \
 	GnashSystemIOHeaders.h \

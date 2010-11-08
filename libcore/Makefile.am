@@ -149,7 +149,6 @@ noinst_HEADERS = \
 	BitmapMovie.h \
 	Transform.h \
 	Button.h \
-	debugger.h \
 	TextField.h \
 	Filters.h \
 	parser/filter_factory.h \
@@ -295,11 +294,6 @@ endif
 if USE_FFMPEG_ENGINE
 AM_CPPFLAGS += $(FFMPEG_CFLAGS) \
 		-I$(top_srcdir)/libmedia/ffmpeg
-endif
-
-# Enable building the Flash debugger
-if DEBUGGER
-libgnashcore_la_SOURCES += debugger.cpp
 endif
 
 #libserver_la_LIBDADD =  #@DL_LIB@
