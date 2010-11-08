@@ -45,7 +45,6 @@
 #include "rc.h"
 #include "URL.h"
 #include "GnashException.h"
-#include "debugger.h"
 #include "VM.h"
 #include "noseek_fd_adapter.h"
 #include "ManualClock.h"
@@ -110,9 +109,6 @@ static void usage (const char *);
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
-#ifdef USE_DEBUGGER
-gnash::Debugger& debugger = gnash::Debugger::getDefaultInstance();
-#endif
 }
 
 static bool play_movie(const std::string& filename,
@@ -280,14 +276,6 @@ main(int argc, char *argv[])
 	      dbglogfile.setVerbosity();
 	      log_debug (_("Verbose output turned on"));
 	      break;
-          case 'g':
-#ifdef USE_DEBUGGER
-              debugger.enabled(true);
-              debugger.console();
-              log_debug (_("Setting debugger ON"));
-#else
-              log_error (_("The debugger has been disabled at configuration time"));
-#endif
 	  case 'n':
 	      dbglogfile.setNetwork(true); 
 	      break;
