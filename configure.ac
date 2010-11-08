@@ -2164,28 +2164,31 @@ if test x$cross_compiling = xno; then
   AC_PATH_MING
 fi
 
-makeswf_installed=[test "$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040000 ]
+if test x"$MING_VERSION_CODE" = x; then
+ MING_VERSION_CODE=00000000
+fi
 
-AM_CONDITIONAL(ENABLE_MING, $makeswf_installed)
+AM_CONDITIONAL(ENABLE_MING,
+	[ test x"$MAKESWF" != x -a $MING_VERSION_CODE -gt 00040000 ])
 
 AM_CONDITIONAL(MING_VERSION_0_4,
-        [ ${makeswf_installed} && test $MING_VERSION_CODE -ge 00040000  ])
+        [ test $MING_VERSION_CODE -ge 00040000  ])
 AM_CONDITIONAL(MAKESWF_SUPPORTS_PREBUILT_CLIPS,
-        [ ${makeswf_installed} && test $MING_VERSION_CODE -ge 00040002  ])
+        [ test $MING_VERSION_CODE -ge 00040002  ])
 AM_CONDITIONAL(MING_SUPPORTS_INIT_ACTIONS,
-        [ ${makeswf_installed} && test $MING_VERSION_CODE -ge 00040004  ])
+        [ test $MING_VERSION_CODE -ge 00040004  ])
 AM_CONDITIONAL(MING_SUPPORTS_REPLACE_TAG,
-        [ ${makeswf_installed} && test $MING_VERSION_CODE -ge 00040005 ])
+        [ test $MING_VERSION_CODE -ge 00040005 ])
 AM_CONDITIONAL(MING_SUPPORTS_SWFBUTTON_ADD_CHARACTER,
-        [ ${makeswf_installed} && test $MING_VERSION_CODE -ge 00040005 ])
+        [ test $MING_VERSION_CODE -ge 00040005 ])
 AM_CONDITIONAL(MING_SUPPORTS_STREAMING_SOUND,
-        [ ${makeswf_installed} && test $MING_VERSION_CODE -ge 00040006 ])
+        [ test $MING_VERSION_CODE -ge 00040006 ])
 AM_CONDITIONAL(MING_SUPPORTS_SWFBUTTON_SET_DEPTH,
-        [ ${makeswf_installed} && test $MING_VERSION_CODE -ge 00040006 ])
+        [ test $MING_VERSION_CODE -ge 00040006 ])
 AM_CONDITIONAL(MING_VERSION_0_4_3,
-        [ ${makeswf_installed} && test $MING_VERSION_CODE -ge 00040300 ])
+        [ test $MING_VERSION_CODE -ge 00040300 ])
 AM_CONDITIONAL(MING_VERSION_0_4_4,
-        [ ${makeswf_installed} && test $MING_VERSION_CODE -ge 00040400 ])
+        [ test $MING_VERSION_CODE -ge 00040400 ])
 
 if test x$cross_compiling = xno; then
   AC_ARG_WITH([swfdec_testsuite],
