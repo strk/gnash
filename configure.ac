@@ -1454,19 +1454,6 @@ AC_SEARCH_LIBS([mallinfo], [c malloc],
 AM_CONDITIONAL([HAVE_MALLINFO], test x$mallinfo = xyes)
 AM_CONDITIONAL(JEMALLOC, test x$jemalloc = xyes)
 
-AC_ARG_ENABLE(debugger,
-  AC_HELP_STRING([--enable-debugger],[Enable the Flash debugger]),
-[case "${enableval}" in
-  yes) debugger=yes ;;
-  no)  debugger=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-debugger option]) ;;
-esac],debugger=no)
-
-if test x"$debugger" = x"yes"; then
-  AC_DEFINE([USE_DEBUGGER], [], [Flash Debugger support])
-fi
-AM_CONDITIONAL(DEBUGGER, test x$debugger = xyes)
-
 AC_ARG_ENABLE(fps-debug,
   AC_HELP_STRING([--enable-fps-debug],[Enable FPS debugging code]),
 [case "${enableval}" in
@@ -3828,28 +3815,11 @@ if test x$cross_compiling = xyes; then
 fi
 
 echo "--------"
-dnl if test x"${ghelp}" = x"yes"; then
-dnl   echo "        GNOME help enabled"
-dnl else
-dnl   echo "        GNOME help disabled (default). Use --enable-ghelp to enable."
-dnl fi
-
-dnl if test x"${extensions}" = x"yes"; then
-dnl   echo "        Building extensions enabled (default). Use --disable-extensions to disable."
-dnl else
-dnl   echo "        Building Gnash extensions disabled."
-dnl fi
 
 if test x"${cygnal}" = x"yes"; then
   echo "        Building Cygnal media server enabled (default). Use --disable-cygnal to disable."
 else
   echo "        Building Cygnal media server disabled."
-fi
-
-if test x"${debugger}" = x"yes"; then
-  echo "        Building Flash debugger support (default). Use --disable-debugger to disable."
-else
-  echo "        Building the Flash debugger is disabled."
 fi
 
 if test x"${with-top_level}" != x; then
