@@ -31,6 +31,7 @@
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <boost/function.hpp>
 #include <cstdlib>
 #include <utility>
 #include <functional>
@@ -69,6 +70,79 @@ namespace {
     void setupSoundAndRendering(gnash::Player& p, int i);
     void setupFlashVars(gnash::Player& p, const std::string& param);
     void setupFDs(gnash::Player& p, const std::string& fds);
+}
+
+namespace {
+
+/// An accumulating option value to handle multiple -v options.
+template<typename T>
+class accumulator : public po::value_semantic {
+public:
+
+    accumulator() : _interval(1) {}
+
+    /// Set the notifier function.
+    accumulator* notifier(boost::function1<void, const T&> f) {
+        _notifier = f;
+        return this;
+    }
+
+    /// Set the default value for this option.
+    accumulator* default_value(const T& t) {
+        _default = t;
+        return this;
+    }
+
+    /// Set the implicit value for this option.
+    //
+    /// Unlike for program_options::value, this specifies a value
+    /// to be applied on each occurence of the option.
+    accumulator* implicit_value(const T& t) {
+        _interval = t;
+        return this;
+    }
+
+    virtual std::string name() const {
+        return "moo";
+    }
+
+    /// There are no tokens for an accumulator
+    virtual unsigned min_tokens() const { return 0; }
+    virtual unsigned max_tokens() const { return 0; }
+
+    // Accumulating from different sources is silly.
+    virtual bool is_composing() const {
+        return false;
+    }
+
+    virtual bool is_required() const { return false; }
+    
+    virtual void parse(boost::any& value_store, 
+                       const std::vector<std::string>& new_tokens,
+                       bool /*utf8*/) const
+    {
+        assert(new_tokens.empty());
+        if (value_store.empty()) value_store = T();
+        boost::any_cast<T&>(value_store) += _interval;
+    }
+
+    virtual bool apply_default(boost::any& value_store) const {
+        value_store = _default;
+        return true;
+    }
+                               
+    virtual void notify(const boost::any& value_store) const {
+        _notifier(boost::any_cast<T>(value_store));
+    }
+    
+    virtual ~accumulator() {}
+
+private:
+    boost::function1<void, const T&> _notifier;
+    T _interval;
+    T _default;
+};
+
 }
 
 static void
@@ -159,11 +233,14 @@ main(int argc, char *argv[])
     po::positional_options_description files;
     files.add("input-file", -1);
 
+    namespace cls = po::command_line_style;
+
     po::variables_map vm;
     try {
         po::store(po::command_line_parser(argc, argv)
                 .options(opts)
                 .positional(files)
+                .style(cls::default_style ^ cls::allow_guessing)
                 .run(), vm);
     }
     catch (const po::error& e) {
@@ -294,6 +371,7 @@ setupSoundAndRendering(gnash::Player& p, int i)
     }
 }
 
+
 po::options_description
 getSupportedOptions(gnash::Player& p)
 {
@@ -328,7 +406,7 @@ getSupportedOptions(gnash::Player& p)
         ->notifier(boost::bind(&Player::setDelay, &p, _1)),
         _("Number of milliseconds to delay in main loop"))
 
-    ("verbose,v", po::value<size_t>()
+    ("verbose,v", (new accumulator<int>())
         ->notifier(boost::bind(&LogFile::setVerbosity, &dbglogfile, _1)),
         _("Produce verbose output"))
 
