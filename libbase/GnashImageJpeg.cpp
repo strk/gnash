@@ -603,6 +603,22 @@ JpegOutput::writeImageRGB(const unsigned char* rgbData)
     }
 }
 
+void
+JpegOutput::writeImageRGBA(const unsigned char* rgbaData)
+{
+    const size_t components = 3;
+    const size_t size = _width * _height;
+
+    boost::scoped_array<unsigned char> data(
+            new unsigned char[size * components]);
+
+    for (size_t pixel = 0; pixel < size; ++pixel) {
+        data[pixel * 3] = rgbaData[pixel * 4];
+        data[pixel * 3 + 1] = rgbaData[pixel * 4 + 1];
+        data[pixel * 3 + 2] = rgbaData[pixel * 4 + 2];
+    }
+    writeImageRGB(data.get());
+}
 
 std::auto_ptr<Output>
 JpegOutput::create(boost::shared_ptr<IOChannel> o, size_t width, size_t height,

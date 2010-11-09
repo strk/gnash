@@ -534,6 +534,7 @@ getSupportedOptions(gnash::Player& p)
         ->notifier(boost::bind(&Player::hideMenu, &p, _1)),
         _("Start without displaying the menu bar"))
 
+    // TODO: do this in ScreenShotter class.
     ("screenshot", po::value<string>()
         ->notifier(boost::bind(&Player::setScreenShots, &p, _1)),
         _("List of frames to save as screenshots"))
@@ -541,6 +542,10 @@ getSupportedOptions(gnash::Player& p)
     ("screenshot-file", po::value<string>()
         ->notifier(boost::bind(&Player::setScreenShotFile, &p, _1)),
         _("Filename pattern for screenshot images"))
+
+    ("screenshot-quality", po::value<size_t>()
+        ->notifier(boost::bind(&Player::setScreenShotQuality, &p, _1)),
+        _("Quality for screenshot output (not all formats)"))
 
     ("input-file", po::value<std::vector<std::string> >(&infiles),
         _("Filename pattern for screenshot images"))

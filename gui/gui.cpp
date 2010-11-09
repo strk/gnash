@@ -25,8 +25,6 @@
 #include "gui.h"
 
 #include <vector>
-#include <cstdio>
-#include <cstring>
 #include <algorithm> 
 
 #include "MovieClip.h"
@@ -37,6 +35,8 @@
 #include "DisplayObject.h"
 #include "GnashEnums.h"
 #include "RunResources.h"
+#include "StreamProvider.h"
+#include "ScreenShotter.h"
 
 #ifdef GNASH_FPS_DEBUG
 #include "ClockTime.h"
@@ -197,11 +197,9 @@ Gui::unsetFullscreen()
 void
 Gui::quit()
 {
-    log_debug(__PRETTY_FUNCTION__);
-
     // Take a screenshot of the last frame if required.
-    if (_screenShotter.get()) {
-        _screenShotter->last();
+    if (_screenShotter.get() && _renderer.get()) {
+        _screenShotter->last(*_renderer);
     }
     
     quitUI();
@@ -965,7 +963,7 @@ Gui::advanceMovie()
 #ifdef GNASH_FPS_DEBUG
     // will be a no-op if fps_timer_interval is zero
     if (advanced) {
-	fpsCounterTick();
+        fpsCounterTick();
     }
 #endif
     
@@ -1001,8 +999,8 @@ Gui::advanceMovie()
 		}
 	}
 
-    if (_screenShotter.get()) {
-        _screenShotter->screenShot(_advances);
+    if (_screenShotter.get() && _renderer.get()) {
+        _screenShotter->screenShot(*_renderer, _advances);
     }
 
     // Only increment advances and check for exit condition when we've
@@ -1019,6 +1017,12 @@ Gui::advanceMovie()
 }
 
 void
+Gui::setScreenShotter(std::auto_ptr<ScreenShotter> ss)
+{
+    _screenShotter.reset(ss.release());
+}
+
+void
 Gui::takeScreenShot()
 {
     if (!_screenShotter.get()) {
@@ -1029,26 +1033,10 @@ Gui::takeScreenShot()
         const std::string& name = (p == std::string::npos) ? url.path() :
             url.path().substr(p + 1);
         const std::string& filename = "screenshot-" + name + "-%f";
-        _screenShotter.reset(new ScreenShotter(_renderer, filename));
+        _screenShotter.reset(new ScreenShotter(filename, GNASH_FILETYPE_PNG));
     }
     assert (_screenShotter.get());
     _screenShotter->now();
-}
-
-void
-Gui::requestScreenShots(const ScreenShotter::FrameList& l, bool last,
-        const std::string& filename)
-{
-    // Nothing to do if there is no renderer or if no frames should be
-    // saved.
-    if (!_renderer.get() || (l.empty() && !last)) {
-	return;
-    }
-
-    _screenShotter.reset(new ScreenShotter(_renderer, filename));
-    if (last) _screenShotter->lastFrame();
-    _screenShotter->setFrames(l);
-
 }
 
 void
@@ -1342,8 +1330,6 @@ Gui::callCallback(int fd)
 
     f();
 }
-
-
 // end of namespace
 }
 

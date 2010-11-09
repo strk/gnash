@@ -688,9 +688,8 @@ public:
     }
 
     virtual void renderToImage(boost::shared_ptr<IOChannel> io,
-            FileType type) const
+            FileType type, int quality) const
     {
-        log_debug("New image: %sx%s", xres, yres);
         image::ImageRGBA im(xres, yres);
         for (int x = 0; x < xres; ++x) {
             for (int y = 0; y < yres; ++y) {
@@ -699,7 +698,7 @@ public:
             }
         }
         
-        image::Output::writeImageData(type, io, im, 100);
+        image::Output::writeImageData(type, io, im, quality);
     }
 
     template<typename SourceFormat, typename Matrix>

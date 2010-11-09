@@ -23,6 +23,13 @@
 #include "gnashconfig.h"
 #endif
 
+#include <boost/intrusive_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/function.hpp>
+#include <string>
+#include <map>
+
+#include "SWFRect.h"  // for composition
 #include "snappingrange.h"  // for InvalidatedRanges
 #include "ScreenShotter.h"
 #include "GnashKey.h"
@@ -35,14 +42,6 @@
 #ifdef USE_SWFTREE
 #include "tree.hh" // for tree
 #endif
-
-#include <boost/intrusive_ptr.hpp>
-#include <boost/scoped_ptr.hpp>
-#include <boost/function.hpp>
-#include <vector>
-#include <cstdlib> 
-#include <string>
-#include <map>
 
 // Define this to enable fps debugging without touching
 // gnashconfig.h
@@ -67,6 +66,7 @@
 // Forward declarations
 namespace gnash {
     class SWFRect;
+    class ScreenShotter;
     class RunResources;
     class movie_root;
     class movie_definition;
@@ -124,13 +124,7 @@ public:
     /// Set the time in milliseconds after which the programme should exit.
     virtual void setTimeout(unsigned int timeout) = 0;
 
-    /// Request a list of screenshots
-    //
-    /// @param l        A list of frames to render to an image file
-    /// @param last     Whether to render the last frame before exist
-    /// @param filename The filename pattern to save images as.
-    void requestScreenShots(const ScreenShotter::FrameList& l, bool last,
-            const std::string& filename);
+    void setScreenShotter(std::auto_ptr<ScreenShotter> ss);
 
     /** \brief
      * Create and display our window.
