@@ -133,7 +133,7 @@ public:
         return oldtimeout;
     }
     
-    void setParam(std::string& name, std::string& value) {
+    void setParam(const std::string& name, const std::string& value) {
         _params[name] = value;
     }
     
