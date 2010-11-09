@@ -32,8 +32,8 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <cstdlib>
-#include <sys/types.h>
-#include <fcntl.h>
+#include <utility>
+#include <functional>
 #ifdef ENABLE_NLS
 # include <clocale>
 #endif
@@ -41,7 +41,6 @@
 #include "Player.h"
 #include "log.h"
 #include "rc.h" // for use of rcfile
-#include "arg_parser.h"
 #include "GnashNumeric.h" // for clamp
 #include "GnashException.h"
 #include "revno.h"
@@ -54,147 +53,23 @@ using std::cout;
 std::vector<std::string> infiles;
 std::string url;
 
+namespace gnash {
+    class Player;
+}
+
 namespace {
     gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
     gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 }
 
-static boost::program_options::options_description
-getSupportedOptions()
-{
+// Forward declarations
+namespace {
     namespace po = boost::program_options;
-    using std::string;
-
-    std::vector<std::string> handlers;
-    gnash::media::MediaFactory::instance().listKeys(back_inserter(handlers));
-
-    std::vector<std::string> renderers;
-    boost::split(renderers, RENDERER_CONFIG,
-        boost::is_any_of(" "), boost::token_compress_on);
-
-    po::options_description desc("Options");
-
-    desc.add_options()
-
-    ( "help,h",
-        _("Print this help and exit") )
-
-    ( "version,V", 
-        _("Print version information and exit") )
-
-    ( "scale,s", po::value<float>(),
-        _("Scale the movie by the specified factor") )
-
-    ( "delay,d", po::value<int>(),
-        _("Number of milliseconds to delay in main loop") )
-
-
-    ( "verbose,v",
-        _("Produce verbose output") )
-
-#if VERBOSE_ACTION
-    ( "verbose-actions,a",
-        _("Be (very) verbose about action execution") )
-#endif
-
-#if VERBOSE_PARSE
-    ( "verbose-parsing,p",
-        _("Be (very) verbose about parsing") )
-#endif
-
-    ( "audio-dump,A", po::value<string>(),
-        _("Audio dump file (wave format)") )
-
-    ( "hwaccel", po::value<string>()->default_value("none"),
-        ( string( _("Hardware Video Accelerator to use"))
-        + string( "\nnone|vaapi|omap") ). c_str() ) 
-
-    ( "xid,x", po::value<long>(),
-        _("X11 Window ID for display") )
-
-    ( "writelog,w",
-        _("Produce the disk based debug log") )
-
-    ( "width,j", po::value<int>(),
-        _("Set window width") )
-
-    ( "height,k", po::value<int>(),
-        _("Set window height") )
-
-    ( "x-pos,X", po::value<int>(),
-        _("Set window x position") )
-
-    ( "y-pos,Y", po::value<int>(),
-        _("Set window y position") )
-
-    ( "once,1", 
-        _("Exit when/if movie reaches the last frame") )
-
-    ( "render-mode,r", po::value<int>()->default_value(3),
-        ( string("0 ")
-        + string(_("disable rendering and sound")) 
-        + string("\n1 ")
-        + string(_("enable rendering, disable sound"))
-        + string("\n2 ")
-        + string(_("enable sound, disable rendering"))
-        + string("\n3 ")
-        + string(_("enable rendering and sound"))
-        ).c_str() )
-
-    ( "media,M", po::value<string>()->default_value(handlers.front()),
-        ( string(_("The media handler to use"))
-        + string("\n") + boost::join(handlers, "|")
-        ).c_str() )
-
-    ( "renderer,R", po::value<string>()->default_value("AGG"),
-        ( string(_("The renderer to use"))
-        + string("\n") + boost::join(renderers, "|")
-        ).c_str() )
-
-    ( "timeout,t", po::value<int>(),
-        _("Exit after the specified number of seconds") )
-
-    ( "real-url,u", po::value<string>(),
-        _("Set \"real\" URL of the movie") )
-
-    ( "base-url,U", po::value<string>(),
-        _("Set \"base\" URL for resolving relative URLs") )
-
-    ( "param,P", po::value<string>(),
-        _("Set parameter (e.g. \"FlashVars=A=1&b=2\")") )
-
-    ( "fd,F", po::value<string>(),
-        ( string(_("Filedescriptor to use for external communications"))
-        + string(" <fd>:<fd>")
-        ).c_str() )
-
-#ifdef GNASH_FPS_DEBUG
-    ( "debug-fps,f", po::value<int>(),
-        _("Print FPS every num seconds (float)") )
-#endif // def GNASH_FPS_DEBUG
-
-    ( "max-advances", po::value<int>(),
-        _("Exit after specified number of frame advances") )
-
-    ( "fullscreen",
-        _("Start in fullscreen mode") )
-
-    // TODO: move to GUIs actually implementing this
-    ( "hide-menubar",
-        _("Start without displaying the menu bar") )
-
-    ( "screenshot", po::value<string>(),
-        _("List of frames to save as screenshots") )
-
-    ( "screenshot-file", po::value<string>(),
-        _("Filename pattern for screenshot images") )
-
-    ;
-
-
-    return desc;
+    po::options_description getSupportedOptions(gnash::Player& p);
+    void setupSoundAndRendering(gnash::Player& p, int i);
+    void setupFlashVars(gnash::Player& p, const std::string& param);
+    void setupFDs(gnash::Player& p, const std::string& fds);
 }
-
 
 static void
 usage_gui_keys(std::ostream& os)
@@ -223,25 +98,17 @@ usage_gui_keys(std::ostream& os)
 }
 
 static void
-usage()
+usage(const po::options_description& opts)
 {
-
-    namespace po = boost::program_options;
-    po::options_description opts = getSupportedOptions();
-
-    cout
-
-    << _("Usage: gnash [options] movie_file.swf") << endl
-    << _("Plays a SWF (Shockwave Flash) movie") << endl
-    << opts
-    << endl;
+    std::cout << _("Usage: gnash [options] movie_file.swf\n")
+              << _("Plays a SWF (Shockwave Flash) movie\n")
+              << opts << "\n";
 
     // Add gui keys
     // TODO: stop printing these in here ?
-    usage_gui_keys(cout);
+    usage_gui_keys(std::cout);
 
-    cout << std::endl;
-
+    std::cout << std::endl;
 }
 
 static void
@@ -271,332 +138,11 @@ build_options()
 	 << _("   Version: ")  << BRANCH_NICK << ":" << BRANCH_REVNO << endl;
 }
 
-static void
-_parseCommandLine(int argc, char* argv[], gnash::Player& player)
-{
-    namespace po = boost::program_options;
-    po::options_description opts = getSupportedOptions();
-
-    po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, opts), vm);
-    po::notify(vm);
-
-    // TODO: get this done :)
-}
-
-static void
-parseCommandLine(int argc, char* argv[], gnash::Player& player)
-{
-    const Arg_parser::Option opts[] =
-        {
-        { 'h', "help",              Arg_parser::no  },
-        { 'v', "verbose",           Arg_parser::no  },
-        { 'a', 0,                   Arg_parser::no  },
-        { 'p', 0,                   Arg_parser::no  },
-        { 's', "scale",             Arg_parser::yes },
-        { 256, "max-advances",      Arg_parser::yes },
-        { 257, "fullscreen",        Arg_parser::no  },
-        { 258, "hide-menubar",      Arg_parser::no  },                
-        { 'd', "delay",             Arg_parser::yes },
-        { 'x', "xid",               Arg_parser::yes },
-        { 'R', "renderer",          Arg_parser::yes },
-        { 'M', "media",             Arg_parser::yes },
-        { 'r', "render-mode",       Arg_parser::yes },
-        { 't', "timeout",           Arg_parser::yes },        
-        { '1', "once",              Arg_parser::no  },        
-        { 'w', "writelog",          Arg_parser::no  },
-        { 'j', "width",             Arg_parser::yes },
-        { 'k', "height",            Arg_parser::yes },
-        { 'X', "x-position",        Arg_parser::yes },
-        { 'Y', "y-position",        Arg_parser::yes },
-        { 'u', "real-url",          Arg_parser::yes },
-        { 'P', "param",             Arg_parser::yes },
-        { 'U', "base-url",          Arg_parser::yes },  
-        { 'V', "version",           Arg_parser::no  },        
-        { 'f', "debug-fps",         Arg_parser::yes },        
-        { 'F', "fifo",              Arg_parser::yes },
-        { 'A', "dump",              Arg_parser::yes },
-        { 259, "screenshot",        Arg_parser::yes },
-        { 260, "screenshot-file",   Arg_parser::yes },
-        { 261, "hwaccel",           Arg_parser::yes },
-        { 262, "flash-version",     Arg_parser::no },
-        { 'D', 0,                   Arg_parser::yes }, // Handled in dump gui
-        { 'S', 0,                   Arg_parser::yes }, // Handled in dump gui
-        {   0, 0,                   Arg_parser::no  }
-    };
-
-    Arg_parser parser(argc, argv, opts);
-    if (!parser.error().empty()) {
-        cout << parser.error() << endl;
-        exit(EXIT_FAILURE);
-    }
-
-    bool renderflag = false;
-    bool plugin = false;
-    bool widthGiven = false, heightGiven = false;
-    bool xPosGiven = false, yPosGiven = false;
-
-    for (int i = 0; i < parser.arguments(); ++i) {
-        const int code = parser.code(i);
-        try {
-            switch (code) {
-                case 'h':
-                    version_and_copyright();
-                    usage ();
-                    exit(EXIT_SUCCESS);
-                case 'v':
-                    dbglogfile.setVerbosity();
-                    // This happens once per 'v' flag 
-                    gnash::log_debug(_("Verbose output turned on"));
-                    break;
-                case 'V':
-                    version_and_copyright();
-                    build_options();
-                    exit(EXIT_SUCCESS);          
-                case 'w':
-                    rcfile.useWriteLog(true); 
-                    gnash::log_debug(_("Logging to disk enabled"));
-                    break;
-                case 'a':
-#if VERBOSE_ACTION
-                    dbglogfile.setActionDump(true); 
-#else
-                    gnash::log_error(_("No verbose actions; disabled at "
-                                "compile time"));
-#endif
-                    break;
-                case 'p':
-#if VERBOSE_PARSE
-                    dbglogfile.setParserDump(true); 
-#else
-                    gnash::log_error (_("No verbose parsing; disabled at "
-                                "compile time"));
-#endif
-                    break;
-                case 256:
-                    player.setMaxAdvances(parser.argument<unsigned long>(i));
-                    break;
-                case 257:
-                    player.setStartFullscreen(true);
-                    break;
-                case 258:
-                    player.hideMenu(true);
-                    break;
-                case 's':
-                    player.setScale(gnash::clamp<float>(
-                                    parser.argument<float>(i), 0.01f, 100.f));
-                    break;
-                case 'd':
-                    player.setDelay(parser.argument<long>(i));
-                    break;
-                case 'u':
-                    url = parser.argument(i);
-                    gnash::log_debug (_("Setting root URL to %s"), url.c_str());
-                    break;
-                case 'U':    
-                    // Set base URL
-                    player.setBaseUrl(parser.argument(i));
-                    gnash::log_debug (_("Setting base URL to %s"),
-                                      parser.argument(i));
-                    break;
-                case 'F':
-                {
-		    const std::string& fds = parser.argument(i);
-                    fds.find(":");
-                    int hostfd = 0, controlfd = 0;
-                    hostfd = strtol(fds.substr(0, fds.find(":")).c_str(), NULL, 0);
-                    std::string csub = fds.substr(fds.find(":")+1, fds.size());
-                    controlfd = strtol(csub.c_str(), 0, 0);
-                    gnash::log_debug(_("Host FD #%d, Control FD #%d\n"), 
-                              hostfd, controlfd);
-                    if (hostfd < 0) {
-                        cerr << boost::format(_("Invalid host communication "
-						"filedescriptor %d\n"))
-                            % hostfd << endl;
-                        exit(EXIT_FAILURE);
-                    }
-                    player.setHostFD (hostfd);
-
-                    if (controlfd < 0) {
-                        cerr << boost::format(_("Invalid control communication "
-                                    "filedescriptor %d\n")) % controlfd << endl;
-                        exit(EXIT_FAILURE);
-                    }
-                    player.setControlFD (controlfd);
-                }
-                break;
-                case 'j':
-                    widthGiven = true;
-                    player.setWidth(parser.argument<long>(i));
-                    gnash::log_debug(_("Setting width to %d"),
-                             player.getWidth());
-                    break;
-                case 'k':
-                    heightGiven = true;
-                    player.setHeight(parser.argument<long>(i));
-                    gnash::log_debug(_("Setting height to %d"),
-                             player.getHeight());
-                    break;
-                case 'X':
-                    xPosGiven = true;
-                    player.setXPosition ( parser.argument<int>(i));
-                    gnash::log_debug (_("Setting x position to %d"), 
-                              player.getXPosition());
-                    break;
-                case 'Y':
-                    yPosGiven = true;
-                    player.setYPosition(parser.argument<int>(i));
-                    gnash::log_debug(_("Setting x position to %d"), 
-                              player.getYPosition());
-                    break;
-                case 'x':
-                    plugin = true;
-                    player.setWindowId(parser.argument<long>(i));
-                    break;
-                case '1':
-                    player.setDoLoop(false);
-                    break;
-                    // See if the hardware video decoder was specified
-                 case 261:
-                    switch (parser.argument<char>(i)) {
-                        case 'v':
-                            player.setHWAccel("vaapi");
-                            break;
-                        case 'n':
-                        default:
-                            player.setHWAccel("none");
-                            break;
-                        }
-                    break; 
-                case 262:
-                    cout << rcfile.getFlashVersionString() << endl;
-                    exit(EXIT_SUCCESS);          
-                    break;
-              case 'M':
-                    player.setMedia(parser.argument(i));
-                    break;
-              case 'R':
-                    player.setRenderer(parser.argument(i));
-                    break;
-              case 'r':
-                    renderflag = true;
-                    switch (parser.argument<char>(i)) {
-                        case '0':
-                            // Disable both
-                            player.setDoRender(false);
-                            player.setDoSound(false);
-                            break;
-                        case '1':
-                            // Enable rendering, disable sound
-                            player.setDoRender(true);
-                            player.setDoSound(false);
-                            break;
-                        case '2':
-                            // Enable sound, disable rendering
-                            player.setDoRender(false);
-                            player.setDoSound(true);
-                            break;
-                        case '3':
-                            // Enable render & sound
-                            player.setDoRender(true);
-                            player.setDoSound(true);
-                            break;
-                            // See if a renderer was specified
-                        case 'a':
-                            // Enable AGG as the rendering backend
-                            player.setRenderer("agg");
-                            break;
-                        case 'o':
-                            // Enable OpenGL as the rendering backend
-                            player.setRenderer("opengl");
-                            break;
-                        case 'c':
-                            // Enable Cairo as the rendering backend
-                            player.setRenderer("cairo");
-                            break;
-                        default:
-                            gnash::log_error(_("ERROR: -r must be followed by "
-                                               "0, 1, 2 or 3 "));
-                            break;
-                    }
-                break;
-            case 't':
-                player.setExitTimeout(parser.argument<float>(i));
-                break;
-            case 'f':
-#ifdef GNASH_FPS_DEBUG
-                player.setFpsPrintTime(parser.argument<float>(i));
-#else
-                cout << _("FPS debugging disabled at compile time, -f "
-                          "is invalid") << endl;
-                exit(EXIT_FAILURE);
-#endif 
-                break;
-            case 'P':
-            {
-                const std::string& param = parser.argument(i);
-                const size_t eq = param.find("=");
-                std::string name, value;
-                if (eq == std::string::npos) {
-                    name = param;
-                    value = "true";
-                } else {
-                    name = param.substr(0, eq);
-                    value = param.substr(eq + 1);
-                }
-                player.setParam(name, value);
-                break;
-            }
-            case 'A':
-            {
-                player.setAudioDumpfile(parser.argument(i));
-                break;
-            }
-            case 259:
-                // The player takes care of parsing the list.
-                player.setScreenShots(parser.argument(i));
-                break;
-            case 260:
-                player.setScreenShotFile(parser.argument(i));
-                break;
-            case 0:
-                infiles.push_back(parser.argument(i));
-                break;
-            }
-        }
-        catch (Arg_parser::ArgParserException &e) {
-            cerr << _("Error parsing command line options: ") << e.what() 
-                << endl;
-            cerr << _("This is a Gnash bug.") << endl;
-        }
-    }
-
-    if (!renderflag) {
-        gnash::log_debug (_("No rendering flags specified, using rcfile"));
-        if (plugin) {
-            player.setDoSound(rcfile.usePluginSound());
-        }
-        else {
-            player.setDoSound(rcfile.useSound());
-        }
-    }
-
-    if (plugin && heightGiven && widthGiven && !player.getHeight() &&
-            !player.getWidth()) {
-            // We were given dimensions of 0x0 to render to (probably the plugin
-            // is playing an "invisible" movie. Disable video rendering.
-            player.setDoRender(false);
-    }
-
-}
-
 int
 main(int argc, char *argv[])
 {
     
     std::ios::sync_with_stdio(false);
-
-    gnash::Player player;
 
     // Enable native language support, i.e. internationalization
 #ifdef ENABLE_NLS
@@ -605,22 +151,65 @@ main(int argc, char *argv[])
     textdomain (PACKAGE);
 #endif
 
-    try { 
-        parseCommandLine(argc, argv, player);
+    gnash::Player player;
+
+    po::options_description opts = getSupportedOptions(player);
+
+    // Add all positional arguments as input files.
+    po::positional_options_description files;
+    files.add("input-file", -1);
+
+    po::variables_map vm;
+    try {
+        po::store(po::command_line_parser(argc, argv)
+                .options(opts)
+                .positional(files)
+                .run(), vm);
     }
-    catch (const std::exception& ex) {
-        cerr << ex.what() << endl;
+    catch (const po::error& e) {
+        std::cerr << boost::format(_("Error parsing options: %s\n"))
+            % e.what();
         return EXIT_FAILURE;
     }
-    catch (...) {
-        cerr << _("Exception thrown during parseCommandLine") << endl;
-        return EXIT_FAILURE;
+
+    po::notify(vm);
+
+    if (vm.count("help")) {
+        version_and_copyright();
+        usage(opts);
+        return EXIT_SUCCESS;
+    }
+
+    if (vm.count("version")) {
+        version_and_copyright();
+        build_options();
+        return EXIT_SUCCESS;
+    }
+
+    // Do some extra sanity checks on the options.
+    const bool plugin = vm.count("xid");
+
+    if (plugin && vm.count("height") && vm.count("width") &&
+            !player.getHeight() && !player.getWidth()) {
+            // We were given dimensions of 0x0 to render to (probably the plugin
+            // is playing an "invisible" movie. Disable video rendering.
+            player.setDoRender(false);
+    }
+
+    if (!vm.count("render-mode")) {
+        std::cerr << "Using rcfile\n";
+        if (plugin) {
+            player.setDoSound(rcfile.usePluginSound());
+        }
+        else {
+            player.setDoSound(rcfile.useSound());
+        }
     }
 
     // No file name was supplied
     if (infiles.empty()) {
-        cerr << _("Error: no input file was specified. Exiting.") << endl;
-        usage();
+        std::cerr << _("Error: no input file was specified. Exiting.\n");
+        usage(opts);
         return EXIT_FAILURE;
     }
 
@@ -634,3 +223,248 @@ main(int argc, char *argv[])
     }
     return EXIT_SUCCESS;
 }
+
+namespace {
+
+void
+setupFlashVars(gnash::Player& p, const std::string& param)
+{
+    const size_t eq = param.find("=");
+    if (eq == std::string::npos) {
+        p.setParam(param, "true");
+        return;
+    }
+    const std::string name = param.substr(0, eq);
+    const std::string value = param.substr(eq + 1);
+    p.setParam(name, value);
+}
+
+void
+setupFDs(gnash::Player& p, const std::string& fds)
+{
+    int hostfd = 0, controlfd = 0;
+    hostfd = std::strtol(fds.substr(0, fds.find(":")).c_str(), NULL, 0);
+    std::string csub = fds.substr(fds.find(":")+1, fds.size());
+    controlfd = strtol(csub.c_str(), 0, 0);
+    gnash::log_debug(_("Host FD #%d, Control FD #%d\n"), 
+              hostfd, controlfd);
+
+    if (hostfd < 0) {
+        std::cerr << boost::format(_("Invalid host communication "
+                    "filedescriptor %1%\n")) % hostfd;
+        std::exit(EXIT_FAILURE);
+    }
+    p.setHostFD(hostfd);
+
+    if (controlfd < 0) {
+        std::cerr << boost::format(_("Invalid control communication "
+                    "filedescriptor %1%\n")) % controlfd;
+        std::exit(EXIT_FAILURE);
+    }
+    p.setControlFD(controlfd);
+}
+
+void
+setupSoundAndRendering(gnash::Player& p, int i)
+{
+    switch (i) {
+        case 0:
+            // Disable both
+            p.setDoRender(false);
+            p.setDoSound(false);
+            return;
+        case 1:
+            // Enable rendering, disable sound
+            p.setDoRender(true);
+            p.setDoSound(false);
+            return;
+        case 2:
+            // Enable sound, disable rendering
+            p.setDoRender(false);
+            p.setDoSound(true);
+            return;
+        case 3:
+            // Enable render & sound
+            p.setDoRender(true);
+            p.setDoSound(true);
+            return;
+        default:
+            gnash::log_error(_("ERROR: -r must be followed by "
+                               "0, 1, 2 or 3 "));
+    }
+}
+
+po::options_description
+getSupportedOptions(gnash::Player& p)
+{
+    using std::string;
+    using gnash::Player;
+    using gnash::LogFile;
+    using gnash::RcInitFile;
+
+    std::vector<std::string> handlers;
+    gnash::media::MediaFactory::instance().listKeys(back_inserter(handlers));
+
+    std::vector<std::string> renderers;
+    boost::split(renderers, RENDERER_CONFIG,
+        boost::is_any_of(" "), boost::token_compress_on);
+
+    po::options_description desc("Options");
+
+    desc.add_options()
+
+    ("help,h",
+        _("Print this help and exit"))
+
+    ("version,V", 
+        _("Print version information and exit"))
+
+    ("scale,s", po::value<float>()
+        ->notifier(boost::bind(&Player::setScale, &p,
+                boost::bind(gnash::clamp<float>, 0.01f, 100.f, _1))),
+        _("Scale the movie by the specified factor"))
+
+    ("delay,d", po::value<int>()
+        ->notifier(boost::bind(&Player::setDelay, &p, _1)),
+        _("Number of milliseconds to delay in main loop"))
+
+    ("verbose,v", po::value<size_t>()
+        ->notifier(boost::bind(&LogFile::setVerbosity, &dbglogfile, _1)),
+        _("Produce verbose output"))
+
+#if VERBOSE_ACTION
+    ("verbose-actions,a", po::bool_switch()
+        ->notifier(boost::bind(&LogFile::setActionDump, &dbglogfile, _1)),
+        _("Be (very) verbose about action execution"))
+#endif
+
+#if VERBOSE_PARSE
+    ("verbose-parsing,p", po::bool_switch()
+        ->notifier(boost::bind(&LogFile::setParserDump, &dbglogfile, _1)),
+        _("Be (very) verbose about parsing"))
+#endif
+
+    ("audio-dump,A", po::value<string>()
+        ->notifier(boost::bind(&Player::setAudioDumpfile, &p, _1)),
+        _("Audio dump file (wave format)"))
+
+    ("hwaccel", po::value<string>()
+        ->default_value("none")
+        ->notifier(boost::bind(&Player::setHWAccel, &p, _1)),
+        (string(_("Hardware Video Accelerator to use"))
+        + string("\nnone|vaapi")). c_str()) 
+
+    ("xid,x", po::value<long>()
+        ->notifier(boost::bind(&Player::setWindowId, &p, _1)),
+        _("X11 Window ID for display"))
+
+    ("writelog,w", po::bool_switch()
+        ->notifier(boost::bind(&RcInitFile::useWriteLog, &rcfile, _1)),
+        _("Produce the disk based debug log"))
+
+    ("width,j", po::value<int>()
+        ->notifier(boost::bind(&Player::setWidth, &p, _1)),
+        _("Set window width"))
+
+    ("height,k", po::value<int>()
+        ->notifier(boost::bind(&Player::setHeight, &p, _1)),
+        _("Set window height"))
+
+    ("x-pos,X", po::value<int>()
+        ->notifier(boost::bind(&Player::setXPosition, &p, _1)),
+        _("Set window x position"))
+
+    ("y-pos,Y", po::value<int>()
+        ->notifier(boost::bind(&Player::setYPosition, &p, _1)),
+        _("Set window y position"))
+
+    ("once,1", po::bool_switch()
+        ->notifier(boost::bind(&Player::setDoLoop, &p,
+                boost::bind(std::logical_not<bool>(), _1))),
+        _("Exit when/if movie reaches the last frame"))
+
+    ("render-mode,r", po::value<int>()
+        ->default_value(3)
+        ->notifier(boost::bind(&setupSoundAndRendering, boost::ref(p), _1)),
+        (string("0 ")
+        + string(_("disable rendering and sound")) 
+        + string("\n1 ")
+        + string(_("enable rendering, disable sound"))
+        + string("\n2 ")
+        + string(_("enable sound, disable rendering"))
+        + string("\n3 ")
+        + string(_("enable rendering and sound"))
+        ).c_str())
+
+    ("media,M", po::value<string>()
+        ->default_value(handlers.front())
+        ->notifier(boost::bind(&Player::setMedia, &p, _1)),
+        (string(_("The media handler to use"))
+         + string("\n") + boost::join(handlers, "|")
+        ).c_str())
+
+    ("renderer,R", po::value<string>()
+        ->default_value("agg")
+        ->notifier(boost::bind(&Player::setRenderer, &p, _1)),
+        (string(_("The renderer to use"))
+        + string("\n") + boost::join(renderers, "|")
+        ).c_str())
+
+    ("timeout,t", po::value<float>()
+        ->notifier(boost::bind(&Player::setExitTimeout, &p, _1)),
+        _("Exit after the specified number of seconds"))
+
+    ("real-url,u", po::value<string>(&url),
+        _("Set \"real\" URL of the movie"))
+
+    ("base-url,U", po::value<string>()
+        ->notifier(boost::bind(&Player::setBaseUrl, &p, _1)),
+        _("Set \"base\" URL for resolving relative URLs"))
+
+    ("param,P", po::value<string>()
+        ->composing()
+        ->notifier(boost::bind(&setupFlashVars, boost::ref(p), _1)),
+        _("Set parameter (e.g. \"FlashVars=A=1&b=2\")"))
+
+    ("fd,F", po::value<string>()
+        ->notifier(boost::bind(&setupFDs, boost::ref(p), _1)),
+        (string(_("Filedescriptor to use for external communications"))
+        + string(" <fd>:<fd>")
+        ).c_str())
+
+#ifdef GNASH_FPS_DEBUG
+    ("debug-fps,f", po::value<float>(),
+        ->notifier(boost::bind(&Player::setFpsPrintTime, &p, _1),
+        _("Print FPS every num seconds"))
+#endif 
+
+    ("max-advances", po::value<size_t>()
+        ->notifier(boost::bind(&Player::setMaxAdvances, &p, _1)),
+        _("Exit after specified number of frame advances"))
+
+    ("fullscreen", po::bool_switch()
+        ->notifier(boost::bind(&Player::setStartFullscreen, &p, _1)),
+        _("Start in fullscreen mode"))
+
+    // TODO: move to GUIs actually implementing this
+    ("hide-menubar", po::bool_switch()
+        ->notifier(boost::bind(&Player::hideMenu, &p, _1)),
+        _("Start without displaying the menu bar"))
+
+    ("screenshot", po::value<string>()
+        ->notifier(boost::bind(&Player::setScreenShots, &p, _1)),
+        _("List of frames to save as screenshots"))
+
+    ("screenshot-file", po::value<string>()
+        ->notifier(boost::bind(&Player::setScreenShotFile, &p, _1)),
+        _("Filename pattern for screenshot images"))
+
+    ("input-file", po::value<std::vector<std::string> >(&infiles),
+        _("Filename pattern for screenshot images"))
+    ;
+
+    return desc;
+}
+
+} // unnamed namespace
+
