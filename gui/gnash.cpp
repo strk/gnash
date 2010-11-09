@@ -76,19 +76,19 @@ namespace {
 
 /// An accumulating option value to handle multiple -v options.
 template<typename T>
-class accumulator : public po::value_semantic {
+class accumulator_type : public po::value_semantic {
 public:
 
-    accumulator() : _interval(1) {}
+    accumulator_type() : _interval(1) {}
 
     /// Set the notifier function.
-    accumulator* notifier(boost::function1<void, const T&> f) {
+    accumulator_type* notifier(boost::function1<void, const T&> f) {
         _notifier = f;
         return this;
     }
 
     /// Set the default value for this option.
-    accumulator* default_value(const T& t) {
+    accumulator_type* default_value(const T& t) {
         _default = t;
         return this;
     }
@@ -97,7 +97,7 @@ public:
     //
     /// Unlike for program_options::value, this specifies a value
     /// to be applied on each occurence of the option.
-    accumulator* implicit_value(const T& t) {
+    accumulator_type* implicit_value(const T& t) {
         _interval = t;
         return this;
     }
@@ -106,7 +106,7 @@ public:
         return "moo";
     }
 
-    /// There are no tokens for an accumulator
+    /// There are no tokens for an accumulator_type
     virtual unsigned min_tokens() const { return 0; }
     virtual unsigned max_tokens() const { return 0; }
 
@@ -135,13 +135,18 @@ public:
         _notifier(boost::any_cast<T>(value_store));
     }
     
-    virtual ~accumulator() {}
+    virtual ~accumulator_type() {}
 
 private:
     boost::function1<void, const T&> _notifier;
     T _interval;
     T _default;
 };
+
+template<typename T>
+accumulator_type<T>* accumulator() {
+    return new accumulator_type<T>();
+}
 
 }
 
@@ -406,7 +411,7 @@ getSupportedOptions(gnash::Player& p)
         ->notifier(boost::bind(&Player::setDelay, &p, _1)),
         _("Number of milliseconds to delay in main loop"))
 
-    ("verbose,v", (new accumulator<int>())
+    ("verbose,v", accumulator<int>()
         ->notifier(boost::bind(&LogFile::setVerbosity, &dbglogfile, _1)),
         _("Produce verbose output"))
 
