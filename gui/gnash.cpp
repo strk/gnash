@@ -55,8 +55,8 @@ std::vector<std::string> infiles;
 std::string url;
 
 namespace {
-gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+    gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+    gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 }
 
 static boost::program_options::options_description
@@ -105,9 +105,9 @@ getSupportedOptions()
     ( "audio-dump,A", po::value<string>(),
         _("Audio dump file (wave format)") )
 
-    ( "hwaccel", po::value<string>(),
+    ( "hwaccel", po::value<string>()->default_value("none"),
         ( string( _("Hardware Video Accelerator to use"))
-        + string( "\nnone|vaapi|omap (default: none)") ). c_str() ) 
+        + string( "\nnone|vaapi|omap") ). c_str() ) 
 
     ( "xid,x", po::value<long>(),
         _("X11 Window ID for display") )
@@ -130,7 +130,7 @@ getSupportedOptions()
     ( "once,1", 
         _("Exit when/if movie reaches the last frame") )
 
-    ( "render-mode,r", po::value<int>(),
+    ( "render-mode,r", po::value<int>()->default_value(3),
         ( string("0 ")
         + string(_("disable rendering and sound")) 
         + string("\n1 ")
@@ -138,19 +138,17 @@ getSupportedOptions()
         + string("\n2 ")
         + string(_("enable sound, disable rendering"))
         + string("\n3 ")
-        + string(_("enable rendering and sound (default)"))
+        + string(_("enable rendering and sound"))
         ).c_str() )
 
-    ( "media,M", po::value<string>(),
+    ( "media,M", po::value<string>()->default_value(handlers.front()),
         ( string(_("The media handler to use"))
         + string("\n") + boost::join(handlers, "|")
-        + string(" (default: ") + handlers.front() + string(")")
         ).c_str() )
 
-    ( "renderer,R", po::value<string>(),
+    ( "renderer,R", po::value<string>()->default_value("AGG"),
         ( string(_("The renderer to use"))
         + string("\n") + boost::join(renderers, "|")
-        + string(" (default: AGG)")
         ).c_str() )
 
     ( "timeout,t", po::value<int>(),
