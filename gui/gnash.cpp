@@ -47,7 +47,6 @@
 #include "revno.h"
 #include "MediaHandler.h"
 
-using std::cerr;
 using std::endl;
 using std::cout;
 
@@ -67,9 +66,15 @@ namespace {
 namespace {
     namespace po = boost::program_options;
     po::options_description getSupportedOptions(gnash::Player& p);
+
     void setupSoundAndRendering(gnash::Player& p, int i);
     void setupFlashVars(gnash::Player& p, const std::string& param);
     void setupFDs(gnash::Player& p, const std::string& fds);
+
+    void usage_gui_keys(std::ostream& os);
+    void usage(std::ostream& os, const po::options_description& opts);
+    void build_options(std::ostream& os);
+    void version_and_copyright(std::ostream& os);
 }
 
 namespace {
@@ -103,7 +108,7 @@ public:
     }
 
     virtual std::string name() const {
-        return "moo";
+        return std::string();
     }
 
     /// There are no tokens for an accumulator_type
@@ -150,73 +155,6 @@ accumulator_type<T>* accumulator() {
 
 }
 
-static void
-usage_gui_keys(std::ostream& os)
-{
-    os
-    << _("Keys:") << std::endl
-    << std::endl
-    << "  CTRL-Q, CTRL-W           "
-    << _("Quit")
-    << std::endl
-    << "  CTRL-F                   "
-    << _("Toggle fullscreen")
-    << std::endl 
-    << "  CTRL-P                   "
-    << _("Toggle pause") 
-    << std::endl 
-    << "  CTRL-R                   "
-    << _("Restart the movie") 
-    << std::endl 
-    << "  CTRL-O                   "
-    << _("Take a screenshot") 
-    << std::endl 
-    << "  CTRL-L                   "
-    << _("Force immediate redraw") 
-    << std::endl;
-}
-
-static void
-usage(const po::options_description& opts)
-{
-    std::cout << _("Usage: gnash [options] movie_file.swf\n")
-              << _("Plays a SWF (Shockwave Flash) movie\n")
-              << opts << "\n";
-
-    // Add gui keys
-    // TODO: stop printing these in here ?
-    usage_gui_keys(std::cout);
-
-    std::cout << std::endl;
-}
-
-static void
-version_and_copyright()
-{
-    cout << "Gnash " << VERSION << endl
-        << endl
-        << _("Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 "
-                "Free Software Foundation, Inc.\n"
-                "Gnash comes with NO WARRANTY, to the extent permitted "
-                "by law.\nYou may redistribute copies of Gnash under the "
-                "terms of the GNU General\nPublic License.  For more "
-                "information, see the file named COPYING.\n") << endl;
-}
-
-static void
-build_options()
-{
-    cout << _("Build options ") << VERSION << endl
-	 << _("   Renderers: ") << RENDERER_CONFIG << endl
-	 << _("   Hardware Acceleration: ") << HWACCEL_CONFIG << endl
-	 << _("   GUI: ") << GUI_CONFIG << endl
-	 << _("   Media handlers: ") << MEDIA_CONFIG << endl
-        
-	 << _("   Configured with: ") << CONFIG_CONFIG << endl
-	 << _("   CXXFLAGS: ") << CXXFLAGS << endl
-	 << _("   Version: ")  << BRANCH_NICK << ":" << BRANCH_REVNO << endl;
-}
-
 int
 main(int argc, char *argv[])
 {
@@ -257,14 +195,14 @@ main(int argc, char *argv[])
     po::notify(vm);
 
     if (vm.count("help")) {
-        version_and_copyright();
-        usage(opts);
+        version_and_copyright(std::cout);
+        usage(std::cout, opts);
         return EXIT_SUCCESS;
     }
 
     if (vm.count("version")) {
-        version_and_copyright();
-        build_options();
+        version_and_copyright(std::cout);
+        build_options(std::cout);
         return EXIT_SUCCESS;
     }
 
@@ -291,7 +229,7 @@ main(int argc, char *argv[])
     // No file name was supplied
     if (infiles.empty()) {
         std::cerr << _("Error: no input file was specified. Exiting.\n");
-        usage(opts);
+        usage(std::cerr, opts);
         return EXIT_FAILURE;
     }
 
@@ -548,11 +486,70 @@ getSupportedOptions(gnash::Player& p)
         _("Quality for screenshot output (not all formats)"))
 
     ("input-file", po::value<std::vector<std::string> >(&infiles),
-        _("Filename pattern for screenshot images"))
+        _("Input files"))
     ;
 
     return desc;
 }
+
+void
+usage_gui_keys(std::ostream& os)
+{
+    os << _("Keys:\n")
+       << "  CTRL-Q, CTRL-W           "
+       << _("Quit\n")
+       << "  CTRL-F                   "
+       << _("Toggle fullscreen\n")
+       << "  CTRL-P                   "
+       << _("Toggle pause\n") 
+       << "  CTRL-R                   "
+       << _("Restart the movie\n") 
+       << "  CTRL-O                   "
+       << _("Take a screenshot\n") 
+       << "  CTRL-L                   "
+       << _("Force immediate redraw\n");
+}
+
+void
+usage(std::ostream& os, const po::options_description& opts)
+{
+    os << _("Usage: gnash [options] movie_file.swf\n")
+       << _("Plays a SWF (Shockwave Flash) movie\n")
+       << opts << "\n";
+
+    // Add gui keys
+    // TODO: stop printing these in here ?
+    usage_gui_keys(os);
+
+    os << std::endl;
+}
+
+void
+version_and_copyright(std::ostream& os)
+{
+    os << "Gnash " << VERSION << "\n\n"
+       << _("Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 "
+            "Free Software Foundation, Inc.\n"
+            "Gnash comes with NO WARRANTY, to the extent permitted "
+            "by law.\nYou may redistribute copies of Gnash under the "
+            "terms of the GNU General\nPublic License.  For more "
+            "information, see the file named COPYING.\n\n");
+}
+
+void
+build_options(std::ostream& os)
+{
+    os << _("Build options ") << VERSION << "\n"
+	   << _("   Renderers: ") << RENDERER_CONFIG << "\n"
+	   << _("   Hardware Acceleration: ") << HWACCEL_CONFIG << "\n"
+	   << _("   GUI: ") << GUI_CONFIG << "\n"
+	   << _("   Media handlers: ") << MEDIA_CONFIG << "\n"
+        
+	   << _("   Configured with: ") << CONFIG_CONFIG << "\n"
+	   << _("   CXXFLAGS: ") << CXXFLAGS << "\n"
+	   << _("   Version: ")  << BRANCH_NICK << ":" << BRANCH_REVNO << "\n";
+}
+
 
 } // unnamed namespace
 
