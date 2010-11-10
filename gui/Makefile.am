@@ -22,8 +22,20 @@
 
 AUTOMAKE_OPTIONS = -Wno-portability
 
+DIST_SUBDIRS = pythonmod fb
+
 # Build the current directory first. It's hard to see, but there is a '.' dot here.
-SUBDIRS = .
+SUBDIRS = . fb
+
+if BUILD_FB_GUI
+SUBDIRS += fb
+endif
+
+# If python support is enabled, built that too
+if HAS_PYTHON
+SUBDIRS += pythonmod
+endif
+
 
 localedir = $(datadir)/locale
 
@@ -31,19 +43,12 @@ localedir = $(datadir)/locale
 pluginsdir = $(libdir)/gnash/plugins
 
 # noinst_LTLIBRARIES = libgnashgui.la
-BUILT_SOURCES = .configline
+BUILT_SOURCES =
 
 EXTRA_DIST = gnash.in \
 	kde/klash3.moc.in \
 	kde/Kde4Gui.moc.in \
-	kde/Kde4Glue.moc.in \
-	am-frag
-
-# If python support is enabled, built that too
-if HAS_PYTHON
-SUBDIRS += pythonmod
-endif
-DIST_SUBDIRS = pythonmod
+	kde/Kde4Glue.moc.in
 
 noinst_HEADERS =
 noinst_LTLIBRARIES = 
@@ -62,12 +67,12 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libltdl \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/librender \
+	-I$(top_srcdir)/librender/agg \
+	-I$(top_srcdir)/librender/cairo \
+	-I$(top_srcdir)/librender/opengl \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
-	-I$(top_srcdir)/libmedia/ffmpeg \
-	-I$(top_srcdir)/libmedia/gst \
-	-I$(top_srcdir)/libmedia/haiku \
-    -DLOCALEDIR=\"$(localedir)\" \
+	-DLOCALEDIR=\"$(localedir)\" \
 	-DPLUGINSDIR=\"$(pluginsdir)\" \
 	-DLIBAVCODEC_IDENT=\"$(LIBAVCODEC_IDENT)\" \
 	$(GLIB_CFLAGS) \
@@ -148,24 +153,6 @@ endif
 
 # endif # DYNAMIC_GUI
 
-# AQUA Toolkit
-if BUILD_AQUA_GUI
-#OS X stuff goes here...
-GUI_CPPFLAGS += -DGUI_AQUA
-
-bundle_name = Gnash.app
-
-if  HAVE_OPENGL
-noinst_LTLIBRARIES += libgnashaqua_ogl.la
-libgnashaqua_ogl_la_CPPFLAGS = $(AM_CPPFLAGS) \
-	$(OPENGL_CFLAGS)
-libgnashaqua_ogl_la_SOURCES = \
-	aqua_ogl_glue.cpp aqua_ogl_glue.h \
-	aqua.cpp aquasup.h aqua_glue.h
-libgnashaqua_ogl_la_LDFLAGS = $(LIB_FLAGS)
-libgnashaqua_ogl_la_LIBADD = 
-endif # HAVE_OPENGL
-endif # BUILD_AQUA_GUI
 
 if USE_FFMPEG_ENGINE
 AM_LDFLAGS += $(FFMPEG_LIBS) $(LIBVA_LIBS) $(LIBVA_X11_LIBS) 
@@ -190,7 +177,7 @@ AM_CPPFLAGS += -DPKGDATADIR="\"$(pkgdatadir)\""
 AM_CPPFLAGS += -DRENDERER_CONFIG="\"$(RENDERER_CONFIG)\""
 AM_CPPFLAGS += -DHWACCEL_CONFIG="\"$(HWACCEL_CONFIG)\""
 AM_CPPFLAGS += -DMEDIA_CONFIG="\"$(MEDIA_CONFIG)\""
-AM_CPPFLAGS += -DCONFIG_CONFIG="\"$(shell cat .configline)\""
+AM_CPPFLAGS += -DCONFIG_CONFIG="\"$(shell cat ../.configline)\""
 AM_CPPFLAGS += -DCXXFLAGS="\"$(CXXFLAGS)\"" 
 
 dist_images_DATA = images/gnash_128_96.ico images/GnashG.png
@@ -204,39 +191,17 @@ gnash: gnash.in
 	cp $< $@
 	chmod +x $@
 
-# These are used to handle input events from a keyboard, mouse, or
-# touchscreen. These are only used by the Framebuffer GUI, as without
-# X11, it has no event handling. We do it this way so the optionally
-# built source files still get included in the source tarball.
-DEVICES =
-if ENABLE_INPUT_DEVICES
-DEVICES += InputDevice.cpp InputDevice.h
-
-# Touchscreen
-if ENABLE_TSLIB
-DEVICES += TouchDevice.cpp
-endif
-# PS/2 Mouse
-if ENABLE_MOUSE
-DEVICES += MouseDevice.cpp
-endif
-# Linux input events
-if ENABLE_INPUT_EVENTS
-DEVICES += EventDevice.cpp
-endif
-endif
-
 # Always include the device files in the source tarball
 EXTRA_DIST += \
-	TouchDevice.cpp \
-	MouseDevice.cpp \
-	EventDevice.cpp
+	fb/TouchDevice.cpp \
+	fb/MouseDevice.cpp \
+	fb/EventDevice.cpp
 
 GUI_SRCS = gnash.cpp \
 	gui.cpp gui.h \
 	Player.cpp Player.h \
 	NullGui.cpp NullGui.h \
-	$(DEVICES) \
+	ScreenShotter.cpp ScreenShotter.h \
 	$(NULL)
 
 if BUILD_AQUA_GUI
@@ -284,7 +249,7 @@ endif
 
 # Build the AQUA gui
 if BUILD_AQUA_GUI
-include $(srcdir)/am-frag/aqua.am
+include $(srcdir)/aqua/aqua.am
 endif
 
 # Build the GTK gui
@@ -294,20 +259,15 @@ endif
 
 # Build the DUMP gui
 if BUILD_DUMP_GUI
-include $(srcdir)/am-frag/dump.am
-endif
-
-# Build the FB gui
-if BUILD_FB_GUI
-include $(srcdir)/fb/fb.am
+include $(srcdir)/dump/dump.am
 endif
 
 # Build the RISCOS gui
 if BUILD_RISCOS_GUI
-include $(srcdir)/am-frag/riscos.am
+include $(srcdir)/riscos/riscos.am
 endif
 
-CLEANFILES = klash3.moc Kde4Gui.moc Kde4Glue.moc .configline gnash
+CLEANFILES = klash3.moc Kde4Gui.moc Kde4Glue.moc gnash
 
 bundle: Info.plist aqua-gnash
 	@echo " Building: $(bundle_name)" 
@@ -319,10 +279,6 @@ bundle: Info.plist aqua-gnash
 	cp -f aqua-gnash $(bundle_name)/Contents/MacOS/Gnash
 	cp -f images/GnashG.icns $(bundle_name)/Contents/Resources/
 
-
-.configline: ../config.log
-	-@rm -f .configline
-	@head ../config.log | grep " .*/configure " | sed -e 's:^  . .*configure ::' > .configline
 
 #noinst_PROGRAMS = guitest # klash flak
 #guitest_SOURCES = guitest.cpp #fltk.cpp #fltksup.h fltksupp.h gnash.cpp gtk.cpp 
