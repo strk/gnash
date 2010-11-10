@@ -516,7 +516,7 @@ getSupportedOptions(gnash::Player& p)
         ).c_str())
 
 #ifdef GNASH_FPS_DEBUG
-    ("debug-fps,f", po::value<float>(),
+    ("debug-fps,f", po::value<float>()
         ->notifier(boost::bind(&Player::setFpsPrintTime, &p, _1),
         _("Print FPS every num seconds"))
 #endif 
