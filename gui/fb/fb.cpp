@@ -154,6 +154,8 @@ FBGui::FBGui(unsigned long xid, float scale, bool loop, RunResources& r)
       own_vt(-1),
       fbmem(0),
       buffer(0),                // the real value is set by ENABLE_DOUBLE_BUFFERING
+      _xpos(0),
+      _ypos(0),  
       m_rowsize(0),
       _timeout(0)
 {
@@ -412,6 +414,7 @@ FBGui::renderBuffer()
     if ( _drawbounds.size() == 0 ) return; // nothing to do..
 
 #ifdef ENABLE_DOUBLE_BUFFERING
+
     // Size of a pixel in bytes
     // NOTE: +7 to support 15 bpp
     const unsigned int pixel_size = (var_screeninfo.bits_per_pixel+7)/8;
@@ -426,10 +429,12 @@ FBGui::renderBuffer()
         // copy each row
         const int minx = bounds.getMinX();
         const int maxy = bounds.getMaxY();
-    
-        for (int y=bounds.getMinY(); y<=maxy; ++y) {
-            const unsigned int pixel_index = y*m_rowsize + minx*pixel_size;
-            memcpy(&fbmem[pixel_index], &buffer[pixel_index], row_size);
+
+        const int minx1 = minx+_xpos;
+        for (int y=bounds.getMinY(), y1=y+_ypos; y<=maxy; ++y, ++y1) {
+            const unsigned int pix_idx_in = y*m_rowsize + minx*pixel_size;
+            const unsigned int pix_idx_out = y1*m_rowsize + minx1*pixel_size;
+            memcpy(&fbmem[pix_idx_out], &buffer[pix_idx_in], row_size);
         }
     }  
        
@@ -439,8 +444,11 @@ FBGui::renderBuffer()
 
 bool
 FBGui::createWindow(const char* /*title*/, int /*width*/, int /*height*/,
-                     int /*xPosition*/, int /*yPosition*/)
+                     int xPosition, int yPosition)
 {
+    _xpos = clamp<int>(xPosition, 0, var_screeninfo.xres-_width);
+    _ypos = clamp<int>(yPosition, 0, var_screeninfo.yres-_height);
+
     // Now initialize AGG
     return initialize_renderer();
 }
@@ -496,21 +504,6 @@ FBGui::showMouse(bool /*show*/)
     // Should return true if the pointer was visible before call,
     // otherwise false;
     return true;
-}
-
-int
-FBGui::valid_x(int x) {
-    if (x < 0) x = 0;
-    if (x >= _width) x = _width - 1;
-    return x;
-}
-
-int
-FBGui::valid_y(int y)
-{
-    if (y < 0) y = 0;
-    if (y >= _height) y = _height - 1;
-    return y;
 }
 
 void

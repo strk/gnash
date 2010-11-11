@@ -99,6 +99,12 @@ private:
     unsigned char *buffer; // offscreen buffer
     
     std::vector< geometry::Range2d<int> > _drawbounds;
+
+    // X position of the output window
+    int _xpos;
+
+    // Y position of the output window
+    int _ypos;
     
     unsigned m_rowsize;
     
@@ -126,9 +132,6 @@ private:
     
     /// reverts disable_terminal() changes
     bool enable_terminal();
-    
-    int valid_x(int x);
-    int valid_y(int y);
     
 public:
     FBGui(unsigned long xid, float scale, bool loop, RunResources& r);
