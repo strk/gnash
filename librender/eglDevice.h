@@ -287,10 +287,6 @@ class EGLDevice
         eglGetConfigAttrib(_eglDisplay, _eglConfig, EGL_MIN_SWAP_INTERVAL, &value);
         return value;
     }
-    // bool i() {
-    //     EGLint value;
-    //     return value;
-    // }
     
 protected:
     EGLConfig           _eglConfig;
@@ -299,6 +295,7 @@ protected:
     EGLDisplay          _eglDisplay;
     EGLint              _eglNumOfConfigs;
     EGLNativeWindowType _nativeWindow;
+    EGLNativePixmapType _nativePixmap;
     EGLint              _max_num_config;
     unsigned int        _bpp;
     unsigned int        _width;
