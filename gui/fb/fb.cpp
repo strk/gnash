@@ -329,7 +329,9 @@ FBGui::init(int argc, char *** argv)
                 break;
         }
     }
-    
+
+    log_debug("Width:%d, Height:%d");
+    _validbounds.setTo(0, 0, _width - 1, _height - 1);    
 
     return true;
 }
@@ -338,8 +340,6 @@ bool
 FBGui::initialize_renderer()
 {
     GNASH_REPORT_FUNCTION;
-
-    _validbounds.setTo(0, 0, _width - 1, _height - 1);    
 
     const int bpp = var_screeninfo.bits_per_pixel;
     const int size = fix_screeninfo.smem_len; 
