@@ -777,7 +777,7 @@ FBGui::enable_terminal()
 void
 FBGui::checkForData()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     std::vector<boost::shared_ptr<InputDevice> >::iterator it;
 
