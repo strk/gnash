@@ -85,7 +85,10 @@ void test_renderer(Renderer *renderer, const std::string &type);
 void test_geometry(Renderer *renderer, const std::string &type);
 void test_iterators(Renderer *renderer, const std::string &type);
 
-#ifdef HAVE_GTK_XX
+// The debug log used by all the gnash libraries.
+static LogFile& dbglogfile = LogFile::getDefaultInstance();
+
+#ifdef HAVE_GTK2
 GtkWidget *create_GTK_window();
 #endif
 
@@ -132,9 +135,6 @@ private:
     boost::posix_time::ptime _stoptime;
 };
 
-// The debug log used by all the gnash libraries.
-static LogFile& dbglogfile = LogFile::getDefaultInstance();
-
 int
 main(int argc, char *argv[])
 {
@@ -143,19 +143,8 @@ main(int argc, char *argv[])
 
     const char *pixelformat = "RGB24";
 
-#ifdef HAVE_GTK2_XX
-    GtkWidget *window = create_GTK_window();
-#endif
-
 #ifdef GTK_TEST_RENDER
-    // FIXME: GTK specific!
-    GtkWidget *drawing_area = 0;
-    if (!drawing_area) {
-        log_error("No GDK drawing area!");
-        exit(-1);
-    }
-    
-    GdkVisual *wvisual = gdk_drawable_get_visual(drawing_area->window);
+    GdkVisual *wvisual = gdk_drawable_get_visual(canvas);
 
     GdkImage* tmpimage = gdk_image_new (GDK_IMAGE_FASTEST, wvisual, 1, 1);
     const GdkVisual* visual = tmpimage->visual;
@@ -169,25 +158,40 @@ main(int argc, char *argv[])
         tmpimage->bpp * 8);
 #endif  // end of GTK_TEST_RENDER
 
-    Renderer *renderer = 0;
-
 #ifdef RENDERER_AGG
     Timer tagg("AGG");
-    renderer = create_Renderer_agg(pixelformat);
-    test_renderer(renderer, "AGG");
-    test_geometry(renderer, "AGG");
-    test_iterators(renderer, "AGG");
-    tagg.stop();
-    cerr << "AGG tests took " << tagg.elapsed() << endl;
+    Renderer *renderer1 = create_Renderer_agg(pixelformat);
+#ifdef HAVE_GTK2
+    GtkWidget *canvas = create_GTK_window();
+    GdkVisual* visual = gdk_drawable_get_visual(canvas->window);
+    GdkImage *offscreenbuf = gdk_image_new (GDK_IMAGE_FASTEST, visual, 200,200);
+    static_cast<Renderer_agg_base *>(renderer1)->init_buffer(
+        (unsigned char*) offscreenbuf->mem,
+        offscreenbuf->bpl * offscreenbuf->height,
+        offscreenbuf->width,
+        offscreenbuf->height,
+        offscreenbuf->bpl);
 #endif
     
-#ifdef RENDERER_OPENVG 
+    if (renderer1) {
+        test_renderer(renderer1, "AGG");
+        test_geometry(renderer1, "AGG");
+        test_iterators(renderer1, "AGG");
+        tagg.stop();
+    }
+    cerr << "AGG tests took " << tagg.elapsed() << endl << endl;
+#endif
+
+#ifdef RENDERER_OPENVG
     Timer tovg("OpenVG");
-    renderer = renderer::openvg::create_handler(pixelformat);
-    if (renderer) {
-        test_renderer(renderer, "OpenVG");
-        test_geometry(renderer, "OpenVG");
-        test_iterators(renderer, "OpenVG");
+    Renderer *renderer2 = renderer::openvg::create_handler(pixelformat);
+    EGLDevice *ovg = dynamic_cast<EGLDevice *>(renderer2);
+    ovg->initDevice(EGLDevice::OPENVG);
+    ovg->initEGL(*(reinterpret_cast<EGLNativeWindowType *>(canvas)));
+    if (renderer2) {
+        test_renderer(renderer2, "OpenVG");
+        test_geometry(renderer2, "OpenVG");
+        test_iterators(renderer2, "OpenVG");
     } else {
         cerr << "ERROR: No OpenVG renderer to test!" << endl;
     }
@@ -195,13 +199,14 @@ main(int argc, char *argv[])
     cerr << "OpenVG tests took " << tovg.elapsed() << endl;
 #endif
     
+#if 1
 #ifdef RENDERER_GLES1
     Timer tgles1("OpenGLES1");
-    renderer = renderer::gles1::create_handler(pixelformat);
-    if (renderer) {
-        test_renderer(renderer, "OpenGLES1");
-        test_geometry(renderer, "OpenGLES1");
-        test_iterators(renderer, "OpenGLES1");
+    Renderer *renderer3 = renderer::gles1::create_handler(pixelformat);
+    if (renderer3) {
+        test_renderer(renderer3, "OpenGLES1");
+        test_geometry(renderer3, "OpenGLES1");
+        test_iterators(renderer3, "OpenGLES1");
     } else {
         cerr << "ERROR: No OpenGLES1 renderer to test!" << endl;
     }
@@ -211,11 +216,11 @@ main(int argc, char *argv[])
 
 #ifdef RENDERER_GLES2
     Timer tgles2("OpenGLES2");
-    renderer =  renderer::gles2::create_handler(pixelformat);
-    if (renderer) {
-        test_renderer(renderer, "OpenGLES2");
-        test_geometry(renderer, "OpenGLES2");
-        test_iterators(renderer, "OpenGLES2");
+    Renderer *renderer4 = renderer::gles2::create_handler(pixelformat);
+    if (renderer4) {
+        test_renderer(renderer4, "OpenGLES2");
+        test_geometry(renderer4, "OpenGLES2");
+        test_iterators(renderer4, "OpenGLES2");
     } else {
         cerr << "ERROR: No OpenGLES2 renderer to test!" << endl;
     }
@@ -225,11 +230,11 @@ main(int argc, char *argv[])
 
 #ifdef RENDERER_CAIRO 
     Timer tcairo("Cairo");
-    renderer = renderer::cairo::create_handler();
-    if (renderer) {
-        test_renderer(renderer, "Cairo");
-        test_geometry(renderer, "Cairo");
-        test_iterators(renderer, "Cairo");
+    Renderer *renderer5 = renderer::cairo::create_handler();
+    if (renderer5) {
+        test_renderer(renderer5, "Cairo");
+        test_geometry(renderer5, "Cairo");
+        test_iterators(renderer5, "Cairo");
     } else {
         cerr << "ERROR: No Cairo renderer to test!" << endl;
     }
@@ -239,19 +244,20 @@ main(int argc, char *argv[])
     
 #ifdef RENDERER_OPENGL
     Timer tgl("OpenGL");
-    renderer = renderer::opengl::create_handler(true);
-    if (renderer) {
-        test_renderer(renderer, "OpenGL");
-        test_geometry(renderer, "OpenGL");
-        test_iterators(renderer, "OpenGL");
+    Renderer *renderer6 = renderer::opengl::create_handler(true);
+    if (renderer6) {
+        test_renderer(renderer6, "OpenGL");
+        test_geometry(renderer6, "OpenGL");
+        test_iterators(renderer6, "OpenGL");
     } else {
         cerr << "ERROR: No OpenGL renderer to test!" << endl;
     }
     tgl.stop();
     cerr << "OpenGL tests took " << tgl.elapsed() << endl;
 #endif
+#endif
     
-#ifdef HAVE_GTK2_XX
+#ifdef HAVE_GTK2
     gtk_main();
     gtk_main_quit();
     gtk_exit(0);
@@ -291,12 +297,33 @@ test_renderer(Renderer *renderer, const std::string &type)
         runtest.fail("getBitsPerPixel()");
     }
 
+#ifdef HAVE_GTK2
+    GtkWidget *canvas = create_GTK_window();
+    if (type == "AGG") {
+        GdkVisual* visual = gdk_drawable_get_visual(canvas->window);
+        GdkImage *offscreenbuf = gdk_image_new (GDK_IMAGE_FASTEST, visual, 200,
+                                                200);;
+        static_cast<Renderer_agg_base *>(renderer)->init_buffer(
+            (unsigned char*) offscreenbuf->mem,
+            offscreenbuf->bpl * offscreenbuf->height,
+            offscreenbuf->width,
+            offscreenbuf->height,
+            offscreenbuf->bpl);    
+    }
+            
+    if ((type == "OpenVG") && (type == "OpenGLES1") && (type == "OpenGLES2")) {
+        EGLDevice *ovg = dynamic_cast<EGLDevice *>(renderer);
+        ovg->initDevice(EGLDevice::OPENVG);
+        ovg->initEGL(*(reinterpret_cast<EGLNativeWindowType *>(canvas)));
+    }
+#else
     // Initializes the renderer for off-screen rendering used by the testsuite.
     if (renderer->initTestBuffer(10, 10)) {
         runtest.pass("initTestBuffer()");
     } else {
         runtest.fail("initTestBuffer()");
     }
+#endif
     
     /// @coords an array of 16-bit signed integer coordinates. Even indices
     ///         (and 0) are x coordinates, while uneven ones are y coordinates.
