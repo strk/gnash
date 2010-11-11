@@ -464,7 +464,7 @@ FBGui::renderBuffer()
         const int maxy = bounds.getMaxY();
     
         for (int y=bounds.getMinY(); y<=maxy; ++y) {
-            const unsigned int pixel_index = y * m_rowsize + minx*pixel_size;      
+            const unsigned int pixel_index = y*m_rowsize + minx*pixel_size;
             memcpy(&fbmem[pixel_index], &buffer[pixel_index], row_size);
         }
     }  
