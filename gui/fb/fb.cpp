@@ -195,7 +195,7 @@ FBGui::FBGui(unsigned long xid, float scale, bool loop, RunResources& r)
 //    memset(mouse_buf, 0, 256);
     memset(&var_screeninfo, 0, sizeof(fb_var_screeninfo));
     memset(&fix_screeninfo, 0, sizeof(fb_fix_screeninfo));
-    
+
     signal(SIGINT, terminate_signal);
     signal(SIGTERM, terminate_signal);
 }
@@ -259,7 +259,7 @@ FBGui::set_grayscale_lut8()
 }
 
 bool
-FBGui::init(int /*argc*/, char *** /*argv*/)
+FBGui::init(int argc, char *** argv)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -313,6 +313,24 @@ FBGui::init(int /*argc*/, char *** /*argv*/)
     }
 #endif
 
+    // Set "window" size
+    _width    = var_screeninfo.xres;
+    _height   = var_screeninfo.yres;
+
+    // Let -j -k override "window" size
+    optind = 0; opterr = 0; char c;
+    while ((c = getopt (argc, *argv, "j:k:")) != -1) {
+        switch (c) {
+            case 'j':
+                _width = atoi(optarg);
+                break;
+            case 'k':
+                _height = atoi(optarg);
+                break;
+        }
+    }
+    
+
     return true;
 }
 
@@ -320,12 +338,6 @@ bool
 FBGui::initialize_renderer()
 {
     GNASH_REPORT_FUNCTION;
-
-    // TODO: do not reset _width and _height
-    //       if they were set trough -j / -k
-
-    _width    = var_screeninfo.xres;
-    _height   = var_screeninfo.yres;
 
     _validbounds.setTo(0, 0, _width - 1, _height - 1);    
 
@@ -463,15 +475,9 @@ FBGui::renderBuffer()
 }
 
 bool
-FBGui::createWindow(const char* /*title*/, int width, int height,
+FBGui::createWindow(const char* /*title*/, int /*width*/, int /*height*/,
                      int /*xPosition*/, int /*yPosition*/)
 {
-    assert(width>0);
-    assert(height>0);
-
-    _width = width;
-    _height = height;
-
     // Now initialize AGG
     return initialize_renderer();
 }
