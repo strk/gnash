@@ -330,7 +330,7 @@ getSupportedOptions(gnash::Player& p)
     boost::split(renderers, RENDERER_CONFIG,
         boost::is_any_of(" "), boost::token_compress_on);
 
-    po::options_description desc("Options");
+    po::options_description desc(_("Options"));
 
     desc.add_options()
 
