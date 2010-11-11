@@ -113,13 +113,6 @@
 
 #include <linux/input.h>    // for /dev/input/event*
 
-//#define DEBUG_SHOW_FPS  // prints number of frames per second to STDOUT
-
-#ifdef DEBUG_SHOW_FPS
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <fcntl.h>
-#endif
 
 // workaround until fatal_error() is implemented
 // that is not silent without -v switch
@@ -144,35 +137,6 @@ namespace gnash
 
 
 //---------------
-#ifdef DEBUG_SHOW_FPS
-double fps_timer=0;
-int fps_counter=0;
-void
-profile()
-{
-    int fd;
-    double uptime, idletime;
-    char buffer[20];
-    int readcount;
-    
-    fd = open("/proc/uptime", O_RDONLY);
-    if (fd<0) return;
-    readcount = read(fd, buffer, sizeof(buffer)-1);
-    buffer[readcount]=0;
-    sscanf(buffer, "%lf %lf", &uptime, &idletime);
-    close(fd);
-    
-    fps_counter++;
-    
-    if (fps_counter<2) {
-        fps_timer = uptime;
-        return;    
-    }
-    
-    printf("FPS: %.3f (%.2f)\n", fps_counter/(uptime-fps_timer), uptime-fps_timer);
-    
-}
-#endif
 
 int terminate_request = false;  // global scope to avoid GUI access
 
@@ -471,9 +435,6 @@ FBGui::renderBuffer()
        
 #endif
   
-#ifdef DEBUG_SHOW_FPS
-    profile();
-#endif
 }
 
 bool
