@@ -342,7 +342,7 @@ getSupportedOptions(gnash::Player& p)
 
     ("scale,s", po::value<float>()
         ->notifier(boost::bind(&Player::setScale, &p,
-                boost::bind(gnash::clamp<float>, 0.01f, 100.f, _1))),
+                boost::bind(gnash::clamp<float>, _1, 0.01f, 100.f))),
         _("Scale the movie by the specified factor"))
 
     ("delay,d", po::value<int>()
