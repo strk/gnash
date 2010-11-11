@@ -831,7 +831,7 @@ AC_ARG_ENABLE(media,
 )
 
 dnl If no render is selected, and media handling isn't disabled, them enable gst
-if test x${build_media_none} = xno -a x${build_media_gst} = xno -a x${build_media_none} = xno; then
+if test x${build_media_none} = xno -a x${build_media_gst} = xno -a x${build_media_ffmpeg} = xno; then
   build_media_gst=yes
 fi
 
