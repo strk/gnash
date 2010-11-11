@@ -77,6 +77,9 @@
 #include "gnashconfig.h"
 #endif
 
+#include "GnashSystemIOHeaders.h"
+#include "GnashNumeric.h"
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -87,7 +90,6 @@
 #include <linux/fb.h>
 #include <linux/kd.h>
 #include <linux/vt.h>
-#include "GnashSystemIOHeaders.h"
 #include <csignal>
 #include <cstdlib> // getenv
 
@@ -322,10 +324,10 @@ FBGui::init(int argc, char *** argv)
     while ((c = getopt (argc, *argv, "j:k:")) != -1) {
         switch (c) {
             case 'j':
-                _width = atoi(optarg);
+                _width = clamp<int>(atoi(optarg), 1, _width);
                 break;
             case 'k':
-                _height = atoi(optarg);
+                _height = clamp<int>(atoi(optarg), 1, _height);
                 break;
         }
     }
