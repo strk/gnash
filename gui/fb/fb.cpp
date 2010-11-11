@@ -287,7 +287,7 @@ FBGui::init(int argc, char *** argv)
 
     // Let -j -k override "window" size
     optind = 0; opterr = 0; char c;
-    while ((c = getopt (argc, *argv, "j:k:")) != -1) {
+    while ((c = getopt (argc, *argv, "j:k:X:Y:")) != -1) {
         switch (c) {
             case 'j':
                 _width = clamp<int>(atoi(optarg), 1, _width);
@@ -295,10 +295,24 @@ FBGui::init(int argc, char *** argv)
             case 'k':
                 _height = clamp<int>(atoi(optarg), 1, _height);
                 break;
+            case 'X':
+                _xpos = atoi(optarg);
+                break;
+            case 'Y':
+                _ypos = atoi(optarg);
+                break;
         }
     }
 
-    log_debug("Width:%d, Height:%d");
+    if ( _xpos < 0 ) _xpos += var_screeninfo.xres - _width;
+    _xpos = clamp<int>(_xpos, 0, var_screeninfo.xres-_width);
+
+    if ( _ypos < 0 ) _ypos += var_screeninfo.yres - _height;
+    _ypos = clamp<int>(_ypos, 0, var_screeninfo.yres-_height);
+
+    log_debug("Width:%d, Height:%d", _width, _height);
+    log_debug("X:%d, Y:%d", _xpos, _ypos);
+
     _validbounds.setTo(0, 0, _width - 1, _height - 1);    
 
     return true;
@@ -444,11 +458,8 @@ FBGui::renderBuffer()
 
 bool
 FBGui::createWindow(const char* /*title*/, int /*width*/, int /*height*/,
-                     int xPosition, int yPosition)
+                     int /*xPosition*/, int /*yPosition*/)
 {
-    _xpos = clamp<int>(xPosition, 0, var_screeninfo.xres-_width);
-    _ypos = clamp<int>(yPosition, 0, var_screeninfo.yres-_height);
-
     // Now initialize AGG
     return initialize_renderer();
 }
