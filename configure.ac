@@ -783,8 +783,9 @@ AC_ARG_ENABLE(sound,
 dnl --------------------------------------------------------
 dnl  Media handler selection
 dnl --------------------------------------------------------
-build_media_gst=yes
+build_media_gst=no
 build_media_ffmpeg=no
+build_media_none=no
 AC_ARG_ENABLE(media,
   AC_HELP_STRING([--enable-media=handler],
     [Enable media handling support using the specified handler: gst, ffmpeg or none (no sound) [[gst]] ]),
@@ -804,6 +805,7 @@ AC_ARG_ENABLE(media,
           media_list="${media_list}ffmpeg "
           ;;
         no|NO|none)
+          build_media_none=yes
           build_media_ffmpeg=no
           build_media_gst=no
           media_list="none"
@@ -827,6 +829,11 @@ AC_ARG_ENABLE(media,
         media_list="gst"
     fi]
 )
+
+dnl If no render is selected, and media handling isn't disabled, them enable gst
+if test x${build_media_none} = xno -a x${build_media_gst} = xno -a yesx${build_media_none} = xno; then
+  build_media_gst=yes
+fi
 
 MEDIA_CONFIG="${media_list}"
 AC_SUBST(MEDIA_CONFIG)
