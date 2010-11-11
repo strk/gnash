@@ -263,7 +263,7 @@ FBGui::set_grayscale_lut8()
 bool
 FBGui::init(int argc, char *** argv)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     // Initialize all the input devices
 
@@ -341,7 +341,7 @@ FBGui::init(int argc, char *** argv)
 bool
 FBGui::initialize_renderer()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     const int bpp = var_screeninfo.bits_per_pixel;
     const int size = fix_screeninfo.smem_len; 
@@ -402,7 +402,7 @@ FBGui::initialize_renderer()
 bool
 FBGui::run()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
   
 #ifdef USE_TSLIB
     int ts_loop_count;
@@ -443,7 +443,7 @@ FBGui::run()
 void
 FBGui::renderBuffer()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     if ( _drawbounds.size() == 0 ) return; // nothing to do..
 
