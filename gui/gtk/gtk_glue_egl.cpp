@@ -28,9 +28,9 @@
 #include "log.h"
 #include "RunResources.h"
 #include "Renderer.h"
-#include "Renderer_ovg.h"
 #include "gtk_glue_egl.h"
 #include "GnashException.h"
+#include "openvg/Renderer_ovg.h"
 
 #ifdef HAVE_VG_OPENVG_H
 #include <VG/openvg.h>
@@ -374,7 +374,7 @@ GtkEGLGlue::createRenderHandler()
 
     gdk_image_destroy(tmpimage);
 
-    _renderer = create_handler(pixelformat);
+//    _renderer = dynamic_cast<Renderer *>(renderer::openvg::create_handler(pixelformat));
     if (! _renderer) {
         boost::format fmt = boost::format(
             _("Could not create OPENVG renderer with pixelformat %s")
