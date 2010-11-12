@@ -51,7 +51,7 @@
 #include "opengles2/Renderer_gles2.h"
 #endif
 #ifdef RENDERER_CAIRO
-#include "cario/Renderer_cairo.h"
+#include "cairo/Renderer_cairo.h"
 #endif
 
 #include "log.h"
