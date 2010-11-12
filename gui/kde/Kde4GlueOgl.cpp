@@ -28,7 +28,7 @@
 #include "Kde4GlueOgl.h"
 #include "Kde4Gui.h"
 #include "Renderer.h"
-#include "Renderer_ogl.h"
+#include "opengl/Renderer_ogl.h"
 #include "GnashException.h"
 
 namespace gnash

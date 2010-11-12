@@ -17,9 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "sdl_glue.h"
-#include "Renderer_ogl.h"
-
-
+#include "opengl/Renderer_ogl.h"
 
 namespace gnash
 {

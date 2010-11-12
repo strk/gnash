@@ -24,6 +24,7 @@
 
 #include "gtk_glue_gtkglext.h"
 #include "log.h"
+#include "opengl/Renderer_ogl.h"
 
 using namespace std;
 
@@ -116,7 +117,7 @@ GtkGlExtGlue::createRenderHandler()
     // Attach our OpenGL context to the drawing_area.
     gdk_gl_drawable_make_current(gldrawable, glcontext);
 
-    Renderer* renderer = create_Renderer_ogl();
+    Renderer* renderer = renderer::opengl::create_handler();
 
 #ifdef FIX_I810_LOD_BIAS
     glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, _tex_lod_bias);

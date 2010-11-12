@@ -20,7 +20,7 @@
 #ifndef AQUA_OGL_GLUE_H
 #define AQUA_OGL_GLUE_H
 
-#include "Renderer_ogl.h"
+#include "opengl/Renderer_ogl.h"
 #include "aqua_glue.h"
 
 namespace gnash
