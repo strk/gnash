@@ -24,13 +24,9 @@ AUTOMAKE_OPTIONS = -Wno-portability
 
 DIST_SUBDIRS = pythonmod fb
 
-if BUILD_FB_GUI
-SUBDIRS += fb
-endif
-
 # If python support is enabled, built that too
 if HAS_PYTHON
-SUBDIRS += pythonmod
+SUBDIRS = pythonmod
 endif
 
 localedir = $(datadir)/locale
