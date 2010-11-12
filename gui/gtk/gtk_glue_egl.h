@@ -26,7 +26,7 @@
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 #include <boost/scoped_array.hpp>
-#include "Renderer_ovg.h"
+#include "openvg/Renderer_ovg.h"
 
 #ifdef HAVE_VG_OPENVG_H
 #include <VG/openvg.h>
@@ -81,7 +81,7 @@ class GtkEGLGlue : public GtkGlue
   private:
     // offscreenbuf is only used with ENABLE_EGL_OFFSCREEN
     GdkImage            *_offscreenbuf;
-    Renderer_ovg_base   *_renderer;
+    renderer::openvg::Renderer_ovg        *_renderer;
     
     EGLConfig           _eglConfig;
     EGLContext          _eglContext;
