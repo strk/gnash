@@ -96,7 +96,7 @@ MovieFactory::makeMovie(std::auto_ptr<IOChannel> in, const std::string& url,
             return ret;
 
         default:
-            log_error(_("unknown file type (%s)"), type);
+            log_error(_("Unknown file type"));
             break;
     }
 

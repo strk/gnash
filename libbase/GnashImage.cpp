@@ -37,6 +37,7 @@
 #include "GnashImageJpeg.h"
 #include "IOChannel.h"
 #include "log.h"
+#include "GnashNumeric.h"
 
 namespace gnash {
 namespace image {
@@ -160,7 +161,9 @@ Output::writeImageData(FileType type,
     
     const size_t width = image.width();
     const size_t height = image.height();
-            
+    
+    quality = clamp<int>(quality, 0, 100);    
+
     std::auto_ptr<Output> outChannel;
 
     switch (type) {

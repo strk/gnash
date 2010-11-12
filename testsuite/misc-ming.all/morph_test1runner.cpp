@@ -47,11 +47,6 @@ main(int /*argc*/, char** /*argv*/)
   rgba red(255,0,0,255);   //start color
   rgba green(0,255,0,255); //end color
 
-  int start_x = 0;  //start coordinates of LU point
-  int start_y = 0;
-  int end_x = 700;  //end coordinates of LU point
-  int end_y = 500;
-
   MovieClip* root = tester.getRootMovie();
   assert(root);
   check_equals(root->get_frame_count(), 7);

@@ -191,8 +191,7 @@ public:
     /// SWF playback, so for normal playback this pointer should not be
     /// used.
     Movie* init(movie_definition* def,
-            const MovieClip::MovieVariables& variables,
-            const MovieClip::MovieVariables& scriptables);
+            const MovieClip::MovieVariables& variables);
 
     /// Return the movie at the given level (0 if unloaded level).
     //
@@ -853,8 +852,8 @@ public:
 
     const RunResources& runResources() const { return _runResources; }
 
-    void addExternalCallback(as_object *obj, const std::string &name,
-                             as_object *callback);
+    /// Add an ExternalInterface callback object with an associated name.
+    void addExternalCallback(const std::string& name, as_object* callback);
 
     bool processInvoke(ExternalInterface::invoke_t *);
 
@@ -1011,7 +1010,7 @@ private:
     const RunResources& _runResources; 
 
     /// This initializes a SharedObjectLibrary, which requires 
-    /// _originalURL, so that must be initialized first.
+    /// _baseURL, so that must be initialized first.
     VM _vm;
 
     /// Registered Interface command handler, if any

@@ -20,18 +20,16 @@
 
 AUTOMAKE_OPTIONS =
 
-#AM_CPPFLAGS = # -Wall
-
 # this is where Gnash plugins get installed
 pluginsdir = $(libdir)/gnash/plugins
 
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
-
 AM_CPPFLAGS = -I.. \
 	-I$(srcdir) \
 	-I$(top_srcdir) \
 	-I$(top_srcdir)/libcore \
+	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libcore/parser \
 	-I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libbase \
@@ -54,24 +52,37 @@ AM_CPPFLAGS = -I.. \
 
 GNASH_LIBS = \
 	$(top_builddir)/libcore/libgnashcore.la \
-	$(top_builddir)/libbase/libgnashbase.la 
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(NULL)
 
-noinst_HEADERS = \
+instdir = $(includedir)/gnash
+
+inst_HEADERS = \
 	Renderer.h \
 	Renderer_ovg.h \
-	Renderer_agg.h \
-	Renderer_agg_bitmap.h \
 	Renderer_ovg_bitmap.h \
-	Renderer_agg_style.h \
-	Renderer_cairo.h \
 	Renderer_ogl.h \
 	eglDevice.h \
-        PathParser.h
+	$(NULL)
+
+noinst_HEADERS = \
+	Renderer_ovg.h \
+	Renderer_ovg_bitmap.h \
+	Renderer_ogl.h \
+	eglDevice.h \
+	agg/Renderer_agg.h \
+	agg/Renderer_agg_bitmap.h \
+	agg/Renderer_agg_style.h \
+	opengl/tu_opengl_includes.h \
+	opengl/Renderer_ogl.h \
+	cairo/Renderer_cairo.h \
+	cairo/PathParser.h
+	$(NULL)
 
 pkglib_LTLIBRARIES = libgnashrender.la
 libgnashrender_la_LIBADD = $(LIBVA_LIBS) $(LIBVA_X11_LIBS) $(LIBVA_GLX_LIBS)
-libgnashrender_la_SOURCES = PathParser.cpp
 libgnashrender_la_LDFLAGS =  -release $(VERSION) 
+libgnashrender_la_SOURCES =
 
 if BUILD_EGL_DEVICE
 libgnashrender_la_SOURCES += eglDevice.cpp
@@ -79,12 +90,12 @@ libgnashrender_la_LIBADD += $(EGL_LIBS) $(GTK2_LIBS)
 endif
 
 if BUILD_OGL_RENDERER
-libgnashrender_la_SOURCES += Renderer_ogl.cpp
+libgnashrender_la_SOURCES += opengl/Renderer_ogl.cpp
 libgnashrender_la_LIBADD += $(OPENGL_LIBS)
 endif
 
 if  BUILD_AGG_RENDERER
-libgnashrender_la_SOURCES += Renderer_agg.cpp 
+libgnashrender_la_SOURCES += agg/Renderer_agg.cpp 
 libgnashrender_la_LIBADD += $(AGG_LIBS) $(LIBVA)
 endif
 
@@ -104,7 +115,8 @@ libgnashrender_la_LIBADD += $(GLES2_LIBS)
 endif
 
 if  BUILD_CAIRO_RENDERER
-libgnashrender_la_SOURCES += Renderer_cairo.cpp
+libgnashrender_la_SOURCES += cairo/Renderer_cairo.cpp
+libgnashrender_la_SOURCES += cairo/PathParser.cpp
 libgnashrender_la_LIBADD += $(CAIRO_LIBS)
 endif
 

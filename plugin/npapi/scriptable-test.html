@@ -70,7 +70,7 @@ quality="high" wmode="transparent" width="640" height="100"
       <li><button onclick='ShowVersion()'>Show Version</button></li>
       <li><button onclick='TestJSMethod("foodbar")'>TestJSMethod</button></li>
       <li><button onclick='TestASMethodJS("barfood")'>TestASMethodJS</button></li>
-      <li><button onclick='FlashSetVariable("var1", "value1")'>SetVariable</button></li>
+      <li><button onclick='FlashSetVariable("var1", "value"+(val++))'>SetVariable</button></li>
       <li><button onclick='FlashGetVariable("var1")'>GetVariable</button></li>
       <li><button onclick='FlashGotoFrame(123)'>GotoFrame</button></li>
       <li><button onclick='FlashIsPlaying()'>IsPlaying</button></li>
@@ -89,6 +89,7 @@ quality="high" wmode="transparent" width="640" height="100"
 </div>
 
       <script type="text/javascript">
+          var val = 0; // used for setVariable
           var embed = document.embeds[0];
           function clearLog() {
               var log = document.getElementById("log");

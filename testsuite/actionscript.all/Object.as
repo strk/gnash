@@ -979,6 +979,21 @@ check(nonk.__proto__);
 check(!nonk._width);
 check(nonk.__proto__._width);
 
+// Check that running Object's constructor doesn't change __proto__.
+// This was only because we were doing something stupid before.
+
+I = function() {
+    check_equals(this.__proto__.toString(), "orig");
+    super();
+    check_equals(this.__proto__.toString(), "orig");
+};
+
+o = new Object();
+I.prototype = o;
+I.prototype.toString = function() { return "orig"; };
+
+var tmp = new I();
+
 ////////////////////////////////
 
 // Messing about here with global classes may ruin later tests, so don't add
@@ -1011,10 +1026,10 @@ o = new Object(b);
 check_equals(typeof(o), "undefined");
 
 #if OUTPUT_VERSION <= 5
-totals(137);
+totals(139);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(325);
+totals(327);
 #endif
 

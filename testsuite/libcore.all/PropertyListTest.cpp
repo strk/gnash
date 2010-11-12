@@ -67,8 +67,9 @@ main(int /*argc*/, char** /*argv*/)
 
     // We don't care about the base URL.
     RunResources runResources;
+    const URL url("");
     runResources.setStreamProvider(
-            boost::shared_ptr<StreamProvider>(new StreamProvider(URL(""))));
+            boost::shared_ptr<StreamProvider>(new StreamProvider(url, url)));
 	
     boost::intrusive_ptr<movie_definition> md5(
             new DummyMovieDefinition(runResources, 5));
@@ -81,10 +82,7 @@ main(int /*argc*/, char** /*argv*/)
 
     movie_root root(*md5, clock, runResources);
 
-    // We pass MovieClip::MovieVariables() twice, as the second one is
-    // for scriptable Variables, which isn't fully implemented yet.
-    root.init(md5.get(), MovieClip::MovieVariables(),
-	      MovieClip::MovieVariables());
+    root.init(md5.get(), MovieClip::MovieVariables());
 
     VM& vm = root.getVM();
 

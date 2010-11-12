@@ -1,0 +1,16 @@
+These files are a test for resolution of relative urls
+with different mixes of <base> tags and "base" params
+and subdir layouts.
+
+The test is not automated.
+You have to build test.swf in both root and sub/ dirs
+(top line of test.as contains makeswf call) and install
+this directory content under a 'test' directory in your
+base root (or change installation in test_base.html top
+lines).
+Pointing your browser to the test.html file will show
+instructions on how to tell if the player is working as
+expected or not.
+
+As a facility, some javascript code shows what's the supposed
+baseURI to use for resolving relative urls.

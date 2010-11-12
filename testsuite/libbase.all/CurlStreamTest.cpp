@@ -22,6 +22,7 @@
 
 #include "NetworkAdapter.h"
 #include "tu_file.h"
+#include "IOChannel.h"
 
 #include <memory>               // for auto_ptr
 #include <cstdio>
@@ -63,7 +64,7 @@ dump_curl(const char* url, ostream& os)
 static void
 dump_tu_file(const char* url, ostream& os)
 {
-	tu_file* reader = new tu_file(url, "r");
+    std::auto_ptr<IOChannel> reader = makeFileChannel(url, true);
 	assert(reader);
 	if (reader->bad()) return;
 

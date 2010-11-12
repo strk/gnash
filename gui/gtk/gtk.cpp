@@ -974,9 +974,6 @@ private:
         GtkWidget *mediaDir;
         GtkWidget *saveStreamingMediaToggle;
         GtkWidget *saveLoadedMediaToggle;
-#ifdef USE_DEBUGGER
-        GtkWidget *DebuggerToggle;
-#endif
 
         PrefWidgets()
             :
@@ -1004,9 +1001,6 @@ private:
             mediaDir(0),
             saveStreamingMediaToggle(0),
             saveLoadedMediaToggle(0)
-#ifdef USE_DEBUGGER
-            ,DebuggerToggle(0)
-#endif
         {}
 
     };
@@ -1358,18 +1352,6 @@ PreferencesDialog::addLoggingTab()
     // Align button state with _rcfile
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_prefs->ASCodingErrorToggle),
                 _rcfile.showASCodingErrors());
-
-#ifdef USE_DEBUGGER
-
-    _prefs->DebuggerToggle = 
-        gtk_check_button_new_with_mnemonic(_("Enable _debugger"));
-    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->DebuggerToggle, FALSE,
-            FALSE, 0);
-    // Align button state with _rcfile
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_prefs->DebuggerToggle),
-            _rcfile.useDebugger());
-
-#endif
 
 }
 
@@ -1804,7 +1786,6 @@ GtkGui::showAboutDialog()
     comments.append(_("\nMedia: "));
     comments.append(m ? m->description() : "no media handler");
 
-    gtk_about_dialog_set_url_hook(NULL, NULL, NULL);
     GdkPixbuf *logo_pixbuf = createPixbuf("GnashG.png");
 
 #if 1
@@ -1813,6 +1794,7 @@ GtkGui::showAboutDialog()
     // See bug #24426.
 
     GtkWidget* aboutWidget = gtk_about_dialog_new();
+    addGnashIcon(GTK_WINDOW(aboutWidget)); 
     GtkAboutDialog* about = GTK_ABOUT_DIALOG(aboutWidget);
 
     gtk_about_dialog_set_name (about, "Gnash");

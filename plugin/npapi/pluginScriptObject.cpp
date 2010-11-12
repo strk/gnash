@@ -469,9 +469,9 @@ bool
 GnashPluginScriptObject::GetProperty(NPIdentifier name, NPVariant *result)
 {
     if (NPN_IdentifierIsString(name)) {
-        log_debug("Getting Property %s\"...", NPN_UTF8FromIdentifier(name));
+        log_debug("Getting Property \"%s\"...", NPN_UTF8FromIdentifier(name));
     } else {
-        log_debug("Getting Property %d\"...", NPN_IntFromIdentifier(name));
+        log_debug("Getting Property \"%d\"...", NPN_IntFromIdentifier(name));
     }
 
     std::map<NPIdentifier, GnashNPVariant>::const_iterator it;

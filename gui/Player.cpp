@@ -48,6 +48,7 @@
 #include "VM.h"
 #include "SystemClock.h"
 #include "ExternalInterface.h"
+#include "ScreenShotter.h"
 
 #include "GnashSystemIOHeaders.h" // for write() 
 #include "log.h"
@@ -71,12 +72,6 @@ Player::setFlashVars(const std::string& varstr)
     URL::parse_querystring(varstr, vars);
 
     _gui->addFlashVars(vars);
-}
-
-void
-Player::setScriptableVar(const std::string &name, const std::string &value)
-{
-    _gui->addScriptableVar(name, value);
 }
 
 Player::Player()
@@ -105,7 +100,8 @@ Player::Player()
     _hostfd(-1),
     _controlfd(-1),
     _startFullscreen(false),
-    _hideMenu(false)
+    _hideMenu(false),
+    _screenshotQuality(100)
 {
 }
 
@@ -226,11 +222,12 @@ Player::load_movie()
     }
 
     try {
-        if ( _infile == "-" ) {
+        if (_infile == "-") {
             std::auto_ptr<IOChannel> in (
                 noseek_fd_adapter::make_stream(fileno(stdin)));
             md = MovieFactory::makeMovie(in, _url, *_runResources, false);
-        } else {
+        }
+        else {
             URL url(_infile);
             if ( url.protocol() == "file" ) {
                 std::string path = url.path();
@@ -249,12 +246,13 @@ Player::load_movie()
             md = MovieFactory::makeMovie(url, *_runResources, _url.c_str(),
                     false);
         }
-    } catch (const GnashException& er) {
+    }
+    catch (const GnashException& er) {
         std::cerr << er.what() << std::endl;
         md = NULL;
     }
 
-    if ( ! md ) {
+    if (!md) {
         fprintf(stderr, "Could not load movie '%s'\n", _infile.c_str());
         return NULL;
     }
@@ -293,9 +291,12 @@ Player::run(int argc, char* argv[], const std::string& infile,
 
     // Parse player parameters. These are not passed to the SWF, but rather
     // control stage properties etc.
+    // NOTE: it is intentional to force a trailing slash to "base" argument
+    //       as it was tested that the "base" argument is always considered
+    //       a directory!
     Params::const_iterator it = _params.find("base");
     const URL baseURL = (it == _params.end()) ? _baseurl :
-                                               URL(it->second, _baseurl);
+                                               URL(it->second+"/", _baseurl);
     /// The RunResources should be populated before parsing.
     _runResources.reset(new RunResources());
 
@@ -306,7 +307,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
     std::auto_ptr<NamingPolicy> np(new IncrementalRename(_baseurl));
 
     /// The StreamProvider uses the actual URL of the loaded movie.
-    boost::shared_ptr<StreamProvider> sp(new StreamProvider(baseURL, np));
+    boost::shared_ptr<StreamProvider> sp(new StreamProvider(_url, baseURL, np));
 
     _runResources->setStreamProvider(sp);
 
@@ -514,14 +515,18 @@ Player::run(int argc, char* argv[], const std::string& infile,
 
         // Use default if filename is empty.
         if (_screenshotFile.empty()) {
-            URL url(_runResources->streamProvider().originalURL());
+            URL url(_runResources->streamProvider().baseURL());
             std::string::size_type p = url.path().rfind('/');
             const std::string& name = (p == std::string::npos) ? url.path() :
                 url.path().substr(p + 1);
             _screenshotFile = "screenshot-" + name + "-%f";
         }
-
-        _gui->requestScreenShots(v, last, _screenshotFile);
+        if (!last && v.empty()) return;
+        
+        std::auto_ptr<ScreenShotter> ss(new ScreenShotter(_screenshotFile, _screenshotQuality));
+        if (last) ss->lastFrame();
+        ss->setFrames(v);
+        _gui->setScreenShotter(ss);
     }
 
     _gui->run();

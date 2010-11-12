@@ -1,0 +1,28 @@
+
+<script>
+document.write('window.location.href: '+window.location.href);
+document.write('<br>');
+document.write('document.baseURI: '+document.baseURI);
+</script>
+
+<hr/>
+
+<embed type="application/x-shockwave-flash"
+ border="1"
+ src="../test.swf"
+ height="100" width="400">
+no base (expect XML:sub)
+
+<hr/>
+
+<embed type="application/x-shockwave-flash"
+ border="1"
+ src="../test.swf"
+ height="100" width="400"
+ base="..">
+base=".." (expect XML:root)
+ 
+<hr/>
+
+<a href="../test.html">root</a>
+

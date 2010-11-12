@@ -27,11 +27,13 @@
 #endif
 
 #include "noseek_fd_adapter.h"
+#include "IOChannel.h"
 #include "tu_file.h"
 
 #include <cstdio>
 #include <iostream>
 #include <cassert>
+#include <memory>
 
 #include "GnashSystemIOHeaders.h"
 #include <sys/types.h>
@@ -147,9 +149,9 @@ main(int /*argc*/, char** /*argv*/)
 
 
     FILE* f = std::fopen(cachename, "r");
-	gnash::tu_file orig(f, false);
+    std::auto_ptr<gnash::IOChannel> orig = gnash::makeFileChannel(f, false);
 	lseek(raw, 0, SEEK_SET);
-	compare_reads(&orig, raw, "cache", "raw");
+	compare_reads(orig.get(), raw, "cache", "raw");
 
 	return 0;
 }

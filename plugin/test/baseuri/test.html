@@ -1,0 +1,55 @@
+<script>
+document.write('window.location.href: '+window.location.href);
+document.write('<br>');
+document.write('document.baseURI: '+document.baseURI);
+</script>
+
+<hr/>
+
+<embed type="application/x-shockwave-flash"
+ border="1"
+ src="test.swf"
+ height="100" width="400">
+src="test.swf" no base (expect XML:root)
+
+<hr/>
+
+<embed type="application/x-shockwave-flash"
+ border="1"
+ src="test.swf"
+ height="100" width="400"
+ base="sub">
+src="test.swf" base="sub" (expect XML:sub)
+
+<hr/>
+
+<embed type="application/x-shockwave-flash"
+ border="1"
+ src="test.swf"
+ height="100" width="400"
+ base="sub/">
+src="test.swf" base="sub/" (expect XML:sub)
+
+<hr/>
+
+<embed type="application/x-shockwave-flash"
+ border="1"
+ src="test.swf"
+ height="100" width="400"
+ base="sub/nonex">
+src="test.swf" base="sub/nonex" (expect Loaded:false)
+
+<hr/>
+
+<embed type="application/x-shockwave-flash"
+ border="1"
+ src="sub/test.swf"
+ height="100" width="400">
+src="sub/test.swf" no base (expect XML:root)
+
+<hr/>
+
+<a href="test_base.html">based</a>
+|
+<a href="sub/test.html">sub</a>
+

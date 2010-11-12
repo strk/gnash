@@ -24,14 +24,15 @@ GNASH_INCLUDES = \
 	-I$(top_srcdir)/gui/pythonmod \
 	-I$(top_srcdir)/libbase	\
 	-I$(top_srcdir)/librender	\
+	-I$(top_srcdir)/librender/opengl \
+	-I$(top_srcdir)/librender/cairo \
+	-I$(top_srcdir)/librender/agg \
 	-I$(top_srcdir)/libcore	\
 	-I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libcore/vm \
 	-I$(top_srcdir)/libcore/parser \
 	-I$(top_srcdir)/libcore/asobj \
 	-I$(top_srcdir)/libmedia \
-	-I$(top_srcdir)/libmedia/gst \
-	-I$(top_srcdir)/libmedia/ffmpeg \
 	-I$(top_srcdir)/libvaapi \
 	-I$(top_srcdir)/libsound
 

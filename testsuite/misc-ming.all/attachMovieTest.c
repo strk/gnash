@@ -35,6 +35,8 @@
 #define OUTPUT_VERSION 6
 #define OUTPUT_FILENAME "attachMovieTest.swf"
 
+void addRedSquareExport(SWFMovie mo);
+
 void
 addRedSquareExport(SWFMovie mo)
 {
@@ -65,7 +67,9 @@ main(int argc, char** argv)
 
     SWFShape sh;
     SWFButton but;
+#if MING_VERSION_CODE >= 00040400
     SWFButtonRecord br;
+#endif
 
 
 	/*********************************************

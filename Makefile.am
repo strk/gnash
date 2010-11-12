@@ -113,7 +113,8 @@ EXTRA_DIST =  \
 # 	@test -d "$(distdir)/packaging" || $(mkinstalldirs) "$(distdir)/packaging"
 # 	cp -p $(srcdir)/*.am $(top_distdir)/packaging/
 
-CLEANFILES =
+CLEANFILES = revno.h .configline
+BUILT_SOURCES = revno.h .configline
 
 #
 # Extract info from the repository to include in the build. If
@@ -127,8 +128,6 @@ CLEANFILES =
 # so it'll be an improvement anyway. Bzr is amazing slow producing
 # the info, which is why we don't want to do it all the time.
 #
-CLEANFILES += revno.h
-BUILT_SOURCES = revno.h
 revno.h: Makefile.in
 	-@if test -d $(srcdir)/.bzr; then \
 	  status=`which bzr 2>&1 | grep -c " no bzr"`; \
@@ -166,30 +165,9 @@ revno.h: Makefile.in
 BRANCH_REVNO  := $(shell grep "REVNO" revno.h | cut -d '"' -f 2 | cut -d '.' -f 1)
 BRANCH_NICK   := $(shell grep "NICK" revno.h | cut -d '"' -f 2)
 
-# Extract info from the repository to include in the build. If
-# GIT (git) isn't installed, just print stubs, as this is only
-# used for display purposes. It's primarily used by the testsuites
-# and when building binary packages from multiple branches.
-# Note that this is only rebuilt after "make clean", if the Makefile
-# has changed, or the source tree gets reconfigured. So unless you do
-# a make clean, or nuke the revno.h file, this can get slightly
-# behind the current version. Currently Gnash doesn't have this info
-# so it'll be an improvement anyway. 
-
-revno.h: Makefile.in
-        @status=`which git 2>&1 | grep -c " no bzr"`; \
-        if test x"$${status}" = x"0"; then \
-           echo "Generating revno.h"; \
-           $(RM) -f revno.h; \
-           revno=`(cd $(srcdir) && git describe --tags | cut -d '-' -f 2-3)`; \
-           nick=`basename $(top_srcdir)`; \
-        else \
-           revno="${NOW}"; \
-           nick="none"; \
-        fi; \
-        echo "Generating revno.h"; \
-        echo "static const char *BRANCH_REVNO  = \"$${revno}\";" > revno.h; \
-        echo "static const char *BRANCH_NICK = \"$${nick}\";" >> revno.h;
+.configline: config.log
+	-@rm -f .configline
+	@head config.log | grep " .*/configure " | sed -e 's:^  . .*configure ::' > .configline
 
 #
 # Precompiled header support

@@ -1266,7 +1266,8 @@ ActionStopDragMovie(ActionExec& thread)
     DisplayObject* tgtch = env.get_target();
     MovieClip* root_movie = tgtch ? tgtch->get_root() : 0;
     if (root_movie) root_movie->stop_drag();
-    else log_debug(_("ActionStopDragMovie: as_environment target is null or not a sprite"));
+    else log_debug(_("ActionStopDragMovie: as_environment target is "
+                "null or not a sprite"));
 }
 
 void

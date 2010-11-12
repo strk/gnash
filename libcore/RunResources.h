@@ -22,20 +22,11 @@
 
 #include <string>
 #include <boost/shared_ptr.hpp>
-
-namespace gnash {
-    class Renderer;
-    class StreamProvider;
-    namespace SWF {
-        class TagLoadersTable;
-    }
-    namespace sound {
-        class sound_handler;
-    }
-    namespace media {
-        class MediaHandler;
-    }
-}
+#include "StreamProvider.h"
+#include "Renderer.h"
+#include "sound_handler.h"
+#include "MediaHandler.h"
+#include "TagLoadersTable.h"
 
 namespace gnash {
 

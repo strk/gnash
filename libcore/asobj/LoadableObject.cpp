@@ -341,7 +341,7 @@ loadableobject_sendAndLoad(const fn_call& fn)
 
     const RunResources& ri = getRunResources(*obj);
 
-    URL url(urlstr, ri.streamProvider().originalURL());
+    URL url(urlstr, ri.streamProvider().baseURL());
 
     std::auto_ptr<IOChannel> str;
 
@@ -435,7 +435,7 @@ loadableobject_load(const fn_call& fn)
 
     const RunResources& ri = getRunResources(*obj);
 
-    URL url(urlstr, ri.streamProvider().originalURL());
+    URL url(urlstr, ri.streamProvider().baseURL());
 
     // Checks whether access is allowed.
     std::auto_ptr<IOChannel> str(ri.streamProvider().getStream(url));

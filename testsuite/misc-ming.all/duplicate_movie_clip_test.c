@@ -36,8 +36,10 @@ main(int argc, char** argv)
   SWFShape  sh_red;
 
   /* For the button duplication test */
+#if MING_VERSION_CODE >= 00040400
   SWFButton but;
   SWFButtonRecord br;
+#endif
 
   const char *srcdir=".";
   if ( argc>1 ) 
@@ -123,6 +125,8 @@ main(int argc, char** argv)
 
   SWFMovie_nextFrame(mo); /* 4th frame */
   
+#if MING_VERSION_CODE >= 00040400
+
   /* Create a button, add it to mc1 */
   but = newSWFButton();
   br = SWFButton_addCharacter(but, (SWFCharacter)sh_red, SWFBUTTON_UP);
@@ -147,7 +151,8 @@ main(int argc, char** argv)
   
   /* initobj not used */
   check_equals(mo, "_root.buttdup.x", "undefined");
-  
+#endif
+
   add_actions(mo,
           "t = new Object();"
           "t.dupl = dupl;"

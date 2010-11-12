@@ -23,6 +23,13 @@
 #include "gnashconfig.h"
 #endif
 
+#include <boost/intrusive_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/function.hpp>
+#include <string>
+#include <map>
+
+#include "SWFRect.h"  // for composition
 #include "snappingrange.h"  // for InvalidatedRanges
 #include "ScreenShotter.h"
 #include "GnashKey.h"
@@ -35,14 +42,6 @@
 #ifdef USE_SWFTREE
 #include "tree.hh" // for tree
 #endif
-
-#include <boost/intrusive_ptr.hpp>
-#include <boost/scoped_ptr.hpp>
-#include <boost/function.hpp>
-#include <vector>
-#include <cstdlib> 
-#include <string>
-#include <map>
 
 // Define this to enable fps debugging without touching
 // gnashconfig.h
@@ -67,6 +66,7 @@
 // Forward declarations
 namespace gnash {
     class SWFRect;
+    class ScreenShotter;
     class RunResources;
     class movie_root;
     class movie_definition;
@@ -124,13 +124,7 @@ public:
     /// Set the time in milliseconds after which the programme should exit.
     virtual void setTimeout(unsigned int timeout) = 0;
 
-    /// Request a list of screenshots
-    //
-    /// @param l        A list of frames to render to an image file
-    /// @param last     Whether to render the last frame before exist
-    /// @param filename The filename pattern to save images as.
-    void requestScreenShots(const ScreenShotter::FrameList& l, bool last,
-            const std::string& filename);
+    void setScreenShotter(std::auto_ptr<ScreenShotter> ss);
 
     /** \brief
      * Create and display our window.
@@ -396,9 +390,6 @@ public:
     /// Add variables to set into instances of the top-level movie definition
     void addFlashVars(VariableMap& vars);
 
-    /// Add a variable used by ExternalInterface
-    void addScriptableVar(const std::string &name, const std::string &value);
-
     /// Set the definition of top-level movie
     void setMovieDefinition(movie_definition* md);
 
@@ -488,7 +479,6 @@ protected:
     /// The X Window ID to attach to. If zero, we create a new window.
     unsigned long   _xid;
 
-    // should it be unsigned ints ? (probably!)
     // This would be 0,0,_width,_height, so maybe
     // we should not duplicate the info with those
     // explicit values too..
@@ -583,7 +573,6 @@ private:
 #endif // def GNASH_FPS_DEBUG
 
     VariableMap _flashVars;
-    VariableMap _scriptableVars;
 
     boost::intrusive_ptr<movie_definition> _movieDef;
     

@@ -285,23 +285,73 @@ ret  = EI._unescapeXML(rin);
 // so this is mainly a test case problem.
 xcheck_equals (ret, "& ß+ü &nbsp; < << <>''\"");
 
+// This isn't how _toAS works:
 val = EI._toAS("<number>34.56</number>");
-xcheck_equals (typeof(val), 'undefined');
+check_equals (typeof(val), 'undefined');
 
 val = EI._toAS("<string>Hello World!</string>");
-xcheck_equals (typeof(val), 'undefined');
+check_equals (typeof(val), 'undefined');
 
 val = EI._toAS("<null/>");
-xcheck_equals (typeof(val), 'undefined');
+check_equals (typeof(val), 'undefined');
 
 val = EI._toAS("<true/>");
-xcheck_equals (typeof(val), 'undefined');
+check_equals (typeof(val), 'undefined');
 
 val = EI._toAS("<false/>");
-xcheck_equals (typeof(val), 'undefined');
+check_equals (typeof(val), 'undefined');
+
+// This is how it works:
+// Note that it's really designed for XMLNodes, but it's quite happy with
+// the faked nodes we're giving it here.
+
+o = {};
+o.nodeName = "false";
+check_equals(EI._toAS(o), false);
+
+o = {};
+o.nodeName = "true";
+check_equals(EI._toAS(o), true);
+
+o = {};
+o.nodeName = "number";
+check_equals(EI._toAS(o).toString(), "NaN");
+o.firstChild = new String("45");
+check_equals(EI._toAS(o), 45);
+
+e = {};
+e.toString = function() { return "23"; };
+o.firstChild = e;
+check_equals(EI._toAS(o), 23);
+
+// This way doesn't work.
+o = {};
+o.nodeName = "boolean";
+check_equals(EI._toAS(o), undefined);
+o.firstChild = new String("false");
+check_equals(EI._toAS(o), undefined);
+
+o = {};
+o.nodeName = "null";
+check_equals(EI._toAS(o), null);
+
+o = {};
+o.nodeName = "class";
+o.firstChild = new String("foo");
+check_equals(EI._toAS(o), undefined);
+
+o.firstChild = new String("Date");
+check_equals(typeof(EI._toAS(o)), "function");
 
 val = EI._objectToAS('<object><property id="b"><string>string</string></property><property id="a"><number>1</number></property></object>');
 xcheck_equals (typeOf(val), 'object');
+
+// Check what happens with addCallback
+
+// It doesn't add the callback as a member of ExternalInterface.
+o = {};
+EI.addCallback("func1", o);
+check_equals(EI.func1, undefined);
 
 #endif  // version > 7 }
 
@@ -313,6 +363,6 @@ xcheck_equals (typeOf(val), 'object');
 #elif OUTPUT_VERSION < 8 // }{
 	check_totals(49);
 #else // SWF8+ }{
-	check_totals(101);
+	check_totals(112);
 # endif // }
 

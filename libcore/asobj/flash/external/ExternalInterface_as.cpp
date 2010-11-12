@@ -49,6 +49,7 @@
 #include "log.h"
 #include "RunResources.h"
 #include "StreamProvider.h"
+#include "ObjectURI.h"
 
 #define MAXHOSTNAMELEN 256 // max hostname size. However this is defined in netdb.h
 
@@ -148,7 +149,6 @@ private:
     const fn_call& _fn;
 };
 
-
 }
 
 void
@@ -171,10 +171,7 @@ registerExternalInterfaceNative(as_object& global)
 void
 externalinterface_class_init(as_object& where, const ObjectURI& uri)
 {
-//    GNASH_REPORT_FUNCTION;
-
     where.init_destructive_property(uri, externalInterfaceConstructor, 0);
-
 }
 
 namespace {
@@ -182,7 +179,6 @@ namespace {
 void
 attachExternalInterfaceStaticInterface(as_object& o)
 {    
-    // GNASH_REPORT_FUNCTION;
     
     const int swf8Flags = PropFlags::onlySWF8Up;
     
@@ -253,7 +249,6 @@ attachExternalInterfaceStaticInterface(as_object& o)
 as_value
 externalinterface_addCallback(const fn_call& fn)
 {
-    // GNASH_REPORT_FUNCTION;
     movie_root& mr = getRoot(fn);
 
     if (mr.getControlFD() <= 0) {
@@ -267,7 +262,7 @@ externalinterface_addCallback(const fn_call& fn)
         if (fn.arg(1).is_object()) {
             log_debug("adding callback %s", name);
             as_object* asCallback = toObject(fn.arg(1), getVM(fn));
-            mr.addExternalCallback(fn.this_ptr, name, asCallback);
+            mr.addExternalCallback(name, asCallback);
         }
     }
 
@@ -279,7 +274,6 @@ externalinterface_addCallback(const fn_call& fn)
 as_value
 externalinterface_call(const fn_call& fn)
 {
-    // GNASH_REPORT_FUNCTION;
     movie_root& mr = getRoot(fn);
     as_value val;
 
@@ -312,7 +306,6 @@ externalinterface_call(const fn_call& fn)
 as_value
 externalinterface_available(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
     
     movie_root& m = getRoot(fn);
     bool mode = false;
@@ -331,7 +324,7 @@ externalinterface_available(const fn_call& fn)
       case movie_root::SCRIPT_ACCESS_SAME_DOMAIN:
       {
           const RunResources& r = m.runResources();
-          const std::string& baseurl = r.streamProvider().originalURL().str();
+          const std::string& baseurl = r.streamProvider().baseURL().str();
           char hostname[MAXHOSTNAMELEN];
           std::memset(hostname, 0, MAXHOSTNAMELEN);
           
@@ -372,7 +365,6 @@ externalinterface_available(const fn_call& fn)
 as_value
 externalinterface_objectID(const fn_call& fn)
 {
-    // GNASH_REPORT_FUNCTION;
 
     movie_root& mr = getRoot(fn);
     MovieClip *mc = mr.getLevel(0);
@@ -385,13 +377,10 @@ externalinterface_objectID(const fn_call& fn)
     getObject(mc)->get_member(st.find("name"), &name);
 
     if (id.is_undefined() && !name.is_undefined()) {
-//        log_debug("ObjectdID name is: %s", name.to_string());
         return name;
     } else if (!id.is_undefined() && name.is_undefined()) {
-//        log_debug("ObjectdID id is: %s", id.to_string());
         return id;
     } else if (id.is_undefined() && name.is_undefined()) {
-//        log_debug("no objectID defined!");
         return as_value();
     }
     
@@ -456,8 +445,6 @@ externalinterface_uArgumentsToAS(const fn_call& /*fn*/)
 as_value
 externalinterface_uAddCallback(const fn_call& /*fn*/)
 {
-    // GNASH_REPORT_FUNCTION;
-    
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
@@ -465,7 +452,6 @@ externalinterface_uAddCallback(const fn_call& /*fn*/)
 as_value
 externalinterface_uArrayToAS(const fn_call& /*fn*/)
 {
-//    GNASH_REPORT_FUNCTION;
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
@@ -473,7 +459,6 @@ externalinterface_uArrayToAS(const fn_call& /*fn*/)
 as_value
 externalinterface_uArrayToJS(const fn_call& /*fn*/)
 {
-//    GNASH_REPORT_FUNCTION;
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
@@ -498,7 +483,6 @@ externalinterface_uArrayToXML(const fn_call& fn)
 as_value
 externalinterface_uCallIn(const fn_call& /*fn*/)
 {
-//    GNASH_REPORT_FUNCTION;
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
@@ -506,7 +490,6 @@ externalinterface_uCallIn(const fn_call& /*fn*/)
 as_value
 externalinterface_uCallOut(const fn_call& /*fn*/)
 {
-//    GNASH_REPORT_FUNCTION;
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
@@ -514,7 +497,6 @@ externalinterface_uCallOut(const fn_call& /*fn*/)
 as_value
 externalinterface_uEvalJS(const fn_call& /*fn*/)
 {
-//    GNASH_REPORT_FUNCTION;
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
@@ -522,7 +504,6 @@ externalinterface_uEvalJS(const fn_call& /*fn*/)
 as_value
 externalinterface_uInitJS(const fn_call& /*fn*/)
 {
-//    GNASH_REPORT_FUNCTION;
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
@@ -530,7 +511,6 @@ externalinterface_uInitJS(const fn_call& /*fn*/)
 as_value
 externalinterface_uJsQuoteString(const fn_call& /*fn*/)
 {
-//    GNASH_REPORT_FUNCTION;
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
@@ -538,19 +518,14 @@ externalinterface_uJsQuoteString(const fn_call& /*fn*/)
 as_value
 externalinterface_uObjectID(const fn_call& /*fn*/)
 {
-//    GNASH_REPORT_FUNCTION;
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 
 as_value
-externalinterface_uObjectToAS(const fn_call& fn)
+externalinterface_uObjectToAS(const fn_call& /*fn*/)
 {
-//    GNASH_REPORT_FUNCTION;
-    if (fn.nargs == 1) {
-        return ExternalInterface::objectToAS(getGlobal(fn), fn.arg(0).to_string());
-    }
-    
+    LOG_ONCE(log_unimpl("ExternalInterface._objectToAS"));
     return as_value();
 }
 
@@ -660,22 +635,69 @@ externalinterface_uToXML(const fn_call& fn)
 as_value
 externalinterface_uToAS(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
-    
-    if (fn.nargs == 1) {
-        as_value val = ExternalInterface::toAS(getGlobal(fn),
-                fn.arg(0).to_string());
-        return val;
+    if (!fn.nargs) return as_value();
+
+    as_value arg = fn.arg(0);
+    as_object* o = toObject(arg, getVM(fn));
+
+    if (!o) {
+        return as_value();
     }
-    
+    string_table& st = getStringTable(fn);
+    const ObjectURI nodeName(st.find("nodeName"));
+    const ObjectURI firstChild(st.find("firstChild"));
+
+    const as_value& nn = getMember(*o, nodeName);
+
+    if (equals(nn, as_value("number"), getVM(fn))) {
+        as_object* fc = toObject(getMember(*o, firstChild), getVM(fn));
+        const as_value v = callMethod(fc, NSV::PROP_TO_STRING);
+        // This should call Number(obj.firstChild.toString()), i.e. use
+        // the non-constructing number conversion function, but the extra
+        // code needed to implement that isn't worth it.
+        return as_value(toNumber(v, getVM(fn)));
+    }
+    if (equals(nn, as_value("string"), getVM(fn))) {
+        as_object* ei =
+            fn.env().find_object("flash.external.ExternalInterface");
+        as_value fc = getMember(*o, firstChild);
+        return callMethod(ei, st.find("_unescapeXML"),
+                fc.to_string(getSWFVersion(fn)));
+    }
+    if (equals(nn, as_value("false"), getVM(fn))) {
+        return as_value(false);
+    }
+    if (equals(nn, as_value("true"), getVM(fn))) {
+        return as_value(true);
+    }
+    if (equals(nn, as_value("null"), getVM(fn))) {
+        as_value null;
+        null.set_null();
+        return null;
+    }
+    if (equals(nn, as_value("undefined"), getVM(fn))) {
+        return as_value();
+    }
+    if (equals(nn, as_value("object"), getVM(fn))) {
+        as_object* ei =
+            fn.env().find_object("flash.external.ExternalInterface");
+        return callMethod(ei, st.find("_objectToXML"), o);
+    }
+    if (equals(nn, as_value("array"), getVM(fn))) {
+        as_object* ei =
+            fn.env().find_object("flash.external.ExternalInterface");
+        return callMethod(ei, st.find("_arrayToXML"), o);
+    }
+    if (equals(nn, as_value("class"), getVM(fn))) {
+        as_value fc = getMember(*o, firstChild);
+        return fn.env().find_object(fc.to_string(getSWFVersion(fn)));
+    }
     return as_value();
 }
 
 as_value
 externalinterface_uEscapeXML(const fn_call& fn)
 {
-    // GNASH_REPORT_FUNCTION;
-    
     if (fn.nargs == 1) {
         std::string str(fn.arg(0).to_string());
         escapeXML(str);
@@ -688,8 +710,6 @@ externalinterface_uEscapeXML(const fn_call& fn)
 as_value
 externalinterface_uUnescapeXML(const fn_call& fn)
 {
-    // GNASH_REPORT_FUNCTION;
-
     if (fn.nargs == 1) {
         std::string str = fn.arg(0).to_string();
         gnash::unescapeXML(str);

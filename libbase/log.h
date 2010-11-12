@@ -244,7 +244,6 @@ DSOEXPORT void processLog_action(const boost::format& fmt);
 DSOEXPORT void processLog_parse(const boost::format& fmt);
 DSOEXPORT void processLog_security(const boost::format& fmt);
 DSOEXPORT void processLog_swferror(const boost::format& fmt);
-DSOEXPORT void processLog_amferror(const boost::format& fmt);
 DSOEXPORT void processLog_aserror(const boost::format& fmt);
 DSOEXPORT void processLog_abc(const boost::format& fmt);
 
@@ -264,7 +263,7 @@ DSOEXPORT void processLog_abc(const boost::format& fmt);
 /// the code. Append the name to log_ to call the function, e.g. 
 /// log_error, log_unimpl.
 #define LOG_TYPES (error) (debug) (unimpl) (aserror) (swferror) \
-    (amferror) (security) (action) (parse) (trace) (abc) (network)
+    (security) (action) (parse) (trace) (abc) (network)
 
 /// This actually creates the template functions using the TOKENIZE
 /// functions above. The templates look like this:
@@ -351,11 +350,6 @@ DSOEXPORT std::string hexify(const unsigned char *bytes, size_t length,
 #define VERBOSE_MALFORMED_SWF 1
 #endif
 
-// Define to 0 this to remove invalid AMF verbosity at compile-time
-#ifndef VERBOSE_MALFORMED_AMF
-#define VERBOSE_MALFORMED_AMF 1
-#endif
-
 // Define to 0 this to remove Networking verbosity at compile-time
 #ifndef VERBOSE_NETWORKING
 #define VERBOSE_NETWORKING 1
@@ -393,31 +387,16 @@ DSOEXPORT std::string hexify(const unsigned char *bytes, size_t length,
 #define IF_VERBOSE_MALFORMED_SWF(x)
 #endif
 
-#if VERBOSE_MALFORMED_AMF
-// TODO: check if it's worth to check verbosity level too... 
-#define IF_VERBOSE_MALFORMED_AMF(x) { if ( gnash::RcInitFile::getDefaultInstance().showMalformedAMFErrors() ) { x; } }
-#else
-#define IF_VERBOSE_MALFORMED_AMF(x)
-#endif
-
-class DSOEXPORT __Host_Function_Report__
+class DSOEXPORT HostFunctionReport
 {
 public:
-    const char *func;
-
     // Only print function tracing messages when multiple -v
     // options have been supplied. 
-    __Host_Function_Report__(void) {
+    HostFunctionReport() {
         log_debug("entering");
     }
 
-    __Host_Function_Report__(char *_func) {
-        func = _func;
-        log_debug("%s enter", func);
-    }
-
-    __Host_Function_Report__(const char *_func) {
-        func = _func;
+    HostFunctionReport(const char* func) : _func(func) {
         if (func) {
             log_debug("%s enter", func);
         }
@@ -425,10 +404,11 @@ public:
             log_debug("No Function Name! enter");
         }
     }
-
-    ~__Host_Function_Report__(void) {
-        log_debug("%s returning", func);
+    ~HostFunctionReport() {
+        log_debug("%s returning", _func);
     }
+private:
+    const char* _func;
 };
 
 #ifndef HAVE_FUNCTION
@@ -447,7 +427,7 @@ public:
 
 #if defined(__cplusplus) && defined(__GNUC__)
 #define GNASH_REPORT_FUNCTION   \
-    gnash::__Host_Function_Report__ __host_function_report__( __PRETTY_FUNCTION__)
+    const gnash::HostFunctionReport hfr(__PRETTY_FUNCTION__)
 #define GNASH_REPORT_RETURN
 #else
 #define GNASH_REPORT_FUNCTION \

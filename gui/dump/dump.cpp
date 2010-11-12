@@ -42,6 +42,9 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/lexical_cast.hpp>
 
 #ifndef RENDERER_AGG
 #error Dump gui requires AGG renderer
@@ -89,6 +92,9 @@ DumpGui::DumpGui(unsigned long xid, float scale, bool loop, RunResources& r) :
     _samplesFetched(0),
     _bpp(32),
     _pixelformat("BGRA32"),
+    _fileOutput(),
+    _fileOutputFPS(0), // dump at every heart-beat by default
+    _lastVideoFrameDump(0), // this will be computed
     _sleepUS(0)
 {
     if (loop) {
@@ -126,7 +132,13 @@ DumpGui::init(int argc, char **argv[])
                     std::endl;      
                 return false;
             }      
-            _fileOutput = optarg;
+            std::vector<std::string> file_fps;
+            boost::split(file_fps, optarg,
+                boost::is_any_of("@"), boost::token_compress_on);
+            _fileOutput = file_fps[0];
+            if ( file_fps.size() > 1 ) {
+                _fileOutputFPS = boost::lexical_cast<unsigned int>(file_fps[1]);
+            }
         }
         else if (c == 'S') {
             // Terminate if no filename is given.
@@ -165,6 +177,13 @@ DumpGui::init(int argc, char **argv[])
 bool
 DumpGui::run()
 {
+    if ( _fileOutputFPS ) {
+        _fileOutputAdvance = static_cast<int>(1000/_fileOutputFPS);
+    } else {
+        _fileOutputAdvance = _interval;
+        _fileOutputFPS = static_cast<int>(1000/_fileOutputAdvance);
+    }
+    
 
     log_debug("DumpGui entering main loop with interval of %d ms", _interval);
 
@@ -182,14 +201,21 @@ DumpGui::run()
         _manualClock.advance(clockAdvance); 
 
         // advance movie now
-        if ( advanceMovie() ) {
-            ++_framecount;
+        advanceMovie();
+
+        writeSamples();
+
+        // Dump a video frame if it's time for it or no frame
+        // was dumped yet
+        size_t elapsed = timer.elapsed();
+        if ( ! _framecount ||
+                elapsed - _lastVideoFrameDump >= _fileOutputAdvance )
+        {
             writeFrame();
-            writeSamples();
         }
 
         // check if we've reached a timeout
-        if (_timeout && timer.elapsed() > _timeout ) {
+        if (_timeout && timer.elapsed() >= _timeout ) {
             break;
         }
 
@@ -198,10 +224,9 @@ DumpGui::run()
     }
 
     boost::uint32_t total_time = timer.elapsed();
-    double fps = _framecount*1000.0 / total_time;
 
     std::cout << "TIME=" << total_time << std::endl;
-    std::cout << "FPS_ACTUAL=" << fps << std::endl;
+    std::cout << "FPS_ACTUAL=" << _fileOutputFPS << std::endl;
     
     // In this Gui, quit() does not exit, but it is necessary to catch the
     // last frame for screenshots.
@@ -219,7 +244,6 @@ void
 DumpGui::setInterval(unsigned int interval)
 {
     std::cout << "INTERVAL=" << interval << std::endl;
-    std::cout << "FPS_DESIRED=" << (1000.0 / static_cast<double>(interval)) << std::endl;
     _interval = interval;
 }
 
@@ -241,6 +265,9 @@ DumpGui::writeFrame()
 
     _fileStream.write(reinterpret_cast<char*>(_offscreenbuf.get()),
             _offscreenbuf_size);
+
+    _lastVideoFrameDump = getClock().elapsed();
+    ++_framecount;
 }
 
 void
@@ -297,14 +324,15 @@ DumpGui::init_dumpfile()
         std::cerr << "# FATAL:  Unable to write file '" << _fileOutput << "'" << std::endl;
         exit(EXIT_FAILURE);
     }
-    
+
     // Yes, this should go to cout.  The user needs to know this
     // information in order to process the file.  Print out in a
     // format that is easy to source into shell.
     std::cout << 
         "# Gnash created a raw dump file with the following properties:" << std::endl <<
         "COLORSPACE=" << _pixelformat << std::endl <<
-        "NAME=" << _fileOutput  << std::endl;
+        "NAME=" << _fileOutput  << 
+        std::endl;
     
 }
 

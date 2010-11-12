@@ -54,7 +54,6 @@ libgnashcore_la_SOURCES = \
 	BitmapMovie.cpp \
 	Property.cpp \
 	PropertyList.cpp \
-	URLAccessManager.cpp \
 	SystemClock.cpp \
 	ClassHierarchy.cpp \
 	as_environment.cpp \
@@ -114,7 +113,6 @@ libgnashcore_la_SOURCES = \
 	Function.cpp \
 	Function2.cpp \
 	Video.cpp \
-	StreamProvider.cpp \
 	Button.cpp \
 	DisplayList.cpp \
 	FillStyle.cpp \
@@ -143,7 +141,6 @@ libgnashcore_la_SOURCES += \
 endif
 
 noinst_HEADERS = \
-	URLAccessManager.h \
 	VirtualClock.h \
 	SystemClock.h \
 	ClassHierarchy.h \
@@ -152,7 +149,6 @@ noinst_HEADERS = \
 	BitmapMovie.h \
 	Transform.h \
 	Button.h \
-	debugger.h \
 	TextField.h \
 	Filters.h \
 	parser/filter_factory.h \
@@ -250,7 +246,6 @@ EXTENSIONS_API = \
 	DisplayObjectContainer.h \
 	DisplayObject.h \
 	MovieClip.h \
-	StreamProvider.h \
 	event_id.h \
 	SWFMatrix.h \
 	SWFCxForm.h \
@@ -299,11 +294,6 @@ endif
 if USE_FFMPEG_ENGINE
 AM_CPPFLAGS += $(FFMPEG_CFLAGS) \
 		-I$(top_srcdir)/libmedia/ffmpeg
-endif
-
-# Enable building the Flash debugger
-if DEBUGGER
-libgnashcore_la_SOURCES += debugger.cpp
 endif
 
 #libserver_la_LIBDADD =  #@DL_LIB@

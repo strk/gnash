@@ -400,22 +400,14 @@ newLessThan(const as_value& op1, const as_value& op2, const VM& vm)
     as_value operand2(op2);
 
     try { operand1 = op1.to_primitive(as_value::NUMBER); }
-    catch (ActionTypeError& e)
-    {
-        log_debug("%s.to_primitive() threw an error during ActionNewLessThen",
-            op1);
-    }
+    catch (const ActionTypeError& e) {}
     
     if (operand1.is_object() && !operand1.is_sprite()) {
         return false;
     }
 
     try { operand2 = op2.to_primitive(as_value::NUMBER); }
-    catch (ActionTypeError& e)
-    {
-        log_debug("%s.to_primitive() threw an error during ActionNewLessThen",
-            op2);
-    }
+    catch (const ActionTypeError& e) {}
     
     if (operand2.is_object() && !operand2.is_sprite()) {
         return false;

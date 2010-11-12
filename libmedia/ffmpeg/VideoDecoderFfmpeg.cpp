@@ -362,7 +362,7 @@ VideoDecoderFfmpeg::decode(const boost::uint8_t* input,
     int bytes = 0;    
     // no idea why avcodec_decode_video wants a non-const input...
     avcodec_decode_video(_videoCodecCtx->getContext(), frame, &bytes,
-            const_cast<boost::uint8_t*>(input), input_size);
+            input, input_size);
     
     if (!bytes) {
         log_error("Decoding of a video frame failed");
@@ -417,10 +417,8 @@ VideoDecoderFfmpeg::flashToFfmpegCodec(videoCodecType format)
 			 // CODEC_ID_H263I didn't work with Lavc51.50.0
 			 // and NetStream-SquareTest.swf
                          return CODEC_ID_FLV1;
-#ifdef FFMPEG_VP6
                 case VIDEO_CODEC_VP6:
                         return CODEC_ID_VP6F;
-#endif
 #ifdef FFMPEG_VP6A
                 case VIDEO_CODEC_VP6A:
 	                return CODEC_ID_VP6A;

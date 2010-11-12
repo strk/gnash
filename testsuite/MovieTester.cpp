@@ -90,7 +90,7 @@ MovieTester::MovieTester(const std::string& url)
     
     _runResources->setTagLoaders(loaders);
     
-    boost::shared_ptr<StreamProvider> sp(new StreamProvider(url));
+    boost::shared_ptr<StreamProvider> sp(new StreamProvider(url, url));
 
     _runResources->setStreamProvider(sp);
 
@@ -143,9 +143,7 @@ MovieTester::MovieTester(const std::string& url)
     
     // Finally, place the root movie on the stage ...
     MovieClip::MovieVariables v;
-    // We pass 'v' twice, as the second one is for scriptable
-    // Variables, which isn't fully implemented yet.
-    _movie_root->init(_movie_def.get(), v, v);
+    _movie_root->init(_movie_def.get(), v);
     
     // ... and render it
     render();
@@ -599,9 +597,7 @@ MovieTester::restart()
 {
     _movie_root->reset(); 
     MovieClip::MovieVariables v;
-    // We pass 'v' twice, as the second one is for scriptable
-    // Variables, which isn't fully implemented yet.
-    _movie_root->init(_movie_def.get(), v, v);
+    _movie_root->init(_movie_def.get(), v);
     
     // Set _movie before calling ::render
     render();

@@ -212,12 +212,10 @@ movie_root::~movie_root()
 }
 
 Movie*
-movie_root::init(movie_definition* def, const MovieClip::MovieVariables& vars,
-                 const MovieClip::MovieVariables& scriptables)
+movie_root::init(movie_definition* def, const MovieClip::MovieVariables& vars)
 {
     Movie* mr = def->createMovie(*_vm.getGlobal());
     mr->setVariables(vars);
-    mr->setVariables(scriptables);
     setRootMovie(mr);
     return mr;
 }
@@ -1509,14 +1507,14 @@ movie_root::executeAdvanceCallbacks()
     if (_controlfd) {
 	boost::shared_ptr<ExternalInterface::invoke_t> invoke = 
 	    ExternalInterface::ExternalEventCheck(_controlfd);
-	if (invoke) {
-	    if (processInvoke(invoke.get()) == false) {
-		if (!invoke->name.empty()) {
-		    log_error("Couldn't process ExternalInterface Call %s",
-			      invoke->name);
-		}
-	    }
-	}	
+        if (invoke) {
+            if (processInvoke(invoke.get()) == false) {
+                if (!invoke->name.empty()) {
+                    log_error("Couldn't process ExternalInterface Call %s",
+                          invoke->name);
+                }
+            }
+        }	
     }
     
     processActionQueue();
@@ -1527,13 +1525,7 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
 {
     GNASH_REPORT_FUNCTION;
 
-    if (invoke == 0) {
-	return false;
-    }
-    
-    if (invoke->name.empty()) {
-	return false;
-    }
+    if (!invoke || invoke->name.empty()) return false;
 
     log_debug("Processing %s call from the Browser.", invoke->name);
 
@@ -1586,9 +1578,9 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         MovieClip *mc = getLevel(0);
         int loaded = mc->get_bytes_loaded();
         int total = mc->get_bytes_total();
-	as_value val((loaded/total) * 100);
-	// PercentLoaded sends the percentage
-	ss << ExternalInterface::toXML(val);	
+        as_value val((loaded/total) * 100);
+        // PercentLoaded sends the percentage
+        ss << ExternalInterface::toXML(val);	
     } else if (invoke->name == "Play") {
         callInterface("ExternalInterface.Play");
 	// Play doesn't send a response
@@ -1618,7 +1610,7 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         MovieClip *mc = getLevel(0);
         as_value val(mc->get_loaded_frames());
 	// TotalFrames sends the number of frames in the movie
-	ss << ExternalInterface::toXML(val);
+        ss << ExternalInterface::toXML(val);
     } else {
         std::string result = callExternalCallback(invoke->name, invoke->args);
         if (result == ExternalInterface::makeString("Error")) {
@@ -1630,16 +1622,17 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
     }
 
     if (!ss.str().empty()) {
-	if (_hostfd) {
-	    log_debug(_("Attempt to write response to ExternalInterface requests fd %d"), _hostfd);
-	    int ret = write(_hostfd, ss.str().c_str(), ss.str().size());
-	    if (ret == -1) {
-		log_error(_("Could not write to user-provided host requests "
-			    "fd %d: %s"), _hostfd, std::strerror(errno));
-	    }
-	}
+        if (_hostfd >= 0) {
+            log_debug(_("Attempt to write response to ExternalInterface "
+                        "requests fd %d"), _hostfd);
+            int ret = write(_hostfd, ss.str().c_str(), ss.str().size());
+            if (ret == -1) {
+            log_error(_("Could not write to user-provided host requests "
+                    "fd %d: %s"), _hostfd, std::strerror(errno));
+            }
+        }
     } else {
-	log_debug("No response needed for %s request", invoke->name);
+        log_debug("No response needed for %s request", invoke->name);
     }
 
     return true;
@@ -1784,27 +1777,17 @@ movie_root::findDropTarget(boost::int32_t x, boost::int32_t y,
     return 0;
 }
 
-/// @example "Internal Gnash message 'addMethod'"
-///
-/// <pre>
-/// <invoke name="addMethod" returntype="xml">
-///      <arguments><string>methodname</string</arguments>
-/// </invoke>
-/// </pre>
+/// This should store a callback object in movie_root.
+//
+/// TODO: currently it doesn't.
 void
-movie_root::addExternalCallback(as_object *obj, const std::string &name,
-                                as_object *callback)
+movie_root::addExternalCallback(const std::string& name, as_object* callback)
 {
-    // GNASH_REPORT_FUNCTION;
-    
-    MovieClip *mc = getLevel(0);
-    as_object *me = getObject(mc);
-    string_table &st = getStringTable(*me);
-    obj->set_member(st.find(name), callback);
+    UNUSED(callback);
 
     // When an external callback is added, we have to notify the plugin
     // that this method is available.
-    if (_hostfd) {
+    if (_hostfd >= 0) {
         std::vector<as_value> fnargs;
         fnargs.push_back(name);
         std::string msg = ExternalInterface::makeInvoke("addMethod", fnargs);
@@ -1839,7 +1822,7 @@ movie_root::callExternalJavascript(const std::string &name,
     std::string result;
     // If the browser is connected, we send an Invoke message to the
     // browser.
-    if (_controlfd && _hostfd) {
+    if (_controlfd >= 0 && _hostfd >= 0) {
         std::string msg = ExternalInterface::makeInvoke(name, fnargs);
         
         const size_t ret = ExternalInterface::writeBrowser(_hostfd, msg);
@@ -1900,7 +1883,7 @@ movie_root::callExternalCallback(const std::string &name,
         
     // If the browser is connected, we send an Invoke message to the
     // browser.
-    if (_hostfd) {
+    if (_hostfd >= 0) {
         const size_t ret = ExternalInterface::writeBrowser(_hostfd, result);
         if (ret != result.size()) {
             log_error(_("Could not write to browser fd #%d: %s"),
@@ -2110,11 +2093,11 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
 
     log_network("%s: HOSTFD is %d",  __FUNCTION__, _hostfd);
     
-    if (_hostfd == -1) {
+    if (_hostfd < 0) {
         /// If there is no hosting application, call the URL launcher. For
         /// safety, we resolve the URL against the base URL for this run.
         /// The data is not sent at all.
-        URL url(urlstr, _runResources.streamProvider().originalURL());
+        URL url(urlstr, _runResources.streamProvider().baseURL());
 
         gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
         std::string command = rcfile.getURLOpenerFormat();

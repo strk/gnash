@@ -33,28 +33,31 @@
 #include <stdio.h>
 #include <ming.h>
 
+#include "ming_utils.h"
+
 #define OUTPUT_FILENAME "spritehier.swf"
 
+static SWFAction frame_print(void);
+
 SWFAction
-frame_print()
+frame_print(void)
 {
 	SWFAction ac;
-	ac = compileSWFActionCode("\
-trace(\"Current frame: \"+this._currentframe); \
-trace(\"Frames loaded: \"+this._framesloaded); \
-");
+	ac = newSWFAction(
+        "trace(\"Current frame: \"+this._currentframe); "
+        "trace(\"Frames loaded: \"+this._framesloaded); "
+    );
 
 	return ac;
 }
 
 int
-main()
+main(void)
 {
 	SWFMovie mo;
 	SWFShape sh;
 	SWFAction ac;
 	SWFMovieClip mc1, mc2, mc3;
-	/*SWFDisplayItem it;*/
 
 	Ming_init();
 	mo = newSWFMovie();

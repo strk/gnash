@@ -137,108 +137,6 @@ ExternalInterface::_toXML(const as_value &val)
     return ss.str();
 }
 
-/// Convert an XML string to an AS object.
-as_value
-ExternalInterface::toAS(Global_as& /*gl*/, const std::string &xml)
-{
-    // GNASH_REPORT_FUNCTION;
-
-    std::string::size_type start = 0;
-    std::string::size_type end;
-    std::string tag;
-    as_value val;
-    
-    // Look for the ending > in the first part of the data for the tag
-    end = xml.find(">");
-    if (end != std::string::npos) {
-        end++;                  // go past the > character
-        tag = xml.substr(start, end);
-        // Look for the easy ones first
-        if (tag == "<null/>") {
-            val.set_null();
-        } else if (tag == "<void/>") {
-            val.set_null();     // FIXME: we need a void type in as_value
-        } else if (tag == "<true/>") {
-            val.set_bool(true);
-        } else if (tag == "<false/>") {
-            val.set_bool(false);
-        } else if (tag == "<number>") {
-            start = end;
-            end = xml.find("</number>");
-            std::string str = xml.substr(start, end-start);
-            if (str.find(".") != std::string::npos) {
-                double num = strtod(str.c_str(), NULL);
-                val.set_double(num);
-            } else {
-                int num = strtol(str.c_str(), NULL, 0);
-                val.set_double(num);
-            }
-        } else if (tag == "<string>") {
-            start = end;
-            end = xml.find("</string>");
-            std::string str = xml.substr(start, end-start);
-            int length = str.size();;
-            char *data = new char[length+1];
-            std::copy(str.begin(), str.end(), data);
-            data[length] = 0;  // terminate the new string or bad things happen
-            // When an NPVariant becomes a string object, it *does not* make a copy.
-            // Instead it stores the pointer (and length) we just allocated.
-            val.set_string(data);
-            // as_value copies the string, so we don't need data anymore
-            delete[] data;
-        } else if (tag == "<array>") {
-            start = end;
-            end = xml.find("</array");
-            std::string str = xml.substr(start, end-start);
-            log_unimpl("array processing for ExternalInterface");
-        } else if (tag == "<object>") {
-            start = end;
-            end = xml.find("</object");
-            std::string str = xml.substr(start, end-start);
-            log_unimpl("object processing for ExternalInterface");
-        }
-    }
-
-    return val;
-}
-
-std::map<std::string, as_value>
-ExternalInterface::propertiesToAS(Global_as& gl, std::string &xml)
-{
-    // GNASH_REPORT_FUNCTION;
-    std::map<std::string, as_value> props;
-
-    std::string::size_type start = 0;
-    std::string::size_type end;
-
-    std::string id;
-    start = xml.find(" id=");
-    while (start != std::string::npos) {
-        // Extract the id from the property tag
-        start++;
-        end = xml.find(">", start) - 1;
-        id = xml.substr(start, end-start);
-        id.erase(0, 4);
-
-        // Extract the data
-        start = end + 2;
-        end = xml.find("</property>", start) ;
-        std::string data = xml.substr(start, end-start);
-        props[id] = toAS(gl, data);
-        start = xml.find(" id=", end);
-    }
-
-    return props;
-}
-
-as_value
-ExternalInterface::objectToAS(Global_as& /*gl*/, const std::string &/*xml*/)
-{
-    // GNASH_REPORT_FUNCTION;
-
-    return as_value();
-}
-
 boost::shared_ptr<ExternalInterface::invoke_t>
 ExternalInterface::ExternalEventCheck(int fd)
 {
@@ -247,26 +145,6 @@ ExternalInterface::ExternalEventCheck(int fd)
     boost::shared_ptr<ExternalInterface::invoke_t> error;
 
     if (fd > 0) {
-#if 0
-        fd_set fdset;
-        FD_ZERO(&fdset);
-        FD_SET(fd, &fdset);
-        struct timeval tval;
-        tval.tv_sec  = 0;
-        tval.tv_usec = 100;
-        errno = 0;
-        int ret1 = ::select(fd+1, &fdset, NULL, NULL, &tval);
-        if (ret1 == 0) {
-//            log_debug ("The pipe for fd #%d timed out waiting to read", fd);
-            return error;
-        } else if (ret1 == 1) {
-            log_debug ("The pipe for fd #%d is ready", fd);
-        } else {
-            log_error("The pipe has this error: %s", strerror(errno));
-            return error;
-        }
-#endif
-        
         int bytes = 0;
         ioctlSocket(fd, FIONREAD, &bytes);
         if (bytes == 0) {
@@ -582,17 +460,7 @@ ExternalInterface::readBrowser(int fd)
     // Wait for some data from the player
     int bytes = 0;
 
-    fd_set fdset;
-    FD_ZERO(&fdset);
-    FD_SET(fd, &fdset);
-    struct timeval tval;
-    tval.tv_sec = 10;
-    tval.tv_usec = 0;
-    // log_debug("Waiting for data... ");
-    if (::select(fd + 1, &fdset, NULL, NULL, &tval)) {
-        // log_debug("There is data in the network");
-        ioctlSocket(fd, FIONREAD, &bytes);
-    }  
+    ioctlSocket(fd, FIONREAD, &bytes);
 
     // No data yet
     if (bytes == 0) {

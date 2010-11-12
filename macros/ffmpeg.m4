@@ -223,22 +223,10 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
 
 dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfound=no])
   
-    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 511100; then
-      AC_MSG_WARN([Wrong ffmpeg/libavcodec version! 51.11.0 or greater required, $ffmpeg_version detected.])
+    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 512800; then
+      AC_MSG_WARN([Wrong ffmpeg/libavcodec version! 51.28.0 or greater required, $ffmpeg_version detected.])
     else
       ffmpeg_version_check=ok
-    fi
-
-    if test ! -z "$ffmpeg_num_version" -a "$ffmpeg_num_version" -gt 512800; then
-      dnl 51.28.0 or higher required
-      AC_DEFINE(FFMPEG_AUDIO2, 1, [Define if avcodec_decode_audio2 can be used.])
-    fi
-
-    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 512700; then
-      dnl 51.27.0 or higher required
-      AC_MSG_WARN([This version of ffmpeg/libavcodec ($ffmpeg_version) is not able to play VP6 encoded video: 51.27.0 or higher required!])
-    else
-      AC_DEFINE(FFMPEG_VP6, 1, [Define if ffmpeg can play VP6.])
     fi
 
     if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 514900; then

@@ -99,6 +99,13 @@
 #define PATH_MAX 1024
 #endif
 
+// Macro to prevent repeated logging calls for the same
+// event
+#define LOG_ONCE(x) { \
+    static bool warned = false; \
+    if (!warned) { warned = true; x; } \
+}
+
 // For scriptable plugin support
 #include "pluginScriptObject.h"
 
@@ -689,7 +696,7 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 
     assert(cond & G_IO_IN);
 
-    gnash::log_debug("Checking player requests on fd #%d",
+    gnash::log_debug("Checking player requests on FD #%d",
               g_io_channel_unix_get_fd(iochan));
 
     GError* error = 0;
@@ -935,6 +942,8 @@ create_standalone_launcher(const std::string& page_url, const std::string& swf_u
     }
 
     saLauncher << "#!/bin/sh" << std::endl
+               << "export GNASH_COOKIES_IN="
+               << "/tmp/gnash-cookies." << getpid() << std::endl
                << getGnashExecutable() << " ";
 
     if (!page_url.empty()) {
@@ -964,7 +973,10 @@ nsPluginInstance::setupCookies(const std::string& pageurl)
     // like IceWeasel on Debian lenny, which pre dates the cookie support
     // in NPAPI, you have to block all Cookie for sites like YouTube to
     // allow Gnash to work.
-    if (!NPNFuncs.getvalueforurl) return;
+    if (!NPNFuncs.getvalueforurl) {
+        LOG_ONCE( gnash::log_debug("Browser doesn't support reading cookies") );
+        return;
+    }
 
     // Cookie appear to drop anything past the domain, so we strip
     // that off.
@@ -1150,20 +1162,20 @@ nsPluginInstance::startProc()
 
     int ret = socketpair(AF_UNIX, SOCK_STREAM, 0, p2c_pipe);
     if (ret == -1) {
-        gnash::log_error("ERROR: socketpair(p2c) failed: %s", strerror(errno));
+        gnash::log_error("socketpair(p2c) failed: %s", strerror(errno));
         return;
     }
     _streamfd = p2c_pipe[1];
 
     ret = socketpair(AF_UNIX, SOCK_STREAM, 0, c2p_pipe);
     if (ret == -1) {
-        gnash::log_error("ERROR: socketpair(c2p) failed: %s", strerror(errno));
+        gnash::log_error("socketpair(c2p) failed: %s", strerror(errno));
         return;
     }
 
     ret = socketpair(AF_UNIX, SOCK_STREAM, 0, p2c_controlpipe);
     if (ret == -1) {
-        gnash::log_error("ERROR: socketpair(control) failed: %s", strerror(errno));
+        gnash::log_error("socketpair(control) failed: %s", strerror(errno));
         return;
     }
 
@@ -1192,7 +1204,7 @@ nsPluginInstance::startProc()
     
     // If the fork failed, childpid is -1. So print out an error message.
     if (_childpid == -1) {
-        gnash::log_error("ERROR: dup2() failed: " + std::string(strerror(errno)));
+        gnash::log_error("dup2() failed: %s", strerror(errno));
         return;
     }
     
@@ -1203,7 +1215,7 @@ nsPluginInstance::startProc()
         ret = close (p2c_pipe[0]);
         if (ret == -1) {
             // this is not really a fatal error, so continue best as we can
-            gnash::log_error("ERROR: p2c_pipe[0] close() failed: %s",
+            gnash::log_error("p2c_pipe[0] close() failed: %s",
                              strerror(errno));
         }
         
@@ -1211,7 +1223,7 @@ nsPluginInstance::startProc()
         ret = close (c2p_pipe[1]);
         if (ret == -1) {
             // this is not really a fatal error, so continue best as we can
-            gnash::log_error("ERROR: c2p_pipe[1] close() failed: %s",
+            gnash::log_error("c2p_pipe[1] close() failed: %s",
                              strerror(errno));
             gnash::log_debug("Forked successfully but with ignorable errors.");
         } else {
@@ -1241,7 +1253,7 @@ nsPluginInstance::startProc()
     ret = dup2 (p2c_pipe[0], fileno(stdin));
 
     if (ret == -1) {
-        gnash::log_error("ERROR: dup2() failed: " + std::string(strerror(errno)));
+        gnash::log_error("dup2() failed: %s", strerror(errno));
     }
     
     // Close all of the browser's file descriptors that we just inherited
@@ -1267,6 +1279,13 @@ nsPluginInstance::startProc()
 std::string
 nsPluginInstance::getCurrentPageURL() const
 {
+    // Return:
+    //  window.document.baseURI
+    //
+    // Was (bogus):
+    //  window.document.location.href
+    //
+
     NPP npp = _instance;
 
     NPIdentifier sDocument = NPN_GetStringIdentifier("document");
@@ -1279,20 +1298,21 @@ nsPluginInstance::getCurrentPageURL() const
     NPN_ReleaseObject(window);
 
     if (!NPVARIANT_IS_OBJECT(vDoc)) {
-        gnash::log_error("Can't get window object");
-        return NULL;
+        gnash::log_error("Can't get window.document object");
+        return std::string();
     }
     
     NPObject* npDoc = NPVARIANT_TO_OBJECT(vDoc);
 
+/*
     NPIdentifier sLocation = NPN_GetStringIdentifier("location");
     NPVariant vLoc;
     NPN_GetProperty(npp, npDoc, sLocation, &vLoc);
     NPN_ReleaseObject(npDoc);
 
     if (!NPVARIANT_IS_OBJECT(vLoc)) {
-        gnash::log_error("Can't get window.location object");
-        return NULL;
+        gnash::log_error("Can't get window.document.location object");
+        return std::string();
     }
 
     NPObject* npLoc = NPVARIANT_TO_OBJECT(vLoc);
@@ -1303,8 +1323,19 @@ nsPluginInstance::getCurrentPageURL() const
     NPN_ReleaseObject(npLoc);
 
     if (!NPVARIANT_IS_STRING(vProp)) {
-        gnash::log_error("Can't get window.location.href object");
-        return NULL;
+        gnash::log_error("Can't get window.document.location.href string");
+        return std::string();
+    }
+*/
+
+    NPIdentifier sProperty = NPN_GetStringIdentifier("baseURI");
+    NPVariant vProp;
+    NPN_GetProperty(npp, npDoc, sProperty, &vProp);
+    NPN_ReleaseObject(npDoc);
+
+    if (!NPVARIANT_IS_STRING(vProp)) {
+        gnash::log_error("Can't get window.document.baseURI string");
+        return std::string();
     }
 
     const NPString& propValue = NPVARIANT_TO_STRING(vProp);

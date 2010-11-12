@@ -320,7 +320,7 @@ public:
     ///                 Note that not all FileTypes are images: rendering
     ///                 to an FLV will not work.
     virtual void renderToImage(boost::shared_ptr<IOChannel> /*io*/,
-        FileType /*type*/) const {
+        FileType /*type*/, int /*quality*/) const {
 
         log_debug(_("Rendering to image not implemented for this "
             "renderer"));

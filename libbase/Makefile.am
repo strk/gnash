@@ -87,6 +87,8 @@ libgnashbase_la_SOURCES = \
 	GC.cpp \
 	BitsReader.cpp \
 	arg_parser.cpp \
+	URLAccessManager.cpp \
+	StreamProvider.cpp \
 	$(NULL)
 
 
@@ -168,7 +170,6 @@ inst_HEADERS = \
 	tu_file.h \
 	IOChannel.h \
 	Socket.h \
-	tu_opengl_includes.h \
 	GnashSystemFDHeaders.h \
 	GnashSystemNetHeaders.h \
 	GnashSystemIOHeaders.h \
@@ -183,6 +184,8 @@ inst_HEADERS = \
 	getclocktime.hpp \
 	GnashAlgorithm.h \
 	GnashFactory.h \
+	URLAccessManager.h \
+	StreamProvider.h \
 	$(NULL)
 
 if USE_PNG

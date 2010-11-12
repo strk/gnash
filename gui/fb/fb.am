@@ -15,7 +15,6 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-
 # These are used to handle input events from a keyboard, mouse, or
 # touchscreen. These are only used by the Framebuffer GUI, as without
 # X11, it has no event handling. We do it this way so the optionally
@@ -51,7 +50,6 @@ fb_gnash_SOURCES = $(GUI_SRCS) \
 fb_gnash_CPPFLAGS = -DGUI_FB -DGUI_CONFIG=\"FB\" -DFAKEFB=\"$(FAKEFB)\" \
 	$(AM_CPPFLAGS) 
 fb_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
-#fb_gnash_DEPENDENCIES = .configline
 fb_gnash_LDADD = \
 	$(top_builddir)/librender/libgnashrender.la \
 	$(GNASH_LIBS) 

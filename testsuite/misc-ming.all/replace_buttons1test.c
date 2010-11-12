@@ -80,7 +80,7 @@ get_button(int width, int height, int r, int g, int b)
 
   sh = make_fill_square (0, 0, width, height, r, g, b, r, g, b);
 
-  SWFButton_addShape(bu, (SWFCharacter)sh, SWFBUTTON_UP );
+  SWFButton_addCharacter(bu, (SWFCharacter)sh, SWFBUTTON_UP );
 
   return bu;
 }

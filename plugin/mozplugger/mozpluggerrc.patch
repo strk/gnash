@@ -1,3 +1,0 @@
-application/x-shockwave-flash:swf:Shockwave Gnash
-	stream embed noisy ignore_errors hidden fill swallow(Gnash) loop: gnash -v -j $width -k $height "$file" -x $window
-	stream: gnash -j $width -k $height -v "$file" -x $window

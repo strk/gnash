@@ -37,7 +37,6 @@
 // Forward declarations
 namespace gnash {
     class IOChannel;
-    class JpegInput;
 }
 
 namespace gnash {
@@ -369,8 +368,10 @@ public:
     /// @param type     The image format to write in (see GnashEnums.h)
     /// @param out      The IOChannel to write to.
     /// @param image    The image to write.
-    /// @param quality  The quality of the image output (not used for all
-    ///                 formats)
+    /// @param quality  The quality of the image output, from 0..100. Values
+    ///                 outside this range will be clamped to the minimum or
+    ///                 maxium value. The quality is not used for all
+    ///                 formats.
     DSOEXPORT static void writeImageData(FileType type,
             boost::shared_ptr<gnash::IOChannel> out, const GnashImage& image,
             int quality);

@@ -1,0 +1,109 @@
+http://www.xmission.com/~ink/gnash/gnash-dump/README.txt:
+
+Gnash stream dumper
+===================
+
+The application allows the user to dump both the raw (BGRA24) video
+stream, and the raw (PCM/Wave) audio stream from a movie. 
+The "dump gui" is disabled by default, you'd need to compile it with
+something like this:
+
+./configure \
+    --prefix=/usr/local/gnash-dump \
+    --enable-renderer=agg \
+    --enable-gui=gtk,dump \
+    --enable-media=ffmpeg \
+    --disable-kparts \
+    --disable-nsapi \
+    --disable-menus
+
+It *requires* AGG as the renderer.
+Audio and video are separate (you can dump video, even if you
+choose gstreamer for audio output).
+
+Gui-specific switches supported are:
+
+  -D <file>[@<fps>]  
+   Name of a file to dump video frames to.
+   By default the frequency of video frames dump is driven by
+   the heart-beat (defaults to 10ms per beat [100FPS],
+   you can change using the -d switch).
+   You can override video output FPS by appending a @<value> to
+   the filename. This will be independent to heart-beating, which
+   would be always best to be a submultiple of SWF and video output
+   FPSs. Example:
+
+  -S <ms>
+   Sleep for the given amount of milliseconds for each heart-beat.
+   By default there's no sleep.
+   You may want to add some sleeping IFF the SWF file you are willing
+   to record doesn't contain proper loading code (ie: _assumes_ loads
+   will happen within a given number of frames advancements).
+
+You can use the generic -A switch for dumping audio:
+
+  -A <file>         
+   Audio dump file (wave format)
+
+Once invoked, gnash will output sh-friendly information about the
+results: 
+
+$ /usr/local/gnash-dump/bin/dump-gnash -D blah.out@12 -A \
+  blah.wav -t 85 ./sbemail45.swf
+
+  # Created 44100 16Mhz stereo wave file:
+  AUDIOFILE=blah.wav
+  # WARNING:  Gnash was told to loop the movie
+  # Gnash created a raw dump file with the following properties:
+  COLORSPACE=BGRA32
+  NAME=blah.out
+  WIDTH=550
+  HEIGHT=400
+  TIME=85.0749
+  FPS_ACTUAL=12
+  # Finished writing file
+  FRAMECOUNT=1026
+
+One could then play the movie with mplayer:
+
+mplayer -demuxer rawvideo \
+	-rawvideo fps=12:w=550:h=400:format=bgra blah.out \
+	-audiofile ./blah.wav 
+
+Or play it fullscreen, with hardware acceleration:
+
+mplayer -demuxer rawvideo \
+	-rawvideo fps=12:w=550:h=400:format=bgra blah.out \
+	-audiofile ./blah.wav \
+	-fs \
+	-vo xv
+
+Or, convert it to YUV:
+
+mplayer blah.out -vo yuv4mpeg:file=blah.yuv \
+	-demuxer rawvideo \
+	-rawvideo w=550:h=400:format=bgra:fps=12
+
+And then make an MPEG-4/AC3 out of it:
+
+mencoder blah.yuv -audiofile ./blah.wav \
+	 -ovc lavc -oac lavc \
+	 -lavcopts vcodec=mpeg4:acodec=ac3 -o blah.avi
+
+Things To Do
+============
+
+ o Investigate gstreamer for audio stream capture.
+ o Let gnash send the bitmap data to places other than a file (eg, use
+   FFmpeg to encode on-the-fly).
+ o Use FFmpeg's swscale to convert AGG's RGB-only output to YUV, which
+   could then be sent to X11's XVideo extension for hardware scaling
+   (ala Adobe's Flash 9).  This could be a raw X11-only gui, or an
+   add-on to the gtk gui -- much in the same way that X11-shm is
+   #ifdef'd right now.
+ o Let the user specify which color space/bpp from AGG they want to
+   see (RGB24, RGB16, BGRA32, etc.).
+ o Change automake to *not* include X11 libraries for the dump
+   renderer.  There is no reason that this "gui" couldn't run on a
+   headless server.
+

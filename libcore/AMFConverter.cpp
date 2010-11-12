@@ -16,12 +16,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+#include "AMFConverter.h"
 
 #include <map>
 
 #include "SimpleBuffer.h"
 #include "AMF.h"
-#include "AMFConverter.h"
 #include "namedStrings.h"
 #include "as_value.h"
 #include "as_object.h"
@@ -33,6 +33,7 @@
 #include "Global_as.h"
 #include "fn_call.h"
 #include "as_function.h"
+#include "PropertyList.h"
 
 // Define this macro to make AMF parsing verbose
 //#define GNASH_DEBUG_AMF_DESERIALIZE 1
@@ -41,7 +42,6 @@
 // #define GNASH_DEBUG_AMF_SERIALIZE 1
 
 namespace gnash {
-
 namespace amf {
 
 namespace {
@@ -60,7 +60,8 @@ public:
     
     bool success() const { return !_error; }
 
-    bool accept(const ObjectURI& uri, const as_value& val) {
+    virtual bool accept(const ObjectURI& uri, const as_value& val) {
+
         if (_error) return true;
 
         // Tested with SharedObject and AMFPHP
@@ -224,9 +225,8 @@ Writer::writeObject(as_object* obj)
         // A normal array.
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
         log_debug(_("amf: serializing array of %d "
-                    "elements as ECMA_ARRAY (index %d) "
-                    "[allowStrict:%d, isStrict:%d]"),
-                    len, idx, allowStrict, isStrict);
+                    "elements as ECMA_ARRAY (index %d) "),
+                    len, idx);
 #endif
         _buf.appendByte(ECMA_ARRAY_AMF0);
         _buf.appendNetworkLong(len);

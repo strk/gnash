@@ -25,6 +25,8 @@
 #define OUTPUT_VERSION 8
 #define OUTPUT_FILENAME "BitmapDataTest.swf"
 
+void addRedSquareExport(SWFMovie mo);
+
 const char* mediadir=".";
 
 void
@@ -51,7 +53,6 @@ int
 main(int argc, char** argv)
 {
   SWFMovie mo;
-  SWFMovieClip mc;
   SWFMovieClip dejagnuclip, staticSquare;
   SWFShape shape;
   SWFDisplayItem it;

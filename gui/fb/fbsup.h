@@ -119,6 +119,12 @@ private:
     int own_vt;            // virtual terminal we are running in   
 
     std::vector< geometry::Range2d<int> > _drawbounds;
+
+    // X position of the output window
+    int _xpos;
+
+    // Y position of the output window
+    int _ypos;
     
     int m_stage_width;
     int m_stage_height;
@@ -128,6 +134,16 @@ private:
     int mouse_x, mouse_y, mouse_btn;
     unsigned char mouse_buf[256];
     int mouse_buf_size;
+#if 0
+    unsigned m_rowsize;
+    
+    std::vector<boost::shared_ptr<InputDevice> > _inputs;
+
+    struct fb_var_screeninfo var_screeninfo;
+    struct fb_fix_screeninfo fix_screeninfo;
+
+    unsigned int _timeout; /* TODO: should we move this to base class ? */
+#endif
     
     // Keyboard SHIFT/CTRL/ALT states (left + right)
     bool keyb_lshift, keyb_rshift, keyb_lctrl, keyb_rctrl, keyb_lalt, keyb_ralt;

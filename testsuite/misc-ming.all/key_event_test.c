@@ -26,6 +26,8 @@
 #define OUTPUT_VERSION  6
 #define OUTPUT_FILENAME  "key_event_test.swf"
 
+SWFDisplayItem add_static_mc(SWFMovie mo, const char* name, int depth);
+
 SWFDisplayItem
 add_static_mc(SWFMovie mo, const char* name, int depth)
 {
@@ -50,7 +52,7 @@ int
 main(int argc, char** argv)
 {
   SWFMovie mo;
-  SWFMovieClip  mc, dejagnuclip;
+  SWFMovieClip dejagnuclip;
   SWFDisplayItem  it, it1, it2, it3;
 
   const char *srcdir=".";

@@ -25,8 +25,6 @@
 #include "gui.h"
 
 #include <vector>
-#include <cstdio>
-#include <cstring>
 #include <algorithm> 
 
 #include "MovieClip.h"
@@ -38,6 +36,7 @@
 #include "GnashEnums.h"
 #include "RunResources.h"
 #include "StreamProvider.h"
+#include "ScreenShotter.h"
 
 #ifdef GNASH_FPS_DEBUG
 #include "ClockTime.h"
@@ -198,11 +197,9 @@ Gui::unsetFullscreen()
 void
 Gui::quit()
 {
-    log_debug(__PRETTY_FUNCTION__);
-
     // Take a screenshot of the last frame if required.
-    if (_screenShotter.get()) {
-        _screenShotter->last();
+    if (_screenShotter.get() && _renderer.get()) {
+        _screenShotter->last(*_renderer);
     }
     
     quitUI();
@@ -905,9 +902,8 @@ Gui::start()
         return;
     }
 
-    // Initializes the stage with a Movie and the passed flash vars and
-    // Scriptable vars for ExternalInterface.
-    _stage->init(_movieDef.get(), _flashVars, _scriptableVars);
+    // Initializes the stage with a Movie and the passed flash vars.
+    _stage->init(_movieDef.get(), _flashVars);
 
     bool background = true; // ??
     _stage->set_background_alpha(background ? 1.0f : 0.05f);
@@ -967,7 +963,7 @@ Gui::advanceMovie()
 #ifdef GNASH_FPS_DEBUG
     // will be a no-op if fps_timer_interval is zero
     if (advanced) {
-	fpsCounterTick();
+        fpsCounterTick();
     }
 #endif
     
@@ -1003,8 +999,8 @@ Gui::advanceMovie()
 		}
 	}
 
-    if (_screenShotter.get()) {
-        _screenShotter->screenShot(_advances);
+    if (_screenShotter.get() && _renderer.get()) {
+        _screenShotter->screenShot(*_renderer, _advances);
     }
 
     // Only increment advances and check for exit condition when we've
@@ -1021,36 +1017,26 @@ Gui::advanceMovie()
 }
 
 void
+Gui::setScreenShotter(std::auto_ptr<ScreenShotter> ss)
+{
+    _screenShotter.reset(ss.release());
+}
+
+void
 Gui::takeScreenShot()
 {
     if (!_screenShotter.get()) {
         // If no ScreenShotter exists, none was requested at startup.
         // We use a default filename pattern.
-        URL url(_runResources.streamProvider().originalURL());
+        URL url(_runResources.streamProvider().baseURL());
         std::string::size_type p = url.path().rfind('/');
         const std::string& name = (p == std::string::npos) ? url.path() :
             url.path().substr(p + 1);
         const std::string& filename = "screenshot-" + name + "-%f";
-        _screenShotter.reset(new ScreenShotter(_renderer, filename));
+        _screenShotter.reset(new ScreenShotter(filename, GNASH_FILETYPE_PNG));
     }
     assert (_screenShotter.get());
     _screenShotter->now();
-}
-
-void
-Gui::requestScreenShots(const ScreenShotter::FrameList& l, bool last,
-        const std::string& filename)
-{
-    // Nothing to do if there is no renderer or if no frames should be
-    // saved.
-    if (!_renderer.get() || (l.empty() && !last)) {
-	return;
-    }
-
-    _screenShotter.reset(new ScreenShotter(_renderer, filename));
-    if (last) _screenShotter->lastFrame();
-    _screenShotter->setFrames(l);
-
 }
 
 void
@@ -1276,14 +1262,6 @@ Gui::addFlashVars(Gui::VariableMap& from)
 }
 
 void
-Gui::addScriptableVar(const std::string &name, const std::string &value)
-{
-    log_debug("Adding scriptable variable \"%s\" = %s",
-              name, value);
-    _scriptableVars[name] = value;
-}
-
-void
 Gui::setMovieDefinition(movie_definition* md)
 {
     assert(!_movieDef);
@@ -1352,8 +1330,6 @@ Gui::callCallback(int fd)
 
     f();
 }
-
-
 // end of namespace
 }
 

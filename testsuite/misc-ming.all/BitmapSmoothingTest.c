@@ -37,8 +37,6 @@ main(int argc, char **argv)
 	SWFMovie mo;
 	SWFInput in;
 	SWFBitmap bitmap;
-	SWFFillStyle smtFill;
-	SWFFillStyle hrdFill;
 	SWFShape shpSmt;
 	SWFShape shpHrd;
 	SWFMovieClip mc;
@@ -47,6 +45,7 @@ main(int argc, char **argv)
 	SWFFont font;
 	SWFMovieClip dejagnuclip;
 	char outputFilename[256];
+    FILE* imgfile;
 
 	if ( argc < 2 ) {
 		fprintf(stderr, "Usage: %s <swf_version>\n", argv[0]);
@@ -73,13 +72,18 @@ main(int argc, char **argv)
 	/****************************************************
 	* Create filled shapes mc
 	****************************************************/
-	in = newSWFInput_filename(MEDIADIR"/vstroke.png");
-	if ( ! in ) {
-		return EXIT_FAILURE;
-	}
+    imgfile = fopen(MEDIADIR"/vstroke.png", "rb");
+    if (!imgfile) {
+        fprintf(stderr, "Failed to open bitmap file");
+        return EXIT_FAILURE;
+    }
 
+    // Note that recent ming version have the more convenient
+    // newSWFInput_filename() function, but we want to support
+    // older versions.
+    in = newSWFInput_file(imgfile);
 	bitmap = newSWFBitmap_fromInput(in);
-	if ( ! bitmap ) {
+	if (!bitmap) {
 		return EXIT_FAILURE;
 	}
 
@@ -128,6 +132,8 @@ main(int argc, char **argv)
 	SWFMovie_nextFrame(mo); /* showFrame */
 
 	SWFMovie_save(mo, outputFilename);
+
+    fclose(imgfile);
 
 	return EXIT_SUCCESS;
 }

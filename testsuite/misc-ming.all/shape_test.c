@@ -38,11 +38,9 @@ int
 main(int argc, char** argv)
 {
   SWFMovie mo;
-  SWFMovieClip mc1, mc2, dejagnuclip;
+  SWFMovieClip dejagnuclip;
   SWFDisplayItem it;
   SWFShape  sh1,sh2;
-  SWFAction ac1, ac2;
-  int i;
 
   const char *srcdir=".";
   if ( argc>1 ) 

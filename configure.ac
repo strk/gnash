@@ -16,7 +16,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
 AC_PREREQ(2.50)
-AC_INIT(gnash, master)
+AC_INIT(gnash, 0.8.9dev)
 AC_CONFIG_SRCDIR([libcore/as_object.h])
 AC_CONFIG_HEADERS([gnashconfig.h])
 
@@ -785,6 +785,7 @@ dnl  Media handler selection
 dnl --------------------------------------------------------
 build_media_gst=yes
 build_media_ffmpeg=no
+build_media_none=no
 AC_ARG_ENABLE(media,
   AC_HELP_STRING([--enable-media=handler],
     [Enable media handling support using the specified handler: gst, ffmpeg or none (no sound) [[gst]] ]),
@@ -804,6 +805,9 @@ AC_ARG_ENABLE(media,
           media_list="${media_list}ffmpeg "
           ;;
         no|NO|none)
+          build_media_none=yes
+          build_media_ffmpeg=no
+          build_media_gst=no
           media_list="none"
           ;;
         *)
@@ -825,6 +829,11 @@ AC_ARG_ENABLE(media,
         media_list="gst"
     fi]
 )
+
+dnl If no render is selected, and media handling isn't disabled, them enable gst
+if test x${build_media_none} = xno -a x${build_media_gst} = xno -a x${build_media_ffmpeg} = xno; then
+  build_media_gst=yes
+fi
 
 MEDIA_CONFIG="${media_list}"
 AC_SUBST(MEDIA_CONFIG)
@@ -1463,19 +1472,6 @@ AC_SEARCH_LIBS([mallinfo], [c malloc],
 
 AM_CONDITIONAL([HAVE_MALLINFO], test x$mallinfo = xyes)
 AM_CONDITIONAL(JEMALLOC, test x$jemalloc = xyes)
-
-AC_ARG_ENABLE(debugger,
-  AC_HELP_STRING([--enable-debugger],[Enable the Flash debugger]),
-[case "${enableval}" in
-  yes) debugger=yes ;;
-  no)  debugger=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-debugger option]) ;;
-esac],debugger=no)
-
-if test x"$debugger" = x"yes"; then
-  AC_DEFINE([USE_DEBUGGER], [], [Flash Debugger support])
-fi
-AM_CONDITIONAL(DEBUGGER, test x$debugger = xyes)
 
 AC_ARG_ENABLE(fps-debug,
   AC_HELP_STRING([--enable-fps-debug],[Enable FPS debugging code]),
@@ -2186,26 +2182,32 @@ GNASH_PKG_FIND(fontconfig, [fontconfig/fontconfig.h], [fontconfig library], FcFo
 if test x$cross_compiling = xno; then
   AC_PATH_MING
 fi
-AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x ])
+
+if test x"$MING_VERSION_CODE" = x; then
+ MING_VERSION_CODE=00000000
+fi
+
+AM_CONDITIONAL(ENABLE_MING,
+	[ test x"$MAKESWF" != x -a $MING_VERSION_CODE -gt 00040000 ])
 
 AM_CONDITIONAL(MING_VERSION_0_4,
-        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040000  ])
+        [ test $MING_VERSION_CODE -ge 00040000  ])
 AM_CONDITIONAL(MAKESWF_SUPPORTS_PREBUILT_CLIPS,
-        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040002  ])
+        [ test $MING_VERSION_CODE -ge 00040002  ])
 AM_CONDITIONAL(MING_SUPPORTS_INIT_ACTIONS,
-        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040004  ])
+        [ test $MING_VERSION_CODE -ge 00040004  ])
 AM_CONDITIONAL(MING_SUPPORTS_REPLACE_TAG,
-        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040005 ])
+        [ test $MING_VERSION_CODE -ge 00040005 ])
 AM_CONDITIONAL(MING_SUPPORTS_SWFBUTTON_ADD_CHARACTER,
-        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040005 ])
+        [ test $MING_VERSION_CODE -ge 00040005 ])
 AM_CONDITIONAL(MING_SUPPORTS_STREAMING_SOUND,
-        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040006 ])
+        [ test $MING_VERSION_CODE -ge 00040006 ])
 AM_CONDITIONAL(MING_SUPPORTS_SWFBUTTON_SET_DEPTH,
-        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040006 ])
+        [ test $MING_VERSION_CODE -ge 00040006 ])
 AM_CONDITIONAL(MING_VERSION_0_4_3,
-        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040300 ])
+        [ test $MING_VERSION_CODE -ge 00040300 ])
 AM_CONDITIONAL(MING_VERSION_0_4_4,
-        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040400 ])
+        [ test $MING_VERSION_CODE -ge 00040400 ])
 
 if test x$cross_compiling = xno; then
   AC_ARG_WITH([swfdec_testsuite],
@@ -2783,12 +2785,6 @@ fi
 if test x$build_qtopia4 = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},qtopia4"
 fi
-if test x$build_hildon = xyes; then
-  SUPPORTED_GUIS="${SUPPORTED_GUIS},hildon"
-fi
-if test x$build_alp = xyes; then
-  SUPPORTED_GUIS="${SUPPORTED_GUIS},alp"
-fi
 if test x$build_fb = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},fb"
 fi
@@ -2862,6 +2858,8 @@ testsuite/actionscript.all/Makefile
 testsuite/samples/Makefile
 testsuite/swfdec/Makefile
 testsuite/misc-ming.all/Makefile
+testsuite/misc-ming.all/action_order/Makefile
+testsuite/misc-ming.all/displaylist_depths/Makefile
 testsuite/misc-ming.all/loop/Makefile
 testsuite/misc-mtasc.all/Makefile
 testsuite/misc-haxe.all/Makefile
@@ -2875,6 +2873,7 @@ testsuite/movies.all/Makefile
 testsuite/libcore.all/Makefile
 testsuite/libmedia.all/Makefile
 gui/Makefile
+gui/fb/Makefile
 gui/Info.plist
 gui/pythonmod/Makefile
 extensions/Makefile
@@ -3575,7 +3574,8 @@ if test x"$testsuite" = x"yes"; then
       echo "        MAKESWF is $MAKESWF"
     else
       echo "        WARNING: You need to have the Ming utilities package" >&4
-      echo "                 installed to run most of the tests in Gnash testsuite." >&4
+      echo "                 version 0.4 or higher installed to run" >&4
+      echo "                 many of the tests in Gnash testsuite." >&4
       echo "                 Install it from http://www.libming.org" >&4
       echo "                 or .deb users: apt-get install libming-util" >&4
     fi
@@ -3856,28 +3856,11 @@ if test x$cross_compiling = xyes; then
 fi
 
 echo "--------"
-dnl if test x"${ghelp}" = x"yes"; then
-dnl   echo "        GNOME help enabled"
-dnl else
-dnl   echo "        GNOME help disabled (default). Use --enable-ghelp to enable."
-dnl fi
-
-dnl if test x"${extensions}" = x"yes"; then
-dnl   echo "        Building extensions enabled (default). Use --disable-extensions to disable."
-dnl else
-dnl   echo "        Building Gnash extensions disabled."
-dnl fi
 
 if test x"${cygnal}" = x"yes"; then
   echo "        Building Cygnal media server enabled (default). Use --disable-cygnal to disable."
 else
   echo "        Building Cygnal media server disabled."
-fi
-
-if test x"${debugger}" = x"yes"; then
-  echo "        Building Flash debugger support (default). Use --disable-debugger to disable."
-else
-  echo "        Building the Flash debugger is disabled."
 fi
 
 if test x"${with-top_level}" != x; then

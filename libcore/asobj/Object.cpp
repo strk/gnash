@@ -138,6 +138,7 @@ attachObjectInterface(as_object& o)
 as_value
 object_ctor(const fn_call& fn)
 {
+
     if (fn.nargs == 1) {
         as_object* obj = toObject(fn.arg(0), getVM(fn));
         if (obj) return as_value(obj);
@@ -153,10 +154,6 @@ object_ctor(const fn_call& fn)
 
     if (!fn.isInstantiation()) {
         return new as_object(gl);
-    }
-
-    if (fn.this_ptr) {
-        gl.makeObject(*fn.this_ptr);
     }
 
     return as_value();

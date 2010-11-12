@@ -1,0 +1,40 @@
+<base href="http://localhost/test/sub/" />
+
+<script>
+document.write('window.location.href: '+window.location.href);
+document.write('<br>');
+document.write('document.baseURI: '+document.baseURI);
+</script>
+
+<hr/>
+
+
+<embed type="application/x-shockwave-flash"
+ border="1"
+ src="test.swf"
+ height="100" width="400">
+src="test.swf" no base (expect XML:sub)
+
+<hr/>
+
+<embed type="application/x-shockwave-flash"
+ border="1"
+ src="test.swf"
+ height="100" width="400"
+ base="..">
+src="test.swf" base=".." (expect XML:root)
+
+<hr/>
+
+<embed type="application/x-shockwave-flash"
+ border="1"
+ src="../test.swf"
+ height="100" width="400">
+src="../test.swf" no base (expect XML:sub)
+
+<hr/>
+
+<a href="../test.html">unbased</a>
+|
+<a href="test.html">sub</a>
+

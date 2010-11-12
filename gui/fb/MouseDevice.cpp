@@ -328,7 +328,9 @@ MouseDevice::command(unsigned char cmd, unsigned char *buf, int count)
     } while (n > 0);
     
     // send command
-    write(_fd, &cmd, 1);
+    if ( -1 == write(_fd, &cmd, 1) ) {
+        return false;
+    }
 
     // read response (if any)
     while (count > 0) {

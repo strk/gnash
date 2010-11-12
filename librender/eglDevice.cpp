@@ -25,7 +25,7 @@
 #include <exception>
 
 #include "log.h"
-#include "RunResources.h"
+// #include "RunResources.h"
 #include "Renderer.h"
 #include "Renderer_ovg.h"
 #include "GnashException.h"

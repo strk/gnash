@@ -133,7 +133,7 @@ public:
         return oldtimeout;
     }
     
-    void setParam(std::string& name, std::string& value) {
+    void setParam(const std::string& name, const std::string& value) {
         _params[name] = value;
     }
     
@@ -194,6 +194,13 @@ public:
     /// A %f in the filename will be replaced with the frame number.
     void setScreenShotFile(const std::string& file) {
         _screenshotFile = file;
+    }
+
+    /// Set the quality for screenshot output.
+    //
+    /// A %f in the filename will be replaced with the frame number.
+    void setScreenShotQuality(int quality) {
+        _screenshotQuality = quality;
     }
 
 private:
@@ -276,8 +283,6 @@ private:
     
     void setFlashVars(const std::string& varstr);
 
-    void setScriptableVar(const std::string &name, const std::string& value);
-    
     typedef std::map<std::string, std::string, StringNoCaseLessThan> Params;
     
     // Movie parameters (for -P)
@@ -368,6 +373,11 @@ private:
     //
     /// If empty, a default is used.
     std::string _screenshotFile;
+    
+    /// The filename to save screenshots to.
+    //
+    /// By default 100.
+    int _screenshotQuality;
 
     /// The identifier for the media handler.
     //

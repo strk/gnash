@@ -49,7 +49,7 @@ AC_DEFUN([AC_PATH_HAXE], [
 
   if test x"$HAXE" != "x"; then
     AC_MSG_CHECKING([for HAXE version])
-    HAXE_VERSION=`$HAXE -help | grep ^Haxe | awk '{print $'3'}'`
+    HAXE_VERSION=`$HAXE -help | grep ^haXe | awk '{print $'3'}'`
     AC_MSG_RESULT([${HAXE_VERSION}])
 
     major=`echo $HAXE_VERSION | cut -d '.' -f 1`

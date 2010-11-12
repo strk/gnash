@@ -80,6 +80,8 @@ static inline bool gl_check_error(void)
     return gl_do_check_error(1);
 }
 
+#if 0
+
 // glGetIntegerv() wrapper
 static bool gl_get_param(GLenum param, unsigned int *pval)
 {
@@ -161,6 +163,8 @@ static void unbind_texture(TextureState *ts)
 
     gl_check_error();
 }
+
+#endif
 
 class VaapiSurfaceGLXImpl: public VaapiSurfaceImplBase {
     void *surface() const

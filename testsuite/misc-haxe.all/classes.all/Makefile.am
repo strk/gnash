@@ -27,38 +27,17 @@ TEST_DRIVERS = classes.exp
 check_SCRIPTS =
 HAXE_FLAGS = -cp $(srcdir) 
 
-
-#include $(srcdir)/fl/accessibility/accessibility.am
-# include $(srcdir)/fl/containers/containers.am
-# include $(srcdir)/fl/controls/controls.am
-# include $(srcdir)/fl/core/core.am
-# include $(srcdir)/fl/managers/managers.am
-# include $(srcdir)/fl/motion/motion.am
-# include $(srcdir)/fl/transitions/transitions.am
-# include $(srcdir)/fl/video/video.am
-
 # These classes are in the flash namespace
 include $(srcdir)/accessibility/accessibility.am
-
-# These classes are for AIR only, not flash
-# include $(srcdir)/data/data.am
-# include $(srcdir)/desktop/desktop.am
 
 include $(srcdir)/display/display.am
 include $(srcdir)/errors/errors.am
 include $(srcdir)/events/events.am
 include $(srcdir)/external/external.am
-# # include $(srcdir)/filesystem/filesystem.am
-# # include $(srcdir)/filters/filters.am
 include $(srcdir)/geom/geom.am
-# # HAXE doesn't appear to support the HTML classes
-# # include $(srcdir)/html/html.am
 include $(srcdir)/media/media.am
 include $(srcdir)/net/net.am
 include $(srcdir)/printing/printing.am
-# # include $(srcdir)/sampler/sampler.am
-# # HAXE doesn't appear to support the Security classes
-# # include $(srcdir)/security/security.am
 include $(srcdir)/system/system.am
 include $(srcdir)/text/text.am
 include $(srcdir)/ui/ui.am
