@@ -50,22 +50,22 @@
 #include "boost/date_time/posix_time/posix_time.hpp"
 
 #ifdef RENDERER_AGG
-#include "Renderer_agg.h"
+#include "agg/Renderer_agg.h"
 #endif
 #ifdef RENDERER_OPENGL
-#include "Renderer_ogl.h"
+#include "opengl/Renderer_ogl.h"
 #endif
 #ifdef RENDERER_OPENVG
-#include "Renderer_ovg.h"
+#include "openvg/Renderer_ovg.h"
 #endif
 #ifdef RENDERER_GLES1
-#include "Renderer_gles1.h"
+#include "opengles1/Renderer_gles1.h"
 #endif
 #ifdef RENDERER_GLES2
-#include "Renderer_gles2.h"
+#include "opengles2/Renderer_gles2.h"
 #endif
 #ifdef RENDERER_CAIRO
-#include "Renderer_cairo.h"
+#include "cairo/Renderer_cairo.h"
 #endif
 #ifdef HAVE_EGL_EGL_H
 # include <EGL/egl.h>

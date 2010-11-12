@@ -57,14 +57,6 @@ GNASH_LIBS = \
 
 instdir = $(includedir)/gnash
 
-inst_HEADERS = \
-	Renderer.h \
-	Renderer_ovg.h \
-	Renderer_ovg_bitmap.h \
-	Renderer_ogl.h \
-	eglDevice.h \
-	$(NULL)
-
 noinst_HEADERS = \
 	openvg/Renderer_ovg.h \
 	openvg/Renderer_ovg_bitmap.h \

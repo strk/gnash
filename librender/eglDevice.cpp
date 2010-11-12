@@ -27,7 +27,7 @@
 #include "log.h"
 // #include "RunResources.h"
 #include "Renderer.h"
-#include "Renderer_ovg.h"
+#include "openvg/Renderer_ovg.h"
 #include "GnashException.h"
 #ifdef HAVE_GTK2
 #include "gdk/gdkx.h"
