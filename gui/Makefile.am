@@ -24,9 +24,6 @@ AUTOMAKE_OPTIONS = -Wno-portability
 
 DIST_SUBDIRS = pythonmod fb
 
-# Build the current directory first. It's hard to see, but there is a '.' dot here.
-SUBDIRS = . fb
-
 if BUILD_FB_GUI
 SUBDIRS += fb
 endif
@@ -35,7 +32,6 @@ endif
 if HAS_PYTHON
 SUBDIRS += pythonmod
 endif
-
 
 localedir = $(datadir)/locale
 
@@ -207,6 +203,11 @@ GUI_SRCS = gnash.cpp \
 if BUILD_AQUA_GUI
 BUILT_SOURCES += bundle
 EXTRA_DIST += Gnash.app
+endif
+
+# Build the FB gui
+if BUILD_FB_GUI
+include $(srcdir)/fb/fb.am
 endif
 
 # Build the QTOPIA gui
