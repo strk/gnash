@@ -39,6 +39,10 @@ class DejaGnu {
     static var position:PosInfos;
 	static var trace = untyped __global__['trace'];
 
+    static private function callerInfo(p:haxe.PosInfos) {
+        return p.fileName + ": " + p.lineNumber;
+    }
+
     // This is a trick to force our 'init' function
     // to be automatically called at the start of the movie.
     static var inithack = init();
@@ -67,77 +71,78 @@ class DejaGnu {
 	return null;
     }
 
-    static public function fail (why) {
+    static public function fail (why, ?p:haxe.PosInfos) {
         failed++;
-        var msg = 'FAILED: '+why;
+        var msg = 'FAILED: ' + why + " " + callerInfo(p);
         xtrace(msg);
     }
 
-    static public function xfail(why) {
+    static public function xfail(why, ?p:haxe.PosInfos) {
         xfailed++;
-        var msg = 'XFAILED: '+why;
+        var msg = 'XFAILED: '+why+ " " + callerInfo(p);
         xtrace(msg);
     }
 
-    static public function pass(why) {
+    static public function pass(why, ?p:haxe.PosInfos) {
         passed++;
-        var msg = 'PASSED: '+why;
+        var msg = 'PASSED: '+why+ " " + callerInfo(p);
         xtrace(msg);
     }
 
-    static public function xpass(why) {
+    static public function xpass(why, ?p:haxe.PosInfos) {
         xpassed++;
-        var msg = 'XPASSED: '+why;
+        var msg = 'XPASSED: '+why+ " " + callerInfo(p);
         xtrace(msg);
     }
     
-	static public function check_equals(obt:Dynamic, exp:Dynamic, msg) {
+	static public function check_equals(obt:Dynamic, exp:Dynamic, msg, ?p:haxe.PosInfos) {
         if(msg == null) msg = "";
-        if ( obt == exp ) {
-            pass(obt+' == '+exp+' '+msg);
+        if (obt == exp) {
+            // Pass the calling posinfos.
+            pass(obt+' == ' + exp + ' ' + msg, p);
         } else {
-            fail('expected: "'+exp+'" , obtained: "'+obt+'" '+msg);
+            fail('expected: "' + exp + '" , obtained: "' + obt + '" ' + msg, p);
 		}
     }
 	
-	static public function xcheck_equals(obt:Dynamic, exp:Dynamic, msg)
+	static public function xcheck_equals(obt:Dynamic, exp:Dynamic, msg, ?p:haxe.PosInfos)
 	{
 		if(msg == null) msg = "";
 		if ( obt == exp ) 
 		{
-			xpass(obt+' == '+exp+' '+msg);
+			xpass(obt+' == '+exp+' '+msg, p);
 		}
 		else 
 		{
-			xfail('expected: '+exp+' , obtained: '+obt+" "+msg);
+			xfail('expected: '+exp+' , obtained: '+obt+" "+msg, p);
 		}
 	}
 	
-	static public function check(a : Dynamic, msg)
+	static public function check(a : Dynamic, msg, ?p:haxe.PosInfos)
 	{
 		if ( a ) 
 		{
-			if ( msg != null ) pass(msg);
-			else pass(a);
+			if ( msg != null ) pass(msg, p);
+			else pass(a, p);
 		}
 		else 
 		{
-			if ( msg != null ) fail(msg);
-			else fail(a);
+			if ( msg != null ) fail(msg, p);
+			else fail(a, p);
 		}
 	}
 	
-	static public function xcheck(a : Dynamic, msg)
+	static public function xcheck(a : Dynamic, msg, ?p:haxe.PosInfos)
 	{
 		if ( a ) 
 		{
-			if ( msg != null ) xpass(msg);
-			else xpass(a);
+			if ( msg != null ) xpass(msg, p);
+			else xpass(a, p);
 		}
 		else 
 		{
-			if ( msg != null ) xfail(msg);
-			else xfail(a);
+			if ( msg != null ) xfail(msg, p);
+			else xfail(a, p);
 		}
 	}
 	
@@ -166,26 +171,26 @@ class DejaGnu {
 		xtrace('#total tests run: '+ testcount());
     }
 
-    static public function totals(exp:Dynamic, msg:Dynamic) {
+    static public function totals(exp:Dynamic, msg:Dynamic, ?p:haxe.PosInfos) {
         var obt = testcount();
         if ( exp != null && obt != exp ) {
-            fail('Test run '+obt+' (expected '+exp+') '+msg);
+            fail('Test run '+obt+' (expected '+exp+') '+msg, p);
         } else {
-            pass('Test run '+obt+' '+msg);
+            pass('Test run '+obt+' '+msg, p);
         }
     }
 
-    static function publicxtotals(exp:Dynamic, msg:Dynamic) {
+    static public function xtotals(exp:Dynamic, msg:Dynamic, ?p:haxe.PosInfos) {
         var obt = testcount();
         if ( exp != null && obt != exp ) {
-            xfail('Test run '+obt+' (expected '+exp+') ['+msg+']');
+            xfail('Test run '+obt+' (expected '+exp+') ['+msg+']', p);
         } else {
-            xpass('Test run '+obt+' ['+msg+']');
+            xpass('Test run '+obt+' ['+msg+']', p);
         }
     }    
     
-    static public function note(msg) {
-        xtrace(msg);
+    static public function note(msg, ?p:haxe.PosInfos) {
+        xtrace(msg + " " + p.lineNumber);
     }
     
     static function xtrace(msg) {
@@ -197,13 +202,13 @@ class DejaGnu {
 		flash.Lib.trace(msg);
     }
 
-    static public function untested(msg) {
+    static public function untested(msg, ?p:haxe.PosInfos) {
 #if flash9
         tf.text += "UNTESTED: "+msg+"\n";
 #else
 		untyped tfsoft.text += "UNTESTED: "+msg+"\n";
 #end
-		flash.Lib.trace("UNTESTED: "+msg);
+		flash.Lib.trace("UNTESTED: " + msg );
     }
 
     static public function unresolved(msg) {
