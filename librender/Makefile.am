@@ -66,9 +66,12 @@ inst_HEADERS = \
 	$(NULL)
 
 noinst_HEADERS = \
-	Renderer_ovg.h \
-	Renderer_ovg_bitmap.h \
-	Renderer_ogl.h \
+	openvg/Renderer_ovg.h \
+	openvg/Renderer_ovg_bitmap.h \
+	openvg/Renderer_ogl.h \
+	opengles1/Renderer_gles1.h \
+	opengles1/render_handler_gles.h \
+	opengles2/Renderer_gles2.h \
 	eglDevice.h \
 	agg/Renderer_agg.h \
 	agg/Renderer_agg_bitmap.h \
@@ -100,17 +103,17 @@ libgnashrender_la_LIBADD += $(AGG_LIBS) $(LIBVA)
 endif
 
 if  BUILD_OVG_RENDERER
-libgnashrender_la_SOURCES += Renderer_ovg.cpp 
+libgnashrender_la_SOURCES += openvg/Renderer_ovg.cpp 
 libgnashrender_la_LIBADD += $(OPENVG_LIBS)
 endif
 
 if  BUILD_GLES1_RENDERER
-libgnashrender_la_SOURCES += Renderer_gles1.cpp 
+libgnashrender_la_SOURCES += opengles1/Renderer_gles1.cpp 
 libgnashrender_la_LIBADD += $(GLES1_LIBS)
 endif
 
 if  BUILD_GLES2_RENDERER
-libgnashrender_la_SOURCES += Renderer_gles2.cpp 
+libgnashrender_la_SOURCES += opengles2/Renderer_gles2.cpp 
 libgnashrender_la_LIBADD += $(GLES2_LIBS)
 endif
 
