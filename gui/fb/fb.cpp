@@ -108,29 +108,15 @@
 #include "RunResources.h"
 
 #include "Renderer.h"
-#include "Renderer_agg.h"
 #include "GnashSleep.h" // for gnashSleep
 
 #include <linux/input.h>    // for /dev/input/event*
 
-#ifdef RENDERER_AGG
-# include "fb_glue_agg.h"
-#endif
-
-#ifdef RENDERER_OPENVG
-# include "fb_glue_ovg.h"
-#endif
- 
-#ifdef RENDERER_GLES1
-# include "fb_glue_gles1.h"
-#endif
-
-#ifdef RENDERER_GLES2
-# include "fb_glue_gles2.h"
-#endif
 
 namespace gnash
 {
+
+//---------------
 
 int terminate_request = false;  // global scope to avoid GUI access
 
@@ -240,7 +226,7 @@ FBGui::init(int argc, char *** argv)
     fd = open("/dev/fb0", O_RDWR);
 #endif
     if (fd < 0) {
-        fatal_error("Could not open framebuffer device: %s", strerror(errno));
+        log_error("Could not open framebuffer device: %s", strerror(errno));
         return false;
     }
   
@@ -354,7 +340,7 @@ FBGui::initialize_renderer()
     if (pixelformat) {    
         agg_handler = create_Renderer_agg(pixelformat);      
     } else {
-        fatal_error("The pixel format of your framebuffer could not be detected.");
+        log_error("The pixel format of your framebuffer could not be detected.");
         return false;
     }
 
