@@ -64,7 +64,7 @@ class Accessibility_as {
 // 	    sendEvent
 	
 	if (Type.typeof(Accessibility.active) == ValueType.TBool) {
-	    DejaGnu.pass("[ln:"+(function(?p:haxe.PosInfos)return p)().lineNumber+"]Accessibility::active property exists");
+	    DejaGnu.pass("Accessibility::active property exists");
 	} else {
 	    DejaGnu.fail("Accessibility::active property doesn't exist");
 	}
