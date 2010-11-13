@@ -182,11 +182,13 @@ DejaGnu.note("\n The following tests come from the Ming test. \n " );
 		DejaGnu.pass("System.security 'updateProperties' is a function");
 	} else {
 	    DejaGnu.fail("System.security 'updateProperties' is not a function");
-	}	if (Type.typeof(untyped Accessibility.sendEvent)== TFunction){
+	}
+	if (Type.typeof(untyped Accessibility.sendEvent)== TFunction){
 		DejaGnu.pass("System.security 'sendEvent' is a function");
 	} else {
 	    DejaGnu.fail("System.security 'sendEvent' is not a function");
-	}	
+	}
+	
 	//These two methods are only defined in SWF 5. haxe does not compile SWF5!
 	// Methods return void (just undefined in SWF 5).
     // Make sure the return type is reight.
