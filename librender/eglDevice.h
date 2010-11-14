@@ -90,7 +90,7 @@ class EGLDevice
     bool swapPbuffers() {
         return eglSwapBuffers(_eglDisplay, _eglSurface);
     }
-    bool copyPbuffers(int x) {
+    bool copyPbuffers(size_t x) {
         if (x < _pbuffers.size()) {
             NativePixmapType pix;
             if (!eglCopyBuffers(_eglDisplay, _pbuffers[x], pix)) {
@@ -109,7 +109,7 @@ class EGLDevice
         }
     }
     
-    bool makePbufferCurrent(int x) {
+    bool makePbufferCurrent(size_t x) {
         if (x < _pbuffers.size()) {
             if (!eglMakeCurrent(_eglDisplay, _pbuffers[x], _pbuffers[x], _eglContext)) {
                 log_error( "eglMakeCurrent() failed (error 0x%x)", eglGetError());
