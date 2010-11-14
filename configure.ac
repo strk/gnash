@@ -927,6 +927,7 @@ dnl Renderer Selection
 dnl -------------------------------
 input_events=
 dnl By default, we want to to build all renderers
+build_directfb=no
 build_ovg=no
 build_gles1=no
 build_gles2=no
@@ -997,6 +998,11 @@ AC_ARG_ENABLE(renderer,
       ovg|OVG|OpenVG|openvg)
         renderer_list="${renderer_list} OpenVG"
         build_ovg=yes
+        nrender=$((nrender+1))
+        ;;
+      directfb|dfb)
+        renderer_list="${renderer_list} DirectF"
+        build_directfb=yes
         nrender=$((nrender+1))
         ;;
       agg|AGG)
@@ -1092,6 +1098,7 @@ if test x$pixelformat = xall; then
   fi
 fi
 
+AM_CONDITIONAL(BUILD_DIRECTFB_RENDERER, [ test x${build_directfb} = xyes ])
 AM_CONDITIONAL(BUILD_OVG_RENDERER,   [ test x${build_ovg} = xyes ])
 AM_CONDITIONAL(BUILD_GLES1_RENDERER, [ test x${build_gles1} = xyes ])
 AM_CONDITIONAL(BUILD_GLES2_RENDERER, [ test x${build_gles2} = xyes ])
@@ -1101,6 +1108,11 @@ AM_CONDITIONAL(BUILD_CAIRO_RENDERER, [ test x${build_cairo} = xyes ])
 
 if test x"${build_ovg}" = xyes; then
    AC_DEFINE([RENDERER_OPENVG], [1], [Use OpenVG renderer])
+fi
+
+if test x"${build_directfb}" = xyes; then
+   GNASH_PKG_FIND(directfb, [directfb.h], [DirectFB render library], DirectFBCreate)
+   AC_DEFINE([RENDERER_DIRECTFB], [1], [Use DirectFB renderer])
 fi
 
 if test x"${build_ogl}" = xyes; then

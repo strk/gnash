@@ -65,6 +65,7 @@ noinst_HEADERS = \
 	cairo/PathParser.h
 	eglDevice.h \
 	opengl/tu_opengl_includes.h \
+	directfb/Renderer_DirectFB.h \
 	opengl/Renderer_ogl.h \
 	opengles1/Renderer_gles1.h \
 	opengles1/render_handler_gles.h \
@@ -75,11 +76,14 @@ noinst_HEADERS = \
 	$(NULL)
 
 pkglib_LTLIBRARIES = libgnashrender.la
+
+libgnashrender_la_CPPFLAGS = $(AM_CPPFLAGS)
 libgnashrender_la_LIBADD = $(LIBVA_LIBS) $(LIBVA_X11_LIBS) $(LIBVA_GLX_LIBS)
 libgnashrender_la_LDFLAGS =  -release $(VERSION) 
 libgnashrender_la_SOURCES =
 
 if BUILD_EGL_DEVICE
+libgnashrender_la_CPPFLAGS += $(EGL_CFLAGS)
 libgnashrender_la_SOURCES += eglDevice.cpp
 libgnashrender_la_LIBADD += $(EGL_LIBS) $(GTK2_LIBS)
 endif
@@ -95,6 +99,7 @@ libgnashrender_la_LIBADD += $(AGG_LIBS) $(LIBVA)
 endif
 
 if  BUILD_OVG_RENDERER
+libgnashrender_la_CPPFLAGS += $(OVG_CFLAGS)
 libgnashrender_la_SOURCES += openvg/Renderer_ovg.cpp 
 libgnashrender_la_LIBADD += $(OPENVG_LIBS)
 endif
@@ -113,6 +118,12 @@ if  BUILD_CAIRO_RENDERER
 libgnashrender_la_SOURCES += cairo/Renderer_cairo.cpp
 libgnashrender_la_SOURCES += cairo/PathParser.cpp
 libgnashrender_la_LIBADD += $(CAIRO_LIBS)
+endif
+
+if  BUILD_DIRECTFB_RENDERER
+libgnashrender_la_CPPFLAGS += $(DIRECTFB_CFLAGS)
+libgnashrender_la_SOURCES += directfb/Renderer_DirectFB.cpp 
+libgnashrender_la_LIBADD += $(DIRECTFB_LIBS)
 endif
 
 # Rebuild with GCC 4.x Mudflap support
@@ -143,7 +154,7 @@ test_egl_LDADD = ../libbase/libgnashbase.la \
 endif
 
 testr_SOURCES = testr.cpp testr_gtk.cpp
-testr_CPPFLAGS = $(AM_CPPFLAGS) # -DUSE_TESTSUITE
+testr_CPPFLAGS = $(AM_CPPFLAGS) $(DIRECTFB_CFLAGS) # -DUSE_TESTSUITE
 testr_LDADD = ../libbase/libgnashbase.la \
 	libgnashrender.la \
 	$(EGL_LIBS) \
