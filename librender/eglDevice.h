@@ -122,33 +122,33 @@ class EGLDevice
     
     // Accessors for the settings needed by higher level code.
     // Surface accessors
-    EGLint getWidth() {
-        return getWidth(_eglSurface);
+    size_t getWidth() {
+        return static_cast<size_t>(getWidth(_eglSurface));
     }
     
-    EGLint getWidth(EGLSurface surface) {
+    size_t getWidth(EGLSurface surface) {
         EGLint value;
         eglQuerySurface(_eglDisplay, surface, EGL_WIDTH, &value);
-        return value;
+        return static_cast<size_t>(value);
     };
-    EGLint getHeigth() {
+    size_t getHeigth() {
         return getHeigth(_eglSurface);
     }
     
-    EGLint getHeigth(EGLSurface surface) {
+    size_t getHeigth(EGLSurface surface) {
         EGLint value;
         eglQuerySurface(_eglDisplay, surface, EGL_HEIGHT, &value);
-        return value;
+        return static_cast<size_t>(value);
     }
-    EGLint getVerticalRes() {
+    size_t getVerticalRes() {
         EGLint value;
         eglQuerySurface(_eglDisplay, _eglSurface, EGL_VERTICAL_RESOLUTION, &value);
-        return value;
+        return static_cast<size_t>(value);
     }
-    EGLint getHorzRes() {
+    size_t getHorzRes() {
         EGLint value;
         eglQuerySurface(_eglDisplay, _eglSurface, EGL_HORIZONTAL_RESOLUTION, &value);
-        return value;
+        return static_cast<size_t>(value);
     }
     bool isSurfaceSingleBuffered() {
         return isSurfaceSingleBuffered(_eglSurface);
