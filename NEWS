@@ -3,7 +3,7 @@ YYYY/MM/DD
 
 Improvements since 0.8.8 release are:
 
- * Fix swapped _framesloaded and _totalframes properties
+ * Fix swapped _framesloaded and _totalframes properties.
  * Improved ActionScript performance processing, especially
    for interactive applications.
  * npapi plugin: fix relative urls resolution in presence of <base> tag
@@ -16,8 +16,9 @@ Improvements since 0.8.8 release are:
    for DefineBitsJpeg4 tags, and fix display of some GIFs with
    multiple records.
  * Restore support for mingw32.
- * fb-gnash: allow specifying size and offset of rendering "window"
- * dump-gnash: improved speed, sync and flexibility
+ * fb-gnash: allow specifying size and offset of rendering "window".
+ * dump-gnash: improved speed, sync and flexibility.
+ * JPEG screenshot output.
 
 Gnash 0.8.8
 2010/08/17
