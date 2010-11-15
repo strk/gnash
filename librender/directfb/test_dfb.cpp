@@ -57,6 +57,12 @@ main(int argc, char *argv[])
     }
 
     dfb.printDirectFB();
+    dfb.printFBSurface();
+    dfb.printFBFont();
+    dfb.printFBDisplay();
+    dfb.printFBScreen();
+
+    std::cerr << "----------------------" << std::endl;
 }
 
 // Local Variables:
