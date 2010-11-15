@@ -33,7 +33,8 @@ namespace gnash {
 
 GC::GC(GcRoot& root)
     :
-    _maxNewCollectablesCount(0),
+    // might raise the default ...
+    _maxNewCollectablesCount(64),
     _resListSize(0),
     _root(root),
     _lastResCount(0)
