@@ -66,6 +66,7 @@ noinst_HEADERS = \
 	eglDevice.h \
 	opengl/tu_opengl_includes.h \
 	directfb/Renderer_DirectFB.h \
+	directfb/DirectFBDevice.cpp \
 	opengl/Renderer_ogl.h \
 	opengles1/Renderer_gles1.h \
 	opengles1/render_handler_gles.h \
@@ -122,7 +123,8 @@ endif
 
 if  BUILD_DIRECTFB_RENDERER
 libgnashrender_la_CPPFLAGS += $(DIRECTFB_CFLAGS)
-libgnashrender_la_SOURCES += directfb/Renderer_DirectFB.cpp 
+libgnashrender_la_SOURCES += directfb/Renderer_DirectFB.cpp \
+	directfb/DirectFBDevice.cpp
 libgnashrender_la_LIBADD += $(DIRECTFB_LIBS)
 endif
 
@@ -141,7 +143,7 @@ endif
 bin_PROGRAMS = testr
 
 if BUILD_EGL_DEVICE
-check_PROGRAMS =  test_egl
+check_PROGRAMS =  test_egl test_dfb
 # this tests the low level EGL interface, used by OpenVG, OpenGLES1,
 # and OpenGLES2.
 test_egl_SOURCES = test_egl.cpp
@@ -151,6 +153,15 @@ test_egl_LDADD = ../libbase/libgnashbase.la \
 	$(EGL_LIBS) \
 	$(GNASH_LIBS) \
 	$(GTK2_LIBS)
+endif
+
+if BUILD_DIRECTFB_RENDERER
+test_dfb_SOURCES = directfb/test_dfb.cpp
+test_dfb_CPPFLAGS = $(AM_CPPFLAGS) $(DIRECTFB_CFLAGS)
+test_dfb_LDADD = ../libbase/libgnashbase.la \
+	libgnashrender.la \
+	$(DIRECTFB_LIBS) \
+	$(GNASH_LIBS)
 endif
 
 testr_SOURCES = testr.cpp testr_gtk.cpp
