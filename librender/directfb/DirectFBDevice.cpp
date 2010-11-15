@@ -141,7 +141,7 @@ DirectFBDevice::initDevice(int argc, char *argv[])
     fdesc.flags = DFDESC_HEIGHT;
     fdesc.height = y/10;
     
-    if ((result == _dfb->CreateFont(_dfb, FONT, &fdesc, &_font)) != DR_OK) {
+    if ((result == _dfb->CreateFont(_dfb, FONT, &fdesc, &_font)) == DR_OK) {
 	log_error("CreateFont(): %s", getErrorString(result));
     }
     _surface->SetFont(_surface, _font);
@@ -154,15 +154,194 @@ DirectFBDevice::initDevice(int argc, char *argv[])
     _provider->GetSurfaceDescription(_provider, &sdesc);
 #endif
 
-    if ((result == _dfb->GetDisplayLayer(_dfb, DLID_PRIMARY, &_layer)) != DR_OK) {
+    if ((result == _dfb->GetDisplayLayer(_dfb, DLID_PRIMARY, &_layer)) == DR_OK) {
 	log_error("GetDisplayLayer(): %s", getErrorString(result));
     }
     
-    if ((result == _layer->GetScreen(_layer, &_screen)) != DR_OK) {
+    if ((result == _layer->GetScreen(_layer, &_screen)) == DR_OK) {
 	log_error("GetScreen(): %s", getErrorString(result));
     }
     
+    DFBSurfacePixelFormat format;
+    _surface->GetPixelFormat(_surface, &format);
+
     return true;
+}
+
+void
+DirectFBDevice::printDisplayLayerConfig(DFBDisplayLayerConfig *config)
+{
+    std::stringstream ss;
+
+    if (config) {
+
+        printDisplayLayerBufferMode(config->buffermode);
+    }
+
+    std::cerr << ss.str();
+}
+
+void
+DirectFBDevice::printDisplayLayerBufferMode(DFBDisplayLayerBufferMode mode)
+{
+    std::cerr << "DisplayLayerBufferMode:" << std:: endl;
+
+    if (mode == DLBM_UNKNOWN) {
+        std::cerr << "\tDLBM_UNKNOWN: Unknown Display LAyer Buffer Mode" << std::endl;
+    }
+    if (mode == DLBM_FRONTONLY) {
+        std::cerr << "\tDLBM_FRONTONLY: No Backbuffer" << std::endl;
+    }
+    if (mode & DLBM_BACKVIDEO) {
+        std::cerr << "\tDLBM_BACKVIDEO: backbuffer in video memory */";
+    }
+    if (mode & DLBM_BACKSYSTEM) {
+        std::cerr << "\tDLBM_BACKSYSTEM: backbuffer in system memory */";
+    }
+    if (mode & DLBM_TRIPLE) {
+        std::cerr << "\tDLBM_TRIPLE: triple buffering */";
+    }
+    if (mode & DLBM_WINDOWS) {
+        std::cerr << "\tDLBM_WINDOWS: no layer buffers at all,using buffer of each window";
+    }
+
+}
+
+int
+DirectFBDevice::getDepth(DFBSurfacePixelFormat format)
+{
+    if (format == DSPF_UNKNOWN) {
+        return 0;
+    }
+    if (format & DSPF_ARGB1555) {
+        return 16;
+    }
+    if (format & DSPF_RGB16) {
+        return 16;
+    }
+    if (format & DSPF_RGB24) {
+        return 24;
+    }
+    if (format & DSPF_RGB32) {
+        return 24;
+    }
+    if (format & DSPF_ARGB) {
+        return 32;
+    }
+    if (format & DSPF_A8) {
+        return 8;
+    }
+    if (format & DSPF_YUY2) {
+        return 16;
+    }
+    if (format & DSPF_RGB332) {
+        return 8;
+    }
+    if (format & DSPF_UYVY) {
+        return 16;
+    }
+    if (format & DSPF_I420) {
+        return 12;
+    }
+    if (format & DSPF_YV12) {
+        return 12;
+    }
+    if (format & DSPF_LUT8) {
+        return 8;
+    }
+    if (format & DSPF_ALUT44) {
+        return 8;
+    }
+    if (format & DSPF_AiRGB) {
+        return 32;
+    }
+    if (format & DSPF_A1) {
+        return 1;
+    }
+    if (format & DSPF_NV12) {
+        return 12;
+    }
+    if (format & DSPF_NV16) {
+        return 16;
+    }
+    if (format & DSPF_ARGB2554) {
+        return 16;
+    }
+    if (format & DSPF_ARGB4444) {
+        return 26;
+    }
+#ifdef DSPF_RGBA4444
+    if (format & DSPF_RGBA4444) {
+        return 16;
+    }
+#endif
+    if (format & DSPF_NV21) {
+        return 12;
+    }
+    if (format & DSPF_AYUV) {
+        return 32;
+    }
+    if (format & DSPF_A4) {
+        return 4;
+    }
+    if (format & DSPF_ARGB1666) {
+        return 1;
+    }
+    if (format & DSPF_ARGB6666) {
+        return 16;
+    }
+    if (format & DSPF_RGB18) {
+        return 16;
+    }
+    if (format & DSPF_LUT2) {
+        return 12;
+    }
+    if (format & DSPF_RGB444) {
+        return 16;
+    }
+    if (format & DSPF_RGB555) {
+        return 16;
+    }
+    if (format & DSPF_BGR555) {
+        return 16;
+    }
+#ifdef DSPF_RGBA5551
+    if (format & DSPF_RGBA5551) {
+        return 16;
+    }
+#endif
+#ifdef DSPF_YUV444P
+    if (format & DSPF_YUV444P) {
+        return 24;
+    }
+#endif
+#ifdef DSPF_ARGB8565
+    if (format & DSPF_ARGB8565) {
+        return 24;
+    }
+#endif
+#ifdef DSPF_AVYU
+    if (format & DSPF_AVYU) {
+        return 32;
+    }
+#endif
+#ifdef  DSPF_VYU
+    if (format & DSPF_VYU) {
+        return 24;
+    }
+#endif
+#ifdef DSPF_A1_LSB
+    if (format & DSPF_A1_LSB) {
+        return 1;
+    }
+#endif
+#ifdef DSPF_YV16
+    if (format & DSPF_YV16) {
+        return 16;
+    }
+#endif
+
+    return 0;
 }
 
 void

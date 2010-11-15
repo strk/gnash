@@ -59,7 +59,7 @@ class DirectFBDevice
     // Accessors for the settings needed by higher level code.
     // Surface accessors
     size_t getWidth() {
-	return getWidth(_surface);
+        return getWidth(_surface);
     }
     
     size_t getWidth(IDirectFBSurface *surface) {
@@ -83,57 +83,122 @@ class DirectFBDevice
 	return 0;
     }
     size_t getVerticalRes() {
+        return getVerticalRes(_screen);
+    }
+    size_t getVerticalRes(IDirectFBScreen *screen) {
+	int x, y;
+	if (screen) {
+	    screen->GetSize(screen, &x, &y);
+	    return static_cast<size_t>(x);
+	}
+        return 0;
     }
     size_t getHorzRes() {
+        return getHorzRes(_screen);
     }
+    size_t getHorzRes(IDirectFBScreen *screen) {
+	int x, y;
+	if (screen) {
+	    screen->GetSize(screen, &x, &y);
+	    return static_cast<size_t>(y);
+	}
+        return 0;
+    }
+
     bool isSurfaceSingleBuffered() {
-        // return isSurfaceSingleBuffered(_directfbSurface);
-    }
-    
-    bool isSurfaceSingleBuffered(IDirectFBSurface surface) {
+        if (_surface) {
+            DFBSurfaceCapabilities caps;
+            _surface->GetCapabilities(_surface, &caps);
+            if (caps & DSCAPS_DOUBLE) {
+                return false;
+            }
+        }
+        return true;
     }
     
     bool isSurfaceBackBuffered() {
-        // return isSurfaceBackBuffered(_directfbSurface);
+        if (_surface) {
+            DFBSurfaceCapabilities caps;
+            _surface->GetCapabilities(_surface, &caps);
+            if (caps & DSCAPS_DOUBLE) {
+                return true;
+            }        
+            return false;
+        }
     }
-    bool isSurfaceBackBuffered(IDirectFBSurface surface) {
-    }
-
     bool isBufferDestroyed() {
         // return isBufferDestroyed(_directfbSurface);
+        return false;
     }
     bool isBufferDestroyed(IDirectFBSurface surface) {
+        return false;
     }
     bool isMultiSample() {
+        return false;
     }
     int getSurfaceID() {
+	if (_layer) {
+            DFBDisplayLayerID id;
+            _screen->GetID(_screen, &id);
+            return static_cast<int>(id);
+	}
+        return 0;
     }
 
     // Context accessors
     int getContextID() {
-	if (_dfb) {
-	    IDirectFBDisplayLayer layer;
-	    // _dfb->GetID(_dfb, &layer);
+	if (_layer) {
+            DFBDisplayLayerID id;
+            _layer->GetID(_layer, &id);
+            return static_cast<int>(id);
 	}
 	return 0;
     }
 
     bool isContextSingleBuffered() {
+        if (_layer) {
+            DFBDisplayLayerConfig config;
+            _layer->GetConfiguration(_layer, &config);
+            if (config.buffermode & DLBM_FRONTONLY) {
+                return true;
+            }        
+            return false;
+        }
+        return false;
     }
     bool isContextBackBuffered() {
+        if (_layer) {
+            DFBDisplayLayerConfig config;
+            _layer->GetConfiguration(_layer, &config);
+            if (config.buffermode & DLBM_FRONTONLY) {
+                return false;
+            }        
+            return true;
+        }
+        return true;
     }
 
     bool isNativeRender() {
+        return 0;
     }
     int getSamples() {
+        return 0;
     }
     int getSampleBuffers() {
+        return 0;
     }
     int getDepth() {
+        DFBSurfacePixelFormat format;
+        _surface->GetPixelFormat(_surface, &format);
+        return getDepth(format);
     }
+    int getDepth(DFBSurfacePixelFormat format);
+
     int getMaxSwapInterval() {
+        return 0;
     }
     int getMinSwapInterval() {
+        return 0;
     }
     
     /// print the data in a DirectFB
@@ -160,6 +225,11 @@ class DirectFBDevice
     };
     void printFBDisplay(IDirectFBDisplayLayer *display);
 
+    void printFBLayer() {
+        printFBDisplayLayer(_layer);
+    };
+    void printFBDisplayLayer(IDirectFBDisplayLayer *layer);
+
     /// print the data in a DirectFBFont
     void printFBScreen() {
         printFBScreen(_screen);
@@ -183,6 +253,8 @@ protected:
     void printDisplayLayerTypeFlags(DFBDisplayLayerTypeFlags flags);
     void printDisplayLayerCapabilities(DFBDisplayLayerCapabilities caps);
     void printfScreenCapabilities(DFBScreenCapabilities caos);
+    void printDisplayLayerConfig(DFBDisplayLayerConfig *config);
+    void printDisplayLayerBufferMode(DFBDisplayLayerBufferMode mode);
 
     void printColor(DFBColor color);
     //    void printFBSurfaceHintFlags(DFBSurfaceHintFlags flags);
