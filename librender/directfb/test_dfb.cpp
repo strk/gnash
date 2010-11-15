@@ -49,13 +49,81 @@ main(int argc, char *argv[])
     dbglogfile.setVerbosity();
 
     directfb::DirectFBDevice dfb;
-    
+
+#if 0
+    string result = "The buffer is empty";
+    DFBResult code = DR_BUFFEREMPTY;
+    if (dfb.getErrorString(code) == result) {
+        runtest.pass("DirectFBDevice::getErrorString()");
+    } else {
+        runtest.fail("DirectFBDevice::getErrorString()");
+    }    
+#endif
+
     if (dfb.initDevice(argc, argv)) {
         runtest.pass("DirectFBDevice:InitDevice()");
     } else {
         runtest.fail("DirectFBDevice:InitDevice()");
     }
 
+    if (dfb.getWidth()) {
+        runtest.pass("DirectFBDevice::getWidth()");
+    } else {
+        runtest.fail("DirectFBDevice::getWidth()");
+    }
+    
+    if (dfb.getHeigth()) {
+        runtest.pass("DirectFBDevice::getHeigth()");
+    } else {
+        runtest.fail("DirecTFBDevice::getHeigth()");
+    }
+    
+    if (dfb.getVerticalRes()) {
+        runtest.pass("DirectFBDevice::getVerticalRes()");
+    } else {
+        runtest.fail("DirectFBDevice::getVerticalRes()");
+    }
+    
+    if (dfb.getHorzRes()) {
+        runtest.pass("DirectFBDevice::getHorzRes()");
+    } else {
+        runtest.fail("DirectFBDevice::getHorzRes()");
+    }    
+    
+    if (dfb.isSurfaceSingleBuffered() != dfb.isSurfaceBackBuffered()) {
+        runtest.pass("DirectFBDevice::isSurface*Buffered()");
+    } else {
+        runtest.fail("DirectFBDevice::isSurface*Buffered()");
+    }
+
+    if (dfb.isContextSingleBuffered() != dfb.isContextBackBuffered()) {
+        runtest.pass("DirectFBDevice::iisContextBuffered()");
+    } else {
+        runtest.fail("DirectFBDevice::isContextBuffered()");
+    }
+
+    // Context accessor tests
+    std::cerr << "FIXME: " << dfb.getContextID() << std::endl;
+
+    if (dfb.getContextID() >= 0) {
+        runtest.pass("DirectFBDevice::getContextID()");
+    } else {
+        runtest.fail("DirectFBDevice::getContextID()");
+    }    
+
+    if (dfb.getSurfaceID() >= 0) {
+        runtest.pass("DirectFBDevice::getSurfaceID()");
+    } else {
+        runtest.fail("DirectFBDevice::getSurfaceID()");
+    }
+
+    if (dfb.getDepth()) {
+        runtest.pass("DirectFBDevice::getDepth()");
+    } else {
+        runtest.fail("DirectFBDevice::getDepth()");
+    }    
+    
+#if 1
     dfb.printDirectFB();
     dfb.printFBSurface();
     dfb.printFBFont();
@@ -63,6 +131,8 @@ main(int argc, char *argv[])
     dfb.printFBScreen();
 
     std::cerr << "----------------------" << std::endl;
+#endif
+
 }
 
 // Local Variables:
