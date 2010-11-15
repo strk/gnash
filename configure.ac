@@ -2845,6 +2845,7 @@ testsuite/misc-ming.all/Makefile
 testsuite/misc-ming.all/action_order/Makefile
 testsuite/misc-ming.all/displaylist_depths/Makefile
 testsuite/misc-ming.all/loop/Makefile
+testsuite/misc-ming.all/loading/Makefile
 testsuite/misc-mtasc.all/Makefile
 testsuite/misc-haxe.all/Makefile
 testsuite/misc-haxe.all/classes.all/Makefile

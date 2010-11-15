@@ -28,7 +28,7 @@ CLEANFILES =  \
 	testrun.sum \
 	testrun.log
 
-SUBDIRS = loop displaylist_depths action_order
+SUBDIRS = loop loading displaylist_depths action_order
 
 EXTRA_DIST = \
 	empty.as \
@@ -106,7 +106,6 @@ check_PROGRAMS = \
 	RollOverOutTest \
 	RollOverOutTest-Runner \
 	definebitsjpeg2 \
-	moviecliploader_test \
 	spritehier \
 	timeline_var_test \
 	root_stop_test \
@@ -133,9 +132,6 @@ check_PROGRAMS = \
 	multi_doactions_and_goto_frame_test \
 	reverse_execute_PlaceObject2_test1 \
 	reverse_execute_PlaceObject2_test2 \
-	loadImageTest \
-	loadMovieTest \
-	loadMovieTestRunner \
 	DrawingApiTestRunner \
 	frame_label_test \
 	path_format_test \
@@ -150,7 +146,6 @@ check_PROGRAMS = \
 	static_vs_dynamic2 \
 	getTimer_test \
 	Video-EmbedSquareTest \
-	LoadVarsTest \
 	Video-EmbedSquareTestRunner \
 	NetStream-SquareTest \
 	NetStream-SquareTestRunner \
@@ -167,12 +162,6 @@ check_PROGRAMS = \
 	BitmapDataDraw \
 	$(NULL)
 	
-if MING_VERSION_0_4_4
-check_PROGRAMS += \
-	LoadBitmapTest \
-	$(NULL)
-endif
-
 if MING_VERSION_0_4_3
 check_PROGRAMS += \
 	EmbeddedSoundTest \
@@ -264,7 +253,6 @@ check_SCRIPTS = \
 	getTimer_testrunner \
 	DepthLimitsTestrunner \
 	shape_testrunner \
-	LoadVarsTestRunner \
 	DefineEditTextVariableNameTest-Runner \
 	DefineEditTextVariableNameTest2-Runner \
 	runtime_vm_stack_testrunner \
@@ -274,12 +262,6 @@ check_SCRIPTS = \
 	InitActionTest2Runner \
 	$(NULL)
 	
-if MING_VERSION_0_4_4
-check_SCRIPTS += \
-	LoadBitmapTestRunner \
-	$(NULL)
-endif
-
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 check_SCRIPTS += VarAndCharClashTest-Runner \
 	gotoFrame2Test-Runner \
@@ -336,20 +318,6 @@ definebitsjpeg2_SOURCES = definebitsjpeg2.c
 definebitsjpeg2_LDADD = $(MING_LIBS)
 definebitsjpeg2.swf: definebitsjpeg2
 	./definebitsjpeg2 $(srcdir)/../media/lynch.jpg
-
-moviecliploader_test_SOURCES =  moviecliploader_test.c
-moviecliploader_test_LDADD = $(MING_LIBS)
-
-#FIXME: make this rule consistent with the others 
-#and write a test runner for the absolute *and* relative
-#versions
-moviecliploader_tests: moviecliploader_test
-	: test with relative urls 
-	ln -fs $(abs_mediadir) media
-	./moviecliploader_test media
-	mv moviecliploader_test.swf moviecliploader_test_relative.swf
-	: test absolute url
-	./moviecliploader_test $(abs_mediadir)
 
 DefineTextTest.swf: DefineTextTest
 	./DefineTextTest $(abs_mediadir)
@@ -1120,23 +1088,6 @@ BitmapDataDrawRunner: $(srcdir)/../generic-testrunner.sh BitmapDataDraw.swf
 	sh $< $(top_builddir) BitmapDataDraw.swf > $@
 	chmod 755 $@
 
-LoadBitmapTest_SOURCES = \
-	LoadBitmapTest.c \
-	$(NULL)
-
-LoadBitmapTest_CFLAGS = \
-	-DMEDIADIR='"$(abs_mediadir)"' \
-	$(NULL)
-
-LoadBitmapTest_LDADD = libgnashmingutils.la
-
-LoadBitmapTest.swf: LoadBitmapTest
-	./LoadBitmapTest $(abs_mediadir)
-
-LoadBitmapTestRunner: $(srcdir)/../generic-testrunner.sh LoadBitmapTest.swf
-	sh $< $(top_builddir) LoadBitmapTest.swf > $@
-	chmod 755 $@
-
 BeginBitmapFill_SOURCES = \
 	BeginBitmapFill.c \
 	$(NULL)
@@ -1342,47 +1293,6 @@ ResolveEventsTest_Runner_DEPENDENCIES = \
 ResolveEventsTest_Runner_CXXFLAGS = \
 	-DTGTDIR='"$(abs_builddir)"' \
 	$(NULL)
-
-loadImageTest_SOURCES =	\
-	loadImageTest.c	\
-	$(NULL)
-loadImageTest_LDADD = libgnashmingutils.la
-loadImageTest.swf: loadImageTest
-	./loadImageTest $(abs_mediadir)
-
-loadMovieTest_SOURCES =	\
-	loadMovieTest.c	\
-	$(NULL)
-loadMovieTest_LDADD = libgnashmingutils.la
-loadMovieTest.swf: loadMovieTest
-	./loadMovieTest $(abs_mediadir)
-loadMovieTestRunner_SOURCES = \
-	loadMovieTestRunner.cpp \
-	$(NULL)
-loadMovieTestRunner_LDADD = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(AM_LDFLAGS) \
-	$(NULL)
-loadMovieTestRunner_CXXFLAGS = \
-	-DSRCDIR='"$(srcdir)"' \
-	-DTGTDIR='"$(abs_builddir)"' \
-	-DMEDIADIR='"$(abs_mediadir)"' \
-	$(NULL)
-loadMovieTestRunner_DEPENDENCIES = \
-	loadMovieTest.swf \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(NULL)
-
-#loadMovieTest_Runner_SOURCES = \
-#	loadMovieTest-Runner.cpp \
-#	$(NULL)
-#loadMovieTest_Runner_LDADD = \
-#	$(top_builddir)/testsuite/libtestsuite.la \
-#	$(NULL)
-#loadMovieTest_Runner_DEPENDENCIES = \
-#	$(top_builddir)/testsuite/libtestsuite.la \
-#	loadMovieTest.swf	\
-#	$(NULL)
 
 # This will only work with Ming-0.4.0beta2 (support for prebuilt clips inclusion)
 VarAndCharClashTest.swf: $(srcdir)/../media/green.swf Dejagnu.swf $(srcdir)/VarAndCharClashTest.as 
@@ -1701,20 +1611,6 @@ Video_EmbedSquareTestRunner_DEPENDENCIES = \
 	Video-EmbedSquareTest.swf	\
 	$(NULL)
 
-LoadVarsTest_SOURCES = \
-	LoadVarsTest.c \
-	$(NULL)
-
-LoadVarsTest_LDADD = libgnashmingutils.la
-
-LoadVarsTest.swf: LoadVarsTest
-	./LoadVarsTest $(abs_mediadir)
-
-LoadVarsTestRunner: $(srcdir)/../generic-testrunner.sh LoadVarsTest.swf
-	sh $< $(top_builddir) LoadVarsTest.swf > $@
-	chmod 755 $@
-
-
 instanceNameTest_SOURCES =	\
 	instanceNameTest.c	\
 	$(NULL)
@@ -1743,7 +1639,6 @@ TEST_CASES = \
 	BeginBitmapFillRunner \
 	BitmapDataTestRunner \
 	BitmapDataDrawRunner \
-	LoadVarsTestRunner \
 	DeviceFontTestRunner \
 	EmbeddedFontTestRunner \
 	DefineEditTextVariableNameTest-Runner \
@@ -1767,7 +1662,6 @@ TEST_CASES = \
 	consecutive_goto_frame_testrunner \
 	multi_doactions_and_goto_frame_testrunner \
 	registerClassTestRunner \
-	loadMovieTestRunner \
 	XMLSocketTester \
 	LCTestRunner \
 	DrawingApiTestRunner \
@@ -1851,12 +1745,6 @@ TEST_CASES += \
 	ButtonPropertiesTestRunner \
 	ButtonEventsTest-Runner \
 	KeyEventOrderRunner \
-	$(NULL)
-endif
-
-if MING_VERSION_0_4_4
-TEST_CASES += \
-	LoadBitmapTestRunner \
 	$(NULL)
 endif
 
