@@ -59,7 +59,7 @@ class DirectFBDevice
     // Accessors for the settings needed by higher level code.
     // Surface accessors
     size_t getWidth() {
-	return getWidth(_surface.get());
+	return getWidth(_surface);
     }
     
     size_t getWidth(IDirectFBSurface *surface) {
@@ -71,7 +71,7 @@ class DirectFBDevice
 	return 0;
     };
     size_t getHeigth() {
-        return getHeigth(_surface.get());
+        return getHeigth(_surface);
     }
     
     size_t getHeigth(IDirectFBSurface *surface) {
@@ -144,19 +144,31 @@ class DirectFBDevice
 
     /// print the data in a DirectFBSurface
     void printFBSurface() {
-        printFBSurface(_surface.get());
+        printFBSurface(_surface);
     };
     void printFBSurface(IDirectFBSurface *surface);
 
     /// print the data in a DirectFBFont
     void printFBFont() {
-        printFBFont(_font.get());
+        printFBFont(_font);
     };
     void printFBFont(IDirectFBFont *font);
 
+    /// print the data in a DirectFBDisplay
+    void printFBDisplay() {
+        printFBDisplay(_layer);
+    };
+    void printFBDisplay(IDirectFBDisplayLayer *display);
+
+    /// print the data in a DirectFBFont
+    void printFBScreen() {
+        printFBScreen(_screen);
+    };
+    void printFBScreen(IDirectFBScreen *screen);
+
     /// print the data in a DirectFBInputDevice
     void printFBInputDevice() {
-        printFBInputDevice(_keyboard.get());
+        printFBInputDevice(_keyboard);
     };
     void printFBInputDevice(IDirectFBInputDevice *input);
 
@@ -165,14 +177,24 @@ protected:
     void printSurfaceBlittingFlags(DFBSurfaceBlittingFlags flags);
     void printSurfaceDrawingFlags(DFBSurfaceDrawingFlags flags);
     void printGrapbicsDriverIndo(DFBGraphicsDriverInfo *driver);
+    void printSurfaceDescriptionFlags(DFBSurfaceDescriptionFlags flags);
+    void printSurfaceCapabilities(DFBSurfaceCapabilities caps);
+    void printSurfacePixelFormat(DFBSurfacePixelFormat format);
+    void printDisplayLayerTypeFlags(DFBDisplayLayerTypeFlags flags);
+    void printDisplayLayerCapabilities(DFBDisplayLayerCapabilities caps);
+    void printfScreenCapabilities(DFBScreenCapabilities caos);
+
+    void printColor(DFBColor color);
+    //    void printFBSurfaceHintFlags(DFBSurfaceHintFlags flags);
     
-    IDirectFB				      *_dfb;
-    boost::scoped_ptr<IDirectFBSurface>        _surface;
-    boost::scoped_ptr<IDirectFBInputDevice>    _keyboard;
-    boost::scoped_ptr<IDirectFBEventBuffer>    _keybuffer;
-    boost::scoped_ptr<IDirectFBImageProvider>  _provider;
-    boost::scoped_ptr<IDirectFBFont>           _font;
-    boost::scoped_ptr<IDirectFBDisplayLayer>   _id;
+    IDirectFB		     *_dfb;
+    IDirectFBSurface         *_surface;
+    IDirectFBInputDevice     *_keyboard;
+    IDirectFBEventBuffer     *_keybuffer;
+    IDirectFBImageProvider   *_provider;
+    IDirectFBFont            *_font;
+    IDirectFBDisplayLayer    *_layer;
+    IDirectFBScreen          *_screen;
 };
 
 } // namespace directfb
