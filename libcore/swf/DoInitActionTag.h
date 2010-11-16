@@ -73,6 +73,11 @@ public:
         in.ensureBytes(2);
         const boost::uint16_t cid = in.read_u16();
 
+        IF_VERBOSE_PARSE(
+            log_parse(_("  tag %d: do_init_action_loader"), tag);
+            log_parse(_("  -- init actions for sprite %d"), cid);
+        );
+
         // TODO: Currently, tags are only be executed for already parsed
         // character ids. This is known to be wrong: a more accurate
         // description is:
@@ -86,13 +91,7 @@ public:
         //
         // Gnash currently doesn't know which characters are on the stage, or
         // which IDs have been exported.
-        DoInitActionTag* da = new DoInitActionTag(in, m, cid);
-
-        IF_VERBOSE_PARSE(
-            log_parse(_("  tag %d: do_init_action_loader"), tag);
-            log_parse(_("  -- init actions for sprite %d"), cid);
-        );
-
+        boost::intrusive_ptr<ControlTag> da(new DoInitActionTag(in, m, cid));
         m.addControlTag(da); // ownership transferred
     }
 

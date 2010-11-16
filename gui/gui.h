@@ -479,7 +479,6 @@ protected:
     /// The X Window ID to attach to. If zero, we create a new window.
     unsigned long   _xid;
 
-    // should it be unsigned ints ? (probably!)
     // This would be 0,0,_width,_height, so maybe
     // we should not duplicate the info with those
     // explicit values too..

@@ -634,7 +634,7 @@ if (x1!=x2){
 
 // Si
 // The following ming tests have not been implemented for some reasons.
-/*
+/*
 // undefined
 result = snd.send("lc_test", funcname);
 check_equals (result, false);

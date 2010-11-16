@@ -243,7 +243,7 @@ if DOCBOOK
 gnash_user.info: gnashuser.texi
 gnash_ref.info: gnashref.texi
 gnashuser.texi gnash_user.texi: images gnashuser.xml
-gnashref.texi gnash_user.texi: gnashref.xml
+gnashref.texi gnash_ref.texi: gnashref.xml
 else
 gnash_user.info: gnashuser.xml
 	-@if test -d $(srcdir)/preformatted; then \

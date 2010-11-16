@@ -228,7 +228,7 @@ public:
             DisplayObject* parent) const;
 
 	// See dox in movie_definition.h
-	virtual void addControlTag(SWF::ControlTag* c)
+	virtual void addControlTag(boost::intrusive_ptr<SWF::ControlTag> c)
 	{
 		m_playlist[m_loading_frame].push_back(c);
 	}

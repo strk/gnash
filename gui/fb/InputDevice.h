@@ -35,7 +35,7 @@
 namespace gnash {
 
 // Define if you want to support multiple input devices of the same type.
-// The default is to support the devices we prefer for moluse, keyboard,
+// The default is to support the devices we prefer for mouse, keyboard,
 // and touchscreen.
 // #define MULTIPLE_DEVICES 1
 

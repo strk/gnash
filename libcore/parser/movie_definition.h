@@ -282,11 +282,7 @@ public:
 	/// 	The tag to add in the list of executable tags for
 	/// 	the frame currently being loaded. Ownership is transferred
 	/// 	to the SWFMovieDefinition.
-	///
-	/// TODO: take an auto_ptr.
-	/// NOTE: the default implementation just let the ControlTag leak.
-	///
-	virtual void addControlTag(SWF::ControlTag* /*c*/)
+	virtual void addControlTag(boost::intrusive_ptr<SWF::ControlTag> /*c*/)
 	{
 	}
 

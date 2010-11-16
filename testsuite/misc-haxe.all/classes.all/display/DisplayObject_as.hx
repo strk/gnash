@@ -71,154 +71,154 @@ class DisplayObject_as {
         if (untyped x1.hasOwnProperty('accessibilityProperties')) {
             DejaGnu.pass("DisplayObject::accessibilityProperties property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+
+            DejaGnu.fail(
                          "]DisplayObject::accessibilityProperties property"+
                          " doesn't exist");
         }
         if (untyped x1.hasOwnProperty('alpha')) {
             DejaGnu.pass("DisplayObject::alpha property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::alpha"+
+            DejaGnu.fail("DisplayObject::alpha"+
                          " property doesn't exist");
         }
         if (untyped x1.hasOwnProperty('blendMode')) {
             DejaGnu.pass("DisplayObject::blendMode property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::blendMode"+
+            DejaGnu.fail("DisplayObject::blendMode"+
                          " property doesn't exist");
         }
         if (untyped x1.hasOwnProperty('cacheAsBitmap')) {
             DejaGnu.pass("DisplayObject::cacheAsBitmap property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::cacheAsBitmap"+
+            DejaGnu.fail("DisplayObject::cacheAsBitmap"+
                          " property doesn't exist");
         }
         if (untyped x1.hasOwnProperty('filters')) {
             DejaGnu.pass("DisplayObject::filters property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::filters"+
+            DejaGnu.fail("DisplayObject::filters"+
                          " property doesn't exist");
         }
         if (untyped x1.hasOwnProperty('height')) {
             DejaGnu.pass("DisplayObject::height property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::height"+
+            DejaGnu.fail("DisplayObject::height"+
                          " property doesn't exist");
         }
         if (untyped x1.hasOwnProperty('loaderInfo')) {
             DejaGnu.pass("DisplayObject::loaderInfo property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::loaderInfo"+
+            DejaGnu.fail("DisplayObject::loaderInfo"+
                          " property does not exist");
         }
     //Determine if the mask property of x1 exists by setting it and testing it
         if (untyped x1.hasOwnProperty('mask')) {
             DejaGnu.pass("DisplayObject::mask property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::mask property"+
+            DejaGnu.fail("DisplayObject::mask property"+
                          " does not exist");
         }
         if (untyped x1.hasOwnProperty('mouseX')) {
             DejaGnu.pass("DisplayObject::mouseX property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::mouseX"+
+            DejaGnu.fail("DisplayObject::mouseX"+
                          " property doesn't exist");
         }
         if (untyped x1.hasOwnProperty('mouseY')) {
             DejaGnu.pass("DisplayObject::mouseY property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::mouseY"+
+            DejaGnu.fail("DisplayObject::mouseY"+
                          " property doesn't exist");
         }
         if (untyped x1.hasOwnProperty('name')) {
             DejaGnu.pass("DisplayObject::name property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::name property"+
+            DejaGnu.fail("DisplayObject::name property"+
                          " doesn't exist");
         }
         if (untyped x1.hasOwnProperty('opaqueBackground')) {
             DejaGnu.pass("DisplayObject::opaqueBackground property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+
+            DejaGnu.fail(
                          "]DisplayObject::opaqueBackground property doesn't"+
                          " exist");
         }
         if (untyped x1.hasOwnProperty('parent')) {
             DejaGnu.pass("DisplayObject::parent property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::parent"+
+            DejaGnu.fail("DisplayObject::parent"+
                          " property does not exist");
         }
         if (untyped x1.hasOwnProperty('root')) {
             DejaGnu.pass("DisplayObject::root property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::root property"+
+            DejaGnu.fail("DisplayObject::root property"+
                          " doesn't exist");
         }
         if (untyped x1.hasOwnProperty('rotation')) {
             DejaGnu.pass("DisplayObject::rotation property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::rotation"+
+            DejaGnu.fail("DisplayObject::rotation"+
                          " property doesn't exist");
         }
         if (untyped x1.hasOwnProperty('scale9Grid')) {
             DejaGnu.pass("DisplayObject::scale9Grid property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::scale9Grid"+
+            DejaGnu.fail("DisplayObject::scale9Grid"+
                          " property doesn't exist");
         }
         if (untyped x1.hasOwnProperty('scaleX')) {
             DejaGnu.pass("DisplayObject::scaleX property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::scaleX"+
+            DejaGnu.fail("DisplayObject::scaleX"+
                          " property doesn't exist");
         }
         if (untyped x1.hasOwnProperty('scaleY')) {
             DejaGnu.pass("DisplayObject::scaleY property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::scaleY"+
+            DejaGnu.fail("DisplayObject::scaleY"+
                          " property doesn't exist");
         }
         if (untyped x1.hasOwnProperty('scrollRect')) {
             DejaGnu.pass("DisplayObject::scrollRect property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::scrollRect"+
+            DejaGnu.fail("DisplayObject::scrollRect"+
                          " property doesn't exist"); 
         }
         if (untyped x1.hasOwnProperty('stage')) {
             DejaGnu.pass("DisplayObject::stage property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::stage"+
+            DejaGnu.fail("DisplayObject::stage"+
                          "property doesn't exist");
         }
         if (untyped x1.hasOwnProperty('transform')) {
             DejaGnu.pass("DisplayObject::transform property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::transform"+
+            DejaGnu.fail("DisplayObject::transform"+
                          " property doesn't exist");
         }
         if (untyped x1.hasOwnProperty('visible')) {
             DejaGnu.pass("DisplayObject::visible property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::visible"+
+            DejaGnu.fail("DisplayObject::visible"+
                          " property doesn't exist");
         }
         if (untyped x1.hasOwnProperty('width')) {
             DejaGnu.pass("DisplayObject::width property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::width"+
+            DejaGnu.fail("DisplayObject::width"+
                          " property doesn't exist");
         }
         if (untyped x1.hasOwnProperty('x')) {
             DejaGnu.pass("DisplayObject::x property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::x property"+
+            DejaGnu.fail("DisplayObject::x property"+
                          " doesn't exist");
         }
         if (untyped x1.hasOwnProperty('y')) {
             DejaGnu.pass("DisplayObject::y property exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::y property"+
+            DejaGnu.fail("DisplayObject::y property"+
                          " doesn't exist");
         }
 
@@ -231,76 +231,76 @@ class DisplayObject_as {
         if (untyped x1.hasOwnProperty('getBounds')) {
             DejaGnu.pass("DisplayObject::getBounds() method exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::getBounds()"+
+            DejaGnu.fail("DisplayObject::getBounds()"+
                          " method doesn't exist");
         }
         if (untyped __typeof__(x1.getBounds) == 'function') {
             DejaGnu.pass("getBounds() is a function");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]getBounds() is not a function");
+            DejaGnu.fail("getBounds() is not a function");
         }
         
         if (untyped x1.hasOwnProperty('getRect')) {
             DejaGnu.pass("DisplayObject::getRect() method exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]DisplayObject::getRect()"+
+            DejaGnu.fail("DisplayObject::getRect()"+
                          " method doesn't exist");
         }
         if (untyped __typeof__(x1.getRect) == 'function') {
             DejaGnu.pass("getRect() is a function");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]getRect() is not a function");
+            DejaGnu.fail("getRect() is not a function");
         }
         
         if (untyped x1.hasOwnProperty('globalToLocal')) {
             DejaGnu.pass("DisplayObject::globalToLocal() method exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+
+            DejaGnu.fail(
                         "]DisplayObject::globalToLocal() method doesn't exist");
         }
         if (untyped __typeof__(x1.globalToLocal) == 'function') {
             DejaGnu.pass("globalToLocal() is a function");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]globalToLocal() is not a"+
+            DejaGnu.fail("globalToLocal() is not a"+
                          " function");
         }
 
         if (untyped x1.hasOwnProperty('hitTestObject')) {
             DejaGnu.pass("DisplayObject::hitTestObject() method exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+
+            DejaGnu.fail(
                         "]DisplayObject::hitTestObject() method doesn't exist");
         }
         if (untyped __typeof__(x1.hitTestObject) == 'function') {
             DejaGnu.pass("hitTestObject() is a function");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]hitTestObject() is not a"+
+            DejaGnu.fail("hitTestObject() is not a"+
                          " function");
         }
         
         if (untyped x1.hasOwnProperty('hitTestPoint')) {
             DejaGnu.pass("DisplayObject::hitTestPoint() method exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+
+            DejaGnu.fail(
                          "]DisplayObject::hitTestPoint() method doesn't exist");
         }
         if (untyped __typeof__(x1.hitTestPoint) == 'function') {
             DejaGnu.pass("hitTestPoint() is a function");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]hitTestPoint() is not a"+
+            DejaGnu.fail("hitTestPoint() is not a"+
                          " function");
         }
         
         if (untyped x1.hasOwnProperty('localToGlobal')) {
             DejaGnu.pass("DisplayObject::localToGlobal() method exists");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+
+            DejaGnu.fail(
                         "]DisplayObject::localToGlobal() method doesn't exist");
         }
         if (untyped __typeof__(x1.localToGlobal) == 'function') {
             DejaGnu.pass("localToGlobal() is a function");
         } else {
-            DejaGnu.fail("[ln:"+here.lineNumber+"]localToGlobal() is not a"+
+            DejaGnu.fail("localToGlobal() is not a"+
                          " function");
         }
 #else

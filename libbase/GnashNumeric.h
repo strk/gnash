@@ -29,6 +29,7 @@
 # include <ieeefp.h> // for finite()
 #endif
 
+#include <cassert>
 #include <cmath>
 #include <algorithm>
 #include <boost/cstdint.hpp>

@@ -18,8 +18,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "as_environment.h"
+
+#include <string>
+#include <utility>
+#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/format.hpp>
+
+#include "smart_ptr.h"
 #include "MovieClip.h"
 #include "movie_root.h"
 #include "as_value.h"
@@ -31,11 +37,6 @@
 #include "CallStack.h"
 #include "Global_as.h"
 
-#include <string>
-#include <utility> // for std::pair
-#include <boost/algorithm/string/case_conv.hpp>
-#include <boost/format.hpp>
-
 // Define this to have find_target() calls trigger debugging output
 //#define DEBUG_TARGET_FINDING 1
 
@@ -45,76 +46,57 @@
 namespace gnash {
 
 namespace {
+    /// Find a variable in the given as_object
+    //
+    /// @param varname
+    /// Name of the local variable
+    ///
+    /// @param ret
+    /// If a variable is found it's assigned to this parameter.
+    /// Untouched if the variable is not found.
+    ///
+    /// @return true if the variable was found, false otherwise
+    bool getLocal(as_object& locals, const std::string& name, as_value& ret);
 
-/// Find a variable in the given as_object
-//
-/// @param varname
-/// Name of the local variable
-///
-/// @param ret
-/// If a variable is found it's assigned to this parameter.
-/// Untouched if the variable is not found.
-///
-/// @return true if the variable was found, false otherwise
-bool
-getLocal(as_object& locals, const std::string& name, as_value& ret)
-{
-    string_table& st = getStringTable(locals);
-    return locals.get_member(st.find(name), &ret);
-}
+    bool findLocal(as_object& locals, const std::string& varname, as_value& ret,
+            as_object** retTarget);
 
-bool
-findLocal(as_object& locals, const std::string& varname, as_value& ret,
-        as_object** retTarget) 
-{
+    /// Delete a local variable
+    //
+    /// @param varname
+    /// Name of the local variable
+    ///
+    /// @return true if the variable was found and deleted, false otherwise
+    bool deleteLocal(as_object& locals, const std::string& varname);
 
-    if (getLocal(locals, varname, ret)) {
-        if (retTarget) *retTarget = &locals;
-        return true;
-    }
+    /// Set a variable of the given object, if it exists.
+    //
+    /// @param varname
+    /// Name of the local variable
+    ///
+    /// @param val
+    /// Value to assign to the variable
+    ///
+    /// @return true if the variable was found, false otherwise
+    bool setLocal(as_object& locals, const std::string& varname,
+        const as_value& val);
 
-    return false;
-}
+    as_object* getElement(as_object* obj, const ObjectURI& uri);
 
-/// Delete a local variable
-//
-/// @param varname
-/// Name of the local variable
-///
-/// @return true if the variable was found and deleted, false otherwise
-bool
-deleteLocal(as_object& locals, const std::string& varname)
-{
-    string_table& st = getStringTable(locals);
-    return locals.delProperty(st.find(varname)).second;
-}
+    /// @param retTarget
+    /// If not NULL, the pointer will be set to the actual object containing the
+    /// found variable (if found).
+    as_value getVariableRaw(const as_environment& env,
+        const std::string& varname,
+        const as_environment::ScopeStack& scopeStack,
+        as_object** retTarget = 0);
 
-/// Set a variable of the given object, if it exists.
-//
-/// @param varname
-/// Name of the local variable
-///
-/// @param val
-/// Value to assign to the variable
-///
-/// @return true if the variable was found, false otherwise
-bool
-setLocal(as_object& locals, const std::string& varname, const as_value& val)
-{
-    string_table& st = getStringTable(locals);
-    Property* prop = locals.getOwnProperty(st.find(varname));
-    if (!prop) return false;
-    prop->setValue(locals, val);
-    return true;
-}
+    void setVariableRaw(const as_environment& env, const std::string& varname,
+        const as_value& val, const as_environment::ScopeStack& scopeStack);
 
-as_object*
-getElement(as_object* obj, const ObjectURI& uri)
-{
-    DisplayObject* d = obj->displayObject();
-    if (d) return d->pathElement(uri);
-    return getPathElement(*obj, uri);
-}
+    // Search for next '.' or '/' character in this word.  Return
+    // a pointer to it, or null if it wasn't found.
+    static const char* next_slash_or_dot(const char* word);
 
 }
 
@@ -158,38 +140,35 @@ as_environment::get_variable(const std::string& varname,
         }
         else
         {
-
             IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("find_object(\"%s\") [ varname = '%s' - "
-                        "current target = '%s' ] failed"),
-                        path, varname, m_target);
-            as_value tmp = get_variable_raw(path, scopeStack, retTarget);
-            if ( ! tmp.is_undefined() )
-            {
-                log_aserror(_("...but get_variable_raw(%s, <scopeStack>) "
-                            "succeeded (%s)!"), path, tmp);
-            }
+                log_aserror(_("find_object(\"%s\") [ varname = '%s' - "
+                            "current target = '%s' ] failed"),
+                            path, varname, m_target);
+                as_value tmp = getVariableRaw(*this, path, scopeStack, retTarget);
+                if (!tmp.is_undefined()) {
+                    log_aserror(_("...but getVariableRaw(%s, <scopeStack>) "
+                                "succeeded (%s)!"), path, tmp);
+                }
             );
-            return as_value(); // TODO: should we check get_variable_raw ?
+            // TODO: should we check getVariableRaw ?
+            return as_value();
         }
     }
-    else
-    {
-    // TODO: have this checked by parse_path as an optimization 
-    if (varname.find('/') != std::string::npos &&
-            varname.find(':') == std::string::npos)
-        {
+    else {
+        // TODO: have this checked by parse_path as an optimization 
+        if (varname.find('/') != std::string::npos &&
+                varname.find(':') == std::string::npos) {
+
             // Consider it all a path ...
             as_object* target = find_object(varname, &scopeStack); 
-            if ( target ) 
-            {
+            if (target) {
                 // ... but only if it resolves to a sprite
                 DisplayObject* d = target->displayObject();
                 MovieClip* m = d ? d->to_movie() : 0;
                 if (m) return as_value(getObject(m));
             }
         }
-        return get_variable_raw(varname, scopeStack, retTarget);
+        return getVariableRaw(*this, varname, scopeStack, retTarget);
     }
 }
 
@@ -207,121 +186,6 @@ validRawVariableName(const std::string& varname)
     return (varname.find(":::") == std::string::npos);
 }
 
-as_value
-as_environment::get_variable_raw(const std::string& varname,
-    const ScopeStack& scopeStack, as_object** retTarget) const
-    // varname must be a plain variable name; no path parsing.
-{
-#ifdef GNASH_DEBUG_GET_VARIABLE
-    log_debug(_("get_variable_raw(%s)"), varname);
-#endif
-
-    if (!validRawVariableName(varname))
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Won't get invalid raw variable name: %s"), varname);
-        );
-        return as_value();
-    }
-
-    as_value    val;
-
-    VM& vm = _vm;
-    int swfVersion = vm.getSWFVersion();
-    string_table& st = vm.getStringTable();
-    string_table::key key = st.find(varname);
-
-    // Check the scope stack.
-    for (size_t i = scopeStack.size(); i > 0; --i)
-    {
-        as_object* obj = scopeStack[i-1];
-        if (obj && obj->get_member(key, &val))
-        {
-            // Found the var in with context.
-#ifdef GNASH_DEBUG_GET_VARIABLE
-            log_debug("Found %s in object %d/%d of scope stack (%p)",
-                    varname, i, scopeStack.size(), obj);
-#endif
-            if ( retTarget ) *retTarget = obj;
-            return val;
-        }
-    }
-
-    // Check locals for getting them
-    // for SWF6 and up locals should be in the scope stack
-    if (swfVersion < 6 && _vm.calling()) {
-       if (findLocal(_vm.currentCall().locals(), varname, val, retTarget)) {
-           return val;
-       }
-    }
-
-    // Check current target members. TODO: shouldn't target be in scope stack ?
-    if (m_target)
-    {
-        as_object* obj = getObject(m_target);
-        assert(obj);
-        if (obj->get_member(key, &val)) {
-#ifdef GNASH_DEBUG_GET_VARIABLE
-            log_debug("Found %s in target %p", varname, m_target->getTarget());
-#endif
-            if ( retTarget ) *retTarget = obj;
-            return val;
-        }
-    }
-    else if ( _original_target ) // this only for swf5+ ?
-    {
-        as_object* obj = getObject(_original_target);
-        assert(obj);
-        if (obj->get_member(key, &val)) {
-#ifdef GNASH_DEBUG_GET_VARIABLE
-            log_debug("Found %s in original target %s", varname, _original_target->getTarget());
-#endif
-            if ( retTarget ) *retTarget = obj;
-            return val;
-        }
-    }
-
-    // Looking for "this"  (TODO: add NSV::PROP_THIS)
-    if (varname == "this") {
-#ifdef GNASH_DEBUG_GET_VARIABLE
-        log_debug("Took %s as this, returning original target %s", varname, _original_target->getTarget());
-#endif
-        val.set_as_object(getObject(_original_target));
-        if ( retTarget ) *retTarget = NULL; // correct ??
-        return val;
-    }
-
-    as_object* global = vm.getGlobal();
-
-    if ( swfVersion > 5 && key == NSV::PROP_uGLOBAL )
-    {
-#ifdef GNASH_DEBUG_GET_VARIABLE
-        log_debug("Took %s as _global, returning _global", varname);
-#endif
-        // The "_global" ref was added in SWF6
-        if ( retTarget ) *retTarget = NULL; // correct ??
-        return as_value(global);
-    }
-
-    if (global->get_member(key, &val))
-    {
-#ifdef GNASH_DEBUG_GET_VARIABLE
-        log_debug("Found %s in _global", varname);
-#endif
-        if ( retTarget ) *retTarget = global;
-        return val;
-    }
-    
-    // Fallback.
-    // FIXME, should this be log_error?  or log_swferror?
-    IF_VERBOSE_ASCODING_ERRORS (
-    log_aserror(_("reference to non-existent variable '%s'"),
-           varname);
-    );
-
-    return as_value();
-}
-
 bool
 as_environment::delVariableRaw(const std::string& varname,
         const ScopeStack& scopeStack) 
@@ -330,33 +194,27 @@ as_environment::delVariableRaw(const std::string& varname,
     assert(varname.find_first_of(":/.") == std::string::npos);
 
     string_table::key varkey = _vm.getStringTable().find(varname);
-    as_value val;
 
     // Check the with-stack.
-    for (size_t i = scopeStack.size(); i > 0; --i)
-    {
-        as_object* obj = scopeStack[i-1];
-        if (obj)
-        {
-            std::pair<bool,bool> ret = obj->delProperty(varkey);
-            if (ret.first)
-            {
+    for (size_t i = scopeStack.size(); i > 0; --i) {
+        as_object* obj = scopeStack[i - 1];
+
+        if (obj) {
+            std::pair<bool, bool> ret = obj->delProperty(varkey);
+            if (ret.first) {
                 return ret.second;
             }
         }
     }
 
     // Check locals for deletion.
-    if (_vm.calling() && deleteLocal(_vm.currentCall().locals(), varname))
-    {
+    if (_vm.calling() && deleteLocal(_vm.currentCall().locals(), varname)) {
         return true;
     }
 
-
     // Try target
-    std::pair<bool,bool> ret = getObject(m_target)->delProperty(varkey);
-    if ( ret.first )
-    {
+    std::pair<bool, bool> ret = getObject(m_target)->delProperty(varkey);
+    if (ret.first) {
         return ret.second;
     }
 
@@ -397,73 +255,8 @@ as_environment::set_variable(const std::string& varname, const as_value& val,
         }
     }
     else {
-        set_variable_raw(varname, val, scopeStack);
+        setVariableRaw(*this, varname, val, scopeStack);
     }
-}
-
-// No path rigamarole.
-void
-as_environment::set_variable_raw(const std::string& varname,
-    const as_value& val, const ScopeStack& scopeStack)
-{
-
-    if (!validRawVariableName(varname))
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Won't set invalid raw variable name: %s"), varname);
-        );
-        return;
-    }
-
-    VM& vm = _vm;
-    string_table& st = vm.getStringTable();
-    string_table::key varkey = st.find(varname);
-
-    // in SWF5 and lower, scope stack should just contain 'with' elements 
-
-    // Check the scope stack.
-    for (size_t i = scopeStack.size(); i > 0; --i)
-    {
-        as_object* obj = scopeStack[i-1];
-        if (obj && obj->set_member(varkey, val, true)) {
-            return;
-        }
-    }
-    
-    const int swfVersion = vm.getSWFVersion();
-    if (swfVersion < 6 && _vm.calling()) {
-       if (setLocal(_vm.currentCall().locals(), varname, val)) return;
-    }
-    
-    // TODO: shouldn't m_target be in the scope chain ?
-    if (m_target) getObject(m_target)->set_member(varkey, val);
-    else if (_original_target) {
-        getObject(_original_target)->set_member(varkey, val);
-    }
-    else
-    {
-        log_error("as_environment(%p)::set_variable_raw(%s, %s): "
-       "neither current target nor original target are defined, "
-           "can't set the variable",
-           this, varname, val);
-    }
-}
-
-// Search for next '.' or '/' DisplayObject in this word.  Return
-// a pointer to it, or to NULL if it wasn't found.
-static const char*
-next_slash_or_dot(const char* word)
-{
-    for (const char* p = word; *p; p++) {
-        if (*p == '.' && p[1] == '.') {
-            ++p;
-        }
-        else if (*p == '.' || *p == '/' || *p == ':') {
-            return p;
-        }
-    }
-    
-    return NULL;
 }
 
 /// Find the sprite/movie referenced by the given path.
@@ -669,15 +462,12 @@ as_environment::set_target(DisplayObject* target)
     m_target = target;
 }
 
-#ifdef GNASH_USE_GC
-
 void
 as_environment::markReachableResources() const
 {
     if (m_target) m_target->setReachable();
     if (_original_target) _original_target->setReachable();
 }
-#endif // GNASH_USE_GC
 
 bool
 parsePath(const std::string& var_path_in, std::string& path, std::string& var)
@@ -703,6 +493,204 @@ parsePath(const std::string& var_path_in, std::string& path, std::string& var)
 
     return true;
 }
+
+namespace {
+
+// No path rigamarole.
+void
+setVariableRaw(const as_environment& env, const std::string& varname,
+    const as_value& val, const as_environment::ScopeStack& scopeStack)
+{
+
+    if (!validRawVariableName(varname)) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Won't set invalid raw variable name: %s"), varname);
+        );
+        return;
+    }
+
+    VM& vm = env.getVM();
+    string_table& st = vm.getStringTable();
+    string_table::key varkey = st.find(varname);
+
+    // in SWF5 and lower, scope stack should just contain 'with' elements 
+
+    // Check the scope stack.
+    for (size_t i = scopeStack.size(); i > 0; --i) {
+        as_object* obj = scopeStack[i - 1];
+        if (obj && obj->set_member(varkey, val, true)) {
+            return;
+        }
+    }
+    
+    const int swfVersion = vm.getSWFVersion();
+    if (swfVersion < 6 && vm.calling()) {
+       if (setLocal(vm.currentCall().locals(), varname, val)) return;
+    }
+    
+    // TODO: shouldn't m_target be in the scope chain ?
+    if (env.get_target()) getObject(env.get_target())->set_member(varkey, val);
+    else if (env.get_original_target()) {
+        getObject(env.get_original_target())->set_member(varkey, val);
+    }
+    else {
+        log_error("as_environment::setVariableRaw(%s, %s): "
+           "neither current target nor original target are defined, "
+           "can't set the variable",
+           varname, val);
+    }
+}
+
+as_value
+getVariableRaw(const as_environment& env, const std::string& varname,
+    const as_environment::ScopeStack& scopeStack, as_object** retTarget)
+{
+
+    if (!validRawVariableName(varname)) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Won't get invalid raw variable name: %s"), varname);
+        );
+        return as_value();
+    }
+
+    as_value val;
+
+    VM& vm = env.getVM();
+    const int swfVersion = vm.getSWFVersion();
+    string_table& st = vm.getStringTable();
+    string_table::key key = st.find(varname);
+
+    // Check the scope stack.
+    for (size_t i = scopeStack.size(); i > 0; --i) {
+
+        as_object* obj = scopeStack[i - 1];
+        if (obj && obj->get_member(key, &val)) {
+            if (retTarget) *retTarget = obj;
+            return val;
+        }
+    }
+
+    // Check locals for getting them
+    // for SWF6 and up locals should be in the scope stack
+    if (swfVersion < 6 && vm.calling()) {
+       if (findLocal(vm.currentCall().locals(), varname, val, retTarget)) {
+           return val;
+       }
+    }
+
+    // Check current target members. TODO: shouldn't target be in scope stack ?
+    if (env.get_target()) {
+        as_object* obj = getObject(env.get_target());
+        assert(obj);
+        if (obj->get_member(key, &val)) {
+            if (retTarget) *retTarget = obj;
+            return val;
+        }
+    }
+    else if (env.get_original_target()) {
+        as_object* obj = getObject(env.get_original_target());
+        assert(obj);
+        if (obj->get_member(key, &val)) {
+            if (retTarget) *retTarget = obj;
+            return val;
+        }
+    }
+
+    // Looking for "this"  (TODO: add NSV::PROP_THIS)
+    if (varname == "this") {
+        val.set_as_object(getObject(env.get_original_target()));
+        if (retTarget) *retTarget = NULL; // correct ??
+        return val;
+    }
+
+    as_object* global = vm.getGlobal();
+
+    if (swfVersion > 5 && key == NSV::PROP_uGLOBAL) {
+#ifdef GNASH_DEBUG_GET_VARIABLE
+        log_debug("Took %s as _global, returning _global", varname);
+#endif
+        // The "_global" ref was added in SWF6
+        if (retTarget) *retTarget = NULL; // correct ??
+        return as_value(global);
+    }
+
+    if (global->get_member(key, &val)) {
+#ifdef GNASH_DEBUG_GET_VARIABLE
+        log_debug("Found %s in _global", varname);
+#endif
+        if (retTarget) *retTarget = global;
+        return val;
+    }
+    
+    // Fallback.
+    // FIXME, should this be log_error?  or log_swferror?
+    IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("reference to non-existent variable '%s'"), varname);
+    );
+
+    return as_value();
+}
+
+bool
+getLocal(as_object& locals, const std::string& name, as_value& ret)
+{
+    string_table& st = getStringTable(locals);
+    return locals.get_member(st.find(name), &ret);
+}
+
+bool
+findLocal(as_object& locals, const std::string& varname, as_value& ret,
+        as_object** retTarget) 
+{
+
+    if (getLocal(locals, varname, ret)) {
+        if (retTarget) *retTarget = &locals;
+        return true;
+    }
+
+    return false;
+}
+
+bool
+deleteLocal(as_object& locals, const std::string& varname)
+{
+    string_table& st = getStringTable(locals);
+    return locals.delProperty(st.find(varname)).second;
+}
+
+bool
+setLocal(as_object& locals, const std::string& varname, const as_value& val)
+{
+    string_table& st = getStringTable(locals);
+    Property* prop = locals.getOwnProperty(st.find(varname));
+    if (!prop) return false;
+    prop->setValue(locals, val);
+    return true;
+}
+
+as_object*
+getElement(as_object* obj, const ObjectURI& uri)
+{
+    DisplayObject* d = obj->displayObject();
+    if (d) return d->pathElement(uri);
+    return getPathElement(*obj, uri);
+}
+
+static const char*
+next_slash_or_dot(const char* word)
+{
+    for (const char* p = word; *p; p++) {
+        if (*p == '.' && p[1] == '.') {
+            ++p;
+        }
+        else if (*p == '.' || *p == '/' || *p == ':') {
+            return p;
+        }
+    }
+    return 0;
+}
+
+} // unnamed namespace 
 
 string_table&
 getStringTable(const as_environment& env)

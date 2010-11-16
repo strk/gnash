@@ -831,7 +831,7 @@ AC_ARG_ENABLE(media,
 )
 
 dnl If no render is selected, and media handling isn't disabled, them enable gst
-if test x${build_media_none} = xno -a x${build_media_gst} = xno -a yesx${build_media_none} = xno; then
+if test x${build_media_none} = xno -a x${build_media_gst} = xno -a x${build_media_ffmpeg} = xno; then
   build_media_gst=yes
 fi
 
@@ -2845,6 +2845,7 @@ testsuite/misc-ming.all/Makefile
 testsuite/misc-ming.all/action_order/Makefile
 testsuite/misc-ming.all/displaylist_depths/Makefile
 testsuite/misc-ming.all/loop/Makefile
+testsuite/misc-ming.all/loading/Makefile
 testsuite/misc-mtasc.all/Makefile
 testsuite/misc-haxe.all/Makefile
 testsuite/misc-haxe.all/classes.all/Makefile

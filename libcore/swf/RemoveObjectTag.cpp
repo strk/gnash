@@ -61,17 +61,17 @@ RemoveObjectTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 {
     assert(tag == SWF::REMOVEOBJECT || tag == SWF::REMOVEOBJECT2);
 
-    std::auto_ptr<RemoveObjectTag> t ( new RemoveObjectTag );
+    boost::intrusive_ptr<RemoveObjectTag> t(new RemoveObjectTag);
     t->read(in, tag);
 
-    int depth = t->getDepth();
+    const int depth = t->getDepth();
 
     IF_VERBOSE_PARSE(
         log_parse(_("  remove_object_2(%d)"), depth);
     );
 
     // Ownership transferred to movie_definition
-    m.addControlTag(t.release());
+    m.addControlTag(t);
 }
 
 } // namespace gnash::SWF

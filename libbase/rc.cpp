@@ -763,6 +763,7 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "LCTrace " << _lctrace << endl <<
     cmd << "LCShmkey " << std::hex << (boost::uint32_t) _lcshmkey << endl <<
     cmd << "ignoreFSCommand " << _ignoreFSCommand << endl <<    
+    cmd << "ignoreShowMenu " << _ignoreShowMenu << endl <<
     cmd << "saveStreamingMedia " << _saveStreamingMedia << endl <<    
     cmd << "saveLoadedMedia " << _saveLoadedMedia << endl <<    
    

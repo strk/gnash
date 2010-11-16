@@ -68,7 +68,8 @@ namespace {
     po::options_description getSupportedOptions(gnash::Player& p);
 
     void setupSoundAndRendering(gnash::Player& p, int i);
-    void setupFlashVars(gnash::Player& p, const std::string& param);
+    void setupFlashVars(gnash::Player& p,
+        const std::vector<std::string>& params);
     void setupFDs(gnash::Player& p, const std::string& fds);
 
     void usage_gui_keys(std::ostream& os);
@@ -247,16 +248,20 @@ main(int argc, char *argv[])
 namespace {
 
 void
-setupFlashVars(gnash::Player& p, const std::string& param)
+setupFlashVars(gnash::Player& p, const std::vector<std::string>& params)
 {
-    const size_t eq = param.find("=");
-    if (eq == std::string::npos) {
-        p.setParam(param, "true");
-        return;
+    for (std::vector<std::string>::const_iterator i = params.begin(), 
+        e = params.end(); i != e; ++i) {
+        const std::string& param = *i;
+        const size_t eq = param.find("=");
+        if (eq == std::string::npos) {
+            p.setParam(param, "true");
+            return;
+        }
+        const std::string name = param.substr(0, eq);
+        const std::string value = param.substr(eq + 1);
+        p.setParam(name, value);
     }
-    const std::string name = param.substr(0, eq);
-    const std::string value = param.substr(eq + 1);
-    p.setParam(name, value);
 }
 
 void
@@ -342,7 +347,7 @@ getSupportedOptions(gnash::Player& p)
 
     ("scale,s", po::value<float>()
         ->notifier(boost::bind(&Player::setScale, &p,
-                boost::bind(gnash::clamp<float>, 0.01f, 100.f, _1))),
+                boost::bind(gnash::clamp<float>, _1, 0.01f, 100.f))),
         _("Scale the movie by the specified factor"))
 
     ("delay,d", po::value<int>()
@@ -442,7 +447,7 @@ getSupportedOptions(gnash::Player& p)
         ->notifier(boost::bind(&Player::setBaseUrl, &p, _1)),
         _("Set \"base\" URL for resolving relative URLs"))
 
-    ("param,P", po::value<string>()
+    ("param,P", po::value<std::vector<std::string> >()
         ->composing()
         ->notifier(boost::bind(&setupFlashVars, boost::ref(p), _1)),
         _("Set parameter (e.g. \"FlashVars=A=1&b=2\")"))

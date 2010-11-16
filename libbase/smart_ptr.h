@@ -27,7 +27,6 @@
 #define SMART_PTR_H
 
 #include "ref_counted.h"
-#include <typeinfo>
 
 // TODO: drop all users of this macro, we _are_ using GC now
 #define GNASH_USE_GC 1

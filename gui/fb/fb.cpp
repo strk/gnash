@@ -77,6 +77,9 @@
 #include "gnashconfig.h"
 #endif
 
+#include "GnashSystemIOHeaders.h"
+#include "GnashNumeric.h"
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -87,7 +90,6 @@
 #include <linux/fb.h>
 #include <linux/kd.h>
 #include <linux/vt.h>
-#include "GnashSystemIOHeaders.h"
 #include <csignal>
 #include <cstdlib> // getenv
 
@@ -111,13 +113,6 @@
 
 #include <linux/input.h>    // for /dev/input/event*
 
-//#define DEBUG_SHOW_FPS  // prints number of frames per second to STDOUT
-
-#ifdef DEBUG_SHOW_FPS
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <fcntl.h>
-#endif
 
 // workaround until fatal_error() is implemented
 // that is not silent without -v switch
@@ -142,35 +137,6 @@ namespace gnash
 
 
 //---------------
-#ifdef DEBUG_SHOW_FPS
-double fps_timer=0;
-int fps_counter=0;
-void
-profile()
-{
-    int fd;
-    double uptime, idletime;
-    char buffer[20];
-    int readcount;
-    
-    fd = open("/proc/uptime", O_RDONLY);
-    if (fd<0) return;
-    readcount = read(fd, buffer, sizeof(buffer)-1);
-    buffer[readcount]=0;
-    sscanf(buffer, "%lf %lf", &uptime, &idletime);
-    close(fd);
-    
-    fps_counter++;
-    
-    if (fps_counter<2) {
-        fps_timer = uptime;
-        return;    
-    }
-    
-    printf("FPS: %.3f (%.2f)\n", fps_counter/(uptime-fps_timer), uptime-fps_timer);
-    
-}
-#endif
 
 int terminate_request = false;  // global scope to avoid GUI access
 
@@ -188,6 +154,8 @@ FBGui::FBGui(unsigned long xid, float scale, bool loop, RunResources& r)
       own_vt(-1),
       fbmem(0),
       buffer(0),                // the real value is set by ENABLE_DOUBLE_BUFFERING
+      _xpos(0),
+      _ypos(0),  
       m_rowsize(0),
       _timeout(0)
 {
@@ -195,7 +163,7 @@ FBGui::FBGui(unsigned long xid, float scale, bool loop, RunResources& r)
 //    memset(mouse_buf, 0, 256);
     memset(&var_screeninfo, 0, sizeof(fb_var_screeninfo));
     memset(&fix_screeninfo, 0, sizeof(fb_fix_screeninfo));
-    
+
     signal(SIGINT, terminate_signal);
     signal(SIGTERM, terminate_signal);
 }
@@ -259,9 +227,9 @@ FBGui::set_grayscale_lut8()
 }
 
 bool
-FBGui::init(int /*argc*/, char *** /*argv*/)
+FBGui::init(int argc, char *** argv)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     // Initialize all the input devices
 
@@ -313,21 +281,47 @@ FBGui::init(int /*argc*/, char *** /*argv*/)
     }
 #endif
 
+    // Set "window" size
+    _width    = var_screeninfo.xres;
+    _height   = var_screeninfo.yres;
+
+    // Let -j -k override "window" size
+    optind = 0; opterr = 0; char c;
+    while ((c = getopt (argc, *argv, "j:k:X:Y:")) != -1) {
+        switch (c) {
+            case 'j':
+                _width = clamp<int>(atoi(optarg), 1, _width);
+                break;
+            case 'k':
+                _height = clamp<int>(atoi(optarg), 1, _height);
+                break;
+            case 'X':
+                _xpos = atoi(optarg);
+                break;
+            case 'Y':
+                _ypos = atoi(optarg);
+                break;
+        }
+    }
+
+    if ( _xpos < 0 ) _xpos += var_screeninfo.xres - _width;
+    _xpos = clamp<int>(_xpos, 0, var_screeninfo.xres-_width);
+
+    if ( _ypos < 0 ) _ypos += var_screeninfo.yres - _height;
+    _ypos = clamp<int>(_ypos, 0, var_screeninfo.yres-_height);
+
+    log_debug("Width:%d, Height:%d", _width, _height);
+    log_debug("X:%d, Y:%d", _xpos, _ypos);
+
+    _validbounds.setTo(0, 0, _width - 1, _height - 1);    
+
     return true;
 }
 
 bool
 FBGui::initialize_renderer()
 {
-    GNASH_REPORT_FUNCTION;
-
-    // TODO: do not reset _width and _height
-    //       if they were set trough -j / -k
-
-    _width    = var_screeninfo.xres;
-    _height   = var_screeninfo.yres;
-
-    _validbounds.setTo(0, 0, _width - 1, _height - 1);    
+    // GNASH_REPORT_FUNCTION;
 
     const int bpp = var_screeninfo.bits_per_pixel;
     const int size = fix_screeninfo.smem_len; 
@@ -388,7 +382,7 @@ FBGui::initialize_renderer()
 bool
 FBGui::run()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
   
 #ifdef USE_TSLIB
     int ts_loop_count;
@@ -429,11 +423,12 @@ FBGui::run()
 void
 FBGui::renderBuffer()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     if ( _drawbounds.size() == 0 ) return; // nothing to do..
 
 #ifdef ENABLE_DOUBLE_BUFFERING
+
     // Size of a pixel in bytes
     // NOTE: +7 to support 15 bpp
     const unsigned int pixel_size = (var_screeninfo.bits_per_pixel+7)/8;
@@ -448,30 +443,23 @@ FBGui::renderBuffer()
         // copy each row
         const int minx = bounds.getMinX();
         const int maxy = bounds.getMaxY();
-    
-        for (int y=bounds.getMinY(); y<=maxy; ++y) {
-            const unsigned int pixel_index = y * m_rowsize + minx*pixel_size;      
-            memcpy(&fbmem[pixel_index], &buffer[pixel_index], row_size);
+
+        const int minx1 = minx+_xpos;
+        for (int y=bounds.getMinY(), y1=y+_ypos; y<=maxy; ++y, ++y1) {
+            const unsigned int pix_idx_in = y*m_rowsize + minx*pixel_size;
+            const unsigned int pix_idx_out = y1*m_rowsize + minx1*pixel_size;
+            memcpy(&fbmem[pix_idx_out], &buffer[pix_idx_in], row_size);
         }
     }  
        
 #endif
   
-#ifdef DEBUG_SHOW_FPS
-    profile();
-#endif
 }
 
 bool
-FBGui::createWindow(const char* /*title*/, int width, int height,
+FBGui::createWindow(const char* /*title*/, int /*width*/, int /*height*/,
                      int /*xPosition*/, int /*yPosition*/)
 {
-    assert(width>0);
-    assert(height>0);
-
-    _width = width;
-    _height = height;
-
     // Now initialize AGG
     return initialize_renderer();
 }
@@ -527,21 +515,6 @@ FBGui::showMouse(bool /*show*/)
     // Should return true if the pointer was visible before call,
     // otherwise false;
     return true;
-}
-
-int
-FBGui::valid_x(int x) {
-    if (x < 0) x = 0;
-    if (x >= _width) x = _width - 1;
-    return x;
-}
-
-int
-FBGui::valid_y(int y)
-{
-    if (y < 0) y = 0;
-    if (y >= _height) y = _height - 1;
-    return y;
 }
 
 void
@@ -771,7 +744,7 @@ FBGui::enable_terminal()
 void
 FBGui::checkForData()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     std::vector<boost::shared_ptr<InputDevice> >::iterator it;
 
