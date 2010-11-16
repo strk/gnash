@@ -90,6 +90,13 @@ namespace {
         const as_environment::ScopeStack& scopeStack,
         as_object** retTarget = 0);
 
+    void setVariableRaw(const as_environment& env, const std::string& varname,
+        const as_value& val, const as_environment::ScopeStack& scopeStack);
+
+    // Search for next '.' or '/' character in this word.  Return
+    // a pointer to it, or null if it wasn't found.
+    static const char* next_slash_or_dot(const char* word);
+
 }
 
 as_value as_environment::undefVal;
@@ -178,7 +185,6 @@ validRawVariableName(const std::string& varname)
     return (varname.find(":::") == std::string::npos);
 }
 
-
 bool
 as_environment::delVariableRaw(const std::string& varname,
         const ScopeStack& scopeStack) 
@@ -254,73 +260,8 @@ as_environment::set_variable(const std::string& varname, const as_value& val,
         }
     }
     else {
-        set_variable_raw(varname, val, scopeStack);
+        setVariableRaw(*this, varname, val, scopeStack);
     }
-}
-
-// No path rigamarole.
-void
-as_environment::set_variable_raw(const std::string& varname,
-    const as_value& val, const ScopeStack& scopeStack)
-{
-
-    if (!validRawVariableName(varname))
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Won't set invalid raw variable name: %s"), varname);
-        );
-        return;
-    }
-
-    VM& vm = _vm;
-    string_table& st = vm.getStringTable();
-    string_table::key varkey = st.find(varname);
-
-    // in SWF5 and lower, scope stack should just contain 'with' elements 
-
-    // Check the scope stack.
-    for (size_t i = scopeStack.size(); i > 0; --i)
-    {
-        as_object* obj = scopeStack[i-1];
-        if (obj && obj->set_member(varkey, val, true)) {
-            return;
-        }
-    }
-    
-    const int swfVersion = vm.getSWFVersion();
-    if (swfVersion < 6 && _vm.calling()) {
-       if (setLocal(_vm.currentCall().locals(), varname, val)) return;
-    }
-    
-    // TODO: shouldn't m_target be in the scope chain ?
-    if (m_target) getObject(m_target)->set_member(varkey, val);
-    else if (_original_target) {
-        getObject(_original_target)->set_member(varkey, val);
-    }
-    else
-    {
-        log_error("as_environment(%p)::set_variable_raw(%s, %s): "
-       "neither current target nor original target are defined, "
-           "can't set the variable",
-           this, varname, val);
-    }
-}
-
-// Search for next '.' or '/' DisplayObject in this word.  Return
-// a pointer to it, or to NULL if it wasn't found.
-static const char*
-next_slash_or_dot(const char* word)
-{
-    for (const char* p = word; *p; p++) {
-        if (*p == '.' && p[1] == '.') {
-            ++p;
-        }
-        else if (*p == '.' || *p == '/' || *p == ':') {
-            return p;
-        }
-    }
-    
-    return NULL;
 }
 
 /// Find the sprite/movie referenced by the given path.
@@ -563,6 +504,51 @@ parsePath(const std::string& var_path_in, std::string& path, std::string& var)
 
 namespace {
 
+// No path rigamarole.
+void
+setVariableRaw(const as_environment& env, const std::string& varname,
+    const as_value& val, const as_environment::ScopeStack& scopeStack)
+{
+
+    if (!validRawVariableName(varname)) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Won't set invalid raw variable name: %s"), varname);
+        );
+        return;
+    }
+
+    VM& vm = env.getVM();
+    string_table& st = vm.getStringTable();
+    string_table::key varkey = st.find(varname);
+
+    // in SWF5 and lower, scope stack should just contain 'with' elements 
+
+    // Check the scope stack.
+    for (size_t i = scopeStack.size(); i > 0; --i) {
+        as_object* obj = scopeStack[i - 1];
+        if (obj && obj->set_member(varkey, val, true)) {
+            return;
+        }
+    }
+    
+    const int swfVersion = vm.getSWFVersion();
+    if (swfVersion < 6 && vm.calling()) {
+       if (setLocal(vm.currentCall().locals(), varname, val)) return;
+    }
+    
+    // TODO: shouldn't m_target be in the scope chain ?
+    if (env.get_target()) getObject(env.get_target())->set_member(varkey, val);
+    else if (env.get_original_target()) {
+        getObject(env.get_original_target())->set_member(varkey, val);
+    }
+    else {
+        log_error("as_environment::setVariableRaw(%s, %s): "
+           "neither current target nor original target are defined, "
+           "can't set the variable",
+           varname, val);
+    }
+}
+
 as_value
 getVariableRaw(const as_environment& env, const std::string& varname,
     const as_environment::ScopeStack& scopeStack, as_object** retTarget)
@@ -696,6 +682,20 @@ getElement(as_object* obj, const ObjectURI& uri)
     DisplayObject* d = obj->displayObject();
     if (d) return d->pathElement(uri);
     return getPathElement(*obj, uri);
+}
+
+static const char*
+next_slash_or_dot(const char* word)
+{
+    for (const char* p = word; *p; p++) {
+        if (*p == '.' && p[1] == '.') {
+            ++p;
+        }
+        else if (*p == '.' || *p == '/' || *p == ':') {
+            return p;
+        }
+    }
+    return 0;
 }
 
 } // unnamed namespace 
