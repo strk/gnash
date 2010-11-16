@@ -102,17 +102,6 @@ public:
         return _clock;
     }
 
-    /// Resets any VM members that must be cleared before the GC cleans up
-    //
-    /// At present, this is:
-    /// - SharedObjectLibrary
-    ///
-    /// Ideally, this would be left to the VM's dtor, but we have no control
-    /// over destruction order at present.
-    /// It is assumed that this is the last VM function called before the
-    /// dtor.
-    void clear();
-
 	/// Get SWF version context for the currently running actions.
 	//
 	/// This information will drive operations of the virtual machine
