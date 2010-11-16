@@ -108,44 +108,23 @@ public:
 
     size_t stack_size() const { return _stack.size(); }
 
-    /// \brief
-    /// Delete a variable, w/out support for the path, using
-    /// a ScopeStack.
+    /// Delete a variable, without support for the path, using a ScopeStack.
     //
-    /// @param varname 
-    /// Variable name. Must not contain path elements.
-    /// TODO: should be case-insensitive up to SWF6.
-    /// NOTE: no case conversion is performed currently,
-    ///       so make sure you do it yourself. Note that
-    ///       ActionExec performs the conversion
-    ///       before calling this method.
-    ///
-    /// @param scopeStack
-    /// The Scope stack to use for lookups.
+    /// @param varname      Variable name. Must not contain path elements.
+    /// @param scopeStack   The Scope stack to use for lookups.
     bool delVariableRaw(const std::string& varname,
             const ScopeStack& scopeStack);
 
-    /// Return the (possibly UNDEFINED) value of the named var.
+    /// Return the (possibly undefined) value of the named var.
     //
-    /// @param varname 
-    /// Variable name. Can contain path elements.
-    /// TODO: should be case-insensitive up to SWF6.
-    /// NOTE: no case conversion is performed currently,
-    ///       so make sure you do it yourself. Note that
-    ///       ActionExec performs the conversion
-    ///       before calling this method.
-    ///
-    /// @param scopeStack
-    /// The Scope stack to use for lookups.
-    ///
-    /// @param retTarget
-    /// If not NULL, the pointer will be set to the actual object containing the
-    /// found variable (if found).
-    ///
+    /// @param varname      Variable name. Can contain path elements.
+    /// @param scopeStack   The Scope stack to use for lookups.
+    /// @param retTarget    If not null, the pointer will be set to
+    ///                     the actual object containing the
+    ///                     found variable (if found).
     as_value get_variable(const std::string& varname,
         const ScopeStack& scopeStack, as_object** retTarget=NULL) const;
 
-    /// \brief
     /// Given a path to variable, set its value.
     //
     /// If no variable with that name is found, a new one is created.
@@ -153,16 +132,9 @@ public:
     /// For path-less variables, this would act as a proxy for
     /// set_variable_raw.
     ///
-    /// @param path
-    /// Variable path. 
-    /// TODO: should be case-insensitive up to SWF6.
-    ///
-    /// @param val
-    /// The value to assign to the variable.
-    ///
-    /// @param scopeStack
-    /// The Scope stack to use for lookups.
-    ///
+    /// @param path         Variable path. 
+    /// @param val          The value to assign to the variable.
+    /// @param scopeStack   The Scope stack to use for lookups.
     void set_variable(const std::string& path, const as_value& val,
         const ScopeStack& scopeStack);
 
@@ -171,47 +143,25 @@ public:
     /// Reachable resources from an as_environment
     /// would be global registers, stack (expected to be empty
     /// actually), stack frames and targets (original and current).
-    ///
     void markReachableResources() const;
 
     /// Find the sprite/movie referenced by the given path.
     //
     /// Supports both /slash/syntax and dot.syntax
-    /// Case insensitive for SWF up to 6, sensitive from 7 up
-    ///
     DisplayObject* find_target(const std::string& path) const;
 
     /// Find the object referenced by the given path.
     //
     /// Supports both /slash/syntax and dot.syntax
-    /// Case insensitive for SWF up to 6, sensitive from 7 up
-    ///
     as_object* find_object(const std::string& path,
             const ScopeStack* scopeStack = 0) const;
     
     /// Return the SWF version we're running for.
     //
-    /// NOTE: this is the version encoded in the first loaded
-    ///       movie, and cannot be changed during play even if
-    ///       replacing the root movie with an externally loaded one.
-    ///
+    /// This is merely a proxy for VM::getSWFVersion.
     int get_version() const;
 
 private:
-
-    /// Given a variable name, set its value (no support for path)
-    //
-    /// If no variable with that name is found, a new one
-    /// will be created as a member of current target.
-    ///
-    /// @param var
-    /// Variable name. Can not contain path elements.
-    /// TODO: should be case-insensitive up to SWF6.
-    ///
-    /// @param val
-    /// The value to assign to the variable, if found.
-    void set_variable_raw(const std::string& path, const as_value& val,
-        const ScopeStack& scopeStack);
 
     VM& _vm;
 

@@ -193,33 +193,27 @@ as_environment::delVariableRaw(const std::string& varname,
     assert(varname.find_first_of(":/.") == std::string::npos);
 
     string_table::key varkey = _vm.getStringTable().find(varname);
-    as_value val;
 
     // Check the with-stack.
-    for (size_t i = scopeStack.size(); i > 0; --i)
-    {
-        as_object* obj = scopeStack[i-1];
-        if (obj)
-        {
-            std::pair<bool,bool> ret = obj->delProperty(varkey);
-            if (ret.first)
-            {
+    for (size_t i = scopeStack.size(); i > 0; --i) {
+        as_object* obj = scopeStack[i - 1];
+
+        if (obj) {
+            std::pair<bool, bool> ret = obj->delProperty(varkey);
+            if (ret.first) {
                 return ret.second;
             }
         }
     }
 
     // Check locals for deletion.
-    if (_vm.calling() && deleteLocal(_vm.currentCall().locals(), varname))
-    {
+    if (_vm.calling() && deleteLocal(_vm.currentCall().locals(), varname)) {
         return true;
     }
 
-
     // Try target
-    std::pair<bool,bool> ret = getObject(m_target)->delProperty(varkey);
-    if ( ret.first )
-    {
+    std::pair<bool, bool> ret = getObject(m_target)->delProperty(varkey);
+    if (ret.first) {
         return ret.second;
     }
 
