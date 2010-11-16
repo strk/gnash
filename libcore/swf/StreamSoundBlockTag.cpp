@@ -100,12 +100,13 @@ StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         return;
     }
 
-    unsigned char *data = new unsigned char[dataLength];
+    unsigned char* data = new unsigned char[dataLength];
     const unsigned int bytesRead = in.read(reinterpret_cast<char*>(data),
             dataLength);
     
     if (bytesRead < dataLength)
     {
+        delete [] data;
         throw ParserException(_("Tag boundary reported past end of stream!"));
     }
 
@@ -113,7 +114,6 @@ StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     // for later "start playing from this frame" events.
     //
     // ownership of 'data' is transferred here
-    //
     sound::sound_handler::StreamBlockId blockId =
         handler->addSoundBlock(data, dataLength, sampleCount, streamId);
 
