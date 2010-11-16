@@ -127,7 +127,7 @@ DirectFBDevice::initDevice(int argc, char *argv[])
     // get the primary surface, i.e. the surface of the primary layer we have
     // exclusive access to
     dsc.flags = DSDESC_CAPS;
-    dsc.caps = static_cast<DFBSurfaceCapabilities>(DSCAPS_PRIMARY | DSCAPS_DOUBLE | DSCAPS_VIDEOONLY);   
+    dsc.caps = static_cast<DFBSurfaceCapabilities>(DSCAPS_PRIMARY | DSCAPS_DOUBLE | DSCAPS_VIDEOONLY);
     
     if ((result = _dfb->CreateSurface(_dfb, &dsc, &_surface)) != DR_OK) {
 	log_error("CreateSurface(): %s", getErrorString(result));
@@ -171,14 +171,18 @@ DirectFBDevice::initDevice(int argc, char *argv[])
 void
 DirectFBDevice::printDisplayLayerConfig(DFBDisplayLayerConfig *config)
 {
-    std::stringstream ss;
-
+    std::cerr << "DisplayLayerConfig:" << std::endl;
+    
     if (config) {
-
+        std::cerr << "\tLaer Width: " << config->width 
+                  << ", Layer Height: " << config->height << std::endl;
+        printSurfacePixelFormat(config->pixelformat);
         printDisplayLayerBufferMode(config->buffermode);
+        printSurfaceCapabilities(config->surface_caps);
+        // FIXME: these two need to be implemented
+        // printDisplayLayerSourceID(config->source);
+        // printDisplayLayerOptions(config->options);
     }
-
-    std::cerr << ss.str();
 }
 
 void
@@ -1000,7 +1004,7 @@ DirectFBDevice::printSurfaceCapabilities(DFBSurfaceCapabilities caps)
         ss << "\tDSCAPS_TRIPLE: Surface is triple buffered." << std::endl;
     }
     if (caps & DSCAPS_PREMULTIPLIED) {
-        ss << "\St: urface stores data with premultiplied alpha." << std::endl;
+        ss << "\t: Surface stores data with premultiplied alpha." << std::endl;
     }
     if (caps & DSCAPS_DEPTH) {
         ss << "\tDSCAPS_DEPTH: A depth buffer is allocated." << std::endl;
