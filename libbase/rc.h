@@ -337,7 +337,7 @@ public:
         _certdir = value;
     }
 
-    void ignoreShowMenu(bool value) { _ignoreShowMenu= value; }
+    void ignoreShowMenu(bool value) { _ignoreShowMenu=value; }
 
     bool ignoreShowMenu() const { return _ignoreShowMenu; }
 
