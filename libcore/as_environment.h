@@ -199,17 +199,6 @@ public:
 
 private:
 
-    VM& _vm;
-
-    /// Stack of as_values in this environment
-    SafeStack<as_value>& _stack;
-
-    /// Movie target. 
-    DisplayObject* m_target;
-
-    /// Movie target. 
-    DisplayObject* _original_target;
-
     /// Given a variable name, set its value (no support for path)
     //
     /// If no variable with that name is found, a new one
@@ -232,6 +221,17 @@ private:
     ///
     as_value get_variable_raw(const std::string& varname,
         const ScopeStack& scopeStack, as_object** retTarget=NULL) const;
+
+    VM& _vm;
+
+    /// Stack of as_values in this environment
+    SafeStack<as_value>& _stack;
+
+    /// Movie target. 
+    DisplayObject* m_target;
+
+    /// Movie target. 
+    DisplayObject* _original_target;
 
     static as_value undefVal;
         

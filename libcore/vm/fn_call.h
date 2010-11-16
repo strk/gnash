@@ -19,12 +19,6 @@
 #ifndef GNASH_FN_CALL_H
 #define GNASH_FN_CALL_H
 
-#include "as_environment.h" 
-#include "as_object.h"
-#include "as_value.h"
-#include "VM.h"
-#include "GnashException.h"
-
 #include <string>
 #include <vector>
 #include <cassert> 
@@ -32,10 +26,15 @@
 #include <sstream>
 #include <algorithm>
 
+#include "as_object.h"
+#include "as_value.h"
+#include "VM.h"
+#include "GnashException.h"
+#include "as_environment.h"
+
+
 // Forward declarations
 namespace gnash {
-    class as_environment;
-    class as_function;
     class movie_definition;
 }
 
