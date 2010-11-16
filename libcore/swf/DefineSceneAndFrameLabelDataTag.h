@@ -59,8 +59,8 @@ public:
                     "non-AS3 SWF!");
         }
 
-        DefineSceneAndFrameLabelDataTag* t =
-            new DefineSceneAndFrameLabelDataTag(in);
+        boost::intrusive_ptr<ControlTag> t(
+            new DefineSceneAndFrameLabelDataTag(in));
 
         /// This tag is only added to the main timeline (SWFMovieDefinition).
         m.addControlTag(t);

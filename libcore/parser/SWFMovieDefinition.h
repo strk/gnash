@@ -281,7 +281,7 @@ public:
     }
 
     // See dox in movie_definition.h
-    void addControlTag(SWF::ControlTag* tag) {
+    void addControlTag(boost::intrusive_ptr<SWF::ControlTag> tag) {
         assert(tag);
         boost::mutex::scoped_lock lock(_frames_loaded_mutex);
         m_playlist[_frames_loaded].push_back(tag);

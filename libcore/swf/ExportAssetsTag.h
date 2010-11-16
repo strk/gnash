@@ -45,8 +45,8 @@ public:
     {
         assert(tag == SWF::EXPORTASSETS); // 56
 
-        std::auto_ptr<ControlTag> t(new ExportAssetsTag(in, m));
-        m.addControlTag(t.release());
+        boost::intrusive_ptr<ControlTag> t(new ExportAssetsTag(in, m));
+        m.addControlTag(t);
     }
 
 

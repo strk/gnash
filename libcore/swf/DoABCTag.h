@@ -94,7 +94,7 @@ public:
         }
 
         // _abc = block;
-		DoABCTag* ABCtag = new DoABCTag(block.release());
+		boost::intrusive_ptr<DoABCTag> ABCtag(new DoABCTag(block.release()));
 		
 		IF_VERBOSE_PARSE (
             log_parse(_("tag %d: DoABCDefine"), tag);

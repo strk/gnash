@@ -42,7 +42,6 @@ private:
 	// (decrement & check in a single statement)
 	//
 	typedef boost::detail::atomic_count Counter;
-	// typedef long Counter;
 
 	mutable Counter m_ref_count;
 	
@@ -68,23 +67,21 @@ public:
 	{
 	}
 
-	void	add_ref() const
-	{
+	void add_ref() const {
 		assert(m_ref_count >= 0);
 		++m_ref_count;
 	}
 
-	void	drop_ref() const
-	{
+	void drop_ref() const {
+
 		assert(m_ref_count > 0);
-		if (!--m_ref_count)
-		{
+		if (!--m_ref_count) {
 			// Delete me!
 			delete this;
 		}
 	}
 
-	long	get_ref_count() const { return m_ref_count; }
+	long get_ref_count() const { return m_ref_count; }
 };
 
 } // namespace gnash
