@@ -162,9 +162,6 @@ public:
 	movie_root& getRoot() const;
 
     /// Return the Shared Object Library
-    //
-    /// The Shared Object Library is assumed to exist until VM::clear()
-    /// is called.
     SharedObjectLibrary& getSharedObjectLibrary() const {
         assert(_shLib.get());
         return *_shLib;
@@ -178,8 +175,6 @@ public:
 	/// - root movie / stage (_rootMovie)
 	/// - Global object (_global)
 	/// - Class Hierarchy object
-	///
-	///
 	void markReachableResources() const;
 
 	void registerNative(as_c_function_ptr fun, unsigned int x, unsigned int y);
