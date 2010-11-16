@@ -46,8 +46,8 @@ StartSoundTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     int sound_id = in.read_u16();
 
     sound_sample* sam = m.get_sound_sample(sound_id);
-    if ( ! sam ) // invalid id... nothing to do
-    {
+    if (!sam) {
+        // invalid id... nothing to do
         IF_VERBOSE_MALFORMED_SWF(
             // if there's no sound_handler we might have simply skipped
             // the definition of sound sample...
@@ -59,17 +59,19 @@ StartSoundTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         return;
     }
 
-    // NOTE: sound_id is the SWF-defined id,
-    //       sam->m_sound_handler_id is the sound_handler-provided id
-    //
-    in.align(); // necessary?
-    StartSoundTag* sst = new StartSoundTag(in, sam->m_sound_handler_id);
-
-    IF_VERBOSE_PARSE (
+    IF_VERBOSE_PARSE(
          log_parse(_("StartSound: id=%d"), sound_id);
     );
 
-    m.addControlTag(sst); // takes ownership
+    // NOTE: sound_id is the SWF-defined id,
+    //       sam->m_sound_handler_id is the sound_handler-provided id
+    
+    in.align(); // necessary?
+
+    boost::intrusive_ptr<ControlTag> sst(
+        new StartSoundTag(in, sam->m_sound_handler_id));
+
+    m.addControlTag(sst);
 }
 
 void

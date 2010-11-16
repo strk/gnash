@@ -61,12 +61,12 @@ public:
             throw ParserException("DoAction tag found in AS3 SWF!");
         }
         
-		DoActionTag* da = new DoActionTag(m);
+		boost::intrusive_ptr<DoActionTag> da(new DoActionTag(m));
 		da->read(in);
 
-		IF_VERBOSE_PARSE (
-		log_parse(_("tag %d: do_action_loader"), tag);
-		log_parse(_("-- actions in frame %d"), m.get_loading_frame());
+		IF_VERBOSE_PARSE(
+            log_parse(_("tag %d: do_action_loader"), tag);
+            log_parse(_("-- actions in frame %d"), m.get_loading_frame());
 		);
 
 		m.addControlTag(da); // ownership transferred

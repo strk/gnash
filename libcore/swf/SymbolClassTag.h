@@ -75,7 +75,7 @@ public:
 			log_parse("Symbol %u name %s, character %u", i, name, id);
 			);
             
-            SymbolClassTag* st = new SymbolClassTag(name);
+            boost::intrusive_ptr<SymbolClassTag> st(new SymbolClassTag(name));
 			
             if (id == 0) m.addControlTag(st);
             else {

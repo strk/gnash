@@ -49,8 +49,8 @@ public:
             const RunResources& /*r*/)
     {
         assert(tag = SWF::SCRIPTLIMITS);
-        std::auto_ptr<ScriptLimitsTag> s(new ScriptLimitsTag(in));
-        m.addControlTag(s.release());
+        boost::intrusive_ptr<ControlTag> s(new ScriptLimitsTag(in));
+        m.addControlTag(s);
     }
 
 private:
