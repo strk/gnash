@@ -1098,13 +1098,14 @@ if test x$pixelformat = xall; then
   fi
 fi
 
-AM_CONDITIONAL(BUILD_DIRECTFB_RENDERER, [ test x${build_directfb} = xyes ])
 AM_CONDITIONAL(BUILD_OVG_RENDERER,   [ test x${build_ovg} = xyes ])
 AM_CONDITIONAL(BUILD_GLES1_RENDERER, [ test x${build_gles1} = xyes ])
 AM_CONDITIONAL(BUILD_GLES2_RENDERER, [ test x${build_gles2} = xyes ])
 AM_CONDITIONAL(BUILD_OGL_RENDERER,   [ test x${build_ogl} = xyes])
 AM_CONDITIONAL(BUILD_AGG_RENDERER,   [ test x${build_agg} = xyes ])
 AM_CONDITIONAL(BUILD_CAIRO_RENDERER, [ test x${build_cairo} = xyes ])
+
+AM_CONDITIONAL(BUILD_DIRECTFB_DEVICE, [ test x${build_directfb} = xyes ])
 
 if test x"${build_ovg}" = xyes; then
    AC_DEFINE([RENDERER_OPENVG], [1], [Use OpenVG renderer])
@@ -1114,6 +1115,7 @@ if test x"${build_directfb}" = xyes; then
    GNASH_PKG_FIND(directfb, [directfb.h], [DirectFB render library], DirectFBCreate)
    AC_DEFINE([RENDERER_DIRECTFB], [1], [Use DirectFB renderer])
 fi
+AM_CONDITIONAL(BUILD_DIRECTFB_DEVICE, [test x"${build_directfb}" = xyes])
 
 if test x"${build_ogl}" = xyes; then
    AC_DEFINE([RENDERER_OPENGL], [1], [Use OpenGL renderer])
@@ -1226,6 +1228,7 @@ dnl selected, as well as whether or not it's found. This we can
 dnl generate better error handling if it's not found.
 AM_CONDITIONAL(BUILD_OMAP, test x"${build_omap}" = xyes)
 AM_CONDITIONAL(USE_VAAPI, test x"${use_libva}" = xyes)
+AM_CONDITIONAL(BUILD_VAAPI_DEVICE, test x"${use_libva}" = xyes)
 
 dnl Only build the vaapi support if we have a version of FFmpeg that
 dnl supports it.
