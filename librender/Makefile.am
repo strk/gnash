@@ -66,7 +66,8 @@ noinst_HEADERS = \
 	eglDevice.h \
 	opengl/tu_opengl_includes.h \
 	directfb/Renderer_DirectFB.h \
-	directfb/DirectFBDevice.cpp \
+	directfb/DirectFBDevice.h \
+	vaapi/VaapiDevice.h \
 	opengl/Renderer_ogl.h \
 	opengles1/Renderer_gles1.h \
 	opengles1/render_handler_gles.h \
@@ -82,12 +83,6 @@ libgnashrender_la_CPPFLAGS = $(AM_CPPFLAGS)
 libgnashrender_la_LIBADD = $(LIBVA_LIBS) $(LIBVA_X11_LIBS) $(LIBVA_GLX_LIBS)
 libgnashrender_la_LDFLAGS =  -release $(VERSION) 
 libgnashrender_la_SOURCES =
-
-if BUILD_EGL_DEVICE
-libgnashrender_la_CPPFLAGS += $(EGL_CFLAGS)
-libgnashrender_la_SOURCES += eglDevice.cpp
-libgnashrender_la_LIBADD += $(EGL_LIBS) $(GTK2_LIBS)
-endif
 
 if BUILD_OGL_RENDERER
 libgnashrender_la_SOURCES += opengl/Renderer_ogl.cpp
@@ -121,11 +116,26 @@ libgnashrender_la_SOURCES += cairo/PathParser.cpp
 libgnashrender_la_LIBADD += $(CAIRO_LIBS)
 endif
 
-if  BUILD_DIRECTFB_RENDERER
+if BUILD_EGL_DEVICE
+libgnashrender_la_CPPFLAGS += $(EGL_CFLAGS)
+libgnashrender_la_SOURCES += eglDevice.cpp
+libgnashrender_la_LIBADD += $(EGL_LIBS) $(GTK2_LIBS)
+endif
+
+if BUILD_DIRECTFB_DEVICE
 libgnashrender_la_CPPFLAGS += $(DIRECTFB_CFLAGS)
-libgnashrender_la_SOURCES += directfb/Renderer_DirectFB.cpp \
+libgnashrender_la_SOURCES += \
+	directfb/Renderer_DirectFB.cpp \
 	directfb/DirectFBDevice.cpp
 libgnashrender_la_LIBADD += $(DIRECTFB_LIBS)
+endif
+
+if BUILD_VAAPI_DEVICE
+libgnashrender_la_CPPFLAGS += $(VAAPI_CFLAGS)
+libgnashrender_la_SOURCES += \
+	vaapi/VaapiDevice.cpp \
+	vaapi/VaapiSurface.cpp
+libgnashrender_la_LIBADD += $(VAAPI_LIBS)
 endif
 
 # Rebuild with GCC 4.x Mudflap support
@@ -141,9 +151,10 @@ AM_CXXFLAGS = $(PCH_FLAGS)
 endif
 
 bin_PROGRAMS = testr
+check_PROGRAMS =
 
 if BUILD_EGL_DEVICE
-check_PROGRAMS =  test_egl test_dfb
+check_PROGRAMS += test_egl
 # this tests the low level EGL interface, used by OpenVG, OpenGLES1,
 # and OpenGLES2.
 test_egl_SOURCES = test_egl.cpp
@@ -155,7 +166,18 @@ test_egl_LDADD = ../libbase/libgnashbase.la \
 	$(GTK2_LIBS)
 endif
 
-if BUILD_DIRECTFB_RENDERER
+if BUILD_VAAPI_DEVICE
+check_PROGRAMS += test_vaapi
+test_vaapi_SOURCES = vaapi/test_vaapi.cpp
+test_vaapi_CPPFLAGS = $(AM_CPPFLAGS) $(VAAPI_CFLAGS)
+test_vaapi_LDADD = ../libbase/libgnashbase.la \
+	libgnashrender.la \
+	$(VAAPI_LIBS) \
+	$(GNASH_LIBS)
+endif
+
+if BUILD_DIRECTFB_DEVICE
+check_PROGRAMS += test_dfb
 test_dfb_SOURCES = directfb/test_dfb.cpp
 test_dfb_CPPFLAGS = $(AM_CPPFLAGS) $(DIRECTFB_CFLAGS)
 test_dfb_LDADD = ../libbase/libgnashbase.la \
