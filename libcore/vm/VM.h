@@ -85,9 +85,6 @@ public:
 
 	~VM();
 
-    /// Initialize VM resources
-	void init();
-
     /// Accessor for the VM's stack
     //
     /// TODO: drop
