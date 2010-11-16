@@ -58,8 +58,10 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_frame_count(), 1);
 
 	// give loader time to load the actual gravity.swf movie 
-	usleep(5000);
-	tester.advance(); // have load processed
+	for (int i=0; i<5; i++) {
+		usleep(1000);
+		tester.advance(); // have load processed
+	}
 
 	// used to get members
 	as_value tmp;
@@ -68,7 +70,7 @@ main(int /*argc*/, char** /*argv*/)
 	check(loaded);
 	check_equals(loaded->parent(), root);
 
-    VM& vm = tester.vm();
+	VM& vm = tester.vm();
 
 	string_table& st = vm.getStringTable();
 	string_table::key xscale = st.find("_xscale");
