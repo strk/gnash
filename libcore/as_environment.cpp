@@ -18,8 +18,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "smart_ptr.h" // GNASH_USE_GC
 #include "as_environment.h"
+
+#include <string>
+#include <utility>
+#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/format.hpp>
+
+#include "smart_ptr.h"
 #include "MovieClip.h"
 #include "movie_root.h"
 #include "as_value.h"
@@ -30,11 +36,6 @@
 #include "namedStrings.h"
 #include "CallStack.h"
 #include "Global_as.h"
-
-#include <string>
-#include <utility> // for std::pair
-#include <boost/algorithm/string/case_conv.hpp>
-#include <boost/format.hpp>
 
 // Define this to have find_target() calls trigger debugging output
 //#define DEBUG_TARGET_FINDING 1
@@ -461,15 +462,12 @@ as_environment::set_target(DisplayObject* target)
     m_target = target;
 }
 
-#ifdef GNASH_USE_GC
-
 void
 as_environment::markReachableResources() const
 {
     if (m_target) m_target->setReachable();
     if (_original_target) _original_target->setReachable();
 }
-#endif // GNASH_USE_GC
 
 bool
 parsePath(const std::string& var_path_in, std::string& path, std::string& var)

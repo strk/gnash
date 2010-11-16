@@ -19,22 +19,24 @@
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
 
-#include "smart_ptr.h" // GNASH_USE_GC
-#include "as_value.h" // for composition (vector + frame_slot)
+#include <string> 
+#include <vector>
+#include <algorithm>
+
+#include "smart_ptr.h"
+#include "as_value.h" 
 #include "SafeStack.h"
 
-#include <string> // for frame_slot name
-#include <vector>
+// Forward declarations
+namespace gnash {
+    class DisplayObject;
+    class VM;
+    class Global_as;
+    class movie_root;
+    class string_table;
+}
 
 namespace gnash {
-
-// Forward declarations
-class DisplayObject;
-class VM;
-class Global_as;
-class movie_root;
-class string_table;
-class UserFunction;
 
 /// ActionScript execution environment.
 class as_environment
@@ -53,11 +55,9 @@ public:
 
     /// Set default target for timeline opcodes
     //
-    /// @param target
-    /// A DisplayObject to apply timeline opcodes on.
-    /// Zero is a valid target, disabling timeline
-    /// opcodes (would get ignored).
-    ///
+    /// @param target   A DisplayObject to apply timeline opcodes on.
+    ///                 Zero is a valid target, disabling timeline
+    ///                 opcodes (would get ignored).
     void set_target(DisplayObject* target);
 
     void set_original_target(DisplayObject* target) {
@@ -75,13 +75,12 @@ public:
     }
 
     /// Pops an as_value off the stack top and return it.
-    as_value pop() {
-        try {
-            return _stack.pop();
-        }
-        catch (const StackException&) {
-            return as_value();
-        }
+    as_value pop()
+    try {
+        return _stack.pop();
+    }
+    catch (const StackException&) {
+        return as_value();
     }
 
     /// Get stack value at the given distance from top.
@@ -90,13 +89,12 @@ public:
     ///
     /// Throw StackException if index is out of range
     ///
-    as_value& top(size_t dist) const
-    {
-        try {
-            return _stack.top(dist);
-        } catch (StackException&) {
-            return undefVal;
-        }
+    as_value& top(size_t dist) const 
+    try {
+        return _stack.top(dist);
+    }
+    catch (const StackException&) {
+        return undefVal;
     }
 
     /// Drop 'count' values off the top of the stack.
@@ -140,9 +138,7 @@ public:
 
     /// Mark all reachable resources.
     //
-    /// Reachable resources from an as_environment
-    /// would be global registers, stack (expected to be empty
-    /// actually), stack frames and targets (original and current).
+    /// Only the targets are reachable.
     void markReachableResources() const;
 
     /// Find the sprite/movie referenced by the given path.
@@ -196,7 +192,6 @@ private:
 ///
 /// TODO: return an integer: 0 not a path, 1 a slash-based path, 2 a
 /// dot-based path
-///
 bool parsePath(const std::string& var_path, std::string& path,
         std::string& var);
 
