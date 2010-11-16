@@ -75,13 +75,12 @@ public:
     }
 
     /// Pops an as_value off the stack top and return it.
-    as_value pop()
-    {
+    as_value pop() {
         try {
             return _stack.pop();
         }
-        catch (StackException&) {
-            return undefVal;
+        catch (const StackException&) {
+            return as_value();
         }
     }
 
@@ -100,24 +99,8 @@ public:
         }
     }
 
-    /// Get stack value at the given distance from bottom.
-    //
-    /// bottom(stack_size()-1) is actual stack top
-    ///
-    /// Throw StackException if index is out of range
-    ///
-    as_value& bottom(size_t index) const
-    {
-        try {
-            return _stack.value(index);
-        } catch (StackException&) {
-            return undefVal;
-        }
-    }
-
     /// Drop 'count' values off the top of the stack.
-    void drop(size_t count)
-    {
+    void drop(size_t count) {
         // in case count > stack size, just drop all, forget about
         // exceptions...
         _stack.drop(std::min(count, _stack.size()));
@@ -183,7 +166,6 @@ public:
     void set_variable(const std::string& path, const as_value& val,
         const ScopeStack& scopeStack);
 
-#ifdef GNASH_USE_GC
     /// Mark all reachable resources.
     //
     /// Reachable resources from an as_environment
@@ -191,7 +173,6 @@ public:
     /// actually), stack frames and targets (original and current).
     ///
     void markReachableResources() const;
-#endif
 
     /// Find the sprite/movie referenced by the given path.
     //
