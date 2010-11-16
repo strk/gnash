@@ -213,15 +213,6 @@ private:
     void set_variable_raw(const std::string& path, const as_value& val,
         const ScopeStack& scopeStack);
 
-    /// Same of the above, but no support for path.
-    ///
-    /// @param retTarget
-    /// If not NULL, the pointer will be set to the actual object containing the
-    /// found variable (if found).
-    ///
-    as_value get_variable_raw(const std::string& varname,
-        const ScopeStack& scopeStack, as_object** retTarget=NULL) const;
-
     VM& _vm;
 
     /// Stack of as_values in this environment
