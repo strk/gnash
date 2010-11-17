@@ -85,7 +85,7 @@ AC_DEFUN([GNASH_PATH_GLES],
       if test x"${ac_cv_path_gles1_includes}" = x -a x"${build_gles1}" = xyes; then
         if test -f $i/GLES/gl.h; then
           AC_DEFINE(HAVE_GLES1_GL_H, [1], [Have OpenGL-ES GLES/gl.h])
-          AC_DEFINE([RENDERER_GLES1], [], [Use OpenGL-ES version 1.x])
+          AC_DEFINE([RENDERER_GLES1], [1], [Use OpenGL-ES version 1.x])
           ac_cv_path_gles1_includes="-I$i"
           dnl Some implementations have this extension, which adds
           dnl framebuffer support.
