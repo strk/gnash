@@ -32,7 +32,6 @@ namespace gnash {
 /// Any executable code 
 class ExecutableCode : boost::noncopyable
 {
-
 public:
 
     ExecutableCode(DisplayObject* t) : _target(t) {}
@@ -43,13 +42,11 @@ public:
 
     virtual void setReachable() const {}
 
-#ifdef GNASH_USE_GC
     /// Mark reachable resources (for the GC)
     void markReachableResources() const {
         setReachable();
         if (_target) _target->setReachable();
     }
-#endif 
 
     DisplayObject* target() const { 
         return _target;
@@ -61,8 +58,8 @@ private:
 };
 
 /// Global code (out of any function)
-class GlobalCode : public ExecutableCode {
-
+class GlobalCode : public ExecutableCode
+{
 public:
 
     GlobalCode(const action_buffer& nBuffer, DisplayObject* nTarget)
@@ -71,8 +68,7 @@ public:
         buffer(nBuffer)
     {}
 
-    virtual void execute()
-    {
+    virtual void execute() {
         if (!target()->unloaded()) {
             ActionExec exec(buffer, target()->get_environment());
             exec();
@@ -80,14 +76,12 @@ public:
     }
 
 private:
-
     const action_buffer& buffer;
-
 };
 
 /// Event code 
-class EventCode : public ExecutableCode {
-
+class EventCode : public ExecutableCode
+{
 public:
 
     typedef std::vector<const action_buffer*> BufferList;
@@ -110,8 +104,7 @@ public:
     /// and not copied, so make sure it's kept
     /// alive for the whole EventCode lifetime.
     ///
-    void addAction(const action_buffer& buffer)
-    {
+    void addAction(const action_buffer& buffer) {
         // don't push actions for destroyed DisplayObjects, 
         // our opcode guard is bogus at the moment.
         if (!target()->isDestroyed()) {
@@ -119,14 +112,13 @@ public:
         }
     }
 
-    virtual void execute()
-    {
-        for (BufferList::iterator it=_buffers.begin(), itEnd=_buffers.end();
-                it != itEnd; ++it)
-        {
+    virtual void execute() {
+        for (BufferList::iterator it = _buffers.begin(),
+            itEnd = _buffers.end(); it != itEnd; ++it) {
+
             // onClipEvents code are guarded by isDestroyed(),
             // still might be also guarded by unloaded()
-            if (target()->isDestroyed())  break;
+            if (target()->isDestroyed()) break;
 
             ActionExec exec(*(*it), target()->get_environment(), false);
             exec();
@@ -134,14 +126,12 @@ public:
     }
 
 private:
-
     BufferList _buffers;
-
 };
 
 /// Generic event  (constructed by id, invoked using notifyEvent
-class QueuedEvent: public ExecutableCode {
-
+class QueuedEvent : public ExecutableCode
+{
 public:
 
     QueuedEvent(DisplayObject* nTarget, const event_id& id)
@@ -150,19 +140,15 @@ public:
         _eventId(id)
     {}
 
-    virtual void execute()
-    {
+    virtual void execute() {
         // don't execute any events for destroyed DisplayObject.
-        if (!target()->isDestroyed() )
-        {
+        if (!target()->isDestroyed()) {
             target()->notifyEvent(_eventId);
         }
     }
 
 private:
-
     const event_id _eventId;
-
 };
 
 /// This class is used to queue a function call action
@@ -178,7 +164,6 @@ private:
 ///
 class DelayedFunctionCall : public ExecutableCode
 {
-
 public:
 
     DelayedFunctionCall(DisplayObject* target,
@@ -192,31 +177,21 @@ public:
         _arg2(arg2)
     {}
 
-    virtual void execute()
-    {
+    virtual void execute() {
         callMethod(_obj, _name, _arg1, _arg2);
     }
 
-#ifdef GNASH_USE_GC
     /// Mark reachable resources (for the GC)
-    //
-    /// Reachable resources are:
-    ///  - the action target (_target)
-    ///
-    virtual void setReachable() const
-    {
+    virtual void setReachable() const {
         _obj->setReachable();
         _arg1.setReachable();
         _arg2.setReachable();
     }
-#endif // GNASH_USE_GC
 
 private:
-
     as_object* _obj;
     string_table::key _name;
     as_value _arg1, _arg2;
-
 };
 
 
