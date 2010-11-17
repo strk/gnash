@@ -167,6 +167,7 @@ X11Device::initDevice(int argc, char *argv[])
     
 #endif
 
+#if 0
     // set hints and properties
     XSizeHints sizehints;
     sizehints.x = x;
@@ -176,12 +177,28 @@ X11Device::initDevice(int argc, char *argv[])
     sizehints.flags = USSize | USPosition;
     XSetNormalHints(_display, win, &sizehints);
     XSetStandardProperties(_display, win, name, name,
-                           None, (char **)NULL, 0, &sizehints);
-   
+                           None, (char **)NULL, 0, sizehints);
+#endif
+    
    // XFree(visInfo);
 #endif
     
     return true;
+}
+
+// Return a string with the error code as text, instead of a numeric value
+const char *
+X11Device::getErrorString(int error)
+{
+    static char msg[80];
+    
+    if (_display) {
+        XGetErrorText(_display, error, msg, 80);
+    } else {
+        log_error("The default Display is not set!");
+    }
+
+    return msg;
 }
 
 #if 0

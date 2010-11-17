@@ -54,7 +54,7 @@ class X11Device
     //    bool initX11(X11NativeWindowType window);
     
     // Utility methods not in the base class
-    /// Return a string with the error code as text, instead of a numeric value
+    // Return a string with the error code as text, instead of a numeric value
     const char *getErrorString(int error);
     
     // Accessors for the settings needed by higher level code.
@@ -98,7 +98,7 @@ class X11Device
     }
 
     bool isSurfaceSingleBuffered() {
-        return false;
+        return true;
     }
     
     bool isSurfaceBackBuffered() {
@@ -123,7 +123,7 @@ class X11Device
     }
 
     bool isContextSingleBuffered() { 
-        return false;
+        return true;
     }
     bool isContextBackBuffered() {
         return false;

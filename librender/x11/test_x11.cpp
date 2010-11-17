@@ -33,6 +33,8 @@
 #include "dejagnu.h"
 #include "X11Device.h"
 
+#include <X11/X.h>
+
 TestState runtest;
 
 using namespace gnash;
@@ -50,21 +52,19 @@ main(int argc, char *argv[])
 
     x11::X11Device x11;
 
-#if 0
-    string result = "The buffer is empty";
-    X11Result code = DR_BUFFEREMPTY;
-    if (x11.getErrorString(code) == result) {
-        runtest.pass("X11Device::getErrorString()");
-    } else {
-        runtest.fail("X11Device::getErrorString()");
-    }    
-#endif
-
     if (x11.initDevice(argc, argv)) {
         runtest.pass("X11Device:InitDevice()");
     } else {
         runtest.fail("X11Device:InitDevice()");
     }
+
+    string result = "BadDrawable (invalid Pixmap or Window parameter)";
+    int code = BadDrawable;
+    if (x11.getErrorString(code) == result) {
+        runtest.pass("X11Device::getErrorString()");
+    } else {
+        runtest.fail("X11Device::getErrorString()");
+    }    
 
     if (x11.getWidth()) {
         runtest.pass("X11Device::getWidth()");
