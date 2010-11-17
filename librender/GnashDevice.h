@@ -35,7 +35,7 @@ struct GnashDevice
 {
     // Handle multiple window types. The derived classes will cast this to
     // the proper data type.
-    typedef void * native_window_t;
+    typedef long native_window_t;
     
     // the list of supported renders that use devices
     typedef enum {OPENVG, OPENGL, OPENGLES1, OPENGLES2, X11, VAAPI} rtype_t;
@@ -53,7 +53,7 @@ struct GnashDevice
     /// Return a string with the error code as text, instead of a numeric value
     virtual const char *getErrorString(int error) = 0;
     
-    // /// Query the system for all supported configs
+    /// Query the system for all supported configs
     // int queryGNASHConfig() { return queryGNASHConfig(_gnashDisplay); };
     // int queryGNASHConfig(GNASHDisplay display);
 
