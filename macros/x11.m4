@@ -17,6 +17,9 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_DEFUN([GNASH_PATH_X11],
 [
+
+  has_x11=no
+
   dnl Look for the header
   AC_ARG_WITH(x11_incl, AC_HELP_STRING([--with-x11-incl], [Directory where x11 header is]), with_x11_incl=${withval})
   AC_CACHE_VAL(ac_cv_path_x11_incl, [
@@ -35,14 +38,11 @@ AC_DEFUN([GNASH_PATH_X11],
     for i in $newlist; do
     	if test -f $i/X11/X.h; then
   	    ac_cv_path_x11_incl="-I$i"
+        AC_DEFINE(HAVE_X11_X_H, [1], [Have the X11 X.h header file])
     	fi
     done
   fi
 
-  if test x"${ac_cv_path_x11_incl}" = x ; then
-    AC_CHECK_HEADERS(X11/X.h, [ac_cv_path_x11_incl=""])
-  fi
-  
   dnl We want to know whether the headers for XShm exist.
   if test x"${ac_cv_path_x11_incl}" != x ; then
     includedirfound=`echo "${ac_cv_path_x11_incl}" | cut -b 3-`
@@ -125,18 +125,15 @@ AC_DEFUN([GNASH_PATH_X11],
   if test x"${ac_cv_path_x11_lib}" != x ; then
     X11_LIBS="${ac_cv_path_x11_lib}"
     AC_MSG_RESULT(${ac_cv_path_x11_lib})
+    has_x11=yes
   else
     X11_LIBS=""
     AC_MSG_RESULT(none)
   fi
 
-  if test -n "$X11_LIBS" -a -n "$X11_CFLAGS"; then
-    x11=yes
-  fi
-
-  if test "x$x11" = xyes; then
-    AC_DEFINE(HAVE_X11, [1], [X11 headers and libraries])
-  fi
+  dnl if test "x$has_x11" = xyes; then
+  dnl   AC_DEFINE(HAVE_X11, [1], [X11 headers and libraries])
+  dnl fi
   
   if test x"$xv_incl" != x -a x"$xv_lib" != x; then
     AC_DEFINE(HAVE_XV, [1], [X Video extension header and library])
