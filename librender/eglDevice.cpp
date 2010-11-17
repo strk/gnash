@@ -167,6 +167,20 @@ EGLDevice::EGLDevice()
     GNASH_REPORT_FUNCTION;
 }
 
+EGLDevice::EGLDevice(GnashDevice::rtype_t rtype)
+    : _eglConfig(0),
+      _eglContext(EGL_NO_CONTEXT),
+      _eglSurface(EGL_NO_SURFACE),
+      _eglDisplay(EGL_NO_DISPLAY),
+      _eglNumOfConfigs(0),
+      _max_num_config(1),
+      _bpp(32),
+      _width(0),
+      _height(0)
+{
+    GNASH_REPORT_FUNCTION;
+}
+
 EGLDevice::~EGLDevice()
 {
     GNASH_REPORT_FUNCTION;
@@ -198,18 +212,19 @@ EGLDevice::~EGLDevice()
 }
 
 bool
-EGLDevice::initDevice(EGLDevice::rtype_t rtype)
+EGLDevice::initDevice(int argc, char *argv[])
 {
+    EGLDevice::rtype_t rtype;
+    
     GNASH_REPORT_FUNCTION;
 
+    
     // // FIXME: for now, always run verbose till this supports command line args
     // dbglogfile.setVerbosity();
 
 #ifdef HAVE_GTK2
     // As gdk_init() wants the command line arguments, we have to create
     // fake ones, as we don't care about the X11 options at this point.
-    int argc = 0;
-    char **argv = 0;
     gdk_init(&argc, &argv);
 #endif
 
@@ -238,6 +253,7 @@ EGLDevice::initDevice(EGLDevice::rtype_t rtype)
               eglQueryString(_eglDisplay, EGL_VERSION),
               eglQueryString(_eglDisplay, EGL_VENDOR));
 
+#if 0
     // step2 - bind to the wanted client API
     switch (rtype) {
       case OPENVG:
@@ -266,9 +282,10 @@ EGLDevice::initDevice(EGLDevice::rtype_t rtype)
           break;
       default:
           log_error("No EGL device type specified!");
-          return false;
-    }    
-
+//          return false;
+    }
+#endif
+    
 //    queryEGLConfig(_eglDisplay);
     
     // step3 - find a suitable config
@@ -344,9 +361,74 @@ EGLDevice::initDevice(EGLDevice::rtype_t rtype)
 }
 
 bool
-EGLDevice::initEGL(EGLNativeWindowType window)
+EGLDevice::supportsRenderer(rtype_t rtype)
 {
+    GNASH_REPORT_FUNCTION;
     
+    if (_eglDisplay && _eglContext) {
+        EGLint value;
+        eglQueryContext(_eglDisplay, _eglContext, EGL_CONTEXT_CLIENT_TYPE, &value);
+        std::string str;
+        if ((value == EGL_OPENGL_ES_API) && (rtype == EGLDevice::OPENGLES2)) {
+            return true;
+        } else if ((value == EGL_OPENGL_ES_API) && (rtype == EGLDevice::OPENGLES1)) {
+            return true;
+        } else if ((value == EGL_OPENVG_API) && (rtype == EGLDevice::OPENVG)){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool
+EGLDevice::bindClient(rtype_t rtype)
+{
+    GNASH_REPORT_FUNCTION;
+    
+    EGLint value;
+
+    switch (rtype) {
+      case GnashDevice::OPENGLES2:
+      {
+          log_debug("Initializing EGL for OpenGLES2");
+          if(EGL_FALSE == eglBindAPI(EGL_OPENGL_ES_API)) {
+              log_error("eglBindAPI() failed to retrive the number of configs (error %s)",
+                        getErrorString(eglGetError()));
+              return false;
+          }
+          break;
+      }
+      case GnashDevice::OPENGLES1:
+      {
+          log_debug("Initializing EGL for OpenGLES1");
+          if(EGL_FALSE == eglBindAPI(EGL_OPENGL_ES_API)) {
+              log_error("eglBindAPI() failed to retrive the number of configs (error %s)",
+                        getErrorString(eglGetError()));
+              return false;
+          }
+          break;
+      }
+      case GnashDevice::OPENVG:
+      {
+          log_debug("Initializing EGL for OpenVG");
+          if(EGL_FALSE == eglBindAPI(EGL_OPENVG_API)) {
+              log_error("eglBindAPI() failed to retrive the number of configs (error %s)",
+                        getErrorString(eglGetError()));
+              return false;
+          }
+          break;
+      }
+      case GnashDevice::X11:
+      case GnashDevice::VAAPI:
+      default:
+          break;
+    }
+    return true;
+}
+
+bool
+EGLDevice::attachWindow(GnashDevice::native_window_t window)
+{
     if (!window) {
 #if HAVE_GTK2
         // This renders to the root screen, instead of the canvas, but keeps
@@ -355,7 +437,7 @@ EGLDevice::initEGL(EGLNativeWindowType window)
         _nativeWindow = gdk_x11_get_default_root_xwindow();
 #endif
     } else {
-        _nativeWindow = window;
+        _nativeWindow = static_cast<EGLNativeWindowType>(window);
     }
 
     log_debug("Initializing EGL Surface");

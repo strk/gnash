@@ -38,6 +38,7 @@
 #include "log.h"
 #include "dejagnu.h"
 #include "eglDevice.h"
+#include "GnashDevice.h"
 
 TestState runtest;
 
@@ -45,7 +46,7 @@ using namespace gnash;
 using namespace std;
 using namespace renderer;
 
-void test_egl(EGLDevice &egl, EGLDevice::rtype_t);
+void test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[]);
 
 // The debug log used by all the gnash libraries.
 static LogFile& dbglogfile = LogFile::getDefaultInstance();
@@ -53,7 +54,9 @@ static LogFile& dbglogfile = LogFile::getDefaultInstance();
 const char *estrs[] = {
     "OpenVG",
     "OpenGLES1",
-    "OpenGLES2"
+    "OpenGLES2",
+    "X11",
+    "VAAPI"
 };
     
 int
@@ -65,44 +68,51 @@ main(int argc, char *argv[])
     EGLDevice egl1, egl2, egl3;
 
 #ifdef RENDERER_OPENVG
-    test_egl(egl1, EGLDevice::OPENVG);
+    std::cerr << "== OpenVG tests ==" << std::endl;
+    test_egl(egl1, GnashDevice::OPENVG, argc, argv);
     egl1.printEGLConfig();
     egl1.printEGLContext();
     egl1.printEGLSurface();
 #endif
     
 #ifdef RENDERER_GLES1
-    test_egl(egl2, EGLDevice::OPENGLES1);
+    std::cerr << "== OpenGLES1 tests ==" << std::endl;
+    test_egl(egl2, GnashDevice::OPENGLES1, argc, argv);
 //    egl2.printEGLConfig();
 #endif
     
 #ifdef RENDERER_GLES2
-    test_egl(egl3, EGLDevice::OPENGLES2);
+    std::cerr << "== OpenGLES2 tests ==" << std::endl;
+    test_egl(egl3, GnashDevice::OPENGLES2, argc, argv);
 //    egl3.printEGLConfig();
 #endif
 }
 
 void
-test_egl(EGLDevice &egl, EGLDevice::rtype_t rtype)
+test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
 {
-    cout << "Testing " << estrs[rtype] << endl;
-
     // There isn't a whole lot to test, if init works, most
     // everything else has to be correct.
-    if (egl.initDevice(rtype)) {
+    if (egl.initDevice(argc, argv)) {
         runtest.pass("EGLDevice::init()");
     } else {
         runtest.fail("EGLDevice::init()");
     }
 
+    if (egl.bindClient(rtype)) {
+        runtest.pass("EGLDevice::bindClient()");
+    } else {
+        runtest.fail("EGLDevice::bindClient()");
+    }
+    
     // Init'ing to zero uses the root screen as the display. Otherwise
     // the argument should be an EGLNativeWindowType.
-    if (egl.initEGL(0)) {
-        runtest.pass("EGLDevice::initEGL(0)");
+    if (egl.attachWindow(0)) {
+        runtest.pass("EGLDevice::attachWindow(0)");
     } else {
-        runtest.fail("EGLDevice::initEGL(0)");
+        runtest.fail("EGLDevice::attachWindow(0)");
     }
-
+    
     // If there are more than zero configurations, something beyond
     // initializing is working
     if (egl.queryEGLConfig()) {
@@ -119,7 +129,31 @@ test_egl(EGLDevice &egl, EGLDevice::rtype_t rtype)
     } else {
         runtest.fail("EGLDevice::getErrorString()");
     }
+
+    if (egl.supportsRenderer(rtype)) {
+        runtest.pass("EGLDevice::supportsRenderer()");
+    } else {
+        runtest.fail("EGLDevice::supportsRenderer()");
+    }
     
+    if (egl.getRedSize() > 0) {
+        runtest.pass("EGLDevice::getRedSize()");
+    } else {
+        runtest.fail("EGLDevice::getRedSize()");
+    }    
+
+    if (egl.getGreenSize() > 0) {
+        runtest.pass("EGLDevice::getGreenSize()");
+    } else {
+        runtest.fail("EGLDevice::getGreenSize()");
+    }    
+    
+    if (egl.getBlueSize() > 0) {
+        runtest.pass("EGLDevice::getBlueSize()");
+    } else {
+        runtest.fail("EGLDevice::getBlueSize()");
+    }    
+
     // Surface config info tests
     if (egl.getSurfaceID()) {
         runtest.pass("EGLDevice::getSurfaceID()");
@@ -133,7 +167,7 @@ test_egl(EGLDevice &egl, EGLDevice::rtype_t rtype)
         runtest.fail("EGLDevice::getWidth()");
     }
     
-    if (egl.getHeigth()) {
+    if (egl.getHeight()) {
         runtest.pass("EGLDevice::getHeigth()");
     } else {
         runtest.fail("EGLDevice::getHeigth()");
@@ -150,17 +184,11 @@ test_egl(EGLDevice &egl, EGLDevice::rtype_t rtype)
     } else {
         runtest.fail("EGLDevice::getHorzRes()");
     }
-    
-    if (egl.supportsRenderer(rtype)) {
-        runtest.pass("EGLDevice::supportsRenderer()");
+
+    if (egl.isSingleBuffered() != egl.isBackBuffered()) {
+        runtest.pass("EGLDevice::is*Buffered()");
     } else {
-        runtest.fail("EGLDevice::supportsRenderer()");
-    }
-    
-    if (egl.isSurfaceSingleBuffered() != egl.isSurfaceBackBuffered()) {
-        runtest.pass("EGLDevice::isSurface*Buffered()");
-    } else {
-        runtest.fail("EGLDevice::isSurface*Buffered()");
+        runtest.fail("EGLDevice::is*Buffered()");
     }
 
     if (egl.isBufferDestroyed()) {
@@ -181,12 +209,14 @@ test_egl(EGLDevice &egl, EGLDevice::rtype_t rtype)
     } else {
         runtest.fail("EGLDevice::getContextID()");
     }
-    
+
+#if 0
     if (egl.supportsClient(rtype)) {
         runtest.pass("EGLDevice::supportsClient()");
     } else {
         runtest.fail("EGLDevice::supportsClient()");
     }
+#endif
     
     if (egl.isContextSingleBuffered() != egl.isContextBackBuffered()) {
         runtest.pass("EGLDevice::isContext*Buffered()");
@@ -238,13 +268,13 @@ test_egl(EGLDevice &egl, EGLDevice::rtype_t rtype)
         runtest.fail("EGLDevice::createPbuffer(int, int)");
     }
     
-    EGLSurface surf1 = egl[0];
-    if ((surf1 != EGL_NO_SURFACE) && (egl.getWidth(surf1) == 200)
-        && (egl.getHeigth(surf1) == 200)) {
-        runtest.pass("EGLDevice::operator[]()");
-    } else {
-        runtest.fail("EGLDevice::operator[]()");
-    }
+    // EGLSurface surf1 = egl[0];
+    // if ((surf1 != EGL_NO_SURFACE) && (egl.getWidth(surf1) == 200)
+    //     && (egl.getHeight(surf1) == 200)) {
+    //     runtest.pass("EGLDevice::operator[]()");
+    // } else {
+    //     runtest.fail("EGLDevice::operator[]()");
+    // }
 
     EGLSurface surf2 = egl.createPbuffer(300, 300);
     EGLSurface surf3 = egl.createPbuffer(400, 400);
@@ -264,7 +294,7 @@ test_egl(EGLDevice &egl, EGLDevice::rtype_t rtype)
 
     egl.makePbufferCurrent(1);
     EGLSurface surf4 = eglGetCurrentSurface(EGL_DRAW);
-    if ((egl.getWidth(surf4) == 300) && ((egl.getHeigth(surf4) == 300))) {
+    if ((egl.getWidth(surf4) == 300) && ((egl.getHeight(surf4) == 300))) {
         runtest.pass("EGLDevice::makePbufferCurrent(int)");
     } else {
         runtest.fail("EGLDevice::makePbufferCurrent(int)");
