@@ -138,6 +138,13 @@ libgnashrender_la_SOURCES += \
 libgnashrender_la_LIBADD += $(VAAPI_LIBS)
 endif
 
+# if BUILD_X11_DEVICE
+libgnashrender_la_CPPFLAGS += $(X11_CFLAGS)
+libgnashrender_la_SOURCES += \
+	x11/X11Device.cpp
+libgnashrender_la_LIBADD += $(X11_LIBS)
+# endif
+
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"
@@ -185,6 +192,16 @@ test_dfb_LDADD = ../libbase/libgnashbase.la \
 	$(DIRECTFB_LIBS) \
 	$(GNASH_LIBS)
 endif
+
+# if BUILD_X11_DEVICE
+check_PROGRAMS += test_x11
+test_x11_SOURCES = x11/test_x11.cpp
+test_x11_CPPFLAGS = $(AM_CPPFLAGS) $(X11_CFLAGS)
+test_x11_LDADD = ../libbase/libgnashbase.la \
+	libgnashrender.la \
+	$(X11_LIBS) \
+	$(GNASH_LIBS)
+# endif
 
 testr_SOURCES = testr.cpp testr_gtk.cpp
 testr_CPPFLAGS = $(AM_CPPFLAGS) $(DIRECTFB_CFLAGS) # -DUSE_TESTSUITE
