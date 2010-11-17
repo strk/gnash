@@ -27,12 +27,13 @@
 #include <boost/scoped_array.hpp>
 #include <boost/scoped_ptr.hpp>
 
-// #ifdef HAVE_X11_X_H
+#ifdef HAVE_X11_X_H
+# include <X11/X.h>
 # include <X11/Xlib.h>
-#include <X11/Xutil.h>
-// #else
-// # error "This file needs X11"
-// #endif
+# include <X11/Xutil.h>
+#else
+# error "This file needs X11"
+#endif
 
 #include "GnashDevice.h"
 
@@ -80,12 +81,7 @@ class X11Device : public GnashDevice
     int getID() { return static_cast<int>(_window); }
 
     // Get the size of the pixels, for X11 it's always 8 as far as I can tell
-    int getRedSize() {
-        if (_vinfo) {
-            return _vinfo[0].bits_per_rgb;
-        }
-        return 0;
-    };
+    int getRedSize() { if (_vinfo) { return _vinfo[0].bits_per_rgb; } return 0; };
     int getGreenSize() { return getRedSize(); };
     int getBlueSize() { return getRedSize(); };
     

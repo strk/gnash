@@ -30,16 +30,15 @@
 
 #ifdef HAVE_GTK2
 #include "gdk/gdkx.h"
-#include "X11/X.h"
 #endif
 
-#include "X11/X.h"
-
-// #ifdef HAVE_X11_H
-// # include <x11/x11.h>
-// #else
-// # error "This file needs X11"
-// #endif
+#ifdef HAVE_X11_X_H
+# include <X11/X.h>
+# include <X11/Xlib.h>
+# include <X11/Xutil.h>
+#else
+# error "This file needs X11"
+#endif
 
 #include "X11Device.h"
 #include "GnashDevice.h"
@@ -129,7 +128,7 @@ X11Device::initDevice(int argc, char *argv[])
         return false;
     }
 
-    Window root = XDefaultRootWindow(_display);
+    _window = XDefaultRootWindow(_display);
     _screennum = XDefaultScreen(_display);
 
     _depth = DefaultDepth(_display, _screennum);
@@ -154,7 +153,7 @@ X11Device::initDevice(int argc, char *argv[])
     // int re = visInfo[0].bits_per_rgb;
     
     XWindowAttributes gattr;
-    XGetWindowAttributes(_display, root, &gattr);
+    XGetWindowAttributes(_display, _window, &gattr);
     
     // std::cerr << "Width: " << gattr.backing_store << std::endl;
     // std::cerr << "Width: " << gattr.depth << std::endl;
@@ -205,7 +204,7 @@ X11Device::attachWindow(GnashDevice::native_window_t window)
 {
     GNASH_REPORT_FUNCTION;
 
-    _window = *static_cast<Window *>(window);
+    _window = static_cast<Window>(window);
 
     return true;
 }
