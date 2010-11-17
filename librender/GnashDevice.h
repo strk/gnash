@@ -39,15 +39,15 @@ struct GnashDevice
     
     // the list of supported renders that use devices
     typedef enum {OPENVG, OPENGL, OPENGLES1, OPENGLES2, X11, VAAPI} rtype_t;
-    
-    GnashDevice() { };
+
+    GnashDevice() { GNASH_REPORT_FUNCTION; };
     virtual ~GnashDevice() { GNASH_REPORT_FUNCTION; };
 
     // Initialize GNASH Device layer
     virtual bool initDevice(int argc, char *argv[]) = 0;
 
     // Initialize Gnash Window on device
-    virtual bool initWindow(native_window_t window) = 0;
+    virtual bool attachWindow(native_window_t window) = 0;
     
     // Utility methods not in the base class
     /// Return a string with the error code as text, instead of a numeric value
@@ -60,6 +60,10 @@ struct GnashDevice
     virtual size_t getWidth() = 0;
     virtual size_t getHeight() = 0;
     virtual int getDepth() = 0;
+    
+    virtual int getRedSize() = 0;
+    virtual int getGreenSize() = 0;
+    virtual int getBlueSize() = 0;
     
     virtual bool isSingleBuffered() = 0;
     virtual bool isBufferDestroyed() = 0;
