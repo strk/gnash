@@ -113,67 +113,6 @@ as_environment::as_environment(VM& vm)
 {
 }
 
-// Return the value of the given var, if it's defined.
-as_value
-as_environment::get_variable(const std::string& varname,
-        const ScopeStack& scopeStack, as_object** retTarget) const
-{
-
-#ifdef GNASH_DEBUG_GET_VARIABLE
-    log_debug(_("get_variable(%s)"), varname);
-#endif
-
-    // Path lookup rigamarole.
-    std::string path;
-    std::string var;
-
-    if (parsePath(varname, path, var))
-    {
-        // TODO: let find_target return generic as_objects, or use 'with' stack,
-        //       see player2.swf or bug #18758 (strip.swf)
-        as_object* target = find_object(path, &scopeStack); 
-
-        if (target)
-        {
-            as_value val;
-            target->get_member(_vm.getStringTable().find(var), &val);
-            if ( retTarget ) *retTarget = target;
-            return val;
-        }
-        else
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("find_object(\"%s\") [ varname = '%s' - "
-                            "current target = '%s' ] failed"),
-                            path, varname, m_target);
-                as_value tmp = getVariableRaw(*this, path, scopeStack, retTarget);
-                if (!tmp.is_undefined()) {
-                    log_aserror(_("...but getVariableRaw(%s, <scopeStack>) "
-                                "succeeded (%s)!"), path, tmp);
-                }
-            );
-            // TODO: should we check getVariableRaw ?
-            return as_value();
-        }
-    }
-    else {
-        // TODO: have this checked by parse_path as an optimization 
-        if (varname.find('/') != std::string::npos &&
-                varname.find(':') == std::string::npos) {
-
-            // Consider it all a path ...
-            as_object* target = find_object(varname, &scopeStack); 
-            if (target) {
-                // ... but only if it resolves to a sprite
-                DisplayObject* d = target->displayObject();
-                MovieClip* m = d ? d->to_movie() : 0;
-                if (m) return as_value(getObject(m));
-            }
-        }
-        return getVariableRaw(*this, varname, scopeStack, retTarget);
-    }
-}
-
 bool
 as_environment::delVariableRaw(const std::string& varname,
         const ScopeStack& scopeStack) 
@@ -210,41 +149,6 @@ as_environment::delVariableRaw(const std::string& varname,
 
     // Try _global 
     return _vm.getGlobal()->delProperty(varkey).second;
-}
-
-// Given a path to variable, set its value.
-void
-as_environment::set_variable(const std::string& varname, const as_value& val,
-    const ScopeStack& scopeStack)
-{
-    IF_VERBOSE_ACTION (
-    log_action("-------------- %s = %s",
-           varname, val);
-    );
-
-    // Path lookup rigamarole.
-    as_object* target = getObject(m_target);
-    std::string path;
-    std::string var;
-    //log_debug(_("set_variable(%s, %s)"), varname, val);
-
-    if (parsePath(varname, path, var)) {
-        target = find_object(path, &scopeStack); 
-        if (target)
-        {
-            target->set_member(_vm.getStringTable().find(var), val);
-        }
-        else
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Path target '%s' not found while setting %s=%s"),
-                path, varname, val);
-            );
-        }
-    }
-    else {
-        setVariableRaw(*this, varname, val, scopeStack);
-    }
 }
 
 as_object*
@@ -435,6 +339,74 @@ as_environment::markReachableResources() const
 {
     if (m_target) m_target->setReachable();
     if (_original_target) _original_target->setReachable();
+}
+
+as_value
+getVariable(const as_environment& env, const std::string& varname,
+        const as_environment::ScopeStack& scopeStack, as_object** retTarget)
+{
+    // Path lookup rigamarole.
+    std::string path;
+    std::string var;
+
+    if (parsePath(varname, path, var)) {
+        // TODO: let find_target return generic as_objects, or use 'with' stack,
+        //       see player2.swf or bug #18758 (strip.swf)
+        as_object* target = env.find_object(path, &scopeStack); 
+
+        if (target) {
+            as_value val;
+            target->get_member(env.getVM().getStringTable().find(var), &val);
+            if (retTarget) *retTarget = target;
+            return val;
+        }
+        else {
+            return as_value();
+        }
+    }
+
+    if (varname.find('/') != std::string::npos &&
+            varname.find(':') == std::string::npos) {
+
+        // Consider it all a path ...
+        as_object* target = env.find_object(varname, &scopeStack); 
+        if (target) {
+            // ... but only if it resolves to a sprite
+            DisplayObject* d = target->displayObject();
+            MovieClip* m = d ? d->to_movie() : 0;
+            if (m) return as_value(getObject(m));
+        }
+    }
+    return getVariableRaw(env, varname, scopeStack, retTarget);
+}
+
+void
+setVariable(const as_environment& env, const std::string& varname,
+    const as_value& val, const as_environment::ScopeStack& scopeStack)
+{
+    IF_VERBOSE_ACTION(
+        log_action("-------------- %s = %s", varname, val);
+    );
+
+    // Path lookup rigamarole.
+    std::string path;
+    std::string var;
+
+    if (parsePath(varname, path, var)) {
+        as_object* target = env.find_object(path, &scopeStack); 
+        if (target) {
+            target->set_member(env.getVM().getStringTable().find(var), val);
+        }
+        else {
+            IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Path target '%s' not found while setting %s=%s"),
+                path, varname, val);
+            );
+        }
+        return;
+    }
+
+    setVariableRaw(env, varname, val, scopeStack);
 }
 
 bool

@@ -620,19 +620,19 @@ ActionExec::delObjectMember(as_object& obj, const std::string& name)
 void
 ActionExec::setVariable(const std::string& name, const as_value& val)
 {
-    return env.set_variable(name, val, getScopeStack());
+    gnash::setVariable(env, name, val, getScopeStack());
 }
 
 as_value
 ActionExec::getVariable(const std::string& name)
 {
-    return env.get_variable(name, getScopeStack());
+    return gnash::getVariable(env, name, getScopeStack());
 }
 
 as_value
 ActionExec::getVariable(const std::string& name, as_object** target)
 {
-    return env.get_variable(name, getScopeStack(), target);
+    return gnash::getVariable(env, name, getScopeStack(), target);
 }
 
 void
@@ -645,7 +645,7 @@ ActionExec::setLocalVariable(const std::string& name, const as_value& val)
     } else {
         // TODO: set target member  ?
         //       what about 'with' stack ?
-        env.set_variable(name, val, getScopeStack());
+        gnash::setVariable(env, name, val, getScopeStack());
     }
 }
 

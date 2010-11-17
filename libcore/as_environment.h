@@ -115,29 +115,6 @@ public:
     bool delVariableRaw(const std::string& varname,
             const ScopeStack& scopeStack);
 
-    /// Return the (possibly undefined) value of the named var.
-    //
-    /// @param varname      Variable name. Can contain path elements.
-    /// @param scopeStack   The Scope stack to use for lookups.
-    /// @param retTarget    If not null, the pointer will be set to
-    ///                     the actual object containing the
-    ///                     found variable (if found).
-    as_value get_variable(const std::string& varname,
-        const ScopeStack& scopeStack, as_object** retTarget=NULL) const;
-
-    /// Given a path to variable, set its value.
-    //
-    /// If no variable with that name is found, a new one is created.
-    ///
-    /// For path-less variables, this would act as a proxy for
-    /// set_variable_raw.
-    ///
-    /// @param path         Variable path. 
-    /// @param val          The value to assign to the variable.
-    /// @param scopeStack   The Scope stack to use for lookups.
-    void set_variable(const std::string& path, const as_value& val,
-        const ScopeStack& scopeStack);
-
     /// Mark all reachable resources.
     //
     /// Only the targets are reachable.
@@ -170,6 +147,30 @@ private:
     static as_value undefVal;
         
 };
+
+/// Return the (possibly undefined) value of the named var.
+//
+/// @param varname      Variable name. Can contain path elements.
+/// @param scopeStack   The Scope stack to use for lookups.
+/// @param retTarget    If not null, the pointer will be set to
+///                     the actual object containing the
+///                     found variable (if found).
+as_value getVariable(const as_environment& env, const std::string& varname,
+    const as_environment::ScopeStack& scopeStack, as_object** retTarget = 0);
+
+/// Given a path to variable, set its value.
+//
+/// If no variable with that name is found, a new one is created.
+///
+/// For path-less variables, this would act as a proxy for
+/// set_variable_raw.
+///
+/// @param path         Variable path. 
+/// @param val          The value to assign to the variable.
+/// @param scopeStack   The Scope stack to use for lookups.
+void setVariable(const as_environment& env, const std::string& path,
+    const as_value& val, const as_environment::ScopeStack& scopeStack);
+
 
 /// See if the given variable name is actually a sprite path
 /// followed by a variable name.  These come in the format:
