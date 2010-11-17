@@ -616,12 +616,6 @@ ActionExec::setVariable(const std::string& name, const as_value& val)
 }
 
 as_value
-ActionExec::getVariable(const std::string& name)
-{
-    return gnash::getVariable(env, name, getScopeStack());
-}
-
-as_value
 ActionExec::getVariable(const std::string& name, as_object** target)
 {
     return gnash::getVariable(env, name, getScopeStack(), target);

@@ -122,17 +122,11 @@ public:
 
 	/// Create an execution thread 
 	//
-	/// @param abuf
-	///	the action code
-	///
-	/// @param newEnv
-	///	the execution environment (variables scope, stack etc.)
-	///
-	/// @param abortOnUnloaded
-	///	If true (the default) execution aborts as soon as the target
-    /// sprite is unloaded.
+	/// @param abuf	            the action code
+	/// @param newEnv 	        the timeline context.
+	/// @param abortOnUnloaded  If true (default) execution aborts as soon
+    ///                         as the target sprite is unloaded.
 	///	NOTE: original target is fetched from the environment.
-	///
 	ActionExec(const action_buffer& abuf, as_environment& newEnv,
             bool abortOnUnloaded = true);
 
@@ -141,23 +135,19 @@ public:
 	/// @param func     The function 
 	/// @param newEnv   The execution environment (variables scope, stack etc.)
 	/// @param nRetval  Where to return a value. If NULL any return will
-    /// be discarded.
+    ///                 be discarded.
 	ActionExec(const Function& func, as_environment& newEnv,
             as_value* nRetVal, as_object* this_ptr);
 
-	/// \brief
-	/// Use this to push a try block.
-	/// t will be copied
+	/// Use this to push a try block. It will be copied
 	void pushTryBlock(TryBlock t);
 
-	/// \brief
 	/// Set the return value.
 	void pushReturn(const as_value& t);
 
 	/// The actual action buffer
 	//
 	/// TODO: provide a getter and make private
-	///
 	const action_buffer& code;
 
 	/// TODO: provide a getter and make private ?
@@ -173,8 +163,7 @@ public:
 	as_object* getThisPointer();
 
 	/// Returns the scope stack associated with this execution thread
-	const ScopeStack& getScopeStack() const
-	{
+	const ScopeStack& getScopeStack() const {
 		return _scopeStack;
 	}
 
@@ -187,56 +176,34 @@ public:
 	/// Skip the specified number of action tags 
 	//
 	/// The offset is relative to next_pc
-	///
 	void skip_actions(size_t offset);
 
 	/// Delete named variable, seeking for it in the with stack if any
 	//
-	/// @param name
-	///	Name of the variable. Supports slash and dot syntax.
-	///	Name is converted to lowercase if SWF version is < 7.
-	///
+	/// @param name     Name of the variable. Supports slash and dot syntax.
 	bool delVariable(const std::string& name);
 
 	/// Set a named variable, seeking for it in the with stack if any.
 	//
-	/// @param name
-	///	Name of the variable. Supports slash and dot syntax.
-	///	Name is converted to lowercase if SWF version is < 7.
-	///
+	/// @param name     Name of the variable. Supports slash and dot syntax.
 	void setVariable(const std::string& name, const as_value& val);
 
-	/// \brief
-	/// If in a function context set a local variable,
-	/// otherwise, set a normal variable.
+	/// Set a function-local variable
+    //
+    /// If we're not in a function, set a normal variable.
 	//
-	/// @param name
-	///	Name of the variable. Supports slash and dot syntax.
-	///	Name is converted to lowercase if SWF version is < 7.
-	///
+	/// @param name Name of the variable. Supports slash and dot syntax.
+    /// @param val  The value to set the variable to.
 	void setLocalVariable(const std::string& name, const as_value& val);
 
 	/// Get a named variable, seeking for it in the with stack if any.
 	//
-	/// @param name
-	///	Name of the variable. Supports slash and dot syntax.
-	///	Name is converted to lowercase if SWF version is < 7.
-	///
-	as_value getVariable(const std::string& name);
-
-	/// Get a named variable, seeking for it in the with stack if any.
-	//
-	/// @param name
-	///	Name of the variable. Supports slash and dot syntax.
-	///	Name is converted to lowercase if SWF version is < 7.
-	///
-	/// @param target
-	///	An output parameter, will be set to point to the object
-	///	containing any found variable.
-	///	The pointer may be set to NULL if the variable was not 
-	///	found or it belongs to no object (absolute references, for instance).
-	///
-	as_value getVariable(const std::string& name, as_object** target);
+	/// @param name     Name of the variable. Supports slash and dot syntax.
+	/// @param target   An output parameter, will be set to point to the object
+	///	                containing any found variable. If you aren't interested,
+    ///                 pass null (default). If the variable does not belong
+    ///                 to an object, target will be set to null.
+	as_value getVariable(const std::string& name, as_object** target = 0);
 
 	/// Get current target.
 	//
@@ -297,7 +264,6 @@ private:
     /// interrupted.
     //
     /// @return whether to continue executing the buffer
-    //
     /// @param t the try block to process.
     bool processExceptions(TryBlock& t);
 
