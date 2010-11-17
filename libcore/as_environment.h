@@ -116,13 +116,6 @@ public:
 
     size_t stack_size() const { return _stack.size(); }
 
-    /// Delete a variable, without support for the path, using a ScopeStack.
-    //
-    /// @param varname      Variable name. Must not contain path elements.
-    /// @param scope   The Scope stack to use for lookups.
-    bool delVariableRaw(const std::string& varname,
-            const ScopeStack& scope);
-
     /// Mark all reachable resources.
     //
     /// Only the targets are reachable.
@@ -179,6 +172,14 @@ as_value getVariable(const as_environment& ctx, const std::string& varname,
 /// @param scope   The Scope stack to use for lookups.
 void setVariable(const as_environment& ctx, const std::string& path,
     const as_value& val, const as_environment::ScopeStack& scope);
+
+/// Delete a variable, without support for the path, using a ScopeStack.
+//
+/// @param ctx      Timeline context to use for variable finding.
+/// @param varname  Variable name. Must not contain path elements.
+/// @param scope    The Scope stack to use for lookups.
+bool delVariable(const as_environment& ctx, const std::string& varname,
+        const as_environment::ScopeStack& scope);
 
 /// See if the given variable name is actually a sprite path
 /// followed by a variable name.  These come in the format:

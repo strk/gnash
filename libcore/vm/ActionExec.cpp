@@ -606,7 +606,7 @@ ActionExec::pushWith(const With& entry)
 bool
 ActionExec::delVariable(const std::string& name)
 {
-    return env.delVariableRaw(name, getScopeStack());
+    return gnash::delVariable(env, name, getScopeStack());
 }
 
 bool

@@ -114,13 +114,15 @@ as_environment::as_environment(VM& vm)
 }
 
 bool
-as_environment::delVariableRaw(const std::string& varname,
-        const ScopeStack& scope) 
+delVariableRaw(const as_environment& ctx, const std::string& varname,
+    const as_environment::ScopeStack& scope) 
 {
     // varname must be a plain variable name; no path parsing.
     assert(varname.find_first_of(":/.") == std::string::npos);
 
-    string_table::key varkey = _vm.getStringTable().find(varname);
+    VM& vm = ctx.getVM();
+
+    string_table::key varkey = vm.getStringTable().find(varname);
 
     // Check the with-stack.
     for (size_t i = scope.size(); i > 0; --i) {
@@ -135,12 +137,12 @@ as_environment::delVariableRaw(const std::string& varname,
     }
 
     // Check locals for deletion.
-    if (_vm.calling() && deleteLocal(_vm.currentCall().locals(), varname)) {
+    if (vm.calling() && deleteLocal(vm.currentCall().locals(), varname)) {
         return true;
     }
 
     // Try target
-    std::pair<bool, bool> ret = getObject(m_target)->delProperty(varkey);
+    std::pair<bool, bool> ret = getObject(ctx.get_target())->delProperty(varkey);
     if (ret.first) {
         return ret.second;
     }
@@ -148,7 +150,7 @@ as_environment::delVariableRaw(const std::string& varname,
     // TODO: try 'this' ? Add a testcase for it !
 
     // Try _global 
-    return _vm.getGlobal()->delProperty(varkey).second;
+    return vm.getGlobal()->delProperty(varkey).second;
 }
 
 as_object*
