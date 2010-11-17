@@ -1105,17 +1105,9 @@ AM_CONDITIONAL(BUILD_OGL_RENDERER,   [ test x${build_ogl} = xyes])
 AM_CONDITIONAL(BUILD_AGG_RENDERER,   [ test x${build_agg} = xyes ])
 AM_CONDITIONAL(BUILD_CAIRO_RENDERER, [ test x${build_cairo} = xyes ])
 
-AM_CONDITIONAL(BUILD_DIRECTFB_DEVICE, [ test x${build_directfb} = xyes ])
-
 if test x"${build_ovg}" = xyes; then
    AC_DEFINE([RENDERER_OPENVG], [1], [Use OpenVG renderer])
 fi
-
-if test x"${build_directfb}" = xyes; then
-   GNASH_PKG_FIND(directfb, [directfb.h], [DirectFB render library], DirectFBCreate)
-   AC_DEFINE([RENDERER_DIRECTFB], [1], [Use DirectFB renderer])
-fi
-AM_CONDITIONAL(BUILD_DIRECTFB_DEVICE, [test x"${build_directfb}" = xyes])
 
 if test x"${build_ogl}" = xyes; then
    AC_DEFINE([RENDERER_OPENGL], [1], [Use OpenGL renderer])
@@ -1144,42 +1136,67 @@ dnl NOTE: it is possible to use Gnash/VAAPI on platforms with an Intel
 dnl GMA500 but you currently will have to build the AGG renderer
 dnl instead of the OGL (OpenGL) one. 
 
-build_vaapi=yes
-hwaccel_list="VAAPI"
-nhwaccel=1
-AC_ARG_ENABLE(hwaccel,
-  AC_HELP_STRING([--enable-hwaccel], [Specify which accleration to support to enable (none,vaapi,omap)]),
+build_vaapi_device=no
+build_openmax_device=no
+build_egl_device=no
+build_directfb_device=no
+build_x11_device=yes
+device_list="X11"
+ndevice=1
+AC_ARG_ENABLE(device,
+  AC_HELP_STRING([--enable-devicel], [Specify which hardware abstraction to use to support to enable (none,openmax,egl,directfb,x11,vaapi)]),
   if test -z ${enableval}; then
-      hwaccel_list="none"
-      nhwaccel=0
+      device_list="none"
+      ndevice=0
       enableval=""
   fi
   while test -n "${enableval}" ; do
     val=`echo ${enableval} | cut -d ' ' -f 1`
     [case "${val}" in
       no*|NO*)
-        hwaccel_list="none"
-        build_vaapi=no
-        build_omap=no
-        nhwaccel=0
+        device_list="none"
+        build_vaapi_device=no
+        build_openmax_device=no
+        build_egl_device=no
+        build_directfb_device=no
+        build_x11_device=no
+        ndevice=0
         ;;
       va*|VA*)
-        hwaccel_list="${hwaccel_list} vaapi"
-        build_vaapi=yes
-        nhwaccel=$((nhwaccel+1))
+        device_list="${device_list} VAAPI"
+        build_vaapi_device=yes
+        ndevice=$((ndevice+1))
+        ;;
+      eg*|EG*)
+        device_list="${device_list} EGL"
+        build_egl_device=yes
+        ndevice=$((ndevice+1))
+        ;;
+      x1*|X1*)
+        device_list="${device_list} X11"
+        build_x11_device=yes
+        ndevice=$((ndevice+1))
+        ;;
+      di*|Di*|DI*)
+        device_list="${device_list} DirectFB"
+        build_directfb_device=yes
+        ndevice=$((ndevice+1))
         ;;
       all|ALL)
-        hwaccel_list="VAAPI OMAP"
-        nhwaccel=2
-        build_omap=yes
-        build_vaapi=yes
+        device_list="OpenMax EGL DirectFB X11 VAAPI"
+        build_openmax_device=yes
+        build_vaapi_device=yes
+        build_egl_device=yes
+        build_directfb_device=yes
+        build_x11_device=yes
+        ndevice=5
         ;;
-      omap*|OMAP*)
-        hwaccel_list="${hwaccel_list} omap"
-        build_omap=yes
-        nhwaccel=$((nhwaccel+1))
+      op*|Op*|OP*)
+        device_list="${device_list} OpenMAX"
+        build_openmax_device=yes
+        ndevice=$((ndevice+1))
         ;;
-      *) AC_MSG_ERROR([invalid hwaccel feature specified: ${enableval} given (accept: none,vaapi,omap)])
+      *) AC_MSG_ERROR([invalid device feature specified: ${enableval} given (accept: none,vaapi,omap)])
         ;;
       esac]
     enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
@@ -1189,7 +1206,7 @@ AC_ARG_ENABLE(hwaccel,
   done
 )
 
-if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${build_vaapi}" = x"yes"; then
+if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${build_vaapi_device}" = x"yes"; then
   use_libva=no
   use_libva_x11=no
   use_libva_glx=no
@@ -1226,21 +1243,7 @@ fi
 dnl libVA drivers. We declare conditional for both the option being
 dnl selected, as well as whether or not it's found. This we can
 dnl generate better error handling if it's not found.
-AM_CONDITIONAL(BUILD_OMAP, test x"${build_omap}" = xyes)
 AM_CONDITIONAL(USE_VAAPI, test x"${use_libva}" = xyes)
-AM_CONDITIONAL(BUILD_VAAPI_DEVICE, test x"${use_libva}" = xyes)
-
-dnl Only build the vaapi support if we have a version of FFmpeg that
-dnl supports it.
-if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${found_libva_incl}" = xyes; then
-  build_vaapi=yes
-  hwaccel_list="VAAPI"
-  nhwaccel=1
-else
-  build_vaapi=no
-  hwaccel_list=""
-  nhwaccel=0
-fi
 
 dnl Until the hwaccel patches in FFmpeg wind up in the ffmpeg-plugin,
 dnl restrict using HW Accel to using FFmpeg directly.
@@ -2405,13 +2408,30 @@ AM_CONDITIONAL(KPARTS3, [test x"${build_kparts3}" = xyes])
 AM_CONDITIONAL(KPARTS4, [test x"${build_kparts4}" = xyes])
 
 if test x"${build_gles1}" = xyes -o x"${build_gles2}" = xyes; then
-  GNASH_PKG_FIND(EGL, [EGL/egl.h], [EGL library], eglGetDisplay)
   GNASH_PATH_GLES
 fi
-AM_CONDITIONAL(BUILD_EGL_DEVICE, [test x"${build_gles1}" = xyes -o  x"${build_gles2}" = xyes -o  x"${build_ovg}" = xyes])
+
+dnl The OpenGLES1, OpenGLES2, and OpenVG all need the EGL support, X11 can use it also
+if test x"${build_gles1}" = xyes -o  x"${build_gles2}" = xyes -o x"${build_ovg}" = xyes; then
+  build_egl_device=yes
+fi
+
+if test x"${build_directfb_device}" = xyes; then
+   GNASH_PKG_FIND(directfb, [directfb/directfb.h], [DirectFB render library], DirectFBCreate)
+   AC_DEFINE([BUILD_DIRECTFB_DEVICE], [1], [Use DirectFB device support])
+fi
+
+if test x"${build_egl_device}" = xyes; then
+  GNASH_PKG_FIND(EGL, [EGL/egl.h], [EGL library], eglGetDisplay)
+  AC_DEFINE(BUILD_EGL_DEVICE, [1], [Build the EGL device for OpenVG, OpenGLES1&2, and X11/Mesa])
+fi
+
+AM_CONDITIONAL(BUILD_VAAPI_DEVICE, [test x"${use_libva}" = xyes])
+AM_CONDITIONAL(BUILD_EGL_DEVICE, [test x"${build_egl_device}" = xyes])
+AM_CONDITIONAL(BUILD_DIRECTFB_DEVICE, [ test x${build_directfb_device} = xyes])
+AM_CONDITIONAL(BUILD_X11_DEVICE, [test x$x11 = xyes])
 
 if test x"${build_ovg}" = xyes; then
-  GNASH_PKG_FIND(EGL, [EGL/egl.h], [EGL library], eglGetDisplay)
   GNASH_PKG_FIND(OpenVG, [vg/openvg.h], [OpenVG library], vgDrawImage)
 fi
 
@@ -2777,7 +2797,7 @@ dnl echo "RENDERER_LIBS=$RENDERER_LIBS"
 AC_SUBST(RENDERER_LIBS)
 AC_SUBST(RENDERER_CONFIG)
 
-HWACCEL_CONFIG="${hwaccel_list}"
+HWACCEL_CONFIG="${device_list}"
 AC_SUBST(HWACCEL_CONFIG)
 
 dnl check for missing libraries and disable them.
@@ -3894,10 +3914,6 @@ if test x"${security_list}" != x; then
   echo "        Enabling security features: ${security_list}"
 fi
 
-if test x"${hwaccel_list}" != xnone; then
-  echo "        Enabling hardware acceleration features: ${hwaccel_list}"
-fi
-
 if test x"${statistics_list}" != x; then
   echo "        Enabling statistics collecting for: ${statistics_list}"
 fi
@@ -3908,7 +3924,7 @@ fi
 
 echo "        GUI toolkits supported: ${SUPPORTED_GUIS}"
 echo "        Renderers supported: ${renderer_list}"
-echo "        Hardware Acceleration: ${hwaccel_list}"
+echo "        Hardware Acceleration: ${device_list}"
 echo "        Media handlers: ${media_list}"
 echo "        Using ${add_sound} for sound handling"
 echo "        Using $with_shm mode for shared memory"
@@ -3923,7 +3939,7 @@ else
 fi
 
 dnl The Framebuffer GUI has several other settings. As it doesn't have X11,
-dnl we have to handle input devices ourselves.
+dnl we have to handle input devics ourselves.
 if test x"${build_fb}" = xyes; then
 echo "        Using ${input_events} for Input"
   if test x"${fakefb}" != x; then
