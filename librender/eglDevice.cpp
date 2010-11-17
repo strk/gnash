@@ -211,6 +211,21 @@ EGLDevice::~EGLDevice()
 #endif
 }
 
+/// @note: There are a few steps required to initialize an EGL
+/// Device. This uses threee methods to do so, two are defaults from
+/// the base class, one is an additional class that is EGL specific.
+///
+/// To start, initialize the device with the command line
+/// arguments. These are ignored by EGL, but passed through here to
+/// follow the way most other Devices need to be initialized.
+///
+/// Once initialized, EGL must be told which Client API to use, this
+/// is either OpenVG, OpenGLES1, or OpenGLES2. To do this, we bind the
+/// EGL device to the client API.
+///
+/// Once bound, the last step attaches the window surface of the
+/// desktop or framebuffer to EGL. This is what binds EGL to the
+/// desktop or framebuffer.
 bool
 EGLDevice::initDevice(int argc, char *argv[])
 {
