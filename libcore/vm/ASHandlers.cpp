@@ -480,7 +480,7 @@ ActionNextFrame(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_NEXTFRAME));
 #endif
 
-    DisplayObject* tgtch = env.get_target();
+    DisplayObject* tgtch = env.target();
     MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
     if (tgt) tgt->goto_frame(tgt->get_current_frame() + 1);
     else log_debug(_("ActionNextFrame: as_environment target is null or not a sprite"));
@@ -495,7 +495,7 @@ ActionPrevFrame(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_PREVFRAME));
 #endif
 
-    DisplayObject* tgtch = env.get_target();
+    DisplayObject* tgtch = env.target();
     MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
     if (tgt) tgt->goto_frame(tgt->get_current_frame() - 1);
     else log_debug(_("ActionPrevFrame: as_environment target is null or not a sprite"));
@@ -510,7 +510,7 @@ ActionPlay(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_PLAY));
 #endif
 
-    DisplayObject* tgtch = env.get_target();
+    DisplayObject* tgtch = env.target();
     MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
     if (tgt) tgt->setPlayState(MovieClip::PLAYSTATE_PLAY);
     else log_debug(_("ActionPlay: as_environment target is null or not a sprite"));
@@ -525,7 +525,7 @@ ActionStop(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_STOP));
 #endif
 
-    DisplayObject* tgtch = env.get_target();
+    DisplayObject* tgtch = env.target();
     MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
     if (tgt) tgt->setPlayState(MovieClip::PLAYSTATE_STOP);
     else log_debug(_("ActionStop: as_environment target is null or not a sprite"));
@@ -568,7 +568,7 @@ ActionGotoFrame(ActionExec& thread)
 
     size_t frame = code.read_int16(thread.getCurrentPC() + 3);
 
-    DisplayObject* tgtch = env.get_target();
+    DisplayObject* tgtch = env.target();
     MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
 
     // frame number within this tag is hard-coded and 0-based
@@ -639,7 +639,7 @@ ActionWaitForFrame(ActionExec& thread)
     unsigned int framenum = code.read_int16(thread.getCurrentPC()+3);
     boost::uint8_t skip = code[thread.getCurrentPC()+5];
 
-    DisplayObject* target = env.get_target();
+    DisplayObject* target = env.target();
     MovieClip* target_sprite = target ? target->to_movie() : 0;
     if (!target_sprite) {
         log_error(_("%s: environment target is null or not a MovieClip"),
@@ -689,7 +689,7 @@ ActionGotoLabel(ActionExec& thread)
     const action_buffer& code = thread.code;
 
     const char* frame_label = code.read_string(thread.getCurrentPC()+3);
-    DisplayObject *target = env.get_target();
+    DisplayObject *target = env.target();
     MovieClip *target_sprite = target ? target->to_movie() : 0;
     if (!target_sprite) {
         log_error(_("GotoLabel: environment target is null or not a "
@@ -1263,7 +1263,7 @@ void
 ActionStopDragMovie(ActionExec& thread)
 {
     as_environment& env = thread.env;
-    DisplayObject* tgtch = env.get_target();
+    DisplayObject* tgtch = env.target();
     MovieClip* root_movie = tgtch ? tgtch->get_root() : 0;
     if (root_movie) root_movie->stop_drag();
     else log_debug(_("ActionStopDragMovie: as_environment target is "
@@ -1711,7 +1711,7 @@ ActionWaitForFrameExpression(ActionExec& thread)
     // evaluated as for ActionGotoExpression
     as_value framespec = env.pop();
 
-    DisplayObject* tgtch = env.get_target();
+    DisplayObject* tgtch = env.target();
     MovieClip* target_sprite = tgtch ? tgtch->to_movie() : 0;
     if (!target_sprite) {
         log_error(_("%s: environment target is null or not a MovieClip"),
@@ -1981,7 +1981,7 @@ ActionCallFrame(ActionExec& thread)
     }
     else {
         frame_var = target_frame;
-        target = env.get_target();
+        target = env.target();
     }
 
     MovieClip* target_sprite = target ? target->to_movie() : 0;
@@ -2034,7 +2034,7 @@ ActionGotoExpression(ActionExec& thread)
     // we should check if a sprite named '4' is supposed to work
     // in that case
     if (!target) {
-        target = env.get_target();
+        target = env.target();
         frame_var = target_frame;
     }
 
@@ -3600,7 +3600,7 @@ commonGetURL(as_environment& env, as_value target,
         //         no matter the target found on stack (which
         //         is the target to load the resource into).
         //
-        as_object* curtgt = getObject(env.get_target());
+        as_object* curtgt = getObject(env.target());
         if (!curtgt) {
             log_error(_("commonGetURL: current target is undefined"));
             return;

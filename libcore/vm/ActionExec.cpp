@@ -137,7 +137,7 @@ ActionExec::operator()()
 
     static const SWF::SWFHandlers& ash = SWF::SWFHandlers::instance();
         
-    _originalTarget = env.get_target();
+    _originalTarget = env.target();
 
     _initialStackSize = env.stack_size();
 
@@ -257,7 +257,7 @@ ActionExec::operator()()
             
             // curveball.swf and feed.swf suggest that it is the
             // *current* target, not the *original* one that matters.
-            DisplayObject* guardedChar = env.get_target();
+            DisplayObject* guardedChar = env.target();
 
             if (_abortOnUnload && guardedChar && guardedChar->unloaded()) {
 
@@ -653,7 +653,7 @@ as_object*
 ActionExec::getTarget()
 {
     if (_withStack.empty()) {
-        return getObject(env.get_target());
+        return getObject(env.target());
     }
     return _withStack.back().object();
 }

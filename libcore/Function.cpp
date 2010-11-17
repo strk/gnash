@@ -47,7 +47,7 @@ TargetGuard::TargetGuard(as_environment& e, DisplayObject* ch,
         DisplayObject* och)
     :
     env(e),
-    from(env.get_target()),
+    from(env.target()),
     from_orig(env.get_original_target())
 {
     env.set_target(ch);
@@ -74,7 +74,7 @@ Function::call(const fn_call& fn)
 	FrameGuard guard(getVM(fn), *this);
     CallFrame& cf = guard.callFrame();
 
-	DisplayObject* target = _env.get_target();
+	DisplayObject* target = _env.target();
 	DisplayObject* orig_target = _env.get_original_target();
 
 	// Some features are version-dependant.

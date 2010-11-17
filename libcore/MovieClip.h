@@ -26,6 +26,12 @@
 #include "gnashconfig.h" // GNASH_USE_GC, USE_SWFTREE
 #endif
 
+#include <boost/intrusive_ptr.hpp>
+#include <vector>
+#include <list>
+#include <map>
+#include <string>
+
 #include "ControlTag.h"
 #include "movie_definition.h" // for inlines
 #include "DisplayList.h" // DisplayList 
@@ -34,12 +40,6 @@
 #include "DynamicShape.h" // for composition
 #include "snappingrange.h"
 #include "dsodefs.h" // for DSOEXPORT
-
-#include <boost/intrusive_ptr.hpp>
-#include <vector>
-#include <list>
-#include <map>
-#include <string>
 
 // Forward declarations
 namespace gnash {
@@ -56,8 +56,7 @@ namespace gnash {
     }
 }
 
-namespace gnash
-{
+namespace gnash {
 
 /// A MovieClip is a container for DisplayObjects.
 //
@@ -500,7 +499,7 @@ public:
     virtual void notifyEvent(const event_id& id);
 
     // inherited from DisplayObject class, see dox in DisplayObject.h
-    as_environment& get_environment() {
+    virtual as_environment& get_environment() {
         return _environment;
     }
 

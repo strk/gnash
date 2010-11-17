@@ -229,9 +229,6 @@ public:
     static const int noClipDepthValue = -1000000;
 
     /// Return a reference to the variable scope of this DisplayObject.
-    //
-    /// TODO: make const/return const& ?
-    ///
     virtual as_environment& get_environment() {
         // MovieClip must override this
         // and any other DisplayObject will have

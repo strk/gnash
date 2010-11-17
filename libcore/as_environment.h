@@ -58,7 +58,7 @@ public:
 
     VM& getVM() const { return _vm; }
 
-    DisplayObject* get_target() const { return m_target; }
+    DisplayObject* target() const { return _target; }
 
     /// Set default target for timeline opcodes
     //
@@ -67,7 +67,7 @@ public:
     ///                 opcodes (would get ignored).
     void set_target(DisplayObject* target) {
         if (!_original_target) _original_target = target;
-        m_target = target;
+        _target = target;
     }
 
     void set_original_target(DisplayObject* target) {
@@ -77,7 +77,7 @@ public:
     DisplayObject* get_original_target() const { return _original_target; }
 
     // Reset target to its original value
-    void reset_target() { m_target = _original_target; }
+    void reset_target() { _target = _original_target; }
 
     /// Push a value on the stack
     void push(const as_value& val) {
@@ -140,7 +140,7 @@ private:
     SafeStack<as_value>& _stack;
 
     /// Movie target. 
-    DisplayObject* m_target;
+    DisplayObject* _target;
 
     /// Movie target. 
     DisplayObject* _original_target;

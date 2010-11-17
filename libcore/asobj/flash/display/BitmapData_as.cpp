@@ -815,7 +815,7 @@ bitmapdata_loadBitmap(const fn_call& fn)
     }
 
     const std::string linkage = fn.arg(0).to_string();
-    DisplayObject* tgt = fn.env().get_target();
+    DisplayObject* tgt = fn.env().target();
     if (!tgt) return as_value();
 
     Movie* root = tgt->get_root();

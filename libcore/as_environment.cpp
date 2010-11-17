@@ -108,7 +108,7 @@ as_environment::as_environment(VM& vm)
     :
     _vm(vm),
     _stack(_vm.getStack()),
-    m_target(0),
+    _target(0),
     _original_target(0)
 {
 }
@@ -118,7 +118,7 @@ as_environment::find_object(const std::string& path,
         const ScopeStack* scope) const
 {
     if (path.empty()) {
-        return getObject(m_target);
+        return getObject(_target);
     }
     
     VM& vm = _vm;
@@ -137,7 +137,7 @@ as_environment::find_object(const std::string& path,
     if (*p == '/') {
 
         MovieClip* root = 0;
-        if (m_target) root = m_target->getAsRoot();
+        if (_target) root = _target->getAsRoot();
         else {
             if (_original_target) {
                 root = _original_target->getAsRoot();
@@ -155,7 +155,7 @@ as_environment::find_object(const std::string& path,
 
     }
     else {
-        env = getObject(m_target);
+        env = getObject(_target);
     }
     
     assert (*p);
@@ -229,7 +229,7 @@ as_environment::find_object(const std::string& path,
                 }
 
                 // Try current target  (if any)
-                assert(env == getObject(m_target));
+                assert(env == getObject(_target));
                 if (env) {
                     element = getElement(env, subpartURI);
                     if (element) break;
@@ -299,7 +299,7 @@ as_environment::get_version() const
 void
 as_environment::markReachableResources() const
 {
-    if (m_target) m_target->setReachable();
+    if (_target) _target->setReachable();
     if (_original_target) _original_target->setReachable();
 }
 
@@ -400,7 +400,7 @@ delVariable(const as_environment& ctx, const std::string& varname,
     }
 
     // Try target
-    std::pair<bool, bool> ret = getObject(ctx.get_target())->delProperty(varkey);
+    std::pair<bool, bool> ret = getObject(ctx.target())->delProperty(varkey);
     if (ret.first) {
         return ret.second;
     }
@@ -484,8 +484,8 @@ setVariableRaw(const as_environment& env, const std::string& varname,
        if (setLocal(vm.currentCall().locals(), varname, val)) return;
     }
     
-    // TODO: shouldn't m_target be in the scope chain ?
-    if (env.get_target()) getObject(env.get_target())->set_member(varkey, val);
+    // TODO: shouldn't _target be in the scope chain ?
+    if (env.target()) getObject(env.target())->set_member(varkey, val);
     else if (env.get_original_target()) {
         getObject(env.get_original_target())->set_member(varkey, val);
     }
@@ -535,8 +535,8 @@ getVariableRaw(const as_environment& env, const std::string& varname,
     }
 
     // Check current target members. TODO: shouldn't target be in scope stack ?
-    if (env.get_target()) {
-        as_object* obj = getObject(env.get_target());
+    if (env.target()) {
+        as_object* obj = getObject(env.target());
         assert(obj);
         if (obj->get_member(key, &val)) {
             if (retTarget) *retTarget = obj;

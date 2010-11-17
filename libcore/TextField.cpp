@@ -1953,11 +1953,10 @@ TextField::parseTextVariableRef(const std::string& variableName) const
 #endif
 
     /// Why isn't get_environment const again ?
-    as_environment& env = const_cast<TextField*>(this)->get_environment();
+    const as_environment& env = const_cast<TextField*>(this)->get_environment();
 
-    as_object* target = getObject(env.get_target());
-    if ( ! target )
-    {
+    as_object* target = getObject(env.target());
+    if (!target) {
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("Current environment has no target, "
                 "can't bind VariableName (%s) associated to "

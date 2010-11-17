@@ -54,7 +54,7 @@ Function2::call(const fn_call& fn)
 	FrameGuard guard(getVM(fn), *this);
     CallFrame& cf = guard.callFrame();
 
-	DisplayObject* target = _env.get_target();
+	DisplayObject* target = _env.target();
 	DisplayObject* orig_target = _env.get_original_target();
 
 	// Some features are version-dependant.
@@ -156,7 +156,7 @@ Function2::call(const fn_call& fn)
 
     if (_function2Flags & PRELOAD_ROOT) {
         // Put '_root' (if any) in a register.
-        DisplayObject* tgtch = _env.get_target();
+        DisplayObject* tgtch = _env.target();
         if (tgtch) {
             // NOTE: _lockroot will be handled by getAsRoot()
             as_object* r = getObject(tgtch->getAsRoot());
@@ -166,7 +166,7 @@ Function2::call(const fn_call& fn)
     }
 
     if (_function2Flags & PRELOAD_PARENT) {
-        DisplayObject* tgtch = _env.get_target();
+        DisplayObject* tgtch = _env.target();
         if (tgtch) {
             as_object* p = getObject(tgtch->parent());
             cf.setLocalRegister(current_reg, p);
@@ -211,17 +211,9 @@ Function2::call(const fn_call& fn)
     }
 
 	// Execute the actions.
-	// Do this in a try block to proper drop the pushed call frame 
-	// in case of problems (most interesting action limits)
-	try {
-        as_value result;
-		ActionExec exec(*this, _env, &result, fn.this_ptr);
-		exec();
-        return result;
-	}
-	catch (ActionLimitException& ale) {
-		throw;
-	}
+    as_value result;
+    ActionExec(*this, _env, &result, fn.this_ptr)();
+    return result;
 }
 
 } // end of gnash namespace
