@@ -91,7 +91,8 @@ namespace gles1 {
 
 Renderer_gles1::Renderer_gles1()
 {
-    if (!initDevice(EGLDevice::OPENVG)) {
+//    if (!initDevice(EGLDevice::OPENVG))
+    if (!initDevice(0, 0)) {
         log_error("Couldn't initialize EGL Device!");
     }
 }

@@ -235,11 +235,12 @@ Renderer_ovg::Renderer_ovg()
       _drawing_mask(false)
 {
 
-    if (!initDevice(EGLDevice::OPENVG)) {
+//    if (!initDevice(EGLDevice::OPENVG))
+    if (!initDevice(0, 0)) {
         log_error("Couldn't initialize EGL Device!");
     }
 #ifdef HAVE_GTK2 
-    if (!initEGL(0)) {
+    if (!attachWindow(0)) {
         log_error("Couldn't initialize EGL Window!");
     }
     EGLint value;
@@ -1517,7 +1518,7 @@ Renderer_ovg::initTestBuffer(unsigned int width, unsigned int height)
     printf("\tRenderer Test memory at: %p\n", _testBuffer);
 #endif
     
-    initEGL(0);
+    attachWindow(0);
     
     init_buffer(_testBuffer, size, width, height, width * getBitsPerPixel());
 //    init(width, height);
