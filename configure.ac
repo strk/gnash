@@ -1953,11 +1953,11 @@ dnl if ! test x$build_fb = xyes; then # <--- this is wrong as build_x is non-exc
 dnl AC_PATH_XTRA
 dnl AC_CHECK_LIB(Xmu, XmuCvtStringToOrientation)
 dnl AC_CHECK_LIB(gmp, _gmp_get_memory_functions)
-  GNASH_PATH_X11
-  AC_CHECK_LIB(Xi, XInput_find_display)
-  AC_CHECK_LIB(X11, XDisableAccessControl)
+GNASH_PATH_X11
+AC_CHECK_LIB(Xi, XInput_find_display)
+AC_CHECK_LIB(X11, XDisableAccessControl)
 dnl fi
-AM_CONDITIONAL(HAVE_X11, [test x$x11 = xyes])
+AM_CONDITIONAL(HAVE_X11, [test x$has_x11 = xyes])
 AC_CHECK_LIB(rt, shm_unlink)
 AC_CHECK_FUNCS(shm_open shm_unlink)
 AC_TRY_COMPILE([#include <strings.h>], [
@@ -2429,7 +2429,7 @@ fi
 AM_CONDITIONAL(BUILD_VAAPI_DEVICE, [test x"${use_libva}" = xyes])
 AM_CONDITIONAL(BUILD_EGL_DEVICE, [test x"${build_egl_device}" = xyes])
 AM_CONDITIONAL(BUILD_DIRECTFB_DEVICE, [ test x${build_directfb_device} = xyes])
-AM_CONDITIONAL(BUILD_X11_DEVICE, [test x$x11 = xyes])
+AM_CONDITIONAL(BUILD_X11_DEVICE, [test x$build_x11_device = xyes])
 
 if test x"${build_ovg}" = xyes; then
   GNASH_PKG_FIND(OpenVG, [vg/openvg.h], [OpenVG library], vgDrawImage)
