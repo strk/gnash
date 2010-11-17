@@ -138,17 +138,10 @@ Function::call(const fn_call& fn)
     setLocal(cf, NSV::PROP_ARGUMENTS, getArguments(*this, *args, fn, caller));
 
 	// Execute the actions.
-	// Do this in a try block to proper drop the pushed call frame 
-	// in case of problems (most interesting action limits)
-	try {
-        as_value result;
-		ActionExec exec(*this, _env, &result, fn.this_ptr);
-		exec();
-        return result;
-	}
-	catch (ActionLimitException& ale) {
-		throw;
-	}
+    as_value result;
+    ActionExec exec(*this, _env, &result, fn.this_ptr);
+    exec();
+    return result;
 }
 
 void
