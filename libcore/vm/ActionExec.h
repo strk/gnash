@@ -198,19 +198,6 @@ public:
 	///
 	bool delVariable(const std::string& name);
 
-	/// Delete a named object member.
-	//
-	/// @param obj
-	///	The object to remove the member/property from.
-	///
-	/// @param name
-	///	Name of the member. 
-	///	Name is converted to lowercase if SWF version is < 7.
-	///
-	/// @return true if the member was successfully removed, false otherwise.
-	///
-	bool delObjectMember(as_object& obj, const std::string& name);
-
 	/// Set a named variable, seeking for it in the with stack if any.
 	//
 	/// @param name

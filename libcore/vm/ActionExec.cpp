@@ -609,14 +609,6 @@ ActionExec::delVariable(const std::string& name)
     return gnash::delVariable(env, name, getScopeStack());
 }
 
-bool
-ActionExec::delObjectMember(as_object& obj, const std::string& name)
-{
-    string_table& st = getStringTable(env);
-    std::pair<bool,bool> ret = obj.delProperty(st.find(name));
-    return ret.second;
-}
-
 void
 ActionExec::setVariable(const std::string& name, const as_value& val)
 {

@@ -2142,7 +2142,10 @@ ActionDelete(ActionExec& thread)
         return;
     }
 
-    env.top(1).set_bool(thread.delObjectMember(*obj, propertyname));
+    string_table& st = getStringTable(env);
+    const std::pair<bool, bool> ret = obj->delProperty(st.find(propertyname));
+
+    env.top(1).set_bool(ret.second);
 
     env.drop(1);
 
@@ -2181,7 +2184,11 @@ ActionDelete2(ActionExec& thread)
     }
 
     as_object* obj = safeToObject(getVM(thread.env), target);
-    env.top(1).set_bool(thread.delObjectMember(*obj, var));
+
+    string_table& st = getStringTable(env);
+    const std::pair<bool, bool> ret = obj->delProperty(st.find(var));
+
+    env.top(1).set_bool(ret.second);
 }
 
 void
