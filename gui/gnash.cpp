@@ -85,7 +85,7 @@ template<typename T>
 class accumulator_type : public po::value_semantic {
 public:
 
-    accumulator_type() : _interval(1) {}
+    accumulator_type() : _interval(1), _default(0) {}
 
     /// Set the notifier function.
     accumulator_type* notifier(boost::function1<void, const T&> f) {
