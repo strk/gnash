@@ -88,11 +88,11 @@ namespace {
     /// found variable (if found).
     as_value getVariableRaw(const as_environment& env,
         const std::string& varname,
-        const as_environment::ScopeStack& scopeStack,
+        const as_environment::ScopeStack& scope,
         as_object** retTarget = 0);
 
     void setVariableRaw(const as_environment& env, const std::string& varname,
-        const as_value& val, const as_environment::ScopeStack& scopeStack);
+        const as_value& val, const as_environment::ScopeStack& scope);
 
     // Search for next '.' or '/' character in this word.  Return
     // a pointer to it, or null if it wasn't found.
@@ -115,7 +115,7 @@ as_environment::as_environment(VM& vm)
 
 bool
 as_environment::delVariableRaw(const std::string& varname,
-        const ScopeStack& scopeStack) 
+        const ScopeStack& scope) 
 {
     // varname must be a plain variable name; no path parsing.
     assert(varname.find_first_of(":/.") == std::string::npos);
@@ -123,8 +123,8 @@ as_environment::delVariableRaw(const std::string& varname,
     string_table::key varkey = _vm.getStringTable().find(varname);
 
     // Check the with-stack.
-    for (size_t i = scopeStack.size(); i > 0; --i) {
-        as_object* obj = scopeStack[i - 1];
+    for (size_t i = scope.size(); i > 0; --i) {
+        as_object* obj = scope[i - 1];
 
         if (obj) {
             std::pair<bool, bool> ret = obj->delProperty(varkey);
@@ -153,7 +153,7 @@ as_environment::delVariableRaw(const std::string& varname,
 
 as_object*
 as_environment::find_object(const std::string& path,
-        const ScopeStack* scopeStack) const
+        const ScopeStack* scope) const
 {
     if (path.empty()) {
         return getObject(m_target);
@@ -256,9 +256,9 @@ as_environment::find_object(const std::string& path,
 
             do {
                 // Try scope stack
-                if (scopeStack) {
-                    for (size_t i = scopeStack->size(); i > 0; --i) {
-                        as_object* obj = (*scopeStack)[i-1];
+                if (scope) {
+                    for (size_t i = scope->size(); i > 0; --i) {
+                        as_object* obj = (*scope)[i-1];
                         
                         element = getElement(obj, subpartURI);
                         if (element) break;
@@ -343,7 +343,7 @@ as_environment::markReachableResources() const
 
 as_value
 getVariable(const as_environment& env, const std::string& varname,
-        const as_environment::ScopeStack& scopeStack, as_object** retTarget)
+        const as_environment::ScopeStack& scope, as_object** retTarget)
 {
     // Path lookup rigamarole.
     std::string path;
@@ -352,7 +352,7 @@ getVariable(const as_environment& env, const std::string& varname,
     if (parsePath(varname, path, var)) {
         // TODO: let find_target return generic as_objects, or use 'with' stack,
         //       see player2.swf or bug #18758 (strip.swf)
-        as_object* target = env.find_object(path, &scopeStack); 
+        as_object* target = env.find_object(path, &scope); 
 
         if (target) {
             as_value val;
@@ -369,7 +369,7 @@ getVariable(const as_environment& env, const std::string& varname,
             varname.find(':') == std::string::npos) {
 
         // Consider it all a path ...
-        as_object* target = env.find_object(varname, &scopeStack); 
+        as_object* target = env.find_object(varname, &scope); 
         if (target) {
             // ... but only if it resolves to a sprite
             DisplayObject* d = target->displayObject();
@@ -377,12 +377,12 @@ getVariable(const as_environment& env, const std::string& varname,
             if (m) return as_value(getObject(m));
         }
     }
-    return getVariableRaw(env, varname, scopeStack, retTarget);
+    return getVariableRaw(env, varname, scope, retTarget);
 }
 
 void
 setVariable(const as_environment& env, const std::string& varname,
-    const as_value& val, const as_environment::ScopeStack& scopeStack)
+    const as_value& val, const as_environment::ScopeStack& scope)
 {
     IF_VERBOSE_ACTION(
         log_action("-------------- %s = %s", varname, val);
@@ -393,7 +393,7 @@ setVariable(const as_environment& env, const std::string& varname,
     std::string var;
 
     if (parsePath(varname, path, var)) {
-        as_object* target = env.find_object(path, &scopeStack); 
+        as_object* target = env.find_object(path, &scope); 
         if (target) {
             target->set_member(env.getVM().getStringTable().find(var), val);
         }
@@ -406,7 +406,7 @@ setVariable(const as_environment& env, const std::string& varname,
         return;
     }
 
-    setVariableRaw(env, varname, val, scopeStack);
+    setVariableRaw(env, varname, val, scope);
 }
 
 bool
@@ -453,7 +453,7 @@ validRawVariableName(const std::string& varname)
 // No path rigamarole.
 void
 setVariableRaw(const as_environment& env, const std::string& varname,
-    const as_value& val, const as_environment::ScopeStack& scopeStack)
+    const as_value& val, const as_environment::ScopeStack& scope)
 {
 
     if (!validRawVariableName(varname)) {
@@ -470,8 +470,8 @@ setVariableRaw(const as_environment& env, const std::string& varname,
     // in SWF5 and lower, scope stack should just contain 'with' elements 
 
     // Check the scope stack.
-    for (size_t i = scopeStack.size(); i > 0; --i) {
-        as_object* obj = scopeStack[i - 1];
+    for (size_t i = scope.size(); i > 0; --i) {
+        as_object* obj = scope[i - 1];
         if (obj && obj->set_member(varkey, val, true)) {
             return;
         }
@@ -497,7 +497,7 @@ setVariableRaw(const as_environment& env, const std::string& varname,
 
 as_value
 getVariableRaw(const as_environment& env, const std::string& varname,
-    const as_environment::ScopeStack& scopeStack, as_object** retTarget)
+    const as_environment::ScopeStack& scope, as_object** retTarget)
 {
 
     if (!validRawVariableName(varname)) {
@@ -515,9 +515,9 @@ getVariableRaw(const as_environment& env, const std::string& varname,
     string_table::key key = st.find(varname);
 
     // Check the scope stack.
-    for (size_t i = scopeStack.size(); i > 0; --i) {
+    for (size_t i = scope.size(); i > 0; --i) {
 
-        as_object* obj = scopeStack[i - 1];
+        as_object* obj = scope[i - 1];
         if (obj && obj->get_member(key, &val)) {
             if (retTarget) *retTarget = obj;
             return val;

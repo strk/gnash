@@ -38,7 +38,15 @@ namespace gnash {
 
 namespace gnash {
 
-/// ActionScript execution environment.
+
+/// Provides information about timeline context.
+//
+/// This class stores information about the current and original "target"
+/// of execution. A target is a MovieClip or other AS-referenceable 
+/// DisplayObject. Non-timeline code has no target.
+//
+/// Why should a timeline context provide access to the VM stack? It shouldn't!
+/// TODO: remove stack access proxy functions, SWF version, etc.
 class as_environment
 {
 public:
@@ -111,9 +119,9 @@ public:
     /// Delete a variable, without support for the path, using a ScopeStack.
     //
     /// @param varname      Variable name. Must not contain path elements.
-    /// @param scopeStack   The Scope stack to use for lookups.
+    /// @param scope   The Scope stack to use for lookups.
     bool delVariableRaw(const std::string& varname,
-            const ScopeStack& scopeStack);
+            const ScopeStack& scope);
 
     /// Mark all reachable resources.
     //
@@ -124,7 +132,7 @@ public:
     //
     /// Supports both /slash/syntax and dot.syntax
     as_object* find_object(const std::string& path,
-            const ScopeStack* scopeStack = 0) const;
+            const ScopeStack* scope = 0) const;
     
     /// Return the SWF version we're running for.
     //
@@ -150,13 +158,13 @@ private:
 
 /// Return the (possibly undefined) value of the named var.
 //
-/// @param varname      Variable name. Can contain path elements.
-/// @param scopeStack   The Scope stack to use for lookups.
-/// @param retTarget    If not null, the pointer will be set to
-///                     the actual object containing the
-///                     found variable (if found).
-as_value getVariable(const as_environment& env, const std::string& varname,
-    const as_environment::ScopeStack& scopeStack, as_object** retTarget = 0);
+/// @param ctx         Timeline context to use for variable finding.
+/// @param varname     Variable name. Can contain path elements.
+/// @param scope       The Scope stack to use for lookups.
+/// @param retTarget   If not null, the pointer will be set to the actual
+///                    object containing the found variable (if found).
+as_value getVariable(const as_environment& ctx, const std::string& varname,
+    const as_environment::ScopeStack& scope, as_object** retTarget = 0);
 
 /// Given a path to variable, set its value.
 //
@@ -164,13 +172,13 @@ as_value getVariable(const as_environment& env, const std::string& varname,
 ///
 /// For path-less variables, this would act as a proxy for
 /// set_variable_raw.
-///
-/// @param path         Variable path. 
-/// @param val          The value to assign to the variable.
-/// @param scopeStack   The Scope stack to use for lookups.
-void setVariable(const as_environment& env, const std::string& path,
-    const as_value& val, const as_environment::ScopeStack& scopeStack);
-
+//
+/// @param ctx     Timeline context to use for variable finding.
+/// @param path    Variable path. 
+/// @param val     The value to assign to the variable.
+/// @param scope   The Scope stack to use for lookups.
+void setVariable(const as_environment& ctx, const std::string& path,
+    const as_value& val, const as_environment::ScopeStack& scope);
 
 /// See if the given variable name is actually a sprite path
 /// followed by a variable name.  These come in the format:
