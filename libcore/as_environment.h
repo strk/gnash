@@ -57,7 +57,10 @@ public:
     /// @param target   A DisplayObject to apply timeline opcodes on.
     ///                 Zero is a valid target, disabling timeline
     ///                 opcodes (would get ignored).
-    void set_target(DisplayObject* target);
+    void set_target(DisplayObject* target) {
+        if (!_original_target) _original_target = target;
+        m_target = target;
+    }
 
     void set_original_target(DisplayObject* target) {
         _original_target = target;

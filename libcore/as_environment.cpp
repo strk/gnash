@@ -98,6 +98,8 @@ namespace {
     // a pointer to it, or null if it wasn't found.
     static const char* next_slash_or_dot(const char* word);
 
+    static bool validRawVariableName(const std::string& varname);
+
 }
 
 as_value as_environment::undefVal;
@@ -170,20 +172,6 @@ as_environment::get_variable(const std::string& varname,
         }
         return getVariableRaw(*this, varname, scopeStack, retTarget);
     }
-}
-
-static bool
-validRawVariableName(const std::string& varname)
-{
-    if (varname.empty()) return false;
-
-    if (varname[0] == '.') return false;
-   
-    if (varname[0] == ':' &&
-            varname.find_first_of(":.", 1) == std::string::npos) {
-        return false;
-    }
-    return (varname.find(":::") == std::string::npos);
 }
 
 bool
@@ -443,13 +431,6 @@ as_environment::get_version() const
 }
 
 void
-as_environment::set_target(DisplayObject* target)
-{
-    if (!_original_target) _original_target = target;
-    m_target = target;
-}
-
-void
 as_environment::markReachableResources() const
 {
     if (m_target) m_target->setReachable();
@@ -482,6 +463,20 @@ parsePath(const std::string& var_path_in, std::string& path, std::string& var)
 }
 
 namespace {
+
+static bool
+validRawVariableName(const std::string& varname)
+{
+    if (varname.empty()) return false;
+
+    if (varname[0] == '.') return false;
+   
+    if (varname[0] == ':' &&
+            varname.find_first_of(":.", 1) == std::string::npos) {
+        return false;
+    }
+    return (varname.find(":::") == std::string::npos);
+}
 
 // No path rigamarole.
 void
