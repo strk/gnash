@@ -31,6 +31,7 @@
 
 #include "log.h"
 #include "dejagnu.h"
+#include "GnashDevice.h"
 #include "X11Device.h"
 
 #include <X11/X.h>
@@ -66,6 +67,12 @@ main(int argc, char *argv[])
         runtest.fail("X11Device::getErrorString()");
     }    
 
+    if (x11.getDepth() > 0) {
+        runtest.pass("X11Device::getDepth()");
+    } else {
+        runtest.fail("X11Device::getDepth()");
+    }    
+
     if (x11.getWidth()) {
         runtest.pass("X11Device::getWidth()");
     } else {
@@ -78,51 +85,38 @@ main(int argc, char *argv[])
         runtest.fail("X11Device::getHeight()");
     }
     
-    if (x11.getVerticalRes()) {
-        runtest.pass("X11Device::getVerticalRes()");
+    if (x11.isSingleBuffered() >= 0) {
+        runtest.pass("X11Device::isSingleBuffered()");
     } else {
-        runtest.fail("X11Device::getVerticalRes()");
-    }
-    
-    if (x11.getHorzRes()) {
-        runtest.pass("X11Device::getHorzRes()");
-    } else {
-        runtest.fail("X11Device::getHorzRes()");
-    }    
-    
-    if (x11.isSurfaceSingleBuffered() != x11.isSurfaceBackBuffered()) {
-        runtest.pass("X11Device::isSurface*Buffered()");
-    } else {
-        runtest.fail("X11Device::isSurface*Buffered()");
-    }
-
-    if (x11.isContextSingleBuffered() != x11.isContextBackBuffered()) {
-        runtest.pass("X11Device::iisContextBuffered()");
-    } else {
-        runtest.fail("X11Device::isContextBuffered()");
+        runtest.fail("X11Device::isSingleBuffered()");
     }
 
     // Context accessor tests
     // std::cerr << "FIXME: " << x11.getContextID() << std::endl;
 
-    if (x11.getContextID() > 0) {
-        runtest.pass("X11Device::getContextID()");
+    if (x11.getID() > 0) {
+        runtest.pass("X11Device::getID()");
     } else {
-        runtest.fail("X11Device::getContextID()");
+        runtest.fail("X11Device::getID()");
     }    
 
-    if (x11.getSurfaceID() > 0) {
-        runtest.pass("X11Device::getSurfaceID()");
+    if (x11.getRedSize() > 0) {
+        runtest.pass("X11Device::getRedSize()");
     } else {
-        runtest.fail("X11Device::getSurfaceID()");
-    }
-
-    if (x11.getDepth() > 0) {
-        runtest.pass("X11Device::getDepth()");
-    } else {
-        runtest.fail("X11Device::getDepth()");
+        runtest.fail("X11Device::getRedSize()");
     }    
 
+    if (x11.getGreenSize() > 0) {
+        runtest.pass("X11Device::getGreenSize()");
+    } else {
+        runtest.fail("X11Device::getGreenSize()");
+    }    
+    
+    if (x11.getBlueSize() > 0) {
+        runtest.pass("X11Device::getBlueSize()");
+    } else {
+        runtest.fail("X11Device::getBlueSize()");
+    }    
 }
 
 // Local Variables:

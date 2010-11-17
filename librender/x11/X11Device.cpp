@@ -30,9 +30,10 @@
 
 #ifdef HAVE_GTK2
 #include "gdk/gdkx.h"
-#include "X11/Xlib.h"
-#include "X11/Xutil.h"
+#include "X11/X.h"
 #endif
+
+#include "X11/X.h"
 
 // #ifdef HAVE_X11_H
 // # include <x11/x11.h>
@@ -41,6 +42,7 @@
 // #endif
 
 #include "X11Device.h"
+#include "GnashDevice.h"
 
 namespace gnash {
 
@@ -55,19 +57,31 @@ static LogFile& dbglogfile = LogFile::getDefaultInstance();
 const char *FONT = "/usr/share/fonts/truetype/freefont/FreeSerif.ttf";
 
 X11Device::X11Device()
+    : _display(0),
+      _screennum(0),
+      _window(0),
+      _visual(0),
+      _screen(0),
+      _depth(0),
+      _vinfo(0)
 {
     GNASH_REPORT_FUNCTION;
 }
 
 X11Device::~X11Device()
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     
 // #ifdef HAVE_GTK2_XX
 //     gdk_exit(0);
 // #else
-//     XDestroyWindow(_display, _window);
-//     XCloseDisplay(_display);
+    // if (_display && _window) {
+    //     XDestroyWindow(_display, _window);
+    // }
+    if (_display) {
+        XCloseDisplay(_display);
+    }
+    XFree(_vinfo);
 // #endif
 }
 
@@ -101,12 +115,6 @@ X11Device::initDevice(int argc, char *argv[])
 #else
     char *dpyName = NULL;
     int num_visuals;
-    XSetWindowAttributes attr;
-    unsigned long mask;    
-    Window win;
-    int width, height;
-    int x, y;
-    const char *name = "Foo";
  
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-display") == 0) {
@@ -133,18 +141,17 @@ X11Device::initDevice(int argc, char *argv[])
 
     VisualID vid = XVisualIDFromVisual(_visual);
     
-    XVisualInfo *visInfo, visTemplate;
+    XVisualInfo visTemplate;
     visTemplate.visualid = vid;
-    visInfo = XGetVisualInfo(_display, VisualIDMask, &visTemplate, &num_visuals);
+    
+    _vinfo = XGetVisualInfo(_display, VisualIDMask, &visTemplate, &num_visuals);
     // std::cerr << "Num Visuals: " << num_visuals << std::endl;
-    if (!visInfo) {
+    if (!_vinfo) {
          log_error("Error: couldn't get X visual\n");
          exit(1);
     }
 
-    int re = visInfo[0].bits_per_rgb;
-    
-    XFree(visInfo);
+    // int re = visInfo[0].bits_per_rgb;
     
     XWindowAttributes gattr;
     XGetWindowAttributes(_display, root, &gattr);
@@ -153,6 +160,12 @@ X11Device::initDevice(int argc, char *argv[])
     // std::cerr << "Width: " << gattr.depth << std::endl;
 
 #if 0
+    const char *name = "Foo";
+    XSetWindowAttributes attr;
+    unsigned long mask;    
+    Window win;
+    int width, height;
+    int x, y;
     
     // window attributes
     attr.background_pixel = 0;
@@ -185,6 +198,18 @@ X11Device::initDevice(int argc, char *argv[])
     
     return true;
 }
+
+// Initialize X11 Window layer
+bool
+X11Device::attachWindow(GnashDevice::native_window_t window)
+{
+    GNASH_REPORT_FUNCTION;
+
+    _window = *static_cast<Window *>(window);
+
+    return true;
+}
+    
 
 // Return a string with the error code as text, instead of a numeric value
 const char *
