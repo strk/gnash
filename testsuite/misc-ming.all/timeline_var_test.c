@@ -81,7 +81,6 @@ SWFAction  action_in_frame4()
   SWFAction ac;
   ac = compileSWFActionCode(" \
     if ( ++loop_back < 2 ) gotoAndPlay(2); \
-    else { _root.totals(); stop(); } \
   " );
   return ac;
 }
@@ -92,6 +91,10 @@ int main(int argc, char** argv)
   SWFMovie  movie;
   SWFMovieClip dejagnuclip;
   SWFAction ac[FRAME_COUNT];
+
+  SWFDisplayItem it;
+  SWFMovieClip mc1;
+
   int i;
   const char *srcdir=".";
 
@@ -120,7 +123,31 @@ int main(int argc, char** argv)
     SWFMovie_add(movie, (SWFBlock)ac[i]);
     SWFMovie_nextFrame(movie); 
   }
+
+  SWFMovie_add(movie, (SWFBlock)newSWFAction("_level0.ar = [];"));
+
+  // This checks that a change of target in onEnterFrame code does
+  // not change the target for other code.
+  mc1 = newSWFMovieClip();
+  SWFMovieClip_add(mc1, (SWFBlock)newSWFAction("this.g = 'moo'; _level0.ar.push(g);"));
+  SWFMovieClip_nextFrame(mc1);
+  SWFMovieClip_add(mc1, (SWFBlock)newSWFAction("_level0.ar.push(g);"));
+  SWFMovieClip_nextFrame(mc1);
+
+  it = SWFMovie_add(movie, (SWFBlock)mc1);
+  SWFDisplayItem_addAction(it,
+    compileSWFActionCode(" _root.note('onEnterFrame');"
+                         " _level0.ar.push('setTarget');"
+                         " asm { push '_level0' settargetexpr }; "),
+                         SWFACTION_ENTERFRAME);  
   
+  SWFMovie_nextFrame(movie); 
+
+  check_equals(movie, "ar.toString()", "'moo,setTarget,moo'");
+
+  SWFMovie_add(movie, (SWFBlock)newSWFAction("_root.totals(); stop();"));
+  SWFMovie_nextFrame(movie); 
+
   // save files
   puts("Saving " OUTPUT_FILENAME );
   SWFMovie_save(movie, OUTPUT_FILENAME);
