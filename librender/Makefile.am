@@ -63,6 +63,7 @@ noinst_HEADERS = \
 	agg/Renderer_agg_style.h \
 	cairo/Renderer_cairo.h \
 	cairo/PathParser.h
+	GnashDevice.h \
 	eglDevice.h \
 	opengl/tu_opengl_includes.h \
 	directfb/Renderer_DirectFB.h \
