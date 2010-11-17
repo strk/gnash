@@ -119,7 +119,7 @@ transform_colorTransform(const fn_call& fn)
     if (!fn.nargs) {
 
         // If it's not found, construction will fail.
-        as_value colorTrans(fn.env().find_object("flash.geom.ColorTransform"));
+        as_value colorTrans(findObject(fn.env(), "flash.geom.ColorTransform"));
 
         as_function* colorTransformCtor = colorTrans.to_function();
 
@@ -195,7 +195,7 @@ transform_concatenatedColorTransform(const fn_call& fn)
     if (!fn.nargs) {
 
         // If it's not found, construction will fail.
-        as_value colorTrans(fn.env().find_object("flash.geom.ColorTransform"));
+        as_value colorTrans(findObject(fn.env(), "flash.geom.ColorTransform"));
 
         as_function* colorTransformCtor = colorTrans.to_function();
 
@@ -232,7 +232,7 @@ transform_concatenatedMatrix(const fn_call& fn)
     {
 
         // If it's not found, construction will fail.
-        as_value matrix(fn.env().find_object("flash.geom.Matrix"));
+        as_value matrix(findObject(fn.env(), "flash.geom.Matrix"));
 
         as_function* matrixCtor = matrix.to_function();
 
@@ -276,7 +276,7 @@ transform_matrix(const fn_call& fn)
     {
 
         // If it's not found, construction will fail.
-        as_value matrix(fn.env().find_object("flash.geom.Matrix"));
+        as_value matrix(findObject(fn.env(), "flash.geom.Matrix"));
 
         as_function* matrixCtor = matrix.to_function();
 

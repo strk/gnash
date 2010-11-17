@@ -120,12 +120,6 @@ public:
     //
     /// Only the targets are reachable.
     void markReachableResources() const;
-
-    /// Find the object referenced by the given path.
-    //
-    /// Supports both /slash/syntax and dot.syntax
-    as_object* find_object(const std::string& path,
-            const ScopeStack* scope = 0) const;
     
     /// Return the SWF version we're running for.
     //
@@ -202,10 +196,22 @@ bool delVariable(const as_environment& ctx, const std::string& varname,
 bool parsePath(const std::string& var_path, std::string& path,
         std::string& var);
 
+/// Find the object referenced by the given path.
+//
+/// This is exposed to allow AS-scoped lookup from C++.
+//
+/// Supports both /slash/syntax and dot.syntax
+//
+/// @param ctx     Timeline context to use for variable finding.
+/// @param path    Variable path. 
+/// @param scope   The Scope stack to use for lookups.
+as_object* findObject(const as_environment& ctx, const std::string& path,
+        const as_environment::ScopeStack* scope = 0);
+
 /// Find the DisplayObject referenced by the given path.
 //
 /// Supports both /slash/syntax and dot.syntax. This is a wrapper round
-/// get_object().
+/// findObject().
 //
 /// Note that only AS-referenceable DisplayObjects can be found by path,
 /// so that the returned object (if it exists) will have an associated

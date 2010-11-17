@@ -114,14 +114,14 @@ as_environment::as_environment(VM& vm)
 }
 
 as_object*
-as_environment::find_object(const std::string& path,
-        const ScopeStack* scope) const
+findObject(const as_environment& ctx, const std::string& path,
+        const as_environment::ScopeStack* scope)
 {
     if (path.empty()) {
-        return getObject(_target);
+        return getObject(ctx.target());
     }
     
-    VM& vm = _vm;
+    VM& vm = ctx.getVM();
     string_table& st = vm.getStringTable();
     const int swfVersion = vm.getSWFVersion();
     ObjectURI globalURI(NSV::PROP_uGLOBAL);
@@ -137,10 +137,10 @@ as_environment::find_object(const std::string& path,
     if (*p == '/') {
 
         MovieClip* root = 0;
-        if (_target) root = _target->getAsRoot();
+        if (ctx.target()) root = ctx.target()->getAsRoot();
         else {
-            if (_original_target) {
-                root = _original_target->getAsRoot();
+            if (ctx.get_original_target()) {
+                root = ctx.get_original_target()->getAsRoot();
             }
             return 0;
         }
@@ -155,12 +155,13 @@ as_environment::find_object(const std::string& path,
 
     }
     else {
-        env = getObject(_target);
+        env = getObject(ctx.target());
     }
     
     assert (*p);
 
     std::string subpart;
+
     while (1) {
 
         // Skip past all colons (why?)
@@ -229,14 +230,14 @@ as_environment::find_object(const std::string& path,
                 }
 
                 // Try current target  (if any)
-                assert(env == getObject(_target));
+                assert(env == getObject(ctx.target()));
                 if (env) {
                     element = getElement(env, subpartURI);
                     if (element) break;
                 }
 
                 // Looking for _global ?
-                as_object* global = _vm.getGlobal();
+                as_object* global = vm.getGlobal();
                 const bool nocase = caseless(*global);
 
                 if (swfVersion > 5) {
@@ -252,13 +253,7 @@ as_environment::find_object(const std::string& path,
 
             } while (0);
 
-            if (!element) {
-#ifdef DEBUG_TARGET_FINDING 
-                log_debug("subpart %s of path %s not found in any "
-                "scope stack element", subpart, path);
-#endif
-                return NULL;
-            }
+            if (!element) return 0;
 
             env = element;
             firstElementParsed = true;
@@ -266,24 +261,12 @@ as_environment::find_object(const std::string& path,
         else {
 
             assert(env);
-
-#ifdef DEBUG_TARGET_FINDING 
-            log_debug(_("Invoking get_path_element(%s) on object "
-                    "%p"), subpart, (void *)env);
-#endif
-
             as_object* element = getElement(env, subpartURI);
-            if (!element) {
-#ifdef DEBUG_TARGET_FINDING 
-                log_debug(_("Path element %s not found in "
-                            "object %p"), subpart, (void *)env);
-#endif
-                return NULL;
-            }
+            if (!element) return 0;
             env = element;
         }
 
-        if (next_slash == NULL) break;
+        if (!next_slash) break;
         
         p = next_slash + 1;
     }
@@ -314,7 +297,7 @@ getVariable(const as_environment& env, const std::string& varname,
     if (parsePath(varname, path, var)) {
         // TODO: let find_target return generic as_objects, or use 'with' stack,
         //       see player2.swf or bug #18758 (strip.swf)
-        as_object* target = env.find_object(path, &scope); 
+        as_object* target = findObject(env, path, &scope); 
 
         if (target) {
             as_value val;
@@ -331,7 +314,7 @@ getVariable(const as_environment& env, const std::string& varname,
             varname.find(':') == std::string::npos) {
 
         // Consider it all a path ...
-        as_object* target = env.find_object(varname, &scope); 
+        as_object* target = findObject(env, varname, &scope); 
         if (target) {
             // ... but only if it resolves to a sprite
             DisplayObject* d = target->displayObject();
@@ -355,7 +338,7 @@ setVariable(const as_environment& env, const std::string& varname,
     std::string var;
 
     if (parsePath(varname, path, var)) {
-        as_object* target = env.find_object(path, &scope); 
+        as_object* target = findObject(env, path, &scope); 
         if (target) {
             target->set_member(env.getVM().getStringTable().find(var), val);
         }
@@ -651,7 +634,7 @@ next_slash_or_dot(const char* word)
 DisplayObject*
 findTarget(const as_environment& env, const std::string& path)
 {
-    return get<DisplayObject>(env.find_object(path));
+    return get<DisplayObject>(findObject(env, path));
 }
 
 

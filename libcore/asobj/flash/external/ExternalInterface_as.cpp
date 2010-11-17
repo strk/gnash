@@ -115,7 +115,7 @@ public:
         newAdd(_ret, static_cast<double>(_count), vm);
         newAdd(_ret, "\">", vm);
         as_object* ei = 
-            _fn.env().find_object("flash.external.ExternalInterface");
+            findObject(_fn.env(), "flash.external.ExternalInterface");
         const as_value& x = callMethod(ei, st.find("_toXML"), val);
         newAdd(_ret, x, vm);
         newAdd(_ret, "</property>", vm);
@@ -139,7 +139,7 @@ public:
     void operator()(const as_value& val) {
         VM& vm = getVM(_fn);
         as_object* ei = 
-            _fn.env().find_object("flash.external.ExternalInterface");
+            findObject(_fn.env(), "flash.external.ExternalInterface");
         string_table& st = getStringTable(_fn);
         const as_value& x = callMethod(ei, st.find("_toXML"), val);
         newAdd(_ret, x, vm);
@@ -566,7 +566,7 @@ externalinterface_uObjectToXML(const fn_call& fn)
                 newAdd(ret, "\">", vm);
 
                 as_object* ei = 
-                    fn.env().find_object("flash.external.ExternalInterface");
+                    findObject(fn.env(), "flash.external.ExternalInterface");
                 const as_value& val = getMember(*obj, *i); 
                 newAdd(ret, callMethod(ei, st.find("_toXML"), val), vm);
                 newAdd(ret, "</property>", vm);
@@ -594,7 +594,7 @@ externalinterface_uToXML(const fn_call& fn)
     if (fn.nargs) {
 
         as_object* ei = 
-            fn.env().find_object("flash.external.ExternalInterface");
+            findObject(fn.env(), "flash.external.ExternalInterface");
         string_table& st = getStringTable(fn);
         VM& vm = getVM(fn);
 
@@ -659,7 +659,7 @@ externalinterface_uToAS(const fn_call& fn)
     }
     if (equals(nn, as_value("string"), getVM(fn))) {
         as_object* ei =
-            fn.env().find_object("flash.external.ExternalInterface");
+            findObject(fn.env(), "flash.external.ExternalInterface");
         as_value fc = getMember(*o, firstChild);
         return callMethod(ei, st.find("_unescapeXML"),
                 fc.to_string(getSWFVersion(fn)));
@@ -680,17 +680,17 @@ externalinterface_uToAS(const fn_call& fn)
     }
     if (equals(nn, as_value("object"), getVM(fn))) {
         as_object* ei =
-            fn.env().find_object("flash.external.ExternalInterface");
+            findObject(fn.env(), "flash.external.ExternalInterface");
         return callMethod(ei, st.find("_objectToXML"), o);
     }
     if (equals(nn, as_value("array"), getVM(fn))) {
         as_object* ei =
-            fn.env().find_object("flash.external.ExternalInterface");
+            findObject(fn.env(), "flash.external.ExternalInterface");
         return callMethod(ei, st.find("_arrayToXML"), o);
     }
     if (equals(nn, as_value("class"), getVM(fn))) {
         as_value fc = getMember(*o, firstChild);
-        return fn.env().find_object(fc.to_string(getSWFVersion(fn)));
+        return findObject(fn.env(), fc.to_string(getSWFVersion(fn)));
     }
     return as_value();
 }

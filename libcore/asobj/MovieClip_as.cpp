@@ -1195,7 +1195,7 @@ movieclip_getTextSnapshot(const fn_call& fn)
     MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     // If not found, construction fails.
-    as_value textSnapshot(fn.env().find_object("TextSnapshot"));
+    as_value textSnapshot(findObject(fn.env(), "TextSnapshot"));
 
     boost::intrusive_ptr<as_function> tsCtor = textSnapshot.to_function();
 
@@ -2087,7 +2087,7 @@ movieclip_transform(const fn_call& fn)
     MovieClip* ptr = ensure<IsDisplayObject<MovieClip> >(fn);
 
     // If not found, construction fails.
-    as_value transform(fn.env().find_object("flash.geom.Transform"));
+    as_value transform(findObject(fn.env(), "flash.geom.Transform"));
 
     boost::intrusive_ptr<as_function> transCtor = transform.to_function();
 

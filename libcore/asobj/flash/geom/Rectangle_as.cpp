@@ -466,7 +466,7 @@ Rectangle_bottomRight(const fn_call& fn)
         newAdd(x, w, vm);
         newAdd(y, h, vm);
 
-        as_value point(fn.env().find_object("flash.geom.Point"));
+        as_value point(findObject(fn.env(), "flash.geom.Point"));
 
         boost::intrusive_ptr<as_function> pointCtor = point.to_function();
 

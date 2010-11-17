@@ -246,7 +246,7 @@ BOOST_PP_REPEAT(BOOST_PP_INC(MAX_ARGS), CALL_METHOD, )
 inline as_function*
 getClassConstructor(const fn_call& fn, const std::string& s)
 {
-    const as_value ctor(fn.env().find_object(s));
+    const as_value ctor(findObject(fn.env(), s));
     return ctor.to_function();
 }
 

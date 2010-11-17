@@ -1978,7 +1978,7 @@ TextField::parseTextVariableRef(const std::string& variableName) const
 #endif
         // find target for the path component
         // we use our parent's environment for this
-        target = env.find_object(path);
+        target = findObject(env, path);
 
         parsedName = var;
     }
