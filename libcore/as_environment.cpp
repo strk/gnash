@@ -113,46 +113,6 @@ as_environment::as_environment(VM& vm)
 {
 }
 
-bool
-delVariableRaw(const as_environment& ctx, const std::string& varname,
-    const as_environment::ScopeStack& scope) 
-{
-    // varname must be a plain variable name; no path parsing.
-    assert(varname.find_first_of(":/.") == std::string::npos);
-
-    VM& vm = ctx.getVM();
-
-    string_table::key varkey = vm.getStringTable().find(varname);
-
-    // Check the with-stack.
-    for (size_t i = scope.size(); i > 0; --i) {
-        as_object* obj = scope[i - 1];
-
-        if (obj) {
-            std::pair<bool, bool> ret = obj->delProperty(varkey);
-            if (ret.first) {
-                return ret.second;
-            }
-        }
-    }
-
-    // Check locals for deletion.
-    if (vm.calling() && deleteLocal(vm.currentCall().locals(), varname)) {
-        return true;
-    }
-
-    // Try target
-    std::pair<bool, bool> ret = getObject(ctx.get_target())->delProperty(varkey);
-    if (ret.first) {
-        return ret.second;
-    }
-
-    // TODO: try 'this' ? Add a testcase for it !
-
-    // Try _global 
-    return vm.getGlobal()->delProperty(varkey).second;
-}
-
 as_object*
 as_environment::find_object(const std::string& path,
         const ScopeStack* scope) const
@@ -409,6 +369,46 @@ setVariable(const as_environment& env, const std::string& varname,
     }
 
     setVariableRaw(env, varname, val, scope);
+}
+
+bool
+delVariable(const as_environment& ctx, const std::string& varname,
+    const as_environment::ScopeStack& scope) 
+{
+    // varname must be a plain variable name; no path parsing.
+    assert(varname.find_first_of(":/.") == std::string::npos);
+
+    VM& vm = ctx.getVM();
+
+    string_table::key varkey = vm.getStringTable().find(varname);
+
+    // Check the with-stack.
+    for (size_t i = scope.size(); i > 0; --i) {
+        as_object* obj = scope[i - 1];
+
+        if (obj) {
+            std::pair<bool, bool> ret = obj->delProperty(varkey);
+            if (ret.first) {
+                return ret.second;
+            }
+        }
+    }
+
+    // Check locals for deletion.
+    if (vm.calling() && deleteLocal(vm.currentCall().locals(), varname)) {
+        return true;
+    }
+
+    // Try target
+    std::pair<bool, bool> ret = getObject(ctx.get_target())->delProperty(varkey);
+    if (ret.first) {
+        return ret.second;
+    }
+
+    // TODO: try 'this' ? Add a testcase for it !
+
+    // Try _global 
+    return vm.getGlobal()->delProperty(varkey).second;
 }
 
 bool
