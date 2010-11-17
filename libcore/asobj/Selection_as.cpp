@@ -208,7 +208,7 @@ selection_setFocus(const fn_call& fn)
 
     if (focus.is_string()) {
         const std::string& target = focus.to_string();
-        ch = fn.env().find_target(target);
+        ch = findTarget(fn.env(), target);
     }
     else {
         /// Try converting directly to DisplayObject.

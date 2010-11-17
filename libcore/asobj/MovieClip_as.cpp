@@ -997,7 +997,7 @@ movieclip_hitTest(const fn_call& fn)
         case 1: // target
         {
             const as_value& tgt_val = fn.arg(0);
-            DisplayObject* target = fn.env().find_target(tgt_val.to_string());
+            DisplayObject* target = findTarget(fn.env(), tgt_val.to_string());
             if ( ! target )
             {
                 IF_VERBOSE_ASCODING_ERRORS(

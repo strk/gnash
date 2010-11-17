@@ -41,7 +41,6 @@ namespace gnash {
 /// ActionScript execution environment.
 class as_environment
 {
-
 public:
 
     /// A stack of objects used for variables/members lookup
@@ -141,11 +140,6 @@ public:
     /// Only the targets are reachable.
     void markReachableResources() const;
 
-    /// Find the sprite/movie referenced by the given path.
-    //
-    /// Supports both /slash/syntax and dot.syntax
-    DisplayObject* find_target(const std::string& path) const;
-
     /// Find the object referenced by the given path.
     //
     /// Supports both /slash/syntax and dot.syntax
@@ -195,6 +189,16 @@ private:
 bool parsePath(const std::string& var_path, std::string& path,
         std::string& var);
 
+/// Find the DisplayObject referenced by the given path.
+//
+/// Supports both /slash/syntax and dot.syntax. This is a wrapper round
+/// get_object().
+//
+/// Note that only AS-referenceable DisplayObjects can be found by path,
+/// so that the returned object (if it exists) will have an associated
+/// as_object. This logic can't be reflected in the return type.
+DisplayObject* findTarget(const as_environment& env, const std::string& path);
+
 inline VM&
 getVM(const as_environment& env)
 {
@@ -206,10 +210,9 @@ string_table& getStringTable(const as_environment& env);
 int getSWFVersion(const as_environment& env);
 Global_as& getGlobal(const as_environment &env);
 
-} // end namespace gnash
+} // namespace gnash
 
-
-#endif // GNASH_AS_ENVIRONMENT_H
+#endif 
 
 
 // Local Variables:

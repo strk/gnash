@@ -275,7 +275,7 @@ getTarget(as_object* obj, const fn_call& fn)
     const as_value& target = getMember(*obj, NSV::PROP_TARGET);
     MovieClip* sp = target.toMovieClip();
     if (sp) return sp;
-    DisplayObject* o = fn.env().find_target(target.to_string());
+    DisplayObject* o = findTarget(fn.env(), target.to_string());
     if (o) return o->to_movie();
     return 0;
 }

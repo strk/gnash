@@ -1059,7 +1059,7 @@ ActionGetProperty(ActionExec& thread)
         }
     }
     else {
-        target = env.find_target(tgt_str);
+        target = findTarget(env, tgt_str);
     }
  
     // FIXME: what happens when it's an invalid number? This will cause
@@ -1085,7 +1085,7 @@ ActionSetProperty(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
-    DisplayObject *target = env.find_target(env.top(2).to_string());
+    DisplayObject *target = findTarget(env, env.top(2).to_string());
     // FIXME: what happens when it's an invalid number? This will cause
     // undefined behaviour on overflow.
     unsigned int prop_number = toNumber(env.top(1), getVM(env));
@@ -1132,7 +1132,7 @@ ActionDuplicateClip(ActionExec& thread)
     const std::string& newname = env.top(1).to_string();
     const std::string& path = env.top(2).to_string();
 
-    DisplayObject* ch = env.find_target(path);
+    DisplayObject* ch = findTarget(env, path);
     if (!ch) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Path given to duplicateMovieClip(%s) doesn't "
@@ -1164,7 +1164,7 @@ ActionRemoveClip(ActionExec& thread)
 
     const std::string path = env.pop().to_string();
 
-    DisplayObject* ch = env.find_target(path);
+    DisplayObject* ch = findTarget(env, path);
     if (!ch) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Path given to removeMovieClip(%s) doesn't "
@@ -1208,7 +1208,7 @@ ActionStartDragMovie(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_STARTDRAGMOVIE));
 #endif
 
-    DisplayObject* tgt = env.find_target(env.top(0).to_string());
+    DisplayObject* tgt = findTarget(env, env.top(0).to_string());
     if (tgt) {
         // mark this DisplayObject as script transformed.
         tgt->transformedByScript();
@@ -1977,7 +1977,7 @@ ActionCallFrame(ActionExec& thread)
 
     DisplayObject* target = 0;
     if (parsePath(target_frame, target_path, frame_var)) {
-        target = env.find_target(target_path);
+        target = findTarget(env, target_path);
     }
     else {
         frame_var = target_frame;
@@ -2027,7 +2027,7 @@ ActionGotoExpression(ActionExec& thread)
 
     DisplayObject* target = NULL;
     if (parsePath(target_frame, target_path, frame_var)) {
-        target = env.find_target(target_path);
+        target = findTarget(env, target_path);
     }
 
     // 4.11 would make parsePath above return true,
@@ -3570,7 +3570,7 @@ commonGetURL(as_environment& env, as_value target,
             target_string, url, static_cast<int>(method),
             sendVarsMethod, loadTargetFlag, loadVariableFlag);
 
-    DisplayObject* target_ch = env.find_target(target.to_string());
+    DisplayObject* target_ch = findTarget(env, target.to_string());
     MovieClip* target_movie = target_ch ? target_ch->to_movie() : 0;
 
     if (loadVariableFlag) {
@@ -3683,7 +3683,7 @@ commonSetTarget(ActionExec& thread, const std::string& target_name)
     if (target_name.empty()) return;
 
     // TODO: pass thread.getScopeStack()
-    DisplayObject* new_target = env.find_target(target_name); 
+    DisplayObject* new_target = findTarget(env, target_name); 
     if (!new_target) {
         IF_VERBOSE_ASCODING_ERRORS (
             log_aserror(_("Couldn't find movie \"%s\" to set target to!"

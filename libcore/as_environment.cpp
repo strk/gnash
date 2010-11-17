@@ -259,19 +259,6 @@ as_environment::set_variable(const std::string& varname, const as_value& val,
     }
 }
 
-/// Find the sprite/movie referenced by the given path.
-//
-/// Supports both /slash/syntax and dot.syntax
-//
-/// @return     The found DisplayObject or 0 if it is not a DisplayObject.
-DisplayObject*
-as_environment::find_target(const std::string& path_in) const
-{
-    as_object* o = find_object(path_in);
-    return get<DisplayObject>(o); 
-}
-
-
 as_object*
 as_environment::find_object(const std::string& path,
         const ScopeStack* scopeStack) const
@@ -691,6 +678,13 @@ next_slash_or_dot(const char* word)
 }
 
 } // unnamed namespace 
+
+DisplayObject*
+findTarget(const as_environment& env, const std::string& path)
+{
+    return get<DisplayObject>(env.find_object(path));
+}
+
 
 string_table&
 getStringTable(const as_environment& env)
