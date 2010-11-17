@@ -84,14 +84,11 @@ Function::call(const fn_call& fn)
 		// In SWF5, when 'this' is a DisplayObject it becomes
 		// the target for this function call.
 		// See actionscript.all/setProperty.as
-		// 
-		if (fn.this_ptr) {
-			DisplayObject* ch = get<DisplayObject>(fn.this_ptr);
-			if (ch) {
-				target = ch;
-				orig_target = ch;
-			}
-		}
+        DisplayObject* ch = get<DisplayObject>(fn.this_ptr);
+        if (ch) {
+            target = ch;
+            orig_target = ch;
+        }
 	}
 
 	/// This is only needed for SWF5 (temp switch of target)
@@ -103,11 +100,9 @@ Function::call(const fn_call& fn)
 	///       (target, in particular).
 	TargetGuard targetGuard(_env, target, orig_target);
 
-    // Conventional function.
-
     // Push the arguments onto the local frame.
-    for (size_t i=0, n=_args.size(); i<n; ++i)
-    {
+    for (size_t i = 0, n = _args.size(); i < n; ++i) {
+
         assert(_args[i].reg == 0);
         if (i < fn.nargs) {
             setLocal(cf, _args[i].name, fn.arg(i));
@@ -139,8 +134,7 @@ Function::call(const fn_call& fn)
 
 	// Execute the actions.
     as_value result;
-    ActionExec exec(*this, _env, &result, fn.this_ptr);
-    exec();
+    ActionExec(*this, _env, &result, fn.this_ptr)();
     return result;
 }
 
