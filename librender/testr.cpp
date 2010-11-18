@@ -186,8 +186,8 @@ main(int argc, char *argv[])
     Timer tovg("OpenVG");
     Renderer *renderer2 = renderer::openvg::create_handler(pixelformat);
     EGLDevice *ovg = dynamic_cast<EGLDevice *>(renderer2);
-    ovg->initDevice(EGLDevice::OPENVG);
-    ovg->initEGL(*(reinterpret_cast<EGLNativeWindowType *>(canvas)));
+    ovg->initDevice(0, 0);
+    ovg->attachWindow(*(reinterpret_cast<EGLNativeWindowType *>(canvas)));
     if (renderer2) {
         test_renderer(renderer2, "OpenVG");
         test_geometry(renderer2, "OpenVG");
@@ -313,8 +313,9 @@ test_renderer(Renderer *renderer, const std::string &type)
             
     if ((type == "OpenVG") && (type == "OpenGLES1") && (type == "OpenGLES2")) {
         EGLDevice *ovg = dynamic_cast<EGLDevice *>(renderer);
-        ovg->initDevice(EGLDevice::OPENVG);
-        ovg->initEGL(*(reinterpret_cast<EGLNativeWindowType *>(canvas)));
+        ovg->initDevice(0, 0);
+//        ovg->initDevice(EGLDevice::OPENVG);
+        ovg->attachWindow(*(reinterpret_cast<EGLNativeWindowType *>(canvas)));
     }
 #else
     // Initializes the renderer for off-screen rendering used by the testsuite.
