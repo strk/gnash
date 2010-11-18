@@ -2221,10 +2221,10 @@ if test x$cross_compiling = xno; then
   AC_ARG_ENABLE([red5_testing],
       dnl # TODO: find out how to add [quotes] around '=<baseurl>'
 	  AC_HELP_STRING([--enable-red5-testing=<host>],
-		  [Enable red5 based testing (default host is localhost)]),
+		  [Enable red5 based testing (default host is www.gnashdev.org)]),
 	      [case "${enableval}" in
              no) RED5_HOST="" ;;
-            yes) RED5_HOST="localhost" ;;
+            yes) RED5_HOST="www.gnashdev.org" ;;
               *) RED5_HOST="${enableval}";;
            esac])
   AC_SUBST(RED5_HOST)
