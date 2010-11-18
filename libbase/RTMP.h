@@ -494,11 +494,6 @@ private:
     /// between the copies until explicitly reset.
     RTMPPacket& storePacket(ChannelType t, size_t channel, const RTMPPacket& p);
 
-    /// Carry out the handshake.
-    //
-    /// This is called internally on connect().
-    bool handShake();
-
     /// A set of channels. An RTMP handler has two sets.
     //
     /// Packets are stored on these channels. As soon as a packet has been

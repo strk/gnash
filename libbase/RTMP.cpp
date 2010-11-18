@@ -589,83 +589,6 @@ RTMP::readPacketPayload(RTMPPacket& packet)
 }
 
 bool
-RTMP::handShake()
-{
-
-    /// It is a size type, but our socket functions return int.
-    const int sigSize = 1536;
-
-    boost::uint8_t clientbuf[sigSize + 1];
-    boost::uint8_t* ourSig = clientbuf + 1;
-
-    // Not encrypted
-    clientbuf[0] = 0x03;
-    
-    // TODO: do this properly.
-    boost::uint32_t uptime = htonl(getUptime());
-    std::memcpy(ourSig, &uptime, 4);
-
-    std::fill_n(ourSig + 4, 4, 0);
-
-    // Generate 1536 random bytes.
-    std::generate(ourSig + 8, ourSig + sigSize, RandomByte());
-
-    // Send it to server.
-    if (_socket.write(clientbuf, sigSize + 1) != sigSize + 1) {
-        return false;
-    }
-
-    // Expect the same byte as we sent.
-    boost::uint8_t type;
-    if (readSocket(&type, 1) != 1) {
-        return false;
-    }
-
-    log_debug( "%s: Type Answer   : %02X", __FUNCTION__, (int)type);
-
-    if (type != clientbuf[0]) {
-        log_error( "%s: Type mismatch: client sent %d, server answered %d",
-            __FUNCTION__, clientbuf[0], type);
-    }
-    
-    boost::uint8_t serverSig[sigSize];
-
-    // Read from server.
-    if (readSocket(serverSig, sigSize) != sigSize) {
-        return false;
-    }
-
-    // decode server response
-    boost::uint32_t suptime;
-
-    memcpy(&suptime, serverSig, 4);
-    suptime = ntohl(suptime);
-
-    log_debug("Server Uptime : %d", suptime);
-    log_debug("FMS Version   : %d.%d.%d.%d",
-            +serverSig[4], +serverSig[5], +serverSig[6], +serverSig[7]);
-
-    // Send what we received from server.
-    if (_socket.write(serverSig, sigSize) != sigSize) {
-        return false;
-    }
-
-    // Expect it back again.
-    if (readSocket(serverSig, sigSize) != sigSize) {
-        return false;
-    }
-
-    const bool match = std::equal(serverSig, serverSig + arraySize(serverSig),
-                                  ourSig);
-
-    if (!match) {
-        log_error( "Signatures do not match during handshake!");
-    }
-    return true;
-}
-
-
-bool
 RTMP::sendPacket(RTMPPacket& packet)
 {
     // Set the data size of the packet to send.
@@ -1017,7 +940,7 @@ HandShaker::stage3()
    
     if (!got) return false;
     
-    assert (got == sigSize);
+    assert(got == sigSize);
 
     const boost::uint8_t* serverSig = &_recvBuf.front();
     const boost::uint8_t* ourSig = &_sendBuf.front() + 1;
