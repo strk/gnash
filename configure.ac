@@ -2473,7 +2473,7 @@ if test x"$build_media_gst" = "xyes"; then
   dnl files but not the libraries.
   if test x"${has_gstreamer_plugins_base}" = xyes; then
     GSTREAMER_LIBS="-lgstinterfaces-0.10 $GSTREAMER_LIBS"
-    AC_DEFINE(HAS_GSTREAMER_PLUGINS_BASE, [1], "Has the Gstreamer Plugin Dev package installed.")
+    AC_DEFINE(HAS_GSTREAMER_PLUGINS_BASE, [1], [Has the Gstreamer Plugin Dev package installed])
   fi
 fi
 
