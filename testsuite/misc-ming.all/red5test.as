@@ -85,9 +85,34 @@ test3 = function(nc)
 	check_equals(typeof(arg[2]), "object");
 	check_equals(arg[2].length, 5);
 
-	test3();
+	test4(nc);
     };
     nc.call("echo", o, 24, { x:23, y:67, text:"a string" }, [ 1, 2, 3, 4, 5] );
+};
+
+// Send more things.
+test4 = function(nc)
+{
+    note("Running test 4");
+    o = {};
+    o.onResult = function(arg)
+    {
+	check_equals(arguments.length, 1);
+	check_equals(typeof(arg), "object");
+	check(arg.hasOwnProperty("length"));
+	check_equals(arg.length, 5);
+
+	// It's a date.
+	check_equals(arg[0].__proto__, Date.prototype);
+
+	check_equals(arg[1], null);
+	check_equals(typeof(arg[2]), "object");
+	check_equals(arg[3], undefined);
+	check_equals(arg[4], null);
+
+	endOfTest();
+    };
+    nc.call("echo", o, new Date(0), new String(), {}, undefined, null);
 };
 
 runtests = function(nc)
