@@ -91,8 +91,6 @@ main(int argc, char *argv[])
 void
 test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
 {
-    // There isn't a whole lot to test, if init works, most
-    // everything else has to be correct.
     if (egl.initDevice(argc, argv)) {
         runtest.pass("EGLDevice::init()");
     } else {
