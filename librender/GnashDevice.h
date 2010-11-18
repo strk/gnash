@@ -33,11 +33,11 @@ namespace renderer {
 
 struct GnashDevice
 {
-    // Handle multiple window types. The derived classes will cast this to
-    // the proper data type.
+    /// Handle multiple window types. The derived classes will cast this to
+    /// the proper data type.
     typedef long native_window_t;
     
-    // the list of supported renders that use devices
+    /// the list of supported renders that use devices
     typedef enum {OPENVG, OPENGL, OPENGLES1, OPENGLES2, X11, VAAPI} rtype_t;
 
     GnashDevice() { GNASH_REPORT_FUNCTION; };
@@ -50,6 +50,7 @@ struct GnashDevice
     virtual bool attachWindow(native_window_t window) = 0;
     
     // Utility methods not in the base class
+    
     /// Return a string with the error code as text, instead of a numeric value
     virtual const char *getErrorString(int error) = 0;
     
@@ -57,21 +58,37 @@ struct GnashDevice
     // int queryGNASHConfig() { return queryGNASHConfig(_gnashDisplay); };
     // int queryGNASHConfig(GNASHDisplay display);
 
+    /// Get the width of the device
     virtual size_t getWidth() = 0;
+
+    /// Get the Height of the device
     virtual size_t getHeight() = 0;
+
+    /// Get the depth of the device
     virtual int getDepth() = 0;
-    
+
+    /// Get the size of the Red pixel
     virtual int getRedSize() = 0;
+
+    /// Get the size of the Green pixel
     virtual int getGreenSize() = 0;
+
+    /// Get the size of the Blue pixel
     virtual int getBlueSize() = 0;
-    
+
+    /// Is this device single buffered
     virtual bool isSingleBuffered() = 0;
+
+    /// Are buffers destroyed ?
     virtual bool isBufferDestroyed() = 0;
-    
+
+    // Get the window ID handle
     virtual int getID() = 0;
-    
+
+    /// Is the specified renderer supported by this hardware ?
     virtual bool supportsRenderer(rtype_t rtype) = 0;
-    
+
+    /// Is this renderering natively
     virtual bool isNativeRender() = 0;
 };
 
