@@ -1001,7 +1001,7 @@ AC_ARG_ENABLE(renderer,
         nrender=$((nrender+1))
         ;;
       directfb|dfb)
-        renderer_list="${renderer_list} DirectF"
+        renderer_list="${renderer_list} DirectFB"
         build_directfb=yes
         nrender=$((nrender+1))
         ;;
@@ -1138,13 +1138,13 @@ dnl instead of the OGL (OpenGL) one.
 
 build_vaapi_device=no
 build_openmax_device=no
-build_egl_device=no
-build_directfb_device=no
+build_egl_device=yes
+build_directfb_device=yes
 build_x11_device=yes
 device_list="X11"
 ndevice=1
 AC_ARG_ENABLE(device,
-  AC_HELP_STRING([--enable-devicel], [Specify which hardware abstraction to use to support to enable (none,openmax,egl,directfb,x11,vaapi)]),
+  AC_HELP_STRING([--enable-device], [Specify which hardware abstraction to use to support to enable (none,openmax,egl,directfb,x11,vaapi)]),
   if test -z ${enableval}; then
       device_list="none"
       ndevice=0
