@@ -26,6 +26,9 @@
 
 #include <boost/scoped_array.hpp>
 
+#ifdef HAVE_X11_X_H
+#include "x11/X11Device.h"
+#endif
 #include "GnashDevice.h"
 
 #ifdef HAVE_EGL_EGL_H
@@ -302,9 +305,10 @@ protected:
     EGLNativePixmapType _nativePixmap;
     EGLint              _max_num_config;
     unsigned int        _bpp;
-    unsigned int        _width;
-    unsigned int        _height;
     std::vector<EGLSurface> _pbuffers;
+#ifdef HAVE_LIBX11
+    x11::X11Device      _x11;
+#endif
 };
 
 #define DUMP_CURRENT_SURFACE printEGLSurface(eglGetCurrentSurface(EGL_DRAW))

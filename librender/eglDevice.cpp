@@ -160,9 +160,7 @@ EGLDevice::EGLDevice()
       _eglDisplay(EGL_NO_DISPLAY),
       _eglNumOfConfigs(0),
       _max_num_config(1),
-      _bpp(32),
-      _width(0),
-      _height(0)
+      _bpp(32)
 {
     GNASH_REPORT_FUNCTION;
 }
@@ -174,9 +172,7 @@ EGLDevice::EGLDevice(GnashDevice::rtype_t rtype)
       _eglDisplay(EGL_NO_DISPLAY),
       _eglNumOfConfigs(0),
       _max_num_config(1),
-      _bpp(32),
-      _width(0),
-      _height(0)
+      _bpp(32)
 {
     GNASH_REPORT_FUNCTION;
 }
@@ -237,12 +233,15 @@ EGLDevice::initDevice(int argc, char *argv[])
     // // FIXME: for now, always run verbose till this supports command line args
     // dbglogfile.setVerbosity();
 
-#ifdef HAVE_GTK2
+#ifdef HAVE_GTK2+XX
     // As gdk_init() wants the command line arguments, we have to create
     // fake ones, as we don't care about the X11 options at this point.
     gdk_init(&argc, &argv);
 #endif
-
+#ifdef HAVE_LIBX11
+    _x11.initDevice(argc, argv);
+#endif
+    
     EGLint major, minor;
     // see egl_config.c for a list of supported configs, this looks for
     // a 5650 (rgba) config, supporting OpenGL ES and windowed surfaces
@@ -268,40 +267,8 @@ EGLDevice::initDevice(int argc, char *argv[])
               eglQueryString(_eglDisplay, EGL_VERSION),
               eglQueryString(_eglDisplay, EGL_VENDOR));
 
-#if 0
     // step2 - bind to the wanted client API
-    switch (rtype) {
-      case OPENVG:
-          log_debug("Initializing EGL for OpenVG");
-          if(EGL_FALSE == eglBindAPI(EGL_OPENVG_API)) {
-              log_error("eglBindAPI() failed to retrive the number of configs (error %s)",
-                        getErrorString(eglGetError()));
-              return false;
-          }
-          break;
-      case OPENGLES1:
-          log_debug("Initializing EGL for OpenGLES1");
-          if(EGL_FALSE == eglBindAPI(EGL_OPENGL_ES_API)) {
-              log_error("eglBindAPI() failed to retrive the number of configs (error %s)",
-                        getErrorString(eglGetError()));
-              return false;
-          }
-          break;
-      case OPENGLES2:
-          log_debug("Initializing EGL for OpenGLES2");
-          if(EGL_FALSE == eglBindAPI(EGL_OPENGL_ES_API)) {
-              log_error("eglBindAPI() failed to retrive the number of configs (error %s)",
-                        getErrorString(eglGetError()));
-              return false;
-          }
-          break;
-      default:
-          log_error("No EGL device type specified!");
-//          return false;
-    }
-#endif
-    
-//    queryEGLConfig(_eglDisplay);
+    /// This is done by bindClient()
     
     // step3 - find a suitable config
     if (_bpp == 32) {
