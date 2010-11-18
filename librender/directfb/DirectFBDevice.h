@@ -27,20 +27,21 @@
 #include <boost/scoped_array.hpp>
 #include <boost/scoped_ptr.hpp>
 
-// #ifdef HAVE_DIRECTFB_H
+#ifdef HAVE_DIRECTFB_DIRECTFB_H
 # include <directfb/directfb.h>
-// #else
-// # error "This file needs DIRECTFB"
-// #endif
+#else
+# error "This file needs DIRECTFB"
+#endif
 
-namespace gnash
-{
+#include "GnashDevice.h"
+
+namespace gnash {
 
 namespace renderer {
 
 namespace directfb {
 
-class DirectFBDevice
+class DirectFBDevice : public GnashDevice
 {
   public:
     DirectFBDevice();
@@ -51,10 +52,11 @@ class DirectFBDevice
 
     // Initialize DirectFB Window layer
     //    bool initDirectFB(DirectFBNativeWindowType window);
-    
+    bool attachWindow(GnashDevice::native_window_t window);
+        
     // Utility methods not in the base class
     /// Return a string with the error code as text, instead of a numeric value
-    const char *getErrorString(DFBResult error);    
+    const char *getErrorString(int error);    
     
     // Accessors for the settings needed by higher level code.
     // Surface accessors
@@ -62,50 +64,27 @@ class DirectFBDevice
         return getWidth(_surface);
     }
     
-    size_t getWidth(IDirectFBSurface *surface) {
-	int x, y;
-	if (surface) {
-	    surface->GetSize(surface, &x, &y);
-	    return static_cast<size_t>(x);
-	}
-	return 0;
-    };
-    size_t getHeigth() {
-        return getHeigth(_surface);
+    size_t getHeight() {
+        return getHeight(_surface);
     }
     
-    size_t getHeigth(IDirectFBSurface *surface) {
-	int x, y;
-	if (surface) {
-	    surface->GetSize(surface, &x, &y);
-	    return static_cast<size_t>(y);
-	}
-	return 0;
-    }
-    size_t getVerticalRes() {
-        return getVerticalRes(_screen);
-    }
-    size_t getVerticalRes(IDirectFBScreen *screen) {
-	int x, y;
-	if (screen) {
-	    screen->GetSize(screen, &x, &y);
-	    return static_cast<size_t>(x);
-	}
-        return 0;
-    }
-    size_t getHorzRes() {
-        return getHorzRes(_screen);
-    }
-    size_t getHorzRes(IDirectFBScreen *screen) {
-	int x, y;
-	if (screen) {
-	    screen->GetSize(screen, &x, &y);
-	    return static_cast<size_t>(y);
-	}
+    int getDepth() {
+        DFBSurfacePixelFormat format;
+        if (_surface) {
+            _surface->GetPixelFormat(_surface, &format);
+            return getDepth(format);
+        }
         return 0;
     }
 
-    bool isSurfaceSingleBuffered() {
+    int getRedSize() {
+    };
+    int getGreenSize() {
+    };
+    int getBlueSize() {
+    };
+    
+    bool isSingleBuffered() {
         if (_surface) {
             DFBSurfaceCapabilities caps;
             _surface->GetCapabilities(_surface, &caps);
@@ -114,6 +93,47 @@ class DirectFBDevice
             }
         }
         return true;
+    }
+
+    int getID() {
+        return static_cast<int>(getSurfaceID());
+    }
+    
+    bool isBufferDestroyed() {
+        // return isBufferDestroyed(_directfbSurface);
+        return false;
+    }
+
+    int getSurfaceID() {
+	if (_layer) {
+            DFBDisplayLayerID id;
+            _screen->GetID(_screen, &id);
+            return static_cast<int>(id);
+	}
+        return 0;
+    }
+
+    virtual bool supportsRenderer(rtype_t rtype) { return true; };
+
+    // Overload some of the base class methods to deal with Device specific
+    // data types.
+    int getDepth(DFBSurfacePixelFormat format);
+
+    size_t getWidth(IDirectFBSurface *surface) {
+	int x, y;
+	if (surface) {
+	    surface->GetSize(surface, &x, &y);
+	    return static_cast<size_t>(x);
+	}
+	return 0;
+    };
+    size_t getHeight(IDirectFBSurface *surface) {
+	int x, y;
+	if (surface) {
+	    surface->GetSize(surface, &x, &y);
+	    return static_cast<size_t>(y);
+	}
+	return 0;
     }
     
     bool isSurfaceBackBuffered() {
@@ -126,25 +146,6 @@ class DirectFBDevice
             return false;
         }
     }
-    bool isBufferDestroyed() {
-        // return isBufferDestroyed(_directfbSurface);
-        return false;
-    }
-    bool isBufferDestroyed(IDirectFBSurface surface) {
-        return false;
-    }
-    bool isMultiSample() {
-        return false;
-    }
-    int getSurfaceID() {
-	if (_layer) {
-            DFBDisplayLayerID id;
-            _screen->GetID(_screen, &id);
-            return static_cast<int>(id);
-	}
-        return 0;
-    }
-
     // Context accessors
     int getContextID() {
 	if (_layer) {
@@ -179,25 +180,29 @@ class DirectFBDevice
     }
 
     bool isNativeRender() {
+        return true;
+    }
+    
+    size_t getVerticalRes() {
+        return getVerticalRes(_screen);
+    }
+    size_t getVerticalRes(IDirectFBScreen *screen) {
+	int x, y;
+	if (screen) {
+	    screen->GetSize(screen, &x, &y);
+	    return static_cast<size_t>(x);
+	}
         return 0;
     }
-    int getSamples() {
-        return 0;
+    size_t getHorzRes() {
+        return getHorzRes(_screen);
     }
-    int getSampleBuffers() {
-        return 0;
-    }
-    int getDepth() {
-        DFBSurfacePixelFormat format;
-        _surface->GetPixelFormat(_surface, &format);
-        return getDepth(format);
-    }
-    int getDepth(DFBSurfacePixelFormat format);
-
-    int getMaxSwapInterval() {
-        return 0;
-    }
-    int getMinSwapInterval() {
+    size_t getHorzRes(IDirectFBScreen *screen) {
+	int x, y;
+	if (screen) {
+	    screen->GetSize(screen, &x, &y);
+	    return static_cast<size_t>(y);
+	}
         return 0;
     }
     

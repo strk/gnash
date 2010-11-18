@@ -72,10 +72,10 @@ main(int argc, char *argv[])
         runtest.fail("DirectFBDevice::getWidth()");
     }
     
-    if (dfb.getHeigth()) {
-        runtest.pass("DirectFBDevice::getHeigth()");
+    if (dfb.getHeight()) {
+        runtest.pass("DirectFBDevice::getHeight()");
     } else {
-        runtest.fail("DirecTFBDevice::getHeigth()");
+        runtest.fail("DirecTFBDevice::getHeight()");
     }
     
     if (dfb.getVerticalRes()) {
@@ -90,10 +90,10 @@ main(int argc, char *argv[])
         runtest.fail("DirectFBDevice::getHorzRes()");
     }    
     
-    if (dfb.isSurfaceSingleBuffered() != dfb.isSurfaceBackBuffered()) {
-        runtest.pass("DirectFBDevice::isSurface*Buffered()");
+    if (dfb.isSingleBuffered()) {
+        runtest.pass("DirectFBDevice::is*Buffered()");
     } else {
-        runtest.fail("DirectFBDevice::isSurface*Buffered()");
+        runtest.fail("DirectFBDevice::is*Buffered()");
     }
 
     if (dfb.isContextSingleBuffered() != dfb.isContextBackBuffered()) {

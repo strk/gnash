@@ -30,11 +30,11 @@
 #include "Renderer.h"
 #include "GnashException.h"
 
-// #ifdef HAVE_DIRECTFB_H
+#ifdef HAVE_DIRECTFB_DIRECTFB_H
 # include <directfb/directfb.h>
-// #else
-// # error "This file needs DIRECTFB"
-// #endif
+#else
+# error "This file needs DIRECTFB"
+#endif
 
 #include "DirectFBDevice.h"
 
@@ -92,8 +92,6 @@ DirectFBDevice::initDevice(int argc, char *argv[])
 {
     GNASH_REPORT_FUNCTION;
 
-    // // FIXME: for now, always run verbose till this supports command line args
-    dbglogfile.setVerbosity();
     DFBResult result;
 
     if ((result = DirectFBInit(&argc, &argv)) != DR_OK) {
@@ -166,6 +164,12 @@ DirectFBDevice::initDevice(int argc, char *argv[])
     _surface->GetPixelFormat(_surface, &format);
 
     return true;
+}
+
+bool
+DirectFBDevice::attachWindow(GnashDevice::native_window_t window)
+{
+    GNASH_REPORT_FUNCTION;
 }
 
 void
@@ -554,8 +558,10 @@ DirectFBDevice::printDisplayLayerTypeFlags(DFBDisplayLayerTypeFlags flags)
 
 /// Return a string with the error code as text, instead of a numeric value
 const char *
-DirectFBDevice::getErrorString(DFBResult code)
+DirectFBDevice::getErrorString(int error)
 {
+    DFBResult code = static_cast<DFBResult>(error);
+    
     switch (code) {
     case DR_OK: 
 	return "No error occured";
@@ -910,7 +916,7 @@ DirectFBDevice::printFBSurface(IDirectFBSurface *surface)
         // printFBSurfaceHintFlags(surface->hints);
         return;
     } else {
-        std::cerr << "ERROR: No surface data!";
+        std::cerr << "ERROR: No surface data!" << std::endl;
     }
 }
 
