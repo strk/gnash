@@ -275,6 +275,9 @@ if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 if ENABLE_HTTP_TESTSUITE
 check_SCRIPTS += remotingTestRunner
 endif
+if ENABLE_RED5_TESTING
+check_SCRIPTS += red5test-runner
+endif
 endif
 
 if MING_VERSION_0_4
@@ -1479,6 +1482,13 @@ remoting.swf: $(srcdir)/remoting.as Dejagnu.swf Makefile ../actionscript.all/che
 
 remotingTestRunner: $(srcdir)/../generic-testrunner.sh remoting.swf
 	sh $< $(top_builddir) remoting.swf > $@
+	chmod 755 $@
+
+red5test.swf: $(srcdir)/red5test.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
+	$(MAKESWF) -n network -r12 -o $@ -v7 -DHTTP_TESTSUITE='\"$(HTTP_TESTSUITE)\"' -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 Dejagnu.swf $(srcdir)/red5test.as $(srcdir)/../actionscript.all/dejagnu_so_fini.as
+
+red5test-runner: $(srcdir)/../generic-testrunner.sh red5test.swf
+	sh $< $(top_builddir) red5test.swf > $@
 	chmod 755 $@
 
 case6.swf: $(srcdir)/case6.as Makefile ../actionscript.all/check.as

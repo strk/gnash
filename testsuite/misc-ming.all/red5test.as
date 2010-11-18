@@ -16,10 +16,12 @@ rcsid="red5test.as - <bzr revno here>";
 #include "../actionscript.all/utils.as"
 #include "../actionscript.all/dejagnu.as"
 
+stop();
+
 endOfTest = function()
 {
     totals();
-    stop();
+    play();
 };
 
 // -P FlashVars='hostname=localhost,rtmptport5080=rtmpport=1935'
