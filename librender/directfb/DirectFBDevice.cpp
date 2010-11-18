@@ -178,7 +178,7 @@ DirectFBDevice::printDisplayLayerConfig(DFBDisplayLayerConfig *config)
     std::cerr << "DisplayLayerConfig:" << std::endl;
     
     if (config) {
-        std::cerr << "\tLaer Width: " << config->width 
+        std::cerr << "\tLayer Width: " << config->width 
                   << ", Layer Height: " << config->height << std::endl;
         printSurfacePixelFormat(config->pixelformat);
         printDisplayLayerBufferMode(config->buffermode);
@@ -385,9 +385,9 @@ DirectFBDevice::printDisplayLayerCapabilities(DFBDisplayLayerCapabilities caps)
     }	 	
     if (caps & DLCAPS_SURFACE) {
         ss << "\tDLCAPS_SURFACE: The layer has a surface that " << std::endl
-           << "\tcan be drawn to. This may not be provided by layers"  << std::endl
-           << "\tthat display realtime data, e.g. from an MPEG decoder chip. Playback" << std::endl
-           << "\tcontrol may be provided by an external API." << std::endl;
+           << "\t\tcan be drawn to. This may not be provided by layers"  << std::endl
+           << "\t\tthat display realtime data, e.g. from an MPEG decoder chip. Playback" << std::endl
+           << "\t\tcontrol may be provided by an external API." << std::endl;
     }
     if (caps & DLCAPS_OPACITY) {
         ss << "\tDLCAPS_OPACITY: The layer supports blending with layer(s) below based on a global alpha factor." << std::endl;
