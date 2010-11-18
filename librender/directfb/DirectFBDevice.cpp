@@ -692,49 +692,42 @@ DirectFBDevice::printAccelerationMask(DFBAccelerationMask mask)
     std::stringstream ss;
     
     if (mask == DFXL_NONE) {
-        ss << "\tNone of these";
+        ss << "\tDFXL_NONE: None of these";
     }
     if (mask & DFXL_FILLRECTANGLE) {
-        ss << "\tFillRectangle() is accelerated";
+        ss << "\tDFXL_FILLRECTANGLE: FillRectangle() is accelerated";
     }
     if (mask & DFXL_DRAWRECTANGLE) {
-        ss << "DrawRectangle() is accelerated";
+        ss << "\tDFXL_DRAWRECTANGLE: DrawRectangle() is accelerated";
     }
     if (mask & DFXL_DRAWLINE) {
-        ss << "\tDrawLine() is accelerated";
+        ss << "\tDFXL_DRAWLINE: DrawLine() is accelerated";
     }
     if (mask & DFXL_FILLTRIANGLE) {
-        ss << "\tFillTriangle() is accelerated";
+        ss << "\tDFXL_FILLTRIANGLE: FillTriangle() is accelerated";
     }
     if (mask & DFXL_BLIT) {
-        ss << "\tBlit() and TileBlit() are accelerated";
+        ss << "\tDFXL_BLIT: Blit() and TileBlit() are accelerated";
     }
     if (mask & DFXL_STRETCHBLIT) {
-        ss << "\tStretchBlit() is accelerated";
+        ss << "\tDFXL_STRETCHBLIT: StretchBlit() is accelerated";
     }
     if (mask & DFXL_TEXTRIANGLES) {
-        ss << "\tTextureTriangles() is accelerated";
+        ss << "\tDFXL_TEXTRIANGLES: TextureTriangles() is accelerated";
     }
 #ifdef DFXL_BLIT2
     if (mask & DFXL_BLIT2) {
-        ss << "\tBatchBlit2() is accelerated";
+        ss << "\tDFXL_BLIT2: BatchBlit2() is accelerated";
     }
 #endif
     if (mask & DFXL_DRAWSTRING) {
-        ss << "\tDrawString() and DrawGlyph() are accelerated";
+        ss << "\tDFXL_DRAWSTRING: DrawString() and DrawGlyph() are accelerated";
     }
     if (mask & DFXL_ALL) {
-        ss << "\tAll drawing/blitting functions";
-    }
-    if (mask & DFXL_ALL) {
-        ss << "\tAll drawing functions";
-    }
-    if (mask & DFXL_ALL) {
-        ss << "\tAll blitting functions. ";
+        ss << "\tDFXL_ALL: All drawing/blitting functions";
     }
 
-    std::cerr << "Acceleration Mask is: "
-              << ss.str() << std::endl;
+    std::cerr << "Acceleration Mask is: " << ss.str() << std::endl;
 }
 
 void
@@ -745,57 +738,57 @@ DirectFBDevice::printSurfaceBlittingFlags(DFBSurfaceBlittingFlags flags)
     std::stringstream ss;
     
     if (flags == DSBLIT_NOFX) {
-        ss << "\tuses none of the effects" << std::endl;
+        ss << "\tDSBLIT_NOFX: uses none of the effects" << std::endl;
     }
     if (flags & DSBLIT_BLEND_ALPHACHANNEL) {
-        ss << "\tenables blending and uses alphachannel from source" << std::endl;
+        ss << "\tDSBLIT_BLEND_ALPHACHANNEL: enables blending and uses alphachannel from source" << std::endl;
     }
     if (flags & DSBLIT_BLEND_COLORALPHA) {
-        ss << "\tenables blending and uses alpha value from color" << std::endl;
+        ss << "\tDSBLIT_BLEND_COLORALPHA: enables blending and uses alpha value from color" << std::endl;
     }
     if (flags & DSBLIT_COLORIZE) {
-        ss << "source color with the color's r/g/b values" << std::endl;
+        ss << "\tDSBLIT_COLORIZE: source color with the color's r/g/b values" << std::endl;
     }
     if (flags & DSBLIT_SRC_COLORKEY) {
-        ss << "\tdon't blit pixels matching the source color key" << std::endl;
+        ss << "\tDSBLIT_SRC_COLORKEY: don't blit pixels matching the source color key" << std::endl;
     }
     if (flags & DSBLIT_DST_COLORKEY) {
-        ss << "\twrite to destination only if the destination pi matches the destination color key" << std::endl;
+        ss << "\tDSBLIT_DST_COLORKEY: write to destination only if the destination pi matches the destination color key" << std::endl;
     }
     if (flags & DSBLIT_SRC_PREMULTIPLY) {
-        ss << "modulates the source color with the (modulated) source alpha" << std::endl;
+        ss << "\tDSBLIT_SRC_PREMULTIPLY: modulates the source color with the (modulated) source alpha" << std::endl;
     }
     if (flags & DSBLIT_DST_PREMULTIPLY) {
         ss << "\tmodulates the dest. color with the dest. alpha" << std::endl;
     }
     if (flags & DSBLIT_DEMULTIPLY) {
-        ss << "\tthe color by the alpha before writing data to the destination" << std::endl;
+        ss << "\tDSBLIT_DEMULTIPLY: the color by the alpha before writing data to the destination" << std::endl;
     }
     if (flags & DSBLIT_DEINTERLACE) {
-        ss << "deinterlaces the source during blitting by reading" << std::endl;
+        ss << "\tDSBLIT_DEINTERLACE: deinterlaces the source during blitting by reading" << std::endl;
     }
     if (flags & DSBLIT_SRC_PREMULTCOLOR) {
-        ss << "\tmodulates the source color with the color alpha" << std::endl;
+        ss << "\tDSBLIT_SRC_PREMULTCOLOR: modulates the source color with the color alpha" << std::endl;
     }
     if (flags & DSBLIT_XOR)  {
-        ss << "\tbitwise xor the destination pixels with the source pixels after premultiplication" << std::endl;
+        ss << "\tDSBLIT_XOR: bitwise xor the destination pixels with the source pixels after premultiplication" << std::endl;
     }
 #ifdef DSBLIT_INDEX_TRANSLATION
     if (flags & DSBLIT_INDEX_TRANSLATION) {
-        ss "\tdo fast indexed to indexed translation, this flag is mutual exclusive with all others" << std::endl;
+        ss "\tDSBLIT_INDEX_TRANSLATION: do fast indexed to indexed translation, this flag is mutual exclusive with all others" << std::endl;
     }
 #endif
     if (flags & DSBLIT_ROTATE180) {
-        ss << "\trotate the image by 180 degree" << std::endl;
+        ss << "\tDSBLIT_ROTATE180: rotate the image by 180 degree" << std::endl;
     }
     if (flags & DSBLIT_COLORKEY_PROTECT) {
-        ss << "\tmake sure written pixels don't match color key (internal only ATM)" << std::endl;
+        ss << "\tDSBLIT_COLORKEY_PROTECT: make sure written pixels don't match color key (internal only ATM)" << std::endl;
     }
     if (flags & DSBLIT_SRC_MASK_ALPHA) {
-        ss << "\tmodulate source alpha channel with alpha channel from source mask, see also IDirectFBSurface::SetSourceMask()" << std::endl;
+        ss << "\tDSBLIT_SRC_MASK_ALPHA: modulate source alpha channel with alpha channel from source mask, see also IDirectFBSurface::SetSourceMask()" << std::endl;
     }
     if (flags & DSBLIT_SRC_MASK_COLOR) {
-        ss << "\tmodulate source color channels with color channels from source mask, see also IDirectFBSurface::SetSourceMask()" << std::endl;
+        ss << "\tDSBLIT_SRC_MASK_COLOR: modulate source color channels with color channels from source mask, see also IDirectFBSurface::SetSourceMask()" << std::endl;
     }
 
     std::cerr << "Blitting Flags are: " << ss.str();
@@ -926,37 +919,37 @@ DirectFBDevice::printSurfaceDescriptionFlags(DFBSurfaceDescriptionFlags flags)
     std::stringstream ss;
 
     if (flags == DSDESC_NONE) {
-        ss << "none of these" << std::endl;
+        ss << "\tDSDESC_NONE: none of these" << std::endl;
     }
     if (flags & DSDESC_CAPS) {
-        ss << "caps field is valid" << std::endl;
+        ss << "\tDSDESC_CAPS: caps field is valid" << std::endl;
     }
     if (flags & DSDESC_WIDTH) {
-        ss << "width field is valid" << std::endl;
+        ss << "\tDSDESC_WIDTH: width field is valid" << std::endl;
     }
     if (flags & DSDESC_HEIGHT) {
-        ss << "height field is valid" << std::endl;
+        ss << "\tDSDESC_HEIGHT: height field is valid" << std::endl;
     }
     if (flags & DSDESC_PIXELFORMAT) {
-        ss << "pixelformat field is valid" << std::endl;
+        ss << "\tDSDESC_PIXELFORMAT: pixelformat field is valid" << std::endl;
     }
     if (flags & DSDESC_PREALLOCATED) {
-        ss << "Surface uses data that has been preallocated by the application" << std::endl;
+        ss << "\tDSDESC_PREALLOCATED: Surface uses data that has been preallocated by the application" << std::endl;
     }
     if (flags & DSDESC_PALETTE) {
-        ss << "Initialize the surfaces palette with the entries specified in the description" << std::endl;
+        ss << "\tDSDESC_PALETTE: Initialize the surfaces palette with the entries specified in the description" << std::endl;
     }
     if (flags & DSDESC_RESOURCE_ID) {
-        ss << "user defined resource id for general purpose surfaces is specified, or resource id of window, layer, user is returned" << std::endl;
+        ss << "\tDSDESC_RESOURCE_ID: user defined resource id for general purpose surfaces is specified, or resource id of window, layer, user is returned" << std::endl;
     }
 #ifdef DSDESC_HINTS
     if (flags & DSDESC_HINTS) {
-        ss << "Flags for optimized allocation and pixel format selection are set. See also DFBSurfaceHintFlags" << std::endl;
+        ss << "\tDSDESC_HINTS: Flags for optimized allocation and pixel format selection are set. See also DFBSurfaceHintFlags" << std::endl;
     }
 #endif
 
     if (flags & DSDESC_ALL) {
-        ss << "\tall of these" << std::endl;
+        ss << "\tDSDESC_ALL: all of these" << std::endl;
     }
 
     std::cerr << "Surfce Description FLags: " << ss.str();
@@ -968,7 +961,7 @@ DirectFBDevice::printSurfaceCapabilities(DFBSurfaceCapabilities caps)
     std::stringstream ss;
 
     if (caps == DSCAPS_NONE) {
-        ss << "\tNone of these" << std::endl;
+        ss << "\tDSCAPS_NONE: None of these" << std::endl;
     }
     if (caps & DSCAPS_PRIMARY) {
         ss << "\tDSCAPS_PRIMARY: It's the primary surface" << std::endl;
@@ -1024,7 +1017,7 @@ DirectFBDevice::printSurfaceCapabilities(DFBSurfaceCapabilities caps)
     }
 #endif
     if (caps & DSCAPS_ALL) {
-        ss << "\tDSCAPS_ALL: Sll of these." << std::endl;
+        ss << "\tDSCAPS_ALL: All of these." << std::endl;
     }
     if (caps & DSCAPS_FLIPPING) {
         ss << "\tDSCAPS_FLIPPING: Surface needs Flip() calls to make updates/changes visible/usable: ";
@@ -1040,133 +1033,133 @@ DirectFBDevice::printSurfacePixelFormat(DFBSurfacePixelFormat format)
     std::stringstream ss;
 
     if (format == DSPF_UNKNOWN) {
-        ss << "\tunknown or unspecified format" << std::endl;
+        ss << "\tDSPF_UNKNOWN: unknown or unspecified format" << std::endl;
     }
     if (format & DSPF_ARGB1555) {
-        ss << "\t16 bit ARGB (2 byte, alpha 1@15, red 5@10, green 5@5, blue 5@0)" << std::endl;
+        ss << "\tDSPF_ARGB1555: 16 bit ARGB (2 byte, alpha 1@15, red 5@10, green 5@5, blue 5@0)" << std::endl;
     }
     if (format & DSPF_RGB16) {
-        ss << "\t16 bit RGB (2 byte, red 5@11, green 6@5, blue 5@0)" << std::endl;
+        ss << "\tDSPF_RGB1: 16 bit RGB (2 byte, red 5@11, green 6@5, blue 5@0)" << std::endl;
     }
     if (format & DSPF_RGB24) {
-        ss << "\t24 bit RGB (3 byte, red 8@16, green 8@8, blue 8@0)" << std::endl;
+        ss << "\tDSPF_RGB24: 24 bit RGB (3 byte, red 8@16, green 8@8, blue 8@0)" << std::endl;
     }
     if (format & DSPF_RGB32) {
-        ss << "\t24 bit RGB (4 byte, nothing@24, red 8@16, green 8@8, blue 8@0)" << std::endl;
+        ss << "\tDSPF_RGB32: 24 bit RGB (4 byte, nothing@24, red 8@16, green 8@8, blue 8@0)" << std::endl;
     }
     if (format & DSPF_ARGB) {
-        ss << "\t32 bit ARGB (4 byte, alpha 8@24, red 8@16, green 8@8, blue 8@0)" << std::endl;
+        ss << "\tDSPF_ARGB: 32 bit ARGB (4 byte, alpha 8@24, red 8@16, green 8@8, blue 8@0)" << std::endl;
     }
     if (format & DSPF_A8) {
-        ss << "\t8 bit alpha (1 byte, alpha 8@0), e.g. anti-aliased glyphs" << std::endl;
+        ss << "\tDSPF_A8: 8 bit alpha (1 byte, alpha 8@0), e.g. anti-aliased glyphs" << std::endl;
     }
     if (format & DSPF_YUY2) {
-        ss << "\t16 bit YUV (4 byte/ 2 pixel, macropixel contains CbYCrY [31:0])" << std::endl;
+        ss << "\tDSPF_YUY2: 16 bit YUV (4 byte/ 2 pixel, macropixel contains CbYCrY [31:0])" << std::endl;
     }
     if (format & DSPF_RGB332) {
-        ss << "\t8 bit RGB (1 byte, red 3@5, green 3@2, blue 2@0)" << std::endl;
+        ss << "\tDSPF_RGB332: 8 bit RGB (1 byte, red 3@5, green 3@2, blue 2@0)" << std::endl;
     }
     if (format & DSPF_UYVY) {
-        ss << "\t16 bit YUV (4 byte/ 2 pixel, macropixel contains YCbYCr [31:0])" << std::endl;
+        ss << "\tDSPF_UYVY: 16 bit YUV (4 byte/ 2 pixel, macropixel contains YCbYCr [31:0])" << std::endl;
     }
     if (format & DSPF_I420) {
-        ss << "\t12 bit YUV (8 bit Y plane followed by 8 bit quarter size U/V planes)" << std::endl;
+        ss << "\tDSPF_I420: 12 bit YUV (8 bit Y plane followed by 8 bit quarter size U/V planes)" << std::endl;
     }
     if (format & DSPF_YV12) {
-        ss << "\t12 bit YUV (8 bit Y plane followed by 8 bit quarter size V/U planes)" << std::endl;
+        ss << "\tDSPF_YV12: 12 bit YUV (8 bit Y plane followed by 8 bit quarter size V/U planes)" << std::endl;
     }
     if (format & DSPF_LUT8) {
-        ss << "\t8 bit LUT (8 bit color and alpha lookup from palette)" << std::endl;
+        ss << "\tDSPF_LUT8: 8 bit LUT (8 bit color and alpha lookup from palette)" << std::endl;
     }
     if (format & DSPF_ALUT44) {
-        ss << "\t8 bit ALUT (1 byte, alpha 4@4, color lookup 4@0)" << std::endl;
+        ss << "\tDSPF_ALUT44: 8 bit ALUT (1 byte, alpha 4@4, color lookup 4@0)" << std::endl;
     }
     if (format & DSPF_AiRGB) {
-        ss << "\t32 bit ARGB (4 byte, inv. alpha 8@24, red 8@16, green 8@8, blue 8@0)" << std::endl;
+        ss << "\tDSPF_AiRGB: 32 bit ARGB (4 byte, inv. alpha 8@24, red 8@16, green 8@8, blue 8@0)" << std::endl;
     }
     if (format & DSPF_A1) {
-        ss << "\t1 bit alpha (1 byte/ 8 pixel, most significant bit used first)" << std::endl;
+        ss << "\tDSPF_A1: 1 bit alpha (1 byte/ 8 pixel, most significant bit used first)" << std::endl;
     }
     if (format & DSPF_NV12) {
-        ss << "\t12 bit YUV (8 bit Y plane followed by one 16 bit quarter size Cb|Cr [7:0|7:0] plane)" << std::endl;
+        ss << "\tDSPF_NV12: 12 bit YUV (8 bit Y plane followed by one 16 bit quarter size Cb|Cr [7:0|7:0] plane)" << std::endl;
     }
     if (format & DSPF_NV16) {
-        ss << "\t16 bit YUV (8 bit Y plane followed by one 16 bit half width Cb|Cr [7:0|7:0] plane)" << std::endl;
+        ss << "\tDSPF_NV16: 16 bit YUV (8 bit Y plane followed by one 16 bit half width Cb|Cr [7:0|7:0] plane)" << std::endl;
     }
     if (format & DSPF_ARGB2554) {
-        ss << "\t16 bit ARGB (2 byte, alpha 2@14, red 5@9, green 5@4, blue 4@0)" << std::endl;
+        ss << "\tDSPF_ARGB2554: 16 bit ARGB (2 byte, alpha 2@14, red 5@9, green 5@4, blue 4@0)" << std::endl;
     }
     if (format & DSPF_ARGB4444) {
-        ss << "\t16 bit ARGB (2 byte, alpha 4@12, red 4@8, green 4@4, blue 4@0)" << std::endl;
+        ss << "\tDSPF_ARGB4444: 16 bit ARGB (2 byte, alpha 4@12, red 4@8, green 4@4, blue 4@0)" << std::endl;
     }
 #ifdef DSPF_RGBA4444
     if (format & DSPF_RGBA4444) {
-        ss << "\t16 bit RGBA (2 byte, red 4@12, green 4@8, blue 4@4, alpha 4@0)" << std::endl;
+        ss << "\tDSPF_RGBA4444: 16 bit RGBA (2 byte, red 4@12, green 4@8, blue 4@4, alpha 4@0)" << std::endl;
     }
 #endif
     if (format & DSPF_NV21) {
-        ss << "\t12 bit YUV (8 bit Y plane followed by one 16 bit quarter size Cr|Cb [7:0|7:0] plane)" << std::endl;
+        ss << "\tDSPF_NV21: 12 bit YUV (8 bit Y plane followed by one 16 bit quarter size Cr|Cb [7:0|7:0] plane)" << std::endl;
     }
     if (format & DSPF_AYUV) {
-        ss << "\t32 bit AYUV (4 byte, alpha 8@24, Y 8@16, Cb 8@8, Cr 8@0)" << std::endl;
+        ss << "\t3DSPF_AYUV: 2 bit AYUV (4 byte, alpha 8@24, Y 8@16, Cb 8@8, Cr 8@0)" << std::endl;
     }
     if (format & DSPF_A4) {
-        ss << "\t4 bit alpha (1 byte/ 2 pixel, more significant nibble used first)" << std::endl;
+        ss << "\tDSPF_A4: 4 bit alpha (1 byte/ 2 pixel, more significant nibble used first)" << std::endl;
     }
     if (format & DSPF_ARGB1666) {
-        ss << "\t1 bit alpha (3 byte/ alpha 1@18, red 6@12, green 6@6, blue 6@0)" << std::endl;
+        ss << "\tDSPF_ARGB1666: 1 bit alpha (3 byte/ alpha 1@18, red 6@12, green 6@6, blue 6@0)" << std::endl;
     }
     if (format & DSPF_ARGB6666) {
-        ss << "\t6 bit alpha (3 byte/ alpha 6@18, red 6@12, green 6@6, blue 6@0)" << std::endl;
+        ss << "\tDSPF_ARGB6666: 6 bit alpha (3 byte/ alpha 6@18, red 6@12, green 6@6, blue 6@0)" << std::endl;
     }
     if (format & DSPF_RGB18) {
-        ss << "\t6 bit RGB (3 byte/ red 6@12, green 6@6, blue 6@0)" << std::endl;
+        ss << "\tDSPF_RGB18: 6 bit RGB (3 byte/ red 6@12, green 6@6, blue 6@0)" << std::endl;
     }
     if (format & DSPF_LUT2) {
-        ss << "\t2 bit LUT (1 byte/ 4 pixel, 2 bit color and alpha lookup from palette)" << std::endl;
+        ss << "\tDSPF_LUT2: 2 bit LUT (1 byte/ 4 pixel, 2 bit color and alpha lookup from palette)" << std::endl;
     }
     if (format & DSPF_RGB444) {
-        ss << "\t16 bit RGB (2 byte, nothing @12, red 4@8, green 4@4, blue 4@0)" << std::endl;
+        ss << "\tDSPF_RGB444: 16 bit RGB (2 byte, nothing @12, red 4@8, green 4@4, blue 4@0)" << std::endl;
     }
     if (format & DSPF_RGB555) {
-        ss << "\t16 bit RGB (2 byte, nothing @15, red 5@10, green 5@5, blue 5@0)" << std::endl;
+        ss << "\tDSPF_RGB555: 16 bit RGB (2 byte, nothing @15, red 5@10, green 5@5, blue 5@0)" << std::endl;
     }
     if (format & DSPF_BGR555) {
-        ss << "\t16 bit BGR (2 byte, nothing @15, blue 5@10, green 5@5, red 5@0)" << std::endl;
+        ss << "\tDSPF_BGR555: 16 bit BGR (2 byte, nothing @15, blue 5@10, green 5@5, red 5@0)" << std::endl;
     }
 #ifdef DSPF_RGBA5551
     if (format & DSPF_RGBA5551) {
-        ss << "\t16 bit RGBA (2 byte, red 5@11, green 5@6, blue 5@1, alpha 1@0)" << std::endl;
+        ss << "\tDSPF_RGBA5551: 16 bit RGBA (2 byte, red 5@11, green 5@6, blue 5@1, alpha 1@0)" << std::endl;
     }
 #endif
 #ifdef DSPF_YUV444P
     if (format & DSPF_YUV444P) {
-        ss << "\t24 bit full YUV planar (8 bit Y plane followed by an 8 bit Cb and an 8 bit Cr plane)" << std::endl;
+        ss << "\tDSPF_YUV444P: 24 bit full YUV planar (8 bit Y plane followed by an 8 bit Cb and an 8 bit Cr plane)" << std::endl;
     }
 #endif
 #ifdef DSPF_ARGB8565
     if (format & DSPF_ARGB8565) {
-        ss << "\t24 bit ARGB (3 byte, alpha 8@16, red 5@11, green 6@5, blue 5@0)" << std::endl;
+        ss << "\tDSPF_ARGB8565: 24 bit ARGB (3 byte, alpha 8@16, red 5@11, green 6@5, blue 5@0)" << std::endl;
     }
 #endif
 #ifdef DSPF_AVYU
     if (format & DSPF_AVYU) {
-        ss << "\t32 bit AVYU 4:4:4 (4 byte, alpha 8@24, Cr 8@16, Y 8@8, Cb 8@0)" << std::endl;
+        ss << "\tDSPF_AVYU: 32 bit AVYU 4:4:4 (4 byte, alpha 8@24, Cr 8@16, Y 8@8, Cb 8@0)" << std::endl;
     }
 #endif
 #ifdef  DSPF_VYU
     if (format & DSPF_VYU) {
-        ss << "\t24 bit VYU 4:4:4 (3 byte, Cr 8@16, Y 8@8, Cb 8@0)" << std::endl;
+        ss << "\tDSPF_VYU: 24 bit VYU 4:4:4 (3 byte, Cr 8@16, Y 8@8, Cb 8@0)" << std::endl;
     }
 #endif
 #ifdef DSPF_A1_LSB
     if (format & DSPF_A1_LSB) {
-        ss << "\t1 bit alpha (1 byte/ 8 pixel, LEAST significant bit used first)" << std::endl;
+        ss << "\tDSPF_A1_LSB: 1 bit alpha (1 byte/ 8 pixel, LEAST significant bit used first)" << std::endl;
     }
 #endif
 #ifdef DSPF_YV16
     if (format & DSPF_YV16) {
-        ss << "\t16 bit YUV (8 bit Y plane followed by 8 bit 2x1 subsampled V/U planes" << std::endl;
+        ss << "\tDSPF_YV16: 16 bit YUV (8 bit Y plane followed by 8 bit 2x1 subsampled V/U planes" << std::endl;
     }
 #endif
 

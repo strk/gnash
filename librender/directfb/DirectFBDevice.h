@@ -135,7 +135,6 @@ class DirectFBDevice : public GnashDevice
 	}
 	return 0;
     }
-    
     bool isSurfaceBackBuffered() {
         if (_surface) {
             DFBSurfaceCapabilities caps;
