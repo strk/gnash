@@ -60,7 +60,12 @@ main(int argc, char *argv[])
     }    
 #endif
 
-    if (dfb.initDevice(argc, argv)) {
+    bool ret = dfb.initDevice(argc, argv);
+    if (ret <= 0) {
+        exit(0);
+    }
+    
+    if (ret) {
         runtest.pass("DirectFBDevice:InitDevice()");
     } else {
         runtest.fail("DirectFBDevice:InitDevice()");
