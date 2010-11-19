@@ -23,8 +23,6 @@ VPATH += $(srcdir)/asobj/
 # class. The header file is generated at build time.
 BUILT_SOURCES =
 
-# pkglib_LTLIBRARIES += libgnashasobjs.la 
-
 libgnashasobjs_la_SOURCES = \
 	asobj/ASConversions.cpp \
 	asobj/AsBroadcaster.cpp \
@@ -110,24 +108,6 @@ EXTENSIONS_API += \
 	asobj/Key_as.h \
 	$(NULL)
 
-# libgnashasobjs_la_LIBADD = \
-# 	$(top_builddir)/libbase/libgnashbase.la
-
-# if USE_FFMPEG_ENGINE
-# AM_CPPFLAGS += $(FFMPEG_CFLAGS) \
-# 	$(SDL_CFLAGS) \
-# 	-I$(top_srcdir)/libmedia/ffmpeg
-# libgnashasobjs_la_LIBADD += $(FFMPEG_LIBS) \
-# 	$(SDL_LIBS)
-# endif
-
-# if USE_GST_ENGINE
-# AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
-# 	-I$(top_srcdir)/libmedia/gst
-# libgnashasobjs_la_LIBADD += $(GSTREAMER_LIBS) \
-# 	$(SDL_LIBS)
-# endif
-
 # These makefile fragments build the ActionScript library for
 # Gnash, and supports both AS2 as well as AS3, so we always
 # want to build.
@@ -145,10 +125,4 @@ libgnashasobjs_la_SOURCES += \
 noinst_HEADERS += \
 	asobj/flash/flash_pkg.h \
 	$(NULL)
-
-#libgnashasobjs_la_LDFLAGS = -release $(VERSION) -no-undefined -export-dynamic
-
-# if WIN32
-#   libgnashasobjs_la_LDFLAGS = -no-undefined
-# endif
 
