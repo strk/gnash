@@ -811,7 +811,7 @@ class IsEnumerable
 public:
     IsEnumerable() {}
     bool operator()(const Property& p) const {
-        return !p.getFlags().get_dont_enum();
+        return !p.getFlags().test<PropFlags::dontEnum>();
     }
 };
 

@@ -90,64 +90,30 @@ public:
         return !(*this == o);
 	}
 
-	/// Get "read-only" flag 
-	bool get_read_only() const {
-	    return (_flags & readOnly);
-	}
-
-	/// Set "read-only" flag 
-	void set_read_only() { _flags |= readOnly; }
-
-	/// Clear "read-only" flag 
-	void clear_read_only() { _flags &= ~readOnly; }
-
-	/// Get "don't delete" flag
-	bool get_dont_delete() const
-	{
-	    return (_flags & dontDelete);
-	}
-
-	/// Set "don't delete" flag
-	void set_dont_delete() { _flags |= dontDelete; }
-
-	/// Clear "don't delete" flag 
-	void clear_dont_delete() { _flags &= ~dontDelete; }
-
-	/// Get "don't enum" flag
-	bool get_dont_enum() const {
-	    return (_flags & dontEnum);
-	}
-
-	/// Set "don't enum" flag
-	void set_dont_enum() { _flags |= dontEnum; }
-
-	/// Clear "don't enum" flag 
-	void clear_dont_enum() { _flags &= ~dontEnum; }
+    template<Flags f>
+    bool test() const {
+        return (_flags & f);
+    }
 
 	/// Get version-based visibility 
-	bool get_visible(int swfVersion) const
-	{
-		if ( _flags & onlySWF6Up && swfVersion < 6 ) return false;
-		if ( _flags & ignoreSWF6 && swfVersion == 6 ) return false;
-		if ( _flags & onlySWF7Up && swfVersion < 7 ) return false;
-		if ( _flags & onlySWF8Up && swfVersion < 8 ) return false;
-		if ( _flags & onlySWF9Up && swfVersion < 9 ) return false;
+	bool get_visible(int swfVersion) const {
+		if (test<onlySWF6Up>() && swfVersion < 6) return false;
+		if (test<ignoreSWF6>() && swfVersion == 6) return false;
+		if (test<onlySWF7Up>() && swfVersion < 7) return false;
+		if (test<onlySWF8Up>() && swfVersion < 8) return false;
+		if (test<onlySWF9Up>() && swfVersion < 9) return false;
 		return true;
 	}
 
-	void clear_visible(int swfVersion) 
-	{
-		if ( swfVersion == 6)
-		{
+	void clear_visible(int swfVersion) {
+		if (swfVersion == 6) {
 			// version 6, so let's forget onlySWF7Up flag!
 			// we will still set the value though, even if that flag is set
 			_flags &= ~(onlySWF6Up|ignoreSWF6|onlySWF8Up|onlySWF9Up);
 		}
-		else
-		{
+		else {
 			_flags &= ~(onlySWF6Up|ignoreSWF6|onlySWF7Up|onlySWF8Up|onlySWF9Up);
 		}
-		
 	}
 
 	/// accessor to the numerical flags value
@@ -158,16 +124,10 @@ public:
 	/// you cannot un-protect from deletion and you cannot
 	/// un-hide from the for..in loop construct
 	///
-	/// @param setTrue
-	///	the set of flags to set
-	///
-	/// @param setFalse
-	///	the set of flags to clear
-	///
-	/// @return true on success, false on failure (is protected)
-	///
-	bool set_flags(boost::uint16_t setTrue, boost::uint16_t setFalse = 0)
-	{
+	/// @param setTrue  the set of flags to set
+	/// @param setFalse the set of flags to clear
+	/// @return         true on success, false on failure (is protected)
+	bool set_flags(boost::uint16_t setTrue, boost::uint16_t setFalse = 0) {
 		_flags &= ~setFalse;
 		_flags |= setTrue;
 		return true;
@@ -181,14 +141,13 @@ private:
 };
 
 inline std::ostream&
-operator << (std::ostream& os, const PropFlags& fl)
+operator<<(std::ostream& os, const PropFlags& fl)
 {
 	os << "(";
-	if ( fl.get_read_only() ) os << " readonly";
-	if ( fl.get_dont_delete() ) os << " nodelete";
-	if ( fl.get_dont_enum() ) os << " noenum";
+	if (fl.test<PropFlags::readOnly>()) os << " readonly";
+	if (fl.test<PropFlags::dontDelete>()) os << " nodelete";
+	if (fl.test<PropFlags::dontEnum>()) os << " noenum";
 	os << " )";
-	// TODO: visibility flags
 	return os;
 }
 

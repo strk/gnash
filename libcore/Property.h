@@ -421,7 +421,7 @@ private:
 /// is this a read-only member ?
 inline bool
 readOnly(const Property& prop) {
-    return prop.getFlags().get_read_only();
+    return prop.getFlags().test<PropFlags::readOnly>();
 }
 
 /// Is this member supposed to be visible by a VM of given version ?

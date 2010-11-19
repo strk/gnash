@@ -822,7 +822,7 @@ public:
   /// remain the same. 
   /// rowstride is the size, in bytes, of one row.
   /// This method *must* be called prior to any other method of the class!
-  void init_buffer(unsigned char *mem, int size, int x, int y, int rowstride)
+  void init_buffer(unsigned char *mem, int /*size*/, int x, int y, int rowstride)
   {
         assert(x > 0);
         assert(y > 0);
@@ -880,6 +880,8 @@ public:
             case image::TYPE_RGBA:
                 in.reset(new Renderer_agg<typename RGBA::PixelFormat>(32));
                 break;
+            default:
+                std::abort();
         }
  
         const size_t width = im.width();

@@ -39,31 +39,65 @@ main(int /*argc*/, char** /*argv*/)
 	PropFlags flags;
 
 	// Check initial state
-	check(!flags.get_read_only());
-	check(!flags.get_dont_enum());
-	check(!flags.get_dont_delete());
+	check(!flags.test<PropFlags::readOnly>());
+	check(!flags.test<PropFlags::dontEnum>());
+	check(!flags.test<PropFlags::dontDelete>());
 	check_equals(flags.get_flags(), 0);
 
-	// Now set some flags and check result
+    PropFlags flags2(PropFlags::dontDelete | PropFlags::dontEnum);
+    check(flags2.test<PropFlags::dontEnum>());
+    check(flags2.test<PropFlags::dontDelete>());
+    check(!flags2.test<PropFlags::readOnly>());
 
-	flags.set_read_only();
-	check(flags.get_read_only());
+    PropFlags i;
+    check(i.get_visible(5));
+    check(i.get_visible(6));
+    check(i.get_visible(7));
+    check(i.get_visible(8));
+    check(i.get_visible(9));
 
-	flags.set_dont_enum();
-	check(flags.get_dont_enum());
+    i.set_flags(PropFlags::onlySWF6Up);
+    check(!i.get_visible(5));
+    check(i.get_visible(6));
+    check(i.get_visible(7));
+    check(i.get_visible(8));
+    check(i.get_visible(9));
 
-	flags.set_dont_delete();
-	check(flags.get_dont_delete());
+    i.set_flags(PropFlags::onlySWF7Up);
+    check(!i.get_visible(5));
+    check(!i.get_visible(6));
+    check(i.get_visible(7));
+    check(i.get_visible(8));
+    check(i.get_visible(9));
 
-	// Now clear the flags and check result
+    i.set_flags(PropFlags::onlySWF8Up);
+    check(!i.get_visible(5));
+    check(!i.get_visible(6));
+    check(!i.get_visible(7));
+    check(i.get_visible(8));
+    check(i.get_visible(9));
 
-	flags.clear_read_only();
-	check(!flags.get_read_only());
+    i.set_flags(PropFlags::onlySWF9Up);
+    check(!i.get_visible(5));
+    check(!i.get_visible(6));
+    check(!i.get_visible(7));
+    check(!i.get_visible(8));
+    check(i.get_visible(9));
 
-	flags.clear_dont_enum();
-	check(!flags.get_dont_enum());
+    PropFlags i2;
+    i2.set_flags(PropFlags::onlySWF8Up);
+    check(!i2.get_visible(5));
+    check(!i2.get_visible(6));
+    check(!i2.get_visible(7));
+    check(i2.get_visible(8));
+    check(i2.get_visible(9));
 
-	flags.clear_dont_delete();
-	check(!flags.get_dont_delete());
+    PropFlags i3;
+    i3.set_flags(PropFlags::ignoreSWF6);
+    check(i3.get_visible(5));
+    check(!i3.get_visible(6));
+    check(i3.get_visible(7));
+    check(i3.get_visible(8));
+    check(i3.get_visible(9));
 }
 

@@ -168,7 +168,7 @@ PropertyList::delProperty(const ObjectURI& uri)
 	}
 
 	// check if member is protected from deletion
-	if (found->getFlags().get_dont_delete()) {
+	if (found->getFlags().test<PropFlags::dontDelete>()) {
 		return std::make_pair(true, false);
 	}
 
@@ -184,7 +184,7 @@ PropertyList::visitKeys(KeyVisitor& visitor, PropertyTracker& donelist)
 	for (const_iterator i = _props.begin(),
             ie = _props.end(); i != ie; ++i) {
 
-		if (i->getFlags().get_dont_enum()) continue;
+		if (i->getFlags().test<PropFlags::dontEnum>()) continue;
 
         const ObjectURI& uri = i->uri();
 

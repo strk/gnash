@@ -391,7 +391,7 @@ object_isPropertyEnumerable(const fn_call& fn)
         return as_value(false);
     }
 
-    return as_value(!prop->getFlags().get_dont_enum());
+    return as_value(!prop->getFlags().test<PropFlags::dontEnum>());
 }
 
 
