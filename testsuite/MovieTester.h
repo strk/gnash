@@ -373,7 +373,9 @@ private:
 	/// Virtual clock to use to let test runners
 	/// control time flow
 	ManualClock _clock;
-	//std::auto_ptr<VirtualClock> _clock;
+
+	/// number of samples fetched 
+	unsigned int _samplesFetched;      
 };
 
 // exp2 isn't part of standard C++, so is defined here in case the compiler

@@ -72,7 +72,8 @@ namespace gnash {
 
 MovieTester::MovieTester(const std::string& url)
     :
-    _forceRedraw(true)
+    _forceRedraw(true),
+    _samplesFetched(0)
 {
     
     // Initialize the testing media handlers
@@ -233,25 +234,30 @@ MovieTester::render()
 }
     
 void
-MovieTester::advanceClock(unsigned long ms)
+MovieTester::advanceClock(unsigned long ms_current)
 {
-    _clock.advance(ms);
+    _clock.advance(ms_current);
     
     if ( _sound_handler ) {
+
+        unsigned int ms = _clock.elapsed();
+
         // We need to fetch as many samples
         // as needed for a theoretical 44100hz loop.
         // That is 44100 samples each second.
         // 44100/1000 = x/ms
         //  x = (44100*ms) / 1000
         unsigned int nSamples = (441*ms) / 10;
-        if ( ms%10 ) {
-            log_error("MovieTester::advanceClock: %d ms lost in sound advancement",
-		      ms%10);
-        }
 	
         // We double because sound_handler interface takes
         // "mono" samples... (eh.. would be wise to change)
         unsigned int toFetch = nSamples*2;
+
+        // Now substract what we fetched already
+        toFetch -= _samplesFetched;
+
+        // And update _samplesFetched..
+        _samplesFetched += toFetch;
 	
         log_debug("advanceClock(%d) needs to fetch %d samples", ms, toFetch);
 	
