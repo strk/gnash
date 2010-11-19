@@ -586,8 +586,10 @@ MovieTester::initTestingSoundHandlers()
     // w/out a registered MediaHandler .
     // Should be fixed though...
     if (_mediaHandler.get()) {
-        log_error("MediaHandler::get returns: %s", _mediaHandler.get());
         _sound_handler.reset(new sound::NullSoundHandler(_mediaHandler.get()));
+    } else {
+        log_error("No media handler available, "
+            "could not construct sound handler");
     }
 }
 
