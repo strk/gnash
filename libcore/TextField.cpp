@@ -1504,7 +1504,12 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             if (attloc != attributes.end()) {
                                 std::string hexval(attloc->second);
                                 if (hexval.empty() || hexval[0] != '#') {
-                                    log_error("Unexpected color value");
+                                    // FIXME: should this be a log_aserror
+                                    //        or log_unimpl ? It is triggered
+                                    //        by TextFieldHTML.as
+                                    log_error("Unexpected value '%s' in "
+                                        "TextField font color attribute",
+                                        hexval);
                                 }
                                 else {
                                     hexval.erase(0, 1);
