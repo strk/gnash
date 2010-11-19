@@ -2473,7 +2473,7 @@ if test x"$build_media_gst" = "xyes"; then
   dnl files but not the libraries.
   if test x"${has_gstreamer_plugins_base}" = xyes; then
     GSTREAMER_LIBS="-lgstinterfaces-0.10 $GSTREAMER_LIBS"
-    AC_DEFINE(HAS_GSTREAMER_PLUGINS_BASE, [1], "Has the Gstreamer Plugin Dev package installed.")
+    AC_DEFINE(HAS_GSTREAMER_PLUGINS_BASE, [1], [Has the Gstreamer Plugin Dev package installed])
   fi
 fi
 
@@ -3241,9 +3241,11 @@ if test x"$build_media_gst" = x"yes"; then
       echo "                     or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&5
     fi
     if test x"$has_gstreamer_plugins_base" = "xno"; then
-      echo "                        Install gstreamer-plugins-base from http://www.gstreamer.net" >&5
-      echo "                        or .rpm users: yum install gstreamer-plugins-base-devel" >&5
-      echo "                        or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&5
+      dnl check if this is really a mandatory asset !
+      echo "        ERROR: base plugins are required for gstreamer media" >&3
+      echo "                        Install gstreamer-plugins-base from http://www.gstreamer.net" >&3
+      echo "                        or .rpm users: yum install gstreamer-plugins-base-devel" >&3
+      echo "                        or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&3
     fi
   else
     echo "        ERROR: GST media handling requested but gstreamer-0.10+ not found" >&3
