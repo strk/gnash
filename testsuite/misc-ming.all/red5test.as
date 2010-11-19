@@ -31,10 +31,7 @@ endOfTest = function()
 };
 
 // -P FlashVars='hostname=localhost,rtmptport5080=rtmpport=1935'
-if (hostname == undefined) {
-    hostname="gnashdev.org";
-    note("No hostname specified, defaulting to "+hostname);
-}
+hostname = RED5_HOST;
 
 if (rtmpport == undefined) {
     rtmpport = 1935;

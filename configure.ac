@@ -2221,10 +2221,10 @@ if test x$cross_compiling = xno; then
   AC_ARG_ENABLE([red5_testing],
       dnl # TODO: find out how to add [quotes] around '=<baseurl>'
 	  AC_HELP_STRING([--enable-red5-testing=<host>],
-		  [Enable red5 based testing (default host is localhost)]),
+		  [Enable red5 based testing (default host is www.gnashdev.org)]),
 	      [case "${enableval}" in
              no) RED5_HOST="" ;;
-            yes) RED5_HOST="localhost" ;;
+            yes) RED5_HOST="www.gnashdev.org" ;;
               *) RED5_HOST="${enableval}";;
            esac])
   AC_SUBST(RED5_HOST)
@@ -2473,7 +2473,7 @@ if test x"$build_media_gst" = "xyes"; then
   dnl files but not the libraries.
   if test x"${has_gstreamer_plugins_base}" = xyes; then
     GSTREAMER_LIBS="-lgstinterfaces-0.10 $GSTREAMER_LIBS"
-    AC_DEFINE(HAS_GSTREAMER_PLUGINS_BASE, [1], "Has the Gstreamer Plugin Dev package installed.")
+    AC_DEFINE(HAS_GSTREAMER_PLUGINS_BASE, [1], [Has the Gstreamer Plugin Dev package installed])
   fi
 fi
 
@@ -3241,9 +3241,11 @@ if test x"$build_media_gst" = x"yes"; then
       echo "                     or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&5
     fi
     if test x"$has_gstreamer_plugins_base" = "xno"; then
-      echo "                        Install gstreamer-plugins-base from http://www.gstreamer.net" >&5
-      echo "                        or .rpm users: yum install gstreamer-plugins-base-devel" >&5
-      echo "                        or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&5
+      dnl check if this is really a mandatory asset !
+      echo "        ERROR: base plugins are required for gstreamer media" >&3
+      echo "                        Install gstreamer-plugins-base from http://www.gstreamer.net" >&3
+      echo "                        or .rpm users: yum install gstreamer-plugins-base-devel" >&3
+      echo "                        or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&3
     fi
   else
     echo "        ERROR: GST media handling requested but gstreamer-0.10+ not found" >&3
