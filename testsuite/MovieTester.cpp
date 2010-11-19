@@ -58,7 +58,7 @@
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 
-#define SHOW_INVALIDATED_BOUNDS_ON_ADVANCE 1
+//#define SHOW_INVALIDATED_BOUNDS_ON_ADVANCE 1
 
 #ifdef SHOW_INVALIDATED_BOUNDS_ON_ADVANCE
 #include <sstream>
