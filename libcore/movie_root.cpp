@@ -2268,7 +2268,8 @@ movie_root::callInterface(const std::string& cmd, const std::string& arg) const
 {
     if (_interfaceHandler) return _interfaceHandler->call(cmd, arg);
 
-    log_error("Hosting application registered no callback for events/queries");
+    log_error("Hosting application registered no callback for events/queries"
+        ", can't call %s(%s)", cmd, arg);
 
     return "<no iface to hosting app>";
 }
