@@ -36,7 +36,7 @@ foreach file $testcases {
     # -open [open "|cmd" "r"] doesn't work for that
   
     # Ignore SIGHUP or we'd get a lot of them on Debian stable
-    spawn -noecho -ignore SIGHUP ./$file 
+    set PID [spawn -noecho -ignore SIGHUP ./$file]
 
     expect {
 	-re "^\[^\n]*NOTE:\[^\n]*\n" {
@@ -95,6 +95,7 @@ foreach file $testcases {
 	}
 	timeout {
 		fail "Test case ${file} still running after ${timeout} seconds, killing it (deadlock?)"
+		exec kill -9 $PID
 		catch close
 		continue;
 	}
