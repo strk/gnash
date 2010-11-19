@@ -16,8 +16,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "log.h"
 #include "Function.h"
+
+#include <algorithm>
+
+#include "log.h"
 #include "fn_call.h"
 #include "action_buffer.h"
 #include "ActionExec.h" 
@@ -148,12 +151,8 @@ Function::setLength(size_t len)
 void
 Function::markReachableResources() const
 {
-	// Mark scope stack objects
-	for (ScopeStack::const_iterator i = _scopeStack.begin(),
-            e = _scopeStack.end(); i != e; ++i)
-	{
-		(*i)->setReachable();
-	}
+    std::for_each(_scopeStack.begin(), _scopeStack.end(),
+        std::mem_fun(&as_object::setReachable));
 
 	_env.markReachableResources();
 
