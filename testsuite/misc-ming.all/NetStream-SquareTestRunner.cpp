@@ -54,7 +54,8 @@ main(int /*argc*/, char** /*argv*/)
 
 	if ( ! tester.canTestVideo() )
 	{
-		cout << "UNTESTED: NetStream video (not supported by this build)." << endl;
+		cout << "UNTESTED: NetStream video (not supported by this build)."
+		     << endl;
 		return EXIT_SUCCESS;
 	}
 
@@ -75,9 +76,7 @@ main(int /*argc*/, char** /*argv*/)
 		// sleep to give the NetStream a chance to load
         // data and trigger notifications
 		// needs more analisys to find a good way for doing this..
-        // TODO: sleep less ! GnashSleep !
         gnashSleep(10000); // 10 milliseconds should be enough for loading
-		//sleep(1);
 	}
 
 	cout << "Pressing space" << endl;
@@ -88,16 +87,16 @@ main(int /*argc*/, char** /*argv*/)
 	{
 		tester.advance();
 
-		// sleep to give the NetStream a chance to load data and trigger notifications
+		// sleep to give the NetStream a chance to
+		// load data and trigger notifications
 		// needs more analisys to find a good way for doing this..
-        // TODO: sleep less !!
         gnashSleep(10000); // 10 milliseconds should be enough for loading
-		//sleep(1);
 	}
 
 	// Consistency check 
 	as_value eot;
-	bool endOfTestFound = getObject(root)->get_member(st.find("end_of_test"), &eot);
+	bool endOfTestFound = getObject(root)->get_member(st.find("end_of_test"),
+		&eot);
 	check(endOfTestFound);
 
 }
