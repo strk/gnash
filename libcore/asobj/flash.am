@@ -33,6 +33,7 @@ libgnashasobjs_la_SOURCES = \
 	asobj/Color_as.cpp \
 	asobj/Date_as.cpp \
 	asobj/Error_as.cpp \
+	asobj/Function_as.cpp \
 	asobj/Global_as.cpp \
 	asobj/LoadVars_as.cpp \
 	asobj/Math_as.cpp \
@@ -72,6 +73,7 @@ inst_HEADERS = \
 	asobj/Color_as.h	\
 	asobj/Date_as.h \
 	asobj/Error_as.h	\
+	asobj/Function_as.h \
 	asobj/Math_as.h	\
 	asobj/Global_as.h\
 	asobj/LoadVars_as.h \

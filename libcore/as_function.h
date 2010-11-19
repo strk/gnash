@@ -20,7 +20,8 @@
 #define GNASH_AS_FUNCTION_H
 
 #include <string>
-#include "as_object.h" // for inheritance
+
+#include "as_object.h"
 
 // Forward declarations
 namespace gnash {
@@ -126,12 +127,6 @@ protected:
 ///                 function.
 as_object* constructInstance(as_function& ctor, const as_environment& env,
         FunctionArgs<as_value>& args);
-
-/// Initialize the global Function constructor
-void function_class_init(as_object& global, const ObjectURI& uri);
-
-/// Register Function native functions.
-void registerFunctionNative(as_object& global);
 
 } // gnash namespace
 
