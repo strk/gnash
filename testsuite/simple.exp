@@ -43,10 +43,16 @@ foreach file $testcases {
 	    regsub ".*NOTE: " $expect_out(0,string) "" output
 	    set output [string range $output 0 end-2]
 	    verbose "${file} $output" 
-            # notes tipically come from the test runner, so we'll trust it to mean 
-            # things are someone not too bad...
+	    # notes tipically come from the test runner, so we'll trust it to mean 
+	    # things are someone not too bad...
 	    # -continue_timer
 	    exp_continue
+	}
+	-re "^\[^\n]* ERROR:\[^\n]*\n" {
+	    regsub ".* ERROR: " $expect_out(0,string) "" output
+	    set output [string range $output 0 end-2]
+	    verbose "ERROR: ${file}: $output" 
+	    exp_continue -continue_timer
 	}
 	-re "^\[^\n]*XPASSED:\[^\n]*\n" {
 	    regsub ".*XPASSED: " $expect_out(0,string) "" output
