@@ -3,8 +3,10 @@ Makefile
 bzrversion.h
 .deps
 .libs
+*.o
 *.lo
 *.la
+*.moc
 bzrversion.h
 gnash.pc
 *site.bak
@@ -15,6 +17,7 @@ config.guess
 config.sub
 configure
 gnashconfig.h.in
+gnashconfig.h
 libltdl
 ltmain.sh
 po/*.gmo
@@ -49,7 +52,6 @@ gui/fb-gnash
 gui/riscos-gnash
 gui/fltk-gnash
 gui/aqua-gnash
-gui/*.moc
 gui/*.gcda
 doc/Doxyfile
 libbase/gnashpluginrc
@@ -289,7 +291,6 @@ testsuite/libamf.all/test_sol
 testsuite/libamf.all/testout.sol
 testsuite/actionscript.all/require-ming
 testsuite/actionscript.all/astests-v*-Runner
-gnashconfig.h
 testsuite/misc-haxe.all/*.swf
 testsuite/misc-haxe.all/PP_*
 testsuite/misc-haxe.all/*-runner
@@ -297,7 +298,6 @@ testsuite/misc-ming.all/SharedObjectTestRunner
 utilities/flvdumper
 testsuite/libbase/gnashrc
 testsuite/libbase/gnashrc-local
-plugin/klash/klash_part.moc
 libnet/gnash.log
 libnet/gnash.sum
 libnet/site.bak
@@ -311,7 +311,6 @@ doc/C/*.html
 doc/C/*.info
 cygnal/testsuite/cygnal.all/cygnalrc
 gui/Info.plist
-gui/klash.moc
 testsuite/Dejagnu.swf
 testsuite/tmpSharedObject
 testsuite/libamf.all/test_flv
@@ -391,3 +390,4 @@ testsuite/as3compile.all/sanetests-runner
 testsuite/libbase.all/gnashrc
 testsuite/libbase.all/gnashrc-local
 testsuite/libcore.all/CodeStreamTest
+testoutlog.*
