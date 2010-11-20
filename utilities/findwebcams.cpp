@@ -170,7 +170,7 @@ int main () {
         for (size_t i = 0; i < numdevs; ++i)
         {
             if (i == 0 && (vidVector[i] != 0)) {
-                g_print("    %d. Video Test Source (videotestsrc)\n", i, i);
+                g_print("    %d. Video Test Source (videotestsrc)\n", i);
                 counter++;
             } else if (i == 0 && (vidVector[i] == 0)) {
                 g_print("no test video device available");
