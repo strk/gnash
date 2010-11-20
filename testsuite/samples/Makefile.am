@@ -78,10 +78,6 @@ clip_as_button2_TestRunner_LDADD = \
 clip_as_button2_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(abs_srcdir)\" \
 	$(NULL)
-clip_as_button2_TestRunner_DEPENDENCIES = \
-	$(GNASH_LIBS) \
-	clip_as_button2.swf \
-	$(NULL)
 
 subshapes_TestRunner_SOURCES = \
 	subshapes-TestRunner.cpp \
@@ -92,10 +88,6 @@ subshapes_TestRunner_LDADD = \
 subshapes_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(abs_srcdir)\" \
 	$(NULL)
-subshapes_TestRunner_DEPENDENCIES = \
-	$(GNASH_LIBS) \
-	subshapes.swf \
-	$(NULL)
 
 gotoFrameOnKeyEvent_TestRunner_SOURCES = \
 	gotoFrameOnKeyEvent-TestRunner.cpp \
@@ -105,10 +97,6 @@ gotoFrameOnKeyEvent_TestRunner_LDADD = \
 	$(NULL)
 gotoFrameOnKeyEvent_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(abs_srcdir)\" \
-	$(NULL)
-gotoFrameOnKeyEvent_TestRunner_DEPENDENCIES = \
-	$(GNASH_LIBS) \
-	gotoFrameOnKeyEvent.swf \
 	$(NULL)
 
 GotoAndPlayTestRunner: $(srcdir)/../generic-testrunner.sh $(srcdir)/GotoAndPlayTest.swf
