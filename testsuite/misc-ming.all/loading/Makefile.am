@@ -26,7 +26,8 @@ CLEANFILES =  \
 	gnash-dbg.log \
 	site.exp.bak \
 	testrun.sum \
-	testrun.log
+	testrun.log \
+	*.swf *.pp *unner
 
 EXTRA_DIST = \
 	$(NULL)
@@ -165,8 +166,6 @@ LoadVarsTestRunner: $(srcdir)/../../generic-testrunner.sh LoadVarsTest.swf
 
 
 
-clean-local: 
-	-rm *.swf *.pp *unner
 
 TEST_DRIVERS = ../../simple.exp
 TEST_CASES = \
