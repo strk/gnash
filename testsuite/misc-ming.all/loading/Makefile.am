@@ -166,7 +166,6 @@ LoadVarsTestRunner: $(srcdir)/../../generic-testrunner.sh LoadVarsTest.swf
 
 
 
-
 TEST_DRIVERS = ../../simple.exp
 TEST_CASES = \
 	loadMovieTestRunner \
