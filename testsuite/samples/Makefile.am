@@ -29,17 +29,17 @@ CLEANFILES =  \
 AM_CPPFLAGS = \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libmedia \
-	-I$(top_srcdir)/libsound \
+        -I$(top_srcdir)/libsound \
         -I$(top_srcdir)/librender \
         -I$(top_srcdir)/libcore  \
         -I$(top_srcdir)/libcore/swf \
         -I$(top_srcdir)/libcore/parser  \
         -I$(top_srcdir)/libcore/vm  \
         -I$(top_srcdir)/testsuite \
-	$(OPENGL_CFLAGS) \
-	$(BOOST_CFLAGS) \
-	$(FFMPEG_CFLAGS) \
-	$(NULL)
+        $(OPENGL_CFLAGS) \
+        $(BOOST_CFLAGS) \
+        $(FFMPEG_CFLAGS) \
+        $(NULL)
 
 AM_LDFLAGS = \
 	$(OPENGL_LIBS) \
@@ -73,13 +73,13 @@ clip_as_button2_TestRunner_SOURCES = \
 	clip_as_button2-TestRunner.cpp \
 	$(NULL)
 clip_as_button2_TestRunner_LDADD = \
-	$(top_builddir)/testsuite/libtestsuite.la \
 	$(GNASH_LIBS) \
 	$(NULL)
 clip_as_button2_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(abs_srcdir)\" \
 	$(NULL)
 clip_as_button2_TestRunner_DEPENDENCIES = \
+	$(GNASH_LIBS) \
 	clip_as_button2.swf \
 	$(NULL)
 
@@ -87,13 +87,13 @@ subshapes_TestRunner_SOURCES = \
 	subshapes-TestRunner.cpp \
 	$(NULL)
 subshapes_TestRunner_LDADD = \
-	$(top_builddir)/testsuite/libtestsuite.la \
 	$(GNASH_LIBS) \
 	$(NULL)
 subshapes_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(abs_srcdir)\" \
 	$(NULL)
 subshapes_TestRunner_DEPENDENCIES = \
+	$(GNASH_LIBS) \
 	subshapes.swf \
 	$(NULL)
 
@@ -101,15 +101,14 @@ gotoFrameOnKeyEvent_TestRunner_SOURCES = \
 	gotoFrameOnKeyEvent-TestRunner.cpp \
 	$(NULL)
 gotoFrameOnKeyEvent_TestRunner_LDADD = \
-	$(top_builddir)/testsuite/libtestsuite.la \
 	$(GNASH_LIBS) \
 	$(NULL)
 gotoFrameOnKeyEvent_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(abs_srcdir)\" \
 	$(NULL)
 gotoFrameOnKeyEvent_TestRunner_DEPENDENCIES = \
-	gotoFrameOnKeyEvent.swf \
 	$(GNASH_LIBS) \
+	gotoFrameOnKeyEvent.swf \
 	$(NULL)
 
 GotoAndPlayTestRunner: $(srcdir)/../generic-testrunner.sh $(srcdir)/GotoAndPlayTest.swf
