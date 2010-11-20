@@ -166,7 +166,7 @@ LoadVarsTestRunner: $(srcdir)/../../generic-testrunner.sh LoadVarsTest.swf
 
 
 clean-local: 
-	-rm *.swf *.pp *unner
+	rm -f *.swf *.pp *unner
 
 TEST_DRIVERS = ../../simple.exp
 TEST_CASES = \
