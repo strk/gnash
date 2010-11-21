@@ -149,7 +149,7 @@ int main () {
         g_print("set microphoneDevice %d\n", dev_select);
     } else {
         numdevs = findAudioDevs(audioVector);
-        if (fromrc <= (audioVector.size() - 1)) {
+        if ((size_t)fromrc < audioVector.size()) {
             g_print("\nThe gnashrc file reports default microphone is set to:\n");
             g_print("%s (%s)\n", audioVector[fromrc]->deviceName,
                 audioVector[fromrc]->deviceType);
