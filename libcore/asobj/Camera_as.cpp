@@ -19,6 +19,11 @@
 
 
 #include "Camera_as.h"
+
+#include <sstream>
+#include <boost/scoped_ptr.hpp>
+#include <memory>
+
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -30,9 +35,7 @@
 #include "VideoInput.h"
 #include "RunResources.h"
 #include "Object.h"
-
 #include "namedStrings.h"
-#include <sstream>
 
 
 namespace gnash {
@@ -156,12 +159,12 @@ class Camera_as: public Relay
 {
 public:
 
-    Camera_as(media::VideoInput* input)
+    Camera_as(std::auto_ptr<media::VideoInput> input)
         :
-        _input(input),
+        _input(input.release()),
         _loopback(false)
     {
-        assert(input);
+        assert(_input.get());
     }
 
     bool muted() const {
@@ -232,7 +235,7 @@ public:
 
 private:
 
-    media::VideoInput* _input;
+    boost::scoped_ptr<media::VideoInput> _input;
 
     // TODO: see whether this should be handled in the VideoInput class
     bool _loopback;
@@ -262,13 +265,12 @@ camera_get(const fn_call& fn)
         log_error(_("No MediaHandler exists! Cannot create a Camera object"));
         return as_value();
     }
-    media::VideoInput* input = handler->getVideoInput(0);
+    std::auto_ptr<media::VideoInput> input(handler->getVideoInput(0));
 
-    if (!input) {
+    if (!input.get()) {
         // TODO: what should happen if the index is not available?
         return as_value();
     }
-
 
     const size_t nargs = fn.nargs;
     if (nargs > 0) {

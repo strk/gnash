@@ -19,6 +19,11 @@
 
 
 #include "Microphone_as.h"
+
+#include <algorithm>
+#include <boost/scoped_ptr.hpp>
+#include <memory>
+
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -34,7 +39,6 @@
 #include "RunResources.h"
 #include "namedStrings.h"
 
-#include <algorithm>
 
 namespace gnash {
 
@@ -145,11 +149,11 @@ class Microphone_as : public Relay
 
 public:
 
-    Microphone_as(media::AudioInput* input)
+    Microphone_as(std::auto_ptr<media::AudioInput> input)
         :
-        _input(input)
+        _input(input.release())
     {
-        assert(_input);
+        assert(_input.get());
     }
 
     /// Takes a value from 0..100
@@ -227,7 +231,7 @@ public:
     }
 
 private:
-    media::AudioInput* _input;
+    boost::scoped_ptr<media::AudioInput> _input;
 
 };
 
@@ -262,9 +266,9 @@ microphone_get(const fn_call& fn)
                     "object"));
         return as_value();
     }
-    media::AudioInput* input = handler->getAudioInput(0);
+    std::auto_ptr<media::AudioInput> input(handler->getAudioInput(0));
 
-    if (!input) {
+    if (!input.get()) {
         // TODO: what should happen if the index is not available?
         return as_value();
     }
