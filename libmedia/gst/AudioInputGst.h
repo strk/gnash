@@ -496,13 +496,7 @@ private:
     /// \brief Function returns the total number of devices detected (useful in
     ///  iterating through the _audioVect vector.
     /// @return The _numdevs private variable from the AudioInputGst class.
-    int getNumdevs() {return _numdevs;}
-    
-    /// \brief Function sets the private _numdevs variable in the AudioInputGst
-    /// class.
-    /// @param n The integer value representing the desired value to set _numdevs
-    /// to.
-    void setNumdevs(int n) {_numdevs = n;}
+    int getNumdevs() const { return _audioVect.size(); }
     
     /// \brief Function returns a pointer to the private _audioVect element from
     ///  AudioInputGst class.
@@ -514,10 +508,6 @@ private:
     
     
 private:
-    /// \var _numdevs
-    /// \brief Contains an integer value representing the number of devices found
-    /// on the machine.
-    int _numdevs;
     
     /// \var _audioVect
     /// \brief A vector of GnashAudio pointers. This is used when storing information
@@ -538,4 +528,4 @@ private:
 } // gnash.media namespace 
 } // gnash namespace
 
-#endif // __AUDIOINPUT_H__
+#endif

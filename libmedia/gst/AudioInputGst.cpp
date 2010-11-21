@@ -89,7 +89,6 @@ AudioInputGst::~AudioInputGst()
 void
 AudioInputGst::findAudioDevs() 
 {
-    _numdevs = 0;
     
     //enumerate audio test sources
     GstElement *element;
@@ -98,13 +97,11 @@ AudioInputGst::findAudioDevs()
     if (element == NULL) {
         log_error("%s: Could not create audio test source", __FUNCTION__);
         _audioVect.push_back(NULL);
-        _numdevs += 1;
     } else {
         _audioVect.push_back(new GnashAudio);
-        _audioVect[_numdevs]->setElementPtr(element);
-        _audioVect[_numdevs]->setGstreamerSrc(g_strdup_printf("audiotestsrc"));
-        _audioVect[_numdevs]->setProductName(g_strdup_printf("audiotest"));
-        _numdevs += 1;
+        _audioVect.back()->setElementPtr(element);
+        _audioVect.back()->setGstreamerSrc(g_strdup_printf("audiotestsrc"));
+        _audioVect.back()->setProductName(g_strdup_printf("audiotest"));
     }
     
 #ifdef HAS_GSTREAMER_PLUGINS_BASE
@@ -131,14 +128,13 @@ AudioInputGst::findAudioDevs()
         }
         else { 
             _audioVect.push_back(new GnashAudio);
-            _audioVect[_numdevs]->setElementPtr(element);
-            _audioVect[_numdevs]->setGstreamerSrc(g_strdup_printf("pulsesrc"));
-            _audioVect[_numdevs]->setProductName(dev_name);
+            _audioVect.back()->setElementPtr(element);
+            _audioVect.back()->setGstreamerSrc(g_strdup_printf("pulsesrc"));
+            _audioVect.back()->setProductName(dev_name);
             
             gchar *location;
             g_object_get (element, "device", &location , NULL);
-            _audioVect[_numdevs]->setDevLocation(location);
-            _numdevs += 1;
+            _audioVect.back()->setDevLocation(location);
         }
     }
     if (devarr) {
