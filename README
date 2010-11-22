@@ -110,7 +110,7 @@ video. By default it'll build both FFmpeg and Gstreamer, which you
 can select at runtime. To select only one media handler use:
 
    --enable-media=GST			Gstreamer (default)
-or --enable-media=ffmpeg		FFmpeg/SDL
+or --enable-media=ffmpeg		FFmpeg
 
 In some countries, the codecs needed to display audio and video are patented.
 The FFmpeg library implements these codecs.  If you link them directly into
