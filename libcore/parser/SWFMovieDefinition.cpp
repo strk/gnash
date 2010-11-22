@@ -554,7 +554,7 @@ SWFMovieDefinition::incrementLoadedFrames()
     }
 
 #ifdef DEBUG_FRAMES_LOAD
-    log_debug(_("Loaded frame %u/%u"), _frames_loaded, m_frame_count);
+    log_debug("Loaded frame %u/%u", _frames_loaded, m_frame_count);
 #endif
 
     // signal load of frame if anyone requested it
@@ -686,8 +686,8 @@ SWFMovieDefinition::importResources(
             // so sleep some and try again
             if (new_loading_frame != loading_frame) {
 #ifdef DEBUG_EXPORTS
-                log_debug(_("looking for exported resource: frame load "
-                            "advancement (from %d to %d)"),
+                log_debug("looking for exported resource: frame load "
+                            "advancement (from %d to %d)",
                     loading_frame, new_loading_frame);
 #endif
                 loading_frame = new_loading_frame;
