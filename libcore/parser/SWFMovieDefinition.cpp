@@ -704,22 +704,34 @@ SWFMovieDefinition::importResources(
 
         }
 
-        // timed out
-        if (!timeout) {
-            log_error("Timeout (%d milliseconds) seeking export "
-                "symbol %s in movie %s. Frames loaded %d/%d",
-                timeout_ms / 1000, symbolName,
-                source->get_url(), loading_frame, source->get_frame_count());
+        if ( ! targetID ) {
+            // timed out
+            if (!timeout) {
+                log_error("Timeout (%d milliseconds) seeking export "
+                    "symbol %s in movie %s. Frames loaded %d/%d",
+                    timeout_ms / 1000, symbolName,
+                    source->get_url(),
+                    loading_frame, source->get_frame_count());
+            }
+            else {
+                // eof
+                //assert(loading_frame >= m_frame_count);
+                log_error("No export symbol %s found in movie %s. "
+                    "Frames loaded %d/%d",
+                    symbolName, source->get_url(), loading_frame,
+                    source->get_frame_count());
+            }
             continue;
         }
-        else {
-            // eof
-            //assert(loading_frame >= m_frame_count);
-            log_error("No export symbol %s found in movie %s. "
-                "Frames loaded %d/%d",
-                symbolName, source->get_url(), loading_frame,
-                source->get_frame_count());
-        }
+
+#ifdef DEBUG_EXPORTS
+        log_debug("Export symbol %s found in movie %s with targetID %d. "
+                    "Frames loaded %d/%d",
+                    symbolName, source->get_url(),
+                    targetID,
+                    loading_frame,
+                    source->get_frame_count());
+#endif
 
         boost::intrusive_ptr<SWF::DefinitionTag> res =
             source->getDefinitionTag(targetID);
@@ -739,6 +751,7 @@ SWFMovieDefinition::importResources(
             ++importedSyms;
             continue;
         }
+
         log_error(_("import error: could not find resource '%s' in "
                     "movie '%s'"), symbolName, source->get_url());
     }
