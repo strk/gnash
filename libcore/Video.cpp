@@ -75,10 +75,7 @@ Video::Video(as_object* object,
 	}
 
 	media::VideoInfo* info = m_def->getVideoInfo();
-	if (!info) {
-		log_error(_("No Video info in video definition"));
-		return;
-	}
+	if (!info) return;
 
     try {
 	    _decoder = mh->createVideoDecoder(*info);
@@ -156,7 +153,10 @@ Video::getVideoFrame()
         // Don't try to do anything if there is no decoder. If it was
         // never constructed (most likely), we'll return nothing,
         // otherwise the last decoded frame.
-        if (!_decoder.get()) return _lastDecodedVideoFrame.get();
+        if (!_decoder.get()) {
+		    LOG_ONCE( log_error(_("No Video info in video definition")) );
+            return _lastDecodedVideoFrame.get();
+        }
 
 		int current_frame = get_ratio(); 
 
