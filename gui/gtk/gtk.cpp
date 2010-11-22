@@ -1772,11 +1772,24 @@ GtkGui::showAboutDialog()
         NULL
     };
 
-    std::string comments =
-        _("Gnash is the GNU SWF Player based on GameSWF.");
+	const std::string license = 
+        _("This program is free software; you can redistribute it and/or modify\n"
+         "it under the terms of the GNU General Public License as published by\n"
+         "the Free Software Foundation; either version 3 of the License, or\n"
+         "(at your option) any later version.\n\n"
+         "This program is distributed in the hope that it will be useful,\n"
+         "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+         "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+         "GNU General Public License for more details.\n"
+         "You should have received a copy of the GNU General Public License\n"
+         "along with this program; if not, write to the Free Software\n"
+         "Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301\n"
+         "USA or visit http://www.gnu.org/licenses/.");
 
     media::MediaHandler* m = _runResources.mediaHandler();
 
+    std::string comments =
+        _("Gnash is the GNU SWF Player based on GameSWF.");
     comments.append(_("\nRenderer: "));
     comments.append(_renderer->description());
     comments.append(_("\nHardware Acceleration: "));
@@ -1786,13 +1799,11 @@ GtkGui::showAboutDialog()
     comments.append(_("\nMedia: "));
     comments.append(m ? m->description() : "no media handler");
 
-    GdkPixbuf *logo_pixbuf = createPixbuf("GnashG.png");
+    GdkPixbuf* logo_pixbuf = createPixbuf("GnashG.png");
 
-#if 1
     // gtk-2.8.20 (Debian 4.0) doesn't work fine with 
     // the gtk_show_about_dialog() call [ omits info ].
     // See bug #24426.
-
     GtkWidget* aboutWidget = gtk_about_dialog_new();
     addGnashIcon(GTK_WINDOW(aboutWidget)); 
     GtkAboutDialog* about = GTK_ABOUT_DIALOG(aboutWidget);
@@ -1807,20 +1818,7 @@ GtkGui::showAboutDialog()
     gtk_about_dialog_set_artists(about, artists);
     gtk_about_dialog_set_translator_credits(about, _("translator-credits"));
     gtk_about_dialog_set_logo(about, logo_pixbuf);
-    gtk_about_dialog_set_license(about, 
-        "This program is free software; you can redistribute it and/or modify\n"
-        "it under the terms of the GNU General Public License as published by\n"
-        "the Free Software Foundation; either version 3 of the License, or\n"
-        "(at your option) any later version.\n\n"
-        "This program is distributed in the hope that it will be useful,\n"
-        "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-        "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-        "GNU General Public License for more details.\n"
-        "You should have received a copy of the GNU General Public License\n"
-        "along with this program; if not, write to the Free Software\n"
-        "Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 "
-        "USA"
-    );
+    gtk_about_dialog_set_license(about, license.c_str());
     gtk_about_dialog_set_website(about, "http://www.gnu.org/software/gnash/");
 
     // Destroy the dialogue box when 'close' is clicked.
@@ -1829,39 +1827,7 @@ GtkGui::showAboutDialog()
 
     gtk_widget_show (aboutWidget);
 
-#else
-
-
-    gtk_show_about_dialog (
-        NULL,
-        "program-name", _("Gnash"), 
-        "version", VERSION,
-        "copyright", "Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 "
-                     "The Free Software Foundation",
-        "comments", comments.c_str(),
-        "authors", authors,
-        "documenters", documentors,
-        "artists", artists,
-        "translator-credits", _("translator-credits"),
-        "logo", logo_pixbuf,
-        "license", 
-        "This program is free software; you can redistribute it and/or modify\n"
-        "it under the terms of the GNU General Public License as published by\n"
-        "the Free Software Foundation; either version 3 of the License, or\n"
-        "(at your option) any later version.\n\n"
-        "This program is distributed in the hope that it will be useful,\n"
-        "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-        "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-        "GNU General Public License for more details.\n"
-        "You should have received a copy of the GNU General Public License\n"
-        "along with this program; if not, write to the Free Software\n"
-        "Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301"
-        "  USA",
-        "website", "http://www.gnu.org/software/gnash/",
-        NULL);
-#endif
-    if (logo_pixbuf)
-        gdk_pixbuf_unref(logo_pixbuf);
+    if (logo_pixbuf) gdk_pixbuf_unref(logo_pixbuf);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2305,7 +2271,7 @@ void
 addPixmapDirectory(const gchar* directory)
 {
     pixmaps_directories = 
-        g_list_prepend(pixmaps_directories, g_strdup (directory));
+        g_list_prepend(pixmaps_directories, g_strdup(directory));
 }
 
 
@@ -2318,7 +2284,7 @@ findPixmapFile(const gchar* filename)
     /* We step through each of the pixmaps directory to find it. */
     elem = pixmaps_directories;
     while (elem) {
-        gchar *pathname = g_strdup_printf ("%s%s%s", (gchar*)elem->data,
+        gchar *pathname = g_strdup_printf("%s%s%s", (gchar*)elem->data,
                 G_DIR_SEPARATOR_S, filename);
         if (g_file_test (pathname, G_FILE_TEST_EXISTS))
             return pathname;
