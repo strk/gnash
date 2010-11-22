@@ -636,12 +636,10 @@ string_toUpperCase(const fn_call& fn)
     // Most other locales are correct. FIXME: get this to
     // work regardless of user's current settings.
     std::locale currentLocale;
-    try
-    {
+    try {
         currentLocale = std::locale("");
     }
-    catch (std::runtime_error& e)
-    {
+    catch (const std::runtime_error& e) {
         currentLocale = std::locale::classic();
     }
 
@@ -656,13 +654,12 @@ string_toUpperCase(const fn_call& fn)
     try {
         boost::to_upper(wstr, currentLocale);
     }
-    catch (std::bad_cast&)
-        {
-            // std::use_facet<wchar_t>(currentLocale) called from
-            // boost::to_upper may throw std::bad_cast
-            log_error(_("bad_cast caught"));
-            std::abort();
-        }
+    catch (const std::bad_cast&) {
+        // std::use_facet<wchar_t>(currentLocale) called from
+        // boost::to_upper may throw std::bad_cast
+        log_error(_("bad_cast caught"));
+        std::abort();
+    }
 #else
     size_t l = wstr.size();
     for (size_t i = 0; i < l; ++i) {
