@@ -265,7 +265,7 @@ public:
     /// it here?
     virtual void setGain(double g) {
         assert (g >= 0 && g <= 100);
-        _gain = (g - 50) * 1.2;
+        _gain = g;
         audioChangeSourceBin(getGlobalAudio());
     }
 
@@ -275,7 +275,7 @@ public:
     /// TODO: shouldn't we query the value from the input rather than storing
     /// it here?
     virtual double gain() const {
-        return (_gain / 1.2) + 50;
+        return _gain;
     }
     
     virtual void setIndex(int i) {
@@ -506,7 +506,9 @@ private:
     ///   structure currently being worked with.
     GnashAudioPrivate* getGlobalAudio() {return _globalAudio;}
     
-    
+    /// Interface range is 0..100, gst range is -60 to 60
+    double gstgain() { return (gain() - 50) * 1.2; }
+
 private:
     
     /// \var _audioVect

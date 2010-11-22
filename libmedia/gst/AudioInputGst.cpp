@@ -61,7 +61,7 @@ GnashAudioPrivate::GnashAudioPrivate() {
 AudioInputGst::AudioInputGst() 
     :
     _activityLevel(-1),
-    _gain(0),
+    _gain(50),
     _index(0),
     _muted(true),
     _rate(8000),
@@ -305,7 +305,7 @@ AudioInputGst::audioChangeSourceBin(GnashAudioPrivate *audio)
     command = g_strdup_printf ("%s name=audioSource device=%s ! capsfilter name=capsfilter caps=audio/x-raw-int,signed=true,channels=2,rate=%i;audio/x-raw-float,channels=2,rate=%i ! rgvolume pre-amp=%f",
         audio->_audioDevice->getGstreamerSrc(),
         audio->_audioDevice->getDevLocation(),
-        _rate, _rate, _gain);
+        _rate, _rate, gstgain());
     
     log_debug ("GstPipeline command is: %s\n", command);
     
@@ -361,7 +361,7 @@ AudioInputGst::audioCreateSourceBin(GnashAudioPrivate *audio)
     command = g_strdup_printf ("%s name=audioSource device=%s ! capsfilter name=capsfilter caps=audio/x-raw-int,signed=true,channels=2,rate=%i;audio/x-raw-float,channels=2,rate=%i ! rgvolume pre-amp=%f",
         audio->_audioDevice->getGstreamerSrc(),
         audio->_audioDevice->getDevLocation(),
-        _rate, _rate, _gain);
+        _rate, _rate, gstgain());
     
     log_debug ("GstPipeline command is: %s", command);
     
