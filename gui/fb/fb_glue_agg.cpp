@@ -26,18 +26,28 @@
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include "log.h"
 #include "Renderer.h"
 #include "Renderer_agg.h"
 #include "fbsup.h"
-#include "fb_glue_agg.h"
 #include "RunResources.h"
-#include "log.h"
+#include "fb_glue_agg.h"
 
 namespace gnash {
 
-FBAggGlue::FBAggGlue(int fd)
-    : _fd(fd),
-      _rowsize(0)
+namespace gui {
+
+FBGlue::FBGlue()
+{
+    GNASH_REPORT_FUNCTION;
+}
+
+FBGlue::~FBGlue()
+{
+    GNASH_REPORT_FUNCTION;
+}
+
+FBAggGlue::FBAggGlue()
 {
     GNASH_REPORT_FUNCTION;
 
@@ -56,14 +66,14 @@ FBAggGlue::~FBAggGlue()
 }
 
 void
-FBAggGlue::setInvalidatedRegions(const InvalidatedRanges &ranges)
+FBAggGlue::setInvalidatedRegions(const InvalidatedRanges & /* ranges */)
 {
     GNASH_REPORT_FUNCTION;
 
 }
 
 bool
-FBAggGlue::init (int argc, char ***argv)
+FBAggGlue::init (int /* argc */, char *** /* argv */)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -217,9 +227,23 @@ FBAggGlue::createRenderHandler()
 }    
 
 void
+FBAggGlue::prepDrawingArea(FbWidget */* drawing_area */)
+{
+    GNASH_REPORT_FUNCTION;
+
+}
+
+void
+FBGlue::render(void * /* region */)
+{
+    GNASH_REPORT_FUNCTION;
+
+}
+
+void
 FBAggGlue::render()
 {
-    // GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     if ( _drawbounds.size() == 0 ) {
         return; // nothing to do..
@@ -268,6 +292,7 @@ FBAggGlue::height()
     return _var_screeninfo.yres_virtual;
 }
 
+} // end of namespace gui
 } // end of namespace gnash
     
 // Local Variables:
