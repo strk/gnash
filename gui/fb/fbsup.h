@@ -23,20 +23,23 @@
 #include "gnashconfig.h"
 #endif
 
+#include <boost/scoped_array.hpp>
 #include <vector>
-#include <boost/scoped_ptr.hpp>
+#include <linux/fb.h>
 
 #include "gui.h"
-#include <linux/fb.h>
+#include "InputDevice.h"
 
 #define PIXELFORMAT_LUT8
 #define CMAP_SIZE (256*2)
 
 #ifdef USE_MOUSE_PS2
-#define MOUSE_DEVICE "/dev/input/mice"
+# define MOUSE_DEVICE "/dev/input/mice"
 #endif
 
-#ifdef USE_MOUSE_ETT
+// FIXME: this should really be TSLIB_DEVICE_NAME, but I don't have the
+// ETT SDK, so for now, leave it the way it was.
+#ifdef USE_ETT_TSLIB
 #define MOUSE_DEVICE "/dev/usb/tkpanel0"
 #endif
 
@@ -44,8 +47,11 @@
 // work and probably is not necessary anyway
 //#define REQUEST_NEW_VT
 
-namespace gnash
-{
+namespace gnash {
+
+namespace gui {
+
+class Renderer;
 
 /// A Framebuffer-based GUI for Gnash.
 /// ----------------------------------
@@ -69,7 +75,7 @@ namespace gnash
 /// touchscreens but will make it difficult for standard mice. This will be 
 /// fixed in near time.
 //
-/// Supported graphics modes:
+// Supported graphics modes:
 ///
 ///   Resolution: any
 ///
@@ -85,70 +91,88 @@ namespace gnash
 ///
 ///   any PS/2 compatible mouse (may be emulated by the kernel) talking 
 ///   to /dev/input/mice
-
-class Renderer;
-
-/// Base class for Framebuffer renderer used by the GUI
-class FBGlue
-{
-public:
-    FBGlue();
-    virtual ~FBGlue();
-
-    /// Initialize the glue between the Renderer and the GUI
-    virtual bool init(int argc, char ***argv) = 0;
-
-    /// Create a new render handler
-    virtual Renderer *createRenderHandler() = 0;
-    
-    virtual void setInvalidatedRegions(const InvalidatedRanges& ranges) = 0;
-    
-    virtual int width() = 0;
-    virtual int height() = 0;
-    
-    virtual void render() = 0;
-};
-
-/// Base class for Framebuffer based displays
 class FBGui : public Gui
 {
+public:
+    FBGui(unsigned long xid, float scale, bool loop, RunResources& r);
+    virtual ~FBGui();
+    virtual bool init(int argc, char ***argv);
+    /// \brief
+    ///Create and display our window.
+    ///
+    /// @param title The window title.
+    /// @param width The desired window width in pixels.
+    /// @param height The desired window height in pixels.
+    /// @param xPosition The desired window X position from the top left corner.
+    /// @param yPosition The desired window Y position from the top left corner.
+    bool createWindow(const char *title, int width, int height,
+                              int xPosition = 0, int yPosition = 0);
+
+    /// Render the current buffer.
+    /// For OpenGL, this means that the front and back buffers are swapped.
+    void renderBuffer();
+    
+
+    /// Start main rendering loop.
+    bool run();
+
+    /// Gives the GUI a *hint* which region of the stage should be redrawn.
+    //
+    /// There is *no* restriction what the GUI might do with these coordinates. 
+    /// Normally the GUI forwards the information to the renderer so that
+    /// it avoids rendering regions that did not change anyway. The GUI can
+    /// also alter the bounds before passing them to the renderer and it's
+    /// absolutely legal for the GUI to simply ignore the call.
+    ///
+    /// Coordinates are in TWIPS!
+    ///
+    /// Note this information is given to the GUI and not directly to the 
+    /// renderer because both of them need to support this feature for 
+    /// correct results. It is up to the GUI to forward this information to
+    /// the renderer.
+    ///
+    // does not need to be implemented (optional feature),
+    // but still needs to be available.
+    //
+    void setInvalidatedRegion(const SWFRect& bounds);
+    void setInvalidatedRegions(const InvalidatedRanges& ranges);
+
+    /// Should return TRUE when the GUI/Renderer combination supports multiple
+    /// invalidated bounds regions. 
+    bool want_multiple_regions() { return true; }
+
+    // Information for System.capabilities to be reimplemented in
+    // each gui.
+    double getPixelAspectRatio() { return 0; }
+    int getScreenResX() { return 0; }
+    int getScreenResY() { return 0; }
+    double getScreenDPI() { return 0; }
+    std::string getScreenColor() { return ""; }
+
+    // For the framebuffer, these are mostly just stubs.
+
+    // void setFullscreen() {};
+    // void unsetFullscreen() {};
+    
+    bool createMenu();
+    bool setupEvents();
+    void setInterval(unsigned int interval);
+    void setTimeout(unsigned int timeout);
+    
+    void showMenu(bool show);
+    bool showMouse(bool show);    
+
+    // Poll this to see if there is any input data.
+    void checkForData();
+    
 private:
-    int _fd;
-    int original_vt;       // virtual terminal that was active at startup
-    int original_kd;       // keyboard mode at startup
-    int own_vt;            // virtual terminal we are running in   
-
-    std::vector< geometry::Range2d<int> > _drawbounds;
-
-    // X position of the output window
-    int _xpos;
-
-    // Y position of the output window
-    int _ypos;
+    /// For 8 bit (palette / LUT) modes, sets a grayscale palette.
+    //
+    /// This GUI currently does not support palette modes. 
+    ///
+    bool set_grayscale_lut8();
     
-    int m_stage_width;
-    int m_stage_height;
-    
-    int input_fd; /// file descriptor for /dev/input/mice
-    int keyb_fd; /// file descriptor for /dev/input/event* (keyboard)
-    int mouse_x, mouse_y, mouse_btn;
-    unsigned char mouse_buf[256];
-    int mouse_buf_size;
-#if 0
-    unsigned m_rowsize;
-    
-    std::vector<boost::shared_ptr<InputDevice> > _inputs;
-
-    struct fb_var_screeninfo var_screeninfo;
-    struct fb_fix_screeninfo fix_screeninfo;
-
-    unsigned int _timeout; /* TODO: should we move this to base class ? */
-#endif
-    
-    // Keyboard SHIFT/CTRL/ALT states (left + right)
-    bool keyb_lshift, keyb_rshift, keyb_lctrl, keyb_rctrl, keyb_lalt, keyb_ralt;
-    
-    boost::scoped_ptr<FBGlue> _fb_glue;
+    bool initialize_renderer();
     
     /// Tries to find a accessible tty
     char* find_accessible_tty(int no);
@@ -160,76 +184,45 @@ private:
     /// reverts disable_terminal() changes
     bool enable_terminal();
     
-#ifdef USE_MOUSE_PS2  	
-    /// Sends a command to the mouse and waits for the response
-    bool mouse_command(unsigned char cmd, unsigned char *buf, int count);
-#endif
+    int fd;
+    int original_vt;       // virtual terminal that was active at startup
+    int original_kd;       // keyboard mode at startup
+    int own_vt;            // virtual terminal we are running in   
+    unsigned char *fbmem;  // framebuffer memory
+    unsigned char *buffer; // offscreen buffer
     
-    /// Fills the mouse data input buffer with fresh data
-    void read_mouse_data();  	
-    
-    /// Initializes mouse routines
-    bool init_mouse();
-    
-    /// Checks for and processes any mouse activity. Returns true on activity.
-    bool check_mouse();
-    
-    /// Initializes keyboard routines 
-    bool init_keyboard();
-    
-    /// Translates a scancode from the Linux Input Subsystem to a Gnash key code 
-    gnash::key::code scancode_to_gnash_key(int code, bool shift);
-    
-    /// Checks for and processes any keyboard activity. Returns true on activity.
-    bool check_keyboard();
-    
-#ifdef USE_INPUT_EVENTS  	
-    /// Applies builtin touchscreen calibration
-    void apply_ts_calibration(float* cx, float* cy, int rawx, int rawy);
-#endif
-    
-    int valid_x(int x);
-    int valid_y(int y);
-    
-public:
-    FBGui(unsigned long xid, float scale, bool loop, RunResources& r);
-    virtual ~FBGui();
-    virtual bool init(int argc, char ***argv);
-    virtual bool createWindow(const char *title, int width, int height,
-                              int xPosition = 0, int yPosition = 0);
-    virtual bool run();
-    virtual bool createMenu();
-    virtual bool setupEvents();
-    virtual void renderBuffer();
-    virtual void setInterval(unsigned int interval);
-    virtual void setTimeout(unsigned int timeout);
-    
-    virtual void setFullscreen();
-    virtual void unsetFullscreen();
-    
-    virtual void showMenu(bool show);
-    virtual bool showMouse(bool show);
-    
-    virtual void setInvalidatedRegions(const InvalidatedRanges& ranges);
-    virtual bool want_multiple_regions() { return true; }
+    std::vector< geometry::Range2d<int> > _drawbounds;
 
-    void checkForData();    
-};
+    // X position of the output window
+    int _xpos;
+
+    // Y position of the output window
+    int _ypos;
     
-    // end of namespace gnash
-}
+    unsigned m_rowsize;
+    
+    std::vector<boost::shared_ptr<InputDevice> > _inputs;
+
+    struct fb_var_screeninfo var_screeninfo;
+    struct fb_fix_screeninfo fix_screeninfo;
+
+    unsigned int _timeout; /* TODO: should we move this to base class ? */
+    
+};
+
+} // end of namespace gui
+} // end of namespace gnash
 
 #ifdef ENABLE_FAKE_FRAMEBUFFER
 /// Simulate the ioctls used to get information from the framebuffer driver.
 ///
 /// Since this is an emulator, we have to set these fields to a reasonable default.
-int
-fakefb_ioctl(int /* fd */, int request, void *data);
+int fakefb_ioctl(int fd, int request, void *data);
 #endif
 
-#endif	// end of GNASH_FBSUP_H
+#endif  // end of GNASH_FBSUP_H
 
-// Local Variables:
+// local Variables:
 // mode: C++
 // indent-tabs-mode: nil
 // End:
