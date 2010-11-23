@@ -91,7 +91,7 @@ boost::uint32_t
 utf8::decodeNextUnicodeCharacter(std::string::const_iterator& it,
                                  const std::string::const_iterator& e)
 {
-    boost::uint32_t    uc;
+    boost::uint32_t uc;
 
     // Security considerations:
     //
@@ -124,27 +124,24 @@ utf8::decodeNextUnicodeCharacter(std::string::const_iterator& it,
     if ((*it & 0x80) == 0) return static_cast<boost::uint32_t>(*it++);
 
     // Multi-byte sequences
-    if ((*it & 0xE0) == 0xC0)
-    {
+    if ((*it & 0xE0) == 0xC0) {
         // Two-byte sequence.
         FIRST_BYTE(0x1F, 6);
         NEXT_BYTE(0);
         if (uc < 0x80) return utf8::invalid;    // overlong
         return uc;
     }
-    else if ((*it & 0xF0) == 0xE0)
-    {
+    else if ((*it & 0xF0) == 0xE0) {
         // Three-byte sequence.
         FIRST_BYTE(0x0F, 12);
         NEXT_BYTE(6);
         NEXT_BYTE(0);
-        if (uc < 0x800) return utf8::invalid;    // overlong
-        if (uc >= 0x0D800 && uc <= 0x0DFFF) return utf8::invalid;    // not valid ISO 10646
-        if (uc == 0x0FFFE || uc == 0x0FFFF) return utf8::invalid;    // not valid ISO 10646
+        if (uc < 0x800) return utf8::invalid;
+        if (uc >= 0x0D800 && uc <= 0x0DFFF) return utf8::invalid;
+        if (uc == 0x0FFFE || uc == 0x0FFFF) return utf8::invalid;
         return uc;
     }
-    else if ((*it & 0xF8) == 0xF0)
-    {
+    else if ((*it & 0xF8) == 0xF0) {
         // Four-byte sequence.
         FIRST_BYTE(0x07, 18);
         NEXT_BYTE(12);
@@ -153,31 +150,7 @@ utf8::decodeNextUnicodeCharacter(std::string::const_iterator& it,
         if (uc < 0x010000) return utf8::invalid;    // overlong
         return uc;
     }
-    else if ((*it & 0xFC) == 0xF8)
-    {
-        // Five-byte sequence.
-        FIRST_BYTE(0x03, 24);
-        NEXT_BYTE(18);
-        NEXT_BYTE(12);
-        NEXT_BYTE(6);
-        NEXT_BYTE(0);
-        if (uc < 0x0200000) return utf8::invalid;    // overlong
-        return uc;
-    }
-    else if ((*it & 0xFE) == 0xFC)
-    {
-        // Six-byte sequence.
-        FIRST_BYTE(0x01, 30);
-        NEXT_BYTE(24);
-        NEXT_BYTE(18);
-        NEXT_BYTE(12);
-        NEXT_BYTE(6);
-        NEXT_BYTE(0);
-        if (uc < 0x04000000) return utf8::invalid;    // overlong
-        return uc;
-    }
-    else
-    {
+    else {
         // Invalid.
         it++;
         return utf8::invalid;
@@ -203,42 +176,20 @@ utf8::encodeUnicodeCharacter(boost::uint32_t ucs_character)
         text.push_back(0xC0 | (ucs_character >> 6));
         text.push_back(0x80 | ((ucs_character >> 0) & 0x3F));
     }
-    else if (ucs_character <= 0xFFFF)
-    {
+    else if (ucs_character <= 0xFFFF) {
         // Three bytes.
         text.push_back(0xE0 | (ucs_character >> 12));
         text.push_back(0x80 | ((ucs_character >> 6) & 0x3F));
         text.push_back(0x80 | ((ucs_character >> 0) & 0x3F));
     }
-    else if (ucs_character <= 0x1FFFFF)
-    {
+    else if (ucs_character <= 0x1FFFFF) {
         // Four bytes.
         text.push_back(0xF0 | (ucs_character >> 18));
         text.push_back(0x80 | ((ucs_character >> 12) & 0x3F));
         text.push_back(0x80 | ((ucs_character >> 6) & 0x3F));
         text.push_back(0x80 | ((ucs_character >> 0) & 0x3F));
     }
-    else if (ucs_character <= 0x3FFFFFF)
-    {
-        // Five bytes.
-        text.push_back(0xF8 | (ucs_character >> 24));
-        text.push_back(0x80 | ((ucs_character >> 18) & 0x3F));
-        text.push_back(0x80 | ((ucs_character >> 12) & 0x3F));
-        text.push_back(0x80 | ((ucs_character >> 6) & 0x3F));
-        text.push_back(0x80 | ((ucs_character >> 0) & 0x3F));
-    }
-    else if (ucs_character <= 0x7FFFFFFF)
-    {
-        // Six bytes.
-        text.push_back(0xFC | (ucs_character >> 30));
-        text.push_back(0x80 | ((ucs_character >> 24) & 0x3F));
-        text.push_back(0x80 | ((ucs_character >> 18) & 0x3F));
-        text.push_back(0x80 | ((ucs_character >> 12) & 0x3F));
-        text.push_back(0x80 | ((ucs_character >> 6) & 0x3F));
-        text.push_back(0x80 | ((ucs_character >> 0) & 0x3F));
-    }
-    else
-    {
+    else {
         // Invalid char; don't encode anything.
     }
     
