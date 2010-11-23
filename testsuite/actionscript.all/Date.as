@@ -547,14 +547,19 @@ note("The pp is known to fail the next three tests");
 	check_equals(wierddate.getMilliseconds(), 700);
 	check_equals(wierddate.getFullYear(), -100000);	   
 
+    // The accessor functions for such a large number give different
+    // results according to the platform and compiler options, so
+    // we won't test them.
     h = new Date(3.0935415006117e+23);
     check_equals(h.valueOf().toString(), "3.0935415006117e+23");
-    check_equals(h.getMilliseconds(), 584);
-    check_equals(h.getSeconds(), 0);
-	check_equals(h.getUTCMilliseconds(), 584);
-	check_equals(h.getUTCSeconds(), 0);
-	check_equals(h.getUTCMinutes(), 4);
-	check_equals(h.getUTCDay(), 2);
+
+    h = new Date(10000001);
+    check_equals(h.getMilliseconds(), 1);
+    check_equals(h.getSeconds(), 40);
+	check_equals(h.getUTCMilliseconds(), 1);
+	check_equals(h.getUTCSeconds(), 40);
+	check_equals(h.getUTCMinutes(), 46);
+	check_equals(h.getUTCDay(), 4);
 
 // It's hard to test TimezoneOffset because the values will be different
 // depending upon where geographically you run the tests.
