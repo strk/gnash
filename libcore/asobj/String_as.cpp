@@ -17,6 +17,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+#include "String_as.h"
+
+#include <boost/algorithm/string/case_conv.hpp>
+#include <algorithm>
+#include <locale>
+#include <stdexcept>
+
+#include "SWFCtype.h"
 #include "smart_ptr.h"
 #include "fn_call.h"
 #include "Global_as.h"
@@ -30,14 +38,8 @@
 #include "VM.h" 
 #include "namedStrings.h"
 #include "utf8.h"
-#include "String_as.h"
 #include "GnashNumeric.h"
 #include "Global_as.h"
-
-#include <boost/algorithm/string/case_conv.hpp>
-#include <algorithm>
-#include <locale>
-#include <stdexcept>
 
 namespace gnash {
 
@@ -632,34 +634,10 @@ string_toUpperCase(const fn_call& fn)
 
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
-    // If this is the C locale, the conversion will be wrong.
-    // Most other locales are correct. FIXME: get this to
-    // work regardless of user's current settings.
-    std::locale currentLocale;
-    try {
-        currentLocale = std::locale("");
-    }
-    catch (const std::runtime_error& e) {
-        currentLocale = std::locale::classic();
-    }
-
-    if (currentLocale == std::locale::classic()) {
-        LOG_ONCE(
-            log_error(_("Your locale probably can't convert non-ascii "
-            "strings to upper case. Using a UTF8 locale may fix this."));
-        );
-    }
+    static const std::locale swfLocale((std::locale()), new SWFCtype());
 
 #if !defined(__HAIKU__) && !defined(__amigaos4__)
-    try {
-        boost::to_upper(wstr, currentLocale);
-    }
-    catch (const std::bad_cast&) {
-        // std::use_facet<wchar_t>(currentLocale) called from
-        // boost::to_upper may throw std::bad_cast
-        log_error(_("bad_cast caught"));
-        std::abort();
-    }
+    boost::to_upper(wstr, swfLocale);
 #else
     size_t l = wstr.size();
     for (size_t i = 0; i < l; ++i) {
@@ -686,35 +664,10 @@ string_toLowerCase(const fn_call& fn)
     // If this is the C locale, the conversion will be wrong.
     // Most other locales are correct. FIXME: get this to
     // work regardless of user's current settings.
-    std::locale currentLocale;
-    try
-    {
-        currentLocale = std::locale("");
-    }
-    catch (std::runtime_error& e)
-    {
-        currentLocale = std::locale::classic();
-    }
-
-    if (currentLocale == std::locale::classic())
-    {
-        LOG_ONCE( 
-            log_error(_("Your locale probably can't convert non-ascii "
-                "strings to lower case. Using a UTF8 locale may fix this"));
-        );
-    }
+    static const std::locale swfLocale((std::locale()), new SWFCtype());
 
 #if !defined(__HAIKU__) && !defined(__amigaos4__)
-    try {
-        boost::to_lower(wstr, currentLocale);
-    }
-    catch (std::bad_cast&)
-    {
-        // std::use_facet<wchar_t>(currentLocale) called from
-        // boost::to_lower may throw std::bad_cast
-        log_error(_("bad_cast caught"));
-        std::abort();
-    }
+    boost::to_lower(wstr, swfLocale);
 #else
     size_t l = wstr.size();
     for (size_t i = 0; i < l; ++i) {

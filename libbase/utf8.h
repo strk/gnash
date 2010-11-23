@@ -51,9 +51,10 @@
 ///
 /// It is important that SWF5 can distinguish between the two encodings,
 /// so we cannot convert all strings to UTF-8.
-///
-/// Presently, this code is used for the AS String object,
-/// gnash::edit_text_character, ord() and chr().
+//
+/// Please note that, although this is called utf8, what the Adobe
+/// player uses is only loosely related to real unicode, so the
+/// encoding support here is correspondingly non-standard.
 namespace utf8
 {
     static const boost::uint32_t invalid = std::numeric_limits<boost::uint32_t>::max();

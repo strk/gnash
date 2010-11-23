@@ -64,6 +64,7 @@ libgnashbase_la_SOURCES = \
 	extension.cpp \
 	$(MALLOC) \
 	GnashImage.cpp \
+	SWFCtype.cpp \
 	GnashImageJpeg.cpp \
 	GnashFileUtilities.cpp \
 	AMF.cpp \
@@ -221,6 +222,7 @@ EXTENSIONS_API = \
 	CachedBitmap.h \
 	GnashImage.h \
 	ImageIterators.h \
+	SWFCtype.h \
 	$(NULL)
 
 instdir = $(includedir)/gnash
