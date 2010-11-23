@@ -128,6 +128,7 @@ ASTESTS =			\
 	LocalConnection.as	\
 	enumerate.as	\
 	case.as			\
+	caseconv.as			\
 	ops.as			\
 	toString_valueOf.as	\
 	Rectangle.as		\
