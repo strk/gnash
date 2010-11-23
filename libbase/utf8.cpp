@@ -23,10 +23,6 @@
 
 #include "utf8.h"
 
-// This isn't actually an invalid character; it's a valid char that
-// looks like an inverted question mark.
-#define INVALID_CHAR 0x0FFFD
-
 std::wstring
 utf8::decodeCanonicalString(const std::string& str, int version)
 {
@@ -35,22 +31,16 @@ utf8::decodeCanonicalString(const std::string& str, int version)
     
     std::string::const_iterator it = str.begin(), e = str.end();
     
-    if (version > 5)
-    {
-        while (boost::uint32_t code = decodeNextUnicodeCharacter(it, e))
-        {
-            if (code == utf8::invalid)
-            {
-                wstr.push_back(static_cast<wchar_t>(INVALID_CHAR));
+    if (version > 5) {
+        while (boost::uint32_t code = decodeNextUnicodeCharacter(it, e)) {
+            if (code == utf8::invalid) {
                 continue;        
             }
             wstr.push_back(static_cast<wchar_t>(code));
         }
     }
-    else
-    {
-        while (it != str.end())
-        {
+    else {
+        while (it != str.end()) {
             // This mangles UTF-8 (UCS4) strings, but is what is
             // wanted for SWF5.
             wstr.push_back(static_cast<unsigned char>(*it++));
@@ -136,9 +126,9 @@ utf8::decodeNextUnicodeCharacter(std::string::const_iterator& it,
         FIRST_BYTE(0x0F, 12);
         NEXT_BYTE(6);
         NEXT_BYTE(0);
-        if (uc < 0x800) return utf8::invalid;
-        if (uc >= 0x0D800 && uc <= 0x0DFFF) return utf8::invalid;
-        if (uc == 0x0FFFE || uc == 0x0FFFF) return utf8::invalid;
+        if (uc < 0x800) {
+            return utf8::invalid;
+        }
         return uc;
     }
     else if ((*it & 0xF8) == 0xF0) {
@@ -211,8 +201,7 @@ utf8::stripBOM(char* in, size_t& size, TextEncoding& encoding)
         // need *ptr to be unsigned or cast all 0xNN
         unsigned char* ptr = reinterpret_cast<unsigned char*>(in);
 
-        if ( *ptr == 0xFF && *(ptr+1) == 0xFE )
-        {
+        if (*ptr == 0xFF && *(ptr+1) == 0xFE) {
             // Text is UTF-16 LE
             encoding = encUTF16LE;
             in+=2;
