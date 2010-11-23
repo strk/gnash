@@ -634,9 +634,8 @@ string_toUpperCase(const fn_call& fn)
 
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
-    static const std::locale swfLocale((std::locale()), new SWFCtype());
-
 #if !defined(__HAIKU__) && !defined(__amigaos4__)
+    static const std::locale swfLocale((std::locale()), new SWFCtype());
     boost::to_upper(wstr, swfLocale);
 #else
     size_t l = wstr.size();
@@ -661,12 +660,8 @@ string_toLowerCase(const fn_call& fn)
 
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
-    // If this is the C locale, the conversion will be wrong.
-    // Most other locales are correct. FIXME: get this to
-    // work regardless of user's current settings.
-    static const std::locale swfLocale((std::locale()), new SWFCtype());
-
 #if !defined(__HAIKU__) && !defined(__amigaos4__)
+    static const std::locale swfLocale((std::locale()), new SWFCtype());
     boost::to_lower(wstr, swfLocale);
 #else
     size_t l = wstr.size();
