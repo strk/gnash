@@ -237,6 +237,8 @@ dumpconfig:
 if USE_GST_ENGINE
 	@echo "	GSTREAMER_CFLAGS is $(GSTREAMER_CFLAGS)"
 	@echo "	GSTREAMER_LIBS is $(GSTREAMER_LIBS)"
+	@echo "	GSTPBUTILS_CFLAGS is $(GSTPBUTILS_CFLAGS)"
+	@echo "	GSTPBUTILS_LIBS is $(GSTPBUTILS_LIBS)"
 endif
 if USE_FFMPEG_ENGINE
 	@echo "	FFMPEG_CFLAGS is $(FFMPEG_CFLAGS)"
@@ -322,7 +324,7 @@ endif
 	@echo "	CURL_LIBS is $(CURL_LIBS)"
 	@echo "	BOOST_CFLAGS is $(BOOST_CFLAGS)"
 	@echo "	BOOST_LIBS is $(BOOST_LIBS)"
-	@if test -n $(BOOST_CYGNAL_LIBS); then \
+	@if test -n "$(BOOST_CYGNAL_LIBS)"; then \
 	  echo "	BOOST_CYGNAL_LIBS is $(BOOST_CYGNAL_LIBS)"; \
 	fi
 if ENABLE_MING
