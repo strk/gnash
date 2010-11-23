@@ -81,3 +81,8 @@ class GtkGlue
 
 // end of GNASH_GTK_GLUE_H
 #endif
+
+// Local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:
