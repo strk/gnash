@@ -3,6 +3,10 @@
 
 #include "check.as"
 
+#if OUTPUT_VERSION < 6
+totals(0);
+#else
+
 upperToLower = [];
 lowerToUpper = [];
 
@@ -1482,3 +1486,5 @@ for (i = 0; i < 65536; ++i) {
 
 
 totals();
+
+#endif
