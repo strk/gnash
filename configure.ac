@@ -2466,6 +2466,10 @@ if test x"$build_media_gst" = "xyes"; then
   dnl it if cross compiling with gstreamer support.
   if test x$cross_compiling = xno; then
     GNASH_PKG_FIND(gstpbutils, [gst/pbutils/install-plugins.h], [gstreamer PB Utils library], gst_install_plugins_supported, [0.10])
+    dnl We need the header for doing anything interesting
+    if test x"${GSTPBUTILS_CFLAGS}" = "x"; then
+        has_gstpbutils=no
+    fi
   fi
   dnl when cross compiling Gstreamer, not all supplied SDKs include all the
   dnl development libraries since most devices don't need to support plugin
@@ -3234,11 +3238,12 @@ if test x"$build_media_gst" = x"yes"; then
       echo "        Gstreamer flags are: default include path"
     fi
     echo "        Gstreamer libs are: $GSTREAMER_LIBS"
-    if test x"$has_modern_gstpbutils" = "xno"; then
+    if test x"$has_gstpbutils" = "xno"; then
       echo "        RECOMMENDED: If the user has not installed the necessary Gstreamer plugins," >&5
       echo "                     Gstreamer can pop up a message prompting them to." >&5
       echo "                     Install gstpbutils (>= 0.10.15) from http://www.gstreamer.net for that to be enabled" >&5
       echo "                     or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&5
+      echo "                     Also see --with-gstpbutils-incl and --with-gstpbutils-lib" >&5
     fi
     if test x"$has_gstreamer_plugins_base" = "xno"; then
       dnl check if this is really a mandatory asset !
