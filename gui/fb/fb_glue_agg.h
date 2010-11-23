@@ -27,24 +27,30 @@
 #include <boost/shared_ptr.hpp>
 
 #include "fbsup.h"
+#include "fb_glue.h"
 
 namespace gnash {
+
+namespace gui {
 
 class Renderer;
 
 class FBAggGlue: public FBGlue
 {
 public:
-    FBAggGlue(int fd);
+    FBAggGlue();
 
     // All of these virtuals are all defined in the base FBGlue class
-    virtual ~FBAggGlue();
-    virtual bool init(int argc, char ***argv);    
-    virtual Renderer *createRenderHandler();
-    virtual void setInvalidatedRegions(const InvalidatedRanges &ranges);
-    virtual int width();
-    virtual int height();
-    virtual void render();
+    ~FBAggGlue();
+    
+    bool init(int argc, char ***argv);    
+    Renderer *createRenderHandler();
+    void prepDrawingArea(void *drawing_area);
+    void setInvalidatedRegions(const InvalidatedRanges &ranges);
+    int width();
+    int height();
+    void render();
+    void render(void* const /* region */) { };
 
     /// For 8 bit (palette / LUT) modes, sets a grayscale palette.
     //
@@ -53,7 +59,7 @@ public:
     bool set_grayscale_lut8();
 
 protected:
-    int                 _fd;
+    int                      _fd;
     struct fb_var_screeninfo _var_screeninfo;
     struct fb_fix_screeninfo _fix_screeninfo;
     struct fb_cmap           _cmap;
@@ -68,6 +74,7 @@ protected:
     boost::shared_ptr<Renderer> _renderer;
 };
 
+} // end of namespace gui
 } // end of gnash namespace
 
 #endif  // GNASH_FB_GLUE_AGG_H
