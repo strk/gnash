@@ -113,12 +113,20 @@
 #include <linux/input.h>    // for /dev/input/event*
 
 
-namespace gnash
-{
+namespace gnash {
+
+namespace gui {
 
 //---------------
 
 int terminate_request = false;  // global scope to avoid GUI access
+
+std::auto_ptr<Gui> createFBGui(unsigned long windowid, float scale,
+                               bool do_loop, RunResources& r)
+{
+    GNASH_REPORT_FUNCTION;
+    return std::auto_ptr<Gui>(new FBGui(windowid, scale, do_loop, r));
+}
 
 /// Called on CTRL-C and alike
 void
@@ -133,12 +141,14 @@ FBGui::FBGui(unsigned long xid, float scale, bool loop, RunResources& r)
       original_kd(-1),
       own_vt(-1),
       fbmem(0),
-      buffer(0),                // the real value is set by ENABLE_DOUBLE_BUFFERING
+      buffer(0),        // the real value is set by ENABLE_DOUBLE_BUFFERING
       _xpos(0),
       _ypos(0),  
       m_rowsize(0),
       _timeout(0)
 {
+    GNASH_REPORT_FUNCTION;
+    
     // initializing to zero helps with debugging and prevents weird bugs
 //    memset(mouse_buf, 0, 256);
     memset(&var_screeninfo, 0, sizeof(fb_var_screeninfo));
@@ -299,67 +309,6 @@ FBGui::init(int argc, char *** argv)
 }
 
 bool
-FBGui::initialize_renderer()
-{
-    // GNASH_REPORT_FUNCTION;
-
-    const int bpp = var_screeninfo.bits_per_pixel;
-    const int size = fix_screeninfo.smem_len; 
-
-    // TODO: should recalculate!  
-    unsigned char* mem;
-    Renderer_agg_base* agg_handler;
-  
-#ifdef ENABLE_DOUBLE_BUFFERING
-    log_debug(_("Double buffering enabled"));
-    mem = buffer;
-#else
-    log_debug(_("Double buffering disabled"));
-    mem = fbmem;
-#endif
-  
-    agg_handler = NULL;
-  
-    // choose apropriate pixel format
-  
-    log_debug(_("red channel: %d / %d"), var_screeninfo.red.offset, 
-              var_screeninfo.red.length);
-    log_debug(_("green channel: %d / %d"), var_screeninfo.green.offset, 
-              var_screeninfo.green.length);
-    log_debug(_("blue channel: %d / %d"), var_screeninfo.blue.offset, 
-              var_screeninfo.blue.length);
-    log_debug(_("Total bits per pixel: %d"), var_screeninfo.bits_per_pixel);
-  
-    const char* pixelformat = agg_detect_pixel_format(
-        var_screeninfo.red.offset, var_screeninfo.red.length,
-        var_screeninfo.green.offset, var_screeninfo.green.length,
-        var_screeninfo.blue.offset, var_screeninfo.blue.length,
-        bpp
-        );
-
-    if (pixelformat) {    
-        agg_handler = create_Renderer_agg(pixelformat);      
-    } else {
-        log_error("The pixel format of your framebuffer could not be detected.");
-        return false;
-    }
-
-    assert(agg_handler);
-
-    _renderer.reset(agg_handler);
-
-    _runResources.setRenderer(_renderer);
-  
-    m_rowsize = var_screeninfo.xres_virtual*((bpp+7)/8);
-  
-    agg_handler->init_buffer(mem, size, _width, _height, m_rowsize);
-  
-    disable_terminal();
-
-    return true;
-}
-
-bool
 FBGui::run()
 {
     // GNASH_REPORT_FUNCTION;
@@ -383,7 +332,7 @@ FBGui::run()
 
 #ifdef USE_TSLIB
         ts_loop_count++; //increase loopcount
-#endif        
+#endif
         
         // check input devices
         checkForData();
@@ -440,8 +389,12 @@ bool
 FBGui::createWindow(const char* /*title*/, int /*width*/, int /*height*/,
                      int /*xPosition*/, int /*yPosition*/)
 {
+    GNASH_REPORT_FUNCTION;
+    
     // Now initialize AGG
-    return initialize_renderer();
+    // return initialize_renderer();
+
+    return false;
 }
 
 bool
@@ -470,17 +423,17 @@ FBGui::setTimeout(unsigned int timeout)
     _timeout = timeout;
 }
 
-void
-FBGui::setFullscreen()
-{
-    // FB GUI always runs fullscreen; ignore...
-}
+// void
+// FBGui::setFullscreen()
+// {
+//     // FB GUI always runs fullscreen; ignore...
+// }
 
-void
-FBGui::unsetFullscreen()
-{
-  // FB GUI always runs fullscreen; ignore...
-}
+// void
+// FBGui::unsetFullscreen()
+// {
+//   // FB GUI always runs fullscreen; ignore...
+// }
 
 void
 FBGui::showMenu(bool /*show*/)
@@ -495,6 +448,12 @@ FBGui::showMouse(bool /*show*/)
     // Should return true if the pointer was visible before call,
     // otherwise false;
     return true;
+}
+
+void
+FBGui::setInvalidatedRegion(const SWFRect& /* bounds */)
+{
+    GNASH_REPORT_FUNCTION;
 }
 
 void
@@ -733,8 +692,8 @@ FBGui::checkForData()
     }
 }
 
-// end of namespace gnash
-}
+} // end of namespace gui
+} // end of namespace gnash
 
 #ifdef ENABLE_FAKE_FRAMEBUFFER
 // Simulate the ioctls used to get information from the framebuffer
