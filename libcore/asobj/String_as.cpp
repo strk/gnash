@@ -646,7 +646,7 @@ string_toUpperCase(const fn_call& fn)
     if (currentLocale == std::locale::classic()) {
         LOG_ONCE(
             log_error(_("Your locale probably can't convert non-ascii "
-            "DisplayObjects to upper case. Using a UTF8 locale may fix this."));
+            "strings to upper case. Using a UTF8 locale may fix this."));
         );
     }
 
@@ -700,7 +700,7 @@ string_toLowerCase(const fn_call& fn)
     {
         LOG_ONCE( 
             log_error(_("Your locale probably can't convert non-ascii "
-                "DisplayObjects to lower case. Using a UTF8 locale may fix this"));
+                "strings to lower case. Using a UTF8 locale may fix this"));
         );
     }
 
