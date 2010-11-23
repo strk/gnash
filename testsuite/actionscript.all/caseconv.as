@@ -1472,12 +1472,10 @@ check_equals(testlower.length, 65339);
 check_equals(testupper.length, 65371);
 
 for (i = 0; i < 65536; ++i) {
-    //if ((upperToLower[i] == undefined && testlower[i] != undefined) || (testlower[i] != upperToLower[i])) {
     if ((testlower[i] != upperToLower[i])) {
         fail("To lower: " + i + "(expected " +
             (upperToLower[i] == undefined ? i : upperToLower[i]) + ", got " + testlower[i] + ")");
     }
-    //if ((lowerToUpper[i] == undefined && testupper[i] == undefined) || testupper[i] != lowerToUpper[i]) {
     if (testupper[i] != lowerToUpper[i]) {
         fail("To upper: " + i + "(expected " +
             (lowerToUpper[i] == undefined ? i : lowerToUpper[i]) + ", got " + testupper[i] + ")");
