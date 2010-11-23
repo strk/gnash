@@ -237,7 +237,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_pixel(48,232, 2, yellow, 2);
 	// 80,232 = white (yellow not covered by its red mask)
 	check( invalidated.contains(80, 232) );
-	check_pixel(80,232, 2, white, 2);
+	check_pixel(80,232, 2, white, 3);
 
 	// 214,232 = white (green not covered by its cyan mask)
 	check( invalidated.contains(214, 232) );
@@ -287,7 +287,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_pixel(48,232, 2, yellow, 2);
 	// 80,232 = white (yellow not covered by its red mask)
 	check( invalidated.contains(80, 232) );
-	check_pixel(80,232, 2, white, 2);
+	check_pixel(80,232, 2, white, 3);
 
 	tester.movePointerTo(14,232); // on the red mask
 	check( tester.isMouseOverMouseEntity() ) // the mask is still sensible to mouse
