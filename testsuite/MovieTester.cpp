@@ -322,6 +322,12 @@ MovieTester::findDisplayItemByName(const MovieClip& mc,
 }
 
 const DisplayObject*
+MovieTester::findDisplayItemByTarget(const std::string& tgt) 
+{
+    return _movie_root->findCharacterByTarget(tgt);
+}
+
+const DisplayObject*
 MovieTester::findDisplayItemByDepth(const MovieClip& mc,
 		int depth)
 {

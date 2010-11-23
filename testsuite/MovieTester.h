@@ -148,6 +148,12 @@ public:
 	const DisplayObject* findDisplayItemByName(const MovieClip& mc,
 			const std::string& name);
 
+	/// Find a DisplayObject on the stage by full target name.
+	//
+	/// Return NULL if there's no DisplayObject reachable with that target.
+	///
+	const DisplayObject* findDisplayItemByTarget(const std::string& tgt);
+
 	/// Find a DisplayObject in the display list of a sprite by depth.
 	//
 	/// Return NULL if there's no DisplayObject at that depth in
