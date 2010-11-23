@@ -42,23 +42,16 @@ main(int /*argc*/, char** /*argv*/)
 	string filename = string(SRCDIR) + string("/") + string(INPUT_FILENAME);
 	MovieTester tester(filename);
 
-	// TODO: check why we need this !!
-	//       I wouldn't want the first advance to be needed
-	tester.advance();
-
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity(1);
 
 	const MovieClip* root = tester.getRootMovie();
 	assert(root);
 
-	//const DisplayList& dl = root->getDisplayList();
-	//dl.dump(std::cout);
-
 	check_equals(root->get_frame_count(), 1);
 
-	// give loader time to load the actual gravity.swf movie 
-	for (int i=0; i<5; i++) {
+	// wait for loader to get ball in
+	while ( ! tester.findDisplayItemByTarget("_level0.container.ball") ) {
 		usleep(1000);
 		tester.advance(); // have load processed
 	}
