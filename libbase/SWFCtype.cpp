@@ -1,3 +1,22 @@
+// SWFCtype.cpp: Case conversion code for SWF strings.
+// 
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
+//   Foundation, Inc
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
 #include "SWFCtype.h"
 
@@ -48,7 +67,7 @@ SWFCtype::do_toupper(char_type c) const
         if (c >= 462 && c <= 476) return c - 1;
         if (c >= 1218 && c <= 1220) return c - 1;
     }
-    if (c & 1) {
+    else if (c & 1) {
         if (c >= 257 && c <= 303) return c - 1;
         if (c >= 307 && c <= 311) return c - 1;
         if (c >= 331 && c <= 375) return c - 1;
@@ -127,7 +146,7 @@ SWFCtype::do_tolower(char_type c) const
         if (c >= 7680 && c <= 7828) return c + 1;
         if (c >= 7840 && c <= 7928) return c + 1;
     }
-    if (c & 1) {
+    else if (c & 1) {
         if (c >= 313 && c <= 327) return c + 1;
         if (c >= 377 && c <= 381) return c + 1;
         if (c >= 435 && c <= 437) return c + 1;
