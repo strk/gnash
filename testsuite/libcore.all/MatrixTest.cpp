@@ -264,22 +264,17 @@ main(int /*argc*/, char** /*argv*/)
     // the result is expected to be an identity SWFMatrix. 
     check_equals(m1_inverse, identity);
 
-    m1.sx  = 4;   // 1/16384
-    m1.shy = 0;
-    m1.tx  = 20;
-    m1.shx = 0;
-    m1.sy  = 4;   // 1/16384
-    m1.ty  = 20;
+    m1 = SWFMatrix(4, 0, 0, 4, 20, 20);
     
     m1_inverse = m1;
     m1_inverse.invert();
     
-    check_equals(m1_inverse.sx, 16384 * 65536);
-    check_equals(m1_inverse.shy, 0);
-    check_equals(m1_inverse.tx, -16384 * 20);
-    check_equals(m1_inverse.shx, 0);
-    check_equals(m1_inverse.sy, 16384 * 65536);
-    check_equals(m1_inverse.ty, -16384 * 20);
+    check_equals(m1_inverse.a(), 16384 * 65536);
+    check_equals(m1_inverse.b(), 0);
+    check_equals(m1_inverse.tx(), -16384 * 20);
+    check_equals(m1_inverse.c(), 0);
+    check_equals(m1_inverse.d(), 16384 * 65536);
+    check_equals(m1_inverse.ty(), -16384 * 20);
     
     // concatenate the inverse SWFMatrix and orignial SWFMatrix.
     m1_inverse.concatenate(m1);
