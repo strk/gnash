@@ -38,7 +38,6 @@
 namespace gnash {
 
 namespace {
-
     as_value transform_colorTransform(const fn_call& fn);
     as_value transform_concatenatedColorTransform(const fn_call& fn);
     as_value transform_concatenatedMatrix(const fn_call& fn);
@@ -47,14 +46,12 @@ namespace {
     as_value transform_ctor(const fn_call& fn);
     void attachTransformInterface(as_object& o);
     as_value get_flash_geom_transform_constructor(const fn_call& fn);
-    
 }
 
 
 
 class Transform_as : public Relay
 {
-
 public:
 
     Transform_as(MovieClip& movieClip)
@@ -83,8 +80,7 @@ public:
 
 protected:
 
-    virtual void markReachableResources() const
-    {
+    virtual void markReachableResources() const {
         _movieClip.setReachable();
     }
 
@@ -111,7 +107,6 @@ namespace {
 as_value
 transform_colorTransform(const fn_call& fn)
 {
-
     const double factor = 256.0;
 
     Transform_as* relay = ensure<ThisIsNative<Transform_as> >(fn);
@@ -124,7 +119,9 @@ transform_colorTransform(const fn_call& fn)
         as_function* colorTransformCtor = colorTrans.to_function();
 
         if (!colorTransformCtor) {
-            log_error("Failed to construct flash.geom.ColorTransform!");
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror("Failed to construct flash.geom.ColorTransform!");
+            );
             return as_value();
         }
 
@@ -142,9 +139,7 @@ transform_colorTransform(const fn_call& fn)
     }
 
     // Setter
-
-    if (fn.nargs > 1)
-    {
+    if (fn.nargs > 1) {
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
@@ -200,7 +195,9 @@ transform_concatenatedColorTransform(const fn_call& fn)
         as_function* colorTransformCtor = colorTrans.to_function();
 
         if (!colorTransformCtor) {
-            log_error("Failed to construct flash.geom.ColorTransform!");
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror("Failed to construct flash.geom.ColorTransform!");
+            );
             return as_value();
         }
 
@@ -228,8 +225,7 @@ transform_concatenatedMatrix(const fn_call& fn)
 
     Transform_as* relay = ensure<ThisIsNative<Transform_as> >(fn);
 
-    if (!fn.nargs)
-    {
+    if (!fn.nargs) {
 
         // If it's not found, construction will fail.
         as_value matrix(findObject(fn.env(), "flash.geom.Matrix"));
@@ -237,7 +233,9 @@ transform_concatenatedMatrix(const fn_call& fn)
         as_function* matrixCtor = matrix.to_function();
 
         if (!matrixCtor) {
-            log_error("Failed to construct flash.geom.Matrix!");
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror("Failed to construct flash.geom.Matrix!");
+            );
             return as_value();
         }
 
@@ -262,7 +260,6 @@ transform_concatenatedMatrix(const fn_call& fn)
 as_value
 transform_matrix(const fn_call& fn)
 {
-
     const double factor = 65536.0;
 
     // TODO: What happens if you do: "mat = mc.transform.matrix; mat.a = 6;"
@@ -272,8 +269,7 @@ transform_matrix(const fn_call& fn)
     // set our _movieClip's matrix from the AS matrix.
     Transform_as* relay = ensure<ThisIsNative<Transform_as> >(fn);
 
-    if (!fn.nargs)
-    {
+    if (!fn.nargs) {
 
         // If it's not found, construction will fail.
         as_value matrix(findObject(fn.env(), "flash.geom.Matrix"));
@@ -281,7 +277,9 @@ transform_matrix(const fn_call& fn)
         as_function* matrixCtor = matrix.to_function();
 
         if (!matrixCtor) {
-            log_error("Failed to construct flash.geom.Matrix!");
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror("Failed to construct flash.geom.Matrix!");
+            );
             return as_value();
         }
 
@@ -301,9 +299,7 @@ transform_matrix(const fn_call& fn)
     }
 
     // Setter
-
-    if (fn.nargs > 1)
-    {
+    if (fn.nargs > 1) {
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
@@ -312,10 +308,8 @@ transform_matrix(const fn_call& fn)
         );
     }
 
-
     as_object* obj = toObject(fn.arg(0), getVM(fn));
-    if (!obj)
-    {
+    if (!obj) {
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
@@ -324,13 +318,11 @@ transform_matrix(const fn_call& fn)
         );
         return as_value();
     }
-    
 
     const SWFMatrix m = toSWFMatrix(*obj);
     relay->setMatrix(m);
 
     return as_value();
-
 }
 
 as_value
@@ -341,8 +333,6 @@ transform_pixelBounds(const fn_call& fn)
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
-
-
 
 as_value
 transform_ctor(const fn_call& fn)
@@ -407,5 +397,4 @@ attachTransformInterface(as_object& o)
 }
 
 } // anonymous namespace
-
 } // end of gnash namespace
