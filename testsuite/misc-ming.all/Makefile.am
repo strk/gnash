@@ -22,8 +22,6 @@ abs_top_builddir=$(shell cd $(top_builddir); pwd)
 abs_builddir=$(shell cd $(top_builddir)/testsuite/misc-ming.all; pwd)
 abs_mediadir = $(shell cd $(srcdir)/../media; pwd)
 
-GST_INSTALL_PLUGINS_HELPER=$(top_srcdir)/testsuite/gst_install_plugins_helper.sh
-
 CLEANFILES =  \
 	gnash-dbg.log \
 	site.exp.bak \
@@ -1764,14 +1762,19 @@ TEST_CASES += \
 	$(NULL)
 endif
 
+TEST_ENV = GNASH_GC_TRIGGER_THRESHOLD=0
+TEST_ENV += GNASHRC=../gnashrc
+TEST_ENV += GST_INSTALL_PLUGINS_HELPER=$(top_srcdir)/testsuite/gst_install_plugins_helper.sh
+
+
 check-DEJAGNU: site-update $(check_PROGRAMS)
-	@runtest=$(RUNTEST); \
+	runtest=$(RUNTEST); \
 	if $(SHELL) -c "$$runtest --version" > /dev/null 2>&1; then \
-	    GNASH_GC_TRIGGER_THRESHOLD=0 GNASHRC=../gnashrc $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); true; \
+	    $(TEST_ENV) $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); true; \
 	else \
 	  echo "WARNING: could not find \`runtest'" 1>&2; \
           for i in "$(TEST_CASES)"; do \
-	    GNASH_GC_TRIGGER_THRESHOLD=0 GNASHRC=../gnashrc $(SHELL) $$i; \
+	    $(TEST_ENV) $(SHELL) $$i; \
 	  done; \
 	fi
 
