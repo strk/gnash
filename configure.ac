@@ -58,7 +58,7 @@ case "${host}" in
     DEFAULT_FLASH_PLATFORM_ID="BSD"
     DEFAULT_FLASH_SYSTEM_OS="OpenBSD"
     ;;
-  *-freebsd*)
+  *-freebsd* | *-kfreebsd*)
     DEFAULT_FLASH_PLATFORM_ID="BSD"
     DEFAULT_FLASH_SYSTEM_OS="FreeBSD"
     ;;
@@ -150,7 +150,7 @@ case "${host}" in
     openbsd=yes
     AC_DEFINE([OPENBSD_HOST], [1], [this is an OpenBSD platform])
     ;;
-  *-freebsd*)
+  *-freebsd* | *-kfreebsd*)
     bsd=yes
     freebsd=yes
     AC_DEFINE([FREEBSD_HOST], [1], [this is a FreeBSD platform])
