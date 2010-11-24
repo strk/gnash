@@ -18,17 +18,24 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
+
+#include "ASHandlers.h"
+
+#include <string>
+#include <vector>
+#include <cstdlib> // std::mbstowcs
+#include <boost/scoped_array.hpp>
+#include <boost/random.hpp>
+#include <boost/lexical_cast.hpp>
+#include <algorithm> 
 
 #include "smart_ptr.h"
 #include "log.h"
 #include "SWF.h"
 #include "rc.h"
-#include "ASHandlers.h"
-
 #include "NativeFunction.h"
 #include "Function.h"
 #include "as_function.h"
@@ -54,14 +61,6 @@
 #include "as_value.h"
 #include "RunResources.h"
 #include "ObjectURI.h"
-
-#include <string>
-#include <vector>
-#include <cstdlib> // std::mbstowcs
-#include <boost/scoped_array.hpp>
-#include <boost/random.hpp>
-#include <boost/lexical_cast.hpp>
-#include <algorithm> // std::swap
 
 // GNASH_PARANOIA_LEVEL:
 // 0 : no assertions
@@ -1518,9 +1517,10 @@ ActionChr(ActionExec& thread)
 {
     as_environment& env = thread.env;
     
-    // Only handles values up to 65535
-    const boost::uint16_t c =
-        static_cast<boost::uint16_t>(toInt(env.top(0), getVM(env)));
+    // The conversion to unsigned happens before truncation;
+    // this is important.
+    const boost::uint16_t c = to_unsigned<boost::int32_t>(
+        toInt(env.top(0), getVM(env)));
 
     // If the argument to chr() is '0', we return
     // nothing, not NULL
@@ -1541,14 +1541,11 @@ ActionChr(ActionExec& thread)
     // Values above 256 evaluate to value % 256, 
     // through the cast, which is expected behaviour.
     const unsigned char uc = static_cast<unsigned char>(c);
-    if (uc == 0)
-    {
+    if (uc == 0) {
         env.top(0).set_string("");
         return;
     }
-    std::string s;
-    s.push_back(uc);
-    env.top(0).set_string(s);
+    env.top(0).set_string(std::string(1, uc));
 }
 
 void
@@ -1668,9 +1665,10 @@ ActionMbChr(ActionExec& thread)
         // No need to return.
     }
 
-    // Cut to uint16, as characters above 65535 'wrap around'
-    const boost::uint16_t i = 
-        static_cast<boost::uint16_t>(toInt(env.top(0), getVM(env)));
+    // The conversion to unsigned happens before truncation;
+    // this is important.
+    const boost::uint16_t i = to_unsigned<boost::int32_t>(
+        toInt(env.top(0), getVM(env)));
     
     std::string out = utf8::encodeUnicodeCharacter(i);
     
@@ -1694,8 +1692,6 @@ ActionStrictMode(ActionExec& thread)
         log_action(_("ActionStrictMode set to %1%"), on);
     );
 }
-
-
 
 // also known as WaitForFrame2
 void
@@ -3035,7 +3031,7 @@ ActionShiftRight(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
-    boost::uint32_t amount = toInt(env.top(0), getVM(env));
+    boost::uint32_t amount = to_unsigned(toInt(env.top(0), getVM(env)));
     boost::int32_t value = toInt(env.top(1), getVM(env));
 
     value = value >> amount;
@@ -3049,7 +3045,7 @@ ActionShiftRight2(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
-    boost::uint32_t amount = toInt(env.top(0), getVM(env)); 
+    boost::uint32_t amount = to_unsigned(toInt(env.top(0), getVM(env))); 
     boost::int32_t value = toInt(env.top(1), getVM(env));
 
     value = boost::uint32_t(value) >> amount;

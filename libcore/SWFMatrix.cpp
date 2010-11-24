@@ -21,31 +21,45 @@
 //
 
 #include "SWFMatrix.h"
+
+#include <cmath>
+#include <iomanip>
+
 #include "log.h"
 #include "GnashNumeric.h"
 #include "SWFRect.h"
 #include "Point2d.h"
 
-#include <cmath>
-#include <iomanip>
 
+// This class intentionally uses overflows, which are not allowed in
+// signed types; apart from being UB always, in practice it produces
+// different results on different platforms.
+//
+// To avoid this, all calculations where an overflow could occur
+// should use only unsigned types, but assign to the signed SWFMatrix
+// members using only signed types. This would be much easier
+// if the matrix values were also unsigned but were converted to
+// signed for external users.
 namespace gnash {
 
 namespace {
 
 inline boost::int32_t
-DoubleToFixed16(double a)
+toFixed16(double a)
 {
     return truncateWithFactor<65536>(a);
 }
 
 inline boost::int32_t
-Fixed16Mul(boost::int32_t a, boost::int32_t b)
+multiplyFixed16(boost::int32_t a, boost::int32_t b)
 {
-    // truncate when overflow occurs.
-    return static_cast<boost::int32_t>(
-            (static_cast<boost::int64_t>(a) *
-             static_cast<boost::int64_t>(b) + 0x8000) >> 16);
+    // Overflows are permitted only in unsigned types, so
+    // convert using two's complement first.
+    const boost::uint32_t mult = 
+        (to_unsigned<boost::int64_t>(a) * to_unsigned<boost::int64_t>(b) + 0x8000) >> 16;
+
+    // Convert back.
+    return to_signed<boost::uint32_t>(mult);
 }
 
 } // anonymous namepace
@@ -53,8 +67,8 @@ Fixed16Mul(boost::int32_t a, boost::int32_t b)
 void
 SWFMatrix::transform(geometry::Point2d& p) const
 {
-    boost::int32_t t0 = Fixed16Mul(sx, p.x) + Fixed16Mul(shy, p.y) + tx;
-    boost::int32_t t1 = Fixed16Mul(shx,p.x) + Fixed16Mul(sy,  p.y) + ty;
+    boost::int32_t t0 = multiplyFixed16(sx, p.x) + multiplyFixed16(shy, p.y) + tx;
+    boost::int32_t t1 = multiplyFixed16(shx,p.x) + multiplyFixed16(sy,  p.y) + ty;
     p.x = t0;
     p.y = t1;
 }
@@ -62,8 +76,8 @@ SWFMatrix::transform(geometry::Point2d& p) const
 void
 SWFMatrix::transform(boost::int32_t& x, boost::int32_t& y) const
 {
-    const boost::int32_t t0 = Fixed16Mul(sx, x) + Fixed16Mul(shy, y) + tx;
-    const boost::int32_t t1 = Fixed16Mul(shx,x) + Fixed16Mul(sy,  y) + ty;
+    const boost::int32_t t0 = multiplyFixed16(sx, x) + multiplyFixed16(shy, y) + tx;
+    const boost::int32_t t1 = multiplyFixed16(shx,x) + multiplyFixed16(sy,  y) + ty;
     x = t0;
     y = t1;
 }
@@ -103,12 +117,12 @@ void
 SWFMatrix::concatenate(const SWFMatrix& m)
 {
     SWFMatrix t;
-    t.sx =  Fixed16Mul(sx, m.sx)  + Fixed16Mul(shy, m.shx);
-    t.shx = Fixed16Mul(shx, m.sx) + Fixed16Mul(sy, m.shx);
-    t.shy = Fixed16Mul(sx, m.shy) + Fixed16Mul(shy, m.sy);
-    t.sy =  Fixed16Mul(shx, m.shy)+ Fixed16Mul(sy, m.sy);
-    t.tx =  Fixed16Mul(sx, m.tx)  + Fixed16Mul(shy, m.ty) + tx;
-    t.ty =  Fixed16Mul(shx, m.tx) + Fixed16Mul(sy, m.ty)  + ty;
+    t.sx =  multiplyFixed16(sx, m.sx)  + multiplyFixed16(shy, m.shx);
+    t.shx = multiplyFixed16(shx, m.sx) + multiplyFixed16(sy, m.shx);
+    t.shy = multiplyFixed16(sx, m.shy) + multiplyFixed16(shy, m.sy);
+    t.sy =  multiplyFixed16(shx, m.shy)+ multiplyFixed16(sy, m.sy);
+    t.tx =  multiplyFixed16(sx, m.tx)  + multiplyFixed16(shy, m.ty) + tx;
+    t.ty =  multiplyFixed16(shx, m.tx) + multiplyFixed16(sy, m.ty)  + ty;
 
     *this = t;
 }
@@ -119,8 +133,8 @@ SWFMatrix::concatenate(const SWFMatrix& m)
 void
 SWFMatrix::concatenate_translation(int xoffset, int yoffset)
 {
-    tx += Fixed16Mul(sx,  xoffset) + Fixed16Mul(shy, yoffset);
-    ty += Fixed16Mul(shx, xoffset) + Fixed16Mul(sy, yoffset);
+    tx += multiplyFixed16(sx,  xoffset) + multiplyFixed16(shy, yoffset);
+    ty += multiplyFixed16(shx, xoffset) + multiplyFixed16(sy, yoffset);
 }
 
 // Concatenate scales to our SWFMatrix. When transforming points, these 
@@ -128,10 +142,10 @@ SWFMatrix::concatenate_translation(int xoffset, int yoffset)
 void
 SWFMatrix::concatenate_scale(double xscale, double yscale)
 {
-    sx  = Fixed16Mul(sx, DoubleToFixed16(xscale));
-    shy = Fixed16Mul(shy,DoubleToFixed16(yscale));
-    shx = Fixed16Mul(shx,DoubleToFixed16(xscale));
-    sy  = Fixed16Mul(sy, DoubleToFixed16(yscale)); 
+    sx  = multiplyFixed16(sx, toFixed16(xscale));
+    shy = multiplyFixed16(shy,toFixed16(yscale));
+    shx = multiplyFixed16(shx,toFixed16(xscale));
+    sy  = multiplyFixed16(sy, toFixed16(yscale)); 
 }
 
 // Set this SWFMatrix to a blend of m1 and m2, parameterized by t.
@@ -153,10 +167,10 @@ SWFMatrix::set_scale_rotation(double x_scale, double y_scale, double angle)
 {
     const double cos_angle = std::cos(angle);
     const double sin_angle = std::sin(angle);
-    sx  = DoubleToFixed16(x_scale * cos_angle);
-    shy = DoubleToFixed16(y_scale * -sin_angle);
-    shx = DoubleToFixed16(x_scale * sin_angle);
-    sy  = DoubleToFixed16(y_scale * cos_angle); 
+    sx  = toFixed16(x_scale * cos_angle);
+    shy = toFixed16(y_scale * -sin_angle);
+    shx = toFixed16(x_scale * sin_angle);
+    sy  = toFixed16(y_scale * cos_angle); 
 }
 
 void
@@ -164,8 +178,8 @@ SWFMatrix::set_x_scale(double xscale)
 {
     const double rot_x =
         std::atan2(static_cast<double>(shx), static_cast<double>(sx));
-    sx = DoubleToFixed16(xscale * std::cos(rot_x));
-    shx = DoubleToFixed16(xscale * std::sin(rot_x)); 
+    sx = toFixed16(xscale * std::cos(rot_x));
+    shx = toFixed16(xscale * std::sin(rot_x)); 
 }
 
 void
@@ -174,8 +188,8 @@ SWFMatrix::set_y_scale(double yscale)
     const double rot_y =
         std::atan2(static_cast<double>(-shy), static_cast<double>(sy));
 
-    shy = -DoubleToFixed16(yscale * std::sin(rot_y));
-    sy = DoubleToFixed16(yscale * std::cos(rot_y));
+    shy = -toFixed16(yscale * std::sin(rot_y));
+    sy = toFixed16(yscale * std::cos(rot_y));
 }
 
 void
@@ -195,10 +209,10 @@ SWFMatrix::set_rotation(double rotation)
     const double scale_x = get_x_scale();
     const double scale_y = get_y_scale();
  
-    sx = DoubleToFixed16(scale_x * std::cos(rotation));
-    shx = DoubleToFixed16(scale_x * std::sin(rotation)); 
-    shy = -DoubleToFixed16(scale_y * std::sin(rot_y - rot_x + rotation));
-    sy = DoubleToFixed16(scale_y * std::cos(rot_y - rot_x + rotation));
+    sx = toFixed16(scale_x * std::cos(rotation));
+    shx = toFixed16(scale_x * std::sin(rotation)); 
+    shy = -toFixed16(scale_y * std::sin(rot_y - rot_x + rotation));
+    sy = toFixed16(scale_y * std::cos(rot_y - rot_x + rotation));
 }
 
 // Transform point 'p' by our SWFMatrix.  Put the result in *result.
@@ -207,8 +221,8 @@ SWFMatrix::transform(point* result, const point& p) const
 {
     assert(result);
 
-    result->x = Fixed16Mul(sx,  p.x) + Fixed16Mul(shy, p.y) + tx;
-    result->y = Fixed16Mul(shx, p.x) + Fixed16Mul(sy,  p.y) + ty;
+    result->x = multiplyFixed16(sx,  p.x) + multiplyFixed16(shy, p.y) + tx;
+    result->y = multiplyFixed16(shx, p.x) + multiplyFixed16(sy,  p.y) + ty;
 }
 
 void 
@@ -254,8 +268,8 @@ SWFMatrix::invert()
     shy = (boost::int32_t)(-shy * d);
     shx = (boost::int32_t)(-shx * d);
 
-    const boost::int32_t t4 = - (Fixed16Mul(tx, t0) + Fixed16Mul(ty, shy));
-    ty = - (Fixed16Mul(tx, shx) + Fixed16Mul(ty, sy));
+    const boost::int32_t t4 = - (multiplyFixed16(tx, t0) + multiplyFixed16(ty, shy));
+    ty = - (multiplyFixed16(tx, shx) + multiplyFixed16(ty, sy));
 
     sx = t0;
     tx = t4;

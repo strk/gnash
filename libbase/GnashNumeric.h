@@ -34,6 +34,9 @@
 #include <algorithm>
 #include <boost/cstdint.hpp>
 #include <limits>
+#include <boost/type_traits/make_signed.hpp>
+#include <boost/type_traits/make_unsigned.hpp>
+#include <boost/utility/enable_if.hpp>
 
 namespace gnash {
 
@@ -54,6 +57,66 @@ isFinite(double d)
     return (isfinite(d));
 #endif
 }
+
+/// Convert an unsigned type to a signed type of the same width.
+//
+/// This mimics the conversion from a two's complement signed type
+/// to a corresponding unsigned type. This is the de facto default
+/// conversion on most i686 machines, but the behaviour is undefined
+/// *in all cases* in C++, and produces incorrect results on
+/// some platforms.
+//
+/// @tparam unsigned_type   The type to convert from
+/// @param t                The value to convert
+/// @return                 An unsigned type of the same width
+template<typename unsigned_type>
+typename boost::make_signed<unsigned_type>::type
+to_signed(unsigned_type t,
+    typename boost::enable_if<
+        typename boost::is_unsigned<unsigned_type> >::type* dummy = 0)
+{
+    (void)dummy;
+    typedef typename boost::make_signed<unsigned_type>::type signed_type;
+
+    // The max of the corresponding signed type can be represented in the
+    // unsigned type.
+    const unsigned_type max = std::numeric_limits<signed_type>::max();
+
+    if (t <= max) return t;
+
+    const signed_type x = t & max;
+
+    const signed_type min = std::numeric_limits<signed_type>::min();
+
+    return min + x;
+};
+
+/// Convert a signed type to an unsigned type of the same width.
+//
+/// This mimics the conversion from an unsigned type to a two's
+/// complement signed type. This is the de facto default
+/// conversion on most i686 machines, but the behaviour is undefined
+/// *in all cases* in C++, and produces incorrect results on
+/// some platforms.
+//
+/// @tparam signed_type     The type to convert from
+/// @param t                The value to convert
+/// @return                 A signed type of the same width
+template<typename signed_type>
+typename boost::make_unsigned<signed_type>::type
+to_unsigned(signed_type t,
+    typename boost::enable_if<
+        typename boost::is_signed<signed_type> >::type* dummy = 0)
+{
+    (void)dummy;
+
+    typedef typename boost::make_unsigned<signed_type>::type unsigned_type;
+
+    // Anything positive can be represented.
+    if (t >= 0) return t;
+
+    return std::numeric_limits<unsigned_type>::max() + t + 1;
+};
 
 inline double
 infinite_to_zero(double x)
@@ -110,7 +173,7 @@ truncateWithFactor(double a)
                 std::numeric_limits<boost::int32_t>::min() / factor;
 
     if (a >= lowerSignedLimit && a <= upperSignedLimit) {
-        return static_cast<boost::int32_t>(a * factor);
+        return to_signed<boost::uint32_t>(a * factor);
     }
 
     // This slow truncation happens only in very unlikely cases.
