@@ -468,7 +468,7 @@ KDE_NO_EXPORT bool KlashLiveConnectExtension::call
     if (!entry)
         return false;
     kdDebug () << "[01;35mentry[00m " << entry->name << endl;
-    for (unsigned int i = 0; i < args.size (); ++i) {
+    for (int i = 0; i < args.size (); ++i) {
         kdDebug () << "      " << args[i] << endl;
     }
     //Klash::View * view = static_cast <Klash::View*> (player->widget ());
