@@ -20,9 +20,6 @@ set file all
 set params ""
 
 global env
-set env(LANG) en_US.UTF-8
-set env(LANGUAGE) en_US.UTF-8
-set env(LC_ALL) en_US.UTF-8
 
 # testcases is set by the Makefile in the site.exp data file.
 foreach file $testcases {
@@ -126,8 +123,6 @@ foreach file $testcases {
 	if { [ lindex $retcode 3 ] != 0 } {
 		fail "${file} exited with non-zero code ([lindex $retcode 3])"
 	}
-
-
 
     # force a close of the executable to be safe.
     catch close
