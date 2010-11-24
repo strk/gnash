@@ -22,6 +22,8 @@ abs_top_builddir=$(shell cd $(top_builddir); pwd)
 abs_builddir=$(shell cd $(top_builddir)/testsuite/misc-ming.all; pwd)
 abs_mediadir = $(shell cd $(srcdir)/../media; pwd)
 
+GST_INSTALL_PLUGINS_HELPER=$(top_srcdir)/testsuite/gst_install_plugins_helper.sh
+
 CLEANFILES =  \
 	gnash-dbg.log \
 	site.exp.bak \
