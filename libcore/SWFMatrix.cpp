@@ -44,6 +44,22 @@ namespace gnash {
 
 namespace {
 
+inline double
+rotationX(const SWFMatrix& m)
+{
+    const double b = m.b();
+    const double a = m.a();
+    return std::atan2(b, a);
+};
+
+inline double
+rotationY(const SWFMatrix& m)
+{
+    const double c = m.c();
+    const double d = m.d();
+    return std::atan2(-c, d);
+};
+
 inline boost::int32_t
 toFixed16(double a)
 {
@@ -176,8 +192,7 @@ SWFMatrix::set_scale_rotation(double x_scale, double y_scale, double angle)
 void
 SWFMatrix::set_x_scale(double xscale)
 {
-    const double rot_x =
-        std::atan2(static_cast<double>(_b), static_cast<double>(_a));
+    const double rot_x = rotationX(*this);
     _a = toFixed16(xscale * std::cos(rot_x));
     _b = toFixed16(xscale * std::sin(rot_x)); 
 }
@@ -185,8 +200,7 @@ SWFMatrix::set_x_scale(double xscale)
 void
 SWFMatrix::set_y_scale(double yscale)
 {
-    const double rot_y =
-        std::atan2(static_cast<double>(-_c), static_cast<double>(_d));
+    const double rot_y = rotationY(*this);
 
     _c = -toFixed16(yscale * std::sin(rot_y));
     _d = toFixed16(yscale * std::cos(rot_y));
@@ -202,10 +216,9 @@ SWFMatrix::set_scale(double xscale, double yscale)
 void
 SWFMatrix::set_rotation(double rotation)
 {   
-    const double rot_x =
-        std::atan2(static_cast<double>(_b), static_cast<double>(_a));
-    const double rot_y =
-        std::atan2(static_cast<double>(-_c), static_cast<double>(_d));
+    const double rot_x = rotationX(*this);
+    const double rot_y = rotationY(*this);
+
     const double scale_x = get_x_scale();
     const double scale_y = get_y_scale();
  
@@ -280,22 +293,21 @@ SWFMatrix::invert()
 double
 SWFMatrix::get_x_scale() const
 {
-    return std::sqrt((static_cast<double>(_a) * _a +
-                static_cast<double>(_b) * _b)) / 65536.0;
+    return std::sqrt((static_cast<double>(a()) * a() +
+                static_cast<double>(b()) * b())) / 65536.0;
 }
 
 double
 SWFMatrix::get_y_scale() const
 {
-    return std::sqrt((static_cast<double>(_d) * _d +
-                static_cast<double>(_c) * _c)) / 65536.0;
+    return std::sqrt((static_cast<double>(d()) * d() +
+                static_cast<double>(c()) * c())) / 65536.0;
 }
 
 double
 SWFMatrix::get_rotation() const
 {
-    // more successes in misc-ming.all/SWFMatrix_test.c
-    return std::atan2(static_cast<double>(_b), _a); 
+    return rotationX(*this);
 }
 
 // private
