@@ -154,7 +154,7 @@ SWFMatrix::concatenate_translation(int xoffset, int yoffset)
 }
 
 // Concatenate scales to our SWFMatrix. When transforming points, these 
-// scales happen first, then our matirx.
+// scales happen first, then our matrix.
 void
 SWFMatrix::concatenate_scale(double xscale, double yscale)
 {

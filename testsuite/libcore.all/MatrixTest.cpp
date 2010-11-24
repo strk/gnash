@@ -259,7 +259,7 @@ main(int /*argc*/, char** /*argv*/)
     
     SWFMatrix m1_inverse = m1;
     m1_inverse.invert();
-    // concatenate the inverse SWFMatrix and orignial SWFMatrix.
+    // concatenate the inverse SWFMatrix and original SWFMatrix.
     m1_inverse.concatenate(m1); 
     // the result is expected to be an identity SWFMatrix. 
     check_equals(m1_inverse, identity);
@@ -276,7 +276,7 @@ main(int /*argc*/, char** /*argv*/)
     check_equals(m1_inverse.d(), 16384 * 65536);
     check_equals(m1_inverse.ty(), -16384 * 20);
     
-    // concatenate the inverse SWFMatrix and orignial SWFMatrix.
+    // concatenate the inverse SWFMatrix and original SWFMatrix.
     m1_inverse.concatenate(m1);
     // the result is expected to be an identity SWFMatrix. 
     check_equals(m1_inverse, identity);
