@@ -751,6 +751,7 @@ dnl --------------------------------------------------------
 dnl  Sound handler selection
 dnl --------------------------------------------------------
 add_sound=
+build_sound_none=no
 build_sound_sdl=no
 build_sound_ahi=no
 build_sound_mkit=no
@@ -760,6 +761,10 @@ AC_ARG_ENABLE(sound,
       sdl|SDL|Sdl)
         build_sound_sdl=yes
         add_sound="sdl"
+        ;;
+      none|NONE|None)
+        build_sound_none=yes
+        add_sound="none"
         ;;
       ahi|AHI|Ahi)
         build_sound_ahi=yes
@@ -774,8 +779,10 @@ AC_ARG_ENABLE(sound,
      build_sound_mkit=yes
      add_sound="mkit"
    else
-     build_sound_sdl=yes
-     add_sound=sdl
+     if test x${build_sound_none} = xno; then
+       build_sound_sdl=yes
+       add_sound=sdl
+     fi
    fi]
 )
 
