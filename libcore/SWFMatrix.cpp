@@ -269,17 +269,18 @@ SWFMatrix&
 SWFMatrix::invert()
 {
     const boost::int64_t det = determinant();
+
     if (det == 0) {
         set_identity();
         return *this;
     }
 
-    const double d = 65536.0 * 65536.0 / det;
+    const double dn = 65536.0 * 65536.0 / det;
     
-    const boost::int32_t t0 = (boost::int32_t)(_d * d);
-    _d  = (boost::int32_t)(_a * d);
-    _c = (boost::int32_t)(-_c * d);
-    _b = (boost::int32_t)(-_b * d);
+    const boost::int32_t t0 = (boost::int32_t)(d() * dn);
+    _d  = (boost::int32_t)(a() * dn);
+    _c = (boost::int32_t)(-c() * dn);
+    _b = (boost::int32_t)(-b() * dn);
 
     const boost::int32_t t4 = - (multiplyFixed16(_tx, t0) + multiplyFixed16(_ty, _c));
     _ty = - (multiplyFixed16(_tx, _b) + multiplyFixed16(_ty, _d));
@@ -293,15 +294,17 @@ SWFMatrix::invert()
 double
 SWFMatrix::get_x_scale() const
 {
-    return std::sqrt((static_cast<double>(a()) * a() +
-                static_cast<double>(b()) * b())) / 65536.0;
+    const double a2 = static_cast<double>(a()) * a();
+    const double b2 = static_cast<double>(b()) * b();
+    return std::sqrt(a2 + b2) / 65536.0;
 }
 
 double
 SWFMatrix::get_y_scale() const
 {
-    return std::sqrt((static_cast<double>(d()) * d() +
-                static_cast<double>(c()) * c())) / 65536.0;
+    const double d2 = static_cast<double>(d()) * d();
+    const double c2 = static_cast<double>(c()) * c();
+    return std::sqrt(d2 + c2) / 65536.0;
 }
 
 double
@@ -321,8 +324,7 @@ SWFMatrix::determinant() const
     // Det(T) = ( (_a * _d * 1 ) + (_c * _ty * 0) + (_tx * _b *  0) ) -
     //          ( (0  * _d * _tx) + (0  * _ty * _a) + (1 * _c * _b) )
     //        = _a * _d - _b * _c
-
-    return (boost::int64_t)_a * _d - (boost::int64_t)_b * _c;
+    return (boost::int64_t)a() * d() - (boost::int64_t)b() * c();
 }
 
 std::ostream&
