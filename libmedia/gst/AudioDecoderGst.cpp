@@ -182,8 +182,12 @@ void AudioDecoderGst::setup(GstCaps* srccaps)
 
     success = swfdec_gst_decoder_init (&_decoder, srccaps, sinkcaps, "audioconvert", resampler.c_str(), NULL);
     if (!success) {
-	/// @todo print more about why, and for which codec ...
-        throw MediaException(_("AudioDecoderGst: initialisation failed."));      
+        GstStructure* sct = gst_caps_get_structure(srccaps, 0);
+        std::string type(gst_structure_get_name(sct));
+        std::string msg = (boost::format(
+            _("AudioDecoderGst: initialisation failed for audio type %s!"))
+            % type).str();
+        throw MediaException(msg);
     }
 
     gst_caps_unref (srccaps);
