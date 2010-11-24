@@ -1153,9 +1153,9 @@ void
 init_cairo_matrix(cairo_matrix_t* cairo_matrix, const SWFMatrix& gnash_matrix)
 {
     cairo_matrix_init(cairo_matrix,
-                      gnash_matrix.sx/65536.0, gnash_matrix.shx/65536.0,
-                      gnash_matrix.shy/65536.0, gnash_matrix.sy/65536.0,
-                      gnash_matrix.tx, gnash_matrix.ty);
+              gnash_matrix.a()/65536.0, gnash_matrix.b()/65536.0,
+              gnash_matrix.c()/65536.0, gnash_matrix.d()/65536.0,
+              gnash_matrix.tx(), gnash_matrix.ty());
 }
 
 

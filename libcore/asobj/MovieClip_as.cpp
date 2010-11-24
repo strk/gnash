@@ -2010,8 +2010,8 @@ movieclip_beginBitmapFill(const fn_call& fn)
     // not exactly intuitive.
     mat.invert();
     mat.concatenate_scale(1 / 20., 1 / 20.);
-    mat.tx /= 20;
-    mat.ty /= 20;
+    mat.set_x_translation(mat.tx() / 20);
+    mat.set_y_translation(mat.ty() / 20);
 
     ptr->graphics().beginFill(BitmapFill(t, bd->bitmapInfo(), mat, p));
     bd->attach(ptr);

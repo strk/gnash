@@ -745,8 +745,8 @@ public:
         
         // convert Gnash SWFMatrix to AGG SWFMatrix and scale down to
         // pixel coordinates while we're at it
-        agg::trans_affine mtx(mat.sx / 65536.0, mat.shx / 65536.0, 
-            mat.shy / 65536.0, mat.sy / 65536.0, mat.tx, mat.ty);        
+        agg::trans_affine mtx(mat.a() / 65536.0, mat.b() / 65536.0, 
+            mat.c() / 65536.0, mat.d() / 65536.0, mat.tx(), mat.ty());        
         
         // invert SWFMatrix since this is used for the image source
         mtx.invert();

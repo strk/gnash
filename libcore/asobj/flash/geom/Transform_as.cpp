@@ -242,12 +242,12 @@ transform_concatenatedMatrix(const fn_call& fn)
         const SWFMatrix& m = relay->worldMatrix();
 
         fn_call::Args args;
-        args += m.sx / factor,
-                m.shx / factor,
-                m.shy / factor,
-                m.sy / factor,
-                twipsToPixels(m.tx),
-                twipsToPixels(m.ty);
+        args += m.a() / factor,
+                m.b() / factor,
+                m.c() / factor,
+                m.d() / factor,
+                twipsToPixels(m.tx()),
+                twipsToPixels(m.ty());
 
         as_object* matrixObj = constructInstance(*matrixCtor, fn.env(), args);
 
@@ -286,12 +286,12 @@ transform_matrix(const fn_call& fn)
         const SWFMatrix& m = relay->matrix();
 
         fn_call::Args args;
-        args += m.sx / factor,
-                m.shx / factor,
-                m.shy / factor,
-                m.sy / factor,
-                twipsToPixels(m.tx),
-                twipsToPixels(m.ty);
+        args += m.a() / factor,
+                m.b() / factor,
+                m.c() / factor,
+                m.d() / factor,
+                twipsToPixels(m.tx()),
+                twipsToPixels(m.ty());
 
         as_object* matrixObj = constructInstance(*matrixCtor, fn.env(), args);
 

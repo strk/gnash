@@ -232,8 +232,8 @@ public:
         :
         AggStyle(false),
         m_cx(cx),
-        m_tr(mat.sx / 65536.0, mat.shx/65536.0, mat.shy / 65536.0,
-              mat.sy / 65536.0, mat.tx, mat.ty),
+        m_tr(mat.a() / 65536.0, mat.b() / 65536.0, mat.c() / 65536.0,
+              mat.d() / 65536.0, mat.tx(), mat.ty()),
         m_span_interpolator(m_tr),
         m_gradient_adaptor(gr),
         m_sg(m_span_interpolator, m_gradient_adaptor, m_gradient_lut, 0,
@@ -358,8 +358,8 @@ public:
     m_rbuf(data, width, height, rowlen),  
     m_pixf(m_rbuf),
     m_img_src(m_pixf),
-    m_tr(mat.sx / 65535.0, mat.shx / 65535.0, mat.shy / 65535.0,
-            mat.sy / 65535.0, mat.tx, mat.ty),
+    m_tr(mat.a() / 65535.0, mat.b() / 65535.0, mat.c() / 65535.0,
+            mat.d() / 65535.0, mat.tx(), mat.ty()),
     m_interpolator(m_tr),
     m_sg(m_img_src, m_interpolator)
   {

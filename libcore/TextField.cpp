@@ -1202,14 +1202,14 @@ TextField::format_text()
             /// Autosize right expands from the previous right margin.
             SWFMatrix m;
 
-            m.tx = oldBounds.get_x_max() - _bounds.width();
+            m.set_x_translation(oldBounds.get_x_max() - _bounds.width());
             m.transform(_bounds);
         }
         else if (_autoSize == AUTOSIZE_CENTER) {
             // Autosize center expands from the previous center.
             SWFMatrix m;
-            m.tx = oldBounds.get_x_min() + oldBounds.width() / 2.0 - 
-                _bounds.width() / 2.0;
+            m.set_x_translation(oldBounds.get_x_min() + oldBounds.width() / 2.0 - 
+                    _bounds.width() / 2.0);
             m.transform(_bounds);
         }
     }
@@ -1219,7 +1219,6 @@ TextField::format_text()
 	
     // align the last (or single) line
     align_line(getTextAlignment(), last_line_start_record, x);
-	
 
     scrollLines();
 	

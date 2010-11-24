@@ -54,45 +54,51 @@ class DSOEXPORT SWFMatrix
 {
 public:
 
-    /// Xscale, 16.16 fixed point. xx in swfdec. 'a' in AS Matrix.
-    boost::int32_t sx; 
-
-    /// Xshear, 16.16 fixed point. yx in swfdec. 'b' in AS Matrix.
-    boost::int32_t shx;
-
-    /// Yshear, 16.16 fixed point. xy in swfdec. 'c' in AS Matrix.
-    boost::int32_t shy;
-
-    /// Yscale, 16.16 fixed point. yy in swfdec. 'd' in AS Matrix.
-    boost::int32_t sy; 
-
-    /// Xtranslation, TWIPS. x0 in swfdec. 'tx' in AS Matrix.
-    boost::int32_t tx; 
-
-    /// Ytranslation, TWIPS. y0 in swfdec. 'ty' in AS Matrix.
-    boost::int32_t ty; 
-             
     /// Construct an identity SWFMatrix
     SWFMatrix()
         :
-        sx(65536),
-        shx(0),
-        shy(0),
-        sy(65536),
-        tx(0),
-        ty(0)
+        _a(65536),
+        _b(0),
+        _c(0),
+        _d(65536),
+        _tx(0),
+        _ty(0)
     {}
 
     /// Construct a SWFMatrix with all values.
     SWFMatrix(int a, int b, int c, int d, int x, int y)
         :
-        sx(a),
-        shx(b),
-        shy(c),
-        sy(d),
-        tx(x),
-        ty(y)
+        _a(a),
+        _b(b),
+        _c(c),
+        _d(d),
+        _tx(x),
+        _ty(y)
     {}
+
+    boost::int32_t a() const {
+        return _a;
+    }
+
+    boost::int32_t b() const {
+        return _b;
+    }
+
+    boost::int32_t c() const {
+        return _c;
+    }
+
+    boost::int32_t d() const {
+        return _d;
+    }
+
+    boost::int32_t tx() const {
+        return _tx;
+    }
+
+    boost::int32_t ty() const {
+        return _ty;
+    }
 
     /// Set the SWFMatrix to identity.
     void set_identity();
@@ -107,7 +113,7 @@ public:
     //
     /// When transforming points, the translation
     /// happens first, then our original xform.
-    void concatenate_translation(int tx, int ty);
+    void concatenate_translation(int _tx, int _ty);
 
     /// Concatenate scale x and y to the front of our SWFMatrix 
     //
@@ -135,18 +141,18 @@ public:
 
     /// Set x translation in TWIPS
     void set_x_translation(int x) {
-        tx = x;
+        _tx = x;
     }
 
     /// Set y translation in TWIPS.
     void set_y_translation(int y) {
-        ty = y;
+        _ty = y;
     }
 
     /// Set x and y translation in TWIPS.
     void set_translation(int x, int y) {
-        tx = x;
-        ty = y;
+        _tx = x;
+        _ty = y;
     }
 
     /// Transform a given point by our SWFMatrix
@@ -183,18 +189,40 @@ public:
 
     /// return x translation n TWIPS unit.
     int get_x_translation() const {
-        return tx;
+        return _tx;
     }
 
     /// return y translation in TWIPS unit.
     int get_y_translation() const {
-        return ty;
+        return _ty;
     }
+
+    /// Allow direct access to values for equality
+    friend bool operator==(const SWFMatrix& a, const SWFMatrix& b);
 
 private: 
 
     /// Return the determinant of this SWFMatrix in 32.32 fixed point format.
     boost::int64_t  determinant() const;
+
+    /// Xscale, 16.16 fixed point. xx in swfdec. 'a' in AS Matrix.
+    boost::int32_t _a; 
+
+    /// Xshear, 16.16 fixed point. yx in swfdec. 'b' in AS Matrix.
+    boost::int32_t _b;
+
+    /// Yshear, 16.16 fixed point. xy in swfdec. 'c' in AS Matrix.
+    boost::int32_t _c;
+
+    /// Yscale, 16.16 fixed point. yy in swfdec. 'd' in AS Matrix.
+    boost::int32_t _d; 
+
+    /// Xtranslation, TWIPS. x0 in swfdec. '_tx' in AS Matrix.
+    boost::int32_t _tx; 
+
+    /// Ytranslation, TWIPS. y0 in swfdec. '_ty' in AS Matrix.
+    boost::int32_t _ty; 
+             
 
 }; //end of SWFMatrix
 
@@ -202,12 +230,12 @@ inline bool
 operator==(const SWFMatrix& a, const SWFMatrix& b)
 {
     return  
-        a.sx  == b.sx  &&
-        a.shx == b.shx &&
-        a.tx  == b.tx  &&
-        a.sy  == b.sy  &&
-        a.shy == b.shy &&
-        a.ty  == b.ty;
+        a.a()  == b._a  &&
+        a._b == b._b &&
+        a._tx  == b._tx  &&
+        a._d  == b._d  &&
+        a._c == b._c &&
+        a._ty  == b._ty;
 }
 
 std::ostream& operator<<(std::ostream& o, const SWFMatrix& m);

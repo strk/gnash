@@ -67,8 +67,8 @@ multiplyFixed16(boost::int32_t a, boost::int32_t b)
 void
 SWFMatrix::transform(geometry::Point2d& p) const
 {
-    boost::int32_t t0 = multiplyFixed16(sx, p.x) + multiplyFixed16(shy, p.y) + tx;
-    boost::int32_t t1 = multiplyFixed16(shx,p.x) + multiplyFixed16(sy,  p.y) + ty;
+    boost::int32_t t0 = multiplyFixed16(_a, p.x) + multiplyFixed16(_c, p.y) + _tx;
+    boost::int32_t t1 = multiplyFixed16(_b,p.x) + multiplyFixed16(_d,  p.y) + _ty;
     p.x = t0;
     p.y = t1;
 }
@@ -76,8 +76,8 @@ SWFMatrix::transform(geometry::Point2d& p) const
 void
 SWFMatrix::transform(boost::int32_t& x, boost::int32_t& y) const
 {
-    const boost::int32_t t0 = multiplyFixed16(sx, x) + multiplyFixed16(shy, y) + tx;
-    const boost::int32_t t1 = multiplyFixed16(shx,x) + multiplyFixed16(sy,  y) + ty;
+    const boost::int32_t t0 = multiplyFixed16(_a, x) + multiplyFixed16(_c, y) + _tx;
+    const boost::int32_t t1 = multiplyFixed16(_b,x) + multiplyFixed16(_d,  y) + _ty;
     x = t0;
     y = t1;
 }
@@ -109,20 +109,20 @@ SWFMatrix::transform(geometry::Range2d<boost::int32_t>& r) const
 void
 SWFMatrix::set_identity()
 {
-    sx = sy = 65536;
-    shx = shy = tx = ty = 0;
+    _a = _d = 65536;
+    _b = _c = _tx = _ty = 0;
 }
 
 void
 SWFMatrix::concatenate(const SWFMatrix& m)
 {
     SWFMatrix t;
-    t.sx =  multiplyFixed16(sx, m.sx)  + multiplyFixed16(shy, m.shx);
-    t.shx = multiplyFixed16(shx, m.sx) + multiplyFixed16(sy, m.shx);
-    t.shy = multiplyFixed16(sx, m.shy) + multiplyFixed16(shy, m.sy);
-    t.sy =  multiplyFixed16(shx, m.shy)+ multiplyFixed16(sy, m.sy);
-    t.tx =  multiplyFixed16(sx, m.tx)  + multiplyFixed16(shy, m.ty) + tx;
-    t.ty =  multiplyFixed16(shx, m.tx) + multiplyFixed16(sy, m.ty)  + ty;
+    t._a =  multiplyFixed16(_a, m._a)  + multiplyFixed16(_c, m._b);
+    t._b = multiplyFixed16(_b, m._a) + multiplyFixed16(_d, m._b);
+    t._c = multiplyFixed16(_a, m._c) + multiplyFixed16(_c, m._d);
+    t._d =  multiplyFixed16(_b, m._c)+ multiplyFixed16(_d, m._d);
+    t._tx =  multiplyFixed16(_a, m._tx)  + multiplyFixed16(_c, m._ty) + _tx;
+    t._ty =  multiplyFixed16(_b, m._tx) + multiplyFixed16(_d, m._ty)  + _ty;
 
     *this = t;
 }
@@ -133,8 +133,8 @@ SWFMatrix::concatenate(const SWFMatrix& m)
 void
 SWFMatrix::concatenate_translation(int xoffset, int yoffset)
 {
-    tx += multiplyFixed16(sx,  xoffset) + multiplyFixed16(shy, yoffset);
-    ty += multiplyFixed16(shx, xoffset) + multiplyFixed16(sy, yoffset);
+    _tx += multiplyFixed16(_a,  xoffset) + multiplyFixed16(_c, yoffset);
+    _ty += multiplyFixed16(_b, xoffset) + multiplyFixed16(_d, yoffset);
 }
 
 // Concatenate scales to our SWFMatrix. When transforming points, these 
@@ -142,22 +142,22 @@ SWFMatrix::concatenate_translation(int xoffset, int yoffset)
 void
 SWFMatrix::concatenate_scale(double xscale, double yscale)
 {
-    sx  = multiplyFixed16(sx, toFixed16(xscale));
-    shy = multiplyFixed16(shy,toFixed16(yscale));
-    shx = multiplyFixed16(shx,toFixed16(xscale));
-    sy  = multiplyFixed16(sy, toFixed16(yscale)); 
+    _a  = multiplyFixed16(_a, toFixed16(xscale));
+    _c = multiplyFixed16(_c,toFixed16(yscale));
+    _b = multiplyFixed16(_b,toFixed16(xscale));
+    _d  = multiplyFixed16(_d, toFixed16(yscale)); 
 }
 
 // Set this SWFMatrix to a blend of m1 and m2, parameterized by t.
 void
 SWFMatrix::set_lerp(const SWFMatrix& m1, const SWFMatrix& m2, float t)
 {
-    sx = lerp<float>(m1.sx, m2.sx, t);
-    shx = lerp<float>(m1.shx, m2.shx, t);
-    shy = lerp<float>(m1.shy, m2.shy, t);
-    sy = lerp<float>(m1.sy, m2.sy, t);
-    tx = lerp<float>(m1.tx, m2.tx, t);
-    ty = lerp<float>(m1.ty, m2.ty, t);
+    _a = lerp<float>(m1._a, m2._a, t);
+    _b = lerp<float>(m1._b, m2._b, t);
+    _c = lerp<float>(m1._c, m2._c, t);
+    _d = lerp<float>(m1._d, m2._d, t);
+    _tx = lerp<float>(m1._tx, m2._tx, t);
+    _ty = lerp<float>(m1._ty, m2._ty, t);
 }
 
 // Set the scale & rotation part of the SWFMatrix.
@@ -167,29 +167,29 @@ SWFMatrix::set_scale_rotation(double x_scale, double y_scale, double angle)
 {
     const double cos_angle = std::cos(angle);
     const double sin_angle = std::sin(angle);
-    sx  = toFixed16(x_scale * cos_angle);
-    shy = toFixed16(y_scale * -sin_angle);
-    shx = toFixed16(x_scale * sin_angle);
-    sy  = toFixed16(y_scale * cos_angle); 
+    _a  = toFixed16(x_scale * cos_angle);
+    _c = toFixed16(y_scale * -sin_angle);
+    _b = toFixed16(x_scale * sin_angle);
+    _d  = toFixed16(y_scale * cos_angle); 
 }
 
 void
 SWFMatrix::set_x_scale(double xscale)
 {
     const double rot_x =
-        std::atan2(static_cast<double>(shx), static_cast<double>(sx));
-    sx = toFixed16(xscale * std::cos(rot_x));
-    shx = toFixed16(xscale * std::sin(rot_x)); 
+        std::atan2(static_cast<double>(_b), static_cast<double>(_a));
+    _a = toFixed16(xscale * std::cos(rot_x));
+    _b = toFixed16(xscale * std::sin(rot_x)); 
 }
 
 void
 SWFMatrix::set_y_scale(double yscale)
 {
     const double rot_y =
-        std::atan2(static_cast<double>(-shy), static_cast<double>(sy));
+        std::atan2(static_cast<double>(-_c), static_cast<double>(_d));
 
-    shy = -toFixed16(yscale * std::sin(rot_y));
-    sy = toFixed16(yscale * std::cos(rot_y));
+    _c = -toFixed16(yscale * std::sin(rot_y));
+    _d = toFixed16(yscale * std::cos(rot_y));
 }
 
 void
@@ -203,16 +203,16 @@ void
 SWFMatrix::set_rotation(double rotation)
 {   
     const double rot_x =
-        std::atan2(static_cast<double>(shx), static_cast<double>(sx));
+        std::atan2(static_cast<double>(_b), static_cast<double>(_a));
     const double rot_y =
-        std::atan2(static_cast<double>(-shy), static_cast<double>(sy));
+        std::atan2(static_cast<double>(-_c), static_cast<double>(_d));
     const double scale_x = get_x_scale();
     const double scale_y = get_y_scale();
  
-    sx = toFixed16(scale_x * std::cos(rotation));
-    shx = toFixed16(scale_x * std::sin(rotation)); 
-    shy = -toFixed16(scale_y * std::sin(rot_y - rot_x + rotation));
-    sy = toFixed16(scale_y * std::cos(rot_y - rot_x + rotation));
+    _a = toFixed16(scale_x * std::cos(rotation));
+    _b = toFixed16(scale_x * std::sin(rotation)); 
+    _c = -toFixed16(scale_y * std::sin(rot_y - rot_x + rotation));
+    _d = toFixed16(scale_y * std::cos(rot_y - rot_x + rotation));
 }
 
 // Transform point 'p' by our SWFMatrix.  Put the result in *result.
@@ -221,8 +221,8 @@ SWFMatrix::transform(point* result, const point& p) const
 {
     assert(result);
 
-    result->x = multiplyFixed16(sx,  p.x) + multiplyFixed16(shy, p.y) + tx;
-    result->y = multiplyFixed16(shx, p.x) + multiplyFixed16(sy,  p.y) + ty;
+    result->x = multiplyFixed16(_a,  p.x) + multiplyFixed16(_c, p.y) + _tx;
+    result->y = multiplyFixed16(_b, p.x) + multiplyFixed16(_d,  p.y) + _ty;
 }
 
 void 
@@ -263,16 +263,16 @@ SWFMatrix::invert()
 
     const double d = 65536.0 * 65536.0 / det;
     
-    const boost::int32_t t0 = (boost::int32_t)(sy * d);
-    sy  = (boost::int32_t)(sx * d);
-    shy = (boost::int32_t)(-shy * d);
-    shx = (boost::int32_t)(-shx * d);
+    const boost::int32_t t0 = (boost::int32_t)(_d * d);
+    _d  = (boost::int32_t)(_a * d);
+    _c = (boost::int32_t)(-_c * d);
+    _b = (boost::int32_t)(-_b * d);
 
-    const boost::int32_t t4 = - (multiplyFixed16(tx, t0) + multiplyFixed16(ty, shy));
-    ty = - (multiplyFixed16(tx, shx) + multiplyFixed16(ty, sy));
+    const boost::int32_t t4 = - (multiplyFixed16(_tx, t0) + multiplyFixed16(_ty, _c));
+    _ty = - (multiplyFixed16(_tx, _b) + multiplyFixed16(_ty, _d));
 
-    sx = t0;
-    tx = t4;
+    _a = t0;
+    _tx = t4;
 
     return *this;
 }
@@ -280,37 +280,37 @@ SWFMatrix::invert()
 double
 SWFMatrix::get_x_scale() const
 {
-    return std::sqrt((static_cast<double>(sx) * sx +
-                static_cast<double>(shx) * shx)) / 65536.0;
+    return std::sqrt((static_cast<double>(_a) * _a +
+                static_cast<double>(_b) * _b)) / 65536.0;
 }
 
 double
 SWFMatrix::get_y_scale() const
 {
-    return std::sqrt((static_cast<double>(sy) * sy +
-                static_cast<double>(shy) * shy)) / 65536.0;
+    return std::sqrt((static_cast<double>(_d) * _d +
+                static_cast<double>(_c) * _c)) / 65536.0;
 }
 
 double
 SWFMatrix::get_rotation() const
 {
     // more successes in misc-ming.all/SWFMatrix_test.c
-    return std::atan2(static_cast<double>(shx), sx); 
+    return std::atan2(static_cast<double>(_b), _a); 
 }
 
 // private
 boost::int64_t
 SWFMatrix::determinant() const
 {
-    // | sx	shy	tx |
-    // | shx	sy	ty |   = T. Using the Leibniz formula:
+    // | _a	_c	_tx |
+    // | _b	_d	_ty |   = T. Using the Leibniz formula:
     // | 0	0	1  |
     //
-    // Det(T) = ( (sx * sy * 1 ) + (shy * ty * 0) + (tx * shx *  0) ) -
-    //          ( (0  * sy * tx) + (0  * ty * sx) + (1 * shy * shx) )
-    //        = sx * sy - shx * shy
+    // Det(T) = ( (_a * _d * 1 ) + (_c * _ty * 0) + (_tx * _b *  0) ) -
+    //          ( (0  * _d * _tx) + (0  * _ty * _a) + (1 * _c * _b) )
+    //        = _a * _d - _b * _c
 
-    return (boost::int64_t)sx * sy - (boost::int64_t)shx * shy;
+    return (boost::int64_t)_a * _d - (boost::int64_t)_b * _c;
 }
 
 std::ostream&
@@ -321,18 +321,18 @@ operator<<(std::ostream& o, const SWFMatrix& m)
 
     o << std::endl << "|"
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
-      << m.sx / 65536.0 << " "
+      << m.a() / 65536.0 << " "
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
-      << m.shy/ 65536.0 << " "
+      << m.c()/ 65536.0 << " "
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
-      << twipsToPixels(m.tx) << " |" 
+      << twipsToPixels(m.tx()) << " |" 
       << std::endl << "|"
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
-      << m.shx/ 65536.0 << " "
+      << m.b()/ 65536.0 << " "
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
-      << m.sy / 65536.0 << " "
+      << m.d() / 65536.0 << " "
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
-      << twipsToPixels(m.ty) << " |";
+      << twipsToPixels(m.ty()) << " |";
       
       return o;
 }

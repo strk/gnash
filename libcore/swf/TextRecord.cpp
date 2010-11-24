@@ -227,7 +227,7 @@ TextRecord::displayRecords(Renderer& renderer, const Transform& xform,
             if (embedded) m = mat;
             else {
                 // Device fonts adopt the concatenated translation.
-                m.concatenate_translation(mat.tx, mat.ty);
+                m.concatenate_translation(mat.tx(), mat.ty());
                 // Device fonts have each glyph scaled in both dimensions
                 // by the matrix's y scale.
                 const double textScale = mat.get_y_scale();

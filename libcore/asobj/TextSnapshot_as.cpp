@@ -19,7 +19,10 @@
 
 
 #include "TextSnapshot_as.h"
-#include "GnashException.h" // for ActionException
+
+#include <boost/algorithm/string/compare.hpp>
+#include <boost/dynamic_bitset.hpp>
+#include <algorithm>
 
 #include "as_object.h" // for inheritance
 #include "log.h"
@@ -35,11 +38,7 @@
 #include "swf/TextRecord.h"
 #include "RGBA.h"
 #include "GnashNumeric.h"
-
 #include "namedStrings.h"
-#include <boost/algorithm/string/compare.hpp>
-#include <boost/dynamic_bitset.hpp>
-#include <algorithm>
 
 namespace gnash {
 
@@ -282,13 +281,13 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, as_object& ri) const
                 el->init_member("height", twipsToPixels(tr->textHeight()));
 
                 const double factor = 65536.0;
-                el->init_member("matrix_a", mat.sx / factor);
-                el->init_member("matrix_b", mat.shx / factor);
-                el->init_member("matrix_c", mat.shy / factor);
-                el->init_member("matrix_d", mat.sy / factor);
+                el->init_member("matrix_a", mat.a() / factor);
+                el->init_member("matrix_b", mat.b() / factor);
+                el->init_member("matrix_c", mat.c() / factor);
+                el->init_member("matrix_d", mat.d() / factor);
 
-                const double xpos = twipsToPixels(mat.tx + x);
-                const double ypos = twipsToPixels(mat.ty + tr->yOffset());
+                const double xpos = twipsToPixels(mat.tx() + x);
+                const double ypos = twipsToPixels(mat.ty() + tr->yOffset());
                 el->init_member("matrix_tx", xpos);
                 el->init_member("matrix_ty", ypos);
 
