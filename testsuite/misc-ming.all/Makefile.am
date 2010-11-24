@@ -1729,6 +1729,10 @@ if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 if ENABLE_HTTP_TESTSUITE
 TEST_CASES += remotingTestRunner
 endif
+if ENABLE_RED5_TESTING
+# FIXME: this test needs more work before activation
+#TEST_CASES += red5test-runner
+endif
 endif
 
 if MING_SUPPORTS_INIT_ACTIONS
