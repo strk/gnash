@@ -132,14 +132,14 @@ test5 = function(nc)
 
     nc.onStatus = function(obj) {
         check_equals(typeof(obj), "object");
-        xcheck(obj.hasOwnProperty("application"));
+        check(obj.hasOwnProperty("application"));
         check(obj.hasOwnProperty("level"));
         check(obj.hasOwnProperty("code"));
-        xcheck(obj.hasOwnProperty("description"));
-        xcheck_equals(obj.application, "org.red5.server.service.MethodNotFoundException");
+        check(obj.hasOwnProperty("description"));
+        check_equals(obj.application, "org.red5.server.service.MethodNotFoundException");
         check_equals(obj.level, "error");
         check_equals(obj.code, "NetConnection.Call.Failed");
-        xcheck_equals(obj.description, "Method nonexistentfunc with arguments [hello, null] not found");
+        check_equals(obj.description, "Method nonexistentfunc with arguments [hello, null] not found");
         endOfTest();
     };
 
