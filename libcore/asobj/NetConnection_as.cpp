@@ -568,7 +568,9 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
         const std::vector<as_value>& args)
 {
     if (!_currentConnection.get()) {
-        log_aserror("NetConnection.call: can't call while not connected");
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("NetConnection.call: can't call while not connected");
+        );
         return;
     }
 
