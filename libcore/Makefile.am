@@ -50,6 +50,13 @@ AM_CPPFLAGS = \
 	$(FONTCONFIG_CFLAGS) \
 	$(NULL)
 
+if BUILD_EGL_DEVICE
+AM_CPPFLAGS += $(EGL_CFLAGS)
+endif
+if BUILD_DIRECTFB_DEVICE
+AM_CPPFLAGS += $(DIRECTFB_CFLAGS)
+endif
+
 libgnashcore_la_SOURCES = \
 	BitmapMovie.cpp \
 	Property.cpp \
