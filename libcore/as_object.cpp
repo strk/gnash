@@ -632,9 +632,11 @@ as_object::set_member(const ObjectURI& uri, const as_value& val, bool ifFound)
         try {
             executeTriggers(prop, uri, val);
         }
-        catch (ActionTypeError& exc) {
-            log_aserror(_("%s: Exception %s. Will create a new member"),
-                        getStringTable(*this).value(getName(uri)), exc.what());
+        catch (const ActionTypeError& exc) {
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror(
+                _("%s: %s"), getStringTable(*this).value(getName(uri)), exc.what());
+            );
         }
             
         return true;
