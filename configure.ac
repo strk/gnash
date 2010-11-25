@@ -2202,11 +2202,16 @@ AM_CONDITIONAL(MING_VERSION_0_4_4,
         [ test $MING_VERSION_CODE -ge 00040400 ])
 
 if test x$cross_compiling = xno; then
-  AC_ARG_WITH([swfdec_testsuite],
-	  AC_HELP_STRING([--with-swfdec-testsuite],
-		  [directory where swfdec testsuite (the 'test' dir) is]),
-	SWFDEC_TESTSUITE=${withval})
-  AC_SUBST(SWFDEC_TESTSUITE)
+    AC_ARG_WITH([swfdec_testsuite],
+        AC_HELP_STRING([--with-swfdec-testsuite],
+            [directory where swfdec testsuite (the 'test' dir) is]),
+        if test x"${withval}" = xyes; then
+            dir=`dirname $0`/testsuite/swfdec/src/test
+            withval=`cd ${dir} && pwd`
+        fi
+        SWFDEC_TESTSUITE=${withval}
+    )
+    AC_SUBST(SWFDEC_TESTSUITE)
 fi
 AM_CONDITIONAL(ENABLE_SWFDEC_TESTSUITE, [ test x"$SWFDEC_TESTSUITE" != x ])
 
