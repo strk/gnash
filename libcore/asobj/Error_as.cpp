@@ -68,9 +68,9 @@ error_toString(const fn_call& fn)
 {
  	as_object* ptr = ensure<ValidThis>(fn);
 
-    string_table& st = getStringTable(*ptr);
+    VM& vm = getVM(*ptr);
     as_value message;
-    ptr->get_member(st.find("message"), &message);
+    ptr->get_member(getURI(vm, "message"), &message);
 
 	return as_value(message);   
 }
@@ -82,10 +82,10 @@ error_ctor(const fn_call& fn)
     as_object* err = fn.this_ptr;
     if (!err) return as_value();
 
-    string_table& st = getStringTable(fn);
+    VM& vm = getVM(fn);
 
     if (fn.nargs && !fn.arg(0).is_undefined()) {
-		err->set_member(st.find("message"), fn.arg(0));
+		err->set_member(getURI(vm, "message"), fn.arg(0));
 	}
 
 	return as_value();

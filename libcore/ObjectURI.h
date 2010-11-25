@@ -19,10 +19,12 @@
 #ifndef GNASH_OBJECTURI_H
 #define GNASH_OBJECTURI_H
 
-#include "string_table.h"
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h" // GNASH_STATS_OBJECT_URI_NOCASE
 #endif
+
+#include "string_table.h"
+#include "namedStrings.h"
 
 #include <string>
 #include <ostream>
@@ -65,7 +67,7 @@ struct ObjectURI
     {}
 
     /// Construct an ObjectURI from name
-    ObjectURI(string_table::key name)
+    ObjectURI(NSV::NamedStrings name)
         :
         name(name),
         nameNoCase(0)

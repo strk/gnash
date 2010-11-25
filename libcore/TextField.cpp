@@ -48,6 +48,7 @@
 #include "Global_as.h"
 #include "Renderer.h"
 #include "Transform.h"
+#include "ObjectURI.h"
 
 #include <algorithm> 
 #include <string>
@@ -2000,7 +2001,7 @@ TextField::parseTextVariableRef(const std::string& variableName) const
     }
 
     ret.first = target;
-    ret.second = getStringTable(*object()).find(parsedName);
+    ret.second = getURI(getVM(*object()), parsedName);
 
     return ret;
 }
@@ -2040,7 +2041,7 @@ TextField::registerTextVariable()
         return;
     }
 
-    const string_table::key key = varRef.second;
+    const ObjectURI& key = varRef.second;
     as_object* obj = getObject(this);
     const int version = getSWFVersion(*obj);
     string_table& st = getStringTable(*obj);
@@ -2084,7 +2085,7 @@ TextField::registerTextVariable()
         log_debug("Calling set_textfield_variable(%s) against sprite %s",
                 st.value(key), sprite->getTarget());
 #endif
-        sprite->set_textfield_variable(st.value(key), this);
+        sprite->set_textfield_variable(key.toString(st), this);
 
     }
     _text_variable_registered=true;

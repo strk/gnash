@@ -80,26 +80,26 @@ main(int /*argc*/, char** /*argv*/)
 	check_pixel(100, 30, 2, rgba(255,255,255,255), 2);
 
 	VM& vm = tester.vm();
+	const ObjectURI& mousedown = getURI(vm, "mousedown");
+	const ObjectURI& mouseup = getURI(vm, "mouseup");
 
-	string_table& st = vm.getStringTable();
-
-	getObject(root)->get_member(st.find("mousedown"), &tmp);
+	getObject(root)->get_member(mousedown, &tmp);
 	check(tmp.is_undefined());
-	getObject(root)->get_member(st.find("mouseup"), &tmp);
+	getObject(root)->get_member(mouseup, &tmp);
 	check(tmp.is_undefined());
 
 	// Note that we are *not* on an active entity !
 	tester.pressMouseButton();
 
-	getObject(root)->get_member(st.find("mousedown"), &tmp);
+	getObject(root)->get_member(mousedown, &tmp);
 	check_equals(toNumber(tmp, vm), 1);
-	check ( ! getObject(root)->get_member(st.find("mouseup"), &tmp) );
+	check ( ! getObject(root)->get_member(mouseup, &tmp) );
 
 	tester.depressMouseButton();
 
-	getObject(root)->get_member(st.find("mousedown"), &tmp);
+	getObject(root)->get_member(mousedown, &tmp);
 	check_equals(toNumber(tmp, vm), 1);
-	getObject(root)->get_member(st.find("mouseup"), &tmp);
+	getObject(root)->get_member(mouseup, &tmp);
 	check_equals(toNumber(tmp, vm), 1);
 
 	tester.advance();
@@ -156,7 +156,7 @@ main(int /*argc*/, char** /*argv*/)
 	// Note that we are *not* on an active entity !
 	tester.pressMouseButton();
 
-	getObject(root)->get_member(st.find("mousedown"), &tmp);
+	getObject(root)->get_member(mousedown, &tmp);
 	check_equals(toNumber(tmp, vm), 5);
 
 }

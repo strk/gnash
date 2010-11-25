@@ -679,7 +679,7 @@ private:
 	///
 	void registerTextVariable();
 
-	typedef std::pair<as_object*, string_table::key> VariableRef;
+	typedef std::pair<as_object*, ObjectURI> VariableRef;
 
 	/// \brief
 	/// Parse the given variable name

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "string_table.h"
+#include "VM.h"
 #include "VM.h"
 #include "fn_call.h"
 #include "namedStrings.h"
@@ -42,14 +42,14 @@ get_flash_package(const fn_call& fn)
 
     as_object* pkg = createObject(gl);
     
-    string_table& st = getStringTable(fn);
+    VM& vm = getVM(fn);
 
-    flash_text_package_init(*pkg, st.find("text"));
-    flash_display_package_init(*pkg, st.find("display"));
-    flash_filters_package_init(*pkg, st.find("filters"));
-    flash_geom_package_init(*pkg, st.find("geom"));
-    flash_net_package_init(*pkg, st.find("net"));
-    flash_external_package_init(*pkg, st.find("external"));
+    flash_text_package_init(*pkg, getURI(vm, "text"));
+    flash_display_package_init(*pkg, getURI(vm, "display"));
+    flash_filters_package_init(*pkg, getURI(vm, "filters"));
+    flash_geom_package_init(*pkg, getURI(vm, "geom"));
+    flash_net_package_init(*pkg, getURI(vm, "net"));
+    flash_external_package_init(*pkg, getURI(vm, "external"));
 
     return pkg;
 }

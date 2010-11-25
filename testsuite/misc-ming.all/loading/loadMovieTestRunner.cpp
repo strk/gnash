@@ -191,10 +191,10 @@ main(int /*argc*/, char** /*argv*/)
 	tester->releaseKey(key::SHIFT);
 
 	// Consistency checking
-	string_table& st = getStringTable(*getObject(root));
+	VM& vm = getVM(*getObject(root));
 	as_value eot;
 	// It's an swf6, so lowercase 'END_OF_TEST'
-	bool endOfTestFound = getObject(root)->get_member(st.find("end_of_test"), &eot);
+	bool endOfTestFound = getObject(root)->get_member(getURI(vm, "end_of_test"), &eot);
 	check(endOfTestFound);
 	if ( endOfTestFound )
 	{

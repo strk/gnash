@@ -192,10 +192,9 @@ Writer::writeObject(as_object* obj)
     // Arrays are handled specially.
     if (obj->array()) {
 
-        string_table& st = vm.getStringTable();
         const size_t len = arrayLength(*obj);
         if (_strictArray) {
-            IsStrictArray s(st);
+            IsStrictArray s(vm);
             // Check if any non-hidden properties are non-numeric.
             obj->visitProperties<IsEnumerable>(s);
 
@@ -211,7 +210,7 @@ Writer::writeObject(as_object* obj)
 
                 as_value elem;
                 for (size_t i = 0; i < len; ++i) {
-                    elem = getMember(*obj, arrayKey(st, i));
+                    elem = getMember(*obj,arrayKey(vm, i));
                     if (!elem.writeAMF0(*this)) {
                         log_error("Problems serializing strict array "
                                 "member %d=%s", i, elem);
@@ -463,7 +462,7 @@ Reader::readArray()
 #endif
 
     as_value objectElement;
-    string_table& st = getStringTable(_global);
+    VM& vm = getVM(_global);
     for (;;) {
 
         // It seems we don't mind about this situation, although it means
@@ -507,7 +506,7 @@ Reader::readArray()
         if (!operator()(objectElement)) {
             throw AMFException("Unable to read array element");
         }
-        array->set_member(st.find(name), objectElement);
+        array->set_member(getURI(vm, name), objectElement);
     }
     return as_value(array);
 }
@@ -515,8 +514,7 @@ Reader::readArray()
 as_value
 Reader::readObject()
 {
-
-    string_table& st = getStringTable(_global);
+    VM& vm = getVM(_global);
     as_object* obj = createObject(_global); 
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
@@ -550,7 +548,7 @@ Reader::readObject()
         if (!operator()(tmp)) {
             throw AMFException("Unable to read object member");
         }
-        obj->set_member(st.find(keyString), tmp);
+        obj->set_member(getURI(vm, keyString), tmp);
     }
 }
 

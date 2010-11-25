@@ -376,8 +376,7 @@ attachDateInterface(as_object& o)
     o.init_member("setUTCSeconds", vm.getNative(103, 142));
     o.init_member("setUTCMilliseconds", vm.getNative(103, 143));
 
-    string_table& st = getStringTable(o);
-    o.init_member("valueOf", getMember(o, st.find("getTime")));
+    o.init_member("valueOf", getMember(o, getURI(vm, "getTime")));
 
 }   
 

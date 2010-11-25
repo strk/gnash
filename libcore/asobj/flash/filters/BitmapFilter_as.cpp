@@ -73,14 +73,14 @@ registerBitmapClass(as_object& where, Global_as::ASFunction ctor,
 {
     Global_as& gl = getGlobal(where);
 
-    string_table& st = getStringTable(where);
+    VM& vm = getVM(where);
 
     // We should be looking for flash.filters.BitmapFilter, but as this
     // triggers a lookup of the flash.filters package while we are creating
     // it, so entering infinite recursion, we'll cheat and assume that
     // the object 'where' is the filters package.
     as_function* constructor =
-        getMember(where, st.find("BitmapFilter")).to_function();
+        getMember(where, getURI(vm, "BitmapFilter")).to_function();
     
     as_object* proto;
     if (constructor) {

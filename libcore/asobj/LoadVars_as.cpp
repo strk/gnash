@@ -100,8 +100,8 @@ loadvars_onData(const fn_call& fn)
     }
     else {
 		VM& vm = getVM(fn);
-		string_table& st = vm.getStringTable();
-		string_table::key decodeKey = st.find("decode"); 
+		// TODO: use NSV
+		const ObjectURI& decodeKey = getURI(vm, "decode"); 
 
 		thisPtr->set_member(NSV::PROP_LOADED, true);
 		callMethod(thisPtr, decodeKey, src);

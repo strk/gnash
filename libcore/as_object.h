@@ -861,7 +861,7 @@ hasOwnProperty(as_object& o, const ObjectURI& uri)
     return (o.getOwnProperty(uri));
 }
 
-as_object* getObjectWithPrototype(Global_as& gl, string_table::key c);
+as_object* getObjectWithPrototype(Global_as& gl, const ObjectURI& c);
 
 /// Check whether the object is an instance of a known type.
 //

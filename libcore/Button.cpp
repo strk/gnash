@@ -315,10 +315,13 @@ Button::trackAsMenu()
     as_object* obj = getObject(this);
     assert(obj);
 
+    VM& vm = getVM(*obj);
+
     as_value track;
-    string_table& st = getStringTable(*obj);
-    if (obj->get_member(st.find("trackAsMenu"), &track)) {
-        return toBool(track, getVM(*obj));
+    // TODO: use NSV
+    const ObjectURI& propTrackAsMenu = getURI(vm, "trackAsMenu");
+    if (obj->get_member(propTrackAsMenu, &track)) {
+        return toBool(track, vm);
     }
     if (_def) return _def->trackAsMenu();
     return false;

@@ -278,19 +278,17 @@ colortransform_toString(const fn_call& fn)
 
     as_object* ptr = ensure<ValidThis>(fn);
 
-    string_table& st = getStringTable(fn);
-
-    const as_value& am = getMember(*ptr, st.find("alphaMultiplier"));
-    const as_value& ao = getMember(*ptr, st.find("alphaOffset"));
-    const as_value& bm = getMember(*ptr, st.find("blueMultiplier"));
-    const as_value& bo = getMember(*ptr, st.find("blueOffset"));
-    const as_value& gm = getMember(*ptr, st.find("greenMultiplier"));
-    const as_value& go = getMember(*ptr, st.find("greenOffset"));
-    const as_value& rm = getMember(*ptr, st.find("redMultiplier"));
-    const as_value& ro = getMember(*ptr, st.find("redOffset"));
-   
     VM& vm = getVM(fn);
 
+    const as_value& am = getMember(*ptr, getURI(vm, "alphaMultiplier"));
+    const as_value& ao = getMember(*ptr, getURI(vm, "alphaOffset"));
+    const as_value& bm = getMember(*ptr, getURI(vm, "blueMultiplier"));
+    const as_value& bo = getMember(*ptr, getURI(vm, "blueOffset"));
+    const as_value& gm = getMember(*ptr, getURI(vm, "greenMultiplier"));
+    const as_value& go = getMember(*ptr, getURI(vm, "greenOffset"));
+    const as_value& rm = getMember(*ptr, getURI(vm, "redMultiplier"));
+    const as_value& ro = getMember(*ptr, getURI(vm, "redOffset"));
+   
     as_value ret("(redMultiplier=");
     newAdd(ret, rm, vm);
     newAdd(ret, ", greenMultiplier=", vm);

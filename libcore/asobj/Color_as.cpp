@@ -45,7 +45,7 @@ namespace {
     as_value color_ctor(const fn_call& fn);
 
     void attachColorInterface(as_object& o);
-    inline void parseColorTransProp(as_object& obj, string_table::key key,
+    inline void parseColorTransProp(as_object& obj, const ObjectURI& key,
             boost::int16_t& target, bool scale);
     inline MovieClip* getTarget(as_object* obj, const fn_call& fn);
 }
@@ -204,21 +204,23 @@ color_settransform(const fn_call& fn)
     MovieClip* sp = getTarget(obj, fn);
     if (!sp) return as_value();
 
-	string_table& st = getStringTable(*obj);
+	VM& vm = getVM(*obj);
 
 	SWFCxForm newTrans = getCxForm(*sp);
 
+    // TODO: use NSV 
+
 	// multipliers
-	parseColorTransProp(*trans, st.find("ra"), newTrans.ra, true);
-	parseColorTransProp(*trans, st.find("ga"), newTrans.ga, true);
-	parseColorTransProp(*trans, st.find("ba"), newTrans.ba, true);
-	parseColorTransProp(*trans, st.find("aa"), newTrans.aa, true);
+	parseColorTransProp(*trans, getURI(vm, "ra"), newTrans.ra, true);
+	parseColorTransProp(*trans, getURI(vm, "ga"), newTrans.ga, true);
+	parseColorTransProp(*trans, getURI(vm, "ba"), newTrans.ba, true);
+	parseColorTransProp(*trans, getURI(vm, "aa"), newTrans.aa, true);
 
 	// offsets
-	parseColorTransProp(*trans, st.find("rb"), newTrans.rb, false);
-	parseColorTransProp(*trans, st.find("gb"), newTrans.gb, false);
-	parseColorTransProp(*trans, st.find("bb"), newTrans.bb, false);
-	parseColorTransProp(*trans, st.find("ab"), newTrans.ab, false);
+	parseColorTransProp(*trans, getURI(vm, "rb"), newTrans.rb, false);
+	parseColorTransProp(*trans, getURI(vm, "gb"), newTrans.gb, false);
+	parseColorTransProp(*trans, getURI(vm, "bb"), newTrans.bb, false);
+	parseColorTransProp(*trans, getURI(vm, "ab"), newTrans.ab, false);
 
 	sp->setCxForm(newTrans);
 
@@ -252,7 +254,7 @@ color_ctor(const fn_call& fn)
 }
 
 inline void
-parseColorTransProp(as_object& obj, string_table::key key, boost::int16_t&
+parseColorTransProp(as_object& obj, const ObjectURI& key, boost::int16_t&
         target, bool scale)
 {
 	as_value tmp;
