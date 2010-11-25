@@ -31,6 +31,8 @@
 
 namespace gnash {
 
+namespace gui {
+
 #ifdef GUI_FB
 std::auto_ptr<Gui> createFBGui(unsigned long windowid, float scale, bool do_loop, RunResources& r)
 {
@@ -43,5 +45,10 @@ std::auto_ptr<Gui> createFBGui(unsigned long , float, bool, RunResourcesfloat , 
 }
 #endif // ! GUI_FB
 
-} // namespace gnash
+} // end of namespace gui
+} // end of namespace gnash
 
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:

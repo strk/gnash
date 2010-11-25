@@ -42,23 +42,60 @@ public:
 
     // All of these virtuals are all defined in the base FBGlue class
     ~FBAggGlue();
-    
+
+    /// \brief
+    ///  Initialise the Framebuffer GUI and the AGG renderer.
+    /// 
+    /// @param argc The commandline argument count.
+    /// @param argv The commandline arguments.
+    /// @return True on success; false on failure.
     bool init(int argc, char ***argv);    
+    
     Renderer *createRenderHandler();
+
+    /// \brief
+    ///  Hand off a handle to the native drawing area to the renderer
     void prepDrawingArea(void *drawing_area);
+    
+    /// Gives the GUI a *hint* which region of the stage should be redrawn.
+    //
+    /// There is *no* restriction what the GUI might do with these coordinates. 
+    /// Normally the GUI forwards the information to the renderer so that
+    /// it avoids rendering regions that did not change anyway. The GUI can
+    /// also alter the bounds before passing them to the renderer and it's
+    /// absolutely legal for the GUI to simply ignore the call.
+    ///
+    /// Coordinates are in TWIPS!
+    ///
+    /// Note this information is given to the GUI and not directly to the 
+    /// renderer because both of them need to support this feature for 
+    /// correct results. It is up to the GUI to forward this information to
+    /// the renderer.
+    ///
+    // does not need to be implemented (optional feature),
+    // but still needs to be available.
+    //
     void setInvalidatedRegions(const InvalidatedRanges &ranges);
+    /// \brief
+    ///  The Width of the drawing area, in pixels. For framebuffer
+    ///  based devices, this is the size of the display screen.
     int width();
+    
+    /// Height of the drawing area, in pixels. For framebuffer
+    ///  based devices, this is the size of the display screen.
     int height();
+
+    /// Render the current buffer.    
     void render();
     void render(void* const /* region */) { };
 
     /// For 8 bit (palette / LUT) modes, sets a grayscale palette.
     //
-    /// This GUI currently does not support palette modes. 
-    //
+    /// This GUI currently does not support palette modes.
     bool set_grayscale_lut8();
 
 protected:
+    /// This is the file descriptor for the framebuffer memory
     int                      _fd;
     struct fb_var_screeninfo _var_screeninfo;
     struct fb_fix_screeninfo _fix_screeninfo;

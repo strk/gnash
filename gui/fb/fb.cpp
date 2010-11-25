@@ -160,6 +160,8 @@ FBGui::FBGui(unsigned long xid, float scale, bool loop, RunResources& r)
 
 FBGui::~FBGui()
 {  
+    GNASH_REPORT_FUNCTION;
+    
     if (fd > 0) {
         enable_terminal();
         log_debug(_("Closing framebuffer device"));
@@ -178,6 +180,8 @@ bool
 FBGui::set_grayscale_lut8()
 {
 #define TO_16BIT(x) (x | (x<<8))
+
+    GNASH_REPORT_FUNCTION;
 
     struct fb_cmap cmap;
     int i;
@@ -219,7 +223,7 @@ FBGui::set_grayscale_lut8()
 bool
 FBGui::init(int argc, char *** argv)
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     // Initialize all the input devices
 
@@ -311,7 +315,7 @@ FBGui::init(int argc, char *** argv)
 bool
 FBGui::run()
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
   
 #ifdef USE_TSLIB
     int ts_loop_count;
@@ -352,7 +356,7 @@ FBGui::run()
 void
 FBGui::renderBuffer()
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     if ( _drawbounds.size() == 0 ) return; // nothing to do..
 
@@ -459,11 +463,18 @@ FBGui::setInvalidatedRegion(const SWFRect& /* bounds */)
 void
 FBGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 {
+    GNASH_REPORT_FUNCTION;
+
+    if (!_renderer) {
+        log_error("No renderer set!");
+        return;
+    }
+    
     _renderer->set_invalidated_regions(ranges);
     
     _drawbounds.clear();
     
-    for (unsigned int rno=0; rno<ranges.size(); rno++) {
+    for (size_t rno = 0; rno<ranges.size(); rno++) {
         geometry::Range2d<int> bounds = Intersection(
             _renderer->world_to_pixel(ranges.getRange(rno)),
             _validbounds);

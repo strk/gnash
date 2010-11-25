@@ -230,20 +230,18 @@ void
 FBAggGlue::prepDrawingArea(FbWidget */* drawing_area */)
 {
     GNASH_REPORT_FUNCTION;
-
 }
 
 void
 FBGlue::render(void * /* region */)
 {
     GNASH_REPORT_FUNCTION;
-
 }
 
 void
 FBAggGlue::render()
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     if ( _drawbounds.size() == 0 ) {
         return; // nothing to do..
