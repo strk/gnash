@@ -1,11 +1,11 @@
 // This test relies on a default deploy of red5 on localhost
 //
 // Build with:
-//	makeswf -n network -o red5test.swf ../Dejagnu.swf red5test.as ../actionscript.all/dejagnu_so_fini.as
+//        makeswf -n network -o red5test.swf ../Dejagnu.swf red5test.as ../actionscript.all/dejagnu_so_fini.as
 // Run with:
-//	firefox red5test.swf
+//        firefox red5test.swf
 // Or:
-//	gnash red5test.swf
+//        gnash red5test.swf
 //
 //
 
@@ -103,20 +103,20 @@ test4 = function(nc)
     o = {};
     o.onResult = function(arg)
     {
-	check_equals(arguments.length, 1);
-	check_equals(typeof(arg), "object");
-	check(arg.hasOwnProperty("length"));
-	check_equals(arg.length, 5);
+        check_equals(arguments.length, 1);
+        check_equals(typeof(arg), "object");
+        check(arg.hasOwnProperty("length"));
+        check_equals(arg.length, 5);
 
-	// It's a date.
-	check_equals(arg[0].__proto__, Date.prototype);
+        // It's a date.
+        check_equals(arg[0].__proto__, Date.prototype);
 
-	check_equals(arg[1], null);
-	check_equals(typeof(arg[2]), "object");
-	check_equals(arg[3], undefined);
-	check_equals(arg[4], null);
+        check_equals(arg[1], null);
+        check_equals(typeof(arg[2]), "object");
+        check_equals(arg[3], undefined);
+        check_equals(arg[4], null);
 
-	endOfTest();
+        endOfTest();
     };
     nc.call("echo", o, new Date(0), new String(), {}, undefined, null);
 };
