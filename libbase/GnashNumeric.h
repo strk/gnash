@@ -111,7 +111,7 @@ truncateWithFactor(double a)
                 std::numeric_limits<boost::int32_t>::min() / factor;
 
     if (a >= lowerSignedLimit && a <= upperSignedLimit) {
-        return static_cast<boost::int32_t>(a * factor);
+        return a * Factor;
     }
 
     // This slow truncation happens only in very unlikely cases.
