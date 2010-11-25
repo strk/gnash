@@ -397,7 +397,6 @@ DisplayObject::setMatrix(const SWFMatrix& m, bool updateCache)
 
     if (m == _transform.matrix) return;
 
-    //log_debug("setting SWFMatrix to: %s", m);
     set_invalidated(__FILE__, __LINE__);
     _transform.matrix = m;
 
