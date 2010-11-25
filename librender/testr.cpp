@@ -35,7 +35,7 @@
 // FIXME: this should be a command line option
 #undef GTK_TEST_RENDER
 
-#ifdef HAVE_GTK2
+#ifdef HAVE_GTK2_XX
 # include <gtk/gtk.h>
 # include <gdk/gdk.h>
 #endif
@@ -82,6 +82,7 @@ using namespace renderer;
 using namespace std;
 using namespace boost::posix_time;
 
+void test_device(Renderer *renderer, const std::string &type);
 void test_renderer(Renderer *renderer, const std::string &type);
 void test_geometry(Renderer *renderer, const std::string &type);
 void test_iterators(Renderer *renderer, const std::string &type);
@@ -89,7 +90,7 @@ void test_iterators(Renderer *renderer, const std::string &type);
 // The debug log used by all the gnash libraries.
 static LogFile& dbglogfile = LogFile::getDefaultInstance();
 
-#ifdef HAVE_GTK2
+#ifdef HAVE_GTK2_XX
 GtkWidget *create_GTK_window();
 #endif
 
@@ -174,6 +175,9 @@ main(int argc, char *argv[])
         offscreenbuf->bpl);
 #endif
     
+    if (renderer1) {
+        test_device(renderer1, "EGL");
+    }
     if (renderer1) {
         test_renderer(renderer1, "AGG");
         test_geometry(renderer1, "AGG");
@@ -260,11 +264,24 @@ main(int argc, char *argv[])
 #endif
 #endif
     
-#ifdef HAVE_GTK2
+#ifdef HAVE_GTK2_XX
     gtk_main();
     gtk_main_quit();
     gtk_exit(0);
 #endif
+}
+
+void
+test_device(Renderer *renderer, const std::string &type)
+{
+    cout << "Testing " << type << " Device" << endl;
+
+    boost::shared_array<renderer::GnashDevice::dtype_t> devs = renderer->probeDevices();
+    if (devs) {
+        runtest.pass("Renderer::probeDevices()");
+    } else {
+        runtest.fail("Renderer::probeDevices()");
+    }
 }
 
 void
@@ -309,7 +326,7 @@ test_renderer(Renderer *renderer, const std::string &type)
         runtest.fail("createCachedBitmap()");
     }
 
-#ifdef HAVE_GTK2
+#ifdef HAVE_GTK2_XX
     GtkWidget *canvas = create_GTK_window();
     if (type == "AGG") {
         GdkVisual* visual = gdk_drawable_get_visual(canvas->window);
