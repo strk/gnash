@@ -26,7 +26,7 @@ stop();
 
 endOfTest = function()
 {
-    totals(29);
+    totals(38);
     trace("ENDOFTEST");
     play();
 };
@@ -116,9 +116,34 @@ test4 = function(nc)
         check_equals(arg[3], undefined);
         check_equals(arg[4], null);
 
-        endOfTest();
+        test5(nc);
     };
     nc.call("echo", o, new Date(0), new String(), {}, undefined, null);
+};
+
+test5 = function(nc)
+{
+    note("Running test 5");
+    o = {};
+    o.onResult = function(arg)
+    {
+        fail("onResult called when call failed");
+    };
+
+    nc.onStatus = function(obj) {
+        check_equals(typeof(obj), "object");
+        xcheck(obj.hasOwnProperty("application"));
+        check(obj.hasOwnProperty("level"));
+        check(obj.hasOwnProperty("code"));
+        xcheck(obj.hasOwnProperty("description"));
+        xcheck_equals(obj.application, "org.red5.server.service.MethodNotFoundException");
+        check_equals(obj.level, "error");
+        check_equals(obj.code, "NetConnection.Call.Failed");
+        xcheck_equals(obj.description, "Method nonexistentfunc with arguments [hello, null] not found");
+        endOfTest();
+    };
+
+    nc.call("nonexistentfunc", o, "hello", null);
 };
 
 runtests = function(nc)
@@ -134,7 +159,7 @@ ncrtmp.statuses = new Array();
 ncrtmp.onStatus = function()
 {
     this.statuses.push(arguments);
-    note('NetConnection.onStatus called with args: '+dumpObject(arguments));
+    note('NetConnection.onStatus called with args: ' + dumpObject(arguments));
     lastStatusArgs = ncrtmp.statuses[ncrtmp.statuses.length-1];
     if ((lastStatusArgs[0].level == "status") && (lastStatusArgs[0].code == "NetConnection.Connect.Success")) {
         pass("RTMP connection - status Success");
