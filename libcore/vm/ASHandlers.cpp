@@ -1049,12 +1049,15 @@ ActionGetProperty(ActionExec& thread)
 
     as_value& tgt_val = env.top(1);
     std::string tgt_str = tgt_val.to_string();
-    DisplayObject *target = NULL;
+
+    DisplayObject* target;
     if (tgt_str.empty()) {
         target = get<DisplayObject>(thread.getTarget());
         if (!target) {
-            log_error(_("ActionGetProperty(<empty>) called, but current "
-                        "target is not a DisplayObject"));
+            IF_VERBOSE_MALFORMED_SWF(
+                log_swferror(_("ActionGetProperty(<empty>) called, but "
+                    "current target is not a DisplayObject"));
+            );
         }
     }
     else {
