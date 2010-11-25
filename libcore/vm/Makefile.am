@@ -38,6 +38,13 @@ AM_CPPFLAGS = \
 	$(FFMPEG_CFLAGS) \
 	$(NULL)
 
+if BUILD_EGL_DEVICE
+AM_CPPFLAGS += $(EGL_CFLAGS)
+endif
+if BUILD_DIRECTFB_DEVICE
+AM_CPPFLAGS += $(DIRECTFB_CFLAGS)
+endif
+
 libgnashvm_la_SOURCES = \
 	ASHandlers.cpp \
 	ActionExec.cpp \
