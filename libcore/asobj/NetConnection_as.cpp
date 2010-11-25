@@ -291,7 +291,6 @@ public:
         aw.writeString(methodName);
         const size_t id = asCallback ? callNo() : 0;
         aw.writeNumber(id);
-        buf.appendByte(amf::NULL_AMF0);
 
         for (size_t i = 0; i < args.size(); ++i) {
             args[i].writeAMF0(aw);

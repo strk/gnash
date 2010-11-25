@@ -310,16 +310,19 @@ NPN_GetStringIdentifier(const NPUTF8 *name)
 nsPluginInstanceBase *
 NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
 {
+  return NULL;
 }
 
 NPError
 NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 {
+  return NPERR_INVALID_INSTANCE_ERROR;
 }
 
 NPError
 NS_PluginInitialize()
 {
+  return NPERR_INVALID_INSTANCE_ERROR;
 }
 
 void
@@ -345,6 +348,7 @@ NPN_SetProperty(NPP npp, NPObject* obj, NPIdentifier name,
                      const NPVariant *value)
 {
     _properties[name] = const_cast<NPVariant *>(value);
+    return true;
 }
 
 bool
@@ -363,6 +367,7 @@ NPN_HasProperty(NPP npp, NPObject* obj, NPIdentifier name,
     if (it != _properties.end()) {
         return true;
     }
+    return false;
 }
 
 void

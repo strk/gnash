@@ -58,7 +58,7 @@ case "${host}" in
     DEFAULT_FLASH_PLATFORM_ID="BSD"
     DEFAULT_FLASH_SYSTEM_OS="OpenBSD"
     ;;
-  *-freebsd*)
+  *-freebsd* | *-kfreebsd*)
     DEFAULT_FLASH_PLATFORM_ID="BSD"
     DEFAULT_FLASH_SYSTEM_OS="FreeBSD"
     ;;
@@ -150,7 +150,7 @@ case "${host}" in
     openbsd=yes
     AC_DEFINE([OPENBSD_HOST], [1], [this is an OpenBSD platform])
     ;;
-  *-freebsd*)
+  *-freebsd* | *-kfreebsd*)
     bsd=yes
     freebsd=yes
     AC_DEFINE([FREEBSD_HOST], [1], [this is a FreeBSD platform])
@@ -751,6 +751,7 @@ dnl --------------------------------------------------------
 dnl  Sound handler selection
 dnl --------------------------------------------------------
 add_sound=
+build_sound_none=no
 build_sound_sdl=no
 build_sound_ahi=no
 build_sound_mkit=no
@@ -760,6 +761,10 @@ AC_ARG_ENABLE(sound,
       sdl|SDL|Sdl)
         build_sound_sdl=yes
         add_sound="sdl"
+        ;;
+      none|NONE|None)
+        build_sound_none=yes
+        add_sound="none"
         ;;
       ahi|AHI|Ahi)
         build_sound_ahi=yes
@@ -774,8 +779,10 @@ AC_ARG_ENABLE(sound,
      build_sound_mkit=yes
      add_sound="mkit"
    else
-     build_sound_sdl=yes
-     add_sound=sdl
+     if test x${build_sound_none} = xno; then
+       build_sound_sdl=yes
+       add_sound=sdl
+     fi
    fi]
 )
 

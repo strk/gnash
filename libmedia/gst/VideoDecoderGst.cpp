@@ -148,7 +148,12 @@ VideoDecoderGst::setup(GstCaps* srccaps)
     bool rv = swfdec_gst_decoder_init (&_decoder, srccaps, sinkcaps,
             "ffmpegcolorspace", NULL);
     if (!rv) {
-        throw MediaException(_("VideoDecoderGst: initialisation failed."));      
+        GstStructure* sct = gst_caps_get_structure(srccaps, 0);
+        std::string type(gst_structure_get_name(sct));
+        std::string msg = (boost::format(
+            _("VideoDecoderGst: initialisation failed for video type %s!"))
+            % type).str();
+        throw MediaException(msg);
     }
 
     gst_caps_unref (srccaps);
