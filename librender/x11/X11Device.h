@@ -89,7 +89,17 @@ class X11Device : public GnashDevice
     
     // Using X11 always means a native renderer
     bool isNativeRender() { return true; }
-    
+
+    // Create an X11 window to render in. This is only used by testing
+    void createWindow(const char *name, int x, int y, int width, int height);
+
+    /// Start an X11 event loop. This is only used by testing. Note that
+    /// calling this function blocks until the specified number of events
+    /// have been handled. The first 5 are used up by creating the window.
+    ///
+    /// @param passes the number of events to process before returning.
+    void event_loop(size_t passes);
+
 protected:
     Display    *_display;
     int         _screennum;
@@ -100,6 +110,11 @@ protected:
     int         _depth;
     XVisualInfo *_vinfo;
 };
+
+typedef void (*init_func)();
+typedef void (*reshape_func)(int, int);
+typedef void (*draw_func)();
+typedef int  (*key_func)(unsigned key);
 
 } // namespace x11
 } // namespace renderer

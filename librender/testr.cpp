@@ -32,14 +32,6 @@
 #include <boost/date_time/date.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-// FIXME: this should be a command line option
-#undef GTK_TEST_RENDER
-
-#ifdef HAVE_GTK2_XX
-# include <gtk/gtk.h>
-# include <gdk/gdk.h>
-#endif
-
 #include "log.h"
 #include "dejagnu.h"
 #include "SWFMatrix.h"
@@ -75,6 +67,16 @@
 # error "This file needs EGL"
 #endif
 
+#ifdef BUILD_EGL_DEVICE
+# include <eglDevice.h>
+#endif
+#ifdef BUILD_DIRECTFB_DEVICE
+# include <directfb/directfb.h>
+#endif
+#ifdef BUILD_X11_DEVICE
+# include <x11/X11Device.h>
+#endif
+
 TestState runtest;
 
 using namespace gnash; 
@@ -89,10 +91,6 @@ void test_iterators(Renderer *renderer, const std::string &type);
 
 // The debug log used by all the gnash libraries.
 static LogFile& dbglogfile = LogFile::getDefaultInstance();
-
-#ifdef HAVE_GTK2_XX
-GtkWidget *create_GTK_window();
-#endif
 
 // Simple class to do nanosecond based timing for performance analysis
 class Timer {
@@ -160,23 +158,21 @@ main(int argc, char *argv[])
         tmpimage->bpp * 8);
 #endif  // end of GTK_TEST_RENDER
 
+#ifdef BUILD_X11_DEVICE
+    x11::X11Device x11;
+    x11.initDevice(0, 0);
+    x11.createWindow("Foo", 0, 0, 640, 480);
+    x11.event_loop(10);
+    std::cerr << "Hello World!" << std::endl;
+    x11.event_loop(10);
+#endif
 #ifdef RENDERER_AGG
     Timer tagg("AGG");
     Renderer *renderer1 = create_Renderer_agg(pixelformat);
-#ifdef HAVE_GTK2_XX
-    GtkWidget *canvas = create_GTK_window();
-    GdkVisual* visual = gdk_drawable_get_visual(canvas->window);
-    GdkImage *offscreenbuf = gdk_image_new (GDK_IMAGE_FASTEST, visual, 200,200);
-    static_cast<Renderer_agg_base *>(renderer1)->init_buffer(
-        (unsigned char*) offscreenbuf->mem,
-        offscreenbuf->bpl * offscreenbuf->height,
-        offscreenbuf->width,
-        offscreenbuf->height,
-        offscreenbuf->bpl);
-#endif
-    
     if (renderer1) {
         test_device(renderer1, "EGL");
+        test_device(renderer1, "DIRECTFB");
+        test_device(renderer1, "X11");
     }
     if (renderer1) {
         test_renderer(renderer1, "AGG");
@@ -262,15 +258,17 @@ main(int argc, char *argv[])
     tgl.stop();
     cerr << "OpenGL tests took " << tgl.elapsed() << endl;
 #endif
-#endif
-    
-#ifdef HAVE_GTK2_XX
-    gtk_main();
-    gtk_main_quit();
-    gtk_exit(0);
-#endif
+#endif    
 }
 
+// Each Renderer has an associated display device, currently EGL
+// for OpenVG, OpenGLES1, and OpenGLES2. The DirectFB device is
+// also available for these three renderers. The EGL device can
+// also be run under X11 using the Mesa libraries. Both EGL and
+// DirectFB are primarily for framebuffers. While all of the methods
+// of each device class are available to the Renderer, most aren't
+// exposed with more accesors beyond these for manipulating the
+// device setting itself.
 void
 test_device(Renderer *renderer, const std::string &type)
 {
@@ -282,6 +280,25 @@ test_device(Renderer *renderer, const std::string &type)
     } else {
         runtest.fail("Renderer::probeDevices()");
     }
+
+    // Be default, there should be no device associated with this
+    // renderer yet.
+    if (renderer->getDevice() == GnashDevice::NODEV) {
+        runtest.pass("Renderer::getDevice()");
+    } else {
+        runtest.fail("Renderer::getDevice()");
+    }
+
+    // Set to a device and see if it's axctually set
+    renderer->setDevice(GnashDevice::X11);
+    if (renderer->getDevice() == GnashDevice::X11) {
+        runtest.pass("Renderer::setDevice()");
+    } else {
+        runtest.fail("Renderer::setDevice()");
+    }
+
+    // reset to the original value so we don't screw up future tests
+    renderer->resetDevice();
 }
 
 void

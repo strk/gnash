@@ -505,9 +505,12 @@ public:
         return devs;
     }
 
+    void resetDevice() { _device.reset(); };
+    
     renderer::GnashDevice::dtype_t getDevice()
     {
         if (_device) {
+            return _device->getType();
         }
         return renderer::GnashDevice::NODEV;
     }

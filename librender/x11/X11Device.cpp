@@ -36,6 +36,7 @@
 # include <X11/X.h>
 # include <X11/Xlib.h>
 # include <X11/Xutil.h>
+#include <X11/keysym.h>
 #else
 # error "This file needs X11"
 #endif
@@ -65,23 +66,19 @@ X11Device::X11Device()
       _vinfo(0)
 {
     GNASH_REPORT_FUNCTION;
+    dbglogfile.setVerbosity();
 }
 
 X11Device::~X11Device()
 {
     GNASH_REPORT_FUNCTION;
-    
-// #ifdef HAVE_GTK2_XX
-//     gdk_exit(0);
-// #else
-    // if (_display && _window) {
-    //     XDestroyWindow(_display, _window);
-    // }
     if (_display) {
+        if (_window) {
+            XDestroyWindow(_display, _window);
+        }
         XCloseDisplay(_display);
     }
     XFree(_vinfo);
-// #endif
 }
 
 bool
@@ -225,13 +222,109 @@ X11Device::getErrorString(int error)
     return msg;
 }
 
-#if 0
-int
-X11Device::getDepth(DFBSurfacePixelFormat format)
+// Create an X11 window to render in. This is only used by testing
+void
+X11Device::createWindow(const char *name, int x, int y, int width, int height)
 {
-    return 0;
+    GNASH_REPORT_FUNCTION;
+
+    if (!_display) {
+        log_error("No Display device set!");
+        return;
+    }
+    
+    if (!_window) {
+        log_error("No drawable window set!");
+        return;
+    }
+
+    XSetWindowAttributes attr;
+    unsigned long mask;
+    Window root;
+    XVisualInfo visTemplate;
+    int num_visuals;
+
+    // window attributes
+    attr.background_pixel = 0;
+    attr.border_pixel = 0;
+    attr.colormap = XCreateColormap(_display, _window, _vinfo->visual, AllocNone);
+    attr.event_mask = StructureNotifyMask | ExposureMask | KeyPressMask;
+    mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
+    
+    _window = XCreateWindow(_display, _window, 0, 0, width, width,
+                        0, _vinfo->depth, InputOutput,
+                        _vinfo->visual, mask, &attr);
+    
+    // set hints and properties
+    XSizeHints sizehints;
+    sizehints.x = x;
+    sizehints.y = y;
+    sizehints.width  = width;
+    sizehints.height = height;
+    sizehints.flags = USSize | USPosition;
+    XSetNormalHints(_display, _window, &sizehints);
+    XSetStandardProperties(_display, _window, name, name, None, (char **)NULL,
+                           0, &sizehints);
+
+    XMapWindow(_display, _window);
+//    reshape(width, height);
+
+
 }
-#endif
+
+void
+X11Device::event_loop(size_t passes)
+{
+    while (passes--) {
+        int redraw = 0;
+        XEvent event;
+        int width, height;
+        
+        reshape_func reshape = 0;
+        key_func     keyPress = 0;
+        draw_func    draw = 0;
+        
+        XNextEvent(_display, &event);
+        
+        switch (event.type) {
+          case Expose:
+              redraw = 1;
+              break;
+          case ConfigureNotify:
+              if (reshape) {
+                  width = event.xconfigure.width;
+                  height = event.xconfigure.height;
+                  reshape(event.xconfigure.width, event.xconfigure.height);
+              }
+              break;
+          case KeyPress:
+          {
+              char buffer[10];
+              int r, code;
+              code = XLookupKeysym(&event.xkey, 0);
+              if (!keyPress || !keyPress(code)) {
+                  r = XLookupString(&event.xkey, buffer, sizeof(buffer),
+                                    NULL, NULL);
+                  if (buffer[0] == 27) {
+                      // escape
+                      return;
+                  } else {
+                      std::cerr << buffer;
+                  }
+              }
+          }
+          redraw = 1;
+          break;
+          default:
+              ; // no-op
+        }
+        
+        if (redraw) {
+//            draw();
+//            eglSwapBuffers(egl_dpy, egl_surf);
+        }
+    } // end of while passes
+}
 
 } // namespace x11
 } // namespace renderer
