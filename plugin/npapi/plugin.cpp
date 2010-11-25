@@ -35,6 +35,7 @@
 #endif
 
 #include <boost/format.hpp>
+#include <boost/algorithm/string/replace.hpp>
 
 #define MIME_TYPES_HANDLED  "application/x-shockwave-flash"
 // The name must be this value to get flash movies that check the
@@ -968,7 +969,11 @@ create_standalone_launcher(const std::string& page_url, const std::string& swf_u
         itEnd = params.end(); it != itEnd; ++it) {
         const std::string& nam = it->first; 
         const std::string& val = it->second;
-        saLauncher << "-P '" << nam << "=" << val << "' ";
+        saLauncher << "-P '"
+                   << boost::algorithm::replace_all_copy(nam, "'", "'\\''")
+                   << "="
+                   << boost::algorithm::replace_all_copy(val, "'", "'\\''")
+                   << "' ";
     }
 
     saLauncher << "'" << swf_url << "' "
