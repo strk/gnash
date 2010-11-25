@@ -89,7 +89,7 @@ to_signed(unsigned_type t,
     const signed_type min = std::numeric_limits<signed_type>::min();
 
     return min + x;
-};
+}
 
 /// Convert a signed type to an unsigned type of the same width.
 //
@@ -116,7 +116,7 @@ to_unsigned(signed_type t,
     if (t >= 0) return t;
 
     return std::numeric_limits<unsigned_type>::max() + t + 1;
-};
+}
 
 inline double
 infinite_to_zero(double x)
