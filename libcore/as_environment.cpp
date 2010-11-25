@@ -212,7 +212,7 @@ findObject(const as_environment& ctx, const std::string& path,
         // No more components to scan
         if (subpart.empty()) break;
 
-        const ObjectURI subpartURI(st.find(subpart));
+        const ObjectURI subpartURI(getURI(vm, subpart));
 
         if (!firstElementParsed) {
             as_object* element(0);
@@ -301,7 +301,7 @@ getVariable(const as_environment& env, const std::string& varname,
 
         if (target) {
             as_value val;
-            target->get_member(env.getVM().getStringTable().find(var), &val);
+            target->get_member(getURI(env.getVM(), var), &val);
             if (retTarget) *retTarget = target;
             return val;
         }
@@ -340,7 +340,7 @@ setVariable(const as_environment& env, const std::string& varname,
     if (parsePath(varname, path, var)) {
         as_object* target = findObject(env, path, &scope); 
         if (target) {
-            target->set_member(env.getVM().getStringTable().find(var), val);
+            target->set_member(getURI(env.getVM(), var), val);
         }
         else {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -363,7 +363,7 @@ delVariable(const as_environment& ctx, const std::string& varname,
 
     VM& vm = ctx.getVM();
 
-    string_table::key varkey = vm.getStringTable().find(varname);
+    const ObjectURI& varkey = getURI(vm, varname);
 
     // Check the with-stack.
     for (size_t i = scope.size(); i > 0; --i) {
@@ -449,8 +449,7 @@ setVariableRaw(const as_environment& env, const std::string& varname,
     }
 
     VM& vm = env.getVM();
-    string_table& st = vm.getStringTable();
-    string_table::key varkey = st.find(varname);
+    const ObjectURI& varkey = getURI(vm, varname);
 
     // in SWF5 and lower, scope stack should just contain 'with' elements 
 
@@ -496,8 +495,7 @@ getVariableRaw(const as_environment& env, const std::string& varname,
 
     VM& vm = env.getVM();
     const int swfVersion = vm.getSWFVersion();
-    string_table& st = vm.getStringTable();
-    string_table::key key = st.find(varname);
+    const ObjectURI& key = getURI(vm, varname);
 
     // Check the scope stack.
     for (size_t i = scope.size(); i > 0; --i) {
@@ -544,7 +542,9 @@ getVariableRaw(const as_environment& env, const std::string& varname,
 
     as_object* global = vm.getGlobal();
 
-    if (swfVersion > 5 && key == NSV::PROP_uGLOBAL) {
+    // TODO: check if we really want case-sensitive comparison
+    ObjectURI::CaseEquals eq(getVM(env).getStringTable());
+    if (swfVersion > 5 && eq(key, NSV::PROP_uGLOBAL)) {
 #ifdef GNASH_DEBUG_GET_VARIABLE
         log_debug("Took %s as _global, returning _global", varname);
 #endif
@@ -573,8 +573,7 @@ getVariableRaw(const as_environment& env, const std::string& varname,
 bool
 getLocal(as_object& locals, const std::string& name, as_value& ret)
 {
-    string_table& st = getStringTable(locals);
-    return locals.get_member(st.find(name), &ret);
+    return locals.get_member(getURI(getVM(locals), name), &ret);
 }
 
 bool
@@ -593,15 +592,13 @@ findLocal(as_object& locals, const std::string& varname, as_value& ret,
 bool
 deleteLocal(as_object& locals, const std::string& varname)
 {
-    string_table& st = getStringTable(locals);
-    return locals.delProperty(st.find(varname)).second;
+    return locals.delProperty(getURI(getVM(locals), varname)).second;
 }
 
 bool
 setLocal(as_object& locals, const std::string& varname, const as_value& val)
 {
-    string_table& st = getStringTable(locals);
-    Property* prop = locals.getOwnProperty(st.find(varname));
+    Property* prop = locals.getOwnProperty(getURI(getVM(locals), varname));
     if (!prop) return false;
     prop->setValue(locals, val);
     return true;

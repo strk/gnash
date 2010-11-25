@@ -265,7 +265,7 @@ loadableobject_decode(const fn_call& fn)
     typedef boost::tokenizer<Sep> Tok;
     Tok t1(qs, Sep("&"));
 
-    string_table& st = getStringTable(fn);
+    VM& vm = getVM(fn);
 
     for (Tok::iterator tit=t1.begin(); tit!=t1.end(); ++tit) {
 
@@ -284,7 +284,7 @@ loadableobject_decode(const fn_call& fn)
         URL::decode(name);
         URL::decode(value);
 
-        if (!name.empty()) ptr->set_member(st.find(name), value);
+        if (!name.empty()) ptr->set_member(getURI(vm, name), value);
     }
 
     return as_value(); 

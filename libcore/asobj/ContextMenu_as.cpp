@@ -59,7 +59,7 @@ namespace {
 class CopyMenuItems
 {
 public:
-    CopyMenuItems(string_table::key c, as_object& nc) : _c(c), _target(nc) {}
+    CopyMenuItems(const ObjectURI& c, as_object& nc) : _c(c), _target(nc) {}
 
     void operator()(const as_value& val) {
         as_object* obj = toObject(val, getVM(_target));
@@ -67,7 +67,7 @@ public:
         callMethod(&_target, NSV::PROP_PUSH, cp);
     }
 private:
-    const string_table::key _c;
+    ObjectURI _c;
     as_object& _target;
 };
 
@@ -76,15 +76,15 @@ void
 setBuiltInItems(as_object& o, bool setting)
 {
     const int flags = 0;
-    string_table& st = getStringTable(o);
-    o.set_member(st.find("print"), setting, flags);
-    o.set_member(st.find("forward_back"), setting, flags);
-    o.set_member(st.find("rewind"), setting, flags);
-    o.set_member(st.find("loop"), setting, flags);
-    o.set_member(st.find("play"), setting, flags);
-    o.set_member(st.find("quality"), setting, flags);
-    o.set_member(st.find("zoom"), setting, flags);
-    o.set_member(st.find("save"), setting, flags);
+    VM& vm = getVM(o);
+    o.set_member(getURI(vm, "print"), setting, flags);
+    o.set_member(getURI(vm, "forward_back"), setting, flags);
+    o.set_member(getURI(vm, "rewind"), setting, flags);
+    o.set_member(getURI(vm, "loop"), setting, flags);
+    o.set_member(getURI(vm, "play"), setting, flags);
+    o.set_member(getURI(vm, "quality"), setting, flags);
+    o.set_member(getURI(vm, "zoom"), setting, flags);
+    o.set_member(getURI(vm, "save"), setting, flags);
 }
 
 
@@ -105,12 +105,12 @@ as_value
 contextmenu_hideBuiltInItems(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
-    string_table& st = getStringTable(fn);
+    VM& vm = getVM(fn);
 
     Global_as& gl = getGlobal(fn);
     as_object* builtIns = createObject(gl);
     setBuiltInItems(*builtIns, false);
-    ptr->set_member(st.find("builtInItems"), builtIns);
+    ptr->set_member(getURI(vm, "builtInItems"), builtIns);
     return as_value();
 }
 
@@ -132,18 +132,18 @@ contextmenu_copy(const fn_call& fn)
 
     if (!o) return as_value();
     
-    string_table& st = getStringTable(fn);
+    VM& vm = getVM(fn);
     as_value onSelect, builtInItems;
     as_value customItems = gl.createArray();
 
     ptr->get_member(NSV::PROP_ON_SELECT, &onSelect);
-    ptr->get_member(st.find("builtInItems"), &builtInItems);
-    ptr->get_member(st.find("customItems"), &customItems);
+    ptr->get_member(getURI(vm, "builtInItems"), &builtInItems);
+    ptr->get_member(getURI(vm, "customItems"), &customItems);
 
     // The onSelect and the builtInItems property are simple copies, which
     // means the new object has a reference to the same object.
     o->set_member(NSV::PROP_ON_SELECT, onSelect);
-    o->set_member(st.find("builtInItems"), builtInItems);
+    o->set_member(getURI(vm, "builtInItems"), builtInItems);
 
     // The customItems object is a deep copy that works by calling
     // the copy property of each array member.
@@ -159,7 +159,7 @@ contextmenu_copy(const fn_call& fn)
             as_object* customs;
             if (customItems.is_object() &&
                     (customs = toObject(customItems, getVM(fn)))) {
-                string_table::key copykey = getStringTable(fn).find("copy");
+                const ObjectURI& copykey = getURI(getVM(fn), "copy");
                 CopyMenuItems c(copykey, *arr);
                 foreachArray(*customs, c);
             }
@@ -167,7 +167,7 @@ contextmenu_copy(const fn_call& fn)
         }
     }
 
-    o->set_member(st.find("customItems"), nc);
+    o->set_member(getURI(vm, "customItems"), nc);
 
     return as_value(o);
 }
@@ -182,15 +182,15 @@ contextmenu_ctor(const fn_call& fn)
     const as_value& callback = fn.nargs ? fn.arg(0) : as_value();
     obj->set_member(NSV::PROP_ON_SELECT, callback);
     
-    string_table& st = getStringTable(fn);
+    VM& vm = getVM(fn);
     Global_as& gl = getGlobal(fn);
     as_object* builtInItems = createObject(gl);
     setBuiltInItems(*builtInItems, true);
-    obj->set_member(st.find("builtInItems"), builtInItems);
+    obj->set_member(getURI(vm, "builtInItems"), builtInItems);
 
     // There is an empty customItems array.
     as_object* customItems = gl.createArray();
-    obj->set_member(st.find("customItems"), customItems);
+    obj->set_member(getURI(vm, "customItems"), customItems);
 
     return as_value();
 }

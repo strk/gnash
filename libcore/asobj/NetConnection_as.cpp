@@ -827,8 +827,7 @@ local_onResult(const fn_call& fn)
     as_object* obj = fn.this_ptr;
 
     if (obj) {
-        string_table& st = getStringTable(fn);
-        const ObjectURI conn(st.find("_conn"));
+        const ObjectURI conn = getURI(getVM(fn), "_conn");
         as_value f = getMember(*obj, conn);
         as_object* nc = toObject(f, getVM(fn));
         if (nc) {
@@ -902,8 +901,7 @@ handleAMFInvoke(amf::Reader& rd, const boost::uint8_t*& b,
         }
 
         VM& vm = getVM(owner);
-        string_table& st = vm.getStringTable();
-        string_table::key key = st.find(headerName);
+        ObjectURI key = getURI(vm, headerName);
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("Invoking %s(%s)", headerName, arg);
 #endif
@@ -995,7 +993,7 @@ HTTPRequest::handleAMFReplies(amf::Reader& rd, const boost::uint8_t*& b,
             continue;
         }
 
-        string_table::key methodKey;
+        ObjectURI methodKey;
         if (methodName == "onResult") {
             methodKey = NSV::PROP_ON_RESULT;
         }
@@ -1241,8 +1239,7 @@ RTMPConnection::handleInvoke(const boost::uint8_t* payload,
 
     log_debug( "Server invoking <%s>", method);
     
-    string_table& st = getStringTable(_nc.owner());
-    const ObjectURI methodname(st.find(method));
+    const ObjectURI methodname = getURI(getVM(_nc.owner()), method);
 
     // _result means it's the answer to a remote method call initiated
     // by us.

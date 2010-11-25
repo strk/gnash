@@ -2142,8 +2142,8 @@ ActionDelete(ActionExec& thread)
         return;
     }
 
-    string_table& st = getStringTable(env);
-    const std::pair<bool, bool> ret = obj->delProperty(st.find(propertyname));
+    VM& vm = getVM(env);
+    const std::pair<bool, bool> ret = obj->delProperty(getURI(vm, propertyname));
 
     env.top(1).set_bool(ret.second);
 
@@ -2185,8 +2185,8 @@ ActionDelete2(ActionExec& thread)
 
     as_object* obj = safeToObject(getVM(thread.env), target);
 
-    string_table& st = getStringTable(env);
-    const std::pair<bool, bool> ret = obj->delProperty(st.find(var));
+    VM& vm = getVM(env);
+    const std::pair<bool, bool> ret = obj->delProperty(getURI(vm, var));
 
     env.top(1).set_bool(ret.second);
 }
@@ -2353,7 +2353,7 @@ ActionVar(ActionExec& thread)
     as_environment& env = thread.env;
     
     const std::string& varname = env.top(0).to_string();
-    const string_table::key name = getStringTable(env).find(varname);
+    const ObjectURI& name = getURI(getVM(env), varname);
     VM& vm = getVM(env);
 
     if (vm.calling()) {
@@ -2380,11 +2380,11 @@ ActionInitArray(ActionExec& thread)
 
     as_object* ao = gl.createArray();
 
-    string_table& st = getStringTable(env);
+    VM& vm = getVM(env);
     // Fill the elements with the initial values from the stack.
     for (int i = 0; i < array_size; i++) {
-        const string_table::key k = 
-            st.find(boost::lexical_cast<std::string>(i));
+        const ObjectURI& k = 
+            getURI(vm, boost::lexical_cast<std::string>(i));
         ao->set_member(k, env.pop());
     }
 
@@ -2413,13 +2413,13 @@ ActionInitObject(ActionExec& thread)
 
     obj->init_member(NSV::PROP_CONSTRUCTOR, getMember(gl, NSV::CLASS_OBJECT));
 
-    string_table& st = getStringTable(env);
+    VM& vm = getVM(env);
 
     // Set provided members
     for (int i = 0; i < nmembers; ++i) {
         const as_value& member_value = env.top(0);
         std::string member_name = env.top(1).to_string();
-        obj->set_member(st.find(member_name), member_value);
+        obj->set_member(getURI(vm, member_name), member_value);
         env.drop(2);
     }
 
@@ -2604,8 +2604,7 @@ ActionGetMember(ActionExec& thread)
                    target, static_cast<void*>(obj));
     );
 
-    string_table& st = getStringTable(env);
-    const string_table::key k = st.find(member_name.to_string());
+    const ObjectURI& k = getURI(getVM(env), member_name.to_string());
 
     if (!obj->get_member(k, &env.top(1))) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -2641,8 +2640,7 @@ ActionSetMember(ActionExec& thread)
         );
     }
     else if (obj) {
-        string_table& st = getStringTable(env);
-        obj->set_member(st.find(member_name), member_value);
+        obj->set_member(getURI(getVM(env), member_name), member_value);
 
         IF_VERBOSE_ACTION (
             log_action(_("-- set_member %s.%s=%s"),
@@ -2752,7 +2750,7 @@ ActionCallMethod(ActionExec& thread)
     as_object* this_ptr(0);
 
     // Will be used to find super later
-    string_table::key method_key = 0;
+    ObjectURI methURI;
 
     // If the method name is undefined or evaluates to an empty string,
     // the first argument is used as the method name and the 'this' pointer
@@ -2763,13 +2761,12 @@ ActionCallMethod(ActionExec& thread)
     }
     else {
 
-        string_table& st = getStringTable(env);
-        method_key = st.find(method_string);
+        methURI = getURI(getVM(env), method_string);
 
         // The method value
         as_value method_value; 
 
-        if (!obj->get_member(method_key, &method_value) ) {
+        if (!obj->get_member(methURI, &method_value) ) {
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("ActionCallMethod: "
                 "Can't find method %s of object %s"),
@@ -2816,7 +2813,7 @@ ActionCallMethod(ActionExec& thread)
         super = 0;
     }
     else {
-        super = obj->get_super(method_key);
+        super = obj->get_super(methURI);
     }
 
     fn_call call(this_ptr, env, args);
@@ -2882,8 +2879,7 @@ ActionNewMethod(ActionExec& thread)
         method_val = obj_val;
     }
     else {
-        string_table& st = getStringTable(env);
-        const string_table::key k = st.find(method_string);
+        const ObjectURI& k = getURI(getVM(env), method_string);
         if (!obj->get_member(k, &method_val)) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("ActionNewMethod: can't find method %s of "
@@ -3181,8 +3177,6 @@ ActionDefineFunction2(ActionExec& thread)
 
     func->setFlags(flags);
 
-    string_table& st = getStringTable(env);
-
     // Get the register assignments and names of the arguments.
     for (size_t n = 0; n < nargs; ++n) {
         boost::uint8_t arg_register = code[i];
@@ -3191,7 +3185,7 @@ ActionDefineFunction2(ActionExec& thread)
         // @@ security: watch out for possible missing terminator here!
         const std::string arg(code.read_string(i));
 
-        func->add_arg(arg_register, st.find(arg));
+        func->add_arg(arg_register, getURI(getVM(env), arg));
         i += arg.size() + 1;
     }
 
@@ -3399,12 +3393,10 @@ ActionDefineFunction(ActionExec& thread)
     const size_t nargs = code.read_uint16(i);
     i += 2;
     
-    string_table& st = getStringTable(env);
-
     // Get the names of the arguments.
     for (size_t n = 0; n < nargs; ++n) {
         const std::string arg(code.read_string(i));
-        func->add_arg(0, st.find(arg));
+        func->add_arg(0, getURI(getVM(env), arg));
         i += arg.size() + 1; 
     }
 

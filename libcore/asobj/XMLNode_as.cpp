@@ -27,7 +27,7 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "NativeFunction.h"
-#include "string_table.h"
+#include "VM.h"
 #include "PropertyList.h"
 #include "Global_as.h"
 #include "Object.h"
@@ -147,14 +147,14 @@ XMLNode_as::updateChildNodes()
 
     if (_children.empty()) return;
 
-    string_table& st = getStringTable(_global);
+    VM& vm = getVM(_global);
 
     // Set up the array without calling push()!
     const size_t size = _children.size();
     Children::const_iterator it = _children.begin();
     for (size_t i = 0; i != size; ++i, ++it) {
         XMLNode_as* node = *it;
-        const string_table::key key = arrayKey(st, i);
+        const ObjectURI& key = arrayKey(vm, i);
         _childNodes->set_member(key, node->object());
 
         // All elements are set to readonly.
@@ -292,8 +292,8 @@ void
 XMLNode_as::setAttribute(const std::string& name, const std::string& value)
 {
     if (_attributes) {
-        string_table& st = getStringTable(_global);
-        _attributes->set_member(st.find(name), value);
+        VM& vm = getVM(_global);
+        _attributes->set_member(getURI(vm, name), value);
     }
 }
 

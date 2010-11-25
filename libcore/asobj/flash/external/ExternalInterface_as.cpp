@@ -109,14 +109,13 @@ public:
 
     void operator()(const as_value& val) {
         VM& vm = getVM(_fn);
-        string_table& st = getStringTable(_fn);
 
         newAdd(_ret, "<property id=\"", vm);
         newAdd(_ret, static_cast<double>(_count), vm);
         newAdd(_ret, "\">", vm);
         as_object* ei = 
             findObject(_fn.env(), "flash.external.ExternalInterface");
-        const as_value& x = callMethod(ei, st.find("_toXML"), val);
+        const as_value& x = callMethod(ei, getURI(vm, "_toXML"), val);
         newAdd(_ret, x, vm);
         newAdd(_ret, "</property>", vm);
         ++_count;
@@ -140,8 +139,7 @@ public:
         VM& vm = getVM(_fn);
         as_object* ei = 
             findObject(_fn.env(), "flash.external.ExternalInterface");
-        string_table& st = getStringTable(_fn);
-        const as_value& x = callMethod(ei, st.find("_toXML"), val);
+        const as_value& x = callMethod(ei, getURI(vm, "_toXML"), val);
         newAdd(_ret, x, vm);
     }
 private:
@@ -368,13 +366,13 @@ externalinterface_objectID(const fn_call& fn)
 
     movie_root& mr = getRoot(fn);
     MovieClip *mc = mr.getLevel(0);
-    string_table& st = getStringTable(fn);
+    VM& vm = getVM(fn);
     
     as_value id;
-    getObject(mc)->get_member(st.find("id"), &id);
+    getObject(mc)->get_member(getURI(vm, "id"), &id);
 
     as_value name;
-    getObject(mc)->get_member(st.find("name"), &name);
+    getObject(mc)->get_member(getURI(vm, "name"), &name);
 
     if (id.is_undefined() && !name.is_undefined()) {
         return name;
@@ -418,14 +416,14 @@ externalinterface_uArgumentsToXML(const fn_call& fn)
     as_value ret("<arguments>");
 
     if (fn.nargs) {
-        as_object *obj = toObject(fn.arg(0), getVM(fn));
+        VM& vm = getVM(fn);
+        as_object *obj = toObject(fn.arg(0), vm);
         if (obj) {
             ArgsToXML tx(ret, fn);
             size_t size = arrayLength(*obj);
-            string_table& st = getStringTable(*obj);
             if (size) {
                 for (size_t i = 1; i < static_cast<size_t>(size); ++i) {
-                    tx(getOwnProperty(*obj, arrayKey(st, i)));
+                    tx(getOwnProperty(*obj, arrayKey(vm, i)));
                 }
             }
         }
@@ -568,7 +566,7 @@ externalinterface_uObjectToXML(const fn_call& fn)
                 as_object* ei = 
                     findObject(fn.env(), "flash.external.ExternalInterface");
                 const as_value& val = getMember(*obj, *i); 
-                newAdd(ret, callMethod(ei, st.find("_toXML"), val), vm);
+                newAdd(ret, callMethod(ei, getURI(vm, "_toXML"), val), vm);
                 newAdd(ret, "</property>", vm);
             }
         }
@@ -595,13 +593,12 @@ externalinterface_uToXML(const fn_call& fn)
 
         as_object* ei = 
             findObject(fn.env(), "flash.external.ExternalInterface");
-        string_table& st = getStringTable(fn);
         VM& vm = getVM(fn);
 
         const as_value& val = fn.arg(0);
         if (val.is_string()) {
             as_value ret = "<string>";
-            newAdd(ret, callMethod(ei, st.find("_escapeXML"), val), vm);
+            newAdd(ret, callMethod(ei, getURI(vm, "_escapeXML"), val), vm);
             newAdd(ret, "</string>", vm);
             return ret;
         }
@@ -624,9 +621,9 @@ externalinterface_uToXML(const fn_call& fn)
             as_object* obj = toObject(val, vm);
             assert(obj);
             if (hasOwnProperty(*obj, NSV::PROP_LENGTH)) {
-                return callMethod(ei, st.find("_arrayToXML"), val);
+                return callMethod(ei, getURI(vm, "_arrayToXML"), val);
             }
-            return callMethod(ei, st.find("_objectToXML"), val);
+            return callMethod(ei, getURI(vm, "_objectToXML"), val);
         }
     }
     return as_value("<null/>");
@@ -643,25 +640,27 @@ externalinterface_uToAS(const fn_call& fn)
     if (!o) {
         return as_value();
     }
-    string_table& st = getStringTable(fn);
-    const ObjectURI nodeName(st.find("nodeName"));
-    const ObjectURI firstChild(st.find("firstChild"));
+
+    VM& vm = getVM(fn);
+    // TODO: use NSV ?
+    const ObjectURI& nodeName = getURI(vm, "nodeName");
+    const ObjectURI& firstChild = getURI(vm, "firstChild");
 
     const as_value& nn = getMember(*o, nodeName);
 
-    if (equals(nn, as_value("number"), getVM(fn))) {
-        as_object* fc = toObject(getMember(*o, firstChild), getVM(fn));
+    if (equals(nn, as_value("number"), vm)) {
+        as_object* fc = toObject(getMember(*o, firstChild), vm);
         const as_value v = callMethod(fc, NSV::PROP_TO_STRING);
         // This should call Number(obj.firstChild.toString()), i.e. use
         // the non-constructing number conversion function, but the extra
         // code needed to implement that isn't worth it.
-        return as_value(toNumber(v, getVM(fn)));
+        return as_value(toNumber(v, vm));
     }
     if (equals(nn, as_value("string"), getVM(fn))) {
         as_object* ei =
             findObject(fn.env(), "flash.external.ExternalInterface");
         as_value fc = getMember(*o, firstChild);
-        return callMethod(ei, st.find("_unescapeXML"),
+        return callMethod(ei, getURI(vm, "_unescapeXML"),
                 fc.to_string(getSWFVersion(fn)));
     }
     if (equals(nn, as_value("false"), getVM(fn))) {
@@ -681,12 +680,12 @@ externalinterface_uToAS(const fn_call& fn)
     if (equals(nn, as_value("object"), getVM(fn))) {
         as_object* ei =
             findObject(fn.env(), "flash.external.ExternalInterface");
-        return callMethod(ei, st.find("_objectToXML"), o);
+        return callMethod(ei, getURI(vm, "_objectToXML"), o);
     }
     if (equals(nn, as_value("array"), getVM(fn))) {
         as_object* ei =
             findObject(fn.env(), "flash.external.ExternalInterface");
-        return callMethod(ei, st.find("_arrayToXML"), o);
+        return callMethod(ei, getURI(vm, "_arrayToXML"), o);
     }
     if (equals(nn, as_value("class"), getVM(fn))) {
         as_value fc = getMember(*o, firstChild);

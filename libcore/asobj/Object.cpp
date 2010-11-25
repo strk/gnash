@@ -360,7 +360,7 @@ object_hasOwnProperty(const fn_call& fn)
         return as_value(false);
     }
 
-    const bool found = hasOwnProperty(*obj, getStringTable(fn).find(propname));
+    const bool found = hasOwnProperty(*obj, getURI(getVM(fn), propname));
     return as_value(found);
 }
 
@@ -385,7 +385,7 @@ object_isPropertyEnumerable(const fn_call& fn)
         return as_value();
     }
 
-    Property* prop = obj->getOwnProperty(getStringTable(fn).find(propname));
+    Property* prop = obj->getOwnProperty(getURI(getVM(fn),propname));
 
     if (!prop) {
         return as_value(false);
@@ -447,10 +447,10 @@ object_watch(const fn_call& fn)
         return as_value(false);
     }
 
-    string_table& st = getStringTable(fn);
+    VM& vm = getVM(fn);
 
     std::string propname = propval.to_string();
-    string_table::key propkey = st.find(propname);
+    const ObjectURI& propkey = getURI(vm, propname);
     as_function* trig = funcval.to_function();
     as_value cust; if ( fn.nargs > 2 ) cust = fn.arg(2);
 
@@ -474,10 +474,10 @@ object_unwatch(const fn_call& fn)
 
     const as_value& propval = fn.arg(0);
 
-    string_table& st = getStringTable(fn);
+    VM& vm = getVM(fn);
 
     std::string propname = propval.to_string();
-    string_table::key propkey = st.find(propname);
+    const ObjectURI& propkey = getURI(vm, propname);
 
     return as_value(obj->unwatch(propkey));
 }

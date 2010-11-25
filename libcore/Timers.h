@@ -96,7 +96,7 @@ public:
     ///
     /// @param runOnce
     ///     If true the interval will run only once. False if omitted.
-    Timer(as_object* obj, string_table::key methodName, unsigned long ms,
+    Timer(as_object* obj, const ObjectURI& methodName, unsigned long ms,
             const fn_call::Args& args, bool runOnce = false);
 
     /// Clear the timer, ready for reuse
@@ -185,7 +185,7 @@ private:
     /// an intrusive pointer
     as_function* _function;
 
-    string_table::key _methodName;
+    ObjectURI _methodName;
 
     /// Context for the function call. Will be used as 'this' pointer.
     as_object* _object;

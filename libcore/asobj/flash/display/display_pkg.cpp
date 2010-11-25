@@ -20,7 +20,7 @@
 
 #include "as_object.h"
 
-#include "string_table.h"
+#include "VM.h"
 #include "VM.h"
 #include "fn_call.h"
 #include "MovieClip.h"
@@ -40,9 +40,9 @@ get_flash_display_package(const fn_call& fn)
 
     as_object* pkg = createObject(gl);
     
-    string_table& st = getStringTable(fn);
+    VM& vm = getVM(fn);
 
-    bitmapdata_class_init(*pkg, st.find("BitmapData"));
+    bitmapdata_class_init(*pkg, getURI(vm, "BitmapData"));
 
 	return pkg;
 }

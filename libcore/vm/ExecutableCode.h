@@ -167,7 +167,7 @@ class DelayedFunctionCall : public ExecutableCode
 public:
 
     DelayedFunctionCall(DisplayObject* target,
-            as_object* obj, string_table::key name,
+            as_object* obj, const ObjectURI& name,
             const as_value& arg1, const as_value& arg2)
         :
         ExecutableCode(target),
@@ -190,7 +190,7 @@ public:
 
 private:
     as_object* _obj;
-    string_table::key _name;
+    ObjectURI _name;
     as_value _arg1, _arg2;
 };
 

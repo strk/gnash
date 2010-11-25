@@ -98,9 +98,9 @@ main(int /*argc*/, char** /*argv*/)
 	int test = 0;
 	while (frame <= totalFrames) {
 		as_value testReady;
-		if (getObject(root)->get_member(st.find("testReady"), &testReady))
+		if (getObject(root)->get_member(getURI(vm, "testReady"), &testReady))
 		{
-			getObject(root)->delProperty(st.find("testReady"));
+			getObject(root)->delProperty(getURI(vm, "testReady"));
 			
 			// When a test is ready, check the result of the previous test.
 			if (testPasses[test]) {
@@ -128,7 +128,7 @@ main(int /*argc*/, char** /*argv*/)
 
     // Consistency checking
     as_value eot;
-    bool endOfTestFound = getObject(root)->get_member(st.find("endoftest"), &eot);
+    bool endOfTestFound = getObject(root)->get_member(getURI(vm, "endoftest"), &eot);
     check(endOfTestFound);
 
 }

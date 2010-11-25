@@ -259,10 +259,10 @@ textfield_createTextField(const fn_call& fn)
 
     DisplayObject* tf = new TextField(obj, ptr, bounds);
 
-    string_table& st = getStringTable(fn);
+    VM& vm = getVM(fn);
 
     // Give name and mark as dynamic
-    tf->set_name(st.find(name));
+    tf->set_name(getURI(vm, name));
     tf->setDynamic();
 
     // Set _x and _y

@@ -30,7 +30,7 @@
 #include "log.h"
 #include "URL.h" // for url parsing
 #include "VM.h" // for the string table.
-#include "string_table.h" // for the string table.
+#include "VM.h" // for the string table.
 #include "builtin_function.h"
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "namedStrings.h"
@@ -206,11 +206,11 @@ moviecliploader_getProgress(const fn_call& fn)
 	size_t bytesLoaded = sp->get_bytes_loaded();
 	size_t bytesTotal = sp->get_bytes_total();
 
-	string_table& st = getStringTable(fn);
+	VM& vm = getVM(fn);
 
 	// We want these to be enumerable
-	mcl_obj->set_member(st.find("bytesLoaded"), bytesLoaded);
-	mcl_obj->set_member(st.find("bytesTotal"),  bytesTotal);
+	mcl_obj->set_member(getURI(vm, "bytesLoaded"), bytesLoaded);
+	mcl_obj->set_member(getURI(vm, "bytesTotal"),  bytesTotal);
   
 	return as_value(mcl_obj); 
 }

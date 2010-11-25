@@ -284,16 +284,15 @@ attachSystemInterface(as_object& proto)
 {
     Global_as& gl = getGlobal(proto);
     
-    string_table& st = getStringTable(proto);
+    VM& vm = getVM(proto);
     registerBuiltinObject(proto, attachSystemSecurityInterface,
-                          st.find("security"));
+                          getURI(vm, "security"));
     registerBuiltinObject(proto, attachSystemCapabilitiesInterface,
-                          st.find("capabilities"));
+                          getURI(vm, "capabilities"));
     
     proto.init_member("setClipboard", 
                       gl.createFunction(system_setClipboard));
     
-    VM& vm = getVM(proto);
     proto.init_member("showSettings", vm.getNative(2107, 0));
     proto.init_property("useCodepage", &system_usecodepage,
                         &system_usecodepage);

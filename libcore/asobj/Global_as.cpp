@@ -275,13 +275,12 @@ Global_as::registerClasses()
     init_member("enableDebugConsole", edc);
     init_member("showRedrawRegions", vm.getNative(1021, 1));
     
-    string_table& st = getStringTable(*this);
-    init_member("clearTimeout", getMember(*this, st.find("clearInterval")));
+    init_member("clearTimeout", getMember(*this, getURI(vm, "clearInterval")));
 
     _classes.declareAll(avm1Classes());
 
     // SWF8 visibility:
-    const string_table::key NS_FLASH = st.find("flash");
+    const ObjectURI& NS_FLASH = getURI(vm, "flash");
     flash_package_init(*this, NS_FLASH); 
 
     const int version = vm.getSWFVersion();
@@ -925,8 +924,8 @@ local_errorConstructor(const fn_call& fn)
 {
     as_object* obj = ensure<ValidThis>(fn);
     const as_value& arg = fn.nargs ? fn.arg(0) : as_value();
-    string_table& st = getStringTable(fn);
-    obj->set_member(st.find("message"), arg);
+    VM& vm = getVM(fn);
+    obj->set_member(getURI(vm, "message"), arg);
     return as_value();
 }
 
@@ -953,7 +952,7 @@ global_assetuperror(const fn_call& fn)
 
         const std::string& err = std::string(pos, comma);
 
-        string_table& st = getStringTable(fn);
+        VM& vm = getVM(fn);
 
         as_function* ctor = getMember(gl, NSV::CLASS_ERROR).to_function();
         if (ctor) {
@@ -962,8 +961,8 @@ global_assetuperror(const fn_call& fn)
 
             // Not really sure what the point of this is.
             gl.createClass(local_errorConstructor, proto);
-            proto->set_member(st.find("name"), err);
-            proto->set_member(st.find("message"), err);
+            proto->set_member(getURI(vm, "name"), err);
+            proto->set_member(getURI(vm, "message"), err);
         }
         
         if (comma == errors.end()) break;
@@ -1000,12 +999,12 @@ global_setInterval(const fn_call& fn)
 		return as_value();
 	}
 
-    string_table::key methodName(0);
+    ObjectURI methodName;
 
 	// Get interval function
 	as_function* as_func = obj->to_function(); 
 	if (!as_func) {
-		methodName = getStringTable(fn).find(fn.arg(1).to_string());
+		methodName = getURI(getVM(fn), fn.arg(1).to_string());
 		timer_arg = 2;
 	}
 
@@ -1071,12 +1070,12 @@ global_setTimeout(const fn_call& fn)
 		return as_value();
 	}
 
-    string_table::key methodName(0);
+    ObjectURI methodName;
 
 	// Get interval function
 	as_function* as_func = obj->to_function(); 
 	if (!as_func) {
-		methodName = getStringTable(fn).find(fn.arg(1).to_string());
+		methodName = getURI(getVM(fn), fn.arg(1).to_string());
 		timer_arg = 2;
 	}
 

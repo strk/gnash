@@ -69,9 +69,9 @@ namespace {
             int version);
     bool compareBoolean(const as_value& boolean, const as_value& other,
             int version);
-    inline bool findMethod(as_object& obj, string_table::key m, as_value& ret);
+    inline bool findMethod(as_object& obj, const ObjectURI& m, as_value& ret);
     template<typename T> as_object* constructObject(VM& vm, const T& arg,
-            string_table::key className);
+            const ObjectURI& className);
 }
 
 namespace {
@@ -983,7 +983,7 @@ stringEqualsNumber(const as_value& str, const as_value& num, int version)
 
 /// Returns a member only if it is an object.
 inline bool
-findMethod(as_object& obj, string_table::key m, as_value& ret)
+findMethod(as_object& obj, const ObjectURI& m, as_value& ret)
 {
     return obj.get_member(m, &ret) && ret.is_object();
 }
@@ -997,7 +997,7 @@ findMethod(as_object& obj, string_table::key m, as_value& ret)
 /// TODO: test the other failure cases.
 template<typename T>
 as_object*
-constructObject(VM& vm, const T& arg, string_table::key className)
+constructObject(VM& vm, const T& arg, const ObjectURI& className)
 {
 
     as_object& gl = *vm.getGlobal();

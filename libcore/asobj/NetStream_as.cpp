@@ -1937,8 +1937,8 @@ executeTag(const SimpleBuffer& _buffer, as_object& thisPtr)
 
 	log_debug("funcName: %s", funcName);
 
-	string_table& st = getStringTable(thisPtr);
-	string_table::key funcKey = st.find(funcName);
+	VM& vm = getVM(thisPtr);
+	const ObjectURI& funcKey = getURI(vm, funcName);
 
     amf::Reader rd(ptr, endptr, getGlobal(thisPtr));
 

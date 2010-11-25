@@ -69,7 +69,7 @@ CallFrame::setLocalRegister(size_t i, const as_value& val)
 }
 
 void
-declareLocal(CallFrame& c, string_table::key name)
+declareLocal(CallFrame& c, const ObjectURI& name)
 {
     as_object& locals = c.locals();
     if (!hasOwnProperty(locals, name)) {
@@ -78,7 +78,7 @@ declareLocal(CallFrame& c, string_table::key name)
 }
 
 void
-setLocal(CallFrame& c, string_table::key name, const as_value& val)
+setLocal(CallFrame& c, const ObjectURI& name, const as_value& val)
 {
     as_object& locals = c.locals();
 

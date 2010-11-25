@@ -112,10 +112,10 @@ main(int /*argc*/, char** /*argv*/)
 
 	for (int i=0; i<3; ++i) tester.advance(); // get to the end
 
-	string_table& st = tester.vm().getStringTable();
+	VM& vm = tester.vm();
 
 	as_value eot;
-	bool endOfTestFound = getObject(root)->get_member(st.find("endoftest"), &eot);
+	bool endOfTestFound = getObject(root)->get_member(getURI(vm, "endoftest"), &eot);
 	check(endOfTestFound);
 	check(eot.is_bool());
 	check(eot.to_bool(8));

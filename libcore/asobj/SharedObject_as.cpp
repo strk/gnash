@@ -42,7 +42,7 @@
 #include "NativeFunction.h" 
 #include "VM.h"
 #include "Property.h"
-#include "string_table.h"
+#include "VM.h"
 #include "rc.h" // for use of rcfile
 #include "URL.h"
 #include "NetConnection_as.h"
@@ -110,10 +110,10 @@ class SOLPropsBufSerializer : public PropertyVisitor
 
 public:
 
-    SOLPropsBufSerializer(amf::Writer w, string_table& st)
+    SOLPropsBufSerializer(amf::Writer w, VM& vm)
         :
         _writer(w),
-        _st(st),
+        _vm(vm),
         _error(false),
         _count(0)
 	{}
@@ -142,20 +142,22 @@ public:
             return true;
         }
 
-        const string_table::key key = getName(uri);
-
         // Test conducted with AMFPHP:
         // '__proto__' and 'constructor' members of an object are not returned
         // from an 'echo-service'.
         // Dunno if they are not serialized or just not sent back.
         // A '__constructor__' member is returned, but only if 
         // not a function; no functions are returned at all.
-        if (key == NSV::PROP_uuPROTOuu || key == NSV::PROP_CONSTRUCTOR) {
+	
+	// TODO: check if this comparison must _really_ be case-sensitive
+	bool caseless = false;
+	ObjectURI::CaseEquals eq(_vm.getStringTable(), caseless);
+        if (eq(uri, NSV::PROP_uuPROTOuu) || eq(uri, NSV::PROP_CONSTRUCTOR)) {
             return true;
         }
 
         // write property name
-        const std::string& name = _st.value(key);
+        const std::string& name = toString(_vm, uri);
         
         _writer.writePropertyName(name);
 
@@ -181,7 +183,7 @@ private:
     amf::Writer _writer;
 
     /// String table for looking up property names as strings.
-    string_table& _st;
+    VM& _vm;
 
     /// Whether an error has been encountered.
     bool _error;
@@ -977,8 +979,7 @@ readSOL(VM& vm, const std::string& filespec)
                     prop_name, len, as);
 
             // set name/value as a member of this (SharedObject) object
-            string_table& st = vm.getStringTable();
-            data->set_member(st.find(prop_name), as);
+            data->set_member(getURI(vm, prop_name), as);
             
             if (buf == end) break;;
 
@@ -1056,9 +1057,9 @@ encodeData(const std::string& name, as_object& data, SimpleBuffer& buf)
     // see http://osflash.org/documentation/amf/envelopes/sharedobject
     // Do not encode strict arrays!
     amf::Writer w(buf, false);
-    string_table& st = getStringTable(data);
+    VM& vm = getVM(data);
 
-    SOLPropsBufSerializer props(w, st);
+    SOLPropsBufSerializer props(w, vm);
 
     // Visit all existing properties.
     data.visitProperties<Exists>(props);

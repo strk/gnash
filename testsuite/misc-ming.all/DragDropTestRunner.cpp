@@ -53,7 +53,7 @@ main(int /*argc*/, char** /*argv*/)
 	assert(root);
 
 	// for variables lookup (consistency checking)
-	string_table& st = getStringTable(*getObject(root));
+	VM& vm = getVM(*getObject(root));
 
 	rgba white(255, 255, 255, 255); // background color
 	rgba blue(0, 0, 255, 255);      // blue circles fill color
@@ -168,7 +168,7 @@ main(int /*argc*/, char** /*argv*/)
 	// Consistency check !!
 	as_value eot;
 	// It's an swf6, so lowercase 'ENDOFTEST'
-	bool endOfTestFound = getObject(root)->get_member(st.find("endoftest"), &eot);
+	bool endOfTestFound = getObject(root)->get_member(getURI(vm, "endoftest"), &eot);
 	check(endOfTestFound);
 	if ( endOfTestFound )
 	{

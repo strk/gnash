@@ -19,7 +19,7 @@
 //
 
 #include "as_object.h"
-#include "string_table.h"
+#include "VM.h"
 #include "fn_call.h"
 #include "TextRenderer_as.h"
 #include "namedStrings.h"
@@ -37,9 +37,9 @@ get_flash_text_package(const fn_call& fn)
 
     as_object* pkg = createObject(gl);
     
-    string_table& st = getStringTable(fn);
+    VM& vm = getVM(fn);
 
-    textrenderer_class_init(*pkg, st.find("TextRenderer"));
+    textrenderer_class_init(*pkg, getURI(vm, "TextRenderer"));
 
     return pkg;
 }

@@ -65,9 +65,8 @@ main(int /*argc*/, char** /*argv*/)
 
 	VM& vm = tester.vm();
 
-	string_table& st = vm.getStringTable();
-	string_table::key xscale = st.find("_xscale");
-	string_table::key yscale = st.find("_yscale");
+	const ObjectURI& xscale = getURI(vm, "_xscale");
+	const ObjectURI& yscale = getURI(vm, "_yscale");
 	// we need a const_cast as get_member *might* eventually
 	// change the DisplayObject (fetching _x shouldn't change it though)
 	check(getObject(const_cast<DisplayObject*>(loaded))->get_member(xscale, &tmp));

@@ -40,6 +40,8 @@
 #include "CallStack.h"
 #include "smart_ptr.h"
 #include "as_value.h"
+#include "namedStrings.h"
+#include "ObjectURI.h"
 
 // Forward declarations
 namespace gnash {
@@ -280,6 +282,34 @@ private:
     RNG _rng;
 
 };
+
+// @param lowerCaseHint if true the caller guarantees
+//        that the lowercase equivalent of `str' is `str' again
+//
+inline ObjectURI
+getURI(const VM& vm, const std::string& str, bool lowerCaseHint=false)
+{
+    lowerCaseHint=lowerCaseHint; // TODO pass hint to ObjectURI ctor
+    // Possible optimization here is to directly compute
+    // noCase value if VM version is < 7
+    return ObjectURI((NSV::NamedStrings)vm.getStringTable().find(str));
+}
+
+inline ObjectURI
+getURI(const VM&, NSV::NamedStrings s)
+{
+    // Possible optimization here is to directly
+    // compute noCase values if VM version is < 7
+    // (using the known information in NSV)
+    return ObjectURI(s);
+}
+
+inline const std::string&
+toString(VM& vm, const ObjectURI& uri)
+{
+	return uri.toString(vm.getStringTable());
+}
+
 
 /// A class to wrap frame access.  Stack allocating a frame guard
 /// will ensure that all CallFrame pushes have a corresponding

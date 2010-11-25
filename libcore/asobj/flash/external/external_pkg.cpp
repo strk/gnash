@@ -19,7 +19,7 @@
 //
 
 #include "as_object.h"
-#include "string_table.h"
+#include "VM.h"
 #include "VM.h"
 #include "fn_call.h"
 #include "ExternalInterface_as.h"
@@ -41,9 +41,9 @@ get_flash_external_package(const fn_call& fn)
 
     as_object* pkg = createObject(gl);
     
-    string_table& st = getStringTable(fn);
+    VM& vm = getVM(fn);
 
-    externalinterface_class_init(*pkg, st.find("ExternalInterface"));
+    externalinterface_class_init(*pkg, getURI(vm, "ExternalInterface"));
 
     return pkg;
 }

@@ -38,14 +38,14 @@ namespace gnash {
 ///                 found.
 size_t arrayLength(as_object& array);
 
-/// Convert an integral value into an array key
+/// Convert an integral value into an ObjectURI
 //
-/// NB this function adds a string value to the string_table for each separate
-/// integral value. It's the way the string_table works.
+/// NB this function adds a string value to the VM for each separate
+/// integral value. It's the way the VM works.
 //
 /// @param i        The integral value to find
-/// @return         The string table key to look up.
-string_table::key arrayKey(string_table& st, size_t i);
+/// @return         The ObjectURI to look up.
+ObjectURI arrayKey(VM& vm, size_t i);
 
 /// A visitor to check whether an array is strict or not.
 //
@@ -54,7 +54,7 @@ string_table::key arrayKey(string_table& st, size_t i);
 class IsStrictArray : public PropertyVisitor
 {
 public:
-    IsStrictArray(string_table& st) : _strict(true), _st(st) {}
+    IsStrictArray(VM& st) : _strict(true), _st(st) {}
     virtual bool accept(const ObjectURI& uri, const as_value& val);
 
     bool strict() const {
@@ -62,7 +62,7 @@ public:
     }
 private:
     bool _strict;
-    string_table& _st;
+    VM& _st;
 };
 
 
@@ -80,10 +80,10 @@ void foreachArray(as_object& array, T& pred)
     size_t size = arrayLength(array);
     if (!size) return;
 
-    string_table& st = getStringTable(array);
+    VM& vm = getVM(array);
 
     for (size_t i = 0; i < static_cast<size_t>(size); ++i) {
-        pred(getOwnProperty(array, arrayKey(st, i)));
+        pred(getOwnProperty(array, arrayKey(vm, i)));
     }
 }
 

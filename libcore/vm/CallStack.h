@@ -27,6 +27,7 @@
 // Forward declarations
 namespace gnash {
     class as_object;
+    struct ObjectURI;
     class UserFunction;
 }
 
@@ -132,7 +133,7 @@ private:
 //
 /// @param c    The CallFrame to set the variable in.
 /// @param name The name of the variable to declare.
-void declareLocal(CallFrame& c, string_table::key name);
+void declareLocal(CallFrame& c, const ObjectURI& name);
 
 /// Set a local variable in this CallFrame
 //
@@ -141,7 +142,7 @@ void declareLocal(CallFrame& c, string_table::key name);
 /// @param c    The CallFrame to set the variable in.
 /// @param name The name of the variable to set.
 /// @param val  The value to set the variable to.
-void setLocal(CallFrame& c, string_table::key name, const as_value& val);
+void setLocal(CallFrame& c, const ObjectURI& name, const as_value& val);
 
 typedef std::vector<CallFrame> CallStack;
 

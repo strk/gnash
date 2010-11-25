@@ -691,7 +691,7 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
 
     MovieClip* newmovieclip = new MovieClip(o, _def.get(), _swf, parent);
 
-    const string_table::key nn = getStringTable(*getObject(this)).find(newname);
+    const ObjectURI& nn = getURI(getVM(*getObject(this)), newname);
     newmovieclip->set_name(nn);
 
     newmovieclip->setDynamic();
@@ -1278,14 +1278,13 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     if (existing_char) return NULL;
 
     Global_as& gl = getGlobal(*getObject(this));
+    VM& vm = getVM(*getObject(this));
     DisplayObject* ch = cdef->createDisplayObject(gl, this);
 
-    string_table& st = getStringTable(*getObject(this));
-
-    if (tag->hasName()) ch->set_name(st.find(tag->getName()));
+    if (tag->hasName()) ch->set_name(getURI(vm, tag->getName()));
     else if (isReferenceable(*ch))
     {
-        const string_table::key instance_name = getNextUnnamedInstanceName();
+        const ObjectURI& instance_name = getNextUnnamedInstanceName();
         ch->set_name(instance_name);
     }
 
@@ -1368,12 +1367,11 @@ MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
     // TODO: check if we can drop this for REPLACE!
     // should we rename the DisplayObject when it's REPLACE tag?
     if (tag->hasName()) {
-        string_table& st = getStringTable(*getObject(this));
-        ch->set_name(st.find(tag->getName()));
+        VM& vm = getVM(*getObject(this));
+        ch->set_name(getURI(vm, tag->getName()));
     }
     else if (isReferenceable(*ch)) {
-        const string_table::key instance_name = getNextUnnamedInstanceName();
-        ch->set_name(instance_name);
+        ch->set_name(getNextUnnamedInstanceName());
     }
     if (tag->hasRatio()) {
         ch->set_ratio(tag->getRatio());
@@ -1573,11 +1571,11 @@ MovieClip::trackAsMenu()
     as_object* obj = getObject(this);
     assert(obj);
 
-    string_table& st = getStringTable(*obj);
-
     as_value track;
-    return (obj->get_member(st.find("trackAsMenu"), &track) &&
-            toBool(track, getVM(*obj)));
+    VM& vm = getVM(*obj);
+    // TODO: use namedStrings here
+    return (obj->get_member(getURI(vm, "trackAsMenu"), &track) &&
+            toBool(track, vm));
 }
 
 bool
@@ -1997,13 +1995,13 @@ MovieClip::processCompletedLoadVariableRequests()
 void
 MovieClip::setVariables(const MovieVariables& vars)
 {
-    string_table& st = getStringTable(*getObject(this));
+    VM& vm = getVM(*getObject(this));
     for (MovieVariables::const_iterator it=vars.begin(), itEnd=vars.end();
         it != itEnd; ++it)
     {
         const std::string& name = it->first;
         const std::string& val = it->second;
-        getObject(this)->set_member(st.find(name), val);
+        getObject(this)->set_member(getURI(vm, name), val);
     }
 }
 

@@ -518,8 +518,9 @@ bool
 XML_as::ignoreWhite() 
 {
 
-    const string_table::key propnamekey =
-        getStringTable(_global).find("ignoreWhite");
+    // TODO: use NSV:
+    const ObjectURI& propnamekey =
+        getURI(getVM(_global), "ignoreWhite");
     as_value val;
 
     as_object* obj = object();
