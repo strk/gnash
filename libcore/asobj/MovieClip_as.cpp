@@ -2092,7 +2092,9 @@ movieclip_transform(const fn_call& fn)
     boost::intrusive_ptr<as_function> transCtor = transform.to_function();
 
     if (!transCtor) {
-        log_error("Failed to construct flash.geom.Transform!");
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("Failed to construct flash.geom.Transform!");
+        );
         return as_value();
     }
 
