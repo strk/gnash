@@ -45,11 +45,13 @@ struct GnashDevice
     
     /// the list of supported renders that use devices
     typedef enum {OPENVG, OPENGL, OPENGLES1, OPENGLES2, XORG, VAAPI} rtype_t;
-    typedef enum {EGL, DIRECTFB, X11} dtype_t;
+    typedef enum {NODEV, EGL, DIRECTFB, X11} dtype_t;
     
     GnashDevice() { GNASH_REPORT_FUNCTION; };
     virtual ~GnashDevice() { GNASH_REPORT_FUNCTION; };
 
+    virtual dtype_t getType() = 0;
+    
     // Initialize GNASH Device layer
     virtual bool initDevice(int argc, char *argv[]) = 0;
 
