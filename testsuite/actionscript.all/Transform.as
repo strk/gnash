@@ -231,8 +231,8 @@ conc2 = conc1.createEmptyMovieClip("conc2", getNextHighestDepth());
 conc1._x = 40;
 conc2._x = 24;
 
-check(nearly_equal(conc1.transform.concatenatedMatrix, 1, 0, 0, 1, 39.75, 2));
-check(nearly_equal(conc2.transform.concatenatedMatrix, 1, 0, 0, 1, 63.5, 2));
+xcheck(nearly_equal(conc1.transform.concatenatedMatrix, 1, 0, 0, 1, 39.75, 2));
+xcheck(nearly_equal(conc2.transform.concatenatedMatrix, 1, 0, 0, 1, 63.5, 2));
 conc2._width = 3;
 conc1._height = 0.6;
 xcheck(nearly_equal(conc1.transform.concatenatedMatrix, 0, 0, 0, 0, 39.75, 2));
