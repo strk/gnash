@@ -154,6 +154,7 @@ AGG resources
 #include "SWFCxForm.h"
 #include "FillStyle.h"
 #include "Transform.h"
+#include "GnashDevice.h"
 
 #ifdef HAVE_VA_VA_H
 #include "GnashVaapiImage.h"
@@ -684,12 +685,14 @@ public:
     // bitmap fill style.
     gnash::CachedBitmap* createCachedBitmap(std::auto_ptr<image::GnashImage> im)
     {        
+	GNASH_REPORT_FUNCTION;
         return new agg_bitmap_info(im);
     }
 
     virtual void renderToImage(boost::shared_ptr<IOChannel> io,
             FileType type, int quality) const
     {
+	GNASH_REPORT_FUNCTION;
         image::ImageRGBA im(xres, yres);
         for (int x = 0; x < xres; ++x) {
             for (int y = 0; y < yres; ++y) {
@@ -814,6 +817,7 @@ public:
     // lead to an assertion failure in begin_display() because we check
     // whether the scale is known there.
     set_scale(1.0f, 1.0f);
+	GNASH_REPORT_FUNCTION;
   }   
 
   /// Initializes the rendering buffer. The memory pointed by "mem" is not
@@ -822,8 +826,9 @@ public:
   /// remain the same. 
   /// rowstride is the size, in bytes, of one row.
   /// This method *must* be called prior to any other method of the class!
-  void init_buffer(unsigned char *mem, int size, int x, int y, int rowstride)
+    void init_buffer(unsigned char *mem, int /* size */, int x, int y, int rowstride)
   {
+	GNASH_REPORT_FUNCTION;
       assert(x > 0);
       assert(y > 0);
 
@@ -845,6 +850,7 @@ public:
       int /*viewport_width*/, int /*viewport_height*/,
       float /*x0*/, float /*x1*/, float /*y0*/, float /*y1*/)
   {
+	GNASH_REPORT_FUNCTION;
     assert(m_pixf.get());
     
     assert(scale_set);
@@ -870,6 +876,7 @@ public:
   
  
     virtual Renderer* startInternalRender(image::GnashImage& im) {
+	GNASH_REPORT_FUNCTION;
     
         std::auto_ptr<Renderer_agg_base> in;
     
@@ -880,6 +887,8 @@ public:
             case image::TYPE_RGBA:
                 in.reset(new Renderer_agg<typename RGBA::PixelFormat>(32));
                 break;
+	  default:
+	      break;
         }
  
         const size_t width = im.width();
@@ -892,6 +901,7 @@ public:
     }
 
     virtual void endInternalRender() {
+	GNASH_REPORT_FUNCTION;
         _external.reset();
     }
 
@@ -903,6 +913,8 @@ public:
     void clear_framebuffer(const geometry::Range2d<int>& region,
         const agg::rgba8& color)
     {
+	GNASH_REPORT_FUNCTION;
+
         assert(region.isFinite());
 
         // add 1 to width since we have still to draw a pixel when 
@@ -925,6 +937,8 @@ public:
     // Clean up after rendering a frame. 
     void end_display()
     {
+	GNASH_REPORT_FUNCTION;
+	
         if (m_drawing_mask) {
             log_debug(_("Warning: rendering ended while drawing a mask"));
         }
@@ -940,6 +954,7 @@ public:
     void drawLine(const std::vector<point>& coords, const rgba& color,
             const SWFMatrix& line_mat)
     {
+	GNASH_REPORT_FUNCTION;
 
         assert(m_pixf.get());
         
@@ -1023,6 +1038,7 @@ public:
   void drawGlyph(const SWF::ShapeRecord& shape, const rgba& color,
           const SWFMatrix& mat) 
   {
+	GNASH_REPORT_FUNCTION;
     
     // select relevant clipping bounds
     if (shape.getBounds().is_null()) {
@@ -1111,6 +1127,7 @@ public:
 
     void drawShape(const SWF::ShapeRecord& shape, const Transform& xform)
     {
+	GNASH_REPORT_FUNCTION;
         // check if the character needs to be rendered at all
         SWFRect cur_bounds;
 
@@ -1138,6 +1155,7 @@ public:
         const std::vector<Path>& objpaths, const SWFMatrix& mat,
         const SWFCxForm& cx)
     {
+	GNASH_REPORT_FUNCTION;
 
         bool have_shape, have_outline;
 
@@ -1890,6 +1908,7 @@ public:
   void drawPoly(const point* corners, size_t corner_count, const rgba& fill, 
     const rgba& outline, const SWFMatrix& mat, bool masked) {
     
+	GNASH_REPORT_FUNCTION;
     if (masked && !_alphaMasks.empty()) {
     
       // apply mask
@@ -1974,6 +1993,7 @@ public:
   }
   
   virtual void set_invalidated_regions(const InvalidatedRanges& ranges) {
+	GNASH_REPORT_FUNCTION;
     using gnash::geometry::Range2d;
     
     int count=0;
@@ -2114,6 +2134,7 @@ bool is_little_endian_host() {
 
 DSOEXPORT Renderer_agg_base*  create_Renderer_agg(const char *pixelformat)
 {
+	GNASH_REPORT_FUNCTION;
 
   if (!pixelformat) return NULL;
 

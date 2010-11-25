@@ -57,10 +57,11 @@
 #include "SWFMatrix.h"
 #include "swf/ShapeRecord.h"
 
-#include "Renderer_gles1.h"
-
 #include <boost/utility.hpp>
 #include <boost/bind.hpp>
+
+#include "Renderer_gles1.h"
+#include "GnashDevice.h"
 
 // Defined to 1 to disable (slow) anti-aliasing with the accumulation buffer
 #define NO_ANTIALIASING 1
@@ -99,7 +100,7 @@ Renderer_gles1::Renderer_gles1()
 
 Renderer_gles1::~Renderer_gles1()
 {
-
+    GNASH_REPORT_FUNCTION;
 }
 
 void
@@ -111,7 +112,7 @@ Renderer_gles1::init(float x, float y)
 CachedBitmap *
 Renderer_gles1::createCachedBitmap(std::auto_ptr<gnash::image::GnashImage>)
 {
-
+    GNASH_REPORT_FUNCTION;
 }
 
 void
@@ -119,6 +120,7 @@ Renderer_gles1::drawVideoFrame(image::GnashImage* /* frame */,
                                const gnash::Transform& t/* m */,
                                const SWFRect* /* bounds */, bool /*smooth*/)
 {
+    GNASH_REPORT_FUNCTION;
     log_unimpl("drawVideoFrame");  
 }
 
@@ -232,7 +234,7 @@ void
 Renderer_gles1::begin_submit_mask()
 {
 #if 0
-    PathVec mask;
+    GnashDevice::PathVec mask;
     _masks.push_back(mask);
     
     _drawing_mask = true;
@@ -260,6 +262,7 @@ Renderer_gles1::disable_mask()
 void
 Renderer_gles1::set_scale(float xscale, float yscale)
 {
+    GNASH_REPORT_FUNCTION;
 #if 0
     _xscale = xscale;
     _yscale = yscale;
@@ -271,11 +274,13 @@ Renderer_gles1::set_scale(float xscale, float yscale)
 void
 Renderer_gles1::set_invalidated_regions(const InvalidatedRanges& /* ranges */)
 {
+    GNASH_REPORT_FUNCTION;
 }
 
 bool
 Renderer_gles1::initTestBuffer(unsigned int width, unsigned int height)
 {
+    GNASH_REPORT_FUNCTION;
 #if 0
     int size = width * height; // * getBytesPerPixel();
     
@@ -292,20 +297,21 @@ Renderer_gles1::initTestBuffer(unsigned int width, unsigned int height)
 Renderer *
 Renderer_gles1::startInternalRender(gnash::image::GnashImage&)
 {
+    GNASH_REPORT_FUNCTION;
 }
 
 void
 Renderer_gles1::endInternalRender()
 {
+    GNASH_REPORT_FUNCTION;
 }
 
 Renderer *
 create_handler(const char *pixelformat)
 {
-  Renderer_gles1 *renderer = new Renderer_gles1;
-  return renderer;
-
-  return 0;
+    GNASH_REPORT_FUNCTION;
+    Renderer_gles1 *renderer = new Renderer_gles1;
+    return renderer;
 }  
 
 } // namespace gnash::renderer::gles1

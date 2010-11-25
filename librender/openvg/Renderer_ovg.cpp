@@ -43,6 +43,7 @@
 #include "Renderer_ovg_bitmap.h"
 #include "SWFMatrix.h"
 #include "swf/ShapeRecord.h"
+#include "CachedBitmap.h"
 
 #define GNASH_IMAGE_QUALITY     VG_IMAGE_QUALITY_FASTER
 #define GNASH_RENDER_QUALITY    VG_RENDERING_QUALITY_FASTER
@@ -181,8 +182,8 @@ bitmap_info_ovg::bitmap_info_ovg(gnash::image::GnashImage* img,
 bitmap_info_ovg::~bitmap_info_ovg()
 {
     tex_size -= _width * _height * 4;
-    log_debug("Remove Texture size:%d (%d x %d x %dbpp)", _width * _height * 4, _width, _height, 4);
-    log_debug("Current Texture size: %d", tex_size);
+    log_debug(_("Remove Texture size:%d (%d x %d x %dbpp)"), _width * _height * 4, _width, _height, 4);
+    log_debug(_("Current Texture size: %d"), tex_size);
 
     vgDestroyImage(_image);
 }
@@ -234,31 +235,46 @@ Renderer_ovg::Renderer_ovg()
       _display_height(0.0),
       _drawing_mask(false)
 {
-
-//    if (!initDevice(EGLDevice::OPENVG))
-    if (!initDevice(0, 0)) {
-        log_error("Couldn't initialize EGL Device!");
-    }
-#ifdef HAVE_GTK2 
-    if (!attachWindow(0)) {
-        log_error("Couldn't initialize EGL Window!");
-    }
-    EGLint value;
-    eglQuerySurface(_eglDisplay, _eglSurface, EGL_WIDTH, &value);
-    _display_width = value;
-    eglQuerySurface(_eglDisplay, _eglSurface, EGL_HEIGHT, &value);
-    _display_height = value;
-#else
-#warning "Must initialize a native window!"
-#endif
-    
-    set_scale(1.0f, 1.0f);
-    m_fillpaint = vgCreatePaint();
-    m_strokepaint = vgCreatePaint();
-
-    vgSetPaint (m_fillpaint,   VG_FILL_PATH);
-    vgSetPaint (m_strokepaint, VG_STROKE_PATH);
+    GNASH_REPORT_FUNCTION;
 }
+
+Renderer_ovg::Renderer_ovg(renderer::GnashDevice::dtype_t dtype)
+    : _display_width(0.0),
+      _display_height(0.0),
+      _drawing_mask(false)
+{
+    GNASH_REPORT_FUNCTION;
+    setDevice(dtype);
+    
+    if (_device) {
+        _device->initDevice(0, 0);
+        
+        set_scale(1.0f, 1.0f);
+        m_fillpaint = vgCreatePaint();
+        m_strokepaint = vgCreatePaint();
+        
+        vgSetPaint (m_fillpaint,   VG_FILL_PATH);
+        vgSetPaint (m_strokepaint, VG_STROKE_PATH);
+    } else {
+        log_error(_("No EGL Device to initialize!"));
+    }
+}
+
+// void
+// Renderer_ovg::setDevice(GnashDevice::dtype_t dtype)
+// {
+    
+// #if 0
+// #ifdef HAVE_GTK2 
+//     if (!_eglDevicea.attachWindow(0)) {
+//         log_error(_("Couldn't initialize EGL Window!"));
+//     }
+// #else
+// #warning "Must initialize a native window!"
+// #endif
+// #else
+// #endif
+// }
 
 void
 Renderer_ovg::init(float x, float y)
@@ -313,25 +329,25 @@ Renderer_ovg::~Renderer_ovg()
 #endif
 }
 
-#if 0
-FIXME
-    // Given an image, returns a pointer to a bitmap_info class
+// Given an image, returns a pointer to a bitmap_info class
 // that can later be passed to fill_styleX_bitmap(), to set a
 // bitmap fill style.
-gnash::BitmapInfo *
-Renderer_ovg::createBitmapInfo(std::auto_ptr<GnashImage> im)
+CachedBitmap *
+Renderer_ovg::createCachedBitmap(std::auto_ptr<image::GnashImage> im)
 {
     GNASH_REPORT_FUNCTION;
     
     // OpenVG don't support 24bit RGB, need translate colorspace
     switch (im->type()) {
-      case GNASH_IMAGE_RGBA:   
-          return new bitmap_info_ovg(im.get(), VG_sARGB_8888, m_fillpaint);
+      case image::TYPE_RGBA:   
+//          return new bitmap_info_ovg(im.get(), VG_sARGB_8888, m_fillpaint);
+          break;
+      case image::TYPE_RGB:
+          break;
       default:
           std::abort();
     }
 }
-#endif
 
 // Since we store drawing operations in display lists, we take special care
 // to store video frame operations in their own display list, lest they be
@@ -1510,15 +1526,16 @@ Renderer_ovg::initTestBuffer(unsigned int width, unsigned int height)
 #ifdef HAVE_GTK2
     // new surface
     // makeCurrentContext
+    
 #else
     
     // _testBuffer = static_cast<unsigned char *>(realloc(_testBuffer, size));
     _testBuffer = new unsigned char[size];
     memset(_testBuffer, 0, size);
     printf("\tRenderer Test memory at: %p\n", _testBuffer);
-#endif
-    
+
     attachWindow(0);
+#endif
     
     init_buffer(_testBuffer, size, width, height, width * getBitsPerPixel());
 //    init(width, height);
@@ -1576,11 +1593,6 @@ Renderer_ovg::begin_display(gnash::rgba const&, int, int, float, float, float, f
 }
 void
 Renderer_ovg::drawVideoFrame(gnash::image::GnashImage*, gnash::Transform const&, gnash::SWFRect const*, bool)
-{
-
-}
-CachedBitmap *
-Renderer_ovg::createCachedBitmap(std::auto_ptr<gnash::image::GnashImage>)
 {
 
 }

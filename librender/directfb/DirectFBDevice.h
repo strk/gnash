@@ -78,10 +78,13 @@ class DirectFBDevice : public GnashDevice
     }
 
     int getRedSize() {
+        return 0;
     };
     int getGreenSize() {
+        return 0;
     };
     int getBlueSize() {
+        return 0;
     };
     
     bool isSingleBuffered() {
@@ -113,7 +116,7 @@ class DirectFBDevice : public GnashDevice
         return 0;
     }
 
-    virtual bool supportsRenderer(rtype_t rtype) { return true; };
+    virtual bool supportsRenderer(rtype_t /* rtype */) { return true; };
 
     // Overload some of the base class methods to deal with Device specific
     // data types.

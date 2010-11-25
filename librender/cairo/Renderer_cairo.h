@@ -124,11 +124,11 @@ public:
 
 private:
     /// The cairo context.
-    cairo_t* _cr;
+    cairo_t     *_cr;
     boost::scoped_array<boost::uint8_t> _video_buffer;
     std::vector<PathVec> _masks;
-    size_t _video_bufsize;
-    bool _drawing_mask;
+    size_t      _video_bufsize;
+    bool        _drawing_mask;
     InvalidatedRanges _invalidated_ranges;
     cairo_matrix_t _stage_mat;
 };

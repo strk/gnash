@@ -228,16 +228,7 @@ EGLDevice::initDevice(int argc, char *argv[])
     EGLDevice::rtype_t rtype;
     
     GNASH_REPORT_FUNCTION;
-
     
-    // // FIXME: for now, always run verbose till this supports command line args
-    // dbglogfile.setVerbosity();
-
-#ifdef HAVE_GTK2+XX
-    // As gdk_init() wants the command line arguments, we have to create
-    // fake ones, as we don't care about the X11 options at this point.
-    gdk_init(&argc, &argv);
-#endif
 #ifdef HAVE_LIBX11
     _x11.initDevice(argc, argv);
 #endif
@@ -400,7 +391,7 @@ EGLDevice::bindClient(rtype_t rtype)
           }
           break;
       }
-      case GnashDevice::X11:
+      case GnashDevice::XORG:
       case GnashDevice::VAAPI:
       default:
           break;

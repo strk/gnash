@@ -26,20 +26,27 @@
 
 #include <boost/scoped_array.hpp>
 
-namespace gnash
-{
+#include "Geometry.h"
+
+namespace gnash {
 
 namespace renderer {
 
 struct GnashDevice
 {
+    typedef std::vector<const Path*> PathRefs;
+    typedef std::vector<Path> PathVec;
+    typedef std::vector<geometry::Range2d<int> > ClipBounds;
+    typedef std::vector<const Path*> PathPtrVec;
+    
     /// Handle multiple window types. The derived classes will cast this to
     /// the proper data type.
     typedef long native_window_t;
     
     /// the list of supported renders that use devices
-    typedef enum {OPENVG, OPENGL, OPENGLES1, OPENGLES2, X11, VAAPI} rtype_t;
-
+    typedef enum {OPENVG, OPENGL, OPENGLES1, OPENGLES2, XORG, VAAPI} rtype_t;
+    typedef enum {EGL, DIRECTFB, X11} dtype_t;
+    
     GnashDevice() { GNASH_REPORT_FUNCTION; };
     virtual ~GnashDevice() { GNASH_REPORT_FUNCTION; };
 

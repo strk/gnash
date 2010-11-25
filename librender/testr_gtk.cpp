@@ -120,7 +120,7 @@ initVGDemo(void)
     path  = vgCreatePath(VG_PATH_FORMAT_STANDARD, VG_PATH_DATATYPE_F,
                          1.0f, 0.0f, 0, 0, VG_PATH_CAPABILITY_ALL);
 
-    vguArc(path, x, y, w, h, startAngle, angleExtent, (VGUArcType)arcType);
+//    vguArc(path, x, y, w, h, startAngle, angleExtent, (VGUArcType)arcType);
 
     vgSeti(VG_STROKE_CAP_STYLE, VG_CAP_BUTT);
     vgSeti(VG_STROKE_JOIN_STYLE, VG_JOIN_BEVEL);

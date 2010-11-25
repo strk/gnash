@@ -37,10 +37,24 @@
 # error "This file needs EGL, which is part of OpenGL-ES"
 #endif
 
-namespace gnash
-{
+namespace gnash {
 
 namespace renderer {
+
+struct eglVertex {
+    eglVertex(float x, float y)
+        : _x(x), _y(y)
+        {
+        }
+  
+    eglVertex(const point& p)
+        : _x(p.x), _y(p.y)
+        {
+        }
+
+    float _x;
+    float _y;
+};
 
 class EGLDevice : public GnashDevice
 {

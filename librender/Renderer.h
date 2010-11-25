@@ -149,6 +149,8 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 
+#include "boost/shared_array.hpp"
+#include "boost/scoped_ptr.hpp"
 #include "GnashEnums.h" 
 #include "Range2d.h"
 #include "Point2d.h"
@@ -156,6 +158,17 @@
 #include "log.h"
 #include "snappingrange.h"
 #include "SWFRect.h"
+#include "GnashDevice.h"
+
+#ifdef BUILD_EGL_DEVICE
+#include "eglDevice.h"
+#endif
+#ifdef BUILD_DIRECTFB_DEVICE
+#include "directfb/DirectFBDevice.h"
+#endif
+#ifdef BUILD_X11_DEVICE
+#include "x11/X11Device.h"
+#endif
 
 // Forward declarations.
 namespace gnash {
@@ -224,8 +237,8 @@ public:
     /// Given an image, returns a pointer to a bitmap_info class
     /// that can later be passed to FillStyleX_bitmap(), to set a
     /// bitmap fill style.
-    virtual CachedBitmap* createCachedBitmap(
-            std::auto_ptr<image::GnashImage> im) = 0;
+    virtual CachedBitmap *
+        createCachedBitmap(std::auto_ptr<image::GnashImage> im) = 0;
 
 
     /// ==================================================================
@@ -462,8 +475,69 @@ public:
         return true;
     }
 
+    /// ==================================================================
+    /// Interface for using low-level devices like EGL or DirectFB
+    /// These are unused by AGG, Cairo, and OpenGL, but are needed
+    /// when using OpenGLES1, OpenGLES2, or OpenVG.
+    /// ==================================================================
+    boost::shared_array<renderer::GnashDevice::dtype_t> probeDevices() {
+        GNASH_REPORT_FUNCTION;
+        
+        size_t total = 0;
+#ifdef BUILD_EGL_DEVICE
+        total++;
+#endif
+#ifdef BUILD_DIRECTFB_DEVICE
+        total++;
+#endif
+#ifdef BUILD_X11_DEVICE
+        total++;
+#endif
+        boost::shared_array<renderer::GnashDevice::dtype_t> devs
+            (new renderer::GnashDevice::dtype_t[total]);
+#ifdef BUILD_EGL_DEVICE
+        devs[--total];
+#endif
+#ifdef BUILD_DIRECTFB_DEVICE
+        devs[--total];
+#endif
+#ifdef BUILD_X11_DEVICE
+        devs[--total];
+#endif
+        
+        return devs;
+    }
+    
+    void setDevice(renderer::GnashDevice::dtype_t dtype) {
+        switch (dtype) {
+#if BUILD_EGL_DEVICE
+          case renderer::GnashDevice::EGL:
+          {
+              _device.reset(new renderer::EGLDevice);
+              break;
+          }
+#endif
+#if BUILD_DIRECTFB_DEVICE
+          case renderer::GnashDevice::DIRECTFB:
+          {
+              _device.reset(new renderer::directfb::DirectFBDevice);
+              break;
+          }
+#endif
+//#ifdef BUILD_X11_DEVICE
+          case renderer::GnashDevice::X11:
+          {
+              _device.reset(new renderer::x11::X11Device);
+              break;
+          }
+//#endif
+          default:
+              log_error("unsupported Display Device!");
+        }
+    }
+    
 #ifdef USE_TESTSUITE
-
+        
     /// ==================================================================
     /// Interfaces for testing only. Disabled when the testsuite isn't built.
     /// ==================================================================
@@ -630,6 +704,9 @@ protected:
     // Delayed imaged to render
     RenderImages _render_images;
 
+    // 
+    boost::scoped_ptr<renderer::GnashDevice> _device;
+    
 private:
 
     /// Bracket the displaying of a frame from a movie.

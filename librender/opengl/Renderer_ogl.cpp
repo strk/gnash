@@ -580,6 +580,8 @@ bitmap_info_ogl::~bitmap_info_ogl()
 void
 bitmap_info_ogl::setup() const
 {      
+    GNASH_REPORT_FUNCTION;
+    
     oglScopeEnable enabler(_ogl_img_type);
   
     glGenTextures(1, &_texture_id);
@@ -723,6 +725,8 @@ public:
   
   void init()
   {
+    GNASH_REPORT_FUNCTION;
+    
     // Turn on alpha blending.
     // FIXME: do this when it's actually used?
     glEnable(GL_BLEND);
@@ -811,6 +815,8 @@ public:
 
   boost::shared_ptr<GnashTexture> getCachedTexture(image::GnashImage *frame)
   {
+    GNASH_REPORT_FUNCTION;
+    
       boost::shared_ptr<GnashTexture> texture;
       gnash::GnashTextureFormat frameFormat(frame->type());
       unsigned int frameFlags;
@@ -995,6 +1001,8 @@ public:
     int viewport_width, int viewport_height,
     float x0, float x1, float y0, float y1)
   {
+    GNASH_REPORT_FUNCTION;
+    
     glViewport(0, 0, viewport_width, viewport_height);
     glLoadIdentity();
 
@@ -1027,6 +1035,8 @@ public:
   virtual void
   end_display()
   {
+    GNASH_REPORT_FUNCTION;
+    
     glEndList();    
     
 #if NO_ANTIALIASING
@@ -1110,6 +1120,8 @@ public:
   virtual void drawLine(const std::vector<point>& coords, const rgba& color,
                   const SWFMatrix& mat)
   {
+    GNASH_REPORT_FUNCTION;
+    
     oglScopeMatrix scope_mat(mat);
 
     const size_t numPoints = coords.size();
@@ -1142,6 +1154,8 @@ public:
   virtual void  drawPoly(const point* corners, size_t corner_count, 
     const rgba& fill, const rgba& outline, const SWFMatrix& mat, bool /* masked */)
   {
+    GNASH_REPORT_FUNCTION;
+    
     if (corner_count < 1) {
       return;
     }
@@ -1174,6 +1188,8 @@ public:
     
   virtual void begin_submit_mask()
   {
+    GNASH_REPORT_FUNCTION;
+    
     PathVec mask;
     _masks.push_back(mask);
     
@@ -1182,6 +1198,8 @@ public:
   
   virtual void end_submit_mask()
   {
+    GNASH_REPORT_FUNCTION;
+    
     _drawing_mask = false;
     
     apply_mask();
@@ -1197,6 +1215,8 @@ public:
   /// the number of masks.
   void apply_mask()
   {
+    GNASH_REPORT_FUNCTION;
+    
     if (_masks.empty()) {
       return;
     }
@@ -1632,6 +1652,8 @@ public:
   
   void draw_mask(const PathVec& path_vec)
   {    
+    GNASH_REPORT_FUNCTION;
+    
     for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
          it != end; ++it) {
       const Path& cur_path = *it;
@@ -1784,6 +1806,7 @@ public:
 
   virtual void drawShape(const SWF::ShapeRecord& shape, const Transform& xform)
   {
+    GNASH_REPORT_FUNCTION;    
   
     const PathVec& path_vec = shape.paths();
 
@@ -1977,6 +2000,8 @@ sampleGradient(const GradientFill& fill, boost::uint8_t ratio)
 const CachedBitmap*
 createGradientBitmap(const GradientFill& gf, Renderer& renderer)
 {
+    GNASH_REPORT_FUNCTION;
+    
     std::auto_ptr<image::ImageRGBA> im;
 
     switch (gf.type())

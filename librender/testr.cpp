@@ -45,6 +45,7 @@
 #include "SWFMatrix.h"
 #include "Renderer.h"
 #include "Transform.h"
+#include "CachedBitmap.h"
 #include "GnashVaapiImage.h"
 #include "GnashVaapiImageProxy.h"
 #include "boost/date_time/posix_time/posix_time.hpp"
@@ -161,7 +162,7 @@ main(int argc, char *argv[])
 #ifdef RENDERER_AGG
     Timer tagg("AGG");
     Renderer *renderer1 = create_Renderer_agg(pixelformat);
-#ifdef HAVE_GTK2
+#ifdef HAVE_GTK2_XX
     GtkWidget *canvas = create_GTK_window();
     GdkVisual* visual = gdk_drawable_get_visual(canvas->window);
     GdkImage *offscreenbuf = gdk_image_new (GDK_IMAGE_FASTEST, visual, 200,200);
@@ -185,9 +186,11 @@ main(int argc, char *argv[])
 #ifdef RENDERER_OPENVG
     Timer tovg("OpenVG");
     Renderer *renderer2 = renderer::openvg::create_handler(pixelformat);
-    EGLDevice *ovg = dynamic_cast<EGLDevice *>(renderer2);
-    ovg->initDevice(0, 0);
-    ovg->attachWindow(*(reinterpret_cast<EGLNativeWindowType *>(canvas)));
+//     EGLDevice *ovg = dynamic_cast<EGLDevice *>(renderer2);
+//     if (ovg) {
+//         ovg->initDevice(0, 0);
+// //        ovg->attachWindow(*(reinterpret_cast<EGLNativeWindowType *>(canvas)));
+//         ovg->attachWindow(0);
     if (renderer2) {
         test_renderer(renderer2, "OpenVG");
         test_geometry(renderer2, "OpenVG");
@@ -295,6 +298,15 @@ test_renderer(Renderer *renderer, const std::string &type)
         runtest.pass("getBitsPerPixel()");
     } else {
         runtest.fail("getBitsPerPixel()");
+    }
+
+    image::GnashImage *frame1 = new image::ImageRGBA(10, 10);
+    std::auto_ptr<image::GnashImage> im1(frame1);
+    CachedBitmap *cb = renderer->createCachedBitmap(im1);
+    if (cb) {
+        runtest.pass("createCachedBitmap()");
+    } else {
+        runtest.fail("createCachedBitmap()");
     }
 
 #ifdef HAVE_GTK2
@@ -553,6 +565,12 @@ test_iterators(Renderer *renderer, const std::string &type)
             { return _render_images.end(); }
 #endif
 }
+
+#if 0
+FIXME:
+ add tests for
+Renderer_ovg::createBitmapInfo(std::auto_ptr<GnashImage> im)
+#endif
 
 // Local Variables:
 // mode: C++

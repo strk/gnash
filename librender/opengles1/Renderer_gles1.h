@@ -134,6 +134,8 @@ class  DSOEXPORT Renderer_gles1: public Renderer, public EGLDevice
 public:
     std::string description() const { return "OpenGLES1"; }
     Renderer_gles1();
+    Renderer_gles1(GnashDevice::dtype_t dtype);
+    
     ~Renderer_gles1();
         
     void init(float x, float y);

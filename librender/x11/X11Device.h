@@ -72,7 +72,7 @@ class X11Device : public GnashDevice
     
     bool isSingleBuffered() { return true; }
     
-    bool supportsRenderer(GnashDevice::rtype_t rtype) { return false; }
+    bool supportsRenderer(GnashDevice::rtype_t /* rtype */) { return false; }
     
     bool isBufferDestroyed() { return false; }
     // bool isBufferDestroyed(IX11Surface surface) {

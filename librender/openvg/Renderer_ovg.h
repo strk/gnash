@@ -28,15 +28,19 @@
 #include <VG/vgext.h>
 #include <vector>
 #include <boost/scoped_array.hpp>
+#include <boost/scoped_ptr.hpp>
 
 #include "Geometry.h"
-//#include "BitmapInfo.h"
 #include "Renderer.h"
 #include "eglDevice.h"
+#include "directfb/DirectFBDevice.h"
+#include "GnashDevice.h"
+#include "CachedBitmap.h"
 
 namespace gnash {
 
 class SWFCxForm;
+class GnashImage;
 
 namespace renderer {
 
@@ -47,28 +51,16 @@ typedef std::vector<Path> PathVec;
 typedef std::vector<geometry::Range2d<int> > ClipBounds;
 typedef std::vector<const Path*> PathPtrVec;
 
-struct eglVertex {
-    eglVertex(float x, float y)
-        : _x(x), _y(y)
-        {
-        }
-  
-    eglVertex(const point& p)
-        : _x(p.x), _y(p.y)
-        {
-        }
-
-    VGfloat _x;
-    VGfloat _y;
-};
-
 // typedef std::map<const Path*, VGPath > PathPointMap;
 
-class  DSOEXPORT Renderer_ovg: public Renderer, public EGLDevice
+class  DSOEXPORT Renderer_ovg: public Renderer
 {
 public:
     std::string description() const { return "OpenVG"; }
+
     Renderer_ovg();
+    Renderer_ovg(GnashDevice::dtype_t dtype);
+    
     ~Renderer_ovg();
         
     void init(float x, float y);
@@ -130,11 +122,7 @@ public:
     void printVGPath();
     
 #if 0
-    // These are all required by thr Render class
-    void set_scale(float xscale, float yscale);
-    void set_translation(float xoff, float yoff);
-    CachedBitmap *createCachedBitmap(std::auto_ptr<image::GnashImage> im);
-
+    // These are all required by the Render class
     void drawLine(const std::vector<point>& coords, const rgba& color,
                           const SWFMatrix& mat);
 
@@ -217,6 +205,8 @@ public:
     VGMaskLayer m_mask;
 #endif
     unsigned char *_testBuffer; // buffer used by initTestBuffer() only
+    
+    boost::scoped_ptr<GnashDevice> _device;
 };
 
 DSOEXPORT Renderer* create_handler(const char *pixelformat);
