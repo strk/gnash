@@ -236,6 +236,9 @@ Renderer_ovg::Renderer_ovg()
       _drawing_mask(false)
 {
     GNASH_REPORT_FUNCTION;
+#ifdef BUILD_EGL_DEVICE
+//    _device.reset(new renderer::EGLDevice);
+#endif      
 }
 
 Renderer_ovg::Renderer_ovg(renderer::GnashDevice::dtype_t dtype)
@@ -347,6 +350,8 @@ Renderer_ovg::createCachedBitmap(std::auto_ptr<image::GnashImage> im)
       default:
           std::abort();
     }
+
+    return 0;
 }
 
 // Since we store drawing operations in display lists, we take special care
@@ -454,6 +459,11 @@ Renderer_ovg::drawLine(const std::vector<point>& coords, const rgba& fill,
     VGfloat     gdata[MAX_SEG*3*2];
     int         scount = 0;
     int         dcount = 0;
+
+    if (!_device) {
+        log_error("No Device specified for OpenVG to draw on!");
+        return;
+    }
     
     if (coords.empty()) return;
     
@@ -515,6 +525,11 @@ Renderer_ovg::drawPoly(const point* corners, size_t corner_count,
     VGfloat     gdata[MAX_SEG*3*2];
     int         scount = 0;
     int         dcount = 0;
+
+    if (!_device) {
+        log_error("No Device specified for OpenVG to draw on!");
+        return;
+    }
     
     if (corner_count < 1) {
         return;

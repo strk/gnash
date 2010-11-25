@@ -95,7 +95,7 @@ Renderer_gles2::init(float x, float y)
 CachedBitmap *
 Renderer_gles2::createCachedBitmap(std::auto_ptr<gnash::image::GnashImage>)
 {
-
+    return 0;
 }
 
 void
