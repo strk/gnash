@@ -1958,6 +1958,9 @@ AC_CHECK_LIB(Xi, XInput_find_display)
 AC_CHECK_LIB(X11, XDisableAccessControl)
 dnl fi
 AM_CONDITIONAL(HAVE_X11, [test x$has_x11 = xyes])
+if test x$has_x11 = xyes; then
+  AC_DEFINE(BUILD_X11_DEVICE, [1], [Build the X11 device])
+fi
 AC_CHECK_LIB(rt, shm_unlink)
 AC_CHECK_FUNCS(shm_open shm_unlink)
 AC_TRY_COMPILE([#include <strings.h>], [
