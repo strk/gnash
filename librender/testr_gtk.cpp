@@ -258,7 +258,6 @@ on_window1_expose_event(GtkWidget *widget, GdkEventExpose  *event,
                         gpointer user_data)
 {
     GNASH_REPORT_FUNCTION;
-    vgLoadIdentity();
     
     return FALSE;
 }
