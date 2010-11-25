@@ -64,6 +64,8 @@ class EGLDevice : public GnashDevice
 
     virtual ~EGLDevice();
 
+    dtype_t getType() { return EGL; };
+
     // Initialize EGL Device layer
     bool initDevice(int argc, char *argv[]);
 
