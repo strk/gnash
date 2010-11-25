@@ -1298,8 +1298,19 @@ RTMPConnection::handleInvoke(const boost::uint8_t* payload,
     }
 
     if (method ==  "_error") {
-        _nc.notifyStatus(NetConnection_as::CALL_FAILED);
+
+        as_value arg;
+
+        amf::Reader rd(payload, end, getGlobal(_nc.owner()));
+        // TODO: use all args and check the order! We currently only use
+        // the last one!
+        while (rd(arg)) {
+            log_debug("Value: %s", arg);
+        }
+
         log_error( "rtmp server sent error");
+
+        callMethod(&_nc.owner(), NSV::PROP_ON_STATUS, arg);
         return;
     }
     
