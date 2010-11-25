@@ -312,8 +312,8 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
     as_object* o = getObjectWithPrototype(getGlobal(fn), NSV::CLASS_MOVIE_CLIP);
     MovieClip* mc = new MovieClip(o, 0, m, ptr);
 
-    string_table& st = getStringTable(fn);
-    mc->set_name(st.find(fn.arg(0).to_string()));
+    VM& vm = getVM(fn);
+    mc->set_name(getURI(vm, fn.arg(0).to_string()));
     mc->setDynamic();
 
     // Unlike other MovieClip methods, the depth argument of an empty movie clip
@@ -491,8 +491,8 @@ movieclip_attachMovie(const fn_call& fn)
     Global_as& gl = getGlobal(fn);
     DisplayObject* newch = exported_movie->createDisplayObject(gl, movieclip);
 
-    string_table& st = getStringTable(fn);
-    newch->set_name(st.find(newname));
+    VM& vm = getVM(fn);
+    newch->set_name(getURI(vm, newname));
     newch->setDynamic();
 
     boost::intrusive_ptr<as_object> initObj;
@@ -1810,13 +1810,13 @@ movieclip_beginGradientFill(const fn_call& fn)
     // Create the gradients vector
     // ----------------------------
 
-    string_table& st = getStringTable(fn);
+    VM& vm = getVM(fn);
 
     std::vector<GradientRecord> gradients;
     gradients.reserve(stops);
     for (size_t i = 0; i < stops; ++i) {
 
-        string_table::key key = st.find(boost::lexical_cast<std::string>(i));
+        const ObjectURI& key = getURI(vm, boost::lexical_cast<std::string>(i));
 
         as_value colVal = getMember(*colors, key);
         boost::uint32_t col = colVal.is_number() ? toInt(colVal, getVM(fn)) : 0;

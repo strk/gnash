@@ -28,7 +28,6 @@
 #include "log.h"
 #include "Point2d.h"
 #include "VM.h"
-#include "string_table.h"
 #include "as_value.h"
 
 #include "check.h"
@@ -65,7 +64,6 @@ main(int /*argc*/, char** /*argv*/)
 
 	MovieClip* root = tester.getRootMovie();
 	VM& vm = getVM(*getObject(root));
-	string_table& st = vm.getStringTable();
 
 	check_equals(root->get_frame_count(), 1);
 
@@ -158,7 +156,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	as_value eot;
         
-    getObject(root)->get_member(st.find("testcompleted"), &eot);
+    getObject(root)->get_member(getURI(vm, "testcompleted"), &eot);
         
 	//cerr << "EOT is " << eot.to_debug_string() << endl;
 	check(eot.to_bool(8));

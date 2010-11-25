@@ -868,7 +868,8 @@ matrix_ctor(const fn_call& fn)
     as_object* obj = ensure<ValidThis>(fn);
     
     if (!fn.nargs) {
-        const string_table::key identity = getStringTable(fn).find("identity");
+        // TODO: use NSV
+        const ObjectURI& identity = getURI(getVM(fn), "identity");
         callMethod(obj, identity);
         return as_value();
     }

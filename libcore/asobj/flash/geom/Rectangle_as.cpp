@@ -658,7 +658,8 @@ Rectangle_ctor(const fn_call& fn)
     as_object* obj = ensure<ValidThis>(fn);
 
     if (!fn.nargs) {
-        const string_table::key setEmpty = getStringTable(fn).find("setEmpty");
+        // TODO: use NSV !
+        const ObjectURI& setEmpty = getURI(getVM(fn), "setEmpty");
         callMethod(obj, setEmpty);
         return as_value();
     }

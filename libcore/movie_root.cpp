@@ -91,7 +91,7 @@ namespace gnash {
 namespace {
     bool generate_mouse_button_events(movie_root& mr, MouseButtonState& ms);
     const DisplayObject* getNearestObject(const DisplayObject* o);
-    as_object* getBuiltinObject(movie_root& mr, string_table::key cl);
+    as_object* getBuiltinObject(movie_root& mr, const ObjectURI& cl);
     void advanceLiveChar(MovieClip* ch);
 
     /// Push a DisplayObject listener to the front of given container, if not
@@ -546,9 +546,11 @@ movie_root::setDimensions(size_t w, size_t h)
     _stageHeight = h;
 
     if (_scaleMode == SCALEMODE_NOSCALE) {
-        as_object* stage = getBuiltinObject(*this, NSV::CLASS_STAGE);
+        as_object* stage = getBuiltinObject(*this,
+            getURI(_vm, NSV::CLASS_STAGE));
         if (stage) {
-            callMethod(stage, NSV::PROP_BROADCAST_MESSAGE, "onResize");
+            callMethod(stage, getURI(_vm, NSV::PROP_BROADCAST_MESSAGE),
+                "onResize");
         }
 
     }
@@ -594,7 +596,7 @@ movie_root::keyEvent(key::code k, bool down)
     }
 
     // Broadcast event to Key._listeners.
-    as_object* key = getBuiltinObject(*this, NSV::CLASS_KEY);
+    as_object* key = getBuiltinObject(*this, getURI(_vm, NSV::CLASS_KEY));
     if (key) {
 
         try {
@@ -603,10 +605,10 @@ movie_root::keyEvent(key::code k, bool down)
             // A stack limit like that is hardly of any use, but could be used
             // maliciously to crash Gnash.
             if (down) {
-                callMethod(key, NSV::PROP_BROADCAST_MESSAGE, "onKeyDown");
+                callMethod(key, getURI(_vm, NSV::PROP_BROADCAST_MESSAGE), "onKeyDown");
             }
             else {
-                callMethod(key, NSV::PROP_BROADCAST_MESSAGE, "onKeyUp");
+                callMethod(key, getURI(_vm,NSV::PROP_BROADCAST_MESSAGE), "onKeyUp");
             }
         }
         catch (ActionLimitException &e)
@@ -650,7 +652,7 @@ movie_root::keyEvent(key::code k, bool down)
 bool
 movie_root::mouseWheel(int delta)
 {
-    as_object* mouseObj = getBuiltinObject(*this, NSV::CLASS_MOUSE);
+    as_object* mouseObj = getBuiltinObject(*this, getURI(_vm,NSV::CLASS_MOUSE));
     if (!mouseObj) return false;
     
     const boost::int32_t x = pixelsToTwips(_mouseX);
@@ -659,7 +661,7 @@ movie_root::mouseWheel(int delta)
     DisplayObject* i = getTopmostMouseEntity(x, y);
 
     // Always called with two arguments.
-    callMethod(mouseObj, NSV::PROP_BROADCAST_MESSAGE, "onMouseWheel",
+    callMethod(mouseObj, getURI(_vm,NSV::PROP_BROADCAST_MESSAGE), "onMouseWheel",
             delta, i ? getObject(i) : as_value());
 
     return true;
@@ -998,15 +1000,18 @@ movie_root::notify_mouse_listeners(const event_id& event)
         }
     }
 
-    as_object* mouseObj = getBuiltinObject(*this, NSV::CLASS_MOUSE);
+    const ObjectURI& propMouse = getURI(_vm, NSV::CLASS_MOUSE);
+    const ObjectURI& propBroadcastMessage =
+        getURI(_vm, NSV::PROP_BROADCAST_MESSAGE);
+
+    as_object* mouseObj = getBuiltinObject(*this, propMouse);
     if (mouseObj) {
 
         // Can throw an action limit exception if the stack limit is 0 or 1.
         // A stack limit like that is hardly of any use, but could be used
         // maliciously to crash Gnash.
         try {
-            callMethod(mouseObj, NSV::PROP_BROADCAST_MESSAGE, 
-                    event.functionName());
+            callMethod(mouseObj, propBroadcastMessage, event.functionName());
         }
         catch (ActionLimitException &e) {
             log_error(_("ActionLimits hit notifying mouse events: %s."),
@@ -1540,18 +1545,18 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
     } else if (invoke->name == "SetVariable") {
         MovieClip *mc = getLevel(0);
         as_object *obj = getObject(mc);
-        string_table &st = getStringTable(*obj);
+        VM &vm = getVM();
         std::string var = invoke->args[0].to_string();
         as_value &val = invoke->args[1] ;
-        obj->set_member(st.find(var), val);
+        obj->set_member(getURI(vm, var), val);
 	// SetVariable doesn't send a response
     } else if (invoke->name == "GetVariable") {
         MovieClip *mc = getLevel(0);
         as_object *obj = getObject(mc);
-        string_table &st = getStringTable(*obj);
+        VM &vm = getVM();
         std::string var = invoke->args[0].to_string();
         as_value val;
-        obj->get_member(st.find(var), &val);
+        obj->get_member(getURI(vm, var), &val);
 	// GetVariable sends the value of the variable
 	ss << ExternalInterface::toXML(val);
     } else if (invoke->name == "GotoFrame") {
@@ -1850,8 +1855,7 @@ movie_root::callExternalCallback(const std::string &name,
     MovieClip *mc = getLevel(0);
     as_object *obj = getObject(mc);
 
-    string_table& st = getStringTable(*obj);
-    const string_table::key key = st.find(name);
+    const ObjectURI& key = getURI(getVM(), name);
     // FIXME: there has got to be a better way of handling the variable
     // length arg list
     as_value val;
@@ -2053,8 +2057,6 @@ movie_root::findCharacterByTarget(const std::string& tgtstr) const
 {
     if (tgtstr.empty()) return 0;
 
-    string_table& st = _vm.getStringTable();
-
     // NOTE: getRootMovie() would be problematic in case the original
     //       root movie is replaced by a load to _level0... 
     //       (but I guess we'd also drop loadMovie requests in that
@@ -2068,7 +2070,7 @@ movie_root::findCharacterByTarget(const std::string& tgtstr) const
         std::string part(tgtstr, from, to - from);
 
         // TODO: there is surely a cleaner way to implement path finding.
-        ObjectURI uri(st.find(part));
+        const ObjectURI& uri = getURI(_vm, part);
         o = o->displayObject() ?
             o->displayObject()->pathElement(uri) :
             getPathElement(*o, uri);
@@ -2536,7 +2538,7 @@ getNearestObject(const DisplayObject* o)
 }
 
 as_object*
-getBuiltinObject(movie_root& mr, string_table::key cl)
+getBuiltinObject(movie_root& mr, const ObjectURI& cl)
 {
     Global_as& gl = *mr.getVM().getGlobal();
 

@@ -20,7 +20,7 @@
 
 #include "Global_as.h" 
 #include "as_object.h"
-#include "string_table.h"
+#include "VM.h"
 #include "VM.h"
 #include "fn_call.h"
 #include "ColorTransform_as.h"
@@ -43,13 +43,13 @@ get_flash_geom_package(const fn_call& fn)
 
     as_object *pkg = createObject(gl);
 	
-    string_table& st = getStringTable(fn);
+    VM& vm = getVM(fn);
 
-    colortransform_class_init(*pkg, st.find("ColorTransform"));
-	matrix_class_init(*pkg, st.find("Matrix"));
-	point_class_init(*pkg, st.find("Point"));
-	rectangle_class_init(*pkg, st.find("Rectangle"));
-	transform_class_init(*pkg, st.find("Transform"));
+    colortransform_class_init(*pkg, getURI(vm, "ColorTransform"));
+	matrix_class_init(*pkg, getURI(vm, "Matrix"));
+	point_class_init(*pkg, getURI(vm, "Point"));
+	rectangle_class_init(*pkg, getURI(vm, "Rectangle"));
+	transform_class_init(*pkg, getURI(vm, "Transform"));
 
     return pkg;
 }

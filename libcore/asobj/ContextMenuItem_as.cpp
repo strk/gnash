@@ -63,19 +63,19 @@ contextmenuitem_copy(const fn_call& fn)
     as_object* ptr = ensure<ValidThis>(fn);
 
     Global_as& gl = getGlobal(fn);
-    string_table& st = getStringTable(fn);
+    VM& vm = getVM(fn);
 
     as_function* ctor =
-        getMember(gl, st.find("ContextMenuItem")).to_function();
+        getMember(gl, getURI(vm, "ContextMenuItem")).to_function();
 
     if (!ctor) return as_value();
 
     fn_call::Args args;
-    args += getMember(*ptr, st.find("caption")),
+    args += getMember(*ptr, getURI(vm, "caption")),
         getMember(*ptr, NSV::PROP_ON_SELECT),
-        getMember(*ptr, st.find("separatorBefore")),
+        getMember(*ptr, getURI(vm, "separatorBefore")),
         getMember(*ptr, NSV::PROP_ENABLED),
-        getMember(*ptr, st.find("visible"));
+        getMember(*ptr, getURI(vm, "visible"));
 
     return constructInstance(*ctor, fn.env(), args);
 }
@@ -86,14 +86,14 @@ contextmenuitem_ctor(const fn_call& fn)
 {
     as_object* obj = fn.this_ptr;
 
-    string_table& st = getStringTable(fn);
+    VM& vm = getVM(fn);
 
-    obj->set_member(st.find("caption"), fn.nargs ? fn.arg(0) : as_value());
+    obj->set_member(getURI(vm, "caption"), fn.nargs ? fn.arg(0) : as_value());
     obj->set_member(NSV::PROP_ON_SELECT, fn.nargs > 1 ? fn.arg(1) : as_value());
-    obj->set_member(st.find("separatorBefore"), fn.nargs > 2 ?
+    obj->set_member(getURI(vm, "separatorBefore"), fn.nargs > 2 ?
             fn.arg(2) : false);
     obj->set_member(NSV::PROP_ENABLED, fn.nargs > 3 ? fn.arg(3) : true);
-    obj->set_member(st.find("visible"), fn.nargs > 4 ? fn.arg(4) : true);
+    obj->set_member(getURI(vm, "visible"), fn.nargs > 4 ? fn.arg(4) : true);
 
     return as_value(); 
 }

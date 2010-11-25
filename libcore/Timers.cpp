@@ -43,7 +43,7 @@ Timer::Timer(as_function& method, unsigned long ms,
     _interval(ms),
     _start(std::numeric_limits<unsigned long>::max()),
     _function(&method),
-    _methodName(0),
+    _methodName(),
     _object(this_ptr),
     _args(args),
     _runOnce(runOnce)
@@ -51,7 +51,7 @@ Timer::Timer(as_function& method, unsigned long ms,
     start();
 }
 
-Timer::Timer(as_object* this_ptr, string_table::key methodName,
+Timer::Timer(as_object* this_ptr, const ObjectURI& methodName,
         unsigned long ms, const fn_call::Args& args, bool runOnce)
     :
     _interval(ms),
@@ -104,7 +104,8 @@ Timer::execute()
 
     // If _function is not 0, _methodName should be 0 anyway, but the
     // ternary operator is there for clarity.
-    as_object* super = _object->get_super(_function ? 0 : _methodName);
+    as_object* super = _function ? _object->get_super()
+                                 : _object->get_super(_methodName);
     VM& vm = getVM(*_object);
 
     as_value timer_method = _function ? _function :

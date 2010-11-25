@@ -128,7 +128,7 @@ DisplayObject::getLoadedMovie(Movie* extern_movie)
     UNUSED(extern_movie);
 }
 
-string_table::key
+ObjectURI
 DisplayObject::getNextUnnamedInstanceName()
 {
     assert(_object);
@@ -136,8 +136,8 @@ DisplayObject::getNextUnnamedInstanceName()
 	std::ostringstream ss;
 	ss << "instance" << mr.nextUnnamedInstance();
 
-    string_table& st = getStringTable(*_object);
-	return st.find(ss.str());
+    VM& vm = getVM(*_object);
+	return getURI(vm, ss.str(), true);
 }
 
 
@@ -1384,8 +1384,7 @@ getNameProperty(DisplayObject& o)
 void
 setName(DisplayObject& o, const as_value& val)
 {
-    string_table& st = getStringTable(*getObject(&o));
-    o.set_name(st.find(val.to_string().c_str()));
+    o.set_name(getURI(getVM(*getObject(&o)), val.to_string()));
 }
 
 void

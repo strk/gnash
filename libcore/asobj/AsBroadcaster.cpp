@@ -51,16 +51,16 @@ namespace {
 
 #ifdef GNASH_DEBUG_BROADCASTER
 struct BroadcasterStats {
-    typedef std::map<string_table::key, unsigned long int> Stat;
+    typedef std::map<ObjectURI&, unsigned long int> Stat;
     Stat stat;
-    const string_table& _st;
-    BroadcasterStats(const string_table& st) : _st(st) {}
-    void check(string_table::key k) {
+    const VM& _st;
+    BroadcasterStats(const VM& vm) : _st(st) {}
+    void check(ObjectURI& k) {
         if ( ! (++stat[k] % 100) ) dump();
     }
     void dump() {
         using namespace std;
-        typedef std::map<unsigned long int, string_table::key> Sorted;
+        typedef std::map<unsigned long int, ObjectURI&> Sorted;
         Sorted sorted;
         for (Stat::iterator i=stat.begin(), e=stat.end(); i!=e; ++i)
             sorted[i->second] = i->first;
@@ -89,7 +89,7 @@ public:
     ///
     BroadcasterVisitor(const fn_call& fn)
         :
-        _eventURI(getStringTable(fn).find(fn.arg(0).to_string())),
+        _eventURI(getURI(getVM(fn),fn.arg(0).to_string())),
         _dispatched(0),
         _fn(fn)
     {
@@ -105,7 +105,7 @@ public:
 
 #ifdef GNASH_DEBUG_BROADCASTER
         static stats::KeyLookup stats("BroadcasterVisitor call operator",
-            getStringTable(_fn), 1);
+            getVM(_fn), 1);
         stats.check(_eventURI.name);
 #endif
         as_value method;
@@ -361,14 +361,16 @@ asbroadcaster_removeListener(const fn_call& fn)
     const int length = toInt(getMember(*listeners, NSV::PROP_LENGTH),
             getVM(fn));
     int i = 0;
-    string_table& st = getStringTable(fn);
+
+    VM& vm = getVM(fn);
+    const ObjectURI& propSplice = getURI(vm, NSV::PROP_SPLICE);
 
     while (i < length) {
         std::ostringstream s;
         s << i;
-        as_value el = getMember(*listeners, st.find(s.str()));
+        as_value el = getMember(*listeners, getURI(vm, s.str()));
         if (equals(el, listenerToRemove, getVM(fn))) {
-            callMethod(listeners, NSV::PROP_SPLICE, s.str(), 1);
+            callMethod(listeners, propSplice, s.str(), 1);
             return as_value(true);
         }
         ++i;

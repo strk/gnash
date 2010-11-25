@@ -318,7 +318,8 @@ MovieTester::findDisplayItemByName(const MovieClip& mc,
 {
     const DisplayList& dlist = mc.getDisplayList();
     string_table& st = getStringTable(*getObject(&mc));
-    return dlist.getDisplayObjectByName(st, st.find(name), false);
+    VM& vm = getVM(*getObject(&mc));
+    return dlist.getDisplayObjectByName(st, getURI(vm, name), false);
 }
 
 const DisplayObject*

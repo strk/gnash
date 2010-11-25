@@ -25,6 +25,7 @@
 
 #include "UserFunction.h"
 #include "smart_ptr.h"
+#include "ObjectURI.h"
 
 // Forward declarations
 namespace gnash {
@@ -107,7 +108,7 @@ public:
     //
     /// @param reg      The register for the argument.
     /// @param name     The name of the argument.
-	void add_arg(boost::uint8_t reg, string_table::key name) {
+	void add_arg(boost::uint8_t reg, const ObjectURI& name) {
         _args.push_back(Argument(reg, name));
 	}
 
@@ -130,9 +131,9 @@ protected:
 	
     struct Argument
 	{
-        Argument(boost::uint8_t r, string_table::key n) : reg(r), name(n) {}
+        Argument(boost::uint8_t r, const ObjectURI& n) : reg(r), name(n) {}
         boost::uint8_t reg;
-        string_table::key name;
+        ObjectURI name;
 	};
 
 	std::vector<Argument> _args;

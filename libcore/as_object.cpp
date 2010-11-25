@@ -324,8 +324,7 @@ void
 as_object::add_property(const std::string& name, as_function& getter,
                         as_function* setter)
 {
-    string_table& st = getStringTable(*this);
-    ObjectURI uri(st.find(name));
+    const ObjectURI& uri = getURI(vm(), name);
 
     Property* prop = _members.getProperty(uri);
 
@@ -604,7 +603,7 @@ as_object::set_member(const ObjectURI& uri, const as_value& val, bool ifFound)
             
         if (displayObject()) {
             DisplayObject* d = displayObject();
-            if (setDisplayObjectProperty(*d, getName(uri), val)) return true;
+            if (setDisplayObjectProperty(*d, uri, val)) return true;
             // TODO: should we execute triggers?
         }
             
@@ -668,7 +667,7 @@ as_object::set_member(const ObjectURI& uri, const as_value& val, bool ifFound)
 void
 as_object::init_member(const std::string& key1, const as_value& val, int flags)
 {
-    const ObjectURI uri(getStringTable(*this).find(key1));
+    const ObjectURI& uri(getURI(vm(), key1));
     init_member(uri, val, flags);
 }
 
@@ -687,11 +686,11 @@ as_object::init_member(const ObjectURI& uri, const as_value& val, int flags)
 }
 
 void
-as_object::init_property(const std::string& key, as_function& getter,
+as_object::init_property(const std::string& name, as_function& getter,
                          as_function& setter, int flags)
 {
-    string_table::key k = getStringTable(*this).find(key);
-    init_property(k, getter, setter, flags);
+    const ObjectURI& uri = getURI(vm(), name);
+    init_property(uri, getter, setter, flags);
 }
 
 void
@@ -702,11 +701,11 @@ as_object::init_property(const ObjectURI& uri, as_function& getter,
 }
 
 void
-as_object::init_property(const std::string& key, as_c_function_ptr getter,
+as_object::init_property(const std::string& name, as_c_function_ptr getter,
                          as_c_function_ptr setter, int flags)
 {
-    string_table::key k = getStringTable(*this).find(key);
-    init_property(k, getter, setter, flags);
+    const ObjectURI& uri = getURI(vm(), name);
+    init_property(uri, getter, setter, flags);
 }
 
 void
@@ -731,23 +730,22 @@ as_object::init_destructive_property(const ObjectURI& uri,
 }
 
 void
-as_object::init_readonly_property(const std::string& key, as_function& getter,
+as_object::init_readonly_property(const std::string& name, as_function& getter,
                                   int initflags)
 {
-    string_table::key k = getStringTable(*this).find(key);
+    const ObjectURI& uri = getURI(vm(), name);
 
-    init_property(k, getter, getter, initflags | PropFlags::readOnly);
-    assert(_members.getProperty(k));
+    init_property(uri, getter, getter, initflags | PropFlags::readOnly);
+    assert(_members.getProperty(uri));
 }
 
 void
-as_object::init_readonly_property(const std::string& key,
+as_object::init_readonly_property(const std::string& name,
                                   as_c_function_ptr getter, int initflags)
 {
-    string_table::key k = getStringTable(*this).find(key);
-
-    init_property(k, getter, getter, initflags | PropFlags::readOnly);
-    assert(_members.getProperty(k));
+    const ObjectURI& uri = getURI(vm(), name);
+    init_property(uri, getter, getter, initflags | PropFlags::readOnly);
+    assert(_members.getProperty(uri));
 }
 
 void
@@ -886,7 +884,7 @@ as_object::setPropFlags(const as_value& props_val, int set_false, int set_true)
         }
 
         // set_member_flags will take care of case conversion
-        set_member_flags(getStringTable(*this).find(prop), set_true, set_false);
+        set_member_flags(getURI(vm(), prop), set_true, set_false);
 
         if (next_comma == std::string::npos) {
             break;
@@ -1113,7 +1111,7 @@ sendEvent(as_object& o, const as_environment& env, const ObjectURI& name)
 }
 
 as_object*
-getObjectWithPrototype(Global_as& gl, string_table::key c)
+getObjectWithPrototype(Global_as& gl, const ObjectURI& c)
 {
     as_object* ctor = toObject(getMember(gl, c), getVM(gl));
     as_object* proto = ctor ? 

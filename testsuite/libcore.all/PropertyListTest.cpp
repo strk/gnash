@@ -47,7 +47,7 @@ using namespace std;
 using namespace gnash;
 
 bool
-getVal(PropertyList& p, string_table::key k, as_value& val, as_object& obj)
+getVal(PropertyList& p, const ObjectURI& k, as_value& val, as_object& obj)
 {
     if (Property* prop = p.getProperty(k)) {
         val = prop->getValue(obj);
@@ -96,54 +96,52 @@ main(int /*argc*/, char** /*argv*/)
 	as_value val3("value3");
 	as_value ret;
 
-	string_table& st = vm.getStringTable();
-
 	if (vm.getSWFVersion() > 6) // SWF 7 or higher is case sensitive.
 	{
 		check_equals(props.size(), 0);
-		check ( props.setValue(st.find("Var0"), val) );
+		check ( props.setValue(getURI(vm, "Var0"), val) );
 		check_equals(props.size(), 1);
 
-		check (getVal(props, st.find("Var0"), ret, *obj) );
+		check (getVal(props, getURI(vm, "Var0"), ret, *obj) );
 		check_strictly_equals ( ret, val );
 
 		// search should be case-sensitive
-		check (!getVal(props, st.find("var0"), ret, *obj) );
+		check (!getVal(props, getURI(vm, "var0"), ret, *obj) );
 
 		// new value overrides existing value
-		check ( props.setValue(st.find("Var0"), val2) );
+		check ( props.setValue(getURI(vm, "Var0"), val2) );
 		check_equals(props.size(), 1);
-		check (getVal(props, st.find("Var0"), ret, *obj) );
+		check (getVal(props, getURI(vm, "Var0"), ret, *obj) );
 		check_strictly_equals ( ret, val2 );
 
 		// case-sensitive setting value doesn't overrides existing value
-		check ( props.setValue(st.find("var0"), val3) );
+		check ( props.setValue(getURI(vm, "var0"), val3) );
 		check_equals(props.size(), 2);
-		check (!getVal(props, st.find("vAr0"), ret, *obj) );
+		check (!getVal(props, getURI(vm, "vAr0"), ret, *obj) );
 
 		// Now add some new labels
-		check ( props.setValue(st.find("var1"), val) );
+		check ( props.setValue(getURI(vm, "var1"), val) );
 		check_equals(props.size(), 3);
-		check ( props.setValue(st.find("var2"), val) );
+		check ( props.setValue(getURI(vm, "var2"), val) );
 		check_equals(props.size(), 4);
-		check ( props.setValue(st.find("var3"), val) );
+		check ( props.setValue(getURI(vm, "var3"), val) );
 		check_equals(props.size(), 5);
 
 		// Test deletion of properties
 
 		// this succeeds
-		check(props.delProperty(st.find("var3")).second);
+		check(props.delProperty(getURI(vm, "var3")).second);
 		check_equals(props.size(), 4);
 
 		// this fails (non existent property)
-		check(!props.delProperty(st.find("non-existent")).first);
+		check(!props.delProperty(getURI(vm, "non-existent")).first);
 		check_equals(props.size(), 4);
 
 		// Set property var2 as protected from deletion!
-		props.setFlags(st.find("var2"), PropFlags::dontDelete, 0);
-        check(props.getProperty(st.find("var2")));
+		props.setFlags(getURI(vm, "var2"), PropFlags::dontDelete, 0);
+        check(props.getProperty(getURI(vm, "var2")));
 		// this fails (protected from deletion)
-		std::pair<bool, bool> delpair = props.delProperty(st.find("var2"));
+		std::pair<bool, bool> delpair = props.delProperty(getURI(vm, "var2"));
 		check_equals(delpair.first, true); // property was found
 		check_equals(delpair.second, false); // property was NOT deleted
 		check_equals(props.size(), 4);
@@ -155,51 +153,51 @@ main(int /*argc*/, char** /*argv*/)
 		// Below SWF or is not case sensitive.
 
 		check_equals(props.size(), 0);
-		check ( props.setValue(st.find("Var0"), val) );
+		check ( props.setValue(getURI(vm, "Var0"), val) );
 		check_equals(props.size(), 1);
 
-		check (getVal(props, st.find("Var0"), ret, *obj) );
+		check (getVal(props, getURI(vm, "Var0"), ret, *obj) );
 		check_strictly_equals ( ret, val );
 
 		// search should be case-insensitive
-		check (getVal(props, st.find("var0"), ret, *obj) );
+		check (getVal(props, getURI(vm, "var0"), ret, *obj) );
 		check_strictly_equals ( ret, val );
 
 		// new value overrides existing value
-		check ( props.setValue(st.find("Var0"), val2) );
+		check ( props.setValue(getURI(vm, "Var0"), val2) );
 		check_equals(props.size(), 1);
-		check (getVal(props, st.find("Var0"), ret, *obj) );
+		check (getVal(props, getURI(vm, "Var0"), ret, *obj) );
 		check_strictly_equals ( ret, val2 );
 
 		// case-insensitive setting value should override existing value
-		check ( props.setValue(st.find("var0"), val3) );
+		check ( props.setValue(getURI(vm, "var0"), val3) );
 		check_equals(props.size(), 1);
-		check (getVal(props, st.find("vAr0"), ret, *obj) );
+		check (getVal(props, getURI(vm, "vAr0"), ret, *obj) );
 		check_strictly_equals ( ret, val3 );
 
 		// Now add some new labels
-		check ( props.setValue(st.find("var1"), val) );
+		check ( props.setValue(getURI(vm, "var1"), val) );
 		check_equals(props.size(), 2);
-		check ( props.setValue(st.find("var2"), val) );
+		check ( props.setValue(getURI(vm, "var2"), val) );
 		check_equals(props.size(), 3);
-		check ( props.setValue(st.find("var3"), val) );
+		check ( props.setValue(getURI(vm, "var3"), val) );
 		check_equals(props.size(), 4);
 
 		// Test deletion of properties
 
 		// this succeeds
-		check(props.delProperty(st.find("var3")).second);
+		check(props.delProperty(getURI(vm, "var3")).second);
 		check_equals(props.size(), 3);
 
 		// this fails (non existent property)
-		check(!props.delProperty(st.find("non-existent")).first);
+		check(!props.delProperty(getURI(vm, "non-existent")).first);
 		check_equals(props.size(), 3);
 
 		// Set property var2 as protected from deletion!
-		props.setFlags(st.find("var2"), PropFlags::dontDelete, 0);
-        check(props.getProperty(st.find("var2")));
+		props.setFlags(getURI(vm, "var2"), PropFlags::dontDelete, 0);
+        check(props.getProperty(getURI(vm, "var2")));
 		// this fails (protected from deletion)
-		std::pair<bool, bool> delpair = props.delProperty(st.find("var2"));
+		std::pair<bool, bool> delpair = props.delProperty(getURI(vm, "var2"));
 		check_equals(delpair.first, true); // property was found
 		check_equals(delpair.second, false); // property was NOT deleted
 		check_equals(props.size(), 3);

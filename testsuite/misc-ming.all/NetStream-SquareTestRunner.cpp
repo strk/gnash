@@ -66,8 +66,9 @@ main(int /*argc*/, char** /*argv*/)
 	// When all possible tests are implemented as self-contained, we'll
 	// add tests that can't be self-contained.
 	//
-	string_table& st = tester.vm().getStringTable();
-	string_table::key k = st.find("startNotified");
+	VM& vm = tester.vm();
+
+	const ObjectURI& k = getURI(vm, "startNotified");
 	as_value tmp;
 	while (!getObject(root)->get_member(k, &tmp) )
 	{
@@ -95,7 +96,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	// Consistency check 
 	as_value eot;
-	bool endOfTestFound = getObject(root)->get_member(st.find("end_of_test"),
+	bool endOfTestFound = getObject(root)->get_member(getURI(vm, "end_of_test"),
 		&eot);
 	check(endOfTestFound);
 

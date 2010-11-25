@@ -19,7 +19,7 @@
 //
 
 #include "as_object.h"
-#include "string_table.h"
+#include "VM.h"
 #include "VM.h"
 #include "fn_call.h"
 #include "MovieClip.h"
@@ -49,18 +49,18 @@ get_flash_filters_package(const fn_call& fn)
     Global_as& gl = getGlobal(fn);
     as_object* pkg = createObject(gl);
 
-    string_table& st = getStringTable(fn);
+    VM& vm = getVM(fn);
 
-    bitmapfilter_class_init(*pkg, st.find("BitmapFilter"));
-    bevelfilter_class_init(*pkg, st.find("BevelFilter"));
-    blurfilter_class_init(*pkg, st.find("BlurFilter"));
-    colormatrixfilter_class_init(*pkg, st.find("ColorMatrixFilter"));
-    convolutionfilter_class_init(*pkg, st.find("ConvolutionFilter"));
-    displacementmapfilter_class_init(*pkg, st.find("DisplacementMapFilter"));
-    dropshadowfilter_class_init(*pkg, st.find("DropShadowFilter"));
-    glowfilter_class_init(*pkg, st.find("GlowFilter"));
-    gradientbevelfilter_class_init(*pkg, st.find("GradientBevelFilter"));
-    gradientglowfilter_class_init(*pkg, st.find("GradientGlowFilter"));
+    bitmapfilter_class_init(*pkg, getURI(vm, "BitmapFilter"));
+    bevelfilter_class_init(*pkg, getURI(vm, "BevelFilter"));
+    blurfilter_class_init(*pkg, getURI(vm, "BlurFilter"));
+    colormatrixfilter_class_init(*pkg, getURI(vm, "ColorMatrixFilter"));
+    convolutionfilter_class_init(*pkg, getURI(vm, "ConvolutionFilter"));
+    displacementmapfilter_class_init(*pkg, getURI(vm, "DisplacementMapFilter"));
+    dropshadowfilter_class_init(*pkg, getURI(vm, "DropShadowFilter"));
+    glowfilter_class_init(*pkg, getURI(vm, "GlowFilter"));
+    gradientbevelfilter_class_init(*pkg, getURI(vm, "GradientBevelFilter"));
+    gradientglowfilter_class_init(*pkg, getURI(vm, "GradientGlowFilter"));
     
     return pkg;
 }

@@ -335,11 +335,11 @@ Sound_as::update()
 {
     probeAudio();
 
-    string_table& st = getStringTable(owner());
+    VM& vm = getVM(owner());
 
     if (active()) {
-        owner().set_member(st.find("duration"), getDuration());
-        owner().set_member(st.find("position"), getPosition());
+        owner().set_member(getURI(vm, "duration"), getDuration());
+        owner().set_member(getURI(vm, "position"), getPosition());
     }
 }
 
@@ -427,9 +427,9 @@ Sound_as::attachSound(int si, const std::string& name)
     soundId = si;
     soundName = name;
     
-    string_table& st = getStringTable(owner());
-    owner().set_member(st.find("duration"), getDuration());
-    owner().set_member(st.find("position"), getPosition());
+    VM& vm = getVM(owner());
+    owner().set_member(getURI(vm, "duration"), getDuration());
+    owner().set_member(getURI(vm, "position"), getPosition());
 
 }
 
@@ -562,9 +562,9 @@ Sound_as::loadSound(const std::string& file, bool streaming)
         // if not streaming, we'll probe on .start()
     }
 
-    string_table& st = getStringTable(owner());
-    owner().set_member(st.find("duration"), getDuration());
-    owner().set_member(st.find("position"), getPosition());
+    VM& vm = getVM(owner());
+    owner().set_member(getURI(vm, "duration"), getDuration());
+    owner().set_member(getURI(vm, "position"), getPosition());
 }
 
 sound::InputStream*

@@ -876,7 +876,7 @@ public:
 #endif
     
     /// Used to assign a name to unnamed instances
-    string_table::key getNextUnnamedInstanceName();
+    ObjectURI getNextUnnamedInstanceName();
 
     enum BlendMode
     {

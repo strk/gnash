@@ -85,7 +85,7 @@ enum SortFlags {
     as_value array_sort(const fn_call& fn);
     as_value array_splice(const fn_call& fn);
 
-    string_table::key getKey(const fn_call& fn, size_t i);
+    ObjectURI getKey(const fn_call& fn, size_t i);
     int isIndex(const std::string& name);
 
     /// Implementation of foreachArray that takes a start and end range.
@@ -208,7 +208,7 @@ bool sort(as_object& o, AVCMP avc, AVEQ ave)
 
     if (std::adjacent_find(v.begin(), v.end(), ave) != v.end()) return false;
 
-    string_table& st = getStringTable(o);
+    VM& vm = getVM(o);
 
     SortContainer::const_iterator it = v.begin();
 
@@ -216,7 +216,7 @@ bool sort(as_object& o, AVCMP avc, AVEQ ave)
         if (i >= v.size()) {
             break;
         }
-        o.set_member(arrayKey(st, i), *it);
+        o.set_member(arrayKey(vm, i), *it);
         ++it;
     }
     return true;
@@ -238,7 +238,7 @@ sort(as_object& o, AVCMP avc)
 
     v.sort(avc);
 
-    string_table& st = getStringTable(o);
+    VM& vm = getVM(o);
 
     SortContainer::const_iterator it = v.begin();
 
@@ -246,7 +246,7 @@ sort(as_object& o, AVCMP avc)
         if (it == v.end()) {
             break;
         }
-        o.set_member(arrayKey(st, i), *it);
+        o.set_member(arrayKey(vm, i), *it);
         ++it;
     }
 }
@@ -610,7 +610,7 @@ class as_value_prop
 public:
     
     // Note: cmpfn must implement a strict weak ordering
-    as_value_prop(string_table::key name, as_cmp_fn cmpfn, const as_object& o)
+    as_value_prop(ObjectURI name, as_cmp_fn cmpfn, const as_object& o)
         :
         _comp(cmpfn),
         _prop(name),
@@ -634,7 +634,7 @@ public:
     }
 private:
     as_cmp_fn _comp;
-    string_table::key _prop;
+    ObjectURI _prop;
     const as_object& _obj;
 };
 
@@ -645,13 +645,13 @@ public:
     typedef std::vector<as_cmp_fn> Comps;
     Comps& _cmps;
 
-    typedef std::vector<string_table::key> Props;
+    typedef std::vector<ObjectURI> Props;
     Props& _prps;
     
     const as_object& _obj;
 
     // Note: all as_cmp_fns in *cmps must implement strict weak ordering
-    as_value_multiprop(std::vector<string_table::key>& prps, 
+    as_value_multiprop(std::vector<ObjectURI>& prps, 
         std::vector<as_cmp_fn>& cmps, const as_object& o)
         :
         _cmps(cmps),
@@ -694,7 +694,7 @@ public:
 class as_value_multiprop_eq : public as_value_multiprop
 {
 public:
-    as_value_multiprop_eq(std::vector<string_table::key>& prps, 
+    as_value_multiprop_eq(std::vector<ObjectURI>& prps, 
         std::vector<as_cmp_fn>& cmps, const as_object& o)
         :
         as_value_multiprop(prps, cmps, o),
@@ -742,18 +742,18 @@ flag_preprocess(boost::uint8_t flgs, bool* douniq, bool* doindex)
 class GetKeys
 {
 public:
-    GetKeys(std::vector<string_table::key>& v, string_table& st, int version)
+    GetKeys(std::vector<ObjectURI>& v, VM& vm, int version)
         :
         _v(v),
-        _st(st),
+        _vm(vm),
         _version(version)
     {}
     void operator()(const as_value& val) {
-        _v.push_back(_st.find(val.to_string(_version)));
+        _v.push_back(getURI(_vm, val.to_string(_version)));
     }
 private:
-    std::vector<string_table::key>& _v;
-    string_table& _st;
+    std::vector<ObjectURI>& _v;
+    VM& _vm;
     const int _version;
 };
 
@@ -806,7 +806,7 @@ bool
 IsStrictArray::accept(const ObjectURI& uri, const as_value& /*val*/)
 {
     // We ignore namespace.
-    if (isIndex(_st.value(getName(uri))) >= 0) return true;
+    if (isIndex(uri.toString(_st.getStringTable())) >= 0) return true;
     _strict = false;
     return false;
 }
@@ -814,13 +814,16 @@ IsStrictArray::accept(const ObjectURI& uri, const as_value& /*val*/)
 void
 checkArrayLength(as_object& array, const ObjectURI& uri, const as_value& val)
 {
-    const string_table::key name = getName(uri);
-    if (name == NSV::PROP_LENGTH) {
+    // TODO: check if we should really be doing
+    //       case-sensitive comparison here!
+    const bool caseless = true;
+    ObjectURI::CaseEquals eq(getStringTable(array), caseless);
+    if (eq(uri, getURI(getVM(array), NSV::PROP_LENGTH))) {
         resizeArray(array, toInt(val, getVM(array)));
         return;
     }
 
-    const int index = isIndex(getStringTable(array).value(name));
+    const int index = isIndex(uri.toString(getStringTable(array)));
 
     // if we were sent a valid array index
     if (index >= 0) {
@@ -884,10 +887,11 @@ array_class_init(as_object& where, const ObjectURI& uri)
 }
 
 // Used by foreachArray, declared in Array_as.h
-string_table::key
-arrayKey(string_table& st, size_t i)
+ObjectURI
+arrayKey(VM& vm, size_t i)
 {
-    return st.find(boost::lexical_cast<std::string>(i));
+    // TODO: tell getURI that the string is already lowercase!
+    return getURI(vm, boost::lexical_cast<std::string>(i), true);
 }
 
 namespace {
@@ -974,8 +978,9 @@ array_splice(const fn_call& fn)
     const size_t newelements = fn.nargs > 2 ? fn.nargs - 2 : 0;
     
     // Push removed elements to the new array.
+    ObjectURI propPush = getURI(getVM(fn), NSV::PROP_PUSH);
     for (size_t i = 0; i < remove; ++i) {
-        const size_t key = getKey(fn, start + i);
+        const ObjectURI& key = getKey(fn, start + i);
         callMethod(ret, NSV::PROP_PUSH, getOwnProperty(*array, key));
     }
 
@@ -994,7 +999,8 @@ array_splice(const fn_call& fn)
     }
     
     // This one is correct!
-    array->set_member(NSV::PROP_LENGTH, size + newelements - remove);
+    ObjectURI propLen = getURI(getVM(fn), NSV::PROP_LENGTH);
+    array->set_member(propLen, size + newelements - remove);
 
     return as_value(ret);
 }
@@ -1076,15 +1082,15 @@ array_sortOn(const fn_call& fn)
     boost::uint8_t flags = 0;
 
     const int version = getSWFVersion(fn);
-    string_table& st = getStringTable(fn);
+    VM& vm = getVM(fn);
 
     if (fn.nargs == 0) return as_value();
 
     // cases: sortOn("prop) and sortOn("prop", Array.FLAG)
     if (fn.arg(0).is_string()) 
     {
-        string_table::key propField =
-            st.find(fn.arg(0).to_string(version));
+        ObjectURI propField =
+            getURI(vm, fn.arg(0).to_string(version));
 
         if (fn.nargs > 1 && fn.arg(1).is_number()) {
             flags = static_cast<boost::uint8_t>(toNumber(fn.arg(1), getVM(fn)));
@@ -1116,8 +1122,8 @@ array_sortOn(const fn_call& fn)
         as_object* props = toObject(fn.arg(0), getVM(fn));
         assert(props);
 
-        std::vector<string_table::key> prp;
-        GetKeys gk(prp, st, version);
+        std::vector<ObjectURI> prp;
+        GetKeys gk(prp, vm, version);
         foreachArray(*props, gk);
         
         std::vector<as_cmp_fn> cmp;
@@ -1231,8 +1237,8 @@ array_unshift(const fn_call& fn)
     const size_t size = arrayLength(*array);
 
     for (size_t i = size + shift - 1; i >= shift ; --i) {
-        const string_table::key nextkey = getKey(fn, i - shift);
-        const string_table::key currentkey = getKey(fn, i);
+        const ObjectURI nextkey = getKey(fn, i - shift);
+        const ObjectURI currentkey = getKey(fn, i);
         array->delProperty(currentkey);
         array->set_member(currentkey, getOwnProperty(*array, nextkey));
     }
@@ -1257,7 +1263,7 @@ array_pop(const fn_call& fn)
     const size_t size = arrayLength(*array);
     if (size < 1) return as_value();
 
-    const string_table::key ind = getKey(fn, size - 1);
+    const ObjectURI ind = getKey(fn, size - 1);
     as_value ret = getOwnProperty(*array, ind);
     array->delProperty(ind);
     
@@ -1279,8 +1285,8 @@ array_shift(const fn_call& fn)
     as_value ret = getOwnProperty(*array, getKey(fn, 0));
 
     for (size_t i = 0; i < static_cast<size_t>(size - 1); ++i) {
-        const string_table::key nextkey = getKey(fn, i + 1);
-        const string_table::key currentkey = getKey(fn, i);
+        const ObjectURI nextkey = getKey(fn, i + 1);
+        const ObjectURI currentkey = getKey(fn, i);
         array->delProperty(currentkey);
         array->set_member(currentkey, getOwnProperty(*array, nextkey));
     }
@@ -1301,8 +1307,8 @@ array_reverse(const fn_call& fn)
     if (size < 2) return as_value();
 
     for (size_t i = 0; i < static_cast<size_t>(size) / 2; ++i) {
-        const string_table::key bottomkey = getKey(fn, i);
-        const string_table::key topkey = getKey(fn, size - i - 1);
+        const ObjectURI bottomkey = getKey(fn, i);
+        const ObjectURI topkey = getKey(fn, size - i - 1);
         const as_value top = getOwnProperty(*array, topkey);
         const as_value bottom = getOwnProperty(*array, bottomkey);
         array->delProperty(topkey);
@@ -1349,6 +1355,7 @@ array_concat(const fn_call& fn)
     PushToArray push(*newarray);
     foreachArray(*array, push);
 
+    ObjectURI propPush = getURI(getVM(fn), NSV::PROP_PUSH);
     for (size_t i = 0; i < fn.nargs; ++i) {
 
         // Array args get concatenated by elements
@@ -1366,7 +1373,7 @@ array_concat(const fn_call& fn)
                 continue;
             }
         }
-        callMethod(newarray, NSV::PROP_PUSH, fn.arg(i));
+        callMethod(newarray, propPush, fn.arg(i));
     }
 
     return as_value(newarray);        
@@ -1443,23 +1450,23 @@ join(as_object* array, const std::string& separator)
 
     std::string s;
 
-    string_table& st = getStringTable(*array);
+    VM& vm = getVM(*array);
     const int version = getSWFVersion(*array);
 
     for (size_t i = 0; i < size; ++i) {
         if (i) s += separator;
         const std::string& index = boost::lexical_cast<std::string>(i);
-        const as_value& el = getOwnProperty(*array, st.find(index));
+        const as_value& el = getOwnProperty(*array, getURI(vm, index));
         s += el.to_string(version);
     }
     return as_value(s);
 }
 
-string_table::key
+ObjectURI
 getKey(const fn_call& fn, size_t i)
 {
-    string_table& st = getStringTable(fn);
-    return arrayKey(st, i);
+    VM& vm = getVM(fn);
+    return arrayKey(vm, i);
 }
 
 template<typename T>
@@ -1480,10 +1487,10 @@ void foreachArray(as_object& array, int start, int end, T& pred)
     assert(end >= start);
     assert(size >= end);
 
-    string_table& st = getStringTable(array);
+    VM& vm = getVM(array);
 
     for (size_t i = start; i < static_cast<size_t>(end); ++i) {
-        pred(getOwnProperty(array, arrayKey(st, i)));
+        pred(getOwnProperty(array, arrayKey(vm, i)));
     }
 }
 
@@ -1511,9 +1518,9 @@ resizeArray(as_object& o, const int size)
 
     const size_t currentSize = arrayLength(o);
     if (realSize < currentSize) {
-        string_table& st = getStringTable(o);
+        VM& vm = getVM(o);
         for (size_t i = realSize; i < currentSize; ++i) {
-            o.delProperty(arrayKey(st, i));
+            o.delProperty(arrayKey(vm, i));
         }
     }
 }
