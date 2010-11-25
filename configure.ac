@@ -2206,8 +2206,9 @@ if test x$cross_compiling = xno; then
         AC_HELP_STRING([--with-swfdec-testsuite],
             [directory where swfdec testsuite (the 'test' dir) is]),
         if test x"${withval}" = xyes; then
-            dir=`dirname $0`/testsuite/swfdec/src/test
-            withval=`cd ${dir} && pwd`
+            dir=`dirname $0`
+            dir=`cd ${dir} && pwd`
+            withval="${dir}/testsuite/swfdec/src/test"
         fi
         SWFDEC_TESTSUITE=${withval}
     )
