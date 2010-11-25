@@ -205,11 +205,8 @@ class DSOEXPORT Renderer : boost::noncopyable
 {
 public:
 
-    Renderer()
-        :
-        _quality(QUALITY_HIGH)
-    {}
-
+    Renderer(): _quality(QUALITY_HIGH) { }
+    
     virtual ~Renderer() {}
 
     /// Return a description of this renderer.
@@ -495,42 +492,49 @@ public:
 #endif
         boost::shared_array<renderer::GnashDevice::dtype_t> devs
             (new renderer::GnashDevice::dtype_t[total]);
+#ifdef BUILD_X11_DEVICE
+        devs[--total] = renderer::GnashDevice::X11;
+#endif
 #ifdef BUILD_EGL_DEVICE
-        devs[--total];
+        devs[--total] = renderer::GnashDevice::EGL;
 #endif
 #ifdef BUILD_DIRECTFB_DEVICE
-        devs[--total];
-#endif
-#ifdef BUILD_X11_DEVICE
-        devs[--total];
+        devs[--total] = renderer::GnashDevice::DIRECTFB;
 #endif
         
         return devs;
     }
+
+    renderer::GnashDevice::dtype_t getDevice()
+    {
+        if (_device) {
+        }
+        return renderer::GnashDevice::NODEV;
+    }
     
     void setDevice(renderer::GnashDevice::dtype_t dtype) {
         switch (dtype) {
-#if BUILD_EGL_DEVICE
+#ifdef BUILD_EGL_DEVICE
           case renderer::GnashDevice::EGL:
           {
               _device.reset(new renderer::EGLDevice);
               break;
           }
 #endif
-#if BUILD_DIRECTFB_DEVICE
+#ifdef BUILD_DIRECTFB_DEVICE
           case renderer::GnashDevice::DIRECTFB:
           {
               _device.reset(new renderer::directfb::DirectFBDevice);
               break;
           }
 #endif
-//#ifdef BUILD_X11_DEVICE
+#ifdef BUILD_X11_DEVICE
           case renderer::GnashDevice::X11:
           {
               _device.reset(new renderer::x11::X11Device);
               break;
           }
-//#endif
+#endif
           default:
               log_error("unsupported Display Device!");
         }
