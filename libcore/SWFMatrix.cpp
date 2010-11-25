@@ -69,13 +69,9 @@ toFixed16(double a)
 inline boost::int32_t
 multiplyFixed16(boost::int32_t a, boost::int32_t b)
 {
-    // Overflows are permitted only in unsigned types, so
-    // convert using two's complement first.
-    const boost::uint32_t mult = 
-        (to_unsigned<boost::int64_t>(a) * to_unsigned<boost::int64_t>(b) + 0x8000) >> 16;
+    return (static_cast<boost::int64_t>(a) *
+            static_cast<boost::int64_t>(b) + 0x8000) >> 16;
 
-    // Convert back.
-    return to_signed<boost::uint32_t>(mult);
 }
 
 } // anonymous namepace

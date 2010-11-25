@@ -1517,10 +1517,8 @@ ActionChr(ActionExec& thread)
 {
     as_environment& env = thread.env;
     
-    // The conversion to unsigned happens before truncation;
-    // this is important.
-    const boost::uint16_t c = to_unsigned<boost::int32_t>(
-        toInt(env.top(0), getVM(env)));
+    // This is UB:
+    const boost::uint16_t c = toInt(env.top(0), getVM(env));
 
     // If the argument to chr() is '0', we return
     // nothing, not NULL
@@ -1665,10 +1663,8 @@ ActionMbChr(ActionExec& thread)
         // No need to return.
     }
 
-    // The conversion to unsigned happens before truncation;
-    // this is important.
-    const boost::uint16_t i = to_unsigned<boost::int32_t>(
-        toInt(env.top(0), getVM(env)));
+    // This is UB
+    const boost::uint16_t i = toInt(env.top(0), getVM(env));
     
     std::string out = utf8::encodeUnicodeCharacter(i);
     
@@ -3031,7 +3027,8 @@ ActionShiftRight(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
-    boost::uint32_t amount = to_unsigned(toInt(env.top(0), getVM(env)));
+    // This is UB.
+    boost::uint32_t amount = toInt(env.top(0), getVM(env));
     boost::int32_t value = toInt(env.top(1), getVM(env));
 
     value = value >> amount;
@@ -3045,7 +3042,8 @@ ActionShiftRight2(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
-    boost::uint32_t amount = to_unsigned(toInt(env.top(0), getVM(env))); 
+    // This is UB
+    boost::uint32_t amount = toInt(env.top(0), getVM(env)); 
     boost::int32_t value = toInt(env.top(1), getVM(env));
 
     value = boost::uint32_t(value) >> amount;
