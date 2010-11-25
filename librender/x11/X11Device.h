@@ -52,6 +52,8 @@ class X11Device : public GnashDevice
     // virtual classes should have virtual destructors
     virtual ~X11Device();
 
+    dtype_t getType() { return X11; };
+
     // Initialize X11 Device layer
     bool initDevice(int argc, char *argv[]);
 

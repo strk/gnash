@@ -47,6 +47,8 @@ class DirectFBDevice : public GnashDevice
     DirectFBDevice();
     ~DirectFBDevice();
 
+    dtype_t getType() { return DIRECTFB; };
+
     // Initialize DirectFB Device layer
     bool initDevice(int argc, char *argv[]);
 
