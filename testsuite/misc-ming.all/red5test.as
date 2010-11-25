@@ -26,7 +26,8 @@ stop();
 
 endOfTest = function()
 {
-    totals();
+    totals(29);
+    trace("ENDOFTEST");
     play();
 };
 
