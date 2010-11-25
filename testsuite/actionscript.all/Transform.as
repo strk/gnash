@@ -215,18 +215,28 @@ xcheck_equals(mcOld.transform.matrix.toString(), "(a=4, b=0.300000011920929, c=0
 // The following group of tests was updated on 2010-08-10 to match
 // FP 9,0,0,115 results (Linux)
 
+near = function(a, b) {
+    return Math.abs(a - b) < 0.01;
+};
+
+nearly_equal = function(m, a, b, c, d, tx, ty) {
+    return near(m.a, a) && near(m.b, b) &&
+           near(m.c, c) && near(m.d, d) &&
+           near(m.tx, tx) && near(m.ty, ty);
+};
+
 conc1 = _root.createEmptyMovieClip("conc1", getNextHighestDepth());
 conc2 = conc1.createEmptyMovieClip("conc2", getNextHighestDepth());
 
-conc1._x = 1.5;
-conc2._x = 0.3;
-check_equals(conc1.transform.concatenatedMatrix.toString(), "(a=1, b=0, c=0, d=1, tx=1.5, ty=0)");
-xcheck_equals(conc2.transform.concatenatedMatrix.toString(), "(a=1, b=0, c=0, d=1, tx=1.75, ty=0)");
+conc1._x = 40;
+conc2._x = 24;
+
+xcheck(nearly_equal(conc1.transform.concatenatedMatrix, 1, 0, 0, 1, 39.75, 2));
+xcheck(nearly_equal(conc2.transform.concatenatedMatrix, 1, 0, 0, 1, 63.5, 2));
 conc2._width = 3;
 conc1._height = 0.6;
-xcheck_equals(conc1.transform.concatenatedMatrix.toString(), "(a=0, b=0, c=0, d=0, tx=1.5, ty=0)");
-xcheck_equals(conc2.transform.concatenatedMatrix.toString(), "(a=0, b=0, c=0, d=0, tx=1.5, ty=0)");
-
+xcheck(nearly_equal(conc1.transform.concatenatedMatrix, 0, 0, 0, 0, 39.75, 2));
+xcheck(nearly_equal(conc1.transform.concatenatedMatrix, 0, 0, 0, 0, 39.75, 2));
 
 d = _root.createEmptyMovieClip("tar", 600);
 d.beginFill(0x00ff00);
