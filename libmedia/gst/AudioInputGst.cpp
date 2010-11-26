@@ -96,7 +96,7 @@ AudioInputGst::findAudioDevs()
     
     if (element == NULL) {
         log_error("%s: Could not create audio test source", __FUNCTION__);
-        _audioVect.push_back(NULL);
+        _audioVect.push_back(NULL); // ??? what for ? FIXME
     } else {
         _audioVect.push_back(new GnashAudio);
         _audioVect.back()->setElementPtr(element);
@@ -111,7 +111,16 @@ AudioInputGst::findAudioDevs()
     element = NULL;
 
     element = gst_element_factory_make ("pulsesrc", "pulsesrc");
+    if ( ! element ) {
+        log_error("%s: Could not create pulsesrc element", __FUNCTION__);
+        return;
+    }
     probe = GST_PROPERTY_PROBE (element);
+    if ( ! probe ) {
+        log_error("%s: Could not get property probe from pulsesrc element",
+            __FUNCTION__);
+        return;
+    }
     devarr = gst_property_probe_probe_and_get_values_name (probe, "device");
     for (size_t i = 0; devarr != NULL && i < devarr->n_values; ++i) {
         GValue *val;
