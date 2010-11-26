@@ -92,9 +92,9 @@ void
 test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
 {
     if (egl.initDevice(argc, argv)) {
-        runtest.pass("EGLDevice::init()");
+        runtest.pass("EGLDevice::initDevice()");
     } else {
-        runtest.fail("EGLDevice::init()");
+        runtest.fail("EGLDevice::initDevice()");
     }
 
     if (egl.bindClient(rtype)) {
@@ -102,7 +102,8 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     } else {
         runtest.fail("EGLDevice::bindClient()");
     }
-    
+
+#if 0
     // Init'ing to zero uses the root screen as the display. Otherwise
     // the argument should be an EGLNativeWindowType.
     if (egl.attachWindow(0)) {
@@ -110,6 +111,7 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     } else {
         runtest.fail("EGLDevice::attachWindow(0)");
     }
+#endif
     
     // If there are more than zero configurations, something beyond
     // initializing is working
