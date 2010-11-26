@@ -20,13 +20,12 @@ class LiveApplication(server.Application):
     def onConnect(self, client, **args):
         print("Connection")
         client.call("initial", [ "connection attempt received", args ])
-        print(args.items())
+        print(args)
         return True
 
     def onConnectAccept(self, client, **args):
         print("Connection accepted", client)
-        client.call("welcome", [ "You have connected!" ] + args.items())
-        print(args.items())
+        client.call("welcome", [ "You have connected!", args ])
         return True
 
     def onDownstreamBandwidth(self, interval, bandwidth):
