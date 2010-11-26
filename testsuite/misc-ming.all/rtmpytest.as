@@ -28,7 +28,7 @@ endOfTest = function()
     check_equals(welcomecalls, 1);
     check_equals(connectcalls, 1);
 
-    totals(57);
+    totals(70);
     trace("ENDOFTEST");
     play();
 };
@@ -40,6 +40,7 @@ if (rtmpport == undefined) {
     rtmpport = 9984;
     note("No RTMP port specified, defaulting to "+rtmpport);
 }
+rtmpuri = "rtmp://"+hostname+":"+rtmpport+"/rtmpyecho";
 
 test1 = function(nc)
 {
@@ -212,33 +213,45 @@ ncrtmp.initial = function(arg) {
     o = arg[1];
 
     xcheck(o.hasOwnProperty("fpad"));
+    xcheck_equals(typeof(o.fpad), "boolean");
     xcheck_equals(o.fpad, false);
 
     xcheck(o.hasOwnProperty("pageUrl"));
-
+    check_equals(typeof(o.pageUrl), "undefined");
     check_equals(o.pageUrl, undefined);
 
     xcheck(o.hasOwnProperty("videoFunction"));
+    xcheck_equals(typeof(o.videoFunction), "number");
+    xcheck_equals(o.videoFunction, 1);
 
     xcheck(o.hasOwnProperty("tcUrl"));
+    xcheck_equals(typeof(o.tcUrl), "string");
+    xcheck_equals(o.tcUrl, rtmpuri);
 
     xcheck(o.hasOwnProperty("app"));
+    xcheck_equals(typeof(o.app), "string");
     xcheck_equals(o.app, "rtmpyecho");
 
     xcheck(o.hasOwnProperty("flashVer"));
+    xcheck_equals(typeof(o.flashVer), "string");
     xcheck_equals(o.flashVer, $version);
 
     xcheck(o.hasOwnProperty("audioCodecs"));
+    xcheck_equals(typeof(o.audioCodecs), "number");
+
     xcheck(o.hasOwnProperty("videoCodecs"));
+    xcheck_equals(typeof(o.videoCodecs), "number");
 
     xcheck(o.hasOwnProperty("swfUrl"));
+    xcheck_equals(typeof(o.swfUrl), "string");
+    xcheck_equals(o.swfUrl, _url);
 
     xcheck(o.hasOwnProperty("capabilities"));
+    xcheck_equals(typeof(o.capabilities), "number");
 
     trace(dumpObject(arg[1]));
 };
 
-rtmpuri = "rtmp://"+hostname+":"+rtmpport+"/rtmpyecho";
 note("Connecting to "+rtmpuri);
 ncrtmp.connect(rtmpuri);
 
