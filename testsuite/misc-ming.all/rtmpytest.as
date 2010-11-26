@@ -1,13 +1,11 @@
-// This test relies on a default deploy of red5 on localhost
-//
-// Build with:
-//        makeswf -n network -o red5test.swf ../Dejagnu.swf red5test.as ../actionscript.all/dejagnu_so_fini.as
-// Run with:
-//        firefox red5test.swf
-// Or:
-//        gnash red5test.swf
-//
-//
+// This test may have similarities to the red5test, but we don't
+// attempt to keep them in sync.
+
+// Differences between red5 and rtmpy:
+// rtmpy always returns an object: a single primitive type is
+// convert to the corresponding object. If several arguments are
+// sent, an array is returned. This array may contain primitive
+// types.
 
 note("SWF" + OUTPUT_VERSION + " - " + System.capabilities.version + "\n");
 rcsid="red5test.as - <bzr revno here>";
@@ -26,16 +24,20 @@ stop();
 
 endOfTest = function()
 {
-    totals(38);
+    // Should be incremented on connect
+    check_equals(welcomecalls, 1);
+    check_equals(connectcalls, 1);
+
+    totals(57);
     trace("ENDOFTEST");
     play();
 };
 
 // -P FlashVars='hostname=localhost,rtmptport5080=rtmpport=1935'
-hostname = RED5_HOST;
+hostname = RTMPY_HOST;
 
 if (rtmpport == undefined) {
-    rtmpport = 1935;
+    rtmpport = 9984;
     note("No RTMP port specified, defaulting to "+rtmpport);
 }
 
@@ -46,8 +48,8 @@ test1 = function(nc)
     o.onResult = function(arg)
     {
         check_equals(arguments.length, 1);
-        check_equals(arg, "hello");
-        check_equals(typeof(arg), "string");
+        check_equals(arg.toString(), "hello");
+        check_equals(typeof(arg), "object");
         test2(nc);
     };
     nc.call("echo", o, "hello");
@@ -60,7 +62,8 @@ test2 = function(nc)
     o.onResult = function(arg)
     {
         check_equals(arguments.length, 1);
-        check_equals(typeof(arg), "number");
+        check_equals(typeof(arg), "object");
+        check_equals(arg.toString(), "24");
         test3(nc);
     };
     nc.call("echo", o, 24);
@@ -131,20 +134,43 @@ test5 = function(nc)
     };
 
     nc.onStatus = function(obj) {
+        trace(dumpObject(obj));
         check_equals(typeof(obj), "object");
-        check(obj.hasOwnProperty("application"));
         check(obj.hasOwnProperty("level"));
         check(obj.hasOwnProperty("code"));
         check(obj.hasOwnProperty("description"));
-        check_equals(obj.application, "org.red5.server.service.MethodNotFoundException");
         check_equals(obj.level, "error");
         check_equals(obj.code, "NetConnection.Call.Failed");
-        check_equals(obj.description, "Method nonexistentfunc with arguments [hello, null] not found");
-        endOfTest();
+        check_equals(obj.description, "Unknown method u'nonexistentfunc'");
+        nc.onStatus = defaultOnStatus;
+        test6(nc);
     };
 
     nc.call("nonexistentfunc", o, "hello", null);
 };
+
+test6 = function(nc)
+{
+    note("Running test 6");
+    o = {};
+    o.onResult = function(obj) {
+        trace(dumpObject(obj));
+        test7(nc);
+    };
+
+    nc.call("echo", o, 1);
+};
+
+test7 = function(nc)
+{
+    nc.onStatus = function(obj) {
+        check_equals(obj.level, "status");
+        check_equals(obj.code, "NetConnection.Connect.Closed");
+        endOfTest();
+    };
+    nc.close();
+};
+
 
 runtests = function(nc)
 {
@@ -153,7 +179,7 @@ runtests = function(nc)
 
 ncrtmp = new NetConnection();
 ncrtmp.statuses = new Array();
-ncrtmp.onStatus = function()
+defaultOnStatus = function()
 {
     this.statuses.push(arguments);
     note('NetConnection.onStatus called with args: ' + dumpObject(arguments));
@@ -166,7 +192,53 @@ ncrtmp.onStatus = function()
     runtests(this);
 };
 
-rtmpuri = "rtmp://"+hostname+":"+rtmpport+"/echo";
+ncrtmp.onStatus = defaultOnStatus;
+
+ncrtmp.disconnected = function(arg) {
+    fail("boohoo");
+};
+
+welcomecalls = 0;
+ncrtmp.welcome = function(arg) {
+    ++welcomecalls;
+    xcheck_equals(arg[0].toString(), "You have connected!");
+    trace(dumpObject(arg[1]));
+};
+
+connectcalls = 0;
+ncrtmp.initial = function(arg) {
+    ++connectcalls;
+    xcheck_equals(arg[0].toString(), "connection attempt received");
+    o = arg[1];
+
+    xcheck(o.hasOwnProperty("fpad"));
+    xcheck_equals(o.fpad, false);
+
+    xcheck(o.hasOwnProperty("pageUrl"));
+
+    xcheck_equals(o.pageUrl, undefined);
+
+    xcheck(o.hasOwnProperty("videoFunction"));
+
+    xcheck(o.hasOwnProperty("tcUrl"));
+
+    xcheck(o.hasOwnProperty("app"));
+    xcheck_equals(o.app, "rtmpyecho");
+
+    xcheck(o.hasOwnProperty("flashVer"));
+    xcheck_equals(o.flashVer, $version);
+
+    xcheck(o.hasOwnProperty("audioCodecs"));
+    xcheck(o.hasOwnProperty("videoCodecs"));
+
+    xcheck(o.hasOwnProperty("swfUrl"));
+
+    xcheck(o.hasOwnProperty("capabilities"));
+
+    trace(dumpObject(arg[1]));
+};
+
+rtmpuri = "rtmp://"+hostname+":"+rtmpport+"/rtmpyecho";
 note("Connecting to "+rtmpuri);
 ncrtmp.connect(rtmpuri);
 
