@@ -43,19 +43,27 @@ struct GnashDevice
     /// the proper data type.
     typedef long native_window_t;
     
-    /// the list of supported renders that use devices
+    /// The list of supported renders that use devices
     typedef enum {OPENVG, OPENGL, OPENGLES1, OPENGLES2, XORG, VAAPI} rtype_t;
+    /// The list of supported device types
     typedef enum {NODEV, EGL, DIRECTFB, X11} dtype_t;
     
+    GnashDevice(int argc, char *argv[]);
     GnashDevice() { GNASH_REPORT_FUNCTION; };
+    
     virtual ~GnashDevice() { GNASH_REPORT_FUNCTION; };
 
+    /// Get the type of the instatiated device. Since the
+    /// renderer has a single value for the supported device,
+    /// this is used to see which device has been loaded.
     virtual dtype_t getType() = 0;
     
-    // Initialize GNASH Device layer
+    /// Initialize GNASH Device layer. This mostly just
+    /// initializes all the private data.
     virtual bool initDevice(int argc, char *argv[]) = 0;
 
-    // Initialize Gnash Window on device
+    /// Attach Native Window to device. This connects a
+    /// Native Window to the device so surfaces can be created.
     virtual bool attachWindow(native_window_t window) = 0;
     
     // Utility methods not in the base class
