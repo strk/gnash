@@ -48,7 +48,9 @@ class X11Device : public GnashDevice
   public:
     
     X11Device();
-
+    X11Device(int);
+    X11Device(int argc, char *argv[]);
+    
     // virtual classes should have virtual destructors
     virtual ~X11Device();
 
@@ -90,6 +92,12 @@ class X11Device : public GnashDevice
     // Using X11 always means a native renderer
     bool isNativeRender() { return true; }
 
+    Window getDrawableWindow() { return _root; };
+    
+    //
+    // Testing Support
+    //
+    
     // Create an X11 window to render in. This is only used by testing
     void createWindow(const char *name, int x, int y, int width, int height);
 
@@ -98,17 +106,20 @@ class X11Device : public GnashDevice
     /// have been handled. The first 5 are used up by creating the window.
     ///
     /// @param passes the number of events to process before returning.
-    void event_loop(size_t passes);
+    /// @return nothing
+    void eventLoop(size_t passes);
 
 protected:
     Display    *_display;
     int         _screennum;
+    Window      _root;
     Window      _window;
     Colormap    _colormap;
     Visual     *_visual;
     Screen     *_screen;
     int         _depth;
     XVisualInfo *_vinfo;
+    int         _vid;
 };
 
 typedef void (*init_func)();

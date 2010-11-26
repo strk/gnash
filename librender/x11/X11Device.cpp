@@ -59,20 +59,62 @@ const char *FONT = "/usr/share/fonts/truetype/freefont/FreeSerif.ttf";
 X11Device::X11Device()
     : _display(0),
       _screennum(0),
+      _root(0),
       _window(0),
       _visual(0),
       _screen(0),
       _depth(0),
-      _vinfo(0)
+      _vinfo(0),
+      _vid(0)
 {
     GNASH_REPORT_FUNCTION;
     dbglogfile.setVerbosity();
+}
+
+X11Device::X11Device(int vid)
+    : _display(0),
+      _screennum(0),
+      _root(0),
+      _window(0),
+      _visual(0),
+      _screen(0),
+      _depth(0),
+      _vinfo(0),
+      _vid(0)
+{
+    GNASH_REPORT_FUNCTION;
+    _vid = vid;
+
+    if (!initDevice(0, 0)) {
+        log_error("Couldn't initialize X11 device!");
+    }
+}
+
+X11Device::X11Device(int argc, char *argv[])
+    : _display(0),
+      _screennum(0),
+      _root(0),
+      _window(0),
+      _visual(0),
+      _screen(0),
+      _depth(0),
+      _vinfo(0),
+      _vid(0)
+{
+    GNASH_REPORT_FUNCTION;
+    
+    if (!initDevice(argc, argv)) {
+        log_error("Couldn't initialize X11 device!");
+    }
 }
 
 X11Device::~X11Device()
 {
     GNASH_REPORT_FUNCTION;
     if (_display) {
+        if (_root) {
+            XDestroyWindow(_display, _root);
+        }
         if (_window) {
             XDestroyWindow(_display, _window);
         }
@@ -86,31 +128,8 @@ X11Device::initDevice(int argc, char *argv[])
 {
     GNASH_REPORT_FUNCTION;
 
-#ifdef HAVE_GTK2_XX
-    // As gdk_init() wants the command line arguments, we have to create
-    // fake ones, as we don't care about the X11 options at this point.
-    gdk_init(&argc, &argv);
-
-#if 0
-    GdkVisual* wvisual = gdk_drawable_get_visual(_drawing_area->window);
-
-    GdkImage* tmpimage = gdk_image_new (GDK_IMAGE_FASTEST, wvisual, 1, 1);
-
-    const GdkVisual* visual = tmpimage->visual;
-
-    // FIXME: we use bpp instead of depth, because depth doesn't appear to
-    // include the padding byte(s) the GdkImage actually has.
-    const char *pixelformat = agg_detect_pixel_format(
-        visual->red_shift, visual->red_prec,
-        visual->green_shift, visual->green_prec,
-        visual->blue_shift, visual->blue_prec,
-        tmpimage->bpp * 8);
-
-    gdk_image_destroy(tmpimage);
-#endif  // end of 0
-#else
     char *dpyName = NULL;
-    int num_visuals;
+    int num_visuals = 0;
  
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-display") == 0) {
@@ -125,73 +144,33 @@ X11Device::initDevice(int argc, char *argv[])
         return false;
     }
 
-    _window = XDefaultRootWindow(_display);
+    _root = XDefaultRootWindow(_display);
     _screennum = XDefaultScreen(_display);
 
     _depth = DefaultDepth(_display, _screennum);
     _colormap = DefaultColormap(_display, _screennum);
-
-    _visual = XDefaultVisual(_display, _screennum);
-
     _screen = DefaultScreenOfDisplay(_display);
-
-    VisualID vid = XVisualIDFromVisual(_visual);
     
     XVisualInfo visTemplate;
-    visTemplate.visualid = vid;
+    // _vid is from the Mesa EGL. The visual for EGL needs to match
+    // the one for X11.
+    std::cerr << "X11 visual from EGL is: " << _vid  << std::endl;
+    visTemplate.visualid = _vid;
     
     _vinfo = XGetVisualInfo(_display, VisualIDMask, &visTemplate, &num_visuals);
-    // std::cerr << "Num Visuals: " << num_visuals << std::endl;
+    std::cerr << "Num Visuals: " << num_visuals << std::endl;
     if (!_vinfo) {
          log_error("Error: couldn't get X visual\n");
          exit(1);
     }
-
-    // int re = visInfo[0].bits_per_rgb;
+    std::cerr << "X11 visual is: " << _vinfo->visual << std::endl;
     
-    XWindowAttributes gattr;
-    XGetWindowAttributes(_display, _window, &gattr);
+    // XWindowAttributes gattr;
+    // XGetWindowAttributes(_display, _root, &gattr);
     
     // std::cerr << "Width: " << gattr.backing_store << std::endl;
     // std::cerr << "Width: " << gattr.depth << std::endl;
 
-#if 0
-    const char *name = "Foo";
-    XSetWindowAttributes attr;
-    unsigned long mask;    
-    Window win;
-    int width, height;
-    int x, y;
-    
-    // window attributes
-    attr.background_pixel = 0;
-    attr.border_pixel = 0;
-    attr.colormap = XCreateColormap(_display, root, visInfo->visual, AllocNone);
-    attr.event_mask = StructureNotifyMask | ExposureMask | KeyPressMask;
-    mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
-    
-    win = XCreateWindow(_display, root, 0, 0, width, height,
-                         0, visInfo->depth, InputOutput,
-                         visInfo->visual, mask, &attr );
-    
-#endif
-
-#if 0
-    // set hints and properties
-    XSizeHints sizehints;
-    sizehints.x = x;
-    sizehints.y = y;
-    sizehints.width  = width;
-    sizehints.height = height;
-    sizehints.flags = USSize | USPosition;
-    XSetNormalHints(_display, win, &sizehints);
-    XSetStandardProperties(_display, win, name, name,
-                           None, (char **)NULL, 0, sizehints);
-#endif
-    
-   // XFree(visInfo);
-#endif
-    
     return true;
 }
 
@@ -233,7 +212,7 @@ X11Device::createWindow(const char *name, int x, int y, int width, int height)
         return;
     }
     
-    if (!_window) {
+    if (!_root) {
         log_error("No drawable window set!");
         return;
     }
@@ -247,11 +226,11 @@ X11Device::createWindow(const char *name, int x, int y, int width, int height)
     // window attributes
     attr.background_pixel = 0;
     attr.border_pixel = 0;
-    attr.colormap = XCreateColormap(_display, _window, _vinfo->visual, AllocNone);
+    attr.colormap = XCreateColormap(_display, _root, _vinfo->visual, AllocNone);
     attr.event_mask = StructureNotifyMask | ExposureMask | KeyPressMask;
     mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
     
-    _window = XCreateWindow(_display, _window, 0, 0, width, width,
+    _window = XCreateWindow(_display, _root, 0, 0, width, width,
                         0, _vinfo->depth, InputOutput,
                         _vinfo->visual, mask, &attr);
     
@@ -266,15 +245,15 @@ X11Device::createWindow(const char *name, int x, int y, int width, int height)
     XSetStandardProperties(_display, _window, name, name, None, (char **)NULL,
                            0, &sizehints);
 
+    
     XMapWindow(_display, _window);
-//    reshape(width, height);
-
-
 }
 
 void
-X11Device::event_loop(size_t passes)
+X11Device::eventLoop(size_t passes)
 {
+    std::cerr << "Starting event loop..." << std::endl;
+
     while (passes--) {
         int redraw = 0;
         XEvent event;
