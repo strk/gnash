@@ -234,7 +234,7 @@ ncrtmp.initial = function(arg) {
 
     check(o.hasOwnProperty("flashVer"));
     check_equals(typeof(o.flashVer), "string");
-    check_equals(o.flashVer, $version);
+    xcheck_equals(o.flashVer, "Our own special nonsense custom version");
 
     check(o.hasOwnProperty("audioCodecs"));
     check_equals(typeof(o.audioCodecs), "number");
@@ -253,5 +253,7 @@ ncrtmp.initial = function(arg) {
 };
 
 note("Connecting to "+rtmpuri);
+
+$version = "Our own special nonsense custom version";
 ncrtmp.connect(rtmpuri);
 
