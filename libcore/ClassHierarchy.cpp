@@ -16,17 +16,18 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "ClassHierarchy.h"
+
+#include <boost/bind.hpp>
+
 #include "as_object.h"
 #include "PropFlags.h"
 #include "as_value.h"
 #include "namedStrings.h"
-#include "ClassHierarchy.h"
 #include "as_function.h"
 #include "Class.h"
 #include "Global_as.h"
 #include "extension.h"
-
-#include <boost/bind.hpp>
 
 namespace gnash {
 

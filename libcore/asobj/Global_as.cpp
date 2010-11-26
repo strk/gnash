@@ -18,16 +18,23 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
+
+#include "Global_as.h"
+
+#include <map>
+#include <limits> 
+#include <sstream>
+#include <boost/lexical_cast.hpp>
+#include <boost/assign/list_of.hpp>
 
 #include "as_object.h"
 #include "movie_root.h"
 #include "PropFlags.h"
 #include "as_value.h"
-#include "as_function.h" // for function_class_init
+#include "as_function.h"
 #include "NativeFunction.h" 
 #include "AsBroadcaster.h"
 #include "Boolean_as.h"
@@ -84,12 +91,6 @@
 #include "LoadVars_as.h"
 #include "Object.h"
 #include "LoadableObject.h"
-
-#include <map>
-#include <limits> 
-#include <sstream>
-#include <boost/lexical_cast.hpp>
-#include <boost/assign/list_of.hpp>
 
 // Common code to warn and return if a required single arg is not present
 // and to warn if there are extra args.
