@@ -216,7 +216,7 @@ ncrtmp.initial = function(arg) {
 
     xcheck(o.hasOwnProperty("pageUrl"));
 
-    xcheck_equals(o.pageUrl, undefined);
+    check_equals(o.pageUrl, undefined);
 
     xcheck(o.hasOwnProperty("videoFunction"));
 

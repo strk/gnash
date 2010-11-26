@@ -277,6 +277,8 @@ check_SCRIPTS += remotingTestRunner
 endif
 if ENABLE_RED5_TESTING
 check_SCRIPTS += red5test-runner
+endif
+if ENABLE_RTMPY_TESTING
 check_SCRIPTS += rtmpytest-runner
 endif
 endif
@@ -1743,6 +1745,9 @@ TEST_CASES += remotingTestRunner
 endif
 if ENABLE_RED5_TESTING
 TEST_CASES += red5test-runner
+endif
+if ENABLE_RTMPY_TESTING
+TEST_CASES += rtmpytest-runner
 endif
 endif
 
