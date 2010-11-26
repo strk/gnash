@@ -96,7 +96,7 @@ AudioInputGst::findAudioDevs()
     
     if (element == NULL) {
         log_error("%s: Could not create audio test source", __FUNCTION__);
-        _audioVect.push_back(NULL); // ??? what for ? FIXME
+	return;
     } else {
         _audioVect.push_back(new GnashAudio);
         _audioVect.back()->setElementPtr(element);

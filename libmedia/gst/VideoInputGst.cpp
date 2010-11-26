@@ -365,7 +365,7 @@ VideoInputGst::findVidDevs(std::vector<GnashWebcam*>& cameraList)
     
     if (element == NULL) {
         log_error("%s: Could not create video test source.", __FUNCTION__);
-        cameraList.push_back(NULL); // ??? what for ? FIXME
+	return;
     } else {
         cameraList.push_back(new GnashWebcam);
         GnashWebcam& cam = *cameraList.back();
