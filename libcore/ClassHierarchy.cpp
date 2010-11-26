@@ -25,7 +25,6 @@
 #include "as_value.h"
 #include "namedStrings.h"
 #include "as_function.h"
-#include "Class.h"
 #include "Global_as.h"
 #include "extension.h"
 
