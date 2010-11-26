@@ -60,6 +60,7 @@ class EGLDevice : public GnashDevice
 {
   public:
     EGLDevice();
+    EGLDevice(int argc, char *argv[]);
     EGLDevice(GnashDevice::rtype_t rtype);
 
     virtual ~EGLDevice();
@@ -166,6 +167,8 @@ class EGLDevice : public GnashDevice
         return false;
     }
 
+    EGLint getNativeVisual();
+    
     /// Check the requested EGl configuration against the current one
     bool checkEGLConfig(EGLConfig config);
     
@@ -322,9 +325,6 @@ protected:
     EGLint              _max_num_config;
     unsigned int        _bpp;
     std::vector<EGLSurface> _pbuffers;
-#ifdef HAVE_LIBX11
-    x11::X11Device      _x11;
-#endif
 };
 
 #define DUMP_CURRENT_SURFACE printEGLSurface(eglGetCurrentSurface(EGL_DRAW))

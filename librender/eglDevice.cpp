@@ -48,14 +48,14 @@
 namespace gnash {
 
 namespace renderer {
-    
+
 static const EGLint attrib32_list[] = {
     EGL_RED_SIZE,       8,
     EGL_GREEN_SIZE,     8,
     EGL_BLUE_SIZE,      8,
-    EGL_ALPHA_SIZE,     0,
-    EGL_DEPTH_SIZE,     24,
-#ifdef RENDERER_GLES1    
+//  EGL_ALPHA_SIZE,     0,
+//  EGL_DEPTH_SIZE,     24,
+#ifdef RENDERER_GLES1
     EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
 #endif
 #ifdef RENDERER_GLES2
@@ -63,8 +63,9 @@ static const EGLint attrib32_list[] = {
 #endif
 #ifdef RENDERER_OPENVG
     EGL_RENDERABLE_TYPE, EGL_OPENVG_BIT,
-    EGL_STENCIL_SIZE,   8,
+//    EGL_STENCIL_SIZE,   8,
 #endif
+    EGL_RENDERABLE_TYPE, EGL_OPENVG_BIT|EGL_OPENGL_ES_BIT|EGL_OPENGL_ES2_BIT,
     EGL_SURFACE_TYPE,   EGL_WINDOW_BIT|EGL_PBUFFER_BIT|EGL_PIXMAP_BIT,
 //    EGL_SAMPLE_BUFFERS, 1,
     // EGL_RENDER_BUFFER, EGL_SINGLE_BUFFER
@@ -163,6 +164,22 @@ EGLDevice::EGLDevice()
       _bpp(32)
 {
     GNASH_REPORT_FUNCTION;
+    dbglogfile.setVerbosity();
+}
+
+EGLDevice::EGLDevice(int argc, char *argv[])
+    : _eglConfig(0),
+      _eglContext(EGL_NO_CONTEXT),
+      _eglSurface(EGL_NO_SURFACE),
+      _eglDisplay(EGL_NO_DISPLAY),
+      _eglNumOfConfigs(0),
+      _max_num_config(1),
+      _bpp(32)
+{
+    GNASH_REPORT_FUNCTION;
+    if (!initDevice(argc, argv)) {
+        log_error("Couldn't initialize EGL device!");
+    }
 }
 
 EGLDevice::EGLDevice(GnashDevice::rtype_t rtype)
@@ -175,6 +192,12 @@ EGLDevice::EGLDevice(GnashDevice::rtype_t rtype)
       _bpp(32)
 {
     GNASH_REPORT_FUNCTION;
+    if (!initDevice(0, 0)) {
+        log_error("Couldn't initialize EGL device!");
+    }
+    if (!bindClient(rtype)) {
+        log_error("Couldn't bind client to type %d!", rtype);
+    }
 }
 
 EGLDevice::~EGLDevice()
@@ -229,10 +252,6 @@ EGLDevice::initDevice(int argc, char *argv[])
     
     GNASH_REPORT_FUNCTION;
     
-#ifdef HAVE_LIBX11
-    _x11.initDevice(argc, argv);
-#endif
-    
     EGLint major, minor;
     // see egl_config.c for a list of supported configs, this looks for
     // a 5650 (rgba) config, supporting OpenGL ES and windowed surfaces
@@ -259,7 +278,8 @@ EGLDevice::initDevice(int argc, char *argv[])
               eglQueryString(_eglDisplay, EGL_VENDOR));
 
     // step2 - bind to the wanted client API
-    /// This is done by bindClient()
+    /// This is done by bindClient() later on
+    // bindClient(GnashDevice::OPENVG);
     
     // step3 - find a suitable config
     if (_bpp == 32) {
@@ -285,31 +305,9 @@ EGLDevice::initDevice(int argc, char *argv[])
         return false;
     }
 
-    EGLint vid;
-    if (!eglGetConfigAttrib(_eglDisplay, _eglConfig, EGL_NATIVE_VISUAL_ID, &vid)) {
-        log_error("eglGetConfigAttrib() failed (error %s)",
-                  getErrorString(eglGetError()));
-        return false;
-    }
-
-#ifdef HAVE_GTK2_XX
-    GdkVisual* wvisual = gdk_drawable_get_visual(_drawing_area->window);
-
-    GdkImage* tmpimage = gdk_image_new (GDK_IMAGE_FASTEST, wvisual, 1, 1);
-
-    const GdkVisual* visual = tmpimage->visual;
-
-    // FIXME: we use bpp instead of depth, because depth doesn't appear to
-    // include the padding byte(s) the GdkImage actually has.
-    const char *pixelformat = agg_detect_pixel_format(
-        visual->red_shift, visual->red_prec,
-        visual->green_shift, visual->green_prec,
-        visual->blue_shift, visual->blue_prec,
-        tmpimage->bpp * 8);
-
-    gdk_image_destroy(tmpimage);
+#ifdef BUILD_X11_DEVICE
 #endif
-
+    
     // printEGLConfig(_eglConfig);
 #if 0
    if (!checkEGLConfig(_eglConfig)) {
@@ -351,6 +349,23 @@ EGLDevice::supportsRenderer(rtype_t rtype)
         }
     }
     return false;
+}
+
+EGLint
+EGLDevice::getNativeVisual()
+{
+    EGLint vid;
+    if (_eglDisplay && _eglConfig) {
+        if (!eglGetConfigAttrib(_eglDisplay, _eglConfig, EGL_NATIVE_VISUAL_ID, &vid)) {
+            log_error("eglGetConfigAttrib() failed (error %s)",
+                      getErrorString(eglGetError()));
+            return false;
+        } else {
+            std::cerr << "EGL native visual is: " << vid << std::endl;
+        }
+    }
+
+    return vid;
 }
 
 bool
@@ -403,20 +418,15 @@ bool
 EGLDevice::attachWindow(GnashDevice::native_window_t window)
 {
     if (!window) {
-#if HAVE_GTK2
-        // This renders to the root screen, instead of the canvas, but keeps
-        // the test case from core dumping, and doesn't really effect anything
-        // but seeing that you are rendering.
-        _nativeWindow = gdk_x11_get_default_root_xwindow();
-#endif
+        return false;
     } else {
         _nativeWindow = static_cast<EGLNativeWindowType>(window);
     }
 
     log_debug("Initializing EGL Surface");
-    if (_nativeWindow) {
-        _eglSurface = eglCreateWindowSurface(_eglDisplay, _eglConfig, _nativeWindow,
-            window_attrib_list);
+    if (_nativeWindow && _eglDisplay && _eglConfig) {
+        _eglSurface = eglCreateWindowSurface(_eglDisplay, _eglConfig,
+                                             _nativeWindow, NULL);
     } else {
         log_error("No native window!");
     }
