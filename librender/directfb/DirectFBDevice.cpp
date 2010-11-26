@@ -63,6 +63,23 @@ DirectFBDevice::DirectFBDevice()
     GNASH_REPORT_FUNCTION;
 }
 
+DirectFBDevice::DirectFBDevice(int argc, char *argv[])
+    : _dfb(0),
+      _surface(0),
+      _keyboard(0),
+      _keybuffer(0),
+      _provider(0),
+      _font(0),
+      _layer(0),
+      _screen(0)
+{
+    GNASH_REPORT_FUNCTION;
+    
+    if (!initDevice(argc, argv)) {
+        log_error("Couldn't initialize DirectFB device!");
+    }
+}
+
 DirectFBDevice::~DirectFBDevice()
 {
     // GNASH_REPORT_FUNCTION;

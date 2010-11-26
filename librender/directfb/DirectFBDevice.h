@@ -45,6 +45,8 @@ class DirectFBDevice : public GnashDevice
 {
   public:
     DirectFBDevice();
+    DirectFBDevice(int argc, char *argv[]);
+
     ~DirectFBDevice();
 
     dtype_t getType() { return DIRECTFB; };
