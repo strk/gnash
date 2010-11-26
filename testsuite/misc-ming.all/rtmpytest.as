@@ -202,52 +202,52 @@ ncrtmp.disconnected = function(arg) {
 welcomecalls = 0;
 ncrtmp.welcome = function(arg) {
     ++welcomecalls;
-    xcheck_equals(arg[0].toString(), "You have connected!");
+    check_equals(arg[0].toString(), "You have connected!");
     trace(dumpObject(arg[1]));
 };
 
 connectcalls = 0;
 ncrtmp.initial = function(arg) {
     ++connectcalls;
-    xcheck_equals(arg[0].toString(), "connection attempt received");
+    check_equals(arg[0].toString(), "connection attempt received");
     o = arg[1];
 
-    xcheck(o.hasOwnProperty("fpad"));
-    xcheck_equals(typeof(o.fpad), "boolean");
-    xcheck_equals(o.fpad, false);
+    check(o.hasOwnProperty("fpad"));
+    check_equals(typeof(o.fpad), "boolean");
+    check_equals(o.fpad, false);
 
-    xcheck(o.hasOwnProperty("pageUrl"));
+    check(o.hasOwnProperty("pageUrl"));
     check_equals(typeof(o.pageUrl), "undefined");
     check_equals(o.pageUrl, undefined);
 
-    xcheck(o.hasOwnProperty("videoFunction"));
-    xcheck_equals(typeof(o.videoFunction), "number");
-    xcheck_equals(o.videoFunction, 1);
+    check(o.hasOwnProperty("videoFunction"));
+    check_equals(typeof(o.videoFunction), "number");
+    check_equals(o.videoFunction, 1);
 
-    xcheck(o.hasOwnProperty("tcUrl"));
-    xcheck_equals(typeof(o.tcUrl), "string");
-    xcheck_equals(o.tcUrl, rtmpuri);
+    check(o.hasOwnProperty("tcUrl"));
+    check_equals(typeof(o.tcUrl), "string");
+    check_equals(o.tcUrl, rtmpuri);
 
-    xcheck(o.hasOwnProperty("app"));
-    xcheck_equals(typeof(o.app), "string");
-    xcheck_equals(o.app, "rtmpyecho");
+    check(o.hasOwnProperty("app"));
+    check_equals(typeof(o.app), "string");
+    check_equals(o.app, "rtmpyecho");
 
-    xcheck(o.hasOwnProperty("flashVer"));
-    xcheck_equals(typeof(o.flashVer), "string");
-    xcheck_equals(o.flashVer, $version);
+    check(o.hasOwnProperty("flashVer"));
+    check_equals(typeof(o.flashVer), "string");
+    check_equals(o.flashVer, $version);
 
-    xcheck(o.hasOwnProperty("audioCodecs"));
-    xcheck_equals(typeof(o.audioCodecs), "number");
+    check(o.hasOwnProperty("audioCodecs"));
+    check_equals(typeof(o.audioCodecs), "number");
 
-    xcheck(o.hasOwnProperty("videoCodecs"));
-    xcheck_equals(typeof(o.videoCodecs), "number");
+    check(o.hasOwnProperty("videoCodecs"));
+    check_equals(typeof(o.videoCodecs), "number");
 
-    xcheck(o.hasOwnProperty("swfUrl"));
-    xcheck_equals(typeof(o.swfUrl), "string");
-    xcheck_equals(o.swfUrl, _url);
+    check(o.hasOwnProperty("swfUrl"));
+    check_equals(typeof(o.swfUrl), "string");
+    check_equals(o.swfUrl, _url);
 
-    xcheck(o.hasOwnProperty("capabilities"));
-    xcheck_equals(typeof(o.capabilities), "number");
+    check(o.hasOwnProperty("capabilities"));
+    check_equals(typeof(o.capabilities), "number");
 
     trace(dumpObject(arg[1]));
 };
