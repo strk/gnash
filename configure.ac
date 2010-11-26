@@ -2244,6 +2244,20 @@ if test x$cross_compiling = xno; then
 fi
 AM_CONDITIONAL(ENABLE_RED5_TESTING, [ test x"$RED5_HOST" != x ])
 
+if test x$cross_compiling = xno; then
+  AC_ARG_ENABLE([rtmpy_testing],
+      dnl # TODO: find out how to add [quotes] around '=<baseurl>'
+	  AC_HELP_STRING([--enable-rtmpy-testing=<host>],
+		  [Enable rtmpy based testing (default host is www.gnashdev.org)]),
+	      [case "${enableval}" in
+             no) RTMPY_HOST="" ;;
+            yes) RTMPY_HOST="www.gnashdev.org" ;;
+              *) RTMPY_HOST="${enableval}";;
+           esac])
+  AC_SUBST(RTMPY_HOST)
+fi
+AM_CONDITIONAL(ENABLE_RTMPY_TESTING, [ test x"$RTMPY_HOST" != x ])
+
 dnl The name might differ between systems.
 if test x"$testsuite" = x"yes"; then
 AC_PATH_PROGS(NETCAT, [nc netcat])
