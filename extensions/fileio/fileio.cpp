@@ -583,11 +583,11 @@ fileio_scandir(const fn_call& fn)
 	}
     
     Global_as& gl = getGlobal(fn);
-    string_table& st = getStringTable(fn);
+    VM& vm = getVM(fn);
 	as_object* array = gl.createArray();	
 	
 	for (int idx = 0; idx < n; ++idx) {
-		array->set_member(arrayKey(st, idx), namelist[idx]->d_name);
+		array->set_member(arrayKey(vm, idx), namelist[idx]->d_name);
 		free(namelist[idx]);
 	}
 	free(namelist);
