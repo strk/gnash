@@ -90,7 +90,7 @@ check_PROGRAMS = \
 	button_test1runner \
 	$(NULL)
 
-abs_mediadir = `cd $(srcdir)/../media; pwd`
+abs_mediadir = $(shell cd $(srcdir)/../media; pwd)
 
 #SWFC = swfc # this is set by ./configure
 SWFC_FLAGS = 
