@@ -3927,6 +3927,8 @@ if test -s $cwarn; then
   echo ""
   echo "Gnash should still compile even with these warnings."
   echo "If it doesn't, report the warnings as a bug."
+else
+  rm $cwarn
 fi
 
 if test -s $crec; then
@@ -3935,6 +3937,8 @@ if test -s $crec; then
   rm $crec
   echo ""
   echo "Gnash should still compile, but you'll miss important support"
+else
+  rm $crec
 fi
 
 dnl If anything critical is missing, don't bother to continue
@@ -3943,7 +3947,10 @@ if test -s $cerr; then
   cat $cerr >&2
   rm $cerr
   AC_MSG_ERROR([Please install required packages])
+else
+  rm $cerr
 fi
+
 
 if test x"$fork" = x"no"; then
   AC_MSG_ERROR([Currently only forking the standalone player works!])
