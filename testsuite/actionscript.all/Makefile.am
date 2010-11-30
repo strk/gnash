@@ -17,7 +17,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-AUTOMAKE_OPTIONS = dejagnu
+AUTOMAKE_OPTIONS = dejagnu -Wno-portability
 
 # Temporarly always disable MING, distribution
 # of the generated SWF should work, but it's currently
