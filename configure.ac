@@ -282,40 +282,12 @@ dnl   $CXXFLAGS="$CXXFLAGS -march=${with_cpu}"
    cross_compiling=yes
 fi
 
-AC_MSG_CHECKING([For the version of libtool])
-if test -d ${srcdir}/libltdl/libltdl; then
-  ltver=2.x
-else
-  ltver=1.x
-fi
-ltmajor=`echo $ltver | cut -d '.' -f 1`
-AC_MSG_RESULT([$ltver])
-AM_CONDITIONAL(LIBLTDL2, [test $ltmajor -eq 2])
-AM_CONDITIONAL(LIBLTDL1, [test $ltmajor -eq 1])
-if test $ltmajor -eq 1; then
-  AC_LIBLTDL_CONVENIENCE
-  AC_LIBTOOL_DLOPEN
-  if test x"${windows}" = x"yes"; then
-    dnl The following macro may be empty; the colon is necessary
-    dnl in this case to avoid an empty if statement (which is a syntax error).
-    AC_LIBTOOL_WIN32_DLL
-    :
-  fi
-  AC_DISABLE_STATIC
-else
-  LT_INIT([dlopen win32-dll disable-static])
-  LTDL_INIT([convenience recursive])
-fi
 AC_PROG_LIBTOOL
-
-AM_CONDITIONAL(CONVENIENCE_LTDL, test x"${enable_ltdl_convenience-no}" != xno)
-AM_CONDITIONAL(INSTALL_LTDL, test x"${enable_ltdl_install-no}" != xno)
 
 AC_C_BIGENDIAN
 AC_C_CONST
 AC_C_INLINE
 AC_SUBST([LIBTOOL_DEPS])
-AC_LIB_LTDL
 
 AM_CONDITIONAL(ENABLE_SHARED, [test x"${enable_shared}" = xyes])
 AM_CONDITIONAL(ENABLE_STATIC, [test x"${enable_shared}" = xno])
@@ -785,7 +757,6 @@ AC_ARG_ENABLE(sound,
      fi
    fi]
 )
-
 
 dnl --------------------------------------------------------
 dnl  Media handler selection
@@ -1264,6 +1235,7 @@ ext_lirc=no
 ext_dbus=no
 ext_all=no
 ext_launcher=no
+nextensions=0
 AC_ARG_ENABLE(extensions,
   AC_HELP_STRING([--enable-extensions=], [Specify which extensions to build]),
   if test -n ${enableval}; then
@@ -1360,6 +1332,38 @@ AM_CONDITIONAL(BUILD_DBUS_EXT, [ test x$ext_dbus = xyes ])
 AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n "$extensions_list"])
 
 GNASH_PKG_CLASSFILE
+
+ltmajor=0
+if test "${nextensions}" -gt 0; then
+  AC_MSG_CHECKING([For the version of libtool])
+  if test -d ${srcdir}/libltdl/libltdl; then
+    ltver=2.x
+  else
+    ltver=1.x
+  fi
+  ltmajor=`echo $ltver | cut -d '.' -f 1`
+  AC_MSG_RESULT([$ltver])
+  if test $ltmajor -eq 1; then
+    AC_LIBLTDL_CONVENIENCE
+    AC_LIBTOOL_DLOPEN
+    if test x"${windows}" = x"yes"; then
+      dnl The following macro may be empty; the colon is necessary
+      dnl in this case to avoid an empty if statement (which is a syntax error).
+      AC_LIBTOOL_WIN32_DLL
+      :
+    fi
+    AC_DISABLE_STATIC
+  else
+    LT_INIT([dlopen win32-dll disable-static])
+    LTDL_INIT([convenience recursive])
+  fi
+  AC_LIB_LTDL
+fi
+
+AM_CONDITIONAL(LIBLTDL2, [test $ltmajor -eq 2])
+AM_CONDITIONAL(LIBLTDL1, [test $ltmajor -eq 1])
+AM_CONDITIONAL(CONVENIENCE_LTDL, test x"${enable_ltdl_convenience-no}" != xno)
+AM_CONDITIONAL(INSTALL_LTDL, test x"${enable_ltdl_install-no}" != xno)
 
 dnl --------------------------------------------------------
 dnl SOL dir
