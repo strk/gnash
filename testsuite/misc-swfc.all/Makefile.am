@@ -90,11 +90,11 @@ check_PROGRAMS = \
 	button_test1runner \
 	$(NULL)
 
-abs_mediadir = `cd $(srcdir)/../media; pwd`
+abs_mediadir = $(shell cd $(srcdir)/../media; pwd)
 
 #SWFC = swfc # this is set by ./configure
 SWFC_FLAGS = 
-SWFC_CPP = $(CPP) -x c -P -I$(srcdir) -DMEDIADIR="$(abs_mediadir)"
+SWFC_CPP = $(CPP) -x c -P -undef -I$(srcdir) -DMEDIADIR="$(abs_mediadir)"
 
 SANE_SCTESTS_OUT = $(SANE_SCTESTS:.sc=.swf)
 BOGO_SCTESTS_OUT = $(BOGO_SCTESTS:.sc=.swf)

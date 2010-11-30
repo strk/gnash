@@ -24,7 +24,7 @@ AUTOMAKE_OPTIONS = dejagnu
 # broken and needs to be used in misc-ming.all too
 # so I take responsibility of dropping that for the moment...
 
-abs_mediadir = `cd $(srcdir)/../media; pwd`
+abs_mediadir = $(shell cd $(srcdir)/../media; pwd)
 swfdir = `cd $(top_builddir)/testsuite/actionscript.all; pwd`
 DEF_MAKESWF_FLAGS=-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\"$(abs_mediadir)\"' -DSWFDIR='\"$(swfdir)\"'
 
