@@ -27,7 +27,6 @@
 #include "dsodefs.h" // for DSOEXPORT
 
 #include <fstream>
-#include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/format.hpp>
 

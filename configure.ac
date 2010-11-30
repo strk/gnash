@@ -2166,8 +2166,6 @@ if test x$has_speexdsp = xyes ; then
 fi
 
 dnl Find freetype and fontconfig
-dnl GNASH_PKG_FIND(freetype2, [freetype/freetype.h], [freetype2 font library], FT_Load_Char)
-dnl rob might be working on this or not ;)
 GNASH_PATH_FREETYPE2
 GNASH_PKG_FIND(fontconfig, [fontconfig/fontconfig.h], [fontconfig library], FcFontMatch)
 
