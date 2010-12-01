@@ -18,27 +18,23 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include <ctime> // std::strftime, std::time etc
-#include <cctype> // for std::isprint
-#include <cstring> // std::memset
+#include "log.h"
 
+#include <ctime> 
+#include <cctype> 
+#include <cstring> 
+#include <iostream>
 #include <map>
 #include <sstream>
 #include <fstream>
-#include <iomanip> // for std::setfill
+#include <iomanip> 
 #include <string>
 #include <boost/format.hpp>
 
-#if defined(_WIN32) && defined(WIN32)
-// Required for SYSTEMTIME definitions
-# include <windows.h>
-# include <sys/types.h>
-#endif
-
 #include <unistd.h> // for getpid
 
-#include "log.h"
 #include "utility.h"
+#include "GnashAlgorithm.h"
 
 using std::cout;
 using std::endl;
@@ -83,16 +79,15 @@ timestamp(std::ostream& o)
     const char fmt[] = "%H:%M:%S";
 
     time_t t;
-    char buf[sizeof(fmt)];
+    char buf[sizeof fmt];
 
     std::time(&t);
-    std::strftime(buf, sizeof(buf), fmt, std::localtime(&t));
+    std::strftime(buf, sizeof buf, fmt, std::localtime(&t));
 
     static std::map<int, int> threadMap;
     int tid = get_thread_id();
     int& htid = threadMap[tid];
-    if ( ! htid )
-    {
+    if (!htid) {
         htid = threadMap.size();
         // TODO: notify actual thread id for index
     }
@@ -201,16 +196,15 @@ LogFile::log(const std::string& msg)
 
     if ( !_verbose ) return; // nothing to do if not verbose
 
-    if (openLogIfNeeded())
-    {
+    if (openLogIfNeeded()) {
         if (_stamp) {
             _outstream << timestamp << ": " << msg << "\n";
         } else {
             _outstream << msg << "\n";
         }
     }
-    else // log to stdout
-    {
+    else {
+        // log to stdout
         if (_stamp) {
             cout << timestamp << " " << msg << endl;
         } else {
@@ -218,8 +212,7 @@ LogFile::log(const std::string& msg)
         }
     }
     
-    if (_listener)
-    {
+    if (_listener) {
         (*_listener)(msg);
     }
 }
@@ -268,7 +261,7 @@ LogFile::openLogIfNeeded()
     if (_state != CLOSED) return true;
     if (!_write) return false;
 
-    if ( _logFilename.empty() ) _logFilename = DEFAULT_LOGFILE;
+    if (_logFilename.empty()) _logFilename = DEFAULT_LOGFILE;
 
     // TODO: expand ~ to getenv("HOME") !!
 
