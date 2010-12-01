@@ -20,6 +20,12 @@
 #include "gnashconfig.h"
 #endif
 
+#include "SharedMem.h"
+
+#include <string>
+#include <vector>
+#include <cerrno>
+#include <cstring>
 #include <sys/types.h>
 #if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__) && !defined(HAIKU_HOST) && !defined(ANDROID)
 # include <sys/shm.h>
@@ -30,9 +36,6 @@
 # include <process.h>
 # include <io.h>
 #endif
-#include <string>
-#include <vector>
-#include <cerrno>
 
 #ifdef ANDROID
 # include <linux/shm.h>
@@ -47,7 +50,6 @@ extern int semctl (int __semid, int __semnum, int __cmd, ...);
 #endif
 
 #include "log.h"
-#include "SharedMem.h"
 
 #if (defined(USE_SYSV_SHM) && defined(HAVE_SHMGET)) || defined(_WIN32) || defined(ANDROID)
 # define ENABLE_SHARED_MEM 1

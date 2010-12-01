@@ -467,15 +467,6 @@ play_movie(const std::string& filename, const RunResources& runResources)
     size_t nadvances=0;
     // Run through the movie.
     while (!quitrequested) {
-        // @@ do we also have to run through all sprite frames
-        // as well?
-        //
-        // @@ also, ActionScript can rescale things
-        // dynamically -- we can't really do much about that I
-        // guess?
-        //
-        // @@ Maybe we should allow the user to specify some
-        // safety margin on scaled shapes.
         
         size_t	last_frame = m.get_current_frame();
         //printf("advancing clock by %lu\n", clockAdvance);

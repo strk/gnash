@@ -47,7 +47,6 @@ AM_LDFLAGS = \
 	$(CURL_LIBS) \
 	$(JPEG_LIBS) \
 	$(PNG_LIBS) \
-	$(X11_LIBS) \
 	$(BOOST_LIBS) \
 	$(PYTHON_LIBS) \
 	$(PTHREAD_LIBS) \

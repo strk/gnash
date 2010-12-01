@@ -21,6 +21,11 @@
 #include "gnashconfig.h"
 #endif
 
+#include "Renderer_ogl.h"
+
+#include <boost/utility.hpp>
+#include <boost/bind.hpp>
+#include <list>
 #include <cstring>
 #include <cmath>
 #include <boost/scoped_ptr.hpp>
@@ -42,11 +47,6 @@
 #if defined(_WIN32) || defined(WIN32)
 #  include <Windows.h>
 #endif
-
-#include "Renderer_ogl.h"
-
-#include <boost/utility.hpp>
-#include <boost/bind.hpp>
 
 #ifdef HAVE_VA_VA_GLX_H
 #  include "GnashVaapiImage.h"

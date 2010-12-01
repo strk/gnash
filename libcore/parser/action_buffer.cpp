@@ -21,6 +21,7 @@
 #include "action_buffer.h"
 
 #include <string>
+#include <cstring> // for memcpy
 #include <boost/static_assert.hpp>
 
 #include "log.h"
@@ -524,7 +525,7 @@ convert_float_little(const void *p)
     switch (u.s.s0) {
 
         case 0x0000:    // little-endian host
-            std::memcpy(&u.i, p, 4);
+            std::memcpy(&u.i, p, 4); // TODO: use std::copy instead ..
             break;
         case 0x3f80:    // big-endian host
         {

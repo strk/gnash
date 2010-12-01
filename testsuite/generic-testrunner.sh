@@ -19,15 +19,17 @@
 
 runs=1
 advances=0
+delay=1 # milliseconds between advances
 endtagpat=
 endtagexp=""
 
-while getopts r:f:c:C: name; do
+while getopts r:f:c:C:d: name; do
 	case $name in
 		r) runs="$OPTARG" ;;
 		f) advances="$OPTARG" ;;
 		c) endtagpat="$OPTARG" ;;
 		C) endtagpat="$OPTARG"; endtagexp=X ;;
+		d) delay="$OPTARG" ;;
 		?)
 		   {
 		   echo "Usage: $0 [-r <runs>] [-f <advances>] [-c <string>]  <swf> ..." 
@@ -61,7 +63,7 @@ for t in ${testfiles}; do
 	echo "NOTE: Running test \${t}"
 	( 
 		exec > \${outlog}
-		${top_builddir}/utilities/gprocessor -d1 -r${runs} -f${advances} -v \${t} || echo "FAILED: gprocessor returned an error while playing '\${t}'"
+		${top_builddir}/utilities/gprocessor -d${delay} -r${runs} -f${advances} -v \${t} || echo "FAILED: gprocessor returned an error while playing '\${t}'"
 	)
 	cat \${outlog}
 	if test "x${endtagpat}" != x; then

@@ -24,9 +24,11 @@
 
 #include "gst/gst.h"
 #include "AudioInputGst.h"
-#include <gst/interfaces/propertyprobe.h>
 #include "log.h"
 #include "rc.h"
+
+#include <cstring>
+#include <gst/interfaces/propertyprobe.h>
 
 namespace {
     //get rc file for default mic selection
@@ -96,7 +98,7 @@ AudioInputGst::findAudioDevs()
     
     if (element == NULL) {
         log_error("%s: Could not create audio test source", __FUNCTION__);
-        _audioVect.push_back(NULL);
+	return;
     } else {
         _audioVect.push_back(new GnashAudio);
         _audioVect.back()->setElementPtr(element);
@@ -111,7 +113,16 @@ AudioInputGst::findAudioDevs()
     element = NULL;
 
     element = gst_element_factory_make ("pulsesrc", "pulsesrc");
+    if ( ! element ) {
+        log_error("%s: Could not create pulsesrc element", __FUNCTION__);
+        return;
+    }
     probe = GST_PROPERTY_PROBE (element);
+    if ( ! probe ) {
+        log_error("%s: Could not get property probe from pulsesrc element",
+            __FUNCTION__);
+        return;
+    }
     devarr = gst_property_probe_probe_and_get_values_name (probe, "device");
     for (size_t i = 0; devarr != NULL && i < devarr->n_values; ++i) {
         GValue *val;

@@ -17,16 +17,16 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "DefineFontAlignZonesTag.h"
+
+#include <boost/cstdint.hpp>
 
 #include "RunResources.h"
 #include "Font.h"
 #include "log.h"
 #include "SWFStream.h"
 #include "movie_definition.h"
-#include "DefineFontAlignZonesTag.h"
 #include "smart_ptr.h"
-
-#include <iostream>
 
 namespace gnash {
 namespace SWF {

@@ -30,7 +30,6 @@
 #include <unistd.h>
 
 #include <string>
-#include <iostream>
 #include <cstdlib>
 
 #if defined(WIN32) || defined(_WIN32)

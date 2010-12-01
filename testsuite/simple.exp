@@ -8,14 +8,16 @@ if $tracelevel {
     strace $tracelevel
 }
 
-# After these many seconds of execution the test script is aborted with a failure.
+# After these many seconds of execution the test script is aborted
+# with a failure.
 # This is to handle deadlocks. We don't reset the timeout when a match is
-# found to avoid hanging in case of a testcase sending matches in an infinite loops.
+# found to avoid hanging in case of a testcase sending matches in an
+# infinite loops.
 # (not unlikely as it seems, think about flash movies...)
 #
 # Expressed in seconds.
 #
-set timeout 600
+set timeout 300
 set file all
 set params ""
 

@@ -19,7 +19,7 @@
 
 #include "FillStyle.h"
 
-#include <iostream> 
+#include <ostream> 
 #include <boost/variant.hpp>
 
 #include "smart_ptr.h"

@@ -20,6 +20,8 @@
 #ifndef GNASH_SWF_DEFINEFONTALIGNZONESTAG_H
 #define GNASH_SWF_DEFINEFONTALIGNZONESTAG_H
 
+#include "SWF.h"
+
 // Forward declarations
 namespace gnash {
 	class movie_definition;
@@ -30,7 +32,8 @@ namespace gnash {
 namespace gnash {
 namespace SWF {
 
-class DefineFontAlignZonesTag {
+class DefineFontAlignZonesTag
+{
 public:
 
 	enum {
@@ -55,10 +58,6 @@ private:
 	unsigned _csm_table_int;
 
 };
-
-
-
-
 
 } // namespace gnash::SWF
 } // namespace gnash

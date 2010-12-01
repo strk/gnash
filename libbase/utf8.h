@@ -21,12 +21,13 @@
 #ifndef UTF8_H
 #define UTF8_H
 
-#include "dsodefs.h" // For DSOEXPORT
-#include "utility.h"
 #include <string>
-
 #include <boost/cstdint.hpp> // for C99 int types
-#include <limits>
+#include <vector>
+
+#include "dsodefs.h" // For DSOEXPORT
+
+namespace gnash {
 
 /// Utilities to convert between std::string and std::wstring.
 //
@@ -55,9 +56,7 @@
 /// Please note that, although this is called utf8, what the Adobe
 /// player uses is only loosely related to real unicode, so the
 /// encoding support here is correspondingly non-standard.
-namespace utf8
-{
-    static const boost::uint32_t invalid = std::numeric_limits<boost::uint32_t>::max();
+namespace utf8 {
 
     /// Converts a std::string with multibyte characters into a std::wstring.
     //
@@ -89,7 +88,7 @@ namespace utf8
     /// returned, unless the returned character is '\0', in which
     /// case the iterator does not advance.
     DSOEXPORT boost::uint32_t decodeNextUnicodeCharacter(std::string::const_iterator& it,
-                                                         const std::string::const_iterator& e);
+                                                     const std::string::const_iterator& e);
 
     /// \brief Encodes the given wide character into a canonical
     /// string, theoretically up to 6 chars in length.
@@ -142,8 +141,27 @@ namespace utf8
 
     /// Return name of a text encoding
     DSOEXPORT const char* textEncodingName(TextEncoding enc);
-}
 
+    enum EncodingGuess {
+        ENCGUESS_UNICODE = 0,
+        ENCGUESS_JIS = 1,
+        ENCGUESS_OTHER = 2
+    };
+
+    /// Common code for guessing at the encoding of random text, between
+    // Shift-Jis, UTF8, and other. Puts the DisplayObject count in length,
+    // and the offsets to the DisplayObjects in offsets, if offsets is not NULL.
+    // If not NULL, offsets should be at least s.length().
+    // offsets are not accurate if the return value is GUESSENC_OTHER
+    //
+    /// TODO: It's doubtful if this even works, and it may not be useful at
+    /// all.
+    EncodingGuess guessEncoding(const std::string& s, int& length,
+            std::vector<int>& offsets);
+
+
+} // namespace utf8
+} // namespace gnash
 
 #endif // UTF8_H
 

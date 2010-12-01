@@ -25,7 +25,6 @@
 
 #include "NetConnection_as.h"
 
-#include <iostream>
 #include <string>
 #include <utility>
 #include <boost/scoped_ptr.hpp>
@@ -1223,6 +1222,7 @@ void
 RTMPConnection::handleInvoke(const boost::uint8_t* payload,
         const boost::uint8_t* end)
 {
+    // TODO: clean up the logic in this function to reduce duplication.
 
     assert(payload != end);
 
@@ -1310,9 +1310,19 @@ RTMPConnection::handleInvoke(const boost::uint8_t* payload,
         callMethod(&_nc.owner(), NSV::PROP_ON_STATUS, arg);
         return;
     }
+
+    // Parse any arguments.
+    as_value arg;
+
+    amf::Reader rd(payload, end, getGlobal(_nc.owner()));
+    // TODO: use all args and check the order! We currently only use
+    // the last one!
+    while (rd(arg)) {
+        log_debug("Value: %s", arg);
+    }
     
     // Call method on the NetConnection object.    
-    callMethod(&_nc.owner(), methodname);
+    callMethod(&_nc.owner(), methodname, arg);
     
 }
 

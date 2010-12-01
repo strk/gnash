@@ -27,10 +27,12 @@
 // If we don't have support for mallinfo(), this code is useless
 #if HAVE_MALLINFO
 
+#include "gmemory.h"
+
 #include <vector>
+#include <iostream>
 
 #include "log.h"
-#include "gmemory.h"
 #include "getclocktime.hpp"
 
 using namespace std;

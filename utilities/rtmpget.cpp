@@ -33,6 +33,7 @@
 #include <algorithm>
 #include <iterator>
 #include <fstream>
+#include <iostream>
 
 using namespace gnash;
 

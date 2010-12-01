@@ -365,7 +365,7 @@ VideoInputGst::findVidDevs(std::vector<GnashWebcam*>& cameraList)
     
     if (element == NULL) {
         log_error("%s: Could not create video test source.", __FUNCTION__);
-        cameraList.push_back(NULL);
+	return;
     } else {
         cameraList.push_back(new GnashWebcam);
         GnashWebcam& cam = *cameraList.back();
@@ -381,7 +381,16 @@ VideoInputGst::findVidDevs(std::vector<GnashWebcam*>& cameraList)
     element = NULL;
     
     element = gst_element_factory_make ("v4lsrc", "v4lvidsrc");
+    if ( ! element ) {
+        log_error("%s: Could not create pulsesrc element", __FUNCTION__);
+        return;
+    }
     probe = GST_PROPERTY_PROBE (element);
+    if ( ! probe ) {
+        log_error("%s: Could not get property probe from pulsesrc element",
+            __FUNCTION__);
+        return;
+    }
     devarr = gst_property_probe_probe_and_get_values_name (probe, "device");
     for (size_t i = 0; devarr != NULL && i < devarr->n_values; ++i) {
         GValue *val;

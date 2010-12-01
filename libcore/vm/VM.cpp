@@ -24,7 +24,7 @@
 
 #include "VM.h"
 
-#include <iostream>
+#include <ostream>
 #include <memory>
 #include <boost/random.hpp> // for random generator
 #include <cstdlib> 

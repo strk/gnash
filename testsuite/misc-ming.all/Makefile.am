@@ -278,6 +278,9 @@ endif
 if ENABLE_RED5_TESTING
 check_SCRIPTS += red5test-runner
 endif
+if ENABLE_RTMPY_TESTING
+check_SCRIPTS += rtmpytest-runner
+endif
 endif
 
 if MING_VERSION_0_4
@@ -1493,6 +1496,15 @@ red5test-runner: $(srcdir)/../generic-testrunner.sh red5test.swf
 	sh $< -c "ENDOFTEST" $(top_builddir) red5test.swf > $@
 	chmod 755 $@
 
+rtmpytest.swf: $(srcdir)/rtmpytest.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
+	$(MAKESWF) -n network -r12 -o $@ -v7 -DRTMPY_HOST='\"$(RTMPY_HOST)\"' \
+		-DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 Dejagnu.swf $(srcdir)/rtmpytest.as \
+		$(srcdir)/../actionscript.all/dejagnu_so_fini.as
+
+rtmpytest-runner: $(srcdir)/../generic-testrunner.sh rtmpytest.swf
+	sh $< -c "ENDOFTEST" $(top_builddir) rtmpytest.swf > $@
+	chmod 755 $@
+
 case6.swf: $(srcdir)/case6.as Makefile ../actionscript.all/check.as
 	$(MAKESWF) -v6 -o $@ -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 -I$(srcdir)/../actionscript.all $(srcdir)/case6.as 
 
@@ -1733,6 +1745,9 @@ TEST_CASES += remotingTestRunner
 endif
 if ENABLE_RED5_TESTING
 TEST_CASES += red5test-runner
+endif
+if ENABLE_RTMPY_TESTING
+TEST_CASES += rtmpytest-runner
 endif
 endif
 

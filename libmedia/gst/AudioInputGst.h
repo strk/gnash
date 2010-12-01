@@ -42,26 +42,26 @@ class GnashAudio {
         ///       to the audio source element.
         ///
         /// @return GstElement* to the audio source element
-        GstElement* getElementPtr() {return _element;};
+        GstElement* getElementPtr() {return _element;}
         
         /// \brief Accessor to set the private _element variable from
         ///       the GnashAudio class.
         ///
         /// @param element The GstElement pointer to the audio source element.
-        void setElementPtr(GstElement* element) {_element = element;};
+        void setElementPtr(GstElement* element) {_element = element;}
         
         /// \brief Accessor to get the private _devLocation variable from
         ///       the GnashAudio class.
         ///
         /// @return The _devLocation private variable from GnashAudio class.
-        gchar* getDevLocation() {return _devLocation;};
+        gchar* getDevLocation() {return _devLocation;}
         
         /// \brief Accessor to set the private _devLocation variable from
         ///       the GnashAudio class.
         ///
         /// @param l A gchar* containing the physical location of the audio
         ///       input hardware device.
-        void setDevLocation(gchar *l) {_devLocation = l;};
+        void setDevLocation(gchar *l) {_devLocation = l;}
         
         /// \brief Accessor to return the private _gstreamerSrc variable
         ///       from the GnashAudio class.
@@ -69,28 +69,28 @@ class GnashAudio {
         /// @return The _gstreamerSrc variable from the GnashAudio class.
         ///        which should contain the type of the Gstreamer audio source
         ///        element (e.g. pulsesrc).
-        gchar* getGstreamerSrc() {return _gstreamerSrc;};
+        gchar* getGstreamerSrc() {return _gstreamerSrc;}
         
         /// \brief Accessor to set the private _gstreamerSrc variable
         ///       from the GnashAudio class.
         ///
         /// @param s A gchar* containing the type of the Gstreamer source
         ///         element type (e.g. pulsesrc)
-        void setGstreamerSrc(gchar *s) {_gstreamerSrc = s;};
+        void setGstreamerSrc(gchar *s) {_gstreamerSrc = s;}
         
         /// \brief Accessor to get the private _productName variable
         ///       from the GnashAudio class.
         ///
         /// @return A gchar* containing the audio input's hardware name
         ///       (e.g. HDA Intel).
-        gchar* getProductName() {return _productName;};
+        gchar* getProductName() {return _productName;}
         
         /// \brief Accessor to set the private _productName variable
         ///       from the GnashAudio class.
         ///
         /// @param n A gchar* to the hardware input device's hardware name
         ///         (e.g. HDA Intel).
-        void setProductName(gchar *n) {_productName = n;};
+        void setProductName(gchar *n) {_productName = n;}
 
         /// Constructor for the GnashAudio class.
         GnashAudio();

@@ -21,14 +21,14 @@
 #define GNASH_RC_H
 
 #include "dsodefs.h"
-#include "StringPredicates.h"
-
 #include <string>
 #include <vector>
-#include <iostream>
+#include <iosfwd>
 #include <sstream>
 #include <boost/cstdint.hpp>
 #include <boost/tokenizer.hpp>
+
+#include "StringPredicates.h"
 
 #if !defined(_WIN32) && !defined(__HAIKU__) && !defined(ANDROID)
 #include <sys/shm.h>
@@ -392,10 +392,6 @@ protected:
             std::istringstream in(value);
             if (in >> num) return true;
             
-            // If conversion fails, set value to 0 rather than leaving
-            // it as the default.
-            std::cerr << "Conversion overflow in extractNumber: " << 
-                value << std::endl;
             num = 0;
             return true;
         }

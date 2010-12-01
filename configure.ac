@@ -2170,8 +2170,6 @@ if test x$has_speexdsp = xyes ; then
 fi
 
 dnl Find freetype and fontconfig
-dnl GNASH_PKG_FIND(freetype2, [freetype/freetype.h], [freetype2 font library], FT_Load_Char)
-dnl rob might be working on this or not ;)
 GNASH_PATH_FREETYPE2
 GNASH_PKG_FIND(fontconfig, [fontconfig/fontconfig.h], [fontconfig library], FcFontMatch)
 
@@ -2206,11 +2204,17 @@ AM_CONDITIONAL(MING_VERSION_0_4_4,
         [ test $MING_VERSION_CODE -ge 00040400 ])
 
 if test x$cross_compiling = xno; then
-  AC_ARG_WITH([swfdec_testsuite],
-	  AC_HELP_STRING([--with-swfdec-testsuite],
-		  [directory where swfdec testsuite (the 'test' dir) is]),
-	SWFDEC_TESTSUITE=${withval})
-  AC_SUBST(SWFDEC_TESTSUITE)
+    AC_ARG_WITH([swfdec_testsuite],
+        AC_HELP_STRING([--with-swfdec-testsuite],
+            [directory where swfdec testsuite (the 'test' dir) is]),
+        if test x"${withval}" = xyes; then
+            dir=`dirname $0`
+            dir=`cd ${dir} && pwd`
+            withval="${dir}/testsuite/swfdec/src/test"
+        fi
+        SWFDEC_TESTSUITE=${withval}
+    )
+    AC_SUBST(SWFDEC_TESTSUITE)
 fi
 AM_CONDITIONAL(ENABLE_SWFDEC_TESTSUITE, [ test x"$SWFDEC_TESTSUITE" != x ])
 
@@ -2241,6 +2245,20 @@ if test x$cross_compiling = xno; then
   AC_SUBST(RED5_HOST)
 fi
 AM_CONDITIONAL(ENABLE_RED5_TESTING, [ test x"$RED5_HOST" != x ])
+
+if test x$cross_compiling = xno; then
+  AC_ARG_ENABLE([rtmpy_testing],
+      dnl # TODO: find out how to add [quotes] around '=<baseurl>'
+	  AC_HELP_STRING([--enable-rtmpy-testing=<host>],
+		  [Enable rtmpy based testing (default host is www.gnashdev.org)]),
+	      [case "${enableval}" in
+             no) RTMPY_HOST="" ;;
+            yes) RTMPY_HOST="www.gnashdev.org" ;;
+              *) RTMPY_HOST="${enableval}";;
+           esac])
+  AC_SUBST(RTMPY_HOST)
+fi
+AM_CONDITIONAL(ENABLE_RTMPY_TESTING, [ test x"$RTMPY_HOST" != x ])
 
 dnl The name might differ between systems.
 if test x"$testsuite" = x"yes"; then
@@ -3911,6 +3929,8 @@ if test -s $cwarn; then
   echo ""
   echo "Gnash should still compile even with these warnings."
   echo "If it doesn't, report the warnings as a bug."
+else
+  rm $cwarn
 fi
 
 if test -s $crec; then
@@ -3919,6 +3939,8 @@ if test -s $crec; then
   rm $crec
   echo ""
   echo "Gnash should still compile, but you'll miss important support"
+else
+  rm $crec
 fi
 
 dnl If anything critical is missing, don't bother to continue
@@ -3927,7 +3949,10 @@ if test -s $cerr; then
   cat $cerr >&2
   rm $cerr
   AC_MSG_ERROR([Please install required packages])
+else
+  rm $cerr
 fi
+
 
 if test x"$fork" = x"no"; then
   AC_MSG_ERROR([Currently only forking the standalone player works!])

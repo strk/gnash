@@ -17,14 +17,14 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-AUTOMAKE_OPTIONS = dejagnu
+AUTOMAKE_OPTIONS = dejagnu -Wno-portability
 
 # Temporarly always disable MING, distribution
 # of the generated SWF should work, but it's currently
 # broken and needs to be used in misc-ming.all too
 # so I take responsibility of dropping that for the moment...
 
-abs_mediadir = `cd $(srcdir)/../media; pwd`
+abs_mediadir = $(shell cd $(srcdir)/../media; pwd)
 swfdir = `cd $(top_builddir)/testsuite/actionscript.all; pwd`
 DEF_MAKESWF_FLAGS=-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\"$(abs_mediadir)\"' -DSWFDIR='\"$(swfdir)\"'
 

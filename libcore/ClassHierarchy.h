@@ -27,6 +27,8 @@
 #include <vector>
 #include <iosfwd>
 
+#include "ObjectURI.h"
+
 namespace gnash {
     class Extension;
     class as_object;

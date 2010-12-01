@@ -18,14 +18,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "WAVWriter.h"
-#include "GnashException.h" // for SoundException
-#include "log.h" // will import boost::format too
 
 #include <cstring> // for strncpy
 #include <boost/cstdint.hpp>
 #include <fstream> // for composition (file_stream)
-#include <iostream>
+#include <iostream> 
 
+#include "GnashException.h" // for SoundException
+#include "log.h" // will import boost::format too
 
 namespace gnash {
 namespace sound {

@@ -76,7 +76,6 @@
 #include <set>
 #include <bitset>
 #include <boost/noncopyable.hpp>
-#include <boost/thread/thread.hpp>
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "dsodefs.h" // DSOEXPORT

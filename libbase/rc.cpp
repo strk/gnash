@@ -23,18 +23,9 @@
 # include "gnashconfig.h"
 #endif
 
-#include "StringPredicates.h"
-#include "log.h"
 #include "rc.h"
 
-#ifdef HAVE_PWD_H
-# include <pwd.h>
-#endif
-
 #include <boost/cstdint.hpp>
-#include <sys/types.h>
-#include <unistd.h> // for getuid()
-#include <sys/stat.h>
 #include <limits>
 #include <cstdlib> // getenv
 #include <string>
@@ -42,13 +33,23 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-
 #include <boost/format.hpp>
+
+#include <sys/types.h>
+#include <unistd.h> // for getuid()
+#include <sys/stat.h>
+
+#ifdef HAVE_PWD_H
+# include <pwd.h>
+#endif
 
 #ifdef HAIKU_HOST
 # include <Path.h>
 # include <FindDirectory.h>
 #endif
+
+#include "StringPredicates.h"
+#include "log.h"
 
 using std::endl;
 using std::cout;

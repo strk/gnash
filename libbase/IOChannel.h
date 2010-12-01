@@ -21,17 +21,18 @@
 #ifndef GNASH_IOCHANNEL_H
 #define GNASH_IOCHANNEL_H
 
-#include "dsodefs.h" // DSOEXPORT
-#include "GnashException.h" // for IOException inheritance
-
 #include <string>
 #include <boost/cstdint.hpp> // for boost int types
 #include <ios>
 
+#include "dsodefs.h" // DSOEXPORT
+#include "GnashException.h" // for IOException inheritance
+
 namespace gnash {
 
 /// Exception signalling an IO error
-class DSOEXPORT IOException : public GnashException {
+class DSOEXPORT IOException : public GnashException
+{
 public:
     IOException(const std::string& s) : GnashException(s) {}
     IOException() : GnashException("IO error") {}
