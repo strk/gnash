@@ -1,4 +1,4 @@
-%define pfx /opt/freescale/rootfs/%{_target_cpu}
+%define pfx /opt/L2.6.31_09.12.01_SDK/ltib/rootfs
 
 Name:           gnash
 # This next field gets edited by "make gnash.spec" when building an rpm
@@ -65,23 +65,6 @@ Common files Shared between Gnash and Klash, Gnash/Klash is a GNU SWF movie
 player that supports many SWF v7 features, with growing support for
 swf v8, v9, and v10.
 
-%package klash4
-Summary:   Konqueror SWF player plugin for KDE 4
-Group:     Applications/Multimedia
-Requires:  gnash-common
-Requires:  kdelibs >= 4, kdebase >= 4, qt >= 4, gnash
-
-%description klash4
-The gnash (klash) SWF player plugin for Konqueror in KDE4.
-
-%package plugin
-Summary:   Web-client SWF player plugin 
-Group:     Applications/Internet
-Requires:  gnash, gnash-common
-
-%description plugin
-The gnash SWF player plugin for firefox or mozilla.
-
 %package devel
 Summary:   Gnash header files
 Group:     Applications/Multimedia
@@ -90,43 +73,10 @@ Requires:  gnash-common
 %description devel
 Gnash header files can be used to write external Gnash extensions.
 
-%package widget
-Summary:   Gnash widgets for Gtk and Python
-Group:     Applications/Multimedia
-Requires:  gnash, gnash-common
-
-%description widget
-The Gnash widgets can be used to embed Gnash into any Gtk or Python-Gtk
-application.
-
-%package fileio-extension
-Summary:   Fileio extension for Gnash
-Group:     Applications/Multimedia
-Requires:  gnash-common
-
-%description fileio-extension
-This extension allows SWF files being played within Gnash to have direct access
-to the file system. The API is similar to the C library one.
-
-%package lirc-extension
-Summary:   LIRC extension for Gnash
-Group:     Applications/Multimedia
-Requires:  gnash-common
-
-%description lirc-extension
-This extension allows SWF files being played within Gnash to have direct access
-to a LIRC based remote control device. The API is similar to the standard
-LIRC one.
-
 %prep
 %setup -q
 
 %build
-
-# Build rpms for an ARM based processor
-%ifarch arm
-RPM_TARGET=%{_target}
-%endif
 
 CROSS_OPTS="--host=arm-linux --with-sysroot=/opt/L2.6.31_09.12.01_SDK/ltib/rootfs/usr"
 # these are actually the default values, but this way they get added
@@ -158,8 +108,8 @@ sh ./configure \
 	--infodir=%{_prefix}/share/info \
 	--disable-dependency-tracking \
 	--disable-testsuite \
-	--disable-rpath
-
+	--disable-rpath \
+        --enable-sound=none
 make $MAKEFLAGS dumpconfig all
 
 # When testing the spec file, try setting MAKEFLAGS to
@@ -192,8 +142,8 @@ scrollkeeper-update -q || :
 
 %files
 %defattr(-,root,root,-)
-%{_bindir}/gtk-gnash
-%{_datadir}/man/man1/gtk-gnash.1.gz
+%{_bindir}/fb-gnash
+# %{_datadir}/man/man1/gtk-gnash.1.gz
 
 %files common
 %defattr(-,root,root,-)
@@ -232,10 +182,6 @@ scrollkeeper-update -q || :
 # %doc %{_prefix}/share/gnash/doc/gnash/C/*.xml
 %endif
 
-%files plugin
-%defattr(-,root,root,-)
-%{_libdir}/mozilla/plugins/libgnashplugin.so
-
 %files devel
 %{_prefix}/include/gnash/*.h*
 %{_prefix}/include/gnash/vm/*.h
@@ -243,26 +189,10 @@ scrollkeeper-update -q || :
 %{_prefix}/include/gnash/parser/*.h
 %{_prefix}/lib/pkgconfig/gnash.pc
 
-%files widget
-%{_prefix}/include/gnash/*.h
-%{_prefix}/lib/python*/site-packages/gtk-2.0/gnash.*
-
-%files klash4
-%defattr(-,root,root,-)
-%{_bindir}/kde4-gnash
-%{_datadir}/man/man1/kde4-gnash.1.gz
-%{_libdir}/kde4/libklashpart.*
-%{_prefix}/share/kde4/apps/klash/klashpartui.rc
-%{_prefix}/share/kde4/apps/klash/pluginsinfo
-%{_prefix}/share/kde4/services/klash_part.desktop
-
-%files fileio-extension
-%{_libdir}/gnash/plugins/fileio.so
-
-%files lirc-extension
-%{_libdir}/gnash/plugins/lirc.so
-
 %changelog
+* Sat Nov 30 2010 Rob Savoye <rob@welcomehome.org> - %{version}-%{release}
+- Drop most of the packages for ltib builds.
+
 * Sat Mar 27 2010 Rob Savoye <rob@welcomehome.org> - %{version}-%{release}
 - add gnash-common package for non GUI files so as not to contaminate
   the gtk or kde packages. 
