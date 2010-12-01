@@ -24,9 +24,11 @@
 
 #include "gst/gst.h"
 #include "AudioInputGst.h"
-#include <gst/interfaces/propertyprobe.h>
 #include "log.h"
 #include "rc.h"
+
+#include <cstring>
+#include <gst/interfaces/propertyprobe.h>
 
 namespace {
     //get rc file for default mic selection
