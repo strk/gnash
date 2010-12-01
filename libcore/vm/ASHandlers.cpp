@@ -26,7 +26,6 @@
 
 #include <string>
 #include <vector>
-#include <cstdlib> // std::mbstowcs
 #include <boost/scoped_array.hpp>
 #include <boost/random.hpp>
 #include <boost/lexical_cast.hpp>

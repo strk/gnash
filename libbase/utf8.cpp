@@ -26,6 +26,7 @@
 #include <boost/cstdint.hpp>
 #include <string>
 #include <vector>
+#include <cstdlib>
 
 namespace gnash {
 namespace utf8 {
