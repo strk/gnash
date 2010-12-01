@@ -24,7 +24,6 @@
 #include "GnashSystemNetHeaders.h"
 
 #include <cerrno> 
-#include <iostream>
 #include <algorithm> // for find / find_if
 #include <cstring> // for strerror
 #include <cstdio>

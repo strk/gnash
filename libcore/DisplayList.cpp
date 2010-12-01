@@ -27,7 +27,7 @@
 #include "ObjectURI.h"
 
 #include <typeinfo>
-#include <iostream>
+#include <ostream>
 #include <algorithm>
 #include <stack>
 #include <cassert>

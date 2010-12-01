@@ -29,7 +29,6 @@
 #include <limits>
 #include <algorithm>
 #include <cassert> // for inlines
-#include <iostream> // temporary include for debugging
 #include <cmath> // for floor / ceil
 
 namespace gnash {

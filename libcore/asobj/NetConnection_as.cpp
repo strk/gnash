@@ -25,7 +25,6 @@
 
 #include "NetConnection_as.h"
 
-#include <iostream>
 #include <string>
 #include <utility>
 #include <boost/scoped_ptr.hpp>

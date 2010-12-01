@@ -20,13 +20,13 @@
 #ifndef GNASH_RECT_H
 #define GNASH_RECT_H
 
+#include <string>
+#include <cassert> 
+#include <ostream> 
+#include <boost/cstdint.hpp>
+
 #include "dsodefs.h"
 #include "Range2d.h"
-
-#include <string>
-#include <cassert> // for inlines
-#include <iostream> // for output operator
-#include <boost/cstdint.hpp>
 
 // Forward decl
 namespace gnash {
