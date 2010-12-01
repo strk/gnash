@@ -31,6 +31,7 @@
 
 #include <vector>
 #include <string>
+#include <iostream>
 
 namespace {
     //get rc file for webcam selection

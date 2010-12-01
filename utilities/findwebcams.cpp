@@ -20,12 +20,13 @@
 #include "gnashconfig.h"
 #endif
 
+#include <vector>
+#include <string>
+#include <iostream>
+
 #include "rc.h"
 #include "gst/gst.h"
 #include <gst/interfaces/propertyprobe.h>
-
-#include <vector>
-#include <string>
 
 namespace {
     //get rc file for webcam selection
