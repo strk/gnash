@@ -23,6 +23,7 @@
 #include <cstdio>
 #include <string>
 #include <boost/format.hpp>
+#include <iostream>
 
 #include "IOChannel.h" // for inheritance
 #include "GnashSystemIOHeaders.h" // for read
@@ -37,7 +38,6 @@
 
 namespace gnash {
 namespace noseek_fd_adapter {
-
 
 /***********************************************************************
  *
