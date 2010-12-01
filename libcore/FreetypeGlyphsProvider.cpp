@@ -22,6 +22,12 @@
 #endif
 
 #include "FreetypeGlyphsProvider.h"
+
+#include <string>
+#include <memory> // for auto_ptr
+#include <boost/cstdint.hpp>
+#include <boost/format.hpp>
+
 #include "smart_ptr.h" // for intrusive_ptr
 #include "GnashException.h"
 #include "ShapeRecord.h"
@@ -55,11 +61,6 @@
 # include <Path.h>
 # include <FindDirectory.h>
 #endif
-
-#include <string>
-#include <memory> // for auto_ptr
-#include <boost/cstdint.hpp>
-#include <boost/format.hpp>
 
 // Define the following to make outline decomposition verbose
 //#define DEBUG_OUTLINE_DECOMPOSITION 1
@@ -249,21 +250,21 @@ FreetypeGlyphsProvider::init()
 
     if (m_lib) return; 
 
-    int error = FT_Init_FreeType(&m_lib);
+    const int error = FT_Init_FreeType(&m_lib);
     if (error) {
-        std::cerr << boost::format(_("Can't init FreeType! Error "
-                    "= %d")) % error << std::endl;
-        exit(EXIT_FAILURE);
+        boost::format err = boost::format(_("Can't init FreeType! Error "
+                    "= %d")) % error;
+        throw GnashException(err.str());
     }
 }
 
 // static private
-void FreetypeGlyphsProvider::close()
+void
+FreetypeGlyphsProvider::close()
 {
-    int error = FT_Done_FreeType(m_lib);
+    const int error = FT_Done_FreeType(m_lib);
     if (error) {
-        std::cerr << boost::format(_("Can't close FreeType! Error "
-                                     "= %d")) % error << std::endl;
+        log_error(_("Can't close FreeType! Error %d"), error);
     }
 }
 
@@ -375,8 +376,9 @@ FreetypeGlyphsProvider::createFace(const std::string& name, bool bold, bool ital
     std::auto_ptr<FreetypeGlyphsProvider> ret;
 
     try { 
-        ret.reset( new FreetypeGlyphsProvider(name, bold, italic) );
-    } catch (GnashException& ge) {
+        ret.reset(new FreetypeGlyphsProvider(name, bold, italic));
+    }
+    catch (const GnashException& ge) {
         log_error(ge.what());
         assert(! ret.get());
     }
