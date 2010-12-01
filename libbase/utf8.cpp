@@ -20,11 +20,22 @@
 //
 // Much useful info at "UTF-8 and Unicode FAQ" http://www.cl.cam.ac.uk/~mgk25/unicode.html
 
-
 #include "utf8.h"
 
+#include <limits>
+#include <boost/cstdint.hpp>
+#include <string>
+#include <vector>
+
+namespace gnash {
+namespace utf8 {
+
+namespace {
+    const boost::uint32_t invalid = std::numeric_limits<boost::uint32_t>::max();
+}
+
 std::wstring
-utf8::decodeCanonicalString(const std::string& str, int version)
+decodeCanonicalString(const std::string& str, int version)
 {
     
     std::wstring wstr;
@@ -33,7 +44,7 @@ utf8::decodeCanonicalString(const std::string& str, int version)
     
     if (version > 5) {
         while (boost::uint32_t code = decodeNextUnicodeCharacter(it, e)) {
-            if (code == utf8::invalid) {
+            if (code == invalid) {
                 continue;        
             }
             wstr.push_back(static_cast<wchar_t>(code));
@@ -52,7 +63,7 @@ utf8::decodeCanonicalString(const std::string& str, int version)
 }
 
 std::string
-utf8::encodeCanonicalString(const std::wstring& wstr, int version)
+encodeCanonicalString(const std::wstring& wstr, int version)
 {
 
     std::string str;
@@ -69,7 +80,7 @@ utf8::encodeCanonicalString(const std::wstring& wstr, int version)
 }
 
 std::string
-utf8::encodeLatin1Character(boost::uint32_t ucsCharacter)
+encodeLatin1Character(boost::uint32_t ucsCharacter)
 {
     std::string text;
     text.push_back(static_cast<unsigned char>(ucsCharacter));
@@ -78,8 +89,8 @@ utf8::encodeLatin1Character(boost::uint32_t ucsCharacter)
 
 
 boost::uint32_t
-utf8::decodeNextUnicodeCharacter(std::string::const_iterator& it,
-                                 const std::string::const_iterator& e)
+decodeNextUnicodeCharacter(std::string::const_iterator& it,
+                             const std::string::const_iterator& e)
 {
     boost::uint32_t uc;
 
@@ -104,7 +115,7 @@ utf8::decodeNextUnicodeCharacter(std::string::const_iterator& it,
 #define NEXT_BYTE(shift)                        \
                     \
     if (it == e || *it == 0) return 0; /* end of buffer, do not advance */    \
-    if ((*it & 0xC0) != 0x80) return utf8::invalid; /* standard check */    \
+    if ((*it & 0xC0) != 0x80) return invalid; /* standard check */    \
     /* Post-increment iterator: */        \
     uc |= (*it++ & 0x3F) << shift;
 
@@ -118,7 +129,7 @@ utf8::decodeNextUnicodeCharacter(std::string::const_iterator& it,
         // Two-byte sequence.
         FIRST_BYTE(0x1F, 6);
         NEXT_BYTE(0);
-        if (uc < 0x80) return utf8::invalid;    // overlong
+        if (uc < 0x80) return invalid;    // overlong
         return uc;
     }
     else if ((*it & 0xF0) == 0xE0) {
@@ -127,7 +138,7 @@ utf8::decodeNextUnicodeCharacter(std::string::const_iterator& it,
         NEXT_BYTE(6);
         NEXT_BYTE(0);
         if (uc < 0x800) {
-            return utf8::invalid;
+            return invalid;
         }
         return uc;
     }
@@ -137,20 +148,20 @@ utf8::decodeNextUnicodeCharacter(std::string::const_iterator& it,
         NEXT_BYTE(12);
         NEXT_BYTE(6);
         NEXT_BYTE(0);
-        if (uc < 0x010000) return utf8::invalid;    // overlong
+        if (uc < 0x010000) return invalid;    // overlong
         return uc;
     }
     else {
         // Invalid.
         it++;
-        return utf8::invalid;
+        return invalid;
     }
 }
 
 // TODO: buffer as std::string; index (iterator); 
 
 std::string
-utf8::encodeUnicodeCharacter(boost::uint32_t ucs_character)
+encodeUnicodeCharacter(boost::uint32_t ucs_character)
 {
 
     std::string text;
@@ -193,7 +204,7 @@ utf8::encodeUnicodeCharacter(boost::uint32_t ucs_character)
 #define ENC_UTF16LE 3
 
 char*
-utf8::stripBOM(char* in, size_t& size, TextEncoding& encoding)
+stripBOM(char* in, size_t& size, TextEncoding& encoding)
 {
     encoding = encUNSPECIFIED;
     if ( size > 2 )
@@ -247,7 +258,7 @@ utf8::stripBOM(char* in, size_t& size, TextEncoding& encoding)
 }
 
 const char*
-utf8::textEncodingName(TextEncoding enc)
+textEncodingName(TextEncoding enc)
 {
     switch (enc)
     {
@@ -265,6 +276,99 @@ utf8::textEncodingName(TextEncoding enc)
     }
 }
 
+EncodingGuess
+guessEncoding(const std::string &str, int &length, std::vector<int>& offsets)
+{
+    int width = 0; // The remaining width, not the total.
+    bool is_sought = true;
+
+    std::string::const_iterator it = str.begin();
+    const std::string::const_iterator e = str.end();
+
+    length = 0;
+    
+    // First, assume it's UTF8 and try to be wrong.
+    while (it != e && is_sought) {
+        ++length;
+
+        offsets.push_back(it - str.begin()); // current position
+
+        // Advances the iterator to point to the next 
+        boost::uint32_t c = utf8::decodeNextUnicodeCharacter(it, e);
+
+        if (c == utf8::invalid) {
+            is_sought = false;
+            break;
+        }
+    }
+
+    offsets.push_back(it - str.begin()); // current position
+
+    if (it == e && is_sought) {
+        // No characters left, so it's almost certainly UTF8.
+        return ENCGUESS_UNICODE;
+    }
+
+    it = str.begin();
+    int index = 0;
+    is_sought = true;
+    width = 0;
+    length = 0;
+    bool was_odd = true;
+    bool was_even = true;
+    // Now, assume it's SHIFT_JIS and try to be wrong.
+    while (it != e && is_sought) {
+        int c = static_cast<int> (*it);
+
+        if (width) {
+            --width;
+            if ((c < 0x40) || ((c < 0x9F) && was_even) ||
+                ((c > 0x9E) && was_odd) || (c == 0x7F)) {
+                is_sought = false;
+            }
+            continue;
+        }
+
+        ++length;
+        offsets.push_back(index); // [length - 1] = index;
+
+        if ((c == 0x80) || (c == 0xA0) || (c >= 0xF0)) {
+            is_sought = false;
+            break;
+        }
+
+        if (((c >= 0x81) && (c <= 0x9F)) || ((c >= 0xE0) && (c <= 0xEF))) {
+            width = 1;
+            was_odd = c & 0x01;
+            was_even = !was_odd;
+        }
+    
+        it++;
+        index++;    
+    }
+    offsets.push_back(index); // [length - 1] = index;
+    
+    if (!width && is_sought) {
+        // No width left, so it's probably SHIFT_JIS.
+        return ENCGUESS_JIS;
+    }
+
+    // It's something else.
+#ifdef ANDROID
+    length = str.size();
+#else
+    length = std::mbstowcs(NULL, str.c_str(), 0);
+#endif
+    if (length == -1)
+    {
+        length = str.length();
+    }
+    return ENCGUESS_OTHER;
+}
+
+
+} // namespace utf8
+} // namespace gnash
 
 // Local Variables:
 // mode: C++

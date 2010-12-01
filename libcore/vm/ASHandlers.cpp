@@ -96,22 +96,6 @@ namespace {
     /// @param thread           The current execution thread.
     void commonSetTarget(ActionExec& thread, const std::string& target_name);
 
-    enum as_encoding_guess_t {
-        ENCGUESS_UNICODE = 0,
-        ENCGUESS_JIS = 1,
-        ENCGUESS_OTHER = 2
-    };
-
-    /// Common code for guessing at the encoding of random text, between
-    // Shift-Jis, UTF8, and other. Puts the DisplayObject count in length,
-    // and the offsets to the DisplayObjects in offsets, if offsets is not NULL.
-    // If not NULL, offsets should be at least s.length().
-    // offsets are not accurate if the return value is GUESSENC_OTHER
-    //
-    /// NB It's doubtful if this even works.
-    as_encoding_guess_t guessEncoding(const std::string& s, int& length,
-            std::vector<int>& offsets);
-
     
     void ActionEnd(ActionExec& thread);
     void ActionNextFrame(ActionExec& thread);
@@ -1488,7 +1472,7 @@ ActionMbLength(ActionExec& thread)
         int length;
         std::vector<int> unused;
         unused.resize(str.length()+1);
-        guessEncoding(str, length, unused);
+        utf8::guessEncoding(str, length, unused);
         env.top(0).set_double(length);
     }
 }
@@ -1582,7 +1566,7 @@ ActionMbSubString(ActionExec& thread)
     int length = 0;
     std::vector<int> offsets;
 
-    as_encoding_guess_t encoding = guessEncoding(str, length, offsets);
+    utf8::EncodingGuess encoding = utf8::guessEncoding(str, length, offsets);
 
     if (size < 0) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1619,7 +1603,7 @@ ActionMbSubString(ActionExec& thread)
         size = length - start;
     }
 
-    if (encoding == ENCGUESS_OTHER) {
+    if (encoding == utf8::ENCGUESS_OTHER) {
         env.top(0).set_string(str.substr(start, size));
     }
     else {
@@ -3688,96 +3672,6 @@ commonSetTarget(ActionExec& thread, const std::string& target_name)
     }
     
     env.set_target(new_target);
-}
-
-as_encoding_guess_t
-guessEncoding(const std::string &str, int &length, std::vector<int>& offsets)
-{
-    int width = 0; // The remaining width, not the total.
-    bool is_sought = true;
-
-    std::string::const_iterator it = str.begin();
-    const std::string::const_iterator e = str.end();
-
-    length = 0;
-    
-    // First, assume it's UTF8 and try to be wrong.
-    while (it != e && is_sought) {
-        ++length;
-
-        offsets.push_back(it - str.begin()); // current position
-
-        // Advances the iterator to point to the next 
-        boost::uint32_t c = utf8::decodeNextUnicodeCharacter(it, e);
-
-        if (c == utf8::invalid) {
-            is_sought = false;
-            break;
-        }
-    }
-
-    offsets.push_back(it - str.begin()); // current position
-
-    if (it == e && is_sought) {
-        // No characters left, so it's almost certainly UTF8.
-        return ENCGUESS_UNICODE;
-    }
-
-    it = str.begin();
-    int index = 0;
-    is_sought = true;
-    width = 0;
-    length = 0;
-    bool was_odd = true;
-    bool was_even = true;
-    // Now, assume it's SHIFT_JIS and try to be wrong.
-    while (it != e && is_sought) {
-        int c = static_cast<int> (*it);
-
-        if (width) {
-            --width;
-            if ((c < 0x40) || ((c < 0x9F) && was_even) ||
-                ((c > 0x9E) && was_odd) || (c == 0x7F)) {
-                is_sought = false;
-            }
-            continue;
-        }
-
-        ++length;
-        offsets.push_back(index); // [length - 1] = index;
-
-        if ((c == 0x80) || (c == 0xA0) || (c >= 0xF0)) {
-            is_sought = false;
-            break;
-        }
-
-        if (((c >= 0x81) && (c <= 0x9F)) || ((c >= 0xE0) && (c <= 0xEF))) {
-            width = 1;
-            was_odd = c & 0x01;
-            was_even = !was_odd;
-        }
-    
-        it++;
-        index++;    
-    }
-    offsets.push_back(index); // [length - 1] = index;
-    
-    if (!width && is_sought) {
-        // No width left, so it's probably SHIFT_JIS.
-        return ENCGUESS_JIS;
-    }
-
-    // It's something else.
-#ifdef ANDROID
-    length = str.size();
-#else
-    length = std::mbstowcs(NULL, str.c_str(), 0);
-#endif
-    if (length == -1)
-    {
-        length = str.length();
-    }
-    return ENCGUESS_OTHER;
 }
 
 }
