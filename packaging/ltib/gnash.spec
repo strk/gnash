@@ -1,49 +1,24 @@
-%define pfx /opt/L2.6.31_09.12.01_SDK/ltib/rootfs
+%define pfx /opt/freescale/rootfs/%{_target_cpu}
 
 Name:           gnash
-# This next field gets edited by "make gnash.spec" when building an rpm
 Version:        0.8.9dev
 Release:        0
 Epoch: 		1
-# This next field gets edited by "make gnash.spec" when building an rpm
-Distribution:	fc13
+Distribution:	ltib
 Summary:        GNU SWF player
 
 Group:          Applications/Multimedia
 Vendor:		Gnash Project
-Packager:	Rob Savoye <rob@welcomehome.org>
+Packager:	Rob Savoye <rob@senecass.com>
 License:        GPLv3
 URL:            http://www.gnu.org/software/gnash/
 Source:         gnash-0.8.9dev.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%{_target_cpu}
 
-# bitmap libraries for loading images
-#BuildRequires:  libpng-devel libjpeg-devel giflib-devel
-# these are needed for the python gtk widget
-#BuildRequires:  pygtk2-devel python-devel
-#BuildRequires:  gtk2-devel freetype-devel fontconfig-devel
-#BuildRequires:  openssl-devel curl-devel boost-devel
-#BuildRequires:  gstreamer-devel >= 0.10, gstreamer-plugins-base-devel >= 0.10
-# these are for the kde4 support
-#BuildRequires:  kdelibs-devel >= 4.0, kdebase-devel >= 4.0, qt-devel >= 4.0
-# these are needed for the various renderers, which now all get built
-#BuildRequires:  libXt-devel agg-devel gtkglext-devel libstdc++
+# BuildRequires:  ffmpeg libpng libjpeg giflib boost agg curl freetype libstdc++ fontconfig
 
-# The default Gnash package only includes the GTK parts, the rest
-# is in gnash-common.
-Requires:  gtkglext gtk2 pygtk2 python
-Requires:  gnash-common
-
-Requires:   boost-date-time boost-thread boost-program-options
-
-# BuildRequires:  scrollkeeper
-
-#Requires(post): scrollkeeper
-#Requires(postun): scrollkeeper
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-#Requires(post): /sbin/install-info
-#Requires(preun): /sbin/install-info
 
 %description
 Gnash is a GNU SWF movie player that supports many SWF v7 features,
@@ -53,12 +28,7 @@ with growing support for swf v8, v9, and v10.
 Summary:   Web-client SWF player plugin 
 Group:     Applications/Multimedia
 # Installation requirements
-Requires:  libpng libjpeg giflib
-Requires:  boost agg 
-Requires:  freetype fontconfig libstdc++
-Requires:  gstreamer >= 0.10, gstreamer-plugins-base >= 0.10
-Requires:  openssl curl
-# libX11 libExt libXv
+Requires:  ffmpeg libpng libjpeg giflib boost curl freetype
 
 %description common
 Common files Shared between Gnash and Klash, Gnash/Klash is a GNU SWF movie
@@ -78,11 +48,11 @@ Gnash header files can be used to write external Gnash extensions.
 
 %build
 
-CROSS_OPTS="--host=arm-linux --with-sysroot=/opt/L2.6.31_09.12.01_SDK/ltib/rootfs/usr"
+CROSS_OPTS="--host=arm-none-linux=gnueabi --with-sysroot=/opt/L2.6.31_10.07.11_ER/ltib/rootfs/usr"
 # these are actually the default values, but this way they get added
 # to the build so they appear in "gnash --version".
 GUI="--enable-gui=fb"	# could be kde3, kde4, aqua, sdl
-SOUND="--enable-media=none"
+SOUND="--enable-media=ffmpeg"
 OTHER="--disable-jemalloc"
 RENDERER="--enable-renderer=agg"		# could be opengl or cairo
 OPTIONAL=""
