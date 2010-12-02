@@ -117,6 +117,13 @@ private:
     DisplayObject* _target;
 };
 
+void
+clear(movie_root::ActionQueue& aq)
+{
+    std::for_each(aq.begin(), aq.end(), 
+            boost::mem_fn(&movie_root::ActionQueue::value_type::clear));
+}
+
 } // anonymous namespace
 
 
@@ -180,26 +187,10 @@ movie_root::nextUnnamedInstance()
     return ++_unnamedInstance;
 }
 
-void
-movie_root::clearActionQueue()
-{
-    for (size_t lvl = 0; lvl < _actionQueue.size(); ++lvl) {
-        ActionQueue& q = _actionQueue[lvl];
-        q.clear();
-    }
-}
-
-void
-movie_root::clearIntervalTimers()
-{
-    deleteSecondElements(_intervalTimers.begin(), _intervalTimers.end());
-    _intervalTimers.clear();
-}
-
 movie_root::~movie_root()
 {
-    clearActionQueue();
-    clearIntervalTimers();
+    clear(_actionQueue);
+    _intervalTimers.clear();
     _movieLoader.clear();
 
     assert(testInvariant());
@@ -266,7 +257,7 @@ movie_root::handleActionLimitHit(const std::string& msg)
     if ( disable )
     {
         disableScripts();
-        clearActionQueue();
+        clear(_actionQueue);
     }
 }
 
@@ -310,15 +301,14 @@ movie_root::setLevel(unsigned int num, Movie* movie)
             log_debug("Replacing starting movie");
         }
 
-        if ( num == 0 )
-        {
+        if (num == 0) {
+
             log_debug("Loading into _level0");
 
             // NOTE: this was tested but not automated, the
             //       test sets an interval and then loads something
             //       in _level0. The result is the interval is disabled.
-            clearIntervalTimers();
-
+            _intervalTimers.clear();
 
             // TODO: check what else we should do in these cases 
             //       (like, unregistering all childs etc...)
@@ -504,13 +494,13 @@ movie_root::reset()
     _liveChars.clear();
 
     // wipe out queued actions
-    clearActionQueue();
+    clear(_actionQueue);
 
     // wipe out all levels
     _movies.clear();
 
     // remove all intervals
-    clearIntervalTimers();
+    _intervalTimers.clear();
 
     // remove all loadMovie requests
     _movieLoader.clear();
@@ -609,7 +599,7 @@ movie_root::keyEvent(key::code k, bool down)
         {
             log_error(_("ActionLimits hit notifying key listeners: %s."),
                     e.what());
-            clearActionQueue();
+            clear(_actionQueue);
         }
     }
     
@@ -803,24 +793,24 @@ movie_root::doMouseDrag()
     dragChar->setMatrix(local);
 }
 
-unsigned int
-movie_root::add_interval_timer(std::auto_ptr<Timer> timer)
+boost::uint32_t
+movie_root::addIntervalTimer(std::auto_ptr<Timer> timer)
 {
     assert(timer.get());
     assert(testInvariant());
             
-    int id = ++_lastTimerId;
+    size_t id = ++_lastTimerId;
 
     assert(_intervalTimers.find(id) == _intervalTimers.end());
-    _intervalTimers[id] = timer.release(); 
+    _intervalTimers.insert(id, timer);
     return id;
 }
     
 bool
-movie_root::clear_interval_timer(unsigned int x)
+movie_root::clearIntervalTimer(boost::uint32_t x)
 {
     TimerMap::iterator it = _intervalTimers.find(x);
-    if ( it == _intervalTimers.end() ) return false;
+    if (it == _intervalTimers.end()) return false;
 
     // We do not remove the element here because
     // we might have been called during execution
@@ -883,11 +873,11 @@ movie_root::advance()
         // The PP does not disable scripts when the stack limit is reached,
         // but rather struggles on. 
         log_error(_("Action limit hit during advance: %s"), al.what());
-        clearActionQueue();
+        clear(_actionQueue);
     }
     catch (const ActionParserException& e) {
         log_error(_("Buffer overread during advance: %s"), e.what());
-        clearActionQueue();
+        clear(_actionQueue);
     }
 
     return advanced;
@@ -1009,7 +999,7 @@ movie_root::notify_mouse_listeners(const event_id& event)
         catch (ActionLimitException &e) {
             log_error(_("ActionLimits hit notifying mouse events: %s."),
                     e.what());
-            clearActionQueue();
+            clear(_actionQueue);
         }
         
     }
@@ -1336,7 +1326,7 @@ movie_root::minPopulatedPriorityQueue() const
 size_t
 movie_root::processActionQueue(size_t lvl)
 {
-    ActionQueue& q = _actionQueue[lvl];
+    ActionQueue::value_type& q = _actionQueue[lvl];
 
     assert(minPopulatedPriorityQueue() == lvl);
 
@@ -1397,7 +1387,7 @@ movie_root::flushHigherPriorityActionQueues()
     if ( _disableScripts )
     {
         /// cleanup anything pushed later..
-        clearActionQueue();
+        clear(_actionQueue);
         return;
     }
 
@@ -1433,7 +1423,7 @@ movie_root::processActionQueue()
 {
     if (_disableScripts) {
         /// cleanup anything pushed later..
-        clearActionQueue();
+        clear(_actionQueue);
         return;
     }
 
@@ -1451,7 +1441,7 @@ movie_root::processActionQueue()
 void
 movie_root::removeQueuedConstructor(DisplayObject* target)
 {
-    ActionQueue& pr = _actionQueue[PRIORITY_CONSTRUCT];
+    ActionQueue::value_type& pr = _actionQueue[PRIORITY_CONSTRUCT];
     pr.erase_if(RemoveTargetCode(target));
 }
 
@@ -1642,11 +1632,15 @@ movie_root::executeTimers()
 
     unsigned long now = _vm.getTime();
 
+    // This does not own its Timers and is strictly temporary; the
+    // original _intervalTimers map must keep all references Timers
+    // alive until the end of this function.
     typedef std::multimap<unsigned int, Timer*> ExpiredTimers;
+
     ExpiredTimers expiredTimers;
 
-    for (TimerMap::iterator it=_intervalTimers.begin(),
-            itEnd=_intervalTimers.end(); it != itEnd; ) {
+    for (TimerMap::iterator it = _intervalTimers.begin(),
+            itEnd = _intervalTimers.end(); it != itEnd; ) {
 
         TimerMap::iterator nextIterator = it;
         ++nextIterator;
@@ -1655,7 +1649,6 @@ movie_root::executeTimers()
 
         if (timer->cleared()) {
             // this timer was cleared, erase it
-            delete timer;
             _intervalTimers.erase(it);
         }
         else {
@@ -1706,7 +1699,7 @@ movie_root::markReachableResources() const
     // Mark resources reachable by queued action code
     for (size_t lvl = 0; lvl < PRIORITY_SIZE; ++lvl)
     {
-        const ActionQueue& q = _actionQueue[lvl];
+        const ActionQueue::value_type& q = _actionQueue[lvl];
         std::for_each(q.begin(), q.end(),
                 std::mem_fun_ref(&ExecutableCode::markReachableResources));
     }
