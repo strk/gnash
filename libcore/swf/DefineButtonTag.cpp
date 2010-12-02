@@ -18,12 +18,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-
-// Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
-
 #include "DefineButtonTag.h"
 
 #include <string>
+#include <boost/functional.hpp>
 
 #include "TypesParser.h"
 #include "RunResources.h"
@@ -73,7 +71,6 @@ DefineButtonTag::DefineButtonTag(SWFStream& in, movie_definition& m,
 
 DefineButtonTag::~DefineButtonTag()
 {
-    deleteChecked(_buttonActions.begin(), _buttonActions.end());
 }
 
 
@@ -207,19 +204,16 @@ DefineButtonTag::readDefineButton2Tag(SWFStream& in, movie_definition& m)
 
         // Read Button2ActionConditions
         // Don't read past tag end
-        while ( in.tell() < tagEndPosition ) 
-        {
+        while (in.tell() < tagEndPosition) {
             in.ensureBytes(2);
             unsigned next_action_offset = in.read_u16();
-            if ( next_action_offset )
-            {
+            if (next_action_offset) {
                 next_action_pos = in.tell() + next_action_offset - 2;
-                if ( next_action_pos > tagEndPosition )
-                {
+                if (next_action_pos > tagEndPosition) {
                     IF_VERBOSE_MALFORMED_SWF(
-                    log_swferror(_("Next action offset (%u) in "
-                            "Button2ActionConditions points past "
-                            "the end of tag"), next_action_offset);
+                        log_swferror(_("Next action offset (%u) in "
+                                "Button2ActionConditions points past "
+                                "the end of tag"), next_action_offset);
                     );
                     next_action_pos = tagEndPosition;
                 }
@@ -260,12 +254,9 @@ DefineButtonTag::getSWFVersion() const
 bool
 DefineButtonTag::hasKeyPressHandler() const
 {
-    for (size_t i = 0, e = _buttonActions.size(); i < e; ++i)
-    {
-        const ButtonAction& ba = *(_buttonActions[i]);
-        if ( ba.triggeredByKeyPress() ) return true;
-    }
-    return false;
+    return std::find_if(_buttonActions.begin(), _buttonActions.end(),
+            boost::mem_fn(&ButtonAction::triggeredByKeyPress)) !=
+            _buttonActions.end();
 }
 
 //

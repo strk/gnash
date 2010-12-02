@@ -71,10 +71,11 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <deque>
 #include <list>
 #include <set>
 #include <bitset>
+#include <boost/array.hpp>
+#include <boost/ptr_container/ptr_deque.hpp>
 #include <boost/noncopyable.hpp>
 
 #include "smart_ptr.h" // GNASH_USE_GC
@@ -1031,11 +1032,12 @@ private:
 
     /// A number of queues of code to execute
     //
-    /// This is a deque because it needs no insertion in the middle but
+    /// This is a ptr_deque because it needs no insertion in the middle but
     /// frequent push_back and pop_front. We also have to traverse it, so
-    /// a std::queue is not usable.
-    typedef std::deque<ExecutableCode*> ActionQueue;
-    ActionQueue _actionQueue[PRIORITY_SIZE];
+    /// a queue is not usable.
+    typedef boost::ptr_deque<ExecutableCode> ActionQueue;
+
+    boost::array<ActionQueue, PRIORITY_SIZE> _actionQueue;
 
     /// Process all actions in the queue
     void processActionQueue();

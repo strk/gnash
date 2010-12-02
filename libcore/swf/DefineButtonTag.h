@@ -17,11 +17,11 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-
 #ifndef GNASH_SWF_DEFINEBUTTONTAG_H
 #define GNASH_SWF_DEFINEBUTTONTAG_H
 
 #include <vector>
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/cstdint.hpp> 
 #include <memory>
@@ -124,7 +124,7 @@ private:
     // This is a GC resource, so not owned by anyone.
     const DefinitionTag* _definitionTag;
 
-    int    _buttonLayer;
+    int _buttonLayer;
 
     SWFMatrix _matrix;
 
@@ -154,8 +154,7 @@ public:
     bool triggeredBy(const event_id& ev) const;
 
     /// Return true if this action is triggered by a keypress
-    bool triggeredByKeyPress() const
-    {
+    bool triggeredByKeyPress() const {
         return (_conditions & KEYPRESS);
     }
 
@@ -164,9 +163,7 @@ private:
     /// Return the keycode triggering this action
     //
     /// Return 0 if no key is supposed to trigger us
-    ///
-    int getKeyCode() const
-    {
+    int getKeyCode() const {
         return (_conditions & KEYPRESS) >> 9;
     }
 
@@ -183,7 +180,7 @@ private:
         OVER_DOWN_TO_IDLE = 1 << 8,
         KEYPRESS = 0xFE00  // highest 7 bits
     };
-    int    _conditions;
+    int _conditions;
 
 };
 
@@ -197,7 +194,7 @@ public:
             const RunResources& r);
 
     typedef std::vector<ButtonRecord> ButtonRecords; 
-    typedef std::vector<ButtonAction*> ButtonActions;
+    typedef boost::ptr_vector<ButtonAction> ButtonActions;
 
     virtual ~DefineButtonTag();
 
@@ -246,14 +243,11 @@ public:
     //
     /// The functor will be passed a const action_buffer&
     /// and is not expected to return anything.
-    ///
     template <class E>
-    void forEachTrigger(const event_id& ev, E& f) const
-    {
-        for (size_t i = 0, e = _buttonActions.size(); i < e; ++i)
-        {
-            const ButtonAction& ba = *(_buttonActions[i]);
-            if ( ba.triggeredBy(ev) ) f(ba._actions);
+    void forEachTrigger(const event_id& ev, E& f) const {
+        for (size_t i = 0, e = _buttonActions.size(); i < e; ++i) {
+            const ButtonAction& ba = _buttonActions[i];
+            if (ba.triggeredBy(ev)) f(ba._actions);
         }
     }
     
@@ -277,6 +271,7 @@ private:
     boost::scoped_ptr<SWF::DefineButtonSoundTag> _soundTag;
 
     ButtonRecords _buttonRecords;
+
     ButtonActions _buttonActions;
 
     /// Whether to enable the trackAsMenu property.

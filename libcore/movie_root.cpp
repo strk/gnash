@@ -110,12 +110,8 @@ class RemoveTargetCode
 {
 public:
     RemoveTargetCode(DisplayObject* target) : _target(target) {}
-    bool operator()(ExecutableCode* c) const {
-        if (_target == c->target()) {
-            delete c;
-            return true;
-        }
-        return false;
+    bool operator()(const ExecutableCode& c) const {
+        return _target == c.target();
     }
 private:
     DisplayObject* _target;
@@ -187,9 +183,8 @@ movie_root::nextUnnamedInstance()
 void
 movie_root::clearActionQueue()
 {
-    for (int lvl=0; lvl < PRIORITY_SIZE; ++lvl) {
+    for (size_t lvl = 0; lvl < _actionQueue.size(); ++lvl) {
         ActionQueue& q = _actionQueue[lvl];
-        deleteChecked(q.begin(), q.end());
         q.clear();
     }
 }
@@ -714,14 +709,13 @@ movie_root::fire_mouse_event()
     // FIXME: need_redraw might also depend on actual
     //        actions execution (consider updateAfterEvent).
 
-    try
-    {
+    try {
         need_redraw = generate_mouse_button_events(*this, _mouseButtonState);
         processActionQueue();
     }
-    catch (ActionLimitException& al)
-    {
-        boost::format fmt = boost::format(_("ActionLimits hit during mouse event processing: %s. Disable scripts ?")) % al.what();
+    catch (const ActionLimitException& al) {
+        boost::format fmt = boost::format(_("ActionLimits hit during mouse "
+                    "event processing: %s. Disable scripts ?")) % al.what();
         handleActionLimitHit(fmt.str());
     }
 
@@ -885,13 +879,13 @@ movie_root::advance()
         executeTimers();
     
     }
-    catch (ActionLimitException& al) {
+    catch (const ActionLimitException& al) {
         // The PP does not disable scripts when the stack limit is reached,
         // but rather struggles on. 
         log_error(_("Action limit hit during advance: %s"), al.what());
         clearActionQueue();
     }
-    catch (ActionParserException& e) {
+    catch (const ActionParserException& e) {
         log_error(_("Buffer overread during advance: %s"), e.what());
         clearActionQueue();
     }
@@ -1344,7 +1338,7 @@ movie_root::processActionQueue(size_t lvl)
 {
     ActionQueue& q = _actionQueue[lvl];
 
-    assert( minPopulatedPriorityQueue() == lvl );
+    assert(minPopulatedPriorityQueue() == lvl);
 
 #ifdef GNASH_DEBUG
     static unsigned calls=0;
@@ -1361,8 +1355,7 @@ movie_root::processActionQueue(size_t lvl)
     // and a final call to .clear() 
     while (!q.empty()) {
 
-        std::auto_ptr<ExecutableCode> code(q.front());
-        q.pop_front(); 
+        std::auto_ptr<ExecutableCode> code(q.pop_front().release());
         code->execute();
 
         size_t minLevel = minPopulatedPriorityQueue();
@@ -1459,16 +1452,14 @@ void
 movie_root::removeQueuedConstructor(DisplayObject* target)
 {
     ActionQueue& pr = _actionQueue[PRIORITY_CONSTRUCT];
-    
-    pr.erase(std::remove_if(pr.begin(), pr.end(), RemoveTargetCode(target)),
-            pr.end());
+    pr.erase_if(RemoveTargetCode(target));
 }
 
 void
 movie_root::pushAction(std::auto_ptr<ExecutableCode> code, size_t lvl)
 {
     assert(lvl < PRIORITY_SIZE);
-    _actionQueue[lvl].push_back(code.release());
+    _actionQueue[lvl].push_back(code);
 }
 
 void
@@ -1481,7 +1472,7 @@ movie_root::pushAction(const action_buffer& buf, DisplayObject* target)
 
     std::auto_ptr<ExecutableCode> code(new GlobalCode(buf, target));
 
-    _actionQueue[PRIORITY_DOACTION].push_back(code.release());
+    _actionQueue[PRIORITY_DOACTION].push_back(code);
 }
 
 void
@@ -1717,7 +1708,7 @@ movie_root::markReachableResources() const
     {
         const ActionQueue& q = _actionQueue[lvl];
         std::for_each(q.begin(), q.end(),
-                std::mem_fun(&ExecutableCode::markReachableResources));
+                std::mem_fun_ref(&ExecutableCode::markReachableResources));
     }
 
     if (_currentFocus) _currentFocus->setReachable();
