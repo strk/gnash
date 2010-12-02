@@ -19,17 +19,18 @@
 #ifndef GNASH_MOVIE_LOADER_H
 #define GNASH_MOVIE_LOADER_H
 
-#include "URL.h"
-#include "as_object.h" 
-#include "MovieClip.h" 
-
 #include <boost/intrusive_ptr.hpp>
 #include <list>
 #include <string>
+#include <boost/ptr_container/ptr_list.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/barrier.hpp>
+
+#include "URL.h"
+#include "as_object.h" 
+#include "MovieClip.h" 
 
 // Forward declarations
 namespace gnash {
@@ -102,8 +103,7 @@ private:
                 _handler(handler),
                 _completed(false)
         {
-            if ( postdata )
-            {
+            if (postdata) {
                 _postData = *postdata;
                 _usePost = true;
             }
@@ -178,7 +178,7 @@ private:
     };
 
     /// Load requests
-    typedef std::list<Request*> Requests;
+    typedef boost::ptr_list<Request> Requests;
     Requests _requests;
 
 	mutable boost::mutex _requestsMutex;
