@@ -290,16 +290,16 @@ SWFMatrix::invert()
 double
 SWFMatrix::get_x_scale() const
 {
-    const double a2 = std::pow(a(), 2);
-    const double b2 = std::pow(b(), 2);
+    const double a2 = std::pow(static_cast<double>(a()), 2.0);
+    const double b2 = std::pow(static_cast<double>(b()), 2.0);
     return std::sqrt(a2 + b2) / 65536.0;
 }
 
 double
 SWFMatrix::get_y_scale() const
 {
-    const double d2 = std::pow(d(), 2);
-    const double c2 = std::pow(c(), 2);
+    const double d2 = std::pow(static_cast<double>(d()), 2.0);
+    const double c2 = std::pow(static_cast<double>(c()), 2.0);
     return std::sqrt(d2 + c2) / 65536.0;
 }
 
