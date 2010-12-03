@@ -907,10 +907,10 @@ input_events=
 dnl By default, we want to to build all renderers
 build_ovg=no
 build_gles=no
-build_ogl=yes
+build_ogl=auto
 build_agg=yes
 build_cairo=yes
-renderer_list="OpenGL AGG Cairo"
+renderer_list="AGG Cairo"
 nrender=3
 AC_ARG_ENABLE(renderer,
   AC_HELP_STRING([--enable-renderer=], [Enable support for the specified renderers (ogl|gles|cairo|agg|all, default=all)]),
@@ -1057,6 +1057,18 @@ if test x$pixelformat = xall; then
       AC_DEFINE(PIXELFORMAT_ARGB32, [1], [ARGB32 pixel format])
       AC_DEFINE(PIXELFORMAT_ABGR32, [1], [ABGR32 pixel format])
     #fi
+  fi
+fi
+
+if test x"${build_ogl}" != xno; then # yes or auto
+  GNASH_PATH_OPENGL
+  if test x"${build_ogl}" = xauto; then
+    if test xyes = x"${has_opengl}"; then
+      build_ogl=yes
+      renderer_list="${renderer_list} OpenGL"
+    else
+      build_ogl=no
+    fi
   fi
 fi
 
@@ -2411,10 +2423,6 @@ fi
 if test x"${build_ogv}" = xyes; then
   GNASH_PKG_FIND(EGL, [EGL/egl.h], [EGL library], eglGetDisplay)
   GNASH_PKG_FIND(OpenVG, [vg/openvg.h], [OpenVG library], vgDrawImage)
-fi
-
-if test x"${build_ogl}" = xyes; then
-  GNASH_PATH_OPENGL
 fi
 
 if test x"${build_gtk}" = xyes; then
