@@ -1905,8 +1905,7 @@ MovieClip::getLoadedMovie(Movie* extern_movie)
                 true, true);
         extern_movie->construct();
     }
-    else
-    {
+    else {
         // replaceLevel will set depth for us
         stage().replaceLevel(get_depth() - DisplayObject::staticDepthOffset,
                               extern_movie);
@@ -1951,8 +1950,7 @@ MovieClip::loadVariables(const std::string& urlstr,
         }
         _loadVariableRequests.back().process();
     }
-    catch (NetworkException& ex)
-    {
+    catch (const NetworkException& ex) {
         log_error(_("Could not load variables from %s"), url.str());
     }
 
@@ -1970,12 +1968,11 @@ MovieClip::processCompletedLoadVariableRequest(LoadVariablesThread& request)
     notifyEvent(event_id::DATA);
 }
 
-/*private*/
 void
 MovieClip::processCompletedLoadVariableRequests()
 {
     // Nothing to do (just for clarity)
-    if ( _loadVariableRequests.empty() ) return;
+    if (_loadVariableRequests.empty()) return;
 
     for (LoadVariablesThreads::iterator it=_loadVariableRequests.begin();
             it != _loadVariableRequests.end(); )
@@ -1994,8 +1991,8 @@ MovieClip::setVariables(const MovieVariables& vars)
 {
     VM& vm = getVM(*getObject(this));
     for (MovieVariables::const_iterator it=vars.begin(), itEnd=vars.end();
-        it != itEnd; ++it)
-    {
+        it != itEnd; ++it) {
+
         const std::string& name = it->first;
         const std::string& val = it->second;
         getObject(this)->set_member(getURI(vm, name), val);
@@ -2005,13 +2002,12 @@ MovieClip::setVariables(const MovieVariables& vars)
 void
 MovieClip::removeMovieClip()
 {
-    int depth = get_depth();
-    if ( depth < 0 || depth > 1048575 )
-    {
+    const int depth = get_depth();
+    if (depth < 0 || depth > 1048575) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("removeMovieClip(%s): movieclip depth (%d) out of the "
-            "'dynamic' zone [0..1048575], won't remove"),
-            getTarget(), depth);
+            log_aserror(_("removeMovieClip(%s): movieclip depth (%d) out of "
+                "the 'dynamic' zone [0..1048575], won't remove"),
+                getTarget(), depth);
         );
         return;
     }

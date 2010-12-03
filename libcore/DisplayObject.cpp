@@ -658,8 +658,8 @@ DisplayObject::getTarget() const
     // Build parents stack
     const DisplayObject* ch = this;
     string_table& st = stage().getVM().getStringTable();
-    for (;;)
-    {
+    for (;;) {
+
         const DisplayObject* parent = ch->parent();
 
         // Don't push the _root name on the stack
@@ -670,8 +670,6 @@ DisplayObject::getTarget() const
                 // must be an as-referenceable
                 // DisplayObject created using 'new'
                 // like, new MovieClip, new Video, new TextField...
-                //log_debug("DisplayObject %p (%s) doesn't have a parent and "
-                //        "is not a Movie", ch, typeName(*ch));
                 ss << "<no parent, depth" << ch->get_depth() << ">";
                 path.push_back(ss.str());
             }
@@ -951,7 +949,7 @@ getDisplayObjectProperty(DisplayObject& obj, const ObjectURI& uri,
         return false;
     }
     
-    MovieClip* mc = dynamic_cast<MovieClip*>(&obj);
+    MovieClip* mc = obj.to_movie();
     if (mc) {
         DisplayObject* ch = mc->getDisplayListObject(uri);
         if (ch) {
@@ -1439,7 +1437,7 @@ as_value
 getDropTarget(DisplayObject& o)
 {
     // This property only applies to MovieClips.
-    MovieClip* mc = dynamic_cast<MovieClip*>(&o);
+    MovieClip* mc = o.to_movie();
     if (!mc) return as_value();
     return as_value(mc->getDropTarget());
 }
@@ -1448,7 +1446,7 @@ as_value
 getCurrentFrame(DisplayObject& o)
 {
     // This property only applies to MovieClips.
-    MovieClip* mc = dynamic_cast<MovieClip*>(&o);
+    MovieClip* mc = o.to_movie();
     if (!mc) return as_value();
     const int currframe =
         std::min(mc->get_loaded_frames(), mc->get_current_frame() + 1);
@@ -1459,7 +1457,7 @@ as_value
 getFramesLoaded(DisplayObject& o)
 {
     // This property only applies to MovieClips.
-    MovieClip* mc = dynamic_cast<MovieClip*>(&o);
+    MovieClip* mc = o.to_movie();
     if (!mc) return as_value();
     return as_value(mc->get_loaded_frames());
 }
@@ -1468,7 +1466,7 @@ as_value
 getTotalFrames(DisplayObject& o)
 {
     // This property only applies to MovieClips.
-    MovieClip* mc = dynamic_cast<MovieClip*>(&o);
+    MovieClip* mc = o.to_movie();
     if (!mc) return as_value();
     return as_value(mc->get_frame_count());
 }
