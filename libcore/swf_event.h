@@ -54,20 +54,18 @@ public:
 	{
 	}
 
-	const action_buffer& action()
-	{
+	const action_buffer& action() const {
 		return m_action_buffer;
 	}
 
-	event_id& event()
-	{
+	const event_id& event() const {
 		return m_event;
 	}
 
 private:
 
 	/// System event id
-	event_id	m_event;
+	event_id m_event;
 
 	/// Action buffer associated with this event
 	//

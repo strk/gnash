@@ -923,11 +923,10 @@ MovieClip::advance()
 #endif
 
     // I'm not sure ENTERFRAME goes in a different queue then DOACTION...
-    queueEvent(event_id::ENTER_FRAME, movie_root::PRIORITY_DOACTION);
+    queueEvent(event_id(event_id::ENTER_FRAME), movie_root::PRIORITY_DOACTION);
 
     // Update current and next frames.
-    if (_playState == PLAYSTATE_PLAY)
-    {
+    if (_playState == PLAYSTATE_PLAY) {
 #ifdef GNASH_DEBUG
         log_debug(_("MovieClip::advance_movieclip we're in PLAYSTATE_PLAY mode"));
 #endif
@@ -1293,11 +1292,12 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     }
 
     // Attach event handlers (if any).
-    const std::vector<swf_event*>& event_handlers = tag->getEventHandlers();
-    for (size_t i = 0, n = event_handlers.size(); i < n; i++)
-    {
-        swf_event* ev = event_handlers[i];
-        ch->add_event_handler(ev->event(), ev->action());
+    const SWF::PlaceObject2Tag::EventHandlers& event_handlers =
+        tag->getEventHandlers();
+
+    for (size_t i = 0, n = event_handlers.size(); i < n; ++i) {
+        const swf_event& ev = event_handlers[i];
+        ch->add_event_handler(ev.event(), ev.action());
     }
 
     // TODO: check if we should check those has_xxx flags first.
@@ -1600,7 +1600,7 @@ MovieClip::mouseEnabled() const
         const event_id &event = EH[i];
 
         // Check event handlers
-        if (hasEventHandler(event.id())) {
+        if (hasEventHandler(event_id(event.id()))) {
             return true;
         }
     }
@@ -1752,7 +1752,7 @@ MovieClip::constructAsScriptObject()
 
     // Send the construct event. This must be done after the __proto__ 
     // member is set. It is always done.
-    notifyEvent(event_id::CONSTRUCT);
+    notifyEvent(event_id(event_id::CONSTRUCT));
         
     if (ctor) {
         const int swfversion = getSWFVersion(*mc);
@@ -1791,15 +1791,18 @@ MovieClip::construct(as_object* initObj)
     //
     assert(!_callingFrameActions); // or will not be queuing actions
     if (!parent()) {
+
         executeFrameTags(0, _displayList, SWF::ControlTag::TAG_DLIST |
                 SWF::ControlTag::TAG_ACTION);
+
         if (getSWFVersion(*getObject(this)) > 5) {
-            queueEvent(event_id::LOAD, movie_root::PRIORITY_DOACTION);
+            queueEvent(event_id(event_id::LOAD),
+                    movie_root::PRIORITY_DOACTION);
         }
 
     }
     else {
-        queueEvent(event_id::LOAD, movie_root::PRIORITY_DOACTION);
+        queueEvent(event_id(event_id::LOAD), movie_root::PRIORITY_DOACTION);
         executeFrameTags(0, _displayList, SWF::ControlTag::TAG_DLIST |
                 SWF::ControlTag::TAG_ACTION);
     }
@@ -1846,7 +1849,7 @@ MovieClip::construct(as_object* initObj)
     // Tested in testsuite/swfdec/duplicateMovieclip-events.c and
     // testsuite/swfdec/clone-sprite-events.c not to call notifyEvent
     // immediately.
-    queueEvent(event_id::INITIALIZE, movie_root::PRIORITY_INIT);
+    queueEvent(event_id(event_id::INITIALIZE), movie_root::PRIORITY_INIT);
 
 }
 
@@ -1965,7 +1968,7 @@ MovieClip::processCompletedLoadVariableRequest(LoadVariablesThread& request)
     setVariables(vals);
 
     // We want to call a clip-event too if available, see bug #22116
-    notifyEvent(event_id::DATA);
+    notifyEvent(event_id(event_id::DATA));
 }
 
 void

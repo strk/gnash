@@ -39,6 +39,19 @@
 namespace gnash {
 namespace SWF {
 
+PlaceObject2Tag::PlaceObject2Tag(const movie_definition& def)
+    :
+    DisplayListTag(0),
+    m_has_flags2(0),
+    m_has_flags3(0),
+    _id(0),
+    _ratio(0),
+    m_clip_depth(0),
+    _blendMode(0),
+    _movie_def(def)
+{
+}
+
 void
 PlaceObject2Tag::readPlaceObject(SWFStream& in)
 {
@@ -81,13 +94,12 @@ PlaceObject2Tag::readPlaceObject(SWFStream& in)
 void
 PlaceObject2Tag::readPlaceActions(SWFStream& in)
 {
-    int movie_version = _movie_def.get_version();
+    const int movie_version = _movie_def.get_version();
 
     in.ensureBytes(2);
     boost::uint16_t reserved = in.read_u16();
-    IF_VERBOSE_MALFORMED_SWF (
-        if ( reserved != 0 ) // must be 0
-        {
+    IF_VERBOSE_MALFORMED_SWF(
+        if (reserved != 0) {
             log_swferror(_("Reserved field in PlaceObject actions == "
                     "%u (expected 0)"), reserved);
         }
@@ -96,13 +108,11 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
     boost::uint32_t all_event_flags;
 
     // The logical 'or' of all the following handlers.
-    if (movie_version >= 6)
-    {
+    if (movie_version >= 6) {
         in.ensureBytes(4);
         all_event_flags = in.read_u32();
     }
-    else
-    {
+    else {
         in.ensureBytes(2);
         all_event_flags = in.read_u16();        
     }
@@ -112,8 +122,7 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
     );
 
     // Read swf_events.
-    for (;;)
-    {
+    for (;;) {
         // Handle SWF malformations locally, by just prematurely interrupting
         // parsing of action events.
         // TODO: a possibly improvement would be using local code for the
@@ -121,32 +130,28 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
         //       call for itself plus a repeated useless function call for
         //       get_end_tag_position (which could be cached).
         //       
-        try
-        {
+        try {
             // Read event.
             in.align();
     
             boost::uint32_t flags;
-            if (movie_version >= 6)
-            {
+            if (movie_version >= 6) {
                 in.ensureBytes(4);
                 flags = in.read_u32();
             }
-            else
-            {
+            else {
                 in.ensureBytes(2);
                 flags = in.read_u16();        
             }
     
-            if (flags == 0) // no other events
-            {
+            // no other events
+            if (flags == 0) {
                 break;
             }
     
             in.ensureBytes(4);
             boost::uint32_t event_length = in.read_u32();
-            if ( in.get_tag_end_position() - in.tell() <  event_length )
-            {
+            if (in.get_tag_end_position() - in.tell() <  event_length) {
                 IF_VERBOSE_MALFORMED_SWF(
                 log_swferror(_("swf_event::read(), "
                     "even_length = %u, but only %lu bytes left "
@@ -157,20 +162,20 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
                 break;
             }
     
-            boost::uint8_t ch = key::INVALID;
-    
-            if (flags & (1 << 17))  // has KeyPress event
-            {
+            key::code ch = key::INVALID;
+            
+            // has KeyPress event
+            if (flags & (1 << 17)) {
                 in.ensureBytes(1);
-                ch = in.read_u8();
-                event_length--;
+                ch = static_cast<key::code>(in.read_u8());
+                --event_length;
             }
     
             // Read the actions for event(s)
             // auto_ptr here prevents leaks on malformed swf
             std::auto_ptr<action_buffer> action(new action_buffer(_movie_def));
-            action->read(in, in.tell()+event_length);
-            _actionBuffers.push_back(action.release()); // take ownership
+            action->read(in, in.tell() + event_length);
+            _actionBuffers.push_back(action); 
     
             // If there is no end tag, action_buffer appends a null-terminator,
             // and fails this check. As action_buffer should check bounds, we
@@ -178,9 +183,7 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
             //assert (action->size() == event_length);
     
             // 13 bits reserved, 19 bits used
-            const int total_known_events = 19;
-            static const event_id s_code_bits[total_known_events] =
-            {
+            static const event_id::EventCode s_code_bits[] = {
                 event_id::LOAD,
                 event_id::ENTER_FRAME,
                 event_id::UNLOAD,
@@ -200,53 +203,48 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
                 event_id::DRAG_OVER,
     
                 event_id::DRAG_OUT,
-                event_id(event_id::KEY_PRESS, key::CONTROL),
+                event_id::KEY_PRESS,
                 event_id::CONSTRUCT
             };
+            const size_t total_known_events = arraySize(s_code_bits);
     
             // Let's see if the event flag we received is for an event
             // that we know of.
     
             // Integrity check: all reserved bits should be zero
-            if( flags >> total_known_events ) 
-            {
+            if (flags >> total_known_events) {
                 IF_VERBOSE_MALFORMED_SWF(
-                log_swferror(_("swf_event::read() -- unknown / unhandled "
-                        "event type received, flags = 0x%x"), flags);
+                    log_swferror(_("swf_event::read() -- unknown / unhandled "
+                            "event type received, flags = 0x%x"), flags);
                 );
             }
     
             // Aah! same action for multiple events !
-            for (int i = 0, mask = 1; i < total_known_events; i++, mask <<= 1)
-            {
-                if (flags & mask)
-                {
+            for (size_t i = 0, mask = 1; i < total_known_events; ++i, mask <<= 1) {
+
+                if (flags & mask) {
                     // Yes, swf_event stores a reference to an element in
                     // _actionBuffers. A case of remote ownership, but both
                     // swf_event and the actions are owned by this class,
                     // so shouldn't be a problem.
-                    action_buffer* thisAction = _actionBuffers.back();
-                    std::auto_ptr<swf_event> ev(
-                            new swf_event(s_code_bits[i], *thisAction));
+                    action_buffer& thisAction = _actionBuffers.back();
 
-                    IF_VERBOSE_PARSE (
-                    log_parse("---- actions for event %s", ev->event());
+                    const event_id id(s_code_bits[i], (i == 17 ? ch : key::INVALID));
+
+                    std::auto_ptr<swf_event> ev(new swf_event(id, thisAction));
+
+                    IF_VERBOSE_PARSE(
+                        log_parse("---- actions for event %s", ev->event());
                     );
     
-                    if (i == 17)    // has KeyPress event
-                    {
-                        ev->event().setKeyCode(ch);
-                    }
-    
-                    _eventHandlers.push_back(ev.release());
+                    _eventHandlers.push_back(ev);
                 }
             }
         }
-        catch (ParserException& what)
-        {
+        catch (const ParserException& what) {
             IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("Unexpected end of tag while parsing PlaceObject "
-                    "tag events"));
+                log_swferror(_("Unexpected end of tag while parsing "
+                        "PlaceObject tag events"));
             );
             break;
         }
@@ -266,64 +264,57 @@ PlaceObject2Tag::readPlaceObject2(SWFStream& in)
 
     _depth = in.read_u16()+DisplayObject::staticDepthOffset;
 
-    if ( hasCharacter( ))
-    {
+    if (hasCharacter()) {
         in.ensureBytes(2);
         _id = in.read_u16();
     }
 
-    if ( hasMatrix() )
-    {
+    if (hasMatrix()) {
         m_matrix = readSWFMatrix(in);
     }
 
-    if ( hasCxform() )
-    {
+    if (hasCxform()) {
         m_color_transform = readCxFormRGBA(in);
     }
 
-    if ( hasRatio() )
-    {
+    if (hasRatio()) {
         in.ensureBytes(2);
         _ratio = in.read_u16();
     }
 
-    if ( hasName() ) 
-    {
+    if (hasName()) {
         in.read_string(m_name);
     }
 
-    if ( hasClipDepth() )
-    {
+    if (hasClipDepth()) {
         in.ensureBytes(2);
         m_clip_depth = in.read_u16() + DisplayObject::staticDepthOffset;
     }
-    else
-    {
+    else {
         m_clip_depth = DisplayObject::noClipDepthValue;
     }
 
-    if ( hasClipActions() )
-    {
+    if (hasClipActions()) {
         readPlaceActions(in);
     }
 
-    IF_VERBOSE_PARSE (
+    IF_VERBOSE_PARSE(
         log_parse(_("  PLACEOBJECT2: depth = %d (%d)"),
             _depth, _depth-DisplayObject::staticDepthOffset);
-        if ( hasCharacter() ) log_parse(_("  char id = %d"), _id);
-        if ( hasMatrix() )
-        {
+        if (hasCharacter()) log_parse(_("  char id = %d"), _id);
+        if (hasMatrix()) {
             log_parse(_("  SWFMatrix: %s"), m_matrix);
         }
-        if ( hasCxform() )
-        {
+        if (hasCxform()) {
             log_parse(_("  SWFCxForm: %s"), m_color_transform);
         }
-        if ( hasRatio() ) log_parse(_("  ratio: %d"), _ratio);
-        if ( hasName() ) log_parse(_("  name = %s"), m_name.c_str());
-        if ( hasClipDepth() ) log_parse(_("  clip_depth = %d (%d)"), m_clip_depth, m_clip_depth-DisplayObject::staticDepthOffset);
-        log_parse(_(" m_place_type: %d"), getPlaceType() );
+        if (hasRatio()) log_parse(_("  ratio: %d"), _ratio);
+        if (hasName()) log_parse(_("  name = %s"), m_name.c_str());
+        if (hasClipDepth()) {
+            log_parse(_("  clip_depth = %d (%d)"), m_clip_depth,
+                m_clip_depth-DisplayObject::staticDepthOffset);
+        }
+        log_parse(_(" m_place_type: %d"), getPlaceType());
     );
 
 }
@@ -415,7 +406,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
 	    LOG_ONCE(log_unimpl("Bitmap caching"));
     }
 
-    if ( hasClipActions() ) {
+    if (hasClipActions()) {
         readPlaceActions(in);
     }
 
@@ -440,9 +431,6 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
 void
 PlaceObject2Tag::read(SWFStream& in, TagType tag)
 {
-
-    m_TagType = tag;
-
     if (tag == SWF::PLACEOBJECT) {
         readPlaceObject(in);
     }
@@ -459,7 +447,6 @@ void
 PlaceObject2Tag::executeState(MovieClip* m, DisplayList& dlist) const
 {
     switch (getPlaceType()) {
-
       case PLACE:
           m->add_display_object(this, dlist);
           break;
@@ -481,8 +468,6 @@ PlaceObject2Tag::executeState(MovieClip* m, DisplayList& dlist) const
 
 PlaceObject2Tag::~PlaceObject2Tag()
 {
-    deleteChecked(_eventHandlers.begin(), _eventHandlers.end());
-    deleteChecked(_actionBuffers.begin(), _actionBuffers.end());
 }
 
 void

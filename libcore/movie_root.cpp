@@ -529,7 +529,7 @@ movie_root::mouseMoved(boost::int32_t x, boost::int32_t y)
 
     _mouseX = x;
     _mouseY = y;
-    return notify_mouse_listeners(event_id::MOUSE_MOVE);
+    return notify_mouse_listeners(event_id(event_id::MOUSE_MOVE));
 }
 
 
@@ -2401,7 +2401,7 @@ generate_mouse_button_events(movie_root& mr, MouseButtonState& ms)
 
                 // onDragOver
                 if (ms.activeEntity) {
-                    ms.activeEntity->mouseEvent(event_id::DRAG_OVER);
+                    ms.activeEntity->mouseEvent(event_id(event_id::DRAG_OVER));
                     need_redisplay=true;
                 }
                 ms.wasInsideActiveEntity = true;
@@ -2410,7 +2410,7 @@ generate_mouse_button_events(movie_root& mr, MouseButtonState& ms)
         else if (ms.topmostEntity != ms.activeEntity) {
             // onDragOut
             if (ms.activeEntity) {
-                ms.activeEntity->mouseEvent(event_id::DRAG_OUT);
+                ms.activeEntity->mouseEvent(event_id(event_id::DRAG_OUT));
                 need_redisplay=true;
             }
             ms.wasInsideActiveEntity = false;
@@ -2424,13 +2424,14 @@ generate_mouse_button_events(movie_root& mr, MouseButtonState& ms)
             if (ms.activeEntity) {
                 if (ms.wasInsideActiveEntity) {
                     // onRelease
-                    ms.activeEntity->mouseEvent(event_id::RELEASE);
+                    ms.activeEntity->mouseEvent(event_id(event_id::RELEASE));
                     need_redisplay = true;
                 }
                 else {
                     // TODO: Handle trackAsMenu 
                     // onReleaseOutside
-                    ms.activeEntity->mouseEvent(event_id::RELEASE_OUTSIDE);
+                    ms.activeEntity->mouseEvent(
+                            event_id(event_id::RELEASE_OUTSIDE));
                     // We got out of active entity
                     ms.activeEntity = 0; // so we don't get RollOut next...
                     need_redisplay = true;
@@ -2445,7 +2446,7 @@ generate_mouse_button_events(movie_root& mr, MouseButtonState& ms)
         if (ms.topmostEntity != ms.activeEntity) {
             // onRollOut
             if (ms.activeEntity) {
-                ms.activeEntity->mouseEvent(event_id::ROLL_OUT);
+                ms.activeEntity->mouseEvent(event_id(event_id::ROLL_OUT));
                 need_redisplay=true;
             }
 
@@ -2453,7 +2454,7 @@ generate_mouse_button_events(movie_root& mr, MouseButtonState& ms)
 
             // onRollOver
             if (ms.activeEntity) {
-                ms.activeEntity->mouseEvent(event_id::ROLL_OVER);
+                ms.activeEntity->mouseEvent(event_id(event_id::ROLL_OVER));
                 need_redisplay=true;
             }
 
@@ -2470,8 +2471,8 @@ generate_mouse_button_events(movie_root& mr, MouseButtonState& ms)
             if (ms.activeEntity) {
                 mr.setFocus(ms.activeEntity);
 
-                ms.activeEntity->mouseEvent(event_id::PRESS);
-                need_redisplay=true;
+                ms.activeEntity->mouseEvent(event_id(event_id::PRESS));
+                need_redisplay = true;
             }
 
             ms.wasInsideActiveEntity = true;

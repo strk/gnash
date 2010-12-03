@@ -461,14 +461,15 @@ DisplayObject::unload()
     const bool childHandler = unloadChildren();
 
     if (!_unloaded) {
-        queueEvent(event_id::UNLOAD, movie_root::PRIORITY_DOACTION);
+        queueEvent(event_id(event_id::UNLOAD), movie_root::PRIORITY_DOACTION);
     }
 
     // Unregister this DisplayObject as mask and/or maskee.
     if (_maskee) _maskee->setMask(0);
     if (_mask) _mask->setMaskee(0);
 
-    const bool hasEvent = hasEventHandler(event_id::UNLOAD) || childHandler;
+    const bool hasEvent =
+        hasEventHandler(event_id(event_id::UNLOAD)) || childHandler;
 
     if (!hasEvent) {
         stage().removeQueuedConstructor(this);

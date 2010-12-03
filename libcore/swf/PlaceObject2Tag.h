@@ -18,12 +18,13 @@
 #ifndef GNASH_SWF_PLACEOBJECT2TAG_H
 #define GNASH_SWF_PLACEOBJECT2TAG_H
 
+#include <string>
+#include <boost/ptr_container/ptr_vector.hpp>
+
 #include "DisplayListTag.h" // for inheritance
 #include "SWF.h" // for TagType definition
 #include "SWFMatrix.h" // for composition
 #include "SWFCxForm.h" // for composition 
-#include <string>
-#include <vector>
 
 // Forward declarations
 namespace gnash {
@@ -84,22 +85,10 @@ class PlaceObject2Tag : public DisplayListTag
 {
 public:
 
-    typedef std::vector<action_buffer*> ActionBuffers;
-    typedef std::vector<swf_event*> EventHandlers;
+    typedef boost::ptr_vector<action_buffer> ActionBuffers;
+    typedef boost::ptr_vector<swf_event> EventHandlers;
 
-    PlaceObject2Tag(const movie_definition& def)
-        :
-        DisplayListTag(0), // why is it 0 here and -1 for RemoveObjectTag ??
-        m_TagType(0),
-        m_has_flags2(0),
-        m_has_flags3(0),
-        _id(0),
-        _ratio(0),
-        m_clip_depth(0),
-        _blendMode(0),
-        _movie_def(def)
-    {
-    }
+    PlaceObject2Tag(const movie_definition& def);
 
     ~PlaceObject2Tag();
 
@@ -116,12 +105,12 @@ public:
         return m_has_flags2 & (HAS_CHARACTER_MASK | MOVE_MASK);
     } 
 
-    int getRatio()     const { return _ratio; }
+    int getRatio() const { return _ratio; }
     int getClipDepth() const { return m_clip_depth; }
-    boost::uint16_t getID()        const { return _id; }
+    boost::uint16_t getID() const { return _id; }
     const std::string& getName() const { return m_name; }
-    const SWFMatrix& getMatrix()    const { return m_matrix; }
-    const SWFCxForm& getCxform()    const { return m_color_transform; }
+    const SWFMatrix& getMatrix() const { return m_matrix; }
+    const SWFCxForm& getCxform() const { return m_color_transform; }
     const EventHandlers& getEventHandlers() const { return _eventHandlers; }
     
     bool hasClipActions() const { return m_has_flags2 & HAS_CLIP_ACTIONS_MASK; }
@@ -132,7 +121,7 @@ public:
     bool hasMatrix()      const { return m_has_flags2 & HAS_MATRIX_MASK; }
     bool hasCharacter()   const { return m_has_flags2 & HAS_CHARACTER_MASK; }
 
-    bool hasImage()         const { return m_has_flags3 & HAS_IMAGE_MASK; }
+    bool hasImage() const { return m_has_flags3 & HAS_IMAGE_MASK; }
 
     bool hasClassName() const {
         return m_has_flags3 & HAS_CLASS_NAME_MASK;
@@ -159,7 +148,19 @@ public:
     }
 
 private:
-    int m_TagType;
+
+    // read SWF::PLACEOBJECT 
+    void readPlaceObject(SWFStream& in);
+
+    // read placeObject2 actions
+    void readPlaceActions(SWFStream& in);
+
+    // read SWF::PLACEOBJECT2 
+    void readPlaceObject2(SWFStream& in);
+
+    // read SWF::PLACEOBJECT3
+    void readPlaceObject3(SWFStream& in);
+
     boost::uint8_t m_has_flags2;
     boost::uint8_t m_has_flags3;
     boost::uint16_t _id;
@@ -206,19 +207,6 @@ private:
     ActionBuffers _actionBuffers;
 
     EventHandlers _eventHandlers;
-
-    // read SWF::PLACEOBJECT 
-    void readPlaceObject(SWFStream& in);
-
-    // read placeObject2 actions
-    void readPlaceActions(SWFStream& in);
-
-    // read SWF::PLACEOBJECT2 
-    void readPlaceObject2(SWFStream& in);
-
-    // read SWF::PLACEOBJECT3
-    void readPlaceObject3(SWFStream& in);
-
 };
 
 } // namespace gnash::SWF
