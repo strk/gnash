@@ -74,7 +74,6 @@ AC_DEFUN([GNASH_PATH_KDE3],
   ])
 
   dnl Look for the files necessary to build KDE 3.x applications
-  if test x"${build_kde3}" = xyes; then
     kde3_prefix=
     AC_PATH_PROG(KDE3_CONFIG, kde-config, ,[${pathlist}])
     if test "x$KDE3_CONFIG" != "x" ; then
@@ -98,19 +97,11 @@ AC_DEFUN([GNASH_PATH_KDE3],
          if test -f $i/kde/kapplication.h; then
             ac_cv_path_kde3_incl="-I$i/kde"
             kde3_prefix=`dirname $i`
-            if test ! -f $i/kde/qxembed.h -a x"${build_kde4}" = x"no"; then
-              AC_MSG_ERROR([You specified building kde3, but you have kde4 installed!])
-              break
-            fi
             break
           fi
           if test -f $i/kapplication.h; then
             ac_cv_path_kde3_incl="-I$i"
             kde3_prefix=`dirname $i`
-            if test ! -f $i/qxembed.h -a x"${build_kde4}" = x"no"; then
-              AC_MSG_ERROR([You specified building kde3, but you have kde4 installed!])
-              break
-            fi
             break
           fi
         done
@@ -177,12 +168,10 @@ AC_DEFUN([GNASH_PATH_KDE3],
         ac_cv_path_kde3_lib="${ac_cv_path_kde3_lib} ${libkdeprint}"
       fi	
     ])                  dnl end of cache ac_cv_path_kde3_lib
-  fi                    dnl end of build_kde3
 
   KLASH_PLUGIN=
   
   dnl If building the kparts plugin, get the install paths correct.  
-  if test x$build_kparts3 = xyes; then
     AC_CACHE_VAL(ac_cv_path_kde3_prefix,[
       dnl if the user specified a path, sanity check it and then use it
       if test x"${with_kde3_prefix}" != x; then
@@ -209,7 +198,6 @@ AC_DEFUN([GNASH_PATH_KDE3],
     KDE3_SERVICESDIR="${KDE3_PREFIX}/share/services"
     KDE3_CONFIGDIR="${KDE3_PREFIX}/share/config"
     KDE3_APPSDATADIR="${KDE3_PREFIX}/share/apps/klash"
-  fi                            dnl end of build_kparts3
 
   if test x"${ac_cv_path_kde3_incl}" != x ; then
     if test x"${ac_cv_path_kde3_incl}" != x"-I/usr/include"; then

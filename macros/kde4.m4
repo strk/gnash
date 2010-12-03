@@ -75,7 +75,6 @@ AC_DEFUN([GNASH_PATH_KDE4],
 
   dnl Only run these tests if this version was specified by the user, and they
   dnl haven't spcified a custom path.
-  if test x"${build_kde4}" = xyes; then
     kde4_prefix=
     dnl FreeBSD puts kde4-config in /usr/local
     pathlist="${pathlist}:/usr/local/kde4/bin"
@@ -106,17 +105,11 @@ AC_DEFUN([GNASH_PATH_KDE4],
           if test -f $i/kde/kapplication.h; then
             ac_cv_path_kde4_incl="-I$i/kde"
             kde4_prefix=`dirname $i`
-            if test -f $i/kde/qxembed.h -a x"${build_kde3}" = x"no"; then
-              AC_MSG_ERROR([You specified building kde4, but you have kde3 installed!])
-            fi
             break
           fi
           if test -f $i/kapplication.h; then
             ac_cv_path_kde4_incl="-I$i"
             kde4_prefix=`dirname $i`
-            if test -f $i/qxembed.h -a x"${build_kde3}" = x"no"; then
-              AC_MSG_ERROR([You specified building kde4, but you have kde3 installed!])
-            fi
             break
           fi
         done
@@ -170,12 +163,10 @@ AC_DEFUN([GNASH_PATH_KDE4],
         fi
       fi
     ])                  dnl end of cache ac_cv_path_kde4_lib
-  fi                    dnl end of build_kde4
 
   KLASH_PLUGIN=
   
   dnl If building the kparts plugin, get the install paths correct.  
-  if test x$build_kparts4 = xyes; then
     AC_CACHE_VAL(ac_cv_path_kde4_prefix,[
       dnl if the user specified a path, sanity check it and then use it
       if test x"${with_kde4_prefix}" != x; then
@@ -218,7 +209,6 @@ AC_DEFUN([GNASH_PATH_KDE4],
     else
       KDE4_APPSDATADIR="${KDE4_PREFIX}/share/kde4/apps/klash"
     fi
-  fi                            dnl end of build_kparts4
 
   if test x"${ac_cv_path_kde4_incl}" != x ; then
     if test x"${ac_cv_path_kde4_incl}" != x"-I/usr/include"; then

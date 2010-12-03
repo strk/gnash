@@ -2321,13 +2321,17 @@ if test x"${build_qt3}" = xyes; then
   GNASH_PATH_QT3
 fi
 
-GNASH_PATH_KDE3
+if test x"${build_kde3}" = xyes; then
+  GNASH_PATH_KDE3
+fi
 
 if test x"${build_qt4}" = xyes; then
   GNASH_PATH_QT4
 fi
 
-GNASH_PATH_KDE4
+if test x"${build_kde4}" = xyes; then
+  GNASH_PATH_KDE4
+fi
 
 dnl Qtopia is a desktop environment for embedded devices.
 dnl GNASH_PATH_QTOPIA3
