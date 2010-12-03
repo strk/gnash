@@ -24,10 +24,11 @@
 
 #include "DisplayObject.h"
 
+#include <utility>
+#include <boost/tuple/tuple.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/bind.hpp>
-#include <utility>
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_root.h"
@@ -133,24 +134,24 @@ DisplayObject::getNextUnnamedInstanceName()
 {
     assert(_object);
     movie_root& mr = getRoot(*_object);
-	std::ostringstream ss;
-	ss << "instance" << mr.nextUnnamedInstance();
+    std::ostringstream ss;
+    ss << "instance" << mr.nextUnnamedInstance();
 
     VM& vm = getVM(*_object);
-	return getURI(vm, ss.str(), true);
+    return getURI(vm, ss.str(), true);
 }
 
 
 int
 DisplayObject::getWorldVolume() const
 {
-	int volume=_volume;
-	if (_parent != NULL)
-	{
-	    volume = int(volume*_parent->getVolume()/100.0);
-	}
+    int volume=_volume;
+    if (_parent != NULL)
+    {
+        volume = int(volume*_parent->getVolume()/100.0);
+    }
 
-	return volume;
+    return volume;
 }
 
 
@@ -166,7 +167,7 @@ DisplayObject::pathElement(const ObjectURI& uri)
 
     // TODO: put ".." and "." in namedStrings
     if (key == st.find("..")) return getObject(parent());
-	if (key == st.find(".")) return obj;
+    if (key == st.find(".")) return obj;
     
     // The check is case-insensitive for SWF6 and below.
     // TODO: cache ObjectURI(NSV::PROP_THIS) [as many others...]
@@ -174,50 +175,50 @@ DisplayObject::pathElement(const ObjectURI& uri)
             (uri, ObjectURI(NSV::PROP_THIS))) {
         return obj;
     }
-	return 0;
+    return 0;
 }
 
 void 
 DisplayObject::set_invalidated()
 {
-	set_invalidated("unknown", -1);
+    set_invalidated("unknown", -1);
 }
 
 void
 DisplayObject::set_invalidated(const char* debug_file, int debug_line)
 {
-	// Set the invalidated-flag of the parent. Note this does not mean that
-	// the parent must re-draw itself, it just means that one of it's childs
-	// needs to be re-drawn.
-	if ( _parent ) _parent->set_child_invalidated(); 
+    // Set the invalidated-flag of the parent. Note this does not mean that
+    // the parent must re-draw itself, it just means that one of it's childs
+    // needs to be re-drawn.
+    if ( _parent ) _parent->set_child_invalidated(); 
   
-	// Ok, at this point the instance will change it's
-	// visual aspect after the
-	// call to set_invalidated(). We save the *current*
-	// position of the instance because this region must
-	// be updated even (or first of all) if the DisplayObject
-	// moves away from here.
-	// 
-	if ( ! _invalidated )
-	{
-		_invalidated = true;
-		
-		#ifdef DEBUG_SET_INVALIDATED
-		log_debug("%p set_invalidated() of %s in %s:%d",
-			(void*)this, get_name(), debug_file, debug_line);
-		#else
-		UNUSED(debug_file);
-		UNUSED(debug_line);
-		#endif
-		
-		// NOTE: the SnappingRanges instance used here is not initialized by the
-		// GUI and therefore uses the default settings. This should not be a 
-		// problem but special snapping ranges configuration done in gui.cpp
-		// is ignored here... 
-				
-		m_old_invalidated_ranges.setNull();
-		add_invalidated_bounds(m_old_invalidated_ranges, true);
-	}
+    // Ok, at this point the instance will change it's
+    // visual aspect after the
+    // call to set_invalidated(). We save the *current*
+    // position of the instance because this region must
+    // be updated even (or first of all) if the DisplayObject
+    // moves away from here.
+    // 
+    if ( ! _invalidated )
+    {
+        _invalidated = true;
+        
+        #ifdef DEBUG_SET_INVALIDATED
+        log_debug("%p set_invalidated() of %s in %s:%d",
+            (void*)this, get_name(), debug_file, debug_line);
+        #else
+        UNUSED(debug_file);
+        UNUSED(debug_line);
+        #endif
+        
+        // NOTE: the SnappingRanges instance used here is not initialized by the
+        // GUI and therefore uses the default settings. This should not be a 
+        // problem but special snapping ranges configuration done in gui.cpp
+        // is ignored here... 
+                
+        m_old_invalidated_ranges.setNull();
+        add_invalidated_bounds(m_old_invalidated_ranges, true);
+    }
 
 }
 
@@ -239,15 +240,15 @@ DisplayObject::set_child_invalidated()
   if ( ! _child_invalidated ) 
   {
     _child_invalidated=true;
-  	if ( _parent ) _parent->set_child_invalidated();
+      if ( _parent ) _parent->set_child_invalidated();
   } 
 }
 
 void
 DisplayObject::extend_invalidated_bounds(const InvalidatedRanges& ranges)
 {
-	set_invalidated(__FILE__, __LINE__);
-	m_old_invalidated_ranges.add(ranges);
+    set_invalidated(__FILE__, __LINE__);
+    m_old_invalidated_ranges.add(ranges);
 }
 
 as_value
@@ -339,9 +340,9 @@ DisplayObject::set_visible(bool visible)
 void
 DisplayObject::setWidth(double newwidth)
 {
-	const SWFRect& bounds = getBounds();
-	const double oldwidth = bounds.width();
-	assert(oldwidth >= 0); 
+    const SWFRect& bounds = getBounds();
+    const double oldwidth = bounds.width();
+    assert(oldwidth >= 0); 
 
     const double xscale = oldwidth ? (newwidth / oldwidth) : 0; 
     const double rotation = _rotation * PI / 180.0;
@@ -355,7 +356,7 @@ DisplayObject::setWidth(double newwidth)
 as_value
 getHeight(DisplayObject& o)
 {
-	SWFRect bounds = o.getBounds();
+    SWFRect bounds = o.getBounds();
     const SWFMatrix m = getMatrix(o);
     m.transform(bounds);
     return twipsToPixels(bounds.height());      
@@ -377,10 +378,10 @@ setHeight(DisplayObject& o, const as_value& val)
 void
 DisplayObject::setHeight(double newheight)
 {
-	const SWFRect& bounds = getBounds();
+    const SWFRect& bounds = getBounds();
 
-	const double oldheight = bounds.height();
-	assert(oldheight >= 0); 
+    const double oldheight = bounds.height();
+    assert(oldheight >= 0); 
 
     const double yscale = oldheight ? (newheight / oldheight) : 0;
     const double rotation = _rotation * PI / 180.0;
@@ -412,45 +413,45 @@ DisplayObject::setMatrix(const SWFMatrix& m, bool updateCache)
 void
 DisplayObject::set_event_handlers(const Events& copyfrom)
 {
-	for (Events::const_iterator it=copyfrom.begin(), itE=copyfrom.end();
-			it != itE; ++it)
-	{
-		const event_id& ev = it->first;
-		const BufferList& bufs = it->second;
-		for (size_t i = 0, e = bufs.size(); i < e; ++i)
-		{
-			const action_buffer* buf = bufs[i];
-			assert(buf);
-			add_event_handler(ev, *buf);
-		}	
-	}
+    for (Events::const_iterator it=copyfrom.begin(), itE=copyfrom.end();
+            it != itE; ++it)
+    {
+        const event_id& ev = it->first;
+        const BufferList& bufs = it->second;
+        for (size_t i = 0, e = bufs.size(); i < e; ++i)
+        {
+            const action_buffer* buf = bufs[i];
+            assert(buf);
+            add_event_handler(ev, *buf);
+        }    
+    }
 }
 
 void
 DisplayObject::add_event_handler(const event_id& id, const action_buffer& code)
 {
-	_event_handlers[id].push_back(&code);
+    _event_handlers[id].push_back(&code);
 
-	// todo: drop the DisplayObject as a listener
-	//       if it gets no valid handlers for
-	//       mouse or Key events.
+    // todo: drop the DisplayObject as a listener
+    //       if it gets no valid handlers for
+    //       mouse or Key events.
 }
 
 std::auto_ptr<ExecutableCode>
 DisplayObject::get_event_handler(const event_id& id) const
 {
-	std::auto_ptr<ExecutableCode> handler;
+    std::auto_ptr<ExecutableCode> handler;
 
-	Events::const_iterator it = _event_handlers.find(id);
-	if ( it == _event_handlers.end() ) return handler;
+    Events::const_iterator it = _event_handlers.find(id);
+    if ( it == _event_handlers.end() ) return handler;
 
 #ifndef GNASH_USE_GC
-	assert(get_ref_count() > 0);
+    assert(get_ref_count() > 0);
 #endif // GNASH_USE_GC
-	DisplayObject* this_ptr = const_cast<DisplayObject*>(this);
+    DisplayObject* this_ptr = const_cast<DisplayObject*>(this);
 
-	handler.reset( new EventCode(this_ptr, it->second) );
-	return handler;
+    handler.reset( new EventCode(this_ptr, it->second) );
+    return handler;
 }
 
 bool
@@ -459,46 +460,47 @@ DisplayObject::unload()
 
     const bool childHandler = unloadChildren();
 
-	if (!_unloaded) {
-		queueEvent(event_id::UNLOAD, movie_root::PRIORITY_DOACTION);
-	}
+    if (!_unloaded) {
+        queueEvent(event_id(event_id::UNLOAD), movie_root::PRIORITY_DOACTION);
+    }
 
     // Unregister this DisplayObject as mask and/or maskee.
     if (_maskee) _maskee->setMask(0);
     if (_mask) _mask->setMaskee(0);
 
-	const bool hasEvent = hasEventHandler(event_id::UNLOAD) || childHandler;
+    const bool hasEvent =
+        hasEventHandler(event_id(event_id::UNLOAD)) || childHandler;
 
     if (!hasEvent) {
         stage().removeQueuedConstructor(this);
     }
 
-	_unloaded = true;
+    _unloaded = true;
 
-	return hasEvent;
+    return hasEvent;
 }
 
 void
 DisplayObject::queueEvent(const event_id& id, int lvl)
 {
     if (!_object) return;
-	std::auto_ptr<ExecutableCode> event(new QueuedEvent(this, id));
-	stage().pushAction(event, lvl);
+    std::auto_ptr<ExecutableCode> event(new QueuedEvent(this, id));
+    stage().pushAction(event, lvl);
 }
 
 bool
 DisplayObject::hasEventHandler(const event_id& id) const
 {
-	Events::const_iterator it = _event_handlers.find(id);
-	if (it != _event_handlers.end()) return true;
+    Events::const_iterator it = _event_handlers.find(id);
+    if (it != _event_handlers.end()) return true;
 
     if (!_object) return false;
 
     // Don't check resolve!
-	if (Property* prop = _object->findProperty(id.functionURI())) {
-		return prop->getValue(*_object).to_function();
-	}
-	return false;
+    if (Property* prop = _object->findProperty(id.functionURI())) {
+        return prop->getValue(*_object).to_function();
+    }
+    return false;
 
 }
 
@@ -525,13 +527,13 @@ DisplayObject::set_x_scale(double scale_percent)
     // we don't need to recompute the SWFMatrix from the 
     // caches.
 
-	SWFMatrix m = getMatrix(*this);
+    SWFMatrix m = getMatrix(*this);
 
     m.set_x_scale(xscale);
 
     setMatrix(m); // we updated the cache ourselves
 
-	transformedByScript(); 
+    transformedByScript(); 
 }
 
 /// Set the real and cached rotation.
@@ -540,16 +542,16 @@ DisplayObject::set_x_scale(double scale_percent)
 void
 DisplayObject::set_rotation(double rot)
 {
-	// Translate to the -180 .. 180 range
-	rot = std::fmod(rot, 360.0);
-	if (rot > 180.0) rot -= 360.0;
-	else if (rot < -180.0) rot += 360.0;
+    // Translate to the -180 .. 180 range
+    rot = std::fmod(rot, 360.0);
+    if (rot > 180.0) rot -= 360.0;
+    else if (rot < -180.0) rot += 360.0;
 
-	double rotation = rot * PI / 180.0;
+    double rotation = rot * PI / 180.0;
 
     if (_xscale < 0) rotation += PI; 
 
-	SWFMatrix m = getMatrix(*this);
+    SWFMatrix m = getMatrix(*this);
     m.set_rotation(rotation);
 
     // Update the matrix from the cached x scale to avoid accumulating
@@ -557,11 +559,11 @@ DisplayObject::set_rotation(double rot)
     // TODO: also update y scale? The x scale update is needed to keep
     // TextField correct; no tests for y scale.
     m.set_x_scale(std::abs(scaleX() / 100.0));
-	setMatrix(m); // we update the cache ourselves
+    setMatrix(m); // we update the cache ourselves
 
-	_rotation = rot;
+    _rotation = rot;
 
-	transformedByScript(); 
+    transformedByScript(); 
 }
 
 
@@ -579,67 +581,67 @@ DisplayObject::set_y_scale(double scale_percent)
         else yscale = std::abs(yscale);
     }
 
-	_yscale = scale_percent;
+    _yscale = scale_percent;
 
-	SWFMatrix m = getMatrix(*this);
+    SWFMatrix m = getMatrix(*this);
     m.set_y_scale(yscale);
-	setMatrix(m); // we updated the cache ourselves
+    setMatrix(m); // we updated the cache ourselves
 
-	transformedByScript(); 
+    transformedByScript(); 
 }
 
 
 std::string
 DisplayObject::getTargetPath() const
 {
-	// TODO: check what happens when this DisplayObject
-	//       is a Movie loaded into another
-	//       running movie.
-	
-	typedef std::vector<std::string> Path;
-	Path path;
+    // TODO: check what happens when this DisplayObject
+    //       is a Movie loaded into another
+    //       running movie.
+    
+    typedef std::vector<std::string> Path;
+    Path path;
 
-	// Build parents stack
-	const DisplayObject* topLevel = 0;
-	const DisplayObject* ch = this;
+    // Build parents stack
+    const DisplayObject* topLevel = 0;
+    const DisplayObject* ch = this;
 
     string_table& st = getStringTable(*getObject(this));
-	for (;;)
-	{
-		const DisplayObject* parent = ch->parent();
+    for (;;)
+    {
+        const DisplayObject* parent = ch->parent();
 
-		// Don't push the _root name on the stack
-		if (!parent) {
-			topLevel = ch;
-			break;
-		}
+        // Don't push the _root name on the stack
+        if (!parent) {
+            topLevel = ch;
+            break;
+        }
 
-		path.push_back(ch->get_name().toString(st));
-		ch = parent;
-	} 
+        path.push_back(ch->get_name().toString(st));
+        ch = parent;
+    } 
 
-	assert(topLevel);
+    assert(topLevel);
 
-	if (path.empty()) {
-		if (&stage().getRootMovie() == this) return "/";
-		std::stringstream ss;
-		ss << "_level" << _depth-DisplayObject::staticDepthOffset;
-		return ss.str();
-	}
+    if (path.empty()) {
+        if (&stage().getRootMovie() == this) return "/";
+        std::stringstream ss;
+        ss << "_level" << _depth-DisplayObject::staticDepthOffset;
+        return ss.str();
+    }
 
-	// Build the target string from the parents stack
-	std::string target;
-	if (topLevel != &stage().getRootMovie()) {
-		std::stringstream ss;
-		ss << "_level" << 
+    // Build the target string from the parents stack
+    std::string target;
+    if (topLevel != &stage().getRootMovie()) {
+        std::stringstream ss;
+        ss << "_level" << 
             topLevel->get_depth() - DisplayObject::staticDepthOffset;
-		target = ss.str();
-	}
-	for (Path::reverse_iterator it=path.rbegin(), itEnd=path.rend();
-			it != itEnd; ++it) {
-		target += "/" + *it; 
-	}
-	return target;
+        target = ss.str();
+    }
+    for (Path::reverse_iterator it=path.rbegin(), itEnd=path.rend();
+            it != itEnd; ++it) {
+        target += "/" + *it; 
+    }
+    return target;
 }
 
 
@@ -647,76 +649,74 @@ std::string
 DisplayObject::getTarget() const
 {
 
-	// TODO: check what happens when this DisplayObject
-	//       is a Movie loaded into another
-	//       running movie.
-	
-	typedef std::vector<std::string> Path;
-	Path path;
+    // TODO: check what happens when this DisplayObject
+    //       is a Movie loaded into another
+    //       running movie.
+    
+    typedef std::vector<std::string> Path;
+    Path path;
 
-	// Build parents stack
-	const DisplayObject* ch = this;
+    // Build parents stack
+    const DisplayObject* ch = this;
     string_table& st = stage().getVM().getStringTable();
-	for (;;)
-	{
-		const DisplayObject* parent = ch->parent();
+    for (;;) {
 
-		// Don't push the _root name on the stack
-		if (!parent) {
+        const DisplayObject* parent = ch->parent();
 
-			std::stringstream ss;
-			if (!dynamic_cast<const Movie*>(ch)) {
-				// must be an as-referenceable
-				// DisplayObject created using 'new'
-				// like, new MovieClip, new Video, new TextField...
-				//log_debug("DisplayObject %p (%s) doesn't have a parent and "
-                //        "is not a Movie", ch, typeName(*ch));
-				ss << "<no parent, depth" << ch->get_depth() << ">";
-				path.push_back(ss.str());
-			}
-			else {
-				ss << "_level" <<
+        // Don't push the _root name on the stack
+        if (!parent) {
+
+            std::stringstream ss;
+            if (!dynamic_cast<const Movie*>(ch)) {
+                // must be an as-referenceable
+                // DisplayObject created using 'new'
+                // like, new MovieClip, new Video, new TextField...
+                ss << "<no parent, depth" << ch->get_depth() << ">";
+                path.push_back(ss.str());
+            }
+            else {
+                ss << "_level" <<
                     ch->get_depth() - DisplayObject::staticDepthOffset;
-				path.push_back(ss.str());
-			}
-			break;
-		}
+                path.push_back(ss.str());
+            }
+            break;
+        }
 
-		path.push_back(ch->get_name().toString(st));
-		ch = parent;
-	} 
+        path.push_back(ch->get_name().toString(st));
+        ch = parent;
+    } 
 
-	assert (!path.empty());
+    assert (!path.empty());
 
-	// Build the target string from the parents stack
-	std::string target;
-	for (Path::const_reverse_iterator it=path.rbegin(), itEnd=path.rend();
-			it != itEnd; ++it) {
+    // Build the target string from the parents stack
+    std::string target;
+    for (Path::const_reverse_iterator it=path.rbegin(), itEnd=path.rend();
+            it != itEnd; ++it) {
 
-		if (!target.empty()) target += ".";
-		target += *it; 
-	}
+        if (!target.empty()) target += ".";
+        target += *it; 
+    }
 
-	return target;
+    return target;
 }
 
 
 void
 DisplayObject::destroy()
 {
-	// in case we are destroyed without being unloaded first
-	// see bug #21842
-	_unloaded = true;
+    // in case we are destroyed without being unloaded first
+    // see bug #21842
+    _unloaded = true;
 
-	/// we may destory a DisplayObject that's not unloaded.
-	///(we don't have chance to unload it in current model,
+    /// we may destory a DisplayObject that's not unloaded.
+    ///(we don't have chance to unload it in current model,
     /// see new_child_in_unload_test.c)
-	/// We don't destroy ourself twice, right ?
+    /// We don't destroy ourself twice, right ?
 
     if (_object) _object->clearProperties();
 
-	assert(!_destroyed);
-	_destroyed = true;
+    assert(!_destroyed);
+    _destroyed = true;
 }
 
 void
@@ -724,9 +724,9 @@ DisplayObject::markReachableResources() const
 {
     markOwnResources();
     if (_object) _object->setReachable();
-	if (_parent) _parent->setReachable();
-	if (_mask) _mask->setReachable();
-	if (_maskee) _maskee->setReachable();
+    if (_parent) _parent->setReachable();
+    if (_mask) _mask->setReachable();
+    if (_maskee) _maskee->setReachable();
 }
 
 /// Whether to use a hand cursor when the mouse is over this DisplayObject
@@ -758,58 +758,58 @@ DisplayObject::allowHandCursor() const
 void
 DisplayObject::setMask(DisplayObject* mask)
 {
-	if ( _mask == mask ) return;
+    if ( _mask == mask ) return;
 
     set_invalidated();
 
-	// Backup this before setMaskee has a chance to change it..
-	DisplayObject* prevMaskee = _maskee;
+    // Backup this before setMaskee has a chance to change it..
+    DisplayObject* prevMaskee = _maskee;
 
-	// If we had a previous mask unregister with it
-	if ( _mask && _mask != mask )
-	{
-		// the mask will call setMask(NULL) 
-		// on any previously registered maskee
-		// so we make sure to set our _mask to 
-		// NULL before getting called again
-		_mask->setMaskee(0);
-	}
+    // If we had a previous mask unregister with it
+    if ( _mask && _mask != mask )
+    {
+        // the mask will call setMask(NULL) 
+        // on any previously registered maskee
+        // so we make sure to set our _mask to 
+        // NULL before getting called again
+        _mask->setMaskee(0);
+    }
 
-	// if we had a maskee, notify it to stop using
-	// us as a mask
-	if (prevMaskee) prevMaskee->setMask(0);
+    // if we had a maskee, notify it to stop using
+    // us as a mask
+    if (prevMaskee) prevMaskee->setMask(0);
 
-	// TODO: should we reset any original clip depth
-	//       specified by PlaceObject tag ?
-	set_clip_depth(noClipDepthValue); 
-	_mask = mask;
-	_maskee = 0;
+    // TODO: should we reset any original clip depth
+    //       specified by PlaceObject tag ?
+    set_clip_depth(noClipDepthValue); 
+    _mask = mask;
+    _maskee = 0;
 
-	if (_mask) {
-		/// Register as as masked by the mask
-		_mask->setMaskee(this);
-	}
+    if (_mask) {
+        /// Register as as masked by the mask
+        _mask->setMaskee(this);
+    }
 }
 
 void
 DisplayObject::setMaskee(DisplayObject* maskee)
 {
-	if ( _maskee == maskee ) { return; }
+    if ( _maskee == maskee ) { return; }
 
-	if (_maskee) {
-		// We don't want the maskee to call setMaskee(null)
-		// on us again
-		_maskee->_mask = 0;
-	}
+    if (_maskee) {
+        // We don't want the maskee to call setMaskee(null)
+        // on us again
+        _maskee->_mask = 0;
+    }
 
-	_maskee = maskee;
+    _maskee = maskee;
 
-	if (!maskee)
-	{
-		// TODO: should we reset any original clip depth
-		//       specified by PlaceObject tag ?
-		set_clip_depth(noClipDepthValue);
-	}
+    if (!maskee)
+    {
+        // TODO: should we reset any original clip depth
+        //       specified by PlaceObject tag ?
+        set_clip_depth(noClipDepthValue);
+    }
 }
 
 
@@ -826,14 +826,14 @@ DisplayObject::boundsInClippingArea(Renderer& renderer) const
 DisplayObject::InfoTree::iterator
 DisplayObject::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 {
-	const std::string yes = _("yes");
-	const std::string no = _("no");
+    const std::string yes = _("yes");
+    const std::string no = _("no");
 
-	it = tr.append_child(it, std::make_pair(getTarget(), typeName(*this)));
+    it = tr.append_child(it, std::make_pair(getTarget(), typeName(*this)));
 
-	std::ostringstream os;
-	os << get_depth();
-	tr.append_child(it, std::make_pair(_("Depth"), os.str()));
+    std::ostringstream os;
+    os << get_depth();
+    tr.append_child(it, std::make_pair(_("Depth"), os.str()));
 
     /// Don't add if the DisplayObject has no ratio value
     if (get_ratio() >= 0)
@@ -841,28 +841,28 @@ DisplayObject::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
         os.str("");
         os << get_ratio();
         tr.append_child(it, std::make_pair(_("Ratio"), os.str()));
-    }	    
+    }        
 
     /// Don't add if it's not a real clipping depth
     const int cd = get_clip_depth();
     if (cd != noClipDepthValue) {
-		os.str("");
-		if (_maskee) os << "Dynamic mask";
-		else os << cd;
+        os.str("");
+        if (_maskee) os << "Dynamic mask";
+        else os << cd;
 
-		tr.append_child(it, std::make_pair(_("Clipping depth"), os.str()));	    
+        tr.append_child(it, std::make_pair(_("Clipping depth"), os.str()));        
     }
 
     os.str("");
     os << getBounds().width() << "x" << getBounds().height();
-	tr.append_child(it, std::make_pair(_("Dimensions"), os.str()));	
+    tr.append_child(it, std::make_pair(_("Dimensions"), os.str()));    
 
-	tr.append_child(it, std::make_pair(_("Dynamic"), isDynamic() ? yes : no));	
-	tr.append_child(it, std::make_pair(_("Mask"), isMaskLayer() ? yes : no));	    
-	tr.append_child(it, std::make_pair(_("Destroyed"),
+    tr.append_child(it, std::make_pair(_("Dynamic"), isDynamic() ? yes : no));    
+    tr.append_child(it, std::make_pair(_("Mask"), isMaskLayer() ? yes : no));        
+    tr.append_child(it, std::make_pair(_("Destroyed"),
                 isDestroyed() ? yes : no));
-	tr.append_child(it, std::make_pair(_("Unloaded"), unloaded() ? yes : no));
-	
+    tr.append_child(it, std::make_pair(_("Unloaded"), unloaded() ? yes : no));
+    
     os.str("");
     os << _blendMode;
     tr.append_child(it, std::make_pair(_("Blend mode"), os.str()));
@@ -873,7 +873,7 @@ DisplayObject::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
     tr.append_child(it, std::make_pair(_("Child invalidated"),
                 _child_invalidated ? yes : no));
 #endif
-	return it;
+    return it;
 }
 #endif
 
@@ -950,7 +950,7 @@ getDisplayObjectProperty(DisplayObject& obj, const ObjectURI& uri,
         return false;
     }
     
-    MovieClip* mc = dynamic_cast<MovieClip*>(&obj);
+    MovieClip* mc = obj.to_movie();
     if (mc) {
         DisplayObject* ch = mc->getDisplayListObject(uri);
         if (ch) {
@@ -1308,11 +1308,11 @@ setAlpha(DisplayObject& o, const as_value& val)
 as_value
 getMouseX(DisplayObject& o)
 {
-	// Local coord of mouse IN PIXELS.
-	boost::int32_t x, y;
-	getRoot(*getObject(&o)).get_mouse_state(x, y);
+    // Local coord of mouse IN PIXELS.
+    boost::int32_t x, y;
+    boost::tie(x, y) = getRoot(*getObject(&o)).mousePosition();
 
-	SWFMatrix m = getWorldMatrix(o);
+    SWFMatrix m = getWorldMatrix(o);
     point a(pixelsToTwips(x), pixelsToTwips(y));
     
     m.invert().transform(a);
@@ -1322,11 +1322,11 @@ getMouseX(DisplayObject& o)
 as_value
 getMouseY(DisplayObject& o)
 {
-	// Local coord of mouse IN PIXELS.
-	boost::int32_t x, y;
-	getRoot(*getObject(&o)).get_mouse_state(x, y);
+    // Local coord of mouse IN PIXELS.
+    boost::int32_t x, y;
+    boost::tie(x, y) = getRoot(*getObject(&o)).mousePosition();
 
-	SWFMatrix m = getWorldMatrix(o);
+    SWFMatrix m = getWorldMatrix(o);
     point a(pixelsToTwips(x), pixelsToTwips(y));
     m.invert().transform(a);
     return as_value(twipsToPixels(a.y));
@@ -1402,7 +1402,7 @@ getSoundBufTime(DisplayObject& /*o*/)
 as_value
 getWidth(DisplayObject& o)
 {
-	SWFRect bounds = o.getBounds();
+    SWFRect bounds = o.getBounds();
     const SWFMatrix& m = getMatrix(o);
     m.transform(bounds);
     return twipsToPixels(bounds.width());
@@ -1438,7 +1438,7 @@ as_value
 getDropTarget(DisplayObject& o)
 {
     // This property only applies to MovieClips.
-    MovieClip* mc = dynamic_cast<MovieClip*>(&o);
+    MovieClip* mc = o.to_movie();
     if (!mc) return as_value();
     return as_value(mc->getDropTarget());
 }
@@ -1447,7 +1447,7 @@ as_value
 getCurrentFrame(DisplayObject& o)
 {
     // This property only applies to MovieClips.
-    MovieClip* mc = dynamic_cast<MovieClip*>(&o);
+    MovieClip* mc = o.to_movie();
     if (!mc) return as_value();
     const int currframe =
         std::min(mc->get_loaded_frames(), mc->get_current_frame() + 1);
@@ -1458,7 +1458,7 @@ as_value
 getFramesLoaded(DisplayObject& o)
 {
     // This property only applies to MovieClips.
-    MovieClip* mc = dynamic_cast<MovieClip*>(&o);
+    MovieClip* mc = o.to_movie();
     if (!mc) return as_value();
     return as_value(mc->get_loaded_frames());
 }
@@ -1467,7 +1467,7 @@ as_value
 getTotalFrames(DisplayObject& o)
 {
     // This property only applies to MovieClips.
-    MovieClip* mc = dynamic_cast<MovieClip*>(&o);
+    MovieClip* mc = o.to_movie();
     if (!mc) return as_value();
     return as_value(mc->get_frame_count());
 }

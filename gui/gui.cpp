@@ -954,9 +954,9 @@ Gui::advanceMovie()
     const size_t tot_frames = m->getRootMovie()->get_frame_count();
     const bool advanced = m->advance();
     
-    m->getRootMovie.ensureFrameLoaded(tot_frames);
+    m->getRootMovie().ensureFrameLoaded(tot_frames);
     m->goto_frame(cur_frame + 1);
-    m->set_play_state(gnash::MovieClip::PLAYSTATE_PLAY);
+    m->getRootMovie().setPlayState(gnash::MovieClip::PLAYSTATE_PLAY);
     log_debug(_("Frame %d"), m->get_current_frame());
 #endif
     

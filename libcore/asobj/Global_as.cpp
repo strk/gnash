@@ -1040,7 +1040,9 @@ global_setInterval(const fn_call& fn)
 	}
     
 	movie_root& root = getRoot(fn);
-	int id = root.add_interval_timer(timer);
+
+    // TODO: check what should happen to overflows.
+	const int id = root.addIntervalTimer(timer);
 	return as_value(id);
 }
 
@@ -1110,7 +1112,8 @@ global_setTimeout(const fn_call& fn)
     
 	movie_root& root = getRoot(fn);
 
-	int id = root.add_interval_timer(timer);
+    // TODO: check what should happen to overflows.
+	const int id = root.addIntervalTimer(timer);
 	return as_value(id);
 }
   
@@ -1124,11 +1127,10 @@ global_clearInterval(const fn_call& fn)
         return as_value();
     }
 
-	int id = int(toNumber(fn.arg(0), getVM(fn)));
+    const boost::uint32_t id = toInt(fn.arg(0), getVM(fn));
 
 	movie_root& root = getRoot(fn);
-	bool ret = root.clear_interval_timer(id);
-	return as_value(ret);
+	return as_value(root.clearIntervalTimer(id));
 }
 
 as_value

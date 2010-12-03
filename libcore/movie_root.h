@@ -107,7 +107,7 @@
 
 // Forward declarations
 namespace gnash {
-    class ExecutableCode; // for ActionQueue
+    class ExecutableCode; 
     class URL;
     class Timer;
     class MovieClip;
@@ -123,9 +123,7 @@ namespace gnash {
 struct DepthComparator
 {
     typedef MovieClip* LevelMovie;
-
-    bool operator()(const LevelMovie& d1, const LevelMovie& d2) const
-    {
+    bool operator()(const LevelMovie& d1, const LevelMovie& d2) const {
         return d1->get_depth() < d2->get_depth();
     }
 };
@@ -297,22 +295,15 @@ public:
     /// Use this to retrieve the last state of the mouse.
     //
     /// Coordinates are in PIXELS, NOT TWIPS.
-    void get_mouse_state(boost::int32_t& x, boost::int32_t& y);
+    std::pair<boost::int32_t, boost::int32_t> mousePosition() const;
 
     void setDragState(const DragState& st);
 
-    /// @return the originating root movie (not necessarely _level0)
-    const Movie& getRootMovie() const {
-        return *_rootMovie;
-    }
-
-    /// Creating new MovieClips needs this for now.
+    /// Access the originating root movie (not necessarily _level0)
     //
-    /// TODO: create MovieClips without this and drop. It's deliberately
-    /// different from getRootMovie() so it doesn't end up getting used
-    /// in the same way.
-    Movie* topLevelMovie() const {
-        return _rootMovie;
+    /// @return the original root movie.
+    Movie& getRootMovie() {
+        return *_rootMovie;
     }
 
     /// Return the current nominal frame rate for the Stage.
@@ -337,8 +328,7 @@ public:
     /// @return An integer indentifying the timer
     ///         for subsequent call to clear_interval_timer.
     ///         It will NEVER be zero.
-    ///
-    unsigned int add_interval_timer(std::auto_ptr<Timer> timer);
+    boost::uint32_t addIntervalTimer(std::auto_ptr<Timer> timer);
 
     /// Register an object for loading data to.
     //
@@ -365,16 +355,14 @@ public:
     /// Remove timer identified by given integer
     //
     /// @return true on success, false on error (no such timer)
-    ///
-    bool clear_interval_timer(unsigned int x);
+    bool clearIntervalTimer(boost::uint32_t x);
 
     /// Return 0-based frame index of originating root movie
     //
     /// TODO: drop this function (currently used by gprocessor)
     ///       or change it to to delegate to _level0 ?
     ///
-    size_t get_current_frame() const
-    {
+    size_t get_current_frame() const {
         return _rootMovie->get_current_frame();
     }
 
@@ -417,23 +405,16 @@ public:
     /// 0-based!! delegates to originating root movie
     //
     /// TODO: drop this method. currently used by gprocessor.
-    void goto_frame(size_t target_frame_number)
-    {
+    void goto_frame(size_t target_frame_number) {
         _rootMovie->goto_frame(target_frame_number);
     }
 
     void display();
 
-    /// Delegate to originating root movie
-    //
-    /// TODO: drop ?
-    void set_play_state(MovieClip::PlayState s)
-    {
-        _rootMovie->setPlayState(s);
-    }
-
     /// Get a unique number for unnamed instances.
-    size_t nextUnnamedInstance();
+    size_t nextUnnamedInstance() {
+        return ++_unnamedInstance;
+    }
 
     /// Push a new DisplayObject listener for key events
     void add_key_listener(Button* listener);
@@ -584,6 +565,14 @@ public:
         /// Last element used to easy computation of size...
         PRIORITY_SIZE
     };
+
+    /// A number of queues of code to execute
+    //
+    /// This is a ptr_deque because it needs no insertion in the middle but
+    /// frequent push_back and pop_front. We also have to traverse it, so
+    /// a queue is not usable.
+    typedef boost::array<boost::ptr_deque<ExecutableCode>, PRIORITY_SIZE>
+        ActionQueue;
 
     /// Push an executable code to the ActionQueue
     void pushAction(std::auto_ptr<ExecutableCode> code, size_t lvl);
@@ -913,12 +902,6 @@ private:
     /// Take care of dragging, if needed
     void doMouseDrag();
 
-    /// Delete all elements on the action queue and empty it.
-    void clearActionQueue();
-
-    /// Delete all elements on the timers list
-    void clearIntervalTimers();
-
     /// Execute expired timers
     void executeAdvanceCallbacks();
     
@@ -985,8 +968,7 @@ private:
     /// return.
     size_t processActionQueue(size_t lvl);
 
-    bool processingActions() const
-    {
+    bool processingActions() const {
         return (_processingActionLevel < PRIORITY_SIZE);
     }
 
@@ -1030,14 +1012,7 @@ private:
     /// The list of advanceable DisplayObject, in placement order
     LiveChars _liveChars;
 
-    /// A number of queues of code to execute
-    //
-    /// This is a ptr_deque because it needs no insertion in the middle but
-    /// frequent push_back and pop_front. We also have to traverse it, so
-    /// a queue is not usable.
-    typedef boost::ptr_deque<ExecutableCode> ActionQueue;
-
-    boost::array<ActionQueue, PRIORITY_SIZE> _actionQueue;
+    ActionQueue _actionQueue;
 
     /// Process all actions in the queue
     void processActionQueue();
@@ -1060,9 +1035,11 @@ private:
 
     LoadCallbacks _loadCallbacks;
     
-    typedef std::map<int, Timer*> TimerMap;
+    typedef std::map<boost::uint32_t, boost::shared_ptr<Timer> > TimerMap;
+
     TimerMap _intervalTimers;
-    unsigned int _lastTimerId;
+
+    size_t _lastTimerId;
 
     /// bit-array for recording the unreleased keys
     Keys _unreleasedKeys;   

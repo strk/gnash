@@ -28,11 +28,22 @@
 //	  change the mouse cursor to the hand cursor standard for linkable 
 //    text
 
+#include "TextField.h"
+
+#include <algorithm> 
+#include <string>
+#include <cstdlib>
+#include <cctype>
+#include <utility>
+#include <map>
+#include <boost/assign/list_of.hpp>
+#include <boost/bind.hpp>
+#include <boost/tuple/tuple.hpp>
+
 #include "utf8.h"
 #include "log.h"
 #include "swf/DefineEditTextTag.h"
 #include "MovieClip.h"
-#include "TextField.h"
 #include "movie_root.h"     // for killing focus
 #include "as_environment.h" 
 #include "Font.h" 
@@ -49,15 +60,6 @@
 #include "Renderer.h"
 #include "Transform.h"
 #include "ObjectURI.h"
-
-#include <algorithm> 
-#include <string>
-#include <boost/assign/list_of.hpp>
-#include <boost/bind.hpp>
-#include <cstdlib>
-#include <cctype>
-#include <utility>
-#include <map>
 
 // Text fields have a fixed 2 pixel padding for each side (regardless of border)
 #define PADDING_TWIPS 40 
@@ -530,7 +532,7 @@ TextField::notifyEvent(const event_id& ev)
 		{
 			movie_root& root = stage();
             boost::int32_t x_mouse, y_mouse;
-            root.get_mouse_state(x_mouse, y_mouse);
+            boost::tie(x_mouse, y_mouse) = root.mousePosition();
 			
 			SWFMatrix m = getMatrix(*this);
 			

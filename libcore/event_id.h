@@ -96,7 +96,7 @@ public:
     /// @param id       The type of event
     /// @param c        The key associated with an event (only if this
     ///                 is a keyboard event).
-    event_id(EventCode id, key::code c = key::INVALID)
+    explicit event_id(EventCode id, key::code c = key::INVALID)
         :
         _id(id),
         _keyCode(c)

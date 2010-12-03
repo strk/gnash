@@ -26,11 +26,12 @@
 #include "gnashconfig.h" // GNASH_USE_GC, USE_SWFTREE
 #endif
 
-#include <boost/intrusive_ptr.hpp>
 #include <vector>
 #include <list>
 #include <map>
 #include <string>
+#include <boost/ptr_container/ptr_list.hpp>
+#include <boost/intrusive_ptr.hpp>
 
 #include "ControlTag.h"
 #include "movie_definition.h" // for inlines
@@ -718,7 +719,7 @@ private:
     /// The list of action will be pushed on the current
     /// global list (see movie_root).
     ///
-    void queueActions(ActionList& action_list);
+    void queueActions(const ActionList& action_list);
 
     /// Execute the actions in the action list
     //
@@ -754,7 +755,7 @@ private:
     const boost::intrusive_ptr<const movie_definition> _def;
 
     /// List of loadVariables requests
-    typedef std::list<LoadVariablesThread*> LoadVariablesThreads;
+    typedef boost::ptr_list<LoadVariablesThread> LoadVariablesThreads;
     
     /// List of active loadVariable requests 
     //

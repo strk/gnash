@@ -518,7 +518,6 @@ MovieClip::MovieClip(as_object* object, const movie_definition* def,
 MovieClip::~MovieClip()
 {
     stopStreamSound();
-    deleteChecked(_loadVariableRequests.begin(), _loadVariableRequests.end());
 }
 
 int
@@ -722,9 +721,9 @@ MovieClip::queueAction(const action_buffer& action)
 }
 
 void
-MovieClip::queueActions(ActionList& actions)
+MovieClip::queueActions(const ActionList& actions)
 {
-    for(ActionList::const_iterator it=actions.begin(), itEnd=actions.end();
+    for (ActionList::const_iterator it=actions.begin(), itEnd=actions.end();
                      it != itEnd; ++it)
     {
         const action_buffer* buf = *it;
@@ -924,11 +923,10 @@ MovieClip::advance()
 #endif
 
     // I'm not sure ENTERFRAME goes in a different queue then DOACTION...
-    queueEvent(event_id::ENTER_FRAME, movie_root::PRIORITY_DOACTION);
+    queueEvent(event_id(event_id::ENTER_FRAME), movie_root::PRIORITY_DOACTION);
 
     // Update current and next frames.
-    if (_playState == PLAYSTATE_PLAY)
-    {
+    if (_playState == PLAYSTATE_PLAY) {
 #ifdef GNASH_DEBUG
         log_debug(_("MovieClip::advance_movieclip we're in PLAYSTATE_PLAY mode"));
 #endif
@@ -1294,11 +1292,12 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     }
 
     // Attach event handlers (if any).
-    const std::vector<swf_event*>& event_handlers = tag->getEventHandlers();
-    for (size_t i = 0, n = event_handlers.size(); i < n; i++)
-    {
-        swf_event* ev = event_handlers[i];
-        ch->add_event_handler(ev->event(), ev->action());
+    const SWF::PlaceObject2Tag::EventHandlers& event_handlers =
+        tag->getEventHandlers();
+
+    for (size_t i = 0, n = event_handlers.size(); i < n; ++i) {
+        const swf_event& ev = event_handlers[i];
+        ch->add_event_handler(ev.event(), ev.action());
     }
 
     // TODO: check if we should check those has_xxx flags first.
@@ -1601,7 +1600,7 @@ MovieClip::mouseEnabled() const
         const event_id &event = EH[i];
 
         // Check event handlers
-        if (hasEventHandler(event.id())) {
+        if (hasEventHandler(event_id(event.id()))) {
             return true;
         }
     }
@@ -1753,7 +1752,7 @@ MovieClip::constructAsScriptObject()
 
     // Send the construct event. This must be done after the __proto__ 
     // member is set. It is always done.
-    notifyEvent(event_id::CONSTRUCT);
+    notifyEvent(event_id(event_id::CONSTRUCT));
         
     if (ctor) {
         const int swfversion = getSWFVersion(*mc);
@@ -1792,15 +1791,18 @@ MovieClip::construct(as_object* initObj)
     //
     assert(!_callingFrameActions); // or will not be queuing actions
     if (!parent()) {
+
         executeFrameTags(0, _displayList, SWF::ControlTag::TAG_DLIST |
                 SWF::ControlTag::TAG_ACTION);
+
         if (getSWFVersion(*getObject(this)) > 5) {
-            queueEvent(event_id::LOAD, movie_root::PRIORITY_DOACTION);
+            queueEvent(event_id(event_id::LOAD),
+                    movie_root::PRIORITY_DOACTION);
         }
 
     }
     else {
-        queueEvent(event_id::LOAD, movie_root::PRIORITY_DOACTION);
+        queueEvent(event_id(event_id::LOAD), movie_root::PRIORITY_DOACTION);
         executeFrameTags(0, _displayList, SWF::ControlTag::TAG_DLIST |
                 SWF::ControlTag::TAG_ACTION);
     }
@@ -1847,7 +1849,7 @@ MovieClip::construct(as_object* initObj)
     // Tested in testsuite/swfdec/duplicateMovieclip-events.c and
     // testsuite/swfdec/clone-sprite-events.c not to call notifyEvent
     // immediately.
-    queueEvent(event_id::INITIALIZE, movie_root::PRIORITY_INIT);
+    queueEvent(event_id(event_id::INITIALIZE), movie_root::PRIORITY_INIT);
 
 }
 
@@ -1906,8 +1908,7 @@ MovieClip::getLoadedMovie(Movie* extern_movie)
                 true, true);
         extern_movie->construct();
     }
-    else
-    {
+    else {
         // replaceLevel will set depth for us
         stage().replaceLevel(get_depth() - DisplayObject::staticDepthOffset,
                               extern_movie);
@@ -1950,10 +1951,9 @@ MovieClip::loadVariables(const std::string& urlstr,
             }
             _loadVariableRequests.push_back(new LoadVariablesThread(sp, url));
         }
-        _loadVariableRequests.back()->process();
+        _loadVariableRequests.back().process();
     }
-    catch (NetworkException& ex)
-    {
+    catch (const NetworkException& ex) {
         log_error(_("Could not load variables from %s"), url.str());
     }
 
@@ -1968,24 +1968,21 @@ MovieClip::processCompletedLoadVariableRequest(LoadVariablesThread& request)
     setVariables(vals);
 
     // We want to call a clip-event too if available, see bug #22116
-    notifyEvent(event_id::DATA);
+    notifyEvent(event_id(event_id::DATA));
 }
 
-/*private*/
 void
 MovieClip::processCompletedLoadVariableRequests()
 {
     // Nothing to do (just for clarity)
-    if ( _loadVariableRequests.empty() ) return;
+    if (_loadVariableRequests.empty()) return;
 
     for (LoadVariablesThreads::iterator it=_loadVariableRequests.begin();
             it != _loadVariableRequests.end(); )
     {
-        LoadVariablesThread& request = *(*it);
-        if (request.completed())
-        {
+        LoadVariablesThread& request = *it;
+        if (request.completed()) {
             processCompletedLoadVariableRequest(request);
-            delete *it;
             it = _loadVariableRequests.erase(it);
         }
         else ++it;
@@ -1997,8 +1994,8 @@ MovieClip::setVariables(const MovieVariables& vars)
 {
     VM& vm = getVM(*getObject(this));
     for (MovieVariables::const_iterator it=vars.begin(), itEnd=vars.end();
-        it != itEnd; ++it)
-    {
+        it != itEnd; ++it) {
+
         const std::string& name = it->first;
         const std::string& val = it->second;
         getObject(this)->set_member(getURI(vm, name), val);
@@ -2008,13 +2005,12 @@ MovieClip::setVariables(const MovieVariables& vars)
 void
 MovieClip::removeMovieClip()
 {
-    int depth = get_depth();
-    if ( depth < 0 || depth > 1048575 )
-    {
+    const int depth = get_depth();
+    if (depth < 0 || depth > 1048575) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("removeMovieClip(%s): movieclip depth (%d) out of the "
-            "'dynamic' zone [0..1048575], won't remove"),
-            getTarget(), depth);
+            log_aserror(_("removeMovieClip(%s): movieclip depth (%d) out of "
+                "the 'dynamic' zone [0..1048575], won't remove"),
+                getTarget(), depth);
         );
         return;
     }

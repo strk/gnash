@@ -20,8 +20,6 @@
 
 #include "movie_root.h"
 
-#include <boost/algorithm/string/erase.hpp>
-#include <boost/algorithm/string/replace.hpp>
 #include <utility>
 #include <string>
 #include <sstream>
@@ -29,13 +27,17 @@
 #include <bitset>
 #include <cassert>
 #include <functional>
+#include <boost/algorithm/string/erase.hpp>
+#include <boost/algorithm/string/replace.hpp>
+#include <boost/ptr_container/ptr_map.hpp>
+#include <boost/ptr_container/ptr_deque.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/bind.hpp>
 
 #include "GnashSystemIOHeaders.h" // write()
 #include "log.h"
 #include "MovieClip.h"
-#include "Movie.h" // for implicit upcast to MovieClip
+#include "Movie.h" 
 #include "VM.h"
 #include "ExecutableCode.h"
 #include "URL.h"
@@ -92,14 +94,6 @@ namespace {
     const DisplayObject* getNearestObject(const DisplayObject* o);
     as_object* getBuiltinObject(movie_root& mr, const ObjectURI& cl);
     void advanceLiveChar(MovieClip* ch);
-
-    /// Push a DisplayObject listener to the front of given container, if not
-    /// already present
-    void add_listener(movie_root::Listeners& ll, Button* elem);
-
-    /// Remove a listener from the list
-    void remove_listener(movie_root::Listeners& ll, Button* elem);
-
 }
 
 // Utility classes
@@ -116,6 +110,13 @@ public:
 private:
     DisplayObject* _target;
 };
+
+void
+clear(movie_root::ActionQueue& aq)
+{
+    std::for_each(aq.begin(), aq.end(), 
+            boost::mem_fn(&movie_root::ActionQueue::value_type::clear));
+}
 
 } // anonymous namespace
 
@@ -173,33 +174,10 @@ movie_root::disableScripts()
     // of the queue.
 }
 
-    
-size_t
-movie_root::nextUnnamedInstance()
-{
-    return ++_unnamedInstance;
-}
-
-void
-movie_root::clearActionQueue()
-{
-    for (size_t lvl = 0; lvl < _actionQueue.size(); ++lvl) {
-        ActionQueue& q = _actionQueue[lvl];
-        q.clear();
-    }
-}
-
-void
-movie_root::clearIntervalTimers()
-{
-    deleteSecondElements(_intervalTimers.begin(), _intervalTimers.end());
-    _intervalTimers.clear();
-}
-
 movie_root::~movie_root()
 {
-    clearActionQueue();
-    clearIntervalTimers();
+    clear(_actionQueue);
+    _intervalTimers.clear();
     _movieLoader.clear();
 
     assert(testInvariant());
@@ -231,8 +209,7 @@ movie_root::setRootMovie(Movie* movie)
     // assert(movie->get_depth() == 0); ?
     movie->set_depth(DisplayObject::staticDepthOffset);
 
-    try
-    {
+    try {
         setLevel(0, movie);
 
         // actions in first frame of _level0 must execute now,
@@ -240,14 +217,12 @@ movie_root::setRootMovie(Movie* movie)
         // or they'll be executed with _currentframe being set to 2
         processActionQueue();
     }
-    catch (ActionLimitException& al)
-    {
+    catch (const ActionLimitException& al) {
         boost::format fmt = boost::format(_("ActionLimits hit during "
                     "setRootMovie: %s. Disable scripts?")) % al.what();
         handleActionLimitHit(fmt.str());
     }
-    catch (ActionParserException& e)
-    {
+    catch (const ActionParserException& e) {
         log_error("ActionParserException thrown during setRootMovie: %s",
                 e.what());
     }
@@ -260,13 +235,14 @@ void
 movie_root::handleActionLimitHit(const std::string& msg)
 {
     bool disable = true;
-    if ( _interfaceHandler ) disable = _interfaceHandler->yesNo(msg);
-    else log_error("No user interface registered, assuming 'Yes' answer to "
+    if (_interfaceHandler) disable = _interfaceHandler->yesNo(msg);
+    else {
+        log_error("No user interface registered, assuming 'Yes' answer to "
             "question: %s", msg);
-    if ( disable )
-    {
+    }
+    if (disable) {
         disableScripts();
-        clearActionQueue();
+        clear(_actionQueue);
     }
 }
 
@@ -290,17 +266,14 @@ movie_root::setLevel(unsigned int num, Movie* movie)
 
 
     Levels::iterator it = _movies.find(movie->get_depth());
-    if ( it == _movies.end() )
-    {
+    if (it == _movies.end()) {
         _movies[movie->get_depth()] = movie; 
     }
-    else
-    {
+    else {
         // don't leak overloaded levels
 
         MovieClip* lm = it->second;
-        if (lm == _rootMovie)
-        {
+        if (lm == _rootMovie) {
             // NOTE: this is not enough to trigger
             //       an application reset. Was tested
             //       but not automated. If curious
@@ -310,15 +283,14 @@ movie_root::setLevel(unsigned int num, Movie* movie)
             log_debug("Replacing starting movie");
         }
 
-        if ( num == 0 )
-        {
+        if (num == 0) {
+
             log_debug("Loading into _level0");
 
             // NOTE: this was tested but not automated, the
             //       test sets an interval and then loads something
             //       in _level0. The result is the interval is disabled.
-            clearIntervalTimers();
-
+            _intervalTimers.clear();
 
             // TODO: check what else we should do in these cases 
             //       (like, unregistering all childs etc...)
@@ -363,8 +335,7 @@ movie_root::swapLevels(MovieClip* movie, int depth)
 #ifdef GNASH_DEBUG_LEVELS_SWAPPING
     log_debug("Before swapLevels (source depth %d, target depth %d) "
             "levels are: ", oldDepth, depth);
-    for (Levels::const_iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
-    {
+    for (Levels::const_iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i) {
         log_debug(" %d: %p (%s @ depth %d)", i->first,
                 (void*)(i->second), i->second->getTarget(),
                 i->second->get_depth());
@@ -415,8 +386,7 @@ movie_root::swapLevels(MovieClip* movie, int depth)
     
 #ifdef GNASH_DEBUG_LEVELS_SWAPPING
     log_debug("After swapLevels levels are: ");
-    for (Levels::const_iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
-    {
+    for (Levels::const_iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i) {
         log_debug(" %d: %p (%s @ depth %d)", i->first, 
                 (void*)(i->second), i->second->getTarget(),
                 i->second->get_depth());
@@ -504,18 +474,18 @@ movie_root::reset()
     _liveChars.clear();
 
     // wipe out queued actions
-    clearActionQueue();
+    clear(_actionQueue);
 
     // wipe out all levels
     _movies.clear();
 
     // remove all intervals
-    clearIntervalTimers();
+    _intervalTimers.clear();
 
     // remove all loadMovie requests
     _movieLoader.clear();
 
-    // remove key/mouse listeners
+    // remove key listeners
     _keyListeners.clear();
 
     // Cleanup the stack.
@@ -559,7 +529,7 @@ movie_root::mouseMoved(boost::int32_t x, boost::int32_t y)
 
     _mouseX = x;
     _mouseY = y;
-    return notify_mouse_listeners(event_id::MOUSE_MOVE);
+    return notify_mouse_listeners(event_id(event_id::MOUSE_MOVE));
 }
 
 
@@ -605,11 +575,10 @@ movie_root::keyEvent(key::code k, bool down)
                 callMethod(key, getURI(_vm,NSV::PROP_BROADCAST_MESSAGE), "onKeyUp");
             }
         }
-        catch (ActionLimitException &e)
-        {
+        catch (const ActionLimitException &e) {
             log_error(_("ActionLimits hit notifying key listeners: %s."),
                     e.what());
-            clearActionQueue();
+            clear(_actionQueue);
         }
     }
     
@@ -723,16 +692,11 @@ movie_root::fire_mouse_event()
 
 }
 
-void
-movie_root::get_mouse_state(boost::int32_t& x, boost::int32_t& y)
+std::pair<boost::int32_t, boost::int32_t>
+movie_root::mousePosition() const
 {
-
     assert(testInvariant());
-
-    x = _mouseX;
-    y = _mouseY;
-
-    assert(testInvariant());
+    return std::make_pair(_mouseX, _mouseY);
 }
 
 void
@@ -803,24 +767,27 @@ movie_root::doMouseDrag()
     dragChar->setMatrix(local);
 }
 
-unsigned int
-movie_root::add_interval_timer(std::auto_ptr<Timer> timer)
+boost::uint32_t
+movie_root::addIntervalTimer(std::auto_ptr<Timer> timer)
 {
     assert(timer.get());
     assert(testInvariant());
             
-    int id = ++_lastTimerId;
+    const size_t id = ++_lastTimerId;
 
     assert(_intervalTimers.find(id) == _intervalTimers.end());
-    _intervalTimers[id] = timer.release(); 
+
+    boost::shared_ptr<Timer> t(timer);
+    _intervalTimers.insert(std::make_pair(id, t));
+
     return id;
 }
     
 bool
-movie_root::clear_interval_timer(unsigned int x)
+movie_root::clearIntervalTimer(boost::uint32_t x)
 {
     TimerMap::iterator it = _intervalTimers.find(x);
-    if ( it == _intervalTimers.end() ) return false;
+    if (it == _intervalTimers.end()) return false;
 
     // We do not remove the element here because
     // we might have been called during execution
@@ -883,11 +850,11 @@ movie_root::advance()
         // The PP does not disable scripts when the stack limit is reached,
         // but rather struggles on. 
         log_error(_("Action limit hit during advance: %s"), al.what());
-        clearActionQueue();
+        clear(_actionQueue);
     }
     catch (const ActionParserException& e) {
         log_error(_("Buffer overread during advance: %s"), e.what());
-        clearActionQueue();
+        clear(_actionQueue);
     }
 
     return advanced;
@@ -1009,7 +976,7 @@ movie_root::notify_mouse_listeners(const event_id& event)
         catch (ActionLimitException &e) {
             log_error(_("ActionLimits hit notifying mouse events: %s."),
                     e.what());
-            clearActionQueue();
+            clear(_actionQueue);
         }
         
     }
@@ -1336,7 +1303,7 @@ movie_root::minPopulatedPriorityQueue() const
 size_t
 movie_root::processActionQueue(size_t lvl)
 {
-    ActionQueue& q = _actionQueue[lvl];
+    ActionQueue::value_type& q = _actionQueue[lvl];
 
     assert(minPopulatedPriorityQueue() == lvl);
 
@@ -1384,8 +1351,7 @@ movie_root::processActionQueue(size_t lvl)
 void
 movie_root::flushHigherPriorityActionQueues()
 {
-    if( ! processingActions() )
-    {
+    if (!processingActions()) {
         // only flush the actions queue when we are 
         // processing the queue.
         // ie. we don't want to flush the queue 
@@ -1394,16 +1360,14 @@ movie_root::flushHigherPriorityActionQueues()
         return;
     }
 
-    if ( _disableScripts )
-    {
+    if (_disableScripts) {
         /// cleanup anything pushed later..
-        clearActionQueue();
+        clear(_actionQueue);
         return;
     }
 
     int lvl=minPopulatedPriorityQueue();
-    while ( lvl<_processingActionLevel )
-    {
+    while (lvl < _processingActionLevel) {
         lvl = processActionQueue(lvl);
     }
 
@@ -1433,7 +1397,7 @@ movie_root::processActionQueue()
 {
     if (_disableScripts) {
         /// cleanup anything pushed later..
-        clearActionQueue();
+        clear(_actionQueue);
         return;
     }
 
@@ -1451,7 +1415,7 @@ movie_root::processActionQueue()
 void
 movie_root::removeQueuedConstructor(DisplayObject* target)
 {
-    ActionQueue& pr = _actionQueue[PRIORITY_CONSTRUCT];
+    ActionQueue::value_type& pr = _actionQueue[PRIORITY_CONSTRUCT];
     pr.erase_if(RemoveTargetCode(target));
 }
 
@@ -1500,8 +1464,8 @@ movie_root::executeAdvanceCallbacks()
     // application. If it is set, we have to check the socket connection
     // for XML messages.
     if (_controlfd) {
-	boost::shared_ptr<ExternalInterface::invoke_t> invoke = 
-	    ExternalInterface::ExternalEventCheck(_controlfd);
+    boost::shared_ptr<ExternalInterface::invoke_t> invoke = 
+        ExternalInterface::ExternalEventCheck(_controlfd);
         if (invoke) {
             if (processInvoke(invoke.get()) == false) {
                 if (!invoke->name.empty()) {
@@ -1509,7 +1473,7 @@ movie_root::executeAdvanceCallbacks()
                           invoke->name);
                 }
             }
-        }	
+        }    
     }
     
     processActionQueue();
@@ -1539,7 +1503,7 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         std::string var = invoke->args[0].to_string();
         as_value &val = invoke->args[1] ;
         obj->set_member(getURI(vm, var), val);
-	// SetVariable doesn't send a response
+    // SetVariable doesn't send a response
     } else if (invoke->name == "GetVariable") {
         MovieClip *mc = getLevel(0);
         as_object *obj = getObject(mc);
@@ -1547,18 +1511,18 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         std::string var = invoke->args[0].to_string();
         as_value val;
         obj->get_member(getURI(vm, var), &val);
-	// GetVariable sends the value of the variable
-	ss << ExternalInterface::toXML(val);
+    // GetVariable sends the value of the variable
+    ss << ExternalInterface::toXML(val);
     } else if (invoke->name == "GotoFrame") {
         log_unimpl("ExternalInterface::GotoFrame()");
-	// GotoFrame doesn't send a response
+    // GotoFrame doesn't send a response
     } else if (invoke->name == "IsPlaying") {
         std::string result = callInterface("ExternalInterface.IsPlaying");
         as_value val((result == "true") ? true : false);
-	ss << ExternalInterface::toXML(val);	
+    ss << ExternalInterface::toXML(val);    
     } else if (invoke->name == "LoadMovie") {
         log_unimpl("ExternalInterface::LoadMovie()");
-	// LoadMovie doesn't send a response
+    // LoadMovie doesn't send a response
     } else if (invoke->name == "Pan") {
         std::string arg = invoke->args[0].to_string();
         arg += ":";
@@ -1568,20 +1532,20 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         arg += ":";
         arg += invoke->args[2].to_string();
         callInterface("ExternalInterface.Pan", arg);
-	// Pan doesn't send a response
+    // Pan doesn't send a response
     } else if (invoke->name == "PercentLoaded") {
         MovieClip *mc = getLevel(0);
         int loaded = mc->get_bytes_loaded();
         int total = mc->get_bytes_total();
         as_value val((loaded/total) * 100);
         // PercentLoaded sends the percentage
-        ss << ExternalInterface::toXML(val);	
+        ss << ExternalInterface::toXML(val);    
     } else if (invoke->name == "Play") {
         callInterface("ExternalInterface.Play");
-	// Play doesn't send a response
+    // Play doesn't send a response
     } else if (invoke->name == "Rewind") {
         callInterface("ExternalInterface.Rewind");
-	// Rewind doesn't send a response
+    // Rewind doesn't send a response
     } else if (invoke->name == "SetZoomRect") {
         std::string arg = invoke->args[0].to_string();
         arg += ":";
@@ -1593,18 +1557,18 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         arg += ":";
         arg += invoke->args[3].to_string();
         callInterface("ExternalInterface.SetZoomRect", arg);
-	// SetZoomRect doesn't send a response
+    // SetZoomRect doesn't send a response
     } else if (invoke->name == "StopPlay") {
         callInterface("ExternalInterface.StopPlay");
-	// StopPlay doesn't send a response
+    // StopPlay doesn't send a response
     } else if (invoke->name == "Zoom") {
         std::string var = invoke->args[0].to_string();
         callInterface("ExternalInterface.Zoom", var);
-	// Zoom doesn't send a response
+    // Zoom doesn't send a response
     } else if (invoke->name == "TotalFrames") {
         MovieClip *mc = getLevel(0);
         as_value val(mc->get_loaded_frames());
-	// TotalFrames sends the number of frames in the movie
+    // TotalFrames sends the number of frames in the movie
         ss << ExternalInterface::toXML(val);
     } else {
         std::string result = callExternalCallback(invoke->name, invoke->args);
@@ -1642,20 +1606,21 @@ movie_root::executeTimers()
 
     unsigned long now = _vm.getTime();
 
-    typedef std::multimap<unsigned int, Timer*> ExpiredTimers;
+    typedef std::multimap<unsigned int, boost::shared_ptr<Timer> >
+        ExpiredTimers;
+
     ExpiredTimers expiredTimers;
 
-    for (TimerMap::iterator it=_intervalTimers.begin(),
-            itEnd=_intervalTimers.end(); it != itEnd; ) {
+    for (TimerMap::iterator it = _intervalTimers.begin(),
+            itEnd = _intervalTimers.end(); it != itEnd; ) {
 
         TimerMap::iterator nextIterator = it;
         ++nextIterator;
 
-        Timer* timer = it->second;
+        boost::shared_ptr<Timer> timer(it->second);
 
         if (timer->cleared()) {
             // this timer was cleared, erase it
-            delete timer;
             _intervalTimers.erase(it);
         }
         else {
@@ -1706,7 +1671,7 @@ movie_root::markReachableResources() const
     // Mark resources reachable by queued action code
     for (size_t lvl = 0; lvl < PRIORITY_SIZE; ++lvl)
     {
-        const ActionQueue& q = _actionQueue[lvl];
+        const ActionQueue::value_type& q = _actionQueue[lvl];
         std::for_each(q.begin(), q.end(),
                 std::mem_fun_ref(&ExecutableCode::markReachableResources));
     }
@@ -1838,7 +1803,7 @@ movie_root::callExternalJavascript(const std::string &name,
 // Javascript in the browser.
 std::string
 movie_root::callExternalCallback(const std::string &name, 
-				 const std::vector<as_value> &fnargs)
+                 const std::vector<as_value> &fnargs)
 {
     // GNASH_REPORT_FUNCTION;
 
@@ -1889,16 +1854,20 @@ movie_root::callExternalCallback(const std::string &name,
 }
 
 void
-movie_root::add_key_listener(Button* listener)
-{
-    add_listener(_keyListeners, listener);
-}
-
-/// Remove a DisplayObject listener for key events
-void
 movie_root::remove_key_listener(Button* listener)
 {
-    remove_listener(_keyListeners, listener);
+    _keyListeners.remove_if(std::bind2nd(std::equal_to<Button*>(), listener));
+}
+
+void
+movie_root::add_key_listener(Button* listener)
+{
+    assert(listener);
+
+    if (std::find(_keyListeners.begin(), _keyListeners.end(), listener)
+            != _keyListeners.end()) return;
+
+    _keyListeners.push_front(listener);
 }
 
 void
@@ -1951,8 +1920,8 @@ movie_root::cleanupDisplayList()
         needScan=false;
 
         // Remove unloaded MovieClips from the _liveChars list
-        for (LiveChars::iterator i=_liveChars.begin(), e=_liveChars.end(); i!=e;)
-        {
+        for (LiveChars::iterator i = _liveChars.begin(), e = _liveChars.end();
+                i != e;) {
             MovieClip* ch = *i;
             if (ch->unloaded()) {
                 // the sprite might have been destroyed already
@@ -1993,8 +1962,7 @@ movie_root::cleanupDisplayList()
     } while (needScan);
 
 #ifdef GNASH_DEBUG_INSTANCE_LIST
-    if ( _liveChars.size() > maxLiveChars )
-    {
+    if (_liveChars.size() > maxLiveChars) {
         maxLiveChars = _liveChars.size();
         log_debug("Global instance list grew to %d entries", maxLiveChars);
     }
@@ -2055,8 +2023,7 @@ movie_root::findCharacterByTarget(const std::string& tgtstr) const
     assert(o);
 
     std::string::size_type from = 0;
-    while (std::string::size_type to = tgtstr.find('.', from))
-    {
+    while (std::string::size_type to = tgtstr.find('.', from)) {
         std::string part(tgtstr, from, to - from);
 
         // TODO: there is surely a cleaner way to implement path finding.
@@ -2105,8 +2072,8 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
         boost::replace_all(command, "%u", safeurl);
         
         log_debug (_("Launching URL: %s"), command);
-        int ret = std::system(command.c_str());
-        if ( -1 == ret ) {
+        const int ret = std::system(command.c_str());
+        if (ret == -1) {
             log_error(_("Fork failed launching url opener '%s'"), command);
         }
         return;
@@ -2134,7 +2101,7 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
     // The third argument is the target, which is something like _blank
     // or _self.
     if (!target.empty()) {
-	fnargs.push_back(as_value(target));
+        fnargs.push_back(as_value(target));
     }
     // Add any data as the optional 4th argument
     if (!data.empty()) {
@@ -2152,10 +2119,10 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
 
     std::string msg = ExternalInterface::makeInvoke("getURL", fnargs);
 
-    size_t ret = ExternalInterface::writeBrowser(_hostfd, msg);
+    const size_t ret = ExternalInterface::writeBrowser(_hostfd, msg);
     if (ret < msg.size()) {
         log_error(_("Could only write %d bytes to fd #%d"),
-		  ret, _hostfd);
+          ret, _hostfd);
     }
 }
 
@@ -2434,7 +2401,7 @@ generate_mouse_button_events(movie_root& mr, MouseButtonState& ms)
 
                 // onDragOver
                 if (ms.activeEntity) {
-                    ms.activeEntity->mouseEvent(event_id::DRAG_OVER);
+                    ms.activeEntity->mouseEvent(event_id(event_id::DRAG_OVER));
                     need_redisplay=true;
                 }
                 ms.wasInsideActiveEntity = true;
@@ -2443,7 +2410,7 @@ generate_mouse_button_events(movie_root& mr, MouseButtonState& ms)
         else if (ms.topmostEntity != ms.activeEntity) {
             // onDragOut
             if (ms.activeEntity) {
-                ms.activeEntity->mouseEvent(event_id::DRAG_OUT);
+                ms.activeEntity->mouseEvent(event_id(event_id::DRAG_OUT));
                 need_redisplay=true;
             }
             ms.wasInsideActiveEntity = false;
@@ -2457,13 +2424,14 @@ generate_mouse_button_events(movie_root& mr, MouseButtonState& ms)
             if (ms.activeEntity) {
                 if (ms.wasInsideActiveEntity) {
                     // onRelease
-                    ms.activeEntity->mouseEvent(event_id::RELEASE);
+                    ms.activeEntity->mouseEvent(event_id(event_id::RELEASE));
                     need_redisplay = true;
                 }
                 else {
                     // TODO: Handle trackAsMenu 
                     // onReleaseOutside
-                    ms.activeEntity->mouseEvent(event_id::RELEASE_OUTSIDE);
+                    ms.activeEntity->mouseEvent(
+                            event_id(event_id::RELEASE_OUTSIDE));
                     // We got out of active entity
                     ms.activeEntity = 0; // so we don't get RollOut next...
                     need_redisplay = true;
@@ -2475,11 +2443,10 @@ generate_mouse_button_events(movie_root& mr, MouseButtonState& ms)
 
     else {
         // New active entity is whatever is below the mouse right now.
-        if (ms.topmostEntity != ms.activeEntity)
-        {
+        if (ms.topmostEntity != ms.activeEntity) {
             // onRollOut
             if (ms.activeEntity) {
-                ms.activeEntity->mouseEvent(event_id::ROLL_OUT);
+                ms.activeEntity->mouseEvent(event_id(event_id::ROLL_OUT));
                 need_redisplay=true;
             }
 
@@ -2487,7 +2454,7 @@ generate_mouse_button_events(movie_root& mr, MouseButtonState& ms)
 
             // onRollOver
             if (ms.activeEntity) {
-                ms.activeEntity->mouseEvent(event_id::ROLL_OVER);
+                ms.activeEntity->mouseEvent(event_id(event_id::ROLL_OVER));
                 need_redisplay=true;
             }
 
@@ -2504,8 +2471,8 @@ generate_mouse_button_events(movie_root& mr, MouseButtonState& ms)
             if (ms.activeEntity) {
                 mr.setFocus(ms.activeEntity);
 
-                ms.activeEntity->mouseEvent(event_id::PRESS);
-                need_redisplay=true;
+                ms.activeEntity->mouseEvent(event_id(event_id::PRESS));
+                need_redisplay = true;
             }
 
             ms.wasInsideActiveEntity = true;
@@ -2553,26 +2520,6 @@ advanceLiveChar(MovieClip* mo)
     }
 #endif
 }
-
-void
-add_listener(movie_root::Listeners& ll, Button* listener)
-{
-    assert(listener);
-
-    // Don't add the same listener twice (why not use a set?)
-    if (std::find(ll.begin(), ll.end(), listener) != ll.end()) return;
-
-    ll.push_front(listener);
-}
-
-
-void
-remove_listener(movie_root::Listeners& ll, Button* listener)
-{
-    assert(listener);
-    ll.remove_if(std::bind2nd(std::equal_to<Button*>(), listener));
-}
-
 
 } // anonymous namespace
 } // namespace gnash
