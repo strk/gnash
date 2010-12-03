@@ -24,10 +24,11 @@
 
 #include "DisplayObject.h"
 
+#include <utility>
+#include <boost/tuple/tuple.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/bind.hpp>
-#include <utility>
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_root.h"
@@ -1310,7 +1311,7 @@ getMouseX(DisplayObject& o)
 {
 	// Local coord of mouse IN PIXELS.
 	boost::int32_t x, y;
-	getRoot(*getObject(&o)).get_mouse_state(x, y);
+    boost::tie(x, y) = getRoot(*getObject(&o)).mousePosition();
 
 	SWFMatrix m = getWorldMatrix(o);
     point a(pixelsToTwips(x), pixelsToTwips(y));
@@ -1324,7 +1325,7 @@ getMouseY(DisplayObject& o)
 {
 	// Local coord of mouse IN PIXELS.
 	boost::int32_t x, y;
-	getRoot(*getObject(&o)).get_mouse_state(x, y);
+    boost::tie(x, y) = getRoot(*getObject(&o)).mousePosition();
 
 	SWFMatrix m = getWorldMatrix(o);
     point a(pixelsToTwips(x), pixelsToTwips(y));

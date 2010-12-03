@@ -692,15 +692,11 @@ movie_root::fire_mouse_event()
 
 }
 
-void
-movie_root::get_mouse_state(boost::int32_t& x, boost::int32_t& y)
+std::pair<boost::int32_t, boost::int32_t>
+movie_root::mousePosition() const
 {
     assert(testInvariant());
-
-    x = _mouseX;
-    y = _mouseY;
-
-    assert(testInvariant());
+    return std::make_pair(_mouseX, _mouseY);
 }
 
 void

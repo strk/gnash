@@ -295,7 +295,7 @@ public:
     /// Use this to retrieve the last state of the mouse.
     //
     /// Coordinates are in PIXELS, NOT TWIPS.
-    void get_mouse_state(boost::int32_t& x, boost::int32_t& y);
+    std::pair<boost::int32_t, boost::int32_t> mousePosition() const;
 
     void setDragState(const DragState& st);
 
