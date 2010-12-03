@@ -20,8 +20,6 @@
 
 #include "movie_root.h"
 
-#include <boost/algorithm/string/erase.hpp>
-#include <boost/algorithm/string/replace.hpp>
 #include <utility>
 #include <string>
 #include <sstream>
@@ -29,13 +27,17 @@
 #include <bitset>
 #include <cassert>
 #include <functional>
+#include <boost/algorithm/string/erase.hpp>
+#include <boost/algorithm/string/replace.hpp>
+#include <boost/ptr_container/ptr_map.hpp>
+#include <boost/ptr_container/ptr_deque.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/bind.hpp>
 
 #include "GnashSystemIOHeaders.h" // write()
 #include "log.h"
 #include "MovieClip.h"
-#include "Movie.h" // for implicit upcast to MovieClip
+#include "Movie.h" 
 #include "VM.h"
 #include "ExecutableCode.h"
 #include "URL.h"
@@ -180,13 +182,6 @@ movie_root::disableScripts()
     // of the queue.
 }
 
-    
-size_t
-movie_root::nextUnnamedInstance()
-{
-    return ++_unnamedInstance;
-}
-
 movie_root::~movie_root()
 {
     clear(_actionQueue);
@@ -222,8 +217,7 @@ movie_root::setRootMovie(Movie* movie)
     // assert(movie->get_depth() == 0); ?
     movie->set_depth(DisplayObject::staticDepthOffset);
 
-    try
-    {
+    try {
         setLevel(0, movie);
 
         // actions in first frame of _level0 must execute now,
@@ -231,14 +225,12 @@ movie_root::setRootMovie(Movie* movie)
         // or they'll be executed with _currentframe being set to 2
         processActionQueue();
     }
-    catch (ActionLimitException& al)
-    {
+    catch (const ActionLimitException& al) {
         boost::format fmt = boost::format(_("ActionLimits hit during "
                     "setRootMovie: %s. Disable scripts?")) % al.what();
         handleActionLimitHit(fmt.str());
     }
-    catch (ActionParserException& e)
-    {
+    catch (const ActionParserException& e) {
         log_error("ActionParserException thrown during setRootMovie: %s",
                 e.what());
     }
@@ -251,11 +243,12 @@ void
 movie_root::handleActionLimitHit(const std::string& msg)
 {
     bool disable = true;
-    if ( _interfaceHandler ) disable = _interfaceHandler->yesNo(msg);
-    else log_error("No user interface registered, assuming 'Yes' answer to "
+    if (_interfaceHandler) disable = _interfaceHandler->yesNo(msg);
+    else {
+        log_error("No user interface registered, assuming 'Yes' answer to "
             "question: %s", msg);
-    if ( disable )
-    {
+    }
+    if (disable) {
         disableScripts();
         clear(_actionQueue);
     }
@@ -281,12 +274,10 @@ movie_root::setLevel(unsigned int num, Movie* movie)
 
 
     Levels::iterator it = _movies.find(movie->get_depth());
-    if ( it == _movies.end() )
-    {
+    if (it == _movies.end()) {
         _movies[movie->get_depth()] = movie; 
     }
-    else
-    {
+    else {
         // don't leak overloaded levels
 
         MovieClip* lm = it->second;
@@ -799,10 +790,13 @@ movie_root::addIntervalTimer(std::auto_ptr<Timer> timer)
     assert(timer.get());
     assert(testInvariant());
             
-    size_t id = ++_lastTimerId;
+    const size_t id = ++_lastTimerId;
 
     assert(_intervalTimers.find(id) == _intervalTimers.end());
-    _intervalTimers.insert(id, timer);
+
+    boost::shared_ptr<Timer> t(timer);
+    _intervalTimers.insert(std::make_pair(id, t));
+
     return id;
 }
     
@@ -1374,8 +1368,7 @@ movie_root::processActionQueue(size_t lvl)
 void
 movie_root::flushHigherPriorityActionQueues()
 {
-    if( ! processingActions() )
-    {
+    if (!processingActions()) {
         // only flush the actions queue when we are 
         // processing the queue.
         // ie. we don't want to flush the queue 
@@ -1384,16 +1377,14 @@ movie_root::flushHigherPriorityActionQueues()
         return;
     }
 
-    if ( _disableScripts )
-    {
+    if (_disableScripts) {
         /// cleanup anything pushed later..
         clear(_actionQueue);
         return;
     }
 
     int lvl=minPopulatedPriorityQueue();
-    while ( lvl<_processingActionLevel )
-    {
+    while (lvl < _processingActionLevel) {
         lvl = processActionQueue(lvl);
     }
 
@@ -1632,10 +1623,8 @@ movie_root::executeTimers()
 
     unsigned long now = _vm.getTime();
 
-    // This does not own its Timers and is strictly temporary; the
-    // original _intervalTimers map must keep all references Timers
-    // alive until the end of this function.
-    typedef std::multimap<unsigned int, Timer*> ExpiredTimers;
+    typedef std::multimap<unsigned int, boost::shared_ptr<Timer> >
+        ExpiredTimers;
 
     ExpiredTimers expiredTimers;
 
@@ -1645,7 +1634,7 @@ movie_root::executeTimers()
         TimerMap::iterator nextIterator = it;
         ++nextIterator;
 
-        Timer* timer = it->second;
+        boost::shared_ptr<Timer> timer(it->second);
 
         if (timer->cleared()) {
             // this timer was cleared, erase it

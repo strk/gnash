@@ -76,7 +76,6 @@
 #include <bitset>
 #include <boost/array.hpp>
 #include <boost/ptr_container/ptr_deque.hpp>
-#include <boost/ptr_container/ptr_map.hpp>
 #include <boost/noncopyable.hpp>
 
 #include "smart_ptr.h" // GNASH_USE_GC
@@ -124,9 +123,7 @@ namespace gnash {
 struct DepthComparator
 {
     typedef MovieClip* LevelMovie;
-
-    bool operator()(const LevelMovie& d1, const LevelMovie& d2) const
-    {
+    bool operator()(const LevelMovie& d1, const LevelMovie& d2) const {
         return d1->get_depth() < d2->get_depth();
     }
 };
@@ -430,7 +427,9 @@ public:
     }
 
     /// Get a unique number for unnamed instances.
-    size_t nextUnnamedInstance();
+    size_t nextUnnamedInstance() {
+        return ++_unnamedInstance;
+    }
 
     /// Push a new DisplayObject listener for key events
     void add_key_listener(Button* listener);
@@ -1051,7 +1050,7 @@ private:
 
     LoadCallbacks _loadCallbacks;
     
-    typedef boost::ptr_map<boost::uint32_t, Timer> TimerMap;
+    typedef std::map<boost::uint32_t, boost::shared_ptr<Timer> > TimerMap;
 
     TimerMap _intervalTimers;
 
