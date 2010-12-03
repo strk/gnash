@@ -299,8 +299,10 @@ public:
 
     void setDragState(const DragState& st);
 
-    /// @return the originating root movie (not necessarely _level0)
-    const Movie& getRootMovie() const {
+    /// Access the originating root movie (not necessarily _level0)
+    //
+    /// @return the original root movie.
+    Movie& getRootMovie() {
         return *_rootMovie;
     }
 
@@ -408,14 +410,6 @@ public:
     }
 
     void display();
-
-    /// Delegate to originating root movie
-    //
-    /// TODO: drop ?
-    void set_play_state(MovieClip::PlayState s)
-    {
-        _rootMovie->setPlayState(s);
-    }
 
     /// Get a unique number for unnamed instances.
     size_t nextUnnamedInstance() {

@@ -516,7 +516,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
                 fprintf(stderr, "Kicking movie after %g seconds in STOP mode, kick ct = %d\n", waitforadvance, kick_count);
                 fflush(stderr);
                 m.goto_frame(last_frame + 1);
-                m.set_play_state(gnash::MovieClip::PLAYSTATE_PLAY);
+                m.getRootMovie().setPlayState(gnash::MovieClip::PLAYSTATE_PLAY);
                 kick_count++;
 
                 if (kick_count > 10) {
