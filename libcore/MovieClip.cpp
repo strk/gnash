@@ -721,9 +721,9 @@ MovieClip::queueAction(const action_buffer& action)
 }
 
 void
-MovieClip::queueActions(ActionList& actions)
+MovieClip::queueActions(const ActionList& actions)
 {
-    for(ActionList::const_iterator it=actions.begin(), itEnd=actions.end();
+    for (ActionList::const_iterator it=actions.begin(), itEnd=actions.end();
                      it != itEnd; ++it)
     {
         const action_buffer* buf = *it;
