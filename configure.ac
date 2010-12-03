@@ -762,7 +762,7 @@ dnl --------------------------------------------------------
 dnl  Media handler selection
 dnl --------------------------------------------------------
 build_media_gst=no
-build_media_ffmpeg=no
+build_media_ffmpeg=auto
 build_media_none=no
 AC_ARG_ENABLE(media,
   AC_HELP_STRING([--enable-media=handler],
@@ -771,6 +771,10 @@ AC_ARG_ENABLE(media,
     if test -n ${enableval}; then
       enableval=`echo ${enableval} | tr '\054' ' ' `
     fi
+    dnl When --enable-media is given, all media defaults to off
+    dnl except the explicitly enabled ones
+    build_media_ffmpeg=no
+    build_media_gst=no
     while test -n "${enableval}"; do
       val=`echo ${enableval} | cut -d ' ' -f 1`
       [case "${val}" in
@@ -784,8 +788,6 @@ AC_ARG_ENABLE(media,
           ;;
         no|NO|none)
           build_media_none=yes
-          build_media_ffmpeg=no
-          build_media_gst=no
           media_list="none"
           ;;
         *)
@@ -813,12 +815,22 @@ if test x${build_media_none} = xno -a x${build_media_gst} = xno -a x${build_medi
   build_media_gst=yes
 fi
 
+if test x"$build_media_ffmpeg" != x"no"; then # yes or auto
+  GNASH_PATH_FFMPEG
+  if test x"${build_media_ffmpeg}" = xauto; then
+    dnl TODO: have GNASH_PATH_FFMPEG set ${has_ffmpeg}
+    if test x"$FFMPEG_LIBS" != x; then
+      build_media_ffmpeg=yes
+      media_list="${media_list} ffmpeg"
+    else
+      build_ogl=no
+    fi
+  fi
+fi
+
 MEDIA_CONFIG="${media_list}"
 AC_SUBST(MEDIA_CONFIG)
 
-if test x"$build_media_ffmpeg" = x"yes"; then
-  GNASH_PATH_FFMPEG
-fi
 
 dnl -------------------------------
 dnl Input Device selection
