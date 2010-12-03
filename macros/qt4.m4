@@ -41,7 +41,6 @@ AC_DEFUN([GNASH_PATH_QT4], [
   ])				dnl end of cache ac_cv_path_qt4_incl
 
   dnl Only run these tests if this version was specified by the user.
-  if test x"${build_qt4}" = xyes; then
 
     if test x"${ac_cv_path_qt4_incl}" = x; then
       dnl if QTDIR is set in the users environment, use that, as that's what
@@ -184,7 +183,6 @@ dnl   fi
     AC_SUBST([QT4_LIBS])
     AC_SUBST([MOC4])
     AC_SUBST([UIC4])
-  fi                              dnl end of build_qt4
 ])				dnl end of defun GNASH_PATH_QT4
 
 dnl dnl Find the QT 4.x libQtCore library

@@ -42,7 +42,7 @@ AC_DEFUN([GNASH_PATH_QT3],
 
   dnl Only run these tests if this version was specified by the user, and they
   dnl haven't spcified a custom path.
-  if test x"${build_qt3}" = xyes -a x"${ac_cv_path_qt3_incl}" = x; then
+  if x"${ac_cv_path_qt3_incl}" = x; then
     dnl if QTDIR is set in the users environment, use that, as that's what
     dnl most QT programmers do, as it's required by the QT build system.
     qt_pkg="qt-mt"
@@ -144,7 +144,7 @@ dnl   # QT_LIBS =  -lqtui -lqtcore -lqtprint -L/usr/lib/qt-3.3/lib -lqt-mt
 
     AC_PATH_PROG(MOC3, moc, ,[ /usr/lib/qt-3.3/bin ${QTDIR}/bin${pathlist}])
 
-  fi                              dnl end of build_qt3
+  fi                              dnl end of ${ac_cv_path_qt3_incl} empty
 
   AC_SUBST(MOC3)
   AC_SUBST(QT3_CFLAGS)  

@@ -2317,10 +2317,16 @@ fi
 
 AM_CONDITIONAL(HAVE_SDL, [ test x$has_SDL = xyes ])
 
-GNASH_PATH_QT3
+if test x"${build_qt3}" = xyes; then
+  GNASH_PATH_QT3
+fi
+
 GNASH_PATH_KDE3
 
-GNASH_PATH_QT4
+if test x"${build_qt4}" = xyes; then
+  GNASH_PATH_QT4
+fi
+
 GNASH_PATH_KDE4
 
 dnl Qtopia is a desktop environment for embedded devices.
