@@ -21,8 +21,38 @@ The main difference between how the Gnash renderers used to work and
 the way they work now is they have gained device knowledge. In the
 embedded world, all GPUs have varying levels of accleration
 support. This functionality is probed at runtime now, and the optimal
-acceleration support selected automatically.
+acceleration support selected automatically. For the features without
+hardware accleration available, they will be renderered in software.
 
 This allows us Gnash to take advantage of each GPUs support where it
-best makes sense.
+best makes sense. Until recently, Gnash just depended on whatever the
+X11 desktop supplied. To run properly without X11 though, requires the
+ability in Gnash to supply the missing support.
 
+Currently 3 devices are supported, as these are the most portable. The
+primary default device is EGL, as it's used by OpenVG, OpenGLES1, and
+OpenGLES2, on both embedded and desktop platforms. When using Gallium
+drivers under libMesa, EGL supports hardware acceleration for the
+higher level libraries.
+
+The DirectFB device is a bit of a special case, as it's both an
+accleration library and a GUI toolkit. So this one has support in both
+librender and gui libraries. For rendering, only the device specific
+parts of DirectFB are used.
+
+The X11 device is primarily for testing and for running EGL on
+X11. This makes X11 follow the same API as the other devices, and
+allows simple window creation via xlib for testing renderers.
+
+GnashDevice
+	> EglDevice
+	> X11Device
+	> DirectFBDevice
+
+Renderer
+	> Renderer_base_agg
+	  > Renderer_agg
+	> Renderer_ogl
+	> Renderer_gles1
+	> Renderer_gles2
+	> Renderer_ovg
