@@ -154,6 +154,8 @@ SharedLib::getInitEntry (const std::string& symbol)
     } else {
         log_debug (_("Found symbol %s @ %p"), symbol, (void *)run);
     }
+#else
+    (void)symbol;
 #endif
     
     return (initentry*)(run);

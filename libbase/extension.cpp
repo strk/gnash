@@ -22,18 +22,6 @@
 #include "gnashconfig.h"
 #endif
 
-// #if defined(_WIN32) || defined(WIN32)
-// # define lock(lib_mutex);
-// # define scoped_lock ;
-// #define PLUGINSDIR "./"    //hack
-// #define USE_DIRENT 1
-// #else
-// # include <boost/detail/lightweight_mutex.hpp>
-//   using boost::detail::lightweight_mutex;
-// # define scoped_lock lightweight_mutex::scoped_lock
-//   static lightweight_mutex lib_mutex;
-// #endif
-
 #if defined(WIN32) || defined(_WIN32)
 #define LIBLTDL_DLL_IMPORT 1
 #endif
@@ -95,7 +83,9 @@ Extension::Extension()
     }
 
     log_debug("Plugins path: %s", _pluginsdir);
+#ifdef HAVE_LTDL
     lt_dlsetsearchpath(_pluginsdir.c_str());
+#endif
 }
 
 Extension::Extension(const std::string& dir)
@@ -106,7 +96,9 @@ Extension::Extension(const std::string& dir)
 //                                 gnash_mutex_seterror, gnash_mutex_geterror);
 #endif
     _pluginsdir = dir;
+#ifdef HAVE_LTDL
     lt_dlsetsearchpath(_pluginsdir.c_str());
+#endif
 }
 
 Extension::~Extension()
@@ -119,7 +111,9 @@ Extension::scanAndLoad(const std::string& dir, as_object &obj)
 {
 //    GNASH_REPORT_FUNCTION;
     
+#ifdef HAVE_LTDL
     lt_dlsetsearchpath(_pluginsdir.c_str());
+#endif
     _pluginsdir = dir;
     
     return scanAndLoad(obj);
