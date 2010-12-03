@@ -518,7 +518,6 @@ MovieClip::MovieClip(as_object* object, const movie_definition* def,
 MovieClip::~MovieClip()
 {
     stopStreamSound();
-    deleteChecked(_loadVariableRequests.begin(), _loadVariableRequests.end());
 }
 
 int
@@ -1950,7 +1949,7 @@ MovieClip::loadVariables(const std::string& urlstr,
             }
             _loadVariableRequests.push_back(new LoadVariablesThread(sp, url));
         }
-        _loadVariableRequests.back()->process();
+        _loadVariableRequests.back().process();
     }
     catch (NetworkException& ex)
     {
@@ -1981,11 +1980,9 @@ MovieClip::processCompletedLoadVariableRequests()
     for (LoadVariablesThreads::iterator it=_loadVariableRequests.begin();
             it != _loadVariableRequests.end(); )
     {
-        LoadVariablesThread& request = *(*it);
-        if (request.completed())
-        {
+        LoadVariablesThread& request = *it;
+        if (request.completed()) {
             processCompletedLoadVariableRequest(request);
-            delete *it;
             it = _loadVariableRequests.erase(it);
         }
         else ++it;
