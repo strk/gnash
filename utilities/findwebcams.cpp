@@ -87,7 +87,7 @@ gint findVidDevs(std::vector<data*>& vidVect) {
         g_object_get (element, "device-name", &dev_name, NULL);
         gst_element_set_state (element, GST_STATE_NULL);
         if (strcmp(dev_name, "null") == 0) {
-            g_print("no v4l video sources found\n");
+            std::cout << "no v4l video sources found" << std::endl;
         }
         else { 
             vidVect.push_back(new data);
@@ -121,7 +121,7 @@ gint findVidDevs(std::vector<data*>& vidVect) {
         g_object_get (element, "device-name", &dev_name, NULL);
         gst_element_set_state (element, GST_STATE_NULL);
         if (strcmp(dev_name, "null") == 0) {
-            g_print("no v4l2 video sources found.\n");
+            std::cout << "no v4l2 video sources found." << std::endl;
         }
         else {
             vidVect.push_back(new data);
@@ -155,30 +155,38 @@ int main () {
     int fromrc = rcfile.getWebcamDevice();
     
     if (fromrc == -1) {
-        g_print("\nUse this utility to set your desired default webcam device.\n");
+        std::cout << std::endl
+                  << "Use this utility to set your desired default webcam device." << std::endl;
         numdevs = findVidDevs(vidVector);
-        g_print("\nINFO: these devices were ignored because they are supported by both");
-        g_print("\nvideo4linux and video4linux2:\n\n");
+        std::cout << std::endl
+             << "INFO: these devices were ignored because they are supported by both" << std::endl
+             << "video4linux and video4linux2:" << std::endl << std::endl;
         for (size_t i = 0; i < numdevs; ++i) {
             if (vidVector[i]->duplicate == true) {
-                g_print("    %s (%s)\n", vidVector[i]->deviceName, vidVector[i]->deviceType);
+                std::cout << "    " << vidVector[i]->deviceName
+                     << " (" << vidVector[i]->deviceType << ")" << std::endl;
             }
         }
-        g_print("\nGnash interacts with v4l2 sources better than v4l sources, thus the");
-        g_print("\nv4l sources will not be printed in the list below.\n");
-        g_print("\nFound %d video devices: \n\n", (numdevs - numDuplicates));
+        std::cout << std::endl
+             << "Gnash interacts with v4l2 sources better than v4l sources, thus the" << std::endl
+             << "v4l sources will not be printed in the list below." << std::endl
+             << std::endl
+             << "Found " << (numdevs - numDuplicates) 
+             << " video devices: " << std::endl << std::endl;
         gint counter = 0;
         for (size_t i = 0; i < numdevs; ++i)
         {
             if (i == 0 && (vidVector[i] != 0)) {
-                g_print("    %d. Video Test Source (videotestsrc)\n", i);
+                std::cout << "    " << i
+                     << ". Video Test Source (videotestsrc)" << std::endl;
                 counter++;
             } else if (i == 0 && (vidVector[i] == 0)) {
-                g_print("no test video device available");
+                std::cout << "no test video device available";
             } else {
                 if (vidVector[i]->duplicate != true) {
-                    g_print("    %d. %s (%s)\n", counter, vidVector[i]->deviceName,
-                            vidVector[i]->deviceType);
+                    std::cout << "    " << counter << ". "
+                         << vidVector[i]->deviceName
+                         << " (" << vidVector[i]->deviceType << ")" << std::endl;
                     counter++;
                 }
             }
@@ -188,8 +196,9 @@ int main () {
         std::string fromCin;
         do {
             dev_select = -1;
-            g_print("\nChoose the device you would like to use (0-%d): ",
-                (numdevs - numDuplicates - 1));
+            std::cout << std::endl
+                 << "Choose the device you would like to use (0-"
+                 << (numdevs - numDuplicates - 1) << "): ";
             std::cin >> fromCin;
             if (fromCin.size() != 1) {
                 dev_select = -1;
@@ -199,23 +208,27 @@ int main () {
                 dev_select = atoi(fromCin.c_str());
             }
             if ((dev_select < 0) || (dev_select > (numdevs - numDuplicates - 1))) {
-                g_print("You must make a valid device selection\n");
+                std::cout << "You must make a valid device selection" << std::endl;
             }
         } while ((dev_select < 0) || (dev_select > (numdevs - numDuplicates - 1)));
-        g_print("\nTo select this camera, add this line to your gnashrc file:\n");
-        g_print("set webcamDevice %d\n", vidVector[dev_select + numDuplicates]->deviceNumber);
+        std::cout << std::endl
+             << "To select this camera, add this line to your gnashrc file:" << std::endl
+             << "set webcamDevice "
+             << (vidVector[dev_select + numDuplicates]->deviceNumber) << std::endl;
     } else {
         numdevs = findVidDevs(vidVector);
         if (fromrc <= (vidVector.size() - 1)) {
-            g_print("\nThe gnashrc file reports default webcam is set to:\n");
-            g_print("%s (%s)\n", vidVector[fromrc]->deviceName,
-                vidVector[fromrc]->deviceType);
-            g_print("To change this setting, delete the 'set webcamDevice' line\n");
-            g_print("from your gnashrc file and re-run this program.\n\n");
+            std::cout << std::endl
+                 << "The gnashrc file reports default webcam is set to:" << std::endl
+                 << vidVector[fromrc]->deviceName
+                 << " (" << vidVector[fromrc]->deviceType << ")" << std::endl
+                 << "To change this setting, delete the 'set webcamDevice' line" << std::endl
+                 << "from your gnashrc file and re-run this program." << std::endl << std::endl;
         } else {
-            g_print("\nYou have an invalid webcam chosen in your gnashrc file.\n");
-            g_print("Try reattaching the device or deleting the value from gnashrc\n");
-            g_print("and running this program again\n");
+          std::cout << std::endl
+               << "You have an invalid webcam chosen in your gnashrc file." << std::endl
+               << "Try reattaching the device or deleting the value from gnashrc" << std::endl
+               << "and running this program again" << std::endl;
         }
     }
     return 0;
