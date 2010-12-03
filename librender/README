@@ -1,0 +1,28 @@
+There is a process here that has to happen in a specific order. The
+first step is to initialize the base hardware platform. Normally for
+X11 you can assume this has already happened. If using EGL from Mesa
+on X11, then we stil need to do this step, as EGL is out interface,
+not X11.
+
+After the device layer is initialized, then the renderer gets
+created. This is just the base initilization though, as the rest needs
+a window to draw into. So the next step after initilizing the renderer
+is to initialize the GUI. For a framebuffer, either EGL or DirectFB
+are used on the bare device.
+
+Once the GUI is initilized, it can then pass the window for the
+renderer to draw into. The renderer initizlizes a surface using the
+window handle, and then make that surface the current context.
+
+Rendering always happens in a back buffer, and is merely swapped with
+the displayed one after rendering.
+
+The main difference between how the Gnash renderers used to work and
+the way they work now is they have gained device knowledge. In the
+embedded world, all GPUs have varying levels of accleration
+support. This functionality is probed at runtime now, and the optimal
+acceleration support selected automatically.
+
+This allows us Gnash to take advantage of each GPUs support where it
+best makes sense.
+
