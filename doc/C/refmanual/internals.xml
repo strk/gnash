@@ -9,7 +9,7 @@
       <emphasis>libgnashcore</emphasis>,
       <emphasis>libgnashmedia</emphasis>,
       <emphasis>libgnashamf</emphasis> and
-      <emphasis>libgnashbackend</emphasis>. There are several utility programs 
+      <emphasis>libgnashrender</emphasis>. There are several utility programs 
       included for debug parsing and processing of SWF movie files,
       and other useful utilities for examining local Shared Objects and
       sniffing LocalConnections.
