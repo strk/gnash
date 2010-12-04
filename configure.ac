@@ -665,6 +665,7 @@ AC_ARG_ENABLE(gui,
   else if test x"${haiku}" = xyes; then
     build_haiku=yes;
   else
+    build_kde3=auto
     build_kde4=auto
     build_gtk=yes
   fi
@@ -1762,7 +1763,6 @@ if test x$build_gtk = xyes -o $build_alp = xyes; then
       GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
    fi
 fi
-dnl TODO: add checks for all other GUIs
 
 
 if test x"${build_kde4}" != xno -o x"${build_qtopia4}" != xno; then
@@ -1781,7 +1781,24 @@ if test x"${build_kde4}" = xauto; then
   fi
 fi
 
+if test x"${build_kde3}" != xno -o x"${build_qtopia3}" != xno; then
+ GNASH_PATH_QT3
+fi
 
+if test x"${build_kde3}" != xno; then
+  GNASH_PATH_KDE3
+fi
+
+
+if test x"${build_kde3}" = xauto; then
+  if test x"${has_qt3}" = xyes -a x"${has_kde3}" = xyes; then
+     build_kde3=yes
+  else
+     build_kde3=no
+  fi
+fi
+
+dnl TODO: add checks for all other GUIs
 
 dnl -----------------------------------------------------------
 dnl Try to ignore stupid dependencies
@@ -2329,14 +2346,6 @@ if test x$build_sdl = xyes -o x$build_sound_sdl = xyes; then
 fi
 
 AM_CONDITIONAL(HAVE_SDL, [ test x$has_SDL = xyes ])
-
-if test x"${build_kde3}" != xno -o x"${build_qtopia3}" != xno; then
- GNASH_PATH_QT3
-fi
-
-if test x"${build_kde3}" = xyes; then
-  GNASH_PATH_KDE3
-fi
 
 dnl Qtopia is a desktop environment for embedded devices.
 dnl GNASH_PATH_QTOPIA3
