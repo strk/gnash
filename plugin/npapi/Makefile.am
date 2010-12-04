@@ -40,6 +40,7 @@ AM_CPPFLAGS = -DPLUGIN_TRACE -DGNASHBINDIR=\"$(GNASHBINDIR)\" \
         -I$(top_srcdir)/librender \
 	-I$(srcdir)/mozilla-sdk \
 	-I$(srcdir)/mozilla-sdk/include \
+	$(X11_CFLAGS) \
         $(GLIB_CFLAGS) \
 	$(NULL)
 
