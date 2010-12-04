@@ -36,9 +36,11 @@
 #include <openssl/err.h>
 #endif
 
+#include "dsodefs.h"
 #include "cque.h"
 #include "network.h"
 #include "buffer.h"
+
 
 namespace gnash
 {
@@ -57,12 +59,12 @@ public:
     ~SSLClient();
 
     // Read bytes from the already opened SSL connection
-    int sslRead(amf::Buffer &buf);
+    int sslRead(cygnal::Buffer &buf);
     int sslRead(boost::uint8_t *buf, size_t length);
     int sslRead(std::string &buf);
 
     // Write bytes to the already opened SSL connection
-    int sslWrite(amf::Buffer &buf);
+    int sslWrite(cygnal::Buffer &buf);
     int sslWrite(const boost::uint8_t *buf, size_t length);
     int sslWrite(std::string &buf);
 

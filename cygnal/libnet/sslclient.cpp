@@ -119,7 +119,7 @@ SSLClient::~SSLClient()
 
 // Read bytes from the already opened SSL connection
 int
-SSLClient::sslRead(amf::Buffer &buf)
+SSLClient::sslRead(cygnal::Buffer &buf)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -142,7 +142,7 @@ SSLClient::sslRead(boost::uint8_t *buf, size_t size)
 
 // Write bytes to the already opened SSL connection
 int
-SSLClient::sslWrite(amf::Buffer &buf)
+SSLClient::sslWrite(cygnal::Buffer &buf)
 {
     GNASH_REPORT_FUNCTION;
 

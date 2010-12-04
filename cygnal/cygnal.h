@@ -21,11 +21,12 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/thread/mutex.hpp>
+#include <boost/thread.hpp>
 #include <vector>
 #include <string>
 #include <map>
 
+#include "dsodefs.h"
 #include "extension.h"
 #include "handler.h"
 
