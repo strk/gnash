@@ -665,8 +665,8 @@ AC_ARG_ENABLE(gui,
   else if test x"${haiku}" = xyes; then
     build_haiku=yes;
   else
-    build_kde4=yes;
-    build_gtk=yes;
+    build_kde4=auto
+    build_gtk=yes
   fi
   fi]
 )
@@ -1765,6 +1765,24 @@ fi
 dnl TODO: add checks for all other GUIs
 
 
+if test x"${build_kde4}" != xno -o x"${build_qtopia4}" != xno; then
+ GNASH_PATH_QT4
+fi
+
+if test x"${build_kde4}" != xno; then
+  GNASH_PATH_KDE4
+fi
+
+if test x"${build_kde4}" = xauto; then
+  if test x"${has_qt4}" = xyes -a x"${has_kde4}" = xyes; then
+     build_kde4=yes
+  else
+     build_kde4=no
+  fi
+fi
+
+
+
 dnl -----------------------------------------------------------
 dnl Try to ignore stupid dependencies
 dnl -----------------------------------------------------------
@@ -2318,14 +2336,6 @@ fi
 
 if test x"${build_kde3}" = xyes; then
   GNASH_PATH_KDE3
-fi
-
-if test x"${build_kde4}" != xno -o x"${build_qtopia4}" != xno; then
- GNASH_PATH_QT4
-fi
-
-if test x"${build_kde4}" = xyes; then
-  GNASH_PATH_KDE4
 fi
 
 dnl Qtopia is a desktop environment for embedded devices.
@@ -3090,7 +3100,7 @@ if test x$build_kde4 = xyes; then
       echo "        ERROR: No KDE 4.x development package installed!" >&3
       echo "               To disable the KDE 4.x gui," >&3
       echo "               reconfigure using --enable-gui=<list-of-guis>" >&3
-      echo "               and omit "kde" from the list." >&3
+      echo "               and omit "kde4" from the list." >&3
       echo "               When the option --enable-gui=... is omitted," >&3
       echo "               the default is the same of --enable-gui=kde,gtk" >&3
       echo "               To be able to build the kde 4.x gui," >&3
