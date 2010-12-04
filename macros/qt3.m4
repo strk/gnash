@@ -42,7 +42,7 @@ AC_DEFUN([GNASH_PATH_QT3],
 
   dnl Only run these tests if this version was specified by the user, and they
   dnl haven't spcified a custom path.
-  if x"${ac_cv_path_qt3_incl}" = x; then
+  if test x"${ac_cv_path_qt3_incl}" = x; then
     dnl if QTDIR is set in the users environment, use that, as that's what
     dnl most QT programmers do, as it's required by the QT build system.
     qt_pkg="qt-mt"
