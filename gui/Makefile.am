@@ -188,7 +188,7 @@ bin_SCRIPTS = gnash
 bin_PROGRAMS = 
 
 gnash: gnash.in
-	cp $< $@
+	cp gnash.in $@
 	chmod +x $@
 
 # Always include the device files in the source tarball
