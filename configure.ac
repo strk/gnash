@@ -3108,11 +3108,11 @@ if test x$build_kde4 = xyes; then
       echo "        ERROR: No KDE 4.x development package installed!" >&3
       echo "               To disable the KDE 4.x gui," >&3
       echo "               reconfigure using --enable-gui=<list-of-guis>" >&3
-      echo "               and omit "kde4" from the list." >&3
-      echo "               When the option --enable-gui=... is omitted," >&3
-      echo "               the default is the same of --enable-gui=kde,gtk" >&3
+      echo "               and omit "kde4" from the list" >&3
+      echo "               or avoid --enable-gui=... as a whole." >&3
       echo "               To be able to build the kde 4.x gui," >&3
-      echo "               install version 4.x of the KDE development environment from http://kde.org" >&3
+      echo "               install version 4.x of the KDE development environment" >&3
+      echo "               from http://kde.org" >&3
       echo "               or .deb users: apt-get install kdelibs5-dev" >&3
       echo "               or .rpm users: yum install kdelibs-devel." >&3
   fi
