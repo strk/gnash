@@ -112,7 +112,7 @@ AC_DEFUN([GNASH_PATH_CURL],
   fi
 
   if ${ENABLE_STATIC}; then
-    CURL_CFLAGS+=" -DCURL_STATICLIB"
+    CURL_CFLAGS="$CURL_CFLAGS -DCURL_STATICLIB"
   fi
 
   if test x"${ac_cv_path_curl_lib}" != x ; then

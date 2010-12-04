@@ -1793,7 +1793,7 @@ if $LD --help 2>/dev/null | grep as-needed > /dev/null; then
   gcc_cv_ld_as_needed=yes
 fi
 if test x"$gcc_cv_ld_as_needed" = xyes; then
-  LDFLAGS+=" -Wl,--as-needed"
+  LDFLAGS="$LDFLAGS -Wl,--as-needed"
 fi
 AC_MSG_RESULT($gcc_cv_ld_as_needed)
 
