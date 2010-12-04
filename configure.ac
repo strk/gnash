@@ -589,8 +589,6 @@ build_kde4=no
 build_qtopia3=no
 build_qtopia4=no
 build_gtk=no
-build_qt3=no
-build_qt4=no
 build_fb=no                     dnl Raw framebuffer
 build_fltk=no
 build_sdl=no
@@ -611,26 +609,16 @@ AC_ARG_ENABLE(gui,
         build_gtk=yes
         ;;
       kde3|KDE3)
-        build_qt3=yes
         build_kde3=yes
         ;;
       kde4|KDE4)
-        build_qt4=yes
         build_kde4=yes
         ;;
       qtopia3|QTOPIA3)
         build_qtopia3=yes
-        build_qt3=yes
         ;;
       qtopia4|QTOPIA4)
         build_qtopia4=yes
-        build_qt4=yes
-        ;;
-      qt3|QT3)
-        build_qt3=yes
-        ;;
-      qt4|QT4)
-        build_qt4=yes
         ;;
       sdl|SDL)
         build_sdl=yes
@@ -660,10 +648,8 @@ AC_ARG_ENABLE(gui,
         build_dump=yes
         build_fb=yes
         build_fltk=yes
-        build_qt3=yes
         build_kde3=yes
         build_kde4=yes
-        build_qt4=yes
         build_sdl=yes
         ;;
       *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde3|kde4|fltk|sdl|riscos|aqua|fb|qtopia3|qtopia4|dump|aos4|haiku)])
@@ -676,13 +662,11 @@ AC_ARG_ENABLE(gui,
   done],
   [if test x"${openbsd_os}" = x"openbsd"; then
     build_kde3=yes;
-    build_qt3=yes;
     build_gtk=yes;
   else if test x"${haiku}" = xyes; then
     build_haiku=yes;
   else
     build_kde4=yes;
-    build_qt4=yes;
     build_gtk=yes;
   fi
   fi]
@@ -2329,16 +2313,16 @@ fi
 
 AM_CONDITIONAL(HAVE_SDL, [ test x$has_SDL = xyes ])
 
-if test x"${build_qt3}" = xyes; then
-  GNASH_PATH_QT3
+if test x"${build_kde3}" != xno -o x"${build_qtopia3}" != xno; then
+ GNASH_PATH_QT3
 fi
 
 if test x"${build_kde3}" = xyes; then
   GNASH_PATH_KDE3
 fi
 
-if test x"${build_qt4}" = xyes; then
-  GNASH_PATH_QT4
+if test x"${build_kde4}" != xno -o x"${build_qtopia4}" != xno; then
+ GNASH_PATH_QT4
 fi
 
 if test x"${build_kde4}" = xyes; then
@@ -2416,8 +2400,13 @@ fi
 
 AM_CONDITIONAL(BUILD_QTOPIA3_GUI,  [ test x$build_qtopia3 = xyes ])
 AM_CONDITIONAL(BUILD_QTOPIA4_GUI,  [ test x$build_qtopia4 = xyes ])
-AM_CONDITIONAL(BUILD_QT3_GUI,      [ test x$build_qt3 = xyes ])
-AM_CONDITIONAL(BUILD_QT4_GUI,      [ test x$build_qt4 = xyes ])
+
+dnl Drop these conditionals ?
+AM_CONDITIONAL(BUILD_QT3_GUI,
+    [ test x"${build_kde3}" = xyes -o x"${build_qtopia3}" = xyes ])
+AM_CONDITIONAL(BUILD_QT4_GUI,
+    [ test x"${build_kde4}" = xyes -o x"${build_qtopia4}" = xyes ])
+
 AM_CONDITIONAL(BUILD_KDE3_GUI,     [ test x$build_kde3 = xyes ])
 AM_CONDITIONAL(BUILD_KDE4_GUI,     [ test x$build_kde4 = xyes ])
 
@@ -2834,12 +2823,6 @@ fi
 if test x$build_fltk = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},fltk"
 fi
-if test x$build_qt3 = xyes; then
-  SUPPORTED_GUIS="${SUPPORTED_GUIS},qt3"
-fi
-if test x$build_qt4 = xyes; then
-  SUPPORTED_GUIS="${SUPPORTED_GUIS},qt4"
-fi
 if test x$build_kde3 = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},kde3"
 fi
@@ -3024,8 +3007,8 @@ dnl -- fi
 
 echo "Configured paths for ${build} are:"
 
-dnl Dump QT3 options is the user specified a QT3 or KDE3 GUI
-if test x"${build_qt3}" = xyes; then
+dnl Dump QT3 options is the user specified a QTOPIA3 or KDE3 GUI
+if test x"${build_kde3}" = xyes -o x"${build_qtopia3}" = xyes; then
   if test x"${has_qt3}" = xyes; then
     echo "        QT3 flags are: ${QT3_CFLAGS}"
     echo "        QT3 libs are: ${QT3_LIBS}"
@@ -3033,13 +3016,12 @@ if test x"${build_qt3}" = xyes; then
     echo "        ERROR: No QT 3.x development package installed!" >&3
     echo "               Install a QT 3.x development environment from http://trolltech.com" >&3
     echo "               or .deb users: apt-get install libqt3-mt-dev" >&3
-    if test x$build_kde3 = xyes; then
-      echo "               or change to a different gui with --enable-gui=..." >&3
-    fi
+    echo "               or change to a different gui with --enable-gui=..." >&3
   fi
 fi
 
-if test x"${build_qt4}" = xyes; then
+dnl Dump QT4 options is the user specified a QTOPIA4 or KDE4 GUI
+if test x"${build_kde4}" = xyes -o x"${build_qtopia4}" = xyes; then
   if test x"${has_qt4}" = xyes; then
     echo "        QT4 flags are: ${QT4_CFLAGS}"
     echo "        QT4 libs are: ${QT4_LIBS}"
@@ -3047,9 +3029,7 @@ if test x"${build_qt4}" = xyes; then
     echo "        ERROR: No QT 4.x development package installed!" >&3
     echo "               Install a QT 4.x development environment from http://trolltech.com" >&3
     echo "               or .deb users: apt-get install qt4-dev-tools" >&3
-    if test x$build_kde4 = xyes; then
-      echo "               or change to a different gui with --enable-gui=..." >&3
-    fi
+    echo "               or change to a different gui with --enable-gui=..." >&3
   fi
 fi
 
