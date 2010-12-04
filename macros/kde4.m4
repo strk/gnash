@@ -216,17 +216,14 @@ AC_DEFUN([GNASH_PATH_KDE4],
     else
       KDE4_CFLAGS=""
     fi
-  else
-    KDE4_CFLAGS=""
-  fi
-
-  if test x"${ac_cv_path_kde4_lib}" != x; then
-    KDE4_LIBS="${ac_cv_path_kde4_lib}"
-    AC_DEFINE(HAVE_KDE4, 1,[Have KDE 4.x installed])
-    has_kde4=yes
-  else
-    KDE4_LIBS=""
-    has_kde4=no
+    if test x"${ac_cv_path_kde4_lib}" != x; then
+      KDE4_LIBS="${ac_cv_path_kde4_lib}"
+      AC_DEFINE(HAVE_KDE4, 1,[Have KDE 4.x installed])
+      has_kde4=yes
+    else
+      KDE4_LIBS=""
+      has_kde4=no
+    fi
   fi
 
   AC_SUBST(KLASH_PLUGIN)
