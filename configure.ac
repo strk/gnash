@@ -581,7 +581,6 @@ dnl --------------------------------------------------------
 dnl  GUI selection
 dnl --------------------------------------------------------
 
-has_gtk2=no        dnl FIXME: has_* shouldn't be in configure but in a macro
 build_haiku=no
 build_aos4=no      dnl AmigaOS4 GUI
 build_kde3=no
@@ -2475,7 +2474,6 @@ AM_CONDITIONAL(include_x11, test "$kde_use_qt_emb" = "no" && test "$kde_use_qt_m
 AM_CONDITIONAL(include_ARTS, test "$build_arts" '!=' "no")
 AM_CONDITIONAL(unsermake_enable_pch, test "$kde_use_pch" = "yes" && test "$kde_gcc_supports_pch" = "yes")
 
-AM_CONDITIONAL(HAVE_GTK2, [ test x$has_gtk2 = xyes ])
 AM_CONDITIONAL(HAVE_GLEXT, [test x$glext = xyes])
 
 dnl We don't have GTKGLExt, so default to SDL, and don't build the Firefox plugin
