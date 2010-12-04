@@ -583,7 +583,7 @@ dnl --------------------------------------------------------
 
 build_haiku=no
 build_aos4=no      dnl AmigaOS4 GUI
-build_kde3=no
+build_kde3=no      dnl WARNING: doesn't work (see https://savannah.gnu.org/bugs/index.php?31782)
 build_kde4=no
 build_qtopia3=no
 build_qtopia4=no
@@ -665,7 +665,6 @@ AC_ARG_ENABLE(gui,
   else if test x"${haiku}" = xyes; then
     build_haiku=yes;
   else
-    build_kde3=auto
     build_kde4=auto
     build_gtk=yes
   fi
