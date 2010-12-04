@@ -16,7 +16,6 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_DEFUN([GNASH_PATH_QT4], [
   gnash_qt4_topdir=
-  has_kde4=no
 
   dnl Look for the header
   AC_ARG_WITH(qt4_incl, AC_HELP_STRING([--with-qt4-incl],
