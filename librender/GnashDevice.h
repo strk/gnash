@@ -28,6 +28,11 @@
 
 #include "Geometry.h"
 
+/// @note This file is the base class for all low level rendering and display
+/// devices. These devices must be probed and initialized first, before any
+/// renderering or window creation happens.
+/// The derived classes for this base class are then used by the renderer to
+/// determine functionality.
 namespace gnash {
 
 namespace renderer {
@@ -99,7 +104,7 @@ struct GnashDevice
     /// Are buffers destroyed ?
     virtual bool isBufferDestroyed() = 0;
 
-    // Get the window ID handle
+    /// Get the window ID handle
     virtual int getID() = 0;
 
     /// Is the specified renderer supported by this hardware ?
