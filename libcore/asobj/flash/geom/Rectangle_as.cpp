@@ -377,8 +377,21 @@ as_value
 Rectangle_offsetPoint(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
-    UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+
+    as_object* arg = (fn.nargs > 0) ? toObject(fn.arg(0), getVM(fn)) : 0;
+    if (!arg) return as_value();
+
+    as_value xdelta = getMember(*arg, NSV::PROP_X);
+    as_value ydelta = getMember(*arg, NSV::PROP_Y);
+
+    as_value x = getMember(*ptr, NSV::PROP_X);
+    newAdd(x, xdelta, getVM(fn));
+    ptr->set_member(NSV::PROP_X, x);
+
+    as_value y = getMember(*ptr, NSV::PROP_Y);
+    newAdd(y, ydelta, getVM(fn));
+    ptr->set_member(NSV::PROP_Y, y);
+
     return as_value();
 }
 
