@@ -281,23 +281,12 @@ Global_as::registerClasses()
     _classes.declareAll(avm1Classes());
 
     // SWF8 visibility:
-    const ObjectURI& NS_FLASH = getURI(vm, "flash");
-    flash_package_init(*this, NS_FLASH); 
+    const ObjectURI& flash = getURI(vm, "flash");
+    flash_package_init(*this, flash); 
 
     const int version = vm.getSWFVersion();
 
-    switch (version)
-    {
-        default:
-            // Version 10 or above reported
-        case 9:
-        case 8:
-
-        case 7:
-        case 6:
-
-        case 5:
-        
+    if (version > 4) {
             // This is surely not correct, but they are not available
             // in SWF4
             init_member("escape", vm.getNative(100, 0));
@@ -310,12 +299,6 @@ Global_as::registerClasses()
             init_member("NaN", as_value(NaN));
             init_member("Infinity", as_value(
                         std::numeric_limits<double>::infinity()));
-        
-        case 4:
-        case 3:
-        case 2:
-        case 1:
-            break;
     }
 
     loadExtensions();
@@ -429,7 +412,8 @@ global_isNaN(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
-    return as_value(static_cast<bool>(isNaN(toNumber(fn.arg(0), getVM(fn)))));
+    return as_value(static_cast<bool>(isNaN(
+                    toNumber(fn.arg(0), getVM(fn)))));
 }
 
 
@@ -438,7 +422,8 @@ global_isfinite(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
-    return as_value(static_cast<bool>(isFinite(toNumber(fn.arg(0), getVM(fn)))));
+    return as_value(static_cast<bool>(isFinite(
+                    toNumber(fn.arg(0), getVM(fn)))));
 }
 
 /// \brief Encode a string to URL-encoded format
@@ -531,21 +516,19 @@ global_parseint(const fn_call& fn)
     // 83, not 0; parseInt(" 0x123", 8) is 0), which is
     // why we do this here.
     size_t base;
-    if (fn.nargs > 1)
-    {
+    if (fn.nargs > 1) {
         base = toInt(fn.arg(1), getVM(fn));
     
         // Bases from 2 to 36 are valid, otherwise return NaN
         if (base < 2 || base > 36) return as_value(NaN);
     }
-    else
-    {
+    else {
         /// No radix specified, so try parsing as octal or hexadecimal
         try {
             double d;
             if (parseNonDecimalInt(expr, d, false)) return d;
         }
-        catch (boost::bad_lexical_cast&) {
+        catch (const boost::bad_lexical_cast&) {
             return as_value(NaN);
         }
 
@@ -574,8 +557,7 @@ global_parseint(const fn_call& fn)
     }    
 
     bool negative = false;
-    if (*it == '-' || *it == '+')
-    {
+    if (*it == '-' || *it == '+') {
         if (*it == '-') negative = true;
         
         it++;
@@ -630,7 +612,7 @@ global_assetpropflags(const fn_call& fn)
     
     // object
     boost::intrusive_ptr<as_object> obj = toObject(fn.arg(0), getVM(fn));
-    if ( ! obj ) {
+    if (!obj) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Invalid call to ASSetPropFlags: "
             "first argument is not an object: %s"),
@@ -677,7 +659,6 @@ global_assetpropflags(const fn_call& fn)
 as_value
 global_asconstructor(const fn_call& fn)
 {
-
     if (fn.nargs < 2) {
         IF_VERBOSE_ASCODING_ERRORS(    
             std::ostringstream ss; fn.dump_args(ss);
@@ -721,9 +702,7 @@ global_asconstructor(const fn_call& fn)
 as_value
 global_asnative(const fn_call& fn)
 {
-
-    if (fn.nargs < 2)
-    {
+    if (fn.nargs < 2) {
         IF_VERBOSE_ASCODING_ERRORS(    
             std::ostringstream ss; fn.dump_args(ss);
             log_aserror(_("ASNative(%s): needs at least two arguments"),
@@ -774,7 +753,6 @@ global_asnew(const fn_call& /*fn*/)
 as_value
 global_assetnative(const fn_call& fn)
 {
-
     if (fn.nargs < 3) {
         return as_value();
     }

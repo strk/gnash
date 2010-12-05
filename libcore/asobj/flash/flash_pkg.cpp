@@ -17,11 +17,11 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "VM.h"
+#include "flash_pkg.h"
+
 #include "VM.h"
 #include "fn_call.h"
 #include "namedStrings.h"
-#include "flash_pkg.h"
 #include "display/display_pkg.h"
 #include "external/external_pkg.h"
 #include "filters/filters_pkg.h"
