@@ -322,7 +322,6 @@ createObject(const Global_as& gl)
 void
 Global_as::loadExtensions()
 {
-
     if (RcInitFile::getDefaultInstance().enableExtensions()) {
         log_security(_("Extensions enabled, scanning plugin dir for load"));
         _et->scanAndLoad(*this);
@@ -330,7 +329,6 @@ Global_as::loadExtensions()
     else {
         log_security(_("Extensions disabled"));
     }
-
 }
 
 void
@@ -344,7 +342,6 @@ namespace {
 const ClassHierarchy::NativeClasses&
 avm1Classes()
 {
-
     typedef ClassHierarchy::NativeClass N;
 
     // Since we maintain separate lists for AVM1 and AVM2, these are all
@@ -387,7 +384,6 @@ avm1Classes()
         (N(accessibility_class_init, NSV::CLASS_ACCESSIBILITY, 5));
 
     return s;
-
 }
 
 as_value
@@ -596,7 +592,6 @@ global_parseint(const fn_call& fn)
 as_value
 global_assetpropflags(const fn_call& fn)
 {
-
     if (fn.nargs < 3) {
         IF_VERBOSE_ASCODING_ERRORS(    
             log_aserror(_("%s needs at least three arguments"), __FUNCTION__);
@@ -733,7 +728,6 @@ global_asnative(const fn_call& fn)
         return as_value();
     }
     return as_value(fun);
-        
 }
 
 // Obsolete ASnew function (exists only as ASnative(2, 0))
@@ -743,7 +737,6 @@ global_asnew(const fn_call& /*fn*/)
     LOG_ONCE(log_unimpl("ASNative (2, 0) - old ASnew"));
     return as_value();
 }
-
 
 /// ASSetNative(targetObject, major, properties, minor)
 //
@@ -950,7 +943,6 @@ global_assetuperror(const fn_call& fn)
 as_value
 global_setInterval(const fn_call& fn)
 {
-    
 	if (fn.nargs < 2) {
 		IF_VERBOSE_ASCODING_ERRORS(
 			std::stringstream ss; fn.dump_args(ss);
@@ -1024,7 +1016,6 @@ global_setInterval(const fn_call& fn)
 as_value
 global_setTimeout(const fn_call& fn)
 {
-    
 	if (fn.nargs < 2) {
 		IF_VERBOSE_ASCODING_ERRORS(
 			std::stringstream ss; fn.dump_args(ss);
@@ -1125,7 +1116,6 @@ global_enableDebugConsole(const fn_call& /*fn*/)
 void
 registerNatives(as_object& global)
 {
-    
     VM& vm = getVM(global);
 
     // ASNew was dropped as an API function but exists
@@ -1189,7 +1179,6 @@ registerNatives(as_object& global)
     registerLoadableNative(global);
     registerXMLNative(global);
     registerXMLNodeNative(global);
-
 }
 
 } // anonymous namespace
