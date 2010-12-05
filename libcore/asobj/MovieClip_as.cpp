@@ -529,17 +529,15 @@ movieclip_attachAudio(const fn_call& fn)
 {
     MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
-    if (!fn.nargs)
-    {
+    if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror("MovieClip.attachAudio(): %s", _("missing arguments"));
+            log_aserror("MovieClip.attachAudio(): %s", _("missing arguments"));
         );
         return as_value();
     }
 
     NetStream_as* ns;
-    if (!isNativeType(toObject(fn.arg(0), getVM(fn)), ns))
-    { 
+    if (!isNativeType(toObject(fn.arg(0), getVM(fn)), ns)) { 
         std::stringstream ss; fn.dump_args(ss);
         // TODO: find out what to do here
         log_error("MovieClip.attachAudio(%s): first arg doesn't cast to a "
@@ -549,7 +547,6 @@ movieclip_attachAudio(const fn_call& fn)
 
     ns->setAudioController(movieclip);
 
-    LOG_ONCE( log_unimpl("MovieClip.attachAudio() - TESTING") );
     return as_value();
 }
 
@@ -571,10 +568,7 @@ movieclip_getDepth(const fn_call& fn)
 {
     // Unlike TextField.getDepth this works for any DisplayObject
     DisplayObject* d = ensure<IsDisplayObject<> >(fn);
-
-    const int n = d->get_depth();
-
-    return as_value(n);
+    return as_value(d->get_depth());
 }
 
 //swapDepths(target:Object|target:Number)
@@ -583,13 +577,11 @@ movieclip_getDepth(const fn_call& fn)
 as_value
 movieclip_swapDepths(const fn_call& fn)
 {
-
     MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
     const int this_depth = movieclip->get_depth();
 
-    if (fn.nargs < 1)
-    {
+    if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("%s.swapDepths() needs one arg"), movieclip->getTarget());
         );
@@ -598,8 +590,7 @@ movieclip_swapDepths(const fn_call& fn)
 
     // Lower bound of source depth below which swapDepth has no effect
     // (below Timeline/static zone)
-    if (this_depth < DisplayObject::lowerAccessibleBound)
-    {
+    if (this_depth < DisplayObject::lowerAccessibleBound) {
         IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss;
             fn.dump_args(ss);
