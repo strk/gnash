@@ -123,12 +123,10 @@ Rectangle_clone(const fn_call& fn)
     // properties that the object has (width, height, x, y) are used.
     as_object* ptr = ensure<ValidThis>(fn);
 
-    as_value x, y, w, h;
-
-    ptr->get_member(NSV::PROP_X, &x);
-    ptr->get_member(NSV::PROP_Y, &y);
-    ptr->get_member(NSV::PROP_WIDTH, &w);
-    ptr->get_member(NSV::PROP_HEIGHT, &h);
+    as_value x = getMember(*ptr, NSV::PROP_X);
+    as_value y = getMember(*ptr, NSV::PROP_Y);
+    as_value w = getMember(*ptr, NSV::PROP_WIDTH);
+    as_value h = getMember(*ptr, NSV::PROP_HEIGHT);
 
     as_function* ctor = getClassConstructor(fn, "flash.geom.Rectangle");
     if (!ctor) return as_value();
@@ -207,36 +205,30 @@ Rectangle_containsPoint(const fn_call& fn)
     
     VM& vm = getVM(fn);
 
-    as_value thisx;
-    ptr->get_member(NSV::PROP_X, &thisx);
-    as_value argx;
-    if (arg) arg->get_member(NSV::PROP_X, &argx);
+    as_value thisx = getMember(*ptr, NSV::PROP_X);
+    as_value argx = arg ? getMember(*arg, NSV::PROP_X) : as_value();
     
     // argx >= thisx
     as_value ret = newLessThan(argx, thisx, vm);
     if (ret.is_undefined()) return as_value(); 
     if (toBool(ret, vm)) return as_value(false); 
 
-    as_value thisw;
-    ptr->get_member(NSV::PROP_WIDTH, &thisw);
+    as_value thisw = getMember(*ptr, NSV::PROP_WIDTH);
     
     newAdd(thisx, thisw, vm);
     ret = newLessThan(argx, thisx, vm);
     if (ret.is_undefined()) return as_value(); 
     if (!toBool(ret, vm)) return as_value(false); 
  
-    as_value thisy;
-    ptr->get_member(NSV::PROP_Y, &thisy);
-    as_value argy;
-    if (arg) arg->get_member(NSV::PROP_Y, &argy);
+    as_value thisy = getMember(*ptr, NSV::PROP_Y);
+    as_value argy = arg ? getMember(*arg, NSV::PROP_Y) : as_value();
     
     // argy >= thisy
     ret = newLessThan(argy, thisy, vm);
     if (ret.is_undefined()) return as_value(); 
     if (toBool(ret, vm)) return as_value(false); 
 
-    as_value thish;
-    ptr->get_member(NSV::PROP_HEIGHT, &thish);
+    as_value thish = getMember(*ptr, NSV::PROP_HEIGHT);
     
     newAdd(thisy, thish, vm);
     ret = newLessThan(argy, thisy, vm);
@@ -335,12 +327,10 @@ Rectangle_isEmpty(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
 
-    as_value w;
-    ptr->get_member(NSV::PROP_WIDTH, &w);
+    as_value w = getMember(*ptr, NSV::PROP_WIDTH);
     if (w.is_undefined() || w.is_null()) return as_value(true);
 
-    as_value h;
-    ptr->get_member(NSV::PROP_HEIGHT, &h);
+    as_value h = getMember(*ptr, NSV::PROP_HEIGHT);
     if (h.is_undefined() || h.is_null()) return as_value(true);
 
     double wn = toNumber(w, getVM(fn));
@@ -348,8 +338,6 @@ Rectangle_isEmpty(const fn_call& fn)
 
     double hn = toNumber(h, getVM(fn));
     if (!isFinite(hn) || hn <= 0) return as_value(true);
-
-    log_debug("Width: %g, Height: %g", wn, hn);
 
     return as_value(false);
 }
@@ -411,12 +399,10 @@ Rectangle_toString(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
 
-    as_value x, y, w, h;
-
-    ptr->get_member(NSV::PROP_X, &x);
-    ptr->get_member(NSV::PROP_Y, &y);
-    ptr->get_member(NSV::PROP_WIDTH, &w);
-    ptr->get_member(NSV::PROP_HEIGHT, &h);
+    as_value x = getMember(*ptr, NSV::PROP_X);
+    as_value y = getMember(*ptr, NSV::PROP_Y);
+    as_value w = getMember(*ptr, NSV::PROP_WIDTH);
+    as_value h = getMember(*ptr, NSV::PROP_HEIGHT);
 
     VM& vm = getVM(fn);
 
