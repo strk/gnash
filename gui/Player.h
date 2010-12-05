@@ -226,8 +226,7 @@ private:
         {
         }
         
-        std::string call(const std::string& event,
-                         const std::string& arg);
+        std::string call(const std::string& event, const std::string& arg);
         
         bool yesNo(const std::string& query);
         

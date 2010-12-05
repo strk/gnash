@@ -22,10 +22,6 @@
 #include "gnashconfig.h"
 #endif
 
-#ifndef DEFAULT_GUI
-# define DEFAULT_GUI "NULL"
-#endif
-
 #include "gui.h"
 #include "NullGui.h"
 
@@ -595,7 +591,7 @@ Player::CallbacksHandler::call(const std::string& event, const std::string& arg)
         // arg contains WIDTHxHEIGHT
         log_debug("Player got Stage.resize(%s) message", arg);
         int width, height;
-        sscanf(arg.c_str(), "%dx%d", &width, &height);
+        std::sscanf(arg.c_str(), "%dx%d", &width, &height);
         _gui.resizeWindow(width, height);
 
         return "";
@@ -617,25 +613,25 @@ Player::CallbacksHandler::call(const std::string& event, const std::string& arg)
     }
 
     if (event == "ExternalInterface.Pan") {
-	// FIXME: the 3 args are encoded as 1:2:0
-	log_unimpl("ExternalInterface.Pan");
+        // FIXME: the 3 args are encoded as 1:2:0
+        log_unimpl("ExternalInterface.Pan");
         return "";
     }
 
     if (event == "ExternalInterface.IsPlaying") {
-	return (_gui.isStopped()) ? "false" : "true";
+        return (_gui.isStopped()) ? "false" : "true";
     }
 
     if (event == "ExternalInterface.SetZoomRect") {
-	// FIXME: the 4 arguments are encoded as 1:2:0:1
-	log_unimpl("ExternalInterface.SetZoomRect");
+        // FIXME: the 4 arguments are encoded as 1:2:0:1
+        log_unimpl("ExternalInterface.SetZoomRect");
         return "";
     }
 
     if (event == "ExternalInterface.Zoom") {
-	// The 1 argument is a percentage to zoom
-	int percent = strtol(arg.c_str(), NULL, 0);
-	log_unimpl("ExternalInterface.Zoom(%d)", percent);
+        // The 1 argument is a percentage to zoom
+        const int percent = std::strtol(arg.c_str(), NULL, 0);
+        log_unimpl("ExternalInterface.Zoom(%d)", percent);
         return "";
     }
 
