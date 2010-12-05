@@ -92,6 +92,58 @@ void test_iterators(Renderer *renderer, const std::string &type);
 // The debug log used by all the gnash libraries.
 static LogFile& dbglogfile = LogFile::getDefaultInstance();
 
+//
+// Test drawing.
+//
+float red_color[4] = {1.0, 0.0, 0.0, 1.0};
+float blue_color[4] = {0.0, 0.0, 1.0, 1.0};
+
+#ifdef BUILD_X11_DEVICE
+static x11::init_func    init = 0;
+static x11::draw_func    draw = 0;
+static x11::reshape_func reshape = 0;
+static x11::key_func     keyPress = 0;
+static int width = 640, height = 480;
+
+#if 0
+static void
+init(void)
+{
+    GNASH_REPORT_FUNCTION;  
+}
+
+// new window size or exposure
+static void
+reshape(int /* width */, int /* height */)
+{
+    GNASH_REPORT_FUNCTION;
+    
+    vgLoadIdentity();
+}
+
+static void
+draw(void)
+{
+    GNASH_REPORT_FUNCTION;
+    
+    VGint scissor[4] = {100, 100, 25, 25};
+    vgSetfv(VG_CLEAR_COLOR, 4, red_color);
+    vgClear(0, 0, 640, 480);
+
+    vgSetfv(VG_CLEAR_COLOR, 4, blue_color);
+    vgClear(50, 50, 50, 50);
+
+    //vgSetiv(VG_SCISSOR_RECTS, 4, scissor);
+    //vgSeti(VG_SCISSORING, VG_TRUE);
+    vgCopyPixels(100, 100, 50, 50, 50, 50);
+    vgClear(150, 150, 50, 50);
+}
+#endif  // end of BUILD_X11_DEVICE
+
+#endif
+
+//------------------------------------------------------------
+
 // Simple class to do nanosecond based timing for performance analysis
 class Timer {
 public:
@@ -143,28 +195,31 @@ main(int argc, char *argv[])
 
     const char *pixelformat = "RGB24";
 
-#ifdef GTK_TEST_RENDER
-    GdkVisual *wvisual = gdk_drawable_get_visual(canvas);
-
-    GdkImage* tmpimage = gdk_image_new (GDK_IMAGE_FASTEST, wvisual, 1, 1);
-    const GdkVisual* visual = tmpimage->visual;
-
-    // FIXME: we use bpp instead of depth, because depth doesn't appear to
-    // include the padding byte(s) the GdkImage actually has.
-    pixelformat = agg_detect_pixel_format(
-        visual->red_shift, visual->red_prec,
-        visual->green_shift, visual->green_prec,
-        visual->blue_shift, visual->blue_prec,
-        tmpimage->bpp * 8);
-#endif  // end of GTK_TEST_RENDER
-
 #ifdef BUILD_X11_DEVICE
-    x11::X11Device x11;
-    x11.initDevice(0, 0);
+    EGLDevice egl(GnashDevice::OPENVG);
+    // egl.initDevice(0,0);
+    // egl.bindClient(GnashDevice::OPENVG);
+    int vid = egl.getNativeVisual();
+    x11::X11Device x11(vid);
+    // x11.initDevice(0, 0);
+    
     x11.createWindow("Foo", 0, 0, 640, 480);
-    x11.event_loop(10);
+    int win = x11.getDrawableWindow();
+    if (win) {
+        egl.attachWindow(win);
+    } else {
+        log_error("Couldn't get Drawable window from X11");
+        exit(1);
+    }    
+    // Set initial projection/viewing transformation.
+    // We can't be sure we'll get a ConfigureNotify event when the window
+    // first appears.
+    if (reshape) {
+        reshape(640, 480);
+    }
+    x11.eventLoop(10);
     std::cerr << "Hello World!" << std::endl;
-    x11.event_loop(10);
+    x11.eventLoop(10);
 #endif
 #ifdef RENDERER_AGG
     Timer tagg("AGG");
