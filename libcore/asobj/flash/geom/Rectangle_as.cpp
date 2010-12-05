@@ -358,8 +358,18 @@ as_value
 Rectangle_offset(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
-    UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+
+    as_value xdelta = fn.nargs > 0 ? fn.arg(0) : as_value();
+    as_value ydelta = fn.nargs > 1 ? fn.arg(1) : as_value();
+
+    as_value x = getMember(*ptr, NSV::PROP_X);
+    newAdd(x, xdelta, getVM(fn));
+    ptr->set_member(NSV::PROP_X, x);
+
+    as_value y = getMember(*ptr, NSV::PROP_Y);
+    newAdd(y, ydelta, getVM(fn));
+    ptr->set_member(NSV::PROP_Y, y);
+
     return as_value();
 }
 
