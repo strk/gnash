@@ -142,20 +142,14 @@ Rectangle_clone(const fn_call& fn)
 as_value
 Rectangle_contains(const fn_call& fn)
 {
-    //fn.arg(0) => x coordinate
-    //fn.arg(1) => y coordinate
-
     as_object* ptr = ensure<ValidThis>(fn);
 
-    as_value rect_x_as, rect_width_as, rect_y_as, rect_height_as;
+    as_value rect_x_as = getMember(*ptr, NSV::PROP_X);
+    as_value rect_width_as = getMember(*ptr, NSV::PROP_WIDTH);
+    as_value rect_y_as = getMember(*ptr, NSV::PROP_Y);
+    as_value rect_height_as = getMember(*ptr, NSV::PROP_HEIGHT);
 
-    ptr->get_member(NSV::PROP_X, &rect_x_as);
-    ptr->get_member(NSV::PROP_WIDTH, &rect_width_as);
-    ptr->get_member(NSV::PROP_Y, &rect_y_as);
-    ptr->get_member(NSV::PROP_HEIGHT, &rect_height_as);
-
-    if ( fn.nargs < 2 )
-    {
+    if (fn.nargs < 2) {
         IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss;
             fn.dump_args(ss);
@@ -167,16 +161,6 @@ Rectangle_contains(const fn_call& fn)
 
     const as_value& x_as = fn.arg(0);
     const as_value& y_as = fn.arg(1);
-    if ( x_as.is_null() || x_as.is_undefined() ||
-         y_as.is_null() || y_as.is_undefined() )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-            std::stringstream ss;
-            fn.dump_args(ss);
-            log_aserror("flash.geom.Rectangle(%s): %s", ss.str(), _("invalid arguments"));
-        );
-        return as_value();
-    }
 
     VM& vm = getVM(fn);
     
@@ -186,40 +170,27 @@ Rectangle_contains(const fn_call& fn)
     as_value rect_y1_as = rect_y_as;
     newAdd(rect_y1_as, rect_height_as, vm);
 
-    if ( rect_x_as.is_null() || rect_x_as.is_undefined() ||
-         rect_y_as.is_null() || rect_y_as.is_undefined() ||
-         rect_x1_as.is_null() || rect_x1_as.is_undefined() ||
-         rect_y1_as.is_null() || rect_y1_as.is_undefined() )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-            std::stringstream ss;
-            fn.dump_args(ss);
-            log_aserror("flash.geom.Rectangle(%s): %s", ss.str(), _("invalid rectangle"));
-        );
-        return as_value();
-    }
-
-    //Points are contained within the Rectangle IFF they lie
-    //on the top or left borders of the rectangle, but not the right or
-    //bottom borders, or they are not on a border but between all.
+    // Points are contained within the Rectangle IFF they lie
+    // on the top or left borders of the rectangle, but not the right or
+    // bottom borders, or they are not on a border but between all.
     
     // NOTE: order of tests is important, see actionscript.all/Rectangle.as
 
     as_value ret = newLessThan(x_as, rect_x_as, vm);
-    if ( ret.is_undefined() ) return as_value();
-    if ( toBool(ret, vm) ) return as_value(false); 
+    if (ret.is_undefined()) return as_value();
+    if (toBool(ret, vm)) return as_value(false); 
 
     ret = newLessThan(x_as, rect_x1_as, vm);
-    if ( ret.is_undefined() ) return as_value();
-    if ( ! toBool(ret, vm) ) return as_value(false); 
+    if (ret.is_undefined()) return as_value();
+    if (!toBool(ret, vm)) return as_value(false); 
 
     ret = newLessThan(y_as, rect_y_as, vm);
-    if ( ret.is_undefined() ) return as_value();
-    if ( toBool(ret, vm) ) return as_value(false); 
+    if (ret.is_undefined()) return as_value();
+    if (toBool(ret, vm)) return as_value(false); 
 
     ret = newLessThan(y_as, rect_y1_as, vm);
-    if ( ret.is_undefined() ) return as_value();
-    if ( ! toBool(ret, vm) ) return as_value(false); 
+    if (ret.is_undefined()) return as_value();
+    if (!toBool(ret, vm)) return as_value(false); 
 
     return as_value(true);
 
