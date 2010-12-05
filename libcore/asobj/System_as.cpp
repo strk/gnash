@@ -18,9 +18,13 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "System_as.h"
+
+#include <sstream>
+#include <string>
+
 #include "movie_root.h" // interface callback
 #include "log.h"
-#include "System_as.h"
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "Global_as.h"
@@ -29,8 +33,6 @@
 #include "VM.h" // for getPlayerVersion() 
 #include "GnashAlgorithm.h"
 #include "RunResources.h"
-
-#include <sstream>
 
 namespace gnash {
 
@@ -43,7 +45,7 @@ namespace {
     template<typename T> inline void convertValue(const std::string& in,
                                                   T& val);
 
-    const std::string& systemLanguage(as_object& proto);
+    std::string systemLanguage(as_object& proto);
 
     as_value system_security_allowdomain(const fn_call& fn);
     as_value system_security_allowinsecuredomain(const fn_call& fn);
@@ -55,7 +57,6 @@ namespace {
     void attachSystemSecurityInterface(as_object& o);
     void attachSystemCapabilitiesInterface(as_object& o);
     void attachSystemInterface(as_object& proto);
-
 }
 
 void
@@ -314,7 +315,7 @@ as_value
 system_security_allowdomain(const fn_call& fn)
 {
     LOG_ONCE(log_unimpl("System.security.allowDomain"));
-    if (fn.nargs < 1) {
+    if (!fn.nargs) {
         return as_value(false);
     }
     return as_value(true);
@@ -324,7 +325,7 @@ system_security_allowdomain(const fn_call& fn)
 as_value
 system_security_allowinsecuredomain(const fn_call& /*fn*/)
 {
-    LOG_ONCE(log_unimpl ("System.security.allowInsecureDomain") );
+    LOG_ONCE(log_unimpl("System.security.allowInsecureDomain"));
     return as_value();
 }
 
@@ -332,21 +333,21 @@ system_security_allowinsecuredomain(const fn_call& /*fn*/)
 as_value
 system_security_loadpolicyfile(const fn_call& /*fn*/)
 {
-    LOG_ONCE(log_unimpl ("System.security.loadPolicyFile") );
+    LOG_ONCE(log_unimpl("System.security.loadPolicyFile"));
     return as_value();
 }
 
 as_value
 system_setClipboard(const fn_call& /*fn*/)
 {
-    LOG_ONCE(log_unimpl ("System.setClipboard") );
+    LOG_ONCE(log_unimpl("System.setClipboard"));
     return as_value();
 }
 
 as_value
 system_showsettings(const fn_call& /*fn*/)
 {
-    LOG_ONCE(log_unimpl ("System.showSettings") );
+    LOG_ONCE(log_unimpl("System.showSettings"));
     return as_value();
 }
 
@@ -357,16 +358,13 @@ system_showsettings(const fn_call& /*fn*/)
 as_value
 system_exactsettings(const fn_call& fn)
 {
-
     // Getter
     if (fn.nargs == 0) {
         // Is always true until we implement it.
         return as_value(true);   
     }
-    
-    // Setter
     else {
-        LOG_ONCE(log_unimpl ("System.exactSettings") );
+        LOG_ONCE(log_unimpl("System.exactSettings"));
         return as_value();
     }
 }
@@ -379,23 +377,17 @@ as_value
 system_usecodepage(const fn_call& fn)
 {
     // Getter
-    if (fn.nargs == 0)
-    {
+    if (!fn.nargs) {
         // Is always false until we implement it.
         return as_value(false);   
     }
-    
-    // Setter
-    else 
-    {
+    else {
         LOG_ONCE(log_unimpl ("System.useCodepage") );
         return as_value();
     }
 }
 
-
-
-const std::string&
+std::string
 systemLanguage(as_object& proto)
 {
 	// Two-letter language code ('en', 'de') corresponding to ISO 639-1
@@ -408,7 +400,7 @@ systemLanguage(as_object& proto)
 	// some scripts rely on there being only 20 possible languages. It could
 	// be a run time option if it's important enough to care.
 
-	static std::string lang = getVM(proto).getSystemLanguage();
+	std::string lang = getVM(proto).getSystemLanguage();
 	
 	const char* languages[] = {"en", "fr", "ko", "ja", "sv",
 				"de", "es", "it", "zh", "pt",
@@ -418,32 +410,27 @@ systemLanguage(as_object& proto)
 	const size_t size = arraySize(languages);
 	
 	if (std::find(languages, languages + size, lang.substr(0, 2)) !=
-            languages + size)
-	{
-		if (lang.substr(0,2) == "zh")
-		{
+            languages + size) {
+		if (lang.substr(0, 2) == "zh") {
 			// Chinese is the only language since the pp version 7
 			// to need an additional qualifier.
 			if (lang.substr(2, 3) == "_TW") lang = "zh-TW";
 			else if (lang.substr(2, 3) == "_CN") lang = "zh-CN";
 			else lang = "xu";
 		}
-		else
-		{
+		else {
 			// All other matching cases: retain just the first
 			// two DisplayObjects.
 			lang.erase(2);
 		}
 	}
-	else
-	{
+	else {
 		// Unknown language. We also return this if
 		// getSystemLanguage() returns something unexpected. 
 		lang = "xu";
 	}
 
 	return lang;
-
 }
 
 } // anonymous namespace
