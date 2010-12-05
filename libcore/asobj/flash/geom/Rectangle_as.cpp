@@ -442,7 +442,9 @@ Rectangle_bottomRight(const fn_call& fn)
         boost::intrusive_ptr<as_function> pointCtor = point.to_function();
 
         if (!pointCtor) {
-            log_error("Failed to construct flash.geom.Point!");
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror("Failed to construct flash.geom.Point!");
+            );
             return as_value();
         }
 
@@ -526,33 +528,30 @@ Rectangle_size(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
 
-    as_value ret;
-
-    if ( ! fn.nargs ) // getter
-    {
-        as_value w,h;
-        ptr->get_member(NSV::PROP_WIDTH, &w);
-        ptr->get_member(NSV::PROP_HEIGHT, &h);
+    if (!fn.nargs) {
+        as_value w = getMember(*ptr, NSV::PROP_WIDTH);
+        as_value h = getMember(*ptr, NSV::PROP_HEIGHT);
 
         as_function* pointCtor = getClassConstructor(fn, "flash.geom.Point");
         if (!pointCtor) {
-            log_error("Failed to construct flash.geom.Point!");
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror("Failed to construct flash.geom.Point!");
+            );
             return as_value();
         }
 
         fn_call::Args args;
         args += w, h;
 
-        ret = constructInstance(*pointCtor, fn.env(), args);
-    }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Attempt to set read-only property %s"), "Rectangle.size");
-        );
+        return constructInstance(*pointCtor, fn.env(), args);
     }
 
-    return ret;
+    IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Attempt to set read-only property %s"),
+            "Rectangle.size");
+    );
+
+    return as_value();
 }
 
 as_value
@@ -560,30 +559,25 @@ Rectangle_top(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
 
-    as_value ret;
-
-    if ( ! fn.nargs ) // getter
-    {
-        ptr->get_member(NSV::PROP_Y, &ret);
-    }
-    else // setter
-    {
-        as_value oldy;
-        ptr->get_member(NSV::PROP_Y, &oldy);
-
-        as_value newy = fn.arg(0);
-        ptr->set_member(NSV::PROP_Y, newy);
-
-        as_value h;
-        ptr->get_member(NSV::PROP_HEIGHT, &h);
-
-        VM& vm = getVM(fn);
-        subtract(oldy, newy, vm);
-        newAdd(h, oldy, vm);
-        ptr->set_member(NSV::PROP_HEIGHT, h);
+    if (!fn.nargs) {
+        // getter
+        return getMember(*ptr, NSV::PROP_Y);
     }
 
-    return ret;
+    // setter
+    as_value oldy = getMember(*ptr, NSV::PROP_Y);
+
+    as_value newy = fn.arg(0);
+    ptr->set_member(NSV::PROP_Y, newy);
+
+    as_value h = getMember(*ptr, NSV::PROP_HEIGHT);
+
+    VM& vm = getVM(fn);
+    subtract(oldy, newy, vm);
+    newAdd(h, oldy, vm);
+    ptr->set_member(NSV::PROP_HEIGHT, h);
+
+    return as_value();
 }
 
 as_value
@@ -591,34 +585,32 @@ Rectangle_topLeft(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
 
-    as_value ret;
-
-    if ( ! fn.nargs ) // getter
-    {
-        as_value x,y;
-        ptr->get_member(NSV::PROP_X, &x);
-        ptr->get_member(NSV::PROP_Y, &y);
+    // getter
+    if (!fn.nargs) {
+        as_value x = getMember(*ptr, NSV::PROP_X);
+        as_value y = getMember(*ptr, NSV::PROP_Y);
 
         as_function* pointCtor = getClassConstructor(fn, "flash.geom.Point");
         if (!pointCtor) {
-            log_error("Failed to construct flash.geom.Point!");
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror("Failed to construct flash.geom.Point!");
+            );
             return as_value();
         }
 
         fn_call::Args args;
         args += x, y;
 
-        ret = constructInstance(*pointCtor, fn.env(), args);
+        return constructInstance(*pointCtor, fn.env(), args);
 
     }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Attempt to set read-only property %s"), "Rectangle.topLeft");
-        );
-    }
 
-    return ret;
+    IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Attempt to set read-only property %s"),
+            "Rectangle.topLeft");
+    );
+
+    return as_value();
 }
 
 
@@ -653,5 +645,6 @@ get_flash_geom_rectangle_constructor(const fn_call& fn)
     attachRectangleInterface(*proto);
     return gl.createClass(&Rectangle_ctor, proto);
 }
+
 } // anonymous namespace
 } // end of gnash namespace
