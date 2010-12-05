@@ -337,11 +337,11 @@ Rectangle_isEmpty(const fn_call& fn)
 
     as_value w;
     ptr->get_member(NSV::PROP_WIDTH, &w);
-    if ( w.is_undefined() || w.is_null() ) return as_value(true);
+    if (w.is_undefined() || w.is_null()) return as_value(true);
 
     as_value h;
     ptr->get_member(NSV::PROP_HEIGHT, &h);
-    if ( h.is_undefined() || h.is_null() ) return as_value(true);
+    if (h.is_undefined() || h.is_null()) return as_value(true);
 
     double wn = toNumber(w, getVM(fn));
     if (!isFinite(wn) || wn <= 0) return as_value(true);
@@ -447,28 +447,18 @@ Rectangle_bottom(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
 
-    as_value ret;
-
-    if ( ! fn.nargs ) // getter
-    {
-        as_value height;
-        ptr->get_member(NSV::PROP_Y, &ret);
-        ptr->get_member(NSV::PROP_HEIGHT, &height);
-        VM& vm = getVM(fn);
-        newAdd(ret, height, vm);
+    if (!fn.nargs) {
+        as_value b = getMember(*ptr, NSV::PROP_Y);
+        as_value height = getMember(*ptr, NSV::PROP_HEIGHT);
+        newAdd(b, height, getVM(fn));
+        return b;
     }
-    else // setter
-    {
-        as_value y;
-        ptr->get_member(NSV::PROP_Y, &y);
+    as_value y = getMember(*ptr, NSV::PROP_Y);
+    as_value height = fn.arg(0);
+    subtract(height, y, getVM(fn));
+    ptr->set_member(NSV::PROP_HEIGHT, height);
 
-        as_value height = fn.arg(0);
-        VM& vm = getVM(fn);
-        subtract(height, y, vm);
-        ptr->set_member(NSV::PROP_HEIGHT, height);
-    }
-
-    return ret;
+    return as_value();
 }
 
 as_value
@@ -478,11 +468,10 @@ Rectangle_bottomRight(const fn_call& fn)
 
     if (!fn.nargs) {
 
-        as_value x, y, w, h;
-        ptr->get_member(NSV::PROP_X, &x);
-        ptr->get_member(NSV::PROP_Y, &y);
-        ptr->get_member(NSV::PROP_WIDTH, &w);
-        ptr->get_member(NSV::PROP_HEIGHT, &h);
+        as_value x = getMember(*ptr, NSV::PROP_X);
+        as_value y = getMember(*ptr, NSV::PROP_Y);
+        as_value w = getMember(*ptr, NSV::PROP_WIDTH);
+        as_value h = getMember(*ptr, NSV::PROP_HEIGHT);
 
         VM& vm = getVM(fn);
         newAdd(x, w, vm);
@@ -502,8 +491,7 @@ Rectangle_bottomRight(const fn_call& fn)
         fn_call::Args args;
         args += x, y;
 
-        as_value ret = constructInstance(*pointCtor, fn.env(), args);
-        return ret;
+        return constructInstance(*pointCtor, fn.env(), args);
     }
 
     IF_VERBOSE_ASCODING_ERRORS(
@@ -519,30 +507,22 @@ Rectangle_left(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
 
-    as_value ret;
-
-    if ( ! fn.nargs ) // getter
-    {
-        ptr->get_member(NSV::PROP_X, &ret);
+    if (!fn.nargs) {
+        return getMember(*ptr, NSV::PROP_X);
     }
-    else // setter
-    {
-        as_value oldx;
-        ptr->get_member(NSV::PROP_X, &oldx);
+    as_value oldx = getMember(*ptr, NSV::PROP_X);
 
-        as_value newx = fn.arg(0);
-        ptr->set_member(NSV::PROP_X, newx);
+    as_value newx = fn.arg(0);
+    ptr->set_member(NSV::PROP_X, newx);
 
-        as_value w;
-        ptr->get_member(NSV::PROP_WIDTH, &w);
+    as_value w = getMember(*ptr, NSV::PROP_WIDTH);
 
-        VM& vm = getVM(fn);
-        subtract(oldx, newx, vm);
-        newAdd(w, oldx, vm);
-        ptr->set_member(NSV::PROP_WIDTH, w);
-    }
+    VM& vm = getVM(fn);
+    subtract(oldx, newx, vm);
+    newAdd(w, oldx, vm);
+    ptr->set_member(NSV::PROP_WIDTH, w);
 
-    return ret;
+    return as_value();
 }
 
 as_value
@@ -550,28 +530,19 @@ Rectangle_right(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
 
-    as_value ret;
-
-    if ( ! fn.nargs ) // getter
-    {
-        as_value width;
-        ptr->get_member(NSV::PROP_X, &ret);
-        ptr->get_member(NSV::PROP_WIDTH, &width);
-        VM& vm = getVM(fn);
-        newAdd(ret, width, vm);
-    }
-    else // setter
-    {
-        as_value x;
-        ptr->get_member(NSV::PROP_X, &x);
-
-        VM& vm = getVM(fn);
-        as_value width = fn.arg(0);
-        subtract(width, x, vm);
-        ptr->set_member(NSV::PROP_WIDTH, width);
+    if (!fn.nargs) {
+        as_value r = getMember(*ptr, NSV::PROP_X);
+        as_value width = getMember(*ptr, NSV::PROP_WIDTH);
+        newAdd(r, width, getVM(fn));
+        return r;
     }
 
-    return ret;
+    as_value x = getMember(*ptr, NSV::PROP_X);
+
+    as_value width = fn.arg(0);
+    subtract(width, x, getVM(fn));
+    ptr->set_member(NSV::PROP_WIDTH, width);
+    return as_value();
 }
 
 as_value
