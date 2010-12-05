@@ -261,9 +261,37 @@ as_value
 Rectangle_equals(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
-    UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
-    return as_value();
+
+    if (!fn.nargs) return as_value(false);
+    as_object* comp = toObject(fn.arg(0), getVM(fn));
+
+    if (!comp) return as_value(false);
+
+    if (!comp->instanceOf(getClassConstructor(fn, "flash.geom.Rectangle"))) {
+        return as_value(false);
+    }
+
+    if (!equals(getMember(*comp, NSV::PROP_X),
+                getMember(*ptr, NSV::PROP_X), getVM(fn))) {
+        return as_value(false);
+    }
+
+    if (!equals(getMember(*comp, NSV::PROP_Y),
+                getMember(*ptr, NSV::PROP_Y), getVM(fn))) {
+        return as_value(false);
+    }
+
+    if (!equals(getMember(*comp, NSV::PROP_WIDTH),
+                getMember(*ptr, NSV::PROP_WIDTH), getVM(fn))) {
+        return as_value(false);
+    }
+
+    if (!equals(getMember(*comp, NSV::PROP_HEIGHT),
+                getMember(*ptr, NSV::PROP_HEIGHT), getVM(fn))) {
+        return as_value(false);
+    }
+
+    return as_value(true);
 }
 
 as_value
