@@ -18,8 +18,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-
 #include "Rectangle_as.h"
+
+#include <sstream>
+
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -31,8 +33,6 @@
 #include "as_value.h"
 #include "namedStrings.h"
 #include "GnashNumeric.h" // isFinite
-
-#include <sstream>
 
 namespace gnash {
 
