@@ -22,17 +22,21 @@
 #include "gnashconfig.h"
 #endif
 
+#include "Player.h"
+
+#include <iostream>
+#include <sstream>
+#include <iomanip>
+#include <boost/lexical_cast.hpp>
+
 #include "gui.h"
 #include "NullGui.h"
-
 #include "MovieFactory.h"
 #include "movie_definition.h"
 #include "sound_handler.h" // for set_sound_handler and create_sound_handler_*
 #include "MovieClip.h" // for setting FlashVars
 #include "movie_root.h" 
-#include "Player.h"
 #include "StreamProvider.h"
-
 #include "swf/TagLoadersTable.h"
 #include "swf/DefaultTagLoaders.h"
 #include "NamingPolicy.h"
@@ -45,13 +49,8 @@
 #include "SystemClock.h"
 #include "ExternalInterface.h"
 #include "ScreenShotter.h"
-
 #include "GnashSystemIOHeaders.h" // for write() 
 #include "log.h"
-#include <iostream>
-#include <sstream>
-#include <iomanip>
-#include <boost/lexical_cast.hpp>
 
 using namespace gnash;
 
