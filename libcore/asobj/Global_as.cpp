@@ -885,10 +885,7 @@ global_assetnativeaccessor(const fn_call& fn)
         ++i;
     }
     return as_value();
-    LOG_ONCE(log_unimpl("ASSetNativeAccessor"));
-    return as_value();
 }
-
 
 // updateAfterEvent function
 as_value
