@@ -58,6 +58,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libcore/asobj \
 	-I$(top_srcdir)/libltdl \
 	-I$(top_srcdir)/libbase \
+	-I$(top_srcdir)/libdevice \
 	-I$(top_srcdir)/librender \
 	-I$(top_srcdir)/librender/agg \
 	-I$(top_srcdir)/librender/cairo \
