@@ -85,7 +85,7 @@ class X11Device : public GnashDevice
     int getID() { return static_cast<int>(_window); }
 
     // Get the size of the pixels, for X11 it's always 8 as far as I can tell
-    int getRedSize() { if (_vinfo) { return _vinfo[0].bits_per_rgb; } return 0; };
+    int getRedSize() { return (_vinfo) ? _vinfo[0].bits_per_rgb : 0; };
     int getGreenSize() { return getRedSize(); };
     int getBlueSize() { return getRedSize(); };
     
