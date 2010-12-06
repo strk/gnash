@@ -533,8 +533,8 @@ MediaParserFfmpeg::readPacket(boost::uint8_t* buf, int buf_size)
 boost::int64_t 
 MediaParserFfmpeg::seekMedia(boost::int64_t offset, int whence)
 {
-	GNASH_REPORT_FUNCTION;
-	log_debug("::seekMedia(%1%, %2%)", offset, whence);
+	//GNASH_REPORT_FUNCTION;
+	//log_debug("::seekMedia(%1%, %2%)", offset, whence);
 
 	assert(_stream.get());
 
