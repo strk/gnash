@@ -1141,8 +1141,8 @@ build_openmax_device=no
 build_egl_device=yes
 build_directfb_device=yes
 build_x11_device=yes
-device_list="X11"
-ndevice=1
+device_list="X11 EGL DirectFB"
+ndevice=3
 AC_ARG_ENABLE(device,
   AC_HELP_STRING([--enable-device], [Specify which hardware abstraction to use to support to enable (none,openmax,egl,directfb,x11,vaapi)]),
   if test -z ${enableval}; then
@@ -1207,6 +1207,7 @@ AC_ARG_ENABLE(device,
 )
 
 if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${build_vaapi_device}" = x"yes"; then
+  AC_OUTPUT(libvaapi/Makefile)
   use_libva=no
   use_libva_x11=no
   use_libva_glx=no
@@ -1256,6 +1257,10 @@ AM_CONDITIONAL(HAVE_VAAPI, test x"${found_libva_incl}" = xyes)
 AM_CONDITIONAL(HAVE_VAAPI_GLX, test x"${found_libva_glx_incl}" = xyes)
 AM_CONDITIONAL(HAVE_VAAPI_X11, test x"${found_libva_x11_incl}" = xyes)
 
+AM_CONDITIONAL(BUILD_DEVICES, test ${ndevice} -gt 0)
+if test ${ndevice} -gt 0; then
+  AC_OUTPUT(libdevice/Makefile)
+fi
 
 AC_PATH_PROG(PERL, perl)
 AM_CONDITIONAL(HAVE_PERL, test x"$PERL" != x)
@@ -1634,6 +1639,21 @@ AC_ARG_ENABLE(cygnal,
   *)   AC_MSG_ERROR([bad value ${enableval} for enable-cygnal option]) ;;
 esac],cygnal=no)
 AM_CONDITIONAL(CYGNAL, test x$cygnal = xyes)
+
+if test x$cygnal = xyes; then
+ AC_OUTPUT(cygnal/Makefile
+    cygnal/libnet/Makefile
+    cygnal/libamf/Makefile
+    cygnal/cgi-bin/Makefile
+    cygnal/cgi-bin/echo/Makefile
+    cygnal/cgi-bin/oflaDemo/Makefile
+    cygnal/cgi-bin/fitcDemo/Makefile
+    cygnal/testsuite/Makefile
+    cygnal/testsuite/libamf.all/Makefile
+    cygnal/testsuite/libnet.all/Makefile
+    cygnal/testsuite/cygnal.all/Makefile
+)
+fi
 
 dnl --------------------------------------------------------
 dnl Build the cgibins server if specified.
@@ -2882,8 +2902,6 @@ libbase/Makefile
 libcore/Makefile
 libcore/vm/Makefile
 libcore/parser/Makefile
-libvaapi/Makefile
-libdevice/Makefile
 librender/Makefile
 utilities/Makefile
 doc/Makefile
@@ -2927,17 +2945,6 @@ plugin/klash/Makefile
 plugin/klash4/Makefile
 plugin/win32/Makefile
 plugin/aos4/Makefile
-cygnal/Makefile
-cygnal/libnet/Makefile
-cygnal/libamf/Makefile
-cygnal/cgi-bin/Makefile
-cygnal/cgi-bin/echo/Makefile
-cygnal/cgi-bin/oflaDemo/Makefile
-cygnal/cgi-bin/fitcDemo/Makefile
-cygnal/testsuite/Makefile
-cygnal/testsuite/libamf.all/Makefile
-cygnal/testsuite/libnet.all/Makefile
-cygnal/testsuite/cygnal.all/Makefile
 )
 
 ###

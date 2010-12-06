@@ -48,12 +48,16 @@ if CYGNAL
 CYGNAL_DIR = cygnal
 endif
 
+if BUILD_DEVICES
+DEVICES_DIR = libdevice
+endif
+
 STD_DIRS = \
 	libbase \
 	libmedia \
 	libsound \
 	libcore \
-	libdevice \
+	$(DEVICES_DIR) \
 	librender \
 	gui \
 	plugin \
