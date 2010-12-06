@@ -52,6 +52,7 @@ fb_gnash_CPPFLAGS = -DGUI_FB -DGUI_CONFIG=\"FB\" -DFAKEFB=\"$(FAKEFB)\" \
 fb_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
 fb_gnash_LDADD = \
 	$(top_builddir)/librender/libgnashrender.la \
+	$(BOOST_LIBS) \
 	$(GNASH_LIBS) 
 
 # Build support for AntiGrain.
