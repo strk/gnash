@@ -53,6 +53,7 @@ STD_DIRS = \
 	libmedia \
 	libsound \
 	libcore \
+	libdevice \
 	librender \
 	gui \
 	plugin \

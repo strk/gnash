@@ -2883,6 +2883,7 @@ libcore/Makefile
 libcore/vm/Makefile
 libcore/parser/Makefile
 libvaapi/Makefile
+libdevice/Makefile
 librender/Makefile
 utilities/Makefile
 doc/Makefile
