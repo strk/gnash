@@ -223,11 +223,7 @@ EGLDevice::~EGLDevice()
         
         eglTerminate(_eglDisplay);
     }
-
     
-#ifdef HAVE_GTK2
-    gdk_exit (0);
-#endif
 }
 
 /// @note: There are a few steps required to initialize an EGL
