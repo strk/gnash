@@ -80,11 +80,11 @@ noinst_HEADERS = \
 	opengl/Renderer_ogl.h \
 	$(NULL)
 
-pkglib_LTLIBRARIES =  libgnashdevice.la libgnashrender.la
+pkglib_LTLIBRARIES =  libgnashrender.la
 
 libgnashrender_la_CPPFLAGS = $(AM_CPPFLAGS)
 libgnashrender_la_LIBADD = \
-	libgnashdevice.la \
+	../libdevice/libgnashdevice.la \
 	$(LIBVA_LIBS) \
 	$(LIBVA_X11_LIBS) \
 	$(LIBVA_GLX_LIBS) \
@@ -124,39 +124,39 @@ libgnashrender_la_SOURCES += cairo/PathParser.cpp
 libgnashrender_la_LIBADD += $(CAIRO_LIBS)
 endif
 
-libgnashdevice_la_CPPFLAGS = $(AM_CPPFLAGS)
-libgnashdevice_la_LIBADD = \
-	$(LIBVA_LIBS) \
-	$(LIBVA_X11_LIBS) \
-	$(LIBVA_GLX_LIBS) \
-	$(GNASH_LIBS)
-libgnashdevice_la_LDFLAGS =  -release $(VERSION) 
-libgnashdevice_la_SOURCES =
+# libgnashdevice_la_CPPFLAGS = $(AM_CPPFLAGS)
+# libgnashdevice_la_LIBADD = \
+# 	$(LIBVA_LIBS) \
+# 	$(LIBVA_X11_LIBS) \
+# 	$(LIBVA_GLX_LIBS) \
+# 	$(GNASH_LIBS)
+# libgnashdevice_la_LDFLAGS =  -release $(VERSION) 
+# libgnashdevice_la_SOURCES =
 
-if BUILD_EGL_DEVICE
-libgnashdevice_la_CPPFLAGS += $(EGL_CFLAGS)
-libgnashdevice_la_SOURCES += eglDevice.cpp
-libgnashdevice_la_LIBADD += $(EGL_LIBS)
-endif
+# if BUILD_EGL_DEVICE
+# libgnashdevice_la_CPPFLAGS += $(EGL_CFLAGS)
+# libgnashdevice_la_SOURCES += eglDevice.cpp
+# libgnashdevice_la_LIBADD += $(EGL_LIBS)
+# endif
 
-if BUILD_DIRECTFB_DEVICE
-libgnashdevice_la_CPPFLAGS += $(DIRECTFB_CFLAGS)
-libgnashdevice_la_SOURCES += directfb/DirectFBDevice.cpp
-libgnashdevice_la_LIBADD += $(DIRECTFB_LIBS)
-endif
+# if BUILD_DIRECTFB_DEVICE
+# libgnashdevice_la_CPPFLAGS += $(DIRECTFB_CFLAGS)
+# libgnashdevice_la_SOURCES += directfb/DirectFBDevice.cpp
+# libgnashdevice_la_LIBADD += $(DIRECTFB_LIBS)
+# endif
 
-if BUILD_VAAPI_DEVICE
-libgnashdevice_la_CPPFLAGS += $(VAAPI_CFLAGS)
-libgnashdevice_la_SOURCES += \
-	vaapi/VaapiDevice.cpp \
-	vaapi/VaapiSurface.cpp
-libgnashdevice_la_LIBADD += $(VAAPI_LIBS)
-endif
+# if BUILD_VAAPI_DEVICE
+# libgnashdevice_la_CPPFLAGS += $(VAAPI_CFLAGS)
+# libgnashdevice_la_SOURCES += \
+# 	vaapi/VaapiDevice.cpp \
+# 	vaapi/VaapiSurface.cpp
+# libgnashdevice_la_LIBADD += $(VAAPI_LIBS)
+# endif
 
-# if BUILD_X11_DEVICE
-libgnashdevice_la_CPPFLAGS += $(X11_CFLAGS)
-libgnashdevice_la_SOURCES += x11/X11Device.cpp
-libgnashdevice_la_LIBADD += $(X11_LIBS)
+# # if BUILD_X11_DEVICE
+# libgnashdevice_la_CPPFLAGS += $(X11_CFLAGS)
+# libgnashdevice_la_SOURCES += x11/X11Device.cpp
+# libgnashdevice_la_LIBADD += $(X11_LIBS)
 # endif
 
 # Rebuild with GCC 4.x Mudflap support
@@ -181,57 +181,13 @@ if BUILD_OGL_RENDERER
 	$(NULL)
 endif
 
-# bin_PROGRAMS = testr
 check_PROGRAMS = testr
-
-if BUILD_EGL_DEVICE
-check_PROGRAMS += test_egl
-# this tests the low level EGL interface, used by OpenVG, OpenGLES1,
-# and OpenGLES2.
-test_egl_SOURCES = test_egl.cpp
-test_egl_CPPFLAGS = $(AM_CPPFLAGS)
-test_egl_LDADD = \
-	libgnashrender.la \
-	libgnashdevice.la \
-	$(EGL_LIBS) \
-	$(GNASH_LIBS)
-endif
-
-if BUILD_VAAPI_DEVICE
-check_PROGRAMS += test_vaapi
-test_vaapi_SOURCES = vaapi/test_vaapi.cpp
-test_vaapi_CPPFLAGS = $(AM_CPPFLAGS) $(VAAPI_CFLAGS)
-test_vaapi_LDADD = \
-	libgnashdevice.la \
-	$(VAAPI_LIBS) \
-	$(GNASH_LIBS)
-endif
-
-if BUILD_DIRECTFB_DEVICE
-check_PROGRAMS += test_dfb
-test_dfb_SOURCES = directfb/test_dfb.cpp
-test_dfb_CPPFLAGS = $(AM_CPPFLAGS) $(DIRECTFB_CFLAGS)
-test_dfb_LDADD = \
-	libgnashdevice.la \
-	$(DIRECTFB_LIBS) \
-	$(GNASH_LIBS)
-endif
-
-# if BUILD_X11_DEVICE
-check_PROGRAMS += test_x11
-test_x11_SOURCES = x11/test_x11.cpp
-test_x11_CPPFLAGS = $(AM_CPPFLAGS) $(X11_CFLAGS)
-test_x11_LDADD = \
-	libgnashdevice.la \
-	$(X11_LIBS) \
-	$(GNASH_LIBS)
-# endif
 
 testr_SOURCES = testr.cpp testr_gtk.cpp
 testr_CPPFLAGS = $(AM_CPPFLAGS) $(DIRECTFB_CFLAGS) # -DUSE_TESTSUITE
 testr_LDADD = \
 	libgnashrender.la \
-	libgnashdevice.la \
+	../libdevice/libgnashdevice.la \
 	$(GNASH_LIBS) \
 	$(GTK2_LIBS) \
 	$(OPENVG_LIBS) \
