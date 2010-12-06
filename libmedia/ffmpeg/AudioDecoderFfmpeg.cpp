@@ -141,6 +141,9 @@ void AudioDecoderFfmpeg::setup(SoundInfo& info)
         throw MediaException(err.str());
     }
 
+    log_debug(_("AudioDecoder: initialized FFMPEG codec %s (%d)"), 
+                _audioCodec->name, (int)codec_id);
+
     /// @todo do this only if !_needsParsing ?
     switch (_audioCodecCtx->codec->id)
     {
