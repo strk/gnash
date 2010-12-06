@@ -170,7 +170,9 @@ AC_DEFUN([GNASH_PATH_KDE4],
     AC_CACHE_VAL(ac_cv_path_kde4_prefix,[
       dnl if the user specified a path, sanity check it and then use it
       if test x"${with_kde4_prefix}" != x; then
-          ac_cv_path_kde4_prefix="`(cd ${with_kde4_prefix}; pwd)`"
+        ac_cv_path_kde4_prefix="`(cd ${with_kde4_prefix}; pwd)`"
+      else
+        ac_cv_path_kde4_prefix=${kde4_prefix}
       fi
     ])                  dnl end of cache ac_cv_path_kde4_prefix
 
