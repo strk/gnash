@@ -1124,7 +1124,12 @@ bool
 CurlStreamFile::seek(std::streampos pos)
 {
 
-    assert(pos >= 0);
+    if ( pos < 0 ) {
+        std::ostringstream os;
+        os << "CurlStreamFile: can't seek to negative absolute position "
+           << pos;
+        throw IOException(os.str());
+    }
 
 #ifdef GNASH_CURL_WARN_SEEKSBACK
     if ( pos < tell() ) {
