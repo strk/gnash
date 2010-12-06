@@ -32,7 +32,7 @@
 
 #include "Geometry.h"
 #include "Renderer.h"
-#include "eglDevice.h"
+#include "egl/eglDevice.h"
 #include "directfb/DirectFBDevice.h"
 #include "GnashDevice.h"
 #include "CachedBitmap.h"
