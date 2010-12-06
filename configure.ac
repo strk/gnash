@@ -1207,7 +1207,6 @@ AC_ARG_ENABLE(device,
 )
 
 if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${build_vaapi_device}" = x"yes"; then
-  AC_OUTPUT(libvaapi/Makefile)
   use_libva=no
   use_libva_x11=no
   use_libva_glx=no

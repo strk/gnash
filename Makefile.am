@@ -71,11 +71,7 @@ if LIBLTDL2
 LIBLTDLDIR = libltdl
 endif
 
-if HAVE_VAAPI
-VAAPI_DIR = libvaapi
-endif
-
-SUBDIRS = $(LIBLTDLDIR) $(VAAPI_DIR) $(STD_DIRS)
+SUBDIRS = $(LIBLTDLDIR) $(STD_DIRS)
 DIST_SUBDIRS = $(STD_DIRS) cygnal extensions testsuite libltdl libvaapi
 
 if TESTSUITE
