@@ -380,17 +380,24 @@ MediaParserFfmpeg::initializeParser()
     _byteIOCxt.is_streamed = 1;
     
     // Open the stream. the 4th argument is the filename, which we ignore.
-    if(av_open_input_stream(&_formatCtx, &_byteIOCxt, "", _inputFmt, NULL) < 0) {
-	throw IOException("MediaParserFfmpeg couldn't open input stream");
+    if(av_open_input_stream(&_formatCtx, &_byteIOCxt, "", _inputFmt, NULL) < 0)
+    {
+        throw IOException("MediaParserFfmpeg couldn't open input stream");
     }
     
-    log_debug("Parsing FFMPEG media file: format:%s; nstreams:%d", _inputFmt->name, _formatCtx->nb_streams);
+    log_debug("Parsing FFMPEG media file: format:%s; nstreams:%d",
+        _inputFmt->name, _formatCtx->nb_streams);
     
-    if ( _formatCtx->title[0] )     log_debug(_("  Title:'%s'"), _formatCtx->title);
-    if ( _formatCtx->author[0] )    log_debug(_("  Author:'%s'"), _formatCtx->author);
-    if ( _formatCtx->copyright[0] ) log_debug(_("  Copyright:'%s'"), _formatCtx->copyright);
-    if ( _formatCtx->comment[0] )   log_debug(_("  Comment:'%s'"), _formatCtx->comment);
-    if ( _formatCtx->album[0] )     log_debug(_("  Album:'%s'"), _formatCtx->album);
+    if ( _formatCtx->title[0] )
+        log_debug(_("  Title:'%s'"), _formatCtx->title);
+    if ( _formatCtx->author[0] )
+        log_debug(_("  Author:'%s'"), _formatCtx->author);
+    if ( _formatCtx->copyright[0] )
+        log_debug(_("  Copyright:'%s'"), _formatCtx->copyright);
+    if ( _formatCtx->comment[0] )
+        log_debug(_("  Comment:'%s'"), _formatCtx->comment);
+    if ( _formatCtx->album[0] )
+        log_debug(_("  Album:'%s'"), _formatCtx->album);
     
     // Find first audio and video stream
     for (unsigned int i = 0; i < static_cast<unsigned int>(_formatCtx->nb_streams); i++)
