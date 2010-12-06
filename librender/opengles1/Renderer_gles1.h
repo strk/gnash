@@ -35,7 +35,7 @@
 
 #include "Renderer.h"
 #include "Geometry.h"
-#include "eglDevice.h"
+#include "egl/eglDevice.h"
 
 #include <map>
 
