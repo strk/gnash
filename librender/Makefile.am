@@ -34,6 +34,7 @@ AM_CPPFLAGS = -I.. \
 	-I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/librender \
+	-I$(top_srcdir)/libdevice \
 	$(PTHREAD_CFLAGS) \
 	$(SDL_CFLAGS) \
 	$(PANGO_CFLAGS) \

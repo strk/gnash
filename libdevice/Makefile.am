@@ -118,7 +118,7 @@ check_PROGRAMS += test_egl
 test_egl_SOURCES = egl/test_egl.cpp
 test_egl_CPPFLAGS = $(AM_CPPFLAGS)
 test_egl_LDADD = \
-	libgnashrender.la \
+	../librender/libgnashrender.la \
 	libgnashdevice.la \
 	$(EGL_LIBS) \
 	$(GNASH_LIBS)
