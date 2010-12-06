@@ -542,10 +542,11 @@ MediaParserFfmpeg::seekMedia(boost::int64_t offset, int whence)
 	{	
 		// Offset is absolute new position in the file
 		if ( offset < 0 ) {
-	   		throw MediaException(
-				"MediaParserFfmpeg couldn't parse input format: "
-				"tried to seek at negative offset."
-			);
+			boost::format fmt = boost::format(
+				_("MediaParserFfmpeg couldn't parse input format: "
+				"tried to seek at negative offset %1%."))
+				% offset;
+	   		throw MediaException(fmt.str());
 		}
 		_stream->seek(offset);
 	}
