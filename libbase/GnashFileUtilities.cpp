@@ -44,7 +44,7 @@ mkdirRecursive(const std::string& filename)
     typedef boost::tokenizer<boost::char_separator<char> > Tok;
     boost::char_separator<char> sep("/");
     Tok t(target, sep);
-    std::string newdir = "/";
+    std::string newdir;
 
     for (Tok::iterator tit = t.begin(); tit != t.end(); ++tit) {
 
