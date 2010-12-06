@@ -125,7 +125,7 @@ AM_LDFLAGS =  \
 
 GNASH_LIBS = \
 	$(top_builddir)/libcore/libgnashcore.la \
-	$(top_builddir)/librender/libgnashdevice.la \
+	$(top_builddir)/libdevice/libgnashdevice.la \
 	$(top_builddir)/librender/libgnashrender.la \
 	$(top_builddir)/libsound/libgnashsound.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
