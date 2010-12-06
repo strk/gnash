@@ -80,10 +80,15 @@ noinst_HEADERS = \
 	opengl/Renderer_ogl.h \
 	$(NULL)
 
-pkglib_LTLIBRARIES = libgnashrender.la libgnashdevice.la
+pkglib_LTLIBRARIES =  libgnashdevice.la libgnashrender.la
 
 libgnashrender_la_CPPFLAGS = $(AM_CPPFLAGS)
-libgnashrender_la_LIBADD = $(LIBVA_LIBS) $(LIBVA_X11_LIBS) $(LIBVA_GLX_LIBS)
+libgnashrender_la_LIBADD = \
+	libgnashdevice.la \
+	$(LIBVA_LIBS) \
+	$(LIBVA_X11_LIBS) \
+	$(LIBVA_GLX_LIBS) \
+	$(GNASH_LIBS)
 libgnashrender_la_LDFLAGS =  -release $(VERSION) 
 libgnashrender_la_SOURCES =
 
@@ -119,22 +124,19 @@ libgnashrender_la_SOURCES += cairo/PathParser.cpp
 libgnashrender_la_LIBADD += $(CAIRO_LIBS)
 endif
 
-
 libgnashdevice_la_CPPFLAGS = $(AM_CPPFLAGS)
 libgnashdevice_la_LIBADD = \
-	libgnashrender.la \
 	$(LIBVA_LIBS) \
 	$(LIBVA_X11_LIBS) \
-	$(LIBVA_GLX_LIBS)
+	$(LIBVA_GLX_LIBS) \
+	$(GNASH_LIBS)
 libgnashdevice_la_LDFLAGS =  -release $(VERSION) 
 libgnashdevice_la_SOURCES =
 
 if BUILD_EGL_DEVICE
 libgnashdevice_la_CPPFLAGS += $(EGL_CFLAGS)
 libgnashdevice_la_SOURCES += eglDevice.cpp
-libgnashdevice_la_LIBADD += \
-	$(EGL_LIBS) \
-	$(GTK2_LIBS)
+libgnashdevice_la_LIBADD += $(EGL_LIBS)
 endif
 
 if BUILD_DIRECTFB_DEVICE
@@ -169,6 +171,16 @@ if ENABLE_PCH
 AM_CXXFLAGS = $(PCH_FLAGS)
 endif
 
+if BUILD_OGL_RENDERER
+   libgnashrender_la_SOURCES += \
+	GnashTexture.cpp \
+	$(NULL)
+
+   noinst_HEADERS += \
+	GnashTexture.h \
+	$(NULL)
+endif
+
 # bin_PROGRAMS = testr
 check_PROGRAMS = testr
 
@@ -179,6 +191,7 @@ check_PROGRAMS += test_egl
 test_egl_SOURCES = test_egl.cpp
 test_egl_CPPFLAGS = $(AM_CPPFLAGS)
 test_egl_LDADD = \
+	libgnashrender.la \
 	libgnashdevice.la \
 	$(EGL_LIBS) \
 	$(GNASH_LIBS)
@@ -220,4 +233,7 @@ testr_LDADD = \
 	libgnashrender.la \
 	libgnashdevice.la \
 	$(GNASH_LIBS) \
-	$(GTK2_LIBS)
+	$(GTK2_LIBS) \
+	$(OPENVG_LIBS) \
+	$(GLES1_LIBS) \
+	$(GLES2_LIBS)
