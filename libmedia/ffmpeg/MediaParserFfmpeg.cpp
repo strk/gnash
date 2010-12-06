@@ -534,22 +534,30 @@ boost::int64_t
 MediaParserFfmpeg::seekMedia(boost::int64_t offset, int whence)
 {
 	GNASH_REPORT_FUNCTION;
+	log_debug("::seekMedia(%1%, %2%)", offset, whence);
 
 	assert(_stream.get());
 
-	// Offset is absolute new position in the file
 	if (whence == SEEK_SET)
 	{	
+		// Offset is absolute new position in the file
+		if ( offset < 0 ) {
+	   		throw MediaException(
+				"MediaParserFfmpeg couldn't parse input format: "
+				"tried to seek at negative offset."
+			);
+		}
 		_stream->seek(offset);
-		// New position is offset + old position
 	}
 	else if (whence == SEEK_CUR)
 	{
+		// New position is offset + old position
 		_stream->seek(_stream->tell() + static_cast<std::streamoff>(offset));
-		// New position is offset + end of file
 	}
 	else if (whence == SEEK_END)
 	{
+		// New position is offset + end of file
+		log_unimpl("MediaParserFfmpeg seek from end of file");
 		// This is (most likely) a streamed file, so we can't seek to the end!
 		// Instead we seek to byteIOBufferSize bytes... seems to work fine...
 		_stream->seek(byteIOBufferSize);
