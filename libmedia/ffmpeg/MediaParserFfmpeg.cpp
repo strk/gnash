@@ -564,6 +564,13 @@ MediaParserFfmpeg::seekMedia(boost::int64_t offset, int whence)
 		_stream->seek(byteIOBufferSize);
 
 	}
+	else
+	{
+		// ffmpeg uses whence=AVSEEK_SIZE and offset=0 to request
+		// stream size !
+		log_unimpl("MediaParserFfmpeg: unsupported whence value %d", whence);
+	}
+
 
 	return _stream->tell(); 
 }
