@@ -284,8 +284,8 @@ TouchDevice::scanForDevices(Gui *gui)
     };
 
     struct ts_types touch[] = {
-        InputDevice::TOUCHSCREEN, "/dev/ts",
-        InputDevice::UNKNOWN, 0
+        {InputDevice::TOUCHSCREEN, "/dev/ts"},
+        {InputDevice::UNKNOWN, 0}
     };
 
     int i = 0;
