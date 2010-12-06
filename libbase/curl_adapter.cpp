@@ -1124,7 +1124,12 @@ bool
 CurlStreamFile::seek(std::streampos pos)
 {
 
-    assert(pos >= 0);
+    if ( pos < 0 ) {
+        std::ostringstream os;
+        os << "CurlStreamFile: can't seek to negative absolute position "
+           << pos;
+        throw IOException(os.str());
+    }
 
 #ifdef GNASH_CURL_WARN_SEEKSBACK
     if ( pos < tell() ) {
@@ -1137,7 +1142,7 @@ CurlStreamFile::seek(std::streampos pos)
     if (_error) return false; // error can be set by fillCache
 
     if (_cached < static_cast<size_t>(pos)) {
-        log_error ("Warning: could not cache anough bytes on seek: %d "
+        log_error ("Warning: could not cache enough bytes on seek: %d "
 		   "requested, %d cached", pos, _cached);
         return false; 
     }

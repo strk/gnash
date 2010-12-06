@@ -380,17 +380,24 @@ MediaParserFfmpeg::initializeParser()
     _byteIOCxt.is_streamed = 1;
     
     // Open the stream. the 4th argument is the filename, which we ignore.
-    if(av_open_input_stream(&_formatCtx, &_byteIOCxt, "", _inputFmt, NULL) < 0) {
-	throw IOException("MediaParserFfmpeg couldn't open input stream");
+    if(av_open_input_stream(&_formatCtx, &_byteIOCxt, "", _inputFmt, NULL) < 0)
+    {
+        throw IOException("MediaParserFfmpeg couldn't open input stream");
     }
     
-    log_debug("Parsing FFMPEG media file: format:%s; nstreams:%d", _inputFmt->name, _formatCtx->nb_streams);
+    log_debug("Parsing FFMPEG media file: format:%s; nstreams:%d",
+        _inputFmt->name, _formatCtx->nb_streams);
     
-    if ( _formatCtx->title[0] )     log_debug(_("  Title:'%s'"), _formatCtx->title);
-    if ( _formatCtx->author[0] )    log_debug(_("  Author:'%s'"), _formatCtx->author);
-    if ( _formatCtx->copyright[0] ) log_debug(_("  Copyright:'%s'"), _formatCtx->copyright);
-    if ( _formatCtx->comment[0] )   log_debug(_("  Comment:'%s'"), _formatCtx->comment);
-    if ( _formatCtx->album[0] )     log_debug(_("  Album:'%s'"), _formatCtx->album);
+    if ( _formatCtx->title[0] )
+        log_debug(_("  Title:'%s'"), _formatCtx->title);
+    if ( _formatCtx->author[0] )
+        log_debug(_("  Author:'%s'"), _formatCtx->author);
+    if ( _formatCtx->copyright[0] )
+        log_debug(_("  Copyright:'%s'"), _formatCtx->copyright);
+    if ( _formatCtx->comment[0] )
+        log_debug(_("  Comment:'%s'"), _formatCtx->comment);
+    if ( _formatCtx->album[0] )
+        log_debug(_("  Album:'%s'"), _formatCtx->album);
     
     // Find first audio and video stream
     for (unsigned int i = 0; i < static_cast<unsigned int>(_formatCtx->nb_streams); i++)
@@ -526,23 +533,32 @@ MediaParserFfmpeg::readPacket(boost::uint8_t* buf, int buf_size)
 boost::int64_t 
 MediaParserFfmpeg::seekMedia(boost::int64_t offset, int whence)
 {
-	GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
+	//log_debug("::seekMedia(%1%, %2%)", offset, whence);
 
 	assert(_stream.get());
 
-	// Offset is absolute new position in the file
 	if (whence == SEEK_SET)
 	{	
+		// Offset is absolute new position in the file
+		if ( offset < 0 ) {
+			boost::format fmt = boost::format(
+				_("MediaParserFfmpeg couldn't parse input format: "
+				"tried to seek at negative offset %1%."))
+				% offset;
+	   		throw MediaException(fmt.str());
+		}
 		_stream->seek(offset);
-		// New position is offset + old position
 	}
 	else if (whence == SEEK_CUR)
 	{
+		// New position is offset + old position
 		_stream->seek(_stream->tell() + static_cast<std::streamoff>(offset));
-		// New position is offset + end of file
 	}
 	else if (whence == SEEK_END)
 	{
+		// New position is offset + end of file
+		log_unimpl("MediaParserFfmpeg seek from end of file");
 		// This is (most likely) a streamed file, so we can't seek to the end!
 		// Instead we seek to byteIOBufferSize bytes... seems to work fine...
 		_stream->seek(byteIOBufferSize);
