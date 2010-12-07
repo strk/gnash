@@ -333,6 +333,14 @@ GtkGui::error(const std::string& msg)
     gtk_box_pack_start(GTK_BOX(content), label, false, false, 0);
     gtk_widget_show_all(popup);
 } 
+    
+void
+GtkGui::setClipboard(const std::string& copy)
+{
+    GtkClipboard* cb = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
+    gtk_clipboard_clear(cb);
+    gtk_clipboard_set_text(cb, copy.c_str(), copy.size());
+}
 
 void
 GtkGui::setFullscreen()

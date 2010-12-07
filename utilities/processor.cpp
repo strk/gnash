@@ -28,7 +28,6 @@
 #include <ctime>
 #include <typeinfo>
 #include <boost/any.hpp>
-#include <boost/variant.hpp>
 
 #ifdef ENABLE_NLS
 # include <clocale>
@@ -168,9 +167,14 @@ public:
         log_debug(_("eventCallback: %s %s"), event);
 
 	    static bool mouseShown = true;
+	    static std::string clipboard;
 
 	    if (event == HostMessage::QUERY) {
             return true;
+        }
+
+	    if (event == HostMessage::SET_CLIPBOARD) {
+            clipboard = boost::any_cast<std::string>(ev.arg());
         }
 
 	    if (event == HostMessage::SHOW_MOUSE) {

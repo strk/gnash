@@ -1098,8 +1098,8 @@ T
 movie_root::callInterface(const HostInterface::Message& e) const
 {
     if (!_interfaceHandler) {
-        log_error("Hosting application registered no callback for events/queries"
-            ", can't call %s(%s)");
+        log_error("Hosting application registered no callback for "
+                "messages, can't call %s(%s)");
         return T();
     }
 

@@ -27,7 +27,7 @@
 #include <iostream>
 #include <sstream>
 #include <boost/lexical_cast.hpp>
-#include <boost/variant.hpp>
+#include <boost/variant/static_visitor.hpp>
 #include <boost/any.hpp>
 #include <utility>
 #include <memory>
@@ -109,7 +109,7 @@ public:
                 return boost::blank();
 
             case HostMessage::SET_CLIPBOARD:
-                LOG_ONCE(log_unimpl("Setting clipboard not supported"));
+                _gui.setClipboard(boost::any_cast<std::string>(e.arg()));
                 return boost::blank();
 
             case HostMessage::RESIZE_STAGE:

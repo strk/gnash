@@ -77,6 +77,8 @@ public:
     virtual double getPixelAspectRatio() const;
     virtual std::pair<int, int> screenResolution() const;
     virtual double getScreenDPI() const;
+
+    virtual void setClipboard(const std::string& copy);
     
     bool watchFD(int fd);
 

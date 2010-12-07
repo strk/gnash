@@ -175,6 +175,12 @@ Gui::~Gui()
     }
 #endif
 }
+    
+void
+Gui::setClipboard(const std::string&)
+{
+    LOG_ONCE(log_unimpl(_("Clipboard not yet supported in this GUI")));
+}
 
 void
 Gui::setFullscreen()

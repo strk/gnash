@@ -192,6 +192,8 @@ public:
     /// Sets the current mouse cursor for the Gui window.
     virtual void setCursor(gnash_cursor_type newcursor);
 
+    virtual void setClipboard(const std::string& copy);
+
     // Information for System.capabilities to be reimplemented in
     // each gui.
     virtual double getPixelAspectRatio() const { return 0; }
