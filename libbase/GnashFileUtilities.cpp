@@ -45,6 +45,9 @@ mkdirRecursive(const std::string& filename)
     boost::char_separator<char> sep("/");
     Tok t(target, sep);
     std::string newdir;
+    // Start from the root if the given filename was given
+    // with an absolute path
+    if ( filename[0] == '/' ) newdir += "/";
 
     for (Tok::iterator tit = t.begin(); tit != t.end(); ++tit) {
 
