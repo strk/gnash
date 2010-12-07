@@ -96,13 +96,14 @@ AC_DEFUN([GNASH_PATH_MYSQL],
       done
     ])
     AC_MSG_CHECKING([for MySQL client library])
-    AC_MSG_RESULT(${ac_cv_path_mysql_lib})
   fi #}
 
 
   if test x"${ac_cv_path_mysql_lib}" != x; then
+    AC_MSG_RESULT(${ac_cv_path_mysql_lib})
     MYSQL_LIBS="${ac_cv_path_mysql_lib}"
   else
+    AC_MSG_RESULT(no)
     MYSQL_LIBS=""
   fi
 
