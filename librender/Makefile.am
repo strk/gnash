@@ -61,17 +61,13 @@ GNASH_LIBS = \
 instdir = $(includedir)/gnash
 
 noinst_HEADERS = \
+	Renderer.h \
 	agg/Renderer_agg.h \
 	agg/Renderer_agg_bitmap.h \
 	agg/Renderer_agg_style.h \
 	cairo/Renderer_cairo.h \
 	cairo/PathParser.h
-	GnashDevice.h \
-	eglDevice.h \
 	opengl/tu_opengl_includes.h \
-	directfb/Renderer_DirectFB.h \
-	directfb/DirectFBDevice.h \
-	vaapi/VaapiDevice.h \
 	opengl/Renderer_ogl.h \
 	opengles1/Renderer_gles1.h \
 	opengles1/render_handler_gles.h \

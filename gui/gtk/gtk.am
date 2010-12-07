@@ -53,12 +53,12 @@ gtk_gnash_SOURCES	+= gtk/gtk_glue_agg_vaapi.cpp
 gtk_gnash_CPPFLAGS	+= \
 	$(X11_CFLAGS) \
 	$(LIBVA_X11_CFLAGS) \
-	-I$(top_srcdir)/libvaapi \
+	-I$(top_srcdir)/libdevice/vaapi \
 	$(NULL)
 gtk_gnash_LDADD += \
 	$(X11_LIBS) \
 	$(LIBVA_X11_LIBS) \
-	$(top_builddir)/libvaapi/libgnashvaapi.la \
+	$(top_builddir)/libdevice/libgnashvaapi.la \
 	$(NULL)
 endif   # USE_VAAPI
 endif	# BUILD_AGG_RENDERER

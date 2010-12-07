@@ -22,7 +22,7 @@
 
 AUTOMAKE_OPTIONS = -Wno-portability
 
-DIST_SUBDIRS = pythonmod fb
+DIST_SUBDIRS = pythonmod
 
 # If python support is enabled, built that too
 if HAS_PYTHON

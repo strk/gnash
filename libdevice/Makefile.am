@@ -58,6 +58,7 @@ GNASH_LIBS = \
 instdir = $(includedir)/gnash
 
 noinst_HEADERS = \
+	GnashDevice.h \
 	$(NULL)
 
 pkglib_LTLIBRARIES =  libgnashdevice.la
@@ -73,13 +74,17 @@ libgnashdevice_la_SOURCES =
 
 if BUILD_EGL_DEVICE
 libgnashdevice_la_CPPFLAGS += $(EGL_CFLAGS)
-libgnashdevice_la_SOURCES += egl/eglDevice.cpp egl/eglDevice.h
+libgnashdevice_la_SOURCES += \
+	egl/eglDevice.cpp \
+	egl/eglDevice.h
 libgnashdevice_la_LIBADD += $(EGL_LIBS)
 endif
 
 if BUILD_DIRECTFB_DEVICE
 libgnashdevice_la_CPPFLAGS += $(DIRECTFB_CFLAGS)
-libgnashdevice_la_SOURCES += directfb/DirectFBDevice.cpp directfb/DirectFBDevice.h
+libgnashdevice_la_SOURCES += \
+	directfb/DirectFBDevice.cpp \
+	directfb/DirectFBDevice.h
 libgnashdevice_la_LIBADD += $(DIRECTFB_LIBS)
 endif
 
@@ -87,13 +92,15 @@ if BUILD_VAAPI_DEVICE
 libgnashdevice_la_CPPFLAGS += $(VAAPI_CFLAGS)
 libgnashdevice_la_SOURCES += \
 	vaapi/VaapiDevice.cpp \
-	vaapi/VaapiSurface.cpp
+	vaapi/VaapiDevice.h
 libgnashdevice_la_LIBADD += $(VAAPI_LIBS)
 endif
 
 # if BUILD_X11_DEVICE
 libgnashdevice_la_CPPFLAGS += $(X11_CFLAGS)
-libgnashdevice_la_SOURCES += x11/X11Device.cpp
+libgnashdevice_la_SOURCES += \
+	x11/X11Device.cpp \
+	x11/X11Device.h
 libgnashdevice_la_LIBADD += $(X11_LIBS)
 # endif
 
@@ -154,3 +161,4 @@ test_x11_LDADD = \
 	$(GNASH_LIBS)
 # endif
 
+include vaapi/vaapi.am

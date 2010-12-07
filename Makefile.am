@@ -72,7 +72,7 @@ LIBLTDLDIR = libltdl
 endif
 
 SUBDIRS = $(LIBLTDLDIR) $(STD_DIRS)
-DIST_SUBDIRS = $(STD_DIRS) cygnal extensions testsuite libltdl libvaapi
+DIST_SUBDIRS = $(STD_DIRS) cygnal extensions testsuite libltdl
 
 if TESTSUITE
 SUBDIRS += testsuite
