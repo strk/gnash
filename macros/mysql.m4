@@ -31,7 +31,6 @@ AC_DEFUN([GNASH_PATH_MYSQL],
 
   if test x"${ac_cv_path_mysql_incl}" = x; then
     AC_CHECK_PROG(mconfig, mysql_config, mysql_config)
-    AC_MSG_RESULT(${ac_cv_prog_mconfig})
   fi
   if test x"${ac_cv_prog_mconfig}" = "x" ; then
      AC_CHECK_PROG(mconfig, mysql-config, mysql-config)
