@@ -503,33 +503,29 @@ GtkGui::showMenu(bool show)
 }
 
 double
-GtkGui::getPixelAspectRatio()
+GtkGui::getPixelAspectRatio() const
 {
     GdkScreen* screen = gdk_screen_get_default();
+
+    const std::pair<int, int> res = screenResolution();
 
     // Screen size / number of pixels = pixel size.
     // The physical size of the screen may be reported wrongly by gdk (from X),
     // but it's the best we have. This method agrees with the pp in my case.
     double pixelAspectRatio =
-        (gdk_screen_get_height_mm(screen) / static_cast<double>(getScreenResY())) / 
-        (gdk_screen_get_width_mm(screen) / static_cast<double>(getScreenResX()));
+        (gdk_screen_get_height_mm(screen) / static_cast<double>(res.first)) / 
+        (gdk_screen_get_width_mm(screen) / static_cast<double>(res.second));
     return pixelAspectRatio;
 }
 
-int
-GtkGui::getScreenResX()
+std::pair<int, int>
+GtkGui::screenResolution() const
 {
-    return gdk_screen_width();
-}
-
-int
-GtkGui::getScreenResY()
-{
-    return gdk_screen_height(); 
+    return std::make_pair(gdk_screen_width(), gdk_screen_height());
 }
 
 double
-GtkGui::getScreenDPI()
+GtkGui::getScreenDPI() const
 {
 #if GTK_CHECK_VERSION(2,10,0)
     GdkScreen* screen = gdk_screen_get_default();

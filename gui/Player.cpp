@@ -29,6 +29,9 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/variant.hpp>
 #include <boost/any.hpp>
+#include <utility>
+#include <memory>
+#include <vector>
 
 #include "gui.h"
 #include "NullGui.h"
@@ -149,8 +152,7 @@ public:
                 return boost::blank();
 
             case HostMessage::SCREEN_RESOLUTION:
-                return std::make_pair(_gui.getScreenResX(),
-                        _gui.getScreenResY());
+                return _gui.screenResolution();
 
             case HostMessage::SCREEN_DPI:
                 return _gui.getScreenDPI();
