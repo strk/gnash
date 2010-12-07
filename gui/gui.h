@@ -197,7 +197,13 @@ public:
     virtual int getScreenResX() { return 0; }
     virtual int getScreenResY() { return 0; }
     virtual double getScreenDPI() { return 0; }
-    virtual std::string getScreenColor() { return ""; }
+
+    /// Get the screen color type.
+    //
+    /// The choice is between "color" and something designating
+    /// monochrome (not sure what). If this isn't implemented in the
+    /// gui we return "color".
+    virtual std::string getScreenColor() { return "color"; }
 
     /// @return Whether or not the movie should be looped indefinitely.
     bool loops() const { return _loop; }
