@@ -152,6 +152,8 @@ attachSystemCapabilitiesInterface(as_object& o)
     const double aspectRatio = m.callInterface<double>(HostMessage(
                 HostMessage::PIXEL_ASPECT_RATIO));
 
+    // Note that the pp uses the current locale to display the
+    // ratio (for the decimal separator).
     std::ostringstream s;
     s << std::setprecision(7) << aspectRatio;
     const std::string pixelAspectRatio = s.str();
