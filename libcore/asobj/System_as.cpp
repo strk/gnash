@@ -246,33 +246,33 @@ attachSystemCapabilitiesInterface(as_object& o)
     const int flags = PropFlags::dontDelete
         | PropFlags::dontEnum | PropFlags::readOnly;
 
+    o.init_member("hasAccessibility", hasAccessibility, flags);
+    o.init_member("pixelAspectRatio", pixelAspectRatio, flags);
+    o.init_member("screenColor", screenColor, flags);
+    o.init_member("screenDPI", screenDPI, flags);
+    o.init_member("screenResolutionY", resY, flags);
+    o.init_member("screenResolutionX", resX, flags);
+    o.init_member("hasTLS", hasTLS, flags);
+    o.init_member("hasVideoEncoder", hasVideoEncoder, flags);
+    o.init_member("hasAudioEncoder", hasAudioEncoder, flags);
+    o.init_member("hasMP3", hasMP3, flags);
+    o.init_member("hasAudio", hasAudio, flags);
+    o.init_member("serverString", serverString.str(), flags);
     o.init_member("version", version, flags);
+    o.init_member("hasStreamingAudio", hasStreamingAudio, flags);
+    o.init_member("hasStreamingVideo", hasStreamingVideo, flags);
+    o.init_member("hasEmbeddedVideo", hasEmbeddedVideo, flags);
+    o.init_member("hasPrinting", hasPrinting, flags);
+    o.init_member("hasScreenPlayback", hasScreenPlayback, flags);
+    o.init_member("hasScreenBroadcast", hasScreenBroadcast, flags);
+    o.init_member("isDebugger", isDebugger, flags);
     o.init_member("playerType", playerType, flags);
+    o.init_member("avHardwareDisable", avHardwareDisable, flags);
+    o.init_member("localFileReadDisable", localFileReadDisable, flags);
+    o.init_member("windowlessDisable", windowlessDisable, flags);
     o.init_member("os", os, flags);
     o.init_member("manufacturer", manufacturer, flags);
     o.init_member("language", language, flags);
-    o.init_member("hasAudio", hasAudio, flags);
-    o.init_member("screenResolutionX", resX, flags);
-    o.init_member("screenResolutionY", resY, flags);
-    o.init_member("screenColor", screenColor, flags);
-    o.init_member("screenDPI", screenDPI, flags);
-    o.init_member("pixelAspectRatio", pixelAspectRatio, flags);
-    o.init_member("serverString", serverString.str(), flags);
-    o.init_member("avHardwareDisable", avHardwareDisable, flags);
-    o.init_member("hasAudioEncoder", hasAudioEncoder, flags);
-    o.init_member("hasEmbeddedVideo", hasEmbeddedVideo, flags);
-    o.init_member("hasMP3", hasMP3, flags);
-    o.init_member("hasPrinting", hasPrinting, flags);
-    o.init_member("hasScreenBroadcast", hasScreenBroadcast, flags);
-    o.init_member("hasScreenPlayback", hasScreenPlayback, flags);
-    o.init_member("hasStreamingAudio", hasStreamingAudio, flags);
-    o.init_member("hasStreamingVideo", hasStreamingVideo, flags);
-    o.init_member("hasVideoEncoder", hasVideoEncoder, flags);
-    o.init_member("hasAccessibility", hasAccessibility, flags);
-    o.init_member("isDebugger", isDebugger, flags);
-    o.init_member("localFileReadDisable", localFileReadDisable, flags);
-    o.init_member("hasTLS", hasTLS, flags);
-    o.init_member("windowlessDisable", windowlessDisable, flags);
 }
 
 void
