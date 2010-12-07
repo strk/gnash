@@ -93,7 +93,7 @@ mouse_hide(const fn_call& fn)
 {
     movie_root& m = getRoot(fn);
     const int success =
-        m.callInterface<bool>(HostMessage(HostMessage::SHOW_MOUSE, true));
+        m.callInterface<bool>(HostMessage(HostMessage::SHOW_MOUSE, false));
 
     // returns 1 if mouse was visible before call.
     return as_value(success);
@@ -107,7 +107,7 @@ mouse_show(const fn_call& fn)
 {
     movie_root& m = getRoot(fn);
     const int success = 
-        m.callInterface<bool>(HostMessage(HostMessage::SHOW_MOUSE, false));
+        m.callInterface<bool>(HostMessage(HostMessage::SHOW_MOUSE, true));
 
     // returns 1 if Mouse was visible before call.
     return as_value(success);

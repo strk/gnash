@@ -180,7 +180,7 @@ public:
 	    if (event == HostMessage::SHOW_MOUSE) {
             bool state = mouseShown;
             mouseShown = boost::any_cast<bool>(ev.arg());
-            return state ? true : false ;
+            return state;
 	    }
 	    
 	    // Some fake values for consistent test results.
