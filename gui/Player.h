@@ -24,17 +24,18 @@
 #include "gnashconfig.h"
 #endif
 
+#include <boost/intrusive_ptr.hpp>
+#include <string>
+#include <boost/shared_ptr.hpp>
+#include <map>
+#include <memory>
+
 #include "sound_handler.h"
 #include "MediaHandler.h" 
 #include "gui.h"
 #include "movie_definition.h" 
 #include "movie_root.h"
 #include "RunResources.h"
-
-#include <boost/intrusive_ptr.hpp>
-#include <string>
-#include <boost/shared_ptr.hpp>
-#include <map>
 
 // Forward declarations
 namespace gnash {
