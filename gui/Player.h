@@ -37,14 +37,11 @@
 #include <map>
 
 // Forward declarations
-namespace gnash
-{
+namespace gnash {
     class MovieClip;
 }
 
-
-namespace gnash
-{
+namespace gnash {
 
 /// This class is an attempt at simplifying the code required
 /// to simply start the SWF player. The idea was to use it
@@ -215,8 +212,7 @@ private:
     /// being the default.
     std::string _renderer;
 
-    class CallbacksHandler : public movie_root::AbstractIfaceCallback,
-                             public movie_root::AbstractFsCallback
+    class CallbacksHandler : public HostInterface, public FsCallback
     {
     public:
         CallbacksHandler(Gui& gui, const Player& player)
@@ -226,11 +222,7 @@ private:
         {
         }
         
-        std::string call(const std::string& event, const std::string& arg);
-        
-        bool yesNo(const std::string& query);
-        
-        void error(const std::string& msg);
+        boost::any call(const HostInterface::Message& e);
 
         void exit();
         

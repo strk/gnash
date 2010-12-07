@@ -77,6 +77,7 @@
 #include <boost/array.hpp>
 #include <boost/ptr_container/ptr_deque.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/any.hpp>
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "dsodefs.h" // DSOEXPORT
@@ -91,6 +92,8 @@
 #include "ExternalInterface.h"
 #include "GC.h"
 #include "VM.h"
+#include "HostInterface.h"
+#include "log.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -696,16 +699,14 @@ public:
 
     /// Set a filedescriptor to use for host application requests
     /// (for browser communication mostly)
-    void setHostFD(int fd)
-    {
+    void setHostFD(int fd) {
         assert(fd >= 0);
         _hostfd = fd;
     }
 
     /// Set a filedescriptor to use for host application requests
     /// (for browser communication mostly)
-    void setControlFD(int fd)
-    {
+    void setControlFD(int fd) {
         _controlfd = fd;
     }
 
@@ -713,23 +714,13 @@ public:
     /// (for browser communication mostly)
     ///
     /// @return -1 if no filedescriptor is provided by host app.
-    int getHostFD() const
-    {
+    int getHostFD() const {
         return _hostfd;
     }
 
-    int getControlFD() const
-    {
+    int getControlFD() const {
         return _controlfd;
     }
-
-
-    /// Abstract base class for FS handlers
-    class AbstractFsCallback {
-    public:
-        virtual void notify(const std::string& cmd, const std::string& arg)=0;
-        virtual ~AbstractFsCallback() {}
-    };
 
     /// ActionScript embedded in a movie can use the built-in
     /// fscommand() function to send data back to the host
@@ -740,8 +731,7 @@ public:
     /// The handler gets the MovieClip* that the script is
     /// embedded in, and the two string arguments passed by the
     /// script to fscommand().
-    DSOEXPORT void registerFSCommandCallback(AbstractFsCallback* handler)
-    {
+    DSOEXPORT void registerFSCommandCallback(FsCallback* handler) {
         _fsCommandHandler = handler;
     }
 
@@ -749,58 +739,31 @@ public:
     DSOEXPORT void handleFsCommand(const std::string& cmd,
             const std::string& arg) const;
     
-    /// Abstract base class for hosting app handler
-    class AbstractIfaceCallback
-    {
-    public:
-
-        /// Get Gui-related information for the core.
-        //
-        /// This should be used for occasional AS calls, such as for
-        /// Mouse.hide, System.capabilities etc. The return can be
-        /// various types, so it is passed as a string.
-        virtual std::string call(const std::string& cmd,
-                const std::string& arg = std::string()) = 0;
-
-        /// Ask the hosting application for a yes / no answer to
-        /// a question.
-        virtual bool yesNo(const std::string& cmd) = 0;
-
-        /// Instruct the hosting application to exit.
-        virtual void exit() = 0;
-
-        /// Send an error message to the hosting application.
-        //
-        /// This does not have to be implemented; the default is a no-op.
-        virtual void error(const std::string& /*msg*/) {}
-
-        virtual ~AbstractIfaceCallback() {}
-    };
-
     /// A callback to the GUI (or whatever is listening) for sending
     /// events and receiving replies. Used for ActionScript interface
     /// with the gui (Mouse visibility, Stage alignment etc and System
     /// information, for instance).
     ///
     /// See callInterface method
-    DSOEXPORT void registerEventCallback(AbstractIfaceCallback* handler)
-    {
+    DSOEXPORT void registerEventCallback(HostInterface* handler) {
         _interfaceHandler = handler;
     }
 
-    /// Call into the hosting application
-    ///
-    /// Will use callback set with registerEventCallback
-    DSOEXPORT std::string callInterface(const std::string& cmd,
-            const std::string& arg = std::string()) const;
+    /// Call the hosting application without expecting a reply.
+    //
+    /// @param e    The message to send to the interface.
+    void callInterface(const HostInterface::Message& e) const;
 
-    /// Send an error message to the hosting application.
+    /// Call the hosting application, ensuring a return of the requested type.
     //
-    /// @param msg  A message to send describing the error.
+    /// If the return type is other than the requested type, this represents
+    /// a bug in the hosting application. An error is logged and the default
+    /// constructed type T is returned. This may unexpected
+    /// ActionScript behaviour, but is otherwise safe.
     //
-    /// The hosting app decides what to do with the message, or whether it
-    /// wants to do anything at all. It may show a popup box.
-    DSOEXPORT void errorInterface(const std::string& msg) const;
+    /// @tparam T   The return type expected. 
+    /// @param e    The message to send to the interface.
+    template<typename T> T callInterface(const HostInterface::Message& e) const;
 
     /// Called from the ScriptLimits tag parser to set the
     /// global script limits. It is expected behaviour that
@@ -821,8 +784,7 @@ public:
     
     /// Get the current global recursion limit for this movie: it can
     /// be changed by loaded movies.
-    boost::uint16_t getRecursionLimit() const
-    {
+    boost::uint16_t getRecursionLimit() const {
         return _recursionLimit;
     }
 
@@ -996,10 +958,10 @@ private:
     VM _vm;
 
     /// Registered Interface command handler, if any
-    AbstractIfaceCallback* _interfaceHandler;
+    HostInterface* _interfaceHandler;
 
     /// Registered FsCommand handler, if any
-    AbstractFsCallback* _fsCommandHandler;
+    FsCallback* _fsCommandHandler;
 
     /// A list of AdvanceableCharacters
     //
@@ -1130,6 +1092,27 @@ private:
 bool isLevelTarget(int version, const std::string& name, unsigned int& levelno);
 
 DSOEXPORT short stringToStageAlign(const std::string& s);
+
+template<typename T>
+T
+movie_root::callInterface(const HostInterface::Message& e) const
+{
+    if (!_interfaceHandler) {
+        log_error("Hosting application registered no callback for events/queries"
+            ", can't call %s(%s)");
+        return T();
+    }
+
+    try {
+        return boost::any_cast<T>(_interfaceHandler->call(e));
+    }
+    catch (const boost::bad_any_cast&) {
+        log_error(_("Unexpected type from host interface when requesting "
+                "%1%"), e); 
+        return T();
+    }
+}
+
 
 } // namespace gnash
 

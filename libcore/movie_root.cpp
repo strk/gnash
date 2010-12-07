@@ -230,12 +230,13 @@ movie_root::setRootMovie(Movie* movie)
     cleanupAndCollect();
 }
 
-/*private*/
 void
 movie_root::handleActionLimitHit(const std::string& msg)
 {
     bool disable = true;
-    if (_interfaceHandler) disable = _interfaceHandler->yesNo(msg);
+    if (_interfaceHandler) {
+        disable = callInterface<bool>(HostMessage(HostMessage::QUERY, msg));
+    }
     else {
         log_error("No user interface registered, assuming 'Yes' answer to "
             "question: %s", msg);
@@ -305,9 +306,9 @@ movie_root::setLevel(unsigned int num, Movie* movie)
 
             // notify  stage replacement
             if (_interfaceHandler) {
-                std::stringstream ss;
-                ss << _stageWidth << "x" << _stageHeight;
-                _interfaceHandler->call("Stage.resize", ss.str());
+                const HostMessage e(HostMessage::RESIZE_STAGE,
+                        std::make_pair(_stageWidth, _stageHeight));
+                _interfaceHandler->call(e);
             }
         }
 
@@ -1144,7 +1145,7 @@ void
 movie_root::setStageAlignment(short s)
 {
     _alignMode = s;
-    callInterface("Stage.align");
+    callInterface(HostMessage(HostMessage::UPDATE_STAGE));
 }
 
 /// The mode is one of never, always, with sameDomain the default
@@ -1197,7 +1198,7 @@ movie_root::setShowMenuState(bool state)
     //   or shows the menubar. Flash expects this option to disable some 
     //   context menu items.
     // callInterface is the proper handler for this
-    callInterface("Stage.showMenu", (_showMenu) ? "true" : "false"); 
+    callInterface(HostMessage(HostMessage::SHOW_MENU, _showMenu)); 
 }
 
 /// Returns the string representation of the current align mode,
@@ -1242,7 +1243,7 @@ movie_root::setStageScaleMode(ScaleMode sm)
     }
 
     _scaleMode = sm;
-    callInterface("Stage.align");    
+    callInterface(HostMessage(HostMessage::UPDATE_STAGE));
 
     if (notifyResize) {
         as_object* stage = getBuiltinObject(*this, NSV::CLASS_STAGE);
@@ -1265,15 +1266,8 @@ movie_root::setStageDisplayState(const DisplayState ds)
 
     if (!_interfaceHandler) return; // No registered callback
     
-    switch (_displayState)
-    {
-        case DISPLAYSTATE_FULLSCREEN:
-            callInterface("Stage.displayState", "fullScreen");
-            break;
-        case DISPLAYSTATE_NORMAL:
-            callInterface("Stage.displayState", "normal");
-            break;
-    }   
+    HostMessage e(HostMessage::SET_DISPLAYSTATE, _displayState);
+    callInterface(e);
 }
 
 void
@@ -1517,9 +1511,10 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         log_unimpl("ExternalInterface::GotoFrame()");
     // GotoFrame doesn't send a response
     } else if (invoke->name == "IsPlaying") {
-        std::string result = callInterface("ExternalInterface.IsPlaying");
-        as_value val((result == "true") ? true : false);
-    ss << ExternalInterface::toXML(val);    
+        const bool result = 
+            callInterface<bool>(HostMessage(HostMessage::EXTERNALINTERFACE_ISPLAYING));
+        as_value val(result);
+        ss << ExternalInterface::toXML(val);    
     } else if (invoke->name == "LoadMovie") {
         log_unimpl("ExternalInterface::LoadMovie()");
     // LoadMovie doesn't send a response
@@ -1531,7 +1526,7 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         arg += invoke->args[1].to_string();
         arg += ":";
         arg += invoke->args[2].to_string();
-        callInterface("ExternalInterface.Pan", arg);
+        callInterface(HostMessage(HostMessage::EXTERNALINTERFACE_PAN, arg));
     // Pan doesn't send a response
     } else if (invoke->name == "PercentLoaded") {
         MovieClip *mc = getLevel(0);
@@ -1541,10 +1536,10 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         // PercentLoaded sends the percentage
         ss << ExternalInterface::toXML(val);    
     } else if (invoke->name == "Play") {
-        callInterface("ExternalInterface.Play");
+        callInterface(HostMessage(HostMessage::EXTERNALINTERFACE_PLAY));
     // Play doesn't send a response
     } else if (invoke->name == "Rewind") {
-        callInterface("ExternalInterface.Rewind");
+        callInterface(HostMessage(HostMessage::EXTERNALINTERFACE_REWIND));
     // Rewind doesn't send a response
     } else if (invoke->name == "SetZoomRect") {
         std::string arg = invoke->args[0].to_string();
@@ -1556,14 +1551,14 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         arg += invoke->args[2].to_string();
         arg += ":";
         arg += invoke->args[3].to_string();
-        callInterface("ExternalInterface.SetZoomRect", arg);
+        callInterface(HostMessage(HostMessage::EXTERNALINTERFACE_SETZOOMRECT, arg));
     // SetZoomRect doesn't send a response
     } else if (invoke->name == "StopPlay") {
-        callInterface("ExternalInterface.StopPlay");
+        callInterface(HostMessage(HostMessage::EXTERNALINTERFACE_STOPPLAY));
     // StopPlay doesn't send a response
     } else if (invoke->name == "Zoom") {
         std::string var = invoke->args[0].to_string();
-        callInterface("ExternalInterface.Zoom", var);
+        callInterface(HostMessage(HostMessage::EXTERNALINTERFACE_ZOOM, var));
     // Zoom doesn't send a response
     } else if (invoke->name == "TotalFrames") {
         MovieClip *mc = getLevel(0);
@@ -2216,23 +2211,6 @@ movie_root::handleFsCommand(const std::string& cmd, const std::string& arg)
     if (_fsCommandHandler) _fsCommandHandler->notify(cmd, arg);
 }
 
-void
-movie_root::errorInterface(const std::string& msg) const
-{
-    if (_interfaceHandler) _interfaceHandler->error(msg);
-}
-
-std::string
-movie_root::callInterface(const std::string& cmd, const std::string& arg) const
-{
-    if (_interfaceHandler) return _interfaceHandler->call(cmd, arg);
-
-    log_error("Hosting application registered no callback for events/queries"
-        ", can't call %s(%s)", cmd, arg);
-
-    return "<no iface to hosting app>";
-}
-
 bool
 isLevelTarget(int version, const std::string& name, unsigned int& levelno)
 {
@@ -2364,6 +2342,18 @@ movie_root::LoadCallback::processLoad()
     return true;
 }
 
+void
+movie_root::callInterface(const HostInterface::Message& e) const
+{
+    if (!_interfaceHandler) {
+        log_error("Hosting application registered no callback for events/queries"
+            ", can't call %s(%s)");
+        return;
+    }
+    _interfaceHandler->call(e);
+}
+
+
 inline bool
 movie_root::testInvariant() const
 {
@@ -2384,7 +2374,6 @@ namespace {
 bool
 generate_mouse_button_events(movie_root& mr, MouseButtonState& ms)
 {
-
     // Did this event trigger any action that needs redisplay ?
     bool need_redisplay = false;
 

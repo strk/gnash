@@ -443,7 +443,7 @@ NetStream_as::initVideoDecoder(const media::VideoInfo& info)
 
         // This is important enough to let the user know.
         movie_root& m = getRoot(owner());
-        m.errorInterface(e.what());
+        m.callInterface(HostMessage(HostMessage::ERROR, std::string(e.what())));
     }
 
 }
@@ -471,7 +471,7 @@ NetStream_as::initAudioDecoder(const media::AudioInfo& info)
 
         // This is important enough to let the user know.
         movie_root& m = getRoot(owner());
-        m.errorInterface(e.what());
+        m.callInterface(HostMessage(HostMessage::ERROR, std::string(e.what())));
     }
 
 }
