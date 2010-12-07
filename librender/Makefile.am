@@ -77,6 +77,8 @@ noinst_HEADERS = \
 	opengl/Renderer_ogl.h \
 	$(NULL)
 
+EXTRA_DIST = $(noinst_HEADERS)
+
 pkglib_LTLIBRARIES =  libgnashrender.la
 
 libgnashrender_la_CPPFLAGS = $(AM_CPPFLAGS)
@@ -90,34 +92,46 @@ libgnashrender_la_LDFLAGS =  -release $(VERSION)
 libgnashrender_la_SOURCES =
 
 if BUILD_OGL_RENDERER
-libgnashrender_la_SOURCES += opengl/Renderer_ogl.cpp
+libgnashrender_la_SOURCES += \
+	opengl/Renderer_ogl.cpp \
+	opengl/Renderer_ogl.h
 libgnashrender_la_LIBADD += $(OPENGL_LIBS)
 endif
 
 if  BUILD_AGG_RENDERER
-libgnashrender_la_SOURCES += agg/Renderer_agg.cpp 
+libgnashrender_la_SOURCES += \
+	agg/Renderer_agg.cpp \
+	agg/Renderer_agg.h
 libgnashrender_la_LIBADD += $(AGG_LIBS) $(LIBVA)
 endif
 
 if  BUILD_OVG_RENDERER
 libgnashrender_la_CPPFLAGS += $(OVG_CFLAGS)
-libgnashrender_la_SOURCES += openvg/Renderer_ovg.cpp 
+libgnashrender_la_SOURCES += \
+	openvg/Renderer_ovg.cpp \
+	openvg/Renderer_ovg.h
 libgnashrender_la_LIBADD += $(OPENVG_LIBS)
 endif
 
 if  BUILD_GLES1_RENDERER
-libgnashrender_la_SOURCES += opengles1/Renderer_gles1.cpp 
+libgnashrender_la_SOURCES += \
+	opengles1/Renderer_gles1.cpp \
+	opengles1/Renderer_gles1.h
 libgnashrender_la_LIBADD += $(GLES1_LIBS)
 endif
 
 if  BUILD_GLES2_RENDERER
-libgnashrender_la_SOURCES += opengles2/Renderer_gles2.cpp 
+libgnashrender_la_SOURCES += \
+	opengles2/Renderer_gles2.cpp \
+	opengles2/Renderer_gles2.h
 libgnashrender_la_LIBADD += $(GLES2_LIBS)
 endif
 
 if  BUILD_CAIRO_RENDERER
-libgnashrender_la_SOURCES += cairo/Renderer_cairo.cpp
-libgnashrender_la_SOURCES += cairo/PathParser.cpp
+libgnashrender_la_SOURCES += \
+	cairo/Renderer_cairo.cpp \
+	cairo/Renderer_cairo.h \
+	cairo/PathParser.cpp
 libgnashrender_la_LIBADD += $(CAIRO_LIBS)
 endif
 
