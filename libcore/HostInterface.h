@@ -161,7 +161,7 @@ public:
         /// - Argument type: std::string
         /// - Effects: notify the user of an error
         /// - Return: none
-        ERROR,
+        NOTIFY_ERROR,
 
         /// Ask a question
         /// - Argument type: std::string
