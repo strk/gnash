@@ -134,11 +134,16 @@ if HAVE_GIT
         nick=`$(GIT) branch | grep '^\*' | cut -d ' ' -f 2`; \
         echo "static const char* BRANCH_REVNO  = \"$${revno}\";" > revno.h.n; \
         echo "static const char* BRANCH_NICK = \"$${nick}\";" >> revno.h.n; \
-        if diff -q revno.h.n revno.h; then \
-            echo "Current revno.h is up to date ($${nick} $${revno})"; \
-            rm -f revno.h.n; \
+        if test -e revno.h; then \
+            if diff -q revno.h.n revno.h; then \
+                echo "Current revno.h is up to date ($${nick} $${revno})"; \
+                rm -f revno.h.n; \
+            else \
+                echo "Updating revno.h ($${nick} $${revno})"; \
+                mv revno.h.n revno.h; \
+            fi; \
         else \
-            echo "Updating revno.h ($${nick} $${revno})"; \
+            echo "Generating revno.h ($${nick} $${revno})"; \
             mv revno.h.n revno.h; \
         fi; \
     else \
