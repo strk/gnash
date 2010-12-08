@@ -16,7 +16,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
 #ifndef GNASH_AUDIODECODERFFMPEG_H
 #define GNASH_AUDIODECODERFFMPEG_H
 
@@ -107,4 +106,4 @@ private:
 } // gnash.media namespace 
 } // gnash namespace
 
-#endif // __AUDIODECODERFFMPEG_H__
+#endif 
