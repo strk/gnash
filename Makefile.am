@@ -135,7 +135,7 @@ if HAVE_GIT
         echo "static const char* BRANCH_REVNO  = \"$${revno}\";" > revno.h.n; \
         echo "static const char* BRANCH_NICK = \"$${nick}\";" >> revno.h.n; \
         if test -e revno.h; then \
-            if diff -q revno.h.n revno.h; then \
+            if diff -q revno.h.n revno.h > /dev/null; then \
                 echo "Current revno.h is up to date ($${nick} $${revno})"; \
                 rm -f revno.h.n; \
             else \
