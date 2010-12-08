@@ -113,57 +113,46 @@ EXTRA_DIST =  \
 # 	@test -d "$(distdir)/packaging" || $(mkinstalldirs) "$(distdir)/packaging"
 # 	cp -p $(srcdir)/*.am $(top_distdir)/packaging/
 
-CLEANFILES = revno.h .configline
+CLEANFILES = .configline
 BUILT_SOURCES = revno.h .configline
 
 #
-# Extract info from the repository to include in the build. If
-# bazar (bzr) isn't installed, just print stubs, as this is only
-# used for display purposes. It's primarily used by the testsuites
-# and when building binary packages from multiple branches.
-# Note that this is only rebuilt after "make clean", if the Makefile
-# has changed, or the source tree gets reconfigured. So unless you do
-# a make clean, or nuke the revno.h file, this can get slightly
-# behind the current version. Currently Gnash doesn't have this info
-# so it'll be an improvement anyway. Bzr is amazing slow producing
-# the info, which is why we don't want to do it all the time.
+# Extract info from the repository to include in the build.
+# If top source dir is not a git repository or git is not installed,
+# keep the current revno.h file (which should be part of any distribution).
+# It's primarily used by the testsuites and when building binary packages
+# from multiple branches.
 #
-revno.h: Makefile.in
-	-@if test -d $(srcdir)/.bzr; then \
-	  status=`which bzr 2>&1 | grep -c " no bzr"`; \
-	  if test x"$${status}" = x"0"; then \
-	    echo "Generating revno.h"; \
-	    $(RM) -f revno.h; \
-	    revno=`(cd $(srcdir) && bzr revno)`; \
-	    nick=`basename $(top_srcdir)`; \
-	  else \
-	    revno="$(NOW)"; \
-	  fi; \
-	else \
-	  if test -d $(top_srcdir)/.git; then \
-            status=`which git 2>&1 | grep -c " no git"`; \
-            if test x"$${status}" = x"0"; then \
-              echo "Generating revno.h"; \
-              $(RM) -f revno.h; \
-              revno="`(cd $(top_srcdir) && git describe --tags | cut -d '-' -f 2-3 | tr a- a.)`"; \
-              nick="`(cd $(top_srcdir) && git branch | grep "\*" | cut -d ' ' -f 2)`"; \
-	    fi; \
-          else \
-            revno="$(NOW)"; \
-            nick="none"; \
-	  fi; \
-	  if test x$$revno = x; then \
-	    revno="$(NOW)"; \
-	  fi; \
-	fi; \
-	echo "static const char* BRANCH_REVNO  = \"$${revno}\";" > revno.h; \
-	echo "static const char* BRANCH_NICK = \"$${nick}\";" >> revno.h;
+# It will NOT be removed by any 'clean' rule (eventually, it should be
+# removed by maintainer-clean...)
+#
+revno.h:
+if HAVE_GIT
+	@cd $(top_srcdir); \
+    if test -d .git; then \
+        revno=`$(GIT) rev-parse --short HEAD`; \
+        nick=`$(GIT) branch | grep '^\*' | cut -d ' ' -f 2`; \
+        echo "static const char* BRANCH_REVNO  = \"$${revno}\";" > revno.h.n; \
+        echo "static const char* BRANCH_NICK = \"$${nick}\";" >> revno.h.n; \
+        if test -e revno.h; then \
+            if diff -q revno.h.n revno.h > /dev/null; then \
+                echo "Current revno.h is up to date ($${nick} $${revno})"; \
+                rm -f revno.h.n; \
+            else \
+                echo "Updating revno.h ($${nick} $${revno})"; \
+                mv revno.h.n revno.h; \
+            fi; \
+        else \
+            echo "Generating revno.h ($${nick} $${revno})"; \
+            mv revno.h.n revno.h; \
+        fi; \
+    else \
+        echo "Source is not in a git repository, revno.h won't be updated"; \
+    fi;
+else
+	@echo "You don't have git installed, revno.h won't be updated";
+endif
 
-# The branch nickname and revision number must be set before including
-# the other Makefile fragments used for package building, as they use
-# these values.
-BRANCH_REVNO  := $(shell grep "REVNO" revno.h | cut -d '"' -f 2 | cut -d '.' -f 1)
-BRANCH_NICK   := $(shell grep "NICK" revno.h | cut -d '"' -f 2)
 
 .configline: config.log
 	-@rm -f .configline
@@ -483,6 +472,7 @@ anal testreport checksum:
 endif
 
 .PHONY : dumpconfig \
+	revno.h \
 	anal \
 	testreport \
 	checksum \

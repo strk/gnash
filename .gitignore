@@ -111,6 +111,7 @@ testsuite/swfdec/*.err
 testsuite/swfdec/*.log
 testsuite/swfdec/run_swfdec_testsuite_*
 testsuite/swfdec/*.trace-gnash
+testsuite/swfdec/src
 testsuite/tmpSharedObject
 utilities/dumpshm
 utilities/findmicrophones

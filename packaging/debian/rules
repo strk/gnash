@@ -316,8 +316,8 @@ binary-arch: install
 	dh_builddeb
 
 VERSION_DATE = $(shell /bin/date --utc +%0Y%0m%0d.%0k%0M)
-BRANCH_NICK   = `grep "NICK" $(BUILD_DIRECTORY)/revno.h | cut -d '"' -f 2`
-BRANCH_REVNO  = `grep "REVNO" $(BUILD_DIRECTORY)/revno.h | cut -d '"' -f 2`
+BRANCH_NICK   = `grep "NICK" $(CURDIR)/revno.h | cut -d '"' -f 2`
+BRANCH_REVNO  = `grep "REVNO" $(CURDIR)/revno.h | cut -d '"' -f 2`
 #VERSION_ID = 0.8.8+bzr.trunk$(VERSION_DATE)
 VERSION_ID = 0.8.8+git.$(BRANCH_NICK)$(BRANCH_REVNO)
 get-git-source:

@@ -16,7 +16,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
 #ifndef GNASH_AUDIODECODERFFMPEG_H
 #define GNASH_AUDIODECODERFFMPEG_H
 
@@ -56,16 +55,20 @@ public:
 	~AudioDecoderFfmpeg();
 
     // See dox in AudioDecoder.h
-	boost::uint8_t* decode(const boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool parse);
+	boost::uint8_t* decode(const boost::uint8_t* input,
+            boost::uint32_t inputSize, boost::uint32_t& outputSize,
+            boost::uint32_t& decodedBytes, bool parse);
 
-	boost::uint8_t* decode(const EncodedAudioFrame& af, boost::uint32_t& outputSize);
+	boost::uint8_t* decode(const EncodedAudioFrame& af,
+            boost::uint32_t& outputSize);
 
 private:
 
 	void setup(const AudioInfo& info);
 	void setup(SoundInfo& info);
 
-	boost::uint8_t* decodeFrame(const boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize);
+	boost::uint8_t* decodeFrame(const boost::uint8_t* input,
+            boost::uint32_t inputSize, boost::uint32_t& outputSize);
 
 	AVCodec* _audioCodec;
 	AVCodecContext* _audioCodecCtx;
@@ -103,4 +106,4 @@ private:
 } // gnash.media namespace 
 } // gnash namespace
 
-#endif // __AUDIODECODERFFMPEG_H__
+#endif 

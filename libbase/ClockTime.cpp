@@ -1,4 +1,4 @@
-// Time.cpp: clock and local time functions for Gnash
+// ClockTime.cpp: clock and local time functions for Gnash
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
 //   Foundation, Inc
@@ -17,70 +17,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/// \page wall_clock_time Wall clock time
-///
-/// Gnash has three time implementations: one using boost::date_time,
-/// which handles portability itself, one for POSIX systems and one for 
-/// Win32.
-///
-/// Namespace clocktime contains a unified source for wall clock time: this
-/// is used mainly for the timing of movie advances and in the ActionScript
-/// Date class. FPS profiling also uses clocktime:: for a relatively high
-/// resolution, robust timer.
-///
-/// The boost::date_time has the great advantage of handling portability itself,
-/// as well as being able to handle a much larger range of true dates. Its
-/// disadvantage is that date_time requires not only header files, but also
-/// a run-time library, and thus increases the requirements.
-///
-/// @todo review this page, some bits seem obsoleted
-
 #include <boost/cstdint.hpp>
 #include "ClockTime.h"
 #include "log.h"
-
-// Define USE_BOOST_DATE_TIME to use boost as the basis for all
-// clock time functions. The function getTimeZoneOffset() is not
-// yet implemented for boost, but will only affect the Date class.
-#undef USE_BOOST_DATE_TIME
-
-#ifdef USE_BOOST_DATE_TIME
-
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/date_time/microsec_time_clock.hpp>
-
-using namespace boost::posix_time;
-
-boost::uint64_t
-clocktime::getTicks()
-{
-
-    // Midnight, 1st January 1970: the Epoch.
-    static const posix_time::ptime epoch (from_time_t(0));
-    
-    // Time between now and the Epoch.
-    posix_time::time_duration elapsed = (microsec_clock::local_time() - epoch);
-    
-    // Divisor to convert ticks to milliseconds
-    const int denominator = time_duration::ticks_per_second() / 1000.0;
-    
-    return elapsed.ticks() / denominator;
-}
-
-boost::int32_t
-clocktime::getTimeZoneOffset()
-{
-    // Obviously this doesn't work yet. Using this method
-    // may come up against the problem that boost won't handle
-    // dates outside its limits. However, ActionScript seems
-    // not to regard dates later than 2037 as having dst (this
-    // may depend on a machine-specific tz database) and there
-    // could also be a lower limit.
-
-    return 0;
-}
-
-#else // not using boost::date_time
 
 #include <ctime> // for time_t, localtime
 
@@ -102,6 +41,7 @@ extern long timezone;   // for tzset()/long timezone;
 #  include <windows.h>
 #  include <mmsystem.h>
 
+namespace gnash {
 
 boost::uint64_t
 clocktime::getTicks()
@@ -110,8 +50,12 @@ clocktime::getTicks()
     return timeGetTime();
 }
 
+}
+
 # else // not _WIN32
 #  include <sys/time.h>
+
+namespace gnash {
 
 boost::uint64_t
 clocktime::getTicks()
@@ -129,7 +73,11 @@ clocktime::getTicks()
     return static_cast<boost::uint64_t>(result / 1000.0);
 }
 
+}
+
 # endif // not WIN32
+
+namespace gnash {
 
 /// Common non-boost function to return the present time offset.
 /// This all seems like a terrible hack. It was moved from Date.cpp,
@@ -283,6 +231,5 @@ clocktime::getTimeZoneOffset(double time)
 #endif // No gmoff
 }
 
+} // namespace gnash
 
-
-#endif // Not using boost::date_time

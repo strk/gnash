@@ -16,7 +16,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
 #ifndef GNASH_AUDIODECODER_H
 #define GNASH_AUDIODECODER_H
 
@@ -90,13 +89,17 @@ public:
 inline boost::uint8_t*
 AudioDecoder::decode(const boost::uint8_t*, boost::uint32_t, boost::uint32_t&,
         boost::uint32_t&, bool)
-{ return 0; }
+{
+    return 0;
+}
 
 inline boost::uint8_t*
 AudioDecoder::decode(const EncodedAudioFrame&, boost::uint32_t&)
-{ return 0; }
+{
+    return 0;
+}
 	
 } // gnash.media namespace 
 } // gnash namespace
 
-#endif // __AUDIODECODER_H__
+#endif 

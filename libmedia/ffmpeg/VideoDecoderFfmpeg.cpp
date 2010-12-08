@@ -21,16 +21,16 @@
 #include "gnashconfig.h"
 #endif
 
-#include "ffmpegHeaders.h"
 #include "VideoDecoderFfmpeg.h"
-#include "MediaParserFfmpeg.h" // for ExtraVideoInfoFfmpeg 
-#include "GnashException.h" // for MediaException
-#include "utility.h"
 
 #include <boost/scoped_array.hpp>
 #include <boost/format.hpp>
 #include <algorithm>
 
+#include "ffmpegHeaders.h"
+#include "MediaParserFfmpeg.h" // for ExtraVideoInfoFfmpeg 
+#include "GnashException.h" // for MediaException
+#include "utility.h"
 #include "FLVParser.h"
 
 #ifdef HAVE_VA_VA_H
@@ -47,8 +47,6 @@ class VaapiContextFfmpeg;
 
 // Forward declarations of VAAPI functions.
 namespace {
-
-
     VaapiContextFfmpeg* get_vaapi_context(AVCodecContext* avctx);
     void set_vaapi_context(AVCodecContext* avctx, VaapiContextFfmpeg* vactx);
     void clear_vaapi_context(AVCodecContext* avctx);
@@ -60,6 +58,7 @@ namespace {
 }
 
 #ifdef HAVE_SWSCALE_H
+
 /// A wrapper round an SwsContext that ensures it's
 /// freed on destruction.
 class SwsContextWrapper
