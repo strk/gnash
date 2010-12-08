@@ -108,11 +108,12 @@ EXTRA_DIST =  \
 	packaging/klash.xpm \
 	revno.h
 
+
 # dist-hook:
 # 	@test -d "$(distdir)/packaging" || $(mkinstalldirs) "$(distdir)/packaging"
 # 	cp -p $(srcdir)/*.am $(top_distdir)/packaging/
 
-CLEANFILES = .configline .revno.h.n
+CLEANFILES = .configline
 BUILT_SOURCES = revno.h .configline
 
 #
@@ -125,31 +126,33 @@ BUILT_SOURCES = revno.h .configline
 # It will NOT be removed by any 'clean' rule (eventually, it should be
 # removed by maintainer-clean...)
 #
-revno.h: Makefile
-	git=`which git`; \
-	if test -d $(top_srcdir)/.git -a x$${git} != x; then \
-	  revno="`(cd $(top_srcdir) ; $${git} rev-parse --short HEAD)`"; \
-          nick="`(cd $(top_srcdir) ; $${git} branch | grep '^\*' | cut -d ' ' -f 2)`"; \
-          echo "static const char* BRANCH_REVNO  = \"$${revno}\";" > .revno.h.n; \
-          echo "static const char* BRANCH_NICK = \"$${nick}\";" >> .revno.h.n; \
-          if test -e .revno.h; then \
-            if diff -q .revno.h.n revno.h > /dev/null; then \
-              echo "Current revno.h is up to date ($${nick} $${revno})"; \
-              rm -f .revno.h.n; \
+revno.h:
+if HAVE_GIT
+	@cd $(top_srcdir); \
+    if test -d .git; then \
+        revno=`$(GIT) rev-parse --short HEAD`; \
+        nick=`$(GIT) branch | grep '^\*' | cut -d ' ' -f 2`; \
+        echo "static const char* BRANCH_REVNO  = \"$${revno}\";" > revno.h.n; \
+        echo "static const char* BRANCH_NICK = \"$${nick}\";" >> revno.h.n; \
+        if test -e revno.h; then \
+            if diff -q revno.h.n revno.h > /dev/null; then \
+                echo "Current revno.h is up to date ($${nick} $${revno})"; \
+                rm -f revno.h.n; \
             else \
-              echo "Updating revno.h ($${nick} $${revno})"; \
-              mv .revno.h.n revno.h; \
+                echo "Updating revno.h ($${nick} $${revno})"; \
+                mv revno.h.n revno.h; \
             fi; \
-          else \
-            echo "Generating revno.h ($${nick} $${revno})"; \
-            mv .revno.h.n revno.h; \
-          fi; \
         else \
-          revno="$(NOW)"; \
-          nick="none"; \
-          echo "static const char* BRANCH_REVNO  = \"$${revno}\";" > revno.h; \
-          echo "static const char* BRANCH_NICK = \"$${nick}\";" >> revno.h; \
-	fi
+            echo "Generating revno.h ($${nick} $${revno})"; \
+            mv revno.h.n revno.h; \
+        fi; \
+    else \
+        echo "Source is not in a git repository, revno.h won't be updated"; \
+    fi;
+else
+	@echo "You don't have git installed, revno.h won't be updated";
+endif
+
 
 .configline: config.log
 	-@rm -f .configline
@@ -469,6 +472,7 @@ anal testreport checksum:
 endif
 
 .PHONY : dumpconfig \
+	revno.h \
 	anal \
 	testreport \
 	checksum \
