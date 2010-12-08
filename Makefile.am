@@ -132,9 +132,15 @@ if HAVE_GIT
     if test -d .git; then \
         revno=`$(GIT) rev-parse --short HEAD`; \
         nick=`$(GIT) branch | grep '^\*' | cut -d ' ' -f 2`; \
-        echo "Updating revno.h ($${nick} $${revno})"; \
-        echo "static const char* BRANCH_REVNO  = \"$${revno}\";" > revno.h; \
-        echo "static const char* BRANCH_NICK = \"$${nick}\";" >> revno.h; \
+        echo "static const char* BRANCH_REVNO  = \"$${revno}\";" > revno.h.n; \
+        echo "static const char* BRANCH_NICK = \"$${nick}\";" >> revno.h.n; \
+        if diff -q revno.h.n revno.h; then \
+            echo "Current revno.h is up to date ($${nick} $${revno})"; \
+            rm -f revno.h.n; \
+        else \
+            echo "Updating revno.h ($${nick} $${revno})"; \
+            mv revno.h.n revno.h; \
+        fi; \
     else \
         echo "Source is not in a git repository, revno.h won't be updated"; \
     fi;
