@@ -43,7 +43,7 @@ namespace gnash {
 // Forward declarations.
 namespace {
 
-    inline std::string trueFalse(bool x) { return x ? "t" : "f"; }
+    inline char trueFalse(bool x) { return x ? 't' : 'f'; }
 
     std::string systemLanguage(as_object& proto);
 
