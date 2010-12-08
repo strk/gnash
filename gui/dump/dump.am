@@ -19,12 +19,10 @@
 # Build the DUMP gui
 #
 if BUILD_DUMP_GUI
-if BUILD_AGG_RENDERER
 bin_PROGRAMS += dump-gnash
 dump_gnash_SOURCES = $(GUI_SRCS) dump/gui_dump.cpp dump/dump.cpp dump/dump.h
 dump_gnash_CPPFLAGS = -DGUI_DUMP -DGUI_CONFIG=\"DUMP\" \
 	$(AM_CPPFLAGS) $(DUMP_CFLAGS) $(AGG_CFLAGS)
 dump_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS) 
 dump_gnash_LDADD = $(GNASH_LIBS) $(DUMP_LIBS) $(AGG_LIBS) $(CAIRO_LIBS)
-endif				# BUILD_AGG_RENDERER
 endif				# BUILD_DUMP_GUI

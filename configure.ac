@@ -667,6 +667,7 @@ AC_ARG_ENABLE(gui,
   else
     build_kde4=auto
     build_gtk=yes
+    build_dump=auto
   fi
   fi]
 )
@@ -1794,6 +1795,19 @@ if test x"${build_kde3}" = xauto; then
      build_kde3=yes
   else
      build_kde3=no
+  fi
+fi
+
+dnl Check possibility to build DUMP gui, if requested
+if test x"${build_dump}" != xno; then
+  if test x"${build_agg}" = xyes; then
+    build_dump=yes
+  else
+    if test x"${build_dump}" = xyes; then
+      dnl SHOULD we just check at the end of file instead ?
+      AC_MSG_ERROR(dump GUI cannot be built without AGG renderer);
+    fi
+    build_dump=no
   fi
 fi
 
