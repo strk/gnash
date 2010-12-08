@@ -1216,6 +1216,9 @@ AM_CONDITIONAL(HAVE_PERL, test x"$PERL" != x)
 AC_PATH_PROG(CSOUND, csound)
 AM_CONDITIONAL(HAVE_CSOUND, test x"$CSOUND" != x)
 
+AC_PATH_PROG(GIT, git)
+AM_CONDITIONAL(HAVE_GIT, test x"$GIT" != x)
+
 dnl -------------------------------------
 dnl LIRC
 dnl -------------------------------------
