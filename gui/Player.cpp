@@ -74,7 +74,7 @@ public:
 
         switch (e.event()) {
 
-            case HostMessage::ERROR:
+            case HostMessage::NOTIFY_ERROR:
                 _gui.error(boost::any_cast<std::string>(e.arg()));
                 return boost::blank();
 
