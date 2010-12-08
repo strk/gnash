@@ -76,7 +76,8 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   dnl in several common places ourselves. Note that the variable ffmpeg_top_incl
   dnl contains the value of the top level path that has been found.
   if test x"${ac_cv_path_ffmpeg_incl}" = x ; then
-    for ffmpeg_top_incl in $incllist; do
+    newlist="/usr/include/ffmpeg $incllist"
+    for ffmpeg_top_incl in $newlist; do
       for i in ffmpeg libavcodec ffmpeg/libavcodec; do
         if test -f ${ffmpeg_top_incl}/${i}/avcodec.h; then
           ac_cv_path_ffmpeg_incl="-I`(cd ${ffmpeg_top_incl}/${i}; pwd)`"
