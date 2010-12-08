@@ -48,6 +48,10 @@ namespace gnash {
     /// Create a directory, granting owner rwx permissions.
     //
     /// On non-POSIX systems, just create the directory.
+    /// 
+    /// @param dirname
+    ///        Directory name, may be absolute or relative to CWD
+    ///
     inline int mkdirUserPermissions(const std::string& dirname)
     {
 #if !defined(_WIN32) && !defined(_MSC_VER) && !defined(__amigaos4__)
@@ -68,6 +72,10 @@ namespace gnash {
     /// Create a directory for a given filename.
     //
     /// Everything after the last '/' is assumed to be the filename.
+    ///
+    /// @param filename
+    ///        Full file path, may be absolute or relative to CWD
+    ///
     DSOEXPORT bool mkdirRecursive(const std::string& filename);
 
 } // namespace gnash
