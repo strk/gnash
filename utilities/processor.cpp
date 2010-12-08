@@ -169,43 +169,45 @@ public:
 	    static bool mouseShown = true;
 	    static std::string clipboard;
 
-	    if (event == HostMessage::QUERY) {
-            return true;
+        switch (event) {
+            case HostMessage::QUERY:
+                return true;
+            case HostMessage::SET_CLIPBOARD:
+                clipboard = boost::any_cast<std::string>(ev.arg());
+                return boost::blank();
+
+            case HostMessage::SHOW_MOUSE:
+            {
+                bool state = mouseShown;
+                mouseShown = boost::any_cast<bool>(ev.arg());
+                return state;
+            }
+
+            // Some fake values for consistent test results.
+            case HostMessage::SCREEN_RESOLUTION:
+                return std::make_pair(800, 640);
+
+	        case HostMessage::SCREEN_DPI:
+                return 72.0;
+
+	        case HostMessage::SCREEN_COLOR:
+                return std::string("Color");
+
+	        case HostMessage::PLAYER_TYPE:
+                return std::string("StandAlone");
+
+	        case HostMessage::PIXEL_ASPECT_RATIO:
+                return 0.9978;
+
+            default:
+                log_debug(_("gprocessor does not handle %1% message"), e);
+                break;
         }
-
-	    if (event == HostMessage::SET_CLIPBOARD) {
-            clipboard = boost::any_cast<std::string>(ev.arg());
-        }
-
-	    if (event == HostMessage::SHOW_MOUSE) {
-            bool state = mouseShown;
-            mouseShown = boost::any_cast<bool>(ev.arg());
-            return state;
-	    }
-	    
-	    // Some fake values for consistent test results.
-	    
-	    if (event == HostMessage::SCREEN_RESOLUTION) {
-            return std::make_pair(800, 640);
-	    }
-
-	    if (event == HostMessage::SCREEN_DPI) {
-            return 72.0;
-	    }        
-
-	    if (event == HostMessage::SCREEN_COLOR) {
-            return "Color";
-	    } 
-
-	    if (event == HostMessage::PLAYER_TYPE) {
-            return "StandAlone";
-	    } 
 
 	    return boost::blank();
-
 	}
 
-    void exit() {
+    virtual void exit() {
         std::exit(EXIT_SUCCESS);
     }
 };
