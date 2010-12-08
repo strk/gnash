@@ -51,7 +51,12 @@ kde4_gnash_SOURCES = $(GUI_SRCS) \
 
 kde4_gnash_CPPFLAGS = -DGUI_KDE4 -DGUI_CONFIG=\"KDE4\" $(AM_CPPFLAGS) $(KDE4_CFLAGS) $(QT4_CFLAGS)
 kde4_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
-kde4_gnash_LDADD = $(MYSQL_LIBS) $(GNASH_LIBS) $(AM_LDFLAGS) $(KDE4_LIBS)
+kde4_gnash_LDADD = \
+	$(MYSQL_LIBS) \
+	$(GNASH_LIBS) \
+	$(AM_LDFLAGS) \
+	$(KDE4_LIBS) \
+	$(LIBVA_X11_LIBS)
 
 if BUILD_OGL_RENDERER
 kde4_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
