@@ -715,12 +715,6 @@ NetStream_as::decodeNextAudioFrame()
     return raw;
 }
 
-bool
-NetStream_as::decodeMediaFrame()
-{
-    return false;
-}
-
 void
 NetStream_as::seek(boost::uint32_t posSeconds)
 {

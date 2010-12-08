@@ -499,10 +499,6 @@ private:
     /// and up to current timestamp
     void refreshAudioBuffer();
 
-    /// Used to decode and push the next available (non-FLV) frame to
-    /// the audio or video queue
-    bool decodeMediaFrame();
-
     /// Decode next video frame fetching it MediaParser cursor
     //
     /// @return 0 on EOF or error, a decoded video otherwise
