@@ -758,7 +758,7 @@ public:
     //
     /// If the return type is other than the requested type, this represents
     /// a bug in the hosting application. An error is logged and the default
-    /// constructed type T is returned. This may unexpected
+    /// constructed type T is returned. This may cause unexpected
     /// ActionScript behaviour, but is otherwise safe.
     //
     /// @tparam T   The return type expected. 
