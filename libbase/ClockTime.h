@@ -24,8 +24,9 @@
 #include <boost/cstdint.hpp>
 #include "dsodefs.h"
 
-namespace clocktime
-{
+namespace gnash {
+
+namespace clocktime {
     /// Wall clock timer, returns current POSIX time in milliseconds.
 	DSOEXPORT boost::uint64_t getTicks();
 
@@ -34,6 +35,7 @@ namespace clocktime
 	/// cannot be regarded as reliable.
 	DSOEXPORT boost::int32_t getTimeZoneOffset(double time);
 
-}
+} // namespace clocktime
+} // namespace gnash
 
 #endif

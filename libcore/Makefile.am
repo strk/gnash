@@ -77,6 +77,7 @@ libgnashcore_la_SOURCES = \
 	parser/filter_factory.cpp \
 	InteractiveObject.cpp \
 	ExternalInterface.cpp \
+	HostInterface.cpp \
 	SWFMatrix.cpp \
 	SWFMovie.cpp \
 	movie_root.cpp \
@@ -161,6 +162,7 @@ noinst_HEADERS = \
 	SWFMovie.h \
 	SWFStream.h \
 	MovieLibrary.h \
+	HostInterface.h \
 	ExternalInterface.h \
 	swf/tag_loaders.h \
 	swf/DefineBitsTag.h \

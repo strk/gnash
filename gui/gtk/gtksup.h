@@ -24,6 +24,7 @@
 #endif
 
 #include <string>
+#include <utility>
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
 
@@ -73,10 +74,11 @@ public:
     virtual void hideMenu();
 
     /// For System.capabilities information.
-    virtual double getPixelAspectRatio();
-    virtual int getScreenResX();
-    virtual int getScreenResY();
-    virtual double getScreenDPI();
+    virtual double getPixelAspectRatio() const;
+    virtual std::pair<int, int> screenResolution() const;
+    virtual double getScreenDPI() const;
+
+    virtual void setClipboard(const std::string& copy);
     
     bool watchFD(int fd);
 

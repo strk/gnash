@@ -22,21 +22,25 @@
 #include "gnashconfig.h"
 #endif
 
-#ifndef DEFAULT_GUI
-# define DEFAULT_GUI "NULL"
-#endif
+#include "Player.h"
+
+#include <iostream>
+#include <sstream>
+#include <boost/lexical_cast.hpp>
+#include <boost/variant/static_visitor.hpp>
+#include <boost/any.hpp>
+#include <utility>
+#include <memory>
+#include <vector>
 
 #include "gui.h"
 #include "NullGui.h"
-
 #include "MovieFactory.h"
 #include "movie_definition.h"
 #include "sound_handler.h" // for set_sound_handler and create_sound_handler_*
 #include "MovieClip.h" // for setting FlashVars
 #include "movie_root.h" 
-#include "Player.h"
 #include "StreamProvider.h"
-
 #include "swf/TagLoadersTable.h"
 #include "swf/DefaultTagLoaders.h"
 #include "NamingPolicy.h"
@@ -49,18 +53,130 @@
 #include "SystemClock.h"
 #include "ExternalInterface.h"
 #include "ScreenShotter.h"
-
 #include "GnashSystemIOHeaders.h" // for write() 
 #include "log.h"
-#include <iostream>
-#include <sstream>
-#include <iomanip>
-#include <boost/lexical_cast.hpp>
+#include "HostInterface.h"
 
 using namespace gnash;
 
 namespace {
     gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+}
+
+namespace {
+
+class MessageHandler : public boost::static_visitor<boost::any>
+{
+public:
+    explicit MessageHandler(Gui& g) : _gui(g) {}
+
+    boost::any operator()(const HostMessage& e) {
+
+        switch (e.event()) {
+
+            case HostMessage::NOTIFY_ERROR:
+                _gui.error(boost::any_cast<std::string>(e.arg()));
+                return boost::blank();
+
+            case HostMessage::QUERY:
+                return _gui.yesno(boost::any_cast<std::string>(e.arg()));
+
+            case HostMessage::SHOW_MOUSE:
+            {
+                // Must return a bool, true if the mouse was visible before.
+                return _gui.showMouse(boost::any_cast<bool>(e.arg()));   
+            }
+
+            case HostMessage::SET_DISPLAYSTATE:
+            {
+                const movie_root::DisplayState s =
+                    boost::any_cast<movie_root::DisplayState>(e.arg());
+                if (s == movie_root::DISPLAYSTATE_FULLSCREEN) {
+                    _gui.setFullscreen();
+                }
+                else if (s == movie_root::DISPLAYSTATE_NORMAL) {
+                    _gui.unsetFullscreen();
+                }
+                return boost::blank();
+            }
+
+            case HostMessage::UPDATE_STAGE:
+                _gui.updateStageMatrix();
+                return boost::blank();
+
+            case HostMessage::SHOW_MENU:
+                _gui.showMenu(boost::any_cast<bool>(e.arg()));
+                return boost::blank();
+
+            case HostMessage::SET_CLIPBOARD:
+                _gui.setClipboard(boost::any_cast<std::string>(e.arg()));
+                return boost::blank();
+
+            case HostMessage::RESIZE_STAGE:
+            {
+                if (_gui.isPlugin()) {
+                    log_debug("Player doing nothing on Stage.resize as we're a plugin");
+                    return boost::blank();
+                }
+
+                typedef std::pair<int, int> Dimensions;
+                const Dimensions i = boost::any_cast<Dimensions>(e.arg());
+                _gui.resizeWindow(i.first, i.second);
+                return boost::blank();
+            }
+            case HostMessage::EXTERNALINTERFACE_ISPLAYING:
+                return (_gui.isStopped()) ? false : true;
+
+            case HostMessage::EXTERNALINTERFACE_PAN:
+                log_unimpl("GUI ExternalInterface.Pan event");
+                return boost::blank();
+
+            case HostMessage::EXTERNALINTERFACE_PLAY:
+                _gui.play();
+                return boost::blank();
+
+            case HostMessage::EXTERNALINTERFACE_REWIND:
+                _gui.restart();
+                return boost::blank();
+
+            case HostMessage::EXTERNALINTERFACE_SETZOOMRECT:
+                log_unimpl("GUI ExternalInterface.SetZoomRect event");
+                return boost::blank();
+
+            case HostMessage::EXTERNALINTERFACE_STOPPLAY:
+                _gui.pause();
+                return boost::blank();
+
+            case HostMessage::EXTERNALINTERFACE_ZOOM:
+                log_unimpl("GUI ExternalInterface.Zoom event");
+                return boost::blank();
+
+            case HostMessage::SCREEN_RESOLUTION:
+                return _gui.screenResolution();
+
+            case HostMessage::SCREEN_DPI:
+                return _gui.getScreenDPI();
+
+            case HostMessage::SCREEN_COLOR:
+                return _gui.getScreenColor();
+
+            case HostMessage::PIXEL_ASPECT_RATIO:
+                return _gui.getPixelAspectRatio();
+
+            case HostMessage::PLAYER_TYPE:
+                return std::string(_gui.isPlugin() ? "PlugIn" : "StandAlone");
+        }
+        log_error(_("Unhandled callback %s with arguments %s"), +e.event());
+        return boost::blank();
+    }
+
+    boost::any operator()(const CustomMessage& /*e*/) {
+        return boost::blank();
+    }
+private:
+    Gui& _gui;
+};
+
 }
 
 void
@@ -173,7 +289,7 @@ Player::init_sound()
             return;
 #endif
 
-        } catch (SoundException& ex) {
+        } catch (const SoundException& ex) {
             log_error(_("Could not create sound handler: %s."
                 " Will continue w/out sound."), ex.what());
         }
@@ -544,137 +660,17 @@ Player::CallbacksHandler::exit()
     _gui.quit();
 }
 
-void
-Player::CallbacksHandler::error(const std::string& msg)
+boost::any
+Player::CallbacksHandler::call(const HostInterface::Message& e)
 {
-    _gui.error(msg);
-}
-
-bool
-Player::CallbacksHandler::yesNo(const std::string& query)
-{
-    return _gui.yesno(query);
-}
-
-std::string
-Player::CallbacksHandler::call(const std::string& event, const std::string& arg)
-{
-    StringNoCaseEqual noCaseCompare;
-        
-    if (event == "Mouse.hide") {
-        return _gui.showMouse(false) ? "true" : "false";
+    MessageHandler v(_gui);
+    try {
+        return boost::apply_visitor(v, e);
     }
-
-    if (event == "Mouse.show") {
-        return _gui.showMouse(true) ? "true" : "false";
+    catch (const boost::bad_any_cast&) {
+        log_error(_("Got unexpected argument type for message %1%"), e);
+        return boost::blank();
     }
-    
-    if (event == "Stage.displayState") {
-        if (arg == "fullScreen") _gui.setFullscreen();
-        else if (arg == "normal") _gui.unsetFullscreen();
-        return "";
-    }
-
-    if (event == "Stage.scaleMode" || event == "Stage.align" ) {
-        _gui.updateStageMatrix();
-        return "";
-    }
-
-    if (event == "Stage.showMenu") {
-        if (noCaseCompare(arg, "true")) _gui.showMenu(true);
-        else if (noCaseCompare(arg, "false")) _gui.showMenu(false);
-        return "";
-    }
-
-    if (event == "Stage.resize") {
-        if ( _gui.isPlugin() ) {
-            log_debug("Player doing nothing on Stage.resize as we're a plugin");
-            return "";
-        }
-
-        // arg contains WIDTHxHEIGHT
-        log_debug("Player got Stage.resize(%s) message", arg);
-        int width, height;
-        sscanf(arg.c_str(), "%dx%d", &width, &height);
-        _gui.resizeWindow(width, height);
-
-        return "";
-    }
-
-    if (event == "ExternalInterface.Play") {
-        _gui.play();
-        return "";
-    }
-
-    if (event == "ExternalInterface.StopPlay") {
-        _gui.pause();
-        return "";
-    }
-
-    if (event == "ExternalInterface.Rewind") {
-        _gui.restart();
-        return "";
-    }
-
-    if (event == "ExternalInterface.Pan") {
-	// FIXME: the 3 args are encoded as 1:2:0
-	log_unimpl("ExternalInterface.Pan");
-        return "";
-    }
-
-    if (event == "ExternalInterface.IsPlaying") {
-	return (_gui.isStopped()) ? "false" : "true";
-    }
-
-    if (event == "ExternalInterface.SetZoomRect") {
-	// FIXME: the 4 arguments are encoded as 1:2:0:1
-	log_unimpl("ExternalInterface.SetZoomRect");
-        return "";
-    }
-
-    if (event == "ExternalInterface.Zoom") {
-	// The 1 argument is a percentage to zoom
-	int percent = strtol(arg.c_str(), NULL, 0);
-	log_unimpl("ExternalInterface.Zoom(%d)", percent);
-        return "";
-    }
-
-    if (event == "System.capabilities.screenResolutionX") {
-        std::ostringstream ss;
-        ss << _gui.getScreenResX();
-        return ss.str();
-    }
-
-    if (event == "System.capabilities.screenResolutionY") {
-        std::ostringstream ss;
-        ss << _gui.getScreenResY();
-        return ss.str();
-    }
-
-    if (event == "System.capabilities.pixelAspectRatio") {
-        std::ostringstream ss;
-        // Whether the pp actively limits the precision or simply
-        // gets a slightly different result isn't clear.
-        ss << std::setprecision(7) << _gui.getPixelAspectRatio();
-        return ss.str();
-    }
-
-    if (event == "System.capabilities.screenDPI") {
-        std::ostringstream ss;
-        ss << _gui.getScreenDPI();
-        return ss.str();
-    }
-
-    if (event == "System.capabilities.screenColor") {
-        return _gui.getScreenColor();
-    }
-
-    if (event == "System.capabilities.playerType") {
-        return _gui.isPlugin() ? "PlugIn" : "StandAlone";
-    }
-
-    log_error(_("Unhandled callback %s with arguments %s"), event, arg);
-    return "";
 }
 
 void

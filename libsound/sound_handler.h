@@ -16,12 +16,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
-/// \page sound_handler_intro Sound handler introduction
-///
-/// The implementation of this class *must* be thread safe!
-///
-
 #ifndef SOUND_HANDLER_H
 #define SOUND_HANDLER_H
 

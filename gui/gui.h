@@ -28,6 +28,7 @@
 #include <boost/function.hpp>
 #include <string>
 #include <map>
+#include <utility>
 
 #include "SWFRect.h"  // for composition
 #include "snappingrange.h"  // for InvalidatedRanges
@@ -191,13 +192,26 @@ public:
     /// Sets the current mouse cursor for the Gui window.
     virtual void setCursor(gnash_cursor_type newcursor);
 
+    virtual void setClipboard(const std::string& copy);
+
     // Information for System.capabilities to be reimplemented in
     // each gui.
-    virtual double getPixelAspectRatio() { return 0; }
-    virtual int getScreenResX() { return 0; }
-    virtual int getScreenResY() { return 0; }
-    virtual double getScreenDPI() { return 0; }
-    virtual std::string getScreenColor() { return ""; }
+    virtual double getPixelAspectRatio() const { return 0; }
+
+    virtual std::pair<int, int> screenResolution() const {
+        return std::make_pair(0, 0);
+    }
+
+    virtual double getScreenDPI() const { return 0; }
+
+    /// Get the screen color type.
+    //
+    /// The choice is between "color" and something designating
+    /// monochrome (not sure what). If this isn't implemented in the
+    /// gui we return "color".
+    virtual std::string getScreenColor() const {
+        return "color";
+    }
 
     /// @return Whether or not the movie should be looped indefinitely.
     bool loops() const { return _loop; }
@@ -423,10 +437,10 @@ public:
     virtual bool yesno(const std::string& question);
 
     /// Width of a window pixel, in stage pseudopixel units.
-    float getXScale() { return _xscale; };
+    float getXScale() const { return _xscale; };
 
     /// Height of a window pixel, in stage pseudopixel units.
-    float getYScale() { return _yscale; };
+    float getYScale() const { return _yscale; };
 
 protected:
 
@@ -474,10 +488,10 @@ protected:
 
 
     /// Determines if playback should restart after the movie ends.
-    bool            _loop;
+    bool _loop;
 
     /// The X Window ID to attach to. If zero, we create a new window.
-    unsigned long   _xid;
+    unsigned long _xid;
 
     // This would be 0,0,_width,_height, so maybe
     // we should not duplicate the info with those

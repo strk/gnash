@@ -22,6 +22,8 @@
 
 #include <sstream>
 #include <string>
+#include <iomanip>
+#include <boost/tuple/tuple.hpp>
 
 #include "movie_root.h" // interface callback
 #include "log.h"
@@ -33,6 +35,7 @@
 #include "VM.h" // for getPlayerVersion() 
 #include "GnashAlgorithm.h"
 #include "RunResources.h"
+#include "HostInterface.h"
 
 namespace gnash {
 
@@ -40,10 +43,7 @@ namespace gnash {
 // Forward declarations.
 namespace {
 
-    inline std::string trueFalse(bool x) { return x ? "t" : "f"; }
-
-    template<typename T> inline void convertValue(const std::string& in,
-                                                  T& val);
+    inline char trueFalse(bool x) { return x ? 't' : 'f'; }
 
     std::string systemLanguage(as_object& proto);
 
@@ -140,25 +140,30 @@ attachSystemCapabilitiesInterface(as_object& o)
 
     const movie_root& m = vm.getRoot();
 
-    int screenResolutionX;
-    convertValue(m.callInterface("System.capabilities.screenResolutionX"),
-            screenResolutionX);
-    int screenResolutionY;
-    convertValue(m.callInterface("System.capabilities.screenResolutionY"),
-            screenResolutionY);
-    int screenDPI;
-    convertValue(m.callInterface("System.capabilities.screenDPI"), screenDPI);
-        
-    // Documented to be a number, but is in fact a string.
-    const std::string pixelAspectRatio = 
-        m.callInterface("System.capabilities.pixelAspectRatio");
+    int resX;
+    int resY;
+
+    boost::tie(resX, resY) = m.callInterface<std::pair<int, int> >(
+            HostMessage(HostMessage::SCREEN_RESOLUTION));
+
+    const double screenDPI = m.callInterface<double>(HostMessage(
+                HostMessage::SCREEN_DPI));
+
+    const double aspectRatio = m.callInterface<double>(HostMessage(
+                HostMessage::PIXEL_ASPECT_RATIO));
+
+    // Note that the pp uses the current locale to display the
+    // ratio (for the decimal separator).
+    std::ostringstream s;
+    s << std::setprecision(7) << aspectRatio;
+    const std::string pixelAspectRatio = s.str();
 
     // "StandAlone", "External", "PlugIn", "ActiveX" (get from GUI)
-    const std::string playerType =
-        m.callInterface("System.capabilities.playerType");
+    const std::string playerType = m.callInterface<std::string>(HostMessage(
+                HostMessage::PLAYER_TYPE));
 
-    const std::string screenColor =
-        m.callInterface("System.capabilities.screenColor");
+    const std::string screenColor = m.callInterface<std::string>(HostMessage(
+                HostMessage::SCREEN_COLOR));
 
     //
     // Media
@@ -224,61 +229,51 @@ attachSystemCapabilitiesInterface(as_object& o)
                  << "&SP="	<< trueFalse(hasScreenPlayback) 
                  << "&SB="	<< trueFalse(hasScreenBroadcast) 
                  << "&DEB="	<< trueFalse(isDebugger)
-                 << "&V="       << URL::encode(version)
-                 << "&M="       << URL::encode(manufacturer)
-                 << "&R="       << screenResolutionX << "x" << screenResolutionY
+                 << "&V="   << URL::encode(version)
+                 << "&M="   << URL::encode(manufacturer)
+                 << "&R="   << resX << "x" << resY
                  << "&DP="	<< screenDPI
                  << "&COL="	<< screenColor					
-                 << "&AR="      << pixelAspectRatio
-                 << "&OS="      << URL::encode(os)
-                 << "&L="       << language			
-                 << "&PT="      << playerType
+                 << "&AR="  << pixelAspectRatio
+                 << "&OS="  << URL::encode(os)
+                 << "&L="   << language			
+                 << "&PT="  << playerType
                  << "&AVD="	<< trueFalse(avHardwareDisable) 
                  << "&LFD="	<< trueFalse(localFileReadDisable)
-                 << "&WD="      << trueFalse(windowlessDisable)
+                 << "&WD="  << trueFalse(windowlessDisable)
                  << "&TLS="	<< trueFalse(hasTLS);
     
     const int flags = PropFlags::dontDelete
         | PropFlags::dontEnum | PropFlags::readOnly;
 
+    o.init_member("hasAccessibility", hasAccessibility, flags);
+    o.init_member("pixelAspectRatio", pixelAspectRatio, flags);
+    o.init_member("screenColor", screenColor, flags);
+    o.init_member("screenDPI", screenDPI, flags);
+    o.init_member("screenResolutionY", resY, flags);
+    o.init_member("screenResolutionX", resX, flags);
+    o.init_member("hasTLS", hasTLS, flags);
+    o.init_member("hasVideoEncoder", hasVideoEncoder, flags);
+    o.init_member("hasAudioEncoder", hasAudioEncoder, flags);
+    o.init_member("hasMP3", hasMP3, flags);
+    o.init_member("hasAudio", hasAudio, flags);
+    o.init_member("serverString", serverString.str(), flags);
     o.init_member("version", version, flags);
+    o.init_member("hasStreamingAudio", hasStreamingAudio, flags);
+    o.init_member("hasStreamingVideo", hasStreamingVideo, flags);
+    o.init_member("hasEmbeddedVideo", hasEmbeddedVideo, flags);
+    o.init_member("hasPrinting", hasPrinting, flags);
+    o.init_member("hasScreenPlayback", hasScreenPlayback, flags);
+    o.init_member("hasScreenBroadcast", hasScreenBroadcast, flags);
+    o.init_member("isDebugger", isDebugger, flags);
     o.init_member("playerType", playerType, flags);
+    o.init_member("avHardwareDisable", avHardwareDisable, flags);
+    o.init_member("localFileReadDisable", localFileReadDisable, flags);
+    o.init_member("windowlessDisable", windowlessDisable, flags);
     o.init_member("os", os, flags);
     o.init_member("manufacturer", manufacturer, flags);
     o.init_member("language", language, flags);
-    o.init_member("hasAudio", hasAudio, flags);
-    o.init_member("screenResolutionX", screenResolutionX, flags);
-    o.init_member("screenResolutionY", screenResolutionY, flags);
-    o.init_member("screenColor", screenColor, flags);
-    o.init_member("screenDPI", screenDPI, flags);
-    o.init_member("pixelAspectRatio", pixelAspectRatio, flags);
-    o.init_member("serverString", serverString.str(), flags);
-    o.init_member("avHardwareDisable", avHardwareDisable, flags);
-    o.init_member("hasAudioEncoder", hasAudioEncoder, flags);
-    o.init_member("hasEmbeddedVideo", hasEmbeddedVideo, flags);
-    o.init_member("hasMP3", hasMP3, flags);
-    o.init_member("hasPrinting", hasPrinting, flags);
-    o.init_member("hasScreenBroadcast", hasScreenBroadcast, flags);
-    o.init_member("hasScreenPlayback", hasScreenPlayback, flags);
-    o.init_member("hasStreamingAudio", hasStreamingAudio, flags);
-    o.init_member("hasStreamingVideo", hasStreamingVideo, flags);
-    o.init_member("hasVideoEncoder", hasVideoEncoder, flags);
-    o.init_member("hasAccessibility", hasAccessibility, flags);
-    o.init_member("isDebugger", isDebugger, flags);
-    o.init_member("localFileReadDisable", localFileReadDisable, flags);
-    o.init_member("hasTLS", hasTLS, flags);
-    o.init_member("windowlessDisable", windowlessDisable, flags);
 }
-
-/// Convert a string to the type passed in, making sure the target variable
-/// is initialized.
-template<typename T>
-inline void
-convertValue(const std::string& in, T& val)
-{
-    std::istringstream is(in);
-    if (!(is >> val)) val = T();
-} 
 
 void
 attachSystemInterface(as_object& proto)
@@ -338,9 +333,16 @@ system_security_loadpolicyfile(const fn_call& /*fn*/)
 }
 
 as_value
-system_setClipboard(const fn_call& /*fn*/)
+system_setClipboard(const fn_call& fn)
 {
-    LOG_ONCE(log_unimpl("System.setClipboard"));
+    if (!fn.nargs) {
+        return as_value();
+    }
+
+    const std::string& s = fn.arg(0).to_string();
+    movie_root& m = getRoot(fn);
+    m.callInterface(HostMessage(HostMessage::SET_CLIPBOARD, s));
+
     return as_value();
 }
 

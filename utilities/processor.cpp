@@ -17,23 +17,23 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
-
-#include "NullSoundHandler.h"
 
 #include <ios>
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <typeinfo>
+#include <boost/any.hpp>
 
 #ifdef ENABLE_NLS
 # include <clocale>
 #endif
 
+#include "NullSoundHandler.h"
 #include "MovieFactory.h"
 #include "swf/TagLoadersTable.h"
 #include "swf/DefaultTagLoaders.h"
@@ -54,6 +54,7 @@
 #include "GnashSleep.h" // for usleep comptibility.
 #include "StreamProvider.h"
 #include "RunResources.h"
+#include "HostInterface.h"
 
 #ifdef RENDERER_AGG
 #include "Renderer.h"
@@ -141,7 +142,7 @@ secondsSinceLastAdvance()
 //
 static int quitrequested = false;
 
-class FsCommandExecutor: public movie_root::AbstractFsCallback {
+class FsCommandExecutor: public FsCallback {
 public:
 	void notify(const std::string& command, const std::string& args)
 	{
@@ -153,61 +154,60 @@ public:
 	}
 };
 
-class EventCallback: public movie_root::AbstractIfaceCallback
+class EventCallback: public HostInterface
 {
 public:
-	std::string call(const std::string& event, const std::string& arg)
+    boost::any call(const HostInterface::Message& e)
 	{
-	    log_debug(_("eventCallback: %s %s"), event, arg);
+        if (e.type() != typeid(HostMessage)) return boost::blank();
+
+        const HostMessage& ev = boost::get<HostMessage>(e);
+        const HostMessage::KnownEvent event = ev.event();
+
+        log_debug(_("eventCallback: %s %s"), event);
 
 	    static bool mouseShown = true;
+	    static std::string clipboard;
 
-	    // These should return "true" if the mouse was visible before
-	    // the call.
-	    if ( event == "Mouse.hide" ) {
-            bool state = mouseShown;
-            mouseShown = false;
-            return state ? "true" : "false";
-	    }
+        switch (event) {
+            case HostMessage::QUERY:
+                return true;
+            case HostMessage::SET_CLIPBOARD:
+                clipboard = boost::any_cast<std::string>(ev.arg());
+                return boost::blank();
 
-	    if ( event == "Mouse.show" ) {
-            bool state = mouseShown;
-            mouseShown = true;
-            return state ? "true" : "false" ;
-	    }
-	    
-	    // Some fake values for consistent test results.
-	    
-	    if ( event == "System.capabilities.screenResolutionX" ) {
-            return "800";
-	    }
+            case HostMessage::SHOW_MOUSE:
+            {
+                bool state = mouseShown;
+                mouseShown = boost::any_cast<bool>(ev.arg());
+                return state;
+            }
 
-	    if ( event == "System.capabilities.screenResolutionY" ) {
-            return "640";
-	    } 
+            // Some fake values for consistent test results.
+            case HostMessage::SCREEN_RESOLUTION:
+                return std::make_pair(800, 640);
 
-	    if ( event == "System.capabilities.screenDPI" ) {
-            return "72";
-	    }        
+	        case HostMessage::SCREEN_DPI:
+                return 72.0;
 
-	    if ( event == "System.capabilities.screenColor" ) {
-            return "Color";
-	    } 
+	        case HostMessage::SCREEN_COLOR:
+                return std::string("Color");
 
-	    if ( event == "System.capabilities.playerType" ) {
-            return "StandAlone";
-	    } 
+	        case HostMessage::PLAYER_TYPE:
+                return std::string("StandAlone");
 
-	    return "";
+	        case HostMessage::PIXEL_ASPECT_RATIO:
+                return 0.9978;
 
+            default:
+                log_debug(_("gprocessor does not handle %1% message"), e);
+                break;
+        }
+
+	    return boost::blank();
 	}
 
-    bool yesNo(const std::string& /*query*/)
-    {
-        return true;
-    }
-
-    void exit() {
+    virtual void exit() {
         std::exit(EXIT_SUCCESS);
     }
 };
