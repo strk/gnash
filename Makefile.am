@@ -126,7 +126,7 @@ BUILT_SOURCES = revno.h .configline
 # removed by maintainer-clean...)
 #
 revno.h: Makefile
-	git=`which git`; \
+	@git=`which git`; \
 	if test -d $(top_srcdir)/.git -a x$${git} != x; then \
 	  revno="`(cd $(top_srcdir) ; $${git} rev-parse --short HEAD)`"; \
           nick="`(cd $(top_srcdir) ; $${git} branch | grep '^\*' | cut -d ' ' -f 2)`"; \
