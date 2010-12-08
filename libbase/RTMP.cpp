@@ -15,14 +15,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+#include "RTMP.h"
+
 #include <cstdlib>
 #include <cstring>
 #include <cassert>
 #include <cstdio>
 #include <boost/lexical_cast.hpp>
-
-#include "GnashSystemNetHeaders.h"
-
 // Replace!!
 #ifndef _WIN32
 # include <sys/times.h>
@@ -31,7 +30,7 @@
 # include <ctime>
 #endif
 
-#include "RTMP.h"
+#include "GnashSystemNetHeaders.h"
 #include "log.h"
 #include "AMF.h"
 #include "GnashAlgorithm.h"
