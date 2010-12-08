@@ -130,7 +130,7 @@ revno.h:
 if HAVE_GIT
 	@cd $(top_srcdir); \
     if test -d .git; then \
-        revno=`$(GIT) log -1 | grep '^commit' | cut -d ' ' -f 2`; \
+        revno=`$(GIT) rev-parse --short HEAD`; \
         nick=`$(GIT) branch | grep '^\*' | cut -d ' ' -f 2`; \
         echo "Updating revno.h ($${nick} $${revno})"; \
         echo "static const char* BRANCH_REVNO  = \"$${revno}\";" > revno.h; \
