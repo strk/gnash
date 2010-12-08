@@ -18,9 +18,16 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "Array_as.h"
+
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/lexical_cast.hpp>
+
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "as_value.h"
-#include "Array_as.h"
 #include "log.h"
 #include "builtin_function.h"
 #include "NativeFunction.h" 
@@ -32,35 +39,29 @@
 #include "GnashNumeric.h"
 #include "namedStrings.h"
 
-#include <string>
-#include <algorithm>
-#include <cmath>
-#include <boost/algorithm/string/case_conv.hpp>
-#include <boost/lexical_cast.hpp>
-
 namespace gnash {
 
 // Forward declarations
 namespace {
 	
-/// Sort flags
-enum SortFlags {
-    /// Case-insensitive (z precedes A)
-    SORT_CASE_INSENSITIVE = (1<<0), // 1
-    /// Descending order (b precedes a)
-    SORT_DESCENDING	= (1<<1), // 2
-    /// If two or more elements in the array
-    /// have identical sort fields, return 0
-    /// and don't modify the array.
-    /// Otherwise proceed to sort the array.
-    SORT_UNIQUE	= (1<<2), // 4
-    /// Don't modify the array, rather return
-    /// a new array containing indexes into it
-    /// in sorted order.
-    SORT_RETURN_INDEX = (1<<3), // 8
-    /// Numerical sort (9 precedes 10)
-    SORT_NUMERIC = (1<<4) // 16
-};
+    /// Sort flags
+    enum SortFlags {
+        /// Case-insensitive (z precedes A)
+        SORT_CASE_INSENSITIVE = (1<<0), // 1
+        /// Descending order (b precedes a)
+        SORT_DESCENDING	= (1<<1), // 2
+        /// If two or more elements in the array
+        /// have identical sort fields, return 0
+        /// and don't modify the array.
+        /// Otherwise proceed to sort the array.
+        SORT_UNIQUE	= (1<<2), // 4
+        /// Don't modify the array, rather return
+        /// a new array containing indexes into it
+        /// in sorted order.
+        SORT_RETURN_INDEX = (1<<3), // 8
+        /// Numerical sort (9 precedes 10)
+        SORT_NUMERIC = (1<<4) // 16
+    };
 
     struct indexed_as_value;
 
