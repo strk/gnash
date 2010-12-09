@@ -788,7 +788,9 @@ bitmapdata_rectangle(const fn_call& fn)
     boost::intrusive_ptr<as_function> rectCtor = rectangle.to_function();
 
     if (!rectCtor) {
-        log_error("Failed to construct flash.geom.Rectangle!");
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("Failed to construct flash.geom.Rectangle!");
+        );
         return -1;
     }
 
