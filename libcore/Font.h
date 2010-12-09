@@ -204,8 +204,6 @@ public:
     //
     /// Note: use unitsPerEM() to get the EM square.
     float leading() const;
-        
-    bool is_subpixel_font() const;
 
     /// Return true if the font is bold.
     bool isBold() const {

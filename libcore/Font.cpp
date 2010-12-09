@@ -351,15 +351,8 @@ Font::descent(bool embedded) const
     if (ft) return ft->descent();
     return 0;
 }
-    
-bool
-Font::is_subpixel_font() const {
-    return _fontTag ? _fontTag->subpixelFont() : false;
-}
-
 
 } // namespace gnash
-
 
 // Local Variables:
 // mode: C++
