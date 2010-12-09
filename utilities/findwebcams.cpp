@@ -51,7 +51,7 @@ data::data() {
 
 gint numDuplicates = 0;
 
-gint findVidDevs(std::vector<data*>& vidVect) {
+size_t findVidDevs(std::vector<data*>& vidVect) {
     gint numdevs = 0;
     
     //vid test source
@@ -106,7 +106,6 @@ gint findVidDevs(std::vector<data*>& vidVect) {
     probe = NULL;
     element = NULL;
     devarr = NULL;
-    gint g;
     
     element = gst_element_factory_make ("v4l2src", "v4l2vidsrc");
     probe = GST_PROPERTY_PROBE (element);
@@ -130,7 +129,7 @@ gint findVidDevs(std::vector<data*>& vidVect) {
             vidVect[numdevs]->deviceNumber = numdevs;
             //mark duplicates (we like v4l2 sources more than v4l, so if
             //they're both detected, mark the v4l source as a duplicate)
-            for (g=1; g < (vidVect.size()-1); g++) {
+            for (size_t g=1; g < (vidVect.size()-1); g++) {
                 if (strcmp(vidVect[numdevs]->deviceName,
                         vidVect[g]->deviceName) == 0) {
                     vidVect[g]->duplicate = true;
@@ -149,7 +148,7 @@ gint findVidDevs(std::vector<data*>& vidVect) {
 int main () {
     //initialize gstreamer to probe for devs
     gst_init(NULL, NULL);
-    gint numdevs = 0;
+    size_t numdevs = 0;
     std::vector<data*> vidVector;
     
     int fromrc = rcfile.getWebcamDevice();
@@ -207,17 +206,17 @@ int main () {
             } else {
                 dev_select = atoi(fromCin.c_str());
             }
-            if ((dev_select < 0) || (dev_select > (numdevs - numDuplicates - 1))) {
+            if ((dev_select < 0) || (dev_select > ((int)numdevs - numDuplicates - 1))) {
                 std::cout << "You must make a valid device selection" << std::endl;
             }
-        } while ((dev_select < 0) || (dev_select > (numdevs - numDuplicates - 1)));
+        } while ((dev_select < 0) || (dev_select > ((int)numdevs - numDuplicates - 1)));
         std::cout << std::endl
              << "To select this camera, add this line to your gnashrc file:" << std::endl
              << "set webcamDevice "
              << (vidVector[dev_select + numDuplicates]->deviceNumber) << std::endl;
     } else {
         numdevs = findVidDevs(vidVector);
-        if (fromrc <= (vidVector.size() - 1)) {
+        if ((size_t)fromrc <= (vidVector.size() - 1)) {
             std::cout << std::endl
                  << "The gnashrc file reports default webcam is set to:" << std::endl
                  << vidVector[fromrc]->deviceName
