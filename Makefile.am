@@ -130,20 +130,22 @@ revno.h:
 if HAVE_GIT
 	@cd $(top_srcdir); \
     if test -d .git; then \
-        revno=`$(GIT) rev-parse --short HEAD`; \
+        revno=`$(GIT) log | grep '^commit' | wc -l`; \
+        comm_id=`$(GIT) rev-parse --short HEAD`; \
         nick=`$(GIT) branch | grep '^\*' | cut -d ' ' -f 2`; \
         echo "static const char* BRANCH_REVNO  = \"$${revno}\";" > revno.h.n; \
         echo "static const char* BRANCH_NICK = \"$${nick}\";" >> revno.h.n; \
+        echo "static const char* COMMIT_ID = \"$${comm_id}\";" >> revno.h.n; \
         if test -e revno.h; then \
             if diff -q revno.h.n revno.h > /dev/null; then \
-                echo "Current revno.h is up to date ($${nick} $${revno})"; \
+                echo "Current revno.h is up to date ($${nick} $${revno} $${comm_id})"; \
                 rm -f revno.h.n; \
             else \
-                echo "Updating revno.h ($${nick} $${revno})"; \
+                echo "Updating revno.h ($${nick} $${revno} $${comm_id})"; \
                 mv revno.h.n revno.h; \
             fi; \
         else \
-            echo "Generating revno.h ($${nick} $${revno})"; \
+            echo "Generating revno.h ($${nick} $${revno} $${comm_id})"; \
             mv revno.h.n revno.h; \
         fi; \
     else \
