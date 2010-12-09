@@ -50,7 +50,7 @@ kde4_gnash_SOURCES = $(GUI_SRCS) \
 	kde/Kde4Glue.h
 
 kde4_gnash_CPPFLAGS = -DGUI_KDE4 -DGUI_CONFIG=\"KDE4\" $(AM_CPPFLAGS) $(KDE4_CFLAGS) $(QT4_CFLAGS)
-kde4_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
+kde4_gnash_LDFLAGS = -export-dynamic 
 kde4_gnash_LDADD = \
 	$(MYSQL_LIBS) \
 	$(GNASH_LIBS) \
