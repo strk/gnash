@@ -114,6 +114,7 @@ EXTRA_DIST =  \
 # 	cp -p $(srcdir)/*.am $(top_distdir)/packaging/
 
 CLEANFILES = .configline
+MAINTAINERCLEANFILES = revno.h .lastmod
 BUILT_SOURCES = revno.h .configline
 
 #
@@ -122,43 +123,35 @@ BUILT_SOURCES = revno.h .configline
 # keep the current revno.h file (which should be part of any distribution).
 # It's primarily used by the testsuites and when building binary packages
 # from multiple branches.
-#
-# It will NOT be removed by any 'clean' rule (eventually, it should be
-# removed by maintainer-clean...)
-#
 revno.h:
-if HAVE_GIT
-	@cd $(top_srcdir); \
-    if test -d .git; then \
-        revno=`$(GIT) log | grep '^commit' | wc -l`; \
-        comm_id=`$(GIT) rev-parse --short HEAD`; \
-        nick=`$(GIT) branch | grep '^\*' | cut -d ' ' -f 2`; \
-        echo "static const char* BRANCH_REVNO  = \"$${revno}\";" > revno.h.n; \
-        echo "static const char* BRANCH_NICK = \"$${nick}\";" >> revno.h.n; \
-        echo "static const char* COMMIT_ID = \"$${comm_id}\";" >> revno.h.n; \
-        if test -e revno.h; then \
-            if diff -q revno.h.n revno.h > /dev/null; then \
-                echo "Current revno.h is up to date ($${nick} $${revno} $${comm_id})"; \
-                rm -f revno.h.n; \
-            else \
-                echo "Updating revno.h ($${nick} $${revno} $${comm_id})"; \
-                mv revno.h.n revno.h; \
-            fi; \
+	@if test -d $(top_srcdir)/.git; then \
+	  nowmod="$(shell stat -c "%X" $(top_srcdir)/.git/index)"; \
+	  if test -e .lastmod; then \
+	    lastmod="$(shell cat .lastmod)"; \
+	  else \
+	    lastmod=0; \
+	  fi; \
+	  if test $${nowmod} -gt $${lastmod}; then \
+	    rm -f .lastmod; echo "$${nowmod}" > .lastmod; \
+            revno="`cd $(top_srcdir) ; $(GIT) log | grep '^commit' | wc -l`"; \
+            comm_id="`cd $(top_srcdir) ; $(GIT) rev-parse --short HEAD`"; \
+            nick="`cd $(top_srcdir) ; $(GIT) branch | grep '^\*' | cut -d ' ' -f 2`"; \
+	  fi; \
         else \
-            echo "Generating revno.h ($${nick} $${revno} $${comm_id})"; \
-            mv revno.h.n revno.h; \
+          revno="$(NOW)"; \
+          nick="master"; \
+          comm_id="none"; \
         fi; \
-    else \
-        echo "Source is not in a git repository, revno.h won't be updated"; \
-    fi;
-else
-	@echo "You don't have git installed, revno.h won't be updated";
-endif
-
+	if test $${nowmod} -gt $${lastmod}; then \
+          echo "Generating revno.h ($${nick} $${revno} $${comm_id})"; \
+          echo "static const char* BRANCH_REVNO  = \"$${revno}\";" > $(top_builddir)/revno.h; \
+          echo "static const char* BRANCH_NICK = \"$${nick}\";" >> $(top_builddir)/revno.h; \
+          echo "static const char* COMMIT_ID = \"$${comm_id}\";" >> $(top_builddir)/revno.h; \
+	fi
 
 .configline: config.log
 	-@rm -f .configline
-	@head config.log | grep " .*/configure " | sed -e 's:^  . .*configure ::' > .configline
+	@head config.log | grep " .*/configure " | sed -e 's:^  . .*configure ::' > .configline*s
 
 #
 # Precompiled header support
