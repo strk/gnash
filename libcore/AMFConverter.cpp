@@ -148,8 +148,8 @@ Writer::writeObject(as_object* obj)
     if (obj->relay()) {
         
         Date_as* date;
-        if (isNativeType(obj, date))
-        {
+        if (isNativeType(obj, date)) {
+
             double d = date->getTimeValue(); 
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
             log_debug(_("amf: serializing date object "
@@ -605,8 +605,11 @@ Reader::readDate()
             throw AMFException("premature _end of input reading "
                         "timezone from Date type");
         }
-        LOG_ONCE(log_unimpl("Timezone info from AMF0 encoded Date object "
-                    "ignored"));
+        const boost::uint16_t tz = readNetworkShort(_pos);
+        if (tz != 0) {
+            log_error(_("Date type encoded timezone info %1%, even though "
+                "this field should not be used."), tz);
+        }
         _pos += 2;
     }
     return date;
