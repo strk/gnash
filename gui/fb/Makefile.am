@@ -129,7 +129,7 @@ GUI_SRCS = ../gnash.cpp \
 fb_gnash_SOURCES = $(GUI_SRCS) $(DEVICES) gui_fb.cpp fb.cpp fbsup.h
 fb_gnash_CPPFLAGS = -DGUI_FB -DGUI_CONFIG=\"FB\" -DFAKEFB=\"$(FAKEFB)\" \
 	$(AM_CPPFLAGS) 
-fb_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
+fb_gnash_LDFLAGS = -export-dynamic $(AM_LDFLAGS)
 #fb_gnash_DEPENDENCIES = .configline
 fb_gnash_LDADD = \
 	$(top_builddir)/librender/libgnashrender.la \

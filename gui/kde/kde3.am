@@ -34,7 +34,7 @@ bin_PROGRAMS += kde3-gnash
 kde3_gnash_CPPFLAGS = -DGUI_KDE3 -DGUI_CONFIG=\"KDE3\" \
 	 $(AM_CPPFLAGS) $(KDE3_CFLAGS) $(QT3_CFLAGS)
 kde3_gnash_SOURCES = $(GUI_SRCS) kde/gui_kde.cpp
-kde3_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
+kde3_gnash_LDFLAGS = -export-dynamic 
 #kde_gnash_DEPENDENCIES = .configline
 kde3_gnash_LDADD = \
 	$(MYSQL_LIBS) \

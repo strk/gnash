@@ -51,11 +51,11 @@ libgnashaqua_ogl_la_LIBADD =
 endif # HAVE_OPENGL
 
 # if BUILD_AGG_RENDERER
-#	aqua_gnash_CPPFLAGS += $(AGG_CFLAGS)
-# 	aqua_gnash_LDADD += $(top_builddir)/librender/libgnashagg.la \
-#	$(AQUA_LIBS) $(AGG_LIBS)
-# 	aqua_gnash_SOURCES += aqua_agg_glue.cpp aqua_agg_glue.h \
-# 	aqua.cpp aquasup.h aqua_glue.h
+# aqua_gnash_CPPFLAGS += $(AGG_CFLAGS)
+# aqua_gnash_LDADD += $(top_builddir)/librender/libgnashagg.la \
+# 	$(AQUA_LIBS) $(AGG_LIBS)
+# aqua_gnash_SOURCES += aqua/aqua_agg_glue.cpp aqua/aqua_agg_glue.h \
+# 	aqua/aqua.cpp aquasup.h aqua/aqua_glue.h
 # endif
 
 endif

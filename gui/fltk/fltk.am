@@ -23,7 +23,7 @@ bin_PROGRAMS += fltk-gnash
 fltk_gnash_CPPFLAGS = -DGUI_FLTK -DGUI_CONFIG=\"FLTK\" \
 	$(AM_CPPFLAGS) $(FLTK2_CFLAGS)
 fltk_gnash_SOURCES = $(GUI_SRCS) fltk/gui_fltk.cpp
-fltk_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
+fltk_gnash_LDFLAGS = -export-dynamic 
 if WIN32
   fltk_gnash_LDFLAGS += -no-undefined
 endif

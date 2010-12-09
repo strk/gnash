@@ -29,7 +29,7 @@ sdl_gnash_SOURCES = $(GUI_SRCS) \
 	sdl/sdlsup.h \
 	sdl/sdl_glue.h
 
-sdl_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
+sdl_gnash_LDFLAGS = -export-dynamic 
 sdl_gnash_LDADD = \
 	$(GNASH_LIBS) \
 	$(MYSQL_LIBS) \

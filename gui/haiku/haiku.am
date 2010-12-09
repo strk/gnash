@@ -27,7 +27,7 @@ haiku_gnash_SOURCES = $(GUI_SRCS) \
      haiku/haikusup.h
 haiku_gnash_CPPFLAGS = -DGUI_HAIKU -DGUI_CONFIG=\"HAIKU\" \
 	$(AM_CPPFLAGS) $(HAIKU_CFLAGS)
-haiku_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
+haiku_gnash_LDFLAGS = -export-dynamic $(AM_LDFLAGS)
 haiku_gnash_LDADD = $(GNASH_LIBS)
 # all-local: haiku-gnash$(EXEEXT)
 # 	echo

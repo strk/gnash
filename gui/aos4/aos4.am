@@ -31,7 +31,7 @@ aos4_gnash_SOURCES = $(GUI_SRCS) \
     aos4/aos4.cpp \
     aos4/aos4sup.h \
     aos4/aos4_glue.h 
-aos4_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
+aos4_gnash_LDFLAGS = -export-dynamic 
 #aos4_gnash_DEPENDENCIES = .configline
 aos4_gnash_LDADD = \
 	$(top_builddir)/librender/libgnashrender.la \
