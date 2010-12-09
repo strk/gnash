@@ -20,26 +20,24 @@ NOW := $(shell date "+%Y%m%d")
 # The branch nickname and revision number must be set before including
 # the other Makefile fragments used for package building, as they use
 # these values.
-BRANCH_REVNO  := $(shell grep "REVNO" $(top_srcdir)/revno.h | cut -d '"' -f 2)
-BRANCH_NICK   := $(shell grep "NICK" $(top_srcdir)/revno.h | cut -d '"' -f 2)
+BRANCH_REVNO  = "`grep "REVNO" revno.h | cut -d '"' -f 2`"
+BRANCH_NICK   = "`grep "NICK" revno.h | cut -d '"' -f 2`"
 
 # this is used for Debian style naming conventions
 NEXT_RELEASE = 0.8.9
 #SNAPSHOT_VERSION := 0.8.8
-SNAPSHOT_VERSION := $(NEXT_RELEASE)~git.$(BRANCH_NICK)$(BRANCH_REVNO)
+SNAPSHOT_VERSION = $(NEXT_RELEASE)~git.$(BRANCH_NICK)$(BRANCH_REVNO)
 
 # these is the directories where the snapshot gets built. Sources are
 # in the top level, the build goes in a _build subdirectory
-SNAPSHOT_DIR := gnash-$(SNAPSHOT_VERSION)
-SNAPSHOT_BUILD := $(SNAPSHOT_DIR)/_build
-SNAPSHOT_NAME := $(SNAPSHOT_DIR)
+SNAPSHOT_DIR = gnash-$(SNAPSHOT_VERSION)
+SNAPSHOT_BUILD = $(SNAPSHOT_DIR)/_build
+SNAPSHOT_NAME = $(SNAPSHOT_DIR)
 
 # this is the name of the actual tarball
 SNAPSHOT_TAR = gnash-$(SNAPSHOT_VERSION).tar.gz
 # this is the temporary directory used for DESTDIR
 SNAPSHOT_TMP = /tmp/$(SNAPSHOT_DIR)
-
-# extract info from bazar
 
 #
 # build a binary snapshot from of Gnash for systems we don't have
