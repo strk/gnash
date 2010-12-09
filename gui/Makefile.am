@@ -131,12 +131,12 @@ GNASH_LIBS = \
 	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libbase/libgnashbase.la
 
-if LIBLTDL2
-GNASH_LIBS += $(top_builddir)/libltdl/libltdlc.la
-endif
-if LIBLTDL1
-GNASH_LIBS += $(top_builddir)/libbase/libltdlc.la
-endif
+# if LIBLTDL2
+# GNASH_LIBS += $(top_builddir)/libltdl/libltdlc.la
+# endif
+# if LIBLTDL1
+# GNASH_LIBS += $(top_builddir)/libbase/libltdlc.la
+# endif
 
 # Only build loadable modules unless statically linking
 # if DYNAMIC_GUI # make shared libraries suitable for dlopen().
