@@ -675,14 +675,19 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
 {
     DisplayObject* parent_ch = parent();
     if (!parent_ch) {
-        log_error(_("Can't clone root of the movie"));
-        return NULL;
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Can't clone root of the movie"));
+        );
+        return 0;
     }
+
     MovieClip* parent = parent_ch->to_movie();
-    if ( ! parent )
-    {
-        log_error(_("%s parent is not a movieclip, can't clone"), getTarget());
-        return NULL;
+    if (!parent) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_error(_("%s parent is not a movieclip, can't clone"),
+                getTarget());
+        );
+        return 0;
     }
 
     as_object* o = getObjectWithPrototype(getGlobal(*getObject(this)), 
