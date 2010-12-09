@@ -92,8 +92,8 @@ namespace {
 /// Its execution will call constructAsScriptObject() 
 /// on the target movieclip
 ///
-class ConstructEvent: public ExecutableCode {
-
+class ConstructEvent: public ExecutableCode
+{
 public:
 
     explicit ConstructEvent(MovieClip* nTarget)
@@ -101,8 +101,7 @@ public:
         ExecutableCode(nTarget)
     {}
 
-    virtual void execute()
-    {
+    virtual void execute() {
         static_cast<MovieClip*>(target())->constructAsScriptObject();
     }
 
@@ -133,13 +132,10 @@ public:
         _checked(false)
     {}
 
-    void operator() (DisplayObject* ch)
-    {
+    void operator() (DisplayObject* ch) {
         assert(!_checked);
-        if ( ch->get_depth() <= _highestHiddenDepth )
-        {
-            if ( ch->isMaskLayer() )
-            {
+        if (ch->get_depth() <= _highestHiddenDepth) {
+            if (ch->isMaskLayer()) {
                 log_debug(_("CHECKME: nested mask in MouseEntityFinder. "
                             "This mask is %s at depth %d outer mask masked "
                             "up to depth %d."),
@@ -150,10 +146,8 @@ public:
             return;
         }
 
-        if ( ch->isMaskLayer() )
-        {
-            if ( ! ch->pointInShape(_wp.x, _wp.y) )
-            {
+        if (ch->isMaskLayer()) {
+            if (!ch->pointInShape(_wp.x, _wp.y)) {
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
                 log_debug(_("Character %s at depth %d is a mask not hitting "
                         "the query point %g,%g and masking up to "
@@ -162,8 +156,7 @@ public:
 #endif
                 _highestHiddenDepth = ch->get_clip_depth();
             }
-            else
-            {
+            else {
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
                 log_debug(_("Character %s at depth %d is a mask hitting the "
                         "query point %g,%g"),
@@ -172,13 +165,12 @@ public:
             }
             return;
         }
-        if (! ch->visible()) return;
+        if (!ch->visible()) return;
 
         _candidates.push_back(ch);
     }
 
-    void checkCandidates()
-    {
+    void checkCandidates() {
         if (_checked) return;
         for (Candidates::reverse_iterator i=_candidates.rbegin(),
                         e=_candidates.rend(); i!=e; ++i) {
@@ -192,12 +184,10 @@ public:
         _checked = true;
     }
 
-    InteractiveObject* getEntity()
-    {
+    InteractiveObject* getEntity() {
         checkCandidates();
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
-        if ( _m ) 
-        {
+        if (_m) {
             log_debug(_("MouseEntityFinder found DisplayObject %s (depth %d) "
                     "hitting point %g,%g"),
                     _m->getTarget(), _m->get_depth(), _wp.x, _wp.y);
@@ -278,8 +268,8 @@ public:
         _y(y)
     {}
 
-    bool operator()(const DisplayObject* ch)
-    {
+    bool operator()(const DisplayObject* ch) {
+
         if (ch->pointInVisibleShape(_x, _y)) {
             _found = true;
             return false;
@@ -309,8 +299,7 @@ public:
         _y(y) 
     {} 
 
-    bool operator()(const DisplayObject* ch) 
-    { 
+    bool operator()(const DisplayObject* ch) { 
         if (ch->isDynamicMask()) return true; 
         if (ch->pointInShape(_x, _y)) {
             _found = true; 
@@ -363,8 +352,78 @@ struct ReachableMarker
 //
 /// Point coordinates in world TWIPS
 ///
-class DropTargetFinder {
+class DropTargetFinder
+{
+public:
+    DropTargetFinder(boost::int32_t x, boost::int32_t y, DisplayObject* dragging)
+        :
+        _highestHiddenDepth(std::numeric_limits<int>::min()),
+        _x(x),
+        _y(y),
+        _dragging(dragging),
+        _dropch(0),
+        _candidates(),
+        _checked(false)
+    {}
 
+    void operator()(const DisplayObject* ch) {
+        assert(!_checked);
+        if (ch->get_depth() <= _highestHiddenDepth) {
+            if (ch->isMaskLayer()) {
+                log_debug(_("CHECKME: nested mask in DropTargetFinder. "
+                        "This mask is %s at depth %d outer mask masked "
+                        "up to depth %d."),
+                        ch->getTarget(), ch->get_depth(), _highestHiddenDepth);
+                // Hiding mask still in effect...
+            }
+            return;
+        }
+
+        if (ch->isMaskLayer()) {
+            if (!ch->visible()) {
+                log_debug(_("FIXME: invisible mask in MouseEntityFinder."));
+            }
+            if (!ch->pointInShape(_x, _y)) {
+#ifdef DEBUG_MOUSE_ENTITY_FINDING
+                log_debug(_("Character %s at depth %d is a mask not hitting "
+                        "the query point %g,%g and masking up to depth %d"),
+                    ch->getTarget(), ch->get_depth(), _x, _y,
+                    ch->get_clip_depth());
+#endif 
+                _highestHiddenDepth = ch->get_clip_depth();
+            }
+            else {
+#ifdef DEBUG_MOUSE_ENTITY_FINDING
+                log_debug(_("Character %s at depth %d is a mask "
+                            "hitting the query point %g,%g"),
+                            ch->getTarget(), ch->get_depth(), _x, _y);
+#endif
+            }
+            return;
+        }
+        _candidates.push_back(ch);
+    }
+
+    void checkCandidates() const {
+        if (_checked) return;
+        for (Candidates::const_reverse_iterator i=_candidates.rbegin(),
+                        e=_candidates.rend(); i!=e; ++i) {
+            const DisplayObject* ch = *i;
+            const DisplayObject* dropChar =
+                ch->findDropTarget(_x, _y, _dragging);
+            if (dropChar) {
+                _dropch = dropChar;
+                break;
+            }
+        }
+        _checked = true;
+    }
+
+    const DisplayObject* getDropChar() const {
+        checkCandidates();
+        return _dropch;
+    }
+private:
     /// Highest depth hidden by a mask
     //
     /// This will be -1 initially, and set
@@ -383,90 +442,6 @@ class DropTargetFinder {
     Candidates _candidates;
 
     mutable bool _checked;
-
-public:
-
-    DropTargetFinder(boost::int32_t x, boost::int32_t y, DisplayObject* dragging)
-        :
-        _highestHiddenDepth(std::numeric_limits<int>::min()),
-        _x(x),
-        _y(y),
-        _dragging(dragging),
-        _dropch(0),
-        _candidates(),
-        _checked(false)
-    {}
-
-    void operator() (const DisplayObject* ch)
-    {
-        assert(!_checked);
-        if ( ch->get_depth() <= _highestHiddenDepth )
-        {
-            if ( ch->isMaskLayer() )
-            {
-                log_debug(_("CHECKME: nested mask in DropTargetFinder. "
-                        "This mask is %s at depth %d outer mask masked "
-                        "up to depth %d."),
-                        ch->getTarget(), ch->get_depth(), _highestHiddenDepth);
-                // Hiding mask still in effect...
-            }
-            return;
-        }
-
-        if ( ch->isMaskLayer() )
-        {
-            if ( ! ch->visible() )
-            {
-                log_debug(_("FIXME: invisible mask in MouseEntityFinder."));
-            }
-            if ( ! ch->pointInShape(_x, _y) )
-            {
-#ifdef DEBUG_MOUSE_ENTITY_FINDING
-                log_debug(_("Character %s at depth %d is a mask not hitting "
-                        "the query point %g,%g and masking up to depth %d"),
-                    ch->getTarget(), ch->get_depth(), _x, _y,
-                    ch->get_clip_depth());
-#endif 
-                _highestHiddenDepth = ch->get_clip_depth();
-            }
-            else
-            {
-#ifdef DEBUG_MOUSE_ENTITY_FINDING
-                log_debug(_("Character %s at depth %d is a mask "
-                            "hitting the query point %g,%g"),
-                            ch->getTarget(), ch->get_depth(), _x, _y);
-#endif
-            }
-
-            return;
-        }
-
-        _candidates.push_back(ch);
-
-    }
-
-    void checkCandidates() const
-    {
-        if ( _checked ) return;
-        for (Candidates::const_reverse_iterator i=_candidates.rbegin(),
-                        e=_candidates.rend(); i!=e; ++i)
-        {
-            const DisplayObject* ch = *i;
-            const DisplayObject* dropChar = ch->findDropTarget(_x, _y, _dragging);
-            if ( dropChar )
-            {
-                _dropch = dropChar;
-                break;
-            }
-        }
-        _checked = true;
-    }
-
-    const DisplayObject* getDropChar() const
-    {
-        checkCandidates();
-        return _dropch;
-    }
 };
 
 class DisplayListVisitor
@@ -512,7 +487,6 @@ MovieClip::MovieClip(as_object* object, const movie_definition* def,
     assert(object);
 
     _environment.set_target(this);
-
 }
 
 MovieClip::~MovieClip()
@@ -569,28 +543,23 @@ MovieClip::getTextFieldVariables(const ObjectURI& uri, as_value& val)
 
     // Try textfield variables
     TextFields* etc = get_textfield_variable(name);
-    if ( etc )
-    {
+    if (etc) {
         for (TextFields::const_iterator i=etc->begin(), e=etc->end();
-                i!=e; ++i)
-        {
+                i!=e; ++i) {
+
             TextField* tf = *i;
-            if ( tf->getTextDefined() )
-            {
+            if (tf->getTextDefined()) {
                 val = tf->get_text_value();
                 return true;
             }
         }
     }
-
     return false;
-
 }
 
 bool
 MovieClip::get_frame_number(const as_value& frame_spec, size_t& frameno) const
 {
-
     // If there is no definition, this is a dynamically-created MovieClip
     // and has no frames.
     if (!_def) return false;
@@ -601,8 +570,7 @@ MovieClip::get_frame_number(const as_value& frame_spec, size_t& frameno) const
 
     const double num = toNumber(str, getVM(*getObject(this)));
 
-    if (!isFinite(num) || int(num) != num || num == 0)
-    {
+    if (!isFinite(num) || int(num) != num || num == 0) {
         bool ret = _def->get_labeled_frame(fspecStr, frameno);
         return ret;
     }
@@ -777,14 +745,13 @@ MovieClip::notifyEvent(const event_id& id)
         // there must be some action-execution-order related problem instead....
         // See testsuite/misc-ming.all/registerClassTest2.swf for an onLoad 
         // execution order related problem ...
-        do
-        {
+        do {
             // we don't skip calling user-defined onLoad for top-level movies 
-            if ( ! parent() ) break;
+            if (!parent()) break;
             // nor if there are clip-defined handler
-            if ( ! get_event_handlers().empty() ) break; 
+            if (!get_event_handlers().empty()) break; 
             // nor if it's dynamic  
-            if ( isDynamic() ) break;
+            if (isDynamic()) break;
 
             const sprite_definition* def =
                 dynamic_cast<const sprite_definition*>(_def.get());
@@ -831,14 +798,10 @@ MovieClip::pathElement(const ObjectURI& uri)
 
     // See if it's a member
     as_value tmp;
-    if (!obj->as_object::get_member(uri, &tmp)) {
-        return NULL;
-    }
-    if (!tmp.is_object()) {
-        return NULL;
-    }
-    if (tmp.is_sprite())
-    {
+    if (!obj->as_object::get_member(uri, &tmp)) return 0;
+    if (!tmp.is_object()) return 0;
+
+    if (tmp.is_sprite()) {
         return getObject(tmp.toDisplayObject(true));
     }
 
@@ -882,7 +845,6 @@ MovieClip::unloadMovie()
 void
 MovieClip::advance()
 {
-
 #ifdef GNASH_DEBUG
     log_debug(_("Advance movieclip '%s' at frame %u/%u"),
         getTargetPath(), _currentFrame,
@@ -997,7 +959,6 @@ MovieClip::execute_action(const action_buffer& ab)
 void
 MovieClip::restoreDisplayList(size_t tgtFrame)
 {
-
     // This is not tested as usable for jump-forwards (yet)...
     // TODO: I guess just moving here the code currently in goto_frame
     //             for jump-forwards would do
@@ -1009,8 +970,7 @@ MovieClip::restoreDisplayList(size_t tgtFrame)
     set_invalidated();
 
     DisplayList tmplist;
-    for (size_t f = 0; f < tgtFrame; ++f)
-    {
+    for (size_t f = 0; f < tgtFrame; ++f) {
         _currentFrame = f;
         executeFrameTags(f, tmplist, SWF::ControlTag::TAG_DLIST);
     }
@@ -1054,11 +1014,8 @@ MovieClip::executeFrameTags(size_t frame, DisplayList& dlist, int typeflags)
             if (typeflags & SWF::ControlTag::TAG_ACTION) {
                 (*it)->executeActions(this, _displayList);
             }
-        
         }
-
     }
-
 }
 
 void
@@ -1128,11 +1085,7 @@ MovieClip::goto_frame(size_t target_frame_number)
         }
     }
 
-
-    //
     // Construct the DisplayList of the target frame
-    //
-
     if (target_frame_number < _currentFrame) {
 
         // Go backward to a previous frame
@@ -1177,7 +1130,6 @@ MovieClip::goto_frame(size_t target_frame_number)
 bool
 MovieClip::goto_labeled_frame(const std::string& label)
 {
-
     // If there is no definition, this is a dynamically-created MovieClip
     // and has no frames. (We are also probably not called in this case).
     if (!_def) return false;
@@ -1223,33 +1175,27 @@ MovieClip::display(Renderer& renderer, const Transform& base)
 void MovieClip::omit_display()
 {
     if (childInvalidated()) _displayList.omit_display();
-        
     clear_invalidated();
 }
 
-bool
+void
 MovieClip::attachCharacter(DisplayObject& newch, int depth, as_object* initObj)
 { 
     _displayList.placeDisplayObject(&newch, depth);
     newch.construct(initObj);
-
-    // FIXME: check return from placeDisplayObject above ?
-    return true; 
 }
 
 DisplayObject*
 MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
         DisplayList& dlist)
 {
-
     // If this MovieClip has no definition, it should also have no ControlTags,
     // and this shouldn't be called.
     assert(_def);
     assert(tag);
 
     SWF::DefinitionTag* cdef = _def->getDefinitionTag(tag->getID());
-    if (!cdef)
-    {
+    if (!cdef) {
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("MovieClip::add_display_object(): "
                     "unknown cid = %d"), tag->getID());
@@ -1266,8 +1212,7 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     DisplayObject* ch = cdef->createDisplayObject(gl, this);
 
     if (tag->hasName()) ch->set_name(getURI(vm, tag->getName()));
-    else if (isReferenceable(*ch))
-    {
+    else if (isReferenceable(*ch)) {
         const ObjectURI& instance_name = getNextUnnamedInstanceName();
         ch->set_name(instance_name);
     }
@@ -1322,8 +1267,7 @@ MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
     const boost::uint16_t id = tag->getID();
 
     SWF::DefinitionTag* cdef = _def->getDefinitionTag(id);
-    if (cdef == NULL)
-    {
+    if (!cdef) {
         log_error(_("movieclip::replace_display_object(): "
             "unknown cid = %d"), id);
         return;
@@ -1398,13 +1342,11 @@ MovieClip::increment_frame_and_check_for_loop()
         _currentFrame = 0;
         _hasLooped = true;
     }
-
 }
 
 bool
 MovieClip::handleFocus()
 {
-
     as_object* obj = getObject(this);
     assert(obj);
 
@@ -1434,9 +1376,8 @@ MovieClip::pointInShape(boost::int32_t x, boost::int32_t y) const
 bool
 MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
 {
-    if ( ! visible() ) return false;
-    if ( isDynamicMask() && ! mouseEnabled() )
-    {
+    if (! visible()) return false;
+    if (isDynamicMask() && ! mouseEnabled()) {
         // see testsuite/misc-ming.all/masks_test.swf
 #ifdef GNASH_DEBUG_HITTEST
         log_debug(_("%s is a dynamic mask and can't handle mouse "
@@ -1445,8 +1386,7 @@ MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
         return false;
     }
     const DisplayObject* mask = getMask(); // dynamic one
-    if ( mask && mask->visible() && ! mask->pointInShape(x, y) )
-    {
+    if (mask && mask->visible() && !mask->pointInShape(x, y)) {
 #ifdef GNASH_DEBUG_HITTEST
         log_debug(_("%s is dynamically masked by %s, which "
                 "doesn't hit point %g,%g"), getTarget(),
@@ -1488,8 +1428,6 @@ MovieClip::pointInHitableShape(boost::int32_t x, boost::int32_t y) const
 InteractiveObject*
 MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 {
-    //GNASH_REPORT_FUNCTION;
-
     if (!visible()) return 0;
 
     // point is in parent's space, we need to convert it in world space
@@ -1504,10 +1442,9 @@ MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
         getWorldMatrix(*p).transform(wp);
     }
 
-    if (mouseEnabled())
-    {
+    if (mouseEnabled()) {
         if (pointInVisibleShape(wp.x, wp.y)) return this;
-        else return NULL;
+        return 0;
     }
 
     SWFMatrix m = getMatrix(*this);
@@ -1528,17 +1465,16 @@ const DisplayObject*
 MovieClip::findDropTarget(boost::int32_t x, boost::int32_t y,
         DisplayObject* dragging) const
 {
-    if ( this == dragging ) return 0; // not here...
+    if (this == dragging) return 0; // not here...
 
-    if ( ! visible() ) return 0; // isn't me !
+    if (!visible()) return 0; // isn't me !
 
     DropTargetFinder finder(x, y, dragging);
     _displayList.visitAll(finder);
 
     // does it hit any child ?
     const DisplayObject* ch = finder.getDropChar();
-    if ( ch )
-    {
+    if (ch) {
         // TODO: find closest actionscript referenceable container
         //             (possibly itself)
         return ch;
@@ -1566,11 +1502,10 @@ MovieClip::trackAsMenu()
 bool
 MovieClip::mouseEnabled() const
 {
-    if ( ! isEnabled() ) return false;
+    if (!isEnabled()) return false;
 
     // Event handlers that qualify as mouse event handlers.
-    static const event_id EH[] =
-    {
+    static const event_id EH[] = {
         event_id(event_id::PRESS),
         event_id(event_id::RELEASE),
         event_id(event_id::RELEASE_OUTSIDE),
@@ -1590,7 +1525,6 @@ MovieClip::mouseEnabled() const
             return true;
         }
     }
-
     return false;
 }
 
@@ -1630,8 +1564,7 @@ MovieClip::set_textfield_variable(const std::string& name, TextField* ch)
     assert(ch);
 
     // lazy allocation
-    if ( ! _text_variables.get() )
-    {
+    if (!_text_variables.get()) {
         _text_variables.reset(new TextFieldIndex);
     }
     
@@ -1642,19 +1575,18 @@ MovieClip::TextFields*
 MovieClip::get_textfield_variable(const std::string& name)
 {
     // nothing allocated yet...
-    if ( ! _text_variables.get() ) return NULL;
+    if (!_text_variables.get()) return 0;
 
     // TODO: should variable name be considered case-insensitive ?
     TextFieldIndex::iterator it = _text_variables->find(name);
     if (it == _text_variables->end()) return 0;
-    else return &(it->second);
+    return &(it->second);
 } 
 
 
 DisplayObject*
 MovieClip::getDisplayListObject(const ObjectURI& uri)
 {
-
     as_object* obj = getObject(this);
     assert(obj);
 
@@ -1679,7 +1611,6 @@ MovieClip::getDisplayListObject(const ObjectURI& uri)
 void 
 MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 {
-
     // nothing to do if this movieclip is not visible
     if (!visible() || invisible(getCxForm(*this))) {
         ranges.add(m_old_invalidated_ranges); 
@@ -1687,7 +1618,6 @@ MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
     }
 
     if (!invalidated() && !childInvalidated() && !force) return;
-    
  
     // m_child_invalidated does not require our own bounds
     if (invalidated() || force) {
@@ -1703,7 +1633,6 @@ MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
             _drawable.getBounds());
 
     ranges.add(bounds.getRange());
-
 }
 
 
@@ -1747,13 +1676,11 @@ MovieClip::constructAsScriptObject()
             ctor->construct(*mc, get_environment(), args);
         }
     }
-
 }
 
 void
 MovieClip::construct(as_object* initObj)
 {
-    
     assert(!unloaded());
 
     saveOriginalTarget();
@@ -1827,16 +1754,13 @@ MovieClip::construct(as_object* initObj)
         if (initObj) {
             mc->copyProperties(*initObj);
         }
-
         constructAsScriptObject();
-
     }
 
     // Tested in testsuite/swfdec/duplicateMovieclip-events.c and
     // testsuite/swfdec/clone-sprite-events.c not to call notifyEvent
     // immediately.
     queueEvent(event_id(event_id::INITIALIZE), movie_root::PRIORITY_INIT);
-
 }
 
 bool
@@ -1855,7 +1779,6 @@ MovieClip::unloadChildren()
     _drawable.clear();
     
     return _displayList.unload();
-
 }
 
 void
@@ -1942,7 +1865,6 @@ MovieClip::loadVariables(const std::string& urlstr,
     catch (const NetworkException& ex) {
         log_error(_("Could not load variables from %s"), url.str());
     }
-
 }
 
 void
@@ -1964,8 +1886,8 @@ MovieClip::processCompletedLoadVariableRequests()
     if (_loadVariableRequests.empty()) return;
 
     for (LoadVariablesThreads::iterator it=_loadVariableRequests.begin();
-            it != _loadVariableRequests.end(); )
-    {
+            it != _loadVariableRequests.end();) {
+
         LoadVariablesThread& request = *it;
         if (request.completed()) {
             processCompletedLoadVariableRequest(request);
@@ -2067,8 +1989,7 @@ MovieClip::markOwnResources() const
     _environment.markReachableResources();
 
     // Mark textfields in the TextFieldIndex
-    if ( _text_variables.get() )
-    {
+    if (_text_variables.get()) {
         for (TextFieldIndex::const_iterator i=_text_variables->begin(),
                     e=_text_variables->end();
                 i!=e; ++i)
@@ -2081,7 +2002,6 @@ MovieClip::markOwnResources() const
 
     // Mark our relative root
     _swf->setReachable();
-
 }
 
 void
@@ -2130,8 +2050,7 @@ MovieClip::getAsRoot()
 void
 MovieClip::setStreamSoundId(int id)
 {
-    if ( id != m_sound_stream_id )
-    {
+    if (id != m_sound_stream_id) {
         log_debug(_("Stream sound id from %d to %d, stopping old"),
                 m_sound_stream_id, id);
         stopStreamSound();
@@ -2142,11 +2061,10 @@ MovieClip::setStreamSoundId(int id)
 void
 MovieClip::stopStreamSound()
 {
-    if ( m_sound_stream_id == -1 ) return; // nothing to do
+    if (m_sound_stream_id == -1) return; // nothing to do
 
     sound::sound_handler* handler = getRunResources(*getObject(this)).soundHandler();
-    if (handler)
-    {
+    if (handler) {
         handler->stop_sound(m_sound_stream_id);
     }
 

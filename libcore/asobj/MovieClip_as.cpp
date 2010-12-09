@@ -513,11 +513,7 @@ movieclip_attachMovie(const fn_call& fn)
     }
 
     // placeDisplayObject() will set depth on newch
-    if (!movieclip->attachCharacter(*newch, depthValue, initObj.get()))
-    {
-        log_error(_("Could not attach DisplayObject at depth %d"), depthValue);
-        return as_value();
-    }
+    movieclip->attachCharacter(*newch, depthValue, initObj.get());
 
     return as_value(getObject(newch));
 }

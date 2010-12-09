@@ -338,15 +338,9 @@ public:
 
     /// Attach the given DisplayObject instance to current display list
     //
-    /// @param newch
-    /// The DisplayObject instance to attach.
-    ///
-    /// @param depth
-    /// The depth to assign to the instance.
-    ///
-    /// @return true on success, false on failure
-    /// FIXME: currently never returns false !
-    bool attachCharacter(DisplayObject& newch, int depth, as_object* initObject);
+    /// @param newch    The DisplayObject instance to attach.
+    /// @param depth    The depth to assign to the instance.
+    void attachCharacter(DisplayObject& newch, int depth, as_object* initObject);
 
     /// Handle placement event
     //
