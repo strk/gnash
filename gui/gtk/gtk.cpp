@@ -23,6 +23,7 @@
 #endif
 
 #include "gtksup.h"
+#include "revno.h"
 
 #include <iostream>
 #include <string>
@@ -1813,7 +1814,17 @@ GtkGui::showAboutDialog()
     GtkAboutDialog* about = GTK_ABOUT_DIALOG(aboutWidget);
 
     gtk_about_dialog_set_name (about, "Gnash");
-    gtk_about_dialog_set_version(about, VERSION);
+    std::string version = VERSION;
+    version.append("\n");
+    version.append("(");
+    version.append(BRANCH_NICK);
+    version.append("-");
+    version.append(BRANCH_REVNO);
+    version.append("-");
+    version.append(COMMIT_ID);
+    version.append(")");
+
+    gtk_about_dialog_set_version(about, version.c_str());
     gtk_about_dialog_set_copyright(about, "Copyright (C) 2005, 2006, 2007, "
             "2008, 2009, 2010 The Free Software Foundation");
     gtk_about_dialog_set_comments (about, comments.c_str());
