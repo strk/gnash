@@ -130,7 +130,7 @@ BUILT_SOURCES = revno.h .configline
 # only want to regenerate this file if that file changes, so we have to
 # do the dependency check ourselves.
 revno.h:
-	@if test -d $(top_srcdir)/.git; then \
+	@if test -d $(top_srcdir)/.git -a x"${GIT}" != x; then \
 	  nowmod="$(shell stat -c "%X" $(top_srcdir)/.git/index)"; \
 	  if test -e .lastmod; then \
 	    lastmod="$(shell cat .lastmod)"; \
