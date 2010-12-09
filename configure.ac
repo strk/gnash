@@ -1330,31 +1330,29 @@ AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n "$extensions_list"])
 GNASH_PKG_CLASSFILE
 
 ltmajor=0
-dnl if test "${nextensions}" -gt 0 -o x"${cygnal}" != x; then
-  AC_MSG_CHECKING([For the version of libtool])
-  if test -d ${srcdir}/libltdl/libltdl; then
-    ltver=2.x
-  else
-    ltver=1.x
+AC_MSG_CHECKING([For the version of libtool])
+if test -d ${srcdir}/libltdl/libltdl; then
+  ltver=2.x
+else
+  ltver=1.x
+fi
+ltmajor=`echo $ltver | cut -d '.' -f 1`
+AC_MSG_RESULT([$ltver])
+if test $ltmajor -eq 1; then
+  AC_LIBLTDL_CONVENIENCE
+  AC_LIBTOOL_DLOPEN
+  if test x"${windows}" = x"yes"; then
+    dnl The following macro may be empty; the colon is necessary
+    dnl in this case to avoid an empty if statement (which is a syntax error).
+    AC_LIBTOOL_WIN32_DLL
+    :
   fi
-  ltmajor=`echo $ltver | cut -d '.' -f 1`
-  AC_MSG_RESULT([$ltver])
-  if test $ltmajor -eq 1; then
-    AC_LIBLTDL_CONVENIENCE
-    AC_LIBTOOL_DLOPEN
-    if test x"${windows}" = x"yes"; then
-      dnl The following macro may be empty; the colon is necessary
-      dnl in this case to avoid an empty if statement (which is a syntax error).
-      AC_LIBTOOL_WIN32_DLL
-      :
-    fi
-    AC_DISABLE_STATIC
-  else
-    LT_INIT([dlopen win32-dll disable-static])
-    LTDL_INIT([convenience recursive])
-  fi
-  AC_LIB_LTDL
-dnl fi
+  AC_DISABLE_STATIC
+else
+  LT_INIT([dlopen win32-dll disable-static])
+  LTDL_INIT([convenience recursive])
+fi
+AC_LIB_LTDL
 
 DLOPEN="-dlopen"
 DLPREOPEN="-dlpreopen"
