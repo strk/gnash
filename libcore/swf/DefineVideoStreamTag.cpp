@@ -146,13 +146,6 @@ DefineVideoStreamTag::createDisplayObject(Global_as& gl,
 	return ch;
 }
 
-bool
-has_frame_number(media::EncodedVideoFrame* frame, boost::uint32_t frameNumber)
-{
-	return frame->frameNum() == frameNumber;
-}
-
-
 void
 DefineVideoStreamTag::getEncodedFrameSlice(boost::uint32_t from,
         boost::uint32_t to, EmbeddedFrames& ret) const
