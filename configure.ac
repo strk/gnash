@@ -282,12 +282,9 @@ dnl   $CXXFLAGS="$CXXFLAGS -march=${with_cpu}"
    cross_compiling=yes
 fi
 
-AC_PROG_LIBTOOL
-
 AC_C_BIGENDIAN
 AC_C_CONST
 AC_C_INLINE
-AC_SUBST([LIBTOOL_DEPS])
 
 AM_CONDITIONAL(ENABLE_SHARED, [test x"${enable_shared}" = xyes])
 AM_CONDITIONAL(ENABLE_STATIC, [test x"${enable_shared}" = xno])
@@ -489,16 +486,6 @@ if test x"${haiku}" = xyes; then
   AC_SUBST(HAIKU_LIBS)
 fi
 
-DLOPEN="-dlopen"
-DLPREOPEN="-dlpreopen"
-AC_SUBST(DLOPEN)
-AC_SUBST(DLPREOPEN)
-
-dnl dnl Substitute INCLTDL and LIBLTDL in the Makefiles
-AC_SUBST(INCLTDL)
-AC_SUBST(LIBLTDL)
-AC_SUBST(LIBTOOL_DEPS)
-
 dnl Darwin uses libtool instead of ar to produce libraries. We determine which one
 dnl we have here now. For some reason on Darwin, we don't get the
 dnl count from grep via stdin correctly. Writing a temp file does the
@@ -646,8 +633,6 @@ AC_ARG_ENABLE(gui,
       all|ALL)
         build_dump=yes
         build_fb=yes
-        build_fltk=yes
-        build_kde3=yes
         build_kde4=yes
         build_sdl=yes
         ;;
@@ -1217,7 +1202,7 @@ AC_PATH_PROG(CSOUND, csound)
 AM_CONDITIONAL(HAVE_CSOUND, test x"$CSOUND" != x)
 
 AC_PATH_PROG(GIT, git)
-AM_CONDITIONAL(HAVE_GIT, test x"$GIT" != x)
+AC_SUBST(GIT)
 
 dnl -------------------------------------
 dnl LIRC
@@ -1237,7 +1222,6 @@ AM_CONDITIONAL(USE_LIRC, test x$lirc = xyes)
 dnl --------------------------------------------------------
 dnl Extension selection
 dnl --------------------------------------------------------
-extensions_list=
 ext_dejagnu=no
 ext_mysql=no
 ext_fileio=no
@@ -1246,6 +1230,7 @@ ext_lirc=no
 ext_dbus=no
 ext_all=no
 ext_launcher=no
+extensions_list=
 nextensions=0
 AC_ARG_ENABLE(extensions,
   AC_HELP_STRING([--enable-extensions=], [Specify which extensions to build]),
@@ -1345,7 +1330,7 @@ AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n "$extensions_list"])
 GNASH_PKG_CLASSFILE
 
 ltmajor=0
-if test "${nextensions}" -gt 0; then
+dnl if test "${nextensions}" -gt 0 -o x"${cygnal}" != x; then
   AC_MSG_CHECKING([For the version of libtool])
   if test -d ${srcdir}/libltdl/libltdl; then
     ltver=2.x
@@ -1369,7 +1354,19 @@ if test "${nextensions}" -gt 0; then
     LTDL_INIT([convenience recursive])
   fi
   AC_LIB_LTDL
-fi
+dnl fi
+
+DLOPEN="-dlopen"
+DLPREOPEN="-dlpreopen"
+AC_SUBST(DLOPEN)
+AC_SUBST(DLPREOPEN)
+
+dnl dnl Substitute INCLTDL and LIBLTDL in the Makefiles
+AC_SUBST(INCLTDL)
+AC_SUBST(LIBLTDL)
+
+AC_PROG_LIBTOOL
+AC_SUBST(LIBTOOL_DEPS)
 
 AM_CONDITIONAL(LIBLTDL2, [test $ltmajor -eq 2])
 AM_CONDITIONAL(LIBLTDL1, [test $ltmajor -eq 1])
