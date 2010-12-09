@@ -212,105 +212,132 @@ class EGLDevice : public GnashDevice
     }
     // Make one of the pbuffers the current one to draw into
     bool makePbufferCurrent() {
-        if (!eglMakeCurrent(_eglDisplay, _eglSurface, _eglSurface, _eglContext)) {
-            log_error( "eglMakeCurrent() failed (error 0x%x)", eglGetError());
-            return false;
-        }
-    }
-    
-    bool makePbufferCurrent(size_t x) {
-        if (x < _pbuffers.size()) {
-            if (!eglMakeCurrent(_eglDisplay, _pbuffers[x], _pbuffers[x], _eglContext)) {
+        if ((_eglDisplay != EGL_NO_DISPLAY) && (_eglSurface != EGL_NO_SURFACE)) {
+            if (!eglMakeCurrent(_eglDisplay, _eglSurface, _eglSurface, _eglContext)) {
                 log_error( "eglMakeCurrent() failed (error 0x%x)", eglGetError());
                 return false;
             }
-            return true;
         }
         return false;
     }
     
+    bool makePbufferCurrent(size_t x) {
+        if (x < _pbuffers.size()) {
+            if ((_eglDisplay != EGL_NO_DISPLAY) && (_eglContext != EGL_NO_CONTEXT)) {
+                if (!eglMakeCurrent(_eglDisplay, _pbuffers[x], _pbuffers[x], _eglContext)) {
+                    log_error( "eglMakeCurrent() failed (error 0x%x)", eglGetError());
+                    return false;
+                }
+                return true;
+            }
+            return false;
+        }
+    }
+    
     size_t getVerticalRes() {
-        EGLint value;
-        if (_eglSurface && _eglDisplay) {
+        EGLint value = 0;
+        if ((_eglDisplay != EGL_NO_DISPLAY) && (_eglSurface != EGL_NO_SURFACE)) {
             eglQuerySurface(_eglDisplay, _eglSurface, EGL_VERTICAL_RESOLUTION, &value);
         }
         return static_cast<size_t>(value);
     }
     size_t getHorzRes() {
-        EGLint value;
-        if (_eglSurface && _eglDisplay) {
+        EGLint value = 0;
+        if ((_eglDisplay != EGL_NO_DISPLAY) && (_eglSurface != EGL_NO_SURFACE)) {
             eglQuerySurface(_eglDisplay, _eglSurface, EGL_HORIZONTAL_RESOLUTION, &value);
         }
         return static_cast<size_t>(value);
     }
     bool isBackBuffered() {
         EGLint value;
-        if (_eglSurface && _eglDisplay) {
+        if ((_eglDisplay != EGL_NO_DISPLAY) && (_eglSurface != EGL_NO_SURFACE)) {
             eglQuerySurface(_eglDisplay, _eglSurface, EGL_RENDER_BUFFER, &value);
-        }
-        if (value == EGL_BACK_BUFFER) {
-            return true;
+            if (value == EGL_BACK_BUFFER) {
+                return true;
+            }
+            return false;
         }
         return false;
     }
 
     bool isMultiSample() {
         EGLint value;
-        eglQuerySurface(_eglDisplay, _eglSurface, EGL_MULTISAMPLE_RESOLVE, &value);
-        if (value == EGL_MULTISAMPLE_RESOLVE_BOX) {
-            return true;
+        if ((_eglDisplay != EGL_NO_DISPLAY) && (_eglSurface != EGL_NO_SURFACE)) {
+            eglQuerySurface(_eglDisplay, _eglSurface, EGL_MULTISAMPLE_RESOLVE, &value);
+            if (value == EGL_MULTISAMPLE_RESOLVE_BOX) {
+                return true;
+            }
+            return false;
         }
         return false;
     }
     
     EGLint getSurfaceID() {
-        EGLint value;
-        eglQuerySurface(_eglDisplay, _eglSurface, EGL_CONFIG_ID, &value);
+        EGLint value = -1;
+        if ((_eglDisplay != EGL_NO_DISPLAY) && (_eglSurface != EGL_NO_SURFACE)) {
+            eglQuerySurface(_eglDisplay, _eglSurface, EGL_CONFIG_ID, &value);
+        }
         return value;
     }
 
     // Context accessors
     EGLint getContextID() {
-        EGLint value;
-        eglQueryContext(_eglDisplay, _eglContext, EGL_CONFIG_ID, &value);
+        EGLint value = -1;
+        if ((_eglDisplay != EGL_NO_DISPLAY) && (_eglContext != EGL_NO_CONTEXT)) {
+            eglQueryContext(_eglDisplay, _eglContext, EGL_CONFIG_ID, &value);
+        }
         return value;
     }
     bool isContextSingleBuffered() {
         EGLint value;
-        eglQueryContext(_eglDisplay, _eglContext, EGL_RENDER_BUFFER, &value);
-        if (value == EGL_SINGLE_BUFFER) {
-            return true;
+        if ((_eglDisplay != EGL_NO_DISPLAY) && (_eglContext != EGL_NO_CONTEXT)) {
+            eglQueryContext(_eglDisplay, _eglContext, EGL_RENDER_BUFFER, &value);
+            if (value == EGL_SINGLE_BUFFER) {
+                return true;
+            }
+            return false;
         }
         return false;
     }
     bool isContextBackBuffered() {
         EGLint value;
-        eglQueryContext(_eglDisplay, _eglContext, EGL_RENDER_BUFFER, &value);
-        if (value == EGL_BACK_BUFFER) {
-            return true;
+        if ((_eglDisplay != EGL_NO_DISPLAY) && (_eglContext != EGL_NO_CONTEXT)) {
+            eglQueryContext(_eglDisplay, _eglContext, EGL_RENDER_BUFFER, &value);
+            if (value == EGL_BACK_BUFFER) {
+                return true;
+            }
+            return false;
         }
         return false;
     }
 
     // Config accessors
     EGLint getSamples() {
-        EGLint value;
-        eglGetConfigAttrib(_eglDisplay, _eglConfig, EGL_SAMPLES, &value);
+        EGLint value = -1;
+        if ((_eglDisplay != EGL_NO_DISPLAY) && (_eglConfig != 0)) {
+            eglGetConfigAttrib(_eglDisplay, _eglConfig, EGL_SAMPLES, &value);
+        }
         return value;
     }
     EGLint getSampleBuffers() {
-        EGLint value; 
-        eglGetConfigAttrib(_eglDisplay, _eglConfig, EGL_SAMPLE_BUFFERS, &value);
+        EGLint value = -1; 
+        if ((_eglDisplay != EGL_NO_DISPLAY) && (_eglConfig != 0)) {
+            eglGetConfigAttrib(_eglDisplay, _eglConfig, EGL_SAMPLE_BUFFERS, &value);
+        }
         return value;
     }
     EGLint getMaxSwapInterval() {
-        EGLint value;
-        eglGetConfigAttrib(_eglDisplay, _eglConfig, EGL_MAX_SWAP_INTERVAL, &value);
+        EGLint value = -1;
+        if ((_eglDisplay != EGL_NO_DISPLAY) && (_eglConfig != 0)) {
+            eglGetConfigAttrib(_eglDisplay, _eglConfig, EGL_MAX_SWAP_INTERVAL, &value);
+        }
         return value;
     }
     EGLint getMinSwapInterval() {
-        EGLint value;
-        eglGetConfigAttrib(_eglDisplay, _eglConfig, EGL_MIN_SWAP_INTERVAL, &value);
+        EGLint value = -1;
+        if ((_eglDisplay != EGL_NO_DISPLAY) && (_eglConfig != 0)) {
+            eglGetConfigAttrib(_eglDisplay, _eglConfig, EGL_MIN_SWAP_INTERVAL, &value);
+        }
         return value;
     }
     
