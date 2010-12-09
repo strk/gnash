@@ -726,21 +726,8 @@ MovieClip::queueAction(const action_buffer& action)
 }
 
 void
-MovieClip::queueActions(const ActionList& actions)
-{
-    for (ActionList::const_iterator it=actions.begin(), itEnd=actions.end();
-                     it != itEnd; ++it)
-    {
-        const action_buffer* buf = *it;
-        queueAction(*buf);
-    }
-
-}
-
-void
 MovieClip::notifyEvent(const event_id& id)
 {
-
 #ifdef GNASH_DEBUG
     log_debug(_("Event %s invoked for movieclip %s"), id, getTarget());
 #endif

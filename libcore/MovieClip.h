@@ -714,13 +714,6 @@ private:
     ///
     void restoreDisplayList(size_t targetFrame);
 
-    /// Queue actions in the action list
-    //
-    /// The list of action will be pushed on the current
-    /// global list (see movie_root).
-    ///
-    void queueActions(const ActionList& action_list);
-
     /// Execute the actions in the action list
     //
     /// The list of action will be consumed starting from the first
