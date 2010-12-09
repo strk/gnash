@@ -43,8 +43,8 @@
 #include "MediaHandler.h"
 #include "StreamProvider.h"
 #include "sound_handler.h"
-#include "GnashSystemNetHeaders.h"
 #include "AMFConverter.h"
+#include "AMF.h"
 
 // Define the following macro to have status notification handling debugged
 //#define GNASH_DEBUG_STATUS
@@ -1870,26 +1870,18 @@ attachNetStreamInterface(as_object& o)
 void
 executeTag(const SimpleBuffer& _buffer, as_object& thisPtr)
 {
-
 	const boost::uint8_t* ptr = _buffer.data();
 	const boost::uint8_t* endptr = ptr + _buffer.size();
 
-	if (endptr - ptr < 2) {
-		log_error("Premature end of AMF in NetStream metatag");
-		return;
-	}
-	const boost::uint16_t length = ntohs((*(boost::uint16_t *)ptr) & 0xffff);
-	ptr += 2;
+    std::string funcName;
 
-	if (endptr - ptr < length) {
-		log_error("Premature end of AMF in NetStream metatag");
-		return;
-	}
-
-	const std::string funcName(reinterpret_cast<const char*>(ptr), length); 
-	ptr += length;
-
-	log_debug("funcName: %s", funcName);
+    try {
+        funcName = amf::readString(ptr, endptr);
+    }
+    catch (const amf::AMFException&) {
+        log_error("Invalid AMF data in FLV tag");
+        return;
+    }
 
 	VM& vm = getVM(thisPtr);
 	const ObjectURI& funcKey = getURI(vm, funcName);
@@ -1898,8 +1890,8 @@ executeTag(const SimpleBuffer& _buffer, as_object& thisPtr)
 
 	as_value arg;
 	if (!rd(arg)) {
-		log_error("Could not convert FLV metatag to as_value, but will try "
-                "passing it anyway. It's an %s", arg);
+		log_error("Could not convert FLV metatag to as_value, passing "
+                "undefined");
 	}
 
 	log_debug("Calling %s(%s)", funcName, arg);
