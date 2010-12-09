@@ -923,7 +923,7 @@ MovieClip::advance()
         log_debug(_("MovieClip::advance_movieclip we're in PLAYSTATE_PLAY mode"));
 #endif
 
-        int prev_frame = _currentFrame;
+        const size_t prev_frame = _currentFrame;
 
 #ifdef GNASH_DEBUG
         log_debug(_("on_event_load called, incrementing"));
@@ -936,18 +936,16 @@ MovieClip::advance()
         // Execute the current frame's tags.
         // First time executeFrameTags(0) executed in dlist.cpp(child) or
         // SWFMovieDefinition(root)
-        if (_currentFrame != (size_t)prev_frame)
-        {
-            if (_currentFrame == 0 && _hasLooped)
-            {
+        if (_currentFrame != prev_frame) {
+
+            if (_currentFrame == 0 && _hasLooped) {
 #ifdef GNASH_DEBUG
                 log_debug(_("Jumping back to frame 0 of movieclip %s"),
                         getTarget());
 #endif
                 restoreDisplayList(0); // seems OK to me.
             }
-            else
-            {
+            else {
 #ifdef GNASH_DEBUG
                 log_debug(_("Executing frame%d (0-based) tags of movieclip "
                             "%s"), _currentFrame, getTarget());
@@ -962,12 +960,10 @@ MovieClip::advance()
 
     }
 #ifdef GNASH_DEBUG
-    else
-    {
+    else {
         log_debug(_("MovieClip::advance_movieclip we're in STOP mode"));
     }
 #endif
-
 }
 
 void
@@ -975,8 +971,7 @@ MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
 {
     assert(cid >= 0);
 
-    if ( _swf->initializeCharacter(cid) )
-    {
+    if (_swf->initializeCharacter(cid)) {
 #ifdef GNASH_DEBUG
         log_debug(_("Queuing init actions in frame %d of movieclip %s"),
                 _currentFrame, getTarget());
@@ -985,8 +980,7 @@ MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
 
         stage().pushAction(code, movie_root::PRIORITY_INIT);
     }
-    else
-    {
+    else {
 #ifdef GNASH_DEBUG
         log_debug(_("Init actions for DisplayObject %d already executed"), cid);
 #endif
