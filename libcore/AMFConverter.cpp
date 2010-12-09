@@ -576,18 +576,8 @@ Reader::readReference()
 as_value
 Reader::readDate()
 {
+    const double d = amf::readNumber(_pos, _end);
 
-    if (_end - _pos < 8) {
-        throw AMFException("Read past _end of buffer for date type");
-    }
-
-    double dub;
-
-    // TODO: may we avoid a copy and swapBytes call
-    //       by bitshifting b[0] trough b[7] ?
-    std::copy(_pos, _pos + 8, reinterpret_cast<char*>(&dub));
-    _pos += 8; 
-    swapBytes(&dub, 8);
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
     log_debug("amf0 read date: %e", dub);
 #endif
@@ -598,7 +588,7 @@ Reader::readDate()
     as_value date;
     if (ctor) {
         fn_call::Args args;
-        args += dub;
+        args += d;
         date = constructInstance(*ctor, as_environment(vm), args);
 
         if (_end - _pos < 2) {
