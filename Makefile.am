@@ -126,35 +126,20 @@ BUILT_SOURCES = revno.h .configline
 # It will NOT be removed by any 'clean' rule (eventually, it should be
 # removed by maintainer-clean...)
 #
-revno.h:
-if HAVE_GIT
-	@cd $(top_srcdir); \
-    if test -d .git; then \
-        revno=`$(GIT) log | grep '^commit' | wc -l`; \
-        comm_id=`$(GIT) rev-parse --short HEAD`; \
-        nick=`$(GIT) branch | grep '^\*' | cut -d ' ' -f 2`; \
-        echo "static const char* BRANCH_REVNO  = \"$${revno}\";" > revno.h.n; \
-        echo "static const char* BRANCH_NICK = \"$${nick}\";" >> revno.h.n; \
-        echo "static const char* COMMIT_ID = \"$${comm_id}\";" >> revno.h.n; \
-        if test -e revno.h; then \
-            if diff -q revno.h.n revno.h > /dev/null; then \
-                echo "Current revno.h is up to date ($${nick} $${revno} $${comm_id})"; \
-                rm -f revno.h.n; \
-            else \
-                echo "Updating revno.h ($${nick} $${revno} $${comm_id})"; \
-                mv revno.h.n revno.h; \
-            fi; \
+revno.h: Makefile .configline
+	-$(RM) -f revno.h
+	if test -d $(top_srcdir)/.git -a x$(GIT) != x; then \
+          revno="$(shell (cd $(top_srcdir) ; $(GIT) log | grep '^commit' | wc -l))"; \
+          comm_id="$(shell (cd $(top_srcdir) ; $(GIT) rev-parse --short HEAD))"; \
+          nick="$(shell (cd $(top_srcdir) ; $(GIT) branch | grep '^\*' | cut -d ' ' -f 2))"; \
         else \
-            echo "Generating revno.h ($${nick} $${revno} $${comm_id})"; \
-            mv revno.h.n revno.h; \
+	  revno="$(NOW)"; \
+	  revno="none"; \
+          nick="master"; \
         fi; \
-    else \
-        echo "Source is not in a git repository, revno.h won't be updated"; \
-    fi;
-else
-	@echo "You don't have git installed, revno.h won't be updated";
-endif
-
+	echo "static const char* BRANCH_REVNO  = \"$${revno}\";" > revno.h; \
+	echo "static const char* BRANCH_NICK = \"$${nick}\";" >> revno.h; \
+	echo "static const char* COMMIT_ID = \"$${comm_id}\";" >> revno.h;
 
 .configline: config.log
 	-@rm -f .configline
@@ -474,7 +459,6 @@ anal testreport checksum:
 endif
 
 .PHONY : dumpconfig \
-	revno.h \
 	anal \
 	testreport \
 	checksum \
