@@ -91,16 +91,46 @@ main(int argc, char *argv[])
 void
 test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
 {
+    bool hwinit = false;
+
+    // This is a utility method for converting integer error codes to
+    // something human readable for debugging.
+    string result = "EGL_BAD_CONFIG";
+    if (egl.getErrorString(EGL_BAD_CONFIG) == result) {
+        runtest.pass("EGLDevice::getErrorString()");
+    } else {
+        runtest.fail("EGLDevice::getErrorString()");
+    }
+
     if (egl.initDevice(argc, argv)) {
         runtest.pass("EGLDevice::initDevice()");
+        hwinit = true;
     } else {
         runtest.fail("EGLDevice::initDevice()");
     }
 
-    if (egl.bindClient(rtype)) {
-        runtest.pass("EGLDevice::bindClient()");
+    if (hwinit) {
+        if (egl.bindClient(rtype)) {
+            runtest.pass("EGLDevice::bindClient()");
+        } else {
+            runtest.fail("EGLDevice::bindClient()");
+        }
     } else {
-        runtest.fail("EGLDevice::bindClient()");
+        runtest.untested("EGLDevice::bindClient()");
+    }
+
+//    egl.printEGLConfig();
+    
+    // If there are more than zero configurations, something beyond
+    // initializing is working
+    if (hwinit) {
+        if (egl.queryEGLConfig()) {
+            runtest.pass("EGLDevice::queryEGLConfig()");
+        } else {
+            runtest.fail("EGLDevice::queryEGLConfig()");
+        }
+    } else {
+        runtest.untested("EGLDevice::queryEGLConfig()");
     }
 
 #if 0
@@ -113,101 +143,136 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     }
 #endif
     
-    // If there are more than zero configurations, something beyond
-    // initializing is working
-    if (egl.queryEGLConfig()) {
-        runtest.pass("EGLDevice::queryEGLConfig()");
+    if (hwinit) {
+        if (egl.supportsRenderer(rtype)) {
+            runtest.pass("EGLDevice::supportsRenderer()");
+        } else {
+            runtest.fail("EGLDevice::supportsRenderer()");
+        }
     } else {
-        runtest.fail("EGLDevice::queryEGLConfig()");
-    }
-
-    // This is a utility method for converting integer error codes to
-    // something human readable for debugging.
-    string result = "EGL_BAD_CONFIG";
-    if (egl.getErrorString(EGL_BAD_CONFIG) == result) {
-        runtest.pass("EGLDevice::getErrorString()");
-    } else {
-        runtest.fail("EGLDevice::getErrorString()");
-    }
-
-    if (egl.supportsRenderer(rtype)) {
-        runtest.pass("EGLDevice::supportsRenderer()");
-    } else {
-        runtest.fail("EGLDevice::supportsRenderer()");
+        runtest.untested("EGLDevice::supportsRenderer()");
     }
     
-    if (egl.getRedSize() > 0) {
-        runtest.pass("EGLDevice::getRedSize()");
+    if (hwinit) {    
+        if (egl.getRedSize() > 0) {
+            runtest.pass("EGLDevice::getRedSize()");
+        } else {
+            runtest.fail("EGLDevice::getRedSize()");
+        }    
     } else {
-        runtest.fail("EGLDevice::getRedSize()");
-    }    
-
-    if (egl.getGreenSize() > 0) {
-        runtest.pass("EGLDevice::getGreenSize()");
-    } else {
-        runtest.fail("EGLDevice::getGreenSize()");
-    }    
+        runtest.untested("EGLDevice::getRedSize()");
+    }
     
-    if (egl.getBlueSize() > 0) {
-        runtest.pass("EGLDevice::getBlueSize()");
+    if (hwinit) {
+        if (egl.getGreenSize() > 0) {
+            runtest.pass("EGLDevice::getGreenSize()");
+        } else {
+            runtest.fail("EGLDevice::getGreenSize()");
+        }    
     } else {
-        runtest.fail("EGLDevice::getBlueSize()");
-    }    
+        runtest.untested("EGLDevice::getGreenSize()");
+    }
+    
+    if (hwinit) {
+        if (egl.getBlueSize() > 0) {
+            runtest.pass("EGLDevice::getBlueSize()");
+        } else {
+            runtest.fail("EGLDevice::getBlueSize()");
+        }
+    } else {
+        runtest.untested("EGLDevice::getBlueSize()");
+    }
 
     // Surface config info tests
-    if (egl.getSurfaceID()) {
-        runtest.pass("EGLDevice::getSurfaceID()");
+    if (hwinit) {
+        if (egl.getSurfaceID()) {
+            runtest.pass("EGLDevice::getSurfaceID()");
+        } else {
+            runtest.fail("EGLDevice::getSurfaceID()");
+        }
     } else {
-        runtest.fail("EGLDevice::getSurfaceID()");
+        runtest.untested("EGLDevice::getSurfaceID()");
     }
     
-    if (egl.getWidth()) {
-        runtest.pass("EGLDevice::getWidth()");
+    if (hwinit) {
+        if (egl.getWidth()) {
+            runtest.pass("EGLDevice::getWidth()");
+        } else {
+            runtest.fail("EGLDevice::getWidth()");
+        }
     } else {
-        runtest.fail("EGLDevice::getWidth()");
+        runtest.untested("EGLDevice::getWidth()");
     }
     
-    if (egl.getHeight()) {
-        runtest.pass("EGLDevice::getHeigth()");
+    if (hwinit) {
+        if (egl.getHeight()) {
+            runtest.pass("EGLDevice::getHeigth()");
+        } else {
+            runtest.fail("EGLDevice::getHeigth()");
+        }
     } else {
-        runtest.fail("EGLDevice::getHeigth()");
+        runtest.untested("EGLDevice::getHeigth()");
     }
     
-    if (egl.getVerticalRes()) {
-        runtest.pass("EGLDevice::getVerticalRes()");
+    if (hwinit) {
+        if (egl.getVerticalRes()) {
+            runtest.pass("EGLDevice::getVerticalRes()");
+        } else {
+            runtest.fail("EGLDevice::getVerticalRes()");
+        }
     } else {
-        runtest.fail("EGLDevice::getVerticalRes()");
+        runtest.untested("EGLDevice::getVerticalRes()");
     }
     
-    if (egl.getHorzRes()) {
-        runtest.pass("EGLDevice::getHorzRes()");
+    if (hwinit) {
+        if (egl.getHorzRes()) {
+            runtest.pass("EGLDevice::getHorzRes()");
+        } else {
+            runtest.fail("EGLDevice::getHorzRes()");
+        }
     } else {
-        runtest.fail("EGLDevice::getHorzRes()");
+        runtest.untested("EGLDevice::getHorzRes()");
     }
 
-    if (egl.isSingleBuffered() != egl.isBackBuffered()) {
-        runtest.pass("EGLDevice::is*Buffered()");
+    if (hwinit) {
+        if (egl.isSingleBuffered() != egl.isBackBuffered()) {
+            runtest.pass("EGLDevice::is*Buffered()");
+        } else {
+            runtest.fail("EGLDevice::is*Buffered()");
+        }
     } else {
-        runtest.fail("EGLDevice::is*Buffered()");
+        runtest.untested("EGLDevice::is*Buffered()");
     }
 
-    if (egl.isBufferDestroyed()) {
-        runtest.pass("EGLDevice::isBufferDestroyed()");
+    if (hwinit) {
+        if (egl.isBufferDestroyed()) {
+            runtest.pass("EGLDevice::isBufferDestroyed()");
+        } else {
+            runtest.fail("EGLDevice::isBufferDestroyed()");
+        }
     } else {
-        runtest.fail("EGLDevice::isBufferDestroyed()");
+        runtest.untested("EGLDevice::isBufferDestroyed()");
     }
     
-    if (!egl.isMultiSample()) {
-        runtest.pass("EGLDevice::isMultiSample()");
+    if (hwinit) {
+        if (!egl.isMultiSample()) {
+            runtest.pass("EGLDevice::isMultiSample()");
+        } else {
+            runtest.fail("EGLDevice::isMultiSample()");
+        }
     } else {
-        runtest.fail("EGLDevice::isMultiSample()");
+        runtest.untested("EGLDevice::isMultiSample()");
     }
 
     // Context accessor tests
-    if (egl.getContextID()) {
-        runtest.pass("EGLDevice::getContextID()");
+    if (hwinit) {
+        if (egl.getContextID()) {
+            runtest.pass("EGLDevice::getContextID()");
+        } else {
+            runtest.fail("EGLDevice::getContextID()");
+        }
     } else {
-        runtest.fail("EGLDevice::getContextID()");
+        runtest.untested("EGLDevice::getContextID()");
     }
 
 #if 0
@@ -218,54 +283,86 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     }
 #endif
     
-    if (egl.isContextSingleBuffered() != egl.isContextBackBuffered()) {
-        runtest.pass("EGLDevice::isContext*Buffered()");
+    if (hwinit) {
+        if (egl.isContextSingleBuffered() != egl.isContextBackBuffered()) {
+            runtest.pass("EGLDevice::isContext*Buffered()");
+        } else {
+            runtest.fail("EGLDevice::isContext*Buffered()");
+        }
     } else {
-        runtest.fail("EGLDevice::isContext*Buffered()");
+        runtest.untested("EGLDevice::isContext*Buffered()");
     }
     
-    if (egl.isNativeRender()) {
-        runtest.pass("EGLDevice::isNativeRender()");
+    if (hwinit) {
+        if (egl.isNativeRender()) {
+            runtest.pass("EGLDevice::isNativeRender()");
+        } else {
+            runtest.fail("EGLDevice::isNativeRender()");
+        }
     } else {
-        runtest.fail("EGLDevice::isNativeRender()");
+        runtest.untested("EGLDevice::isNativeRender()");
     }
 
-    if (egl.getSamples() == 0) {
-        runtest.pass("EGLDevice::getSamples()");
+    if (hwinit) {
+        if (egl.getSamples() == 0) {
+            runtest.pass("EGLDevice::getSamples()");
+        } else {
+            runtest.fail("EGLDevice::getSamples()");
+        }
     } else {
-        runtest.fail("EGLDevice::getSamples()");
+        runtest.untested("EGLDevice::getSamples()");
     }
     
-    if (egl.getSampleBuffers() == 0) {
-        runtest.pass("EGLDevice::getSampleBuffers()");
+    if (hwinit) {
+        if (egl.getSampleBuffers() == 0) {
+            runtest.pass("EGLDevice::getSampleBuffers()");
+        } else {
+            runtest.fail("EGLDevice::getSampleBuffers()");
+        }
     } else {
-        runtest.fail("EGLDevice::getSampleBuffers()");
+        runtest.untested("EGLDevice::getSampleBuffers()");
     }
     
-    if (egl.getDepth()) {
-        runtest.pass("EGLDevice::getDepth()");
+    if (hwinit) {
+        if (egl.getDepth()) {
+            runtest.pass("EGLDevice::getDepth()");
+        } else {
+            runtest.fail("EGLDevice::getDepth()");
+        }
     } else {
-        runtest.fail("EGLDevice::getDepth()");
+        runtest.untested("EGLDevice::getDepth()");
     }
     
-    if (egl.getMaxSwapInterval() == 0) {
-        runtest.pass("EGLDevice::getMaxSwapInterval()");
+    if (hwinit) {
+        if (egl.getMaxSwapInterval() == 0) {
+            runtest.pass("EGLDevice::getMaxSwapInterval()");
+        } else {
+            runtest.fail("EGLDevice::getMaxSwapInterval()");
+        }
     } else {
-        runtest.fail("EGLDevice::getMaxSwapInterval()");
+        runtest.untested("EGLDevice::getMaxSwapInterval()");
     }
     
-    if (egl.getMinSwapInterval() == 0) {
-        runtest.pass("EGLDevice::getMinSwapInterval()");
+    if (hwinit) {
+        if (egl.getMinSwapInterval() == 0) {
+            runtest.pass("EGLDevice::getMinSwapInterval()");
+        } else {
+            runtest.fail("EGLDevice::getMinSwapInterval()");
+        }
     } else {
-        runtest.fail("EGLDevice::getMinSwapInterval()");
+        runtest.untested("EGLDevice::getMinSwapInterval()");
     }
 
     // Test Pbuffers
-    EGLSurface surf = egl.createPbuffer(200, 200);
-    if ((surf != EGL_NO_SURFACE) && (egl.getWidth(surf) == 200)) {
-        runtest.pass("EGLDevice::createPbuffer(int, int)");
+    if (hwinit) {
+        EGLSurface surf = egl.createPbuffer(200, 200);
+        if ((surf != EGL_NO_SURFACE) && (egl.getWidth(surf) == 200)) {
+            runtest.pass("EGLDevice::createPbuffer(int, int)");
+        } else {
+            runtest.fail("EGLDevice::createPbuffer(int, int)");
+        }
     } else {
-        runtest.fail("EGLDevice::createPbuffer(int, int)");
+        runtest.untested("EGLDevice::createPbuffer(int, int)");
     }
     
     // EGLSurface surf1 = egl[0];
@@ -279,33 +376,47 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     EGLSurface surf2 = egl.createPbuffer(300, 300);
     EGLSurface surf3 = egl.createPbuffer(400, 400);
 
-    if (egl.totalPbuffers() == 3) {
-        runtest.pass("EGLDevice::totalPbuffers(2)");
-    } else {
-        runtest.fail("EGLDevice::totalPbuffers(2)");
+    if (hwinit) {
+        if (egl.totalPbuffers() == 3) {
+            runtest.pass("EGLDevice::totalPbuffers(2)");
+        } else {
+            runtest.fail("EGLDevice::totalPbuffers(2)");
+        }
     }
 
     // Since we're EGL_SINGLE_BUFFER'd, this is a nop
-    if (egl.swapPbuffers()) {
-        runtest.pass("EGLDevice::swapPbuffers()");
+    if (hwinit) {
+        if (egl.swapPbuffers()) {
+            runtest.pass("EGLDevice::swapPbuffers()");
+        } else {
+            runtest.fail("EGLDevice::swapPbuffers()");
+        }
     } else {
-        runtest.fail("EGLDevice::swapPbuffers()");
+        runtest.untested("EGLDevice::swapPbuffers()");
     }
 
     egl.makePbufferCurrent(1);
     EGLSurface surf4 = eglGetCurrentSurface(EGL_DRAW);
-    if ((egl.getWidth(surf4) == 300) && ((egl.getHeight(surf4) == 300))) {
-        runtest.pass("EGLDevice::makePbufferCurrent(int)");
+    if (hwinit) {
+        if ((egl.getWidth(surf4) == 300) && ((egl.getHeight(surf4) == 300))) {
+            runtest.pass("EGLDevice::makePbufferCurrent(int)");
+        } else {
+            runtest.fail("EGLDevice::makePbufferCurrent(int)");
+        }
     } else {
-        runtest.fail("EGLDevice::makePbufferCurrent(int)");
+        runtest.untested("EGLDevice::makePbufferCurrent(int)");
     }
 
     // This should trigger an error as the number is more than we
     // have created
-    if (!egl.makePbufferCurrent(10)) {
-        runtest.pass("EGLDevice::makePbufferCurrent(maxed)");
+    if (hwinit) {
+        if (!egl.makePbufferCurrent(10)) {
+            runtest.pass("EGLDevice::makePbufferCurrent(maxed)");
+        } else {
+            runtest.fail("EGLDevice::makePbufferCurrent(maxed)");
+        }
     } else {
-        runtest.fail("EGLDevice::makePbufferCurrent(maxed)");
+        runtest.untested("EGLDevice::makePbufferCurrent(maxed)");
     }
     
 #if 0
