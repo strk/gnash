@@ -184,15 +184,21 @@ deb-edit-changelog:
 	  if test -e /etc/lsb-release; then \
             . /etc/lsb-release; \
 	    dist=$${DISTRIB_CODENAME}; \
-	  else \
+	  fi; \
+	  if test x"$${dist}" = x; then \
 	    if test -x /usr/bin/lsb_release; then \
-	      dist=`lsb_release -d | cut -d ' ' -f 4 | sed -e "s:(::" -e "s:)::"`; \
+	      dist="`lsb_release -cs`"; \
 	    else \
 	      dist="lenny"; \
 	    fi; \
 	  fi; \
 	else \
 	  dist=$(DIST); \
+	fi; \
+	if test -z "$$dist" ; then \
+	  echo "Missing distribution name"; exit 1; \
+	else \
+	  echo "Building for distribution '$$dist''"; \
 	fi; \
 	if test -e $(BUILD_DIR)/debian/changelog; then \
 	  mv -f $(BUILD_DIR)/debian/changelog $(BUILD_DIR)/debian/changelog.orig; \
