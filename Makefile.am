@@ -138,6 +138,7 @@ revno.h:
 	    lastmod=0; \
 	  fi; \
 	  if test $${nowmod} -gt $${lastmod}; then \
+            echo "Getting build info for revno.h"; \
 	    rm -f .lastmod; echo "$${nowmod}" > .lastmod; \
             revno="`cd $(top_srcdir) ; $(GIT) log | grep '^commit' | wc -l`"; \
             comm_id="`cd $(top_srcdir) ; $(GIT) rev-parse --short HEAD`"; \
