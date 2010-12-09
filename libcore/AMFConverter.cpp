@@ -156,10 +156,7 @@ Writer::writeObject(as_object* obj)
                         "with index %d and value %g"), idx, d);
 #endif
             _buf.appendByte(DATE_AMF0);
-
-            // This actually only swaps on little-endian machines
-            swapBytes(&d, 8);
-            _buf.append(&d, 8);
+            writePlainNumber(_buf, d);
 
             // This should be timezone
             boost::uint16_t tz = 0; 
@@ -479,7 +476,7 @@ Reader::readArray()
         // followed by an OBJECT_END_AMF0 (0x09) byte
         if (!strlen) {
             // expect an object terminator here
-            if (*_pos != amf::OBJECT_END_AMF0) {
+            if (*_pos != OBJECT_END_AMF0) {
                 log_error("MALFORMED AMF: empty member name not "
                         "followed by OBJECT_END_AMF0 byte");
             }
@@ -527,7 +524,7 @@ Reader::readObject()
     std::string keyString;
     for (;;) {
 
-        if (!operator()(tmp, amf::STRING_AMF0)) {
+        if (!operator()(tmp, STRING_AMF0)) {
             throw AMFException("Could not read object property name");
         }
         keyString = tmp.to_string();
@@ -576,7 +573,7 @@ Reader::readReference()
 as_value
 Reader::readDate()
 {
-    const double d = amf::readNumber(_pos, _end);
+    const double d = readNumber(_pos, _end);
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
     log_debug("amf0 read date: %e", dub);

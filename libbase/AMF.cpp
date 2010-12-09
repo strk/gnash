@@ -34,8 +34,17 @@
 // #define GNASH_DEBUG_AMF_SERIALIZE 1
 
 namespace gnash {
-
 namespace amf {
+
+namespace {
+    /// Swap bytes in raw data.
+    //
+    ///	This only swaps bytes if the host byte order is little endian.
+    ///
+    /// @param word The address of the data to byte swap.
+    /// @param size The number of bytes in the data.
+    void swapBytes(void* word, size_t size);
+}
 
 bool
 readBoolean(const boost::uint8_t*& pos, const boost::uint8_t* _end)
@@ -142,6 +151,13 @@ writePlainString(SimpleBuffer& buf, const std::string& str, Type t)
 }
 
 void
+writePlainNumber(SimpleBuffer& buf, double d)
+{
+    swapBytes(&d, 8);
+    buf.append(&d, 8);
+}
+
+void
 write(SimpleBuffer& buf, const std::string& str)
 {
     Type t = str.size() < 65536 ? STRING_AMF0 : LONG_STRING_AMF0;
@@ -153,8 +169,7 @@ void
 write(SimpleBuffer& buf, double d)
 {
     buf.appendByte(NUMBER_AMF0);
-    swapBytes(&d, 8);
-    buf.append(&d, 8);
+    writePlainNumber(buf, d);
 }
 
 void
@@ -163,6 +178,8 @@ write(SimpleBuffer& buf, bool b)
     buf.appendByte(BOOLEAN_AMF0);
     buf.appendByte(b ? 1 : 0);
 }
+
+namespace {
 
 void
 swapBytes(void* word, size_t size)
@@ -189,6 +206,7 @@ swapBytes(void* word, size_t size)
     std::reverse(x, x + size);
 }
 
+} // unnamed namespace
 
 } // namespace amf
 } // namespace gnash

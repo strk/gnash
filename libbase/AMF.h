@@ -177,6 +177,11 @@ DSOEXPORT void write(SimpleBuffer& buf, bool b);
 DSOEXPORT void writePlainString(SimpleBuffer& buf, const std::string& str,
         Type t);
 
+/// Write a number to an AMF buffer.
+//
+/// This function writes the double value without a type byte.
+DSOEXPORT void writePlainNumber(SimpleBuffer& buf, double d);
+
 /// Encode a string-value pair.
 //
 /// This is used for object properties; the string is always encoded with
@@ -188,16 +193,6 @@ writeProperty(SimpleBuffer& buf, const std::string& name, const T& t)
     writePlainString(buf, name, STRING_AMF0);
     write(buf, t);
 }
-
-/// Swap bytes in raw data.
-//
-///	This only swaps bytes if the host byte order is little endian.
-///
-/// @param word The address of the data to byte swap.
-/// @param size The number of bytes in the data.
-/// @return A pointer to the raw data.
-DSOEXPORT void swapBytes(void* word, size_t size);
-
 
 } // namespace amf
 } // namespace gnash
