@@ -142,6 +142,10 @@ if test -z "$NO_LIBTOOLIZE" ; then
   # possible these files are being regenerated on a machine with a
   # different version of libtoolize.
   rm -fr libltdl
+  # delete the old libtool config macros too, or things break when downgrading
+  # to libtool 1.x.
+  rm -fr macros/libtool.m4 macros/ltdl.m4 macros/ltoptions.m4
+  rm -fr macros/ltsugar.m4 macros/ltversion.m4 macros/lt~obsolete.m4
   if ${LIBTOOLIZE:-libtoolize} ${libtoolflags}; then
     # libtool insists on including config.h, but we use gnashconfig.h
     # to avoid any problems, so we have to change this include
@@ -192,24 +196,26 @@ do
         aclocalinclude="-I cygnal ${aclocalinclude}"
      fi
 
-     if test -d libltdl/m4; then
-        aclocalinclude="-I libltdl/m4 -I macros $ACLOCAL_FLAGS"
+     # libtoolize 1.x puts the additional config files in the top level libltdl
+     # libtoolize puits them in ourt own macros subdirectory.
+     if test -f libltdl/acinclude.m4; then
+        aclocalinclude="-I libltdl ${aclocalinclude}"
      fi
 
-      if grep "^AM_GLIB_GNU_GETTEXT" configure.ac >/dev/null; then
-	echo "Creating $dr/aclocal.m4 ..."
-	test -r $dr/aclocal.m4 || touch $dr/aclocal.m4
-	echo "Making $dr/aclocal.m4 writable ..."
-	test -r $dr/aclocal.m4 && chmod u+w $dr/aclocal.m4
-      fi
-      if grep "^AC_PROG_INTLTOOL" configure.ac >/dev/null; then
-        echo "Running intltoolize --copy --force --automake ..."
-	${INTLTOOLIZE:-intltoolize} --copy --force --automake
-      fi
-      if grep "^AM_PROG_XML_I18N_TOOLS" configure.ac >/dev/null; then
-        echo "Running xml-i18n-toolize --copy --force --automake..."
-	xml-i18n-toolize --copy --force --automake
-      fi
+     if grep "^AM_GLIB_GNU_GETTEXT" configure.ac >/dev/null; then
+       echo "Creating $dr/aclocal.m4 ..."
+       test -r $dr/aclocal.m4 || touch $dr/aclocal.m4
+       echo "Making $dr/aclocal.m4 writable ..."
+       test -r $dr/aclocal.m4 && chmod u+w $dr/aclocal.m4
+     fi
+     if grep "^AC_PROG_INTLTOOL" configure.ac >/dev/null; then
+       echo "Running intltoolize --copy --force --automake ..."
+       ${INTLTOOLIZE:-intltoolize} --copy --force --automake
+     fi
+     if grep "^AM_PROG_XML_I18N_TOOLS" configure.ac >/dev/null; then
+       echo "Running xml-i18n-toolize --copy --force --automake..."
+       xml-i18n-toolize --copy --force --automake
+     fi
 #       if grep "^AC_PROG_LIBTOOL" configure.ac >/dev/null; then
 # 	if test -z "$NO_LIBTOOLIZE" ; then 
 # 	  echo "Running libtoolize --force --copy ..."
@@ -217,7 +223,7 @@ do
 # 	fi
 #       fi
       echo "Running aclocal $aclocalinclude ..."
-      ${ACLOCAL:-aclocal} $aclocalinclude
+      ${ACLOCAL:-aclocal} ${aclocalinclude}
       if grep "^A[CM]_CONFIG_HEADER" configure.ac >/dev/null; then
 	echo "Running autoheader..."
 	${AUTOHEADER:-autoheader}
