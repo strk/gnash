@@ -123,6 +123,12 @@ BUILT_SOURCES = revno.h .configline
 # keep the current revno.h file (which should be part of any distribution).
 # It's primarily used by the testsuites and when building binary packages
 # from multiple branches.
+#
+# This ia a big hack around makes's built in dependency checking, as the
+# key file here isn't part of the normal files. In the source tree for
+# developers, the .git/index files changes on any commits or pulls. We
+# only want to regenerate this file if that file changes, so we have to
+# do the dependency check ourselves.
 revno.h:
 	@if test -d $(top_srcdir)/.git; then \
 	  nowmod="$(shell stat -c "%X" $(top_srcdir)/.git/index)"; \
@@ -144,14 +150,14 @@ revno.h:
         fi; \
 	if test $${nowmod} -gt $${lastmod}; then \
           echo "Generating revno.h ($${nick} $${revno} $${comm_id})"; \
-          echo "static const char* BRANCH_REVNO  = \"$${revno}\";" > $(top_builddir)/revno.h; \
-          echo "static const char* BRANCH_NICK = \"$${nick}\";" >> $(top_builddir)/revno.h; \
-          echo "static const char* COMMIT_ID = \"$${comm_id}\";" >> $(top_builddir)/revno.h; \
+          echo "static const char* BRANCH_REVNO  = \"$${revno}\";" > revno.h; \
+          echo "static const char* BRANCH_NICK = \"$${nick}\";" >> revno.h; \
+          echo "static const char* COMMIT_ID = \"$${comm_id}\";" >> revno.h; \
 	fi
 
-.configline: config.log
+.configline: revno.h
 	-@rm -f .configline
-	@head config.log | grep " .*/configure " | sed -e 's:^  . .*configure ::' > .configline*s
+	@head config.log | grep " .*/configure " | sed -e 's:^  . .*configure ::' > .configline
 
 #
 # Precompiled header support
