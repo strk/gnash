@@ -532,7 +532,10 @@ usage(std::ostream& os, const po::options_description& opts)
 void
 version_and_copyright(std::ostream& os)
 {
-    os << "Gnash " << VERSION << "\n\n"
+    os << "Gnash "
+       << VERSION " ("
+       << BRANCH_NICK << "-" << BRANCH_REVNO << "-" << COMMIT_ID
+       << ")" << endl << endl
        << _("Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 "
             "Free Software Foundation, Inc.\n"
             "Gnash comes with NO WARRANTY, to the extent permitted "
@@ -544,15 +547,14 @@ version_and_copyright(std::ostream& os)
 void
 build_options(std::ostream& os)
 {
-    os << _("Build options ") << VERSION << "\n"
-	   << _("   Renderers: ") << RENDERER_CONFIG << "\n"
-	   << _("   Hardware Acceleration: ") << HWACCEL_CONFIG << "\n"
-	   << _("   GUI: ") << GUI_CONFIG << "\n"
-	   << _("   Media handlers: ") << MEDIA_CONFIG << "\n"
+    os << _("Build options ") << endl
+	   << _("   Renderers: ") << RENDERER_CONFIG << endl
+	   << _("   Hardware Acceleration: ") << HWACCEL_CONFIG << endl
+	   << _("   GUI: ") << GUI_CONFIG << endl
+	   << _("   Media handlers: ") << MEDIA_CONFIG << endl
         
-	   << _("   Configured with: ") << CONFIG_CONFIG << "\n"
-	   << _("   CXXFLAGS: ") << CXXFLAGS << "\n"
-	   << _("   Version: ")  << BRANCH_NICK << ":" << BRANCH_REVNO << "\n";
+	   << _("   Configured with: ") << CONFIG_CONFIG << endl
+	   << _("   CXXFLAGS: ") << CXXFLAGS << endl;
 }
 
 
