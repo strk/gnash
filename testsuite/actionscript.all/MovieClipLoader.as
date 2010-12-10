@@ -51,6 +51,9 @@ check(!mcl.hasOwnProperty('loadClip'));
 check_equals(typeOf(mcl.unloadClip), 'function');
 check(!mcl.hasOwnProperty('unloadClip'));
 
+ret = mcl.unloadClip();
+check_equals(ret, undefined);
+
 check_equals(typeOf(mcl.getProgress), 'function');
 check(!mcl.hasOwnProperty('getProgress'));
 
@@ -373,7 +376,7 @@ function test3()
 	// subtract the number of progress callback runs reported when playing from the totals to get the correct number
 	// BUT MAKE SURE nextTestOrEnd CONTAINS THE CORRECT testsPerProgressCallback INFO !!
 	//
-	expected.totals = 84;
+	expected.totals = 85;
 	// gnash doesn't call onLoadInit if the data at the url is not an SWF or JPG
 	// (or whatever else can become a movie_instance), while the PP does.
 	// So in this testcase, the attempt to load vars.txt is invalid for Gnash
