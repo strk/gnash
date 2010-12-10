@@ -18,11 +18,17 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "XMLSocket_as.h"
 
+#include <boost/thread.hpp>
+#include <boost/scoped_array.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <string>
+
+#include "namedStrings.h"
 #include "GnashSystemFDHeaders.h"
 #include "utility.h"
 #include "Socket.h"
-#include "XMLSocket_as.h"
 #include "as_function.h"
 #include "movie_root.h"
 #include "fn_call.h"
@@ -33,12 +39,6 @@
 #include "URLAccessManager.h"
 #include "Global_as.h" 
 #include "log.h"
-
-#include "namedStrings.h"
-#include <boost/thread.hpp>
-#include <boost/scoped_array.hpp>
-#include <boost/scoped_ptr.hpp>
-#include <string>
 
 #undef GNASH_XMLSOCKET_DEBUG
 
@@ -132,7 +132,6 @@ XMLSocket_as::~XMLSocket_as()
 void
 XMLSocket_as::update()
 {
-
     // This function should never be called unless a connection is active 
     // or a connection attempt is being made.
 
@@ -261,7 +260,6 @@ XMLSocket_as::checkForIncomingData()
 
 }
 
-
 // XMLSocket.send doesn't return anything, so we don't need
 // to here either.
 void
@@ -316,7 +314,14 @@ xmlsocket_connect(const fn_call& fn)
                     "connected, ignored"));
         return as_value(false);
     }
-    
+ 
+    if (!fn.nargs) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("XMLSocket.connect() needs at least one argument"));
+        );
+        return as_value();
+    }
+
     as_value hostval = fn.arg(0);
     const std::string& host = hostval.to_string();
     const double port = toNumber(fn.arg(1), getVM(fn));
@@ -350,6 +355,12 @@ as_value
 xmlsocket_send(const fn_call& fn)
 {
     XMLSocket_as* ptr = ensure<ThisIsNative<XMLSocket_as> >(fn);
+    if (!fn.nargs) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("XMLSocket.send() needs at least one argument"));
+        );
+        return as_value();
+    }
     const std::string& str = fn.arg(0).to_string();
     ptr->send(str);
     return as_value();
@@ -363,7 +374,6 @@ as_value
 xmlsocket_close(const fn_call& fn)
 {
     XMLSocket_as* ptr = ensure<ThisIsNative<XMLSocket_as> >(fn);
-
     ptr->close();
     return as_value();
 }
@@ -371,7 +381,7 @@ xmlsocket_close(const fn_call& fn)
 as_value
 xmlsocket_new(const fn_call& fn)
 {
-    as_object* obj = fn.this_ptr;
+    as_object* obj = ensure<ValidThis>(fn);
     obj->setRelay(new XMLSocket_as(obj));
     return as_value();
 }
@@ -379,26 +389,7 @@ xmlsocket_new(const fn_call& fn)
 as_value
 xmlsocket_onData(const fn_call& fn)
 {
-   
-    if (!fn.nargs) {
-        IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Builtin XMLSocket.onData() needs an argument"));
-        );
-        return as_value();
-    }
-
-    const std::string& xmlin = fn.arg(0).to_string();
-
-#ifdef GNASH_XMLSOCKET_DEBUG
-    log_debug("Arg: %s, val: %s", xmlin, fn.arg(0));
-#endif
-
-    if (xmlin.empty()) {
-        log_error(_("Builtin XMLSocket.onData() called with an argument "
-                        "that resolves to an empty string: %s"), fn.arg(0));
-        return as_value();
-    }
-
+    const as_value& xmlin = fn.nargs ? fn.arg(0).to_string() : as_value();
 
     Global_as& gl = getGlobal(fn);
     as_function* ctor = getMember(gl, NSV::CLASS_XML).to_function();
