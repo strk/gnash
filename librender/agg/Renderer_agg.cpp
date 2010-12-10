@@ -190,10 +190,10 @@ inline void applyClipBox(Rasterizer& ras, const geometry::Range2d<int>& bounds)
 {
     assert(bounds.isFinite());
     ras.clip_box(static_cast<double>(bounds.getMinX()),
-            static_cast<double>(bounds.getMinY()),
-            static_cast<double>(bounds.getMaxX() + 1), 
-            static_cast<double>(bounds.getMaxY() + 1)
-            );  
+		 static_cast<double>(bounds.getMinY()),
+		 static_cast<double>(bounds.getMaxX() + 1), 
+		 static_cast<double>(bounds.getMaxY() + 1)
+	);
 }
 
 /// Analyzes a set of paths to detect real presence of fills and/or outlines
@@ -206,13 +206,13 @@ analyzePaths(const GnashPaths &paths, bool& have_shape,
 
     have_shape = false;
     have_outline = false;
-
+    
     const int pcount = paths.size();
-
+    
     for (int pno=0; pno<pcount; ++pno) {
-
+	
         const Path &the_path = paths[pno];
-
+	
         if ((the_path.m_fill0 > 0) || (the_path.m_fill1 > 0)) {
             have_shape = true;
             if (have_outline) return; // have both
@@ -811,13 +811,13 @@ public:
       m_display_height(0.0),
       m_drawing_mask(false)
   {
-    // TODO: we really don't want to set the scale here as the core should
-    // tell us the right values before rendering anything. However this is
-    // currently difficult to implement. Removing the next call will
-    // lead to an assertion failure in begin_display() because we check
-    // whether the scale is known there.
-    set_scale(1.0f, 1.0f);
-	GNASH_REPORT_FUNCTION;
+      // TODO: we really don't want to set the scale here as the core should
+      // tell us the right values before rendering anything. However this is
+      // currently difficult to implement. Removing the next call will
+      // lead to an assertion failure in begin_display() because we check
+      // whether the scale is known there.
+      set_scale(1.0f, 1.0f);
+      GNASH_REPORT_FUNCTION;
   }   
 
   /// Initializes the rendering buffer. The memory pointed by "mem" is not
@@ -851,29 +851,26 @@ public:
       float /*x0*/, float /*x1*/, float /*y0*/, float /*y1*/)
   {
 	GNASH_REPORT_FUNCTION;
-    assert(m_pixf.get());
-    
-    assert(scale_set);
-
-    // Render images list is cleared here because the GUI may want
+	assert(m_pixf.get());
+	
+	assert(scale_set);
+	
+	// Render images list is cleared here because the GUI may want
     // them for display after ::end_display()
     _render_images.clear();
 
     // clear the stage using the background color
-    if ( ! _clipbounds.empty() )
-    {
+    if ( ! _clipbounds.empty() ) {
         const agg::rgba8& col = agg::rgba8_pre(bg.m_r, bg.m_g, bg.m_b, bg.m_a);
         for (ClipBounds::const_iterator i = _clipbounds.begin(),
-                e = _clipbounds.end(); i!= e; ++i) 
-        {
-            clear_framebuffer(*i, col);
-        }
+		 e = _clipbounds.end(); i!= e; ++i) {
+	    clear_framebuffer(*i, col);
+	}
     }
     
     // reset status variables
     m_drawing_mask = false;
   }
-  
  
     virtual Renderer* startInternalRender(image::GnashImage& im) {
 	GNASH_REPORT_FUNCTION;
@@ -2198,81 +2195,54 @@ DSOEXPORT const char *agg_detect_pixel_format(unsigned int rofs,
         unsigned int rsize, unsigned int gofs, unsigned int gsize,
         unsigned int bofs, unsigned int bsize, unsigned int bpp)
 {
-  
-  if (!is_little_endian_host() && (bpp>=24)) {
-  
-    // Swap bits for big endian hosts, because the following tests assume
-    // little endians. The pixel format string matches the bytes in memory.
     
-    // This applies for 24 bpp and 32 bpp modes only because AGG uses arrays
-    // in the premultiply() implementation for these modes. 16 bpp modes 
-    // instead use bit shifting, which is transparent to host endianess.
-    // See bug #22799.
+    if (!is_little_endian_host() && (bpp>=24)) {
+	
+	// Swap bits for big endian hosts, because the following tests assume
+	// little endians. The pixel format string matches the bytes in memory.
+	
+	// This applies for 24 bpp and 32 bpp modes only because AGG uses arrays
+	// in the premultiply() implementation for these modes. 16 bpp modes 
+	// instead use bit shifting, which is transparent to host endianess.
+	// See bug #22799.
+	
+	rofs = bpp - rofs - rsize;
+	gofs = bpp - gofs - gsize;
+	bofs = bpp - bofs - bsize; 
+	
+    }
     
-    rofs = bpp - rofs - rsize;
-    gofs = bpp - gofs - gsize;
-    bofs = bpp - bofs - bsize; 
-  
-  }
-  
-  // 15 bits RGB (hicolor)
-  if ((rofs==10) && (rsize==5)
-   && (gofs==5) && (gsize==5)
-   && (bofs==0) && (bsize==5) ) {
-   
-    return "RGB555";
-      
-  } else   
-  // 16 bits RGB (hicolor)
-  if ((rofs==11) && (rsize==5)
-   && (gofs==5) && (gsize==6)
-   && (bofs==0) && (bsize==5) ) {
-   
-    return "RGB565";
-      
-  } else   
-  
-  // 24 bits RGB (truecolor)
-  if ((rofs==16) && (rsize==8)
-   && (gofs==8) && (gsize==8)
-   && (bofs==0) && (bsize==8) ) {
-   
-    if (bpp==24)
-      return "BGR24";
-    else
-      return "BGRA32";
-      
-  } else   
-  // 24 bits BGR (truecolor)
-  if ((rofs==0) && (rsize==8)
-   && (gofs==8) && (gsize==8)
-   && (bofs==16) && (bsize==8)) {
-   
-    if (bpp==24)
-      return "RGB24";
-    else
-      return "RGBA32";
-      
-  } else
-  // special 32 bits (mostly on big endian hosts)
-  if ((rofs==8) && (rsize==8)
-   && (gofs==16) && (gsize==8)
-   && (bofs==24) && (bsize==8)) {
-   
-   return "ARGB32";
-   
-  } else
-  // special 32 bits (mostly on big endian hosts)
-  if ((rofs==24) && (rsize==8)
-   && (gofs==16) && (gsize==8)
-   && (bofs==8) && (bsize==8)) {
-   
-   return "ABGR32";
-   
-  }
-  
-  return NULL; // unknown format
-  
+    // 15 bits RGB (hicolor)
+    if ((rofs == 10) && (rsize == 5)
+	&& (gofs == 5) && (gsize == 5)
+	&& (bofs == 0) && (bsize == 5)) {
+	return "RGB555";
+    } else if ((rofs == 11) && (rsize == 5)	// 16 bits RGB (hicolor)
+	       && (gofs == 5) && (gsize == 6)
+	       && (bofs == 0) && (bsize == 5)) {
+	return "RGB565";
+    } else if ((rofs == 16) && (rsize == 8)	// 24 bits RGB (truecolor)
+	       && (gofs == 8) && (gsize == 8)
+	       && (bofs == 0) && (bsize == 8)) {
+	// BGRA32 seems to be standard for linux desktops
+	return (bpp == 24) ? "BGR24" : "BGRA32";
+    } else if ((rofs == 0) && (rsize == 8) // 24 bits BGR (truecolor)
+	       && (gofs == 8) && (gsize == 8)
+	       && (bofs == 16) && (bsize == 8)) {
+	return (bpp == 24) ? "RGB24" : "RGBA32";
+	// special 32 bits (mostly on big endian hosts
+    } else if ((rofs==8) && (rsize==8)
+	       && (gofs==16) && (gsize==8)
+	       && (bofs==24) && (bsize==8)) {
+	return "ARGB32";
+	// special 32 bits (mostly on big endian hosts)
+    } else if ((rofs==24) && (rsize==8)
+	       && (gofs==16) && (gsize==8)
+	       && (bofs==8) && (bsize==8)) {
+	return "ABGR32";
+    }
+    
+    return NULL; // unknown format
 }
 
 } // end of namespace gnash
