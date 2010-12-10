@@ -132,6 +132,7 @@ ASTESTS =			\
 	ops.as			\
 	toString_valueOf.as	\
 	Rectangle.as		\
+	argstest.as		\
 	$(NULL)
 
 if HAVE_PERL
