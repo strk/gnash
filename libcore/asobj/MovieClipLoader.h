@@ -24,6 +24,7 @@
 namespace gnash {
 
 class as_object;
+class ObjectURI;
 
 /// Initialize the global MovieClipLoader class
 void moviecliploader_class_init(as_object& global, const ObjectURI& uri);

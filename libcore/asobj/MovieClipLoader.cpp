@@ -18,6 +18,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "MovieClipLoader.h"
+
+#include <string>
+
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "as_value.h"
 #include "as_object.h" // for inheritance
@@ -28,8 +32,6 @@
 #include "MovieClip.h"
 #include "DisplayObject.h" // for loadClip (get_parent)
 #include "log.h"
-#include "URL.h" // for url parsing
-#include "VM.h" // for the string table.
 #include "VM.h" // for the string table.
 #include "builtin_function.h"
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
@@ -37,12 +39,9 @@
 #include "ExecutableCode.h"
 #include "NativeFunction.h"
 
-#include <string>
-
 //#define GNASH_DEBUG 1
 
 namespace gnash {
-
 
 // Forward declarations
 namespace {
@@ -88,7 +87,6 @@ namespace {
 void
 attachMovieClipLoaderInterface(as_object& o)
 {
-
     const int flags = PropFlags::onlySWF7Up;
 
     VM& vm = getVM(o);
@@ -96,13 +94,11 @@ attachMovieClipLoaderInterface(as_object& o)
   	o.init_member("loadClip", vm.getNative(112, 100), flags);
 	o.init_member("getProgress", vm.getNative(112, 101), flags);
 	o.init_member("unloadClip", vm.getNative(112, 102), flags);
-
 }
 
 as_value
 moviecliploader_loadClip(const fn_call& fn)
 {
-
     as_object* ptr = ensure<ValidThis>(fn);
   
 	if (fn.nargs < 2) {
@@ -181,9 +177,7 @@ moviecliploader_new(const fn_call& fn)
 as_value
 moviecliploader_getProgress(const fn_call& fn)
 {
-
-	if ( ! fn.nargs )
-	{
+	if (!fn.nargs) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("MovieClipLoader.getProgress(): missing argument"));
 		);
@@ -208,7 +202,6 @@ moviecliploader_getProgress(const fn_call& fn)
 		);
 		return as_value();
 	}
-
 
 	as_object* mcl_obj = new as_object(getGlobal(fn));
 
