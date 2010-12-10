@@ -456,16 +456,11 @@ loadableobject_send(const fn_call& fn)
 {
     as_object* obj = ensure<ValidThis>(fn);
  
-    std::ostringstream os;
-    fn.dump_args(os);
-    log_debug("XML.send(%s) / LoadVars.send() TESTING", os.str());
-
     std::string target;
     std::string url;
     std::string method;
 
-    switch (fn.nargs)
-    {
+    switch (fn.nargs) {
         case 0:
             return as_value(false);
         case 3:
