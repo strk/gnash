@@ -189,7 +189,7 @@ AC_DEFUN([GNASH_PATH_KDE3],
           KDE3_PREFIX="${kde3_prefix}"
           ;;
         prefix)
-        	KDE3_PREFIX="${prefix}"
+        	KDE3_PREFIX="\${prefix}"
           ;;
       esac
     fi
