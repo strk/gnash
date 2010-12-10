@@ -649,6 +649,7 @@ AC_ARG_ENABLE(gui,
   done],
   [ dnl Run the following code if no --enable-gui is given
   build_fb=auto
+  build_sdl=auto
   if test x"${openbsd_os}" = x"openbsd"; then
     build_kde3=yes;
     build_gtk=yes;
@@ -805,6 +806,25 @@ fi
 
 MEDIA_CONFIG="${media_list}"
 AC_SUBST(MEDIA_CONFIG)
+
+dnl -----------------------------------------------------
+dnl Check for SDL and decide about auto gui accordingly.
+dnl Need be done after build_sound_sdl and build_sdl are
+dnl initialized and before they are checked for yes/no
+dnl -----------------------------------------------------
+
+if test x$build_sdl != xno -o x$build_sound_sdl = xyes; then
+  GNASH_PATH_SDL
+fi
+
+if test x"${build_sdl}" = xauto; then
+  if test xyes = x"${has_sdl}"; then
+    build_sdl=yes
+  else
+    AC_MSG_NOTICE([sdl GUI won't be built (no sdl development files found)])
+    build_sdl=no
+  fi
+fi
 
 
 dnl -------------------------------
@@ -2383,10 +2403,6 @@ AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 
 dnl currently unused
 dnl GNASH_PKG_FIND(ogg, [ogg.h], [decode ogg streams], ogg_stream_init)
-
-if test x$build_sdl = xyes -o x$build_sound_sdl = xyes; then
-  GNASH_PATH_SDL
-fi
 
 dnl Qtopia is a desktop environment for embedded devices.
 dnl GNASH_PATH_QTOPIA3
