@@ -99,6 +99,17 @@ namespace {
 // Utility classes
 namespace {
 
+/// Execute an ActiveRelay if the object has that type.
+struct ExecuteCallback
+{
+    void operator()(const as_object* o) const {
+        ActiveRelay* a;
+        if (isNativeType(o, a)) {
+            a->update();
+        }
+    }
+};
+
 /// Identify and delete ExecutableCode that matches a particular target.
 class RemoveTargetCode
 {
@@ -1439,14 +1450,29 @@ movie_root::executeAdvanceCallbacks()
 
     if (!_objectCallbacks.empty()) {
 
-        // Copy it, as the call can change the original, which is not only 
-        // bad for invalidating iterators, but also allows infinite recursion.
-        std::vector<ActiveRelay*> currentCallbacks;
-        std::copy(_objectCallbacks.begin(), _objectCallbacks.end(),
-                std::back_inserter(currentCallbacks));
+        // We have two considerations:
+        // 1. any update can change the active callbacks by removing or
+        //    adding to the original callbacks list.
+        // 2. Additionally, an as_object may destroy its own Relay. This can
+        //    happen if the callback itself calls a native constructor on
+        //    an object that already has a Relay. If this is an ActiveRelay
+        //    registered with movie_root, a pointer to the destroyed object
+        //    will still be held, resulting in memory corruption. This is an
+        //    *extremely* unlikely case, but we are very careful!
+        //
+        // By copying to a new container we avoid errors caused by changes to
+        // the original set (such as infinite recursions or invalidated
+        // iterators). We also know that no as_object will be destroyed
+        // during processing, even though its Relay may be.
+        std::vector<as_object*> currentCallbacks;
 
-        std::for_each(currentCallbacks.begin(), currentCallbacks.end(), 
-                std::mem_fun(&ActiveRelay::update));
+        std::transform(_objectCallbacks.begin(), _objectCallbacks.end(),
+            std::back_inserter(currentCallbacks),
+            boost::bind(CreatePointer<as_object>(),
+                boost::bind(std::mem_fun(&ActiveRelay::owner), _1)));
+
+        std::for_each(currentCallbacks.begin(), currentCallbacks.end(),
+                ExecuteCallback());
     }
 
     if (!_loadCallbacks.empty()) {

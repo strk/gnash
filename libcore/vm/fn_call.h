@@ -239,7 +239,7 @@ template<typename T>
 struct ThisIsNative
 {
     typedef T value_type;
-    value_type* operator()(as_object* o) const {
+    value_type* operator()(const as_object* o) const {
         return dynamic_cast<value_type*>(o->relay());
     }
 };
@@ -251,7 +251,7 @@ template<typename T = DisplayObject>
 struct IsDisplayObject
 {
     typedef T value_type;
-    value_type* operator()(as_object* o) const {
+    value_type* operator()(const as_object* o) const {
         if (!o) return 0;
         return dynamic_cast<T*>(o->displayObject());
     }

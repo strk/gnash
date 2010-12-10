@@ -54,7 +54,8 @@ struct FirstElement
 template<typename T>
 struct CreatePointer
 {
-    const T* operator()(const T& t) { 
+    typedef T* result_type;
+    result_type operator()(T& t) { 
         return &t;
     }
 };
