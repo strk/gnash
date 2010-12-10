@@ -40,7 +40,7 @@
 
 namespace gnash {
 
-namespace device {
+namespace renderer {
 
 namespace directfb {
     
@@ -1239,7 +1239,7 @@ DirectFBDevice::printFBInputDevice(IDirectFBInputDevice *input)
 }
 
 } // namespace directfb
-} // namespace device
+} // namespace renderer
 } // namespace gnash
 
 // local Variables:

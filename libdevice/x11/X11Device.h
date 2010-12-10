@@ -39,7 +39,7 @@
 
 namespace gnash {
 
-namespace device {
+namespace renderer {
 
 namespace x11 {
 
@@ -128,7 +128,7 @@ typedef void (*draw_func)();
 typedef int  (*key_func)(unsigned key);
 
 } // namespace x11
-} // namespace device
+} // namespace renderer
 } // namespace gnash
 
 #endif  // end of __X11_DEVICE_H__

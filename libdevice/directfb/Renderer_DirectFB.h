@@ -38,7 +38,7 @@ namespace gnash {
 class GnashImage;
 class SWFCxForm;
 
-namespace device {
+namespace renderer {
 
 namespace DirectFB {
 
@@ -102,8 +102,8 @@ public:
 
 DSOEXPORT Renderer* create_handler(const char *pixelformat);
 
-} // namespace gnash::device::DirectFB
-} // namespace gnash::device
+} // namespace gnash::renderer::DirectFB
+} // namespace gnash::renderer
 } // namespace gnash
 
 #endif // __RENDER_HANDLER_DIRECTFB_H__
