@@ -632,7 +632,10 @@ AC_ARG_ENABLE(gui,
         ;;
       all|ALL)
         build_dump=yes
-        build_fb=yes
+        dnl BSD doesn't have a framebuffer interface
+        if test x${linux} = xyes; then
+          build_fb=yes
+        fi
         build_kde4=yes
         build_sdl=yes
         ;;
