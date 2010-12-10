@@ -196,8 +196,7 @@ XMLNode_as*
 XMLNode_as::lastChild()
 {
 	if (_children.empty()) {
-			log_debug(_("XMLNode_as %p has no children"), (void*)this);
-			return 0;
+        return 0;
 	}
 	return _children.back();
 }
