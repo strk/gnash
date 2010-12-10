@@ -647,7 +647,9 @@ AC_ARG_ENABLE(gui,
       break;
     fi
   done],
-  [if test x"${openbsd_os}" = x"openbsd"; then
+  [ dnl Run the following code if no --enable-gui is given
+  build_fb=auto
+  if test x"${openbsd_os}" = x"openbsd"; then
     build_kde3=yes;
     build_gtk=yes;
   else if test x"${haiku}" = xyes; then
@@ -657,7 +659,8 @@ AC_ARG_ENABLE(gui,
     build_gtk=yes
     build_dump=auto
   fi
-  fi]
+  fi
+  ]
 )
 
 if test x"${build_haiku}" = xyes; then
@@ -1809,6 +1812,31 @@ if test x"${build_dump}" != xno; then
       AC_MSG_ERROR(dump GUI cannot be built without AGG renderer);
     fi
     build_dump=no
+  fi
+fi
+
+dnl Check possibility to build FB gui, if requested
+dnl FB dependencies are a linux system (linux/fb.h) 
+dnl and AGG renderer
+if test x"${build_fb}" != xno; then
+  if test x"${linux}" = xyes; then
+    if test x"${build_agg}" = xyes; then
+      build_fb=yes
+    else
+      if test x"${build_fb}" = xyes; then
+        dnl SHOULD we just check at the end of file instead ?
+        AC_MSG_ERROR([fb GUI cannot be built without AGG renderer])
+      fi
+      AC_MSG_NOTICE([fb GUI won't be built (needs AGG renderer)])
+      build_fb=no
+    fi
+  else
+    if test x"${build_fb}" = xyes; then
+      dnl SHOULD we just check at the end of file instead ?
+      AC_MSG_ERROR(fb GUI cannot be built on non-linux platforms);
+    fi
+    AC_MSG_NOTICE([fb GUI won't be built (non-linux platform)])
+    build_fb=no
   fi
 fi
 
