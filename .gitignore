@@ -9,11 +9,9 @@
 *est
 *est[0-9]
 *est[0-9][0-9]
-
 .configline
 .deps
 .libs
-
 aclocal.m4
 autom4te.cache
 bzrversion.h
@@ -120,3 +118,6 @@ utilities/flvdumper
 utilities/gprocessor
 utilities/rtmpget
 utilities/soldumper
+extensions/fileio/test.swf
+gui/fb/fb-gnash
+gnash-*
