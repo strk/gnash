@@ -17,8 +17,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-
 #include "XMLNode_as.h"
+
+#include <boost/bind.hpp>
+#include <string>
+#include <sstream>
+#include <vector>
+#include <algorithm>
+
 #include "XML_as.h"
 #include "VM.h"
 #include "log.h"
@@ -27,18 +33,11 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "NativeFunction.h"
-#include "VM.h"
 #include "PropertyList.h"
 #include "Global_as.h"
 #include "Object.h"
 #include "Array_as.h"
-
 #include "namedStrings.h"
-#include <boost/bind.hpp>
-#include <string>
-#include <sstream>
-#include <vector>
-#include <algorithm>
 
 namespace gnash {
 
