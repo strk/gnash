@@ -1684,6 +1684,21 @@ if test x"${has_ssl}" = x"yes"; then
 fi
 
 dnl -----------------------------------------------------------
+dnl Set the general plugins install policy here
+dnl (NOTE: before GNASH_PATH_FIREFOX and GNASH_PATH_KDE*)
+dnl -----------------------------------------------------------
+
+AC_ARG_WITH(plugins-install,
+  AC_HELP_STRING([--with-plugins-install=system|user|prefix], [Policy for plugins install. Default: user.]),
+	[case "${withval}" in
+	  user) PLUGINS_INSTALL_POLICY=user ;;
+	  system) PLUGINS_INSTALL_POLICY=system ;;
+	  prefix) PLUGINS_INSTALL_POLICY=prefix ;;
+	  *)  AC_MSG_ERROR([bad value ${withval} for --with-plugins-install]) ;;
+	 esac 
+	], PLUGINS_INSTALL_POLICY=user) 
+
+dnl -----------------------------------------------------------
 dnl   Verify dependencies for requested GUIs are met, and
 dnl   disable build of the GUIS for which deps are NOT met
 dnl ------------------------------------------------------------
@@ -1970,19 +1985,6 @@ if test x$plugins = xno; then
   build_kparts3=no
   build_kparts4=no
 fi
-
-dnl
-dnl Set the general plugins install policy here
-dnl
-AC_ARG_WITH(plugins-install,
-  AC_HELP_STRING([--with-plugins-install=system|user|prefix], [Policy for plugins install. Default: user.]),
-	[case "${withval}" in
-	  user) PLUGINS_INSTALL_POLICY=user ;;
-	  system) PLUGINS_INSTALL_POLICY=system ;;
-	  prefix) PLUGINS_INSTALL_POLICY=prefix ;;
-	  *)  AC_MSG_ERROR([bad value ${withval} for --with-plugins-install]) ;;
-	 esac 
-	], PLUGINS_INSTALL_POLICY=user) 
 
 
 GNASH_PATH_FIREFOX
