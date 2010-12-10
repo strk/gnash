@@ -2388,8 +2388,6 @@ if test x$build_sdl = xyes -o x$build_sound_sdl = xyes; then
   GNASH_PATH_SDL
 fi
 
-AM_CONDITIONAL(HAVE_SDL, [ test x$has_SDL = xyes ])
-
 dnl Qtopia is a desktop environment for embedded devices.
 dnl GNASH_PATH_QTOPIA3
 dnl GNASH_PATH_QTOPIA4
