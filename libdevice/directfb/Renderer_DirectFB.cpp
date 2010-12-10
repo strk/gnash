@@ -64,7 +64,7 @@
 
 namespace gnash {
 
-namespace renderer {
+namespace device {
 
 namespace DirectFB {
 
@@ -271,8 +271,8 @@ create_handler(const char *pixelformat)
   return renderer;
 }  
 
-} // namespace gnash::renderer::DirectFB
-} // namespace gnash::renderer
+} // namespace gnash::device::DirectFB
+} // namespace gnash::device
 } // end of gnash namespace
 
 // local Variables:

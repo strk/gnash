@@ -59,12 +59,12 @@ class RawFBDevice : public device::GnashDevice
     // Return a string with the error code as text, instead of a numeric value
     const char *getErrorString(int error);
     
-    int getDepth();
+    int getDepth() { return 0; };
 
     // Accessors for the settings needed by higher level code.
     // Surface accessors
-    size_t getWidth();
-    size_t getHeight();
+    size_t getWidth() { return 0; };
+    size_t getHeight() { return 0; };
     
     bool isSingleBuffered() { return true; }
     
@@ -74,17 +74,17 @@ class RawFBDevice : public device::GnashDevice
     // bool isBufferDestroyed(IRAWFBSurface surface) {
     //     return false;
     // }
-    int getID();
+    int getID() { return 0; };
 
     // Get the size of the pixels, for RAWFB it's always 8 as far as I can tell
-    int getRedSize();
-    int getGreenSize();
-    int getBlueSize();
+    int getRedSize() { return 0; };
+    int getGreenSize() { return 0; };
+    int getBlueSize() { return 0; };
     
     // Using RAWFB always means a native renderer
     bool isNativeRender() { return true; }
 
-    native_window_t getDrawableWindow();
+    native_window_t getDrawableWindow() { return 0; };
     
     //
     // Testing Support

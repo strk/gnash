@@ -35,7 +35,7 @@
 /// determine functionality.
 namespace gnash {
 
-namespace renderer {
+namespace device {
 
 struct GnashDevice
 {
@@ -51,12 +51,12 @@ struct GnashDevice
     /// The list of supported renders that use devices
     typedef enum {OPENVG, OPENGL, OPENGLES1, OPENGLES2, XORG, VAAPI} rtype_t;
     /// The list of supported device types
-    typedef enum {NODEV, EGL, DIRECTFB, X11} dtype_t;
+    typedef enum {NODEV, EGL, DIRECTFB, X11, RAWFB} dtype_t;
     
     GnashDevice(int argc, char *argv[]);
-    GnashDevice() { GNASH_REPORT_FUNCTION; };
+    GnashDevice();
     
-    virtual ~GnashDevice() { GNASH_REPORT_FUNCTION; };
+    virtual ~GnashDevice();
 
     /// Get the type of the instatiated device. Since the
     /// renderer has a single value for the supported device,
@@ -114,7 +114,7 @@ struct GnashDevice
     virtual bool isNativeRender() = 0;
 };
 
-} // namespace renderer
+} // namespace device
 } // namespace gnash
 
 #endif  // end of __GNASH_DEVICE_H__

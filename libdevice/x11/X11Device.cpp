@@ -46,7 +46,7 @@
 
 namespace gnash {
 
-namespace renderer {
+namespace device {
 
 namespace x11 {
     
@@ -306,7 +306,7 @@ X11Device::eventLoop(size_t passes)
 }
 
 } // namespace x11
-} // namespace renderer
+} // namespace device
 } // namespace gnash
 
 // local Variables:

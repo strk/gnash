@@ -47,7 +47,7 @@
 
 namespace gnash {
 
-namespace renderer {
+namespace device {
 
 static const EGLint attrib32_list[] = {
     EGL_RED_SIZE,       8,
@@ -55,6 +55,7 @@ static const EGLint attrib32_list[] = {
     EGL_BLUE_SIZE,      8,
 //  EGL_ALPHA_SIZE,     0,
 //  EGL_DEPTH_SIZE,     24,
+#if 0
 #ifdef RENDERER_GLES1
     EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
 #endif
@@ -64,6 +65,7 @@ static const EGLint attrib32_list[] = {
 #ifdef RENDERER_OPENVG
     EGL_RENDERABLE_TYPE, EGL_OPENVG_BIT,
 //    EGL_STENCIL_SIZE,   8,
+#endif
 #endif
     EGL_RENDERABLE_TYPE, EGL_OPENVG_BIT|EGL_OPENGL_ES_BIT|EGL_OPENGL_ES2_BIT,
     EGL_SURFACE_TYPE,   EGL_WINDOW_BIT|EGL_PBUFFER_BIT|EGL_PIXMAP_BIT,
@@ -683,28 +685,33 @@ EGLDevice::printEGLContext(EGLContext context)
 void
 EGLDevice::printEGLSurface(EGLSurface surface)
 {
-    EGLint value;
-    eglQuerySurface(_eglDisplay, surface, EGL_CONFIG_ID, &value);
-    std::cerr << "Surface EGL_CONFIG_ID is " << value << std::endl;
-    eglQuerySurface(_eglDisplay, surface, EGL_HEIGHT, &value);
-    std::cerr << "\tEGL_HEIGHT is " << value<< std::endl;
-    eglQuerySurface(_eglDisplay, surface, EGL_WIDTH, &value);
-    std::cerr << "\tEGL_WIDTH is " << value << std::endl;
-    eglQuerySurface(_eglDisplay, surface, EGL_RENDER_BUFFER, &value);
-    std::cerr << "\tEGL_RENDER_BUFFER is " << std::string((value == EGL_BACK_BUFFER)
-              ? "EGL_BACK_BUFFER" : "EGL_SINGLE_BUFFER") << std::endl;
-    eglQuerySurface(_eglDisplay, surface, EGL_VERTICAL_RESOLUTION, &value);
-    std::cerr << "\tEGL_VERTICAL_RESOLUTION is " << value << std::endl;
-    eglQuerySurface(_eglDisplay, surface, EGL_HORIZONTAL_RESOLUTION, &value);
-    std::cerr << "\tEGL_HORIZONTAL_RESOLUTION is " << value << std::endl;
-    eglQuerySurface(_eglDisplay, surface, EGL_SWAP_BEHAVIOR, &value);
-    std::cerr << "\tEGL_SWAP_BEHAVIOR is "
-              << std::string((value == EGL_BUFFER_DESTROYED)
-                 ? "EGL_BUFFER_DESTROYED" : "EGL_BUFFER_PRESERVED") << std::endl;
-    eglQuerySurface(_eglDisplay, surface, EGL_MULTISAMPLE_RESOLVE, &value);
-    std::cerr << "\tEGL_MULTISAMPLE_RESOLVE is "
-              << std::string((value == EGL_MULTISAMPLE_RESOLVE_BOX)
-                 ? "EGL_MULTISAMPLE_RESOLVE_BOX" : "EGL_MULTISAMPLE_RESOLVE_DEFAULT") << std::endl;
+    if (_eglSurface != EGL_NO_SURFACE) {
+        EGLint value;
+        eglQuerySurface(_eglDisplay, surface, EGL_CONFIG_ID, &value);
+        std::cerr << "Surface EGL_CONFIG_ID is " << value << std::endl;
+        eglQuerySurface(_eglDisplay, surface, EGL_HEIGHT, &value);
+        std::cerr << "\tEGL_HEIGHT is " << value<< std::endl;
+        eglQuerySurface(_eglDisplay, surface, EGL_WIDTH, &value);
+        std::cerr << "\tEGL_WIDTH is " << value << std::endl;
+        eglQuerySurface(_eglDisplay, surface, EGL_RENDER_BUFFER, &value);
+        std::cerr << "\tEGL_RENDER_BUFFER is " << std::string((value == EGL_BACK_BUFFER)
+                 ? "EGL_BACK_BUFFER" : "EGL_SINGLE_BUFFER") << std::endl;
+        eglQuerySurface(_eglDisplay, surface, EGL_VERTICAL_RESOLUTION, &value);
+        std::cerr << "\tEGL_VERTICAL_RESOLUTION is " << value << std::endl;
+        eglQuerySurface(_eglDisplay, surface, EGL_HORIZONTAL_RESOLUTION, &value);
+        std::cerr << "\tEGL_HORIZONTAL_RESOLUTION is " << value << std::endl;
+        eglQuerySurface(_eglDisplay, surface, EGL_SWAP_BEHAVIOR, &value);
+        std::cerr << "\tEGL_SWAP_BEHAVIOR is "
+                  << std::string((value == EGL_BUFFER_DESTROYED)
+                   ? "EGL_BUFFER_DESTROYED" : "EGL_BUFFER_PRESERVED") << std::endl;
+        eglQuerySurface(_eglDisplay, surface, EGL_MULTISAMPLE_RESOLVE, &value);
+        std::cerr << "\tEGL_MULTISAMPLE_RESOLVE is "
+                  << std::string((value == EGL_MULTISAMPLE_RESOLVE_BOX)
+                  ? "EGL_MULTISAMPLE_RESOLVE_BOX" : "EGL_MULTISAMPLE_RESOLVE_DEFAULT")
+                  << std::endl;
+    } else {
+        std::cerr << "Surface no configured yet" << std::endl;
+    }
 }
 
 // EGL WIDTH, EGL HEIGHT, EGL LARGEST PBUFFER, EGL TEXTURE FORMAT, 
@@ -771,7 +778,7 @@ EGLDevice::createPixmap(int width, int height, NativePixmapType buf)
     return pbuf;  
 }
 
-} // namespace renderer
+} // namespace device
 } // namespace gnash
 
 // local Variables:

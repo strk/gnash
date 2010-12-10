@@ -39,7 +39,7 @@
 
 namespace gnash {
 
-namespace renderer {
+namespace device {
 
 struct eglVertex {
     eglVertex(float x, float y)
@@ -357,7 +357,7 @@ protected:
 #define DUMP_CURRENT_SURFACE printEGLSurface(eglGetCurrentSurface(EGL_DRAW))
 #define DUMP_CURRENT_CONTEXT printEGLContext(eglGetCurrentContext())
 
-} // namespace renderer
+} // namespace device
 } // namespace gnash
 
 #endif  // end of __EGL_DEVICE_H__

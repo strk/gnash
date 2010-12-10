@@ -77,6 +77,8 @@ bool
 RawFBDevice::attachWindow(GnashDevice::native_window_t window)
 {
     GNASH_REPORT_FUNCTION;
+
+    return false;
 }
     
 
@@ -84,6 +86,7 @@ RawFBDevice::attachWindow(GnashDevice::native_window_t window)
 const char *
 RawFBDevice::getErrorString(int error)
 {
+    return 0;
 }
 
 // Create an RAWFB window to render in. This is only used by testing
@@ -96,6 +99,7 @@ RawFBDevice::createWindow(const char *name, int x, int y, int width, int height)
 void
 RawFBDevice::eventLoop(size_t passes)
 {
+    GNASH_REPORT_FUNCTION;
 }
 
 } // namespace rawfb

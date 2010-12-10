@@ -37,7 +37,7 @@
 
 namespace gnash {
 
-namespace renderer {
+namespace device {
 
 namespace directfb {
 
@@ -281,7 +281,7 @@ protected:
 };
 
 } // namespace directfb
-} // namespace renderer
+} // namespace device
 } // namespace gnash
 
 #endif  // end of __DIRECTFB_DEVICE_H__

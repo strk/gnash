@@ -44,7 +44,7 @@ TestState runtest;
 
 using namespace gnash;
 using namespace std;
-using namespace renderer;
+using namespace device;
 
 void test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[]);
 
@@ -324,7 +324,7 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     }
     
     if (hwinit) {
-        if (egl.getDepth()) {
+        if (egl.getDepth() == 24) {
             runtest.pass("EGLDevice::getDepth()");
         } else {
             runtest.fail("EGLDevice::getDepth()");
@@ -334,7 +334,7 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     }
     
     if (hwinit) {
-        if (egl.getMaxSwapInterval() == 0) {
+        if (egl.getMaxSwapInterval() == 1) {
             runtest.pass("EGLDevice::getMaxSwapInterval()");
         } else {
             runtest.fail("EGLDevice::getMaxSwapInterval()");
