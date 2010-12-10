@@ -19,6 +19,9 @@
 //
 
 #include "Color_as.h"
+
+#include <sstream>
+
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -29,10 +32,7 @@
 #include "SWFCxForm.h" // for composition
 #include "VM.h"
 #include "MovieClip.h"
-
 #include "namedStrings.h"
-#include <sstream>
-
 
 namespace gnash {
 
@@ -242,9 +242,7 @@ color_ctor(const fn_call& fn)
     as_value target;
     if (fn.nargs) target = fn.arg(0);
 
-    const int flags = as_object::DefaultFlags | PropFlags::readOnly;
-
-    obj->init_member(NSV::PROP_TARGET, target, flags); 
+    obj->set_member(NSV::PROP_TARGET, target);
 
     Global_as& gl = getGlobal(fn);
     as_object* null = 0;
