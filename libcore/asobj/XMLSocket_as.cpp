@@ -315,10 +315,11 @@ xmlsocket_connect(const fn_call& fn)
         return as_value(false);
     }
  
-    if (!fn.nargs) {
+    if (fn.nargs < 2) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("XMLSocket.connect() needs at least one argument"));
+            log_aserror(_("XMLSocket.connect() needs two arguments"));
         );
+        // TODO: check expected return values!
         return as_value();
     }
 
