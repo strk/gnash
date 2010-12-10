@@ -24,6 +24,7 @@
 #endif
 
 #include <boost/scoped_array.hpp>
+#include <boost/shared_ptr.hpp>
 #include <vector>
 #include <linux/fb.h>
 
@@ -52,6 +53,7 @@ namespace gnash {
 namespace gui {
 
 class Renderer;
+class FBGlue;
 
 /// A Framebuffer-based GUI for Gnash.
 /// ----------------------------------
@@ -206,8 +208,9 @@ private:
     struct fb_var_screeninfo var_screeninfo;
     struct fb_fix_screeninfo fix_screeninfo;
 
-    unsigned int _timeout; /* TODO: should we move this to base class ? */
+    unsigned int _timeout;
     
+    boost::shared_ptr<FBGlue> _glue;    
 };
 
 } // end of namespace gui

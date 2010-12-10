@@ -106,12 +106,29 @@
 #include "log.h"
 #include "movie_root.h"
 #include "RunResources.h"
-
-#include "Renderer.h"
 #include "GnashSleep.h" // for gnashSleep
+#include "Renderer.h"
 
 #include <linux/input.h>    // for /dev/input/event*
 
+#ifdef RENDERER_AGG
+#include "fb_glue_agg.h"
+#endif
+
+#if 0
+#ifdef RENDERER_OPENVG
+#include "fb_glue_ovg.h"
+#endif
+
+// FIXME: this is just to remind us to implement these too
+#ifdef RENDERER_GLES1
+#include "fb_glue_gles1.h"
+#endif
+
+#ifdef RENDERER_GLES2
+#include "fb_glue_gles2.h"
+#endif
+#endif
 
 namespace gnash {
 
@@ -307,8 +324,19 @@ FBGui::init(int argc, char *** argv)
     log_debug("Width:%d, Height:%d", _width, _height);
     log_debug("X:%d, Y:%d", _xpos, _ypos);
 
-    _validbounds.setTo(0, 0, _width - 1, _height - 1);    
+    _validbounds.setTo(0, 0, _width - 1, _height - 1);
 
+    // Create a new Glue layer
+    _glue.reset(new FBAggGlue);
+
+    // Initialize the renderer
+    _glue->init(argc, argv);
+
+    // The agg glue file defines a typedef of Renderer, so we have to make sure
+    gnash::Renderer *rend = reinterpret_cast<gnash::Renderer *>
+                                             _glue->createRenderHandler());
+    _renderer.reset(rend);
+    
     return true;
 }
 
@@ -396,7 +424,8 @@ FBGui::createWindow(const char* /*title*/, int /*width*/, int /*height*/,
     GNASH_REPORT_FUNCTION;
     
     // Now initialize AGG
-    // return initialize_renderer();
+//    return initialize_renderer();
+//    _renderer->createRenderHandler();
 
     return false;
 }
@@ -464,12 +493,11 @@ void
 FBGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 {
     GNASH_REPORT_FUNCTION;
-
+    
     if (!_renderer) {
         log_error("No renderer set!");
         return;
     }
-    
     _renderer->set_invalidated_regions(ranges);
     
     _drawbounds.clear();

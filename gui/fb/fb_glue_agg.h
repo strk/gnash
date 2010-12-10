@@ -26,14 +26,13 @@
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include "Renderer.h"
 #include "fbsup.h"
 #include "fb_glue.h"
 
 namespace gnash {
 
 namespace gui {
-
-class Renderer;
 
 class FBAggGlue: public FBGlue
 {
