@@ -647,7 +647,10 @@ AC_ARG_ENABLE(gui,
       break;
     fi
   done],
-  [if test x"${openbsd_os}" = x"openbsd"; then
+  [ dnl Run the following code if no --enable-gui is given
+  build_fb=auto
+  build_sdl=auto
+  if test x"${openbsd_os}" = x"openbsd"; then
     build_kde3=yes;
     build_gtk=yes;
   else if test x"${haiku}" = xyes; then
@@ -657,7 +660,8 @@ AC_ARG_ENABLE(gui,
     build_gtk=yes
     build_dump=auto
   fi
-  fi]
+  fi
+  ]
 )
 
 if test x"${build_haiku}" = xyes; then
@@ -803,86 +807,25 @@ fi
 MEDIA_CONFIG="${media_list}"
 AC_SUBST(MEDIA_CONFIG)
 
+dnl -----------------------------------------------------
+dnl Check for SDL and decide about auto gui accordingly.
+dnl Need be done after build_sound_sdl and build_sdl are
+dnl initialized and before they are checked for yes/no
+dnl -----------------------------------------------------
 
-dnl -------------------------------
-dnl Input Device selection
-dnl -------------------------------
-
-dnl Multiple input devices are supported. These can all work in
-dnl varying combinations, so several may be listed. These are only
-dnl required when using the Framebuffer, as without the X11 desktop,
-dnl Gnash has to handle all these internally. This can get
-dnl messy, as one might want to use a touchscreen with a normal mouse
-dnl or keyboard attached. 
-dnl By default, don't build any of these, as they are only for the Framebuffer
-dnl running without X11.
-if test x"${build_fb}" = xyes; then
-build_ps2mouse=yes
-build_ps2keyboard=no
-build_input_events=yes
-build_tslib=yes
-input_events="PS/2 Mouse, Input Devices, Touchscreen via Tslib"
-else
-build_ps2mouse=no
-build_ps2keyboard=no
-build_input_events=no
-build_tslib=no
-input_events=
+if test x$build_sdl != xno -o x$build_sound_sdl = xyes; then
+  GNASH_PATH_SDL
 fi
-AC_ARG_ENABLE(input,
-  AC_HELP_STRING([--enable-input=], [Enable support for the specified input devices for the framebuffer GUI (default=ps2mouse|ps2keyboard|events|touchscreen)]),
-  [if test -n ${enableval}; then
-    enableval=`echo ${enableval} | tr '\054' ' ' `
+
+if test x"${build_sdl}" = xauto; then
+  if test xyes = x"${has_sdl}"; then
+    build_sdl=yes
+  else
+    AC_MSG_NOTICE([sdl GUI won't be built (no sdl development files found)])
+    build_sdl=no
   fi
-  while test -n "${enableval}" ; do
-    val=`echo ${enableval} | cut -d ' ' -f 1`
-    case "${val}" in
-      ps2m*|PS2m*|m*|M*)        dnl a PS/2 style mouse
-        build_ps2mouse=yes
-        input_events="${input_events}, PS/2 Mouse"
-        ;;
-      ps2k*|PS2K*|k*|K*)        dnl a PS/2 style keyboard
-        build_ps2keyboard=yes
-        input_events="${input_events}, PS/2 Keyboard"
-        ;;
-      i*|I*|ev*|Ev*)    dnl use the new Input Event, which supports both
-        input_events="${input_events}, Input Event Device"
-        build_input_events=yes
-        ;;
-      t*|T*) dnl use a touchscreen with tslib, which works like a mouse
-        build_tslib=yes
-        input_events="${input_events}, Touchscreen"
-        ;;
-      *) AC_MSG_ERROR([invalid input device list! ${enableval} given (accept: ps2mouse|keyboard|events,touchscreen)])
-         ;;
-      esac
-    enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
-    if test "x$val" = "x$enableval"; then
-      break;
-    fi
-  done],
-)
+fi
 
-if test x"${build_tslib}" = xyes; then
-  AC_DEFINE(USE_TSLIB, [1], [Use a tslib supported touchscreen])
-  GNASH_PKG_FIND(ts, [tslib.h], [Touchscreen library], ts_config)
-fi
-AM_CONDITIONAL(ENABLE_TSLIB, [test x${ac_cv_header_tslib_h} != xno])
-
-if test x"${build_ps2mouse}" = xyes; then
-  AC_DEFINE(USE_MOUSE_PS2, [1], [Add support for a directly using a PS/2 Mouse])
-fi
-AM_CONDITIONAL(ENABLE_MOUSE, [test x"${build_ps2mouse}" = xyes])
-
-if test x"${build_ps2keyboard}" = xyes; then
-  AC_DEFINE(USE_KEYBOARD_PS2, [1], [Add support for directly using a PS/2 Keyboard])
-fi
-if test x"${build_input_events}" = xyes; then
-  AC_DEFINE(USE_INPUT_EVENTS, [1], [Add support for a directly using Linux Input Event Devices])
-fi
-AM_CONDITIONAL(ENABLE_INPUT_EVENTS, [test x"${build_input_events}" = xyes])
-dnl this is enabled if we have any input devices at all
-AM_CONDITIONAL(ENABLE_INPUT_DEVICES, [test x"${input_events}" != x])
 
 dnl -------------------------------
 dnl Renderer Selection
@@ -1812,7 +1755,113 @@ if test x"${build_dump}" != xno; then
   fi
 fi
 
+dnl Check possibility to build FB gui, if requested
+dnl FB dependencies are a linux system (linux/fb.h) 
+dnl and AGG renderer
+if test x"${build_fb}" != xno; then
+  if test x"${linux}" = xyes; then
+    if test x"${build_agg}" = xyes; then
+      build_fb=yes
+    else
+      if test x"${build_fb}" = xyes; then
+        dnl SHOULD we just check at the end of file instead ?
+        AC_MSG_ERROR([fb GUI cannot be built without AGG renderer])
+      fi
+      AC_MSG_NOTICE([fb GUI won't be built (needs AGG renderer)])
+      build_fb=no
+    fi
+  else
+    if test x"${build_fb}" = xyes; then
+      dnl SHOULD we just check at the end of file instead ?
+      AC_MSG_ERROR(fb GUI cannot be built on non-linux platforms);
+    fi
+    AC_MSG_NOTICE([fb GUI won't be built (non-linux platform)])
+    build_fb=no
+  fi
+fi
+
 dnl TODO: add checks for all other GUIs
+
+dnl -------------------------------
+dnl Input Device selection
+dnl -------------------------------
+
+dnl Multiple input devices are supported. These can all work in
+dnl varying combinations, so several may be listed. These are only
+dnl required when using the Framebuffer, as without the X11 desktop,
+dnl Gnash has to handle all these internally. This can get
+dnl messy, as one might want to use a touchscreen with a normal mouse
+dnl or keyboard attached. 
+dnl By default, don't build any of these, as they are only for the Framebuffer
+dnl running without X11.
+if test x"${build_fb}" = xyes; then
+build_ps2mouse=yes
+build_ps2keyboard=no
+build_input_events=yes
+build_tslib=yes
+input_events="PS/2 Mouse, Input Devices, Touchscreen via Tslib"
+else
+build_ps2mouse=no
+build_ps2keyboard=no
+build_input_events=no
+build_tslib=no
+input_events=
+fi
+AC_ARG_ENABLE(input,
+  AC_HELP_STRING([--enable-input=], [Enable support for the specified input devices for the framebuffer GUI (default=ps2mouse|ps2keyboard|events|touchscreen)]),
+  [if test -n ${enableval}; then
+    enableval=`echo ${enableval} | tr '\054' ' ' `
+  fi
+  while test -n "${enableval}" ; do
+    val=`echo ${enableval} | cut -d ' ' -f 1`
+    case "${val}" in
+      ps2m*|PS2m*|m*|M*)        dnl a PS/2 style mouse
+        build_ps2mouse=yes
+        input_events="${input_events}, PS/2 Mouse"
+        ;;
+      ps2k*|PS2K*|k*|K*)        dnl a PS/2 style keyboard
+        build_ps2keyboard=yes
+        input_events="${input_events}, PS/2 Keyboard"
+        ;;
+      i*|I*|ev*|Ev*)    dnl use the new Input Event, which supports both
+        input_events="${input_events}, Input Event Device"
+        build_input_events=yes
+        ;;
+      t*|T*) dnl use a touchscreen with tslib, which works like a mouse
+        build_tslib=yes
+        input_events="${input_events}, Touchscreen"
+        ;;
+      *) AC_MSG_ERROR([invalid input device list! ${enableval} given (accept: ps2mouse|keyboard|events,touchscreen)])
+         ;;
+      esac
+    enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
+    if test "x$val" = "x$enableval"; then
+      break;
+    fi
+  done],
+)
+
+if test x"${build_tslib}" = xyes; then
+  AC_DEFINE(USE_TSLIB, [1], [Use a tslib supported touchscreen])
+  GNASH_PKG_FIND(ts, [tslib.h], [Touchscreen library], ts_config)
+fi
+AM_CONDITIONAL(ENABLE_TSLIB, [test x${ac_cv_header_tslib_h} != xno])
+
+if test x"${build_ps2mouse}" = xyes; then
+  AC_DEFINE(USE_MOUSE_PS2, [1], [Add support for a directly using a PS/2 Mouse])
+fi
+AM_CONDITIONAL(ENABLE_MOUSE, [test x"${build_ps2mouse}" = xyes])
+
+if test x"${build_ps2keyboard}" = xyes; then
+  AC_DEFINE(USE_KEYBOARD_PS2, [1], [Add support for directly using a PS/2 Keyboard])
+fi
+if test x"${build_input_events}" = xyes; then
+  AC_DEFINE(USE_INPUT_EVENTS, [1], [Add support for a directly using Linux Input Event Devices])
+fi
+AM_CONDITIONAL(ENABLE_INPUT_EVENTS, [test x"${build_input_events}" = xyes])
+dnl this is enabled if we have any input devices at all
+AM_CONDITIONAL(ENABLE_INPUT_DEVICES, [test x"${input_events}" != x])
+
 
 dnl -----------------------------------------------------------
 dnl Try to ignore stupid dependencies
@@ -2354,12 +2403,6 @@ AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 
 dnl currently unused
 dnl GNASH_PKG_FIND(ogg, [ogg.h], [decode ogg streams], ogg_stream_init)
-
-if test x$build_sdl = xyes -o x$build_sound_sdl = xyes; then
-  GNASH_PATH_SDL
-fi
-
-AM_CONDITIONAL(HAVE_SDL, [ test x$has_SDL = xyes ])
 
 dnl Qtopia is a desktop environment for embedded devices.
 dnl GNASH_PATH_QTOPIA3
