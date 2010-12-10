@@ -118,6 +118,10 @@ endif
 
 check_PROGRAMS =
 
+if BUILD_RAWFB_DEVICE
+include rawfb/rawfb.am
+endif
+
 if BUILD_EGL_DEVICE
 check_PROGRAMS += test_egl
 # this tests the low level EGL interface, used by OpenVG, OpenGLES1,
