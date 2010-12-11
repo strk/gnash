@@ -817,7 +817,6 @@ public:
       // lead to an assertion failure in begin_display() because we check
       // whether the scale is known there.
       set_scale(1.0f, 1.0f);
-      GNASH_REPORT_FUNCTION;
   }   
 
   /// Initializes the rendering buffer. The memory pointed by "mem" is not
@@ -1990,7 +1989,6 @@ public:
   }
   
   virtual void set_invalidated_regions(const InvalidatedRanges& ranges) {
-	GNASH_REPORT_FUNCTION;
     using gnash::geometry::Range2d;
     
     int count=0;
