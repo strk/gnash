@@ -104,6 +104,12 @@ main(int argc, char *argv[])
         runtest.fail("RawFBDevice::getBlueSize()");
     }
 
+    if (rfb.setGrayscaleLUT8()) {
+        runtest.pass("RawFBDevice::setGrayscaleLUT8()");
+    } else {
+        runtest.fail("RawFBDevice::setGrayscaleLUT8()");
+    }
+        
     // AGG uses these to calculate the poixel format
 #ifdef RENDERER_AGG
     if (rfb.getRedOffset() > 0) {

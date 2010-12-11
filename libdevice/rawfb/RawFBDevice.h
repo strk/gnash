@@ -41,6 +41,8 @@ namespace renderer {
 
 namespace rawfb {
 
+#define CMAP_SIZE (256*2)
+
 class RawFBDevice : public GnashDevice
 {
   public:
@@ -118,6 +120,9 @@ class RawFBDevice : public GnashDevice
     /// @return nothing
     void eventLoop(size_t passes);
     
+    /// For 8 bit (palette / LUT) modes, sets a grayscale palette.
+    /// This GUI currently does not support palette modes. 
+    bool setGrayscaleLUT8();    
 protected:
     /// Clear the framebuffer memory
     void clear();
@@ -127,6 +132,8 @@ protected:
     struct fb_fix_screeninfo _fixinfo;
     struct fb_var_screeninfo _varinfo;
     boost::uint8_t           *_fbmem;
+    struct fb_cmap           _cmap;       // the colormap
+    
 };
 
 #ifdef ENABLE_FAKE_FRAMEBUFFER

@@ -159,7 +159,6 @@ FBGui::FBGui(unsigned long xid, float scale, bool loop, RunResources& r)
       _own_vt(-1),
       _xpos(0),
       _ypos(0),  
-      _rowsize(0),
       _timeout(0)
 {
     GNASH_REPORT_FUNCTION;
@@ -168,7 +167,6 @@ FBGui::FBGui(unsigned long xid, float scale, bool loop, RunResources& r)
 //    memset(mouse_buf, 0, 256);
     memset(&_var_screeninfo, 0, sizeof(fb_var_screeninfo));
     memset(&_fix_screeninfo, 0, sizeof(fb_fix_screeninfo));
-    memset(&_cmap, 0, sizeof(struct fb_cmap));
 
     signal(SIGINT, terminate_signal);
     signal(SIGTERM, terminate_signal);
@@ -183,50 +181,6 @@ FBGui::~FBGui()
         log_debug(_("Closing framebuffer device"));
         close(_fd);
     }
-}
-
-bool
-FBGui::set_grayscale_lut8()
-{
-#define TO_16BIT(x) (x | (x<<8))
-
-    GNASH_REPORT_FUNCTION;
-
-    struct fb_cmap cmap;
-    int i;
-
-    log_debug(_("LUT8: Setting up colormap"));
-
-    cmap.start=0;
-    cmap.len=256;
-    cmap.red = (__u16*)malloc(CMAP_SIZE);
-    cmap.green = (__u16*)malloc(CMAP_SIZE);
-    cmap.blue = (__u16*)malloc(CMAP_SIZE);
-    cmap.transp = NULL;
-
-    for (i=0; i<256; i++) {
-        int r = i;
-        int g = i;
-        int b = i;
-
-        cmap.red[i] = TO_16BIT(r);
-        cmap.green[i] = TO_16BIT(g);
-        cmap.blue[i] = TO_16BIT(b);
-    }
-
-#ifdef ENABLE_FAKE_FRAMEBUFFER
-    if (fakefb_ioctl(_fd, FBIOPUTCMAP, &_cmap))
-#else
-    if (ioctl(_fd, FBIOPUTCMAP, &_cmap))
-#endif
-    {
-        log_error(_("LUT8: Error setting colormap: %s"), strerror(errno));
-        return false;
-    }
-
-    return true;
-
-#undef TO_16BIT
 }
 
 bool
@@ -315,11 +269,14 @@ FBGui::init(int argc, char *** argv)
 
     // map framebuffer into memory
     // Create a new Glue layer
-    // if (renderer == "agg") {
-    _glue.reset(new FBAggGlue());
-    // } else if (renderer = "openvg") {
-    //     _glue.reset(new FBOvgGlue);
-    // }
+    if (renderer == "agg") {
+        _glue.reset(new FBAggGlue());
+    } else if (renderer == "openvg") {
+        //     _glue.reset(new FBOvgGlue);
+        log_error("No renderer! %s not supported.", renderer);
+    } else {
+        log_error("No renderer! %s not supported.", renderer);
+    }
         
     // Initialize the glue layer between the renderer and the gui toolkit
     _glue->init(argc, argv);
@@ -339,7 +296,7 @@ FBGui::run()
     VirtualClock& timer = getClock();
     
     // let the GUI recompute the x/y scale factors to best fit the whole screen
-    resize_view(_validbounds.width(), _validbounds.height());
+//    resize_view(_validbounds.width(), _validbounds.height());
 
     // This loops endlessly at the frame rate
     while (!terminate_request) {  
@@ -371,9 +328,9 @@ FBGui::run()
 void
 FBGui::renderBuffer()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
-    // if ( _drawbounds.size() == 0 ) return; // nothing to do..
+//    if ( _drawbounds.size() == 0 ) return; // nothing to do..
 
 #ifdef ENABLE_DOUBLE_BUFFERING
 
@@ -470,17 +427,23 @@ FBGui::showMouse(bool /*show*/)
 void
 FBGui::setInvalidatedRegion(const SWFRect& bounds)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+    
+     FBAggGlue *fbag = reinterpret_cast
+        <FBAggGlue *>(_glue.get());
 
-//    _glue->setInvalidatedRegion(bounds);
+     fbag->setInvalidatedRegion(bounds);
 }
 
 void
 FBGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
  {
-     GNASH_REPORT_FUNCTION;
+     // GNASH_REPORT_FUNCTION;
+     
+     FBAggGlue *fbag = reinterpret_cast
+        <FBAggGlue *>(_glue.get());
 
-//    _glue->setInvalidatedRegions(ranges);
+     fbag->setInvalidatedRegions(ranges);
 }
 
 char *

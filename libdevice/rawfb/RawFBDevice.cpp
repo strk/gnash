@@ -55,6 +55,8 @@ RawFBDevice::RawFBDevice(int vid)
 {
     GNASH_REPORT_FUNCTION;
 
+    memset(&_cmap, 0, sizeof(struct fb_cmap));
+    
     if (!initDevice(0, 0)) {
         log_error("Couldn't initialize RAWFB device!");
     }
@@ -65,7 +67,7 @@ RawFBDevice::RawFBDevice(int argc, char *argv[])
       _fbmem(0)
 {
     GNASH_REPORT_FUNCTION;
-    
+    memset(&_cmap, 0, sizeof(struct fb_cmap));    
 }
 
 void
@@ -121,15 +123,9 @@ RawFBDevice::initDevice(int /* argc */, char **/* argv[] */)
               _varinfo.bits_per_pixel);    
 
     // map framebuffer into memory
-#if 0
-    _fbmem.reset(static_cast<boost::uint8_t *>(mmap(0, _fixinfo.smem_len,
-                                              PROT_READ|PROT_WRITE, MAP_SHARED,
-                                              _fd, 0)));
-#else
     _fbmem = (unsigned char *)mmap(0, _fixinfo.smem_len,
                                    PROT_READ|PROT_WRITE, MAP_SHARED,
                                    _fd, 0);
-#endif
     
     if (!_fbmem) {
         log_error("Couldn't mmap() %d bytes of memory!",
@@ -138,6 +134,49 @@ RawFBDevice::initDevice(int /* argc */, char **/* argv[] */)
     }
     
     return true;
+}
+
+bool
+RawFBDevice::setGrayscaleLUT8()
+{
+#define TO_16BIT(x) (x | (x<<8))
+
+    GNASH_REPORT_FUNCTION;
+
+    int i;
+
+    log_debug(_("LUT8: Setting up colormap"));
+
+    _cmap.start=0;
+    _cmap.len=256;
+    _cmap.red = (__u16*)malloc(CMAP_SIZE);
+    _cmap.green = (__u16*)malloc(CMAP_SIZE);
+    _cmap.blue = (__u16*)malloc(CMAP_SIZE);
+    _cmap.transp = NULL;
+
+    for (i=0; i<256; i++) {
+        int r = i;
+        int g = i;
+        int b = i;
+
+        _cmap.red[i] = TO_16BIT(r);
+        _cmap.green[i] = TO_16BIT(g);
+        _cmap.blue[i] = TO_16BIT(b);
+    }
+    
+#ifdef ENABLE_FAKE_FRAMEBUFFER
+    if (fakefb_ioctl(_fd, FBIOPUTCMAP, &_cmap))
+#else
+    if (ioctl(_fd, FBIOPUTCMAP, &_cmap))
+#endif
+    {
+        log_error(_("LUT8: Error setting colormap: %s"), strerror(errno));
+        return false;
+    }
+
+    return true;
+
+#undef TO_16BIT
 }
 
 // Initialize RAWFB Window layer
