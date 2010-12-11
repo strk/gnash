@@ -43,6 +43,12 @@ using namespace renderer;
 // The debug log used by all the gnash libraries.
 static LogFile& dbglogfile = LogFile::getDefaultInstance();
 
+
+unsigned short red[256], green[256], blue[256];
+struct fb_cmap map332 = {0, 256, red, green, blue, NULL};
+unsigned short red_b[256], green_b[256], blue_b[256];
+struct fb_cmap map_back = {0, 256, red_b, green_b, blue_b, NULL};
+
 int
 main(int argc, char *argv[])
 {
@@ -104,12 +110,14 @@ main(int argc, char *argv[])
         runtest.fail("RawFBDevice::getBlueSize()");
     }
 
+#if 0
     if (rfb.setGrayscaleLUT8()) {
         runtest.pass("RawFBDevice::setGrayscaleLUT8()");
     } else {
         runtest.fail("RawFBDevice::setGrayscaleLUT8()");
     }
-        
+#endif
+    
     // AGG uses these to calculate the poixel format
 #ifdef RENDERER_AGG
     if (rfb.getRedOffset() > 0) {
@@ -130,6 +138,30 @@ main(int argc, char *argv[])
         runtest.fail("RawFBDevice::getBlueOffset()");
     }
 #endif
+
+#if 1
+    // This is a manual test to see if we can draw a line on the
+    // raw framebuffer to make sure it got initialized correctly.
+    int x = 0, y = 0;
+    int xoff = 0, yoff = 0;
+    long location = 0;
+    int line_length = rfb.getWidth() * ((rfb.getDepth()+7)/8);
+
+    boost::uint8_t *fbp = rfb.getFBMemory();
+
+    for(y=100; y<102; y++);            /* Where we are going to put the pixel */
+    
+    for(x=0; x<200; x++) {
+        /* Figure out where in memory to put the pixel */
+        location = x * (rfb.getDepth()/8) + y * line_length;
+        
+        *(fbp + location) = 89;    /* Some blue */
+        *(fbp + location + 1) = 40; /* A little green */
+        *(fbp + location + 2) = 200; /* A lot of red */
+        *(fbp + location + 3) = 0; /* No transparency */
+    }
+#endif
+
 }
 
 // Local Variables:
