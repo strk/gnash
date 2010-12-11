@@ -140,7 +140,7 @@ revno.h:
 	  if test $${nowmod} -gt $${lastmod}; then \
             echo "Getting build info for revno.h"; \
 	    rm -f .lastmod; echo "$${nowmod}" > .lastmod; \
-            revno="`cd $(top_srcdir) ; $(GIT) log | grep '^commit' | wc -l`"; \
+            revno="`cd $(top_srcdir) ; $(GIT) rev-list HEAD | wc -l`"; \
             comm_id="`cd $(top_srcdir) ; $(GIT) rev-parse --short HEAD`"; \
             nick="`cd $(top_srcdir) ; $(GIT) branch | grep '^\*' | cut -d ' ' -f 2`"; \
 	  fi; \
