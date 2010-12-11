@@ -469,78 +469,8 @@ public:
         return true;
     }
 
-    /// ==================================================================
-    /// Interface for using low-level devices like EGL or DirectFB
-    /// These are unused by AGG, Cairo, and OpenGL, but are needed
-    /// when using OpenGLES1, OpenGLES2, or OpenVG.
-    /// ==================================================================
-    boost::shared_array<renderer::GnashDevice::dtype_t> probeDevices() {
-        GNASH_REPORT_FUNCTION;
-        
-        size_t total = 0;
-#ifdef BUILD_EGL_DEVICE
-        total++;
-#endif
-#ifdef BUILD_DIRECTFB_DEVICE
-        total++;
-#endif
-#ifdef BUILD_X11_DEVICE
-        total++;
-#endif
-        boost::shared_array<renderer::GnashDevice::dtype_t> devs
-            (new renderer::GnashDevice::dtype_t[total]);
-#ifdef BUILD_X11_DEVICE
-        devs[--total] = renderer::GnashDevice::X11;
-#endif
-#ifdef BUILD_EGL_DEVICE
-        devs[--total] = renderer::GnashDevice::EGL;
-#endif
-#ifdef BUILD_DIRECTFB_DEVICE
-        devs[--total] = renderer::GnashDevice::DIRECTFB;
-#endif
-        
-        return devs;
-    }
-
-    void resetDevice() { _device.reset(); };
-    
-    renderer::GnashDevice::dtype_t getDevice()
-    {
-        if (_device) {
-            return _device->getType();
-        }
-        return renderer::GnashDevice::NODEV;
-    }
-    
-    void setDevice(renderer::GnashDevice::dtype_t dtype) {
-        switch (dtype) {
-#ifdef BUILD_EGL_DEVICE
-          case renderer::GnashDevice::EGL:
-          {
-              _device.reset(new renderer::EGLDevice);
-              break;
-          }
-#endif
-#ifdef BUILD_DIRECTFB_DEVICE
-          case renderer::GnashDevice::DIRECTFB:
-          {
-              _device.reset(new renderer::directfb::DirectFBDevice);
-              break;
-          }
-#endif
-#ifdef BUILD_X11_DEVICE
-          case renderer::GnashDevice::X11:
-          {
-              _device.reset(new renderer::x11::X11Device);
-              break;
-          }
-#endif
-          default:
-              log_error("unsupported Display Device!");
-        }
-    }
-    
 #ifdef USE_TESTSUITE
+
         
     /// ==================================================================
     /// Interfaces for testing only. Disabled when the testsuite isn't built.
@@ -708,9 +638,6 @@ protected:
     // Delayed imaged to render
     RenderImages _render_images;
 
-    // 
-    boost::scoped_ptr<renderer::GnashDevice> _device;
-    
 private:
 
     /// Bracket the displaying of a frame from a movie.
