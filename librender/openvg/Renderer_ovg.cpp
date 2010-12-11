@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 ///
-/// Author: Visor <cutevisor@gmail.com>
+/// original author: Visor <cutevisor@gmail.com>
 ///
 
 #ifdef HAVE_CONFIG_H
@@ -247,37 +247,14 @@ Renderer_ovg::Renderer_ovg(renderer::GnashDevice::dtype_t dtype)
       _drawing_mask(false)
 {
     GNASH_REPORT_FUNCTION;
-    setDevice(dtype);
-    
-    if (_device) {
-        _device->initDevice(0, 0);
-        
-        set_scale(1.0f, 1.0f);
-        m_fillpaint = vgCreatePaint();
-        m_strokepaint = vgCreatePaint();
-        
-        vgSetPaint (m_fillpaint,   VG_FILL_PATH);
-        vgSetPaint (m_strokepaint, VG_STROKE_PATH);
-    } else {
-        log_error(_("No EGL Device to initialize!"));
-    }
-}
 
-// void
-// Renderer_ovg::setDevice(GnashDevice::dtype_t dtype)
-// {
+    set_scale(1.0f, 1.0f);
+    m_fillpaint = vgCreatePaint();
+    m_strokepaint = vgCreatePaint();
     
-// #if 0
-// #ifdef HAVE_GTK2 
-//     if (!_eglDevicea.attachWindow(0)) {
-//         log_error(_("Couldn't initialize EGL Window!"));
-//     }
-// #else
-// #warning "Must initialize a native window!"
-// #endif
-// #else
-// #endif
-// }
+    vgSetPaint (m_fillpaint,   VG_FILL_PATH);
+    vgSetPaint (m_strokepaint, VG_STROKE_PATH);
+}
 
 void
 Renderer_ovg::init(float x, float y)
@@ -422,7 +399,7 @@ Renderer_ovg::begin_display(const rgba& /* bg_color */, int /* viewport_x0 */,
                             int /* viewport_height */, float x0, float x1,
                             float y0, float y1)
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     
     vgSeti (VG_MASKING, VG_FALSE);
     
@@ -442,7 +419,7 @@ Renderer_ovg::begin_display(const rgba& /* bg_color */, int /* viewport_x0 */,
 void
 Renderer_ovg::end_display()
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     
 }
 
@@ -588,6 +565,7 @@ Renderer_ovg::set_antialiased(bool /* enable */)
 void
 Renderer_ovg::begin_submit_mask()
 {
+    GNASH_REPORT_FUNCTION;
     PathVec mask;
     _masks.push_back(mask);
     
@@ -598,6 +576,7 @@ Renderer_ovg::begin_submit_mask()
 void
 Renderer_ovg::end_submit_mask()
 {
+    GNASH_REPORT_FUNCTION;
     _drawing_mask = false;
     
     apply_mask();
@@ -614,6 +593,7 @@ Renderer_ovg::end_submit_mask()
 void
 Renderer_ovg::apply_mask()
 {  
+    GNASH_REPORT_FUNCTION;
     if (_masks.empty()) {
         return;
     }
