@@ -25,11 +25,14 @@
 
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/cstdint.hpp>
 #include <vector>
+
 #include <linux/fb.h>
 
 #include "gui.h"
 #include "InputDevice.h"
+#include "Renderer.h"
 
 #define PIXELFORMAT_LUT8
 #define CMAP_SIZE (256*2)
@@ -52,7 +55,6 @@ namespace gnash {
 
 namespace gui {
 
-class Renderer;
 class FBGlue;
 
 /// A Framebuffer-based GUI for Gnash.
@@ -98,9 +100,12 @@ class FBGui : public Gui
 public:
     FBGui(unsigned long xid, float scale, bool loop, RunResources& r);
     virtual ~FBGui();
+    /// \brief Initialize the framebuffer
+    ///
+    /// This opens the framebuffer device,
     virtual bool init(int argc, char ***argv);
     /// \brief
-    ///Create and display our window.
+    /// Create and display our window.
     ///
     /// @param title The window title.
     /// @param width The desired window width in pixels.
@@ -114,7 +119,6 @@ public:
     /// For OpenGL, this means that the front and back buffers are swapped.
     void renderBuffer();
     
-
     /// Start main rendering loop.
     bool run();
 
@@ -186,42 +190,26 @@ private:
     /// reverts disable_terminal() changes
     bool enable_terminal();
     
-    int fd;
-    int original_vt;       // virtual terminal that was active at startup
-    int original_kd;       // keyboard mode at startup
-    int own_vt;            // virtual terminal we are running in   
-    unsigned char *fbmem;  // framebuffer memory
-    unsigned char *buffer; // offscreen buffer
+    int         _fd;
+    int         _original_vt; // virtual terminal that was active at startup
+    int         _original_kd; // keyboard mode at startup
+    int         _own_vt;      // virtual terminal we are running in   
     
-    std::vector< geometry::Range2d<int> > _drawbounds;
+    int         _xpos;          // X position of the output window
+    int         _ypos;          // Y position of the output window
+    size_t      _timeout;       // timeout period for the event loop
 
-    // X position of the output window
-    int _xpos;
+    struct fb_cmap _cmap;       // the colormap
+    struct fb_var_screeninfo _var_screeninfo;
+    struct fb_fix_screeninfo _fix_screeninfo;
+    boost::shared_ptr<FBGlue> _glue;
 
-    // Y position of the output window
-    int _ypos;
-    
-    unsigned m_rowsize;
-    
-    std::vector<boost::shared_ptr<InputDevice> > _inputs;
-
-    struct fb_var_screeninfo var_screeninfo;
-    struct fb_fix_screeninfo fix_screeninfo;
-
-    unsigned int _timeout;
-    
-    boost::shared_ptr<FBGlue> _glue;    
+    /// This is the array of functioning input devices.
+    std::vector<boost::shared_ptr<InputDevice> > _inputs;    
 };
 
 } // end of namespace gui
 } // end of namespace gnash
-
-#ifdef ENABLE_FAKE_FRAMEBUFFER
-/// Simulate the ioctls used to get information from the framebuffer driver.
-///
-/// Since this is an emulator, we have to set these fields to a reasonable default.
-int fakefb_ioctl(int fd, int request, void *data);
-#endif
 
 #endif  // end of GNASH_FBSUP_H
 

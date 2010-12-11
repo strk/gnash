@@ -39,6 +39,10 @@ class FBAggGlue: public FBGlue
 public:
     FBAggGlue();
 
+    // This constructor is not part of the API, as it's AGG and
+    // Framebuffer specific
+    FBAggGlue(int fd);
+
     // All of these virtuals are all defined in the base FBGlue class
     ~FBAggGlue();
 
@@ -48,8 +52,9 @@ public:
     /// @param argc The commandline argument count.
     /// @param argv The commandline arguments.
     /// @return True on success; false on failure.
-    bool init(int argc, char ***argv);    
-    
+    bool init(int argc, char ***argv);
+
+    /// Create the renderer handler
     Renderer *createRenderHandler();
 
     /// \brief
@@ -74,6 +79,7 @@ public:
     // does not need to be implemented (optional feature),
     // but still needs to be available.
     //
+    void setInvalidatedRegion(const SWFRect& bounds);
     void setInvalidatedRegions(const InvalidatedRanges &ranges);
     /// \brief
     ///  The Width of the drawing area, in pixels. For framebuffer
@@ -93,21 +99,23 @@ public:
     /// This GUI currently does not support palette modes.
     bool set_grayscale_lut8();
 
+    // these are used only for debugging purpose to access private data
+    size_t getBounds() { return _drawbounds.size(); };
+    size_t getMemSize() { return _fixinfo.smem_len; };
+    
 protected:
     /// This is the file descriptor for the framebuffer memory
     int                      _fd;
-    struct fb_var_screeninfo _var_screeninfo;
-    struct fb_fix_screeninfo _fix_screeninfo;
-    struct fb_cmap           _cmap;
-    
+    struct fb_fix_screeninfo _fixinfo;
+    struct fb_var_screeninfo _varinfo;
     boost::shared_ptr<boost::uint8_t> _fbmem;  // framebuffer memory
+    
 #ifdef ENABLE_DOUBLE_BUFFERING
     boost::shared_ptr<boost::uint8_t> _buffer; // offscreen buffer
 #endif
-    boost::uint32_t             _rowsize;
     std::vector< geometry::Range2d<int> > _drawbounds;
 
-    boost::shared_ptr<Renderer> _renderer;
+    boost::scoped_ptr<Renderer> _renderer;
 };
 
 } // end of namespace gui

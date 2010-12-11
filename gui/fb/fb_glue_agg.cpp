@@ -25,6 +25,7 @@
 #include <cstring>
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
+#include <fcntl.h>
 
 #include "log.h"
 #include "Renderer.h"
@@ -32,6 +33,10 @@
 #include "fbsup.h"
 #include "RunResources.h"
 #include "fb_glue_agg.h"
+
+#ifdef BUILD_RAWFB_DEVICE
+#include "rawfb/RawFBDevice.h"
+#endif
 
 namespace gnash {
 
@@ -47,12 +52,19 @@ FBGlue::~FBGlue()
     GNASH_REPORT_FUNCTION;
 }
 
+//---------------------------------------------
 FBAggGlue::FBAggGlue()
+    : _fd(-1)
 {
     GNASH_REPORT_FUNCTION;
+    memset(&_varinfo, 0, sizeof(fb_var_screeninfo));
+    memset(&_fixinfo, 0, sizeof(fb_fix_screeninfo));
+}
 
-    memset(&_var_screeninfo, 0, sizeof(struct fb_var_screeninfo));
-    memset(&_fix_screeninfo, 0, sizeof(struct fb_fix_screeninfo));
+FBAggGlue::FBAggGlue(int fd)
+    : _fd(fd)
+{
+    GNASH_REPORT_FUNCTION;    
 }
 
 FBAggGlue::~FBAggGlue()
@@ -66,55 +78,68 @@ FBAggGlue::~FBAggGlue()
 }
 
 void
-FBAggGlue::setInvalidatedRegions(const InvalidatedRanges & /* ranges */)
+FBAggGlue::setInvalidatedRegion(const SWFRect &/*bounds */)
 {
     GNASH_REPORT_FUNCTION;
+    if (!_renderer) {
+        log_error("No renderer set!");
+        return;
+    }
+}
+
+void
+FBAggGlue::setInvalidatedRegions(const InvalidatedRanges &ranges)
+{
+    GNASH_REPORT_FUNCTION;
+    if (!_renderer) {
+        log_error("No renderer set!");
+        return;
+    }
+
+    _renderer->set_invalidated_regions(ranges);
+    
+    _drawbounds.clear();
+
+#if 0
+    for (size_t rno = 0; rno<ranges.size(); rno++) {
+        geometry::Range2d<int> bounds = Intersection(
+            _renderer->world_to_pixel(ranges.getRange(rno)),
+            _validbounds);
+        // it may happen that a particular range is out of the screen, which 
+        // will lead to bounds==null. 
+        if (bounds.isNull()) continue; 
+        
+        _drawbounds.push_back(bounds);   
+    }
+#endif   
 
 }
 
 bool
-FBAggGlue::init (int /* argc */, char *** /* argv */)
+FBAggGlue::init (int argc, char ***argv)
 {
-    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;    
 
-    // Load framebuffer properties
-#ifdef ENABLE_FAKE_FRAMEBUFFER
-    fakefb_ioctl(_fd, FBIOGET_VSCREENINFO, &_var_screeninfo);
-    fakefb_ioctl(_fd, FBIOGET_FSCREENINFO, &_fix_screeninfo);
-#else  // ENABLE_FAKE_FRAMEBUFFER
-    ioctl(_fd, FBIOGET_VSCREENINFO, &_var_screeninfo);
-    ioctl(_fd, FBIOGET_FSCREENINFO, &_fix_screeninfo);
-#endif
-    
-    log_debug(_("Framebuffer device uses %d bytes of memory."),
-	      _fix_screeninfo.smem_len);
-    log_debug(_("Video mode: %dx%d with %d bits per pixel."),
-	      _var_screeninfo.xres, _var_screeninfo.yres,
-              _var_screeninfo.bits_per_pixel);
-    
-    // map framebuffer into memory
-    _fbmem.reset(static_cast<boost::uint8_t *>(mmap(0, _fix_screeninfo.smem_len,
-                                          PROT_READ|PROT_WRITE, MAP_SHARED,
-                                          _fd, 0)));
-
-    if (!_fbmem) {
-        log_error("Couldn't mmap() %d bytes of memory!",
-                  _fix_screeninfo.smem_len);
-    }
-    
-#ifdef ENABLE_DOUBLE_BUFFERING
-    // allocate offscreen buffer
-    _buffer.reset(new boost::uint8_t[_fix_screeninfo.smem_len]);
-    memset(_buffer.get(), 0, _fix_screeninfo.smem_len);
-#endif  
-    
 #ifdef PIXELFORMAT_LUT8
     // Set grayscale for 8 bit modes
-    if (_var_screeninfo.bits_per_pixel == 8) {
+    if (_varinfo.bits_per_pixel == 8) {
 	if (!set_grayscale_lut8())
 	    return false;
     }
 #endif
+
+    // The agg glue file defines a typedef of Renderer, so we have to make sure
+    gnash::Renderer *rend = reinterpret_cast<gnash::Renderer *>
+        (createRenderHandler());
+    // boost::shared_array<renderer::GnashDevice::dtype_t>
+    //     devs = _renderer->probeDevices();
+    // boost::shared_array<renderer::GnashDevice::dtype_t>::iterator it;
+    // Initialize to EGL for now
+    _device.reset(new renderer::rawfb::RawFBDevice);
+    _device->initDevice(argc, *argv);
+    
+    // Set the renderer for the AGG glue layer
+    _renderer.reset(rend);
 
     return true;
 }
@@ -150,15 +175,15 @@ FBAggGlue::set_grayscale_lut8()
 	
     }
     
-#ifdef ENABLE_FAKE_FRAMEBUFFER
-    if (fakefb_ioctl(_fd, FBIOPUTCMAP, &cmap))
-#else
-    if (ioctl(_fd, FBIOPUTCMAP, &cmap))
-#endif
-    {
-	log_error(_("LUT8: Error setting colormap: %s"), strerror(errno));
-	return false;
-    }
+// #ifdef ENABLE_FAKE_FRAMEBUFFER
+//     if (fakefb_ioctl(_fd, FBIOPUTCMAP, &cmap))
+// #else
+//     if (ioctl(_fd, FBIOPUTCMAP, &cmap))
+// #endif
+//     {
+// 	log_error(_("LUT8: Error setting colormap: %s"), strerror(errno));
+// 	return false;
+//     }
     
     return true;
      
@@ -170,10 +195,14 @@ FBAggGlue::createRenderHandler()
 {
     GNASH_REPORT_FUNCTION;
 
-    const int width     = _var_screeninfo.xres;
-    const int height    = _var_screeninfo.yres;
-    const int bpp       = _var_screeninfo.bits_per_pixel;
-    const int size      = _fix_screeninfo.smem_len; 
+    if (!_device) {
+        log_error("No Device layer initialized yet!");
+        return 0;
+    }
+    
+    const int width     = _device->getWidth();
+    const int height    = _device->getHeight();
+    const int bpp       = _device->getDepth();
     
     // TODO: should recalculate!  
     boost::uint8_t       *mem;
@@ -181,37 +210,38 @@ FBAggGlue::createRenderHandler()
 
     agg_handler = NULL;
 
-    // _validbounds.setTo(0, 0, width - 1, height - 1);
+//    _validbounds.setTo(0, 0, width - 1, height - 1);
     
 #ifdef ENABLE_DOUBLE_BUFFERING
     log_debug(_("Double buffering enabled"));
     mem = _buffer;
 #else
     log_debug(_("Double buffering disabled"));
-    mem = _fbmem.get();
+    mem = _device->getFBMemory();
 #endif
     
     agg_handler = NULL;
   
     // choose apropriate pixel format
-    
-    log_debug(_("red channel: %d / %d"), _var_screeninfo.red.offset, 
-	      _var_screeninfo.red.length);
-    log_debug(_("green channel: %d / %d"), _var_screeninfo.green.offset, 
-	      _var_screeninfo.green.length);
-    log_debug(_("blue channel: %d / %d"), _var_screeninfo.blue.offset, 
-	      _var_screeninfo.blue.length);
-    log_debug(_("Total bits per pixel: %d"), _var_screeninfo.bits_per_pixel);
+
+    renderer::rawfb::RawFBDevice *rawfb = reinterpret_cast
+        <renderer::rawfb::RawFBDevice *>(_device.get());
+    log_debug(_("red channel: %d / %d"), rawfb->getRedOffset(), 
+	      rawfb->getRedSize());
+    log_debug(_("green channel: %d / %d"), rawfb->getGreenOffset(), 
+	      rawfb->getGreenSize());
+    log_debug(_("blue channel: %d / %d"), rawfb->getBlueOffset(), 
+              rawfb->getBlueSize());
+    log_debug(_("Total bits per pixel: %d"), bpp);
     
     const char* pixelformat = agg_detect_pixel_format(
-        _var_screeninfo.red.offset, _var_screeninfo.red.length,
-        _var_screeninfo.green.offset, _var_screeninfo.green.length,
-        _var_screeninfo.blue.offset, _var_screeninfo.blue.length,
-        bpp
-        );
-    
-    if (pixelformat) {    
-	agg_handler = create_Renderer_agg(pixelformat);      
+        rawfb->getRedOffset(),   rawfb->getRedSize(),
+        rawfb->getGreenOffset(), rawfb->getGreenSize(),
+        rawfb->getBlueOffset(),  rawfb->getBlueSize(),
+        bpp);
+
+    if (pixelformat) {
+	agg_handler = create_Renderer_agg(pixelformat);
     } else {
 	log_error("The pixel format of your framebuffer could not be detected.");
 	return false;
@@ -219,9 +249,11 @@ FBAggGlue::createRenderHandler()
     
     assert(agg_handler != NULL);
 
-    _rowsize = _var_screeninfo.xres_virtual*((bpp+7)/8);
-    
-    agg_handler->init_buffer(mem, size, width, height, _rowsize);
+    size_t rowsize = width*((bpp+7)/8);
+
+    agg_handler->init_buffer((unsigned char *)_device->getFBMemory(),
+                             _device->getFBMemSize(),
+                             width, height, rowsize);
     
     return (Renderer *)agg_handler;
 }    
@@ -230,6 +262,8 @@ void
 FBAggGlue::prepDrawingArea(FbWidget */* drawing_area */)
 {
     GNASH_REPORT_FUNCTION;
+
+
 }
 
 void
@@ -266,7 +300,7 @@ FBAggGlue::render()
 	
 	for (int y=bounds.getMinY(); y<=maxy; ++y) {    
 	    const unsigned int pixel_index = y * _rowsize + minx*pixel_size;
-	    memcpy(&fbmem[pixel_index], &buffer[pixel_index], row_size);
+	    memcpy(&(_fbmem[pixel_index]), &buffer[pixel_index], row_size);
 	    
 	}
     }  
@@ -281,13 +315,23 @@ FBAggGlue::render()
 int
 FBAggGlue::width()
 {
-    return _var_screeninfo.xres_virtual;
+    GNASH_REPORT_FUNCTION;
+
+    if (_device) {
+        return _device->getWidth();
+    }
+    return 0;
 }
 
 int
 FBAggGlue::height()
 {
-    return _var_screeninfo.yres_virtual;
+    GNASH_REPORT_FUNCTION;
+
+    if (_device) {
+        return _device->getHeight();
+    }
+    return 0;
 }
 
 } // end of namespace gui
