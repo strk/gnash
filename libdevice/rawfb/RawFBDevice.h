@@ -26,6 +26,12 @@
 
 #include <boost/scoped_array.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <sys/mman.h>
+#include <linux/fb.h>
+#include <linux/kd.h>
+#include <linux/vt.h>
 
 #include "GnashDevice.h"
 
@@ -59,12 +65,12 @@ class RawFBDevice : public GnashDevice
     // Return a string with the error code as text, instead of a numeric value
     const char *getErrorString(int error);
     
-    int getDepth() {GNASH_REPORT_FUNCTION; };
+    int getDepth() { return _varinfo.bits_per_pixel; };
 
     // Accessors for the settings needed by higher level code.
     // Surface accessors
-    size_t getWidth() {GNASH_REPORT_FUNCTION; };
-    size_t getHeight() {GNASH_REPORT_FUNCTION; };
+    size_t getWidth() { return _varinfo.xres; };
+    size_t getHeight() { return _varinfo.yres; };
     
     bool isSingleBuffered() { return true; }
     
@@ -74,12 +80,20 @@ class RawFBDevice : public GnashDevice
     // bool isBufferDestroyed(IRAWFBSurface surface) {
     //     return false;
     // }
-    int getID() {GNASH_REPORT_FUNCTION; };
+    int getID() { return 0; };
 
-    // Get the size of the pixels, for RAWFB it's always 8 as far as I can tell
-    int getRedSize() {GNASH_REPORT_FUNCTION; };
-    int getGreenSize(){GNASH_REPORT_FUNCTION; };
-    int getBlueSize() {GNASH_REPORT_FUNCTION; };
+    // Get the size of the pixels
+    int getRedSize()   { return _varinfo.red.length; };
+    int getGreenSize() { return _varinfo.green.length; };
+    int getBlueSize()  { return _varinfo.blue.length; };
+
+#ifdef RENDERER_AGG
+    /// These methods are only needed by AGG, which uses these
+    /// to calculate the pixel format.
+    int getRedOffset()   { return _varinfo.red.offset; };
+    int getGreenOffset() { return _varinfo.green.offset; };
+    int getBlueOffset()  { return _varinfo.blue.offset; };    
+#endif
     
     // Using RAWFB always means a native renderer
     bool isNativeRender() { return true; }
@@ -93,6 +107,9 @@ class RawFBDevice : public GnashDevice
     // Create an RAWFB window to render in. This is only used by testing
     void createWindow(const char *name, int x, int y, int width, int height);
 
+    boost::uint8_t *getFBMemory() { return _fbmem; };
+    size_t getFBMemSize() { return _fixinfo.smem_len; };
+    
     /// Start an RAWFB event loop. This is only used by testing. Note that
     /// calling this function blocks until the specified number of events
     /// have been handled. The first 5 are used up by creating the window.
@@ -100,10 +117,24 @@ class RawFBDevice : public GnashDevice
     /// @param passes the number of events to process before returning.
     /// @return nothing
     void eventLoop(size_t passes);
-
+    
 protected:
-    std::string _filespec;
+    /// Clear the framebuffer memory
+    void clear();
+
+    int                      _fd;
+    std::string              _filespec;
+    struct fb_fix_screeninfo _fixinfo;
+    struct fb_var_screeninfo _varinfo;
+    boost::uint8_t           *_fbmem;
 };
+
+#ifdef ENABLE_FAKE_FRAMEBUFFER
+/// Simulate the ioctls used to get information from the framebuffer driver.
+///
+/// Since this is an emulator, we have to set these fields to a reasonable default.
+int fakefb_ioctl(int fd, int request, void *data);
+#endif
 
 typedef void (*init_func)();
 typedef void (*reshape_func)(int, int);

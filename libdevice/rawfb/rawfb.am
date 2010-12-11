@@ -1,5 +1,8 @@
 if BUILD_RAWFB_DEVICE
-libgnashdevice_la_CPPFLAGS += $(RAWFB_CFLAGS) $(TSLIB_CFLAGS)
+libgnashdevice_la_CPPFLAGS += \
+	 -DFAKEFB=\"$(FAKEFB)\" \
+	$(RAWFB_CFLAGS) \
+	$(TSLIB_CFLAGS)
 libgnashdevice_la_SOURCES += \
 	rawfb/RawFBDevice.cpp \
 	rawfb/RawFBDevice.h

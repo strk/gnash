@@ -56,7 +56,7 @@ main(int argc, char *argv[])
         exit(0);
     }
     
-    if (ret) {
+    if ((ret) && (rfb.getFBMemory() > 0) && (rfb.getFBMemSize() > 0)) {
         runtest.pass("RawFBDevice:InitDevice()");
     } else {
         runtest.fail("RawFBDevice:InitDevice()");
@@ -74,54 +74,56 @@ main(int argc, char *argv[])
         runtest.fail("DirecTFBDevice::getHeight()");
     }
 
-#if 0
-    if (rfb.getVerticalRes()) {
-        runtest.pass("RawFBDevice::getVerticalRes()");
-    } else {
-        runtest.fail("RawFBDevice::getVerticalRes()");
-    }
-    
-    if (rfb.getHorzRes()) {
-        runtest.pass("RawFBDevice::getHorzRes()");
-    } else {
-        runtest.fail("RawFBDevice::getHorzRes()");
-    }    
-#endif
-    
     if (rfb.isSingleBuffered()) {
         runtest.pass("RawFBDevice::is*Buffered()");
     } else {
         runtest.fail("RawFBDevice::is*Buffered()");
     }
-
-#if 0
-    if (rfb.isContextSingleBuffered() != rfb.isContextBackBuffered()) {
-        runtest.pass("RawFBDevice::iisContextBuffered()");
-    } else {
-        runtest.fail("RawFBDevice::isContextBuffered()");
-    }
-
-    // Context accessor tests
-    std::cerr << "FIXME: " << rfb.getContextID() << std::endl;
-
-    if (rfb.getContextID() >= 0) {
-        runtest.pass("RawFBDevice::getContextID()");
-    } else {
-        runtest.fail("RawFBDevice::getContextID()");
-    }    
-
-    if (rfb.getSurfaceID() >= 0) {
-        runtest.pass("RawFBDevice::getSurfaceID()");
-    } else {
-        runtest.fail("RawFBDevice::getSurfaceID()");
-    }
-#endif
     
     if (rfb.getDepth()) {
         runtest.pass("RawFBDevice::getDepth()");
     } else {
         runtest.fail("RawFBDevice::getDepth()");
     }
+    
+    if (rfb.getRedSize() > 0) {
+        runtest.pass("RawFBDevice::getRedSize()");
+    } else {
+        runtest.fail("RawFBDevice::getRedSize()");
+    }
+
+    if (rfb.getGreenSize() > 0) {
+        runtest.pass("RawFBDevice::getGreenSize()");
+    } else {
+        runtest.fail("RawFBDevice::getGreenSize()");
+    }
+
+    if (rfb.getBlueSize() > 0) {
+        runtest.pass("RawFBDevice::getBlueSize()");
+    } else {
+        runtest.fail("RawFBDevice::getBlueSize()");
+    }
+
+    // AGG uses these to calculate the poixel format
+#ifdef RENDERER_AGG
+    if (rfb.getRedOffset() > 0) {
+        runtest.pass("RawFBDevice::getRedOffset()");
+    } else {
+        runtest.fail("RawFBDevice::getRedOffset()");
+    }
+    
+    if (rfb.getGreenOffset() > 0) {
+        runtest.pass("RawFBDevice::getGreenOffset()");
+    } else {
+        runtest.fail("RawFBDevice::getGreenOffset()");
+    }
+    
+    if (rfb.getBlueOffset() == 0) {
+        runtest.pass("RawFBDevice::getBlueOffset()");
+    } else {
+        runtest.fail("RawFBDevice::getBlueOffset()");
+    }
+#endif
 }
 
 // Local Variables:
