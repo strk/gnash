@@ -59,7 +59,7 @@ public:
     std::string description() const { return "OpenVG"; }
 
     Renderer_ovg();
-    Renderer_ovg(GnashDevice::dtype_t dtype);
+    Renderer_ovg(renderer::GnashDevice::dtype_t dtype);
     
     ~Renderer_ovg();
         
@@ -206,7 +206,7 @@ public:
 #endif
     unsigned char *_testBuffer; // buffer used by initTestBuffer() only
     
-    boost::scoped_ptr<GnashDevice> _device;
+    boost::scoped_ptr<renderer::GnashDevice> _device;
 };
 
 DSOEXPORT Renderer* create_handler(const char *pixelformat);
