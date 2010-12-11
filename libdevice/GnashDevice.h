@@ -51,7 +51,7 @@ struct GnashDevice
     /// The list of supported renders that use devices
     typedef enum {OPENVG, OPENGL, OPENGLES1, OPENGLES2, XORG, VAAPI} rtype_t;
     /// The list of supported device types
-    typedef enum {NODEV, EGL, DIRECTFB, X11} dtype_t;
+    typedef enum {NODEV, EGL, DIRECTFB, X11, RAWFB} dtype_t;
     
     GnashDevice(int argc, char *argv[]);
     GnashDevice() { GNASH_REPORT_FUNCTION; };
