@@ -609,6 +609,7 @@ public:
     /// actionscript.all and the swfdec testsuite.
     void setRelay(Relay* p) {
         if (p) _array = false;
+        if (_relay) _relay->clean();
         _relay.reset(p);
     }
 
@@ -877,7 +878,7 @@ as_object* getObjectWithPrototype(Global_as& gl, const ObjectURI& c);
 ///                 false.
 template<typename T>
 bool
-isNativeType(as_object* obj, T*& relay)
+isNativeType(const as_object* obj, T*& relay)
 {
     if (!obj) return false;
     relay = dynamic_cast<T*>(obj->relay());

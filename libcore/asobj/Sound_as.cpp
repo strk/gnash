@@ -898,7 +898,7 @@ attachSoundInterface(as_object& o)
 as_value
 sound_new(const fn_call& fn)
 {
-    as_object* so = fn.this_ptr;
+    as_object* so = ensure<ValidThis>(fn);
     Sound_as* s(new Sound_as(so));
     so->setRelay(s);
 

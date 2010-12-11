@@ -6,14 +6,17 @@
 *.o
 *.out
 *.bak
+*.deb
+*.dsc
+*.changes
+*.tar.gz
 *est
 *est[0-9]
 *est[0-9][0-9]
-
 .configline
 .deps
+.lastmod
 .libs
-
 aclocal.m4
 autom4te.cache
 bzrversion.h
@@ -24,6 +27,7 @@ config.status
 config.sub
 configure
 cygnal/testsuite/cygnal.all/cygnalrc
+deb-copy-stamp
 doc/C/*.1
 doc/C/*.html
 doc/C/*.info
@@ -31,7 +35,9 @@ doc/Doxyfile
 gnashconfig.h
 gnashconfig.h.in
 gnash.pc
+gnash-*/
 gui/*gnash
+gui/fb/fb-gnash
 gui/*.gcda
 gui/Info.plist
 libbase/gnashpluginrc
@@ -120,3 +126,4 @@ utilities/flvdumper
 utilities/gprocessor
 utilities/rtmpget
 utilities/soldumper
+extensions/fileio/test.swf

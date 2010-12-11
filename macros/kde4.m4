@@ -186,7 +186,7 @@ AC_DEFUN([GNASH_PATH_KDE4],
           KDE4_PREFIX="${kde4_prefix}"
           ;;
         prefix)
-          KDE4_PREFIX="${prefix}"
+          KDE4_PREFIX="\${prefix}"
           ;;
       esac
     fi

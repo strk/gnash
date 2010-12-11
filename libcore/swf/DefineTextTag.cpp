@@ -17,8 +17,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// Derived from text.cpp	-- Thatcher Ulrich <tu@tulrich.com> 2003
-
 #include "DefineTextTag.h"
 
 #include <algorithm>
@@ -72,7 +70,7 @@ DefineTextTag::extractStaticText(std::vector<const TextRecord*>& to,
 
     /// Insert pointers to all our TextRecords into to.
     std::transform(_textRecords.begin(), _textRecords.end(),
-            std::back_inserter(to), CreatePointer<TextRecord>());
+            std::back_inserter(to), CreatePointer<const TextRecord>());
 
     /// Count the number of DisplayObjects in this definition's text records.
     numChars = std::accumulate(_textRecords.begin(), _textRecords.end(),

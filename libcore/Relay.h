@@ -49,12 +49,21 @@ namespace gnash {
 class Relay : boost::noncopyable
 {
 public:
-    virtual ~Relay() {};
+    virtual ~Relay() = 0;
 
     /// A Relay itself is not a GC object, but may point to GC resources.
     virtual void setReachable() {}
+
+    /// Handle any cleanup necessary before the Relay is destroyed.
+    //
+    /// Only the replacement of one Relay by another should cause this
+    /// to happen. The cleanup may involve deregistration.
+    virtual void clean() {}
 };
 
+inline Relay::~Relay()
+{
+}
 
 /// A native type that requires periodic updates from the core (movie_root).
 //
@@ -86,6 +95,11 @@ public:
     //
     /// Do not override this function.
     virtual void setReachable();
+
+    /// Remove the ActiveRelay from movie_root's callback set.
+    //
+    /// This must be called before the Relay is destroyed!
+    virtual void clean();
 
     /// Return the as_object that this Relay is attached to.
     as_object& owner() const {
