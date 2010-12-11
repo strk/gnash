@@ -128,9 +128,6 @@ FBAggGlue::init (int argc, char ***argv)
     }
 #endif
 
-    // The agg glue file defines a typedef of Renderer, so we have to make sure
-    gnash::Renderer *rend = reinterpret_cast<gnash::Renderer *>
-        (createRenderHandler());
     // boost::shared_array<renderer::GnashDevice::dtype_t>
     //     devs = _renderer->probeDevices();
     // boost::shared_array<renderer::GnashDevice::dtype_t>::iterator it;
@@ -138,6 +135,11 @@ FBAggGlue::init (int argc, char ***argv)
     _device.reset(new renderer::rawfb::RawFBDevice);
     _device->initDevice(argc, *argv);
     
+    // The agg glue file defines a typedef of Renderer, so we have to make sure
+    // we get thr right one.
+    gnash::Renderer *rend = reinterpret_cast<gnash::Renderer *>
+        (createRenderHandler());
+
     // Set the renderer for the AGG glue layer
     _renderer.reset(rend);
 
@@ -251,7 +253,7 @@ FBAggGlue::createRenderHandler()
 
     size_t rowsize = width*((bpp+7)/8);
 
-    agg_handler->init_buffer((unsigned char *)_device->getFBMemory(),
+    agg_handler->init_buffer((unsigned char *)mem,
                              _device->getFBMemSize(),
                              width, height, rowsize);
     
