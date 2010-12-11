@@ -35,7 +35,6 @@
 #include "Renderer.h"
 
 #define PIXELFORMAT_LUT8
-#define CMAP_SIZE (256*2)
 
 #ifdef USE_MOUSE_PS2
 # define MOUSE_DEVICE "/dev/input/mice"
@@ -172,12 +171,6 @@ public:
     void checkForData();
     
 private:
-    /// For 8 bit (palette / LUT) modes, sets a grayscale palette.
-    //
-    /// This GUI currently does not support palette modes. 
-    ///
-    bool set_grayscale_lut8();
-    
     bool initialize_renderer();
     
     /// Tries to find a accessible tty
@@ -199,7 +192,6 @@ private:
     int         _ypos;          // Y position of the output window
     size_t      _timeout;       // timeout period for the event loop
 
-    struct fb_cmap _cmap;       // the colormap
     struct fb_var_screeninfo _var_screeninfo;
     struct fb_fix_screeninfo _fix_screeninfo;
     boost::shared_ptr<FBGlue> _glue;
