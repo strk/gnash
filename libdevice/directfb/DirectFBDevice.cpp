@@ -121,28 +121,27 @@ DirectFBDevice::initDevice(int argc, char *argv[])
         return false;
     }
 
-#if 0
     // get an interface to the primary keyboard and create an
     // input buffer for it
-   _ dfb->GetInputDevice(_dfb, DIDID_KEYBOARD, &_keyboard);
-    keyboard->CreateEventBuffer(_keyboard, &_keybuffer);
+   _dfb->GetInputDevice(_dfb, DIDID_KEYBOARD, &_keyboard);
+    _keyboard->CreateEventBuffer(_keyboard, &_keybuffer);
 
     // get an interface to the primary keyboard and create an
     // input buffer for it
-    DFBCHECK(dfb->GetInputDevice( dfb, DIDID_KEYBOARD, &keyboard ));
-    DFBCHECK(keyboard->CreateEventBuffer( keyboard, &keybuffer ));
+    _dfb->GetInputDevice(_dfb, DIDID_KEYBOARD, &_keyboard);
+    _keyboard->CreateEventBuffer(_keyboard, &_keybuffer );
     
     // set our cooperative level to DFSCL_FULLSCREEN for exclusive access to
     // the primary layer
-    dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
-#endif
+    _dfb->SetCooperativeLevel(_dfb, DFSCL_FULLSCREEN);
     
     DFBSurfaceDescription dsc;
 
     // get the primary surface, i.e. the surface of the primary layer we have
     // exclusive access to
     dsc.flags = DSDESC_CAPS;
-    dsc.caps = static_cast<DFBSurfaceCapabilities>(DSCAPS_PRIMARY | DSCAPS_DOUBLE | DSCAPS_VIDEOONLY);
+//    dsc.caps = static_cast<DFBSurfaceCapabilities>(DSCAPS_PRIMARY | DSCAPS_DOUBLE | DSCAPS_VIDEOONLY);
+    dsc.caps = static_cast<DFBSurfaceCapabilities>(DSCAPS_PRIMARY | DSCAPS_FLIPPING);
     
     if ((result = _dfb->CreateSurface(_dfb, &dsc, &_surface)) != DR_OK) {
 	log_error("CreateSurface(): %s", getErrorString(result));
@@ -163,7 +162,7 @@ DirectFBDevice::initDevice(int argc, char *argv[])
 
 #if 0
     DFBSurfaceDescription sdesc;
-    if ((result == _dfb->CreateImageProvider(_dfb, "/home/rob/imgp2300.jpg", &_provider)) != DR_OK) {
+    if ((result == _dfb->CreateImageProvider(_dfb, "/tmp/img832a.jpg", &_provider)) != DR_OK) {
 	log_error("CreateImageProvider(): %s", getErrorString(result));
     }
     _provider->GetSurfaceDescription(_provider, &sdesc);
@@ -180,6 +179,14 @@ DirectFBDevice::initDevice(int argc, char *argv[])
     DFBSurfacePixelFormat format;
     _surface->GetPixelFormat(_surface, &format);
 
+#if 0
+    _surface->FillRectangle (_surface, 0, 0, x, y);
+    _surface->SetColor (_surface, 0x80, 0x80, 0xff, 0xff);
+    _surface->DrawLine (_surface, 0, x / 2, x - 1, y / 2);
+    _surface->Flip (_surface, NULL, DSFLIP_NONE);
+    sleep(15);
+#endif
+    
     return true;
 }
 
