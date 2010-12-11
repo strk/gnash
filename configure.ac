@@ -651,8 +651,8 @@ AC_ARG_ENABLE(gui,
   build_fb=auto
   build_sdl=auto
   if test x"${openbsd_os}" = x"openbsd"; then
-    build_kde3=yes;
-    build_gtk=yes;
+    build_gtk=yes
+    build_dump=auto
   else if test x"${haiku}" = xyes; then
     build_haiku=yes;
   else
