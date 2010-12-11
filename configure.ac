@@ -854,7 +854,7 @@ dnl messy, as one might want to use a touchscreen with a normal mouse
 dnl or keyboard attached. 
 dnl By default, don't build any of these, as they are only for the 
 dnl Framebuffer running without X11.
-if test x"${build_fb}" = xyes -a x"${linux}" = yes; then
+if test x"${build_fb}" = xyes -a x"${linux}" = xyes; then
   build_ps2mouse=yes
   build_ps2keyboard=no
   build_input_events=yes
