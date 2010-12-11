@@ -40,9 +40,10 @@ public:
     virtual ~Renderer_agg_base() {}
     
     // these methods need to be accessed from outside:
-    virtual void init_buffer(unsigned char *mem, int size, int x, int y, int rowstride)=0;
+    virtual void init_buffer(unsigned char *mem, int size, int x, int y,
+                             int rowstride) = 0;
     
-    virtual unsigned int getBytesPerPixel() const=0;
+    virtual unsigned int getBytesPerPixel() const = 0;
     
     unsigned int getBitsPerPixel() const { return getBytesPerPixel()*8; }
     
