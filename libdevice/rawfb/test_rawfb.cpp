@@ -38,7 +38,7 @@ TestState runtest;
 
 using namespace gnash;
 using namespace std;
-using namespace device;
+using namespace renderer;
 
 // The debug log used by all the gnash libraries.
 static LogFile& dbglogfile = LogFile::getDefaultInstance();

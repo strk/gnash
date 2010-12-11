@@ -33,7 +33,7 @@
 
 namespace gnash {
 
-namespace device {
+namespace renderer {
 
 namespace rawfb {
     

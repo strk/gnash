@@ -31,11 +31,11 @@
 
 namespace gnash {
 
-namespace device {
+namespace renderer {
 
 namespace rawfb {
 
-class RawFBDevice : public device::GnashDevice
+class RawFBDevice : public GnashDevice
 {
   public:
     
@@ -59,12 +59,12 @@ class RawFBDevice : public device::GnashDevice
     // Return a string with the error code as text, instead of a numeric value
     const char *getErrorString(int error);
     
-    int getDepth();
+    int getDepth() {GNASH_REPORT_FUNCTION; };
 
     // Accessors for the settings needed by higher level code.
     // Surface accessors
-    size_t getWidth();
-    size_t getHeight();
+    size_t getWidth() {GNASH_REPORT_FUNCTION; };
+    size_t getHeight() {GNASH_REPORT_FUNCTION; };
     
     bool isSingleBuffered() { return true; }
     
@@ -74,17 +74,17 @@ class RawFBDevice : public device::GnashDevice
     // bool isBufferDestroyed(IRAWFBSurface surface) {
     //     return false;
     // }
-    int getID();
+    int getID() {GNASH_REPORT_FUNCTION; };
 
     // Get the size of the pixels, for RAWFB it's always 8 as far as I can tell
-    int getRedSize();
-    int getGreenSize();
-    int getBlueSize();
+    int getRedSize() {GNASH_REPORT_FUNCTION; };
+    int getGreenSize(){GNASH_REPORT_FUNCTION; };
+    int getBlueSize() {GNASH_REPORT_FUNCTION; };
     
     // Using RAWFB always means a native renderer
     bool isNativeRender() { return true; }
 
-    native_window_t getDrawableWindow();
+    native_window_t getDrawableWindow() {GNASH_REPORT_FUNCTION; };
     
     //
     // Testing Support
@@ -111,7 +111,7 @@ typedef void (*draw_func)();
 typedef int  (*key_func)(unsigned key);
 
 } // namespace rawFB
-} // namespace device
+} // namespace renderer
 } // namespace gnash
 
 #endif  // end of __RAWFB_DEVICE_H__
