@@ -80,7 +80,8 @@ FBAggGlue::~FBAggGlue()
 void
 FBAggGlue::setInvalidatedRegion(const SWFRect &/*bounds */)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+    
     if (!_renderer) {
         log_error("No renderer set!");
         return;
@@ -90,7 +91,8 @@ FBAggGlue::setInvalidatedRegion(const SWFRect &/*bounds */)
 void
 FBAggGlue::setInvalidatedRegions(const InvalidatedRanges &ranges)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     if (!_renderer) {
         log_error("No renderer set!");
         return;
@@ -100,7 +102,6 @@ FBAggGlue::setInvalidatedRegions(const InvalidatedRanges &ranges)
     
     _drawbounds.clear();
 
-#if 0
     for (size_t rno = 0; rno<ranges.size(); rno++) {
         geometry::Range2d<int> bounds = Intersection(
             _renderer->world_to_pixel(ranges.getRange(rno)),
@@ -111,7 +112,6 @@ FBAggGlue::setInvalidatedRegions(const InvalidatedRanges &ranges)
         
         _drawbounds.push_back(bounds);   
     }
-#endif   
 
 }
 
@@ -120,77 +120,35 @@ FBAggGlue::init (int argc, char ***argv)
 {
     GNASH_REPORT_FUNCTION;    
 
+    // The device must be initialized before the renderer. AGG only supports
+    // The Raw framebuffer, so we use that.
+    _device.reset(new renderer::rawfb::RawFBDevice);
+    _device->initDevice(argc, *argv);    
+
+    // Set the renderer for the AGG glue layer
+    gnash::Renderer *rend = reinterpret_cast<gnash::Renderer *>
+                                                (createRenderHandler());
+    if (rend) {
+        _renderer.reset(rend);
+    } else {
+        log_error("failed to create a render handler for AGG!");
+        return false;
+    }
+
 #ifdef PIXELFORMAT_LUT8
     // Set grayscale for 8 bit modes
+    renderer::rawfb::RawFBDevice *rawfb = reinterpret_cast
+        <renderer::rawfb::RawFBDevice *>(_device.get());    
     if (_varinfo.bits_per_pixel == 8) {
-	if (!set_grayscale_lut8())
+	if (!rawfb->setGrayscaleLUT8())
 	    return false;
     }
 #endif
-
-    // boost::shared_array<renderer::GnashDevice::dtype_t>
-    //     devs = _renderer->probeDevices();
-    // boost::shared_array<renderer::GnashDevice::dtype_t>::iterator it;
-    // Initialize to EGL for now
-    _device.reset(new renderer::rawfb::RawFBDevice);
-    _device->initDevice(argc, *argv);
     
-    // The agg glue file defines a typedef of Renderer, so we have to make sure
-    // we get thr right one.
-    gnash::Renderer *rend = reinterpret_cast<gnash::Renderer *>
-        (createRenderHandler());
-
-    // Set the renderer for the AGG glue layer
-    _renderer.reset(rend);
-
     return true;
 }
 
 #define TO_16BIT(x) (x | (x<<8))
-
-bool
-FBAggGlue::set_grayscale_lut8()
-{
-    GNASH_REPORT_FUNCTION;
-    
-    struct fb_cmap cmap;
-    int i;
-    
-    log_debug(_("LUT8: Setting up colormap"));
-    
-    cmap.start = 0;
-    cmap.len = 256;
-    cmap.red = new boost::uint16_t[CMAP_SIZE];
-    cmap.green = new boost::uint16_t[CMAP_SIZE];
-    cmap.blue = new boost::uint16_t[CMAP_SIZE];
-    cmap.transp = NULL;
-    
-    for (i=0; i<256; i++) {
-	
-	int r = i;
-	int g = i;
-	int b = i;
-	
-	cmap.red[i] = TO_16BIT(r);
-	cmap.green[i] = TO_16BIT(g);
-	cmap.blue[i] = TO_16BIT(b);
-	
-    }
-    
-// #ifdef ENABLE_FAKE_FRAMEBUFFER
-//     if (fakefb_ioctl(_fd, FBIOPUTCMAP, &cmap))
-// #else
-//     if (ioctl(_fd, FBIOPUTCMAP, &cmap))
-// #endif
-//     {
-// 	log_error(_("LUT8: Error setting colormap: %s"), strerror(errno));
-// 	return false;
-//     }
-    
-    return true;
-     
-#undef TO_16BIT
-}    
 
 Renderer *
 FBAggGlue::createRenderHandler()
@@ -212,7 +170,7 @@ FBAggGlue::createRenderHandler()
 
     agg_handler = NULL;
 
-//    _validbounds.setTo(0, 0, width - 1, height - 1);
+    _validbounds.setTo(0, 0, width - 1, height - 1);
     
 #ifdef ENABLE_DOUBLE_BUFFERING
     log_debug(_("Double buffering enabled"));
@@ -251,10 +209,10 @@ FBAggGlue::createRenderHandler()
     
     assert(agg_handler != NULL);
 
+    // This attaches the memory from the framebuffer to the AGG
+    // renderer.
     size_t rowsize = width*((bpp+7)/8);
-
-    agg_handler->init_buffer((unsigned char *)mem,
-                             _device->getFBMemSize(),
+    agg_handler->init_buffer((unsigned char *)mem, _device->getFBMemSize(),
                              width, height, rowsize);
     
     return (Renderer *)agg_handler;
@@ -264,8 +222,8 @@ void
 FBAggGlue::prepDrawingArea(FbWidget */* drawing_area */)
 {
     GNASH_REPORT_FUNCTION;
-
-
+    // nothing to do here, the memory was attached when
+    // creating the renderer.
 }
 
 void

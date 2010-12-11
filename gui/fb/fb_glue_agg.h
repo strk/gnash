@@ -94,11 +94,6 @@ public:
     void render();
     void render(void* const /* region */) { };
 
-    /// For 8 bit (palette / LUT) modes, sets a grayscale palette.
-    //
-    /// This GUI currently does not support palette modes.
-    bool set_grayscale_lut8();
-
     // these are used only for debugging purpose to access private data
     size_t getBounds() { return _drawbounds.size(); };
     size_t getMemSize() { return _fixinfo.smem_len; };
@@ -113,6 +108,7 @@ protected:
 #ifdef ENABLE_DOUBLE_BUFFERING
     boost::shared_ptr<boost::uint8_t> _buffer; // offscreen buffer
 #endif
+    geometry::Range2d<int> _validbounds;
     std::vector< geometry::Range2d<int> > _drawbounds;
 
     boost::scoped_ptr<Renderer> _renderer;
