@@ -852,20 +852,20 @@ dnl required when using the Framebuffer, as without the X11 desktop,
 dnl Gnash has to handle all these internally. This can get
 dnl messy, as one might want to use a touchscreen with a normal mouse
 dnl or keyboard attached. 
-dnl By default, don't build any of these, as they are only for the Framebuffer
-dnl running without X11.
-if test x"${build_fb}" = xyes; then
-build_ps2mouse=yes
-build_ps2keyboard=no
-build_input_events=yes
-build_tslib=yes
-input_events="PS/2 Mouse, Input Devices, Touchscreen via Tslib"
+dnl By default, don't build any of these, as they are only for the 
+dnl Framebuffer running without X11.
+if test x"${build_fb}" = xyes -a x"${linux}" = yes; then
+  build_ps2mouse=yes
+  build_ps2keyboard=no
+  build_input_events=yes
+  build_tslib=yes
+  input_events="PS/2 Mouse, Input Devices, Touchscreen via Tslib"
 else
-build_ps2mouse=no
-build_ps2keyboard=no
-build_input_events=no
-build_tslib=no
-input_events=
+  build_ps2mouse=no
+  build_ps2keyboard=no
+  build_input_events=no
+  build_tslib=no
+  input_events=
 fi
 AC_ARG_ENABLE(input,
   AC_HELP_STRING([--enable-input=], [Enable support for the specified input devices for the framebuffer GUI (default=ps2mouse|ps2keyboard|events|touchscreen)]),
@@ -1140,11 +1140,12 @@ build_vaapi_device=no
 build_openmax_device=no
 build_egl_device=yes
 build_directfb_device=yes
+build_rawfb_device=yes
 build_x11_device=yes
 device_list="X11 EGL DirectFB"
 ndevice=3
 AC_ARG_ENABLE(device,
-  AC_HELP_STRING([--enable-device], [Specify which hardware abstraction to use to support to enable (none,openmax,egl,directfb,x11,vaapi)]),
+  AC_HELP_STRING([--enable-device], [Specify which hardware abstraction to use to support to enable (none,openmax,egl,directfb,rawfb,x11,vaapi)]),
   if test -z ${enableval}; then
       device_list="none"
       ndevice=0
@@ -1182,11 +1183,17 @@ AC_ARG_ENABLE(device,
         build_directfb_device=yes
         ndevice=$((ndevice+1))
         ;;
+      ra*|RAW*)
+        device_list="${device_list} RawFB"
+        build_rawfb_device=yes
+        ndevice=$((ndevice+1))
+        ;;
       all|ALL)
         device_list="OpenMax EGL DirectFB X11 VAAPI"
         build_openmax_device=yes
         build_vaapi_device=yes
         build_egl_device=yes
+        build_rawfb_device=yes
         build_directfb_device=yes
         build_x11_device=yes
         ndevice=5
@@ -2438,6 +2445,11 @@ if test x"${build_gles1}" = xyes -o  x"${build_gles2}" = xyes -o x"${build_ovg}"
   build_egl_device=yes
 fi
 
+dnl only Linux supports /dev/fb0
+if test x"${build_rawfb_device}" = xyes -a x"${linux}" = xyes; then
+   AC_DEFINE([BUILD_RAWFB_DEVICE], [1], [Use raw Framebuffer device support])
+fi
+
 if test x"${build_directfb_device}" = xyes; then
    GNASH_PKG_FIND(directfb, [directfb/directfb.h], [DirectFB render library], DirectFBCreate)
    AC_DEFINE([BUILD_DIRECTFB_DEVICE], [1], [Use DirectFB device support])
@@ -2451,6 +2463,7 @@ fi
 AM_CONDITIONAL(BUILD_VAAPI_DEVICE, [test x"${use_libva}" = xyes])
 AM_CONDITIONAL(BUILD_EGL_DEVICE, [test x"${build_egl_device}" = xyes])
 AM_CONDITIONAL(BUILD_DIRECTFB_DEVICE, [ test x${build_directfb_device} = xyes])
+AM_CONDITIONAL(BUILD_RAWFB_DEVICE, [ test x${build_rawfb_device} = xyes])
 AM_CONDITIONAL(BUILD_X11_DEVICE, [test x$build_x11_device = xyes])
 
 if test x"${build_ovg}" = xyes; then
