@@ -558,7 +558,7 @@ Renderer_cairo::drawVideoFrame(image::GnashImage* baseframe, const Transform& xf
 
   
 geometry::Range2d<int>
-Renderer_cairo::world_to_pixel(const SWFRect& worldbounds)
+Renderer_cairo::world_to_pixel(const SWFRect& worldbounds) const
 {
     double xmin = worldbounds.get_x_min(),
            ymin = worldbounds.get_y_min(),
@@ -574,7 +574,7 @@ Renderer_cairo::world_to_pixel(const SWFRect& worldbounds)
 
 // FIXME
 point
-Renderer_cairo::pixel_to_world(int x, int y)
+Renderer_cairo::pixel_to_world(int x, int y) const
 {
     cairo_matrix_t inv_stage = _stage_mat;
     cairo_matrix_invert(&inv_stage);

@@ -963,7 +963,7 @@ private:
 
   // FIXME
   geometry::Range2d<int>
-  world_to_pixel(const SWFRect& worldbounds)
+  world_to_pixel(const SWFRect& worldbounds) const
   {
     // TODO: verify this is correct
     geometry::Range2d<int> ret(worldbounds.getRange());
@@ -973,7 +973,7 @@ private:
 
   // FIXME
   point 
-  pixel_to_world(int x, int y)
+  pixel_to_world(int x, int y) const
   {
     // TODO: verify this is correct
     return point(pixelsToTwips(x), pixelsToTwips(y));

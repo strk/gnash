@@ -50,8 +50,10 @@ public:
     void drawVideoFrame(image::GnashImage* baseframe, const Transform& xform,
                                 const SWFRect* bounds, bool smooth);
 
-    geometry::Range2d<int> world_to_pixel(const SWFRect& worldbounds);
-    point pixel_to_world(int x, int y);
+    virtual geometry::Range2d<int> world_to_pixel(const SWFRect& worldbounds)
+        const;
+
+    virtual point pixel_to_world(int x, int y) const;
 
     void set_color(const rgba& c);
 

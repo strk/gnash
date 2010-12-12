@@ -1922,7 +1922,7 @@ public:
   }                      
   
   inline void world_to_pixel(int& x, int& y,
-    float world_x, float world_y)
+    float world_x, float world_y) const
   {
     // negative pixels seems ok here... we don't 
     // clip to valid range, use world_to_pixel(SWFRect&)
@@ -1933,7 +1933,7 @@ public:
     y = (int)p.y;
   }
 
-  geometry::Range2d<int> world_to_pixel(const SWFRect& wb)
+  geometry::Range2d<int> world_to_pixel(const SWFRect& wb) const
   {
       using namespace gnash::geometry;
 
@@ -1948,20 +1948,8 @@ public:
     return Range2d<int>(xmin, ymin, xmax, ymax);
   }
   
-  geometry::Range2d<int> world_to_pixel(const geometry::Range2d<int>& wb)
-  {
-    if (wb.isNull() || wb.isWorld()) return wb;
-    
-    int xmin, ymin, xmax, ymax;
-
-    world_to_pixel(xmin, ymin, wb.getMinX(), wb.getMinY());
-    world_to_pixel(xmax, ymax, wb.getMaxX(), wb.getMaxY());
-
-    return geometry::Range2d<int>(xmin, ymin, xmax, ymax);
-  }
-  
   point 
-  pixel_to_world(int x, int y)
+  pixel_to_world(int x, int y) const
   {
     point p(x, y);
     SWFMatrix mat = stage_matrix;
@@ -1992,7 +1980,7 @@ public:
     
       const Range2d<int>& range = ranges.getRange(rno);
 
-      Range2d<int> pixbounds = world_to_pixel(range);
+      Range2d<int> pixbounds = Renderer::world_to_pixel(range);
       
       geometry::Range2d<int> bounds = Intersection(pixbounds, visiblerect);
       
@@ -2014,7 +2002,7 @@ public:
 
     using gnash::geometry::Range2d;
   
-    Range2d<int> pixbounds = world_to_pixel(bounds);
+    Range2d<int> pixbounds = Renderer::world_to_pixel(bounds);
     
     for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {  
       if (Intersect(pixbounds, _clipbounds[cno]))

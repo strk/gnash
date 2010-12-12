@@ -392,13 +392,22 @@ public:
     /// ==================================================================
     
     /// Converts world coordinates to pixel coordinates
-    virtual geometry::Range2d<int> world_to_pixel(const SWFRect& worldbounds) = 0;
+    virtual geometry::Range2d<int> world_to_pixel(const SWFRect& worldbounds)
+        const = 0;
     
+    geometry::Range2d<int> world_to_pixel(const geometry::Range2d<int>& wb)
+        const
+    {
+        if ((wb.isNull() || wb.isWorld())) return wb;
+        return world_to_pixel(SWFRect(wb.getMinX(), wb.getMinY(),
+                       wb.getMaxX(), wb.getMaxY()));
+    }
+        
     /// Converts pixel coordinates to world coordinates (TWIPS)
-    virtual point pixel_to_world(int x, int y) = 0;
+    virtual point pixel_to_world(int x, int y) const = 0;
     
     virtual geometry::Range2d<int> pixel_to_world(
-                    const geometry::Range2d<int>& pixelbounds)
+                    const geometry::Range2d<int>& pixelbounds) const
     {
         point topleft = pixel_to_world(
                         pixelbounds.getMinX(), pixelbounds.getMinY());
@@ -408,22 +417,7 @@ public:
         return geometry::Range2d<int> (topleft.x, topleft.y, 
             bottomright.x, bottomright.y);
     }
-    
-    virtual geometry::Range2d<int> world_to_pixel(
-                    const geometry::Range2d<int>& worldbounds)
-    {
-        if ((worldbounds.isNull() || worldbounds.isWorld())) return worldbounds;
 
-	// We always get compiler warnings on casting floats to int
-	// here, so we cast it ourselves to get rid of the warning
-	// message. Note that in both cases this rounds the float to
-	// an integer by dropping the decimal part.
-        return world_to_pixel(SWFRect(static_cast<int>(worldbounds.getMinX()),
-				   static_cast<int>(worldbounds.getMinY()),
-				   static_cast<int>(worldbounds.getMaxX()),
-				   static_cast<int>(worldbounds.getMaxY())));
-    }
-        
     /// \brief
     /// Checks if the given bounds are (partially) in the current drawing
     /// clipping area.
