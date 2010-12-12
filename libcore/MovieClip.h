@@ -84,8 +84,13 @@ namespace gnash {
 /// dependent on the _swf. Exports are also sought in this Movie.
 class MovieClip : public DisplayObjectContainer 
 {
-
 public:
+
+    typedef std::vector<TextField*> TextFields;
+
+    /// A container for textfields, indexed by their variable name
+    typedef std::map<ObjectURI, TextFields, ObjectURI::LessThan>
+        TextFieldIndex;
 
     typedef std::map<std::string, std::string> MovieVariables;
 
@@ -218,13 +223,11 @@ public:
     const DisplayObject* findDropTarget(boost::int32_t x, boost::int32_t y,
             DisplayObject* dragging) const;
 
-    void setDropTarget(const std::string& tgt)
-    {
+    void setDropTarget(const std::string& tgt) {
         _droptarget = tgt;
     }
 
-    const std::string& getDropTarget() const
-    {
+    const std::string& getDropTarget() const {
         return _droptarget;
     }
     
@@ -503,7 +506,7 @@ public:
     //
     /// A TextField variable is a variable that acts
     /// as a setter/getter for a TextField 'text' member.
-    void set_textfield_variable(const std::string& name, TextField* ch);
+    void set_textfield_variable(const ObjectURI& name, TextField* ch);
 
     void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
     
@@ -625,11 +628,6 @@ protected:
 
 private:
 
-    typedef std::vector<TextField*> TextFields;
-
-    /// A container for textfields, indexed by their variable name
-    typedef std::map<std::string, TextFields> TextFieldIndex;
-
     /// Process any completed loadVariables request
     void processCompletedLoadVariableRequests();
 
@@ -717,22 +715,6 @@ private:
 
     /// Increment _currentFrame, and take care of looping.
     void increment_frame_and_check_for_loop();
-    
-    /// \brief
-    /// Returns a vector of TextField associated with the given variable name,
-    /// or NULL if no such variable name is known.
-    //
-    /// A TextField variable is a variable that acts
-    /// as a setter/getter for a TextField 'text' member.
-    ///
-    /// Search is case-sensitive.
-    ///
-    /// @todo find out wheter we should be case sensitive or not
-    ///
-    /// @return a pointer inside a vector, will be invalidated by modifications
-    ///         of the vector (set_textfield_variable)
-    ///
-    TextFields* get_textfield_variable(const std::string& name);
 
     /// Unregister textfield variables bound to unloaded TextFields
     void cleanup_textfield_variables();

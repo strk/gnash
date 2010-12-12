@@ -84,7 +84,12 @@ namespace gnash {
 //
 //#define DEBUG_MOUSE_ENTITY_FINDING 1
 
-// Anonymous namespace for module-private definitions
+namespace {
+    MovieClip::TextFields* textfieldVar(MovieClip::TextFieldIndex* t,
+            const ObjectURI& name);
+}
+
+// Utility functors.
 namespace {
 
 /// ConstructEvent, used for queuing construction
@@ -537,12 +542,8 @@ MovieClip::getDisplayObjectAtDepth(int depth)
 bool
 MovieClip::getTextFieldVariables(const ObjectURI& uri, as_value& val)
 {
-    const string_table::key name_key = getName(uri);
-
-    const std::string& name = getStringTable(*getObject(this)).value(name_key);
-
     // Try textfield variables
-    TextFields* etc = get_textfield_variable(name);
+    TextFields* etc = textfieldVar(_text_variables.get(), uri);
     if (etc) {
         for (TextFields::const_iterator i=etc->begin(), e=etc->end();
                 i!=e; ++i) {
@@ -811,19 +812,8 @@ MovieClip::pathElement(const ObjectURI& uri)
 bool
 MovieClip::setTextFieldVariables(const ObjectURI& uri, const as_value& val)
 {
-
-    const string_table::key name = getName(uri);
-
     // Try textfield variables
-    //
-    // FIXME: Turn textfield variables into Getter/Setters (Properties)
-    //           so that as_object::set_member will do this automatically.
-    //           The problem is that setting a TextVariable named after
-    //           a builtin property will prevent *any* setting for the
-    //           property (ie: have a textfield use _x as variable name and
-    //           be scared)
-    TextFields* etc = get_textfield_variable(
-            getStringTable(*getObject(this)).value(name));
+    TextFields* etc = textfieldVar(_text_variables.get(), uri);
 
     if (!etc) return false;
 
@@ -1559,7 +1549,7 @@ MovieClip::cleanup_textfield_variables()
 
 
 void
-MovieClip::set_textfield_variable(const std::string& name, TextField* ch)
+MovieClip::set_textfield_variable(const ObjectURI& name, TextField* ch)
 {
     assert(ch);
 
@@ -1570,19 +1560,6 @@ MovieClip::set_textfield_variable(const std::string& name, TextField* ch)
     
     (*_text_variables)[name].push_back(ch);
 }
-
-MovieClip::TextFields*
-MovieClip::get_textfield_variable(const std::string& name)
-{
-    // nothing allocated yet...
-    if (!_text_variables.get()) return 0;
-
-    // TODO: should variable name be considered case-insensitive ?
-    TextFieldIndex::iterator it = _text_variables->find(name);
-    if (it == _text_variables->end()) return 0;
-    return &(it->second);
-} 
-
 
 DisplayObject*
 MovieClip::getDisplayListObject(const ObjectURI& uri)
@@ -2079,4 +2056,19 @@ MovieClip::setPlayState(PlayState s)
     _playState = s;
 }
 
+namespace {
+
+MovieClip::TextFields*
+textfieldVar(MovieClip::TextFieldIndex* t, const ObjectURI& name)
+{
+    // nothing allocated yet...
+    if (!t) return 0;
+
+    // TODO: should variable name be considered case-insensitive ?
+    MovieClip::TextFieldIndex::iterator it = t->find(name);
+    if (it == t->end()) return 0;
+    return &(it->second);
+} 
+
+} // unnamed namespace
 } // namespace gnash

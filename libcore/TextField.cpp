@@ -2046,36 +2046,18 @@ TextField::registerTextVariable()
     const ObjectURI& key = varRef.second;
     as_object* obj = getObject(this);
     const int version = getSWFVersion(*obj);
-    string_table& st = getStringTable(*obj);
     
     // check if the VariableName already has a value,
     // in that case update text value
     as_value val;
     if (target->get_member(key, &val) ) {
-#ifdef DEBUG_DYNTEXT_VARIABLES
-        log_debug(_("target object (%s @ %p) does have a member named %s"),
-            typeName(*target), (void*)target, st.value(key));
-#endif
         // TODO: pass environment to to_string ?
         // as_environment& env = get_environment();
         setTextValue(utf8::decodeCanonicalString(val.to_string(), version));
     }
     else if (_textDefined) {
         as_value newVal = as_value(utf8::encodeCanonicalString(_text, version));
-#ifdef DEBUG_DYNTEXT_VARIABLES
-        log_debug(_("target sprite (%s @ %p) does NOT have a member "
-                    "named %s (no problem, we'll add it with value %s)"),
-                    typeName(*target), (void*)target,
-                    st.value(key), newVal);
-#endif
         target->set_member(key, newVal);
-    }
-    else {
-#ifdef DEBUG_DYNTEXT_VARIABLES
-        log_debug(_("target sprite (%s @ %p) does NOT have a member "
-                    "named %s, and we don't have text defined"),
-                    typeName(*target), (void*)target, st.value(key));
-#endif
     }
 
     MovieClip* sprite = get<MovieClip>(target);
@@ -2083,11 +2065,7 @@ TextField::registerTextVariable()
     if (sprite) {
         // add the textfield variable to the target sprite
         // TODO: have set_textfield_variable take a string_table::key instead ?
-#ifdef DEBUG_DYNTEXT_VARIABLES
-        log_debug("Calling set_textfield_variable(%s) against sprite %s",
-                st.value(key), sprite->getTarget());
-#endif
-        sprite->set_textfield_variable(key.toString(st), this);
+        sprite->set_textfield_variable(key, this);
 
     }
     _text_variable_registered=true;
