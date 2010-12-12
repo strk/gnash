@@ -836,8 +836,7 @@ DisplayObject::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
     tr.append_child(it, std::make_pair(_("Depth"), os.str()));
 
     /// Don't add if the DisplayObject has no ratio value
-    if (get_ratio() >= 0)
-    {
+    if (get_ratio() > 0) {
         os.str("");
         os << get_ratio();
         tr.append_child(it, std::make_pair(_("Ratio"), os.str()));
