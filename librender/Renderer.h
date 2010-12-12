@@ -482,58 +482,6 @@ public:
         return false; // avoid compiler warning        
     }
     
-    
-    /// Returns the average RGB color for a square block on the stage. The 
-    /// width and height of the block is defined by "radius" and x/y refer
-    /// to the center of the block. radius==1 equals getPixel() and radius==0
-    /// is illegal. For even "radius" values, the center point is not exactly
-    /// defined. 
-    /// The function returns false when at least one pixel of the block was
-    /// outside the main frame buffer. In that case the value in color_return
-    /// is undefined.
-    /// This implementation is provided for simplicity. Renderers should
-    /// implement a specialized version for better performance.
-    virtual bool getAveragePixel(rgba& color_return, int x, int y, 
-        unsigned int radius) const
-    {
-    
-        assert(radius>0); 
-    
-        // optimization:
-        if (radius==1) return getPixel(color_return, x, y);
-    
-        unsigned int r=0, g=0, b=0, a=0;
-        
-        x -= radius/2;
-        y -= radius/2;
-        
-        int xe = x+radius;
-        int ye = y+radius;
-
-        rgba pixel;
-        
-        for (int yp=y; yp<ye; yp++)
-        for (int xp=x; xp<xe; xp++)
-        {
-            if (!getPixel(pixel, xp, yp))
-                return false;
-                
-            r += pixel.m_r;            
-            g += pixel.m_g;            
-            b += pixel.m_b;            
-            a += pixel.m_a;            
-        }
-        
-        int pcount = radius*radius; 
-        color_return.m_r = r / pcount; 
-        color_return.m_g = g / pcount; 
-        color_return.m_b = b / pcount; 
-        color_return.m_a = a / pcount; 
-        
-        return true;
-    }
-    
-    
     /// \brief
     /// Initializes the renderer for off-screen rendering used by the    
     /// testsuite.
