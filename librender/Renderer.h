@@ -406,7 +406,7 @@ public:
     /// Converts pixel coordinates to world coordinates (TWIPS)
     virtual point pixel_to_world(int x, int y) const = 0;
     
-    virtual geometry::Range2d<int> pixel_to_world(
+    geometry::Range2d<int> pixel_to_world(
                     const geometry::Range2d<int>& pixelbounds) const
     {
         point topleft = pixel_to_world(
