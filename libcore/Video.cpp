@@ -153,7 +153,7 @@ Video::getVideoFrame()
         // never constructed (most likely), we'll return nothing,
         // otherwise the last decoded frame.
         if (!_decoder.get()) {
-		    LOG_ONCE( log_error(_("No Video info in video definition")) );
+		    LOG_ONCE(log_error(_("No Video info in video definition")));
             return _lastDecodedVideoFrame.get();
         }
 
@@ -180,8 +180,7 @@ Video::getVideoFrame()
 
 		// If current frame is smaller then last decoded frame
 		// we restart decoding from scratch
-		if ( current_frame < _lastDecodedVideoFrameNum )
-		{
+		if (current_frame < _lastDecodedVideoFrameNum) {
 #ifdef DEBUG_EMBEDDED_VIDEO_DECODING
 			log_debug("  current frame (%d) < _lastDecodedVideoFrameNum (%d)",
                     current_frame, _lastDecodedVideoFrameNum);
@@ -198,7 +197,7 @@ Video::getVideoFrame()
                 "object %s", from_frame, current_frame, getTarget());
 #endif
 
-        size_t frames = m_def->visitSlice(
+        const size_t frames = m_def->visitSlice(
                 boost::bind(boost::mem_fn(&media::VideoDecoder::push), _decoder.get(), _1),
                 from_frame, current_frame);
 
