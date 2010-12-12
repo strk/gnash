@@ -60,31 +60,6 @@ struct CreatePointer
     }
 };
 
-/// Recurse to the base type of a pointer.
-template<typename T>
-struct RemovePointer
-{
-    typedef T value_type;
-};
-
-template<typename T>
-struct RemovePointer<T*>
-{
-    typedef typename RemovePointer<T>::value_type value_type;
-};
-
-template<typename T>
-struct RemovePointer<boost::intrusive_ptr<T> >
-{
-    typedef typename RemovePointer<T>::value_type value_type;
-};
-
-template<typename T>
-struct RemovePointer<boost::shared_ptr<T> >
-{
-    typedef typename RemovePointer<T>::value_type value_type;
-};
-
 /// Erase elements from an associative container based on a predicate
 //
 /// This removes elements from a container such as a map if they fulfil a
