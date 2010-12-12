@@ -16,46 +16,26 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
+#include "DefineVideoStreamTag.h"
+
+#include <boost/type_traits.hpp>
+#include <boost/shared_array.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
+#include <memory> 
+#include <vector> 
 
 #include "RunResources.h"
-#include "DefineVideoStreamTag.h"
 #include "Video.h"
 #include "MediaParser.h" // for VideoInfo
 #include "VideoDecoder.h"
 #include "SWFStream.h" // for read()
 #include "movie_definition.h"
-#include "GnashAlgorithm.h"
 #include "GnashNumeric.h"
 #include "Global_as.h"
 
 namespace gnash {
 namespace SWF {
-
-namespace {
-
-/// A Functor for comparing frames by frame number.
-//
-/// A comparison operator would avoid having two variants, but seems less
-/// intuitive, and could open up all sorts of unexpected behaviour due to
-/// type promotion.
-struct FrameFinder
-{
-
-    typedef DefineVideoStreamTag::EmbeddedFrames::value_type Frame;
-
-    bool operator()(const Frame& frame, size_t i)
-    {
-        return frame->frameNum() < i;
-    }
-    
-    bool operator()(size_t i, const Frame& frame)
-    {
-        return i < frame->frameNum();
-    }
-};
-
-}
 
 DefineVideoStreamTag::DefineVideoStreamTag(SWFStream& in, boost::uint16_t id)
 	:
@@ -68,7 +48,6 @@ DefineVideoStreamTag::DefineVideoStreamTag(SWFStream& in, boost::uint16_t id)
 
 DefineVideoStreamTag::~DefineVideoStreamTag()
 {
-    deleteChecked(_video_frames.begin(), _video_frames.end());
 }
 
 
@@ -92,8 +71,6 @@ DefineVideoStreamTag::read(SWFStream& in)
 {
 
 	assert(!_videoInfo.get()); // allowed to be called only once
-
-	//m_start_frame = m->get_loading_frame();
 
 	// numFrames:2 width:2 height:2 flags:1
 	in.ensureBytes(8);
@@ -132,41 +109,17 @@ DefineVideoStreamTag::addVideoFrameTag(
         std::auto_ptr<media::EncodedVideoFrame> frame)
 {
 	boost::mutex::scoped_lock lock(_video_mutex);
-
-    _video_frames.push_back(frame.release());
+    _video_frames.push_back(frame);
 }
 
 DisplayObject*
 DefineVideoStreamTag::createDisplayObject(Global_as& gl,
         DisplayObject* parent) const
 {
-
     as_object* obj = createVideoObject(gl);
 	DisplayObject* ch = new Video(obj, this, parent);
 	return ch;
 }
-
-void
-DefineVideoStreamTag::getEncodedFrameSlice(boost::uint32_t from,
-        boost::uint32_t to, EmbeddedFrames& ret) const
-{
-	assert(from<=to);
-
-	boost::mutex::scoped_lock lock(_video_mutex);
-
-    // It's assumed that frame numbers are in order.
-    EmbeddedFrames::const_iterator lower = std::lower_bound(
-            _video_frames.begin(), _video_frames.end(), from, FrameFinder());
-
-    EmbeddedFrames::const_iterator upper = std::upper_bound(
-            lower, _video_frames.end(), to, FrameFinder());
-
-    // This copies a pointer to the encoded video frames; the actual
-    // data is owned by this class for its entire lifetime.
-    std::copy(lower, upper, std::back_inserter(ret));
-}
-
-
 
 } // namespace SWF
 } // namespace gnash

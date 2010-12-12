@@ -16,17 +16,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-
 #ifndef GNASH_VIDEO_H
 #define GNASH_VIDEO_H
 
 #include <boost/intrusive_ptr.hpp>
-#include "DisplayObject.h" // for inheritance
+#include "DisplayObject.h"
 
 // Forward declarations
 namespace gnash {
 	class NetStream_as;
+    class Global_as;
     namespace image {
         class GnashImage;
     }
@@ -49,7 +48,6 @@ namespace gnash {
 ///
 class Video : public DisplayObject
 {
-
 public:
 	
 	Video(as_object* object, const SWF::DefineVideoStreamTag* def,

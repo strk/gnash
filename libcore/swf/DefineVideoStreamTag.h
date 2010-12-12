@@ -19,16 +19,16 @@
 #ifndef GNASH_SWF_DEFINEVIDEOSTREAMTAG_H
 #define GNASH_SWF_DEFINEVIDEOSTREAMTAG_H
 
+#include <boost/shared_array.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
+#include <memory> 
+#include <vector> 
+
 #include "DefinitionTag.h"
 #include "SWF.h"
 #include "SWFRect.h" // for composition
 #include "MediaParser.h" // for videoFrameType and videoCodecType enums
-
-#include <boost/shared_array.hpp>
-#include <boost/thread/mutex.hpp>
-
-#include <memory> // for composition (auto_ptr)
-#include <vector> // for composition
 
 // Forward declarations
 namespace gnash {
@@ -66,15 +66,32 @@ namespace SWF {
 
 class DefineVideoStreamTag : public DefinitionTag
 {
-public:
 	
-    /// The undecoded video frames and its size, using the swf-frame number
-    /// as key
+    /// The undecoded video frames, using the swf-frame number as key
 	//
 	/// Elements of this vector are owned by this instance, and will be deleted 
 	/// at instance destruction time.
-	///
-	typedef std::vector<media::EncodedVideoFrame*> EmbeddedFrames;
+	typedef boost::ptr_vector<media::EncodedVideoFrame> EmbeddedFrames;
+
+    /// A Functor for comparing frames by frame number.
+    //
+    /// A comparison operator would avoid having two variants, but seems less
+    /// intuitive, and could open up all sorts of unexpected behaviour due to
+    /// type promotion.
+    struct FrameFinder
+    {
+        typedef EmbeddedFrames::const_reference Frame;
+
+        bool operator()(Frame frame, size_t i) const {
+            return frame.frameNum() < i;
+        }
+        
+        bool operator()(size_t i, Frame frame) const {
+            return i < frame.frameNum();
+        }
+    };
+
+public:
 
 	~DefineVideoStreamTag();
 
@@ -103,8 +120,7 @@ public:
             movie_definition& m);
 
 	/// Return local video bounds in twips
-	const SWFRect&	bounds() const
-	{
+	const SWFRect& bounds() const {
 		return m_bound;
 	}
 
@@ -115,25 +131,27 @@ public:
 	///
 	media::VideoInfo* getVideoInfo() const { return _videoInfo.get(); }
 
-	/// Get a slice of encoded video frames
+	/// Visit a slice of encoded video frames
 	//
-	/// @param from
-	///	Frame number of first frame to get
-	/// 
-	/// @param to
-	///	Frame number of last frame to get
-	///
-	/// @param ret
-	///	The vector to push defined elements onto. Ownership of elements
-	///	is left to callee.
-	///
-	/// NOTE: video definition can have gaps, so you may get NO frames
-	///       if you ask for frames from 1 to 2 when available frames
-	///	  are 0,3,6
-	///
-	void getEncodedFrameSlice(boost::uint32_t from, boost::uint32_t to,
-		std::vector<media::EncodedVideoFrame*>& ret) const;
+	/// @param from     Frame number of first frame to get
+	/// @param to       Frame number of last frame to get
+    /// @tparam t       A visitor that should accept a const
+    ///                 media::EncodedVideoFrame.
+    template<typename T>
+    size_t visitSlice(const T& t, boost::uint32_t from, boost::uint32_t to) const {
 
+        boost::mutex::scoped_lock lock(_video_mutex);
+
+        // It's assumed that frame numbers are in order.
+        EmbeddedFrames::const_iterator lower = std::lower_bound(
+                _video_frames.begin(), _video_frames.end(), from, FrameFinder());
+
+        EmbeddedFrames::const_iterator upper = std::upper_bound(
+                lower, _video_frames.end(), to, FrameFinder());
+
+        std::for_each(lower, upper, t);
+        return (upper - lower);
+    }
     
     void addVideoFrameTag(std::auto_ptr<media::EncodedVideoFrame> frame);
 

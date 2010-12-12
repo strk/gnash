@@ -18,9 +18,12 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
+#include "Video.h"
+
+#include <boost/bind.hpp>
+#include <cassert>
 
 #include "MovieClip.h"
-#include "Video.h"
 #include "DefineVideoStreamTag.h"
 #include "fn_call.h"
 #include "as_value.h"
@@ -135,20 +138,16 @@ Video::display(Renderer& renderer, const Transform& base)
 image::GnashImage*
 Video::getVideoFrame()
 {
-
-
 	// If this is a video from a NetStream_as object, retrieve a video
     // frame from there.
-	if (_ns)
-	{
+	if (_ns) {
 		std::auto_ptr<image::GnashImage> tmp = _ns->get_video();
 		if ( tmp.get() ) _lastDecodedVideoFrame = tmp;
 	}
 
 	// If this is a video from a VideoFrame tag, retrieve a video frame
     // from there.
-	else if (_embeddedStream)
-	{
+	else if (_embeddedStream) {
 
         // Don't try to do anything if there is no decoder. If it was
         // never constructed (most likely), we'll return nothing,
@@ -159,6 +158,7 @@ Video::getVideoFrame()
         }
 
 		int current_frame = get_ratio(); 
+        assert(current_frame >= 0);
 
 #ifdef DEBUG_EMBEDDED_VIDEO_DECODING
 		log_debug("Video instance %s need display video frame (ratio) %d",
@@ -167,8 +167,7 @@ Video::getVideoFrame()
 
 		// If current frame is the same then last decoded
 		// we don't need to decode more
-		if ( _lastDecodedVideoFrameNum == current_frame )
-		{
+		if (_lastDecodedVideoFrameNum == current_frame) {
 #ifdef DEBUG_EMBEDDED_VIDEO_DECODING
 			log_debug("  current frame == _lastDecodedVideoFrameNum (%d)",
                     current_frame);
@@ -199,29 +198,11 @@ Video::getVideoFrame()
                 "object %s", from_frame, current_frame, getTarget());
 #endif
 
-		typedef SWF::DefineVideoStreamTag::EmbeddedFrames EncodedFrames;
+        size_t frames = m_def->visitSlice(
+                boost::bind(boost::mem_fn(&media::VideoDecoder::push), _decoder.get(), _1),
+                from_frame, current_frame);
 
-		EncodedFrames toDecode;
-		m_def->getEncodedFrameSlice(from_frame, current_frame, toDecode);
-
-		// Nothing more to decode, return last decoded (possibly null)
-		if ( toDecode.empty() )
-		{
-#ifdef DEBUG_EMBEDDED_VIDEO_DECODING
-			log_debug("    no defined frames, we'll return last one");
-#endif
-			return _lastDecodedVideoFrame.get();
-		}
-
-		for (EncodedFrames::iterator it=toDecode.begin(),
-                itEnd=toDecode.end(); it!=itEnd; ++it)
-		{
-			media::EncodedVideoFrame* frame = *it;
-#ifdef DEBUG_EMBEDDED_VIDEO_DECODING
-			log_debug("    pushing frame %d to decoder", frame->frameNum());
-#endif
-			_decoder->push(*frame);
-		}
+        if (!frames) return _lastDecodedVideoFrame.get();
 
 		_lastDecodedVideoFrame = _decoder->pop();
 	}

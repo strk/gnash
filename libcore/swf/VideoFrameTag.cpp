@@ -16,17 +16,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+#include "DefineVideoStreamTag.h"
+
+#include <algorithm>
 
 #include "RunResources.h"
-#include "DefineVideoStreamTag.h"
 #include "VideoFrameTag.h"
 #include "VideoDecoder.h"
 #include "SWFStream.h" // for read()
 #include "movie_definition.h"
 #include "utility.h"
 #include "smart_ptr.h"
-
-#include <algorithm>
 
 namespace gnash {
 namespace SWF {
