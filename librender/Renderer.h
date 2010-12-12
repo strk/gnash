@@ -434,31 +434,9 @@ public:
     /// By default this method always returns true, which will ensure correct
     /// rendering. If possible, it should be re-implemented by the renderer 
     /// handler for better performance.
-    /// 'bounds' contains TWIPS coordinates.
-    ///
-    /// TODO: Take a Range2d<T> rather then a gnash::SWFRect ?
-    ///             Would T==int be good ? TWIPS as integer types ?
-    ///
-    /// See also gnash::renderer::bounds_in_clipping_area
-    ///
-    virtual bool bounds_in_clipping_area(const SWFRect& bounds) {
-        return bounds_in_clipping_area(bounds.getRange());
-    }
-    
-    virtual bool bounds_in_clipping_area(const InvalidatedRanges& ranges)
-    {
-        for (unsigned int rno=0; rno<ranges.size(); rno++) 
-        {
-            if (bounds_in_clipping_area(ranges.getRange(rno)))
-                return true;
-        }
-                
-        return false;
-    }
-    
-    virtual bool bounds_in_clipping_area(
-            const geometry::Range2d<int>& /*bounds*/)
-    {
+    /// b contains TWIPS coordinates.
+    virtual bool bounds_in_clipping_area(const geometry::Range2d<int>& /*b*/)
+        const {
         return true;
     }
 
@@ -545,7 +523,6 @@ public:
     class Internal 
     {
     public:
-
         /// Prepare the renderer for internal rendering
         Internal(Renderer& r, image::GnashImage& im)
             :

@@ -1118,7 +1118,7 @@ public:
 
         cur_bounds.expand_to_transformed_rect(xform.matrix, shape.getBounds());
                 
-        if (!Renderer::bounds_in_clipping_area(cur_bounds))
+        if (!bounds_in_clipping_area(cur_bounds.getRange()))
         {
             return; // no need to draw
         }        
@@ -2009,8 +2009,9 @@ public:
   }
   
   
-  virtual bool bounds_in_clipping_area(const geometry::Range2d<int>& bounds) {    
-    
+  virtual bool bounds_in_clipping_area(const geometry::Range2d<int>& bounds)
+    const {
+
     using gnash::geometry::Range2d;
   
     Range2d<int> pixbounds = world_to_pixel(bounds);
