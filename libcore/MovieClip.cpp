@@ -1235,14 +1235,13 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
 void 
 MovieClip::move_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist)
 {    
-    int ratio = tag->getRatio();
+    boost::uint16_t ratio = tag->getRatio();
     // clip_depth is not used in MOVE tag(at least no related tests). 
     dlist.moveDisplayObject(
         tag->getDepth(), 
         tag->hasCxform() ? &tag->getCxform() : NULL,
         tag->hasMatrix() ? &tag->getMatrix() : NULL,
-        tag->hasRatio() ? &ratio : NULL,
-        NULL);
+        tag->hasRatio() ? &ratio : NULL);
 }
 
 void

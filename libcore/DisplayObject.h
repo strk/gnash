@@ -356,9 +356,9 @@ public:
         }
     }
 
-    int get_ratio() const { return _ratio; }
+    boost::uint16_t get_ratio() const { return _ratio; }
 
-    void set_ratio(int r) {
+    void set_ratio(boost::uint16_t r) {
         if (r != _ratio) set_invalidated(); 
         _ratio = r;       
     }
@@ -1063,7 +1063,7 @@ private:
     ///
     int _volume;
 
-    int _ratio;
+    boost::uint16_t _ratio;
     int m_clip_depth;
 
     /// The DisplayObject masking this instance (if any)

@@ -312,7 +312,7 @@ DisplayList::replaceDisplayObject(DisplayObject* ch, int depth,
 // the specified depth.
 void
 DisplayList::moveDisplayObject( int depth, const SWFCxForm* color_xform,
-        const SWFMatrix* mat, int* ratio, int* /* clip_depth */)
+        const SWFMatrix* mat, boost::uint16_t* ratio)
 {
     testInvariant();
 

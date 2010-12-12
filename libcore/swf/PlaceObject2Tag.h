@@ -105,7 +105,7 @@ public:
         return m_has_flags2 & (HAS_CHARACTER_MASK | MOVE_MASK);
     } 
 
-    int getRatio() const { return _ratio; }
+    boost::uint16_t getRatio() const { return _ratio; }
     int getClipDepth() const { return m_clip_depth; }
     boost::uint16_t getID() const { return _id; }
     const std::string& getName() const { return m_name; }
@@ -166,7 +166,7 @@ private:
     boost::uint16_t _id;
     SWFCxForm  m_color_transform;
     SWFMatrix  m_matrix;
-    int     _ratio;
+    boost::uint16_t _ratio;
     std::string m_name;
     int     m_clip_depth;
     

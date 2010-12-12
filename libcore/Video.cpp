@@ -142,7 +142,7 @@ Video::getVideoFrame()
     // frame from there.
 	if (_ns) {
 		std::auto_ptr<image::GnashImage> tmp = _ns->get_video();
-		if ( tmp.get() ) _lastDecodedVideoFrame = tmp;
+		if (tmp.get()) _lastDecodedVideoFrame = tmp;
 	}
 
 	// If this is a video from a VideoFrame tag, retrieve a video frame
@@ -157,8 +157,7 @@ Video::getVideoFrame()
             return _lastDecodedVideoFrame.get();
         }
 
-		int current_frame = get_ratio(); 
-        assert(current_frame >= 0);
+        const boost::uint16_t current_frame = get_ratio(); 
 
 #ifdef DEBUG_EMBEDDED_VIDEO_DECODING
 		log_debug("Video instance %s need display video frame (ratio) %d",
@@ -167,7 +166,8 @@ Video::getVideoFrame()
 
 		// If current frame is the same then last decoded
 		// we don't need to decode more
-		if (_lastDecodedVideoFrameNum == current_frame) {
+		if (_lastDecodedVideoFrameNum >= 0 &&
+                _lastDecodedVideoFrameNum == current_frame) {
 #ifdef DEBUG_EMBEDDED_VIDEO_DECODING
 			log_debug("  current frame == _lastDecodedVideoFrameNum (%d)",
                     current_frame);
@@ -175,12 +175,14 @@ Video::getVideoFrame()
 			return _lastDecodedVideoFrame.get();
 		}
 
-		int from_frame = _lastDecodedVideoFrameNum < 0 ?
-            0 : _lastDecodedVideoFrameNum + 1;
+        // TODO: find a better way than using -1 to show that no
+        // frames have been decoded yet.
+        assert(_lastDecodedVideoFrameNum >= -1);
+        boost::uint16_t from_frame = _lastDecodedVideoFrameNum + 1;
 
 		// If current frame is smaller then last decoded frame
 		// we restart decoding from scratch
-		if (current_frame < _lastDecodedVideoFrameNum) {
+		if (current_frame < static_cast<size_t>(_lastDecodedVideoFrameNum)) {
 #ifdef DEBUG_EMBEDDED_VIDEO_DECODING
 			log_debug("  current frame (%d) < _lastDecodedVideoFrameNum (%d)",
                     current_frame, _lastDecodedVideoFrameNum);
@@ -198,7 +200,8 @@ Video::getVideoFrame()
 #endif
 
         const size_t frames = m_def->visitSlice(
-                boost::bind(boost::mem_fn(&media::VideoDecoder::push), _decoder.get(), _1),
+                boost::bind(boost::mem_fn(&media::VideoDecoder::push),
+                    _decoder.get(), _1),
                 from_frame, current_frame);
 
         if (!frames) return _lastDecodedVideoFrame.get();
@@ -224,7 +227,7 @@ Video::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
     
 	ranges.add(m_old_invalidated_ranges);
 	
-	assert (m_def);
+	assert(m_def);
 
 	SWFRect bounds;	
 	bounds.expand_to_transformed_rect(getWorldMatrix(*this), m_def->bounds());

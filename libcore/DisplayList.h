@@ -155,12 +155,8 @@ public:
 	/// @param ratio
 	/// The new ratio value to assign to the DisplayObject at the given depth.
 	/// If NULL the original ratio will be kept.
-	///
-	/// @clip_depth
-	/// Not used at the moment.
-	/// 
-	void moveDisplayObject( int depth, const SWFCxForm* color_xform,
-            const SWFMatrix* mat, int* ratio, int* clip_depth);
+	void moveDisplayObject(int depth, const SWFCxForm* color_xform,
+            const SWFMatrix* mat, boost::uint16_t* ratio);
 
 	/// Removes the object at the specified depth.
 	//
