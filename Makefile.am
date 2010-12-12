@@ -505,3 +505,10 @@ fetch-swfdec:
 	else \
 	    git clone $(SWFDEC_REPO) "$(SWFDEC_MOUNT)"; \
 	fi 
+
+package:
+	@if test -f /etc/debian_version; then $(MAKE) deb; \
+	  else if test -f /etc/redhat-release; then $(MAKE) rpm; \
+	    else echo "Gnash will not be packaged for this platform"; \
+	fi;fi
+
