@@ -87,3 +87,6 @@ install-pluginsLTLIBRARIES: $(plugins_LTLIBRARIES)
 	test -d "$(DESTDIR)$(pluginsdir)" || $(mkinstalldirs) "$(DESTDIR)$(pluginsdir)"
 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(plugins_LTLIBRARIES) "$(DESTDIR)$(pluginsdir)/$(plugins_LTLIBRARIES)"
 	$(RM) $(DESTDIR)$(pluginsdir)/*.a 
+
+uninstall-local:
+	$(RM) $(DESTDIR)$(pluginsdir)/launcher.so

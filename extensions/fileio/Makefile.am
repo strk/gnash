@@ -74,6 +74,13 @@ test: $(srcdir)/../../testsuite/generic-testrunner.sh test.swf
 	GNASH_PLUGINS=$(PWD)/.libs GNASHRC=$(srcdir)/../gnashrc sh $< $(top_builddir) test.swf > $@
 	chmod +x $@
 
+uninstall-local:
+	$(RM) $(DESTDIR)$(pluginsdir)/fileio.so
+
+test: $(srcdir)/../../testsuite/generic-testrunner.sh test.swf
+	GNASH_PLUGINS=$(PWD)/.libs GNASHRC=$(srcdir)/../gnashrc sh $< $(top_builddir) test.swf > $@
+	chmod +x $@
+
 # Wrap a single .as tests in dejagnu_so importer.
 # At play time, if the relative url '../ming-misc.all/Dejagnu.swf' 
 # takes to the Dejagnu.swf shared library we'll get visual traces,

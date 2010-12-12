@@ -83,3 +83,5 @@ install-pluginsLTLIBRARIES: $(plugins_LTLIBRARIES)
 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(plugins_LTLIBRARIES) "$(DESTDIR)$(pluginsdir)/$(plugins_LTLIBRARIES)"
 	$(RM) $(DESTDIR)$(pluginsdir)/*.a 
 
+uninstall-local:
+	$(RM) $(DESTDIR)$(pluginsdir)/gtk2.so
