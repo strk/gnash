@@ -169,23 +169,6 @@ deleteChecked(T begin, T end)
     std::for_each(begin, end, CheckedDeleter<value_type>());
 }
 
-/// Safely call delete on each second element in a range of pairs.
-//
-/// This checks that the type is fully known, but cannot check whether the
-/// pointer was allocated with new. Pointers allocated with new[] or any other
-/// allocation function should never be passed to this function.
-//
-/// @param begin        The start of the range to call delete on.
-/// @param end          The end of the range to call delete on.
-template<typename T>
-void
-deleteSecondElements(T begin, T end)
-{
-    typedef SecondElement<typename std::iterator_traits<T>::value_type> S;
-    foreachSecond(begin, end, CheckedDeleter<typename S::result_type>());
-}
-
-            
 } // namespace gnash
 
 #endif
