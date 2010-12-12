@@ -137,22 +137,6 @@ foreachSecond(T begin, T end, U op)
     std::for_each(begin, end, boost::bind(op, boost::bind(S(), _1)));
 }
 
-/// Call a functor on the first element of each element in a range.
-//
-/// @tparam T           An iterator type satisfying the requirements of a
-///                     forward iterator
-/// @tparam U           The type of the functor op.
-/// @param begin        The start of the range to call op on.
-/// @param end          The end of the range to call op on.
-/// @param op           The function to call on each second element.
-template<typename T, typename U>
-void
-foreachFirst(T begin, T end, U op)
-{
-    typedef FirstElement<typename std::iterator_traits<T>::value_type> S;
-    std::for_each(begin, end, boost::bind(op, boost::bind(S(), _1)));
-}
-
 /// Safely call delete on each element in a range.
 //
 /// This checks that the type is fully known, but cannot check whether the
