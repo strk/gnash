@@ -633,13 +633,13 @@ namespace {
 /// The function returns false when at least one pixel of the block was
 /// outside the main frame buffer. In that case the value in color_return
 /// is undefined.
-bool getAveragePixel(const Renderer& r, rgba& color_return, int x, int y, 
+bool getAveragePixel(const Renderer& rh, rgba& color_return, int x, int y, 
     unsigned int radius) 
 {
     assert(radius>0); 
 
     // optimization:
-    if (radius==1) return getPixel(color_return, x, y);
+    if (radius==1) return rh.getPixel(color_return, x, y);
 
     unsigned int r=0, g=0, b=0, a=0;
     
@@ -653,7 +653,7 @@ bool getAveragePixel(const Renderer& r, rgba& color_return, int x, int y,
     
     for (int yp=y; yp<ye; yp++)
     for (int xp=x; xp<xe; xp++) {
-        if (!getPixel(pixel, xp, yp))
+        if (!rh.getPixel(pixel, xp, yp))
             return false;
             
         r += pixel.m_r;            
