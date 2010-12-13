@@ -513,3 +513,8 @@ package:
 	    else echo "Gnash will not be packaged for this platform"; \
 	fi;fi
 
+packageclean:
+	-test -z "$(CLEANFILES)" || rm -rf $(CLEANFILES)
+ 
+# these files are created when building packages
+CLEANFILES += *.deb rpmbuild *.dsc *.gz *.bz2 *.changes deb-copy-stamp gnash*git*
