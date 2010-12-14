@@ -257,6 +257,6 @@ deb-edit-control: deb-copy-files
 # Build the package. debuild would also work. This requires all
 # the file editing to be done
 snapshot-deb:
-	(cd $(BUILD_DIR); dpkg-buildpackage -rfakeroot -j4)
+	cd $(BUILD_DIR) && dpkg-buildpackage -rfakeroot
 
 .PHONY : deb debian snapshot-deb setup-deb deb-edit-control deb-edit-changelog deb-copy-files deb-rename-build deb-edit-configure deb-edit-install deb-edit-utilities deb-edit-python deb-edit-browser
