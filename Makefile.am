@@ -131,30 +131,25 @@ BUILT_SOURCES = revno.h .configline
 # only want to regenerate this file if that file changes, so we have to
 # do the dependency check ourselves.
 revno.h:
-	@if test -d $(top_srcdir)/.git -a x"${GIT}" != x; then \
-	  nowmod="$(shell stat -c "%X" $(top_srcdir)/.git/index)"; \
-	  if test -e .lastmod; then \
-	    lastmod="$(shell cat .lastmod)"; \
-	  else \
-	    lastmod=0; \
-	  fi; \
-	  if test $${nowmod} -gt $${lastmod}; then \
+	@if test \! -e .lastmod; then \
+	  touch -t 197001010000 .lastmod; \
+	fi; \
+	if test $(top_srcdir)/.git/index -nt .lastmod; then \
+	  if test -d $(top_srcdir)/.git -a x"${GIT}" != x; then \
             echo "Getting build info for revno.h"; \
-	    rm -f .lastmod; echo "$${nowmod}" > .lastmod; \
             revno="`cd $(top_srcdir) ; $(GIT) rev-list HEAD | wc -l`"; \
             comm_id="`cd $(top_srcdir) ; $(GIT) rev-parse --short HEAD`"; \
             nick="`cd $(top_srcdir) ; $(GIT) branch | grep '^\*' | cut -d ' ' -f 2`"; \
-	  fi; \
-        else \
-          revno="$(NOW)"; \
-          nick="master"; \
-          comm_id="none"; \
-        fi; \
-	if test $${nowmod} -gt $${lastmod}; then \
+          else \
+            revno="$(NOW)"; \
+            comm_id="none"; \
+            nick="master"; \
+          fi; \
           echo "Generating revno.h ($${nick} $${revno} $${comm_id})"; \
           echo "static const char* BRANCH_REVNO  = \"$${revno}\";" > revno.h; \
           echo "static const char* BRANCH_NICK = \"$${nick}\";" >> revno.h; \
           echo "static const char* COMMIT_ID = \"$${comm_id}\";" >> revno.h; \
+          touch .lastmod; \
 	fi
 
 .configline: revno.h
