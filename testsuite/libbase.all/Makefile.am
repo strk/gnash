@@ -74,7 +74,7 @@ NoSeekFileTest_CPPFLAGS = '-DINPUT="$(srcdir)/NoSeekFileTest.cpp"'
 URLTest_SOURCES = URLTest.cpp
 URLTest_CPPFLAGS = '-DBUILDDIR="$(abs_builddir)"'
 
-RcTest_SOURCES = TCXXRc.cpp
+RcTest_SOURCES = RcTest.cpp
 RcTest_CPPFLAGS = -DSRCDIR="$(srcdir)"
 
 IntTypesTest_SOURCES = IntTypesTest.cpp
@@ -86,9 +86,6 @@ IntTypesTest_CPPFLAGS = -DSRCDIR="$(srcdir)"
 Point2dTest_SOURCES = Point2dTest.cpp
 Range2dTest_SOURCES = Range2dTest.cpp
 snappingrangetest_SOURCES = snappingrangetest.cpp
-
-# LogTest_SOURCES = TCXXLog.cpp
-# LogTest_CPPFLAGS = '-DBUILDDIR="$(abs_builddir)"'
 
 string_tableTest_SOURCES = string_tableTest.cpp
 string_tableTest_CPPFLAGS = -DSRCDIR="$(srcdir)"
