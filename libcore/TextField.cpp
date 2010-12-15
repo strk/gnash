@@ -486,21 +486,27 @@ TextField::setRestrict(const std::string& restrict)
 void
 TextField::replaceSelection(const std::string& replace)
 {
-
     const int version = getSWFVersion(*getObject(this));
     const std::wstring& wstr = utf8::decodeCanonicalString(replace, version);
     
+    assert(_selection.second >= _selection.first);
+    assert(_selection.second <= _text.size());
+    assert(_selection.first <= _text.size());
+
+    // If the text has changed but the selection hasn't, make sure we
+    // don't access it out of bounds.
     const size_t start = _selection.first;
+    const size_t end = _selection.second;
+
     const size_t replaceLength = wstr.size();
 
-    _text.replace(start, _selection.second - start, wstr);
+    _text.replace(start, end - start, wstr);
     _selection = std::make_pair(start + replaceLength, start + replaceLength);
 }
 
 void
 TextField::setSelection(int start, int end)
 {
-
     if (_text.empty()) {
         _selection = std::make_pair(0, 0);
         return;
@@ -804,12 +810,15 @@ void
 TextField::updateText(const std::wstring& wstr)
 {
     _textDefined = true;
-
     if (_text == wstr) return;
 
     set_invalidated();
 
     _text = wstr;
+
+    _selection.first = std::min(_selection.first, _text.size());
+    _selection.second = std::min(_selection.second, _text.size());
+
     format_text();
 }
 

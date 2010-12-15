@@ -19,15 +19,15 @@
 #ifndef GNASH_TEXTFIELD_H
 #define GNASH_TEXTFIELD_H
 
-#include "InteractiveObject.h" // for inheritance
-#include "LineStyle.h" // for LineStyle
-#include "snappingrange.h"
-#include "SWFRect.h" // for inlines
-
 #include <boost/intrusive_ptr.hpp>
 #include <map>
 #include <string>
 #include <vector>
+
+#include "InteractiveObject.h" // for inheritance
+#include "LineStyle.h" // for LineStyle
+#include "snappingrange.h"
+#include "SWFRect.h" // for inlines
 
 // Forward declarations
 namespace gnash {
@@ -164,6 +164,9 @@ public:
     }
 
 	/// Get a std::pair of size_t with start/end of selection
+    //
+    /// Both start and end should invariably be within the
+    /// range of the text.
     const std::pair<size_t, size_t>& getSelection() const {
         return _selection;
     }
