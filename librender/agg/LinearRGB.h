@@ -25,7 +25,7 @@ namespace gnash {
 
 /// Convert linear RGB colorspace to sRGB
 double
-linearToRGB(double s)
+linearToSRGB(double s)
 {
     const double a = 0.055;
     if (s <= 0.0031308) return 12.92 * s;
@@ -37,13 +37,18 @@ T
 cdiff(T a, T b, double ratio)
 {
     const int diff = b - a;
-    const double d = linearToRGB((diff < 0) ? 1 - ratio : ratio);
+    const double d = linearToSRGB((diff < 0) ? 1 - ratio : ratio);
     if (diff < 0) {
         return b - d * diff;
     }
     return a + d * diff;
 }
 
+/// Interpolate in the linear RGB colorspace
+//
+/// This is an inefficient interpolation method because the
+/// ratio is transformed on the fly to convert between linear RGB
+/// and sRGB colorspaces.
 template<class ColorT>
 struct linear_rgb_interpolator
 {
@@ -51,7 +56,8 @@ public:
     typedef ColorT color_type;
 
     linear_rgb_interpolator(const color_type& c1, const color_type& c2, 
-        size_t len) :
+        size_t len)
+        :
         _c1(c1),
         _c2(c2),
         _len(len),
@@ -63,7 +69,7 @@ public:
     }
 
     color_type color() const {
-        const double ratio = double(_count) / _len;
+        const double ratio = static_cast<double>(_count) / _len;
         return color_type(
                 cdiff(_c1.r, _c2.r, ratio),
                 cdiff(_c1.g, _c2.g, ratio),
