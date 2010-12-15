@@ -4,6 +4,8 @@ YYYY/MM/DD
 Improvements since 0.8.8 release are:
 
  * Fix swapped _framesloaded and _totalframes properties.
+ * Fixes for several crashes, with better automated testing of the
+   entire ActionScript API for input sanitization.
  * Improved ActionScript performance processing, especially
    for interactive applications.
  * npapi plugin: fix relative urls resolution in presence of <base> tag
@@ -19,6 +21,9 @@ Improvements since 0.8.8 release are:
  * fb-gnash: allow specifying size and offset of rendering "window".
  * dump-gnash: improved speed, sync and flexibility.
  * JPEG screenshot output.
+ * Support for linear RGB interpolation mode in gradient fills.
+ * Clipboard setting (GTK only).
+ * More flash.geom.Rectangle functions.
 
 Gnash 0.8.8
 2010/08/17
