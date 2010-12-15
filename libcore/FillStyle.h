@@ -51,7 +51,6 @@ public:
     rgba color;
 };
 
-
 /// A BitmapFill
 //
 /// BitmapFills can refer to a parsed bitmap tag or be constructed from
@@ -151,8 +150,6 @@ private:
 };
 
 /// A GradientFill
-//
-/// TODO: clean this up!
 class DSOEXPORT GradientFill
 {
 public:
@@ -169,6 +166,11 @@ public:
         PAD,
         REPEAT,
         REFLECT
+    };
+
+    enum InterpolationMode {
+        RGB,
+        LINEAR_RGB
     };
 
     typedef std::vector<GradientRecord> GradientRecords;
@@ -224,7 +226,7 @@ public:
     }
 
     SpreadMode spreadMode;
-    SWF::InterpolationMode interpolation;
+    InterpolationMode interpolation;
 
 private:
 

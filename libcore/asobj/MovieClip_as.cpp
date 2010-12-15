@@ -1863,7 +1863,12 @@ movieclip_beginGradientFill(const fn_call& fn)
         else assert(fd.spreadMode == GradientFill::PAD);
     }
 
-    /// TODO: set interpolation mode and spread mode.
+    if (fn.nargs > 6) {
+        const std::string& inter = fn.arg(6).to_string();
+        if (inter == "rgb") fd.interpolation = GradientFill::RGB;
+        else if (inter == "linearRGB") fd.interpolation = GradientFill::LINEAR_RGB;
+        else assert(fd.interpolation == GradientFill::RGB);
+    }
 
     /// Add a focus if present.
     if (fn.nargs > 7) {

@@ -85,7 +85,7 @@ GradientFill::GradientFill(Type t, const SWFMatrix& m,
         const GradientRecords& recs)
     :
     spreadMode(PAD),
-    interpolation(SWF::GRADIENT_INTERPOLATION_NORMAL),
+    interpolation(RGB),
     _focalPoint(0.0),
     _gradients(recs),
     _type(t),

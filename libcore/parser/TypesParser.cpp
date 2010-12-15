@@ -268,14 +268,16 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
                         );
                 }
         
-                // TODO: handle in GradientFill.
                 const SWF::InterpolationMode i =
                     static_cast<SWF::InterpolationMode>((grad_props >> 4) & 3);
 
                 switch (i) {
                     case SWF::GRADIENT_INTERPOLATION_NORMAL:
+                        gf.interpolation = GradientFill::RGB;
+                        break;
                     case SWF::GRADIENT_INTERPOLATION_LINEAR:
-                        gf.interpolation = i;
+                        gf.interpolation = GradientFill::LINEAR_RGB;
+                        break;
                     default:
                         IF_VERBOSE_MALFORMED_SWF(
                             log_swferror("Illegal interpolation mode in "
