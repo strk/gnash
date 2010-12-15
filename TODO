@@ -11,6 +11,7 @@
   - Implement all the missing player classes/methods.
   - SVG support ?
   - Keep improving the plugin (+ add GTK1 support).
+  - Make loading from filesystem predictable
 
 Partially implemented classes are:
 ----------------------------------
