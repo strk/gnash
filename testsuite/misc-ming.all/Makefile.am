@@ -222,6 +222,7 @@ check_PROGRAMS += \
 endif
 
 check_SCRIPTS = \
+	GradientFillTestRunner \
 	BitmapDataDrawRunner \
 	DeviceFontTestRunner \
 	EmbeddedFontTestRunner \
@@ -1441,6 +1442,10 @@ XMLSocketTester: $(srcdir)/XMLSocketTester.sh XMLSocketTest.swf
 GradientFillTest.swf: $(srcdir)/GradientFillTest.as 
 	$(MAKESWF) -v 8 -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/GradientFillTest.as
 
+GradientFillTestRunner: $(srcdir)/../generic-testrunner.sh GradientFillTest.swf
+	sh $< $(top_builddir) GradientFillTest.swf > $@
+	chmod 755 $@
+
 DrawingApiTest.swf: $(srcdir)/DrawingApiTest.as 
 	$(MAKESWF) -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/DrawingApiTest.as
 
@@ -1660,6 +1665,7 @@ clean-local:
 
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
+	GradientFillTestRunner \
 	BeginBitmapFillRunner \
 	BitmapDataTestRunner \
 	BitmapDataDrawRunner \
