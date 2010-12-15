@@ -114,7 +114,7 @@ EXTRA_DIST =  \
 # 	cp -p $(srcdir)/*.am $(top_distdir)/packaging/
 
 CLEANFILES = .configline
-DISTCLEANFILES = revno.h
+DISTCLEANFILES = revno.h .lastmod
 MAINTAINERCLEANFILES = revno.h .lastmod
 BUILT_SOURCES = revno.h .configline
 
