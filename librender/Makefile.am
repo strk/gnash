@@ -62,6 +62,7 @@ inst_HEADERS = \
 
 noinst_HEADERS = \
 	agg/Renderer_agg.h \
+	agg/LinearRGB.h \
 	agg/Renderer_agg_bitmap.h \
 	agg/Renderer_agg_style.h \
 	opengl/tu_opengl_includes.h \
