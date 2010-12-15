@@ -213,7 +213,9 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     } else {
         runtest.untested("EGLDevice::getHeigth()");
     }
-    
+
+#if 0
+    // these are the same as width and height
     if (hwinit) {
         if (egl.getVerticalRes()) {
             runtest.pass("EGLDevice::getVerticalRes()");
@@ -223,6 +225,7 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     } else {
         runtest.untested("EGLDevice::getVerticalRes()");
     }
+
     
     if (hwinit) {
         if (egl.getHorzRes()) {
@@ -233,7 +236,8 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     } else {
         runtest.untested("EGLDevice::getHorzRes()");
     }
-
+#endif
+    
     if (hwinit) {
         if (egl.isSingleBuffered() != egl.isBackBuffered()) {
             runtest.pass("EGLDevice::is*Buffered()");

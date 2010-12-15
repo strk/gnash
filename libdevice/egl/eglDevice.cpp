@@ -27,13 +27,7 @@
 #include "log.h"
 // #include "RunResources.h"
 #include "Renderer.h"
-#include "openvg/Renderer_ovg.h"
 #include "GnashException.h"
-#ifdef HAVE_GTK2
-#include "gdk/gdkx.h"
-#include "X11/Xlib.h"
-#include "X11/Xutil.h"
-#endif
 
 #ifdef HAVE_EGL_EGL_H
 # include <EGL/egl.h>
@@ -55,18 +49,18 @@ static const EGLint attrib32_list[] = {
     EGL_BLUE_SIZE,      8,
 //  EGL_ALPHA_SIZE,     0,
 //  EGL_DEPTH_SIZE,     24,
-#ifdef RENDERER_GLES1
-    EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
-#endif
-#ifdef RENDERER_GLES2
-    EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-#endif
+// #ifdef RENDERER_GLES1
+//     EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
+// #endif
+// #ifdef RENDERER_GLES2
+//     EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+// #endif
 #ifdef RENDERER_OPENVG
-    EGL_RENDERABLE_TYPE, EGL_OPENVG_BIT,
+     EGL_RENDERABLE_TYPE, EGL_OPENVG_BIT,
 //    EGL_STENCIL_SIZE,   8,
 #endif
-    EGL_RENDERABLE_TYPE, EGL_OPENVG_BIT|EGL_OPENGL_ES_BIT|EGL_OPENGL_ES2_BIT,
-    EGL_SURFACE_TYPE,   EGL_WINDOW_BIT|EGL_PBUFFER_BIT|EGL_PIXMAP_BIT,
+//    EGL_RENDERABLE_TYPE, EGL_OPENVG_BIT|EGL_OPENGL_ES_BIT|EGL_OPENGL_ES2_BIT,
+//    EGL_SURFACE_TYPE,   EGL_WINDOW_BIT|EGL_PBUFFER_BIT|EGL_PIXMAP_BIT,
 //    EGL_SAMPLE_BUFFERS, 1,
 // FIXME: Single Buffering appears not to work on X11, you get no visual.
 //    EGL_RENDER_BUFFER, EGL_SINGLE_BUFFER,
@@ -78,19 +72,19 @@ static EGLint const attrib16_list[] = {
     EGL_GREEN_SIZE,     6,
     EGL_BLUE_SIZE,      5,
     EGL_ALPHA_SIZE,     0,
-#ifdef RENDERER_GLES1
-    EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
-#endif
-#ifdef RENDERER_GLES2
-    EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-#endif
+// #ifdef RENDERER_GLES1
+//     EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
+// #endif
+// #ifdef RENDERER_GLES2
+//     EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+// #endif
+    EGL_LUMINANCE_SIZE,     EGL_DONT_CARE,
+    EGL_SURFACE_TYPE,       EGL_VG_COLORSPACE_LINEAR_BIT,
+    EGL_SAMPLES,            0,
 #ifdef RENDERER_OPENVG
-    EGL_RENDERABLE_TYPE, EGL_OPENVG_BIT,
-    EGL_DEPTH_SIZE,     16,
-    EGL_STENCIL_SIZE,   0,
+    EGL_RENDERABLE_TYPE, EGL_WINDOW_BIT|EGL_PBUFFER_BIT|EGL_PIXMAP_BIT,
+//    EGL_DEPTH_SIZE,     16,
 #endif
-    EGL_SURFACE_TYPE,   EGL_WINDOW_BIT,
-    EGL_SAMPLE_BUFFERS, 0,
     EGL_NONE
 };
 
@@ -193,6 +187,8 @@ EGLDevice::EGLDevice(GnashDevice::rtype_t rtype)
       _bpp(32)
 {
     GNASH_REPORT_FUNCTION;
+    dbglogfile.setVerbosity();
+    
     if (!initDevice(0, 0)) {
         log_error("Couldn't initialize EGL device!");
     }
@@ -249,21 +245,21 @@ EGLDevice::initDevice(int argc, char *argv[])
     
     GNASH_REPORT_FUNCTION;
     
-    EGLint major, minor;
     // see egl_config.c for a list of supported configs, this looks for
     // a 5650 (rgba) config, supporting OpenGL ES and windowed surfaces
 
     // step 1 - get an EGL display
 
     // This can be called multiple times, and always returns the same display
+//    _eglDisplay = eglGetDisplay(XOpenDisplay(0)/* EGL_DEFAULT_DISPLAY */);
     _eglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if (EGL_NO_DISPLAY == _eglDisplay) {
-        log_error( "eglGetDisplay() failed (error 0x%x)", eglGetError() );
+        log_error( "eglGetDisplay() failed (error 0x%x)", eglGetError());
         return false;
     }
     
     // This can be called multiple times safely
-    if (EGL_FALSE == eglInitialize(_eglDisplay, &major, &minor)) {
+    if (EGL_FALSE == eglInitialize(_eglDisplay, 0, 0)) {
         log_error( "eglInitialize() failed (error %s)",
                    getErrorString(eglGetError()));
         return false;
@@ -276,20 +272,20 @@ EGLDevice::initDevice(int argc, char *argv[])
 
     // step2 - bind to the wanted client API
     /// This is done by bindClient() later on
-    // bindClient(GnashDevice::OPENVG);
+    //bindClient(GnashDevice::OPENVG);
     
     // step3 - find a suitable config
     if (_bpp == 32) {
-        if (EGL_FALSE == eglChooseConfig(_eglDisplay, attrib32_list, &_eglConfig,
+        if (EGL_FALSE == eglChooseConfig(_eglDisplay, attrib16_list, &_eglConfig,
                                           1, &_eglNumOfConfigs)) {
-            log_error("eglChooseConfig() failed (error %s)", 
+            log_error("eglChooseConfig(32) failed (error %s)", 
                        getErrorString(eglGetError()));
             return false;
         }
     } else if (_bpp == 16) {
         if (EGL_FALSE == eglChooseConfig(_eglDisplay, attrib16_list, &_eglConfig,
                                          1, &_eglNumOfConfigs)) {
-            log_error("eglChooseConfig() failed (error %s)",
+            log_error("eglChooseConfig(16) failed (error %s)",
                        getErrorString(eglGetError()));
             return false;
         }
@@ -301,29 +297,16 @@ EGLDevice::initDevice(int argc, char *argv[])
         log_error("eglChooseConfig() was unable to find a suitable config");
         return false;
     }
-
-#ifdef BUILD_X11_DEVICE
-#endif
     
-    // printEGLConfig(_eglConfig);
-#if 0
    if (!checkEGLConfig(_eglConfig)) {
        log_error("EGL configuration doesn't match!");
-//       return false;
+       return false;
    } else {
-       //printEGLConfig(_eglConfig);
+       printEGLConfig(_eglConfig);
    }
-#endif
-
-#if 0
-#if 0
-    eglSwapInterval(_eglDisplay, 0);
-#else
-    eglSwapBuffers(_eglDisplay, _eglSurface);
-#endif
     
-//    log_debug("Gnash EGL Frame width %d height %d bpp %d \n", _width, _height, _bpp);
-#endif
+   // log_debug("Gnash EGL Frame width %d height %d bpp %d \n",
+   //           _width, _height, _bpp);
     
     return true;
 }
@@ -356,9 +339,9 @@ EGLDevice::getNativeVisual()
         if (!eglGetConfigAttrib(_eglDisplay, _eglConfig, EGL_NATIVE_VISUAL_ID, &vid)) {
             log_error("eglGetConfigAttrib() failed (error %s)",
                       getErrorString(eglGetError()));
-            return false;
+            return 0;
         } else {
-            std::cerr << "EGL native visual is: " << vid << std::endl;
+            log_debug("EGL native visual is: %d", vid);
         }
     }
 
@@ -414,18 +397,19 @@ EGLDevice::bindClient(rtype_t rtype)
 bool
 EGLDevice::attachWindow(GnashDevice::native_window_t window)
 {
+    GNASH_REPORT_FUNCTION;
+    
     if (!window) {
         return false;
     } else {
         _nativeWindow = static_cast<EGLNativeWindowType>(window);
     }
 
+#if 1
     log_debug("Initializing EGL Surface");
-    if (_nativeWindow && _eglDisplay && _eglConfig) {
+    if (_eglDisplay && _eglConfig) {
         _eglSurface = eglCreateWindowSurface(_eglDisplay, _eglConfig,
-                                             _nativeWindow, NULL);
-    } else {
-        log_error("No native window!");
+                                             window, NULL);
     }
     
     if (EGL_NO_SURFACE == _eglSurface) {
@@ -434,7 +418,8 @@ EGLDevice::attachWindow(GnashDevice::native_window_t window)
     } else {
         printEGLSurface(_eglSurface);
     }
-
+#endif
+    
     // step5 - create a context
     _eglContext = eglCreateContext(_eglDisplay, _eglConfig, EGL_NO_CONTEXT, NULL);
     if (EGL_NO_CONTEXT == _eglContext) {
@@ -513,7 +498,7 @@ EGLDevice::checkEGLConfig(EGLConfig config)
             return false;
         }
         eglGetConfigAttrib(_eglDisplay, config, EGL_ALPHA_SIZE, &value);
-        if (8 != value) {
+        if (0 != value) {
             return false;
         }
         eglGetConfigAttrib(_eglDisplay, config, EGL_SAMPLES, &value);
@@ -587,7 +572,7 @@ EGLDevice::queryEGLConfig(EGLDisplay display)
          return 0;
      }
      
-#if 0
+#if 1
      // This prints out all the configurations, so it can be quite large
      for (int i=0; i<max_num_config; i++ ) {
          std::cerr << "Config[" << i << "] is:" << i << std::endl;
