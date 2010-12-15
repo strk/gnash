@@ -320,6 +320,19 @@ with(grad) {
             "linearRGB", 3.5);
     draw100x100Box(x, y, grad);
 
+    // Shape 24
+    x = 0;
+    y += 100;
+    
+    fillType = "linear";
+    colors = [0xff0000, 0x00ff00];
+    alphas = [100, 0];
+    ratios = [0, 0xff];
+    matrix.createGradientBox(90, 90, 0, x, y);
+    beginGradientFill(fillType, colors, alphas, ratios, matrix, "pad",
+            "linearRGB", 3.5);
+    draw100x100Box(x, y, grad);
+
 };
 grad.onRollOver = function() {};
 
@@ -373,7 +386,7 @@ checkSquare = function(x, y, ar, bmp, fails) {
     low = 4;
     high = size - low;
     mid = size / 2;
-#if 0
+#if 1
     t = [
         "0x" + testbmp.getPixel(x + low, y + low).toString(16),
         "0x" + testbmp.getPixel(x + low, y + mid).toString(16),
@@ -425,6 +438,8 @@ checkSquare(200, 300, [0xfefe,0xe2fe,0xfefe,0xe2fe,0xfefe00,0xe2fe,0xfefe,0xe2fe
 checkSquare(300, 300, [0xffff,0xc3ff,0xffff,0xc3ff,0xffff00,0xc3ff,0xffff,0xc3ff,0xffff], bmp);
 checkSquare(400, 300, [0xffff,0xe1ff,0xffff,0xc6ff,0x3636c8,0xc6ff,0xffff,0xf2f20c,0xffff], bmp);
 checkSquare(500, 300, [0xfa3a00,0xfa3a00,0xfa3a00,0xbbbb00,0xbbbb00,0xbbbb00,0x3afa00,0x3afa00,0x3afa00], bmp);
+
+checkSquare(0, 400, [0xfa420b,0xfa420b,0xfa420b,0xdddd7f,0xdddd7f,0xdddd7f,0xf6fff4,0xf6fff4,0xf6fff4], bmp);
 totals();
 
 stop();
