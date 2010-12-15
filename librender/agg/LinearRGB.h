@@ -73,7 +73,8 @@ public:
         return color_type(
                 cdiff(_c1.r, _c2.r, ratio),
                 cdiff(_c1.g, _c2.g, ratio),
-                cdiff(_c1.b, _c2.b, ratio));
+                cdiff(_c1.b, _c2.b, ratio),
+                _c1.a + (_c2.a - _c1.a) * ratio);
     }
 
 private:
