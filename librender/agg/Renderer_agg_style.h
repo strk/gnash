@@ -35,7 +35,9 @@
 #include <agg_span_image_filter_rgba.h>
 #include <agg_pixfmt_rgb.h>
 #include <agg_pixfmt_rgba.h>
+#include <iostream>
 
+#include "LinearRGB.h"
 #include "Renderer_agg_bitmap.h"
 #include "GnashAlgorithm.h"
 #include "FillStyle.h"
@@ -209,6 +211,14 @@ struct Pad
 };
 
 /// The default RGB color interpolator
+struct InterpolatorLinearRGB
+{
+    template<typename Pixel> struct Type {
+        typedef agg::gradient_lut<linear_rgb_interpolator<Pixel>, 256> type;
+    };
+};
+
+/// The default RGB color interpolator
 struct InterpolatorRGB
 {
     template<typename Pixel> struct Type {
@@ -252,8 +262,8 @@ public:
         for (size_t i = 0; i != size; ++i) { 
             const GradientRecord& gr = fs.record(i); 
             const rgba tr = m_cx.transform(gr.color);
-            if (tr.m_a < 255) m_need_premultiply = true;    
-            m_gradient_lut.add_color(gr.ratio/255.0,
+            if (tr.m_a < 0xff) m_need_premultiply = true;    
+            m_gradient_lut.add_color(gr.ratio / 255.0,
                     agg::rgba8(tr.m_r, tr.m_g, tr.m_b, tr.m_a));
         } 
         m_gradient_lut.build_lut();
@@ -589,7 +599,8 @@ struct AddStyles : boost::static_visitor<>
         _cx(c),
         _sh(sh),
         _quality(q)
-    {}
+    {
+    }
 
     void operator()(const GradientFill& f) const {
           SWFMatrix m = f.matrix();
@@ -713,11 +724,13 @@ void
 storeGradient(StyleHandler& st, const GradientFill& fs, const SWFMatrix& mat,
         const SWFCxForm& cx)
 {
-    // TODO: provide and use a linearRGB interpolator.
     switch (fs.interpolation) {
-        default:
-          storeGradient<Spread, InterpolatorRGB>(st, fs, mat, cx);
-          break;
+        case SWF::GRADIENT_INTERPOLATION_NORMAL:
+            storeGradient<Spread, InterpolatorRGB>(st, fs, mat, cx);
+            break;
+        case SWF::GRADIENT_INTERPOLATION_LINEAR:
+            storeGradient<Spread, InterpolatorLinearRGB>(st, fs, mat, cx);
+            break;
     }
 
 }
