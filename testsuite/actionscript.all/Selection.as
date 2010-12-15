@@ -295,6 +295,20 @@ check_equals(ret, false);
  ret = Selection.getCaretIndex();
  check_equals(ret, 1);
 
+ Selection.setFocus(text1);
+ text1.text = "Some relatively long text";
+ Selection.setSelection(10, 15);
+ check_equals(Selection.getBeginIndex(), 10);
+ text1.text = "Some slightly shorter te";
+ check_equals(Selection.getBeginIndex(), 10);
+ text1.text = "too short";
+ check_equals(Selection.getBeginIndex(), 9);
+ text1.text = "";
+ check_equals(Selection.getBeginIndex(), 0);
+ // This triggers a bug in Gnash 0.8.8 due to 
+ // the selection being outside the text bounds.
+ text1.replaceSel("hello");
+
 #endif // OUTPUT_VERSION >= 6
 
 totals();
