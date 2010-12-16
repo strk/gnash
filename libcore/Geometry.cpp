@@ -271,15 +271,11 @@ pointTest(const std::vector<Path>& paths,
                 continue;
             }
 
-            bool touched = false;
-
             // check first crossing
             if (cross1 <= x)
             {
                 if (pth.m_fill0 > 0) counter += dir1;
                 if (pth.m_fill1 > 0) counter -= dir1;
-
-                touched = true;
             }
 
             // check optional second crossing (only possible with curves)
@@ -287,8 +283,6 @@ pointTest(const std::vector<Path>& paths,
             {
                 if (pth.m_fill0 > 0) counter += dir2;
                 if (pth.m_fill1 > 0) counter -= dir2;
-
-                touched = true;
             }
 
         }// for edge
