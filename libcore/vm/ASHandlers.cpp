@@ -432,7 +432,7 @@ SWFHandlers::execute(ActionType type, ActionExec& thread) const
     try {
         _handlers[type].execute(thread);
     }
-    catch (ActionParserException& e) {
+    catch (const ActionParserException& e) {
         log_swferror(_("Malformed action code: %s"), e.what());
     }
 }
@@ -2506,16 +2506,14 @@ ActionNewEquals(ActionExec& thread)
     {
         as_value op1 = env.top(0);
         try { convertToPrimitive(op1, vm); }
-        catch (ActionTypeError& e)
-        {
+        catch (const ActionTypeError& e) {
             log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),
                     op1, e.what());
         }
 
         as_value op2 = env.top(1);
         try { convertToPrimitive(op2, vm); }
-        catch (ActionTypeError& e)
-        {
+        catch (const ActionTypeError& e) {
             log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),
                     op2, e.what());
         }
