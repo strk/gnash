@@ -45,13 +45,13 @@
 #include "swf/ShapeRecord.h"
 #include "CachedBitmap.h"
 
-#include <VG/openvg.h>
 #include <VG/vgu.h>
 #ifdef OPENVG_VERSION_1_1
 # include <VG/ext.h>
 #else
 # include <VG/vgext.h>
 #endif
+#include <VG/openvg.h>
 #define GNASH_IMAGE_QUALITY     VG_IMAGE_QUALITY_FASTER
 #define GNASH_RENDER_QUALITY    VG_RENDERING_QUALITY_FASTER
 

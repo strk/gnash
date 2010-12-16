@@ -32,6 +32,7 @@
 //#include "directfb/DirectFBDevice.h"
 #include "GnashDevice.h"
 #include "CachedBitmap.h"
+
 #include <VG/vgu.h>
 #ifdef OPENVG_VERSION_1_1
 # include <VG/ext.h>
