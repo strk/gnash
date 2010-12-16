@@ -113,8 +113,8 @@ struct GnashDevice
     /// Is this renderering natively
     virtual bool isNativeRender() = 0;
 
-    virtual boost::uint8_t *getFBMemory() { };
-    virtual size_t getFBMemSize() { };
+    virtual boost::uint8_t *getFBMemory() { return 0; };
+    virtual size_t getFBMemSize() { return 0; };
 };
 
 } // namespace renderer
