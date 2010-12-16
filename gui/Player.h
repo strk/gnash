@@ -95,16 +95,16 @@ public:
 #endif // def GNASH_FPS_DEBUG
     
     void setWidth(size_t w) { _width = w; }
-    size_t getWidth() { return _width; }
+    size_t getWidth() const { return _width; }
     
     void setHeight(size_t h) { _height = h; }
-    size_t getHeight() { return _height; }
+    size_t getHeight() const { return _height; }
     
     void setXPosition(int xPos) { _xPosition = xPos; }
-    size_t getXPosition() { return _xPosition; }
+    size_t getXPosition() const { return _xPosition; }
     
     void setYPosition(int yPos) { _yPosition = yPos; }
-    size_t getYPosition() { return _yPosition; }
+    size_t getYPosition() const { return _yPosition; }
     
     void setWindowId(unsigned long x) { _windowID = x; }
     
