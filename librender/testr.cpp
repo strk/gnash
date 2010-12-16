@@ -345,13 +345,15 @@ test_renderer(Renderer *renderer, const std::string &type)
     } else {
         runtest.fail("Couldn't get description!");
     }
-    
+
+#if 0
     if (renderer->getBitsPerPixel()) {
         runtest.pass("getBitsPerPixel()");
     } else {
         runtest.fail("getBitsPerPixel()");
     }
-
+#endif
+    
     image::GnashImage *frame1 = new image::ImageRGBA(10, 10);
     std::auto_ptr<image::GnashImage> im1(frame1);
     CachedBitmap *cb = renderer->createCachedBitmap(im1);
@@ -382,12 +384,14 @@ test_renderer(Renderer *renderer, const std::string &type)
         ovg->attachWindow(*(reinterpret_cast<EGLNativeWindowType *>(canvas)));
     }
 #else
+#if 0
     // Initializes the renderer for off-screen rendering used by the testsuite.
     if (renderer->initTestBuffer(10, 10)) {
         runtest.pass("initTestBuffer()");
     } else {
         runtest.fail("initTestBuffer()");
     }
+#endif
 #endif
     
     /// @coords an array of 16-bit signed integer coordinates. Even indices
@@ -583,7 +587,7 @@ test_iterators(Renderer *renderer, const std::string &type)
         runtest.fail("getFirstRenderImage()");
     }
 
-    
+#if 0    
     geometry::Point2d a(1, 2);
     geometry::Point2d c(3, 4);
     Renderer::RenderImage image;
@@ -596,6 +600,7 @@ test_iterators(Renderer *renderer, const std::string &type)
     renderer->addRenderImage(image);
 //    image.reset(new gnash::GnashVaapiImageProxy(foo, a.x, a.y, c.x - a.x, c.y - a.y));
     renderer->addRenderImage(image);
+#endif
     
     fit = renderer->getFirstRenderImage();
     lit = renderer->getLastRenderImage();
