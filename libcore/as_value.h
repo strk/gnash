@@ -186,10 +186,11 @@ public:
     }
     
     /// Assign to an as_value.
-    DSOEXPORT void operator=(const as_value& v)
+    DSOEXPORT as_value& operator=(const as_value& v)
     {
         _type = v._type;
         _value = v._value;
+        return *this;
     }
 
     friend std::ostream& operator<<(std::ostream& o, const as_value&);
