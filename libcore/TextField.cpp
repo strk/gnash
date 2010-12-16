@@ -726,15 +726,12 @@ TextField::notifyEvent(const event_id& ev)
                     
                 case key::ENTER:
                     if (isReadOnly()) return;
-                    if ( !multiline() )
-                        break;
+                    if (!multiline()) break;
 
                 default:
 				
-					if ( maxChars()!=0 )
-					{
-						if ( _maxChars <= _glyphcount )
-						{
+					if (maxChars() != 0) {
+						if (_maxChars <= _glyphcount) {
 							break;
 						}
 					}
@@ -742,26 +739,25 @@ TextField::notifyEvent(const event_id& ev)
                     if (isReadOnly()) return;
                     wchar_t t = static_cast<wchar_t>(
                             gnash::key::codeMap[c][key::ASCII]);
-                    if (t != 0)
-                    {
+                    if (t != 0) {
                         
                         if (!_restrictDefined) {
                             // Insert one copy of the character
                             // at the cursor position.
-                              s.insert(m_cursor, 1, t);
+                            s.insert(m_cursor, 1, t);
                             m_cursor++;
                         } else if (_restrictedchars.count(t)) {
                             // Insert one copy of the character
                             // at the cursor position.
-                              s.insert(m_cursor, 1, t);
+                            s.insert(m_cursor, 1, t);
                             m_cursor++;
                         } else if (_restrictedchars.count(tolower(t))) {
                             // restrict substitutes the opposite case
-                              s.insert(m_cursor, 1, tolower(t));
+                            s.insert(m_cursor, 1, tolower(t));
                             m_cursor++;
                         } else if (_restrictedchars.count(toupper(t))) {
                             // restrict substitutes the opposite case
-                              s.insert(m_cursor, 1, toupper(t));
+                            s.insert(m_cursor, 1, toupper(t));
                             m_cursor++;
                         }
                     }
@@ -779,7 +775,6 @@ TextField::notifyEvent(const event_id& ev)
 InteractiveObject*
 TextField::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 {
-
     if (!visible()) return 0;
     
     // Not selectable, so don't catch mouse events!
@@ -908,7 +903,6 @@ TextField::setTextFormat(TextFormat_as& tf)
 float
 TextField::align_line(TextAlignment align, int last_line_start_record, float x)
 {
-
     float width = _bounds.width(); 
     float right_margin = getRightMargin();
 
@@ -953,7 +947,7 @@ TextField::align_line(TextAlignment align, int last_line_start_record, float x)
 boost::intrusive_ptr<const Font>
 TextField::setFont(boost::intrusive_ptr<const Font> newfont)
 {
-    if ( newfont == _font ) return _font;
+    if (newfont == _font) return _font;
 
     boost::intrusive_ptr<const Font> oldfont = _font;
     set_invalidated();
@@ -969,8 +963,7 @@ TextField::insertTab(SWF::TextRecord& rec, boost::int32_t& x, float scale)
      // tab (ASCII HT)
     const int space = 32;
     int index = rec.getFont()->get_glyph_index(space, _embedFonts); 
-    if ( index == -1 )
-    {
+    if (index == -1) {
         IF_VERBOSE_MALFORMED_SWF (
           log_error(_("TextField: missing glyph for space char (needed "
                   "for TAB). Make sure DisplayObject shapes for font "
@@ -978,24 +971,19 @@ TextField::insertTab(SWF::TextRecord& rec, boost::int32_t& x, float scale)
                 rec.getFont()->name());
         );
     }
-    else
-    {
-		std::vector<int> tabStops;
-        tabStops = _tabStops;
+    else {
+        // TODO: why is there a copy of the vector?
+		std::vector<int> tabStops = _tabStops;
         
         std::sort(_tabStops.begin(), _tabStops.end()); 
 
         int tab = 0;
-        if ( !_tabStops.empty() )
-        {
-            tab = _tabStops.back()+1;
+        if (!_tabStops.empty()) {
+            tab = _tabStops.back() + 1;
             
-            for (size_t i = 0; i < tabStops.size(); ++i)
-            {        
-                if (tabStops[i] > x)
-                {
-                    if((tabStops[i] - x) < tab) 
-                    {
+            for (size_t i = 0; i < tabStops.size(); ++i) {        
+                if (tabStops[i] > x) {
+                    if((tabStops[i] - x) < tab) {
                         tab = tabStops[i] - x;
                     }
 				}
@@ -1005,8 +993,7 @@ TextField::insertTab(SWF::TextRecord& rec, boost::int32_t& x, float scale)
 			// This is necessary in case the number of tabs in the text
 			// are more than the actual number of tabStops inside the 
 			// vector
-			if ( !(tab == _tabStops.back()+1) ) 
-			{
+			if (tab != _tabStops.back() + 1) {
 				SWF::TextRecord::GlyphEntry ge;
 				ge.index = rec.getFont()->get_glyph_index(32, _embedFonts);
 				ge.advance = tab;
@@ -1014,8 +1001,7 @@ TextField::insertTab(SWF::TextRecord& rec, boost::int32_t& x, float scale)
 				x+=ge.advance;
 			}
         }
-        else
-        {
+        else {
             SWF::TextRecord::GlyphEntry ge;
             ge.index = index;
             ge.advance = scale * rec.getFont()->get_advance(index, 
@@ -1039,8 +1025,7 @@ TextField::format_text()
     _recordStarts.push_back(0);
 		
     // nothing more to do if text is empty
-    if ( _text.empty() )
-    {
+    if (_text.empty()) {
         // TODO: should we still reset _bounds if autoSize != AUTOSIZE_NONE ?
         //       not sure we should...
         reset_bounding_box(0, 0);
@@ -1100,8 +1085,7 @@ TextField::format_text()
     // Note: this works only for additional lines of a 
     // bulleted list, so that is why there is a bullet format
     // in the beginning of format_text()
-    if ( _bullet )
-    {
+    if (_bullet) {
         int space = rec.getFont()->get_glyph_index(32, _embedFonts);
 
         SWF::TextRecord::GlyphEntry ge;
@@ -1931,8 +1915,7 @@ TextField::parseTextVariableRef(const std::string& variableName) const
     // name. We copy the string so we can assign to it if necessary.
     std::string parsedName = variableName;
     std::string path, var;
-    if (parsePath(variableName, path, var))
-    {
+    if (parsePath(variableName, path, var)) {
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug(_("Variable text Path: %s, Var: %s"), path, var);
 #endif
@@ -1943,8 +1926,7 @@ TextField::parseTextVariableRef(const std::string& variableName) const
         parsedName = var;
     }
 
-    if ( ! target )
-    {
+    if (!target) {
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("VariableName associated to text field refers "
                     "to an unknown target (%s). It is possible that the "
@@ -1997,7 +1979,7 @@ TextField::registerTextVariable()
     // check if the VariableName already has a value,
     // in that case update text value
     as_value val;
-    if (target->get_member(key, &val) ) {
+    if (target->get_member(key, &val)) {
         // TODO: pass environment to to_string ?
         // as_environment& env = get_environment();
         setTextValue(utf8::decodeCanonicalString(val.to_string(), version));
@@ -2181,8 +2163,7 @@ TextField::parseHTML(std::wstring& tag,
 void
 TextField::set_variable_name(const std::string& newname)
 {
-    if ( newname != _variable_name )
-    {
+    if (newname != _variable_name) {
         _variable_name = newname;
 
         // The name was empty or undefined, so there's nothing more to do.
@@ -2224,8 +2205,7 @@ TextField::getDrawBorder() const
 void
 TextField::setDrawBorder(bool val) 
 {
-    if ( _drawBorder != val )
-    {
+    if (_drawBorder != val) {
         set_invalidated();
         _drawBorder = val;
     }
@@ -2240,8 +2220,7 @@ TextField::getBorderColor() const
 void
 TextField::setBorderColor(const rgba& col)
 {
-    if ( _borderColor != col )
-    {
+    if (_borderColor != col) {
         set_invalidated();
         _borderColor = col;
     }
@@ -2256,8 +2235,7 @@ TextField::getDrawBackground() const
 void
 TextField::setDrawBackground(bool val) 
 {
-    if ( _drawBackground != val )
-    {
+    if (_drawBackground != val) {
         set_invalidated();
         _drawBackground = val;
     }
@@ -2272,8 +2250,7 @@ TextField::getBackgroundColor() const
 void
 TextField::setBackgroundColor(const rgba& col)
 {
-    if ( _backgroundColor != col )
-    {
+    if (_backgroundColor != col) {
         set_invalidated();
         _backgroundColor = col;
     }
@@ -2294,8 +2271,7 @@ TextField::setTextColor(const rgba& col)
 void
 TextField::setEmbedFonts(bool use)
 {
-    if ( _embedFonts != use )
-    {
+    if (_embedFonts != use) {
         set_invalidated();
         _embedFonts=use;
         format_text();
@@ -2306,7 +2282,6 @@ void
 TextField::setWordWrap(bool wrap)
 {
     if (_wordWrap != wrap) {
-
         set_invalidated();
         _wordWrap = wrap;
         format_text();
@@ -2316,8 +2291,7 @@ TextField::setWordWrap(bool wrap)
 void
 TextField::setLeading(boost::int16_t h)
 {
-    if ( _leading != h )
-    {
+    if (_leading != h) {
         set_invalidated();
         _leading = h;
     }
@@ -2326,8 +2300,7 @@ TextField::setLeading(boost::int16_t h)
 void
 TextField::setUnderlined(bool v)
 {
-    if ( _underlined != v )
-    {
+    if (_underlined != v) {
         set_invalidated();
         _underlined = v;
     }
@@ -2356,7 +2329,7 @@ TextField::setTabStops(const std::vector<int>& tabStops)
 void 
 TextField::setURL(std::string url)
 { 
-    if ( _url != url ) {
+    if (_url != url) {
         set_invalidated();
         _url = url;
     }
@@ -2365,8 +2338,7 @@ TextField::setURL(std::string url)
 void
 TextField::setTarget(std::string target)
 {
-    if ( _target != target)
-    {
+    if (_target != target) {
         set_invalidated();
         _target = target;
     }
@@ -2375,8 +2347,7 @@ TextField::setTarget(std::string target)
 void
 TextField::setDisplay(TextFormatDisplay display)
 {
-    if ( _display != display )
-    {
+    if (_display != display) {
         set_invalidated();
         _display = display;
     }
@@ -2385,8 +2356,7 @@ TextField::setDisplay(TextFormatDisplay display)
 void
 TextField::setAlignment(TextAlignment h)
 {
-    if ( _alignment != h )
-    {
+    if (_alignment != h) {
         set_invalidated();
         _alignment = h;
     }
@@ -2395,8 +2365,7 @@ TextField::setAlignment(TextAlignment h)
 void
 TextField::setIndent(boost::uint16_t h)
 {
-    if ( _indent != h )
-    {
+    if (_indent != h) {
         set_invalidated();
         _indent = h;
     }
@@ -2405,8 +2374,7 @@ TextField::setIndent(boost::uint16_t h)
 void
 TextField::setBlockIndent(boost::uint16_t h)
 {
-    if ( _blockIndent != h )
-    {
+    if (_blockIndent != h) {
         set_invalidated();
         _blockIndent = h;
     }
@@ -2415,8 +2383,7 @@ TextField::setBlockIndent(boost::uint16_t h)
 void
 TextField::setRightMargin(boost::uint16_t h)
 {
-    if ( _rightMargin != h )
-    {
+    if (_rightMargin != h) {
         set_invalidated();
         _rightMargin = h;
     }
@@ -2425,8 +2392,7 @@ TextField::setRightMargin(boost::uint16_t h)
 void
 TextField::setLeftMargin(boost::uint16_t h)
 {
-    if (_leftMargin != h)
-    {
+    if (_leftMargin != h) {
         set_invalidated();
         _leftMargin = h;
     }
@@ -2435,8 +2401,7 @@ TextField::setLeftMargin(boost::uint16_t h)
 void
 TextField::setFontHeight(boost::uint16_t h)
 {
-    if ( _fontHeight != h )
-    {
+    if (_fontHeight != h) {
         set_invalidated();
         _fontHeight = h;
     }
@@ -2451,15 +2416,13 @@ TextField::parseTypeValue(const std::string& val)
     if (cmp(val, "input")) return typeInput;
     if (cmp(val, "dynamic")) return typeDynamic;
     return typeInvalid;
-
 }
 
 
 const char*
 TextField::typeValueName(TypeValue val)
 {
-    switch (val)
-    {
+    switch (val) {
         case typeInput:
             //log_debug("typeInput returned as 'input'");
             return "input";
@@ -2476,10 +2439,9 @@ TextField::typeValueName(TypeValue val)
 void
 TextField::setAutoSize(AutoSize val)
 {
-    if ( val == _autoSize ) return;
+    if (val == _autoSize) return; 
 
     set_invalidated();
-
     _autoSize = val; 
     format_text();
 }
@@ -2539,13 +2501,10 @@ TextField::handleFocus()
 void
 TextField::killFocus()
 {
-    if ( ! m_has_focus ) return; // nothing to do
-
+    if (!m_has_focus) return; 
     set_invalidated();
     m_has_focus = false;
-
     format_text(); // is this needed ?
-
 }
 
 void
@@ -2567,9 +2526,6 @@ TextField::setHeight(double newheight)
             bounds.get_x_max(),
             bounds.get_y_min() + newheight);
 }
-
-/// TextField interface functions
-
 
 } // namespace gnash
 
