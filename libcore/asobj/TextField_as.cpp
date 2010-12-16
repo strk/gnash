@@ -882,8 +882,8 @@ textfield_htmlText(const fn_call& fn)
     // Setter
     const int version = getSWFVersion(fn);
     
-    ptr->setHtmlTextValue(
-            utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
+    ptr->setTextValue(utf8::decodeCanonicalString(fn.arg(0).to_string(),
+                version));
 
     return as_value();
 }

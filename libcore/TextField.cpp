@@ -136,10 +136,8 @@ TextField::TextField(as_object* object, DisplayObject* parent,
     // set default text *before* calling registerTextVariable
     // (if the textvariable already exist and has a value
     // the text will be replaced with it)
-    if (_textDefined) 
-    {
+    if (_textDefined) {
         setTextValue(utf8::decodeCanonicalString(def.defaultText(), version));
-        setHtmlTextValue(utf8::decodeCanonicalString(def.defaultText(), version));
     }
 
     init();
@@ -823,14 +821,6 @@ TextField::updateText(const std::wstring& wstr)
 }
 
 void
-TextField::updateHtmlText(const std::string& str)
-{
-    int version = getSWFVersion(*getObject(this));
-    const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
-    updateHtmlText(wstr);
-}
-
-void
 TextField::updateHtmlText(const std::wstring& wstr)
 {
     _htmlTextDefined = true;
@@ -844,64 +834,22 @@ TextField::updateHtmlText(const std::wstring& wstr)
 }
 
 void
-TextField::setHtmlTextValue(const std::wstring& wstr)
-{
-    if (!doHtml()) {
-        updateText(wstr);
-    } else {
-        //updateText with no HTML tags
-        //for now, it is better to make the display correct
-        updateText(wstr);
-    }
-    updateHtmlText(wstr);
-
-    if ( ! _variable_name.empty() && _text_variable_registered )
-    {
-        // TODO: notify MovieClip if we have a variable name !
-        VariableRef ref = parseTextVariableRef(_variable_name);
-        as_object* tgt = ref.first;
-        if ( tgt )
-        {
-            const int version = getSWFVersion(*getObject(this));
-            // we shouldn't truncate, right?
-            tgt->set_member(ref.second, utf8::encodeCanonicalString(wstr,
-                        version)); 
-        }
-        else    
-        {
-            // nothing to do (too early ?)
-            log_debug("setHtmlTextValue: variable name %s points to a non-existent"
-                    " target, I guess we would not be registered if this was "
-                    "true, or the sprite we've registered our variable name "
-                    "has been unloaded", _variable_name);
-        }
-    }
-}
-
-void
 TextField::setTextValue(const std::wstring& wstr)
 {
-    if (!doHtml()) {
-        updateHtmlText(wstr);
-    } else {
-        //updateHtmlText and insert necessary html tags
-    }
+    updateHtmlText(wstr);
     updateText(wstr);
 
-    if ( ! _variable_name.empty() && _text_variable_registered )
-    {
+    if (!_variable_name.empty() && _text_variable_registered) {
         // TODO: notify MovieClip if we have a variable name !
         VariableRef ref = parseTextVariableRef(_variable_name);
         as_object* tgt = ref.first;
-        if ( tgt )
-        {
+        if (tgt) {
             const int version = getSWFVersion(*getObject(this));
             // we shouldn't truncate, right?
             tgt->set_member(ref.second, utf8::encodeCanonicalString(wstr,
                         version)); 
         }
-        else    
-        {
+        else {
             // nothing to do (too early ?)
             log_debug("setTextValue: variable name %s points to a non-existent"
                     " target, I guess we would not be registered if this was "
@@ -2018,7 +1966,7 @@ TextField::parseTextVariableRef(const std::string& variableName) const
 }
 
 void
-TextField::registerTextVariable() 
+TextField::registerTextVariable()
 {
 //#define DEBUG_DYNTEXT_VARIABLES 1
 
@@ -2027,17 +1975,11 @@ TextField::registerTextVariable()
 #endif
 
     if (_text_variable_registered) {
-#ifdef DEBUG_DYNTEXT_VARIABLES
-        log_debug(_("registerTextVariable() no-op call (already registered)"));
-#endif
         return;
     }
 
     if (_variable_name.empty()) {
-#ifdef DEBUG_DYNTEXT_VARIABLES
-        log_debug(_("string is empty, consider as registered"));
-#endif
-        _text_variable_registered=true;
+        _text_variable_registered = true;
         return;
     }
 
@@ -2077,8 +2019,7 @@ TextField::registerTextVariable()
         sprite->set_textfield_variable(key, this);
 
     }
-    _text_variable_registered=true;
-
+    _text_variable_registered = true;
 }
 
 /// Parses an HTML tag (between < and >) and puts

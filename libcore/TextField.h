@@ -148,8 +148,6 @@ public:
     /// updated.
 	void updateText(const std::string& s);
 
-	void updateHtmlText(const std::string& s);
-
  	/// Return value of our text.
 	std::string get_text_value() const;
 
@@ -572,8 +570,7 @@ public:
 
 	void setTextFormat(TextFormat_as& tf);
 
-	const SWFRect& getTextBoundingBox() const
-	{
+	const SWFRect& getTextBoundingBox() const {
 		return m_text_bounding_box;
 	}
 
@@ -582,10 +579,6 @@ public:
 	/// This function will also update any registered variable
 	///
 	void setTextValue(const std::wstring& wstr);
-
-	/// Set our htmlText to the given string.
-	//
-	void setHtmlTextValue(const std::wstring& wstr);
 
 private:
 
