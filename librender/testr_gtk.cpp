@@ -34,25 +34,28 @@
 # include <gdk/gdk.h>
 #endif
 #ifdef RENDERER_AGG
-#include "agg/Renderer_agg.h"
+# include "agg/Renderer_agg.h"
 #endif
 #ifdef RENDERER_OPENGL
-#include "opengl/Renderer_ogl.h"
+# include "opengl/Renderer_ogl.h"
 #endif
 #ifdef RENDERER_OPENVG
-#include "openvg/Renderer_ovg.h"
-//#include <VG/openvg.h>
-#include <VG/vgu.h>
-#include <VG/ext.h>
+# include <VG/vgu.h>
+# ifdef OPENVG_VERSION_1_1
+#  include <VG/ext.h>
+# else
+#  include <VG/vgext.h>
+# endif
+# include <VG/openvg.h>
 #endif
 #ifdef RENDERER_GLES1
-#include "opengles1/Renderer_gles1.h"
+# include "opengles1/Renderer_gles1.h"
 #endif
-#ifdef RENDERER_GLES2
-#include "opengles2/Renderer_gles2.h"
-#endif
+# ifdef RENDERER_GLES2
+#  include "opengles2/Renderer_gles2.h"
+# endif
 #ifdef RENDERER_CAIRO
-#include "cairo/Renderer_cairo.h"
+# include "cairo/Renderer_cairo.h"
 #endif
 
 #ifdef BUILD_EGL_DEVICE
