@@ -115,7 +115,7 @@ public:
 		_htmlURL = url;
 	}
 	
-	std::string getURL() {
+	const std::string& getURL() const {
 		return _htmlURL;
 	}
 	
@@ -123,7 +123,7 @@ public:
 		_htmlTarget = target;
 	}
 	
-	std::string getTarget() {
+	const std::string& getTarget() const {
 		return _htmlTarget;
 	}
 	
