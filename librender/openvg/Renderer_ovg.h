@@ -23,19 +23,24 @@
 #define GNASH_RENDER_HANDLER_OVG_H
 
 #include <EGL/egl.h>
-#include <VG/openvg.h>
-#include <VG/vgu.h>
-#include <VG/vgext.h>
 #include <vector>
 #include <boost/scoped_array.hpp>
 #include <boost/scoped_ptr.hpp>
 
 #include "Geometry.h"
 #include "Renderer.h"
-#include "egl/eglDevice.h"
-#include "directfb/DirectFBDevice.h"
+//#include "directfb/DirectFBDevice.h"
 #include "GnashDevice.h"
 #include "CachedBitmap.h"
+#include <VG/vgu.h>
+#ifdef OPENVG_VERSION_1_1
+# include <VG/ext.h>
+#else
+# include <VG/vgext.h>
+#endif
+#include <VG/openvg.h>
+#include "openvg/Renderer_ovg_bitmap.h"
+#include "egl/eglDevice.h"
 
 namespace gnash {
 

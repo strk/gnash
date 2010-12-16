@@ -41,8 +41,9 @@
 #endif
 #ifdef RENDERER_OPENVG
 #include "openvg/Renderer_ovg.h"
-#include <VG/openvg.h>
+//#include <VG/openvg.h>
 #include <VG/vgu.h>
+#include <VG/ext.h>
 #endif
 #ifdef RENDERER_GLES1
 #include "opengles1/Renderer_gles1.h"
@@ -52,6 +53,16 @@
 #endif
 #ifdef RENDERER_CAIRO
 #include "cairo/Renderer_cairo.h"
+#endif
+
+#ifdef BUILD_EGL_DEVICE
+# include <egl/eglDevice.h>
+#endif
+#ifdef BUILD_DIRECTFB_DEVICE
+# include <directfb/directfb.h>
+#endif
+#ifdef BUILD_X11_DEVICE
+# include <x11/X11Device.h>
 #endif
 
 #include "log.h"
@@ -69,25 +80,11 @@ const VGfloat color[4] = {0.4, 0.1, 1.0, 1.0};
 
 VGPath path;
 VGPaint paint;
+VGPaint fill;
 
 // The debug log used by all the gnash libraries.
 static LogFile& dbglogfile = LogFile::getDefaultInstance();
 
-void on_window1_activate_default(GtkWindow *window, gpointer user_data);
-void on_canvas_realize (GtkWidget *widget, gpointer user_data);
-gboolean on_canvas_expose_event (GtkWidget *widget, GdkEventExpose *event,
-                                        gpointer user_data);
-gboolean on_canvas_configure_event (GtkWidget *widget, GdkEventConfigure *event,
-                                          gpointer user_data);
-void on_canvas_size_allocate (GtkWidget *widget, GdkRectangle *allocation,
-                                        gpointer user_data);
-gboolean on_window1_configure_event (GtkWidget *widget, GdkEventConfigure *event,
-                                     gpointer user_data);
-gboolean on_window1_expose_event (GtkWidget *widget, GdkEventExpose *event,
-                                        gpointer user_data);
-void on_window1_realize (GtkWidget *widget, gpointer user_data);
-void on_window1_size_allocate (GtkWidget *widget, GdkRectangle *allocation,
-                                        gpointer user_data);
 
 static void
 initVGDemo(void)
@@ -120,7 +117,7 @@ initVGDemo(void)
     path  = vgCreatePath(VG_PATH_FORMAT_STANDARD, VG_PATH_DATATYPE_F,
                          1.0f, 0.0f, 0, 0, VG_PATH_CAPABILITY_ALL);
 
-//    vguArc(path, x, y, w, h, startAngle, angleExtent, (VGUArcType)arcType);
+    vguArc(path, x, y, w, h, startAngle, angleExtent, (VGUArcType)arcType);
 
     vgSeti(VG_STROKE_CAP_STYLE, VG_CAP_BUTT);
     vgSeti(VG_STROKE_JOIN_STYLE, VG_JOIN_BEVEL);
@@ -128,6 +125,29 @@ initVGDemo(void)
 }
 
 /* new window size or exposure */
+static void
+init(void)
+{
+    static const VGubyte sqrCmds[5] = {VG_MOVE_TO_ABS, VG_HLINE_TO_ABS,
+                                       VG_VLINE_TO_ABS, VG_HLINE_TO_ABS, VG_CLOSE_PATH};
+    static const VGfloat sqrCoords[5] = {50.0f, 50.0f, 250.0f, 250.0f, 50.0f};
+    path = vgCreatePath(VG_PATH_FORMAT_STANDARD, VG_PATH_DATATYPE_F, 1, 0, 0, 0,
+                        VG_PATH_CAPABILITY_APPEND_TO);
+    vgAppendPathData(path, 5, sqrCmds, sqrCoords);
+    
+    VGPaint fill = vgCreatePaint();
+    vgSetParameterfv(fill, VG_PAINT_COLOR, 4, color);
+    vgSetPaint(fill, VG_FILL_PATH);
+    
+    vgSetfv(VG_CLEAR_COLOR, 4, white_color);
+    vgSetf(VG_STROKE_LINE_WIDTH, 10);
+    vgSeti(VG_STROKE_CAP_STYLE, VG_CAP_BUTT);
+    vgSeti(VG_STROKE_JOIN_STYLE, VG_JOIN_ROUND);
+    vgSetf(VG_STROKE_MITER_LIMIT, 4.0f);
+    
+//    printVGParams();
+}
+
 static void
 reshape(int w, int h)
 {
@@ -137,144 +157,14 @@ reshape(int w, int h)
 static void
 draw(void)
 {
-   vgClear(0, 0, 500, 500);
-   vgDrawPath(path, VG_STROKE_PATH);
-
-   vgFlush();
-}
-
-GtkWidget *
-create_GTK_window()
-{
-    // As gtk_init() wants the command line arguments, we have to create
-    // fake ones, as we don't care about the X11 options at this point.
-    int argc = 0;
-    char **argv = 0;    
-    gtk_init(&argc, &argv);
-
-    GtkWidget *window;
-    GtkWidget *canvas;
-
-    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_container_set_border_width(GTK_CONTAINER(window), 10);
-    gtk_window_set_title(GTK_WINDOW(window), "testR");
-
-#if 0
-    gtk_widget_push_visual(gdk_rgb_get_visual());
-    gtk_widget_push_colormap(gdk_rgb_get_cmap());
-    gtk_widget_pop_colormap();
-    gtk_widget_pop_visual();
-#endif
-    canvas = gtk_drawing_area_new();
-    gtk_widget_show(canvas);
-    gtk_container_add (GTK_CONTAINER (window), canvas);
-    // Disable double buffering, otherwise gtk tries to update widget
-    // contents from its internal offscreen buffer at the end of expose event
-    gtk_widget_set_double_buffered(canvas, FALSE);
+    vgClear(0, 0, 640, 480);
+    vgSeti(VG_MATRIX_MODE, VG_MATRIX_STROKE_PAINT_TO_USER);
+    vgLoadIdentity();
+    vgScale(2.25, 2.25);
+    vgDrawPath(path, VG_STROKE_PATH);
     
-    g_signal_connect(GTK_OBJECT(window), "delete_event",
-                     (GCallback)gtk_main_quit, NULL);
-    g_signal_connect ((gpointer) window, "configure_event",
-                      G_CALLBACK (on_window1_configure_event), NULL);
-    g_signal_connect ((gpointer) window, "expose_event",
-                    G_CALLBACK (on_window1_expose_event), NULL);
-    g_signal_connect ((gpointer) window, "realize",
-                      G_CALLBACK (on_window1_realize), NULL);
-    g_signal_connect ((gpointer) window, "size_allocate",
-                      G_CALLBACK (on_window1_size_allocate), NULL);
-    
-    g_signal_connect ((gpointer) canvas, "realize",
-                      G_CALLBACK (on_canvas_realize), NULL);
-    g_signal_connect ((gpointer) canvas, "expose_event",
-                      G_CALLBACK (on_canvas_expose_event), NULL);
-    g_signal_connect ((gpointer) canvas, "configure_event",
-                      G_CALLBACK (on_canvas_configure_event), NULL);
-    g_signal_connect ((gpointer) canvas, "size_allocate",
-                      G_CALLBACK (on_canvas_size_allocate), NULL);
-
-    // Add the window frame and icons
-    gtk_window_set_decorated(GTK_WINDOW(window), TRUE);
-    gtk_window_set_default_size(GTK_WINDOW(window),500,500);
-
-    gtk_window_set_skip_taskbar_hint(GTK_WINDOW(window), TRUE);
-    gtk_window_set_skip_pager_hint(GTK_WINDOW(window), TRUE);
-
-    // Open window at this location
-    gtk_window_move(GTK_WINDOW(window), 100, 100);
-    
-    gtk_widget_show(window);
-    
-    // Just do one iteration of the main loop
-    gtk_main_iteration_do(true);
-    
-    return canvas;
+    vgFlush();
 }
-
-void
-on_canvas_realize(GtkWidget *widget, gpointer user_data)
-{
-    GNASH_REPORT_FUNCTION;
-}
-
-gboolean
-on_canvas_expose_event(GtkWidget *widget, GdkEventExpose  *event,
-                       gpointer user_data)
-{
-    GNASH_REPORT_FUNCTION;
-    
-    return FALSE;
-}
-
-gboolean
-on_canvas_configure_event(GtkWidget *widget, GdkEventConfigure *event,
-                          gpointer user_data)
-{
-    GNASH_REPORT_FUNCTION;
-
-    return FALSE;
-}
-
-
-void
-on_canvas_size_allocate(GtkWidget *widget, GdkRectangle *allocation,
-                        gpointer user_data)
-{
-    GNASH_REPORT_FUNCTION;
-}
-
-// Window Events
-gboolean
-on_window1_configure_event(GtkWidget *widget, GdkEventConfigure *event,
-                           gpointer user_data)
-{
-    GNASH_REPORT_FUNCTION;
-
-    return FALSE;
-}
-
-
-gboolean
-on_window1_expose_event(GtkWidget *widget, GdkEventExpose  *event,
-                        gpointer user_data)
-{
-    GNASH_REPORT_FUNCTION;
-    
-    return FALSE;
-}
-
-void
-on_window1_realize(GtkWidget *widget, gpointer user_data)
-{
-    GNASH_REPORT_FUNCTION;
-}
-
-void
-on_window1_size_allocate(GtkWidget *widget, GdkRectangle *allocation,
-                         gpointer user_data)
-{
-    GNASH_REPORT_FUNCTION;
-}
-
 
 // Local Variables:
 // mode: C++

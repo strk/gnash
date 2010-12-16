@@ -37,6 +37,7 @@
 #include "SWFMatrix.h"
 #include "Renderer.h"
 #include "Transform.h"
+#include "ShapeRecord.h"
 #include "CachedBitmap.h"
 #include "GnashVaapiImage.h"
 #include "GnashVaapiImageProxy.h"
@@ -50,6 +51,9 @@
 #endif
 #ifdef RENDERER_OPENVG
 #include "openvg/Renderer_ovg.h"
+//#include <VG/openvg.h>
+#include <VG/vgu.h>
+#include <VG/ext.h>
 #endif
 #ifdef RENDERER_GLES1
 #include "opengles1/Renderer_gles1.h"
@@ -62,13 +66,12 @@
 #endif
 #ifdef HAVE_EGL_EGL_H
 # include <EGL/egl.h>
-# include <eglDevice.h>
 #else
 # error "This file needs EGL"
 #endif
 
 #ifdef BUILD_EGL_DEVICE
-# include <eglDevice.h>
+# include <egl/eglDevice.h>
 #endif
 #ifdef BUILD_DIRECTFB_DEVICE
 # include <directfb/directfb.h>
@@ -91,56 +94,6 @@ void test_iterators(Renderer *renderer, const std::string &type);
 
 // The debug log used by all the gnash libraries.
 static LogFile& dbglogfile = LogFile::getDefaultInstance();
-
-//
-// Test drawing.
-//
-float red_color[4] = {1.0, 0.0, 0.0, 1.0};
-float blue_color[4] = {0.0, 0.0, 1.0, 1.0};
-
-#ifdef BUILD_X11_DEVICE
-static x11::init_func    init = 0;
-static x11::draw_func    draw = 0;
-static x11::reshape_func reshape = 0;
-static x11::key_func     keyPress = 0;
-static int width = 640, height = 480;
-
-#if 0
-static void
-init(void)
-{
-    GNASH_REPORT_FUNCTION;  
-}
-
-// new window size or exposure
-static void
-reshape(int /* width */, int /* height */)
-{
-    GNASH_REPORT_FUNCTION;
-    
-    vgLoadIdentity();
-}
-
-static void
-draw(void)
-{
-    GNASH_REPORT_FUNCTION;
-    
-    VGint scissor[4] = {100, 100, 25, 25};
-    vgSetfv(VG_CLEAR_COLOR, 4, red_color);
-    vgClear(0, 0, 640, 480);
-
-    vgSetfv(VG_CLEAR_COLOR, 4, blue_color);
-    vgClear(50, 50, 50, 50);
-
-    //vgSetiv(VG_SCISSOR_RECTS, 4, scissor);
-    //vgSeti(VG_SCISSORING, VG_TRUE);
-    vgCopyPixels(100, 100, 50, 50, 50, 50);
-    vgClear(150, 150, 50, 50);
-}
-#endif  // end of BUILD_X11_DEVICE
-
-#endif
 
 //------------------------------------------------------------
 
@@ -194,17 +147,21 @@ main(int argc, char *argv[])
     dbglogfile.setVerbosity();
 
     const char *pixelformat = "RGB24";
-
-#ifdef BUILD_X11_DEVICE
-    EGLDevice egl(GnashDevice::OPENVG);
-    // egl.initDevice(0,0);
-    // egl.bindClient(GnashDevice::OPENVG);
-    int vid = egl.getNativeVisual();
-    x11::X11Device x11(vid);
-    // x11.initDevice(0, 0);
     
-    x11.createWindow("Foo", 0, 0, 640, 480);
-    int win = x11.getDrawableWindow();
+#ifdef BUILD_X11_DEVICE
+    // Setup EGL, OpenVG needs it
+    EGLDevice egl(argc, argv);
+    int vid = egl.getNativeVisual();
+
+    // Create an X11 device for the display. This is for libMesa
+    // where we can also run OpenVG on the desktop.
+    x11::X11Device x11(vid);
+    //x11.initDevice(argc, argv);
+    x11.createWindow("TestR", 0, 0, 640, 480);
+    egl.bindClient(GnashDevice::OPENVG);
+    
+    // This is the window that gets rendered in
+    Window win = x11.getDrawableWindow();
     if (win) {
         egl.attachWindow(win);
     } else {
@@ -214,21 +171,25 @@ main(int argc, char *argv[])
     // Set initial projection/viewing transformation.
     // We can't be sure we'll get a ConfigureNotify event when the window
     // first appears.
+#if 0
     if (reshape) {
         reshape(640, 480);
     }
+#endif
     x11.eventLoop(10);
     std::cerr << "Hello World!" << std::endl;
     x11.eventLoop(10);
 #endif
+#if 0
 #ifdef RENDERER_AGG
     Timer tagg("AGG");
     Renderer *renderer1 = create_Renderer_agg(pixelformat);
-    if (renderer1) {
-        test_device(renderer1, "EGL");
-        test_device(renderer1, "DIRECTFB");
-        test_device(renderer1, "X11");
-    }
+    // The methods were moved to the glue API
+    // if (renderer1) {
+    //     test_device(renderer1, "EGL");
+    //     test_device(renderer1, "DIRECTFB");
+    //     test_device(renderer1, "X11");
+    // }
     if (renderer1) {
         test_renderer(renderer1, "AGG");
         test_geometry(renderer1, "AGG");
@@ -257,7 +218,7 @@ main(int argc, char *argv[])
     cerr << "OpenVG tests took " << tovg.elapsed() << endl;
 #endif
     
-#if 1
+#if 0
 #ifdef RENDERER_GLES1
     Timer tgles1("OpenGLES1");
     Renderer *renderer3 = renderer::gles1::create_handler(pixelformat);
@@ -314,6 +275,7 @@ main(int argc, char *argv[])
     cerr << "OpenGL tests took " << tgl.elapsed() << endl;
 #endif
 #endif    
+#endif    
 }
 
 // Each Renderer has an associated display device, currently EGL
@@ -329,13 +291,13 @@ test_device(Renderer *renderer, const std::string &type)
 {
     cout << "Testing " << type << " Device" << endl;
 
+#if 0
     boost::shared_array<renderer::GnashDevice::dtype_t> devs = renderer->probeDevices();
     if (devs) {
         runtest.pass("Renderer::probeDevices()");
     } else {
         runtest.fail("Renderer::probeDevices()");
     }
-
     // Be default, there should be no device associated with this
     // renderer yet.
     if (renderer->getDevice() == GnashDevice::NODEV) {
@@ -354,6 +316,7 @@ test_device(Renderer *renderer, const std::string &type)
 
     // reset to the original value so we don't screw up future tests
     renderer->resetDevice();
+#endif
 }
 
 void
@@ -477,12 +440,18 @@ test_renderer(Renderer *renderer, const std::string &type)
     runtest.unresolved(std::string("drawPoly() ") + tdrawpoly.elapsed());
     
 //    SWF::ShapeRecord shape;
-    // Transform xform;
-    
-//    Timer drawshape("drawShape");
-//    renderer->drawShape(shape, xform);
-    runtest.untested("drawShape()");
-//    drawshape.stop();
+    SWFMatrix mat2(0x10000, 0x0, 0x0, 0x10000, 0x0, 0x0);
+    SWFCxForm cxform;
+    //(0x100, 0x100, 0x100, 0x100, 0x0, 0x0, 0x0, 0x0);
+    Transform xform(mat2, cxform);
+    SWF::ShapeRecord shape;
+    // _bounds = {0x80000000, 0x7fffffff,
+    //            0x80000000, 0x80000000,
+    //            0x80000000, 0x80000000}}
+    Timer drawshape("drawShape");
+    renderer->drawShape(shape, xform);
+    runtest.unresolved("drawShape()");
+    drawshape.stop();
     
 //    SWF::ShapeRecord rec;
     // rgba color;

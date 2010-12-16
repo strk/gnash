@@ -39,12 +39,19 @@
 #include "utility.h"
 #include "Range2d.h"
 #include "SWFCxForm.h"
-#include "Renderer_ovg.h"
-#include "Renderer_ovg_bitmap.h"
+#include "openvg/Renderer_ovg.h"
+#include "openvg/Renderer_ovg_bitmap.h"
 #include "SWFMatrix.h"
 #include "swf/ShapeRecord.h"
 #include "CachedBitmap.h"
 
+#include <VG/openvg.h>
+#include <VG/vgu.h>
+#ifdef OPENVG_VERSION_1_1
+# include <VG/ext.h>
+#else
+# include <VG/vgext.h>
+#endif
 #define GNASH_IMAGE_QUALITY     VG_IMAGE_QUALITY_FASTER
 #define GNASH_RENDER_QUALITY    VG_RENDERING_QUALITY_FASTER
 
@@ -437,11 +444,6 @@ Renderer_ovg::drawLine(const std::vector<point>& coords, const rgba& fill,
     int         scount = 0;
     int         dcount = 0;
 
-    if (!_device) {
-        log_error("No Device specified for OpenVG to draw on!");
-        return;
-    }
-    
     if (coords.empty()) return;
     
     eglScopeMatrix scope_mat(mat);
@@ -614,11 +616,11 @@ Renderer_ovg::apply_mask()
     vgLoadMatrix(mat);
     
 #ifdef OPENVG_VERSION_1_1    
-    vgMask(m_mask, VG_FILL_MASK, 0, 0, _display_width, _display_height); FIXME
+    vgMask(m_mask, VG_FILL_MASK, 0, 0, _display_width, _display_height); // FIXME
 #endif
 // Call add_paths for each mask.
     std::for_each(_masks.begin(), _masks.end(),
-                  boost::bind(&Renderer_ovg::add_paths, this, _1));    
+                  boost::bind(&Renderer_ovg::add_paths, this, _1));
     vgSeti(VG_MASKING, VG_TRUE);      
     vgLoadMatrix (omat);
 }
@@ -1169,9 +1171,9 @@ Renderer_ovg::draw_submask(const PathVec& path_vec,
     }
     
 #ifdef OPENVG_VERSION_1_1    
-    vgRenderToMask(vg_path, VG_FILL_PATH, VG_INTERSECT_MASK); FIXME
+    vgRenderToMask(vg_path, VG_FILL_PATH, VG_INTERSECT_MASK); //FIXME
 #endif
-                                                                  vgDestroyPath(vg_path);
+    vgDestroyPath(vg_path);
 }
 
 // Drawing procedure:
@@ -1298,9 +1300,11 @@ Renderer_ovg::printVGParams()
       case VG_MATRIX_STROKE_PAINT_TO_USER:
           str = "VG_MATRIX_STROKE_PAINT_TO_USER";
           break;
+#ifdef VG_MATRIX_MODE_FORCE_SIZE
       case VG_MATRIX_MODE_FORCE_SIZE:
           str = "VG_MATRIX_MODE_FORCE_SIZE";
           break;
+#endif
       default:
           log_error("unsupported VG_MATRIX_MODE!");
     }
@@ -1330,9 +1334,11 @@ Renderer_ovg::printVGParams()
       case VG_IMAGE_QUALITY_BETTER:
           str = "VG_IMAGE_QUALITY_BETTER";
           break;
+#ifdef VG_MATRIX_MODE_FORCE_SIZE
       case VG_IMAGE_QUALITY_FORCE_SIZE:
           str = "VG_IMAGE_QUALITY_FORCE_SIZE";
           break;
+#endif
       default:
           log_error("unsupported VG_IMAGE_QUALITY!");
     }
@@ -1349,9 +1355,11 @@ Renderer_ovg::printVGParams()
       case VG_RENDERING_QUALITY_BETTER:
           str = "VG_RENDERING_QUALITY_BETTER";
           break;
+#ifdef VG_MATRIX_MODE_FORCE_SIZE
       case VG_RENDERING_QUALITY_FORCE_SIZE:
           str = "VG_RENDERING_QUALITY_FORCE_SIZE";
           break;
+#endif
       default:
           log_error("unsupported VG_RENDERING_QUALITY!");
     }
@@ -1405,9 +1413,11 @@ Renderer_ovg::printVGParams()
       case VG_DRAW_IMAGE_STENCIL:
           str = "VG_DRAW_IMAGE_STENCIL";
           break;
+#ifdef VG_MATRIX_MODE_FORCE_SIZE
       case VG_IMAGE_MODE_FORCE_SIZE:
           str = "VG_IMAGE_MODE_FORCE_SIZE";
           break;
+#endif
       default:
           log_error("unsupported VG_IMAGE_MODE!");
     }
@@ -1427,9 +1437,11 @@ Renderer_ovg::printVGParams()
       case VG_CAP_SQUARE:
           str = "VG_CAP_SQUARE";
           break;
+#ifdef VG_MATRIX_MODE_FORCE_SIZE
       case VG_CAP_STYLE_FORCE_SIZE:
           str = "VG_CAP_STYLE_FORCE_SIZE";
           break;
+#endif
       default:
           log_error("unsupported VG_STROKE_CAP_STYLE!");
     }
@@ -1446,9 +1458,11 @@ Renderer_ovg::printVGParams()
       case VG_JOIN_BEVEL:
           str = "VG_JOIN_BEVEL";
           break;
+#ifdef VG_MATRIX_MODE_FORCE_SIZE
       case VG_JOIN_STYLE_FORCE_SIZE:
           str = "VG_JOIN_STYLE_FORCE_SIZE";
           break;
+#endif
       default:
           log_error("unsupported VG_STROKE_JOIN_STYLE!");
     }
@@ -1476,9 +1490,11 @@ Renderer_ovg::printVGParams()
       case VG_PIXEL_LAYOUT_BGR_HORIZONTAL:
           str = "VG_PIXEL_LAYOUT_BGR_HORIZONTAL";
           break;
+#ifdef VG_MATRIX_MODE_FORCE_SIZE
       case VG_PIXEL_LAYOUT_FORCE_SIZE:
           str = "VG_PIXEL_LAYOUT_FORCE_SIZE";
           break;
+#endif
       default:
           log_error("unsupported VG_PIXEL_LAYOUT!");
     }
@@ -1518,12 +1534,7 @@ Renderer_ovg::initTestBuffer(unsigned int width, unsigned int height)
 {
     int size = width * height * getBitsPerPixel(); // FIXME was Bytes not bits
 
-#ifdef HAVE_GTK2
-    // new surface
-    // makeCurrentContext
-    
-#else
-    
+#if 0
     // _testBuffer = static_cast<unsigned char *>(realloc(_testBuffer, size));
     _testBuffer = new unsigned char[size];
     memset(_testBuffer, 0, size);
