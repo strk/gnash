@@ -33,6 +33,9 @@ AC_PROG_CXX
 AC_EXEEXT
 AC_PROG_INSTALL
 AM_COMPILER_LIB
+AC_C_BIGENDIAN
+AC_C_CONST
+AC_C_INLINE
 
 dnl Set the default values for Flash Version. These are converted into
 dnl various strings to make JavaScript or ActionScript detectors
@@ -282,44 +285,8 @@ dnl   $CXXFLAGS="$CXXFLAGS -march=${with_cpu}"
    cross_compiling=yes
 fi
 
-AC_MSG_CHECKING([For the version of libtool])
-if test -d ${srcdir}/libltdl/libltdl; then
-  ltver=2.x
-else
-  ltver=1.x
-fi
-ltmajor=`echo $ltver | cut -d '.' -f 1`
-AC_MSG_RESULT([$ltver])
-AM_CONDITIONAL(LIBLTDL2, [test $ltmajor -eq 2])
-AM_CONDITIONAL(LIBLTDL1, [test $ltmajor -eq 1])
-if test $ltmajor -eq 1; then
-  AC_LIBLTDL_CONVENIENCE
-  AC_LIBTOOL_DLOPEN
-  if test x"${windows}" = x"yes"; then
-    dnl The following macro may be empty; the colon is necessary
-    dnl in this case to avoid an empty if statement (which is a syntax error).
-    AC_LIBTOOL_WIN32_DLL
-    :
-  fi
-  AC_DISABLE_STATIC
-else
-  LT_INIT([dlopen win32-dll disable-static])
-  LTDL_INIT([convenience recursive])
-fi
 AC_PROG_LIBTOOL
-
-AM_CONDITIONAL(CONVENIENCE_LTDL, test x"${enable_ltdl_convenience-no}" != xno)
-AM_CONDITIONAL(INSTALL_LTDL, test x"${enable_ltdl_install-no}" != xno)
-
-AC_C_BIGENDIAN
-AC_C_CONST
-AC_C_INLINE
 AC_SUBST([LIBTOOL_DEPS])
-AC_LIB_LTDL
-
-AM_CONDITIONAL(ENABLE_SHARED, [test x"${enable_shared}" = xyes])
-AM_CONDITIONAL(ENABLE_STATIC, [test x"${enable_shared}" = xno])
-dnl -- AM_CONDITIONAL(STATIC_GUI, test x"${dynamic_gui}" = xno -o x"${enable_shared}" = xno)
 
 AC_PATH_PROG(DEJAGNU, runtest)
 
@@ -783,8 +750,8 @@ AC_ARG_ENABLE(sound,
 dnl --------------------------------------------------------
 dnl  Media handler selection
 dnl --------------------------------------------------------
-build_media_gst=yes
-build_media_ffmpeg=no
+build_media_gst=no
+build_media_ffmpeg=yes
 build_media_none=no
 AC_ARG_ENABLE(media,
   AC_HELP_STRING([--enable-media=handler],
@@ -1138,12 +1105,12 @@ dnl instead of the OGL (OpenGL) one.
 
 build_vaapi_device=no
 build_openmax_device=no
+build_directfb_device=no
+build_x11_device=no
 build_egl_device=yes
-build_directfb_device=yes
 build_rawfb_device=yes
-build_x11_device=yes
-device_list="X11 EGL DirectFB"
-ndevice=3
+device_list="EGL RawFB"
+ndevice=2
 AC_ARG_ENABLE(device,
   AC_HELP_STRING([--enable-device], [Specify which hardware abstraction to use to support to enable (none,openmax,egl,directfb,rawfb,x11,vaapi)]),
   if test -z ${enableval}; then
@@ -1395,6 +1362,39 @@ AM_CONDITIONAL(BUILD_GTK_EXT, [ test x$ext_gtk = xyes ])
 AM_CONDITIONAL(BUILD_LIRC_EXT, [ test x$ext_lirc = xyes ])
 AM_CONDITIONAL(BUILD_DBUS_EXT, [ test x$ext_dbus = xyes ])
 AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n "$extensions_list"])
+
+dnl AC_MSG_CHECKING([For the version of libtool])
+dnl if test -d ${srcdir}/libltdl/libltdl; then
+dnl   ltver=2.x
+dnl else
+dnl   ltver=1.x
+dnl fi
+dnl ltmajor=`echo $ltver | cut -d '.' -f 1`
+dnl AC_MSG_RESULT([$ltver])
+ltmajor=0
+AM_CONDITIONAL(LIBLTDL2, [test $ltmajor -eq 2])
+AM_CONDITIONAL(LIBLTDL1, [test $ltmajor -eq 1])
+dnl if test $ltmajor -eq 1; then
+dnl   AC_LIBLTDL_CONVENIENCE
+dnl   AC_LIBTOOL_DLOPEN
+dnl   if test x"${windows}" = x"yes"; then
+dnl     dnl The following macro may be empty; the colon is necessary
+dnl     dnl in this case to avoid an empty if statement (which is a syntax error).
+dnl     AC_LIBTOOL_WIN32_DLL
+dnl     :
+dnl   fi
+dnl   AC_DISABLE_STATIC
+dnl else
+dnl   LT_INIT([dlopen win32-dll disable-static])
+dnl   LTDL_INIT([convenience recursive])
+dnl fi
+dnl AC_LIB_LTDL
+AM_CONDITIONAL(CONVENIENCE_LTDL, test x"${enable_ltdl_convenience-no}" != xno)
+AM_CONDITIONAL(INSTALL_LTDL, test x"${enable_ltdl_install-no}" != xno)
+
+AM_CONDITIONAL(ENABLE_SHARED, [test x"${enable_shared}" = xyes])
+AM_CONDITIONAL(ENABLE_STATIC, [test x"${enable_shared}" = xno])
+dnl -- AM_CONDITIONAL(STATIC_GUI, test x"${dynamic_gui}" = xno -o x"${enable_shared}" = xno)
 
 GNASH_PKG_CLASSFILE
 
@@ -2451,7 +2451,7 @@ if test x"${build_rawfb_device}" = xyes -a x"${linux}" = xyes; then
 fi
 
 if test x"${build_directfb_device}" = xyes; then
-   GNASH_PKG_FIND(directfb, [directfb/directfb.h], [DirectFB render library], DirectFBCreate)
+   GNASH_PKG_FIND(directfb, [directfb.h], [DirectFB render library], DirectFBCreate)
    AC_DEFINE([BUILD_DIRECTFB_DEVICE], [1], [Use DirectFB device support])
 fi
 
@@ -2467,7 +2467,7 @@ AM_CONDITIONAL(BUILD_RAWFB_DEVICE, [ test x${build_rawfb_device} = xyes])
 AM_CONDITIONAL(BUILD_X11_DEVICE, [test x$build_x11_device = xyes])
 
 if test x"${build_ovg}" = xyes; then
-  GNASH_PKG_FIND(OpenVG, [vg/openvg.h], [OpenVG library], vgDrawImage)
+  GNASH_PATH_OPENVG
 fi
 
 if test x"${build_ogl}" = xyes; then
@@ -3178,6 +3178,24 @@ else
   echo "                     or .deb users: apt-get install libpng12-dev" >&5
   echo "                     or .rpm users: yum install libpng-devel" >&5
 fi
+
+if test x"${build_ovg}" = x"yes"; then
+  if test x"$OPENVG_LIBS" != x; then
+    if test x"$OPENVG_CFLAGS" != x; then
+      echo "        OpenVG flags are: $OPENVG_CFLAGS"
+    else
+      echo "        OpenVG flags are: default include path"
+    fi
+    echo "        OpenVG libs are: $OPENVG_LIBS"
+    else
+      echo "        ERROR: No OpenVG development package installed!" >&3
+      echo "               You need to install the libmesa development package" >&3
+      echo "               or .deb users: apt-get install libopenvg1-mesa-dev" >&3
+      echo "               or .rpm users: yum install mesa-libOpenVG-devel-7.8.1-7.fc13.i686" >&3
+      echo "               or use a different renderer with --enable-renderer=" >&3
+  fi
+fi
+
 
 if test x"${build_ogl}" = x"yes"; then
   if test x"$OPENGL_LIBS" != x; then
