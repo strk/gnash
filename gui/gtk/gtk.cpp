@@ -1203,7 +1203,7 @@ PreferencesDialog::handlePrefs(GtkWidget* dialog, gint response, gpointer data)
         gtk_widget_destroy(dialog);
     }
 
-    if (prefs) delete prefs;
+    delete prefs;
 }
 
 void
