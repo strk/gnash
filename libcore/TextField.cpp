@@ -108,7 +108,6 @@ TextField::TextField(as_object* object, DisplayObject* parent,
     _rightMargin(def.rightMargin()), 
     _fontHeight(def.textHeight()), 
     _textDefined(def.hasText()),
-    _htmlTextDefined(def.hasText()),
     _restrictDefined(false),
     _underlined(false),
     _bullet(false),
@@ -177,7 +176,6 @@ TextField::TextField(as_object* object, DisplayObject* parent,
     _rightMargin(0), 
     _fontHeight(12 * 20), 
     _textDefined(false),
-    _htmlTextDefined(false),
     _restrictDefined(false),
     _underlined(false),
     _bullet(false),
@@ -823,8 +821,6 @@ TextField::updateText(const std::wstring& wstr)
 void
 TextField::updateHtmlText(const std::wstring& wstr)
 {
-    _htmlTextDefined = true;
-
     if (_htmlText == wstr) return;
 
     set_invalidated();
@@ -879,7 +875,7 @@ std::string
 TextField::get_htmltext_value() const
 {
     const_cast<TextField*>(this)->registerTextVariable();
-    const int version = getSWFVersion(*getObject(const_cast<TextField*>(this)));
+    const int version = getSWFVersion(*getObject(this));
     return utf8::encodeCanonicalString(_htmlText, version);
 }
 
@@ -2526,7 +2522,6 @@ TextField::onChanged()
 bool
 TextField::handleFocus()
 {
-
     set_invalidated();
 
     /// Select the entire text on focus.

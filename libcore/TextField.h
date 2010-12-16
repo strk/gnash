@@ -787,8 +787,6 @@ private:
 	/// and no actionscript added text.
 	bool _textDefined;
 
-	bool _htmlTextDefined;
-
 	bool _restrictDefined;
 	bool _underlined;
 	bool _bullet;
