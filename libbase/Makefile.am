@@ -124,17 +124,16 @@ if USE_GIF
 libgnashbase_la_SOURCES += GnashImageGif.cpp
 endif
 
-if LIBLTDL1
-noinst_LTLIBRARIES = libltdlc.la
-libltdlc_la_CPPFLAGS = $(LTDLINCL) -I$(top_srcdir)/libltdl
-libltdlc_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
-libgnashbase_la_LIBADD += $(top_builddir)/libbase/libltdlc.la
-endif
+# if LIBLTDL1
+# noinst_LTLIBRARIES = libltdlc.la
+# libltdlc_la_CPPFLAGS = $(LTDLINCL) -I$(top_srcdir)/libltdl
+# libltdlc_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
+# libgnashbase_la_LIBADD += $(top_builddir)/libbase/libltdlc.la
+# endif
 
-if LIBLTDL2
-libgnashbase_la_LIBADD += $(top_builddir)/libltdl/libltdlc.la
-endif
-
+# if LIBLTDL2
+# libgnashbase_la_LIBADD += $(top_builddir)/libltdl/libltdlc.la
+# endif
 
 if HAIKU
   libgnashbase_la_LIBADD += $(HAIKU_LIBS)
