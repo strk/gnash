@@ -30,7 +30,6 @@
 #include <unistd.h>
 
 #include <string>
-#include <iostream>
 #include <cstdlib>
 
 #if defined(WIN32) || defined(_WIN32)
@@ -73,11 +72,14 @@ SharedLib::SharedLib(const std::string& filespec, const std::string& envvar)
     scoped_lock lock(_libMutex);
     
     // Initialize libtool's dynamic library loader
+#ifdef HAVE_LTDL
     int errors = lt_dlinit ();
     if (errors) {
         log_error (_("Couldn't initialize ltdl: %s"), lt_dlerror());
     }
-    
+#else
+# warning "libltdl not enabled in build".
+#endif    
     std::string pluginsdir;
     char *env = std::getenv (envvar.c_str());
     if (env) {
@@ -95,7 +97,11 @@ SharedLib::~SharedLib()
 bool
 SharedLib::closeLib()
 {
+#ifdef HAVE_LTDL
     return lt_dlclose(_dlhandle);
+#else
+    return true;
+#endif
 }
 
 bool
@@ -111,6 +117,8 @@ SharedLib::openLib (const std::string& filespec)
     scoped_lock lock(_libMutex);
 
     log_debug ("Trying to open shared library \"%s\"", filespec);
+
+#ifdef HAVE_LTDL
     _dlhandle = lt_dlopenext (filespec.c_str());
     
     if (_dlhandle == NULL) {
@@ -120,6 +128,7 @@ SharedLib::openLib (const std::string& filespec)
 
     // Make this module unloadable
     lt_dlmakeresident(_dlhandle);
+#endif
     
     log_debug (_("Opened dynamic library \"%s\""), filespec);
 
@@ -136,6 +145,7 @@ SharedLib::getInitEntry (const std::string& symbol)
     
     scoped_lock lock(_libMutex);
 
+#ifdef HAVE_LTDL
     run  = lt_dlsym (_dlhandle, symbol.c_str());
     
     if (run == NULL) {
@@ -144,6 +154,9 @@ SharedLib::getInitEntry (const std::string& symbol)
     } else {
         log_debug (_("Found symbol %s @ %p"), symbol, (void *)run);
     }
+#else
+    (void)symbol;
+#endif
     
     return (initentry*)(run);
 }
@@ -157,7 +170,9 @@ SharedLib::getDllSymbol(const std::string& symbol)
     
     scoped_lock lock(_libMutex);
 
+#ifdef HAVE_LTDL
     run  = lt_dlsym (_dlhandle, symbol.c_str());
+#endif
     
     /* 
     Realistically, we should never get a valid pointer with a value of 0
