@@ -1115,9 +1115,6 @@ TextField::format_text()
     int last_space_glyph = -1;
     size_t last_line_start_record = 0;
 
-    float leading = getLeading();
-    leading += fontLeading * scale; // not sure this is correct...
-    
     _line_starts.push_back(0);
     
     // String iterators are very sensitive to 
