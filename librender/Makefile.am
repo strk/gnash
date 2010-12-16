@@ -109,7 +109,8 @@ if  BUILD_OVG_RENDERER
 libgnashrender_la_CPPFLAGS += $(OPENVG_CFLAGS)
 libgnashrender_la_SOURCES += \
 	openvg/Renderer_ovg.cpp \
-	openvg/Renderer_ovg.h
+	openvg/Renderer_ovg.h \
+	openvg/Renderer_ovg_bitmap.h
 libgnashrender_la_LIBADD += $(OPENVG_LIBS)
 endif
 
@@ -157,21 +158,23 @@ if BUILD_OGL_RENDERER
 	$(NULL)
 endif
 
-# bin_PROGRAMS = testr
+bin_PROGRAMS = testr
 
-# testr_SOURCES = testr.cpp testr_gtk.cpp
-# testr_CPPFLAGS = \
-# 	$(AM_CPPFLAGS) \
-# 	$(EGL_CFLAGS) \
-# 	$(GLES1_CFLAGS) \
-# 	$(GLES2_CFLAGS)
-# 	$(OPENVG_CFLAGS) \
-# 	$(DIRECTFB_CFLAGS)
-# testr_LDADD = \
-# 	libgnashrender.la \
-# 	../libdevice/libgnashdevice.la \
-# 	$(GNASH_LIBS) \
-# 	$(GTK2_LIBS) \
-# 	$(OPENVG_LIBS) \
-# 	$(GLES1_LIBS) \
-# 	$(GLES2_LIBS)
+testr_SOURCES = testr.cpp # testr_gtk.cpp
+testr_CPPFLAGS = \
+	$(AM_CPPFLAGS) \
+	$(EGL_CFLAGS) \
+	$(OPENVG_CFLAGS) \
+	$(GLES1_CFLAGS) \
+	$(GLES2_CFLAGS)
+	$(DIRECTFB_CFLAGS)
+testr_LDADD = \
+	libgnashrender.la \
+	../libdevice/libgnashdevice.la \
+	$(GTK2_LIBS) \
+	$(EXTRA_EGL_LIBS) \
+	$(EGL_LIBS) \
+	$(GNASH_LIBS) \
+	$(OPENVG_LIBS) \
+	$(GLES1_LIBS) \
+	$(GLES2_LIBS)
