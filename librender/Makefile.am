@@ -106,7 +106,7 @@ libgnashrender_la_LIBADD += $(AGG_LIBS) $(LIBVA)
 endif
 
 if  BUILD_OVG_RENDERER
-libgnashrender_la_CPPFLAGS += $(OVG_CFLAGS)
+libgnashrender_la_CPPFLAGS += $(OPENVG_CFLAGS)
 libgnashrender_la_SOURCES += \
 	openvg/Renderer_ovg.cpp \
 	openvg/Renderer_ovg.h
@@ -135,41 +135,6 @@ libgnashrender_la_SOURCES += \
 libgnashrender_la_LIBADD += $(CAIRO_LIBS)
 endif
 
-# libgnashdevice_la_CPPFLAGS = $(AM_CPPFLAGS)
-# libgnashdevice_la_LIBADD = \
-# 	$(LIBVA_LIBS) \
-# 	$(LIBVA_X11_LIBS) \
-# 	$(LIBVA_GLX_LIBS) \
-# 	$(GNASH_LIBS)
-# libgnashdevice_la_LDFLAGS =  -release $(VERSION) 
-# libgnashdevice_la_SOURCES =
-
-# if BUILD_EGL_DEVICE
-# libgnashdevice_la_CPPFLAGS += $(EGL_CFLAGS)
-# libgnashdevice_la_SOURCES += eglDevice.cpp
-# libgnashdevice_la_LIBADD += $(EGL_LIBS)
-# endif
-
-# if BUILD_DIRECTFB_DEVICE
-# libgnashdevice_la_CPPFLAGS += $(DIRECTFB_CFLAGS)
-# libgnashdevice_la_SOURCES += directfb/DirectFBDevice.cpp
-# libgnashdevice_la_LIBADD += $(DIRECTFB_LIBS)
-# endif
-
-# if BUILD_VAAPI_DEVICE
-# libgnashdevice_la_CPPFLAGS += $(VAAPI_CFLAGS)
-# libgnashdevice_la_SOURCES += \
-# 	vaapi/VaapiDevice.cpp \
-# 	vaapi/VaapiSurface.cpp
-# libgnashdevice_la_LIBADD += $(VAAPI_LIBS)
-# endif
-
-# # if BUILD_X11_DEVICE
-# libgnashdevice_la_CPPFLAGS += $(X11_CFLAGS)
-# libgnashdevice_la_SOURCES += x11/X11Device.cpp
-# libgnashdevice_la_LIBADD += $(X11_LIBS)
-# endif
-
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"
@@ -192,15 +157,21 @@ if BUILD_OGL_RENDERER
 	$(NULL)
 endif
 
-check_PROGRAMS = testr
+# bin_PROGRAMS = testr
 
-testr_SOURCES = testr.cpp testr_gtk.cpp
-testr_CPPFLAGS = $(AM_CPPFLAGS) $(DIRECTFB_CFLAGS) # -DUSE_TESTSUITE
-testr_LDADD = \
-	libgnashrender.la \
-	../libdevice/libgnashdevice.la \
-	$(GNASH_LIBS) \
-	$(GTK2_LIBS) \
-	$(OPENVG_LIBS) \
-	$(GLES1_LIBS) \
-	$(GLES2_LIBS)
+# testr_SOURCES = testr.cpp testr_gtk.cpp
+# testr_CPPFLAGS = \
+# 	$(AM_CPPFLAGS) \
+# 	$(EGL_CFLAGS) \
+# 	$(GLES1_CFLAGS) \
+# 	$(GLES2_CFLAGS)
+# 	$(OPENVG_CFLAGS) \
+# 	$(DIRECTFB_CFLAGS)
+# testr_LDADD = \
+# 	libgnashrender.la \
+# 	../libdevice/libgnashdevice.la \
+# 	$(GNASH_LIBS) \
+# 	$(GTK2_LIBS) \
+# 	$(OPENVG_LIBS) \
+# 	$(GLES1_LIBS) \
+# 	$(GLES2_LIBS)
