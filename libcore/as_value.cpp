@@ -238,7 +238,7 @@ as_value::to_string(int version) const
                 // reference player.
                 if (ret.is_string()) return ret.getStr();
             }
-            catch (ActionTypeError& e) {}
+            catch (const ActionTypeError& e) {}
            
             return is_function() ? "[type Function]" : "[type Object]";
 
@@ -360,7 +360,7 @@ as_value::to_number(const int version) const
                 return parseDecimalNumber(s.begin() + pos, s.end());
  
             }
-            catch (boost::bad_lexical_cast&) {
+            catch (const boost::bad_lexical_cast&) {
                 // There is no standard textual representation of infinity
                 // in the C++ standard, so our conversion function an
                 // exception for 'inf', just like for any other
@@ -394,8 +394,7 @@ as_value::to_number(const int version) const
                 as_value ret = to_primitive(NUMBER);
                 return ret.to_number(version);
             }
-            catch (ActionTypeError& e)
-            {
+            catch (const ActionTypeError& e) {
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
                 log_debug(_("to_primitive(%s, NUMBER) threw an "
                             "ActionTypeError %s"), *this, e.what());
@@ -596,12 +595,12 @@ as_value::equals(const as_value& v, int version) const
     try {
         p = to_primitive(NUMBER); 
     }
-    catch (ActionTypeError& e) {}
+    catch (const ActionTypeError& e) {}
 
     try {
         vp = v.to_primitive(NUMBER); 
     }
-    catch (ActionTypeError& e) {}
+    catch (const ActionTypeError& e) {}
 
     // No conversion took place; the result is false
     if (strictly_equals(p) && v.strictly_equals(vp)) {
