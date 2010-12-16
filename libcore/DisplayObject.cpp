@@ -938,9 +938,9 @@ getDisplayObjectProperty(DisplayObject& obj, const ObjectURI& uri,
     const std::string& propname = uri.toString(st);
 
     // Check _level0.._level9
-    movie_root& mr = getRoot(*getObject(&obj));
     unsigned int levelno;
     if (isLevelTarget(getSWFVersion(*o), propname, levelno)) {
+        movie_root& mr = getRoot(*getObject(&obj));
         MovieClip* mo = mr.getLevel(levelno);
         if (mo) {
             val = getObject(mo);
