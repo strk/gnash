@@ -152,12 +152,9 @@ gnash_canvas_configure_event(GtkWidget *widget, GdkEventConfigure *event)
 static void
 gnash_canvas_realize(GtkWidget *widget)
 {
-    GnashCanvas *canvas = GNASH_CANVAS(widget);
-    GdkWindowAttr attributes;
-    gint attributes_mask;
-
     GTK_WIDGET_SET_FLAGS (widget, GTK_REALIZED);
 
+    GdkWindowAttr attributes;
     attributes.window_type = GDK_WINDOW_CHILD;
     attributes.x = widget->allocation.x;
     attributes.y = widget->allocation.y;
@@ -168,13 +165,15 @@ gnash_canvas_realize(GtkWidget *widget)
     attributes.colormap = gtk_widget_get_colormap (widget);
     attributes.event_mask = gtk_widget_get_events (widget) | GDK_EXPOSURE_MASK;
 
-    attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
+    gint attributes_mask =
+        GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
 
     widget->window = gdk_window_new (gtk_widget_get_parent_window (widget),
                                     &attributes, attributes_mask);
     gdk_window_set_user_data (widget->window, widget);
 
 #if defined(RENDERER_CAIRO) || defined(RENDERER_AGG)
+    GnashCanvas *canvas = GNASH_CANVAS(widget);
     // cairo needs the _drawingArea.window to prepare it ..
     // TODO: find a way to make 'glue' use independent from actual
     // renderer in use

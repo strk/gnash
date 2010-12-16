@@ -1701,34 +1701,28 @@ GtkGui::showPropertiesDialog()
     
     gtk_tree_view_set_headers_clickable(GTK_TREE_VIEW(treeview), TRUE);
 
-    gint coloffset;
-    GtkCellRenderer* renderer;
-    GtkTreeViewColumn* column;
-
     // Add columns:
     
     // 'Variable' column:
-    renderer = gtk_cell_renderer_text_new();
-    coloffset = gtk_tree_view_insert_column_with_attributes(
+    GtkCellRenderer* renderer = gtk_cell_renderer_text_new();
+    gtk_tree_view_insert_column_with_attributes(
             GTK_TREE_VIEW(treeview),
             -1, _("Variable"),
             renderer, "text",
             STRING1_COLUMN,
             NULL);
-    column = gtk_tree_view_get_column (GTK_TREE_VIEW (treeview), coloffset - 1);
 
     // 'Value' column:
     // Set to be 'editable' so that the data can be selected and
     // copied; it can't actually be edited, though.
     renderer = gtk_cell_renderer_text_new ();
     g_object_set (renderer, "xalign", 0.0, "editable", TRUE, NULL);
-    coloffset = gtk_tree_view_insert_column_with_attributes(
+    gtk_tree_view_insert_column_with_attributes(
             GTK_TREE_VIEW(treeview),
             -1, _("Value"),
             renderer, "text",
             STRING2_COLUMN,
             NULL);
-    column = gtk_tree_view_get_column(GTK_TREE_VIEW(treeview), coloffset - 1);
 
     //Add tree to scrollwindow.
     gtk_container_add(GTK_CONTAINER(scrollwindow1), treeview);
