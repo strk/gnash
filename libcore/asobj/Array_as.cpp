@@ -868,13 +868,12 @@ registerArrayNative(as_object& global)
 void
 array_class_init(as_object& where, const ObjectURI& uri)
 {
-
     // This is going to be the global Array "class"/"function"
-    VM& vm = getVM(where);
     Global_as& gl = getGlobal(where);
 
     as_object* proto = createObject(gl);
 
+    VM& vm = getVM(where);
     as_object* cl = vm.getNative(252, 0);
 
     cl->init_member(NSV::PROP_PROTOTYPE, proto);

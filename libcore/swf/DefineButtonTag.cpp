@@ -118,11 +118,9 @@ DefineButtonTag::readDefineButtonTag(SWFStream& in, movie_definition& m)
     unsigned long endTagPos = in.get_tag_end_position();
 
     // Read button DisplayObject records.
-    for (;;)
-    {
+    for (;;) {
         ButtonRecord r;
-        if (r.read(in, SWF::DEFINEBUTTON, m, endTagPos) == false)
-        {
+        if (r.read(in, SWF::DEFINEBUTTON, m, endTagPos) == false) {
             // Null record; marks the end of button records.
             break;
         }

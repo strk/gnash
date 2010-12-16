@@ -104,7 +104,7 @@ public:
     /// @return false if no match found.
     bool getPrefixForNamespace(const std::string& ns, std::string& prefix);
 
-    void setNamespaceURI(const std::string value) {
+    void setNamespaceURI(const std::string& value) {
         _namespaceURI = value;
     }
 
