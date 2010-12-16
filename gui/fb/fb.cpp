@@ -382,11 +382,6 @@ FBGui::initialize_renderer()
 bool
 FBGui::run()
 {
-    // GNASH_REPORT_FUNCTION;
-  
-#ifdef USE_TSLIB
-    int ts_loop_count;
-#endif
 
     VirtualClock& timer = getClock();
     
@@ -401,10 +396,6 @@ FBGui::run()
         // up early because of some Linux signal sent to our process (and thus
         // "advance" faster than the "heartbeat" interval)? - Udo
 
-#ifdef USE_TSLIB
-        ts_loop_count++; //increase loopcount
-#endif        
-        
         // check input devices
         checkForData();
         
