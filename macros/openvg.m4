@@ -86,12 +86,27 @@ AC_DEFUN([GNASH_PATH_OPENVG],
         if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
           ac_cv_path_openvg_lib="-L$i -lOpenVG"
           break
-       else
+        else
           ac_cv_path_openvg_lib="-lOpenVG"
           break
-       fi
+        fi
       fi
     done
+    dnl The Babbage board wants libgsl too. We put this in a separate
+    dnl vatiable because all the executables need it when statically
+    dnl linking. With Ltib, when cross compiling, these are needed at
+    dnl link time.
+    if test -f $i/libgsl.${shlibext} -o -f $i/libgsl.a; then
+      EXTRA_EGL_LIBS="${EXTRA_EGL_LIBS} -lgsl"
+    fi
+    dnl The Babbage board wants libssl too because libcurl
+    dnl is statically linked.
+    if test -f $i/libssl.${shlibext} -o -f $i/libssl.a; then
+      EXTRA_EGL_LIBS="${EXTRA_EGL_LIBS} -lssl"
+    fi
+    if test -f $i/libcrypto.${shlibext} -o -f $i/libcrypto.a; then
+      EXTRA_EGL_LIBS="${EXTRA_EGL_LIBS} -lcrypto"
+    fi
   fi
   if test x"${ac_cv_path_openvg_lib}" = x; then
     AC_CHECK_LIB([OpenVG], [vgClear], [ac_cv_path_openvg_lib="-lOpenVG"])
@@ -104,6 +119,7 @@ AC_DEFUN([GNASH_PATH_OPENVG],
     OPENVG_LIBS=""
   fi
   
+  AC_SUBST(EXTRA_EGL_LIBS)
   AC_SUBST(OPENVG_CFLAGS)
   AC_SUBST(OPENVG_LIBS)
 ])
