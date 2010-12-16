@@ -140,7 +140,9 @@ html: $(HTMLS)
 pdf:  $(PDFS)
 man:  $(MANPAGES)
 info: $(INFOS)
+if DOCBOOK
 texi: $(TEXIS)
+endif
 
 #
 # Gnash uses suffix rules to build all the various supported
