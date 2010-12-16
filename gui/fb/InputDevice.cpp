@@ -132,7 +132,7 @@ InputDevice::readData(size_t size)
 }   
 
 void
-InputDevice::dump()
+InputDevice::dump() const
 {
     // Debug strings to make output more readable
     const char *debug[] = {

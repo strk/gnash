@@ -76,12 +76,12 @@ public:
 
     static std::vector<boost::shared_ptr<InputDevice> > scanForDevices(Gui *gui);
 
-    InputDevice::devicetype_e getType() { return _type; };
+    InputDevice::devicetype_e getType() const { return _type; };
 
     // Read data into the Device input buffer.
     boost::shared_array<boost::uint8_t> readData(size_t size);
 
-    void dump();
+    void dump() const;
     
 protected:
     devicetype_e        _type;
