@@ -16,8 +16,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include <cmath>
 #include "Geometry.h"
+
+#include <cmath>
+
 #include "log.h"
 #include "LineStyle.h"
 
