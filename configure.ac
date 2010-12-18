@@ -1107,11 +1107,11 @@ dnl instead of the OGL (OpenGL) one.
 build_vaapi_device=no
 build_openmax_device=no
 build_directfb_device=no
-build_x11_device=no
+build_x11_device=yes
 build_egl_device=yes
 build_rawfb_device=yes
-device_list="EGL RawFB"
-ndevice=2
+device_list="EGL RawFB X11"
+ndevice=3
 AC_ARG_ENABLE(device,
   AC_HELP_STRING([--enable-device], [Specify which hardware abstraction to use to support to enable (none,openmax,egl,directfb,rawfb,x11,vaapi)]),
   if test -z ${enableval}; then
@@ -1157,9 +1157,9 @@ AC_ARG_ENABLE(device,
         ndevice=$((ndevice+1))
         ;;
       all|ALL)
-        device_list="OpenMax EGL DirectFB X11 VAAPI"
-        build_openmax_device=yes
-        build_vaapi_device=yes
+        device_list="EGL DirectFB X11"
+        build_openmax_device=no
+        build_vaapi_device=no
         build_egl_device=yes
         build_rawfb_device=yes
         build_directfb_device=yes
@@ -1984,7 +1984,7 @@ GNASH_PATH_X11
 AC_CHECK_LIB(Xi, XInput_find_display)
 AC_CHECK_LIB(X11, XDisableAccessControl)
 dnl fi
-AM_CONDITIONAL(HAVE_X11, [test x$has_x11 = xyes])
+AM_CONDITIONAL(HAVE_X11, [test x$has_x11x = xyes])
 if test x$has_x11 = xyes; then
   AC_DEFINE(BUILD_X11_DEVICE, [1], [Build the X11 device])
 fi
@@ -2465,7 +2465,7 @@ AM_CONDITIONAL(BUILD_VAAPI_DEVICE, [test x"${use_libva}" = xyes])
 AM_CONDITIONAL(BUILD_EGL_DEVICE, [test x"${build_egl_device}" = xyes])
 AM_CONDITIONAL(BUILD_DIRECTFB_DEVICE, [ test x${build_directfb_device} = xyes])
 AM_CONDITIONAL(BUILD_RAWFB_DEVICE, [ test x${build_rawfb_device} = xyes])
-AM_CONDITIONAL(BUILD_X11_DEVICE, [test x$build_x11_device = xyes])
+AM_CONDITIONAL(BUILD_X11_DEVICE, [test x${build_x11_device} = xyes])
 
 if test x"${build_ovg}" = xyes; then
   GNASH_PATH_OPENVG
