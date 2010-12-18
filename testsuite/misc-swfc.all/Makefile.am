@@ -109,11 +109,11 @@ TEST_CASES = \
 	$(check_PROGRAMS)
 
 sanetests-runner: $(srcdir)/../generic-testrunner.sh $(SANE_SCTESTS_OUT) $(AUXMOVIES_OUT) Makefile
-	sh $< -c __END_OF_TEST__ -f 50 -r 50 $(top_builddir) $(SANE_SCTESTS_OUT) > $@
+	sh $(srcdir)/../generic-testrunner.sh -c __END_OF_TEST__ -f 50 -r 50 $(top_builddir) $(SANE_SCTESTS_OUT) > $@
 	chmod 755 $@
 
 bogustests-runner: $(srcdir)/../generic-testrunner.sh $(BOGO_SCTESTS_OUT) $(AUXMOVIES_OUT) Makefile
-	sh $< -C __END_OF_TEST__ -f 50 -r 50 $(top_builddir) $(BOGO_SCTESTS_OUT) > $@
+	sh $(srcdir)/../generic-testrunner.sh -C __END_OF_TEST__ -f 50 -r 50 $(top_builddir) $(BOGO_SCTESTS_OUT) > $@
 	chmod 755 $@
 
 $(SANE_SCTESTS_OUT): Dejagnu.sc check.sc

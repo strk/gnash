@@ -142,7 +142,7 @@ tmpSharedObject:
 	mkdir tmpSharedObject
 
 gnashrc: gnashrc.in Makefile tmpSharedObject
-	sed -e 's#@@MEDIADIR@@#'$(abs_mediadir)'#g' -e 's#@@TMPSODIR@@#'$(abs_tmpsodir)'#g' $< > $@
+	sed -e 's#@@MEDIADIR@@#'$(abs_mediadir)'#g' -e 's#@@TMPSODIR@@#'$(abs_tmpsodir)'#g' $(srcdir)/gnashrc.in > $@
 
 if ENABLE_MING
 

@@ -118,7 +118,7 @@ LoadBitmapTest.swf: LoadBitmapTest
 	./LoadBitmapTest $(abs_mediadir)
 
 LoadBitmapTestRunner: $(srcdir)/../../generic-testrunner.sh LoadBitmapTest.swf
-	sh $< $(top_builddir) LoadBitmapTest.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh $(top_builddir) LoadBitmapTest.swf > $@
 	chmod 755 $@
 
 loadImageTest_SOURCES =	\
@@ -161,7 +161,7 @@ LoadVarsTest.swf: LoadVarsTest
 	./LoadVarsTest $(abs_mediadir)
 
 LoadVarsTestRunner: $(srcdir)/../../generic-testrunner.sh LoadVarsTest.swf
-	sh $< $(top_builddir) LoadVarsTest.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh $(top_builddir) LoadVarsTest.swf > $@
 	chmod 755 $@
 
 
