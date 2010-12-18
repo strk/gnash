@@ -110,6 +110,7 @@
 #include "Renderer.h"
 
 #include <linux/input.h>    // for /dev/input/event*
+#include <events/InputDevice.h>
 
 #ifdef RENDERER_AGG
 #include "fb_glue_agg.h"
@@ -191,44 +192,12 @@ FBGui::init(int argc, char *** argv)
     // Initialize all the input devices
 
     // Look for Mice that use the PS/2 mouse protocol
-    _inputs = InputDevice::scanForDevices(this);
+    _inputs = InputDevice::scanForDevices();
     if (_inputs.empty()) {
         log_error("Found no accessible input event devices");
     }
     
 #if 0
-    // FIME: moved to fb_glue_agg.cpp
-    
-    // Open the framebuffer device
-#ifdef ENABLE_FAKE_FRAMEBUFFER
-    _fd = open(FAKEFB, O_RDWR);
-    log_debug("WARNING: Using %s as a fake framebuffer!", FAKEFB);
-#else
-    _fd = open("/dev/fb0", O_RDWR);
-#endif
-    if (_fd < 0) {
-        log_error("Could not open framebuffer device: %s", strerror(errno));
-        return false;
-    }
-  
-    // Load framebuffer properties
-#ifdef ENABLE_FAKE_FRAMEBUFFER
-    fakefb_ioctl(_fd, FBIOGET_VSCREENINFO, &_var_screeninfo);
-    fakefb_ioctl(_fd, FBIOGET_FSCREENINFO, &_fix_screeninfo);
-#else
-    ioctl(_fd, FBIOGET_VSCREENINFO, &_var_screeninfo);
-    ioctl(_fd, FBIOGET_FSCREENINFO, &_fix_screeninfo);
-#endif
-    log_debug(_("Framebuffer device uses %d bytes of memory."),
-              _fix_screeninfo.smem_len);
-    log_debug(_("Video mode: %dx%d with %d bits per pixel."),
-              _var_screeninfo.xres, _var_screeninfo.yres,
-              _var_screeninfo.bits_per_pixel);
-
-    _fbmem.reset(static_cast<boost::uint8_t *>(mmap(0, _fixinfo.smem_len,
-                                                    PROT_READ|PROT_WRITE, MAP_SHARED,
-                                                    _fd, 0)));
-    
     // Set "window" size
     _width    = _var_screeninfo.xres;
     _height   = _var_screeninfo.yres;
@@ -281,6 +250,8 @@ FBGui::init(int argc, char *** argv)
     // Initialize the glue layer between the renderer and the gui toolkit
     _glue->init(argc, argv);
 
+    disable_terminal();
+    
     return true;
 }
 
@@ -312,6 +283,9 @@ FBGui::run()
         
         // check input devices
         checkForData();
+
+        // FIXME: process the input data
+        // boost::shared_ptr<input_event_t> popData();
         
         // advance movie  
         Gui::advance_movie(this);
@@ -449,6 +423,7 @@ FBGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 char *
 FBGui::find_accessible_tty(int no)
 {
+    GNASH_REPORT_FUNCTION;
     char* fn;
     
     fn = find_accessible_tty("/dev/vc/%d", no);   if (fn) return fn;
@@ -482,6 +457,7 @@ FBGui::find_accessible_tty(const char* format, int no)
 bool
 FBGui::disable_terminal() 
 {
+    GNASH_REPORT_FUNCTION;
     _original_kd = -1;
     
     struct vt_stat vts;
@@ -613,6 +589,7 @@ FBGui::disable_terminal()
 bool
 FBGui::enable_terminal() 
 {
+    GNASH_REPORT_FUNCTION;
     log_debug(_("Restoring terminal..."));
 
     char* tty = find_accessible_tty(_own_vt);
@@ -662,6 +639,30 @@ FBGui::checkForData()
 
     for (it=_inputs.begin(); it!=_inputs.end(); ++it) {
         (*it)->check();
+        boost::shared_ptr<InputDevice::input_data_t> ie = (*it)->popData();
+        if (ie) {
+#if 0
+            std::cerr << "Got data: " << ie->pressed;
+            std::cerr << ", " << ie->key << ", " << ie->modifier;
+            std::cerr << ", " << ie->x << ", " << ie->y << std::endl;
+            // cerr << "X = " << coords[0] << endl;
+            // cerr << "Y = " << coords[1] << endl;
+#endif
+            // Range check and convert the position
+            boost::shared_array<int> coords =
+                MouseDevice::convertCoordinates(ie->x, ie->y,
+                                                getStage()->getStageWidth(),
+                                                getStage()->getStageHeight());
+            // See if a mouse button was clicked
+            if (ie->pressed) {
+                notifyMouseClick(true);
+            }
+            
+            // The mouse was moved
+            if (coords) {
+                notifyMouseMove(coords[0], coords[1]);
+            }
+        }
     }
 }
 
