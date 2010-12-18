@@ -31,7 +31,7 @@
 #include <linux/fb.h>
 
 #include "gui.h"
-#include "InputDevice.h"
+#include "events/InputDevice.h"
 #include "Renderer.h"
 
 #define PIXELFORMAT_LUT8
