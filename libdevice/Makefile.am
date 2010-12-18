@@ -73,37 +73,13 @@ libgnashdevice_la_LIBADD = \
 libgnashdevice_la_LDFLAGS =  -release $(VERSION) 
 libgnashdevice_la_SOURCES =
 
-if BUILD_EGL_DEVICE
-libgnashdevice_la_CPPFLAGS += $(EGL_CFLAGS)
+if BUILD_X11_DEVICE
+libgnashdevice_la_CPPFLAGS += $(X11_CFLAGS)
 libgnashdevice_la_SOURCES += \
-	egl/eglDevice.cpp \
-	egl/eglDevice.h
-libgnashdevice_la_LIBADD += $(EGL_LIBS)
+	x11/X11Device.cpp \
+	x11/X11Device.h
+libgnashdevice_la_LIBADD += $(X11_LIBS)
 endif
-
-if BUILD_DIRECTFB_DEVICE
-libgnashdevice_la_CPPFLAGS += $(DIRECTFB_CFLAGS)
-libgnashdevice_la_SOURCES += \
-	directfb/DirectFBDevice.cpp \
-	directfb/DirectFBDevice.h
-libgnashdevice_la_LIBADD += $(DIRECTFB_LIBS)
-endif
-
-if BUILD_VAAPI_DEVICE
-libgnashdevice_la_CPPFLAGS += $(VAAPI_CFLAGS)
-libgnashdevice_la_SOURCES += \
-	vaapi/VaapiDevice.cpp \
-	vaapi/VaapiDevice.h
-libgnashdevice_la_LIBADD += $(VAAPI_LIBS)
-endif
-
-# if BUILD_X11_DEVICE
-# libgnashdevice_la_CPPFLAGS += $(X11_CFLAGS)
-# libgnashdevice_la_SOURCES += \
-# 	x11/X11Device.cpp \
-# 	x11/X11Device.h
-# libgnashdevice_la_LIBADD += $(X11_LIBS)
-# endif
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
@@ -124,55 +100,29 @@ if BUILD_RAWFB_DEVICE
 include rawfb/rawfb.am
 endif
 
-if BUILD_EGL_DEVICE
-bin_PROGRAMS += eglinfo
-eglinfo_SOURCES = egl/eglinfo.c
-eglinfo_CPPFLAGS = $(AM_CPPFLAGS)
-eglinfo_LDADD = \
-	$(EXTRA_EGL_LIBS) \
-	$(EGL_LIBS)
+# This is for Linux Input Event support
+if ENABLE_INPUT_EVENTS
+include events/events.am
+endif
 
-check_PROGRAMS += test_egl 
-# this tests the low level EGL interface, used by OpenVG, OpenGLES1,
-# and OpenGLES2.
-test_egl_SOURCES = egl/test_egl.cpp
-test_egl_CPPFLAGS = $(AM_CPPFLAGS)
-test_egl_LDADD = \
+if BUILD_EGL_DEVICE
+include egl/egl.am
+endif
+
+if BUILD_DIRECTFB_DEVICE
+include directfb/directfb.am
+endif
+
+if BUILD_X11_DEVICE
+check_PROGRAMS += test_x11
+test_x11_SOURCES = x11/test_x11.cpp
+test_x11_CPPFLAGS = $(AM_CPPFLAGS) $(X11_CFLAGS)
+test_x11_LDADD = \
 	libgnashdevice.la \
-	$(EXTRA_EGL_LIBS) \
-	$(CURL_LIBS) \
-	$(EGL_LIBS) \
+	$(X11_LIBS) \
 	$(GNASH_LIBS)
 endif
 
 if BUILD_VAAPI_DEVICE
-check_PROGRAMS += test_vaapi
-test_vaapi_SOURCES = vaapi/test_vaapi.cpp
-test_vaapi_CPPFLAGS = $(AM_CPPFLAGS) $(VAAPI_CFLAGS)
-test_vaapi_LDADD = \
-	libgnashdevice.la \
-	$(VAAPI_LIBS) \
-	$(GNASH_LIBS)
-endif
-
-if BUILD_DIRECTFB_DEVICE
-check_PROGRAMS += test_dfb
-test_dfb_SOURCES = directfb/test_dfb.cpp
-test_dfb_CPPFLAGS = $(AM_CPPFLAGS) $(DIRECTFB_CFLAGS)
-test_dfb_LDADD = \
-	libgnashdevice.la \
-	$(DIRECTFB_LIBS) \
-	$(GNASH_LIBS)
-endif
-
-# if BUILD_X11_DEVICE
-# bin_PROGRAMS += test_x11
-# test_x11_SOURCES = x11/test_x11.cpp
-# test_x11_CPPFLAGS = $(AM_CPPFLAGS) $(X11_CFLAGS)
-# test_x11_LDADD = \
-# 	libgnashdevice.la \
-# 	$(X11_LIBS) \
-# 	$(GNASH_LIBS)
-# endif
-
 include vaapi/vaapi.am
+endif
