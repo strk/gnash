@@ -241,7 +241,7 @@ MouseDevice::check()
     // A Touchscreen works similar to a Mouse, but not exactly.
     // At least for the eTurboTouch, it has a different layout
     // in the packet for the location as it has an additional byte
-    btn   = buf[0] & 1;
+    btn   = buf[0] & 0x7;
     if (_type == InputDevice::TOUCHMOUSE) {
         xmove = (buf[1] << 7) | (buf[2]);
         ymove = (buf[3] << 7) | (buf[4]);
@@ -260,7 +260,8 @@ MouseDevice::check()
         xmove = xmove * _gui->getStage()->getStageWidth() / 2048;
         ymove = (2048-ymove) * _gui->getStage()->getStageHeight() / 2048;
 #endif
-    } else {                    // end of InputDevice::MOUSE
+    } else {                    // end of InputDevice::TOUCHMOUSE
+        // PS/2 Mouse
         xmove = buf[1];
         ymove = buf[2];
     
