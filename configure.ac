@@ -636,7 +636,9 @@ AC_ARG_ENABLE(gui,
         if test x${linux} = xyes; then
           build_fb=yes
         fi
-        build_kde4=yes
+        if test x${openbsd} != xyes; then
+          build_kde4=yes
+        fi
         build_sdl=yes
         ;;
       *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde3|kde4|fltk|sdl|riscos|aqua|fb|qtopia3|qtopia4|dump|aos4|haiku)])
