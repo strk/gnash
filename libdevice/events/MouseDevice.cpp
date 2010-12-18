@@ -23,6 +23,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <boost/shared_array.hpp>
 
 #include "GnashSleep.h"
 #include "log.h"
@@ -212,7 +213,7 @@ MouseDevice::init(const std::string &filespec, size_t size)
 bool
 MouseDevice::check()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     if (_fd < 0) {
         return false;   // no mouse available
@@ -262,6 +263,14 @@ MouseDevice::check()
 #endif
     } else {                    // end of InputDevice::TOUCHMOUSE
         // PS/2 Mouse
+        // The movement values are 9-bit 2's complement integers,
+        // where the most significant bit appears as a "sign" bit in
+        // byte 1 of the movement data packet. Their value represents
+        // the mouse's offset relative to its position when the
+        // previous packet was sent, in units determined by the
+        // current resolution. The range of values that can be
+        // expressed is -255 to +255. If this range is exceeded, the
+        // appropriate overflow bit is set.  
         xmove = buf[1];
         ymove = buf[2];
     
@@ -286,15 +295,17 @@ MouseDevice::check()
         if (_y < 0) {
             _y = 0;
         }
-#if 0
-        // FIXME: don't calculate here, this should be done by the GUI
-        if (_x > static_cast<int>(_gui->getStage()->getStageWidth())) {
-            _x = static_cast<int>(_gui->getStage()->getStageWidth());
-        }
-        if (_y > static_cast<int>(_gui->getStage()->getStageHeight())) {
-            _y = static_cast<int>(_gui->getStage()->getStageHeight());
-        }
-#endif
+        // FIXME: this is a bit of a temporary hack. The last two
+        // arguments are a range, so hardcoding them is safe for
+        // now. In the future more conversion may be done, making this
+        // then be incorrect.
+        boost::shared_array<int> coords =
+            MouseDevice::convertCoordinates(_x, _y, 1024, 768);
+//          MouseDevice::convertCoordinates(_x, _y,
+//                                 _gui->getStage()->getStageWidth(),
+//                                 _gui->getStage()->getStageHeight());
+        _x = coords[0];
+        _y = coords[1];
     } // end of InputDevice::MOUSE
     
     log_debug(_("read mouse @ %d / %d, btn %d"), _x, _y, _button);
@@ -345,6 +356,30 @@ MouseDevice::command(unsigned char cmd, unsigned char *buf, int count)
     return true;
     
 } // command()
+
+/// \brief. Mouse movements are relative to the last position, so
+/// this method is used to convert from relative position to
+/// the absolute position Gnash needs.
+boost::shared_array<int>
+MouseDevice::convertCoordinates(int x, int y, int width, int height)
+{
+    GNASH_REPORT_FUNCTION;
+    
+    boost::shared_array<int> coords(new int[2]);
+
+    if (x > width) {
+        coords[0] = width;
+    } else {
+        coords[0] = x;
+    }
+    if (y > height) {
+        coords[1] = height;
+    } else {
+        coords[1] = y;
+    }
+    
+    return coords;
+}
 
 // end of namespace
 }

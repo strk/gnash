@@ -90,6 +90,7 @@ main(int argc, char *argv[])
 
     cerr << "Starting inactivity timeout to 10 seconds..." << endl;
     alarm(10);
+    
     // This loops endlessly at the frame rate
     while (loop) {  
         std::vector<boost::shared_ptr<InputDevice> >::iterator it;
@@ -101,9 +102,14 @@ main(int argc, char *argv[])
                 boost::shared_ptr<InputDevice::input_data_t> ie = id->popData();
 #if 1
                 if (ie) {
-                    std::cerr << "Got data: " << ie->pressed;
-                    std::cerr << ", " << ie->key << ", " << ie->modifier;
-                    std::cerr << ", " << ie->x << ", " << ie->y << std::endl;
+                    cerr << "Got data: " << ie->pressed;
+                    cerr << ", " << ie->key << ", " << ie->modifier;
+                    cerr << ", " << ie->x << ", " << ie->y << endl;
+                    // Range check and convert the position
+                    boost::shared_array<int> coords =
+                        MouseDevice::convertCoordinates(ie->x, ie->y, 1024, 768);
+                    cerr << "X = " << coords[0] << endl;
+                    cerr << "Y = " << coords[1] << endl;
                 }
             } else {
                 std::cerr << ".";
@@ -111,8 +117,9 @@ main(int argc, char *argv[])
 #endif
         }
         
-        // wait the "heartbeat" inteval
-        sleep(1);    
+        // wait the "heartbeat" interval. The default mouse update rate is
+        // only 100 samples/sec. so why rush...
+        usleep(1000000);
     }
     
     std::cerr << std::endl;

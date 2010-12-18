@@ -112,7 +112,7 @@ InputDevice::addData(bool pressed, key::code key, int modifier, int x, int y)
 boost::shared_array<boost::uint8_t>
 InputDevice::readData(size_t size)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     boost::shared_array<boost::uint8_t> inbuf;
 

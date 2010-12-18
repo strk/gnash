@@ -121,15 +121,14 @@ TouchDevice::check()
     if (n == 1) {
         if (event.pressure > 0) {
             // the screen is touched
+            boost::shared_array<int> coords =
+                MouseDevice::convertCoordinates(event.x, event.y, 1024, 768);
+//          MouseDevice::convertCoordinates(event.x, event.y,
+//                                 _gui->getStage()->getStageWidth(),
+//                                 _gui->getStage()->getStageHeight());
+            event.x = coords[0];
+            event.y = coords[1];
 #if 0
-        // FIXME: don't calculate here, this should be done by the GUI
-            if (event.x > static_cast<int>(_gui->getStage()->getStageWidth())) {
-                event.x = static_cast<int>(_gui->getStage()->getStageWidth());
-            }
-            if (event.y > static_cast<int>(_gui->getStage()->getStageHeight())) {
-                event.y = static_cast<int>(_gui->getStage()->getStageHeight());
-            }
-#endif
             // FIXME: the API for these mouse events has changed, so this needs to be
             // updated.
             _gui->notifyMouseMove(int(event.x / _gui->getXScale()),

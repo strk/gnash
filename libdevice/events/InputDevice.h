@@ -118,6 +118,12 @@ public:
     
     /// Sends a command to the mouse and waits for the response
     bool command(unsigned char cmd, unsigned char *buf, int count);
+
+    /// \brief. Mouse movements are relative to the last position, so
+    /// this method is used to convert from relative position to
+    /// the absolute position Gnash needs.
+    static boost::shared_array<int> convertCoordinates(int x, int y,
+                                                       int width, int height);
 };
 
 class TouchDevice : public InputDevice
