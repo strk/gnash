@@ -20,9 +20,17 @@
 
 		trace("Sound duration is: ");
 		trace(snd.duration);
-		trace("Correct value should be 13740");
+		trace("Correct value should be 13740 or 13766 " +
+			"(depending on liblame version)");
 		// fails when no media handler is compiled-in
-		check_equals(snd.duration, 13740);
+		// TODO: handle that case
+		if ( snd.duration != 13740 && snd.duration != 13766 )
+		{
+			Dejagnu.fail("snd.duration="+snd.duration +
+				", expected 13740 or 13766 " + _INFO_);
+		} else {
+			Dejagnu.pass("snd.duration="+snd.duration + _INFO_);
+		}
 	
 		trace("Now I'll get the position before starting it");
 		sndpos=snd.position;
