@@ -47,6 +47,7 @@ RawFBDevice::RawFBDevice()
       _fbmem(0)
 {
     GNASH_REPORT_FUNCTION;
+    dbglogfile.setVerbosity();
 }
 
 RawFBDevice::RawFBDevice(int vid)
@@ -95,13 +96,23 @@ bool
 RawFBDevice::initDevice(int /* argc */, char **/* argv[] */)
 {
     GNASH_REPORT_FUNCTION;
-
+    
     // Open the framebuffer device
 #ifdef ENABLE_FAKE_FRAMEBUFFER
     _fd = open(FAKEFB, O_RDWR);
     log_debug("WARNING: Using %s as a fake framebuffer!", FAKEFB);
 #else
-    _fd = open("/dev/fb0", O_RDWR);
+    char *devname = getenv("FRAMEBUFFER");
+    if (!devname) {
+        // We can't use the fake framebuffer with the FRAMEBUFFER
+        // environment variable, as it coinfuses X11. So this
+        // lets us redefine this at runtime.
+        devname = getenv("FAKE_FRAMEBUFFER");
+        if (!devname) {
+            devname = "/dev/fb0";
+        }
+    }
+    _fd = open(devname, O_RDWR);
 #endif
     if (_fd < 0) {
         log_error("Could not open framebuffer device: %s", strerror(errno));
