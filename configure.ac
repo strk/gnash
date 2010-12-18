@@ -36,6 +36,7 @@ AM_COMPILER_LIB
 AC_C_BIGENDIAN
 AC_C_CONST
 AC_C_INLINE
+AM_PROG_CC_C_O
 
 dnl Set the default values for Flash Version. These are converted into
 dnl various strings to make JavaScript or ActionScript detectors
@@ -1145,7 +1146,7 @@ AC_ARG_ENABLE(device,
         build_x11_device=yes
         ndevice=$((ndevice+1))
         ;;
-      di*|Di*|DI*)
+      di*|Di*|DI*|dfb)
         device_list="${device_list} DirectFB"
         build_directfb_device=yes
         ndevice=$((ndevice+1))

@@ -118,13 +118,21 @@ AM_CXXFLAGS = $(PCH_FLAGS)
 endif
 
 bin_PROGRAMS =
+check_PROGRAMS =
 
 if BUILD_RAWFB_DEVICE
 include rawfb/rawfb.am
 endif
 
 if BUILD_EGL_DEVICE
-bin_PROGRAMS += test_egl
+bin_PROGRAMS += eglinfo
+eglinfo_SOURCES = egl/eglinfo.c
+eglinfo_CPPFLAGS = $(AM_CPPFLAGS)
+eglinfo_LDADD = \
+	$(EXTRA_EGL_LIBS) \
+	$(EGL_LIBS)
+
+check_PROGRAMS += test_egl 
 # this tests the low level EGL interface, used by OpenVG, OpenGLES1,
 # and OpenGLES2.
 test_egl_SOURCES = egl/test_egl.cpp
@@ -138,7 +146,7 @@ test_egl_LDADD = \
 endif
 
 if BUILD_VAAPI_DEVICE
-bin_PROGRAMS += test_vaapi
+check_PROGRAMS += test_vaapi
 test_vaapi_SOURCES = vaapi/test_vaapi.cpp
 test_vaapi_CPPFLAGS = $(AM_CPPFLAGS) $(VAAPI_CFLAGS)
 test_vaapi_LDADD = \
@@ -148,7 +156,7 @@ test_vaapi_LDADD = \
 endif
 
 if BUILD_DIRECTFB_DEVICE
-bin_PROGRAMS += test_dfb
+check_PROGRAMS += test_dfb
 test_dfb_SOURCES = directfb/test_dfb.cpp
 test_dfb_CPPFLAGS = $(AM_CPPFLAGS) $(DIRECTFB_CFLAGS)
 test_dfb_LDADD = \
