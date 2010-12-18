@@ -100,7 +100,7 @@ gotoFrameOnKeyEvent_TestRunner_CXXFLAGS = \
 	$(NULL)
 
 GotoAndPlayTestRunner: $(srcdir)/../generic-testrunner.sh $(srcdir)/GotoAndPlayTest.swf
-	sh $< $(top_builddir) $(srcdir)/GotoAndPlayTest.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) $(srcdir)/GotoAndPlayTest.swf > $@
 	chmod 755 $@
 
 clean-local: 
