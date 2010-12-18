@@ -53,7 +53,7 @@ AC_DEFUN([GNASH_PATH_OPENVG],
     AC_CHECK_HEADERS([VG/open.h], [ac_cv_path_openvg_includes=""])
   fi
 
-  if test x"${ac_cv_path_openvg_includes}" != x -a x"${ac_cv_path_openvg_includes}" != x"default"; then
+  if test x"${ac_cv_path_openvg_includes}" != x; then
     if test x$mesavg = xyes; then
       OPENVG_CFLAGS="${ac_cv_path_openvg_includes}"
       AC_DEFINE(HAVE_VG_VGEXT_H, 1, [Have LibMESA OpenVG])
