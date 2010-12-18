@@ -20,20 +20,19 @@
 # touchscreen. These are only used by the Framebuffer GUI, as without
 # X11, it has no event handling. We do it this way so the optionally
 # built source files still get included in the source tarball.
-DEVICES =
 if ENABLE_INPUT_DEVICES
-DEVICES += fb/InputDevice.cpp fb/InputDevice.h
+libgnashdevice_la_SOURCES += events/InputDevice.cpp events/InputDevice.h
 
 # Touchscreen
 if ENABLE_TSLIB
-libgnashdevice_la_SOURCES += fb/TouchDevice.cpp
+libgnashdevice_la_SOURCES += events/TouchDevice.cpp
 endif
 # PS/2 Mouse
 if ENABLE_MOUSE
-libgnashdevice_la_SOURCES += fb/MouseDevice.cpp
+libgnashdevice_la_SOURCES += events/MouseDevice.cpp
 endif
 # Linux input events
 if ENABLE_INPUT_EVENTS
-libgnashdevice_la_SOURCES += fb/EventDevice.cpp
+libgnashdevice_la_SOURCES += events/EventDevice.cpp
 endif
 endif
