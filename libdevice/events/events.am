@@ -36,3 +36,14 @@ if ENABLE_INPUT_EVENTS
 libgnashdevice_la_SOURCES += events/EventDevice.cpp
 endif
 endif
+
+check_PROGRAMS += test_events 
+test_events_SOURCES = events/test_events.cpp
+test_events_CPPFLAGS = $(AM_CPPFLAGS)
+test_events_LDADD = \
+	libgnashdevice.la \
+	$(EXTRA_EVENTS_LIBS) \
+	$(CURL_LIBS) \
+	$(EVENTS_LIBS) \
+	$(GNASH_LIBS)
+

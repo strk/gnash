@@ -27,6 +27,9 @@
 #include <map>
 #include <cassert>
 #include <regex.h>
+#include <unistd.h>
+#include <signal.h>
+
 #include <boost/assign/list_of.hpp>
 
 #include "log.h"
@@ -42,40 +45,77 @@ using namespace std;
 
 // The debug log used by all the gnash libraries.
 static LogFile& dbglogfile = LogFile::getDefaultInstance();
-    
+
+// Trap a Sig Alarm, so this test doesn't hang forever if there
+// is no input.
+static void
+alarm_handler (int sig)
+{
+    cerr << endl << "Ending test beacuse of no input. This is normal if" << endl
+         << "running this in an automated fashion, ie... \"make check\"" << endl
+         << "This is an interactive test, not a unit or regression test" << endl;
+    exit(0);
+}
+
 int
 main(int argc, char *argv[])
 {
-    // FIXME: for now, always run verbose till this supports command line args
-    dbglogfile.setVerbosity();
+    struct sigaction act;
+    act.sa_handler = alarm_handler;
+    sigaction (SIGALRM, &act, NULL);
 
-    MouseDevice me;
-
-    bool loop = true;
-
+    bool loop = false;
     std::vector<boost::shared_ptr<InputDevice> > inputs
         = InputDevice::scanForDevices();
+    cerr << "Found " << inputs.size() << " input devices" << endl;
     if (inputs.empty()) {
         runtest.fail("InputDevice::scanForDevices()");
-        loop = false;
     } else {
         runtest.pass("InputDevice::scanForDevices()");
+        loop = true;
     }    
     
+    std::vector<boost::shared_ptr<InputDevice> >::iterator it;
+    
+    // check input devices
+    for (it = inputs.begin(); it != inputs.end(); ++it) {
+        boost::shared_ptr<InputDevice> id = *it;
+        cerr << "Found " << id->id() << " device" << endl;
+        if (id->init()) {
+            runtest.pass("InputDevice::init()");
+        } else {
+            runtest.fail("InputDevice::init()()");
+        }
+    }
+
+    cerr << "Starting inactivity timeout to 10 seconds..." << endl;
+    alarm(10);
     // This loops endlessly at the frame rate
     while (loop) {  
+        std::vector<boost::shared_ptr<InputDevice> >::iterator it;
+        // // check input devices
+        for (it = inputs.begin(); it != inputs.end(); ++it) {
+            boost::shared_ptr<InputDevice> id = *it;
+            if (id->check()) {
+                // FIXME: process the input data
+                boost::shared_ptr<InputDevice::input_data_t> ie = id->popData();
+#if 1
+                if (ie) {
+                    std::cerr << "Got data: " << ie->pressed;
+                    std::cerr << ", " << ie->key << ", " << ie->modifier;
+                    std::cerr << ", " << ie->x << ", " << ie->y << std::endl;
+                }
+            } else {
+                std::cerr << ".";
+            }
+#endif
+        }
+        
         // wait the "heartbeat" inteval
         sleep(1);    
-        // TODO: Do we need to check the real time slept or is it OK when we woke
-        // up early because of some Linux signal sent to our process (and thus
-        // "advance" faster than the "heartbeat" interval)? - Udo
-
-        // check input devices
-        me.check();
-
-        // FIXME: process the input data
-        // boost::shared_ptr<input_event_t> popData();
-    }    
+    }
+    
+    std::cerr << std::endl;
 }
 
 // Local Variables:
