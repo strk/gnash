@@ -28,6 +28,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/cstdint.hpp>
 #include <vector>
+#include <queue>
 #include <linux/input.h>
 
 #include "GnashKey.h"
@@ -68,6 +69,8 @@ public:
     } devicetype_e;
     InputDevice();
     virtual ~InputDevice();
+
+    virtual const char *id() = 0;
     
     virtual bool init();
     bool init(devicetype_e type);
@@ -84,7 +87,7 @@ public:
     // Read data into the Device input buffer.
     boost::shared_array<boost::uint8_t> readData(size_t size);
 
-    boost::shared_ptr<input_data_t> popData() { return _data.front();};
+    boost::shared_ptr<input_data_t> popData();
     
     void dump();
 protected:
@@ -99,16 +102,17 @@ protected:
     int                 _button;
     size_t              _position;
     boost::scoped_array<boost::uint8_t> _buffer;
-    std::vector<boost::shared_ptr<input_data_t> > _data;
+    std::queue<boost::shared_ptr<input_data_t> > _data;
 };
 
 class MouseDevice : public InputDevice
 {
 public:
     MouseDevice();
-    virtual bool init();
-    virtual bool init(const std::string &filespec, size_t size);
-    virtual bool check();
+    const char *id() { return "Mouse"; };
+    bool init();
+    bool init(const std::string &filespec, size_t size);
+    bool check();
 
     static std::vector<boost::shared_ptr<InputDevice> > scanForDevices();
     
@@ -119,11 +123,12 @@ public:
 class TouchDevice : public InputDevice
 {
 public:
+    const char *id() { return "TouchScreen"; };
     TouchDevice();
     virtual ~TouchDevice();
-    virtual bool init();
-    virtual bool init(const std::string &filespec, size_t size);
-    virtual bool check();
+    bool init();
+    bool init(const std::string &filespec, size_t size);
+    bool check();
 
     void apply_ts_calibration(float* cx, float* cy, int rawx, int rawy);
     
@@ -138,6 +143,7 @@ class EventDevice : public InputDevice
 {
 public:
     EventDevice();
+    const char *id() { return "InputEvent"; };
     virtual bool init();
     virtual bool init(const std::string &filespec, size_t size);
     virtual bool check();

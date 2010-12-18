@@ -77,6 +77,18 @@ InputDevice::init(InputDevice::devicetype_e type, const std::string &filespec,
     return init(filespec, size);
 }
 
+boost::shared_ptr<InputDevice::input_data_t>
+InputDevice::popData()
+{
+    boost::shared_ptr<InputDevice::input_data_t> input;
+    if (_data.size()) {
+        // std::cerr << "FIXME: " <<_data.size() << std::endl;
+        input = _data.front();
+        _data.pop();
+    }
+    return input;
+}
+
 void
 InputDevice::addData(bool pressed, key::code key, int modifier, int x, int y)
 {
@@ -88,12 +100,12 @@ InputDevice::addData(bool pressed, key::code key, int modifier, int x, int y)
     _newdata->modifier = modifier;
     _newdata->x = x;
     _newdata->y = y;
-#if 1
+#if 0
     std::cerr << "Adding data: " << _newdata->pressed;
     std::cerr << ", " << _newdata->key << ", " << _newdata->modifier;
     std::cerr << ", " << _newdata->x << ", " << _newdata->y << std::endl;
 #endif
-    _data.push_back(_newdata);
+    _data.push(_newdata);
 }
 
 // Read data into the Device input buffer.
