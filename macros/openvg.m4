@@ -36,13 +36,18 @@ AC_DEFUN([GNASH_PATH_OPENVG],
       if test -f $i/VG/openvg.h; then
       dnl We have the libMesa version of OpenVG 1.0.1
         if test -f $i/VG/vgext.h; then
+           AC_DEFINE(HAVE_VG_VGEXT_H, 1, [Have LibMESA OpenVG])
            mesavg=yes
+	else 
+	  if test -f $i/VG/ext.h; then
+            AC_DEFINE(HAVE_VG_EXT_H, 1, [Have Freescale OpenVG])
+	  fi
         fi
         if test x"$i" != x"/usr/include"; then
           ac_cv_path_openvg_includes="-I$i"
           break
         else
-          ac_cv_path_openvg_includes="default"
+          ac_cv_path_openvg_includes=""
           break
         fi
       fi
@@ -53,20 +58,10 @@ AC_DEFUN([GNASH_PATH_OPENVG],
     AC_CHECK_HEADERS([VG/open.h], [ac_cv_path_openvg_includes=""])
   fi
 
-  if test x"${ac_cv_path_openvg_includes}" != x; then
-    if test x$mesavg = xyes; then
-      OPENVG_CFLAGS="${ac_cv_path_openvg_includes}"
-      AC_DEFINE(HAVE_VG_VGEXT_H, 1, [Have LibMESA OpenVG])
-    else
-      OPENVG_CFLAGS="-DOPENVG_STATIC_LIBRARY ${ac_cv_path_openvg_includes}"
-      AC_DEFINE(HAVE_VG_EXT_H, 1, [Have Freescale OpenVG])
-    fi
+  if test x"${mesavg}" = xyes; then
+    OPENVG_CFLAGS="${ac_cv_path_openvg_includes}"
   else
-    if test x$mesavg = xyes; then
-      OPENVG_CFLAGS=""
-    else
-      OPENVG_CFLAGS="-DOPENVG_STATIC_LIBRARY"
-    fi
+    OPENVG_CFLAGS="-DOPENVG_STATIC_LIBRARY ${ac_cv_path_openvg_includes}"
   fi
   AC_MSG_RESULT(${ac_cv_path_openvg_includes})
 
