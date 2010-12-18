@@ -100,7 +100,7 @@ displaylist_depths_test.swf: displaylist_depths_test
 	./displaylist_depths_test $(abs_mediadir)
 
 displaylist_depths_testrunner: $(srcdir)/../../generic-testrunner.sh displaylist_depths_test.swf
-	sh $< -r5 $(top_builddir) displaylist_depths_test.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh -r5 $(top_builddir) displaylist_depths_test.swf > $@
 	chmod 755 $@
 
 displaylist_depths_test2_SOURCES =	\
@@ -112,7 +112,7 @@ displaylist_depths_test2.swf: displaylist_depths_test2
 	./displaylist_depths_test2 $(abs_mediadir)
 
 displaylist_depths_test2runner: $(srcdir)/../../generic-testrunner.sh displaylist_depths_test2.swf
-	sh $< -f20 $(top_builddir) displaylist_depths_test2.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh -f20 $(top_builddir) displaylist_depths_test2.swf > $@
 	chmod 755 $@
 
 displaylist_depths_test3_SOURCES =	\
@@ -124,7 +124,7 @@ displaylist_depths_test3.swf: displaylist_depths_test3
 	./displaylist_depths_test3 $(abs_mediadir)
 
 displaylist_depths_test3runner: $(srcdir)/../../generic-testrunner.sh displaylist_depths_test3.swf
-	sh $< -f20 $(top_builddir) displaylist_depths_test3.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh -f20 $(top_builddir) displaylist_depths_test3.swf > $@
 	chmod 755 $@
 
 displaylist_depths_test4_SOURCES =	\
@@ -136,7 +136,7 @@ displaylist_depths_test4.swf: displaylist_depths_test4
 	./displaylist_depths_test4 $(abs_mediadir)
 
 displaylist_depths_test4runner: $(srcdir)/../../generic-testrunner.sh displaylist_depths_test4.swf
-	sh $< -f20 $(top_builddir) displaylist_depths_test4.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh -f20 $(top_builddir) displaylist_depths_test4.swf > $@
 	chmod 755 $@
 
 displaylist_depths_test5_SOURCES =	\
@@ -148,7 +148,7 @@ displaylist_depths_test5.swf: displaylist_depths_test5
 	./displaylist_depths_test5 $(abs_mediadir)
 
 displaylist_depths_test5runner: $(srcdir)/../../generic-testrunner.sh displaylist_depths_test5.swf
-	sh $< -f20 $(top_builddir) displaylist_depths_test5.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh -f20 $(top_builddir) displaylist_depths_test5.swf > $@
 	chmod 755 $@
 
 displaylist_depths_test6_SOURCES =	\
@@ -160,7 +160,7 @@ displaylist_depths_test6.swf: displaylist_depths_test6
 	./displaylist_depths_test6 $(abs_mediadir)
 
 displaylist_depths_test6runner: $(srcdir)/../../generic-testrunner.sh displaylist_depths_test6.swf
-	sh $< -f20 $(top_builddir) displaylist_depths_test6.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh -f20 $(top_builddir) displaylist_depths_test6.swf > $@
 	chmod 755 $@
 
 displaylist_depths_test7_SOURCES =	\
@@ -172,7 +172,7 @@ displaylist_depths_test7.swf: displaylist_depths_test7
 	./displaylist_depths_test7 $(abs_mediadir)
 
 displaylist_depths_test7runner: $(srcdir)/../../generic-testrunner.sh displaylist_depths_test7.swf
-	sh $< -f20 $(top_builddir) displaylist_depths_test7.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh -f20 $(top_builddir) displaylist_depths_test7.swf > $@
 	chmod 755 $@
 
 displaylist_depths_test8_SOURCES =	\
@@ -184,7 +184,7 @@ displaylist_depths_test8.swf: displaylist_depths_test8
 	./displaylist_depths_test8 $(abs_mediadir)
 
 displaylist_depths_test8runner: $(srcdir)/../../generic-testrunner.sh displaylist_depths_test8.swf
-	sh $< -f20 $(top_builddir) displaylist_depths_test8.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh -f20 $(top_builddir) displaylist_depths_test8.swf > $@
 	chmod 755 $@
 
 
@@ -197,7 +197,7 @@ displaylist_depths_test9.swf: displaylist_depths_test9
 	./displaylist_depths_test9 $(abs_mediadir)
 
 displaylist_depths_test9runner: $(srcdir)/../../generic-testrunner.sh displaylist_depths_test9.swf
-	sh $< -f20 $(top_builddir) displaylist_depths_test9.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh -f20 $(top_builddir) displaylist_depths_test9.swf > $@
 	chmod 755 $@
 
 displaylist_depths_test10_SOURCES =	\
@@ -209,7 +209,7 @@ displaylist_depths_test10.swf: displaylist_depths_test10
 	./displaylist_depths_test10 $(abs_mediadir)
 
 displaylist_depths_test10runner: $(srcdir)/../../generic-testrunner.sh displaylist_depths_test10.swf
-	sh $< -f20 $(top_builddir) displaylist_depths_test10.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh -f20 $(top_builddir) displaylist_depths_test10.swf > $@
 	chmod 755 $@
 
 displaylist_depths_test11_SOURCES = displaylist_depths_test11.c	
@@ -219,7 +219,7 @@ displaylist_depths_test11.swf: displaylist_depths_test11
 	./displaylist_depths_test11 $(abs_mediadir)
 
 displaylist_depths_test11runner: $(srcdir)/../../generic-testrunner.sh displaylist_depths_test11.swf
-	sh $< -f20 $(top_builddir) displaylist_depths_test11.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh -f20 $(top_builddir) displaylist_depths_test11.swf > $@
 	chmod 755 $@
 
 
