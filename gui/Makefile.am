@@ -101,10 +101,6 @@ GTK_LIBS =  \
 	$(X11_LIBS) \
 	$(Z_LIBS)
 
-DUMP_CFLAGS =
-
-DUMP_LIBS =
-
 # The following will be filled up later
 GUI_CPPFLAGS = 
 
