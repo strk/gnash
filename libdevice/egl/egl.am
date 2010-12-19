@@ -32,6 +32,7 @@ test_egl_CPPFLAGS = $(AM_CPPFLAGS)
 test_egl_LDADD = \
 	libgnashdevice.la \
 	$(EXTRA_EGL_LIBS) \
+	$(TS_LIBS) \
 	$(CURL_LIBS) \
 	$(EGL_LIBS) \
 	$(GNASH_LIBS)

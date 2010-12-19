@@ -26,11 +26,14 @@ libgnashdevice_la_SOURCES += events/InputDevice.cpp events/InputDevice.h
 # Touchscreen
 if ENABLE_TSLIB
 libgnashdevice_la_SOURCES += events/TouchDevice.cpp
+libgnashdevice_la_LIBADD += $(TS_LIBS)
 endif
+
 # PS/2 Mouse
 if ENABLE_MOUSE
 libgnashdevice_la_SOURCES += events/MouseDevice.cpp
 endif
+
 # Linux input events
 if ENABLE_INPUT_EVENTS
 libgnashdevice_la_SOURCES += events/EventDevice.cpp
@@ -43,6 +46,7 @@ test_events_CPPFLAGS = $(AM_CPPFLAGS)
 test_events_LDADD = \
 	libgnashdevice.la \
 	$(EXTRA_EVENTS_LIBS) \
+	$(TS_LIBS) \
 	$(CURL_LIBS) \
 	$(EVENTS_LIBS) \
 	$(GNASH_LIBS)

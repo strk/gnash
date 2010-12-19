@@ -72,6 +72,7 @@ libgnashdevice_la_LIBADD = \
 	$(LIBVA_LIBS) \
 	$(LIBVA_X11_LIBS) \
 	$(LIBVA_GLX_LIBS) \
+	$(TS_LIBS) \
 	$(GNASH_LIBS)
 libgnashdevice_la_LDFLAGS =  -release $(VERSION) 
 libgnashdevice_la_SOURCES =
@@ -81,7 +82,9 @@ libgnashdevice_la_CPPFLAGS += $(X11_CFLAGS)
 libgnashdevice_la_SOURCES += \
 	x11/X11Device.cpp \
 	x11/X11Device.h
-libgnashdevice_la_LIBADD += $(X11_LIBS)
+libgnashdevice_la_LIBADD += \
+	$(TS_LIBS) \
+	$(X11_LIBS)
 endif
 
 # Rebuild with GCC 4.x Mudflap support

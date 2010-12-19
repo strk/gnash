@@ -27,5 +27,6 @@ test_dfb_SOURCES = directfb/test_dfb.cpp
 test_dfb_CPPFLAGS = $(AM_CPPFLAGS) $(DIRECTFB_CFLAGS)
 test_dfb_LDADD = \
 	libgnashdevice.la \
+	$(TS_LIBS) \
 	$(DIRECTFB_LIBS) \
 	$(GNASH_LIBS)

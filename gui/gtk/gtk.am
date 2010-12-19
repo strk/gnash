@@ -30,10 +30,10 @@ gtk_gnash_CPPFLAGS = -DGUI_GTK -DGUI_CONFIG=\"GTK\" \
 	$(AM_CPPFLAGS) $(GTK_CFLAGS) $(X11_CFLAGS)
 gtk_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
 gtk_gnash_LDADD = \
-	$(top_builddir)/librender/libgnashrender.la \
-	$(GNASH_LIBS) \
 	$(GTK_LIBS) \
-	$(BOOST_LIBS)
+	$(GNASH_LIBS) \
+	$(BOOST_LIBS) \
+	$(TS_LIBS)
 #gtk_gnash_DEPENDENCIES = .configline
 
 if BUILD_OGL_RENDERER
@@ -66,7 +66,9 @@ endif	# BUILD_AGG_RENDERER
 if BUILD_OVG_RENDERER
 gtk_gnash_CPPFLAGS += $(OPENVG_CFLAGS) $(EGL_CFLAGS)
 gtk_gnash_SOURCES += gtk/gtk_glue_egl.cpp gtk/gtk_glue_egl.h 
-gtk_gnash_LDADD += $(OPENVG_LIBS) $(EGL_LIBS)
+gtk_gnash_LDADD += \
+	$(OPENVG_LIBS) \
+	$(EGL_LIBS)
 endif	# BUILD_OVG_RENDERER
 
 if BUILD_CAIRO_RENDERER
