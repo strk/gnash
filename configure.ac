@@ -714,6 +714,19 @@ if test x"${fakefb}" != x; then
     AC_DEFINE(ENABLE_FAKE_FRAMEBUFFER, [1], [Enable using a file instead of a real framebuffer])
 fi
 
+dnl This enable a small handful of tests that aren't designed to be
+dnl run as part of "make check", as they are either incomplete, or
+dnl can only be run interactively. These are all primarily oriented
+dnl towards code development and debugging, instead of regression
+dnl or unit testing.
+AC_ARG_ENABLE(devtests, AC_HELP_STRING([--enable-devtests],
+  [Developer only tests, not to be included in make check]),
+[case "${enableval}" in
+  yes) devtests=yes ;;
+  no)  devtests=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for enable-devtests option]) ;;
+esac], devtests=yes)
+AM_CONDITIONAL(ENABLE_DEVELOPER_TESTS, [test x${devtests} = xyes])
 
 dnl --------------------------------------------------------
 dnl  Sound handler selection
@@ -824,10 +837,10 @@ dnl By default, don't build any of these, as they are only for the
 dnl Framebuffer running without X11.
 if test x"${build_fb}" = xyes -a x"${linux}" = xyes; then
   build_ps2mouse=yes
-  build_ps2keyboard=no
+  build_ps2keyboard=yes
   build_input_events=yes
   build_tslib=yes
-  input_events="PS/2 Mouse, Input Devices, Touchscreen via Tslib"
+  input_events="PS/2 Mouse, PS/2 Keyboard, Input Devices, Touchscreen via Tslib"
 else
   build_ps2mouse=no
   build_ps2keyboard=no
@@ -836,7 +849,7 @@ else
   input_events=
 fi
 AC_ARG_ENABLE(input,
-  AC_HELP_STRING([--enable-input=], [Enable support for the specified input devices for the framebuffer GUI (default=ps2mouse|ps2keyboard|events|touchscreen)]),
+  AC_HELP_STRING([--enable-input], [Enable support for the specified input devices for the framebuffer GUI (default=ps2mouse|ps2keyboard|events|touchscreen)]),
   [if test -n ${enableval}; then
     enableval=`echo ${enableval} | tr '\054' ' ' `
   fi
@@ -859,6 +872,13 @@ AC_ARG_ENABLE(input,
         build_tslib=yes
         input_events="${input_events}, Touchscreen"
         ;;
+      a*) dnl all
+        build_ps2mouse=yes
+        build_ps2keyboard=yes
+        build_input_events=yes
+        build_tslib=yes
+        input_events="PS/2 Mouse, PS/2 Keyboard, Input Devices, Touchscreen via Tslib"                
+        ;;
       *) AC_MSG_ERROR([invalid input device list! ${enableval} given (accept: ps2mouse|keyboard|events,touchscreen)])
          ;;
       esac
@@ -873,7 +893,7 @@ if test x"${build_tslib}" = xyes; then
   AC_DEFINE(USE_TSLIB, [1], [Use a tslib supported touchscreen])
   GNASH_PKG_FIND(ts, [tslib.h], [Touchscreen library], ts_config)
 fi
-AM_CONDITIONAL(ENABLE_TSLIB, [test x${ac_cv_header_tslib_h} != xno])
+AM_CONDITIONAL(ENABLE_TSLIB, [test x${ac_cv_header_tslib_h} = xyes])
 
 if test x"${build_ps2mouse}" = xyes; then
   AC_DEFINE(USE_MOUSE_PS2, [1], [Add support for a directly using a PS/2 Mouse])
@@ -1106,12 +1126,12 @@ dnl instead of the OGL (OpenGL) one.
 
 build_vaapi_device=no
 build_openmax_device=no
+build_x11_device=no
 build_directfb_device=no
-build_x11_device=yes
 build_egl_device=yes
 build_rawfb_device=yes
-device_list="EGL RawFB X11"
-ndevice=3
+device_list="EGL RawFB"
+ndevice=2
 AC_ARG_ENABLE(device,
   AC_HELP_STRING([--enable-device], [Specify which hardware abstraction to use to support to enable (none,openmax,egl,directfb,rawfb,x11,vaapi)]),
   if test -z ${enableval}; then
