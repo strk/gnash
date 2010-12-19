@@ -44,8 +44,9 @@
 #include "log.h"
 #include "fb_glue_gles1.h"
 
-namespace gnash
-{
+namespace gnash {
+
+namespace gui {
 
 FBgles1Glue::FBgles1Glue(int fd)
     : _fd (fd),
@@ -202,6 +203,7 @@ FBgles1Glue::render_to_display () {
         eglMakeCurrent(_display, _surface, _surface, _context);
 }
 
+} // end of namespace gui
 } // namespace gnash
 
 // Local Variables:

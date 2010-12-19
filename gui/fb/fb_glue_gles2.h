@@ -45,10 +45,11 @@
 
 #include "fbsup.h"
 
-namespace gnash
-{
+namespace gnash {
 
-    class FBgles2Glue: public FBGlue // , public OglGlue
+namespace gui {
+
+class FBgles2Glue: public FBGlue // , public OglGlue
 {
 public:
     FBgles2Glue(int fd);
@@ -72,6 +73,7 @@ protected:
 private:
 };
 
+} // end of namespace gui
 } // namespace gnash
 
 #endif // FB_GLUE__GLES2_H

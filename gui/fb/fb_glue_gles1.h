@@ -47,8 +47,10 @@
 
 #include "fbsup.h"
 
-namespace gnash
-{
+namespace gnash {
+
+namespace gui {
+
 class Renderer;
 
 class FBgles1Glue: public FBGlue
@@ -82,6 +84,7 @@ private:
     EGLSurface  _pbuffer;
 };
 
+} // end of namespace gui
 } // namespace gnash
 
 #endif // FB_GLUE_GLES1_H

@@ -44,8 +44,9 @@
 #include "log.h"
 #include "fb_glue_gles2.h"
 
-namespace gnash
-{
+namespace gnash {
+
+namespace gui {
 
 FBgles2Glue::FBgles2Glue(int fd)
     : _fd(fd)
@@ -93,6 +94,7 @@ void
 FBgles2Glue::render_to_display () {
 }
 
+} // end of namespace gui
 } // namespace gnash
 
 // Local Variables:
