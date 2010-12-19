@@ -24,7 +24,10 @@ fb_gnash_SOURCES = $(GUI_SRCS) \
 	fb/fb.cpp \
 	fb/fbsup.h \
 	fb/fb_glue.h
-fb_gnash_CPPFLAGS = -DGUI_FB -DGUI_CONFIG=\"FB\" -DFAKEFB=\"$(FAKEFB)\" \
+fb_gnash_CPPFLAGS = \
+	-DGUI_FB \
+	-DGUI_CONFIG=\"FB\" \
+	-DFAKEFB=\"$(FAKEFB)\" \
 	$(AM_CPPFLAGS) 
 fb_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
 fb_gnash_LDADD = \
@@ -42,7 +45,9 @@ endif	# BUILD_AGG_RENDERER
 # Build support for OpenVG.
 if BUILD_OVG_RENDERER
 fb_gnash_SOURCES += fb/fb_glue_ovg.cpp fb/fb_glue_ovg.h
-fb_gnash_CPPFLAGS += $(OPENVG_CFLAGS) $(EGL_CFLAGS)
+fb_gnash_CPPFLAGS += \
+	$(OPENVG_CFLAGS) \
+	$(EGL_CFLAGS)
 fb_gnash_LDADD += $(OPENVG_LIBS) $(EGL_LIBS)
 endif	# BUILD_OVG_RENDERER
 

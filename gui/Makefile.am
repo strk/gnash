@@ -118,7 +118,7 @@ AM_LDFLAGS =  \
 	$(LIRC_LIBS) \
 	$(MYSQL_LIBS) \
 	$(INTLLIBS) \
-	$(TS_LIBS)
+	$(TS_LIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
@@ -191,12 +191,6 @@ bin_PROGRAMS =
 gnash: gnash.in
 	cp $< $@
 	chmod +x $@
-
-# Always include the device files in the source tarball
-EXTRA_DIST += \
-	fb/TouchDevice.cpp \
-	fb/MouseDevice.cpp \
-	fb/EventDevice.cpp
 
 GUI_SRCS = gnash.cpp \
 	gui.cpp gui.h \
