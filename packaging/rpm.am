@@ -44,9 +44,10 @@ gnash.spec spec: $(srcdir)/packaging/redhat/gnash.spec
 # Do the entire process to build an RPM package
 rpm: distdir spec setup-rpm rpm-gnash
 
-# build everything in one pass using rpmbuild
+# build everything in one pass using rpmbuild. This was using
+# --sign gnash.spec, but it didn't work for the automated builds.
 rpm-gnash: 
-	rpmbuild -ba $(RPMBUILD_FLAGS) --sign gnash.spec
+	rpmbuild -ba $(RPMBUILD_FLAGS) gnash.spec
 
 # configure the build directory, which we do by executing only the %prep stage,
 # which doesn't actually run configure
