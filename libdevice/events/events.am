@@ -40,6 +40,7 @@ libgnashdevice_la_SOURCES += events/EventDevice.cpp
 endif
 endif
 
+if ENABLE_DEVELOPER_TESTS
 check_PROGRAMS += test_events 
 test_events_SOURCES = events/test_events.cpp
 test_events_CPPFLAGS = $(AM_CPPFLAGS)
@@ -50,4 +51,4 @@ test_events_LDADD = \
 	$(CURL_LIBS) \
 	$(EVENTS_LIBS) \
 	$(GNASH_LIBS)
-
+endif

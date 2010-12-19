@@ -301,15 +301,17 @@ clean-hook:
 # 	done
 # endif
 
+if ENABLE_DEVELOPER_TESTS
 check_PROGRAMS = test_glue
 
-test_glue_SOURCES = test_glue.cpp fb/fb_glue_agg.cpp
+test_glue_SOURCES = \
+	test_glue.cpp \
+	fb/fb_glue_agg.cpp \
+	fb/fb_glue_ovg.cpp
 test_glue_CPPFLAGS = \
 	-DFAKEFB=\"$(FAKEFB)\" \
 	$(AM_CPPFLAGS) \
 	$(DIRECTFB_CFLAGS)
 #       -DUSE_TESTSUITE
-test_glue_LDADD = \
-	../librender/libgnashrender.la \
-	../libdevice/libgnashdevice.la \
-	$(GNASH_LIBS)
+test_glue_LDADD = $(GNASH_LIBS)
+endif

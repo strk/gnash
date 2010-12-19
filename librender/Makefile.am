@@ -158,7 +158,8 @@ if BUILD_OGL_RENDERER
 	$(NULL)
 endif
 
-bin_PROGRAMS = testr
+if ENABLE_DEVELOPER_TESTS
+check_PROGRAMS = testr
 
 testr_SOURCES = testr.cpp # testr_gtk.cpp
 testr_CPPFLAGS = \
@@ -178,3 +179,4 @@ testr_LDADD = \
 	$(OPENVG_LIBS) \
 	$(GLES1_LIBS) \
 	$(GLES2_LIBS)
+endif
