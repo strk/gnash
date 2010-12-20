@@ -155,17 +155,6 @@
 #include "log.h"
 #include "snappingrange.h"
 #include "SWFRect.h"
-#include "GnashDevice.h"
-
-#ifdef BUILD_EGL_DEVICE
-#include "egl/eglDevice.h"
-#endif
-#ifdef BUILD_DIRECTFB_DEVICE
-#include "directfb/DirectFBDevice.h"
-#endif
-#ifdef BUILD_X11_DEVICE
-#include "x11/X11Device.h"
-#endif
 
 // Forward declarations.
 namespace gnash {
