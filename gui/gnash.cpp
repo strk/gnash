@@ -512,6 +512,26 @@ getSupportedOptions(gnash::Player& p)
 
     desc.add(getDebuggingOptions(p));
 
+
+// Add gui-specific options
+// TODO make this somehow cleaner, maybe add a signature
+//      for such function in each of the gui's mains
+//      like getGuiOptions()
+#ifdef GUI_DUMP
+    po::options_description dumpOpts (_("Dump options"));
+
+    dumpOpts.add_options()
+
+    (",D", po::value<string>(),
+        _("Video dump file (raw format) and optional video FPS (@<num>)"))
+    (",S", po::value<string>(),
+        _("Number of milliseconds to sleep between advances"))
+    ;
+
+    desc.add(dumpOpts);
+#endif
+
+
     return desc;
 }
 
