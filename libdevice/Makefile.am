@@ -62,6 +62,7 @@ instdir = $(includedir)/gnash
 
 noinst_HEADERS = \
 	GnashDevice.h \
+	DeviceGlue.h \
 	$(NULL)
 
 pkglib_LTLIBRARIES =  libgnashdevice.la
