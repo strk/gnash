@@ -33,6 +33,9 @@ namespace gnash {
 
 static const char *INPUT_DEVICE = "/dev/input/event0";
 
+// The debug log used by all the gnash libraries.
+static LogFile& dbglogfile = LogFile::getDefaultInstance();
+
 EventDevice::EventDevice()
 {
     // GNASH_REPORT_FUNCTION;
@@ -50,6 +53,7 @@ bool
 EventDevice::init(const std::string &filespec, size_t /* size */)
 {
     GNASH_REPORT_FUNCTION;
+    dbglogfile.setVerbosity();
     
     _filespec = filespec;
     
@@ -74,9 +78,11 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
     if (ioctl(_fd, EVIOCGVERSION, &version)) {
         perror("evdev ioctl");
     }
+#if 0
     log_debug("evdev driver version is %d.%d.%d",
               version >> 16, (version >> 8) & 0xff,
               version & 0xff);
+#endif
     
     if(ioctl(_fd, EVIOCGID, &_device_info)) {
         perror("evdev ioctl");
@@ -87,7 +93,11 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
         perror("evdev ioctl");
     }
     log_debug("The device on %s says its name is %s", filespec, name);
-    
+    // /dev/mxc_ts is the Touchscreen driver used by the Freescale Babbage board
+    // For some reason it has an empty device info structure other than the name.
+    if (strstr(name, "mxc_ts") != 0) {
+        _device_info.bustype = BUS_HOST;
+    }
     log_debug("vendor %04hx product %04hx version %04hx",
               _device_info.vendor, _device_info.product,
               _device_info.version);
@@ -167,7 +177,14 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
           break;
       case BUS_HOST:
           log_debug("is Host bus type");
-          _type = InputDevice::POWERBUTTON;
+          // ON the Babbage board, this is the evdev driver version 1.0.0 
+          if (strstr(name, "mxc_ts") != 0) {
+              log_debug("Babbage Touchscreen found!");
+              _type = InputDevice::TOUCHSCREEN;
+          }
+          if (strstr(name, "mxckpd") != 0) {
+              _type = InputDevice::POWERBUTTON;
+          }
           break;
       case BUS_GSC:
           log_unimpl("is a GSC bus type");
