@@ -65,7 +65,7 @@ endif	# BUILD_AGG_RENDERER
 
 if BUILD_OVG_RENDERER
 gtk_gnash_CPPFLAGS += $(OPENVG_CFLAGS) $(EGL_CFLAGS)
-gtk_gnash_SOURCES += gtk/gtk_glue_egl.cpp gtk/gtk_glue_egl.h 
+gtk_gnash_SOURCES += gtk/gtk_glue_ovg.cpp gtk/gtk_glue_ovg.h 
 gtk_gnash_LDADD += \
 	$(OPENVG_LIBS) \
 	$(EGL_LIBS)
