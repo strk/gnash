@@ -28,6 +28,8 @@
 #include <gdk/gdk.h>
 #endif
 
+#include "DeviceGlue.h"
+
 namespace gnash {
     class Renderer;
     class movie_root;
@@ -35,7 +37,7 @@ namespace gnash {
 
 namespace gnash {
 
-class GtkGlue
+class GtkGlue : public DeviceGlue
 {
   public:
     GtkGlue() : _drawing_area(0) { }

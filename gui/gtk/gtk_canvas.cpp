@@ -40,7 +40,7 @@
 #endif
 
 #ifdef RENDERER_OPENVG
-# include "gtk_glue_egl.h"
+# include "gtk_glue_ovg.h"
 #endif
 
 // Cairo support for rendering in the canvas.
@@ -240,6 +240,17 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
         // Global enable VA-API, if requested
         gnash::vaapi_set_is_enabled(hwaccel == "vaapi");
 #endif
+#ifdef RENDERER_OPENVG
+	// Use OpenVG, which uses EGL as the display API. This works with
+	// Mesa on desktop unix systems, and on ARM based devices running
+	// Linux, often with manufacturer provided SDKs.
+        if ((renderer == "openvg") || (renderer == "ovg")) {
+            canvas->glue.reset(new gnash::gui::GtkOvgGlue);
+            // Set the renderer to the next one to try if initializing
+            // fails.
+            next_renderer = "agg";
+        }
+#endif
         // Use the Cairo renderer. Cairo is also used by GTK2, so using
         // Cairo makes much sense. Unfortunately, our implementation seems
         // to have serious performance issues, although it does work.
@@ -266,17 +277,6 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
             // rendering performance issues.
         }
 #endif
-#ifdef RENDERER_OPENVG
-	// Use OpenVG, which uses EGL as the display API. This works with
-	// Mesa on desktop unix systems, and on ARM based devices running
-	// Linux, often with manufacturer provided SDKs.
-        if (renderer == "openvg") {
-            canvas->glue.reset(new gnash::GtkEGLGlue);
-            // Set the renderer to the next one to try if initializing
-            // fails.
-            next_renderer = "agg";
-        }
-#endif
         if (renderer == "agg") {
             // Use LibVva, which works on Nvidia, AT, or Intel 965 GPUs
             // with AGG or OpenGL.
@@ -292,16 +292,16 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
         {
             canvas->glue.reset(new gnash::GtkAggGlue);
         }
-#else // ndef RENDERER_AGG
-        boost::format fmt = boost::format("Support for renderer %1% "
-                "was not built") % renderer;
-        throw gnash::GnashException(fmt.str());
+#else // ifdef RENDERER_AGG
+            boost::format fmt = boost::format("Support for renderer %1% "
+                                              "was not built") % renderer;
+            throw gnash::GnashException(fmt.str());
 #endif
-                {
+            {
                 canvas->glue.reset(new gnash::GtkAggGlue);
             }
         }
-
+        
         // Initialize the canvas for rendering into
         initialized_renderer = canvas->glue->init(argc, argv);
         // If the renderer with the least dependencies fails, we can't
