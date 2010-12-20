@@ -20,8 +20,130 @@
 #include "gnashconfig.h"
 #endif
 
+#include "log.h"
+#include "fb_glue_ovg.h"
+#include "GnashDevice.h"
+
 namespace gnash {
+
+namespace gui {
+
+FBOvgGlue::FBOvgGlue(int fd)
+    : _stride(0)
+{
+    GNASH_REPORT_FUNCTION;
+}
+
+FBOvgGlue::~FBOvgGlue()
+{
+    GNASH_REPORT_FUNCTION;
+}
+
+bool
+FBOvgGlue::init(int /* argc */, char **/*argv*/[])
+{
+    GNASH_REPORT_FUNCTION;
+
+    bool egl = false;
+    bool rawfb = false;
+    bool dfb = false;
+    bool x11 = false;
     
+    // Probe to see what display devices we have that could be used.
+    boost::shared_array<renderer::GnashDevice::dtype_t> devs = probeDevices();
+    if (devs) {
+        int i = 0;
+        while (devs[i] != renderer::GnashDevice::NODEV) {
+            switch (devs[i++]) {
+              case renderer::GnashDevice::EGL:
+                  log_debug("Probing found an EGL display device");
+                  egl = true;
+                  break;
+              case renderer::GnashDevice::RAWFB:
+                  log_debug("Probing found a raw Framebuffer display device");
+                  rawfb = true;
+                  break;
+              case renderer::GnashDevice::X11:
+                  log_debug("Probing found an X11 display device");
+                  x11 = true;
+                  break;
+              case renderer::GnashDevice::DIRECTFB:
+                  log_debug("Probing found a DirectFB display device");
+                  dfb = true;
+                  break;
+              case renderer::GnashDevice::NODEV:
+              default:
+                  log_error("No display devices found by probing!");
+                  break;
+            }
+        }
+
+        // Now that we know what exists, we have to decide which one to
+        // use, as OpenVG can work with anything. We can only have one
+        // display device operating at a time.
+        if (egl) {
+            setDevice(renderer::GnashDevice::EGL);
+        } else if (rawfb) {
+            setDevice(renderer::GnashDevice::RAWFB);
+        } else if (dfb) {
+            setDevice(renderer::GnashDevice::DIRECTFB);
+        } else if (x11) {
+            setDevice(renderer::GnashDevice::X11);
+        }        
+    }
+
+    // Initialize the display device
+    return _device->initDevice(0, 0);
+}
+
+
+Renderer*
+FBOvgGlue::createRenderHandler()
+{
+    GNASH_REPORT_FUNCTION;
+
+    // Create the renderer
+    _renderer.reset(renderer::openvg::create_handler(0));
+
+    // Print the ID tag
+    if (!_renderer->description().empty()) {
+        log_debug("Renderer is: %s", _renderer->description());
+    }
+    
+    return _renderer.get();
+}
+
+/// Not implemented, Fixme
+void
+FBOvgGlue::setInvalidatedRegions(const InvalidatedRanges& ranges)
+{
+    // GNASH_REPORT_FUNCTION;
+    // if (_renderer) {
+    //     _renderer->setInvalidatedRegions(ranges);
+    // }
+}
+
+void
+FBOvgGlue::prepDrawingArea(void *drawing_area)
+{
+    GNASH_REPORT_FUNCTION;
+
+    _device->attachWindow(reinterpret_cast
+            <renderer::GnashDevice::native_window_t>(drawing_area));
+    
+    // if (_bpp == 16) {
+    // }       
+}
+
+void
+FBOvgGlue::render()
+{
+    GNASH_REPORT_FUNCTION;
+
+    // SwapBuffer();
+}
+
+} // end of namespace gui
 } // end of namespace gnash
     
 // Local Variables:

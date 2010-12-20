@@ -24,8 +24,9 @@
 #endif
 
 #include <boost/cstdint.hpp>
-
+#include "openvg/Renderer_ovg.h"
 #include "fbsup.h"
+#include "fb_glue.h"
 
 #ifdef HAVE_VG_OPENVG_H
 #include <VG/openvg.h>
@@ -33,37 +34,59 @@
 
 namespace gnash {
 
+namespace gui {
+
 class render_handler;
 
 class FBOvgGlue : public FBGlue
 {
+    
 public:
     FBOvgGlue(int fd);
-    FBOvgGlue(int x, int y, int width, int height);
+//    FBOvgGlue(int x, int y, int width, int height);
     ~FBOvgGlue();
     
-    virtual bool init(int argc, char ***argv);
-    virtual void render();
+    bool init(int argc, char ***argv);
+    void render();
     
     // resize(int width, int height);
     void draw();
-    // Renderer* createRenderHandler();
+    Renderer* createRenderHandler();
+    void setInvalidatedRegions(const InvalidatedRanges &ranges);
+    
+    /// \brief
+    ///  Hand off a handle to the native drawing area to the renderer
+    void prepDrawingArea(void *drawing_area);
+    
     void initBuffer(int width, int height);
     void resize(int width, int height);
     // void render(geometry::Range2d<int>& bounds);
+
+    /// \brief
+    ///  The Width of the drawing area, in pixels. For framebuffer
+    ///  based devices, this is the size of the display screen.
+    int width() { return (_device) ? _device->getWidth() : 0; };
+    
+    /// Height of the drawing area, in pixels. For framebuffer
+    ///  based devices, this is the size of the display screen.
+    int height() { return (_device) ? _device->getHeight() : 0; };
+
+    // these are used only for debugging purpose to access private data
+    size_t getBounds() { return _drawbounds.size(); };
+    // size_t getMemSize() { return _fixinfo.smem_len; };    
     
 private:
-    int         _width;
-    int         _height;
     int         _stride;
-    boost::uint8_t *_offscreenbuf;
-    // Renderer *_renderer;
+    boost::uint8_t *_offscreenbuf; // FIXME: I think this should go away
     
     //Rectangle _bounds;
-    geometry::Range2d<int> _drawbounds;
+    std::vector< geometry::Range2d<int> > _drawbounds;
     geometry::Range2d<int> _validbounds;
+
+//    boost::scoped_ptr<Renderer> _renderer;
 };
-    
+
+} // end of namespace gui
 } // end of namespace gnash
 
 #endif  // end of FB_GLUE_OVG_H

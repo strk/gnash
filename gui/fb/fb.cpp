@@ -113,21 +113,21 @@
 #include <events/InputDevice.h>
 
 #ifdef RENDERER_AGG
-#include "fb_glue_agg.h"
+# include "fb_glue_agg.h"
+#endif
+
+#ifdef RENDERER_OPENVG
+# include "fb_glue_ovg.h"
 #endif
 
 #if 0
-#ifdef RENDERER_OPENVG
-#include "fb_glue_ovg.h"
-#endif
-
 // FIXME: this is just to remind us to implement these too
 #ifdef RENDERER_GLES1
-#include "fb_glue_gles1.h"
+# include "fb_glue_gles1.h"
 #endif
 
 #ifdef RENDERER_GLES2
-#include "fb_glue_gles2.h"
+# include "fb_glue_gles2.h"
 #endif
 #endif
 
@@ -241,8 +241,7 @@ FBGui::init(int argc, char *** argv)
     if (renderer == "agg") {
         _glue.reset(new FBAggGlue());
     } else if (renderer == "openvg") {
-        //     _glue.reset(new FBOvgGlue);
-        log_error("No renderer! %s not supported.", renderer);
+        _glue.reset(new FBOvgGlue(0));
     } else {
         log_error("No renderer! %s not supported.", renderer);
     }
@@ -413,11 +412,12 @@ void
 FBGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
  {
      // GNASH_REPORT_FUNCTION;
-     
-     FBAggGlue *fbag = reinterpret_cast
-        <FBAggGlue *>(_glue.get());
 
+#if 0
+     FBAggGlue *fbag = reinterpret_cast<FBAggGlue *>(_glue.get());
      fbag->setInvalidatedRegions(ranges);
+#endif
+     _glue->setInvalidatedRegions(ranges);     
 }
 
 char *
