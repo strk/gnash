@@ -315,3 +315,4 @@ test_glue_CPPFLAGS = \
 #       -DUSE_TESTSUITE
 test_glue_LDADD = $(GNASH_LIBS)
 endif
+
