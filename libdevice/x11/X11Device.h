@@ -92,7 +92,7 @@ class X11Device : public GnashDevice
     // Using X11 always means a native renderer
     bool isNativeRender() { return true; }
 
-    Window getDrawableWindow() { return _root; };
+    Window getDrawableWindow() { return _window; };
     
     //
     // Testing Support
