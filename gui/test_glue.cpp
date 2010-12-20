@@ -27,6 +27,8 @@
 #include <vector>
 #include <sstream>
 #include <map>
+#include <signal.h>
+#include <unistd.h>
 #include <cassert>
 #include <regex.h>
 #include <boost/assign/list_of.hpp>
@@ -44,18 +46,31 @@
 #include "boost/date_time/posix_time/posix_time.hpp"
 
 #ifdef RENDERER_AGG
-# include "fb/fb_glue_agg.h"
-//# include "gtk/gtk_glue_agg.h"
-#endif
-#ifdef RENDERER_OPENGL
+# ifdef BUILD_RAWFB_DEVICE
+#  include "fb/fb_glue_agg.h"
+# endif
+# ifdef BUILD_X11_DEVICE
+#  include "gtk/gtk_glue_agg.h"
+# endif
 #endif
 #ifdef RENDERER_OPENVG
+# include "fb/fb_glue_ovg.h"
 #endif
+#if 0
 #ifdef RENDERER_GLES1
+# include "fb/fb_glue_gles1.h"
 #endif
 #ifdef RENDERER_GLES2
+# include "fb/fb_glue_gles2.h"
+#endif
+#ifdef RENDERER_OPENGL
+# ifdef BUILD_X11_DEVICE
+#  include "gtk/gtk_glue_gtkglext.h"
+# endif
 #endif
 #ifdef RENDERER_CAIRO
+# include "gtk/gtk_glue_cairo.h"
+#endif
 #endif
 
 TestState runtest;
@@ -65,6 +80,8 @@ using namespace renderer;
 using namespace gui; 
 using namespace std;
 using namespace boost::posix_time;
+
+static void test_render(const std::string &gui, const std::string &render);
 
 // The debug log used by all the gnash libraries.
 static LogFile& dbglogfile = LogFile::getDefaultInstance();
@@ -154,72 +171,90 @@ main(int argc, char *argv[])
         0,
         {0, 0, 0}};
 
-    // We're not testing the virtual terminals here, so we just pass 0 as
-    // the file descriptor.
-    FBAggGlue fbag(0);
+    test_render("FB", "OpenVG");
+}
+
+static void
+test_render(const std::string &gui, const std::string &render)
+{
+    cout << "*** Testing the glue layer for " << gui
+         << " and " << render << "*** " << endl;
+
+    FBOvgGlue fbvg(0);
+
+    // if ((gui == "FB") && (render = "OpenVG")) {
+    //     // We're not testing the virtual terminals here, so we just pass 0 as
+    //     // the file descriptor.
+    //     glue = FBAggGlue;
+    // }
 
     // Test the defaults. These need to properly handle an unitialized
-    // Renderer without segfaulting.
-    if (fbag.width() == 0) {
-        runtest.pass("FBAggGlue::width(0)");
+    // Glue without segfaulting.
+    if (fbvg.width() == 0) {
+        runtest.pass("FBOvgGlue::width(0)");
     } else {
-        runtest.fail("FBAggGlue::width(0)");
+        runtest.fail("FBOvgGlue::width(0)");
     }
     
-    if (fbag.height() == 0) {
-        runtest.pass("FBAggGlue::height(0)");
+    if (fbvg.height() == 0) {
+        runtest.pass("FBOvgGlue::height(0)");
     } else {
-        runtest.fail("FBAggGlue::height(0)");
-    }    
+        runtest.fail("FBOvgGlue::height(0)");
+    }
 
-    // These next two will display an error, because the renderer isn't
+    Renderer *renderer = fbvg.createRenderHandler();    
+    
+#if 0
+    // FIXME: this appears to be AGG specific
+    // These next two will display an error, because the glue isn't
     // set but we know that, we want to test if nothiung crashes when
     // unitilized.
     SWFRect bounds;
-    fbag.setInvalidatedRegion(bounds);
-    if (fbag.getBounds() == 0) {
-        runtest.pass("FBAggGlue::setInvalidatedRegion(0)");
+    fbvg.setInvalidatedRegion(bounds);
+    if (fbvg.getBounds() == 0) {
+        runtest.pass("FBOvgGlue::setInvalidatedRegion(0)");
     } else {
-        runtest.fail("FBAggGlue::setInvalidatedRegion(0)");
+        runtest.fail("FBOvgGlue::setInvalidatedRegion(0)");
     }    
-
+#endif
+    
     InvalidatedRanges ranges;
-    fbag.setInvalidatedRegions(ranges);
-    if (fbag.getBounds() == 0) {
-        runtest.pass("FBAggGlue::setInvalidatedRegions(0)");
+    fbvg.setInvalidatedRegions(ranges);
+    if (fbvg.getBounds() == 0) {
+        runtest.pass("FBOvgGlue::setInvalidatedRegions(0)");
     } else {
-        runtest.fail("FBAggGlue::setInvalidatedRegions(0)");
+        runtest.fail("FBOvgGlue::setInvalidatedRegions(0)");
     }    
 
 #if 0
-    fbag.prepDrawingArea(reinterpret_cast<void *>(fixinfo.smem_start));
-    if (fbag.getBounds() == 0) {
-        runtest.pass("FBAggGlue::setInvalidatedRegions(0)");
+    fbvg.prepDrawingArea(reinterpret_cast<void *>(fixinfo.smem_start));
+    if (fbvg.getBounds() == 0) {
+        runtest.pass("FBOvgGlue::setInvalidatedRegions(0)");
     } else {
-        runtest.fail("FBAggGlue::setInvalidatedRegions(0)");
+        runtest.fail("FBOvgGlue::setInvalidatedRegions(0)");
     }
 #endif
 
-    // This initlizes the device and renderer
-    if (fbag.init(argc, &argv)) {
-        runtest.pass("FBAggGlue::init()");
+    // This initlizes the device and glue
+    if (fbvg.init(0, 0)) {
+        runtest.pass("FBOvgGlue::init()");
     } else {
-        runtest.fail("FBAggGlue::init()");
+        runtest.fail("FBOvgGlue::init()");
     }
 
-    if (fbag.width() > 0) {
-        runtest.pass("FBAggGlue::width()");
+    if (fbvg.width() > 0) {
+        runtest.pass("FBOvgGlue::width()");
     } else {
-        runtest.fail("FBAggGlue::width()");
+        runtest.fail("FBOvgGlue::width()");
     }
     
-    if (fbag.height() > 0) {
-        runtest.pass("FBAggGlue::height()");
+    if (fbvg.height() > 0) {
+        runtest.pass("FBOvgGlue::height()");
     } else {
-        runtest.fail("FBAggGlue::height()");
+        runtest.fail("FBOvgGlue::height()");
     }
 
-    fbag.render();
+    fbvg.render();
 }
 
 #ifdef ENABLE_FAKE_FRAMEBUFFER
