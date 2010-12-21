@@ -69,7 +69,6 @@ if USE_SOUND_MKIT
  libgnashsound_la_LIBADD += -lmedia
  noinst_HEADERS += mkit/sound_handler_mkit.h
 endif
-EXTRA_DIST += mkit
 
 if ENABLE_PCH
 AM_CXXFLAGS = $(PCH_FLAGS)
