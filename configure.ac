@@ -1134,11 +1134,7 @@ device_list="EGL RawFB"
 ndevice=2
 AC_ARG_ENABLE(device,
   AC_HELP_STRING([--enable-device], [Specify which hardware abstraction to use to support to enable (none,openmax,egl,directfb,rawfb,x11,vaapi)]),
-  if test -z ${enableval}; then
-      device_list="none"
-      ndevice=0
-      enableval=""
-  fi
+  enableval=`echo ${enableval} | tr '\054' ' ' `
   while test -n "${enableval}" ; do
     val=`echo ${enableval} | cut -d ' ' -f 1`
     [case "${val}" in
