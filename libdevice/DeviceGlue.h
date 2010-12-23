@@ -26,6 +26,8 @@
 
 #include <boost/scoped_array.hpp>
 #include <boost/shared_array.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "GnashDevice.h"
 
@@ -137,6 +139,13 @@ public:
         // egl->printEGLConfig();
         // egl->printEGLSurface();
     }
+
+    bool initDevice(int argc, char *argv[]) { return
+            _device->initDevice(argc, argv); };
+
+    bool attachWindow(renderer::GnashDevice::native_window_t window) { return
+            _device->attachWindow(window); };
+    
 protected:
     boost::scoped_ptr<renderer::GnashDevice> _device;
 };
