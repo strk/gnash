@@ -29,6 +29,10 @@
 #include <regex.h>
 #include <boost/assign/list_of.hpp>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #ifdef HAVE_EGL_EGL_H
 # include <EGL/egl.h>
 #else
@@ -65,26 +69,29 @@ main(int argc, char *argv[])
     // FIXME: for now, always run verbose till this supports command line args
     dbglogfile.setVerbosity();
     
-    EGLDevice egl1, egl2, egl3;
-
 #ifdef RENDERER_OPENVG
+    EGLDevice egl1;
     std::cerr << "== OpenVG tests ==" << std::endl;
     test_egl(egl1, GnashDevice::OPENVG, argc, argv);
     egl1.printEGLConfig();
     egl1.printEGLContext();
     egl1.printEGLSurface();
 #endif
-    
-#ifdef RENDERER_GLES1
+
+#if 0
+#ifdef RENDERER_GLES1 
+    EGLDevice egl2;
     std::cerr << "== OpenGLES1 tests ==" << std::endl;
     test_egl(egl2, GnashDevice::OPENGLES1, argc, argv);
 //    egl2.printEGLConfig();
 #endif
     
 #ifdef RENDERER_GLES2
+    EGLDevice egl3;
     std::cerr << "== OpenGLES2 tests ==" << std::endl;
     test_egl(egl3, GnashDevice::OPENGLES2, argc, argv);
 //    egl3.printEGLConfig();
+#endif
 #endif
 }
 
@@ -133,15 +140,14 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
         runtest.untested("EGLDevice::queryEGLConfig()");
     }
 
-#if 0
     // Init'ing to zero uses the root screen as the display. Otherwise
     // the argument should be an EGLNativeWindowType.
-    if (egl.attachWindow(0)) {
+    int fd = open("/dev/fb0", O_RDWR);
+    if (egl.attachWindow(fd)) {
         runtest.pass("EGLDevice::attachWindow(0)");
     } else {
         runtest.fail("EGLDevice::attachWindow(0)");
     }
-#endif
     
     if (hwinit) {
         if (egl.supportsRenderer(rtype)) {
@@ -214,30 +220,6 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
         runtest.untested("EGLDevice::getHeigth()");
     }
 
-#if 0
-    // these are the same as width and height
-    if (hwinit) {
-        if (egl.getVerticalRes()) {
-            runtest.pass("EGLDevice::getVerticalRes()");
-        } else {
-            runtest.fail("EGLDevice::getVerticalRes()");
-        }
-    } else {
-        runtest.untested("EGLDevice::getVerticalRes()");
-    }
-
-    
-    if (hwinit) {
-        if (egl.getHorzRes()) {
-            runtest.pass("EGLDevice::getHorzRes()");
-        } else {
-            runtest.fail("EGLDevice::getHorzRes()");
-        }
-    } else {
-        runtest.untested("EGLDevice::getHorzRes()");
-    }
-#endif
-    
     if (hwinit) {
         if (egl.isSingleBuffered() != egl.isBackBuffered()) {
             runtest.pass("EGLDevice::is*Buffered()");
@@ -248,11 +230,40 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
         runtest.untested("EGLDevice::is*Buffered()");
     }
 
+    // these are often the same as width and height, but not on all
+    // displays. When EGL is back buffered, the size of the display
+    // horizontally is doubled.
+    if (hwinit) {
+        if (egl.getVerticalRes() == 480) {
+            runtest.pass("EGLDevice::getVerticalRes()");
+        } else {
+            runtest.fail("EGLDevice::getVerticalRes()");
+        }
+    } else {
+        runtest.untested("EGLDevice::getVerticalRes()");
+    }
+
+    
+    if (hwinit) {
+        int newval = 800;
+        if (egl.isBackBuffered()) {
+            newval += newval;
+        }
+        if (egl.getHorzRes() == 1600) {
+            runtest.pass("EGLDevice::getHorzRes()");
+        } else {
+            runtest.fail("EGLDevice::getHorzRes()");
+        }
+    } else {
+        runtest.untested("EGLDevice::getHorzRes()");
+    }
+    
+    // When running in a framebuffer, EGL_SWAP_BEHAVIOR is EGL_BUFFER_PRESERVED
     if (hwinit) {
         if (egl.isBufferDestroyed()) {
-            runtest.pass("EGLDevice::isBufferDestroyed()");
-        } else {
             runtest.fail("EGLDevice::isBufferDestroyed()");
+        } else {
+            runtest.pass("EGLDevice::isBufferDestroyed()");
         }
     } else {
         runtest.untested("EGLDevice::isBufferDestroyed()");
@@ -296,12 +307,13 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     } else {
         runtest.untested("EGLDevice::isContext*Buffered()");
     }
-    
+
+    // When running in a framebuffer, EGL_NATIVE_RENDERABLE is false
     if (hwinit) {
         if (egl.isNativeRender()) {
-            runtest.pass("EGLDevice::isNativeRender()");
-        } else {
             runtest.fail("EGLDevice::isNativeRender()");
+        } else {
+            runtest.pass("EGLDevice::isNativeRender()");
         }
     } else {
         runtest.untested("EGLDevice::isNativeRender()");
@@ -338,7 +350,7 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     }
     
     if (hwinit) {
-        if (egl.getMaxSwapInterval() == 0) {
+        if (egl.getMaxSwapInterval() == 1) {
             runtest.pass("EGLDevice::getMaxSwapInterval()");
         } else {
             runtest.fail("EGLDevice::getMaxSwapInterval()");
@@ -348,7 +360,7 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     }
     
     if (hwinit) {
-        if (egl.getMinSwapInterval() == 0) {
+        if (egl.getMinSwapInterval() == 1) {
             runtest.pass("EGLDevice::getMinSwapInterval()");
         } else {
             runtest.fail("EGLDevice::getMinSwapInterval()");
@@ -360,7 +372,7 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     // Test Pbuffers
     if (hwinit) {
         EGLSurface surf = egl.createPbuffer(200, 200);
-        if ((surf != EGL_NO_SURFACE) && (egl.getWidth(surf) == 200)) {
+        if ((egl.getWidth(surf) == 200) && (egl.getHeight(surf) == 200)) {
             runtest.pass("EGLDevice::createPbuffer(int, int)");
         } else {
             runtest.fail("EGLDevice::createPbuffer(int, int)");
@@ -400,9 +412,10 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     }
 
     egl.makePbufferCurrent(1);
+    // The current surface is fullscreen
     EGLSurface surf4 = eglGetCurrentSurface(EGL_DRAW);
     if (hwinit) {
-        if ((egl.getWidth(surf4) == 300) && ((egl.getHeight(surf4) == 300))) {
+        if ((egl.getWidth(surf4) == 800) && ((egl.getHeight(surf4) == 480))) {
             runtest.pass("EGLDevice::makePbufferCurrent(int)");
         } else {
             runtest.fail("EGLDevice::makePbufferCurrent(int)");
@@ -433,6 +446,7 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     
     // EGLSurface surf5 = eglGetCurrentSurface(EGL_DRAW);
     // egl.printEGLSurface(surf5);
+    close(fd);
 }
 
 // Local Variables:
