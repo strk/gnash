@@ -24,6 +24,16 @@
 #include "fb_glue_ovg.h"
 #include "GnashDevice.h"
 
+#ifdef BUILD_EGL_DEVICE
+# include <egl/eglDevice.h>
+#endif
+
+#ifdef BUILD_RAWFB_DEVICE
+# include <rawfb/RawFBDevice.h>
+#endif
+
+#include "GnashDevice.h"
+
 namespace gnash {
 
 namespace gui {
@@ -48,7 +58,7 @@ FBOvgGlue::init(int /* argc */, char **/*argv*/[])
     bool rawfb = false;
     bool dfb = false;
     bool x11 = false;
-    
+#if 0
     // Probe to see what display devices we have that could be used.
     boost::shared_array<renderer::GnashDevice::dtype_t> devs = probeDevices();
     if (devs) {
@@ -77,23 +87,50 @@ FBOvgGlue::init(int /* argc */, char **/*argv*/[])
                   break;
             }
         }
+#endif
+        egl = true;
 
+#if 0
         // Now that we know what exists, we have to decide which one to
         // use, as OpenVG can work with anything. We can only have one
         // display device operating at a time.
         if (egl) {
             setDevice(renderer::GnashDevice::EGL);
-        } else if (rawfb) {
-            setDevice(renderer::GnashDevice::RAWFB);
-        } else if (dfb) {
-            setDevice(renderer::GnashDevice::DIRECTFB);
-        } else if (x11) {
-            setDevice(renderer::GnashDevice::X11);
-        }        
+        } else {
+            log_error("OpenVG needs EGL to work!");
+            return false;
+        }
+//    }
+#endif
+        
+//        _device.reset(new renderer::EGLDevice);
+    if (egl) {
+        renderer::EGLDevice egl; //= dynamic_cast<renderer::EGLDevice *>(_device.get());
+        // Initialize the display device
+        egl.initDevice(0, 0);
+        egl.bindClient(renderer::GnashDevice::OPENVG);
+        egl.queryEGLConfig();
+#if 0
+        // EGL still reqires us to open the framebuffer
+        _framebuffer.initDevice(0, 0);
+        // You must pass in the file descriptor to the opened
+        // framebuffer when creating a window
+        egl.attachWindow(_framebuffer.getFBHandle());
+#else
+        char *devname = getenv("FRAMEBUFFER");
+        if (!devname) {
+            devname = (char *)"/dev/fb0";
+            int fd = open(devname, O_RDWR); 
+            // You must pass in the file descriptor to the opened
+            // framebuffer when creating a window
+            if (fd > 0) {
+                egl.attachWindow(fd);
+            } else {
+                log_error("Couldn't attach the Framebuffer!");
+            }
+        }
+#endif
     }
-
-    // Initialize the display device
-    return _device->initDevice(0, 0);
 }
 
 
@@ -105,7 +142,7 @@ FBOvgGlue::createRenderHandler()
     // Create the renderer
     _renderer.reset(renderer::openvg::create_handler(0));
 
-    // Print the ID tag
+    // Print the description
     if (!_renderer->description().empty()) {
         log_debug("Renderer is: %s", _renderer->description());
     }
@@ -130,9 +167,6 @@ FBOvgGlue::prepDrawingArea(void *drawing_area)
 
     _device->attachWindow(reinterpret_cast
             <renderer::GnashDevice::native_window_t>(drawing_area));
-    
-    // if (_bpp == 16) {
-    // }       
 }
 
 void

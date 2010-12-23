@@ -32,6 +32,10 @@
 #include <VG/openvg.h>
 #endif
 
+#ifdef BUILD_RAWFB_DEVICE
+# include "rawfb/RawFBDevice.h"
+#endif
+
 namespace gnash {
 
 namespace gui {
@@ -83,6 +87,7 @@ private:
     std::vector< geometry::Range2d<int> > _drawbounds;
     geometry::Range2d<int> _validbounds;
 
+//    renderer::rawfb::RawFBDevice         _framebuffer;
 //    boost::scoped_ptr<Renderer> _renderer;
 };
 
