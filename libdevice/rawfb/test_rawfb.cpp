@@ -62,49 +62,49 @@ main(int argc, char *argv[])
         exit(0);
     }
     
-    if ((ret) && (rfb.getFBMemory() > 0) && (rfb.getFBMemSize() > 0)) {
+    if (ret && (rfb.getFBHandle() > 0)) {
         runtest.pass("RawFBDevice:InitDevice()");
     } else {
         runtest.fail("RawFBDevice:InitDevice()");
     }
 
-    if (rfb.getWidth()) {
+    if (ret && rfb.getWidth()) {
         runtest.pass("RawFBDevice::getWidth()");
     } else {
         runtest.fail("RawFBDevice::getWidth()");
     }
     
-    if (rfb.getHeight()) {
+    if (ret && rfb.getHeight()) {
         runtest.pass("RawFBDevice::getHeight()");
     } else {
         runtest.fail("DirecTFBDevice::getHeight()");
     }
 
-    if (rfb.isSingleBuffered()) {
+    if (ret && rfb.isSingleBuffered()) {
         runtest.pass("RawFBDevice::is*Buffered()");
     } else {
         runtest.fail("RawFBDevice::is*Buffered()");
     }
     
-    if (rfb.getDepth()) {
+    if (ret && rfb.getDepth()) {
         runtest.pass("RawFBDevice::getDepth()");
     } else {
         runtest.fail("RawFBDevice::getDepth()");
     }
     
-    if (rfb.getRedSize() > 0) {
+    if (ret && rfb.getRedSize() > 0) {
         runtest.pass("RawFBDevice::getRedSize()");
     } else {
         runtest.fail("RawFBDevice::getRedSize()");
     }
 
-    if (rfb.getGreenSize() > 0) {
+    if (ret && rfb.getGreenSize() > 0) {
         runtest.pass("RawFBDevice::getGreenSize()");
     } else {
         runtest.fail("RawFBDevice::getGreenSize()");
     }
 
-    if (rfb.getBlueSize() > 0) {
+    if (ret && rfb.getBlueSize() > 0) {
         runtest.pass("RawFBDevice::getBlueSize()");
     } else {
         runtest.fail("RawFBDevice::getBlueSize()");
@@ -120,19 +120,19 @@ main(int argc, char *argv[])
     
     // AGG uses these to calculate the poixel format
 #ifdef RENDERER_AGG
-    if (rfb.getRedOffset() > 0) {
+    if (ret && rfb.getRedOffset() > 0) {
         runtest.pass("RawFBDevice::getRedOffset()");
     } else {
         runtest.fail("RawFBDevice::getRedOffset()");
     }
     
-    if (rfb.getGreenOffset() > 0) {
+    if (ret && rfb.getGreenOffset() > 0) {
         runtest.pass("RawFBDevice::getGreenOffset()");
     } else {
         runtest.fail("RawFBDevice::getGreenOffset()");
     }
     
-    if (rfb.getBlueOffset() == 0) {
+    if (ret && rfb.getBlueOffset() == 0) {
         runtest.pass("RawFBDevice::getBlueOffset()");
     } else {
         runtest.fail("RawFBDevice::getBlueOffset()");

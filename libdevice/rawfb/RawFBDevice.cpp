@@ -97,12 +97,13 @@ RawFBDevice::initDevice(int /* argc */, char **/* argv[] */)
 {
     GNASH_REPORT_FUNCTION;
     
+    char *devname = 0;
     // Open the framebuffer device
 #ifdef ENABLE_FAKE_FRAMEBUFFER
     _fd = open(FAKEFB, O_RDWR);
     log_debug("WARNING: Using %s as a fake framebuffer!", FAKEFB);
 #else
-    char *devname = getenv("FRAMEBUFFER");
+    devname = getenv("FRAMEBUFFER");
     if (!devname) {
         // We can't use the fake framebuffer with the FRAMEBUFFER
         // environment variable, as it coinfuses X11. So this
@@ -117,6 +118,8 @@ RawFBDevice::initDevice(int /* argc */, char **/* argv[] */)
     if (_fd < 0) {
         log_error("Could not open framebuffer device: %s", strerror(errno));
         return false;
+    } else {
+        log_debug("Opened framebuffer device: %s", devname);
     }
     
     // Load framebuffer properties
@@ -133,17 +136,6 @@ RawFBDevice::initDevice(int /* argc */, char **/* argv[] */)
               _varinfo.xres, _varinfo.yres,
               _varinfo.bits_per_pixel);    
 
-    // map framebuffer into memory
-    _fbmem = (unsigned char *)mmap(0, _fixinfo.smem_len,
-                                   PROT_READ|PROT_WRITE, MAP_SHARED,
-                                   _fd, 0);
-    
-    if (!_fbmem) {
-        log_error("Couldn't mmap() %d bytes of memory!",
-                  _fixinfo.smem_len);
-        return false;
-    }
-    
     return true;
 }
 
@@ -195,6 +187,24 @@ bool
 RawFBDevice::attachWindow(GnashDevice::native_window_t window)
 {
     GNASH_REPORT_FUNCTION;
+
+    // map framebuffer into memory. There isn't really a native
+    // window when using a frambuffer, it's actualy the file descriptor
+    // of the opened device. EGL wants the descriptor here too, so
+    // this way we work in a similar manner.
+    if (window) {
+        _fbmem = (unsigned char *)mmap(0, _fixinfo.smem_len,
+                                       PROT_READ|PROT_WRITE, MAP_SHARED,
+                                       window, 0);
+    }
+        
+    if (!_fbmem) {
+        log_error("Couldn't mmap() %d bytes of memory!",
+                  _fixinfo.smem_len);
+        return false;
+    }
+
+    return true;
 }
     
 
@@ -231,27 +241,32 @@ fakefb_ioctl(int /* fd */, int request, void *data)
       {
           struct fb_var_screeninfo *ptr =
               reinterpret_cast<struct fb_var_screeninfo *>(data);
-          // If we are using a simulated framebuffer, the default for
-          // fbe us 640x480, 8bits. So use that as a sensible
-          // default. Note that the fake framebuffer is only used for
+          // Note that the fake framebuffer is only used for
           // debugging and development.
-          ptr->xres          = 1280; // visible resolution
-          ptr->xres_virtual  = 1280; // virtual resolution
-          ptr->yres          = 1024; // visible resolution
-          ptr->yres_virtual  = 1024; // virtual resolution
+          // Framebuffer device uses 1536000 bytes of memory at this size
+#if 0
+          ptr->xres          = 1024; // visible resolution
+          ptr->xres_virtual  = 1024; // virtual resolution
+          ptr->yres          = 768; // visible resolution
+          ptr->yres_virtual  = 768; // virtual resolution
 
           // standard PC framebuffer use a 32 bit 8/8/8 framebuffer
-          ptr->bits_per_pixel = 32;
-          ptr->red.offset    = 16;
+          ptr->bits_per_pixel = 24;
+          ptr->red.offset    = 0;
           ptr->red.length    = 8;
-          ptr->green.offset  = 8;
+          ptr->green.offset  = 16;
           ptr->green.length  = 8;
           ptr->blue.offset   = 0;
-          ptr->blue.length   = 8;
+          ptr->blue.length   = 6;
           ptr->transp.offset = 0;
           ptr->transp.length = 0;
-#if 0
-          // Android and fbe use a 16bit 5/6/5 framebuffer
+#else
+          ptr->xres          = 800; // visible resolution
+          ptr->xres_virtual  = 1600; // virtual resolution
+          ptr->yres          = 480; // visible resolution
+          ptr->yres_virtual  = 480; // virtual resolution
+
+          // Most modile devices use a 16bit 5/6/5 framebuffer
           ptr->bits_per_pixel = 16;
           ptr->red.length    = 5;
           ptr->red.offset    = 11;
@@ -280,17 +295,18 @@ fakefb_ioctl(int /* fd */, int request, void *data)
       {
           struct fb_fix_screeninfo *ptr =
               reinterpret_cast<struct fb_fix_screeninfo *>(data);
-          // Android and fbe use a 16bit 5/6/5 framebuffer
-          ptr->smem_len = 5242880; // size of frame buffer memory
+#if 1
+          // Most mobile devices use a 16bit 5/6/5 framebuffer
+          ptr->smem_len = 33554432; // size of frame buffer memory
           ptr->type = 0; // see FB_TYPE_*
           ptr->visual = 2; // see FB_VISUAL_*
           ptr->xpanstep = 1;      // zero if no hardware panning
           ptr->ypanstep = 1;      // zero if no hardware panning
           ptr->ywrapstep = 0;     // zero if no hardware panning
-          ptr->line_length = 5120; // line length
+          ptr->line_length = 1600; // line length
           ptr->accel = FB_ACCEL_NONE; // Indicate to driver which specific
                                   // chip/card we have
-#if 0
+#else
           // Android and fbe use a 16bit 5/6/5 framebuffer
           ptr->smem_len = 307200; // Length of frame buffer mem
           ptr->type = FB_TYPE_PACKED_PIXELS; // see FB_TYPE_*
