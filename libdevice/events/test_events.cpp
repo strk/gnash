@@ -60,6 +60,8 @@ alarm_handler (int sig)
 int
 main(int argc, char *argv[])
 {
+    dbglogfile.setVerbosity();
+    
     struct sigaction act;
     act.sa_handler = alarm_handler;
     sigaction (SIGALRM, &act, NULL);
