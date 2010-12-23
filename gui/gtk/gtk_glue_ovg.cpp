@@ -138,8 +138,18 @@ GtkOvgGlue::prepDrawingArea(GtkWidget *drawing_area)
     // contents from its internal offscreen buffer at the end of expose event
     gtk_widget_set_double_buffered(_drawing_area, FALSE);
 
-    // DUMP_CURRENT_SURFACE;
-    // DUMP_CURRENT_CONTEXT;
+    // EGL needs to be bound to the type of client. The possible
+    // clients are OpenVG, OpenGLES1, and OpenGLES2.
+    if (_device->getType() == renderer::GnashDevice::EGL) {
+        renderer::EGLDevice *egl = (renderer::EGLDevice*)_device.get();
+        egl->bindClient(renderer::GnashDevice::OPENVG);
+    }
+    
+#if 0
+    renderer::EGLDevice *egl = (renderer::EGLDevice*)_device.get();
+    egl->printEGLSurface(eglGetCurrentSurface(EGL_DRAW));
+    egl->printEGLContext(eglGetCurrentContext());
+#endif
 }
 
 Renderer*
@@ -155,22 +165,13 @@ GtkOvgGlue::createRenderHandler()
     GdkVisual* wvisual = gdk_drawable_get_visual(_drawing_area->window);
     GdkImage* tmpimage = gdk_image_new (GDK_IMAGE_FASTEST, wvisual, 1, 1);
     const GdkVisual* visual = tmpimage->visual;
-
-    // FIXME: we use bpp instead of depth, because depth doesn't appear to
-    // include the padding byte(s) the GdkImage actually has.
-    const char *pixelformat = 0;
-    // agg_detect_pixel_format(visual->red_shift, visual->red_prec,
-    // visual->green_shift, visual->green_prec, visual->blue_shift, visual->blue_prec,
-    // tmpimage->bpp * 8);
-
     gdk_image_destroy(tmpimage);
 
     _renderer.reset(reinterpret_cast<renderer::openvg::Renderer_ovg *>
-                    (renderer::openvg::create_handler(pixelformat)));
+                    (renderer::openvg::create_handler(0)));
     if (!_renderer) {
         boost::format fmt = boost::format(
-            _("Could not create OPENVG renderer with pixelformat %s")
-            ) % pixelformat;
+            _("Could not create OPENVG renderer"));
         throw GnashException(fmt.str());
     }
 
@@ -206,17 +207,33 @@ GtkOvgGlue::setRenderHandlerSize(int width, int height)
     _device->attachWindow(static_cast<renderer::GnashDevice::native_window_t>
                           (xid));
 
-    // EGL needs to be bound to the type of client. The possible
-    // clients are OpenVG, OpenGLES1, and OpenGLES2.
-    if (_device->getType() == renderer::GnashDevice::EGL) {
-        renderer::EGLDevice *egl = (renderer::EGLDevice*)_device.get();
-        egl->bindClient(renderer::GnashDevice::OPENVG);
-    }
-    
+    vgLoadIdentity();
+
     // Allow drawing everywhere by default
     InvalidatedRanges ranges;
     ranges.setWorld();
-    _renderer->set_invalidated_regions(ranges);    
+    _renderer->set_invalidated_regions(ranges);
+    
+    float red_color[4] = {1.0, 0.0, 0.0, 1.0};
+    float blue_color[4] = {0.0, 0.0, 1.0, 1.0};
+    
+    VGint scissor[4] = {100, 100, 25, 25};
+    vgSetfv(VG_CLEAR_COLOR, 4, red_color);
+    vgClear(0, 0, 300, 300);
+
+    vgSetfv(VG_CLEAR_COLOR, 4, blue_color);
+    vgClear(50, 50, 50, 50);
+
+    //vgSetiv(VG_SCISSOR_RECTS, 4, scissor);
+    //vgSeti(VG_SCISSORING, VG_TRUE);
+    vgCopyPixels(100, 100, 50, 50, 50, 50);
+    vgClear(150, 150, 50, 50);
+
+
+    renderer::EGLDevice *egl = (renderer::EGLDevice*)_device.get();
+    egl->swapPbuffers();
+    
+    sleep(5);
 }
 
 void 
@@ -281,7 +298,7 @@ GtkOvgGlue::render(int minx, int miny, int maxx, int maxy)
                    height);
     gdk_gc_unref(gc);
 #else
-//    eglSwapBuffers(_eglDisplay, _eglSurface);
+//    _device->swapBbuffers();
 #endif
 }
 
@@ -291,8 +308,6 @@ GtkOvgGlue::configure(GtkWidget *const /*widget*/, GdkEventConfigure *const even
     GNASH_REPORT_FUNCTION;
 
     setRenderHandlerSize(event->width, event->height);
-    
-    vgLoadIdentity();
 }
 
 #if 0
