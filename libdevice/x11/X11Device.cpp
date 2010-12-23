@@ -80,10 +80,9 @@ X11Device::X11Device(int vid)
       _screen(0),
       _depth(0),
       _vinfo(0),
-      _vid(0)
+      _vid(vid)
 {
     GNASH_REPORT_FUNCTION;
-    _vid = vid;
 
     if (!initDevice(0, 0)) {
         log_error("Couldn't initialize X11 device!");
@@ -164,6 +163,8 @@ X11Device::initDevice(int argc, char *argv[])
          exit(1);
     }
     std::cerr << "X11 visual is: " << _vinfo->visual << std::endl;
+
+    XFree(_vinfo);
     
     // XWindowAttributes gattr;
     // XGetWindowAttributes(_display, _root, &gattr);
@@ -230,7 +231,7 @@ X11Device::createWindow(const char *name, int x, int y, int width, int height)
     attr.event_mask = StructureNotifyMask | ExposureMask | KeyPressMask;
     mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
     
-    _window = XCreateWindow(_display, _root, 0, 0, width, width,
+    _window = XCreateWindow(_display, _root, 0, 0, width, height,
                         0, _vinfo->depth, InputOutput,
                         _vinfo->visual, mask, &attr);
     
@@ -244,7 +245,6 @@ X11Device::createWindow(const char *name, int x, int y, int width, int height)
     XSetNormalHints(_display, _window, &sizehints);
     XSetStandardProperties(_display, _window, name, name, None, (char **)NULL,
                            0, &sizehints);
-
     
     XMapWindow(_display, _window);
 }
