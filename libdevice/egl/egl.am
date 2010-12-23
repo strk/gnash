@@ -26,7 +26,7 @@ eglinfo_LDADD = \
 	$(EGL_LIBS)
 
 # this tests the low level EGL interface, used by OpenVG, OpenGLES1, and OpenGLES2.
-check_PROGRAMS += test_egl 
+bin_PROGRAMS += test_egl 
 test_egl_SOURCES = egl/test_egl.cpp
 test_egl_CPPFLAGS = $(AM_CPPFLAGS)
 test_egl_LDADD = \

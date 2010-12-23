@@ -48,7 +48,7 @@ static const EGLint attrib32_list[] = {
     EGL_GREEN_SIZE,     8,
     EGL_BLUE_SIZE,      8,
 //  EGL_ALPHA_SIZE,     0,
-//  EGL_DEPTH_SIZE,     24,
+//    EGL_DEPTH_SIZE,     24,
 // #ifdef RENDERER_GLES1
 //     EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
 // #endif
@@ -57,12 +57,13 @@ static const EGLint attrib32_list[] = {
 // #endif
 #ifdef RENDERER_OPENVG
      EGL_RENDERABLE_TYPE, EGL_OPENVG_BIT,
-//    EGL_STENCIL_SIZE,   8,
+//     EGL_STENCIL_SIZE,   8,
 #endif
 //    EGL_RENDERABLE_TYPE, EGL_OPENVG_BIT|EGL_OPENGL_ES_BIT|EGL_OPENGL_ES2_BIT,
-//    EGL_SURFACE_TYPE,   EGL_WINDOW_BIT|EGL_PBUFFER_BIT|EGL_PIXMAP_BIT,
+    EGL_SURFACE_TYPE,   EGL_WINDOW_BIT|EGL_PBUFFER_BIT|EGL_PIXMAP_BIT,
 //    EGL_SAMPLE_BUFFERS, 1,
-// FIXME: Single Buffering appears not to work on X11, you get no visual.
+// FIXME: Single Buffering appears not to work on X11, you get no visual. This is
+// the default though.    
 //    EGL_RENDER_BUFFER, EGL_SINGLE_BUFFER,
     EGL_NONE
 };
@@ -83,7 +84,7 @@ static EGLint const attrib16_list[] = {
     EGL_SAMPLES,            0,
 #ifdef RENDERER_OPENVG
     EGL_RENDERABLE_TYPE, EGL_WINDOW_BIT|EGL_PBUFFER_BIT|EGL_PIXMAP_BIT,
-//    EGL_DEPTH_SIZE,     16,
+    EGL_DEPTH_SIZE,     16,
 #endif
     EGL_NONE
 };
@@ -156,10 +157,9 @@ EGLDevice::EGLDevice()
       _eglDisplay(EGL_NO_DISPLAY),
       _eglNumOfConfigs(0),
       _max_num_config(1),
-      _bpp(32)
+      _bpp(16)
 {
     GNASH_REPORT_FUNCTION;
-    dbglogfile.setVerbosity();
 }
 
 EGLDevice::EGLDevice(int argc, char *argv[])
@@ -169,7 +169,7 @@ EGLDevice::EGLDevice(int argc, char *argv[])
       _eglDisplay(EGL_NO_DISPLAY),
       _eglNumOfConfigs(0),
       _max_num_config(1),
-      _bpp(32)
+      _bpp(16)
 {
     GNASH_REPORT_FUNCTION;
     if (!initDevice(argc, argv)) {
@@ -184,7 +184,7 @@ EGLDevice::EGLDevice(GnashDevice::rtype_t rtype)
       _eglDisplay(EGL_NO_DISPLAY),
       _eglNumOfConfigs(0),
       _max_num_config(1),
-      _bpp(32)
+      _bpp(16)
 {
     GNASH_REPORT_FUNCTION;
     dbglogfile.setVerbosity();
@@ -220,7 +220,6 @@ EGLDevice::~EGLDevice()
         
         eglTerminate(_eglDisplay);
     }
-    
 }
 
 /// @note: There are a few steps required to initialize an EGL
@@ -250,33 +249,34 @@ EGLDevice::initDevice(int argc, char *argv[])
 
     // step 1 - get an EGL display
 
-    // This can be called multiple times, and always returns the same display
-//    _eglDisplay = eglGetDisplay(XOpenDisplay(0)/* EGL_DEFAULT_DISPLAY */);
+//    _eglDisplay = eglGetDisplay(XOpenDisplay(0));
     _eglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if (EGL_NO_DISPLAY == _eglDisplay) {
         log_error( "eglGetDisplay() failed (error 0x%x)", eglGetError());
         return false;
     }
-    
+
     // This can be called multiple times safely
-    if (EGL_FALSE == eglInitialize(_eglDisplay, 0, 0)) {
+    if (eglInitialize(_eglDisplay, 0, 0) != EGL_TRUE) {
         log_error( "eglInitialize() failed (error %s)",
                    getErrorString(eglGetError()));
         return false;
     }
+
+    // step2 - bind to the wanted client API
+    /// This is done by bindClient() later on
+    // bindClient(GnashDevice::OPENVG);
+    // queryEGLConfig(_eglDisplay);
+    
     log_debug("EGL_CLIENT_APIS = %s", eglQueryString(_eglDisplay, EGL_CLIENT_APIS));
     log_debug("EGL_EXTENSIONS = %s",  eglQueryString(_eglDisplay, EGL_EXTENSIONS));
     log_debug("EGL_VERSION = %s, EGL_VENDOR = %s",
               eglQueryString(_eglDisplay, EGL_VERSION),
               eglQueryString(_eglDisplay, EGL_VENDOR));
 
-    // step2 - bind to the wanted client API
-    /// This is done by bindClient() later on
-    //bindClient(GnashDevice::OPENVG);
-    
     // step3 - find a suitable config
     if (_bpp == 32) {
-        if (EGL_FALSE == eglChooseConfig(_eglDisplay, attrib16_list, &_eglConfig,
+        if (EGL_FALSE == eglChooseConfig(_eglDisplay, attrib32_list, &_eglConfig,
                                           1, &_eglNumOfConfigs)) {
             log_error("eglChooseConfig(32) failed (error %s)", 
                        getErrorString(eglGetError()));
@@ -304,9 +304,6 @@ EGLDevice::initDevice(int argc, char *argv[])
    } else {
        printEGLConfig(_eglConfig);
    }
-    
-   // log_debug("Gnash EGL Frame width %d height %d bpp %d \n",
-   //           _width, _height, _bpp);
     
     return true;
 }
@@ -405,11 +402,10 @@ EGLDevice::attachWindow(GnashDevice::native_window_t window)
         _nativeWindow = static_cast<EGLNativeWindowType>(window);
     }
 
-#if 1
     log_debug("Initializing EGL Surface");
     if (_eglDisplay && _eglConfig) {
         _eglSurface = eglCreateWindowSurface(_eglDisplay, _eglConfig,
-                                             window, NULL);
+                                             _nativeWindow, NULL);
     }
     
     if (EGL_NO_SURFACE == _eglSurface) {
@@ -418,7 +414,6 @@ EGLDevice::attachWindow(GnashDevice::native_window_t window)
     } else {
         printEGLSurface(_eglSurface);
     }
-#endif
     
     // step5 - create a context
     _eglContext = eglCreateContext(_eglDisplay, _eglConfig, EGL_NO_CONTEXT, NULL);
@@ -434,7 +429,7 @@ EGLDevice::attachWindow(GnashDevice::native_window_t window)
         log_error("eglMakeCurrent failed (error %s)",
                   getErrorString(eglGetError()));
     }       // begin user code
-    
+
     return true;
 }   
 
@@ -572,7 +567,7 @@ EGLDevice::queryEGLConfig(EGLDisplay display)
          return 0;
      }
      
-#if 1
+#if 0
      // This prints out all the configurations, so it can be quite large
      for (int i=0; i<max_num_config; i++ ) {
          std::cerr << "Config[" << i << "] is:" << i << std::endl;
@@ -591,26 +586,26 @@ EGLDevice::printEGLConfig(EGLConfig config)
     eglGetConfigAttrib(_eglDisplay, config, EGL_RED_SIZE, &red);
     eglGetConfigAttrib(_eglDisplay, config, EGL_GREEN_SIZE, &green);
     eglGetConfigAttrib(_eglDisplay, config, EGL_BLUE_SIZE, &blue);
-    std::cerr << "\tConfig has RED = " << red << ", GREEN = " << green
+    std::cout << "\tConfig has RED = " << red << ", GREEN = " << green
               << ", BLUE = " << blue  << std::endl;
     
     eglGetConfigAttrib(_eglDisplay, config, EGL_ALPHA_SIZE, &value);
-    std::cerr << "\tEGL_ALPHA_SIZE is " << value  << std::endl;
+    std::cout << "\tEGL_ALPHA_SIZE is " << value  << std::endl;
     eglGetConfigAttrib(_eglDisplay, config, EGL_STENCIL_SIZE, &value);
-    std::cerr << "\tEGL_STENCIL_SIZE is " << value  << std::endl;
+    std::cout << "\tEGL_STENCIL_SIZE is " << value  << std::endl;
     eglGetConfigAttrib(_eglDisplay, config, EGL_SAMPLES, &value);
-    std::cerr << "\tEGL_SAMPLES is " << value  << std::endl;
+    std::cout << "\tEGL_SAMPLES is " << value  << std::endl;
     eglGetConfigAttrib(_eglDisplay, config, EGL_DEPTH_SIZE, &value);
-    std::cerr << "\tEGL_DEPTH_SIZE is " << value  << std::endl;
+    std::cout << "\tEGL_DEPTH_SIZE is " << value  << std::endl;
     eglGetConfigAttrib(_eglDisplay, config, EGL_MAX_SWAP_INTERVAL, &value);
-    std::cerr << "\tEGL_MAX_SWAP_INTERVAL is " << value << std::endl;
+    std::cout << "\tEGL_MAX_SWAP_INTERVAL is " << value << std::endl;
     eglGetConfigAttrib(_eglDisplay, config, EGL_MIN_SWAP_INTERVAL, &value);
-    std::cerr << "\tEGL_MIN_SWAP_INTERVAL is " << value << std::endl;
+    std::cout << "\tEGL_MIN_SWAP_INTERVAL is " << value << std::endl;
     eglGetConfigAttrib(_eglDisplay, config, EGL_NATIVE_RENDERABLE, &value);
     std::string val = (value)? "true" : "false";
-    std::cerr << "\tEGL_NATIVE_RENDERABLE is " << val << std::endl;
+    std::cout << "\tEGL_NATIVE_RENDERABLE is " << val << std::endl;
     eglGetConfigAttrib(_eglDisplay, config, EGL_SAMPLE_BUFFERS, &value);
-    std::cerr << "\tEGL_SAMPLE_BUFFERS is " << value << std::endl;
+    std::cout << "\tEGL_SAMPLE_BUFFERS is " << value << std::endl;
     eglGetConfigAttrib(_eglDisplay, config, EGL_RENDERABLE_TYPE, &value);
     if (value > 0) {
         std::string str;
@@ -626,9 +621,9 @@ EGLDevice::printEGLConfig(EGLConfig config)
         if (value & EGL_OPENGL_BIT) {
             str += " OpenGL";
         }
-        std::cerr <<"\tEGL_RENDERABLE_TYPE = " << str << std::endl;
+        std::cout <<"\tEGL_RENDERABLE_TYPE = " << str << std::endl;
     } else {
-        std::cerr <<"\tEGL_RENDERABLE_TYPE (default)" << std::endl;
+        std::cout <<"\tEGL_RENDERABLE_TYPE (default)" << std::endl;
     }
     eglGetConfigAttrib(_eglDisplay, config, EGL_SURFACE_TYPE, &value);
     if (value > 0) {
@@ -642,9 +637,9 @@ EGLDevice::printEGLConfig(EGLConfig config)
         if (value & EGL_PBUFFER_BIT) {
             str += " Pbuffer";
         }
-        std::cerr <<"\tEGL_SURFACE_TYPE = " << str  << std::endl;
+        std::cout <<"\tEGL_SURFACE_TYPE = " << str  << std::endl;
     } else {
-          std::cerr <<"\tEGL_SURFACE_TYPE (default)" << std::endl;
+          std::cout <<"\tEGL_SURFACE_TYPE (default)" << std::endl;
     }
 }
 
@@ -653,15 +648,15 @@ EGLDevice::printEGLContext(EGLContext context)
 {
     EGLint value;
     eglQueryContext(_eglDisplay, context, EGL_CONFIG_ID, &value);
-    std::cerr << "Context EGL_CONFIG_ID is " << value << std::endl;
+    std::cout << "Context EGL_CONFIG_ID is " << value << std::endl;
     eglQueryContext(_eglDisplay, context, EGL_CONTEXT_CLIENT_TYPE, &value);
-    std::cerr << "\tEGL_CONTEXT_CLIENT_TYPE is "
+    std::cout << "\tEGL_CONTEXT_CLIENT_TYPE is "
               << std::string((value == EGL_OPENVG_API)
               ? "EGL_OPENVG_API" : "EGL_OPENGL_ES_API") << std::endl;
     // eglQueryContext(_eglDisplay, context, EGL_CONTEXT_CLIENT_VERSION, &value);
     // log_debug("EGL_CONTEXT_CLIENT_VERSION is %d", value);
     eglQueryContext(_eglDisplay, context, EGL_RENDER_BUFFER, &value);
-    std::cerr << "\tEGL_RENDER_BUFFER is " << std::string((value == EGL_BACK_BUFFER)
+    std::cout << "\tEGL_RENDER_BUFFER is " << std::string((value == EGL_BACK_BUFFER)
               ? "EGL_BACK_BUFFER" : "EGL_SINGLE_BUFFER") << std::endl;
 }
 
@@ -670,24 +665,24 @@ EGLDevice::printEGLSurface(EGLSurface surface)
 {
     EGLint value;
     eglQuerySurface(_eglDisplay, surface, EGL_CONFIG_ID, &value);
-    std::cerr << "Surface EGL_CONFIG_ID is " << value << std::endl;
+    std::cout << "Surface EGL_CONFIG_ID is " << value << std::endl;
     eglQuerySurface(_eglDisplay, surface, EGL_HEIGHT, &value);
-    std::cerr << "\tEGL_HEIGHT is " << value<< std::endl;
+    std::cout << "\tEGL_HEIGHT is " << value<< std::endl;
     eglQuerySurface(_eglDisplay, surface, EGL_WIDTH, &value);
-    std::cerr << "\tEGL_WIDTH is " << value << std::endl;
+    std::cout << "\tEGL_WIDTH is " << value << std::endl;
     eglQuerySurface(_eglDisplay, surface, EGL_RENDER_BUFFER, &value);
-    std::cerr << "\tEGL_RENDER_BUFFER is " << std::string((value == EGL_BACK_BUFFER)
+    std::cout << "\tEGL_RENDER_BUFFER is " << std::string((value == EGL_BACK_BUFFER)
               ? "EGL_BACK_BUFFER" : "EGL_SINGLE_BUFFER") << std::endl;
     eglQuerySurface(_eglDisplay, surface, EGL_VERTICAL_RESOLUTION, &value);
-    std::cerr << "\tEGL_VERTICAL_RESOLUTION is " << value << std::endl;
+    std::cout << "\tEGL_VERTICAL_RESOLUTION is " << value << std::endl;
     eglQuerySurface(_eglDisplay, surface, EGL_HORIZONTAL_RESOLUTION, &value);
-    std::cerr << "\tEGL_HORIZONTAL_RESOLUTION is " << value << std::endl;
+    std::cout << "\tEGL_HORIZONTAL_RESOLUTION is " << value << std::endl;
     eglQuerySurface(_eglDisplay, surface, EGL_SWAP_BEHAVIOR, &value);
-    std::cerr << "\tEGL_SWAP_BEHAVIOR is "
+    std::cout << "\tEGL_SWAP_BEHAVIOR is "
               << std::string((value == EGL_BUFFER_DESTROYED)
                  ? "EGL_BUFFER_DESTROYED" : "EGL_BUFFER_PRESERVED") << std::endl;
     eglQuerySurface(_eglDisplay, surface, EGL_MULTISAMPLE_RESOLVE, &value);
-    std::cerr << "\tEGL_MULTISAMPLE_RESOLVE is "
+    std::cout << "\tEGL_MULTISAMPLE_RESOLVE is "
               << std::string((value == EGL_MULTISAMPLE_RESOLVE_BOX)
                  ? "EGL_MULTISAMPLE_RESOLVE_BOX" : "EGL_MULTISAMPLE_RESOLVE_DEFAULT") << std::endl;
 }

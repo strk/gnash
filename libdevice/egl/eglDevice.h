@@ -230,8 +230,8 @@ class EGLDevice : public GnashDevice
                 }
                 return true;
             }
-            return false;
         }
+        return false;        
     }
     
     size_t getVerticalRes() {
