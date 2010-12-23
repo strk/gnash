@@ -157,7 +157,11 @@ EGLDevice::EGLDevice()
       _eglDisplay(EGL_NO_DISPLAY),
       _eglNumOfConfigs(0),
       _max_num_config(1),
+#if BUILD_X11_DEVICE
+      _bpp(32)
+#else
       _bpp(16)
+#endif
 {
     GNASH_REPORT_FUNCTION;
 }
@@ -169,7 +173,11 @@ EGLDevice::EGLDevice(int argc, char *argv[])
       _eglDisplay(EGL_NO_DISPLAY),
       _eglNumOfConfigs(0),
       _max_num_config(1),
+#if BUILD_X11_DEVICE
+      _bpp(32)
+#else
       _bpp(16)
+#endif
 {
     GNASH_REPORT_FUNCTION;
     if (!initDevice(argc, argv)) {
@@ -184,10 +192,13 @@ EGLDevice::EGLDevice(GnashDevice::rtype_t rtype)
       _eglDisplay(EGL_NO_DISPLAY),
       _eglNumOfConfigs(0),
       _max_num_config(1),
+#if BUILD_X11_DEVICE
+      _bpp(32)
+#else
       _bpp(16)
+#endif
 {
     GNASH_REPORT_FUNCTION;
-    dbglogfile.setVerbosity();
     
     if (!initDevice(0, 0)) {
         log_error("Couldn't initialize EGL device!");
@@ -567,7 +578,7 @@ EGLDevice::queryEGLConfig(EGLDisplay display)
          return 0;
      }
      
-#if 0
+#if 1
      // This prints out all the configurations, so it can be quite large
      for (int i=0; i<max_num_config; i++ ) {
          std::cerr << "Config[" << i << "] is:" << i << std::endl;

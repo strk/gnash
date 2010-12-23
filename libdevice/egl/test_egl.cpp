@@ -77,8 +77,10 @@ main(int argc, char *argv[])
     egl1.printEGLContext();
     egl1.printEGLSurface();
 #endif
-
+    
 #if 0
+    // FIXME: we can only have one EGL device per process until it
+    // handles this better
 #ifdef RENDERER_GLES1 
     EGLDevice egl2;
     std::cerr << "== OpenGLES1 tests ==" << std::endl;
