@@ -578,7 +578,7 @@ EGLDevice::queryEGLConfig(EGLDisplay display)
          return 0;
      }
      
-#if 1
+#if 0
      // This prints out all the configurations, so it can be quite large
      for (int i=0; i<max_num_config; i++ ) {
          std::cerr << "Config[" << i << "] is:" << i << std::endl;
