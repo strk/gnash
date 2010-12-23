@@ -189,6 +189,24 @@ FBGui::init(int argc, char *** argv)
 {
     GNASH_REPORT_FUNCTION;
 
+    // the current renderer as set on the command line or gnashrc file
+    std::string renderer = _runResources.getRenderBackend();
+
+    // map framebuffer into memory
+    // Create a new Glue layer
+    if (renderer == "agg") {
+        _glue.reset(new FBAggGlue());
+    } else if (renderer == "openvg") {
+        _glue.reset(new FBOvgGlue(0));
+    } else {
+        log_error("No renderer! %s not supported.", renderer);
+    }
+        
+    // Initialize the glue layer between the renderer and the gui toolkit
+    _glue->init(argc, argv);
+
+    disable_terminal();
+    
     // Initialize all the input devices
 
     // Look for Mice that use the PS/2 mouse protocol
@@ -197,7 +215,6 @@ FBGui::init(int argc, char *** argv)
         log_error("Found no accessible input event devices");
     }
     
-#if 0
     // Set "window" size
     _width    = _var_screeninfo.xres;
     _height   = _var_screeninfo.yres;
@@ -231,26 +248,7 @@ FBGui::init(int argc, char *** argv)
     log_debug("X:%d, Y:%d", _xpos, _ypos);
 
     _validbounds.setTo(0, 0, _width - 1, _height - 1);
-#endif
 
-    // the current renderer as set on the command line or gnashrc file
-    std::string renderer = _runResources.getRenderBackend();
-
-    // map framebuffer into memory
-    // Create a new Glue layer
-    if (renderer == "agg") {
-        _glue.reset(new FBAggGlue());
-    } else if (renderer == "openvg") {
-        _glue.reset(new FBOvgGlue(0));
-    } else {
-        log_error("No renderer! %s not supported.", renderer);
-    }
-        
-    // Initialize the glue layer between the renderer and the gui toolkit
-    _glue->init(argc, argv);
-
-    disable_terminal();
-    
     return true;
 }
 
@@ -340,8 +338,16 @@ FBGui::createWindow(const char* /*title*/, int /*width*/, int /*height*/,
                      int /*xPosition*/, int /*yPosition*/)
 {
     GNASH_REPORT_FUNCTION;
+
+#if 0
+    if (_glue) {
+        _glue->prepDrawingArea(0);
+        return true;
+    }
+#endif
+    _runResources.setRenderer(_renderer);
     
-    return true;
+    return false;
 }
 
 bool
