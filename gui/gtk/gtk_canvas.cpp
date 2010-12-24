@@ -25,6 +25,7 @@
 
 #include "gtk_canvas.h"
 #include "Renderer.h"
+#include "GnashException.h"
 #include "rc.h"
 #include "log.h"
 #include "gtk_glue.h"
@@ -289,16 +290,26 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
             } else
 #endif
 #ifdef RENDERER_AGG
-        {
-            canvas->glue.reset(new gnash::GtkAggGlue);
-        }
-#else // ifdef RENDERER_AGG
-            boost::format fmt = boost::format("Support for renderer %1% "
-                                              "was not built") % renderer;
-            throw gnash::GnashException(fmt.str());
-#endif
+                {
+                    canvas->glue.reset(new gnash::GtkAggGlue);
+                }
+#else // end of RENDERER_AGG
+# ifdef RENDERER_OPENVG
             {
+                canvas->glue.reset(new gnash::gui::GtkOvgGlue);
+            }
+# endif // end of RENDERER_OPENVG
+#endif   // end of AGG
+            if (canvas->glue.get()) {
+                boost::format fmt = boost::format("Support for renderer %1% "
+                                                  "was not built") % renderer;
+                throw gnash::GnashException(fmt.str());
+#ifdef RENDERER_AGG
                 canvas->glue.reset(new gnash::GtkAggGlue);
+#endif
+#ifdef RENDERER_OPENVG
+                canvas->glue.reset(new gnash::gui::GtkOvgGlue);
+#endif
             }
         }
         
@@ -307,14 +318,14 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
         // If the renderer with the least dependencies fails, we can't
         // proceed.
         if (!initialized_renderer && (renderer == "agg") &&
-                (hwaccel == "none")) {
+            (hwaccel == "none")) {
             break;
         }
         if (!initialized_renderer) {
             gnash::log_debug("Trying to find new Renderer %s, and HWAccel %s",
                              renderer, hwaccel);
         }
-    }
+    } // end of while initialized_renderer
         
     if (initialized_renderer && (renderer == "opengl" || renderer == "openvg")) {
         // OpenGL glue needs to prepare the drawing area for OpenGL
