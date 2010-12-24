@@ -62,7 +62,7 @@ main(int argc, char *argv[])
         exit(0);
     }
     
-    if (ret && (rfb.getFBHandle() > 0)) {
+    if (ret && (rfb.getHandle() > 0)) {
         runtest.pass("RawFBDevice:InitDevice()");
     } else {
         runtest.fail("RawFBDevice:InitDevice()");

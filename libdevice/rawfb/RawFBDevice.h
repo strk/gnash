@@ -111,7 +111,7 @@ class RawFBDevice : public GnashDevice
 
     boost::uint8_t *getFBMemory() { return _fbmem; };
     size_t getFBMemSize() { return _fixinfo.smem_len; };
-    int getFBHandle() { return _fd; };
+    int getHandle() { return _fd; };
     
     /// Start an RAWFB event loop. This is only used by testing. Note that
     /// calling this function blocks until the specified number of events
