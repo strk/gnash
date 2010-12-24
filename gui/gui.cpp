@@ -413,9 +413,10 @@ Gui::updateStageMatrix()
 void
 Gui::resize_view(int width, int height)
 {
-
-	assert(width>0);
-	assert(height>0);
+    GNASH_REPORT_FUNCTION;
+    
+    assert(width > 0);
+    assert(height > 0);
 
     if (_stage && _started) {
         _stage->setDimensions(width, height);
