@@ -194,17 +194,28 @@ FBGui::init(int argc, char *** argv)
 
     // map framebuffer into memory
     // Create a new Glue layer
+#ifdef RENDERER_AGG
     if (renderer == "agg") {
         _glue.reset(new FBAggGlue());
-    } else if (renderer == "openvg") {
+    } else
+#endif
+#ifdef RENDERER_OPENVG
+        if (renderer == "openvg") {
         _glue.reset(new FBOvgGlue(0));
     } else {
+#endif
         log_error("No renderer! %s not supported.", renderer);
     }
         
     // Initialize the glue layer between the renderer and the gui toolkit
     _glue->init(argc, argv);
 
+    FBOvgGlue *ovg = reinterpret_cast<FBOvgGlue *>(_glue.get());
+    // Set "window" size
+    _width =  ovg->getWidth();
+    _height = ovg->getHeight();
+    log_debug("Width:%d, Height:%d", _width, _height);
+    
     disable_terminal();
     
     // Initialize all the input devices
@@ -215,10 +226,11 @@ FBGui::init(int argc, char *** argv)
         log_error("Found no accessible input event devices");
     }
     
-    // Set "window" size
-    _width    = _var_screeninfo.xres;
-    _height   = _var_screeninfo.yres;
-
+#if 0
+    // FIXME: this allows to draw in a subsection of the screen. OpenVG
+    // should be able to support this, but right now it hust gets in
+    // the way of debugging.
+    
     // Let -j -k override "window" size
     optind = 0; opterr = 0; char c;
     while ((c = getopt (argc, *argv, "j:k:X:Y:")) != -1) {
@@ -237,15 +249,15 @@ FBGui::init(int argc, char *** argv)
                 break;
         }
     }
-
+    
     if ( _xpos < 0 ) _xpos += _var_screeninfo.xres - _width;
     _xpos = clamp<int>(_xpos, 0, _var_screeninfo.xres-_width);
 
     if ( _ypos < 0 ) _ypos += _var_screeninfo.yres - _height;
     _ypos = clamp<int>(_ypos, 0, _var_screeninfo.yres-_height);
 
-    log_debug("Width:%d, Height:%d", _width, _height);
     log_debug("X:%d, Y:%d", _xpos, _ypos);
+#endif
 
     _validbounds.setTo(0, 0, _width - 1, _height - 1);
 
@@ -264,7 +276,7 @@ FBGui::run()
     VirtualClock& timer = getClock();
     
     // let the GUI recompute the x/y scale factors to best fit the whole screen
-//    resize_view(_validbounds.width(), _validbounds.height());
+    resize_view(_validbounds.width(), _validbounds.height());
 
     // This loops endlessly at the frame rate
     while (!terminate_request) {  
@@ -407,11 +419,13 @@ void
 FBGui::setInvalidatedRegion(const SWFRect& bounds)
 {
     // GNASH_REPORT_FUNCTION;
-    
+
+#if 0
      FBAggGlue *fbag = reinterpret_cast
         <FBAggGlue *>(_glue.get());
 
      fbag->setInvalidatedRegion(bounds);
+#endif
 }
 
 void

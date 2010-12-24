@@ -36,6 +36,10 @@
 # include "rawfb/RawFBDevice.h"
 #endif
 
+#ifdef BUILD_EGL_DEVICE
+# include "egl/eglDevice.h"
+#endif
+
 namespace gnash {
 
 namespace gui {
@@ -46,6 +50,7 @@ class FBOvgGlue : public FBGlue
 {
     
 public:
+    FBOvgGlue() {};
     FBOvgGlue(int fd);
 //    FBOvgGlue(int x, int y, int width, int height);
     ~FBOvgGlue();
@@ -66,28 +71,40 @@ public:
     void resize(int width, int height);
     // void render(geometry::Range2d<int>& bounds);
 
-    /// \brief
-    ///  The Width of the drawing area, in pixels. For framebuffer
-    ///  based devices, this is the size of the display screen.
-    int width() { return (_device) ? _device->getWidth() : 0; };
-    
-    /// Height of the drawing area, in pixels. For framebuffer
-    ///  based devices, this is the size of the display screen.
-    int height() { return (_device) ? _device->getHeight() : 0; };
+    // FIXME: these should go away to be replaced by the DeviceGlue
+    // versions of the same methods.
+    // int width() { return (_device) ? _device->getWidth() : 0; };
+    // int height() { return (_device) ? _device->getHeight() : 0; };
+    int width() { return _width; };
+    int height() { return _height; };
 
     // these are used only for debugging purpose to access private data
     size_t getBounds() { return _drawbounds.size(); };
-    // size_t getMemSize() { return _fixinfo.smem_len; };    
-    
+    // size_t getMemSize() { return _fixinfo.smem_len; };
+
 private:
     int         _stride;
+    int         _width;
+    int         _height;
     boost::uint8_t *_offscreenbuf; // FIXME: I think this should go away
     
     //Rectangle _bounds;
     std::vector< geometry::Range2d<int> > _drawbounds;
-    geometry::Range2d<int> _validbounds;
+    geometry::Range2d<int>              _validbounds;
 
-//    renderer::rawfb::RawFBDevice         _framebuffer;
+    
+    // EGL needs it's own display device, as that's how it stays platform
+    // independent. For a Framebuffer we use that, and on the desktop,
+    // well, there really isn't framebuffer support on the desktop because
+    // the X11 server has control of the device. So the X11 glue support
+    // for OpenVG on a fake framebuffer is for development only.
+#ifdef BUILD_RAWFB_DEVICE
+    renderer::rawfb::RawFBDevice        _display;
+#else
+# ifdef BUILD_X11_DEVICE
+    renderer::x11::X11Device            _display;
+# endif
+#endif
 //    boost::scoped_ptr<Renderer> _renderer;
 };
 

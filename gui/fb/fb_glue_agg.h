@@ -98,6 +98,10 @@ public:
     size_t getBounds() { return _drawbounds.size(); };
     size_t getMemSize() { return _fixinfo.smem_len; };
     
+    size_t getWidth()  { return (_Device) ? _Device->getWidth() : 0; };
+    size_t getHeight() { return (_Device) ? _Device->getWidth() : 0; };
+    size_t getDepth()  { return (_Device) ? _Device->getDepth() : 0; };
+    boost::scoped_ptr<renderer::GnashDevice> _Device;
 protected:
     /// This is the file descriptor for the framebuffer memory
     int                      _fd;

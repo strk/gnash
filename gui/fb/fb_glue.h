@@ -46,15 +46,21 @@ namespace gnash {
 namespace gui {
     
 typedef void FbWidget;
-  
+
+/// \class FBGlue
+/// This class is the base class for the glue layer between the GUI toolkit
+/// and the renderer.
 class FBGlue : public DeviceGlue
 {
 public:
-    FBGlue();
-    virtual ~FBGlue();
-    
+    FBGlue() {};
+    virtual ~FBGlue() {};
+
+    /// Initialize the glue layer. This also initializes the Renderer
+    /// and display device.
     virtual bool init(int argc, char **argv[]) = 0;
-    
+
+    // Prepare the drawing area for the renderer
     virtual void prepDrawingArea(FbWidget *drawing_area) = 0;
     virtual Renderer* createRenderHandler() = 0;
     virtual void setRenderHandlerSize(int /*width*/, int /*height*/) {}
@@ -65,16 +71,11 @@ public:
     virtual int width() = 0;
     virtual int height() = 0;
     
-    virtual void render(void* const region);
+    virtual void render(void* const region) {};
 
     virtual void beforeRendering(movie_root *) {};
 
-    size_t getWidth()  { return (_device) ? _device->getWidth() : 0; };
-    size_t getHeight() { return (_device) ? _device->getWidth() : 0; };
-    size_t getDepth()  { return (_device) ? _device->getDepth() : 0; };
-    
 protected:
-    boost::scoped_ptr<renderer::GnashDevice> _device;
     boost::scoped_ptr<Renderer> _renderer;
 };
 

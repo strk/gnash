@@ -55,10 +55,10 @@ FBOvgGlue::init(int /* argc */, char **/*argv*/[])
     GNASH_REPORT_FUNCTION;
 
     bool egl = false;
+#if 0
     bool rawfb = false;
     bool dfb = false;
     bool x11 = false;
-#if 0
     // Probe to see what display devices we have that could be used.
     boost::shared_array<renderer::GnashDevice::dtype_t> devs = probeDevices();
     if (devs) {
@@ -87,52 +87,37 @@ FBOvgGlue::init(int /* argc */, char **/*argv*/[])
                   break;
             }
         }
-#endif
-        egl = true;
 
-#if 0
-        // Now that we know what exists, we have to decide which one to
-        // use, as OpenVG can work with anything. We can only have one
-        // display device operating at a time.
-        if (egl) {
-            setDevice(renderer::GnashDevice::EGL);
-        } else {
-            log_error("OpenVG needs EGL to work!");
-            return false;
-        }
-//    }
-#endif
-        
-//        _device.reset(new renderer::EGLDevice);
-    if (egl) {
-        renderer::EGLDevice egl; //= dynamic_cast<renderer::EGLDevice *>(_device.get());
-        // Initialize the display device
-        egl.initDevice(0, 0);
-        egl.bindClient(renderer::GnashDevice::OPENVG);
-        egl.queryEGLConfig();
-#if 0
-        // EGL still reqires us to open the framebuffer
-        _framebuffer.initDevice(0, 0);
-        // You must pass in the file descriptor to the opened
-        // framebuffer when creating a window
-        egl.attachWindow(_framebuffer.getFBHandle());
-#else
-        char *devname = getenv("FRAMEBUFFER");
-        if (!devname) {
-            devname = (char *)"/dev/fb0";
-            int fd = open(devname, O_RDWR); 
-            // You must pass in the file descriptor to the opened
-            // framebuffer when creating a window
-            if (fd > 0) {
-                egl.attachWindow(fd);
-            } else {
-                log_error("Couldn't attach the Framebuffer!");
-            }
-        }
-#endif
     }
-}
+    
+    // Now that we know what exists, we have to decide which one to
+    // use, as OpenVG can work with anything. We can only have one
+    // display device operating at a time.
+    if (egl) {
+        setDevice(renderer::GnashDevice::EGL);
+    } else {
+        // OpenVG reauires EGL, so if we don't have it, Gnash won't run
+        log_error("OpenVG needs EGL to work!");
+        return false;
+    }
+#endif
 
+    _device.reset(new renderer::EGLDevice(0, 0));
+
+    // Initialize the display device
+    // EGL still reqires us to open the framebuffer
+    _device->bindClient(renderer::GnashDevice::OPENVG);
+    
+    // You must pass in the file descriptor to the opened
+    // framebuffer when creating a window. Under X11, this is
+    // actually the XID of the created window.
+    _display.initDevice(0, 0);
+
+    _width = getWidth();
+    _height = getHeight();
+    
+    return _device->attachWindow(_display.getHandle());
+}
 
 Renderer*
 FBOvgGlue::createRenderHandler()
@@ -174,7 +159,7 @@ FBOvgGlue::render()
 {
     GNASH_REPORT_FUNCTION;
 
-    // SwapBuffer();
+//    _device->swapPbuffer();
 }
 
 } // end of namespace gui
