@@ -93,6 +93,8 @@ class X11Device : public GnashDevice
     bool isNativeRender() { return true; }
 
     Window getDrawableWindow() { return _window; };
+
+    int getHandle() { return _window; };
     
     //
     // Testing Support
