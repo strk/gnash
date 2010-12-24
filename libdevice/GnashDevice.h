@@ -115,8 +115,13 @@ struct GnashDevice
 
     virtual boost::uint8_t *getFBMemory() { return 0; };
     virtual size_t getFBMemSize() { return 0; };
-};
 
+    // bindClient() is used by OpenVG, OpenGLES1, and OpenGLES2
+    // to bind the client type to the EGL surface. This method
+    // is unused by the RawFB, DirectFB, and X11 Devices.
+    virtual bool bindClient(GnashDevice::rtype_t rtype) {};
+};
+    
 } // namespace renderer
 } // namespace gnash
 

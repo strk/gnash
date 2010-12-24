@@ -105,28 +105,28 @@ public:
 #ifdef BUILD_EGL_DEVICE
           case renderer::GnashDevice::EGL:
           {
-              _device.reset(new renderer::EGLDevice);
+              _device.reset(new renderer::EGLDevice(0, 0));
               break;
           }
 #endif
 #ifdef BUILD_RAWFB_DEVICE
           case renderer::GnashDevice::RAWFB:
           {
-              _device.reset(new renderer::rawfb::RawFBDevice);
+              _device.reset(new renderer::rawfb::RawFBDevice(0, 0));
               break;
           }
 #endif
 #ifdef BUILD_DIRECTFB_DEVICE
           case renderer::GnashDevice::DIRECTFB:
           {
-              _device.reset(new renderer::directfb::DirectFBDevice);
+              _device.reset(new renderer::directfb::DirectFBDevice(0, 0));
               break;
           }
 #endif
 #ifdef BUILD_X11_DEVICE
           case renderer::GnashDevice::X11:
           {
-              _device.reset(new renderer::x11::X11Device);
+              _device.reset(new renderer::x11::X11Device(0, 0));
               break;
           }
 #endif
@@ -140,11 +140,26 @@ public:
         // egl->printEGLSurface();
     }
 
-    bool initDevice(int argc, char *argv[]) { return
-            _device->initDevice(argc, argv); };
+    bool initDevice(int argc, char *argv[]) {
+        return (_device) ? _device->initDevice(argc, argv) : false;
+    };
 
-    bool attachWindow(renderer::GnashDevice::native_window_t window) { return
-            _device->attachWindow(window); };
+    bool attachWindow(renderer::GnashDevice::native_window_t window) {
+        return (_device) ? _device->attachWindow(window) : false;
+    };
+
+    bool bindClient(renderer::GnashDevice::rtype_t rtype) {
+        return (_device) ? _device->bindClient(rtype) : false;
+    };
+
+    /// \brief
+    ///  The Width of the drawing area, in pixels. For framebuffer
+    ///  based devices, this is the size of the display screen.
+    size_t getWidth()  { return (_device) ? _device->getWidth() : 0; };
+
+    /// Height of the drawing area, in pixels. For framebuffer
+    ///  based devices, this is the size of the display screen.
+    size_t getHeight() { return (_device) ? _device->getHeight() : 0; };
     
 protected:
     boost::scoped_ptr<renderer::GnashDevice> _device;
