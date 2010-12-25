@@ -171,7 +171,7 @@ public:
     void checkForData();
     
 private:
-    bool initialize_renderer();
+    // bool initialize_renderer();
     
     /// Tries to find a accessible tty
     char* find_accessible_tty(int no);
@@ -198,6 +198,8 @@ private:
 
     /// This is the array of functioning input devices.
     std::vector<boost::shared_ptr<InputDevice> > _inputs;    
+
+    boost::shared_ptr<Renderer> _renderer;
 };
 
 } // end of namespace gui
