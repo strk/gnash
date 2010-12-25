@@ -16,7 +16,9 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 ///
-/// Author: Visor <cutevisor@gmail.com>
+/// Original Author: Visor <cutevisor@gmail.com>.
+/// Heavily hacked by Rob <rob@welcomehome.org> to work with Gnash
+/// gitmaster.
 ///
 
 #ifndef GNASH_RENDER_HANDLER_OVG_H
@@ -32,6 +34,7 @@
 //#include "directfb/DirectFBDevice.h"
 #include "GnashDevice.h"
 #include "CachedBitmap.h"
+#include "FillStyle.h"
 
 #include <VG/vgu.h>
 #ifdef OPENVG_VERSION_1_1
@@ -51,6 +54,11 @@ class GnashImage;
 namespace renderer {
 
 namespace openvg {
+
+namespace {
+    const CachedBitmap* createGradientBitmap(const GradientFill& gf,
+            Renderer& renderer);
+}
 
 typedef std::vector<const Path*> PathRefs;
 typedef std::vector<Path> PathVec;
@@ -80,7 +88,7 @@ public:
     geometry::Range2d<int> world_to_pixel(const geometry::Range2d<float>& wb);
     gnash::point pixel_to_world(int, int);
 
-    // this is in Render
+    // this is in master
     void begin_display(const gnash::rgba&, int, int, float,
                                         float, float, float);
     // This is from the patch
@@ -96,12 +104,10 @@ public:
     void drawPoly(const point* corners, size_t corner_count, 
                   const rgba& fill, const rgba& outline,
                   const SWFMatrix& mat, bool masked);
-    // this is in Render
+    // this is in master
     void drawShape(const gnash::SWF::ShapeRecord&,
                                     const gnash::Transform&);
     // This is from the patch
-    void drawShape(const SWF::ShapeRecord& shape, const SWFCxForm& cx,
-                   const SWFMatrix& mat);
     void drawGlyph(const SWF::ShapeRecord& rec, const rgba& c,
                    const SWFMatrix& mat);
 
@@ -129,38 +135,16 @@ public:
     
 #if 0
     // These are all required by the Render class
-    void drawLine(const std::vector<point>& coords, const rgba& color,
-                          const SWFMatrix& mat);
-
     void draw_poly(const point* corners, size_t corner_count,
                            const rgba& fill, const rgba& outline,
                            const SWFMatrix& mat, bool masked);
-    void drawGlyph(const SWF::ShapeRecord& rec, const rgba& color,
-                   const SWFMatrix& mat);
     void drawVideoFrame(gnash::image::GnashImage*, const gnash::Transform&,
                         const gnash::SWFRect*, bool);
-    void drawShape(const gnash::SWF::ShapeRecord&,
-                                    const gnash::Transform&);
 
     void renderToImage(boost::shared_ptr<IOChannel> io,FileType type);
     void set_invalidated_regions(const InvalidatedRanges& ranges);
     
     void begin_submit_mask();
-    void end_submit_mask();
-    void disable_mask();
-
-    gnash::geometry::Range2d<int> world_to_pixel(const gnash::SWFRect&);
-    gnash::point pixel_to_world(int, int);
-    void begin_display(const gnash::rgba&, int, int, float,
-                                        float, float, float);
-    void end_display();
-    Renderer *startInternalRender(gnash::image::GnashImage&);
-    void endInternalRender();
-    unsigned int getBitsPerPixel();
-
-    bool getPixel(rgba& color_return, int x, int y);
-
-    bool initTestBuffer(unsigned width, unsigned height);
 #endif
   private:
     void draw_mask(const PathVec& path_vec);
@@ -176,9 +160,11 @@ public:
                        bool& have_outline);
     void apply_fill_style(const FillStyle& style, const SWFMatrix& /* mat */,
                           const SWFCxForm& cx);
-    bool apply_line_style(const LineStyle& style, const SWFCxForm& cx, const SWFMatrix& mat);
+    bool apply_line_style(const LineStyle& style, const SWFCxForm& cx,
+                          const SWFMatrix& mat);
     void draw_outlines(const PathVec& path_vec, const SWFMatrix& mat,
-                       const SWFCxForm& cx, const std::vector<LineStyle>& line_styles);
+                       const SWFCxForm& cx, const std::vector<
+                       LineStyle>& line_styles);
     std::list<PathPtrVec> get_contours(const PathPtrVec &paths);
     PathPtrVec paths_by_style(const PathVec& path_vec, unsigned int style);
     std::vector<PathVec::const_iterator> find_subshapes(const PathVec& path_vec);

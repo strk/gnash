@@ -35,6 +35,7 @@
 #include "GnashImage.h"
 #include "GnashNumeric.h"
 #include "FillStyle.h"
+#include "Transform.h"
 #include "log.h"
 #include "utility.h"
 #include "Range2d.h"
@@ -165,21 +166,26 @@ preparepath(VGPath path, const std::vector<Edge>& edges,
 
 // Use the image class copy constructor; it's not important any more
 // what kind of image it is.
-bitmap_info_ovg::bitmap_info_ovg(gnash::image::GnashImage* img,
-                                        VGImageFormat pixelformat, VGPaint paint) 
-    :
-    _img(img),
+bitmap_info_ovg::bitmap_info_ovg(std::auto_ptr<gnash::image::GnashImage> img,
+                                 VGImageFormat pixelformat, VGPaint paint)
+:
+    _img(img.release()),
     _pixel_format(pixelformat),
-    _paint(paint)
+    _paint(paint),
+    _orig_width(_img->width()),
+    _orig_height(_img->height())
 {
+    GNASH_REPORT_FUNCTION;
+
     _width = _img->width();
     _height = _img->height();
   
-    if (_pixel_format == VG_sARGB_8888)
+    if (_pixel_format == VG_sARGB_8888) {
         _image = vgCreateImage(VG_sARGB_8888, _width, _height, GNASH_IMAGE_QUALITY);    
     
-    // vgImageSubData(_image, _img->data(), _width * 4, VG_sARGB_8888,
-    //                0, 0, _width, _height); FIXME
+        vgImageSubData(_image, _img->begin(), _width * 4, VG_sARGB_8888,
+                       0, 0, _width, _height);
+    }
     
     tex_size += _width * _height * 4;
     log_debug("Add Texture size:%d (%d x %d x %dbpp)", _width * _height * 4, _width, _height, 4);
@@ -188,6 +194,7 @@ bitmap_info_ovg::bitmap_info_ovg(gnash::image::GnashImage* img,
     
 bitmap_info_ovg::~bitmap_info_ovg()
 {
+    GNASH_REPORT_FUNCTION;
     tex_size -= _width * _height * 4;
     log_debug(_("Remove Texture size:%d (%d x %d x %dbpp)"), _width * _height * 4, _width, _height, 4);
     log_debug(_("Current Texture size: %d"), tex_size);
@@ -199,6 +206,7 @@ void
 bitmap_info_ovg::apply(const gnash::SWFMatrix& bitmap_matrix,
                        bitmap_wrap_mode wrap_mode) const
 {
+    GNASH_REPORT_FUNCTION;
     gnash::SWFMatrix mat;
     VGfloat     vmat[9];
     
@@ -267,23 +275,7 @@ void
 Renderer_ovg::init(float x, float y)
 {
     GNASH_REPORT_FUNCTION;
-#if 0
-    static const VGubyte sqrCmds[5] = {VG_MOVE_TO_ABS, VG_HLINE_TO_ABS, VG_VLINE_TO_ABS, VG_HLINE_TO_ABS, VG_CLOSE_PATH};
-    static const VGfloat sqrCoords[5]   = {50.0f, 50.0f, 250.0f, 250.0f, 50.0f};
-    path = vgCreatePath(VG_PATH_FORMAT_STANDARD, VG_PATH_DATATYPE_F, 1, 0, 0, 0,
-                        VG_PATH_CAPABILITY_APPEND_TO);
-    vgAppendPathData(path, 5, sqrCmds, sqrCoords);
-    
-    fill = vgCreatePaint();
-    vgSetParameterfv(fill, VG_PAINT_COLOR, 4, color);
-    vgSetPaint(fill, VG_FILL_PATH);
-    
-    vgSetfv(VG_CLEAR_COLOR, 4, white_color);
-    vgSetf(VG_STROKE_LINE_WIDTH, 10);
-    vgSeti(VG_STROKE_CAP_STYLE, VG_CAP_BUTT);
-    vgSeti(VG_STROKE_JOIN_STYLE, VG_JOIN_ROUND);
-    vgSetf(VG_STROKE_MITER_LIMIT, 4.0f);
-#else
+
     _display_width = x;
     _display_height = y;
     
@@ -299,7 +291,7 @@ Renderer_ovg::init(float x, float y)
 #ifdef OPENVG_VERSION_1_1    
     m_mask = vgCreateMaskLayer(x, y);
 #endif
-#endif
+
     log_debug("VG Vendor is %s, VG Version is %s, VG Renderer is %s",
               vgGetString(VG_VENDOR), vgGetString(VG_VERSION),
               vgGetString(VG_RENDERER));
@@ -309,6 +301,8 @@ Renderer_ovg::init(float x, float y)
 
 Renderer_ovg::~Renderer_ovg()
 {
+    GNASH_REPORT_FUNCTION;
+
     vgDestroyPaint(m_fillpaint);
     vgDestroyPaint(m_strokepaint);
 #ifdef OPENVG_VERSION_1_1    
@@ -327,13 +321,17 @@ Renderer_ovg::createCachedBitmap(std::auto_ptr<image::GnashImage> im)
     // OpenVG don't support 24bit RGB, need translate colorspace
     switch (im->type()) {
       case image::TYPE_RGBA:   
-//          return new bitmap_info_ovg(im.get(), VG_sARGB_8888, m_fillpaint);
+          return new bitmap_info_ovg(im, VG_sARGB_8888, m_fillpaint);
           break;
       case image::TYPE_RGB:
-          break;
       default:
+          log_error("Can't create a cached bitmap! Unsuppored type: %d",
+                    im->type());
           std::abort();
     }
+
+   const CachedBitmap* bi = createCachedBitmap(
+                    static_cast<std::auto_ptr<image::GnashImage> >(im));
 
     return 0;
 }
@@ -406,7 +404,7 @@ Renderer_ovg::begin_display(const rgba& /* bg_color */, int /* viewport_x0 */,
                             int /* viewport_height */, float x0, float x1,
                             float y0, float y1)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     vgSeti (VG_MASKING, VG_FALSE);
     
@@ -421,13 +419,12 @@ Renderer_ovg::begin_display(const rgba& /* bg_color */, int /* viewport_x0 */,
     
     vgSeti (VG_MATRIX_MODE, VG_MATRIX_PATH_USER_TO_SURFACE);
     vgLoadMatrix (mat);
-}
+ }
 
 void
 Renderer_ovg::end_display()
 {
-    GNASH_REPORT_FUNCTION;
-    
+//    GNASH_REPORT_FUNCTION;
 }
 
 /// Draw a line-strip directly, using a thin, solid line. 
@@ -628,20 +625,22 @@ Renderer_ovg::apply_mask()
 void
 Renderer_ovg::add_paths(const PathVec& path_vec)
 {
+    GNASH_REPORT_FUNCTION;
     SWFCxForm dummy_cx;
-#if 0
-  FIXME:
     
-    FillStyle coloring
-        coloring.setSolid(rgba(0,255,0,255));
-    
-    draw_submask(path_vec, SWFMatrix(), dummy_cx, coloring);
+#if 0                           // original
+    FillStyle coloring = SolidFill(rgba(0,255,0,255));
+#else
+    FillStyle coloring = FillStyle(SolidFill(rgba(0, 255, 0, 255)));
 #endif
+
+    draw_submask(path_vec, SWFMatrix(), dummy_cx, coloring);
 }
 
 void
 Renderer_ovg::disable_mask()
 {
+    GNASH_REPORT_FUNCTION;
     _masks.pop_back();
     
     if (_masks.empty()) {
@@ -727,6 +726,7 @@ Renderer_ovg::find_connecting_path(const Path& to_connect,
 PathVec
 Renderer_ovg::normalize_paths(const PathVec &paths)
 {
+    GNASH_REPORT_FUNCTION;
     PathVec normalized;
     
     for (PathVec::const_iterator it = paths.begin(), end = paths.end();
@@ -774,6 +774,7 @@ void
 Renderer_ovg::analyze_paths(const PathVec &paths, bool& have_shape,
                             bool& have_outline) 
 {
+    GNASH_REPORT_FUNCTION;
     have_shape=false;
     have_outline=false;
     
@@ -800,9 +801,11 @@ void
 Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& /* mat */,
                                const SWFCxForm& cx)
 {
+    GNASH_REPORT_FUNCTION;
+
 #if 0
-    FIXME fill_style changed to FillStyle
-        int fill_type = style.get_type();
+    //    FIXME fill_style changed to FillStyle
+    SWF::FillType fill_type = SWF::FILL_SOLID; // style.get_type();
     
     switch (fill_type) {
         
@@ -810,13 +813,18 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& /* mat *
       case SWF::FILL_RADIAL_GRADIENT:
       case SWF::FILL_FOCAL_GRADIENT:
       {
+          gnash::GradientFill f();
           const bitmap_info_ovg* binfo = static_cast<const bitmap_info_ovg*>(
-              style.need_gradient_bitmap(*this));       
-          
+#if 0                           // original
+              style.need_gradient_bitmap(*this));   
+#else
+          createGradientBitmap(&f, *this));
+#endif
           binfo->apply(style.getGradientMatrix(), bitmap_info_ovg::WRAP_CLAMP); 
           vgSetParameteri (m_fillpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
           break;
-      }        
+      }
+#if 0
       case SWF::FILL_TILED_BITMAP_HARD:
       case SWF::FILL_TILED_BITMAP:
       {
@@ -838,7 +846,7 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& /* mat *
           vgSetParameteri (m_fillpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
           break;
       } 
-      
+#endif 
       case SWF::FILL_SOLID:
       {
           rgba c = cx.transform(style.get_color());
@@ -860,6 +868,7 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& /* mat *
 bool
 Renderer_ovg::apply_line_style(const LineStyle& style, const SWFCxForm& cx, const SWFMatrix& mat)
 {
+    GNASH_REPORT_FUNCTION;
     
     bool rv = true;
     
@@ -938,6 +947,7 @@ void
 Renderer_ovg::draw_outlines(const PathVec& path_vec, const SWFMatrix& mat,
                             const SWFCxForm& cx, const std::vector<LineStyle>& line_styles)
 {
+    GNASH_REPORT_FUNCTION;
     for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
          it != end; ++it) {
         
@@ -966,6 +976,7 @@ Renderer_ovg::draw_outlines(const PathVec& path_vec, const SWFMatrix& mat,
 std::list<PathPtrVec>
 Renderer_ovg::get_contours(const PathPtrVec &paths)
 {
+    GNASH_REPORT_FUNCTION;
     std::list<const Path*> path_refs;
     std::list<PathPtrVec> contours;
     
@@ -1013,6 +1024,7 @@ Renderer_ovg::get_contours(const PathPtrVec &paths)
 void
 Renderer_ovg::draw_mask(const PathVec& path_vec)
 { 
+    GNASH_REPORT_FUNCTION;
    
     for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
          it != end; ++it) {
@@ -1184,11 +1196,13 @@ Renderer_ovg::draw_submask(const PathVec& path_vec,
 //  b. Apply fill style.
 //  c. Feed the contours in the tesselator. (Render.)
 //  d. Draw outlines for every path in the subshape with a line style.
-
+// FIMXE: this doesn't work anymore as the API has changed.
 void
-Renderer_ovg::drawShape(const SWF::ShapeRecord& shape, const SWFCxForm& cx,
-                        const SWFMatrix& mat)
+Renderer_ovg::drawShape(gnash::SWF::ShapeRecord const &shape, 
+                        gnash::Transform const& xform)
 {
+    //    GNASH_REPORT_FUNCTION;
+
     const PathVec& path_vec = shape.paths();
     
     if (!path_vec.size()) {
@@ -1197,7 +1211,7 @@ Renderer_ovg::drawShape(const SWF::ShapeRecord& shape, const SWFCxForm& cx,
     }
     if (_drawing_mask) {
         PathVec scaled_path_vec = path_vec;
-        apply_matrix_to_paths(scaled_path_vec, mat);
+        apply_matrix_to_paths(scaled_path_vec, xform.matrix);
         draw_mask(scaled_path_vec); 
         return;
     }    
@@ -1210,7 +1224,7 @@ Renderer_ovg::drawShape(const SWF::ShapeRecord& shape, const SWFCxForm& cx,
         return;
     }    
     
-    eglScopeMatrix scope_mat(mat);
+    eglScopeMatrix scope_mat(xform.matrix);
     
     std::vector<PathVec::const_iterator> subshapes = find_subshapes(path_vec);
     
@@ -1226,8 +1240,8 @@ Renderer_ovg::drawShape(const SWF::ShapeRecord& shape, const SWFCxForm& cx,
             subshape_paths.push_back(*subshapes[i]);
         }
         
-        draw_subshape(subshape_paths, mat, cx, fill_styles,
-                      line_styles);
+        draw_subshape(subshape_paths, xform.matrix, xform.colorTransform,
+                      fill_styles, line_styles);
     }
 }
 
@@ -1235,6 +1249,8 @@ void
 Renderer_ovg::drawGlyph(const SWF::ShapeRecord& rec, const rgba& c,
                         const SWFMatrix& mat)
 {
+    GNASH_REPORT_FUNCTION;
+
     if (_drawing_mask) abort();
     
     if (rec.getBounds().is_null()) {
@@ -1244,13 +1260,14 @@ Renderer_ovg::drawGlyph(const SWF::ShapeRecord& rec, const rgba& c,
     SWFCxForm dummy_cx;
     std::vector<FillStyle> glyph_fs;
     
-#if 0
-    FIXME fill_style is now FillStyle
-        FillStyle coloring;
-    coloring.setSolid(c);
-    
-    glyph_fs.push_back(coloring);
+#if 0                           // original
+    FillStyle coloring = SolidFill(c);
+#else
+    FillStyle coloring = FillStyle(SolidFill(c));
 #endif
+
+    glyph_fs.push_back(coloring);
+
     std::vector<LineStyle> dummy_ls;
     
     eglScopeMatrix scope_mat(mat);
@@ -1275,6 +1292,8 @@ Renderer_ovg::set_invalidated_regions(const InvalidatedRanges& /* ranges */)
 DSOEXPORT Renderer *
 create_handler(const char */* pixelformat */)
 {
+    GNASH_REPORT_FUNCTION;
+
     Renderer_ovg *renderer = new Renderer_ovg;
     return renderer;
 }
@@ -1532,6 +1551,7 @@ Renderer_ovg::printVGParams()
 bool
 Renderer_ovg::initTestBuffer(unsigned int width, unsigned int height)
 {
+    GNASH_REPORT_FUNCTION;
     int size = width * height * getBitsPerPixel(); // FIXME was Bytes not bits
 
 #if 0
@@ -1558,6 +1578,7 @@ Renderer_ovg::initTestBuffer(unsigned int width, unsigned int height)
 void
 Renderer_ovg::init_buffer(unsigned char *mem, int size, int x, int y, int rowstride)
 {
+    GNASH_REPORT_FUNCTION;
 #if 0
     assert(x > 0);
     assert(y > 0);
@@ -1579,28 +1600,25 @@ Renderer_ovg::init_buffer(unsigned char *mem, int size, int x, int y, int rowstr
 Renderer *
 Renderer_ovg::startInternalRender(gnash::image::GnashImage&)
 {
-    
+    // GNASH_REPORT_FUNCTION;
 }
 
 void
 Renderer_ovg::endInternalRender()
 {
-    
+    // GNASH_REPORT_FUNCTION;    
 }
 
 void
-Renderer_ovg::drawShape(gnash::SWF::ShapeRecord const&, gnash::Transform const&)
-{
-}
-void
 Renderer_ovg::begin_display(gnash::rgba const&, int, int, float, float, float, float)
 {
+    GNASH_REPORT_FUNCTION;
 
 }
 void
 Renderer_ovg::drawVideoFrame(gnash::image::GnashImage*, gnash::Transform const&, gnash::SWFRect const*, bool)
 {
-
+    GNASH_REPORT_FUNCTION;
 }
 
 unsigned int

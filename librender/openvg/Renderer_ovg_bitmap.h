@@ -23,7 +23,7 @@
 #define GNASH_RENDER_HANDLER_OVG_BITMAP_H
 
 #include "Geometry.h"
-//#include "BitmapInfo.h"
+#include "CachedBitmap.h"
 #include "GnashImage.h"
 #include "Renderer.h"
 
@@ -33,11 +33,7 @@ namespace renderer {
 
 namespace openvg {
 
-/// The class itself uses a template. Currently this is unnecessary and it may
-/// be removed but an older implementation required this method and it may be
-/// necessary again when the last missing parts of the renderer will be
-/// implemented. And when might that be? I don't think I'll wait.
-class bitmap_info_ovg // : public BitmapInfo
+class bitmap_info_ovg : public CachedBitmap
 {
 public:
   
@@ -48,21 +44,56 @@ public:
         WRAP_CLAMP
     };
     
-    bitmap_info_ovg(image::GnashImage* img, VGImageFormat pixelformat, VGPaint paint);
+    bitmap_info_ovg(std::auto_ptr<image::GnashImage> img,
+                    VGImageFormat pixelformat, VGPaint paint);
     ~bitmap_info_ovg();
+
+    void dispose() {
+        _img.reset();
+    }
+
+    bool disposed() const {
+        return !_img.get();
+    }
 
     void apply(const gnash::SWFMatrix& bitmap_matrix,
                bitmap_wrap_mode wrap_mode) const;
 
+    virtual image::GnashImage& image() {
+        GNASH_REPORT_FUNCTION;
+        if (_cache.get()) {
+            return *_cache;
+        }
+        log_error("Image not cached!");
+#if 0
+        switch (_pixel_format) {
+            case GL_RGB:
+                _cache.reset(new image::ImageRGB(_orig_width, _orig_height));
+                break;
+            case GL_RGBA:
+                _cache.reset(new image::ImageRGBA(_orig_width, _orig_height));
+                break;
+            default:
+                std::abort();
+        }
+#endif
+        std::fill(_cache->begin(), _cache->end(), 0xff);
+
+        return *_cache;
+    }
+    
     int _width;
     int _height;
 
 private:
     
-    mutable image::GnashImage *_img;
+    mutable boost::scoped_ptr<image::GnashImage> _img;
+    mutable boost::scoped_ptr<image::GnashImage> _cache;
     VGImageFormat   _pixel_format;
     mutable VGImage _image;
     VGPaint         _paint;
+    size_t          _orig_width;
+    size_t          _orig_height;
 };
 
 } // namespace gnash::renderer::openvg
