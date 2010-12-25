@@ -196,7 +196,7 @@ class EGLDevice : public GnashDevice
     // EGL_SINGLE_BUFFER then this has no effect, as the display was drawn to
     // directly.
     // Swap to the default surface
-    bool swapPbuffers() {
+    bool swapBuffers() {
         return eglSwapBuffers(_eglDisplay, _eglSurface);
     }
     bool copyPbuffers(size_t x) {

@@ -404,13 +404,13 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
 
     // Since we're EGL_SINGLE_BUFFER'd, this is a nop
     if (hwinit) {
-        if (egl.swapPbuffers()) {
-            runtest.pass("EGLDevice::swapPbuffers()");
+        if (egl.swapBuffers()) {
+            runtest.pass("EGLDevice::swapBuffers()");
         } else {
-            runtest.fail("EGLDevice::swapPbuffers()");
+            runtest.fail("EGLDevice::swapBuffers()");
         }
     } else {
-        runtest.untested("EGLDevice::swapPbuffers()");
+        runtest.untested("EGLDevice::swapBuffers()");
     }
 
     egl.makePbufferCurrent(1);

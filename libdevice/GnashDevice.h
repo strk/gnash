@@ -120,6 +120,8 @@ struct GnashDevice
     // to bind the client type to the EGL surface. This method
     // is unused by the RawFB, DirectFB, and X11 Devices.
     virtual bool bindClient(GnashDevice::rtype_t rtype) {};
+    
+    virtual bool swapBuffers() {};
 };
     
 } // namespace renderer
