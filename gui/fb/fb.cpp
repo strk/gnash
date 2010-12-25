@@ -117,6 +117,7 @@
 #endif
 
 #ifdef RENDERER_OPENVG
+# include "openvg/Renderer_ovg.h"
 # include "fb_glue_ovg.h"
 #endif
 
@@ -261,6 +262,12 @@ FBGui::init(int argc, char *** argv)
 
     _validbounds.setTo(0, 0, _width - 1, _height - 1);
 
+    _renderer.reset(renderer::openvg::create_handler(0));
+  
+    renderer::openvg::Renderer_ovg *rend = reinterpret_cast
+        <renderer::openvg::Renderer_ovg *>(_renderer.get());
+    rend->init(_width, _height);
+
     return true;
 }
 
@@ -304,7 +311,7 @@ FBGui::run()
             break;
         }
     }
-  
+
     return true;
 }
 
@@ -357,6 +364,7 @@ FBGui::createWindow(const char* /*title*/, int /*width*/, int /*height*/,
         return true;
     }
 #endif
+    
     _runResources.setRenderer(_renderer);
     
     return false;

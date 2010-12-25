@@ -23,6 +23,7 @@
 #include "log.h"
 #include "fb_glue_ovg.h"
 #include "GnashDevice.h"
+#include "GnashException.h"
 
 #ifdef BUILD_EGL_DEVICE
 # include <egl/eglDevice.h>
@@ -115,8 +116,30 @@ FBOvgGlue::init(int /* argc */, char **/*argv*/[])
 
     _width = getWidth();
     _height = getHeight();
-    
+
+#if 1
     return _device->attachWindow(_display.getHandle());
+#endif
+    _device->attachWindow(_display.getHandle());
+
+    float red_color[4] = {1.0, 0.0, 0.0, 1.0};
+    float blue_color[4] = {0.0, 0.0, 1.0, 1.0};
+
+    VGint scissor[4] = {100, 100, 25, 25};
+    vgSetfv(VG_CLEAR_COLOR, 4, red_color);
+    vgClear(0, 0, _width, _height);
+
+    vgSetfv(VG_CLEAR_COLOR, 4, blue_color);
+    vgClear(50, 50, 50, 50);
+
+    //vgSetiv(VG_SCISSOR_RECTS, 4, scissor);
+    //vgSeti(VG_SCISSORING, VG_TRUE);
+    vgCopyPixels(100, 100, 50, 50, 50, 50);
+    vgClear(150, 150, 50, 50);
+
+    _device->swapBuffers();
+
+    return true;
 }
 
 Renderer*
@@ -132,6 +155,12 @@ FBOvgGlue::createRenderHandler()
         log_debug("Renderer is: %s", _renderer->description());
     }
     
+    if (!_renderer) {
+        boost::format fmt = boost::format(
+            _("Could not create OPENVG renderer"));
+        throw GnashException(fmt.str());
+    }
+
     return _renderer.get();
 }
 
@@ -159,7 +188,7 @@ FBOvgGlue::render()
 {
     GNASH_REPORT_FUNCTION;
 
-//    _device->swapPbuffer();
+    _device->swapBuffers();
 }
 
 } // end of namespace gui

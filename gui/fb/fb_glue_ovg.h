@@ -105,7 +105,7 @@ private:
     renderer::x11::X11Device            _display;
 # endif
 #endif
-//    boost::scoped_ptr<Renderer> _renderer;
+    //    boost::scoped_ptr<Renderer> _renderer;
 };
 
 } // end of namespace gui
