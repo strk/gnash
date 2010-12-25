@@ -103,7 +103,7 @@ TouchDevice::init(const std::string &filespec, size_t /* size */)
 bool
 TouchDevice::check()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     // Read events from the touchscreen and transport them into Gnash
     // Tslib should be setup so the output is pretty clean.
@@ -157,7 +157,16 @@ TouchDevice::apply_ts_calibration(float* cx, float* cy, int rawx, int rawy)
     // it is described in http://www.embedded.com/story/OEG20020529S0046
     
     float k,a,b,c,d,e,f;
-    
+
+#if 1
+    float ref0x = 800 / 5 * 1;
+    float ref0y = 480 / 5 * 1;
+    float ref1x = 800 / 5 * 4;
+
+    float ref1y = 480  / 5 * 1;
+    float ref2x = 800  / 5 * 1;
+    float ref2y = 480  / 5 * 4;
+#else   
     float ref0x = _gui->getStage()->getStageWidth() / 5 * 1;
     float ref0y = _gui->getStage()->getStageHeight() / 5 * 1;
     float ref1x = _gui->getStage()->getStageWidth() / 5 * 4;
@@ -165,7 +174,7 @@ TouchDevice::apply_ts_calibration(float* cx, float* cy, int rawx, int rawy)
     float ref1y = _gui->getStage()->getStageHeight() / 5 * 1;
     float ref2x = _gui->getStage()->getStageWidth() / 5 * 4;
     float ref2y = _gui->getStage()->getStageHeight() / 5 * 4;
-  
+#endif
     static float cal0x = 2048/5*1;   // very approximative default values
     static float cal0y = 2048/5*4;
     static float cal1x = 2048/5*1;
