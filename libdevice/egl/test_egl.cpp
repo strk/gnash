@@ -144,7 +144,10 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
 
     // Init'ing to zero uses the root screen as the display. Otherwise
     // the argument should be an EGLNativeWindowType.
-    int fd = open("/dev/fb0", O_RDWR);
+    int fd = 0;
+#ifndef BUILD_X11_DEVICE
+    fd = open("/dev/fb0", O_RDWR);
+#endif
     if (egl.attachWindow(fd)) {
         runtest.pass("EGLDevice::attachWindow(0)");
     } else {

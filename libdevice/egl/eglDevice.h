@@ -25,6 +25,7 @@
 #endif
 
 #include <boost/scoped_array.hpp>
+#include <boost/scoped_ptr.hpp>
 
 #ifdef HAVE_X11_X_H
 #include "x11/X11Device.h"
@@ -183,6 +184,7 @@ class EGLDevice : public GnashDevice
     void printEGLContext(EGLContext context);
     void printEGLSurface() { return printEGLSurface(_eglSurface); };
     void printEGLSurface(EGLSurface surface);
+    void printEGLAttribs(const EGLint *attrib);
     
     // Create Pbuffers for offscreen rendering
     EGLSurface createPbuffer(int width, int height);
@@ -197,9 +199,11 @@ class EGLDevice : public GnashDevice
     // directly.
     // Swap to the default surface
     bool swapBuffers() {
+        GNASH_REPORT_FUNCTION;
         return eglSwapBuffers(_eglDisplay, _eglSurface);
     }
     bool copyPbuffers(size_t x) {
+        GNASH_REPORT_FUNCTION;
         if (x < _pbuffers.size()) {
             NativePixmapType pix;
             if (!eglCopyBuffers(_eglDisplay, _pbuffers[x], pix)) {
@@ -341,6 +345,7 @@ class EGLDevice : public GnashDevice
         return value;
     }
     
+    void setAttrib(int bpp);
 protected:
     EGLConfig           _eglConfig;
     EGLContext          _eglContext;
@@ -350,6 +355,7 @@ protected:
     EGLNativeWindowType _nativeWindow;
     EGLNativePixmapType _nativePixmap;
     EGLint              _max_num_config;
+    const EGLint       *_attrib;
     unsigned int        _bpp;
     std::vector<EGLSurface> _pbuffers;
 };

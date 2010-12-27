@@ -89,6 +89,16 @@ static EGLint const attrib16_list[] = {
     EGL_NONE
 };
 
+// These are the same EGL config settings as used by the Mesa
+// examples, which run on X11
+static const EGLint attrib1_list[] = {
+    EGL_RED_SIZE, 1,
+    EGL_GREEN_SIZE, 1,
+    EGL_BLUE_SIZE, 1,
+    EGL_RENDERABLE_TYPE, EGL_OPENVG_BIT,
+    EGL_NONE
+};
+
 const EGLint window_attrib_list[] = {
     // Back buffering is used for window and pbuffer surfaces. Windows
     // require eglSwapBuffers() to become visible, and pbuffers don't.   
@@ -164,10 +174,13 @@ EGLDevice::EGLDevice()
 #endif
 {
     GNASH_REPORT_FUNCTION;
+    
+    setAttrib(_bpp);
 }
 
 EGLDevice::EGLDevice(int argc, char *argv[])
-    : _eglConfig(0),
+    :  _attrib(0),
+       _eglConfig(0),
       _eglContext(EGL_NO_CONTEXT),
       _eglSurface(EGL_NO_SURFACE),
       _eglDisplay(EGL_NO_DISPLAY),
@@ -180,13 +193,17 @@ EGLDevice::EGLDevice(int argc, char *argv[])
 #endif
 {
     GNASH_REPORT_FUNCTION;
+
+    setAttrib(_bpp);
+
     if (!initDevice(argc, argv)) {
         log_error("Couldn't initialize EGL device!");
     }
 }
 
 EGLDevice::EGLDevice(GnashDevice::rtype_t rtype)
-    : _eglConfig(0),
+    :  _attrib(0),
+       _eglConfig(0),
       _eglContext(EGL_NO_CONTEXT),
       _eglSurface(EGL_NO_SURFACE),
       _eglDisplay(EGL_NO_DISPLAY),
@@ -200,11 +217,29 @@ EGLDevice::EGLDevice(GnashDevice::rtype_t rtype)
 {
     GNASH_REPORT_FUNCTION;
     
+    setAttrib(_bpp);
+
     if (!initDevice(0, 0)) {
         log_error("Couldn't initialize EGL device!");
     }
     if (!bindClient(rtype)) {
         log_error("Couldn't bind client to type %d!", rtype);
+    }
+}
+
+void
+EGLDevice::setAttrib(int bpp)
+{ 
+    switch (bpp) {
+    case 32:
+        _attrib = attrib32_list;
+        break;
+    case 16:
+        _attrib = attrib16_list;
+        break;
+    case 1:
+        _attrib = attrib1_list;
+        break;
     }
 }
 
@@ -225,9 +260,6 @@ EGLDevice::~EGLDevice()
         
         if (_eglSurface != EGL_NO_SURFACE)
             eglDestroySurface(_eglDisplay, _eglSurface);
-        
-        // if (_eglwin_native)
-        //     free(_eglwin_native);
         
         eglTerminate(_eglDisplay);
     }
@@ -252,7 +284,9 @@ bool
 EGLDevice::initDevice(int argc, char *argv[])
 {
     EGLDevice::rtype_t rtype;
-    
+
+    dbglogfile.setVerbosity(2);
+
     GNASH_REPORT_FUNCTION;
     
     // see egl_config.c for a list of supported configs, this looks for
@@ -277,8 +311,8 @@ EGLDevice::initDevice(int argc, char *argv[])
     // step2 - bind to the wanted client API
     /// This is done by bindClient() later on
     // bindClient(GnashDevice::OPENVG);
-    // queryEGLConfig(_eglDisplay);
-    
+    queryEGLConfig(_eglDisplay);
+   
     log_debug("EGL_CLIENT_APIS = %s", eglQueryString(_eglDisplay, EGL_CLIENT_APIS));
     log_debug("EGL_EXTENSIONS = %s",  eglQueryString(_eglDisplay, EGL_EXTENSIONS));
     log_debug("EGL_VERSION = %s, EGL_VENDOR = %s",
@@ -286,7 +320,17 @@ EGLDevice::initDevice(int argc, char *argv[])
               eglQueryString(_eglDisplay, EGL_VENDOR));
 
     // step3 - find a suitable config
+#if 1
+    printEGLAttribs(_attrib);
+    if (EGL_FALSE == eglChooseConfig(_eglDisplay, _attrib, &_eglConfig,
+                                     1, &_eglNumOfConfigs)) {
+        log_error("eglChooseConfig(32) failed (error %s)", 
+                  getErrorString(eglGetError()));
+        return false;
+    }
+#else
     if (_bpp == 32) {
+        printEGLAttribs(attrib32_list);
         if (EGL_FALSE == eglChooseConfig(_eglDisplay, attrib32_list, &_eglConfig,
                                           1, &_eglNumOfConfigs)) {
             log_error("eglChooseConfig(32) failed (error %s)", 
@@ -294,6 +338,7 @@ EGLDevice::initDevice(int argc, char *argv[])
             return false;
         }
     } else if (_bpp == 16) {
+        printEGLAttribs(attrib16_list);
         if (EGL_FALSE == eglChooseConfig(_eglDisplay, attrib16_list, &_eglConfig,
                                          1, &_eglNumOfConfigs)) {
             log_error("eglChooseConfig(16) failed (error %s)",
@@ -303,6 +348,7 @@ EGLDevice::initDevice(int argc, char *argv[])
     } else {
         log_error("No supported bpp value!");
     }
+#endif
 
     if (0 == _eglNumOfConfigs) {
         log_error("eglChooseConfig() was unable to find a suitable config");
@@ -581,12 +627,52 @@ EGLDevice::queryEGLConfig(EGLDisplay display)
 #if 0
      // This prints out all the configurations, so it can be quite large
      for (int i=0; i<max_num_config; i++ ) {
-         std::cerr << "Config[" << i << "] is:" << i << std::endl;
+         std::cerr << "Config[" << i << "] is:" << std::endl;
          printEGLConfig(configs[i]);
      }
 #endif
      
      return max_num_config;
+}
+
+void
+EGLDevice::printEGLAttribs(const EGLint *attrib)
+{
+    if (attrib) {
+        std::cout << "Printing EGL Attributes list" << std::endl;
+        int i = 0;
+        while (attrib[i] != EGL_NONE) {
+            switch (attrib[i]) {
+            case EGL_RED_SIZE:
+                std::cout << "\tRed: " << attrib[i+1];
+                break;
+            case EGL_GREEN_SIZE:
+                std::cout << ", Green: " << attrib[i+1];
+                break;
+            case EGL_BLUE_SIZE:
+                std::cout << ", Blue: " << attrib[i+1] << std::endl;
+                break;
+            case EGL_DEPTH_SIZE:
+                std::cout << ", Depth: " << attrib[i+1] << std::endl;
+                break;
+            case EGL_RENDERABLE_TYPE:
+                if (attrib[i+1] & EGL_OPENVG_BIT) {
+                    std::cout << "\tOpenVG Renderable" << std::endl;
+                }
+                if (attrib[i+1] & EGL_OPENGL_ES_BIT) {
+                    std::cout << "\tOpenGLES1 Renderable" << std::endl;
+                }
+                if (attrib[i+1] & EGL_OPENGL_ES2_BIT) {
+                    std::cout << "\tOpenGLES2 Renderable" << std::endl;
+                }
+                break;
+            default:
+                break;
+            }
+            i+=2;
+        }
+    }
+    std::cout << "----------------------------------" << std::endl;
 }
 
 void
@@ -652,6 +738,8 @@ EGLDevice::printEGLConfig(EGLConfig config)
     } else {
           std::cout <<"\tEGL_SURFACE_TYPE (default)" << std::endl;
     }
+    eglGetConfigAttrib(_eglDisplay, config, EGL_NATIVE_VISUAL_ID, &value);
+    std::cout << "\tX11 Visual is: " << value << std::endl;
 }
 
 void
