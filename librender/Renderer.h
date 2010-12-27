@@ -217,7 +217,7 @@ public:
     /// ==================================================================
     
     /// \brief
-    /// Given an image, returns a pointer to a bitmap_info class
+    /// Given an image, returns a pointer to a CachedBitmap class
     /// that can later be passed to FillStyleX_bitmap(), to set a
     /// bitmap fill style.
     virtual CachedBitmap *
