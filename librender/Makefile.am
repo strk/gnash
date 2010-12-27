@@ -172,6 +172,7 @@ testr_CPPFLAGS = \
 testr_LDADD = \
 	libgnashrender.la \
 	../libdevice/libgnashdevice.la \
+	../libsound/libgnashsound.la \
 	$(GTK2_LIBS) \
 	$(EXTRA_EGL_LIBS) \
 	$(EGL_LIBS) \
