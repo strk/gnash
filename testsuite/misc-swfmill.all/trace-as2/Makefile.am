@@ -47,7 +47,7 @@ check_SCRIPTS = \
 	$(NULL)
 
 trace-test-runner: $(srcdir)/../gen-swfmill-trace-runner.sh $(TRACE_TESTS) $(TRACE_XMLTESTS_OUT) Makefile
-	sh $< $(srcdir) $(builddir) > $@
+	sh $(srcdir)/../gen-swfmill-trace-runner.sh $(srcdir) $(builddir) > $@
 	chmod 755 $@
 
 .xml.swf: 

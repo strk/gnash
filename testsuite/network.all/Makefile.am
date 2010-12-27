@@ -100,21 +100,21 @@ http.swf: $(srcdir)/http.as Dejagnu.swf Makefile ../actionscript.all/check.as ..
 	$(MAKESWF) -n network -r12 -o $@ -v7 -DRED5_HOST='\"$(RED5_HOST)\"' -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 Dejagnu.swf $(srcdir)/http.as $(srcdir)/../actionscript.all/dejagnu_so_fini.as
 
 httpTestRunner: $(srcdir)/../generic-testrunner.sh http.swf
-	sh $< $(top_builddir) http.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) http.swf > $@
 	chmod 755 $@
 
 rtmp.swf: $(srcdir)/rtmp.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
 	$(MAKESWF) -n network -r12 -o $@ -v7 -DRED5_HOST='\"$(RED5_HOST)\"' -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 Dejagnu.swf $(srcdir)/rtmp.as $(srcdir)/../actionscript.all/dejagnu_so_fini.as
 
 rtmpTestRunner: $(srcdir)/../generic-testrunner.sh rtmp.swf
-	sh $< $(top_builddir) rtmp.swf > $@
+	sh  $(srcdir)/../generic-testrunner.sh $(top_builddir) rtmp.swf > $@
 	chmod 755 $@
 
 netstream.swf: $(srcdir)/netstream.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
 	$(MAKESWF) -n network -r12 -o $@ -v7 -DRED5_HOST='\"$(RED5_HOST)\"' -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 Dejagnu.swf $(srcdir)/netstream.as $(srcdir)/../actionscript.all/dejagnu_so_fini.as
 
 netstreamRunner: $(srcdir)/../generic-testrunner.sh netstream.swf
-	sh $< $(top_builddir) netstream.swf > $@
+	sh  $(srcdir)/../generic-testrunner.sh $(top_builddir) netstream.swf > $@
 	chmod 755 $@
 
 Dejagnu_SOURCES = \

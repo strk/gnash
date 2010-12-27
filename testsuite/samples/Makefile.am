@@ -16,9 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AUTOMAKE_OPTIONS = dejagnu -Wno-portability
-
-abs_srcdir=$(shell cd $(srcdir); pwd)
+AUTOMAKE_OPTIONS = dejagnu 
 
 CLEANFILES =  \
       gnash-dbg.log \
@@ -100,7 +98,7 @@ gotoFrameOnKeyEvent_TestRunner_CXXFLAGS = \
 	$(NULL)
 
 GotoAndPlayTestRunner: $(srcdir)/../generic-testrunner.sh $(srcdir)/GotoAndPlayTest.swf
-	sh $< $(top_builddir) $(srcdir)/GotoAndPlayTest.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) $(srcdir)/GotoAndPlayTest.swf > $@
 	chmod 755 $@
 
 clean-local: 

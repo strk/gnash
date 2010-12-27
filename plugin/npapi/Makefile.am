@@ -21,7 +21,16 @@ AUTOMAKE_OPTIONS =
 SUBDIRS =
 
 # make sure these files make it into the distribution tarball.
-EXTRA_DIST = mozilla-sdk 
+EXTRA_DIST = \
+	mozilla-sdk/include/npapi.h \
+	mozilla-sdk/include/npfunctions.h \
+	mozilla-sdk/include/npruntime.h \
+	mozilla-sdk/include/nptypes.h \
+	mozilla-sdk/np_entry.cpp \
+	mozilla-sdk/npn_gate.cpp \
+	mozilla-sdk/npp_gate.cpp \
+	mozilla-sdk/npplat.h \
+	mozilla-sdk/pluginbase.h
 
 # This is a hard coded path to where the plugin gets installed.
 GNASHBINDIR = $(bindir)

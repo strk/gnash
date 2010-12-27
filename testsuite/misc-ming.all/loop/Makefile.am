@@ -142,7 +142,7 @@ loop_test3.swf: loop_test3
 	./loop_test3 $(abs_mediadir)
 
 loop_test3runner: $(top_srcdir)/testsuite/generic-testrunner.sh loop_test3.swf
-	sh $< -f20 $(top_builddir) loop_test3.swf > $@
+	sh $(top_srcdir)/testsuite/generic-testrunner.sh -f20 $(top_builddir) loop_test3.swf > $@
 	chmod 755 $@
 
 loop_test4_SOURCES = loop_test4.c
@@ -152,7 +152,7 @@ loop_test4.swf: loop_test4
 	./loop_test4 $(abs_mediadir)
 
 loop_test4runner: $(top_srcdir)/testsuite/generic-testrunner.sh loop_test4.swf
-	sh $< -f20 $(top_builddir) loop_test4.swf > $@
+	sh $(top_srcdir)/testsuite/generic-testrunner.sh -f20 $(top_builddir) loop_test4.swf > $@
 	chmod 755 $@
 
 loop_test5_SOURCES = loop_test5.c
@@ -162,7 +162,7 @@ loop_test5.swf: loop_test5
 	./loop_test5 $(abs_mediadir)
 
 loop_test5runner: $(top_srcdir)/testsuite/generic-testrunner.sh loop_test5.swf
-	sh $< -f20 $(top_builddir) loop_test5.swf > $@
+	sh $(top_srcdir)/testsuite/generic-testrunner.sh -f20 $(top_builddir) loop_test5.swf > $@
 	chmod 755 $@
 
 loop_test6_SOURCES = loop_test6.c
@@ -172,7 +172,7 @@ loop_test6.swf: loop_test6
 	./loop_test6 $(abs_mediadir)
 
 loop_test6runner: $(top_srcdir)/testsuite/generic-testrunner.sh loop_test6.swf
-	sh $< -f20 $(top_builddir) loop_test6.swf > $@
+	sh $(top_srcdir)/testsuite/generic-testrunner.sh -f20 $(top_builddir) loop_test6.swf > $@
 	chmod 755 $@
 
 loop_test7_SOURCES = loop_test7.c
@@ -182,7 +182,7 @@ loop_test7.swf: loop_test7
 	./loop_test7 $(abs_mediadir)
 
 loop_test7runner: $(top_srcdir)/testsuite/generic-testrunner.sh loop_test7.swf
-	sh $< -f20 $(top_builddir) loop_test7.swf > $@
+	sh $(top_srcdir)/testsuite/generic-testrunner.sh -f20 $(top_builddir) loop_test7.swf > $@
 	chmod 755 $@
 
 loop_test8_SOURCES = loop_test8.c
@@ -192,7 +192,7 @@ loop_test8.swf: loop_test8
 	./loop_test8 $(abs_mediadir)
 
 loop_test8runner: $(top_srcdir)/testsuite/generic-testrunner.sh loop_test8.swf
-	sh $< -f20 $(top_builddir) loop_test8.swf > $@
+	sh $(top_srcdir)/testsuite/generic-testrunner.sh -f20 $(top_builddir) loop_test8.swf > $@
 	chmod 755 $@
 
 loop_test9_SOURCES = loop_test9.c
@@ -202,7 +202,7 @@ loop_test9.swf: loop_test9
 	./loop_test9 $(abs_mediadir)
 
 loop_test9runner: $(top_srcdir)/testsuite/generic-testrunner.sh loop_test9.swf Makefile
-	sh $< -r10 -f20 -c "#total tests" $(top_builddir) loop_test9.swf > $@
+	sh $(top_srcdir)/testsuite/generic-testrunner.sh -r10 -f20 -c "#total tests" $(top_builddir) loop_test9.swf > $@
 	chmod 755 $@
 
 
@@ -213,7 +213,7 @@ loop_test10.swf: loop_test10
 	./loop_test10 $(abs_mediadir)
 
 loop_test10runner: $(top_srcdir)/testsuite/generic-testrunner.sh loop_test10.swf Makefile
-	sh $<  -f15 -c "#total tests" $(top_builddir) loop_test10.swf > $@
+	sh $(top_srcdir)/testsuite/generic-testrunner.sh  -f15 -c "#total tests" $(top_builddir) loop_test10.swf > $@
 	chmod 755 $@
 
 simple_loop_test_SOURCES =	\

@@ -118,7 +118,7 @@ action_execution_order_test.swf: action_execution_order_test
 	./action_execution_order_test $(abs_mediadir)
 
 action_execution_order_testrunner: $(srcdir)/../../generic-testrunner.sh action_execution_order_test.swf
-	sh $< $(top_builddir) action_execution_order_test.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh $(top_builddir) action_execution_order_test.swf > $@
 	chmod 755 $@
 
 action_execution_order_test1_SOURCES =	\
@@ -130,7 +130,7 @@ action_execution_order_test1.swf: action_execution_order_test1
 	./action_execution_order_test1 $(abs_mediadir)
 
 action_execution_order_test1runner: $(srcdir)/../../generic-testrunner.sh action_execution_order_test1.swf
-	sh $< $(top_builddir) action_execution_order_test1.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh $(top_builddir) action_execution_order_test1.swf > $@
 	chmod 755 $@
 
 action_execution_order_test2_SOURCES =	\
@@ -142,7 +142,7 @@ action_execution_order_test2.swf: action_execution_order_test2
 	./action_execution_order_test2 $(abs_mediadir)
 
 action_execution_order_test2runner: $(srcdir)/../../generic-testrunner.sh action_execution_order_test2.swf
-	sh $< $(top_builddir) action_execution_order_test2.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh $(top_builddir) action_execution_order_test2.swf > $@
 	chmod 755 $@
 
 action_execution_order_test3_SOURCES =	\
@@ -154,7 +154,7 @@ action_execution_order_test3.swf: action_execution_order_test3
 	./action_execution_order_test3 $(abs_mediadir)
 
 action_execution_order_test3runner: $(srcdir)/../../generic-testrunner.sh action_execution_order_test3.swf
-	sh $< $(top_builddir) action_execution_order_test3.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh $(top_builddir) action_execution_order_test3.swf > $@
 	chmod 755 $@
 
 action_execution_order_test4_SOURCES =	\
@@ -166,7 +166,7 @@ action_execution_order_test4.swf: action_execution_order_test4
 	./action_execution_order_test4 $(abs_mediadir)
 
 action_execution_order_test4runner: $(srcdir)/../../generic-testrunner.sh action_execution_order_test4.swf
-	sh $< $(top_builddir) action_execution_order_test4.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh $(top_builddir) action_execution_order_test4.swf > $@
 	chmod 755 $@
 
 action_execution_order_test5_SOURCES =	\
@@ -178,7 +178,7 @@ action_execution_order_test5.swf: action_execution_order_test5
 	./action_execution_order_test5 $(abs_mediadir)
 
 action_execution_order_test5runner: $(srcdir)/../../generic-testrunner.sh action_execution_order_test5.swf
-	sh $< $(top_builddir) action_execution_order_test5.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh $(top_builddir) action_execution_order_test5.swf > $@
 	chmod 755 $@
 
 action_execution_order_test6_SOURCES =	\
@@ -190,7 +190,7 @@ action_execution_order_test6.swf: action_execution_order_test6
 	./action_execution_order_test6 $(abs_mediadir)
 
 action_execution_order_test6runner: $(srcdir)/../../generic-testrunner.sh action_execution_order_test6.swf
-	sh $< $(top_builddir) action_execution_order_test6.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh $(top_builddir) action_execution_order_test6.swf > $@
 	chmod 755 $@
 
 action_execution_order_test7_SOURCES =	\
@@ -202,7 +202,7 @@ action_execution_order_test7.swf: action_execution_order_test7
 	./action_execution_order_test7 $(abs_mediadir)
 
 action_execution_order_test7runner: $(srcdir)/../../generic-testrunner.sh action_execution_order_test7.swf
-	sh $< $(top_builddir) action_execution_order_test7.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh $(top_builddir) action_execution_order_test7.swf > $@
 	chmod 755 $@
 
 action_execution_order_test8_SOURCES =	\
@@ -217,7 +217,7 @@ action_execution_order_test8-v5.swf: action_execution_order_test8
 	./action_execution_order_test8 $(abs_mediadir) 5
 
 action_execution_order_test8runner: $(srcdir)/../../generic-testrunner.sh action_execution_order_test8-v5.swf action_execution_order_test8-v6.swf
-	sh $< -f8 $(top_builddir) action_execution_order_test8-v5.swf action_execution_order_test8-v6.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh -f8 $(top_builddir) action_execution_order_test8-v5.swf action_execution_order_test8-v6.swf > $@
 	chmod 755 $@
 
 action_execution_order_test9_SOURCES =	\
@@ -229,7 +229,7 @@ action_execution_order_test9.swf: action_execution_order_test9
 	./action_execution_order_test9 $(abs_mediadir)
 
 action_execution_order_test9runner: $(srcdir)/../../generic-testrunner.sh action_execution_order_test9.swf
-	sh $< -f8 $(top_builddir) action_execution_order_test9.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh -f8 $(top_builddir) action_execution_order_test9.swf > $@
 	chmod 755 $@
 
 action_execution_order_test11_SOURCES =	\
@@ -241,7 +241,7 @@ action_execution_order_test11.swf: action_execution_order_test11
 	./action_execution_order_test11 $(abs_mediadir)
 
 action_execution_order_test11runner: $(srcdir)/../../generic-testrunner.sh action_execution_order_test11.swf
-	sh $< -f10 $(top_builddir) action_execution_order_test11.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh -f10 $(top_builddir) action_execution_order_test11.swf > $@
 	chmod 755 $@
 
 ActionOrderTest3_SOURCES =	\
@@ -253,7 +253,7 @@ ActionOrderTest3.swf: ActionOrderTest3
 	./ActionOrderTest3 $(abs_mediadir)
 
 ActionOrderTest3Runner: $(srcdir)/../../generic-testrunner.sh ActionOrderTest3.swf
-	sh $< $(top_builddir) ActionOrderTest3.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh $(top_builddir) ActionOrderTest3.swf > $@
 	chmod 755 $@
 
 ActionOrderTest4_SOURCES =	\
@@ -265,7 +265,7 @@ ActionOrderTest4.swf: ActionOrderTest4
 	./ActionOrderTest4 $(abs_mediadir)
 
 ActionOrderTest4Runner: $(srcdir)/../../generic-testrunner.sh ActionOrderTest4.swf
-	sh $< $(top_builddir) ActionOrderTest4.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh $(top_builddir) ActionOrderTest4.swf > $@
 	chmod 755 $@
 
 ActionOrderTest5_SOURCES =	\
@@ -277,7 +277,7 @@ ActionOrderTest5.swf: ActionOrderTest5
 	./ActionOrderTest5 $(abs_mediadir)
 
 ActionOrderTest5Runner: $(srcdir)/../../generic-testrunner.sh ActionOrderTest5.swf
-	sh $< $(top_builddir) ActionOrderTest5.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh $(top_builddir) ActionOrderTest5.swf > $@
 	chmod 755 $@
 
 action_execution_order_extend_test_SOURCES =	\
@@ -289,7 +289,7 @@ action_execution_order_extend_test.swf: action_execution_order_extend_test
 	./action_execution_order_extend_test $(abs_mediadir)
 
 action_execution_order_extend_testrunner: $(srcdir)/../../generic-testrunner.sh action_execution_order_extend_test.swf
-	sh $< $(top_builddir) action_execution_order_extend_test.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh $(top_builddir) action_execution_order_extend_test.swf > $@
 	chmod 755 $@
 
 clean-local: 

@@ -38,6 +38,7 @@ gnash.pc
 gnash-*/
 gui/*gnash
 gui/fb/fb-gnash
+gui/dump/dump-gnash
 gui/*.gcda
 gui/Info.plist
 libbase/gnashpluginrc

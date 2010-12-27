@@ -66,11 +66,11 @@ TEST_CASES = \
 	$(NULL)
 
 sanetests-runner: $(srcdir)/../generic-testrunner.sh $(SANE_ASTESTS_OUT) $(AUXMOVIES_OUT) Makefile
-	sh $< -c __END_OF_TEST__ -r 50 -d 30 $(top_builddir) $(SANE_ASTESTS_OUT) > $@
+	sh $(srcdir)/../generic-testrunner.sh -c __END_OF_TEST__ -r 50 -d 30 $(top_builddir) $(SANE_ASTESTS_OUT) > $@
 	chmod 755 $@
 
 bogustests-runner: $(srcdir)/../generic-testrunner.sh $(BOGUS_ASTESTS_OUT) $(AUXMOVIES_OUT) Makefile
-	sh $< -C __END_OF_TEST__ -r 50 $(top_builddir) $(BOGUS_ASTESTS_OUT) > $@
+	sh $(srcdir)/../generic-testrunner.sh -C __END_OF_TEST__ -r 50 $(top_builddir) $(BOGUS_ASTESTS_OUT) > $@
 	chmod 755 $@
 
 .as.swf: 

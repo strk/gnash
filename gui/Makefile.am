@@ -22,13 +22,17 @@
 
 AUTOMAKE_OPTIONS = -Wno-portability
 
-DIST_SUBDIRS = pythonmod fb
+DIST_SUBDIRS = pythonmod fb dump
 
 # Build the current directory first. It's hard to see, but there is a '.' dot here.
 SUBDIRS = . fb
 
 if BUILD_FB_GUI
 SUBDIRS += fb
+endif
+
+if BUILD_DUMP_GUI
+SUBDIRS += dump
 endif
 
 # If python support is enabled, built that too
@@ -100,10 +104,6 @@ GTK_LIBS =  \
 	$(EXPAT_LIBS) \
 	$(X11_LIBS) \
 	$(Z_LIBS)
-
-DUMP_CFLAGS =
-
-DUMP_LIBS =
 
 # The following will be filled up later
 GUI_CPPFLAGS = 
@@ -255,11 +255,6 @@ endif
 # Build the GTK gui
 if BUILD_GTK_GUI
 include $(srcdir)/gtk/gtk.am
-endif
-
-# Build the DUMP gui
-if BUILD_DUMP_GUI
-include $(srcdir)/dump/dump.am
 endif
 
 # Build the RISCOS gui

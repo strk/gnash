@@ -306,43 +306,43 @@ alltests-v8.swf: $(ASTESTS)
 	@mv alltests.swf alltests-v8.swf
 
 astests-v5-Runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_V5_OUT)
-	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $< $(top_builddir) $(ASTESTS_V5_OUT) > $@
+	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $(srcdir)/../generic-testrunner.sh $(top_builddir) $(ASTESTS_V5_OUT) > $@
 	chmod 755 $@
 
 astests-v6-Runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_V6_OUT)
-	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $< $(top_builddir) $(ASTESTS_V6_OUT) > $@
+	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $(srcdir)/../generic-testrunner.sh $(top_builddir) $(ASTESTS_V6_OUT) > $@
 	chmod 755 $@
 
 astests-v7-Runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_V7_OUT)
-	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $< $(top_builddir) $(ASTESTS_V7_OUT) > $@
+	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $(srcdir)/../generic-testrunner.sh $(top_builddir) $(ASTESTS_V7_OUT) > $@
 	chmod 755 $@
 
 astests-v8-Runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_V8_OUT)
-	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $< $(top_builddir) $(ASTESTS_V8_OUT) > $@
+	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $(srcdir)/../generic-testrunner.sh $(top_builddir) $(ASTESTS_V8_OUT) > $@
 	chmod 755 $@
 
 astests-v9-Runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_V9_OUT)
-	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $< $(top_builddir) $(HAXE_DIR)/$(ASTESTS_V9_OUT) > $@
+	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $(srcdir)/../generic-testrunner.sh $(top_builddir) $(HAXE_DIR)/$(ASTESTS_V9_OUT) > $@
 	chmod 755 $@
 
 # This version runs all testcases in a single SWF targetted at player 5
 alltests-v5-Runner: $(srcdir)/../generic-testrunner.sh alltests-v5.swf
-	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $< $(top_builddir) alltests-v5.swf > $@
+	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $(srcdir)/../generic-testrunner.sh $(top_builddir) alltests-v5.swf > $@
 	chmod 755 $@
 
 # This version runs all testcases in a single SWF targetted at player 6
 alltests-v6-Runner: $(srcdir)/../generic-testrunner.sh alltests-v6.swf
-	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $< $(top_builddir) alltests-v6.swf > $@
+	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $(srcdir)/../generic-testrunner.sh $(top_builddir) alltests-v6.swf > $@
 	chmod 755 $@
 
 # This version runs all testcases in a single SWF targetted at player 7
 alltests-v7-Runner: $(srcdir)/../generic-testrunner.sh alltests-v7.swf
-	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $< $(top_builddir) alltests-v7.swf > $@
+	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $(srcdir)/../generic-testrunner.sh $(top_builddir) alltests-v7.swf > $@
 	chmod 755 $@
 
 # This version runs all testcases in a single SWF targetted at player 8
 alltests-v8-Runner: $(srcdir)/../generic-testrunner.sh alltests-v8.swf
-	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $< $(top_builddir) alltests-v8.swf > $@
+	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $(srcdir)/../generic-testrunner.sh $(top_builddir) alltests-v8.swf > $@
 	chmod 755 $@
 
 $(ASTESTS_V5_OUT) : $(ASTESTS) Dejagnu.swf

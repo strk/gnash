@@ -354,11 +354,11 @@ TextSnapshotTest_SOURCES =  TextSnapshotTest.c
 TextSnapshotTest_LDADD = libgnashmingutils.la
 
 TextSnapshotTest-Runner: $(srcdir)/../generic-testrunner.sh TextSnapshotTest.swf
-	sh $< $(top_builddir) TextSnapshotTest.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) TextSnapshotTest.swf > $@
 	chmod 755 $@
 
 DeviceFontTestRunner: $(srcdir)/../generic-testrunner.sh DeviceFontTest.swf
-	sh $< $(top_builddir) DeviceFontTest.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) DeviceFontTest.swf > $@
 	chmod 755 $@
 DeviceFontTest.swf: DeviceFontTest
 	./DeviceFontTest $(abs_mediadir)
@@ -366,7 +366,7 @@ DeviceFontTest_SOURCES =  DeviceFontTest.c
 DeviceFontTest_LDADD = libgnashmingutils.la
 
 EmbeddedFontTestRunner: $(srcdir)/../generic-testrunner.sh EmbeddedFontTest.swf
-	sh $< $(top_builddir) EmbeddedFontTest.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) EmbeddedFontTest.swf > $@
 	chmod 755 $@
 EmbeddedFontTest.swf: EmbeddedFontTest
 	./EmbeddedFontTest $(abs_mediadir)
@@ -405,7 +405,7 @@ opcode_guard_test.swf: opcode_guard_test
 	./opcode_guard_test $(abs_mediadir)
 
 opcode_guard_testrunner: $(srcdir)/../generic-testrunner.sh opcode_guard_test.swf
-	sh $< $(top_builddir) opcode_guard_test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) opcode_guard_test.swf > $@
 	chmod 755 $@
 
 runtime_vm_stack_test_SOURCES =	\
@@ -417,7 +417,7 @@ runtime_vm_stack_test.swf: runtime_vm_stack_test
 	./runtime_vm_stack_test $(abs_mediadir)
 
 runtime_vm_stack_testrunner: $(srcdir)/../generic-testrunner.sh runtime_vm_stack_test.swf
-	sh $< $(top_builddir) runtime_vm_stack_test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) runtime_vm_stack_test.swf > $@
 	chmod 755 $@
 
 new_child_in_unload_test_SOURCES =	\
@@ -429,7 +429,7 @@ new_child_in_unload_test.swf: new_child_in_unload_test
 	./new_child_in_unload_test $(abs_mediadir)
 
 new_child_in_unload_testrunner: $(srcdir)/../generic-testrunner.sh new_child_in_unload_test.swf
-	sh $< $(top_builddir) new_child_in_unload_test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) new_child_in_unload_test.swf > $@
 	chmod 755 $@
 
 PlaceObject2Test_SOURCES =	\
@@ -441,7 +441,7 @@ PlaceObject2Test.swf: PlaceObject2Test
 	./PlaceObject2Test $(abs_mediadir)
 
 PlaceObject2TestRunner: $(srcdir)/../generic-testrunner.sh PlaceObject2Test.swf
-	sh $< -r5 $(top_builddir) PlaceObject2Test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r5 $(top_builddir) PlaceObject2Test.swf > $@
 	chmod 755 $@
 
 RemoveObject2Test_SOURCES = RemoveObject2Test.c
@@ -521,7 +521,7 @@ DefineEditTextVariableNameTest2.swf: DefineEditTextVariableNameTest2
 	./DefineEditTextVariableNameTest2 $(abs_mediadir)
 
 DefineEditTextVariableNameTest2-Runner: $(srcdir)/../generic-testrunner.sh DefineEditTextVariableNameTest2.swf
-	sh $< $(top_builddir) DefineEditTextVariableNameTest2.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) DefineEditTextVariableNameTest2.swf > $@
 	chmod 755 $@
 
 timeline_var_test_SOURCES =	\
@@ -533,7 +533,7 @@ timeline_var_test.swf: timeline_var_test
 	./timeline_var_test $(abs_mediadir)
 
 timeline_var_test-Runner: $(srcdir)/../generic-testrunner.sh timeline_var_test.swf
-	sh $< $(top_builddir) timeline_var_test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) timeline_var_test.swf > $@
 	chmod 755 $@
 
 root_stop_test_SOURCES = root_stop_test.c
@@ -564,7 +564,7 @@ shape_test.swf: shape_test
 	./shape_test $(abs_mediadir)
 
 shape_testrunner: $(srcdir)/../generic-testrunner.sh shape_test.swf
-	sh $< -f20 $(top_builddir) shape_test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -f20 $(top_builddir) shape_test.swf > $@
 	chmod 755 $@
 
 morph_test1_SOURCES = morph_test1.c
@@ -640,7 +640,7 @@ place_object_test.swf: place_object_test
 	./place_object_test $(abs_mediadir)
 
 place_object_testrunner: $(srcdir)/../generic-testrunner.sh place_object_test.swf
-	sh $< -r5 $(top_builddir) place_object_test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r5 $(top_builddir) place_object_test.swf > $@
 	chmod 755 $@
 
 
@@ -651,7 +651,7 @@ place_object_test2.swf: place_object_test2
 	./place_object_test2 $(abs_mediadir)
 
 place_object_test2runner: $(srcdir)/../generic-testrunner.sh place_object_test2.swf
-	sh $< -r5 $(top_builddir) place_object_test2.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r5 $(top_builddir) place_object_test2.swf > $@
 	chmod 755 $@
 
 move_object_test_SOURCES =	\
@@ -663,7 +663,7 @@ move_object_test.swf: move_object_test
 	./move_object_test $(abs_mediadir)
 
 move_object_testrunner: $(srcdir)/../generic-testrunner.sh move_object_test.swf
-	sh $< -r5 $(top_builddir) move_object_test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r5 $(top_builddir) move_object_test.swf > $@
 	chmod 755 $@
 
 place_and_remove_object_test_SOURCES =	\
@@ -675,7 +675,7 @@ place_and_remove_object_test.swf: place_and_remove_object_test
 	./place_and_remove_object_test $(abs_mediadir)
 
 place_and_remove_object_testrunner: $(srcdir)/../generic-testrunner.sh place_and_remove_object_test.swf
-	sh $< -r5 $(top_builddir) place_and_remove_object_test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r5 $(top_builddir) place_and_remove_object_test.swf > $@
 	chmod 755 $@
 
 place_and_remove_object_insane_test_SOURCES =	\
@@ -687,7 +687,7 @@ place_and_remove_object_insane_test.swf: place_and_remove_object_insane_test
 	./place_and_remove_object_insane_test $(abs_mediadir)
 
 place_and_remove_object_insane_testrunner: $(srcdir)/../generic-testrunner.sh place_and_remove_object_insane_test.swf
-	sh $< -r5 $(top_builddir) place_and_remove_object_insane_test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r5 $(top_builddir) place_and_remove_object_insane_test.swf > $@
 	chmod 755 $@
 
 unload_movieclip_test1_SOURCES =	\
@@ -699,7 +699,7 @@ unload_movieclip_test1.swf: unload_movieclip_test1
 	./unload_movieclip_test1 $(abs_mediadir)
 
 unload_movieclip_test1runner: $(srcdir)/../generic-testrunner.sh unload_movieclip_test1.swf
-	sh $< -f10 $(top_builddir) unload_movieclip_test1.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -f10 $(top_builddir) unload_movieclip_test1.swf > $@
 	chmod 755 $@
 
 DepthLimitsTest_SOURCES = DepthLimitsTest.c
@@ -709,7 +709,7 @@ DepthLimitsTest.swf: DepthLimitsTest
 	./DepthLimitsTest $(abs_mediadir)
 
 DepthLimitsTestrunner: $(srcdir)/../generic-testrunner.sh DepthLimitsTest.swf
-	sh $< -r5 $(top_builddir) DepthLimitsTest.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r5 $(top_builddir) DepthLimitsTest.swf > $@
 	chmod 755 $@
 
 
@@ -833,7 +833,7 @@ matrix_test.swf: matrix_test
 	./matrix_test $(abs_mediadir)
 
 matrix_testrunner: $(srcdir)/../generic-testrunner.sh matrix_test.swf
-	sh $< -r5 $(top_builddir) matrix_test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r5 $(top_builddir) matrix_test.swf > $@
 	chmod 755 $@
 
 get_frame_number_test_SOURCES =	\
@@ -845,7 +845,7 @@ get_frame_number_test.swf: get_frame_number_test
 	./get_frame_number_test $(abs_mediadir)
 
 get_frame_number_testrunner: $(srcdir)/../generic-testrunner.sh get_frame_number_test.swf
-	sh $< -f20 $(top_builddir) get_frame_number_test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -f20 $(top_builddir) get_frame_number_test.swf > $@
 	chmod 755 $@
 
 frame_label_test_SOURCES =	\
@@ -857,7 +857,7 @@ frame_label_test.swf: frame_label_test
 	./frame_label_test $(abs_mediadir)
 
 frame_label_testrunner: $(srcdir)/../generic-testrunner.sh frame_label_test.swf
-	sh $< -r5 $(top_builddir) frame_label_test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r5 $(top_builddir) frame_label_test.swf > $@
 	chmod 755 $@
 
 path_format_test_SOURCES =	\
@@ -869,7 +869,7 @@ path_format_test.swf: path_format_test
 	./path_format_test $(abs_mediadir)
 
 path_format_testrunner: $(srcdir)/../generic-testrunner.sh path_format_test.swf
-	sh $< -r5 $(top_builddir) path_format_test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r5 $(top_builddir) path_format_test.swf > $@
 	chmod 755 $@
 
 callFunction_test_SOURCES =	\
@@ -881,7 +881,7 @@ callFunction_test.swf: callFunction_test
 	./callFunction_test $(abs_mediadir)
 
 callFunction_testrunner: $(srcdir)/../generic-testrunner.sh callFunction_test.swf
-	sh $< -r5 $(top_builddir) callFunction_test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r5 $(top_builddir) callFunction_test.swf > $@
 	chmod 755 $@
 
 duplicate_movie_clip_test_SOURCES =	\
@@ -893,7 +893,7 @@ duplicate_movie_clip_test.swf: duplicate_movie_clip_test
 	./duplicate_movie_clip_test $(abs_mediadir)
 
 duplicate_movie_clip_testrunner: $(srcdir)/../generic-testrunner.sh duplicate_movie_clip_test.swf
-	sh $< -r5 $(top_builddir) duplicate_movie_clip_test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r5 $(top_builddir) duplicate_movie_clip_test.swf > $@
 	chmod 755 $@
 
 
@@ -906,7 +906,7 @@ duplicate_movie_clip_test2.swf: duplicate_movie_clip_test2
 	./duplicate_movie_clip_test2 $(abs_mediadir)
 
 duplicate_movie_clip_test2runner: $(srcdir)/../generic-testrunner.sh duplicate_movie_clip_test2.swf
-	sh $< -r5 $(top_builddir) duplicate_movie_clip_test2.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r5 $(top_builddir) duplicate_movie_clip_test2.swf > $@
 	chmod 755 $@
 
 
@@ -919,7 +919,7 @@ event_handler_scope_test.swf: event_handler_scope_test
 	./event_handler_scope_test $(abs_mediadir)
 
 event_handler_scope_testrunner: $(srcdir)/../generic-testrunner.sh event_handler_scope_test.swf
-	sh $< -r5 $(top_builddir) event_handler_scope_test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r5 $(top_builddir) event_handler_scope_test.swf > $@
 	chmod 755 $@
 
 attachMovieTest_SOURCES =	\
@@ -975,7 +975,7 @@ attachMovieLoopingTestRunner_DEPENDENCIES = \
 attachImported.swf: Dejagnu.swf $(srcdir)/attachImported.as attachMovieTest.swf
 	$(MAKESWF) -DOUTPUT_VERSION=6 -v6 -i attachMovieTest.swf:redsquare -o $@ Dejagnu.swf $(srcdir)/attachImported.as
 attachImported-Runner: $(srcdir)/../generic-testrunner.sh attachImported.swf Makefile
-	sh $< -r5 -c "END_OF_TEST" $(top_builddir) attachImported.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r5 -c "END_OF_TEST" $(top_builddir) attachImported.swf > $@
 	chmod 755 $@
 
 # This will only work with Ming-0.4.0beta2
@@ -983,7 +983,7 @@ attachImported-Runner: $(srcdir)/../generic-testrunner.sh attachImported.swf Mak
 attachExtImported.swf: Dejagnu.swf $(srcdir)/attachExtImported.as attachImported.swf attachMovieTest.swf
 	$(MAKESWF) -DOUTPUT_VERSION=6 -v6 -i attachImported.swf:redsquare -o $@ Dejagnu.swf $(srcdir)/attachExtImported.as
 attachExtImported-Runner: $(srcdir)/../generic-testrunner.sh attachExtImported.swf Makefile
-	sh $< -r5 -c "END_OF_TEST" $(top_builddir) attachExtImported.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r5 -c "END_OF_TEST" $(top_builddir) attachExtImported.swf > $@
 	chmod 755 $@
 
 goto_frame_test_SOURCES =	\
@@ -995,7 +995,7 @@ goto_frame_test.swf: goto_frame_test
 	./goto_frame_test $(abs_mediadir)
 
 goto_frame_testrunner: $(srcdir)/../generic-testrunner.sh goto_frame_test.swf
-	sh $< $(top_builddir) goto_frame_test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) goto_frame_test.swf > $@
 	chmod 755 $@
 
 consecutive_goto_frame_test_SOURCES =	\
@@ -1007,7 +1007,7 @@ consecutive_goto_frame_test.swf: consecutive_goto_frame_test
 	./consecutive_goto_frame_test $(abs_mediadir)
 
 consecutive_goto_frame_testrunner: $(srcdir)/../generic-testrunner.sh consecutive_goto_frame_test.swf
-	sh $< $(top_builddir) consecutive_goto_frame_test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) consecutive_goto_frame_test.swf > $@
 	chmod 755 $@
 
 multi_doactions_and_goto_frame_test_SOURCES =	\
@@ -1019,7 +1019,7 @@ multi_doactions_and_goto_frame_test.swf: multi_doactions_and_goto_frame_test
 	./multi_doactions_and_goto_frame_test $(abs_mediadir)
 
 multi_doactions_and_goto_frame_testrunner: $(srcdir)/../generic-testrunner.sh multi_doactions_and_goto_frame_test.swf
-	sh $< $(top_builddir) multi_doactions_and_goto_frame_test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) multi_doactions_and_goto_frame_test.swf > $@
 	chmod 755 $@
 
 reverse_execute_PlaceObject2_test1_SOURCES =	\
@@ -1031,7 +1031,7 @@ reverse_execute_PlaceObject2_test1.swf: reverse_execute_PlaceObject2_test1
 	./reverse_execute_PlaceObject2_test1 $(abs_mediadir)
 
 reverse_execute_PlaceObject2_test1runner: $(srcdir)/../generic-testrunner.sh reverse_execute_PlaceObject2_test1.swf
-	sh $< $(top_builddir) reverse_execute_PlaceObject2_test1.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) reverse_execute_PlaceObject2_test1.swf > $@
 	chmod 755 $@
 
 reverse_execute_PlaceObject2_test2_SOURCES =	\
@@ -1043,7 +1043,7 @@ reverse_execute_PlaceObject2_test2.swf: reverse_execute_PlaceObject2_test2
 	./reverse_execute_PlaceObject2_test2 $(abs_mediadir)
 
 reverse_execute_PlaceObject2_test2runner: $(srcdir)/../generic-testrunner.sh reverse_execute_PlaceObject2_test2.swf
-	sh $< $(top_builddir) reverse_execute_PlaceObject2_test2.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) reverse_execute_PlaceObject2_test2.swf > $@
 	chmod 755 $@
 
 BitmapDataTest_SOURCES = \
@@ -1092,7 +1092,7 @@ BitmapDataDraw.swf: BitmapDataDraw
 	./BitmapDataDraw $(abs_mediadir)
 
 BitmapDataDrawRunner: $(srcdir)/../generic-testrunner.sh BitmapDataDraw.swf
-	sh $< $(top_builddir) BitmapDataDraw.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) BitmapDataDraw.swf > $@
 	chmod 755 $@
 
 BeginBitmapFill_SOURCES = \
@@ -1208,7 +1208,7 @@ registerClassTest2.swf: registerClassTest2
 	./registerClassTest2 $(abs_mediadir)
 
 registerClassTest2runner: $(srcdir)/../generic-testrunner.sh registerClassTest2.swf
-	sh $< $(top_builddir) registerClassTest2.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) registerClassTest2.swf > $@
 	chmod 755 $@
 
 spritehier.swf: spritehier
@@ -1305,7 +1305,7 @@ ResolveEventsTest_Runner_CXXFLAGS = \
 VarAndCharClashTest.swf: $(srcdir)/../media/green.swf Dejagnu.swf $(srcdir)/VarAndCharClashTest.as 
 	$(MAKESWF) -o $@ Dejagnu.swf $(srcdir)/../media/green.swf $(srcdir)/VarAndCharClashTest.as
 VarAndCharClashTest-Runner: $(srcdir)/../generic-testrunner.sh VarAndCharClashTest.swf
-	sh $< $(top_builddir) VarAndCharClashTest.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) VarAndCharClashTest.swf > $@
 	chmod 755 $@
 
 # This will only work with Ming-0.4.0beta2 (support for prebuilt clips inclusion)
@@ -1320,7 +1320,7 @@ SharedObjectTest.swf: Dejagnu.swf $(srcdir)/SharedObjectTest.as
 	$(MAKESWF) -DOUTPUT_VERSION=6 -v6 -o $@ Dejagnu.swf $(srcdir)/SharedObjectTest.as
 
 SharedObjectTestRunner: SharedObjectTestRunner.sh Makefile SharedObjectTest.swf
-	sed -e 's#@@TOP_BUILDDIR@@#${abs_top_builddir}#' -e 's#@@BASEINPUTSOLDIR@@#${srcdir}/SharedObjectTest.sol#' $< > $@
+	sed -e 's#@@TOP_BUILDDIR@@#${abs_top_builddir}#' -e 's#@@BASEINPUTSOLDIR@@#${srcdir}/SharedObjectTest.sol#' $(srcdir)/SharedObjectTestRunner.sh > $@
 	chmod +x $@
 
 StageConfigTest.swf: $(srcdir)/StageConfigTest.as 
@@ -1356,7 +1356,7 @@ InitActionTest2.swf: InitActionTest2
 	./InitActionTest2 $(abs_mediadir)
 
 InitActionTest2Runner: $(srcdir)/../generic-testrunner.sh InitActionTest2.swf
-	sh $< $(top_builddir) InitActionTest2.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) InitActionTest2.swf > $@
 	chmod 755 $@
 
 RegisterClassTest3_SOURCES =	\
@@ -1368,7 +1368,7 @@ RegisterClassTest3.swf: RegisterClassTest3
 	./RegisterClassTest3 $(abs_mediadir)
 
 RegisterClassTest3Runner: $(srcdir)/../generic-testrunner.sh RegisterClassTest3.swf
-	sh $< $(top_builddir) RegisterClassTest3.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) RegisterClassTest3.swf > $@
 	chmod 755 $@
 
 RegisterClassTest4_SOURCES =	\
@@ -1380,7 +1380,7 @@ RegisterClassTest4.swf: RegisterClassTest4
 	./RegisterClassTest4 $(abs_mediadir)
 
 RegisterClassTest4Runner: $(srcdir)/../generic-testrunner.sh RegisterClassTest4.swf
-	sh $< $(top_builddir) RegisterClassTest4.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) RegisterClassTest4.swf > $@
 	chmod 755 $@
 
 init_action_test_SOURCES =	\
@@ -1392,7 +1392,7 @@ init_action_test.swf: init_action_test
 	./init_action_test $(abs_mediadir)
 
 init_action_testrunner: $(srcdir)/../generic-testrunner.sh init_action_test.swf
-	sh $< $(top_builddir) init_action_test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) init_action_test.swf > $@
 	chmod 755 $@
 
 intervalTest.swf: $(srcdir)/../media/green.swf Dejagnu.swf $(srcdir)/intervalTest.as 
@@ -1418,7 +1418,7 @@ gotoFrame2Test.swf: $(srcdir)/../media/green.swf Dejagnu.swf $(srcdir)/gotoFrame
 		$(srcdir)/gotoFrame2Test.as 
 
 gotoFrame2Test-Runner: $(srcdir)/../generic-testrunner.sh gotoFrame2Test.swf
-	sh $< $(top_builddir) gotoFrame2Test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) gotoFrame2Test.swf > $@
 	chmod 755 $@
 
 LC-Receive.swf: $(srcdir)/LC-Receive.as 
@@ -1428,14 +1428,14 @@ LC-Send.swf: $(srcdir)/LC-Send.as
 	$(MAKESWF) -v 8 -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/LC-Send.as
 
 LCTestRunner: $(srcdir)/../simultaneous-testrunner.sh LC-Receive.swf LC-Send.swf
-	sh $< -c "ENDOFTEST" $(top_builddir) LC-Receive.swf LC-Send.swf > $@
+	sh $(srcdir)/../simultaneous-testrunner.sh -c "ENDOFTEST" $(top_builddir) LC-Receive.swf LC-Send.swf > $@
 	chmod 755 $@
 
 XMLSocketTest.swf: $(srcdir)/XMLSocketTest.as 
 	$(MAKESWF) -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/XMLSocketTest.as
 
 XMLSocketTester: $(srcdir)/XMLSocketTester.sh XMLSocketTest.swf
-	sh $< -c "ENDOFTEST" $(top_builddir) $(top_srcdir) $(PERL) \
+	sh $(srcdir)/XMLSocketTester.sh -c "ENDOFTEST" $(top_builddir) $(top_srcdir) $(PERL) \
 		XMLSocketTest.swf > $@
 	chmod 755 $@
 
@@ -1443,7 +1443,7 @@ GradientFillTest.swf: $(srcdir)/GradientFillTest.as
 	$(MAKESWF) -v 8 -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/GradientFillTest.as
 
 GradientFillTestRunner: $(srcdir)/../generic-testrunner.sh GradientFillTest.swf
-	sh $< $(top_builddir) GradientFillTest.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) GradientFillTest.swf > $@
 	chmod 755 $@
 
 DrawingApiTest.swf: $(srcdir)/DrawingApiTest.as 
@@ -1489,7 +1489,7 @@ remoting.swf: $(srcdir)/remoting.as Dejagnu.swf Makefile ../actionscript.all/che
 	$(MAKESWF) -n network -r12 -o $@ -v7 -DHTTP_TESTSUITE='\"$(HTTP_TESTSUITE)\"' -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 Dejagnu.swf $(srcdir)/remoting.as $(srcdir)/../actionscript.all/dejagnu_so_fini.as
 
 remotingTestRunner: $(srcdir)/../generic-testrunner.sh remoting.swf
-	sh $< $(top_builddir) remoting.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) remoting.swf > $@
 	chmod 755 $@
 
 red5test.swf: $(srcdir)/red5test.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
@@ -1498,7 +1498,7 @@ red5test.swf: $(srcdir)/red5test.as Dejagnu.swf Makefile ../actionscript.all/che
 		$(srcdir)/../actionscript.all/dejagnu_so_fini.as
 
 red5test-runner: $(srcdir)/../generic-testrunner.sh red5test.swf
-	sh $< -c "ENDOFTEST" $(top_builddir) red5test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -c "ENDOFTEST" $(top_builddir) red5test.swf > $@
 	chmod 755 $@
 
 rtmpytest.swf: $(srcdir)/rtmpytest.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
@@ -1507,7 +1507,7 @@ rtmpytest.swf: $(srcdir)/rtmpytest.as Dejagnu.swf Makefile ../actionscript.all/c
 		$(srcdir)/../actionscript.all/dejagnu_so_fini.as
 
 rtmpytest-runner: $(srcdir)/../generic-testrunner.sh rtmpytest.swf
-	sh $< -c "ENDOFTEST" $(top_builddir) rtmpytest.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -c "ENDOFTEST" $(top_builddir) rtmpytest.swf > $@
 	chmod 755 $@
 
 case6.swf: $(srcdir)/case6.as Makefile ../actionscript.all/check.as
@@ -1517,7 +1517,7 @@ case7.swf: $(srcdir)/case7.as Makefile ../actionscript.all/check.as
 	$(MAKESWF) -v7 -o $@ -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 -I$(srcdir)/../actionscript.all $(srcdir)/case7.as 
 
 caseTestRunner: $(srcdir)/../generic-testrunner.sh case6.swf case7.swf Makefile
-	sh $< -f10 -r10 -c '#total' $(top_builddir) case6.swf case7.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -f10 -r10 -c '#total' $(top_builddir) case6.swf case7.swf > $@
 	chmod 755 $@
 
 DragDropTest.swf: $(srcdir)/DragDropTest.as Dejagnu.swf DragDropTestLoaded.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
@@ -1553,7 +1553,7 @@ static_vs_dynamic1.swf: static_vs_dynamic1
 	./static_vs_dynamic1 $(srcdir)/../media
 
 static_vs_dynamic1_testrunner: $(srcdir)/../generic-testrunner.sh static_vs_dynamic1.swf
-	sh $< $(top_builddir) static_vs_dynamic1.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) static_vs_dynamic1.swf > $@
 	chmod 755 $@
 
 static_vs_dynamic2_SOURCES = \
@@ -1566,7 +1566,7 @@ static_vs_dynamic2.swf: static_vs_dynamic2
 	./static_vs_dynamic2 $(srcdir)/../media
 
 static_vs_dynamic2_testrunner: $(srcdir)/../generic-testrunner.sh static_vs_dynamic2.swf
-	sh $< $(top_builddir) static_vs_dynamic2.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) static_vs_dynamic2.swf > $@
 	chmod 755 $@
 
 
@@ -1580,7 +1580,7 @@ getTimer_test.swf: getTimer_test
 	./getTimer_test $(srcdir)/../media
 
 getTimer_testrunner: $(srcdir)/../generic-testrunner.sh getTimer_test.swf
-	sh $< $(top_builddir) getTimer_test.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) getTimer_test.swf > $@
 	chmod 755 $@
 
 NetStream_SquareTest_SOURCES = \
@@ -1649,7 +1649,7 @@ instanceNameTest.swf: instanceNameTest
 	./instanceNameTest $(abs_mediadir)
 
 instanceNameTestRunner: $(srcdir)/../generic-testrunner.sh instanceNameTest.swf
-	sh $< $(top_builddir) instanceNameTest.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) instanceNameTest.swf > $@
 	chmod 755 $@
 
 Dejagnu_SOURCES =	\

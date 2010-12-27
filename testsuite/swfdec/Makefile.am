@@ -58,107 +58,107 @@ clean-local:
 		gnash.sum 
 
 run_swfdec_testsuite_a: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace aA > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace aA > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_b: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace bB > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace bB > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_c: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace cC > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace cC > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_d: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace dD > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace dD > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_e: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace eE > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace eE > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_f: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace fF > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace fF > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_g: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace gG > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace gG > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_h: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace hH > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace hH > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_i: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace iI > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace iI > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_j: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace jJ > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace jJ > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_k: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace kK > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace kK > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_l: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace lL > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace lL > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_m: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace mM > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace mM > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_n: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace nN > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace nN > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_o: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace oO > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace oO > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_p: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace pP > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace pP > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_q: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace qQ > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace qQ > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_r: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace rR > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace rR > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_s: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace sS > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace sS > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_t: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace tT > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace tT > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_u: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace uU > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace uU > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_v: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace vV > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace vV > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_w: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace wW > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace wW > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_x: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace xX > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace xX > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_y: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace yY > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace yY > $@
 	chmod 755 $@
 
 run_swfdec_testsuite_z: $(srcdir)/gen_run_swfdec_testsuite.sh Makefile
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace zZ > $@
+	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace zZ > $@
 	chmod 755 $@
 
 TEST_DRIVERS = ../simple.exp

@@ -319,6 +319,48 @@ setupSoundAndRendering(gnash::Player& p, int i)
     }
 }
 
+po::options_description
+getDebuggingOptions(gnash::Player& p)
+{
+    using gnash::Player;
+    using gnash::LogFile;
+    using gnash::RcInitFile;
+
+    po::options_description desc(_("Debugging options"));
+
+    desc.add_options()
+
+    ("verbose,v", accumulator<int>()
+        ->notifier(boost::bind(&LogFile::setVerbosity, &dbglogfile, _1)),
+        _("Produce verbose output"))
+
+    ("writelog,w", po::bool_switch()
+        ->notifier(boost::bind(&RcInitFile::useWriteLog, &rcfile, _1)),
+        _("Produce the disk based debug log"))
+
+#if VERBOSE_ACTION
+    ("verbose-actions,a", po::bool_switch()
+        ->notifier(boost::bind(&LogFile::setActionDump, &dbglogfile, _1)),
+        _("Be (very) verbose about action execution"))
+#endif
+
+#if VERBOSE_PARSE
+    ("verbose-parsing,p", po::bool_switch()
+        ->notifier(boost::bind(&LogFile::setParserDump, &dbglogfile, _1)),
+        _("Be (very) verbose about parsing"))
+#endif
+
+#ifdef GNASH_FPS_DEBUG
+    ("debug-fps,f", po::value<float>()
+        ->notifier(boost::bind(&Player::setFpsPrintTime, &p, _1)),
+        _("Print FPS every num seconds"))
+#endif 
+
+
+    ;
+
+    return desc;
+}
 
 po::options_description
 getSupportedOptions(gnash::Player& p)
@@ -354,22 +396,6 @@ getSupportedOptions(gnash::Player& p)
         ->notifier(boost::bind(&Player::setDelay, &p, _1)),
         _("Number of milliseconds to delay in main loop"))
 
-    ("verbose,v", accumulator<int>()
-        ->notifier(boost::bind(&LogFile::setVerbosity, &dbglogfile, _1)),
-        _("Produce verbose output"))
-
-#if VERBOSE_ACTION
-    ("verbose-actions,a", po::bool_switch()
-        ->notifier(boost::bind(&LogFile::setActionDump, &dbglogfile, _1)),
-        _("Be (very) verbose about action execution"))
-#endif
-
-#if VERBOSE_PARSE
-    ("verbose-parsing,p", po::bool_switch()
-        ->notifier(boost::bind(&LogFile::setParserDump, &dbglogfile, _1)),
-        _("Be (very) verbose about parsing"))
-#endif
-
     ("audio-dump,A", po::value<string>()
         ->notifier(boost::bind(&Player::setAudioDumpfile, &p, _1)),
         _("Audio dump file (wave format)"))
@@ -383,10 +409,6 @@ getSupportedOptions(gnash::Player& p)
     ("xid,x", po::value<long>()
         ->notifier(boost::bind(&Player::setWindowId, &p, _1)),
         _("X11 Window ID for display"))
-
-    ("writelog,w", po::bool_switch()
-        ->notifier(boost::bind(&RcInitFile::useWriteLog, &rcfile, _1)),
-        _("Produce the disk based debug log"))
 
     ("width,j", po::value<int>()
         ->notifier(boost::bind(&Player::setWidth, &p, _1)),
@@ -458,12 +480,6 @@ getSupportedOptions(gnash::Player& p)
         + string(" <fd>:<fd>")
         ).c_str())
 
-#ifdef GNASH_FPS_DEBUG
-    ("debug-fps,f", po::value<float>()
-        ->notifier(boost::bind(&Player::setFpsPrintTime, &p, _1)),
-        _("Print FPS every num seconds"))
-#endif 
-
     ("max-advances", po::value<size_t>()
         ->notifier(boost::bind(&Player::setMaxAdvances, &p, _1)),
         _("Exit after specified number of frame advances"))
@@ -493,6 +509,28 @@ getSupportedOptions(gnash::Player& p)
     ("input-file", po::value<std::vector<std::string> >(&infiles),
         _("Input files"))
     ;
+
+    desc.add(getDebuggingOptions(p));
+
+
+// Add gui-specific options
+// TODO make this somehow cleaner, maybe add a signature
+//      for such function in each of the gui's mains
+//      like getGuiOptions()
+#ifdef GUI_DUMP
+    po::options_description dumpOpts (_("Dump options"));
+
+    dumpOpts.add_options()
+
+    (",D", po::value<string>(),
+        _("Video dump file (raw format) and optional video FPS (@<num>)"))
+    (",S", po::value<string>(),
+        _("Number of milliseconds to sleep between advances"))
+    ;
+
+    desc.add(dumpOpts);
+#endif
+
 
     return desc;
 }

@@ -134,17 +134,19 @@ revno.h:
 	@if test \! -e .lastmod; then \
 	  touch -t 197001010000 .lastmod; \
 	fi; \
-	if test $(top_srcdir)/.git/index -nt .lastmod; then \
-	  if test -d $(top_srcdir)/.git -a x"${GIT}" != x; then \
+	if test -d $(top_srcdir)/.git -a x"${GIT}" != x; then \
+	  if test $(top_srcdir)/.git/index -nt .lastmod; then \
             echo "Getting build info for revno.h"; \
             revno="`cd $(top_srcdir) ; $(GIT) rev-list HEAD | wc -l`"; \
             comm_id="`cd $(top_srcdir) ; $(GIT) rev-parse --short HEAD`"; \
             nick="`cd $(top_srcdir) ; $(GIT) branch | grep '^\*' | cut -d ' ' -f 2`"; \
-          else \
-            revno="$(NOW)"; \
-            comm_id="none"; \
-            nick="master"; \
-          fi; \
+	  fi \
+        else \
+          revno="$(NOW)"; \
+          comm_id="none"; \
+          nick="master"; \
+        fi; \
+	if test \! -z "$${revno}"; then \
           echo "Generating revno.h ($${nick} $${revno} $${comm_id})"; \
           echo "static const char* BRANCH_REVNO  = \"$${revno}\";" > revno.h; \
           echo "static const char* BRANCH_NICK = \"$${nick}\";" >> revno.h; \
@@ -512,4 +514,4 @@ packageclean:
 	-test -z "$(CLEANFILES)" || rm -rf $(CLEANFILES)
  
 # these files are created when building packages
-CLEANFILES += *.deb rpmbuild *.dsc *.gz *.bz2 *.changes deb-copy-stamp gnash*git*
+CLEANFILES += *.deb *.dsc *.gz *.bz2 *.changes deb-copy-stamp gnash*git* gnash*dev rpmbuild gnash.spec .rpmmacros

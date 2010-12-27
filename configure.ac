@@ -636,7 +636,9 @@ AC_ARG_ENABLE(gui,
         if test x${linux} = xyes; then
           build_fb=yes
         fi
-        build_kde4=yes
+        if test x${openbsd} != xyes; then
+          build_kde4=yes
+        fi
         build_sdl=yes
         ;;
       *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde3|kde4|fltk|sdl|riscos|aqua|fb|qtopia3|qtopia4|dump|aos4|haiku)])
@@ -1284,6 +1286,7 @@ else
 fi
 ltmajor=`echo $ltver | cut -d '.' -f 1`
 AC_MSG_RESULT([$ltver])
+dnl Libtool version 1.5
 if test $ltmajor -eq 1; then
   AC_LIBLTDL_CONVENIENCE
   AC_LIBTOOL_DLOPEN
@@ -1294,6 +1297,14 @@ if test $ltmajor -eq 1; then
     :
   fi
   AC_DISABLE_STATIC
+  dnl FIXME: there should really be a test here to make sure it's really there,
+  dnl but because libltdl requires us to use their config code, it's a lot harder
+  dnl to do that. So if we get this far without errors, we just blindly assume
+  dnl the header exists too. This is only used by libtool 1.5, which appears to
+  dnl mostly only effect Debian lenny or OpenBSD. Libtool; 2.x defines this, but
+  dnl libtool 1.5 doesn't, and we need it for dlopen() so extensions work.
+  AC_DEFINE(HAVE_LTDL, [1], [Libtool 2.x defines this, but libtool 1.5 doesn't])
+dnl libtool version 2.x
 else
   LT_INIT([dlopen win32-dll disable-static])
   LTDL_INIT([convenience recursive])
@@ -2977,6 +2988,7 @@ testsuite/libcore.all/Makefile
 testsuite/libmedia.all/Makefile
 gui/Makefile
 gui/fb/Makefile
+gui/dump/Makefile
 gui/Info.plist
 gui/pythonmod/Makefile
 extensions/Makefile

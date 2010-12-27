@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AUTOMAKE_OPTIONS = dejagnu -Wno-portability
+AUTOMAKE_OPTIONS = dejagnu
 
 # These will get executed and parsed for test output
 SANE_SCTESTS = \
@@ -90,7 +90,7 @@ check_PROGRAMS = \
 	button_test1runner \
 	$(NULL)
 
-abs_mediadir = $(shell cd $(srcdir)/../media; pwd)
+abs_mediadir = $(abs_top_srcdir)/testsuite/media 
 
 #SWFC = swfc # this is set by ./configure
 SWFC_FLAGS = 
@@ -109,11 +109,11 @@ TEST_CASES = \
 	$(check_PROGRAMS)
 
 sanetests-runner: $(srcdir)/../generic-testrunner.sh $(SANE_SCTESTS_OUT) $(AUXMOVIES_OUT) Makefile
-	sh $< -c __END_OF_TEST__ -f 50 -r 50 $(top_builddir) $(SANE_SCTESTS_OUT) > $@
+	sh $(srcdir)/../generic-testrunner.sh -c __END_OF_TEST__ -f 50 -r 50 $(top_builddir) $(SANE_SCTESTS_OUT) > $@
 	chmod 755 $@
 
 bogustests-runner: $(srcdir)/../generic-testrunner.sh $(BOGO_SCTESTS_OUT) $(AUXMOVIES_OUT) Makefile
-	sh $< -C __END_OF_TEST__ -f 50 -r 50 $(top_builddir) $(BOGO_SCTESTS_OUT) > $@
+	sh $(srcdir)/../generic-testrunner.sh -C __END_OF_TEST__ -f 50 -r 50 $(top_builddir) $(BOGO_SCTESTS_OUT) > $@
 	chmod 755 $@
 
 $(SANE_SCTESTS_OUT): Dejagnu.sc check.sc

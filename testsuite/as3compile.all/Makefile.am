@@ -56,11 +56,11 @@ TEST_CASES = \
 	$(check_PROGRAMS)
 
 sanetests-runner: $(srcdir)/../generic-testrunner.sh $(SANE_AS3TESTS_OUT) Makefile
-	sh $< -c "__END_OF_TEST__" -r 50 $(top_builddir) $(SANE_AS3TESTS_OUT) > $@
+	sh $(srcdir)/../generic-testrunner.sh -c "__END_OF_TEST__" -r 50 $(top_builddir) $(SANE_AS3TESTS_OUT) > $@
 	chmod 755 $@
 
 bogustests-runner: $(srcdir)/../generic-testrunner.sh $(BOGUS_AS3TESTS_OUT) Makefile
-	sh $< -C __END_OF_TEST__ -r 50 $(top_builddir) $(BOGUS_AS3TESTS_OUT) > $@
+	sh $(srcdir)/../generic-testrunner.sh -C __END_OF_TEST__ -r 50 $(top_builddir) $(BOGUS_AS3TESTS_OUT) > $@
 	chmod 755 $@
 
 $(AS3TESTS_OUT): dejagnu.as check.as

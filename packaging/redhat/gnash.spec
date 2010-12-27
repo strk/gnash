@@ -15,6 +15,7 @@ URL:            http://www.gnu.org/software/gnash/
 Source0:        http://www.getgnash.org/packages/snapshots/fedora/%{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%{_target_cpu}
 
+BuildRequires:  redhat-lsb
 # bitmap libraries for loading images
 BuildRequires:  libpng-devel libjpeg-devel giflib-devel
 # these are needed for the python gtk widget
@@ -230,7 +231,7 @@ RPM_TARGET=%{_target}
 	--disable-rpath \
 	--with-plugindir=%{_libdir}/mozilla/plugins
 
-make $MAKEFLAGS dumpconfig all
+make MAKEFLAGS=$MAKEFLAGS dumpconfig all
 %else
 # uncommenting these will produce huge volumes of debug info from the
 # shell, but sometimes that's what you need to do.
@@ -243,6 +244,7 @@ sh ./configure \
 	$OTHER \
 	$OPTIONAL \
         --prefix=/usr \
+	--libdir=%{_libdir} \
 	--mandir=%{_prefix}/share/man \
 	--infodir=%{_prefix}/share/info \
 	--disable-dependency-tracking \
@@ -252,9 +254,10 @@ sh ./configure \
 	--enable-cygnal \
 	--enable-python \
 	--with-plugins-install=system \
+	--with-plugindir=%{_libdir}/mozilla/plugins \
 	--enable-extensions=fileio,lirc,dejagnu,mysql
 
-make $MAKEFLAGS dumpconfig all LDFLAGS="-Wl,--build-id"
+make MAKEFLAGS=$MAKEFLAGS dumpconfig all LDFLAGS="-Wl,--build-id"
 %endif
 # When testing the spec file, try setting MAKEFLAGS to
 # "CXXFLAGS-O0 -j4" to speed up getting results. Note *don't*
@@ -264,14 +267,14 @@ make $MAKEFLAGS dumpconfig all LDFLAGS="-Wl,--build-id"
 strip gui/.libs/*-gnash
 strip utilities/.libs/g* utilities/.libs/soldumper utilities/.libs/flvdumper cygnal/.libs/cygnal
 rm -rf $RPM_BUILD_ROOT
-make $MAKEFLAGS install DESTDIR=$RPM_BUILD_ROOT LDFLAGS="-Wl,--build-id"
-make $MAKEFLAGS install-plugins DESTDIR=$RPM_BUILD_ROOT LDFLAGS="-Wl,--build-id"
-rm $RPM_BUILD_ROOT%{_libdir}/gnash/*.*a
+make MAKEFLAGS=$MAKEFLAGS install DESTDIR=$RPM_BUILD_ROOT LDFLAGS="-Wl,--build-id"
+make MAKEFLAGS=$MAKEFLAGS install-plugins DESTDIR=$RPM_BUILD_ROOT LDFLAGS="-Wl,--build-id"
+rm -f $RPM_BUILD_ROOT%{_libdir}/gnash/*.*a
 %if !%{cross_compile}
-
 rm -rf $RPM_BUILD_ROOT%{_localstatedir}/scrollkeeper
 rm -f $RPM_BUILD_ROOT%{_infodir}/dir
 %endif
+/usr/lib/rpm/brp-compress
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -297,14 +300,14 @@ scrollkeeper-update -q || :
 %files
 %defattr(-,root,root,-)
 %{_bindir}/gtk-gnash
-%{_datadir}/man/man1/gtk-gnash.1.gz
+%{_mandir}/man1/gtk-gnash.1.gz
 
 %files common
 %defattr(-,root,root,-)
 %dump
 %doc README AUTHORS COPYING NEWS 
 %{_bindir}/gnash
-%{_datadir}/man/man1/gnash.1.gz
+%{_mandir}/man1/gnash.1.gz
 %{_bindir}/gprocessor
 %{_bindir}/soldumper
 %{_bindir}/flvdumper
@@ -315,12 +318,12 @@ scrollkeeper-update -q || :
 %{_libdir}/gnash/*.so*
 %{_prefix}/share/gnash/GnashG.png
 %{_prefix}/share/gnash/gnash_128_96.ico
-%{_datadir}/man/man1/gprocessor.1.gz
-%{_datadir}/man/man1/soldumper.1.gz
-%{_datadir}/man/man1/flvdumper.1.gz
-%{_datadir}/man/man1/findmicrophones.1.gz
-%{_datadir}/man/man1/findwebcams.1.gz
-%{_datadir}/man/man1/rtmpget.1.gz
+%{_mandir}/man1/gprocessor.1.gz
+%{_mandir}/man1/soldumper.1.gz
+%{_mandir}/man1/flvdumper.1.gz
+%{_mandir}/man1/findmicrophones.1.gz
+%{_mandir}/man1/findwebcams.1.gz
+%{_mandir}/man1/rtmpget.1.gz
 %{_datadir}/locale/*/LC_MESSAGES/gnash.mo
 %if !%{cross_compile}
 #%{_prefix}/share/info/*.info*
@@ -345,38 +348,44 @@ scrollkeeper-update -q || :
 %{_bindir}/cygnal
 %{_prefix}/etc/cygnalrc
 %{_libdir}/cygnal/plugins/*.so*
-%{_datadir}/man/man1/cygnal.1.gz
+%{_mandir}/man1/cygnal.1.gz
 
 %files devel
+%defattr(-,root,root,-)
 %{_prefix}/include/gnash/*.h*
 %{_prefix}/include/gnash/vm/*.h
 %{_prefix}/include/gnash/asobj/*.h
 %{_prefix}/include/gnash/parser/*.h
-%{_prefix}/lib/pkgconfig/gnash.pc
+%{_libdir}/pkgconfig/gnash.pc
 
 %files widget
+%defattr(-,root,root,-)
 %{_prefix}/include/gnash/*.h
-%{_prefix}/lib/python*/site-packages/gtk-2.0/gnash.*
+%{_prefix}/lib*/python*/site-packages/gtk-2.0/gnash.*
 
 %files klash4
 %defattr(-,root,root,-)
 %{_bindir}/kde4-gnash
-%{_datadir}/man/man1/kde4-gnash.1.gz
-%{_libdir}/kde4/libklashpart.*
+%{_mandir}/man1/kde4-gnash.1.gz
+%{_prefix}/%{_lib}/kde4/libklashpart.*
 %{_prefix}/share/kde4/apps/klash/klashpartui.rc
 %{_prefix}/share/kde4/apps/klash/pluginsinfo
 %{_prefix}/share/kde4/services/klash_part.desktop
 
 %files fileio-extension
+%defattr(-,root,root,-)
 %{_libdir}/gnash/plugins/fileio.so
 
 %files lirc-extension
+%defattr(-,root,root,-)
 %{_libdir}/gnash/plugins/lirc.so
 
 %files dejagnu-extension
+%defattr(-,root,root,-)
 %{_libdir}/gnash/plugins/dejagnu.so
 
 %files mysql-extension
+%defattr(-,root,root,-)
 %{_libdir}/gnash/plugins/mysql.so
 
 %changelog

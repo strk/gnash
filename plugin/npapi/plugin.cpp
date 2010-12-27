@@ -850,20 +850,34 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
             this->getScriptObject()->AddMethod(id, remoteCallback);
             return true;
         }
-        NPVariant *result = 0;
+        NPVariant result;
+        VOID_TO_NPVARIANT(result);
+        bool invokeResult=false;
         // This is the player invoking a method in Javascript
-        uint32_t count = 0;
-        NPVariant args;
         if (!invoke->name.empty()) {
-            NPIdentifier id = NPN_GetStringIdentifier(invoke->name.c_str());      
-            gnash::log_debug("Invoking JavaScript method %s", invoke->name);
-            NPN_Invoke(_instance, _scriptObject, id, &args, count, result);
+            //Convert the as_value argument to NPVariant
+            uint32_t count = invoke->args.size();
+            if(count!=0) //The first argument should exists and be the method name
+            {
+                count--;
+                NPVariant* args = new NPVariant[count];
+                //Skip the first argument
+                for(uint32_t i=0;i<count;i++)
+                    invoke->args[i+1].copy(args[i]);
+                NPIdentifier id = NPN_GetStringIdentifier(invoke->name.c_str());
+                gnash::log_debug("Invoking JavaScript method %s", invoke->name);
+                NPObject* windowObject;
+                NPN_GetValue(_instance, NPNVWindowNPObject, &windowObject);
+                invokeResult=NPN_Invoke(_instance, windowObject, id, args, count, &result);
+                NPN_ReleaseObject(windowObject);
+                delete[] args;
+            }
         }
         // We got a result from invoking the Javascript method
         std::stringstream ss;
-        if (result) {
-            NPN_ReleaseVariantValue(result);
-            ss << ExternalInterface::convertNPVariant(result);
+        if (invokeResult) {
+            ss << ExternalInterface::convertNPVariant(&result);
+            NPN_ReleaseVariantValue(&result);
         } else {
             // Send response
             // FIXME: "securityError" also possible, check domain
