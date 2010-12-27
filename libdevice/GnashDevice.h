@@ -119,9 +119,12 @@ struct GnashDevice
     // bindClient() is used by OpenVG, OpenGLES1, and OpenGLES2
     // to bind the client type to the EGL surface. This method
     // is unused by the RawFB, DirectFB, and X11 Devices.
-    virtual bool bindClient(GnashDevice::rtype_t rtype) {};
+    virtual bool bindClient(GnashDevice::rtype_t rtype) { return false; };
     
-    virtual bool swapBuffers() {};
+    virtual bool swapBuffers() {
+        GNASH_REPORT_FUNCTION;
+        return false;
+    };
 };
     
 } // namespace renderer
