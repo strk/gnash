@@ -31,6 +31,9 @@
 #include <boost/assign/list_of.hpp>
 #include <boost/date_time/date.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include "log.h"
 #include "dejagnu.h"
@@ -51,9 +54,12 @@
 #endif
 #ifdef RENDERER_OPENVG
 #include "openvg/Renderer_ovg.h"
-//#include <VG/openvg.h>
 #include <VG/vgu.h>
-#include <VG/ext.h>
+#ifdef HAVE_VG_VGEXT_H
+# include <VG/vgext.h>
+#else
+# include <VG/ext.h>
+#endif
 #endif
 #ifdef RENDERER_GLES1
 #include "opengles1/Renderer_gles1.h"
@@ -147,21 +153,37 @@ main(int argc, char *argv[])
     dbglogfile.setVerbosity();
 
     const char *pixelformat = "RGB24";
+    int fd = 0;
+
+#ifdef BUILD_RAWFB_DEVICE_XXX
+    rawfb::RawFBDevice rawfb(argc, argv);
+    fd = rawfb.getHandle();
+#endif  // BUILD_RAWFB_DEVICE
+
+#if defined(BUILD_EGL_DEVICE) && !defined(BUILD_X11_DEVICE)
+    // Setup EGL, OpenVG needs it
+    EGLDevice egl(argc, argv);
+    egl.bindClient(GnashDevice::OPENVG);
+    fd = open("/dev/fb0", O_RDWR);
+    egl.attachWindow(fd);
+#endif  // BUILD_EGL_DEVICE
     
 #ifdef BUILD_X11_DEVICE
     // Setup EGL, OpenVG needs it
-    EGLDevice egl(argc, argv);
+    EGLDevice egl;
+    //egl.setAttrib(1);
+    egl.initDevice(argc, argv);
     int vid = egl.getNativeVisual();
+    egl.bindClient(GnashDevice::OPENVG);
 
     // Create an X11 device for the display. This is for libMesa
     // where we can also run OpenVG on the desktop.
     x11::X11Device x11(vid);
     //x11.initDevice(argc, argv);
     x11.createWindow("TestR", 0, 0, 640, 480);
-    egl.bindClient(GnashDevice::OPENVG);
     
     // This is the window that gets rendered in
-    Window win = x11.getDrawableWindow();
+    Window win = x11.getHandle();
     if (win) {
         egl.attachWindow(win);
     } else {
@@ -180,7 +202,7 @@ main(int argc, char *argv[])
     std::cerr << "Hello World!" << std::endl;
     x11.eventLoop(10);
 #endif
-#if 0
+
 #ifdef RENDERER_AGG
     Timer tagg("AGG");
     Renderer *renderer1 = create_Renderer_agg(pixelformat);
@@ -275,7 +297,6 @@ main(int argc, char *argv[])
     cerr << "OpenGL tests took " << tgl.elapsed() << endl;
 #endif
 #endif    
-#endif    
 }
 
 // Each Renderer has an associated display device, currently EGL
@@ -289,7 +310,7 @@ main(int argc, char *argv[])
 void
 test_device(Renderer *renderer, const std::string &type)
 {
-    cout << "Testing " << type << " Device" << endl;
+    cout << endl << "Testing " << type << " Device" << endl;
 
 #if 0
     boost::shared_array<renderer::GnashDevice::dtype_t> devs = renderer->probeDevices();
@@ -354,44 +375,29 @@ test_renderer(Renderer *renderer, const std::string &type)
     }
 #endif
     
-    image::GnashImage *frame1 = new image::ImageRGBA(10, 10);
+    image::GnashImage *frame1 = new image::ImageRGBA(10, 12);
     std::auto_ptr<image::GnashImage> im1(frame1);
     CachedBitmap *cb = renderer->createCachedBitmap(im1);
     if (cb) {
-        runtest.pass("createCachedBitmap()");
+        image::GnashImage &gi = cb->image();
+        if ((gi.width() == 10) && (gi.height() == 12)) {
+            runtest.pass("createCachedBitmap()");
+        } else {
+            runtest.fail("createCachedBitmap()");
+        }
     } else {
-        runtest.fail("createCachedBitmap()");
+        runtest.unresolved("createCachedBitmap()");
     }
 
-#ifdef HAVE_GTK2_XX
-    GtkWidget *canvas = create_GTK_window();
-    if (type == "AGG") {
-        GdkVisual* visual = gdk_drawable_get_visual(canvas->window);
-        GdkImage *offscreenbuf = gdk_image_new (GDK_IMAGE_FASTEST, visual, 200,
-                                                200);;
-        static_cast<Renderer_agg_base *>(renderer)->init_buffer(
-            (unsigned char*) offscreenbuf->mem,
-            offscreenbuf->bpl * offscreenbuf->height,
-            offscreenbuf->width,
-            offscreenbuf->height,
-            offscreenbuf->bpl);    
-    }
-            
-    if ((type == "OpenVG") && (type == "OpenGLES1") && (type == "OpenGLES2")) {
-        EGLDevice *ovg = dynamic_cast<EGLDevice *>(renderer);
-        ovg->initDevice(0, 0);
-//        ovg->initDevice(EGLDevice::OPENVG);
-        ovg->attachWindow(*(reinterpret_cast<EGLNativeWindowType *>(canvas)));
-    }
-#else
 #if 0
+    // FIXME: initTestBuffer() is going away, replaced by the fake
+    // framebuffer code.
     // Initializes the renderer for off-screen rendering used by the testsuite.
     if (renderer->initTestBuffer(10, 10)) {
         runtest.pass("initTestBuffer()");
     } else {
         runtest.fail("initTestBuffer()");
     }
-#endif
 #endif
     
     /// @coords an array of 16-bit signed integer coordinates. Even indices
