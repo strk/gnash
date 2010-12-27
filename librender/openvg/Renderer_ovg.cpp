@@ -16,7 +16,9 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 ///
-/// original author: Visor <cutevisor@gmail.com>
+/// Original author: Visor <cutevisor@gmail.com>
+/// Heavily hacked by Rob <rob@welcomehome.org> to work with Gnash
+/// git master.
 ///
 
 #ifdef HAVE_CONFIG_H
@@ -35,6 +37,7 @@
 #include "GnashImage.h"
 #include "GnashNumeric.h"
 #include "FillStyle.h"
+#include "LineStyle.h"
 #include "Transform.h"
 #include "log.h"
 #include "utility.h"
@@ -72,6 +75,62 @@ typedef std::vector<geometry::Range2d<int> > ClipBounds;
 namespace renderer {
 
 namespace openvg {
+
+namespace {
+
+// FIXME: These helper classes should be moved to their own file.
+
+/// @note These helper functions are used by the boost::variant used
+/// for fill styles. A variant is a C++ style version of the C union.
+/// Before accessing any of the data of the variant, we have to use
+/// boost::apply_visitor() to bind one of these classes to the style
+/// to extract the data.
+
+/// Get the color of a style from the variant
+class GetColor : public boost::static_visitor<rgba>
+{
+public:
+    rgba operator()(const SolidFill& f) const {
+        return f.color();
+    }
+    rgba operator()(const GradientFill&) const {
+        return rgba();
+    }
+    rgba operator()(const BitmapFill&) const {
+        return rgba();
+    }
+};
+
+/// Get the bitmap data of a style from the variant
+class GetBitmap : public boost::static_visitor<const CachedBitmap *>
+{
+public:
+    const CachedBitmap *operator()(const SolidFill&) const {
+        return 0;
+    }
+    const CachedBitmap *operator()(const GradientFill&) const {
+        return 0;
+    }
+    const CachedBitmap *operator()(const BitmapFill& b) const {
+        return b.bitmap();
+    }
+};
+
+/// Get the matrix of a style from the variant
+class GetMatrix : public boost::static_visitor<SWFMatrix>
+{
+public:
+    SWFMatrix operator()(const SolidFill&) const {
+    }
+    SWFMatrix operator()(const GradientFill& g) const {
+        return g.matrix();
+    }
+    SWFMatrix operator()(const BitmapFill& b) const {
+        return b.matrix();
+    }
+};
+
+}
 
 class eglScopeMatrix : public boost::noncopyable
 {
@@ -164,42 +223,42 @@ preparepath(VGPath path, const std::vector<Edge>& edges,
         vgAppendPathData (path, scount, gseg, gdata);
 }
 
+#if 0
 // Use the image class copy constructor; it's not important any more
 // what kind of image it is.
 bitmap_info_ovg::bitmap_info_ovg(std::auto_ptr<gnash::image::GnashImage> img,
-                                 VGImageFormat pixelformat, VGPaint paint)
-:
-    _img(img.release()),
-    _pixel_format(pixelformat),
-    _paint(paint),
-    _orig_width(_img->width()),
-    _orig_height(_img->height())
+                                 VGImageFormat pixelformat, VGPaint vgpaint)
+    : _image(img.release()),
+      _pixel_format(pixelformat),
+      _vgpaint(vgpaint)
 {
     GNASH_REPORT_FUNCTION;
 
-    _width = _img->width();
-    _height = _img->height();
+    size_t width = _image->width();
+    size_t height = _image->height();
   
-    if (_pixel_format == VG_sARGB_8888) {
-        _image = vgCreateImage(VG_sARGB_8888, _width, _height, GNASH_IMAGE_QUALITY);    
+    _vgimage = vgCreateImage(VG_sRGB_565, width, height, GNASH_IMAGE_QUALITY);    
     
-        vgImageSubData(_image, _img->begin(), _width * 4, VG_sARGB_8888,
-                       0, 0, _width, _height);
-    }
-    
-    tex_size += _width * _height * 4;
-    log_debug("Add Texture size:%d (%d x %d x %dbpp)", _width * _height * 4, _width, _height, 4);
+    vgImageSubData(_vgimage, _image->begin(), width * 4, VG_sRGB_565,
+                   0, 0, width, height);
+
+    tex_size += width * height * 4;
+    log_debug("Add Texture size:%d (%d x %d x %dbpp)", width * height * 4, 
+              width, height, 4);
     log_debug("Current Texture size: %d", tex_size);
 }   
-    
+
 bitmap_info_ovg::~bitmap_info_ovg()
 {
     GNASH_REPORT_FUNCTION;
-    tex_size -= _width * _height * 4;
-    log_debug(_("Remove Texture size:%d (%d x %d x %dbpp)"), _width * _height * 4, _width, _height, 4);
+
+    tex_size -= _image->width() * _image->height() * 4;
+    log_debug(_("Remove Texture size:%d (%d x %d x %dbpp)"),
+              _image->width() * _image->height() * 4,
+              _image->width(), _image->height(), 4);
     log_debug(_("Current Texture size: %d"), tex_size);
 
-    vgDestroyImage(_image);
+    vgDestroyImage(_vgimage);
 }
 
 void
@@ -212,8 +271,8 @@ bitmap_info_ovg::apply(const gnash::SWFMatrix& bitmap_matrix,
     
     mat = bitmap_matrix;
 
-    vgSetParameteri (_paint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
-    vgPaintPattern (_paint, _image);
+    vgSetParameteri (_vgpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
+    vgPaintPattern (_vgpaint, _vgimage);
     
     mat.invert();
     memset(vmat, 0, sizeof(vmat));
@@ -231,11 +290,12 @@ bitmap_info_ovg::apply(const gnash::SWFMatrix& bitmap_matrix,
     vgSeti (VG_MATRIX_MODE, VG_MATRIX_PATH_USER_TO_SURFACE);
 
     if (wrap_mode == WRAP_CLAMP) {  
-        vgSetParameteri (_paint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_PAD);
+        vgSetParameteri (_vgpaint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_PAD);
     } else {
-        vgSetParameteri (_paint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_REPEAT);
+        vgSetParameteri (_vgpaint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_REPEAT);
     }
 }
+#endif
 
 template<typename C, typename T, typename R, typename A>
 void 
@@ -251,12 +311,9 @@ Renderer_ovg::Renderer_ovg()
       _drawing_mask(false)
 {
     GNASH_REPORT_FUNCTION;
-#ifdef BUILD_EGL_DEVICE
-//    _device.reset(new renderer::EGLDevice);
-#endif      
 }
 
-Renderer_ovg::Renderer_ovg(renderer::GnashDevice::dtype_t dtype)
+Renderer_ovg::Renderer_ovg(renderer::GnashDevice::dtype_t /* dtype */)
     : _display_width(0.0),
       _display_height(0.0),
       _drawing_mask(false)
@@ -317,23 +374,9 @@ CachedBitmap *
 Renderer_ovg::createCachedBitmap(std::auto_ptr<image::GnashImage> im)
 {
     GNASH_REPORT_FUNCTION;
-    
+
     // OpenVG don't support 24bit RGB, need translate colorspace
-    switch (im->type()) {
-      case image::TYPE_RGBA:   
-          return new bitmap_info_ovg(im, VG_sARGB_8888, m_fillpaint);
-          break;
-      case image::TYPE_RGB:
-      default:
-          log_error("Can't create a cached bitmap! Unsuppored type: %d",
-                    im->type());
-          std::abort();
-    }
-
-   const CachedBitmap* bi = createCachedBitmap(
-                    static_cast<std::auto_ptr<image::GnashImage> >(im));
-
-    return 0;
+    return reinterpret_cast<CachedBitmap *>(new bitmap_info_ovg(im, VG_sRGB_565, 0));
 }
 
 // Since we store drawing operations in display lists, we take special care
@@ -502,11 +545,6 @@ Renderer_ovg::drawPoly(const point* corners, size_t corner_count,
     int         scount = 0;
     int         dcount = 0;
 
-    if (!_device) {
-        log_error("No Device specified for OpenVG to draw on!");
-        return;
-    }
-    
     if (corner_count < 1) {
         return;
     }
@@ -726,7 +764,8 @@ Renderer_ovg::find_connecting_path(const Path& to_connect,
 PathVec
 Renderer_ovg::normalize_paths(const PathVec &paths)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     PathVec normalized;
     
     for (PathVec::const_iterator it = paths.begin(), end = paths.end();
@@ -774,7 +813,8 @@ void
 Renderer_ovg::analyze_paths(const PathVec &paths, bool& have_shape,
                             bool& have_outline) 
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     have_shape=false;
     have_outline=false;
     
@@ -798,12 +838,11 @@ Renderer_ovg::analyze_paths(const PathVec &paths, bool& have_shape,
 }
 
 void
-Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& /* mat */,
+Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
                                const SWFCxForm& cx)
 {
-    GNASH_REPORT_FUNCTION;
+    //    GNASH_REPORT_FUNCTION;
 
-#if 0
     //    FIXME fill_style changed to FillStyle
     SWF::FillType fill_type = SWF::FILL_SOLID; // style.get_type();
     
@@ -813,25 +852,34 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& /* mat *
       case SWF::FILL_RADIAL_GRADIENT:
       case SWF::FILL_FOCAL_GRADIENT:
       {
-          gnash::GradientFill f();
-          const bitmap_info_ovg* binfo = static_cast<const bitmap_info_ovg*>(
-#if 0                           // original
-              style.need_gradient_bitmap(*this));   
-#else
-          createGradientBitmap(&f, *this));
-#endif
-          binfo->apply(style.getGradientMatrix(), bitmap_info_ovg::WRAP_CLAMP); 
+          GradientFill::Type gr;
+          switch (fill_type) {
+          case SWF::FILL_LINEAR_GRADIENT:
+              gr = GradientFill::LINEAR;
+              break;
+          case SWF::FILL_RADIAL_GRADIENT:
+          case SWF::FILL_FOCAL_GRADIENT:
+              gr = GradientFill::RADIAL;
+              break;
+          default:
+              std::abort();
+          }
+          GradientFill gf(gr, mat);
+
+          const bitmap_info_ovg* binfo = reinterpret_cast<const bitmap_info_ovg *>(
+               createGradientBitmap(gf, this));
+
+          binfo->apply(gf.matrix(), bitmap_info_ovg::WRAP_CLAMP); 
           vgSetParameteri (m_fillpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
           break;
       }
-#if 0
       case SWF::FILL_TILED_BITMAP_HARD:
       case SWF::FILL_TILED_BITMAP:
       {
-          const bitmap_info_ovg* binfo = static_cast<const bitmap_info_ovg*>(
-              style.get_bitmap_info(*this));
-          
-          binfo->apply(style.getBitmapMatrix(), bitmap_info_ovg::WRAP_REPEAT);
+          const CachedBitmap *cb = boost::apply_visitor(GetBitmap(), style.fill);
+          const bitmap_info_ovg* binfo = dynamic_cast<const bitmap_info_ovg *>(cb);
+          SWFMatrix sm = boost::apply_visitor(GetMatrix(), style.fill);          
+          binfo->apply(sm, bitmap_info_ovg::WRAP_REPEAT);
           vgSetParameteri (m_fillpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
           break;
       }
@@ -839,17 +887,18 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& /* mat *
       case SWF::FILL_CLIPPED_BITMAP:
       case SWF::FILL_CLIPPED_BITMAP_HARD:
       {     
-          const bitmap_info_ovg* binfo = dynamic_cast<const bitmap_info_ovg*>(
-              style.get_bitmap_info(*this));
-          
-          binfo->apply(style.getBitmapMatrix(), bitmap_info_ovg::WRAP_CLAMP);
+          const CachedBitmap *cb = boost::apply_visitor(GetBitmap(), style.fill);
+          const bitmap_info_ovg* binfo = dynamic_cast<const bitmap_info_ovg *>(cb);     
+
+          SWFMatrix sm = boost::apply_visitor(GetMatrix(), style.fill);
+          binfo->apply(sm, bitmap_info_ovg::WRAP_CLAMP);
           vgSetParameteri (m_fillpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
           break;
       } 
-#endif 
       case SWF::FILL_SOLID:
       {
-          rgba c = cx.transform(style.get_color());
+          rgba fc = boost::apply_visitor(GetColor(), style.fill);
+          rgba c = cx.transform(fc);
           VGfloat color[] = {
               c.m_r / 255.0f,
               c.m_g / 255.0f,
@@ -862,13 +911,13 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& /* mat *
       }
       
     } // switch
-#endif
 }
 
 bool
-Renderer_ovg::apply_line_style(const LineStyle& style, const SWFCxForm& cx, const SWFMatrix& mat)
+Renderer_ovg::apply_line_style(const LineStyle& style, const SWFCxForm& cx, 
+                               const SWFMatrix& mat)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     
     bool rv = true;
     
@@ -947,7 +996,8 @@ void
 Renderer_ovg::draw_outlines(const PathVec& path_vec, const SWFMatrix& mat,
                             const SWFCxForm& cx, const std::vector<LineStyle>& line_styles)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
          it != end; ++it) {
         
@@ -976,7 +1026,8 @@ Renderer_ovg::draw_outlines(const PathVec& path_vec, const SWFMatrix& mat,
 std::list<PathPtrVec>
 Renderer_ovg::get_contours(const PathPtrVec &paths)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     std::list<const Path*> path_refs;
     std::list<PathPtrVec> contours;
     
@@ -1260,11 +1311,7 @@ Renderer_ovg::drawGlyph(const SWF::ShapeRecord& rec, const rgba& c,
     SWFCxForm dummy_cx;
     std::vector<FillStyle> glyph_fs;
     
-#if 0                           // original
-    FillStyle coloring = SolidFill(c);
-#else
     FillStyle coloring = FillStyle(SolidFill(c));
-#endif
 
     glyph_fs.push_back(coloring);
 
@@ -1601,6 +1648,8 @@ Renderer *
 Renderer_ovg::startInternalRender(gnash::image::GnashImage&)
 {
     // GNASH_REPORT_FUNCTION;
+
+    return 0;
 }
 
 void
@@ -1612,7 +1661,7 @@ Renderer_ovg::endInternalRender()
 void
 Renderer_ovg::begin_display(gnash::rgba const&, int, int, float, float, float, float)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
 }
 void
@@ -1627,6 +1676,110 @@ Renderer_ovg::getBitsPerPixel()
     return 0;
 }
 
+namespace {
+
+// TODO: this function is rubbish and shouldn't survive a rewritten OGL
+// renderer.
+rgba
+sampleGradient(const GradientFill& fill, boost::uint8_t ratio)
+{
+
+    // By specs, first gradient should *always* be 0, 
+    // anyway a malformed SWF could break this,
+    // so we cannot rely on that information...
+    if (ratio < fill.record(0).ratio) {
+        return fill.record(0).color;
+    }
+
+    if (ratio >= fill.record(fill.recordCount() - 1).ratio) {
+        return fill.record(fill.recordCount() - 1).color;
+    }
+        
+    for (size_t i = 1, n = fill.recordCount(); i < n; ++i) {
+
+        const GradientRecord& gr1 = fill.record(i);
+        if (gr1.ratio < ratio) continue;
+
+        const GradientRecord& gr0 = fill.record(i - 1);
+        if (gr0.ratio > ratio) continue;
+
+        float f = 0.0f;
+
+        if (gr0.ratio != gr1.ratio) {
+            f = (ratio - gr0.ratio) / float(gr1.ratio - gr0.ratio);
+        }
+        else {
+            // Ratios are equal IFF first and second GradientRecord
+            // have the same ratio. This would be a malformed SWF.
+            IF_VERBOSE_MALFORMED_SWF(
+                log_swferror(_("two gradients in a FillStyle "
+                    "have the same position/ratio: %d"),
+                    gr0.ratio);
+            );
+        }
+
+        rgba result;
+        result.set_lerp(gr0.color, gr1.color, f);
+        return result;
+    }
+
+    // Assuming gradients are ordered by ratio? see start comment
+    return fill.record(fill.recordCount() - 1).color;
+}
+
+const CachedBitmap*
+createGradientBitmap(const GradientFill& gf, Renderer_ovg *renderer)
+{
+    GNASH_REPORT_FUNCTION;
+    
+    std::auto_ptr<image::ImageRGBA> im;
+
+    switch (gf.type())
+    {
+        case GradientFill::LINEAR:
+            // Linear gradient.
+            im.reset(new image::ImageRGBA(256, 1));
+
+            for (size_t i = 0; i < im->width(); i++) {
+
+                rgba sample = sampleGradient(gf, i);
+                im->setPixel(i, 0, sample.m_r, sample.m_g,
+                        sample.m_b, sample.m_a);
+            }
+            break;
+
+        case GradientFill::RADIAL:
+            // Focal gradient.
+            im.reset(new image::ImageRGBA(64, 64));
+
+            for (size_t j = 0; j < im->height(); j++)
+            {
+                for (size_t i = 0; i < im->width(); i++)
+                {
+                    float radiusy = (im->height() - 1) / 2.0f;
+                    float radiusx = radiusy + std::abs(radiusy * gf.focalPoint());
+                    float y = (j - radiusy) / radiusy;
+                    float x = (i - radiusx) / radiusx;
+                    int ratio = std::floor(255.5f * std::sqrt(x*x + y*y));
+                    
+                    if (ratio > 255) ratio = 255;
+
+                    rgba sample = sampleGradient(gf, ratio);
+                    im->setPixel(i, j, sample.m_r, sample.m_g,
+                            sample.m_b, sample.m_a);
+                }
+            }
+            break;
+        default:
+            break;
+    }
+
+    const CachedBitmap* bi = renderer->createCachedBitmap(
+                    static_cast<std::auto_ptr<image::GnashImage> >(im));
+
+    return bi;
+}
+}
 
 } // namespace gnash::renderer::gles1
 } // namespace gnash::renderer

@@ -17,6 +17,8 @@
 
 ///
 /// Author: Visor <cutevisor@gmail.com>
+/// Heavily hacked by Rob <rob@welcomehome.org> to work with Gnash
+/// git master.
 ///
 
 #ifndef GNASH_RENDER_HANDLER_OVG_BITMAP_H
@@ -26,6 +28,7 @@
 #include "CachedBitmap.h"
 #include "GnashImage.h"
 #include "Renderer.h"
+#include "openvg/Renderer_ovg.h"
 
 namespace gnash {
 
@@ -33,67 +36,110 @@ namespace renderer {
 
 namespace openvg {
 
-class bitmap_info_ovg : public CachedBitmap
+// FIXME: this should really be derived from CachedBitmap
+class bitmap_info_ovg //: public CachedBitmap
 {
 public:
-  
     /// Set line and fill styles for mesh & line_strip rendering.
-    enum bitmap_wrap_mode
-    {
-        WRAP_REPEAT,
-        WRAP_CLAMP
-    };
+    enum bitmap_wrap_mode { WRAP_REPEAT, WRAP_CLAMP };
     
-    bitmap_info_ovg(std::auto_ptr<image::GnashImage> img,
-                    VGImageFormat pixelformat, VGPaint paint);
-    ~bitmap_info_ovg();
+    bitmap_info_ovg(std::auto_ptr<image::GnashImage> im)
+        : _image(im.release())
+    {
+        GNASH_REPORT_FUNCTION;
+    }
+  
+    bitmap_info_ovg(std::auto_ptr<image::GnashImage> im,
+                    VGImageFormat pixelformat, VGPaint vgpaint)
+        : _image(im.release()),
+          _pixel_format(pixelformat),
+          _vgpaint(vgpaint)
+    {
+        GNASH_REPORT_FUNCTION;
+        
+        size_t width = _image->width();
+        size_t height = _image->height();
+        
+        _vgimage = vgCreateImage(VG_sRGB_565, width, height,
+                                 VG_IMAGE_QUALITY_FASTER);    
+        
+        vgImageSubData(_vgimage, _image->begin(), width * 4, VG_sRGB_565,
+                       0, 0, width, height);
+        
+        _tex_size += width * height * 4;
+        log_debug("Add Texture size:%d (%d x %d x %dbpp)", width * height * 4, 
+                  width, height, 4);
+        log_debug("Current Texture size: %d", _tex_size);
+    } 
 
-    void dispose() {
-        _img.reset();
+    ~bitmap_info_ovg()
+    {
+        GNASH_REPORT_FUNCTION;
+        
+        _tex_size -= _image->width() * _image->height() * 4;
+        log_debug(_("Remove Texture size:%d (%d x %d x %dbpp)"),
+                  _image->width() * _image->height() * 4,
+                  _image->width(), _image->height(), 4);
+        log_debug(_("Current Texture size: %d"), _tex_size);
+        
+        vgDestroyImage(_vgimage);
     }
 
-    bool disposed() const {
-        return !_img.get();
-    }
+    void disposed()  { _image.reset(); }
+    bool disposed() const { return !_image.get(); }
+
+    image::GnashImage& image() {
+        GNASH_REPORT_FUNCTION;
+        if (_image) {
+            return *_image;
+        }
+    }    
 
     void apply(const gnash::SWFMatrix& bitmap_matrix,
-               bitmap_wrap_mode wrap_mode) const;
-
-    virtual image::GnashImage& image() {
+               bitmap_wrap_mode wrap_mode) const
+    {
         GNASH_REPORT_FUNCTION;
-        if (_cache.get()) {
-            return *_cache;
+        gnash::SWFMatrix mat;
+        VGfloat     vmat[9];
+        
+        mat = bitmap_matrix;
+        
+        vgSetParameteri (_vgpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
+        vgPaintPattern (_vgpaint, _vgimage);
+        
+        mat.invert();
+        memset(vmat, 0, sizeof(vmat));
+        vmat[0] = mat.sx  / 65536.0f;
+        vmat[1] = mat.shx / 65536.0f;
+        vmat[3] = mat.shy / 65536.0f;
+        vmat[4] = mat.sy  / 65536.0f;
+        vmat[6] = mat.tx;
+        vmat[7] = mat.ty;
+        
+        vgSeti (VG_MATRIX_MODE, VG_MATRIX_FILL_PAINT_TO_USER);
+        vgLoadMatrix (vmat);
+        vgSeti (VG_MATRIX_MODE, VG_MATRIX_STROKE_PAINT_TO_USER);
+        vgLoadMatrix (vmat);
+        vgSeti (VG_MATRIX_MODE, VG_MATRIX_PATH_USER_TO_SURFACE);
+        
+        if (wrap_mode == WRAP_CLAMP) {  
+            vgSetParameteri (_vgpaint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_PAD);
+        } else {
+            vgSetParameteri (_vgpaint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_REPEAT);
         }
-        log_error("Image not cached!");
-#if 0
-        switch (_pixel_format) {
-            case GL_RGB:
-                _cache.reset(new image::ImageRGB(_orig_width, _orig_height));
-                break;
-            case GL_RGBA:
-                _cache.reset(new image::ImageRGBA(_orig_width, _orig_height));
-                break;
-            default:
-                std::abort();
-        }
-#endif
-        std::fill(_cache->begin(), _cache->end(), 0xff);
-
-        return *_cache;
     }
-    
-    int _width;
-    int _height;
 
-private:
-    
-    mutable boost::scoped_ptr<image::GnashImage> _img;
-    mutable boost::scoped_ptr<image::GnashImage> _cache;
+    // Accessors for the GnashImage internal data
+    int getWidth() { return _image->width(); };
+    int getHeight() { return _image->height(); };
+    boost::uint8_t *getData() const { return _image->begin(); };
+
+private:    
+    boost::scoped_ptr<image::GnashImage> _image;
     VGImageFormat   _pixel_format;
-    mutable VGImage _image;
-    VGPaint         _paint;
-    size_t          _orig_width;
-    size_t          _orig_height;
+    mutable VGImage _vgimage;
+    VGPaint         _vgpaint;
+    int             _tex_size;
 };
 
 } // namespace gnash::renderer::openvg

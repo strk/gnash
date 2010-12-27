@@ -18,7 +18,7 @@
 ///
 /// Original Author: Visor <cutevisor@gmail.com>.
 /// Heavily hacked by Rob <rob@welcomehome.org> to work with Gnash
-/// gitmaster.
+/// git master.
 ///
 
 #ifndef GNASH_RENDER_HANDLER_OVG_H
@@ -54,11 +54,6 @@ class GnashImage;
 namespace renderer {
 
 namespace openvg {
-
-namespace {
-    const CachedBitmap* createGradientBitmap(const GradientFill& gf,
-            Renderer& renderer);
-}
 
 typedef std::vector<const Path*> PathRefs;
 typedef std::vector<Path> PathVec;
@@ -200,6 +195,11 @@ public:
     
     boost::scoped_ptr<renderer::GnashDevice> _device;
 };
+
+namespace {
+    const CachedBitmap* createGradientBitmap(const GradientFill& gf,
+                                  renderer::openvg::Renderer_ovg *renderer);
+}
 
 DSOEXPORT Renderer* create_handler(const char *pixelformat);
 
