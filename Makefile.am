@@ -514,4 +514,4 @@ packageclean:
 	-test -z "$(CLEANFILES)" || rm -rf $(CLEANFILES)
  
 # these files are created when building packages
-CLEANFILES += *.deb rpmbuild *.dsc *.gz *.bz2 *.changes deb-copy-stamp gnash*git*
+CLEANFILES += *.deb *.dsc *.gz *.bz2 *.changes deb-copy-stamp gnash*git* gnash*dev rpmbuild gnash.spec .rpmmacros

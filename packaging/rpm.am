@@ -22,15 +22,20 @@
 # 	rpmbuild -rcfile=$(srcdir)/packaging/redhat/rpmrc:/usr/lib/rpm/rpmrc \
 # 	         -ba --target=geode-olpc /usr/src/redhat/SPECS/gnash.spec
 
-RPMBUILD_FLAGS = # --clean --rmsource --rmspec
+RPMBUILD_DIR = $(abs_top_builddir)/rpmbuild
+RPMMACROS = $(abs_top_builddir)/.rpmmacros
+RPMSPEC = $(abs_top_builddir)/gnash.spec
+RPMBUILD_FLAGS = --macros=/usr/lib/rpm/macros:$(RPMMACROS) # --clean --rmsource --rmspec
 
 gnash.spec spec: $(srcdir)/packaging/redhat/gnash.spec
+	mkdir -p $(RPMBUILD_DIR); \
+	echo "%_topdir $(RPMBUILD_DIR)" > $(RPMMACROS); \
 	snapshot_version="$(SNAPSHOT_VERSION)"; \
 	snapshot_version=`echo $${snapshot_version}|tr "~" "_"`; \
-	distver=`cat /etc/redhat-release | cut -d ' ' -f 3`; \
-	echo "Editing the version in the spec file to be $${snapshot_version} for Distribution $${distver}..."; \
+	distro=`lsb_release -is`; \
+	echo "Editing the version in the spec file to be $${snapshot_version} for Distribution $${distro}..."; \
 	sed -e "s/Version.*/Version:	$${snapshot_version}/" \
-	    -e "s/Distribution:.*/Distribution:   fc$${distver}/" $(srcdir)/packaging/redhat/gnash.spec > gnash.spec; 
+	    -e "s/Distribution:.*/Distribution:   $${distro}/" $(srcdir)/packaging/redhat/gnash.spec > $(RPMSPEC)
 
 
 # Build an Redhat/Fedora .rpm package
@@ -47,22 +52,22 @@ rpm: distdir spec setup-rpm rpm-gnash
 # build everything in one pass using rpmbuild. This was using
 # --sign gnash.spec, but it didn't work for the automated builds.
 rpm-gnash: 
-	rpmbuild -ba $(RPMBUILD_FLAGS) gnash.spec
+	rpmbuild -ba $(RPMBUILD_FLAGS) $(RPMSPEC)
 
 # configure the build directory, which we do by executing only the %prep stage,
 # which doesn't actually run configure
 rpm-configure: 
-	rpmbuild -bp $(RPMBUILD_FLAGS) gnash.spec
+	rpmbuild -bp $(RPMBUILD_FLAGS) $(RPMSPEC)
 
 # compile the build, which we do by executing only the %build stage, which
 # runs configure as the first step.
 rpm-build:
-	rpmbuild -bc --short-circuit $(RPMBUILD_FLAGS) gnash.spec
+	rpmbuild -bc --short-circuit $(RPMBUILD_FLAGS) $(RPMSPEC)
 
 # install the build, which we do by executing only the %install stage, which
 # also builds the actual rpms
 rpm-install: 
-	rpmbuild -bi --short-circuit $(RPMBUILD_FLAGS) gnash.spec
+	rpmbuild -bi --short-circuit $(RPMBUILD_FLAGS) $(RPMSPEC)
 
 # After distdir is done, all we have is an empty subdirectory
 # populated from the *_DIST variables used by Automake. RPM and Deb
@@ -91,14 +96,7 @@ setup-rpm:
 	  --exclude=$${snapshot_version}/autom4te.cache \
 	  --exclude=$${snapshot_version}/configure.ac.orig \
 	  --exclude=$${snapshot_version}/configure.orig $${snapshot_version}; \
-	cp $${snapshot_version}.tar.gz $${HOME}/rpmbuild/SOURCES/
+	mkdir -p $(RPMBUILD_DIR)/SOURCES; \
+	cp $${snapshot_version}.tar.gz $(RPMBUILD_DIR)/SOURCES
 
-# this removes old builds from the maintainer's $HOME/rpmbuild directory.
-rpmbuild-clean:
-	rm -f  ~/rpmbuild/SOURCES/gnash*
-	rm -fr ~/rpmbuild/BUILD/gnash*
-	rm -fr ~/rpmbuild/BUILDROOT/gnash*
-	rm -fr ~/rpmbuild/SRPMS/gnash*
-	rm -fr ~/rpmbuild/RPMS/i686/gnash*
-
-.PHONY : rpm redhat spec rpm-configure rpm-install rpm-build setup-rpm rpmbuild-clean
+.PHONY : rpm redhat spec rpm-configure rpm-install rpm-build setup-rpm
