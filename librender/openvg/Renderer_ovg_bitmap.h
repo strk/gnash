@@ -36,8 +36,7 @@ namespace renderer {
 
 namespace openvg {
 
-// FIXME: this should really be derived from CachedBitmap
-class bitmap_info_ovg //: public CachedBitmap
+class bitmap_info_ovg : public CachedBitmap
 {
 public:
     /// Set line and fill styles for mesh & line_strip rendering.
@@ -85,7 +84,7 @@ public:
         vgDestroyImage(_vgimage);
     }
 
-    void disposed()  { _image.reset(); }
+    void dispose()  { _image.reset(); }
     bool disposed() const { return !_image.get(); }
 
     image::GnashImage& image() {
