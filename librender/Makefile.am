@@ -66,14 +66,15 @@ noinst_HEADERS = \
 	agg/Renderer_agg_bitmap.h \
 	agg/Renderer_agg_style.h \
 	cairo/Renderer_cairo.h \
-	cairo/PathParser.h
+	cairo/PathParser.h \
 	opengl/tu_opengl_includes.h \
 	opengl/Renderer_ogl.h \
 	opengles1/Renderer_gles1.h \
 	opengles1/render_handler_gles.h \
 	opengles2/Renderer_gles2.h \
 	openvg/Renderer_ovg.h \
-	openvg/Renderer_ovg_bitmap.h \
+	openvg/OpenVGBitmap.h \
+	openvg/OpenVGStyle.h \
 	opengl/Renderer_ogl.h \
 	$(NULL)
 

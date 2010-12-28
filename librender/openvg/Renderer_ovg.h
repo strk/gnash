@@ -43,7 +43,7 @@
 # include <VG/vgext.h>
 #endif
 #include <VG/openvg.h>
-#include "openvg/Renderer_ovg_bitmap.h"
+#include "openvg/OpenVGBitmap.h"
 #include "egl/eglDevice.h"
 
 namespace gnash {
