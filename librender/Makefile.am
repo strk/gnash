@@ -111,7 +111,9 @@ libgnashrender_la_CPPFLAGS += $(OPENVG_CFLAGS)
 libgnashrender_la_SOURCES += \
 	openvg/Renderer_ovg.cpp \
 	openvg/Renderer_ovg.h \
-	openvg/Renderer_ovg_bitmap.h
+	openvg/OpenVGBitmap.h \
+	openvg/OpenVGBitmap.cpp \
+	openvg/OpenVGStyle.h
 libgnashrender_la_LIBADD += $(OPENVG_LIBS)
 endif
 
