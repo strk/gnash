@@ -231,7 +231,7 @@ GtkOvgGlue::setRenderHandlerSize(int width, int height)
 
 
     renderer::EGLDevice *egl = (renderer::EGLDevice*)_device.get();
-    egl->swapPbuffers();
+    egl->swapBuffers();
     
     sleep(5);
 }
