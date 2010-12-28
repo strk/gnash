@@ -44,7 +44,8 @@
 #include "Range2d.h"
 #include "SWFCxForm.h"
 #include "openvg/Renderer_ovg.h"
-#include "openvg/Renderer_ovg_bitmap.h"
+#include "openvg/OpenVGBitmap.h"
+#include "openvg/OpenVGStyle.h"
 #include "SWFMatrix.h"
 #include "swf/ShapeRecord.h"
 #include "CachedBitmap.h"
@@ -75,104 +76,6 @@ typedef std::vector<geometry::Range2d<int> > ClipBounds;
 namespace renderer {
 
 namespace openvg {
-
-namespace {
-
-// FIXME: These helper classes should be moved to their own file.
-
-/// @note These helper functions are used by the boost::variant used
-/// for fill styles. A variant is a C++ style version of the C union.
-/// Before accessing any of the data of the variant, we have to use
-/// boost::apply_visitor() to bind one of these classes to the style
-/// to extract the data.
-
-/// Get the color of a style from the variant
-class GetColor : public boost::static_visitor<rgba>
-{
-public:
-    rgba operator()(const SolidFill& f) const {
-        return f.color();
-    }
-    rgba operator()(const GradientFill&) const {
-        return rgba();
-    }
-    rgba operator()(const BitmapFill&) const {
-        return rgba();
-    }
-};
-
-/// Get the fill type. Each fill type has it's own sub types,
-/// so we map the sub type name to the fill type name.
-class GetType : public boost::static_visitor<SWF::FillType>
-{
-public:
-    SWF::FillType operator()(const SolidFill& f) const {
-        return SWF::FILL_SOLID;
-    }
-    SWF::FillType operator()(const GradientFill& g) const {
-        switch (g.type()) {
-          case GradientFill::LINEAR:
-              return SWF::FILL_LINEAR_GRADIENT;
-              break;
-          case GradientFill::RADIAL:
-              return SWF::FILL_RADIAL_GRADIENT;
-              break;
-          default:
-              break;              
-        }
-    }
-    SWF::FillType operator()(const BitmapFill& b) const {
-        switch (b.type()) {
-          case BitmapFill::TILED:
-              if (b.smoothingPolicy() == BitmapFill::SMOOTHING_OFF) {
-                  return SWF::FILL_TILED_BITMAP_HARD;
-              } else {
-                  return SWF::FILL_TILED_BITMAP;
-              }
-              break;
-          case BitmapFill::CLIPPED:
-              if (b.smoothingPolicy() == BitmapFill::SMOOTHING_OFF) {
-                  return SWF::FILL_CLIPPED_BITMAP_HARD;
-              } else {
-                  return SWF::FILL_CLIPPED_BITMAP;
-              }
-              break;
-          default:
-              break;
-        }
-    }
-};
-
-/// Get the bitmap data of a style from the variant
-class GetBitmap : public boost::static_visitor<const CachedBitmap *>
-{
-public:
-    const CachedBitmap *operator()(const SolidFill&) const {
-        return 0;
-    }
-    const CachedBitmap *operator()(const GradientFill&) const {
-        return 0;
-    }
-    const CachedBitmap *operator()(const BitmapFill& b) const {
-        return b.bitmap();
-    }
-};
-
-/// Get the matrix of a style from the variant
-class GetMatrix : public boost::static_visitor<SWFMatrix>
-{
-public:
-    SWFMatrix operator()(const SolidFill&) const {
-    }
-    SWFMatrix operator()(const GradientFill& g) const {
-        return g.matrix();
-    }
-    SWFMatrix operator()(const BitmapFill& b) const {
-        return b.matrix();
-    }
-};
-
-}
 
 class eglScopeMatrix : public boost::noncopyable
 {
@@ -268,7 +171,7 @@ preparepath(VGPath path, const std::vector<Edge>& edges,
 #if 0
 // Use the image class copy constructor; it's not important any more
 // what kind of image it is.
-bitmap_info_ovg::bitmap_info_ovg(std::auto_ptr<gnash::image::GnashImage> img,
+OpenVGBitmap::OpenVGBitmap(std::auto_ptr<gnash::image::GnashImage> img,
                                  VGImageFormat pixelformat, VGPaint vgpaint)
     : _image(img.release()),
       _pixel_format(pixelformat),
@@ -290,7 +193,7 @@ bitmap_info_ovg::bitmap_info_ovg(std::auto_ptr<gnash::image::GnashImage> img,
     log_debug("Current Texture size: %d", tex_size);
 }   
 
-bitmap_info_ovg::~bitmap_info_ovg()
+OpenVGBitmap::~OpenVGBitmap()
 {
     GNASH_REPORT_FUNCTION;
 
@@ -304,7 +207,7 @@ bitmap_info_ovg::~bitmap_info_ovg()
 }
 
 void
-bitmap_info_ovg::apply(const gnash::SWFMatrix& bitmap_matrix,
+OpenVGBitmap::apply(const gnash::SWFMatrix& bitmap_matrix,
                        bitmap_wrap_mode wrap_mode) const
 {
     GNASH_REPORT_FUNCTION;
@@ -418,7 +321,7 @@ Renderer_ovg::createCachedBitmap(std::auto_ptr<image::GnashImage> im)
     GNASH_REPORT_FUNCTION;
 
     // OpenVG don't support 24bit RGB, need translate colorspace
-    return reinterpret_cast<CachedBitmap *>(new bitmap_info_ovg(im, VG_sRGB_565, 0));
+    return reinterpret_cast<CachedBitmap *>(new OpenVGBitmap(im, VG_sRGB_565, 0));
 }
 
 // Since we store drawing operations in display lists, we take special care
@@ -892,24 +795,24 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
       case SWF::FILL_RADIAL_GRADIENT:
       case SWF::FILL_FOCAL_GRADIENT:
       {
-          GradientFill::Type gr;
+          GradientFill::Type gt;
           switch (fill_type) {
           case SWF::FILL_LINEAR_GRADIENT:
-              gr = GradientFill::LINEAR;
+              gt = GradientFill::LINEAR;
               break;
           case SWF::FILL_RADIAL_GRADIENT:
           case SWF::FILL_FOCAL_GRADIENT:
-              gr = GradientFill::RADIAL;
+              gt = GradientFill::RADIAL;
               break;
           default:
               std::abort();
           }
-          GradientFill gf(gr, mat);
+          GradientFill gf(gt, mat);
 
-          const bitmap_info_ovg* binfo = reinterpret_cast<const bitmap_info_ovg *>(
+          const OpenVGBitmap* binfo = reinterpret_cast<const OpenVGBitmap *>(
                createGradientBitmap(gf, this));
 
-          binfo->apply(gf.matrix(), bitmap_info_ovg::WRAP_CLAMP); 
+          binfo->apply(gf.matrix(), OpenVGBitmap::WRAP_CLAMP); 
           vgSetParameteri (m_fillpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
           break;
       }
@@ -917,9 +820,9 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
       case SWF::FILL_TILED_BITMAP:
       {
           const CachedBitmap *cb = boost::apply_visitor(GetBitmap(), style.fill);
-          const bitmap_info_ovg* binfo = dynamic_cast<const bitmap_info_ovg *>(cb);
+          const OpenVGBitmap* binfo = dynamic_cast<const OpenVGBitmap *>(cb);
           SWFMatrix sm = boost::apply_visitor(GetMatrix(), style.fill);          
-          binfo->apply(sm, bitmap_info_ovg::WRAP_REPEAT);
+          binfo->apply(sm, OpenVGBitmap::WRAP_REPEAT);
           vgSetParameteri (m_fillpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
           break;
       }
@@ -928,10 +831,10 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
       case SWF::FILL_CLIPPED_BITMAP_HARD:
       {     
           const CachedBitmap *cb = boost::apply_visitor(GetBitmap(), style.fill);
-          const bitmap_info_ovg* binfo = dynamic_cast<const bitmap_info_ovg *>(cb);     
+          const OpenVGBitmap* binfo = dynamic_cast<const OpenVGBitmap *>(cb);     
 
           SWFMatrix sm = boost::apply_visitor(GetMatrix(), style.fill);
-          binfo->apply(sm, bitmap_info_ovg::WRAP_CLAMP);
+          binfo->apply(sm, OpenVGBitmap::WRAP_CLAMP);
           vgSetParameteri (m_fillpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
           break;
       } 
