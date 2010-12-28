@@ -18,14 +18,17 @@
 #ifndef GNASH_OPENVG_STYLE_H
 #define GNASH_OPENVG_STYLE_H
 
-#include "Geometry.h"
 #include "CachedBitmap.h"
 #include "GnashImage.h"
 #include "Renderer.h"
-#include "openvg/Renderer_ovg.h"
 
 namespace gnash {
 
+class SolidFill;
+class GradientFill;
+class BitmapFill;
+class rgba; 
+ 
 namespace renderer {
 
 namespace openvg {

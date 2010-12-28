@@ -19,7 +19,7 @@
 #include "CachedBitmap.h"
 #include "GnashImage.h"
 #include "Renderer.h"
-#include "openvg/Renderer_ovg.h"
+#include "openvg/OpenVGRenderer.h"
 #include "openvg/OpenVGBitmap.h"
 
 namespace gnash {

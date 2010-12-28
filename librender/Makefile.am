@@ -72,7 +72,7 @@ noinst_HEADERS = \
 	opengles1/Renderer_gles1.h \
 	opengles1/render_handler_gles.h \
 	opengles2/Renderer_gles2.h \
-	openvg/Renderer_ovg.h \
+	openvg/OpenVGRenderer.h \
 	openvg/OpenVGBitmap.h \
 	openvg/OpenVGStyle.h \
 	opengl/Renderer_ogl.h \
@@ -109,8 +109,8 @@ endif
 if  BUILD_OVG_RENDERER
 libgnashrender_la_CPPFLAGS += $(OPENVG_CFLAGS)
 libgnashrender_la_SOURCES += \
-	openvg/Renderer_ovg.cpp \
-	openvg/Renderer_ovg.h \
+	openvg/OpenVGRenderer.cpp \
+	openvg/OpenVGRenderer.h \
 	openvg/OpenVGBitmap.h \
 	openvg/OpenVGBitmap.cpp \
 	openvg/OpenVGStyle.h

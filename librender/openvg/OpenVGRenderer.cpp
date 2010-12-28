@@ -43,7 +43,7 @@
 #include "utility.h"
 #include "Range2d.h"
 #include "SWFCxForm.h"
-#include "openvg/Renderer_ovg.h"
+#include "openvg/OpenVGRenderer.h"
 #include "openvg/OpenVGBitmap.h"
 #include "openvg/OpenVGStyle.h"
 #include "SWFMatrix.h"
@@ -715,6 +715,7 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
     GNASH_REPORT_FUNCTION;
 
     SWF::FillType fill_type = boost::apply_visitor(GetType(), style.fill);
+    log_debug("Fill type is: %d", fill_type);
     switch (fill_type) {
         
       case SWF::FILL_LINEAR_GRADIENT:
