@@ -39,7 +39,7 @@ public:
     {
     }
   
-    virtual image::GnashImage& image() {
+    image::GnashImage& image() {
         assert(!disposed());
         return *_image;
     }
