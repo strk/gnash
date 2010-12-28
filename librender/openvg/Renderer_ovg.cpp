@@ -101,6 +101,48 @@ public:
     }
 };
 
+/// Get the fill type. Each fill type has it's own sub types,
+/// so we map the sub type name to the fill type name.
+class GetType : public boost::static_visitor<SWF::FillType>
+{
+public:
+    SWF::FillType operator()(const SolidFill& f) const {
+        return SWF::FILL_SOLID;
+    }
+    SWF::FillType operator()(const GradientFill& g) const {
+        switch (g.type()) {
+          case GradientFill::LINEAR:
+              return SWF::FILL_LINEAR_GRADIENT;
+              break;
+          case GradientFill::RADIAL:
+              return SWF::FILL_RADIAL_GRADIENT;
+              break;
+          default:
+              break;              
+        }
+    }
+    SWF::FillType operator()(const BitmapFill& b) const {
+        switch (b.type()) {
+          case BitmapFill::TILED:
+              if (b.smoothingPolicy() == BitmapFill::SMOOTHING_OFF) {
+                  return SWF::FILL_TILED_BITMAP_HARD;
+              } else {
+                  return SWF::FILL_TILED_BITMAP;
+              }
+              break;
+          case BitmapFill::CLIPPED:
+              if (b.smoothingPolicy() == BitmapFill::SMOOTHING_OFF) {
+                  return SWF::FILL_CLIPPED_BITMAP_HARD;
+              } else {
+                  return SWF::FILL_CLIPPED_BITMAP;
+              }
+              break;
+          default:
+              break;
+        }
+    }
+};
+
 /// Get the bitmap data of a style from the variant
 class GetBitmap : public boost::static_visitor<const CachedBitmap *>
 {
@@ -841,11 +883,9 @@ void
 Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
                                const SWFCxForm& cx)
 {
-    //    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
-    //    FIXME fill_style changed to FillStyle
-    SWF::FillType fill_type = SWF::FILL_SOLID; // style.get_type();
-    
+    SWF::FillType fill_type = boost::apply_visitor(GetType(), style.fill);
     switch (fill_type) {
         
       case SWF::FILL_LINEAR_GRADIENT:
