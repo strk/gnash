@@ -24,7 +24,7 @@
 #endif
 
 #include <boost/cstdint.hpp>
-#include "openvg/Renderer_ovg.h"
+#include "openvg/OpenVGRenderer.h"
 #include "fbsup.h"
 #include "fb_glue.h"
 
