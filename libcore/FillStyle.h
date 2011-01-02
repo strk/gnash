@@ -39,18 +39,16 @@ namespace gnash {
 class GradientRecord
 {
 public:
-
     GradientRecord(boost::uint8_t ratio, const rgba& color)
         :
         ratio(ratio),
         color(color)
-    {}
+    { }
     
     //data:
     boost::uint8_t ratio;
     rgba color;
 };
-
 
 /// A BitmapFill
 //
@@ -245,13 +243,13 @@ public:
     explicit SolidFill(const rgba& c)
         :
         _color(c)
-    {}
+    { }
 
     /// Copy a SolidFill.
     SolidFill(const SolidFill& other)
         :
         _color(other._color)
-    {}
+    { }
 
     /// Set this fill to a lerp of two other SolidFills.
     void setLerp(const SolidFill& a, const SolidFill& b, double ratio) {
@@ -288,7 +286,7 @@ public:
     FillStyle(const FillStyle& other)
         :
         fill(other.fill)
-    {}
+    { }
 
     Fill fill;
 
@@ -305,10 +303,9 @@ DSOEXPORT std::ostream& operator<<(std::ostream& os,
 
 } // namespace gnash
 
-#endif 
-
+#endif
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:
