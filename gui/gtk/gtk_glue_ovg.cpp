@@ -201,7 +201,12 @@ GtkOvgGlue::setRenderHandlerSize(int width, int height)
     _offscreenbuf = gdk_image_new (GDK_IMAGE_FASTEST, visual, width,
                                    height);
 #endif
-    
+
+#if 1
+    // if (_renderer) {
+    //     vgScale(width, height);
+    // }
+#else
     // Attach the window to the low level device
     long xid = GDK_WINDOW_XID(gtk_widget_get_window(_drawing_area));
     _device->attachWindow(static_cast<renderer::GnashDevice::native_window_t>
@@ -212,28 +217,11 @@ GtkOvgGlue::setRenderHandlerSize(int width, int height)
     // Allow drawing everywhere by default
     InvalidatedRanges ranges;
     ranges.setWorld();
-    _renderer->set_invalidated_regions(ranges);
-    
-    float red_color[4] = {1.0, 0.0, 0.0, 1.0};
-    float blue_color[4] = {0.0, 0.0, 1.0, 1.0};
-    
-    VGint scissor[4] = {100, 100, 25, 25};
-    vgSetfv(VG_CLEAR_COLOR, 4, red_color);
-    vgClear(0, 0, 300, 300);
-
-    vgSetfv(VG_CLEAR_COLOR, 4, blue_color);
-    vgClear(50, 50, 50, 50);
-
-    //vgSetiv(VG_SCISSOR_RECTS, 4, scissor);
-    //vgSeti(VG_SCISSORING, VG_TRUE);
-    vgCopyPixels(100, 100, 50, 50, 50, 50);
-    vgClear(150, 150, 50, 50);
-
+    _renderer->set_invalidated_regions(ranges);    
 
     renderer::EGLDevice *egl = (renderer::EGLDevice*)_device.get();
     egl->swapBuffers();
-    
-    sleep(5);
+#endif    
 }
 
 void 
