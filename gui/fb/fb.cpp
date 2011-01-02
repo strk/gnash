@@ -117,7 +117,8 @@
 #endif
 
 #ifdef RENDERER_OPENVG
-# include "openvg/Renderer_ovg.h"
+# include "VG/openvg.h"
+# include "openvg/OpenVGRenderer.h"
 # include "fb_glue_ovg.h"
 #endif
 
@@ -135,8 +136,6 @@
 namespace gnash {
 
 namespace gui {
-
-//---------------
 
 int terminate_request = false;  // global scope to avoid GUI access
 
@@ -302,7 +301,10 @@ FBGui::run()
 
         // FIXME: process the input data
         // boost::shared_ptr<input_event_t> popData();
-        
+
+        draw_hack(_glue.get());
+        //_glue->render();
+
         // advance movie  
         Gui::advance_movie(this);
 
@@ -318,7 +320,7 @@ FBGui::run()
 void
 FBGui::renderBuffer()
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
 //    if ( _drawbounds.size() == 0 ) return; // nothing to do..
 
@@ -349,7 +351,7 @@ FBGui::renderBuffer()
        
 #endif
 
-    // FIXME: should call swapBuffer()
+    _glue->render();
 }
 
 bool
