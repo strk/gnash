@@ -53,7 +53,7 @@
 #include "opengl/Renderer_ogl.h"
 #endif
 #ifdef RENDERER_OPENVG
-#include "openvg/Renderer_ovg.h"
+#include "openvg/OpenVGRenderer.h"
 #include <VG/vgu.h>
 #ifdef HAVE_VG_VGEXT_H
 # include <VG/vgext.h>
