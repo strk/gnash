@@ -38,10 +38,9 @@ public:
     /// Set line and fill styles for mesh & line_strip rendering.
     enum bitmap_wrap_mode { WRAP_REPEAT, WRAP_CLAMP };
     
-    OpenVGBitmap(std::auto_ptr<image::GnashImage> im);
-  
-    OpenVGBitmap(std::auto_ptr<image::GnashImage> im,
-                 VGImageFormat pixelformat, VGPaint vgpaint);
+    OpenVGBitmap(VGPaint paint);
+    OpenVGBitmap(const CachedBitmap *bitmap, VGPaint vgpaint);
+    OpenVGBitmap(std::auto_ptr<image::GnashImage> im, VGPaint vgpaint);
     ~OpenVGBitmap();
 
     void dispose()  { _image.reset(); }
@@ -50,13 +49,24 @@ public:
     image::GnashImage& image();
     
     void apply(const gnash::SWFMatrix& bitmap_matrix,
-               bitmap_wrap_mode wrap_mode) const;
+               bitmap_wrap_mode wrap_mode, VGPaint paint) const;
     // Accessors for the GnashImage internal data
-    int getWidth() { return _image->width(); };
-    int getHeight() { return _image->height(); };
-    boost::uint8_t *getData() const { return _image->begin(); };
+    VGPaint getFillPaint() const { return _vgpaint; }
+    int getWidth() { return _image->width(); }
+    int getHeight() { return _image->height(); }
+    boost::uint8_t *getData() const { return _image->begin(); }
 
-private:    
+    /// OpenVG supports creating linear and gradient fills in hardware, so
+    /// we want to use that instead of the existing way of calculating the
+    /// gradient in software.
+    OpenVGBitmap *createRadialBitmap(float x0, float y0, float x1,
+                                     float y1, float radial, VGPaint paint);
+    OpenVGBitmap *createLinearBitmap(float x0, float y0, float x1,
+                                     float y1, VGPaint paint);
+    OpenVGBitmap *createPatternBitmap(std::auto_ptr<image::GnashImage> im,
+                                      VGPaint paint);
+
+private:
     boost::scoped_ptr<image::GnashImage> _image;
     VGImageFormat   _pixel_format;
     mutable VGImage _vgimage;

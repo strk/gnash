@@ -100,8 +100,7 @@ public:
                   const rgba& fill, const rgba& outline,
                   const SWFMatrix& mat, bool masked);
     // this is in master
-    void drawShape(const gnash::SWF::ShapeRecord&,
-                                    const gnash::Transform&);
+    void drawShape(const gnash::SWF::ShapeRecord&, const gnash::Transform&);
     // This is from the patch
     void drawGlyph(const SWF::ShapeRecord& rec, const rgba& c,
                    const SWFMatrix& mat);
@@ -115,19 +114,18 @@ public:
     void set_scale(float xscale, float yscale);
     void set_invalidated_regions(const InvalidatedRanges &ranges);
 
-    // These weren't in the patch
+    // These weren't in the patch, and do nothing anyway
     Renderer *startInternalRender(gnash::image::GnashImage&);
     void endInternalRender();
 
     unsigned int getBitsPerPixel();
-    bool initTestBuffer(unsigned width, unsigned height);
-    void init_buffer(unsigned char *mem, int size, int x, int y, int rowstride);
+
+    void setFillPaint(const VGPaint paint) { _fillpaint = paint; }
 
     // These methods are only for debugging and development
     void printVGParams();
     void printVGHardware();
-    void printVGPath();
-    
+    void printVGPath();    
 #if 0
     // These are all required by the Render class
     void draw_poly(const point* corners, size_t corner_count,
@@ -142,12 +140,12 @@ public:
     void begin_submit_mask();
 #endif
   private:
-    void draw_mask(const PathVec& path_vec);
     void add_paths(const PathVec& path_vec);
     Path reverse_path(const Path& cur_path);
     const Path* find_connecting_path(const Path& to_connect,
                                      std::list<const Path*> path_refs);
     PathVec normalize_paths(const PathVec &paths);
+    
     /// Analyzes a set of paths to detect real presence of fills and/or outlines
     /// TODO: This should be something the character tells us and should be 
     /// cached. 
@@ -164,36 +162,35 @@ public:
     PathPtrVec paths_by_style(const PathVec& path_vec, unsigned int style);
     std::vector<PathVec::const_iterator> find_subshapes(const PathVec& path_vec);
     void apply_matrix_to_paths(std::vector<Path>& paths, const SWFMatrix& mat);
+    
     void draw_subshape(const PathVec& path_vec, const SWFMatrix& mat,
                        const SWFCxForm& cx,
                        const std::vector<FillStyle>& fill_styles,
                        const std::vector<LineStyle>& line_styles);
+    void draw_mask(const PathVec& path_vec);    
     void draw_submask(const PathVec& path_vec, const SWFMatrix& mat,
                       const SWFCxForm& cx, const FillStyle& f_style);
-    
-    float _xscale;
-    float _yscale;
-    float _width; // Width of the movie, in world coordinates.
-    float _height;
+
+    float       _xscale;
+    float       _yscale;
+    float       _width; // Width of the movie, in world coordinates.
+    float       _height;
   
     // Output size.
-    float _display_width;
-    float _display_height;
+    float       _display_width;
+    float       _display_height;
   
     std::vector<PathVec> _masks;
-    bool _drawing_mask;
+    bool        _drawing_mask;
   
     gnash::SWFMatrix stage_matrix;  // conversion from TWIPS to pixels
     
-    VGPaint     m_fillpaint;
-    VGPaint     m_strokepaint;
+    VGPaint     _fillpaint;
+    VGPaint     _strokepaint;
 
-#ifdef OPENVG_VERSION_1_1    
-    VGMaskLayer m_mask;
+#ifdef OPENVG_VERSION_1_1
+    VGMaskLayer _mask;
 #endif
-    unsigned char *_testBuffer; // buffer used by initTestBuffer() only
-    
-    boost::scoped_ptr<renderer::GnashDevice> _device;
 };
 
 namespace {

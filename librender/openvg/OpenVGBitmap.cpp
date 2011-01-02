@@ -21,6 +21,7 @@
 #include "Renderer.h"
 #include "openvg/OpenVGRenderer.h"
 #include "openvg/OpenVGBitmap.h"
+#include "VG/openvg.h"
 
 namespace gnash {
 
@@ -28,28 +29,37 @@ namespace renderer {
 
 namespace openvg {
 
-OpenVGBitmap::OpenVGBitmap(std::auto_ptr<image::GnashImage> im)
-    : _image(im.release())
+static const int NUM_STOPS = 10;
+
+OpenVGBitmap::OpenVGBitmap(VGPaint paint)
 {
     GNASH_REPORT_FUNCTION;
+    if (paint) {
+        _vgpaint = paint;
+    }
 }
 
-OpenVGBitmap::OpenVGBitmap(std::auto_ptr<image::GnashImage> im,
-                           VGImageFormat pixelformat, VGPaint vgpaint)
-    : _image(im.release()),
-      _pixel_format(pixelformat),
-      _vgpaint(vgpaint)
+// 
+// VG_sRGB_565
+// VG_sRGBA_5551
+// VG_sRGBA_4444
+// VG_A_8
+OpenVGBitmap::OpenVGBitmap(std::auto_ptr<image::GnashImage> image, VGPaint paint)
+    :
+    _image(image),
+    _pixel_format(VG_A_4), // was VG_sARGB_8888  VG_sRGB_565
+    _vgpaint(paint)
 {
     GNASH_REPORT_FUNCTION;
-    
+
     size_t width = _image->width();
     size_t height = _image->height();
 
     // Create a VG image, and copy the GnashImage data into it
-    _vgimage = vgCreateImage(VG_sRGB_565, width, height,
+    _vgimage = vgCreateImage(_pixel_format, width, height,
                              VG_IMAGE_QUALITY_FASTER);    
     
-    vgImageSubData(_vgimage, _image->begin(), width * 4, VG_sRGB_565,
+    vgImageSubData(_vgimage, _image->begin(), width * 4, _pixel_format,
                    0, 0, width, height);
     
     _tex_size += width * height * 4;
@@ -67,7 +77,8 @@ OpenVGBitmap::~OpenVGBitmap()
               _image->width() * _image->height() * 4,
               _image->width(), _image->height(), 4);
     log_debug(_("Current Texture size: %d"), _tex_size);
-    
+
+//    vgDestroyPaint(_vgpaint);
     vgDestroyImage(_vgimage);
 }
 
@@ -80,18 +91,20 @@ OpenVGBitmap::image()
     }
 }    
 
+// 
 void
 OpenVGBitmap::apply(const gnash::SWFMatrix& bitmap_matrix,
-                    bitmap_wrap_mode wrap_mode) const
+                    bitmap_wrap_mode wrap_mode, VGPaint paint) const
 {
     GNASH_REPORT_FUNCTION;
+    
     gnash::SWFMatrix mat;
     VGfloat     vmat[9];
     
     mat = bitmap_matrix;
     
-    vgSetParameteri (_vgpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
-    vgPaintPattern (_vgpaint, _vgimage);
+    vgSetParameteri (paint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
+    vgPaintPattern (paint, _vgimage);
     
     mat.invert();
     memset(vmat, 0, sizeof(vmat));
@@ -109,10 +122,73 @@ OpenVGBitmap::apply(const gnash::SWFMatrix& bitmap_matrix,
     vgSeti (VG_MATRIX_MODE, VG_MATRIX_PATH_USER_TO_SURFACE);
     
     if (wrap_mode == WRAP_CLAMP) {  
-        vgSetParameteri (_vgpaint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_PAD);
+        vgSetParameteri (paint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_PAD);
     } else {
-        vgSetParameteri (_vgpaint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_REPEAT);
+        vgSetParameteri (paint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_REPEAT);
     }
+}
+
+/// OpenVG supports creating linear and gradient fills in hardware, so
+/// we want to use that instead of the existing way of calculating the
+/// gradient in software.
+OpenVGBitmap *
+OpenVGBitmap::createRadialBitmap(float cx, float cy, float fx, float fy, float radial,
+                                 VGPaint paint)
+{
+    GNASH_REPORT_FUNCTION;
+
+    VGfloat rgParams[] = { cx, cy, fx, fy, radial };
+    VGfloat stops[5*NUM_STOPS];
+    
+    // Paint Type 
+    vgSetParameteri(paint, VG_PAINT_TYPE, VG_PAINT_TYPE_RADIAL_GRADIENT);
+
+    // Gradient Parameters
+    vgSetParameterfv(paint, VG_PAINT_RADIAL_GRADIENT, 4, rgParams);
+
+    // Color Ramp is the same as for linear gradient
+    return this;
+}
+
+OpenVGBitmap *
+OpenVGBitmap::createLinearBitmap(float x0, float y0, float x1, float y1, VGPaint paint)
+{
+    GNASH_REPORT_FUNCTION;
+
+    VGfloat lgParams[] = { x0, y0, x1, y1 };
+    VGfloat stops[] = { 0.0, 0.33, 0.66, 1.0};
+    
+    // Paint Type
+    vgSetParameteri(paint, VG_PAINT_TYPE, VG_PAINT_TYPE_LINEAR_GRADIENT);
+    // Gradient Parameters
+    vgSetParameterfv(paint, VG_PAINT_LINEAR_GRADIENT, 4, lgParams);
+    // Color Ramp
+    vgSetParameterfv(paint, VG_PAINT_COLOR_RAMP_STOPS, 5*NUM_STOPS, stops);
+    vgSetParameteri(paint, VG_PAINT_COLOR_RAMP_SPREAD_MODE, VG_COLOR_RAMP_SPREAD_PAD);
+
+    return this;
+}
+
+    // Create and fill pattern image
+OpenVGBitmap *
+OpenVGBitmap::createPatternBitmap(std::auto_ptr<image::GnashImage> im, VGPaint paint)
+{
+    GNASH_REPORT_FUNCTION;
+
+    if (paint != VG_INVALID_HANDLE) {
+        _vgimage = vgCreateImage(_pixel_format, im->width(), im->height(),
+                                 VG_IMAGE_QUALITY_FASTER);
+        vgImageSubData(_vgimage, im->begin(), 4*im->width(), /* stride */
+                       _pixel_format, 0, 0, im->width(), im->height());
+        
+        vgSetParameteri(_vgpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
+        vgSetParameteri(_vgpaint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_REPEAT);
+        vgPaintPattern(_vgpaint, _vgimage);
+        vgDrawImage(_vgimage);
+        vgFlush();
+    }
+
+    return this;
 }
 
 } // namespace gnash::renderer::openvg

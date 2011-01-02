@@ -97,17 +97,17 @@ public:
 };
 
 /// Get the bitmap data of a style from the variant
-class GetBitmap : public boost::static_visitor<const CachedBitmap *>
+class GetBitmap : public boost::static_visitor<CachedBitmap *>
 {
 public:
-    const CachedBitmap *operator()(const SolidFill&) const {
+    CachedBitmap *operator()(const SolidFill&) const {
         return 0;
     }
-    const CachedBitmap *operator()(const GradientFill&) const {
+    CachedBitmap *operator()(const GradientFill&) const {
         return 0;
     }
-    const CachedBitmap *operator()(const BitmapFill& b) const {
-        return b.bitmap();
+    CachedBitmap *operator()(const BitmapFill& b) const {
+        return const_cast<CachedBitmap *>(b.bitmap());
     }
 };
 
