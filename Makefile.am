@@ -108,6 +108,9 @@ EXTRA_DIST =  \
 	packaging/klash.xpm \
 	revno.h
 
+if LIBLTDL1
+EXTRA_DIST += libltdl/ltdl.h libltdl/ltdl.c
+endif
 
 # dist-hook:
 # 	@test -d "$(distdir)/packaging" || $(mkinstalldirs) "$(distdir)/packaging"
