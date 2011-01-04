@@ -154,7 +154,9 @@ SharedMem::attach()
     log_debug("Using shared memory key %s",
             boost::io::group(std::hex, std::showbase, _shmkey));
 
-#ifndef _WIN32
+#ifdef _WIN32
+    return false;
+#else
 
     // First get semaphore.
     
