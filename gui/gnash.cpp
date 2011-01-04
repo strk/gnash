@@ -46,6 +46,7 @@
 #include "GnashException.h"
 #include "revno.h"
 #include "MediaHandler.h"
+#include "utility.h"
 
 using std::endl;
 using std::cout;
@@ -322,6 +323,10 @@ setupSoundAndRendering(gnash::Player& p, int i)
 po::options_description
 getDebuggingOptions(gnash::Player& p)
 {
+#ifndef GNASH_FPS_DEBUG
+    UNUSED(p);
+#endif
+
     using gnash::Player;
     using gnash::LogFile;
     using gnash::RcInitFile;
@@ -355,7 +360,6 @@ getDebuggingOptions(gnash::Player& p)
         ->notifier(boost::bind(&Player::setFpsPrintTime, &p, _1)),
         _("Print FPS every num seconds"))
 #endif 
-
 
     ;
 
