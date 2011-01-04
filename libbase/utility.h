@@ -153,9 +153,9 @@ inline unsigned long int /* pthread_t */ get_thread_id(void)
 } // namespace gnash
 
 // Handy macro to quiet compiler warnings about unused parameters/variables.
-#define UNUSED(x) (x) = (x)
+#define UNUSED(x) static_cast<void>((x))
 
-#endif // _GNASH_UTILITY_H
+#endif 
 
 
 // Local Variables:
