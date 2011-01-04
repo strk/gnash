@@ -90,6 +90,7 @@ SharedMem::~SharedMem()
         log_error("Error during stat of shared memory segment: %s",
                 std::strerror(err));
     }
+
 #ifndef __amigaos4__
     else {
         // Note that this isn't completely reliable.
@@ -99,17 +100,18 @@ SharedMem::~SharedMem()
         }
     }
 #endif
+
 #else
     // Windows code here.
 #endif
 }
 
 bool
-SharedMem::lock()
+SharedMem::lock() const
 {
 #ifndef _WIN32
     struct sembuf sb = { 0, -1, SEM_UNDO };
-    int ret = semop(_semid, &sb, 1);
+    const int ret = ::semop(_semid, &sb, 1);
     return ret >= 0;
 #else
     // Windows code here.
@@ -118,11 +120,11 @@ SharedMem::lock()
 }
 
 bool
-SharedMem::unlock()
+SharedMem::unlock() const
 {
 #ifndef _WIN32
     struct sembuf sb = { 0, 1, SEM_UNDO };
-    int ret = semop(_semid, &sb, 1);
+    const int ret = ::semop(_semid, &sb, 1);
     return ret >= 0;
 #else
     // Windows code here
@@ -133,7 +135,9 @@ SharedMem::unlock()
 bool
 SharedMem::attach()
 {
-#if ENABLE_SHARED_MEM
+#if !ENABLE_SHARED_MEM
+# error "You need SYSV Shared memory support to use this option"
+#endif
     
     // Don't try to attach twice.
     if (_addr) return true;
@@ -154,6 +158,9 @@ SharedMem::attach()
 
     // First get semaphore.
     
+    // Check if it exists already.
+    _semid = ::semget(_shmkey, 1, 0600);
+
 #ifndef __amigaos4__
     // Struct for semctl
     union semun {
@@ -163,15 +170,12 @@ SharedMem::attach()
     };
 #endif
 
-    // Check if it exists already.
-    _semid = semget(_shmkey, 1, 0600);
-    
     semun s;
 
     // If it does not exist, create it and set its value to 1.
     if (_semid < 0) {
 
-        _semid = semget(_shmkey, 1, IPC_CREAT | 0600);
+        _semid = ::semget(_shmkey, 1, IPC_CREAT | 0600);
         
         if (_semid < 0) {
             log_error("Failed to get semaphore for shared memory!");
@@ -179,7 +183,7 @@ SharedMem::attach()
         }    
 
         s.val = 1;
-        int ret = semctl(_semid, 0, SETVAL, s);
+        const int ret = ::semctl(_semid, 0, SETVAL, s);
         if (ret < 0) {
             log_error("Failed to set semaphore value");
             return false;
@@ -188,7 +192,7 @@ SharedMem::attach()
     
     // The 4th argument is neither necessary nor used, but we pass it
     // anyway for fun.
-    int semval = semctl(_semid, 0, GETVAL, s);
+    const int semval = ::semctl(_semid, 0, GETVAL, s);
 
     if (semval != 1) {
         log_error("Need semaphore value of 1 for locking. Cannot "
@@ -199,11 +203,11 @@ SharedMem::attach()
     Lock lock(*this);
 
     // Then attach shared memory. See if it exists.
-    _shmid = shmget(_shmkey, _size, 0600);
+    _shmid = ::shmget(_shmkey, _size, 0600);
 
     // If not create it.
     if (_shmid < 0) {
-        _shmid = shmget(_shmkey, _size, IPC_CREAT | 0660);
+        _shmid = ::shmget(_shmkey, _size, IPC_CREAT | 0660);
     }
 
     if (_shmid < 0) {
@@ -211,7 +215,7 @@ SharedMem::attach()
         return false;
     }
 
-    _addr = static_cast<iterator>(shmat(_shmid, 0, 0));
+    _addr = static_cast<iterator>(::shmat(_shmid, 0, 0));
 
     if (!_addr) {
         log_error("Unable to attach shared memory: %s",
@@ -219,30 +223,8 @@ SharedMem::attach()
         return false;
     }
 
-#else
-
-    _shmhandle = CreateFileMapping((HANDLE) 0xFFFFFFFF, NULL,
-        PAGE_READWRITE, 0, _size, NULL);
-
-    if (_shmhandle == NULL) {
-        log_debug("WARNING: CreateFileMapping failed: %ld\n", GetLastError());
-            return false;
-    }
-    _addr = static_cast<iterator>(MapViewOfFile(_shmhandle, FILE_MAP_ALL_ACCESS,
-            0, 0, _size));
-
-    if (!_addr) {
-        log_debug("WARNING: MapViewOfFile() failed: %ld\n", GetLastError());
-        return false;
-    }
-#endif
-
     assert(_addr);
     return true;
-
-
-#else
-# error "You need SYSV Shared memory support to use this option"
 #endif
 }
 
