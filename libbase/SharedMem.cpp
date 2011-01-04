@@ -26,18 +26,9 @@
 #include <vector>
 #include <cerrno>
 #include <cstring>
-#include <sys/types.h>
-#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__) && !defined(HAIKU_HOST) && !defined(ANDROID)
-# include <sys/shm.h>
-# include <sys/sem.h>
-# include <sys/ipc.h>
-#elif !defined(__riscos__) && !defined(__OS2__) && !defined(ANDROID)
-# include <windows.h>
-# include <process.h>
-# include <io.h>
-#endif
 
-#ifdef ANDROID
+#if defined(ANDROID)
+# include <sys/types.h>
 # include <linux/shm.h>
 # include <linux/sem.h>
 extern int shmctl (int __shmid, int __cmd, struct shmid_ds *__buf);
@@ -47,6 +38,15 @@ extern int shmdt (__const void *__shmaddr);
 extern void *shmat (int __shmid, __const void *__shmaddr, int __shmflg);
 extern int shmget (key_t __key, size_t __size, int __shmflg);
 extern int semctl (int __semid, int __semnum, int __cmd, ...);
+#elif defined(WIN32)
+# include <windows.h>
+# include <process.h>
+# include <io.h>
+#elif !defined(__riscos__) && !defined(__OS2__) && !defined(HAIKU_HOST)
+# include <sys/types.h>
+# include <sys/shm.h>
+# include <sys/sem.h>
+# include <sys/ipc.h>
 #endif
 
 #include "log.h"
