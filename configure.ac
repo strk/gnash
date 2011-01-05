@@ -3021,9 +3021,14 @@ cygnal/testsuite/cygnal.all/Makefile
 ########################## Final report begins... ############################
 ###
 
-cerr=/tmp/gnash-configure-errors.$$
-cwarn=/tmp/gnash-configure-warnings.$$
-crec=/tmp/gnash-configure-recommended.$$
+dnl Create temporary directory in a secure way
+tmp=`mktemp -d ${TMPDIR=/tmp}/gnash-configure-XXXXXX`
+if test \! -n "$tmp" || test \! -d "$tmp"; then
+  tmp=`(umask 077 && mkdir -d ${TMPDIR=/tmp}/gnash-configure-${RANDOM}-$$) 2>/dev/null`
+fi
+cerr=${tmp}/errors
+cwarn=${tmp}/warnings
+crec=${tmp}/recommended
 echo ""
 
 #trap 'rm cerr' 0 # trap isn't a good idea, might override other traps
@@ -4051,6 +4056,7 @@ else
   rm $cerr
 fi
 
+rmdir $tmp
 
 if test x"$fork" = x"no"; then
   AC_MSG_ERROR([Currently only forking the standalone player works!])

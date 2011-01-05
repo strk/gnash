@@ -56,8 +56,6 @@ const int MAP_INHERIT = 0;
 const int MAP_HASSEMAPHORE = 0;
 #endif
 
-const int MAX_SHM_NAME_SIZE = 48;
-
 class SharedMem
 {
 public:
@@ -99,13 +97,13 @@ public:
     class Lock
     {
     public:
-        Lock(SharedMem& s) : _s(s), _locked(s.lock()) {}
+        Lock(const SharedMem& s) : _s(s), _locked(s.lock()) {}
         ~Lock() { if (_locked) _s.unlock(); }
         bool locked() const {
             return _locked;
         }
     private:
-        SharedMem& _s;
+        const SharedMem& _s;
         bool _locked;
     };
 
@@ -114,12 +112,12 @@ private:
     /// Get a semaphore lock if possible
     //
     /// @return     true if successful, false if not.
-    DSOEXPORT bool lock();
+    DSOEXPORT bool lock() const;
     
     /// Release a semaphore lock if possible
     //
     /// @return     true if successful, false if not.
-    DSOEXPORT bool unlock();
+    DSOEXPORT bool unlock() const;
 
     iterator _addr;
 
