@@ -42,8 +42,10 @@
 # include <X11/keysym.h>
 # include <gdk/gdkx.h>
 # include <X11/Xlib.h>
-# include <X11/extensions/Xv.h>
-# include <X11/extensions/Xvlib.h>
+# ifdef HAVE_XV
+#  include <X11/extensions/Xv.h>
+#  include <X11/extensions/Xvlib.h>
+# endif
 #endif
 
 #include "log.h"
