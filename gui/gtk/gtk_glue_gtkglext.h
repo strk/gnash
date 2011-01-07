@@ -23,6 +23,10 @@
 #include "gnashconfig.h"
 #endif
 
+#include <gtk/gtk.h>
+#include <gdk/gdk.h>
+#include <boost/scoped_array.hpp>
+
 #include <gtk/gtkgl.h>
 
 #include "Renderer_ogl.h"
