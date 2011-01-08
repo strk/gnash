@@ -1307,7 +1307,7 @@ if test $ltmajor -eq 1; then
   AC_DEFINE(HAVE_LTDL, [1], [Libtool 2.x defines this, but libtool 1.5 doesn't])
 dnl libtool version 2.x
 else
-  LT_CONFIG_LTDL_DIR([libltdl])
+  dnl LT_CONFIG_LTDL_DIR([libltdl])
   LT_INIT([dlopen win32-dll disable-static])
   LTDL_INIT([convenience recursive])
 fi
