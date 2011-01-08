@@ -19,6 +19,7 @@ AC_PREREQ(2.50)
 AC_INIT(gnash, 0.8.9dev)
 AC_CONFIG_SRCDIR([libcore/as_object.h])
 AC_CONFIG_HEADERS([gnashconfig.h])
+AC_CONFIG_MACRO_DIR([macros])
 
 dnl AC_CONFIG_SUBDIRS(libltdl)
 AC_CANONICAL_BUILD
@@ -1288,6 +1289,7 @@ ltmajor=`echo $ltver | cut -d '.' -f 1`
 AC_MSG_RESULT([$ltver])
 dnl Libtool version 1.5
 if test $ltmajor -eq 1; then
+  AC_CONFIG_SUBDIRS([libltdl])
   AC_LIBLTDL_CONVENIENCE
   AC_LIBTOOL_DLOPEN
   if test x"${windows}" = x"yes"; then
@@ -1306,6 +1308,7 @@ if test $ltmajor -eq 1; then
   AC_DEFINE(HAVE_LTDL, [1], [Libtool 2.x defines this, but libtool 1.5 doesn't])
 dnl libtool version 2.x
 else
+  LT_CONFIG_LTDL_DIR([libltdl])
   LT_INIT([dlopen win32-dll disable-static])
   LTDL_INIT([convenience recursive])
 fi
