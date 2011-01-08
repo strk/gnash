@@ -2725,7 +2725,11 @@ AC_SUBST(PCH_FLAGS)
 GNASH_PATH_PTHREADS
 
 GNASH_PATH_BOOST
-dnl AX_GCC_ARCHFLAG(no)
+
+dnl disable --gcc-arch by default
+dnl AX_GCC_ARCHFLAG
+dnl AC_SUBST(CFLAGS)
+dnl AC_SUBST(CLIBS)
 
 AC_ARG_ENABLE([strict],
   AC_HELP_STRING([--enable-strict],[Accept only standards compliant code (GCC only)]),
