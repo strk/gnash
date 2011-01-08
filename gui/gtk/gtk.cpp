@@ -1,6 +1,6 @@
 // gtk.cpp: Gnome ToolKit graphical user interface, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free Software
 //   Foundation, Inc
 // 
 // This program is free software; you can redistribute it and/or modify
@@ -42,8 +42,10 @@
 # include <X11/keysym.h>
 # include <gdk/gdkx.h>
 # include <X11/Xlib.h>
-# include <X11/extensions/Xv.h>
-# include <X11/extensions/Xvlib.h>
+# ifdef HAVE_XV
+#  include <X11/extensions/Xv.h>
+#  include <X11/extensions/Xvlib.h>
+# endif
 #endif
 
 #include "log.h"
@@ -154,11 +156,12 @@ GtkGui::GtkGui(unsigned long xid, float scale, bool loop, RunResources& r)
 bool
 GtkGui::init(int argc, char **argv[])
 {
+#ifdef HAVE_X11
     if (!XInitThreads()) {
         log_debug("Failed to initialize X threading support\n");
         return false;
     }
-
+#endif
     gtk_init(&argc, argv);
 
     addPixmapDirectory (PKGDATADIR);
@@ -2122,7 +2125,10 @@ GtkGui::playHook()
 bool 
 GtkGui::checkX11Extension(const std::string& ext)
 {
-    
+#ifdef HAVE_X11
+#if GTK_CHECK_VERSION(2,22,0)
+	#define GDK_DISPLAY() (GDK_DISPLAY_XDISPLAY(gdk_display_get_default()))
+#endif 
     int n = 0;
     char **extlist = XListExtensions(GDK_DISPLAY(), &n);
 
@@ -2133,6 +2139,7 @@ GtkGui::checkX11Extension(const std::string& ext)
             }
         }
     }
+#endif /* HAVE_X11 */ 
     // do not free, Xlib can depend on contents being unaltered
     return false;
 }

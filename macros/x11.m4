@@ -1,5 +1,5 @@
 dnl  
-dnl    Copyright (C) 2005, 2006, 2009, 2010 Free Software Foundation, Inc.
+dnl    Copyright (C) 2005, 2006, 2009, 2010, 2011 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
@@ -31,10 +31,11 @@ AC_DEFUN([GNASH_PATH_X11],
 
   dnl If the path hasn't been specified, go look for it.
   if test x"${ac_cv_path_x11_incl}" = x ; then
-    newlist="/Developer/SDKs/MacOSX10.5*.sdk/usr/include /Developer/SDKs/MacOSX10.4*.sdk/usr/include ${incllist}"
+    newlist="/Developer/SDKs/MacOSX10.6*.sdk/usr/include /Developer/SDKs/MacOSX10.5*.sdk/usr/include /Developer/SDKs/MacOSX10.4*.sdk/usr/include ${incllist}"
     for i in $newlist; do
     	if test -f $i/X11/X.h; then
   	    ac_cv_path_x11_incl="-I$i"
+            break
     	fi
     done
   fi
@@ -55,10 +56,12 @@ AC_DEFUN([GNASH_PATH_X11],
   if test x"${ac_cv_path_x11_incl}" != x ; then
     dnl Don't pass -I/usr/include
     if test x"${ac_cv_path_x11_incl}" != "x-I/usr/include"; then
-      X11_CFLAGS="${ac_cv_path_x11_incl}"
+       X11_CFLAGS="${ac_cv_path_x11_incl}"
     fi
+    x11_incl=yes
     AC_MSG_RESULT(${ac_cv_path_x11_incl})
   else
+    x11_incl=""
     X11_CFLAGS=""
     AC_MSG_RESULT(none)
   fi
@@ -77,7 +80,7 @@ AC_DEFUN([GNASH_PATH_X11],
 
   dnl If the header doesn't exist, there is no point looking for the library.
   if test x"${ac_cv_path_x11_incl}" != x ; then
-    newlist="/Developer/SDKs/MacOSX10.5*.sdk/usr/lib /Developer/SDKs/MacOSX10.5*.sdk/usr/X11R6/lib /Developer/SDKs/MacOSX10.4*.sdk/usr/lib /Developer/SDKs/MacOSX10.4*.sdk/usr/X11R6/lib ${libslist}"
+    newlist="/Developer/SDKs/MacOSX10.6*.sdk/usr/lib /Developer/SDKs/MacOSX10.6*.sdk/usr/X11R6/lib /Developer/SDKs/MacOSX10.5*.sdk/usr/lib /Developer/SDKs/MacOSX10.5*.sdk/usr/X11R6/lib /Developer/SDKs/MacOSX10.4*.sdk/usr/lib /Developer/SDKs/MacOSX10.4*.sdk/usr/X11R6/lib ${libslist}"
     for i in $newlist; do
       if test -f $i/libX11.a -o -f $i/libX11.${shlibext}; then
         if test ! x"${i}" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
@@ -130,7 +133,7 @@ AC_DEFUN([GNASH_PATH_X11],
     AC_MSG_RESULT(none)
   fi
 
-  if test -n "$X11_LIBS" -a -n "$X11_CFLAGS"; then
+  if test -n "$X11_LIBS" -a -n "$x11_incl"; then
     x11=yes
   fi
 
