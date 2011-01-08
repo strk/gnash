@@ -1289,7 +1289,6 @@ ltmajor=`echo $ltver | cut -d '.' -f 1`
 AC_MSG_RESULT([$ltver])
 dnl Libtool version 1.5
 if test $ltmajor -eq 1; then
-  AC_CONFIG_SUBDIRS([libltdl])
   AC_LIBLTDL_CONVENIENCE
   AC_LIBTOOL_DLOPEN
   if test x"${windows}" = x"yes"; then
