@@ -326,91 +326,6 @@ ExternalInterface::makeInvoke (const std::string &method,
 }
 
 std::string
-ExternalInterface::makeNull ()
-{
-    return "<null/>";
-}
-
-std::string
-ExternalInterface::makeTrue ()
-{
-    return "<true/>";
-}
-
-std::string
-ExternalInterface::makeFalse ()
-{
-    return "<false/>";
-}
-
-std::string
-ExternalInterface::makeString (const std::string &str)
-{
-    std::stringstream ss;
-
-    ss << "<string>" << str << "</string>";
-    
-    return ss.str();
-}
-
-
-std::string
-ExternalInterface::makeProperty (const std::string &id, double num)
-{
-    std::stringstream ss;
-    ss << num;
-    return makeProperty(id, ss.str());
-}
-
-std::string
-ExternalInterface::makeProperty (const std::string &id, int num)
-{
-    std::stringstream ss;
-    ss << num;
-    return makeProperty(id, ss.str());
-}
-
-std::string
-ExternalInterface::makeProperty (const std::string &id, const std::string &data)
-{
-    std::stringstream ss;
-
-    ss << "<property id=\"" << id << "\">" << data << "</property>";
-    
-    return ss.str();
-}
-
-std::string
-ExternalInterface::makeNumber (double num)
-{
-    std::stringstream ss;
-
-    ss << "<number>" << num << "</number>";
-    
-    return ss.str();
-}
-
-std::string
-ExternalInterface::makeNumber (int num)
-{
-    std::stringstream ss;
-
-    ss << "<number>" << num << "</number>";
-    
-    return ss.str();
-}
-
-std::string
-ExternalInterface::makeNumber (unsigned int num)
-{
-    std::stringstream ss;
-    
-    ss << "<number>" << num << "</number>";
-
-    return ss.str();
-}
-
-std::string
 ExternalInterface::makeArray (std::vector<std::string> &args)
 {
     std::stringstream ss;
@@ -424,21 +339,6 @@ ExternalInterface::makeArray (std::vector<std::string> &args)
     }
     
     ss << "</array>";
-    
-    return ss.str();
-}
-
-std::string
-ExternalInterface::makeObject (std::map<std::string, std::string> &args)
-{
-    std::stringstream ss;
-    std::map<std::string, std::string>::iterator it;
-
-    ss << "<object>";
-    for (it = args.begin(); it != args.end(); ++it) {
-        ss << "<property id=\"" << it->first << "\">" << it->second << "</property>";
-    }
-    ss << "</object>";
     
     return ss.str();
 }

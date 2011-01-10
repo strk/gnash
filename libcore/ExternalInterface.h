@@ -70,16 +70,10 @@ struct DSOEXPORT ExternalInterface
     DSOEXPORT static std::string makeInvoke (const std::string &method,
               		                     const std::vector<as_value> &args);
     
-    static std::string makeNull ();
-    static std::string makeTrue ();
-    static std::string makeFalse ();
-    static std::string makeString (const std::string &str);
-    static std::string makeProperty (const std::string &str, const std::string &data);
-    static std::string makeProperty (const std::string &str, double num);
-    static std::string makeProperty (const std::string &str, int num);
-    static std::string makeNumber (double num);
-    static std::string makeNumber (int num);
-    static std::string makeNumber (unsigned int num);
+    static std::string makeString (const std::string &str) {
+        return "<string>" + str + "</string";
+    }
+
     static std::string makeArray (std::vector<std::string> &args);
     static std::string makeObject (std::map<std::string, std::string> &args);
 
