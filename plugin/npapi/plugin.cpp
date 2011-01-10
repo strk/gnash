@@ -772,7 +772,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
         return false;
     }
     
-    ExternalInterface::invoke_t *invoke = ExternalInterface::parseInvoke(buf);
+    plugin::ExternalInterface::invoke_t *invoke = plugin::ExternalInterface::parseInvoke(buf);
 
     if (!invoke->name.empty()) {
         gnash::log_debug("Requested method is: %s", invoke->name);
@@ -877,12 +877,12 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
         // We got a result from invoking the Javascript method
         std::stringstream ss;
         if (invokeResult) {
-            ss << ExternalInterface::convertNPVariant(&result);
+            ss << plugin::ExternalInterface::convertNPVariant(&result);
             NPN_ReleaseVariantValue(&result);
         } else {
             // Send response
             // FIXME: "securityError" also possible, check domain
-            ss << ExternalInterface::makeString("Error");
+            ss << plugin::ExternalInterface::makeString("Error");
         }
         size_t ret = _scriptObject->writePlayer(ss.str());
         if (ret != ss.str().size()) {

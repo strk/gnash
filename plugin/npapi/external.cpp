@@ -35,6 +35,7 @@
 #include <boost/algorithm/string/erase.hpp>
 
 namespace gnash {
+namespace plugin {
 
 // Create an Invoke message for the standalone Gnash
 std::string
@@ -419,6 +420,7 @@ ExternalInterface::parseArguments(const std::string &xml)
     return args;
 }
 
+} // namespace plugin
 } // namespace gnash
 
 // local Variables:

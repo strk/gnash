@@ -35,6 +35,8 @@
 
 namespace gnash {
 
+namespace plugin {
+
 struct ExternalInterface
 {
     typedef struct {
@@ -67,6 +69,7 @@ struct ExternalInterface
     static std::string convertNPVariant (const NPVariant *npv);
 };
 
+}
 }
 
 #endif // GNASH_PLUGIN_EXTERNAL_H

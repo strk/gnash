@@ -177,8 +177,6 @@ ExternalInterface::ExternalEventCheck(int fd)
 boost::shared_ptr<ExternalInterface::invoke_t>
 ExternalInterface::parseInvoke(const std::string &xml)
 {
-    //    GNASH_REPORT_FUNCTION;
-
     boost::shared_ptr<ExternalInterface::invoke_t> invoke;
     if (xml.empty()) {
         return invoke;
@@ -226,8 +224,6 @@ ExternalInterface::parseInvoke(const std::string &xml)
 as_value
 ExternalInterface::parseXML(const std::string &xml)
 {
-    //    GNASH_REPORT_FUNCTION;
-
     if (xml.empty()) {
         return as_value();
     }
