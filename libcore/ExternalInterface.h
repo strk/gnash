@@ -54,9 +54,6 @@ struct DSOEXPORT ExternalInterface
         return ei._toXML(obj);
     }
     
-    static std::string escapeXML(as_object &obj);
-    static std::string unescapeXML(as_object &obj);
-
     static as_value parseXML(const std::string &xml);
     static std::vector<as_value> parseArguments(const std::string &xml);
 
