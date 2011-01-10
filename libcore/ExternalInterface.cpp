@@ -325,24 +325,6 @@ ExternalInterface::makeInvoke (const std::string &method,
     return ss.str();
 }
 
-std::string
-ExternalInterface::makeArray (std::vector<std::string> &args)
-{
-    std::stringstream ss;
-    std::vector<std::string>::iterator it;
-    int index = 0;
-    
-    ss << "<array>";
-    for (it=args.begin(); it != args.end(); ++it) {
-        ss << "<property id=\"" << index << "\">" << *it << "</property>";
-        index++;
-    }
-    
-    ss << "</array>";
-    
-    return ss.str();
-}
-
 size_t
 ExternalInterface::writeBrowser(int fd, const std::string &data)
 {

@@ -74,9 +74,6 @@ struct DSOEXPORT ExternalInterface
         return "<string>" + str + "</string";
     }
 
-    static std::string makeArray (std::vector<std::string> &args);
-    static std::string makeObject (std::map<std::string, std::string> &args);
-
     DSOEXPORT static size_t writeBrowser(int fd, const std::string &xml);
     DSOEXPORT static std::string readBrowser(int fd);
 
