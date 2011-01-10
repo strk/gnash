@@ -68,7 +68,7 @@ struct DSOEXPORT ExternalInterface
               		                     const std::vector<as_value> &args);
     
     static std::string makeString (const std::string &str) {
-        return "<string>" + str + "</string";
+        return "<string>" + str + "</string>";
     }
 
     DSOEXPORT static size_t writeBrowser(int fd, const std::string &xml);
