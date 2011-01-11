@@ -26,7 +26,8 @@
 #include <boost/cstdint.hpp>
 
 #if defined (WIN32)
-// Include for key_t and HANDLE
+// Include for HANDLE
+#include <windows.h>
 #else
 // key_t
 #include <sys/types.h>
