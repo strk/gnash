@@ -100,7 +100,11 @@ else
 if HAIKU
 libgnashbase_la_SOURCES += SharedMemHaiku.cpp
 else
+if WIN32
+libgnashbase_la_SOURCES += SharedMemW32.cpp
+else
 libgnashbase_la_SOURCES += SharedMem.cpp
+endif
 endif
 endif
 

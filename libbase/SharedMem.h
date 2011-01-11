@@ -25,19 +25,11 @@
 
 #include <boost/cstdint.hpp>
 
-#include <sys/types.h>
-#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__) && !defined(__HAIKU__)
-# include <sys/ipc.h>
-#ifdef ANDROID
-# include <linux/shm.h>
+#if defined (WIN32)
+// Include for key_t and HANDLE
 #else
-# include <sys/shm.h>
-#endif
-#elif !defined(__riscos__) && !defined(__OS2__) && !defined(__HAIKU__)
-# include <windows.h>
-# include <process.h>
-# include <fcntl.h>
-# include <io.h>
+// key_t
+#include <sys/types.h>
 #endif
 
 #include "dsodefs.h" //For DSOEXPORT
@@ -48,13 +40,6 @@ namespace gnash {
 }
 
 namespace gnash {
-
-#ifndef MAP_INHERIT
-const int MAP_INHERIT = 0;
-#endif
-#ifndef MAP_HASSEMAPHORE
-const int MAP_HASSEMAPHORE = 0;
-#endif
 
 class SharedMem
 {
@@ -129,11 +114,11 @@ private:
     // Shared memory ID.
     int _shmid;
 
-#if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
-    key_t	_shmkey;
+#if !defined(WIN32) 
+    key_t _shmkey;
 #else
-    long	_shmkey;
-    HANDLE      _shmhandle;
+    long _shmkey;
+    HANDLE _shmhandle;
 #endif
 };
 
