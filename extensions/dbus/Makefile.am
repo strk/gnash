@@ -22,20 +22,23 @@ pluginsdir = $(libdir)/gnash/plugins
 
 plugins_LTLIBRARIES = dbus.la
 
-INCLUDES =  \
+AM_CPPFLAGS =  \
             -I$(top_srcdir)/libbase \
             -I$(top_srcdir)/libcore \
             -I$(top_srcdir)/libcore/abc \
             -I$(top_srcdir)/libcore/swf \
             -I$(top_srcdir)/libcore/vm \
 	    -I$(top_srcdir)/libcore/asobj \
+	    $(BOOST_CFLAGS) \
 	    $(INCLTDL)
 
 dbus_la_SOURCES = dbus_ext.cpp dbus_ext.h
+dbus_la_CPPFLAGS = $(AM_CPPFLAGS)
 dbus_la_LDFLAGS = -module -avoid-version -no-undefined
 dbus_la_LIBDADD = $(LIBADD_DL) \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libcore/libgnashcore.la \
+	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 
