@@ -21,7 +21,6 @@ AUTOMAKE_OPTIONS = dejagnu
 LDADD = $(top_builddir)/libbase/libgnashbase.la \
 	$(LIBINTL)
 
-
 if LIBLTDL2
 LDADD  += $(top_builddir)/libltdl/libltdlc.la
 endif
@@ -31,7 +30,7 @@ endif
 
 # AM_CPPFLAGS isn't right here since per-program *_CPPFLAGS override global
 # AM_CPPFLAGS
-INCLUDES = \
+AM_CPPFLAGS = \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libcore  \
         -I$(top_srcdir)/testsuite \
@@ -70,16 +69,20 @@ check_PROGRAMS = \
 #endif
 
 NoSeekFileTest_SOURCES = NoSeekFileTest.cpp
-NoSeekFileTest_CPPFLAGS = '-DINPUT="$(srcdir)/NoSeekFileTest.cpp"'
+NoSeekFileTest_CPPFLAGS = $(AM_CPPFLAGS) \
+	'-DINPUT="$(srcdir)/NoSeekFileTest.cpp"'
 
 URLTest_SOURCES = URLTest.cpp
-URLTest_CPPFLAGS = '-DBUILDDIR="$(abs_builddir)"'
+URLTest_CPPFLAGS =  $(AM_CPPFLAGS) \
+	'-DBUILDDIR="$(abs_builddir)"'
 
 RcTest_SOURCES = RcTest.cpp
-RcTest_CPPFLAGS = -DSRCDIR="$(srcdir)"
+RcTest_CPPFLAGS =  $(AM_CPPFLAGS) \
+	-DSRCDIR="$(srcdir)"
 
 IntTypesTest_SOURCES = IntTypesTest.cpp
-IntTypesTest_CPPFLAGS = -DSRCDIR="$(srcdir)"
+IntTypesTest_CPPFLAGS =  $(AM_CPPFLAGS) \
+	-DSRCDIR="$(srcdir)"
 
 # Test the Memory class
 #memtest_SOURCES = memtest.cpp
@@ -89,7 +92,8 @@ Range2dTest_SOURCES = Range2dTest.cpp
 snappingrangetest_SOURCES = snappingrangetest.cpp
 
 string_tableTest_SOURCES = string_tableTest.cpp
-string_tableTest_CPPFLAGS = -DSRCDIR="$(srcdir)"
+string_tableTest_CPPFLAGS =  $(AM_CPPFLAGS) \
+	-DSRCDIR="$(srcdir)"
 string_tableTest_LDFLAGS = $(BOOST_LIBS)
 
 TEST_DRIVERS = ../simple.exp
