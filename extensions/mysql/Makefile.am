@@ -30,11 +30,14 @@ AM_CPPFLAGS = \
             -I$(top_srcdir)/libcore/vm \
             -I$(top_srcdir)/libcore/asobj \
             -I$(top_srcdir)/libltdl \
-            $(MYSQL_CFLAGS)
+            $(BOOST_CFLAGS) \
+            $(MYSQL_CFLAGS) \
+	    $(NULL)
 
 AM_LDFLAGS =  \
         $(MYSQL_LIBS) \
 	$(top_builddir)/libcore/libgnashcore.la \
+        $(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 
