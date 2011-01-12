@@ -1136,12 +1136,10 @@ public:
 
   // NOTE: this implementation can't handle complex polygons (such as concave
   // polygons.
-  virtual void  draw_poly(const point* corners, size_t corner_count, 
+  virtual void draw_poly(const std::vector<point>& corners, 
     const rgba& fill, const rgba& outline, const SWFMatrix& mat, bool /* masked */)
   {
-    if (corner_count < 1) {
-      return;
-    }
+    if (corners.empty()) return;
 
     oglScopeMatrix scope_mat(mat);
 
@@ -1150,14 +1148,14 @@ public:
     glEnableClientState(GL_VERTEX_ARRAY);
 
     // Draw simple polygon
-    glVertexPointer(2, GL_FLOAT, 0 /* tight packing */, corners);
-    glDrawArrays(GL_POLYGON, 0, corner_count);
+    glVertexPointer(2, GL_FLOAT, 0 /* tight packing */, &corners.front());
+    glDrawArrays(GL_POLYGON, 0, corners.size());
 
     // Draw outline
     glLineWidth(1.0);
     glColor4ub(outline.m_r, outline.m_g, outline.m_b, outline.m_a);
-    glVertexPointer(2, GL_FLOAT, 0 /* tight packing */, corners);
-    glDrawArrays(GL_LINE_LOOP, 0, corner_count);
+    glVertexPointer(2, GL_FLOAT, 0 /* tight packing */, &corners.front());
+    glDrawArrays(GL_LINE_LOOP, 0, corners.size());
 
     glDisableClientState(GL_VERTEX_ARRAY);
 
@@ -1194,9 +1192,7 @@ public:
   /// the number of masks.
   void apply_mask()
   {
-    if (_masks.empty()) {
-      return;
-    }
+    if (_masks.empty()) return;
     
     glEnable(GL_STENCIL_TEST);
 

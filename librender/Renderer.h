@@ -285,7 +285,7 @@ public:
     /// When masked==false, then any potential mask currently active will be
     /// ignored, otherwise it is respected.
     ///
-    virtual void draw_poly(const point* corners, size_t corner_count, 
+    virtual void draw_poly(const std::vector<point>& corners, 
         const rgba& fill, const rgba& outline, const SWFMatrix& mat,
         bool masked) = 0;
         
