@@ -44,15 +44,10 @@ namespace renderer {
 
 struct eglVertex {
     eglVertex(float x, float y)
-        : _x(x), _y(y)
-        {
-        }
+        : _x(x), _y(y) { }
   
     eglVertex(const point& p)
-        : _x(p.x), _y(p.y)
-        {
-        }
-
+        : _x(p.x), _y(p.y) { }
     float _x;
     float _y;
 };
@@ -60,6 +55,7 @@ struct eglVertex {
 class EGLDevice : public GnashDevice
 {
   public:
+    typedef enum {LOW, MEDIUM, HIGH} quality_e;
     EGLDevice();
     EGLDevice(int argc, char *argv[]);
     EGLDevice(GnashDevice::rtype_t rtype);
@@ -200,6 +196,7 @@ class EGLDevice : public GnashDevice
     // Swap to the default surface
     bool swapBuffers() {
         GNASH_REPORT_FUNCTION;
+        log_debug("FIXME: %p, %p", _eglDisplay, _eglSurface);
         return eglSwapBuffers(_eglDisplay, _eglSurface);
     }
     bool copyPbuffers(size_t x) {
@@ -346,15 +343,15 @@ class EGLDevice : public GnashDevice
     }
     
     void setAttrib(int bpp);
+    static EGLint getRenderableTypes();
 protected:
     EGLConfig           _eglConfig;
     EGLContext          _eglContext;
     EGLSurface          _eglSurface;
     EGLDisplay          _eglDisplay;
-    EGLint              _eglNumOfConfigs;
     EGLNativeWindowType _nativeWindow;
     EGLNativePixmapType _nativePixmap;
-    EGLint              _max_num_config;
+    quality_e           _quality;
     const EGLint       *_attrib;
     unsigned int        _bpp;
     std::vector<EGLSurface> _pbuffers;

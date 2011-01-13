@@ -39,65 +39,11 @@
 
 #include "eglDevice.h"
 
+#include "configTemplates.h"
+
 namespace gnash {
 
 namespace renderer {
-
-static const EGLint attrib32_list[] = {
-    EGL_RED_SIZE,       8,
-    EGL_GREEN_SIZE,     8,
-    EGL_BLUE_SIZE,      8,
-//  EGL_ALPHA_SIZE,     0,
-//    EGL_DEPTH_SIZE,     24,
-// #ifdef RENDERER_GLES1
-//     EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
-// #endif
-// #ifdef RENDERER_GLES2
-//     EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-// #endif
-#ifdef RENDERER_OPENVG
-     EGL_RENDERABLE_TYPE, EGL_OPENVG_BIT,
-//     EGL_STENCIL_SIZE,   8,
-#endif
-//    EGL_RENDERABLE_TYPE, EGL_OPENVG_BIT|EGL_OPENGL_ES_BIT|EGL_OPENGL_ES2_BIT,
-    EGL_SURFACE_TYPE,   EGL_WINDOW_BIT|EGL_PBUFFER_BIT|EGL_PIXMAP_BIT,
-//    EGL_SAMPLE_BUFFERS, 1,
-// FIXME: Single Buffering appears not to work on X11, you get no visual. This is
-// the default though.    
-//    EGL_RENDER_BUFFER, EGL_SINGLE_BUFFER,
-    EGL_NONE
-};
-
-static EGLint const attrib16_list[] = {
-    EGL_RED_SIZE,       5,
-    EGL_GREEN_SIZE,     6,
-    EGL_BLUE_SIZE,      5,
-    EGL_ALPHA_SIZE,     0,
-// #ifdef RENDERER_GLES1
-//     EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
-// #endif
-// #ifdef RENDERER_GLES2
-//     EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-// #endif
-    EGL_LUMINANCE_SIZE,     EGL_DONT_CARE,
-    EGL_SURFACE_TYPE,       EGL_VG_COLORSPACE_LINEAR_BIT,
-    EGL_SAMPLES,            0,
-#ifdef RENDERER_OPENVG
-    EGL_RENDERABLE_TYPE, EGL_WINDOW_BIT|EGL_PBUFFER_BIT|EGL_PIXMAP_BIT,
-    EGL_DEPTH_SIZE,     16,
-#endif
-    EGL_NONE
-};
-
-// These are the same EGL config settings as used by the Mesa
-// examples, which run on X11
-static const EGLint attrib1_list[] = {
-    EGL_RED_SIZE, 1,
-    EGL_GREEN_SIZE, 1,
-    EGL_BLUE_SIZE, 1,
-    EGL_RENDERABLE_TYPE, EGL_OPENVG_BIT,
-    EGL_NONE
-};
 
 const EGLint window_attrib_list[] = {
     // Back buffering is used for window and pbuffer surfaces. Windows
@@ -110,53 +56,6 @@ const EGLint window_attrib_list[] = {
     EGL_NONE
 };
 
-// From the EGL 1.4 spec:
-//
-// EGL defines several types of drawing surfaces collectively referred
-// to as EGLSurfaces. These include windows, used for onscreen
-// rendering; pbuffers, used for offscreen rendering; and pixmaps,
-// used for offscreen rendering into buffers that may be accessed
-// through native APIs. EGL windows and pixmaps are tied to native
-// window system windows and pixmaps.
-//
-// depth, multisample, and stencil buffers are currently used only by
-// OpenGL-ES.
-
-// EGL and OpenGL ES supports two rendering models: back buffered and
-// single buffered. Back buffered rendering is used by window and
-// pbuffer surfaces. Memory for the color buffer used during rendering
-// is allocated and owned by EGL. When the client is finished drawing
-// a frame, the back buffer may be copied to a visible window using
-// eglSwapBuffers. Pbuffer surfaces have a back buffer but no
-// associated window, so the back buffer need not be copied.
-//
-// Single buffered rendering is used by pixmap surfaces. Memory for
-// the color buffer is specified at surface creation time in the form
-// of a native pixmap, and client APIs are required to use that memory
-// during rendering. When the client is finished drawing a frame, the
-// native pixmap contains the final image. Pixmap surfaces typically
-// do not support multisampling, since the native pixmap used as the
-// color buffer is unlikely to provide space to store multisample
-// information. Some client APIs , such as OpenGL and OpenVG , also
-// support single buffered rendering to window surfaces. This behavior
-// can be selected when creating the window surface, as defined in
-// section 3.5.1. When mixing use of client APIs which do not support
-// single buffered rendering into windows, like OpenGL ES , with
-// client APIs which do support it, back color buffers and visible
-// window contents must be kept consistent when binding window
-// surfaces to contexts for each API type. Both back and single
-// buffered surfaces may also be copied to a specified native pixmap
-// using eglCopyBuffers.
-
-// Native rendering will always be supported by pixmap surfaces (to
-// the extent that native rendering APIs can draw to native
-// pixmaps). Pixmap surfaces are typically used when mixing native and
-// client API rendering is desirable, since there is no need to move
-// data between the back buffer visible to the client APIs and the
-// native pixmap visible to native rendering APIs. However, pixmap
-// surfaces may, for the same reason, have restricted capabilities and
-// performance relative to window and pbuffer surfaces.
-
 // The debug log used by all the gnash libraries.
 static LogFile& dbglogfile = LogFile::getDefaultInstance();
 
@@ -165,8 +64,8 @@ EGLDevice::EGLDevice()
       _eglContext(EGL_NO_CONTEXT),
       _eglSurface(EGL_NO_SURFACE),
       _eglDisplay(EGL_NO_DISPLAY),
-      _eglNumOfConfigs(0),
-      _max_num_config(1),
+      _quality(LOW),
+      _attrib(0),
 #if BUILD_X11_DEVICE
       _bpp(32)
 #else
@@ -179,13 +78,12 @@ EGLDevice::EGLDevice()
 }
 
 EGLDevice::EGLDevice(int argc, char *argv[])
-    :  _attrib(0),
-       _eglConfig(0),
+    : _eglConfig(0),
       _eglContext(EGL_NO_CONTEXT),
       _eglSurface(EGL_NO_SURFACE),
       _eglDisplay(EGL_NO_DISPLAY),
-      _eglNumOfConfigs(0),
-      _max_num_config(1),
+      _quality(LOW),
+      _attrib(0),
 #if BUILD_X11_DEVICE
       _bpp(32)
 #else
@@ -202,13 +100,12 @@ EGLDevice::EGLDevice(int argc, char *argv[])
 }
 
 EGLDevice::EGLDevice(GnashDevice::rtype_t rtype)
-    :  _attrib(0),
-       _eglConfig(0),
+    : _eglConfig(0),
       _eglContext(EGL_NO_CONTEXT),
       _eglSurface(EGL_NO_SURFACE),
       _eglDisplay(EGL_NO_DISPLAY),
-      _eglNumOfConfigs(0),
-      _max_num_config(1),
+      _quality(LOW),
+      _attrib(0),
 #if BUILD_X11_DEVICE
       _bpp(32)
 #else
@@ -232,10 +129,10 @@ EGLDevice::setAttrib(int bpp)
 { 
     switch (bpp) {
     case 32:
-        _attrib = attrib32_list;
+        _attrib = attrib32_low;
         break;
     case 16:
-        _attrib = attrib16_list;
+        _attrib = attrib16_low;
         break;
     case 1:
         _attrib = attrib1_list;
@@ -289,11 +186,7 @@ EGLDevice::initDevice(int argc, char *argv[])
 
     GNASH_REPORT_FUNCTION;
     
-    // see egl_config.c for a list of supported configs, this looks for
-    // a 5650 (rgba) config, supporting OpenGL ES and windowed surfaces
-
     // step 1 - get an EGL display
-
 //    _eglDisplay = eglGetDisplay(XOpenDisplay(0));
     _eglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if (EGL_NO_DISPLAY == _eglDisplay) {
@@ -311,7 +204,7 @@ EGLDevice::initDevice(int argc, char *argv[])
     // step2 - bind to the wanted client API
     /// This is done by bindClient() later on
     // bindClient(GnashDevice::OPENVG);
-    queryEGLConfig(_eglDisplay);
+    // queryEGLConfig(_eglDisplay);
    
     log_debug("EGL_CLIENT_APIS = %s", eglQueryString(_eglDisplay, EGL_CLIENT_APIS));
     log_debug("EGL_EXTENSIONS = %s",  eglQueryString(_eglDisplay, EGL_EXTENSIONS));
@@ -320,44 +213,82 @@ EGLDevice::initDevice(int argc, char *argv[])
               eglQueryString(_eglDisplay, EGL_VENDOR));
 
     // step3 - find a suitable config
-#if 1
-    printEGLAttribs(_attrib);
-    if (EGL_FALSE == eglChooseConfig(_eglDisplay, _attrib, &_eglConfig,
-                                     1, &_eglNumOfConfigs)) {
-        log_error("eglChooseConfig(32) failed (error %s)", 
+    EGLint max_num_config = 0;
+    
+    // Get the number of supported configurations
+    if ( EGL_FALSE == eglGetConfigs(_eglDisplay, 0, 0, &max_num_config) ) {
+        log_error("eglGetConfigs() failed to retrive the number of configs (error %s)",
                   getErrorString(eglGetError()));
-        return false;
+        return 0;
     }
-#else
-    if (_bpp == 32) {
-        printEGLAttribs(attrib32_list);
-        if (EGL_FALSE == eglChooseConfig(_eglDisplay, attrib32_list, &_eglConfig,
-                                          1, &_eglNumOfConfigs)) {
-            log_error("eglChooseConfig(32) failed (error %s)", 
-                       getErrorString(eglGetError()));
-            return false;
-        }
-    } else if (_bpp == 16) {
-        printEGLAttribs(attrib16_list);
-        if (EGL_FALSE == eglChooseConfig(_eglDisplay, attrib16_list, &_eglConfig,
-                                         1, &_eglNumOfConfigs)) {
-            log_error("eglChooseConfig(16) failed (error %s)",
-                       getErrorString(eglGetError()));
-            return false;
-        }
-    } else {
-        log_error("No supported bpp value!");
+    if(max_num_config <= 0) {
+        printf( "No EGLconfigs found\n" );
+        return 0;
     }
-#endif
+    log_debug("Max number of EGL Configs is %d", max_num_config);
 
-    if (0 == _eglNumOfConfigs) {
-        log_error("eglChooseConfig() was unable to find a suitable config");
-        return false;
+    // The quality of the rendering is controlled by the number of samples
+    // and sample buffers as specified in the configuration. Higher quality
+    // settings force lower performance.
+    EGLint eglNumOfConfigs = 0;
+    switch (_quality) {
+      case EGLDevice::LOW:
+          if (eglChooseConfig(_eglDisplay, attrib32_low, &_eglConfig,
+                              1, &eglNumOfConfigs)) {
+              log_debug("Choose 32bpp, low quality configuration");
+          } else {
+              log_error("eglChooseConfig(32-low) failed (error %s)", 
+                        getErrorString(eglGetError()));
+              if (eglChooseConfig(_eglDisplay, attrib16_low, &_eglConfig,
+                                  1, &eglNumOfConfigs)) {
+                  log_error("eglChooseConfig(16-low) failed (error %s)", 
+                            getErrorString(eglGetError()));
+                  return false;
+              }
+          }
+          break;
+      case EGLDevice::MEDIUM:
+          if (eglChooseConfig(_eglDisplay, attrib32_medium, &_eglConfig,
+                              1, &eglNumOfConfigs)) {
+              log_debug("Choose 32bpp, medium quality configuration");
+          } else {
+              log_error("eglChooseConfig(32-medium) failed (error %s)", 
+                        getErrorString(eglGetError()));
+              if (eglChooseConfig(_eglDisplay, attrib16_medium, &_eglConfig,
+                                  1, &eglNumOfConfigs)) {
+                  log_error("eglChooseConfig(16-medium) failed (error %s)", 
+                            getErrorString(eglGetError()));
+                  return false;
+              }
+          }
+          break;
+      case EGLDevice::HIGH:
+          if (eglChooseConfig(_eglDisplay, attrib32_high, &_eglConfig,
+                              1, &eglNumOfConfigs)) {
+              log_debug("Choose 32bpp, high quality configuration");
+          } else {
+              log_error("eglChooseConfig(32-high) failed (error %s)", 
+                        getErrorString(eglGetError()));
+              if (eglChooseConfig(_eglDisplay, attrib16_high, &_eglConfig,
+                                  1, &eglNumOfConfigs)) {
+                  log_error("eglChooseConfig(16-high) failed (error %s)", 
+                            getErrorString(eglGetError()));
+                  return false;
+              }
+          }
+          break;
+      default:
+          break;
     }
+
+    // if  (eglNumOfConfigs == 0) {
+    //     log_error("eglChooseConfig() was unable to find a suitable config");
+    //     return false;
+    // }
     
    if (!checkEGLConfig(_eglConfig)) {
        log_error("EGL configuration doesn't match!");
-       return false;
+       //return false;
    } else {
        printEGLConfig(_eglConfig);
    }
@@ -849,6 +780,25 @@ EGLDevice::createPixmap(int width, int height, NativePixmapType buf)
     
     return pbuf;  
 }
+
+// Set the bitmask for the configured renderable types.
+EGLint
+EGLDevice::getRenderableTypes()
+{
+    EGLint type = 0;
+#ifdef RENDERER_GLES1
+    type = type | EGL_OPENGL_ES_BIT;
+#endif
+#ifdef RENDERER_GLES2
+    type = type | EGL_OPENGL_ES2_BIT;
+#endif
+#ifdef RENDERER_OPENVG
+    type = type | EGL_OPENVG_BIT;
+#endif
+    return type;
+}
+
+
 
 } // namespace renderer
 } // namespace gnash
