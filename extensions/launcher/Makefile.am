@@ -23,8 +23,7 @@ pluginsdir = $(libdir)/gnash/plugins
 plugins_LTLIBRARIES = launcher_ext.la
 bin_PROGRAMS = launcher-gnash
 
-AM_CPPFLAGS = -DGNASHBINDIR=\"${bindir}\" 
-AM_CPPFLAGS =  \
+AM_CPPFLAGS = -DGNASHBINDIR=\"${bindir}\" \
             -I$(top_srcdir)/libbase \
             -I$(top_srcdir)/libcore \
             -I$(top_srcdir)/libcore/abc \
