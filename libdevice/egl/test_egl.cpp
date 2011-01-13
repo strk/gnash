@@ -42,6 +42,7 @@
 #include "log.h"
 #include "dejagnu.h"
 #include "eglDevice.h"
+#include "configTemplates.h"
 #include "GnashDevice.h"
 
 TestState runtest;
@@ -102,6 +103,12 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
 {
     bool hwinit = false;
 
+    if (EGLDevice::getRenderableTypes()) {
+        runtest.pass("EGLDevice::getRenderableTypes()");
+    } else {
+        runtest.fail("EGLDevice::getRenderableTypes()");
+    }
+    
     // This is a utility method for converting integer error codes to
     // something human readable for debugging.
     string result = "EGL_BAD_CONFIG";
@@ -163,9 +170,10 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     } else {
         runtest.untested("EGLDevice::supportsRenderer()");
     }
-    
+
+    // pixel formats are either 8,8,8 or 5,6,5
     if (hwinit) {    
-        if (egl.getRedSize() > 0) {
+        if ((egl.getRedSize() == 8) || (egl.getRedSize() == 5)) {
             runtest.pass("EGLDevice::getRedSize()");
         } else {
             runtest.fail("EGLDevice::getRedSize()");
@@ -175,7 +183,7 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     }
     
     if (hwinit) {
-        if (egl.getGreenSize() > 0) {
+        if ((egl.getGreenSize() == 8) || (egl.getGreenSize() == 6)) {
             runtest.pass("EGLDevice::getGreenSize()");
         } else {
             runtest.fail("EGLDevice::getGreenSize()");
@@ -185,7 +193,7 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     }
     
     if (hwinit) {
-        if (egl.getBlueSize() > 0) {
+        if ((egl.getBlueSize() == 8) || (egl.getBlueSize() == 5)) {
             runtest.pass("EGLDevice::getBlueSize()");
         } else {
             runtest.fail("EGLDevice::getBlueSize()");
@@ -196,7 +204,7 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
 
     // Surface config info tests
     if (hwinit) {
-        if (egl.getSurfaceID()) {
+        if ((egl.getSurfaceID() > 0) && (egl.getSurfaceID() <= 10)) {
             runtest.pass("EGLDevice::getSurfaceID()");
         } else {
             runtest.fail("EGLDevice::getSurfaceID()");
@@ -206,7 +214,7 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     }
     
     if (hwinit) {
-        if (egl.getWidth()) {
+        if (egl.getWidth() < 16000) {
             runtest.pass("EGLDevice::getWidth()");
         } else {
             runtest.fail("EGLDevice::getWidth()");
@@ -216,7 +224,7 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     }
     
     if (hwinit) {
-        if (egl.getHeight()) {
+        if (egl.getHeight() < 16000) {
             runtest.pass("EGLDevice::getHeigth()");
         } else {
             runtest.fail("EGLDevice::getHeigth()");
@@ -286,7 +294,7 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
 
     // Context accessor tests
     if (hwinit) {
-        if (egl.getContextID()) {
+        if (egl.getContextID() < 10) {
             runtest.pass("EGLDevice::getContextID()");
         } else {
             runtest.fail("EGLDevice::getContextID()");
@@ -345,7 +353,7 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     }
     
     if (hwinit) {
-        if (egl.getDepth()) {
+        if ((egl.getDepth() == 32) || (egl.getDepth() == 16)) {
             runtest.pass("EGLDevice::getDepth()");
         } else {
             runtest.fail("EGLDevice::getDepth()");
