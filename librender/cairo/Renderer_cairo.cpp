@@ -701,20 +701,18 @@ Renderer_cairo::drawLine(const std::vector<point>& coords,
 }
   
 void
-Renderer_cairo::draw_poly(const point* corners, size_t corner_count, 
+Renderer_cairo::draw_poly(const std::vector<point>& corners, 
                                const rgba& fill, const rgba& outline,
                                const SWFMatrix& mat, bool /*masked*/)
 {
     CairoScopeMatrix mat_transformer(_cr, mat);
     cairo_transform(_cr, &_stage_mat);
 
-    if (corner_count < 1) {
-        return;
-    }
+    if (corners.empty()) return;
         
     cairo_move_to(_cr, corners[0].x, corners[0].y);
     
-    for (size_t i = 0; i < corner_count; ++i) {
+    for (size_t i = 0; i < corners.size(); ++i) {
         cairo_line_to(_cr, corners[i].x, corners[i].y);
     }
     

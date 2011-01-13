@@ -45,7 +45,7 @@ main(int argc, char *argv[])
     NPVariant *value =  (NPVariant *)NPN_MemAlloc(sizeof(NPVariant));
 
     BOOLEAN_TO_NPVARIANT(true, *value);
-    std::string str = ExternalInterface::convertNPVariant(value);
+    std::string str = plugin::ExternalInterface::convertNPVariant(value);
     if (str == "<true/>") {
         runtest.pass("convertNPVariant(true)");
     } else {
@@ -53,7 +53,7 @@ main(int argc, char *argv[])
     }
     
     BOOLEAN_TO_NPVARIANT(false, *value);
-    str = ExternalInterface::convertNPVariant(value);
+    str = plugin::ExternalInterface::convertNPVariant(value);
     if (str == "<false/>") {
         runtest.pass("convertNPVariant(false)");
     } else {
@@ -61,7 +61,7 @@ main(int argc, char *argv[])
     }
 
     NULL_TO_NPVARIANT(*value);
-    str = ExternalInterface::convertNPVariant(value);
+    str = plugin::ExternalInterface::convertNPVariant(value);
     if (str == "<null/>") {
         runtest.pass("convertNPVariant(null)");
     } else {
@@ -69,7 +69,7 @@ main(int argc, char *argv[])
     }
 
     VOID_TO_NPVARIANT(*value);
-    str = ExternalInterface::convertNPVariant(value);
+    str = plugin::ExternalInterface::convertNPVariant(value);
     if (str == "<void/>") {
         runtest.pass("convertNPVariant(void)");
     } else {
@@ -77,7 +77,7 @@ main(int argc, char *argv[])
     }
 
     DOUBLE_TO_NPVARIANT(123.456, *value);
-    str = ExternalInterface::convertNPVariant(value);
+    str = plugin::ExternalInterface::convertNPVariant(value);
     if (str == "<number>123.456</number>") {
         runtest.pass("convertNPVariant(double)");
     } else {
@@ -85,7 +85,7 @@ main(int argc, char *argv[])
     }    
 
     INT32_TO_NPVARIANT(78, *value);
-    str = ExternalInterface::convertNPVariant(value);
+    str = plugin::ExternalInterface::convertNPVariant(value);
     if (str == "<number>78</number>") {
         runtest.pass("convertNPVariant(int32)");
     } else {
@@ -93,23 +93,23 @@ main(int argc, char *argv[])
     }
     
     STRINGZ_TO_NPVARIANT("Hello World!", *value);
-    str = ExternalInterface::convertNPVariant(value);
+    str = plugin::ExternalInterface::convertNPVariant(value);
     if (str == "<string>Hello World!</string>") {
         runtest.pass("convertNPVariant(string)");
     } else {
         runtest.fail("convertNPVariant(string)");
     }
     
-    str = ExternalInterface::makeProperty("hi", "Hello World!");
+    str = plugin::ExternalInterface::makeProperty("hi", "Hello World!");
     if (str == "<property id=\"hi\">Hello World!</property>") {
-        runtest.pass("ExternalInterface::makeProperty()");
+        runtest.pass("plugin::ExternalInterface::makeProperty()");
     } else {
-        runtest.fail("ExternalInterface::makeProperty()");
+        runtest.fail("plugin::ExternalInterface::makeProperty()");
     }
     
 #if 0
     ARRAY_TO_NPVARIANT(*value);
-    str = ExternalInterface::convertNPVariant(value);
+    str = plugin::ExternalInterface::convertNPVariant(value);
     if (str == "<array></array>") {
         runtest.pass("convertNPVariant(array)");
     } else {
@@ -118,9 +118,9 @@ main(int argc, char *argv[])
 #endif
 
     NPObject *obj =  (NPObject *)NPN_MemAlloc(sizeof(NPObject));
-    std::string prop1 = ExternalInterface::makeString("foobar");
-    std::string prop2 = ExternalInterface::makeNumber(12.34);
-    std::string prop3 = ExternalInterface::makeNumber(56);
+    std::string prop1 = plugin::ExternalInterface::makeString("foobar");
+    std::string prop2 = plugin::ExternalInterface::makeNumber(12.34);
+    std::string prop3 = plugin::ExternalInterface::makeNumber(56);
     std::vector<std::string> aargs;
     aargs.push_back(prop1);
     aargs.push_back(prop2);
@@ -128,11 +128,11 @@ main(int argc, char *argv[])
     
     regex_t regex_pat;
     regcomp (&regex_pat, "<array><property id=\"0\"><string>foobar</string></property><property id=\"1\"><number>12.34</number></property><property id=\"2\"><number>56</number></property></array>", REG_NOSUB|REG_NEWLINE);
-    str = ExternalInterface::makeArray(aargs);
+    str = plugin::ExternalInterface::makeArray(aargs);
     if (regexec (&regex_pat, reinterpret_cast<const char*>(str.c_str()), 0, (regmatch_t *)0, 0)) {    
-        runtest.fail("ExternalInterface::makeArray()");
+        runtest.fail("plugin::ExternalInterface::makeArray()");
     } else {
-        runtest.pass("ExternalInterface::makeArray()");
+        runtest.pass("plugin::ExternalInterface::makeArray()");
     }
 
     std::map<std::string, std::string> margs;
@@ -140,137 +140,137 @@ main(int argc, char *argv[])
     margs["test2"] = prop2;
     margs["test3"] = prop3;
     
-    str = ExternalInterface::makeObject(margs);
+    str = plugin::ExternalInterface::makeObject(margs);
     std::string xml = "<object><property id=\"test1\"><string>foobar</string></property><property id=\"test2\"><number>12.34</number></property><property id=\"test3\"><number>56</number></property></object>";
     
     regcomp (&regex_pat, xml.c_str(), REG_NOSUB|REG_NEWLINE);
 
 //    std::cout << str << std::endl;
     if (regexec (&regex_pat, reinterpret_cast<const char*>(str.c_str()), 0, (regmatch_t *)0, 0)) {
-        runtest.fail("ExternalInterface::makeObject()");
+        runtest.fail("plugin::ExternalInterface::makeObject()");
     } else {
-        runtest.pass("ExternalInterface::makeObject()");
+        runtest.pass("plugin::ExternalInterface::makeObject()");
     }
 
     //
     // Parsing tests
     //
     xml = "<string>Hello World!</string>";
-    GnashNPVariant np = ExternalInterface::parseXML(xml);
+    GnashNPVariant np = plugin::ExternalInterface::parseXML(xml);
     std::string data = NPStringToString(NPVARIANT_TO_STRING(np.get()));
     if (NPVARIANT_IS_STRING(np.get()) &&
         (data == "Hello World!")) {
-        runtest.pass("ExternalInterface::parseXML(string)");
+        runtest.pass("plugin::ExternalInterface::parseXML(string)");
     } else {
-        runtest.fail("ExternalInterface::parseXML(string)");
+        runtest.fail("plugin::ExternalInterface::parseXML(string)");
     }
 
     xml = "<number>123.456</number>";
-    np = ExternalInterface::parseXML(xml);
+    np = plugin::ExternalInterface::parseXML(xml);
     double num = NPVARIANT_TO_DOUBLE(np.get());
     if (NPVARIANT_IS_DOUBLE(np.get()) &&
         (num == 123.456)) {
-        runtest.pass("ExternalInterface::parseXML(double)");
+        runtest.pass("plugin::ExternalInterface::parseXML(double)");
     } else {
-        runtest.fail("ExternalInterface::parseXML(double)");
+        runtest.fail("plugin::ExternalInterface::parseXML(double)");
     }
 
     xml = "<number>78</number>";
-    np = ExternalInterface::parseXML(xml);
+    np = plugin::ExternalInterface::parseXML(xml);
     int inum = NPVARIANT_TO_INT32(np.get());
     if (NPVARIANT_IS_INT32(np.get()) &&
         (inum == 78)) {
-        runtest.pass("ExternalInterface::parseXML(int32)");
+        runtest.pass("plugin::ExternalInterface::parseXML(int32)");
     } else {
-        runtest.fail("ExternalInterface::parseXML(int32)");
+        runtest.fail("plugin::ExternalInterface::parseXML(int32)");
     }
 
     xml = "<true/>";
-    np = ExternalInterface::parseXML(xml);
+    np = plugin::ExternalInterface::parseXML(xml);
     bool flag = NPVARIANT_TO_BOOLEAN(np.get());
     if (NPVARIANT_IS_BOOLEAN(np.get()) &&
         (flag == true)) {
-        runtest.pass("ExternalInterface::parseXML(true)");
+        runtest.pass("plugin::ExternalInterface::parseXML(true)");
     } else {
-        runtest.fail("ExternalInterface::parseXML(true)");
+        runtest.fail("plugin::ExternalInterface::parseXML(true)");
     }
 
     xml = "<false/>";
-    np = ExternalInterface::parseXML(xml);
+    np = plugin::ExternalInterface::parseXML(xml);
     flag = NPVARIANT_TO_BOOLEAN(np.get());
     if (NPVARIANT_IS_BOOLEAN(np.get()) &&
         (flag == false)) {
-        runtest.pass("ExternalInterface::parseXML(false)");
+        runtest.pass("plugin::ExternalInterface::parseXML(false)");
     } else {
-        runtest.fail("ExternalInterface::parseXML(false)");
+        runtest.fail("plugin::ExternalInterface::parseXML(false)");
     }
 
     xml = "<null/>";
-    np = ExternalInterface::parseXML(xml);
+    np = plugin::ExternalInterface::parseXML(xml);
     if (NPVARIANT_IS_NULL(np.get())) {
-        runtest.pass("ExternalInterface::parseXML(null)");
+        runtest.pass("plugin::ExternalInterface::parseXML(null)");
     } else {
-        runtest.fail("ExternalInterface::parseXML(null)");
+        runtest.fail("plugin::ExternalInterface::parseXML(null)");
     }
 
     xml = "<void/>";
-    np = ExternalInterface::parseXML(xml);
+    np = plugin::ExternalInterface::parseXML(xml);
     if (NPVARIANT_IS_VOID(np.get())) {
-        runtest.pass("ExternalInterface::parseXML(void)");
+        runtest.pass("plugin::ExternalInterface::parseXML(void)");
     } else {
-        runtest.fail("ExternalInterface::parseXML(void)");
+        runtest.fail("plugin::ExternalInterface::parseXML(void)");
     }
 
     xml = "<property id=\"0\"><string>foobar</string></property><property id=\"1\"><number>12.34</number></property><property id=\"2\"><number>56</number></property>";
-    std::map<std::string, GnashNPVariant> props = ExternalInterface::parseProperties(xml);
+    std::map<std::string, GnashNPVariant> props = plugin::ExternalInterface::parseProperties(xml);
     np = props["0"];
     data = NPStringToString(NPVARIANT_TO_STRING(np.get()));
     if ((props.size() == 3) && (data == "foobar")) {
-        runtest.pass("ExternalInterface::parseProperties()");
+        runtest.pass("plugin::ExternalInterface::parseProperties()");
     } else {
-        runtest.fail("ExternalInterface::parseProperties()");
+        runtest.fail("plugin::ExternalInterface::parseProperties()");
     }
     
     xml = "<object><property id=\"test1\"><string>foobar</string></property><property id=\"test2\"><number>12.34</number></property><property id=\"test3\"><number>56</number></property></object>";
-    np = ExternalInterface::parseXML(xml);
+    np = plugin::ExternalInterface::parseXML(xml);
     if (NPVARIANT_IS_OBJECT(np.get())) {
-        runtest.pass("ExternalInterface::parseXML(object)");
+        runtest.pass("plugin::ExternalInterface::parseXML(object)");
     } else {
-        runtest.fail("ExternalInterface::parseXML(object)");
+        runtest.fail("plugin::ExternalInterface::parseXML(object)");
     }
     
     std::vector<std::string> iargs;
-    str = ExternalInterface::makeString("barfoo");
+    str = plugin::ExternalInterface::makeString("barfoo");
     iargs.push_back(str);
-    str = ExternalInterface::makeNumber(135.78);
+    str = plugin::ExternalInterface::makeNumber(135.78);
     iargs.push_back(str);
     
-    str = ExternalInterface::makeInvoke("barbyfoo", iargs);
+    str = plugin::ExternalInterface::makeInvoke("barbyfoo", iargs);
     xml = "<invoke name=\"barbyfoo\" returntype=\"xml\"><arguments><string>barfoo</string><number>135.78</number></arguments></invoke>";
 //    std::cout << str << std::endl;
     regcomp (&regex_pat, xml.c_str(), REG_NOSUB|REG_NEWLINE);
     if (regexec (&regex_pat, reinterpret_cast<const char*>(str.c_str()), 0, (regmatch_t *)0, 0) == 0) {
-        runtest.pass("ExternalInterface::makeInvoke()");
+        runtest.pass("plugin::ExternalInterface::makeInvoke()");
     } else {
-        runtest.fail("ExternalInterface::makeInvoke()");
+        runtest.fail("plugin::ExternalInterface::makeInvoke()");
     }
     
     xml = "<arguments><string>barfoo</string><number>135.78</number><number>89</number></arguments>";
-    std::vector<GnashNPVariant> arguments = ExternalInterface::parseArguments(xml);
+    std::vector<GnashNPVariant> arguments = plugin::ExternalInterface::parseArguments(xml);
     np = arguments[0];
     str = NPStringToString(NPVARIANT_TO_STRING(np.get()));
     double dub = NPVARIANT_TO_DOUBLE(arguments[1].get());
     int    val = NPVARIANT_TO_INT32(arguments[2].get());
     if ((arguments.size() == 3) && (str == "barfoo")
         && (dub == 135.78) && (val == 89)) {
-        runtest.pass("ExternalInterface::parseArguments()");
+        runtest.pass("plugin::ExternalInterface::parseArguments()");
     } else {
-        runtest.fail("ExternalInterface::parseArguments()");
+        runtest.fail("plugin::ExternalInterface::parseArguments()");
     }
 
     // Parse an invoke message
     xml = "<invoke name=\"barbyfoo\" returntype=\"xml\"><arguments><string>barfoo</string><number>135.78</number></arguments></invoke>";
-    ExternalInterface::invoke_t *invoke = ExternalInterface::parseInvoke(xml);
+    plugin::ExternalInterface::invoke_t *invoke = plugin::ExternalInterface::parseInvoke(xml);
     str = NPStringToString(NPVARIANT_TO_STRING(invoke->args[0].get()));
     if ((invoke->name == "barbyfoo") && (invoke->type == "xml")
         && (NPVARIANT_IS_STRING(invoke->args[0].get()))
@@ -278,9 +278,9 @@ main(int argc, char *argv[])
         && (NPVARIANT_IS_DOUBLE(invoke->args[1].get()))
         && (NPVARIANT_TO_DOUBLE(invoke->args[1].get()) == 135.78)
         ) {
-        runtest.pass("ExternalInterface::parseInvoke()");
+        runtest.pass("plugin::ExternalInterface::parseInvoke()");
     } else {
-        runtest.fail("ExternalInterface::parseInvoke()");
+        runtest.fail("plugin::ExternalInterface::parseInvoke()");
     }
 }
 

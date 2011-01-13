@@ -311,7 +311,7 @@ DisplayList::replaceDisplayObject(DisplayObject* ch, int depth,
 // Updates the transform properties of the DisplayObject at
 // the specified depth.
 void
-DisplayList::moveDisplayObject( int depth, const SWFCxForm* color_xform,
+DisplayList::moveDisplayObject(int depth, const SWFCxForm* color_xform,
         const SWFMatrix* mat, boost::uint16_t* ratio)
 {
     testInvariant();
@@ -350,8 +350,6 @@ DisplayList::moveDisplayObject( int depth, const SWFCxForm* color_xform,
 void
 DisplayList::removeDisplayObject(int depth)
 {
-    //GNASH_REPORT_FUNCTION;
-
     testInvariant();
 
 #ifndef NDEBUG
@@ -427,10 +425,8 @@ DisplayList::swapDepths(DisplayObject* ch1, int newdepth)
     }
 
     // Found another DisplayObject at the given depth
-    if (it2 != _charsByDepth.end() && (*it2)->get_depth() == newdepth)
-    {
+    if (it2 != _charsByDepth.end() && (*it2)->get_depth() == newdepth) {
         DisplayObject* ch2 = *it2;
-
         ch2->set_depth(srcdepth);
 
         // TODO: we're not actually invalidated ourselves, rather 
@@ -443,9 +439,8 @@ DisplayList::swapDepths(DisplayObject* ch1, int newdepth)
 
         std::iter_swap(it1, it2);
     }
-
-    // No DisplayObject found at the given depth
     else {
+        // No DisplayObject found at the given depth
         // Move the DisplayObject to the new position
         // NOTE: insert *before* erasing, in case the list is
         //             the only referer of the ref-counted DisplayObject
@@ -466,7 +461,6 @@ DisplayList::swapDepths(DisplayObject* ch1, int newdepth)
     ch1->transformedByScript();
 
     testInvariant();
-
 }
 
 DisplayObject*
@@ -520,7 +514,6 @@ DisplayList::insertDisplayObject(DisplayObject* obj, int index)
     }
 
     testInvariant();
-
 }
 
 void
@@ -531,24 +524,18 @@ DisplayList::addDisplayObject(DisplayObject* obj)
     assert(!obj->unloaded());
 
     obj->set_invalidated();
-
-    int index;
-
     if (_charsByDepth.empty()) {
-        index = 0;
+        obj->set_depth(0);
     }
     else {
         container_type::const_reverse_iterator it = _charsByDepth.rbegin();
-        index = (*it)->get_depth() + 1;
+        obj->set_depth((*it)->get_depth() + 1);
     }
-
-    obj->set_depth(index);
 
     // Insert the DisplayObject at the end
     _charsByDepth.insert(_charsByDepth.end(), obj);
 
     testInvariant();
-
 }
 
 
@@ -564,8 +551,7 @@ DisplayList::unload()
     // not be destroyed or removed from the display list. This affects
     // children without an unload handler.
     for (iterator it = beginNonRemoved(_charsByDepth),
-            itEnd = _charsByDepth.end(); it != itEnd; )
-    {
+            itEnd = _charsByDepth.end(); it != itEnd; ) {
         // make a copy
         DisplayObject* di = *it;
 
@@ -584,21 +570,17 @@ DisplayList::unload()
             it = _charsByDepth.erase(it);
         }
         else ++it;
-
     }
 
     testInvariant();
 
     return unloadHandler;
-
 }
 
 
 void
 DisplayList::destroy()
 {
-    //GNASH_REPORT_FUNCTION;
-
     testInvariant();
 
     for (iterator it = _charsByDepth.begin(), itEnd = _charsByDepth.end();
@@ -631,8 +613,7 @@ DisplayList::display(Renderer& renderer, const Transform& base)
     // We only display DisplayObjects which are out of the "removed" zone
     // (or should we check unloaded?)
     iterator it = beginNonRemoved(_charsByDepth);
-    for (iterator endIt = _charsByDepth.end(); it != endIt; ++it)
-    {
+    for (iterator endIt = _charsByDepth.end(); it != endIt; ++it) {
         DisplayObject* ch = *it;
         assert(!ch->isDestroyed());
 
@@ -688,8 +669,6 @@ DisplayList::display(Renderer& renderer, const Transform& base)
         clipDepthStack.pop();
         renderer.disable_mask();
     }
-    
-    
 }
 
 void
@@ -705,9 +684,7 @@ DisplayList::omit_display()
 void
 DisplayList::dump() const
 {
-    //testInvariant();
-
-    if ( _charsByDepth.empty() ) return;
+    if (_charsByDepth.empty()) return;
 
     string_table& st = getStringTable(*getObject(_charsByDepth.front()));
     ObjectURI::Logger l(st);
@@ -767,7 +744,6 @@ DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
         assert(dobj->get_ref_count() > 0);
 #endif // ndef GNASH_USE_GC
 
-
         const int depth = dobj->get_depth();        
 
         // Discard useless masks
@@ -811,18 +787,14 @@ DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
             // As long the mask has not been invalidated and force==false this
             // call won't modify the "ranges" list.
             dobj->add_invalidated_bounds(ranges, force);
-            
         }
         else {
             
             if (rangesStack.empty()) {
-            
                 // --> normal case for unmasked DisplayObjects
                 dobj->add_invalidated_bounds(ranges, force);
-                
             }
             else {
-            
                 // --> DisplayObject is masked, so intersect with "mask"
                 
                 // first get the ranges of the child in a separate list
@@ -836,22 +808,16 @@ DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
                 
                 // add result to the global ranges
                 ranges.add(childRanges);
-            
             }
-            
         } // not drawing mask 
         
         // <== end of display() equivalent
-        
-        
         // Mask "drawing" has finished
         if (dobj->isMaskLayer()) {
             // end_submit_mask equivalent
             drawing_mask = false; 
         }
     }
-    
-    
 }
 
 void
@@ -1084,11 +1050,11 @@ dlistTagsEffectiveZoneEnd(DisplayList::container_type& c)
 
 
 std::ostream&
-operator<< (std::ostream& os, const DisplayList& dl)
+operator<<(std::ostream& os, const DisplayList& dl)
 {
     os << "By depth: ";
 
-    if ( dl._charsByDepth.empty() ) return os;
+    if (dl._charsByDepth.empty()) return os;
 
     string_table& st = getStringTable(*getObject(dl._charsByDepth.front()));
     ObjectURI::Logger l(st);

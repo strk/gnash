@@ -29,11 +29,13 @@ INCLUDES =  \
         -I$(top_srcdir)/libcore/swf \
         -I$(top_srcdir)/libcore/vm \
 	-I$(top_srcdir)/libcore/asobj \
+	$(BOOST_CFLAGS) \
 	$(INCLTDL)
 
 AM_LDFLAGS =  \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libcore/libgnashcore.la \
+	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 

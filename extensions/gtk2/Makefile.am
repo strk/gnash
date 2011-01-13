@@ -23,12 +23,12 @@ pluginsdir = $(libdir)/gnash/plugins
 plugins_LTLIBRARIES = gtkext.la
 DEF_MAKESWF_FLAGS = -I $(top_srcdir)/testsuite/actionscript.all
 
-INCLUDES = \
+AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/gui \
 	-I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/libcore/abc \
-    -I$(top_srcdir)/libcore/swf \
+        -I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libcore/vm \
 	-I$(top_srcdir)/libcore/parser \
 	-I$(top_srcdir)/libcore/asobj \
@@ -58,6 +58,7 @@ AM_LDFLAGS =  \
 	$(NULL)
 
 gtkext_la_SOURCES = gtkext.cpp gtkext.h
+gtkext_la_CPPFLAGS = $(AM_CPPFLAGS)
 gtkext_la_LDFLAGS = -module -avoid-version # -no-undefined
 gtkext_la_LIBDADD = $(LIBADD_DL) $(AM_LDFLAGS)
 

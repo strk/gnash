@@ -47,6 +47,7 @@
 #include "revno.h"
 #include "MediaHandler.h"
 #include "utility.h"
+#include "accumulator.h"
 
 using std::endl;
 using std::cout;
@@ -77,84 +78,6 @@ namespace {
     void usage(std::ostream& os, const po::options_description& opts);
     void build_options(std::ostream& os);
     void version_and_copyright(std::ostream& os);
-}
-
-namespace {
-
-/// An accumulating option value to handle multiple -v options.
-template<typename T>
-class accumulator_type : public po::value_semantic {
-public:
-
-    accumulator_type() : _interval(1), _default(0) {}
-
-    /// Set the notifier function.
-    accumulator_type* notifier(boost::function1<void, const T&> f) {
-        _notifier = f;
-        return this;
-    }
-
-    /// Set the default value for this option.
-    accumulator_type* default_value(const T& t) {
-        _default = t;
-        return this;
-    }
-
-    /// Set the implicit value for this option.
-    //
-    /// Unlike for program_options::value, this specifies a value
-    /// to be applied on each occurence of the option.
-    accumulator_type* implicit_value(const T& t) {
-        _interval = t;
-        return this;
-    }
-
-    virtual std::string name() const {
-        return std::string();
-    }
-
-    /// There are no tokens for an accumulator_type
-    virtual unsigned min_tokens() const { return 0; }
-    virtual unsigned max_tokens() const { return 0; }
-
-    // Accumulating from different sources is silly.
-    virtual bool is_composing() const {
-        return false;
-    }
-
-    virtual bool is_required() const { return false; }
-    
-    virtual void parse(boost::any& value_store, 
-                       const std::vector<std::string>& new_tokens,
-                       bool /*utf8*/) const
-    {
-        assert(new_tokens.empty());
-        if (value_store.empty()) value_store = T();
-        boost::any_cast<T&>(value_store) += _interval;
-    }
-
-    virtual bool apply_default(boost::any& value_store) const {
-        value_store = _default;
-        return true;
-    }
-                               
-    virtual void notify(const boost::any& value_store) const {
-        _notifier(boost::any_cast<T>(value_store));
-    }
-    
-    virtual ~accumulator_type() {}
-
-private:
-    boost::function1<void, const T&> _notifier;
-    T _interval;
-    T _default;
-};
-
-template<typename T>
-accumulator_type<T>* accumulator() {
-    return new accumulator_type<T>();
-}
-
 }
 
 int
@@ -534,7 +457,6 @@ getSupportedOptions(gnash::Player& p)
 
     desc.add(dumpOpts);
 #endif
-
 
     return desc;
 }

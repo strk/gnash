@@ -27,22 +27,7 @@
 #include <cerrno>
 #include <cstring>
 
-#if defined(ANDROID)
-# include <sys/types.h>
-# include <linux/shm.h>
-# include <linux/sem.h>
-extern int shmctl (int __shmid, int __cmd, struct shmid_ds *__buf);
-extern int semget (key_t __key, int __nsems, int __semflg);
-extern int semop (int __semid, struct sembuf *__sops, size_t __nsops);
-extern int shmdt (__const void *__shmaddr);
-extern void *shmat (int __shmid, __const void *__shmaddr, int __shmflg);
-extern int shmget (key_t __key, size_t __size, int __shmflg);
-extern int semctl (int __semid, int __semnum, int __cmd, ...);
-#elif defined(WIN32)
-# include <windows.h>
-# include <process.h>
-# include <io.h>
-#elif !defined(__riscos__) && !defined(__OS2__) && !defined(HAIKU_HOST)
+#if !defined(__riscos__) && !defined(__OS2__) 
 # include <sys/types.h>
 # include <sys/shm.h>
 # include <sys/sem.h>
@@ -51,7 +36,7 @@ extern int semctl (int __semid, int __semnum, int __cmd, ...);
 
 #include "log.h"
 
-#if (defined(USE_SYSV_SHM) && defined(HAVE_SHMGET)) || defined(_WIN32) || defined(ANDROID)
+#if (defined(USE_SYSV_SHM) && defined(HAVE_SHMGET)) 
 # define ENABLE_SHARED_MEM 1
 #else
 # undef ENABLE_SHARED_MEM
@@ -77,7 +62,7 @@ SharedMem::~SharedMem()
 {
     // Nothing to do if we were never attached.
     if (!_addr) return;
-#ifndef _WIN32
+
     if (::shmdt(_addr) < 0) {
         const int err = errno;
         log_error("Error detaching shared memory: %s", std::strerror(err));
@@ -100,36 +85,22 @@ SharedMem::~SharedMem()
         }
     }
 #endif
-
-#else
-    // Windows code here.
-#endif
 }
 
 bool
 SharedMem::lock() const
 {
-#ifndef _WIN32
     struct sembuf sb = { 0, -1, SEM_UNDO };
     const int ret = ::semop(_semid, &sb, 1);
     return ret >= 0;
-#else
-    // Windows code here.
-    return false;
-#endif
 }
 
 bool
 SharedMem::unlock() const
 {
-#ifndef _WIN32
     struct sembuf sb = { 0, 1, SEM_UNDO };
     const int ret = ::semop(_semid, &sb, 1);
     return ret >= 0;
-#else
-    // Windows code here
-    return false;
-#endif
 }
 
 bool
@@ -153,10 +124,6 @@ SharedMem::attach()
     
     log_debug("Using shared memory key %s",
             boost::io::group(std::hex, std::showbase, _shmkey));
-
-#ifdef _WIN32
-    return false;
-#else
 
     // First get semaphore.
     
@@ -227,7 +194,6 @@ SharedMem::attach()
 
     assert(_addr);
     return true;
-#endif
 }
 
 } // end of gnash namespace

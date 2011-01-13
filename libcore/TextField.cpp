@@ -263,11 +263,11 @@ TextField::show_cursor(Renderer& renderer, const SWFMatrix& mat)
         }
     }
 
-    const std::vector<point> box = boost::assign::list_of
+    const std::vector<point> line = boost::assign::list_of
         (point(x, y))
         (point(x, y + h));
     
-    renderer.drawLine(box, rgba(0, 0, 0, 255), mat);
+    renderer.drawLine(line, rgba(0, 0, 0, 255), mat);
 }
 
 size_t
@@ -303,17 +303,16 @@ TextField::display(Renderer& renderer, const Transform& base)
 
     if ((drawBorder || drawBackground) && !_bounds.is_null()) {
 
-        std::vector<point> coords(4);
-
         boost::int32_t xmin = _bounds.get_x_min();
         boost::int32_t xmax = _bounds.get_x_max();
         boost::int32_t ymin = _bounds.get_y_min();
         boost::int32_t ymax = _bounds.get_y_max();
 
-        coords[0].setTo(xmin, ymin); 
-        coords[1].setTo(xmax, ymin); 
-        coords[2].setTo(xmax, ymax); 
-        coords[3].setTo(xmin, ymax); 
+        const std::vector<point> coords = boost::assign::list_of
+            (point(xmin, ymin))
+            (point(xmax, ymin))
+            (point(xmax, ymax))
+            (point(xmin, ymax));
 
         rgba borderColor = drawBorder ? getBorderColor() : rgba(0,0,0,0);
         rgba backgroundColor = drawBackground ? getBackgroundColor() :
@@ -329,7 +328,7 @@ TextField::display(Renderer& renderer, const Transform& base)
     log_debug("rendering a Pol composed by corners %s", _bounds);
 #endif
 
-        renderer.draw_poly(&coords.front(), 4, backgroundColor, 
+        renderer.draw_poly(coords, backgroundColor, 
                 borderColor, xform.matrix, true);
         
     }

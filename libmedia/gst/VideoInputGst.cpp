@@ -498,7 +498,7 @@ VideoInputGst::getSupportedFramerates
     
     //note that framerates may contain one value, a list, or a range
     framerates = gst_structure_get_value (structure, "framerate");
-    if (GST_VALUE_HOLDS_FRACTION (framerates)) {
+    if (GST_VALUE_HOLDS_FRACTION (const_cast<GValue *>(framerates))) {
         video_format->numFramerates = 1;
         video_format->framerates =
             g_new0 (FramerateFraction, video_format->numFramerates);
@@ -507,7 +507,7 @@ VideoInputGst::getSupportedFramerates
         video_format->framerates[0].denominator =
             gst_value_get_fraction_denominator (framerates);
     }
-    else if (GST_VALUE_HOLDS_LIST (framerates)) {
+    else if (GST_VALUE_HOLDS_LIST (const_cast<GValue *>(framerates))) {
         video_format->numFramerates = gst_value_list_get_size (framerates);
         video_format->framerates =
             g_new0 (FramerateFraction, video_format->numFramerates);
@@ -520,7 +520,7 @@ VideoInputGst::getSupportedFramerates
                 gst_value_get_fraction_denominator (value);
         }
     }
-    else if (GST_VALUE_HOLDS_FRACTION_RANGE (framerates)) {
+    else if (GST_VALUE_HOLDS_FRACTION_RANGE (const_cast<GValue *>(framerates))) {
         gint numerator_min, denominator_min, numerator_max, denominator_max;
         const GValue *fraction_range_min;
         const GValue *fraction_range_max;
@@ -556,7 +556,7 @@ VideoInputGst::getSupportedFramerates
     }
     else {
         g_critical ("GValue type %s, cannot be handled for framerates",
-            G_VALUE_TYPE_NAME (framerates));
+            G_VALUE_TYPE_NAME (const_cast<GValue *>(framerates)));
     }
 }
 
@@ -754,7 +754,7 @@ VideoInputGst::getSupportedFormats(GnashWebcam *cam, GstCaps *caps)
         width  = gst_structure_get_value (structure, "width");
         height = gst_structure_get_value (structure, "height");
         
-        if (G_VALUE_HOLDS_INT (width)) {
+        if (G_VALUE_HOLDS_INT (const_cast<GValue *>(width))) {
               WebcamVidFormat video_format;
 
               video_format.mimetype = 
@@ -763,7 +763,7 @@ VideoInputGst::getSupportedFormats(GnashWebcam *cam, GstCaps *caps)
               gst_structure_get_int (structure, "height", &(video_format.height));
               addSupportedFormat(cam, &video_format, structure);
         }
-        else if (GST_VALUE_HOLDS_INT_RANGE (width)) {
+        else if (GST_VALUE_HOLDS_INT_RANGE (const_cast<GValue *>(width))) {
             int min_width, max_width, min_height, max_height;
             int cur_width, cur_height;
 
@@ -802,7 +802,7 @@ VideoInputGst::getSupportedFormats(GnashWebcam *cam, GstCaps *caps)
         }
         else {
             log_error("%s: type %s, cannot be handled for resolution width",
-                __FUNCTION__, G_VALUE_TYPE_NAME (width));
+                __FUNCTION__, G_VALUE_TYPE_NAME (const_cast<GValue *>(width)));
         }
     }
 }

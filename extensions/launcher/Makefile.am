@@ -23,8 +23,7 @@ pluginsdir = $(libdir)/gnash/plugins
 plugins_LTLIBRARIES = launcher_ext.la
 bin_PROGRAMS = launcher-gnash
 
-AM_CPPFLAGS = -DGNASHBINDIR=\"${bindir}\" 
-INCLUDES =  \
+AM_CPPFLAGS = -DGNASHBINDIR=\"${bindir}\" \
             -I$(top_srcdir)/libbase \
             -I$(top_srcdir)/libcore \
             -I$(top_srcdir)/libcore/abc \
@@ -39,12 +38,14 @@ launcher_ext_la_LDFLAGS = -module -avoid-version -no-undefined
 launcher_ext_la_LIBDADD = $(LIBADD_DL) \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libcore/libgnashcore.la \
+	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 
 launcher_gnash_SOURCES = \
 	launcher.cpp \
 	md5.cpp md5.h
+launcher_gnash_CPPFLAGS = $(AM_CPPFLAGS)
 launcher_gnash_LDADD = $(top_builddir)/libbase/libgnashbase.la
 launcher_gnash_DEPENDENCIES = sums
 

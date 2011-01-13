@@ -26,6 +26,7 @@
 
 #include <vector>
 #include <algorithm> 
+#include <boost/assign/list_of.hpp>
 
 #include "MovieClip.h"
 #include "Renderer.h"
@@ -792,35 +793,30 @@ Gui::display(movie_root* m)
   
 		// show invalidated region using a red rectangle
 		// (Flash debug style)
-		IF_DEBUG_REGION_UPDATES (
-		if (_renderer.get() && !changed_ranges.isWorld())
-		{
-		
-			for (size_t rno = 0; rno < changed_ranges.size(); rno++) {
-			
-				const geometry::Range2d<int>& bounds = 
-					changed_ranges.getRange(rno);
+		IF_DEBUG_REGION_UPDATES(
+            if (_renderer.get() && !changed_ranges.isWorld()) {
+            
+                for (size_t rno = 0; rno < changed_ranges.size(); rno++) {
+                
+                    const geometry::Range2d<int>& bounds = 
+                        changed_ranges.getRange(rno);
 
-				point corners[4];
-				float xmin = bounds.getMinX();
-				float xmax = bounds.getMaxX();
-				float ymin = bounds.getMinY();
-				float ymax = bounds.getMaxY();
-				
-				corners[0].x = xmin;
-				corners[0].y = ymin;
-				corners[1].x = xmax;
-				corners[1].y = ymin;
-				corners[2].x = xmax;
-				corners[2].y = ymax;
-				corners[3].x = xmin;
-				corners[3].y = ymax;
-				SWFMatrix no_transform;
-				_renderer->draw_poly(corners, 4,
-					rgba(0,0,0,0), rgba(255,0,0,255), no_transform, false);
-					
-			}
-		}
+                    float xmin = bounds.getMinX();
+                    float xmax = bounds.getMaxX();
+                    float ymin = bounds.getMinY();
+                    float ymax = bounds.getMaxY();
+
+                    const std::vector<point> box = boost::assign::list_of
+                        (point(xmin, ymin))
+                        (point(xmax, ymin))
+                        (point(xmax, ymax))
+                        (point(xmin, ymax));
+
+                    _renderer->draw_poly(box, rgba(0,0,0,0), rgba(255,0,0,255),
+                            SWFMatrix(), false);
+                        
+                }
+            }
 		);
 
 		// show frame on screen

@@ -613,11 +613,11 @@ GnashPluginScriptObject::SetVariable(const std::string &name,
                                      const NPVariant& value)
 {
     std::vector<std::string> iargs;
-    std::string str = ExternalInterface::makeString(name);
+    std::string str = plugin::ExternalInterface::makeString(name);
     iargs.push_back(str);
-    str = ExternalInterface::convertNPVariant(&value);
+    str = plugin::ExternalInterface::convertNPVariant(&value);
     iargs.push_back(str);
-    str = ExternalInterface::makeInvoke("SetVariable", iargs);
+    str = plugin::ExternalInterface::makeInvoke("SetVariable", iargs);
     
     log_debug("Trying to set a value for %s.", name);
 
@@ -640,9 +640,9 @@ GnashNPVariant
 GnashPluginScriptObject::GetVariable(const std::string &name)
 {
     std::vector<std::string> iargs;
-    std::string str = ExternalInterface::makeString(name);
+    std::string str = plugin::ExternalInterface::makeString(name);
     iargs.push_back(str);
-    str = ExternalInterface::makeInvoke("GetVariable", iargs);
+    str = plugin::ExternalInterface::makeInvoke("GetVariable", iargs);
 
     log_debug("Trying to get a value for %s.", name);
     
@@ -670,7 +670,7 @@ GnashPluginScriptObject::GetVariable(const std::string &name)
         return GnashNPVariant();
     }
 
-    GnashNPVariant parsed = ExternalInterface::parseXML(data);
+    GnashNPVariant parsed = plugin::ExternalInterface::parseXML(data);
 
     printNPVariant(&parsed.get());
     
@@ -812,7 +812,7 @@ GnashPluginScriptObject::closePipe(int fd)
     if (fd > 0) {
         // Send a Quit message to the player before closing the pipe.
         std::vector<std::string> args;
-        std::string str = ExternalInterface::makeInvoke("Quit", args);
+        std::string str = plugin::ExternalInterface::makeInvoke("Quit", args);
         writePlayer(fd, str);
     
         ::shutdown(fd, SHUT_RDWR);

@@ -19,6 +19,7 @@ AC_PREREQ(2.50)
 AC_INIT(gnash, 0.8.9dev)
 AC_CONFIG_SRCDIR([libcore/as_object.h])
 AC_CONFIG_HEADERS([gnashconfig.h])
+AC_CONFIG_MACRO_DIR([macros])
 
 dnl AC_CONFIG_SUBDIRS(libltdl)
 AC_CANONICAL_BUILD
@@ -1306,6 +1307,7 @@ if test $ltmajor -eq 1; then
   AC_DEFINE(HAVE_LTDL, [1], [Libtool 2.x defines this, but libtool 1.5 doesn't])
 dnl libtool version 2.x
 else
+  dnl LT_CONFIG_LTDL_DIR([libltdl])
   LT_INIT([dlopen win32-dll disable-static])
   LTDL_INIT([convenience recursive])
 fi
@@ -2725,7 +2727,11 @@ AC_SUBST(PCH_FLAGS)
 GNASH_PATH_PTHREADS
 
 GNASH_PATH_BOOST
-dnl AX_GCC_ARCHFLAG(no)
+
+dnl disable --gcc-arch by default
+dnl AX_GCC_ARCHFLAG
+dnl AC_SUBST(CFLAGS)
+dnl AC_SUBST(CLIBS)
 
 AC_ARG_ENABLE([strict],
   AC_HELP_STRING([--enable-strict],[Accept only standards compliant code (GCC only)]),

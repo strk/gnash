@@ -1889,7 +1889,7 @@ public:
   } //draw_poly_impl
   
   
-  void draw_poly(const point* corners, size_t corner_count, const rgba& fill, 
+  void draw_poly(const std::vector<point>& corners, const rgba& fill, 
     const rgba& outline, const SWFMatrix& mat, bool masked) {
     
     if (masked && !_alphaMasks.empty()) {
@@ -1900,7 +1900,7 @@ public:
       
       sl_type sl(_alphaMasks.back()->getMask());
          
-      draw_poly_impl<sl_type> (corners, corner_count, fill, outline, sl, mat);       
+      draw_poly_impl<sl_type>(&corners.front(), corners.size(), fill, outline, sl, mat);       
     
     } else {
     
@@ -1910,7 +1910,7 @@ public:
       
       sl_type sl;
          
-      draw_poly_impl<sl_type> (corners, corner_count, fill, outline, sl, mat);
+      draw_poly_impl<sl_type>(&corners.front(), corners.size(), fill, outline, sl, mat);
     
     }
     

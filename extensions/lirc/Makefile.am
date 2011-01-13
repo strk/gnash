@@ -22,7 +22,7 @@ pluginsdir = $(libdir)/gnash/plugins
 
 plugins_LTLIBRARIES = lirc.la
 
-INCLUDES = \
+AM_CPPFLAGS = \
             -I$(top_srcdir)/libbase \
             -I$(top_srcdir)/libcore \
             -I$(top_srcdir)/libcore/abc \
@@ -34,6 +34,7 @@ INCLUDES = \
 	    $(INCLTDL)
 
 lirc_la_SOURCES = lirc_ext.cpp lirc_ext.h
+lirc_la_CPPFLAGS = $(AM_CPPFLAGS)
 lirc_la_LDFLAGS = -module -avoid-version -no-undefined
 lirc_la_LIBDADD = $(LIBADD_DL) \
 	$(top_builddir)/libbase/libgnashbase.la \
