@@ -156,7 +156,6 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     // Init'ing to zero uses the root screen as the display. Otherwise
     // the argument should be an EGLNativeWindowType.
     int win = 0;
-
 #ifdef ENABLE_FAKE_FRAMEBUFFER
     win = open("/tmp/fbe_buffer", O_RDWR);
 #else

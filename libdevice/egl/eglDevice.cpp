@@ -45,17 +45,6 @@ namespace gnash {
 
 namespace renderer {
 
-const EGLint window_attrib_list[] = {
-    // Back buffering is used for window and pbuffer surfaces. Windows
-    // require eglSwapBuffers() to become visible, and pbuffers don't.   
-    // EGL_SINGLE_BUFFER is by pixmap surfaces. With OpenVG, windows
-    // can also be single buffered. eglCopyBuffers() can be used to copy
-    // both back and single buffered surfaces to a pixmap.
-    EGL_RENDER_BUFFER, EGL_SINGLE_BUFFER,
-    EGL_COLORSPACE,    EGL_COLORSPACE_sRGB,
-    EGL_NONE
-};
-
 // The debug log used by all the gnash libraries.
 static LogFile& dbglogfile = LogFile::getDefaultInstance();
 
@@ -230,49 +219,59 @@ EGLDevice::initDevice(int argc, char *argv[])
     // The quality of the rendering is controlled by the number of samples
     // and sample buffers as specified in the configuration. Higher quality
     // settings force lower performance.
+
+    // eglChooseConfig() always returns EGL_SUCCESS, so we we just check the
+    // returned number of configurations to see if eglChooseConfig() actually
+    // found a workable configuration.
     EGLint eglNumOfConfigs = 0;
     switch (_quality) {
       case EGLDevice::LOW:
-          if (eglChooseConfig(_eglDisplay, attrib32_low, &_eglConfig,
-                              1, &eglNumOfConfigs)) {
-              log_debug("Choose 32bpp, low quality configuration");
+          eglChooseConfig(_eglDisplay, attrib32_low, &_eglConfig,
+                          1, &eglNumOfConfigs);
+          if (eglNumOfConfigs) {
+              log_debug("Using the 32bpp, low quality configuration");
           } else {
-              log_error("eglChooseConfig(32-low) failed (error %s)", 
-                        getErrorString(eglGetError()));
-              if (eglChooseConfig(_eglDisplay, attrib16_low, &_eglConfig,
-                                  1, &eglNumOfConfigs)) {
-                  log_error("eglChooseConfig(16-low) failed (error %s)", 
-                            getErrorString(eglGetError()));
+              log_error("eglChooseConfig(32-low) failed");
+              eglChooseConfig(_eglDisplay, attrib16_low, &_eglConfig,
+                              1, &eglNumOfConfigs);
+              if (eglNumOfConfigs) {
+                  log_debug("Using the 16bpp, low quality configuration");
+              } else {
+                  log_error("eglChooseConfig(16-low) failed");
                   return false;
               }
           }
           break;
       case EGLDevice::MEDIUM:
-          if (eglChooseConfig(_eglDisplay, attrib32_medium, &_eglConfig,
-                              1, &eglNumOfConfigs)) {
-              log_debug("Choose 32bpp, medium quality configuration");
+          eglChooseConfig(_eglDisplay, attrib32_medium, &_eglConfig,
+                          1, &eglNumOfConfigs);
+          if (eglNumOfConfigs) {
+              log_debug("Using the 32bpp, medium quality configuration");
           } else {
-              log_error("eglChooseConfig(32-medium) failed (error %s)", 
-                        getErrorString(eglGetError()));
-              if (eglChooseConfig(_eglDisplay, attrib16_medium, &_eglConfig,
-                                  1, &eglNumOfConfigs)) {
-                  log_error("eglChooseConfig(16-medium) failed (error %s)", 
-                            getErrorString(eglGetError()));
+              log_error("eglChooseConfig(32-medium) failed");
+              eglChooseConfig(_eglDisplay, attrib16_medium, &_eglConfig,
+                              1, &eglNumOfConfigs);
+              if (eglNumOfConfigs) {
+                  log_debug("Using the 16bpp, medium quality configuration");
+              } else {
+                  log_error("eglChooseConfig(16-medium) failed");
                   return false;
               }
           }
           break;
       case EGLDevice::HIGH:
-          if (eglChooseConfig(_eglDisplay, attrib32_high, &_eglConfig,
-                              1, &eglNumOfConfigs)) {
-              log_debug("Choose 32bpp, high quality configuration");
+          eglChooseConfig(_eglDisplay, attrib32_high, &_eglConfig,
+                          1, &eglNumOfConfigs);
+          if (eglNumOfConfigs) {
+              log_debug("Using the 32bpp, high quality configuration");
           } else {
-              log_error("eglChooseConfig(32-high) failed (error %s)", 
-                        getErrorString(eglGetError()));
-              if (eglChooseConfig(_eglDisplay, attrib16_high, &_eglConfig,
-                                  1, &eglNumOfConfigs)) {
-                  log_error("eglChooseConfig(16-high) failed (error %s)", 
-                            getErrorString(eglGetError()));
+              log_error("eglChooseConfig(32-high) failed");
+              eglChooseConfig(_eglDisplay, attrib16_high, &_eglConfig,
+                              1, &eglNumOfConfigs);
+              if (eglNumOfConfigs) {
+                  log_debug("Using the 16bpp, medium quality configuration");
+              } else {
+                  log_error("eglChooseConfig(16-high) failed");
                   return false;
               }
           }
@@ -281,11 +280,6 @@ EGLDevice::initDevice(int argc, char *argv[])
           break;
     }
 
-    // if  (eglNumOfConfigs == 0) {
-    //     log_error("eglChooseConfig() was unable to find a suitable config");
-    //     return false;
-    // }
-    
    if (!checkEGLConfig(_eglConfig)) {
        log_error("EGL configuration doesn't match!");
        //return false;
@@ -316,6 +310,7 @@ EGLDevice::supportsRenderer(rtype_t rtype)
     return false;
 }
 
+#ifdef BUILD_X11_DEVICE
 EGLint
 EGLDevice::getNativeVisual()
 {
@@ -332,6 +327,7 @@ EGLDevice::getNativeVisual()
 
     return vid;
 }
+#endif
 
 bool
 EGLDevice::bindClient(rtype_t rtype)
@@ -393,7 +389,7 @@ EGLDevice::attachWindow(GnashDevice::native_window_t window)
     log_debug("Initializing EGL Surface");
     if (_eglDisplay && _eglConfig) {
         _eglSurface = eglCreateWindowSurface(_eglDisplay, _eglConfig,
-                                             _nativeWindow, NULL);
+                                             _nativeWindow, surface_attributes);
     }
     
     if (EGL_NO_SURFACE == _eglSurface) {
@@ -617,6 +613,8 @@ EGLDevice::printEGLConfig(EGLConfig config)
     std::cout << "\tConfig has RED = " << red << ", GREEN = " << green
               << ", BLUE = " << blue  << std::endl;
     
+    eglGetConfigAttrib(_eglDisplay, config, EGL_BUFFER_SIZE, &value);
+    std::cout << "\tEGL_BUFFER_SIZE is " << value  << std::endl;
     eglGetConfigAttrib(_eglDisplay, config, EGL_ALPHA_SIZE, &value);
     std::cout << "\tEGL_ALPHA_SIZE is " << value  << std::endl;
     eglGetConfigAttrib(_eglDisplay, config, EGL_STENCIL_SIZE, &value);
@@ -669,8 +667,37 @@ EGLDevice::printEGLConfig(EGLConfig config)
     } else {
           std::cout <<"\tEGL_SURFACE_TYPE (default)" << std::endl;
     }
+
+    eglGetConfigAttrib(_eglDisplay, config, EGL_CONFIG_CAVEAT, &value);
+    if (value > 0) {
+        std::string str;
+        if (value & EGL_NONE) {
+            str += " EGL_NONE";
+        }
+        if (value & EGL_SLOW_CONFIG) {
+            str += " EGL_SLOW_CONFIG";
+        }
+        if (value & EGL_NON_CONFORMANT_CONFIG) {
+            str += " EGL_NON_CONFORMANT_CONFIG";
+        }
+        std::cout <<"\tEGL_CONFIG_CAVEAT = " << str << std::endl;
+    } else {
+        std::cout <<"\tEGL_CONFIG_CAVEAT (default)" << std::endl;
+    }
+
+#ifdef BUILD_X11_DEVICE
     eglGetConfigAttrib(_eglDisplay, config, EGL_NATIVE_VISUAL_ID, &value);
     std::cout << "\tX11 Visual is: " << value << std::endl;
+#endif
+    
+    eglGetConfigAttrib(_eglDisplay, config, EGL_BIND_TO_TEXTURE_RGB, &value);
+    val = (value)? "true" : "false";
+    std::cout << "\tEGL_BIND_TO_TEXTURE_RGB is " << val << std::endl;
+
+    eglGetConfigAttrib(_eglDisplay, config, EGL_BIND_TO_TEXTURE_RGBA, &value);
+    val = (value)? "true" : "false";
+    std::cout << "\tEGL_BIND_TO_TEXTURE_RGBA is " << val << std::endl;
+
 }
 
 void

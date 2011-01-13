@@ -163,8 +163,9 @@ class EGLDevice : public GnashDevice
         }
         return false;
     }
-
+#ifdef BUILD_X11_DEVICE
     EGLint getNativeVisual();
+#endif
     
     /// Check the requested EGl configuration against the current one
     bool checkEGLConfig(EGLConfig config);
@@ -196,7 +197,6 @@ class EGLDevice : public GnashDevice
     // Swap to the default surface
     bool swapBuffers() {
         GNASH_REPORT_FUNCTION;
-        log_debug("FIXME: %p, %p", _eglDisplay, _eglSurface);
         return eglSwapBuffers(_eglDisplay, _eglSurface);
     }
     bool copyPbuffers(size_t x) {

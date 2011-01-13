@@ -91,7 +91,7 @@ static const EGLint attrib32_low[] = {
     EGL_BLUE_SIZE,       8,
     EGL_ALPHA_SIZE,      0,
     EGL_DEPTH_SIZE,      24,
-    // EGL_RENDERABLE_TYPE, EGLDevice::getRenderableTypes(),
+    EGL_RENDERABLE_TYPE, EGLDevice::getRenderableTypes(),
     EGL_SURFACE_TYPE,    EGL_WINDOW_BIT|EGL_PBUFFER_BIT|EGL_PIXMAP_BIT,
     EGL_SAMPLES,         0,
     EGL_SAMPLE_BUFFERS,  0,  
@@ -131,8 +131,8 @@ static EGLint const attrib16_low[] = {
     EGL_BLUE_SIZE,       5,
     EGL_ALPHA_SIZE,      0,
     EGL_RENDERABLE_TYPE, EGLDevice::getRenderableTypes(),
-    EGL_LUMINANCE_SIZE,  EGL_DONT_CARE,
-    EGL_SURFACE_TYPE,    EGL_VG_COLORSPACE_LINEAR_BIT,
+//  EGL_LUMINANCE_SIZE,  EGL_DONT_CARE,
+//  EGL_SURFACE_TYPE,    EGL_VG_COLORSPACE_LINEAR_BIT,
     EGL_SAMPLES,         0,
     EGL_DEPTH_SIZE,      16,
     EGL_SAMPLES,         0,
@@ -177,6 +177,17 @@ static const EGLint attrib1_list[] = {
     EGL_GREEN_SIZE, 1,
     EGL_BLUE_SIZE, 1,
     EGL_RENDERABLE_TYPE, EGL_OPENVG_BIT,
+    EGL_NONE
+};
+
+const EGLint surface_attributes[] = {
+    // Back buffering is used for window and pbuffer surfaces. Windows
+    // require eglSwapBuffers() to become visible, and pbuffers don't.   
+    // EGL_SINGLE_BUFFER is by pixmap surfaces. With OpenVG, windows
+    // can also be single buffered. eglCopyBuffers() can be used to copy
+    // both back and single buffered surfaces to a pixmap.
+    EGL_RENDER_BUFFER, EGL_SINGLE_BUFFER,
+    EGL_VG_COLORSPACE, EGL_VG_COLORSPACE_sRGB,
     EGL_NONE
 };
 
