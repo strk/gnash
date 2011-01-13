@@ -33,17 +33,21 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#ifdef HAVE_EGL_EGL_H
-# include <EGL/egl.h>
-#else
-# error "This file needs EGL, which is part of OpenGL-ES"
-#endif
-
 #include "log.h"
 #include "dejagnu.h"
 #include "eglDevice.h"
 #include "configTemplates.h"
 #include "GnashDevice.h"
+
+#ifdef BUILD_X11_DEVICE
+# include "x11/X11Device.h"
+#endif
+
+#ifdef HAVE_EGL_EGL_H
+# include <EGL/egl.h>
+#else
+# error "This file needs EGL, which is part of OpenGL-ES"
+#endif
 
 TestState runtest;
 
@@ -151,14 +155,24 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
 
     // Init'ing to zero uses the root screen as the display. Otherwise
     // the argument should be an EGLNativeWindowType.
-    int fd = 0;
-#ifndef BUILD_X11_DEVICE
-    fd = open("/dev/fb0", O_RDWR);
+    int win = 0;
+
+#ifdef ENABLE_FAKE_FRAMEBUFFER
+    win = open("/tmp/fbe_buffer", O_RDWR);
+#else
+# ifdef BUILD_RAWFB_DEVICE
+    win = open("/dev/fb0", O_RDWR);
+# endif
+# ifdef BUILD_X11_DEVICE
+    x11::X11Device x11(egl.getNativeVisual());
+    win = x11.getHandle();
+# endif
 #endif
-    if (egl.attachWindow(fd)) {
-        runtest.pass("EGLDevice::attachWindow(0)");
+    if (egl.attachWindow(win)) {
+        runtest.pass("EGLDevice::attachWindow()");
     } else {
-        runtest.fail("EGLDevice::attachWindow(0)");
+        runtest.fail("EGLDevice::attachWindow()");
+        hwinit = false;
     }
     
     if (hwinit) {
@@ -459,7 +473,9 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     
     // EGLSurface surf5 = eglGetCurrentSurface(EGL_DRAW);
     // egl.printEGLSurface(surf5);
-    close(fd);
+#ifndef BUILD_X11_DEVICE
+    close(win);
+#endif
 }
 
 // Local Variables:
