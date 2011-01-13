@@ -40,5 +40,6 @@ test_egl_LDADD = \
 libgnashdevice_la_CPPFLAGS += $(EGL_CFLAGS)
 libgnashdevice_la_SOURCES += \
 	egl/eglDevice.cpp \
-	egl/eglDevice.h
+	egl/eglDevice.h \
+	egl/configTemplates.h
 libgnashdevice_la_LIBADD += $(EGL_LIBS)
