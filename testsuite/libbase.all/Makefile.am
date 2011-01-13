@@ -36,7 +36,7 @@ AM_CPPFLAGS = \
         -I$(top_srcdir)/testsuite \
         $(MING_CFLAGS) \
 	$(BOOST_CFLAGS) \
-	$(PTHREADS_CFLAGS) \
+	$(PTHREAD_CFLAGS) \
 	$(DEJAGNU_CFLAGS) \
 	$(NULL)
 
