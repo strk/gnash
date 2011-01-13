@@ -164,6 +164,7 @@ noinst_HEADERS =
 
 inst_HEADERS = \
 	$(LIBLTDLHEAD) \
+	accumulator.h \
 	SimpleBuffer.h \
 	extension.h \
 	GnashNumeric.h \
