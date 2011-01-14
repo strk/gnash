@@ -1629,7 +1629,7 @@
 
 2007-05-10 Sandro Santilli <strk@keybit.net>
 
-	* testsuite/anaylse-results.sh: print an header before the actual
+	* testsuite/analyse-results.sh: print an header before the actual
 	  results; don't limit depth of search for summary files.
 	* Makefile.am, add an anal rule to run the test results analyzer.
 	  Run the analyzer at end of 'make check', so the report doesn't
@@ -9518,7 +9518,7 @@
 
 	* testsuite/actionscript.all/: Makefile.am, gen-index.sh,
 	  gen-index-wiki.sh: fix index.wiki generation rule.
-	* testsuite/anaylse-results.sh: sort directories, to make
+	* testsuite/analyse-results.sh: sort directories, to make
 	  cross-systems comparison easier.
 	* testsuite/simple.exp: handle deadlocks or infinite loops 
 	  in testcases.
@@ -12226,9 +12226,9 @@ q2006-11-04 Sandro Santilli <strk@keybit.net>
 	
 2006-10-15 Patrice Dumas <pertusus@free.fr>
 
-	* testsuite/Makefile.am: Add anaylse-results.sh to the
+	* testsuite/Makefile.am: Add analyse-results.sh to the
 	distibution.
-	* testsuite/anaylse-results.sh: Make sure the test log exists
+	* testsuite/analyse-results.sh: Make sure the test log exists
 	before trying to parse it.
 	* testsuite/actionscript.all/Makefile.am: Also clean the out.swf
 	file.
