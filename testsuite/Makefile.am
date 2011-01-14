@@ -91,7 +91,7 @@ SUBDIRS = \
 
 EXTRA_DIST = check.h DummyMovieDefinition.h DummyCharacter.h gnashrc.in simple.exp 
 
-dist_noinst_SCRIPTS = anaylse-results.sh generic-testrunner.sh
+dist_noinst_SCRIPTS = analyse-results.sh generic-testrunner.sh
 
 abs_mediadir = `cd $(srcdir)/media; pwd`
 abs_tmpsodir = `cd tmpSharedObject; pwd`
