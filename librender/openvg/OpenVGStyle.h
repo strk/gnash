@@ -111,6 +111,24 @@ public:
     }
 };
 
+/// Get the image from style variant
+class GetImage : public boost::static_visitor<image::GnashImage *>
+{
+public:
+    image::GnashImage *operator()(const SolidFill&) const {
+        return 0;
+    }
+    image::GnashImage *operator()(const GradientFill&) const {
+        return 0;
+    }
+    image::GnashImage *operator()(const BitmapFill& b) const {
+        CachedBitmap *cb = const_cast<CachedBitmap *>(b.bitmap());
+        image::GnashImage &im = cb->image();
+//      image::GnashImage::const_iterator it = const_cast<CachedBitmap *>(cb)->image().begin();
+        return &im;
+    }
+};
+
 /// Get the matrix of a style from the variant
 class GetMatrix : public boost::static_visitor<SWFMatrix>
 {
