@@ -286,8 +286,8 @@ EGLDevice::initDevice(int argc, char *argv[])
    } else {
        printEGLConfig(_eglConfig);
    }
-    
-    return true;
+
+   return true;
 }
 
 bool
