@@ -39,8 +39,8 @@ public:
     enum bitmap_wrap_mode { WRAP_REPEAT, WRAP_CLAMP };
     
     OpenVGBitmap(VGPaint paint);
-    OpenVGBitmap(const CachedBitmap *bitmap, VGPaint vgpaint);
-    OpenVGBitmap(std::auto_ptr<image::GnashImage> im, VGPaint vgpaint);
+    OpenVGBitmap(CachedBitmap *bitmap, VGPaint vgpaint);
+    OpenVGBitmap(image::GnashImage *im, VGPaint vgpaint);
     ~OpenVGBitmap();
 
     void dispose()  { _image.reset(); }
@@ -63,8 +63,9 @@ public:
                                      float y1, float radial, VGPaint paint);
     OpenVGBitmap *createLinearBitmap(float x0, float y0, float x1,
                                      float y1, VGPaint paint);
-    OpenVGBitmap *createPatternBitmap(std::auto_ptr<image::GnashImage> im,
+    OpenVGBitmap *createPatternBitmap(image::GnashImage &im,
                                       VGPaint paint);
+    OpenVGBitmap *createPatternBitmap();
 
 private:
     boost::scoped_ptr<image::GnashImage> _image;

@@ -32,11 +32,46 @@ namespace openvg {
 static const int NUM_STOPS = 10;
 
 OpenVGBitmap::OpenVGBitmap(VGPaint paint)
+    : _vgimage(VG_INVALID_HANDLE),
+      _pixel_format(VG_sRGB_565), // was VG_sARGB_8888, VG_sRGB_565
+      _vgpaint(paint)
 {
     GNASH_REPORT_FUNCTION;
-    if (paint) {
-        _vgpaint = paint;
+}
+
+OpenVGBitmap::OpenVGBitmap(CachedBitmap *bitmap, VGPaint vgpaint)
+    :  _pixel_format(VG_sRGBA_8888), // was VG_sARGB_8888, VG_sRGB_565
+       _vgpaint(vgpaint)
+{
+    GNASH_REPORT_FUNCTION;
+
+    // extract a reference to the image from the cached bitmap
+    image::GnashImage &im = bitmap->image();
+
+    // Store the reference so so it's available to createPatternBitmap()
+    //    _image.reset(&im);
+
+    // Create a VG image
+#ifdef BUILD_X11_DEVICE
+    _vgimage = vgCreateImage(VG_sRGBA_8888, im.width(), im.height(),
+                             VG_IMAGE_QUALITY_FASTER);
+    // Copy the image data into the VG image container
+    vgImageSubData(_vgimage, im.begin(), 0, VG_sRGBA_8888,
+                   0, 0, im.width(), im.height());
+#else
+    _vgimage = vgCreateImage(VG_sRGB_565, im.width(), im.height(),
+                             VG_IMAGE_QUALITY_FASTER);    
+    // Copy the image data into the VG image container
+    vgImageSubData(_vgimage, im.begin(), im.width() * 2, VG_sRGB_565,
+                   0, 0, im.width(), im.height());
+#endif
+    if (_vgimage == VG_INVALID_HANDLE) {
+        log_error("Failed to create VG image! %s", Renderer_ovg::getErrorString(vgGetError()));
     }
+
+    // vgPaintPattern(_vgpaint, _vgimage);
+    // vgDrawImage(_vgimage);
+    // vgFlush();
 }
 
 // 
@@ -44,14 +79,15 @@ OpenVGBitmap::OpenVGBitmap(VGPaint paint)
 // VG_sRGBA_5551
 // VG_sRGBA_4444
 // VG_A_8
-OpenVGBitmap::OpenVGBitmap(std::auto_ptr<image::GnashImage> image, VGPaint paint)
+// VG_A_4
+OpenVGBitmap::OpenVGBitmap(image::GnashImage *image, VGPaint vgpaint)
     :
     _image(image),
-    _pixel_format(VG_A_4), // was VG_sARGB_8888  VG_sRGB_565
-    _vgpaint(paint)
+    _pixel_format(VG_sRGB_565), // was VG_sARGB_8888, VG_sRGB_565
+    _vgpaint(vgpaint)
 {
     GNASH_REPORT_FUNCTION;
-
+    
     size_t width = _image->width();
     size_t height = _image->height();
 
@@ -59,26 +95,36 @@ OpenVGBitmap::OpenVGBitmap(std::auto_ptr<image::GnashImage> image, VGPaint paint
     _vgimage = vgCreateImage(_pixel_format, width, height,
                              VG_IMAGE_QUALITY_FASTER);    
     
-    vgImageSubData(_vgimage, _image->begin(), width * 4, _pixel_format,
+    vgImageSubData(_vgimage, image->begin(), width * 4, _pixel_format,
                    0, 0, width, height);
     
+    vgSetParameteri(vgpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
+    vgSetParameteri(vgpaint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_REPEAT);
+    vgPaintPattern(vgpaint, _vgimage);
+    vgDrawImage(_vgimage);
+    vgFlush();
+    
+#if 0
     _tex_size += width * height * 4;
     log_debug("Add Texture size:%d (%d x %d x %dbpp)", width * height * 4, 
               width, height, 4);
     log_debug("Current Texture size: %d", _tex_size);
+#endif
 } 
 
 OpenVGBitmap::~OpenVGBitmap()
 {
     GNASH_REPORT_FUNCTION;
     
+#if 0
     _tex_size -= _image->width() * _image->height() * 4;
     log_debug(_("Remove Texture size:%d (%d x %d x %dbpp)"),
               _image->width() * _image->height() * 4,
               _image->width(), _image->height(), 4);
     log_debug(_("Current Texture size: %d"), _tex_size);
-
-//    vgDestroyPaint(_vgpaint);
+#endif
+    
+    vgDestroyPaint(_vgpaint);
     vgDestroyImage(_vgimage);
 }
 
@@ -104,8 +150,14 @@ OpenVGBitmap::apply(const gnash::SWFMatrix& bitmap_matrix,
     mat = bitmap_matrix;
     
     vgSetParameteri (paint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
-    vgPaintPattern (paint, _vgimage);
+
+    if (_vgimage == VG_INVALID_HANDLE) {
+        log_error("No cached VG image!");
+    }
     
+    // Paint the cached VG image into the VG paint surface
+    vgPaintPattern (paint, _vgimage);
+
     mat.invert();
     memset(vmat, 0, sizeof(vmat));
     vmat[0] = mat.sx  / 65536.0f;
@@ -171,20 +223,43 @@ OpenVGBitmap::createLinearBitmap(float x0, float y0, float x1, float y1, VGPaint
 
     // Create and fill pattern image
 OpenVGBitmap *
-OpenVGBitmap::createPatternBitmap(std::auto_ptr<image::GnashImage> im, VGPaint paint)
+OpenVGBitmap::createPatternBitmap(image::GnashImage &im, VGPaint vgpaint)
 {
     GNASH_REPORT_FUNCTION;
 
-    if (paint != VG_INVALID_HANDLE) {
-        _vgimage = vgCreateImage(_pixel_format, im->width(), im->height(),
+    VGImage vgimage;
+    if (vgpaint != VG_INVALID_HANDLE) {
+        vgimage = vgCreateImage(_pixel_format, im.width(), im.height(),
                                  VG_IMAGE_QUALITY_FASTER);
-        vgImageSubData(_vgimage, im->begin(), 4*im->width(), /* stride */
-                       _pixel_format, 0, 0, im->width(), im->height());
+        vgImageSubData(vgimage, im.begin(), 4*im.width(), /* stride */
+                       _pixel_format, 0, 0, im.width(), im.height());
+        
+        vgSetParameteri(vgpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
+        vgSetParameteri(vgpaint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_REPEAT);
+        vgPaintPattern(vgpaint, vgimage);
+        vgDrawImage(vgimage);
+        vgFlush();
+    }
+
+    return this;
+}
+
+    // Create and fill pattern image
+OpenVGBitmap *
+OpenVGBitmap::createPatternBitmap()
+{
+    GNASH_REPORT_FUNCTION;
+
+    if (_vgpaint != VG_INVALID_HANDLE) {
+        VGImage vgimage = vgCreateImage(_pixel_format, _image->width(), _image->height(),
+                                 VG_IMAGE_QUALITY_FASTER);
+        vgImageSubData(vgimage, _image->begin(), 4*_image->width(), /* stride */
+                       _pixel_format, 0, 0, _image->width(), _image->height());
         
         vgSetParameteri(_vgpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
         vgSetParameteri(_vgpaint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_REPEAT);
-        vgPaintPattern(_vgpaint, _vgimage);
-        vgDrawImage(_vgimage);
+        vgPaintPattern(_vgpaint, vgimage);
+        vgDrawImage(vgimage);
         vgFlush();
     }
 

@@ -126,6 +126,8 @@ public:
     void printVGParams();
     void printVGHardware();
     void printVGPath();    
+
+    static const char *getErrorString(VGErrorCode error);
 #if 0
     // These are all required by the Render class
     void draw_poly(const point* corners, size_t corner_count,
@@ -185,7 +187,10 @@ public:
   
     gnash::SWFMatrix stage_matrix;  // conversion from TWIPS to pixels
     
+    /// this paint object is used for solid, gradient, and pattern fills.
     VGPaint     _fillpaint;
+
+    /// this pain object is used for paths
     VGPaint     _strokepaint;
 
 #ifdef OPENVG_VERSION_1_1

@@ -204,7 +204,10 @@ Renderer_ovg::Renderer_ovg(renderer::GnashDevice::dtype_t /* dtype */)
     
     _strokepaint = vgCreatePaint();
     
+    // this paint object is used for solid, gradient, and pattern fills.
     vgSetPaint (_fillpaint,   VG_FILL_PATH);
+
+    // this pain object is used for paths
     vgSetPaint (_strokepaint, VG_STROKE_PATH);
 }
 
@@ -218,10 +221,12 @@ Renderer_ovg::init(float x, float y)
     
     _fillpaint = vgCreatePaint();
     
-    log_debug("FIXME: %s: %p", __FUNCTION__, _fillpaint);
     _strokepaint = vgCreatePaint();
     
+    // this paint object is used for solid, gradient, and pattern fills.
     vgSetPaint (_fillpaint,   VG_FILL_PATH);
+
+    // this pain object is used for paths
     vgSetPaint (_strokepaint, VG_STROKE_PATH);
 
     // Turn on alpha blending.
@@ -265,10 +270,8 @@ Renderer_ovg::createCachedBitmap(std::auto_ptr<image::GnashImage> im)
 
     // OpenVG don't support 24bit RGB, so we need to translate
     // the colorspace
-//    image::GnashImage &image = im.release();
-    return reinterpret_cast<CachedBitmap *>(new OpenVGBitmap(im, _fillpaint));
-
-    return 0;
+    image::GnashImage *image = im.release();
+    return reinterpret_cast<CachedBitmap *>(new OpenVGBitmap(image, _fillpaint));
 }
 
 // Since we store drawing operations in display lists, we take special care
@@ -286,6 +289,8 @@ Renderer_ovg::drawVideoFrame(image::GnashImage* /* frame */, const SWFMatrix* /*
 void
 Renderer_ovg::world_to_pixel(int& x, int& y, float world_x, float world_y)
 {
+    GNASH_REPORT_FUNCTION;
+
     // negative pixels seems ok here... we don't
     // clip to valid range, use world_to_pixel(rect&)
     // and Intersect() against valid range instead.
@@ -298,6 +303,8 @@ Renderer_ovg::world_to_pixel(int& x, int& y, float world_x, float world_y)
 geometry::Range2d<int>
 Renderer_ovg::world_to_pixel(const SWFRect& wb)
 {
+    GNASH_REPORT_FUNCTION;
+
     using namespace gnash::geometry;
     
     if ( wb.is_null() ) return Range2d<int>(nullRange);
@@ -314,6 +321,8 @@ Renderer_ovg::world_to_pixel(const SWFRect& wb)
 geometry::Range2d<int>
 Renderer_ovg::world_to_pixel(const geometry::Range2d<float>& wb)
 {
+    GNASH_REPORT_FUNCTION;
+
     if (wb.isNull() || wb.isWorld()) return wb;
     
     int xmin, ymin, xmax, ymax;
@@ -327,6 +336,8 @@ Renderer_ovg::world_to_pixel(const geometry::Range2d<float>& wb)
 point
 Renderer_ovg::pixel_to_world(int x, int y)
 {
+    GNASH_REPORT_FUNCTION;
+
     point p(x, y);
     SWFMatrix mat = stage_matrix;
     mat.invert().transform(p);
@@ -433,6 +444,7 @@ Renderer_ovg::drawPoly(const point* corners, size_t corner_count,
                        const rgba& fill, const rgba& /* outline */,
                        const SWFMatrix& mat, bool /* masked */)
 {
+    GNASH_REPORT_FUNCTION;
     VGubyte     gseg[MAX_SEG];
     VGfloat     gdata[MAX_SEG*3*2];
     int         scount = 0;
@@ -581,6 +593,7 @@ Renderer_ovg::disable_mask()
 Path
 Renderer_ovg::reverse_path(const Path& cur_path)
 {
+    GNASH_REPORT_FUNCTION;
     const Edge& cur_end = cur_path.m_edges.back();    
     
     float prev_cx = cur_end.cp.x;
@@ -621,6 +634,8 @@ const Path *
 Renderer_ovg::find_connecting_path(const Path& to_connect,
                                    std::list<const Path*> path_refs)
 {        
+    GNASH_REPORT_FUNCTION;
+
     float target_x = to_connect.m_edges.back().ap.x;
     float target_y = to_connect.m_edges.back().ap.y;
     
@@ -653,7 +668,7 @@ Renderer_ovg::find_connecting_path(const Path& to_connect,
 PathVec
 Renderer_ovg::normalize_paths(const PathVec &paths)
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     PathVec normalized;
     
@@ -702,27 +717,28 @@ void
 Renderer_ovg::analyze_paths(const PathVec &paths, bool& have_shape,
                             bool& have_outline) 
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
-    have_shape=false;
-    have_outline=false;
+    have_shape = false;
+    have_outline = false;
     
     int pcount = paths.size();
     
-    for (int pno=0; pno<pcount; pno++) {
+    for (int pno= 0; pno<pcount; pno++) {
         
         const Path &the_path = paths[pno];
         
-        if ((the_path.m_fill0>0) || (the_path.m_fill1>0)) {
-            have_shape=true;
+        // If a left or right fill is set, then this is an outline
+        if ((the_path.m_fill0 > 0) || (the_path.m_fill1 > 0)) {
+            have_shape = true;
             if (have_outline) return; // have both
         }
         
-        if (the_path.m_line>0) {
-            have_outline=true;
+        // If a line is set, then it's a shape. A path can be both
+        if (the_path.m_line > 0) {
+            have_outline = true;
             if (have_shape) return; // have both
         }
-        
     }    
 }
 
@@ -739,13 +755,13 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
       case SWF::FILL_RADIAL_GRADIENT:
       case SWF::FILL_FOCAL_GRADIENT:
       {
-          log_debug("Fill Style Type: Gradient");
           OpenVGBitmap* binfo = new OpenVGBitmap(_fillpaint);
           
           GradientFill::Type gt;
           switch (fill_type) {
           case SWF::FILL_LINEAR_GRADIENT:
           {
+              log_debug("Fill Style Type: Linear Gradient");
               binfo->createLinearBitmap(mat.sx, mat.sy, mat.tx, mat.ty,
                                         _fillpaint);
               break;
@@ -753,6 +769,7 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
           case SWF::FILL_RADIAL_GRADIENT:
           case SWF::FILL_FOCAL_GRADIENT:
           {
+              log_debug("Fill Style Type: Radial Gradient");
               float x0, y0, x1, y1, radial;
               binfo->createRadialBitmap(x0, y0, x1, y1, radial, _fillpaint);
               break;
@@ -768,11 +785,11 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
       case SWF::FILL_TILED_BITMAP_HARD:
       case SWF::FILL_TILED_BITMAP:
       {
+          log_debug("Fill Style Type: Tiled Bitmap");
           SWFMatrix sm = boost::apply_visitor(GetMatrix(), style.fill);          
           CachedBitmap *cb = boost::apply_visitor(GetBitmap(), style.fill);
-          std::auto_ptr<image::GnashImage> im(&cb->image());
-          OpenVGBitmap *binfo = new OpenVGBitmap(_fillpaint);
-          binfo->createPatternBitmap(im, _fillpaint);
+          //          std::auto_ptr<image::GnashImage> im(&cb->image());
+          OpenVGBitmap *binfo = new OpenVGBitmap(cb, _fillpaint);
           binfo->apply(sm, OpenVGBitmap::WRAP_REPEAT, _fillpaint);
           break;
       }
@@ -780,15 +797,22 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
       case SWF::FILL_CLIPPED_BITMAP:
       case SWF::FILL_CLIPPED_BITMAP_HARD:
       {     
+          log_debug("Fill Style Type: Clipped Bitmap");
           SWFMatrix sm = boost::apply_visitor(GetMatrix(), style.fill);
+
           CachedBitmap *cb = boost::apply_visitor(GetBitmap(), style.fill);
-          std::auto_ptr<image::GnashImage> im(&cb->image());
+          OpenVGBitmap *binfo = new OpenVGBitmap(cb, _fillpaint);
+#if 0
+          binfo->createPatternBitmap();
+          image::GnashImage *im = boost::apply_visitor(GetImage(), style.fill);
           OpenVGBitmap *binfo = new OpenVGBitmap(im, _fillpaint);
+#endif
           binfo->apply(sm, OpenVGBitmap::WRAP_CLAMP, _fillpaint);
           break;
       } 
       case SWF::FILL_SOLID:
       {
+          log_debug("Fill Style Type: Solid");
           rgba incolor = boost::apply_visitor(GetColor(), style.fill);
           rgba c = cx.transform(incolor);
           VGfloat color[] = {
@@ -802,7 +826,7 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
           vgSetParameterfv (_fillpaint, VG_PAINT_COLOR, 4, color);
       }
       
-    } // switch
+    } // switch fill_type
 }
 
 bool
@@ -888,7 +912,7 @@ void
 Renderer_ovg::draw_outlines(const PathVec& path_vec, const SWFMatrix& mat,
                             const SWFCxForm& cx, const std::vector<LineStyle>& line_styles)
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
          it != end; ++it) {
@@ -918,7 +942,7 @@ Renderer_ovg::draw_outlines(const PathVec& path_vec, const SWFMatrix& mat,
 std::list<PathPtrVec>
 Renderer_ovg::get_contours(const PathPtrVec &paths)
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     std::list<const Path*> path_refs;
     std::list<PathPtrVec> contours;
@@ -984,6 +1008,8 @@ Renderer_ovg::draw_mask(const PathVec& path_vec)
 PathPtrVec
 Renderer_ovg::paths_by_style(const PathVec& path_vec, unsigned int style)
 {
+    GNASH_REPORT_FUNCTION;
+
     PathPtrVec paths;
     for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
          it != end; ++it) {
@@ -1005,6 +1031,7 @@ Renderer_ovg::paths_by_style(const PathVec& path_vec, unsigned int style)
 std::vector<PathVec::const_iterator>
 Renderer_ovg::find_subshapes(const PathVec& path_vec)
 {
+    GNASH_REPORT_FUNCTION;
     std::vector<PathVec::const_iterator> subshapes;
     
     PathVec::const_iterator it = path_vec.begin(),
@@ -1032,6 +1059,7 @@ Renderer_ovg::find_subshapes(const PathVec& path_vec)
 void
 Renderer_ovg::apply_matrix_to_paths(std::vector<Path>& paths, const SWFMatrix& mat)
 {  
+    GNASH_REPORT_FUNCTION;
     std::for_each(paths.begin(), paths.end(),
                   boost::bind(&Path::transform, _1, boost::ref(mat)));
 }  
@@ -1043,6 +1071,7 @@ Renderer_ovg::draw_subshape(const PathVec& path_vec,
                             const std::vector<FillStyle>& fill_styles,
                             const std::vector<LineStyle>& line_styles)
 {
+    GNASH_REPORT_FUNCTION;
     PathVec normalized = normalize_paths(path_vec);
     
     for (size_t i = 0; i < fill_styles.size(); ++i) {
@@ -1092,6 +1121,7 @@ Renderer_ovg::draw_submask(const PathVec& path_vec,
                            const SWFCxForm& /* cx */,
                            const FillStyle& /* f_style */)
 {
+    GNASH_REPORT_FUNCTION;
     
     PathVec normalized = normalize_paths(path_vec);
     
@@ -1139,12 +1169,11 @@ Renderer_ovg::draw_submask(const PathVec& path_vec,
 //  b. Apply fill style.
 //  c. Feed the contours in the tesselator. (Render.)
 //  d. Draw outlines for every path in the subshape with a line style.
-// FIMXE: this doesn't work anymore as the API has changed.
 void
 Renderer_ovg::drawShape(gnash::SWF::ShapeRecord const &shape, 
                         gnash::Transform const& xform)
 {
-    //    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     const PathVec& path_vec = shape.paths();
     
@@ -1216,7 +1245,10 @@ Renderer_ovg::drawGlyph(const SWF::ShapeRecord& rec, const rgba& c,
 }
 
 void
-Renderer_ovg::set_scale(float xscale, float yscale) {
+Renderer_ovg::set_scale(float xscale, float yscale)
+{
+    GNASH_REPORT_FUNCTION;
+
     _xscale = xscale;
     _yscale = yscale;
     stage_matrix.set_identity();
@@ -1227,7 +1259,7 @@ void
 Renderer_ovg::set_invalidated_regions(const InvalidatedRanges& /* ranges */)
 {
     // do nothing obviously. This method is required by the base class though,
-    // something has to be here.
+    // so something has to be here.
 }
   
 DSOEXPORT Renderer *
@@ -1519,6 +1551,48 @@ unsigned int
 Renderer_ovg::getBitsPerPixel()
 {
     return 0;
+}
+
+const char *
+Renderer_ovg::getErrorString(VGErrorCode error)
+{
+    switch (error) {
+    case VG_NO_ERROR:
+        return "No Error";
+        break;
+    case VG_BAD_HANDLE_ERROR:
+        return "Bad Handle";
+        break;
+    case VG_ILLEGAL_ARGUMENT_ERROR:
+        return "Illegal Argument";
+        break;
+    case VG_OUT_OF_MEMORY_ERROR:
+        return "Our Of Memory";
+        break;
+    case VG_PATH_CAPABILITY_ERROR:
+        return "Path Capability";
+        break;
+    case VG_UNSUPPORTED_IMAGE_FORMAT_ERROR:
+        return "Unsupported Image Format";
+        break;
+    case VG_UNSUPPORTED_PATH_FORMAT_ERROR:
+        return "Unsupported Path Format";
+        break;
+    case VG_IMAGE_IN_USE_ERROR: 
+        return "VG Image In Use";
+       break;
+    case VG_NO_CONTEXT_ERROR:
+        return "No COntext";
+        break;
+#ifdef VG_ERROR_CODE_FORCE_SIZE
+    case VG_ERROR_CODE_FORCE_SIZE:
+        return "Code Force Size";
+        break;
+#endif
+    default:
+        return "Unknown error";
+        break;
+    }
 }
 
 } // namespace gnash::renderer::gles1
