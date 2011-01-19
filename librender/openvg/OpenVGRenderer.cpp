@@ -250,11 +250,14 @@ Renderer_ovg::init(float x, float y)
               vgGetString(VG_RENDERER));
     log_debug("VG Extensions are: ", vgGetString(VG_EXTENSIONS));
     printVGParams();
+    
+    // vgSeti(VG_SCISSORING, VG_FALSE);
+    vgClear(0, 0, x*2, y*2);
 }
 
 Renderer_ovg::~Renderer_ovg()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     vgDestroyPaint(_fillpaint);
     vgDestroyPaint(_strokepaint);
@@ -269,7 +272,7 @@ Renderer_ovg::~Renderer_ovg()
 CachedBitmap *
 Renderer_ovg::createCachedBitmap(std::auto_ptr<image::GnashImage> im)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     // OpenVG don't support 24bit RGB, so we need to translate
     // the colorspace
@@ -360,7 +363,7 @@ void
 Renderer_ovg::begin_display(gnash::rgba const&, int width, int height,
                             float x0, float x1, float y0, float y1)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     
     vgSeti (VG_MASKING, VG_FALSE);
     
@@ -392,6 +395,9 @@ Renderer_ovg::begin_display(gnash::rgba const&, int width, int height,
     //
     // If not VG_MATRIX_IMAGE_USER_TO_SURFACE, w0, w1, and w2 are ignored.
     vgLoadMatrix (mat);
+    
+    // vgSeti(VG_SCISSORING, VG_FALSE);
+    vgClear(0, 0, width, height);
 }
 
 void
@@ -621,7 +627,8 @@ Renderer_ovg::disable_mask()
 Path
 Renderer_ovg::reverse_path(const Path& cur_path)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     const Edge& cur_end = cur_path.m_edges.back();    
     
     float prev_cx = cur_end.cp.x;
@@ -774,7 +781,7 @@ void
 Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
                                const SWFCxForm& cx)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     SWF::FillType fill_type = boost::apply_visitor(GetType(), style.fill);
     switch (fill_type) {
@@ -840,7 +847,7 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
       } 
       case SWF::FILL_SOLID:
       {
-          log_debug("Fill Style Type: Solid");
+//          log_debug("Fill Style Type: Solid");
           rgba incolor = boost::apply_visitor(GetColor(), style.fill);
           rgba c = cx.transform(incolor);
           VGfloat color[] = {
@@ -1204,7 +1211,7 @@ void
 Renderer_ovg::drawShape(gnash::SWF::ShapeRecord const &shape, 
                         gnash::Transform const& xform)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     const PathVec& path_vec = shape.paths();
     
@@ -1289,6 +1296,8 @@ Renderer_ovg::set_scale(float xscale, float yscale)
 void
 Renderer_ovg::set_invalidated_regions(const InvalidatedRanges& /* ranges */)
 {
+    GNASH_REPORT_FUNCTION;
+
     // do nothing obviously. This method is required by the base class though,
     // so something has to be here.
 }
