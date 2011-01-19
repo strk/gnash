@@ -27,12 +27,12 @@
 #include "fn_call.h"
 #include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
 #include "VM.h"
 #include "as_value.h"
 #include "namedStrings.h"
 #include "GnashNumeric.h" // isFinite
+#include "as_function.h"
 
 namespace gnash {
 

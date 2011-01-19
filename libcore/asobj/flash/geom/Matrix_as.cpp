@@ -19,21 +19,21 @@
 //
 
 #include "Matrix_as.h"
-#include "as_object.h" // for inheritance
-#include "log.h"
-#include "fn_call.h"
-#include "Global_as.h"
-#include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException
-#include "VM.h"
 
-#include "namedStrings.h"
 #include <cmath>
 #include <boost/numeric/ublas/matrix.hpp> // boost matrix
 #include <boost/numeric/ublas/io.hpp>
 #include <sstream>
 
+#include "as_function.h"
+#include "as_object.h" 
+#include "log.h"
+#include "fn_call.h"
+#include "Global_as.h"
+#include "smart_ptr.h" // for boost intrusive_ptr
+#include "GnashException.h" // for ActionException
+#include "VM.h"
+#include "namedStrings.h"
 // According to senocular, Flash docs get this wrong (b and c swapped).
 //
 // A transformation matrix for affine transformations:

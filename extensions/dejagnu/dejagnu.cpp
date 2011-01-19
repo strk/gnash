@@ -28,7 +28,6 @@
 #include "fn_call.h"
 #include "as_object.h"
 #include "Global_as.h"
-#include "builtin_function.h" // need builtin_function
 
 using namespace std;
 

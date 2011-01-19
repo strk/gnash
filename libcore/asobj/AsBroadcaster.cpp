@@ -23,7 +23,6 @@
 #include "Array_as.h" // for _listeners construction
 #include "log.h"
 #include "fn_call.h"
-#include "builtin_function.h"
 #include "NativeFunction.h" 
 #include "Global_as.h"
 #include "namedStrings.h"

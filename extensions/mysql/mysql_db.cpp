@@ -33,7 +33,6 @@
 #include "as_value.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "builtin_function.h" // need builtin_function
 
 namespace gnash {
 

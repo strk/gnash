@@ -25,7 +25,6 @@
 #include "Global_as.h"
 #include "movie_root.h"
 #include "VM.h" // for registerNative
-#include "builtin_function.h" // need builtin_function
 #include "NativeFunction.h" 
 #include "AsBroadcaster.h" //for initializing self as a broadcaster
 #include "namedStrings.h"

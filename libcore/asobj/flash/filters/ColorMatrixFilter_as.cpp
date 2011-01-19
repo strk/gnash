@@ -19,7 +19,6 @@
 
 #include "as_object.h"
 #include "VM.h"
-#include "builtin_function.h"
 #include "Global_as.h"
 #include "BitmapFilter_as.h"
 #include "Filters.h"

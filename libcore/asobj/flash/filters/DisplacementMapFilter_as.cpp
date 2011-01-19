@@ -21,16 +21,15 @@
 
 #include "DisplacementMapFilter_as.h"
 
-#include "as_object.h" // for inheritance
+#include <sstream>
+
+#include "as_object.h"
+#include "as_function.h" 
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
 #include "BitmapFilter_as.h"
 #include "Filters.h"
-
-#include <sstream>
 
 namespace gnash {
 

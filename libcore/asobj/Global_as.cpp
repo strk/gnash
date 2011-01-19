@@ -31,6 +31,7 @@
 #include <boost/assign/list_of.hpp>
 
 #include "as_object.h"
+#include "builtin_function.h"
 #include "movie_root.h"
 #include "PropFlags.h"
 #include "as_value.h"
@@ -80,7 +81,6 @@
 #include "VM.h"
 #include "Timers.h"
 #include "URL.h" 
-#include "builtin_function.h"
 #include "rc.h"
 #include "ClassHierarchy.h"
 #include "namedStrings.h"

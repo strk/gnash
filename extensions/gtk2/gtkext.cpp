@@ -36,7 +36,6 @@
 #include "fn_call.h"
 #include "as_object.h"
 #include "as_function.h"
-#include "builtin_function.h" // need builtin_function
 #include "debugger.h"
 #include "gtkext.h"
 //#include "Player.h"

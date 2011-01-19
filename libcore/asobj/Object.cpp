@@ -23,7 +23,6 @@
 #include "smart_ptr.h"
 #include "fn_call.h"
 #include "as_object.h" // for inheritance
-#include "builtin_function.h" 
 #include "NativeFunction.h" 
 #include "movie_definition.h" 
 #include "sprite_definition.h"

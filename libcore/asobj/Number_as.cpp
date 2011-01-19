@@ -26,7 +26,6 @@
 #include "Global_as.h"
 #include "as_object.h" // for inheritance
 #include "as_value.h" // for doubleToString
-#include "builtin_function.h"
 #include "NativeFunction.h"
 #include "VM.h"
 

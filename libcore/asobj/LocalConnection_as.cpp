@@ -34,7 +34,6 @@
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "builtin_function.h"
 #include "NativeFunction.h"
 #include "SharedMem.h"
 #include "namedStrings.h"

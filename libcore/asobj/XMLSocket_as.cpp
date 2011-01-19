@@ -34,7 +34,6 @@
 #include "fn_call.h"
 #include "Global_as.h"
 #include "VM.h"
-#include "builtin_function.h" 
 #include "NativeFunction.h" 
 #include "URLAccessManager.h"
 #include "Global_as.h" 
