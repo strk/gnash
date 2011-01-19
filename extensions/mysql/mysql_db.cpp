@@ -33,6 +33,7 @@
 #include "as_value.h"
 #include "fn_call.h"
 #include "Global_as.h"
+#include "as_function.h"
 
 namespace gnash {
 
