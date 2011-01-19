@@ -356,14 +356,10 @@ public:
     typedef std::vector<RenderImage> RenderImages;
 
     // Get first render image
-    virtual RenderImages::iterator getFirstRenderImage()
-            { return _render_images.begin(); }
     virtual RenderImages::const_iterator getFirstRenderImage() const
             { return _render_images.begin(); }
 
     // Get last render image
-    virtual RenderImages::iterator getLastRenderImage()
-            { return _render_images.end(); }
     virtual RenderImages::const_iterator getLastRenderImage() const
             { return _render_images.end(); }
     
