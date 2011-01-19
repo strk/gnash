@@ -107,9 +107,8 @@ attachMicrophoneProperties(as_object& o)
 {
     Global_as& gl = getGlobal(o);
 
-    builtin_function* getset;
 
-    getset = gl.createFunction(microphone_activityLevel);
+    as_function* getset = gl.createFunction(microphone_activityLevel);
     o.init_readonly_property("activityLevel", microphone_activityLevel);
     getset = gl.createFunction(microphone_gain);
     o.init_readonly_property("gain", microphone_gain);

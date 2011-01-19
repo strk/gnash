@@ -127,7 +127,7 @@ attachCameraProperties(as_object& o)
 {
     Global_as& gl = getGlobal(o);
 
-    builtin_function* getset = gl.createFunction(camera_activitylevel);
+    as_function* getset = gl.createFunction(camera_activitylevel);
     o.init_property("activityLevel", *getset, *getset);
     getset = gl.createFunction(camera_bandwidth);
     o.init_property("bandwidth", *getset, *getset);

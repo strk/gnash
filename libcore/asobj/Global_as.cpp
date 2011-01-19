@@ -154,7 +154,7 @@ Global_as::~Global_as()
 {
 }
 
-builtin_function*
+as_function*
 Global_as::createFunction(Global_as::ASFunction function)
 {
     as_object* proto = createObject(*this);

@@ -25,7 +25,6 @@
 #include "fn_call.h"
 #include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "TextFormat_as.h"
 #include "MovieClip.h"
@@ -156,7 +155,7 @@ attachPrototypeProperties(as_object& o)
 
     Global_as& gl = getGlobal(o);
 
-    builtin_function* getset = gl.createFunction(textfield_variable);
+    as_function* getset = gl.createFunction(textfield_variable);
     o.init_property("variable", *getset, *getset, swf6Flags);
     getset = gl.createFunction(textfield_background);
     o.init_property("background", *getset, *getset, swf6Flags);
