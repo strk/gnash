@@ -186,7 +186,7 @@ const EGLint surface_attributes[] = {
     // EGL_SINGLE_BUFFER is by pixmap surfaces. With OpenVG, windows
     // can also be single buffered. eglCopyBuffers() can be used to copy
     // both back and single buffered surfaces to a pixmap.
-    EGL_RENDER_BUFFER, EGL_SINGLE_BUFFER,
+    EGL_RENDER_BUFFER, EGL_BACK_BUFFER,
     EGL_VG_COLORSPACE, EGL_VG_COLORSPACE_sRGB,
     EGL_NONE
 };
