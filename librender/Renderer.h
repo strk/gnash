@@ -564,7 +564,7 @@ public:
     ///
     /// TODO: this should be a pure abstract function, just don't want
     ///     to scan ogl and cairo backend for an implementation *now*
-    ///     but would be needed for automated testing... Quinn, can you help ?
+    ///     but would be needed for automated testing...
     virtual unsigned int getBitsPerPixel() const {
         return 0;
     }
@@ -628,7 +628,6 @@ protected:
     RenderImages _render_images;
 
 private:
-
     /// Bracket the displaying of a frame from a movie.
     //
     /// Set up to render a full frame from a movie and fills the
