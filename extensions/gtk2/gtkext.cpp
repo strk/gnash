@@ -48,11 +48,6 @@ namespace gnash
 
 #define dbglogfile cerr		// FIXME: use log_*()
 
-#ifdef USE_DEBUGGER
-static Debugger& debugger = Debugger::getDefaultInstance();
-#endif
-//Player& player = Player::getDefaultInstance();
-
 // prototypes for the callbacks required by Gnash
 as_value gtkext_window_new(const fn_call& fn);
 as_value gtkext_signal_connect(const fn_call& fn);

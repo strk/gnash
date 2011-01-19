@@ -18,7 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h" // USE_DEBUGGER
+#include "gnashconfig.h"
 #endif
 
 #include "ActionExec.h"

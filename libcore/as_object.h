@@ -523,11 +523,6 @@ public:
     /// @param set_true     A mask of flags to set to true.
     void setPropFlags(const as_value& props, int set_false, int set_true);
 
-#ifdef USE_DEBUGGER
-    /// Get the properties of this object
-    PropertyList &get_properties() { return _members; };
-#endif
-
     /// Copy properties from the given object
     //
     /// NOTE: the __proto__ member will NOT be copied.
