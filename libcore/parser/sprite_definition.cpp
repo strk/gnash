@@ -18,7 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "RunResources.h"
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h" 
 #include "MovieClip.h"
 #include "sprite_definition.h"
 #include "ControlTag.h" // for dtor visibility
@@ -148,12 +148,10 @@ sprite_definition::registerClass(as_function* the_class)
 #endif
 }
 
-#ifdef GNASH_USE_GC
 void
 sprite_definition::markReachableResources() const
 {
 	if ( registeredClass.get() ) registeredClass->setReachable();
 }
-#endif // GNASH_USE_GC
 
 } // namespace gnash

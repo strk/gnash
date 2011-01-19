@@ -33,7 +33,7 @@
 #include <algorithm> 
 
 #include "GnashSleep.h"
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h" 
 #include "movie_definition.h" 
 #include "zlib_adapter.h"
 #include "IOChannel.h"
@@ -183,14 +183,9 @@ SWFMovieDefinition::addDisplayObject(boost::uint16_t id, SWF::DefinitionTag* c)
 SWF::DefinitionTag*
 SWFMovieDefinition::getDefinitionTag(boost::uint16_t id) const
 {
-
     boost::mutex::scoped_lock lock(_dictionaryMutex);
-
     boost::intrusive_ptr<SWF::DefinitionTag> ch = 
         _dictionary.getDisplayObject(id);
-#ifndef GNASH_USE_GC
-    assert(ch == NULL || ch->get_ref_count() > 1);
-#endif 
     return ch.get(); 
 }
 

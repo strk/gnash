@@ -21,12 +21,11 @@
 #ifndef GNASH_SPRITE_DEFINITION_H
 #define GNASH_SPRITE_DEFINITION_H
 
-
 #include <boost/intrusive_ptr.hpp>
 #include <boost/cstdint.hpp>
 #include <string>
 #include <map>
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h" 
 #include "movie_definition.h" // for inheritance
 #include "log.h"
 #include "SWFRect.h"
@@ -311,18 +310,15 @@ private:
 
 protected:
 
-
-#ifdef GNASH_USE_GC
 	/// Mark reachable resources of a sprite_definition
 	//
 	/// Reachable resources are:
 	///	- registered class (registeredClass)
 	///
 	void markReachableResources() const;
-#endif // GNASH_USE_GC
 };
 
 
 } // end of namespace gnash
 
-#endif // GNASH_SPRITE_H
+#endif 
