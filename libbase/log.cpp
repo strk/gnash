@@ -168,12 +168,6 @@ processLog_swferror(const boost::format& fmt)
 }
 
 void
-processLog_amferror(const boost::format& fmt)
-{
-    dbglogfile.log(N_("MALFORMED AMF"), fmt.str());
-}
-
-void
 processLog_aserror(const boost::format& fmt)
 {
     dbglogfile.log(N_("ACTIONSCRIPT ERROR"), fmt.str());
