@@ -34,6 +34,7 @@
 #include "fn_call.h"
 #include "as_object.h"
 #include "Global_as.h"
+#include "function_as.h"
 
 using namespace std;
 

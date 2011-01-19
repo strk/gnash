@@ -37,6 +37,7 @@
 #include "Global_as.h"
 #include "fileio.h"
 #include "Array_as.h"  // used by scandir()
+#include "function_as.h"
 
 using namespace std;
 
