@@ -142,7 +142,7 @@ int terminate_request = false;  // global scope to avoid GUI access
 std::auto_ptr<Gui> createFBGui(unsigned long windowid, float scale,
                                bool do_loop, RunResources& r)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     return std::auto_ptr<Gui>(new FBGui(windowid, scale, do_loop, r));
 }
 
@@ -162,7 +162,7 @@ FBGui::FBGui(unsigned long xid, float scale, bool loop, RunResources& r)
       _ypos(0),  
       _timeout(0)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     
     // initializing to zero helps with debugging and prevents weird bugs
 //    memset(mouse_buf, 0, 256);
@@ -175,7 +175,7 @@ FBGui::FBGui(unsigned long xid, float scale, bool loop, RunResources& r)
 
 FBGui::~FBGui()
 {  
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     
     if (_fd > 0) {
         enable_terminal();
@@ -187,7 +187,7 @@ FBGui::~FBGui()
 bool
 FBGui::init(int argc, char *** argv)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     // the current renderer as set on the command line or gnashrc file
     std::string renderer = _runResources.getRenderBackend();
@@ -273,7 +273,7 @@ FBGui::init(int argc, char *** argv)
 bool
 FBGui::run()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
   
 #ifdef USE_TSLIB
     int ts_loop_count;
@@ -302,9 +302,6 @@ FBGui::run()
         // FIXME: process the input data
         // boost::shared_ptr<input_event_t> popData();
 
-        draw_hack(_glue.get());
-        //_glue->render();
-
         // advance movie  
         Gui::advance_movie(this);
 
@@ -320,7 +317,7 @@ FBGui::run()
 void
 FBGui::renderBuffer()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
 //    if ( _drawbounds.size() == 0 ) return; // nothing to do..
 
@@ -453,7 +450,8 @@ FBGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 char *
 FBGui::find_accessible_tty(int no)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     char* fn;
     
     fn = find_accessible_tty("/dev/vc/%d", no);   if (fn) return fn;
@@ -487,7 +485,8 @@ FBGui::find_accessible_tty(const char* format, int no)
 bool
 FBGui::disable_terminal() 
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     _original_kd = -1;
     
     struct vt_stat vts;
@@ -619,7 +618,8 @@ FBGui::disable_terminal()
 bool
 FBGui::enable_terminal() 
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     log_debug(_("Restoring terminal..."));
 
     char* tty = find_accessible_tty(_own_vt);

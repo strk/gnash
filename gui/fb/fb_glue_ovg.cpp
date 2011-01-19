@@ -42,18 +42,18 @@ namespace gui {
 FBOvgGlue::FBOvgGlue(int fd)
     : _stride(0)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;    
 }
 
 FBOvgGlue::~FBOvgGlue()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 }
 
 bool
 FBOvgGlue::init(int /* argc */, char **/*argv*/[])
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     bool egl = false;
 #if 0
@@ -117,35 +117,27 @@ FBOvgGlue::init(int /* argc */, char **/*argv*/[])
     _width = getWidth();
     _height = getHeight();
 
-#if 1
+    // Some linux distros like ltib have more information available
+    // about the framebuffer
+    int fd = ::open("/sys/class/graphics/fb0/stride", O_RDONLY);
+    char number[10];
+    if (::read(fd, &number, 10)) {
+        _stride = strtol(number, NULL, 0);
+    } else {
+        if (getDepth() == 32) {
+            _stride = _width * 4;
+        } else {
+            _stride = _width * 2;
+        }
+    }
+        
     return _device->attachWindow(_display.getHandle());
-#endif
-    _device->attachWindow(_display.getHandle());
-
-    float red_color[4] = {1.0, 0.0, 0.0, 1.0};
-    float blue_color[4] = {0.0, 0.0, 1.0, 1.0};
-
-    VGint scissor[4] = {100, 100, 25, 25};
-    vgSetfv(VG_CLEAR_COLOR, 4, red_color);
-    vgClear(0, 0, _width, _height);
-
-    vgSetfv(VG_CLEAR_COLOR, 4, blue_color);
-    vgClear(50, 50, 50, 50);
-
-    //vgSetiv(VG_SCISSOR_RECTS, 4, scissor);
-    //vgSeti(VG_SCISSORING, VG_TRUE);
-    vgCopyPixels(100, 100, 50, 50, 50, 50);
-    vgClear(150, 150, 50, 50);
-
-    _device->swapBuffers();
-
-    return true;
 }
 
 Renderer*
 FBOvgGlue::createRenderHandler()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     // Create the renderer
     _renderer.reset(renderer::openvg::create_handler(0));
@@ -157,7 +149,7 @@ FBOvgGlue::createRenderHandler()
     
     if (!_renderer) {
         boost::format fmt = boost::format(
-            _("Could not create OPENVG renderer"));
+            _("Could not create OpenVG renderer"));
         throw GnashException(fmt.str());
     }
 
@@ -186,7 +178,7 @@ FBOvgGlue::prepDrawingArea(void *drawing_area)
 void
 FBOvgGlue::render()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     _device->swapBuffers();
 }

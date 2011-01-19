@@ -77,6 +77,7 @@ public:
     // int height() { return (_device) ? _device->getHeight() : 0; };
     int width() { return _width; };
     int height() { return _height; };
+    int stride() { return _stride; };
 
     // these are used only for debugging purpose to access private data
     size_t getBounds() { return _drawbounds.size(); };
