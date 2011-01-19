@@ -196,7 +196,7 @@ class EGLDevice : public GnashDevice
     // directly.
     // Swap to the default surface
     bool swapBuffers() {
-        GNASH_REPORT_FUNCTION;
+        // GNASH_REPORT_FUNCTION;
         if (!isSingleBuffered()) {
             return eglSwapBuffers(_eglDisplay, _eglSurface);
         }

@@ -131,7 +131,7 @@ EGLDevice::setAttrib(int bpp)
 
 EGLDevice::~EGLDevice()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     if (_eglDisplay != EGL_NO_DISPLAY) {  
         eglMakeCurrent(_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
