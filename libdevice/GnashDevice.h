@@ -54,9 +54,9 @@ struct GnashDevice
     typedef enum {NODEV, EGL, DIRECTFB, X11, RAWFB} dtype_t;
     
     GnashDevice(int argc, char *argv[]);
-    GnashDevice() { GNASH_REPORT_FUNCTION; };
+    GnashDevice() { };
     
-    virtual ~GnashDevice() { GNASH_REPORT_FUNCTION; };
+    virtual ~GnashDevice() { };
 
     /// Get the type of the instatiated device. Since the
     /// renderer has a single value for the supported device,
