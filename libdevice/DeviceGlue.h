@@ -180,6 +180,9 @@ public:
     ///  based devices, this is the size of the display screen.
     size_t getHeight() { return (_device) ? _device->getHeight() : 0; };
 
+    /// Depth of the display
+    size_t getDepth() { return (_device) ? _device->getDepth() : 0; };
+
     /// Make the current buffer the active one.
     bool swapBuffers() {
         return (_device) ? _device->swapBuffers() : false;
