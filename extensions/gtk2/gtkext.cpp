@@ -38,7 +38,7 @@
 #include "as_function.h"
 #include "debugger.h"
 #include "gtkext.h"
-//#include "Player.h"
+#include "as_function.h"
 
 using namespace std;
 

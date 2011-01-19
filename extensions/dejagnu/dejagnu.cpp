@@ -27,6 +27,7 @@
 #include "dejagnu.h"
 #include "fn_call.h"
 #include "as_object.h"
+#include "as_function.h"
 #include "Global_as.h"
 
 using namespace std;
