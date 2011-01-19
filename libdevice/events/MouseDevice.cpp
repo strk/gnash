@@ -35,7 +35,7 @@ static const char *MOUSE_DEVICE = "/dev/input/mice";
 
 MouseDevice::MouseDevice()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 }
 
 std::vector<boost::shared_ptr<InputDevice> >
@@ -109,7 +109,7 @@ MouseDevice::scanForDevices()
 bool
 MouseDevice::init()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     return init(MOUSE_DEVICE, DEFAULT_BUFFER_SIZE);
 }
@@ -117,7 +117,7 @@ MouseDevice::init()
 bool
 MouseDevice::init(const std::string &filespec, size_t size)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     _type = MOUSE;
     _filespec = filespec;
@@ -325,7 +325,7 @@ MouseDevice::check()
 bool
 MouseDevice::command(unsigned char cmd, unsigned char *buf, int count)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     int n;
     

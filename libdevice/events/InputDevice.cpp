@@ -165,10 +165,10 @@ InputDevice::dump()
         "Infrared Receiver"
     };    
 
-    std::cerr << "Device type is: " << debug[_type] << std::endl;
-    std::cerr << "\tfilespec is: " << _filespec
+    std::cerr << "Device type is: " << debug[_type];
+    std::cerr << ", \tfilespec is: " << _filespec
               << ", fd #" << _fd << std::endl;
-    std::cerr << "\tX is: " << _x << ", Y is: " << _y << std::endl;
+//    std::cerr << "\tX is: " << _x << ", Y is: " << _y << std::endl;
 }
 
 // Scan for all the possible input devices. This aggregates all

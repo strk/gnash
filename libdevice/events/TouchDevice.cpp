@@ -49,11 +49,13 @@ static const char *TSLIB_DEVICE_NAME = "/dev/ts";
 
 TouchDevice::TouchDevice()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 }
 
 TouchDevice::~TouchDevice()
 {
+    // GNASH_REPORT_FUNCTION;
+
     if (_tsDev) {
         ts_close(_tsDev);
     }
@@ -68,7 +70,7 @@ TouchDevice::init()
 bool
 TouchDevice::init(const std::string &filespec, size_t /* size */)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     _type = TouchDevice::TOUCHSCREEN;
     _filespec = filespec;

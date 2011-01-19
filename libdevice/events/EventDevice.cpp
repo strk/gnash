@@ -44,7 +44,7 @@ EventDevice::EventDevice()
 bool
 EventDevice::init()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     return init(INPUT_DEVICE, DEFAULT_BUFFER_SIZE);
 }
@@ -52,7 +52,8 @@ EventDevice::init()
 bool
 EventDevice::init(const std::string &filespec, size_t /* size */)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     dbglogfile.setVerbosity();
     
     _filespec = filespec;
@@ -176,7 +177,7 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
           log_unimpl("is an i2C bus type ");
           break;
       case BUS_HOST:
-          log_debug("is Host bus type");
+          // log_debug("is Host bus type");
           // ON the Babbage board, this is the evdev driver version 1.0.0 
           if (strstr(name, "mxc_ts") != 0) {
               log_debug("Babbage Touchscreen found!");
