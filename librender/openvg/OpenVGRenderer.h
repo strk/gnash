@@ -83,14 +83,9 @@ public:
     geometry::Range2d<int> world_to_pixel(const geometry::Range2d<float>& wb);
     gnash::point pixel_to_world(int, int);
 
-    // this is in master
+    // Called by movie_root::display()
     void begin_display(const gnash::rgba&, int, int, float,
-                                        float, float, float);
-    // This is from the patch
-    void begin_display(const rgba& bg_color, int viewport_x0,
-                       int viewport_y0, int viewport_width,
-                       int viewport_height, float x0, float x1,
-                       float y0, float y1);
+                       float, float, float);
     void end_display();
     void drawLine(const std::vector<point>& coords, const rgba& fill,
                   const SWFMatrix& mat);

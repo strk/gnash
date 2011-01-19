@@ -77,6 +77,9 @@ namespace renderer {
 
 namespace openvg {
 
+/// Transforms the current OpenVG SWFMatrix using the given SWFMatrix.
+/// When it goes out of scope, the SWFMatrix will be reset to what it
+/// was before the new SWFMatrix was applied.
 class eglScopeMatrix : public boost::noncopyable
 {
 public:
@@ -186,7 +189,7 @@ Renderer_ovg::Renderer_ovg()
       , _mask(0)
 #endif
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 }
 
 Renderer_ovg::Renderer_ovg(renderer::GnashDevice::dtype_t /* dtype */)
@@ -344,29 +347,52 @@ Renderer_ovg::pixel_to_world(int x, int y)
     return p;
 };
 
+/// Setup the renderer to display by setting the Matrix for scaling,
+/// shearing, and transformations.
+///
+/// @param width - stage width
+/// @param height - stage height
+/// @param x0 - minimum frame size in X dimension
+/// @param x1 - maximum frame size in X dimension
+/// @param y0 - minimum frame size in Y dimension
+/// @param y1 - maximum frame size in Y dimension
 void
-Renderer_ovg::begin_display(const rgba& /* bg_color */, int /* viewport_x0 */,
-                            int /* viewport_y0 */, int /* viewport_width */,
-                            int /* viewport_height */, float x0, float x1,
-                            float y0, float y1)
+Renderer_ovg::begin_display(gnash::rgba const&, int width, int height,
+                            float x0, float x1, float y0, float y1)
 {
     GNASH_REPORT_FUNCTION;
     
     vgSeti (VG_MASKING, VG_FALSE);
     
-    float mat[9];
+    VGfloat mat[9];
     memset(mat, 0, sizeof(mat));
-    mat[0] = (float)_display_width / float(x1 - x0);  // scale sx
+    // sx and sy define scaling in the x and y directions, respectively;
+    // shx and shy define shearing in the x and y directions, respectively;
+    // tx and ty define translation in the x and y directions, respectively.
+    mat[0] = (VGfloat)width / VGfloat(x1 - x0);  // scale sx
     mat[1] = 0; // shx
     mat[3] = 0; // shy
-    mat[4] = -((float)_display_height / float(y1 - y0)); // scale sy
+    mat[4] = -((VGfloat)height / VGfloat(y1 - y0)); // scale sy
     mat[6] = 0;   // shift tx
-    mat[7] = _display_height;   // shift ty
+    mat[7] = height;   // shift ty
     
     vgSeti (VG_MATRIX_MODE, VG_MATRIX_PATH_USER_TO_SURFACE);
+    // The default values after vgLoadIdentity() are:
+    //          [ 1 0 0 ]
+    //       M =| 0 1 0 |
+    //          [ 0 0 1 ]
     vgLoadIdentity();
+
+    // An affine transformation maps a point (x, y) (represented using
+    // homogeneous coordinates as the column vector [x, y, 1]T) into the
+    // point (x*sx + y*shx + tx, x*shy + y*sy + ty) using matrix multiplication:
+    // [ sx shx tx ] [ x ]   [ x∗sx + y∗shx + tx ]
+    // | shy sy ty |.[ y | = | x∗shy + y∗sy + ty |
+    // [   0  0  1 ] [ 1 ]   [            1      ]
+    //
+    // If not VG_MATRIX_IMAGE_USER_TO_SURFACE, w0, w1, and w2 are ignored.
     vgLoadMatrix (mat);
- }
+}
 
 void
 Renderer_ovg::end_display()
@@ -569,7 +595,8 @@ Renderer_ovg::apply_mask()
 void
 Renderer_ovg::add_paths(const PathVec& path_vec)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     SWFCxForm dummy_cx;
     
     FillStyle coloring = FillStyle(SolidFill(rgba(0, 255, 0, 255)));
@@ -581,6 +608,7 @@ void
 Renderer_ovg::disable_mask()
 {
     GNASH_REPORT_FUNCTION;
+    
     _masks.pop_back();
     
     if (_masks.empty()) {
@@ -634,7 +662,7 @@ const Path *
 Renderer_ovg::find_connecting_path(const Path& to_connect,
                                    std::list<const Path*> path_refs)
 {        
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     float target_x = to_connect.m_edges.back().ap.x;
     float target_y = to_connect.m_edges.back().ap.y;
@@ -668,7 +696,7 @@ Renderer_ovg::find_connecting_path(const Path& to_connect,
 PathVec
 Renderer_ovg::normalize_paths(const PathVec &paths)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     PathVec normalized;
     
@@ -717,7 +745,7 @@ void
 Renderer_ovg::analyze_paths(const PathVec &paths, bool& have_shape,
                             bool& have_outline) 
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     have_shape = false;
     have_outline = false;
@@ -912,7 +940,7 @@ void
 Renderer_ovg::draw_outlines(const PathVec& path_vec, const SWFMatrix& mat,
                             const SWFCxForm& cx, const std::vector<LineStyle>& line_styles)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
          it != end; ++it) {
@@ -942,7 +970,7 @@ Renderer_ovg::draw_outlines(const PathVec& path_vec, const SWFMatrix& mat,
 std::list<PathPtrVec>
 Renderer_ovg::get_contours(const PathPtrVec &paths)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     std::list<const Path*> path_refs;
     std::list<PathPtrVec> contours;
@@ -1008,7 +1036,7 @@ Renderer_ovg::draw_mask(const PathVec& path_vec)
 PathPtrVec
 Renderer_ovg::paths_by_style(const PathVec& path_vec, unsigned int style)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     PathPtrVec paths;
     for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
@@ -1031,7 +1059,8 @@ Renderer_ovg::paths_by_style(const PathVec& path_vec, unsigned int style)
 std::vector<PathVec::const_iterator>
 Renderer_ovg::find_subshapes(const PathVec& path_vec)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     std::vector<PathVec::const_iterator> subshapes;
     
     PathVec::const_iterator it = path_vec.begin(),
@@ -1060,6 +1089,7 @@ void
 Renderer_ovg::apply_matrix_to_paths(std::vector<Path>& paths, const SWFMatrix& mat)
 {  
     GNASH_REPORT_FUNCTION;
+
     std::for_each(paths.begin(), paths.end(),
                   boost::bind(&Path::transform, _1, boost::ref(mat)));
 }  
@@ -1071,7 +1101,8 @@ Renderer_ovg::draw_subshape(const PathVec& path_vec,
                             const std::vector<FillStyle>& fill_styles,
                             const std::vector<LineStyle>& line_styles)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     PathVec normalized = normalize_paths(path_vec);
     
     for (size_t i = 0; i < fill_styles.size(); ++i) {
@@ -1265,7 +1296,7 @@ Renderer_ovg::set_invalidated_regions(const InvalidatedRanges& /* ranges */)
 DSOEXPORT Renderer *
 create_handler(const char */* pixelformat */)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     Renderer_ovg *renderer = new Renderer_ovg;
     return renderer;
@@ -1535,12 +1566,6 @@ Renderer_ovg::endInternalRender()
     // GNASH_REPORT_FUNCTION;    
 }
 
-void
-Renderer_ovg::begin_display(gnash::rgba const&, int, int, float, float, float, float)
-{
-    // GNASH_REPORT_FUNCTION;
-
-}
 void
 Renderer_ovg::drawVideoFrame(gnash::image::GnashImage*, gnash::Transform const&, gnash::SWFRect const*, bool)
 {
