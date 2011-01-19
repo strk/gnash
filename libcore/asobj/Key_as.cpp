@@ -18,7 +18,7 @@
 //
 
 
-#include "smart_ptr.h" //GNASH_USE_GC
+#include "smart_ptr.h" 
 #include "Key_as.h"
 #include "log.h"
 #include "fn_call.h"

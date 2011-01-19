@@ -139,7 +139,6 @@ public:
     ///
     void executeAndReset();
 
-#ifdef GNASH_USE_GC
     /// Mark all reachable resources (for GC)
     //
     /// Resources reachable from Timer are:
@@ -149,7 +148,6 @@ public:
     ///    - Target object (_object)
     ///
     void markReachableResources() const;
-#endif // GNASH_USE_GC
 
 private:
 

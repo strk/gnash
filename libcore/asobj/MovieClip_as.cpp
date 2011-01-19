@@ -31,7 +31,7 @@
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "smart_ptr.h" // for boost intrusive_ptr
+#include "smart_ptr.h"
 #include "builtin_function.h" // need builtin_function
 #include "NativeFunction.h" 
 #include "Bitmap.h"
@@ -495,7 +495,7 @@ movieclip_attachMovie(const fn_call& fn)
     newch->set_name(getURI(vm, newname));
     newch->setDynamic();
 
-    boost::intrusive_ptr<as_object> initObj;
+    as_object* initObj(0);
 
     if (fn.nargs > 3 ) {
         initObj = toObject(fn.arg(3), getVM(fn));
@@ -513,7 +513,7 @@ movieclip_attachMovie(const fn_call& fn)
     }
 
     // placeDisplayObject() will set depth on newch
-    movieclip->attachCharacter(*newch, depthValue, initObj.get());
+    movieclip->attachCharacter(*newch, depthValue, initObj);
 
     return as_value(getObject(newch));
 }
@@ -1184,7 +1184,7 @@ movieclip_getTextSnapshot(const fn_call& fn)
     // If not found, construction fails.
     as_value textSnapshot(findObject(fn.env(), "TextSnapshot"));
 
-    boost::intrusive_ptr<as_function> tsCtor = textSnapshot.to_function();
+    as_function* tsCtor = textSnapshot.to_function();
 
     if (!tsCtor) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1198,10 +1198,9 @@ movieclip_getTextSnapshot(const fn_call& fn)
     fn_call::Args args;
     args += getObject(movieclip);
 
-    boost::intrusive_ptr<as_object> ts =
-        constructInstance(*tsCtor, fn.env(), args);
+    as_object* ts = constructInstance(*tsCtor, fn.env(), args);
 
-    return as_value(ts.get());
+    return as_value(ts);
 }
 
 
@@ -1272,9 +1271,8 @@ movieclip_globalToLocal(const fn_call& fn)
         return ret;
     }
 
-    boost::intrusive_ptr<as_object> obj = toObject(fn.arg(0), getVM(fn));
-    if ( ! obj )
-    {
+    as_object* obj = toObject(fn.arg(0), getVM(fn));
+    if (!obj) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("MovieClip.globalToLocal(%s): "
                 "first argument doesn't cast to an object"),
@@ -1334,9 +1332,8 @@ movieclip_localToGlobal(const fn_call& fn)
         return ret;
     }
 
-    boost::intrusive_ptr<as_object> obj = toObject(fn.arg(0), getVM(fn));
-    if ( ! obj )
-    {
+    as_object* obj = toObject(fn.arg(0), getVM(fn));
+    if (!obj) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("MovieClip.localToGlobal(%s): "
                 "first argument doesn't cast to an object"),
@@ -1346,11 +1343,10 @@ movieclip_localToGlobal(const fn_call& fn)
     }
 
     as_value tmp;
-    boost::int32_t    x = 0;
-    boost::int32_t    y = 0;
+    boost::int32_t x = 0;
+    boost::int32_t y = 0;
 
-    if ( ! obj->get_member(NSV::PROP_X, &tmp) )
-    {
+    if (!obj->get_member(NSV::PROP_X, &tmp)) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("MovieClip.localToGlobal(%s): "
                 "object parameter doesn't have an 'x' member"),
@@ -1750,7 +1746,7 @@ movieclip_beginGradientFill(const fn_call& fn)
         return as_value();
     }
 
-    typedef boost::intrusive_ptr<as_object> ObjPtr;
+    typedef as_object* ObjPtr;
     ObjPtr colors = toObject(fn.arg(1), getVM(fn));
     ObjPtr alphas = toObject(fn.arg(2), getVM(fn));
     ObjPtr ratios = toObject(fn.arg(3), getVM(fn));
@@ -2081,7 +2077,7 @@ movieclip_transform(const fn_call& fn)
     // If not found, construction fails.
     as_value transform(findObject(fn.env(), "flash.geom.Transform"));
 
-    boost::intrusive_ptr<as_function> transCtor = transform.to_function();
+    as_function* transCtor = transform.to_function();
 
     if (!transCtor) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -2094,10 +2090,9 @@ movieclip_transform(const fn_call& fn)
     fn_call::Args args;
     args += getObject(ptr);
 
-    boost::intrusive_ptr<as_object> newTrans =
-        constructInstance(*transCtor, fn.env(), args);
+    as_object* newTrans = constructInstance(*transCtor, fn.env(), args);
 
-    return as_value(newTrans.get());
+    return as_value(newTrans);
 }
 
 as_value

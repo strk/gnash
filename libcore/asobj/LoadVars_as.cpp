@@ -24,7 +24,7 @@
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h" 
 #include "builtin_function.h" // need builtin_function
 #include "NativeFunction.h" // need builtin_function
 #include "as_function.h" // for calling event handlers

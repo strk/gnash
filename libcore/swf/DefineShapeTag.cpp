@@ -18,15 +18,12 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
-
 // Quadratic bezier outline shapes are the basis for most SWF rendering.
-
 
 #include "RunResources.h"
 #include "DefineShapeTag.h"
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h" 
 #include "log.h"
 #include "Shape.h"
 #include "SWFStream.h"

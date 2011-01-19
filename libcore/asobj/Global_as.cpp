@@ -606,7 +606,7 @@ global_assetpropflags(const fn_call& fn)
     );
     
     // object
-    boost::intrusive_ptr<as_object> obj = toObject(fn.arg(0), getVM(fn));
+    as_object* obj = toObject(fn.arg(0), getVM(fn));
     if (!obj) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Invalid call to ASSetPropFlags: "

@@ -239,17 +239,15 @@ sound_sample*
 SWFMovieDefinition::get_sound_sample(int id) const
 {
     SoundSampleMap::const_iterator it = m_sound_samples.find(id);
-    if ( it == m_sound_samples.end() ) return 0;
+    if (it == m_sound_samples.end()) return 0;
 
     boost::intrusive_ptr<sound_sample> ch = it->second;
-#ifndef GNASH_USE_GC
-    assert(ch->get_ref_count() > 1);
-#endif 
 
     return ch.get();
 }
 
-void SWFMovieDefinition::add_sound_sample(int id, sound_sample* sam)
+void
+SWFMovieDefinition::add_sound_sample(int id, sound_sample* sam)
 {
     assert(sam);
     IF_VERBOSE_PARSE(

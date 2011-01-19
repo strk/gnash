@@ -26,7 +26,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h" 
 #include "as_value.h"
 #include "log.h"
 #include "builtin_function.h"

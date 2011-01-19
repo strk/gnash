@@ -398,7 +398,6 @@ Sound_as::probeAudio()
     }
 }
 
-#ifdef GNASH_USE_GC
 void
 Sound_as::markReachableResources() const
 {
@@ -406,7 +405,6 @@ Sound_as::markReachableResources() const
         _attachedCharacter->setReachable();
     }
 }
-#endif // GNASH_USE_GC
 
 void
 Sound_as::markSoundCompleted(bool completed)

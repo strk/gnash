@@ -22,7 +22,7 @@
 
 #include <string>
 
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h" 
 #include "as_value.h"
 #include "as_object.h" // for inheritance
 #include "movie_root.h"

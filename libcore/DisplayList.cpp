@@ -18,7 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA    02110-1301    USA
 //
 
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h" 
 #include "DisplayList.h"
 #include "log.h"
 #include "Renderer.h"
@@ -740,10 +740,6 @@ DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
     for (iterator endIt = _charsByDepth.end(); it != endIt; ++it) {
         DisplayObject* dobj = *it;
         
-#ifndef GNASH_USE_GC
-        assert(dobj->get_ref_count() > 0);
-#endif // ndef GNASH_USE_GC
-
         const int depth = dobj->get_depth();        
 
         // Discard useless masks

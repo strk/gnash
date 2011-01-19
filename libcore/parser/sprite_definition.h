@@ -84,9 +84,8 @@ public:
 	void registerClass(as_function* the_class);
 
 	/// Get the Class registered to this definition.
-	as_function* getRegisteredClass() const
-	{
-		return registeredClass.get();
+	as_function* getRegisteredClass() const {
+		return registeredClass;
 	}
 
     virtual void incrementLoadedFrames() {
@@ -297,14 +296,11 @@ private:
 		return true;
 	}
 
-	/// \brief
 	/// The constructor to use for setting up the interface
 	/// for new instances of this sprite
 	//
-	/// If NULL, new instances will have the default MovieClip
-	/// interface.
-	///
-	boost::intrusive_ptr<as_function> registeredClass;
+    /// TODO: this really shouldn't be stored in an immutable definition.
+	as_function* registeredClass;
 
 	int	_loadingSoundStream;
 

@@ -23,10 +23,10 @@
 #define GNASH_DISPLAYOBJECTCONTAINER_H
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h" // GNASH_USE_GC, USE_SWFTREE
+#include "gnashconfig.h" 
 #endif
 
-#include "DisplayList.h" // DisplayList 
+#include "DisplayList.h" 
 #include "InteractiveObject.h"
 
 #ifdef USE_SWFTREE

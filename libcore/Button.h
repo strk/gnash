@@ -23,7 +23,7 @@
 #ifndef GNASH_BUTTON_H
 #define GNASH_BUTTON_H
 
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h"
 #include "InteractiveObject.h" // for inheritance
 
 #include <boost/intrusive_ptr.hpp>
@@ -139,8 +139,7 @@ protected:
 	/// Properly unload contained DisplayObjects
 	virtual bool unloadChildren();
 
-#ifdef GNASH_USE_GC
-	/// Mark reachabe resources (for the GC)
+	/// Mark reachable resources (for the GC)
 	//
 	/// These are:
 	///	- this char's definition (_def)
@@ -148,7 +147,6 @@ protected:
 	///	- the vector of hit DisplayObjects (_hitCharacters)
 	///
 	void markOwnResources() const;
-#endif // GNASH_USE_GC
 
 private:
 

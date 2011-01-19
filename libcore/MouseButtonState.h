@@ -7,8 +7,7 @@
 #ifndef GNASH_MOUSE_BUTTON_STATE_H
 #define GNASH_MOUSE_BUTTON_STATE_H
 
-#include "smart_ptr.h" // GNASH_USE_GC
-#include "InteractiveObject.h" // for use in intrusive_ptr
+#include "InteractiveObject.h" 
 
 // Forward declarations
 namespace gnash {
@@ -48,14 +47,11 @@ public:
 	{
 	}
 
-#ifdef GNASH_USE_GC
 	/// Mark reachable objects (active and topmost entities)
-	void markReachableResources() const
-	{
+	void markReachableResources() const {
 		if (activeEntity) activeEntity->setReachable();
 		if (topmostEntity) topmostEntity->setReachable();
 	}
-#endif // GNASH_USE_GC
 };
 
 }	// end namespace gnash

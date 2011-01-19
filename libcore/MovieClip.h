@@ -23,7 +23,7 @@
 #define GNASH_MOVIECLIP_H
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h" // GNASH_USE_GC, USE_SWFTREE
+#include "gnashconfig.h" 
 #endif
 
 #include <vector>

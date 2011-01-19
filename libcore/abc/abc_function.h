@@ -19,7 +19,7 @@
 #define GNASH_ABC_FUNCTION_H
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h" // GNASH_USE_GC
+#include "gnashconfig.h" 
 #endif
 
 #include "as_function.h"

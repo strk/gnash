@@ -30,7 +30,7 @@
 #include <boost/assign/list_of.hpp>
 #include <boost/bind.hpp>
 
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h" 
 #include "movie_root.h"
 #include "MovieClip.h"
 #include "VM.h" 
@@ -445,9 +445,6 @@ DisplayObject::get_event_handler(const event_id& id) const
     Events::const_iterator it = _event_handlers.find(id);
     if ( it == _event_handlers.end() ) return handler;
 
-#ifndef GNASH_USE_GC
-    assert(get_ref_count() > 0);
-#endif // GNASH_USE_GC
     DisplayObject* this_ptr = const_cast<DisplayObject*>(this);
 
     handler.reset( new EventCode(this_ptr, it->second) );

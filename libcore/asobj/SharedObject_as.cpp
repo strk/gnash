@@ -28,7 +28,7 @@
 #include <boost/shared_ptr.hpp>
 #include <cstdio>
 
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h" 
 #include "movie_root.h"
 #include "GnashSystemNetHeaders.h"
 #include "GnashFileUtilities.h" // stat

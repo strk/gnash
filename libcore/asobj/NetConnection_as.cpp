@@ -671,7 +671,7 @@ netconnection_call(const fn_call& fn)
 #endif
 
     // TODO: arg(1) is the response object. let it know when data comes back
-    boost::intrusive_ptr<as_object> asCallback;
+    as_object* asCallback(0);
     if (fn.nargs > 1) {
 
         if (fn.arg(1).is_object()) {
@@ -691,7 +691,7 @@ netconnection_call(const fn_call& fn)
         args = std::vector<as_value>(fn.getArgs().begin() + 2,
                 fn.getArgs().end());
     }
-    ptr->call(asCallback.get(), methodName, args);
+    ptr->call(asCallback, methodName, args);
 
     return as_value();
 }

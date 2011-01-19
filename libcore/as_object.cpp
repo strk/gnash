@@ -17,11 +17,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+#include "as_object.h"
+
+#include <set>
+#include <string>
+#include <boost/algorithm/string/case_conv.hpp>
+#include <utility> // for std::pair
+
 #include "RunResources.h"
 #include "log.h"
-
-#include "smart_ptr.h" // GNASH_USE_GC
-#include "as_object.h"
+#include "smart_ptr.h" 
 #include "as_function.h"
 #include "as_environment.h" 
 #include "movie_root.h" 
@@ -35,13 +40,7 @@
 #include "Global_as.h" 
 #include "GnashAlgorithm.h"
 #include "DisplayObject.h"
-
-#include <set>
-#include <string>
-#include <boost/algorithm/string/case_conv.hpp>
-#include <utility> // for std::pair
 #include "namedStrings.h"
-
 
 namespace gnash {
 template<typename T>
@@ -833,11 +832,11 @@ as_object::instanceOf(as_object* ctor)
 bool
 as_object::prototypeOf(as_object& instance)
 {
-    boost::intrusive_ptr<as_object> obj = &instance;
+    as_object* obj = &instance;
 
     std::set<as_object*> visited;
 
-    while (obj && visited.insert(obj.get()).second ) {
+    while (obj && visited.insert(obj).second ) {
         if (obj->get_prototype() == this) return true;
         obj = obj->get_prototype(); 
 	}
@@ -1010,7 +1009,6 @@ as_object::unwatch(const ObjectURI& uri)
     return true;
 }
 
-#ifdef GNASH_USE_GC
 void
 as_object::markReachableResources() const
 {
@@ -1031,7 +1029,6 @@ as_object::markReachableResources() const
     if (_relay) _relay->setReachable();
     if (_displayObject) _displayObject->setReachable();
 }
-#endif // GNASH_USE_GC
 
 void
 Trigger::setReachable() const

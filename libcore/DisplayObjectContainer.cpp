@@ -19,14 +19,14 @@
 
 
 #ifdef HAVE_CONFIG_H
-# include "gnashconfig.h" // GNASH_USE_GC, USE_SWFTREE
+# include "gnashconfig.h" 
 #endif
 
 #include "DisplayObjectContainer.h"
 
 #include <utility>
 
-#include "DisplayList.h" // DisplayList 
+#include "DisplayList.h" 
 #include "InteractiveObject.h"
 #include "log.h"
 #include "dsodefs.h" // for DSOEXPORT
