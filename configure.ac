@@ -853,6 +853,10 @@ AC_ARG_ENABLE(input,
   [if test -n ${enableval}; then
     enableval=`echo ${enableval} | tr '\054' ' ' `
   fi
+  build_ps2mouse=no
+  build_ps2keyboard=no
+  build_input_events=no
+  build_tslib=no
   while test -n "${enableval}" ; do
     val=`echo ${enableval} | cut -d ' ' -f 1`
     case "${val}" in
