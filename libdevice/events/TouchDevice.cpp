@@ -98,6 +98,8 @@ TouchDevice::init(const std::string &filespec, size_t /* size */)
         return false;
     }
     
+    _fd = ts_fd(_tsDev);
+    
     log_debug("Using TSLIB on %s", devname);
     return true;
 }
@@ -283,7 +285,16 @@ TouchDevice::scanForDevices()
 
     // Debug strings to make output more readable
     const char *debug[] = {
-        "TSlib"
+        "UNKNOWN",
+        "KEYBOARD",
+        "MOUSE",
+        "TABLET",
+        "TOUCHSCREEN",
+        "TOUCHMOUSE",
+        "POWERBUTTON",
+        "SLEEPBUTTON",
+        "SERIALUSB",
+        "INFRARED"
     };
     
     // Look for these files for mouse input
@@ -301,6 +312,7 @@ TouchDevice::scanForDevices()
     int i = 0;
     while (touch[i].type != InputDevice::UNKNOWN) {
         int fd = 0;
+        // log_debug("Checking for device %s...", touch[i].filespec);
         if (stat(touch[i].filespec, &st) == 0) {
             // Then see if we can open it
             if ((fd = open(touch[i].filespec, O_RDWR)) < 0) {
@@ -309,18 +321,17 @@ TouchDevice::scanForDevices()
                 i++;
                 continue;
             } // open()
-            log_debug("Found a %s device for mouse input using %s",
+            close(fd);
+            log_debug("Found a %s device for touchscreen input using %s",
                       debug[touch[i].type], touch[i].filespec);
             boost::shared_ptr<InputDevice> dev;
             dev = boost::shared_ptr<InputDevice>(new TouchDevice());
             if (dev->init(touch[i].filespec, DEFAULT_BUFFER_SIZE)) {
                 devices.push_back(dev);
+                break;
             }
-            dev->dump();
-            
-            devices.push_back(dev);
+//            dev->dump();
         }     // stat()
-        close(fd);
         i++;
     }         // while()
     

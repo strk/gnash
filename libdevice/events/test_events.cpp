@@ -102,7 +102,7 @@ main(int argc, char *argv[])
             if (id->check()) {
                 // FIXME: process the input data
                 boost::shared_ptr<InputDevice::input_data_t> ie = id->popData();
-#if 1
+#if 0
                 if (ie) {
                     cerr << "Got data: " << ie->pressed;
                     cerr << ", " << ie->key << ", " << ie->modifier;
@@ -113,10 +113,10 @@ main(int argc, char *argv[])
                     cerr << "X = " << coords[0] << endl;
                     cerr << "Y = " << coords[1] << endl;
                 }
+#endif
             } else {
                 std::cerr << ".";
             }
-#endif
         }
         
         // wait the "heartbeat" interval. The default mouse update rate is

@@ -41,7 +41,7 @@ endif
 endif
 
 if ENABLE_DEVELOPER_TESTS
-check_PROGRAMS += test_events 
+check_PROGRAMS += test_events evtest
 test_events_SOURCES = events/test_events.cpp
 test_events_CPPFLAGS = $(AM_CPPFLAGS)
 test_events_LDADD = \
@@ -49,6 +49,14 @@ test_events_LDADD = \
 	$(EXTRA_EVENTS_LIBS) \
 	$(TS_LIBS) \
 	$(CURL_LIBS) \
+	$(EVENTS_LIBS) \
+	$(GNASH_LIBS)
+
+evtest_SOURCES = events/evtest.c
+evtest_CPPFLAGS = $(AM_CPPFLAGS)
+evtest_LDADD = \
+	$(EXTRA_EVENTS_LIBS) \
+	$(TS_LIBS) \
 	$(EVENTS_LIBS) \
 	$(GNASH_LIBS)
 endif

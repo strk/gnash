@@ -286,36 +286,36 @@ MouseDevice::check()
         log_debug(_("x/y %d/%d button %d"), xmove, ymove, btn);
         
         // movement    
-        _x += xmove;
-        _y += ymove;
+        _input_data.x += xmove;
+        _input_data.y += ymove;
         
-        if (_x < 0) {
-            _x = 0;
+        if (_input_data.x < 0) {
+            _input_data.x = 0;
         }
-        if (_y < 0) {
-            _y = 0;
+        if (_input_data.y < 0) {
+            _input_data.y = 0;
         }
         // FIXME: this is a bit of a temporary hack. The last two
         // arguments are a range, so hardcoding them is safe for
         // now. In the future more conversion may be done, making this
         // then be incorrect.
         boost::shared_array<int> coords =
-            MouseDevice::convertCoordinates(_x, _y, 1024, 768);
+            MouseDevice::convertCoordinates(_input_data.x, _input_data.y, 1024, 768);
 //          MouseDevice::convertCoordinates(_x, _y,
 //                                 _gui->getStage()->getStageWidth(),
 //                                 _gui->getStage()->getStageHeight());
-        _x = coords[0];
-        _y = coords[1];
+        _input_data.x = coords[0];
+        _input_data.y = coords[1];
     } // end of InputDevice::MOUSE
     
-    log_debug(_("read mouse @ %d / %d, btn %d"), _x, _y, _button);
-    addData(false, gnash::key::INVALID, 0, _x, _y);
+    log_debug(_("read mouse @ %d / %d, btn %d"), _input_data.x, _input_data.y, _input_data.button);
+    addData(false, gnash::key::INVALID, 0, _input_data.x, _input_data.y);
     
     // button
-    if (btn != _button) {
-        _button = btn;
+    if (btn != _input_data.button) {
+        _input_data.button = btn;
         log_debug("clicked: %d", btn); 
-        addData(true, gnash::key::INVALID, 0, _x, _y);
+        addData(true, gnash::key::INVALID, 0, _input_data.x, _input_data.y);
         log_debug(_("mouse click! %d"), btn);
     }
     
@@ -363,7 +363,7 @@ MouseDevice::command(unsigned char cmd, unsigned char *buf, int count)
 boost::shared_array<int>
 MouseDevice::convertCoordinates(int x, int y, int width, int height)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     
     boost::shared_array<int> coords(new int[2]);
 
