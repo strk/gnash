@@ -28,13 +28,10 @@ namespace gnash {
 
 InputDevice::InputDevice()
     : _type(InputDevice::UNKNOWN),
-      _fd(-1),
-      _x(0),
-      _y(0),
-      _button(0),
-      _position(0)
+      _fd(-1)
 {
     // GNASH_REPORT_FUNCTION;
+    memset(&_input_data, 0, sizeof(InputDevice::input_data_t));
 }
 
 InputDevice::~InputDevice()
@@ -92,7 +89,7 @@ InputDevice::popData()
 void
 InputDevice::addData(bool pressed, key::code key, int modifier, int x, int y)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     
     boost::shared_ptr<input_data_t> _newdata(new input_data_t);
     _newdata->pressed = pressed;
@@ -132,7 +129,7 @@ InputDevice::readData(size_t size)
 //            log_debug ("The pipe for fd #%d timed out waiting to read", fd);
         return inbuf;
     } else if (ret == 1) {
-        log_debug ("The device for fd #%d is ready", _fd);
+        // log_debug ("The device for fd #%d is ready", _fd);
     } else {
         log_error("The device has this error: %s", strerror(errno));
         return inbuf;
@@ -141,7 +138,7 @@ InputDevice::readData(size_t size)
     inbuf.reset(new boost::uint8_t[size]);
     ret = ::read(_fd, inbuf.get(), size);
     if (ret > 0) {
-        log_debug("Read %d bytes, %s", ret, hexify(inbuf.get(), ret, false));
+        // log_debug("Read %d bytes, %s", ret, hexify(inbuf.get(), ret, false));
     } else {
         inbuf.reset();
     }
@@ -157,6 +154,7 @@ InputDevice::dump()
         "UNKNOWN",
         "Keyboard",
         "Mouse",
+        "Tablet",
         "Touchscreen",
         "Touchscreen Mouse",
         "Power Button",
@@ -202,6 +200,22 @@ InputDevice::scanForDevices()
 #endif
 
     return devices;
+}
+
+// The Babbage touchscreen gives is absolute coordinates, but they don't
+// match the actual screen resolution. So we convert the coordinates
+// to a new absolute location.
+// For example, if the LCD is 480 x 800, the tablet thinks this is 1010 x 960.
+// This should really use a calibration function, but as we know the numbers...
+boost::shared_array<int>
+InputDevice::convertAbsCoords(int x, int y, int width, int height)
+{
+    boost::shared_array<int> coords(new int[2]);
+
+    coords[0] = (x/width) * x;
+    coords[1] = (y/height) * y;
+    
+    return coords;
 }
 
 // end of gnash namespace
