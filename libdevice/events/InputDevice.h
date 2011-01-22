@@ -36,7 +36,7 @@
 namespace gnash {
 
 // Define if you want to support multiple input devices of the same type.
-// The default is to support the devices we prefer for moluse, keyboard,
+// The default is to support the devices we prefer for mouse, keyboard,
 // and touchscreen.
 // #define MULTIPLE_DEVICES 1
 
@@ -55,11 +55,26 @@ public:
         int modifier;
         int x;
         int y;
+        int button;
+        int position;
+        int pressure;
+        int volumne;
+        int distance;
+        int rx;
+        int ry;
+        int rz;
+        int throttle;
+        int rudder;
+        int gas;
+        int brake;
+        int tiltX;
+        int tiltY;        
     } input_data_t;
     typedef enum {
         UNKNOWN,
         KEYBOARD,
         MOUSE,
+        TABLET,
         TOUCHSCREEN,
         TOUCHMOUSE,
         POWERBUTTON,
@@ -86,9 +101,11 @@ public:
 
     // Read data into the Device input buffer.
     boost::shared_array<boost::uint8_t> readData(size_t size);
-
     boost::shared_ptr<input_data_t> popData();
-    
+
+    static boost::shared_array<int> convertAbsCoords(int x, int y,
+                                                     int width, int height);
+
     void dump();
 protected:
     void addData(bool pressed, key::code key, int modifier, int x, int y);
@@ -96,11 +113,8 @@ protected:
     devicetype_e        _type;
     std::string         _filespec;
     int                 _fd;
-    int                 _x;
-    int                 _y;
-    // Touchscreens don't have buttons
-    int                 _button;
-    size_t              _position;
+    input_data_t        _input_data;
+    // These hold the data queue
     boost::scoped_array<boost::uint8_t> _buffer;
     std::queue<boost::shared_ptr<input_data_t> > _data;
 };
