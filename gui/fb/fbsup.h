@@ -197,7 +197,7 @@ private:
     boost::shared_ptr<FBGlue> _glue;
 
     /// This is the array of functioning input devices.
-    std::vector<boost::shared_ptr<InputDevice> > _inputs;    
+    std::vector<boost::shared_ptr<InputDevice> > _inputs;
 
     boost::shared_ptr<Renderer> _renderer;
 };

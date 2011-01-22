@@ -221,9 +221,38 @@ FBGui::init(int argc, char *** argv)
     // Initialize all the input devices
 
     // Look for Mice that use the PS/2 mouse protocol
-    _inputs = InputDevice::scanForDevices();
-    if (_inputs.empty()) {
+    std::vector<boost::shared_ptr<InputDevice> > possibles
+        = InputDevice::scanForDevices();
+    if (possibles.empty()) {
         log_error("Found no accessible input event devices");
+    } else {
+        log_debug("Found %d input event devices.", possibles.size());
+    }
+    
+    std::vector<boost::shared_ptr<InputDevice> >::iterator it;
+    for (it=possibles.begin(); it!=possibles.end(); ++it) {
+        (*it)->dump();
+        if ((*it)->getType() == InputDevice::MOUSE) {
+            log_debug("WARNING: Mouse support disabled as it conflicts with the input event support.");
+            // For now we only want keyboards input events, as the mouse
+            // interface default of /dev/input/mice supports hotpluging devices,
+            // unlike the regular events.
+            // _inputs.push_back(*it);
+        }
+        if ((*it)->getType() == InputDevice::KEYBOARD) {
+            _inputs.push_back(*it);
+        }
+        if ((*it)->getType() == InputDevice::TOUCHSCREEN) {
+            log_debug("WARNING: Touchscreen support disabled as it conflicts with the input event support.");
+//            _inputs.push_back(*it);
+        }
+        if ((*it)->getType() == InputDevice::TABLET) {
+            log_debug("Enabling Babbage Touchscreen support");
+            _inputs.push_back(*it);
+        }
+        if ((*it)->getType() == InputDevice::POWERBUTTON) {
+            _inputs.push_back(*it);
+        }
     }
     
 #if 0
@@ -259,7 +288,7 @@ FBGui::init(int argc, char *** argv)
     log_debug("X:%d, Y:%d", _xpos, _ypos);
 #endif
 
-    _validbounds.setTo(0, 0, _width - 1, _height - 1);
+_validbounds.setTo(0, 0, _width - 1, _height - 1);
 
     _renderer.reset(renderer::openvg::create_handler(0));
   
@@ -283,7 +312,7 @@ FBGui::run()
     
     // let the GUI recompute the x/y scale factors to best fit the whole screen
     resize_view(_validbounds.width(), _validbounds.height());
-
+    
     // This loops endlessly at the frame rate
     while (!terminate_request) {  
         // wait the "heartbeat" inteval
@@ -672,26 +701,34 @@ FBGui::checkForData()
         boost::shared_ptr<InputDevice::input_data_t> ie = (*it)->popData();
         if (ie) {
 #if 0
-            std::cerr << "Got data: " << ie->pressed;
+            std::cerr << "Got data: " << ((ie->pressed) ? "true" : "false");
             std::cerr << ", " << ie->key << ", " << ie->modifier;
             std::cerr << ", " << ie->x << ", " << ie->y << std::endl;
             // cerr << "X = " << coords[0] << endl;
             // cerr << "Y = " << coords[1] << endl;
 #endif
-            // Range check and convert the position
+#if 0
+            // Range check and convert the position from relative to
+            // absolute
             boost::shared_array<int> coords =
                 MouseDevice::convertCoordinates(ie->x, ie->y,
                                                 getStage()->getStageWidth(),
                                                 getStage()->getStageHeight());
-            // See if a mouse button was clicked
-            if (ie->pressed) {
-                notifyMouseClick(true);
-            }
-            
             // The mouse was moved
             if (coords) {
                 notifyMouseMove(coords[0], coords[1]);
             }
+#endif
+            // See if a mouse button was clicked
+            //if (ie->pressed) {
+            notifyMouseClick(true);
+            double x = 0.655 * ie->x;
+            double y = 0.46875 * ie->y;
+            log_debug("Mouse clicked at: %g:%g", x, y);
+            notifyMouseMove(ie->x, ie->y);
+//                notifyMouseMove(int(x), int(y));
+//        }
+            
         }
     }
 }
