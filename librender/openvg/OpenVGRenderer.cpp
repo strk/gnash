@@ -66,6 +66,8 @@
 /// \brief The OpenVG renderer and related code.
 ///
 
+static const int TwipsPerInch = 1440;
+
 namespace gnash {
 
 static int tex_size;
@@ -203,6 +205,7 @@ Renderer_ovg::Renderer_ovg(renderer::GnashDevice::dtype_t /* dtype */)
     GNASH_REPORT_FUNCTION;
 
     set_scale(1.0f, 1.0f);
+    
     _fillpaint = vgCreatePaint();
     
     _strokepaint = vgCreatePaint();
@@ -355,29 +358,41 @@ Renderer_ovg::pixel_to_world(int x, int y)
 ///
 /// @param width - stage width
 /// @param height - stage height
-/// @param x0 - minimum frame size in X dimension
-/// @param x1 - maximum frame size in X dimension
-/// @param y0 - minimum frame size in Y dimension
-/// @param y1 - maximum frame size in Y dimension
+/// @param x0 - minimum frame size in X dimension in twips
+/// @param x1 - maximum frame size in X dimension in twips
+/// @param y0 - minimum frame size in Y dimension in twips
+/// @param y1 - maximum frame size in Y dimension in twips
 void
 Renderer_ovg::begin_display(gnash::rgba const&, int width, int height,
                             float x0, float x1, float y0, float y1)
 {
     // GNASH_REPORT_FUNCTION;
-    
+
+    // std::cerr << "FIXME2: " << width / VGfloat(x1 - 1600) << " : "
+    //           << -((VGfloat)height / VGfloat(y1 - 0)) << std::endl;
+
     vgSeti (VG_MASKING, VG_FALSE);
+
+    // std::cerr << "FIXME1: " << width << ", " << height << ", " << x0 << ", " << x1
+    //           << ", " << y0 << ", " << y1 << std::endl;
     
     VGfloat mat[9];
     memset(mat, 0, sizeof(mat));
     // sx and sy define scaling in the x and y directions, respectively;
     // shx and shy define shearing in the x and y directions, respectively;
     // tx and ty define translation in the x and y directions, respectively.
-    mat[0] = (VGfloat)width / VGfloat(x1 - x0);  // scale sx
+    
+    // Flash internally calculates anything that uses pixels with
+    // twips (or 1/20 of a pixel). Sprites, movie clips and any other
+    // object on the stage are positioned with twips. As a result, the
+    // coordinates of (for example) sprites are always multiples of
+    // 0.05 (i.e. 1/20).
+    mat[0] = (VGfloat)width / VGfloat(x1 - x0);  // scale sx = 0.05
     mat[1] = 0; // shx
     mat[3] = 0; // shy
-    mat[4] = -((VGfloat)height / VGfloat(y1 - y0)); // scale sy
-    mat[6] = 0;   // shift tx
-    mat[7] = height;   // shift ty
+    mat[4] = -((VGfloat)height / VGfloat(y1 - y0)); // scale sy = -0.05
+    mat[6] = 0;   // shift tx in pixels
+    mat[7] = height;   // shift ty in pixels
     
     vgSeti (VG_MATRIX_MODE, VG_MATRIX_PATH_USER_TO_SURFACE);
     // The default values after vgLoadIdentity() are:
@@ -397,7 +412,7 @@ Renderer_ovg::begin_display(gnash::rgba const&, int width, int height,
     vgLoadMatrix (mat);
     
     // vgSeti(VG_SCISSORING, VG_FALSE);
-    vgClear(0, 0, width, height);
+    vgClear(0, 0, _display_width, _display_height);
 }
 
 void
@@ -684,9 +699,7 @@ Renderer_ovg::find_connecting_path(const Path& to_connect,
         const Path* cur_path = *it;
         
         if (cur_path == &to_connect) {
-            
             continue;
-            
         }
         
         if (cur_path->ap.x == target_x && cur_path->ap.y == target_y) {
@@ -805,8 +818,8 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
           case SWF::FILL_FOCAL_GRADIENT:
           {
               log_debug("Fill Style Type: Radial Gradient");
-              float x0, y0, x1, y1, radial;
-              binfo->createRadialBitmap(x0, y0, x1, y1, radial, _fillpaint);
+              float radial = 0.5;
+              binfo->createRadialBitmap(mat.sx, mat.sy, mat.tx, mat.ty, radial, _fillpaint);
               break;
           }
           default:
@@ -1259,7 +1272,7 @@ void
 Renderer_ovg::drawGlyph(const SWF::ShapeRecord& rec, const rgba& c,
                         const SWFMatrix& mat)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     if (_drawing_mask) abort();
     
