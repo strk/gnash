@@ -55,7 +55,7 @@ AC_DEFUN([GNASH_PATH_OPENVG],
   fi
 
   if test x"${ac_cv_path_openvg_includes}" = x; then
-    AC_CHECK_HEADERS([VG/open.h], [ac_cv_path_openvg_includes=""])
+    AC_CHECK_HEADERS([VG/openvg.h], [ac_cv_path_openvg_includes=""])
   fi
 
   if test x"${mesavg}" = xyes; then
