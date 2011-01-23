@@ -72,6 +72,7 @@ private:
     VGImageFormat   _pixel_format;
     mutable VGImage _vgimage;
     VGPaint         _vgpaint;
+    int             _stride;
     int             _tex_size;
 };
 

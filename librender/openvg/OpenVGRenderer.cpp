@@ -604,7 +604,7 @@ Renderer_ovg::apply_mask()
     vgLoadMatrix(mat);
     
 #ifdef OPENVG_VERSION_1_1    
-    vgMask(_mask, VG_FILL_MASK, 0, 0, _display_width, _display_height); // FIXME
+    vgMask(_mask, VG_FILL_MASK, 0, 0, _display_width, _display_height); 
 #endif
 // Call add_paths for each mask.
     std::for_each(_masks.begin(), _masks.end(),

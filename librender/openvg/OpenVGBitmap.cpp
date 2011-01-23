@@ -33,14 +33,27 @@ static const int NUM_STOPS = 10;
 
 OpenVGBitmap::OpenVGBitmap(VGPaint paint)
     : _vgimage(VG_INVALID_HANDLE),
-      _pixel_format(VG_sRGB_565), // was VG_sARGB_8888, VG_sRGB_565
+#ifdef BUILD_X11_DEVICE
+      _pixel_format(VG_sARGB_8888),
+      _stride(4),
+#else
+      _pixel_format(VG_sRGB_565),
+      _stride(2),
+#endif
       _vgpaint(paint)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 }
 
 OpenVGBitmap::OpenVGBitmap(CachedBitmap *bitmap, VGPaint vgpaint)
-    :  _pixel_format(VG_sRGBA_8888), // was VG_sARGB_8888, VG_sRGB_565
+    : 
+#ifdef BUILD_X11_DEVICE
+      _pixel_format(VG_sARGB_8888),
+      _stride(4),
+#else
+      _pixel_format(VG_sRGB_565),
+      _stride(2),
+#endif
        _vgpaint(vgpaint)
 {
     GNASH_REPORT_FUNCTION;
@@ -52,26 +65,15 @@ OpenVGBitmap::OpenVGBitmap(CachedBitmap *bitmap, VGPaint vgpaint)
     //    _image.reset(&im);
 
     // Create a VG image
-#ifdef BUILD_X11_DEVICE
-    _vgimage = vgCreateImage(VG_sRGBA_8888, im.width(), im.height(),
-                             VG_IMAGE_QUALITY_FASTER);
-    // Copy the image data into the VG image container
-    vgImageSubData(_vgimage, im.begin(), 0, VG_sRGBA_8888,
-                   0, 0, im.width(), im.height());
-#else
-    _vgimage = vgCreateImage(VG_sRGB_565, im.width(), im.height(),
+    _vgimage = vgCreateImage(_pixel_format, im.width(), im.height(),
                              VG_IMAGE_QUALITY_FASTER);    
     // Copy the image data into the VG image container
-    vgImageSubData(_vgimage, im.begin(), im.width() * 2, VG_sRGB_565,
+    vgImageSubData(_vgimage, im.begin(), im.width() * _stride, _pixel_format,
                    0, 0, im.width(), im.height());
-#endif
+    
     if (_vgimage == VG_INVALID_HANDLE) {
         log_error("Failed to create VG image! %s", Renderer_ovg::getErrorString(vgGetError()));
     }
-
-    // vgPaintPattern(_vgpaint, _vgimage);
-    // vgDrawImage(_vgimage);
-    // vgFlush();
 }
 
 // 
@@ -81,9 +83,14 @@ OpenVGBitmap::OpenVGBitmap(CachedBitmap *bitmap, VGPaint vgpaint)
 // VG_A_8
 // VG_A_4
 OpenVGBitmap::OpenVGBitmap(image::GnashImage *image, VGPaint vgpaint)
-    :
-    _image(image),
-    _pixel_format(VG_sRGB_565), // was VG_sARGB_8888, VG_sRGB_565
+    : _image(image),
+#ifdef BUILD_X11_DEVICE
+    _pixel_format(VG_sARGB_8888),
+    _stride(4),
+#else
+    _pixel_format(VG_sRGB_565),
+    _stride(2),
+#endif
     _vgpaint(vgpaint)
 {
     GNASH_REPORT_FUNCTION;
@@ -95,9 +102,9 @@ OpenVGBitmap::OpenVGBitmap(image::GnashImage *image, VGPaint vgpaint)
     _vgimage = vgCreateImage(_pixel_format, width, height,
                              VG_IMAGE_QUALITY_FASTER);    
     
-    vgImageSubData(_vgimage, image->begin(), width * 4, _pixel_format,
+    vgImageSubData(_vgimage, image->begin(), width * _stride, _pixel_format,
                    0, 0, width, height);
-    
+
     vgSetParameteri(vgpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
     vgSetParameteri(vgpaint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_REPEAT);
     vgPaintPattern(vgpaint, _vgimage);
@@ -114,7 +121,7 @@ OpenVGBitmap::OpenVGBitmap(image::GnashImage *image, VGPaint vgpaint)
 
 OpenVGBitmap::~OpenVGBitmap()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     
 #if 0
     _tex_size -= _image->width() * _image->height() * 4;
@@ -172,12 +179,16 @@ OpenVGBitmap::apply(const gnash::SWFMatrix& bitmap_matrix,
     vgSeti (VG_MATRIX_MODE, VG_MATRIX_STROKE_PAINT_TO_USER);
     vgLoadMatrix (vmat);
     vgSeti (VG_MATRIX_MODE, VG_MATRIX_PATH_USER_TO_SURFACE);
-    
+
+#if 0
     if (wrap_mode == WRAP_CLAMP) {  
         vgSetParameteri (paint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_PAD);
     } else {
         vgSetParameteri (paint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_REPEAT);
     }
+#else
+    vgSetParameteri (paint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_FILL);
+#endif
 }
 
 /// OpenVG supports creating linear and gradient fills in hardware, so
