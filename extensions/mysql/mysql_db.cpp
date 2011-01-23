@@ -24,8 +24,8 @@
 #include "mysql_db.h"
 
 #include "namedStrings.h"
-#include <mysql/errmsg.h>
-#include <mysql/mysql.h>
+#include <errmsg.h>
+#include <mysql.h>
 #include <vector>
 
 #include "log.h"
