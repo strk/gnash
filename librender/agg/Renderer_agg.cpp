@@ -2180,6 +2180,6 @@ DSOEXPORT const char *agg_detect_pixel_format(unsigned int rofs,
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: NIL
+// indent-tabs-mode: nil
 // End:
 /* vim: set cindent tabstop=8 softtabstop=4 shiftwidth=4: */
