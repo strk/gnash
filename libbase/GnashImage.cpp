@@ -169,7 +169,7 @@ Output::writeImageData(FileType type,
     switch (type) {
 #ifdef USE_PNG
         case GNASH_FILETYPE_PNG:
-            outChannel = PngOutput::create(out, width, height, quality);
+            outChannel = createPngOutput(out, width, height, quality);
             break;
 #endif
         case GNASH_FILETYPE_JPEG:
@@ -203,7 +203,7 @@ Input::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
     switch (type) {
 #ifdef USE_PNG
         case GNASH_FILETYPE_PNG:
-            inChannel = PngInput::create(in);
+            inChannel = createPngInput(in);
             break;
 #endif
 #ifdef USE_GIF                

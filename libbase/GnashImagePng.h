@@ -22,125 +22,27 @@
 #define GNASH_IMAGE_PNG_H
 
 #include <memory>
-
-#include "dsodefs.h"
-#include "GnashImage.h"
-#include <boost/scoped_array.hpp>
-
-
-extern "C" {
-#ifdef HAVE_PNG_H
-#include <png.h>
-#else
-#warning "This system doesn't have png.h installed!"
-#endif
-}
+#include <boost/shared_ptr.hpp>
 
 // Forward declarations
 namespace gnash {
     class IOChannel;
+    namespace image {
+        class Input;
+        class Output;
+    }
 }
 
 namespace gnash {
 namespace image {
 
-class PngInput : public Input
-{
+/// Create a PngInput and transfer ownership to the caller.
+//
+/// @param in   The IOChannel to read PNG data from.
+std::auto_ptr<Input> createPngInput(boost::shared_ptr<IOChannel> in);
 
-public:
-
-    /// Construct a PngInput object to read from an IOChannel.
-    //
-    /// @param in   The stream to read PNG data from. Ownership is shared
-    ///             between caller and JpegInput, so it is freed
-    ///             automatically when the last owner is destroyed.
-    PngInput(boost::shared_ptr<IOChannel> in);
-    
-    ~PngInput();
-    
-    /// Begin processing the image data.
-    void read();
-
-    /// Get the image's height in pixels.
-    //
-    /// @return     The height of the image in pixels.
-    size_t getHeight() const;
-
-    /// Get the image's width in pixels.
-    //
-    /// @return     The width of the image in pixels.
-    size_t getWidth() const;
-
-    /// Read a scanline's worth of image data into the given buffer.
-    //
-    /// The amount of data read is getWidth() * getComponents().
-    ///
-    /// @param rgbData  The buffer for writing raw RGB data to.
-    void readScanline(unsigned char* imageData);
-
-    /// Create a PngInput and transfer ownership to the caller.
-    //
-    /// @param in   The IOChannel to read PNG data from.
-    DSOEXPORT static std::auto_ptr<Input> create(
-            boost::shared_ptr<IOChannel> in)
-    {
-        std::auto_ptr<Input> ret ( new PngInput(in) );
-        if (ret.get()) ret->read();
-        return ret;
-    }
-
-private:
-
-    // State needed for input.
-    png_structp _pngPtr;
-    png_infop _infoPtr;
-    boost::scoped_array<png_bytep> _rowPtrs;
-    boost::scoped_array<png_byte> _pixelData;
-   
-    // A counter for keeping track of the last row copied.
-    size_t _currentRow;
-
-    void init();
-
-    // Return number of components (i.e. == 3 for RGB
-    // data).
-    size_t getComponents() const;
-
-};
-
-// Class object for writing PNG image data.
-class PngOutput : public Output
-{
-
-public:
-
-    /// Create an output object bound to a gnash::IOChannel
-    //
-    /// @param out      The IOChannel used for output. Must be kept alive
-    ///                 throughout
-    /// @param quality Unused in PNG output
-    PngOutput(boost::shared_ptr<IOChannel> out, size_t width,
-            size_t height, int quality);
-    
-    ~PngOutput();
-
-    void writeImageRGB(const unsigned char* rgbData);
-    
-    void writeImageRGBA(const unsigned char* rgbaData);
-
-    static std::auto_ptr<Output> create(boost::shared_ptr<IOChannel> out,
-            size_t width, size_t height, int quality);
-    
-private:
-
-    /// Initialize libpng.
-    void init();
-
-    /// Libpng structures for image and output state.
-    png_structp _pngPtr;
-    png_infop _infoPtr;
-    
-};
+std::auto_ptr<Output> createPngOutput(boost::shared_ptr<IOChannel> out,
+        size_t width, size_t height, int quality);
 
 } // namespace image
 } // namespace gnash
