@@ -3,7 +3,8 @@
 
   - SWF 8 support. This is mostly adding support
     for blend modes and bitmap filters.
-  - SWF 9 / AVM2 support.
+  - SWF 9 support
+  - AVM2 support.
   - RTMP support.
   - IO redesign.
   - Performance improvements, and reducing the footprint.
