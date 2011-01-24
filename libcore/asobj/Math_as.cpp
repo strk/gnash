@@ -27,7 +27,6 @@
 #include "Global_as.h"
 #include "Math_as.h"
 #include "log.h"
-#include "builtin_function.h" 
 #include "NativeFunction.h" 
 #include "GnashNumeric.h"
 

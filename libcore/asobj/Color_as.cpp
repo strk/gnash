@@ -27,7 +27,6 @@
 #include "fn_call.h"
 #include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
 #include "NativeFunction.h" 
 #include "SWFCxForm.h" // for composition
 #include "VM.h"

@@ -31,6 +31,13 @@ if [ -n "$4" ]; then
 	STARTPATTERN="$4"
 fi
 NOW=`date`
+if [ -x /bin/md5 ]; then
+	MD5="md5"
+	CUT="4"
+else
+	MD5="md5sum"
+	CUT="1"
+fi
 
 GPROCESSOR="${BUILDDIR}/utilities/gprocessor"
 GNASHRC="${BUILDDIR}/testsuite/gnashrc"
@@ -52,7 +59,7 @@ REALTIME=${SRCDIR}/REALTIME
 
 for test in \`ls ${SWFDECTRACEDIR}/[$STARTPATTERN]*.swf\`; do
 	testname=\`basename \${test}\`
-	md5=\`md5sum \${test} | cut -d' ' -f1\`
+	md5=\`$MD5 \${test} | cut -d' ' -f$CUT\`
 	testid="\${testname}:\${md5}"
 
 	if [ -f \${test}.act ]; then

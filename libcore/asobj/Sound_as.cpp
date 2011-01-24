@@ -36,7 +36,6 @@
 #include "fn_call.h"
 #include "Global_as.h"
 #include "GnashException.h" // for ActionException
-#include "builtin_function.h" // need builtin_function
 #include "NativeFunction.h" // need builtin_function
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "VM.h"
@@ -398,7 +397,6 @@ Sound_as::probeAudio()
     }
 }
 
-#ifdef GNASH_USE_GC
 void
 Sound_as::markReachableResources() const
 {
@@ -406,7 +404,6 @@ Sound_as::markReachableResources() const
         _attachedCharacter->setReachable();
     }
 }
-#endif // GNASH_USE_GC
 
 void
 Sound_as::markSoundCompleted(bool completed)

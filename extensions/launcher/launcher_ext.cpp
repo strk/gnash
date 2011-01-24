@@ -32,7 +32,6 @@
 #include "launcher_ext.h"
 #include "fn_call.h"
 #include "as_object.h"
-#include "builtin_function.h" // need builtin_function
 
 using namespace std;
 

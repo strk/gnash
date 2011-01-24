@@ -22,7 +22,6 @@
 #include "as_object.h"
 #include "VM.h"
 #include "Global_as.h"
-#include "builtin_function.h"
 
 namespace gnash {
 

@@ -31,6 +31,7 @@
 #include <boost/assign/list_of.hpp>
 
 #include "as_object.h"
+#include "builtin_function.h"
 #include "movie_root.h"
 #include "PropFlags.h"
 #include "as_value.h"
@@ -80,7 +81,6 @@
 #include "VM.h"
 #include "Timers.h"
 #include "URL.h" 
-#include "builtin_function.h"
 #include "rc.h"
 #include "ClassHierarchy.h"
 #include "namedStrings.h"
@@ -154,7 +154,7 @@ Global_as::~Global_as()
 {
 }
 
-builtin_function*
+as_function*
 Global_as::createFunction(Global_as::ASFunction function)
 {
     as_object* proto = createObject(*this);
@@ -606,7 +606,7 @@ global_assetpropflags(const fn_call& fn)
     );
     
     // object
-    boost::intrusive_ptr<as_object> obj = toObject(fn.arg(0), getVM(fn));
+    as_object* obj = toObject(fn.arg(0), getVM(fn));
     if (!obj) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Invalid call to ASSetPropFlags: "

@@ -36,12 +36,7 @@ namespace gnash {
 }
 
 
-#define COMPILER_SUPPORTS_ARGUMENT_DEPENDENT_LOOKUP 1
-#ifdef COMPILER_SUPPORTS_ARGUMENT_DEPENDENT_LOOKUP
 namespace gnash {
-#else
-namespace boost {
-#endif
 
 inline void
 intrusive_ptr_add_ref(const ref_counted* o)

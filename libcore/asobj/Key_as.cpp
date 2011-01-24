@@ -18,14 +18,13 @@
 //
 
 
-#include "smart_ptr.h" //GNASH_USE_GC
+#include "smart_ptr.h" 
 #include "Key_as.h"
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
 #include "movie_root.h"
 #include "VM.h" // for registerNative
-#include "builtin_function.h" // need builtin_function
 #include "NativeFunction.h" 
 #include "AsBroadcaster.h" //for initializing self as a broadcaster
 #include "namedStrings.h"

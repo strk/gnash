@@ -35,7 +35,6 @@
 
 // Forward declarations
 namespace gnash {
-    class builtin_function;
     class as_value;
     class VM;
     class Extension;
@@ -70,7 +69,7 @@ public:
     }
     
     /// Create an ActionScript function
-    builtin_function* createFunction(Global_as::ASFunction function);
+    as_function* createFunction(Global_as::ASFunction function);
 
     /// Create an ActionScript class
     //

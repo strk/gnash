@@ -120,7 +120,6 @@ Timer::execute()
 
 }
 
-#ifdef GNASH_USE_GC
 void
 Timer::markReachableResources() const
 {
@@ -129,6 +128,5 @@ Timer::markReachableResources() const
     if (_function) _function->setReachable();
     if (_object) _object->setReachable();
 }
-#endif // GNASH_USE_GC
 
 } // namespace gnash

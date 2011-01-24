@@ -40,6 +40,7 @@ gnash [option]... [URL]
 <variablelist>
   <varlistentry>
     <term>-h</term>
+    <term>--help</term>
     <listitem>
       <para>
 	Print usage info.
@@ -48,7 +49,20 @@ gnash [option]... [URL]
   </varlistentry>
 
   <varlistentry>
+    <term>-V</term>
+    <term>--version</term>
+    <listitem>
+      <para>
+	Print the version number, and the configuration, of the
+	Gnash player. Please provide this information when submitting bug
+	reports.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
     <term>-s factor</term>
+    <term>--scale factor</term>
     <listitem>
       <para>
 	    Scale the movie up/down by the specified factor.
@@ -57,10 +71,30 @@ gnash [option]... [URL]
   </varlistentry>
 
   <varlistentry>
+    <term>-c</term>
+    <listitem>
+      <para>
+        Produce a core file instead of letting SDL trap it
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
     <term>-d num</term>
+    <term>--delay num</term>
     <listitem>
       <para>
         Number of milliseconds to delay in main loop.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-v</term>
+    <term>--verbose</term>
+    <listitem>
+      <para>
+          Be verbose; i.e. print log messages to stdout.
       </para>
     </listitem>
   </varlistentry>
@@ -85,6 +119,24 @@ gnash [option]... [URL]
   </varlistentry>
 
   <varlistentry>
+    <term>-A file</term>
+    <listitem>
+      <para>
+        Audio dump file (wave format).
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>--hwaccel none|vaapi|xv</term>
+    <listitem>
+      <para>
+        Hardware Video Accelerator to use none|vaapi|xv|omap (default: none)
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
     <term>-x xid</term>
     <term>--xid xid</term>
     <listitem>
@@ -92,6 +144,18 @@ gnash [option]... [URL]
 	    The XID of the parent window Gnash should use instead of
 	    creating a new one.  This is only used when embedding the player
 	    into another window.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-w</term>
+    <term>--writelog</term>
+    <listitem>
+      <para>
+	Write the gnash-dbg.log debug log to disk. By default the
+	plugin writes its log in your home directory when using a
+	launcher from GNOME or KDE.
       </para>
     </listitem>
   </varlistentry>
@@ -119,31 +183,21 @@ gnash [option]... [URL]
   </varlistentry>
 
   <varlistentry>
-    <term>-v</term>
+    <term>-X x-pos</term>
+    <term>--x-pos x-pos</term>
     <listitem>
       <para>
-          Be verbose; i.e. print log messages to stdout.
+	Set window x position.
       </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term>-g</term>
+    <term>-Y y-pos</term>
+    <term>--y-pos y-pos</term>
     <listitem>
       <para>
-          Start Gnash with a Flash debugger console so one can set
-	  breakpoints or watchpoints.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>-w</term>
-    <listitem>
-      <para>
-	Write the gnash-dbg.log debug log to disk. By default the
-	plugin writes its log in your home directory when using a
-	launcher from GNOME or KDE.
+	Set window y position.
       </para>
     </listitem>
   </varlistentry>
@@ -159,16 +213,49 @@ gnash [option]... [URL]
   </varlistentry>
 
   <varlistentry>
-    <term>-r [0|1|2]</term>
+    <term>-g</term>
+    <listitem>
+      <para>
+          Start Gnash with a Flash debugger console so one can set
+	  breakpoints or watchpoints.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-r [0|1|2|3]</term>
     <listitem>
       <para>
 	0 disables rendering and sound (good for batch tests).
       </para>
       <para>
-	1 enables rendering and sound (default setting).
+	1 enables rendering, disable sound.
       </para>
       <para>
-	2 enables rendering and disables sound.
+	2 disables rendering, enable sound.
+      </para>
+      <para>
+	3 enables rendering and sound (default setting).
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-M ffmpeg|gst</term>
+    <term>--media ffmpeg|gst</term>
+    <listitem>
+      <para>
+        The media handler to use (default: ffmpeg).
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-R agg|cairo|opengl</term>
+    <term>--renderer agg|cairo|opengl</term>
+    <listitem>
+      <para>
+        The renderer to use (default: agg).
       </para>
     </listitem>
   </varlistentry>
@@ -184,8 +271,8 @@ gnash [option]... [URL]
   </varlistentry>
 
   <varlistentry>
-    <term>-u</term>
-    <term>--real-url</term>
+    <term>-u url</term>
+    <term>--real-url url</term>
     <listitem>
       <para>
 	Set "real" url of the movie (useful for downloaded movies).
@@ -194,13 +281,12 @@ gnash [option]... [URL]
   </varlistentry>
 
   <varlistentry>
-    <term>-U</term>
-    <term>--base-url</term>
+    <term>-U url</term>
+    <term>--base-url url</term>
     <listitem>
       <para>
 	Set "base" url for this run (used to resolve relative urls,
 	defaults to movie url)
-
       </para>
     </listitem>
   </varlistentry>
@@ -216,7 +302,7 @@ gnash [option]... [URL]
   </varlistentry>
 
   <varlistentry>
-    <term>-F</term>
+    <term>-F x:y</term>
     <term>--fd x:y</term>
     <listitem>
       <para>
@@ -228,12 +314,28 @@ gnash [option]... [URL]
   </varlistentry>
 
   <varlistentry>
-    <term>--version</term>
+    <term>--max-advances num</term>
     <listitem>
       <para>
-	Print the version number, and the configuration, of the
-	Gnash player. Please provide this information when submitting bug
-	reports.
+        Exit after specified number of frame advances.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>--fullscreen</term>
+    <listitem>
+      <para>
+        Start in fullscreen mode.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>--hide-menubar</term>
+    <listitem>
+      <para>
+        Start without displaying the menu bar.
       </para>
     </listitem>
   </varlistentry>
@@ -308,6 +410,15 @@ gnash [option]... [URL]
   </varlistentry>
 
   <varlistentry>
+    <term>CTRL-L   </term>
+    <listitem>
+      <para>
+          Force immediate redraw.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
     <term>CTRL-F   </term>
     <listitem>
       <para>
@@ -315,7 +426,6 @@ gnash [option]... [URL]
       </para>
     </listitem>
   </varlistentry>
-
 
   <varlistentry>
     <term>CTRL-O </term>

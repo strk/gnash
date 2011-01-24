@@ -2066,7 +2066,7 @@ ActionDelete(ActionExec& thread)
 
     std::string propertyname = env.top(0).to_string();
 
-    boost::intrusive_ptr<as_object> obj;
+    as_object* obj(0);
 
     // Behaviour is different according to version. For SWF7 and above,
     // the delete fails if there aren't two items on the stack. For SWF6
@@ -2126,7 +2126,6 @@ ActionDelete(ActionExec& thread)
     env.top(1).set_bool(ret.second);
 
     env.drop(1);
-
 }
 
 void

@@ -26,7 +26,6 @@
 #include "LoadableObject.h"
 #include "XMLNode_as.h"
 #include "XML_as.h"
-#include "builtin_function.h"
 #include "NativeFunction.h"
 #include "VM.h"
 #include "namedStrings.h"

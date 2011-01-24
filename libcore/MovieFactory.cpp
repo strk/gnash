@@ -26,7 +26,7 @@
 
 #include "GnashEnums.h"
 #include "GnashImage.h"
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h" 
 #include "IOChannel.h"
 #include "utility.h"
 #include "log.h"

@@ -27,11 +27,10 @@
 
 #include "RunResources.h"
 #include "CharacterProxy.h"
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h"
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "builtin_function.h"
 #include "NativeFunction.h"
 #include "GnashException.h"
 #include "NetConnection_as.h"
@@ -287,7 +286,6 @@ NetStream_as::setAudioController(DisplayObject* ch)
     _audioController.reset(new CharacterProxy(ch, getRoot(owner())));
 }
 
-#ifdef GNASH_USE_GC
 void
 NetStream_as::markReachableResources() const
 {
@@ -296,7 +294,6 @@ NetStream_as::markReachableResources() const
     if (_audioController) _audioController->setReachable();
     if (_invalidatedVideoCharacter) _invalidatedVideoCharacter->setReachable();
 }
-#endif // GNASH_USE_GC
 
 void
 NetStream_as::stopAdvanceTimer()

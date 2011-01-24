@@ -24,6 +24,7 @@ namespace gnash {
 	class as_value;
 	class as_object;
 	class fn_call;
+    struct ObjectURI;
 }
 
 namespace gnash {
@@ -47,9 +48,6 @@ public:
 	///
 	static void initialize(as_object& obj);
 
-	/// AsBroadcaster.initialize() AS method
-	static as_value initialize_method(const fn_call& fn);
-
 	/// Return the global AsBroadcaster
 	/// (the native one, immune to any override)
 	///
@@ -63,6 +61,5 @@ public:
 
 } // end of gnash namespace
 
-// __ASBROADCASTER_H__
 #endif
 

@@ -21,12 +21,11 @@
 #ifndef GNASH_SPRITE_DEFINITION_H
 #define GNASH_SPRITE_DEFINITION_H
 
-
 #include <boost/intrusive_ptr.hpp>
 #include <boost/cstdint.hpp>
 #include <string>
 #include <map>
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h" 
 #include "movie_definition.h" // for inheritance
 #include "log.h"
 #include "SWFRect.h"
@@ -85,9 +84,8 @@ public:
 	void registerClass(as_function* the_class);
 
 	/// Get the Class registered to this definition.
-	as_function* getRegisteredClass() const
-	{
-		return registeredClass.get();
+	as_function* getRegisteredClass() const {
+		return registeredClass;
 	}
 
     virtual void incrementLoadedFrames() {
@@ -298,31 +296,25 @@ private:
 		return true;
 	}
 
-	/// \brief
 	/// The constructor to use for setting up the interface
 	/// for new instances of this sprite
 	//
-	/// If NULL, new instances will have the default MovieClip
-	/// interface.
-	///
-	boost::intrusive_ptr<as_function> registeredClass;
+    /// TODO: this really shouldn't be stored in an immutable definition.
+	as_function* registeredClass;
 
 	int	_loadingSoundStream;
 
 protected:
 
-
-#ifdef GNASH_USE_GC
 	/// Mark reachable resources of a sprite_definition
 	//
 	/// Reachable resources are:
 	///	- registered class (registeredClass)
 	///
 	void markReachableResources() const;
-#endif // GNASH_USE_GC
 };
 
 
 } // end of namespace gnash
 
-#endif // GNASH_SPRITE_H
+#endif 

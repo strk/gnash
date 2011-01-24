@@ -25,7 +25,7 @@
 
 #include "TypesParser.h"
 #include "RunResources.h"
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h" 
 #include "DisplayObject.h"
 #include "Button.h" // for createDisplayObject()
 #include "DefineButtonCxformTag.h"

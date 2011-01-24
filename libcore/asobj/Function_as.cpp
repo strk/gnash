@@ -138,8 +138,7 @@ function_apply(const fn_call& fn)
 				}
 			);
 
-			boost::intrusive_ptr<as_object> arg1 = 
-                toObject(fn.arg(1), getVM(fn));
+			as_object* arg1 = toObject(fn.arg(1), getVM(fn));
 
             if (arg1) {
                 PushFunctionArgs pa(new_fn_call);

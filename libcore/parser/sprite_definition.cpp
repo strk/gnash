@@ -18,7 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "RunResources.h"
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h" 
 #include "MovieClip.h"
 #include "sprite_definition.h"
 #include "ControlTag.h" // for dtor visibility
@@ -34,23 +34,14 @@
 #include <cassert>
 
 
-// Define the following macro to get a dump the prototype 
-// members of classes registered to definitions.
-//#define DEBUG_REGISTER_CLASS 1
-
 namespace gnash {
 
 DisplayObject*
 sprite_definition::createDisplayObject(Global_as& gl, DisplayObject* parent)
     const
 {
-#ifdef DEBUG_REGISTER_CLASS
-	log_debug(_("Instantiating sprite_def %p"), (void*)this);
-#endif
-
     // Should not call MovieClip constructor (probably), but should
     // attach MovieClip.prototype
-
     as_object* obj = getObjectWithPrototype(gl, NSV::CLASS_MOVIE_CLIP);
     DisplayObject* mc = new MovieClip(obj, this, parent->get_root(), parent);
 	return mc;
@@ -134,26 +125,12 @@ void
 sprite_definition::registerClass(as_function* the_class)
 {
 	registeredClass = the_class;
-#ifdef DEBUG_REGISTER_CLASS
-    assert(registeredClass);
-
-	log_debug(_("Registered class %p for sprite_def %p"),
-            (void*)registeredClass.get(), (void*)this);
-	as_object* proto = toObject(
-            getMember(*registeredClass, NSV::PROP_PROTOTYPE),
-                getVM(*registeredClass));
-
-	log_debug(_(" Exported interface: "));
-	proto->dump_members();
-#endif
 }
 
-#ifdef GNASH_USE_GC
 void
 sprite_definition::markReachableResources() const
 {
-	if ( registeredClass.get() ) registeredClass->setReachable();
+	if (registeredClass) registeredClass->setReachable();
 }
-#endif // GNASH_USE_GC
 
 } // namespace gnash

@@ -21,7 +21,7 @@
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h" 
 #include "Font.h"
 #include "log.h"
 #include "ShapeRecord.h"

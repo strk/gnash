@@ -17,15 +17,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "TextField_as.h"
 
 #include "namedStrings.h"
-#include "TextField_as.h"
 #include "TextField.h"
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "TextFormat_as.h"
 #include "MovieClip.h"
@@ -147,8 +146,6 @@ attachPrototypeProperties(as_object& o)
     // SWF6 or higher
     const int swf6Flags = as_object::DefaultFlags | PropFlags::onlySWF6Up;
 
-    boost::intrusive_ptr<builtin_function> getset;
-
     // The following properties should only be attached to the prototype
     // on first textfield creation.
     o.init_property(NSV::PROP_TEXT_WIDTH,
@@ -158,7 +155,7 @@ attachPrototypeProperties(as_object& o)
 
     Global_as& gl = getGlobal(o);
 
-    getset = gl.createFunction(textfield_variable);
+    as_function* getset = gl.createFunction(textfield_variable);
     o.init_property("variable", *getset, *getset, swf6Flags);
     getset = gl.createFunction(textfield_background);
     o.init_property("background", *getset, *getset, swf6Flags);

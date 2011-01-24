@@ -28,7 +28,7 @@
 #include <boost/shared_ptr.hpp>
 #include <cstdio>
 
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h" 
 #include "movie_root.h"
 #include "GnashSystemNetHeaders.h"
 #include "GnashFileUtilities.h" // stat
@@ -38,7 +38,6 @@
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "builtin_function.h" // need builtin_function
 #include "NativeFunction.h" 
 #include "VM.h"
 #include "Property.h"

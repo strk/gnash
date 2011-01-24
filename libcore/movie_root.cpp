@@ -503,10 +503,8 @@ movie_root::reset()
     // Cleanup the stack.
     _vm.getStack().clear();
 
-#ifdef GNASH_USE_GC
     // Run the garbage collector again
     _gc.fuzzyCollect();
-#endif
 
     setInvalidated();
 
@@ -627,7 +625,8 @@ movie_root::keyEvent(key::code k, bool down)
 bool
 movie_root::mouseWheel(int delta)
 {
-    as_object* mouseObj = getBuiltinObject(*this, getURI(_vm,NSV::CLASS_MOUSE));
+    as_object* mouseObj = 
+        getBuiltinObject(*this, getURI(_vm, NSV::CLASS_MOUSE));
     if (!mouseObj) return false;
     
     const boost::int32_t x = pixelsToTwips(_mouseX);
@@ -1661,7 +1660,6 @@ movie_root::executeTimers()
 
 }
 
-#ifdef GNASH_USE_GC
 void
 movie_root::markReachableResources() const
 {
@@ -1728,7 +1726,6 @@ movie_root::markReachableResources() const
 #endif
 
 }
-#endif // GNASH_USE_GC
 
 InteractiveObject*
 movie_root::getTopmostMouseEntity(boost::int32_t x, boost::int32_t y) const

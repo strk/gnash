@@ -34,7 +34,7 @@
 #endif
 
 #include "SharedObject_as.h" // for SharedObjectLibrary
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h" 
 #include "NativeFunction.h"
 #include "movie_definition.h"
 #include "Movie.h"

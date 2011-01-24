@@ -22,7 +22,7 @@
 #include <vector>
 #include <boost/noncopyable.hpp>
 
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h" 
 #include "ActionExec.h"
 #include "Global_as.h"
 #include "fn_call.h"

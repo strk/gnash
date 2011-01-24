@@ -1,11 +1,11 @@
-.\" -*- coding: us-ascii -*-
+'\" -*- coding: us-ascii -*-
 .if \n(.g .ds T< \\FC
 .if \n(.g .ds T> \\F[\n[.fam]]
 .de URL
 \\$2 \(la\\$1\(ra\\$3
 ..
 .if \n(.g .mso www.tmac
-.TH gnash 1 "22 August 2010" "" ""
+.TH gnash 1 "17 January 2011" "" ""
 .SH NAME
 gnash, gtk-gnash, kde4-gnash \- GNU Flash (SWF) Player
 .SH Synopsis
@@ -16,14 +16,25 @@ gnash [option]... [URL]
 .SH DESCRIPTION
 Run the SWF movie player.
 .TP 
--h
+-h, --help
 Print usage info.
 .TP 
--s factor
+-V, --version
+Print the version number, and the configuration, of the
+Gnash player. Please provide this information when submitting bug
+reports.
+.TP 
+-s factor, --scale factor
 Scale the movie up/down by the specified factor.
 .TP 
--d num
+-c
+Produce a core file instead of letting SDL trap it
+.TP 
+-d num, --delay num
 Number of milliseconds to delay in main loop.
+.TP 
+-v, --verbose
+Be verbose; i.e. print log messages to stdout.
 .TP 
 -a
 Be very verbose about movie action execution. Must be used in
@@ -32,10 +43,21 @@ conjunction with -v.
 -p
 Be very verbose about parsing. Must be used in conjunction with -v.
 .TP 
+-A file
+Audio dump file (wave format).
+.TP 
+--hwaccel none|vaapi|xv
+Hardware Video Accelerator to use none|vaapi|xv|omap (default: none)
+.TP 
 -x xid, --xid xid
 The XID of the parent window Gnash should use instead of
 creating a new one. This is only used when embedding the player
 into another window.
+.TP 
+-w, --writelog
+Write the gnash-dbg.log debug log to disk. By default the
+plugin writes its log in your home directory when using a
+launcher from GNOME or KDE.
 .TP 
 -j width, --width width
 Set the width of the window. This is only used when embedding
@@ -45,50 +67,60 @@ the player into another window.
 Set the height of the window. This is only used when embedding
 the player into another window.
 .TP 
--v
-Be verbose; i.e. print log messages to stdout.
+-X x-pos, --x-pos x-pos
+Set window x position.
+.TP 
+-Y y-pos, --y-pos y-pos
+Set window y position.
+.TP 
+-1, --once
+Play once; exit when/if movie reaches the last frame.
 .TP 
 -g
 Start Gnash with a Flash debugger console so one can set
 breakpoints or watchpoints.
 .TP 
--w
-Write the gnash-dbg.log debug log to disk. By default the
-plugin writes its log in your home directory when using a
-launcher from GNOME or KDE.
-.TP 
--1, --once
-Play once; exit when/if movie reaches the last frame.
-.TP 
--r [0|1|2]
+-r [0|1|2|3]
 0 disables rendering and sound (good for batch tests).
 
-1 enables rendering and sound (default setting).
+1 enables rendering, disable sound.
 
-2 enables rendering and disables sound.
+2 disables rendering, enable sound.
+
+3 enables rendering and sound (default setting).
+.TP 
+-M ffmpeg|gst, --media ffmpeg|gst
+The media handler to use (default: ffmpeg).
+.TP 
+-R agg|cairo|opengl, --renderer agg|cairo|opengl
+The renderer to use (default: agg).
 .TP 
 -t sec, --timeout sec
 Timeout and exit after the specified number of seconds.
 .TP 
--u, --real-url
+-u url, --real-url url
 Set "real" url of the movie (useful for downloaded movies).
 .TP 
--U, --base-url
+-U url, --base-url url
 Set "base" url for this run (used to resolve relative urls,
 defaults to movie url)
 .TP 
 -P param, --param param
 Set parameter (ie. "FlashVars=A=1&b=2")
 .TP 
--F, --fd x:y
+-F x:y, --fd x:y
 Set file descriptors to use for external communications. x is
 use by the player to send commands to the plugin, y is used
 by the plugin to send commands to the standalone player.
 .TP 
---version
-Print the version number, and the configuration, of the
-Gnash player. Please provide this information when submitting bug
-reports.
+--max-advances num
+Exit after specified number of frame advances.
+.TP 
+--fullscreen
+Start in fullscreen mode.
+.TP 
+--hide-menubar
+Start without displaying the menu bar.
 .TP 
 --screenshot list
 Set a list of frame advances to be saved as screenshots. The list
@@ -118,6 +150,9 @@ Toggle pause.
 .TP 
 CTRL-R 
 Restart the movie.
+.TP 
+CTRL-L 
+Force immediate redraw.
 .TP 
 CTRL-F 
 Toggle fullscreen. ESC also exits fullscreen.

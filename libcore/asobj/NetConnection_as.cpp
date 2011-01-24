@@ -18,7 +18,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
@@ -36,7 +35,6 @@
 #include "GnashSystemNetHeaders.h"
 #include "log.h"
 #include "GnashException.h"
-#include "builtin_function.h"
 #include "movie_root.h"
 #include "StreamProvider.h"
 #include "URL.h"
@@ -48,7 +46,7 @@
 #include "Global_as.h"
 #include "AMFConverter.h"
 #include "AMF.h"
-#include "smart_ptr.h"
+#include "as_function.h"
 #include "RunResources.h"
 #include "IOChannel.h"
 #include "RTMP.h"
@@ -671,7 +669,7 @@ netconnection_call(const fn_call& fn)
 #endif
 
     // TODO: arg(1) is the response object. let it know when data comes back
-    boost::intrusive_ptr<as_object> asCallback;
+    as_object* asCallback(0);
     if (fn.nargs > 1) {
 
         if (fn.arg(1).is_object()) {
@@ -691,7 +689,7 @@ netconnection_call(const fn_call& fn)
         args = std::vector<as_value>(fn.getArgs().begin() + 2,
                 fn.getArgs().end());
     }
-    ptr->call(asCallback.get(), methodName, args);
+    ptr->call(asCallback, methodName, args);
 
     return as_value();
 }

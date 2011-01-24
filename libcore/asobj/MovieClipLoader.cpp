@@ -22,7 +22,7 @@
 
 #include <string>
 
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h" 
 #include "as_value.h"
 #include "as_object.h" // for inheritance
 #include "movie_root.h"
@@ -33,7 +33,6 @@
 #include "DisplayObject.h" // for loadClip (get_parent)
 #include "log.h"
 #include "VM.h" // for the string table.
-#include "builtin_function.h"
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "namedStrings.h"
 #include "ExecutableCode.h"

@@ -22,8 +22,7 @@
 #include "swf/DefineTextTag.h"
 #include "log.h"
 
-namespace gnash
-{
+namespace gnash {
 
 StaticText*
 StaticText::getStaticText(std::vector<const SWF::TextRecord*>& to,

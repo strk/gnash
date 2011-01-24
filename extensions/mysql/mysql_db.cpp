@@ -24,8 +24,8 @@
 #include "mysql_db.h"
 
 #include "namedStrings.h"
-#include <mysql/errmsg.h>
-#include <mysql/mysql.h>
+#include <errmsg.h>
+#include <mysql.h>
 #include <vector>
 
 #include "log.h"
@@ -33,7 +33,7 @@
 #include "as_value.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "builtin_function.h" // need builtin_function
+#include "as_function.h"
 
 namespace gnash {
 

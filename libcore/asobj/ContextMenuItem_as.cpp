@@ -17,14 +17,13 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "ContextMenuItem_as.h"
 
 #include "namedStrings.h"
-#include "ContextMenuItem_as.h"
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "smart_ptr.h" // for boost intrusive_ptr
-#include "builtin_function.h" // need builtin_function
+#include "as_function.h"
 
 namespace gnash {
 

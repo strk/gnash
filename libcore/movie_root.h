@@ -79,7 +79,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/any.hpp>
 
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h" 
 #include "dsodefs.h" // DSOEXPORT
 #include "MouseButtonState.h" // for composition
 #include "DragState.h" // for composition
@@ -583,7 +583,6 @@ public:
     /// Push an executable code to the ActionQueue
     void pushAction(const action_buffer& buf, DisplayObject* target);
 
-#ifdef GNASH_USE_GC
     /// Mark all reachable resources (for GC)
     //
     /// Resources reachable from movie_root are:
@@ -597,7 +596,6 @@ public:
     /// - Any DisplayObject being dragged 
     ///
     void markReachableResources() const;
-#endif // GNASH_USE_GC
 
     /// \brief
     /// Register a newly born advanceable DisplayObject to the

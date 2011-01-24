@@ -18,11 +18,11 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "AsBroadcaster.h"
+
 #include "Array_as.h" // for _listeners construction
 #include "log.h"
-#include "AsBroadcaster.h"
 #include "fn_call.h"
-#include "builtin_function.h"
 #include "NativeFunction.h" 
 #include "Global_as.h"
 #include "namedStrings.h"
@@ -239,8 +239,7 @@ asbroadcaster_initialize(const fn_call& fn)
 
     // TODO: check if automatic primitive to object conversion apply here
     const as_value& tgtval = fn.arg(0);
-    if ( ! tgtval.is_object() )
-    {
+    if (!tgtval.is_object()) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("AsBroadcaster.initialize(%s): first arg is "
                 "not an object"), tgtval); 
@@ -248,9 +247,8 @@ asbroadcaster_initialize(const fn_call& fn)
         return as_value();
     }
 
-    boost::intrusive_ptr<as_object> tgt = toObject(tgtval, getVM(fn));
-    if ( ! tgt )
-    {
+    as_object* tgt = toObject(tgtval, getVM(fn));
+    if (!tgt) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("AsBroadcaster.initialize(%s): first arg is an object"
             " but doesn't cast to one (dangling DisplayObject ref?)"), tgtval); 
@@ -316,7 +314,7 @@ asbroadcaster_addListener(const fn_call& fn)
 as_value
 asbroadcaster_removeListener(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = fn.this_ptr;
+    as_object* obj = ensure<ValidThis>(fn);
 
     as_value listenersValue;
 
@@ -324,8 +322,7 @@ asbroadcaster_removeListener(const fn_call& fn)
     //       inheritance chain in case it's own property _listeners 
     //       has been deleted while another one is found in any base
     //       class.
-    if (!obj->get_member(NSV::PROP_uLISTENERS, &listenersValue) )
-    {
+    if (!obj->get_member(NSV::PROP_uLISTENERS, &listenersValue)) {
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss; fn.dump_args(ss);
             log_aserror(_("%p.addListener(%s): this object has no _listeners "

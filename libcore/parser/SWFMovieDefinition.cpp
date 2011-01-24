@@ -33,7 +33,7 @@
 #include <algorithm> 
 
 #include "GnashSleep.h"
-#include "smart_ptr.h" // GNASH_USE_GC
+#include "smart_ptr.h" 
 #include "movie_definition.h" 
 #include "zlib_adapter.h"
 #include "IOChannel.h"
@@ -183,14 +183,9 @@ SWFMovieDefinition::addDisplayObject(boost::uint16_t id, SWF::DefinitionTag* c)
 SWF::DefinitionTag*
 SWFMovieDefinition::getDefinitionTag(boost::uint16_t id) const
 {
-
     boost::mutex::scoped_lock lock(_dictionaryMutex);
-
     boost::intrusive_ptr<SWF::DefinitionTag> ch = 
         _dictionary.getDisplayObject(id);
-#ifndef GNASH_USE_GC
-    assert(ch == NULL || ch->get_ref_count() > 1);
-#endif 
     return ch.get(); 
 }
 
@@ -244,17 +239,15 @@ sound_sample*
 SWFMovieDefinition::get_sound_sample(int id) const
 {
     SoundSampleMap::const_iterator it = m_sound_samples.find(id);
-    if ( it == m_sound_samples.end() ) return 0;
+    if (it == m_sound_samples.end()) return 0;
 
     boost::intrusive_ptr<sound_sample> ch = it->second;
-#ifndef GNASH_USE_GC
-    assert(ch->get_ref_count() > 1);
-#endif 
 
     return ch.get();
 }
 
-void SWFMovieDefinition::add_sound_sample(int id, sound_sample* sam)
+void
+SWFMovieDefinition::add_sound_sample(int id, sound_sample* sam)
 {
     assert(sam);
     IF_VERBOSE_PARSE(

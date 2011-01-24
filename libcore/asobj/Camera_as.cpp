@@ -17,7 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-
 #include "Camera_as.h"
 
 #include <sstream>
@@ -29,7 +28,6 @@
 #include "fn_call.h"
 #include "Global_as.h"
 #include "smart_ptr.h" 
-#include "builtin_function.h" 
 #include "NativeFunction.h" 
 #include "MediaHandler.h"
 #include "VideoInput.h"
@@ -127,9 +125,8 @@ void
 attachCameraProperties(as_object& o)
 {
     Global_as& gl = getGlobal(o);
-    boost::intrusive_ptr<builtin_function> getset;
 
-    getset = gl.createFunction(camera_activitylevel);
+    as_function* getset = gl.createFunction(camera_activitylevel);
     o.init_property("activityLevel", *getset, *getset);
     getset = gl.createFunction(camera_bandwidth);
     o.init_property("bandwidth", *getset, *getset);
