@@ -208,7 +208,7 @@ Input::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
 #endif
 #ifdef USE_GIF                
         case GNASH_FILETYPE_GIF:
-            inChannel = GifInput::create(in);
+            inChannel = createGifInput(in);
             break;
 #endif
         case GNASH_FILETYPE_JPEG:

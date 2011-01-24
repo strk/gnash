@@ -28,11 +28,11 @@ extern "C" {
 #include <gif_lib.h>
 }
 
+#include "GnashImage.h"
 #include "utility.h"
 #include "log.h"
 #include "GnashException.h"
 #include "IOChannel.h"
-
 
 namespace gnash {
 namespace image {
@@ -48,7 +48,67 @@ readData(GifFileType* ft, GifByteType* data, int length)
     return in->read(reinterpret_cast<char*>(data), length);
 }
 
-}
+class GifInput : public Input
+{
+
+public:
+
+    /// Construct a GifInput object to read from an IOChannel.
+    //
+    /// @param in   The stream to read GIF data from. Ownership is shared
+    ///             between caller and GifInput, so it is freed
+    ///             automatically when the last owner is destroyed.
+    GifInput(boost::shared_ptr<IOChannel> in);
+    
+    ~GifInput();
+
+    /// Begin processing the image data.
+    void read();
+
+    /// Get the image's height in pixels.
+    //
+    /// @return     The height of the image in pixels.
+    size_t getHeight() const;
+
+    /// Get the image's width in pixels.
+    //
+    /// @return     The width of the image in pixels.
+    size_t getWidth() const;
+
+    /// Get number of components (channels)
+    //
+    /// @return     The number of components, e.g. 3 for RGB
+    size_t getComponents() const { return 3; }
+
+    /// Read a scanline's worth of image data into the given buffer.
+    //
+    /// The amount of data read is getWidth() * getComponents().
+    ///
+    /// @param rgbData  The buffer for writing raw RGB data to.
+    void readScanline(unsigned char* rgb_data);
+
+private:
+    
+    /// Initialize gif_lib
+    void init();
+
+    /// Process a single image record
+    //
+    /// @return     false if no image was parsed, true if we have an image.
+    bool processRecord(GifRecordType record);
+
+    // State needed for input.
+    GifFileType* _gif;
+    
+    // A counter for keeping track of the last row copied.
+    size_t _currentRow;
+    
+    typedef boost::scoped_array<GifPixelType> PixelRow;
+
+    // A 2-dimensional scoped array holding the unpacked pixel data.
+    boost::scoped_array<PixelRow> _gifData;
+};
+
 
 GifInput::GifInput(boost::shared_ptr<IOChannel> in)
     :
@@ -230,6 +290,16 @@ GifInput::read()
     // TODO: implement RGBA!
     _type = TYPE_RGB;
 
+}
+
+} // unnamed namespace
+
+std::auto_ptr<Input>
+createGifInput(boost::shared_ptr<IOChannel> in)
+{
+    std::auto_ptr<Input> ret(new GifInput(in));
+    ret->read();
+    return ret;
 }
 
 } // namespace image
