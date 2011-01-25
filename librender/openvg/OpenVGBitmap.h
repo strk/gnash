@@ -36,7 +36,7 @@ class OpenVGBitmap : public CachedBitmap
 {
 public:
     /// Set line and fill styles for mesh & line_strip rendering.
-    enum bitmap_wrap_mode { WRAP_REPEAT, WRAP_CLAMP };
+    enum bitmap_wrap_mode { WRAP_REPEAT, WRAP_FILL, WRAP_PAD, WRAP_REFLECT };
     
     OpenVGBitmap(VGPaint paint);
     OpenVGBitmap(CachedBitmap *bitmap, VGPaint vgpaint);
@@ -61,8 +61,10 @@ public:
     /// gradient in software.
     OpenVGBitmap *createRadialBitmap(float x0, float y0, float x1,
                                      float y1, float radial, VGPaint paint);
-    OpenVGBitmap *createLinearBitmap(float x0, float y0, float x1,
-                                     float y1, VGPaint paint);
+    OpenVGBitmap *createLinearBitmap(float x0, float y0, float x1, float y1,
+                                     const rgba &incolor, const VGPaint paint);
+
+    // This is for images
     OpenVGBitmap *createPatternBitmap(image::GnashImage &im,
                                       VGPaint paint);
     OpenVGBitmap *createPatternBitmap();
@@ -70,10 +72,10 @@ public:
 private:
     boost::scoped_ptr<image::GnashImage> _image;
     VGImageFormat   _pixel_format;
-    mutable VGImage _vgimage;
-    VGPaint         _vgpaint;
+    VGImage         _vgimage;
     int             _stride;
-    int             _tex_size;
+    VGPaint         _vgpaint;
+//    int             _tex_size;
 };
 
 } // namespace gnash::renderer::openvg

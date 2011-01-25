@@ -120,7 +120,9 @@ public:
     // These methods are only for debugging and development
     void printVGParams();
     void printVGHardware();
-    void printVGPath();    
+    static void printVGPath(VGPath path);
+    static void printVGMatrix(VGfloat *mat);
+    static void printVGMatrix(const SWFMatrix &mat);
 
     static const char *getErrorString(VGErrorCode error);
 #if 0

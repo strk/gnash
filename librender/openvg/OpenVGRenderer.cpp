@@ -87,8 +87,10 @@ class eglScopeMatrix : public boost::noncopyable
 public:
     eglScopeMatrix(const SWFMatrix& m)
         {
-            vgGetMatrix(orig_mat);
-
+            // GNASH_REPORT_FUNCTION;            
+            vgGetMatrix(_orig_mat);
+            //Renderer_ovg::printVGMatrix(_orig_mat);
+            
             float mat[9];
             memset(mat, 0, sizeof(mat));
             mat[0] = m.sx  / 65536.0f;
@@ -102,26 +104,40 @@ public:
   
     ~eglScopeMatrix()
         {
-            vgLoadMatrix(orig_mat);
+            vgLoadMatrix(_orig_mat);
         }
 private:
-    VGfloat orig_mat[9];
+    VGfloat _orig_mat[9];
 };
+
+/// @note
+/// A VGpath is constructed from a series of appended path
+/// segments. When drawing shapes from flash, we start each path by
+/// moving to a known location. Then segments are appended, and then
+/// the path is closed. This is also used for fills.
 
 #define MAX_SEG  (256)
 
+/// Start a VGPath by moving to a specified location
+///
+/// @param path The VGPath to start
+/// @returns nothing
 inline void
 startpath(VGPath path, const int x, const int y)
 {
     VGubyte     gseg[1];
     VGfloat     gdata[2];
-  
+
     gseg[0] = VG_MOVE_TO;
     gdata[0] = x;
     gdata[1] = y;
     vgAppendPathData (path, 1, gseg, gdata);
 }
 
+/// Close the VGPath started by startpath()
+///
+/// @param path The VGPath to close
+/// @returns nothing
 inline void
 closepath(VGPath path)
 {
@@ -132,6 +148,13 @@ closepath(VGPath path)
     vgAppendPathData (path, 1, gseg, gdata);
 }
 
+/// Add a series of edges to the existing path created by startpath()
+///
+/// @param path The VGPath to append segments to
+/// @param edges The segments to append to the path
+/// @param anchor_x The X coordinate to start from
+/// @param anchor_y The Y coordinate to start from
+/// @returns nothing
 inline void
 preparepath(VGPath path, const std::vector<Edge>& edges,
                         const float& anchor_x, const float& anchor_y)
@@ -366,16 +389,10 @@ void
 Renderer_ovg::begin_display(gnash::rgba const&, int width, int height,
                             float x0, float x1, float y0, float y1)
 {
-    // GNASH_REPORT_FUNCTION;
-
-    // std::cerr << "FIXME2: " << width / VGfloat(x1 - 1600) << " : "
-    //           << -((VGfloat)height / VGfloat(y1 - 0)) << std::endl;
+    GNASH_REPORT_FUNCTION;
 
     vgSeti (VG_MASKING, VG_FALSE);
 
-    // std::cerr << "FIXME1: " << width << ", " << height << ", " << x0 << ", " << x1
-    //           << ", " << y0 << ", " << y1 << std::endl;
-    
     VGfloat mat[9];
     memset(mat, 0, sizeof(mat));
     // sx and sy define scaling in the x and y directions, respectively;
@@ -796,7 +813,12 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
 {
     // GNASH_REPORT_FUNCTION;
 
+    // Renderer_ovg::printVGMatrix(mat);
+    
     SWF::FillType fill_type = boost::apply_visitor(GetType(), style.fill);
+    SWFMatrix sm = boost::apply_visitor(GetMatrix(), style.fill);
+    rgba incolor = boost::apply_visitor(GetColor(), style.fill);
+    
     switch (fill_type) {
         
       case SWF::FILL_LINEAR_GRADIENT:
@@ -804,14 +826,15 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
       case SWF::FILL_FOCAL_GRADIENT:
       {
           OpenVGBitmap* binfo = new OpenVGBitmap(_fillpaint);
+          // Renderer_ovg::printVGMatrix(sm);
           
-          GradientFill::Type gt;
+          eglScopeMatrix scope_mat(mat);
+          rgba c = cx.transform(incolor);
           switch (fill_type) {
           case SWF::FILL_LINEAR_GRADIENT:
           {
-              log_debug("Fill Style Type: Linear Gradient");
-              binfo->createLinearBitmap(mat.sx, mat.sy, mat.tx, mat.ty,
-                                        _fillpaint);
+              log_debug("FIXME: Fill Style Type: Linear Gradient");
+              // binfo->createLinearBitmap(sm, c, _fillpaint);
               break;
           }
           case SWF::FILL_RADIAL_GRADIENT:
@@ -825,8 +848,7 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
           default:
               std::abort();
           }
-          SWFMatrix sm = boost::apply_visitor(GetMatrix(), style.fill);          
-          binfo->apply(sm, OpenVGBitmap::WRAP_CLAMP, _fillpaint);
+          // binfo->apply(sm, OpenVGBitmap::WRAP_PAD, _fillpaint);
           vgSetParameteri (_fillpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
           break;
       }
@@ -834,11 +856,11 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
       case SWF::FILL_TILED_BITMAP:
       {
           log_debug("Fill Style Type: Tiled Bitmap");
-          SWFMatrix sm = boost::apply_visitor(GetMatrix(), style.fill);          
           CachedBitmap *cb = boost::apply_visitor(GetBitmap(), style.fill);
           //          std::auto_ptr<image::GnashImage> im(&cb->image());
           OpenVGBitmap *binfo = new OpenVGBitmap(cb, _fillpaint);
           binfo->apply(sm, OpenVGBitmap::WRAP_REPEAT, _fillpaint);
+          vgSetParameteri (_fillpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
           break;
       }
       
@@ -846,8 +868,6 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
       case SWF::FILL_CLIPPED_BITMAP_HARD:
       {     
           log_debug("Fill Style Type: Clipped Bitmap");
-          SWFMatrix sm = boost::apply_visitor(GetMatrix(), style.fill);
-
           CachedBitmap *cb = boost::apply_visitor(GetBitmap(), style.fill);
           OpenVGBitmap *binfo = new OpenVGBitmap(cb, _fillpaint);
 #if 0
@@ -855,7 +875,8 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
           image::GnashImage *im = boost::apply_visitor(GetImage(), style.fill);
           OpenVGBitmap *binfo = new OpenVGBitmap(im, _fillpaint);
 #endif
-          binfo->apply(sm, OpenVGBitmap::WRAP_CLAMP, _fillpaint);
+          binfo->apply(sm, OpenVGBitmap::WRAP_PAD, _fillpaint);
+          vgSetParameteri (_fillpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
           break;
       } 
       case SWF::FILL_SOLID:
@@ -1132,9 +1153,13 @@ Renderer_ovg::draw_subshape(const PathVec& path_vec,
             continue;
         }
         
+        SWF::FillType fill_type = boost::apply_visitor(GetType(), fill_styles[i].fill);
+        if ((fill_type != SWF::FILL_LINEAR_GRADIENT)
+            && (fill_type != SWF::FILL_RADIAL_GRADIENT)) {
+            apply_fill_style(fill_styles[i], mat, cx);
+        }
+
         std::list<PathPtrVec> contours = get_contours(paths);
-        
-        apply_fill_style(fill_styles[i], mat, cx);
         
         VGPath      vg_path;
         vg_path = vgCreatePath (VG_PATH_FORMAT_STANDARD,
@@ -1148,7 +1173,17 @@ Renderer_ovg::draw_subshape(const PathVec& path_vec,
             const PathPtrVec& refs = *iter;
             
             startpath(vg_path, (*(refs[0])).ap.x, (*(refs[0])).ap.y);
-            
+            if (fill_type == SWF::FILL_LINEAR_GRADIENT) {
+                rgba incolor = boost::apply_visitor(GetColor(), fill_styles[i].fill);
+                OpenVGBitmap* binfo = new OpenVGBitmap(_fillpaint);
+                // All positions are specified in twips, which are 20 to the
+                // pixel. Use th display size for the extent of the shape, 
+                // as it'll get clipped by OpenVG at the end of the
+                // shape that is being filled with the gradient.
+                binfo->createLinearBitmap((*(refs[0])).ap.x, (*(refs[0])).ap.y,
+                                          _display_width * 20.0f, _display_height * 20.0f,
+                                          incolor, _fillpaint);
+            }
             for (PathPtrVec::const_iterator it = refs.begin(), end = refs.end();
                  it != end; ++it) {
                 const Path& cur_path = *(*it);
@@ -1160,7 +1195,7 @@ Renderer_ovg::draw_subshape(const PathVec& path_vec,
             closepath(vg_path);
         }
         vgDrawPath (vg_path, VG_FILL_PATH);
-        vgDestroyPath(vg_path);    
+        vgDestroyPath(vg_path);
     }
     
     draw_outlines(normalized, mat, cx, line_styles);
@@ -1572,8 +1607,39 @@ Renderer_ovg::printVGParams()
     log_debug("VG_MAX_IMAGE_HEIGHT is %d", vgGeti(VG_MAX_IMAGE_HEIGHT));
     log_debug("VG_MAX_IMAGE_PIXELS is %d", vgGeti(VG_MAX_IMAGE_PIXELS));
     log_debug("VG_MAX_IMAGE_BYTES is %d", vgGeti(VG_MAX_IMAGE_BYTES));
+
 }
-  
+
+void
+Renderer_ovg::printVGPath(VGPath path)
+{
+    log_debug("VG_PATH_FORMAT is %d", vgGetParameteri(path, VG_PATH_FORMAT));
+    log_debug("VG_PATH_DATATYPE is %d", vgGetParameteri(path, VG_PATH_DATATYPE));
+    log_debug("VG_PATH_CAPABILITY_APPEND_TO is %d", vgGetParameteri(path, VG_PATH_CAPABILITY_APPEND_TO));
+    log_debug("VG_PATH_SCALE is %g", vgGetParameteri(path, VG_PATH_SCALE));
+    log_debug("VG_PATH_BIA is %g", vgGetParameteri(path, VG_PATH_BIAS));
+
+    log_debug("VG_PATH_NUM_SEGMENTS is %d", vgGetParameteri(path, VG_PATH_NUM_SEGMENTS));
+    log_debug("VG_PATH_NUM_COORDS is %d", vgGetParameteri(path, VG_PATH_NUM_COORDS));
+}
+
+// Print an OpenVG matric, which is 3 x 3. Elements 2 and 5 are
+// ignored, as they are the w0 and w1 paramaters.
+// It looks like this: { sx, shy, w0, shx, sy, w1, tx, ty, w2 }
+void
+Renderer_ovg::printVGMatrix(VGfloat *mat)
+{
+    std::cerr << "sx, shx, tx: " << mat[0] << ", " << mat[1]<< ", "  << mat[3] << std::endl;
+    std::cerr << "sy, shy, ty: " << mat[4]<< ", " << mat[6] << ", "<< mat[7] << std::endl;
+}
+
+void
+Renderer_ovg::printVGMatrix(const SWFMatrix &mat)
+{
+    std::cerr << "sx, shx, tx: " << mat.sx << ", " << mat.shx << ", " << mat.tx << std::endl;
+    std::cerr << "sy, shy, ty: " << mat.sy << ", " << mat.shy << ", " << mat.ty << std::endl;
+}
+
 Renderer *
 Renderer_ovg::startInternalRender(gnash::image::GnashImage&)
 {
