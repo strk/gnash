@@ -255,10 +255,11 @@ OpenVGBitmap::createLinearBitmap(float x0, float y0, float x1, float y1,
     vgSetParameteri(paint, VG_PAINT_TYPE, VG_PAINT_TYPE_LINEAR_GRADIENT);
     vgSetParameteri(paint, VG_PAINT_COLOR_RAMP_SPREAD_MODE, VG_COLOR_RAMP_SPREAD_PAD);
 
-    VGfloat linearGradient[4] = { x0, y0, x1, y1 };
+    VGfloat linearGradient[4] = { x0, y0, 10000, 10000 };
+//    VGfloat linearGradient[4] = { x0, y0, x1, y1 };
     vgSetParameterfv(paint, VG_PAINT_LINEAR_GRADIENT, 4, linearGradient);
 
-#if 1
+#if 0
     VGfloat stops[] = { 0.0, 0.33, 0.66, 1.0};
     vgSetParameterfv(paint, VG_PAINT_COLOR_RAMP_STOPS, 4, stops);
 #else
