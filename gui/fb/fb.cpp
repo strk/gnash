@@ -231,7 +231,7 @@ FBGui::init(int argc, char *** argv)
     
     std::vector<boost::shared_ptr<InputDevice> >::iterator it;
     for (it=possibles.begin(); it!=possibles.end(); ++it) {
-        (*it)->dump();
+        //(*it)->dump();
         if ((*it)->getType() == InputDevice::MOUSE) {
             log_debug("WARNING: Mouse support disabled as it conflicts with the input event support.");
             // For now we only want keyboards input events, as the mouse
