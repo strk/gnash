@@ -31,7 +31,7 @@
 #include "GnashException.h"
 
 #ifdef HAVE_VG_OPENVG_H
-# include "openvg/Renderer_ovg.h"
+# include "openvg/OpenVGRenderer.h"
 # include <VG/openvg.h>
 #endif
 
