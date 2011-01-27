@@ -617,6 +617,8 @@ EGLDevice::printEGLConfig(EGLConfig config)
     std::cout << "\tEGL_BUFFER_SIZE is " << value  << std::endl;
     eglGetConfigAttrib(_eglDisplay, config, EGL_ALPHA_SIZE, &value);
     std::cout << "\tEGL_ALPHA_SIZE is " << value  << std::endl;
+    eglGetConfigAttrib(_eglDisplay, config, EGL_ALPHA_MASK_SIZE, &value);
+    std::cout << "\tEGL_ALPHA_MASK_SIZE is " << value  << std::endl;
     eglGetConfigAttrib(_eglDisplay, config, EGL_STENCIL_SIZE, &value);
     std::cout << "\tEGL_STENCIL_SIZE is " << value  << std::endl;
     eglGetConfigAttrib(_eglDisplay, config, EGL_SAMPLES, &value);
