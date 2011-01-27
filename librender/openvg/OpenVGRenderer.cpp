@@ -268,7 +268,10 @@ Renderer_ovg::init(float x, float y)
     vgSetfv( VG_CLEAR_COLOR, 4, clearColor );
     
 #ifdef OPENVG_VERSION_1_1    
-    _mask = vgCreateMaskLayer(x, y);
+    // If masking isn't enabled, don't use it.
+    if (vgGeti(VG_MASKING) == VG_TRUE) {
+        _mask = vgCreateMaskLayer(x, y);
+    }
 #endif
 
     log_debug("VG Vendor is %s, VG Version is %s, VG Renderer is %s",
@@ -389,8 +392,9 @@ void
 Renderer_ovg::begin_display(gnash::rgba const&, int width, int height,
                             float x0, float x1, float y0, float y1)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
+    // Disable masking
     vgSeti (VG_MASKING, VG_FALSE);
 
     VGfloat mat[9];
@@ -572,20 +576,24 @@ void
 Renderer_ovg::begin_submit_mask()
 {
     GNASH_REPORT_FUNCTION;
-    PathVec mask;
-    _masks.push_back(mask);
-    
-    _drawing_mask = true;
-    
+
+    // If masking is disabled, then we can't use it
+    if (vgGeti(VG_MASKING) == VG_TRUE) {
+        PathVec mask;
+        _masks.push_back(mask);
+        _drawing_mask = true;
+    }
 }
 
 void
 Renderer_ovg::end_submit_mask()
 {
     GNASH_REPORT_FUNCTION;
-    _drawing_mask = false;
-    
-    apply_mask();
+    // If masking is disabled, rhen we can't use it
+    if (_drawing_mask == true) {
+        _drawing_mask = false;    
+        apply_mask();
+    }
 }
 
 /// Apply the current mask; nesting is supported.
@@ -647,13 +655,15 @@ Renderer_ovg::disable_mask()
 {
     GNASH_REPORT_FUNCTION;
     
-    _masks.pop_back();
-    
-    if (_masks.empty()) {
-        vgSeti (VG_MASKING, VG_FALSE);
-    } else {
-        apply_mask();
-    }    
+    if (vgGeti(VG_MASKING) == VG_TRUE) {
+        _masks.pop_back();
+        
+        if (_masks.empty()) {
+            vgSeti (VG_MASKING, VG_FALSE);
+        } else {
+            apply_mask();
+        }
+    }
 }
 
 Path
@@ -832,19 +842,12 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
           rgba c = cx.transform(incolor);
           switch (fill_type) {
           case SWF::FILL_LINEAR_GRADIENT:
-          {
-              log_debug("FIXME: Fill Style Type: Linear Gradient");
-              // binfo->createLinearBitmap(sm, c, _fillpaint);
+              log_error("Fill Style Type: Linear Gradient, you shouldn't be here");
               break;
-          }
           case SWF::FILL_RADIAL_GRADIENT:
           case SWF::FILL_FOCAL_GRADIENT:
-          {
-              log_debug("Fill Style Type: Radial Gradient");
-              float radial = 0.5;
-              binfo->createRadialBitmap(mat.sx, mat.sy, mat.tx, mat.ty, radial, _fillpaint);
+              log_error("Fill Style Type: Radial Gradient, you shouldn't be here");
               break;
-          }
           default:
               std::abort();
           }
@@ -1062,16 +1065,17 @@ Renderer_ovg::draw_mask(const PathVec& path_vec)
 { 
     GNASH_REPORT_FUNCTION;
    
-    for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
-         it != end; ++it) {
-        const Path& cur_path = *it;
-        
-        if (cur_path.m_fill0 || cur_path.m_fill1) {
-            _masks.back().push_back(cur_path);
-            _masks.back().back().m_line = 0;    
-        }
-    }  
-    
+    if (_drawing_mask == true) {
+        for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
+             it != end; ++it) {
+            const Path& cur_path = *it;
+            
+            if (cur_path.m_fill0 || cur_path.m_fill1) {
+                _masks.back().push_back(cur_path);
+                _masks.back().back().m_line = 0;    
+            }
+        }  
+    }
 }
 
 PathPtrVec
@@ -1182,6 +1186,18 @@ Renderer_ovg::draw_subshape(const PathVec& path_vec,
                 // shape that is being filled with the gradient.
                 binfo->createLinearBitmap((*(refs[0])).ap.x, (*(refs[0])).ap.y,
                                           _display_width * 20.0f, _display_height * 20.0f,
+                                          incolor, _fillpaint);
+            }
+            if (fill_type == SWF::FILL_RADIAL_GRADIENT) {
+                rgba incolor = boost::apply_visitor(GetColor(), fill_styles[i].fill);
+                OpenVGBitmap* binfo = new OpenVGBitmap(_fillpaint);
+                // All positions are specified in twips, which are 20 to the
+                // pixel. Use th display size for the extent of the shape, 
+                // as it'll get clipped by OpenVG at the end of the
+                // shape that is being filled with the gradient.
+                binfo->createRadialBitmap((*(refs[0])).ap.x, (*(refs[0])).ap.y,
+                                          _display_width * 20.0f,
+                                          _display_height * 20.0f, 500,
                                           incolor, _fillpaint);
             }
             for (PathPtrVec::const_iterator it = refs.begin(), end = refs.end();

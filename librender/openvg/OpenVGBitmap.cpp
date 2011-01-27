@@ -216,19 +216,25 @@ OpenVGBitmap::apply(const gnash::SWFMatrix& bitmap_matrix,
 // coordinate system. The gradient starts at x0,y0 as the center, and
 // x1,y1 is the focal point that is forced to be in the circle.
 OpenVGBitmap *
-OpenVGBitmap::createRadialBitmap(float cx, float cy, float fx, float fy, float radial,
+OpenVGBitmap::createRadialBitmap(float cx, float cy, float fx, float fy,
+                                 float radial, const rgba &incolor,
                                  VGPaint paint)
 {
     GNASH_REPORT_FUNCTION;
 
     VGfloat rgParams[] = { cx, cy, fx, fy, radial };
-    VGfloat stops[5*NUM_STOPS];
     
     // Paint Type 
     vgSetParameteri(paint, VG_PAINT_TYPE, VG_PAINT_TYPE_RADIAL_GRADIENT);
 
     // Gradient Parameters
-    vgSetParameterfv(paint, VG_PAINT_RADIAL_GRADIENT, 4, rgParams);
+    vgSetParameterfv(paint, VG_PAINT_RADIAL_GRADIENT, 5, rgParams);
+
+    VGfloat rampStop[] = {0.00f, 1.0f, 1.0f, 1.0f, 1.0f,
+                          0.33f, 1.0f, 0.0f, 0.0f, 1.0f,
+                          0.66f, 0.0f, 1.0f, 0.0f, 1.0f,
+                          1.00f, 0.0f, 0.0f,  1.0f, 1.0f};
+    vgSetParameterfv(paint, VG_PAINT_COLOR_RAMP_STOPS, 20, rampStop);    
 
     // Color Ramp is the same as for linear gradient
     return this;
@@ -253,10 +259,11 @@ OpenVGBitmap::createLinearBitmap(float x0, float y0, float x1, float y1,
     vgSetParameterfv (paint, VG_PAINT_COLOR, 4, color);
 
     vgSetParameteri(paint, VG_PAINT_TYPE, VG_PAINT_TYPE_LINEAR_GRADIENT);
-    vgSetParameteri(paint, VG_PAINT_COLOR_RAMP_SPREAD_MODE, VG_COLOR_RAMP_SPREAD_PAD);
+    vgSetParameteri(paint, VG_PAINT_COLOR_RAMP_SPREAD_MODE,
+                    VG_COLOR_RAMP_SPREAD_PAD);
 
-    VGfloat linearGradient[4] = { x0, y0, 10000, 10000 };
-//    VGfloat linearGradient[4] = { x0, y0, x1, y1 };
+    //    VGfloat linearGradient[4] = { x0, y0, 10000, 10000 };
+    VGfloat linearGradient[4] = { x0, y0, x1, y1 };
     vgSetParameterfv(paint, VG_PAINT_LINEAR_GRADIENT, 4, linearGradient);
 
 #if 0

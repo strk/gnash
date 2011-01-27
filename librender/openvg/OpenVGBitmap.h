@@ -60,7 +60,8 @@ public:
     /// we want to use that instead of the existing way of calculating the
     /// gradient in software.
     OpenVGBitmap *createRadialBitmap(float x0, float y0, float x1,
-                                     float y1, float radial, VGPaint paint);
+                                     float y1, float radial,
+                                     const rgba &incolor, VGPaint paint);
     OpenVGBitmap *createLinearBitmap(float x0, float y0, float x1, float y1,
                                      const rgba &incolor, const VGPaint paint);
 
