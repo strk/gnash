@@ -74,6 +74,7 @@ InputDevice::init(InputDevice::devicetype_e type, const std::string &filespec,
     return init(filespec, size);
 }
 
+#if 0
 boost::shared_ptr<InputDevice::input_data_t>
 InputDevice::popData()
 {
@@ -85,6 +86,7 @@ InputDevice::popData()
     }
     return input;
 }
+#endif
 
 void
 InputDevice::addData(bool pressed, key::code key, int modifier, int x, int y)
@@ -171,6 +173,7 @@ InputDevice::dump()
 
 // Scan for all the possible input devices. This aggregates all
 // the devices from each type into a single big vector.
+#if 0
 std::vector<boost::shared_ptr<InputDevice> >
 InputDevice::scanForDevices()
 {
@@ -201,6 +204,7 @@ InputDevice::scanForDevices()
 
     return devices;
 }
+#endif
 
 // The Babbage touchscreen gives is absolute coordinates, but they don't
 // match the actual screen resolution. So we convert the coordinates

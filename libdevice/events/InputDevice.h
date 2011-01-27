@@ -95,13 +95,49 @@ public:
     virtual bool init(const std::string &filespec, size_t size) = 0;
     virtual bool check() = 0;
 
-    static std::vector<boost::shared_ptr<InputDevice> > scanForDevices();
-
+    static std::vector<boost::shared_ptr<InputDevice> > scanForDevices()
+    {
+        // GNASH_REPORT_FUNCTION;
+        
+        std::vector<boost::shared_ptr<InputDevice> > devices;
+        
+        std::vector<boost::shared_ptr<InputDevice> > id;
+        std::vector<boost::shared_ptr<InputDevice> >::iterator it;
+#ifdef USE_INPUT_EVENTS
+        id = EventDevice::scanForDevices();
+        for (it=id.begin(); it!=id.end(); ++it) {
+            devices.push_back(*it);
+        }
+#endif
+#if defined(USE_MOUSE_PS2) || defined(USE_MOUSE_ETT)
+        id = MouseDevice::scanForDevices();
+        for (it=id.begin(); it!=id.end(); ++it) {
+        devices.push_back(*it);
+        }
+#endif
+#if defined(HAVE_TSLIB_H) && defined(USE_TSLIB)
+        id = TouchDevice::scanForDevices();
+        for (it=id.begin(); it!=id.end(); ++it) {
+        devices.push_back(*it);
+        }
+#endif    
+    return devices;
+    }        
+    
     InputDevice::devicetype_e getType() { return _type; };
 
     // Read data into the Device input buffer.
     boost::shared_array<boost::uint8_t> readData(size_t size);
-    boost::shared_ptr<input_data_t> popData();
+    boost::shared_ptr<input_data_t> popData()
+    {
+        boost::shared_ptr<InputDevice::input_data_t> input;
+        if (_data.size()) {
+            // std::cerr << "FIXME: " <<_data.size() << std::endl;
+            input = _data.front();
+            _data.pop();
+        }
+        return input;
+    }
 
     static boost::shared_array<int> convertAbsCoords(int x, int y,
                                                      int width, int height);

@@ -319,17 +319,16 @@ TouchDevice::scanForDevices()
                 log_error("You don't have the proper permissions to open %s",
                           touch[i].filespec);
                 i++;
-                continue;
+                close(fd);
+                log_debug("Found a %s device for touchscreen input using %s",
+                          debug[touch[i].type], touch[i].filespec);
+                boost::shared_ptr<InputDevice> dev;
+                dev = boost::shared_ptr<InputDevice>(new TouchDevice());
+                if (dev->init(touch[i].filespec, DEFAULT_BUFFER_SIZE)) {
+                    devices.push_back(dev);
+                    break;
+                }
             } // open()
-            close(fd);
-            log_debug("Found a %s device for touchscreen input using %s",
-                      debug[touch[i].type], touch[i].filespec);
-            boost::shared_ptr<InputDevice> dev;
-            dev = boost::shared_ptr<InputDevice>(new TouchDevice());
-            if (dev->init(touch[i].filespec, DEFAULT_BUFFER_SIZE)) {
-                devices.push_back(dev);
-                break;
-            }
 //            dev->dump();
         }     // stat()
         i++;
