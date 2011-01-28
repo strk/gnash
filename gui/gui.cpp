@@ -166,7 +166,9 @@ Gui::Gui(unsigned long xid, float scale, bool loop, RunResources& r)
 
 Gui::~Gui()
 {
-    if ( _movieDef.get() ) log_debug("~Gui - _movieDef refcount: %d", _movieDef->get_ref_count());
+    if ( _movieDef.get() ) {
+        log_debug("~Gui - _movieDef refcount: %d", _movieDef->get_ref_count());
+    }
 
 #ifdef GNASH_FPS_DEBUG
     if ( fps_timer_interval ) {
@@ -214,14 +216,14 @@ Gui::hideMenu()
 bool
 Gui::showMouse(bool /* show */)
 {
-	LOG_ONCE(log_unimpl(_("Mouse show/hide not yet supported in this GUI")));
-   	return true;
+    LOG_ONCE(log_unimpl(_("Mouse show/hide not yet supported in this GUI")));
+    return true;
 }
 
 void
 Gui::showMenu(bool /* show */)
 {
-	LOG_ONCE(log_unimpl(_("menushow not yet supported in this GUI")));
+    LOG_ONCE(log_unimpl(_("menushow not yet supported in this GUI")));
 }
 
 void
@@ -240,20 +242,19 @@ void
 Gui::toggleFullscreen()
 {
     /// Sends request to Gnash core to change display state.
-	if (_fullscreen) {
-		_stage->setStageDisplayState(movie_root::DISPLAYSTATE_NORMAL);
-	}
-	else {
-		_stage->setStageDisplayState(movie_root::DISPLAYSTATE_FULLSCREEN);
-	} 
+    if (_fullscreen) {
+        _stage->setStageDisplayState(movie_root::DISPLAYSTATE_NORMAL);
+    } else {
+        _stage->setStageDisplayState(movie_root::DISPLAYSTATE_FULLSCREEN);
+    } 
 }
 
 void
 Gui::restart()
 {
-	_stage->reset();
-	_started = false;
-	start();
+    _stage->reset();
+    _started = false;
+    start();
 }
 
 void
@@ -289,8 +290,7 @@ Gui::updateStageMatrix()
             // Scale proportionally, using smallest scale
             if (_xscale < _yscale) {
                 _yscale = _xscale;
-            } 
-            else if (_yscale < _xscale) {
+            } else if (_yscale < _xscale) {
                 _xscale = _yscale;
             }
             break;
@@ -303,8 +303,7 @@ Gui::updateStageMatrix()
             // Scale proportionally, using biggest scale
             if (_xscale > _yscale) {
                 _yscale = _xscale;
-            } 
-            else if (_yscale > _xscale) {
+            } else if (_yscale > _xscale) {
                 _xscale = _yscale;
             }
             break;
@@ -330,66 +329,66 @@ Gui::updateStageMatrix()
     
     // Handle horizontal alignment
     switch ( halign ) {
-    case movie_root::STAGE_H_ALIGN_L:
-        {
-            // _xoffset=0 is fine
-            break;
-        }
+      case movie_root::STAGE_H_ALIGN_L:
+      {
+          // _xoffset=0 is fine
+          break;
+      }
+      
+      case movie_root::STAGE_H_ALIGN_R:
+      {
+          // Offsets in pixels
+          float defWidth = swfwidth *= _xscale;
+          float diffWidth = _width-defWidth;
+          _xoffset = diffWidth;
+          break;
+      }
         
-    case movie_root::STAGE_H_ALIGN_R:
-        {
-            // Offsets in pixels
-            float defWidth = swfwidth *= _xscale;
-            float diffWidth = _width-defWidth;
-            _xoffset = diffWidth;
-            break;
-        }
+      case movie_root::STAGE_V_ALIGN_C:
+      {
+          // Offsets in pixels
+          float defWidth = swfwidth *= _xscale;
+          float diffWidth = _width-defWidth;
+          _xoffset = diffWidth/2.0;
+          break;
+      }
         
-    case movie_root::STAGE_V_ALIGN_C:
-        {
-            // Offsets in pixels
-            float defWidth = swfwidth *= _xscale;
-            float diffWidth = _width-defWidth;
-            _xoffset = diffWidth/2.0;
-            break;
-        }
-        
-    default:
-        {
-            log_error("Invalid horizontal align %d", valign);
-            break;
-        }
+      default:
+      {
+          log_error("Invalid horizontal align %d", valign);
+          break;
+      }
     }
     
     // Handle vertical alignment
     switch ( valign ) {
-    case movie_root::STAGE_V_ALIGN_T:
-        {
-            // _yoffset=0 is fine
-            break;
-        }
+      case movie_root::STAGE_V_ALIGN_T:
+      {
+          // _yoffset=0 is fine
+          break;
+      }
+      
+      case movie_root::STAGE_V_ALIGN_B:
+      {
+          float defHeight = swfheight *= _yscale;
+          float diffHeight = _height-defHeight;
+          _yoffset = diffHeight;
+          break;
+      }
         
-    case movie_root::STAGE_V_ALIGN_B:
-        {
-            float defHeight = swfheight *= _yscale;
-            float diffHeight = _height-defHeight;
-            _yoffset = diffHeight;
-            break;
-        }
+      case movie_root::STAGE_V_ALIGN_C:
+      {
+          float defHeight = swfheight *= _yscale;
+          float diffHeight = _height-defHeight;
+          _yoffset = diffHeight/2.0;
+          break;
+      }
         
-    case movie_root::STAGE_V_ALIGN_C:
-        {
-            float defHeight = swfheight *= _yscale;
-            float diffHeight = _height-defHeight;
-            _yoffset = diffHeight/2.0;
-            break;
-        }
-        
-    default:
-        {
-            log_error("Invalid vertical align %d", valign);
-            break;
-        }
+      default:
+      {
+          log_error("Invalid vertical align %d", valign);
+          break;
+      }
     }
     
     //log_debug("updateStageMatrix: scaleMode:%d, valign:%d, halign:%d",
@@ -422,13 +421,15 @@ Gui::resize_view(int width, int height)
         _stage->setDimensions(width, height);
     }
 
-	_width = width;
-	_height = height;
-	_validbounds.setTo(0, 0, _width, _height);
-
-	updateStageMatrix();
-
-	if ( _stage && _started ) display(_stage);
+    _width = width;
+    _height = height;
+    _validbounds.setTo(0, 0, _width, _height);
+    
+    updateStageMatrix();
+    
+    if ( _stage && _started ) {
+        display(_stage);
+    }
 }
 
 
@@ -450,53 +451,44 @@ Gui::toggleSound()
 void
 Gui::notifyMouseMove(int ux, int uy) 
 {
-	movie_root* m = _stage;
-
-	if ( ! _started ) return;
-
-	if ( _stopped ) return;
-
-	// A stage pseudopixel is user pixel / _xscale wide
-	boost::int32_t x = (ux-_xoffset) / _xscale;
-
-	// A stage pseudopixel is user pixel / _xscale high
-	boost::int32_t y = (uy-_yoffset) / _yscale;
-
-#ifdef DEBUG_MOUSE_COORDINATES
-	log_debug(_("mouse @ %d,%d"), x, y);
-#endif
-
-	if ( m->mouseMoved(x, y) )
-	{
-		// any action triggered by the
-		// event required screen refresh
-		display(m);
-	}
+    movie_root* m = _stage;
     
-	DisplayObject* activeEntity = m->getActiveEntityUnderPointer();
-	if ( activeEntity )
-	{
-		if ( activeEntity->isSelectableTextField() )
-		{
-			setCursor(CURSOR_INPUT);
-		}
-		else if ( activeEntity->allowHandCursor() )
-		{
-			setCursor(CURSOR_HAND);
-		}
-		else
-		{
-			setCursor(CURSOR_NORMAL);
-		}
-	}
-	else
-	{
-		setCursor(CURSOR_NORMAL);
-	}
-
+    if ( ! _started ) return;
+    
+    if ( _stopped ) return;
+    
+    // A stage pseudopixel is user pixel / _xscale wide
+    boost::int32_t x = (ux-_xoffset) / _xscale;
+    
+    // A stage pseudopixel is user pixel / _xscale high
+    boost::int32_t y = (uy-_yoffset) / _yscale;
+    
+#ifdef DEBUG_MOUSE_COORDINATES
+    log_debug(_("mouse @ %d,%d"), x, y);
+#endif
+    
+    if ( m->mouseMoved(x, y) ) {
+        // any action triggered by the
+        // event required screen refresh
+        display(m);
+    }
+    
+    DisplayObject* activeEntity = m->getActiveEntityUnderPointer();
+    if ( activeEntity ) {
+        if ( activeEntity->isSelectableTextField() ) {
+            setCursor(CURSOR_INPUT);
+        } else if ( activeEntity->allowHandCursor() ) {
+            setCursor(CURSOR_HAND);
+        } else {
+            setCursor(CURSOR_NORMAL);
+        }
+    } else {
+        setCursor(CURSOR_NORMAL);
+    }
+    
 #ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS
-	_xpointer = ux;
-	_ypointer = uy;
+    _xpointer = ux;
+    _ypointer = uy;
 #endif
 
 
@@ -505,33 +497,33 @@ Gui::notifyMouseMove(int ux, int uy)
 void
 Gui::notifyMouseWheel(int delta)
 {
-	movie_root* m = _stage;
-	assert(m);
+    movie_root* m = _stage;
+    assert(m);
 
     if (!_started) return;
     if (_stopped) return;
 
-	if (m->mouseWheel(delta)) {
-		// any action triggered by the
-		// event required screen refresh
-		display(m);
-	}
+    if (m->mouseWheel(delta)) {
+        // any action triggered by the
+        // event required screen refresh
+        display(m);
+    }
 } 
 
 void
 Gui::notifyMouseClick(bool mouse_pressed) 
 {
-	movie_root* m = _stage;
-	assert(m);
+    movie_root* m = _stage;
+    assert(m);
 
     if (!_started) return;
     if (_stopped) return;
 
-	if (m->mouseClick(mouse_pressed)) {
-		// any action triggered by the
-		// event required screen refresh
-		display(m);
-	}
+    if (m->mouseClick(mouse_pressed)) {
+        // any action triggered by the
+        // event required screen refresh
+        display(m);
+    }
 }
 
 void
@@ -551,7 +543,7 @@ void
 Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed) 
 {
 
-	/* Handle GUI shortcuts */
+    // Handle GUI shortcuts
     if (pressed) {
         if (k == gnash::key::ESCAPE) {
             if (isFullscreen()) {
@@ -683,158 +675,153 @@ Gui::display(movie_root* m)
     assert(m == _stage); // why taking this arg ??
 
     assert(_started);
-
-	InvalidatedRanges changed_ranges;
-	bool redraw_flag;
-
-	// Should the frame be rendered completely, even if it did not change?
+    
+    InvalidatedRanges changed_ranges;
+    bool redraw_flag;
+    
+    // Should the frame be rendered completely, even if it did not change?
 #ifdef FORCE_REDRAW
-  redraw_flag = true;
+    redraw_flag = true;
 #else	
-	redraw_flag = _redraw_flag || want_redraw();
+    redraw_flag = _redraw_flag || want_redraw();
 #endif	
+    
+    // reset class member if we do a redraw now
+    if (redraw_flag) _redraw_flag=false;
+    
+    // Find out the surrounding frame of all characters which
+    // have been updated. This just checks what region of the stage has changed
+    // due to ActionScript code, the timeline or user events. The GUI can still
+    // choose to render a different part of the stage. 
+    //
+    if (!redraw_flag) {
+        
+        // choose snapping ranges factor 
+        changed_ranges.setSnapFactor(1.3f);  
 	
-	// reset class member if we do a redraw now
-	if (redraw_flag) _redraw_flag=false;
-
-	// Find out the surrounding frame of all characters which
-	// have been updated. This just checks what region of the stage has changed
-	// due to ActionScript code, the timeline or user events. The GUI can still
-	// choose to render a different part of the stage. 
-	//
-	if (!redraw_flag) {
-		
-		// choose snapping ranges factor 
-		changed_ranges.setSnapFactor(1.3f);  
-			
-		// Use multi ranges only when GUI/Renderer supports it
-		// (Useless CPU overhead, otherwise)
-		changed_ranges.setSingleMode(!want_multiple_regions());
-
-		// scan through all sprites to compute invalidated bounds  
-		m->add_invalidated_bounds(changed_ranges, false);
-		
-		// grow ranges by a 2 pixels to avoid anti-aliasing issues		
-		changed_ranges.growBy(40.0f / _xscale);
-		
-		// optimize ranges
-		changed_ranges.combineRanges();
-		
-	}
+        // Use multi ranges only when GUI/Renderer supports it
+        // (Useless CPU overhead, otherwise)
+        changed_ranges.setSingleMode(!want_multiple_regions());
+        
+        // scan through all sprites to compute invalidated bounds  
+        m->add_invalidated_bounds(changed_ranges, false);
+	
+        // grow ranges by a 2 pixels to avoid anti-aliasing issues		
+        changed_ranges.growBy(40.0f / _xscale);
+	
+        // optimize ranges
+        changed_ranges.combineRanges();	
+    }
     
     // TODO: Remove this and want_redraw to avoid confusion!?
-	if (redraw_flag)  {
-		changed_ranges.setWorld();
-	}
-	
-	// DEBUG ONLY:
-  // This is a good place to inspect the invalidated bounds state. Enable
-  // the following block (and parts of it) if you need to. 
-#if 0
-  {
-    // This may print a huge amount of information, but is useful to analyze
-    // the (visible) object structure of the movie and the flags of the
-    // characters. For example, a characters should have set the 
-    // m_child_invalidated flag if at least one of it's childs has the
-    // invalidated flag set.
-    log_debug("DUMPING CHARACTER TREE"); 
-    
-    InfoTree tr;
-    InfoTree::iterator top = tr.begin();
-    _stage->getMovieInfo(tr, top);
-
-    for (InfoTree::iterator i = tr.begin(), e = tr.end();
-            i != e; ++i) {
-        std::cout << std::string(tr.depth(i) * 2, ' ') << i->first << ": " << 
-            i->second << std::endl;
+    if (redraw_flag)  {
+        changed_ranges.setWorld();
     }
-
-
-    // less verbose, and often necessary: see the exact coordinates of the
-    // invalidated bounds (mainly to see if it's NULL or something else).	
-    std::cout << "Calculated changed ranges: " << changed_ranges << "\n";
-  }
+    
+    // DEBUG ONLY:
+    // This is a good place to inspect the invalidated bounds state. Enable
+    // the following block (and parts of it) if you need to. 
+#if 0
+    {
+        // This may print a huge amount of information, but is useful to analyze
+        // the (visible) object structure of the movie and the flags of the
+        // characters. For example, a characters should have set the 
+        // m_child_invalidated flag if at least one of it's childs has the
+        // invalidated flag set.
+        log_debug("DUMPING CHARACTER TREE"); 
+        
+        InfoTree tr;
+        InfoTree::iterator top = tr.begin();
+        _stage->getMovieInfo(tr, top);
+        
+        for (InfoTree::iterator i = tr.begin(), e = tr.end();
+             i != e; ++i) {
+            std::cout << std::string(tr.depth(i) * 2, ' ') << i->first << ": " << 
+                i->second << std::endl;
+        }
+        
+        
+        // less verbose, and often necessary: see the exact coordinates of the
+        // invalidated bounds (mainly to see if it's NULL or something else).	
+        std::cout << "Calculated changed ranges: " << changed_ranges << "\n";
+    }
 #endif
-  
-	// Avoid drawing of stopped movies
-	if ( ! changed_ranges.isNull() ) // use 'else'?
-	{
-		// Tell the GUI(!) that we only need to update this
-		// region. Note the GUI can do whatever it wants with
-		// this information. It may simply ignore the bounds
-		// (which will normally lead into a complete redraw),
-		// or it may extend or shrink the bounds as it likes. So,
-		// by calling set_invalidated_bounds we have no guarantee
-		// that only this part of the stage is rendered again.
+    
+    // Avoid drawing of stopped movies
+    if ( ! changed_ranges.isNull() ) { // use 'else'?
+        // Tell the GUI(!) that we only need to update this
+        // region. Note the GUI can do whatever it wants with
+        // this information. It may simply ignore the bounds
+        // (which will normally lead into a complete redraw),
+        // or it may extend or shrink the bounds as it likes. So,
+        // by calling set_invalidated_bounds we have no guarantee
+        // that only this part of the stage is rendered again.
 #ifdef REGION_UPDATES_DEBUGGING_FULL_REDRAW
-		// redraw the full screen so that only the
-		// *new* invalidated region is visible
-		// (helps debugging)
-		InvalidatedRanges world_ranges;
-		world_ranges.setWorld();
-		setInvalidatedRegions(world_ranges);
+        // redraw the full screen so that only the
+        // *new* invalidated region is visible
+        // (helps debugging)
+        InvalidatedRanges world_ranges;
+        world_ranges.setWorld();
+        setInvalidatedRegions(world_ranges);
 #else
-		setInvalidatedRegions(changed_ranges);
+        setInvalidatedRegions(changed_ranges);
 #endif
-
-		// TODO: should this be called even if we're late ?
-		beforeRendering();
-
-		// Render the frame, if not late.
-		// It's up to the GUI/renderer combination
-		// to do any clipping, if desired.     
-		m->display();
-  
-		// show invalidated region using a red rectangle
-		// (Flash debug style)
-		IF_DEBUG_REGION_UPDATES (
-		if (_renderer.get() && !changed_ranges.isWorld())
-		{
-		
-			for (size_t rno = 0; rno < changed_ranges.size(); rno++) {
-			
-				const geometry::Range2d<int>& bounds = 
-					changed_ranges.getRange(rno);
-
-				point corners[4];
-				float xmin = bounds.getMinX();
-				float xmax = bounds.getMaxX();
-				float ymin = bounds.getMinY();
-				float ymax = bounds.getMaxY();
-				
-				corners[0].x = xmin;
-				corners[0].y = ymin;
-				corners[1].x = xmax;
-				corners[1].y = ymin;
-				corners[2].x = xmax;
-				corners[2].y = ymax;
-				corners[3].x = xmin;
-				corners[3].y = ymax;
-				SWFMatrix no_transform;
-				_renderer->drawPoly(corners, 4,
+        
+        // TODO: should this be called even if we're late ?
+        beforeRendering();
+        
+        // Render the frame, if not late.
+        // It's up to the GUI/renderer combination
+        // to do any clipping, if desired.     
+        m->display();
+        
+        // show invalidated region using a red rectangle
+        // (Flash debug style)
+        IF_DEBUG_REGION_UPDATES (
+            if (_renderer.get() && !changed_ranges.isWorld()) {
+                for (size_t rno = 0; rno < changed_ranges.size(); rno++) {
+                    const geometry::Range2d<int>& bounds = 
+                        changed_ranges.getRange(rno);
+                    
+                    point corners[4];
+                    float xmin = bounds.getMinX();
+                    float xmax = bounds.getMaxX();
+                    float ymin = bounds.getMinY();
+                    float ymax = bounds.getMaxY();
+                    
+                    corners[0].x = xmin;
+                    corners[0].y = ymin;
+                    corners[1].x = xmax;
+                    corners[1].y = ymin;
+                    corners[2].x = xmax;
+                    corners[2].y = ymax;
+                    corners[3].x = xmin;
+                    corners[3].y = ymax;
+                    SWFMatrix no_transform;
+                    _renderer->drawPoly(corners, 4,
 					rgba(0,0,0,0), rgba(255,0,0,255), no_transform, false);
-					
-			}
-		}
-		);
-
-		// show frame on screen
-		renderBuffer();
+                    
+                }
+            }
+            );
+        
+        // show frame on screen
+        renderBuffer();
    	
-	};
-  
-	return true;
+    };
+    
+    return true;
 }
 
 void
 Gui::play()
 {
     if ( ! _stopped ) return;
-
+    
     _stopped = false;
-    if ( ! _started ) start();
-    else
-    {
+    if ( ! _started ) {
+        start();
+    } else {
         assert (_stage);
         // @todo since we registered the sound handler, shouldn't we know
         //       already what it is ?!
