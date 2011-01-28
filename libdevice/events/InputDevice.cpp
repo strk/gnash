@@ -74,20 +74,6 @@ InputDevice::init(InputDevice::devicetype_e type, const std::string &filespec,
     return init(filespec, size);
 }
 
-#if 0
-boost::shared_ptr<InputDevice::input_data_t>
-InputDevice::popData()
-{
-    boost::shared_ptr<InputDevice::input_data_t> input;
-    if (_data.size()) {
-        // std::cerr << "FIXME: " <<_data.size() << std::endl;
-        input = _data.front();
-        _data.pop();
-    }
-    return input;
-}
-#endif
-
 void
 InputDevice::addData(bool pressed, key::code key, int modifier, int x, int y)
 {
@@ -171,14 +157,27 @@ InputDevice::dump()
 //    std::cerr << "\tX is: " << _x << ", Y is: " << _y << std::endl;
 }
 
-// Scan for all the possible input devices. This aggregates all
-// the devices from each type into a single big vector.
-#if 0
-std::vector<boost::shared_ptr<InputDevice> >
+// The Babbage touchscreen gives is absolute coordinates, but they don't
+// match the actual screen resolution. So we convert the coordinates
+// to a new absolute location.
+// For example, if the LCD is 480 x 800, the tablet thinks this is 1010 x 960.
+// This should really use a calibration function, but as we know the numbers...
+boost::shared_array<int>
+InputDevice::convertAbsCoords(int x, int y, int width, int height)
+{
+    boost::shared_array<int> coords(new int[2]);
+
+    coords[0] = (x/width) * x;
+    coords[1] = (y/height) * y;
+    
+    return coords;
+}
+
+std::vector<boost::shared_ptr<InputDevice> > 
 InputDevice::scanForDevices()
 {
     // GNASH_REPORT_FUNCTION;
-
+    
     std::vector<boost::shared_ptr<InputDevice> > devices;
     
     std::vector<boost::shared_ptr<InputDevice> > id;
@@ -200,28 +199,10 @@ InputDevice::scanForDevices()
     for (it=id.begin(); it!=id.end(); ++it) {
         devices.push_back(*it);
     }
-#endif
-
+#endif    
     return devices;
 }
-#endif
-
-// The Babbage touchscreen gives is absolute coordinates, but they don't
-// match the actual screen resolution. So we convert the coordinates
-// to a new absolute location.
-// For example, if the LCD is 480 x 800, the tablet thinks this is 1010 x 960.
-// This should really use a calibration function, but as we know the numbers...
-boost::shared_array<int>
-InputDevice::convertAbsCoords(int x, int y, int width, int height)
-{
-    boost::shared_array<int> coords(new int[2]);
-
-    coords[0] = (x/width) * x;
-    coords[1] = (y/height) * y;
     
-    return coords;
-}
-
 // end of gnash namespace
 }
 

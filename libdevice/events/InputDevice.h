@@ -95,34 +95,7 @@ public:
     virtual bool init(const std::string &filespec, size_t size) = 0;
     virtual bool check() = 0;
 
-    static std::vector<boost::shared_ptr<InputDevice> > scanForDevices()
-    {
-        // GNASH_REPORT_FUNCTION;
-        
-        std::vector<boost::shared_ptr<InputDevice> > devices;
-        
-        std::vector<boost::shared_ptr<InputDevice> > id;
-        std::vector<boost::shared_ptr<InputDevice> >::iterator it;
-#ifdef USE_INPUT_EVENTS
-        id = EventDevice::scanForDevices();
-        for (it=id.begin(); it!=id.end(); ++it) {
-            devices.push_back(*it);
-        }
-#endif
-#if defined(USE_MOUSE_PS2) || defined(USE_MOUSE_ETT)
-        id = MouseDevice::scanForDevices();
-        for (it=id.begin(); it!=id.end(); ++it) {
-        devices.push_back(*it);
-        }
-#endif
-#if defined(HAVE_TSLIB_H) && defined(USE_TSLIB)
-        id = TouchDevice::scanForDevices();
-        for (it=id.begin(); it!=id.end(); ++it) {
-        devices.push_back(*it);
-        }
-#endif    
-    return devices;
-    }        
+    static std::vector<boost::shared_ptr<InputDevice> > scanForDevices();
     
     InputDevice::devicetype_e getType() { return _type; };
 
