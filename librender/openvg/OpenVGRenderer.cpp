@@ -863,7 +863,7 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
           //          std::auto_ptr<image::GnashImage> im(&cb->image());
           OpenVGBitmap *binfo = new OpenVGBitmap(cb, _fillpaint);
           binfo->apply(sm, OpenVGBitmap::WRAP_REPEAT, _fillpaint);
-          vgSetParameteri (_fillpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
+          //vgSetParameteri (_fillpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
           break;
       }
       
@@ -879,7 +879,7 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
           OpenVGBitmap *binfo = new OpenVGBitmap(im, _fillpaint);
 #endif
           binfo->apply(sm, OpenVGBitmap::WRAP_PAD, _fillpaint);
-          vgSetParameteri (_fillpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
+          //vgSetParameteri (_fillpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
           break;
       } 
       case SWF::FILL_SOLID:

@@ -58,23 +58,38 @@ OpenVGBitmap::OpenVGBitmap(CachedBitmap *bitmap, VGPaint vgpaint)
 {
     GNASH_REPORT_FUNCTION;
 
-    // extract a reference to the image from the cached bitmap
-    image::GnashImage &im = bitmap->image();
-
     // Store the reference so so it's available to createPatternBitmap()
     //    _image.reset(&im);
+
+    // extract a reference to the image from the cached bitmap
+    image::GnashImage &im = bitmap->image();
 
     // Create a VG image
     _vgimage = vgCreateImage(_pixel_format, im.width(), im.height(),
                              VG_IMAGE_QUALITY_FASTER);    
     if (_vgimage == VG_INVALID_HANDLE) {
-        log_error("Failed to create VG image! %s", Renderer_ovg::getErrorString(vgGetError()));
+        log_error("Failed to create VG image! %s",
+                  Renderer_ovg::getErrorString(vgGetError()));
     }
     
-    // Copy the image data into the VG image container
-    vgImageSubData(_vgimage, im.begin(), im.width() * _stride, _pixel_format,
+    switch (im.type()) {
+    case image::TYPE_RGB:
+        log_debug("Image has RGB Pixel Format, Stride is %d",
+                  im.stride());
+        vgImageSubData(_vgimage, im.begin(), im.stride(), VG_sRGBA_8888,
                    0, 0, im.width(), im.height());
-    
+        break;
+    case image::TYPE_RGBA:
+        log_debug("Image has RGBA Pixel Format, Stride is %d",
+                  im.stride());
+        // Copy the image data into the VG image container
+        vgImageSubData(_vgimage, im.begin(), im.stride(), VG_sRGBX_8888,
+                   0, 0, im.width(), im.height());
+        break;
+    default:
+        std::abort();
+    }
+
     vgSetParameteri (_vgpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
     vgPaintPattern (_vgpaint, _vgimage);
 }
@@ -99,6 +114,23 @@ OpenVGBitmap::OpenVGBitmap(image::GnashImage *image, VGPaint vgpaint)
 {
     GNASH_REPORT_FUNCTION;
     
+    switch (image->type()) {
+    case image::TYPE_RGB:
+        log_debug("Image has RGB Pixel Format, Stride is %d",
+                  image->stride());
+        vgImageSubData(_vgimage, image->begin(), image->stride(), VG_sRGBX_8888,
+                   0, 0, image->width(), image->height());
+        break;
+    case image::TYPE_RGBA:
+        log_debug("Image has RGBA Pixel Format, Stride is %d",
+                  image->stride());
+        vgImageSubData(_vgimage, image->begin(), image->stride(), VG_sRGBX_8888,
+                   0, 0, image->width(), image->height());
+        break;
+    default:
+        std::abort();
+    }
+
     size_t width = _image->width();
     size_t height = _image->height();
 
@@ -106,11 +138,11 @@ OpenVGBitmap::OpenVGBitmap(image::GnashImage *image, VGPaint vgpaint)
     _vgimage = vgCreateImage(_pixel_format, width, height,
                              VG_IMAGE_QUALITY_FASTER);    
     
-    vgImageSubData(_vgimage, image->begin(), width * _stride, _pixel_format,
+    vgImageSubData(_vgimage, image->begin(), image->stride(), _pixel_format,
                    0, 0, width, height);
 
-    vgSetParameteri(vgpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
-    vgSetParameteri(vgpaint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_REPEAT);
+    // vgSetParameteri(vgpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
+    //    vgSetParameteri(vgpaint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_REPEAT);
     vgPaintPattern(vgpaint, _vgimage);
     vgDrawImage(_vgimage);
     vgFlush();
@@ -173,6 +205,7 @@ OpenVGBitmap::apply(const gnash::SWFMatrix& bitmap_matrix,
     mat.invert();
     Renderer_ovg::printVGMatrix(mat);
     
+#if 1
     memset(vmat, 0, sizeof(vmat));
     vmat[0] = mat.sx  / 65536.0f;
     vmat[1] = mat.shx / 65536.0f;
@@ -188,6 +221,7 @@ OpenVGBitmap::apply(const gnash::SWFMatrix& bitmap_matrix,
     vgSeti (VG_MATRIX_MODE, VG_MATRIX_STROKE_PAINT_TO_USER);
     vgLoadMatrix (vmat);
     vgSeti (VG_MATRIX_MODE, VG_MATRIX_PATH_USER_TO_SURFACE);
+#endif
     
     switch (wrap_mode) {
       case WRAP_FILL:
@@ -206,6 +240,10 @@ OpenVGBitmap::apply(const gnash::SWFMatrix& bitmap_matrix,
           log_error("No supported wrap mode specified!");
           break;
     }
+
+    vgPaintPattern(paint, _vgimage);
+    vgDrawImage(_vgimage);
+    vgFlush();
 }
 
 /// OpenVG supports creating linear and gradient fills in hardware, so
