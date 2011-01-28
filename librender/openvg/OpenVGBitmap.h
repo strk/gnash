@@ -48,8 +48,6 @@ public:
 
     image::GnashImage& image();
     
-    void apply(const gnash::SWFMatrix& bitmap_matrix,
-               bitmap_wrap_mode wrap_mode, VGPaint paint) const;
     // Accessors for the GnashImage internal data
     VGPaint getFillPaint() const { return _vgpaint; }
     int getWidth() { return _image->width(); }
@@ -66,10 +64,9 @@ public:
                                      const rgba &incolor, const VGPaint paint);
 
     // This is for images
-    OpenVGBitmap *createPatternBitmap(image::GnashImage &im,
-                                      VGPaint paint);
-    OpenVGBitmap *createPatternBitmap();
-
+    OpenVGBitmap *createPatternBitmap(CachedBitmap *bitmap, const gnash::SWFMatrix& matrix,
+                                      bitmap_wrap_mode mode);
+    
 private:
     boost::scoped_ptr<image::GnashImage> _image;
     VGImageFormat   _pixel_format;

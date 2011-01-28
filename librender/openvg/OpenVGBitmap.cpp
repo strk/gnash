@@ -83,7 +83,7 @@ OpenVGBitmap::OpenVGBitmap(CachedBitmap *bitmap, VGPaint vgpaint)
         log_debug("Image has RGBA Pixel Format, Stride is %d",
                   im.stride());
         // Copy the image data into the VG image container
-        vgImageSubData(_vgimage, im.begin(), im.stride(), VG_sRGBX_8888,
+        vgImageSubData(_vgimage, im.begin(), im.stride(), VG_sRGBA_8888,
                    0, 0, im.width(), im.height());
         break;
     default:
@@ -118,13 +118,13 @@ OpenVGBitmap::OpenVGBitmap(image::GnashImage *image, VGPaint vgpaint)
     case image::TYPE_RGB:
         log_debug("Image has RGB Pixel Format, Stride is %d",
                   image->stride());
-        vgImageSubData(_vgimage, image->begin(), image->stride(), VG_sRGBX_8888,
+        vgImageSubData(_vgimage, image->begin(), image->stride(), VG_sRGBA_8888,
                    0, 0, image->width(), image->height());
         break;
     case image::TYPE_RGBA:
         log_debug("Image has RGBA Pixel Format, Stride is %d",
                   image->stride());
-        vgImageSubData(_vgimage, image->begin(), image->stride(), VG_sRGBX_8888,
+        vgImageSubData(_vgimage, image->begin(), image->stride(), VG_sRGBA_8888,
                    0, 0, image->width(), image->height());
         break;
     default:
@@ -179,72 +179,6 @@ OpenVGBitmap::image()
         return *_image;
     }
 }    
-
-// This applies the cached VGimage or VGpath to the current paint object.
-// a VGimage is used for a bitmap, for example a jpeg. VGpath is used
-// instead of a VGimage when handling gradients, as a VGPath has hardware
-// support for gradients.
-void
-OpenVGBitmap::apply(const gnash::SWFMatrix& bitmap_matrix,
-                    bitmap_wrap_mode wrap_mode, VGPaint paint) const
-{
-    GNASH_REPORT_FUNCTION;
-    
-    gnash::SWFMatrix mat;
-    VGfloat     vmat[9];
-
-//    Renderer_ovg::printVGMatrix(bitmap_matrix);
-    
-    // if (_vgimage == VG_INVALID_HANDLE) {
-    //     log_error("No cached VG image!");
-    // } else {
-    
-    vgSetParameteri (paint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
-    // Paint the cached VG image into the VG paint surface
-    mat = bitmap_matrix;
-    mat.invert();
-    Renderer_ovg::printVGMatrix(mat);
-    
-#if 1
-    memset(vmat, 0, sizeof(vmat));
-    vmat[0] = mat.sx  / 65536.0f;
-    vmat[1] = mat.shx / 65536.0f;
-    vmat[3] = mat.shy / 65536.0f;
-    vmat[4] = mat.sy  / 65536.0f;
-    vmat[6] = mat.tx;
-    vmat[7] = mat.ty;
-    
-    Renderer_ovg::printVGMatrix(vmat);
-    
-    vgSeti (VG_MATRIX_MODE, VG_MATRIX_FILL_PAINT_TO_USER);
-    vgLoadMatrix (vmat);
-    vgSeti (VG_MATRIX_MODE, VG_MATRIX_STROKE_PAINT_TO_USER);
-    vgLoadMatrix (vmat);
-    vgSeti (VG_MATRIX_MODE, VG_MATRIX_PATH_USER_TO_SURFACE);
-#endif
-    
-    switch (wrap_mode) {
-      case WRAP_FILL:
-          vgSetParameteri (paint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_FILL);
-          break;
-      case WRAP_PAD:
-          vgSetParameteri (paint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_PAD);
-          break;
-      case WRAP_REPEAT:
-          vgSetParameteri (paint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_REPEAT);
-          break;
-      case WRAP_REFLECT:
-          vgSetParameteri (paint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_REFLECT);
-          break;
-      default:
-          log_error("No supported wrap mode specified!");
-          break;
-    }
-
-    vgPaintPattern(paint, _vgimage);
-    vgDrawImage(_vgimage);
-    vgFlush();
-}
 
 /// OpenVG supports creating linear and gradient fills in hardware, so
 /// we want to use that instead of the existing way of calculating the
@@ -320,45 +254,89 @@ OpenVGBitmap::createLinearBitmap(float x0, float y0, float x1, float y1,
 
     // Create and fill pattern image
 OpenVGBitmap *
-OpenVGBitmap::createPatternBitmap(image::GnashImage &im, VGPaint vgpaint)
+OpenVGBitmap::createPatternBitmap(CachedBitmap *bitmap, const gnash::SWFMatrix& matrix,
+                                  bitmap_wrap_mode mode)
 {
     GNASH_REPORT_FUNCTION;
 
-    VGImage vgimage;
-    if (vgpaint != VG_INVALID_HANDLE) {
-        vgimage = vgCreateImage(_pixel_format, im.width(), im.height(),
-                                 VG_IMAGE_QUALITY_FASTER);
-        vgImageSubData(vgimage, im.begin(), 4*im.width(), /* stride */
-                       _pixel_format, 0, 0, im.width(), im.height());
-        
-        vgSetParameteri(vgpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
-        vgSetParameteri(vgpaint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_REPEAT);
-        vgPaintPattern(vgpaint, vgimage);
-        vgDrawImage(vgimage);
-        vgFlush();
+    // extract a reference to the image from the cached bitmap
+    image::GnashImage &im = bitmap->image();
+
+    // Create a VG image
+    _vgimage = vgCreateImage(_pixel_format, im.width(), im.height(),
+                             VG_IMAGE_QUALITY_FASTER);    
+    if (_vgimage == VG_INVALID_HANDLE) {
+        log_error("Failed to create VG image! %s",
+                  Renderer_ovg::getErrorString(vgGetError()));
+    }
+    
+    switch (im.type()) {
+    case image::TYPE_RGB:
+        log_debug("Image has RGB Pixel Format, Stride is %d",
+                  im.stride());
+        vgImageSubData(_vgimage, im.begin(), im.stride(), VG_sRGBA_8888,
+                   0, 0, im.width(), im.height());
+        break;
+    case image::TYPE_RGBA:
+        log_debug("Image has RGBA Pixel Format, Stride is %d",
+                  im.stride());
+        // Copy the image data into the VG image container
+        vgImageSubData(_vgimage, im.begin(), im.stride(), VG_sRGBA_8888,
+                   0, 0, im.width(), im.height());
+        break;
+    default:
+        log_error("");
+        return 0;
     }
 
-    return this;
-}
+    vgSetParameteri (_vgpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
+//    vgPaintPattern (_vgpaint, _vgimage);
 
-    // Create and fill pattern image
-OpenVGBitmap *
-OpenVGBitmap::createPatternBitmap()
-{
-    GNASH_REPORT_FUNCTION;
-
-    if (_vgpaint != VG_INVALID_HANDLE) {
-        VGImage vgimage = vgCreateImage(_pixel_format, _image->width(), _image->height(),
-                                 VG_IMAGE_QUALITY_FASTER);
-        vgImageSubData(vgimage, _image->begin(), 4*_image->width(), /* stride */
-                       _pixel_format, 0, 0, _image->width(), _image->height());
-        
-        vgSetParameteri(_vgpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
-        vgSetParameteri(_vgpaint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_REPEAT);
-        vgPaintPattern(_vgpaint, vgimage);
-        vgDrawImage(vgimage);
-        vgFlush();
+    gnash::SWFMatrix mat;
+    VGfloat     vmat[9];
+    
+    // Paint the cached VG image into the VG paint surface
+    mat = matrix;
+    mat.invert();
+//    Renderer_ovg::printVGMatrix(mat);
+    
+    memset(vmat, 0, sizeof(vmat));
+    vmat[0] = mat.sx  / 65536.0f;
+    vmat[1] = mat.shx / 65536.0f;
+    vmat[3] = mat.shy / 65536.0f;
+    vmat[4] = mat.sy  / 65536.0f;
+    vmat[6] = mat.tx;
+    vmat[7] = mat.ty;
+    
+    Renderer_ovg::printVGMatrix(vmat);
+    
+    vgSeti (VG_MATRIX_MODE, VG_MATRIX_FILL_PAINT_TO_USER);
+    vgLoadMatrix (vmat);
+    vgSeti (VG_MATRIX_MODE, VG_MATRIX_STROKE_PAINT_TO_USER);
+    vgLoadMatrix (vmat);
+    vgSeti (VG_MATRIX_MODE, VG_MATRIX_PATH_USER_TO_SURFACE);
+    
+    switch (mode) {
+      case WRAP_FILL:
+          vgSetParameteri (_vgpaint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_FILL);
+          break;
+      case WRAP_PAD:
+          vgSetParameteri (_vgpaint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_PAD);
+          break;
+      case WRAP_REPEAT:
+          vgSetParameteri (_vgpaint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_REPEAT);
+          break;
+      case WRAP_REFLECT:
+          vgSetParameteri (_vgpaint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_REFLECT);
+          break;
+      default:
+          log_error("No supported wrap mode specified!");
+          break;
     }
+
+    vgPaintPattern(_vgpaint, _vgimage);
+//    vgDrawImage(_vgimage);
+//    vgFlush();
 
     return this;
 }

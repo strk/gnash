@@ -835,24 +835,8 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
       case SWF::FILL_RADIAL_GRADIENT:
       case SWF::FILL_FOCAL_GRADIENT:
       {
-          OpenVGBitmap* binfo = new OpenVGBitmap(_fillpaint);
-          // Renderer_ovg::printVGMatrix(sm);
-          
-          eglScopeMatrix scope_mat(mat);
-          rgba c = cx.transform(incolor);
-          switch (fill_type) {
-          case SWF::FILL_LINEAR_GRADIENT:
-              log_error("Fill Style Type: Linear Gradient, you shouldn't be here");
-              break;
-          case SWF::FILL_RADIAL_GRADIENT:
-          case SWF::FILL_FOCAL_GRADIENT:
-              log_error("Fill Style Type: Radial Gradient, you shouldn't be here");
-              break;
-          default:
-              std::abort();
-          }
-          // binfo->apply(sm, OpenVGBitmap::WRAP_PAD, _fillpaint);
-          vgSetParameteri (_fillpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
+          // This is handled elsewhere, as it's now hardware supported.
+          log_error("Fill Style Type: Gradient, you shouldn't be here!");
           break;
       }
       case SWF::FILL_TILED_BITMAP_HARD:
@@ -860,10 +844,8 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
       {
           log_debug("Fill Style Type: Tiled Bitmap");
           CachedBitmap *cb = boost::apply_visitor(GetBitmap(), style.fill);
-          //          std::auto_ptr<image::GnashImage> im(&cb->image());
-          OpenVGBitmap *binfo = new OpenVGBitmap(cb, _fillpaint);
-          binfo->apply(sm, OpenVGBitmap::WRAP_REPEAT, _fillpaint);
-          //vgSetParameteri (_fillpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
+          OpenVGBitmap *binfo = new OpenVGBitmap(_fillpaint);
+          binfo->createPatternBitmap(cb, sm, OpenVGBitmap::WRAP_REPEAT);
           break;
       }
       
@@ -872,14 +854,8 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
       {     
           log_debug("Fill Style Type: Clipped Bitmap");
           CachedBitmap *cb = boost::apply_visitor(GetBitmap(), style.fill);
-          OpenVGBitmap *binfo = new OpenVGBitmap(cb, _fillpaint);
-#if 0
-          binfo->createPatternBitmap();
-          image::GnashImage *im = boost::apply_visitor(GetImage(), style.fill);
-          OpenVGBitmap *binfo = new OpenVGBitmap(im, _fillpaint);
-#endif
-          binfo->apply(sm, OpenVGBitmap::WRAP_PAD, _fillpaint);
-          //vgSetParameteri (_fillpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
+          OpenVGBitmap *binfo = new OpenVGBitmap(_fillpaint);
+          binfo->createPatternBitmap(cb, sm, OpenVGBitmap::WRAP_FILL);
           break;
       } 
       case SWF::FILL_SOLID:
