@@ -301,7 +301,7 @@ FBGui::init(int argc, char *** argv)
     log_debug("X:%d, Y:%d", _xpos, _ypos);
 #endif
 
-_validbounds.setTo(0, 0, _width - 1, _height - 1);
+    _validbounds.setTo(0, 0, _width - 1, _height - 1);
 
     _renderer.reset(renderer::openvg::create_handler(0));
   
@@ -733,16 +733,17 @@ FBGui::checkForData()
             }
 #endif
             // See if a mouse button was clicked
-            //if (ie->pressed) {
-            notifyMouseClick(true);
+            if (ie->pressed) {
+                notifyMouseClick(true);
 #if 0
-            double x = 0.655 * ie->x;
-            double y = 0.46875 * ie->y;
-            log_debug("Mouse clicked at: %g:%g", x, y);
-            notifyMouseMove(int(x), int(y));
+                double x = 0.655 * ie->x;
+                double y = 0.46875 * ie->y;
+                log_debug("Mouse clicked at: %g:%g", x, y);
+                notifyMouseMove(int(x), int(y));
 #else
-            notifyMouseMove(ie->x, ie->y);
-#endif            
+                notifyMouseMove(ie->x, ie->y);
+#endif  
+            }
         }
     }
 }
