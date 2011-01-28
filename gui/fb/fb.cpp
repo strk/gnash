@@ -102,6 +102,7 @@
 #endif
 
 #include "gui.h"
+#include "rc.h"
 #include "fbsup.h"
 #include "log.h"
 #include "movie_root.h"
@@ -133,9 +134,13 @@
 #endif
 #endif
 
+namespace {
+gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+}
 namespace gnash {
 
 namespace gui {
+
 
 int terminate_request = false;  // global scope to avoid GUI access
 
@@ -190,7 +195,8 @@ FBGui::init(int argc, char *** argv)
     // GNASH_REPORT_FUNCTION;
 
     // the current renderer as set on the command line or gnashrc file
-    std::string renderer = _runResources.getRenderBackend();
+//    std::string renderer = _runResources.getRenderBackend();
+    std::string renderer = rcfile.getRenderer();
 
     // map framebuffer into memory
     // Create a new Glue layer
@@ -234,7 +240,7 @@ FBGui::init(int argc, char *** argv)
         //(*it)->dump();
         if ((*it)->getType() == InputDevice::MOUSE) {
             log_debug("WARNING: Mouse support disabled as it conflicts with the input event support.");
-            // For now we only want keyboards input events, as the mouse
+            // For now we only want keyboard input events, as the mouse
             // interface default of /dev/input/mice supports hotpluging devices,
             // unlike the regular events.
             // _inputs.push_back(*it);
@@ -242,13 +248,20 @@ FBGui::init(int argc, char *** argv)
         if ((*it)->getType() == InputDevice::KEYBOARD) {
             _inputs.push_back(*it);
         }
+        // TSLib also supports linux input events, so we
+        // use that instead of handling the events directly. The
+        // Babbage is configured as a tablet when using input events.
         if ((*it)->getType() == InputDevice::TOUCHSCREEN) {
-            log_debug("WARNING: Touchscreen support disabled as it conflicts with the input event support.");
-//            _inputs.push_back(*it);
+            log_debug("Enabling Touchscreen support.");
+            _inputs.push_back(*it);
         }
         if ((*it)->getType() == InputDevice::TABLET) {
+#if 1
+            log_debug("WARNING: Babbage Tablet support disabled as it conflicts with TSlib");
+#else
             log_debug("Enabling Babbage Touchscreen support");
             _inputs.push_back(*it);
+#endif
         }
         if ((*it)->getType() == InputDevice::POWERBUTTON) {
             _inputs.push_back(*it);
@@ -700,7 +713,7 @@ FBGui::checkForData()
         (*it)->check();
         boost::shared_ptr<InputDevice::input_data_t> ie = (*it)->popData();
         if (ie) {
-#if 0
+#if 1
             std::cerr << "Got data: " << ((ie->pressed) ? "true" : "false");
             std::cerr << ", " << ie->key << ", " << ie->modifier;
             std::cerr << ", " << ie->x << ", " << ie->y << std::endl;
@@ -722,13 +735,14 @@ FBGui::checkForData()
             // See if a mouse button was clicked
             //if (ie->pressed) {
             notifyMouseClick(true);
+#if 0
             double x = 0.655 * ie->x;
             double y = 0.46875 * ie->y;
             log_debug("Mouse clicked at: %g:%g", x, y);
+            notifyMouseMove(int(x), int(y));
+#else
             notifyMouseMove(ie->x, ie->y);
-//                notifyMouseMove(int(x), int(y));
-//        }
-            
+#endif            
         }
     }
 }
