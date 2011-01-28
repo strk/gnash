@@ -1,12 +1,3 @@
-
-// _root.lineStyle(1, 0x000000, 100);
-// _root.moveTo(200, 100);
-// _root.lineTo(350, 100);
-// _root.lineTo(350, 200);
-// _root.lineTo(200, 200);
-// _root.lineTo(200, 100);
-
-
 fillType = "linear";
 colors = [0xFF0000, 0x0000FF];
 alphas = [100, 100];
@@ -30,7 +21,7 @@ _root.beginGradientFill(fillType, colors, alphas, ratios, matrix);
 // This is the dimensions of the big black box that is supposed to have
 // a linear gradient in it.
 x0 = 200; // 200 pixels = 4000 twips
-y0 = 200; // 200 pixels = 4000 twips -77, was -102 at 150
+y0 = 200; // 200 pixels = 4000 twips
 x1 = 500; // 500 pixels = 10000 twips
 y1 = 400; // 400 pixels = 8000 twips
 _root.moveTo(x0, y0);
