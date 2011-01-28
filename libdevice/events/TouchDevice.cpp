@@ -77,8 +77,6 @@ TouchDevice::init(const std::string &filespec, size_t /* size */)
     
     char *devname = getenv(TSLIB_DEVICE_ENV);
     if (!devname) {
-        devname = const_cast<char *>(TSLIB_DEVICE_NAME);
-    } else {
         if (!filespec.empty()) {
             devname = const_cast<char *>(_filespec.c_str());
         } else {
@@ -88,19 +86,20 @@ TouchDevice::init(const std::string &filespec, size_t /* size */)
     
     _tsDev = ts_open(devname, 1);  //Open tslib non-blocking
     if (_tsDev == 0) {
-        log_debug("Could not open touchscreen %s: %s", devname, strerror(errno));
+        log_error("Could not open touchscreen %s: %s", devname, strerror(errno));
         return false;
     }
     
     ts_config(_tsDev); 
     if (ts_fd(_tsDev) < 0) {
-        log_debug("Could not get touchscreen fd %s: %s", devname, strerror(errno));
+        log_error("Could not get touchscreen fd %s: %s", devname, strerror(errno));
         return false;
     }
     
     _fd = ts_fd(_tsDev);
     
     log_debug("Using TSLIB on %s", devname);
+    
     return true;
 }
 
@@ -112,8 +111,6 @@ TouchDevice::check()
     // Read events from the touchscreen and transport them into Gnash
     // Tslib should be setup so the output is pretty clean.
     struct ts_sample event;
-    // unsigned long    flags;
-    // unsigned long    buttons;
     
     if (_tsDev == 0) {
         return false;           // No tslib device initialized, exit!
@@ -126,27 +123,11 @@ TouchDevice::check()
         if (event.pressure > 0) {
             // the screen is touched
             boost::shared_array<int> coords =
-                MouseDevice::convertCoordinates(event.x, event.y, 1024, 768);
-//          MouseDevice::convertCoordinates(event.x, event.y,
-//                                 _gui->getStage()->getStageWidth(),
-//                                 _gui->getStage()->getStageHeight());
-            event.x = coords[0];
-            event.y = coords[1];
-#if 0
-            // FIXME: the API for these mouse events has changed, so this needs to be
-            // updated.
-            _gui->notifyMouseMove(int(event.x / _gui->getXScale()),
-                                  int(event.y / _gui->getYScale()));
-            _gui->notifyMouseClick(true);  //fire mouse click event into Gnash
-            
-            log_debug("Touched x: %d y: %d width: %d height: %d",
-                      event.x , event.y, _gui->getStage()->getStageWidth(),
-                      _gui->getStage()->getStageHeight());
-#endif
+                MouseDevice::convertCoordinates(event.x, event.y, 800, 480);
+            log_debug("Touched x: %d, y: %d", event.x , event.y);
             addData(true, gnash::key::INVALID, 0, event.x, event.y);
         } else {
             addData(false, gnash::key::INVALID, 0, event.x, event.y);
-//            _gui->notifyMouseClick(false);  //button released
             log_debug("lifted x: %d y: %d", event.x, event.y); //debug
         }
     }
@@ -154,9 +135,14 @@ TouchDevice::check()
     return true;
 }
 
+// FIXME: this currently is lacking thw swf program used to generate the
+// input data. Instead use the tslib utility 'ts_calibrate', as Gnash now
+// has TSlib support.
 void
 TouchDevice::apply_ts_calibration(float* cx, float* cy, int rawx, int rawy)
 {
+    GNASH_REPORT_FUNCTION;
+    
     // This method use 3 points calibration
     // it is described in http://www.embedded.com/story/OEG20020529S0046
     
@@ -319,16 +305,17 @@ TouchDevice::scanForDevices()
                 log_error("You don't have the proper permissions to open %s",
                           touch[i].filespec);
                 i++;
-                close(fd);
-                log_debug("Found a %s device for touchscreen input using %s",
-                          debug[touch[i].type], touch[i].filespec);
-                boost::shared_ptr<InputDevice> dev;
-                dev = boost::shared_ptr<InputDevice>(new TouchDevice());
-                if (dev->init(touch[i].filespec, DEFAULT_BUFFER_SIZE)) {
-                    devices.push_back(dev);
-                    break;
-                }
-            } // open()
+                continue;
+            }
+            close(fd);
+            log_debug("Found a %s device for touchscreen input using %s",
+                      debug[touch[i].type], touch[i].filespec);
+            boost::shared_ptr<InputDevice> dev
+                = boost::shared_ptr<InputDevice>(new TouchDevice());
+            if (dev->init(touch[i].filespec, DEFAULT_BUFFER_SIZE)) {
+                devices.push_back(dev);
+            }
+            break;
 //            dev->dump();
         }     // stat()
         i++;
