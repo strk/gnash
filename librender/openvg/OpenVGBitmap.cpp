@@ -35,10 +35,8 @@ OpenVGBitmap::OpenVGBitmap(VGPaint paint)
     : _vgimage(VG_INVALID_HANDLE),
 #ifdef BUILD_X11_DEVICE
       _pixel_format(VG_sARGB_8888),
-      _stride(4),
 #else
       _pixel_format(VG_sRGB_565),
-      _stride(2),
 #endif
       _vgpaint(paint)
 {
@@ -49,20 +47,18 @@ OpenVGBitmap::OpenVGBitmap(CachedBitmap *bitmap, VGPaint vgpaint)
     : _vgimage(VG_INVALID_HANDLE),
 #ifdef BUILD_X11_DEVICE
       _pixel_format(VG_sARGB_8888),
-      _stride(4),
 #else
       _pixel_format(VG_sRGB_565),
-      _stride(2),
 #endif
        _vgpaint(vgpaint)
 {
     GNASH_REPORT_FUNCTION;
 
-    // Store the reference so so it's available to createPatternBitmap()
-    //    _image.reset(&im);
-
     // extract a reference to the image from the cached bitmap
     image::GnashImage &im = bitmap->image();
+
+    // Store the reference so so it's available to createPatternBitmap()
+    _image.reset(&im);
 
     // Create a VG image
     _vgimage = vgCreateImage(_pixel_format, im.width(), im.height(),
@@ -89,30 +85,27 @@ OpenVGBitmap::OpenVGBitmap(CachedBitmap *bitmap, VGPaint vgpaint)
     default:
         std::abort();
     }
-
-    vgSetParameteri (_vgpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
-    vgPaintPattern (_vgpaint, _vgimage);
 }
 
-// 
-// VG_sRGB_565
-// VG_sRGBA_5551
-// VG_sRGBA_4444
-// VG_A_8
-// VG_A_4
+// FIXME: this caches the GnashImage, but we should really cache the VG Image.
 OpenVGBitmap::OpenVGBitmap(image::GnashImage *image, VGPaint vgpaint)
     : _image(image),
       _vgimage(VG_INVALID_HANDLE),
 #ifdef BUILD_X11_DEVICE
       _pixel_format(VG_sARGB_8888),
-      _stride(4),
 #else
       _pixel_format(VG_sRGB_565),
-      _stride(2),
 #endif
     _vgpaint(vgpaint)
 {
     GNASH_REPORT_FUNCTION;
+    // Create a VG image
+    _vgimage = vgCreateImage(_pixel_format, image->width(), image->height(),
+                             VG_IMAGE_QUALITY_FASTER);    
+    if (_vgimage == VG_INVALID_HANDLE) {
+        log_error("Failed to create VG image! %s",
+                  Renderer_ovg::getErrorString(vgGetError()));
+    }
     
     switch (image->type()) {
     case image::TYPE_RGB:
@@ -124,48 +117,18 @@ OpenVGBitmap::OpenVGBitmap(image::GnashImage *image, VGPaint vgpaint)
     case image::TYPE_RGBA:
         log_debug("Image has RGBA Pixel Format, Stride is %d",
                   image->stride());
+        // Copy the image data into the VG image container
         vgImageSubData(_vgimage, image->begin(), image->stride(), VG_sRGBA_8888,
                    0, 0, image->width(), image->height());
         break;
     default:
         std::abort();
     }
-
-    size_t width = _image->width();
-    size_t height = _image->height();
-
-    // Create a VG image, and copy the GnashImage data into it
-    _vgimage = vgCreateImage(_pixel_format, width, height,
-                             VG_IMAGE_QUALITY_FASTER);    
-    
-    vgImageSubData(_vgimage, image->begin(), image->stride(), _pixel_format,
-                   0, 0, width, height);
-
-    // vgSetParameteri(vgpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
-    //    vgSetParameteri(vgpaint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_REPEAT);
-    vgPaintPattern(vgpaint, _vgimage);
-    vgDrawImage(_vgimage);
-    vgFlush();
-    
-#if 0
-    _tex_size += width * height * 4;
-    log_debug("Add Texture size:%d (%d x %d x %dbpp)", width * height * 4, 
-              width, height, 4);
-    log_debug("Current Texture size: %d", _tex_size);
-#endif
 } 
 
 OpenVGBitmap::~OpenVGBitmap()
 {
     // GNASH_REPORT_FUNCTION;
-    
-#if 0
-    _tex_size -= _image->width() * _image->height() * 4;
-    log_debug(_("Remove Texture size:%d (%d x %d x %dbpp)"),
-              _image->width() * _image->height() * 4,
-              _image->width(), _image->height(), 4);
-    log_debug(_("Current Texture size: %d"), _tex_size);
-#endif
     
     vgDestroyPaint(_vgpaint);
     vgDestroyImage(_vgimage);
@@ -174,7 +137,8 @@ OpenVGBitmap::~OpenVGBitmap()
 image::GnashImage&
 OpenVGBitmap::image()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     if (_image) {
         return *_image;
     }
@@ -252,45 +216,22 @@ OpenVGBitmap::createLinearBitmap(float x0, float y0, float x1, float y1,
     return this;
 }
 
-    // Create and fill pattern image
+// Create and fill pattern image
 OpenVGBitmap *
-OpenVGBitmap::createPatternBitmap(CachedBitmap *bitmap, const gnash::SWFMatrix& matrix,
-                                  bitmap_wrap_mode mode)
+OpenVGBitmap::applyPatternBitmap(const gnash::SWFMatrix& matrix,
+                                 bitmap_wrap_mode mode, VGPaint paint)
 {
     GNASH_REPORT_FUNCTION;
 
-    // extract a reference to the image from the cached bitmap
-    image::GnashImage &im = bitmap->image();
-
-    // Create a VG image
-    _vgimage = vgCreateImage(_pixel_format, im.width(), im.height(),
-                             VG_IMAGE_QUALITY_FASTER);    
     if (_vgimage == VG_INVALID_HANDLE) {
-        log_error("Failed to create VG image! %s",
+        log_error("No VG image to paint! %s",
                   Renderer_ovg::getErrorString(vgGetError()));
-    }
-    
-    switch (im.type()) {
-    case image::TYPE_RGB:
-        log_debug("Image has RGB Pixel Format, Stride is %d",
-                  im.stride());
-        vgImageSubData(_vgimage, im.begin(), im.stride(), VG_sRGBA_8888,
-                   0, 0, im.width(), im.height());
-        break;
-    case image::TYPE_RGBA:
-        log_debug("Image has RGBA Pixel Format, Stride is %d",
-                  im.stride());
-        // Copy the image data into the VG image container
-        vgImageSubData(_vgimage, im.begin(), im.stride(), VG_sRGBA_8888,
-                   0, 0, im.width(), im.height());
-        break;
-    default:
-        log_error("");
         return 0;
     }
 
+    _vgpaint = paint;
+        
     vgSetParameteri (_vgpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
-//    vgPaintPattern (_vgpaint, _vgimage);
 
     gnash::SWFMatrix mat;
     VGfloat     vmat[9];
@@ -335,8 +276,6 @@ OpenVGBitmap::createPatternBitmap(CachedBitmap *bitmap, const gnash::SWFMatrix& 
     }
 
     vgPaintPattern(_vgpaint, _vgimage);
-//    vgDrawImage(_vgimage);
-//    vgFlush();
 
     return this;
 }

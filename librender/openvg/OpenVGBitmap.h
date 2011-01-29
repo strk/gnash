@@ -47,6 +47,7 @@ public:
     bool disposed() const { return !_image.get(); }
 
     image::GnashImage& image();
+    VGPaint &vgimage() { return _vgimage; };
     
     // Accessors for the GnashImage internal data
     VGPaint getFillPaint() const { return _vgpaint; }
@@ -57,21 +58,26 @@ public:
     /// OpenVG supports creating linear and gradient fills in hardware, so
     /// we want to use that instead of the existing way of calculating the
     /// gradient in software.
+    ///
+    /// @param x0 The X coordinate of the origin point
+    /// @param y0 The Y coordinate of the origin point
+    /// @param x1 The X coordinate of the opposite corner point
+    /// @param y1 The Y coordinate of the opposite corner point
+    /// @param incolor The base color of the gradient
+    /// @param paint The VG paint surface
     OpenVGBitmap *createRadialBitmap(float x0, float y0, float x1,
                                      float y1, float radial,
                                      const rgba &incolor, VGPaint paint);
     OpenVGBitmap *createLinearBitmap(float x0, float y0, float x1, float y1,
                                      const rgba &incolor, const VGPaint paint);
 
-    // This is for images
-    OpenVGBitmap *createPatternBitmap(CachedBitmap *bitmap, const gnash::SWFMatrix& matrix,
-                                      bitmap_wrap_mode mode);
+    OpenVGBitmap *applyPatternBitmap(const gnash::SWFMatrix& matrix,
+                                      bitmap_wrap_mode mode, VGPaint paint);
     
 private:
     boost::scoped_ptr<image::GnashImage> _image;
     VGImageFormat   _pixel_format;
     VGImage         _vgimage;
-    int             _stride;
     VGPaint         _vgpaint;
 //    int             _tex_size;
 };

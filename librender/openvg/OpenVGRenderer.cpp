@@ -297,14 +297,15 @@ Renderer_ovg::~Renderer_ovg()
 
 // Given an image, returns a pointer to a CachedBitmap class
 // that can later be passed to fill_styleX_bitmap(), to set a
-// bitmap fill style.
+// bitmap fill style. This unfortunately doesn't support
+// hardware acceleration libraries like OpenVG, which have their
+// own image type, which is what should be cached to avoid
+// recalculating it.
 CachedBitmap *
 Renderer_ovg::createCachedBitmap(std::auto_ptr<image::GnashImage> im)
 {
     // GNASH_REPORT_FUNCTION;
 
-    // OpenVG don't support 24bit RGB, so we need to translate
-    // the colorspace
     image::GnashImage *image = im.release();
     return reinterpret_cast<CachedBitmap *>(new OpenVGBitmap(image, _fillpaint));
 }
@@ -839,13 +840,19 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
           log_error("Fill Style Type: Gradient, you shouldn't be here!");
           break;
       }
+      // FIXME: Bitmap cacheing needs to be improved. Currently the GnahInage
+      // is cached, but the VG image is not. This forces the VG Image to be
+      // recalculated all the time from the GnashImage. Ideally the VG Image
+      // should be cached instead.
       case SWF::FILL_TILED_BITMAP_HARD:
       case SWF::FILL_TILED_BITMAP:
       {
           log_debug("Fill Style Type: Tiled Bitmap");
           CachedBitmap *cb = boost::apply_visitor(GetBitmap(), style.fill);
-          OpenVGBitmap *binfo = new OpenVGBitmap(_fillpaint);
-          binfo->createPatternBitmap(cb, sm, OpenVGBitmap::WRAP_REPEAT);
+          // Convert the GnashImage to a VG Image
+          OpenVGBitmap *binfo = new OpenVGBitmap(cb, _fillpaint);
+          // Apply the transformation and paint
+          binfo->applyPatternBitmap(sm, OpenVGBitmap::WRAP_FILL, _fillpaint);
           break;
       }
       
@@ -854,8 +861,16 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
       {     
           log_debug("Fill Style Type: Clipped Bitmap");
           CachedBitmap *cb = boost::apply_visitor(GetBitmap(), style.fill);
-          OpenVGBitmap *binfo = new OpenVGBitmap(_fillpaint);
-          binfo->createPatternBitmap(cb, sm, OpenVGBitmap::WRAP_FILL);
+          // Convert the GnashImage to a VG Image
+#if 1
+          OpenVGBitmap *binfo = new OpenVGBitmap(cb, _fillpaint);
+          // Apply the transformation and paint
+          binfo->applyPatternBitmap(sm, OpenVGBitmap::WRAP_FILL, _fillpaint);
+#else
+          OpenVGBitmap *binfo = reinterpret_cast<OpenVGBitmap *>(cb);
+          // Apply the transformation and paint
+          binfo->applyPatternBitmap(sm, OpenVGBitmap::WRAP_FILL, _fillpaint);
+#endif
           break;
       } 
       case SWF::FILL_SOLID:
