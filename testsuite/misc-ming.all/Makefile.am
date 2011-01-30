@@ -50,8 +50,8 @@ EXTRA_DIST = \
 	SharedObjectTest.as \
 	SharedObjectTestRunner.sh \
 	SharedObjectTest.sol/sol1.sol \
-	SharedObjectTest.sol/README 
-
+	SharedObjectTest.sol/README \
+	XMLSocketTester.sh
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
@@ -161,7 +161,7 @@ check_PROGRAMS = \
 	BitmapDataTestRunner \
 	BitmapDataDraw \
 	$(NULL)
-	
+
 if MING_VERSION_0_4_3
 check_PROGRAMS += \
 	EmbeddedSoundTest \
@@ -262,7 +262,7 @@ check_SCRIPTS = \
 	init_action_testrunner \
 	InitActionTest2Runner \
 	$(NULL)
-	
+
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 check_SCRIPTS += VarAndCharClashTest-Runner \
 	gotoFrame2Test-Runner \
