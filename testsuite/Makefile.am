@@ -89,7 +89,16 @@ SUBDIRS = \
 	libcore.all \
 	$(NULL)
 
-EXTRA_DIST = check.h DummyMovieDefinition.h DummyCharacter.h gnashrc.in simple.exp 
+EXTRA_DIST = check.h \
+	DummyMovieDefinition.h \
+	DummyCharacter.h \
+	gnashrc.in \
+	simple.exp \
+	analyse-results.sh \
+	generic-testrunner.sh \
+	gst_install_plugins_helper.sh \
+	simultaneous-testrunner.sh
+
 
 dist_noinst_SCRIPTS = analyse-results.sh generic-testrunner.sh
 
@@ -144,8 +153,6 @@ tmpSharedObject:
 gnashrc: gnashrc.in Makefile tmpSharedObject
 	sed -e 's#@@MEDIADIR@@#'$(abs_mediadir)'#g' -e 's#@@TMPSODIR@@#'$(abs_tmpsodir)'#g' $(srcdir)/gnashrc.in > $@
 
-check-local:: gnashrc
-
 if ENABLE_MING
 
 .PHONY: Dejagnu.swf
@@ -154,7 +161,8 @@ Dejagnu.swf:
 	cp misc-ming.all/Dejagnu.swf $@
 
 check-local:: Dejagnu.swf
-
+else
+check-local:: gnashrc
 endif
 
 clean-local:
