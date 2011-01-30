@@ -31,6 +31,7 @@ namespace openvg {
 
 static const int NUM_STOPS = 10;
 
+/// @param vgpaint the VG paint context
 OpenVGBitmap::OpenVGBitmap(VGPaint paint)
     : _vgimage(VG_INVALID_HANDLE),
 #ifdef BUILD_X11_DEVICE
@@ -43,6 +44,10 @@ OpenVGBitmap::OpenVGBitmap(VGPaint paint)
     // GNASH_REPORT_FUNCTION;
 }
 
+/// Construct a new bitmap
+///
+/// @param bitmap A CachedBitmap
+/// @param vgpaint the VG paint context
 OpenVGBitmap::OpenVGBitmap(CachedBitmap *bitmap, VGPaint vgpaint)
     : _vgimage(VG_INVALID_HANDLE),
 #ifdef BUILD_X11_DEVICE
@@ -57,7 +62,7 @@ OpenVGBitmap::OpenVGBitmap(CachedBitmap *bitmap, VGPaint vgpaint)
     // extract a reference to the image from the cached bitmap
     image::GnashImage &im = bitmap->image();
 
-    // Store the reference so so it's available to createPatternBitmap()
+    // Store the reference so it's available to applyPatternBitmap()
     _image.reset(&im);
 
     // Create a VG image
@@ -70,14 +75,14 @@ OpenVGBitmap::OpenVGBitmap(CachedBitmap *bitmap, VGPaint vgpaint)
     
     switch (im.type()) {
     case image::TYPE_RGB:
-        log_debug("Image has RGB Pixel Format, Stride is %d",
-                  im.stride());
-        vgImageSubData(_vgimage, im.begin(), im.stride(), VG_sRGBA_8888,
+        log_debug("Image has RGB Pixel Format, Stride is %d, width is %d, height is %d",
+                  im.stride(), im.width(), im.height());
+        vgImageSubData(_vgimage, im.begin(), im.stride(), VG_sRGBX_8888,
                    0, 0, im.width(), im.height());
         break;
     case image::TYPE_RGBA:
-        log_debug("Image has RGBA Pixel Format, Stride is %d",
-                  im.stride());
+        log_debug("Image has RGBA Pixel Format, Stride is %d, width is %d, height is %d",
+                  im.stride(), im.width(), im.height());
         // Copy the image data into the VG image container
         vgImageSubData(_vgimage, im.begin(), im.stride(), VG_sRGBA_8888,
                    0, 0, im.width(), im.height());
@@ -87,7 +92,14 @@ OpenVGBitmap::OpenVGBitmap(CachedBitmap *bitmap, VGPaint vgpaint)
     }
 }
 
-// FIXME: this caches the GnashImage, but we should really cache the VG Image.
+/// Construct a new bitmap
+///
+/// @param A pointer to a GnashImage
+/// @param vgpaint the VG paint context
+
+/// @note This is usually only called by createCachedBitmap() when a bitmap
+/// is loaded from a swf file. As the renderer isn't initialized yet,
+/// only the GnashImage is cached.
 OpenVGBitmap::OpenVGBitmap(image::GnashImage *image, VGPaint vgpaint)
     : _image(image),
       _vgimage(VG_INVALID_HANDLE),
@@ -99,31 +111,6 @@ OpenVGBitmap::OpenVGBitmap(image::GnashImage *image, VGPaint vgpaint)
     _vgpaint(vgpaint)
 {
     GNASH_REPORT_FUNCTION;
-    // Create a VG image
-    _vgimage = vgCreateImage(_pixel_format, image->width(), image->height(),
-                             VG_IMAGE_QUALITY_FASTER);    
-    if (_vgimage == VG_INVALID_HANDLE) {
-        log_error("Failed to create VG image! %s",
-                  Renderer_ovg::getErrorString(vgGetError()));
-    }
-    
-    switch (image->type()) {
-    case image::TYPE_RGB:
-        log_debug("Image has RGB Pixel Format, Stride is %d",
-                  image->stride());
-        vgImageSubData(_vgimage, image->begin(), image->stride(), VG_sRGBA_8888,
-                   0, 0, image->width(), image->height());
-        break;
-    case image::TYPE_RGBA:
-        log_debug("Image has RGBA Pixel Format, Stride is %d",
-                  image->stride());
-        // Copy the image data into the VG image container
-        vgImageSubData(_vgimage, image->begin(), image->stride(), VG_sRGBA_8888,
-                   0, 0, image->width(), image->height());
-        break;
-    default:
-        std::abort();
-    }
 } 
 
 OpenVGBitmap::~OpenVGBitmap()
@@ -138,12 +125,22 @@ image::GnashImage&
 OpenVGBitmap::image()
 {
     // GNASH_REPORT_FUNCTION;
-
     if (_image) {
         return *_image;
     }
 }    
 
+/// Create a radial gradient and paint it to the context
+///
+/// @param x0 The X coordinate of the origin point
+/// @param y0 The Y coordinate of the origin point
+/// @param x1 The X coordinate of the opposite corner point
+/// @param y1 The Y coordinate of the opposite corner point
+/// @param incolor The base color of the gradient
+/// @param paint The VG paint context
+/// @return A pointer to the new Bitmap
+
+/// @note
 /// OpenVG supports creating linear and gradient fills in hardware, so
 /// we want to use that instead of the existing way of calculating the
 /// gradient in software.
@@ -176,10 +173,20 @@ OpenVGBitmap::createRadialBitmap(float cx, float cy, float fx, float fy,
     return this;
 }
 
-// A Linear Gradient Bitmap uses two points, x0,y0 and x1,y1 in the paint
-// coordinate system. The gradient starts at x0,y0 and goes to x1,y1. If
-// x1 and y1 are outside the boundaries of the shape, then the gradient gets
-// clipped at the boundary instead of x1,y1.
+/// Create a linear gradient and paint it to the context
+///
+/// @param x0 The X coordinate of the origin point
+/// @param y0 The Y coordinate of the origin point
+/// @param x1 The X coordinate of the opposite corner point
+/// @param y1 The Y coordinate of the opposite corner point
+/// @param incolor The base color of the gradient
+/// @param paint The VG paint context
+/// @return A pointer to the new Bitmap
+///
+/// @note A Linear Gradient Bitmap uses two points, x0,y0 and x1,y1 in the paint
+/// coordinate system. The gradient starts at x0,y0 and goes to x1,y1. If
+/// x1 and y1 are outside the boundaries of the shape, then the gradient gets
+/// clipped at the boundary instead of x1,y1.
 OpenVGBitmap *
 OpenVGBitmap::createLinearBitmap(float x0, float y0, float x1, float y1,
                                  const rgba &incolor, const VGPaint paint)
@@ -216,12 +223,17 @@ OpenVGBitmap::createLinearBitmap(float x0, float y0, float x1, float y1,
     return this;
 }
 
-// Create and fill pattern image
+/// Create and fill pattern image
+///
+/// @param matrix The transformation matrix
+/// @param mode The mode used to pain the image
+/// @param paint The VG paint context
+/// @return A pointer to the new Bitmap
 OpenVGBitmap *
 OpenVGBitmap::applyPatternBitmap(const gnash::SWFMatrix& matrix,
                                  bitmap_wrap_mode mode, VGPaint paint)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     if (_vgimage == VG_INVALID_HANDLE) {
         log_error("No VG image to paint! %s",
