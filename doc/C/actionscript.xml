@@ -3,14 +3,14 @@
     "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
   <!ENTITY legal SYSTEM "legal.xml">
   <!ENTITY fdl-app SYSTEM "fdl-appendix.xml">
-  <!ENTITY appversion "0.8.8">
+  <!ENTITY appversion "0.8.9">
   <!ENTITY manrevision "0.2">
-  <!ENTITY date "Aug 2010">
+  <!ENTITY date "Feb 2011">
   <!ENTITY app "<application>Gnash</application>">
   <!ENTITY appname "Gnash">
   <!ENTITY actionscript "ActionScript">
   <!ENTITY fn_call "<emphasis>fn_call</emphasis>">
-  <!ENTITY version "0.8.8">
+  <!ENTITY version "0.8">
 
   <!ENTITY main SYSTEM "actionscript/main.xml">
   <!ENTITY new_as_class SYSTEM "actionscript/new_as_class.xml">
@@ -27,7 +27,7 @@
    <articleinfo>
      <title>&actionscript; Manual V&manrevision;</title>
      <copyright>
-       <year>2007, 2008, 2009, 2010</year>
+       <year>2007, 2008, 2009, 2010, 2011</year>
        <holder>Free Software Foundation</holder>
      </copyright>
 

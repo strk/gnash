@@ -5,7 +5,7 @@
 \\$2 \(la\\$1\(ra\\$3
 ..
 .if \n(.g .mso www.tmac
-.TH gprocessor 1 "22 August 2010" "" ""
+.TH gprocessor 1 "30 January 2011" "" ""
 .SH NAME
 gprocessor \- Gnash SWF Processor
 .SH Synopsis

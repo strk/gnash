@@ -1,7 +1,8 @@
 This is gnash_ref.info, produced by makeinfo version 4.13 from stdin.
 
+INFO-DIR-SECTION Video
 START-INFO-DIR-ENTRY
-* Gnash Reference Manual: (gnash_ref).   [MISSING TEXT]
+* Gnash Reference Manual: (gnash_ref).   Gnash Documentation
 END-INFO-DIR-ENTRY
 
 
@@ -1643,7 +1644,7 @@ File: gnash_ref.info,  Node: A Tour of Gnash,  Next: Sound handling in Gnash,  U
 ===================
 
 The top level of Gnash has several libraries, _libgnashbase_,
-_libgnashcore_, _libgnashmedia_, _libgnashamf_ and _libgnashbackend_.
+_libgnashcore_, _libgnashmedia_, _libgnashamf_ and _libgnashrender_.
 There are several utility programs included for debug parsing and
 processing of SWF movie files, and other useful utilities for examining
 local Shared Objects and sniffing LocalConnections.
@@ -4385,127 +4386,127 @@ software.
 
 
 Tag Table:
-Node: Top168
-Node: Introduction2000
-Node: Audience2805
-Node: What Is Supported?3132
-Node: Building from Source5639
-Node: Overview6019
-Node: Getting The Source7161
-Node: Releases7367
-Node: Git Access7735
-Node: Code Dependencies8472
-Ref: Code Dependency Table9171
-Node: Testing Dependencies35144
-Ref: Testing Dependency Table35453
-Node: Documentation Dependencies39377
-Ref: Documentation Dependency Table39646
-Node: Configuring Gnash48714
-Node: Features51008
-Ref: Configuration Options - Features51608
-Node: Specifying Custom Paths58683
-Ref: Custom Path Options59153
-Node: Compiling the Code70900
-Node: Creating the Documentation71841
-Node: Running the Tests73187
-Node: Using DejaGnu73641
-Node: Increasing Verbosity74004
-Node: Running Some Tests74540
-Node: Running The Tests Manually75360
-Node: Movie tests76022
-Node: ActionScript Unit Tests76372
-Node: Installation76689
-Node: Libraries78002
-Node: Executables78858
-Node: Documentation79728
-Node: Cross Configuring80483
-Node: Software Internals83563
-Node: A Tour of Gnash83834
-Node: The Libraries84398
-Node: libgnashbase84684
-Node: libgnashcore85109
-Node: libgnashmedia85470
-Node: libgnashsound85920
-Node: libgnashamf86135
-Node: libgnashbackend86557
-Node: libgnashplugin86872
-Node: libklashpart87078
-Node: The Applications87248
-Node: The Standalone Player87616
-Node: Gprocessor87913
-Node: SOLdumper88305
-Node: Dumpshm88572
-Node: The Plugin88791
-Node: Current Implementation89266
-Node: GUI Support89710
-Node: Klash91394
-Node: The Message Logging System91945
-Node: Logging System API93502
-Node: The LogFile Instance96311
-Node: Sound handling in Gnash97795
-Node: Sound types98459
-Node: Sound parsing98996
-Node: Sound playback99564
-Node: The SDL sound backend100094
-Node: The Gstreamer backend101395
-Node: Detailed description of the Gstreamer backend102435
-Node: Testing104686
-Node: Testing Tools105159
-Node: Test Cases105989
-Node: Writing ActionScript Tests106568
-Node: Writing Ming-based self-contained SWF tests109069
-Node: Using Ming-based test generators facilities110226
-Node: Writing self-contained SWF tests with other compilers112586
-Node: Writing Test Runners115711
-Node: Using the generic test runner for self-contained SWF tests117460
-Node: Writing Movie testers119550
-Node: Adding New ActionScript Classes121290
-Node: Prototype121962
-Node: Constructor123121
-Node: properties125328
-Node: Reporting Bugs125690
-Node: Get a Fresh Binary Package126673
-Node: Determine if the bug was previously reported127459
-Node: Review the bug writing guidelines128277
-Node: Filing a bug report129328
-Node: Gnash Extensions129611
-Node: Creating A New Extension130632
-Node: Crafting an Extension132047
-Node: Debugging An Extension141676
-Node: Included Extensions142472
-Node: Gtk Extension142916
-Node: File I/O Extension143903
-Node: MySQL Extension145089
-Node: RTMP Protocol145940
-Node: AMF Format155708
-Node: Mozilla/Firefox NPAPI Plugin156678
-Node: Plugin C API157696
-Node: Plugin C++ API159555
-Node: OpenGL and Threads162819
-Node: Plugin Event Handling164147
-Node: Appendix165116
-Node: Code Style165268
-Node: Authors169098
-Node: GNU Free Documentation License169807
-Node: 0_ PREAMBLE170570
-Node: 1_ APPLICABILITY AND DEFINITIONS171876
-Ref: fdl-document172101
-Ref: fdl-modified172392
-Ref: fdl-secondary172579
-Ref: fdl-invariant173224
-Ref: fdl-cover-texts173473
-Ref: fdl-transparent173686
-Ref: fdl-title-page174976
-Node: 2_ VERBATIM COPYING175365
-Node: 3_ COPYING IN QUANTITY176345
-Node: 4_ MODIFICATIONS178702
-Node: 5_ COMBINING DOCUMENTS184762
-Node: 6_ COLLECTIONS OF DOCUMENTS186259
-Node: 7_ AGGREGATION WITH INDEPENDENT WORKS187150
-Node: 8_ TRANSLATION188378
-Node: 9_ TERMINATION189281
-Node: 10_ FUTURE REVISIONS OF THIS LICENSE189936
-Node: Addendum191076
+Node: Top196
+Node: Introduction2028
+Node: Audience2833
+Node: What Is Supported?3160
+Node: Building from Source5667
+Node: Overview6047
+Node: Getting The Source7189
+Node: Releases7395
+Node: Git Access7763
+Node: Code Dependencies8500
+Ref: Code Dependency Table9199
+Node: Testing Dependencies35172
+Ref: Testing Dependency Table35481
+Node: Documentation Dependencies39405
+Ref: Documentation Dependency Table39674
+Node: Configuring Gnash48742
+Node: Features51036
+Ref: Configuration Options - Features51636
+Node: Specifying Custom Paths58711
+Ref: Custom Path Options59181
+Node: Compiling the Code70928
+Node: Creating the Documentation71869
+Node: Running the Tests73215
+Node: Using DejaGnu73669
+Node: Increasing Verbosity74032
+Node: Running Some Tests74568
+Node: Running The Tests Manually75388
+Node: Movie tests76050
+Node: ActionScript Unit Tests76400
+Node: Installation76717
+Node: Libraries78030
+Node: Executables78886
+Node: Documentation79756
+Node: Cross Configuring80511
+Node: Software Internals83591
+Node: A Tour of Gnash83862
+Node: The Libraries84425
+Node: libgnashbase84711
+Node: libgnashcore85136
+Node: libgnashmedia85497
+Node: libgnashsound85947
+Node: libgnashamf86162
+Node: libgnashbackend86584
+Node: libgnashplugin86899
+Node: libklashpart87105
+Node: The Applications87275
+Node: The Standalone Player87643
+Node: Gprocessor87940
+Node: SOLdumper88332
+Node: Dumpshm88599
+Node: The Plugin88818
+Node: Current Implementation89293
+Node: GUI Support89737
+Node: Klash91421
+Node: The Message Logging System91972
+Node: Logging System API93529
+Node: The LogFile Instance96338
+Node: Sound handling in Gnash97822
+Node: Sound types98486
+Node: Sound parsing99023
+Node: Sound playback99591
+Node: The SDL sound backend100121
+Node: The Gstreamer backend101422
+Node: Detailed description of the Gstreamer backend102462
+Node: Testing104713
+Node: Testing Tools105186
+Node: Test Cases106016
+Node: Writing ActionScript Tests106595
+Node: Writing Ming-based self-contained SWF tests109096
+Node: Using Ming-based test generators facilities110253
+Node: Writing self-contained SWF tests with other compilers112613
+Node: Writing Test Runners115738
+Node: Using the generic test runner for self-contained SWF tests117487
+Node: Writing Movie testers119577
+Node: Adding New ActionScript Classes121317
+Node: Prototype121989
+Node: Constructor123148
+Node: properties125355
+Node: Reporting Bugs125717
+Node: Get a Fresh Binary Package126700
+Node: Determine if the bug was previously reported127486
+Node: Review the bug writing guidelines128304
+Node: Filing a bug report129355
+Node: Gnash Extensions129638
+Node: Creating A New Extension130659
+Node: Crafting an Extension132074
+Node: Debugging An Extension141702
+Node: Included Extensions142498
+Node: Gtk Extension142942
+Node: File I/O Extension143929
+Node: MySQL Extension145115
+Node: RTMP Protocol145966
+Node: AMF Format155734
+Node: Mozilla/Firefox NPAPI Plugin156704
+Node: Plugin C API157722
+Node: Plugin C++ API159581
+Node: OpenGL and Threads162845
+Node: Plugin Event Handling164173
+Node: Appendix165142
+Node: Code Style165294
+Node: Authors169124
+Node: GNU Free Documentation License169833
+Node: 0_ PREAMBLE170596
+Node: 1_ APPLICABILITY AND DEFINITIONS171902
+Ref: fdl-document172127
+Ref: fdl-modified172418
+Ref: fdl-secondary172605
+Ref: fdl-invariant173250
+Ref: fdl-cover-texts173499
+Ref: fdl-transparent173712
+Ref: fdl-title-page175002
+Node: 2_ VERBATIM COPYING175391
+Node: 3_ COPYING IN QUANTITY176371
+Node: 4_ MODIFICATIONS178728
+Node: 5_ COMBINING DOCUMENTS184788
+Node: 6_ COLLECTIONS OF DOCUMENTS186285
+Node: 7_ AGGREGATION WITH INDEPENDENT WORKS187176
+Node: 8_ TRANSLATION188404
+Node: 9_ TERMINATION189307
+Node: 10_ FUTURE REVISIONS OF THIS LICENSE189962
+Node: Addendum191102
 
 End Tag Table
 
