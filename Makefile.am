@@ -147,7 +147,7 @@ revno.h:
         else \
           revno="$(NOW)"; \
           comm_id="none"; \
-          nick="master"; \
+          nick="$(VERSION)"; \
         fi; \
 	if test \! -z "$${revno}"; then \
           echo "Generating revno.h ($${nick} $${revno} $${comm_id})"; \
