@@ -61,3 +61,12 @@ endif
 check_SCRIPTS += $(MEDIA_TESTS_V6) $(MEDIA_TESTS_V9)
 HAXE_FLAGS += -cp $(MEDIAdir)
 
+EXTRA_DIST += media/Camera_as.hx \
+	media/ID3Info_as.hx \
+	media/Microphone_as.hx \
+	media/SoundChannel_as.hx \
+	media/SoundLoaderContext_as.hx \
+	media/SoundMixer_as.hx \
+	media/SoundTransform_as.hx \
+	media/Sound_as.hx \
+	media/Video_as.hx

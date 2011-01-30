@@ -115,3 +115,26 @@ endif
 
 check_SCRIPTS += $(NET_TESTS_V6) $(NET_TESTS_V7) $(NET_TESTS_V8) $(NET_TESTS_V9)
 HAXE_FLAGS += -cp $(NETdir)
+
+EXTRA_DIST += net/FileFilter_as.hx \
+	net/FileReferenceList_as.hx \
+	net/FileReference_as.hx \
+	net/IDynamicPropertyOutput_as.hx \
+	net/IDynamicPropertyWriter_as.hx \
+	net/LocalConnection_as.hx \
+	net/NetConnection_as.hx \
+	net/NetStream_as.hx \
+	net/ObjectEncoding_as.hx \
+	net/Responder_as.hx \
+	net/SharedObjectFlushStatus_as.hx \
+	net/SharedObject_as.hx \
+	net/Socket_as.hx \
+	net/URLLoaderDataFormat_as.hx \
+	net/URLLoader_as.hx \
+	net/URLRequestDefaults_as.hx \
+	net/URLRequestHeader_as.hx \
+	net/URLRequestMethod_as.hx \
+	net/URLRequest_as.hx \
+	net/URLStream_as.hx \
+	net/URLVariables_as.hx \
+	net/XMLSocket_as.hx

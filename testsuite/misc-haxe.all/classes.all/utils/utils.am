@@ -58,3 +58,13 @@ endif
 
 check_SCRIPTS += $(UTILS_TESTS_V9) $(UTILS_TESTS_V6)
 HAXE_FLAGS += -cp $(UTILSdir)
+
+EXTRA_DIST += utils/ByteArray_as.hx \
+	utils/CompressionAlgorithm_as.hx \
+	utils/Dictionary_as.hx \
+	utils/Endian_as.hx \
+	utils/IDataInput_as.hx \
+	utils/IDataOutput_as.hx \
+	utils/IExternalizable_as.hx \
+	utils/Proxy_as.hx \
+	utils/Timer_as.hx

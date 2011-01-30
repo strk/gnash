@@ -25,3 +25,5 @@ endif
 
 check_SCRIPTS += $(EXTERNAL_TESTS_V9)
 HAXE_FLAGS += -cp $(EXTERNALdir)
+
+EXTRA_DIST += external/ExternalInterface_as.hx

@@ -48,3 +48,9 @@ endif
 check_SCRIPTS += $(UI_TESTS_V9) $(UI_TESTS_V6)
 HAXE_FLAGS += -cp $(UIdir)
 
+EXTRA_DIST += ui/ContextMenuBuiltInItems_as.hx \
+	ui/ContextMenuItem_as.hx \
+	ui/ContextMenu_as.hx \
+	ui/KeyLocation_as.hx \
+	ui/Keyboard_as.hx \
+	ui/Mouse_as.hx

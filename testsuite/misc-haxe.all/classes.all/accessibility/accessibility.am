@@ -36,3 +36,7 @@ endif
 
 check_SCRIPTS += $(ACCESSIBILITY_TESTS_V6) $(ACCESSIBILITY_TESTS_V9)
 HAXE_FLAGS += -cp $(ACCESSIBILITYdir)
+
+EXTRA_DIST += \
+	accessibility/AccessibilityProperties_as.hx \
+	accessibility/Accessibility_as.hx

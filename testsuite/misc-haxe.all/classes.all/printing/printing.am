@@ -34,3 +34,7 @@ endif
 
 check_SCRIPTS += $(PRINTING_TESTS_V7) $(PRINTING_TESTS_V9)
 HAXE_FLAGS += -cp $(PRINTINGdir)
+
+EXTRA_DIST += printing/PrintJobOptions_as.hx \
+	printing/PrintJobOrientation_as.hx \
+	printing/PrintJob_as.hx

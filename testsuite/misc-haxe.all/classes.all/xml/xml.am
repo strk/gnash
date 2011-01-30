@@ -36,3 +36,7 @@ endif
 
 check_SCRIPTS += $(XML_TESTS_v6) $(XML_TESTS_v9)
 HAXE_FLAGS += -cp $(XMLdir)
+
+EXTRA_DIST += xml/XMLDocument_as.hx \
+	xml/XMLNodeType_as.hx \
+	xml/XMLNode_as.hx

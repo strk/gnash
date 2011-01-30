@@ -197,3 +197,46 @@ endif
 
 check_SCRIPTS += $(DISPLAY_TESTS_V6) $(DISPLAY_TESTS_V8) $(DISPLAY_TESTS_V9)
 HAXE_FLAGS += -cp $(DISPLAYdir)
+
+EXTRA_DIST += display/AVM1Movie_as.hx \
+	display/ActionScriptVersion_as.hx \
+	display/BitmapDataChannel_as.hx \
+	display/BitmapData_as.hx \
+	display/Bitmap_as.hx \
+	display/BlendMode_as.hx \
+	display/CapsStyle_as.hx \
+	display/DisplayObjectContainer_as.hx \
+	display/DisplayObject_as.hx \
+	display/FocusDirection_as.hx \
+	display/FrameLabel_as.hx \
+	display/GradientType_as.hx \
+	display/Graphics_as.hx \
+	display/IBitmapDrawable_as.hx \
+	display/InteractiveObject_as.hx \
+	display/InterpolationMethod_as.hx \
+	display/JointStyle_as.hx \
+	display/LineScaleMode_as.hx \
+	display/LoaderInfo_as.hx \
+	display/Loader_as.hx \
+	display/MorphShape_as.hx \
+	display/MovieClip_as.hx \
+	display/NativeMenuItem_as.hx \
+	display/NativeMenu_as.hx \
+	display/NativeWindowDisplayState_as.hx \
+	display/NativeWindowInitOptions_as.hx \
+	display/NativeWindowResize_as.hx \
+	display/NativeWindowType_as.hx \
+	display/NativeWindow_as.hx \
+	display/PixelSnapping_as.hx \
+	display/SWFVersion_as.hx \
+	display/Scene_as.hx \
+	display/Screen_as.hx \
+	display/Shape_as.hx \
+	display/SimpleButton_as.hx \
+	display/SpreadMethod_as.hx \
+	display/Sprite_as.hx \
+	display/StageAlign_as.hx \
+	display/StageDisplayState_as.hx \
+	display/StageQuality_as.hx \
+	display/StageScaleMode_as.hx \
+	display/Stage_as.hx
