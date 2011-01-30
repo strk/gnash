@@ -89,7 +89,16 @@ SUBDIRS = \
 	libcore.all \
 	$(NULL)
 
-EXTRA_DIST = check.h DummyMovieDefinition.h DummyCharacter.h gnashrc.in simple.exp 
+EXTRA_DIST = check.h \
+	DummyMovieDefinition.h \
+	DummyCharacter.h \
+	gnashrc.in \
+	simple.exp \
+	analyse-results.sh \
+	generic-testrunner.sh \
+	gst_install_plugins_helper.sh \
+	simultaneous-testrunner.sh
+
 
 dist_noinst_SCRIPTS = analyse-results.sh generic-testrunner.sh
 
