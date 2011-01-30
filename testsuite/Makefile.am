@@ -144,7 +144,7 @@ tmpSharedObject:
 gnashrc: gnashrc.in Makefile tmpSharedObject
 	sed -e 's#@@MEDIADIR@@#'$(abs_mediadir)'#g' -e 's#@@TMPSODIR@@#'$(abs_tmpsodir)'#g' $(srcdir)/gnashrc.in > $@
 
-check-local:: gnashrc
+check-local: gnashrc Dejagnu.swf
 
 if ENABLE_MING
 
@@ -153,7 +153,10 @@ Dejagnu.swf:
 	$(MAKE) -C misc-ming.all $@
 	cp misc-ming.all/Dejagnu.swf $@
 
-check-local:: Dejagnu.swf
+else
+
+Dejagnu.swf:
+	@echo "Dejagnu.swf will not be needed w/out Ming"
 
 endif
 
