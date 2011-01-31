@@ -95,3 +95,22 @@ endif
 
 check_SCRIPTS += $(TEXT_TESTS_V9) $(TEXT_TESTS_V6) $(TEXT_TESTS_V8)
 HAXE_FLAGS += -cp $(TEXTdir)
+
+EXTRA_DIST += text/AntiAliasType_as.hx \
+	text/CSMSettings_as.hx \
+	text/FontStyle_as.hx \
+	text/FontType_as.hx \
+	text/Font_as.hx \
+	text/GridFitType_as.hx \
+	text/StaticText_as.hx \
+	text/StyleSheet_as.hx \
+	text/TextColorType_as.hx \
+	text/TextDisplayMode_as.hx \
+	text/TextFieldAutoSize_as.hx \
+	text/TextFieldType_as.hx \
+	text/TextField_as.hx \
+	text/TextFormatAlign_as.hx \
+	text/TextFormat_as.hx \
+	text/TextLineMetrics_as.hx \
+	text/TextRenderer_as.hx \
+	text/TextSnapshot_as.hx

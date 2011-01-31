@@ -81,3 +81,19 @@ endif
 
 check_SCRIPTS += $(DATA_TESTS_V9)
 HAXE_FLAGS += -cp $(DATAdir)
+
+EXTRA_DIST += data/EncryptedLocalStore_as.hx \
+	data/SQLCollationType_as.hx \
+	data/SQLColumnNameStyle_as.hx \
+	data/SQLColumnSchema_as.hx \
+	data/SQLConnection_as.hx \
+	data/SQLIndexSchema_as.hx \
+	data/SQLMode_as.hx \
+	data/SQLResult_as.hx \
+	data/SQLSchemaResult_as.hx \
+	data/SQLSchema_as.hx \
+	data/SQLStatement_as.hx \
+	data/SQLTableSchema_as.hx \
+	data/SQLTransactionLockType_as.hx \
+	data/SQLTriggerSchema_as.hx \
+	data/SQLViewSchema_as.hx

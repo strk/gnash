@@ -74,3 +74,16 @@ endif
 check_SCRIPTS += $(DESKTOP_TESTS_V9)
 HAXE_FLAGS += -cp $(DESKTOPdir)
 
+EXTRA_DIST += desktop/ClipboardFormats_as.hx \
+	desktop/ClipboardTransferMode_as.hx \
+	desktop/Clipboard_as.hx \
+	desktop/DockIcon_as.hx \
+	desktop/Icon_as.hx \
+	desktop/InteractiveIcon_as.hx \
+	desktop/NativeApplication_as.hx \
+	desktop/NativeDragActions_as.hx \
+	desktop/NativeDragManager_as.hx \
+	desktop/NativeDragOptions_as.hx \
+	desktop/NotificationType_as.hx \
+	desktop/SystemTrayIcon_as.hx \
+	desktop/Updater_as.hx

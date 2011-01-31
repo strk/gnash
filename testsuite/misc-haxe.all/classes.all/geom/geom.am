@@ -41,3 +41,9 @@ endif
 
 check_SCRIPTS += $(GEOM_TESTS_V8)
 HAXE_FLAGS += -cp $(GEOMdir)
+
+EXTRA_DIST += geom/ColorTransform_as.hx \
+	geom/Matrix_as.hx \
+	geom/Point_as.hx \
+	geom/Rectangle_as.hx \
+	geom/Transform_as.hx

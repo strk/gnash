@@ -191,3 +191,42 @@ endif
 
 check_SCRIPTS += $(EVENTS_TESTS_V9)
 HAXE_FLAGS += -cp $(EVENTSdir)
+
+EXTRA_DIST += events/ActivityEvent_as.hx \
+	events/AsyncErrorEvent_as.hx \
+	events/BrowserInvokeEvent_as.hx \
+	events/ContextMenuEvent_as.hx \
+	events/DRMAuthenticateEvent_as.hx \
+	events/DRMErrorEvent_as.hx \
+	events/DRMStatusEvent_as.hx \
+	events/DataEvent_as.hx \
+	events/ErrorEvent_as.hx \
+	events/EventDispatcher_as.hx \
+	events/EventPhase_as.hx \
+	events/Event_as.hx \
+	events/FileListEvent_as.hx \
+	events/FocusEvent_as.hx \
+	events/FullScreenEvent_as.hx \
+	events/HTMLUncaughtScriptExceptionEvent_as.hx \
+	events/HTTPStatusEvent_as.hx \
+	events/IEventDispatcher_as.hx \
+	events/IMEEvent_as.hx \
+	events/IOErrorEvent_as.hx \
+	events/InvokeEvent_as.hx \
+	events/KeyboardEvent_as.hx \
+	events/MouseEvent_as.hx \
+	events/NativeDragEvent_as.hx \
+	events/NativeWindowBoundsEvent_as.hx \
+	events/NativeWindowDisplayStateEvent_as.hx \
+	events/NetStatusEvent_as.hx \
+	events/OutputProgressEvent_as.hx \
+	events/ProgressEvent_as.hx \
+	events/SQLErrorEvent_as.hx \
+	events/SQLEvent_as.hx \
+	events/SQLUpdateEvent_as.hx \
+	events/ScreenMouseEvent_as.hx \
+	events/SecurityErrorEvent_as.hx \
+	events/StatusEvent_as.hx \
+	events/SyncEvent_as.hx \
+	events/TextEvent_as.hx \
+	events/TimerEvent_as.hx

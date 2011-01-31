@@ -58,3 +58,13 @@ endif
 
 check_SCRIPTS += $(ERRORS_TESTS_V9)
 HAXE_FLAGS += -cp $(ERRORSdir)
+
+EXTRA_DIST += errors/EOFError_as.hx \
+	errors/IOError_as.hx \
+	errors/IllegalOperationError_as.hx \
+	errors/InvalidSWFError_as.hx \
+	errors/MemoryError_as.hx \
+	errors/SQLErrorOperation_as.hx \
+	errors/SQLError_as.hx \
+	errors/ScriptTimeoutError_as.hx \
+	errors/StackOverflowError_as.hx

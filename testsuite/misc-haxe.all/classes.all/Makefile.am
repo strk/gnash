@@ -29,7 +29,6 @@ HAXE_FLAGS = -cp $(srcdir)
 
 # These classes are in the flash namespace
 include $(srcdir)/accessibility/accessibility.am
-
 include $(srcdir)/display/display.am
 include $(srcdir)/errors/errors.am
 include $(srcdir)/events/events.am

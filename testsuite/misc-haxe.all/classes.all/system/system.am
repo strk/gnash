@@ -60,3 +60,14 @@ endif
 
 check_SCRIPTS += $(SYSTEM_TESTS_V9) $(SYSTEM_TESTS_V8) $(SYSTEM_TESTS_V6)
 HAXE_FLAGS += -cp $(SYSTEMdir)
+
+EXTRA_DIST += \
+	system/ApplicationDomain_as.hx \
+	system/Capabilities_as.hx \
+	system/IMEConversionMode_as.hx \
+	system/IME_as.hx \
+	system/LoaderContext_as.hx \
+	system/SecurityDomain_as.hx \
+	system/SecurityPanel_as.hx \
+	system/Security_as.hx \
+	system/System_as.hx

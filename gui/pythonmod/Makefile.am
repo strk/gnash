@@ -46,6 +46,7 @@ pkgpyexec_LTLIBRARIES = gnash.la
 
 GNASH_LIBS = \
 	$(top_builddir)/libmedia/libgnashmedia.la \
+	$(top_builddir)/librender/libgnashrender.la \
 	$(top_builddir)/libsound/libgnashsound.la \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libbase/libgnashbase.la \
