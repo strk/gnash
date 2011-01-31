@@ -1430,10 +1430,10 @@ gotoFrame2Test-Runner: $(srcdir)/../generic-testrunner.sh gotoFrame2Test.swf
 	chmod 755 $@
 
 LC-Receive.swf: LC-Receive.as 
-	$(MAKESWF) -v 8 -r 1 -o $@  $(srcdir)/empty.as LC-Receive.as
+	$(MAKESWF) -v 8 -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/LC-Receive.as
 
 LC-Send.swf: LC-Send.as 
-	$(MAKESWF) -v 8 -r 1 -o $@  $(srcdir)/empty.as LC-Send.as
+	$(MAKESWF) -v 8 -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/LC-Send.as
 
 LCTestRunner: $(srcdir)/../simultaneous-testrunner.sh LC-Receive.swf LC-Send.swf
 	sh $(srcdir)/../simultaneous-testrunner.sh -c "ENDOFTEST" $(top_builddir) LC-Receive.swf LC-Send.swf > $@
@@ -1448,7 +1448,7 @@ XMLSocketTester: XMLSocketTester.sh XMLSocketTest.swf
 	chmod 755 $@
 
 GradientFillTest.swf: GradientFillTest.as 
-	$(MAKESWF) -v 8 -r 1 -o $@  $(srcdir)/empty.as GradientFillTest.as
+	$(MAKESWF) -v 8 -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/GradientFillTest.as
 
 GradientFillTestRunner: $(srcdir)/../generic-testrunner.sh GradientFillTest.swf
 	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) GradientFillTest.swf > $@
