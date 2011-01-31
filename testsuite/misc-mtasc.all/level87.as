@@ -62,7 +62,7 @@ class Level87
 
 		_level0.level87loaded = true;
 
-               	check_equals(_level0.frameno, 2);
+               	check(_level0.frameno >= 2);
 
 		// This one fails because gnash is executing code
 		// in level99 before code in the first load of level87,
