@@ -41,7 +41,7 @@ NullGui::run()
   while (!_quit)
   {
 
-    Gui::advance_movie(this);
+    advanceMovie();
     unsigned long now = timer.elapsed();
     unsigned long spent = now-prevtime;
 
