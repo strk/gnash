@@ -252,7 +252,9 @@ public:
         for (size_t i = 0; i != size; ++i) { 
             const GradientRecord& gr = fs.record(i); 
             const rgba tr = m_cx.transform(gr.color);
-            if (tr.m_a < 255) m_need_premultiply = true;    
+            if (tr.m_a < 255) {
+              m_need_premultiply = true;
+            }
             m_gradient_lut.add_color(gr.ratio/255.0,
                     agg::rgba8(tr.m_r, tr.m_g, tr.m_b, tr.m_a));
         } 
