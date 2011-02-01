@@ -143,6 +143,37 @@ public:
     }
 };
 
+/// GradientFills have more data we need to construct the gradient.
+
+/// Return the focal point of a radial gradient
+class GetFocalPoint : public boost::static_visitor<double>
+{
+public:
+    double operator()(const SolidFill&) const {
+        return 0.0f;
+    }
+    double operator()(const GradientFill& g) const {
+        return g.focalPoint();
+    }
+    double operator()(const BitmapFill&) const {
+        return 0.0f;
+    }
+};
+
+/// Return the records in the gradient
+class GetGradientRecords : public boost::static_visitor<const GradientFill::GradientRecords &>
+{
+public:
+    const GradientFill::GradientRecords &operator()(const SolidFill&) const {
+    }
+    const GradientFill::GradientRecords &operator()(const GradientFill& fs) const {
+        return fs.getRecords();
+    }
+    const GradientFill::GradientRecords &operator()(const BitmapFill&) const {
+    }
+};
+
+
 } // namespace gnash::renderer::openvg
 } // namespace gnash::renderer
 } // namespace gnash

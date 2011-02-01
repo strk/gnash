@@ -125,6 +125,8 @@ public:
     static void printVGMatrix(const SWFMatrix &mat);
 
     static const char *getErrorString(VGErrorCode error);
+
+    // VGImage (CachedBitmap *x) { return _image_cache[x]; };
 #if 0
     // These are all required by the Render class
     void draw_poly(const point* corners, size_t corner_count,
@@ -193,12 +195,14 @@ public:
 #ifdef OPENVG_VERSION_1_1
     VGMaskLayer _mask;
 #endif
+    // FIXME: A cache for the VGImages might make some sense assuming it takes more time
+    // to render the cached GnashImage to a VGImage. Right now every ti;l a fill style is
+    // applied, the VGImage is rebuilt from the GnashImage. This appears to be relatively
+    // fast, and possibly faster than the lookup in a map as the size of the cache grows.
+    // The other issue would be when to clear the cache, as we have no knowledge from the VM
+    // when images are deleted, or unused.
+//    std::map<CachedBitmap *, VGImage > _image_cache;
 };
-
-namespace {
-    const CachedBitmap* createGradientBitmap(const GradientFill& gf,
-                                  renderer::openvg::Renderer_ovg *renderer);
-}
 
 DSOEXPORT Renderer* create_handler(const char *pixelformat);
 

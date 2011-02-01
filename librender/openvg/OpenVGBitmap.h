@@ -22,6 +22,7 @@
 #include "CachedBitmap.h"
 #include "GnashImage.h"
 #include "Renderer.h"
+#include "FillStyle.h"
 #include "openvg/OpenVGRenderer.h"
 
 namespace gnash {
@@ -55,21 +56,14 @@ public:
     int getHeight() { return _image->height(); }
     boost::uint8_t *getData() const { return _image->begin(); }
 
-    /// OpenVG supports creating linear and gradient fills in hardware, so
-    /// we want to use that instead of the existing way of calculating the
-    /// gradient in software.
-    ///
-    /// @param x0 The X coordinate of the origin point
-    /// @param y0 The Y coordinate of the origin point
-    /// @param x1 The X coordinate of the opposite corner point
-    /// @param y1 The Y coordinate of the opposite corner point
-    /// @param incolor The base color of the gradient
-    /// @param paint The VG paint surface
-    OpenVGBitmap *createRadialBitmap(float x0, float y0, float x1,
-                                     float y1, float radial,
-                                     const rgba &incolor, VGPaint paint);
+    OpenVGBitmap *createRadialBitmap(float x0, float y0, float x1, float y1,
+                                     float radial, const rgba &incolor,
+                                     const GradientFill::GradientRecords &records,
+                                     VGPaint paint);
     OpenVGBitmap *createLinearBitmap(float x0, float y0, float x1, float y1,
-                                     const rgba &incolor, const VGPaint paint);
+                                     const rgba &incolor,
+                                     const GradientFill::GradientRecords &records,
+                                     const VGPaint paint);
 
     OpenVGBitmap *applyPatternBitmap(const gnash::SWFMatrix& matrix,
                                       bitmap_wrap_mode mode, VGPaint paint);

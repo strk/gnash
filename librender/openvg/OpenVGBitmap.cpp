@@ -15,10 +15,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
+#include <boost/scoped_ptr.hpp>
+
 #include "Geometry.h"
 #include "CachedBitmap.h"
 #include "GnashImage.h"
 #include "Renderer.h"
+#include "FillStyle.h"
 #include "openvg/OpenVGRenderer.h"
 #include "openvg/OpenVGBitmap.h"
 #include "VG/openvg.h"
@@ -57,7 +60,7 @@ OpenVGBitmap::OpenVGBitmap(CachedBitmap *bitmap, VGPaint vgpaint)
 #endif
        _vgpaint(vgpaint)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     // extract a reference to the image from the cached bitmap
     image::GnashImage &im = bitmap->image();
@@ -110,7 +113,7 @@ OpenVGBitmap::OpenVGBitmap(image::GnashImage *image, VGPaint vgpaint)
 #endif
     _vgpaint(vgpaint)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 } 
 
 OpenVGBitmap::~OpenVGBitmap()
@@ -151,10 +154,20 @@ OpenVGBitmap::image()
 OpenVGBitmap *
 OpenVGBitmap::createRadialBitmap(float cx, float cy, float fx, float fy,
                                  float radial, const rgba &incolor,
+                                 const GradientFill::GradientRecords &records,
                                  VGPaint paint)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
+    VGfloat color[] = {
+        incolor.m_r / 255.0f,
+        incolor.m_g / 255.0f,
+        incolor.m_b / 255.0f,
+        incolor.m_a / 255.0f
+    };
+    vgSetParameteri (paint, VG_PAINT_TYPE, VG_PAINT_TYPE_COLOR);
+    vgSetParameterfv (paint, VG_PAINT_COLOR, 4, color);
+    
     VGfloat rgParams[] = { cx, cy, fx, fy, radial };
     
     // Paint Type 
@@ -163,13 +176,24 @@ OpenVGBitmap::createRadialBitmap(float cx, float cy, float fx, float fy,
     // Gradient Parameters
     vgSetParameterfv(paint, VG_PAINT_RADIAL_GRADIENT, 5, rgParams);
 
-    VGfloat rampStop[] = {0.00f, 1.0f, 1.0f, 1.0f, 1.0f,
-                          0.33f, 1.0f, 0.0f, 0.0f, 1.0f,
-                          0.66f, 0.0f, 1.0f, 0.0f, 1.0f,
-                          1.00f, 0.0f, 0.0f,  1.0f, 1.0f};
-    vgSetParameterfv(paint, VG_PAINT_COLOR_RAMP_STOPS, 20, rampStop);    
-
     // Color Ramp is the same as for linear gradient
+    size_t entries = records.size() * 5;
+    VGfloat ramps[entries];
+    int j = 0;
+    for (size_t i=0; i!= records.size(); ++i) {
+        // std::cerr << "The record is: " << records[i].ratio/255.0f;
+        rgba c = records[i].color;
+        // std::cerr << ", " << c.m_r/255.0f << ", " << c.m_g/255.0f << ", "
+        //           << c.m_b/255.0f << ", " << c.m_a/255.0f << std::endl;
+        // The set of 5 for each record is simply: { Offset, R, G, B, A }
+        ramps[j++] = records[i].ratio/255.0f;
+        ramps[j++] = c.m_r / 255.0f;
+        ramps[j++] = c.m_g / 255.0f;
+        ramps[j++] = c.m_b / 255.0f;
+        ramps[j++] = c.m_a / 255.0f;
+    }
+    vgSetParameterfv(paint, VG_PAINT_COLOR_RAMP_STOPS, entries, ramps);
+
     return this;
 }
 
@@ -189,7 +213,9 @@ OpenVGBitmap::createRadialBitmap(float cx, float cy, float fx, float fy,
 /// clipped at the boundary instead of x1,y1.
 OpenVGBitmap *
 OpenVGBitmap::createLinearBitmap(float x0, float y0, float x1, float y1,
-                                 const rgba &incolor, const VGPaint paint)
+                                 const rgba &incolor,
+                                 const GradientFill::GradientRecords &records,
+                                 const VGPaint paint)
 {
     // GNASH_REPORT_FUNCTION;
     VGfloat color[] = {
@@ -205,20 +231,37 @@ OpenVGBitmap::createLinearBitmap(float x0, float y0, float x1, float y1,
     vgSetParameteri(paint, VG_PAINT_COLOR_RAMP_SPREAD_MODE,
                     VG_COLOR_RAMP_SPREAD_PAD);
 
-    //    VGfloat linearGradient[4] = { x0, y0, 10000, 10000 };
+    // This is the origin and size of the gradient
     VGfloat linearGradient[4] = { x0, y0, x1, y1 };
     vgSetParameterfv(paint, VG_PAINT_LINEAR_GRADIENT, 4, linearGradient);
 
-#if 0
-    VGfloat stops[] = { 0.0, 0.33, 0.66, 1.0};
-    vgSetParameterfv(paint, VG_PAINT_COLOR_RAMP_STOPS, 4, stops);
-#else
-    VGfloat rampStop[] = {0.00f, 1.0f, 1.0f, 1.0f, 1.0f,
-                          0.33f, 1.0f, 0.0f, 0.0f, 1.0f,
-                          0.66f, 0.0f, 1.0f, 0.0f, 1.0f,
-                          1.00f, 0.0f, 0.0f,  1.0f, 1.0f};
-    vgSetParameterfv(paint, VG_PAINT_COLOR_RAMP_STOPS, 20, rampStop);    
-#endif
+    // The application defines the non-premultiplied sRGBA color and alpha value
+    // associated with each of a number of values, called stops.
+    // A stop is defined by an offset between 0 and 1, inclusive, and a color value.
+    
+    // an array of floating-point values giving the offsets and colors
+    // of the stops. Each stop is defined by a floating-point offset
+    // value and four floating-point values containing the sRGBA color
+    // and alpha value associated with each stop, in the form of a
+    // non-premultiplied (R, G, B, α) quad. The vgSetParameter
+    // function will generate an error if the number of values
+    // submitted is not a multiple of 5 (zero is acceptable)
+    size_t entries = records.size() * 5;
+    VGfloat ramps[entries];
+    int j = 0;
+    for (size_t i=0; i!= records.size(); ++i) {
+        std::cerr << "The record is: " << records[i].ratio/255.0f;
+        rgba c = records[i].color;
+        std::cerr << ", " << c.m_r/255.0f << ", " << c.m_g/255.0f << ", "
+                  << c.m_b/255.0f << ", " << c.m_a/255.0f << std::endl;
+        // The set of 5 for each record is simply: { Offset, R, G, B, A }
+        ramps[j++] = records[i].ratio/255.0f;
+        ramps[j++] = c.m_r / 255.0f;
+        ramps[j++] = c.m_g / 255.0f;
+        ramps[j++] = c.m_b / 255.0f;
+        ramps[j++] = c.m_a / 255.0f;
+    }
+    vgSetParameterfv(paint, VG_PAINT_COLOR_RAMP_STOPS, entries, ramps);
     
     return this;
 }
@@ -251,9 +294,11 @@ OpenVGBitmap::applyPatternBitmap(const gnash::SWFMatrix& matrix,
     // Paint the cached VG image into the VG paint surface
     mat = matrix;
     mat.invert();
-//    Renderer_ovg::printVGMatrix(mat);
+    Renderer_ovg::printVGMatrix(matrix);
+    Renderer_ovg::printVGMatrix(mat);
     
     memset(vmat, 0, sizeof(vmat));
+    // Convert from fixed point to floating point
     vmat[0] = mat.sx  / 65536.0f;
     vmat[1] = mat.shx / 65536.0f;
     vmat[3] = mat.shy / 65536.0f;

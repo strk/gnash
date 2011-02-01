@@ -87,9 +87,9 @@ class eglScopeMatrix : public boost::noncopyable
 public:
     eglScopeMatrix(const SWFMatrix& m)
         {
-            // GNASH_REPORT_FUNCTION;            
+            GNASH_REPORT_FUNCTION;            
             vgGetMatrix(_orig_mat);
-            //Renderer_ovg::printVGMatrix(_orig_mat);
+            Renderer_ovg::printVGMatrix(_orig_mat);
             
             float mat[9];
             memset(mat, 0, sizeof(mat));
@@ -99,6 +99,7 @@ public:
             mat[4] = m.sy  / 65536.0f;
             mat[6] = m.tx;
             mat[7] = m.ty;
+            Renderer_ovg::printVGMatrix(mat);
             vgMultMatrix(mat);
         }
   
@@ -297,17 +298,16 @@ Renderer_ovg::~Renderer_ovg()
 
 // Given an image, returns a pointer to a CachedBitmap class
 // that can later be passed to fill_styleX_bitmap(), to set a
-// bitmap fill style. This unfortunately doesn't support
-// hardware acceleration libraries like OpenVG, which have their
-// own image type, which is what should be cached to avoid
-// recalculating it.
+// bitmap fill style. We only cache the GnashImage here, as a
+// VGImage can't be created yet until the renderer is initialized.
 CachedBitmap *
 Renderer_ovg::createCachedBitmap(std::auto_ptr<image::GnashImage> im)
 {
     // GNASH_REPORT_FUNCTION;
 
-    image::GnashImage *image = im.release();
-    return reinterpret_cast<CachedBitmap *>(new OpenVGBitmap(image, _fillpaint));
+    CachedBitmap *cbinfo = reinterpret_cast<CachedBitmap *>(new OpenVGBitmap(im.release(),
+                                                                             _fillpaint));
+    return cbinfo;
 }
 
 // Since we store drawing operations in display lists, we take special care
@@ -829,7 +829,6 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
     SWF::FillType fill_type = boost::apply_visitor(GetType(), style.fill);
     SWFMatrix sm = boost::apply_visitor(GetMatrix(), style.fill);
     rgba incolor = boost::apply_visitor(GetColor(), style.fill);
-    
     switch (fill_type) {
         
       case SWF::FILL_LINEAR_GRADIENT:
@@ -840,10 +839,10 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
           log_error("Fill Style Type: Gradient, you shouldn't be here!");
           break;
       }
-      // FIXME: Bitmap cacheing needs to be improved. Currently the GnahInage
+      // FIXME: Bitmap cacheing needs to be improved. Currently the GnashInage
       // is cached, but the VG image is not. This forces the VG Image to be
       // recalculated all the time from the GnashImage. Ideally the VG Image
-      // should be cached instead.
+      // should be cached instead by the Renderer.
       case SWF::FILL_TILED_BITMAP_HARD:
       case SWF::FILL_TILED_BITMAP:
       {
@@ -860,17 +859,12 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
       case SWF::FILL_CLIPPED_BITMAP_HARD:
       {     
           log_debug("Fill Style Type: Clipped Bitmap");
-          CachedBitmap *cb = boost::apply_visitor(GetBitmap(), style.fill);
+          CachedBitmap *cb = boost::apply_visitor(GetBitmap(), style.fill);          
           // Convert the GnashImage to a VG Image
-#if 1
           OpenVGBitmap *binfo = new OpenVGBitmap(cb, _fillpaint);
           // Apply the transformation and paint
+          // sm.sx = 2450; // FIXME: debug hack
           binfo->applyPatternBitmap(sm, OpenVGBitmap::WRAP_FILL, _fillpaint);
-#else
-          OpenVGBitmap *binfo = reinterpret_cast<OpenVGBitmap *>(cb);
-          // Apply the transformation and paint
-          binfo->applyPatternBitmap(sm, OpenVGBitmap::WRAP_FILL, _fillpaint);
-#endif
           break;
       } 
       case SWF::FILL_SOLID:
@@ -1175,21 +1169,29 @@ Renderer_ovg::draw_subshape(const PathVec& path_vec,
                 // pixel. Use th display size for the extent of the shape, 
                 // as it'll get clipped by OpenVG at the end of the
                 // shape that is being filled with the gradient.
+                const std::vector<gnash::GradientRecord> &records =
+                    boost::apply_visitor(GetGradientRecords(), fill_styles[i].fill);
+                // log_debug("Fill Style Type: Linear Gradient, %d records", records.size());
                 binfo->createLinearBitmap((*(refs[0])).ap.x, (*(refs[0])).ap.y,
-                                          _display_width * 20.0f, _display_height * 20.0f,
-                                          incolor, _fillpaint);
+                                          _display_width * 20.0f, (_display_height * 20.0f)/2,
+                                          incolor, records, _fillpaint);
             }
             if (fill_type == SWF::FILL_RADIAL_GRADIENT) {
                 rgba incolor = boost::apply_visitor(GetColor(), fill_styles[i].fill);
+                double focalpt = boost::apply_visitor(GetFocalPoint(), fill_styles[i].fill);
+                const std::vector<gnash::GradientRecord> &records =
+                    boost::apply_visitor(GetGradientRecords(), fill_styles[i].fill);
+                // log_debug("Fill Style Type: Radial Gradient: focal is: %d, %d records",
+                //           focalpt, records.size());
                 OpenVGBitmap* binfo = new OpenVGBitmap(_fillpaint);
                 // All positions are specified in twips, which are 20 to the
-                // pixel. Use th display size for the extent of the shape, 
+                // pixel. Use the display size for the extent of the shape, 
                 // as it'll get clipped by OpenVG at the end of the
                 // shape that is being filled with the gradient.
                 binfo->createRadialBitmap((*(refs[0])).ap.x, (*(refs[0])).ap.y,
-                                          _display_width * 20.0f,
-                                          _display_height * 20.0f, 500,
-                                          incolor, _fillpaint);
+                                          (*(refs[0])).ap.x * 3,
+                                          (*(refs[0])).ap.y * 3, focalpt,
+                                          incolor, records, _fillpaint);
             }
             for (PathPtrVec::const_iterator it = refs.begin(), end = refs.end();
                  it != end; ++it) {
