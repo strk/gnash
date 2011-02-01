@@ -220,7 +220,7 @@ class bitmap_info_cairo : public CachedBitmap, boost::noncopyable
 
 /// Style handler
 //
-/// Transfer FillStyles to agg styles.
+/// Transfer FillStyles to cairo styles.
 struct StyleHandler : boost::static_visitor<cairo_pattern_t*>
 {
     StyleHandler(const SWFCxForm& c)
