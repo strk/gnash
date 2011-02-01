@@ -160,9 +160,9 @@ Dejagnu.swf:
 	$(MAKE) -C misc-ming.all $@
 	cp misc-ming.all/Dejagnu.swf $@
 
-check-local:: Dejagnu.swf
+check-local: gnashrc Dejagnu.swf
 else
-check-local:: gnashrc
+check-local: gnashrc
 endif
 
 clean-local:
