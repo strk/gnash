@@ -157,7 +157,7 @@ public:
 
     /// The type of GradientFill
     //
-    /// A Focal fill is a gradient fill with a focal point.
+    /// A Radial fill is a gradient fill with a focal point.
     enum Type {
         LINEAR,
         RADIAL
@@ -194,6 +194,10 @@ public:
     void setRecords(const GradientRecords& recs) {
         assert(recs.size() > 1);
         _gradients = recs;
+    }
+
+    const GradientRecords &getRecords() const {
+        return _gradients;
     }
 
     /// Get the number of records in this GradientFill
