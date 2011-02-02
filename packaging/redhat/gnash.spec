@@ -1,6 +1,6 @@
 Name:           gnash
 # This next field gets edited by "make gnash.spec" when building an rpm
-Version:        master
+Version:        0.8.9
 Release:        0
 Epoch: 		1
 # This next field gets edited by "make gnash.spec" when building an rpm
@@ -15,7 +15,7 @@ URL:            http://www.gnu.org/software/gnash/
 Source0:        http://www.getgnash.org/packages/snapshots/fedora/%{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%{_target_cpu}
 
-BuildRequires:  redhat-lsb
+BuildRequires:  redhat-lsb mysql-devel
 # bitmap libraries for loading images
 BuildRequires:  libpng-devel libjpeg-devel giflib-devel
 # these are needed for the python gtk widget
