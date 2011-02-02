@@ -82,21 +82,11 @@ rpm-install:
 # requires we do it ourselves, and copy it to $HOME/rpmbuild/SOURCES
 # before rpmbuild will work.
 setup-rpm: 
-	-snapshot_version="gnash-$(SNAPSHOT_VERSION)"; \
-	snapshot_version=`echo $${snapshot_version}|tr "~" "_"`; \
-	if test -d gnash-$(PACKAGE_VERSION); then \
-	  mv gnash-$(PACKAGE_VERSION) $${snapshot_version}; \
-	  if test ! -f $${snapshot_version}/configure.ac.orig; then \
-	    mv -f $${snapshot_version}/configure.ac $${snapshot_version}/configure.ac.orig; \
-	    sed -e "s/AC_INIT(gnash, master)/AC_INIT(gnash, $${snapshot_version})/" \
-	      $${snapshot_version}/configure.ac.orig > $${snapshot_version}/configure.ac; \
-	  fi; \
-	fi; \
-	tar zcf $${snapshot_version}.tar.gz \
-	  --exclude=$${snapshot_version}/autom4te.cache \
-	  --exclude=$${snapshot_version}/configure.ac.orig \
-	  --exclude=$${snapshot_version}/configure.orig $${snapshot_version}; \
+	tar zcf $(SNAPSHOT_DIR).tar.gz \
+	  --exclude=$(SNAPSHOT_DIR)/autom4te.cache \
+	  --exclude=$(SNAPSHOT_DIR)/configure.ac.orig \
+	  --exclude=$(SNAPSHOT_DIR)/configure.orig $(SNAPSHOT_DIR); \
 	mkdir -p $(RPMBUILD_DIR)/SOURCES; \
-	cp $${snapshot_version}.tar.gz $(RPMBUILD_DIR)/SOURCES
+	cp $(SNAPSHOT_DIR).tar.gz $(RPMBUILD_DIR)/SOURCES
 
 .PHONY : rpm redhat spec rpm-configure rpm-install rpm-build setup-rpm
