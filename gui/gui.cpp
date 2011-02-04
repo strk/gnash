@@ -83,6 +83,9 @@ struct Gui::Display
 {
     Display(Gui& g, movie_root& r) : _g(g), _r(r) {}
     void operator()() const {
+		InvalidatedRanges world_ranges;
+		world_ranges.setWorld();
+		_g.setInvalidatedRegions(world_ranges);
         _g.display(&_r);
     }
 private:
