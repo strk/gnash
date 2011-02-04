@@ -46,7 +46,7 @@ class Level99
 
                 check_equals(mc._currentframe, 1);
 
-               	check_equals(_level0.frameno, 2);
+               	check(_level0.frameno >= 2);
 
                 // Check our depth
 		check_equals(mc.getDepth(), -16285);

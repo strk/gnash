@@ -23,14 +23,14 @@ FLAGS="$FLAGS $@"
 out=`basename "${in}"`.trace-gnash
 logout=`basename "${in}"`.out
 logerr=`basename "${in}"`.err
+logpipe=${logout}.fifo
+mknod $logpipe p
 exp="${in}.trace"
 
 echo "Running ${GPROCESSOR} ${FLAGS} ${in}" >&2
-${GPROCESSOR} ${FLAGS} "$in" > $logout 2> $logerr
-if test "$?" != 0; then
-	echo "gprocessor returned an error"
-	exit 2
-fi
+${GPROCESSOR} ${FLAGS} "$in" > $logpipe 2> $logerr &
+cat < $logpipe > $logout
+rm $logpipe
 
 grep TRACE -A40 ${logout} | sed '/^--$/d; s/.*TRACE: //; /\n*[0-9]:[0-9]*\].*/d; s/^$//;' > $out
 diff -u "$exp" "$out"
