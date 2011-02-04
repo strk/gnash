@@ -931,7 +931,7 @@ Gui::start()
 }
 
 bool
-Gui::advanceMovie()
+Gui::advanceMovie(bool doDisplay)
 {
 
     if (isStopped()) {
@@ -968,11 +968,6 @@ Gui::advanceMovie()
         fpsCounterTick();
     }
 #endif
-    
-    
-    // TODO: ask stage about doDisplay ?
-    // - if it didn't advance might need to check updateAfterEvent
-    bool doDisplay = true;
     
 #ifdef SKIP_RENDERING_IF_LATE
     // We want to skip rendering IFF it's time to advance again.

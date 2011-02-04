@@ -274,7 +274,7 @@ public:
     ///
     /// @return true if this beat resulted in actual frame advancement.
     ///
-    bool advanceMovie();
+    bool advanceMovie(bool doDisplay = true);
 
     /// Convenience static wrapper around advanceMovie for callbacks happiness.
     //
