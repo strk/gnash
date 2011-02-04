@@ -79,6 +79,17 @@
 
 namespace gnash {
 
+struct Gui::Display
+{
+    Display(Gui& g, movie_root& r) : _g(g), _r(r) {}
+    void operator()() const {
+        _g.display(&_r);
+    }
+private:
+    Gui& _g;
+    movie_root& _r;
+};
+
 Gui::Gui(RunResources& r) :
     _loop(true),
     _xid(0),
@@ -206,7 +217,8 @@ Gui::quit()
 {
     // Take a screenshot of the last frame if required.
     if (_screenShotter.get() && _renderer.get()) {
-        _screenShotter->last(*_renderer);
+        Display dis(*this, *_stage);
+        _screenShotter->last(*_renderer, &dis);
     }
     
     quitUI();
@@ -934,6 +946,7 @@ bool
 Gui::advanceMovie(bool doDisplay)
 {
 
+
     if (isStopped()) {
         return false;
     }
@@ -942,6 +955,7 @@ Gui::advanceMovie(bool doDisplay)
         start();
     }
 
+    Display dis(*this, *_stage);
     gnash::movie_root* m = _stage;
     
     // Define REVIEW_ALL_FRAMES to have *all* frames
@@ -997,7 +1011,7 @@ Gui::advanceMovie(bool doDisplay)
 	}
 
     if (_screenShotter.get() && _renderer.get()) {
-        _screenShotter->screenShot(*_renderer, _advances);
+        _screenShotter->screenShot(*_renderer, _advances, doDisplay ? 0 : &dis);
     }
 
     // Only increment advances and check for exit condition when we've

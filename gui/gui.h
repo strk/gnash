@@ -540,6 +540,9 @@ protected:
     virtual void playHook() {}
 
 private:
+
+    struct Display;
+
     std::map<int /* fd */, boost::function<void ()> > _fd_callbacks;
 
     /// Width of a window pixel, in stage pseudopixel units.

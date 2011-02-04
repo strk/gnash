@@ -101,33 +101,6 @@ ScreenShotter::saveImage(const Renderer& r, const std::string& id) const
 }
 
 void
-ScreenShotter::screenShot(const Renderer& r, size_t frameAdvance)
-{
-    // Save an image if a spontaneous screenshot was requested or the
-    // frame is in the list of requested frames.
-    if (_immediate || std::binary_search(_frames.begin(), _frames.end(),
-                frameAdvance)) {
-
-        // Check whether we've rendered an image for this frame.
-        if (_done.find(frameAdvance) != _done.end()) {
-            return;
-        }
-        _done.insert(frameAdvance);
-
-        saveImage(r, boost::lexical_cast<std::string>(frameAdvance));
-        _immediate = false;
-    }
-}
-
-void
-ScreenShotter::last(const Renderer& r) const
-{
-    if (_last) {
-        saveImage(r, "last");
-    }
-}
-
-void
 ScreenShotter::setFrames(const FrameList& frames)
 {
     _frames = frames;
