@@ -4,7 +4,7 @@
     
     <!ENTITY appversion "0.8.9">
     <!ENTITY manrevision "0.2">
-    <!ENTITY Feb "Aug 2011">
+    <!ENTITY Feb "Feb 2011">
     <!ENTITY app "<application>Gnash</application>">
     <!ENTITY appname "Gnash">
 
@@ -40,7 +40,7 @@
 <bookinfo>
   <title>Gnash User Manual</title>
   <copyright>
-    <year>2005, 2006, 2007, 2008, 2009, 2010</year>
+    <year>2005, 2006, 2007, 2008, 2009, 2010, 2011</year>
     <holder>Free Software Foundation</holder>
   </copyright>
     <abstract role="texinfo-node">
