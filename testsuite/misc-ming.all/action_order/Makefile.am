@@ -1,6 +1,7 @@
 ## Process this file with automake to generate Makefile.in
 # 
-# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010,
+#   2011 Free Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -85,7 +86,7 @@ check_PROGRAMS += \
 	ActionOrderTest5 \
 	$(NULL)
 endif
-	
+
 check_SCRIPTS = \
 	action_execution_order_testrunner \
 	action_execution_order_extend_testrunner \
@@ -108,7 +109,7 @@ check_SCRIPTS += \
 	ActionOrderTest5Runner \
 	$(NULL)
 endif
-	
+
 action_execution_order_test_SOURCES =	\
 	action_execution_order_test.c	\
 	$(NULL)
