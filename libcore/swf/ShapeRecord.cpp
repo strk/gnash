@@ -99,10 +99,8 @@ public:
     const Edge& getNextEdge()
     {
         const Edge& ret = _paths[_currpath][_curredge];
-        if ( ++_curredge >= _paths[_currpath].size() )
-        {
-            if ( ++_currpath >= _paths.size() )
-            {
+        if ( ++_curredge >= _paths[_currpath].size() ) {
+            if ( ++_currpath >= _paths.size() ) {
                 // this is not really needed,
                 // but it's simpler to do so that
                 // to make next call fail or abort..
@@ -219,8 +217,7 @@ ShapeRecord::setLerp(const ShapeRecord& a, const ShapeRecord& b,
     // shape
     const Paths& paths1 = a.paths();
     const Paths& paths2 = b.paths();
-    for (size_t i = 0, k = 0, n = 0; i < _paths.size(); i++)
-    {
+    for (size_t i = 0, k = 0, n = 0; i < _paths.size(); i++) {
         Path& p = _paths[i];
         const Path& p1 = i < paths1.size() ? paths1[i] : empty_path;
         const Path& p2 = n < paths2.size() ? paths2[n] : empty_path;
@@ -235,8 +232,7 @@ ShapeRecord::setLerp(const ShapeRecord& a, const ShapeRecord& b,
         const size_t len = p1.size();
         p.m_edges.resize(len);
 
-        for (size_t j=0; j < p.size(); j++)
-        {
+        for (size_t j=0; j < p.size(); j++) {
             Edge& e = p[j];
             const Edge& e1 = j < p1.size() ? p1[j] : empty_edge;
 
@@ -270,7 +266,6 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                             tag == SWF::DEFINESHAPE4_);
 
     if (styleInfo) {
-
         _bounds = readRect(in);
     
         IF_VERBOSE_PARSE(
@@ -290,8 +285,7 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
         readLineStyles(_lineStyles, in, tag, m, r);
     }
 
-    if (tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2 )
-    {
+    if (tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2 ) {
         assert(!styleInfo);
     }
     
@@ -306,8 +300,7 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
             tag, num_fill_bits, num_line_bits);
     );
     
-    if ( !num_fill_bits && !num_line_bits )
-    {
+    if ( !num_fill_bits && !num_line_bits ) {
         /// When reading font glyphs it happens to read 1 byte
         /// past end boundary of a glyph due to fill/line bits being
         /// zero.
@@ -323,8 +316,7 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
         ///
         ///
         if (tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2 || 
-                tag == SWF::DEFINEFONT3)
-        {
+                tag == SWF::DEFINEFONT3) {
             log_debug("Skipping glyph read, being fill and line bits zero. "
                     "SWF tag is %d.", tag);
             return;
@@ -346,30 +338,24 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
 #define SHAPE_LOG 0
     
     // SHAPERECORDS
-    for (;;)
-    {
+    for (;;) {
         in.ensureBits(1);
         bool isEdgeRecord = in.read_bit();
-        if (!isEdgeRecord)
-        {
+        if (!isEdgeRecord) {
             // Parse the record.
             in.ensureBits(5);
             int flags = in.read_uint(5);
-            if (flags == SHAPE_END)
-            {  
+            if (flags == SHAPE_END) {  
                 // Store the current path if any.
-                if (! current_path.empty())
-                {
+                if (! current_path.empty()) {
                     _paths.push_back(current_path);
                     current_path.m_edges.resize(0);
                 }
                 break;
             }
-            if (flags & SHAPE_MOVE)
-            {  
+            if (flags & SHAPE_MOVE) {  
                 // Store the current path if any, and prepare a fresh one.
-                if (! current_path.empty())
-                {
+                if (! current_path.empty()) {
                     _paths.push_back(current_path);
                     current_path.m_edges.resize(0);
                 }
@@ -392,11 +378,9 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                 );
 #endif
             }
-            if ((flags & SHAPE_FILLSTYLE0_CHANGE) && num_fill_bits > 0)
-            {
+            if ((flags & SHAPE_FILLSTYLE0_CHANGE) && num_fill_bits > 0) {
                 // FillStyle_0_change = 1;
-                if (! current_path.empty())
-                {
+                if (! current_path.empty()) {
                     _paths.push_back(current_path);
                     current_path.m_edges.resize(0);
                     current_path.ap.x = x;
@@ -404,15 +388,12 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                 }
                 in.ensureBits(num_fill_bits);
                 unsigned style = in.read_uint(num_fill_bits);
-                if (style > 0)
-                {
+                if (style > 0) {
                     style += fill_base;
                 }
     
-                if (tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2)
-                {
-                    if ( style > 1 )          // 0:hide 1:renderer
-                    {
+                if (tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2) {
+                    if ( style > 1 ) {         // 0:hide 1:renderer
                         IF_VERBOSE_MALFORMED_SWF(
                              log_swferror(_("Invalid fill style %d in "
                                      "fillStyle0Change record for font tag "
@@ -420,12 +401,9 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                         );
                         style = 0;
                     }
-                }
-                else
-                {
+                } else {
                     // 1-based index
-                    if ( style > _fillStyles.size() )
-                    {
+                    if ( style > _fillStyles.size() ) {
                         IF_VERBOSE_MALFORMED_SWF(
                              log_swferror(_("Invalid fill style %d in "
                                      "fillStyle0Change record - %d defined. "
@@ -443,11 +421,9 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                 );
 #endif
             }
-            if ((flags & SHAPE_FILLSTYLE1_CHANGE) && num_fill_bits > 0)
-            {
+            if ((flags & SHAPE_FILLSTYLE1_CHANGE) && num_fill_bits > 0) {
                 // FillStyle_1_change = 1;
-                if (! current_path.empty())
-                {
+                if (! current_path.empty()) {
                     _paths.push_back(current_path);
                     current_path.m_edges.resize(0);
                     current_path.ap.x = x;
@@ -455,15 +431,12 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                 }
                 in.ensureBits(num_fill_bits);
                 unsigned style = in.read_uint(num_fill_bits);
-                if (style > 0)
-                {
+                if (style > 0) {
                     style += fill_base;
                 }
     
-                if (tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2)
-                {
-                    if ( style > 1 )          // 0:hide 1:renderer
-                    {
+                if (tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2) {
+                    if ( style > 1 ) {          // 0:hide 1:renderer
                         IF_VERBOSE_MALFORMED_SWF(
                              log_swferror(_("Invalid fill style %d in "
                                      "fillStyle1Change record for font tag "
@@ -471,12 +444,9 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                         );
                         style = 0;
                     }
-                }
-                else
-                {
+                } else {
                     // 1-based index
-                    if ( style > _fillStyles.size() )
-                    {
+                    if ( style > _fillStyles.size() ) {
                         IF_VERBOSE_MALFORMED_SWF(
                             log_swferror(_("Invalid fill style %d in "
                                     "fillStyle1Change record - %d defined. "
@@ -493,11 +463,9 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                 );
 #endif
             }
-            if ((flags & SHAPE_LINESTYLE_CHANGE) && num_line_bits > 0)
-            {
+            if ((flags & SHAPE_LINESTYLE_CHANGE) && num_line_bits > 0) {
                 // line_style_change = 1;
-                if (! current_path.empty())
-                {
+                if (! current_path.empty()) {
                     _paths.push_back(current_path);
                     current_path.m_edges.resize(0);
                     current_path.ap.x = x;
@@ -505,14 +473,11 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                 }
                 in.ensureBits(num_line_bits);
                 unsigned style = in.read_uint(num_line_bits);
-                if (style > 0)
-                {
+                if (style > 0) {
                     style += line_base;
                 }
-                if (tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2)
-                {
-                    if ( style > 1 )          // 0:hide 1:renderer
-                    {
+                if (tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2) {
+                    if ( style > 1 ) {         // 0:hide 1:renderer
                         IF_VERBOSE_MALFORMED_SWF(
                             log_swferror(_("Invalid line style %d in "
                                     "lineStyleChange record for font tag "
@@ -520,8 +485,7 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                         );
                         style = 0;
                     }
-                }
-                else {
+                } else {
                     // 1-based index
                     if (style > _lineStyles.size()) {
                         IF_VERBOSE_MALFORMED_SWF(
@@ -540,10 +504,8 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                 )
 #endif
             }
-            if (flags & SHAPE_HAS_NEW_STYLES)
-            {
-                if (!styleInfo)
-                {
+            if (flags & SHAPE_HAS_NEW_STYLES) {
+                if (!styleInfo) {
                     IF_VERBOSE_MALFORMED_SWF(
                          log_swferror("Unexpected HasNewStyle flag in tag "
                              "%d shape record", tag);
@@ -555,8 +517,7 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                 );
     
                 // Store the current path if any.
-                if (! current_path.empty())
-                {
+                if (! current_path.empty()) {
                     _paths.push_back(current_path);
                     current_path.clear();
                 }
@@ -576,14 +537,11 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                 num_fill_bits = in.read_uint(4);
                 num_line_bits = in.read_uint(4);
             }
-        }
-        else
-        {
+        } else {
             // EDGERECORD
             in.ensureBits(1);
             bool edge_flag = in.read_bit();
-            if (edge_flag == 0)
-            {
+            if (edge_flag == 0) {
                 in.ensureBits(4);
                 int num_bits = 2 + in.read_uint(4);
                 // curved edge
@@ -602,9 +560,7 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                 current_path.m_edges.push_back(Edge(cx, cy, ax, ay));
                 x = ax;
                 y = ay;
-            }
-            else
-            {
+            } else {
                 // straight edge
                 in.ensureBits(5);
                 int num_bits = 2 + in.read_uint(4);
@@ -616,19 +572,14 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                     in.ensureBits(2 * num_bits);
                     dx = in.read_sint(num_bits);
                     dy = in.read_sint(num_bits);
-                }
-                else
-                {
+                } else {
                     in.ensureBits(1);
                     bool vert_flag = in.read_bit();
-                    if (vert_flag == 0)
-                    {
+                    if (vert_flag == 0) {
                         // Horizontal line.
                         in.ensureBits(num_bits);
                         dx = in.read_sint(num_bits);
-                    }
-                    else
-                    {
+                    } else {
                         // Vertical line.
                         in.ensureBits(num_bits);
                         dy = in.read_sint(num_bits);
@@ -649,16 +600,14 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
         }
     }
     
-    if (!styleInfo)
-    {
+    if (!styleInfo) {
         // TODO: performance would be improved by computing
         //       the bounds as edges are parsed.
         computeBounds(_bounds, _paths, _lineStyles, m.get_version());
     }
 
 #ifdef GNASH_DEBUG_SHAPE_BOUNDS
-    else
-    {
+    else {
         SWFRect computedBounds;
         computeBounds(computedBounds, _paths, _lineStyles, m.get_version());
         if ( computedBounds != _bounds )
@@ -680,10 +629,8 @@ readFillStyles(ShapeRecord::FillStyles& styles, SWFStream& in,
 {
     in.ensureBytes(1);
     boost::uint16_t FillStyle_count = in.read_u8();
-    if (tag != SWF::DEFINESHAPE)
-    {
-        if (FillStyle_count == 0xFF)
-        {
+    if (tag != SWF::DEFINESHAPE) {
+        if (FillStyle_count == 0xFF) {
             in.ensureBytes(2);
             FillStyle_count = in.read_u16();
         }
@@ -714,8 +661,7 @@ readLineStyles(ShapeRecord::LineStyles& styles, SWFStream& in,
         log_parse(_("  readLineStyles: count = %d"), line_style_count);
     );
 
-    if (line_style_count == 0xFF)
-    {
+    if (line_style_count == 0xFF) {
         in.ensureBytes(2);
         line_style_count = in.read_u16();
         IF_VERBOSE_PARSE(
@@ -724,8 +670,7 @@ readLineStyles(ShapeRecord::LineStyles& styles, SWFStream& in,
     }
 
     // Read the styles.
-    for (int i = 0; i < line_style_count; i++)
-    {
+    for (int i = 0; i < line_style_count; i++) {
         styles.resize(styles.size() + 1);
         styles.back().read(in, tag, md, r);
     }
@@ -738,13 +683,11 @@ computeBounds(SWFRect& bounds, const ShapeRecord::Paths& paths,
 {
     bounds.set_null();
 
-    for (unsigned int i = 0; i < paths.size(); i++)
-    {
+    for (unsigned int i = 0; i < paths.size(); i++) {
         const Path& p = paths[i];
 
         unsigned thickness = 0;
-        if ( p.m_line )
-        {
+        if ( p.m_line ) {
             // For glyph shapes m_line is allowed to be 1
             // while no defined line styles are allowed.
             if (lineStyles.empty()) {
