@@ -32,6 +32,6 @@ ${GPROCESSOR} ${FLAGS} "$in" > $logpipe 2> $logerr &
 cat < $logpipe > $logout
 rm $logpipe
 
-grep TRACE -A40 ${logout} | sed '/^--$/d; s/.*TRACE: //; /\n*[0-9]:[0-9]*\].*/d; s/^$//;' > $out
+grep -a TRACE -A40 ${logout} | sed '/^--$/d; s/.*TRACE: //; /\n*[0-9]:[0-9]*\].*/d; s/^$//;' > $out
 diff -u "$exp" "$out"
 exit $?
