@@ -127,19 +127,6 @@ public:
     static const char *getErrorString(VGErrorCode error);
 
     // VGImage (CachedBitmap *x) { return _image_cache[x]; };
-#if 0
-    // These are all required by the Render class
-    void draw_poly(const point* corners, size_t corner_count,
-                           const rgba& fill, const rgba& outline,
-                           const SWFMatrix& mat, bool masked);
-    void drawVideoFrame(gnash::image::GnashImage*, const gnash::Transform&,
-                        const gnash::SWFRect*, bool);
-
-    void renderToImage(boost::shared_ptr<IOChannel> io,FileType type);
-    void set_invalidated_regions(const InvalidatedRanges& ranges);
-    
-    void begin_submit_mask();
-#endif
   private:
     void add_paths(const PathVec& path_vec);
     Path reverse_path(const Path& cur_path);
@@ -183,6 +170,9 @@ public:
   
     std::vector<PathVec> _masks;
     bool        _drawing_mask;
+#ifdef OPENVG_VERSION_1_1
+    VGMaskLayer _mask_layer;
+#endif
   
     gnash::SWFMatrix stage_matrix;  // conversion from TWIPS to pixels
     
@@ -192,9 +182,12 @@ public:
     /// this pain object is used for paths
     VGPaint     _strokepaint;
 
-#ifdef OPENVG_VERSION_1_1
-    VGMaskLayer _mask;
-#endif
+    /// This stores the Aspect Ratio, which is required to properly set the X
+    /// axis scale. This is usually represented as 4:3 or 16:9 for most
+    /// framebuffers. To get the scale, divide the 2nd argument by the first,
+    /// ie... 4:3 = 3/4 = 0.75.
+    double      _aspect_ratio;
+    
     // FIXME: A cache for the VGImages might make some sense assuming it takes more time
     // to render the cached GnashImage to a VGImage. Right now every ti;l a fill style is
     // applied, the VGImage is rebuilt from the GnashImage. This appears to be relatively
