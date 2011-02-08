@@ -62,15 +62,17 @@ gnash_la_LIBADD = \
 instdir = $(includedir)/gnash
 inst_HEADERS = gnash-view.h
 
+RENDERER_GLUE =
 if BUILD_OGL_RENDERER
-RENDERER_GLUE = $(top_srcdir)/gui/gtk/gtk_glue_gtkglext.cpp
+RENDERER_GLUE += $(top_srcdir)/gui/gtk/gtk_glue_gtkglext.cpp
 INCLUDES += $(GLEXT_CFLAGS)
+gnash_la_LIBADD += $(GLEXT_LIBS)
 endif
 if BUILD_AGG_RENDERER
-RENDERER_GLUE = $(top_srcdir)/gui/gtk/gtk_glue_agg.cpp
+RENDERER_GLUE += $(top_srcdir)/gui/gtk/gtk_glue_agg.cpp
 endif
 if BUILD_CAIRO_RENDERER
-RENDERER_GLUE = $(top_srcdir)/gui/gtk/gtk_glue_cairo.cpp
+RENDERER_GLUE += $(top_srcdir)/gui/gtk/gtk_glue_cairo.cpp
 endif
 
 if USE_PYTHON
