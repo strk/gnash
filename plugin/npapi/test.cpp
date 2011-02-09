@@ -285,6 +285,17 @@ main(int , char **)
         runtest.fail("plugin::ExternalInterface::parseInvoke()");
     }
 
+    // Test for bug #31766
+    xml = "<invoke name=\"reportFlashTiming\" returntype=\"xml\"><arguments><string>reportFlashTiming</string><object><property id=\"5\"><number>1297286708921</number></property><property id=\"4\"><string>vr</string></p";
+    invoke.reset ( plugin::ExternalInterface::parseInvoke(xml) );
+    if ((invoke->name == "reportFlashTiming") && (invoke->type == "xml")
+        && invoke->args.empty())
+    {
+        runtest.pass("plugin::ExternalInterface::parseInvoke() with missing closing invoke tag");
+    } else {
+        runtest.fail("plugin::ExternalInterface::parseInvoke() with missing closing invoke tag");
+    }
+
     regfree (&regex_pat);
     NPN_MemFree(value);
 }

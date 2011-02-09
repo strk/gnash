@@ -237,8 +237,11 @@ ExternalInterface::parseInvoke(const std::string &xml)
             // extract the arguments to the method
             start = xml.find("<arguments>");
             end   = xml.find("</invoke");
-            tag   = xml.substr(start, end-start);
-            invoke->args = parseArguments(tag);
+            if (start != std::string::npos && end != std::string::npos )
+            {
+              tag   = xml.substr(start, end-start);
+              invoke->args = parseArguments(tag);
+            }
         }
     }
 
