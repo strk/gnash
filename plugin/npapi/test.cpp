@@ -38,7 +38,7 @@ std::map<NPIdentifier, NPVariant *> _properties;
 std::map<NPIdentifier,  NPInvokeFunctionPtr> _methods;
 
 int
-main(int argc, char *argv[])
+main(int , char **)
 {
     using namespace gnash; 
 
@@ -117,7 +117,7 @@ main(int argc, char *argv[])
     }
 #endif
 
-    NPObject *obj =  (NPObject *)NPN_MemAlloc(sizeof(NPObject));
+    //NPObject *obj =  (NPObject *)NPN_MemAlloc(sizeof(NPObject));
     std::string prop1 = plugin::ExternalInterface::makeString("foobar");
     std::string prop2 = plugin::ExternalInterface::makeNumber(12.34);
     std::string prop3 = plugin::ExternalInterface::makeNumber(56);
@@ -303,18 +303,19 @@ NPN_MemFree(void* ptr)
 
 // These are just stubs to get the test case to link standalone.
 NPIdentifier
-NPN_GetStringIdentifier(const NPUTF8 *name)
+NPN_GetStringIdentifier(const NPUTF8 *)
 {
+  return 0;
 }
 
 nsPluginInstanceBase *
-NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
+NS_NewPluginInstance(nsPluginCreateData *)
 {
   return NULL;
 }
 
 NPError
-NS_PluginGetValue(NPPVariable aVariable, void *aValue)
+NS_PluginGetValue(NPPVariable, void *)
 {
   return NPERR_INVALID_INSTANCE_ERROR;
 }
@@ -338,13 +339,13 @@ NPP_GetMIMEDescription(void)
 }
 
 void
-NS_DestroyPluginInstance(nsPluginInstanceBase *aPlugin)
+NS_DestroyPluginInstance(nsPluginInstanceBase *)
 {
 }
 
 // Implement minimal properties handling
 bool
-NPN_SetProperty(NPP npp, NPObject* obj, NPIdentifier name,
+NPN_SetProperty(NPP, NPObject*, NPIdentifier name,
                      const NPVariant *value)
 {
     _properties[name] = const_cast<NPVariant *>(value);
@@ -352,15 +353,18 @@ NPN_SetProperty(NPP npp, NPObject* obj, NPIdentifier name,
 }
 
 bool
-NPN_GetProperty(NPP npp, NPObject* obj, NPIdentifier name,
+NPN_GetProperty(NPP, NPObject* , NPIdentifier name,
                      const NPVariant *value)
 {
-    return _properties[name];
+    std::map<NPIdentifier, NPVariant *>::iterator it;
+    it = _properties.find(name);
+    if (it == _properties.end()) return false;
+    value = it->second;
+    return true;
 }
 
 bool
-NPN_HasProperty(NPP npp, NPObject* obj, NPIdentifier name,
-                     const NPVariant *value)
+NPN_HasProperty(NPP , NPObject* , NPIdentifier name)
 {
     std::map<NPIdentifier, NPVariant *>::iterator it;
     it = _properties.find(name);
