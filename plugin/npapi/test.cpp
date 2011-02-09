@@ -143,6 +143,7 @@ main(int , char **)
     str = plugin::ExternalInterface::makeObject(margs);
     std::string xml = "<object><property id=\"test1\"><string>foobar</string></property><property id=\"test2\"><number>12.34</number></property><property id=\"test3\"><number>56</number></property></object>";
     
+    regfree (&regex_pat);
     regcomp (&regex_pat, xml.c_str(), REG_NOSUB|REG_NEWLINE);
 
 //    std::cout << str << std::endl;
@@ -248,6 +249,7 @@ main(int , char **)
     str = plugin::ExternalInterface::makeInvoke("barbyfoo", iargs);
     xml = "<invoke name=\"barbyfoo\" returntype=\"xml\"><arguments><string>barfoo</string><number>135.78</number></arguments></invoke>";
 //    std::cout << str << std::endl;
+    regfree (&regex_pat);
     regcomp (&regex_pat, xml.c_str(), REG_NOSUB|REG_NEWLINE);
     if (regexec (&regex_pat, reinterpret_cast<const char*>(str.c_str()), 0, (regmatch_t *)0, 0) == 0) {
         runtest.pass("plugin::ExternalInterface::makeInvoke()");
@@ -283,6 +285,7 @@ main(int , char **)
         runtest.fail("plugin::ExternalInterface::parseInvoke()");
     }
 
+    regfree (&regex_pat);
     NPN_MemFree(value);
 }
 
