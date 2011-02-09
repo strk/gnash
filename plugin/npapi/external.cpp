@@ -296,6 +296,7 @@ ExternalInterface::parseXML(const std::string &xml)
             STRINGN_TO_NPVARIANT(data, length, value);
         } else if (tag == "<array>") {
             NPObject *obj =  (NPObject *)NPN_MemAlloc(sizeof(NPObject));
+            obj->referenceCount = 1;
             start = end;
             end = xml.find("</array");
             std::string str = xml.substr(start, end-start);
@@ -307,9 +308,9 @@ ExternalInterface::parseXML(const std::string &xml)
                 NPN_SetProperty(NULL, obj, id, &value.get());
             }
             OBJECT_TO_NPVARIANT(obj, value);
-            NPN_RetainObject(obj);
         } else if (tag == "<object>") {
             NPObject *obj =  (NPObject *)NPN_MemAlloc(sizeof(NPObject));
+            obj->referenceCount = 1;
             start = end;
             end = xml.find("</object");
             std::string str = xml.substr(start, end-start);
@@ -321,7 +322,6 @@ ExternalInterface::parseXML(const std::string &xml)
                 NPN_SetProperty(NULL, obj, id, &value.get());
             }
             OBJECT_TO_NPVARIANT(obj, value);
-            NPN_RetainObject(obj);
         }
     }
     
