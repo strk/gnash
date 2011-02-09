@@ -96,6 +96,9 @@ public:
 
     GnashNPVariant& operator= (const GnashNPVariant& var)
     {
+	// Avoid destroying self
+	if ( &var == this ) return *this; 
+
         NPN_ReleaseVariantValue(&_variant);
 
         CopyVariantValue(var._variant, _variant);
