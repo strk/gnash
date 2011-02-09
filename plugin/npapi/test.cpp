@@ -22,6 +22,7 @@
 #include <vector>
 #include <map>
 #include <cassert>
+#include <memory>
 
 #include "npapi.h"
 #include "npruntime.h"
@@ -117,7 +118,6 @@ main(int , char **)
     }
 #endif
 
-    //NPObject *obj =  (NPObject *)NPN_MemAlloc(sizeof(NPObject));
     std::string prop1 = plugin::ExternalInterface::makeString("foobar");
     std::string prop2 = plugin::ExternalInterface::makeNumber(12.34);
     std::string prop3 = plugin::ExternalInterface::makeNumber(56);
@@ -270,7 +270,7 @@ main(int , char **)
 
     // Parse an invoke message
     xml = "<invoke name=\"barbyfoo\" returntype=\"xml\"><arguments><string>barfoo</string><number>135.78</number></arguments></invoke>";
-    plugin::ExternalInterface::invoke_t *invoke = plugin::ExternalInterface::parseInvoke(xml);
+    std::auto_ptr<plugin::ExternalInterface::invoke_t> invoke ( plugin::ExternalInterface::parseInvoke(xml) );
     str = NPStringToString(NPVARIANT_TO_STRING(invoke->args[0].get()));
     if ((invoke->name == "barbyfoo") && (invoke->type == "xml")
         && (NPVARIANT_IS_STRING(invoke->args[0].get()))
@@ -282,6 +282,8 @@ main(int , char **)
     } else {
         runtest.fail("plugin::ExternalInterface::parseInvoke()");
     }
+
+    NPN_MemFree(value);
 }
 
 // We have to implement these two memory allocation functions as
