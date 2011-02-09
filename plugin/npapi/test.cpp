@@ -29,11 +29,12 @@
 #include "pluginbase.h"
 #include "npfunctions.h"
 #include "dejagnu.h"
+#include "../../testsuite/check.h"
 #include <regex.h>
 
 #include "external.h"
 
-TestState runtest;
+TestState& runtest = _runtest;
 
 std::map<NPIdentifier, NPVariant *> _properties;
 std::map<NPIdentifier,  NPInvokeFunctionPtr> _methods;
