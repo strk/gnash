@@ -151,14 +151,14 @@ ExternalInterface::ExternalEventCheck(int fd)
             return error;
         }
         log_debug("There are %d bytes in the network buffer", bytes);
-        boost::scoped_array<char> buffer(new char[bytes+1]);
+        boost::scoped_array<char> buffer(new char[bytes + 1]);
         // Since we know how bytes are in the network buffer, allocate
         // some memory to read the data.
         // terminate incase we want to treat the data like a string.
-        buffer[bytes+1] = 0;
+        buffer[bytes] = 0;
         const int ret = ::read(fd, buffer.get(), bytes);
-        if (ret) {
-            return parseInvoke(buffer.get());
+        if (ret > 0) {
+            return parseInvoke(std::string(buffer.get(), ret));
         }
     }
 
