@@ -309,6 +309,7 @@ NetStream_as::startAdvanceTimer()
 
 NetStream_as::~NetStream_as()
 {
+    _audioStreamer.detachAuxStreamer();
 }
 
 
