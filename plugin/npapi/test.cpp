@@ -308,32 +308,32 @@ main(int , char **)
     str = NPStringToString(NPVARIANT_TO_STRING(invoke->args[0].get()));
     check_equals(str, "reportFlashTiming");
     //
-// The rest is temporarely disabled due to really bad memory issues
-//    check(NPVARIANT_IS_OBJECT(invoke->args[1].get()));
-//    // TODO: check object contents
-//    //
-//    check(NPVARIANT_IS_STRING(invoke->args[2].get()));
+    check(NPVARIANT_IS_OBJECT(invoke->args[1].get()));
+    // TODO: check object contents
+    //
+    xcheck(NPVARIANT_IS_STRING(invoke->args[2].get()));
 //    str = NPStringToString(NPVARIANT_TO_STRING(invoke->args[2].get()));
 //    check_equals(str, "34");
-//    //
-//    check(NPVARIANT_IS_DOUBLE(invoke->args[3].get()));
+    //
+    xcheck(NPVARIANT_IS_DOUBLE(invoke->args[3].get()));
 //    check_equals(NPVARIANT_TO_DOUBLE(invoke->args[3].get()), 2);
-//    //
-//    check(NPVARIANT_IS_STRING(invoke->args[4].get()));
-//    str = NPStringToString(NPVARIANT_TO_STRING(invoke->args[4].get()));
-//    check_equals(str, "AASb6VeOkQtvnu_8");
-//    //
-//    check(NPVARIANT_IS_STRING(invoke->args[5].get()));
+    //
+    check(NPVARIANT_IS_STRING(invoke->args[4].get()));
+    str = NPStringToString(NPVARIANT_TO_STRING(invoke->args[4].get()));
+    xcheck_equals(str, "AASb6VeOkQtvnu_8");
+    //
+    xcheck(NPVARIANT_IS_STRING(invoke->args[5].get()));
 //    str = NPStringToString(NPVARIANT_TO_STRING(invoke->args[5].get()));
 //    check_equals(str, "0");
-//    //
-//    check(NPVARIANT_IS_STRING(invoke->args[6].get()));
+    //
+    xcheck(NPVARIANT_IS_STRING(invoke->args[6].get()));
 //    str = NPStringToString(NPVARIANT_TO_STRING(invoke->args[6].get()));
 //    check_equals(str, "LNX%2010%2C1%2C999%2C0");
-//    //
-//    check(NPVARIANT_IS_STRING(invoke->args[7].get()));
+    //
+    xcheck(NPVARIANT_IS_STRING(invoke->args[7].get()));
 //    str = NPStringToString(NPVARIANT_TO_STRING(invoke->args[7].get()));
 //    check_equals(str, "Gnash%20GNU%2FLinux");
+
 
     regfree (&regex_pat);
     NPN_MemFree(value);
