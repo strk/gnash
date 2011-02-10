@@ -28,6 +28,8 @@ CLEANFILES =  \
 	testrun.sum \
 	testrun.log
 
+DISTCLEANFILES = XMLSocketTester
+
 SUBDIRS = loop loading displaylist_depths action_order
 
 EXTRA_DIST = \
