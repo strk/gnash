@@ -297,6 +297,44 @@ main(int , char **)
         runtest.fail("plugin::ExternalInterface::parseInvoke() with missing closing invoke tag");
     }
 
+
+    xml = "<invoke name=\"reportFlashTiming\" returntype=\"xml\"><arguments><string>reportFlashTiming</string><object><property id=\"5\"><number>1297326407594</number></property><property id=\"4\"><string>vr</string></property><property id=\"3\"><number>1297326407147</number></property><property id=\"2\"><string>gv</string></property><property id=\"1\"><number>1297326406281</number></property><property id=\"0\"><string>fs</string></property></object><string>34</string><number>2</number><string>AASb6VeOkQtvnu_8</string><string>0</string><string>LNX%2010%2C1%2C999%2C0</string><string>Gnash%20GNU%2FLinux</string></arguments></invoke>";
+    invoke.reset ( plugin::ExternalInterface::parseInvoke(xml) );
+    check_equals (invoke->name, "reportFlashTiming");
+    check_equals (invoke->type, "xml");
+    check_equals (invoke->args.size(), 8);
+    //
+    check(NPVARIANT_IS_STRING(invoke->args[0].get()));
+    str = NPStringToString(NPVARIANT_TO_STRING(invoke->args[0].get()));
+    check_equals(str, "reportFlashTiming");
+    //
+// The rest is temporarely disabled due to really bad memory issues
+//    check(NPVARIANT_IS_OBJECT(invoke->args[1].get()));
+//    // TODO: check object contents
+//    //
+//    check(NPVARIANT_IS_STRING(invoke->args[2].get()));
+//    str = NPStringToString(NPVARIANT_TO_STRING(invoke->args[2].get()));
+//    check_equals(str, "34");
+//    //
+//    check(NPVARIANT_IS_DOUBLE(invoke->args[3].get()));
+//    check_equals(NPVARIANT_TO_DOUBLE(invoke->args[3].get()), 2);
+//    //
+//    check(NPVARIANT_IS_STRING(invoke->args[4].get()));
+//    str = NPStringToString(NPVARIANT_TO_STRING(invoke->args[4].get()));
+//    check_equals(str, "AASb6VeOkQtvnu_8");
+//    //
+//    check(NPVARIANT_IS_STRING(invoke->args[5].get()));
+//    str = NPStringToString(NPVARIANT_TO_STRING(invoke->args[5].get()));
+//    check_equals(str, "0");
+//    //
+//    check(NPVARIANT_IS_STRING(invoke->args[6].get()));
+//    str = NPStringToString(NPVARIANT_TO_STRING(invoke->args[6].get()));
+//    check_equals(str, "LNX%2010%2C1%2C999%2C0");
+//    //
+//    check(NPVARIANT_IS_STRING(invoke->args[7].get()));
+//    str = NPStringToString(NPVARIANT_TO_STRING(invoke->args[7].get()));
+//    check_equals(str, "Gnash%20GNU%2FLinux");
+
     regfree (&regex_pat);
     NPN_MemFree(value);
 }
