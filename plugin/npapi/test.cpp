@@ -306,7 +306,7 @@ main(int , char **)
     //
     check(NPVARIANT_IS_STRING(invoke->args[0].get()));
     str = NPStringToString(NPVARIANT_TO_STRING(invoke->args[0].get()));
-    check_equals(str, "reportFlashTiming");
+    xcheck_equals(str, "reportFlashTiming");
     //
 // The rest is temporarely disabled due to really bad memory issues
 //    check(NPVARIANT_IS_OBJECT(invoke->args[1].get()));
