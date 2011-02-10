@@ -302,11 +302,11 @@ main(int , char **)
     invoke.reset ( plugin::ExternalInterface::parseInvoke(xml) );
     check_equals (invoke->name, "reportFlashTiming");
     check_equals (invoke->type, "xml");
-    check_equals (invoke->args.size(), 8);
+    xcheck_equals (invoke->args.size(), 8);
     //
     check(NPVARIANT_IS_STRING(invoke->args[0].get()));
     str = NPStringToString(NPVARIANT_TO_STRING(invoke->args[0].get()));
-    xcheck_equals(str, "reportFlashTiming");
+    check_equals(str, "reportFlashTiming");
     //
 // The rest is temporarely disabled due to really bad memory issues
 //    check(NPVARIANT_IS_OBJECT(invoke->args[1].get()));
