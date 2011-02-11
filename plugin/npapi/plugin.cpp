@@ -797,19 +797,23 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
         std::string op = NPStringToString(NPVARIANT_TO_STRING(
                                               invoke->args[1].get()));
         // The third is the optional target, which is something like
-        // _blank or _self. NONE means no target.
+        // _blank or _self.
         std::string target;
+
         // The fourth is the optional data. If there is data, the target
         // field is always set so this argument is on the correct index.
-        // No target is "NONE".
         std::string data;
+
         if (invoke->args.size() >= 3) {
             target = NPStringToString(NPVARIANT_TO_STRING(
                                           invoke->args[2].get()));
-            if (target == "NONE") {
-                target.clear();
-            }
         }
+
+        // An empty target defaults to "_self"
+        // This is _required_ for chromium,
+        // see https://savannah.gnu.org/bugs/?32425
+        if ( target.empty() ) target = "_self";
+
         if (invoke->args.size() == 4) {
             data = NPStringToString(NPVARIANT_TO_STRING(
                                         invoke->args[3].get()));
