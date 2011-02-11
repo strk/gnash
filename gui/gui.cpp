@@ -263,7 +263,7 @@ Gui::updateStageMatrix()
     if (!_stage) {
         // When VM initializes, we'll get a call to resize_view, which
         // would call us again.
-        //log_debug("Can't update stage matrix till VM is initialized");
+        log_debug("Can't update stage matrix till VM is initialized");
         return;
     }
     
@@ -286,7 +286,7 @@ Gui::updateStageMatrix()
             // stage matrix that returns nan values.			
             _xscale = (swfwidth == 0.0f) ? 1.0f : _width / swfwidth;
             _yscale = (swfheight == 0.0f) ? 1.0f : _height / swfheight;
-            
+
             // Scale proportionally, using smallest scale
             if (_xscale < _yscale) {
                 _yscale = _xscale;
@@ -294,7 +294,7 @@ Gui::updateStageMatrix()
                 _xscale = _yscale;
             }
             break;
-        
+
         case movie_root::SCALEMODE_NOBORDER:
             // set new scale value ( user-pixel / pseudo-pixel )
             _xscale = (swfwidth == 0.0f) ? 1.0f : _width / swfwidth;
