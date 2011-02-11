@@ -1823,7 +1823,7 @@ GtkGui::showAboutDialog()
 
     gtk_about_dialog_set_version(about, version.c_str());
     gtk_about_dialog_set_copyright(about, "Copyright (C) 2005, 2006, 2007, "
-            "2008, 2009, 2010 The Free Software Foundation");
+            "2008, 2009, 2010, 2011 The Free Software Foundation");
     gtk_about_dialog_set_comments (about, comments.c_str());
     gtk_about_dialog_set_authors(about, authors);
     gtk_about_dialog_set_documenters(about, documentors);

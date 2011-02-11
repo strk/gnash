@@ -28,12 +28,12 @@ error message.  Here are the programs required:
 GNU             Minimum         RPM or DEB package names:
 Package         Version  Debian         Ubuntu          Fedora   
 -------         -------  -----------    ------------    --------- 
-automake        1.9.6    automake1.9    automake1.9     automake
 autoconf        2.59                    autoconf        autoconf
-git             1.3                     git             git
+automake        1.9.6    automake1.9    automake1.9     automake
 gettext         0.14.6                  gettext         gettext
+git             1.3                     git             git
 libtool         1.5.22                  libtool         libtool
-                1.5.22                  libltdl3-dev    libtool
+                1.5.22                  libltdl-dev     libtool
 
 The "Minimum Version" is not necessarily the lowest version that will work;
 it's the lowest version that the Gnash team has recently tested with.  
