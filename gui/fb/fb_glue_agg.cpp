@@ -42,15 +42,15 @@ namespace gnash {
 
 namespace gui {
 
-FBGlue::FBGlue()
-{
-    GNASH_REPORT_FUNCTION;
-}
+// FBGlue::FBGlue()
+// {
+//     GNASH_REPORT_FUNCTION;
+// }
 
-FBGlue::~FBGlue()
-{
-    GNASH_REPORT_FUNCTION;
-}
+// FBGlue::~FBGlue()
+// {
+//     GNASH_REPORT_FUNCTION;
+// }
 
 //---------------------------------------------
 FBAggGlue::FBAggGlue()
@@ -226,11 +226,13 @@ FBAggGlue::prepDrawingArea(FbWidget */* drawing_area */)
     // creating the renderer.
 }
 
+#if 0
 void
 FBGlue::render(void * /* region */)
 {
     GNASH_REPORT_FUNCTION;
 }
+#endif
 
 void
 FBAggGlue::render()
