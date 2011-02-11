@@ -262,7 +262,10 @@ getDebuggingOptions(gnash::Player& p)
         ->notifier(boost::bind(&LogFile::setVerbosity, &dbglogfile, _1)),
         _("Produce verbose output"))
 
-    ("writelog,w", po::bool_switch()
+    // NB: if we use a bool_switch(), the default will be false. TODO:
+    // make a sensible process for handling command-line and rcfile options.
+    ("writelog,w", po::value<bool>()
+        ->zero_tokens()
         ->notifier(boost::bind(&RcInitFile::useWriteLog, &rcfile, _1)),
         _("Produce the disk based debug log"))
 
