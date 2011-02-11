@@ -851,7 +851,9 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
         
         NPN_GetURL(_instance, jsurl.str().c_str(), tgt);
         return true;
-    } else if (invoke->name == "addMethod") {
+    } 
+#if 0
+    else if (invoke->name == "addMethod") {
 
         assert(!invoke->args.empty());
         // Make this flash function accessible to Javascript. The
@@ -903,6 +905,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
         log_error("Couldn't write the response to Gnash, network problems.");
         return false;
     }
+#endif
     return true;
 }
 

@@ -251,12 +251,11 @@ ExternalInterface::parseInvoke(const std::string &xml)
 GnashNPVariant 
 ExternalInterface::parseXML(const std::string &xml)
 {
+    assert(!xml.empty());
+
     NPVariant value;
     NULL_TO_NPVARIANT(value);
     
-    if (xml.empty()) {
-        return value;
-    }
     std::string::size_type start = 0;
     std::string::size_type end;
     std::string tag;
@@ -386,6 +385,7 @@ ExternalInterface::parseProperties(const std::string &xml)
         start = end + 2;
         end = xml.find("</property>", start) ;
         std::string data = xml.substr(start, end-start);
+        if (data.empty()) break;
         props[id] = parseXML(data);
         start = xml.find(" id=", end);
     }
@@ -416,6 +416,7 @@ ExternalInterface::parseArguments(const std::string &xml)
         if (data == "</arguments>") {
             break;
         }
+        if (data.empty()) break;
         args.push_back(parseXML(sub));
         data.erase(0, end);
     }
