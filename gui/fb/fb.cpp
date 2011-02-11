@@ -203,25 +203,23 @@ FBGui::init(int argc, char *** argv)
 #ifdef RENDERER_AGG
     if (renderer == "agg") {
         _glue.reset(new FBAggGlue());
-    } else
+    }
 #endif
 #ifdef RENDERER_OPENVG
-        if (renderer == "openvg") {
+    if (renderer == "openvg") {
         _glue.reset(new FBOvgGlue(0));
+        // Initialize the glue layer between the renderer and the gui toolkit
+        _glue->init(argc, argv);
+        
+        FBOvgGlue *ovg = reinterpret_cast<FBOvgGlue *>(_glue.get());
+        // Set "window" size
+        _width =  ovg->getWidth();
+        _height = ovg->getHeight();
+            log_debug("Width:%d, Height:%d", _width, _height);
     } else {
-#endif
         log_error("No renderer! %s not supported.", renderer);
     }
-        
-    // Initialize the glue layer between the renderer and the gui toolkit
-    _glue->init(argc, argv);
-
-    FBOvgGlue *ovg = reinterpret_cast<FBOvgGlue *>(_glue.get());
-    // Set "window" size
-    _width =  ovg->getWidth();
-    _height = ovg->getHeight();
-    log_debug("Width:%d, Height:%d", _width, _height);
-    
+#endif
     disable_terminal();
     
     // Initialize all the input devices
@@ -303,8 +301,11 @@ FBGui::init(int argc, char *** argv)
 
     _validbounds.setTo(0, 0, _width - 1, _height - 1);
 
+#ifdef RENDERER_OPENVG
     _renderer.reset(renderer::openvg::create_handler(0));
-  
+#else
+    _renderer.reset(renderer::openvg::create_Renderer_agg(0));
+#endif
     renderer::openvg::Renderer_ovg *rend = reinterpret_cast
         <renderer::openvg::Renderer_ovg *>(_renderer.get());
     rend->init(_width, _height);
