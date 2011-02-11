@@ -89,7 +89,7 @@ public:
         {
             GNASH_REPORT_FUNCTION;            
             vgGetMatrix(_orig_mat);
-            Renderer_ovg::printVGMatrix(_orig_mat);
+            // Renderer_ovg::printVGMatrix(_orig_mat);
             
             float mat[9];
             memset(mat, 0, sizeof(mat));
@@ -99,8 +99,8 @@ public:
             mat[4] = m.sy  / 65536.0f;
             mat[6] = m.tx;
             mat[7] = m.ty;
-            Renderer_ovg::printVGMatrix(mat);
             vgMultMatrix(mat);
+            Renderer_ovg::printVGMatrix(mat);
         }
   
     ~eglScopeMatrix()
@@ -209,11 +209,12 @@ Renderer_ovg::Renderer_ovg()
     : _display_width(0.0),
       _display_height(0.0),
       _drawing_mask(false),
-      _fillpaint(0),
-      _strokepaint(0)
 #ifdef OPENVG_VERSION_1_1    
-      , _mask(0)
+      _mask_layer(VG_INVALID_HANDLE),
 #endif
+      _fillpaint(VG_INVALID_HANDLE),
+      _strokepaint(VG_INVALID_HANDLE),
+      _aspect_ratio(0.75)       // 4:3 aspect ratio
 {
     // GNASH_REPORT_FUNCTION;
 }
@@ -221,15 +222,19 @@ Renderer_ovg::Renderer_ovg()
 Renderer_ovg::Renderer_ovg(renderer::GnashDevice::dtype_t /* dtype */)
     : _display_width(0.0),
       _display_height(0.0),
-      _drawing_mask(false)
+      _drawing_mask(false),
 #ifdef OPENVG_VERSION_1_1    
-      , _mask(0)
+      _mask_layer(VG_INVALID_HANDLE),
 #endif
+      _fillpaint(VG_INVALID_HANDLE),
+      _strokepaint(VG_INVALID_HANDLE),
+      _aspect_ratio(0.75)       // 4:3 aspect ratio
 {
     GNASH_REPORT_FUNCTION;
 
     set_scale(1.0f, 1.0f);
-    
+
+#if 0
     _fillpaint = vgCreatePaint();
     
     _strokepaint = vgCreatePaint();
@@ -239,6 +244,7 @@ Renderer_ovg::Renderer_ovg(renderer::GnashDevice::dtype_t /* dtype */)
 
     // this pain object is used for paths
     vgSetPaint (_strokepaint, VG_STROKE_PATH);
+#endif
 }
 
 void
@@ -249,14 +255,12 @@ Renderer_ovg::init(float x, float y)
     _display_width = x;
     _display_height = y;
     
-    _fillpaint = vgCreatePaint();
-    
-    _strokepaint = vgCreatePaint();
-    
     // this paint object is used for solid, gradient, and pattern fills.
-    vgSetPaint (_fillpaint,   VG_FILL_PATH);
+    _fillpaint = vgCreatePaint();
+    vgSetPaint (_fillpaint, VG_FILL_PATH);
 
     // this pain object is used for paths
+    _strokepaint = vgCreatePaint();
     vgSetPaint (_strokepaint, VG_STROKE_PATH);
 
     // Turn on alpha blending.
@@ -269,10 +273,7 @@ Renderer_ovg::init(float x, float y)
     vgSetfv( VG_CLEAR_COLOR, 4, clearColor );
     
 #ifdef OPENVG_VERSION_1_1    
-    // If masking isn't enabled, don't use it.
-    if (vgGeti(VG_MASKING) == VG_TRUE) {
-        _mask = vgCreateMaskLayer(x, y);
-    }
+    _mask_layer = vgCreateMaskLayer(x, y);
 #endif
 
     log_debug("VG Vendor is %s, VG Version is %s, VG Renderer is %s",
@@ -292,7 +293,7 @@ Renderer_ovg::~Renderer_ovg()
     vgDestroyPaint(_fillpaint);
     vgDestroyPaint(_strokepaint);
 #ifdef OPENVG_VERSION_1_1    
-    vgDestroyMaskLayer(_mask);
+    vgDestroyMaskLayer(_mask_layer);
 #endif
 }
 
@@ -440,7 +441,7 @@ Renderer_ovg::begin_display(gnash::rgba const&, int width, int height,
 void
 Renderer_ovg::end_display()
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 }
 
 /// Draw a line-strip directly, using a thin, solid line. 
@@ -578,18 +579,16 @@ Renderer_ovg::begin_submit_mask()
 {
     GNASH_REPORT_FUNCTION;
 
-    // If masking is disabled, then we can't use it
-    if (vgGeti(VG_MASKING) == VG_TRUE) {
-        PathVec mask;
-        _masks.push_back(mask);
-        _drawing_mask = true;
-    }
+    PathVec mask;
+    _masks.push_back(mask);
+    _drawing_mask = true;
 }
 
 void
 Renderer_ovg::end_submit_mask()
 {
     GNASH_REPORT_FUNCTION;
+
     // If masking is disabled, rhen we can't use it
     if (_drawing_mask == true) {
         _drawing_mask = false;    
@@ -618,7 +617,7 @@ Renderer_ovg::apply_mask()
     
     vgSeti (VG_MATRIX_MODE, VG_MATRIX_PATH_USER_TO_SURFACE);
     vgLoadIdentity();
-    vgGetMatrix (omat);
+    vgGetMatrix (omat);         // get the current matrix
     
     memset(mat, 0, sizeof(mat));
     mat[0] =  stage_matrix.get_x_scale(); // scale sx
@@ -628,27 +627,17 @@ Renderer_ovg::apply_mask()
     mat[6] =  0;    // shift tx
     mat[7] =  _display_height;   // shift ty
     vgLoadMatrix(mat);
+    Renderer_ovg::printVGMatrix(mat);
     
-#ifdef OPENVG_VERSION_1_1    
-    vgMask(_mask, VG_FILL_MASK, 0, 0, _display_width, _display_height); 
+#ifdef OPENVG_VERSION_1_1
+    vgMask(_mask_layer, VG_FILL_MASK, 0, 0, _display_width, _display_height);
 #endif
 // Call add_paths for each mask.
     std::for_each(_masks.begin(), _masks.end(),
                   boost::bind(&Renderer_ovg::add_paths, this, _1));
-    vgSeti(VG_MASKING, VG_TRUE);      
-    vgLoadMatrix (omat);
-}
-
-void
-Renderer_ovg::add_paths(const PathVec& path_vec)
-{
-    // GNASH_REPORT_FUNCTION;
-
-    SWFCxForm dummy_cx;
+    vgSeti(VG_MASKING, VG_TRUE);
     
-    FillStyle coloring = FillStyle(SolidFill(rgba(0, 255, 0, 255)));
-
-    draw_submask(path_vec, SWFMatrix(), dummy_cx, coloring);
+    vgLoadMatrix (omat);        // restore the current matrix
 }
 
 void
@@ -656,7 +645,7 @@ Renderer_ovg::disable_mask()
 {
     GNASH_REPORT_FUNCTION;
     
-    if (vgGeti(VG_MASKING) == VG_TRUE) {
+    // if (vgGeti(VG_MASKING) == VG_TRUE) {
         _masks.pop_back();
         
         if (_masks.empty()) {
@@ -664,7 +653,19 @@ Renderer_ovg::disable_mask()
         } else {
             apply_mask();
         }
-    }
+    // }
+}
+
+void
+Renderer_ovg::add_paths(const PathVec& path_vec)
+{
+    GNASH_REPORT_FUNCTION;
+
+    SWFCxForm dummy_cx;
+    
+    FillStyle coloring = FillStyle(SolidFill(rgba(0, 255, 0, 255)));
+
+    draw_submask(path_vec, SWFMatrix(), dummy_cx, coloring);
 }
 
 Path
@@ -682,8 +683,7 @@ Renderer_ovg::reverse_path(const Path& cur_path)
     float prev_ax = cur_end.ap.x;
     float prev_ay = cur_end.ap.y; 
     
-    for (std::vector<Edge>::const_reverse_iterator it = cur_path.m_edges.rbegin()+1, end = cur_path.m_edges.rend();
-         it != end; ++it) {
+    for (std::vector<Edge>::const_reverse_iterator it = cur_path.m_edges.rbegin()+1, end = cur_path.m_edges.rend(); it != end; ++it) {
         const Edge& cur_edge = *it;
         
         if (prev_ax == prev_cx && prev_ay == prev_cy) {
@@ -850,6 +850,8 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
           CachedBitmap *cb = boost::apply_visitor(GetBitmap(), style.fill);
           // Convert the GnashImage to a VG Image
           OpenVGBitmap *binfo = new OpenVGBitmap(cb, _fillpaint);
+          // Adjust the X scale by the aspect ratio or images get squished
+          sm.sx = sm.sx * _aspect_ratio;
           // Apply the transformation and paint
           binfo->applyPatternBitmap(sm, OpenVGBitmap::WRAP_FILL, _fillpaint);
           break;
@@ -862,8 +864,9 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& mat,
           CachedBitmap *cb = boost::apply_visitor(GetBitmap(), style.fill);          
           // Convert the GnashImage to a VG Image
           OpenVGBitmap *binfo = new OpenVGBitmap(cb, _fillpaint);
+          // Adjust the X scale by the aspect ratio or images get squished
+          sm.sx = sm.sx * _aspect_ratio;
           // Apply the transformation and paint
-          // sm.sx = 2450; // FIXME: debug hack
           binfo->applyPatternBitmap(sm, OpenVGBitmap::WRAP_FILL, _fillpaint);
           break;
       } 
@@ -1174,24 +1177,23 @@ Renderer_ovg::draw_subshape(const PathVec& path_vec,
                 // log_debug("Fill Style Type: Linear Gradient, %d records", records.size());
                 binfo->createLinearBitmap((*(refs[0])).ap.x, (*(refs[0])).ap.y,
                                           _display_width * 20.0f, (_display_height * 20.0f)/2,
-                                          incolor, records, _fillpaint);
+                                          incolor, records, cx, _fillpaint);
             }
             if (fill_type == SWF::FILL_RADIAL_GRADIENT) {
                 rgba incolor = boost::apply_visitor(GetColor(), fill_styles[i].fill);
                 double focalpt = boost::apply_visitor(GetFocalPoint(), fill_styles[i].fill);
                 const std::vector<gnash::GradientRecord> &records =
                     boost::apply_visitor(GetGradientRecords(), fill_styles[i].fill);
-                // log_debug("Fill Style Type: Radial Gradient: focal is: %d, %d records",
-                //           focalpt, records.size());
+                log_debug("Fill Style Type: Radial Gradient: focal is: %d, %d:%d",
+                          focalpt, (*(refs[0])).ap.x, (*(refs[0])).ap.y);
                 OpenVGBitmap* binfo = new OpenVGBitmap(_fillpaint);
                 // All positions are specified in twips, which are 20 to the
                 // pixel. Use the display size for the extent of the shape, 
                 // as it'll get clipped by OpenVG at the end of the
                 // shape that is being filled with the gradient.
                 binfo->createRadialBitmap((*(refs[0])).ap.x, (*(refs[0])).ap.y,
-                                          (*(refs[0])).ap.x * 3,
-                                          (*(refs[0])).ap.y * 3, focalpt,
-                                          incolor, records, _fillpaint);
+                                          (*(refs[0])).ap.x+1000, (*(refs[0])).ap.y+1000, focalpt,
+                                          incolor, records, cx, _fillpaint);
             }
             for (PathPtrVec::const_iterator it = refs.begin(), end = refs.end();
                  it != end; ++it) {
@@ -1214,7 +1216,7 @@ void
 Renderer_ovg::draw_submask(const PathVec& path_vec,
                            const SWFMatrix& /* mat */,
                            const SWFCxForm& /* cx */,
-                           const FillStyle& /* f_style */)
+                            const FillStyle& /* f_style */)
 {
     GNASH_REPORT_FUNCTION;
     
@@ -1250,8 +1252,8 @@ Renderer_ovg::draw_submask(const PathVec& path_vec,
         closepath(vg_path);
     }
     
-#ifdef OPENVG_VERSION_1_1    
-    vgRenderToMask(vg_path, VG_FILL_PATH, VG_INTERSECT_MASK); //FIXME
+#ifdef OPENVG_VERSION_1_1
+    vgRenderToMask(vg_path, VG_FILL_PATH, VG_INTERSECT_MASK);
 #endif
     vgDestroyPath(vg_path);
 }
@@ -1318,7 +1320,9 @@ Renderer_ovg::drawGlyph(const SWF::ShapeRecord& rec, const rgba& c,
 {
     // GNASH_REPORT_FUNCTION;
 
-    if (_drawing_mask) abort();
+    if (_drawing_mask) {
+        abort();
+    }
     
     if (rec.getBounds().is_null()) {
         return;

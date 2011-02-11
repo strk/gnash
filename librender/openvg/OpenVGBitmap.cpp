@@ -22,6 +22,7 @@
 #include "GnashImage.h"
 #include "Renderer.h"
 #include "FillStyle.h"
+#include "SWFCxForm.h"
 #include "openvg/OpenVGRenderer.h"
 #include "openvg/OpenVGBitmap.h"
 #include "VG/openvg.h"
@@ -155,6 +156,7 @@ OpenVGBitmap *
 OpenVGBitmap::createRadialBitmap(float cx, float cy, float fx, float fy,
                                  float radial, const rgba &incolor,
                                  const GradientFill::GradientRecords &records,
+                                 const SWFCxForm& cxform,
                                  VGPaint paint)
 {
     // GNASH_REPORT_FUNCTION;
@@ -215,14 +217,18 @@ OpenVGBitmap *
 OpenVGBitmap::createLinearBitmap(float x0, float y0, float x1, float y1,
                                  const rgba &incolor,
                                  const GradientFill::GradientRecords &records,
+                                 const SWFCxForm& cxform,                                 
                                  const VGPaint paint)
 {
     // GNASH_REPORT_FUNCTION;
+
+    rgba nc = cxform.transform(incolor);
+
     VGfloat color[] = {
-        incolor.m_r / 255.0f,
-        incolor.m_g / 255.0f,
-        incolor.m_b / 255.0f,
-        incolor.m_a / 255.0f
+        nc.m_r / 255.0f,
+        nc.m_g / 255.0f,
+        nc.m_b / 255.0f,
+        nc.m_a / 255.0f
     };
     vgSetParameteri (paint, VG_PAINT_TYPE, VG_PAINT_TYPE_COLOR);
     vgSetParameterfv (paint, VG_PAINT_COLOR, 4, color);
@@ -250,10 +256,10 @@ OpenVGBitmap::createLinearBitmap(float x0, float y0, float x1, float y1,
     VGfloat ramps[entries];
     int j = 0;
     for (size_t i=0; i!= records.size(); ++i) {
-        std::cerr << "The record is: " << records[i].ratio/255.0f;
-        rgba c = records[i].color;
-        std::cerr << ", " << c.m_r/255.0f << ", " << c.m_g/255.0f << ", "
-                  << c.m_b/255.0f << ", " << c.m_a/255.0f << std::endl;
+        // std::cerr << "The record is: " << records[i].ratio/255.0f;
+        rgba c = cxform.transform(records[i].color);
+        // std::cerr << ", " << c.m_r/255.0f << ", " << c.m_g/255.0f << ", "
+        //           << c.m_b/255.0f << ", " << c.m_a/255.0f << std::endl;
         // The set of 5 for each record is simply: { Offset, R, G, B, A }
         ramps[j++] = records[i].ratio/255.0f;
         ramps[j++] = c.m_r / 255.0f;
@@ -295,7 +301,7 @@ OpenVGBitmap::applyPatternBitmap(const gnash::SWFMatrix& matrix,
     mat = matrix;
     mat.invert();
     Renderer_ovg::printVGMatrix(matrix);
-    Renderer_ovg::printVGMatrix(mat);
+    //Renderer_ovg::printVGMatrix(mat);
     
     memset(vmat, 0, sizeof(vmat));
     // Convert from fixed point to floating point
@@ -333,7 +339,8 @@ OpenVGBitmap::applyPatternBitmap(const gnash::SWFMatrix& matrix,
     }
 
     vgPaintPattern(_vgpaint, _vgimage);
-
+    vgDestroyImage(_vgimage);
+    
     return this;
 }
 

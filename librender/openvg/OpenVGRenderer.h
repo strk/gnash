@@ -173,7 +173,6 @@ public:
 #ifdef OPENVG_VERSION_1_1
     VGMaskLayer _mask_layer;
 #endif
-  
     gnash::SWFMatrix stage_matrix;  // conversion from TWIPS to pixels
     
     /// this paint object is used for solid, gradient, and pattern fills.
@@ -182,19 +181,25 @@ public:
     /// this pain object is used for paths
     VGPaint     _strokepaint;
 
-    /// This stores the Aspect Ratio, which is required to properly set the X
-    /// axis scale. This is usually represented as 4:3 or 16:9 for most
-    /// framebuffers. To get the scale, divide the 2nd argument by the first,
-    /// ie... 4:3 = 3/4 = 0.75.
+    /// This stores the Aspect Ratio, which is required to properly
+    /// set the X axis scale. This is usually represented as 4:3 or
+    /// 16:9 for most framebuffers. To get the scale, divide the 2nd
+    /// argument by the first, ie... 4:3 = 3/4 = 0.75.
+    /// The official calculation for the aspect ratio for a monitor of
+    /// 800x480 returns a 5:3 aspect ratio, which for a WVGA LCD
+    /// touchscreen is wrong. The manufacturer specs say it's a 4:3 or
+    /// 16:9, so we use 4:3, which in my testing is correct.
     double      _aspect_ratio;
     
-    // FIXME: A cache for the VGImages might make some sense assuming it takes more time
-    // to render the cached GnashImage to a VGImage. Right now every ti;l a fill style is
-    // applied, the VGImage is rebuilt from the GnashImage. This appears to be relatively
-    // fast, and possibly faster than the lookup in a map as the size of the cache grows.
-    // The other issue would be when to clear the cache, as we have no knowledge from the VM
-    // when images are deleted, or unused.
-//    std::map<CachedBitmap *, VGImage > _image_cache;
+    // FIXME: A cache for the VGImages might make some sense assuming
+    // it takes more time to render the cached GnashImage to a
+    // VGImage. Right now every til a fill style is applied, the
+    // VGImage is rebuilt from the GnashImage. This appears to be
+    // relatively fast, and possibly faster than the lookup in a map
+    // as the size of the cache grows. The other issue would be when
+    // to clear the cache, as we have no knowledge from the VM when
+    // images are deleted, or unused.
+    // std::map<CachedBitmap *, VGImage > _image_cache;
 };
 
 DSOEXPORT Renderer* create_handler(const char *pixelformat);

@@ -27,6 +27,8 @@
 
 namespace gnash {
 
+class SWFCxForm;
+
 namespace renderer {
 
 namespace openvg {
@@ -59,10 +61,12 @@ public:
     OpenVGBitmap *createRadialBitmap(float x0, float y0, float x1, float y1,
                                      float radial, const rgba &incolor,
                                      const GradientFill::GradientRecords &records,
+                                     const SWFCxForm& cx,
                                      VGPaint paint);
     OpenVGBitmap *createLinearBitmap(float x0, float y0, float x1, float y1,
                                      const rgba &incolor,
                                      const GradientFill::GradientRecords &records,
+                                     const SWFCxForm& cx,
                                      const VGPaint paint);
 
     OpenVGBitmap *applyPatternBitmap(const gnash::SWFMatrix& matrix,
