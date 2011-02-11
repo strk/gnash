@@ -35,6 +35,7 @@
 #endif
 
 #include <boost/format.hpp>
+#include <boost/scoped_array.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
 #define MIME_TYPES_HANDLED  "application/x-shockwave-flash"
@@ -767,135 +768,136 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
         if (buf) {
             gnash::log_error("Invalid player request (too short): %s", buf);
         } else {
-            gnash::log_error("Invalid player request (too short): %d bytes", linelen);
+            gnash::log_error("Invalid player request (too short): %d bytes",
+                    linelen);
         }
         return false;
     }
     
-    plugin::ExternalInterface::invoke_t *invoke = plugin::ExternalInterface::parseInvoke(buf);
+    plugin::ExternalInterface::invoke_t *invoke =
+        plugin::ExternalInterface::parseInvoke(buf);
+
+    if (!invoke) return false;
 
     if (!invoke->name.empty()) {
         gnash::log_debug("Requested method is: %s", invoke->name);
     }
     
-    // The invoke message is also used for getURL. In this case there are 4
-    // possible arguments.
-    if (invoke) {
-        if (invoke->name == "getURL") {
-            // gnash::log_debug("Got a getURL() request: %", invoke->args[0].get());
+    if (invoke->name == "getURL") {
+        // gnash::log_debug("Got a getURL() request: %", invoke->args[0].get());
 
-            // The first argument is the URL string.
-            std::string url = NPStringToString(NPVARIANT_TO_STRING(
-                                                   invoke->args[0].get()));
-            // The second is the method, namely GET or POST.
-            std::string op = NPStringToString(NPVARIANT_TO_STRING(
-                                                  invoke->args[1].get()));
-            // The third is the optional target, which is something like
-            // _blank or _self. NONE means no target.
-            std::string target;
-            // The fourth is the optional data. If there is data, the target
-            // field is always set so this argument is on the correct index.
-            // No target is "NONE".
-            std::string data;
-            if (invoke->args.size() >= 3) {
-                target = NPStringToString(NPVARIANT_TO_STRING(
-                                              invoke->args[2].get()));
-                if (target == "NONE") {
-                    target.clear();
-                }
+        assert(invoke->args.size() > 1);
+
+        // The first argument is the URL string.
+        std::string url = NPStringToString(NPVARIANT_TO_STRING(
+                                               invoke->args[0].get()));
+        // The second is the method, namely GET or POST.
+        std::string op = NPStringToString(NPVARIANT_TO_STRING(
+                                              invoke->args[1].get()));
+        // The third is the optional target, which is something like
+        // _blank or _self. NONE means no target.
+        std::string target;
+        // The fourth is the optional data. If there is data, the target
+        // field is always set so this argument is on the correct index.
+        // No target is "NONE".
+        std::string data;
+        if (invoke->args.size() >= 3) {
+            target = NPStringToString(NPVARIANT_TO_STRING(
+                                          invoke->args[2].get()));
+            if (target == "NONE") {
+                target.clear();
             }
-            if (invoke->args.size() == 4) {
-                data = NPStringToString(NPVARIANT_TO_STRING(
-                                            invoke->args[3].get()));
-            }
-            if (op == "GET") {
-                gnash::log_debug("Asked to getURL '%s' in target %s", url,
-                                 target);
-                NPN_GetURL(_instance, url.c_str(), target.c_str());
-            } else if (op == "POST") {                
-                gnash::log_debug("Asked to postURL '%s' this data %s", url,
-                                 data);
-                NPN_PostURL(_instance, url.c_str(), target.c_str(), data.size(),
-                            data.c_str(), false);
-                return true;
-            }
-            
-            return true;
-        } else if (invoke->name == "fsCommand") {
-            std::string command = NPStringToString(NPVARIANT_TO_STRING(
-                                                       invoke->args[0].get()));
-            std::string arg = NPStringToString(NPVARIANT_TO_STRING(
-                                                   invoke->args[1].get()));            
-            std::string name = _name; 
-            std::stringstream jsurl;
-            jsurl << "javascript:" << name << "_DoFSCommand('" << command
-                  << "','" << arg <<"')";
-            
-            // TODO: check if _self is a good target for this
-            static const char* tgt = "_self";
-            
-            gnash::log_debug("Calling NPN_GetURL(%s, %s)",
-                             jsurl.str(), tgt);
-            
-            NPN_GetURL(_instance, jsurl.str().c_str(), tgt);
-            return true;
-        } else if (invoke->name == "addMethod") {
-            // Make this flash function accessible to Javascript. The
-            // actual callback lives in libcore/movie_root, but it
-            // needs to be on the list of supported remote methods so
-            // it can be called by Javascript.
-            std::string method = NPStringToString(NPVARIANT_TO_STRING(
-                                                      invoke->args[0].get()));
-            NPIdentifier id = NPN_GetStringIdentifier(method.c_str());
-            // log_debug("SCRIPT OBJECT addMethod: %x, %s", (void *)_scriptObject, method);
-            this->getScriptObject()->AddMethod(id, remoteCallback);
+        }
+        if (invoke->args.size() == 4) {
+            data = NPStringToString(NPVARIANT_TO_STRING(
+                                        invoke->args[3].get()));
+        }
+        if (op == "GET") {
+            gnash::log_debug("Asked to getURL '%s' in target %s", url,
+                             target);
+            NPN_GetURL(_instance, url.c_str(), target.c_str());
+        } else if (op == "POST") {                
+            gnash::log_debug("Asked to postURL '%s' this data %s", url,
+                             data);
+            NPN_PostURL(_instance, url.c_str(), target.c_str(), data.size(),
+                        data.c_str(), false);
             return true;
         }
-        NPVariant result;
-        VOID_TO_NPVARIANT(result);
-        bool invokeResult=false;
-        // This is the player invoking a method in Javascript
-        if (!invoke->name.empty()) {
-            //Convert the as_value argument to NPVariant
-            uint32_t count = invoke->args.size();
-            if(count!=0) //The first argument should exists and be the method name
-            {
-                count--;
-                NPVariant* args = new NPVariant[count];
-                //Skip the first argument
-                for(uint32_t i=0;i<count;i++)
-                    invoke->args[i+1].copy(args[i]);
-                NPIdentifier id = NPN_GetStringIdentifier(invoke->name.c_str());
-                gnash::log_debug("Invoking JavaScript method %s", invoke->name);
-                NPObject* windowObject;
-                NPN_GetValue(_instance, NPNVWindowNPObject, &windowObject);
-                invokeResult=NPN_Invoke(_instance, windowObject, id, args, count, &result);
-                NPN_ReleaseObject(windowObject);
-                delete[] args;
-            }
-        }
-        // We got a result from invoking the Javascript method
-        std::stringstream ss;
-        if (invokeResult) {
-            ss << plugin::ExternalInterface::convertNPVariant(&result);
-            NPN_ReleaseVariantValue(&result);
-        } else {
-            // Send response
-            // FIXME: "securityError" also possible, check domain
-            ss << plugin::ExternalInterface::makeString("Error");
-        }
-        size_t ret = _scriptObject->writePlayer(ss.str());
-        if (ret != ss.str().size()) {
-            log_error("Couldn't write the response to Gnash, network problems.");
-            return false;
-        }
+        
         return true;
-    } else {
-        gnash::log_error("Unknown player request: " + std::string(buf));
-        return false;
+    } else if (invoke->name == "fsCommand") {
+
+        assert(invoke->args.size() > 1);
+        std::string command = NPStringToString(NPVARIANT_TO_STRING(
+                                                   invoke->args[0].get()));
+        std::string arg = NPStringToString(NPVARIANT_TO_STRING(
+                                               invoke->args[1].get()));            
+        std::string name = _name; 
+        std::stringstream jsurl;
+        jsurl << "javascript:" << name << "_DoFSCommand('" << command
+              << "','" << arg <<"')";
+        
+        // TODO: check if _self is a good target for this
+        static const char* tgt = "_self";
+        
+        gnash::log_debug("Calling NPN_GetURL(%s, %s)",
+                         jsurl.str(), tgt);
+        
+        NPN_GetURL(_instance, jsurl.str().c_str(), tgt);
+        return true;
+    } else if (invoke->name == "addMethod") {
+
+        assert(!invoke->args.empty());
+        // Make this flash function accessible to Javascript. The
+        // actual callback lives in libcore/movie_root, but it
+        // needs to be on the list of supported remote methods so
+        // it can be called by Javascript.
+        std::string method = NPStringToString(NPVARIANT_TO_STRING(
+                                                  invoke->args[0].get()));
+        NPIdentifier id = NPN_GetStringIdentifier(method.c_str());
+        // log_debug("SCRIPT OBJECT addMethod: %x, %s", (void *)_scriptObject, method);
+        this->getScriptObject()->AddMethod(id, remoteCallback);
+        return true;
     }
 
-    return false;
+    NPVariant result;
+    VOID_TO_NPVARIANT(result);
+    bool invokeResult = false;
+
+    // This is the player invoking a method in Javascript
+    if (!invoke->name.empty() && !invoke->args.empty()) {
+        //Convert the as_value argument to NPVariant
+        const size_t count = invoke->args.size() - 1;
+        boost::scoped_array<NPVariant> args(new NPVariant[count]);
+        //Skip the first argument
+        for (size_t i = 0; i < count; ++i) {
+            invoke->args[i+1].copy(args[i]);
+        }
+
+        NPIdentifier id = NPN_GetStringIdentifier(invoke->name.c_str());
+        gnash::log_debug("Invoking JavaScript method %s", invoke->name);
+        NPObject* windowObject;
+        NPN_GetValue(_instance, NPNVWindowNPObject, &windowObject);
+        invokeResult=NPN_Invoke(_instance, windowObject, id, args.get(),
+                count, &result);
+        NPN_ReleaseObject(windowObject);
+    }
+    // We got a result from invoking the Javascript method
+    std::stringstream ss;
+    if (invokeResult) {
+        ss << plugin::ExternalInterface::convertNPVariant(&result);
+        NPN_ReleaseVariantValue(&result);
+    } else {
+        // Send response
+        // FIXME: "securityError" also possible, check domain
+        ss << plugin::ExternalInterface::makeString("Error");
+    }
+    size_t ret = _scriptObject->writePlayer(ss.str());
+    if (ret != ss.str().size()) {
+        log_error("Couldn't write the response to Gnash, network problems.");
+        return false;
+    }
+    return true;
 }
 
 std::string
@@ -929,7 +931,6 @@ getGnashExecutable()
         gnash::log_error(std::string("Unable to find Gnash in ") + GNASHBINDIR);
         return "";
     }
-
 
     return procname;
 }
