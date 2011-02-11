@@ -1903,7 +1903,7 @@ void
 adjustVolume(boost::int16_t* data, size_t size, int volume)
 {
     std::transform(data, data + size, data,
-            boost::bind(std::multiplies<int>(), volume / 100.0, _1));
+            boost::bind(std::multiplies<double>(), volume / 100.0, _1));
 }
 
 } // anonymous namespace
