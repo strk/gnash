@@ -21,9 +21,14 @@
 #include "gnashconfig.h"
 #endif
 
+#include <boost/format.hpp>
+#include <boost/scoped_array.hpp>
+#include <boost/algorithm/string/replace.hpp>
+#include <cassert>
 #include <cstdlib> // getenv
 #include <stdlib.h> // putenv
 #include <sys/types.h>
+
 #if defined(HAVE_WINSOCK_H) && !defined(__OS2__)
 # include <winsock2.h>
 # include <windows.h>
@@ -34,9 +39,6 @@
 # include <sys/socket.h>
 #endif
 
-#include <boost/format.hpp>
-#include <boost/scoped_array.hpp>
-#include <boost/algorithm/string/replace.hpp>
 
 #define MIME_TYPES_HANDLED  "application/x-shockwave-flash"
 // The name must be this value to get flash movies that check the
