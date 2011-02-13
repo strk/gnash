@@ -129,7 +129,7 @@ AC_DEFUN([GNASH_PATH_KDE4],
     dnl Look for the libraries
     AC_CACHE_VAL(ac_cv_path_kde4_lib, [
       if test x"${with_kde4_lib}" != x ; then
-        if test -f ${with_kde4_lib}/libkdeui.la; then
+        if test -f ${with_kde4_lib}/libkdeui.la -o -f ${with_kde4_lib}/libkdeui.${shlibext}; then
 	        ac_cv_path_kde4_lib="-L`(cd ${with_kde4_lib}; pwd)`"
         else
 	        AC_MSG_ERROR([${with_kde4_lib} directory doesn't contain KDE 4.x libraries.])
