@@ -54,7 +54,7 @@ class Level87
 
 		if (_level0.level87loaded )
 		{
-                	check_equals(_level0.frameno, 3);
+                	check(_level0.frameno >= 3);
 
                 	check_equals(typeof(_level5), 'undefined');
 			return;
