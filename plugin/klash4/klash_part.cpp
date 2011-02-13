@@ -101,7 +101,7 @@ KDE_NO_CDTOR_EXPORT KlashPart::KlashPart (QWidget * wparent,
    m_started_emited (false) {
     //kdDebug () << "KlashPart(" << this << ")::KlashPart ()" << endl;
     bool show_fullscreen = false;
-    // FIXME what is the right replacement for this? setInstance (KlashFactory::instance (), true);
+    setComponentData (*KlashFactory::instance ());
     KAction *playact = new KAction(this);
     playact->setText(i18n("P&lay"));
     connect(playact, SIGNAL(triggered()), this, SLOT(play()));
