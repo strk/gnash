@@ -133,7 +133,7 @@ dnl    	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
     for i in $scripts; do dnl## {
       AC_PATH_PROG(DB2X_TEXI, $i, [], [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
       if test x$DB2X_TEXI != x; then
-        type="`file $DB2X_TEXI  | grep -ic " perl " 2>&1`"
+        type="`file $DB2X_TEXI  | grep -ic "perl " 2>&1`"
         if test $type -gt 0; then
           break
         else
@@ -159,7 +159,7 @@ dnl    	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
     for i in $scripts; do
       AC_PATH_PROG(DB2X_MAN, $i, [], [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
       if test x$DB2X_MAN != x; then 
-        type="`file $DB2X_MAN  | grep -ic " perl " 2>&1`"
+        type="`file $DB2X_MAN  | grep -ic "perl " 2>&1`"
         if test $type -gt 0; then
           break
         else
