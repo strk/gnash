@@ -308,7 +308,7 @@ main(int , char **)
     str = NPStringToString(NPVARIANT_TO_STRING(invoke->args[0].get()));
     check_equals(str, "reportFlashTiming");
     //
-    check(NPVARIANT_IS_OBJECT(invoke->args[1].get()));
+    xcheck(NPVARIANT_IS_OBJECT(invoke->args[1].get()));
     // TODO: check object contents
     //
     xcheck(NPVARIANT_IS_STRING(invoke->args[2].get()));
@@ -334,6 +334,20 @@ main(int , char **)
 //    str = NPStringToString(NPVARIANT_TO_STRING(invoke->args[7].get()));
 //    check_equals(str, "Gnash%20GNU%2FLinux");
 
+
+    {
+      xml = "<object><property id=\"5\">";
+      GnashNPVariant v = plugin::ExternalInterface::parseXML(xml);
+      check(NPVARIANT_IS_NULL(v.get()));
+    }
+
+    {
+      NPVariant val;
+      NULL_TO_NPVARIANT(val);
+      check(NPVARIANT_IS_NULL(val));
+      GnashNPVariant v = val;
+      check(NPVARIANT_IS_NULL(v.get()));
+    }
 
     regfree (&regex_pat);
     NPN_MemFree(value);
