@@ -59,7 +59,7 @@ class GetterSetter
         GetSetVisitor(const Arg& arg) : _arg(arg) {}
         template<typename T> typename S::result_type operator()(T& t) const {
             return S()(t, _arg);
-        };
+        }
     private:
         const Arg& _arg;
     };
