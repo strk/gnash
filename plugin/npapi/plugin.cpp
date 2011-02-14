@@ -725,11 +725,12 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
         switch (status) {
           case G_IO_STATUS_ERROR:
               gnash::log_error("error reading request line: %s",
-                               error->message);
+                               error ? error->message : "unspecified error");
               g_error_free(error);
               return false;
           case G_IO_STATUS_EOF:
-              gnash::log_error("EOF (error: %s", error->message);
+              gnash::log_error("EOF (error: %s)", 
+                               error ? error->message : "unspecified error");
               g_error_free(error);
               return false;
           case G_IO_STATUS_AGAIN:
