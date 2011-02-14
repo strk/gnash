@@ -192,9 +192,17 @@ AC_DEFUN([GNASH_PATH_KDE4],
     fi
 
     if test x"${with_kde4_plugindir}" != x ; then 
-      KDE4_PLUGINDIR="${with_kde4_plugindir}/lib/kde4"
+      if test -d ${with_kde4_plugindir}/lib64; then
+        KDE4_PLUGINDIR="${with_kde4_plugindir}/lib64/kde4"
+      else
+        KDE4_PLUGINDIR="${with_kde4_plugindir}/lib/kde4"
+      fi
     else
-      KDE4_PLUGINDIR="${KDE4_PREFIX}/lib/kde4"
+      if test -d ${KDE4_PREFIX}/lib64; then
+        KDE4_PLUGINDIR="${KDE4_PREFIX}/lib64/kde4"
+      else
+        KDE4_PLUGINDIR="${KDE4_PREFIX}/lib/kde4"
+      fi
     fi
     if test x"${with_kde4_servicesdir}" != x ; then 
       KDE4_SERVICESDIR="${with_kde4_servicesdir}/share/kde4/services"
