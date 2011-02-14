@@ -27,6 +27,8 @@
 #include <sstream>
 #include <vector>
 #include <map>
+#include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
 
 #include "npapi.h"
 #include "npruntime.h"
@@ -62,7 +64,7 @@ struct ExternalInterface
     static std::string makeObject (std::map<std::string, std::string> &args);
     
     static GnashNPVariant parseXML(const std::string &xml);
-    static invoke_t *parseInvoke(const std::string &xml);
+    static boost::shared_ptr<invoke_t> parseInvoke(const std::string &xml);
     
     static std::map<std::string, GnashNPVariant> parseProperties(const std::string &xml);
     static std::vector<GnashNPVariant> parseArguments(const std::string &xml);

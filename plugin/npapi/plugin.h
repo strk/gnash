@@ -144,7 +144,7 @@ private:
 //  0: no messages at all
 //  1: fatal errors (errors preventing the plugin from working as it should)
 //  2: informational messages
-#define GNASH_PLUGIN_DEBUG 1
+#define GNASH_PLUGIN_DEBUG 2
 
 // This following logging code is copied from libbase/log.h, but
 // duplicated here because the plugin only needs a more trimmed down

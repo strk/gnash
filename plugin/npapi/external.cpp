@@ -20,6 +20,10 @@
 #include "gnashconfig.h"
 #endif
 
+#include <boost/algorithm/string/erase.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
+
 #include <string>
 #include <sstream>
 #include <vector>
@@ -31,8 +35,6 @@
 #include "npruntime.h"
 #include "external.h"
 #include "plugin.h"
-
-#include <boost/algorithm/string/erase.hpp>
 
 namespace gnash {
 namespace plugin {
@@ -198,19 +200,19 @@ ExternalInterface::makeObject (std::map<std::string, std::string> &args)
 //              <number>135.78</number>
 //      </arguments>
 // </invoke>
-ExternalInterface::invoke_t *
+boost::shared_ptr<ExternalInterface::invoke_t>
 ExternalInterface::parseInvoke(const std::string &xml)
 {
+    boost::shared_ptr<ExternalInterface::invoke_t> invoke;
     if (xml.empty()) {
-        return 0;
+        return invoke;
     }
-    
-    ExternalInterface::invoke_t *invoke = new invoke_t;
-    
+
+    invoke.reset(new invoke_t);
     std::string::size_type start = 0;
     std::string::size_type end;
     std::string tag;
-
+    
     // Look for the ending > in the first part of the data for the tag
     end = xml.find(">");
     if (end != std::string::npos) {
@@ -220,37 +222,44 @@ ExternalInterface::parseInvoke(const std::string &xml)
         if (tag.substr(0, 7) == "<invoke") {
             // extract the name of the method to invoke
             start = tag.find("name=");
-            if ( start == std::string::npos ) return invoke;
+            if ( start == std::string::npos ) {
+                return invoke;
+            }
             start += 5;
             end   = tag.find(" ", start);
-            if ( end == std::string::npos ) return invoke;
+            if ( end == std::string::npos ) {
+                return invoke;
+            }
             invoke->name  = tag.substr(start, end-start);
             // Ignore any quote characters around the string
             boost::erase_first(invoke->name, "\"");
             boost::erase_last(invoke->name, "\"");
-
+            
             // extract the return type of the method
             start = tag.find("returntype=");
-            if ( start == std::string::npos ) return invoke;
+            if ( start == std::string::npos ) {
+                return invoke;
+            }
             start += 11;
             end   = tag.find(">", start);
-            if ( end == std::string::npos ) return invoke;
+            if ( end == std::string::npos ) {
+                return invoke;
+            }
             invoke->type  = tag.substr(start, end-start);
             // Ignore any quote characters around the string
             boost::erase_first(invoke->type, "\"");
             boost::erase_last(invoke->type, "\"");
-
+            
             // extract the arguments to the method
             start = xml.find("<arguments>");
             end   = xml.find("</invoke");
-            if (start != std::string::npos && end != std::string::npos )
-            {
-              tag   = xml.substr(start, end-start);
-              invoke->args = parseArguments(tag);
-            }
+            if (start != std::string::npos && end != std::string::npos) {
+                    tag   = xml.substr(start, end-start);
+                    invoke->args = parseArguments(tag);
+                }
         }
     }
-
+    
     return invoke;
 }
 
