@@ -273,7 +273,7 @@ main(int , char **)
 
     // Parse an invoke message
     xml = "<invoke name=\"barbyfoo\" returntype=\"xml\"><arguments><string>barfoo</string><number>135.78</number></arguments></invoke>";
-    std::auto_ptr<plugin::ExternalInterface::invoke_t> invoke ( plugin::ExternalInterface::parseInvoke(xml) );
+    boost::shared_ptr<plugin::ExternalInterface::invoke_t> invoke ( plugin::ExternalInterface::parseInvoke(xml) );
     str = NPStringToString(NPVARIANT_TO_STRING(invoke->args[0].get()));
     if ((invoke->name == "barbyfoo") && (invoke->type == "xml")
         && (NPVARIANT_IS_STRING(invoke->args[0].get()))
@@ -288,7 +288,7 @@ main(int , char **)
 
     // Test for bug #31766
     xml = "<invoke name=\"reportFlashTiming\" returntype=\"xml\"><arguments><string>reportFlashTiming</string><object><property id=\"5\"><number>1297286708921</number></property><property id=\"4\"><string>vr</string></p";
-    invoke.reset ( plugin::ExternalInterface::parseInvoke(xml) );
+    invoke = plugin::ExternalInterface::parseInvoke(xml);
     if ((invoke->name == "reportFlashTiming") && (invoke->type == "xml")
         && invoke->args.empty())
     {
@@ -299,7 +299,7 @@ main(int , char **)
 
 
     xml = "<invoke name=\"reportFlashTiming\" returntype=\"xml\"><arguments><string>reportFlashTiming</string><object><property id=\"5\"><number>1297326407594</number></property><property id=\"4\"><string>vr</string></property><property id=\"3\"><number>1297326407147</number></property><property id=\"2\"><string>gv</string></property><property id=\"1\"><number>1297326406281</number></property><property id=\"0\"><string>fs</string></property></object><string>34</string><number>2</number><string>AASb6VeOkQtvnu_8</string><string>0</string><string>LNX%2010%2C1%2C999%2C0</string><string>Gnash%20GNU%2FLinux</string></arguments></invoke>";
-    invoke.reset ( plugin::ExternalInterface::parseInvoke(xml) );
+    invoke = plugin::ExternalInterface::parseInvoke(xml);
     check_equals (invoke->name, "reportFlashTiming");
     check_equals (invoke->type, "xml");
     xcheck_equals (invoke->args.size(), 8);
