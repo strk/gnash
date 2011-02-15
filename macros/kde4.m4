@@ -192,31 +192,23 @@ AC_DEFUN([GNASH_PATH_KDE4],
     fi
 
     if test x"${with_kde4_plugindir}" != x ; then 
-      if test -d ${with_kde4_plugindir}/lib64; then
-        KDE4_PLUGINDIR="${with_kde4_plugindir}/lib64/kde4"
-      else
-        KDE4_PLUGINDIR="${with_kde4_plugindir}/lib/kde4"
-      fi
+      KDE4_PLUGINDIR="${with_kde4_plugindir}"
     else
-      if test -d ${KDE4_PREFIX}/lib64; then
+      if test -d ${KDE4_PREFIX}/lib64 -a ! -h ${KDE4_PREFIX}/lib64; then
         KDE4_PLUGINDIR="${KDE4_PREFIX}/lib64/kde4"
       else
         KDE4_PLUGINDIR="${KDE4_PREFIX}/lib/kde4"
       fi
     fi
     if test x"${with_kde4_servicesdir}" != x ; then 
-      KDE4_SERVICESDIR="${with_kde4_servicesdir}/share/kde4/services"
+      KDE4_SERVICESDIR="${with_kde4_servicesdir}"
     else
       KDE4_SERVICESDIR="${KDE4_PREFIX}/share/kde4/services"
     fi
-    if test x"${KDE4_CONFIGDIR}" != x ; then 
-      KDE4_CONFIGDIR="${KDE4_CONFIGDIR}/share/kde4/config"
-    else
+    if test x"${KDE4_CONFIGDIR}" = x ; then 
       KDE4_CONFIGDIR="${KDE4_PREFIX}/share/kde4/config"
     fi
-    if test x"${KDE4_APPSDATADIR}" != x ; then 
-      KDE4_APPSDATADIR="${KDE4_APPSDATADIR}/share/kde4/apps/klash"
-    else
+    if test x"${KDE4_APPSDATADIR}" = x ; then 
       KDE4_APPSDATADIR="${KDE4_PREFIX}/share/kde4/apps/klash"
     fi
 
