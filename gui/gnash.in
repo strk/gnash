@@ -57,7 +57,11 @@ fi
 for gui in ${gui} ${GUIS}; do
 	exe=${THIS_DIR}/${gui}-gnash
 	if test -e ${exe}; then
-		exec ${exe} "$@"
+		if test "x$1" = "x" -a -f @datadir@/gnash/gnash-splash.swf -a "${gui}" = "gtk";then
+			exec ${exe} @datadir@/gnash/gnash-splash.swf
+		else
+			exec ${exe} "$@"
+		fi
 	fi
 done
 

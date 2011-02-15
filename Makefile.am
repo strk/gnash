@@ -49,6 +49,7 @@ CYGNAL_DIR = cygnal
 endif
 
 STD_DIRS = \
+	desktop \
 	libbase \
 	libmedia \
 	libsound \

@@ -2952,9 +2952,14 @@ AC_CONFIG_LINKS(cygnal/testsuite/cygnal.all/cygnalrc:cygnal/testsuite/cygnal.all
 AC_CONFIG_LINKS(testsuite/libbase.all/gnashrc:testsuite/libbase.all/gnashrc.in)
 AC_CONFIG_LINKS(testsuite/libbase.all/gnashrc-local:testsuite/libbase.all/gnashrc-local.in)
 
-AC_CONFIG_FILES(gnash.pc:gnash.pc.in)
+AC_CONFIG_FILES(
+gnash.pc:gnash.pc.in
+gui/gnash:gui/gnash.in
+gui/klash:gui/klash.in
+)
 
 AC_OUTPUT(Makefile
+desktop/Makefile
 po/Makefile
 libltdl/Makefile
 libmedia/Makefile
