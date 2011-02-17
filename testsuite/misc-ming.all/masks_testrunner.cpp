@@ -64,7 +64,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->getPlayState(), MovieClip::PLAYSTATE_STOP);
 	check_equals(root->get_current_frame(), 1); // 0-based
 	check_equals(root->getDisplayList().size(), 9);
-	root->getDisplayList().dump();
+    std::cout << root->getDisplayList() << "\n";
 	check( tester.findDisplayItemByName(*root, "staticmc2") );
 	check( tester.findDisplayItemByName(*root, "staticmc3") );
 	check( tester.findDisplayItemByName(*root, "staticmc4") );
