@@ -15,23 +15,26 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA    02110-1301    USA
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "smart_ptr.h" 
 #include "DisplayList.h"
+
+#include <ostream>
+#include <sstream>
+#include <algorithm>
+#include <stack>
+#include <cassert>
+#include <boost/bind.hpp>
+#include <boost/format.hpp>
+
+#include "smart_ptr.h" 
 #include "log.h"
 #include "Renderer.h"
 #include "StringPredicates.h"
 #include "MovieClip.h"
 #include "ObjectURI.h"
-
-#include <typeinfo>
-#include <ostream>
-#include <algorithm>
-#include <stack>
-#include <cassert>
-#include <boost/bind.hpp>
+#include "utility.h"
 
 namespace gnash {
 
@@ -681,28 +684,6 @@ DisplayList::omit_display()
     }
 }
 
-void
-DisplayList::dump() const
-{
-    if (_charsByDepth.empty()) return;
-
-    string_table& st = getStringTable(*getObject(_charsByDepth.front()));
-    ObjectURI::Logger l(st);
-
-    int num=0;
-    for (const_iterator it = _charsByDepth.begin(),
-            endIt = _charsByDepth.end(); it != endIt; ++it) {
-
-        const DisplayObject* dobj = *it;
-        log_debug(_("Item %d(%s) at depth %d (char name %s, type %s)"
-                    "Destroyed: %s, unloaded: %s"),
-            num, dobj, dobj->get_depth(), l.debug(dobj->get_name()), typeName(*dobj),
-            dobj->isDestroyed(), dobj->unloaded());
-        num++;
-    }
-}
-
-
 void 
 DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 {
@@ -1048,20 +1029,29 @@ dlistTagsEffectiveZoneEnd(DisplayList::container_type& c)
 std::ostream&
 operator<<(std::ostream& os, const DisplayList& dl)
 {
-    os << "By depth: ";
 
     if (dl._charsByDepth.empty()) return os;
 
-    string_table& st = getStringTable(*getObject(dl._charsByDepth.front()));
-    ObjectURI::Logger l(st);
+    os << "DisplayList size " << dl._charsByDepth.size() << "\n";
+
+    size_t count = 0;
 
     for (DisplayList::const_iterator it = dl._charsByDepth.begin(),
-            itEnd = dl._charsByDepth.end(); it != itEnd; ++it) {
+            itEnd = dl._charsByDepth.end(); it != itEnd; ++it, ++count) {
 
-        const DisplayObject* item = *it; 
-        if (it != dl._charsByDepth.begin()) os << " | ";
-        os << " name:" << l.debug(item->get_name())
-           << " depth:" << item->get_depth();
+        const DisplayObject* dobj = *it;
+
+        boost::format fmt = boost::format(
+            "Item %1% (%2%) at depth %3% (type %4%) "
+            "Destroyed: %5%, unloaded: %6%")
+            % count 
+            % dobj 
+            % dobj->get_depth() 
+            % typeName(*dobj)
+            % boost::io::group(std::boolalpha, dobj->isDestroyed())
+            % boost::io::group(std::boolalpha, dobj->unloaded());
+
+        os << fmt.str() << std::endl;
     }
 
     return os;

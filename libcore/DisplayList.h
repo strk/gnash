@@ -288,9 +288,6 @@ public:
 	template <class V> inline void visitAll(V& visitor);
 	template <class V> inline void visitAll(V& visitor) const;
 
-	/// dump list to logfile/stderr
-	void dump() const;
-
     /// Like DisplayObject_instance::add_invalidated_bounds() this method calls the
     /// method with the same name of all childs.	
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);	
