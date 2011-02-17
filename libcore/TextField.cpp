@@ -1456,10 +1456,14 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             }
                             attloc = attributes.find("FACE");
                             if (attloc != attributes.end()) {
-                                //font FACE attribute
-                                Font* newfont = new Font(attloc->second,
-                                    rec.getFont()->isBold(), rec.getFont()->isItalic());
-                                newrec.setFont(newfont);
+                                if (attloc->second.empty()) {
+                                    log_error("Expected a font name in FACE attribute.");
+                                } else {
+                                    //font FACE attribute
+                                    Font* newfont = new Font(attloc->second,
+                                        rec.getFont()->isBold(), rec.getFont()->isItalic());
+                                    newrec.setFont(newfont);
+                                }
                             }
                             attloc = attributes.find("SIZE");
                             if (attloc != attributes.end()) {
