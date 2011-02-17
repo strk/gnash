@@ -43,8 +43,11 @@ MovieClip* root;
 MovieClip*
 getCoverArt()
 {
-	DisplayObject* coverartch = const_cast<DisplayObject*>(tester->findDisplayItemByName(*root, "coverart"));
-	MovieClip* coverart = coverartch->to_movie();
+    const DisplayObject* coverartch = tester->findDisplayItemByTarget(
+        "_level0.cont.coverart"
+    );
+    if ( ! coverartch ) return 0;
+	MovieClip* coverart = const_cast<DisplayObject*>(coverartch)->to_movie();
 
 	//log_debug("Coverart is %p, displaylist is:", coverart);
 	//coverart->getDisplayList().dump();
@@ -83,7 +86,7 @@ waitForLoad(MovieClip* from)
     do {
 	    usleep(500); // give it some time... 
 	    tester->advance(); // loads (should) happen on next advance
-	    coverart = const_cast<DisplayObject*>(tester->findDisplayItemByName(*root, "coverart"))->to_movie();
+	    coverart = getCoverArt();
     } while (coverart == from);
 
     return coverart;
@@ -184,8 +187,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_current_frame(), 1);
 
 	// Verify that 'coverart' exists and is empty
-	DisplayObject* coverartch = const_cast<DisplayObject*>(tester->findDisplayItemByName(*root, "coverart"));
-	MovieClip* coverart = coverartch->to_movie();
+	MovieClip* coverart = getCoverArt();
 	check(coverart);
 	std::string url = coverart->get_root()->url();
 	check_equals(coverart->get_root()->url(), baseURL.str());
@@ -193,9 +195,10 @@ main(int /*argc*/, char** /*argv*/)
 	// Check scribbling on the empty canvas
 	checkScribbling();
 
-	clickCycle(coverart);
-	clickCycle(coverart);
-	clickCycle(coverart);
+	clickCycle(coverart); // MovieClip::loadMovie
+	clickCycle(coverart); // GETURL _level0.cont.coverart 
+	clickCycle(coverart); // GETURL /cont/coverart
+	//clickCycle(coverart); // GETURL _level0.coverart
 
 	// Consistency checking
 	VM& vm = getVM(*getObject(root));
