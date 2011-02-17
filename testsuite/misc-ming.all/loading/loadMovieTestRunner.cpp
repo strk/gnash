@@ -90,7 +90,7 @@ waitForLoad(MovieClip* from)
 }
 
 void
-clickCycle(MovieClip* coverart, bool withShift)
+clickCycle(MovieClip* coverart)
 {
 
 	URL mediaURL(MEDIADIR"/");
@@ -104,14 +104,12 @@ clickCycle(MovieClip* coverart, bool withShift)
 	tester->movePointerTo(80, 80);
 	check(tester->isMouseOverMouseEntity());
 
-	if ( withShift ) tester->pressKey(key::SHIFT);
 	tester->pressMouseButton();
 
 	coverart = waitForLoad(coverart);
 	check_equals(coverart->get_root()->url(), lynchURL.str());
 
 	tester->depressMouseButton();
-	if ( withShift ) tester->releaseKey(key::SHIFT);
 
 	// Check scribbling on the lynch
 	checkScribbling();
@@ -126,9 +124,7 @@ clickCycle(MovieClip* coverart, bool withShift)
 	tester->movePointerTo(280, 80);
 	check(tester->isMouseOverMouseEntity());
 
-	if ( withShift ) tester->pressKey(key::SHIFT);
 	tester->click();
-	if ( withShift ) tester->releaseKey(key::SHIFT);
 
 	coverart = waitForLoad(coverart);
 
@@ -150,9 +146,7 @@ clickCycle(MovieClip* coverart, bool withShift)
 	tester->movePointerTo(480, 80);
 	check(tester->isMouseOverMouseEntity());
 
-	if ( withShift ) tester->pressKey(key::SHIFT);
 	tester->click();
-	if ( withShift ) tester->releaseKey(key::SHIFT);
 
 	coverart = waitForLoad(coverart);
 
@@ -199,8 +193,9 @@ main(int /*argc*/, char** /*argv*/)
 	// Check scribbling on the empty canvas
 	checkScribbling();
 
-	clickCycle(coverart, false);
-	clickCycle(coverart, true);
+	clickCycle(coverart);
+	clickCycle(coverart);
+	clickCycle(coverart);
 
 	// Consistency checking
 	VM& vm = getVM(*getObject(root));

@@ -87,17 +87,23 @@ add_clip(SWFMovie mo, char* file, char* name,
 	/* "Click" handler */
 	snprintf(action,  1023,
 		"%s.onPress = function () { "
-		"  if ( Key.isDown(Key.SHIFT) ) { "
-		"    loadMovie('%s', '/coverart');" /* Uses GETURL tag */
-		"    _level0.loadMethod = 'GETURL, target:/coverart';"
-		"  } else {"
+		"  if ( _root.clicks < 3 ) {"
 		"    coverart.loadMovie('%s');"
 		"    _level0.loadMethod = 'MovieClip.loadMovie';" 
+		"  } else if ( _root.clicks < 6 ) {"
+		"    loadMovie('%s', '/coverart');" /* Uses GETURL tag */
+		"    _level0.loadMethod = 'GETURL, target:/coverart';"
+		"  } else if ( _root.clicks < 9 ) {"
+		"    loadMovie('%s', '_level0.coverart');" /* Uses GETURL */
+		"    _level0.loadMethod = 'GETURL, target:_level0.coverart';"
+		"  } else {"
+		"    _root.note('You are not supposed to be clicking anymore');"
+		"    return;"
 		"  }"
 		" _level0.expectLoaded = '%s';" 
 		" note('Wait for the image to appear on the right. Then click on it.');"
 		"};"
-		, name, url, url, fname);
+		, name, url, url, url, fname);
 
 	ac = compileSWFActionCode(action);
 
@@ -160,18 +166,18 @@ add_coverart(SWFMovie mo, int x, int y)
 		"  } else if ( _root.clicks < 7 ) {"
 		"    _root.check_equals(_root.loadMethod, "
 		"         'GETURL, target:/coverart');" 
+		"  } else if ( _root.clicks < 10 ) {"
+		"    _root.check_equals(_root.loadMethod, "
+		"         'GETURL, target:_level0.coverart');" 
 		"  }"
 
-		"  if ( _root.clicks < 3 ) {"
-		"    _root.note('Click on the '+"
-		"      _root.imagenames[_root.clicks]+' image.');"
-		"  }"
-		"  else if ( _root.clicks < 6 ) {"
-		"    _root.note('SHIFT-Click on the '+"
-		"      _root.imagenames[_root.clicks-3]+' image.');"
+		"  if ( _root.clicks < 9 ) {"
+		"    _root.note(Math.floor(_root.clicks/3)+'.'+"
+		"    _root.clicks%%3+': Click on the '+"
+		"      _root.imagenames[_root.clicks%%3]+' image.');"
 		"  } else {"
 		"    _root.note('The test is over');"
-		"    _root.totals(44, '"__FILE__"');"
+		"    _root.totals(65, '"__FILE__"');"
 		"    _root.END_OF_TEST = true;"
 		"  }"
 		"};"
@@ -344,7 +350,7 @@ main(int argc, char** argv)
 	add_actions(mo,
 		"_root.imagenames = ['first','second','third'];"
 		"_root.clicks = 0;"
-		"note('Click on the '+_root.imagenames[_root.clicks]+' image.');"
+		"note('0.0: Click on the '+_root.imagenames[_root.clicks]+' image.');"
 		"_level0.expectLoaded = 'loadMovieTest.swf';" 
 		// TODO: add self-contained tests after each load
 		//       like for the DragAndDropTest.as movie
