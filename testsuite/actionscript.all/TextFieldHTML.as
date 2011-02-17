@@ -129,6 +129,10 @@
  format = tf.getTextFormat(1, 4);
  xcheck_equals(format.color, 0x00ff00);
 
- totals(30);
+ // Check empty face value (bug #32508)
+ tf.htmlText = '<font face="">#32508</font>';
+ xcheck_equals(tf.text, "#32508");
+
+ totals(31);
 
 #endif
