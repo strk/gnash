@@ -3546,7 +3546,7 @@ commonGetURL(as_environment& env, as_value target,
             target_string, url, static_cast<int>(method),
             sendVarsMethod, loadTargetFlag, loadVariableFlag);
 
-    DisplayObject* target_ch = findTarget(env, target.to_string());
+    DisplayObject* target_ch = findTarget(env, target_string);
     MovieClip* target_movie = target_ch ? target_ch->to_movie() : 0;
 
     if (loadVariableFlag) {
@@ -3618,13 +3618,28 @@ commonGetURL(as_environment& env, as_value target,
 
         const std::string s = target_movie->getTarget(); // or getOrigTarget ?
         if (s != target_movie->getOrigTarget()) {
-            log_debug(_("TESTME: target of a loadMovie changed its target "
-                        "path"));
+            log_debug("TESTME: target of a loadMovie changed its target path");
         }
         
-        // TODO: try to trigger this !
-        assert(m.findCharacterByTarget(s) == target_movie);
+        // To trigger: https://savannah.gnu.org/bugs/?32506
+        if ( m.findCharacterByTarget(s) != target_movie ) {
+            log_error("FIXME: "
+                "getURL target %1% is resolved by findTarget(env) "
+                "to sprite %2%. Sprite %2% has "
+                "target %3%. Target %3% will be resolved "
+                "by movie_root::findCharacterByTarget() to %4%",
+                target_string, target_movie, s,
+                m.findCharacterByTarget(s));
+        }
 
+        // We might probably use target_string here rather than
+        // ``s'' (which is the _official_ target) but at time   
+        // of writing the MovieLoader will use
+        // movie_root::findCharacterByTarget to resolve paths,
+        // and that one, in turn, won't support /slash/notation
+        // which may be found in target_string (see also loadMovieTest.swf
+        // under misc-ming.all)
+        //
         m.loadMovie(url, s, varsToSend, sendVarsMethod); 
         return;
     }
