@@ -72,6 +72,100 @@ checkScribbling()
 	check_equals(coverart->getDisplayList().size(), initial_child_count);
 }
 
+/* Wait until the coverart character is different from the given character */
+MovieClip*
+waitForLoad(MovieClip* from)
+{
+    MovieClip* coverart;
+
+    // Wait for the movie to load
+    // TODO: drop this test and use a self-containment instead
+    do {
+	    usleep(500); // give it some time... 
+	    tester->advance(); // loads (should) happen on next advance
+	    coverart = const_cast<DisplayObject*>(tester->findDisplayItemByName(*root, "coverart"))->to_movie();
+    } while (coverart == from);
+
+    return coverart;
+}
+
+void
+clickCycle(MovieClip* coverart, bool withShift)
+{
+
+	URL mediaURL(MEDIADIR"/");
+	URL lynchURL("lynch.swf", mediaURL);
+	URL greenURL("green.jpg", mediaURL);
+	URL offspringURL("offspring.swf", mediaURL);
+
+	/*------------------------------------- */
+
+	// Click on the first (lynch)
+	tester->movePointerTo(80, 80);
+	check(tester->isMouseOverMouseEntity());
+
+	if ( withShift ) tester->pressKey(key::SHIFT);
+	tester->pressMouseButton();
+
+	coverart = waitForLoad(coverart);
+	check_equals(coverart->get_root()->url(), lynchURL.str());
+
+	tester->depressMouseButton();
+	if ( withShift ) tester->releaseKey(key::SHIFT);
+
+	// Check scribbling on the lynch
+	checkScribbling();
+
+	// Run 'coverart' tests..
+	tester->movePointerTo(640,180);
+	tester->click(); tester->advance();
+
+	/*------------------------------------- */
+
+	// Click on the second (green)
+	tester->movePointerTo(280, 80);
+	check(tester->isMouseOverMouseEntity());
+
+	if ( withShift ) tester->pressKey(key::SHIFT);
+	tester->click();
+	if ( withShift ) tester->releaseKey(key::SHIFT);
+
+	coverart = waitForLoad(coverart);
+
+	check_equals(coverart->get_root()->url(), greenURL.str());
+	// TODO: find a way to test if the jpeg is really displayed
+	//       (like turn it into a mouse-event-handling char and
+	//        use isMouseOverActiveEntity ?)
+
+	// Check scribbling on the jpeg
+	checkScribbling();
+
+	// Run 'coverart' tests..
+	tester->movePointerTo(640,180);
+	tester->click(); tester->advance();
+
+	/*------------------------------------- */
+
+	// Click on the third (offspring)
+	tester->movePointerTo(480, 80);
+	check(tester->isMouseOverMouseEntity());
+
+	if ( withShift ) tester->pressKey(key::SHIFT);
+	tester->click();
+	if ( withShift ) tester->releaseKey(key::SHIFT);
+
+	coverart = waitForLoad(coverart);
+
+	check_equals(coverart->get_root()->url(), offspringURL.str());
+
+	// Check scribbling on the offspring
+	checkScribbling();
+
+	// Run 'coverart' tests..
+	tester->movePointerTo(640,180);
+	tester->click(); tester->advance();
+}
+
 int
 main(int /*argc*/, char** /*argv*/)
 {
@@ -82,16 +176,9 @@ main(int /*argc*/, char** /*argv*/)
 	tester.reset(new MovieTester(filename));
 
 	URL baseURL(filename);
-	URL mediaURL(MEDIADIR"/");
-	URL lynchURL("lynch.swf", mediaURL);
-	URL greenURL("green.jpg", mediaURL);
-	URL offspringURL("offspring.swf", mediaURL);
-	std::string url;
 
 	gnash::RcInitFile& rc = gnash::RcInitFile::getDefaultInstance();
 	rc.addLocalSandboxPath(MEDIADIR);
-
-
 
 	root = tester->getRootMovie();
 	assert(root);
@@ -106,89 +193,14 @@ main(int /*argc*/, char** /*argv*/)
 	DisplayObject* coverartch = const_cast<DisplayObject*>(tester->findDisplayItemByName(*root, "coverart"));
 	MovieClip* coverart = coverartch->to_movie();
 	check(coverart);
-	url = coverart->get_root()->url();
+	std::string url = coverart->get_root()->url();
 	check_equals(coverart->get_root()->url(), baseURL.str());
 
 	// Check scribbling on the empty canvas
 	checkScribbling();
 
-	// Click on the first (lynch)
-	tester->movePointerTo(80, 80);
-	check(tester->isMouseOverMouseEntity());
-	tester->pressMouseButton();
-
-    // Wait for the movie to load
-    // TODO: drop this test and use a self-containment instead
-    do {
-	    usleep(500); // give it some time...
-	    tester->advance(); // loads (should) happen on next advance
-	    coverartch = const_cast<DisplayObject*>(tester->findDisplayItemByName(*root, "coverart"));
-    } while (coverartch->to_movie() == coverart);
-
-	coverart = coverartch->to_movie();
-	check_equals(coverart->get_root()->url(), lynchURL.str());
-
-	tester->depressMouseButton();
-
-	// Check scribbling on the lynch
-	checkScribbling();
-
-	// Run 'coverart' tests..
-	tester->movePointerTo(640,180);
-	tester->click(); tester->advance();
-
-	// Click on the second (green)
-	tester->movePointerTo(280, 80);
-	check(tester->isMouseOverMouseEntity());
-	tester->click();
-
-    // Wait for the movie to load
-    // TODO: drop this test and use a self-containment instead
-    do {
-	    usleep(500); // give it some time... 
-	    tester->advance(); // loads (should) happen on next advance
-	    coverartch = const_cast<DisplayObject*>(tester->findDisplayItemByName(*root, "coverart"));
-    } while (coverartch->to_movie() == coverart);
-
-	coverart = coverartch->to_movie();
-	check_equals(coverart->get_root()->url(), greenURL.str());
-	// TODO: find a way to test if the jpeg is really displayed
-	//       (like turn it into a mouse-event-handling char and use isMouseOverActiveEntity ?)
-
-	// Check scribbling on the jpeg
-	checkScribbling();
-
-	// Run 'coverart' tests..
-	tester->movePointerTo(640,180);
-	tester->click(); tester->advance();
-
-	// Click on the third (offspring)
-	tester->movePointerTo(480, 80);
-	check(tester->isMouseOverMouseEntity());
-	tester->click();
-
-    // Wait for the movie to load
-    // TODO: drop this test and use a self-containment instead
-    do {
-	    usleep(500); // give it some time... 
-	    tester->advance(); // loads (should) happen on next advance
-	    coverartch = const_cast<DisplayObject*>(tester->findDisplayItemByName(*root, "coverart"));
-    } while (coverartch->to_movie() == coverart);
-
-	coverart = coverartch->to_movie();
-	check_equals(coverart->get_root()->url(), offspringURL.str());
-
-	// Check scribbling on the offspring
-	checkScribbling();
-
-	// Run 'coverart' tests..
-	tester->movePointerTo(640,180);
-	tester->click(); tester->advance();
-
-	// Get summary ...
-	tester->pressKey(key::SHIFT);
-	tester->click(); tester->advance();
-	tester->releaseKey(key::SHIFT);
+	clickCycle(coverart, false);
+	clickCycle(coverart, true);
 
 	// Consistency checking
 	VM& vm = getVM(*getObject(root));

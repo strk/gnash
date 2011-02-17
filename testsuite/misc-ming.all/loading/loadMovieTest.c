@@ -1,6 +1,6 @@
 /***********************************************************************
  *
- *   Copyright (C) 2007, 2009, 2010 Free Software Foundation, Inc.
+ *   Copyright (C) 2007, 2009, 2010, 2011 Free Software Foundation, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -87,10 +87,17 @@ add_clip(SWFMovie mo, char* file, char* name,
 	/* "Click" handler */
 	snprintf(action,  1023,
 		"%s.onPress = function () { "
-		"	coverart.loadMovie('%s');"
-		"	_level0.expectLoaded = '%s';" 
+		"  if ( Key.isDown(Key.SHIFT) ) { "
+		"    loadMovie('%s', '/coverart');" /* Uses GETURL tag */
+		"    _level0.loadMethod = 'GETURL, target:/coverart';"
+		"  } else {"
+		"    coverart.loadMovie('%s');"
+		"    _level0.loadMethod = 'MovieClip.loadMovie';" 
+		"  }"
+		" _level0.expectLoaded = '%s';" 
+		" note('Wait for the image to appear on the right. Then click on it.');"
 		"};"
-		,name, url, fname);
+		, name, url, url, fname);
 
 	ac = compileSWFActionCode(action);
 
@@ -104,7 +111,7 @@ add_coverart(SWFMovie mo, int x, int y)
 	SWFFillStyle fstyle;
 	SWFMovieClip mc_coverart;
 	SWFDisplayItem it;
-#define BUFSIZE 1024
+#define BUFSIZE 2048
 	char buf[BUFSIZE];
 
 	sh_coverart = newSWFShape();
@@ -143,15 +150,30 @@ add_coverart(SWFMovie mo, int x, int y)
 		"  _root.check_equals(lastUrlComponent, _level0.expectLoaded, '%s:%d');"
 		"  _root.check_equals(this.getDepth(), -16376);"
 		"  _root.check_equals(this.getBytesLoaded(), this.getBytesTotal());"
-		"  _root.check(this.getBytesLoaded() > 0);" /* assuming something was loaded here */
-		"  _root.note('bytesLoaded: '+this.getBytesLoaded());"
-		"  if ( Key.isDown(Key.SHIFT) ) { "
-		"	trace('SHIFT-click on coverart...');"
-		//"	_root.note('SHIFT-click on coverart...');"
-		"	_root.totals(26, '"__FILE__"');"
-		"	_root.END_OF_TEST = true;"
-		" }"
-		"  else _root.note('2 tests run');"
+		/* assuming something was loaded here */
+		"  _root.check(this.getBytesLoaded() > 0);"
+		"  _root.clicks++;"
+
+		"  if ( _root.clicks < 4 ) {"
+		"    _root.check_equals(_root.loadMethod, "
+		"       'MovieClip.loadMovie');" 
+		"  } else if ( _root.clicks < 7 ) {"
+		"    _root.check_equals(_root.loadMethod, "
+		"         'GETURL, target:/coverart');" 
+		"  }"
+
+		"  if ( _root.clicks < 3 ) {"
+		"    _root.note('Click on the '+"
+		"      _root.imagenames[_root.clicks]+' image.');"
+		"  }"
+		"  else if ( _root.clicks < 6 ) {"
+		"    _root.note('SHIFT-Click on the '+"
+		"      _root.imagenames[_root.clicks-3]+' image.');"
+		"  } else {"
+		"    _root.note('The test is over');"
+		"    _root.totals(44, '"__FILE__"');"
+		"    _root.END_OF_TEST = true;"
+		"  }"
 		"};"
 		, __FILE__, __LINE__);
 
@@ -320,9 +342,9 @@ main(int argc, char** argv)
 	add_coverart(mo, 600, 100);
 
 	add_actions(mo,
-		"note('Click on each image to load it into the container on the right.');"
-		"note('After each load, click on the container.');"
-		"note('Finally, shift-click on the container to get results printed.');"
+		"_root.imagenames = ['first','second','third'];"
+		"_root.clicks = 0;"
+		"note('Click on the '+_root.imagenames[_root.clicks]+' image.');"
 		"_level0.expectLoaded = 'loadMovieTest.swf';" 
 		// TODO: add self-contained tests after each load
 		//       like for the DragAndDropTest.as movie
