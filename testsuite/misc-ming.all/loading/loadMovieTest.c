@@ -347,7 +347,7 @@ main(int argc, char** argv)
 	add_button(mo, 50, 220, "Clear", newSWFAction(
 				" art=_root.coverart;"
 				" for (i=0; i<art.lastdepth; ++i) {"
-				"  removeMovieClip('_root.coverart.child'+i);" 
+				"  removeMovieClip('_root.cont.coverart.child'+i);" 
 				" }"
 				" art.lastdepth=0;"
 				" art.clear(); "
