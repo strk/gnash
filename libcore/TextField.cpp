@@ -1426,7 +1426,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                         }
                         else if (s == "B") {
                             //bold
-                            Font* boldfont = new Font(rec.getFont()->name(),
+                            boost::intrusive_ptr<Font> boldfont = new Font(rec.getFont()->name(),
                                     true, rec.getFont()->isItalic());
                             newrec.setFont(boldfont);
                             handleChar(it, e, x, y, newrec, last_code,
@@ -1460,7 +1460,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                                     log_aserror("Expected a font name in FACE attribute.");
                                 } else {
                                     //font FACE attribute
-                                    Font* newfont = new Font(attloc->second,
+                                    boost::intrusive_ptr<Font> newfont = new Font(attloc->second,
                                         rec.getFont()->isBold(), rec.getFont()->isItalic());
                                     newrec.setFont(newfont);
                                 }
@@ -1514,7 +1514,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                         }
                         else if (s == "I") {
                             //italic
-                            Font* italicfont = new Font(rec.getFont()->name(),
+                            boost::intrusive_ptr<Font> italicfont = new Font(rec.getFont()->name(),
                                     rec.getFont()->isBold(), true);
                             newrec.setFont(italicfont);
                             handleChar(it, e, x, y, newrec, last_code,
