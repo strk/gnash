@@ -153,6 +153,9 @@ public:
     // Overridden to unpause SDL audio
     void plugInputStream(std::auto_ptr<InputStream> in);
 
+    // Overidden to provide thread safety.
+    void unplugInputStream(InputStream* id);
+
     // See dox in sound_handler.h
     void fetchSamples(boost::int16_t* to, unsigned int nSamples);
 };
