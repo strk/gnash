@@ -190,10 +190,10 @@ SWFMovieDefinition::getDefinitionTag(boost::uint16_t id) const
 }
 
 void
-SWFMovieDefinition::add_font(int font_id, Font* f)
+SWFMovieDefinition::add_font(int font_id, boost::intrusive_ptr<Font> f)
 {
     assert(f);
-    m_fonts.insert(std::make_pair(font_id, boost::intrusive_ptr<Font>(f)));
+    m_fonts.insert(std::make_pair(font_id, f));
 }
 
 Font*

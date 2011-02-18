@@ -252,7 +252,7 @@ public:
     bool get_labeled_frame(const std::string& label, size_t& frame_number)
         const;
 
-    void add_font(int font_id, Font* f);
+    void add_font(int font_id, boost::intrusive_ptr<Font> f);
 
     Font* get_font(int font_id) const;
 
