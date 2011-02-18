@@ -193,7 +193,12 @@ Font::codeTableLookup(int glyph, bool embedded) const
     
     CodeTable::const_iterator it = std::find_if(ctable.begin(), ctable.end(),
             CodeLookup(glyph));
+
     if (it == ctable.end()) {
+        // NB: this occurs with a long and complex SWF (bug #32537)
+        // that defines the same font twice and ends up with a glyph
+        // table shorter than the number of glyphs. We don't know
+        // whether it's a SWF or a Gnash bug.
         log_error("Failed to find glyph %s in %s font %s",
                 glyph, embedded ? "embedded" : "device", _name);
         return 0;
