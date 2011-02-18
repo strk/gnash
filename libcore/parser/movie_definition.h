@@ -251,7 +251,7 @@ public:
 	/// This method is here to be called by DEFINEFONT tags loaders.
 	/// The default implementation does nothing.
 	///
-	virtual void add_font(int /*id*/, Font* /*ch*/)
+	virtual void add_font(int /*id*/, boost::intrusive_ptr<Font> /*ch*/)
 	{
 	}
 
