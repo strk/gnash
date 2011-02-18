@@ -113,6 +113,7 @@ AudioDecoderGst::AudioDecoderGst(const AudioInfo& info)
         throw MediaException(err.str());
     }
 
+    gst_caps_ref(extraaudioinfo->caps);
     setup(extraaudioinfo->caps);
 }
 
