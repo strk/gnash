@@ -445,32 +445,6 @@ DisplayList::swapDepths(DisplayObject* ch1, int newdepth)
 
     testInvariant();
 }
-
-DisplayObject*
-DisplayList::removeDisplayObjectAt(int index)
-{
-    container_type::iterator it =
-        std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
-            boost::bind(DepthEquals(), _1, index));
-
-    if (it == _charsByDepth.end()) return 0;
-   
-    DisplayObject* obj = *it;
-    _charsByDepth.erase(it);
-    return obj;
-}
-
-void
-DisplayList::removeDisplayObject(DisplayObject* obj)
-{
-    container_type::iterator it = std::find(_charsByDepth.begin(),
-            _charsByDepth.end(), obj);
-    
-    if (it != _charsByDepth.end()) {
-        _charsByDepth.erase(it);
-    }
-}
-
 void
 DisplayList::insertDisplayObject(DisplayObject* obj, int index)
 {
@@ -495,28 +469,6 @@ DisplayList::insertDisplayObject(DisplayObject* obj, int index)
         (*it)->set_depth(index + 1);
         ++index, ++it;
     }
-
-    testInvariant();
-}
-
-void
-DisplayList::addDisplayObject(DisplayObject* obj)
-{
-    testInvariant();
-
-    assert(!obj->unloaded());
-
-    obj->set_invalidated();
-    if (_charsByDepth.empty()) {
-        obj->set_depth(0);
-    }
-    else {
-        container_type::const_reverse_iterator it = _charsByDepth.rbegin();
-        obj->set_depth((*it)->get_depth() + 1);
-    }
-
-    // Insert the DisplayObject at the end
-    _charsByDepth.insert(_charsByDepth.end(), obj);
 
     testInvariant();
 }
@@ -590,6 +542,8 @@ void
 DisplayList::display(Renderer& renderer, const Transform& base)
 {
     testInvariant();
+
+    //log_debug("Displaying list: %s", *this);
 
     std::stack<int> clipDepthStack;
     
