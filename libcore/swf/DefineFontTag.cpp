@@ -57,8 +57,6 @@ void
 DefineFontTag::readCodeTable(SWFStream& in, Font::CodeTable& table,
         bool wideCodes, size_t glyphCount)
 {
-    log_error("Read code table");
-
     IF_VERBOSE_PARSE(
         log_parse(_("reading code table at offset %1%, "
                 "%2% glyphs"), in.tell(), glyphCount);
@@ -133,32 +131,25 @@ DefineFontTag::readDefineFont(SWFStream& in, movie_definition& m,
     offsets.push_back(in.read_u16());
 
     IF_VERBOSE_PARSE (
-    log_parse("offset[0] = %d", offsets[0]);
+        log_parse("offset[0] = %d", offsets[0]);
     );
 
-    int	count = offsets[0] >> 1;
-    if ( count > 0 )
-    {
+    const size_t count = offsets[0] >> 1;
+    if (count > 0) {
         in.ensureBytes(count*2);
-        for (int i = 1; i < count; i++)
-        {
+        for (size_t i = 1; i < count; ++i) {
             offsets.push_back(in.read_u16());
 
             IF_VERBOSE_PARSE (
-            log_parse("offset[%d] = %d", i, offsets[i]);
+                log_parse("offset[%d] = %d", i, offsets[i]);
             );
         }
-    }
-    else
-    {
-        log_error("Negative embedded glyph table size: %d", count);
     }
 
     _glyphTable.resize(count);
 
     // Read the glyph shapes.
-    for (int i = 0; i < count; i++)
-    {
+    for (size_t i = 0; i < count; ++i) {
         // Seek to the start of the shape data.
         unsigned long new_pos = table_base + offsets[i];
 
@@ -252,7 +243,6 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
     }
 
     _glyphTable.resize(glyph_count);
-    log_error("Glyph count: %s", glyph_count);
 
     // Read the glyph shapes.
     for (size_t i = 0; i < glyph_count; ++i) {
@@ -283,6 +273,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
 
     readCodeTable(in, *table, wideCodes, _glyphTable.size());
     _codeTable.reset(table.release());
+    log_debug("Code table size: %s", _codeTable->size());
 
     // Read layout info for the glyphs.
     if (has_layout) {
@@ -336,7 +327,6 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
                     log_swferror(_("Repeated kerning pair found - ignoring"));
                 );
             }
-
         }
     }
 }

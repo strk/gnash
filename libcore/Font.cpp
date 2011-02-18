@@ -196,7 +196,6 @@ Font::codeTableLookup(int glyph, bool embedded) const
     if (it == ctable.end()) {
         log_error("Failed to find glyph %s in %s font %s",
                 glyph, embedded ? "embedded" : "device", _name);
-        log_error("Font table size: %s", _embeddedCodeTable->size());
         return 0;
     }
     return it->first;
