@@ -59,35 +59,29 @@ namespace {
 /// Anonymous namespace for generic algorithm functors.
 namespace {
 
-class DepthEquals
+struct DepthEquals : std::binary_function<const DisplayObject*, int, bool>
 {
-public:
-
-    DepthEquals(int depth) : _depth(depth) {}
-
-    bool operator() (const DisplayObject* item) const {
+    bool operator()(const DisplayObject* item, int depth) const {
         if (!item) return false;
-        return item->get_depth() == _depth;
+        return item->get_depth() == depth;
     }
-
-private:
-    const int _depth;
 };
 
-class DepthGreaterOrEqual
+struct DepthLessThan : std::binary_function<const DisplayObject*, int, bool>
 {
-public:
-
-    DepthGreaterOrEqual(int depth) : _depth(depth) {}
-
-    bool operator() (const DisplayObject* item) const {
+    bool operator()(const DisplayObject* item, int depth) const {
         if (!item) return false;
-        return item->get_depth() >= _depth;
+        return item->get_depth() < depth;
     }
-private:
-    const int _depth;
 };
 
+struct DepthGreaterThan : std::binary_function<const DisplayObject*, int, bool>
+{
+    bool operator()(const DisplayObject* item, int depth) const {
+        if (!item) return false;
+        return item->get_depth() > depth;
+    }
+};
 
 class NameEquals
 {
@@ -188,7 +182,7 @@ DisplayList::placeDisplayObject(DisplayObject* ch, int depth)
 
     container_type::iterator it =
         std::find_if( _charsByDepth.begin(), _charsByDepth.end(),
-                DepthGreaterOrEqual(depth));
+                boost::bind(std::not2(DepthLessThan()), _1, depth));
 
     if (it == _charsByDepth.end() || (*it)->get_depth() != depth) {
         // add the new char
@@ -225,7 +219,7 @@ DisplayList::add(DisplayObject* ch, bool replace)
 
     container_type::iterator it =
         std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
-                DepthGreaterOrEqual(depth));
+                boost::bind(std::not2(DepthLessThan()), _1, depth));
 
     if (it == _charsByDepth.end() || (*it)->get_depth() != depth) {
         _charsByDepth.insert(it, ch);
@@ -249,7 +243,7 @@ DisplayList::replaceDisplayObject(DisplayObject* ch, int depth,
 
     container_type::iterator it =
         std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
-            DepthGreaterOrEqual(depth));
+            boost::bind(std::not2(DepthLessThan()), _1, depth));
 
     if (it == _charsByDepth.end() || (*it)->get_depth() != depth) {
         _charsByDepth.insert(it, ch);
@@ -350,7 +344,7 @@ DisplayList::removeDisplayObject(int depth)
     // TODO: optimize to take by-depth order into account
     container_type::iterator it = 
         std::find_if( _charsByDepth.begin(), _charsByDepth.end(),
-            DepthEquals(depth));
+            boost::bind(DepthEquals(), _1, depth));
 
     if (it != _charsByDepth.end()) {
         // Make a copy (before erasing)
@@ -405,7 +399,7 @@ DisplayList::swapDepths(DisplayObject* ch1, int newdepth)
     // upper bound ...
     container_type::iterator it2 =
         std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
-            DepthGreaterOrEqual(newdepth));
+            boost::bind(std::not2(DepthLessThan()), _1, newdepth));
 
     if (it1 == _charsByDepth.end()) {
         log_error("First argument to DisplayList::swapDepth() "
@@ -457,7 +451,7 @@ DisplayList::removeDisplayObjectAt(int index)
 {
     container_type::iterator it =
         std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
-                DepthEquals(index));
+            boost::bind(DepthEquals(), _1, index));
 
     if (it == _charsByDepth.end()) return 0;
    
@@ -490,7 +484,7 @@ DisplayList::insertDisplayObject(DisplayObject* obj, int index)
     // Find the first index greater than or equal to the required index
     container_type::iterator it =
         std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
-            DepthGreaterOrEqual(index));
+            boost::bind(std::not2(DepthLessThan()), _1, index));
         
     // Insert the DisplayObject before that position
     _charsByDepth.insert(it, obj);
@@ -902,7 +896,7 @@ DisplayList::mergeDisplayList(DisplayList& newList)
         if (chNew->unloaded()) {
             iterator it =
                 std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
-                    DepthGreaterOrEqual(depthNew));
+                    boost::bind(std::not2(DepthLessThan()), _1, depthNew));
             
             _charsByDepth.insert(it, *itNew);
         }
@@ -956,7 +950,7 @@ DisplayList::reinsertRemovedCharacter(DisplayObject* ch)
     // TODO: optimize this by searching from the end(lowest depth).
     container_type::iterator it =
         std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
-                DepthGreaterOrEqual(newDepth));
+                boost::bind(std::not2(DepthLessThan()), _1, newDepth));
 
     _charsByDepth.insert(it, ch);
 
@@ -990,7 +984,7 @@ beginNonRemoved(DisplayList::container_type& c)
     const int depth = DisplayObject::removedDepthOffset -
         DisplayObject::staticDepthOffset;
     
-    return std::find_if(c.begin(), c.end(), DepthGreaterOrEqual(depth));
+    return std::find_if(c.begin(), c.end(), boost::bind(std::not2(DepthLessThan()), _1, depth));
 }
 
 DisplayList::const_iterator
@@ -999,14 +993,16 @@ beginNonRemoved(const DisplayList::container_type& c)
     const int depth = DisplayObject::removedDepthOffset -
         DisplayObject::staticDepthOffset;
 
-    return std::find_if(c.begin(), c.end(), DepthGreaterOrEqual(depth));
+    return std::find_if(c.begin(), c.end(), 
+            boost::bind(std::not2(DepthLessThan()), _1, depth));
 }
 
 DisplayList::iterator
 dlistTagsEffectiveZoneEnd(DisplayList::container_type& c)
 {
     return std::find_if(c.begin(), c.end(), 
-             DepthGreaterOrEqual(0xffff + DisplayObject::staticDepthOffset));
+            boost::bind(DepthGreaterThan(), _1,
+                0xffff + DisplayObject::staticDepthOffset));
 }
 
 } // anonymous namespace
