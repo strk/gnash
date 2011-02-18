@@ -74,20 +74,6 @@ private:
     const int _depth;
 };
 
-struct DepthGreaterThan
-{
-    bool operator()(const DisplayObject* a, const DisplayObject* b) const {
-        return a->get_depth() > b->get_depth();
-    }
-};
-
-struct DepthLessThan
-{
-    bool operator()(const DisplayObject* a, const DisplayObject* b) const {
-        return a->get_depth() < b->get_depth();
-    }
-};
-
 class DepthGreaterOrEqual
 {
 public:
