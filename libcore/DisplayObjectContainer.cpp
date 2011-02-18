@@ -37,51 +37,6 @@ DisplayObjectContainer::~DisplayObjectContainer()
 {
 }
 
-DisplayObject*
-DisplayObjectContainer::removeChild(DisplayObject* obj)
-{
-    _displayList.removeDisplayObject(obj);
-    obj->set_parent(0);
-    return obj;
-}
-
-DisplayObject*
-DisplayObjectContainer::removeChildAt(int index)
-{
-    DisplayObject* obj = _displayList.removeDisplayObjectAt(index);
-    if (obj) obj->set_parent(0);
-
-    return obj;
-}
-
-DisplayObject*
-DisplayObjectContainer::addChild(DisplayObject* obj)
-{
-    // TODO: parent should be a DisplayObjectContainer; remove dynamic_cast.
-    DisplayObjectContainer* parent =
-        dynamic_cast<DisplayObjectContainer*>(obj->parent());
-    if (parent) parent->removeChild(obj);
-
-    _displayList.addDisplayObject(obj);
-    obj->set_parent(this);
-    return obj;
-}
-
-
-DisplayObject*
-DisplayObjectContainer::addChildAt(DisplayObject* obj, int index)
-{
-    // TODO: parent should be a DisplayObjectContainer; remove dynamic_cast.
-    DisplayObjectContainer* parent =
-        dynamic_cast<DisplayObjectContainer*>(obj->parent());
-    if (parent) parent->removeChild(obj);
-    
-    _displayList.insertDisplayObject(obj, index);
-    obj->set_parent(this);
-    return obj;
-}
-
-
 #ifdef USE_SWFTREE
 
 namespace {
