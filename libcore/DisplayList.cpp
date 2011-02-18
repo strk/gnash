@@ -786,12 +786,7 @@ DisplayList::mergeDisplayList(DisplayList& newList)
     iterator itNew = beginNonRemoved(newList._charsByDepth);
 
     iterator itOldEnd = dlistTagsEffectiveZoneEnd(_charsByDepth);
-
-    // There used to be an assertion here that no character in the new list
-    // is at depth 65535 or higher. There's no reason why the tags executed
-    // on the new list shouldn't do this though. Bug #29282 does this.
-    // TODO: check whether we should be ignoring that character.
-    iterator itNewEnd = dlistTagsEffectiveZoneEnd(newList._charsByDepth); 
+    iterator itNewEnd = dlistTagsEffectiveZoneEnd(newList._charsByDepth);
 
     // step1. 
     // starting scanning both lists.
@@ -800,13 +795,13 @@ DisplayList::mergeDisplayList(DisplayList& newList)
         iterator itOldBackup = itOld;
         
         DisplayObject* chOld = *itOldBackup;
-        int depthOld = chOld->get_depth();
+        const int depthOld = chOld->get_depth();
 
         while (itNew != itNewEnd) {
             iterator itNewBackup = itNew;
             
             DisplayObject* chNew = *itNewBackup;
-            int depthNew = chNew->get_depth();
+            const int depthNew = chNew->get_depth();
             
             // depth in old list is occupied, and empty in new list.
             if (depthOld < depthNew) {
@@ -828,7 +823,7 @@ DisplayList::mergeDisplayList(DisplayList& newList)
                 ++itOld;
                 ++itNew;
                 
-                bool is_ratio_compatible = 
+                const bool is_ratio_compatible = 
                     (chOld->get_ratio() == chNew->get_ratio());
 
                 if (!is_ratio_compatible || chOld->isDynamic() ||
@@ -859,9 +854,9 @@ DisplayList::mergeDisplayList(DisplayList& newList)
             }
 
             // depth in old list is empty, but occupied in new list.
-            ++ itNew;
+            ++itNew;
             // add the new DisplayObject to the old list.
-            _charsByDepth.insert(itOldBackup, *itNewBackup );
+            _charsByDepth.insert(itOldBackup, *itNewBackup);
         }
 
         // break if finish scanning the new list
@@ -871,7 +866,7 @@ DisplayList::mergeDisplayList(DisplayList& newList)
     // step2(only required if scanning of new list finished earlier in step1).
     // continue to scan the static zone of the old list.
     // unload remaining DisplayObjects directly.
-    while((itOld != itOldEnd) && ((*itOld)->get_depth() < 0)) {
+    while ((itOld != itOldEnd) && ((*itOld)->get_depth() < 0)) {
 
         DisplayObject* chOld = *itOld;
         itOld = _charsByDepth.erase(itOld);
@@ -891,7 +886,7 @@ DisplayList::mergeDisplayList(DisplayList& newList)
     for (itNew = newList._charsByDepth.begin(); itNew != itNewEnd; ++itNew) {
 
         DisplayObject* chNew = *itNew;
-        int depthNew = chNew->get_depth();
+        const int depthNew = chNew->get_depth();
 
         if (chNew->unloaded()) {
             iterator it =
@@ -1011,8 +1006,7 @@ dlistTagsEffectiveZoneEnd(DisplayList::container_type& c)
 std::ostream&
 operator<<(std::ostream& os, const DisplayList& dl)
 {
-
-    if (dl._charsByDepth.empty()) return os;
+    if (dl._charsByDepth.empty()) return os << "Empty DisplayList";
 
     os << "DisplayList size " << dl._charsByDepth.size() << "\n";
 
