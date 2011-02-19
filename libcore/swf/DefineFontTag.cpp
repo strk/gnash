@@ -273,7 +273,6 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
 
     readCodeTable(in, *table, wideCodes, _glyphTable.size());
     _codeTable.reset(table.release());
-    log_debug("Code table size: %s", _codeTable->size());
 
     // Read layout info for the glyphs.
     if (has_layout) {
