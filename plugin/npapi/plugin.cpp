@@ -393,7 +393,6 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
     _width(0),
     _height(0),
     _streamfd(-1),
-    _ichan(0),
     _ichanWatchId(0),
     _controlfd(-1),
     _childpid(0),
@@ -1290,6 +1289,7 @@ nsPluginInstance::startProc()
                                        (GIOCondition)(G_IO_IN|G_IO_HUP), 
                                        (GIOFunc)handlePlayerRequestsWrapper,
                                        this);
+        g_io_channel_unref(ichan);
         return;
     }
     
