@@ -329,13 +329,9 @@ public:
         _pixf(_rbuf),
         _rbase(_pixf),
         _amask(_rbuf),
-        _buffer(new boost::uint8_t[width * height])
+        _buffer(new boost::uint8_t[width * height]())
     {
         _rbuf.attach(_buffer.get(), width, height, width);
-        
-        // NOTE: The buffer is *not* cleared. The clear() function must
-        // be called to clear the buffer (alpha=0). The reason is to avoid
-        // clearing the whole mask when only a small portion is really used.
     }
     
     void clear(const geometry::Range2d<int>& region)
