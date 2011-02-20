@@ -65,8 +65,18 @@ VideoFrameTag::loader(SWFStream& in, SWF::TagType tag, movie_definition& m,
 
     const unsigned short padding = 8;
 
-	in.ensureBytes(2);
-	unsigned int frameNum = in.read_u16(); 
+    in.ensureBytes(3);
+    unsigned int frameNum = in.read_u16();
+
+    const media::VideoInfo* info = vs->getVideoInfo();
+
+    if (info && info->codec == media::VIDEO_CODEC_SCREENVIDEO) {
+        // According to swfdec, every SV frame comes with keyframe
+        // and format identifiers (4 bits each), but these are not
+        // part of the codec bitstream and break the decoder.
+        (void) in.read_u8();
+    }
+
 	
 	const unsigned int dataLength = in.get_tag_end_position() - in.tell();
 
