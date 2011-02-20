@@ -1457,7 +1457,9 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             attloc = attributes.find("FACE");
                             if (attloc != attributes.end()) {
                                 if (attloc->second.empty()) {
-                                    log_aserror("Expected a font name in FACE attribute.");
+                                    IF_VERBOSE_ASCODING_ERRORS(
+                                         log_aserror(_("Expected a font name in FACE attribute."))
+                                    );
                                 } else {
                                     //font FACE attribute
                                     boost::intrusive_ptr<Font> newfont = new Font(attloc->second,
