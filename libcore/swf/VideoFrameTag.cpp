@@ -61,7 +61,7 @@ VideoFrameTag::loader(SWFStream& in, SWF::TagType tag, movie_definition& m,
         return;
     }
 
-	// TODO: skip if there's no MediaHandler registered ?
+    // TODO: skip if there's no MediaHandler registered ?
 
     const unsigned short padding = 8;
 
@@ -78,13 +78,13 @@ VideoFrameTag::loader(SWFStream& in, SWF::TagType tag, movie_definition& m,
     }
 
 	
-	const unsigned int dataLength = in.get_tag_end_position() - in.tell();
+    const unsigned int dataLength = in.get_tag_end_position() - in.tell();
 
     // FIXME: catch bad_alloc
-	boost::uint8_t* buffer = new boost::uint8_t[dataLength + padding]; 
+    boost::uint8_t* buffer = new boost::uint8_t[dataLength + padding]; 
 
-	const size_t bytesRead = in.read(reinterpret_cast<char*>(buffer),
-            dataLength);
+    const size_t bytesRead = in.read(reinterpret_cast<char*>(buffer),
+                                     dataLength);
 
     if (bytesRead < dataLength)
     {
@@ -95,12 +95,12 @@ VideoFrameTag::loader(SWFStream& in, SWF::TagType tag, movie_definition& m,
 	
     std::fill_n(buffer + bytesRead, padding, 0);
 
-	using namespace media;
+    using namespace media;
 
     std::auto_ptr<EncodedVideoFrame> frame(
             new EncodedVideoFrame(buffer, dataLength, frameNum));
 
-	vs->addVideoFrameTag(frame);
+    vs->addVideoFrameTag(frame);
 }
 
 } // namespace SWF
