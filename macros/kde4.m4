@@ -194,7 +194,7 @@ AC_DEFUN([GNASH_PATH_KDE4],
     if test x"${with_kde4_plugindir}" != x ; then 
       KDE4_PLUGINDIR="${with_kde4_plugindir}"
     else
-      if test -d ${KDE4_PREFIX}/lib64 -a ! -h ${KDE4_PREFIX}/lib64; then
+      if test -d ${KDE4_PREFIX}/lib64 -a -f /etc/redhat-release; then
         KDE4_PLUGINDIR="${KDE4_PREFIX}/lib64/kde4"
       else
         KDE4_PLUGINDIR="${KDE4_PREFIX}/lib/kde4"
