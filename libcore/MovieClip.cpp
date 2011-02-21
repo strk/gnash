@@ -505,26 +505,6 @@ MovieClip::getDefinitionVersion() const
     return _swf->version();
 }
 
-// Execute the actions in the action list, in the given
-// environment. The list of action will be consumed
-// starting from the first element. When the function returns
-// the list should be empty.
-void
-MovieClip::execute_actions(MovieClip::ActionList& action_list)
-{
-    // action_list may be changed due to actions (appended-to)
-    // This loop is probably quicker than using an iterator
-    // and a final call to .clear(), as repeated calls to
-    // .size() or .end() are no quicker (and probably slower)
-    // than pop_front(), which is constant time.
-    while (!action_list.empty()) {
-        const action_buffer* ab = action_list.front();
-        action_list.pop_front(); 
-
-        execute_action(*ab);
-    }
-}
-
 DisplayObject*
 MovieClip::getDisplayObjectAtDepth(int depth)
 {
@@ -595,6 +575,9 @@ MovieClip::call_frame_actions(const as_value& frame_spec)
     // If there is no definition, this is a dynamically-created MovieClip
     // and has no frames.
     if (!_def) return;
+
+    // TODO: check to see how this can be prevented.
+    if (isDestroyed()) return;
 
     size_t frame_number;
     if (!get_frame_number(frame_spec, frame_number)) {
@@ -980,6 +963,7 @@ MovieClip::executeFrameTags(size_t frame, DisplayList& dlist, int typeflags)
     // If there is no definition, this is a dynamically-created MovieClip
     // and has no frames.
     if (!_def) return;
+    if (isDestroyed()) return;
 
     assert(typeflags);
 
@@ -1183,6 +1167,9 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     // and this shouldn't be called.
     assert(_def);
     assert(tag);
+
+    // No tags should ever be executed on destroyed MovieClips.
+    assert(!isDestroyed());
 
     SWF::DefinitionTag* cdef = _def->getDefinitionTag(tag->getID());
     if (!cdef) {
