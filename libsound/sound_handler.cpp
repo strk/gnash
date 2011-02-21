@@ -231,7 +231,7 @@ sound_handler::stopEmbedSoundInstances(EmbedSound& def)
         log_debug(" unplugging input stream %p from stopEmbedSoundInstances", *i);
 #endif
 
-        unplugInputStream(*i);
+        sound_handler::unplugInputStream(*i);
     }
 
     def.clearInstances();
