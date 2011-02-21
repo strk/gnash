@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
 {
 
     SWFMovie mo;
-    SWFMovieClip mc50, mc51, mc74;
+    SWFMovieClip mc50, mc51, mc74, dejagnuclip;
     SWFDisplayItem it3, it52;
 
     const char *srcdir=".";
@@ -29,9 +29,15 @@ int main(int argc, char* argv[])
     SWFMovie_setDimension(mo, 800, 600);
     SWFMovie_setRate (mo, 12.0);
 
+    dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10,
+                0, 0, 800, 600);
+    SWFMovie_add(mo, (SWFBlock)dejagnuclip);
+
     // Empty character 50.
     mc50 = newSWFMovieClip();
-    SWFMovieClip_add(mc50, (SWFBlock)newSWFAction("trace('moo ' + ++_global.counter);"));
+    SWFMovieClip_add(mc50, (SWFBlock)newSWFAction(
+                "trace('moo ' + ++_global.counter);"
+                "_root.fail('This MovieClip should never be constructed');"));
     SWFMovieClip_nextFrame(mc50);
 
     mc51 = newSWFMovieClip();
@@ -49,7 +55,6 @@ int main(int argc, char* argv[])
     SWFDisplayItem_setDepth(it3, 3);
 
     SWFMovieClip_nextFrame(mc51);
-
 
     mc74 = newSWFMovieClip();
 
