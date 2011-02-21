@@ -256,7 +256,7 @@ PlaceAndRemove.swf: PlaceAndRemove
 	./PlaceAndRemove $(abs_mediadir)
 
 PlaceAndRemoveRunner: $(srcdir)/../../generic-testrunner.sh PlaceAndRemove.swf
-	sh $(srcdir)/../../generic-testrunner.sh $(top_builddir) PlaceAndRemove.swf > $@
+	sh $(srcdir)/../../generic-testrunner.sh -r40 $(top_builddir) PlaceAndRemove.swf > $@
 	chmod 755 $@
 
 ActionOrderTest3_SOURCES =	\

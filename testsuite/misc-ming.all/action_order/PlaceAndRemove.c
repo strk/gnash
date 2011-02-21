@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
 
     // Empty character 50.
     mc50 = newSWFMovieClip();
-    SWFMovieClip_add(mc50, (SWFBlock)newSWFAction("trace('moo');"));
+    SWFMovieClip_add(mc50, (SWFBlock)newSWFAction("trace('moo ' + ++_global.counter);"));
     SWFMovieClip_nextFrame(mc50);
 
     mc51 = newSWFMovieClip();
@@ -52,6 +52,9 @@ int main(int argc, char* argv[])
 
 
     mc74 = newSWFMovieClip();
+
+    SWFMovieClip_addInitAction(mc74, newSWFAction("_global.counter = 0;"));
+
     it52 = SWFMovieClip_add(mc74, (SWFBlock)mc51);
     SWFDisplayItem_setDepth(it52, 52);
     SWFDisplayItem_remove(it52);
