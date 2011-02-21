@@ -231,6 +231,9 @@ sound_handler::stopEmbedSoundInstances(EmbedSound& def)
         log_debug(" unplugging input stream %p from stopEmbedSoundInstances", *i);
 #endif
 
+        // Explicitly calling the base class implementation
+        // is a (dirty?) way to avoid mutex-locking overrides
+        // in subclasses causing deadlocks.
         sound_handler::unplugInputStream(*i);
     }
 
