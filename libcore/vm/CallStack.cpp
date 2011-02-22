@@ -22,7 +22,6 @@
 
 #include "as_object.h"
 #include "UserFunction.h" 
-#include "Global_as.h" 
 #include "Property.h"
 #include "log.h"
 
