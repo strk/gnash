@@ -265,13 +265,10 @@ u8_expand(unsigned char * &data,
 	const unsigned char* input,
 	boost::uint32_t input_size) // This is also the number of u8bit samples
 {
-	boost::scoped_array<boost::uint8_t> in_data ( new boost::uint8_t[input_size] );
 	boost::int16_t	*out_data = new boost::int16_t[input_size];
 
-	memcpy((char *)in_data.get(), input, input_size);
-
 	// Convert 8-bit to 16
-	boost::uint8_t *inp = in_data.get();
+	const boost::uint8_t *inp = input;
 	boost::int16_t *outp = out_data;
 	for (unsigned int i = input_size; i>0; i--) {
 		*outp++ = ((boost::int16_t)(*inp++) - 128) * 256;
