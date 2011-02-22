@@ -183,6 +183,7 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 
         switch(info.codec)
         {
+            case AUDIO_CODEC_UNCOMPRESSED:
             case AUDIO_CODEC_RAW:
                 if (info.sampleSize == 2) {
                     codec_id = CODEC_ID_PCM_S16LE;
