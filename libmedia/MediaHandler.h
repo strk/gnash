@@ -164,7 +164,7 @@ protected:
     /// Return true if input stream is an FLV
     //
     /// If this cannot read the necessary 3 bytes, it throws an IOException.
-    bool isFLV(IOChannel& stream) throw (IOException);
+    bool isFLV(IOChannel& stream);
 
 };
 
