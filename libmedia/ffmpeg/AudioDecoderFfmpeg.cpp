@@ -184,7 +184,11 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
         switch(info.codec)
         {
             case AUDIO_CODEC_RAW:
-                codec_id = CODEC_ID_PCM_U16LE;
+                if (info.sampleSize == 2) {
+                    codec_id = CODEC_ID_PCM_S16LE;
+                } else {
+                    codec_id = CODEC_ID_PCM_S8;
+                }
                 break;
 
             case AUDIO_CODEC_ADPCM:
@@ -301,12 +305,14 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
             case CODEC_ID_MP3:
                 break;
 
-            case CODEC_ID_PCM_U16LE:
+            case CODEC_ID_PCM_S8:
+                // Either FFMPEG or the parser are getting this wrong.
+                _audioCodecCtx->sample_rate = info.sampleRate / 2;
+                _audioCodecCtx->channels = (info.stereo ? 2 : 1);
+                break;
+            case CODEC_ID_PCM_S16LE:
                 _audioCodecCtx->channels = (info.stereo ? 2 : 1);
                 _audioCodecCtx->sample_rate = info.sampleRate;
-                // was commented out (why?):
-                _audioCodecCtx->sample_fmt = SAMPLE_FMT_S16;
-                _audioCodecCtx->frame_size = 1; 
                 break;
 
             default:

@@ -114,7 +114,7 @@ DSOEXPORT std::ostream& operator<< (std::ostream& os, const videoCodecType& t);
 ///
 enum audioCodecType
 {
-	/// Linear PCM, unspecified byte order 
+	/// Signed Linear PCM, unspecified byte order 
    	//
    	/// Use of this codec is deprecated (but still supported) due to
    	/// the unspecified byte order (you can only play >8bit samples
