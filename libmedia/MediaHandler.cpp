@@ -36,7 +36,7 @@ namespace gnash {
 namespace media {
 
 bool
-MediaHandler::isFLV(IOChannel& stream) throw (IOException)
+MediaHandler::isFLV(IOChannel& stream)
 {
     char head[4] = {0, 0, 0, 0};
     stream.seek(0);
