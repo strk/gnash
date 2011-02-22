@@ -661,11 +661,20 @@ AudioDecoderFfmpeg::parseInput(const boost::uint8_t* input,
     }
     else
     {
+        // democratic value for a chunk to decode...
+        // @todo this might be constrained by codec id, check that !
+        //static const unsigned int maxFrameSize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+        //static const unsigned int maxFrameSize = 2;
+        static const unsigned int maxFrameSize = 1024;
+
+        int frameSize = inputSize < maxFrameSize ? inputSize : maxFrameSize;
+
         // we assume the input is just a set of frames
         // and we'll consume all
         *outFrame = input; // frame always start on input
-        *outFrameSize = inputSize;
-        return inputSize;
+        *outFrameSize = frameSize;
+        int parsed = frameSize;
+        return parsed;
     }
 }
 
