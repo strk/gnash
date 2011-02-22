@@ -72,6 +72,16 @@ AudioDecoderGst::AudioDecoderGst(const AudioInfo& info)
         return;
     }
 
+    if (info.type == CODEC_TYPE_FLASH && info.codec == AUDIO_CODEC_ADPCM)
+    {
+        srccaps = gst_caps_new_simple ("audio/x-adpcm",
+                "rate", G_TYPE_INT, info.sampleRate,
+                "channels", G_TYPE_INT, info.stereo ? 2 : 1, 
+                "layout", G_TYPE_STRING, "swf", NULL);
+        setup(srccaps);
+        return;
+    }
+
     if (info.type == CODEC_TYPE_FLASH && info.codec == AUDIO_CODEC_AAC)
     {
         srccaps = gst_caps_new_simple ("audio/mpeg",
