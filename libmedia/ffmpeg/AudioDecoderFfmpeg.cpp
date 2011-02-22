@@ -663,9 +663,23 @@ AudioDecoderFfmpeg::parseInput(const boost::uint8_t* input,
     {
         // democratic value for a chunk to decode...
         // @todo this might be constrained by codec id, check that !
+
+        // NOTE: AVCODEC_MAX_AUDIO_FRAME_SIZE resulted bigger
+        //       than avcodec_decode_audio could handle, resulting
+        //       in eventSoundTest1.swf regression.
         //static const unsigned int maxFrameSize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-        //static const unsigned int maxFrameSize = 2;
-        static const unsigned int maxFrameSize = 1024;
+
+        // NOTE: 1024 resulted too few
+        //       to properly decode (or resample?) raw audio
+        //       thus resulting noisy (bugs #21177 and #22284)
+        //static const unsigned int maxFrameSize = 1024;
+
+        // NOTE: 96000 was found to be the max returned
+        //       by avcodec_decode_audio when passed anything
+        //       bigger than that. Works fine with all of
+        //       eventSoundTest1.swf, bug #21177 and bug #22284
+        //
+        static const unsigned int maxFrameSize = 96000;
 
         int frameSize = inputSize < maxFrameSize ? inputSize : maxFrameSize;
 
