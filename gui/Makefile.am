@@ -187,6 +187,10 @@ imagesdir = $(pkgdatadir)
 bin_SCRIPTS = gnash
 bin_PROGRAMS = 
 
+gnash: gnash.in
+	cp $(srcdir)/gnash.in $@
+	chmod +x $@
+
 if BUILD_KDE4_GUI
 bin_SCRIPTS += klash
 endif
