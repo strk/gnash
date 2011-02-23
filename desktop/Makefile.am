@@ -7,6 +7,8 @@ icons32_DATA =
 splashdir = $(pkgdatadir)
 splash_DATA = gnash-splash.swf
 
+EXTRA_DIST = $(splash_DATA) $(desktop_DATA) $(icons32_DATA)
+
 if BUILD_GTK_GUI
 desktop_DATA += gnash.desktop
 icons32_DATA += ../packaging/gnash.xpm
