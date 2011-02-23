@@ -143,15 +143,12 @@ private:
 
     // mutex protecting share state
     boost::mutex _shareMutex;
-    boost::mutex::scoped_lock _shareMutexLock;
 
     // mutex protecting shared cookies
     boost::mutex _cookieMutex;
-    boost::mutex::scoped_lock _cookieMutexLock;
 
     // mutex protecting shared dns cache
     boost::mutex _dnscacheMutex;
-    boost::mutex::scoped_lock _dnscacheMutexLock;
 
     /// Import cookies, if requested
     //
@@ -238,11 +235,8 @@ CurlSession::CurlSession()
     :
     _shandle(0),
     _shareMutex(),
-    _shareMutexLock(_shareMutex, GNASH_DEFER_LOCK), // start unlocked
     _cookieMutex(),
-    _cookieMutexLock(_cookieMutex, GNASH_DEFER_LOCK), // start unlocked
-    _dnscacheMutex(),
-    _dnscacheMutexLock(_dnscacheMutex, GNASH_DEFER_LOCK) // start unlocked
+    _dnscacheMutex()
 {
     // TODO: handle an error here (throw an exception)
     curl_global_init(CURL_GLOBAL_ALL);
@@ -305,17 +299,17 @@ CurlSession::lockSharedHandle(CURL* handle, curl_lock_data data,
     switch (data) {
     case CURL_LOCK_DATA_DNS:
 	//log_debug("Locking DNS cache mutex");
-	_dnscacheMutexLock.lock();
+	_dnscacheMutex.lock();
 	//log_debug("DNS cache mutex locked");
 	break;
     case CURL_LOCK_DATA_COOKIE:
 	//log_debug("Locking cookies mutex");
-	_cookieMutexLock.lock(); 
+	_cookieMutex.lock(); 
 	//log_debug("Cookies mutex locked");
             break;
     case CURL_LOCK_DATA_SHARE:
 	//log_debug("Locking share mutex");
-	_shareMutexLock.lock(); 
+	_shareMutex.lock(); 
 	//log_debug("Share mutex locked");
 	break;
     case CURL_LOCK_DATA_SSL_SESSION:
@@ -344,15 +338,15 @@ CurlSession::unlockSharedHandle(CURL* handle, curl_lock_data data)
     switch (data) {
     case CURL_LOCK_DATA_DNS:
 	//log_debug("Unlocking DNS cache mutex");
-	_dnscacheMutexLock.unlock();
+	_dnscacheMutex.unlock();
 	break;
     case CURL_LOCK_DATA_COOKIE:
 	//log_debug("Unlocking cookies mutex");
-	_cookieMutexLock.unlock();
+	_cookieMutex.unlock();
 	break;
     case CURL_LOCK_DATA_SHARE:
 	//log_debug("Unlocking share mutex");
-	_shareMutexLock.unlock();
+	_shareMutex.unlock();
 	break;
     case CURL_LOCK_DATA_SSL_SESSION:
 	log_error("unlockSharedHandle: SSL session locking "
