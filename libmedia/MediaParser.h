@@ -494,12 +494,16 @@ public:
 	/// @param ts will be set to timestamp of next available frame
 	/// @return false if no frame is available yet
 	///
+	/// NOTE: locks _qMutex
+	///
 	DSOEXPORT bool nextFrameTimestamp(boost::uint64_t& ts) const;
 
 	/// Get timestamp of the video frame which would be returned on nextVideoFrame
 	//
 	/// @return false if there no video frame left
 	///         (either none or no more)
+	///
+	/// NOTE: locks _qMutex
 	///
 	DSOEXPORT bool nextVideoFrameTimestamp(boost::uint64_t& ts) const;
 
@@ -516,6 +520,8 @@ public:
 	//
 	/// @return false if there no video frame left
 	///         (either none or no more)
+	///
+	/// NOTE: locks _qMutex
 	///
 	DSOEXPORT bool nextAudioFrameTimestamp(boost::uint64_t& ts) const;
 
@@ -637,18 +643,6 @@ protected:
 	///
 	void pushEncodedVideoFrame(std::auto_ptr<EncodedVideoFrame> frame);
 
-	/// Return pointer to next encoded video frame in buffer
-	//
-	/// If no video is present, or queue is empty, 0 is returned
-	///
-	const EncodedVideoFrame* peekNextVideoFrame() const;
-
-	/// Return pointer to next encoded audio frame in buffer
-	//
-	/// If no video is present, or queue is empty, 0 is returned
-	///
-	const EncodedAudioFrame* peekNextAudioFrame() const;
-
 	/// The stream used to access the file
 	std::auto_ptr<IOChannel> _stream;
 	mutable boost::mutex _streamMutex;
@@ -712,10 +706,28 @@ protected:
 	/// The parser, when obtained a lock on _streamMutex, will check this
 	/// flag, if found to be true will clear the buffers and reset to false.
 	bool _seekRequest;
+
 private:
 
 	typedef std::deque<EncodedVideoFrame*> VideoFrames;
 	typedef std::deque<EncodedAudioFrame*> AudioFrames;
+
+	/// Return pointer to next encoded video frame in buffer
+	//
+	/// If no video is present, or queue is empty, 0 is returned
+	/// 
+	/// NOTE: Caller is expected to hold a lock on _qMutex
+	/// 
+	const EncodedVideoFrame* peekNextVideoFrame() const;
+
+	/// Return pointer to next encoded audio frame in buffer
+	//
+	/// If no video is present, or queue is empty, 0 is returned
+	/// 
+	/// NOTE: Caller is expected to hold a lock on _qMutex
+	///
+	const EncodedAudioFrame* peekNextAudioFrame() const;
+
 
 	/// Queue of video frames (the video buffer)
 	//
