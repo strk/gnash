@@ -2954,7 +2954,6 @@ AC_CONFIG_LINKS(testsuite/libbase.all/gnashrc-local:testsuite/libbase.all/gnashr
 
 AC_CONFIG_FILES(
 gnash.pc:gnash.pc.in
-gui/gnash:gui/gnash.in
 gui/klash:gui/klash.in
 )
 
