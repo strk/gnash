@@ -65,18 +65,22 @@
 	The latest &app; development sources are available via git.
 	Use the following commands to check them out:
 	<programlisting>
-	mkdir gnash
-	cd gnash
 	git clone git://git.sv.gnu.org/gnash.git
+	cd gnash
 	</programlisting>
-	At any time, other temporary development branches may also
-	be available. Replace <emphasis>trunk</emphasis> with the
-	branch name to check these out.
-	You can update your copy from the main 
+	You can then update your copy from the main 
 	repository using:
 	<programlisting>
-	  cd trunk
 	  git pull
+	</programlisting>
+      </para>
+      <para>
+	At any time, other temporary development branches may also
+	be available. Replace <emphasis>exp</emphasis> with the
+	branch name to check these out.
+	<programlisting>
+	  git branch exp origin/exp
+	  git checkout exp
 	</programlisting>
       </para>
       <para>
