@@ -124,11 +124,11 @@ MediaParserGst::~MediaParserGst()
 }
 
 bool
-MediaParserGst::seek(boost::uint32_t&)
+MediaParserGst::seek(boost::uint32_t& milliseconds)
 {
-    LOG_ONCE(log_unimpl("MediaParserGst::seek()"))
-
-    return false;
+    return gst_element_seek_simple(_bin, GST_FORMAT_TIME, 
+              GstSeekFlags(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT),
+                            GST_MSECOND * milliseconds);
 }
 
 
