@@ -126,7 +126,6 @@ private:
     std::map<std::string, std::string> _options;
     int                                _streamfd;
     int                                _ichanWatchId;
-    int                                _controlfd;
     pid_t                              _childpid;
     int                                _filefd;
 

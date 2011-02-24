@@ -394,7 +394,6 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
     _height(0),
     _streamfd(-1),
     _ichanWatchId(0),
-    _controlfd(-1),
     _childpid(0),
     _filefd(-1),
     _name(),
@@ -465,8 +464,11 @@ nsPluginInstance::~nsPluginInstance()
     }
 
     if (_childpid > 0) {
-        // When the child has terminated (signaled by _controlfd), it remains
-        // as a defunct process and we remove it from the kernel table now.
+        // When the child has terminated (signaled by GTK through GtkSocket), it
+        // remains as a defunct process and we remove it from the kernel table now.
+        
+        // FIXME: we should ideally do this before the GtkSocket goes away, but
+        // after the delete signal has been sent.
         
         // If all goes well, Gnash will already have terminated.
         int status;
@@ -525,14 +527,6 @@ nsPluginInstance::shut()
             _streamfd = -1;
         }
     }
-
-    if (_controlfd != -1) {
-        _scriptObject->closePipe(_controlfd);
-        if (close(_controlfd) != 0) {
-            gnash::log_error("Gnash plugin failed to close the control socket!");
-        }
-    }
-
 
 }
 /// \brief Set the window to be used to render in
