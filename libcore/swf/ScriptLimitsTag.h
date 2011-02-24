@@ -40,8 +40,10 @@ public:
 
     virtual void executeState(MovieClip* m, DisplayList& /*dl*/) const {
 
+        LOG_ONCE( // movie_root will always log on change
         log_debug("Setting script limits: recursion %s, timeout %s",
                 _recursionLimit, _timeoutLimit);
+        );
         getRoot(*getObject(m)).setScriptLimits(_recursionLimit, _timeoutLimit);
     }
 

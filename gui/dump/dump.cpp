@@ -195,13 +195,15 @@ DumpGui::run()
 
     VirtualClock& timer = getClock();
 
+    const bool doDisplay = _fileStream.is_open();
+
     _terminate_request = false;
     while (!_terminate_request) {
 
         _manualClock.advance(clockAdvance); 
 
         // advance movie now
-        advanceMovie();
+        advanceMovie(doDisplay);
 
         writeSamples();
 

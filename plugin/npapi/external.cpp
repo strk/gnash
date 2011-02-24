@@ -20,6 +20,10 @@
 #include "gnashconfig.h"
 #endif
 
+#include <boost/algorithm/string/erase.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
+
 #include <string>
 #include <sstream>
 #include <vector>
@@ -31,8 +35,6 @@
 #include "npruntime.h"
 #include "external.h"
 #include "plugin.h"
-
-#include <boost/algorithm/string/erase.hpp>
 
 namespace gnash {
 namespace plugin {
@@ -198,19 +200,19 @@ ExternalInterface::makeObject (std::map<std::string, std::string> &args)
 //              <number>135.78</number>
 //      </arguments>
 // </invoke>
-ExternalInterface::invoke_t *
+boost::shared_ptr<ExternalInterface::invoke_t>
 ExternalInterface::parseInvoke(const std::string &xml)
 {
+    boost::shared_ptr<ExternalInterface::invoke_t> invoke;
     if (xml.empty()) {
-        return 0;
+        return invoke;
     }
-    
-    ExternalInterface::invoke_t *invoke = new invoke_t;
-    
+
+    invoke.reset(new invoke_t);
     std::string::size_type start = 0;
     std::string::size_type end;
     std::string tag;
-
+    
     // Look for the ending > in the first part of the data for the tag
     end = xml.find(">");
     if (end != std::string::npos) {
@@ -219,29 +221,45 @@ ExternalInterface::parseInvoke(const std::string &xml)
         // Look for the easy ones first
         if (tag.substr(0, 7) == "<invoke") {
             // extract the name of the method to invoke
-            start = tag.find("name=") + 5;
+            start = tag.find("name=");
+            if ( start == std::string::npos ) {
+                return invoke;
+            }
+            start += 5;
             end   = tag.find(" ", start);
+            if ( end == std::string::npos ) {
+                return invoke;
+            }
             invoke->name  = tag.substr(start, end-start);
             // Ignore any quote characters around the string
             boost::erase_first(invoke->name, "\"");
             boost::erase_last(invoke->name, "\"");
-
+            
             // extract the return type of the method
-            start = tag.find("returntype=") + 11;
+            start = tag.find("returntype=");
+            if ( start == std::string::npos ) {
+                return invoke;
+            }
+            start += 11;
             end   = tag.find(">", start);
+            if ( end == std::string::npos ) {
+                return invoke;
+            }
             invoke->type  = tag.substr(start, end-start);
             // Ignore any quote characters around the string
             boost::erase_first(invoke->type, "\"");
             boost::erase_last(invoke->type, "\"");
-
+            
             // extract the arguments to the method
             start = xml.find("<arguments>");
             end   = xml.find("</invoke");
-            tag   = xml.substr(start, end-start);
-            invoke->args = parseArguments(tag);
+            if (start != std::string::npos && end != std::string::npos) {
+                    tag   = xml.substr(start, end-start);
+                    invoke->args = parseArguments(tag);
+                }
         }
     }
-
+    
     return invoke;
 }
 
@@ -296,32 +314,36 @@ ExternalInterface::parseXML(const std::string &xml)
             STRINGN_TO_NPVARIANT(data, length, value);
         } else if (tag == "<array>") {
             NPObject *obj =  (NPObject *)NPN_MemAlloc(sizeof(NPObject));
+            obj->referenceCount = 1;
             start = end;
             end = xml.find("</array");
-            std::string str = xml.substr(start, end-start);
-            std::map<std::string, GnashNPVariant> props = parseProperties(str);
-            std::map<std::string, GnashNPVariant>::iterator it;
-            for (it=props.begin(); it != props.end(); ++it) {
-                NPIdentifier id = NPN_GetStringIdentifier(it->first.c_str());
-                GnashNPVariant& value = it->second;
-                NPN_SetProperty(NULL, obj, id, &value.get());
+            if ( end != std::string::npos )  {
+              std::string str = xml.substr(start, end-start);
+              std::map<std::string, GnashNPVariant> props = parseProperties(str);
+              std::map<std::string, GnashNPVariant>::iterator it;
+              for (it=props.begin(); it != props.end(); ++it) {
+                  NPIdentifier id = NPN_GetStringIdentifier(it->first.c_str());
+                  GnashNPVariant& value = it->second;
+                  NPN_SetProperty(NULL, obj, id, &value.get());
+              }
+              OBJECT_TO_NPVARIANT(obj, value);
             }
-            OBJECT_TO_NPVARIANT(obj, value);
-            NPN_RetainObject(obj);
         } else if (tag == "<object>") {
-            NPObject *obj =  (NPObject *)NPN_MemAlloc(sizeof(NPObject));
             start = end;
             end = xml.find("</object");
-            std::string str = xml.substr(start, end-start);
-            std::map<std::string, GnashNPVariant> props = parseProperties(str);
-            std::map<std::string, GnashNPVariant>::iterator it;
-            for (it=props.begin(); it != props.end(); ++it) {
-                NPIdentifier id = NPN_GetStringIdentifier(it->first.c_str());
-                GnashNPVariant& value = it->second;
-                NPN_SetProperty(NULL, obj, id, &value.get());
+            if ( end != std::string::npos )  {
+              NPObject *obj =  (NPObject *)NPN_MemAlloc(sizeof(NPObject));
+              obj->referenceCount = 1;
+              std::string str = xml.substr(start, end-start);
+              std::map<std::string, GnashNPVariant> props = parseProperties(str);
+              std::map<std::string, GnashNPVariant>::iterator it;
+              for (it=props.begin(); it != props.end(); ++it) {
+                  NPIdentifier id = NPN_GetStringIdentifier(it->first.c_str());
+                  GnashNPVariant& value = it->second;
+                  NPN_SetProperty(NULL, obj, id, &value.get());
+              }
+              OBJECT_TO_NPVARIANT(obj, value);
             }
-            OBJECT_TO_NPVARIANT(obj, value);
-            NPN_RetainObject(obj);
         }
     }
     
@@ -408,7 +430,10 @@ ExternalInterface::parseArguments(const std::string &xml)
     while (!data.empty()) {
         // Extract the data
         start = data.find("<", 1); // start past the opening <
-        end = data.find(">", start) + 1;
+        if (start == std::string::npos ) break;
+        end = data.find(">", start);
+        if (end == std::string::npos ) break;
+        end += 1;
         std::string sub = data.substr(0, end);
         if (data == "</arguments>") {
             break;

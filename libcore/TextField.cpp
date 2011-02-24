@@ -1426,7 +1426,8 @@ TextField::handleChar(std::wstring::const_iterator& it,
                         }
                         else if (s == "B") {
                             //bold
-                            Font* boldfont = new Font(rec.getFont()->name(),
+                            Font* boldfont =
+                                fontlib::get_font(rec.getFont()->name(),
                                     true, rec.getFont()->isItalic());
                             newrec.setFont(boldfont);
                             handleChar(it, e, x, y, newrec, last_code,
@@ -1456,10 +1457,18 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             }
                             attloc = attributes.find("FACE");
                             if (attloc != attributes.end()) {
-                                //font FACE attribute
-                                Font* newfont = new Font(attloc->second,
-                                    rec.getFont()->isBold(), rec.getFont()->isItalic());
-                                newrec.setFont(newfont);
+                                if (attloc->second.empty()) {
+                                    IF_VERBOSE_ASCODING_ERRORS(
+                                         log_aserror(_("Expected a font name in FACE attribute."))
+                                    );
+                                } else {
+                                    //font FACE attribute
+                                    Font* newfont = 
+                                        fontlib::get_font(attloc->second,
+                                        rec.getFont()->isBold(),
+                                        rec.getFont()->isItalic());
+                                    newrec.setFont(newfont);
+                                }
                             }
                             attloc = attributes.find("SIZE");
                             if (attloc != attributes.end()) {
@@ -1510,7 +1519,8 @@ TextField::handleChar(std::wstring::const_iterator& it,
                         }
                         else if (s == "I") {
                             //italic
-                            Font* italicfont = new Font(rec.getFont()->name(),
+                            Font* italicfont = 
+                                fontlib::get_font(rec.getFont()->name(),
                                     rec.getFont()->isBold(), true);
                             newrec.setFont(italicfont);
                             handleChar(it, e, x, y, newrec, last_code,

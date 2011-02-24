@@ -338,6 +338,14 @@ SDL_sound_handler::unpause()
     sound_handler::unpause();
 }
 
+void
+SDL_sound_handler::unplugInputStream(InputStream* id)
+{
+    boost::mutex::scoped_lock lock(_mutex);
+
+    sound_handler::unplugInputStream(id);
+}
+
 } // gnash.sound namespace 
 } // namespace gnash
 

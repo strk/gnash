@@ -94,6 +94,7 @@ test_LDADD  = \
 	$(NULL)
 test_SOURCES = test.cpp \
 	external.cpp
+test_CPPFLAGS = -I$(top_srcdir)/testsuite $(AM_CPPFLAGS) 
 
 noinst_HEADERS += pluginScriptObject.h \
 	callbacks.h \

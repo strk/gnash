@@ -19,10 +19,13 @@
 #ifndef GNASH_SWF_TEXTRECORD_H
 #define GNASH_SWF_TEXTRECORD_H
 
-#include "RGBA.h"
-#include "SWF.h"
 #include <string>
 #include <vector>
+#include <boost/intrusive_ptr.hpp>
+
+#include "RGBA.h"
+#include "SWF.h"
+#include "Font.h"
 
 namespace gnash {
     class movie_definition;
@@ -107,7 +110,7 @@ public:
     }
 
     // TODO: check font properly.
-    void setFont(const Font* f) {
+    void setFont(boost::intrusive_ptr<const Font> f) {
         _font = f;
     }
 
@@ -128,7 +131,7 @@ public:
 	}
 	
     const Font* getFont() const {
-        return _font;
+        return _font.get();
     }
 
     void setTextHeight(boost::uint16_t height) {
@@ -213,7 +216,7 @@ private:
     float _yOffset;
 
     /// The font associated with the TextRecord. Can be NULL.
-    const Font* _font;
+    boost::intrusive_ptr<const Font> _font;
 
 	std::string _htmlURL;
 	std::string _htmlTarget;

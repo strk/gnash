@@ -41,6 +41,7 @@ gui/fb/fb-gnash
 gui/dump/dump-gnash
 gui/*.gcda
 gui/Info.plist
+gui/pythonmod/gen-gnash.c
 libbase/gnashpluginrc
 libbase/gnashrc
 libltdl

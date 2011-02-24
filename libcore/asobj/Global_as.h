@@ -26,6 +26,7 @@
 #include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 #include <boost/preprocessor/seq/for_each.hpp>
+#include <boost/preprocessor/facilities/empty.hpp>
 #include <boost/scoped_ptr.hpp>
 
 #include "as_object.h" 
@@ -237,7 +238,7 @@ callMethod(as_object* obj, const ObjectURI& uri BOOST_PP_COMMA_IF(n)\
 
 /// The maximum number of as_value arguments allowed in callMethod functions.
 #define MAX_ARGS 4
-BOOST_PP_REPEAT(BOOST_PP_INC(MAX_ARGS), CALL_METHOD, )
+BOOST_PP_REPEAT(BOOST_PP_INC(MAX_ARGS), CALL_METHOD, BOOST_PP_EMPTY)
 
 /// Convenience function for finding a class constructor.
 //

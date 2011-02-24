@@ -21,9 +21,16 @@
 #include "gnashconfig.h"
 #endif
 
+#include <boost/format.hpp>
+#include <boost/scoped_array.hpp>
+#include <boost/algorithm/string/replace.hpp>
+#include <boost/algorithm/string/find.hpp>
+#include <cassert>
+#include <string>
 #include <cstdlib> // getenv
 #include <stdlib.h> // putenv
 #include <sys/types.h>
+
 #if defined(HAVE_WINSOCK_H) && !defined(__OS2__)
 # include <winsock2.h>
 # include <windows.h>
@@ -34,8 +41,6 @@
 # include <sys/socket.h>
 #endif
 
-#include <boost/format.hpp>
-#include <boost/algorithm/string/replace.hpp>
 
 #define MIME_TYPES_HANDLED  "application/x-shockwave-flash"
 // The name must be this value to get flash movies that check the
@@ -52,7 +57,7 @@
 
 #define PLUGIN_DESCRIPTION \
   "Shockwave Flash "FLASH_VERSION"<br>Gnash "VERSION", the GNU SWF Player. \
-  Copyright (C) 2006, 2007, 2008, 2009, 2010 \
+  Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 \
   <a href=\"http://www.fsf.org\">Free \
   Software Foundation</a>, Inc. <br> \
   Gnash comes with NO WARRANTY, to the extent permitted by law. \
@@ -388,9 +393,7 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
     _width(0),
     _height(0),
     _streamfd(-1),
-    _ichan(0),
     _ichanWatchId(0),
-    _controlfd(-1),
     _childpid(0),
     _filefd(-1),
     _name(),
@@ -461,8 +464,11 @@ nsPluginInstance::~nsPluginInstance()
     }
 
     if (_childpid > 0) {
-        // When the child has terminated (signaled by _controlfd), it remains
-        // as a defunct process and we remove it from the kernel table now.
+        // When the child has terminated (signaled by GTK through GtkSocket), it
+        // remains as a defunct process and we remove it from the kernel table now.
+        
+        // FIXME: we should ideally do this before the GtkSocket goes away, but
+        // after the delete signal has been sent.
         
         // If all goes well, Gnash will already have terminated.
         int status;
@@ -521,14 +527,6 @@ nsPluginInstance::shut()
             _streamfd = -1;
         }
     }
-
-    if (_controlfd != -1) {
-        _scriptObject->closePipe(_controlfd);
-        if (close(_controlfd) != 0) {
-            gnash::log_error("Gnash plugin failed to close the control socket!");
-        }
-    }
-
 
 }
 /// \brief Set the window to be used to render in
@@ -712,7 +710,6 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
         // looping here forever, so this is our escape from that loop.
         if (retries-- <= 0) {
             gnash::log_error("Too many attempts to read from the player!");
-            return false;
         }
         error = 0;
         request = 0;
@@ -722,11 +719,12 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
         switch (status) {
           case G_IO_STATUS_ERROR:
               gnash::log_error("error reading request line: %s",
-                               error->message);
+                               error ? error->message : "unspecified error");
               g_error_free(error);
               return false;
           case G_IO_STATUS_EOF:
-              gnash::log_error("EOF (error: %s", error->message);
+              gnash::log_error("EOF (error: %s)", 
+                               error ? error->message : "unspecified error");
               g_error_free(error);
               return false;
           case G_IO_STATUS_AGAIN:
@@ -756,6 +754,8 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
     return true;
 }
 
+// There may be multiple Invoke messages in a single packet, so each
+// packet needs to be broken up into separate messages to be parsed.
 bool
 nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
 {
@@ -767,23 +767,45 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
         if (buf) {
             gnash::log_error("Invalid player request (too short): %s", buf);
         } else {
-            gnash::log_error("Invalid player request (too short): %d bytes", linelen);
+            gnash::log_error("Invalid player request (too short): %d bytes",
+                    linelen);
         }
         return false;
     }
-    
-    plugin::ExternalInterface::invoke_t *invoke = plugin::ExternalInterface::parseInvoke(buf);
 
-    if (!invoke->name.empty()) {
-        gnash::log_debug("Requested method is: %s", invoke->name);
-    }
-    
-    // The invoke message is also used for getURL. In this case there are 4
-    // possible arguments.
-    if (invoke) {
+    std::string packet(buf, linelen);
+    do {
+        std::string term = "</invoke>";
+        std::string::size_type pos = packet.find(term);
+        // no terminator, bad message
+        if (pos == std::string::npos) {
+            gnash::log_error("No terminator, bad Invoke message");
+            return false;
+        }
+        // Extract a message from the packet
+        std::string msg = packet.substr(0, pos + term.size());
+        boost::shared_ptr<plugin::ExternalInterface::invoke_t> invoke =
+            plugin::ExternalInterface::parseInvoke(msg);
+
+        // drop the parsed message from the packet
+        packet.erase(0, msg.size());
+        
+        if (!invoke) {
+            return false;
+        }
+
+        // size_t invoke_size = invoke->name.size() + invoke->type.size() +
+        //     (invoke->args.size() * sizeof(GnashNPVariant));
+        
+        if (!invoke->name.empty()) {
+            gnash::log_debug("Requested method is: %s", invoke->name);
+        }
+        
         if (invoke->name == "getURL") {
             // gnash::log_debug("Got a getURL() request: %", invoke->args[0].get());
-
+            
+            assert(invoke->args.size() > 1);
+            
             // The first argument is the URL string.
             std::string url = NPStringToString(NPVARIANT_TO_STRING(
                                                    invoke->args[0].get()));
@@ -791,19 +813,23 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
             std::string op = NPStringToString(NPVARIANT_TO_STRING(
                                                   invoke->args[1].get()));
             // The third is the optional target, which is something like
-            // _blank or _self. NONE means no target.
+            // _blank or _self.
             std::string target;
+            
             // The fourth is the optional data. If there is data, the target
             // field is always set so this argument is on the correct index.
-            // No target is "NONE".
             std::string data;
+            
             if (invoke->args.size() >= 3) {
                 target = NPStringToString(NPVARIANT_TO_STRING(
                                               invoke->args[2].get()));
-                if (target == "NONE") {
-                    target.clear();
-                }
             }
+            
+            // An empty target defaults to "_self"
+            // This is _required_ for chromium,
+            // see https://savannah.gnu.org/bugs/?32425
+            if ( target.empty() ) target = "_self";
+            
             if (invoke->args.size() == 4) {
                 data = NPStringToString(NPVARIANT_TO_STRING(
                                             invoke->args[3].get()));
@@ -822,6 +848,8 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
             
             return true;
         } else if (invoke->name == "fsCommand") {
+            
+            assert(invoke->args.size() > 1);
             std::string command = NPStringToString(NPVARIANT_TO_STRING(
                                                        invoke->args[0].get()));
             std::string arg = NPStringToString(NPVARIANT_TO_STRING(
@@ -840,6 +868,8 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
             NPN_GetURL(_instance, jsurl.str().c_str(), tgt);
             return true;
         } else if (invoke->name == "addMethod") {
+            
+            assert(!invoke->args.empty());
             // Make this flash function accessible to Javascript. The
             // actual callback lives in libcore/movie_root, but it
             // needs to be on the list of supported remote methods so
@@ -851,28 +881,28 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
             this->getScriptObject()->AddMethod(id, remoteCallback);
             return true;
         }
+        
         NPVariant result;
         VOID_TO_NPVARIANT(result);
-        bool invokeResult=false;
+        bool invokeResult = false;
+        
         // This is the player invoking a method in Javascript
-        if (!invoke->name.empty()) {
+        if (!invoke->name.empty() && !invoke->args.empty()) {
             //Convert the as_value argument to NPVariant
-            uint32_t count = invoke->args.size();
-            if(count!=0) //The first argument should exists and be the method name
-            {
-                count--;
-                NPVariant* args = new NPVariant[count];
-                //Skip the first argument
-                for(uint32_t i=0;i<count;i++)
-                    invoke->args[i+1].copy(args[i]);
-                NPIdentifier id = NPN_GetStringIdentifier(invoke->name.c_str());
-                gnash::log_debug("Invoking JavaScript method %s", invoke->name);
-                NPObject* windowObject;
-                NPN_GetValue(_instance, NPNVWindowNPObject, &windowObject);
-                invokeResult=NPN_Invoke(_instance, windowObject, id, args, count, &result);
-                NPN_ReleaseObject(windowObject);
-                delete[] args;
+            const size_t count = invoke->args.size() - 1;
+            boost::scoped_array<NPVariant> args(new NPVariant[count]);
+            //Skip the first argument
+            for (size_t i = 0; i < count; ++i) {
+                invoke->args[i+1].copy(args[i]);
             }
+            
+            NPIdentifier id = NPN_GetStringIdentifier(invoke->name.c_str());
+            gnash::log_debug("Invoking JavaScript method %s", invoke->name);
+            NPObject* windowObject;
+            NPN_GetValue(_instance, NPNVWindowNPObject, &windowObject);
+            invokeResult=NPN_Invoke(_instance, windowObject, id, args.get(),
+                                    count, &result);
+            NPN_ReleaseObject(windowObject);
         }
         // We got a result from invoking the Javascript method
         std::stringstream ss;
@@ -889,13 +919,9 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
             log_error("Couldn't write the response to Gnash, network problems.");
             return false;
         }
-        return true;
-    } else {
-        gnash::log_error("Unknown player request: " + std::string(buf));
-        return false;
-    }
-
-    return false;
+    } while (!packet.empty());
+    
+    return true;
 }
 
 std::string
@@ -929,7 +955,6 @@ getGnashExecutable()
         gnash::log_error(std::string("Unable to find Gnash in ") + GNASHBINDIR);
         return "";
     }
-
 
     return procname;
 }
@@ -1258,6 +1283,7 @@ nsPluginInstance::startProc()
                                        (GIOCondition)(G_IO_IN|G_IO_HUP), 
                                        (GIOFunc)handlePlayerRequestsWrapper,
                                        this);
+        g_io_channel_unref(ichan);
         return;
     }
     

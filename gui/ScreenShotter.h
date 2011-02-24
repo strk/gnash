@@ -23,6 +23,8 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <set>
+#include <algorithm>
+#include <boost/lexical_cast.hpp>
 
 #include "GnashEnums.h"
 
@@ -57,7 +59,9 @@ public:
         _last = true;
     }
 
-    /// Called on the last frame before exit.
+    struct NoAction { void operator()() const {} };
+
+    /// To be called on the last frame before exit.
     //
     /// @param r                The renderer to use to render the image.
     //
@@ -65,7 +69,28 @@ public:
     /// the SWF loops, whether a timeout was requested or a maximum number of
     /// advances set. Those conditions are not knowable in advance, so
     /// the last frame is a special case.
-    void last(const Renderer& r) const;
+    void last(const Renderer& r) const {
+        last<NoAction>(r);
+    }
+
+    /// To be called on the last frame before exit.
+    //
+    /// @tparam Action          The functor to call only when a screenshot is
+    ///                         due. 
+    /// @param r                The renderer to use to render the image.
+    //
+    /// Which frame is last depends on the execution path of the SWF, whether
+    /// the SWF loops, whether a timeout was requested or a maximum number of
+    /// advances set. Those conditions are not knowable in advance, so
+    /// the last frame is a special case.
+    template<typename Action>
+    void last(const Renderer& r, Action* t = 0) const
+    {
+        if (_last) {
+            if (t) (*t)();
+            saveImage(r, "last");
+        }
+    }
 
     /// Takes a screenshot if required.
     //
@@ -74,7 +99,39 @@ public:
     /// @param frameAdvance     used to check whether a screenshot is required
     ///                         as well as to construct the filename.
     /// @param r                The renderer to use to render the image.
-    void screenShot(const Renderer& r, size_t frameAdvance);
+    void screenShot(const Renderer& r, size_t frameAdvance) {
+        screenShot<NoAction>(r, frameAdvance);
+    }
+
+    /// Takes a screenshot if required.
+    //
+    /// Called on each advance, invoking a functor before any screenshot is
+    /// taken.
+    //
+    /// @tparam Action          The functor to call only when a screenshot is
+    ///                         due. 
+    /// @param frameAdvance     used to check whether a screenshot is required
+    ///                         as well as to construct the filename.
+    /// @param r                The renderer to use to render the image.
+    template<typename Action>
+    void screenShot(const Renderer& r, size_t frameAdvance, Action* t = 0) {
+        // Save an image if a spontaneous screenshot was requested or the
+        // frame is in the list of requested frames.
+        if (_immediate || std::binary_search(_frames.begin(), _frames.end(),
+                    frameAdvance)) {
+
+            // Check whether we've rendered an image for this frame.
+            if (_done.find(frameAdvance) != _done.end()) {
+                return;
+            }
+            if (t) (*t)();
+            _done.insert(frameAdvance);
+
+            saveImage(r, boost::lexical_cast<std::string>(frameAdvance));
+            _immediate = false;
+        }
+        
+    }
 
     /// Request a list of frames to be rendered to image files.
     void setFrames(const FrameList& frames);

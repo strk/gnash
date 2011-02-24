@@ -16,7 +16,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
 AC_PREREQ(2.50)
-AC_INIT(gnash, 0.8.9)
+AC_INIT(gnash, 0.8.9rc2)
 AC_CONFIG_SRCDIR([libcore/as_object.h])
 AC_CONFIG_HEADERS([gnashconfig.h])
 AC_CONFIG_MACRO_DIR([macros])
@@ -2952,9 +2952,13 @@ AC_CONFIG_LINKS(cygnal/testsuite/cygnal.all/cygnalrc:cygnal/testsuite/cygnal.all
 AC_CONFIG_LINKS(testsuite/libbase.all/gnashrc:testsuite/libbase.all/gnashrc.in)
 AC_CONFIG_LINKS(testsuite/libbase.all/gnashrc-local:testsuite/libbase.all/gnashrc-local.in)
 
-AC_CONFIG_FILES(gnash.pc:gnash.pc.in)
+AC_CONFIG_FILES(
+gnash.pc:gnash.pc.in
+gui/klash:gui/klash.in
+)
 
 AC_OUTPUT(Makefile
+desktop/Makefile
 po/Makefile
 libltdl/Makefile
 libmedia/Makefile

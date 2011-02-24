@@ -61,20 +61,30 @@ VideoFrameTag::loader(SWFStream& in, SWF::TagType tag, movie_definition& m,
         return;
     }
 
-	// TODO: skip if there's no MediaHandler registered ?
+    // TODO: skip if there's no MediaHandler registered ?
 
     const unsigned short padding = 8;
 
-	in.ensureBytes(2);
-	unsigned int frameNum = in.read_u16(); 
+    in.ensureBytes(3);
+    unsigned int frameNum = in.read_u16();
+
+    const media::VideoInfo* info = vs->getVideoInfo();
+
+    if (info && info->codec == media::VIDEO_CODEC_SCREENVIDEO) {
+        // According to swfdec, every SV frame comes with keyframe
+        // and format identifiers (4 bits each), but these are not
+        // part of the codec bitstream and break the decoder.
+        (void) in.read_u8();
+    }
+
 	
-	const unsigned int dataLength = in.get_tag_end_position() - in.tell();
+    const unsigned int dataLength = in.get_tag_end_position() - in.tell();
 
     // FIXME: catch bad_alloc
-	boost::uint8_t* buffer = new boost::uint8_t[dataLength + padding]; 
+    boost::uint8_t* buffer = new boost::uint8_t[dataLength + padding]; 
 
-	const size_t bytesRead = in.read(reinterpret_cast<char*>(buffer),
-            dataLength);
+    const size_t bytesRead = in.read(reinterpret_cast<char*>(buffer),
+                                     dataLength);
 
     if (bytesRead < dataLength)
     {
@@ -85,12 +95,12 @@ VideoFrameTag::loader(SWFStream& in, SWF::TagType tag, movie_definition& m,
 	
     std::fill_n(buffer + bytesRead, padding, 0);
 
-	using namespace media;
+    using namespace media;
 
     std::auto_ptr<EncodedVideoFrame> frame(
             new EncodedVideoFrame(buffer, dataLength, frameNum));
 
-	vs->addVideoFrameTag(frame);
+    vs->addVideoFrameTag(frame);
 }
 
 } // namespace SWF

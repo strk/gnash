@@ -706,13 +706,6 @@ private:
     ///
     void restoreDisplayList(size_t targetFrame);
 
-    /// Execute the actions in the action list
-    //
-    /// The list of action will be consumed starting from the first
-    /// element. When the function returns the list should be empty.
-    ///
-    void execute_actions(ActionList& action_list);
-
     /// Increment _currentFrame, and take care of looping.
     void increment_frame_and_check_for_loop();
 

@@ -878,7 +878,7 @@ AOS4Gui::showAboutDialog(void)
     					LIBAVCODEC_IDENT
 #endif
 						"\n\nCopyright (C) 2005, 2006, 2007, "
-            			"2008, 2009, 2010 The Free Software Foundation"
+            			"2008, 2009, 2010, 2011 The Free Software Foundation"
 						"\n\nAmigaOS4 Version by Andrea Palmate' - http://www.amigasoft.net";
 
 	PrintMsg(about);

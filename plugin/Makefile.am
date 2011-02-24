@@ -55,3 +55,14 @@ endif
 else	# windoze
 	: # do nothing
 endif	# end of if windoze
+
+uninstall-plugins: 
+if NPAPI
+	$(MAKE) -C npapi $@
+endif
+if KPARTS4
+	$(MAKE) -C klash4 $@
+endif
+if KPARTS3
+	$(MAKE) -C klash $@
+endif

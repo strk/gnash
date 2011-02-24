@@ -124,7 +124,7 @@ SDLGui::run()
             SDL_Delay(delay);
         }
 
-        Gui::advance_movie(this);
+        advanceMovie();
         movie_time += _interval;        // Time next frame should be displayed
     }
     return false;

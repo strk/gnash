@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include <iostream>
 #include "URL.h"
 
+#include <iostream>
 #include <string>
 #include <cstring>
 #include <vector>
@@ -26,7 +26,9 @@
 #include <sstream>
 #include <algorithm>
 #include <cerrno>
-#include <GnashException.h>
+#include <boost/tokenizer.hpp>
+#include <boost/scoped_array.hpp>
+#include <cctype>
 
 // This is for getcwd(2) 
 
@@ -36,8 +38,7 @@
 # include <direct.h>
 #endif
 
-#include <boost/tokenizer.hpp>
-#include <boost/scoped_array.hpp>
+#include "GnashException.h"
 
 namespace gnash {
 
@@ -409,21 +410,21 @@ URL::decode(std::string& input)
 
     for (unsigned int i=0; i<input.length(); i++) {
         if (input[i] == '%' && (input.length() > i + 2) &&
-            isxdigit(input[i+1]) && isxdigit(input[i+2])) {
-            input[i+1] = toupper(input[i+1]);
-            input[i+2] = toupper(input[i+2]);
-            if (isdigit(input[i+1])) {
+            std::isxdigit(input[i+1]) && std::isxdigit(input[i+2])) {
+            input[i+1] = std::toupper(input[i+1]);
+            input[i+2] = std::toupper(input[i+2]);
+            if (std::isdigit(input[i+1])) {
                 hexcode = (input[i+1] - '0') * 16;
             } else {
                 hexcode = (input[i+1] - 'A' + 10) * 16;
             }
             
-            if (isdigit(input[i+2])) {
+            if (std::isdigit(input[i+2])) {
                 hexcode += (input[i+2] - '0');
             } else {
                 hexcode += (input[i+2] - 'A' + 10);
             }
-            input[i] = (char)hexcode;
+            input[i] = hexcode;
             input.erase(i+1, 2);
         } else if ( input[i] == '+' ) {
             input[i] = ' ';

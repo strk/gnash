@@ -183,8 +183,13 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 
         switch(info.codec)
         {
+            case AUDIO_CODEC_UNCOMPRESSED:
             case AUDIO_CODEC_RAW:
-                codec_id = CODEC_ID_PCM_U16LE;
+                if (info.sampleSize == 2) {
+                    codec_id = CODEC_ID_PCM_S16LE;
+                } else {
+                    codec_id = CODEC_ID_PCM_S8;
+                }
                 break;
 
             case AUDIO_CODEC_ADPCM:
@@ -301,12 +306,14 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
             case CODEC_ID_MP3:
                 break;
 
-            case CODEC_ID_PCM_U16LE:
+            case CODEC_ID_PCM_S8:
+                // Either FFMPEG or the parser are getting this wrong.
+                _audioCodecCtx->sample_rate = info.sampleRate / 2;
+                _audioCodecCtx->channels = (info.stereo ? 2 : 1);
+                break;
+            case CODEC_ID_PCM_S16LE:
                 _audioCodecCtx->channels = (info.stereo ? 2 : 1);
                 _audioCodecCtx->sample_rate = info.sampleRate;
-                // was commented out (why?):
-                _audioCodecCtx->sample_fmt = SAMPLE_FMT_S16;
-                _audioCodecCtx->frame_size = 1; 
                 break;
 
             default:
@@ -663,9 +670,23 @@ AudioDecoderFfmpeg::parseInput(const boost::uint8_t* input,
     {
         // democratic value for a chunk to decode...
         // @todo this might be constrained by codec id, check that !
+
+        // NOTE: AVCODEC_MAX_AUDIO_FRAME_SIZE resulted bigger
+        //       than avcodec_decode_audio could handle, resulting
+        //       in eventSoundTest1.swf regression.
         //static const unsigned int maxFrameSize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-        //static const unsigned int maxFrameSize = 2;
-        static const unsigned int maxFrameSize = 1024;
+
+        // NOTE: 1024 resulted too few
+        //       to properly decode (or resample?) raw audio
+        //       thus resulting noisy (bugs #21177 and #22284)
+        //static const unsigned int maxFrameSize = 1024;
+
+        // NOTE: 96000 was found to be the max returned
+        //       by avcodec_decode_audio when passed anything
+        //       bigger than that. Works fine with all of
+        //       eventSoundTest1.swf, bug #21177 and bug #22284
+        //
+        static const unsigned int maxFrameSize = 96000;
 
         int frameSize = inputSize < maxFrameSize ? inputSize : maxFrameSize;
 

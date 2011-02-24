@@ -140,7 +140,7 @@ public:
 	}
 
 	/// Overridden just for complaining  about malformed SWF
-	virtual void add_font(int /*id*/, Font* /*ch*/)
+	virtual void add_font(int /*id*/, boost::intrusive_ptr<Font> /*ch*/)
 	{
 		IF_VERBOSE_MALFORMED_SWF (
 		log_swferror(_("add_font tag appears in sprite tags"));

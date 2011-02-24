@@ -195,23 +195,6 @@ public:
 	///	pre-existing DisplayObject at the same depth.
 	void add(DisplayObject* ch, bool replace);
 
-    /// Removes the specified DisplayObject
-    //
-    /// Other DisplayObjects are left untouched.
-    /// This implements AS3 DisplayObjectContainer.removeChild().
-    //
-    /// @param obj      The DisplayObject to remove.
-    void removeDisplayObject(DisplayObject* obj);
-
-    /// Removes the DisplayObject at the specified index
-    //
-    /// Other DisplayObjects are left untouched.
-    /// This implements AS3 DisplayObjectContainer.removeChildAt().
-    //
-    /// @param index    The index from which to remove the DisplayObject.
-    /// @return         The DisplayObject removed, or 0 if none was removed.
-    DisplayObject* removeDisplayObjectAt(int index);
-
     /// Inserts a DisplayObject at the specified index (depth)
     //
     /// If a DisplayObject is already at that index, it is moved up.
@@ -223,16 +206,6 @@ public:
     ///                 owner.
     /// @param index    The index at which to insert the DisplayObject.
     void insertDisplayObject(DisplayObject* obj, int index);
-
-    /// Adds a DisplayObject at the top of the DisplayList.
-    //
-    /// This implements AS3 DisplayObjectContainer.addChild().
-    //
-    /// @param obj      The DisplayObject to insert. This should already be
-    ///                 removed from any other DisplayLists. It should not be
-    ///                 the owner of this DisplayList or any parent of that
-    ///                 owner.
-    void addDisplayObject(DisplayObject* obj);
 
 	/// Display the list's DisplayObjects.
     //
@@ -287,9 +260,6 @@ public:
 	/// TODO: inspect if worth providing an arg to skip removed
 	template <class V> inline void visitAll(V& visitor);
 	template <class V> inline void visitAll(V& visitor) const;
-
-	/// dump list to logfile/stderr
-	void dump() const;
 
     /// Like DisplayObject_instance::add_invalidated_bounds() this method calls the
     /// method with the same name of all childs.	

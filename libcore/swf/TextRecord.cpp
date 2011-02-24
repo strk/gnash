@@ -77,7 +77,7 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
         {
             IF_VERBOSE_PARSE(
                 log_parse(_("  has_font: font id = %d (%p)"), fontID,
-                    (void*)_font);
+                    _font.get());
             );
         } 
     }

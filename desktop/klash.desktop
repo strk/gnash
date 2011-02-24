@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Gnash SWF Viewer for KDE
+GenericName=SWF Viewer
+Comment=View SWF Files
+Icon=klash
+Exec=klash %U
+Terminal=false
+Categories=AudioVideo;Qt;KDE;
+MimeType=application/x-shockwave-flash;application/futuresplash;

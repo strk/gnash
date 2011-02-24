@@ -111,7 +111,7 @@ main(int /*argc*/, char** /*argv*/)
 		{
 			check(!"loadTarget was never loaded");
 			cerr << "Root display list is: " << endl;
-			root->getDisplayList().dump();
+            std::cerr << root->getDisplayList();
 			exit(EXIT_FAILURE);
 		}
 

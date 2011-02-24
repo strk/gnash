@@ -36,17 +36,18 @@ namespace {
  
 /// This may need a reference to its owner as_object
 //
-/// TODO: is BitmapFilter GC collected?
+/// TODO: is BitmapFilter GC collected? Not currently (see libcore/Filters.h)
 class BitmapFilter_as : public Relay
 {
 public:
     BitmapFilter_as()
-        :
-        _filter(new BitmapFilter)
+        //: _filter(new BitmapFilter)
     {}
 
+    // ~BitmapFilter_as() { delete _filter; }
+
 private:
-    BitmapFilter* _filter;
+    //BitmapFilter* _filter;
 };
 
 

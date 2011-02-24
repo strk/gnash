@@ -74,7 +74,7 @@ MediaParserGst::MediaParserGst(std::auto_ptr<IOChannel> stream)
     SimpleTimer timer;
 
     size_t counter = 0;
-    while (!probingConditionsMet(timer)) {
+    while (!probingConditionsMet(timer) && !_stream->eof() && !_stream->bad()) {
 
         if (!pushGstBuffer()) {
             ++counter;
@@ -141,7 +141,7 @@ MediaParserGst::parseNextChunk()
 
     // FIXME: our caller check for _parsingComplete prior
     //        to call parseNextChunk
-    if (_stream->eof()) {
+    if (_stream->eof() || _stream->bad()) {
         //log_debug (_("Stream EOF, emitting!"));
         _parsingComplete = true;
         return false;
@@ -174,24 +174,18 @@ MediaParserGst::pushGstBuffer()
 
     std::streamoff ret = _stream->read(GST_BUFFER_DATA(buffer), PUSHBUF_SIZE);
 
-    if (ret == 0) {
-        if (!_stream->eof()) {
-            log_error(_("MediaParserGst failed to read the stream, but did not "
-                      "reach EOF!"));
+    if (ret < PUSHBUF_SIZE) {
+        if (!_stream->eof() && !_stream->bad()) {
+            log_error(_("MediaParserGst failed to read the stream, but it did"
+                      " not reach EOF or enter a bad state."));
         } else {
             _parsingComplete = true;
         }
-        gst_buffer_unref(buffer);
-        return false;
-    }
 
-    if (ret < PUSHBUF_SIZE) {
-        if (!_stream->eof()) {
-            log_error(_("MediaParserGst failed to read the stream, but did not "
-                      "reach EOF!"));
-        } else {
-            _parsingComplete = true;
-        }       
+        if (!ret) {
+            gst_buffer_unref(buffer);
+            return false;
+        }
 
         GST_BUFFER_SIZE(buffer) = ret;
     }

@@ -21,15 +21,16 @@
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
-#include "smart_ptr.h" 
 #include "Font.h"
+
+#include <utility> 
+#include <memory>
+
+#include "smart_ptr.h" 
 #include "log.h"
 #include "ShapeRecord.h"
 #include "DefineFontTag.h"
 #include "FreetypeGlyphsProvider.h"
-
-#include <utility> // for std::make_pair
-#include <memory>
 
 namespace gnash {
 
@@ -44,12 +45,12 @@ class CodeLookup
 public:
     CodeLookup(const int glyph) : _glyph(glyph) {}
 
-    bool operator()(const std::pair<const boost::uint16_t, int>& p) {
+    bool operator()(const std::pair<const boost::uint16_t, int>& p) const {
         return p.second == _glyph;
     }
 
 private:
-    int _glyph;
+    const int _glyph;
 };
 
 }
@@ -83,7 +84,9 @@ Font::Font(std::auto_ptr<SWF::DefineFontTag> ft)
     _italic(_fontTag->italic()),
     _bold(_fontTag->bold())
 {
-    if (_fontTag->hasCodeTable()) _embeddedCodeTable = _fontTag->getCodeTable();
+    if (_fontTag->hasCodeTable()) {
+        _embeddedCodeTable = _fontTag->getCodeTable();
+    }
 }
 
 Font::Font(const std::string& name, bool bold, bool italic)
@@ -160,8 +163,7 @@ Font::setFlags(boost::uint8_t flags)
 void
 Font::setCodeTable(std::auto_ptr<CodeTable> table)
 {
-    if (_embeddedCodeTable)
-    {
+    if (_embeddedCodeTable) {
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("Attempt to add an embedded glyph CodeTable to "
                     "a font that already has one. This should mean there "
@@ -191,7 +193,16 @@ Font::codeTableLookup(int glyph, bool embedded) const
     
     CodeTable::const_iterator it = std::find_if(ctable.begin(), ctable.end(),
             CodeLookup(glyph));
-    assert (it != ctable.end());
+
+    if (it == ctable.end()) {
+        // NB: this occurs with a long and complex SWF (bug #32537)
+        // that defines the same font twice and ends up with a glyph
+        // table shorter than the number of glyphs. We don't know
+        // whether it's a SWF or a Gnash bug.
+        log_error("Failed to find glyph %s in %s font %s",
+                glyph, embedded ? "embedded" : "device", _name);
+        return 0;
+    }
     return it->first;
 }
 

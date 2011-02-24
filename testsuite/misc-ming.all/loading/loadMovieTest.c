@@ -87,10 +87,33 @@ add_clip(SWFMovie mo, char* file, char* name,
 	/* "Click" handler */
 	snprintf(action,  1023,
 		"%s.onPress = function () { "
-		"	coverart.loadMovie('%s');"
-		"	_level0.expectLoaded = '%s';" 
+		"  if ( _root.clicks < 3 ) {"
+		"    coverart.loadMovie('%s');"
+		"    _level0.loadMethod = 'MovieClip.loadMovie';" 
+		"  } else if ( _root.clicks < 6 ) {"
+		"    loadMovie('%s', '_level0.cont.coverart');" /* Uses GETURL */
+		"    _level0.loadMethod = 'GETURL, target:_level0.cont.coverart';"
+		"  } else if ( _root.clicks < 9 ) {"
+		"    loadMovie('%s', '/cont/coverart');" /* Uses GETURL tag */
+		"    _level0.loadMethod = 'GETURL, target:/cont/coverart';"
+#define SKIP_FAILING 1
+#ifndef SKIP_FAILING
+// This is disabled as gnash fails
+		"  } else if ( _root.clicks < 12 ) {"
+		"    loadMovie('%s', '_level0.coverart');" /* Uses GETURL */
+		"    _level0.loadMethod = 'GETURL, target:_level0.coverart';"
+#endif
+		"  } else {"
+		"    _root.note('You are not supposed to be clicking anymore');"
+		"    return;"
+		"  }"
+		" _level0.expectLoaded = '%s';" 
 		"};"
-		,name, url, fname);
+		, name, url, url, url,
+#ifndef SKIP_FAILING
+		url,
+#endif
+		fname);
 
 	ac = compileSWFActionCode(action);
 
@@ -102,9 +125,10 @@ add_coverart(SWFMovie mo, int x, int y)
 {
 	SWFShape sh_coverart;
 	SWFFillStyle fstyle;
+	SWFMovieClip mc_coverart_cont;
 	SWFMovieClip mc_coverart;
 	SWFDisplayItem it;
-#define BUFSIZE 1024
+#define BUFSIZE 2048
 	char buf[BUFSIZE];
 
 	sh_coverart = newSWFShape();
@@ -124,9 +148,12 @@ add_coverart(SWFMovie mo, int x, int y)
 	));
 	SWFMovieClip_nextFrame(mc_coverart); /* showFrame */
 
-	it = SWFMovie_add(mo, (SWFBlock)mc_coverart);
+	mc_coverart_cont = newSWFMovieClip();
+	it = SWFMovieClip_add(mc_coverart_cont, (SWFBlock)mc_coverart);
+	SWFDisplayItem_setDepth(it, 8);
 	SWFDisplayItem_setName(it, "coverart"); 
 	SWFDisplayItem_moveTo(it, x, y);
+
 
 	snprintf(buf, BUFSIZE,
 		//"_root.note(this+'.on(RollOver) ... ');"
@@ -143,15 +170,34 @@ add_coverart(SWFMovie mo, int x, int y)
 		"  _root.check_equals(lastUrlComponent, _level0.expectLoaded, '%s:%d');"
 		"  _root.check_equals(this.getDepth(), -16376);"
 		"  _root.check_equals(this.getBytesLoaded(), this.getBytesTotal());"
-		"  _root.check(this.getBytesLoaded() > 0);" /* assuming something was loaded here */
-		"  _root.note('bytesLoaded: '+this.getBytesLoaded());"
-		"  if ( Key.isDown(Key.SHIFT) ) { "
-		"	trace('SHIFT-click on coverart...');"
-		//"	_root.note('SHIFT-click on coverart...');"
-		"	_root.totals(26, '"__FILE__"');"
-		"	_root.END_OF_TEST = true;"
-		" }"
-		"  else _root.note('2 tests run');"
+		/* assuming something was loaded here */
+		"  _root.check(this.getBytesLoaded() > 0);"
+		"  _root.clicks++;"
+
+		"  if ( _root.clicks < 4 ) {"
+		"    _root.check_equals(_root.loadMethod, "
+		"       'MovieClip.loadMovie');" 
+		"  } else if ( _root.clicks < 7 ) {"
+		"    _root.check_equals(_root.loadMethod, "
+		"         'GETURL, target:_level0.cont.coverart');" 
+		"  } else if ( _root.clicks < 10 ) {"
+		"    _root.check_equals(_root.loadMethod, "
+		"         'GETURL, target:/cont/coverart');" 
+		"  } else if ( _root.clicks < 13 ) {"
+		"    _root.check_equals(_root.loadMethod, "
+		"         'GETURL, target:_level0.coverart');" 
+		"  }"
+
+		"  if ( _root.clicks < 9 ) {"
+		"    _root.note(Math.floor(_root.clicks/3)+'.'+"
+		"    _root.clicks%%3+': Click on the '+"
+		"      _root.imagenames[_root.clicks%%3]+' image.' +"
+		"      ' Wait for it to appear on the right, then click on it.');"
+		"  } else {"
+		"    _root.note('The test is over');"
+		"    _root.totals(67, '"__FILE__"');"
+		"    _root.END_OF_TEST = true;"
+		"  }"
 		"};"
 		, __FILE__, __LINE__);
 
@@ -164,6 +210,11 @@ add_coverart(SWFMovie mo, int x, int y)
 		"delete _level0.coverart.onMouseDown;"
 		),
 		SWFACTION_ROLLOUT);
+
+
+	SWFMovieClip_nextFrame(mc_coverart_cont); /* showFrame */
+	it = SWFMovie_add(mo, (SWFBlock)mc_coverart_cont);
+	SWFDisplayItem_setName(it, "cont"); 
 
 }
 
@@ -296,7 +347,7 @@ main(int argc, char** argv)
 	add_button(mo, 50, 220, "Clear", newSWFAction(
 				" art=_root.coverart;"
 				" for (i=0; i<art.lastdepth; ++i) {"
-				"  removeMovieClip('_root.coverart.child'+i);" 
+				"  removeMovieClip('_root.cont.coverart.child'+i);" 
 				" }"
 				" art.lastdepth=0;"
 				" art.clear(); "
@@ -320,9 +371,13 @@ main(int argc, char** argv)
 	add_coverart(mo, 600, 100);
 
 	add_actions(mo,
-		"note('Click on each image to load it into the container on the right.');"
-		"note('After each load, click on the container.');"
-		"note('Finally, shift-click on the container to get results printed.');"
+		"_root.imagenames = ['first','second','third'];"
+		"_root.clicks = 0;"
+		"_root.check_equals(typeof(_level0.cont), 'movieclip');"
+		"_root.check_equals(typeof(_level0.cont.coverart), 'movieclip');"
+		"_root.coverart = _level0.cont.coverart;"
+		"note('0.0: Click on the '+_root.imagenames[_root.clicks]+' image.'+"
+		"      ' Wait for it to appear on the right, then click on it.');"
 		"_level0.expectLoaded = 'loadMovieTest.swf';" 
 		// TODO: add self-contained tests after each load
 		//       like for the DragAndDropTest.as movie

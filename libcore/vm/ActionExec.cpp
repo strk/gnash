@@ -295,7 +295,7 @@ ActionExec::operator()()
                 // Check for script limits hit. 
                 // See: http://www.gnashdev.org/wiki/index.php/ScriptLimits
                 if (clock.elapsed() > maxTime) {
-                    boost::format fmt(_("Time exceeded"));
+                    boost::format fmt = boost::format(_("Time exceeded while executing code in %1%")) % code.getMovieDefinition().get_url();
                     throw ActionLimitException(fmt.str());
                 }
                 // TODO: Run garbage collector ? If stack isn't too big ?

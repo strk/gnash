@@ -107,11 +107,12 @@ MediaParser::audioBufferLength() const
 	return _audioFrames.back()->timestamp - _audioFrames.front()->timestamp; 
 }
 
+/*private*/
 const EncodedVideoFrame*
 MediaParser::peekNextVideoFrame() const
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
-	boost::mutex::scoped_lock lock(_qMutex);
+    // TODO: assert _qMutex is locked by this thread
 #else // ndef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	while (!parsingCompleted() && _videoInfo.get() && _videoFrames.empty())
 	{
@@ -166,6 +167,9 @@ MediaParser::nextFrameTimestamp(boost::uint64_t& ts) const
 bool
 MediaParser::nextVideoFrameTimestamp(boost::uint64_t& ts) const
 {
+#ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
+	boost::mutex::scoped_lock lock(_qMutex);
+#endif // def LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	const EncodedVideoFrame* ef = peekNextVideoFrame();
 	if ( ! ef ) return false;
 	ts = ef->timestamp();
@@ -221,17 +225,21 @@ MediaParser::nextAudioFrame()
 bool
 MediaParser::nextAudioFrameTimestamp(boost::uint64_t& ts) const
 {
+#ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
+	boost::mutex::scoped_lock lock(_qMutex);
+#endif // def LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	const EncodedAudioFrame* ef = peekNextAudioFrame();
 	if ( ! ef ) return false;
 	ts = ef->timestamp;
 	return true;
 }
 
+/*private*/
 const EncodedAudioFrame*
 MediaParser::peekNextAudioFrame() const
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
-	boost::mutex::scoped_lock lock(_qMutex);
+    // TODO: assert _qMutex is locked by this thread
 #else // ndef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	while (!parsingCompleted() && _audioInfo.get() && _audioFrames.empty())
 	{

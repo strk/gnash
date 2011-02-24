@@ -55,7 +55,6 @@ kde4_gnash_LDADD = \
 	$(MYSQL_LIBS) \
 	$(GNASH_LIBS) \
 	$(AM_LDFLAGS) \
-	$(KDE4_LIBS) \
 	$(LIBVA_X11_LIBS)
 
 if BUILD_OGL_RENDERER

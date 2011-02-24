@@ -77,6 +77,7 @@ check_PROGRAMS = \
 	action_execution_order_test8 \
 	action_execution_order_test9 \
 	action_execution_order_test11 \
+	PlaceAndRemove \
 	$(NULL)
 
 if MING_SUPPORTS_INIT_ACTIONS
@@ -100,6 +101,7 @@ check_SCRIPTS = \
 	action_execution_order_test8runner \
 	action_execution_order_test9runner \
 	action_execution_order_test11runner \
+	PlaceAndRemoveRunner \
 	$(NULL)
 
 if MING_SUPPORTS_INIT_ACTIONS
@@ -243,6 +245,19 @@ action_execution_order_test11.swf: action_execution_order_test11
 
 action_execution_order_test11runner: $(srcdir)/../../generic-testrunner.sh action_execution_order_test11.swf
 	sh $(srcdir)/../../generic-testrunner.sh -f10 $(top_builddir) action_execution_order_test11.swf > $@
+	chmod 755 $@
+
+
+PlaceAndRemove_SOURCES =	\
+	PlaceAndRemove.c	\
+	$(NULL)
+PlaceAndRemove_LDADD = ../libgnashmingutils.la
+
+PlaceAndRemove.swf: PlaceAndRemove
+	./PlaceAndRemove $(abs_mediadir)
+
+PlaceAndRemoveRunner: $(srcdir)/../../generic-testrunner.sh PlaceAndRemove.swf
+	sh $(srcdir)/../../generic-testrunner.sh -r40 $(top_builddir) PlaceAndRemove.swf > $@
 	chmod 755 $@
 
 ActionOrderTest3_SOURCES =	\

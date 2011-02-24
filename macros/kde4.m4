@@ -130,7 +130,7 @@ AC_DEFUN([GNASH_PATH_KDE4],
     dnl Look for the libraries
     AC_CACHE_VAL(ac_cv_path_kde4_lib, [
       if test x"${with_kde4_lib}" != x ; then
-        if test -f ${with_kde4_lib}/libkdeui.la; then
+        if test -f ${with_kde4_lib}/libkdeui.la -o -f ${with_kde4_lib}/libkdeui.${shlibext}; then
 	        ac_cv_path_kde4_lib="-L`(cd ${with_kde4_lib}; pwd)`"
         else
 	        AC_MSG_ERROR([${with_kde4_lib} directory doesn't contain KDE 4.x libraries.])
@@ -193,23 +193,23 @@ AC_DEFUN([GNASH_PATH_KDE4],
     fi
 
     if test x"${with_kde4_plugindir}" != x ; then 
-      KDE4_PLUGINDIR="${with_kde4_plugindir}/lib/kde4"
+      KDE4_PLUGINDIR="${with_kde4_plugindir}"
     else
-      KDE4_PLUGINDIR="${KDE4_PREFIX}/lib/kde4"
+      if test -d ${KDE4_PREFIX}/lib64 -a -f /etc/redhat-release; then
+        KDE4_PLUGINDIR="${KDE4_PREFIX}/lib64/kde4"
+      else
+        KDE4_PLUGINDIR="${KDE4_PREFIX}/lib/kde4"
+      fi
     fi
     if test x"${with_kde4_servicesdir}" != x ; then 
-      KDE4_SERVICESDIR="${with_kde4_servicesdir}/share/kde4/services"
+      KDE4_SERVICESDIR="${with_kde4_servicesdir}"
     else
       KDE4_SERVICESDIR="${KDE4_PREFIX}/share/kde4/services"
     fi
-    if test x"${KDE4_CONFIGDIR}" != x ; then 
-      KDE4_CONFIGDIR="${KDE4_CONFIGDIR}/share/kde4/config"
-    else
+    if test x"${KDE4_CONFIGDIR}" = x ; then 
       KDE4_CONFIGDIR="${KDE4_PREFIX}/share/kde4/config"
     fi
-    if test x"${KDE4_APPSDATADIR}" != x ; then 
-      KDE4_APPSDATADIR="${KDE4_APPSDATADIR}/share/kde4/apps/klash"
-    else
+    if test x"${KDE4_APPSDATADIR}" = x ; then 
       KDE4_APPSDATADIR="${KDE4_PREFIX}/share/kde4/apps/klash"
     fi
 

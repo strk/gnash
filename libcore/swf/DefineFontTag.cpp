@@ -48,11 +48,9 @@ DefineFontTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     const boost::uint16_t fontID = in.read_u16();
 
     std::auto_ptr<DefineFontTag> ft(new DefineFontTag(in, m, tag, r));
-
-    Font* f = new Font(ft);
+    boost::intrusive_ptr<Font> f(new Font(ft));
 
     m.add_font(fontID, f);
-
 }
 
 void
@@ -60,7 +58,8 @@ DefineFontTag::readCodeTable(SWFStream& in, Font::CodeTable& table,
         bool wideCodes, size_t glyphCount)
 {
     IF_VERBOSE_PARSE(
-        log_parse(_("reading code table at offset %lu"), in.tell());
+        log_parse(_("reading code table at offset %1%, "
+                "%2% glyphs"), in.tell(), glyphCount);
     );
 
     // Good. We can only do this once.
@@ -70,7 +69,7 @@ DefineFontTag::readCodeTable(SWFStream& in, Font::CodeTable& table,
         in.ensureBytes(2 * glyphCount);
         // Code table is made of boost::uint16_t's.
         for (size_t i=0; i < glyphCount; ++i) {
-            boost::uint16_t code = in.read_u16();
+            const boost::uint16_t code = in.read_u16();
             table.insert(std::make_pair(code, i));
         }
     }
@@ -78,7 +77,7 @@ DefineFontTag::readCodeTable(SWFStream& in, Font::CodeTable& table,
         // Code table is made of bytes.
         in.ensureBytes(1 * glyphCount);
         for (size_t i = 0; i < glyphCount; ++i) {
-            boost::uint8_t code = in.read_u8();
+            const boost::uint8_t code = in.read_u8();
             table.insert(std::make_pair(code, i));
         }
     }
@@ -132,32 +131,25 @@ DefineFontTag::readDefineFont(SWFStream& in, movie_definition& m,
     offsets.push_back(in.read_u16());
 
     IF_VERBOSE_PARSE (
-    log_parse("offset[0] = %d", offsets[0]);
+        log_parse("offset[0] = %d", offsets[0]);
     );
 
-    int	count = offsets[0] >> 1;
-    if ( count > 0 )
-    {
+    const size_t count = offsets[0] >> 1;
+    if (count > 0) {
         in.ensureBytes(count*2);
-        for (int i = 1; i < count; i++)
-        {
+        for (size_t i = 1; i < count; ++i) {
             offsets.push_back(in.read_u16());
 
             IF_VERBOSE_PARSE (
-            log_parse("offset[%d] = %d", i, offsets[i]);
+                log_parse("offset[%d] = %d", i, offsets[i]);
             );
         }
-    }
-    else
-    {
-        log_error("Negative embedded glyph table size: %d", count);
     }
 
     _glyphTable.resize(count);
 
     // Read the glyph shapes.
-    for (int i = 0; i < count; i++)
-    {
+    for (size_t i = 0; i < count; ++i) {
         // Seek to the start of the shape data.
         unsigned long new_pos = table_base + offsets[i];
 
@@ -177,23 +169,23 @@ void
 DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
         const RunResources& r)
 {
-    IF_VERBOSE_PARSE (
-    log_parse(_("reading DefineFont2 or DefineFont3"));
+    IF_VERBOSE_PARSE(
+        log_parse(_("reading DefineFont2 or DefineFont3"));
     );
 
     in.ensureBytes(2); // 1 for the flags, 1 unknown
-    int flags = in.read_u8();
-    bool has_layout = flags & (1 << 7);
+    const int flags = in.read_u8();
+    const bool has_layout = flags & (1 << 7);
     _shiftJISChars = flags & (1 << 6);
     _unicodeChars = flags & (1 << 5);
     _ansiChars = flags & (1 << 4);
-    bool wide_offsets = flags & (1 << 3);
-    bool wideCodes = flags & (1 << 2);
+    const bool wide_offsets = flags & (1 << 3);
+    const bool wideCodes = flags & (1 << 2);
     _italic = flags & (1 << 1);
     _bold = flags & (1 << 0);
 
     // Next is language code, always 0 for SWF5 or previous
-    int languageCode = in.read_u8();
+    const int languageCode = in.read_u8();
     if (languageCode) {
         LOG_ONCE(log_unimpl("LanguageCode (%d) in DefineFont tag",
                     languageCode));
@@ -202,7 +194,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
     in.read_string_with_length(_name);
 
     in.ensureBytes(2); 
-    boost::uint16_t glyph_count = in.read_u16();
+    const boost::uint16_t glyph_count = in.read_u16();
 
     IF_VERBOSE_PARSE (
         log_parse(" has_layout = %d", has_layout);
@@ -217,7 +209,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
         log_parse(" glyphs count = %d", glyph_count);
     );
     
-    unsigned long table_base = in.tell();
+    const unsigned long table_base = in.tell();
 
     // Read the glyph offsets.  Offsets
     // are measured from the start of the
@@ -228,14 +220,11 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
     if (wide_offsets) {
         // 32-bit offsets.
         in.ensureBytes(4*glyph_count + 4); 
-        for (size_t i = 0; i < glyph_count; ++i)
-        {
+        for (size_t i = 0; i < glyph_count; ++i) {
             const boost::uint32_t off = in.read_u32();	
-
             IF_VERBOSE_PARSE (
                 log_parse(_("Glyph %d at offset %u"), i, off);
             );
-
             offsets.push_back(off);
         }
         font_code_offset = in.read_u32();
@@ -244,13 +233,10 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
         // 16-bit offsets.
         in.ensureBytes(2*glyph_count + 2); 
         for (size_t i = 0; i < glyph_count; ++i) {
-
             const boost::uint16_t off = in.read_u16();	
-
-            IF_VERBOSE_PARSE (
+            IF_VERBOSE_PARSE(
                 log_parse(_("Glyph %d at offset %u"), i, off);
             );
-
             offsets.push_back(off);
         }
         font_code_offset = in.read_u16();
@@ -274,9 +260,8 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
         _glyphTable[i].glyph.reset(new ShapeRecord(in, SWF::DEFINEFONT2, m, r));
     }
 
-    unsigned long current_position = in.tell();
-    if (font_code_offset + table_base != current_position)
-    {
+    const unsigned long current_position = in.tell();
+    if (font_code_offset + table_base != current_position) {
         // Bad offset!  Don't try to read any more.
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("Bad offset in DefineFont2"));
@@ -297,7 +282,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
         _leading = in.read_s16();
         
         // Advance table; i.e. how wide each DisplayObject is.
-        size_t nGlyphs = _glyphTable.size();
+        const size_t nGlyphs = _glyphTable.size();
         in.ensureBytes(nGlyphs*2);
 
         for (size_t i = 0; i < nGlyphs; i++) {
@@ -307,7 +292,6 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
             _glyphTable[i].advance = static_cast<float>(in.read_u16());
         }
 
-        // TODO: shouldn't we log_unimpl here ??
         for (size_t i = 0; i < nGlyphs; i++) {
             LOG_ONCE(log_unimpl("Bounds table in DefineFont2Tag"));
             readRect(in);
@@ -342,7 +326,6 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
                     log_swferror(_("Repeated kerning pair found - ignoring"));
                 );
             }
-
         }
     }
 }

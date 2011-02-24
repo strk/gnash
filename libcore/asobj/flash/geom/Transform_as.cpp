@@ -79,7 +79,7 @@ public:
 
 protected:
 
-    virtual void markReachableResources() const {
+    virtual void setReachable() {
         _movieClip.setReachable();
     }
 

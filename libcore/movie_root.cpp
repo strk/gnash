@@ -2147,6 +2147,11 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
 void
 movie_root::setScriptLimits(boost::uint16_t recursion, boost::uint16_t timeout)
 {
+    
+    if ( recursion == _recursionLimit && _timeoutLimit == timeout ) {
+        // avoid the debug log...
+        return;
+    }
 
     // This tag reported in some sources to be ignored for movies
     // below SWF7. However, on Linux with PP version 9, the tag

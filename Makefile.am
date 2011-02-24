@@ -49,6 +49,7 @@ CYGNAL_DIR = cygnal
 endif
 
 STD_DIRS = \
+	desktop \
 	libbase \
 	libmedia \
 	libsound \
@@ -134,7 +135,7 @@ BUILT_SOURCES = revno.h .configline
 # only want to regenerate this file if that file changes, so we have to
 # do the dependency check ourselves.
 revno.h:
-	@if test \! -e .lastmod; then \
+	@if test \! -f .lastmod -o \! -f revno.h ; then \
 	  touch -t 197001010000 .lastmod; \
 	fi; \
 	if test -d $(top_srcdir)/.git -a x"${GIT}" != x; then \
@@ -517,4 +518,4 @@ packageclean:
 	-test -z "$(CLEANFILES)" || rm -rf $(CLEANFILES)
  
 # these files are created when building packages
-CLEANFILES += *.deb *.dsc *.gz *.bz2 *.changes deb-copy-stamp gnash*git* gnash*dev rpmbuild gnash.spec .rpmmacros
+CLEANFILES += *.deb *.dsc *.gz *.bz2 *.changes deb-copy-stamp gnash*git* gnash-* rpmbuild gnash.spec .rpmmacros
