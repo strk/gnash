@@ -309,7 +309,7 @@ NetStream_as::startAdvanceTimer()
 
 NetStream_as::~NetStream_as()
 {
-    // TODO: have thi done by ~BufferedAudioQueue ?
+    // TODO: have this done by ~BufferedAudioQueue ?
     _audioStreamer.cleanAudioQueue();
     _audioStreamer.detachAuxStreamer();
 }
