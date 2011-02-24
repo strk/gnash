@@ -34,9 +34,6 @@
 #include "GnashSleep.h"
 
 #include <iostream> // std::cerr
-#include <boost/thread/mutex.hpp>
-#include <boost/version.hpp>
-#include <boost/assign/list_of.hpp>
 
 #ifndef USE_CURL
 
@@ -90,6 +87,15 @@ extern "C" {
 #include <cstdio> // cached data uses a *FILE
 #include <cstdlib> // std::getenv
 
+#include <boost/version.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/thread/mutex.hpp>
+
+#if BOOST_VERSION < 103500
+# include <boost/thread/detail/lock.hpp>
+#endif
+
+
 //#define GNASH_CURL_VERBOSE 1
 
 // define this if you want seeks back to be reported
@@ -99,6 +105,29 @@ extern "C" {
 namespace gnash {
 
 namespace {
+
+inline
+void lock(boost::mutex& mut)
+{
+#if BOOST_VERSION < 103500
+    // see https://savannah.gnu.org/bugs/index.php?32579#comment7
+    boost::detail::thread::lock_ops<boost::mutex>::lock(mut);
+#else
+    mut.lock();
+#endif
+}
+
+inline
+void unlock(boost::mutex& mut)
+{
+#if BOOST_VERSION < 103500
+    // see https://savannah.gnu.org/bugs/index.php?32579#comment7
+    boost::detail::thread::lock_ops<boost::mutex>::unlock(mut);
+#else
+    mut.unlock();
+#endif
+}
+
 
 /***********************************************************************
  *
@@ -299,17 +328,17 @@ CurlSession::lockSharedHandle(CURL* handle, curl_lock_data data,
     switch (data) {
     case CURL_LOCK_DATA_DNS:
 	//log_debug("Locking DNS cache mutex");
-	_dnscacheMutex.lock();
+	lock(_dnscacheMutex);
 	//log_debug("DNS cache mutex locked");
 	break;
     case CURL_LOCK_DATA_COOKIE:
 	//log_debug("Locking cookies mutex");
-	_cookieMutex.lock(); 
+	lock(_cookieMutex); 
 	//log_debug("Cookies mutex locked");
             break;
     case CURL_LOCK_DATA_SHARE:
 	//log_debug("Locking share mutex");
-	_shareMutex.lock(); 
+	lock(_shareMutex); 
 	//log_debug("Share mutex locked");
 	break;
     case CURL_LOCK_DATA_SSL_SESSION:
@@ -338,15 +367,15 @@ CurlSession::unlockSharedHandle(CURL* handle, curl_lock_data data)
     switch (data) {
     case CURL_LOCK_DATA_DNS:
 	//log_debug("Unlocking DNS cache mutex");
-	_dnscacheMutex.unlock();
+	unlock(_dnscacheMutex);
 	break;
     case CURL_LOCK_DATA_COOKIE:
 	//log_debug("Unlocking cookies mutex");
-	_cookieMutex.unlock();
+	unlock(_cookieMutex);
 	break;
     case CURL_LOCK_DATA_SHARE:
 	//log_debug("Unlocking share mutex");
-	_shareMutex.unlock();
+	unlock(_shareMutex);
 	break;
     case CURL_LOCK_DATA_SSL_SESSION:
 	log_error("unlockSharedHandle: SSL session locking "
