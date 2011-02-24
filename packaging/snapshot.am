@@ -1,5 +1,6 @@
 # 
-# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010,
+#               2011 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,7 +26,7 @@ BRANCH_NICK   = "`if test -f revno.h; then grep "NICK" revno.h | cut -d '"' -f 2
 
 # this is used for Debian style naming conventions
 NEXT_RELEASE = 0.8.10
-SNAPSHOT_VERSION := 0.8.9
+SNAPSHOT_VERSION := 0.8.9rc2
 #SNAPSHOT_VERSION = $(NEXT_RELEASE)~git.$(BRANCH_NICK)$(BRANCH_REVNO)
 
 # these is the directories where the snapshot gets built. Sources are
