@@ -20,8 +20,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-if test "x$1" = "x" -a -f @datadir@/gnash/gnash-splash.swf; then
-  kde4-gnash @datadir@/gnash-splash.swf
+if test "x$1" = "x" -a -f @prefix@/share/gnash/gnash-splash.swf; then
+  kde4-gnash @prefix@/share/gnash/gnash-splash.swf
 else
   kde4-gnash "$@"
 fi

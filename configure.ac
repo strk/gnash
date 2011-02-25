@@ -2954,7 +2954,8 @@ AC_CONFIG_LINKS(testsuite/libbase.all/gnashrc-local:testsuite/libbase.all/gnashr
 
 AC_CONFIG_FILES(
 gnash.pc:gnash.pc.in
-gui/klash:gui/klash.in
+desktop/gnash-gtk-launcher:desktop/gnash-gtk-launcher.in
+desktop/gnash-qt-launcher:desktop/gnash-qt-launcher.in
 )
 
 AC_OUTPUT(Makefile

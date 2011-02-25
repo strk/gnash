@@ -191,10 +191,6 @@ gnash: gnash.in
 	cp $(srcdir)/gnash.in $@
 	chmod +x $@
 
-if BUILD_KDE4_GUI
-bin_SCRIPTS += klash
-endif
-
 # Always include the device files in the source tarball
 EXTRA_DIST += \
 	fb/TouchDevice.cpp \
