@@ -325,6 +325,9 @@ scrollkeeper-update -q || :
 %{_mandir}/man1/findwebcams.1.gz
 %{_mandir}/man1/rtmpget.1.gz
 %{_datadir}/locale/*/LC_MESSAGES/gnash.mo
+%{_prefix}/share/applications/gnash.desktop
+%{_prefix}/share/icons/hicolor/32x32/apps/gnash.xpm
+%{_prefix}/share/gnash/gnash-splash.swf
 %if !%{cross_compile}
 #%{_prefix}/share/info/*.info*
 %{_prefix}/share/doc/gnash/*.html
@@ -365,12 +368,15 @@ scrollkeeper-update -q || :
 
 %files klash4
 %defattr(-,root,root,-)
+%{_bindir}/klash
 %{_bindir}/kde4-gnash
-%{_mandir}/man1/kde4-gnash.1.gz
-%{_prefix}/%{_lib}/kde4/libklashpart.*
+%{_mandir}/man1/kde4-gnash.1.*
+%{_prefix}/lib*/kde4/libklashpart.*
 %{_prefix}/share/kde4/apps/klash/klashpartui.rc
 %{_prefix}/share/kde4/apps/klash/pluginsinfo
 %{_prefix}/share/kde4/services/klash_part.desktop
+%{_prefix}/share/applications/klash.desktop
+%{_prefix}/share/icons/hicolor/32x32/apps/klash.xpm
 
 %files fileio-extension
 %defattr(-,root,root,-)
