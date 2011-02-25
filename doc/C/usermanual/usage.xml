@@ -31,11 +31,6 @@
       gnash
       /home/<replaceable>&lt;username&gt;</replaceable>/gnash/testsuite/car_smash.swf 
     </programlisting>
-    <mediaobject>
-      <imageobject>
-	<imagedata align="center" fileref="images/car_crash.png"/>
-      </imageobject>
-    </mediaobject>
   </para>
   
   <para>
