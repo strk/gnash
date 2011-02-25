@@ -81,12 +81,18 @@ rpm-install:
 # Unlike creating a deb, which build their own source tarball, rpm
 # requires we do it ourselves, and copy it to $HOME/rpmbuild/SOURCES
 # before rpmbuild will work.
-setup-rpm: 
-	tar zcf $(SNAPSHOT_DIR).tar.gz \
-	  --exclude=$(SNAPSHOT_DIR)/autom4te.cache \
-	  --exclude=$(SNAPSHOT_DIR)/configure.ac.orig \
-	  --exclude=$(SNAPSHOT_DIR)/configure.orig $(SNAPSHOT_DIR); \
+setup-rpm: snapshot-rename-build
+	snapshot_version="$(SNAPSHOT_VERSION)"; \
+	snapshot_dir="gnash-`echo $${snapshot_version}|tr "~" "_"`"; \
+	if test $${snapshot_dir} != $(SNAPSHOT_DIR); then \
+	  rm -fr $${snapshot_dir}; \
+	  mv -f $(SNAPSHOT_DIR) $${snapshot_dir}; \
+	fi; \
+	tar zcf $${snapshot_dir}.tar.gz \
+	  --exclude=$${snapshot_dir}/autom4te.cache \
+	  --exclude=$${snapshot_dir}/configure.ac.orig \
+	  --exclude=$${snapshot_dir}/configure.orig $${snapshot_dir}; \
 	mkdir -p $(RPMBUILD_DIR)/SOURCES; \
-	cp $(SNAPSHOT_DIR).tar.gz $(RPMBUILD_DIR)/SOURCES
+	cp $${snapshot_dir}.tar.gz $(RPMBUILD_DIR)/SOURCES
 
 .PHONY : rpm redhat spec rpm-configure rpm-install rpm-build setup-rpm
