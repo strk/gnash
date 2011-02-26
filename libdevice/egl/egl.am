@@ -20,26 +20,29 @@
 # when bring up Gnash on a new target, it's included here.
 bin_PROGRAMS += eglinfo
 eglinfo_SOURCES = egl/eglinfo.c
-eglinfo_CPPFLAGS = $(AM_CPPFLAGS)
+eglinfo_CPPFLAGS = $(AM_CPPFLAGS) $(EGL_CFLAGS)
 eglinfo_LDADD = \
 	$(EXTRA_EGL_LIBS) \
-	$(EGL_LIBS)
+	$(EGL_LIBS) \
+	$(NULL)
 
 # this tests the low level EGL interface, used by OpenVG, OpenGLES1, and OpenGLES2.
 bin_PROGRAMS += test_egl 
 test_egl_SOURCES = egl/test_egl.cpp
-test_egl_CPPFLAGS = $(AM_CPPFLAGS)
+test_egl_CPPFLAGS = $(AM_CPPFLAGS) $(EGL_CFLAGS)
 test_egl_LDADD = \
 	libgnashdevice.la \
 	$(EXTRA_EGL_LIBS) \
 	$(TS_LIBS) \
 	$(CURL_LIBS) \
 	$(EGL_LIBS) \
-	$(GNASH_LIBS)
+	$(GNASH_LIBS) \
+	$(NULL)
 
 libgnashdevice_la_CPPFLAGS += $(EGL_CFLAGS)
 libgnashdevice_la_SOURCES += \
 	egl/eglDevice.cpp \
 	egl/eglDevice.h \
-	egl/configTemplates.h
+	egl/configTemplates.h  \
+	$(NULL)
 libgnashdevice_la_LIBADD += $(EGL_LIBS)
