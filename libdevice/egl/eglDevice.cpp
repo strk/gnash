@@ -386,6 +386,10 @@ EGLDevice::attachWindow(GnashDevice::native_window_t window)
         _nativeWindow = static_cast<EGLNativeWindowType>(window);
     }
 
+    if (_eglSurface != EGL_NO_SURFACE) {
+        eglDestroySurface(_eglDisplay, _eglSurface);
+    }
+    
     log_debug("Initializing EGL Surface");
     if (_eglDisplay && _eglConfig) {
         _eglSurface = eglCreateWindowSurface(_eglDisplay, _eglConfig,
