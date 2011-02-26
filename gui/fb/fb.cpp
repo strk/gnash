@@ -115,6 +115,7 @@
 
 #ifdef RENDERER_AGG
 # include "fb_glue_agg.h"
+# include "agg/Renderer_agg.h"
 #endif
 
 #ifdef RENDERER_OPENVG
@@ -201,11 +202,24 @@ FBGui::init(int argc, char *** argv)
     // map framebuffer into memory
     // Create a new Glue layer
 #ifdef RENDERER_AGG
+    if (renderer.empty()) {
+        renderer = "agg";
+    }
     if (renderer == "agg") {
         _glue.reset(new FBAggGlue());
+        // Initialize the glue layer between the renderer and the gui toolkit
+        _glue->init(argc, argv);
+        FBAggGlue *agg = reinterpret_cast<FBAggGlue *>(_glue.get());
+        // Set "window" size
+        _width =  agg->width();
+        _height = agg->height();
+        log_debug("Width:%d, Height:%d", _width, _height);
     }
 #endif
 #ifdef RENDERER_OPENVG
+    if (renderer.empty()) {
+        renderer = "openvg";
+    }
     if (renderer == "openvg") {
         _glue.reset(new FBOvgGlue(0));
         // Initialize the glue layer between the renderer and the gui toolkit
@@ -215,7 +229,7 @@ FBGui::init(int argc, char *** argv)
         // Set "window" size
         _width =  ovg->getWidth();
         _height = ovg->getHeight();
-            log_debug("Width:%d, Height:%d", _width, _height);
+        log_debug("Width:%d, Height:%d", _width, _height);
     } else {
         log_error("No renderer! %s not supported.", renderer);
     }
@@ -303,13 +317,15 @@ FBGui::init(int argc, char *** argv)
 
 #ifdef RENDERER_OPENVG
     _renderer.reset(renderer::openvg::create_handler(0));
-#else
-    _renderer.reset(renderer::openvg::create_Renderer_agg(0));
-#endif
+    
     renderer::openvg::Renderer_ovg *rend = reinterpret_cast
         <renderer::openvg::Renderer_ovg *>(_renderer.get());
     rend->init(_width, _height);
-
+#else
+# ifdef RENDERER_AGG
+    _renderer.reset(create_Renderer_agg(0));
+# endif
+#endif
     return true;
 }
 
@@ -400,7 +416,7 @@ FBGui::createWindow(const char* /*title*/, int /*width*/, int /*height*/,
 {
     GNASH_REPORT_FUNCTION;
 
-#if 0
+#ifdef RENDERER_AGG
     if (_glue) {
         _glue->prepDrawingArea(0);
         return true;
