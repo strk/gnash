@@ -100,7 +100,7 @@ class RawFBDevice : public GnashDevice
     // Using RAWFB always means a native renderer
     bool isNativeRender() { return true; }
 
-    native_window_t getDrawableWindow() {GNASH_REPORT_FUNCTION; };
+    native_window_t getDrawableWindow() { return 0; };
     
     //
     // Testing Support
