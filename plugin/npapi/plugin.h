@@ -99,19 +99,11 @@ private:
 
     bool handlePlayerRequests(GIOChannel* iochan, GIOCondition cond);
 
-    /// Process a null-terminated request line
+    /// Process requests from the player.
     //
-    /// @param buf
-    ///	  The single request.
-    ///   Caller is responsible for memory management, but give us
-    ///   permission to modify the string.
+    /// @return true if the requests were processed, false otherwise (bogus request..)
     ///
-    /// @param len
-    ///	  Lenght of buffer.
-    ///
-    /// @return true if the request was processed, false otherwise (bogus request..)
-    ///
-    bool processPlayerRequest(gchar* buf, gsize len);
+    bool processPlayerRequest();
 
     // EMBED or OBJECT attributes / parameters
     // @@ this should likely replace the _options element below
@@ -132,6 +124,12 @@ private:
     /// Name of the plugin instance element in the dom 
     std::string                        _name;
     GnashPluginScriptObject             *_scriptObject;
+
+    /// Buffer containing incoming requests from the player process received
+    /// over a socket. Since partial requests are likely in a network situation
+    /// this buffer preserves them until they can be finished.
+    // FIXME: should we perhaps use a deque instead?
+    std::string                        _requestbuf;
     
     std::string getCurrentPageURL() const;
 };

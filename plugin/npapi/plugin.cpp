@@ -83,6 +83,7 @@
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/trim.hpp>
 #include <boost/format.hpp>
 #include <sys/param.h>
 #include <csignal>
@@ -695,28 +696,28 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 
     assert(cond & G_IO_IN);
 
+    assert(g_io_channel_get_flags(iochan) & G_IO_FLAG_NONBLOCK);
+
     gnash::log_debug("Checking player requests on FD #%d",
               g_io_channel_unix_get_fd(iochan));
 
-    GError* error = 0;
-    //    g_io_channel_set_flags(iochan, G_IO_FLAG_NONBLOCK, &error);
+    int retries = 5;
+    const size_t buf_size = 512;
+    gchar buffer[buf_size];
 
-    size_t retries = 5;
-    gchar* request = 0;
-    gsize requestSize = 0;
     do {
-        // When in non-blocking mode, we'll get several iterations of this
-        // loop while waiting for data. if data never arrives, we'd be stuck
-        // looping here forever, so this is our escape from that loop.
         if (retries-- <= 0) {
-            gnash::log_error("Too many attempts to read from the player!");
-            return false;
+            gnash::log_debug("Too many reads necessary to get all the data from"
+                             " the Gnash socket. Will try to get the rest later.");
+            break;
         }
-        error = 0;
-        request = 0;
-        requestSize = 0;
-        GIOStatus status = g_io_channel_read_line(iochan, &request,
-                           &requestSize, NULL, &error);
+
+        GError* error = 0;
+        gsize bytes_read = 0;
+
+        GIOStatus status = g_io_channel_read_chars(iochan, buffer, buf_size,
+                                                   &bytes_read, &error);
+
         switch (status) {
           case G_IO_STATUS_ERROR:
               gnash::log_error("error reading request line: %s",
@@ -729,18 +730,14 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
               g_error_free(error);
               return false;
           case G_IO_STATUS_AGAIN:
-              gnash::log_debug("read again: nonblocking mode set ");
+              gnash::log_debug("read again");
               continue;
           case G_IO_STATUS_NORMAL:
               // process request
-              // Get rid of the newline on the end if there is one. The string
-              // is also NULL terninated, so the requestSize includes it in
-              // the total.
-              if (request[requestSize-1] == '\n') {
-                  request[requestSize-1] = 0;
-                  requestSize--;
-              }
-              gnash::log_debug("Normal read: %s", request);
+              _requestbuf.append(buffer, buffer+bytes_read);
+#if 0
+              gnash::log_debug("Normal read: %s", std::string(buffer, buffer+bytes_read));
+#endif
               break;
           default:
               gnash::log_error("Abnormal status!");
@@ -749,8 +746,7 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
     } while (g_io_channel_get_buffer_condition(iochan) & G_IO_IN);
 
     // process request..
-    processPlayerRequest(request, requestSize);
-    g_free(request);
+    processPlayerRequest();
     
     return true;
 }
@@ -758,31 +754,35 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 // There may be multiple Invoke messages in a single packet, so each
 // packet needs to be broken up into separate messages to be parsed.
 bool
-nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
+nsPluginInstance::processPlayerRequest()
 {
-    // gnash::log_debug(__PRETTY_FUNCTION__);
+#if 0
+     gnash::log_debug(__PRETTY_FUNCTION__);
 
-   // log_debug("SCRIPT OBJECT %d: %x", __LINE__, this->getScriptObject());
+     log_debug("SCRIPT OBJECT %d: %x", __LINE__, this->getScriptObject());
+#endif
 
-    if ( linelen < 4 ) {
-        if (buf) {
-            gnash::log_error("Invalid player request (too short): %s", buf);
-        } else {
-            gnash::log_error("Invalid player request (too short): %d bytes",
-                    linelen);
-        }
+    if ( _requestbuf.size() < 4 ) {
+        gnash::log_error("Invalid player request (too short): %s", _requestbuf);
         return false;
     }
 
-    std::string packet(buf, linelen);
+
+    std::string& packet = _requestbuf;
     do {
+        boost::trim_left(packet);
+        if (packet.empty()) {
+            return false;
+        }
+
         std::string term = "</invoke>";
         std::string::size_type pos = packet.find(term);
         // no terminator, bad message
         if (pos == std::string::npos) {
-            gnash::log_error("No terminator, bad Invoke message");
+            gnash::log_debug("Incomplete Invoke message. Probably a fragment.");
             return false;
         }
+         
         // Extract a message from the packet
         std::string msg = packet.substr(0, pos + term.size());
         boost::shared_ptr<plugin::ExternalInterface::invoke_t> invoke =
@@ -792,24 +792,27 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
         packet.erase(0, msg.size());
         
         if (!invoke) {
+            log_error("Failed to parse invoke message: %s", msg);
             return false;
         }
 
-        // size_t invoke_size = invoke->name.size() + invoke->type.size() +
-        //     (invoke->args.size() * sizeof(GnashNPVariant));
-        
         if (!invoke->name.empty()) {
             gnash::log_debug("Requested method is: %s", invoke->name);
+        } else {
+            gnash::log_error("Invoke request missing a name to invoke.");
+            continue;
         }
         
         if (invoke->name == "getURL") {
-            // gnash::log_debug("Got a getURL() request: %", invoke->args[0].get());
             
             assert(invoke->args.size() > 1);
             
             // The first argument is the URL string.
             std::string url = NPStringToString(NPVARIANT_TO_STRING(
                                                    invoke->args[0].get()));
+#if 0
+            gnash::log_debug("Got a getURL() request: %s", url);
+#endif
             // The second is the method, namely GET or POST.
             std::string op = NPStringToString(NPVARIANT_TO_STRING(
                                                   invoke->args[1].get()));
@@ -844,10 +847,11 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
                                  data);
                 NPN_PostURL(_instance, url.c_str(), target.c_str(), data.size(),
                             data.c_str(), false);
-                return true;
+            } else {
+                log_error("Unexpected op in getURL (expected POST or GET).");
             }
             
-            return true;
+            continue; 
         } else if (invoke->name == "fsCommand") {
             
             assert(invoke->args.size() > 1);
@@ -867,7 +871,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
                              jsurl.str(), tgt);
             
             NPN_GetURL(_instance, jsurl.str().c_str(), tgt);
-            return true;
+            continue;
         } else if (invoke->name == "addMethod") {
             
             assert(!invoke->args.empty());
@@ -880,7 +884,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
             NPIdentifier id = NPN_GetStringIdentifier(method.c_str());
             // log_debug("SCRIPT OBJECT addMethod: %x, %s", (void *)_scriptObject, method);
             this->getScriptObject()->AddMethod(id, remoteCallback);
-            return true;
+            continue;
         }
         
         NPVariant result;
@@ -1277,9 +1281,23 @@ nsPluginInstance::startProc()
         }
         
         GIOChannel* ichan = g_io_channel_unix_new(c2p_pipe[0]);
+        g_io_channel_set_close_on_unref(ichan, true);
+
+        GError* error = 0;
+        GIOStatus rv = g_io_channel_set_flags(ichan, G_IO_FLAG_NONBLOCK,
+                                              &error);
+        if (error || rv != G_IO_STATUS_NORMAL) {
+            log_error("Could not make player communication nonblocking.");
+
+            g_io_channel_unref(ichan);
+            if (error) {
+                g_error_free(error);
+            }
+            return;
+        }
+
         gnash::log_debug("New IO Channel for fd #%d",
                          g_io_channel_unix_get_fd(ichan));
-        g_io_channel_set_close_on_unref(ichan, true);
         _ichanWatchId = g_io_add_watch(ichan, 
                                        (GIOCondition)(G_IO_IN|G_IO_HUP), 
                                        (GIOFunc)handlePlayerRequestsWrapper,
