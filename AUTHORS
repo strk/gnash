@@ -31,7 +31,7 @@ Thatcher Ulrich <tu@tulrich.com> -- maintainer, most of the code so far
 Mike Shaver -- fixes for Linux, morph shapes in gameswf
 Thierry Berger-Perrin -- fixes, fixes for Linux, Linux version of memory
 mapping wrapper, mp3 handling for gameswf player
-Ignacio Castaño -- fixes in chunklod, lots of code and fixes for gameswf
+Ignacio CastaÃ±o -- fixes in chunklod, lots of code and fixes for gameswf
 Willem Kokke -- gameswf_parser, clip shapes, other misc gameswf code & test
 cases
 Vitaly Alexeev -- gameswf bug fixes, tag 17 (button sound), some morphing code, test cases, etc
