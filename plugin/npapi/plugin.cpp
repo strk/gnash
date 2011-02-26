@@ -710,6 +710,7 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
         // looping here forever, so this is our escape from that loop.
         if (retries-- <= 0) {
             gnash::log_error("Too many attempts to read from the player!");
+            return false;
         }
         error = 0;
         request = 0;
