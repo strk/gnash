@@ -297,3 +297,7 @@ CLEANFILES = libltdl.la libltdlc.la gnashrc gnashpluginrc
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"
 	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
+
+# Remove libtool .la files
+install-exec-hook:
+	$(RM) $(DESTDIR)$(libdir)/gnash/libgnashbase.la

@@ -99,3 +99,7 @@ endif
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"
 	$(MAKE) CXXFLAGS="$(CXXFLAGS) $(MUDFLAP_OPT)" LIBS="$(LIBS) $(MUDFLAP_LIB)"
+
+# Remove libtool .la files
+install-exec-hook:
+	$(RM) $(DESTDIR)$(libdir)/gnash/libgnashnet.la

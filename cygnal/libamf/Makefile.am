@@ -73,3 +73,6 @@ mudflap:
 clean-hook:
 	-rm -f core.*
 
+# Remove libtool .la files
+install-exec-hook:
+	$(RM) $(DESTDIR)$(libdir)/gnash/libgnashamf.la
