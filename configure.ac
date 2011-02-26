@@ -1139,6 +1139,8 @@ ndevice=2
 AC_ARG_ENABLE(device,
   AC_HELP_STRING([--enable-device], [Specify which hardware abstraction to use to support to enable (none,openmax,egl,directfb,rawfb,x11,vaapi)]),
   enableval=`echo ${enableval} | tr '\054' ' ' `
+  build_egl_device=no
+  build_rawfb_device=no
   device_list=""
   ndevice=0
   while test -n "${enableval}" ; do
