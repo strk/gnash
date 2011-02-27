@@ -31,13 +31,6 @@ GNASH_LIBS = \
 	$(top_builddir)/librender/libgnashrender.la \
 	$(NULL)
 
-if LIBLTDL2
-GNASH_LIBS += $(top_builddir)/libltdl/libltdlc.la
-endif
-if LIBLTDL1
-GNASH_LIBS += $(top_builddir)/libbase/libltdlc.la
-endif
-
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS = \

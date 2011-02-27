@@ -23,10 +23,6 @@ pluginsdir = $(prefix)/lib/gnash/plugins
 
 AM_CXXFLAGS = -DREGISTER_MEDIA_HANDLERS
 
-#if INSTALL_LTDL
-#LIBLTDLHEAD =  $(top_srcdir)/libltdl/ltdl.h
-#endif
-
 # If we are using an installable libltdl, then it needs to be built
 # before libgnash, as libgnash depends on it for extensions.
 pkglib_LTLIBRARIES =  libgnashmedia.la

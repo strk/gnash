@@ -50,13 +50,6 @@ GNASH_LIBS = \
 	$(top_builddir)/librender/libgnashrender.la \
 	$(NULL)
 
-if LIBLTDL2
-GNASH_LIBS += $(top_builddir)/libltdl/libltdlc.la
-endif
-if LIBLTDL1
-GNASH_LIBS += $(top_builddir)/libbase/libltdlc.la
-endif
-
 check_PROGRAMS = \
 	clip_as_button2-TestRunner \
 	subshapes-TestRunner \

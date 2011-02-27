@@ -24,13 +24,13 @@ plugins_LTLIBRARIES = dejagnu.la
 
 INCLUDES =  \
 	-I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/libcore \
-        -I$(top_srcdir)/libcore/abc \
-        -I$(top_srcdir)/libcore/swf \
-        -I$(top_srcdir)/libcore/vm \
+	-I$(top_srcdir)/libcore \
+	-I$(top_srcdir)/libcore/abc \
+	-I$(top_srcdir)/libcore/swf \
+	-I$(top_srcdir)/libcore/vm \
 	-I$(top_srcdir)/libcore/asobj \
 	$(BOOST_CFLAGS) \
-	$(INCLTDL)
+	$(NULL)
 
 AM_LDFLAGS =  \
 	$(top_builddir)/libbase/libgnashbase.la \

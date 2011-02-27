@@ -56,13 +56,6 @@ AM_LDFLAGS = \
 	$(top_builddir)/librender/libgnashrender.la \
 	$(NULL)
 
-if LIBLTDL2
-AM_LDFLAGS  += $(top_builddir)/libltdl/libltdlc.la
-endif
-if LIBLTDL1
-AM_LDFLAGS += $(top_builddir)/libbase/libltdlc.la
-endif
-
 check_PROGRAMS = \
 	displaylist_depths_test \
 	displaylist_depths_test2 \

@@ -43,13 +43,6 @@ INCLUDES = \
 	$(DEJAGNU_CFLAGS) \
 	$(PTHREAD_CFLAGS)
 
-if LIBLTDL2
-AM_LDFLAGS  += $(top_builddir)/libltdl/libltdlc.la
-endif
-if LIBLTDL1
-AM_LDFLAGS += $(top_builddir)/libbase/libltdlc.la
-endif
-
 check_PROGRAMS = \
 	test_amf \
 	test_amfmsg \

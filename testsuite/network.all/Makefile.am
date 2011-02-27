@@ -60,13 +60,6 @@ AM_LDFLAGS =
 	$(PTHREAD_LIBS)
 	$(NULL)
 
-if LIBLTDL2
-AM_LDFLAGS  += $(top_builddir)/libltdl/libltdlc.la
-endif
-if LIBLTDL1
-AM_LDFLAGS += $(top_builddir)/libbase/libltdlc.la
-endif
-
 if BUILD_SSL
 TEST_SSL = test_ssl
 endif
