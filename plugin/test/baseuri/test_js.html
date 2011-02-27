@@ -1,0 +1,15 @@
+<script>
+
+function writePage()
+{
+	s = "";
+	s += '<embed type="application/x-shockwave-flash"';
+ 	s += ' border="1"';
+ 	s += ' src="test.swf"';
+	s += ' height="100" width="400">';
+	s += ' page wrote by javascript (expect: XML:root)';
+	return s;
+}
+
+window.location.href = 'javascript:writePage()';
+</script>
