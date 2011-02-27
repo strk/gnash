@@ -134,8 +134,6 @@ static bool waitforgdb = false;
 static bool createSaLauncher = false;
 
 static const char* getPluginDescription();
-// void GnashLogDebug(const std::string& msg);
-// void GnashLogError(const std::string& msg);
 
 static const char*
 getPluginDescription() 
@@ -441,7 +439,6 @@ cleanup_childpid(gpointer data)
 
     if (rv <= 0) {
         // The child process has not exited; it may be deadlocked. Kill it.
-//        gnash::log_error("BUG: Child process is stuck. Killing it.");
 
         kill(*pid, SIGKILL);
         waitpid(*pid, &status, 0);
@@ -590,14 +587,6 @@ nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
     return NS_PluginGetValue(aVariable, aValue);
 }
 
-#if 0
-// FIXME: debugging stuff, will be gone soon after I figure how this works
-void myfunc(void */* param */)
-{
-    gnash::log_debug("Here I am!!!\n");
-}
-#endif
-
 /// \brief Open a new data stream
 ///
 /// Opens a new incoming data stream, which is the flash movie we want
@@ -622,12 +611,6 @@ nsPluginInstance::NewStream(NPMIMEType /*type*/, NPStream* stream,
     }
     _swf_url = stream->url;
 
-#if 0
-    // FIXME: debugging crap for now call javascript
-    NPN_PluginThreadAsyncCall(_instance, myfunc, NULL);
-    // gnash::log_debug("FIXME: %s", getEmbedURL());
-#endif
-    
     if (!_swf_url.empty() && _window) {
         startProc();
     }
