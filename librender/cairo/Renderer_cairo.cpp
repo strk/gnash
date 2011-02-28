@@ -486,9 +486,8 @@ Renderer_cairo::createCachedBitmap(std::auto_ptr<image::GnashImage> im)
 
 void
 Renderer_cairo::drawVideoFrame(image::GnashImage* baseframe, const Transform& xform,
-                               const SWFRect* bounds, bool /*smooth*/)
+                               const SWFRect* bounds, bool smooth)
 {
-
     if (baseframe->type() == image::TYPE_RGBA)
     {
         LOG_ONCE(log_error(_("Can't render videos with alpha")));
@@ -538,6 +537,20 @@ Renderer_cairo::drawVideoFrame(image::GnashImage* baseframe, const Transform& xf
     cairo_pattern_set_extend(pattern, CAIRO_EXTEND_NONE);
     cairo_pattern_set_matrix(pattern, &mat);
 
+    cairo_filter_t filter;
+    switch (_quality) {
+        case QUALITY_BEST:
+        case QUALITY_HIGH:
+            if (smooth) {
+                filter = CAIRO_FILTER_GOOD;
+                break;
+            }
+        case QUALITY_MEDIUM:
+        case QUALITY_LOW:
+            filter = CAIRO_FILTER_FAST;
+    }
+    cairo_pattern_set_filter(pattern, filter);
+
     // Draw the frame now
     cairo_save(_cr);
     cairo_set_source(_cr, pattern);
@@ -547,6 +560,7 @@ Renderer_cairo::drawVideoFrame(image::GnashImage* baseframe, const Transform& xf
   
     cairo_rectangle(_cr, range.getMinX(), range.getMinY(), range.width(),
                     range.height());
+    
     cairo_clip(_cr);
     cairo_paint(_cr);
     cairo_restore(_cr);
