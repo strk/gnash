@@ -25,6 +25,7 @@ Improvements since 0.8.8 release are:
  * Support for linear RGB interpolation mode in gradient fills.
  * Clipboard setting (GTK only).
  * More flash.geom.Rectangle functions.
+ * Improved OpenBSD compatibility
 
 Gnash 0.8.8
 2010/08/17
