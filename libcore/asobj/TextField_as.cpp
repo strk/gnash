@@ -254,6 +254,8 @@ textfield_createTextField(const fn_call& fn)
     //  2. Make that object into a TextField and put it on the display list.
     as_object* obj = createTextFieldObject(getGlobal(fn));
 
+    if (!obj) return as_value();
+
     DisplayObject* tf = new TextField(obj, ptr, bounds);
 
     VM& vm = getVM(fn);
