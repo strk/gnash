@@ -85,17 +85,6 @@ static int hostfd = -1;
 /// standalone player from this plugin.
 static int controlfd = -1;
 
-bool
-testfunc (NPObject */* npobj */, NPIdentifier /* name */, const NPVariant */*args */,
-          uint32_t /* argCount */, NPVariant *result)
-{   
-    log_debug(__PRETTY_FUNCTION__);
-    
-    DOUBLE_TO_NPVARIANT(122333.4444, *result);
-    
-    return true;
-}
-
 void
 printNPVariant(const NPVariant *value)
 {
@@ -103,7 +92,7 @@ printNPVariant(const NPVariant *value)
         double num = NPVARIANT_TO_DOUBLE(*value);
         log_debug("is double, value %g", num);
     } else if (NPVARIANT_IS_STRING(*value)) {
-        std::string str(NPVARIANT_TO_STRING(*value).UTF8Characters);
+        std::string str = NPStringToString(NPVARIANT_TO_STRING(*value));
         log_debug("is string, value %s", str);
     } else if (NPVARIANT_IS_BOOLEAN(*value)) {
         bool flag = NPVARIANT_TO_BOOLEAN(*value);
