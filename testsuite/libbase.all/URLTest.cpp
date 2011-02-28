@@ -282,6 +282,16 @@ main(int /*argc*/, char** /*argv*/)
        check_equals (u2.anchor(), "anchor");
     }
 
+    { // URL with url in query string
+       URL u("http://anurl.com/tmp/easy.swf?url=http://url.it/there");
+       xcheck_equals (u2.protocol(), "http");
+       xcheck_equals (u2.hostname(), "anurl.com");
+       check_equals (u2.port(), "");
+       xcheck_equals (u2.path(), "/tmp/easy.swf");
+       xcheck_equals (u2.querystring(), "url=http://url.it/there");
+       check_equals (u2.anchor(), "");
+    }
+
     bool threw = false;
     try
     { // pseudo-url from Mozilla
