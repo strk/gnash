@@ -1003,7 +1003,7 @@ Gui::advanceMovie(bool doDisplay)
     }
 #endif // ndef SKIP_RENDERING_IF_LATE
 
-	if (doDisplay) display(m);
+	if (doDisplay && visible()) display(m);
 
 	if (!loops()) {
 		size_t curframe = m->get_current_frame(); // can be 0 on malformed SWF

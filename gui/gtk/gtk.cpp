@@ -111,6 +111,8 @@ namespace {
                                        gpointer data);
     gboolean motionNotifyEvent(GtkWidget *widget, GdkEventMotion *event,
                                         gpointer data);
+    gboolean visibilityNotifyEvent(GtkWidget *widget, GdkEventVisibility *event,
+                                   gpointer data);
     gint popupHandler(GtkWidget *widget, GdkEvent *event);    
 
     gint popupHandlerAlt(GtkWidget *widget, GdkEvent *event);    
@@ -145,6 +147,7 @@ GtkGui::GtkGui(unsigned long xid, float scale, bool loop, RunResources& r)
     ,_resumeButton(0)
     ,_overlay(0)
     ,_canvas(0)
+    ,_visible(true)
     ,_popup_menu(0)
     ,_popup_menu_alt(0)
     ,_menubar(0)
@@ -567,6 +570,7 @@ GtkGui::setupEvents()
     setupWindowEvents();
 
     gtk_widget_add_events(_canvas, GDK_EXPOSURE_MASK
+                        | GDK_VISIBILITY_NOTIFY_MASK
                         | GDK_BUTTON_PRESS_MASK
                         | GDK_BUTTON_RELEASE_MASK
                         | GDK_KEY_RELEASE_MASK
@@ -589,6 +593,8 @@ GtkGui::setupEvents()
                    G_CALLBACK(motionNotifyEvent), this);
     g_signal_connect(_canvas, "scroll_event",
                    G_CALLBACK(mouseWheelEvent), this);
+    g_signal_connect(_canvas, "visibility-notify-event",
+                   G_CALLBACK(visibilityNotifyEvent), this);
   
     g_signal_connect_after(_canvas, "realize",
                          G_CALLBACK (realizeEvent), NULL);
@@ -2438,6 +2444,25 @@ motionNotifyEvent(GtkWidget *const /*widget*/, GdkEventMotion *const event,
 
     obj->notifyMouseMove(event->x, event->y);
     return true;
+}
+
+gboolean
+visibilityNotifyEvent(GtkWidget *const /*widget*/, GdkEventVisibility  *const event,
+                  const gpointer data)
+{
+    GtkGui *obj = static_cast<GtkGui *>(data);
+
+    switch (event->state) {
+        case GDK_VISIBILITY_FULLY_OBSCURED:
+            obj->setVisible(false);
+            break;
+        case GDK_VISIBILITY_PARTIAL:
+        case GDK_VISIBILITY_UNOBSCURED:
+            obj->setVisible(true);
+            break;
+    }
+        
+    return false; // propagate the event to other listeners, if any.
 }
 
 ///////////////////////////////////////////////////////////////////////////////
