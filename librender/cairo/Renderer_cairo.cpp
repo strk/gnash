@@ -364,10 +364,7 @@ public:
 
   void moveTo(const point& ap)
   {
-      double x = ap.x, y = ap.y;
-      snap_to_half_pixel(_cr, x, y);
-    
-      cairo_move_to(_cr, x, y);
+      cairo_move_to(_cr, ap.x, ap.y);
   }
 
   virtual void curveTo(const Edge& cur_edge)
@@ -387,19 +384,13 @@ public:
     x = cur_edge.ap.x;
     y = cur_edge.ap.y;
 
-    snap_to_half_pixel(_cr, x1, y1);
-    snap_to_half_pixel(_cr, x2, y2);
-    snap_to_half_pixel(_cr, x, y);
-
-    cairo_curve_to(_cr, x1, y1, x2, y2, x, y);
-    
+    cairo_curve_to(_cr, x1, y1, x2, y2, x, y);    
   }
 
   void lineTo(const point& ap)
   {
     double x = ap.x;
     double y = ap.y;
-    snap_to_half_pixel(_cr, x, y);
       
     cairo_line_to(_cr, x, y);
   }
