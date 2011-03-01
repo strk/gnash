@@ -111,7 +111,7 @@ xlc )
 esac
 
 if test -z "$NO_LIBTOOLIZE" ; then
-  libtoolflags="--force --copy --quiet"
+  libtoolflags="--force --copy"
   echo "Running libtoolize ${libtoolflags} ..."
   rm -fr macros/libtool.m4 macros/ltoptions.m4
   rm -fr macros/ltsugar.m4 macros/ltversion.m4 macros/lt~obsolete.m4
