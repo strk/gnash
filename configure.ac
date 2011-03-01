@@ -3878,7 +3878,7 @@ else
   echo "        ERROR: No libltdl development package is installed" >&3
   echo "               Install it from ftp://ftp.gnu.org/gnu/libtool/" >&3
   echo "               or .deb users: apt-get install libltdl-dev" >&3
-  echo "               or .rpm users: yum install libltdl-devel" >&3
+  echo "               or .rpm users: yum install libtool-ltdl-devel" >&3
 fi
  
 if test x"$python" = x"yes"; then
