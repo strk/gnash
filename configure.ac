@@ -1293,7 +1293,7 @@ AC_SUBST(DLPREOPEN)
 
 GNASH_PKG_FIND([ltdl], [ltdl.h], [libltdl library], [lt_dlinit])
 
-if test x"$ĥas_ltdl" = x"yes";then
+if test x"$has_ltdl" = x"yes";then
   AC_DEFINE(HAVE_LTDL, [1], [Libtool 2.x defines this, but libtool 1.5 doesn't])
 fi
 
