@@ -575,6 +575,7 @@ MediaParserGst::cb_chain_func_audio (GstPad *pad, GstBuffer *buffer)
     }
     
     frame->extradata.reset(new EncodedExtraGstData(buffer));
+    frame->dataSize = GST_BUFFER_SIZE(buffer);
     
 #ifdef GNASH_DEBUG_DATAFLOW
     log_debug("remembering audio buffer with timestamp %d.", frame->timestamp);
