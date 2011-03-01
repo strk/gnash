@@ -37,6 +37,7 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	$(Z_CFLAGS) \
 	$(JPEG_CFLAGS) \
 	$(BOOST_CFLAGS) \
+	$(LTDL_CFLAGS) \
 	$(NULL)
 
 if ANDROID
@@ -126,7 +127,7 @@ if USE_GIF
 libgnashbase_la_SOURCES += GnashImageGif.cpp
 endif
 
-libgnashbase_la_LIBADD += -lltdl
+libgnashbase_la_LIBADD += $(LTDL_LIBS)
 
 if HAIKU
   libgnashbase_la_LIBADD += $(HAIKU_LIBS)

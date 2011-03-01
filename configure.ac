@@ -3870,6 +3870,16 @@ dnl Haiku
 if test x"${build_haiku}" = xyes -o x"${build_sound_mkit}" = xyes -o x"${build_media_haiku}" = x"yes"; then
     echo "        Haiku libs are: $HAIKU_LIBS"
 fi
+
+if test x"$has_ltdl" = x"yes";then
+  echo "        LIBLTDL flags are: $LTDL_CFLAGS"
+  echo "        LIBLTDL libs are: $LTDL_LIBS"
+else
+  echo "        ERROR: No libltdl development package is installed" >&3
+  echo "               Install it from ftp://ftp.gnu.org/gnu/libtool/" >&3
+  echo "               or .deb users: apt-get install libltdl-dev" >&3
+  echo "               or .rpm users: yum install libltdl-devel" >&3
+fi
  
 if test x"$python" = x"yes"; then
   if test x"$has_python" = x"yes"; then
