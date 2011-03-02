@@ -1513,20 +1513,18 @@ BufferedAudioStreamer::fetch(boost::int16_t* samples, unsigned int nSamples, boo
             break;
         }
 
-        CursoredBuffer* samples = _audioQueue.front();
+        CursoredBuffer& samples = _audioQueue.front();
 
-        assert( ! (samples->m_size%2) ); 
-        int n = std::min<int>(samples->m_size, len);
-        std::copy(samples->m_ptr, samples->m_ptr+n, stream);
+        assert( ! (samples.m_size%2) ); 
+        int n = std::min<int>(samples.m_size, len);
+        std::copy(samples.m_ptr, samples.m_ptr+n, stream);
 
         stream += n;
-        samples->m_ptr += n;
-        samples->m_size -= n;
+        samples.m_ptr += n;
+        samples.m_size -= n;
         len -= n;
 
-        if (samples->m_size == 0)
-        {
-            delete samples;
+        if (samples.m_size == 0) {
             _audioQueue.pop_front();
         }
 
@@ -1563,9 +1561,6 @@ void
 BufferedAudioStreamer::cleanAudioQueue()
 {
     boost::mutex::scoped_lock lock(_audioQueueMutex);
-
-    deleteChecked(_audioQueue.begin(), _audioQueue.end());
-
     _audioQueue.clear();
 }
 
