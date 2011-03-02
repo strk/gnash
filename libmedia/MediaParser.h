@@ -471,6 +471,11 @@ public:
 	///
 	DSOEXPORT boost::uint64_t getBufferLength() const;
 
+	/// Return true if both audio and video buffers are empty
+	//
+	/// NOTE: locks _qMutex
+	DSOEXPORT bool isBufferEmpty() const;
+
 	/// Return the time we want the parser thread to maintain in the buffer
 	DSOEXPORT boost::uint64_t getBufferTime() const
 	{
