@@ -22,41 +22,23 @@ SYSTEM_TESTS_V9 =
 SYSTEM_TESTS_V8 = 
 SYSTEM_TESTS_V6 = 
 
-if BUILD_APPLICATIONDOMAIN_AS3
 SYSTEM_TESTS_V9 += system/ApplicationDomain_as.swf
-endif
 
-if BUILD_CAPABILITIES_AS3
 SYSTEM_TESTS_V9 += system/Capabilities_as.swf
-endif
 
-if BUILD_IMECONVERSIONMODE_AS3
 SYSTEM_TESTS_V9 += system/IMEConversionMode_as.swf
-endif
 
-if BUILD_IME_AS3
 SYSTEM_TESTS_V9 += system/IME_as.swf
-endif
 
-if BUILD_LOADERCONTEXT_AS3
 SYSTEM_TESTS_V9 += system/LoaderContext_as.swf
-endif
 
-if BUILD_SECURITYDOMAIN_AS3
 SYSTEM_TESTS_V9 += system/SecurityDomain_as.swf
-endif
 
-if BUILD_SECURITYPANEL_AS3
 SYSTEM_TESTS_V9 += system/SecurityPanel_as.swf
-endif
 
-if BUILD_SECURITY_AS3
 SYSTEM_TESTS_V8 += system/Security_as.swf
-endif
 
-if BUILD_SYSTEM_AS3
 SYSTEM_TESTS_V6 += system/System_as.swf
-endif
 
 check_SCRIPTS += $(SYSTEM_TESTS_V9) $(SYSTEM_TESTS_V8) $(SYSTEM_TESTS_V6)
 HAXE_FLAGS += -cp $(SYSTEMdir)

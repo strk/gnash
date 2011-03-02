@@ -1275,8 +1275,6 @@ AM_CONDITIONAL(BUILD_LIRC_EXT, [ test x$ext_lirc = xyes ])
 AM_CONDITIONAL(BUILD_DBUS_EXT, [ test x$ext_dbus = xyes ])
 AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n "$extensions_list"])
 
-GNASH_PKG_CLASSFILE
-
 dnl --------------------------------------------------------
 dnl Libtool
 dnl --------------------------------------------------------

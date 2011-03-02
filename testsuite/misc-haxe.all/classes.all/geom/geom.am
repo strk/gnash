@@ -19,25 +19,15 @@ GEOMdir = $(srcdir)/geom
 
 GEOM_TESTS_V8 = 
 
-if BUILD_COLORTRANSFORM_AS3
 GEOM_TESTS_V8 += geom/ColorTransform_as.swf
-endif
 
-if BUILD_MATRIX_AS3
 GEOM_TESTS_V8 += geom/Matrix_as.swf
-endif
 
-if BUILD_POINT_AS3
 GEOM_TESTS_V8 += geom/Point_as.swf
-endif
 
-if BUILD_RECTANGLE_AS3
 GEOM_TESTS_V8 += geom/Rectangle_as.swf
-endif
 
-if BUILD_TRANSFORM_AS3
 GEOM_TESTS_V8 += geom/Transform_as.swf
-endif
 
 check_SCRIPTS += $(GEOM_TESTS_V8)
 HAXE_FLAGS += -cp $(GEOMdir)

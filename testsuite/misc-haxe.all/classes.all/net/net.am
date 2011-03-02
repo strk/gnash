@@ -24,94 +24,52 @@ NET_TESTS_V7 =
 NET_TESTS_V8 =
 NET_TESTS_V9 =
 
-if BUILD_FILEFILTER_AS3
 NET_TESTS_V9 += net/FileFilter_as.swf
-endif
 
-if BUILD_FILEREFERENCELIST_AS3
 NET_TESTS_V8 += net/FileReferenceList_as.swf
-endif
 
-if BUILD_FILEREFERENCE_AS3
 NET_TESTS_V8 += net/FileReference_as.swf
-endif
 
-if BUILD_IDYNAMICPROPERTYOUTPUT_AS3
 NET_TESTS_V9 += net/IDynamicPropertyOutput_as.swf
-endif
 
-if BUILD_IDYNAMICPROPERTYWRITER_AS3
 NET_TESTS_V9 += net/IDynamicPropertyWriter_as.swf
-endif
 
-if BUILD_LOCALCONNECTION_AS3
 NET_TESTS_V6 += net/LocalConnection_as.swf
-endif
 
-if BUILD_NETCONNECTION_AS3
 NET_TESTS_V7 += net/NetConnection_as.swf
-endif
 
-if BUILD_NETSTREAM_AS3
 NET_TESTS_V7 += net/NetStream_as.swf
-endif
 
-if BUILD_OBJECTENCODING_AS3
 NET_TESTS_V9 += net/ObjectEncoding_as.swf
-endif
 
-if BUILD_RESPONDER_AS3
 NET_TESTS_V9 += net/Responder_as.swf
-endif
 
-if BUILD_SHAREDOBJECTFLUSHSTATUS_AS3
 NET_TESTS_V9 += net/SharedObjectFlushStatus_as.swf
-endif
 
-if BUILD_SHAREDOBJECT_AS3
 NET_TESTS_V6 += net/SharedObject_as.swf
-endif
 
-if BUILD_SOCKET_AS3
 NET_TESTS_V9 += net/Socket_as.swf
-endif
 
-if BUILD_URLLOADERDATAFORMAT_AS3
 NET_TESTS_V9 += net/URLLoaderDataFormat_as.swf
-endif
 
-if BUILD_URLLOADER_AS3
 NET_TESTS_V9 += net/URLLoader_as.swf
-endif
 
 # AIR only
 # if BUILD_URLREQUESTDEFAULTS_AS3
 # NET_TESTS += net/URLRequestDefaults_as.swf
 # endif
 
-if BUILD_URLREQUESTHEADER_AS3
 NET_TESTS_V9 += net/URLRequestHeader_as.swf
-endif
 
-if BUILD_URLREQUESTMETHOD_AS3
 NET_TESTS_V9 += net/URLRequestMethod_as.swf
-endif
 
-if BUILD_URLREQUEST_AS3
 NET_TESTS_V9 += net/URLRequest_as.swf
-endif
 
-if BUILD_URLSTREAM_AS3
 NET_TESTS_V9 += net/URLStream_as.swf
-endif
 
-if BUILD_URLVARIABLES_AS3
 NET_TESTS_V9 += net/URLVariables_as.swf
-endif
 
-if BUILD_XMLSOCKET_AS3
 NET_TESTS_V6 += net/XMLSocket_as.swf
-endif
 
 check_SCRIPTS += $(NET_TESTS_V6) $(NET_TESTS_V7) $(NET_TESTS_V8) $(NET_TESTS_V9)
 HAXE_FLAGS += -cp $(NETdir)

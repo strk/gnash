@@ -50,11 +50,9 @@ TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
 	$(NULL)
 
-if ENABLE_AVM2
 TEST_CASES += \
 	sanetests-runner \
 	bogustests-runner
-endif
 
 sanetests-runner: $(srcdir)/../generic-testrunner.sh $(SANE_ASTESTS_OUT) Makefile
 	sh $(srcdir)/../generic-testrunner.sh -c __END_OF_TEST__ -r 50 $(top_builddir) $(SANE_ASTESTS_OUT) > $@
