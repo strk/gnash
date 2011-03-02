@@ -29,7 +29,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/gui \
 	-I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/libcore/abc \
-        -I$(top_srcdir)/libcore/swf \
+	-I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libcore/vm \
 	-I$(top_srcdir)/libcore/parser \
 	-I$(top_srcdir)/libcore/asobj \
@@ -42,7 +42,7 @@ AM_CPPFLAGS = \
 	$(PANGO_CFLAGS) \
 	$(ATK_CFLAGS) \
 	$(CAIRO_CFLAGS) \
-	$(INCLTDL)
+	$(NULL)
 
 AM_LDFLAGS =  \
 	$(top_builddir)/libbase/libgnashbase.la \

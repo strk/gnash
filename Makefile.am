@@ -63,16 +63,12 @@ STD_DIRS = \
 	po \
 	$(NULL)
 
-if LIBLTDL2
-LIBLTDLDIR = libltdl
-endif
-
 if HAVE_VAAPI
 VAAPI_DIR = libvaapi
 endif
 
-SUBDIRS = $(LIBLTDLDIR) $(VAAPI_DIR) $(STD_DIRS)
-DIST_SUBDIRS = $(STD_DIRS) cygnal extensions testsuite libltdl libvaapi
+SUBDIRS = $(VAAPI_DIR) $(STD_DIRS)
+DIST_SUBDIRS = $(STD_DIRS) cygnal extensions testsuite libvaapi
 
 if TESTSUITE
 SUBDIRS += testsuite
@@ -108,10 +104,6 @@ EXTRA_DIST =  \
 	packaging/gnash.xpm \
 	packaging/klash.xpm \
 	revno.h
-
-if LIBLTDL1
-EXTRA_DIST += libltdl/ltdl.h libltdl/ltdl.c
-endif
 
 # dist-hook:
 # 	@test -d "$(distdir)/packaging" || $(mkinstalldirs) "$(distdir)/packaging"
@@ -292,8 +284,8 @@ endif
 	@echo "	X11_CFLAGS is $(X11_CFLAGS)"
 	@echo "	X11_LIBS is $(X11_LIBS)"
 	@echo "Support libraries..."
-	@echo "	INCLTDL $(INCLTDL) "
-	@echo "	LIBLTDL $(LIBLTDL) "
+	@echo "	LTDL_CFLAGS is $(LTDL_CFLAGS)"
+	@echo "	LTDL_LIBS is $(LTDL_LIBS)"
 	@echo "	GLIB_CFLAGS is $(GLIB_CFLAGS)"
 	@echo "	GLIB_LIBS is $(GLIB_LIBS)"
 	@echo "	Z_CFLAGS is $(Z_CFLAGS)"

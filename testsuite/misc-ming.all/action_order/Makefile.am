@@ -57,13 +57,6 @@ AM_LDFLAGS = \
 	$(top_builddir)/librender/libgnashrender.la \
 	$(NULL)
 
-if LIBLTDL2
-AM_LDFLAGS  += $(top_builddir)/libltdl/libltdlc.la
-endif
-if LIBLTDL1
-AM_LDFLAGS += $(top_builddir)/libbase/libltdlc.la
-endif
-
 check_PROGRAMS = \
 	action_execution_order_test \
 	action_execution_order_extend_test \

@@ -124,13 +124,6 @@ libtestsuite_la_LIBADD = \
 	$(top_builddir)/librender/libgnashrender.la \
 	$(NULL)
 
-if LIBLTDL2
-libtestsuite_la_LIBADD += $(top_builddir)/libltdl/libltdlc.la
-endif
-if LIBLTDL1
-libtestsuite_la_LIBADD += $(top_builddir)/libbase/libltdlc.la
-endif
-
 libtestsuite_la_CXXFLAGS = \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libmedia \

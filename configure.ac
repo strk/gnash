@@ -21,7 +21,6 @@ AC_CONFIG_SRCDIR([libcore/as_object.h])
 AC_CONFIG_HEADERS([gnashconfig.h])
 AC_CONFIG_MACRO_DIR([macros])
 
-dnl AC_CONFIG_SUBDIRS(libltdl)
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 
@@ -1278,57 +1277,25 @@ AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n "$extensions_list"])
 
 GNASH_PKG_CLASSFILE
 
-ltmajor=0
-AC_MSG_CHECKING([For the version of libtool])
-if test -d ${srcdir}/libltdl/libltdl; then
-  ltver=2.x
-else
-  ltver=1.x
-fi
-ltmajor=`echo $ltver | cut -d '.' -f 1`
-AC_MSG_RESULT([$ltver])
-dnl Libtool version 1.5
-if test $ltmajor -eq 1; then
-  AC_LIBLTDL_CONVENIENCE
-  AC_LIBTOOL_DLOPEN
-  if test x"${windows}" = x"yes"; then
-    dnl The following macro may be empty; the colon is necessary
-    dnl in this case to avoid an empty if statement (which is a syntax error).
-    AC_LIBTOOL_WIN32_DLL
-    :
-  fi
-  AC_DISABLE_STATIC
-  dnl FIXME: there should really be a test here to make sure it's really there,
-  dnl but because libltdl requires us to use their config code, it's a lot harder
-  dnl to do that. So if we get this far without errors, we just blindly assume
-  dnl the header exists too. This is only used by libtool 1.5, which appears to
-  dnl mostly only effect Debian lenny or OpenBSD. Libtool; 2.x defines this, but
-  dnl libtool 1.5 doesn't, and we need it for dlopen() so extensions work.
-  AC_DEFINE(HAVE_LTDL, [1], [Libtool 2.x defines this, but libtool 1.5 doesn't])
-dnl libtool version 2.x
-else
-  dnl LT_CONFIG_LTDL_DIR([libltdl])
-  LT_INIT([dlopen win32-dll disable-static])
-  LTDL_INIT([convenience recursive])
-fi
-AC_LIB_LTDL
+dnl --------------------------------------------------------
+dnl Libtool
+dnl --------------------------------------------------------
 
+AC_LIBTOOL_DLOPEN
+AC_LIBTOOL_WIN32_DLL
+AC_DISABLE_STATIC
+AC_PROG_LIBTOOL
+AC_SUBST(LIBTOOL_DEPS)
 DLOPEN="-dlopen"
 DLPREOPEN="-dlpreopen"
 AC_SUBST(DLOPEN)
 AC_SUBST(DLPREOPEN)
 
-dnl dnl Substitute INCLTDL and LIBLTDL in the Makefiles
-AC_SUBST(INCLTDL)
-AC_SUBST(LIBLTDL)
+GNASH_PKG_FIND([ltdl], [ltdl.h], [libltdl library], [lt_dlinit])
 
-AC_PROG_LIBTOOL
-AC_SUBST(LIBTOOL_DEPS)
-
-AM_CONDITIONAL(LIBLTDL2, [test $ltmajor -eq 2])
-AM_CONDITIONAL(LIBLTDL1, [test $ltmajor -eq 1])
-AM_CONDITIONAL(CONVENIENCE_LTDL, test x"${enable_ltdl_convenience-no}" != xno)
-AM_CONDITIONAL(INSTALL_LTDL, test x"${enable_ltdl_install-no}" != xno)
+if test x"$has_ltdl" = x"yes";then
+  AC_DEFINE(HAVE_LTDL, [1], [Libtool 2.x defines this, but libtool 1.5 doesn't])
+fi
 
 dnl --------------------------------------------------------
 dnl SOL dir
@@ -2947,20 +2914,20 @@ SUPPORTED_GUIS="`echo ${SUPPORTED_GUIS} | sed 's/,//'`" # Strip leading comma
 AC_SUBST(SUPPORTED_GUIS)
 
 dnl AC_CONFIG_LINKS(doc/C/images)
-dnl AC_CONFIG_LINKS(gnashconfig.h,libltdl/config.h)
+dnl AC_CONFIG_LINKS(gnashconfig.h)
 AC_CONFIG_LINKS(cygnal/testsuite/cygnal.all/cygnalrc:cygnal/testsuite/cygnal.all/cygnalrc.in)
 AC_CONFIG_LINKS(testsuite/libbase.all/gnashrc:testsuite/libbase.all/gnashrc.in)
 AC_CONFIG_LINKS(testsuite/libbase.all/gnashrc-local:testsuite/libbase.all/gnashrc-local.in)
 
 AC_CONFIG_FILES(
 gnash.pc:gnash.pc.in
-gui/klash:gui/klash.in
+desktop/gnash-gtk-launcher:desktop/gnash-gtk-launcher.in
+desktop/gnash-qt-launcher:desktop/gnash-qt-launcher.in
 )
 
 AC_OUTPUT(Makefile
 desktop/Makefile
 po/Makefile
-libltdl/Makefile
 libmedia/Makefile
 libsound/Makefile
 libbase/Makefile
@@ -3902,6 +3869,16 @@ fi
 dnl Haiku
 if test x"${build_haiku}" = xyes -o x"${build_sound_mkit}" = xyes -o x"${build_media_haiku}" = x"yes"; then
     echo "        Haiku libs are: $HAIKU_LIBS"
+fi
+
+if test x"$has_ltdl" = x"yes";then
+  echo "        LIBLTDL flags are: $LTDL_CFLAGS"
+  echo "        LIBLTDL libs are: $LTDL_LIBS"
+else
+  echo "        ERROR: No libltdl development package is installed" >&3
+  echo "               Install it from ftp://ftp.gnu.org/gnu/libtool/" >&3
+  echo "               or .deb users: apt-get install libltdl-dev" >&3
+  echo "               or .rpm users: yum install libtool-ltdl-devel" >&3
 fi
  
 if test x"$python" = x"yes"; then

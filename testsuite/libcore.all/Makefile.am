@@ -66,17 +66,6 @@ AM_LDFLAGS = \
 	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libsound/libgnashsound.la
 
-if LIBLTDL2
-AM_LDFLAGS += $(top_builddir)/libltdl/libltdlc.la
-endif
-if LIBLTDL1
-AM_LDFLAGS += $(top_builddir)/libbase/libltdlc.la
-endif
-
-#if USE_FFMPEG_ENGINE
-#AM_LDFLAGS += $(FFMPEG_LIBS)
-#endif
-
 BitsReaderTest_SOURCES = BitsReaderTest.cpp
 BitsReaderTest_LDADD = $(AM_LDFLAGS)
 

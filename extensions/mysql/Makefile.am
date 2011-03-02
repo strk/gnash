@@ -30,7 +30,6 @@ AM_CPPFLAGS = \
             -I$(top_srcdir)/libcore/swf \
             -I$(top_srcdir)/libcore/vm \
             -I$(top_srcdir)/libcore/asobj \
-            -I$(top_srcdir)/libltdl \
             $(BOOST_CFLAGS) \
             $(MYSQL_CFLAGS) \
 	    $(NULL)

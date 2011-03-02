@@ -110,66 +110,12 @@ xlc )
   am_opt=--include-deps;;
 esac
 
-# Rather than have libltdl run it's own configure, the few tests
-# libltdl needed were added to the main configure.ac. As we need to
-# look at config.h in header files, which may conflict with other
-# versions of config.h, this has been renamed to gnashconfig,h to be
-# unique. As the files libtoolize copies insist on using config.h, we
-# just edit the name, rather than adding a fixed copy to Gnash.
-#
-# This gets more interesting with libtool 2.x, which heavily changed
-# how everything worked. Where libtool 1.5 installed only a header and
-# had a single source file, libtool 2.x has an entire sub directory
-# tree of headers and source files. So for libtool 1.5.x, we do
-# everything the way this has always worked for Gnash. For libtool
-# 2.x, we install in a subdirectory of libbase, because we have to
-# hack the build directory, and everything configures tottally
-# differernt than 1.5.x used to. For more fun, libtoolize has
-# different command line arguments, but one thing that got fixed is
-# for libtool 2.x there is an #define for the config file name, but
-# for libtool 1.5 it expects config.h always, so we change this to
-# gnashconfig.h.
-ltdlver=`${LIBTOOLIZE:-libtoolize} --version | head -1 | sed -e 's/(.*) //' | cut -d ' ' -f 2`
-ltdlmajor=`echo $ltdlver | cut -d '.' -f 1`
 if test -z "$NO_LIBTOOLIZE" ; then
-  ltbasedir="libltdl"
-  libtoolflags="--force --copy  --ltdl"
-  if test $ltdlmajor -eq 2; then
-    libtoolflags="${libtoolflags} ${ltbasedir} --quiet --recursive"
-  fi
-  echo "Running libtoolize $ltdlver ${libtoolflags} ..."
-  # We have to remove the old libltdl sources, as it's entirely
-  # possible these files are being regenerated on a machine with a
-  # different version of libtoolize.
-  rm -fr libltdl
-  # delete the old libtool config macros too, or things break when downgrading
-  # to libtool 1.x.
-  rm -fr macros/libtool.m4 macros/ltdl.m4 macros/ltoptions.m4
+  libtoolflags="--force --copy"
+  echo "Running libtoolize ${libtoolflags} ..."
+  rm -fr macros/libtool.m4 macros/ltoptions.m4
   rm -fr macros/ltsugar.m4 macros/ltversion.m4 macros/lt~obsolete.m4
-  if ${LIBTOOLIZE:-libtoolize} ${libtoolflags}; then
-    # libtool insists on including config.h, but we use gnashconfig.h
-    # to avoid any problems, so we have to change this include
-    # so they all reference the right config header file.
-    if test -d libltdl; then
-      for i in libltdl/*.c; do
-#      echo "Fixing $i..."
-        mv $i $i.orig
-        sed -e 's/include <config.h>/include <gnashconfig.h>/' $i.orig > $i
-      done
-    fi
-#            mv libltdl/ltdl.c libltdl/ltdl.c.orig
-#            sed -e 's/include <config.h>/include <gnashconfig.h>/' libltdl/ltdl.c.orig > libltdl/ltdl.c
-    # for libtool 1.x, we don't build in libltdl, it's built in libbase instead. autoconf doesn't like
-    # conditional output files, so we nuke the original libltdl/Makefile.am and replace it with a zero
-    # sized one to keep autoconf happy.
-    if test $ltdlmajor -eq 1; then
-       mv libltdl/Makefile.am Makefile.am.orig
-       touch libltdl/Makefile.am
-    fi
-    if test -f  ${ltbasedir}/config-h.in; then
-      chmod a+w  ${ltbasedir}/config-h.in # Darwin needs this
-    fi
-  else
+  if ! ${LIBTOOLIZE:-libtoolize} ${libtoolflags}; then
     echo
     echo "**Error**: libtoolize failed, do you have libtool and libltdl3-dev packages installed?"
     exit 1
@@ -194,12 +140,6 @@ do
 
      if test -d cygnal; then
         aclocalinclude="-I cygnal ${aclocalinclude}"
-     fi
-
-     # libtoolize 1.x puts the additional config files in the top level libltdl
-     # libtoolize puits them in ourt own macros subdirectory.
-     if test -f libltdl/acinclude.m4; then
-        aclocalinclude="-I libltdl ${aclocalinclude}"
      fi
 
      if grep "^AM_GLIB_GNU_GETTEXT" configure.ac >/dev/null; then

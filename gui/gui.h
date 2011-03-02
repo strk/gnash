@@ -539,6 +539,8 @@ protected:
     /// Called by Gui::play().
     virtual void playHook() {}
 
+    /// Determines whether the Gui is visible (not obscured).
+    virtual bool visible() { return true; }
 private:
 
     struct Display;

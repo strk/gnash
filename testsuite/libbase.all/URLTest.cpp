@@ -282,6 +282,26 @@ main(int /*argc*/, char** /*argv*/)
        check_equals (u2.anchor(), "anchor");
     }
 
+    { // HTTP URL with url in query string
+       URL u("http://anurl.com/tmp/easy.swf?url=http://url.it/there");
+       check_equals (u.protocol(), "http");
+       check_equals (u.hostname(), "anurl.com");
+       check_equals (u.port(), "");
+       check_equals (u.path(), "/tmp/easy.swf");
+       check_equals (u.querystring(), "url=http://url.it/there");
+       check_equals (u.anchor(), "");
+    }
+
+    { // File URL with url in query string (see bug #32625)
+       URL u("/tmp/easy.swf?url=http://url.it/there");
+       xcheck_equals (u.protocol(), "file");
+       xcheck_equals (u.hostname(), "");
+       check_equals (u.port(), "");
+       xcheck_equals (u.path(), "/tmp/easy.swf");
+       xcheck_equals (u.querystring(), "url=http://url.it/there");
+       check_equals (u.anchor(), "");
+    }
+
     bool threw = false;
     try
     { // pseudo-url from Mozilla

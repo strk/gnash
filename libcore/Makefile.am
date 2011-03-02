@@ -24,9 +24,7 @@ if ENABLE_PCH
 AM_CXXFLAGS = $(PCH_FLAGS)
 endif
 
-# noinst_LTLIBRARIES = libserver.la 
 pkglib_LTLIBRARIES = libgnashcore.la
-# noinst_SCRIPTS = gen-files.sh
 
 # TODO: use a conditional to optionally link ?
 FREETYPE_SOURCES = FreetypeGlyphsProvider.h FreetypeGlyphsProvider.cpp
@@ -39,8 +37,8 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libcore/asobj \
 	-I$(top_srcdir)/libcore/asobj/flash \
 	-I$(top_srcdir)/libcore/parser \
-	-I$(top_srcdir)/libltdl \
 	-I$(top_srcdir)/libcore/vm \
+	-I$(top_srcdir)/libltdl \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
@@ -299,7 +297,6 @@ AM_CPPFLAGS += $(FFMPEG_CFLAGS) \
 		-I$(top_srcdir)/libmedia/ffmpeg
 endif
 
-#libserver_la_LIBDADD =  #@DL_LIB@
 libgnashcore_la_LDFLAGS = -release $(VERSION) -export-dynamic
 
 if HAIKU
@@ -314,3 +311,6 @@ mudflap:
 clean-hook:
 	-rm -f core.*
 
+# Remove libtool .la files
+install-exec-hook:
+	$(RM) $(DESTDIR)$(libdir)/gnash/libgnashcore.la

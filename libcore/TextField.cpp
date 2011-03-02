@@ -122,7 +122,6 @@ TextField::TextField(as_object* object, DisplayObject* parent,
     _html(def.html()),
     _selectable(!def.noSelect())
 {
-
     assert(object);
 
     // WARNING! remember to set the font *before* setting text value!
@@ -190,6 +189,7 @@ TextField::TextField(as_object* object, DisplayObject* parent,
     _html(false),
     _selectable(true)
 {
+    assert(object);
     // Use the default font (Times New Roman for Windows, Times for Mac
     // according to docs. They don't say what it is for Linux.
     boost::intrusive_ptr<const Font> f = fontlib::get_default_font(); 

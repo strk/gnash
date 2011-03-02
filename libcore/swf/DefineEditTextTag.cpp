@@ -50,6 +50,19 @@ DefineEditTextTag::createDisplayObject(Global_as& gl, DisplayObject* parent)
 	// Resolve the font, if possible
 	getFont();
     as_object* obj = createTextFieldObject(gl);
+
+    // If the TextField class is not present, the construction of a TextField
+    // object will fail.
+    // TODO: check what happens in this case (when the TextField class is
+    // removed before this tag is processed).
+    if (!obj) {
+        // Note that it is expected that createDisplayObject() always returns
+        // a DisplayObject and not null.
+        log_error("Failed to construct a TextField object; using"
+                "a substitute object");
+        obj = new as_object(gl);
+    }
+
 	TextField* ch = new TextField(obj, parent, *this);
 
 	return ch;

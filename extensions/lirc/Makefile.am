@@ -24,15 +24,15 @@ pluginsdir = $(libdir)/gnash/plugins
 plugins_LTLIBRARIES = lirc.la
 
 AM_CPPFLAGS = \
-            -I$(top_srcdir)/libbase \
-            -I$(top_srcdir)/libcore \
-            -I$(top_srcdir)/libcore/abc \
-            -I$(top_srcdir)/libcore/swf \
-            -I$(top_srcdir)/libcore/vm \
+		-I$(top_srcdir)/libbase \
+		-I$(top_srcdir)/libcore \
+		-I$(top_srcdir)/libcore/abc \
+		-I$(top_srcdir)/libcore/swf \
+		-I$(top_srcdir)/libcore/vm \
 	    -I$(top_srcdir)/libcore/asobj \
 	    -I$(top_srcdir)/cygnal/libnet \
 	    $(BOOST_CFLAGS) \
-	    $(INCLTDL)
+	    $(NULL)
 
 lirc_la_SOURCES = lirc_ext.cpp lirc_ext.h
 lirc_la_CPPFLAGS = $(AM_CPPFLAGS)

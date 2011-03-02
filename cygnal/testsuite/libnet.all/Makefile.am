@@ -33,13 +33,6 @@ AM_LDFLAGS = \
 	$(DEJAGNU_CFLAGS) \
 	$(PTHREAD_LIBS)
 
-if LIBLTDL2
-AM_LDFLAGS  += $(top_builddir)/libltdl/libltdlc.la
-endif
-if LIBLTDL1
-AM_LDFLAGS += $(top_builddir)/libbase/libltdlc.la
-endif
-
 localedir = $(datadir)/locale
 
 INCLUDES = \

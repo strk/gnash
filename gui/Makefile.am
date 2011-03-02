@@ -132,21 +132,6 @@ GNASH_LIBS = \
 	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libbase/libgnashbase.la
 
-# if LIBLTDL2
-# GNASH_LIBS += $(top_builddir)/libltdl/libltdlc.la
-# endif
-# if LIBLTDL1
-# GNASH_LIBS += $(top_builddir)/libbase/libltdlc.la
-# endif
-
-# Only build loadable modules unless statically linking
-# if DYNAMIC_GUI # make shared libraries suitable for dlopen().
-# if  ENABLE_SHARED
-#      LIB_FLAGS = -module -avoid-version -no-undefined
-# else
-#      LIB_FLAGS = -release $(VERSION)
-# endif # ENABLE_SHARED
-# else # make shared libraries suitable for linking.
 LIB_FLAGS = -release $(VERSION)
 if WIN32
 LIB_FLAGS += --enable-auto-import
@@ -191,10 +176,6 @@ bin_PROGRAMS =
 gnash: gnash.in
 	cp $(srcdir)/gnash.in $@
 	chmod +x $@
-
-if BUILD_KDE4_GUI
-bin_SCRIPTS += klash
-endif
 
 # Always include the device files in the source tarball
 EXTRA_DIST += \

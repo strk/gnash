@@ -123,6 +123,10 @@ public:
 
     bool checkX11Extension(const std::string& ext);
 
+    virtual bool visible() { return _visible; }
+
+    void setVisible(bool visible) { _visible = visible; }
+
 private:
 
     GtkWidget* _window;
@@ -133,11 +137,13 @@ private:
     
     // The area rendered into by Gnash
     GtkWidget* _canvas;
+    bool _visible;
 
     GtkMenu* _popup_menu;
     GtkMenu* _popup_menu_alt;
     GtkWidget* _menubar;
     GtkWidget* _vbox;
+
 
     /// Add key press events to the toplevel window.
     //
@@ -159,7 +165,6 @@ private:
     void startAdvanceTimer();
 
     void stopAdvanceTimer();
-
 };
 
 } // namespace gnash

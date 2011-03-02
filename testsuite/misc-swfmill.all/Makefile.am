@@ -80,13 +80,6 @@ AM_LDFLAGS = \
 	$(top_builddir)/librender/libgnashrender.la \
 	$(NULL)
 
-if LIBLTDL2
-AM_LDFLAGS += $(top_builddir)/libltdl/libltdlc.la
-endif
-if LIBLTDL1
-AM_LDFLAGS += $(top_builddir)/libbase/libltdlc.la
-endif
-
 SC_XMLTESTS_OUT = $(SC_AS2_XMLTESTS:.xml=.swf)
 
 # Dependencies for all self-contained SWF tests

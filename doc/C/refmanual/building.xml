@@ -79,8 +79,7 @@
 	be available. Replace <emphasis>exp</emphasis> with the
 	branch name to check these out.
 	<programlisting>
-	  git branch exp origin/exp
-	  git checkout exp
+	  git checkout -b exp origin/exp
 	</programlisting>
       </para>
       <para>

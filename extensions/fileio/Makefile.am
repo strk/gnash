@@ -37,7 +37,7 @@ INCLUDES =  \
 	    -I$(top_srcdir)/libcore/asobj \
 	    $(BOOST_CFLAGS) \
 	    $(PTHREAD_CFLAGS) \
-	    $(INCLTDL)
+	    $(NULL)
 
 AM_LDFLAGS =  \
 	$(top_builddir)/libbase/libgnashbase.la \
