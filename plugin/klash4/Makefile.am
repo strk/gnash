@@ -97,13 +97,11 @@ install-plugin install-plugins: test_perms $(plugin_LTLIBRARIES) $(dist_kde_serv
 	install-dist_kde_appsdataDATA install-dist_kde_rcDATA \
 	install-dist_kde_servicesDATA
 	test -d $(DESTDIR)$(plugindir) || $(mkinstalldirs) $(DESTDIR)$(plugindir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(plugin_LTLIBRARIES) $(DESTDIR)$(plugindir)
+	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) libklashpart.* $(DESTDIR)$(plugindir)
 	$(RM) $(DESTDIR)$(plugindir)/libklashpart.la
 
 uninstall-plugins: 
 	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.so
-	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.la
-	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.a
 
 endif
 
