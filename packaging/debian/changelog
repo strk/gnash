@@ -2,6 +2,8 @@ gnash (master) distro; urgency=low
 
   * local package, updated for the 0.8.9 release.
 
+ -- Rob Savoye (Rollinsville, CO) <rob@welcomehome.org>  Wed, 02 March 2011 04:20:00 +0100
+
 gnash (0.8.9~git.19963) distro; urgency=low
 
   * local package. Add ffmpeg enabled builds
