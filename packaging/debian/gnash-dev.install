@@ -1,4 +1,3 @@
 usr/include/gnash
 #usr/lib/gnash/lib*.a
-usr/lib/gnash/*.la
 usr/*/pkgconfig/*
