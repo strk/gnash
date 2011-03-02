@@ -299,6 +299,7 @@ scrollkeeper-update -q || :
 
 %files
 %defattr(-,root,root,-)
+%{_bindir}/gnash-gtk-launcher
 %{_bindir}/gtk-gnash
 %{_mandir}/man1/gtk-gnash.1.gz
 
@@ -368,7 +369,7 @@ scrollkeeper-update -q || :
 
 %files klash4
 %defattr(-,root,root,-)
-%{_bindir}/klash
+%{_bindir}/gnash-qt-launcher
 %{_bindir}/kde4-gnash
 %{_mandir}/man1/kde4-gnash.1.*
 %{_prefix}/lib*/kde4/libklashpart.*
