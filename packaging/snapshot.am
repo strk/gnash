@@ -26,7 +26,7 @@ BRANCH_NICK   = "`if test -f revno.h; then grep "NICK" revno.h | cut -d '"' -f 2
 
 # this is used for Debian style naming conventions
 NEXT_RELEASE = 0.8.10
-SNAPSHOT_VERSION := 0.8.9~rc2
+SNAPSHOT_VERSION := 0.8.9~rc3
 #SNAPSHOT_VERSION = $(NEXT_RELEASE)~git.$(BRANCH_NICK)$(BRANCH_REVNO)
 
 # these is the directories where the snapshot gets built. Sources are
