@@ -1948,7 +1948,7 @@ AC_ARG_ENABLE(npapi,
 )
 
 if test x"$npapi" = x"yes"; then
-  PKG_CHECK_MODULES([MOZPLUGIN],[mozilla-plugin],[have_mozplugin=yes],[have_mozplugin=no])
+  GNASH_PATH_NPAPI
 fi
 
 dnl -----------------------------------------------------------------
@@ -3861,8 +3861,8 @@ if test x"$ac_cv_gcc_visibility" != xyes; then
 fi
 
 if test x"$npapi" = xyes; then
-  if test x"$have_mozplugin" = xyes; then
-    echo "        MOZILLA PLUGIN flags are: $MOZPLUGIN_CFLAGS"
+  if test x"$has_npapi" = xyes; then
+    echo "        NPAPI flags are: $NPAPI_CFLAGS"
   else
     echo "        ERROR : No xulrunner development package is installed" >&3
     echo "                Install it from http://releases.mozilla.org/pub/mozilla.org/xulrunner" >&3
