@@ -997,6 +997,55 @@ create_standalone_launcher(const std::string& page_url, const std::string& swf_u
 #endif
 }
 
+std::string
+nsPluginInstance::getDocumentProp(const std::string& propname) const
+{
+    std::string rv;
+
+    NPObject* windowobj;
+    NPError err = NPN_GetValue(_instance, NPNVWindowNPObject, &windowobj);
+    if (err != NPERR_NO_ERROR || !windowobj) {
+        return rv;
+    }
+
+    boost::shared_ptr<NPObject> window_obj(windowobj, NPN_ReleaseObject);
+  
+    NPIdentifier doc_id = NPN_GetStringIdentifier("document");
+
+    NPVariant docvar;
+    if(! NPN_GetProperty(_instance, windowobj, doc_id, &docvar) ) {
+        return rv;
+    }
+
+    boost::shared_ptr<NPVariant> doc_var(&docvar, NPN_ReleaseVariantValue);
+
+    if (!NPVARIANT_IS_OBJECT(docvar)) {
+        return rv;
+    }
+
+    NPObject* doc_obj = NPVARIANT_TO_OBJECT(docvar);
+    
+    NPIdentifier prop_id = NPN_GetStringIdentifier(propname.c_str());
+
+    NPVariant propvar;
+    if (!NPN_GetProperty(_instance, doc_obj, prop_id, &propvar)) {
+        return rv;
+    }
+
+    boost::shared_ptr<NPVariant> prop_var(&propvar, NPN_ReleaseVariantValue);
+
+    if (!NPVARIANT_IS_STRING(propvar)) {
+        return rv;
+    }
+
+    const NPString& prop_str = NPVARIANT_TO_STRING(propvar);
+
+    rv = NPStringToString(prop_str);
+    return rv;
+}
+
+
+
 void
 nsPluginInstance::setupCookies(const std::string& pageurl)
 {
@@ -1015,31 +1064,45 @@ nsPluginInstance::setupCookies(const std::string& pageurl)
     std::string::size_type pos;
     pos = pageurl.find("/", pageurl.find("//", 0) + 2) + 1;
     std::string url = pageurl.substr(0, pos);
-    
+
+    std::string ncookie;
+ 
     char *cookie = 0;
     uint32_t length = 0;
-    NPN_GetValueForURL(_instance, NPNURLVCookie, url.c_str(),
+
+    NPError rv = NPN_GetValueForURL(_instance, NPNURLVCookie, url.c_str(),
                        &cookie, &length);
+
+    // Firefox does not (always) return the cookies that are associated
+    // with a domain name through GetValueForURL.
+    if (rv == NPERR_GENERIC_ERROR) {
+        log_debug("Trying window.document.cookie for cookies");
+        ncookie = getDocumentProp("cookie");
+    }
     if (cookie) {
-        std::string ncookie (cookie, length);
-        gnash::log_debug("The Cookie for %s is %s", url, ncookie);
-        std::ofstream cookiefile;
-        std::stringstream ss;
-        ss << "/tmp/gnash-cookies." << getpid(); 
-        
-        cookiefile.open(ss.str().c_str(), std::ios::out | std::ios::trunc);
-        cookiefile << "Set-Cookie: " << ncookie << std::endl;
-        cookiefile.close();
-        
-        if (setenv("GNASH_COOKIES_IN", ss.str().c_str(), 1) < 0) {
-            gnash::log_error(
-                "Couldn't set environment variable GNASH_COOKIES_IN to %s",
-                ncookie);
-        }
+        ncookie.assign(cookie, length);
         NPN_MemFree(cookie);
-    } else {
+    }
+
+    if (ncookie.empty()) {
         gnash::log_debug("No stored Cookie for %s", url);
-    }    
+        return;
+    }
+
+    gnash::log_debug("The Cookie for %s is %s", url, ncookie);
+    std::ofstream cookiefile;
+    std::stringstream ss;
+    ss << "/tmp/gnash-cookies." << getpid(); 
+ 
+    cookiefile.open(ss.str().c_str(), std::ios::out | std::ios::trunc);
+    cookiefile << "Set-Cookie: " << ncookie << std::endl;
+    cookiefile.close();
+  
+    if (setenv("GNASH_COOKIES_IN", ss.str().c_str(), 1) < 0) {
+        gnash::log_error(
+            "Couldn't set environment variable GNASH_COOKIES_IN to %s",
+            ncookie);
+    }
 }
 
 void
@@ -1323,6 +1386,10 @@ nsPluginInstance::startProc()
     exit (-1);
 }
 
+
+
+
+
 std::string
 nsPluginInstance::getCurrentPageURL() const
 {
@@ -1331,63 +1398,8 @@ nsPluginInstance::getCurrentPageURL() const
     //
     // Was (bogus):
     //  window.document.location.href
-    //
 
-    NPP npp = _instance;
-
-    NPIdentifier sDocument = NPN_GetStringIdentifier("document");
-
-    NPObject *window;
-    NPN_GetValue(npp, NPNVWindowNPObject, &window);
-
-    NPVariant vDoc;
-    NPN_GetProperty(npp, window, sDocument, &vDoc);
-    NPN_ReleaseObject(window);
-
-    if (!NPVARIANT_IS_OBJECT(vDoc)) {
-        gnash::log_error("Can't get window.document object");
-        return std::string();
-    }
-    
-    NPObject* npDoc = NPVARIANT_TO_OBJECT(vDoc);
-
-/*
-    NPIdentifier sLocation = NPN_GetStringIdentifier("location");
-    NPVariant vLoc;
-    NPN_GetProperty(npp, npDoc, sLocation, &vLoc);
-    NPN_ReleaseObject(npDoc);
-
-    if (!NPVARIANT_IS_OBJECT(vLoc)) {
-        gnash::log_error("Can't get window.document.location object");
-        return std::string();
-    }
-
-    NPObject* npLoc = NPVARIANT_TO_OBJECT(vLoc);
-
-    NPIdentifier sProperty = NPN_GetStringIdentifier("href");
-    NPVariant vProp;
-    NPN_GetProperty(npp, npLoc, sProperty, &vProp);
-    NPN_ReleaseObject(npLoc);
-
-    if (!NPVARIANT_IS_STRING(vProp)) {
-        gnash::log_error("Can't get window.document.location.href string");
-        return std::string();
-    }
-*/
-
-    NPIdentifier sProperty = NPN_GetStringIdentifier("baseURI");
-    NPVariant vProp;
-    NPN_GetProperty(npp, npDoc, sProperty, &vProp);
-    NPN_ReleaseObject(npDoc);
-
-    if (!NPVARIANT_IS_STRING(vProp)) {
-        gnash::log_error("Can't get window.document.baseURI string");
-        return std::string();
-    }
-
-    const NPString& propValue = NPVARIANT_TO_STRING(vProp);
-
-    return NPStringToString(propValue);
+    return getDocumentProp("baseURI");
 }
 
 void
