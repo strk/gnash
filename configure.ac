@@ -213,6 +213,17 @@ AM_GNU_GETTEXT([external])
 AM_CONDITIONAL(HAS_GETTEXT, test x$ac_cv_path_XGETTEXT != x)
 dnl AM_GNU_GETTEXT_VERSION(0.15)
 
+dnl Many of the Gnash macros depend on gettext macros defining shlibext; recent
+dnl gettext however does not.
+if test x"${shlibext}" = x; then
+  if text x"${acl_cv_shlibext}" = x; then
+    echo "Gettext macros were supposed to define shared library extensions"
+    exit 1;
+  else
+    shlibext="${acl_cv_shlibext}"
+  fi
+fi
+
 dnl This is primarily used when compiling for a similar architecture,
 dnl like pentium->geode, which can use the same compiler, but have
 dnl different development libraries.
