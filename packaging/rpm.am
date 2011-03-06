@@ -31,10 +31,13 @@ gnash.spec spec: $(srcdir)/packaging/redhat/gnash.spec
 	mkdir -p $(RPMBUILD_DIR); \
 	echo "%_topdir $(RPMBUILD_DIR)" > $(RPMMACROS); \
 	snapshot_version="$(SNAPSHOT_VERSION)"; \
-	snapshot_version=`echo $${snapshot_version}|tr "~" "_"`; \
+	snapshot_release=`echo $${snapshot_version}|cut -d"~" -f2|sed 's/^/0.1./'`; \
+	snapshot_version=`echo $${snapshot_version}|cut -d"~" -f1`; \
+	if [ "$${snapshot_release}" = "" ];then snapshot_release=1;fi; \
 	distro=`lsb_release -is`; \
-	echo "Editing the version in the spec file to be $${snapshot_version} for Distribution $${distro}..."; \
+	echo "Editing the version in the spec file to be $${snapshot_version} $${snapshot_release} for Distribution $${distro}..."; \
 	sed -e "s/Version.*/Version:	$${snapshot_version}/" \
+	    -e "s/Release.*/Release:	$${snapshot_release}/" \
 	    -e "s/Distribution:.*/Distribution:   $${distro}/" $(srcdir)/packaging/redhat/gnash.spec > $(RPMSPEC)
 
 
@@ -83,7 +86,7 @@ rpm-install:
 # before rpmbuild will work.
 setup-rpm: 
 	snapshot_version="$(SNAPSHOT_VERSION)"; \
-	snapshot_dir="gnash-`echo $${snapshot_version}|tr "~" "_"`"; \
+	snapshot_dir="gnash-`echo $${snapshot_version}|cut -d"~" -f1`"; \
 	if test $${snapshot_dir} != $(SNAPSHOT_DIR); then \
 	  rm -fr $${snapshot_dir}; \
 	  mv -f $(SNAPSHOT_DIR) $${snapshot_dir}; \
