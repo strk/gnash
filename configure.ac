@@ -216,7 +216,7 @@ dnl AM_GNU_GETTEXT_VERSION(0.15)
 dnl Many of the Gnash macros depend on gettext macros defining shlibext; recent
 dnl gettext however does not.
 if test x"${shlibext}" = x; then
-  if text x"${acl_cv_shlibext}" = x; then
+  if test x"${acl_cv_shlibext}" = x; then
     echo "Gettext macros were supposed to define shared library extensions"
     exit 1;
   else
