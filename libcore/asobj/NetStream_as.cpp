@@ -290,7 +290,6 @@ void
 NetStream_as::markReachableResources() const
 {
     if (_netCon) _netCon->setReachable();
-    if (_statusHandler) _statusHandler->setReachable();
     if (_audioController) _audioController->setReachable();
     if (_invalidatedVideoCharacter) _invalidatedVideoCharacter->setReachable();
 }

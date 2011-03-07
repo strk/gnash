@@ -412,7 +412,7 @@ matrix_deltaTransformPoint(const fn_call& fn)
     // Construct a Point and set its properties.
     as_value pointClass(findObject(fn.env(), "flash.geom.Point"));
 
-    boost::intrusive_ptr<as_function> pointCtor = pointClass.to_function();
+    as_function* pointCtor = pointClass.to_function();
 
     if (!pointCtor) {
         log_error("Failed to construct flash.geom.Point!");
@@ -734,7 +734,7 @@ matrix_transformPoint(const fn_call& fn)
     // Construct a Point and set its properties.
     as_value pointClass(findObject(fn.env(), "flash.geom.Point"));
 
-    boost::intrusive_ptr<as_function> pointCtor = pointClass.to_function();
+    as_function* pointCtor = pointClass.to_function();
 
     if (!pointCtor) {
         log_error("Failed to construct flash.geom.Point!");

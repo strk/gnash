@@ -405,10 +405,6 @@ protected:
     // The input media parser
     std::auto_ptr<media::MediaParser> m_parser;
 
-    // Are we playing a FLV?
-    // The handler which is invoked on status change
-    boost::intrusive_ptr<as_function> _statusHandler;
-
     // The position in the inputfile, only used when not playing a FLV
     long inputPos;
 
