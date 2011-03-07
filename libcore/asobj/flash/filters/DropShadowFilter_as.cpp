@@ -226,7 +226,7 @@ dropshadowfilter_hideObject(const fn_call& fn)
 as_value
 dropshadowfilter_new(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensure<ValidThis>(fn);
+    as_object* obj = ensure<ValidThis>(fn);
     obj->setRelay(new DropShadowFilter_as);
     return as_value();
 }
