@@ -22,6 +22,10 @@
 // Main plugin entry point implementation -- exports from the 
 // plugin library
 //
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
 #include "npplat.h"
 #include "pluginbase.h"
 
@@ -159,8 +163,10 @@ fillNetscapeFunctionTable(NPNetscapeFuncs* aNPNFuncs)
     if (++i <= n) NPNFuncs.enumerate = aNPNFuncs->enumerate;
     if (++i <= n) NPNFuncs.pluginthreadasynccall = aNPNFuncs->pluginthreadasynccall;
     if (++i <= n) NPNFuncs.construct = aNPNFuncs->construct;
+#ifndef HAVE_NPUPP
     if (++i <= n) NPNFuncs.getvalueforurl = aNPNFuncs->getvalueforurl;
     if (++i <= n) NPNFuncs.setvalueforurl = aNPNFuncs->setvalueforurl;
+#endif
     
     return NPERR_NO_ERROR;
 }
