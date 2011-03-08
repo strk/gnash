@@ -23,61 +23,33 @@ DATA_TESTS_V9 =
 # DATA_TESTS += data/EncryptedLocalStore_as.swf
 # endif
 
-if BUILD_SQLCOLLATIONTYPE_AS3
 DATA_TESTS_V9 += data/SQLCollationType_as.swf
-endif
 
-if BUILD_SQLCOLUMNNAMESTYLE_AS3
 DATA_TESTS_V9 += data/SQLColumnNameStyle_as.swf
-endif
 
-if BUILD_SQLCOLUMNSCHEMA_AS3
 DATA_TESTS_V9 += data/SQLColumnSchema_as.swf
-endif
 
-if BUILD_SQLCONNECTION_AS3
 DATA_TESTS_V9 += data/SQLConnection_as.swf
-endif
 
-if BUILD_SQLINDEXSCHEMA_AS3
 DATA_TESTS_V9 += data/SQLIndexSchema_as.swf
-endif
 
-if BUILD_SQLMODE_AS3
 DATA_TESTS_V9 += data/SQLMode_as.swf
-endif
 
-if BUILD_SQLRESULT_AS3
 DATA_TESTS_V9 += data/SQLResult_as.swf
-endif
 
-if BUILD_SQLSCHEMARESULT_AS3
 DATA_TESTS_V9 += data/SQLSchemaResult_as.swf
-endif
 
-if BUILD_SQLSCHEMA_AS3
 DATA_TESTS_V9 += data/SQLSchema_as.swf
-endif
 
-if BUILD_SQLSTATEMENT_AS3
 DATA_TESTS_V9 += data/SQLStatement_as.swf
-endif
 
-if BUILD_SQLTABLESCHEMA_AS3
 DATA_TESTS_V9 += data/SQLTableSchema_as.swf
-endif
 
-if BUILD_SQLTRANSACTIONLOCKTYPE_AS3
 DATA_TESTS_V9 += data/SQLTransactionLockType_as.swf
-endif
 
-if BUILD_SQLTRIGGERSCHEMA_AS3
 DATA_TESTS_V9 += data/SQLTriggerSchema_as.swf
-endif
 
-if BUILD_SQLVIEWSCHEMA_AS3
 DATA_TESTS_V9 += data/SQLViewSchema_as.swf
-endif
 
 check_SCRIPTS += $(DATA_TESTS_V9)
 HAXE_FLAGS += -cp $(DATAdir)

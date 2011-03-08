@@ -22,17 +22,11 @@ XML_TESTS_V6 =
 
 # In versions up to v8, this class and file wwre called XML. In v9,
 # it was renamed to XMLDocument.
-if BUILD_XMLDOCUMENT_AS3
 XML_TESTS_V6 += xml/XMLDocument_as.swf
-endif
 
-if BUILD_XMLNODETYPE_AS3
 XML_TESTS_V9 += xml/XMLNodeType_as.swf
-endif
 
-if BUILD_XMLNODE_AS3
 XML_TESTS_V6 += xml/XMLNode_as.swf
-endif
 
 check_SCRIPTS += $(XML_TESTS_v6) $(XML_TESTS_v9)
 HAXE_FLAGS += -cp $(XMLdir)

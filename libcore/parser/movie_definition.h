@@ -93,13 +93,6 @@ namespace gnash
 /// and SWFMovieDefinition (a top-level movie) to derive from
 /// a common class to allow tag_loaders to take a pointer
 /// to the base class to act on (consider PLACEOBJECT tags...).
-///
-/// This design is uncomfortable when it comes to programmatically
-/// created DisplayObjects, in that they do NOT have any *fixed* definition.
-/// A possible workaround to this would be not *requiring* DisplayObject
-/// instances to have an associated DefinitionTag. I'll work on this
-/// --strk 2006-12-05.
-///
 class movie_definition : public SWF::DefinitionTag
 {
 public:
@@ -226,10 +219,6 @@ public:
 	{
 		return false;
 	}
-
-	//
-	// For use during creation.
-	//
 
 	/// Returns 1 based index. Ex: if 1 then 1st frame as been fully loaded
 	virtual size_t	get_loading_frame() const = 0;
@@ -469,10 +458,13 @@ public:
 
 #endif
 protected:
+
     movie_definition(boost::uint16_t id = 0)
         :
         DefinitionTag(id)
     {}
+
+    virtual ~movie_definition() {}
 };
 
 } // namespace gnash

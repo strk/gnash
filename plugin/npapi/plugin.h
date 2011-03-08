@@ -95,6 +95,9 @@ private:
     void setupCookies(const std::string& pageURL);
     void setupProxy(const std::string& pageURL);
 
+    /// @return a string property of window.document.
+    std::string getDocumentProp(const std::string& propname) const;
+
     static bool handlePlayerRequestsWrapper(GIOChannel* iochan, GIOCondition cond, nsPluginInstance* plugin);
 
     bool handlePlayerRequests(GIOChannel* iochan, GIOCondition cond);

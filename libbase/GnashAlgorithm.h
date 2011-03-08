@@ -85,42 +85,6 @@ arraySize(T(&)[N])
     return N;
 }
 
-
-/// Delete a pointer safely
-//
-/// Any depth of pointers-to-pointers (up to maximum template recursion) can
-/// be passed to this struct. The type of the pointee is deduced and passed
-/// to boost::checked_deleter, which ensures that the type is fully known
-/// at the point of deletion. It does not, of course, check that the pointer
-/// was allocated with new, so this isn't completely idiot-proof.
-template<typename T>
-struct CheckedDeleter
-{
-};
-
-template<typename T>
-struct CheckedDeleter<T**>
-{
-    /// Typedef for use in boost::bind.
-    typedef typename CheckedDeleter<T*>::result_type result_type;
-
-    void operator()(T** p) const {
-        CheckedDeleter<T*>()(*p);
-    }
-};
-
-template<typename T>
-struct CheckedDeleter<T*>
-{
-    /// Typedef for use in boost::bind.
-    typedef void result_type;
-
-    void operator()(T* p) const {
-        boost::checked_delete<T>(p);
-    }
-};
-
-
 /// Call a functor on the second element of each element in a range.
 //
 /// @tparam T           An iterator type satisfying the requirements of a
@@ -135,22 +99,6 @@ foreachSecond(T begin, T end, U op)
 {
     typedef SecondElement<typename std::iterator_traits<T>::value_type> S;
     std::for_each(begin, end, boost::bind(op, boost::bind(S(), _1)));
-}
-
-/// Safely call delete on each element in a range.
-//
-/// This checks that the type is fully known, but cannot check whether the
-/// pointer was allocated with new. Pointers allocated with new[] or any other
-/// allocation function should never be passed to this function.
-//
-/// @param begin        The start of the range to call delete on.
-/// @param end          The end of the range to call delete on.
-template<typename T>
-void
-deleteChecked(T begin, T end)
-{
-    typedef typename std::iterator_traits<T>::value_type value_type;
-    std::for_each(begin, end, CheckedDeleter<value_type>());
 }
 
 } // namespace gnash

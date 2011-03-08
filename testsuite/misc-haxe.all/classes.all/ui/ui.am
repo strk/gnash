@@ -33,17 +33,11 @@ UI_TESTS_V9 =
 UI_TESTS_V8 += ui/ContextMenu_as.swf
 # endif
 
-if BUILD_KEYLOCATION_AS3
 UI_TESTS_V9 += ui/KeyLocation_as.swf
-endif
 
-if BUILD_KEYBOARD_AS3
 UI_TESTS_V6 += ui/Keyboard_as.swf
-endif
 
-if BUILD_MOUSE_AS3
 UI_TESTS_V6 += ui/Mouse_as.swf
-endif
 
 check_SCRIPTS += $(UI_TESTS_V9) $(UI_TESTS_V6)
 HAXE_FLAGS += -cp $(UIdir)

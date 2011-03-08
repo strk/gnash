@@ -130,14 +130,22 @@ Property::getCache() const
     return boost::apply_visitor(GetCache(), _bound);
 }
 
-void
-Property::setValue(as_object& this_ptr, const as_value &value) const
+bool
+Property::setValue(as_object& this_ptr, const as_value& value) const
 {
-	switch (_bound.which())
-	{
+    if (readOnly(*this)) {
+        if (_destructive) {
+            _destructive = false;
+            _bound = value;
+            return true;
+        }
+        return false;
+    }
+
+	switch (_bound.which()) {
         case TYPE_VALUE: 
             _bound = value;
-            return;
+            return true;
         case TYPE_GETTER_SETTER:
             // Destructive are always overwritten.
             if (_destructive) {
@@ -157,8 +165,8 @@ Property::setValue(as_object& this_ptr, const as_value &value) const
                 a->set(fn);
                 a->setCache(value);
             }
-            return;
-        }
+    }
+    return true;
 }
 
 void

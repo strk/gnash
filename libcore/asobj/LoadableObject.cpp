@@ -143,7 +143,7 @@ private:
 as_value
 loadableobject_getBytesLoaded(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensure<ValidThis>(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     as_value bytesLoaded;
     ptr->get_member(NSV::PROP_uBYTES_LOADED, &bytesLoaded);
     return bytesLoaded;
@@ -152,7 +152,7 @@ loadableobject_getBytesLoaded(const fn_call& fn)
 as_value
 loadableobject_getBytesTotal(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensure<ValidThis>(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
     as_value bytesTotal;
     ptr->get_member(NSV::PROP_uBYTES_TOTAL, &bytesTotal);
     return bytesTotal;
@@ -248,7 +248,7 @@ loadableobject_addRequestHeader(const fn_call& fn)
 as_value
 loadableobject_decode(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> ptr = ensure<ValidThis>(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     if (!fn.nargs) return as_value(false);
 

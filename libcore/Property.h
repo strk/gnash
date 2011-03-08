@@ -364,20 +364,21 @@ public:
 
 	/// Set value of this property
 	//
-	/// @param this_ptr
-	/// 	The as_object used to set the 'this' pointer.
-	/// 	for calling getter/setter function (GetterSetterProperty);
-	/// 	it will be unused when getting or setting SimpleProperty
-	/// 	properties.
-	///	This parameter is non-const as nothing prevents an
-	///	eventual "Setter" function from actually modifying it,
-	///	so we can't promise constness.
-	///
-	/// @param value
-	///	The new value for this property. It will be used as first
-	///	argument of the 'setter' function if this is a Getter/Setter
-	///	property. @see isGetterSetter().
-	void setValue(as_object& this_ptr, const as_value &value) const;
+	/// @param this_ptr The as_object used to set the 'this' pointer
+	///                 for calling getter/setter function
+	///                 It will be unused when getting or setting
+    ///                 simple properties.
+	///	                This parameter is non-const as nothing prevents an
+	///	                eventual "Setter" function from actually modifying it,
+	///	                so we can't promise constness.
+	/// @param value    The new value for this property. It will be used as first
+	///	                argument of the 'setter' function if this is a Getter/Setter
+	///                 property. @see isGetterSetter().
+    /// @return         true if the property was set, otherwise false. Read-only
+    ///                 properties can generally not be set, but destructive
+    ///                 properties are still allowed to be replaced, as this
+    ///                 should be invisible to the user.
+	bool setValue(as_object& this_ptr, const as_value &value) const;
 
 	/// Is this a getter/setter property?
 	bool isGetterSetter() const {

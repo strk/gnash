@@ -64,6 +64,17 @@ MediaParser::getBufferLength() const
 	return getBufferLengthNoLock();
 }
 
+/* public */
+bool
+MediaParser::isBufferEmpty() const
+{
+#ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
+	boost::mutex::scoped_lock lock(_qMutex);
+#endif
+	return _videoFrames.empty() && _audioFrames.empty();
+}
+
+
 boost::uint64_t
 MediaParser::getBufferLengthNoLock() const
 {

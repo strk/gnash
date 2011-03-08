@@ -23,6 +23,7 @@
 // be cached somewhere.
 
 #include <vector>
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <agg_gradient_lut.h>
 #include <agg_color_rgba.h>
 #include <agg_color_gray.h>
@@ -440,13 +441,12 @@ public:
     {}
     
     ~StyleHandler() {
-        deleteChecked(_styles.begin(), _styles.end());
     }
 
     /// Called by AGG to ask if a certain style is a solid color
     bool is_solid(unsigned style) const {
       assert(style < _styles.size());
-      return _styles[style]->solid(); 
+      return _styles[style].solid(); 
     }
     
     /// Adds a new solid fill color style
@@ -515,7 +515,7 @@ public:
     agg::rgba8 color(unsigned style) const 
     {
         if (style < _styles.size())
-            return _styles[style]->color();
+            return _styles[style].color();
 
         return m_transparent;
     }
@@ -524,7 +524,7 @@ public:
     void generate_span(agg::rgba8* span, int x, int y,
         unsigned len, unsigned style)
     {
-      _styles[style]->generate_span(span,x,y,len);
+      _styles[style].generate_span(span,x,y,len);
     }
 
 
@@ -551,7 +551,7 @@ public:
         _styles.push_back(st);
     }
 
-    std::vector<AggStyle*> _styles;
+    boost::ptr_vector<AggStyle> _styles;
     agg::rgba8 m_transparent;
 
 }; 

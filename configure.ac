@@ -213,6 +213,17 @@ AM_GNU_GETTEXT([external])
 AM_CONDITIONAL(HAS_GETTEXT, test x$ac_cv_path_XGETTEXT != x)
 dnl AM_GNU_GETTEXT_VERSION(0.15)
 
+dnl Many of the Gnash macros depend on gettext macros defining shlibext; recent
+dnl gettext however does not.
+if test x"${shlibext}" = x; then
+  if test x"${acl_cv_shlibext}" = x; then
+    echo "Gettext macros were supposed to define shared library extensions"
+    exit 1;
+  else
+    shlibext="${acl_cv_shlibext}"
+  fi
+fi
+
 dnl This is primarily used when compiling for a similar architecture,
 dnl like pentium->geode, which can use the same compiler, but have
 dnl different development libraries.
@@ -1177,7 +1188,6 @@ ext_gtk=no
 ext_lirc=no
 ext_dbus=no
 ext_all=no
-ext_launcher=no
 extensions_list=
 nextensions=0
 AC_ARG_ENABLE(extensions,
@@ -1219,11 +1229,6 @@ AC_ARG_ENABLE(extensions,
         ext_gtk=yes
         nextensions=$((nextensions+1))
         ;;
-      launcher|LAUNCHER)
-        AC_DEFINE(USE_LAUNCHER_EXT, [1], [Build the Launcher extension])
-        ext_launcher=yes
-        nextensions=$((nextensions+1))
-        ;;
       lirc|LIRC)
         AC_DEFINE(USE_LIRC_EXT, [1], [Build the LIRC extension])
         ext_lirc=yes
@@ -1242,7 +1247,6 @@ AC_ARG_ENABLE(extensions,
         ext_gtk=yes
         ext_lirc=yes
         ext_dbus=yes
-        ext_launcher=yes
         ext_all=yes
         nextensions=9
         ;;
@@ -1269,13 +1273,10 @@ fi
 AM_CONDITIONAL(BUILD_DEJAGNU_EXT, [ test x$ext_dejagnu = xyes ])
 AM_CONDITIONAL(BUILD_FILEIO_EXT, [ test x$ext_fileio = xyes ])
 AM_CONDITIONAL(BUILD_MYSQL_EXT, [ test x$ext_mysql = xyes ])
-AM_CONDITIONAL(BUILD_LAUNCHER_EXT, [ test x$ext_launcher = xyes ])
 AM_CONDITIONAL(BUILD_GTK_EXT, [ test x$ext_gtk = xyes ])
 AM_CONDITIONAL(BUILD_LIRC_EXT, [ test x$ext_lirc = xyes ])
 AM_CONDITIONAL(BUILD_DBUS_EXT, [ test x$ext_dbus = xyes ])
 AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n "$extensions_list"])
-
-GNASH_PKG_CLASSFILE
 
 dnl --------------------------------------------------------
 dnl Libtool
