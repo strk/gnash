@@ -32,9 +32,9 @@
 #else
 #include "npapi.h"
 #include "npruntime.h"
+#include "npfunctions.h"
 #endif
 #include "pluginbase.h"
-#include "npfunctions.h"
 #include "dejagnu.h"
 #include "../../testsuite/check.h"
 #include <regex.h>
