@@ -1109,10 +1109,27 @@ nsPluginInstance::setupCookies(const std::string& pageurl)
     gnash::log_debug("The Cookie for %s is %s", url, ncookie);
     std::ofstream cookiefile;
     std::stringstream ss;
-    ss << "/tmp/gnash-cookies." << getpid(); 
- 
+    ss << "/tmp/gnash-cookies." << getpid();
+
     cookiefile.open(ss.str().c_str(), std::ios::out | std::ios::trunc);
-    cookiefile << "Set-Cookie: " << ncookie << std::endl;
+
+    // Firefox provides cookies in the following format:
+    //
+    // cookie1=value1;cookie2=value2;cookie3=value3
+    //
+    // Whereas libcurl expects cookies in the following format:
+    //
+    // Set-Cookie: cookie1=value1;
+    // Set-Cookie: cookie2=value2;
+  
+    typedef boost::char_separator<char> char_sep;
+    typedef boost::tokenizer<char_sep> tokenizer;
+    tokenizer tok(ncookie, char_sep(";"));
+
+    for (tokenizer::iterator it=tok.begin(); it != tok.end(); ++it) {
+        cookiefile << "Set-Cookie: " << *it << std::endl;
+    }
+ 
     cookiefile.close();
   
     if (setenv("GNASH_COOKIES_IN", ss.str().c_str(), 1) < 0) {
