@@ -202,9 +202,9 @@ deb-edit-changelog:
 	fi; \
 	if test -e $(BUILD_DIR)/debian/changelog; then \
 	  mv -f $(BUILD_DIR)/debian/changelog $(BUILD_DIR)/debian/changelog.orig; \
-	  sed -e "s:master:$(BUILD_VERSION):" -e "s/distro/$${dist}/" $(srcdir)/packaging/debian/changelog > $(BUILD_DIR)/debian/changelog; \
+	  sed -e "s:master:$(BUILD_VERSION)-1~$${dist}:" -e "s/distro/$${dist}/" $(srcdir)/packaging/debian/changelog > $(BUILD_DIR)/debian/changelog; \
 	else \
-	  sed -e "s:master:$(BUILD_VERSION):"  -e "s/distro/$${dist}/" $(srcdir)/packaging/debian/changelog > $(BUILD_DIR)/debian/changelog; \
+	  sed -e "s:master:$(BUILD_VERSION)-1~$${dist}:"  -e "s/distro/$${dist}/" $(srcdir)/packaging/debian/changelog > $(BUILD_DIR)/debian/changelog; \
 	fi
 
 # Edit the configure scripts, so if somebody reconfigures from this tarball,
