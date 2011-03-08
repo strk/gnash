@@ -24,8 +24,12 @@
 #include <cassert>
 #include <memory>
 
+#ifdef HAVE_NPUPP
+#include "npupp.h"
+#else
 #include "npapi.h"
 #include "npruntime.h"
+#endif
 #include "pluginbase.h"
 #include "npfunctions.h"
 #include "dejagnu.h"
@@ -449,7 +453,11 @@ NPN_ReleaseVariantValue(NPVariant *variant)
     switch(variant->type) {
         case NPVariantType_String:
         {
+#ifdef NPAPI_1_9_2
             NPN_MemFree(const_cast<NPUTF8*>(NPVARIANT_TO_STRING(*variant).UTF8Characters));
+#else
+            NPN_MemFree(const_cast<NPUTF8*>(NPVARIANT_TO_STRING(*variant).utf8characters));
+#endif
             break;
         }
         case NPVariantType_Object:
