@@ -20,6 +20,10 @@
 #ifndef npplat_h_
 #define npplat_h_
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
 #ifdef HAVE_NPUPP
 #include "npupp.h"
 #else
