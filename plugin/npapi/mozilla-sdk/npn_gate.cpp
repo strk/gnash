@@ -23,8 +23,12 @@
 //
 // Implementation of Netscape entry points (NPN_*)
 //
+#ifdef HAVE_NPUPP
+#include "npupp.h"
+#else
 #include "npapi.h"
 #include "npfunctions.h"
+#endif
 
 #include "plugin.h"
 
@@ -362,7 +366,7 @@ NPN_SetException(NPObject* obj, const NPUTF8 *message)
 {
     NPNFuncs.setexception(obj, message);
 }
-
+#ifndef HAVE_NPUPP
 NPError
 NPN_GetValueForURL(NPP instance, NPNURLVariable variable,
                    const char *url, char **value, uint32_t *len)
@@ -387,7 +391,7 @@ NPError NPN_GetAuthenticationInfo(NPP instance, const char *protocol,
                                           scheme, realm, username, ulen,
                                           password, plen);
 }
-  
+#endif  
 void
 NPN_PluginThreadAsyncCall(NPP plugin, void (*func)(void *), void *userData)
 {
