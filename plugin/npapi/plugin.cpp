@@ -74,9 +74,13 @@
 #include "StringPredicates.h"
 #include "external.h"
 #include "callbacks.h"
+#ifdef HAVE_NPUPP
+#include "npupp.h"
+#else
 #include "npapi.h"
 #include "npruntime.h"
 #include "npfunctions.h"
+#endif
 #include "GnashNPVariant.h"
 
 #include <boost/tokenizer.hpp>
@@ -1081,7 +1085,6 @@ nsPluginInstance::setupCookies(const std::string& pageurl)
 #ifndef HAVE_NPUPP
     NPError rv = NPN_GetValueForURL(_instance, NPNURLVCookie, url.c_str(),
                        &cookie, &length);
-#endif
 
     // Firefox does not (always) return the cookies that are associated
     // with a domain name through GetValueForURL.
@@ -1089,6 +1092,7 @@ nsPluginInstance::setupCookies(const std::string& pageurl)
         log_debug("Trying window.document.cookie for cookies");
         ncookie = getDocumentProp("cookie");
     }
+#endif
     if (cookie) {
         ncookie.assign(cookie, length);
         NPN_MemFree(cookie);
