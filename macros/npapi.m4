@@ -100,8 +100,8 @@ AC_DEFUN([GNASH_PATH_NPAPI],
                  [AC_MSG_RESULT([no])])
     CXXFLAGS="$save_CXXFLAGS"
     AC_LANG_POP(C++)
-    if test -f ${ac_cv_path_npapi_incl}/npupp.h -o 
-            -f ${ac_cv_path_npapi_incl}/plugin/npupp.h -o 
+    if test -f ${ac_cv_path_npapi_incl}/npupp.h -o \
+            -f ${ac_cv_path_npapi_incl}/plugin/npupp.h -o \
             -f "`$PKG_CONFIG --variable=includedir mozilla-plugin`"/plugin/npupp.h;then
       AC_DEFINE([HAVE_NPUPP],[1],[Define that we have NPAPI pre 1.9.1])
     fi
