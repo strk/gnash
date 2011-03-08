@@ -50,7 +50,11 @@ CopyVariantValue(const NPVariant& from, NPVariant& to)
 #endif
 
             NPUTF8* tostr = static_cast<NPUTF8*>(NPN_MemAlloc(len));
+#ifdef NPAPI_1_9_2
             std::copy(fromstr.UTF8Characters, fromstr.UTF8Characters+len, tostr);
+#else
+            std::copy(fromstr.utf8characters, fromstr.utf8characters+len, tostr);
+#endif
 
             STRINGN_TO_NPVARIANT(tostr, len, to);
             break;
@@ -69,7 +73,11 @@ CopyVariantValue(const NPVariant& from, NPVariant& to)
 inline std::string
 NPStringToString(const NPString& str)
 {
+#ifdef NPAPI_1_9_2
     return std::string(str.UTF8Characters, str.UTF8Length);
+#else
+    return std::string(str.utf8characters, str.utf8length);
+#endif
 }
 
 

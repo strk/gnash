@@ -20,8 +20,12 @@
 #ifndef npplat_h_
 #define npplat_h_
 
+#ifdef HAVE_NPUPP
+#include "npupp.h"
+#else
 #include "npapi.h"
 #include "npfunctions.h"
+#endif
 
 #ifdef XP_WIN
 #include "windows.h"

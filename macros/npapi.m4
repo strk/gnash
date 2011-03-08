@@ -45,7 +45,7 @@ AC_DEFUN([GNASH_PATH_NPAPI],
   AC_MSG_CHECKING([for npapi.h])
   if test x"${ac_cv_path_npapi_incl}" = x; then
     gnash_npapi_topdir=""
-    for i in $incllist; do
+    for i in $incllist "/usr/local"; do
       for j in `ls -dr $i/xulrunner* 2>/dev/null`; do
         if test -f $j/npapi.h; then
           gnash_npapi_topdir="`basename $j`"
@@ -55,6 +55,16 @@ AC_DEFUN([GNASH_PATH_NPAPI],
         if test -f $j/plugin/npapi.h; then
           gnash_npapi_topdir="`basename $j`"
           ac_cv_path_npapi_incl="-I$i/${gnash_npapi_topdir}/plugin"
+          break 2
+        fi
+        if test -f $j/include/npapi.h; then
+          gnash_npapi_topdir="`basename $j`"
+          ac_cv_path_npapi_incl="-I$i/${gnash_npapi_topdir}/include"
+          break 2
+        fi
+        if test -f $j/include/plugin/npapi.h; then
+          gnash_npapi_topdir="`basename $j`"
+          ac_cv_path_npapi_incl="-I$i/${gnash_npapi_topdir}/include/plugin"
           break 2
         fi
       done
@@ -90,7 +100,9 @@ AC_DEFUN([GNASH_PATH_NPAPI],
                  [AC_MSG_RESULT([no])])
     CXXFLAGS="$save_CXXFLAGS"
     AC_LANG_POP(C++)
-    if test -f ${ac_cv_path_npapi_incl}/npupp.h -o ${ac_cv_path_npapi_incl}/plugin/npupp.h;then
+    if test -f ${ac_cv_path_npapi_incl}/npupp.h -o 
+            -f ${ac_cv_path_npapi_incl}/plugin/npupp.h -o 
+            -f "`$PKG_CONFIG --variable=includedir mozilla-plugin`"/plugin/npupp.h;then
       AC_DEFINE([HAVE_NPUPP],[1],[Define that we have NPAPI pre 1.9.1])
     fi
   fi
