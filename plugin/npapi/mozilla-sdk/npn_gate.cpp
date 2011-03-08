@@ -23,14 +23,14 @@
 //
 // Implementation of Netscape entry points (NPN_*)
 //
+#include "plugin.h"
+
 #ifdef HAVE_NPUPP
 #include "npupp.h"
 #else
 #include "npapi.h"
 #include "npfunctions.h"
 #endif
-
-#include "plugin.h"
 
 #ifndef HIBYTE
 #define HIBYTE(x) ((((uint32_t)(x)) & 0xff00) >> 8)
