@@ -46,10 +46,15 @@ AC_DEFUN([GNASH_PATH_NPAPI],
   if test x"${ac_cv_path_npapi_incl}" = x; then
     gnash_npapi_topdir=""
     for i in $incllist; do
-      for j in `ls -dr $i/xulrunner-* 2>/dev/null`; do
+      for j in `ls -dr $i/xulrunner* 2>/dev/null`; do
         if test -f $j/npapi.h; then
           gnash_npapi_topdir="`basename $j`"
       	  ac_cv_path_npapi_incl="-I$i/${gnash_npapi_topdir}"
+          break 2
+        fi
+        if test -f $j/plugin/npapi.h; then
+          gnash_npapi_topdir="`basename $j`"
+          ac_cv_path_npapi_incl="-I$i/${gnash_npapi_topdir}/plugin"
           break 2
         fi
       done
@@ -63,10 +68,30 @@ AC_DEFUN([GNASH_PATH_NPAPI],
     AC_MSG_RESULT($ac_cv_path_npapi_incl)
     has_npapi=yes
     NPAPI_CFLAGS="${ac_cv_path_npapi_incl}"
-    if test x"`echo $NPAPI_CFLAGS | grep "\-DXP_UNIX"`" != x"-DXP_UNIX";then
+    if test x"`echo $NPAPI_CFLAGS | grep "\-DXP_UNIX"`" = x;then
       if test x"$linux" = x"yes" -o x"$bsd" = x"yes" -o x"$solaris" = x"yes";then
         NPAPI_CFLAGS="$NPAPI_CFLAGS -DXP_UNIX"
       fi
+    fi
+    AC_LANG_PUSH(C++)
+    save_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $NPAPI_CFLAGS"
+    AC_MSG_CHECKING([whether NPString has member UTF8Length])
+    AC_COMPILE_IFELSE(AC_LANG_SOURCE([
+                  #include "npapi.h" 
+                  #include "npruntime.h"
+                  int main(int argc, char* argv[]){
+	            NPString str;
+                    uint32_t len = str.UTF8Length;
+	            return 0;
+                  }]),
+                 [AC_DEFINE([NPAPI_1_9_2],[1],[Define that we have NPAPI present in version 1.9.2 and newer])
+                  AC_MSG_RESULT([yes])],
+                 [AC_MSG_RESULT([no])])
+    CXXFLAGS="$save_CXXFLAGS"
+    AC_LANG_POP(C++)
+    if test -f ${ac_cv_path_npapi_incl}/npupp.h -o ${ac_cv_path_npapi_incl}/plugin/npupp.h;then
+      AC_DEFINE([HAVE_NPUPP],[1],[Define that we have NPAPI pre 1.9.1])
     fi
   fi
 

@@ -339,10 +339,12 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
       case NPPVpluginScriptableNPObject:
           break;
 
+#ifndef HAVE_NPUPP
       case NPPVpluginUrlRequestsDisplayedBool:
           break;
       case NPPVpluginWantsAllNetworkStreams:
           break;
+#endif
           
       default:
           err = NPERR_INVALID_PARAM;
@@ -419,7 +421,7 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
         _params[name] = val;
     }
 
-#if 1
+#ifndef HAVE_NPUPP
     if (NPNFuncs.version >= 14) { // since NPAPI start to support
         _scriptObject = (GnashPluginScriptObject *)NPNFuncs.createobject(
             _instance, GnashPluginScriptObject::marshalGetNPClass());
@@ -575,7 +577,9 @@ nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
     if (aVariable == NPPVpluginScriptableNPObject) {
         if (_scriptObject) {
             void **v = (void **)aValue;
+#ifndef HAVE_NPUPP
             NPNFuncs.retainobject(_scriptObject);
+#endif
             *v = _scriptObject;
         } else {
             gnash::log_debug("_scriptObject is not assigned");
@@ -1054,10 +1058,14 @@ nsPluginInstance::setupCookies(const std::string& pageurl)
     // like IceWeasel on Debian lenny, which pre dates the cookie support
     // in NPAPI, you have to block all Cookie for sites like YouTube to
     // allow Gnash to work.
+#ifndef HAVE_NPUPP
     if (!NPNFuncs.getvalueforurl) {
         LOG_ONCE( gnash::log_debug("Browser doesn't support reading cookies") );
         return;
     }
+#else
+    LOG_ONCE( gnash::log_debug("Browser doesn't support reading cookies") );
+#endif
 
     // Cookie appear to drop anything past the domain, so we strip
     // that off.
@@ -1070,8 +1078,10 @@ nsPluginInstance::setupCookies(const std::string& pageurl)
     char *cookie = 0;
     uint32_t length = 0;
 
+#ifndef HAVE_NPUPP
     NPError rv = NPN_GetValueForURL(_instance, NPNURLVCookie, url.c_str(),
                        &cookie, &length);
+#endif
 
     // Firefox does not (always) return the cookies that are associated
     // with a domain name through GetValueForURL.
@@ -1110,12 +1120,16 @@ nsPluginInstance::setupProxy(const std::string& url)
 {
     // In pre xulrunner 1.9, (Firefox 3.1) this function does not exist,
     // so we can't use it to read the proxy information.
+#ifndef HAVE_NPUPP
     if (!NPNFuncs.getvalueforurl) return;
+#endif
 
     char *proxy = 0;
     uint32_t length = 0;
+#ifndef HAVE_NPUPP
     NPN_GetValueForURL(_instance, NPNURLVProxy, url.c_str(),
                        &proxy, &length);
+#endif
     if (!proxy) {
         gnash::log_debug("No proxy setting for %s", url);
         return;

@@ -19,8 +19,12 @@
 #ifndef GNASH_NPVARIANT_H
 #define GNASH_NPVARIANT_H
 
+#ifdef HAVE_NPUPP
+#include "npupp.h"
+#else
 #include "npapi.h"
 #include "npruntime.h"
+#endif
 
 namespace gnash {
 
@@ -39,7 +43,11 @@ CopyVariantValue(const NPVariant& from, NPVariant& to)
         case NPVariantType_String:
         {
             const NPString& fromstr = NPVARIANT_TO_STRING(from);
+#ifdef NPAPI_1_9_2
             const uint32_t& len = fromstr.UTF8Length;
+#else
+            const uint32_t& len = fromstr.utf8length;
+#endif
 
             NPUTF8* tostr = static_cast<NPUTF8*>(NPN_MemAlloc(len));
             std::copy(fromstr.UTF8Characters, fromstr.UTF8Characters+len, tostr);
