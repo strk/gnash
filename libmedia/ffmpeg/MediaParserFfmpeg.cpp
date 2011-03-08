@@ -546,9 +546,10 @@ MediaParserFfmpeg::seekMedia(boost::int64_t offset, int whence)
 				_("MediaParserFfmpeg couldn't parse input format: "
 				"tried to seek at negative offset %1%."))
 				% offset;
-	   		throw MediaException(fmt.str());
+	   		log_error(fmt);
+		} else {
+			_stream->seek(offset);
 		}
-		_stream->seek(offset);
 	}
 	else if (whence == SEEK_CUR)
 	{
