@@ -1948,6 +1948,10 @@ AC_ARG_ENABLE(npapi,
   fi
 )
 
+if test x"$npapi" = x"yes"; then
+  GNASH_PATH_NPAPI
+fi
+
 dnl -----------------------------------------------------------------
 dnl Enable us to disable building all browser plugins in one command.
 dnl -----------------------------------------------------------------
@@ -3855,6 +3859,19 @@ if test x"$ac_cv_gcc_visibility" != xyes; then
     echo "                 the plugin to malfunction and may result in small "
     echo "                 children being eaten. You have been warned!"
   fi
+fi
+
+if test x"$npapi" = xyes; then
+  if test x"$has_npapi" = xyes; then
+    echo "        NPAPI flags are: $NPAPI_CFLAGS"
+  else
+    echo "        ERROR : No xulrunner development package is installed" >&3
+    echo "                Install it from http://releases.mozilla.org/pub/mozilla.org/xulrunner" >&3
+    echo "                or .deb users: apt-get install xulrunner-dev" >&3
+    echo "                or .rpm users: yum install xulrunner-devel" >&3
+  fi
+else
+  echo "        NPAPI plugin is disabled"
 fi
 
 if test x"${DEJAGNU}" != x""; then
