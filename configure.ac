@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-AC_PREREQ(2.50)
+AC_PREREQ(2.59c)
 AC_INIT(gnash, 0.8.9dev)
 AC_CONFIG_SRCDIR([libcore/as_object.h])
 AC_CONFIG_HEADERS([gnashconfig.h])

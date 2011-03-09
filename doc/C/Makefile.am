@@ -18,7 +18,6 @@
 
 # Building a PDF using Apache FOP only works with fop-0.20.5 for now.
 
-htmldir = ${prefix}/share/doc/gnash
 infodir = ${prefix}/share/info
 man1dir = ${mandir}/man1
 docname = gnash
