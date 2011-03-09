@@ -581,9 +581,7 @@ nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
     if (aVariable == NPPVpluginScriptableNPObject) {
         if (_scriptObject) {
             void **v = (void **)aValue;
-#if NPAPI_VERSION != 190
             NPNFuncs.retainobject(_scriptObject);
-#endif
             *v = _scriptObject;
         } else {
             gnash::log_debug("_scriptObject is not assigned");
@@ -1068,7 +1066,7 @@ nsPluginInstance::setupCookies(const std::string& pageurl)
         return;
     }
 #else
-    LOG_ONCE( gnash::log_debug("Browser doesn't support reading cookies") );
+    LOG_ONCE( log_debug("Browser doesn't support reading cookies via NPAPI.") );
 #endif
 
     // Cookie appear to drop anything past the domain, so we strip
