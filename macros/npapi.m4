@@ -69,7 +69,7 @@ AC_DEFUN([GNASH_PATH_NPAPI],
   if test x"${ac_cv_path_npapi_incl}" = x -a x"${NPAPI_CFLAGS}" = x; then
     AC_MSG_RESULT([not found])
     has_npapi=no
-  else if x"${ac_cv_path_npapi_incl}" = x -a x"${NPAPI_CFLAGS}" != x; then
+  elif x"${ac_cv_path_npapi_incl}" = x -a x"${NPAPI_CFLAGS}" != x; then
     AC_MSG_RESULT(["${NPAPI_CFLAGS}"])
     has_npapi=yes
   else
