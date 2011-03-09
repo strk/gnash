@@ -25,7 +25,7 @@ AC_DEFUN([GNASH_PATH_NPAPI],
     if test x"${with_npapi_incl}" != x ; then
       if test -f ${with_npapi_incl}/npapi.h; then
         ac_cv_npapi_incl_dir="`(cd ${with_npapi_incl}; pwd)`"
-      	ac_cv_path_npapi_incl="-I${ac_cv_npapi_incl_dir}"
+        ac_cv_path_npapi_incl="-I${ac_cv_npapi_incl_dir}"
       else
       	AC_MSG_ERROR([${with_npapi_incl} directory doesn't contain npapi.h])
       fi
@@ -50,7 +50,7 @@ AC_DEFUN([GNASH_PATH_NPAPI],
       for j in `ls -dr $i/xulrunner* 2>/dev/null`; do
         if test -f $j/npapi.h; then
           ac_cv_npapi_incl_dir="${j}"
-      	  ac_cv_path_npapi_incl="-I${ac_cv_npapi_incl_dir}"
+          ac_cv_path_npapi_incl="-I${ac_cv_npapi_incl_dir}"
           break 2
         fi
         if test -f $j/plugin/npapi.h; then
