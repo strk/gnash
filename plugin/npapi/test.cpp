@@ -40,6 +40,7 @@
 #include <regex.h>
 
 #include "external.h"
+#include "GnashNPVariant.h"
 
 TestState& runtest = _runtest;
 
@@ -456,11 +457,7 @@ NPN_ReleaseVariantValue(NPVariant *variant)
     switch(variant->type) {
         case NPVariantType_String:
         {
-#if NPAPI_VERSION == 192
-            NPN_MemFree(const_cast<NPUTF8*>(NPVARIANT_TO_STRING(*variant).UTF8Characters));
-#else
-            NPN_MemFree(const_cast<NPUTF8*>(NPVARIANT_TO_STRING(*variant).utf8characters));
-#endif
+            NPN_MemFree(const_cast<NPUTF8*>(gnash::GetNPStringChars(NPVARIANT_TO_STRING(*variant))));
             break;
         }
         case NPVariantType_Object:
