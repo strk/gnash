@@ -24,8 +24,7 @@ AC_DEFUN([GNASH_PATH_NPAPI],
     AC_CACHE_VAL(ac_cv_path_npapi_incl,[
     if test x"${with_npapi_incl}" != x ; then
       if test -f ${with_npapi_incl}/npapi.h; then
-        ac_cv_npapi_incl_dir="`(cd ${with_npapi_incl}; pwd)`"
-        ac_cv_path_npapi_incl="-I${ac_cv_npapi_incl_dir}"
+        ac_cv_path_npapi_incl="`(cd ${with_npapi_incl}; pwd)`"
       else
       	AC_MSG_ERROR([${with_npapi_incl} directory doesn't contain npapi.h])
       fi
@@ -35,7 +34,7 @@ AC_DEFUN([GNASH_PATH_NPAPI],
 
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_npapi_incl}" = x; then
-      $PKG_CONFIG --exists mozilla-plugin && ac_cv_path_npapi_incl="`$PKG_CONFIG --cflags mozilla-plugin`"
+      $PKG_CONFIG --exists mozilla-plugin && NPAPI_CFLAGS="`$PKG_CONFIG --cflags mozilla-plugin`"
     fi
   fi
 
@@ -49,32 +48,30 @@ AC_DEFUN([GNASH_PATH_NPAPI],
     for i in $incllist "/usr/local"; do
       for j in `ls -dr $i/xulrunner* 2>/dev/null`; do
         if test -f $j/npapi.h; then
-          ac_cv_npapi_incl_dir="${j}"
-          ac_cv_path_npapi_incl="-I${ac_cv_npapi_incl_dir}"
+          ac_cv_path_npapi_incl="${j}"
           break 2
         fi
         if test -f $j/plugin/npapi.h; then
-          npapi_include_dir="${j}/plugin"
-          ac_cv_path_npapi_incl="-I${ac_cv_npapi_incl_dir}"
+          ac_cv_path_npapi_incl="${j}/plugin"
           break 2
         fi
         if test -f $j/include/npapi.h; then
-          ac_cv_npapi_incl_dir="${j}/include"
-          ac_cv_path_npapi_incl="-I${ac_cv_npapi_incl_dir}"
+          ac_cv_path_npapi_incl="${j}/include"
           break 2
         fi
         if test -f $j/include/plugin/npapi.h; then
-          ac_cv_npapi_incl_dir="${j}/include/plugin"
-          ac_cv_path_npapi_incl="-I${ac_cv_npapi_incl_dir}"
+          ac_cv_path_npapi_incl="${j}/include/plugin"
           break 2
         fi
       done
     done
   fi
-  if test x"${ac_cv_path_npapi_incl}" = x; then
+  if test x"${ac_cv_path_npapi_incl}" = x -a x"${NPAPI_CFLAGS}" = x; then
     AC_MSG_RESULT([not found])
     has_npapi=no
-    NPAPI_CFLAGS=""
+  else if x"${ac_cv_path_npapi_incl}" = x -a x"${NPAPI_CFLAGS}" != x; then
+    AC_MSG_RESULT(["${NPAPI_CFLAGS}"])
+    has_npapi=yes
   else
     AC_MSG_RESULT($ac_cv_path_npapi_incl)
     has_npapi=yes
@@ -102,8 +99,8 @@ AC_DEFUN([GNASH_PATH_NPAPI],
     CXXFLAGS="$save_CXXFLAGS"
     AC_LANG_POP(C++)
     AC_MSG_CHECKING([for npupp.h])
-    if test -f "${ac_cv_npapi_incl_dir}"/npupp.h -o \
-            -f "${ac_cv_npapi_incl_dir}"/plugin/npupp.h -o \
+    if test -f "${ac_cv_path_npapi_incl}"/npupp.h -o \
+            -f "${ac_cv_path_npapi_incl}"/plugin/npupp.h -o \
             -f "`$PKG_CONFIG --variable=includedir mozilla-plugin`"/npupp.h -o \
             -f "`$PKG_CONFIG --variable=includedir mozilla-plugin`"/stable/npupp.h -o \
             -f "`$PKG_CONFIG --variable=includedir mozilla-plugin`"/plugin/npupp.h;then
