@@ -518,6 +518,11 @@ MediaParserFfmpeg::~MediaParserFfmpeg()
 
 }
 
+// NOTE: as this function is used as a callback from FFMPEG, it should not
+// throw any exceptions, because:
+// a) The behaviour of C++ exceptions passed into C code is undefined.
+// b) Even if we don't crash and burn, the FFMPEG parser is left in an
+//    undefined state.
 int 
 MediaParserFfmpeg::readPacket(boost::uint8_t* buf, int buf_size)
 {
@@ -530,6 +535,11 @@ MediaParserFfmpeg::readPacket(boost::uint8_t* buf, int buf_size)
 
 }
 
+// NOTE: as this function is used as a callback from FFMPEG, it should not
+// throw any exceptions, because:
+// a) The behaviour of C++ exceptions passed into C code is undefined.
+// b) Even if we don't crash and burn, the FFMPEG parser is left in an
+//    undefined state.
 boost::int64_t 
 MediaParserFfmpeg::seekMedia(boost::int64_t offset, int whence)
 {
