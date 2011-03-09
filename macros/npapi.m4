@@ -79,7 +79,9 @@ AC_DEFUN([GNASH_PATH_NPAPI],
     fi
     AC_MSG_RESULT(["${NPAPI_CFLAGS}"])
     has_npapi=yes
+  fi
 
+  if test x"${NPAPI_CFLAGS}" != x; then
     AC_LANG_PUSH(C++)
     save_CXXFLAGS="$CXXFLAGS"
     CXXFLAGS="$CXXFLAGS $NPAPI_CFLAGS"
