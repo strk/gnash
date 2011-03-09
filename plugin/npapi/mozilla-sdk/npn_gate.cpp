@@ -25,7 +25,7 @@
 //
 #include "plugin.h"
 
-#ifdef HAVE_NPUPP
+#if NPAPI_VERSION == 190
 #include "npupp.h"
 #else
 #include "npapi.h"
@@ -366,7 +366,7 @@ NPN_SetException(NPObject* obj, const NPUTF8 *message)
 {
     NPNFuncs.setexception(obj, message);
 }
-#ifndef HAVE_NPUPP
+#if NPAPI_VERSION != 190
 NPError
 NPN_GetValueForURL(NPP instance, NPNURLVariable variable,
                    const char *url, char **value, uint32_t *len)

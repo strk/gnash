@@ -163,7 +163,7 @@ fillNetscapeFunctionTable(NPNetscapeFuncs* aNPNFuncs)
     if (++i <= n) NPNFuncs.enumerate = aNPNFuncs->enumerate;
     if (++i <= n) NPNFuncs.pluginthreadasynccall = aNPNFuncs->pluginthreadasynccall;
     if (++i <= n) NPNFuncs.construct = aNPNFuncs->construct;
-#ifndef HAVE_NPUPP
+#if NPAPI_VERSION != 190
     if (++i <= n) NPNFuncs.getvalueforurl = aNPNFuncs->getvalueforurl;
     if (++i <= n) NPNFuncs.setvalueforurl = aNPNFuncs->setvalueforurl;
 #endif

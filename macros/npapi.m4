@@ -95,7 +95,7 @@ AC_DEFUN([GNASH_PATH_NPAPI],
                     uint32_t len = str.UTF8Length;
 	            return 0;
                   }]),
-                 [AC_DEFINE([NPAPI_1_9_2],[1],[Define that we have NPAPI present in version 1.9.2 and newer])
+                 [AC_DEFINE([NPAPI_VERSION],[192],[Define that we have NPAPI present in version 1.9.2 and newer])
                   AC_MSG_RESULT([yes])],
                  [AC_MSG_RESULT([no])])
     CXXFLAGS="$save_CXXFLAGS"
@@ -106,7 +106,7 @@ AC_DEFUN([GNASH_PATH_NPAPI],
             -f "`$PKG_CONFIG --variable=includedir mozilla-plugin`"/npupp.h -o \
             -f "`$PKG_CONFIG --variable=includedir mozilla-plugin`"/stable/npupp.h -o \
             -f "`$PKG_CONFIG --variable=includedir mozilla-plugin`"/plugin/npupp.h;then
-      AC_DEFINE([HAVE_NPUPP],[1],[Define that we have NPAPI pre 1.9.1])
+      AC_DEFINE([NPAPI_VERSION],[190],[Define that we have NPAPI present in version 1.9.0 and maybe older])
       AC_MSG_RESULT([yes])
     else
       AC_MSG_RESULT([no])

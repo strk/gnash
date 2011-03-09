@@ -27,7 +27,7 @@
 #include <cassert>
 #include <memory>
 
-#ifdef HAVE_NPUPP
+#if NPAPI_VERSION == 190
 #include "npupp.h"
 #else
 #include "npapi.h"
@@ -456,7 +456,7 @@ NPN_ReleaseVariantValue(NPVariant *variant)
     switch(variant->type) {
         case NPVariantType_String:
         {
-#ifdef NPAPI_1_9_2
+#if NPAPI_VERSION == 192
             NPN_MemFree(const_cast<NPUTF8*>(NPVARIANT_TO_STRING(*variant).UTF8Characters));
 #else
             NPN_MemFree(const_cast<NPUTF8*>(NPVARIANT_TO_STRING(*variant).utf8characters));

@@ -24,7 +24,7 @@
 #include "gnashconfig.h"
 #endif
 
-#ifdef HAVE_NPUPP
+#if NPAPI_VERSION == 190
 #include "npupp.h"
 #else
 #include "npapi.h"

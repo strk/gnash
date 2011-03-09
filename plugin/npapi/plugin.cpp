@@ -74,7 +74,7 @@
 #include "StringPredicates.h"
 #include "external.h"
 #include "callbacks.h"
-#ifdef HAVE_NPUPP
+#if NPAPI_VERSION == 190
 #include "npupp.h"
 #else
 #include "npapi.h"
@@ -343,7 +343,7 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
       case NPPVpluginScriptableNPObject:
           break;
 
-#ifndef HAVE_NPUPP
+#if NPAPI_VERSION != 190
       case NPPVpluginUrlRequestsDisplayedBool:
           break;
       case NPPVpluginWantsAllNetworkStreams:
@@ -425,7 +425,7 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
         _params[name] = val;
     }
 
-#ifndef HAVE_NPUPP
+#if NPAPI_VERSION != 190
     if (NPNFuncs.version >= 14) { // since NPAPI start to support
         _scriptObject = (GnashPluginScriptObject *)NPNFuncs.createobject(
             _instance, GnashPluginScriptObject::marshalGetNPClass());
@@ -581,7 +581,7 @@ nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
     if (aVariable == NPPVpluginScriptableNPObject) {
         if (_scriptObject) {
             void **v = (void **)aValue;
-#ifndef HAVE_NPUPP
+#if NPAPI_VERSION != 190
             NPNFuncs.retainobject(_scriptObject);
 #endif
             *v = _scriptObject;
@@ -1062,7 +1062,7 @@ nsPluginInstance::setupCookies(const std::string& pageurl)
     // like IceWeasel on Debian lenny, which pre dates the cookie support
     // in NPAPI, you have to block all Cookie for sites like YouTube to
     // allow Gnash to work.
-#ifndef HAVE_NPUPP
+#if NPAPI_VERSION != 190
     if (!NPNFuncs.getvalueforurl) {
         LOG_ONCE( gnash::log_debug("Browser doesn't support reading cookies") );
         return;
@@ -1082,7 +1082,7 @@ nsPluginInstance::setupCookies(const std::string& pageurl)
     char *cookie = 0;
     uint32_t length = 0;
 
-#ifndef HAVE_NPUPP
+#if NPAPI_VERSION != 190
     NPError rv = NPN_GetValueForURL(_instance, NPNURLVCookie, url.c_str(),
                        &cookie, &length);
 #else
@@ -1127,13 +1127,13 @@ nsPluginInstance::setupProxy(const std::string& url)
 {
     // In pre xulrunner 1.9, (Firefox 3.1) this function does not exist,
     // so we can't use it to read the proxy information.
-#ifndef HAVE_NPUPP
+#if NPAPI_VERSION != 190
     if (!NPNFuncs.getvalueforurl) return;
 #endif
 
     char *proxy = 0;
     uint32_t length = 0;
-#ifndef HAVE_NPUPP
+#if NPAPI_VERSION != 190
     NPN_GetValueForURL(_instance, NPNURLVProxy, url.c_str(),
                        &proxy, &length);
 #endif

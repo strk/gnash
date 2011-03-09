@@ -19,7 +19,7 @@
 #ifndef GNASH_NPVARIANT_H
 #define GNASH_NPVARIANT_H
 
-#ifdef HAVE_NPUPP
+#if NPAPI_VERSION == 190
 #include "npupp.h"
 #else
 #include "npapi.h"
@@ -43,14 +43,14 @@ CopyVariantValue(const NPVariant& from, NPVariant& to)
         case NPVariantType_String:
         {
             const NPString& fromstr = NPVARIANT_TO_STRING(from);
-#ifdef NPAPI_1_9_2
+#if NPAPI_VERSION == 192
             const uint32_t& len = fromstr.UTF8Length;
 #else
             const uint32_t& len = fromstr.utf8length;
 #endif
 
             NPUTF8* tostr = static_cast<NPUTF8*>(NPN_MemAlloc(len));
-#ifdef NPAPI_1_9_2
+#if NPAPI_VERSION == 192
             std::copy(fromstr.UTF8Characters, fromstr.UTF8Characters+len, tostr);
 #else
             std::copy(fromstr.utf8characters, fromstr.utf8characters+len, tostr);
@@ -73,7 +73,7 @@ CopyVariantValue(const NPVariant& from, NPVariant& to)
 inline std::string
 NPStringToString(const NPString& str)
 {
-#ifdef NPAPI_1_9_2
+#if NPAPI_VERSION == 192
     return std::string(str.UTF8Characters, str.UTF8Length);
 #else
     return std::string(str.utf8characters, str.utf8length);
