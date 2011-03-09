@@ -577,7 +577,8 @@ NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
             ts, parsingComplete);
 #endif 
 
-        if (parsingComplete) {
+        if (parsingComplete && m_parser->isBufferEmpty()) {
+
             decodingStatus(DEC_STOPPED);
 #ifdef GNASH_DEBUG_STATUS
             log_debug("getDecodedVideoFrame setting playStop status "
@@ -973,13 +974,15 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
 
             if (parsingComplete) {
                 consumed = true;
-                decodingStatus(DEC_STOPPED);
+                if (m_parser->isBufferEmpty()) {
+                    decodingStatus(DEC_STOPPED);
 #ifdef GNASH_DEBUG_STATUS
-                log_debug("pushDecodedAudioFrames setting playStop status "
-                        "(parsing complete and nextAudioFrameTimestamp "
-                        "returned false)");
+                    log_debug("pushDecodedAudioFrames setting playStop status "
+                              "(parsing complete and nextAudioFrameTimestamp "
+                              "returned false)");
 #endif
-                setStatus(playStop);
+                    setStatus(playStop);
+                }
             }
 
             break;
