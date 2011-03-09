@@ -70,14 +70,14 @@ AC_DEFUN([GNASH_PATH_NPAPI],
     AC_MSG_RESULT([not found])
     has_npapi=no
   elif test x"${ac_cv_path_npapi_incl}" = x -a x"${NPAPI_CFLAGS}" != x; then
-    AC_MSG_RESULT(["${NPAPI_CFLAGS}"])
+    AC_MSG_RESULT([${NPAPI_CFLAGS}])
     has_npapi=yes
   else
     NPAPI_CFLAGS="-I${ac_cv_path_npapi_incl}"
     if test x"$linux" = x"yes" -o x"$bsd" = x"yes" -o x"$solaris" = x"yes";then
         NPAPI_CFLAGS="$NPAPI_CFLAGS -DXP_UNIX"
     fi
-    AC_MSG_RESULT(["${NPAPI_CFLAGS}"])
+    AC_MSG_RESULT([${NPAPI_CFLAGS}])
     has_npapi=yes
   fi
 
