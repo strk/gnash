@@ -41,6 +41,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <sstream>
+#include <limits>
 
 using namespace std;
 
@@ -152,6 +153,20 @@ main(int /*argc*/, char** /*argv*/)
     std::auto_ptr<gnash::IOChannel> orig = gnash::makeFileChannel(f, false);
 	lseek(raw, 0, SEEK_SET);
 	compare_reads(orig.get(), raw, "cache", "raw");
+
+
+    if (sizeof(size_t) != sizeof(std::streamoff)) {
+        std::streampos pos = std::numeric_limits<size_t>::max();
+        pos += orig->size() / 2;
+        // Check that seek() handles integer overflow situations gracefully.
+        if (orig->seek(pos)) {
+            runtest.fail("Successfully sought to an invalid position.");
+        } else {
+            runtest.pass("Gracefully handled invalid seek.");
+        }
+    }
+
+
 
 	return 0;
 }
