@@ -171,14 +171,14 @@ bool
 tu_file::seek(std::streampos pos)
 {
     // TODO: optimize this by caching total stream size ?
-    if (static_cast<size_t>(pos) > size()) return false;
+    if (pos > static_cast<std::streampos>(size())) return false;
 
     std::clearerr(_data); // make sure EOF flag is cleared.
     const int result = std::fseek(_data, pos, SEEK_SET);
     if (result == EOF) {
         return false;
     }
-
+    assert (pos < std::numeric_limits<long>::max());
     assert (std::ftell(_data) == pos);
 
     return true;
