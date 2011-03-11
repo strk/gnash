@@ -425,12 +425,10 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
         _params[name] = val;
     }
 
-#if NPAPI_VERSION != 190
     if (NPNFuncs.version >= 14) { // since NPAPI start to support
         _scriptObject = (GnashPluginScriptObject *)NPNFuncs.createobject(
             _instance, GnashPluginScriptObject::marshalGetNPClass());
     }
-#endif
     
     return;
 }
