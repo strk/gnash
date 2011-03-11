@@ -113,3 +113,6 @@ endif
 # Remove libtool .la files
 install-exec-hook:
 	$(RM) $(DESTDIR)$(pyexecdir)/gtk-2.0/gnash.la
+
+uninstall-local:
+	$(RM) $(DESTDIR)$(pyexecdir)/gtk-2.0/gnash.so

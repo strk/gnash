@@ -244,3 +244,6 @@ clean-hook:
 # Remove libtool .la files
 install-exec-hook:
 	$(RM) $(DESTDIR)$(libdir)/gnash/libgnashmedia.la
+
+uninstall-local:
+	$(RM) $(DESTDIR)$(libdir)/gnash/libgnashmedia-*.so

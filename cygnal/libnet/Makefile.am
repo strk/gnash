@@ -103,3 +103,6 @@ mudflap:
 # Remove libtool .la files
 install-exec-hook:
 	$(RM) $(DESTDIR)$(libdir)/gnash/libgnashnet.la
+
+uninstall-local:
+	$(RM) $(DESTDIR)$(libdir)/gnash/libgnashnet-*.so

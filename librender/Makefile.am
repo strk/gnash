@@ -108,3 +108,6 @@ endif
 # Remove libtool .la files
 install-exec-hook:
 	$(RM) $(DESTDIR)$(libdir)/gnash/libgnashrender.la
+
+uninstall-local:
+	$(RM) $(DESTDIR)$(libdir)/gnash/libgnashrender-*.so
