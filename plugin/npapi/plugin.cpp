@@ -465,6 +465,10 @@ nsPluginInstance::~nsPluginInstance()
         _ichanWatchId = 0;
     }
 
+    if (_scriptObject) {
+        NPN_ReleaseObject(_scriptObject);
+    }
+
     if (_childpid > 0) {
         // When the child has terminated (signaled by GTK through GtkSocket), it
         // remains as a defunct process and we remove it from the kernel table now.
