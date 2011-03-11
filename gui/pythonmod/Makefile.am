@@ -82,6 +82,7 @@ BUILT_SOURCES =
 endif
 
 nodist_gnash_la_SOURCES = $(BUILT_SOURCES)
+gnash_la_CPPFLAGS = $(INCLUDES) $(GNASH_INCLUDES)
 gnash_la_SOURCES = \
 	gnashmodule.c \
 	gnash-view.cpp \
