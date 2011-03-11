@@ -358,8 +358,6 @@ ExternalInterface::readBrowser(int fd)
         buf.resize(ret);
     }
 
-    std::cout << buf << std::endl;
-    
     return buf;
 }
 
