@@ -557,6 +557,7 @@ MediaParserFfmpeg::seekMedia(boost::int64_t offset, int whence)
 				"tried to seek at negative offset %1%."))
 				% offset;
 	   		log_error(fmt);
+			return -1;
 		} else {
 			_stream->seek(offset);
 		}
@@ -580,6 +581,7 @@ MediaParserFfmpeg::seekMedia(boost::int64_t offset, int whence)
 		// ffmpeg uses whence=AVSEEK_SIZE and offset=0 to request
 		// stream size !
 		log_unimpl("MediaParserFfmpeg: unsupported whence value %d", whence);
+		return -1;
 	}
 
 
