@@ -426,8 +426,8 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
     }
 
     if (NPNFuncs.version >= 14) { // since NPAPI start to support
-        _scriptObject = (GnashPluginScriptObject *)NPNFuncs.createobject(
-            _instance, GnashPluginScriptObject::marshalGetNPClass());
+        _scriptObject = (GnashPluginScriptObject*) NPN_CreateObject( _instance,
+            GnashPluginScriptObject::marshalGetNPClass());
     }
     
     return;
@@ -583,7 +583,7 @@ nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
     if (aVariable == NPPVpluginScriptableNPObject) {
         if (_scriptObject) {
             void **v = (void **)aValue;
-            NPNFuncs.retainobject(_scriptObject);
+            NPN_RetainObject(_scriptObject);
             *v = _scriptObject;
         } else {
             gnash::log_debug("_scriptObject is not assigned");
