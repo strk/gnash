@@ -41,8 +41,9 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--with-plugins-install=prefix \
 	--enable-extensions=all \
 	--enable-gui=all \
+	--enable-python \
+	--enable-cygnal \
 	--disable-testsuite
-#--enable-cygnal
 
 if CYGNAL
 CYGNAL_DIR = cygnal
