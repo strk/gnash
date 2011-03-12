@@ -3,6 +3,12 @@ YYYY/MM/DD
 
 Improvements since 0.8.8 release are:
 
+ * Avoid drawing operations when the window is obscured, including when
+   Gnash is used as a plugin, starting with Firefox 4.0 (GTK GUI).
+ * Support SWF with embedded ScreenVideo when using FFMPEG or
+   gstreamer-ffmpeg >= 0.10.12.
+ * Fix playback of SWF-embedded ADPCM audio when using Gstreamer.
+ * Fix playback of SWF-embedded PCM audio when using FFMPEG.
  * Fix swapped _framesloaded and _totalframes properties.
  * Fixes for several crashes, with better automated testing of the
    entire ActionScript API for input sanitization.
