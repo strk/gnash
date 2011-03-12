@@ -524,7 +524,7 @@ GnashPluginScriptObject::Invoke(NPObject */* npobj */, NPIdentifier name,
     if (it != _methods.end()) {
         // log_debug("FOUND Method \"%s\"!", NPN_UTF8FromIdentifier(name));
         NPInvokeFunctionPtr func = it->second;
-        return func(NULL, name, args, argCount, result);
+        return func(this, name, args, argCount, result);
     } else {
         log_error("Couldn't find Method \"%s\"", NPN_UTF8FromIdentifier(name));
     }
