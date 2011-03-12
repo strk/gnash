@@ -91,7 +91,7 @@ gnash_la_SOURCES = \
 
 gnash.c: gnash.defs gnash.override
 
-CLEANFILES = 
+CLEANFILES = gen-gnash.c
 EXTRA_DIST = gnash.override gnash.defs
 
 gen-gnash.c:   gnash.override gnash.defs
