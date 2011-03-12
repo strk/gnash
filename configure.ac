@@ -3904,7 +3904,7 @@ if test x"$python" = x"yes"; then
   if test x"$has_python" = x"yes"; then
     echo "        PYTHON flags are: $PYTHON_CFLAGS"
     echo "        PYTHON libs are: $PYTHON_LIBS"
-    echo "        PYTHON executable is are: $PYTHON"
+    echo "        PYTHON executable is: $PYTHON"
   else
     echo "        ERROR: No Python development package is installed, but it's enabled." >&3
   fi
