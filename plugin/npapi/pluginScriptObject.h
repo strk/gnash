@@ -120,10 +120,8 @@ public:
     GnashNPVariant GetVariable(const std::string &name);
 
 
-    int getReadFD()  { return _sockfds[READFD]; };
-    GIOChannel *getReadChannel()  { return _iochan[READFD]; };
-    int getWriteFD() { return _sockfds[WRITEFD]; };
-    GIOChannel *getWriteChannel() { return _iochan[WRITEFD]; };
+    int getReadFD()  { return _hostfd; };
+    int getWriteFD() { return _controlfd; };
 
     // Write to the standalone player over the control socket
     int writePlayer(const std::string &data);
@@ -165,10 +163,15 @@ private:
     std::map<NPIdentifier, GnashNPVariant> _properties;
     std::map<NPIdentifier, NPInvokeFunctionPtr> _methods;
     // 0 for reading, 1 for writing
-    int         _sockfds[2];
-    GIOChannel *_iochan[2];
-    // ID to watch the read channel from the player
-    int         _watchid;
+
+    /// The ControlFD is the file descriptor for the socket connection
+    /// to the standalone player. This is used when writing to the
+    /// standalone player from this plugin.
+    int _controlfd;
+    /// The HostFD is the file descriptor for the socket connection
+    /// to the standalone player. This is used by this plugin when reading
+    /// messages from the standalone player.
+    int _hostfd;
 };
 
 } // end of gnash namespace

@@ -75,16 +75,6 @@ static NPClass GnashPluginScriptObjectClass = {
     GnashPluginScriptObject::marshalConstruct
 };
 
-/// The HostFD is the file descriptor for the socket connection
-/// to the standalone player. This is used by this plugin when reading
-/// messages from the standalone player.
-static int hostfd = -1;
-
-/// The ControlFD is the file descriptor for the socket connection
-/// to the standalone player. This is used when writing to the
-/// standalone player from this plugin.
-static int controlfd = -1;
-
 void
 printNPVariant(const NPVariant *value)
 {
@@ -271,14 +261,14 @@ GnashPluginScriptObject::initializeIdentifiers()
 
 // Constructor
 GnashPluginScriptObject::GnashPluginScriptObject()
-    : _nppinstance (0)
+    : _nppinstance (0),
+      _controlfd(-1),
+      _hostfd(-1)
 {
 //    log_debug(__PRETTY_FUNCTION__);
     
     initializeIdentifiers();
     
-    _sockfds[READFD] = 0;
-    _sockfds[WRITEFD] = 0;
 }
 
 // Constructor
@@ -289,8 +279,6 @@ GnashPluginScriptObject::GnashPluginScriptObject(NPP npp)
     
     initializeIdentifiers();
 
-    _sockfds[READFD] = 0;
-    _sockfds[WRITEFD] = 0;
 }
 
 // Destructor
@@ -656,7 +644,7 @@ void
 GnashPluginScriptObject::setControlFD(int x)
 {
 //    log_debug("%s: %d", __FUNCTION__, x);
-    controlfd = x;              // FIXME: this should go away
+    _controlfd = x;              // FIXME: this should go away
 }
 
 int
@@ -664,14 +652,14 @@ GnashPluginScriptObject::getControlFD()
 {
 // log_debug("getControlFD: %d", controlfd);
 
-    return controlfd;
+    return _controlfd;
 };
 
 void
 GnashPluginScriptObject::setHostFD(int x)
 {
 //    log_debug("%s: %d", __FUNCTION__, x);
-    hostfd = x;              // FIXME: this should go away
+    _hostfd = x;              // FIXME: this should go away
 }
 
 int
@@ -679,7 +667,7 @@ GnashPluginScriptObject::getHostFD()
 {
 // log_debug("getControlFD: %d", controlfd);
 
-    return hostfd;
+    return _hostfd;
 };
 
 
@@ -687,7 +675,7 @@ GnashPluginScriptObject::getHostFD()
 int
 GnashPluginScriptObject::writePlayer(const std::string &data)
 {
-    return writePlayer(controlfd, data);
+    return writePlayer(_controlfd, data);
 }
 
 int
@@ -707,7 +695,7 @@ GnashPluginScriptObject::writePlayer(int fd, const std::string &data)
 std::string
 GnashPluginScriptObject::readPlayer()
 {
-    return readPlayer(hostfd);
+    return readPlayer(_hostfd);
 }
 
 std::string
