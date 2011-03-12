@@ -58,7 +58,6 @@ STD_DIRS = \
 	librender \
 	gui \
 	plugin \
-	$(CYGNAL_DIR) \
 	utilities \
 	doc \
 	po \
@@ -68,7 +67,7 @@ if HAVE_VAAPI
 VAAPI_DIR = libvaapi
 endif
 
-SUBDIRS = $(VAAPI_DIR) $(STD_DIRS)
+SUBDIRS = $(VAAPI_DIR) $(STD_DIRS) $(CYGNAL_DIR)
 DIST_SUBDIRS = $(STD_DIRS) cygnal extensions testsuite libvaapi
 
 if TESTSUITE
