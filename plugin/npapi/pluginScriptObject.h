@@ -119,16 +119,6 @@ public:
     /// @return the value as returned by the standalone player
     GnashNPVariant GetVariable(const std::string &name);
 
-    // Create a socketpair so we can talk to the player.
-    bool createPipe();
-    
-    // Close the socket
-    bool closePipe();
-    bool closePipe(int fd);
-
-    // Check the pipe to see if it's ready, ie... is gnash connected yet ?
-    bool checkPipe();
-    bool checkPipe(int fd);
 
     int getReadFD()  { return _sockfds[READFD]; };
     GIOChannel *getReadChannel()  { return _iochan[READFD]; };
@@ -165,25 +155,7 @@ protected:
     bool Enumerate(NPIdentifier **identifier, uint32_t *count);
     bool Construct(const NPVariant *data, uint32_t argCount, NPVariant *result);
 
-    bool handleInvoke(GIOChannel *iochan, GIOCondition cond);
-    
-    /// Process a null-terminated request line
-    //
-    /// @param buf
-    ///	  The single request.
-    ///   Caller is responsible for memory management, but give us
-    ///   permission to modify the string.
-    ///
-    /// @param len
-    ///	  Lenght of buffer.
-    ///
-    /// @return true if the request was processed, false otherwise (bogus request..)
-    ///
-    bool processPlayerRequest(gchar* buf, gsize len);
 private:
-    static bool handleInvokeWrapper(GIOChannel* iochan, GIOCondition cond,
-                                     GnashPluginScriptObject* plugin);
-
     void initializeIdentifiers();
     void setInstance(NPP inst) { _nppinstance = inst; };
     
