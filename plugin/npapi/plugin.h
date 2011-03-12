@@ -102,6 +102,9 @@ private:
 
     bool handlePlayerRequests(GIOChannel* iochan, GIOCondition cond);
 
+    void setupIOChannel(int fd, GIOFunc handler, GIOCondition signals) const;
+
+
     /// Process requests from the player.
     //
     /// @return true if the requests were processed, false otherwise (bogus request..)
@@ -120,7 +123,6 @@ private:
     unsigned int                       _height;
     std::map<std::string, std::string> _options;
     int                                _streamfd;
-    int                                _ichanWatchId;
     pid_t                              _childpid;
     int                                _filefd;
 

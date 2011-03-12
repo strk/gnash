@@ -398,7 +398,6 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
     _width(0),
     _height(0),
     _streamfd(-1),
-    _ichanWatchId(0),
     _childpid(0),
     _filefd(-1),
     _name(),
@@ -460,14 +459,11 @@ nsPluginInstance::~nsPluginInstance()
 {
 //    gnash::log_debug("plugin instance destruction");
 
-    if ( _ichanWatchId ) {
-        g_source_remove(_ichanWatchId);
-        _ichanWatchId = 0;
-    }
-
     if (_scriptObject) {
         NPN_ReleaseObject(_scriptObject);
     }
+
+    do { } while (g_source_remove_by_user_data(this));
 
     if (_childpid > 0) {
         // When the child has terminated (signaled by GTK through GtkSocket), it
@@ -630,7 +626,6 @@ nsPluginInstance::NewStream(NPMIMEType /*type*/, NPStream* stream,
 NPError
 nsPluginInstance::DestroyStream(NPStream* /*stream*/, NPError /*reason*/)
 {
-
     if (_streamfd != -1) {
         if (close(_streamfd) == -1) {
             perror("closing _streamfd");
@@ -678,10 +673,6 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 
     if ( cond & G_IO_HUP ) {
         gnash::log_debug("Player control socket hang up");
-        // Returning false here will cause the "watch" to be removed. This watch
-        // is the only reference held to the GIOChannel, so it will be
-        // destroyed. We must make sure we don't attempt to destroy it again.
-        _ichanWatchId = 0;
         return false;
     }
 
@@ -741,6 +732,14 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
     
     return true;
 }
+
+// This GIOFunc handler removes the source from the mainloop.
+gboolean 
+remove_handler(GIOChannel *source, GIOCondition condition, gpointer data)
+{
+    return FALSE;
+}
+
 
 // There may be multiple Invoke messages in a single packet, so each
 // packet needs to be broken up into separate messages to be parsed.
@@ -1286,6 +1285,32 @@ wait_for_gdb()
 }
 
 void
+nsPluginInstance::setupIOChannel(int fd, GIOFunc handler, GIOCondition signals) const
+{
+    GIOChannel* ichan = g_io_channel_unix_new(fd);
+    g_io_channel_set_close_on_unref(ichan, true);
+
+    GError* error = 0;
+    GIOStatus rv = g_io_channel_set_flags(ichan, G_IO_FLAG_NONBLOCK,
+                                          &error);
+    if (error || rv != G_IO_STATUS_NORMAL) {
+        log_error("Could not make player communication nonblocking.");
+
+        g_io_channel_unref(ichan);
+        if (error) {
+            g_error_free(error);
+        }
+        return;
+    }
+
+    gnash::log_debug("New IO Channel for fd #%d",
+                     g_io_channel_unix_get_fd(ichan));
+    g_io_add_watch(ichan, signals, handler, (gpointer)this); 
+    g_io_channel_unref(ichan);
+}
+
+
+void
 nsPluginInstance::startProc()
 {
 
@@ -1363,30 +1388,12 @@ nsPluginInstance::startProc()
             gnash::log_debug("Forked successfully, child process PID is %d",
                              _childpid);
         }
+
+        setupIOChannel(c2p_pipe[0], (GIOFunc)handlePlayerRequestsWrapper,
+                                    (GIOCondition)(G_IO_IN|G_IO_HUP));
         
-        GIOChannel* ichan = g_io_channel_unix_new(c2p_pipe[0]);
-        g_io_channel_set_close_on_unref(ichan, true);
+        setupIOChannel(p2c_controlpipe[1], remove_handler, G_IO_HUP);
 
-        GError* error = 0;
-        GIOStatus rv = g_io_channel_set_flags(ichan, G_IO_FLAG_NONBLOCK,
-                                              &error);
-        if (error || rv != G_IO_STATUS_NORMAL) {
-            log_error("Could not make player communication nonblocking.");
-
-            g_io_channel_unref(ichan);
-            if (error) {
-                g_error_free(error);
-            }
-            return;
-        }
-
-        gnash::log_debug("New IO Channel for fd #%d",
-                         g_io_channel_unix_get_fd(ichan));
-        _ichanWatchId = g_io_add_watch(ichan, 
-                                       (GIOCondition)(G_IO_IN|G_IO_HUP), 
-                                       (GIOFunc)handlePlayerRequestsWrapper,
-                                       this);
-        g_io_channel_unref(ichan);
         return;
     }
     
