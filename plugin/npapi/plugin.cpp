@@ -735,7 +735,7 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 
 // This GIOFunc handler removes the source from the mainloop.
 gboolean 
-remove_handler(GIOChannel *source, GIOCondition condition, gpointer data)
+remove_handler(GIOChannel*, GIOCondition, gpointer)
 {
     return FALSE;
 }
