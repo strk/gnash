@@ -161,6 +161,3 @@ endif
 clean-local:
 	rm -f Dejagnu.swf gnashrc
 	rm -rf tmpSharedObject
-
-dist-hook:
-	$(MAKE) -C $(top_srcdir) fetch-swfdec

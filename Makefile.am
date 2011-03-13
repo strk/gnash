@@ -491,7 +491,7 @@ pkgconfig_DATA = \
 	$(NULL)
 
 SWFDEC_REPO=git://anongit.freedesktop.org/git/swfdec/swfdec
-SWFDEC_MOUNT=$(srcdir)/testsuite/swfdec/src
+SWFDEC_MOUNT=$(top_builddir)/testsuite/swfdec/src
 fetch-swfdec:
 	if test -d "$(SWFDEC_MOUNT)"; then \
 	    cd "$(SWFDEC_MOUNT)" && git pull && git branch -v; \

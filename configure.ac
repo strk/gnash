@@ -202,7 +202,7 @@ AC_SUBST(BUILDDATE)
 
 dnl These are required by automake
 dnl AM_INIT_AUTOMAKE(gnash, "trunk$BUILDDATE")
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([tar-ustar])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AM_MAINTAINER_MODE
 AC_PROG_MAKE_SET
