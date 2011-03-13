@@ -477,11 +477,20 @@ void MediaParserGst::cb_pad_added(GstElement* /* element */, GstPad* new_pad,
         log_debug(_("MediaParserGst: Linked audio source (type: %s)"), caps_name); 
 
     } else {
-        parser->_videosink = swfdec_gst_connect_sinkpad_by_pad (final_pad, caps);
+        // A parser element may still change the caps in a way that is
+        // incompatible with the caps provided by the demuxer. The only parser
+        // I am aware of that does this is h264parse. Setting the caps to the
+        // very simple form "video/codec" does not appear to be problematic for
+        // other codecs either.
+        GstCaps* sinkcaps = gst_caps_from_string(caps_name);
+
+        parser->_videosink = swfdec_gst_connect_sinkpad_by_pad (final_pad, sinkcaps);
+        gst_caps_unref(sinkcaps);
+
         if (!parser->_videosink) {
             log_error(_("MediaParserGst: couldn't link \"fake\" sink."));
             return;        
-        }        
+        }
         
         gst_pad_set_chain_function(parser->_videosink,
                 MediaParserGst::cb_chain_func_video);
