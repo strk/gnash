@@ -136,8 +136,10 @@ bool
 MediaParserGst::parseNextChunk()
 {
     boost::mutex::scoped_lock streamLock(_streamMutex);
-    
-    emitEncodedFrames();
+
+    if (emitEncodedFrames()) {
+        return true;
+    }
 
     // FIXME: our caller check for _parsingComplete prior
     //        to call parseNextChunk
@@ -178,8 +180,6 @@ MediaParserGst::pushGstBuffer()
         if (!_stream->eof() && !_stream->bad()) {
             log_error(_("MediaParserGst failed to read the stream, but it did"
                       " not reach EOF or enter a bad state."));
-        } else {
-            _parsingComplete = true;
         }
 
         if (!ret) {
@@ -201,9 +201,13 @@ MediaParserGst::pushGstBuffer()
     return true;
 }
 
-void
+bool
 MediaParserGst::emitEncodedFrames()
 {
+    if (_enc_audio_frames.empty() && _enc_video_frames.empty()) {
+        return false;
+    }
+
     while (!_enc_audio_frames.empty()) {
         EncodedAudioFrame* frame = _enc_audio_frames.front();
         pushEncodedAudioFrame(std::auto_ptr<EncodedAudioFrame>(frame));
@@ -215,6 +219,8 @@ MediaParserGst::emitEncodedFrames()
         pushEncodedVideoFrame(std::auto_ptr<EncodedVideoFrame>(frame));
        _enc_video_frames.pop_front();
     }
+
+    return true;
 }
 
 void
