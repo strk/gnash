@@ -184,7 +184,8 @@ site-update: site.exp
 	@echo "# This is a list of the pre-compiled testcases" >> site.exp
 	@echo "set testcases \"$(TEST_CASES)\"" >> site.exp
 
-dist-hook: 
+dist-hook: src
+src:
 	$(MAKE) -C $(top_builddir) fetch-swfdec
 
-EXTRA_DIST = gen_run_swfdec_testsuite.sh PASSING README REALTIME swfdec_gnash_tester
+EXTRA_DIST = gen_run_swfdec_testsuite.sh PASSING README REALTIME swfdec_gnash_tester src
