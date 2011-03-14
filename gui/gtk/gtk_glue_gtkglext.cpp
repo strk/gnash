@@ -31,9 +31,6 @@ namespace gnash
 {
 
 GtkGlExtGlue::GtkGlExtGlue()
-#ifdef FIX_I810_LOD_BIAS
-  : _tex_lod_bias(-1.2f)
-#endif
 {
     GNASH_REPORT_FUNCTION;
 }
@@ -57,12 +54,6 @@ bool
 GtkGlExtGlue::init(int argc, char** argv[])
 {
 //    GNASH_REPORT_FUNCTION;
-#ifdef FIX_I810_LOD_BIAS
-    int c = getopt (argc, *argv, "m:");
-    if (c == 'm') {
-      _tex_lod_bias = (float) strtof(optarg, NULL);
-    }
-#endif
 
     gtk_gl_init (&argc, argv);
 
@@ -117,10 +108,6 @@ GtkGlExtGlue::createRenderHandler()
     gdk_gl_drawable_make_current(gldrawable, glcontext);
 
     Renderer* renderer = create_Renderer_ogl();
-
-#ifdef FIX_I810_LOD_BIAS
-    glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, _tex_lod_bias);
-#endif
 
     return renderer;
 }

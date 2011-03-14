@@ -85,9 +85,6 @@ private:
     SdlCairoGlue    _glue;
 #elif defined(RENDERER_OPENGL)
     SdlOglGlue      _glue;
-# ifdef FIX_I810_LOD_BIAS
-    float       _tex_lod_bias;
-# endif
 #endif
 
 };

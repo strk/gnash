@@ -1563,21 +1563,6 @@ if test x"${cgibin}" = x"yes"; then
 fi
 
 dnl --------------------------------------------------------
-dnl Fix the Intel 810 LOD bias problem
-dnl --------------------------------------------------------
-AC_ARG_ENABLE(i810-lod-bias,
-  AC_HELP_STRING([--enable-i810-lod-bias], [Enable fix for Intel 810 LOD bias problem]),
-[case "${enableval}" in
-  yes) i810lodbias=yes ;;
-  no)  i810lodbias=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for enable-i810-lod-bias option]) ;;
-esac])
-
-if test x"${i810lodbias}" = xyes; then
-    AC_DEFINE([FIX_I810_LOD_BIAS], [], [Fix i810 LOD bias problem])
-fi
-
-dnl --------------------------------------------------------
 dnl  Double buffer
 dnl --------------------------------------------------------
 dnl Add an option for double buffering when rendering, currently only used by
@@ -3020,12 +3005,6 @@ exec 4> $cwarn
 exec 5> $crec
 
 echo "Configurable options are:"
-
-if test x"${i810lodbias}" = x"yes"; then
-  echo "        Intel 810 LOD bias hack enabled"
-else
-  echo "        Intel 810 LOD bias hack disabled (default). Use --enable-i810-lod-bias to enable."
-fi
 
 if test x"${pthreads}" = x"yes"; then
   echo "        POSIX Threads support enabled (default)"

@@ -153,14 +153,6 @@
 	  </entry>
 	</row>
 	<row>
-	  <entry><option>--enable-i810-lod-bias</option>
-	  </entry>
-	  <entry>Enable fix for Intel 810 LOD bias problem. Older versions
-	  of libMesa on the Intel i810 or i815 graphics processor
-	  need this flag or Gnash will core dump. This has been
-	  fixed in newer versions (summer 2005) of libMesa.</entry>
-	</row>
-	<row>
 	  <entry><option>--enable-media=ffmpeg|gst|none</option>
 	  </entry>
 	  <entry>  <para>

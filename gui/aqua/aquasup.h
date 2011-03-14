@@ -52,9 +52,6 @@ class DSOEXPORT AquaGui : public Gui
 
 #if defined(RENDERER_OPENGL)
     AquaOglGlue		_glue;
-#ifdef FIX_I810_LOD_BIAS
-    float			_tex_lod_bias;
-#endif
 #endif
   	
 	public:

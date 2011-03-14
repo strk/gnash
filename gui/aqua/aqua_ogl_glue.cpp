@@ -28,9 +28,6 @@ namespace gnash
 
 AquaOglGlue::AquaOglGlue()
 : _context(NULL)
-#ifdef FIX_I810_LOD_BIAS
-  ,_tex_lod_bias(-1.2f)
-#endif
    
 {
 //    GNASH_REPORT_FUNCTION;
@@ -46,12 +43,6 @@ AquaOglGlue::~AquaOglGlue()
 bool AquaOglGlue::init(int argc, char **argv[])
 {
 //    GNASH_REPORT_FUNCTION;
-#ifdef FIX_I810_LOD_BIAS
-    int c = getopt (argc, *argv, "m:");
-    if (c == 'm') {
-      _tex_lod_bias = (float) strtof(optarg, NULL);
-    }
-#endif
 
     const GLint glattribs[] = { AGL_RGBA, AGL_ACCELERATED,
                                 AGL_DEPTH_SIZE, 32,
@@ -80,9 +71,6 @@ Renderer* AquaOglGlue::createRenderHandler()
 {
 //    GNASH_REPORT_FUNCTION;
     Renderer* renderer = create_Renderer_ogl();
-#ifdef FIX_I810_LOD_BIAS
-    glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, _tex_lod_bias);
-#endif
     return renderer;
 }
 

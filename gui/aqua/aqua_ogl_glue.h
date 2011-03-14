@@ -38,9 +38,6 @@ class AquaOglGlue : public AquaGlue
     void setInvalidatedRegions(const InvalidatedRanges& /* ranges */);
     void render();
    private:
-#ifdef FIX_I810_LOD_BIAS
-    float _tex_lod_bias;
-#endif
     AGLContext _context;
 };
 }
