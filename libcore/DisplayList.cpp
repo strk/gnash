@@ -543,8 +543,6 @@ DisplayList::display(Renderer& renderer, const Transform& base)
 {
     testInvariant();
 
-    //log_debug("Displaying list: %s", *this);
-
     std::stack<int> clipDepthStack;
     
     // We only display DisplayObjects which are out of the "removed" zone
