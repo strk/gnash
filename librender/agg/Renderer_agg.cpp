@@ -172,6 +172,7 @@ AGG resources
 
 
 #include <boost/numeric/conversion/converter.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 
 namespace gnash {
 
@@ -181,7 +182,7 @@ class AlphaMask;
 
 typedef std::vector<agg::path_storage> AggPaths;
 typedef std::vector<geometry::Range2d<int> > ClipBounds;
-typedef std::vector<AlphaMask*> AlphaMasks;
+typedef boost::ptr_vector<AlphaMask> AlphaMasks;
 typedef std::vector<Path> GnashPaths;
 
 template <class Rasterizer>
@@ -465,7 +466,7 @@ public:
         else {
             // Untested.
             typedef agg::scanline_u8_am<agg::alpha_mask_gray8> Scanline;
-            Scanline sl(masks.back()->getMask());
+            Scanline sl(masks.back().getMask());
             renderScanlines(path, rbase, sl);
         }
     } 
@@ -612,7 +613,7 @@ private:
         else {
             // Untested.
             typedef agg::scanline_u8_am<agg::alpha_mask_gray8> Scanline;
-            Scanline sl(masks.back()->getMask());
+            Scanline sl(masks.back().getMask());
             renderScanlines(path, rbase, sl, sg);
         }
     } 
@@ -983,7 +984,7 @@ public:
         else {
             // Mask is active!
             typedef agg::scanline_u8_am<agg::alpha_mask_gray8> sl_type;
-            sl_type sl(_alphaMasks.back()->getMask());      
+            sl_type sl(_alphaMasks.back().getMask());      
             lr.render(sl, stroke, color);
         }
 
@@ -995,14 +996,14 @@ public:
         // Set flag so that rendering of shapes is simplified (only solid fill) 
         m_drawing_mask = true;
 
-        AlphaMask* new_mask = new AlphaMask(xres, yres);
+        _alphaMasks.push_back(new AlphaMask(xres, yres));
+        AlphaMask& new_mask = _alphaMasks.back();
 
         for (ClipBounds::const_iterator i = _clipbounds.begin(), 
                 e = _clipbounds.end(); i != e; ++i) {
-            new_mask->clear(*i);
+            new_mask.clear(*i);
         }
 
-        _alphaMasks.push_back(new_mask);
     }
 
     void end_submit_mask()
@@ -1012,8 +1013,7 @@ public:
 
     void disable_mask()
     {
-        assert( ! _alphaMasks.empty() );
-        delete _alphaMasks.back();
+        assert(!_alphaMasks.empty());
         _alphaMasks.pop_back();
     }
   
@@ -1451,7 +1451,7 @@ public:
       
       typedef agg::scanline_u8_am<agg::alpha_mask_gray8> scanline_type;
       
-      scanline_type sl(_alphaMasks.back()->getMask());
+      scanline_type sl(_alphaMasks.back().getMask());
       
       draw_shape_impl<scanline_type> (subshape_id, paths, agg_paths, 
         sh, even_odd, sl);
@@ -1576,7 +1576,7 @@ public:
       
       typedef agg::scanline_u8_am<agg::alpha_mask_gray8> scanline_type;
       
-      scanline_type sl(_alphaMasks[mask_count-2]->getMask());
+      scanline_type sl(_alphaMasks[mask_count - 2].getMask());
       
       draw_mask_shape_impl(paths, even_odd, sl);
         
@@ -1635,7 +1635,7 @@ public:
     } // for path
     
     // renderer base
-    renderer_base& rbase = _alphaMasks.back()->get_rbase();
+    renderer_base& rbase = _alphaMasks.back().get_rbase();
     
     // span allocator
     typedef agg::span_allocator<agg::gray8> alloc_type;
@@ -1672,7 +1672,7 @@ public:
       
       typedef agg::scanline_u8_am<agg::alpha_mask_gray8> scanline_type;
       
-      scanline_type sl(_alphaMasks.back()->getMask());
+      scanline_type sl(_alphaMasks.back().getMask());
       
       draw_outlines_impl<scanline_type> (subshape_id, paths, agg_paths,
         line_styles, cx, linestyle_matrix, sl);
@@ -1894,7 +1894,7 @@ public:
       
       typedef agg::scanline_u8_am<agg::alpha_mask_gray8> sl_type; 
       
-      sl_type sl(_alphaMasks.back()->getMask());
+      sl_type sl(_alphaMasks.back().getMask());
          
       draw_poly_impl<sl_type>(&corners.front(), corners.size(), fill, outline, sl, mat);       
     
