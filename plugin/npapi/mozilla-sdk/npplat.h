@@ -20,8 +20,16 @@
 #ifndef npplat_h_
 #define npplat_h_
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
+#if NPAPI_VERSION == 190
+#include "npupp.h"
+#else
 #include "npapi.h"
 #include "npfunctions.h"
+#endif
 
 #ifdef XP_WIN
 #include "windows.h"

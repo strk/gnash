@@ -518,6 +518,11 @@ MediaParserFfmpeg::~MediaParserFfmpeg()
 
 }
 
+// NOTE: as this function is used as a callback from FFMPEG, it should not
+// throw any exceptions, because:
+// a) The behaviour of C++ exceptions passed into C code is undefined.
+// b) Even if we don't crash and burn, the FFMPEG parser is left in an
+//    undefined state.
 int 
 MediaParserFfmpeg::readPacket(boost::uint8_t* buf, int buf_size)
 {
@@ -530,6 +535,11 @@ MediaParserFfmpeg::readPacket(boost::uint8_t* buf, int buf_size)
 
 }
 
+// NOTE: as this function is used as a callback from FFMPEG, it should not
+// throw any exceptions, because:
+// a) The behaviour of C++ exceptions passed into C code is undefined.
+// b) Even if we don't crash and burn, the FFMPEG parser is left in an
+//    undefined state.
 boost::int64_t 
 MediaParserFfmpeg::seekMedia(boost::int64_t offset, int whence)
 {
@@ -546,9 +556,11 @@ MediaParserFfmpeg::seekMedia(boost::int64_t offset, int whence)
 				_("MediaParserFfmpeg couldn't parse input format: "
 				"tried to seek at negative offset %1%."))
 				% offset;
-	   		throw MediaException(fmt.str());
+	   		log_error(fmt);
+			return -1;
+		} else {
+			_stream->seek(offset);
 		}
-		_stream->seek(offset);
 	}
 	else if (whence == SEEK_CUR)
 	{
@@ -569,6 +581,7 @@ MediaParserFfmpeg::seekMedia(boost::int64_t offset, int whence)
 		// ffmpeg uses whence=AVSEEK_SIZE and offset=0 to request
 		// stream size !
 		log_unimpl("MediaParserFfmpeg: unsupported whence value %d", whence);
+		return -1;
 	}
 
 

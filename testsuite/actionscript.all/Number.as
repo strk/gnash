@@ -676,14 +676,18 @@ check_equals(a, 77);
 
 check( isNaN(0/0) );
 
+a=16711680; // 1.67117e+07;
+as=a.toString(16);
+check_equals(as, 'ff0000');
+
 // END OF TEST
 
 #if OUTPUT_VERSION < 6
- check_totals(237);
+ check_totals(238);
 #else
 #if OUTPUT_VERSION < 7
- check_totals(232);
+ check_totals(233);
 #else
- check_totals(230);
+ check_totals(231);
 #endif
 #endif

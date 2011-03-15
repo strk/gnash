@@ -498,7 +498,7 @@ private:
     std::string _postdata;
 
     // Current size of cached data
-    size_t _cached;
+    std::streampos _cached;
 
     /// Total stream size.
     //
@@ -508,7 +508,7 @@ private:
 
     // Attempt at filling the cache up to the given size.
     // Will call libcurl routines to fetch data.
-    void fillCache(std::streamsize size);
+    void fillCache(std::streampos size);
 
     // Process pending curl messages (handles 404)
     void processMessages();
@@ -603,7 +603,7 @@ CurlStreamFile::fillCacheNonBlocking()
 
 /*private*/
 void
-CurlStreamFile::fillCache(std::streamsize size)
+CurlStreamFile::fillCache(std::streampos size)
 {
 
 #if GNASH_CURL_VERBOSE
@@ -612,7 +612,7 @@ CurlStreamFile::fillCache(std::streamsize size)
 
     assert(size >= 0);
 
-    if ( ! _running || _cached >= static_cast<size_t>(size)) {
+    if ( ! _running || _cached >= size) {
 #if GNASH_CURL_VERBOSE
         if (!_running) log_debug("Not running: returning");
         else log_debug("Already enough bytes cached: returning");
@@ -644,7 +644,7 @@ CurlStreamFile::fillCache(std::streamsize size)
         // Do this here to avoid calling select()
         // when we have enough bytes anyway, or
         // we reached EOF
-        if (_cached >= static_cast<size_t>(size) || !_running) break; 
+        if (_cached >= size || !_running) break; 
 	
 #if GNASH_CURL_VERBOSE
         //log_debug("cached: %d, size: %d", _cached, size);
@@ -1164,7 +1164,7 @@ CurlStreamFile::seek(std::streampos pos)
     fillCache(pos);
     if (_error) return false; // error can be set by fillCache
 
-    if (_cached < static_cast<size_t>(pos)) {
+    if (_cached < pos) {
         log_error ("Warning: could not cache enough bytes on seek: %d "
 		   "requested, %d cached", pos, _cached);
         return false; 

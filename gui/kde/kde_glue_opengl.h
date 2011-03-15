@@ -35,10 +35,6 @@ class KdeOpenGLGlue : public KdeGlue
     void prepDrawingArea(QWidget *drawing_area);
     Renderer* createRenderHandler();
     void render();
-  private:
-#ifdef FIX_I810_LOD_BIAS
-    float _tex_lod_bias;
-#endif
 };
 
 }

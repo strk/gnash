@@ -35,6 +35,21 @@ AC_DEFUN([GNASH_PATH_PYTHON],
     # Look for the python-config script
     pythonconfig=""
     AC_PATH_PROG(pythonconfig, python-config, ,[${pathlist}])
+    if  test x"${pythonconfig}" = x; then
+      AC_MSG_CHECKING([for versioned python-config])
+      for i in `echo ${pathlist} | sed  's|:| |g' 2>/dev/null`; do
+        pythonconfig="`ls ${i}/python2.*-config 2>/dev/null | head -1`"
+        if test x"${pythonconfig}" != x; then
+          break
+        fi
+      done
+      if test x"${pythonconfig}" != x; then
+        AC_MSG_RESULT([${pythonconfig}])
+      else
+        AC_MSG_RESULT([no])
+      fi
+    fi
+
 
     dnl If the path hasn't been specified, go look for it.
     if test x"${ac_cv_path_python_incl}" = x; then
@@ -42,10 +57,12 @@ AC_DEFUN([GNASH_PATH_PYTHON],
         ac_cv_path_python_incl="`${pythonconfig} --include`"
       else
         for i in $incllist; do
-          if test -f $i/pythonrun.h; then
-            ac_cv_path_python_incl="-I$i"
-	          break
-          fi
+          for j in `ls -dr $i/python2.* 2>/dev/null`;do
+            if test -f $j/pythonrun.h; then
+              ac_cv_path_python_incl="-I$j"
+              break 2
+            fi
+          done
         done
       fi
 

@@ -295,13 +295,9 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
 
     switch (pixFmt)
     {
-// As of libavcodec 0.cvs20060823-8  PIX_FMT_RGBA is unknown symbol
-// As of libavcodec 0.svn20080206-17 it is a define
-#ifdef PIX_FMT_RGBA
         case PIX_FMT_RGBA:
             im.reset(new image::ImageRGBA(width, height));
             break;
-#endif
         case PIX_FMT_RGB24:
             im.reset(new image::ImageRGB(width, height));
             break;

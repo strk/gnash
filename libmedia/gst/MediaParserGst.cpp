@@ -136,8 +136,10 @@ bool
 MediaParserGst::parseNextChunk()
 {
     boost::mutex::scoped_lock streamLock(_streamMutex);
-    
-    emitEncodedFrames();
+
+    if (emitEncodedFrames()) {
+        return true;
+    }
 
     // FIXME: our caller check for _parsingComplete prior
     //        to call parseNextChunk
@@ -178,8 +180,6 @@ MediaParserGst::pushGstBuffer()
         if (!_stream->eof() && !_stream->bad()) {
             log_error(_("MediaParserGst failed to read the stream, but it did"
                       " not reach EOF or enter a bad state."));
-        } else {
-            _parsingComplete = true;
         }
 
         if (!ret) {
@@ -201,9 +201,13 @@ MediaParserGst::pushGstBuffer()
     return true;
 }
 
-void
+bool
 MediaParserGst::emitEncodedFrames()
 {
+    if (_enc_audio_frames.empty() && _enc_video_frames.empty()) {
+        return false;
+    }
+
     while (!_enc_audio_frames.empty()) {
         EncodedAudioFrame* frame = _enc_audio_frames.front();
         pushEncodedAudioFrame(std::auto_ptr<EncodedAudioFrame>(frame));
@@ -215,6 +219,8 @@ MediaParserGst::emitEncodedFrames()
         pushEncodedVideoFrame(std::auto_ptr<EncodedVideoFrame>(frame));
        _enc_video_frames.pop_front();
     }
+
+    return true;
 }
 
 void
@@ -477,11 +483,20 @@ void MediaParserGst::cb_pad_added(GstElement* /* element */, GstPad* new_pad,
         log_debug(_("MediaParserGst: Linked audio source (type: %s)"), caps_name); 
 
     } else {
-        parser->_videosink = swfdec_gst_connect_sinkpad_by_pad (final_pad, caps);
+        // A parser element may still change the caps in a way that is
+        // incompatible with the caps provided by the demuxer. The only parser
+        // I am aware of that does this is h264parse. Setting the caps to the
+        // very simple form "video/codec" does not appear to be problematic for
+        // other codecs either.
+        GstCaps* sinkcaps = gst_caps_from_string(caps_name);
+
+        parser->_videosink = swfdec_gst_connect_sinkpad_by_pad (final_pad, sinkcaps);
+        gst_caps_unref(sinkcaps);
+
         if (!parser->_videosink) {
             log_error(_("MediaParserGst: couldn't link \"fake\" sink."));
             return;        
-        }        
+        }
         
         gst_pad_set_chain_function(parser->_videosink,
                 MediaParserGst::cb_chain_func_video);

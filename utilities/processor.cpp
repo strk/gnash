@@ -232,12 +232,12 @@ main(int argc, char *argv[])
     for (c = 0; c < argc; c++) {
       if (strcmp("--help", argv[c]) == 0) {
         usage(argv[0]);
-        exit(EXIT_SUCCESS);
+        return EXIT_SUCCESS;
       }
       if (strcmp("--version", argv[c]) == 0) {
         printf (_("Gnash gprocessor version: %s, Gnash version: %s\n"),
 		   GPROC_VERSION, VERSION);
-        exit(EXIT_SUCCESS);
+        return EXIT_SUCCESS;
       }
     }
  
@@ -271,7 +271,7 @@ main(int argc, char *argv[])
 	  case 'h':
 	      usage (argv[0]);
               dbglogfile.removeLog();
-	      exit(EXIT_SUCCESS);
+	      return EXIT_SUCCESS;
 	  case 'v':
 	      dbglogfile.setVerbosity();
 	      log_debug (_("Verbose output turned on"));
@@ -306,11 +306,11 @@ main(int argc, char *argv[])
 	      break;
 	  case ':':
               fprintf(stderr, "Missing argument for switch ``%c''\n", optopt); 
-	      exit(EXIT_FAILURE);
+	      return EXIT_FAILURE;
 	  case '?':
 	  default:
               fprintf(stderr, "Unknown switch ``%c''\n", optopt); 
-	      exit(EXIT_FAILURE);
+	      return EXIT_FAILURE;
 	}
     }
     
@@ -326,7 +326,7 @@ main(int argc, char *argv[])
 	    std::cerr << "no input files" << std::endl;
 	    usage(argv[0]);
         dbglogfile.removeLog();
-	    exit(EXIT_FAILURE);
+	    return EXIT_FAILURE;
     }
 
     boost::shared_ptr<gnash::media::MediaHandler> mediaHandler;
@@ -335,8 +335,6 @@ main(int argc, char *argv[])
     std::string mh = rcfile.getMediaHandler();
     mediaHandler.reset(media::MediaFactory::instance().get(mh));
     soundHandler.reset(new sound::NullSoundHandler(mediaHandler.get()));
-
-
 
     boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
     addDefaultLoaders(*loaders);
@@ -373,7 +371,7 @@ main(int argc, char *argv[])
 	        if (s_stop_on_errors) {
 		    // Fail.
                 std::cerr << "error playing through movie " << *i << std::endl;
-		        std::exit(EXIT_FAILURE);
+		        return EXIT_FAILURE;
 	        }
         }
 	
@@ -442,116 +440,125 @@ play_movie(const std::string& filename, const RunResources& runResources)
 
     // Use a clock advanced at every iteration to match exact FPS speed.
     ManualClock cl;
-    gnash::movie_root m(*md, cl, runResources);
-    
-    // Register processor to receive ActionScript events (Mouse, Stage
-    // System etc).
-    m.registerEventCallback(&eventCallback);
-    m.registerFSCommandCallback(&execFsCommand);
 
-    md->completeLoad();
-
-    MovieClip::MovieVariables v;
-    m.init(md.get(), v);
-
-    log_debug("iteration, timer: %lu, localDelay: %ld\n",
-            cl.elapsed(), localDelay);
-    gnashSleep(localDelay);
-    
-    resetLastAdvanceTimer();
-    int	kick_count = 0;
-    int stop_count=0;
-    size_t loop_back_count=0;
-    size_t latest_frame=0;
-    size_t end_hitcount=0;
-    size_t nadvances=0;
-    // Run through the movie.
-    while (!quitrequested) {
+    // Scope to ensure that movie_root is destroyed before the library
+    // is cleared; otherwise movie_root's MovieLoader can continue to
+    // add movie_definitions to MovieLibrary, which then keeps them
+    // and their parsing thread alive until static destruction. The parser
+    // can then continue to access destroyed resources.
+    {
+        gnash::movie_root m(*md, cl, runResources);
         
-        size_t	last_frame = m.get_current_frame();
-        //printf("advancing clock by %lu\n", clockAdvance);
-        cl.advance(clockAdvance);
-        m.advance();
+        // Register processor to receive ActionScript events (Mouse, Stage
+        // System etc).
+        m.registerEventCallback(&eventCallback);
+        m.registerFSCommandCallback(&execFsCommand);
 
-        if ( quitrequested ) 
-        {
-            quitrequested = false;
-            break;
-        }
+        md->completeLoad();
 
-        m.display(); // FIXME: for which reason are we calling display here ??
-        ++nadvances;
-        if ( limit_advances && nadvances >= limit_advances)
-        {
-            log_debug("exiting after %d advances", nadvances);
-            break;
-        }
-
-        size_t curr_frame = m.get_current_frame();
-        
-        // We reached the end, done !
-        if (curr_frame >= md->get_frame_count() - 1 )
-        {
-            if ( allowed_end_hits && ++end_hitcount >= allowed_end_hits )
-            {
-                log_debug("exiting after %d" 
-                       " times last frame was reached", end_hitcount);
-                    break;
-            }
-        }
-
-        // We didn't advance 
-        if (curr_frame == last_frame)
-        {
-            // Max stop counts reached, kick it
-            if ( secondsSinceLastAdvance() > waitforadvance )
-            {
-                stop_count=0;
-
-                // Kick the movie.
-                if ( last_frame + 1 > md->get_frame_count() -1 )
-                {
-                    fprintf(stderr, "Exiting after %g seconds in STOP mode at last frame\n", waitforadvance);
-                    break;
-                }
-                fprintf(stderr, "Kicking movie after %g seconds in STOP mode, kick ct = %d\n", waitforadvance, kick_count);
-                fflush(stderr);
-                m.goto_frame(last_frame + 1);
-                m.getRootMovie().setPlayState(gnash::MovieClip::PLAYSTATE_PLAY);
-                kick_count++;
-
-                if (kick_count > 10) {
-                    printf("movie is stalled; giving up on playing it through.\n");
-                    break;
-                }
-
-                    resetLastAdvanceTimer(); // It's like we advanced
-            }
-        }
-        
-        // We looped back.  Skip ahead...
-        else if (m.get_current_frame() < last_frame)
-        {
-            if ( last_frame > latest_frame ) latest_frame = last_frame;
-            if ( ++loop_back_count > allowloopbacks )
-            {
-                log_debug("%d loop backs; jumping one-after "
-                        "latest frame (%d)",
-                        loop_back_count, latest_frame+1);
-                m.goto_frame(latest_frame + 1);
-                loop_back_count = 0;
-            }
-        }
-        else
-        {
-            kick_count = 0;
-            stop_count = 0;
-            resetLastAdvanceTimer();
-        }
+        MovieClip::MovieVariables v;
+        m.init(md.get(), v);
 
         log_debug("iteration, timer: %lu, localDelay: %ld\n",
                 cl.elapsed(), localDelay);
         gnashSleep(localDelay);
+        
+        resetLastAdvanceTimer();
+        int	kick_count = 0;
+        int stop_count=0;
+        size_t loop_back_count=0;
+        size_t latest_frame=0;
+        size_t end_hitcount=0;
+        size_t nadvances=0;
+        // Run through the movie.
+        while (!quitrequested) {
+            
+            size_t	last_frame = m.get_current_frame();
+            //printf("advancing clock by %lu\n", clockAdvance);
+            cl.advance(clockAdvance);
+            m.advance();
+
+            if ( quitrequested ) 
+            {
+                quitrequested = false;
+                break;
+            }
+
+            m.display(); // FIXME: for which reason are we calling display here ??
+            ++nadvances;
+            if ( limit_advances && nadvances >= limit_advances)
+            {
+                log_debug("exiting after %d advances", nadvances);
+                break;
+            }
+
+            size_t curr_frame = m.get_current_frame();
+            
+            // We reached the end, done !
+            if (curr_frame >= md->get_frame_count() - 1 )
+            {
+                if ( allowed_end_hits && ++end_hitcount >= allowed_end_hits )
+                {
+                    log_debug("exiting after %d" 
+                           " times last frame was reached", end_hitcount);
+                        break;
+                }
+            }
+
+            // We didn't advance 
+            if (curr_frame == last_frame)
+            {
+                // Max stop counts reached, kick it
+                if ( secondsSinceLastAdvance() > waitforadvance )
+                {
+                    stop_count=0;
+
+                    // Kick the movie.
+                    if ( last_frame + 1 > md->get_frame_count() -1 )
+                    {
+                        fprintf(stderr, "Exiting after %g seconds in STOP mode at last frame\n", waitforadvance);
+                        break;
+                    }
+                    fprintf(stderr, "Kicking movie after %g seconds in STOP mode, kick ct = %d\n", waitforadvance, kick_count);
+                    fflush(stderr);
+                    m.goto_frame(last_frame + 1);
+                    m.getRootMovie().setPlayState(gnash::MovieClip::PLAYSTATE_PLAY);
+                    kick_count++;
+
+                    if (kick_count > 10) {
+                        printf("movie is stalled; giving up on playing it through.\n");
+                        break;
+                    }
+
+                        resetLastAdvanceTimer(); // It's like we advanced
+                }
+            }
+            
+            // We looped back.  Skip ahead...
+            else if (m.get_current_frame() < last_frame)
+            {
+                if ( last_frame > latest_frame ) latest_frame = last_frame;
+                if ( ++loop_back_count > allowloopbacks )
+                {
+                    log_debug("%d loop backs; jumping one-after "
+                            "latest frame (%d)",
+                            loop_back_count, latest_frame+1);
+                    m.goto_frame(latest_frame + 1);
+                    loop_back_count = 0;
+                }
+            }
+            else
+            {
+                kick_count = 0;
+                stop_count = 0;
+                resetLastAdvanceTimer();
+            }
+
+            log_debug("iteration, timer: %lu, localDelay: %ld\n",
+                    cl.elapsed(), localDelay);
+            gnashSleep(localDelay);
+        }
+
     }
 
     log_debug("-- Playback completed");

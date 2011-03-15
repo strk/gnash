@@ -245,7 +245,7 @@ gradientbevelfilter_type(const fn_call& fn)
 as_value
 gradientbevelfilter_new(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj = ensure<ValidThis>(fn);
+    as_object* obj = ensure<ValidThis>(fn);
     obj->setRelay(new GradientBevelFilter_as);
     return as_value();
 }

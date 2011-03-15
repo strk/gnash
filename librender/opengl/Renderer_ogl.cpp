@@ -744,21 +744,6 @@ public:
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-
-#ifdef FIX_I810_LOD_BIAS
-    // If 2D textures weren't previously enabled, enable
-    // them now and force the driver to notice the update,
-    // then disable them again.
-    if (!glIsEnabled(GL_TEXTURE_2D)) {
-      // Clearing a mask of zero *should* have no
-      // side effects, but coupled with enbling
-      // GL_TEXTURE_2D it works around a segmentation
-      // fault in the driver for the Intel 810 chip.
-      oglScopeEnable enabler(GL_TEXTURE_2D);
-      glClear(0);
-    }
-#endif
-
     glShadeModel(GL_FLAT);
   
   }

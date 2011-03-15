@@ -344,9 +344,8 @@ TextField::display(Renderer& renderer, const Transform& base)
     }
 
     _displayRecords.clear();
-    float scale = getFontHeight() /
-        static_cast<float>(_font->unitsPerEM(_embedFonts));
-    float fontLeading = _font->leading() * scale;
+    // TODO: work out how leading should be implemented.
+    const float fontLeading = 0;
 
     //offset the lines
     int yoffset = (getFontHeight() + fontLeading) + PADDING_TWIPS;
@@ -1052,9 +1051,12 @@ TextField::format_text()
     }
 
     boost::uint16_t fontHeight = getFontHeight();
-    float scale = fontHeight /
-        static_cast<float>(_font->unitsPerEM(_embedFonts)); 
-    const float fontLeading = _font->leading() * scale;
+    const float scale = fontHeight /
+        static_cast<float>(_font->unitsPerEM(_embedFonts));
+
+    // TODO: work out how leading affects things.
+    const float fontLeading = 0;
+
     const boost::uint16_t leftMargin = getLeftMargin();
     const boost::uint16_t indent = getIndent();
     const boost::uint16_t blockIndent = getBlockIndent();
@@ -1166,9 +1168,8 @@ void
 TextField::scrollLines()
 {
     boost::uint16_t fontHeight = getFontHeight();
-    float scale = fontHeight /
-        static_cast<float>(_font->unitsPerEM(_embedFonts));
-    float fontLeading = _font->leading() * scale;
+    const float fontLeading = 0;
+
     _linesindisplay = _bounds.height() / (fontHeight + fontLeading + PADDING_TWIPS);
     if (_linesindisplay > 0) { //no need to place lines if we can't fit any
         size_t manylines = _line_starts.size();
@@ -1214,11 +1215,8 @@ TextField::newLine(boost::int32_t& x, boost::int32_t& y,
     LineStarts::iterator linestartit = _line_starts.begin();
     LineStarts::const_iterator linestartend = _line_starts.end();
     
-    float scale = _fontHeight /
-        static_cast<float>(_font->unitsPerEM(_embedFonts)); 
-    float fontLeading = _font->leading() * scale;
-    float leading = getLeading();
-    leading += fontLeading * scale; // not sure this is correct...
+    // TODO: work out how leading affects things.
+    const float leading = 0;
     
     // Close out this stretch of glyphs.
     ++_glyphcount;
@@ -1272,6 +1270,10 @@ TextField::newLine(boost::int32_t& x, boost::int32_t& y,
         int space = rec.getFont()->get_glyph_index(32, _embedFonts);
         SWF::TextRecord::GlyphEntry ge;
         ge.index = space;
+
+        const float scale = getFontHeight() /
+            static_cast<float>(_font->unitsPerEM(_embedFonts));
+
         ge.advance = scale * rec.getFont()->get_advance(space, _embedFonts);
                   
         rec.addGlyph(ge,5);
@@ -1303,9 +1305,10 @@ TextField::handleChar(std::wstring::const_iterator& it,
     float scale = _fontHeight /
         static_cast<float>(_font->unitsPerEM(_embedFonts)); 
     float fontDescent = _font->descent(_embedFonts) * scale; 
-    float fontLeading = _font->leading() * scale;
-    float leading = getLeading();
-    leading += fontLeading * scale; // not sure this is correct...
+
+    // TODO: work out how leading should be implemented.
+    const float leading = 0;
+    const float fontLeading = 0;
     
     boost::uint32_t code = 0;
     while (it != e)
@@ -1677,9 +1680,6 @@ TextField::handleChar(std::wstring::const_iterator& it,
 
             default:
             {
-	
-
-				
                 if ( password() )
                 {    
                     SWF::TextRecord::GlyphEntry ge;

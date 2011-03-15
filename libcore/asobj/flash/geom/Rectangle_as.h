@@ -32,9 +32,6 @@ struct ObjectURI;
 /// Initialize the global Rectangle class
 void rectangle_class_init(as_object& where, const ObjectURI& uri);
 
-/// Return a Rectangle instance (in case the core lib needs it)
-boost::intrusive_ptr<as_object> init_Rectangle_instance();
-
 } // end of gnash namespace
 
 // __GNASH_ASOBJ_RECTANGLE_H__

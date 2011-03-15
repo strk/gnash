@@ -32,10 +32,11 @@ AM_LDFLAGS = \
 	$(CURL_LIBS) \
 	$(LIBADD_DL) \
 	$(BOOST_LIBS) \
+	$(BOOST_CYGNAL_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 
-libgnashnet_la_LDFLAGS =  -release $(VERSION)
+libgnashnet_la_LDFLAGS =  -release $(VERSION) $(AM_LDFLAGS)
 
 localedir = $(datadir)/locale
 
@@ -104,3 +105,6 @@ mudflap:
 # Remove libtool .la files
 install-exec-hook:
 	$(RM) $(DESTDIR)$(libdir)/gnash/libgnashnet.la
+
+uninstall-local:
+	$(RM) $(DESTDIR)$(libdir)/gnash/libgnashnet-*.so

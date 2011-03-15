@@ -41,8 +41,9 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--with-plugins-install=prefix \
 	--enable-extensions=all \
 	--enable-gui=all \
-	--disable-testsuite
-#--enable-cygnal
+	--enable-python \
+	--enable-cygnal \
+	--with-swfdec-testsuite
 
 if CYGNAL
 CYGNAL_DIR = cygnal
@@ -57,8 +58,6 @@ STD_DIRS = \
 	librender \
 	gui \
 	plugin \
-	$(CYGNAL_DIR) \
-	utilities \
 	doc \
 	po \
 	$(NULL)
@@ -67,8 +66,8 @@ if HAVE_VAAPI
 VAAPI_DIR = libvaapi
 endif
 
-SUBDIRS = $(VAAPI_DIR) $(STD_DIRS)
-DIST_SUBDIRS = $(STD_DIRS) cygnal extensions testsuite libvaapi
+SUBDIRS = $(VAAPI_DIR) $(STD_DIRS) $(CYGNAL_DIR) utilities
+DIST_SUBDIRS = $(STD_DIRS) cygnal utilities extensions testsuite libvaapi
 
 if TESTSUITE
 SUBDIRS += testsuite
@@ -492,7 +491,7 @@ pkgconfig_DATA = \
 	$(NULL)
 
 SWFDEC_REPO=git://anongit.freedesktop.org/git/swfdec/swfdec
-SWFDEC_MOUNT=$(srcdir)/testsuite/swfdec/src
+SWFDEC_MOUNT=$(top_builddir)/testsuite/swfdec/src
 fetch-swfdec:
 	if test -d "$(SWFDEC_MOUNT)"; then \
 	    cd "$(SWFDEC_MOUNT)" && git pull && git branch -v; \

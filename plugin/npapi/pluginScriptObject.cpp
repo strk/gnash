@@ -75,16 +75,6 @@ static NPClass GnashPluginScriptObjectClass = {
     GnashPluginScriptObject::marshalConstruct
 };
 
-/// The HostFD is the file descriptor for the socket connection
-/// to the standalone player. This is used by this plugin when reading
-/// messages from the standalone player.
-static int hostfd = -1;
-
-/// The ControlFD is the file descriptor for the socket connection
-/// to the standalone player. This is used when writing to the
-/// standalone player from this plugin.
-static int controlfd = -1;
-
 void
 printNPVariant(const NPVariant *value)
 {
@@ -271,14 +261,14 @@ GnashPluginScriptObject::initializeIdentifiers()
 
 // Constructor
 GnashPluginScriptObject::GnashPluginScriptObject()
-    : _nppinstance (0)
+    : _nppinstance (0),
+      _controlfd(-1),
+      _hostfd(-1)
 {
 //    log_debug(__PRETTY_FUNCTION__);
     
     initializeIdentifiers();
     
-    _sockfds[READFD] = 0;
-    _sockfds[WRITEFD] = 0;
 }
 
 // Constructor
@@ -289,16 +279,12 @@ GnashPluginScriptObject::GnashPluginScriptObject(NPP npp)
     
     initializeIdentifiers();
 
-    _sockfds[READFD] = 0;
-    _sockfds[WRITEFD] = 0;
 }
 
 // Destructor
 GnashPluginScriptObject::~GnashPluginScriptObject() 
 {
 //    log_debug(__PRETTY_FUNCTION__);
-// Should be automatically shutdown by GIO
-//    closePipe();
 }
 
 // Marshal Functions
@@ -313,14 +299,7 @@ NPObject *
 GnashPluginScriptObject::marshalAllocate (NPP npp, NPClass */* aClass */)
 {
 //    log_debug(__PRETTY_FUNCTION__);
-#if 0
-    GnashPluginScriptObject *npobj = reinterpret_cast<GnashPluginScriptObject *>
-        (NPN_MemAlloc(sizeof(GnashPluginScriptObject)));
-    npobj->setInstance(npp);
-    return npobj;
-#else
     return new GnashPluginScriptObject(npp);
-#endif
 }
 
 
@@ -328,11 +307,7 @@ void
 GnashPluginScriptObject::marshalDeallocate (NPObject *npobj)
 {
 //    log_debug(__PRETTY_FUNCTION__);
-#if 0
-    NPN_MemFree(reinterpret_cast<void *>(npobj));
-#else
     delete (GnashPluginScriptObject *)npobj;
-#endif
 }
 
 void 
@@ -340,7 +315,6 @@ GnashPluginScriptObject::marshalInvalidate (NPObject */* npobj */)
 {
 //    log_debug(__PRETTY_FUNCTION__);
 
-//    gpso->Invalidate();
 }
 
 bool 
@@ -550,7 +524,7 @@ GnashPluginScriptObject::Invoke(NPObject */* npobj */, NPIdentifier name,
     if (it != _methods.end()) {
         // log_debug("FOUND Method \"%s\"!", NPN_UTF8FromIdentifier(name));
         NPInvokeFunctionPtr func = it->second;
-        return func(NULL, name, args, argCount, result);
+        return func(this, name, args, argCount, result);
     } else {
         log_error("Couldn't find Method \"%s\"", NPN_UTF8FromIdentifier(name));
     }
@@ -670,12 +644,7 @@ void
 GnashPluginScriptObject::setControlFD(int x)
 {
 //    log_debug("%s: %d", __FUNCTION__, x);
-#if 0
-    if (_iochan == 0) {
-        _iochan[WRITEFD] = g_io_channel_unix_new(x);
-    }
-#endif
-    controlfd = x;              // FIXME: this should go away
+    _controlfd = x;              // FIXME: this should go away
 }
 
 int
@@ -683,22 +652,14 @@ GnashPluginScriptObject::getControlFD()
 {
 // log_debug("getControlFD: %d", controlfd);
 
-#if 0
-    return g_io_channel_unix_get_fd (_iochan);
-#endif    
-    return controlfd;
+    return _controlfd;
 };
 
 void
 GnashPluginScriptObject::setHostFD(int x)
 {
 //    log_debug("%s: %d", __FUNCTION__, x);
-#if 0
-    if (_iochan == 0) {
-        _iochan[WRITEFD] = g_io_channel_unix_new(x);
-    }
-#endif
-    hostfd = x;              // FIXME: this should go away
+    _hostfd = x;              // FIXME: this should go away
 }
 
 int
@@ -706,10 +667,7 @@ GnashPluginScriptObject::getHostFD()
 {
 // log_debug("getControlFD: %d", controlfd);
 
-#if 0
-    return g_io_channel_unix_get_fd (_iochan);
-#endif    
-    return hostfd;
+    return _hostfd;
 };
 
 
@@ -717,7 +675,7 @@ GnashPluginScriptObject::getHostFD()
 int
 GnashPluginScriptObject::writePlayer(const std::string &data)
 {
-    return writePlayer(controlfd, data);
+    return writePlayer(_controlfd, data);
 }
 
 int
@@ -737,7 +695,7 @@ GnashPluginScriptObject::writePlayer(int fd, const std::string &data)
 std::string
 GnashPluginScriptObject::readPlayer()
 {
-    return readPlayer(hostfd);
+    return readPlayer(_hostfd);
 }
 
 std::string
@@ -792,253 +750,7 @@ GnashPluginScriptObject::readPlayer(int fd)
 }
 
 
-// Close the socket
-bool
-GnashPluginScriptObject::closePipe(int fd)
-{
-//     log_debug(__FUNCTION__);
-    
-    if (fd > 0) {
-        // Send a Quit message to the player before closing the pipe.
-        std::vector<std::string> args;
-        std::string str = plugin::ExternalInterface::makeInvoke("Quit", args);
-        writePlayer(fd, str);
-    
-        ::shutdown(fd, SHUT_RDWR);
-        ::close(fd);
-    }
 
-    return true;
-}
-
-// Create a socket so we can talk to the player.
-bool
-GnashPluginScriptObject::createPipe()
-{
-    log_debug(__PRETTY_FUNCTION__);
-#if 0    
-    int p2c_pipe[2];
-    int c2p_pipe[2];
-    int p2c_controlpipe[2];
-
-    int ret = socketpair(AF_UNIX, SOCK_STREAM, 0, p2c_pipe);
-    if (ret == -1) {
-        gnash::log_error("ERROR: socketpair(p2c) failed: %s", strerror(errno));
-        return;
-    }
-    _streamfd = p2c_pipe[1];
-
-    ret = socketpair(AF_UNIX, SOCK_STREAM, 0, c2p_pipe);
-    if (ret == -1) {
-        gnash::log_error("ERROR: socketpair(c2p) failed: %s", strerror(errno));
-        return;
-    }
-
-    ret = socketpair(AF_UNIX, SOCK_STREAM, 0, p2c_controlpipe);
-    if (ret == -1) {
-        gnash::log_error("ERROR: socketpair(control) failed: %s", strerror(errno));
-        return;
-    }
-    _controlfd = p2c_controlpipe[1];
-#endif
-
-#if 0
-    if ((_sockfds[READFD] == 0) && (_sockfds[WRITEFD] == 0)) {
-        int ret = socketpair(AF_UNIX, SOCK_STREAM, 0, _sockfds);
-    
-        if (ret == 0) {
-            // Set up the Glib IO Channel for reading from the plugin
-//            log_debug("Read fd for socketpair is: %d", _sockfds[READFD]);
-            
-            _iochan[READFD]  = g_io_channel_unix_new(_sockfds[READFD]);
-            g_io_channel_set_close_on_unref(_iochan[READFD], true);
-            _watchid = g_io_add_watch(_iochan[READFD], 
-                                      (GIOCondition)(G_IO_IN|G_IO_HUP), 
-                                      (GIOFunc)handleInvokeWrapper, this);
-            
-            // Set up the Glib IO Channel for writing to the plugin
-//            log_debug("Write fd for socketpair is: %d", _sockfds[WRITEFD]);
-            _iochan[WRITEFD] = g_io_channel_unix_new(_sockfds[WRITEFD]);
-            g_io_channel_set_close_on_unref(_iochan[WRITEFD], true);
-            return true;
-        }
-    }
-#endif
-    
-#if 0
-    std::stringstream ss;
-    static int count = 0;
-    ss << "/tmp/gnash-" << getpid() << count++;
-
-    return createPipe(ss.str());
-#endif
-
-    return false;
-}
-
-#if 0
-bool
-GnashPluginScriptObject::createPipe(const std::string &name)
-{
-    log_debug(__PRETTY_FUNCTION__);
-
-    mode_t mode = S_IRUSR|S_IWUSR;
-    if (!name.empty()) {
-        int ret = mkfifo(name.c_str(), mode);
-        if (ret == 0) {
-            _sockfd = ::open(name.c_str(), O_RDWR|O_NONBLOCK, mode);
-            if (_sockfd < 0) {
-                log_error("Couldn't open the pipe: \"%s\"", strerror(errno));
-            }
-        } else {
-            log_error("Couldn't create fifo: s\n", strerror(errno));
-        }
-    }
-
-    _pipename = name;
-    
-    return false;
-}
-#endif
-
-
-// Close the socketpair
-bool
-GnashPluginScriptObject::closePipe()
-{
-//     log_debug(__FUNCTION__);
-
-    bool ret = closePipe(_sockfds[READFD]);
-    if (ret) {
-        ret = closePipe(_sockfds[WRITEFD]);
-    } else {
-        return false;
-    }
-
-    GError *error;
-    GIOStatus rstatus = g_io_channel_shutdown(_iochan[READFD], true, &error);
-    GIOStatus wstatus = g_io_channel_shutdown(_iochan[WRITEFD], true, &error);
-    if ((rstatus == G_IO_STATUS_NORMAL)
-        && (wstatus == G_IO_STATUS_NORMAL)) {
-        return true;
-    } else {
-        return false;
-    }
-
-    return false;
-}
-
-// Check the pipe to see if it's ready, ie... is gnash connected yet ?
-bool
-GnashPluginScriptObject::checkPipe()
-{
-    return checkPipe(_sockfds[WRITEFD]);
-}
-
-bool
-GnashPluginScriptObject::checkPipe(int fd)
-{
-//    log_debug(__PRETTY_FUNCTION__);
-    
-    fd_set fdset;
-        
-    if (fd > 2) {
-        FD_ZERO(&fdset);
-        FD_SET(fd, &fdset);
-	struct timeval tval;
-        tval.tv_sec = 0;
-        tval.tv_usec = 100;
-        errno = 0;
-        int ret = select(fd+1, &fdset, NULL, NULL, &tval);
-        if (ret == 0) {
-            log_debug ("The pipe for #fd %d timed out waiting to read", fd);
-            return false;
-        } else if (ret == 1) {
-            log_debug ("The pipe for #fd is ready", fd);
-            controlfd = fd;
-            return true;
-        } else {
-            log_error("The pipe has this error: %s", strerror(errno));
-        }
-    }
-
-    return false;
-}
-
-bool
-GnashPluginScriptObject::handleInvoke(GIOChannel *iochan, GIOCondition cond)
-{
-    log_debug(__PRETTY_FUNCTION__);
-    
-    if ( cond & G_IO_HUP ) {
-        log_debug("Player control channel hang up");
-        // Returning false here will cause the "watch" to be removed. This watch
-        // is the only reference held to the GIOChannel, so it will be
-        // destroyed. We must make sure we don't attempt to destroy it again.
-        _watchid = 0;
-        return false;
-    }
-
-    assert(cond & G_IO_IN);
-
-    log_debug("Checking player requests on fd #%d",
-              g_io_channel_unix_get_fd(iochan));
-
-    do {
-        GError* error=NULL;
-        gchar* request;
-        gsize requestSize=0;
-        GIOStatus status = g_io_channel_read_line(iochan, &request,
-                &requestSize, NULL, &error);
-
-        switch ( status ) {
-          case G_IO_STATUS_ERROR:
-                log_error("Error reading request line: %s", error->message);
-
-                g_error_free(error);
-                return false;
-            case G_IO_STATUS_EOF:
-                log_error("EOF (error: %s", error->message);
-                return false;
-            case G_IO_STATUS_AGAIN:
-                log_error("Read again(error: %s", error->message);
-                break;
-            case G_IO_STATUS_NORMAL:
-                // process request
-                log_debug("Normal read: %s" + std::string(request));
-                break;
-            default:
-                log_error("Abnormal status!");
-                return false;
-            
-        }
-
-        // process request..
-        processPlayerRequest(request, requestSize);
-        g_free(request);
-
-    } while (g_io_channel_get_buffer_condition(iochan) & G_IO_IN);
-
-    return true;
-}
-
-bool
-GnashPluginScriptObject::processPlayerRequest(gchar */* buf */, gsize /* len */)
-{
-    log_debug(__PRETTY_FUNCTION__);
-
-    return false;
-}
-
-bool
-GnashPluginScriptObject::handleInvokeWrapper(GIOChannel *iochan,
-                                             GIOCondition cond,
-                                             GnashPluginScriptObject* plugin)
-{
-    log_debug(__PRETTY_FUNCTION__);
-    
-    return plugin->handleInvoke(iochan, cond);
-}
 
 } // end of gnash namespace
 

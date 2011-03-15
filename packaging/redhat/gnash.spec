@@ -325,22 +325,21 @@ scrollkeeper-update -q || :
 %{_mandir}/man1/findmicrophones.1.gz
 %{_mandir}/man1/findwebcams.1.gz
 %{_mandir}/man1/rtmpget.1.gz
+%{_mandir}/man1/gnash-gtk-launcher.1.gz
 %{_datadir}/locale/*/LC_MESSAGES/gnash.mo
 %{_prefix}/share/applications/gnash.desktop
 %{_prefix}/share/icons/hicolor/32x32/apps/gnash.xpm
 %{_prefix}/share/gnash/gnash-splash.swf
 %if !%{cross_compile}
 #%{_prefix}/share/info/*.info*
-%{_prefix}/share/doc/gnash/*.html
-%{_prefix}/share/doc/gnash/images/*.png
+%{_prefix}/share/gnash/doc/gnash/C/gnash*.html
+%{_prefix}/share/gnash/doc/gnash/C/images/*.png
 %{_prefix}/etc/gnashrc
 %{_prefix}/etc/gnashpluginrc
 # %{_infodir}/*.info*
-#%doc doc/C/gnash*.html 
+#%doc doc/C/gnash*.html
 #%doc doc/C/images/*.png
 #%doc doc/C/images/*.txt
-# %doc %{_prefix}/share/gnash/doc/gnash/C/images
-# %doc %{_prefix}/share/gnash/doc/gnash/C/*.xml
 %endif
 
 %files plugin
@@ -372,6 +371,7 @@ scrollkeeper-update -q || :
 %{_bindir}/gnash-qt-launcher
 %{_bindir}/kde4-gnash
 %{_mandir}/man1/kde4-gnash.1.*
+%{_mandir}/man1/gnash-qt-launcher.1.gz
 %{_prefix}/lib*/kde4/libklashpart.*
 %{_prefix}/share/kde4/apps/klash/klashpartui.rc
 %{_prefix}/share/kde4/apps/klash/pluginsinfo

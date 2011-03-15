@@ -229,10 +229,12 @@ public:
 };
 
 /// Stream a description of any host interface message type.
-std::ostream& operator<<(std::ostream& os, const HostInterface::Message& e);
+std::ostream& operator<<(std::ostream& os, const HostMessage& m);
+std::ostream& operator<<(std::ostream& os, const CustomMessage& m);
 
 /// Stream a description of an expected message.
 std::ostream& operator<<(std::ostream& os, HostMessage::KnownEvent e);
+
 
 } // namespace gnash
 

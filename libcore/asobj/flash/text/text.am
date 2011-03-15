@@ -23,10 +23,8 @@ TEXT_HEADERS = asobj/flash/text/text_pkg.h
 TEXT_SOURCES_AS2 = 
 TEXT_HEADERS_AS2 = 
 
-if BUILD_TEXTRENDERER_AS3
 TEXT_SOURCES_AS2 += asobj/flash/text/TextRenderer_as.cpp
 TEXT_HEADERS_AS2 += asobj/flash/text/TextRenderer_as.h
-endif
 
 libgnashasobjs_la_SOURCES += $(TEXT_SOURCES) $(TEXT_SOURCES_AS2)
 noinst_HEADERS +=  $(TEXT_HEADERS) $(TEXT_HEADERS_AS2)

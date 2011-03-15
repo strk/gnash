@@ -20,41 +20,23 @@ UTILSdir = $(srcdir)/utils
 UTILS_TESTS_V9 =
 UTILS_TESTS_V6 =
 
-if BUILD_BYTEARRAY_AS3
 UTILS_TESTS_V9 += utils/ByteArray_as.swf
-endif
 
-if BUILD_COMPRESSIONALGORITHM_AS3
 UTILS_TESTS_V9 += utils/CompressionAlgorithm_as.swf
-endif
 
-if BUILD_DICTIONARY_AS3
 UTILS_TESTS_V9 += utils/Dictionary_as.swf
-endif
 
-if BUILD_ENDIAN_AS3
 UTILS_TESTS_V9 += utils/Endian_as.swf
-endif
 
-if BUILD_IDATAINPUT_AS3
 UTILS_TESTS_V9 += utils/IDataInput_as.swf
-endif
 
-if BUILD_IDATAOUTPUT_AS3
 UTILS_TESTS_V9 += utils/IDataOutput_as.swf
-endif
 
-if BUILD_IEXTERNALIZABLE_AS3
 UTILS_TESTS_V9 += utils/IExternalizable_as.swf
-endif
 
-if BUILD_PROXY_AS3
 UTILS_TESTS_V9 += utils/Proxy_as.swf
-endif
 
-if BUILD_TIMER_AS3
 UTILS_TESTS_V9 += utils/Timer_as.swf
-endif
 
 check_SCRIPTS += $(UTILS_TESTS_V9) $(UTILS_TESTS_V6)
 HAXE_FLAGS += -cp $(UTILSdir)

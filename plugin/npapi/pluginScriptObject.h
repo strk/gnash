@@ -119,21 +119,9 @@ public:
     /// @return the value as returned by the standalone player
     GnashNPVariant GetVariable(const std::string &name);
 
-    // Create a socketpair so we can talk to the player.
-    bool createPipe();
-    
-    // Close the socket
-    bool closePipe();
-    bool closePipe(int fd);
 
-    // Check the pipe to see if it's ready, ie... is gnash connected yet ?
-    bool checkPipe();
-    bool checkPipe(int fd);
-
-    int getReadFD()  { return _sockfds[READFD]; };
-    GIOChannel *getReadChannel()  { return _iochan[READFD]; };
-    int getWriteFD() { return _sockfds[WRITEFD]; };
-    GIOChannel *getWriteChannel() { return _iochan[WRITEFD]; };
+    int getReadFD()  { return _hostfd; };
+    int getWriteFD() { return _controlfd; };
 
     // Write to the standalone player over the control socket
     int writePlayer(const std::string &data);
@@ -165,25 +153,7 @@ protected:
     bool Enumerate(NPIdentifier **identifier, uint32_t *count);
     bool Construct(const NPVariant *data, uint32_t argCount, NPVariant *result);
 
-    bool handleInvoke(GIOChannel *iochan, GIOCondition cond);
-    
-    /// Process a null-terminated request line
-    //
-    /// @param buf
-    ///	  The single request.
-    ///   Caller is responsible for memory management, but give us
-    ///   permission to modify the string.
-    ///
-    /// @param len
-    ///	  Lenght of buffer.
-    ///
-    /// @return true if the request was processed, false otherwise (bogus request..)
-    ///
-    bool processPlayerRequest(gchar* buf, gsize len);
 private:
-    static bool handleInvokeWrapper(GIOChannel* iochan, GIOCondition cond,
-                                     GnashPluginScriptObject* plugin);
-
     void initializeIdentifiers();
     void setInstance(NPP inst) { _nppinstance = inst; };
     
@@ -193,10 +163,15 @@ private:
     std::map<NPIdentifier, GnashNPVariant> _properties;
     std::map<NPIdentifier, NPInvokeFunctionPtr> _methods;
     // 0 for reading, 1 for writing
-    int         _sockfds[2];
-    GIOChannel *_iochan[2];
-    // ID to watch the read channel from the player
-    int         _watchid;
+
+    /// The ControlFD is the file descriptor for the socket connection
+    /// to the standalone player. This is used when writing to the
+    /// standalone player from this plugin.
+    int _controlfd;
+    /// The HostFD is the file descriptor for the socket connection
+    /// to the standalone player. This is used by this plugin when reading
+    /// messages from the standalone player.
+    int _hostfd;
 };
 
 } // end of gnash namespace

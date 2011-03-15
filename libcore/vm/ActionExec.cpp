@@ -165,6 +165,8 @@ ActionExec::operator()()
     // must still be carried out. 
 
     // TODO: set this in gnashrc.
+    // NOTE: According to http://www.gnashdev.org/wiki/index.php/ScriptLimits
+    //       this should be 15, not 40, seconds
     const size_t maxTime = 40 * 1000;
     SystemClock clock;
 
@@ -295,7 +297,7 @@ ActionExec::operator()()
                 // Check for script limits hit. 
                 // See: http://www.gnashdev.org/wiki/index.php/ScriptLimits
                 if (clock.elapsed() > maxTime) {
-                    boost::format fmt = boost::format(_("Time exceeded while executing code in %1%")) % code.getMovieDefinition().get_url();
+                    boost::format fmt = boost::format(_("Time exceeded while executing code in %1% between pc %2% and %3%")) % code.getMovieDefinition().get_url() % next_pc % pc;
                     throw ActionLimitException(fmt.str());
                 }
                 // TODO: Run garbage collector ? If stack isn't too big ?

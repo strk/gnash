@@ -50,10 +50,8 @@ gui/Info.plist
 gui/pythonmod/gen-gnash.c
 libbase/gnashpluginrc
 libbase/gnashrc
-libltdl
 libnet/gnash.log
 libnet/gnash.sum
-libtool
 ltmain.sh
 macros/argz.m4
 macros/libtool.m4

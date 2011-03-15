@@ -15,6 +15,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
 
 #include <iostream>
 #include <string>
@@ -24,15 +27,20 @@
 #include <cassert>
 #include <memory>
 
+#if NPAPI_VERSION == 190
+#include "npupp.h"
+#else
 #include "npapi.h"
 #include "npruntime.h"
-#include "pluginbase.h"
 #include "npfunctions.h"
+#endif
+#include "pluginbase.h"
 #include "dejagnu.h"
 #include "../../testsuite/check.h"
 #include <regex.h>
 
 #include "external.h"
+#include "GnashNPVariant.h"
 
 TestState& runtest = _runtest;
 
@@ -449,7 +457,7 @@ NPN_ReleaseVariantValue(NPVariant *variant)
     switch(variant->type) {
         case NPVariantType_String:
         {
-            NPN_MemFree(const_cast<NPUTF8*>(NPVARIANT_TO_STRING(*variant).UTF8Characters));
+            NPN_MemFree(const_cast<NPUTF8*>(gnash::GetNPStringChars(NPVARIANT_TO_STRING(*variant))));
             break;
         }
         case NPVariantType_Object:

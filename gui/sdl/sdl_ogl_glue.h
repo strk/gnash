@@ -35,10 +35,6 @@ class SdlOglGlue : public SdlGlue
     void setInvalidatedRegions(const InvalidatedRanges& ranges);
     bool prepDrawingArea(int width, int height, boost::uint32_t sdl_flags);
     void render();
-  private:
-#ifdef FIX_I810_LOD_BIAS
-    float _tex_lod_bias;
-#endif
 };
 
 }

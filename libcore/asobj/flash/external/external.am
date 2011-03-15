@@ -21,10 +21,8 @@ EXTERNALdir = $(includedir)/gnash
 EXTERNAL_SOURCES = asobj/flash/external/external_pkg.cpp
 EXTERNAL_HEADERS = asobj/flash/external/external_pkg.h
 
-if BUILD_EXTERNALINTERFACE_AS3
 EXTERNAL_SOURCES += asobj/flash/external/ExternalInterface_as.cpp
 EXTERNAL_HEADERS += asobj/flash/external/ExternalInterface_as.h
-endif
 
 libgnashasobjs_la_SOURCES += $(EXTERNAL_SOURCES)
 noinst_HEADERS +=  $(EXTERNAL_HEADERS) 

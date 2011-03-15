@@ -29,6 +29,8 @@ CLEANFILES =  \
 	testrun.sum \
 	testrun.log
 
+DISTCLEANFILES = XMLSocketTester
+
 SUBDIRS = loop loading displaylist_depths action_order
 
 EXTRA_DIST = \
@@ -85,6 +87,7 @@ AM_LDFLAGS = \
 	$(GIF_LIBS) \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/librender/libgnashrender.la \
+	$(top_builddir)/libcore/libgnashcore.la \
 	$(NULL)
 
 check_PROGRAMS = \

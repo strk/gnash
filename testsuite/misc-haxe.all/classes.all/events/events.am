@@ -21,22 +21,16 @@ EVENTSdir = $(srcdir)/events
 EVENTS_TESTS_V9 = 
 EVENTS_TESTS =
 
-if BUILD_ACTIVITYEVENT_AS3
 EVENTS_TESTS_V9 += events/ActivityEvent_as.swf
-endif
 
-if BUILD_ASYNCERROREVENT_AS3
 EVENTS_TESTS_V9 += events/AsyncErrorEvent_as.swf
-endif
 
 #this is air only
 #if BUILD_BROWSERINVOKEEVENT_AS3
 #EVENTS_TESTS += events/BrowserInvokeEvent_as.swf
 #endif
 
-if BUILD_CONTEXTMENUEVENT_AS3
 EVENTS_TESTS_V9 += events/ContextMenuEvent_as.swf
-endif
 
 #this is air only
 #if BUILD_DRMAUTHENTICATEEVENT_AS3
@@ -53,73 +47,49 @@ endif
 #EVENTS_TESTS += events/DRMStatusEvent_as.swf
 #endif
 
-if BUILD_DATAEVENT_AS3
 EVENTS_TESTS_V9 += events/DataEvent_as.swf
-endif
 
-if BUILD_ERROREVENT_AS3
 EVENTS_TESTS_V9 += events/ErrorEvent_as.swf
-endif
 
-if BUILD_EVENTDISPATCHER_AS3
 EVENTS_TESTS_V9 += events/EventDispatcher_as.swf
-endif
 
-if BUILD_EVENTPHASE_AS3
 EVENTS_TESTS_V9 += events/EventPhase_as.swf
-endif
 
-if BUILD_EVENT_AS3
 EVENTS_TESTS_V9 += events/Event_as.swf
-endif
 
 #AIR ONLY
 #if BUILD_FILELISTEVENT_AS3
 #EVENTS_TESTS += events/FileListEvent_as.swf
 #endif
 
-if BUILD_FOCUSEVENT_AS3
 EVENTS_TESTS_V9 += events/FocusEvent_as.swf
-endif
 
-if BUILD_FULLSCREENEVENT_AS3
 EVENTS_TESTS_V9 += events/FullScreenEvent_as.swf
-endif
 
 #AIR ONLY
 #if BUILD_HTMLUNCAUGHTSCRIPTEXCEPTIONEVENT_AS3
 #EVENTS_TESTS += events/HTMLUncaughtScriptExceptionEvent_as.swf
 #endif
 
-if BUILD_HTTPSTATUSEVENT_AS3
 EVENTS_TESTS_V9 += events/HTTPStatusEvent_as.swf
-endif
 
 #THIS IS AN INTERFACE
 #if BUILD_IEVENTDISPATCHER_AS3
 #EVENTS_TESTS_V9 += events/IEventDispatcher_as.swf
 #endif
 
-if BUILD_IMEEVENT_AS3
 EVENTS_TESTS_V9 += events/IMEEvent_as.swf
-endif
 
-if BUILD_IOERROREVENT_AS3
 EVENTS_TESTS += events/IOErrorEvent_as.swf
-endif
 
 #not implemented in haxe
 #if BUILD_INVOKEEVENT_AS3
 #EVENTS_TESTS += events/InvokeEvent_as.swf
 #endif
 
-if BUILD_KEYBOARDEVENT_AS3
 EVENTS_TESTS_V9 += events/KeyboardEvent_as.swf
-endif
 
-if BUILD_MOUSEEVENT_AS3
 EVENTS_TESTS_V9 += events/MouseEvent_as.swf
-endif
 
 #AIR ONLY
 #if BUILD_NATIVEDRAGEVENT_AS3
@@ -136,18 +106,14 @@ endif
 #EVENTS_TESTS += events/NativeWindowDisplayStateEvent_as.swf
 #endif
 
-if BUILD_NETSTATUSEVENT_AS3
 EVENTS_TESTS_V9 += events/NetStatusEvent_as.swf
-endif
 
 #AIR ONLY
 #if BUILD_OUTPUTPROGRESSEVENT_AS3
 #EVENTS_TESTS += events/OutputProgressEvent_as.swf
 #endif
 
-if BUILD_PROGRESSEVENT_AS3
 EVENTS_TESTS_V9 += events/ProgressEvent_as.swf
-endif
 
 #AIR ONLY
 #if BUILD_SQLERROREVENT_AS3
@@ -170,25 +136,15 @@ endif
 #endif
 
 
-if BUILD_SECURITYERROREVENT_AS3
 EVENTS_TESTS_V9 += events/SecurityErrorEvent_as.swf
-endif
 
-if BUILD_STATUSEVENT_AS3
 EVENTS_TESTS_V9 += events/StatusEvent_as.swf
-endif
 
-if BUILD_SYNCEVENT_AS3
 EVENTS_TESTS_V9 += events/SyncEvent_as.swf
-endif
 
-if BUILD_TEXTEVENT_AS3
 EVENTS_TESTS_V9 += events/TextEvent_as.swf
-endif
 
-if BUILD_TIMEREVENT_AS3
 EVENTS_TESTS_V9 += events/TimerEvent_as.swf
-endif
 
 check_SCRIPTS += $(EVENTS_TESTS_V9)
 HAXE_FLAGS += -cp $(EVENTSdir)

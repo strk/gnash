@@ -142,7 +142,7 @@ private:
     static GstFlowReturn cb_chain_func_video (GstPad *pad, GstBuffer *buffer);
 
     bool pushGstBuffer();
-    void emitEncodedFrames();
+    bool emitEncodedFrames();
 
 
     GstElement* _bin;

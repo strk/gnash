@@ -21,77 +21,41 @@ TEXT_TESTS_V9 =
 TEXT_TESTS_V8 = 
 TEXT_TESTS_V6 = 
 
-if BUILD_ANTIALIASTYPE_AS3
 TEXT_TESTS_V9 += text/AntiAliasType_as.swf
-endif
 
-if BUILD_CSMSETTINGS_AS3
 TEXT_TESTS_V9 += text/CSMSettings_as.swf
-endif
 
-if BUILD_FONTSTYLE_AS3
 TEXT_TESTS_V9 += text/FontStyle_as.swf
-endif
 
-if BUILD_FONTTYPE_AS3
 TEXT_TESTS_V9 += text/FontType_as.swf
-endif
 
-if BUILD_FONT_AS3
 TEXT_TESTS_V9 += text/Font_as.swf
-endif
 
-if BUILD_GRIDFITTYPE_AS3
 TEXT_TESTS_V9 += text/GridFitType_as.swf
-endif
 
-if BUILD_STATICTEXT_AS3
 TEXT_TESTS_V6 += text/StaticText_as.swf
-endif
 
-if BUILD_STYLESHEET_AS3
 TEXT_TESTS_V6 += text/StyleSheet_as.swf
-endif
 
-if BUILD_TEXTCOLORTYPE_AS3
 TEXT_TESTS_V9 += text/TextColorType_as.swf
-endif
 
-if BUILD_TEXTDISPLAYMODE_AS3
 TEXT_TESTS_V6 += text/TextDisplayMode_as.swf
-endif
 
-if BUILD_TEXTFIELDAUTOSIZE_AS3
 TEXT_TESTS_V6 += text/TextFieldAutoSize_as.swf
-endif
 
-if BUILD_TEXTFIELDTYPE_AS3
 TEXT_TESTS_V6 += text/TextFieldType_as.swf
-endif
 
-if BUILD_TEXTFIELD_AS3
 TEXT_TESTS_V6 += text/TextField_as.swf
-endif
 
-if BUILD_TEXTFORMATALIGN_AS3
 TEXT_TESTS_V6 += text/TextFormatAlign_as.swf
-endif
 
-if BUILD_TEXTFORMAT_AS3
 TEXT_TESTS_V6 += text/TextFormat_as.swf
-endif
 
-if BUILD_TEXTLINEMETRICS_AS3
 TEXT_TESTS_V6 += text/TextLineMetrics_as.swf
-endif
 
-if BUILD_TEXTRENDERER_AS3
 TEXT_TESTS_V6 += text/TextRenderer_as.swf
-endif
 
-if BUILD_TEXTSNAPSHOT_AS3
 TEXT_TESTS_V8 += text/TextSnapshot_as.swf
-endif
 
 check_SCRIPTS += $(TEXT_TESTS_V9) $(TEXT_TESTS_V6) $(TEXT_TESTS_V8)
 HAXE_FLAGS += -cp $(TEXTdir)

@@ -57,6 +57,7 @@ clean-local:
 	rm -f *.trace-gnash \
 		site.bak site.exp site.exp.bak testrun.sum \
 		gnash.sum 
+	rm -rf src
 
 run_swfdec_testsuite_a: gen_run_swfdec_testsuite.sh Makefile
 	sh $(srcdir)/gen_run_swfdec_testsuite.sh $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace aA > $@
@@ -184,4 +185,4 @@ site-update: site.exp
 	@echo "# This is a list of the pre-compiled testcases" >> site.exp
 	@echo "set testcases \"$(TEST_CASES)\"" >> site.exp
 
-EXTRA_DIST = gen_run_swfdec_testsuite.sh
+EXTRA_DIST = gen_run_swfdec_testsuite.sh PASSING README REALTIME swfdec_gnash_tester

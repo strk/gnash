@@ -361,11 +361,7 @@ SWFMovieDefinition::completeLoad()
     }
 
     // Wait until 'startup_frames' have been loaded
-#if 1
     size_t startup_frames = 0;
-#else
-    size_t startup_frames = m_frame_count;
-#endif
     ensure_frame_loaded(startup_frames);
 
 #else // undef LOAD_MOVIES_IN_A_SEPARATE_THREAD

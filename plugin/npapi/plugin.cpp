@@ -74,9 +74,13 @@
 #include "StringPredicates.h"
 #include "external.h"
 #include "callbacks.h"
+#if NPAPI_VERSION == 190
+#include "npupp.h"
+#else
 #include "npapi.h"
 #include "npruntime.h"
 #include "npfunctions.h"
+#endif
 #include "GnashNPVariant.h"
 
 #include <boost/tokenizer.hpp>
@@ -339,10 +343,12 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
       case NPPVpluginScriptableNPObject:
           break;
 
+#if NPAPI_VERSION != 190
       case NPPVpluginUrlRequestsDisplayedBool:
           break;
       case NPPVpluginWantsAllNetworkStreams:
           break;
+#endif
           
       default:
           err = NPERR_INVALID_PARAM;
@@ -392,7 +398,6 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
     _width(0),
     _height(0),
     _streamfd(-1),
-    _ichanWatchId(0),
     _childpid(0),
     _filefd(-1),
     _name(),
@@ -419,12 +424,10 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
         _params[name] = val;
     }
 
-#if 1
     if (NPNFuncs.version >= 14) { // since NPAPI start to support
-        _scriptObject = (GnashPluginScriptObject *)NPNFuncs.createobject(
-            _instance, GnashPluginScriptObject::marshalGetNPClass());
+        _scriptObject = (GnashPluginScriptObject*) NPN_CreateObject( _instance,
+            GnashPluginScriptObject::marshalGetNPClass());
     }
-#endif
     
     return;
 }
@@ -456,10 +459,11 @@ nsPluginInstance::~nsPluginInstance()
 {
 //    gnash::log_debug("plugin instance destruction");
 
-    if ( _ichanWatchId ) {
-        g_source_remove(_ichanWatchId);
-        _ichanWatchId = 0;
+    if (_scriptObject) {
+        NPN_ReleaseObject(_scriptObject);
     }
+
+    do { } while (g_source_remove_by_user_data(this));
 
     if (_childpid > 0) {
         // When the child has terminated (signaled by GTK through GtkSocket), it
@@ -575,7 +579,7 @@ nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
     if (aVariable == NPPVpluginScriptableNPObject) {
         if (_scriptObject) {
             void **v = (void **)aValue;
-            NPNFuncs.retainobject(_scriptObject);
+            NPN_RetainObject(_scriptObject);
             *v = _scriptObject;
         } else {
             gnash::log_debug("_scriptObject is not assigned");
@@ -622,7 +626,6 @@ nsPluginInstance::NewStream(NPMIMEType /*type*/, NPStream* stream,
 NPError
 nsPluginInstance::DestroyStream(NPStream* /*stream*/, NPError /*reason*/)
 {
-
     if (_streamfd != -1) {
         if (close(_streamfd) == -1) {
             perror("closing _streamfd");
@@ -670,10 +673,6 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 
     if ( cond & G_IO_HUP ) {
         gnash::log_debug("Player control socket hang up");
-        // Returning false here will cause the "watch" to be removed. This watch
-        // is the only reference held to the GIOChannel, so it will be
-        // destroyed. We must make sure we don't attempt to destroy it again.
-        _ichanWatchId = 0;
         return false;
     }
 
@@ -733,6 +732,14 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
     
     return true;
 }
+
+// This GIOFunc handler removes the source from the mainloop.
+gboolean 
+remove_handler(GIOChannel*, GIOCondition, gpointer)
+{
+    return FALSE;
+}
+
 
 // There may be multiple Invoke messages in a single packet, so each
 // packet needs to be broken up into separate messages to be parsed.
@@ -997,6 +1004,55 @@ create_standalone_launcher(const std::string& page_url, const std::string& swf_u
 #endif
 }
 
+std::string
+nsPluginInstance::getDocumentProp(const std::string& propname) const
+{
+    std::string rv;
+
+    NPObject* windowobj;
+    NPError err = NPN_GetValue(_instance, NPNVWindowNPObject, &windowobj);
+    if (err != NPERR_NO_ERROR || !windowobj) {
+        return rv;
+    }
+
+    boost::shared_ptr<NPObject> window_obj(windowobj, NPN_ReleaseObject);
+  
+    NPIdentifier doc_id = NPN_GetStringIdentifier("document");
+
+    NPVariant docvar;
+    if(! NPN_GetProperty(_instance, windowobj, doc_id, &docvar) ) {
+        return rv;
+    }
+
+    boost::shared_ptr<NPVariant> doc_var(&docvar, NPN_ReleaseVariantValue);
+
+    if (!NPVARIANT_IS_OBJECT(docvar)) {
+        return rv;
+    }
+
+    NPObject* doc_obj = NPVARIANT_TO_OBJECT(docvar);
+    
+    NPIdentifier prop_id = NPN_GetStringIdentifier(propname.c_str());
+
+    NPVariant propvar;
+    if (!NPN_GetProperty(_instance, doc_obj, prop_id, &propvar)) {
+        return rv;
+    }
+
+    boost::shared_ptr<NPVariant> prop_var(&propvar, NPN_ReleaseVariantValue);
+
+    if (!NPVARIANT_IS_STRING(propvar)) {
+        return rv;
+    }
+
+    const NPString& prop_str = NPVARIANT_TO_STRING(propvar);
+
+    rv = NPStringToString(prop_str);
+    return rv;
+}
+
+
+
 void
 nsPluginInstance::setupCookies(const std::string& pageurl)
 {
@@ -1005,41 +1061,81 @@ nsPluginInstance::setupCookies(const std::string& pageurl)
     // like IceWeasel on Debian lenny, which pre dates the cookie support
     // in NPAPI, you have to block all Cookie for sites like YouTube to
     // allow Gnash to work.
+#if NPAPI_VERSION != 190
     if (!NPNFuncs.getvalueforurl) {
         LOG_ONCE( gnash::log_debug("Browser doesn't support reading cookies") );
         return;
     }
+#else
+    LOG_ONCE( log_debug("Browser doesn't support reading cookies via NPAPI.") );
+#endif
 
     // Cookie appear to drop anything past the domain, so we strip
     // that off.
     std::string::size_type pos;
     pos = pageurl.find("/", pageurl.find("//", 0) + 2) + 1;
     std::string url = pageurl.substr(0, pos);
-    
+
+    std::string ncookie;
+ 
     char *cookie = 0;
     uint32_t length = 0;
-    NPN_GetValueForURL(_instance, NPNURLVCookie, url.c_str(),
+
+#if NPAPI_VERSION != 190
+    NPError rv = NPN_GetValueForURL(_instance, NPNURLVCookie, url.c_str(),
                        &cookie, &length);
+#else
+    NPError rv = NPERR_GENERIC_ERROR;
+#endif
+
+    // Firefox does not (always) return the cookies that are associated
+    // with a domain name through GetValueForURL.
+    if (rv == NPERR_GENERIC_ERROR) {
+        log_debug("Trying window.document.cookie for cookies");
+        ncookie = getDocumentProp("cookie");
+    }
+
     if (cookie) {
-        std::string ncookie (cookie, length);
-        gnash::log_debug("The Cookie for %s is %s", url, ncookie);
-        std::ofstream cookiefile;
-        std::stringstream ss;
-        ss << "/tmp/gnash-cookies." << getpid(); 
-        
-        cookiefile.open(ss.str().c_str(), std::ios::out | std::ios::trunc);
-        cookiefile << "Set-Cookie: " << ncookie << std::endl;
-        cookiefile.close();
-        
-        if (setenv("GNASH_COOKIES_IN", ss.str().c_str(), 1) < 0) {
-            gnash::log_error(
-                "Couldn't set environment variable GNASH_COOKIES_IN to %s",
-                ncookie);
-        }
+        ncookie.assign(cookie, length);
         NPN_MemFree(cookie);
-    } else {
+    }
+
+    if (ncookie.empty()) {
         gnash::log_debug("No stored Cookie for %s", url);
-    }    
+        return;
+    }
+
+    gnash::log_debug("The Cookie for %s is %s", url, ncookie);
+    std::ofstream cookiefile;
+    std::stringstream ss;
+    ss << "/tmp/gnash-cookies." << getpid();
+
+    cookiefile.open(ss.str().c_str(), std::ios::out | std::ios::trunc);
+
+    // Firefox provides cookies in the following format:
+    //
+    // cookie1=value1;cookie2=value2;cookie3=value3
+    //
+    // Whereas libcurl expects cookies in the following format:
+    //
+    // Set-Cookie: cookie1=value1;
+    // Set-Cookie: cookie2=value2;
+  
+    typedef boost::char_separator<char> char_sep;
+    typedef boost::tokenizer<char_sep> tokenizer;
+    tokenizer tok(ncookie, char_sep(";"));
+
+    for (tokenizer::iterator it=tok.begin(); it != tok.end(); ++it) {
+        cookiefile << "Set-Cookie: " << *it << std::endl;
+    }
+ 
+    cookiefile.close();
+  
+    if (setenv("GNASH_COOKIES_IN", ss.str().c_str(), 1) < 0) {
+        gnash::log_error(
+            "Couldn't set environment variable GNASH_COOKIES_IN to %s",
+            ncookie);
+    }
 }
 
 void
@@ -1047,12 +1143,16 @@ nsPluginInstance::setupProxy(const std::string& url)
 {
     // In pre xulrunner 1.9, (Firefox 3.1) this function does not exist,
     // so we can't use it to read the proxy information.
+#if NPAPI_VERSION != 190
     if (!NPNFuncs.getvalueforurl) return;
+#endif
 
     char *proxy = 0;
     uint32_t length = 0;
+#if NPAPI_VERSION != 190
     NPN_GetValueForURL(_instance, NPNURLVProxy, url.c_str(),
                        &proxy, &length);
+#endif
     if (!proxy) {
         gnash::log_debug("No proxy setting for %s", url);
         return;
@@ -1185,6 +1285,32 @@ wait_for_gdb()
 }
 
 void
+nsPluginInstance::setupIOChannel(int fd, GIOFunc handler, GIOCondition signals) const
+{
+    GIOChannel* ichan = g_io_channel_unix_new(fd);
+    g_io_channel_set_close_on_unref(ichan, true);
+
+    GError* error = 0;
+    GIOStatus rv = g_io_channel_set_flags(ichan, G_IO_FLAG_NONBLOCK,
+                                          &error);
+    if (error || rv != G_IO_STATUS_NORMAL) {
+        log_error("Could not make player communication nonblocking.");
+
+        g_io_channel_unref(ichan);
+        if (error) {
+            g_error_free(error);
+        }
+        return;
+    }
+
+    gnash::log_debug("New IO Channel for fd #%d",
+                     g_io_channel_unix_get_fd(ichan));
+    g_io_add_watch(ichan, signals, handler, (gpointer)this); 
+    g_io_channel_unref(ichan);
+}
+
+
+void
 nsPluginInstance::startProc()
 {
 
@@ -1262,30 +1388,12 @@ nsPluginInstance::startProc()
             gnash::log_debug("Forked successfully, child process PID is %d",
                              _childpid);
         }
+
+        setupIOChannel(c2p_pipe[0], (GIOFunc)handlePlayerRequestsWrapper,
+                                    (GIOCondition)(G_IO_IN|G_IO_HUP));
         
-        GIOChannel* ichan = g_io_channel_unix_new(c2p_pipe[0]);
-        g_io_channel_set_close_on_unref(ichan, true);
+        setupIOChannel(p2c_controlpipe[1], remove_handler, G_IO_HUP);
 
-        GError* error = 0;
-        GIOStatus rv = g_io_channel_set_flags(ichan, G_IO_FLAG_NONBLOCK,
-                                              &error);
-        if (error || rv != G_IO_STATUS_NORMAL) {
-            log_error("Could not make player communication nonblocking.");
-
-            g_io_channel_unref(ichan);
-            if (error) {
-                g_error_free(error);
-            }
-            return;
-        }
-
-        gnash::log_debug("New IO Channel for fd #%d",
-                         g_io_channel_unix_get_fd(ichan));
-        _ichanWatchId = g_io_add_watch(ichan, 
-                                       (GIOCondition)(G_IO_IN|G_IO_HUP), 
-                                       (GIOFunc)handlePlayerRequestsWrapper,
-                                       this);
-        g_io_channel_unref(ichan);
         return;
     }
     
@@ -1323,6 +1431,10 @@ nsPluginInstance::startProc()
     exit (-1);
 }
 
+
+
+
+
 std::string
 nsPluginInstance::getCurrentPageURL() const
 {
@@ -1331,63 +1443,8 @@ nsPluginInstance::getCurrentPageURL() const
     //
     // Was (bogus):
     //  window.document.location.href
-    //
 
-    NPP npp = _instance;
-
-    NPIdentifier sDocument = NPN_GetStringIdentifier("document");
-
-    NPObject *window;
-    NPN_GetValue(npp, NPNVWindowNPObject, &window);
-
-    NPVariant vDoc;
-    NPN_GetProperty(npp, window, sDocument, &vDoc);
-    NPN_ReleaseObject(window);
-
-    if (!NPVARIANT_IS_OBJECT(vDoc)) {
-        gnash::log_error("Can't get window.document object");
-        return std::string();
-    }
-    
-    NPObject* npDoc = NPVARIANT_TO_OBJECT(vDoc);
-
-/*
-    NPIdentifier sLocation = NPN_GetStringIdentifier("location");
-    NPVariant vLoc;
-    NPN_GetProperty(npp, npDoc, sLocation, &vLoc);
-    NPN_ReleaseObject(npDoc);
-
-    if (!NPVARIANT_IS_OBJECT(vLoc)) {
-        gnash::log_error("Can't get window.document.location object");
-        return std::string();
-    }
-
-    NPObject* npLoc = NPVARIANT_TO_OBJECT(vLoc);
-
-    NPIdentifier sProperty = NPN_GetStringIdentifier("href");
-    NPVariant vProp;
-    NPN_GetProperty(npp, npLoc, sProperty, &vProp);
-    NPN_ReleaseObject(npLoc);
-
-    if (!NPVARIANT_IS_STRING(vProp)) {
-        gnash::log_error("Can't get window.document.location.href string");
-        return std::string();
-    }
-*/
-
-    NPIdentifier sProperty = NPN_GetStringIdentifier("baseURI");
-    NPVariant vProp;
-    NPN_GetProperty(npp, npDoc, sProperty, &vProp);
-    NPN_ReleaseObject(npDoc);
-
-    if (!NPVARIANT_IS_STRING(vProp)) {
-        gnash::log_error("Can't get window.document.baseURI string");
-        return std::string();
-    }
-
-    const NPString& propValue = NPVARIANT_TO_STRING(vProp);
-
-    return NPStringToString(propValue);
+    return getDocumentProp("baseURI");
 }
 
 void

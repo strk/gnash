@@ -36,7 +36,7 @@
 
 #include "log.h"
 
-#if (defined(USE_SYSV_SHM) && defined(HAVE_SHMGET)) 
+#if (defined(HAVE_SHMGET)) 
 # define ENABLE_SHARED_MEM 1
 #else
 # undef ENABLE_SHARED_MEM

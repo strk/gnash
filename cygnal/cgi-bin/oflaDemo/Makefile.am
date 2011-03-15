@@ -52,3 +52,6 @@ install-cgiLTLIBRARIES: $(cgi_LTLIBRARIES)
 	test -d "$(DESTDIR)$(cgidir)" || $(mkinstalldirs) "$(DESTDIR)$(cgidir)"
 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(cgi_LTLIBRARIES) "$(DESTDIR)$(cgidir)/$(cgi_LTLIBRARIES)"
 	$(RM) $(DESTDIR)$(cgidir)/*.a $(DESTDIR)$(cgidir)/*.la
+
+uninstall-local:
+	$(RM) $(DESTDIR)$(cgidir)/oflaDemo.so

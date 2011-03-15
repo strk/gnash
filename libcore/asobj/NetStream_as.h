@@ -25,20 +25,17 @@
 #define __STDC_CONSTANT_MACROS
 #endif
 
-#include "MediaParser.h"
-#include "PlayHead.h" // for composition
-
-#include "VideoDecoder.h" // for visibility of dtor
-#include "AudioDecoder.h" // for visibility of dtor
-
-#include "VirtualClock.h"
-
-#include "Relay.h" // for ActiveRelay inheritance
-
 #include <boost/intrusive_ptr.hpp>
 #include <string>
-#include <deque>
+#include <boost/ptr_container/ptr_deque.hpp>
 #include <boost/scoped_ptr.hpp>
+
+#include "MediaParser.h"
+#include "PlayHead.h" // for composition
+#include "VideoDecoder.h" // for visibility of dtor
+#include "AudioDecoder.h" // for visibility of dtor
+#include "VirtualClock.h"
+#include "Relay.h" // for ActiveRelay inheritance
 
 // Forward declarations
 namespace gnash {
@@ -110,7 +107,7 @@ public:
         boost::uint8_t* m_ptr;
     };
 
-    typedef std::deque<CursoredBuffer*> AudioQueue;
+    typedef boost::ptr_deque<CursoredBuffer> AudioQueue;
 
     // Delete all samples in the audio queue.
     void cleanAudioQueue();
@@ -407,10 +404,6 @@ protected:
 
     // The input media parser
     std::auto_ptr<media::MediaParser> m_parser;
-
-    // Are we playing a FLV?
-    // The handler which is invoked on status change
-    boost::intrusive_ptr<as_function> _statusHandler;
 
     // The position in the inputfile, only used when not playing a FLV
     long inputPos;

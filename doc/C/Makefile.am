@@ -19,7 +19,6 @@
 
 # Building a PDF using Apache FOP only works with fop-0.20.5 for now.
 
-htmldir = ${prefix}/share/doc/gnash
 infodir = ${prefix}/share/info
 man1dir = ${mandir}/man1
 docname = gnash
@@ -104,7 +103,11 @@ EXTRA_DIST = \
 	preformatted/findmicrophones.1.in \
 	preformatted/findwebcams.1.in \
 	preformatted/gtk-gnash.1.in \
-	preformatted/kde4-gnash.1.in
+	preformatted/kde4-gnash.1.in \
+	preformatted/sdl-gnash.1.in \
+	preformatted/fb-gnash.1.in \
+	preformatted/gnash-gtk-launcher.1.in \
+	preformatted/gnash-qt-launcher.1.in
 #	preformatted/dumpshm.1.in
 
 #noinst_SCRIPT = gen-doc.sh
@@ -122,6 +125,24 @@ MANPAGES = \
 	findmicrophones.1 \
 	findwebcams.1
 #	dumpshm.1
+
+EXTRAMANPAGES =
+
+if BUILD_GTK_GUI
+EXTRAMANPAGES += gtk-gnash.1 gnash-gtk-launcher.1
+endif
+
+if BUILD_KDE4_GUI
+EXTRAMANPAGES += kde4-gnash.1 gnash-qt-launcher.1
+endif
+
+if BUILD_SDL_GUI
+EXTRAMANPAGES += sdl-gnash.1
+endif
+
+if BUILD_FB_GUI
+EXTRAMANPAGES += fb-gnash.1
+endif
 
 MANSRC = $(MANPAGES:.1=.man-xml)
 INFOS  = gnash_user.info gnash_ref.info
@@ -355,34 +376,30 @@ uninstall-man1-hook:
 # install-data-hook: install-data-hook-omf
 # uninstall-local: uninstall-local-doc uninstall-local-omf
 
-# gtk-gnash.1 and kde4-gnash.1 are special, as they are created by
-# the --solinks option to the docbook2 tools for creating man pages.
+# gtk-gnash.1, kde4-gnash.1, fb-gnash.1, sdl-gnash.1,gnash-gtk-launcher.1 and gnash-qt-launcher.1 are special,
+# as they  are created by the --solinks option to the docbook2 tools for creating man pages.
 install-man1: $(MANPAGES)
 	-test -d "$(DESTDIR)$(man1dir)/" || $(mkinstalldirs) "$(DESTDIR)$(man1dir)/"
-	-$(INSTALL_DATA) gtk-gnash.1 $(DESTDIR)$(man1dir)/gtk-gnash.1
-	-$(INSTALL_DATA) kde4-gnash.1 $(DESTDIR)$(man1dir)/kde4-gnash.1
-	-for file in $(MANPAGES); do \
+	-for file in $(MANPAGES) $(EXTRAMANPAGES); do \
 	   $(INSTALL_DATA) $$file $(DESTDIR)$(man1dir)/$$file; \
 	done
 
 uninstall-man1:
-	-for file in $(MANPAGES); do \
+	-for file in $(MANPAGES) $(EXTRAMANPAGES); do \
 	   $(RM) $(DESTDIR)$(man1dir)/$$file; \
 	done
 
-# the gtk-gnash.1 and kde4-gnash.1 manpages are generated as aliases
-# for the gnash.1 man page, so we can't use the suffix rules to build
+# gtk-gnash.1, kde4-gnash.1, fb-gnash.1, sdl-gnash.1,gnash-gtk-launcher.1 and gnash-qt-launcher.1
+# manpages are generated as aliases for the gnash.1 man page, so we can't use the suffix rules to build
 # them, but we need to install the ".so gnash.1" manpages also, or
 # they aren;t in the tarball.
-link-extra-man: 
-	-@if test ! -e gtk-gnash.1; then \
-	    echo "WARNING: Linking to preformatted version of gtk-gnash.1, it could be out of date."; \
-	    $(LN_S) -f $(srcdir)/preformatted/gtk-gnash.1.in gtk-gnash.1; \
-	  fi
-	-@if test ! -e kde4-gnash.1; then \
-	    echo "WARNING: Linking to preformatted version of kde4-gnash.1, it could be out of date."; \
-	    $(LN_S) -f $(srcdir)/preformatted/kde4-gnash.1.in kde4-gnash.1; \
-	  fi
+link-extra-man:
+	-for file in $(EXTRAMANPAGES); do \
+	  if test ! -e $$file; then \
+	    echo "WARNING: Linking to preformatted version of $$file, it could be out of date."; \
+	    $(LN_S) -f $(srcdir)/preformatted/$$file.in $$file; \
+	  fi; \
+	done
 
 install-data-hook: $(MANPAGES) install-man1 install-info-hook install-html-hook 
 uninstall-hook: uninstall-info-hook uninstall-html-hook
@@ -439,7 +456,11 @@ CLEANFILES = \
 	omf_timestamp \
 	images \
 	gtk-gnash.1 \
-	kde4-gnash.1
+	kde4-gnash.1 \
+	fb-gnash.1 \
+	sdl-gnash.1 \
+	gnash-gtk-launcher.1 \
+	gnash-qt-launcher.1
 
 # This updates the copies of the manuals that are stored preformatted
 # so not everyone needs to get Docbook working well enough to produce

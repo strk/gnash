@@ -23,10 +23,6 @@ SUBDIRS =
 
 # make sure these files make it into the distribution tarball.
 EXTRA_DIST = \
-	mozilla-sdk/include/npapi.h \
-	mozilla-sdk/include/npfunctions.h \
-	mozilla-sdk/include/npruntime.h \
-	mozilla-sdk/include/nptypes.h \
 	mozilla-sdk/np_entry.cpp \
 	mozilla-sdk/npn_gate.cpp \
 	mozilla-sdk/npp_gate.cpp \
@@ -49,7 +45,7 @@ AM_CPPFLAGS = -DPLUGIN_TRACE -DGNASHBINDIR=\"$(GNASHBINDIR)\" \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/librender \
 	-I$(srcdir)/mozilla-sdk \
-	-I$(srcdir)/mozilla-sdk/include \
+	$(NPAPI_CFLAGS) \
 	$(X11_CFLAGS) \
         $(GLIB_CFLAGS) \
 	$(NULL)
@@ -68,11 +64,7 @@ endif
 
 noinst_HEADERS = plugin.h \
 	 mozilla-sdk/pluginbase.h \
-	 mozilla-sdk/npplat.h \
-	 mozilla-sdk/include/npapi.h \
-         mozilla-sdk/include/npfunctions.h \
-         mozilla-sdk/include/npruntime.h \
-         mozilla-sdk/include/nptypes.h
+	 mozilla-sdk/npplat.h
 
 if !WIN32
 if !AMIGAOS4

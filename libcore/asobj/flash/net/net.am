@@ -24,15 +24,11 @@ NET_HEADERS = asobj/flash/net/net_pkg.h
 NET_SOURCES_AS2 = 
 NET_HEADERS_AS2 = 
 
-if BUILD_FILEREFERENCELIST_AS3
 NET_SOURCES_AS2 += asobj/flash/net/FileReferenceList_as.cpp
 NET_HEADERS_AS2 += asobj/flash/net/FileReferenceList_as.h
-endif
 
-if BUILD_FILEREFERENCE_AS3
 NET_SOURCES_AS2 += asobj/flash/net/FileReference_as.cpp
 NET_HEADERS_AS2 += asobj/flash/net/FileReference_as.h
-endif
 
 libgnashasobjs_la_SOURCES  += $(NET_SOURCES) $(NET_SOURCES_AS2)
 noinst_HEADERS +=  $(NET_HEADERS) $(NET_HEADERS_AS2)

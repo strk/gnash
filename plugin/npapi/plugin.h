@@ -95,9 +95,20 @@ private:
     void setupCookies(const std::string& pageURL);
     void setupProxy(const std::string& pageURL);
 
+    /// @return a string property of window.document.
+    std::string getDocumentProp(const std::string& propname) const;
+
     static bool handlePlayerRequestsWrapper(GIOChannel* iochan, GIOCondition cond, nsPluginInstance* plugin);
 
     bool handlePlayerRequests(GIOChannel* iochan, GIOCondition cond);
+
+    /// Setup an event handler for a file descriptor.
+    /// @param fd the file descriptor to handle
+    /// @param handler the function to invoke
+    /// @param signals the signals for which to invoke the handler
+    /// See GIOChannel documentation for more information on the parameters.
+    void setupIOChannel(int fd, GIOFunc handler, GIOCondition signals) const;
+
 
     /// Process requests from the player.
     //
@@ -116,8 +127,11 @@ private:
     unsigned int                       _width;
     unsigned int                       _height;
     std::map<std::string, std::string> _options;
+    /// This is the file descriptor for writing to Gnash's standard input.
+    /// As of this writing, the file descriptor must be closed before Gnash
+    /// can finish parsing, which in turn must be finished before Gnash starts
+    /// playback.
     int                                _streamfd;
-    int                                _ichanWatchId;
     pid_t                              _childpid;
     int                                _filefd;
 

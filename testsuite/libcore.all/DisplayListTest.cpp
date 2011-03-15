@@ -79,16 +79,16 @@ main(int /*argc*/, char** /*argv*/)
     as_object* ob1 = createObject(getGlobal(*getObject(root)));
     as_object* ob2 = createObject(getGlobal(*getObject(root)));
     
-    boost::intrusive_ptr<DisplayObject> ch1 ( new DummyCharacter(ob1, root) );
-    boost::intrusive_ptr<DisplayObject> ch2 ( new DummyCharacter(ob2, root) );
+    DisplayObject* ch1 ( new DummyCharacter(ob1, root) );
+    DisplayObject* ch2 ( new DummyCharacter(ob2, root) );
     
-    dlist1.placeDisplayObject( ch1.get(), 1);
-    dlist1.placeDisplayObject( ch2.get(), 2);
+    dlist1.placeDisplayObject(ch1, 1);
+    dlist1.placeDisplayObject(ch2, 2);
     
     check(dlist1 != dlist2);
     
-    dlist2.placeDisplayObject( ch2.get(), 1);
-    dlist2.placeDisplayObject( ch1.get(), 2);
+    dlist2.placeDisplayObject(ch2, 1);
+    dlist2.placeDisplayObject(ch1, 2);
     
     
 }

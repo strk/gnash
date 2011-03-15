@@ -50,9 +50,6 @@ class GtkGlExtGlue : public GtkGlue
     void configure(GtkWidget *const widget, GdkEventConfigure *const event);
   private:
     GdkGLConfig *_glconfig;
-#ifdef FIX_I810_LOD_BIAS
-    float _tex_lod_bias;
-#endif
 };
 
 } // end of gnash namespace

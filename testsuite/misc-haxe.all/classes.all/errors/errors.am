@@ -19,25 +19,15 @@ ERRORSdir = $(srcdir)/errors
 
 ERRORS_TESTS_V9 = 
 
-if BUILD_EOFERROR_AS3
 ERRORS_TESTS_V9 += errors/EOFError_as.swf
-endif
 
-if BUILD_IOERROR_AS3
 ERRORS_TESTS_V9 += errors/IOError_as.swf
-endif
 
-if BUILD_ILLEGALOPERATIONERROR_AS3
 ERRORS_TESTS_V9 += errors/IllegalOperationError_as.swf
-endif
 
-if BUILD_INVALIDSWFERROR_AS3
 ERRORS_TESTS_V9 += errors/InvalidSWFError_as.swf
-endif
 
-if BUILD_MEMORYERROR_AS3
 ERRORS_TESTS_V9 += errors/MemoryError_as.swf
-endif
 
 # AIR only
 # if BUILD_SQLERROROPERATION_AS3
@@ -48,13 +38,9 @@ endif
 # ERRORS_TESTS_V9 += errors/SQLError_as.swf
 # endif
 
-if BUILD_SCRIPTTIMEOUTERROR_AS3
 ERRORS_TESTS_V9 += errors/ScriptTimeoutError_as.swf
-endif
 
-if BUILD_STACKOVERFLOWERROR_AS3
 ERRORS_TESTS_V9 += errors/StackOverflowError_as.swf
-endif
 
 check_SCRIPTS += $(ERRORS_TESTS_V9)
 HAXE_FLAGS += -cp $(ERRORSdir)

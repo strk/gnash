@@ -15,8 +15,8 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-AC_PREREQ(2.50)
-AC_INIT(gnash, 0.8.9~rc3)
+AC_PREREQ(2.59c)
+AC_INIT(gnash, 0.8.9~rc4)
 AC_CONFIG_SRCDIR([libcore/as_object.h])
 AC_CONFIG_HEADERS([gnashconfig.h])
 AC_CONFIG_MACRO_DIR([macros])
@@ -201,30 +201,28 @@ BUILDDATE="`date +%Y%m%d`"
 AC_SUBST(BUILDDATE)
 
 dnl These are required by automake
-dnl AM_INIT_AUTOMAKE(gnash, "trunk$BUILDDATE")
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([tar-ustar])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AM_MAINTAINER_MODE
 AC_PROG_MAKE_SET
 
-dnl AC_DISABLE_STATIC dnl Disable building static libs.
-
 AM_GNU_GETTEXT([external])
 AM_CONDITIONAL(HAS_GETTEXT, test x$ac_cv_path_XGETTEXT != x)
-dnl AM_GNU_GETTEXT_VERSION(0.15)
+
+dnl Many of the Gnash macros depend on gettext macros defining shlibext; recent
+dnl gettext however does not.
+if test x"${shlibext}" = x; then
+  if test x"${acl_cv_shlibext}" = x; then
+    echo "Gettext macros were supposed to define shared library extensions"
+    exit 1;
+  else
+    shlibext="${acl_cv_shlibext}"
+  fi
+fi
 
 dnl This is primarily used when compiling for a similar architecture,
 dnl like pentium->geode, which can use the same compiler, but have
 dnl different development libraries.
-
-dnl I want to deprecate this option for the new sysroot name to be
-dnl consistant with other tools. This will be left for a while as 
-dnl a transistion.
-AC_ARG_WITH(top_level,
-  AC_HELP_STRING([--with-top-level],
-  [top level directory for cross compiling files]),
-  with_top_level=${withval} ;
-  cross_compiling=yes)
 
 AC_ARG_WITH(sysroot,
   AC_HELP_STRING([--with-sysroot],
@@ -255,8 +253,6 @@ AC_ARG_WITH([android],
 )
 CROSS_CXXFLAGS=
 if test x"${android_ndk}" != xno; then
-dnl  LDFLAGS=-Wl,--dynamic-linker -Wl,/system/bin/linker -nostdlib -Wl,-rpath -Wl,/system/lib -Wl,-rpath -Wl,${android_ndk}/usr/lib -L${android_ndk}/usr/lib -lc -o hello ${android_ndk}/usr/lib/crtbegin_dynamic.o
-dnl  CROSS_CXXFLAGS=-mandroid -fexceptions -I${android_ndk}/include
   CROSS_CXXFLAGS=-mandroid -fexceptions
   if test x"${with_top_level}" = x; then
     with_top_level=/usr/local/android-arm/sysroot/usr
@@ -278,7 +274,6 @@ AC_ARG_WITH(cpu,
    esac],with_cpu=none)
 
 if test x"$with_cpu" != x"none"; then
-dnl   $CXXFLAGS="$CXXFLAGS -march=${with_cpu}"
    cross_compiling=yes
 fi
 
@@ -288,12 +283,8 @@ AC_C_INLINE
 
 AM_CONDITIONAL(ENABLE_SHARED, [test x"${enable_shared}" = xyes])
 AM_CONDITIONAL(ENABLE_STATIC, [test x"${enable_shared}" = xno])
-dnl -- AM_CONDITIONAL(STATIC_GUI, test x"${dynamic_gui}" = xno -o x"${enable_shared}" = xno)
 
 AC_PATH_PROG(DEJAGNU, runtest)
-
-dnl AC_CHECK_LIB(ltdl, lt_dlmutex_register, AC_DEFINE(LT_DLMUTEX, 1, [Has lt_dlmutex_register]),
-dnl                                         AC_DEFINE(LT_DLMUTEX, 0, [doesn't have lt_dlmutex_register]) )
 
 dnl These options are for Cygnal, which collects optional statistics
 dnl on all the network traffic By default, we turn on statistics
@@ -427,7 +418,6 @@ AC_ARG_WITH(security,
   nsecurity=0
   while test -n "${withval}" ; do
     val=`echo ${withval} | cut -d ' ' -f 1`
-dnl    security_list="${security_list} ${val}"
     [case "${val}" in
       solreadonly)
         solreadonly=yes
@@ -498,14 +488,7 @@ rm -f .tmp
 dnl is there any good way to report what we found here?
 AC_MSG_RESULT()
 if test x"${archiver}" != x && test "${archiver}" -eq 1; then
-dnl   if test "$enable_shared" = no; then
-dnl     AR="libtool -static"
-dnl   else
-dnl     AR="libtool -dynamic"
-dnl     CXXFLAGS="${CXXFLAGS} -dynamic"
    export MACOSX_DEPLOYMENT_TARGET="10.3"
-dnl   fi
-dnl   AR_FLAGS="-o"
    darwin=yes
 else
    darwin=no
@@ -640,6 +623,7 @@ AC_ARG_ENABLE(gui,
           build_kde4=yes
         fi
         build_sdl=yes
+        build_gtk=yes
         ;;
       *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde3|kde4|fltk|sdl|riscos|aqua|fb|qtopia3|qtopia4|dump|aos4|haiku)])
          ;;
@@ -823,7 +807,7 @@ if test x"${build_sdl}" = xauto; then
   if test xyes = x"${has_sdl}"; then
     build_sdl=yes
   else
-    AC_MSG_NOTICE([sdl GUI won't be built (no sdl development files found)])
+    AC_MSG_NOTICE([sdl GUI will not be built (no sdl development files found)])
     build_sdl=no
   fi
 fi
@@ -1177,7 +1161,6 @@ ext_gtk=no
 ext_lirc=no
 ext_dbus=no
 ext_all=no
-ext_launcher=no
 extensions_list=
 nextensions=0
 AC_ARG_ENABLE(extensions,
@@ -1219,11 +1202,6 @@ AC_ARG_ENABLE(extensions,
         ext_gtk=yes
         nextensions=$((nextensions+1))
         ;;
-      launcher|LAUNCHER)
-        AC_DEFINE(USE_LAUNCHER_EXT, [1], [Build the Launcher extension])
-        ext_launcher=yes
-        nextensions=$((nextensions+1))
-        ;;
       lirc|LIRC)
         AC_DEFINE(USE_LIRC_EXT, [1], [Build the LIRC extension])
         ext_lirc=yes
@@ -1242,7 +1220,6 @@ AC_ARG_ENABLE(extensions,
         ext_gtk=yes
         ext_lirc=yes
         ext_dbus=yes
-        ext_launcher=yes
         ext_all=yes
         nextensions=9
         ;;
@@ -1269,13 +1246,10 @@ fi
 AM_CONDITIONAL(BUILD_DEJAGNU_EXT, [ test x$ext_dejagnu = xyes ])
 AM_CONDITIONAL(BUILD_FILEIO_EXT, [ test x$ext_fileio = xyes ])
 AM_CONDITIONAL(BUILD_MYSQL_EXT, [ test x$ext_mysql = xyes ])
-AM_CONDITIONAL(BUILD_LAUNCHER_EXT, [ test x$ext_launcher = xyes ])
 AM_CONDITIONAL(BUILD_GTK_EXT, [ test x$ext_gtk = xyes ])
 AM_CONDITIONAL(BUILD_LIRC_EXT, [ test x$ext_lirc = xyes ])
 AM_CONDITIONAL(BUILD_DBUS_EXT, [ test x$ext_dbus = xyes ])
 AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n "$extensions_list"])
-
-GNASH_PKG_CLASSFILE
 
 dnl --------------------------------------------------------
 dnl Libtool
@@ -1294,7 +1268,7 @@ AC_SUBST(DLPREOPEN)
 GNASH_PKG_FIND([ltdl], [ltdl.h], [libltdl library], [lt_dlinit])
 
 if test x"$has_ltdl" = x"yes";then
-  AC_DEFINE(HAVE_LTDL, [1], [Libtool 2.x defines this, but libtool 1.5 doesn't])
+  AC_DEFINE(HAVE_LTDL, [1], [Libtool 2.x defines this, but libtool 1.5 does not])
 fi
 
 dnl --------------------------------------------------------
@@ -1419,31 +1393,11 @@ AC_ARG_ENABLE(allstatic,
 esac],allstatic=no)
 AM_CONDITIONAL(ALLSTATIC, test x$allstatic = xyes)
 
-
-dnl --------------------------------------------------------
-dnl SHM
-dnl --------------------------------------------------------
-AC_ARG_WITH(shm,
-  AC_HELP_STRING([--with-shm],[specify a shared memory type.]),
-  [case "${withval}" in
-    sysv) with_shm=sysv
-          ;;
-    posix) with_shm=posix
-          ;;    
-    *)   AC_MSG_ERROR([bad value ${enableval} for --with-shm option (try sysv or posix])
-          ;;
-   esac],with_shm=sysv)
-
-if test x"${with_shm}" = x"sysv"; then
-  AC_DEFINE([USE_SYSV_SHM], [1], [Use SYSV shared memory for compatability])
-  dnl IPC_INFO isn't portable, and doesn't exist on BSD
-  AC_TRY_COMPILE([#include <sys/ipc.h> #include <sys/shm.h>], [
-    int flag = IPC_INFO; ],
-    AC_DEFINE([HAVE_IPC_INFO], [1], [Use shm_info])
-  )
-else
-  AC_DEFINE([USE_POSIX_SHM], [1], [Use POSIX shared memory])
-fi
+dnl IPC_INFO isn't portable, and doesn't exist on BSD
+AC_TRY_COMPILE([#include <sys/ipc.h> #include <sys/shm.h>], [
+  int flag = IPC_INFO; ],
+  AC_DEFINE([HAVE_IPC_INFO], [1], [Use ipc_info])
+)
 
 dnl --------------------------------------------------------
 dnl Disable menus
@@ -1558,21 +1512,6 @@ esac],cgibin=yes)
 AM_CONDITIONAL(USE_CGI, test x$cgibin = xyes)
 if test x"${cgibin}" = x"yes"; then
   AC_DEFINE([USE_CGIBIN], [1], [Enable cgi-bin processes for Cygnal])
-fi
-
-dnl --------------------------------------------------------
-dnl Fix the Intel 810 LOD bias problem
-dnl --------------------------------------------------------
-AC_ARG_ENABLE(i810-lod-bias,
-  AC_HELP_STRING([--enable-i810-lod-bias], [Enable fix for Intel 810 LOD bias problem]),
-[case "${enableval}" in
-  yes) i810lodbias=yes ;;
-  no)  i810lodbias=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for enable-i810-lod-bias option]) ;;
-esac])
-
-if test x"${i810lodbias}" = xyes; then
-    AC_DEFINE([FIX_I810_LOD_BIAS], [], [Fix i810 LOD bias problem])
 fi
 
 dnl --------------------------------------------------------
@@ -1873,23 +1812,11 @@ if test x"$gcc_cv_ld_as_needed" = xyes; then
 fi
 AC_MSG_RESULT($gcc_cv_ld_as_needed)
 
-dnl AC_MSG_CHECKING(linker --no-undefined support)
-dnl gcc_cv_ld_undef_needed=no
-dnl # Check if linker supports --no-undefined
-dnl if $LD --help 2>/dev/null | grep as-needed > /dev/null; then
-dnl 	gcc_cv_ld_undef_needed=yes
-dnl fi
-dnl if test x"$gcc_cv_ld_undef_needed" = xyes; then
-dnl 	LDFLAGS=" ${LDFLAGS} -Wl,--no-undefined"
-dnl fi
-dnl AC_MSG_RESULT($gcc_cv_ld_undef_needed)
-
 AC_DEFINE(USE_GIF, [1], [Use the GIF library])
 AC_DEFINE(USE_PNG, [1], [Use the PNG library])
 AM_CONDITIONAL(USE_GIF, true)
 AM_CONDITIONAL(USE_PNG, true)
 
-dnl GNASH_PKG_FIND(dmalloc, [dmalloc.h], [dmalloc], mallinfo)
 AM_CONDITIONAL(HAVE_DMALLOC, [ test x$has_dmalloc = xyes ])
 
 AC_PATH_TOOL([AUTOTRACE], [autotrace])
@@ -1946,6 +1873,10 @@ AC_ARG_ENABLE(npapi,
     npapi=yes
   fi
 )
+
+if test x"$npapi" = x"yes"; then
+  GNASH_PATH_NPAPI
+fi
 
 dnl -----------------------------------------------------------------
 dnl Enable us to disable building all browser plugins in one command.
@@ -2014,14 +1945,9 @@ AC_CHECK_LIB(c, getpwnam, AC_DEFINE(HAVE_GETPWNAM, 1, [Has getpwnam] ))
 
 dnl X11 is needed for fltk (at least),
 dnl and probably for many other guis too ...
-dnl if ! test x$build_fb = xyes; then # <--- this is wrong as build_x is non-exclusive
-dnl AC_PATH_XTRA
-dnl AC_CHECK_LIB(Xmu, XmuCvtStringToOrientation)
-dnl AC_CHECK_LIB(gmp, _gmp_get_memory_functions)
-  GNASH_PATH_X11
-  AC_CHECK_LIB(Xi, XInput_find_display)
-  AC_CHECK_LIB(X11, XDisableAccessControl)
-dnl fi
+GNASH_PATH_X11
+AC_CHECK_LIB(Xi, XInput_find_display)
+AC_CHECK_LIB(X11, XDisableAccessControl)
 AM_CONDITIONAL(HAVE_X11, [test x$x11 = xyes])
 AC_CHECK_LIB(rt, shm_unlink)
 AC_CHECK_FUNCS(shm_open shm_unlink)
@@ -2085,9 +2011,6 @@ if test x$ipc_key = xno; then
     ipc_key=yes
   )
 fi
-
-dnl AC_CHECK_FUNCS(strcasecmp stricmp)
-dnl AC_CHECK_FUNCS(vsnprintf)
 
 AC_CACHE_CHECK([for finite], ac_cv_finite,
  [AC_TRY_COMPILE([
@@ -2169,7 +2092,7 @@ AC_CACHE_CHECK([whether struct tm has tm_gmtoff], ac_cv_tm_gmtoff, [
         AC_TRY_LINK([
 /* ctime(1) says "The glibc version of struct tm has additional fields
  * defined  when _BSD_SOURCE was set before including <time.h>"
- * In practice, you don't need to define it yourself (tested on glibc-2.2.1 
+ * In practice, you do not need to define it yourself (tested on glibc-2.2.1 
  * and 2.3.6) but if you *do* define it yourself, it makes *all* functions
  * favour BSD-like behaviour over of GNU/POSIX, which seems dangerous.
  */
@@ -2210,18 +2133,12 @@ AC_CHECK_FUNCS(sysconf)
 AC_CHECK_FUNCS(shmget shmat shmdt mmap)
 AC_CHECK_FUNCS(memmove)
 AC_CHECK_FUNCS(scandir)         dnl supported by BSD and Linux, but you never know...
-dnl AC_CHECK_FUNC(strndup, AC_DEFINE(HAVE_STRNDUP, 1, [Has strndup()] ))
 AC_CHECK_FUNC(clock_gettime, AC_DEFINE(HAVE_CLOCK_GETTIME, 1, [Has clock_gettime()] ))
-dnl AC_CHECK_FUNCS(strlcpy, AC_DEFINE(HAVE_STRLCPY_PROTO, [1],[Define if you have the strlcpy prototype]))
-dnl AC_CHECK_FUNCS(strlcat, AC_DEFINE(HAVE_STRLCAT_PROTO, [1],[Define if you have the strlcat prototype]))
 dnl Look for Win32 networking stuff
 AC_CHECK_HEADERS(winsock.h)
 AC_CHECK_HEADERS(winsock2.h)
 AC_CHECK_FUNCS(socket)
 AC_CHECK_FUNCS(CreateFileMappingA)
-
-dnl Shm::resize() uses this if it exists
-AC_CHECK_LIB(c, mremap)
 
 GNASH_PKG_FIND(nspr, [nspr.h], [Netscape Portable Runtime (NSPR)], PR_Init)
 
@@ -2383,18 +2300,6 @@ AM_CONDITIONAL(ENABLE_HAXE, [ test x"$HAXE" != x ])
 AC_PATH_PROG(DOXYGEN, doxygen)
 AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 
-dnl currently unused
-dnl GNASH_PKG_FIND(ogg, [ogg.h], [decode ogg streams], ogg_stream_init)
-
-dnl Qtopia is a desktop environment for embedded devices.
-dnl GNASH_PATH_QTOPIA3
-dnl GNASH_PATH_QTOPIA4
-has_qtopia3=no
-has_qtopia4=no
-
-
-AM_CONDITIONAL(HAVE_QTOPIA3, [test x$has_qtopia3 = xyes])
-AM_CONDITIONAL(HAVE_QTOPIA4, [test x$has_qtopia4 = xyes])
 AM_CONDITIONAL(HAVE_KDE3,    [test x$has_kde3 = xyes])
 AM_CONDITIONAL(HAVE_KDE4,    [test x$has_kde4 = xyes])
 AM_CONDITIONAL(HAVE_QT3,     [test x$has_qt3 = xyes])
@@ -2438,7 +2343,6 @@ dnl if kde isn't installed, even if it's specified, don't try to build
 dnl the KPARTS plugin, which is KDE based.
 if test x$has_kde3 = xno -a x$build_kparts3 = xyes; then
   build_kparts3=no
-dnl  build_kde3=no
   AC_MSG_WARN(["Disabling KPARTS 3.x plugin, no KDE development found"])
 fi
 
@@ -2447,7 +2351,6 @@ if test x$build_kde3 = xno -a x$build_kparts3 = xyes; then
 fi
 if test x$has_kde4 = xno -a x$build_kparts4 = xyes; then
   build_kparts4=no
-dnl  build_kde4=no
   AC_MSG_WARN(["Disabling KPARTS 4.x plugin, no KDE 4.x development found"])
 fi
 
@@ -2582,9 +2485,7 @@ if test x"$build_media_gst" = "xyes"; then
 fi
 
 AM_CONDITIONAL(HAVE_CAIRO, [true])
-dnl AM_CONDITIONAL(HAVE_CAIRO, [test x"${has_cairo}" = xyes])
 AM_CONDITIONAL(HAVE_OPENGL, [true])
-dnl AM_CONDITIONAL(HAVE_OPENGL, test x"${has_opengl}" = xyes)
 
 AM_CONDITIONAL(USE_SOUND_SDL, test x$build_sound_sdl = xyes)
 AM_CONDITIONAL(USE_SOUND_AHI, test x$build_sound_ahi = xyes)
@@ -2611,7 +2512,7 @@ if test x$build_sound_mkit = xyes; then
   if test x"${haiku}" != xyes; then
     AC_MSG_ERROR([Media Kit sound handling is supported only under Haiku]);
   else
-    AC_DEFINE([SOUND_MKIT],  [1], [Use Haiku's Media Kit for sound handling])
+    AC_DEFINE([SOUND_MKIT],  [1], [Use Haiku Media Kit for sound handling])
   fi
 fi
 
@@ -2642,7 +2543,6 @@ AM_CONDITIONAL(ENABLE_PDF, [ test x"$DB2X_PDF" ])
 AM_CONDITIONAL(ENABLE_HTML, [ test x"$XSLTPROC" != x -a x"$docbook_styles" != x ])
 AM_CONDITIONAL(ENABLE_FOP, [ test x"$FOP" != x -a x"$docbook_styles" != x ])
 AM_CONDITIONAL(ENABLE_XMLTEX, [ test x"$PDFXMLTEX" != x -a x"$XSLTPROC" != x -a x"$docbook_styles" != x ])
-dnl  AM_CONDITIONAL(ENABLE_DBLATEX, [ test x"$DBLATEX" != x ])
 AM_CONDITIONAL(ENABLE_MAN, [ test x"$DB2X_MAN" != x -o x"$DB2X_MANXML" != x ])
 AM_CONDITIONAL(HAVE_AGG, [test x"${AGG_LIBS}" != x])
 
@@ -2694,11 +2594,6 @@ AC_SUBST(PCH_FLAGS)
 GNASH_PATH_PTHREADS
 
 GNASH_PATH_BOOST
-
-dnl disable --gcc-arch by default
-dnl AX_GCC_ARCHFLAG
-dnl AC_SUBST(CFLAGS)
-dnl AC_SUBST(CLIBS)
 
 AC_ARG_ENABLE([strict],
   AC_HELP_STRING([--enable-strict],[Accept only standards compliant code (GCC only)]),
@@ -2843,14 +2738,13 @@ if test x"$ac_cv_gcc_visibility" = xyes -a x"$enable_visibility" != xno; then
   CXXFLAGS="$CXXFLAGS -fvisibility=hidden"
 fi
 
-dnl Define convienience constants so Gnash can print out the
+dnl Define convenience constants so Gnash can print out the
 dnl default configuration of the build.
 RENDERER_CONFIG="${renderer_list}"
 RENDERER_LIBS=
 for rend in `echo "${add_renderer}" | tr ',' ' '`; do
 	RENDERER_LIBS="${RENDERER_LIBS} \$(top_builddir)/librender/libgnash${rend}.la"
 done
-dnl echo "RENDERER_LIBS=$RENDERER_LIBS"
 AC_SUBST(RENDERER_LIBS)
 AC_SUBST(RENDERER_CONFIG)
 
@@ -2913,8 +2807,6 @@ fi
 SUPPORTED_GUIS="`echo ${SUPPORTED_GUIS} | sed 's/,//'`" # Strip leading comma
 AC_SUBST(SUPPORTED_GUIS)
 
-dnl AC_CONFIG_LINKS(doc/C/images)
-dnl AC_CONFIG_LINKS(gnashconfig.h)
 AC_CONFIG_LINKS(cygnal/testsuite/cygnal.all/cygnalrc:cygnal/testsuite/cygnal.all/cygnalrc.in)
 AC_CONFIG_LINKS(testsuite/libbase.all/gnashrc:testsuite/libbase.all/gnashrc.in)
 AC_CONFIG_LINKS(testsuite/libbase.all/gnashrc-local:testsuite/libbase.all/gnashrc-local.in)
@@ -3015,12 +2907,6 @@ exec 5> $crec
 
 echo "Configurable options are:"
 
-if test x"${i810lodbias}" = x"yes"; then
-  echo "        Intel 810 LOD bias hack enabled"
-else
-  echo "        Intel 810 LOD bias hack disabled (default). Use --enable-i810-lod-bias to enable."
-fi
-
 if test x"${pthreads}" = x"yes"; then
   echo "        POSIX Threads support enabled (default)"
 else
@@ -3064,12 +2950,6 @@ if test x"${build_kparts4}" = x"yes"; then
 else
   echo "        KPARTS 4.x plugin disabled."
 fi
-
-dnl -- if test x"${dynamic_gui}" = x"yes"; then
-dnl --   echo "        Loadable GUI & renderer enabled."
-dnl -- else
-dnl --   echo "        Loadable GUI & renderer disabled (default). Use --enable-dynamic-gui to enable."
-dnl -- fi
 
 # set a variable if we shouldn't continue. This way we can print
 # out everything that is missing in one pass, hopefully making it
@@ -3437,9 +3317,6 @@ if test x$build_fltk = xyes; then
     echo "               There are currently no Debian or RPM packages for FLTK2;" >&3
     echo "               see http://www.fltk.org to install it from source." >&3
     echo "               or change to a different gui with --enable-gui=..." >&3
-dnl What it was for FLTK 1:
-dnl    echo "               or .deb users: apt-get install fltk-1.1-dev"
-dnl    echo "               or .rpm users: yum install fltk-devel"
   fi
 fi
 
@@ -3451,11 +3328,6 @@ if test x$build_fltk = xyes; then
       echo "        Xft flags are: default include path"
     fi
       echo "        Xft libs are: $XFT_LIBS"
-dnl     else
-dnl       echo "        ERROR: No Xft development package installed!" >&3
-dnl       echo "               Install the xft development package" >&3
-dnl       echo "               or .deb users: apt-get install libxft-dev" >&3
-dnl       echo "               or .rpm users: yum install xft-devel" >&3
   fi
 fi
 
@@ -3480,13 +3352,7 @@ fi
 unset need_sdl
 
 if test x"$nsapi" = x"yes"; then
-dnl  if test x"$FIREFOX_CFLAGS" != x; then
-dnl    echo "        Firefox flags are: $FIREFOX_CFLAGS"
-dnl    echo "        Firefox libs are: $FIREFOX_LIBS"
     echo "        Plugin will be installed in ${FIREFOX_PLUGINS}"
-dnl  else
-dnl    echo "        ERROR: No Firefox or Mozilla development package installed!" >&3
-dnl  fi
 fi
 
 if test x"${pthreads}" = x"yes"; then
@@ -3856,6 +3722,19 @@ if test x"$ac_cv_gcc_visibility" != xyes; then
   fi
 fi
 
+if test x"$npapi" = xyes; then
+  if test x"$has_npapi" = xyes; then
+    echo "        NPAPI flags are: $NPAPI_CFLAGS"
+  else
+    echo "        ERROR : No xulrunner development package is installed" >&3
+    echo "                Install it from http://releases.mozilla.org/pub/mozilla.org/xulrunner" >&3
+    echo "                or .deb users: apt-get install xulrunner-dev" >&3
+    echo "                or .rpm users: yum install xulrunner-devel" >&3
+  fi
+else
+  echo "        NPAPI plugin is disabled"
+fi
+
 if test x"${DEJAGNU}" != x""; then
   echo "        DEJAGNU's runtest is $DEJAGNU"
 else
@@ -3885,7 +3764,7 @@ if test x"$python" = x"yes"; then
   if test x"$has_python" = x"yes"; then
     echo "        PYTHON flags are: $PYTHON_CFLAGS"
     echo "        PYTHON libs are: $PYTHON_LIBS"
-    echo "        PYTHON executable is are: $PYTHON"
+    echo "        PYTHON executable is: $PYTHON"
   else
     echo "        ERROR: No Python development package is installed, but it's enabled." >&3
   fi

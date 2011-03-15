@@ -25,27 +25,16 @@
 
 namespace gnash {
 
-namespace {
-
-struct MessageOutput : public boost::static_visitor<std::ostream&>
+std::ostream&
+operator<<(std::ostream& os, const HostMessage& m)
 {
-    MessageOutput(std::ostream& os) : _os(os) {}
-    std::ostream& operator()(const HostMessage& e) const {
-        return _os << e.event();
-    }
-    std::ostream& operator()(const CustomMessage& e) const {
-        return _os << e.name();
-    }
-private:
-    std::ostream& _os;
-};
-
+    return os << m.event();
 }
 
 std::ostream&
-operator<<(std::ostream& os, const HostInterface::Message& e)
+operator<<(std::ostream& os, const CustomMessage& m)
 {
-    return boost::apply_visitor(MessageOutput(os), e);
+    return os << m.name();
 }
 
 std::ostream&

@@ -50,12 +50,6 @@ intrusive_ptr_release(const ref_counted* o)
 	o->drop_ref();
 }
 
-// These two should not be needed when we switch all GcResource 
-// pointers to use the gc_ptr instead of the intrusive_ptr
-
-inline void intrusive_ptr_add_ref(const GcResource* ) { }
-inline void intrusive_ptr_release(const GcResource* ) { }
-
 } // namespace boost||gnash 
 
 

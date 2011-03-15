@@ -83,6 +83,7 @@ BUILT_SOURCES =
 endif
 
 nodist_gnash_la_SOURCES = $(BUILT_SOURCES)
+gnash_la_CPPFLAGS = $(INCLUDES) $(GNASH_INCLUDES)
 gnash_la_SOURCES = \
 	gnashmodule.c \
 	gnash-view.cpp \
@@ -91,7 +92,7 @@ gnash_la_SOURCES = \
 
 gnash.c: gnash.defs gnash.override
 
-CLEANFILES = 
+CLEANFILES = gen-gnash.c
 EXTRA_DIST = gnash.override gnash.defs
 
 gen-gnash.c:   gnash.override gnash.defs
@@ -114,3 +115,6 @@ endif
 # Remove libtool .la files
 install-exec-hook:
 	$(RM) $(DESTDIR)$(pyexecdir)/gtk-2.0/gnash.la
+
+uninstall-local:
+	$(RM) $(DESTDIR)$(pyexecdir)/gtk-2.0/gnash.so

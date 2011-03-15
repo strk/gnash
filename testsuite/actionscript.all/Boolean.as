@@ -25,6 +25,23 @@
 rcsid="$Id: Boolean.as,v 1.21 2008/04/02 09:39:59 strk Exp $";
 #include "check.as"
 
+// This test used to crash gnash because the
+// destructive property became read-only without
+// triggering replacement.
+ASSetPropFlags(_global, null, 4);
+var b = new Boolean();
+
+_global.Boolean = 6;
+
+#if OUTPUT_VERSION > 5
+check_equals(typeof(_global.Boolean), "function");
+#else
+check_equals(typeof(_global.Boolean), "undefined");
+#endif
+
+// Remove all prop flags on _global.
+ASSetPropFlags(_global, null, 0);
+
 check_equals(typeof(Boolean), 'function');
 check_equals(typeof(Boolean()), 'undefined');
 check_equals(typeof(Boolean(true)), 'boolean');
@@ -106,4 +123,4 @@ trueBoolean = new Boolean(true);
 check( trueBoolean );
 
 
-check_totals(31);
+check_totals(32);

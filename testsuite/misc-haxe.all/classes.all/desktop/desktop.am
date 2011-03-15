@@ -19,57 +19,31 @@ DESKTOPdir = $(srcdir)/desktop
 
 DESKTOP_TESTS_V9 = 
 
-if BUILD_CLIPBOARDFORMATS_AS3
 DESKTOP_TESTS_V9 += desktop/ClipboardFormats_as.swf
-endif
 
-if BUILD_CLIPBOARDTRANSFERMODE_AS3
 DESKTOP_TESTS_V9 += desktop/ClipboardTransferMode_as.swf
-endif
 
-if BUILD_CLIPBOARD_AS3
 DESKTOP_TESTS_V9 += desktop/Clipboard_as.swf
-endif
 
-if BUILD_DOCKICON_AS3
 DESKTOP_TESTS_V9 += desktop/DockIcon_as.swf
-endif
 
-if BUILD_ICON_AS3
 DESKTOP_TESTS_V9 += desktop/Icon_as.swf
-endif
 
-if BUILD_INTERACTIVEICON_AS3
 DESKTOP_TESTS_V9 += desktop/InteractiveIcon_as.swf
-endif
 
-if BUILD_NATIVEAPPLICATION_AS3
 DESKTOP_TESTS_V9 += desktop/NativeApplication_as.swf
-endif
 
-if BUILD_NATIVEDRAGACTIONS_AS3
 DESKTOP_TESTS_V9 += desktop/NativeDragActions_as.swf
-endif
 
-if BUILD_NATIVEDRAGMANAGER_AS3
 DESKTOP_TESTS_V9 += desktop/NativeDragManager_as.swf
-endif
 
-if BUILD_NATIVEDRAGOPTIONS_AS3
 DESKTOP_TESTS_V9 += desktop/NativeDragOptions_as.swf
-endif
 
-if BUILD_NOTIFICATIONTYPE_AS3
 DESKTOP_TESTS_V9 += desktop/NotificationType_as.swf
-endif
 
-if BUILD_SYSTEMTRAYICON_AS3
 DESKTOP_TESTS_V9 += desktop/SystemTrayIcon_as.swf
-endif
 
-if BUILD_UPDATER_AS3
 DESKTOP_TESTS_V9 += desktop/Updater_as.swf
-endif
 
 check_SCRIPTS += $(DESKTOP_TESTS_V9)
 HAXE_FLAGS += -cp $(DESKTOPdir)

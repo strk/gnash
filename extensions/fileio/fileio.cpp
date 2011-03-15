@@ -327,7 +327,7 @@ FileIO::fputs(const string &str)
 {
 //    GNASH_REPORT_FUNCTION;
     if (_stream) {
-        if (::fputs(str.c_str(), _stream)) {
+        if (::fputs(str.c_str(), _stream) != EOF) {
             return true;
         }
     }    
