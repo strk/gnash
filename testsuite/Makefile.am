@@ -99,7 +99,8 @@ EXTRA_DIST = check.h \
 	generic-testrunner.sh \
 	gst_install_plugins_helper.sh \
 	simultaneous-testrunner.sh \
-	XmlSocketServer.pl
+	XmlSocketServer.pl \
+	dejagnu.h
 
 dist_noinst_SCRIPTS = analyse-results.sh generic-testrunner.sh
 
