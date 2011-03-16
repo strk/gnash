@@ -1,8 +1,21 @@
 Gnash 0.8.9
 YYYY/MM/DD
 
+Caveats:
+
+ * The minimum required FFmpeg version, for people who prefer it over
+   Gstreamer, is now 51.28.0.
+ * The configure script option --enable-i810-lod-bias, which provided
+   a workaround for a very old driver for the Intel I810 when using the
+   OpenGL renderer, has been removed.
+ * Gnash now uses the system-installed libltdl rather than its in-tree
+   copy.
+ * NPAPI headers are now required for building the Mozilla plugin; they
+   are normally part of the Xulrunner development package.
+
 Improvements since 0.8.8 release are:
 
+ * Fixed playback of uncommon MPEG4 streams when using GStreamer.
  * Avoid drawing operations when the window is obscured, including when
    Gnash is used as a plugin, starting with Firefox 4.0 (GTK GUI).
  * Support SWF with embedded ScreenVideo when using FFMPEG or
@@ -14,9 +27,9 @@ Improvements since 0.8.8 release are:
    entire ActionScript API for input sanitization.
  * Improved ActionScript performance processing, especially
    for interactive applications.
- * npapi plugin: fix relative urls resolution in presence of <base> tag
+ * NPAPI plugin: fix relative urls resolution in presence of <base> tag
    and "base" parameter; improved robustness and compatibility with
-   chromium browser. 
+   chromium browser. Avoid blocking the parent process.
  * Improved SWF8 support with BitmapData.draw, BitmapData.loadBitmap,
    and other bitmap functions.
  * Re-entrant core libraries.
@@ -31,7 +44,7 @@ Improvements since 0.8.8 release are:
  * Support for linear RGB interpolation mode in gradient fills.
  * Clipboard setting (GTK only).
  * More flash.geom.Rectangle functions.
- * Improved OpenBSD compatibility
+ * Improved OpenBSD compatibility.
 
 Gnash 0.8.8
 2010/08/17
