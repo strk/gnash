@@ -547,8 +547,9 @@ DisplayList::display(Renderer& renderer, const Transform& base)
     
     // We only display DisplayObjects which are out of the "removed" zone
     // (or should we check unloaded?)
-    iterator it = beginNonRemoved(_charsByDepth);
-    for (iterator endIt = _charsByDepth.end(); it != endIt; ++it) {
+    for (iterator it = beginNonRemoved(_charsByDepth),
+            endIt = _charsByDepth.end(); it != endIt; ++it) {
+
         DisplayObject* ch = *it;
         assert(!ch->isDestroyed());
 
@@ -560,7 +561,6 @@ DisplayList::display(Renderer& renderer, const Transform& base)
         // Check if this charater or any of its parents is a mask.
         // Characters acting as masks should always be rendered to the
         // mask buffer despite their visibility.
-        //
         DisplayObject* p = ch->parent();
         bool renderAsMask = ch->isMaskLayer();
 
@@ -569,7 +569,7 @@ DisplayList::display(Renderer& renderer, const Transform& base)
             p = p->parent();
         }
         
-        // check for non-mask hiden DisplayObjects
+        // check for non-mask hidden DisplayObjects
         if (!renderAsMask && (!ch->visible())) {
             ch->omit_display();
             // Don't display non-mask hidden DisplayObjects
