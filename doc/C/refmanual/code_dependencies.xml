@@ -460,10 +460,21 @@
 	    if you are using the development source from CVS.
 	  </entry>
 	  <entry><filename>libltdl3-dev</filename></entry>
-	  <entry><filename>libtool</filename></entry>
+	  <entry><filename>libtool-ltdl-devel</filename></entry>
 	  <entry><filename>libtool</filename></entry>
 	</row>
 	
+	<row>
+	  <entry>Xulrunner SDK</entry>
+	  <entry>optional</entry>
+	  <entry></entry>
+	  <entry>Xulrunner SDK is needed to develop plugins for Firefox</entry>
+	  <entry>This package is required to build npapi plugin</entry>
+	  <entry><filename>xulrunner-dev</filename></entry>
+	  <entry><filename>xulrunner-devel</filename></entry>
+	  <entry><filename>xulrunner-devel</filename></entry>
+	</row>
+
       </tbody>
     </tgroup>
   </table>
