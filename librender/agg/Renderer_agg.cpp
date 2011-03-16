@@ -50,16 +50,13 @@ Status
     linear gradients  COMPLETE
     radial gradients  COMPLETE
     focal gradients   COMPLETE
-    ext. spread modes NOT IMPLEMENTED *
-    linear RGB mode   NOT IMPLEMENTED *
+    ext. spread modes COMPLETE
+    linear RGB mode   COMPLETE
     bitmaps, tiled    COMPLETE
     bitmaps, clipped  COMPLETE
     bitmaps, smooth   COMPLETE
     bitmaps, hard     COMPLETE    
     color xform       COMPLETE
-    
-    * special fill styles are not yet supported by Gnash itself AFAIK, but AGG 
-    supports them and it should be easy to add them.    
     
   fonts               COMPLETE
     
