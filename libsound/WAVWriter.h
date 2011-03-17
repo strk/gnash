@@ -23,11 +23,13 @@
 #include <fstream> // for composition (file_stream)
 #include <boost/cstdint.hpp>
 
+#include "dsodefs.h"
+
 namespace gnash {
 namespace sound {
 
 /// WAV writer class
-class WAVWriter {
+class DSOEXPORT WAVWriter {
 
 public:
 
