@@ -63,7 +63,7 @@ namespace gnash {
 /// A custom form of communication with the host application.
 //
 /// This comprises a string and any type of argument.
-class DSOEXPORT CustomMessage
+class CustomMessage
 {
 public:
     explicit CustomMessage(const std::string& s,
@@ -82,7 +82,7 @@ private:
 /// Built-in forms of communication with the host application.
 //
 /// These messages should be supported for ActionScript compatibility.
-class DSOEXPORT HostMessage
+class HostMessage
 {
 public:
 
@@ -231,11 +231,11 @@ public:
 };
 
 /// Stream a description of any host interface message type.
-std::ostream& operator<<(std::ostream& os, const HostMessage& m);
-std::ostream& operator<<(std::ostream& os, const CustomMessage& m);
+DSOEXPORT std::ostream& operator<<(std::ostream& os, const HostMessage& m);
+DSOEXPORT std::ostream& operator<<(std::ostream& os, const CustomMessage& m);
 
 /// Stream a description of an expected message.
-std::ostream& operator<<(std::ostream& os, HostMessage::KnownEvent e);
+DSOEXPORT std::ostream& operator<<(std::ostream& os, HostMessage::KnownEvent e);
 
 
 } // namespace gnash
