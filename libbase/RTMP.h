@@ -26,6 +26,7 @@
 
 #include "SimpleBuffer.h"
 #include "Socket.h"
+#include "dsodefs.h"
 
 #define RTMP_DEFAULT_CHUNKSIZE	128
 
@@ -538,7 +539,7 @@ private:
 };
 
 /// Send a bandwidth ping to the server.
-bool sendServerBW(RTMP& r);
+DSOEXPORT bool sendServerBW(RTMP& r);
 
 /// Send a control packet
 bool sendCtrl(RTMP& r, ControlType, unsigned int nObject, unsigned int nTime);

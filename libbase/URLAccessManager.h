@@ -21,6 +21,8 @@
 
 #include <string>
 
+#include "dsodefs.h"
+
 // Forward declarations
 namespace gnash {
 	class URL;
@@ -28,30 +30,30 @@ namespace gnash {
 
 namespace gnash {
 
-/// Manage a list of URL access configuration
-// stuff for an URLAccessManager
-namespace URLAccessManager {
+	/// Manage a list of URL access configuration
+	// stuff for an URLAccessManager
+	namespace URLAccessManager {
 
-/// Return true if access to given url is allowed, false otherwise.
-//
-/// Will use rc file for whitelist/blacklist and localSandbox.
-///
-/// @param url
-///   The url to check
-///
-/// @param baseurl
-///   The originating url, only used for local urls and only
-///   for protocol checking (ie: a non-local originating url
-///   will not be allowed to load a local url)
-///
-bool allow(const URL& url, const URL& baseurl);
+	/// Return true if access to given url is allowed, false otherwise.
+	//
+	/// Will use rc file for whitelist/blacklist and localSandbox.
+	///
+	/// @param url
+	///   The url to check
+	///
+	/// @param baseurl
+	///   The originating url, only used for local urls and only
+	///   for protocol checking (ie: a non-local originating url
+	///   will not be allowed to load a local url)
+	///
+	bool allow(const URL& url, const URL& baseurl);
 
-//bool allowHost(const std::string& str);
+	//bool allowHost(const std::string& str);
 
-// Used by XMLSocket::connect (and others?)
-bool allowXMLSocket(const std::string& str, short port);
+	// Used by XMLSocket::connect (and others?)
+	DSOEXPORT bool allowXMLSocket(const std::string& str, short port);
 
-} // AccessManager
+	} // AccessManager
 
 } // namespace gnash
 

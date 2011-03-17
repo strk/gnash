@@ -156,7 +156,7 @@ namespace utf8 {
     //
     /// TODO: It's doubtful if this even works, and it may not be useful at
     /// all.
-    EncodingGuess guessEncoding(const std::string& s, int& length,
+    DSOEXPORT EncodingGuess guessEncoding(const std::string& s, int& length,
             std::vector<int>& offsets);
 
 

@@ -23,11 +23,12 @@
 
 #include <locale>
 
+#include "dsodefs.h"
+
 namespace gnash {
 
 /// Facet for SWF-compatible case conversion.
-class SWFCtype : public std::ctype<wchar_t>
-{
+class DSOEXPORT SWFCtype : public std::ctype<wchar_t> {
 public:
     SWFCtype(size_t refs = 0) : std::ctype<wchar_t>(refs) {}
     typedef std::ctype<wchar_t>::char_type char_type;
