@@ -117,7 +117,7 @@ public:
     /// Clear the MovieFactory resources
     //
     /// This should be in the dtor.
-    static void clear();
+    static DSOEXPORT void clear();
 
     static MovieLibrary movieLibrary;
 };

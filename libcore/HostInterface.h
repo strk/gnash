@@ -56,12 +56,14 @@
 #include <string>
 #include <ostream>
 
+#include "dsodefs.h"
+
 namespace gnash {
 
 /// A custom form of communication with the host application.
 //
 /// This comprises a string and any type of argument.
-class CustomMessage
+class DSOEXPORT CustomMessage
 {
 public:
     explicit CustomMessage(const std::string& s,
@@ -80,7 +82,7 @@ private:
 /// Built-in forms of communication with the host application.
 //
 /// These messages should be supported for ActionScript compatibility.
-class HostMessage
+class DSOEXPORT HostMessage
 {
 public:
 
