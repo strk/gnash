@@ -459,9 +459,20 @@
 	    <emphasis>autogen.sh</emphasis>, which is a requirement
 	    if you are using the development source from CVS.
 	  </entry>
-	  <entry><filename>libltdl3-dev</filename></entry>
-	  <entry><filename>libtool-ltdl-devel</filename></entry>
 	  <entry><filename>libtool</filename></entry>
+	  <entry><filename>libtool</filename></entry>
+	  <entry><filename>libtool</filename></entry>
+	</row>
+
+	<row>
+	  <entry>libltdl</entry>
+	  <entry>Required</entry>
+	  <entry></entry>
+	  <entry>GNU Libtool Dynamic Module Loader</entry>
+	  <entry>This package is used to load gnash extensions</entry>
+	  <entry>libltdl-dev</entry>
+	  <entry>libtool-ltdl-devel</entry>
+	  <entry>libtool</entry>
 	</row>
 	
 	<row>
