@@ -460,7 +460,7 @@ public:
         const SWFCxForm& cx, bool repeat, bool smooth) {
 
         if (!bi) {
-            add_color(agg::rgba8_pre(0,0,0,0));
+            add_color(agg::rgba8_pre(255,0,0,255));
             return;
         }
 
