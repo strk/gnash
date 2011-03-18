@@ -50,6 +50,7 @@ SC_AS2_XMLTESTS = \
 	background.xml \
 	registers.xml \
 	Try-without-jump.xml \
+	missing_bitmap.xml \
 	$(NULL)
 
 SC_AS3_XMLTESTS = \
