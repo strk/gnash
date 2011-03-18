@@ -98,6 +98,7 @@ check_SCRIPTS = \
 
 check_PROGRAMS = \
 	backgroundTestRunner \
+	missing_bitmapTestRunner \
 	$(NULL)
 
 mixed-bytecode-as3-runner: $(srcdir)/../generic-testrunner.sh mixed-bytecode-as3.swf Makefile
@@ -152,6 +153,22 @@ backgroundTestRunner_DEPENDENCIES = \
 	background.swf      \
 	$(NULL)
 
+missing_bitmapTestRunner_SOURCES = \
+	missing_bitmapTestRunner.cpp \
+	$(NULL)
+missing_bitmapTestRunner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+missing_bitmapTestRunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
+	$(NULL)
+missing_bitmapTestRunner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	missing_bitmap.swf      \
+	$(NULL)
+
 .xml.swf: 
 	$(SWFMILL) -v xml2swf $(@:%.swf=$(srcdir)/%.xml) $@
 
@@ -163,9 +180,9 @@ clean-local:
 
 
 TEST_DRIVERS = ../simple.exp
-TEST_CASES = ${check_SCRIPTS} ${check_PROGRAMS}
+TEST_CASES = $(check_SCRIPTS) $(check_PROGRAMS)
 
-check-DEJAGNU: site-update $(check_PROGRAMS)
+check-DEJAGNU: site-update $(TEST_CASES)
 	@runtest=$(RUNTEST); \
 	if $(SHELL) -c "$$runtest --version" > /dev/null 2>&1; then \
 	    GNASH_GC_TRIGGER_THRESHOLD=0 GNASHRC=../gnashrc $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); true; \
