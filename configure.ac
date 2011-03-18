@@ -561,7 +561,6 @@ build_gtk=no
 build_fb=no                     dnl Raw framebuffer
 build_fltk=no
 build_sdl=no
-build_riscos=no                 dnl Native OS2 GUI
 build_aqua=no                   dnl Native MacOSX
 build_hildon=no                 dnl Native LIMO
 build_alp=no                    dnl Acess Linux Platform using Hiker
@@ -595,9 +594,6 @@ AC_ARG_ENABLE(gui,
       aqua|AQUA|Aqua)
         build_aqua=yes
         ;;
-      riscos|RISCOS|RiscOS)
-        build_riscos=yes
-        ;;
       fltk|FLTK|fltk2|FLTK2)
         build_fltk=yes
         ;;
@@ -625,7 +621,7 @@ AC_ARG_ENABLE(gui,
         build_sdl=yes
         build_gtk=yes
         ;;
-      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde3|kde4|fltk|sdl|riscos|aqua|fb|qtopia3|qtopia4|dump|aos4|haiku)])
+      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde3|kde4|fltk|sdl|aqua|fb|qtopia3|qtopia4|dump|aos4|haiku)])
          ;;
       esac
     enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
@@ -2376,7 +2372,6 @@ AM_CONDITIONAL(BUILD_SDL_GUI,      [ test x$build_sdl = xyes ])
 AM_CONDITIONAL(BUILD_FB_GUI,       [ test x$build_fb = xyes ])
 AM_CONDITIONAL(BUILD_AQUA_GUI,     [ test x$build_aqua = xyes ])
 AM_CONDITIONAL(ALLSTATIC,          [ test x$build_aqua = xyes ]) dnl the Aqua-binary is always static.
-AM_CONDITIONAL(BUILD_RISCOS_GUI,   [ test x$build_riscos = xyes ])
 AM_CONDITIONAL(BUILD_DUMP_GUI,     [ test x$build_dump = xyes ])
 AM_CONDITIONAL(BUILD_AMIGAOS4_GUI, [ test x$build_aos4 = xyes ])
 AM_CONDITIONAL(BUILD_HAIKU_GUI,    [ test x$build_haiku = xyes ])
@@ -2788,9 +2783,6 @@ if test x$build_gtk = xyes; then
 fi
 if test x$build_sdl = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},sdl"
-fi
-if test x$build_riscos = xyes; then
-  SUPPORTED_GUIS="${SUPPORTED_GUIS},riscos"
 fi
 if test x$build_aqua = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},aqua"

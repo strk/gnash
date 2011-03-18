@@ -17,7 +17,7 @@
 
 # 
 # build gtk-gnash, kde-gnash, sdl-gnash, fltk-gnash, aqua-gnash, fb-gnash,
-# riscos-gnash, haiku-gnash and dump-gnash
+# haiku-gnash and dump-gnash
 #
 
 AUTOMAKE_OPTIONS = -Wno-portability
@@ -240,11 +240,6 @@ endif
 # Build the GTK gui
 if BUILD_GTK_GUI
 include $(srcdir)/gtk/gtk.am
-endif
-
-# Build the RISCOS gui
-if BUILD_RISCOS_GUI
-include $(srcdir)/riscos/riscos.am
 endif
 
 CLEANFILES = klash3.moc Kde4Gui.moc Kde4Glue.moc gnash
