@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<swf version="6" compressed="1">
+  <Header framerate="30" frames="1">
+    <size>
+      <Rectangle left="0" right="16000" top="0" bottom="12000"/>
+    </size>
+    <tags>
+      <DefineShape objectID="2" nonScalingStrokes="0" scalingStrokes="0">
+        <styles>
+          <StyleList>
+            <fillStyles>
+              <ClippedBitmap objectID="65535"/>
+              <ClippedBitmap objectID="44444"/>
+            </fillStyles>
+          </StyleList>
+        </styles>
+        <shapes>
+          <Shape>
+            <edges>
+              <ShapeSetup fillStyle0="1"/>
+              <LineTo x="4000" y="0"/>
+              <LineTo x="0" y="4000"/>
+              <LineTo x="-4000" y="0"/>
+              <LineTo x="0" y="-4000"/>
+              <ShapeSetup/>
+		<!-- TODO: add a second square referencing fillStyle1 -->
+            </edges>
+          </Shape>
+        </shapes>
+      </DefineShape>
+      <PlaceObject2 replace="0" depth="1" objectID="2"/>
+      <ShowFrame/>
+      <End/>
+    </tags>
+  </Header>
+</swf>
