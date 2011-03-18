@@ -678,22 +678,13 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 
     assert(cond & G_IO_IN);
 
-    assert(g_io_channel_get_flags(iochan) & G_IO_FLAG_NONBLOCK);
-
     gnash::log_debug("Checking player requests on FD #%d",
               g_io_channel_unix_get_fd(iochan));
 
-    int retries = 5;
-    const size_t buf_size = 512;
+    const size_t buf_size = 1;
     gchar buffer[buf_size];
 
     do {
-        if (retries-- <= 0) {
-            gnash::log_debug("Too many reads necessary to get all the data from"
-                             " the Gnash socket. Will try to get the rest later.");
-            break;
-        }
-
         GError* error = 0;
         gsize bytes_read = 0;
 
@@ -1289,19 +1280,6 @@ nsPluginInstance::setupIOChannel(int fd, GIOFunc handler, GIOCondition signals) 
 {
     GIOChannel* ichan = g_io_channel_unix_new(fd);
     g_io_channel_set_close_on_unref(ichan, true);
-
-    GError* error = 0;
-    GIOStatus rv = g_io_channel_set_flags(ichan, G_IO_FLAG_NONBLOCK,
-                                          &error);
-    if (error || rv != G_IO_STATUS_NORMAL) {
-        log_error("Could not make player communication nonblocking.");
-
-        g_io_channel_unref(ichan);
-        if (error) {
-            g_error_free(error);
-        }
-        return;
-    }
 
     gnash::log_debug("New IO Channel for fd #%d",
                      g_io_channel_unix_get_fd(ichan));
