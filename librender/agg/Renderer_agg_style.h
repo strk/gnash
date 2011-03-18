@@ -460,14 +460,7 @@ public:
     void add_bitmap(const agg_bitmap_info* bi, const SWFMatrix& mat,
         const SWFCxForm& cx, bool repeat, bool smooth) {
 
-        if (!bi) {
-            // For misc-swfmill.all/missing_bitmap.swf should be 255,0,0,255
-            // For misc-ming.all/BeginBitmapFill.swf should be 0,0,0,0
-            // See https://savannah.gnu.org/bugs/index.php?32833
-            //add_color(agg::rgba8_pre(255,0,0,255));
-            add_color(agg::rgba8_pre(0,0,0,0));
-            return;
-        }
+        assert(bi);
 
         // Tiled
         if (repeat) {
@@ -653,8 +646,20 @@ struct AddStyles : boost::static_visitor<>
 
         const bool tiled = (f.type() == BitmapFill::TILED);
 
-        _sh.add_bitmap(dynamic_cast<const agg_bitmap_info*>(f.bitmap()),
+        const CachedBitmap* bm = f.bitmap(); 
+
+        if (!bm) {
+            // See misc-swfmill.all/missing_bitmap.swf
+            _sh.add_color(agg::rgba8_pre(255,0,0,255));
+        }
+        else if ( bm->disposed() ) {
+            // See misc-ming.all/BeginBitmapFill.swf
+            _sh.add_color(agg::rgba8_pre(0,0,0,0));
+        }
+        else {
+            _sh.add_bitmap(dynamic_cast<const agg_bitmap_info*>(bm),
                 m, _cx, tiled, smooth);
+        }
     }
 
 private:

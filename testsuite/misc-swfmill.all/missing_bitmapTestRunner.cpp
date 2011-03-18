@@ -63,7 +63,7 @@ main(int /*argc*/, char** /*argv*/)
 
 
     // See https://savannah.gnu.org/bugs/index.php?32833
-	xcheck_pixel(100, 100, 20, red, tol);
+	check_pixel(100, 100, 20, red, tol);
 	check_pixel(300, 100, 20, white, tol);
 	check_pixel(100, 300, 20, white, tol);
 
