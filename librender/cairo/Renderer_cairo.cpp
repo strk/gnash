@@ -281,10 +281,24 @@ struct StyleHandler : boost::static_visitor<cairo_pattern_t*>
     cairo_pattern_t* operator()(const BitmapFill& f) const {
         SWFMatrix m = f.matrix();
       
-        const bitmap_info_cairo* binfo =
-            dynamic_cast<const bitmap_info_cairo*>(f.bitmap());
+        const CachedBitmap* bm = f.bitmap();
 
-        if (!binfo) return 0;
+        if (!bm) {
+            // See misc-swfmill.all/missing_bitmap.swf
+            cairo_pattern_t* pattern =
+                cairo_pattern_create_rgba(255, 0, 0, 255);
+            return pattern;
+        }
+
+        if (bm->disposed()) {
+            // See misc-ming.all/BeginBitmapFill.swf
+            cairo_pattern_t* pattern =
+                cairo_pattern_create_rgba(0, 0, 0, 0);
+            return pattern;
+        }
+
+        const bitmap_info_cairo* binfo =
+            dynamic_cast<const bitmap_info_cairo*>(bm);
       
         cairo_matrix_t mat;
         init_cairo_matrix(&mat, m);       
