@@ -42,8 +42,7 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--enable-extensions=all \
 	--enable-gui=all \
 	--enable-python \
-	--enable-cygnal \
-	--with-swfdec-testsuite
+	--enable-cygnal
 
 if CYGNAL
 CYGNAL_DIR = cygnal
