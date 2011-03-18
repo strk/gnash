@@ -20,7 +20,8 @@
 #define BACKEND_RENDER_HANDLER_AGG_STYLE_H
 
 // TODO: Instead of re-creating AGG fill styles again and again, they should
-// be cached somewhere.
+// be cached somewhere. NOTE that bitmap styles referencing bitmaps would need
+// to re-check the bitmap definitions as parsing goes on.
 
 #include <vector>
 #include <boost/ptr_container/ptr_vector.hpp>
@@ -460,7 +461,11 @@ public:
         const SWFCxForm& cx, bool repeat, bool smooth) {
 
         if (!bi) {
-            add_color(agg::rgba8_pre(255,0,0,255));
+            // For misc-swfmill.all/missing_bitmap.swf should be 255,0,0,255
+            // For misc-ming.all/BeginBitmapFill.swf should be 0,0,0,0
+            // See https://savannah.gnu.org/bugs/index.php?32833
+            //add_color(agg::rgba8_pre(255,0,0,255));
+            add_color(agg::rgba8_pre(0,0,0,0));
             return;
         }
 
