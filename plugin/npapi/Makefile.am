@@ -46,7 +46,8 @@ AM_CPPFLAGS = -DPLUGIN_TRACE -DGNASHBINDIR=\"$(GNASHBINDIR)\" \
 	-I$(srcdir)/mozilla-sdk \
 	$(NPAPI_CFLAGS) \
 	$(X11_CFLAGS) \
-        $(GLIB_CFLAGS) \
+	$(GLIB_CFLAGS) \
+	$(BOOST_CFLAGS) \
 	$(NULL)
 
 if HAIKU
