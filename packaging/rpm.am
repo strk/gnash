@@ -31,7 +31,7 @@ gnash.spec spec: $(srcdir)/packaging/redhat/gnash.spec
 	mkdir -p $(RPMBUILD_DIR); \
 	echo "%_topdir $(RPMBUILD_DIR)" > $(RPMMACROS); \
 	snapshot_version="$(SNAPSHOT_VERSION)"; \
-	snapshot_release=`echo $${snapshot_version}|cut -d"~" -f2|sed 's/^/0.1./'`; \
+	snapshot_release=`echo $${snapshot_version}|grep "~"|sed 's/[0-9.]*~\?\(.*$\)/0.1.\1/'`; \
 	snapshot_version=`echo $${snapshot_version}|cut -d"~" -f1`; \
 	if [ "$${snapshot_release}" = "" ];then snapshot_release=1;fi; \
 	distro=`lsb_release -is`; \
