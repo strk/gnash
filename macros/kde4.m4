@@ -139,7 +139,7 @@ AC_DEFUN([GNASH_PATH_KDE4],
         AC_MSG_CHECKING([for kdeui library])
         kde4_topdir=
         for i in ${kde4_prefix}/lib64 ${kde4_prefix}/lib $libslist /usr/lib/kde4/devel /usr/lib64/kde4/devel; do
-          if test -f $i/libkdeui.${shlibext} -o -f $i/libkdeui.la; then
+          if test -f $i/libkdeui.${shlibext} -o -f $i/libkdeui.a; then
             kde4_topdir=$i
             AC_MSG_RESULT(${kde4_topdir}/libkdeui)
 	          if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
