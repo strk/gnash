@@ -376,7 +376,6 @@ endif
 if BUILD_GTK_GUI
 	@echo "	Supported GUI: GTK"
 endif
-endif
 if BUILD_DUMP_GUI
 	@echo "	Supported GUI: Dump"
 endif
