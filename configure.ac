@@ -2143,11 +2143,7 @@ AC_SUBST(WINDRES)
 
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
-if test x"${openbsd_os}" = x"yes"; then
-  GNASH_PKG_FIND(libpng, [png.h], [png images], png_info_init)
-else
-  GNASH_PKG_FIND(png, [png.h], [png images], png_info_init)
-fi
+GNASH_PKG_FIND(png, [png.h], [png images], png_info_init)
 GNASH_PKG_FIND(gif, [gif_lib.h], [gif images], DGifOpen)
 if test x"${GIF_LIBS}" = x ; then
  GNASH_PKG_FIND(ungif, [gif_lib.h], [gif images], DGifOpen)
