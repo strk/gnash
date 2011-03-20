@@ -42,7 +42,7 @@ AM_LDFLAGS =  \
 
 mysql_la_SOURCES = mysql_db.cpp mysql_db.h
 mysql_la_LDFLAGS = -module -avoid-version -no-undefined
-mysql_la_LIBDADD = $(AM_LDFLAGS)
+mysql_la_LIBADD = $(AM_LDFLAGS)
 
 CLEANFILES = \
       gnash-dbg.log
