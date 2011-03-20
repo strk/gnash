@@ -374,9 +374,6 @@ if BUILD_SSH
 	@echo "	SSH_LIBS is $(SSH_LIBS)"
 endif
 if BUILD_GTK_GUI
-if HAVE_XV
-	@echo "	Supported GUI: GTK (+XVideo)"
-else
 	@echo "	Supported GUI: GTK"
 endif
 endif
