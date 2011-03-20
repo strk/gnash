@@ -562,8 +562,6 @@ build_fb=no                     dnl Raw framebuffer
 build_fltk=no
 build_sdl=no
 build_aqua=no                   dnl Native MacOSX
-build_hildon=no                 dnl Native LIMO
-build_alp=no                    dnl Acess Linux Platform using Hiker
 build_dump=no
 AC_ARG_ENABLE(gui,
   AC_HELP_STRING([--enable-gui=], [Enable support for the specified GUI toolkits (default=gtk,kde4)]),
@@ -1618,15 +1616,7 @@ dnl   Verify dependencies for requested GUIs are met, and
 dnl   disable build of the GUIS for which deps are NOT met
 dnl ------------------------------------------------------------
 
-dnl Look for scratchbox (used in GNASH_PATH_ALP)
-dnl FIXME: move it in macros/alp.m4 or at least after
-dnl        the build_alp conditional ?
-sbox=no
-if test x"${SBOX_REDIRECT_FROM_DIRS}" != x; then
-  sbox=yes
-fi
-
-if test x$build_gtk = xyes -o $build_alp = xyes; then
+if test x$build_gtk = xyes; then
    GNASH_PATH_GTK2
    GNASH_PATH_PANGO
    GNASH_PKG_FIND(atk, [atk/atk.h], [atk library], atk_focus_tracker_init, [1.0])
