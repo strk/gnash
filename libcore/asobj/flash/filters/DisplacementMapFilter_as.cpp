@@ -18,6 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include <boost/intrusive_ptr.hpp>
 
 #include "DisplacementMapFilter_as.h"
 
@@ -30,6 +31,7 @@
 #include "Global_as.h"
 #include "BitmapFilter_as.h"
 #include "Filters.h"
+#include "smart_ptr.h"
 
 namespace gnash {
 

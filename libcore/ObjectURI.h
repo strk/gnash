@@ -27,7 +27,6 @@
 #include "namedStrings.h"
 
 #include <string>
-#include <ostream>
 #include <sstream>
 
 //#define GNASH_STATS_OBJECT_URI_NOCASE 1

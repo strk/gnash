@@ -22,7 +22,6 @@
 #include <vector>
 
 #include "as_value.h"
-#include "string_table.h"
 
 // Forward declarations
 namespace gnash {

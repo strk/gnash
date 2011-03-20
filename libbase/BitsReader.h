@@ -25,7 +25,6 @@
 #include "dsodefs.h"
 #include "log.h"
 
-#include <sstream>
 #include <cassert>
 #include <boost/cstdint.hpp> // for boost::uint32_t used in this file
 

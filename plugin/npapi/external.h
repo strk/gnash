@@ -24,11 +24,9 @@
 #endif
 
 #include <string>
-#include <sstream>
 #include <vector>
 #include <map>
 #include <boost/shared_ptr.hpp>
-#include <boost/scoped_ptr.hpp>
 
 #include "npapi.h"
 #include "npruntime.h"

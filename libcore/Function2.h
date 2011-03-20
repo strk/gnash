@@ -19,12 +19,7 @@
 #ifndef GNASH_FUNCTION2_H
 #define GNASH_FUNCTION2_H
 
-#include <vector>
-#include <cassert>
-#include <string>
-
 #include "Function.h"
-#include "smart_ptr.h"
 
 // Forward declarations
 namespace gnash {

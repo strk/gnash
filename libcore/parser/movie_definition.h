@@ -55,7 +55,6 @@
 #include <string>
 #include <memory> // for auto_ptr
 #include <vector> // for PlayList typedef
-#include <set>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/cstdint.hpp>
 

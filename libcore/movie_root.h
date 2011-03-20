@@ -79,7 +79,6 @@
 #include <boost/noncopyable.hpp>
 #include <boost/any.hpp>
 
-#include "smart_ptr.h" 
 #include "dsodefs.h" // DSOEXPORT
 #include "MouseButtonState.h" // for composition
 #include "DragState.h" // for composition

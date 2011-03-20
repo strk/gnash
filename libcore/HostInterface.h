@@ -54,7 +54,7 @@
 #include <boost/variant.hpp>
 #include <boost/any.hpp>
 #include <string>
-#include <ostream>
+#include <iosfwd>
 
 #include "dsodefs.h"
 

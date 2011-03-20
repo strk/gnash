@@ -29,13 +29,14 @@
 #include <boost/thread/barrier.hpp>
 
 #include "URL.h"
-#include "as_object.h" 
 #include "MovieClip.h" 
+#include "smart_ptr.h"
 
 // Forward declarations
 namespace gnash {
     class movie_root;
     class movie_definition;
+    class as_object;
 }
 
 namespace gnash {

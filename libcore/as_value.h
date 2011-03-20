@@ -25,7 +25,7 @@
 #include <limits>
 #include <string>
 #include <boost/variant.hpp>
-#include <ostream> // for inlined output operator
+#include <iosfwd> // for inlined output operator
 #include <boost/type_traits/is_floating_point.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/cstdint.hpp>

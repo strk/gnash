@@ -31,14 +31,12 @@
 #include <boost/cstdint.hpp> 
 #include <boost/random.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/intrusive_ptr.hpp>
 #include <boost/array.hpp>
 
 #include "GC.h"
 #include "string_table.h"
 #include "SafeStack.h"
 #include "CallStack.h"
-#include "smart_ptr.h"
 #include "as_value.h"
 #include "namedStrings.h"
 #include "ObjectURI.h"

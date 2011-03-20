@@ -23,6 +23,7 @@
 #include <cmath>
 #include <boost/numeric/ublas/matrix.hpp> // boost matrix
 #include <boost/numeric/ublas/io.hpp>
+#include <boost/intrusive_ptr.hpp>
 #include <sstream>
 
 #include "as_function.h"

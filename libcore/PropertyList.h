@@ -20,8 +20,6 @@
 #define GNASH_PROPERTYLIST_H
 
 #include <set> 
-#include <map> 
-#include <vector> 
 #include <string> // for use within map 
 #include <cassert> // for inlines
 #include <utility> // for std::pair

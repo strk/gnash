@@ -22,7 +22,6 @@
 
 #include <list>
 #include <string>
-#include <sstream>
 #include <cassert>
 
 #include "Relay.h"

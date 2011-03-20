@@ -19,7 +19,7 @@
 #ifndef GNASH_SWF_H
 #define GNASH_SWF_H
 
-#include <ostream> 
+#include <iosfwd> 
 
 namespace gnash {
 

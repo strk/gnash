@@ -24,7 +24,6 @@
 #include <string>
 
 #include "UserFunction.h"
-#include "smart_ptr.h"
 #include "ObjectURI.h"
 
 // Forward declarations

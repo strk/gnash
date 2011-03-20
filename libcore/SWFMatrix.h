@@ -27,7 +27,7 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 
-#include <ostream> 
+#include <iosfwd> 
 #include <boost/cstdint.hpp>
 
 // Forward declarations

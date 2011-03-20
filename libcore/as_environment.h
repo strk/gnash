@@ -23,7 +23,6 @@
 #include <vector>
 #include <algorithm>
 
-#include "smart_ptr.h"
 #include "as_value.h" 
 #include "SafeStack.h"
 

@@ -23,6 +23,7 @@
 #include "DisplayObject.h" 
 #include "VM.h" 
 #include "movie_root.h" 
+#include "smart_ptr.h"
 
 #include <string>
 

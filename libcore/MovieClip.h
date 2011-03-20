@@ -39,7 +39,6 @@
 #include "DisplayObjectContainer.h"
 #include "as_environment.h" // for composition
 #include "DynamicShape.h" // for composition
-#include "snappingrange.h"
 #include "dsodefs.h" // for DSOEXPORT
 
 // Forward declarations

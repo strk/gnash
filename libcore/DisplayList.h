@@ -21,12 +21,12 @@
 #define GNASH_DLIST_H
 
 #include "snappingrange.h"
-#include "DisplayObject.h"
 
 #include <string>
 #include <list>
 #include <iosfwd>
 #if GNASH_PARANOIA_LEVEL > 1 && !defined(NDEBUG)
+#include "DisplayObject.h"
 #include <set>  // for testInvariant
 #include <algorithm>
 #include "log.h"
@@ -42,9 +42,13 @@
 #endif
 
 namespace gnash {
-	class SWFCxForm;
-	class Renderer;
-	struct ObjectURI;
+    class SWFCxForm;
+    class Renderer;
+    struct ObjectURI;
+    class Transform;
+    class string_table;
+    class DisplayObject;
+    class SWFMatrix;
 }
 
 namespace gnash {

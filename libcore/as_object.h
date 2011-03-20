@@ -27,12 +27,9 @@
 #include <vector>
 #include <cmath>
 #include <utility> 
-#include <set>
-#include <sstream>
 #include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
 
-#include "string_table.h"
 #include "GC.h" // for inheritance from GcResource (to complete)
 #include "PropertyList.h"
 #include "PropFlags.h"
@@ -51,6 +48,7 @@ namespace gnash {
     class RunResources;
     class Global_as;
     class as_value;
+    class string_table;
 }
 
 namespace gnash {

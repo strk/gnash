@@ -23,7 +23,6 @@
 #include <vector>
 #include <cassert> 
 #include <ostream>
-#include <sstream>
 #include <algorithm>
 
 #include "as_object.h"

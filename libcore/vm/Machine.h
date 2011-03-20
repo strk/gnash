@@ -21,7 +21,6 @@
 
 #include <string>
 #include <vector>
-#include <sstream>
 #include "SafeStack.h"
 #include "as_value.h"
 #include "log.h"
