@@ -1375,18 +1375,6 @@ AC_ARG_ENABLE(fps-debug,
   yes) AC_DEFINE([GNASH_FPS_DEBUG], [1], [Enable FPS debugging code])
 esac])
 
-dnl When we're making binary releases, it's often nice to just statically link
-dnl the final executables so we don't worry about what's installed, or which
-dnl version it is.
-AC_ARG_ENABLE(allstatic,
-  AC_HELP_STRING([--enable-allstatic],[Enable using static libraries when possible for dependencies]),
-[case "${enableval}" in
-  yes) allstatic=yes ;;
-  no)  allstatic=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-allstatic option]) ;;
-esac],allstatic=no)
-AM_CONDITIONAL(ALLSTATIC, test x$allstatic = xyes)
-
 dnl IPC_INFO isn't portable, and doesn't exist on BSD
 AC_TRY_COMPILE([#include <sys/ipc.h> #include <sys/shm.h>], [
   int flag = IPC_INFO; ],
@@ -2357,7 +2345,6 @@ AM_CONDITIONAL(BUILD_FLTK_GUI,     [ test x$build_fltk = xyes ])
 AM_CONDITIONAL(BUILD_SDL_GUI,      [ test x$build_sdl = xyes ])
 AM_CONDITIONAL(BUILD_FB_GUI,       [ test x$build_fb = xyes ])
 AM_CONDITIONAL(BUILD_AQUA_GUI,     [ test x$build_aqua = xyes ])
-AM_CONDITIONAL(ALLSTATIC,          [ test x$build_aqua = xyes ]) dnl the Aqua-binary is always static.
 AM_CONDITIONAL(BUILD_DUMP_GUI,     [ test x$build_dump = xyes ])
 AM_CONDITIONAL(BUILD_AMIGAOS4_GUI, [ test x$build_aos4 = xyes ])
 AM_CONDITIONAL(BUILD_HAIKU_GUI,    [ test x$build_haiku = xyes ])
