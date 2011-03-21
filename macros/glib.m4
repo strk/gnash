@@ -56,7 +56,7 @@ AC_DEFUN([GNASH_PATH_GLIB],
           if test -f ${gnash_glib_config}/include/glibconfig.h; then
             ac_cv_path_glib_incl="${ac_cv_path_glib_incl} -I${gnash_glib_config}/include"
           fi
-          break
+          break 2
         fi
       done
     done
