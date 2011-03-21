@@ -119,6 +119,8 @@ public:
     virtual void setFullscreen();
     virtual bool showMouse(bool show);
     virtual void unsetFullscreen();
+    virtual void setClipboard(const std::string& copy);
+
     void setInvalidatedRegions(const InvalidatedRanges& ranges);
     void resize(int width, int height);
     void showProperties();

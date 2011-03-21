@@ -54,6 +54,8 @@
 #include <QLCDNumber>
 #include <QSpinBox>
 #include <QSocketNotifier>
+#include <QClipboard>
+#include <QString>
 
 #include "Range2d.h"
 
@@ -88,6 +90,13 @@ Kde4Gui::~Kde4Gui()
 {
 }
 
+void
+Kde4Gui::setClipboard(const std::string& copy)
+{
+    QClipboard* cb = QApplication::clipboard();
+    assert(cb);
+    cb->setText(QString::fromStdString(copy));
+}
 
 bool
 Kde4Gui::init(int /*argc*/, char ** /*argv*/[])
