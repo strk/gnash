@@ -807,7 +807,7 @@ build_cairo=yes
 renderer_list="AGG Cairo"
 nrender=3
 AC_ARG_ENABLE(renderer,
-  AC_HELP_STRING([--enable-renderer=], [Enable support for the specified renderers (ogl|gles|cairo|agg|all, default=all)]),
+  AC_HELP_STRING([--enable-renderer=], [Enable support for the specified renderers (ogl|cairo|agg|all, default=all)]),
   if test -n ${enableval}; then
     if test "x${enableval}" != "xno" -o "x${enableval}" != "xnone" ; then
       renderer_list="none"
