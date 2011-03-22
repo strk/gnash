@@ -102,6 +102,7 @@ public:
     virtual void unsetFullscreen();
     virtual void setClipboard(const std::string& copy);
     virtual std::pair<int, int> screenResolution() const;
+    virtual double getScreenDPI() const;
 
     void setInvalidatedRegions(const InvalidatedRanges& ranges);
     void resize(int width, int height);

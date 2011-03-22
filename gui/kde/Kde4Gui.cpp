@@ -361,6 +361,14 @@ Kde4Gui::unsetFullscreen()
         }
     }
 }
+    
+double
+Kde4Gui::getScreenDPI() const
+{
+    assert(_drawingWidget);
+    // Should this be logical or physical DPI?
+    return _drawingWidget->logicalDpiX();
+}
 
 std::pair<int, int>
 Kde4Gui::screenResolution() const

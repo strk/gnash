@@ -29,14 +29,14 @@
 
 class QRect;
 class QGLWidget;
+
 namespace gnash {
     class Renderer;
     class DrawingWidget;
     class Kde4Gui;
 }
 
-namespace gnash
-{
+namespace gnash {
 
 class DrawingWidget : public QWidget
 {
