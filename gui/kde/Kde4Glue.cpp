@@ -28,12 +28,15 @@
 #include "Kde4Gui.h"
 #include <QWidget>
 #include <QPaintEvent>
+#include <QMouseEvent>
+#include <QWheelEvent>
 
 namespace gnash {
 
 /// DrawingWidget implementation
 DrawingWidget::DrawingWidget(Kde4Gui& gui)
-    : _gui(gui)
+    :
+    _gui(gui)
 {
 }
 
@@ -47,6 +50,12 @@ void
 DrawingWidget::timerEvent(QTimerEvent*)
 {
     Gui::advance_movie(&_gui);
+}
+
+void
+DrawingWidget::wheelEvent(QWheelEvent* event)
+{
+    _gui.notifyMouseWheel(event->delta() > 0 ? 1 : -1);
 }
 
 void

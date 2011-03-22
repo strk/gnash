@@ -62,15 +62,17 @@ public slots:
     void quit();
 
 protected:
-    void paintEvent(QPaintEvent*);
-    void timerEvent(QTimerEvent*);
-    void resizeEvent(QResizeEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
-    void mousePressEvent(QMouseEvent *event); 
-    void mouseMoveEvent(QMouseEvent *event); 
-    void keyPressEvent(QKeyEvent *event);
-    void keyReleaseEvent(QKeyEvent *event);
-    void contextMenuEvent(QContextMenuEvent *event);
+    void paintEvent(QPaintEvent* event);
+    void timerEvent(QTimerEvent* event);
+    void resizeEvent(QResizeEvent* event);
+    void mouseReleaseEvent(QMouseEvent* event);
+    void mousePressEvent(QMouseEvent* event); 
+    void mouseMoveEvent(QMouseEvent* event); 
+    void wheelEvent(QWheelEvent* event); 
+
+    void keyPressEvent(QKeyEvent* event);
+    void keyReleaseEvent(QKeyEvent* event);
+    void contextMenuEvent(QContextMenuEvent* event);
     
 private:
     Kde4Gui& _gui;
