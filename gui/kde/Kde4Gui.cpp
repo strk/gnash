@@ -52,9 +52,9 @@
 #include <QCheckBox>
 #include <QLCDNumber>
 #include <QSpinBox>
-#include <QSocketNotifier>
 #include <QClipboard>
 #include <QString>
+#include <QDesktopWidget>
 
 #include "Range2d.h"
 
@@ -360,6 +360,16 @@ Kde4Gui::unsetFullscreen()
             _embedWidget->embedInto(_xid);
         }
     }
+}
+
+std::pair<int, int>
+Kde4Gui::screenResolution() const
+{
+    QDesktopWidget* d = QApplication::desktop();
+    assert(d);
+
+    const QRect c = d->screenGeometry();
+    return std::make_pair(c.width(), c.height());
 }
 
 gnash::key::code
