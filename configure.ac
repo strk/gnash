@@ -401,7 +401,6 @@ AC_SUBST(STATISTICS_LIST)
 #
 solreadonly=no
 localconnection=yes
-lctrace=yes
 
 AC_ARG_WITH(security,
   AC_HELP_STRING([--with-security=], [Specify which security features to enable]),
@@ -427,17 +426,12 @@ AC_ARG_WITH(security,
         localconnection=yes
         nsecurity=$((nsecurity+1))
         ;;
-      lctrace)
-        lctrace=yes
-        nsecurity=$((nsecurity+1))
-        ;;
       all|ALL)
         solreadonly=yes
         lc=yes
-        lctrace=yes
         nsecurity=3
         ;;
-      *) AC_MSG_ERROR([invalid security feature specified: ${withval} given (accept: solreadonly|lc|lctrace)])
+      *) AC_MSG_ERROR([invalid security feature specified: ${withval} given (accept: solreadonly|lc)])
         ;;
       esac]
     withval=`echo ${withval} | cut -d ' ' -f 2-6`
@@ -446,13 +440,6 @@ AC_ARG_WITH(security,
     fi
   done
 )
-if test xlctrace = xyes; then
-  security_list="${security_list} lctrace"
-  AC_DEFINE(USE_LC_TRACE, [1],
-           [Support LocalConnection])
-  AC_MSG_NOTICE([This build supports LocalConnection tracing])
-  AC_MSG_WARN([This option will effect your performance])
-fi
 
 if test x$localconnection = xyes; then
   security_list="${security_list} localconnection"
@@ -1130,21 +1117,6 @@ AM_CONDITIONAL(HAVE_CSOUND, test x"$CSOUND" != x)
 AC_PATH_PROG(GIT, git)
 AC_SUBST(GIT)
 
-dnl -------------------------------------
-dnl LIRC
-dnl -------------------------------------
-AC_ARG_ENABLE(lirc, AC_HELP_STRING([--enable-lirc], [Disable support for Lirc]),
-[case "${enableval}" in
-  yes) lirc=yes ;;
-  no)  lirc=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for enable-lirc option]) ;;
-esac], lirc=no)
-
-if test x"$lirc" = x"yes"; then
-  AC_DEFINE([USE_LIRC], [], [LIRC daemon support])
-fi
-AM_CONDITIONAL(USE_LIRC, test x$lirc = xyes)
-
 dnl --------------------------------------------------------
 dnl Extension selection
 dnl --------------------------------------------------------
@@ -1790,8 +1762,6 @@ AC_DEFINE(USE_GIF, [1], [Use the GIF library])
 AC_DEFINE(USE_PNG, [1], [Use the PNG library])
 AM_CONDITIONAL(USE_GIF, true)
 AM_CONDITIONAL(USE_PNG, true)
-
-AM_CONDITIONAL(HAVE_DMALLOC, [ test x$has_dmalloc = xyes ])
 
 AC_PATH_TOOL([AUTOTRACE], [autotrace])
 AC_HEADER_DIRENT
@@ -2880,13 +2850,6 @@ else
   els
      echo "        POSIX Thread support disabled."
   fi
-fi
-
-if test x"${dmalloc}" = x"yes"; then
-  echo "        DMalloc support enabled"
-  echo "        For a list of the command-line options enter: dmalloc --usage"
-else
-  echo "        DMalloc support disabled (default). Use --enable-dmalloc to enable."
 fi
 
 if test x"${npapi}" = x"yes"; then
