@@ -89,9 +89,6 @@ namespace {
     void menuQualityHigh(GtkMenuItem *menuitem, gpointer instance); 
     void menuQualityBest(GtkMenuItem *menuitem, gpointer instance);
 
-    gboolean fd_callback_handler(GIOChannel *source, GIOCondition condition,
-                                 gpointer data);
-
     void timeoutQuit(gpointer data);
 
     // Event handlers
@@ -288,29 +285,6 @@ GtkGui::setTimeout(unsigned int timeout)
     g_timeout_add(timeout, (GSourceFunc)timeoutQuit, this);
 }
 
-
-bool
-GtkGui::watchFD(int fd)
-{
-    // NOTE: "The default encoding for GIOChannel is UTF-8. If your application
-    // is reading output from a command using via pipe, you may need to set the
-    // encoding to the encoding of the current locale (see g_get_charset())
-    // with the g_io_channel_set_encoding() function."
-
-    GIOChannel* gio_read = g_io_channel_unix_new(fd);
-    
-    if (!gio_read) {
-        return false;
-    }
-    
-    if (!g_io_add_watch (gio_read, GIOCondition(G_IO_HUP),
-                         GIOFunc (fd_callback_handler), this)) {
-        g_io_channel_unref(gio_read);
-        return false;
-    }
-    
-    return true;
-}
 
 void
 GtkGui::error(const std::string& msg)
@@ -2727,18 +2701,6 @@ menuQualityBest(GtkMenuItem* /*menuitem*/, gpointer data)
     Gui* gui = static_cast<Gui*>(data);
     gui->setQuality(QUALITY_BEST);
 }
-
-gboolean
-fd_callback_handler(GIOChannel *source, GIOCondition /*condition*/,
-                    gpointer data)
-{
-    Gui* gui = static_cast<Gui*>(data);
-
-    gui->callCallback(g_io_channel_unix_get_fd (source));
-
-    return true;
-}
-
 
 } // anonymous namespace
 

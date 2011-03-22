@@ -22,7 +22,6 @@
 #include "gnashconfig.h"
 #endif
 
-
 #include <map>
 #include <boost/assign/list_inserter.hpp>
 
@@ -81,7 +80,6 @@ namespace gnash
 
 Kde4Gui::Kde4Gui(unsigned long xid, float scale, bool loop, RunResources& r)
  : Gui(xid, scale, loop, r)
- , _fdMonitor(*this)
 {
 }
 
@@ -162,15 +160,6 @@ Kde4Gui::run()
 {
     return _application->exec();
 }
-
-
-bool
-Kde4Gui::watchFD(int fd)
-{
-    _fdMonitor.addFD(fd);
-    return true;
-}
-
 
 bool
 Kde4Gui::createWindow(const char* windowtitle, int width, int height,
@@ -731,12 +720,14 @@ EmbedWidget::EmbedWidget(Kde4Gui& gui)
     connect(_playButton, SIGNAL(clicked()), _drawingWidget, SLOT(play()));
 }
 
-void EmbedWidget::hidePlayButton()
+void
+EmbedWidget::hidePlayButton()
 {
     _playButton->hide();
 }
 
-void EmbedWidget::showPlayButton()
+void
+EmbedWidget::showPlayButton()
 {
     _playButton->show();
 }
@@ -1013,35 +1004,7 @@ PreferencesDialog::savePreferences()
     emit accept();
 }
 
-
 } // End of Kde4GuiPrefs namespace
-
-FDMonitor::FDMonitor(Kde4Gui& gui)
-    : _gui(gui)
-{
-}
-
-FDMonitor::~FDMonitor()
-{
-}
-
-void
-FDMonitor::dataReceived(int fd)
-{
-    _gui.callCallback(fd);
-}
-
-void
-FDMonitor::addFD(int fd)
-{
-    QSocketNotifier* socketNotifier =
-                        new QSocketNotifier(fd, QSocketNotifier::Read, this);
-
-    connect(socketNotifier, SIGNAL(activated(int)),
-            this, SLOT(dataReceived(int)));
-
-    socketNotifier->setEnabled(true);
-}
 
 }
 

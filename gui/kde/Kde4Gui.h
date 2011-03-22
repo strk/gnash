@@ -82,24 +82,6 @@ private:
 };
 
 
-class FDMonitor : public QObject
-{
-    Q_OBJECT
-public:
-    FDMonitor(Kde4Gui& gui);
-    ~FDMonitor();
-
-    // Add a file descriptor for monitoring.
-    void addFD(int fd);
-
-public slots:
-    void dataReceived(int fd);
-
-private:
-    Kde4Gui& _gui;
-};
-
-
 class DSOEXPORT Kde4Gui :  public Gui
 {
 public:
@@ -110,7 +92,6 @@ public:
                               int xPosition = 0, int yPosition = 0);
     virtual void resizeWindow(int width, int height);
     virtual bool run();
-    virtual bool watchFD(int fd);
     virtual void renderBuffer();
     virtual void setInterval(unsigned int interval);
     virtual void setTimeout(unsigned int timeout);
@@ -150,9 +131,6 @@ private:
 
     /// Called when the movie is played.
     void playHook();
-
-    /// Object that allows the mainloop to read file descriptors.
-    FDMonitor _fdMonitor;
 
     DrawBounds _drawbounds;
  

@@ -79,8 +79,6 @@ public:
     virtual double getScreenDPI() const;
 
     virtual void setClipboard(const std::string& copy);
-    
-    bool watchFD(int fd);
 
     /// Grab focus so to receive all key events
     //

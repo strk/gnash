@@ -103,18 +103,6 @@ public:
       _interval = interval;
     }
 
-    /// Instructs the Gui to monitor a file descriptor.
-    //
-    /// @param fd The file descriptor to monitor
-    /// @param callback The callback to fire
-    void setFDCallback(int fd, boost::function<void ()> callback);
-
-    /// Calls the callback function registered for a file descriptor.
-    //
-    /// @param fd The file descriptor for which the registered callback should
-    ///        be fired.
-    void callCallback(int fd);
-
     /// Return the clock provided by this Gui.
     //
     /// The Gui clock will be paused when the gui is put

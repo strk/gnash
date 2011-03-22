@@ -1319,32 +1319,6 @@ Gui::getQuality() const
     return _stage->getQuality();
 }
 
-void
-Gui::setFDCallback(int fd, boost::function<void ()> callback)
-{
-    log_debug("Setting callback for fd #%d", fd);
-    
-    _fd_callbacks[fd] = callback;
-
-    watchFD(fd);
-}
-
-
-void
-Gui::callCallback(int fd)
-{
-    std::map<int, boost::function<void ()> >::iterator it = _fd_callbacks.find(fd);
-
-    if (it == _fd_callbacks.end()) {
-        log_error("Attempted to call a callback for an unregistered fd.");
-        return;
-    }
-
-    boost::function<void()>& f = it->second;
-
-    f();
-}
-// end of namespace
 }
 
 // local Variables:
