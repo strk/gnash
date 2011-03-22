@@ -206,7 +206,7 @@ include $(srcdir)/kde/kde3.am
 endif
 
 # Build the KDE4 gui
-if BUILD_KDE4_GUI
+if BUILD_QT4_GUI
 BUILT_SOURCES += Kde4Gui.moc
 BUILT_SOURCES += Kde4Glue.moc
 include $(srcdir)/kde/kde4.am

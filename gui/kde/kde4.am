@@ -18,7 +18,7 @@
 #
 # Build the KDE gui
 # 
-if BUILD_KDE4_GUI
+if BUILD_QT4_GUI
 
 Kde4Gui.moc: $(srcdir)/kde/Kde4Gui.h
 	@if test x"$(MOC4)" != x; then \
@@ -49,7 +49,7 @@ kde4_gnash_SOURCES = $(GUI_SRCS) \
 	kde/Kde4Gui.h \
 	kde/Kde4Glue.h
 
-kde4_gnash_CPPFLAGS = -DGUI_KDE4 -DGUI_CONFIG=\"KDE4\" $(AM_CPPFLAGS) $(KDE4_CFLAGS) $(QT4_CFLAGS)
+kde4_gnash_CPPFLAGS = -DGUI_KDE4 -DGUI_CONFIG=\"KDE4\" $(AM_CPPFLAGS) $(QT4_CFLAGS)
 kde4_gnash_LDFLAGS = -export-dynamic 
 kde4_gnash_LDADD = \
 	$(MYSQL_LIBS) \

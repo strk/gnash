@@ -21,7 +21,7 @@ icons32_DATA += ../packaging/gnash.xpm
 bin_SCRIPTS  += gnash-gtk-launcher
 endif
 
-if BUILD_KDE4_GUI
+if BUILD_QT4_GUI
 desktop_DATA += klash.desktop
 icons32_DATA += ../packaging/klash.xpm
 bin_SCRIPTS  += gnash-qt-launcher

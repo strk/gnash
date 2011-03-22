@@ -131,7 +131,7 @@ if BUILD_GTK_GUI
 EXTRAMANPAGES += gtk-gnash.1 gnash-gtk-launcher.1
 endif
 
-if BUILD_KDE4_GUI
+if BUILD_QT4_GUI
 EXTRAMANPAGES += kde4-gnash.1 gnash-qt-launcher.1
 endif
 

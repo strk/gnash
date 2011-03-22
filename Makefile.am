@@ -242,9 +242,9 @@ if BUILD_KDE3_GUI
 	@echo "	KDE3_CFLAGS is $(KDE3_CFLAGS)"
 	@echo "	KDE3_LIBS is $(KDE3_LIBS)"
 endif
-if BUILD_KDE4_GUI
-	@echo "	KDE4_CFLAGS is $(KDE4_CFLAGS)"
-	@echo "	KDE4_LIBS is $(KDE4_LIBS)"
+if BUILD_QT4_GUI
+	@echo "	QT4_CFLAGS is $(QT4_CFLAGS)"
+	@echo "	QT4_LIBS is $(QT4_LIBS)"
 endif
 if BUILD_QT3_GUI
 	@echo "	QT3_CFLAGS is $(QT3_CFLAGS)"
@@ -378,8 +378,8 @@ endif
 if BUILD_KDE3_GUI
 	@echo "	Supported GUI: KDE3"
 endif
-if BUILD_KDE4_GUI
-	@echo "	Supported GUI: KDE4"
+if BUILD_QT4_GUI
+	@echo "	Supported GUI: QT4"
 endif
 if BUILD_QTOPIA3_GUI
 	@echo "	Supported GUI: QTOPIA3"

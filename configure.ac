@@ -541,7 +541,7 @@ dnl --------------------------------------------------------
 build_haiku=no
 build_aos4=no      dnl AmigaOS4 GUI
 build_kde3=no      dnl WARNING: doesn't work (see https://savannah.gnu.org/bugs/index.php?31782)
-build_kde4=no
+build_qt4=no
 build_qtopia3=no
 build_qtopia4=no
 build_gtk=no
@@ -565,7 +565,7 @@ AC_ARG_ENABLE(gui,
         build_kde3=yes
         ;;
       kde4|KDE4)
-        build_kde4=yes
+        build_qt4=yes
         ;;
       qtopia3|QTOPIA3)
         build_qtopia3=yes
@@ -601,7 +601,7 @@ AC_ARG_ENABLE(gui,
           build_fb=yes
         fi
         if test x${openbsd} != xyes; then
-          build_kde4=yes
+          build_qt4=yes
         fi
         build_sdl=yes
         build_gtk=yes
@@ -623,7 +623,7 @@ AC_ARG_ENABLE(gui,
   else if test x"${haiku}" = xyes; then
     build_haiku=yes;
   else
-    build_kde4=auto
+    build_qt4=auto
     build_gtk=yes
     build_dump=auto
   fi
@@ -1588,20 +1588,15 @@ if test x$build_gtk = xyes; then
    fi
 fi
 
-
-if test x"${build_kde4}" != xno -o x"${build_qtopia4}" != xno; then
+if test x"${build_qt4}" != xno; then
  GNASH_PATH_QT4
 fi
 
-if test x"${build_kde4}" != xno; then
-  GNASH_PATH_KDE4
-fi
-
-if test x"${build_kde4}" = xauto; then
-  if test x"${has_qt4}" = xyes -a x"${has_kde4}" = xyes; then
-     build_kde4=yes
+if test x"${build_qt4}" = xauto; then
+  if test x"${has_qt4}" = xyes; then
+     build_qt4=yes
   else
-     build_kde4=no
+     build_qt4=no
   fi
 fi
 
@@ -1800,7 +1795,11 @@ AC_ARG_ENABLE(kparts4,
   yes) build_kparts4=yes ;;
   no)  build_kparts4=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for --disable-kparts4 option]) ;;
-esac],build_kparts4=$build_kde4)
+esac],build_kparts4=$build_qt4)
+
+if test x"${build_kparts4}" != xno; then
+  GNASH_PATH_KDE4
+fi
 
 dnl -----------------------------------------------------------
 dnl Add NPAPI support, if specified or GTK or KDE4 gui is built
@@ -1813,7 +1812,7 @@ AC_ARG_ENABLE(npapi,
     no)  npapi=no ;;
     *)   AC_MSG_ERROR([bad value ${enableval} for disable-npapi option]) ;;
   esac],
-  if test x$build_gtk = xyes -o x$build_kde4 = xyes; then
+  if test x$build_gtk = xyes -o x$build_qt4 = xyes; then
     npapi=yes
   fi
 )
@@ -2245,7 +2244,6 @@ AM_CONDITIONAL(HAVE_KDE4,    [test x$has_kde4 = xyes])
 AM_CONDITIONAL(HAVE_QT3,     [test x$has_qt3 = xyes])
 AM_CONDITIONAL(HAVE_QT4,     [test x$has_qt4 = xyes])
 
-AM_CONDITIONAL(WITH_KDE4,    [test "$with_kde4" != "no"])
 AM_CONDITIONAL([QT_X11],     [test "$platform" = "X11"])
 AM_CONDITIONAL([QTOPIA],     [test "$platform" = "Qtopia"])
 AM_CONDITIONAL([QT_OSX],     [test "$platform" = "OSX"])
@@ -2260,7 +2258,7 @@ fi
 AM_CONDITIONAL(HAVE_GLIB, [ test x"${has_glib}" = xyes ])
 
 if test x$npapi = xyes; then
-  if ! test x$build_gtk = xyes -o x$build_kde4 = xyes; then
+  if ! test x$build_gtk = xyes -o x$build_qt4 = xyes; then
     AC_MSG_WARN(["Enabled NPAPI plugin, but it's not supported by the selected GUI"])
   fi
 fi
@@ -2294,7 +2292,7 @@ if test x$has_kde4 = xno -a x$build_kparts4 = xyes; then
   AC_MSG_WARN(["Disabling KPARTS 4.x plugin, no KDE 4.x development found"])
 fi
 
-if test x$build_kde4 = xno -a x$kparts4 = xyes; then
+if test x$build_qt4 = xno -a x$kparts4 = xyes; then
   AC_MSG_WARN(["Enabled KPARTS 4.x plugin, but you aren't building a KDE 4.x based GUI!"])
 fi
 
@@ -2305,10 +2303,10 @@ dnl Drop these conditionals ?
 AM_CONDITIONAL(BUILD_QT3_GUI,
     [ test x"${build_kde3}" = xyes -o x"${build_qtopia3}" = xyes ])
 AM_CONDITIONAL(BUILD_QT4_GUI,
-    [ test x"${build_kde4}" = xyes -o x"${build_qtopia4}" = xyes ])
+    [ test x"${build_qt4}" = xyes -o x"${build_qtopia4}" = xyes ])
 
 AM_CONDITIONAL(BUILD_KDE3_GUI,     [ test x$build_kde3 = xyes ])
-AM_CONDITIONAL(BUILD_KDE4_GUI,     [ test x$build_kde4 = xyes ])
+AM_CONDITIONAL(BUILD_QT4_GUI,     [ test x$build_qt4 = xyes ])
 
 AM_CONDITIONAL(BUILD_GTK_GUI,      [ test x$build_gtk = xyes ])
 AM_CONDITIONAL(BUILD_FLTK_GUI,     [ test x$build_fltk = xyes ])
@@ -2718,7 +2716,7 @@ fi
 if test x$build_kde3 = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},kde3"
 fi
-if test x$build_kde4 = xyes; then
+if test x$build_qt4 = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},kde4"
 fi
 if test x$build_gtk = xyes; then
@@ -2899,7 +2897,7 @@ if test x"${build_kde3}" = xyes -o x"${build_qtopia3}" = xyes; then
 fi
 
 dnl Dump QT4 options is the user specified a QTOPIA4 or KDE4 GUI
-if test x"${build_kde4}" = xyes -o x"${build_qtopia4}" = xyes; then
+if test x"${build_qt4}" = xyes -o x"${build_qtopia4}" = xyes; then
   if test x"${has_qt4}" = xyes; then
     echo "        QT4 flags are: ${QT4_CFLAGS}"
     echo "        QT4 libs are: ${QT4_LIBS}"
@@ -2908,6 +2906,20 @@ if test x"${build_kde4}" = xyes -o x"${build_qtopia4}" = xyes; then
     echo "               Install a QT 4.x development environment from http://trolltech.com" >&3
     echo "               or .deb users: apt-get install qt4-dev-tools" >&3
     echo "               or change to a different gui with --enable-gui=..." >&3
+  fi
+fi
+
+if test x"${build_kparts4}" = xyes; then
+  if test x"${has_kde4}" = xyes; then
+    echo "        KDE4 flags are: ${KDE4_CFLAGS}"
+    echo "        KDE4 libs are: ${KDE4_LIBS}"
+  else
+    echo "        kparts4 plugin is disabled"
+    echo "               To enable the KDE 4.x gui," >&3
+    echo "               install version 4.x of the KDE development environment" >&3
+    echo "               from http://kde.org" >&3
+    echo "               or .deb users: apt-get install kdelibs5-dev" >&3
+    echo "               or .rpm users: yum install kdelibs-devel." >&3
   fi
 fi
 
@@ -2958,25 +2970,6 @@ if test x$build_kde3 = xyes; then
       echo "               from http://kde.org" >&3
       echo "               or .deb users: apt-get install kdelibs4-dev" >&3
       echo "               or .rpm users: yum install kdelibs3-devel." >&3
-  fi
-fi
-
-# -o x$build_kparts4 = xyes
-if test x$build_kde4 = xyes; then
-  if test x"$has_kde4" = xyes; then
-    echo "        KDE 4.x flags are: $KDE4_CFLAGS"
-    echo "        KDE 4.x libs are: $KDE4_LIBS"
-  else
-      echo "        ERROR: No KDE 4.x development package installed!" >&3
-      echo "               To disable the KDE 4.x gui," >&3
-      echo "               reconfigure using --enable-gui=<list-of-guis>" >&3
-      echo "               and omit "kde4" from the list" >&3
-      echo "               or avoid --enable-gui=... as a whole." >&3
-      echo "               To be able to build the kde 4.x gui," >&3
-      echo "               install version 4.x of the KDE development environment" >&3
-      echo "               from http://kde.org" >&3
-      echo "               or .deb users: apt-get install kdelibs5-dev" >&3
-      echo "               or .rpm users: yum install kdelibs-devel." >&3
   fi
 fi
 
