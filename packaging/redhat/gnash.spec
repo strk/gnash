@@ -1,6 +1,6 @@
 Name:           gnash
 # This next field gets edited by "make gnash.spec" when building an rpm
-Version:        master
+Version:        0.8.10dev
 Release:        0
 Epoch: 		1
 # This next field gets edited by "make gnash.spec" when building an rpm
@@ -15,7 +15,7 @@ URL:            http://www.gnu.org/software/gnash/
 Source0:        http://www.getgnash.org/packages/snapshots/fedora/%{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%{_target_cpu}
 
-BuildRequires:  redhat-lsb
+BuildRequires:  redhat-lsb mysql-devel
 # bitmap libraries for loading images
 BuildRequires:  libpng-devel libjpeg-devel giflib-devel
 # these are needed for the python gtk widget
@@ -299,6 +299,7 @@ scrollkeeper-update -q || :
 
 %files
 %defattr(-,root,root,-)
+%{_bindir}/gnash-gtk-launcher
 %{_bindir}/gtk-gnash
 %{_mandir}/man1/gtk-gnash.1.gz
 
@@ -324,19 +325,21 @@ scrollkeeper-update -q || :
 %{_mandir}/man1/findmicrophones.1.gz
 %{_mandir}/man1/findwebcams.1.gz
 %{_mandir}/man1/rtmpget.1.gz
+%{_mandir}/man1/gnash-gtk-launcher.1.gz
 %{_datadir}/locale/*/LC_MESSAGES/gnash.mo
+%{_prefix}/share/applications/gnash.desktop
+%{_prefix}/share/icons/hicolor/32x32/apps/gnash.xpm
+%{_prefix}/share/gnash/gnash-splash.swf
 %if !%{cross_compile}
 #%{_prefix}/share/info/*.info*
-%{_prefix}/share/doc/gnash/*.html
-%{_prefix}/share/doc/gnash/images/*.png
+%{_prefix}/share/gnash/doc/gnash/C/gnash*.html
+%{_prefix}/share/gnash/doc/gnash/C/images/*.png
 %{_prefix}/etc/gnashrc
 %{_prefix}/etc/gnashpluginrc
 # %{_infodir}/*.info*
-#%doc doc/C/gnash*.html 
+#%doc doc/C/gnash*.html
 #%doc doc/C/images/*.png
 #%doc doc/C/images/*.txt
-# %doc %{_prefix}/share/gnash/doc/gnash/C/images
-# %doc %{_prefix}/share/gnash/doc/gnash/C/*.xml
 %endif
 
 %files plugin
@@ -365,12 +368,16 @@ scrollkeeper-update -q || :
 
 %files klash4
 %defattr(-,root,root,-)
+%{_bindir}/gnash-qt-launcher
 %{_bindir}/kde4-gnash
-%{_mandir}/man1/kde4-gnash.1.gz
-%{_prefix}/%{_lib}/kde4/libklashpart.*
+%{_mandir}/man1/kde4-gnash.1.*
+%{_mandir}/man1/gnash-qt-launcher.1.gz
+%{_prefix}/lib*/kde4/libklashpart.*
 %{_prefix}/share/kde4/apps/klash/klashpartui.rc
 %{_prefix}/share/kde4/apps/klash/pluginsinfo
 %{_prefix}/share/kde4/services/klash_part.desktop
+%{_prefix}/share/applications/klash.desktop
+%{_prefix}/share/icons/hicolor/32x32/apps/klash.xpm
 
 %files fileio-extension
 %defattr(-,root,root,-)

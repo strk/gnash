@@ -5,7 +5,7 @@
 \\$2 \(la\\$1\(ra\\$3
 ..
 .if \n(.g .mso www.tmac
-.TH cygnal 1 "22 August 2010" "" ""
+.TH cygnal 1 "30 January 2011" "" ""
 .SH NAME
 cygnal \- Cygnal
 .SH Synopsis

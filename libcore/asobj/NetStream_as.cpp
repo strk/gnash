@@ -1,7 +1,7 @@
 // NetStream.cpp:  ActionScript class for streaming audio/video, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
-//   Foundation, Inc
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010,
+//   2011 Free Software Foundation, Inc
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -308,7 +308,7 @@ NetStream_as::startAdvanceTimer()
 
 NetStream_as::~NetStream_as()
 {
-    // TODO: have thi done by ~BufferedAudioQueue ?
+    // TODO: have this done by ~BufferedAudioQueue ?
     _audioStreamer.cleanAudioQueue();
     _audioStreamer.detachAuxStreamer();
 }

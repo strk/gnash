@@ -1,7 +1,7 @@
 // DefineScalingGridTag.h: Define scale factors for a window, a button, or other similar objects. 
 //
-//   Copyright (C) 2006, 2007, 2008, 2009, 2010 Free Software
-//   Foundation, Inc
+//   Copyright (C) 2006, 2007, 2008, 2009, 2010,
+//   2011 Free Software Foundation, Inc
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by

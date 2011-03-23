@@ -2,9 +2,9 @@
                    "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd"
 [
   <!ENTITY legal SYSTEM "legal.xml">
-  <!ENTITY appversion "0.8.8">
+  <!ENTITY appversion "0.8.9">
   <!ENTITY manrevision "0.1">
-  <!ENTITY date "Aug 2010">
+  <!ENTITY date "Feb 2011">
   <!ENTITY app "<application>RTMPGet</application>">
   <!ENTITY appname "RTMPGet">
   <!ENTITY version "0.8">
