@@ -2496,12 +2496,12 @@ if test x"$enable_visibility" != x"no"; then
   save_CFLAGS="$CFLAGS"
   CFLAGS="$CFLAGS -Wall -Werror"
   AC_MSG_CHECKING([whether $CC supports the GNUC visibility attribute])
-  AC_COMPILE_IFELSE(AC_LANG_SOURCE(
+  AC_COMPILE_IFELSE([AC_LANG_SOURCE(
     [
       void __attribute__ ((visibility("default"))) test_default (void) {}
       void __attribute__ ((visibility("hidden"))) test_hidden (void) {}
       int main (int argc, char **argv) { test_default (); test_hidden (); return 0; }
-    ]),
+    ])],
     [
       AC_DEFINE([HAVE_GNUC_VISIBILITY], [1], [Define this for GCC-visibility.])
       AC_MSG_RESULT([yes])
