@@ -1,5 +1,5 @@
-// Kde4Glue.cpp: KDE4/Qt4 shared code to connect the various renderers to
-// the Kde4 gui.
+// Qt4Glue.cpp: KDE4/Qt4 shared code to connect the various renderers to
+// the Qt4 gui.
 //                                                         
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
 //   Foundation, Inc                                       
@@ -23,9 +23,9 @@
 #include "gnashconfig.h"
 #endif
 
-#include "Kde4Glue.h"
-#include "Kde4Glue.moc"
-#include "Kde4Gui.h"
+#include "Qt4Glue.h"
+#include "Qt4Glue.moc"
+#include "Qt4Gui.h"
 #include <QWidget>
 #include <QPaintEvent>
 #include <QMouseEvent>
@@ -34,7 +34,7 @@
 namespace gnash {
 
 /// DrawingWidget implementation
-DrawingWidget::DrawingWidget(Kde4Gui& gui)
+DrawingWidget::DrawingWidget(Qt4Gui& gui)
     :
     _gui(gui)
 {

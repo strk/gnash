@@ -6,6 +6,6 @@ Name[fi]=Gnash-SWF-katselin (KDE)
 GenericName=
 Comment=
 Icon=/usr/share/pixmaps/klash.xpm
-Exec=/usr/bin/kde4-gnash
+Exec=/usr/bin/qt4-gnash
 Terminal=false
 Categories=Application;AudioVideo;KDE;

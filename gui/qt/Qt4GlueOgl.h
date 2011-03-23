@@ -24,7 +24,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "Kde4Glue.h"
+#include "Qt4Glue.h"
 
 #include <boost/scoped_array.hpp>
 #include "snappingrange.h"
@@ -35,11 +35,11 @@ class QWidget;
 namespace gnash
 {
 
-class Kde4OglGlue : public Kde4Glue
+class Qt4OglGlue : public Qt4Glue
 {
   public:
-    Kde4OglGlue();
-    ~Kde4OglGlue();
+    Qt4OglGlue();
+    ~Qt4OglGlue();
     
     bool init(int argc, char **argv[]);
     void prepDrawingArea(DrawingWidget *drawing_area);

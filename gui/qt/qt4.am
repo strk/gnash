@@ -16,64 +16,64 @@
 # 
 
 #
-# Build the KDE gui
+# Build the Qt gui
 # 
 if BUILD_QT4_GUI
 
-Kde4Gui.moc: $(srcdir)/kde/Kde4Gui.h
+Qt4Gui.moc: $(srcdir)/qt/Qt4Gui.h
 	@if test x"$(MOC4)" != x; then \
-	  echo "Generating MOC file: Kde4Gui.moc."; \
-	  $(MOC4) $(srcdir)/kde/Kde4Gui.h -o Kde4Gui.moc; \
+	  echo "Generating MOC file: Qt4Gui.moc."; \
+	  $(MOC4) $(srcdir)/qt/Qt4Gui.h -o Qt4Gui.moc; \
 	else  \
 	  echo "WARNING: Install QT 4.x moc tool! Using default MOC file"; \
-	  ln -sf $(srcdir)/kde/Kde4Gui.moc.in Kde4Gui.moc; \
+	  ln -sf $(srcdir)/qt/Qt4Gui.moc.in Qt4Gui.moc; \
 	fi
 
-Kde4Glue.moc: $(srcdir)/kde/Kde4Glue.h
+Qt4Glue.moc: $(srcdir)/qt/Qt4Glue.h
 	@if test x"$(MOC4)" != x; then \
-	  echo "Generating MOC file: Kde4Glue.moc."; \
-	  $(MOC4) $(srcdir)/kde/Kde4Glue.h -o Kde4Glue.moc; \
+	  echo "Generating MOC file: Qt4Glue.moc."; \
+	  $(MOC4) $(srcdir)/qt/Qt4Glue.h -o Qt4Glue.moc; \
 	else  \
 	  echo "WARNING: Install QT 4.x moc tool! Using default MOC file"; \
-	  ln -sf $(srcdir)/kde/Kde4Glue.moc.in Kde4Glue.moc; \
+	  ln -sf $(srcdir)/qt/Qt4Glue.moc.in Qt4Glue.moc; \
 	fi
 
 endif
 
-bin_PROGRAMS += kde4-gnash
+bin_PROGRAMS += qt4-gnash
 
-kde4_gnash_SOURCES = $(GUI_SRCS) \
-	kde/GuiKde4.cpp \
-	kde/Kde4Gui.cpp \
-	kde/Kde4Glue.cpp \
-	kde/Kde4Gui.h \
-	kde/Kde4Glue.h
+qt4_gnash_SOURCES = $(GUI_SRCS) \
+	qt/GuiQt4.cpp \
+	qt/Qt4Gui.cpp \
+	qt/Qt4Glue.cpp \
+	qt/Qt4Gui.h \
+	qt/Qt4Glue.h
 
-kde4_gnash_CPPFLAGS = -DGUI_KDE4 -DGUI_CONFIG=\"KDE4\" $(AM_CPPFLAGS) $(QT4_CFLAGS)
-kde4_gnash_LDFLAGS = -export-dynamic 
-kde4_gnash_LDADD = \
+qt4_gnash_CPPFLAGS = -DGUI_QT4 -DGUI_CONFIG=\"QT4\" $(AM_CPPFLAGS) $(QT4_CFLAGS)
+qt4_gnash_LDFLAGS = -export-dynamic 
+qt4_gnash_LDADD = \
 	$(MYSQL_LIBS) \
 	$(GNASH_LIBS) \
 	$(AM_LDFLAGS) \
 	$(LIBVA_X11_LIBS)
 
 if BUILD_OGL_RENDERER
-kde4_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
-kde4_gnash_LDADD += $(top_builddir)/librender/libgnashrender.la \
+qt4_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
+qt4_gnash_LDADD += $(top_builddir)/librender/libgnashrender.la \
 	$(QT4_LIBS) $(OGL_LIBS) -lQtOpenGL
-kde4_gnash_SOURCES += kde/Kde4GlueOgl.cpp kde/Kde4GlueOgl.h
+qt4_gnash_SOURCES += qt/Qt4GlueOgl.cpp qt/Qt4GlueOgl.h
 endif                           # BUILD_OGL_RENDERER
 
 if BUILD_CAIRO_RENDERER
-kde4_gnash_CPPFLAGS += $(CAIRO_CFLAGS) $(X11_CFLAGS)
-kde4_gnash_LDADD += $(top_builddir)/librender/libgnashrender.la \
+qt4_gnash_CPPFLAGS += $(CAIRO_CFLAGS) $(X11_CFLAGS)
+qt4_gnash_LDADD += $(top_builddir)/librender/libgnashrender.la \
 	$(QT4_LIBS) $(CAIRO_LIBS)
-kde4_gnash_SOURCES += kde/Kde4GlueCairo.cpp kde/Kde4GlueCairo.h
+qt4_gnash_SOURCES += qt/Qt4GlueCairo.cpp qt/Qt4GlueCairo.h
 endif                           # BUILD_CAIRO_RENDERER
 
 if BUILD_AGG_RENDERER
-kde4_gnash_CPPFLAGS += $(AGG_CFLAGS) $(X11_CFLAGS)
-kde4_gnash_LDADD += $(top_builddir)/librender/libgnashrender.la \
+qt4_gnash_CPPFLAGS += $(AGG_CFLAGS) $(X11_CFLAGS)
+qt4_gnash_LDADD += $(top_builddir)/librender/libgnashrender.la \
 	$(QT4_LIBS) $(AGG_LIBS)
-kde4_gnash_SOURCES += kde/Kde4GlueAgg.cpp kde/Kde4GlueAgg.h
+qt4_gnash_SOURCES += qt/Qt4GlueAgg.cpp qt/Qt4GlueAgg.h
 endif

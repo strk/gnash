@@ -24,7 +24,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "Kde4Glue.h"
+#include "Qt4Glue.h"
 
 #include <memory>
 #include <QImage>
@@ -37,11 +37,11 @@ class QRect;
 namespace gnash
 {
 
-class Kde4AggGlue : public Kde4Glue
+class Qt4AggGlue : public Qt4Glue
 {
   public:
-    Kde4AggGlue();
-    ~Kde4AggGlue();
+    Qt4AggGlue();
+    ~Qt4AggGlue();
     
     bool init(int argc, char **argv[]);
     void prepDrawingArea(DrawingWidget *drawing_area);

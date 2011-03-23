@@ -24,7 +24,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "Kde4Glue.h"
+#include "Qt4Glue.h"
 
 #include <memory>        // for auto_ptr
 #include <QImage>
@@ -39,11 +39,11 @@ class QRect;
 namespace gnash
 {
 
-class Kde4CairoGlue : public Kde4Glue
+class Qt4CairoGlue : public Qt4Glue
 {
   public:
-    Kde4CairoGlue();
-    ~Kde4CairoGlue();
+    Qt4CairoGlue();
+    ~Qt4CairoGlue();
     
     bool init(int argc, char **argv[]);
     void initBuffer(int width, int height);

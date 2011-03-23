@@ -25,23 +25,23 @@
 #include "gui.h"
 #include "GnashException.h"
 
-#ifdef GUI_KDE4
-#include "Kde4Gui.h"
+#ifdef GUI_QT4
+#include "Qt4Gui.h"
 #endif
 
 namespace gnash {
 
-#ifdef GUI_KDE4
-std::auto_ptr<Gui> createKDE4Gui(unsigned long windowid, float scale, bool do_loop, RunResources& r)
+#ifdef GUI_QT4
+std::auto_ptr<Gui> createQt4Gui(unsigned long windowid, float scale, bool do_loop, RunResources& r)
 {
-	return std::auto_ptr<Gui>(new Kde4Gui(windowid, scale, do_loop, r));
+	return std::auto_ptr<Gui>(new Qt4Gui(windowid, scale, do_loop, r));
 }
-#else // ! GUI_KDE4
-std::auto_ptr<Gui> createKDE4Gui(unsigned long , float, bool, RunResourcesfloat , bool , unsigned int )
+#else 
+std::auto_ptr<Gui> createQt4Gui(unsigned long , float, bool, RunResourcesfloat , bool , unsigned int )
 {
-	throw GnashException("Support for KDE4 gui was not compiled in");
+	throw GnashException("Support for QT4 gui was not compiled in");
 }
-#endif // ! GUI_KDE4
+#endif 
 
 } // namespace gnash
 

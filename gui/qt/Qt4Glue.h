@@ -33,7 +33,7 @@ class QGLWidget;
 namespace gnash {
     class Renderer;
     class DrawingWidget;
-    class Kde4Gui;
+    class Qt4Gui;
 }
 
 namespace gnash {
@@ -43,7 +43,7 @@ class DrawingWidget : public QWidget
     Q_OBJECT
 
 public:
-    DrawingWidget(Kde4Gui& gui);
+    DrawingWidget(Qt4Gui& gui);
     ~DrawingWidget() {}
 
 #ifdef RENDERER_OPENGL
@@ -75,14 +75,14 @@ protected:
     void contextMenuEvent(QContextMenuEvent* event);
     
 private:
-    Kde4Gui& _gui;
+    Qt4Gui& _gui;
 };  
 
-class Kde4Glue
+class Qt4Glue
 {
   public:
-    Kde4Glue() : _drawing_area(NULL) {}
-    virtual ~Kde4Glue() { }
+    Qt4Glue() : _drawing_area(NULL) {}
+    virtual ~Qt4Glue() { }
     virtual bool init(int argc, char **argv[]) = 0;
 
     virtual void prepDrawingArea(DrawingWidget *drawing_area) = 0;

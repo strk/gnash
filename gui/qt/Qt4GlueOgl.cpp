@@ -25,8 +25,8 @@
 #include <QGLWidget>
 #include <QRect>
 
-#include "Kde4GlueOgl.h"
-#include "Kde4Gui.h"
+#include "Qt4GlueOgl.h"
+#include "Qt4Gui.h"
 #include "Renderer.h"
 #include "Renderer_ogl.h"
 #include "GnashException.h"
@@ -34,7 +34,7 @@
 namespace gnash
 {
 
-Kde4OglGlue::Kde4OglGlue()
+Qt4OglGlue::Qt4OglGlue()
 :
   _width(0),
   _height(0),
@@ -42,19 +42,19 @@ Kde4OglGlue::Kde4OglGlue()
 {
 }
 
-Kde4OglGlue::~Kde4OglGlue()
+Qt4OglGlue::~Qt4OglGlue()
 {
 }
 
 bool
-Kde4OglGlue::init(int /* argc */, char *** /* argv */)
+Qt4OglGlue::init(int /* argc */, char *** /* argv */)
 {
     return true;
 }
 
 
 void
-Kde4OglGlue::prepDrawingArea(DrawingWidget *drawing_area)
+Qt4OglGlue::prepDrawingArea(DrawingWidget *drawing_area)
 {
     assert(drawing_area);
     _drawing_area = drawing_area;
@@ -68,7 +68,7 @@ Kde4OglGlue::prepDrawingArea(DrawingWidget *drawing_area)
 
 
 void
-Kde4OglGlue::render()
+Qt4OglGlue::render()
 {
     assert(_drawing_area);
     _drawing_area->_glWidget->swapBuffers();
@@ -76,14 +76,14 @@ Kde4OglGlue::render()
 
 
 void
-Kde4OglGlue::render(const QRect& /*updateRect*/)
+Qt4OglGlue::render(const QRect& /*updateRect*/)
 {
   render();
 }
 
 
 Renderer*
-Kde4OglGlue::createRenderHandler()
+Qt4OglGlue::createRenderHandler()
 {
     _renderer = create_Renderer_ogl();
 

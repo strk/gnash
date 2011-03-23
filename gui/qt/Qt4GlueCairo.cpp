@@ -21,8 +21,8 @@
 #include "gnashconfig.h"
 #endif
 
-#include "Kde4Gui.h"
-#include "Kde4GlueCairo.h"
+#include "Qt4Gui.h"
+#include "Qt4GlueCairo.h"
 #include "Renderer.h"
 #include "Renderer_cairo.h"
 #include <QWidget>
@@ -31,7 +31,7 @@
 namespace gnash
 {
 
-Kde4CairoGlue::Kde4CairoGlue()
+Qt4CairoGlue::Qt4CairoGlue()
 :
   _width(0),
   _height(0),
@@ -42,20 +42,20 @@ Kde4CairoGlue::Kde4CairoGlue()
 {
 }
 
-Kde4CairoGlue::~Kde4CairoGlue()
+Qt4CairoGlue::~Qt4CairoGlue()
 {
     if (_cairo_surface)
         cairo_surface_destroy(_cairo_surface);
 }
 
 bool
-Kde4CairoGlue::init(int /* argc */, char *** /* argv */)
+Qt4CairoGlue::init(int /* argc */, char *** /* argv */)
 {
     return true;
 }
 
 void
-Kde4CairoGlue::initBuffer(int width, int height)
+Qt4CairoGlue::initBuffer(int width, int height)
 {
     if (! _drawing_area)
         return;
@@ -98,7 +98,7 @@ Kde4CairoGlue::initBuffer(int width, int height)
 }
 
 void
-Kde4CairoGlue::prepDrawingArea(DrawingWidget *drawing_area)
+Qt4CairoGlue::prepDrawingArea(DrawingWidget *drawing_area)
 {
     assert(drawing_area);
     _drawing_area = drawing_area;
@@ -106,7 +106,7 @@ Kde4CairoGlue::prepDrawingArea(DrawingWidget *drawing_area)
 
 
 void
-Kde4CairoGlue::render()
+Qt4CairoGlue::render()
 {
     QRect r(0, 0, _width, _height);
     render(r);
@@ -114,7 +114,7 @@ Kde4CairoGlue::render()
 
 
 void
-Kde4CairoGlue::render(const QRect& updateRect)
+Qt4CairoGlue::render(const QRect& updateRect)
 {
     assert(_drawing_area);
 
@@ -130,7 +130,7 @@ Kde4CairoGlue::render(const QRect& updateRect)
 }
 
 void
-Kde4CairoGlue::resize(int width, int height)
+Qt4CairoGlue::resize(int width, int height)
 {
     initBuffer(width, height);
 }
@@ -138,7 +138,7 @@ Kde4CairoGlue::resize(int width, int height)
 
 
 Renderer*
-Kde4CairoGlue::createRenderHandler()
+Qt4CairoGlue::createRenderHandler()
 {
     _renderer = renderer::cairo::create_handler();
 

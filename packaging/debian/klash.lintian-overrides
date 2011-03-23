@@ -1,1 +1,1 @@
-klash: binary-or-shlib-defines-rpath ./usr/bin/kde4-gnash /usr/lib/gnash
+klash: binary-or-shlib-defines-rpath ./usr/bin/qt4-gnash /usr/lib/gnash

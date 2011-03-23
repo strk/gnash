@@ -31,15 +31,15 @@
 #include <QDialog>
 
 #ifdef RENDERER_AGG
-#include "Kde4GlueAgg.h"
+#include "Qt4GlueAgg.h"
 #endif
 
 #ifdef RENDERER_CAIRO
-#include "Kde4GlueCairo.h"
+#include "Qt4GlueCairo.h"
 #endif
 
 #ifdef RENDERER_OPENGL
-#include "Kde4GlueOgl.h"
+#include "Qt4GlueOgl.h"
 class QGLWidget;
 #endif
 
@@ -55,7 +55,7 @@ class QSpinBox;
 class QStackedWidget;
 
 namespace gnash {
-    class Kde4Gui;
+    class Qt4Gui;
     class DrawingWidget;
 }
 
@@ -67,7 +67,7 @@ class EmbedWidget : public QX11EmbedWidget
     Q_OBJECT
 
 public:
-    EmbedWidget(Kde4Gui& gui);
+    EmbedWidget(Qt4Gui& gui);
     ~EmbedWidget() {};
 
     DrawingWidget* drawingWidget() { return _drawingWidget; }
@@ -82,11 +82,11 @@ private:
 };
 
 
-class DSOEXPORT Kde4Gui :  public Gui
+class DSOEXPORT Qt4Gui :  public Gui
 {
 public:
-    Kde4Gui(unsigned long xid, float scale, bool loop, RunResources& r);
-    virtual ~Kde4Gui();
+    Qt4Gui(unsigned long xid, float scale, bool loop, RunResources& r);
+    virtual ~Qt4Gui();
     virtual bool init(int argc, char **argv[]);
     virtual bool createWindow(const char* windowtitle, int width, int height,
                               int xPosition = 0, int yPosition = 0);
@@ -150,7 +150,7 @@ private:
     DrawingWidget* _drawingWidget;
     
     /// Takes care of painting onto the widget.
-    std::auto_ptr<Kde4Glue> _glue;
+    std::auto_ptr<Qt4Glue> _glue;
     
     /// The main application window.
     std::auto_ptr<QMainWindow> _window;
@@ -190,7 +190,7 @@ private:
     QAction* fullscreenAction;
 };
 
-namespace Kde4GuiPrefs
+namespace Qt4GuiPrefs
 {
 
 class PreferencesDialog : public QDialog

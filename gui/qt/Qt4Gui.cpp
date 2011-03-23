@@ -1,4 +1,4 @@
-// Kde4Gui.cpp: KDE4/Qt4 Gui implementation for Gnash window
+// Qt4Gui.cpp: KDE4/Qt4 Gui implementation for Gnash window
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
 //   Foundation, Inc
@@ -63,8 +63,8 @@
 #include "log.h"
 
 #include "gui.h"
-#include "Kde4Gui.h"
-#include "Kde4Gui.moc"
+#include "Qt4Gui.h"
+#include "Qt4Gui.moc"
 #include "Renderer.h"
 #include "RunResources.h" 
 
@@ -78,18 +78,18 @@ extern "C" {
 namespace gnash 
 {
 
-Kde4Gui::Kde4Gui(unsigned long xid, float scale, bool loop, RunResources& r)
+Qt4Gui::Qt4Gui(unsigned long xid, float scale, bool loop, RunResources& r)
  : Gui(xid, scale, loop, r)
 {
 }
 
 
-Kde4Gui::~Kde4Gui()
+Qt4Gui::~Qt4Gui()
 {
 }
 
 void
-Kde4Gui::setClipboard(const std::string& copy)
+Qt4Gui::setClipboard(const std::string& copy)
 {
     QClipboard* cb = QApplication::clipboard();
     assert(cb);
@@ -97,7 +97,7 @@ Kde4Gui::setClipboard(const std::string& copy)
 }
 
 bool
-Kde4Gui::init(int /*argc*/, char ** /*argv*/[])
+Qt4Gui::init(int /*argc*/, char ** /*argv*/[])
 {
 
     char** r = NULL;
@@ -117,7 +117,7 @@ Kde4Gui::init(int /*argc*/, char ** /*argv*/[])
     if (renderer == "cairo") {
 #ifdef RENDERER_CAIRO
         log_debug("Using Cairo renderer");
-        _glue.reset(new Kde4CairoGlue());
+        _glue.reset(new Qt4CairoGlue());
 #else
         log_error(_("Cairo renderer not supported!"));
         return false;
@@ -125,7 +125,7 @@ Kde4Gui::init(int /*argc*/, char ** /*argv*/[])
     } else if (renderer == "opengl") {
 #ifdef RENDERER_OPENGL
         log_debug("Using OpenGL renderer");
-        _glue.reset(new Kde4OglGlue());
+        _glue.reset(new Qt4OglGlue());
 #else
         log_error(_("OpenGL renderer not supported!"));
         return false;
@@ -133,7 +133,7 @@ Kde4Gui::init(int /*argc*/, char ** /*argv*/[])
     } else {
 #ifdef RENDERER_AGG
         log_debug("Using AGG renderer");
-        _glue.reset(new Kde4AggGlue());
+        _glue.reset(new Qt4AggGlue());
 #else
         log_error(_("AGG renderer not supported!"));
         return false;
@@ -156,13 +156,13 @@ Kde4Gui::init(int /*argc*/, char ** /*argv*/[])
 
 
 bool
-Kde4Gui::run()
+Qt4Gui::run()
 {
     return _application->exec();
 }
 
 bool
-Kde4Gui::createWindow(const char* windowtitle, int width, int height,
+Qt4Gui::createWindow(const char* windowtitle, int width, int height,
                      int xPosition, int yPosition)
 {
     _width = width;
@@ -214,7 +214,7 @@ Kde4Gui::createWindow(const char* windowtitle, int width, int height,
 
 
 void
-Kde4Gui::resizeWindow(int width, int height)
+Qt4Gui::resizeWindow(int width, int height)
 {
     _width = width;
     _height = height;
@@ -223,7 +223,7 @@ Kde4Gui::resizeWindow(int width, int height)
 }
 
 void
-Kde4Gui::popupMenu(const QPoint& point)
+Qt4Gui::popupMenu(const QPoint& point)
 {
     QMenu popupMenu(_drawingWidget);
     popupMenu.addMenu(fileMenu);
@@ -235,7 +235,7 @@ Kde4Gui::popupMenu(const QPoint& point)
 
 
 void
-Kde4Gui::renderBuffer()
+Qt4Gui::renderBuffer()
 {
     
     for (DrawBounds::const_iterator i = _drawbounds.begin(),
@@ -255,7 +255,7 @@ Kde4Gui::renderBuffer()
 
 
 void
-Kde4Gui::renderWidget(const QRect& updateRect)
+Qt4Gui::renderWidget(const QRect& updateRect)
 {
     // This call renders onto the widget using a QPainter,
     // which *must only happen inside a paint event*.
@@ -264,7 +264,7 @@ Kde4Gui::renderWidget(const QRect& updateRect)
 
 
 void
-Kde4Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
+Qt4Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 {
     _renderer->set_invalidated_regions(ranges);
 
@@ -289,7 +289,7 @@ Kde4Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 
 
 void
-Kde4Gui::setTimeout(unsigned int timeout)
+Qt4Gui::setTimeout(unsigned int timeout)
 {
     // This must go through Gui::quit() to make sure screenshots are
     // handled if necessary.
@@ -298,14 +298,14 @@ Kde4Gui::setTimeout(unsigned int timeout)
 
 
 void
-Kde4Gui::setInterval(unsigned int interval)
+Qt4Gui::setInterval(unsigned int interval)
 {
     _drawingWidget->startTimer(interval);
 }
 
 
 void
-Kde4Gui::setCursor(gnash_cursor_type newcursor)
+Qt4Gui::setCursor(gnash_cursor_type newcursor)
 {
     if (! _mouseShown) return;
 
@@ -322,7 +322,7 @@ Kde4Gui::setCursor(gnash_cursor_type newcursor)
 }
 
 bool
-Kde4Gui::showMouse(bool show)
+Qt4Gui::showMouse(bool show)
 {
     bool prevState = _mouseShown;
     _mouseShown = show;
@@ -338,7 +338,7 @@ Kde4Gui::showMouse(bool show)
 }
 
 void
-Kde4Gui::setFullscreen()
+Qt4Gui::setFullscreen()
 {
     _fullscreen = true;
     fullscreenAction->setChecked(_fullscreen);
@@ -348,7 +348,7 @@ Kde4Gui::setFullscreen()
 }
 
 void
-Kde4Gui::unsetFullscreen()
+Qt4Gui::unsetFullscreen()
 {
     _fullscreen = false;
     fullscreenAction->setChecked(_fullscreen);
@@ -363,7 +363,7 @@ Kde4Gui::unsetFullscreen()
 }
     
 double
-Kde4Gui::getScreenDPI() const
+Qt4Gui::getScreenDPI() const
 {
     assert(_drawingWidget);
     // Should this be logical or physical DPI?
@@ -371,7 +371,7 @@ Kde4Gui::getScreenDPI() const
 }
 
 std::pair<int, int>
-Kde4Gui::screenResolution() const
+Qt4Gui::screenResolution() const
 {
     QDesktopWidget* d = QApplication::desktop();
     assert(d);
@@ -381,7 +381,7 @@ Kde4Gui::screenResolution() const
 }
 
 gnash::key::code
-Kde4Gui::qtToGnashKey(QKeyEvent *event)
+Qt4Gui::qtToGnashKey(QKeyEvent *event)
 {
 
     // This should be initialized by now.
@@ -434,7 +434,7 @@ Kde4Gui::qtToGnashKey(QKeyEvent *event)
 
 
 int
-Kde4Gui::qtToGnashModifier(const Qt::KeyboardModifiers modifiers)
+Qt4Gui::qtToGnashModifier(const Qt::KeyboardModifiers modifiers)
 {
     int gnashModifier = gnash::key::GNASH_MOD_NONE;
 
@@ -449,7 +449,7 @@ Kde4Gui::qtToGnashModifier(const Qt::KeyboardModifiers modifiers)
 }
 
 void
-Kde4Gui::handleKeyEvent(QKeyEvent *event, bool down)
+Qt4Gui::handleKeyEvent(QKeyEvent *event, bool down)
 {
     gnash::key::code c = qtToGnashKey(event);
     int mod = qtToGnashModifier(event->modifiers());
@@ -458,14 +458,14 @@ Kde4Gui::handleKeyEvent(QKeyEvent *event, bool down)
 
 
 void
-Kde4Gui::resize(int width, int height)
+Qt4Gui::resize(int width, int height)
 {
     _glue->resize(width, height);
     resize_view(width, height);
 }
 
 void
-Kde4Gui::showProperties()
+Qt4Gui::showProperties()
 {
     QDialog* propsDialog = new QDialog(_drawingWidget);
     propsDialog->setWindowTitle(_q("Movie properties"));
@@ -552,9 +552,9 @@ Kde4Gui::showProperties()
 
 
 void
-Kde4Gui::showPreferences()
+Qt4Gui::showPreferences()
 {
-    Kde4GuiPrefs::PreferencesDialog* prefsDialog = new Kde4GuiPrefs::PreferencesDialog(_drawingWidget);
+    Qt4GuiPrefs::PreferencesDialog* prefsDialog = new Qt4GuiPrefs::PreferencesDialog(_drawingWidget);
 
     prefsDialog->setAttribute(Qt::WA_DeleteOnClose);
     prefsDialog->show();
@@ -564,14 +564,14 @@ Kde4Gui::showPreferences()
 
 
 void
-Kde4Gui::quitUI()
+Qt4Gui::quitUI()
 {
     _application->quit();
 }
 
 
 void
-Kde4Gui::setupActions()
+Qt4Gui::setupActions()
 {
 
     // File Menu actions
@@ -620,7 +620,7 @@ Kde4Gui::setupActions()
 
 
 void
-Kde4Gui::setupMenus()
+Qt4Gui::setupMenus()
 {
     /// The menus are children of the QMainWindow so that
     /// they are destroyed on exit. The QMainWindow already has
@@ -650,7 +650,7 @@ Kde4Gui::setupMenus()
 
 
 void
-Kde4Gui::createMainMenu()
+Qt4Gui::createMainMenu()
 {
     std::auto_ptr<QMenuBar> mainMenu(new QMenuBar);
 
@@ -667,7 +667,7 @@ Kde4Gui::createMainMenu()
 }
 
 void
-Kde4Gui::setupKeyMap()
+Qt4Gui::setupKeyMap()
 {
     // We only want to do this once, although it would not
     // be harmful to do it more.
@@ -708,20 +708,20 @@ Kde4Gui::setupKeyMap()
 }
 
 void
-Kde4Gui::playHook()
+Qt4Gui::playHook()
 {
     _embedWidget->hidePlayButton();
 }
 
 void
-Kde4Gui::stopHook()
+Qt4Gui::stopHook()
 {
     _embedWidget->showPlayButton();
 }
 
 /// EmbedWidget implementation
 
-EmbedWidget::EmbedWidget(Kde4Gui& gui)
+EmbedWidget::EmbedWidget(Qt4Gui& gui)
   : QX11EmbedWidget()
 {
     _drawingWidget = new DrawingWidget(gui);
@@ -750,7 +750,7 @@ EmbedWidget::showPlayButton()
     _playButton->show();
 }
 
-namespace Kde4GuiPrefs {
+namespace Qt4GuiPrefs {
 
 PreferencesDialog::PreferencesDialog(QWidget* parent)
     :
@@ -1022,7 +1022,7 @@ PreferencesDialog::savePreferences()
     emit accept();
 }
 
-} // End of Kde4GuiPrefs namespace
+} // End of Qt4GuiPrefs namespace
 
 }
 
