@@ -65,7 +65,7 @@ The gnash SWF player plugin for Konqueror in KDE4.
 
 # Native RPM build
 CROSS_OPTS="" # "--enable-ghelp --enable-docbook"
-GUI="" # --enable-gui=gtk,kde3,kde4
+GUI="" # --enable-gui=gtk,kde3,qt4
 SOUND="--enable-media=ffmpeg --enable-jemalloc"
 RENDERER="" # --enable-render=ogl
 # KDE3_OPTS="--with-kde3-plugindir=%{_libdir}/kde3/plugins \

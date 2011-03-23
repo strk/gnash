@@ -51,7 +51,7 @@ Gnash header files can be used to write external Gnash extensions.
 CROSS_OPTS="--host=arm-none-linux=gnueabi --with-sysroot=/opt/L2.6.31_10.07.11_ER/ltib/rootfs/usr"
 # these are actually the default values, but this way they get added
 # to the build so they appear in "gnash --version".
-GUI="--enable-gui=fb"	# could be kde3, kde4, aqua, sdl
+GUI="--enable-gui=fb"	# could be kde3, qt4, aqua, sdl
 SOUND="--enable-media=ffmpeg"
 OTHER="--disable-jemalloc"
 RENDERER="--enable-renderer=agg"		# could be opengl or cairo

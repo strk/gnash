@@ -800,8 +800,8 @@ Player::getGui()
     return createKDEGui(_windowID, _scale, _doLoop, *_runResources);
 #endif
 
-#ifdef GUI_KDE4
-    return createKDE4Gui(_windowID, _scale, _doLoop, *_runResources);
+#ifdef GUI_QT4
+    return createQt4Gui(_windowID, _scale, _doLoop, *_runResources);
 #endif
 
 #ifdef GUI_SDL

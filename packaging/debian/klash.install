@@ -1,4 +1,4 @@
-usr/bin/kde4-gnash
-usr/share/man/man1/kde4-gnash.1*
+usr/bin/qt4-gnash
+usr/share/man/man1/qt4-gnash.1*
 usr/share/pixmaps/klash.xpm
 usr/share/applications/klash.desktop

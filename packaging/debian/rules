@@ -100,7 +100,7 @@ else
 	BUILD_FLAGS += --enable-media=gst,ffmpeg
 endif
 
-# Optionally build the older kde3 package, KDE4 is the default
+# Optionally build the older kde3 package, Qt4 is the default
 ifneq (,$(findstring kde3,$(DEB_BUILD_OPTIONS)))
 	BUILD_FLAGS += --enable-gui=gtk,kde3
 	BUILD_VERSION = $(MAIN_VERSION).kde3.$(BUILD_VERSION)
@@ -113,7 +113,7 @@ else
 	BUILD_DEBUG = -kde3
 endif
 else
-	BUILD_FLAGS += --enable-gui=gtk,kde4
+	BUILD_FLAGS += --enable-gui=gtk,qt4
 endif
 
 # Configure Gnash. We use a different set of options, as when building
@@ -121,7 +121,7 @@ endif
 # python support, the SDK cygnal, etc... These are not enabled by
 # default to make it less complicated for end users building Gnash
 # from source.
-# for now, only build the kde4 support, as kde3 is being depreciated.
+# for now, only build the qt4 support, as kde3 is being depreciated.
 CONFIGURE_FLAGS = CFLAGS="$(CFLAGS)" \
 	CXXFLAGS="$(CXXFLAGS)" \
 	--host=$(DEB_HOST_GNU_TYPE) \
@@ -263,7 +263,7 @@ install: build
 	install -d $(CURDIR)/debian/tmp/usr/share/applications/
 	cp debian/*.desktop $(CURDIR)/debian/tmp/usr/share/applications/
 	gzip -f9 $(CURDIR)/debian/tmp/usr/share/man/man1/gtk-gnash.1
-	gzip -f9 $(CURDIR)/debian/tmp/usr/share/man/man1/kde4-gnash.1
+	gzip -f9 $(CURDIR)/debian/tmp/usr/share/man/man1/qt4-gnash.1
 
 # CREATE PACKAGES
 

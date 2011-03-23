@@ -20,20 +20,20 @@
 # 
 if BUILD_KDE3_GUI
 
-klash3.moc: $(srcdir)/kde/kdesup.h
+klash3.moc: $(srcdir)/qt/kdesup.h
 	@if test x"$(MOC3)" != x; then \
 	  echo "Generating MOC 3 file..."; \
-	  $(MOC3) $(srcdir)/kde/kdesup.h -o klash3.moc; \
+	  $(MOC3) $(srcdir)/qt/kdesup.h -o klash3.moc; \
 	else  \
 	  echo "WARNING: Install QT 3.x moc tool! Linking to default MOC file"; \
-	  ln -sf $(srcdir)/kde/klash3.moc.in klash3.moc; \
+	  ln -sf $(srcdir)/qt/klash3.moc.in klash3.moc; \
 	fi
 
 bin_PROGRAMS += kde3-gnash
 
 kde3_gnash_CPPFLAGS = -DGUI_KDE3 -DGUI_CONFIG=\"KDE3\" \
 	 $(AM_CPPFLAGS) $(KDE3_CFLAGS) $(QT3_CFLAGS)
-kde3_gnash_SOURCES = $(GUI_SRCS) kde/gui_kde.cpp
+kde3_gnash_SOURCES = $(GUI_SRCS) qt/gui_kde.cpp
 kde3_gnash_LDFLAGS = -export-dynamic 
 #kde_gnash_DEPENDENCIES = .configline
 kde3_gnash_LDADD = \
@@ -44,21 +44,21 @@ if BUILD_OGL_RENDERER
 kde3_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
 kde3_gnash_LDADD += $(top_builddir)/librender/libgnashrender.la \
 	$(KDE3_LIBS) $(QT3_LIBS) $(OPENGL_LIBS)
-kde3_gnash_SOURCES += kde/kde_glue_opengl.cpp \
-	kde/kde_glue_opengl.h \
-	kde/kde_glue.h \
-	kde/kde.cpp \
-	kde/kdesup.h \
-	kde/kde_glue.h
+kde3_gnash_SOURCES += qt/kde_glue_opengl.cpp \
+	qt/kde_glue_opengl.h \
+	qt/kde_glue.h \
+	qt/kde.cpp \
+	qt/kdesup.h \
+	qt/kde_glue.h
 endif
 if BUILD_AGG_RENDERER
 kde3_gnash_CPPFLAGS += $(AGG_CFLAGS) $(QT3_CFLAGS)
 kde3_gnash_LDADD += $(top_builddir)/librender/libgnashrender.la \
 	$(KDE3_LIBS) $(QT3_LIBS) $(AGG_LIBS)
-kde3_gnash_SOURCES += kde/kde_glue_agg.cpp \
-	kde/kde_glue_agg.h \
-	kde/kde.cpp \
-	kde/kdesup.h \
-	kde/kde_glue.h
+kde3_gnash_SOURCES += qt/kde_glue_agg.cpp \
+	qt/kde_glue_agg.h \
+	qt/kde.cpp \
+	qt/kdesup.h \
+	qt/kde_glue.h
 endif
 endif

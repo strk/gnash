@@ -16,41 +16,53 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef GNASH_KDE4_OGL_GLUE_H
-#define GNASH_KDE4_OGL_GLUE_H
+#ifndef GNASH_KDE4_CAIRO_GLUE_H
+#define GNASH_KDE4_CAIRO_GLUE_H
 
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
 
-#include "Kde4Glue.h"
+#include "Qt4Glue.h"
 
+#include <memory>        // for auto_ptr
+#include <QImage>
 #include <boost/scoped_array.hpp>
+#include <QPainter>
 #include "snappingrange.h"
 
+#include <cairo.h>
+
 class QRect;
-class QWidget;
 
 namespace gnash
 {
 
-class Kde4OglGlue : public Kde4Glue
+class Qt4CairoGlue : public Qt4Glue
 {
   public:
-    Kde4OglGlue();
-    ~Kde4OglGlue();
+    Qt4CairoGlue();
+    ~Qt4CairoGlue();
     
     bool init(int argc, char **argv[]);
+    void initBuffer(int width, int height);
     void prepDrawingArea(DrawingWidget *drawing_area);
     Renderer* createRenderHandler();
     void render();
     void render(const QRect& updateRect);
+    void resize(int width, int height);
 
   private:
     int _width;
     int _height;
+    boost::scoped_array<unsigned char> _offscreenbuf;
     Renderer* _renderer; // We don't own this pointer.
+    std::auto_ptr<QImage> _image;
+    std::auto_ptr<QPainter> _painter;
+
+    cairo_t         *_cairo_handle;
+    cairo_surface_t *_cairo_surface;
 };
 
 

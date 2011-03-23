@@ -23,7 +23,7 @@ bin_PROGRAMS += qtopia-gnash
 
 qtopia_gnash_CPPFLAGS = -DGUI_QTOPIA -DGUI_CONFIG=\"QTOPIA\" \
 	 $(AM_CPPFLAGS) $(KDE_CFLAGS) $(QT_CFLAGS)
-qtopia_gnash_SOURCES = $(GUI_SRCS) kde/gui_kde.cpp
+qtopia_gnash_SOURCES = $(GUI_SRCS) qt/gui_kde.cpp
 qtopia_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
 #qtopia_gnash_DEPENDENCIES = .configline
 qtopia_gnash_LDADD = \
@@ -34,15 +34,15 @@ if BUILD_OGL_RENDERER
 qtopia_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
 qtopia_gnash_LDADD += $(top_builddir)/librender/libgnashogl.la \
 	$(KDE_LIBS) $(QTOPIA_LIBS) $(QT_LIBS) $(OPENGL_LIBS)
-qtopia_gnash_SOURCES += kde/kde_glue_opengl.cpp kde/kde_glue_opengl.h kde/kde_glue.h \
-	 	kde/kde.cpp kde/kdesup.h kde/kde_glue.h
+qtopia_gnash_SOURCES += qt/kde_glue_opengl.cpp qt/kde_glue_opengl.h qt/kde_glue.h \
+	 	qt/kde.cpp qt/kdesup.h qt/kde_glue.h
 endif
 if BUILD_AGG_RENDERER
 qtopia_gnash_CPPFLAGS += $(AGG_CFLAGS)
 qtopia_gnash_LDADD += $(top_builddir)/librender/libgnashagg.la \
 	$(KDE_LIBS) $(QTOPIA_LIBS) $(QT_LIBS) $(AGG_LIBS)
-qtopia_gnash_SOURCES += kde/kde_glue_agg.cpp kde/kde_glue_agg.h \
-	 	kde/kde.cpp kde/kdesup.h kde/kde_glue.h
+qtopia_gnash_SOURCES += qt/kde_glue_agg.cpp qt/kde_glue_agg.h \
+	 	qt/kde.cpp qt/kdesup.h qt/kde_glue.h
 endif
 endif
 

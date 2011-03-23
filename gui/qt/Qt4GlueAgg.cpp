@@ -21,7 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "Kde4GlueAgg.h"
+#include "Qt4GlueAgg.h"
 #include "Renderer.h"
 #include "Renderer_agg.h"
 #include "GnashException.h"
@@ -32,7 +32,7 @@
 namespace gnash
 {
 
-Kde4AggGlue::Kde4AggGlue()
+Qt4AggGlue::Qt4AggGlue()
 :
   _width(0),
   _height(0),
@@ -40,26 +40,26 @@ Kde4AggGlue::Kde4AggGlue()
 {
 }
 
-Kde4AggGlue::~Kde4AggGlue()
+Qt4AggGlue::~Qt4AggGlue()
 {
 }
 
 bool
-Kde4AggGlue::init(int /* argc */, char *** /* argv */)
+Qt4AggGlue::init(int /* argc */, char *** /* argv */)
 {
     return true;
 }
 
 
 void
-Kde4AggGlue::prepDrawingArea(DrawingWidget *drawing_area)
+Qt4AggGlue::prepDrawingArea(DrawingWidget *drawing_area)
 {
     _drawing_area = drawing_area;
 }
 
 
 void
-Kde4AggGlue::initBuffer(int width, int height)
+Qt4AggGlue::initBuffer(int width, int height)
 {
     if (!_renderer) return;
 
@@ -88,7 +88,7 @@ Kde4AggGlue::initBuffer(int width, int height)
 
 
 void
-Kde4AggGlue::render()
+Qt4AggGlue::render()
 {
     QRect r(0, 0, _width, _height);
     render(r);
@@ -96,7 +96,7 @@ Kde4AggGlue::render()
 
 
 void
-Kde4AggGlue::render(const QRect& updateRect)
+Qt4AggGlue::render(const QRect& updateRect)
 {
     QPainter p(_drawing_area);
    
@@ -106,7 +106,7 @@ Kde4AggGlue::render(const QRect& updateRect)
 
 
 Renderer*
-Kde4AggGlue::createRenderHandler()
+Qt4AggGlue::createRenderHandler()
 {
     _renderer = create_Renderer_agg("BGRA32");
 
@@ -118,7 +118,7 @@ Kde4AggGlue::createRenderHandler()
 }
 
 void
-Kde4AggGlue::resize(int width, int height)
+Qt4AggGlue::resize(int width, int height)
 {
     initBuffer(width, height);
 }

@@ -551,7 +551,7 @@ build_sdl=no
 build_aqua=no                   dnl Native MacOSX
 build_dump=no
 AC_ARG_ENABLE(gui,
-  AC_HELP_STRING([--enable-gui=], [Enable support for the specified GUI toolkits (default=gtk,kde4)]),
+  AC_HELP_STRING([--enable-gui=], [Enable support for the specified GUI toolkits (default=gtk,qt4)]),
   [if test -n ${enableval}; then
     enableval=`echo ${enableval} | tr '\054' ' ' `
   fi
@@ -564,7 +564,7 @@ AC_ARG_ENABLE(gui,
       kde3|KDE3)
         build_kde3=yes
         ;;
-      kde4|KDE4)
+      qt4|QT4|kde4|KDE4)
         build_qt4=yes
         ;;
       qtopia3|QTOPIA3)
@@ -606,7 +606,7 @@ AC_ARG_ENABLE(gui,
         build_sdl=yes
         build_gtk=yes
         ;;
-      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde3|kde4|fltk|sdl|aqua|fb|qtopia3|qtopia4|dump|aos4|haiku)])
+      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde3|qt4|fltk|sdl|aqua|fb|qtopia3|qtopia4|dump|aos4|haiku)])
          ;;
       esac
     enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
@@ -1790,7 +1790,7 @@ dnl Add KPARTS 4.x support, if specified or KDE gui is built
 dnl --------------------------------------------------------
 
 AC_ARG_ENABLE(kparts4,
-  AC_HELP_STRING([--disable-kparts4], [Disble support for Konqueror 4.x plugin (default: enabled if kde4 gui is)]),
+  AC_HELP_STRING([--disable-kparts4], [Disable support for Konqueror 4.x plugin (default: enabled if Qt4 gui is)]),
 [case "${enableval}" in
   yes) build_kparts4=yes ;;
   no)  build_kparts4=no ;;
@@ -1802,11 +1802,11 @@ if test x"${build_kparts4}" != xno; then
 fi
 
 dnl -----------------------------------------------------------
-dnl Add NPAPI support, if specified or GTK or KDE4 gui is built
+dnl Add NPAPI support, if specified or GTK or Qt4 gui is built
 dnl -----------------------------------------------------------
 
 AC_ARG_ENABLE(npapi,
-  AC_HELP_STRING([--disable-npapi], [Disable NPAPI plugin build (default: enabled if gtk or kde4 gui is)]),
+  AC_HELP_STRING([--disable-npapi], [Disable NPAPI plugin build (default: enabled if gtk or Qt4 gui is)]),
   [case "${enableval}" in
     yes) npapi=yes ;;
     no)  npapi=no ;;
@@ -2299,12 +2299,6 @@ fi
 AM_CONDITIONAL(BUILD_QTOPIA3_GUI,  [ test x$build_qtopia3 = xyes ])
 AM_CONDITIONAL(BUILD_QTOPIA4_GUI,  [ test x$build_qtopia4 = xyes ])
 
-dnl Drop these conditionals ?
-AM_CONDITIONAL(BUILD_QT3_GUI,
-    [ test x"${build_kde3}" = xyes -o x"${build_qtopia3}" = xyes ])
-AM_CONDITIONAL(BUILD_QT4_GUI,
-    [ test x"${build_qt4}" = xyes -o x"${build_qtopia4}" = xyes ])
-
 AM_CONDITIONAL(BUILD_KDE3_GUI,     [ test x$build_kde3 = xyes ])
 AM_CONDITIONAL(BUILD_QT4_GUI,     [ test x$build_qt4 = xyes ])
 
@@ -2717,7 +2711,7 @@ if test x$build_kde3 = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},kde3"
 fi
 if test x$build_qt4 = xyes; then
-  SUPPORTED_GUIS="${SUPPORTED_GUIS},kde4"
+  SUPPORTED_GUIS="${SUPPORTED_GUIS},qt4"
 fi
 if test x$build_gtk = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},gtk"
@@ -2896,7 +2890,7 @@ if test x"${build_kde3}" = xyes -o x"${build_qtopia3}" = xyes; then
   fi
 fi
 
-dnl Dump QT4 options is the user specified a QTOPIA4 or KDE4 GUI
+dnl Dump QT4 options is the user specified a QTOPIA4 or Qt4 GUI
 if test x"${build_qt4}" = xyes -o x"${build_qtopia4}" = xyes; then
   if test x"${has_qt4}" = xyes; then
     echo "        QT4 flags are: ${QT4_CFLAGS}"

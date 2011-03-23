@@ -17,7 +17,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 # 
-# build gtk-gnash, kde-gnash, sdl-gnash, fltk-gnash, aqua-gnash, fb-gnash,
+# build gtk-gnash, qt4-gnash, sdl-gnash, fltk-gnash, aqua-gnash, fb-gnash,
 # haiku-gnash and dump-gnash
 #
 
@@ -51,9 +51,9 @@ pluginsdir = $(libdir)/gnash/plugins
 BUILT_SOURCES =
 
 EXTRA_DIST = gnash.in \
-	kde/klash3.moc.in \
-	kde/Kde4Gui.moc.in \
-	kde/Kde4Glue.moc.in
+	qt/klash3.moc.in \
+	qt/Qt4Gui.moc.in \
+	qt/Qt4Glue.moc.in
 
 noinst_HEADERS =
 noinst_LTLIBRARIES = 
@@ -167,7 +167,6 @@ AM_CPPFLAGS += -DCONFIG_CONFIG="\"$(shell cat ../.configline)\""
 AM_CPPFLAGS += -DCXXFLAGS="\"$(CXXFLAGS)\"" 
 
 dist_images_DATA = images/gnash_128_96.ico images/GnashG.png
-#dist_images_DATA = images/gnash_G_v3.ico
 imagesdir = $(pkgdatadir)
 
 bin_SCRIPTS = gnash
@@ -197,20 +196,20 @@ endif
 
 # Build the QTOPIA gui
 if BUILD_QTOPIA3_GUI
-include $(srcdir)/kde/qtopia3.am
+include $(srcdir)/qt/qtopia3.am
 endif
 
 # Build the KDE3 gui
 if BUILD_KDE3_GUI
 BUILT_SOURCES += klash3.moc 
-include $(srcdir)/kde/kde3.am
+include $(srcdir)/qt/kde3.am
 endif
 
-# Build the KDE4 gui
+# Build the QT4 gui
 if BUILD_QT4_GUI
-BUILT_SOURCES += Kde4Gui.moc
-BUILT_SOURCES += Kde4Glue.moc
-include $(srcdir)/kde/kde4.am
+BUILT_SOURCES += Qt4Gui.moc
+BUILT_SOURCES += Qt4Glue.moc
+include $(srcdir)/qt/qt4.am
 endif
 
 # Build the SDL gui
@@ -243,7 +242,7 @@ if BUILD_GTK_GUI
 include $(srcdir)/gtk/gtk.am
 endif
 
-CLEANFILES = klash3.moc Kde4Gui.moc Kde4Glue.moc gnash
+CLEANFILES = klash3.moc Qt4Gui.moc Qt4Glue.moc gnash
 
 bundle: Info.plist aqua-gnash
 	@echo " Building: $(bundle_name)" 
@@ -255,12 +254,6 @@ bundle: Info.plist aqua-gnash
 	cp -f aqua-gnash $(bundle_name)/Contents/MacOS/Gnash
 	cp -f images/GnashG.icns $(bundle_name)/Contents/Resources/
 
-
-#noinst_PROGRAMS = guitest # klash flak
-#guitest_SOURCES = guitest.cpp #fltk.cpp #fltksup.h fltksupp.h gnash.cpp gtk.cpp 
-#	gtksup.h gui.cpp gui.h menu.cpp menu.h sdl.cpp sdlsup.h [21~sdlsupp.h
-#guitest_LDADD = $(gnash_LDADD)
-
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"
@@ -268,12 +261,4 @@ mudflap:
 
 clean-hook:
 	-rm -f core.* $(CLEANFILES)
-
-# if DYNAMIC_GUI
-# install-pluginsLTLIBRARIES: $(plugins_LTLIBRARIES)
-# 	test -d "$(DESTDIR)$(plugindir)" || $(mkinstalldirs) "$(DESTDIR)$(plugindir)"
-# 	for i in $(plugins_LTLIBRARIES); do \
-# 	  $(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$i "$(DESTDIR)$(plugindir)/$$i" ; \
-# 	done
-# endif
 

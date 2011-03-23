@@ -241,14 +241,12 @@ endif
 if BUILD_KDE3_GUI
 	@echo "	KDE3_CFLAGS is $(KDE3_CFLAGS)"
 	@echo "	KDE3_LIBS is $(KDE3_LIBS)"
+	@echo "	QT3_CFLAGS is $(QT3_CFLAGS)"
+	@echo "	QT3_LIBS is $(QT3_LIBS)"
 endif
 if BUILD_QT4_GUI
 	@echo "	QT4_CFLAGS is $(QT4_CFLAGS)"
 	@echo "	QT4_LIBS is $(QT4_LIBS)"
-endif
-if BUILD_QT3_GUI
-	@echo "	QT3_CFLAGS is $(QT3_CFLAGS)"
-	@echo "	QT3_LIBS is $(QT3_LIBS)"
 endif
 if BUILD_QT4_GUI
 	@echo "	QT4_CFLAGS is $(QT4_CFLAGS)"

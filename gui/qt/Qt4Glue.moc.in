@@ -1,17 +1,17 @@
 /****************************************************************************
-** Meta object code from reading C++ file 'Kde4Glue.h'
+** Meta object code from reading C++ file 'Qt4Glue.h'
 **
-** Created: Mon Mar 22 08:26:47 2010
-**      by: The Qt Meta Object Compiler version 62 (Qt 4.6.2)
+** Created: Wed Mar 23 11:02:13 2011
+**      by: The Qt Meta Object Compiler version 62 (Qt 4.6.3)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "Kde4Glue.h"
+#include "../../../trunk/gui/qt/Qt4Glue.h"
 #if !defined(Q_MOC_OUTPUT_REVISION)
-#error "The header file 'Kde4Glue.h' doesn't include <QObject>."
+#error "The header file 'Qt4Glue.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 62
-#error "This file was generated using the moc from 4.6.2. It"
+#error "This file was generated using the moc from 4.6.3. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
