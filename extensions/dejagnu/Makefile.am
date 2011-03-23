@@ -41,7 +41,7 @@ AM_LDFLAGS =  \
 
 dejagnu_la_SOURCES = dejagnu.cpp dejagnu.h
 dejagnu_la_LDFLAGS = -module -avoid-version -no-undefined
-dejagnu_la_LIBDADD = $(LIBADD_DL) $(AM_LDFLAGS)
+dejagnu_la_LIBADD = $(LIBADD_DL) $(AM_LDFLAGS)
 
 check_PROGRAMS = # SharedTest
 CLEANFILES = \
