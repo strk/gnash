@@ -37,7 +37,6 @@ kde3_gnash_SOURCES = $(GUI_SRCS) qt/gui_kde.cpp
 kde3_gnash_LDFLAGS = -export-dynamic 
 #kde_gnash_DEPENDENCIES = .configline
 kde3_gnash_LDADD = \
-	$(MYSQL_LIBS) \
 	$(GNASH_LIBS) \
 	$(AM_LDFLAGS)
 if BUILD_OGL_RENDERER
