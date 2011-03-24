@@ -21,7 +21,7 @@
 #
 
 if test "x$1" = "x" -a -f @prefix@/share/gnash/gnash-splash.swf; then
-  kde4-gnash @prefix@/share/gnash/gnash-splash.swf
+  qt4-gnash @prefix@/share/gnash/gnash-splash.swf
 else
-  kde4-gnash "$@"
+  qt4-gnash "$@"
 fi
