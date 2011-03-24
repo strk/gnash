@@ -7,7 +7,7 @@
 .if \n(.g .mso www.tmac
 .TH gnash 1 "17 January 2011" "" ""
 .SH NAME
-gnash, gtk-gnash, kde4-gnash \- GNU Flash (SWF) Player
+gnash, gtk-gnash, qt4-gnash \- GNU Flash (SWF) Player
 .SH Synopsis
 .nf
 
