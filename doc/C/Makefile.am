@@ -24,7 +24,12 @@ docname = gnash
 lang = C
 omffile = gnash-C.omf
 
-docdir = $(datadir)/$(PACKAGE)/doc/$(docname)/$(lang)
+# htmldir=docdir, which isn't what we want, so comment the hardcoded
+# docdir value for now
+# docdir is used to install scrollkeeper files, which isn't supported
+# anymore, so maybe it should be removed together with its corresponding
+# hooks
+# docdir = $(datadir)/$(PACKAGE)/doc/$(docname)/$(lang)
 omf_dest_dir=$(datadir)/omf/$(PACKAGE)
 scrollkeeper_localstate_dir = $(localstatedir)/scrollkeeper
 
