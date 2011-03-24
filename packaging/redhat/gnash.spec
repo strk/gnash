@@ -197,7 +197,7 @@ RPM_TARGET=%{_target}
   CROSS_OPTS="" # "--enable-ghelp --enable-docbook"
   # these are actually the default values, but this way they get added
   # to the build so they appear in "gnash --version".
-  GUI="--enable-gui=gtk,kde4"	# could be kde3, kde4, aqua, sdl
+  GUI="--enable-gui=gtk,qt4"	# could be kde3, qt4, aqua, sdl
   SOUND="--enable-media=gst"	# could be ffmpeg
   OTHER="--enable-cygnal"
   RENDERER="--enable-renderer=all"		# could be opengl or cairo
@@ -365,8 +365,8 @@ scrollkeeper-update -q || :
 
 %files klash4
 %defattr(-,root,root,-)
-%{_bindir}/kde4-gnash
-%{_mandir}/man1/kde4-gnash.1.gz
+%{_bindir}/qt4-gnash
+%{_mandir}/man1/qt4-gnash.1.gz
 %{_prefix}/%{_lib}/kde4/libklashpart.*
 %{_prefix}/share/kde4/apps/klash/klashpartui.rc
 %{_prefix}/share/kde4/apps/klash/pluginsinfo
