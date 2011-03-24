@@ -933,7 +933,7 @@ getGnashExecutable()
         process_found = (0 == stat(procname.c_str(), &procstats));
     }
     if (!process_found) {
-        procname = GNASHBINDIR "/kde4-gnash";
+        procname = GNASHBINDIR "/qt4-gnash";
         process_found = (0 == stat(procname.c_str(), &procstats));
     }
 
