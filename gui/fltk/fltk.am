@@ -29,7 +29,6 @@ if WIN32
 endif
 #fltk_gnash_DEPENDENCIES = .configline
 fltk_gnash_LDADD = \
-	$(MYSQL_LIBS) \
 	$(GNASH_LIBS) \
     $(X!!_LIBS) \
 	$(AM_LDFLAGS)

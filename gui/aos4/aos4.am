@@ -35,7 +35,6 @@ aos4_gnash_LDFLAGS = -export-dynamic
 #aos4_gnash_DEPENDENCIES = .configline
 aos4_gnash_LDADD = \
 	$(top_builddir)/librender/libgnashrender.la \
-	$(MYSQL_LIBS) \
 	$(GNASH_LIBS) \
 	$(AM_LDFLAGS) \
 	$(AOS4_LIBS)

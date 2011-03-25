@@ -21,7 +21,7 @@
 <refnamediv>
 <refname>gnash</refname>
 <refname>gtk-gnash</refname>
-<refname>kde4-gnash</refname>
+<refname>qt4-gnash</refname>
 <refname>fb-gnash</refname>
 <refname>sdl-gnash</refname>
 <refname>gnash-gtk-launcher</refname>

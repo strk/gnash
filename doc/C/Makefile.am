@@ -25,7 +25,12 @@ docname = gnash
 lang = C
 omffile = gnash-C.omf
 
-docdir = $(datadir)/$(PACKAGE)/doc/$(docname)/$(lang)
+# htmldir=docdir, which isn't what we want, so comment the hardcoded
+# docdir value for now
+# docdir is used to install scrollkeeper files, which isn't supported
+# anymore, so maybe it should be removed together with its corresponding
+# hooks
+# docdir = $(datadir)/$(PACKAGE)/doc/$(docname)/$(lang)
 omf_dest_dir=$(datadir)/omf/$(PACKAGE)
 scrollkeeper_localstate_dir = $(localstatedir)/scrollkeeper
 
@@ -103,7 +108,7 @@ EXTRA_DIST = \
 	preformatted/findmicrophones.1.in \
 	preformatted/findwebcams.1.in \
 	preformatted/gtk-gnash.1.in \
-	preformatted/kde4-gnash.1.in \
+	preformatted/qt4-gnash.1.in \
 	preformatted/sdl-gnash.1.in \
 	preformatted/fb-gnash.1.in \
 	preformatted/gnash-gtk-launcher.1.in \
@@ -133,7 +138,7 @@ EXTRAMANPAGES += gtk-gnash.1 gnash-gtk-launcher.1
 endif
 
 if BUILD_QT4_GUI
-EXTRAMANPAGES += kde4-gnash.1 gnash-qt-launcher.1
+EXTRAMANPAGES += qt4-gnash.1 gnash-qt-launcher.1
 endif
 
 if BUILD_SDL_GUI
@@ -376,7 +381,7 @@ uninstall-man1-hook:
 # install-data-hook: install-data-hook-omf
 # uninstall-local: uninstall-local-doc uninstall-local-omf
 
-# gtk-gnash.1, kde4-gnash.1, fb-gnash.1, sdl-gnash.1,gnash-gtk-launcher.1 and gnash-qt-launcher.1 are special,
+# gtk-gnash.1, qt4-gnash.1, fb-gnash.1, sdl-gnash.1,gnash-gtk-launcher.1 and gnash-qt-launcher.1 are special,
 # as they  are created by the --solinks option to the docbook2 tools for creating man pages.
 install-man1: $(MANPAGES)
 	-test -d "$(DESTDIR)$(man1dir)/" || $(mkinstalldirs) "$(DESTDIR)$(man1dir)/"
@@ -389,7 +394,7 @@ uninstall-man1:
 	   $(RM) $(DESTDIR)$(man1dir)/$$file; \
 	done
 
-# gtk-gnash.1, kde4-gnash.1, fb-gnash.1, sdl-gnash.1,gnash-gtk-launcher.1 and gnash-qt-launcher.1
+# gtk-gnash.1, qt-gnash.1, fb-gnash.1, sdl-gnash.1,gnash-gtk-launcher.1 and gnash-qt-launcher.1
 # manpages are generated as aliases for the gnash.1 man page, so we can't use the suffix rules to build
 # them, but we need to install the ".so gnash.1" manpages also, or
 # they aren;t in the tarball.
@@ -456,7 +461,7 @@ CLEANFILES = \
 	omf_timestamp \
 	images \
 	gtk-gnash.1 \
-	kde4-gnash.1 \
+	qt4-gnash.1 \
 	fb-gnash.1 \
 	sdl-gnash.1 \
 	gnash-gtk-launcher.1 \

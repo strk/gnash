@@ -25,7 +25,6 @@ aqua_gnash_SOURCES = $(GUI_SRCS) aqua/gui_aqua.cpp
 aqua_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
 #aqua_gnash_DEPENDENCIES = .configline
 aqua_gnash_LDADD = \
-	$(MYSQL_LIBS) \
 	$(GNASH_LIBS) \
 	$(AM_LDFLAGS)
 

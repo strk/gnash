@@ -48,7 +48,7 @@ AM_LDFLAGS =  \
 
 fileio_la_SOURCES = fileio.cpp fileio.h
 fileio_la_LDFLAGS = -module -avoid-version -no-undefined
-fileio_la_LIBDADD = $(LIBADD_DL) $(AM_LDFLAGS)
+fileio_la_LIBADD = $(LIBADD_DL) $(AM_LDFLAGS)
 
 
 check_SCRIPTS =

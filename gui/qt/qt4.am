@@ -52,7 +52,6 @@ qt4_gnash_SOURCES = $(GUI_SRCS) \
 qt4_gnash_CPPFLAGS = -DGUI_QT4 -DGUI_CONFIG=\"QT4\" $(AM_CPPFLAGS) $(QT4_CFLAGS)
 qt4_gnash_LDFLAGS = -export-dynamic 
 qt4_gnash_LDADD = \
-	$(MYSQL_LIBS) \
 	$(GNASH_LIBS) \
 	$(AM_LDFLAGS) \
 	$(LIBVA_X11_LIBS)

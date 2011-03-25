@@ -32,7 +32,6 @@ sdl_gnash_SOURCES = $(GUI_SRCS) \
 sdl_gnash_LDFLAGS = -export-dynamic 
 sdl_gnash_LDADD = \
 	$(GNASH_LIBS) \
-	$(MYSQL_LIBS) \
 	$(AM_LDFLAGS) \
 	$(SDL_LIBS)
 

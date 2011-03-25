@@ -35,7 +35,7 @@ AM_CPPFLAGS =  \
 dbus_la_SOURCES = dbus_ext.cpp dbus_ext.h
 dbus_la_CPPFLAGS = $(AM_CPPFLAGS)
 dbus_la_LDFLAGS = -module -avoid-version -no-undefined
-dbus_la_LIBDADD = $(LIBADD_DL) \
+dbus_la_LIBADD = $(LIBADD_DL) \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(BOOST_LIBS) \

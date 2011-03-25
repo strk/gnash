@@ -86,14 +86,14 @@ AC_DEFUN([GNASH_PATH_NPAPI],
     save_CXXFLAGS="$CXXFLAGS"
     CXXFLAGS="$CXXFLAGS $NPAPI_CFLAGS"
     AC_MSG_CHECKING([whether NPString has member UTF8Length])
-    AC_COMPILE_IFELSE(AC_LANG_SOURCE([
+    AC_COMPILE_IFELSE([AC_LANG_SOURCE([
                   #include "npapi.h" 
                   #include "npruntime.h"
                   int main(int argc, char* argv[]){
 	            NPString str;
                     uint32_t len = str.UTF8Length;
 	            return 0;
-                  }]),
+                  }])],
                  [AC_DEFINE([NPAPI_VERSION],[192],[Define that we have NPAPI present in version 1.9.2 and newer])
                   AC_MSG_RESULT([yes])],
                  [AC_MSG_RESULT([no])])
