@@ -280,11 +280,15 @@ rm -f $RPM_BUILD_ROOT%{_infodir}/dir
 rm -rf $RPM_BUILD_ROOT
 
 %post 
-/sbin/ldconfig
 %if !%{cross_compile}
 scrollkeeper-update -q -o %{_datadir}/omf/%{name} || :
 /sbin/install-info --entry="* Gnash: (gnash). GNU SWF Player" %{_infodir}/%{name}.info %{_infodir}/dir || :
 %endif
+update-desktop-database &> /dev/null || :
+touch --no-create %{_datadir}/icons/hicolor
+if [ -x %{_bindir}/gtk-update-icon-cache ] ; then
+  %{_bindir}/gtk-update-icon-cache --quiet %{_datadir}/icons/hicolor || :
+fi
 
 %preun
 if [ $1 = 0 ]; then
@@ -292,16 +296,33 @@ if [ $1 = 0 ]; then
 fi
 
 %postun
-/sbin/ldconfig
 %if !%{cross_compile}
 scrollkeeper-update -q || :
 %endif
+update-desktop-database &> /dev/null || :
+touch --no-create %{_datadir}/icons/hicolor
+if [ -x %{_bindir}/gtk-update-icon-cache ] ; then
+  %{_bindir}/gtk-update-icon-cache --quiet %{_datadir}/icons/hicolor || :
+fi
+
+%post klash4
+update-desktop-database &> /dev/null || :
+touch --no-create %{_datadir}/icons/hicolor
+
+%postun klash4
+update-desktop-database &> /dev/null || :
+touch --no-create %{_datadir}/icons/hicolor
+
 
 %files
 %defattr(-,root,root,-)
 %{_bindir}/gnash-gtk-launcher
 %{_bindir}/gtk-gnash
+%{_bindir}/gnash-gtk-launcher
 %{_mandir}/man1/gtk-gnash.1.gz
+%{_mandir}/man1/gnash-gtk-launcher.1.gz
+%{_datadir}/icons/hicolor/32x32/apps/gnash.xpm
+%{_datadir}/applications/gnash.desktop
 
 %files common
 %defattr(-,root,root,-)
@@ -372,7 +393,9 @@ scrollkeeper-update -q || :
 %{_bindir}/qt4-gnash
 %{_mandir}/man1/gnash-qt-launcher.1.gz
 %{_mandir}/man1/qt4-gnash.1.gz
-%{_prefix}/%{_lib}/kde4/libklashpart.*
+%{_mandir}/man1/gnash-qt-launcher.1.gz
+%{_datadir}/applications/klash.desktop
+%{_prefix}/lib*/kde4/libklashpart.*
 %{_prefix}/share/kde4/apps/klash/klashpartui.rc
 %{_prefix}/share/kde4/apps/klash/pluginsinfo
 %{_prefix}/share/kde4/services/klash_part.desktop
