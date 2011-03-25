@@ -24,7 +24,7 @@ BRANCH_REVNO  = "`if test -f revno.h; then grep "REVNO" revno.h | cut -d '"' -f 
 BRANCH_NICK   = "`if test -f revno.h; then grep "NICK" revno.h | cut -d '"' -f 2; fi`"
 
 # this is used for Debian style naming conventions
-NEXT_RELEASE = 0.8.9
+NEXT_RELEASE = 0.8.10
 #SNAPSHOT_VERSION := 0.8.8
 SNAPSHOT_VERSION = $(NEXT_RELEASE)~git.$(BRANCH_NICK)$(BRANCH_REVNO)
 
