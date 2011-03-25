@@ -346,6 +346,7 @@ touch --no-create %{_datadir}/icons/hicolor
 %{_mandir}/man1/findwebcams.1.gz
 %{_mandir}/man1/rtmpget.1.gz
 %{_datadir}/locale/*/LC_MESSAGES/gnash.mo
+%{_prefix}/share/gnash/gnash-splash.swf
 %if !%{cross_compile}
 #%{_prefix}/share/info/*.info*
 %{_prefix}/share/doc/gnash/*.html
@@ -391,10 +392,11 @@ touch --no-create %{_datadir}/icons/hicolor
 %{_mandir}/man1/qt4-gnash.1.gz
 %{_mandir}/man1/gnash-qt-launcher.1.gz
 %{_datadir}/applications/klash.desktop
-%{_prefix}/%{_lib}/kde4/libklashpart.*
+%{_prefix}/lib*/kde4/libklashpart.*
 %{_prefix}/share/kde4/apps/klash/klashpartui.rc
 %{_prefix}/share/kde4/apps/klash/pluginsinfo
 %{_prefix}/share/kde4/services/klash_part.desktop
+%{_datadir}/icons/hicolor/32x32/apps/klash.xpm
 
 %files fileio-extension
 %defattr(-,root,root,-)
