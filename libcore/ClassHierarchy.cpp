@@ -56,45 +56,6 @@ addVisibilityFlag(int& flags, int version)
     }
 }
 
-class declare_extension_function : public as_function
-{
-private:
-    ClassHierarchy::ExtensionClass _decl;
-    as_object *mTarget;
-    Extension *mExtension;
-
-public:
-    bool isBuiltin() { return true; }
-
-    declare_extension_function(ClassHierarchy::ExtensionClass &c, as_object *g,
-            Extension* e)
-        :
-        as_function(getGlobal(*g)),
-        _decl(c),
-        mTarget(g),
-        mExtension(e)
-    {
-    }
-
-    virtual as_value call(const fn_call& fn)
-    {
-        string_table& st = getStringTable(fn);
-        log_debug("Loading extension class %s", st.value(getName(_decl.uri)));
-
-        if (mExtension->initModuleWithFunc(_decl.file_name,
-            _decl.init_name, *mTarget))
-        {
-            // Successfully loaded it, now find it, set its proto, and return.
-            as_value us;
-            mTarget->get_member(_decl.uri, &us);
-            return us;
-        }
-        // Error here -- not successful in loading.
-        log_error("Could not load class %s", st.value(getName(_decl.uri)));
-        return as_value();
-    }
-};
-
 class declare_native_function : public as_function
 {
 
@@ -144,18 +105,6 @@ private:
 
 ClassHierarchy::~ClassHierarchy()
 {
-}
-
-bool
-ClassHierarchy::declareClass(ExtensionClass& c)
-{
-    if (!mExtension) return false; 
-
-    as_function* getter(new declare_extension_function(c, mGlobal, mExtension));
-
-    int flags = PropFlags::dontEnum;
-    addVisibilityFlag(flags, c.version);
-    return mGlobal->init_destructive_property(c.uri, *getter, flags);
 }
 
 bool

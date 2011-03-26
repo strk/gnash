@@ -101,14 +101,6 @@ public:
 
     typedef std::vector<NativeClass> NativeClasses;
 
-	/// Declare an ActionScript class, with information on how to load it.
-	///
-	/// @param c
-	/// The ExtensionClass structure which defines the class.
-	///
-	/// @return true, unless the class with c.name already existed.
-	bool declareClass(ExtensionClass& c);
-
 	/// Declare an ActionScript class and how to instantiate it from the core.
 	///
 	/// @param c
