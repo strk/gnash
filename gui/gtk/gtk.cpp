@@ -180,13 +180,13 @@ GtkGui::init(int argc, char **argv[])
     
     addGnashIcon(GTK_WINDOW(_window));
 
-    std::string hwaccel = _runResources.getHWAccelBackend();
+    std::string hwaccel = rcfile.getHWAccel();
     if (hwaccel.empty()) {
-        hwaccel = rcfile.getHWAccel();
+        hwaccel = _runResources.getHWAccelBackend();
     }
-    std::string renderer = _runResources.getRenderBackend();
+    std::string renderer = rcfile.getRenderer();
     if (renderer.empty()) {
-        renderer = rcfile.getRenderer();
+        renderer = _runResources.getRenderBackend();
     }
 
     if (renderer == "opengl") {
