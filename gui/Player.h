@@ -169,12 +169,12 @@ public:
     
     /// Set the renderer backend, agg, opengl, or cairo. This is set
     /// in the users gnashrc file, or can be overridden with the
-    /// --hwaccel option to gnash.
+    /// --renderer option to gnash.
     void setRenderer(const std::string& x) { _renderer = x; }
     
     /// Set the hardware video accleration backend, none, vaapi, xv,
     /// or cairo. This is set in the users gnashrc file, or can be
-    /// overridden with the --render-mode option to gnash.
+    /// overridden with the --hwaccel option to gnash.
     void setHWAccel(const std::string& x) { _hwaccel = x; }
 
     /// This should be a comma-separated list of frames.
