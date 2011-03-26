@@ -804,10 +804,9 @@ build_gles=no
 build_ogl=auto
 build_agg=yes
 build_cairo=yes
-renderer_list="AGG Cairo"
-nrender=3
+renderer_list="agg cairo"
 AC_ARG_ENABLE(renderer,
-  AC_HELP_STRING([--enable-renderer=], [Enable support for the specified renderers (ogl|cairo|agg|all, default=all)]),
+  AC_HELP_STRING([--enable-renderer=], [Enable support for the specified renderers (agg|cairo|opengl|all, default=all)]),
   if test -n ${enableval}; then
     if test "x${enableval}" != "xno" -o "x${enableval}" != "xnone" ; then
       renderer_list="none"
@@ -818,7 +817,6 @@ AC_ARG_ENABLE(renderer,
     fi
   fi
   renderer_list=""
-  nrender=0
   build_ovg=no
   build_ogl=no
   build_gles=no
@@ -834,47 +832,40 @@ AC_ARG_ENABLE(renderer,
         build_gles=no
         build_agg=no
         build_cairo=no
-        nrender=1
         ;;
       all|ALL)
-        renderer_list="OpenGL, Cairo, AGG"
+        renderer_list="agg cairo opengl"
         build_ogl=yes
         build_agg=yes
         build_cairo=yes
         build_ovg=yes
-        nrender=4
         ;;
       ogl|OGL|OpenGL|opengl)
-        renderer_list="${renderer_list} OpenGL"
+        renderer_list="${renderer_list} opengl"
         build_gles=no
         build_ogl=yes
-        nrender=$((nrender+1))
         ;;
       gles|GLES|GL-ES|gl-es)
-        renderer_list="${renderer_list} OpenGL-ES"
+        renderer_list="${renderer_list} opengl-es"
         build_gles=yes
         build_ogl=no
-        nrender=$((nrender+1))
         ;;
       ovg|OVG|OpenVG|openvg)
-        renderer_list="${renderer_list} OpenVG"
+        renderer_list="${renderer_list} openvg"
         build_ogv=yes
-        nrender=$((nrender+1))
         ;;
       agg|AGG)
-        renderer_list="${renderer_list} AGG"
+        renderer_list="${renderer_list} agg"
         build_agg=yes
-        nrender=$((nrender+1))
         ;;
       cairo|CAIRO|Cairo*)
-        renderer_list="${renderer_list} Cairo"
+        renderer_list="${renderer_list} cairo"
         build_cairo=yes
-        nrender=$((nrender+1))
         ;;
-      *) AC_MSG_ERROR([invalid renderer specified: ${enableval} given (accept:  (ogl|cairo|agg|all)])
+      *) AC_MSG_ERROR([invalid renderer specified: ${enableval} given (accept:  (agg|cairo|opengl|all)])
         ;;
       esac]
-    enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
+    enableval=`echo ${enableval} | cut -d ' ' -f 2-`
     if test "x$val" = "x$enableval"; then
       break;
     fi
