@@ -1128,16 +1128,20 @@ ext_lirc=no
 ext_dbus=no
 ext_all=no
 extensions_list=
+extensions_support=yes
 nextensions=0
 AC_ARG_ENABLE(extensions,
-  AC_HELP_STRING([--enable-extensions=], [Specify which extensions to build]),
+  AC_HELP_STRING([--enable-extensions=], [Specify which extensions to build (default: none)])
+  AC_HELP_STRING([--disable-extensions], [Disable support for extensions entirely]),
   if test -n ${enableval}; then
     if test "x${enableval}" != "xno"; then
       extlist="${enableval}"
       enableval=`echo ${enableval} | tr '\054' ' ' `
+      AC_DEFINE([USE_EXTENSIONS], [1], [Specify that extension support is enabled.])
     else
       extlist=""
       enableval=""
+      extensions_support=no
     fi
   fi
   nextensions=0
@@ -1216,6 +1220,8 @@ AM_CONDITIONAL(BUILD_GTK_EXT, [ test x$ext_gtk = xyes ])
 AM_CONDITIONAL(BUILD_LIRC_EXT, [ test x$ext_lirc = xyes ])
 AM_CONDITIONAL(BUILD_DBUS_EXT, [ test x$ext_dbus = xyes ])
 AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n "$extensions_list"])
+
+AM_CONDITIONAL(ENABLE_EXTENSIONS, [ test "x${extensions_support}" != "xno" ])
 
 dnl --------------------------------------------------------
 dnl Libtool
@@ -3669,10 +3675,13 @@ if test x"$has_ltdl" = x"yes";then
   echo "        LIBLTDL flags are: $LTDL_CFLAGS"
   echo "        LIBLTDL libs are: $LTDL_LIBS"
 else
-  echo "        ERROR: No libltdl development package is installed" >&3
-  echo "               Install it from ftp://ftp.gnu.org/gnu/libtool/" >&3
-  echo "               or .deb users: apt-get install libltdl-dev" >&3
-  echo "               or .rpm users: yum install libtool-ltdl-devel" >&3
+  if test x"${extensions_support}" != xno; then
+    echo "        ERROR: No libltdl development package is installed," >&3
+    echo "               yet --disable-extensions was not specified." >&3
+    echo "               Install it from ftp://ftp.gnu.org/gnu/libtool/" >&3
+    echo "               or .deb users: apt-get install libltdl-dev" >&3
+    echo "               or .rpm users: yum install libtool-ltdl-devel" >&3
+  fi
 fi
  
 if test x"$python" = x"yes"; then
@@ -3757,6 +3766,10 @@ fi
 
 if test x"${extensions_list}" != x; then
   echo "        Building extensions: ${extensions_list}"
+fi
+
+if test x"${extensions_support}" = xno; then
+  echo "        Extension support disabled."
 fi
 
 if test x"${security_list}" != x; then

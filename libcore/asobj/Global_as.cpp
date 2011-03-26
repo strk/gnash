@@ -144,7 +144,9 @@ namespace {
 Global_as::Global_as(VM& vm)
     :
     as_object(vm),
+#ifdef USE_EXTENSIONS
     _et(new Extension()),
+#endif
     _classes(this, _et.get()),
     _objectProto(new as_object(*this))
 {
@@ -322,13 +324,14 @@ createObject(const Global_as& gl)
 void
 Global_as::loadExtensions()
 {
-    if (RcInitFile::getDefaultInstance().enableExtensions()) {
+#if USE_EXTENSIONS
+    if (_et.get() && RcInitFile::getDefaultInstance().enableExtensions()) {
         log_security(_("Extensions enabled, scanning plugin dir for load"));
         _et->scanAndLoad(*this);
+        return;
     }
-    else {
-        log_security(_("Extensions disabled"));
-    }
+#endif
+    log_security(_("Extensions disabled"));
 }
 
 void

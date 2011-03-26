@@ -101,11 +101,6 @@ Extension::Extension(const std::string& dir)
 #endif
 }
 
-Extension::~Extension()
-{
-//    GNASH_REPORT_FUNCTION;
-}
-
 bool
 Extension::scanAndLoad(const std::string& dir, as_object &obj)
 {

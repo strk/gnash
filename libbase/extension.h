@@ -23,8 +23,11 @@
 #include <vector>
 #include <string>
 #include <boost/tokenizer.hpp>
-#include "sharedlib.h"
 #include "dsodefs.h"
+
+namespace gnash {
+    class SharedLib;
+}
 
 
 namespace gnash 
@@ -41,7 +44,7 @@ public:
 
     Extension(const std::string& dir);
 
-    ~Extension();
+    ~Extension() {}
 
     /// Scan a directory for Gnash modules
     bool scanDir();

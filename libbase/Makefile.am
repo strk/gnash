@@ -59,7 +59,6 @@ libgnashbase_la_LIBADD = \
 	$(NULL)
 
 libgnashbase_la_SOURCES = \
-	extension.cpp \
 	$(MALLOC) \
 	GnashImage.cpp \
 	SWFCtype.cpp \
@@ -70,7 +69,6 @@ libgnashbase_la_SOURCES = \
 	log.cpp	\
 	memory.cpp \
 	rc.cpp \
-	sharedlib.cpp \
 	string_table.cpp \
 	tu_file.cpp \
 	IOChannel.cpp \
@@ -103,6 +101,10 @@ else
 libgnashbase_la_SOURCES += SharedMem.cpp
 endif
 endif
+endif
+
+if ENABLE_EXTENSIONS
+libgnashbase_la_SOURCES += extension.cpp sharedlib.cpp
 endif
 
 edit = sed \
@@ -152,13 +154,11 @@ noinst_HEADERS =
 inst_HEADERS = \
 	accumulator.h \
 	SimpleBuffer.h \
-	extension.h \
 	GnashNumeric.h \
 	jemtree.h \
 	GnashSleep.h \
 	gmemory.h \
 	SharedMem.h \
-	sharedlib.h \
 	tree.hh \
 	tu_file.h \
 	IOChannel.h \
@@ -186,6 +186,10 @@ noinst_HEADERS += GnashImagePng.h
 endif
 if USE_GIF
 noinst_HEADERS += GnashImageGif.h
+endif
+
+if ENABLE_EXTENSIONS
+inst_HEADERS += extension.h sharedlib.h
 endif
 
 EXTENSIONS_API = \
