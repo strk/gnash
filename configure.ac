@@ -1003,7 +1003,7 @@ build_vaapi=yes
 hwaccel_list="VAAPI"
 nhwaccel=1
 AC_ARG_ENABLE(hwaccel,
-  AC_HELP_STRING([--enable-hwaccel], [Specify which accleration to support to enable (none,vaapi,omap)]),
+  AC_HELP_STRING([--enable-hwaccel], [Enable hardware accelerated video decoding (none,vaapi)]),
   if test -z ${enableval}; then
       hwaccel_list="none"
       nhwaccel=0
