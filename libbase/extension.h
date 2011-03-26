@@ -27,6 +27,7 @@
 
 namespace gnash {
     class SharedLib;
+    class as_object;
 }
 
 
