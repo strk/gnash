@@ -382,7 +382,8 @@ getSupportedOptions(gnash::Player& p)
         ).c_str())
 
     ("renderer,R", po::value<string>()
-        ->default_value(renderers[0])
+        ->default_value(rcfile.getRenderer().empty() ? renderers[0]
+                                                     : rcfile.getRenderer())
         ->notifier(boost::bind(&Player::setRenderer, &p, _1)),
         (string(_("The renderer to use"))
         + string("\n") + boost::join(renderers, "|")
