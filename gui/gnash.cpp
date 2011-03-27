@@ -375,14 +375,15 @@ getSupportedOptions(gnash::Player& p)
         ).c_str())
 
     ("media,M", po::value<string>()
-        ->default_value(handlers.front())
+        ->default_value(rcfile.getMediaHandler().empty() ? handlers.front()
+                                                 : rcfile.getMediaHandler() )
         ->notifier(boost::bind(&Player::setMedia, &p, _1)),
         (string(_("The media handler to use"))
          + string("\n") + boost::join(handlers, "|")
         ).c_str())
 
     ("renderer,R", po::value<string>()
-        ->default_value(rcfile.getRenderer().empty() ? renderers[0]
+        ->default_value(rcfile.getRenderer().empty() ? renderers.front()
                                                      : rcfile.getRenderer())
         ->notifier(boost::bind(&Player::setRenderer, &p, _1)),
         (string(_("The renderer to use"))
