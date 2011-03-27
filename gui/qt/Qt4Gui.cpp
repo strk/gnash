@@ -109,10 +109,6 @@ Qt4Gui::init(int /*argc*/, char ** /*argv*/[])
     _drawingWidget = _embedWidget->drawingWidget();
 
     std::string renderer = _runResources.getRenderBackend();
-    if (renderer.empty()) {
-        gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
-        renderer = rcfile.getRenderer();
-    }
 
     if (renderer == "cairo") {
 #ifdef RENDERER_CAIRO
@@ -130,7 +126,7 @@ Qt4Gui::init(int /*argc*/, char ** /*argv*/[])
         log_error(_("OpenGL renderer not supported!"));
         return false;
 #endif
-    } else {
+    } else if (renderer == "agg") {
 #ifdef RENDERER_AGG
         log_debug("Using AGG renderer");
         _glue.reset(new Qt4AggGlue());
@@ -138,6 +134,11 @@ Qt4Gui::init(int /*argc*/, char ** /*argv*/[])
         log_error(_("AGG renderer not supported!"));
         return false;
 #endif
+    }
+    else {
+        boost::format fmt = boost::format("Non-existent renderer %1% "
+            "specified") % renderer;
+        throw gnash::GnashException(fmt.str());
     }
 
     setupActions();
