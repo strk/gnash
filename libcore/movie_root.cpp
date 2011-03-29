@@ -861,8 +861,11 @@ movie_root::advance()
     catch (const ActionLimitException& al) {
         // The PP does not disable scripts when the stack limit is reached,
         // but rather struggles on. 
-        log_error(_("Action limit hit during advance: %s"), al.what());
-        clear(_actionQueue);
+        // TODO: find a test case for this, if confirmed fix accordingly
+        boost::format fmt = boost::format(
+            _("ActionLimits hit during advance: %1%. Disable scripts ? "))
+            % al.what();
+        handleActionLimitHit(fmt.str());
     }
     catch (const ActionParserException& e) {
         log_error(_("Buffer overread during advance: %s"), e.what());
