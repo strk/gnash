@@ -3,22 +3,21 @@
 
   - SWF 8 support. This is mostly adding support
     for blend modes and bitmap filters.
-  - SWF 9 support
   - AVM2 support.
-  - RTMP support.
+  - RTMP streaming support and fixes to remoting.
   - IO redesign.
   - Performance improvements, and reducing the footprint.
-  - Custom ActionScript plugins (think MySQL support in Flash).
   - Implement all the missing player classes/methods.
-  - SVG support ?
-  - Keep improving the plugin (+ add GTK1 support).
+  - Keep improving the plugin.
   - Make loading from filesystem predictable
 
 Partially implemented classes are:
 ----------------------------------
-
 NetConnection
 LocalConnection
+NetStream
+flash.display.BitmapData
+flash.external.ExternalInterface
 ...
 
 Unimplemented classes are:
@@ -26,8 +25,13 @@ Unimplemented classes are:
 Accessibility
 Microphone
 Camera
+flash.text.TextRenderer
+flash.filter.*
+flash.net.*
 ContextMenu
-CustomActions
+
+* NB: in some cases the AS interface is present, but the actual
+  desired functionality is not implemented.
 ...
 
 Others
