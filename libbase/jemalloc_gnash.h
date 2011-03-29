@@ -70,7 +70,6 @@ struct mallinfo {
   int keepcost; /* top-most, releasable space UNUSED */
 };
 
-static
 struct mallinfo
 mallinfo(void)
 {
@@ -80,12 +79,12 @@ mallinfo(void)
     jemalloc_stats(&stats);
 
     /* clear unused fields */
-    mi.arena = mi.ordblks = mi.smblks = mi.usmblks = mi.fsmblks =
+    mi.keepcost = mi.ordblks = mi.smblks = mi.usmblks = mi.fsmblks =
         mi.hblks = mi.hblkhd = 0;
 
+    mi.arena = stats.mapped;
     mi.uordblks = stats.allocated;
     mi.fordblks = stats.mapped - mi.uordblks;
-    mi.keepcost = stats.mapped;
 
     return mi;
 }
