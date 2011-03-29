@@ -157,6 +157,7 @@ inst_HEADERS = \
 	GnashNumeric.h \
 	jemalloc_gnash.h \
 	jemalloc_types.h \
+	jemalloc_rb.h \
 	jemalloc.h \
 	GnashSleep.h \
 	gmemory.h \
