@@ -164,6 +164,7 @@ movie_root::movie_root(const movie_definition& def,
     _scaleMode(SCALEMODE_SHOWALL),
     _displayState(DISPLAYSTATE_NORMAL),
     _recursionLimit(256),
+    // TODO: allow gnashrc to set this
     _timeoutLimit(15),
     _movieAdvancementDelay(83), // ~12 fps by default
     _lastMovieAdvancement(0),
