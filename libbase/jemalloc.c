@@ -118,18 +118,18 @@
  */
 #define	MOZ_MEMORY_NARENAS_DEFAULT_ONE
 
-/*
- * MALLOC_STATS enables statistics calculation, and is required for
- * jemalloc_stats().
- */
-#define MALLOC_STATS
-
 #ifndef MALLOC_PRODUCTION
    /*
     * MALLOC_DEBUG enables assertions and other sanity checks, and disables
     * inline functions.
     */
 #  define MALLOC_DEBUG
+
+   /*
+    * MALLOC_STATS enables statistics calculation, and is required for
+    * jemalloc_stats().
+    */
+#  define MALLOC_STATS
 
    /* Memory filling (junk/zero). */
 #  define MALLOC_FILL
