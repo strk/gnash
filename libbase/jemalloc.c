@@ -95,6 +95,7 @@
  *
  *******************************************************************************
  */
+#include "jemalloc_gnash.h"
 
 #ifdef MOZ_MEMORY_ANDROID
 #define NO_TLS
@@ -376,7 +377,6 @@ __FBSDID("$FreeBSD: head/lib/libc/stdlib/malloc.c 180599 2008-07-18 19:35:44Z ja
 
 #endif
 
-#include "jemalloc.h"
 
 /* Some tools, such as /dev/dsp wrappers, LD_PRELOAD libraries that
  * happen to override mmap() and call dlsym() from their overridden
@@ -443,7 +443,7 @@ static const bool __isthreaded = true;
    /* MSVC++ does not support C99 variable-length arrays. */
 #  define RB_NO_C99_VARARRAYS
 #endif
-#include "rb.h"
+#include "jemalloc_rb.h"
 
 #ifdef MALLOC_DEBUG
    /* Disable inlining to make debugging easier. */

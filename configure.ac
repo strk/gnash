@@ -188,6 +188,19 @@ case "${host}" in
     gnu=yes
     AC_DEFINE([GNU_HOST], [1], [this is a GNU platform])
     ;;
+  *-*wince)
+    wince=yes
+    AC_DEFINE([WINCE_HOST], [1], [this is a WINCE platform])
+    ;;
+  *-*winmo)
+    wince=yes
+    AC_DEFINE([WINCE_HOST], [1], [this is a WINCE platform])
+    AC_DEFINE([WINCE6_HOST], [1], [this is a WINCE6 platform])
+    ;;
+  *-android*)
+    android=yes
+    AC_DEFINE([ANDROID_HOST], [1], [this is an Android platform])
+    ;;
 esac
 
 

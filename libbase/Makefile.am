@@ -155,7 +155,9 @@ inst_HEADERS = \
 	accumulator.h \
 	SimpleBuffer.h \
 	GnashNumeric.h \
-	jemtree.h \
+	jemalloc_gnash.h \
+	jemalloc_types.h \
+	jemalloc.h \
 	GnashSleep.h \
 	gmemory.h \
 	SharedMem.h \
