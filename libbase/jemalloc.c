@@ -6157,6 +6157,7 @@ malloc_usable_size(const void *ptr)
 #endif
 }
 
+#ifdef MALLOC_STATS
 void
 jemalloc_stats(jemalloc_stats_t *stats)
 {
@@ -6257,6 +6258,7 @@ jemalloc_stats(jemalloc_stats_t *stats)
 	assert(stats->mapped >= stats->committed);
 	assert(stats->committed >= stats->allocated);
 }
+#endif /* MALLOC_STATS */
 
 #ifdef MOZ_MEMORY_WINDOWS
 void*
