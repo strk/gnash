@@ -2116,6 +2116,37 @@ GtkGui::checkX11Extension(const std::string& ext)
     return false;
 }
 
+bool
+GtkGui::yesno(const std::string& question)
+{
+    bool ret = true;
+
+    GtkWidget *dialog;
+
+    dialog = gtk_message_dialog_new(
+        GTK_WINDOW(_window),
+        GTK_DIALOG_MODAL,
+        GTK_MESSAGE_QUESTION,
+        GTK_BUTTONS_YES_NO,
+        question.c_str());
+
+    switch(gtk_dialog_run(GTK_DIALOG(dialog)))
+    {
+      case GTK_RESPONSE_YES:
+        ret = true;
+        break;
+      case GTK_RESPONSE_NO:
+        ret = false;
+        break;
+      default:
+        break;
+    }
+
+    gtk_widget_destroy(dialog);
+
+    return ret;
+}
+
 
 /// Anonymous namespace for callbacks, local functions, event handlers etc.
 namespace {

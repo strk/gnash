@@ -73,6 +73,8 @@ public:
     
     virtual void hideMenu();
 
+    virtual bool yesno(const std::string& question);
+
     /// For System.capabilities information.
     virtual double getPixelAspectRatio() const;
     virtual std::pair<int, int> screenResolution() const;
