@@ -1320,6 +1320,13 @@ AC_ARG_ENABLE(jemalloc,
   *)   AC_MSG_ERROR([bad value ${enableval} for --enable-jemalloc option]) ;;
 esac],jemalloc=yes)
 
+AC_CHECK_SIZEOF([void *], [4])
+
+if test "x${ac_cv_sizeof_void_p}" != x4 -a x"${ac_cv_sizeof_void_p}" != x8; then
+  dnl jemalloc doesn't support unusual pointer sizes
+  jemalloc=no
+fi
+
 dnl There is some weird stuff going on with NetBSD and jemalloc, so don't 
 dnl build it for now.
 if test x"${netbsd}" = x"yes" -o x"${windows}" = x"yes" -o x"${freebsd}" = x"yes" -o x"${haiku}" = x"yes" -o x"${gnu}" = x"yes"; then

@@ -37,6 +37,12 @@
 #define MOZ_MEMORY_ANDROID
 #endif
 
+#if SIZEOF_VOID_P == 4
+# define MOZ_MEMORY_SIZEOF_PTR_2POW 2
+#elif SIZEOF_VOID_P == 8
+# define MOZ_MEMORY_SIZEOF_PTR_2POW 3
+#endif
+
 #include "jemalloc.h"
 
 #ifdef USE_STATS_MEMORY
