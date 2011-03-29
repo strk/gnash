@@ -41,7 +41,7 @@
 
 #ifdef USE_STATS_MEMORY
 
-/* Enable statistics tracking in jemalloc. */
+/* Enable statistics tracking plus API in jemalloc. */
 #define MALLOC_STATS
 
 /* Borrowed from malloc.h, as this is Linux specific. This has been
@@ -70,17 +70,17 @@ mallinfo(void)
 {
     struct mallinfo mi;
     jemalloc_stats_t stats;
-    
+
     jemalloc_stats(&stats);
 
     /* clear unused fields */
     mi.arena = mi.ordblks = mi.smblks = mi.usmblks = mi.fsmblks =
         mi.hblks = mi.hblkhd = 0;
-  
+
     mi.uordblks = stats.allocated;
     mi.fordblks = stats.mapped - mi.uordblks;
     mi.keepcost = stats.mapped;
-    
+
     return mi;
 }
 
