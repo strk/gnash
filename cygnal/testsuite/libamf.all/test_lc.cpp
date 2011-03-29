@@ -62,7 +62,7 @@ extern int optind, getopt(int, char *const *, const char *);
 #include "SharedMem.h"
 #include "lcshm.h"
 
-using namespace amf;
+using namespace cygnal;
 using namespace gnash;
 using namespace std;
 
@@ -218,7 +218,7 @@ test_data()
     shmaddr = reinterpret_cast<char*>(lcs.begin());     // for gdb
 
     Element *el;
-    vector<amf::Element *> els;
+    vector<cygnal::Element *> els;
 
 #if 0
     // Apparently this constructor no longer exists.
@@ -364,7 +364,7 @@ test_read()
     }
 
 //    boost::uint8_t *ptr = lc.parseHeader(reinterpret_cast<boost::uint8_t *>(shmaddr));
-//    vector<amf::Element *> ellist = lc.parseBody(ptr);
+//    vector<cygnal::Element *> ellist = lc.parseBody(ptr);
 //    cout << "# of AMF Elements in file: " << ellist.size() << endl;
 //    lc.dump();
     lc.close();
@@ -623,7 +623,7 @@ int main(int /*argc*/, char **/* argv[]*/)
 // gnash::LcShm::parseHeader(unsigned char*)
 // gnash::LcShm::formatHeader(std::string const&, std::string const&, bool)
 // gnash::LcShm::dump()
-// gnash::LcShm::send(std::string const&, std::string const&, std::vector<amf::Element*, std::allocator<amf::Element*> >&)
+// gnash::LcShm::send(std::string const&, std::string const&, std::vector<cygnal::Element*, std::allocator<cygnal::Element*> >&)
 // gnash::LcShm::close()
 // gnash::LcShm::connect(std::string const&)
 // gnash::LcShm::connect(int)

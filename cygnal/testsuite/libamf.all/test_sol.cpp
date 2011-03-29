@@ -44,7 +44,7 @@
 #include "arg_parser.h"
 #include "gmemory.h"
 
-using namespace amf;
+using namespace cygnal;
 using namespace gnash;
 using namespace std;
 
@@ -147,7 +147,7 @@ test_read(std::string &filespec)
     if (stat(filespec.c_str(), &st) == 0) {
         SOL sol;
         sol.readFile(filespec);
-        vector<boost::shared_ptr<amf::Element> > els = sol.getElements();
+        vector<boost::shared_ptr<cygnal::Element> > els = sol.getElements();
 
         if (els.size() > 1) {
             string str = els[2]->to_string();
