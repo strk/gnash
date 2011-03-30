@@ -111,3 +111,12 @@ set Renderer
 
 # Use default media handler (there's a space at the end, don't drop it)
 set MediaHandler 
+
+# Override scripts timeout (how to test the defaults?!)
+set scriptsTimeout 15
+
+# Override scripts recursion limit (how to test the defaults?!)
+set scriptsRecursionLimit 256
+
+# Override scripts limit locking (how to test the defaults?!)
+set lockScriptLimits false
