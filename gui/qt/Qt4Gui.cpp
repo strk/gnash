@@ -55,6 +55,7 @@
 #include <QClipboard>
 #include <QString>
 #include <QDesktopWidget>
+#include <QMessageBox>
 
 #include "Range2d.h"
 
@@ -155,7 +156,6 @@ Qt4Gui::init(int /*argc*/, char ** /*argv*/[])
     return true;
 }
 
-
 bool
 Qt4Gui::run()
 {
@@ -254,7 +254,6 @@ Qt4Gui::renderBuffer()
     }
 }
 
-
 void
 Qt4Gui::renderWidget(const QRect& updateRect)
 {
@@ -262,7 +261,6 @@ Qt4Gui::renderWidget(const QRect& updateRect)
     // which *must only happen inside a paint event*.
     _glue->render(updateRect);
 }
-
 
 void
 Qt4Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
@@ -288,7 +286,6 @@ Qt4Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
     }
 }
 
-
 void
 Qt4Gui::setTimeout(unsigned int timeout)
 {
@@ -297,13 +294,11 @@ Qt4Gui::setTimeout(unsigned int timeout)
     QTimer::singleShot(timeout, _drawingWidget, SLOT(quit()));
 }
 
-
 void
 Qt4Gui::setInterval(unsigned int interval)
 {
     _drawingWidget->startTimer(interval);
 }
-
 
 void
 Qt4Gui::setCursor(gnash_cursor_type newcursor)
@@ -433,7 +428,6 @@ Qt4Gui::qtToGnashKey(QKeyEvent *event)
 
 }
 
-
 int
 Qt4Gui::qtToGnashModifier(const Qt::KeyboardModifiers modifiers)
 {
@@ -456,7 +450,6 @@ Qt4Gui::handleKeyEvent(QKeyEvent *event, bool down)
     int mod = qtToGnashModifier(event->modifiers());
     notify_key_event(c, mod, down);
 }
-
 
 void
 Qt4Gui::resize(int width, int height)
@@ -550,8 +543,6 @@ Qt4Gui::showProperties()
     propsDialog->activateWindow();
 }
 
-
-
 void
 Qt4Gui::showPreferences()
 {
@@ -563,13 +554,23 @@ Qt4Gui::showPreferences()
     prefsDialog->activateWindow();
 }
 
+bool
+Qt4Gui::yesno(const std::string& question)
+{
+    QMessageBox* dialog = new QMessageBox(_drawingWidget);
+    dialog->setText(QString::fromStdString(question));
+    dialog->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    dialog->setDefaultButton(QMessageBox::Yes);
+    const int ret = dialog->exec();
+    if (ret == QMessageBox::Yes) return true;
+    return false;
+}
 
 void
 Qt4Gui::quitUI()
 {
     _application->quit();
 }
-
 
 void
 Qt4Gui::setupActions()
