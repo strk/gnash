@@ -21,6 +21,10 @@
 #define MOZ_MEMORY_BSD
 #endif
 
+#ifdef DARWIN_HOST
+#define MOZ_MEMORY_DARWIN
+#endif
+
 #ifdef SOLARIS_HOST
 #define MOZ_MEMORY_SOLARIS
 #endif
