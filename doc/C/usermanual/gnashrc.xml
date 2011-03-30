@@ -328,7 +328,38 @@
 	    1=medium, 2=high, 3=best). Defaults to -1. 
 	  </entry>
 	</row>
-	
+
+	<row>
+	  <entry>scriptsTimeout</entry>
+	  <entry>integer</entry>
+	  <entry>
+	    The amount of seconds after which to prompt popup for script
+	    execution abortion. Defaults to 15. Can be changed by SWF
+	    tags unless you 'set lockScriptLimits on'.
+	  </entry>
+	</row>
+
+	<row>
+	  <entry>scriptsRecursionLimit</entry>
+	  <entry>integer</entry>
+	  <entry>
+	    The maximum depth of function call stack for ActionScript execution.
+	    Defaults to 256. Can be changed by SWF tags unless you
+	    'set lockScriptLimits on'.
+	  </entry>
+	</row>
+
+	<row>
+	  <entry>lockScriptLimits</entry>
+	  <entry>boolean</entry>
+	  <entry>
+	    Makes scriptsRecursionLimit and scriptsTimeout locked to
+	    the default (or rcfile) values and doesn't allow SWF tag
+	    to modify it.
+	    Defaults to off.
+	  </entry>
+	</row>
+
       </tbody>
     </tgroup>
   </table>
