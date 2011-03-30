@@ -233,9 +233,7 @@ movie_root::setRootMovie(Movie* movie)
         processActionQueue();
     }
     catch (const ActionLimitException& al) {
-        boost::format fmt = boost::format(_("ActionLimits hit during "
-                    "setRootMovie: %s. Disable scripts?")) % al.what();
-        handleActionLimitHit(fmt.str());
+        handleActionLimitHit(al.what());
     }
     catch (const ActionParserException& e) {
         log_error("ActionParserException thrown during setRootMovie: %s",
@@ -245,9 +243,11 @@ movie_root::setRootMovie(Movie* movie)
     cleanupAndCollect();
 }
 
-void
-movie_root::handleActionLimitHit(const std::string& msg)
+bool
+movie_root::abortOnScriptTimeout(const std::string& what) const
 {
+    std::string msg = what + std::string(". Disable scripts? ");
+
     bool disable = true;
     if (_interfaceHandler) {
         disable = callInterface<bool>(HostMessage(HostMessage::QUERY, msg));
@@ -256,10 +256,15 @@ movie_root::handleActionLimitHit(const std::string& msg)
         log_error("No user interface registered, assuming 'Yes' answer to "
             "question: %s", msg);
     }
-    if (disable) {
-        disableScripts();
-        clear(_actionQueue);
-    }
+    return disable;
+}
+
+void
+movie_root::handleActionLimitHit(const std::string& msg)
+{
+    log_debug("Disabling scripts: %1%", msg);
+    disableScripts();
+    clear(_actionQueue);
 }
 
 void
@@ -698,9 +703,7 @@ movie_root::fire_mouse_event()
         processActionQueue();
     }
     catch (const ActionLimitException& al) {
-        boost::format fmt = boost::format(_("ActionLimits hit during mouse "
-                    "event processing: %s. Disable scripts ?")) % al.what();
-        handleActionLimitHit(fmt.str());
+        handleActionLimitHit(al.what());
     }
 
     return need_redraw;
@@ -865,10 +868,7 @@ movie_root::advance()
         // The PP does not disable scripts when the stack limit is reached,
         // but rather struggles on. 
         // TODO: find a test case for this, if confirmed fix accordingly
-        boost::format fmt = boost::format(
-            _("ActionLimits hit during advance: %1%. Disable scripts ? "))
-            % al.what();
-        handleActionLimitHit(fmt.str());
+        handleActionLimitHit(al.what());
     }
     catch (const ActionParserException& e) {
         log_error(_("Buffer overread during advance: %s"), e.what());

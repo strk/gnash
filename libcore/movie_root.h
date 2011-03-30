@@ -823,6 +823,8 @@ public:
         return _gc;
     }
 
+    bool abortOnScriptTimeout(const std::string& when) const;
+
 private:
 
     /// Set the root movie, replacing the current one if any.

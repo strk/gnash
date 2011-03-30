@@ -299,7 +299,11 @@ ActionExec::operator()()
                             "executing code in %1% between pc %2% and %3%")) %
                             code.getMovieDefinition().get_url() % next_pc %
                             pc % (maxTime/1000);
-                    throw ActionLimitException(fmt.str());
+                    if ( getRoot(env).abortOnScriptTimeout(fmt.str()) ) {
+                        throw ActionLimitException(fmt.str());
+                    } else {
+                        clock.restart();
+                    }
                 }
                 // TODO: Run garbage collector ? If stack isn't too big ?
             }
