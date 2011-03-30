@@ -43,6 +43,13 @@
 # define MOZ_MEMORY_SIZEOF_PTR_2POW 3
 #endif
 
+#if 0
+/* Unfortunately, even though jemalloc has valgrind hooks, it still produces
+ * false positives. See https://bugzilla.mozilla.org/show_bug.cgi?id=503249
+ */
+#define MOZ_VALGRIND
+#endif
+
 #include "jemalloc.h"
 
 #ifdef USE_STATS_MEMORY
