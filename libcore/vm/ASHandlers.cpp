@@ -242,7 +242,7 @@ ActionHandler::execute(ActionExec& thread) const
 
 SWFHandlers::SWFHandlers()
     :
-    _handlers(255)
+    _handlers(256)
 {
 
     _handlers[ACTION_END] = ActionHandler(ACTION_END, ActionEnd);
