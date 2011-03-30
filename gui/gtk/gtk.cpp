@@ -954,6 +954,9 @@ private:
         GtkWidget *mediaDir;
         GtkWidget *saveStreamingMediaToggle;
         GtkWidget *saveLoadedMediaToggle;
+        GtkWidget *scriptsTimeout;
+        GtkWidget *scriptsRecursionLimit;
+        GtkWidget *lockScriptLimitsToggle;
 
         PrefWidgets()
             :
@@ -980,7 +983,10 @@ private:
             startStoppedToggle(0),
             mediaDir(0),
             saveStreamingMediaToggle(0),
-            saveLoadedMediaToggle(0)
+            saveLoadedMediaToggle(0),
+            scriptsTimeout(0),
+            scriptsRecursionLimit(0),
+            lockScriptLimitsToggle(0)
         {}
 
     };
@@ -1587,6 +1593,27 @@ PreferencesDialog::addPlayerTab()
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(_prefs->librarySize),
             _rcfile.getMovieLibraryLimit());
 
+    // Scripts timeout -- {
+
+    GtkWidget *hbox = gtk_hbox_new (FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(playervbox), hbox, FALSE, FALSE, 0);
+
+    GtkWidget *lbl = gtk_label_new (
+        _("Max scripts execution time (in seconds):"));
+    gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
+    gtk_box_pack_start(GTK_BOX(hbox), lbl, FALSE, FALSE, 0);
+
+    _prefs->scriptsTimeout = gtk_spin_button_new_with_range(0, 60, 1);
+    gtk_box_pack_start(GTK_BOX(hbox), _prefs->scriptsTimeout, FALSE,
+            FALSE, 0);
+    // Align to _rcfile value:
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(_prefs->scriptsTimeout),
+            _rcfile.getScriptsTimeout());
+
+    // --}
+
+
+    // Start-stopped toggle
     _prefs->startStoppedToggle = gtk_check_button_new_with_mnemonic (
                     _("Start _Gnash in pause mode"));
     gtk_box_pack_start(GTK_BOX(playervbox), _prefs->startStoppedToggle,
