@@ -2126,7 +2126,7 @@ GtkGui::yesno(const std::string& question)
         GTK_DIALOG_MODAL,
         GTK_MESSAGE_QUESTION,
         GTK_BUTTONS_YES_NO,
-        question.c_str());
+        "%s", question.c_str());
 
     switch (gtk_dialog_run(GTK_DIALOG(dialog)))
     {
