@@ -289,13 +289,16 @@ ActionExec::operator()()
             );
 #endif
 
-
             // Do some housecleaning on branch back
             if (next_pc <= pc) {
                 // Check for script limits hit. 
                 // See: http://www.gnashdev.org/wiki/index.php/ScriptLimits
                 if (clock.elapsed() > maxTime) {
-                    boost::format fmt = boost::format(_("Time exceeded (%4% secs) while executing code in %1% between pc %2% and %3%")) % code.getMovieDefinition().get_url() % next_pc % pc % (maxTime/1000);
+                    boost::format fmt = 
+                        boost::format(_("Time exceeded (%4% secs) while "
+                            "executing code in %1% between pc %2% and %3%")) %
+                            code.getMovieDefinition().get_url() % next_pc %
+                            pc % (maxTime/1000);
                     throw ActionLimitException(fmt.str());
                 }
                 // TODO: Run garbage collector ? If stack isn't too big ?
@@ -303,7 +306,6 @@ ActionExec::operator()()
 
             // Control flow actions will change the PC (next_pc)
             pc = next_pc;
-
         }
     }
     catch (const ActionLimitException&) {
