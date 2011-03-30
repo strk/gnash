@@ -1163,10 +1163,28 @@ PreferencesDialog::handlePrefs(GtkWidget* dialog, gint response, gpointer data)
                 gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->startStoppedToggle)));
         }
 
+        if ( prefs->scriptsTimeout ) {
+            _rcfile.setScriptsTimeout(
+                gtk_spin_button_get_value_as_int(
+                    GTK_SPIN_BUTTON(prefs->scriptsTimeout)));
+        }
+
+        if ( prefs->scriptsRecursionLimit ) {
+            _rcfile.setScriptsRecursionLimit(
+                gtk_spin_button_get_value_as_int(
+                    GTK_SPIN_BUTTON(prefs->scriptsRecursionLimit)));
+        }
+
+        if ( prefs->lockScriptLimitsToggle ) {
+            _rcfile.lockScriptLimits(
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->lockScriptLimitsToggle)));
+        }
+
         if ( prefs->urlOpenerText ) {
             tmp = gtk_entry_get_text(GTK_ENTRY(prefs->urlOpenerText));            
             _rcfile.setURLOpenerFormat(tmp);
         }
+
         
         // Let _rcfile decide which file to update: generally the file
         // being used if specified in GNASHRC environment variable, or in
@@ -1593,7 +1611,7 @@ PreferencesDialog::addPlayerTab()
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(_prefs->librarySize),
             _rcfile.getMovieLibraryLimit());
 
-    // Scripts timeout -- {
+    { // Scripts timeout -- {
 
     GtkWidget *hbox = gtk_hbox_new (FALSE, 2);
     gtk_box_pack_start(GTK_BOX(playervbox), hbox, FALSE, FALSE, 0);
@@ -1610,7 +1628,38 @@ PreferencesDialog::addPlayerTab()
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(_prefs->scriptsTimeout),
             _rcfile.getScriptsTimeout());
 
-    // --}
+    } // --}
+
+    { // Scripts recursion limit -- {
+
+    GtkWidget *hbox = gtk_hbox_new (FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(playervbox), hbox, FALSE, FALSE, 0);
+
+    GtkWidget *lbl = gtk_label_new (
+        _("Max scripts recursion limit (stack depth):"));
+    gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
+    gtk_box_pack_start(GTK_BOX(hbox), lbl, FALSE, FALSE, 0);
+
+    _prefs->scriptsRecursionLimit = gtk_spin_button_new_with_range(0, 1024, 1);
+    gtk_box_pack_start(GTK_BOX(hbox), _prefs->scriptsRecursionLimit, FALSE,
+            FALSE, 0);
+    // Align to _rcfile value:
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(_prefs->scriptsRecursionLimit),
+            _rcfile.getScriptsRecursionLimit());
+
+    } // --}
+
+    { // Scripts limits lock -- {
+
+    _prefs->lockScriptLimitsToggle = gtk_check_button_new_with_mnemonic(
+            _("Lock script limits so that SWF tags can't override"));
+    gtk_box_pack_start (GTK_BOX(playervbox), _prefs->lockScriptLimitsToggle,
+            FALSE, FALSE, 0);
+    // Align button state with rcfile
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(
+            _prefs->lockScriptLimitsToggle), _rcfile.lockScriptLimits());
+
+    } // --}
 
 
     // Start-stopped toggle
