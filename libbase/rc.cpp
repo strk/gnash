@@ -119,7 +119,10 @@ RcInitFile::RcInitFile()
     _certfile("client.pem"),
     _certdir("/etc/pki/tls"),
     _rootcert("rootcert.pem"),
-    _ignoreShowMenu(true)
+    _ignoreShowMenu(true),
+    _scriptsTimeout(15),
+    _scriptsRecursionLimit(256),
+    _lockScriptLimits(false)
 {
     expandPath(_solsandbox);
     loadFiles();
@@ -606,6 +609,15 @@ RcInitFile::parseFile(const std::string& filespec)
 			||
                  extractSetting(_ignoreShowMenu, "ignoreShowMenu", variable,
                            value)
+			||
+                 extractNumber(_scriptsTimeout, "scriptsTimeout", variable, 
+                         value)
+			||
+                 extractNumber(_scriptsRecursionLimit, "scriptsRecursionLimit",
+                         variable, value)
+			||
+                 extractSetting(_lockScriptLimits, "lockScriptLimits", variable,
+                           value)
             ||
                  cerr << boost::format(_("Warning: unrecognized directive "
                              "\"%s\" in rcfile %s line %d")) 
@@ -767,6 +779,9 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "ignoreShowMenu " << _ignoreShowMenu << endl <<
     cmd << "saveStreamingMedia " << _saveStreamingMedia << endl <<    
     cmd << "saveLoadedMedia " << _saveLoadedMedia << endl <<    
+    cmd << "scriptsTimeout " << _scriptsTimeout << endl <<
+    cmd << "scriptsRecursionLimit " << _scriptsRecursionLimit << endl <<
+    cmd << "lockScriptLimits " << _lockScriptLimits << endl <<
    
     // Strings.
 

@@ -242,3 +242,28 @@
 #
 # Default: true
 #set ignoreShowMenu false
+
+# After a given amount of seconds an action script is running the user
+# is given a chance to interrupt them and abort further scripts execution.
+# You can tweak the number of seconds here, useful for quick profiling.
+#
+# Note that SWF tags can override this, see lockScriptLimits to forbid that.
+#
+# Default: 15
+#set scriptsTimeout 
+
+# Scripts are limited in the number of nested function calls they can
+# make. This is primarly aimed at interrupting infinite recursions.
+# You can tweak the max stack depth here.
+#
+# Note that SWF tags can override this, see lockScriptLimits to forbid that.
+#
+# Default: 256
+#set scriptsRecursionLimit 32
+
+# Forbid override of script limits by SWF tag.
+#
+# See scriptsRecursionLimit and scriptsTimeout directive for further info.
+#
+# Default: false
+#set lockScriptLimits true

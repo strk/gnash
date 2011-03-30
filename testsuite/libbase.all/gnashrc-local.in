@@ -12,3 +12,9 @@ set Renderer fakeRenderer
 
 # Use arbitrary renderer
 set MediaHandler fakeMediaHandler
+
+# Override scripts timeout
+set scriptsTimeout 2
+
+# Override scripts recursion limit
+set scriptsRecursionLimit 32

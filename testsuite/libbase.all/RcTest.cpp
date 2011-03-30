@@ -300,6 +300,19 @@ main (int /*argc*/, char** /*argv*/) {
         runtest.fail ("getMediaHandler gives " + rc.getMediaHandler() );
     }
 
+    if ( rc.getScriptsTimeout() == 15 ) {
+        runtest.pass ("getScriptsTimeout gives 15");
+    } else {
+        runtest.fail ("getScriptsTimeout doesn't gives 15");
+    }
+
+    if ( rc.getScriptsRecursionLimit() == 256 ) {
+        runtest.pass ("getScriptsRecursionLimit gives 256");
+    } else {
+        runtest.fail ("getScriptsRecursionLimit doesn't gives 256");
+    }
+
+
     // Parse a second file
     if (rc.parseFile("gnashrc-local")) {
 
@@ -350,6 +363,18 @@ main (int /*argc*/, char** /*argv*/) {
             runtest.pass ("getMediaHandler gives " + rc.getMediaHandler() );
         } else {
             runtest.fail ("getMediaHandler gives " + rc.getMediaHandler() );
+        }
+
+        if ( rc.getScriptsTimeout() == 2 ) {
+            runtest.pass ("getScriptsTimeout gives 2");
+        } else {
+            runtest.fail ("getScriptsTimeout doesn't gives 2");
+        }
+
+        if ( rc.getScriptsRecursionLimit() == 32 ) {
+            runtest.pass ("getScriptsRecursionLimit gives 32");
+        } else {
+            runtest.fail ("getScriptsRecursionLimit doesn't gives 32");
         }
 
     }

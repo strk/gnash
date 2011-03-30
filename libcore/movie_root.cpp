@@ -163,9 +163,8 @@ movie_root::movie_root(const movie_definition& def,
     _showMenu(true),
     _scaleMode(SCALEMODE_SHOWALL),
     _displayState(DISPLAYSTATE_NORMAL),
-    _recursionLimit(256),
-    // TODO: allow gnashrc to set this
-    _timeoutLimit(15),
+    _recursionLimit(), // set in ctor body
+    _timeoutLimit(),   // set in ctor body
     _movieAdvancementDelay(83), // ~12 fps by default
     _lastMovieAdvancement(0),
     _unnamedInstance(0),
@@ -173,6 +172,10 @@ movie_root::movie_root(const movie_definition& def,
 {
     // This takes care of informing the renderer (if present) too.
     setQuality(QUALITY_HIGH);
+
+    gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+    _recursionLimit = rcfile.getScriptsRecursionLimit();
+    _timeoutLimit = rcfile.getScriptsTimeout();
 }
 
 void
@@ -2154,6 +2157,14 @@ movie_root::setScriptLimits(boost::uint16_t recursion, boost::uint16_t timeout)
     
     if ( recursion == _recursionLimit && _timeoutLimit == timeout ) {
         // avoid the debug log...
+        return;
+    }
+
+    if ( RcInitFile::getDefaultInstance().lockScriptLimits() )
+    {
+        LOG_ONCE( log_debug(_("SWF ScriptLimits tag attempting to set "
+            "recursionLimit=%1% and scriptsTimeout=%2% ignored "
+            "as per rcfile directive"), recursion, timeout) );
         return;
     }
 
