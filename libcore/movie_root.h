@@ -308,13 +308,6 @@ public:
         return *_rootMovie;
     }
 
-    /// Return the current nominal frame rate for the Stage.
-    //
-    /// This is dependent on the Movie set as root movie.
-    float frameRate() const {
-        return _rootMovie->frameRate();
-    }
-
     void stop_drag() {
         _dragState.reset();
     }
@@ -359,15 +352,6 @@ public:
     /// @return true on success, false on error (no such timer)
     bool clearIntervalTimer(boost::uint32_t x);
 
-    /// Return 0-based frame index of originating root movie
-    //
-    /// TODO: drop this function (currently used by gprocessor)
-    ///       or change it to to delegate to _level0 ?
-    ///
-    size_t get_current_frame() const {
-        return _rootMovie->get_current_frame();
-    }
-
     void set_background_color(const rgba& color);
 
     void set_background_alpha(float alpha);
@@ -403,13 +387,6 @@ public:
     ///     DisplayObjects list.
     ///   - Run the GC collector
     void advanceMovie();
-
-    /// 0-based!! delegates to originating root movie
-    //
-    /// TODO: drop this method. currently used by gprocessor.
-    void goto_frame(size_t target_frame_number) {
-        _rootMovie->goto_frame(target_frame_number);
-    }
 
     void display();
 

@@ -1134,9 +1134,8 @@ movie_root::getStageWidth() const
     // If scaling is allowed, always return the original movie size.
     if (_rootMovie) {
         return static_cast<size_t>(_rootMovie->widthPixels());
-    } else {
-        return 0;
-    }
+    } 
+    return 0;
 }
 
 /// Get actionscript height of stage, in pixels. The height
@@ -1151,9 +1150,8 @@ movie_root::getStageHeight() const
     // If scaling is allowed, always return the original movie size.
     if (_rootMovie) {
         return static_cast<size_t>(_rootMovie->heightPixels());
-    } else {
-        return 0;
-    }
+    } 
+    return 0;
 }
 
 /// Takes a short int bitfield: the four bits correspond
@@ -1676,7 +1674,8 @@ movie_root::markReachableResources() const
 
     // Mark original top-level movie
     // This should always be in _movies, but better make sure
-    if ( _rootMovie ) _rootMovie->setReachable();
+    assert(_rootMovie);
+    _rootMovie->setReachable();
 
     // Mark mouse entities 
     _mouseButtonState.markReachableResources();
