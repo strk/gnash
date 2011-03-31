@@ -279,17 +279,6 @@ fi
 AC_SUBST(ANDROID_NDK)
 AM_CONDITIONAL(ANDROID, [ test x"${android_ndk}" != xno ])
 
-AC_ARG_WITH(cpu,
-  AC_HELP_STRING([--with-cpu],[specify a cpu when cross compiling.]),
-  [case "${withval}" in
-    geode) with_cpu=geode ;;
-    *)   AC_MSG_ERROR([bad value ${enableval} for --with-cpu option]) ;;
-   esac],with_cpu=none)
-
-if test x"$with_cpu" != x"none"; then
-   cross_compiling=yes
-fi
-
 AC_C_BIGENDIAN
 AC_C_CONST
 AC_C_INLINE
