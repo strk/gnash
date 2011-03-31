@@ -186,11 +186,6 @@ include $(srcdir)/packaging/alp.am
 #
 include $(srcdir)/packaging/bsd.am
 
-#
-# Mozille/Firefox XPI support
-#
-include $(srcdir)/packaging/xpi.am
-
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"
 	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflapth" LDFLAGS="$(LDFLAGS) -lmudflapth"
