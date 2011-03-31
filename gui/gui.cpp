@@ -629,7 +629,7 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
               case gnash::key::EQUALS:
               {
                   if (_stage) {
-                      const float fps = _stage->frameRate();
+                      const float fps = _stage->getRootMovie().frameRate();
                       // Min interval allowed: 1/100 second (100FPS)
                       const size_t ni = 1000.0/fps;
                       setInterval(ni);
@@ -969,14 +969,14 @@ Gui::advanceMovie(bool doDisplay)
     // Advance movie by one frame
     const bool advanced = m->advance();
 #else
-    const size_t cur_frame = m->getRootMovie()->get_current_frame();
-    const size_t tot_frames = m->getRootMovie()->get_frame_count();
+    const size_t cur_frame = m->getRootMovie().get_current_frame();
+    const size_t tot_frames = m->getRootMovie().get_frame_count();
     const bool advanced = m->advance();
     
     m->getRootMovie().ensureFrameLoaded(tot_frames);
     m->goto_frame(cur_frame + 1);
     m->getRootMovie().setPlayState(gnash::MovieClip::PLAYSTATE_PLAY);
-    log_debug(_("Frame %d"), m->get_current_frame());
+    log_debug(_("Frame %d"), m->getRootMovie().get_current_frame());
 #endif
     
 #ifdef GNASH_FPS_DEBUG
@@ -1006,7 +1006,7 @@ Gui::advanceMovie(bool doDisplay)
 	if (doDisplay && visible()) display(m);
 
 	if (!loops()) {
-		size_t curframe = m->get_current_frame(); // can be 0 on malformed SWF
+		size_t curframe = m->getRootMovie().get_current_frame(); // can be 0 on malformed SWF
 		const gnash::MovieClip& si = m->getRootMovie();
 		if (curframe + 1 >= si.get_frame_count()) {
 			quit(); 
