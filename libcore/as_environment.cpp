@@ -553,7 +553,8 @@ getVariableRaw(const as_environment& env, const std::string& varname,
         return as_value(global);
     }
 
-    if (global->get_member(key, &val)) {
+    // Version 4 only has local variables.
+    if (swfVersion > 4 && global->get_member(key, &val)) {
 #ifdef GNASH_DEBUG_GET_VARIABLE
         log_debug("Found %s in _global", varname);
 #endif
