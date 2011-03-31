@@ -1119,7 +1119,7 @@ Gui::getMovieInfo() const
     /// VM top level
     //
     os << "SWF " << vm.getSWFVersion();
-    topIter = tr->insert(topIter, std::make_pair("VM version", os.str()));
+    topIter = tr->insert(topIter, std::make_pair("Root SWF version", os.str()));
 
     // This short-cut is to avoid a bug in movie_root's getMovieInfo,
     // which relies on the availability of a _rootMovie for doing
