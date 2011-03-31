@@ -1782,10 +1782,6 @@ dnl -----------------------------------------------------------------
 dnl PLUGIN RELATED STUFF
 dnl -----------------------------------------------------------------
 
-dnl Zip is used insted of tar when building an xpi package
-dnl for Mozilla/Firefox.
-AC_PATH_PROG(ZIP, zip, ,[${pathlist}])
-
 dnl !! This has been moved here to make --enable-npapi work
 dnl !! All of plugin-related macro calls could be moved into
 dnl !! a specialized macros/plugin.m4
