@@ -32,6 +32,8 @@
 #include "npfunctions.h"
 #endif
 
+#include "GnashNPVariant.h"
+
 #ifndef HIBYTE
 #define HIBYTE(x) ((((uint32_t)(x)) & 0xff00) >> 8)
 #endif
@@ -358,7 +360,16 @@ NPN_HasMethod(NPP npp, NPObject* obj, NPIdentifier methodName)
 void
 NPN_ReleaseVariantValue(NPVariant *variant)
 {
-    NPNFuncs.releasevariantvalue(variant);
+    if (NPNFuncs.releasevariantvalue) {
+        NPNFuncs.releasevariantvalue(variant);
+    } else {
+        if (variant->type == NPVariantType_String) {
+           NPN_MemFree((void*)gnash::GetNPStringChars(NPVARIANT_TO_STRING(*variant)));
+        } else if (variant->type == NPVariantType_Object) {
+           NPN_ReleaseObject(NPVARIANT_TO_OBJECT(*variant));
+        }
+        VOID_TO_NPVARIANT(*variant);
+    }
 }
 
 void
