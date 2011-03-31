@@ -286,9 +286,9 @@
 	    Examples:
 	    <programlisting>
 	      set urlOpenerFormat firefox -remote 'openurl(%u)'
-	      set urlOpenerFormat xdg-open %u
-	      set urlOpenerFormat open %u
-	      set urlOpenerFormat kfmclient exec %u
+	      set urlOpenerFormat xdg-open '%u'
+	      set urlOpenerFormat open '%u'
+	      set urlOpenerFormat kfmclient exec '%u'
 	    </programlisting>
 	  </entry>
 	</row>

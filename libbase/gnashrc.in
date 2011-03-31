@@ -169,15 +169,15 @@
 # Use the following command format to open urls if 
 # no host-request FD was given.
 #
-# The '%u' label will be substituted with the url
+# The ``%u'' label will be substituted with the url
 # to open.
 # 
 # NOTE that the NPAPI plugin provides an host request FD
 # to send url opening requests to.
 #
-# Default: firefox -remote 'openurl(%u)'
+# Default: xdg-open '%u'
 #
-#set urlOpenerFormat lynx %u
+#set urlOpenerFormat lynx '%u'
 
 # Directory to store SharedObject files 
 #

@@ -75,7 +75,7 @@ RcInitFile::RcInitFile()
     _debugger(false),
     _verbosity(-1),
     // will be reset to something else if __OS2__x is defined:
-    _urlOpenerFormat("firefox -remote 'openurl(%u)'"),
+    _urlOpenerFormat("xdg-open '%u'"),
     _flashVersionString(
         DEFAULT_FLASH_PLATFORM_ID" "\
         DEFAULT_FLASH_MAJOR_VERSION","\
