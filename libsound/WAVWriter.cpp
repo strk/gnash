@@ -34,7 +34,7 @@ namespace { // anonymous
 
 // Header of a wave file
 // http://ftp.iptel.org/pub/sems/doc/full/current/wav__hdr_8c-source.html
-typedef struct{
+struct WAV_HDR {
      char rID[4];            // 'RIFF'
      boost::uint32_t rLen;        
      char wID[4];            // 'WAVE'
@@ -46,14 +46,14 @@ typedef struct{
      boost::uint32_t nAvgBytesPerSec;
      boost::int16_t nBlockAlign;      
      boost::int16_t nBitsPerSample;
-} WAV_HDR;
+};
 
 // Chunk of wave file
 // http://ftp.iptel.org/pub/sems/doc/full/current/wav__hdr_8c-source.html
-typedef struct{
+struct CHUNK_HDR{
     char dId[4];            // 'data' or 'fact'
     boost::uint32_t dLen;
-} CHUNK_HDR;
+};
 
 } // end of anonymous namespace
 
