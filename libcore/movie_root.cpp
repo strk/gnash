@@ -132,12 +132,11 @@ clear(movie_root::ActionQueue& aq)
 } // anonymous namespace
 
 
-movie_root::movie_root(const movie_definition& def,
-        VirtualClock& clock, const RunResources& runResources)
+movie_root::movie_root(VirtualClock& clock, const RunResources& runResources)
     :
     _gc(*this),
     _runResources(runResources),
-    _vm(def.get_version(), *this, clock),
+    _vm(*this, clock),
     _interfaceHandler(0),
     _fsCommandHandler(0),
     _stageWidth(1),
@@ -201,6 +200,8 @@ movie_root::~movie_root()
 Movie*
 movie_root::init(movie_definition* def, const MovieClip::MovieVariables& vars)
 {
+    _vm.setSWFVersion(def->get_version());
+
     Movie* mr = def->createMovie(*_vm.getGlobal());
     mr->setVariables(vars);
     setRootMovie(mr);

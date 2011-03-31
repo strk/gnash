@@ -51,11 +51,11 @@ gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 
 namespace gnash {
 
-VM::VM(int version, movie_root& root, VirtualClock& clock)
+VM::VM(movie_root& root, VirtualClock& clock)
 	:
 	_rootMovie(root),
 	_global(new Global_as(*this)),
-	_swfversion(version),
+	_swfversion(6),
 	_clock(clock),
 	_stack(),
     _shLib(new SharedObjectLibrary(*this)),

@@ -447,7 +447,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
     // and their parsing thread alive until static destruction. The parser
     // can then continue to access destroyed resources.
     {
-        gnash::movie_root m(*md, cl, runResources);
+        gnash::movie_root m(cl, runResources);
         
         // Register processor to receive ActionScript events (Mouse, Stage
         // System etc).

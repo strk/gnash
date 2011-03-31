@@ -175,9 +175,7 @@ public:
     //
     /// Make sure to call setRootMovie() 
     /// before using any of this class methods !
-    ///
-    movie_root(const movie_definition& def, VirtualClock& clock,
-            const RunResources& runResources);
+    movie_root(VirtualClock& clock, const RunResources& runResources);
 
     ~movie_root();
 

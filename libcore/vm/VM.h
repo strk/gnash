@@ -78,10 +78,9 @@ public:
 	
 	/// Initializes the VM
     //
-    /// @param version      The initial version of the VM
     /// @param root         The movie_root that owns this VM
     /// @param clock        The clock to use for advances.
-	VM(int version, movie_root& root, VirtualClock& clock);
+	VM(movie_root& root, VirtualClock& clock);
 
 	~VM();
 

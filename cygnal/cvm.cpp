@@ -434,7 +434,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
 
     // Use a clock advanced at every iteration to match exact FPS speed.
     ManualClock cl;
-    gnash::movie_root m(*md, cl, runResources);
+    gnash::movie_root m(cl, runResources);
     
     // Register processor to receive ActionScript events (Mouse, Stage
     // System etc).
