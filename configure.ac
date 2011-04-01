@@ -1849,26 +1849,6 @@ dnl -----------------------------------------------------------------
 dnl END OF PLUGIN RELATED STUFF
 dnl -----------------------------------------------------------------
 
-dnl IRIX-hack.
-case $host in
-  *-*-irix*)
-  dnl ABI-check
-  save_LIBS=$LIBS
-  dir="/usr/lib /usr/lib32 /usr/lib/lib64"
-  for i in $dir; do
-    LIBS=-L$i
-    AC_SEARCH_LIBS(XDisableAccessControl, X11, [
-      xpathed=$i
-      break
-    ])
-    unset ac_cv_search_XDisableAccessControl
-  done
-  ac_x_libraries=$xpathed
-  x_libraries=$xpathed
-  LIBS=$save_LIBS
-  ;;
-esac
-
 AM_CONDITIONAL(LIRC, [test x$lirc_ext = xyes])
 
 AC_CHECK_HEADERS(endian.h machine/endian.h)
