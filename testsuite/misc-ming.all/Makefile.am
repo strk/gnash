@@ -47,6 +47,8 @@ EXTRA_DIST = \
 	XMLSocketTest.as \
 	attachExtImported.as \
 	attachImported.as \
+	Version4Loader.as \
+	Version5Loaded.as \
 	case6.as \
 	case7.as \
 	easysound.as \
@@ -274,6 +276,7 @@ check_SCRIPTS += VarAndCharClashTest-Runner \
 	FlashVarsTest-Runner \
 	attachImported-Runner \
 	attachExtImported-Runner \
+	MixedVersion4And5Runner \
 	SharedObjectTestRunner
 endif
 
@@ -351,6 +354,14 @@ DefineTextTest_Runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	DefineTextTest.swf      \
 	$(NULL)
+
+Version4Loader.swf: $(srcdir)/Version4Loader.as 
+	$(MAKESWF) -o $@ -v4 $(srcdir)/Version4Loader.as
+Version5Loaded.swf: $(srcdir)/Version5Loaded.as Dejagnu.swf
+	$(MAKESWF) -o $@ Dejagnu.swf -v5 $(srcdir)/Version5Loaded.as
+MixedVersion4And5Runner: Version4Loader.swf Version5Loaded.swf
+	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) Version5Loaded.swf > $@
+	chmod 755 $@
 
 TextSnapshotTest.swf: TextSnapshotTest
 	./TextSnapshotTest $(abs_mediadir)
@@ -1743,6 +1754,7 @@ TEST_CASES += VarAndCharClashTest-Runner \
 	DragDropTestRunner   \
 	FlashVarsTest-Runner \
 	SharedObjectTestRunner \
+	MixedVersion4And5Runner \
 	intervalTestRunner \
 	gotoFrame2Test-Runner \
 	attachImported-Runner \
