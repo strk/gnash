@@ -1865,7 +1865,7 @@ dnl libcurl3-dev on Ubuntu has a dependency on lber, and Gnash won't link
 dnl on most machines without it. While it isn't diretly used by Gnash at all,
 dnl it's to work around an Ubuntu packaging bug.
 AC_CHECK_LIB(lber, ber_free)
-AC_CHECK_LIB(bz2, BZ2_bzopen)
+AC_CHECK_LIB(bz2, BZ2_bzopen, [AC_SUBST(BZ2_LIBS, -lbz2)])
 AC_CHECK_LIB(c, getpwnam, AC_DEFINE(HAVE_GETPWNAM, 1, [Has getpwnam] ))
 
 dnl X11 is needed for fltk (at least),
