@@ -122,7 +122,7 @@ AC_DEFUN([GNASH_PATH_CURL],
     dnl on most machines without it. (Ubuntu packaging bug.)
     save_LIBS="$LIBS"
     LIBS="$LIBS $CURL_LIBS"
-    AC_TRY_LINK_FUNC(curl_easy_init, [echo "ok!"], 
+    AC_TRY_LINK_FUNC(curl_easy_init, [], 
       [AC_CHECK_LIB(lber, ber_free, [CURL_LIBS="$CURL_LIBS -llber"])])
     dnl FIXME: complain if that didn't do the trick?
     LIBS="$save_LIBS"
