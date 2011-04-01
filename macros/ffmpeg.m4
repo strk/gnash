@@ -22,6 +22,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   backupLIBS="$LIBS"
   backupCFLAGS="$CFLAGS"
   avcodec_h=""
+  avcodec_version_h=""
   ffmpeg_top_incl=""
 
   dnl If the user specify an path to include headers from, we assume it's the full
@@ -45,6 +46,9 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
         avcodec_h=${with_ffmpeg_incl}/avcodec.h
       else
         AC_MSG_ERROR([${with_ffmpeg_incl} directory does not contain the avcodec.h header])
+      fi
+      if test -f ${with_ffmpeg_incl}/version.h; then
+        avcodec_version_h=${with_ffmpeg_incl}/version.h
       fi
     fi
   ])
@@ -182,14 +186,24 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   dnl a modified form of grepping may be better, making sure all old kinds of
   dnl version numbering fail gracefully.
 
+  versionfile=""
+
   dnl Check avcodec version number, if it was found
-  if test x"${avcodec_h}" != x; then
+  if test x"${avcodec_version_h}" != x; then
+    versionfile=${avcodec_version_h}
+  else
+    if test x"${avcodec_h}" != x; then
+      versionfile=${avcodec_h}
+    fi
+  fi
+
+  if test x"${versionfile}" != x; then
 
     AC_MSG_CHECKING([ffmpeg version])
 
-    ffmpeg_major_version=`$EGREP "define LIBAVCODEC_VERSION_MAJOR " ${avcodec_h} | sed -e "s%[[^0-9]]%%g"`
-    ffmpeg_minor_version=`$EGREP "define LIBAVCODEC_VERSION_MINOR " ${avcodec_h} | sed -e "s%[[^0-9]]%%g"`
-    ffmpeg_micro_version=`$EGREP "define LIBAVCODEC_VERSION_MICRO " ${avcodec_h} | sed -e "s%[[^0-9]]%%g"`
+    ffmpeg_major_version=`$EGREP "define LIBAVCODEC_VERSION_MAJOR " ${versionfile} | sed -e "s%[[^0-9]]%%g"`
+    ffmpeg_minor_version=`$EGREP "define LIBAVCODEC_VERSION_MINOR " ${versionfile} | sed -e "s%[[^0-9]]%%g"`
+    ffmpeg_micro_version=`$EGREP "define LIBAVCODEC_VERSION_MICRO " ${versionfile} | sed -e "s%[[^0-9]]%%g"`
 
     if test x"${ffmpeg_major_version}" != x ; then
 
@@ -198,15 +212,15 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
     else
 
       dnl #define LIBAVCODEC_VERSION_TRIPLET 51,50,1
-      ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION_TRIPLET " ${avcodec_h} | awk '{print $'3'}' | sed -e "s%,%.%g"`
+      ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION_TRIPLET " ${versionfile} | awk '{print $'3'}' | sed -e "s%,%.%g"`
 
       if test x"${ffmpeg_version}" = x ; then
 
         dnl NOTE: the [0-9]*d. pattern discards deb-heads rubbish prefix
-        ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION " ${avcodec_h} | awk '{print $'3'}' | sed -e "s%^[[0-9]]d\.%%"` 
+        ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION " ${versionfile} | awk '{print $'3'}' | sed -e "s%^[[0-9]]d\.%%"` 
 
         if test x"${ffmpeg_version}" = x ; then
-          ffmpeg_version=`$EGREP "define LIBAVCODEC_BUILD " ${avcodec_h} | awk '{print $'3'}'`
+          ffmpeg_version=`$EGREP "define LIBAVCODEC_BUILD " ${versionfile} | awk '{print $'3'}'`
         fi
       fi
 
