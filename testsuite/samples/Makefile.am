@@ -108,6 +108,7 @@ EXTRA_DIST = \
 	GotoAndPlayTest.swf \
 	gotoFrameOnKeyEvent.swf \
 	subshapes.swf \
+	test_lastopcode_v6.swf \
 	README \
 	$(NULL)
 
