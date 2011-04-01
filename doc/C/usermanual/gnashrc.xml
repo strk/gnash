@@ -306,6 +306,16 @@
 	</row>
 
 	<row>
+	  <entry>MediaHandler</entry>
+	  <entry>string</entry>
+	  <entry>
+	    Specify the type of Media Handler to use. Currently only
+	    <emphasis>ffmpeg</emphasis> or <emphasis>gst</emphasis>
+	    are supported. The default is ffmpeg.
+	  </entry>
+	</row>
+
+	<row>
 	  <entry>Renderer</entry>
 	  <entry>string</entry>
 	  <entry>
