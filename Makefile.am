@@ -221,8 +221,6 @@ endif
 if USE_FFMPEG_ENGINE
 	@echo "	FFMPEG_CFLAGS is $(FFMPEG_CFLAGS)"
 	@echo "	FFMPEG_LIBS is $(FFMPEG_LIBS)"
-	@echo "	OGG_CFLAGS is $(OGG_CFLAGS)"
-	@echo "	OGG_LIBS is $(OGG_LIBS)"
 endif
 if HAVE_SPEEX
 	@echo "	SPEEX_CFLAGS is $(SPEEX_CFLAGS)"
