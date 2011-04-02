@@ -100,11 +100,7 @@ libgnashplugin_la_SOURCES += pluginScriptObject.cpp \
 check:
 	./test
 
-if PLUGIN_LINK_UNDEFINED
-libgnashplugin_la_LDFLAGS = -avoid-version -L$(plugindir)
-else
 libgnashplugin_la_LDFLAGS = -module -avoid-version -L$(plugindir)
-endif
 
 if VISIBILITY_WORKS
 libgnashplugin_la_CXXFLAGS = -fvisibility=hidden

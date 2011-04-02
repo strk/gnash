@@ -204,7 +204,6 @@ case "${host}" in
 esac
 
 
-AM_CONDITIONAL(PLUGIN_LINK_UNDEFINED, test x$openbsd_os = xopenbsd)
 AM_CONDITIONAL(WIN32, test x$windows = xyes)
 AM_CONDITIONAL(HAIKU, test x$haiku = xyes)
 AM_CONDITIONAL(AMIGAOS4, test x$amigaos4 = xyes)
@@ -619,7 +618,7 @@ AC_ARG_ENABLE(gui,
   [ dnl Run the following code if no --enable-gui is given
   build_fb=auto
   build_sdl=auto
-  if test x"${openbsd_os}" = x"openbsd"; then
+  if test x"${openbsd}" = xyes; then
     build_gtk=yes
     build_dump=auto
   else if test x"${haiku}" = xyes; then

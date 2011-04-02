@@ -539,23 +539,20 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
       libgsm=""
     fi
 
-    dnl OpenBSD seems to have a problem with libgsm.
-    if test x$openbsd_os != xopenbsd; then
-      if test x"${libgsm}" = x; then
-        if test -f ${top_lib_dir}/libgsm.a -o -f ${top_lib_dir}/libgsm.${shlibext}; then
-          ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lgsm"
-          AC_MSG_RESULT(${top_lib_dir}/libgsm)
-        else
-          AC_MSG_RESULT(no)
-          if test x${cross_compiling} = xno; then
-            AC_CHECK_LIB(gsm, gsm_destroy, [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lgsm"])
-          fi
+    if test x"${libgsm}" = x; then
+      if test -f ${top_lib_dir}/libgsm.a -o -f ${top_lib_dir}/libgsm.${shlibext}; then
+        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lgsm"
+        AC_MSG_RESULT(${top_lib_dir}/libgsm)
+      else
+        AC_MSG_RESULT(no)
+        if test x${cross_compiling} = xno; then
+          AC_CHECK_LIB(gsm, gsm_destroy, [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lgsm"])
         fi
       fi
-    else
-      AC_MSG_RESULT(${libgsm})
-      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libgsm}"      
     fi
+
+    AC_MSG_RESULT(${libgsm})
+    ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libgsm}"
     dnl End of GSM library looking }
     
     dnl Look for the DC1394 library, which is required on some systems. {
