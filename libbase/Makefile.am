@@ -34,6 +34,7 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	$(Z_CFLAGS) \
 	$(JPEG_CFLAGS) \
 	$(BOOST_CFLAGS) \
+	$(OPENGL_CFLAGS) \
 	$(LTDL_CFLAGS) \
 	$(NULL)
 
