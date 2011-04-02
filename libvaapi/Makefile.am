@@ -35,31 +35,26 @@ libgnashvaapi_la_LIBADD = \
 	$(NULL)
 
 libgnashvaapi_la_SOURCES = \
-	vaapi_utils.cpp	\
-	VaapiContext.cpp \
-	VaapiDisplay.cpp \
-	VaapiGlobalContext.cpp \
-	VaapiImage.cpp \
-	VaapiImageFormat.cpp \
-	VaapiSubpicture.cpp \
-	VaapiSurface.cpp \
-	VaapiSurfaceProxy.cpp \
-	$(NULL)
-
-noinst_HEADERS = \
 	vaapi_common.h \
+	vaapi_utils.cpp	\
 	vaapi_utils.h \
+	VaapiContext.cpp \
 	VaapiContext.h \
+	VaapiDisplay.cpp \
 	VaapiDisplay.h \
 	VaapiDisplayX11.h \
-	VaapiDisplayGLX.h \
 	VaapiException.h \
+	VaapiGlobalContext.cpp \
 	VaapiGlobalContext.h \
+	VaapiImage.cpp \
 	VaapiImage.h \
+	VaapiImageFormat.cpp \
 	VaapiImageFormat.h \
+	VaapiSubpicture.cpp \
 	VaapiSubpicture.h \
+	VaapiSurface.cpp \
 	VaapiSurface.h \
-	VaapiSurfaceGLX.h \
+	VaapiSurfaceProxy.cpp \
 	VaapiSurfaceProxy.h \
 	$(NULL)
 
@@ -73,7 +68,9 @@ libgnashvaapi_la_LIBADD += \
 	$(NULL)
 
 libgnashvaapi_la_SOURCES += \
+	VaapiDisplayGLX.h \
 	VaapiSurfaceGLX.cpp \
+	VaapiSurfaceGLX.h \
 	$(NULL)
 endif
 
