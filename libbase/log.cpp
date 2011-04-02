@@ -33,11 +33,15 @@
 
 #include <unistd.h> // for getpid
 
-#include "utility.h"
 #include "GnashAlgorithm.h"
 
 using std::cout;
 using std::endl;
+
+namespace {
+    // TODO: drop this and use boost::this_thread::id instead.
+    inline unsigned long int /* pthread_t */ get_thread_id(void);
+}
 
 namespace gnash {
 
@@ -322,6 +326,47 @@ LogFile::removeLog()
 
 } // end of gnash namespace
 
+/// Used in logging.
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#else
+# ifdef _WIN32
+extern "C" unsigned long int /* DWORD WINAPI */ GetCurrentThreadId(void);
+# else
+#include <sys/types.h>
+#include <unistd.h>
+# endif
+#endif
+
+namespace {
+
+inline unsigned long int /* pthread_t */ get_thread_id(void)
+{
+#ifdef HAVE_PTHREADS
+# ifdef __APPLE_CC__
+    return reinterpret_cast<unsigned long int>(pthread_self());
+# else
+    // This isn't a proper style C++ cast, but FreeBSD has a problem with
+    // static_cast for this as pthread_self() returns a pointer. We can
+    // use that too, this ID is only used for the log file to keep output
+    // from seperare threads clear.
+# ifdef _WIN32
+    return GetCurrentThreadId();
+#else
+    return (unsigned long int)pthread_self();
+#endif
+# endif 
+#else
+# ifdef _WIN32
+    return GetCurrentThreadId();
+# else
+    return static_cast<unsigned long int>(getpid());
+# endif
+#endif
+
+}
+
+} // anonymous namespace
 
 // Local Variables:
 // mode: C++

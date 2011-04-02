@@ -31,10 +31,6 @@
 #include <string>
 #include <typeinfo>
 
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
-
 #if defined(__GNUC__) && __GNUC__ > 2
 #  include <cxxabi.h>
 #endif
@@ -109,45 +105,6 @@ std::string typeName(const T& inst)
 	}
 #endif // __GNUC__ > 2
 	return typeName;
-}
-
-/// Used in logging.
-#ifdef HAVE_PTHREADS
-#else
-# ifdef _WIN32
-} // end namespace gnash
-extern "C" unsigned long int /* DWORD WINAPI */ GetCurrentThreadId(void);
-namespace gnash {
-# else
-/* getpid() */
-#include <sys/types.h>
-#include <unistd.h>
-# endif
-#endif
-
-inline unsigned long int /* pthread_t */ get_thread_id(void)
-{
-#ifdef HAVE_PTHREADS
-# ifdef __APPLE_CC__
-    return reinterpret_cast<unsigned long int>(pthread_self());
-# else
-    // This isn't a proper style C++ cast, but FreeBSD has a problem with
-    // static_cast for this as pthread_self() returns a pointer. We can
-    // use that too, this ID is only used for the log file to keep output
-    // from seperare threads clear.
-# ifdef _WIN32
-    return GetCurrentThreadId();
-#else
-    return (unsigned long int)pthread_self();
-#endif
-# endif 
-#else
-# ifdef _WIN32
-    return GetCurrentThreadId();
-# else
-    return static_cast<unsigned long int>(getpid());
-# endif
-#endif
 }
 
 } // namespace gnash
