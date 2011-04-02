@@ -25,8 +25,6 @@ AUTOMAKE_OPTIONS =
 # this is where Gnash plugins get installed
 pluginsdir = $(libdir)/gnash/plugins
 
-## WARNING: make sure GLIB_LIBS appears first
-## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_CPPFLAGS = -I.. \
 	-I$(srcdir) \
 	-I$(top_srcdir) \
@@ -35,14 +33,6 @@ AM_CPPFLAGS = -I.. \
 	-I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/librender \
-	$(SDL_CFLAGS) \
-	$(PANGO_CFLAGS) \
-	$(GLIB_CFLAGS) \
-	$(ATK_CFLAGS) \
-	$(DMALLOC_CFLAGS) \
-	$(PNG_CFLAGS) \
-	$(JPEG_CFLAGS) \
-	$(OGG_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(OPENGL_CFLAGS) \
 	$(AGG_CFLAGS) \
