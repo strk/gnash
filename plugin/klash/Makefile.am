@@ -38,11 +38,7 @@ plugin_LTLIBRARIES= libklashpart.la
 
 libklashpart_la_SOURCES = klash_part.cpp klash_part.h
 libklashpart_la_DEPENDENCIES = klash_part.moc
-if PLUGIN_LINK_UNDEFINED
-libklashpart_la_LDFLAGS = -avoid-version -L$(plugindir)
-else
 libklashpart_la_LDFLAGS = -module -avoid-version -L$(plugindir)
-endif
 
 dist_kde_services_DATA = klash_part.desktop
 dist_kde_rc_DATA = klashpartui.rc
