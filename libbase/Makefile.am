@@ -30,10 +30,7 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	$(PTHREAD_CFLAGS) \
 	$(PNG_CFLAGS) \
 	$(GIF_CFLAGS) \
-	$(GLIB_CFLAGS) \
-	$(GSTREAMER_CFLAGS) \
 	$(CURL_CFLAGS) \
-	$(OPENGL_CFLAGS) \
 	$(Z_CFLAGS) \
 	$(JPEG_CFLAGS) \
 	$(BOOST_CFLAGS) \
@@ -52,7 +49,6 @@ libgnashbase_la_LIBADD = \
 	$(GIF_LIBS) \
 	$(Z_LIBS) \
 	$(CURL_LIBS) \
-	$(OPENGL_LIBS) \
 	$(LIBINTL) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
