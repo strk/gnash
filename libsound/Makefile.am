@@ -23,6 +23,7 @@ pkglib_LTLIBRARIES =  libgnashsound.la
 libgnashsound_la_CPPFLAGS = \
 	-I$(top_srcdir)/libbase	\
 	-I$(top_srcdir)/libmedia \
+	$(PTHREAD_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(SDL_CFLAGS) \
 	$(NULL)

@@ -29,6 +29,7 @@ pkglib_LTLIBRARIES =  libgnashmedia.la
 
 libgnashmedia_la_CPPFLAGS = \
 	-I$(top_srcdir)/libbase	\
+	$(PTHREAD_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(NULL)
 

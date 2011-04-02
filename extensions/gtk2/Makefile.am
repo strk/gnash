@@ -35,6 +35,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libcore/asobj \
 	$(SDL_CFLAGS) \
 	$(BOOST_CFLAGS) \
+	$(PTHREAD_CFLAGS) \
 	$(GTK2_CFLAGS) \
 	$(GLEXT_CFLAGS) \
 	$(GLIB_CFLAGS) \

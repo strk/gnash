@@ -51,6 +51,7 @@ AM_CPPFLAGS = \
 	$(LIRC_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(PYTHON_LIBS) \
+	$(PTHREAD_CFLAGS) \
 	$(NULL)
 
 AM_CPPFLAGS += -DPKGDATADIR="\"$(pkgdatadir)\""

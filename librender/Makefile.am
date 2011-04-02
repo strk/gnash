@@ -33,6 +33,7 @@ AM_CPPFLAGS = -I.. \
 	-I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/librender \
+	$(PTHREAD_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(OPENGL_CFLAGS) \
 	$(AGG_CFLAGS) \
