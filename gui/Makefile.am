@@ -99,8 +99,7 @@ GTK_LIBS =  \
 	$(PANGO_LIBS) \
 	$(ATK_LIBS) \
 	$(EXPAT_LIBS) \
-	$(X11_LIBS) \
-	$(Z_LIBS)
+	$(X11_LIBS)
 
 # The following will be filled up later
 GUI_CPPFLAGS = 
