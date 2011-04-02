@@ -2173,7 +2173,7 @@ if test x$cross_compiling = xno; then
 		  [Enable rtmpy based testing (default host is www.gnashdev.org)]),
 	      [case "${enableval}" in
              no) RTMPY_HOST="" ;;
-            yes) RTMPY_HOST="www.gnashdev.org" ;;
+            yes) RTMPY_HOST="gnash.keybit.net" ;;
               *) RTMPY_HOST="${enableval}";;
            esac])
   AC_SUBST(RTMPY_HOST)
