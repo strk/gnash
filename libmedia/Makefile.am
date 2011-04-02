@@ -58,7 +58,6 @@ libgnashmedia_la_LIBADD = \
 	$(CURL_LIBS) \
 	$(OPENGL_LIBS) \
 	$(BOOST_LIBS) \
-	$(PTHREAD_LIBS) \
 	$(NULL)
 
 libgnashmedia_la_SOURCES = \

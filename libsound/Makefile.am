@@ -33,7 +33,6 @@ libgnashsound_la_LIBADD = \
 	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(BOOST_LIBS) \
-	$(PTHREAD_LIBS) \
 	$(SDL_LIBS) \
 	$(NULL)
 

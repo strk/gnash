@@ -28,7 +28,6 @@ AM_LDFLAGS = \
 	$(CURL_LIBS) \
 	$(BOOST_LIBS) \
 	$(DEJAGNU_CFLAGS) \
-	$(PTHREAD_LIBS) \
 	$(NULL)
 
 AM_CPPFLAGS = -DSRCDIR=\"$(srcdir)\"

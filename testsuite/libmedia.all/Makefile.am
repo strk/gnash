@@ -30,7 +30,6 @@ AM_LDFLAGS = \
 	$(GSTREAMER_APP_LIBS) \
 	$(GSTREAMER_LIBS) \
 	$(BOOST_LIBS) \
-	$(PTHREAD_LIBS) \
 	$(NULL)
 
 localedir = $(datadir)/locale

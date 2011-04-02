@@ -29,7 +29,6 @@ libgnashvaapi_la_CPPFLAGS = \
 libgnashvaapi_la_LIBADD = \
 	$(X11_LIBS) \
 	$(BOOST_LIBS) \
-	$(PTHREAD_LIBS) \
 	$(FFMPEG_LIBS) \
 	$(LIBVA_LIBS) \
 	$(LIBVA_X11_LIBS) \

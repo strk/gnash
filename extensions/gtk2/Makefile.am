@@ -55,7 +55,6 @@ AM_LDFLAGS =  \
 	$(GLIB_LIBS) \
 	$(EXPAT_LIBS) \
 	$(BOOST_LIBS) \
-	$(PTHREAD_LIBS) \
 	$(NULL)
 
 gtkext_la_SOURCES = gtkext.cpp gtkext.h

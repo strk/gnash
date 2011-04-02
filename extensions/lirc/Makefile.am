@@ -40,7 +40,6 @@ lirc_la_LDFLAGS = -module -avoid-version -no-undefined
 lirc_la_LIBADD = $(LIBADD_DL) \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libcore/libgnashcore.la \
-	$(PTHREAD_LIBS) \
 	$(NULL)
 
 check_PROGRAMS = # SharedTest

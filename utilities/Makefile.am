@@ -42,7 +42,6 @@ AM_LDFLAGS = \
 	$(PNG_LIBS) \
 	$(BOOST_LIBS) \
 	$(PYTHON_LIBS) \
-	$(PTHREAD_LIBS) \
 	$(NULL)
 
 # bzip2 is a dependency of some libraries with mingw32
@@ -157,8 +156,6 @@ mudflap:
 
 clean-hook:
 	-rm -f core.*
-
-#gdebug.swf: gdebug.as gdebcmds.as
 
 # Wrap a single .as tests in dejagnu_so importer.
 # At play time, if the relative url '../ming-misc.all/Dejagnu.swf' 

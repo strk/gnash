@@ -281,7 +281,6 @@ libgnashcore_la_LIBADD = \
 	$(top_builddir)/libsound/libgnashsound.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(BOOST_LIBS) \
-	$(PTHREAD_LIBS) \
 	$(FREETYPE2_LIBS) \
 	$(FONTCONFIG_LIBS) \
 	$(NULL)

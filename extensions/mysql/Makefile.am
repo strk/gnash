@@ -38,7 +38,6 @@ AM_LDFLAGS =  \
         $(MYSQL_LIBS) \
 	$(top_builddir)/libcore/libgnashcore.la \
         $(BOOST_LIBS) \
-	$(PTHREAD_LIBS) \
 	$(NULL)
 
 mysql_la_SOURCES = mysql_db.cpp mysql_db.h

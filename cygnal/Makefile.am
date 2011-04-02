@@ -58,7 +58,6 @@ AM_LDFLAGS = \
 	$(CURL_LIBS) \
 	$(BOOST_LIBS) \
 	$(BOOST_CYGNAL_LIBS) \
-	$(PTHREAD_LIBS) \
 	$(NULL)
 
 localedir = $(datadir)/locale

@@ -36,7 +36,7 @@ AM_LDFLAGS = \
 	$(top_builddir)/libnet/libgnashnet.la \
 	$(top_builddir)/cygnal/libcygnal.la \
 	$(BOOST_LIBS) \
-	$(PTHREAD_LIBS)
+	$(NULL)
 
 localedir = $(datadir)/locale
 

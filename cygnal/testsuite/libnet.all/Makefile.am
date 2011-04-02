@@ -31,7 +31,7 @@ AM_LDFLAGS = \
 	$(top_builddir)/libsound/libgnashsound.la \
 	$(BOOST_LIBS) \
 	$(DEJAGNU_CFLAGS) \
-	$(PTHREAD_LIBS)
+	$(NULL)
 
 localedir = $(datadir)/locale
 
