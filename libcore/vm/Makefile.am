@@ -73,10 +73,6 @@ inst_HEADERS += $(EXTENSIONS_API)
 libgnashvm_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la 
 
-if USE_FFMPEG_ENGINE
-	libgnashvm_la_CPPFLAGS += $(FFMPEG_CFLAGS)
-endif
-
 libgnashvm_la_LDFLAGS = -export-dynamic # -release $(VERSION)
 
 if WIN32

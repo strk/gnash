@@ -284,17 +284,6 @@ libgnashcore_la_LIBADD = \
 	$(FONTCONFIG_LIBS) \
 	$(NULL)
 
-if USE_GST_ENGINE
-AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
-		-I$(top_srcdir)/libmedia/gst
-libgnashcore_la_LIBADD += $(GSTREAMER_LIBS)
-endif
-
-if USE_FFMPEG_ENGINE
-AM_CPPFLAGS += $(FFMPEG_CFLAGS) \
-		-I$(top_srcdir)/libmedia/ffmpeg
-endif
-
 libgnashcore_la_LDFLAGS = -release $(VERSION) -export-dynamic
 
 if HAIKU

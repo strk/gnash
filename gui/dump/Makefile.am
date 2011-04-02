@@ -73,17 +73,6 @@ AM_LDFLAGS =  \
 	$(BOOST_LIBS) \
 	$(NULL)
 
-if USE_FFMPEG_ENGINE
-AM_LDFLAGS += $(FFMPEG_LIBS) $(LIBVA_LIBS) $(LIBVA_X11_LIBS) 
-AM_CPPFLAGS += $(FFMPEG_CFLAGS) 
-endif
-
-if USE_GST_ENGINE
-GST_STUFF = $(GSTREAMER_PBUTILS_LIBS) $(GSTREAMER_PLUGINS_BASE_LIBS) $(GSTREAMER_LIBS)
-AM_CPPFLAGS += $(GSTREAMER_CFLAGS)
-AM_LDFLAGS += $(GST_STUFF)
-endif
-
 GNASH_LIBS = \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/librender/libgnashrender.la \

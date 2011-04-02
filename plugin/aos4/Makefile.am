@@ -37,7 +37,6 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/plugin/npapi \
 	$(AGG_CFLAGS) \
 	$(BOOST_CFLAGS) \
-	$(FFMPEG_CFLAGS) \
 	$(SDL_CFLAGS) \
 	$(NULL)
 
@@ -54,7 +53,6 @@ AM_LDFLAGS = \
 	$(BOOST_LIBS) \
 	$(CURL_LIBS) \
 	$(EXPAT_LIBS) \
-	$(FFMPEG_LIBS) \
 	$(JPEG_LIBS) \
 	$(PNG_LIBS) \
 	$(SDL_LIBS) \

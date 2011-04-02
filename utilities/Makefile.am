@@ -69,21 +69,6 @@ if WIN32
   GNASH_LIBS += -lintl -lz -lws2_32
 endif
 
-if USE_FFMPEG_ENGINE
- AM_CPPFLAGS += $(FFMPEG_CFLAGS) \
-		-I$(top_srcdir)/libmedia/ffmpeg 
- GNASH_LIBS += $(FFMPEG_LIBS)
-endif
-
-if USE_GST_ENGINE
- AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
-		-I$(top_srcdir)/libmedia/gst
- GNASH_LIBS += $(GLIB_LIBS) $(GSTREAMER_LIBS)
-if CROSS_COMPILING
-  GNASH_LIBS +=	$(GLIB_LIBS)
-endif
-endif
-
 bin_PROGRAMS = gprocessor rtmpget
 
 if CYGNAL
