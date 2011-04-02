@@ -821,7 +821,7 @@ Player::getGui()
 #endif
 
 #ifdef GUI_FB
-    return createFBGui(_windowID, _scale, _doLoop, *_runResources);
+    return gui::createFBGui(_windowID, _scale, _doLoop, *_runResources);
 #endif
 
 #ifdef GUI_AOS4

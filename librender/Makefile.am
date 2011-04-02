@@ -17,7 +17,6 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-
 ## Process this file with automake to generate Makefile.in
 
 AUTOMAKE_OPTIONS =
@@ -31,14 +30,17 @@ AM_CPPFLAGS = -I.. \
 	-I$(srcdir) \
 	-I$(top_srcdir) \
 	-I$(top_srcdir)/libcore \
+	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libcore/parser \
 	-I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/librender \
+	-I$(top_srcdir)/libdevice \
 	$(PTHREAD_CFLAGS) \
 	$(SDL_CFLAGS) \
 	$(PANGO_CFLAGS) \
 	$(GLIB_CFLAGS) \
+	$(GTK2_CFLAGS) \
 	$(ATK_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
 	$(PNG_CFLAGS) \
@@ -47,49 +49,95 @@ AM_CPPFLAGS = -I.. \
 	$(BOOST_CFLAGS) \
 	$(OPENGL_CFLAGS) \
 	$(AGG_CFLAGS) \
+	$(DIRECTFB_CFLAGS) \
 	$(CAIRO_CFLAGS) \
 	$(NULL)
 
 GNASH_LIBS = \
 	$(top_builddir)/libcore/libgnashcore.la \
+	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(NULL)
 
 instdir = $(includedir)/gnash
 
-inst_HEADERS = \
-	Renderer.h \
-	$(NULL)
-
 noinst_HEADERS = \
+	Renderer.h \
 	agg/Renderer_agg.h \
 	agg/LinearRGB.h \
 	agg/Renderer_agg_bitmap.h \
 	agg/Renderer_agg_style.h \
+	cairo/Renderer_cairo.h \
+	cairo/PathParser.h \
 	opengl/tu_opengl_includes.h \
 	opengl/Renderer_ogl.h \
-	cairo/Renderer_cairo.h \
-	cairo/PathParser.h
+	opengles1/Renderer_gles1.h \
+	opengles1/render_handler_gles.h \
+	opengles2/Renderer_gles2.h \
+	openvg/OpenVGRenderer.h \
+	openvg/OpenVGBitmap.h \
+	openvg/OpenVGStyle.h \
+	opengl/Renderer_ogl.h \
 	$(NULL)
 
-pkglib_LTLIBRARIES = libgnashrender.la
-libgnashrender_la_LIBADD = $(LIBVA_LIBS) $(LIBVA_X11_LIBS) $(LIBVA_GLX_LIBS)
+EXTRA_DIST = $(noinst_HEADERS)
+
+pkglib_LTLIBRARIES =  libgnashrender.la
+
+libgnashrender_la_CPPFLAGS = $(AM_CPPFLAGS)
+libgnashrender_la_LIBADD = \
+	../libdevice/libgnashdevice.la \
+	$(LIBVA_LIBS) \
+	$(LIBVA_X11_LIBS) \
+	$(LIBVA_GLX_LIBS) \
+	$(GNASH_LIBS)
 libgnashrender_la_LDFLAGS =  -release $(VERSION) 
 libgnashrender_la_SOURCES =
 
 if BUILD_OGL_RENDERER
-libgnashrender_la_SOURCES += opengl/Renderer_ogl.cpp
+libgnashrender_la_SOURCES += \
+	opengl/Renderer_ogl.cpp \
+	opengl/Renderer_ogl.h
 libgnashrender_la_LIBADD += $(OPENGL_LIBS)
 endif
 
 if  BUILD_AGG_RENDERER
-libgnashrender_la_SOURCES += agg/Renderer_agg.cpp 
+libgnashrender_la_SOURCES += \
+	agg/Renderer_agg.cpp \
+	agg/Renderer_agg.h
 libgnashrender_la_LIBADD += $(AGG_LIBS) $(LIBVA)
 endif
 
+if  BUILD_OVG_RENDERER
+libgnashrender_la_CPPFLAGS += $(OPENVG_CFLAGS)
+libgnashrender_la_SOURCES += \
+	openvg/OpenVGRenderer.cpp \
+	openvg/OpenVGRenderer.h \
+	openvg/OpenVGBitmap.h \
+	openvg/OpenVGBitmap.cpp \
+	openvg/OpenVGStyle.h
+libgnashrender_la_LIBADD += $(OPENVG_LIBS)
+endif
+
+if  BUILD_GLES1_RENDERER
+libgnashrender_la_SOURCES += \
+	opengles1/Renderer_gles1.cpp \
+	opengles1/Renderer_gles1.h
+libgnashrender_la_LIBADD += $(GLES1_LIBS)
+endif
+
+if  BUILD_GLES2_RENDERER
+libgnashrender_la_SOURCES += \
+	opengles2/Renderer_gles2.cpp \
+	opengles2/Renderer_gles2.h
+libgnashrender_la_LIBADD += $(GLES2_LIBS)
+endif
+
 if  BUILD_CAIRO_RENDERER
-libgnashrender_la_SOURCES += cairo/Renderer_cairo.cpp
-libgnashrender_la_SOURCES += cairo/PathParser.cpp
+libgnashrender_la_SOURCES += \
+	cairo/Renderer_cairo.cpp \
+	cairo/Renderer_cairo.h \
+	cairo/PathParser.cpp
 libgnashrender_la_LIBADD += $(CAIRO_LIBS)
 endif
 
@@ -101,7 +149,6 @@ mudflap:
 clean-hook:
 	-rm -f core.*
 
-
 if ENABLE_PCH
 AM_CXXFLAGS = $(PCH_FLAGS)
 endif
@@ -112,3 +159,37 @@ install-exec-hook:
 
 uninstall-local:
 	$(RM) $(DESTDIR)$(libdir)/gnash/libgnashrender-*.so
+
+# if BUILD_OGL_RENDERER
+#    libgnashrender_la_SOURCES += \
+# 	GnashTexture.cpp \
+# 	$(NULL)
+
+#    noinst_HEADERS += \
+# 	GnashTexture.h \
+# 	$(NULL)
+# endif
+
+if ENABLE_DEVELOPER_TESTS
+check_PROGRAMS = testr
+
+testr_SOURCES = testr.cpp # testr_gtk.cpp
+testr_CPPFLAGS = \
+	$(AM_CPPFLAGS) \
+	$(EGL_CFLAGS) \
+	$(OPENVG_CFLAGS) \
+	$(GLES1_CFLAGS) \
+	$(GLES2_CFLAGS)
+	$(DIRECTFB_CFLAGS)
+testr_LDADD = \
+	libgnashrender.la \
+	../libdevice/libgnashdevice.la \
+	../libsound/libgnashsound.la \
+	$(GTK2_LIBS) \
+	$(EXTRA_EGL_LIBS) \
+	$(EGL_LIBS) \
+	$(GNASH_LIBS) \
+	$(OPENVG_LIBS) \
+	$(GLES1_LIBS) \
+	$(GLES2_LIBS)
+endif

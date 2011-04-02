@@ -1,0 +1,69 @@
+# 
+#   Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+# 
+
+#
+# Build the FB gui
+#
+if BUILD_FB_GUI
+bin_PROGRAMS += fb-gnash
+fb_gnash_SOURCES = $(GUI_SRCS) \
+	fb/fb.cpp \
+	fb/fbsup.h \
+	fb/fb_glue.h
+fb_gnash_CPPFLAGS = \
+	-DGUI_FB \
+	-DGUI_CONFIG=\"FB\" \
+	-DFAKEFB=\"$(FAKEFB)\" \
+	$(AM_CPPFLAGS) 
+fb_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
+fb_gnash_LDADD = \
+	$(GNASH_LIBS) \
+	$(TS_LIBS) \
+	$(BOOST_LIBS)
+
+# Build support for AntiGrain.
+if BUILD_AGG_RENDERER
+fb_gnash_SOURCES += fb/fb_glue_agg.cpp fb/fb_glue_agg.h
+fb_gnash_CPPFLAGS += $(AGG_CFLAGS)
+fb_gnash_LDADD += $(AGG_LIBS)
+endif	# BUILD_AGG_RENDERER
+
+# Build support for OpenVG.
+if BUILD_OVG_RENDERER
+fb_gnash_SOURCES += fb/fb_glue_ovg.cpp fb/fb_glue_ovg.h
+fb_gnash_CPPFLAGS += \
+	$(OPENVG_CFLAGS) \
+	$(EGL_CFLAGS)
+fb_gnash_LDADD += $(OPENVG_LIBS) $(EGL_LIBS)
+endif	# BUILD_OVG_RENDERER
+
+# # This supports only OpenGLES 1.1 with EGL support.
+# if BUILD_GLES1_RENDERER
+# fb_gnash_SOURCES += fb/fb_glue_gles1.cpp fb/fb_glue_gles1.h
+# fb_gnash_CPPFLAGS += $(GLES1_CFLAGS) $(EGL_CFLAGS)
+# fb_gnash_LDADD += $(GLES1_LIBS) $(EGL_LIBS)
+# endif	# BUILD_GLES1_RENDERER
+
+# # This supports only OpenGLES 2 with EGL support.
+# if BUILD_GLES2_RENDERER
+# fb_gnash_SOURCES += fb/fb_glue_gles2.cpp fb/fb_glue_gles2.h
+# fb_gnash_CPPFLAGS += $(GLES2_CFLAGS) $(EGL_CFLAGS)
+# fb_gnash_LDADD += $(GLES2_LIBS) $(EGL_LIBS)
+# endif	# BUILD_GLES2_RENDERER
+
+endif	# BUILD_FB_GUI
+

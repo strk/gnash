@@ -33,6 +33,10 @@ AC_PROG_CXX
 AC_EXEEXT
 AC_PROG_INSTALL
 AM_COMPILER_LIB
+AC_C_BIGENDIAN
+AC_C_CONST
+AC_C_INLINE
+AM_PROG_CC_C_O
 
 dnl Set the default values for Flash Version. These are converted into
 dnl various strings to make JavaScript or ActionScript detectors
@@ -280,9 +284,6 @@ fi
 AC_C_BIGENDIAN
 AC_C_CONST
 AC_C_INLINE
-
-AM_CONDITIONAL(ENABLE_SHARED, [test x"${enable_shared}" = xyes])
-AM_CONDITIONAL(ENABLE_STATIC, [test x"${enable_shared}" = xno])
 
 AC_PATH_PROG(DEJAGNU, runtest)
 
@@ -661,6 +662,19 @@ if test x"${fakefb}" != x; then
     AC_DEFINE(ENABLE_FAKE_FRAMEBUFFER, [1], [Enable using a file instead of a real framebuffer])
 fi
 
+dnl This enable a small handful of tests that aren't designed to be
+dnl run as part of "make check", as they are either incomplete, or
+dnl can only be run interactively. These are all primarily oriented
+dnl towards code development and debugging, instead of regression
+dnl or unit testing.
+AC_ARG_ENABLE(devtests, AC_HELP_STRING([--enable-devtests],
+  [Developer only tests, not to be included in make check]),
+[case "${enableval}" in
+  yes) devtests=yes ;;
+  no)  devtests=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for enable-devtests option]) ;;
+esac], devtests=yes)
+AM_CONDITIONAL(ENABLE_DEVELOPER_TESTS, [test x${devtests} = xyes])
 
 dnl --------------------------------------------------------
 dnl  Sound handler selection
@@ -774,16 +788,83 @@ fi
 MEDIA_CONFIG="${media_list}"
 AC_SUBST(MEDIA_CONFIG)
 
+dnl Multiple input devices are supported. These can all work in
+dnl varying combinations, so several may be listed. These are only
+dnl required when using the Framebuffer, as without the X11 desktop,
+dnl Gnash has to handle all these internally. This can get
+dnl messy, as one might want to use a touchscreen with a normal mouse
+dnl or keyboard attached. 
+dnl By default, don't build any of these, as they are only for the 
+dnl Framebuffer running without X11.
+if test x"${build_fb}" = xyes -a x"${linux}" = xyes; then
+  build_ps2mouse=yes
+  build_ps2keyboard=yes
+  build_input_events=yes
+  build_tslib=yes
+  input_events="PS/2 Mouse, PS/2 Keyboard, Input Devices, Touchscreen via Tslib"
+else
+  build_ps2mouse=no
+  build_ps2keyboard=no
+  build_input_events=no
+  build_tslib=no
+  input_events=
+fi
+AC_ARG_ENABLE(input,
+  AC_HELP_STRING([--enable-input], [Enable support for the specified input devices for the framebuffer GUI (default=ps2mouse|ps2keyboard|events|touchscreen)]),
+  [if test -n ${enableval}; then
+    enableval=`echo ${enableval} | tr '\054' ' ' `
+  fi
+  build_ps2mouse=no
+  build_ps2keyboard=no
+  build_input_events=no
+  build_tslib=no
+  while test -n "${enableval}" ; do
+    val=`echo ${enableval} | cut -d ' ' -f 1`
+    case "${val}" in
+      ps2m*|PS2m*|m*|M*)        dnl a PS/2 style mouse
+        build_ps2mouse=yes
+        input_events="${input_events}, PS/2 Mouse"
+        ;;
+      ps2k*|PS2K*|k*|K*)        dnl a PS/2 style keyboard
+        build_ps2keyboard=yes
+        input_events="${input_events}, PS/2 Keyboard"
+        ;;
+      i*|I*|ev*|Ev*)    dnl use the new Input Event, which supports both
+        input_events="${input_events}, Input Event Device"
+        build_input_events=yes
+        ;;
+      t*|T*) dnl use a touchscreen with tslib, which works like a mouse
+        build_tslib=yes
+        input_events="${input_events}, Touchscreen"
+        ;;
+      a*) dnl all
+        build_ps2mouse=yes
+        build_ps2keyboard=yes
+        build_input_events=yes
+        build_tslib=yes
+        input_events="PS/2 Mouse, PS/2 Keyboard, Input Devices, Touchscreen via Tslib"                
+        ;;
+      *) AC_MSG_ERROR([invalid input device list! ${enableval} given (accept: ps2mouse|keyboard|events,touchscreen)])
+         ;;
+      esac
+    enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
+    if test "x$val" = "x$enableval"; then
+      break;
+    fi
+  done],
+)
+
+if test x$build_sdl != xno -o x$build_sound_sdl = xyes; then
+  GNASH_PATH_SDL
+fi
+AM_CONDITIONAL(ENABLE_TSLIB, [test x${ac_cv_header_tslib_h} = xyes])
+
+
 dnl -----------------------------------------------------
 dnl Check for SDL and decide about auto gui accordingly.
 dnl Need be done after build_sound_sdl and build_sdl are
 dnl initialized and before they are checked for yes/no
 dnl -----------------------------------------------------
-
-if test x$build_sdl != xno -o x$build_sound_sdl = xyes; then
-  GNASH_PATH_SDL
-fi
-
 if test x"${build_sdl}" = xauto; then
   if test xyes = x"${has_sdl}"; then
     build_sdl=yes
@@ -799,9 +880,10 @@ dnl Renderer Selection
 dnl -------------------------------
 input_events=
 dnl By default, we want to to build all renderers
+build_directfb=no
 build_ovg=no
-build_gles=no
-build_ogl=auto
+build_gles1=no
+build_ogl=yes
 build_agg=yes
 build_cairo=yes
 renderer_list="agg cairo"
@@ -819,7 +901,8 @@ AC_ARG_ENABLE(renderer,
   renderer_list=""
   build_ovg=no
   build_ogl=no
-  build_gles=no
+  build_gles1=no
+  build_gles2=no
   build_agg=no
   build_cairo=no
   while test -n "${enableval}" ; do
@@ -829,30 +912,38 @@ AC_ARG_ENABLE(renderer,
         renderer_list="none"
         build_ovg=no
         build_ogl=no
-        build_gles=no
+        build_gles1=no
+        build_gles2=no
         build_agg=no
         build_cairo=no
         ;;
       all|ALL)
-        renderer_list="agg cairo opengl"
+        renderer_list="agg cairo opengl openvg, opengles1"
         build_ogl=yes
         build_agg=yes
         build_cairo=yes
         build_ovg=yes
+        nrender=4
         ;;
       ogl|OGL|OpenGL|opengl)
         renderer_list="${renderer_list} opengl"
-        build_gles=no
         build_ogl=yes
         ;;
-      gles|GLES|GL-ES|gl-es)
-        renderer_list="${renderer_list} opengl-es"
-        build_gles=yes
+      gles|GLES|gles1|GLES1)
+        renderer_list="${renderer_list} opengles1"
+        build_gles1=yes
         build_ogl=no
+        nrender=$((nrender+1))
         ;;
       ovg|OVG|OpenVG|openvg)
         renderer_list="${renderer_list} openvg"
-        build_ogv=yes
+        build_ovg=yes
+        nrender=$((nrender+1))
+        ;;
+      directfb|dfb)
+        renderer_list="${renderer_list} DirectFB"
+        build_directfb=yes
+        nrender=$((nrender+1))
         ;;
       agg|AGG)
         renderer_list="${renderer_list} agg"
@@ -862,7 +953,7 @@ AC_ARG_ENABLE(renderer,
         renderer_list="${renderer_list} cairo"
         build_cairo=yes
         ;;
-      *) AC_MSG_ERROR([invalid renderer specified: ${enableval} given (accept:  (agg|cairo|opengl|all)])
+      *) AC_MSG_ERROR([invalid renderer specified: ${enableval} given (accept:  (ogl|ovg|cairo|agg|gles1|all)])
         ;;
       esac]
     enableval=`echo ${enableval} | cut -d ' ' -f 2-`
@@ -957,23 +1048,28 @@ if test x"${build_ogl}" != xno; then # yes or auto
   fi
 fi
 
-AM_CONDITIONAL(BUILD_OVG_RENDERER, [ test x$build_ovg = xyes ])
-AM_CONDITIONAL(BUILD_GLES_RENDERER, [ test x$build_gles = xyes ])
-AM_CONDITIONAL(BUILD_OGL_RENDERER, [ test x$build_ogl = xyes])
-AM_CONDITIONAL(BUILD_AGG_RENDERER, [ test x$build_agg = xyes ])
-AM_CONDITIONAL(BUILD_CAIRO_RENDERER, [ test x$build_cairo = xyes ])
+AM_CONDITIONAL(BUILD_OVG_RENDERER,   [ test x${build_ovg} = xyes ])
+AM_CONDITIONAL(BUILD_GLES1_RENDERER, [ test x${build_gles1} = xyes ])
+AM_CONDITIONAL(BUILD_GLES2_RENDERER, [ test x${build_gles2} = xyes ])
+AM_CONDITIONAL(BUILD_OGL_RENDERER,   [ test x${build_ogl} = xyes])
+AM_CONDITIONAL(BUILD_AGG_RENDERER,   [ test x${build_agg} = xyes ])
+AM_CONDITIONAL(BUILD_CAIRO_RENDERER, [ test x${build_cairo} = xyes ])
+
+if test x"${build_ovg}" = xyes; then
+   AC_DEFINE([RENDERER_OPENVG], [1], [Use OpenVG renderer])
+fi
 
 if test x"${build_ogl}" = xyes; then
-   AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
+   AC_DEFINE([RENDERER_OPENGL], [1], [Use OpenGL renderer])
 fi
 
-if test x"$build_agg" = xyes; then
-  AC_DEFINE([RENDERER_AGG], [], [Use AntiGrain renderer])
+if test x"${build_agg}" = xyes; then
+  AC_DEFINE([RENDERER_AGG], [1], [Use AntiGrain renderer])
 fi
 
-if test x"$build_cairo" = xyes; then
+if test x"${build_cairo}" = xyes; then
   GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
-  AC_DEFINE([RENDERER_CAIRO], [], [Use cairo renderer])
+  AC_DEFINE([RENDERER_CAIRO], [1], [Use cairo renderer])
 fi
 
 if test x"${build_agg}" = xyes; then
@@ -989,43 +1085,74 @@ dnl     Moorestown platform and future G45 VA driver.
 dnl NOTE: it is possible to use Gnash/VAAPI on platforms with an Intel
 dnl GMA500 but you currently will have to build the AGG renderer
 dnl instead of the OGL (OpenGL) one. 
-
-build_vaapi=yes
-hwaccel_list="VAAPI"
-nhwaccel=1
-AC_ARG_ENABLE(hwaccel,
-  AC_HELP_STRING([--enable-hwaccel], [Enable hardware accelerated video decoding (none,vaapi)]),
-  if test -z ${enableval}; then
-      hwaccel_list="none"
-      nhwaccel=0
-      enableval=""
-  fi
+build_vaapi_device=no
+build_openmax_device=no
+build_x11_device=no
+build_directfb_device=no
+build_egl_device=yes
+build_rawfb_device=yes
+device_list="EGL RawFB"
+ndevice=2
+AC_ARG_ENABLE(device,
+  AC_HELP_STRING([--enable-device], [Specify which hardware abstraction to use to support to enable (none,egl,directfb,rawfb,x11,vaapi)]),
+  enableval=`echo ${enableval} | tr '\054' ' ' `
+  build_egl_device=no
+  build_rawfb_device=no
+  device_list=""
+  ndevice=0
   while test -n "${enableval}" ; do
     val=`echo ${enableval} | cut -d ' ' -f 1`
     [case "${val}" in
       no*|NO*)
-        hwaccel_list="none"
-        build_vaapi=no
-        build_omap=no
-        nhwaccel=0
+        device_list="none"
+        build_vaapi_device=no
+        build_openmax_device=no
+        build_egl_device=no
+        build_directfb_device=no
+        build_x11_device=no
+        ndevice=0
         ;;
       va*|VA*)
-        hwaccel_list="${hwaccel_list} vaapi"
-        build_vaapi=yes
-        nhwaccel=$((nhwaccel+1))
+        device_list="${device_list} VAAPI"
+        build_vaapi_device=yes
+        ndevice=$((ndevice+1))
+        ;;
+      eg*|EG*)
+        device_list="${device_list} EGL"
+        build_egl_device=yes
+        ndevice=$((ndevice+1))
+        ;;
+      x1*|X1*)
+        device_list="${device_list} X11"
+        build_x11_device=yes
+        ndevice=$((ndevice+1))
+        ;;
+      di*|Di*|DI*|dfb)
+        device_list="${device_list} DirectFB"
+        build_directfb_device=yes
+        ndevice=$((ndevice+1))
+        ;;
+      ra*|RAW*)
+        device_list="${device_list} RawFB"
+        build_rawfb_device=yes
+        ndevice=$((ndevice+1))
         ;;
       all|ALL)
-        hwaccel_list="VAAPI OMAP"
-        nhwaccel=2
-        build_omap=yes
-        build_vaapi=yes
+        device_list="EGL DirectFB X11"
+        build_openmax_device=no
+        build_vaapi_device=no
+        build_egl_device=yes
+        build_rawfb_device=yes
+        build_directfb_device=yes
+        build_x11_device=yes
+        ndevice=5
         ;;
-      omap*|OMAP*)
-        hwaccel_list="${hwaccel_list} omap"
-        build_omap=yes
-        nhwaccel=$((nhwaccel+1))
+      op*|Op*|OP*)
+        device_list="${device_list} OpenMAX"
+        build_openmax_device=yes
+        ndevice=$((ndevice+1))
         ;;
-      *) AC_MSG_ERROR([invalid hwaccel feature specified: ${enableval} given (accept: none,vaapi,omap)])
+      *) AC_MSG_ERROR([invalid device feature specified: ${enableval} given (accept: none,vaapi)])
         ;;
       esac]
     enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
@@ -1035,7 +1162,7 @@ AC_ARG_ENABLE(hwaccel,
   done
 )
 
-if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${build_vaapi}" = x"yes"; then
+if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${build_vaapi_device}" = x"yes"; then
   use_libva=no
   use_libva_x11=no
   use_libva_glx=no
@@ -1072,20 +1199,7 @@ fi
 dnl libVA drivers. We declare conditional for both the option being
 dnl selected, as well as whether or not it's found. This we can
 dnl generate better error handling if it's not found.
-AM_CONDITIONAL(BUILD_OMAP, test x"${build_omap}" = xyes)
 AM_CONDITIONAL(USE_VAAPI, test x"${use_libva}" = xyes)
-
-dnl Only build the vaapi support if we have a version of FFmpeg that
-dnl supports it.
-if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${found_libva_incl}" = xyes; then
-  build_vaapi=yes
-  hwaccel_list="VAAPI"
-  nhwaccel=1
-else
-  build_vaapi=no
-  hwaccel_list=""
-  nhwaccel=0
-fi
 
 dnl Until the hwaccel patches in FFmpeg wind up in the ffmpeg-plugin,
 dnl restrict using HW Accel to using FFmpeg directly.
@@ -1098,6 +1212,10 @@ AM_CONDITIONAL(HAVE_VAAPI, test x"${found_libva_incl}" = xyes)
 AM_CONDITIONAL(HAVE_VAAPI_GLX, test x"${found_libva_glx_incl}" = xyes)
 AM_CONDITIONAL(HAVE_VAAPI_X11, test x"${found_libva_x11_incl}" = xyes)
 
+AM_CONDITIONAL(BUILD_DEVICES, test ${ndevice} -gt 0)
+if test ${ndevice} -gt 0; then
+  AC_OUTPUT(libdevice/Makefile)
+fi
 
 AC_PATH_PROG(PERL, perl)
 AM_CONDITIONAL(HAVE_PERL, test x"$PERL" != x)
@@ -1450,6 +1568,21 @@ AC_ARG_ENABLE(cygnal,
 esac],cygnal=no)
 AM_CONDITIONAL(CYGNAL, test x$cygnal = xyes)
 
+if test x$cygnal = xyes; then
+ AC_OUTPUT(cygnal/Makefile
+    cygnal/libnet/Makefile
+    cygnal/libamf/Makefile
+    cygnal/cgi-bin/Makefile
+    cygnal/cgi-bin/echo/Makefile
+    cygnal/cgi-bin/oflaDemo/Makefile
+    cygnal/cgi-bin/fitcDemo/Makefile
+    cygnal/testsuite/Makefile
+    cygnal/testsuite/libamf.all/Makefile
+    cygnal/testsuite/libnet.all/Makefile
+    cygnal/testsuite/cygnal.all/Makefile
+)
+fi
+
 dnl --------------------------------------------------------
 dnl Build the cgibins server if specified.
 dnl --------------------------------------------------------
@@ -1628,20 +1761,10 @@ if test x"${build_dump}" != xno; then
 fi
 
 dnl Check possibility to build FB gui, if requested
-dnl FB dependencies are a linux system (linux/fb.h) 
-dnl and AGG renderer
+dnl FB dependency is a linux system (linux/fb.h)
 if test x"${build_fb}" != xno; then
   if test x"${linux}" = xyes; then
-    if test x"${build_agg}" = xyes; then
       build_fb=yes
-    else
-      if test x"${build_fb}" = xyes; then
-        dnl SHOULD we just check at the end of file instead ?
-        AC_MSG_ERROR([fb GUI cannot be built without AGG renderer])
-      fi
-      AC_MSG_NOTICE([fb GUI won't be built (needs AGG renderer)])
-      build_fb=no
-    fi
   else
     if test x"${build_fb}" = xyes; then
       dnl SHOULD we just check at the end of file instead ?
@@ -1885,10 +2008,19 @@ AC_CHECK_LIB(c, getpwnam, AC_DEFINE(HAVE_GETPWNAM, 1, [Has getpwnam] ))
 
 dnl X11 is needed for fltk (at least),
 dnl and probably for many other guis too ...
+dnl if ! test x$build_fb = xyes; then # <--- this is wrong as build_x is non-exclusive
+dnl AC_PATH_XTRA
+dnl AC_CHECK_LIB(Xmu, XmuCvtStringToOrientation)
+dnl AC_CHECK_LIB(gmp, _gmp_get_memory_functions)
 GNASH_PATH_X11
 AC_CHECK_LIB(Xi, XInput_find_display)
 AC_CHECK_LIB(X11, XDisableAccessControl)
-AM_CONDITIONAL(HAVE_X11, [test x$x11 = xyes])
+dnl fi
+AM_CONDITIONAL(HAVE_X11, [test x${has_x11} = xyes])
+if test x${build_x11_device} = xyes -a  x${has_x11} = xyes; then
+  AC_DEFINE(BUILD_X11_DEVICE, [1], [Build the X11 device])
+fi
+
 AC_CHECK_LIB(rt, shm_unlink)
 AC_CHECK_FUNCS(shm_open shm_unlink)
 AC_TRY_COMPILE([#include <strings.h>], [
@@ -2313,14 +2445,38 @@ AM_CONDITIONAL(NPAPI,   [test x"${npapi}" = xyes])
 AM_CONDITIONAL(KPARTS3, [test x"${build_kparts3}" = xyes])
 AM_CONDITIONAL(KPARTS4, [test x"${build_kparts4}" = xyes])
 
-if test x"${build_gles}" = xyes; then
-  GNASH_PKG_FIND(EGL, [EGL/egl.h], [EGL library], eglGetDisplay)
+if test x"${build_gles1}" = xyes -o x"${build_gles2}" = xyes; then
   GNASH_PATH_GLES
 fi
 
-if test x"${build_ogv}" = xyes; then
+dnl The OpenGLES1, OpenGLES2, and OpenVG all need the EGL support, X11 can use it also
+if test x"${build_gles1}" = xyes -o  x"${build_gles2}" = xyes -o x"${build_ovg}" = xyes; then
+  build_egl_device=yes
+fi
+
+dnl only Linux supports /dev/fb0
+if test x"${build_rawfb_device}" = xyes -a x"${linux}" = xyes; then
+   AC_DEFINE([BUILD_RAWFB_DEVICE], [1], [Use raw Framebuffer device support])
+fi
+
+if test x"${build_directfb_device}" = xyes; then
+   GNASH_PKG_FIND(directfb, [directfb.h], [DirectFB render library], DirectFBCreate)
+   AC_DEFINE([BUILD_DIRECTFB_DEVICE], [1], [Use DirectFB device support])
+fi
+
+if test x"${build_egl_device}" = xyes; then
   GNASH_PKG_FIND(EGL, [EGL/egl.h], [EGL library], eglGetDisplay)
-  GNASH_PKG_FIND(OpenVG, [vg/openvg.h], [OpenVG library], vgDrawImage)
+  AC_DEFINE(BUILD_EGL_DEVICE, [1], [Build the EGL device for OpenVG, OpenGLES1&2, and X11/Mesa])
+fi
+
+AM_CONDITIONAL(BUILD_VAAPI_DEVICE, [test x"${use_libva}" = xyes])
+AM_CONDITIONAL(BUILD_EGL_DEVICE, [test x"${build_egl_device}" = xyes])
+AM_CONDITIONAL(BUILD_DIRECTFB_DEVICE, [ test x${build_directfb_device} = xyes])
+AM_CONDITIONAL(BUILD_RAWFB_DEVICE, [ test x${build_rawfb_device} = xyes])
+AM_CONDITIONAL(BUILD_X11_DEVICE, [test x${build_x11_device} = xyes])
+
+if test x"${build_ovg}" = xyes; then
+  GNASH_PATH_OPENVG
 fi
 
 if test x"${build_gtk}" = xyes; then
@@ -2675,7 +2831,7 @@ done
 AC_SUBST(RENDERER_LIBS)
 AC_SUBST(RENDERER_CONFIG)
 
-HWACCEL_CONFIG="${hwaccel_list}"
+HWACCEL_CONFIG="${device_list}"
 AC_SUBST(HWACCEL_CONFIG)
 
 dnl check for missing libraries and disable them.
@@ -2750,7 +2906,6 @@ libbase/Makefile
 libcore/Makefile
 libcore/vm/Makefile
 libcore/parser/Makefile
-libvaapi/Makefile
 librender/Makefile
 utilities/Makefile
 doc/Makefile
@@ -2780,7 +2935,6 @@ testsuite/movies.all/Makefile
 testsuite/libcore.all/Makefile
 testsuite/libmedia.all/Makefile
 gui/Makefile
-gui/fb/Makefile
 gui/dump/Makefile
 gui/Info.plist
 gui/pythonmod/Makefile
@@ -2797,17 +2951,6 @@ plugin/klash/Makefile
 plugin/klash4/Makefile
 plugin/win32/Makefile
 plugin/aos4/Makefile
-cygnal/Makefile
-cygnal/libnet/Makefile
-cygnal/libamf/Makefile
-cygnal/cgi-bin/Makefile
-cygnal/cgi-bin/echo/Makefile
-cygnal/cgi-bin/oflaDemo/Makefile
-cygnal/cgi-bin/fitcDemo/Makefile
-cygnal/testsuite/Makefile
-cygnal/testsuite/libamf.all/Makefile
-cygnal/testsuite/libnet.all/Makefile
-cygnal/testsuite/cygnal.all/Makefile
 )
 
 ###
@@ -3008,6 +3151,24 @@ else
   echo "                     or .rpm users: yum install libpng-devel" >&5
 fi
 
+if test x"${build_ovg}" = x"yes"; then
+  if test x"$OPENVG_LIBS" != x; then
+    if test x"$OPENVG_CFLAGS" != x; then
+      echo "        OpenVG flags are: $OPENVG_CFLAGS"
+    else
+      echo "        OpenVG flags are: default include path"
+    fi
+    echo "        OpenVG libs are: $OPENVG_LIBS"
+    else
+      echo "        ERROR: No OpenVG development package installed!" >&3
+      echo "               You need to install the libmesa development package" >&3
+      echo "               or .deb users: apt-get install libopenvg1-mesa-dev" >&3
+      echo "               or .rpm users: yum install mesa-libOpenVG-devel-7.8.1-7.fc13.i686" >&3
+      echo "               or use a different renderer with --enable-renderer=" >&3
+  fi
+fi
+
+
 if test x"${build_ogl}" = x"yes"; then
   if test x"$OPENGL_LIBS" != x; then
     if test x"$OPENGL_CFLAGS" != x; then
@@ -3025,16 +3186,28 @@ if test x"${build_ogl}" = x"yes"; then
   fi
 fi
 
-if test x"${build_gles}" = x"yes"; then
-  if test x"${has_gles}" != x; then
-    if test x"$GLES_CFLAGS" != x; then
-      echo "        OpenGL-ES flags are: $GLES_CFLAGS"
+if test x"${build_gles1}" = x"yes" -o x"${build_gles2}" = xyes; then
+  if test x"${has_gles1}" = xyes; then
+    if test x"${GLES1_CFLAGS}" != x; then
+      echo "        OpenGLES1 flags are: ${GLES1_CFLAGS}"
     else
-      echo "        OpenGL-ES flags are: default include path"
+      echo "        OpenGLES1 flags are: default include path"
     fi
-    echo "        OpenGL-ES libs are: $GLES_LIBS"
+    echo "        OpenGLES1 libs are: ${GLES1_LIBS}"
   else
-      echo "        ERROR: No OpenGL-ES development package installed!" >&3
+      echo "        ERROR: No OpenGLES1 development package installed!" >&3
+      echo "               You need to install the this from source proobably" >&3
+      echo "               or use a different renderer with --enable-renderer=" >&3
+  fi
+  if test x"${has_gles2}" = xyes; then
+    if test x"${GLES2_CFLAGS}" != x; then
+      echo "        OpenGLES2 flags are: ${GLES2_CFLAGS}"
+    else
+      echo "        OpenGLES2 flags are: default include path"
+    fi
+    echo "        OpenGLES2 libs are: ${GLES2_LIBS}"
+  else
+      echo "        ERROR: No OpenGLES2 development package installed!" >&3
       echo "               You need to install the this from source proobably" >&3
       echo "               or use a different renderer with --enable-renderer=" >&3
   fi
@@ -3525,6 +3698,12 @@ fi
 if test x"$testsuite" = x"yes"; then
   if test x"$CSOUND" != x; then
     echo "        CSOUND is $CSOUND"
+  else
+    echo "        WARNING: You need to have csound installed" >&4
+    echo "                 to have real fun." >&4
+    echo "                 Install it from http://www.csounds.com/" >&4
+    echo "                 or .deb users: apt-get install csound" >&4
+    echo "                 or .rpm users: yum install csound" >&4
   fi
 fi
 
@@ -3767,10 +3946,6 @@ if test x"${security_list}" != x; then
   echo "        Enabling security features: ${security_list}"
 fi
 
-if test x"${hwaccel_list}" != xnone; then
-  echo "        Enabling hardware acceleration features: ${hwaccel_list}"
-fi
-
 if test x"${statistics_list}" != x; then
   echo "        Enabling statistics collecting for: ${statistics_list}"
 fi
@@ -3781,7 +3956,7 @@ fi
 
 echo "        GUI toolkits supported: ${SUPPORTED_GUIS}"
 echo "        Renderers supported: ${renderer_list}"
-echo "        Hardware Acceleration: ${hwaccel_list}"
+echo "        Hardware Acceleration: ${device_list}"
 echo "        Media handlers: ${media_list}"
 echo "        Using ${add_sound} for sound handling"
 echo "        Using $with_shm mode for shared memory"
@@ -3796,7 +3971,7 @@ else
 fi
 
 dnl The Framebuffer GUI has several other settings. As it doesn't have X11,
-dnl we have to handle input devices ourselves.
+dnl we have to handle input devics ourselves.
 if test x"${build_fb}" = xyes; then
 echo "        Using ${input_events} for Input"
   if test x"${fakefb}" != x; then

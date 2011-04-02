@@ -38,7 +38,7 @@
 #ifdef HAVE_VA_VA_X11_H
 # include <va/va_x11.h>
 #endif
-#ifdef HAVE_X11
+#ifdef HAVE_X11_X_H
 # include <X11/keysym.h>
 # include <gdk/gdkx.h>
 # include <X11/Xlib.h>

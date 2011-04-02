@@ -33,22 +33,18 @@ namespace gnash {
 
 static const char *INPUT_DEVICE = "/dev/input/event0";
 
+// The debug log used by all the gnash libraries.
+static LogFile& dbglogfile = LogFile::getDefaultInstance();
+
 EventDevice::EventDevice()
 {
     // GNASH_REPORT_FUNCTION;
 }
 
-EventDevice::EventDevice(Gui *gui)
-{
-    // GNASH_REPORT_FUNCTION;
-
-    _gui = gui;
-}
-
 bool
 EventDevice::init()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     return init(INPUT_DEVICE, DEFAULT_BUFFER_SIZE);
 }
@@ -56,7 +52,9 @@ EventDevice::init()
 bool
 EventDevice::init(const std::string &filespec, size_t /* size */)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
+    dbglogfile.setVerbosity();
     
     _filespec = filespec;
     
@@ -81,9 +79,11 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
     if (ioctl(_fd, EVIOCGVERSION, &version)) {
         perror("evdev ioctl");
     }
+#if 0
     log_debug("evdev driver version is %d.%d.%d",
               version >> 16, (version >> 8) & 0xff,
               version & 0xff);
+#endif
     
     if(ioctl(_fd, EVIOCGID, &_device_info)) {
         perror("evdev ioctl");
@@ -94,7 +94,11 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
         perror("evdev ioctl");
     }
     log_debug("The device on %s says its name is %s", filespec, name);
-    
+    // /dev/mxc_ts is the Touchscreen driver used by the Freescale Babbage board
+    // For some reason it has an empty device info structure other than the name.
+    if (strstr(name, "mxc_ts") != 0) {
+        _device_info.bustype = BUS_HOST;
+    }
     log_debug("vendor %04hx product %04hx version %04hx",
               _device_info.vendor, _device_info.product,
               _device_info.version);
@@ -173,8 +177,16 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
           log_unimpl("is an i2C bus type ");
           break;
       case BUS_HOST:
-          log_debug("is Host bus type");
-          _type = InputDevice::POWERBUTTON;
+          // log_debug("is Host bus type");
+          // ON the Babbage board, this is the evdev driver version 1.0.0 
+          if (strstr(name, "mxc_ts") != 0) {
+              log_debug("Babbage Touchscreen found!");
+              _type = InputDevice::TABLET;
+          }
+          if (strstr(name, "mxckpd") != 0) {
+              log_debug("Babbage Power Button found!");
+              _type = InputDevice::POWERBUTTON;
+          }
           break;
       case BUS_GSC:
           log_unimpl("is a GSC bus type");
@@ -190,13 +202,33 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
     
     log_debug("Event enabled for %s on fd #%d", _filespec, _fd);
     
+    // Set the scale of the display so the absolute postions
+    // we get from the touchscreen driver are correct.
+    struct input_absinfo abs;
+    abs.minimum = 0;
+    abs.fuzz = 4;
+    abs.flat = 8;
+    abs.resolution = 0;
+    abs.maximum = 800;
+    if (ioctl(_fd, EVIOCSABS(ABS_X), &abs) < 0) {
+        perror("ioctl(EVIOCSABS(ABS_X))");
+    }
+    abs.maximum = 480;
+    if (ioctl(_fd, EVIOCSABS(ABS_Y), &abs) < 0) {
+        perror("ioctl(EVIOCSABS(ABS_Y))");
+    }
+#if 0
+    if (ioctl(_fd, EVIOCGRAB, (void *)1) < 0) {
+        perror("ioctl(EVIOCGRAB(1))");
+    }
+#endif
     return true;
 }
 
 bool
 EventDevice::check()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     bool activity = false;
   
@@ -210,15 +242,55 @@ EventDevice::check()
     if (!buf) {
         return false;
     }
-    
+
+    /// @note
+    /// A typical touchscreen event is actuall a series of events, one for each
+    /// piece of data. The sequence is terminated by the EV_SYN message. An
+    /// example from evtests looks like this:
+    /// Event: time 697585.633672, type 3 (Absolute), code 0 (X), value 127
+    /// Event: time 697585.633679, type 3 (Absolute), code 1 (Y), value 72
+    /// Event: time 697585.633681, type 3 (Absolute), code 24 (Pressure), value 41
+    /// Event: time 697585.633684, type 1 (Key), code 330 (Touch), value 1
+    /// Event: time 697585.633686, -------------- Report Sync ------------
+    ///
+    /// Everytime we get the EV_SYN message we add this fully populated event to
+    /// queue of events. As the GUI polls for events, there may be multiple events
+    /// in the queue by the time the main event loop comes around to process the
+    /// events.
     struct input_event *ev = reinterpret_cast<struct input_event *>(buf.get());
-    // log_debug("Type is: %hd, Code is: %hd, Val us: %d", ev->type, ev->code,
-    //           ev->value);
+    // log_debug("Type is: %hd, Code is: %hd, Val us: %d", ev->type, ev->code, ev->value);
     switch (ev->type) {
       case EV_SYN:
-          log_unimpl("Sync event from Input Event Device");
+      {
+          boost::shared_ptr<InputDevice::input_data_t> _newdata(new InputDevice::input_data_t);
+#if 0
+          std::copy(_input_data.begin(), _input_data.end(), _newdata.begin());
+#else
+          _newdata->pressed = _input_data.pressed;
+          _newdata->key = _input_data.key;
+          _newdata->modifier = _input_data.modifier;
+          _newdata->x = _input_data.x;
+          _newdata->y = _input_data.y;
+          _newdata->button = _input_data.button;
+          _newdata->position = _input_data.position;
+          _newdata->pressure = _input_data.pressure;
+          _newdata->volumne = _input_data.volumne;
+          _newdata->distance = _input_data.distance;
+          _newdata->rx = _input_data.rx;
+          _newdata->ry = _input_data.ry;
+          _newdata->rz = _input_data.rz;
+          _newdata->throttle = _input_data.throttle;
+          _newdata->rudder = _input_data.rudder;
+          _newdata->gas = _input_data.gas;
+          _newdata->brake = _input_data.brake;
+          _newdata->tiltX = _input_data.tiltX;
+          _newdata->tiltY = _input_data.tiltY;
+#endif
+          _data.push(_newdata);
+          activity = true;
           break;
-        // Keyboard event
+      }
+      // Keyboard event
       case EV_KEY:
       {
           // code == scan code of the key (KEY_xxxx defines in input.h)         
@@ -237,29 +309,26 @@ EventDevice::check()
               keyb_lalt = ev->value;
           } else if (ev->code == KEY_RIGHTALT) {
               keyb_ralt = ev->value;
+          } else if (ev->code == BTN_TOUCH) {
+              // keyb_ralt = ev->value;
           } else {
-              gnash::key::code  c = scancode_to_gnash_key(ev->code,
-                                            keyb_lshift || keyb_rshift);
+              _input_data.key = scancode_to_gnash_key(ev->code,
+                                                      keyb_lshift || keyb_rshift);
                   // build modifier
-              int modifier = gnash::key::GNASH_MOD_NONE;
+              _input_data.modifier = gnash::key::GNASH_MOD_NONE;
               
               if (keyb_lshift || keyb_rshift) {
-                  modifier = modifier | gnash::key::GNASH_MOD_SHIFT;
+                  _input_data.modifier = _input_data.modifier | gnash::key::GNASH_MOD_SHIFT;
               }
               
               if (keyb_lctrl || keyb_rctrl) {
-                  modifier = modifier | gnash::key::GNASH_MOD_CONTROL;
+                  _input_data.modifier = _input_data.modifier | gnash::key::GNASH_MOD_CONTROL;
               }
               
               if (keyb_lalt || keyb_ralt) {
-                  modifier = modifier | gnash::key::GNASH_MOD_ALT;
+                  _input_data.modifier = _input_data.modifier | gnash::key::GNASH_MOD_ALT;
               }
-              
-              // send event
-              if (c != gnash::key::INVALID) {
-                  _gui->notify_key_event(c, modifier, ev->value);
-                  activity = true;
-              }
+              activity = true;
           } // if normal key
           break;
       } // case EV_KEY
@@ -268,9 +337,79 @@ EventDevice::check()
           log_unimpl("Relative move event from Input Event Device");
           // Touchscreen or joystick
           break;
+          // Absolute coordinates come as multiple events, one for
+          // each axis.
       case EV_ABS:
-          log_unimpl("Absolute move event from Input Event Device");
+      {
+          switch (ev->code) {
+            case ABS_X:
+                // log_debug("ABS_X: %d", ev->value);
+                _input_data.x = ev->value;
+                break;
+            case ABS_Y:
+            {
+                // log_debug("ABS_X: %d ABS_Y: %d", _x, ev->value);
+                _input_data.y = ev->value;
+            }
+                break;
+                // FIXME: Currently the Z axis is ignored
+            case ABS_Z:
+            case ABS_WHEEL:
+                log_debug("ABS_Z: %d", ev->value);
+                break;
+            case ABS_PRESSURE:
+                //log_debug("Pressure: %d", ev->value);
+                _input_data.pressure = ev->value;
+                break;
+            case ABS_VOLUME:
+                log_debug("ABS_VOLUME: %d", ev->value);
+                _input_data.volumne = ev->value;
+                break;
+            case ABS_DISTANCE:
+                log_debug("ABS_DISTANCE: %d", ev->value);
+                _input_data.distance = ev->value;
+                break;
+            case ABS_RX:
+                log_debug("ABS_RX: %d", ev->value);
+                _input_data.rx = ev->value;
+                break;
+            case ABS_RY:
+                log_debug("ABS_RY: %d", ev->value);
+                _input_data.ry = ev->value;
+                break;
+            case ABS_RZ:
+                log_debug("ABS_RZ: %d", ev->value);
+                _input_data.rz = ev->value;
+                break;
+            case ABS_THROTTLE:
+                log_debug("ABS_THROTTLE: %d", ev->value);
+                _input_data.throttle = ev->value;
+                break;
+            case ABS_RUDDER:
+                log_debug("ABS_RUDDER: %d", ev->value);
+                _input_data.rudder = ev->value;
+                break;
+            case ABS_GAS:
+                log_debug("ABS_GAS: %d", ev->value);
+                _input_data.gas = ev->value;
+                break;
+            case ABS_BRAKE:
+                log_debug("ABS_BRAKE: %d", ev->value);
+                _input_data.brake = ev->value;
+                break;
+            case ABS_TILT_X:
+                log_debug("ABS_TILT_X: %d", ev->value);
+                _input_data.tiltX = ev->value;
+                break;
+            case ABS_TILT_Y:
+                log_debug("ABS_TILT_Y: %d", ev->value);
+                _input_data.tiltY = ev->value;
+                break;
+            default:
+                break;
+          }
           break;
+      }
       case EV_MSC:
           log_unimpl("Misc event from Input Event Device");
           break;
@@ -411,7 +550,6 @@ EventDevice::scancode_to_gnash_key(int code, bool shift)
       case KEY_DELETE        : return gnash::key::DELETEKEY;
       case KEY_HOME          : return gnash::key::HOME;
       case KEY_END           : return gnash::key::END;
-    
     }
   
     return gnash::key::INVALID;  
@@ -419,9 +557,9 @@ EventDevice::scancode_to_gnash_key(int code, bool shift)
 
 // This looks in the input event devices
 std::vector<boost::shared_ptr<InputDevice> > 
-EventDevice::scanForDevices(Gui *gui)
+EventDevice::scanForDevices()
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     struct stat st;
 
@@ -470,16 +608,10 @@ EventDevice::scanForDevices(Gui *gui)
                   device_info.version);
         close(fd);
         boost::shared_ptr<InputDevice> dev;
-        dev = boost::shared_ptr<InputDevice>(new EventDevice(gui));
-        // For now we only want keyboards, as the mouse interface
-        // default of /dev/input/mice supports hotpluging devices,
-        // unlike the regular event.
+        dev = boost::shared_ptr<InputDevice>(new EventDevice());
         if (dev->init(filespec, DEFAULT_BUFFER_SIZE)) {
-            if ((dev->getType() == InputDevice::KEYBOARD)) {
-                devices.push_back(dev);
-            }
+            devices.push_back(dev);
         }
-
 //        dev->dump();
         
         // setup the next device filespec to try

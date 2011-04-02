@@ -24,14 +24,17 @@
 #endif
 
 #include <boost/scoped_array.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/cstdint.hpp>
 #include <vector>
+
 #include <linux/fb.h>
 
 #include "gui.h"
-#include "InputDevice.h"
+#include "events/InputDevice.h"
+#include "Renderer.h"
 
 #define PIXELFORMAT_LUT8
-#define CMAP_SIZE (256*2)
 
 #ifdef USE_MOUSE_PS2
 # define MOUSE_DEVICE "/dev/input/mice"
@@ -47,8 +50,11 @@
 // work and probably is not necessary anyway
 //#define REQUEST_NEW_VT
 
-namespace gnash
-{
+namespace gnash {
+
+namespace gui {
+
+class FBGlue;
 
 /// A Framebuffer-based GUI for Gnash.
 /// ----------------------------------
@@ -90,38 +96,82 @@ namespace gnash
 ///   to /dev/input/mice
 class FBGui : public Gui
 {
-private:
-    int fd;
-    int original_vt;       // virtual terminal that was active at startup
-    int original_kd;       // keyboard mode at startup
-    int own_vt;            // virtual terminal we are running in   
-    unsigned char *fbmem;  // framebuffer memory
-    unsigned char *buffer; // offscreen buffer
-    
-    std::vector< geometry::Range2d<int> > _drawbounds;
-
-    // X position of the output window
-    int _xpos;
-
-    // Y position of the output window
-    int _ypos;
-    
-    unsigned m_rowsize;
-    
-    std::vector<boost::shared_ptr<InputDevice> > _inputs;
-
-    struct fb_var_screeninfo var_screeninfo;
-    struct fb_fix_screeninfo fix_screeninfo;
-
-    unsigned int _timeout; /* TODO: should we move this to base class ? */
-    
-    /// For 8 bit (palette / LUT) modes, sets a grayscale palette.
-    //
-    /// This GUI currently does not support palette modes. 
+public:
+    FBGui(unsigned long xid, float scale, bool loop, RunResources& r);
+    virtual ~FBGui();
+    /// \brief Initialize the framebuffer
     ///
-    bool set_grayscale_lut8();
+    /// This opens the framebuffer device,
+    virtual bool init(int argc, char ***argv);
+    /// \brief
+    /// Create and display our window.
+    ///
+    /// @param title The window title.
+    /// @param width The desired window width in pixels.
+    /// @param height The desired window height in pixels.
+    /// @param xPosition The desired window X position from the top left corner.
+    /// @param yPosition The desired window Y position from the top left corner.
+    bool createWindow(const char *title, int width, int height,
+                              int xPosition = 0, int yPosition = 0);
+
+    /// Render the current buffer.
+    /// For OpenGL, this means that the front and back buffers are swapped.
+    void renderBuffer();
     
-    bool initialize_renderer();
+    /// Start main rendering loop.
+    bool run();
+
+    /// Gives the GUI a *hint* which region of the stage should be redrawn.
+    //
+    /// There is *no* restriction what the GUI might do with these coordinates. 
+    /// Normally the GUI forwards the information to the renderer so that
+    /// it avoids rendering regions that did not change anyway. The GUI can
+    /// also alter the bounds before passing them to the renderer and it's
+    /// absolutely legal for the GUI to simply ignore the call.
+    ///
+    /// Coordinates are in TWIPS!
+    ///
+    /// Note this information is given to the GUI and not directly to the 
+    /// renderer because both of them need to support this feature for 
+    /// correct results. It is up to the GUI to forward this information to
+    /// the renderer.
+    ///
+    // does not need to be implemented (optional feature),
+    // but still needs to be available.
+    //
+    void setInvalidatedRegion(const SWFRect& bounds);
+    void setInvalidatedRegions(const InvalidatedRanges& ranges);
+
+    /// Should return TRUE when the GUI/Renderer combination supports multiple
+    /// invalidated bounds regions. 
+    bool want_multiple_regions() { return true; }
+
+    // Information for System.capabilities to be reimplemented in
+    // each gui.
+    double getPixelAspectRatio() { return 0; }
+    int getScreenResX() { return 0; }
+    int getScreenResY() { return 0; }
+    double getScreenDPI() { return 0; }
+    std::string getScreenColor() { return ""; }
+
+    // For the framebuffer, these are mostly just stubs.
+
+    // void setFullscreen() {};
+    // void unsetFullscreen() {};
+    
+    bool createMenu();
+    bool setupEvents();
+    void setInterval(unsigned int interval);
+    void setTimeout(unsigned int timeout);
+    
+    void showMenu(bool show);
+    bool showMouse(bool show);    
+
+    // Poll this to see if there is any input data.
+    void checkForData();
+    
+private:
+    // bool initialize_renderer();
     
     /// Tries to find a accessible tty
     char* find_accessible_tty(int no);
@@ -133,40 +183,27 @@ private:
     /// reverts disable_terminal() changes
     bool enable_terminal();
     
-public:
-    FBGui(unsigned long xid, float scale, bool loop, RunResources& r);
-    virtual ~FBGui();
-    virtual bool init(int argc, char ***argv);
-    virtual bool createWindow(const char *title, int width, int height,
-                              int xPosition = 0, int yPosition = 0);
-    virtual bool run();
-    virtual bool createMenu();
-    virtual bool setupEvents();
-    virtual void renderBuffer();
-    virtual void setInterval(unsigned int interval);
-    virtual void setTimeout(unsigned int timeout);
+    int         _fd;
+    int         _original_vt; // virtual terminal that was active at startup
+    int         _original_kd; // keyboard mode at startup
+    int         _own_vt;      // virtual terminal we are running in   
     
-    virtual void setFullscreen();
-    virtual void unsetFullscreen();
-    
-    virtual void showMenu(bool show);
-    virtual bool showMouse(bool show);
-    
-    virtual void setInvalidatedRegions(const InvalidatedRanges& ranges);
-    virtual bool want_multiple_regions() { return true; }
+    int         _xpos;          // X position of the output window
+    int         _ypos;          // Y position of the output window
+    size_t      _timeout;       // timeout period for the event loop
 
-    void checkForData();    
+    struct fb_var_screeninfo _var_screeninfo;
+    struct fb_fix_screeninfo _fix_screeninfo;
+    boost::shared_ptr<FBGlue> _glue;
+
+    /// This is the array of functioning input devices.
+    std::vector<boost::shared_ptr<InputDevice> > _inputs;
+
+    boost::shared_ptr<Renderer> _renderer;
 };
 
-// end of namespace gnash
-}
-
-#ifdef ENABLE_FAKE_FRAMEBUFFER
-/// Simulate the ioctls used to get information from the framebuffer driver.
-///
-/// Since this is an emulator, we have to set these fields to a reasonable default.
-int fakefb_ioctl(int fd, int request, void *data);
-#endif
+} // end of namespace gui
+} // end of namespace gnash
 
 #endif  // end of GNASH_FBSUP_H
 

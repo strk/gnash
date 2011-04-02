@@ -59,13 +59,12 @@
 
 namespace gnash {
 
+namespace renderer {
 
-
+namespace opengl {
 
 typedef std::vector<const Path*> PathRefs;
-
-
-
+ 
 struct oglVertex {
   oglVertex(double x, double y, double z = 0.0)
     : _x(x), _y(y), _z(z)
@@ -150,15 +149,15 @@ private:
 
 };
 
-
-
-
 DSOEXPORT Renderer* create_Renderer_ogl(bool init = true);
 
-
-
+} // namespace gnash::renderer::opengl
+} // namespace gnash::renderer
 } // namespace gnash
-
 
 #endif
 
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:

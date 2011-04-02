@@ -129,8 +129,6 @@ if USE_GIF
 libgnashbase_la_SOURCES += GnashImageGif.cpp
 endif
 
-libgnashbase_la_LIBADD += $(LTDL_LIBS)
-
 if HAIKU
   libgnashbase_la_LIBADD += $(HAIKU_LIBS)
 endif
@@ -226,16 +224,6 @@ inst_HEADERS += $(EXTENSIONS_API)
 
 libgnashbase_la_LDFLAGS = -release $(VERSION)
 libgnashbase_la_DEPENDENCIES =
-
-if BUILD_OGL_RENDERER
-   libgnashbase_la_SOURCES += \
-	GnashTexture.cpp \
-	$(NULL)
-
-   noinst_HEADERS += \
-	GnashTexture.h \
-	$(NULL)
-endif
 
 if HAVE_VAAPI
    libgnashbase_la_SOURCES += \

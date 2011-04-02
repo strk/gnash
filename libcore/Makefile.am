@@ -32,6 +32,7 @@ FREETYPE_SOURCES = FreetypeGlyphsProvider.h FreetypeGlyphsProvider.cpp
 # Only enable if we're configured with --enable-mp3
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/librender \
+	-I$(top_srcdir)/libdevice \
 	-I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libcore/abc \
 	-I$(top_srcdir)/libcore/asobj \
@@ -48,6 +49,13 @@ AM_CPPFLAGS = \
 	$(FREETYPE2_CFLAGS) \
 	$(FONTCONFIG_CFLAGS) \
 	$(NULL)
+
+if BUILD_EGL_DEVICE
+AM_CPPFLAGS += $(EGL_CFLAGS)
+endif
+if BUILD_DIRECTFB_DEVICE
+AM_CPPFLAGS += $(DIRECTFB_CFLAGS)
+endif
 
 libgnashcore_la_SOURCES = \
 	BitmapMovie.cpp \

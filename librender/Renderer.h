@@ -146,6 +146,8 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 
+#include "boost/shared_array.hpp"
+#include "boost/scoped_ptr.hpp"
 #include "GnashEnums.h" 
 #include "Range2d.h"
 #include "Point2d.h"
@@ -189,11 +191,8 @@ class DSOEXPORT Renderer : boost::noncopyable
 {
 public:
 
-    Renderer()
-        :
-        _quality(QUALITY_HIGH)
-    {}
-
+    Renderer(): _quality(QUALITY_HIGH) { }
+    
     virtual ~Renderer() {}
 
     /// Return a description of this renderer.
@@ -218,11 +217,11 @@ public:
     /// ==================================================================
     
     /// \brief
-    /// Given an image, returns a pointer to a bitmap_info class
+    /// Given an image, returns a pointer to a CachedBitmap class
     /// that can later be passed to FillStyleX_bitmap(), to set a
     /// bitmap fill style.
-    virtual CachedBitmap* createCachedBitmap(
-            std::auto_ptr<image::GnashImage> im) = 0;
+    virtual CachedBitmap *
+        createCachedBitmap(std::auto_ptr<image::GnashImage> im) = 0;
 
 
     /// ==================================================================
@@ -429,6 +428,7 @@ public:
 
 #ifdef USE_TESTSUITE
 
+        
     /// ==================================================================
     /// Interfaces for testing only. Disabled when the testsuite isn't built.
     /// ==================================================================
@@ -445,6 +445,60 @@ public:
         log_debug("getPixel() not implemented for this renderer");
         abort();        
         return false; // avoid compiler warning        
+    }
+
+    void addRenderImage(boost::shared_ptr<GnashVaapiImageProxy> image) {
+        _render_images.push_back(image);
+    }
+    
+    /// Returns the average RGB color for a square block on the stage. The 
+    /// width and height of the block is defined by "radius" and x/y refer
+    /// to the center of the block. radius==1 equals getPixel() and radius==0
+    /// is illegal. For even "radius" values, the center point is not exactly
+    /// defined. 
+    /// The function returns false when at least one pixel of the block was
+    /// outside the main frame buffer. In that case the value in color_return
+    /// is undefined.
+    /// This implementation is provided for simplicity. Renderers should
+    /// implement a specialized version for better performance.
+    virtual bool getAveragePixel(rgba& color_return, int x, int y, 
+        unsigned int radius) const
+    {
+    
+        assert(radius>0); 
+    
+        // optimization:
+        if (radius==1) return getPixel(color_return, x, y);
+    
+        unsigned int r=0, g=0, b=0, a=0;
+        
+        x -= radius/2;
+        y -= radius/2;
+        
+        int xe = x+radius;
+        int ye = y+radius;
+
+        rgba pixel;
+        
+        for (int yp=y; yp<ye; yp++)
+        for (int xp=x; xp<xe; xp++)
+        {
+            if (!getPixel(pixel, xp, yp))
+                return false;
+                
+            r += pixel.m_r;            
+            g += pixel.m_g;            
+            b += pixel.m_b;            
+            a += pixel.m_a;            
+        }
+        
+        int pcount = radius*radius; 
+        color_return.m_r = r / pcount; 
+        color_return.m_g = g / pcount; 
+        color_return.m_b = b / pcount; 
+        color_return.m_a = a / pcount; 
+        
+        return true;
     }
     
     /// \brief
@@ -477,7 +531,7 @@ public:
     ///
     /// TODO: this should be a pure abstract function, just don't want
     ///     to scan ogl and cairo backend for an implementation *now*
-    ///     but would be needed for automated testing... Quinn, can you help ?
+    ///     but would be needed for automated testing...
     virtual unsigned int getBitsPerPixel() const {
         return 0;
     }
@@ -540,7 +594,6 @@ protected:
     RenderImages _render_images;
 
 private:
-
     /// Bracket the displaying of a frame from a movie.
     //
     /// Set up to render a full frame from a movie and fills the
@@ -578,5 +631,5 @@ private:
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

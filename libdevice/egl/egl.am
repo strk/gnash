@@ -1,0 +1,50 @@
+# 
+#   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+
+# eglinfo is a utility program that isn't always available. Since it's useful
+# when bring up Gnash on a new target, it's included here.
+bin_PROGRAMS += eglinfo
+eglinfo_SOURCES = egl/eglinfo.c
+eglinfo_CPPFLAGS = $(AM_CPPFLAGS) $(EGL_CFLAGS)
+eglinfo_LDADD = \
+	$(EXTRA_EGL_LIBS) \
+	$(LTDL_LIBS) \
+	$(EGL_LIBS) \
+	$(NULL)
+
+# this tests the low level EGL interface, used by OpenVG, OpenGLES1, and OpenGLES2.
+bin_PROGRAMS += test_egl 
+test_egl_SOURCES = egl/test_egl.cpp
+test_egl_CPPFLAGS = $(AM_CPPFLAGS) $(EGL_CFLAGS)
+test_egl_LDADD = \
+	libgnashdevice.la \
+	$(EXTRA_EGL_LIBS) \
+	$(TS_LIBS) \
+	$(CURL_LIBS) \
+	$(EGL_LIBS) \
+	$(GNASH_LIBS) \
+	$(LTDL_LIBS) \
+	$(NULL)
+
+libgnashdevice_la_CPPFLAGS += $(EGL_CFLAGS)
+libgnashdevice_la_SOURCES += \
+	egl/eglDevice.cpp \
+	egl/eglDevice.h \
+	egl/configTemplates.h  \
+	$(NULL)
+libgnashdevice_la_LIBADD += $(EGL_LIBS)

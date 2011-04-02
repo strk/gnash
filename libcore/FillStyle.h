@@ -39,12 +39,11 @@ namespace gnash {
 class GradientRecord
 {
 public:
-
     GradientRecord(boost::uint8_t ratio, const rgba& color)
         :
         ratio(ratio),
         color(color)
-    {}
+    { }
     
     //data:
     boost::uint8_t ratio;
@@ -156,7 +155,7 @@ public:
 
     /// The type of GradientFill
     //
-    /// A Focal fill is a gradient fill with a focal point.
+    /// A Radial fill is a gradient fill with a focal point.
     enum Type {
         LINEAR,
         RADIAL
@@ -198,6 +197,10 @@ public:
     void setRecords(const GradientRecords& recs) {
         assert(recs.size() > 1);
         _gradients = recs;
+    }
+
+    const GradientRecords &getRecords() const {
+        return _gradients;
     }
 
     /// Get the number of records in this GradientFill
@@ -247,13 +250,13 @@ public:
     explicit SolidFill(const rgba& c)
         :
         _color(c)
-    {}
+    { }
 
     /// Copy a SolidFill.
     SolidFill(const SolidFill& other)
         :
         _color(other._color)
-    {}
+    { }
 
     /// Set this fill to a lerp of two other SolidFills.
     void setLerp(const SolidFill& a, const SolidFill& b, double ratio) {
@@ -290,7 +293,7 @@ public:
     FillStyle(const FillStyle& other)
         :
         fill(other.fill)
-    {}
+    { }
 
     Fill fill;
 
@@ -307,10 +310,9 @@ DSOEXPORT std::ostream& operator<<(std::ostream& os,
 
 } // namespace gnash
 
-#endif 
-
+#endif
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

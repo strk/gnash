@@ -23,24 +23,16 @@
 
 AUTOMAKE_OPTIONS = -Wno-portability
 
-DIST_SUBDIRS = pythonmod fb dump
-
-# Build the current directory first. It's hard to see, but there is a '.' dot here.
-SUBDIRS = . fb
-
-if BUILD_FB_GUI
-SUBDIRS += fb
-endif
-
-if BUILD_DUMP_GUI
-SUBDIRS += dump
-endif
+SUBDIRS = .
 
 # If python support is enabled, built that too
 if HAS_PYTHON
 SUBDIRS += pythonmod
 endif
 
+if BUILD_DUMP_GUI
+SUBDIRS += dump
+endif
 
 localedir = $(datadir)/locale
 
@@ -50,6 +42,7 @@ pluginsdir = $(libdir)/gnash/plugins
 # noinst_LTLIBRARIES = libgnashgui.la
 BUILT_SOURCES =
 
+DIST_SUBDIRS = pythonmod
 EXTRA_DIST = gnash.in \
 	qt/klash3.moc.in \
 	qt/Qt4Gui.moc.in \
@@ -71,6 +64,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libcore/asobj \
 	-I$(top_srcdir)/libltdl \
 	-I$(top_srcdir)/libbase \
+	-I$(top_srcdir)/libdevice \
 	-I$(top_srcdir)/librender \
 	-I$(top_srcdir)/librender/agg \
 	-I$(top_srcdir)/librender/cairo \
@@ -86,6 +80,13 @@ AM_CPPFLAGS = \
 	$(PYTHON_LIBS) \
 	$(PTHREAD_CFLAGS) \
 	$(NULL)
+
+if BUILD_EGL_DEVICE
+AM_CPPFLAGS += $(EGL_CFLAGS)
+endif
+if BUILD_DIRECTFB_DEVICE
+AM_CPPFLAGS += $(DIRECTFB_CFLAGS)
+endif
 
 GTK_CFLAGS = \
 	$(GTK2_CFLAGS) \
@@ -125,6 +126,7 @@ AM_LDFLAGS =  \
 
 GNASH_LIBS = \
 	$(top_builddir)/libcore/libgnashcore.la \
+	$(top_builddir)/libdevice/libgnashdevice.la \
 	$(top_builddir)/librender/libgnashrender.la \
 	$(top_builddir)/libsound/libgnashsound.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
@@ -174,12 +176,6 @@ gnash: gnash.in
 	cp $(srcdir)/gnash.in $@
 	chmod +x $@
 
-# Always include the device files in the source tarball
-EXTRA_DIST += \
-	fb/TouchDevice.cpp \
-	fb/MouseDevice.cpp \
-	fb/EventDevice.cpp
-
 GUI_SRCS = gnash.cpp \
 	gui.cpp gui.h \
 	Player.cpp Player.h \
@@ -190,6 +186,11 @@ GUI_SRCS = gnash.cpp \
 if BUILD_AQUA_GUI
 BUILT_SOURCES += bundle
 EXTRA_DIST += Gnash.app
+endif
+
+# Build the FB gui
+if BUILD_FB_GUI
+include $(srcdir)/fb/fb.am
 endif
 
 # Build the QTOPIA gui
@@ -260,3 +261,17 @@ mudflap:
 clean-hook:
 	-rm -f core.* $(CLEANFILES)
 
+if ENABLE_DEVELOPER_TESTS
+check_PROGRAMS = test_glue
+
+test_glue_SOURCES = \
+	test_glue.cpp \
+	fb/fb_glue_agg.cpp \
+	fb/fb_glue_ovg.cpp
+test_glue_CPPFLAGS = \
+	-DFAKEFB=\"$(FAKEFB)\" \
+	$(AM_CPPFLAGS) \
+	$(DIRECTFB_CFLAGS)
+#       -DUSE_TESTSUITE
+test_glue_LDADD = $(GNASH_LIBS)
+endif

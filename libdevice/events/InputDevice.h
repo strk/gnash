@@ -27,10 +27,11 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/cstdint.hpp>
-
-#include "gui.h"
-
+#include <vector>
+#include <queue>
 #include <linux/input.h>
+
+#include "GnashKey.h"
 
 namespace gnash {
 
@@ -38,9 +39,6 @@ namespace gnash {
 // The default is to support the devices we prefer for mouse, keyboard,
 // and touchscreen.
 // #define MULTIPLE_DEVICES 1
-
-// Forward declarations
-class Gui;
 
 // If we have a mouse, but the size isn't specified, then this is the
 // default size.
@@ -51,10 +49,32 @@ static const int DEFAULT_BUFFER_SIZE = 256;
 class InputDevice
 {
 public:
+    typedef struct {
+        bool pressed;
+        gnash::key::code key;
+        int modifier;
+        int x;
+        int y;
+        int button;
+        int position;
+        int pressure;
+        int volumne;
+        int distance;
+        int rx;
+        int ry;
+        int rz;
+        int throttle;
+        int rudder;
+        int gas;
+        int brake;
+        int tiltX;
+        int tiltY;        
+    } input_data_t;
     typedef enum {
         UNKNOWN,
         KEYBOARD,
         MOUSE,
+        TABLET,
         TOUCHSCREEN,
         TOUCHMOUSE,
         POWERBUTTON,
@@ -63,8 +83,9 @@ public:
         INFRARED
     } devicetype_e;
     InputDevice();
-    InputDevice(Gui *gui);
     virtual ~InputDevice();
+
+    virtual const char *id() = 0;
     
     virtual bool init();
     bool init(devicetype_e type);
@@ -74,58 +95,74 @@ public:
     virtual bool init(const std::string &filespec, size_t size) = 0;
     virtual bool check() = 0;
 
-    static std::vector<boost::shared_ptr<InputDevice> > scanForDevices(Gui *gui);
-
-    InputDevice::devicetype_e getType() const { return _type; };
+    static std::vector<boost::shared_ptr<InputDevice> > scanForDevices();
+    
+    InputDevice::devicetype_e getType() { return _type; };
 
     // Read data into the Device input buffer.
     boost::shared_array<boost::uint8_t> readData(size_t size);
+    boost::shared_ptr<input_data_t> popData()
+    {
+        boost::shared_ptr<InputDevice::input_data_t> input;
+        if (_data.size()) {
+            // std::cerr << "FIXME: " <<_data.size() << std::endl;
+            input = _data.front();
+            _data.pop();
+        }
+        return input;
+    }
+
+    static boost::shared_array<int> convertAbsCoords(int x, int y,
+                                                     int width, int height);
 
     void dump() const;
-    
+
 protected:
+    void addData(bool pressed, key::code key, int modifier, int x, int y);
+    
     devicetype_e        _type;
     std::string         _filespec;
     int                 _fd;
-    int                 _x;
-    int                 _y;
-    // Touchscreens don't have buttons
-    int                 _button;
-    size_t              _position;
+    input_data_t        _input_data;
+    // These hold the data queue
     boost::scoped_array<boost::uint8_t> _buffer;
-    // We don't control the memory associated with the Gui, we just use
-    // it to propogate the events from this device.
-    Gui                 *_gui;
+    std::queue<boost::shared_ptr<input_data_t> > _data;
 };
 
 class MouseDevice : public InputDevice
 {
-public:    
+public:
     MouseDevice();
-    MouseDevice(Gui *gui);
-    virtual bool init();
-    virtual bool init(const std::string &filespec, size_t size);
-    virtual bool check();
+    const char *id() { return "Mouse"; };
+    bool init();
+    bool init(const std::string &filespec, size_t size);
+    bool check();
 
-    static std::vector<boost::shared_ptr<InputDevice> > scanForDevices(Gui *gui);
+    static std::vector<boost::shared_ptr<InputDevice> > scanForDevices();
     
     /// Sends a command to the mouse and waits for the response
     bool command(unsigned char cmd, unsigned char *buf, int count);
+
+    /// \brief. Mouse movements are relative to the last position, so
+    /// this method is used to convert from relative position to
+    /// the absolute position Gnash needs.
+    static boost::shared_array<int> convertCoordinates(int x, int y,
+                                                       int width, int height);
 };
 
 class TouchDevice : public InputDevice
 {
 public:
+    const char *id() { return "TouchScreen"; };
     TouchDevice();
-    TouchDevice(Gui *gui);
     virtual ~TouchDevice();
-    virtual bool init();
-    virtual bool init(const std::string &filespec, size_t size);
-    virtual bool check();
+    bool init();
+    bool init(const std::string &filespec, size_t size);
+    bool check();
 
     void apply_ts_calibration(float* cx, float* cy, int rawx, int rawy);
     
-    static std::vector<boost::shared_ptr<InputDevice> > scanForDevices(Gui *gui);
+    static std::vector<boost::shared_ptr<InputDevice> > scanForDevices();
 private:
     // Although the value is only set when using a touchscreen, it takes up little
     // memory to initialize a pointer to avoid lots of messy ifdefs.
@@ -134,9 +171,9 @@ private:
 
 class EventDevice : public InputDevice
 {
-public:    
+public:
     EventDevice();
-    EventDevice(Gui *gui);
+    const char *id() { return "InputEvent"; };
     virtual bool init();
     virtual bool init(const std::string &filespec, size_t size);
     virtual bool check();
@@ -144,7 +181,7 @@ public:
     gnash::key::code scancode_to_gnash_key(int code, bool shift);
 
     // This looks for all the input event devices.
-    static std::vector<boost::shared_ptr<InputDevice> > scanForDevices(Gui *gui);
+    static std::vector<boost::shared_ptr<InputDevice> > scanForDevices();
     
 private:
     // Keyboard SHIFT/CTRL/ALT states (left + right)

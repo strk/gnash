@@ -168,3 +168,8 @@ private:
 } // namespace gnash
 
 #endif
+
+// Local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:

@@ -23,7 +23,7 @@
 #include <fltk/Item.h>
 #include <fltk/Window.h>
 
-#ifdef HAVE_X11
+#ifdef HAVE_X11_X_H
 #include <fltk/x11.h>
 #endif
 
@@ -218,7 +218,7 @@ FltkGui::setInterval(unsigned int time)
 void
 FltkGui::create()
 {
-#ifdef HAVE_X11
+#ifdef HAVE_X11_X_H
     if (_xid) {
       // Make FLTK render into an X window indicated by the XID.
       CreatedWindow::set_xid(this, _xid);

@@ -48,12 +48,17 @@ if CYGNAL
 CYGNAL_DIR = cygnal
 endif
 
+if BUILD_DEVICES
+DEVICES_DIR = libdevice
+endif
+
 STD_DIRS = \
 	desktop \
 	libbase \
 	libmedia \
 	libsound \
 	libcore \
+	$(DEVICES_DIR) \
 	librender \
 	gui \
 	plugin \
@@ -61,12 +66,8 @@ STD_DIRS = \
 	po \
 	$(NULL)
 
-if HAVE_VAAPI
-VAAPI_DIR = libvaapi
-endif
-
-SUBDIRS = $(VAAPI_DIR) $(STD_DIRS) $(CYGNAL_DIR) utilities
-DIST_SUBDIRS = $(STD_DIRS) cygnal utilities extensions testsuite libvaapi
+SUBDIRS = $(STD_DIRS)
+DIST_SUBDIRS = $(STD_DIRS) cygnal extensions testsuite
 
 if TESTSUITE
 SUBDIRS += testsuite
@@ -344,6 +345,18 @@ if BUILD_OGL_RENDERER
 	@echo "	GLEXT_LIBS is $(GLEXT_LIBS)"
 	@echo "	OPENGL_CFLAGS is $(OPENGL_CFLAGS)"
 	@echo "	OPENGL_LIBS is $(OPENGL_LIBS)"
+endif
+if BUILD_OVG_RENDERER
+	@echo "	OVG_CFLAGS is $(OVG_CFLAGS)"
+	@echo "	OVG_LIBS is $(OVG_LIBS)"
+endif
+if BUILD_GLES1_RENDERER
+	@echo "	GLES1_CFLAGS is $(GLES1_CFLAGS)"
+	@echo "	GLES1_LIBS is $(GLES1_LIBS)"
+endif
+if BUILD_GLES2_RENDERER
+	@echo "	GLES2_CFLAGS is $(GLES2_CFLAGS)"
+	@echo "	GLES2_LIBS is $(GLES2_LIBS)"
 endif
 if BUILD_AGG_RENDERER
 	@echo "	AGG_CFLAGS is $(AGG_CFLAGS)"

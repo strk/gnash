@@ -184,7 +184,9 @@ BitmapFill::bitmap() const
     if (_bitmapInfo) {
         return  _bitmapInfo.get();
     }
-    if (!_md) return 0;
+    if (!_md) {
+        return 0;
+    }
     _bitmapInfo = _md->getBitmap(_id);
 
     // May still be 0!

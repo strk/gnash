@@ -55,10 +55,11 @@ localedir = $(datadir)/locale
 
 AM_CPPFLAGS = \
         -I$(top_srcdir)/libbase \
+        -I$(top_srcdir)/libdevice \
         -I$(top_srcdir)/librender \
-		-I$(top_srcdir)/librender/agg \
-		-I$(top_srcdir)/librender/cairo \
-		-I$(top_srcdir)/librender/opengl \
+	-I$(top_srcdir)/librender/agg \
+	-I$(top_srcdir)/librender/cairo \
+	-I$(top_srcdir)/librender/opengl \
         -I$(top_srcdir)/libcore \
         -I$(top_srcdir)/libcore/asobj \
         -I$(top_srcdir)/libcore/swf \
@@ -74,6 +75,13 @@ AM_CPPFLAGS = \
 	$(PTHREAD_CFLAGS) \
 	$(MYSQL_CFLAGS) \
 	$(NULL)
+
+if BUILD_EGL_DEVICE
+AM_CPPFLAGS += $(EGL_CFLAGS)
+endif
+if BUILD_DIRECTFB_DEVICE
+AM_CPPFLAGS += $(DIRECTFB_CFLAGS)
+endif
 
 if WIN32
   GNASH_LIBS += -lintl -lz -lws2_32

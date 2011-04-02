@@ -28,20 +28,24 @@ gtk_gnash_SOURCES = $(GUI_SRCS) $(GTK_CANVAS) \
 	gtk/gtk.cpp gtk/gtksup.h gtk/gtk_glue.h gtk/gui_gtk.cpp
 gtk_gnash_CPPFLAGS = -DGUI_GTK -DGUI_CONFIG=\"GTK\" \
 	$(AM_CPPFLAGS) $(GTK_CFLAGS) $(X11_CFLAGS)
-gtk_gnash_LDFLAGS = -export-dynamic $(AM_LDFLAGS)
+gtk_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
+gtk_gnash_LDADD = \
+	$(GTK_LIBS) \
+	$(GNASH_LIBS) \
+	$(BOOST_LIBS) \
+	$(TS_LIBS)
 #gtk_gnash_DEPENDENCIES = .configline
 
 if BUILD_OGL_RENDERER
 gtk_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
 gtk_gnash_SOURCES += gtk/gtk_glue_gtkglext.cpp gtk/gtk_glue_gtkglext.h 
-gtk_gnash_LDADD = $(top_builddir)/librender/libgnashrender.la \
-		$(GNASH_LIBS) $(GTK_LIBS) $(OPENGL_LIBS)
+gtk_gnash_LDADD += $(OPENGL_LIBS)
 endif	# BUILD_OGL_RENDERER
 
 if BUILD_AGG_RENDERER
 gtk_gnash_CPPFLAGS += $(AGG_CFLAGS)
 gtk_gnash_SOURCES += gtk/gtk_glue_agg.cpp gtk/gtk_glue_agg.h 
-gtk_gnash_LDADD = $(GNASH_LIBS) $(GTK_LIBS) $(AGG_LIBS) $(CAIRO_LIBS)
+gtk_gnash_LDADD += $(AGG_LIBS)
 
 if HAVE_VAAPI
 noinst_HEADERS		+= gtk/gtk_glue_agg_vaapi.h
@@ -49,21 +53,29 @@ gtk_gnash_SOURCES	+= gtk/gtk_glue_agg_vaapi.cpp
 gtk_gnash_CPPFLAGS	+= \
 	$(X11_CFLAGS) \
 	$(LIBVA_X11_CFLAGS) \
-	-I$(top_srcdir)/libvaapi \
+	-I$(top_srcdir)/libdevice/vaapi \
 	$(NULL)
 gtk_gnash_LDADD += \
 	$(X11_LIBS) \
 	$(LIBVA_X11_LIBS) \
-	$(top_builddir)/libvaapi/libgnashvaapi.la \
+	$(top_builddir)/libdevice/libgnashvaapi.la \
 	$(NULL)
 endif   # USE_VAAPI
 endif	# BUILD_AGG_RENDERER
 
+if BUILD_OVG_RENDERER
+gtk_gnash_CPPFLAGS += $(OPENVG_CFLAGS) $(EGL_CFLAGS)
+gtk_gnash_SOURCES += gtk/gtk_glue_ovg.cpp gtk/gtk_glue_ovg.h 
+gtk_gnash_LDADD += \
+	$(OPENVG_LIBS) \
+	$(EGL_LIBS)
+endif	# BUILD_OVG_RENDERER
+
 if BUILD_CAIRO_RENDERER
 gtk_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
 gtk_gnash_SOURCES += gtk/gtk_glue_cairo.cpp gtk/gtk_glue_cairo.h 
-gtk_gnash_LDADD = $(top_builddir)/librender/libgnashrender.la \
-		$(GNASH_LIBS) $(GTK_LIBS) $(CAIRO_LIBS)
+gtk_gnash_LDADD += $(top_builddir)/librender/libgnashrender.la \
+		$(CAIRO_LIBS)
 endif	# BUILD_CAIRO_RENDERER
 
 endif	# BUILD_GTK_GUI
