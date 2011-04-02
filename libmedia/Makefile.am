@@ -29,13 +29,6 @@ pkglib_LTLIBRARIES =  libgnashmedia.la
 
 libgnashmedia_la_CPPFLAGS = \
 	-I$(top_srcdir)/libbase	\
-	$(OPENGL_CFLAGS) \
-	$(PNG_CFLAGS) \
-	$(GLIB_CFLAGS) \
-	$(CURL_CFLAGS) \
-	$(Z_CFLAGS) \
-	$(JPEG_CFLAGS) \
-	$(GIF_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(NULL)
 
@@ -43,19 +36,8 @@ if ANDROID
   libgnashmedia_la_CPPFLAGS += $(ANDROID_NDK)/usr/include
 endif
 
-
-# These headers get installed
-# include_HEADERS = log.h err.h
-
 libgnashmedia_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(FFMPEG_LIBS) \
-	$(PNG_LIBS) \
-	$(JPEG_LIBS) \
-	$(GIF_LIBS) \
-	$(Z_LIBS) \
-	$(CURL_LIBS) \
-	$(OPENGL_LIBS) \
 	$(BOOST_LIBS) \
 	$(NULL)
 
