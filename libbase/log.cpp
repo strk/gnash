@@ -40,7 +40,7 @@ using std::endl;
 
 namespace {
     // TODO: drop this and use boost::this_thread::id instead.
-    inline unsigned long int /* pthread_t */ get_thread_id(void);
+    inline unsigned long int /* pthread_t */ get_thread_id();
 }
 
 namespace gnash {
@@ -331,7 +331,7 @@ LogFile::removeLog()
 #include <pthread.h>
 #else
 # ifdef _WIN32
-extern "C" unsigned long int /* DWORD WINAPI */ GetCurrentThreadId(void);
+extern "C" unsigned long int /* DWORD WINAPI */ GetCurrentThreadId();
 # else
 #include <sys/types.h>
 #include <unistd.h>
