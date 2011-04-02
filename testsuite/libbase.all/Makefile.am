@@ -30,6 +30,7 @@ AM_CPPFLAGS = \
         $(MING_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(DEJAGNU_CFLAGS) \
+	$(PTHREAD_CFLAGS) \
 	$(NULL)
 
 abs_builddir=`(cd $(top_builddir)/testsuite/libbase; pwd)`
