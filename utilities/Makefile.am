@@ -32,16 +32,10 @@ GNASH_LIBS = \
 	$(top_builddir)/librender/libgnashrender.la \
 	$(NULL)
 
-## WARNING: make sure GLIB_LIBS appears first
-## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS = \
 	$(LIBINTL) \
 	$(LIBADD_DL) \
-	$(CURL_LIBS) \
-	$(JPEG_LIBS) \
-	$(PNG_LIBS) \
 	$(BOOST_LIBS) \
-	$(PYTHON_LIBS) \
 	$(NULL)
 
 # bzip2 is a dependency of some libraries with mingw32
