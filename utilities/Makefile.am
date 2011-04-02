@@ -37,7 +37,6 @@ GNASH_LIBS = \
 AM_LDFLAGS = \
 	$(LIBINTL) \
 	$(LIBADD_DL) \
-	$(MYSQL_LIBS) \
 	$(CURL_LIBS) \
 	$(JPEG_LIBS) \
 	$(PNG_LIBS) \
@@ -72,7 +71,6 @@ AM_CPPFLAGS = \
 	$(GLIB_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(PTHREAD_CFLAGS) \
-	$(MYSQL_CFLAGS) \
 	$(NULL)
 
 if WIN32
