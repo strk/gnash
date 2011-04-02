@@ -54,6 +54,7 @@ qt4_gnash_LDFLAGS = -export-dynamic
 qt4_gnash_LDADD = \
 	$(GNASH_LIBS) \
 	$(AM_LDFLAGS) \
+	$(X11_LIBS) \
 	$(LIBVA_X11_LIBS)
 
 if BUILD_OGL_RENDERER

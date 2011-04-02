@@ -1867,11 +1867,11 @@ AC_CHECK_LIB(c, getpwnam, AC_DEFINE(HAVE_GETPWNAM, 1, [Has getpwnam] ))
 dnl X11 is needed for fltk (at least),
 dnl and probably for many other guis too ...
 GNASH_PATH_X11
-AC_CHECK_LIB(Xi, XInput_find_display)
-AC_CHECK_LIB(X11, XDisableAccessControl)
 AM_CONDITIONAL(HAVE_X11, [test x$x11 = xyes])
+
 AC_CHECK_LIB(rt, shm_unlink)
 AC_CHECK_FUNCS(shm_open shm_unlink)
+
 AC_TRY_COMPILE([#include <strings.h>], [
   char *p1 = (char *)"Hello";
   char *p2 = (char *)"World";
@@ -2438,6 +2438,10 @@ fi
 
 if test x$build_fltk = xyes; then
   GNASH_PKG_FIND(fltk2, [fltk/FL_API.h], [Fast Light Toolkit], fl_window_flush)
+  if test x"${has_fltk2}" = xyes; then
+    AC_CHECK_LIB(Xi, XInput_find_display,
+      [AC_SUBST(FLTK2_LIBS, "$FLTK2_LIBS -lXi")])
+  fi
 fi
 
 AM_CONDITIONAL(HAVE_FLTK2, [ test x$has_fltk2 = xyes ])
