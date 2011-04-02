@@ -291,11 +291,6 @@ if HAIKU
   libgnashcore_la_LIBADD += $(HAIKU_LIBS)
 endif
 
-# Rebuild with GCC 4.x Mudflap support
-mudflap:
-	@echo "Rebuilding with GCC Mudflap support"
-	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
-
 # Remove libtool .la files
 install-exec-hook:
 	$(RM) $(DESTDIR)$(libdir)/gnash/libgnashcore.la

@@ -83,11 +83,6 @@ libgnashrender_la_SOURCES += cairo/PathParser.cpp
 libgnashrender_la_LIBADD += $(CAIRO_LIBS)
 endif
 
-# Rebuild with GCC 4.x Mudflap support
-mudflap:
-	@echo "Rebuilding with GCC Mudflap support"
-	$(MAKE) CXXFLAGS="`$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
-
 if ENABLE_PCH
 AM_CXXFLAGS = $(PCH_FLAGS)
 endif

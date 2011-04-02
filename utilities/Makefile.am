@@ -128,11 +128,6 @@ if USE_GST_ENGINE
  findmicrophones_LDADD = $(GST_STUFF) $(GNASH_LIBS) $(AM_LDFLAGS)
 endif
 
-# Rebuild with GCC 4.x Mudflap support
-mudflap:
-	@echo "Rebuilding with GCC Mudflap support"
-	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
-
 # Wrap a single .as tests in dejagnu_so importer.
 # At play time, if the relative url '../ming-misc.all/Dejagnu.swf' 
 # takes to the Dejagnu.swf shared library we'll get visual traces,

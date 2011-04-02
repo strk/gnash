@@ -218,8 +218,3 @@ bundle: Info.plist aqua-gnash
 	cp -f aqua-gnash $(bundle_name)/Contents/MacOS/Gnash
 	cp -f images/GnashG.icns $(bundle_name)/Contents/Resources/
 
-# Rebuild with GCC 4.x Mudflap support
-mudflap:
-	@echo "Rebuilding with GCC Mudflap support"
-	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
-

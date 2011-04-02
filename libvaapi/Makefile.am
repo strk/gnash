@@ -79,8 +79,3 @@ endif
 
 libgnashvaapi_la_LDFLAGS = -release $(VERSION)
 
-# Rebuild with GCC 4.x Mudflap support
-mudflap:
-	@echo "Rebuilding with GCC Mudflap support"
-	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
-
