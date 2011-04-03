@@ -79,7 +79,7 @@ public:
     void drawVideoFrame(gnash::image::GnashImage*, const gnash::Transform&,
                         const gnash::SWFRect*, bool);
 
-    void world_to_pixel(int& x, int& y, float world_x, float world_y);
+    void world_to_pixel(int& x, int& y, float world_x, float world_y) const;
     gnash::geometry::Range2d<int> world_to_pixel(const gnash::SWFRect& wb) const;
     gnash::geometry::Range2d<int> world_to_pixel(const geometry::Range2d<float>& wb) const;
     

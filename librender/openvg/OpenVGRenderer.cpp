@@ -319,7 +319,7 @@ Renderer_ovg::drawVideoFrame(image::GnashImage* /* frame */, const SWFMatrix* /*
 }
 
 void
-Renderer_ovg::world_to_pixel(int& x, int& y, float world_x, float world_y)
+Renderer_ovg::world_to_pixel(int& x, int& y, float world_x, float world_y) const
 {
     GNASH_REPORT_FUNCTION;
 
@@ -344,10 +344,8 @@ Renderer_ovg::world_to_pixel(const SWFRect& wb) const
     
     int xmin, ymin, xmax, ymax;
 
-#if 0                           // FIXME:
     world_to_pixel(xmin, ymin, wb.get_x_min(), wb.get_y_min());
     world_to_pixel(xmax, ymax, wb.get_x_max(), wb.get_y_max());
-#endif
     
     return Range2d<int>(xmin, ymin, xmax, ymax);
 }
@@ -361,10 +359,8 @@ Renderer_ovg::world_to_pixel(const geometry::Range2d<float>& wb) const
     
     int xmin, ymin, xmax, ymax;
     
-#if 0                           // FIXME:
     world_to_pixel(xmin, ymin, wb.getMinX(), wb.getMinY());
     world_to_pixel(xmax, ymax, wb.getMaxX(), wb.getMaxY());
-#endif
     
     return geometry::Range2d<int>(xmin, ymin, xmax, ymax);
 }
