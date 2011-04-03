@@ -109,16 +109,13 @@
 
 namespace gnash {
 
-namespace {
-    const CachedBitmap* createGradientBitmap(const GradientFill& gf,
-            Renderer& renderer);
-}
-
 namespace renderer {
 
 namespace opengl {
 
 namespace {
+    const CachedBitmap* createGradientBitmap(const GradientFill& gf,
+            Renderer& renderer);
 
 class bitmap_info_ogl : public CachedBitmap
 {
