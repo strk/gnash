@@ -279,7 +279,6 @@ private:
     
     // Movie parameters (for -P)
     Params      _params;
-    unsigned int _bitDepth;
     
     // the scale at which to play 
     float       _scale;
