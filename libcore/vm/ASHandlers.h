@@ -26,7 +26,6 @@
 // Forward declarations
 namespace gnash {
     class ActionExec;
-    class as_environment;
 }
 
 namespace gnash {

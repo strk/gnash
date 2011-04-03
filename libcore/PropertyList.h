@@ -37,7 +37,6 @@
 // Forward declaration
 namespace gnash {
     class as_object;
-    class as_environment;
     class as_function;
     struct ObjectURI;
     class as_value;
@@ -159,7 +158,7 @@ public:
         }
     }
 
-    /// Enumerate all non-hidden properties to the given as_environment.
+    /// Enumerate all non-hidden properties to the given container.
     //
     /// Follows enumeration order. Note that this enumeration does not
     /// access the values. Accessing the values can result in changes to

@@ -20,7 +20,6 @@
 #define GNASH_BUILTIN_FUNCTION_H
 
 #include "UserFunction.h" 
-#include "as_environment.h"
 #include "fn_call.h"
 
 #include <cassert>
