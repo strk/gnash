@@ -1882,7 +1882,7 @@ private:
 #endif
 }; // class Renderer_ogl
   
-Renderer* create_Renderer_ogl(bool init)
+Renderer* create_handler(bool init)
 // Factory.
 {
   Renderer_ogl* renderer = new Renderer_ogl;
