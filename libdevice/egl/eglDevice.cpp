@@ -379,6 +379,7 @@ EGLDevice::attachWindow(GnashDevice::native_window_t window)
     GNASH_REPORT_FUNCTION;
     
     if (!window) {
+        log_error("bogus window handle!");
         return false;
     } else {
         _nativeWindow = static_cast<EGLNativeWindowType>(window);
