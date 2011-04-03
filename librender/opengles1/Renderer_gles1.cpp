@@ -127,7 +127,7 @@ Renderer_gles1::drawVideoFrame(image::GnashImage* /* frame */,
 
 
 void
-Renderer_gles1::world_to_pixel(int& x, int& y, float world_x, float world_y)
+Renderer_gles1::world_to_pixel(int& x, int& y, float world_x, float world_y) const
 {
 #if 0
     // negative pixels seems ok here... we don't
@@ -141,7 +141,7 @@ Renderer_gles1::world_to_pixel(int& x, int& y, float world_x, float world_y)
 }
 
 geometry::Range2d<int>
-Renderer_gles1::world_to_pixel(const SWFRect& wb)
+Renderer_gles1::world_to_pixel(const SWFRect& wb) const
 {
     using namespace gnash::geometry;
     
@@ -157,7 +157,7 @@ Renderer_gles1::world_to_pixel(const SWFRect& wb)
 }
 
 geometry::Range2d<int>
-Renderer_gles1::world_to_pixel(const geometry::Range2d<float>& wb)
+Renderer_gles1::world_to_pixel(const geometry::Range2d<float>& wb) const
 {
     if (wb.isNull() || wb.isWorld()) return wb;
     
@@ -170,7 +170,7 @@ Renderer_gles1::world_to_pixel(const geometry::Range2d<float>& wb)
 }
 
 point
-Renderer_gles1::pixel_to_world(int x, int y)
+Renderer_gles1::pixel_to_world(int x, int y) const
 {
 #if 0
     point p(x, y);
@@ -200,7 +200,7 @@ Renderer_gles1::drawLine(const std::vector<point>& coords, const rgba& fill,
     GNASH_REPORT_FUNCTION;
 }
 void
-Renderer_gles1::drawPoly(const point* corners, size_t corner_count, 
+Renderer_gles1::draw_poly(const std::vector<point>& corners,
                        const rgba& fill, const rgba& /* outline */,
                        const SWFMatrix& mat, bool /* masked */)
 {

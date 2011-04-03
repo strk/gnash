@@ -141,10 +141,10 @@ public:
     void init(float x, float y);
     CachedBitmap *createCachedBitmap(std::auto_ptr<image::GnashImage> im);
 
-    void world_to_pixel(int& x, int& y, float world_x, float world_y);
-    gnash::geometry::Range2d<int> world_to_pixel(const gnash::SWFRect& wb);
-    geometry::Range2d<int> world_to_pixel(const geometry::Range2d<float>& wb);
-    gnash::point pixel_to_world(int, int);
+    void world_to_pixel(int& x, int& y, float world_x, float world_y) const;
+    gnash::geometry::Range2d<int> world_to_pixel(const gnash::SWFRect& wb) const;
+    geometry::Range2d<int> world_to_pixel(const geometry::Range2d<float>& wb) const;
+    gnash::point pixel_to_world(int, int) const;
 
     void begin_display(const gnash::rgba&, int, int, float,
                                         float, float, float);
@@ -158,7 +158,7 @@ public:
                   const SWFMatrix& mat);
     void drawVideoFrame(gnash::image::GnashImage *frame, const gnash::Transform& tx,
                         const gnash::SWFRect *bounds, bool smooth);
-    void drawPoly(const point* corners, size_t corner_count, 
+    void draw_poly(const std::vector<point>& corners,
                   const rgba& fill, const rgba& outline,
                   const SWFMatrix& mat, bool masked);
     void drawShape(const gnash::SWF::ShapeRecord&, const gnash::Transform&);
