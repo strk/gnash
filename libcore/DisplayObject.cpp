@@ -133,11 +133,12 @@ ObjectURI
 DisplayObject::getNextUnnamedInstanceName()
 {
     assert(_object);
-    movie_root& mr = getRoot(*_object);
+    movie_root& mr = stage();
+
     std::ostringstream ss;
     ss << "instance" << mr.nextUnnamedInstance();
 
-    VM& vm = getVM(*_object);
+    VM& vm = mr.getVM();
     return getURI(vm, ss.str(), true);
 }
 
@@ -145,9 +146,8 @@ DisplayObject::getNextUnnamedInstanceName()
 int
 DisplayObject::getWorldVolume() const
 {
-    int volume=_volume;
-    if (_parent != NULL)
-    {
+    int volume = _volume;
+    if (_parent) {
         volume = int(volume*_parent->getVolume()/100.0);
     }
 
@@ -329,7 +329,7 @@ DisplayObject::set_visible(bool visible)
     // invisible (see Selection.as).
     if (_visible && !visible) {
         assert(_object);
-        movie_root& mr = getRoot(*_object);
+        movie_root& mr = stage();
         if (mr.getFocus() == this) {
             mr.setFocus(0);
         }
