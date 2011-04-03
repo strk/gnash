@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2010 Free Software Foundation, Inc
+//   Copyright (C) 2010, 2011 Free Software Foundation, Inc
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -63,7 +63,6 @@ static LogFile& dbglogfile = LogFile::getDefaultInstance();
 const char *estrs[] = {
     "OpenVG",
     "OpenGLES1",
-    "OpenGLES2",
     "X11",
     "VAAPI"
 };
@@ -93,12 +92,6 @@ main(int argc, char *argv[])
 //    egl2.printEGLConfig();
 #endif
     
-#ifdef RENDERER_GLES2
-    EGLDevice egl3;
-    std::cerr << "== OpenGLES2 tests ==" << std::endl;
-    test_egl(egl3, GnashDevice::OPENGLES2, argc, argv);
-//    egl3.printEGLConfig();
-#endif
 #endif
 }
 
