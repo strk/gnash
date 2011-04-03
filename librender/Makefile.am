@@ -61,7 +61,6 @@ noinst_HEADERS = \
 	opengl/Renderer_ogl.h \
 	opengles1/Renderer_gles1.h \
 	opengles1/render_handler_gles.h \
-	opengles2/Renderer_gles2.h \
 	openvg/OpenVGRenderer.h \
 	openvg/OpenVGBitmap.h \
 	openvg/OpenVGStyle.h \
