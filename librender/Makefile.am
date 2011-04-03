@@ -114,13 +114,6 @@ libgnashrender_la_SOURCES += \
 libgnashrender_la_LIBADD += $(GLES1_LIBS)
 endif
 
-if  BUILD_GLES2_RENDERER
-libgnashrender_la_SOURCES += \
-	opengles2/Renderer_gles2.cpp \
-	opengles2/Renderer_gles2.h
-libgnashrender_la_LIBADD += $(GLES2_LIBS)
-endif
-
 if  BUILD_CAIRO_RENDERER
 libgnashrender_la_SOURCES += \
 	cairo/Renderer_cairo.cpp \
@@ -167,7 +160,6 @@ testr_CPPFLAGS = \
 	$(EGL_CFLAGS) \
 	$(OPENVG_CFLAGS) \
 	$(GLES1_CFLAGS) \
-	$(GLES2_CFLAGS)
 	$(DIRECTFB_CFLAGS)
 testr_LDADD = \
 	libgnashrender.la \
@@ -178,6 +170,5 @@ testr_LDADD = \
 	$(EGL_LIBS) \
 	$(GNASH_LIBS) \
 	$(OPENVG_LIBS) \
-	$(GLES1_LIBS) \
-	$(GLES2_LIBS)
+	$(GLES1_LIBS)
 endif
