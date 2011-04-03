@@ -75,7 +75,7 @@ namespace {
 /// TODO: do this properly (it's currently not very random).
 struct RandomByte
 {
-    bool operator()() const {
+    boost::uint8_t operator()() const {
         return std::rand() % 256;
     }
 };
