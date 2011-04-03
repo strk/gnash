@@ -167,9 +167,9 @@ EGLDevice::~EGLDevice()
 /// desktop or framebuffer to EGL. This is what binds EGL to the
 /// desktop or framebuffer.
 bool
-EGLDevice::initDevice(int argc, char *argv[])
+EGLDevice::initDevice(int /* argc */, char **/*argv[] */)
 {
-    EGLDevice::rtype_t rtype;
+    // EGLDevice::rtype_t rtype;
 
     dbglogfile.setVerbosity(2);
 
@@ -334,8 +334,6 @@ EGLDevice::bindClient(rtype_t rtype)
 {
     GNASH_REPORT_FUNCTION;
     
-    EGLint value;
-
     switch (rtype) {
       case GnashDevice::OPENGLES2:
       {

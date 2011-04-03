@@ -220,9 +220,9 @@ X11Device::createWindow(const char *name, int x, int y, int width, int height)
 
     XSetWindowAttributes attr;
     unsigned long mask;
-    Window root;
-    XVisualInfo visTemplate;
-    int num_visuals;
+    // Window root;
+    // XVisualInfo visTemplate;
+    // int num_visuals;
 
     // window attributes
     attr.background_pixel = 0;
@@ -261,7 +261,7 @@ X11Device::eventLoop(size_t passes)
         
         reshape_func reshape = 0;
         key_func     keyPress = 0;
-        draw_func    draw = 0;
+        // draw_func    draw = 0;
         
         XNextEvent(_display, &event);
         
