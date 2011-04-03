@@ -33,6 +33,7 @@ AM_CPPFLAGS = -I.. \
 	-I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/librender \
+	-I$(top_srcdir)/libdevice \
 	$(BOOST_CFLAGS) \
 	$(OPENGL_CFLAGS) \
 	$(AGG_CFLAGS) \
@@ -147,15 +148,15 @@ install-exec-hook:
 uninstall-local:
 	$(RM) $(DESTDIR)$(libdir)/gnash/libgnashrender-*.so
 
-# if BUILD_OGL_RENDERER
-#    libgnashrender_la_SOURCES += \
-# 	GnashTexture.cpp \
-# 	$(NULL)
+if BUILD_OGL_RENDERER
+    libgnashrender_la_SOURCES += \
+	GnashTexture.cpp \
+	$(NULL)
 
-#    noinst_HEADERS += \
-# 	GnashTexture.h \
-# 	$(NULL)
-# endif
+noinst_HEADERS += \
+	GnashTexture.h \
+	$(NULL)
+endif
 
 if ENABLE_DEVELOPER_TESTS
 check_PROGRAMS = testr
