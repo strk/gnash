@@ -875,21 +875,34 @@ if test x"${build_sdl}" = xauto; then
   fi
 fi
 
-
 dnl -------------------------------
 dnl Renderer Selection
 dnl -------------------------------
 input_events=
 dnl By default, we want to to build all renderers
+dnl DirectFB has both a device layer and a rendering layer, although
+dnl currently the rendering part is incomplete. Configure support is
+dnl included for development purposes.
 build_directfb=no
+dnl The OpenVG support works on both the desktop and embedded devices
+dnl that don't run X11. It is supported by iPhone/iPad/Android
+dnl devices, and the nouveau driver on the desktop.
 build_ovg=no
+dnl The OpenGLES1 renderer is a work in progress. It is originally
+dnl based on a patch to Gnash 0.8.5, which of course not only didn't
+dnl compile anymore, it was all hardcoded into the framebuffer
+dnl code. This version compiles with the latest internal rendering
+dnl API, and works properly with the glue code for the Gnash GUIs.
 build_gles1=no
+dnl OpenGL works, but suffers from performance problems. This should
+dnl eventually be replacd by the OpenGLES1 and OpenVG renders.
 build_ogl=yes
+dnl AGG is a software only renderer
 build_agg=yes
 build_cairo=yes
 renderer_list="agg cairo"
 AC_ARG_ENABLE(renderer,
-  AC_HELP_STRING([--enable-renderer=], [Enable support for the specified renderers (agg|cairo|opengl|all, default=all)]),
+  AC_HELP_STRING([--enable-renderer=], [Enable support for the specified renderers (agg|cairo|opengl|openvg|all, default=all)]),
   if test -n ${enableval}; then
     if test "x${enableval}" != "xno" -o "x${enableval}" != "xnone" ; then
       renderer_list="none"
@@ -954,7 +967,7 @@ AC_ARG_ENABLE(renderer,
         renderer_list="${renderer_list} cairo"
         build_cairo=yes
         ;;
-      *) AC_MSG_ERROR([invalid renderer specified: ${enableval} given (accept:  (ogl|ovg|cairo|agg|gles1|all)])
+      *) AC_MSG_ERROR([invalid renderer specified: ${enableval} given (accept:  (opengl|openvg|cairo|agg|all)])
         ;;
       esac]
     enableval=`echo ${enableval} | cut -d ' ' -f 2-`
@@ -963,6 +976,7 @@ AC_ARG_ENABLE(renderer,
     fi
   done
 )
+
 dnl 16 bit: RGB555, RGB565
 dnl 24 bit: RGB24, BGR24
 dnl 32 bit: RGBA32, BGRA32
@@ -2426,12 +2440,12 @@ AM_CONDITIONAL(NPAPI,   [test x"${npapi}" = xyes])
 AM_CONDITIONAL(KPARTS3, [test x"${build_kparts3}" = xyes])
 AM_CONDITIONAL(KPARTS4, [test x"${build_kparts4}" = xyes])
 
-if test x"${build_gles1}" = xyes -o x"${build_gles2}" = xyes; then
+if test x"${build_gles1}"; then
   GNASH_PATH_GLES
 fi
 
 dnl The OpenGLES1, OpenGLES2, and OpenVG all need the EGL support, X11 can use it also
-if test x"${build_gles1}" = xyes -o  x"${build_gles2}" = xyes -o x"${build_ovg}" = xyes; then
+if test x"${build_gles1}" = xyes -o x"${build_ovg}" = xyes; then
   build_egl_device=yes
 fi
 
@@ -3153,7 +3167,6 @@ if test x"${build_ovg}" = x"yes"; then
   fi
 fi
 
-
 if test x"${build_ogl}" = x"yes"; then
   if test x"$OPENGL_LIBS" != x; then
     if test x"$OPENGL_CFLAGS" != x; then
@@ -3181,20 +3194,6 @@ if test x"${build_gles1}" = x"yes"; then
     echo "        OpenGLES1 libs are: ${GLES1_LIBS}"
   else
       echo "        ERROR: No OpenGLES1 development package installed!" >&3
-      echo "               You need to install the this from source proobably" >&3
-      echo "               or use a different renderer with --enable-renderer=" >&3
-  fi
-fi
-if test x"${build_gles2}" = xyes; then
-  if test x"${has_gles2}" = xyes; then
-    if test x"${GLES2_CFLAGS}" != x; then
-      echo "        OpenGLES2 flags are: ${GLES2_CFLAGS}"
-    else
-      echo "        OpenGLES2 flags are: default include path"
-    fi
-    echo "        OpenGLES2 libs are: ${GLES2_LIBS}"
-  else
-      echo "        ERROR: No OpenGLES2 development package installed!" >&3
       echo "               You need to install the this from source proobably" >&3
       echo "               or use a different renderer with --enable-renderer=" >&3
   fi
