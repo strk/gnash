@@ -197,28 +197,6 @@ public:
 
 };
 
-/// An unhandled exception in ActionScript, which should
-/// interrupt code execution.
-class ActionScriptException: public ActionException
-{
-
-public:
-
-	ActionScriptException(const std::string& s)
-		:
-		ActionException(s)
-	{}
-
-	ActionScriptException()
-		:
-		ActionException("Unhandled ActionScript exception")
-	{}
-
-	virtual ~ActionScriptException() throw() {}
-
-};
-
-
 } // namespace gnash
 
 #endif // def GNASH_GNASHEXCEPTION_H
