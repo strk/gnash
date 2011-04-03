@@ -3171,7 +3171,7 @@ if test x"${build_ogl}" = x"yes"; then
   fi
 fi
 
-if test x"${build_gles1}" = x"yes" -o x"${build_gles2}" = xyes; then
+if test x"${build_gles1}" = x"yes"; then
   if test x"${has_gles1}" = xyes; then
     if test x"${GLES1_CFLAGS}" != x; then
       echo "        OpenGLES1 flags are: ${GLES1_CFLAGS}"
@@ -3184,6 +3184,8 @@ if test x"${build_gles1}" = x"yes" -o x"${build_gles2}" = xyes; then
       echo "               You need to install the this from source proobably" >&3
       echo "               or use a different renderer with --enable-renderer=" >&3
   fi
+fi
+if test x"${build_gles2}" = xyes; then
   if test x"${has_gles2}" = xyes; then
     if test x"${GLES2_CFLAGS}" != x; then
       echo "        OpenGLES2 flags are: ${GLES2_CFLAGS}"
