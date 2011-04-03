@@ -40,7 +40,7 @@ namespace gnash {
 class GtkGlue : public DeviceGlue
 {
   public:
-    GtkGlue() : _drawing_area(0) { }
+    GtkGlue() : _drawing_area(0), _needs_area(false) { }
     virtual ~GtkGlue() { }
     virtual bool init(int argc, char **argv[]) = 0;
 
@@ -48,7 +48,6 @@ class GtkGlue : public DeviceGlue
     virtual Renderer* createRenderHandler() = 0;
     virtual void setRenderHandlerSize(int /*width*/, int /*height*/) {}
     virtual void render() = 0;
-    
     virtual void render(int /*minx*/, int /*miny*/, int /*maxx*/, int /*maxy*/)
     {
         render();	
@@ -75,8 +74,11 @@ class GtkGlue : public DeviceGlue
     
     virtual void beforeRendering(movie_root*) {};
 
+    virtual bool needsDrawingArea() { return _needs_area; };
+
   protected:
     GtkWidget *_drawing_area;
+    bool      _needs_area;  
 };
 
 } // namespace gnash

@@ -187,12 +187,12 @@ gnash_canvas_realize(GtkWidget *widget)
                                     &attributes, attributes_mask);
     gdk_window_set_user_data (widget->window, widget);
 
-#if defined(RENDERER_CAIRO) || defined(RENDERER_AGG) || defined(RENDERER_OPENVG)
-    // cairo needs the _drawingArea.window to prepare it ..
-    // TODO: find a way to make 'glue' use independent from actual
-    // renderer in use
-    canvas->glue->prepDrawingArea(GTK_WIDGET(canvas));
-#endif
+    if (canvas->glue->needsDrawingArea()) {
+	// cairo needs the _drawingArea.window to prepare it ..
+	// TODO: find a way to make 'glue' use independent from actual
+	// renderer in use
+	canvas->glue->prepDrawingArea(GTK_WIDGET(canvas));
+    }
 }
 
 static void

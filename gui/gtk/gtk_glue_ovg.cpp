@@ -145,6 +145,14 @@ GtkOvgGlue::prepDrawingArea(GtkWidget *drawing_area)
         egl->bindClient(renderer::GnashDevice::OPENVG);
     }
     
+
+    // Attach the window to the low level device
+    long xid = GDK_WINDOW_XID(gtk_widget_get_window(drawing_area));
+    _device->attachWindow(static_cast<renderer::GnashDevice::native_window_t>
+                          (xid));
+
+    //vgLoadIdentity();
+
 #if 0
     renderer::EGLDevice *egl = (renderer::EGLDevice*)_device.get();
     egl->printEGLSurface(eglGetCurrentSurface(EGL_DRAW));
