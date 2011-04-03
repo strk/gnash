@@ -42,7 +42,7 @@
 #include "amf.h"
 #include "element.h"
 
-using namespace amf;
+using namespace cygnal;
 using namespace gnash;
 using namespace std;
 
@@ -119,21 +119,21 @@ main(int argc, char *argv[])
 void
 test_properties()
 {
-    std::vector<boost::shared_ptr<amf::Element> > data1;
+    std::vector<boost::shared_ptr<cygnal::Element> > data1;
 
     const char *str1 = "property one";
-    boost::shared_ptr<amf::Element> prop1(new Element(str1));
+    boost::shared_ptr<cygnal::Element> prop1(new Element(str1));
     data1.push_back(prop1);
 
     string str2 = "property two";
-    boost::shared_ptr<amf::Element> prop2(new Element(str2));
+    boost::shared_ptr<cygnal::Element> prop2(new Element(str2));
     data1.push_back(prop2);
 
-    boost::shared_ptr<amf::Element> prop3(new Element("property three"));
+    boost::shared_ptr<cygnal::Element> prop3(new Element("property three"));
     data1.push_back(prop3);
 
     double num = 123.456;
-    boost::shared_ptr<amf::Element> prop4(new Element(num));
+    boost::shared_ptr<cygnal::Element> prop4(new Element(num));
     data1.push_back(prop4);
     
     Element top;

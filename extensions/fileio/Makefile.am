@@ -36,14 +36,12 @@ INCLUDES =  \
 	    -I$(top_srcdir)/libcore/parser \
 	    -I$(top_srcdir)/libcore/asobj \
 	    $(BOOST_CFLAGS) \
-	    $(PTHREAD_CFLAGS) \
 	    $(NULL)
 
 AM_LDFLAGS =  \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(BOOST_LIBS) \
-	$(PTHREAD_LIBS) \
 	$(NULL)
 
 fileio_la_SOURCES = fileio.cpp fileio.h

@@ -165,11 +165,8 @@ ActionExec::operator()()
     // code. There may be no catch and/or finally block, but certain operations
     // must still be carried out. 
 
-    // TODO: set this in gnashrc.
-    // NOTE: According to http://www.gnashdev.org/wiki/index.php/ScriptLimits
-    //       this should be 15, not 40, seconds
-    const size_t maxTime = 40 * 1000;
-    SystemClock clock;
+    const size_t maxTime = getRoot(vm).getTimeoutLimit() * 1000;
+    SystemClock clock; // TODO: should we use a CPUClock here ?
 
     try {
 
@@ -292,21 +289,27 @@ ActionExec::operator()()
             );
 #endif
 
-
             // Do some housecleaning on branch back
             if (next_pc <= pc) {
                 // Check for script limits hit. 
                 // See: http://www.gnashdev.org/wiki/index.php/ScriptLimits
                 if (clock.elapsed() > maxTime) {
-                    boost::format fmt = boost::format(_("Time exceeded while executing code in %1% between pc %2% and %3%")) % code.getMovieDefinition().get_url() % next_pc % pc;
-                    throw ActionLimitException(fmt.str());
+                    boost::format fmt = 
+                        boost::format(_("Time exceeded (%4% secs) while "
+                            "executing code in %1% between pc %2% and %3%")) %
+                            code.getMovieDefinition().get_url() % next_pc %
+                            pc % (maxTime/1000);
+                    if ( getRoot(env).abortOnScriptTimeout(fmt.str()) ) {
+                        throw ActionLimitException(fmt.str());
+                    } else {
+                        clock.restart();
+                    }
                 }
                 // TODO: Run garbage collector ? If stack isn't too big ?
             }
 
             // Control flow actions will change the PC (next_pc)
             pc = next_pc;
-
         }
     }
     catch (const ActionLimitException&) {

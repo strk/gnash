@@ -33,7 +33,6 @@ AM_LDFLAGS = \
 	$(LIBADD_DL) \
 	$(BOOST_LIBS) \
 	$(BOOST_CYGNAL_LIBS) \
-	$(PTHREAD_LIBS) \
 	$(NULL)
 
 libgnashnet_la_LDFLAGS =  -release $(VERSION) $(AM_LDFLAGS)

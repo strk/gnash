@@ -341,6 +341,18 @@ public:
 
     bool ignoreShowMenu() const { return _ignoreShowMenu; }
 
+    int getScriptsTimeout() const { return _scriptsTimeout; }
+
+    void setScriptsTimeout(int x) { _scriptsTimeout = x; }
+
+    int getScriptsRecursionLimit() const { return _scriptsRecursionLimit; }
+
+    void setScriptsRecursionLimit(int x) { _scriptsRecursionLimit = x; }
+
+    void lockScriptLimits(bool x) { _lockScriptLimits = x; }
+
+    bool lockScriptLimits() const { return _lockScriptLimits; }
+
     void dump();    
 
 protected:
@@ -596,6 +608,16 @@ protected:
     /// Which media player backend to use, no value means use the default.
     /// The default is set in the MediaFactory initialization table.
     std::string _mediahandler;
+
+    /// The number of seconds after which action execution is
+    /// considered to be slow enough to prompt the user for aborting
+    int _scriptsTimeout;
+
+    /// The max actionscript function call stack depth
+    int _scriptsRecursionLimit;
+
+    /// Whether to ignore SWF ScriptLimits tags 
+    bool _lockScriptLimits;
 };
 
 // End of gnash namespace 

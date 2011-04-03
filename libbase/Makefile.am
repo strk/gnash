@@ -30,13 +30,11 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	$(PTHREAD_CFLAGS) \
 	$(PNG_CFLAGS) \
 	$(GIF_CFLAGS) \
-	$(GLIB_CFLAGS) \
-	$(GSTREAMER_CFLAGS) \
 	$(CURL_CFLAGS) \
-	$(OPENGL_CFLAGS) \
 	$(Z_CFLAGS) \
 	$(JPEG_CFLAGS) \
 	$(BOOST_CFLAGS) \
+	$(OPENGL_CFLAGS) \
 	$(LTDL_CFLAGS) \
 	$(NULL)
 
@@ -52,9 +50,9 @@ libgnashbase_la_LIBADD = \
 	$(GIF_LIBS) \
 	$(Z_LIBS) \
 	$(CURL_LIBS) \
-	$(OPENGL_LIBS) \
 	$(LIBINTL) \
 	$(BOOST_LIBS) \
+	$(OPENGL_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 
@@ -153,7 +151,10 @@ inst_HEADERS = \
 	accumulator.h \
 	SimpleBuffer.h \
 	GnashNumeric.h \
-	jemtree.h \
+	jemalloc_gnash.h \
+	jemalloc_types.h \
+	jemalloc_rb.h \
+	jemalloc.h \
 	GnashSleep.h \
 	gmemory.h \
 	SharedMem.h \

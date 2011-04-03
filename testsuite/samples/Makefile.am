@@ -23,7 +23,8 @@ CLEANFILES =  \
       gnash-dbg.log \
       site.exp.bak \
       testrun.* \
-      GotoAndPlayTestRunner
+      GotoAndPlayTestRunner \
+      lastopcode_v6_TestRunner
 
 AM_CPPFLAGS = \
         -I$(top_srcdir)/libbase \
@@ -59,6 +60,7 @@ check_PROGRAMS = \
 
 check_SCRIPTS = \
 	GotoAndPlayTestRunner \
+	lastopcode_v6_TestRunner \
 	$(NULL)
 
 clip_as_button2_TestRunner_SOURCES = \
@@ -91,8 +93,12 @@ gotoFrameOnKeyEvent_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(srcdir)\" \
 	$(NULL)
 
-GotoAndPlayTestRunner: $(srcdir)/../generic-testrunner.sh $(srcdir)/GotoAndPlayTest.swf
+GotoAndPlayTestRunner: Makefile $(srcdir)/../generic-testrunner.sh $(srcdir)/GotoAndPlayTest.swf
 	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) $(srcdir)/GotoAndPlayTest.swf > $@
+	chmod 755 $@
+
+lastopcode_v6_TestRunner: Makefile $(srcdir)/../generic-testrunner.sh $(srcdir)/test_lastopcode_v6.swf
+	sh $(srcdir)/../generic-testrunner.sh -c done $(top_builddir) $(srcdir)/test_lastopcode_v6.swf > $@
 	chmod 755 $@
 
 clean-local: 
@@ -102,6 +108,7 @@ EXTRA_DIST = \
 	GotoAndPlayTest.swf \
 	gotoFrameOnKeyEvent.swf \
 	subshapes.swf \
+	test_lastopcode_v6.swf \
 	README \
 	$(NULL)
 

@@ -51,7 +51,6 @@ AM_CPPFLAGS = \
 	$(LIRC_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(PYTHON_LIBS) \
-	$(PTHREAD_CFLAGS) \
 	$(NULL)
 
 AM_CPPFLAGS += -DPKGDATADIR="\"$(pkgdatadir)\""
@@ -72,7 +71,6 @@ AM_LDFLAGS =  \
 	$(INTLLIBS) \
 	$(TS_LIBS) \
 	$(BOOST_LIBS) \
-	$(PTHREAD_LIBS) \
 	$(NULL)
 
 if USE_FFMPEG_ENGINE

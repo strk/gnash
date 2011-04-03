@@ -108,7 +108,7 @@ main(int argc, char *argv[])
 
     ManualClock clock;
 
-    movie_root stage(*md, clock, runResources);
+    movie_root stage(clock, runResources);
 
     MovieClip::MovieVariables v;
     stage.init(md, v);

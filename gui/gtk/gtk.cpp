@@ -264,9 +264,6 @@ GtkGui::init(int argc, char **argv[])
 bool
 GtkGui::run()
 {
-    // Kick-start before setting the interval timeout
-    advance_movie(this);
-    
     gtk_main();
     return true;
 }
@@ -954,6 +951,9 @@ private:
         GtkWidget *mediaDir;
         GtkWidget *saveStreamingMediaToggle;
         GtkWidget *saveLoadedMediaToggle;
+        GtkWidget *scriptsTimeout;
+        GtkWidget *scriptsRecursionLimit;
+        GtkWidget *lockScriptLimitsToggle;
 
         PrefWidgets()
             :
@@ -980,7 +980,10 @@ private:
             startStoppedToggle(0),
             mediaDir(0),
             saveStreamingMediaToggle(0),
-            saveLoadedMediaToggle(0)
+            saveLoadedMediaToggle(0),
+            scriptsTimeout(0),
+            scriptsRecursionLimit(0),
+            lockScriptLimitsToggle(0)
         {}
 
     };
@@ -1157,10 +1160,28 @@ PreferencesDialog::handlePrefs(GtkWidget* dialog, gint response, gpointer data)
                 gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->startStoppedToggle)));
         }
 
+        if ( prefs->scriptsTimeout ) {
+            _rcfile.setScriptsTimeout(
+                gtk_spin_button_get_value_as_int(
+                    GTK_SPIN_BUTTON(prefs->scriptsTimeout)));
+        }
+
+        if ( prefs->scriptsRecursionLimit ) {
+            _rcfile.setScriptsRecursionLimit(
+                gtk_spin_button_get_value_as_int(
+                    GTK_SPIN_BUTTON(prefs->scriptsRecursionLimit)));
+        }
+
+        if ( prefs->lockScriptLimitsToggle ) {
+            _rcfile.lockScriptLimits(
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->lockScriptLimitsToggle)));
+        }
+
         if ( prefs->urlOpenerText ) {
             tmp = gtk_entry_get_text(GTK_ENTRY(prefs->urlOpenerText));            
             _rcfile.setURLOpenerFormat(tmp);
         }
+
         
         // Let _rcfile decide which file to update: generally the file
         // being used if specified in GNASHRC environment variable, or in
@@ -1587,6 +1608,58 @@ PreferencesDialog::addPlayerTab()
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(_prefs->librarySize),
             _rcfile.getMovieLibraryLimit());
 
+    { // Scripts timeout -- {
+
+    GtkWidget *hbox = gtk_hbox_new (FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(playervbox), hbox, FALSE, FALSE, 0);
+
+    GtkWidget *lbl = gtk_label_new (
+        _("Max scripts execution time (in seconds):"));
+    gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
+    gtk_box_pack_start(GTK_BOX(hbox), lbl, FALSE, FALSE, 0);
+
+    _prefs->scriptsTimeout = gtk_spin_button_new_with_range(0, 60, 1);
+    gtk_box_pack_start(GTK_BOX(hbox), _prefs->scriptsTimeout, FALSE,
+            FALSE, 0);
+    // Align to _rcfile value:
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(_prefs->scriptsTimeout),
+            _rcfile.getScriptsTimeout());
+
+    } // --}
+
+    { // Scripts recursion limit -- {
+
+    GtkWidget *hbox = gtk_hbox_new (FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(playervbox), hbox, FALSE, FALSE, 0);
+
+    GtkWidget *lbl = gtk_label_new (
+        _("Max scripts recursion limit (stack depth):"));
+    gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
+    gtk_box_pack_start(GTK_BOX(hbox), lbl, FALSE, FALSE, 0);
+
+    _prefs->scriptsRecursionLimit = gtk_spin_button_new_with_range(0, 1024, 1);
+    gtk_box_pack_start(GTK_BOX(hbox), _prefs->scriptsRecursionLimit, FALSE,
+            FALSE, 0);
+    // Align to _rcfile value:
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(_prefs->scriptsRecursionLimit),
+            _rcfile.getScriptsRecursionLimit());
+
+    } // --}
+
+    { // Scripts limits lock -- {
+
+    _prefs->lockScriptLimitsToggle = gtk_check_button_new_with_mnemonic(
+            _("Lock script limits so that SWF tags can't override"));
+    gtk_box_pack_start (GTK_BOX(playervbox), _prefs->lockScriptLimitsToggle,
+            FALSE, FALSE, 0);
+    // Align button state with rcfile
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(
+            _prefs->lockScriptLimitsToggle), _rcfile.lockScriptLimits());
+
+    } // --}
+
+
+    // Start-stopped toggle
     _prefs->startStoppedToggle = gtk_check_button_new_with_mnemonic (
                     _("Start _Gnash in pause mode"));
     gtk_box_pack_start(GTK_BOX(playervbox), _prefs->startStoppedToggle,
@@ -2114,6 +2187,35 @@ GtkGui::checkX11Extension(const std::string& ext)
 #endif /* HAVE_X11 */ 
     // do not free, Xlib can depend on contents being unaltered
     return false;
+}
+
+bool
+GtkGui::yesno(const std::string& question)
+{
+    bool ret = true;
+
+    GtkWidget *dialog = gtk_message_dialog_new(
+        GTK_WINDOW(_window),
+        GTK_DIALOG_MODAL,
+        GTK_MESSAGE_QUESTION,
+        GTK_BUTTONS_YES_NO,
+        "%s", question.c_str());
+
+    switch (gtk_dialog_run(GTK_DIALOG(dialog)))
+    {
+        case GTK_RESPONSE_YES:
+            ret = true;
+            break;
+        case GTK_RESPONSE_NO:
+            ret = false;
+            break;
+        default:
+            break;
+    }
+
+    gtk_widget_destroy(dialog);
+
+    return ret;
 }
 
 

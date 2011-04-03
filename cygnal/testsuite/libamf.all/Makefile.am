@@ -21,21 +21,20 @@ AUTOMAKE_OPTIONS = dejagnu
 
 AM_LDFLAGS = \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/libamf/libgnashamf.la \
+	$(top_builddir)/cygnal/libamf/libgnashamf.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libsound/libgnashsound.la \
 	$(GLIB_LIBS) \
 	$(CURL_LIBS) \
 	$(BOOST_LIBS) \
 	$(DEJAGNU_CFLAGS) \
-	$(PTHREAD_LIBS) \
 	$(NULL)
 
 AM_CPPFLAGS = -DSRCDIR=\"$(srcdir)\"
 
 INCLUDES = \
-        -I$(top_srcdir)/libamf \
-        -I$(top_srcdir)/libnet \
+        -I$(top_srcdir)/cygnal/libamf \
+        -I$(top_srcdir)/cygnal/libnet \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/testsuite \

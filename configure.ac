@@ -192,10 +192,22 @@ case "${host}" in
     gnu=yes
     AC_DEFINE([GNU_HOST], [1], [this is a GNU platform])
     ;;
+  *-*wince)
+    wince=yes
+    AC_DEFINE([WINCE_HOST], [1], [this is a WINCE platform])
+    ;;
+  *-*winmo)
+    wince=yes
+    AC_DEFINE([WINCE_HOST], [1], [this is a WINCE platform])
+    AC_DEFINE([WINCE6_HOST], [1], [this is a WINCE6 platform])
+    ;;
+  *-android*)
+    android=yes
+    AC_DEFINE([ANDROID_HOST], [1], [this is an Android platform])
+    ;;
 esac
 
 
-AM_CONDITIONAL(PLUGIN_LINK_UNDEFINED, test x$openbsd_os = xopenbsd)
 AM_CONDITIONAL(WIN32, test x$windows = xyes)
 AM_CONDITIONAL(HAIKU, test x$haiku = xyes)
 AM_CONDITIONAL(AMIGAOS4, test x$amigaos4 = xyes)
@@ -269,17 +281,6 @@ else
 fi
 AC_SUBST(ANDROID_NDK)
 AM_CONDITIONAL(ANDROID, [ test x"${android_ndk}" != xno ])
-
-AC_ARG_WITH(cpu,
-  AC_HELP_STRING([--with-cpu],[specify a cpu when cross compiling.]),
-  [case "${withval}" in
-    geode) with_cpu=geode ;;
-    *)   AC_MSG_ERROR([bad value ${enableval} for --with-cpu option]) ;;
-   esac],with_cpu=none)
-
-if test x"$with_cpu" != x"none"; then
-   cross_compiling=yes
-fi
 
 AC_C_BIGENDIAN
 AC_C_CONST
@@ -618,7 +619,7 @@ AC_ARG_ENABLE(gui,
   [ dnl Run the following code if no --enable-gui is given
   build_fb=auto
   build_sdl=auto
-  if test x"${openbsd_os}" = x"openbsd"; then
+  if test x"${openbsd}" = xyes; then
     build_gtk=yes
     build_dump=auto
   else if test x"${haiku}" = xyes; then
@@ -1425,6 +1426,13 @@ AC_ARG_ENABLE(jemalloc,
   *)   AC_MSG_ERROR([bad value ${enableval} for --enable-jemalloc option]) ;;
 esac],jemalloc=yes)
 
+AC_CHECK_SIZEOF([void *], [4])
+
+if test "x${ac_cv_sizeof_void_p}" != x4 -a x"${ac_cv_sizeof_void_p}" != x8; then
+  dnl jemalloc doesn't support unusual pointer sizes
+  jemalloc=no
+fi
+
 dnl There is some weird stuff going on with NetBSD and jemalloc, so don't 
 dnl build it for now.
 if test x"${netbsd}" = x"yes" -o x"${windows}" = x"yes" -o x"${freebsd}" = x"yes" -o x"${haiku}" = x"yes" -o x"${gnu}" = x"yes"; then
@@ -1885,10 +1893,6 @@ dnl -----------------------------------------------------------------
 dnl PLUGIN RELATED STUFF
 dnl -----------------------------------------------------------------
 
-dnl Zip is used insted of tar when building an xpi package
-dnl for Mozilla/Firefox.
-AC_PATH_PROG(ZIP, zip, ,[${pathlist}])
-
 dnl !! This has been moved here to make --enable-npapi work
 dnl !! All of plugin-related macro calls could be moved into
 dnl !! a specialized macros/plugin.m4
@@ -1967,26 +1971,6 @@ dnl -----------------------------------------------------------------
 dnl END OF PLUGIN RELATED STUFF
 dnl -----------------------------------------------------------------
 
-dnl IRIX-hack.
-case $host in
-  *-*-irix*)
-  dnl ABI-check
-  save_LIBS=$LIBS
-  dir="/usr/lib /usr/lib32 /usr/lib/lib64"
-  for i in $dir; do
-    LIBS=-L$i
-    AC_SEARCH_LIBS(XDisableAccessControl, X11, [
-      xpathed=$i
-      break
-    ])
-    unset ac_cv_search_XDisableAccessControl
-  done
-  ac_x_libraries=$xpathed
-  x_libraries=$xpathed
-  LIBS=$save_LIBS
-  ;;
-esac
-
 AM_CONDITIONAL(LIRC, [test x$lirc_ext = xyes])
 
 AC_CHECK_HEADERS(endian.h machine/endian.h)
@@ -1999,11 +1983,7 @@ AC_CHECK_HEADERS(signal.h)
 AC_CHECK_HEADERS(unistd.h)
 AC_CHECK_HEADERS(sys/time.h)
 AC_CHECK_HEADERS(ieeefp.h)
-dnl libcurl3-dev on Ubuntu has a dependency on lber, and Gnash won't link
-dnl on most machines without it. While it isn't diretly used by Gnash at all,
-dnl it's to work around an Ubuntu packaging bug.
-AC_CHECK_LIB(lber, ber_free)
-AC_CHECK_LIB(bz2, BZ2_bzopen)
+AC_CHECK_LIB(bz2, BZ2_bzopen, [AC_SUBST(BZ2_LIBS, -lbz2)])
 AC_CHECK_LIB(c, getpwnam, AC_DEFINE(HAVE_GETPWNAM, 1, [Has getpwnam] ))
 
 dnl X11 is needed for fltk (at least),
@@ -2023,6 +2003,7 @@ fi
 
 AC_CHECK_LIB(rt, shm_unlink)
 AC_CHECK_FUNCS(shm_open shm_unlink)
+
 AC_TRY_COMPILE([#include <strings.h>], [
   char *p1 = (char *)"Hello";
   char *p2 = (char *)"World";
@@ -2325,7 +2306,7 @@ if test x$cross_compiling = xno; then
 		  [Enable rtmpy based testing (default host is www.gnashdev.org)]),
 	      [case "${enableval}" in
              no) RTMPY_HOST="" ;;
-            yes) RTMPY_HOST="www.gnashdev.org" ;;
+            yes) RTMPY_HOST="gnash.keybit.net" ;;
               *) RTMPY_HOST="${enableval}";;
            esac])
   AC_SUBST(RTMPY_HOST)
@@ -2613,6 +2594,10 @@ fi
 
 if test x$build_fltk = xyes; then
   GNASH_PKG_FIND(fltk2, [fltk/FL_API.h], [Fast Light Toolkit], fl_window_flush)
+  if test x"${has_fltk2}" = xyes; then
+    AC_CHECK_LIB(Xi, XInput_find_display,
+      [AC_SUBST(FLTK2_LIBS, "$FLTK2_LIBS -lXi")])
+  fi
 fi
 
 AM_CONDITIONAL(HAVE_FLTK2, [ test x$has_fltk2 = xyes ])

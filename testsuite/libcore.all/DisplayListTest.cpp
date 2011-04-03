@@ -60,7 +60,7 @@ main(int /*argc*/, char** /*argv*/)
     boost::intrusive_ptr<movie_definition> md6(new DummyMovieDefinition(ri, 6));
     
     ManualClock clock;
-    movie_root stage(*md5, clock, ri);
+    movie_root stage(clock, ri);
     
     MovieClip::MovieVariables v;
     stage.init(md5.get(), v);

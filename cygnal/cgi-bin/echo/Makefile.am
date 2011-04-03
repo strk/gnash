@@ -29,7 +29,6 @@ GNASH_LIBS = \
 	../../libamf/libgnashamf.la \
 	../../libnet/libgnashnet.la \
 	$(BOOST_LIBS) \
-	$(PTHREAD_LIBS) \
 	$(NULL)
 
 INCLUDES = \

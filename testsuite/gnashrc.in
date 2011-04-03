@@ -59,4 +59,10 @@ set LCShmkey 138765373
 # Do not ignore FSCommand while running tests !
 set ignoreFSCommand false
 
+# Make sure user script limit setting don't get
+# in our way while testing
+set scriptsTimeout 30
+set scriptsRecursionLimit 256
+set lockScriptLimits false
+
 # TODO: enable extensions ?

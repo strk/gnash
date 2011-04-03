@@ -452,7 +452,7 @@ gnash_view_load_movie(GnashView *view, const gchar *uri)
     //       before and destroyed after _virtualClock !
     view->system_clock.reset(new gnash::SystemClock());
     view->virtual_clock.reset(new gnash::InterruptableVirtualClock(*view->system_clock));
-    view->stage.reset(new gnash::movie_root(*view->movie_definition, *view->virtual_clock, *view->run_info));
+    view->stage.reset(new gnash::movie_root(*view->virtual_clock, *view->run_info));
     
     view->movie_definition->completeLoad();
 

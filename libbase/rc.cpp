@@ -75,7 +75,7 @@ RcInitFile::RcInitFile()
     _debugger(false),
     _verbosity(-1),
     // will be reset to something else if __OS2__x is defined:
-    _urlOpenerFormat("firefox -remote 'openurl(%u)'"),
+    _urlOpenerFormat("xdg-open '%u'"),
     _flashVersionString(
         DEFAULT_FLASH_PLATFORM_ID" "\
         DEFAULT_FLASH_MAJOR_VERSION","\
@@ -119,7 +119,10 @@ RcInitFile::RcInitFile()
     _certfile("client.pem"),
     _certdir("/etc/pki/tls"),
     _rootcert("rootcert.pem"),
-    _ignoreShowMenu(true)
+    _ignoreShowMenu(true),
+    _scriptsTimeout(15),
+    _scriptsRecursionLimit(256),
+    _lockScriptLimits(false)
 {
     expandPath(_solsandbox);
     loadFiles();
@@ -606,6 +609,15 @@ RcInitFile::parseFile(const std::string& filespec)
 			||
                  extractSetting(_ignoreShowMenu, "ignoreShowMenu", variable,
                            value)
+			||
+                 extractNumber(_scriptsTimeout, "scriptsTimeout", variable, 
+                         value)
+			||
+                 extractNumber(_scriptsRecursionLimit, "scriptsRecursionLimit",
+                         variable, value)
+			||
+                 extractSetting(_lockScriptLimits, "lockScriptLimits", variable,
+                           value)
             ||
                  cerr << boost::format(_("Warning: unrecognized directive "
                              "\"%s\" in rcfile %s line %d")) 
@@ -762,11 +774,15 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "SOLSafeDir " << _solsandbox << endl <<
     cmd << "localConnection " << _lcdisabled << endl <<
     cmd << "LCTrace " << _lctrace << endl <<
-    cmd << "LCShmkey " << std::hex << (boost::uint32_t) _lcshmkey << endl <<
+    cmd << "LCShmkey " << std::hex << (boost::uint32_t) _lcshmkey
+        << std::dec << endl <<
     cmd << "ignoreFSCommand " << _ignoreFSCommand << endl <<    
     cmd << "ignoreShowMenu " << _ignoreShowMenu << endl <<
     cmd << "saveStreamingMedia " << _saveStreamingMedia << endl <<    
     cmd << "saveLoadedMedia " << _saveLoadedMedia << endl <<    
+    cmd << "scriptsTimeout " << _scriptsTimeout << endl <<
+    cmd << "scriptsRecursionLimit " << _scriptsRecursionLimit << endl <<
+    cmd << "lockScriptLimits " << _lockScriptLimits << endl <<
    
     // Strings.
 

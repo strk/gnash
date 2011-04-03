@@ -62,7 +62,6 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/testsuite \
 	$(OPENGL_CFLAGS)	\
 	$(MP3_CFLAGS)		\
-	$(OGG_CFLAGS)		\
 	$(MING_CFLAGS)		\
 	$(SDL_CFLAGS)		\
 	$(NULL)

@@ -103,6 +103,7 @@ public:
     virtual void setClipboard(const std::string& copy);
     virtual std::pair<int, int> screenResolution() const;
     virtual double getScreenDPI() const;
+    virtual bool yesno(const std::string& question);
 
     void setInvalidatedRegions(const InvalidatedRanges& ranges);
     void resize(int width, int height);

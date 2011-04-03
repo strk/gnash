@@ -132,12 +132,11 @@ clear(movie_root::ActionQueue& aq)
 } // anonymous namespace
 
 
-movie_root::movie_root(const movie_definition& def,
-        VirtualClock& clock, const RunResources& runResources)
+movie_root::movie_root(VirtualClock& clock, const RunResources& runResources)
     :
     _gc(*this),
     _runResources(runResources),
-    _vm(def.get_version(), *this, clock),
+    _vm(*this, clock),
     _interfaceHandler(0),
     _fsCommandHandler(0),
     _stageWidth(1),
@@ -163,8 +162,8 @@ movie_root::movie_root(const movie_definition& def,
     _showMenu(true),
     _scaleMode(SCALEMODE_SHOWALL),
     _displayState(DISPLAYSTATE_NORMAL),
-    _recursionLimit(256),
-    _timeoutLimit(15),
+    _recursionLimit(), // set in ctor body
+    _timeoutLimit(),   // set in ctor body
     _movieAdvancementDelay(83), // ~12 fps by default
     _lastMovieAdvancement(0),
     _unnamedInstance(0),
@@ -172,6 +171,10 @@ movie_root::movie_root(const movie_definition& def,
 {
     // This takes care of informing the renderer (if present) too.
     setQuality(QUALITY_HIGH);
+
+    gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+    _recursionLimit = rcfile.getScriptsRecursionLimit();
+    _timeoutLimit = rcfile.getScriptsTimeout();
 }
 
 void
@@ -197,6 +200,8 @@ movie_root::~movie_root()
 Movie*
 movie_root::init(movie_definition* def, const MovieClip::MovieVariables& vars)
 {
+    _vm.setSWFVersion(def->get_version());
+
     Movie* mr = def->createMovie(*_vm.getGlobal());
     mr->setVariables(vars);
     setRootMovie(mr);
@@ -229,9 +234,7 @@ movie_root::setRootMovie(Movie* movie)
         processActionQueue();
     }
     catch (const ActionLimitException& al) {
-        boost::format fmt = boost::format(_("ActionLimits hit during "
-                    "setRootMovie: %s. Disable scripts?")) % al.what();
-        handleActionLimitHit(fmt.str());
+        handleActionLimitHit(al.what());
     }
     catch (const ActionParserException& e) {
         log_error("ActionParserException thrown during setRootMovie: %s",
@@ -241,9 +244,11 @@ movie_root::setRootMovie(Movie* movie)
     cleanupAndCollect();
 }
 
-void
-movie_root::handleActionLimitHit(const std::string& msg)
+bool
+movie_root::abortOnScriptTimeout(const std::string& what) const
 {
+    std::string msg = what + std::string(". Disable scripts? ");
+
     bool disable = true;
     if (_interfaceHandler) {
         disable = callInterface<bool>(HostMessage(HostMessage::QUERY, msg));
@@ -252,10 +257,15 @@ movie_root::handleActionLimitHit(const std::string& msg)
         log_error("No user interface registered, assuming 'Yes' answer to "
             "question: %s", msg);
     }
-    if (disable) {
-        disableScripts();
-        clear(_actionQueue);
-    }
+    return disable;
+}
+
+void
+movie_root::handleActionLimitHit(const std::string& msg)
+{
+    log_debug("Disabling scripts: %1%", msg);
+    disableScripts();
+    clear(_actionQueue);
 }
 
 void
@@ -694,9 +704,7 @@ movie_root::fire_mouse_event()
         processActionQueue();
     }
     catch (const ActionLimitException& al) {
-        boost::format fmt = boost::format(_("ActionLimits hit during mouse "
-                    "event processing: %s. Disable scripts ?")) % al.what();
-        handleActionLimitHit(fmt.str());
+        handleActionLimitHit(al.what());
     }
 
     return need_redraw;
@@ -860,8 +868,8 @@ movie_root::advance()
     catch (const ActionLimitException& al) {
         // The PP does not disable scripts when the stack limit is reached,
         // but rather struggles on. 
-        log_error(_("Action limit hit during advance: %s"), al.what());
-        clear(_actionQueue);
+        // TODO: find a test case for this, if confirmed fix accordingly
+        handleActionLimitHit(al.what());
     }
     catch (const ActionParserException& e) {
         log_error(_("Buffer overread during advance: %s"), e.what());
@@ -1127,9 +1135,8 @@ movie_root::getStageWidth() const
     // If scaling is allowed, always return the original movie size.
     if (_rootMovie) {
         return static_cast<size_t>(_rootMovie->widthPixels());
-    } else {
-        return 0;
-    }
+    } 
+    return 0;
 }
 
 /// Get actionscript height of stage, in pixels. The height
@@ -1144,9 +1151,8 @@ movie_root::getStageHeight() const
     // If scaling is allowed, always return the original movie size.
     if (_rootMovie) {
         return static_cast<size_t>(_rootMovie->heightPixels());
-    } else {
-        return 0;
-    }
+    } 
+    return 0;
 }
 
 /// Takes a short int bitfield: the four bits correspond
@@ -1669,7 +1675,8 @@ movie_root::markReachableResources() const
 
     // Mark original top-level movie
     // This should always be in _movies, but better make sure
-    if ( _rootMovie ) _rootMovie->setReachable();
+    assert(_rootMovie);
+    _rootMovie->setReachable();
 
     // Mark mouse entities 
     _mouseButtonState.markReachableResources();
@@ -2150,6 +2157,14 @@ movie_root::setScriptLimits(boost::uint16_t recursion, boost::uint16_t timeout)
     
     if ( recursion == _recursionLimit && _timeoutLimit == timeout ) {
         // avoid the debug log...
+        return;
+    }
+
+    if ( RcInitFile::getDefaultInstance().lockScriptLimits() )
+    {
+        LOG_ONCE( log_debug(_("SWF ScriptLimits tag attempting to set "
+            "recursionLimit=%1% and scriptsTimeout=%2% ignored "
+            "as per rcfile directive"), recursion, timeout) );
         return;
     }
 

@@ -35,7 +35,6 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libcore/asobj \
 	$(SDL_CFLAGS) \
 	$(BOOST_CFLAGS) \
-	$(PTHREAD_CFLAGS) \
 	$(GTK2_CFLAGS) \
 	$(GLEXT_CFLAGS) \
 	$(GLIB_CFLAGS) \
@@ -55,7 +54,6 @@ AM_LDFLAGS =  \
 	$(GLIB_LIBS) \
 	$(EXPAT_LIBS) \
 	$(BOOST_LIBS) \
-	$(PTHREAD_LIBS) \
 	$(NULL)
 
 gtkext_la_SOURCES = gtkext.cpp gtkext.h

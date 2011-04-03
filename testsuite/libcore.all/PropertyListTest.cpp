@@ -80,7 +80,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	ManualClock clock;
 
-    movie_root root(*md5, clock, runResources);
+    movie_root root(clock, runResources);
 
     root.init(md5.get(), MovieClip::MovieVariables());
 

@@ -286,22 +286,16 @@ Global_as::registerClasses()
     const ObjectURI& flash = getURI(vm, "flash");
     flash_package_init(*this, flash); 
 
-    const int version = vm.getSWFVersion();
+    init_member("escape", vm.getNative(100, 0));
+    init_member("unescape", vm.getNative(100, 1));
+    init_member("parseInt", vm.getNative(100, 2));
+    init_member("parseFloat", vm.getNative(100, 3));
+    init_member("isNaN", vm.getNative(200, 18));
+    init_member("isFinite", vm.getNative(200, 19));
 
-    if (version > 4) {
-            // This is surely not correct, but they are not available
-            // in SWF4
-            init_member("escape", vm.getNative(100, 0));
-            init_member("unescape", vm.getNative(100, 1));
-            init_member("parseInt", vm.getNative(100, 2));
-            init_member("parseFloat", vm.getNative(100, 3));
-            init_member("isNaN", vm.getNative(200, 18));
-            init_member("isFinite", vm.getNative(200, 19));
-
-            init_member("NaN", as_value(NaN));
-            init_member("Infinity", as_value(
-                        std::numeric_limits<double>::infinity()));
-    }
+    init_member("NaN", as_value(NaN));
+    init_member("Infinity", as_value(
+                std::numeric_limits<double>::infinity()));
 
     loadExtensions();
 }

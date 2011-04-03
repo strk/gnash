@@ -74,11 +74,7 @@ AM_CPPFLAGS = \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DPLUGINSDIR=\"$(pluginsdir)\" \
 	-DLIBAVCODEC_IDENT=\"$(LIBAVCODEC_IDENT)\" \
-	$(GLIB_CFLAGS) \
-	$(LIRC_CFLAGS) \
 	$(BOOST_CFLAGS) \
-	$(PYTHON_LIBS) \
-	$(PTHREAD_CFLAGS) \
 	$(NULL)
 
 if BUILD_EGL_DEVICE
@@ -97,12 +93,12 @@ GTK_CFLAGS = \
 	$(CAIRO_CFLAGS)
 
 GTK_LIBS =  \
+	$(GLIB_LIBS) \
 	$(GTK2_LIBS) \
 	$(GLEXT_LIBS) \
 	$(CAIRO_LIBS) \
 	$(PANGO_LIBS) \
 	$(ATK_LIBS) \
-	$(GLIB_LIBS) \
 	$(EXPAT_LIBS) \
 	$(X11_LIBS) \
 	$(Z_LIBS)
@@ -110,17 +106,9 @@ GTK_LIBS =  \
 # The following will be filled up later
 GUI_CPPFLAGS = 
 
-## WARNING: make sure GLIB_LIBS appears first
-## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS =  \
-	$(GLIB_LIBS) \
-	$(CURL_LIBS) \
-	$(JPEG_LIBS) \
-	$(PNG_LIBS) \
 	$(INTLLIBS) \
-	$(TS_LIBS) \
 	$(BOOST_LIBS) \
-	$(PTHREAD_LIBS) \
 	$(NULL)
 
 
@@ -137,9 +125,6 @@ if WIN32
 LIB_FLAGS += --enable-auto-import
 endif
 
-# endif # DYNAMIC_GUI
-
-
 if USE_FFMPEG_ENGINE
 AM_LDFLAGS += $(FFMPEG_LIBS) $(LIBVA_LIBS) $(LIBVA_X11_LIBS) 
 AM_CPPFLAGS += $(FFMPEG_CFLAGS) 
@@ -150,14 +135,6 @@ GST_STUFF = $(GSTREAMER_PBUTILS_LIBS) $(GSTREAMER_PLUGINS_BASE_LIBS) $(GSTREAMER
 AM_CPPFLAGS += $(GSTREAMER_CFLAGS)
 AM_LDFLAGS += $(GST_STUFF)
 endif
-
-# if USE_GUI_FLTK
-#  FLTK_SRCS = fltk.cpp fltksup.h $(FLTK_AGG_SRCS) $(FLTK_CAIRO_SRCS)
-#  AM_CPPFLAGS += $(FLTK2_CFLAGS) $(X11_CFLAGS)
-#  AM_LDFLAGS += $(FLTK2_LIBS) $(XFT_LIBS) $(X11_LIBS)
-# else
-#  FLTK_SRCS = 
-# endif
 
 AM_CPPFLAGS += -DPKGDATADIR="\"$(pkgdatadir)\""
 AM_CPPFLAGS += -DRENDERER_CONFIG="\"$(RENDERER_CONFIG)\""

@@ -24,7 +24,7 @@
 
 namespace gnash {
 
-typedef enum
+enum filter_types
 {
     DROP_SHADOW = 0,
     BLUR = 1,
@@ -34,7 +34,7 @@ typedef enum
     CONVOLUTION = 5,
     COLOR_MATRIX = 6,
     GRADIENT_BEVEL = 7
-} filter_types;
+};
 
 int
 filter_factory::read(SWFStream& in, bool read_multiple, Filters* store)

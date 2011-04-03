@@ -32,18 +32,10 @@ GNASH_LIBS = \
 	$(top_builddir)/librender/libgnashrender.la \
 	$(NULL)
 
-## WARNING: make sure GLIB_LIBS appears first
-## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS = \
 	$(LIBINTL) \
 	$(LIBADD_DL) \
-	$(MYSQL_LIBS) \
-	$(CURL_LIBS) \
-	$(JPEG_LIBS) \
-	$(PNG_LIBS) \
 	$(BOOST_LIBS) \
-	$(PYTHON_LIBS) \
-	$(PTHREAD_LIBS) \
 	$(NULL)
 
 # bzip2 is a dependency of some libraries with mingw32
@@ -72,8 +64,6 @@ AM_CPPFLAGS = \
 	$(GSTREAMER_PLUGINS_BASE_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(BOOST_CFLAGS) \
-	$(PTHREAD_CFLAGS) \
-	$(MYSQL_CFLAGS) \
 	$(NULL)
 
 if BUILD_EGL_DEVICE
@@ -167,8 +157,6 @@ mudflap:
 
 clean-hook:
 	-rm -f core.*
-
-#gdebug.swf: gdebug.as gdebcmds.as
 
 # Wrap a single .as tests in dejagnu_so importer.
 # At play time, if the relative url '../ming-misc.all/Dejagnu.swf' 

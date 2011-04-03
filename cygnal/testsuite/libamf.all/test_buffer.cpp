@@ -43,7 +43,7 @@
 #include "GnashException.h"
 
 using namespace std;
-using namespace amf;
+using namespace cygnal;
 using namespace gnash;
 using namespace boost;
 
@@ -148,7 +148,7 @@ main (int argc, char** argv)
     test_remove();
     test_operators();
 
-// amf::Buffer::resize(unsigned int)
+// cygnal::Buffer::resize(unsigned int)
     
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
     if (memdebug) {
@@ -177,7 +177,7 @@ test_resize()
         mem->addStats(__LINE__);             // take a sample
     }
 #endif    
-    if (buf.size() == amf::NETBUFSIZE) {
+    if (buf.size() == cygnal::NETBUFSIZE) {
         runtest.pass ("Buffer::size(NETBUFSIZE)");
     } else {
         runtest.fail ("Buffer::size(NETBUFSIZE)");
@@ -272,9 +272,9 @@ test_copy()
 
     // Copy the raw bytes used for the number into the temporary
     // data pointer, so we can do a comparison
-    memcpy(data, &num, amf::AMF0_NUMBER_SIZE);
+    memcpy(data, &num, cygnal::AMF0_NUMBER_SIZE);
 
-    if (memcmp(data, buf4.reference(), amf::AMF0_NUMBER_SIZE) == 0) {
+    if (memcmp(data, buf4.reference(), cygnal::AMF0_NUMBER_SIZE) == 0) {
          runtest.pass ("Buffer::operator=(double)");
     } else {
          runtest.fail ("Buffer::operator=(double)");
@@ -289,7 +289,7 @@ test_copy()
          runtest.fail ("Buffer::operator=(Network::byte_t)");
     }
 
-    amf::Element::amf0_type_e type = Element::NUMBER_AMF0;
+    cygnal::Element::amf0_type_e type = Element::NUMBER_AMF0;
     Buffer buf6;
     buf6 = type;
     if (*buf6.reference() == type) {
@@ -347,7 +347,7 @@ test_find()
          runtest.fail ("Buffer::find(Network::byte_t *, size_t)");
     }
 
-// amf::Buffer::init(unsigned int)
+// cygnal::Buffer::init(unsigned int)
 }
 
 void

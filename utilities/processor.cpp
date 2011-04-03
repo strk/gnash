@@ -447,7 +447,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
     // and their parsing thread alive until static destruction. The parser
     // can then continue to access destroyed resources.
     {
-        gnash::movie_root m(*md, cl, runResources);
+        gnash::movie_root m(cl, runResources);
         
         // Register processor to receive ActionScript events (Mouse, Stage
         // System etc).
@@ -473,7 +473,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
         // Run through the movie.
         while (!quitrequested) {
             
-            size_t	last_frame = m.get_current_frame();
+            size_t	last_frame = m.getRootMovie().get_current_frame();
             //printf("advancing clock by %lu\n", clockAdvance);
             cl.advance(clockAdvance);
             m.advance();
@@ -492,7 +492,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
                 break;
             }
 
-            size_t curr_frame = m.get_current_frame();
+            size_t curr_frame = m.getRootMovie().get_current_frame();
             
             // We reached the end, done !
             if (curr_frame >= md->get_frame_count() - 1 )
@@ -521,7 +521,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
                     }
                     fprintf(stderr, "Kicking movie after %g seconds in STOP mode, kick ct = %d\n", waitforadvance, kick_count);
                     fflush(stderr);
-                    m.goto_frame(last_frame + 1);
+                    m.getRootMovie().goto_frame(last_frame + 1);
                     m.getRootMovie().setPlayState(gnash::MovieClip::PLAYSTATE_PLAY);
                     kick_count++;
 
@@ -535,7 +535,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
             }
             
             // We looped back.  Skip ahead...
-            else if (m.get_current_frame() < last_frame)
+            else if (m.getRootMovie().get_current_frame() < last_frame)
             {
                 if ( last_frame > latest_frame ) latest_frame = last_frame;
                 if ( ++loop_back_count > allowloopbacks )
@@ -543,7 +543,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
                     log_debug("%d loop backs; jumping one-after "
                             "latest frame (%d)",
                             loop_back_count, latest_frame+1);
-                    m.goto_frame(latest_frame + 1);
+                    m.getRootMovie().goto_frame(latest_frame + 1);
                     loop_back_count = 0;
                 }
             }

@@ -39,7 +39,6 @@ dbus_la_LIBADD = $(LIBADD_DL) \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(BOOST_LIBS) \
-	$(PTHREAD_LIBS) \
 	$(NULL)
 
 check_PROGRAMS = # SharedTest
