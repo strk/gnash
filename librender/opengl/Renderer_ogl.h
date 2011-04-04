@@ -149,7 +149,7 @@ private:
 
 };
 
-DSOEXPORT Renderer* create_Renderer_ogl(bool init = true);
+DSOEXPORT Renderer* create_handler(bool init = true);
 
 } // namespace gnash::renderer::opengl
 } // namespace gnash::renderer
