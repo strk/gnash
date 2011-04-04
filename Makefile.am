@@ -62,12 +62,13 @@ STD_DIRS = \
 	librender \
 	gui \
 	plugin \
+	utilities \
 	doc \
 	po \
 	$(NULL)
 
-SUBDIRS = $(STD_DIRS)
-DIST_SUBDIRS = $(STD_DIRS) cygnal utilities extensions testsuite
+SUBDIRS = $(STD_DIRS) $(CYGNAL_DIR)
+DIST_SUBDIRS = $(STD_DIRS) cygnal extensions testsuite
 
 if TESTSUITE
 SUBDIRS += testsuite
