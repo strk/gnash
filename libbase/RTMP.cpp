@@ -134,7 +134,8 @@ RTMPPacket::RTMPPacket(size_t reserve)
 RTMPPacket::RTMPPacket(const RTMPPacket& other)
     :
     header(other.header),
-    buffer(other.buffer)
+    buffer(other.buffer),
+    bytesRead(other.bytesRead)
 {}
 
 const size_t RTMPHeader::headerSize;
