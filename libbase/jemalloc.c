@@ -464,7 +464,9 @@ static const bool __isthreaded = true;
 #else
 #  define SIZEOF_PTR_2POW       2
 #endif
-#define PIC
+#ifndef PIC
+# define PIC
+#endif
 #ifndef MOZ_MEMORY_DARWIN
 static const bool __isthreaded = true;
 #else
