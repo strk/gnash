@@ -67,7 +67,7 @@ STD_DIRS = \
 	$(NULL)
 
 SUBDIRS = $(STD_DIRS)
-DIST_SUBDIRS = $(STD_DIRS) cygnal extensions testsuite
+DIST_SUBDIRS = $(STD_DIRS) cygnal utilities extensions testsuite
 
 if TESTSUITE
 SUBDIRS += testsuite
