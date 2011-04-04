@@ -183,7 +183,15 @@ ActionExec::operator()()
                         // Stop execution if an exception
                         // is still on the stack and there is nothing
                         // left to catch it.
-                        throw ActionScriptException();
+                        cleanupAfterRun();
+
+                        // Forceably clear the stack.
+                        // - Fixes misc-mtasc.all/exception.swf
+                        // By commenting the line above, we get an XPASS in
+                        // - swfdec/catch-in-caller.swf
+                        env.drop(env.stack_size());
+
+                        return;
                     }
                     break;
                 }
@@ -318,18 +326,6 @@ ActionExec::operator()()
         // what to do next (abort or not ?)
         cleanupAfterRun(); // we expect inconsistencies here
         throw;
-    }
-    catch (const ActionScriptException&) {
-        // An unhandled ActionScript exception was thrown.
-        cleanupAfterRun();
-
-        // Forceably clear the stack.
-        // - Fixes misc-mtasc.all/exception.swf
-        // By commenting the line above, we get an XPASS in
-        // - swfdec/catch-in-caller.swf
-        env.drop(env.stack_size());
-
-        return;
     }
 
     cleanupAfterRun();

@@ -36,6 +36,7 @@ INCLUDES =  \
 	    -I$(top_srcdir)/libcore/parser \
 	    -I$(top_srcdir)/libcore/asobj \
 	    $(BOOST_CFLAGS) \
+	    $(PTHREAD_CFLAGS) \
 	    $(NULL)
 
 AM_LDFLAGS =  \

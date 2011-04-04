@@ -34,6 +34,7 @@ AM_CPPFLAGS = -I.. \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/librender \
 	-I$(top_srcdir)/libdevice \
+	$(PTHREAD_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(OPENGL_CFLAGS) \
 	$(AGG_CFLAGS) \
@@ -120,11 +121,6 @@ libgnashrender_la_SOURCES += \
 	cairo/PathParser.cpp
 libgnashrender_la_LIBADD += $(CAIRO_LIBS)
 endif
-
-# Rebuild with GCC 4.x Mudflap support
-mudflap:
-	@echo "Rebuilding with GCC Mudflap support"
-	$(MAKE) CXXFLAGS="`$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
 
 clean-hook:
 	-rm -f core.*

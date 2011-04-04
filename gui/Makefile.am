@@ -75,6 +75,7 @@ AM_CPPFLAGS = \
 	-DPLUGINSDIR=\"$(pluginsdir)\" \
 	-DLIBAVCODEC_IDENT=\"$(LIBAVCODEC_IDENT)\" \
 	$(BOOST_CFLAGS) \
+	$(PTHREAD_CFLAGS) \
 	$(NULL)
 
 if BUILD_EGL_DEVICE
@@ -100,8 +101,7 @@ GTK_LIBS =  \
 	$(PANGO_LIBS) \
 	$(ATK_LIBS) \
 	$(EXPAT_LIBS) \
-	$(X11_LIBS) \
-	$(Z_LIBS)
+	$(X11_LIBS)
 
 # The following will be filled up later
 GUI_CPPFLAGS = 
@@ -123,17 +123,6 @@ GNASH_LIBS = \
 LIB_FLAGS = -release $(VERSION)
 if WIN32
 LIB_FLAGS += --enable-auto-import
-endif
-
-if USE_FFMPEG_ENGINE
-AM_LDFLAGS += $(FFMPEG_LIBS) $(LIBVA_LIBS) $(LIBVA_X11_LIBS) 
-AM_CPPFLAGS += $(FFMPEG_CFLAGS) 
-endif
-
-if USE_GST_ENGINE
-GST_STUFF = $(GSTREAMER_PBUTILS_LIBS) $(GSTREAMER_PLUGINS_BASE_LIBS) $(GSTREAMER_LIBS)
-AM_CPPFLAGS += $(GSTREAMER_CFLAGS)
-AM_LDFLAGS += $(GST_STUFF)
 endif
 
 AM_CPPFLAGS += -DPKGDATADIR="\"$(pkgdatadir)\""
@@ -229,11 +218,6 @@ bundle: Info.plist aqua-gnash
 	cp Info.plist $(bundle_name)/Contents/Info.plist
 	cp -f aqua-gnash $(bundle_name)/Contents/MacOS/Gnash
 	cp -f images/GnashG.icns $(bundle_name)/Contents/Resources/
-
-# Rebuild with GCC 4.x Mudflap support
-mudflap:
-	@echo "Rebuilding with GCC Mudflap support"
-	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
 
 clean-hook:
 	-rm -f core.* $(CLEANFILES)

@@ -1987,7 +1987,6 @@ TextField::registerTextVariable()
     as_value val;
     if (target->get_member(key, &val)) {
         // TODO: pass environment to to_string ?
-        // as_environment& env = get_environment();
         setTextValue(utf8::decodeCanonicalString(val.to_string(), version));
     }
     else if (_textDefined) {

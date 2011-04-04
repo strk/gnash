@@ -43,6 +43,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
+	$(PTHREAD_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(FREETYPE2_CFLAGS) \
@@ -292,30 +293,11 @@ libgnashcore_la_LIBADD = \
 	$(FONTCONFIG_LIBS) \
 	$(NULL)
 
-if USE_GST_ENGINE
-AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
-		-I$(top_srcdir)/libmedia/gst
-libgnashcore_la_LIBADD += $(GSTREAMER_LIBS)
-endif
-
-if USE_FFMPEG_ENGINE
-AM_CPPFLAGS += $(FFMPEG_CFLAGS) \
-		-I$(top_srcdir)/libmedia/ffmpeg
-endif
-
 libgnashcore_la_LDFLAGS = -release $(VERSION) -export-dynamic
 
 if HAIKU
   libgnashcore_la_LIBADD += $(HAIKU_LIBS)
 endif
-
-# Rebuild with GCC 4.x Mudflap support
-mudflap:
-	@echo "Rebuilding with GCC Mudflap support"
-	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
-
-clean-hook:
-	-rm -f core.*
 
 # Remove libtool .la files
 install-exec-hook:

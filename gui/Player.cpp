@@ -192,11 +192,6 @@ Player::setFlashVars(const std::string& varstr)
 
 Player::Player()
     :
-#if defined(RENDERER_CAIRO)
-    _bitDepth(32),
-#else
-    _bitDepth(16),
-#endif
     _scale(1.0f),
     _delay(0),
     _width(0),

@@ -39,6 +39,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
+	$(PTHREAD_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(NULL)
 
@@ -87,25 +88,7 @@ if WIN32
   libgnashparser_la_LDFLAGS += -no-undefined 
 endif
 
-if USE_GST_ENGINE
-AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
-		-I$(top_srcdir)/libmedia/gst
-endif
-
-if USE_FFMPEG_ENGINE
-AM_CPPFLAGS += $(FFMPEG_CFLAGS) \
-		-I$(top_srcdir)/libmedia/ffmpeg
-endif
-
 if ENABLE_PCH
 AM_CXXFLAGS = $(PCH_FLAGS)
 endif
-
-# Rebuild with GCC 4.x Mudflap support
-mudflap:
-	@echo "Rebuilding with GCC Mudflap support"
-	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
-
-clean-hook:
-	-rm -f core.*
 

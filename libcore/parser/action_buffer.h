@@ -29,7 +29,6 @@
 
 // Forward declarations
 namespace gnash {
-	class as_environment;
 	class as_value;
 	class movie_definition;
 	class SWFStream; // for read signature

@@ -23,6 +23,7 @@ pkglib_LTLIBRARIES =  libgnashsound.la
 libgnashsound_la_CPPFLAGS = \
 	-I$(top_srcdir)/libbase	\
 	-I$(top_srcdir)/libmedia \
+	$(PTHREAD_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(SDL_CFLAGS) \
 	$(NULL)
@@ -78,14 +79,6 @@ if WIN32
   libgnashsound_la_LIBADD += \
 	-lintl
 endif
-
-# Rebuild with GCC 4.x Mudflap support
-mudflap:
-	@echo "Rebuilding with GCC Mudflap support"
-	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
-
-clean-hook:
-	-rm -f core.* *.obj
 
 # Remove libtool .la files
 install-exec-hook:

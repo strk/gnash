@@ -64,6 +64,7 @@ AM_CPPFLAGS = \
 	$(GSTREAMER_PLUGINS_BASE_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(BOOST_CFLAGS) \
+	$(PTHREAD_CFLAGS) \
 	$(NULL)
 
 if BUILD_EGL_DEVICE
@@ -75,21 +76,6 @@ endif
 
 if WIN32
   GNASH_LIBS += -lintl -lz -lws2_32
-endif
-
-if USE_FFMPEG_ENGINE
- AM_CPPFLAGS += $(FFMPEG_CFLAGS) \
-		-I$(top_srcdir)/libmedia/ffmpeg 
- GNASH_LIBS += $(FFMPEG_LIBS)
-endif
-
-if USE_GST_ENGINE
- AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
-		-I$(top_srcdir)/libmedia/gst
- GNASH_LIBS += $(GLIB_LIBS) $(GSTREAMER_LIBS)
-if CROSS_COMPILING
-  GNASH_LIBS +=	$(GLIB_LIBS)
-endif
 endif
 
 bin_PROGRAMS = gprocessor rtmpget
@@ -149,14 +135,6 @@ if USE_GST_ENGINE
  findmicrophones_SOURCES = findmicrophones.cpp
  findmicrophones_LDADD = $(GST_STUFF) $(GNASH_LIBS) $(AM_LDFLAGS)
 endif
-
-# Rebuild with GCC 4.x Mudflap support
-mudflap:
-	@echo "Rebuilding with GCC Mudflap support"
-	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
-
-clean-hook:
-	-rm -f core.*
 
 # Wrap a single .as tests in dejagnu_so importer.
 # At play time, if the relative url '../ming-misc.all/Dejagnu.swf' 

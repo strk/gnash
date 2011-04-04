@@ -2018,13 +2018,6 @@ fi
 AC_CHECK_LIB(rt, shm_unlink)
 AC_CHECK_FUNCS(shm_open shm_unlink)
 
-AC_TRY_COMPILE([#include <strings.h>], [
-  char *p1 = (char *)"Hello";
-  char *p2 = (char *)"World";
-  strcasecmp(p1, p2); ],
-  AC_DEFINE(HAVE_STRINGCASECMP, [1], [Has strcasecmp])
-)
-
 dnl if test x$cross_compiling = xno; then
 AC_LANG_PUSH(C++)
 AC_MSG_CHECKING([to see if float formatting is broken])

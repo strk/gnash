@@ -33,6 +33,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
+	$(PTHREAD_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(NULL)
 
@@ -81,10 +82,6 @@ inst_HEADERS += $(EXTENSIONS_API)
 libgnashvm_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la 
 
-if USE_FFMPEG_ENGINE
-	libgnashvm_la_CPPFLAGS += $(FFMPEG_CFLAGS)
-endif
-
 libgnashvm_la_LDFLAGS = -export-dynamic # -release $(VERSION)
 
 if WIN32
@@ -94,12 +91,4 @@ endif
 if ENABLE_PCH
 AM_CXXFLAGS = $(PCH_FLAGS)
 endif
-
-# Rebuild with GCC 4.x Mudflap support
-mudflap:
-	@echo "Rebuilding with GCC Mudflap support"
-	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
-
-clean-hook:
-	-rm -f core.*
 
