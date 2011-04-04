@@ -460,7 +460,7 @@ public:
     {
         mat.transform(ap);
         std::vector<Edge>::iterator it = m_edges.begin(), ie = m_edges.end();
-        for(; it != ie; it++)
+        for(; it != ie; ++it)
         {
             (*it).transform(mat);
         }
