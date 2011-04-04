@@ -36,6 +36,7 @@ AM_LDFLAGS = \
 	$(LIBINTL) \
 	$(LIBADD_DL) \
 	$(BOOST_LIBS) \
+	$(PTHREAD_LIBS) \
 	$(NULL)
 
 # bzip2 is a dependency of some libraries with mingw32
