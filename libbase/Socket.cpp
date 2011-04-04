@@ -18,21 +18,17 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include <boost/cstdint.hpp>
-
-namespace {
-}
-            
-#include "GnashSystemNetHeaders.h"
-#include "GnashSystemFDHeaders.h"
+#include "Socket.h"
 
 #include <cstring>
 #include <cerrno>
 #include <csignal>
 #include <boost/lexical_cast.hpp>
-
+#include <boost/cstdint.hpp>
+            
+#include "GnashSystemNetHeaders.h"
+#include "GnashSystemFDHeaders.h"
 #include "URL.h"
-#include "Socket.h"
 #include "log.h"
 #include "utility.h"
 #include "GnashAlgorithm.h"
