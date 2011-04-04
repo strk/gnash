@@ -85,7 +85,7 @@ Qt4OglGlue::render(const QRect& /*updateRect*/)
 Renderer*
 Qt4OglGlue::createRenderHandler()
 {
-    _renderer = create_Renderer_ogl();
+    _renderer = renderer::opengl::create_handler();
 
     if ( ! _renderer ) {
         throw GnashException("Could not create OpenGL renderer");
