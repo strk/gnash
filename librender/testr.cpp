@@ -445,7 +445,7 @@ test_renderer(Renderer *renderer, const std::string &type)
     rgba outline(0, 0, 0, 255);;
     bool masked = true;
     Timer tdrawpoly("drawPoly");
-    renderer->drawPoly(corners, corner_count, fill, outline, mat, masked);
+    renderer->draw_poly(corners, corner_count, fill, outline, mat, masked);
     tdrawpoly.stop();
     runtest.unresolved(std::string("drawPoly() ") + tdrawpoly.elapsed());
     
