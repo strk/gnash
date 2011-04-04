@@ -124,30 +124,26 @@ public:
 	/// Shrink the stack by i entries. Does not invalidate any entries
 	/// previously given, it just sets the top for pop, push, and top
 	/// operations.
-	void drop(StackSize i)
-    {
+	void drop(StackSize i) {
         if (i > size()) throw StackException();
         _end -= i;
     }
 
 	/// Drop all stack elements reguardless of the "downstop"
-	void clear()
-	{
+	void clear() {
         _downstop = 0;
         _end = 1;
     }
 
 	/// Put a new value onto the top of the stack.  The value will be
 	/// copied.
-	void push(const T t)
-	{
+	void push(const T& t) {
         grow(1);
         top(0) = t;
     }
 
 	/// Pop the top of the stack.
-	T& pop()
-	{
+	T& pop() {
         T& ret = top(0);
         drop(1);
         return ret;
