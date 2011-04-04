@@ -27,10 +27,10 @@
 #include <boost/scoped_array.hpp>
 #include <boost/scoped_ptr.hpp>
 
-#ifdef HAVE_DIRECTFB_DIRECTFB_H
+#ifdef HAVE_DIRECTFB_H
 # include <directfb/directfb.h>
 #else
-# error "This file needs DIRECTFB"
+# error "This file needs DirectFB"
 #endif
 
 #include "GnashDevice.h"

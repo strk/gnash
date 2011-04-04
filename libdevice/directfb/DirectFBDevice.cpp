@@ -30,10 +30,10 @@
 #include "Renderer.h"
 #include "GnashException.h"
 
-#ifdef HAVE_DIRECTFB_DIRECTFB_H
+#ifdef HAVE_DIRECTFB_H
 # include <directfb/directfb.h>
 #else
-# error "This file needs DIRECTFB"
+# error "This file needs DirectFB"
 #endif
 
 #include "DirectFBDevice.h"
