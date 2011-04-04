@@ -2927,7 +2927,6 @@ testsuite/movies.all/Makefile
 testsuite/libcore.all/Makefile
 testsuite/libmedia.all/Makefile
 gui/Makefile
-gui/dump/Makefile
 gui/Info.plist
 gui/pythonmod/Makefile
 extensions/Makefile

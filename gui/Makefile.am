@@ -149,6 +149,10 @@ GUI_SRCS = gnash.cpp \
 	ScreenShotter.cpp ScreenShotter.h \
 	$(NULL)
 
+if BUILD_DUMP_GUI
+include $(srcdir)/dump/dump.am
+endif
+
 if BUILD_AQUA_GUI
 BUILT_SOURCES += bundle
 EXTRA_DIST += Gnash.app
