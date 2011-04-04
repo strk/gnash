@@ -674,7 +674,7 @@ AC_ARG_ENABLE(devtests, AC_HELP_STRING([--enable-devtests],
   yes) devtests=yes ;;
   no)  devtests=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for enable-devtests option]) ;;
-esac], devtests=yes)
+esac], devtests=no)
 AM_CONDITIONAL(ENABLE_DEVELOPER_TESTS, [test x${devtests} = xyes])
 
 dnl --------------------------------------------------------
