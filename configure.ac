@@ -1104,10 +1104,10 @@ build_vaapi_device=no
 build_openmax_device=no
 build_x11_device=no
 build_directfb_device=no
-build_egl_device=yes
+build_egl_device=auto
 build_rawfb_device=yes
-device_list="EGL RawFB"
-ndevice=2
+device_list="RawFB"
+ndevice=1
 AC_ARG_ENABLE(device,
   AC_HELP_STRING([--enable-device], [Specify which hardware abstraction to use to support to enable (none,egl,directfb,rawfb,x11,vaapi)]),
   enableval=`echo ${enableval} | tr '\054' ' ' `
@@ -1226,6 +1226,22 @@ fi
 AM_CONDITIONAL(HAVE_VAAPI, test x"${found_libva_incl}" = xyes)
 AM_CONDITIONAL(HAVE_VAAPI_GLX, test x"${found_libva_glx_incl}" = xyes)
 AM_CONDITIONAL(HAVE_VAAPI_X11, test x"${found_libva_x11_incl}" = xyes)
+
+if test x"${build_egl_device}" != xno; then # yes or auto
+  GNASH_PKG_FIND(EGL, [EGL/egl.h], [EGL library], eglGetDisplay)
+  if test xyes = x"${has_EGL}"; then
+    AC_DEFINE(BUILD_EGL_DEVICE, [ 1 ],
+          [Build the EGL device for OpenVG, OpenGLES1&2, and X11/Mesa])
+    build_egl_device=yes
+    device_list="${device_list} EGL"
+    ndevice=$((ndevice+1))
+  else
+    if test xyes = x"${build_egl_device}"; then
+      AC_MSG_ERROR(["EGL requested but development package not found"])
+    fi
+    build_egl_device=no
+  fi
+fi
 
 AM_CONDITIONAL(BUILD_DEVICES, test ${ndevice} -gt 0)
 if test ${ndevice} -gt 0; then
@@ -2438,8 +2454,12 @@ if test x"${build_gles1}"; then
 fi
 
 dnl The OpenGLES1, OpenGLES2, and OpenVG all need the EGL support, X11 can use it also
+dnl TODO: move this at the bottom ?
 if test x"${build_gles1}" = xyes -o x"${build_ovg}" = xyes; then
-  build_egl_device=yes
+  if test x"${build_egl_device}" != xyes; then
+    AC_MSG_ERROR(["OpenGLES1 and OpenVG both need EGL support. See --enable-device."])
+    build_egl_device=yes
+  fi
 fi
 
 dnl only Linux supports /dev/fb0
@@ -2450,11 +2470,6 @@ fi
 if test x"${build_directfb_device}" = xyes; then
    GNASH_PKG_FIND(directfb, [directfb.h], [DirectFB render library], DirectFBCreate)
    AC_DEFINE([BUILD_DIRECTFB_DEVICE], [1], [Use DirectFB device support])
-fi
-
-if test x"${build_egl_device}" = xyes; then
-  GNASH_PKG_FIND(EGL, [EGL/egl.h], [EGL library], eglGetDisplay)
-  AC_DEFINE(BUILD_EGL_DEVICE, [1], [Build the EGL device for OpenVG, OpenGLES1&2, and X11/Mesa])
 fi
 
 AM_CONDITIONAL(BUILD_VAAPI_DEVICE, [test x"${use_libva}" = xyes])
