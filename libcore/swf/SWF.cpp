@@ -23,6 +23,102 @@ namespace gnash {
 namespace SWF { 
 
 std::ostream&
+operator<<(std::ostream& o, TagType t)
+{
+    switch (t) {
+        case END: return o << "END";
+        case SHOWFRAME: return o << "SHOWFRAME";
+        case DEFINESHAPE: return o << "DEFINESHAPE";
+        case FREECHARACTER: return o << "FREECHARACTER";
+        case PLACEOBJECT: return o << "PLACEOBJECT";
+        case REMOVEOBJECT: return o << "REMOVEOBJECT";
+        case DEFINEBITS: return o << "DEFINEBITS";
+        case DEFINEBUTTON: return o << "DEFINEBUTTON";
+        case JPEGTABLES: return o << "JPEGTABLES";
+        case SETBACKGROUNDCOLOR: return o << "SETBACKGROUNDCOLOR";
+        case DEFINEFONT: return o << "DEFINEFONT";
+        case DEFINETEXT: return o << "DEFINETEXT";
+        case DOACTION: return o << "DOACTION";
+        case DEFINEFONTINFO: return o << "DEFINEFONTINFO";
+        case DEFINESOUND: return o << "DEFINESOUND";
+        case STARTSOUND: return o << "STARTSOUND";
+        case STOPSOUND: return o << "STOPSOUND";
+        case DEFINEBUTTONSOUND: return o << "DEFINEBUTTONSOUND";
+        case SOUNDSTREAMHEAD: return o << "SOUNDSTREAMHEAD";
+        case SOUNDSTREAMBLOCK: return o << "SOUNDSTREAMBLOCK";
+        case DEFINELOSSLESS: return o << "DEFINELOSSLESS";
+        case DEFINEBITSJPEG2: return o << "DEFINEBITSJPEG2";
+        case DEFINESHAPE2: return o << "DEFINESHAPE2";
+        case DEFINEBUTTONCXFORM: return o << "DEFINEBUTTONCXFORM";
+        case PROTECT: return o << "PROTECT";
+        case PATHSAREPOSTSCRIPT: return o << "PATHSAREPOSTSCRIPT";
+        case PLACEOBJECT2: return o << "PLACEOBJECT2";
+        case REMOVEOBJECT2: return o << "REMOVEOBJECT2";
+        case SYNCFRAME: return o << "SYNCFRAME";
+        case FREEALL: return o << "FREEALL";
+        case DEFINESHAPE3: return o << "DEFINESHAPE3";
+        case DEFINETEXT2: return o << "DEFINETEXT2";
+        case DEFINEBUTTON2: return o << "DEFINEBUTTON2";
+        case DEFINEBITSJPEG3: return o << "DEFINEBITSJPEG3";
+        case DEFINELOSSLESS2: return o << "DEFINELOSSLESS2";
+        case DEFINEEDITTEXT: return o << "DEFINEEDITTEXT";
+        case DEFINEVIDEO: return o << "DEFINEVIDEO";
+        case DEFINESPRITE: return o << "DEFINESPRITE";
+        case NAMECHARACTER: return o << "NAMECHARACTER";
+        case SERIALNUMBER: return o << "SERIALNUMBER";
+        case DEFINETEXTFORMAT: return o << "DEFINETEXTFORMAT";
+        case FRAMELABEL: return o << "FRAMELABEL";
+        case DEFINEBEHAVIOR: return o << "DEFINEBEHAVIOR";
+        case SOUNDSTREAMHEAD2: return o << "SOUNDSTREAMHEAD2";
+        case DEFINEMORPHSHAPE: return o << "DEFINEMORPHSHAPE";
+        case FRAMETAG: return o << "FRAMETAG";
+        case DEFINEFONT2: return o << "DEFINEFONT2";
+        case GENCOMMAND: return o << "GENCOMMAND";
+        case DEFINECOMMANDOBJ: return o << "DEFINECOMMANDOBJ";
+        case CHARACTERSET: return o << "CHARACTERSET";
+        case FONTREF: return o << "FONTREF";
+        case DEFINEFUNCTION: return o << "DEFINEFUNCTION";
+        case PLACEFUNCTION: return o << "PLACEFUNCTION";
+        case GENTAGOBJECT: return o << "GENTAGOBJECT";
+        case EXPORTASSETS: return o << "EXPORTASSETS";
+        case IMPORTASSETS: return o << "IMPORTASSETS";
+        case ENABLEDEBUGGER: return o << "ENABLEDEBUGGER";
+        case INITACTION: return o << "INITACTION";
+        case DEFINEVIDEOSTREAM: return o << "DEFINEVIDEOSTREAM";
+        case VIDEOFRAME: return o << "VIDEOFRAME";
+        case DEFINEFONTINFO2: return o << "DEFINEFONTINFO2";
+        case DEBUGID: return o << "DEBUGID";
+        case ENABLEDEBUGGER2: return o << "ENABLEDEBUGGER2";
+        case SCRIPTLIMITS: return o << "SCRIPTLIMITS";
+        case SETTABINDEX: return o << "SETTABINDEX";
+        case DEFINESHAPE4_: return o << "DEFINESHAPE4_";
+        case DEFINEMORPHSHAPE2_: return o << "DEFINEMORPHSHAPE2_";
+        case FILEATTRIBUTES: return o << "FILEATTRIBUTES";
+        case PLACEOBJECT3: return o << "PLACEOBJECT3";
+        case IMPORTASSETS2: return o << "IMPORTASSETS2";
+        case DOABC: return o << "DOABC";
+        case DEFINEALIGNZONES: return o << "DEFINEALIGNZONES";
+        case CSMTEXTSETTINGS: return o << "CSMTEXTSETTINGS";
+        case DEFINEFONT3: return o << "DEFINEFONT3";
+        case SYMBOLCLASS: return o << "SYMBOLCLASS";
+        case METADATA: return o << "METADATA";
+        case DEFINESCALINGGRID: return o << "DEFINESCALINGGRID";
+        case DOABCDEFINE: return o << "DOABCDEFINE";
+        case DEFINESHAPE4: return o << "DEFINESHAPE4";
+        case DEFINEMORPHSHAPE2: return o << "DEFINEMORPHSHAPE2";
+        case DEFINESCENEANDFRAMELABELDATA: return o << "DEFINESCENEANDFRAMELABELDATA";
+        case DEFINEBINARYDATA: return o << "DEFINEBINARYDATA";
+        case DEFINEFONTNAME: return o << "DEFINEFONTNAME";
+        case STARTSOUND2: return o << "STARTSOUND2";
+        case DEFINEBITSJPEG4: return o << "DEFINEBITSJPEG4";
+        case REFLEX: return o << "REFLEX";
+        case DEFINEBITSPTR: return o << "DEFINEBITSPTR";
+        default: return o << "Unknown TagType " << (int)t;
+    }
+    return o;
+}
+
+std::ostream&
 operator<<(std::ostream& o, ActionType a)
 {
     switch (a) {

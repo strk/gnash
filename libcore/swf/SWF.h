@@ -118,6 +118,8 @@ enum TagType
     DEFINEBITSPTR         = 1023
 };
 
+std::ostream& operator<<(std::ostream& o, TagType t);
+
 /// SWF action ids. Symbolic names copied from Ming.
 enum ActionType
 {
