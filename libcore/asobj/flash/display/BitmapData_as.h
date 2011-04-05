@@ -142,14 +142,14 @@ public:
         return image::end<image::ARGB>(*data());
     }
 
+    /// Inform any attached objects that the data has changed.
+    void updateObjects();
+
 private:
     
     image::GnashImage* data() const {
         return _cachedBitmap.get() ? &_cachedBitmap->image() : _image.get();
     }
-
-    /// Inform any attached objects that the data has changed.
-    void updateObjects();
 
     /// The object to which this native type class belongs to.
     as_object* _owner;

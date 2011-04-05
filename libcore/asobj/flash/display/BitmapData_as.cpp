@@ -87,6 +87,17 @@ namespace {
     BitmapData_as::iterator pixelAt(const BitmapData_as& bd, size_t x,
             size_t y);
 
+    /// Get the overlapping part of a rectangle and a Bitmap
+    //
+    /// The values are adjusted so that the rectangle is wholly inside the
+    /// bitmap. If no part of the rectangle overlaps, either w or h
+    /// will be 0.
+    //
+    /// @param x    The x co-ordinate of the top left corner.
+    /// @param y    The y co-ordinate of the top left corner.
+    /// @param w    The width of the rectangle.
+    /// @param h    The height of the rectangle.
+    void adjustRect(int& x, int& y, int& w, int& h, BitmapData_as& b);
 }
 
 BitmapData_as::BitmapData_as(as_object* owner,
@@ -149,36 +160,18 @@ BitmapData_as::getPixel(size_t x, size_t y) const
     return *pixelAt(*this, x, y);
 }
 
+
 void
 BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
 {
-
     if (disposed()) return;
 
-    if (w < 0 || h < 0) return;
-    if (x >= static_cast<int>(width()) || y >= static_cast<int>(height())) {
-        return;
-    }
-
-    // If x or y is less than 0, make a rectangle of the
-    // intersection with the bitmap.    
-    if (x < 0) {
-        w += x;
-        x = 0;
-    }
-
-    if (y < 0) {
-        h += y;
-        y = 0;
-    }
+    adjustRect(x, y, w, h, *this);
 
     // Make sure that the rectangle has some area in the 
     // bitmap and that its bottom corner is within the
     // the bitmap.    
-    if (w <= 0 || h <= 0) return;
-
-    w = std::min<size_t>(width() - x, w);
-    h = std::min<size_t>(height() - y, h);
+    if (w == 0 || h == 0) return;
     
     iterator it = begin() + y * width();
     iterator e = it + width() * h;
@@ -411,12 +404,117 @@ bitmapdata_copyChannel(const fn_call& fn)
 	return as_value();
 }
 
+// sourceBitmap: BitmapData,
+// sourceRect: Rectangle,
+// destPoint: Point,
+// [alphaBitmap: BitmapData],
+// [alphaPoint: Point],
+// [mergeAlpha: Boolean]
 as_value
 bitmapdata_copyPixels(const fn_call& fn)
 {
 	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
+
+    if (ptr->disposed()) return as_value();
+
+    if (fn.nargs < 3) {
+        // Require three arguments? (TODO: check).
+        return as_value();
+    }
+    if (fn.nargs > 3) {
+        LOG_ONCE(log_unimpl("BitmapData.copyPixels(): arguments after "
+                    "the first three are discarded"));
+    }
+
+    as_object* o = toObject(fn.arg(0), getVM(fn));
+    BitmapData_as* source;
+    if (!isNativeType(o, source) || source->disposed()) {
+        // First argument is not a BitmapData or is disposed.
+        return as_value();
+    }
+
+    as_object* rect = toObject(fn.arg(1), getVM(fn));
+    if (!rect) {
+        // Second argument is not an object
+        return as_value();
+    }
+
+    as_value x, y, w, h;
+    
+    rect->get_member(NSV::PROP_X, &x);
+    rect->get_member(NSV::PROP_Y, &y);
+    rect->get_member(NSV::PROP_WIDTH, &w);
+    rect->get_member(NSV::PROP_HEIGHT, &h);    
+    
+    as_object* destpoint = toObject(fn.arg(2), getVM(fn));
+    as_value px, py;
+    
+    destpoint->get_member(NSV::PROP_X, &px);
+    destpoint->get_member(NSV::PROP_Y, &py);
+
+    // TODO: remaining arguments.
+
+    // Find true source rect and true dest rect.
+    int sourceX = toInt(x, getVM(fn));
+    int sourceY = toInt(y, getVM(fn));
+    int sourceW = toInt(w, getVM(fn));
+    int sourceH = toInt(h, getVM(fn));
+
+    int destX = toInt(px, getVM(fn));
+    int destY = toInt(py, getVM(fn));
+
+    // Any part of the source rect that is not in the image (i.e.
+    // above or left) is concatenated to the destination offset.
+    if (sourceX < 0) destX -= sourceX;
+    if (sourceY < 0) destY -= sourceY;
+
+    adjustRect(sourceX, sourceY, sourceW, sourceH, *source);
+    if (sourceW == 0 || sourceH == 0) {
+        // The source rect does not overlap with source bitmap
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("BitmapData.copyPixels(): no part of source rectangle"
+                "overlaps with the source BitmapData");
+        );
+        return as_value();
+    }
+
+    // The dest width starts the same as the adjusted source width.
+    int destW = sourceW;
+    int destH = sourceH;
+
+    adjustRect(destX, destY, destW, destH, *ptr);
+    if (destW == 0 || destH == 0) {
+        // The target rect does not overlap with source bitmap
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("BitmapData.copyPixels(): destination area is "
+                "wholly outside the destination BitmapData");
+        );
+        return as_value();
+    }
+
+    BitmapData_as::iterator targ = pixelAt(*ptr, destX, destY);
+    BitmapData_as::iterator src = pixelAt(*source, sourceX, sourceY);
+
+    log_debug("Source rect: %sx%s, w: %s, h: %s", sourceX, sourceY, destW, destH);
+    log_debug("Target rect: %sx%s, w: %s, h: %s", destX, destY, destW, destH);
+
+    // Just being careful...
+    assert(sourceX + destW <= static_cast<int>(source->width()));
+    assert(sourceY + destH <= static_cast<int>(source->height()));
+    assert(destX + destW <= static_cast<int>(ptr->width()));
+    assert(destY + destH <= static_cast<int>(ptr->height()));
+
+    // Copy for the width and height of the *dest* image.
+    // We have already ensured that the copied area
+    // is inside both bitmapdatas.
+    for (int i = 0; i < destH; ++i) {
+        std::copy(src, src + destW, targ);
+        targ += ptr->width();
+        src += source->width();
+    }
+
+    ptr->updateObjects();
+
 	return as_value();
 }
 
@@ -971,6 +1069,43 @@ pixelAt(const BitmapData_as& bd, size_t x, size_t y)
     if (x >= bd.width() || y >= bd.height()) return bd.end();
     return (bd.begin() + y * bd.width() + x);
 }
+
+void
+adjustRect(int& x, int& y, int& w, int& h, BitmapData_as& b) 
+{
+    // No negative width or height
+    if (w < 0 || h < 0) {
+        w = 0;
+        h = 0;
+        return;
+    }
+
+    // No part of rect in bitmap
+    if (x >= static_cast<int>(b.width()) || y >= static_cast<int>(b.height())) {
+        w = 0;
+        h = 0;
+        return;
+    }
+
+    // Remove left excess
+    if (x < 0) {
+        w += x;
+        x = 0;
+        if (w < 0) w = 0;
+    }
+
+    // Remove top excess
+    if (y < 0) {
+        h += y;
+        y = 0;
+        if (h < 0) h = 0;
+    }
+
+    // Remove right and bottom excess after x and y adjustments.
+    w = std::min<int>(b.width() - x, w);
+    h = std::min<int>(b.height() - y, h);
+}
+
 
 } // anonymous namespace
 } // end of gnash namespace

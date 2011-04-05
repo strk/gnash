@@ -758,7 +758,7 @@ DisplayList::mergeDisplayList(DisplayList& newList)
             // depth in old list is occupied, and empty in new list.
             if (depthOld < depthNew) {
 
-                itOld++;
+                ++itOld;
                 // unload the DisplayObject if it's in static zone(-16384,0)
                 if (depthOld < 0) {
                     _charsByDepth.erase(itOldBackup);

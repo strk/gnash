@@ -50,7 +50,7 @@ public:
     static void loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunResources& /*r*/)
     {
-        assert(tag = SWF::SCRIPTLIMITS);
+        assert(tag == SWF::SCRIPTLIMITS);
         boost::intrusive_ptr<ControlTag> s(new ScriptLimitsTag(in));
         m.addControlTag(s);
     }

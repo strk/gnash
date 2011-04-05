@@ -21,21 +21,15 @@
 #ifndef GNASH_LOADVARIABLESTHREAD_H
 #define GNASH_LOADVARIABLESTHREAD_H
 
-#include "StreamProvider.h" // for inlines
-#include "URL.h" // for inlines
-
-
 #include <string>
 #include <map>
-#include <memory>
+#include <boost/scoped_ptr.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/bind.hpp> 
 
-// Forward declarations
-namespace gnash {
-	//class URL;
-}
+#include "StreamProvider.h" // for inlines
+#include "URL.h" // for inlines
 
 namespace gnash {
 
@@ -198,9 +192,9 @@ private:
 
 	size_t _bytesTotal;
 
-	std::auto_ptr<IOChannel> _stream;
+    boost::scoped_ptr<IOChannel> _stream;
 
-	std::auto_ptr<boost::thread> _thread;
+    boost::scoped_ptr<boost::thread> _thread;
 
 	ValuesMap _vals;
 

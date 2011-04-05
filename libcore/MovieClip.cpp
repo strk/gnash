@@ -601,7 +601,7 @@ MovieClip::call_frame_actions(const as_value& frame_spec)
     if (playlist) {
         PlayList::const_iterator it = playlist->begin();
         const PlayList::const_iterator e = playlist->end();
-        for (; it != e; it++) {
+        for (; it != e; ++it) {
             (*it)->executeActions(this, _displayList);
         }
     }

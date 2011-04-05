@@ -250,7 +250,7 @@ XMLNode_as::previousSibling()
 
     XMLNode_as *previous_node = 0;
     for (Children::iterator itx = _parent->_children.begin();
-            itx != _parent->_children.end(); itx++) {
+            itx != _parent->_children.end(); ++itx) {
 
         if (*itx == this) return previous_node;
 		

@@ -101,7 +101,6 @@ LoadVariablesThread::completeLoad()
 		}
 
 		_bytesLoaded += bytesRead;
-		//dispatchDataEvent();
 
 		// eof, get out !
 		if ( _stream->eof() ) break;
@@ -144,6 +143,8 @@ LoadVariablesThread::completeLoad()
 LoadVariablesThread::LoadVariablesThread(const StreamProvider& sp,
         const URL& url, const std::string& postdata)
 	:
+	_bytesLoaded(0),
+	_bytesTotal(0),
 	_stream(sp.getStream(url, postdata)),
 	_completed(false),
 	_canceled(false)
@@ -157,6 +158,8 @@ LoadVariablesThread::LoadVariablesThread(const StreamProvider& sp,
 LoadVariablesThread::LoadVariablesThread(const StreamProvider& sp,
         const URL& url)
 	:
+	_bytesLoaded(0),
+	_bytesTotal(0),
 	_stream(sp.getStream(url)),
 	_completed(false),
 	_canceled(false)
