@@ -598,6 +598,51 @@ check_equals(bm.getPixel32(5, 5), 0x300000ff);
 bm = new flash.display.BitmapData(10, 10, true, 0x30ffffff);
 check_equals(bm.getPixel32(5, 5), 0x30ffffff);
 
+// copyPixels()
+
+source = new flash.display.BitmapData(100, 100, false, 0x0000ff);
+
+// $
+
+Rect = flash.geom.Rectangle;
+Point = flash.geom.Point;
+
+// These are identical:
+// i.e. any part of the rect that is above or left of the source
+// is added as an offset to the destination point.
+
+dest = new flash.display.BitmapData(100, 100, false, 0xff0000);
+dest.copyPixels(source, new Rect(-50, -50, 100, 100), new Point(0, 0));
+ check_equals(dest.getPixel(10, 10), 0xff0000);
+ xcheck_equals(dest.getPixel(52, 52), 0x0000ff);
+ check_equals(dest.getPixel(52, 10), 0xff0000);
+ check_equals(dest.getPixel(10, 52), 0xff0000);
+
+dest = new flash.display.BitmapData(100, 100, false, 0xff0000);
+dest.copyPixels(source, new Rect(0, 0, 100, 100), new Point(50, 50));
+ check_equals(dest.getPixel(10, 10), 0xff0000);
+ xcheck_equals(dest.getPixel(52, 52), 0x0000ff);
+ check_equals(dest.getPixel(52, 10), 0xff0000);
+ check_equals(dest.getPixel(10, 52), 0xff0000);
+
+// If the source rect is completely outside the source bitmap, nothing happens
+dest = new flash.display.BitmapData(100, 100, false, 0xff0000);
+dest.copyPixels(source, new Rect(101, 40, 100, 100), new Point(50, 50));
+ check_equals(dest.getPixel(10, 10), 0xff0000);
+ check_equals(dest.getPixel(52, 52), 0xff0000);
+ check_equals(dest.getPixel(52, 10), 0xff0000);
+ check_equals(dest.getPixel(10, 52), 0xff0000);
+ check_equals(dest.getPixel(90, 90), 0xff0000);
+
+// If the dest point is right or below the dest bitmap, nothing happens
+dest = new flash.display.BitmapData(100, 100, false, 0xff0000);
+dest.copyPixels(source, new Rect(0, 0, 100, 100), new Point(200, 50));
+ check_equals(dest.getPixel(10, 10), 0xff0000);
+ check_equals(dest.getPixel(52, 52), 0xff0000);
+ check_equals(dest.getPixel(52, 10), 0xff0000);
+ check_equals(dest.getPixel(10, 52), 0xff0000);
+ check_equals(dest.getPixel(90, 90), 0xff0000);
+
 // clone();
 
 orig = new flash.display.BitmapData(10, 10, false, 0x00ff10);
@@ -671,6 +716,6 @@ flash.display.BitmapData.prototype = e;
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(252);
+totals(270);
 
 #endif // OUTPUT_VERSION >= 8
