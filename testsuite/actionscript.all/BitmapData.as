@@ -643,6 +643,158 @@ dest.copyPixels(source, new Rect(0, 0, 100, 100), new Point(200, 50));
  check_equals(dest.getPixel(10, 52), 0xff0000);
  check_equals(dest.getPixel(90, 90), 0xff0000);
 
+// copyChannel
+
+// This function seems to work as expected for single channel to single 
+// channel.
+// When the destination is a combination of channels, nothing happens. When
+// it is a single channel, it is set to 0!
+
+// Source:
+//    ---------------------
+//    |         |         |
+//    |   R     |    RG   |
+//    |         |         |
+//    |         |         |
+//    ---------------------
+//    |         |         |
+//    |   RB    | G(0x7f) |
+//    |         |         |
+//    |         |         |
+//    ---------------------
+
+// Copy one channel to another
+src = new flash.display.BitmapData(100, 100, true);
+src.fillRect(new Rect(0, 0, 50, 50), 0xffff0000); // Red channel
+src.fillRect(new Rect(50, 0, 50, 50), 0xff00ffff); // Blue and green channels
+src.fillRect(new Rect(0, 50, 50, 50), 0xffff00ff); // Red and Blue channels
+src.fillRect(new Rect(50, 50, 50, 50), 0xff007f00); // Green channel
+
+// Copy red channel to green channel
+dest = new flash.display.BitmapData(100, 100, true, 0xff000000);
+dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 1, 2);
+ xcheck_equals(dest.getPixel(25, 25), 0x00ff00); // Green
+ check_equals(dest.getPixel(75, 25), 0x000000); // Nothing
+ xcheck_equals(dest.getPixel(25, 75), 0x00ff00); // Was red, now green
+ check_equals(dest.getPixel(75, 75), 0x000000); // Nothing
+
+// Copy red channel to green and blue channels
+// Doesn't work!
+dest = new flash.display.BitmapData(100, 100, true, 0xff000000);
+dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 1, 6);
+ check_equals(dest.getPixel(25, 25), 0x000000); // Nothing
+ check_equals(dest.getPixel(75, 25), 0x000000); // Nothing
+ check_equals(dest.getPixel(25, 75), 0x000000); // Nothing
+ check_equals(dest.getPixel(75, 75), 0x000000); // Nothing
+
+// Copy red channel to green and blue channels
+// Doesn't work!
+dest = new flash.display.BitmapData(100, 100, true, 0xffffffff);
+dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 1, 6);
+ check_equals(dest.getPixel(25, 25), 0xffffff); // Nothing
+ check_equals(dest.getPixel(75, 25), 0xffffff); // Nothing
+ check_equals(dest.getPixel(25, 75), 0xffffff); // Nothing
+ check_equals(dest.getPixel(75, 75), 0xffffff); // Nothing
+
+// Copy red and green channels to blue channel
+dest = new flash.display.BitmapData(100, 100, true, 0xff000000);
+dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 3, 4);
+ check_equals(dest.getPixel(25, 25), 0x000000); // Nothing
+ check_equals(dest.getPixel(75, 25), 0x000000); // Nothing
+ check_equals(dest.getPixel(25, 75), 0x000000); // Nothing
+ check_equals(dest.getPixel(75, 75), 0x000000); // Nothing
+
+// Copy green channel to green and blue channels
+// Doesn't work!
+dest = new flash.display.BitmapData(100, 100, true, 0xffffffff);
+dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 2, 6);
+ check_equals(dest.getPixel(25, 25), 0xffffff); // Nothing
+ check_equals(dest.getPixel(75, 25), 0xffffff); // Nothing
+ check_equals(dest.getPixel(25, 75), 0xffffff); // Nothing
+ check_equals(dest.getPixel(75, 75), 0xffffff); // Nothing
+
+// Copy red and green channels to blue and green channels
+dest = new flash.display.BitmapData(100, 100, true, 0xff000000);
+dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 3, 6);
+ check_equals(dest.getPixel(25, 25), 0x000000); // Nothing
+ check_equals(dest.getPixel(75, 25), 0x000000); // Nothing
+ check_equals(dest.getPixel(25, 75), 0x000000); // Nothing
+ check_equals(dest.getPixel(75, 75), 0x000000); // Nothing
+
+// Copy red and green to red and green.
+dest = new flash.display.BitmapData(100, 100, true, 0xff000000);
+dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 3, 3);
+ check_equals(dest.getPixel(25, 25), 0x000000); // Nothing
+ check_equals(dest.getPixel(75, 25), 0x000000); // Nothing
+ check_equals(dest.getPixel(25, 75), 0x000000); // Nothing
+ check_equals(dest.getPixel(75, 75), 0x000000); // Nothing
+
+// Copy green channel to red and green channels
+dest = new flash.display.BitmapData(100, 100, true, 0xff000000);
+dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 2, 3);
+ check_equals(dest.getPixel(25, 25), 0x000000); // Nothing
+ check_equals(dest.getPixel(75, 25), 0x000000); // Nothing
+ check_equals(dest.getPixel(25, 75), 0x000000); // Nothing
+ check_equals(dest.getPixel(75, 75), 0x000000); // Nothing
+
+// Copy green channel to blue channel
+dest = new flash.display.BitmapData(100, 100, true, 0xff000000);
+dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 2, 4);
+ check_equals(dest.getPixel(25, 25), 0x000000); // Nothing
+ xcheck_equals(dest.getPixel(75, 25), 0x0000ff); // Blue
+ check_equals(dest.getPixel(25, 75), 0x000000); // Nothing
+ xcheck_equals(dest.getPixel(75, 75), 0x00007f); // Half blue
+
+// -------------------
+// Without alpha
+// -------------------
+
+src = new flash.display.BitmapData(100, 100, false);
+src.fillRect(new Rect(0, 0, 50, 50), 0xff0000); // Red channel
+src.fillRect(new Rect(50, 0, 50, 50), 0x00ffff); // Blue and green channels
+src.fillRect(new Rect(0, 50, 50, 50), 0xff00ff); // Red and Blue channels
+src.fillRect(new Rect(50, 50, 50, 50), 0x007f00); // Green channel
+
+// Copy red and green to red and green.
+dest = new flash.display.BitmapData(100, 100, false);
+dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 3, 3);
+ check_equals(dest.getPixel(25, 25), 0xffffff); // Nothing
+ check_equals(dest.getPixel(75, 25), 0xffffff); // Nothing
+ check_equals(dest.getPixel(25, 75), 0xffffff); // Nothing
+ check_equals(dest.getPixel(75, 75), 0xffffff); // Nothing
+
+// Copy red and green to red
+dest = new flash.display.BitmapData(100, 100, false);
+dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 3, 1);
+ xcheck_equals(dest.getPixel(25, 25), 0x00ffff); // Cyan
+ xcheck_equals(dest.getPixel(75, 25), 0x00ffff); // Cyan
+ xcheck_equals(dest.getPixel(25, 75), 0x00ffff); // Cyan
+ xcheck_equals(dest.getPixel(75, 75), 0x00ffff); // Cyan
+
+// Copy green to red and blue
+dest = new flash.display.BitmapData(100, 100, false);
+dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 2, 5);
+ check_equals(dest.getPixel(25, 25), 0xffffff); // White
+ check_equals(dest.getPixel(75, 25), 0xffffff); // White
+ check_equals(dest.getPixel(25, 75), 0xffffff); // White
+ check_equals(dest.getPixel(75, 75), 0xffffff); // White
+
+// Copy red and blue to green
+dest = new flash.display.BitmapData(100, 100, false);
+dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 5, 2);
+ xcheck_equals(dest.getPixel(25, 25), 0xff00ff); // White
+ xcheck_equals(dest.getPixel(75, 25), 0xff00ff); // White
+ xcheck_equals(dest.getPixel(25, 75), 0xff00ff); // White
+ xcheck_equals(dest.getPixel(75, 75), 0xff00ff); // White
+
+// Copy green and blue to blue
+dest = new flash.display.BitmapData(100, 100, false);
+dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 6, 4);
+ xcheck_equals(dest.getPixel(25, 25), 0xffff00); // Yellow
+ xcheck_equals(dest.getPixel(75, 25), 0xffff00); // Yellow
+ xcheck_equals(dest.getPixel(25, 75), 0xffff00); // Yellow
+ xcheck_equals(dest.getPixel(75, 75), 0xffff00); // Yellow
+
 // clone();
 
 orig = new flash.display.BitmapData(10, 10, false, 0x00ff10);
@@ -716,6 +868,6 @@ flash.display.BitmapData.prototype = e;
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(270);
+totals(326);
 
 #endif // OUTPUT_VERSION >= 8
