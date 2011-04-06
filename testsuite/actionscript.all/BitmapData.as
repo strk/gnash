@@ -796,6 +796,104 @@ dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 6, 4);
  check_equals(dest.getPixel(25, 75), 0xffff00); // Yellow
  check_equals(dest.getPixel(75, 75), 0xffff00); // Yellow
 
+// noise().
+
+// Tests that a particular color does not appear.
+testNoColor = function(bd, mask) {
+   var width = bd.width;
+   var height = bd.height;
+   for (var i = 0; i < height; ++i) {
+       for (var j = 0; j < width; ++j) {
+           if ( (bd.getPixel32(i, j) & mask) != 0) return false;
+       };
+   };
+   return true;
+};
+
+// Tests that a particular color is within a specified range
+testColorRange = function(bd, mask, low, high) {
+    var width = bd.width;
+    var height = bd.height;
+
+    var shift = 0;
+    if (mask == 0xff00) shift = 8;
+    if (mask == 0xff0000) shift = 16;
+    if (mask == 0xff000000) shift = 24;
+
+    for (var i = 0; i < height; ++i) {
+        for (var j = 0; j < width; ++j) {
+            var pix = (bd.getPixel32(i, j) & mask) >> shift;
+            if (pix < low || pix > high) {
+                return false;
+            };
+        };
+    };
+    return true;
+};
+
+// Tests that a particular color is within a specified range
+testGreys = function(bd, low, high) {
+    var width = bd.width;
+    var height = bd.height;
+
+    for (var i = 0; i < height; ++i) {
+        for (var j = 0; j < width; ++j) {
+            var r = (bd.getPixel32(i, j) & 0xff0000) >> 16;
+            var g = (bd.getPixel32(i, j) & 0xff00) >> 8;
+            var b = (bd.getPixel32(i, j) & 0xff);
+            if (r != g || g != b) return false;
+            if (r < low || r > high) return false;
+        };
+    };
+    return true;
+};
+
+ns = new flash.display.BitmapData(15, 15, false);
+
+// Noise on red and green channels from 0 to 255
+ns.noise(203, 0, 255, 1 | 2);
+ check(testNoColor(ns, 0xff));
+
+ns.noise(203, 0, 255, 1 | 4);
+ check(testNoColor(ns, 0xff00));
+
+// Noise on green and blue from 25 to 150
+ns.noise(203, 25, 150, 2 | 4);
+ check(testNoColor(ns, 0xff0000));
+ // Green should be from 25 to 150
+ check(testColorRange(ns, 0xff00, 25, 150));
+ check(testColorRange(ns, 0xff, 25, 150));
+
+// Noise on green from 200 to 201
+ns.noise(203, 200, 201, 2);
+ check(testColorRange(ns, 0xff00, 200, 201));
+
+// Noise on blue from 200 to 200
+ns.noise(203, 200, 200, 4);
+ check(testColorRange(ns, 0xff, 200, 200));
+
+// Noise on all from 70 to 80
+ns.noise(203, 70, 80);
+ check(testColorRange(ns, 0xff, 70, 80));
+ check(testColorRange(ns, 0xff00, 70, 80));
+ check(testColorRange(ns, 0xff0000, 70, 80));
+
+// Equal noise on all from 70 to 80
+ns.noise(203, 70, 80, 0, true);
+ check(testGreys(ns, 70, 80));
+
+// Equal noise on all from 0, 200
+ns.noise(203, 0, 200, 0, true);
+ check(testGreys(ns, 0, 200));
+
+// Swapped values
+ns.noise(203, 60, 50, 0, true);
+ check(testGreys(ns, 60, 60));
+
+// Negative values
+ns.noise(203, -10, 0, 0, true);
+ check(testGreys(ns, 0, 0));
+
 // clone();
 
 orig = new flash.display.BitmapData(10, 10, false, 0x00ff10);
@@ -869,6 +967,6 @@ flash.display.BitmapData.prototype = e;
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(326);
+totals(340);
 
 #endif // OUTPUT_VERSION >= 8

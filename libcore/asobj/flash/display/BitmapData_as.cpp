@@ -24,6 +24,7 @@
 #include <sstream>
 #include <algorithm>
 #include <queue>
+#include <boost/random.hpp>
 
 #include "MovieClip.h"
 #include "GnashImage.h"
@@ -44,6 +45,7 @@
 #include "ASConversions.h"
 #include "flash/geom/ColorTransform_as.h"
 #include "NativeFunction.h"
+#include "GnashNumeric.h"
 
 namespace gnash {
 
@@ -107,6 +109,75 @@ namespace {
     inline bool oneBitSet(boost::uint8_t mask) {
         return mask == (mask & -mask);
     }
+}
+
+/// Local functors.
+namespace {
+
+/// Random number generator for noise
+//
+/// This uses the fastest RNG available; it's still more
+/// homogeneous than the Adobe one.
+template<typename RNG = boost::rand48>
+struct Noise
+{
+    Noise(int seed, boost::uint8_t low, boost::uint8_t high)
+        :
+        rng(seed),
+        dist(low, high),
+        uni(rng, dist)
+    {}
+
+    boost::uint8_t operator()() {
+        return uni();
+    }
+
+private:
+    RNG rng;
+    boost::uniform_int<> dist;
+    boost::variate_generator<RNG, boost::uniform_int<> > uni;
+};
+
+template<typename NoiseGenerator>
+struct NoiseAdapter
+{
+    NoiseAdapter(NoiseGenerator& n, boost::uint8_t bitmask, bool grey)
+        :
+        _gen(n),
+        _bitmask(bitmask),
+        _greyscale(grey)
+    {}
+
+    boost::uint32_t operator()() {
+
+        if (_greyscale) {
+            boost::uint8_t val = _gen();
+            return val | val << 8 | val << 16;
+        }
+
+        boost::uint32_t ret = 0;
+
+        if (_bitmask & 1) {
+            ret |= (_gen() << 16);
+        }
+        if (_bitmask & 2) {
+            ret |= _gen() << 8;
+        }
+        if (_bitmask & 4) {
+            ret |= _gen();
+        }
+        if (_bitmask & 8) {
+            ret |= _gen() << 24;
+        }
+        return ret;
+    }
+
+private:
+    NoiseGenerator& _gen;
+    const boost::uint8_t _bitmask;
+    const bool _greyscale;
+};
+
 }
 
 BitmapData_as::BitmapData_as(as_object* owner,
@@ -914,8 +985,34 @@ as_value
 bitmapdata_noise(const fn_call& fn)
 {
 	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
+
+    if (ptr->disposed()) return as_value();
+
+    if (fn.nargs < 1) {
+        return as_value();
+    }
+    const int seed = toInt(fn.arg(0), getVM(fn));
+
+    const boost::uint8_t low = fn.nargs > 1 ?
+        clamp(toInt(fn.arg(1), getVM(fn)), 0, 255) : 0;
+
+    const boost::uint8_t high = fn.nargs > 2 ?
+        clamp<int>(toInt(fn.arg(2), getVM(fn)), low, 255) : 255;
+
+    const boost::uint8_t chans = fn.nargs > 3 ?
+        std::abs(toInt(fn.arg(3), getVM(fn))) & 15 : 1 | 2 | 4;
+
+    const bool greyscale = fn.nargs > 4 ?
+        toBool(fn.arg(4), getVM(fn)) : false;
+
+    Noise<> noise(seed, low, high);
+
+    NoiseAdapter<Noise<> > n(noise, chans, greyscale);
+
+    std::generate(ptr->begin(), ptr->end(), n);
+    
+    ptr->updateObjects();
+
 	return as_value();
 }
 
