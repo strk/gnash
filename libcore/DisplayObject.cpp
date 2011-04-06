@@ -204,7 +204,7 @@ DisplayObject::set_invalidated(const char* debug_file, int debug_line)
         _invalidated = true;
         
 #ifdef DEBUG_SET_INVALIDATED
-        ObjectURI::Logger l(getStringTable(*getObject(this)));
+        ObjectURI::Logger l(getStringTable(stage().getVM()));
         log_debug("%p set_invalidated() of %s in %s:%d",
             (void*)this, l(get_name()), debug_file, debug_line);
 #else
