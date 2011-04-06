@@ -178,11 +178,10 @@ private:
     const bool _greyscale;
 };
 
-}
+} // anonymous namespace
 
 BitmapData_as::BitmapData_as(as_object* owner,
         std::auto_ptr<image::GnashImage> im)
-   
     :
     _owner(owner),
     _cachedBitmap(0)
