@@ -118,10 +118,12 @@ if USE_GST_ENGINE
 	$(NULL)
 
  findwebcams_SOURCES = findwebcams.cpp
- findwebcams_LDADD = $(GST_STUFF) $(GNASH_LIBS) $(AM_LDFLAGS)
+ findwebcams_LDADD = $(GST_STUFF) $(top_builddir)/libbase/libgnashbase.la \
+                     $(AM_LDFLAGS)
 
  findmicrophones_SOURCES = findmicrophones.cpp
- findmicrophones_LDADD = $(GST_STUFF) $(GNASH_LIBS) $(AM_LDFLAGS)
+ findmicrophones_LDADD = $(GST_STUFF) $(top_builddir)/libbase/libgnashbase.la \
+                         $(AM_LDFLAGS)
 endif
 
 # Wrap a single .as tests in dejagnu_so importer.
