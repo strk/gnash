@@ -35,22 +35,16 @@ GNASH_LIBS = \
 AM_LDFLAGS = \
 	$(LIBINTL) \
 	$(LIBADD_DL) \
-	$(BOOST_LIBS) \
 	$(NULL)
-
-# bzip2 is a dependency of some libraries with mingw32
-if WIN32
-AM_LDFLAGS += $(BZ2_LIBS)
-endif
 
 localedir = $(datadir)/locale
 
 AM_CPPFLAGS = \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/librender \
-		-I$(top_srcdir)/librender/agg \
-		-I$(top_srcdir)/librender/cairo \
-		-I$(top_srcdir)/librender/opengl \
+	-I$(top_srcdir)/librender/agg \
+	-I$(top_srcdir)/librender/cairo \
+	-I$(top_srcdir)/librender/opengl \
         -I$(top_srcdir)/libcore \
         -I$(top_srcdir)/libcore/asobj \
         -I$(top_srcdir)/libcore/swf \
@@ -67,6 +61,8 @@ AM_CPPFLAGS = \
 	$(NULL)
 
 if WIN32
+  # bzip2 is a dependency of some libraries with mingw32
+  AM_LDFLAGS += $(BZ2_LIBS)
   GNASH_LIBS += -lintl -lz -lws2_32
 endif
 
@@ -108,7 +104,7 @@ gprocessor_LDFLAGS = -export-dynamic
 gprocessor_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
 
 rtmpget_SOURCES = rtmpget.cpp 
-rtmpget_LDADD =  $(GNASH_LIBS) $(AM_LDFLAGS)
+rtmpget_LDADD = $(top_builddir)/libbase/libgnashbase.la $(AM_LDFLAGS)
 
 #dumpshm_SOURCES = dumpshm.cpp
 #dumpshm_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
