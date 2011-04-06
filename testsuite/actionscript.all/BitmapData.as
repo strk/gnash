@@ -648,12 +648,13 @@ dest.copyPixels(source, new Rect(0, 0, 100, 100), new Point(200, 50));
 // This function seems to work as expected for single channel to single 
 // channel.
 // When the destination is a combination of channels, nothing happens. When
-// it is a single channel, it is set to 0!
+// it is a single channel and the source is a combination of channels, it
+// is set to 0!
 
 // Source:
 //    ---------------------
 //    |         |         |
-//    |   R     |    RG   |
+//    |   R     |    BG   |
 //    |         |         |
 //    |         |         |
 //    ---------------------
@@ -673,9 +674,9 @@ src.fillRect(new Rect(50, 50, 50, 50), 0xff007f00); // Green channel
 // Copy red channel to green channel
 dest = new flash.display.BitmapData(100, 100, true, 0xff000000);
 dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 1, 2);
- xcheck_equals(dest.getPixel(25, 25), 0x00ff00); // Green
+ check_equals(dest.getPixel(25, 25), 0x00ff00); // Was red, now green
  check_equals(dest.getPixel(75, 25), 0x000000); // Nothing
- xcheck_equals(dest.getPixel(25, 75), 0x00ff00); // Was red, now green
+ check_equals(dest.getPixel(25, 75), 0x00ff00); // Was red/blue, now green
  check_equals(dest.getPixel(75, 75), 0x000000); // Nothing
 
 // Copy red channel to green and blue channels
@@ -741,9 +742,9 @@ dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 2, 3);
 dest = new flash.display.BitmapData(100, 100, true, 0xff000000);
 dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 2, 4);
  check_equals(dest.getPixel(25, 25), 0x000000); // Nothing
- xcheck_equals(dest.getPixel(75, 25), 0x0000ff); // Blue
+ check_equals(dest.getPixel(75, 25), 0x0000ff); // Blue
  check_equals(dest.getPixel(25, 75), 0x000000); // Nothing
- xcheck_equals(dest.getPixel(75, 75), 0x00007f); // Half blue
+ check_equals(dest.getPixel(75, 75), 0x00007f); // Half blue
 
 // -------------------
 // Without alpha
@@ -766,10 +767,10 @@ dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 3, 3);
 // Copy red and green to red
 dest = new flash.display.BitmapData(100, 100, false);
 dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 3, 1);
- xcheck_equals(dest.getPixel(25, 25), 0x00ffff); // Cyan
- xcheck_equals(dest.getPixel(75, 25), 0x00ffff); // Cyan
- xcheck_equals(dest.getPixel(25, 75), 0x00ffff); // Cyan
- xcheck_equals(dest.getPixel(75, 75), 0x00ffff); // Cyan
+ check_equals(dest.getPixel(25, 25), 0x00ffff); // Cyan
+ check_equals(dest.getPixel(75, 25), 0x00ffff); // Cyan
+ check_equals(dest.getPixel(25, 75), 0x00ffff); // Cyan
+ check_equals(dest.getPixel(75, 75), 0x00ffff); // Cyan
 
 // Copy green to red and blue
 dest = new flash.display.BitmapData(100, 100, false);
@@ -782,18 +783,18 @@ dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 2, 5);
 // Copy red and blue to green
 dest = new flash.display.BitmapData(100, 100, false);
 dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 5, 2);
- xcheck_equals(dest.getPixel(25, 25), 0xff00ff); // White
- xcheck_equals(dest.getPixel(75, 25), 0xff00ff); // White
- xcheck_equals(dest.getPixel(25, 75), 0xff00ff); // White
- xcheck_equals(dest.getPixel(75, 75), 0xff00ff); // White
+ check_equals(dest.getPixel(25, 25), 0xff00ff); // Magenta
+ check_equals(dest.getPixel(75, 25), 0xff00ff); // Magenta
+ check_equals(dest.getPixel(25, 75), 0xff00ff); // Magenta
+ check_equals(dest.getPixel(75, 75), 0xff00ff); // Magenta
 
 // Copy green and blue to blue
 dest = new flash.display.BitmapData(100, 100, false);
 dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 6, 4);
- xcheck_equals(dest.getPixel(25, 25), 0xffff00); // Yellow
- xcheck_equals(dest.getPixel(75, 25), 0xffff00); // Yellow
- xcheck_equals(dest.getPixel(25, 75), 0xffff00); // Yellow
- xcheck_equals(dest.getPixel(75, 75), 0xffff00); // Yellow
+ check_equals(dest.getPixel(25, 25), 0xffff00); // Yellow
+ check_equals(dest.getPixel(75, 25), 0xffff00); // Yellow
+ check_equals(dest.getPixel(25, 75), 0xffff00); // Yellow
+ check_equals(dest.getPixel(75, 75), 0xffff00); // Yellow
 
 // clone();
 
