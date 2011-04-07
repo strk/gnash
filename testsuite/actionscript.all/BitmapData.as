@@ -826,6 +826,24 @@ dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 6, 4);
  check_equals(dest.getPixel(25, 75), 0xffff00); // Yellow
  check_equals(dest.getPixel(75, 75), 0xffff00); // Yellow
 
+// Copy same channel to source range
+// As the source range is transformed while being processed,
+// those transformations accumulate to give unexpected 
+// results.
+dest = new flash.display.BitmapData(100, 100, false, 0x000000);
+dest.fillRect(new Rect(0, 0, 50, 50), 0x0000ff);
+dest.copyChannel(dest, new Rect(0, 0, 100, 100), new Point(4, 4), 4, 4);
+ check_equals(dest.getPixel(52, 6), 0x0000ff);
+ check_equals(dest.getPixel(56, 10), 0x0000ff);
+ check_equals(dest.getPixel(60, 14), 0x0000ff);
+ check_equals(dest.getPixel(96, 50), 0x0000ff);
+ check_equals(dest.getPixel(96, 96), 0x0000ff);
+ check_equals(dest.getPixel(6, 52), 0x0000ff);
+ check_equals(dest.getPixel(10, 56), 0x0000ff);
+ check_equals(dest.getPixel(14, 60), 0x0000ff);
+ check_equals(dest.getPixel(50, 96), 0x0000ff);
+ check_equals(dest.getPixel(96, 96), 0x0000ff);
+
 // noise().
 
 // Tests that a particular color does not appear.
@@ -997,6 +1015,6 @@ flash.display.BitmapData.prototype = e;
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(354);
+totals(364);
 
 #endif // OUTPUT_VERSION >= 8
