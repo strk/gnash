@@ -643,6 +643,28 @@ dest.copyPixels(source, new Rect(0, 0, 100, 100), new Point(200, 50));
  check_equals(dest.getPixel(10, 52), 0xff0000);
  check_equals(dest.getPixel(90, 90), 0xff0000);
 
+// Check self copies!
+
+source = new flash.display.BitmapData(100, 100, false);
+
+// Should be the same
+source.fillRect(new Rect(0, 0, 50, 50), 0x00ff00);
+source.copyPixels(source, new Rect(35, 35, 20, 20), new Point(35, 35));
+
+ check_equals(source.getPixel(55, 45), 0xffffff);
+ check_equals(source.getPixel(60, 60), 0xffffff);
+ check_equals(source.getPixel(45, 55), 0xffffff);
+ check_equals(source.getPixel(45, 45), 0x00ff00);
+
+source.copyPixels(source, new Rect(20, 20, 50, 50), new Point(45, 45));
+ // Bottom right corner is still white
+ check_equals(source.getPixel(90, 90), 0xffffff);
+ check_equals(source.getPixel(55, 42), 0xffffff);
+ check_equals(source.getPixel(42, 55), 0xffffff);
+ check_equals(source.getPixel(55, 55), 0x00ff00);
+ check_equals(source.getPixel(55, 70), 0x00ff00);
+ check_equals(source.getPixel(70, 55), 0x00ff00);
+
 // copyChannel
 
 // This function seems to work as expected for single channel to single 
@@ -967,6 +989,6 @@ flash.display.BitmapData.prototype = e;
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(340);
+totals(350);
 
 #endif // OUTPUT_VERSION >= 8

@@ -750,6 +750,12 @@ bitmapdata_copyPixels(const fn_call& fn)
     BitmapData_as::iterator targ = pixelAt(*ptr, destX, destY);
     BitmapData_as::iterator src = pixelAt(*source, sourceX, sourceY);
 
+    const bool sameImage = (ptr == source);
+    const bool copyToXRange = sameImage && 
+        (destX >= sourceX && destX < sourceX + destW);
+    const bool copyToYRange = sameImage &&
+        (destY >= sourceY && destY < sourceY + destH);
+
     // Just being careful...
     assert(sourceX + destW <= static_cast<int>(source->width()));
     assert(sourceY + destH <= static_cast<int>(source->height()));
@@ -759,10 +765,39 @@ bitmapdata_copyPixels(const fn_call& fn)
     // Copy for the width and height of the *dest* image.
     // We have already ensured that the copied area
     // is inside both bitmapdatas.
-    for (int i = 0; i < destH; ++i) {
-        std::copy(src, src + destW, targ);
-        targ += ptr->width();
-        src += source->width();
+    //
+    // If the destination y-range starts within the source y-range, copy from
+    // bottom to top.
+    // If the destination x-range starts within the source x-range, copy from
+    // right to left.
+    if (copyToYRange) {
+        assert(destH > 0);
+        targ += (destH - 1) * ptr->width();
+        src += (destH - 1) * source->width();
+        // Copy from bottom to top.
+        for (int i = destH; i > 0; --i) {
+            if (copyToXRange) {
+                std::copy_backward(src, src + destW, targ + destW);
+            }
+            else {
+                std::copy(src, src + destW, targ);
+            }
+            targ -= ptr->width();
+            src -= source->width();
+        }
+    }
+    else {
+        // Normal copy from top to bottom.
+        for (int i = 0; i < destH; ++i) {
+            if (copyToXRange) {
+                std::copy_backward(src, src + destW, targ + destW);
+            }
+            else {
+                std::copy(src, src + destW, targ);
+            }
+            targ += ptr->width();
+            src += source->width();
+        }
     }
 
     ptr->updateObjects();
