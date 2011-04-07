@@ -567,7 +567,7 @@ bitmapdata_copyChannel(const fn_call& fn)
     if (destW == 0 || destH == 0) {
         // The target rect does not overlap with source bitmap
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("BitmapData.copyPixels(): destination area is "
+            log_aserror("BitmapData.copyChannel(): destination area is "
                 "wholly outside the destination BitmapData");
         );
         return as_value();
