@@ -254,12 +254,6 @@ CurlSession::~CurlSession()
     curl_global_cleanup();
 }
 
-#if BOOST_VERSION < 103500
-# define GNASH_DEFER_LOCK false
-#else
-# define GNASH_DEFER_LOCK boost::defer_lock
-#endif
-
 CurlSession::CurlSession()
     :
     _shandle(0),
@@ -326,34 +320,34 @@ CurlSession::lockSharedHandle(CURL* handle, curl_lock_data data,
     UNUSED(access);
 
     switch (data) {
-    case CURL_LOCK_DATA_DNS:
-	//log_debug("Locking DNS cache mutex");
-	lock(_dnscacheMutex);
-	//log_debug("DNS cache mutex locked");
-	break;
-    case CURL_LOCK_DATA_COOKIE:
-	//log_debug("Locking cookies mutex");
-	lock(_cookieMutex); 
-	//log_debug("Cookies mutex locked");
+        case CURL_LOCK_DATA_DNS:
+            //log_debug("Locking DNS cache mutex");
+            lock(_dnscacheMutex);
+            //log_debug("DNS cache mutex locked");
             break;
-    case CURL_LOCK_DATA_SHARE:
-	//log_debug("Locking share mutex");
-	lock(_shareMutex); 
-	//log_debug("Share mutex locked");
-	break;
-    case CURL_LOCK_DATA_SSL_SESSION:
-	log_error("lockSharedHandle: SSL session locking "
-		  "unsupported");
-	break;
-    case CURL_LOCK_DATA_CONNECT:
-	log_error("lockSharedHandle: connect locking unsupported");
-	break;
-    case CURL_LOCK_DATA_LAST:
-	log_error("lockSharedHandle: last locking unsupported ?!");
-	break;
-    default:
-	log_error("lockSharedHandle: unknown shared data %d", data);
-	break;
+        case CURL_LOCK_DATA_COOKIE:
+            //log_debug("Locking cookies mutex");
+            lock(_cookieMutex); 
+            //log_debug("Cookies mutex locked");
+            break;
+        case CURL_LOCK_DATA_SHARE:
+            //log_debug("Locking share mutex");
+            lock(_shareMutex); 
+            //log_debug("Share mutex locked");
+            break;
+        case CURL_LOCK_DATA_SSL_SESSION:
+            log_error("lockSharedHandle: SSL session locking "
+              "unsupported");
+            break;
+        case CURL_LOCK_DATA_CONNECT:
+            log_error("lockSharedHandle: connect locking unsupported");
+            break;
+        case CURL_LOCK_DATA_LAST:
+            log_error("lockSharedHandle: last locking unsupported ?!");
+            break;
+        default:
+            log_error("lockSharedHandle: unknown shared data %d", data);
+            break;
     }
 }
 
