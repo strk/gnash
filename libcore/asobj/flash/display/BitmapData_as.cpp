@@ -180,6 +180,40 @@ private:
     const bool _greyscale;
 };
 
+/// Copy a single channel from one ARGB value to a channel in another.
+//
+/// Due to peculiarities in the Adobe implementation, this also supports
+/// setting them to black.
+template<typename Iterator>
+struct CopyChannel
+{
+    typedef boost::tuple<Iterator, Iterator> iterator_tuple;
+    typedef boost::zip_iterator<iterator_tuple> iterator_type;
+
+    CopyChannel(bool multiple, boost::uint8_t srcchans,
+            boost::uint8_t destchans)
+        :
+        _multiple(multiple),
+        _srcchans(srcchans),
+        _destchans(destchans)
+    {}
+
+    /// 
+    boost::uint32_t operator()(typename iterator_type::value_type p) const {
+        // If multiple source channels, we set the destination channel
+        // to black. Else to the value of the requested channel.
+        const boost::uint8_t val = _multiple ? 0 : getChannel(boost::get<0>(p), _srcchans);
+        return setChannel(boost::get<1>(p), _destchans, val);
+    }
+
+private:
+    const bool _multiple;
+    const boost::uint8_t _srcchans;
+    const boost::uint8_t _destchans;
+
+};
+
+
 } // anonymous namespace
 
 BitmapData_as::BitmapData_as(as_object* owner,
@@ -584,23 +618,19 @@ bitmapdata_copyChannel(const fn_call& fn)
     assert(destX + destW <= static_cast<int>(ptr->width()));
     assert(destY + destH <= static_cast<int>(ptr->height()));
 
-    boost::make_zip_iterator(boost::make_tuple(src, targ));
-
     // Copy for the width and height of the *dest* image.
     // We have already ensured that the copied area
-    // is inside both bitmapdatas.
+    // is inside both bitmapdatas
+    typedef CopyChannel<BitmapData_as::iterator> Copier;
+    Copier c(multiple, srcchans, destchans);
+
+    // Note that copying the same channel to a range starting in the
+    // source range produces unexpected effects because the source
+    // range is changed while it is being copied. This is verified
+    // to happen with the Adobe player too.
     for (int i = 0; i < destH; ++i) {
-
-        BitmapData_as::iterator s = src;
-        BitmapData_as::iterator d = targ;
-        for (int j = 0; j < destW; ++j, ++s, ++d) {
-
-            // If multiple source channels, we set the destination channel
-            // to black. Else to the value of the requested channel.
-            const boost::uint8_t val = multiple ? 0 : getChannel(*s, srcchans);
-            *d = setChannel(*d, destchans, val);
-
-        }
+        Copier::iterator_type zip(boost::make_tuple(src, targ));
+        std::transform(zip, zip + destW, targ, c);
         targ += ptr->width();
         src += source->width();
     }
