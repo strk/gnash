@@ -25,6 +25,8 @@
 #include <algorithm>
 #include <queue>
 #include <boost/random.hpp>
+#include <boost/iterator/zip_iterator.hpp>
+#include <boost/tuple/tuple.hpp>
 
 #include "MovieClip.h"
 #include "GnashImage.h"
@@ -581,6 +583,8 @@ bitmapdata_copyChannel(const fn_call& fn)
     assert(sourceY + destH <= static_cast<int>(source->height()));
     assert(destX + destW <= static_cast<int>(ptr->width()));
     assert(destY + destH <= static_cast<int>(ptr->height()));
+
+    boost::make_zip_iterator(boost::make_tuple(src, targ));
 
     // Copy for the width and height of the *dest* image.
     // We have already ensured that the copied area
