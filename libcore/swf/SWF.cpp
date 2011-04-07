@@ -121,6 +121,7 @@ operator<<(std::ostream& o, TagType t)
 std::ostream&
 operator<<(std::ostream& o, ActionType a)
 {
+    o << "Action";
     switch (a) {
         case ACTION_END: return o << "End";
         case ACTION_NEXTFRAME: return o << "NextFrame";
@@ -144,89 +145,88 @@ operator<<(std::ostream& o, ActionType a)
         case ACTION_LOGICALOR: return o << "LogicalOr";
         case ACTION_LOGICALNOT: return o << "LogicalNot";
         case ACTION_STRINGEQ: return o << "StringEq";
-        case ACTION_STRINGLENGTH: return o << "ActionStringLength";
-        case ACTION_SUBSTRING: return o << "ActionSubString";
-        case ACTION_POP: return o << "ActionPop";
-        case ACTION_INT: return o << "ActionInt";
-        case ACTION_GETVARIABLE: return o << "ActionGetVariable";
-        case ACTION_SETVARIABLE: return o << "ActionSetVariable";
-        case ACTION_SETTARGETEXPRESSION:
-             return o << "ActionSetTargetExpression";
-        case ACTION_STRINGCONCAT: return o << "ActionStringConcat";
-        case ACTION_GETPROPERTY: return o << "ActionGetProperty";
-        case ACTION_SETPROPERTY: return o << "ActionSetProperty";
-        case ACTION_DUPLICATECLIP: return o << "ActionDuplicateClip";
-        case ACTION_REMOVECLIP: return o << "ActionRemoveClip";
-        case ACTION_TRACE: return o << "ActionTrace";
-        case ACTION_STARTDRAGMOVIE: return o << "ActionStartDragMovie";
-        case ACTION_STOPDRAGMOVIE: return o << "ActionStopDragMovie";
-        case ACTION_STRINGCOMPARE: return o << "ActionStringCompare";
-        case ACTION_THROW: return o << "ActionThrow";
-        case ACTION_CASTOP: return o << "ActionCastOp";
-        case ACTION_IMPLEMENTSOP: return o << "ActionImplementsOp";
-        case ACTION_FSCOMMAND2: return o << "ActionFscommand2";
-        case ACTION_RANDOM: return o << "ActionRandom";
-        case ACTION_MBLENGTH: return o << "ActionMbLength";
-        case ACTION_ORD: return o << "ActionOrd";
-        case ACTION_CHR: return o << "ActionChr";
-        case ACTION_GETTIMER: return o << "ActionGetTimer";
-        case ACTION_MBSUBSTRING: return o << "ActionMbSubString";
-        case ACTION_MBORD: return o << "ActionMbOrd";
-        case ACTION_MBCHR: return o << "ActionMbChr";
-        case ACTION_STRICTMODE: return o << "ActionStrictMode";
+        case ACTION_STRINGLENGTH: return o << "StringLength";
+        case ACTION_SUBSTRING: return o << "SubString";
+        case ACTION_POP: return o << "Pop";
+        case ACTION_INT: return o << "Int";
+        case ACTION_GETVARIABLE: return o << "GetVariable";
+        case ACTION_SETVARIABLE: return o << "SetVariable";
+        case ACTION_SETTARGETEXPRESSION: return o << "SetTargetExpression";
+        case ACTION_STRINGCONCAT: return o << "StringConcat";
+        case ACTION_GETPROPERTY: return o << "GetProperty";
+        case ACTION_SETPROPERTY: return o << "SetProperty";
+        case ACTION_DUPLICATECLIP: return o << "DuplicateClip";
+        case ACTION_REMOVECLIP: return o << "RemoveClip";
+        case ACTION_TRACE: return o << "Trace";
+        case ACTION_STARTDRAGMOVIE: return o << "StartDragMovie";
+        case ACTION_STOPDRAGMOVIE: return o << "StopDragMovie";
+        case ACTION_STRINGCOMPARE: return o << "StringCompare";
+        case ACTION_THROW: return o << "Throw";
+        case ACTION_CASTOP: return o << "CastOp";
+        case ACTION_IMPLEMENTSOP: return o << "ImplementsOp";
+        case ACTION_FSCOMMAND2: return o << "Fscommand2";
+        case ACTION_RANDOM: return o << "Random";
+        case ACTION_MBLENGTH: return o << "MbLength";
+        case ACTION_ORD: return o << "Ord";
+        case ACTION_CHR: return o << "Chr";
+        case ACTION_GETTIMER: return o << "GetTimer";
+        case ACTION_MBSUBSTRING: return o << "MbSubString";
+        case ACTION_MBORD: return o << "MbOrd";
+        case ACTION_MBCHR: return o << "MbChr";
+        case ACTION_STRICTMODE: return o << "StrictMode";
         case ACTION_WAITFORFRAMEEXPRESSION:
-            return o << "ActionWaitForFrameExpression";
-        case ACTION_PUSHDATA: return o << "ActionPushData";
-        case ACTION_BRANCHALWAYS: return o << "ActionBranchAlways";
-        case ACTION_GETURL2: return o << "ActionGetUrl2";
-        case ACTION_BRANCHIFTRUE: return o << "ActionBranchIfTrue";
-        case ACTION_CALLFRAME: return o << "ActionCallFrame";
-        case ACTION_GOTOEXPRESSION: return o << "ActionGotoExpression";
-        case ACTION_DELETE: return o << "ActionDelete";
-        case ACTION_DELETE2: return o << "ActionDelete2";
-        case ACTION_VAREQUALS: return o << "ActionVarEquals";
-        case ACTION_CALLFUNCTION: return o << "ActionCallFunction";
-        case ACTION_RETURN: return o << "ActionReturn";
-        case ACTION_MODULO: return o << "ActionModulo";
-        case ACTION_NEW: return o << "ActionNew";
-        case ACTION_VAR: return o << "ActionVar";
-        case ACTION_INITARRAY: return o << "ActionInitArray";
-        case ACTION_INITOBJECT: return o << "ActionInitObject";
-        case ACTION_TYPEOF: return o << "ActionTypeOf";
-        case ACTION_TARGETPATH: return o << "ActionTargetPath";
-        case ACTION_ENUMERATE: return o << "ActionEnumerate";
-        case ACTION_NEWADD: return o << "ActionNewAdd";
-        case ACTION_NEWLESSTHAN: return o << "ActionNewLessThan";
-        case ACTION_NEWEQUALS: return o << "ActionNewEquals";
-        case ACTION_TONUMBER: return o << "ActionToNumber";
-        case ACTION_TOSTRING: return o << "ActionToString";
-        case ACTION_DUP: return o << "ActionDup";
-        case ACTION_SWAP: return o << "ActionSwap";
-        case ACTION_GETMEMBER: return o << "ActionGetMember";
-        case ACTION_SETMEMBER: return o << "ActionSetMember";
-        case ACTION_INCREMENT: return o << "ActionIncrement";
-        case ACTION_DECREMENT: return o << "ActionDecrement";
-        case ACTION_CALLMETHOD: return o << "ActionCallMethod";
-        case ACTION_NEWMETHOD: return o << "ActionNewMethod";
-        case ACTION_INSTANCEOF: return o << "ActionInstanceOf";
-        case ACTION_ENUM2: return o << "ActionEnum2";
-        case ACTION_BITWISEAND: return o << "ActionBitwiseAnd";
-        case ACTION_BITWISEOR: return o << "ActionBitwiseOr";
-        case ACTION_BITWISEXOR: return o << "ActionBitwiseXor";
-        case ACTION_SHIFTLEFT: return o << "ActionShiftLeft";
-        case ACTION_SHIFTRIGHT: return o << "ActionShiftRight";
-        case ACTION_SHIFTRIGHT2: return o << "ActionShiftRight2";
-        case ACTION_STRICTEQ: return o << "ActionStrictEq";
-        case ACTION_GREATER: return o << "ActionGreater";
-        case ACTION_STRINGGREATER: return o << "ActionStringGreater";
-        case ACTION_EXTENDS: return o << "ActionExtends";
-        case ACTION_CONSTANTPOOL: return o << "ActionConstantPool";
-        case ACTION_DEFINEFUNCTION2: return o << "ActionDefineFunction2";
-        case ACTION_TRY: return o << "ActionTry";
-        case ACTION_WITH: return o << "ActionWith";
-        case ACTION_DEFINEFUNCTION: return o << "ActionDefineFunction";
-        case ACTION_SETREGISTER: return o << "ActionSetRegister";
-        default: return o << "Unknown ActionType";
+            return o << "WaitForFrameExpression";
+        case ACTION_PUSHDATA: return o << "PushData";
+        case ACTION_BRANCHALWAYS: return o << "BranchAlways";
+        case ACTION_GETURL2: return o << "GetUrl2";
+        case ACTION_BRANCHIFTRUE: return o << "BranchIfTrue";
+        case ACTION_CALLFRAME: return o << "CallFrame";
+        case ACTION_GOTOEXPRESSION: return o << "GotoExpression";
+        case ACTION_DELETE: return o << "Delete";
+        case ACTION_DELETE2: return o << "Delete2";
+        case ACTION_VAREQUALS: return o << "VarEquals";
+        case ACTION_CALLFUNCTION: return o << "CallFunction";
+        case ACTION_RETURN: return o << "Return";
+        case ACTION_MODULO: return o << "Modulo";
+        case ACTION_NEW: return o << "New";
+        case ACTION_VAR: return o << "Var";
+        case ACTION_INITARRAY: return o << "InitArray";
+        case ACTION_INITOBJECT: return o << "InitObject";
+        case ACTION_TYPEOF: return o << "TypeOf";
+        case ACTION_TARGETPATH: return o << "TargetPath";
+        case ACTION_ENUMERATE: return o << "Enumerate";
+        case ACTION_NEWADD: return o << "NewAdd";
+        case ACTION_NEWLESSTHAN: return o << "NewLessThan";
+        case ACTION_NEWEQUALS: return o << "NewEquals";
+        case ACTION_TONUMBER: return o << "ToNumber";
+        case ACTION_TOSTRING: return o << "ToString";
+        case ACTION_DUP: return o << "Dup";
+        case ACTION_SWAP: return o << "Swap";
+        case ACTION_GETMEMBER: return o << "GetMember";
+        case ACTION_SETMEMBER: return o << "SetMember";
+        case ACTION_INCREMENT: return o << "Increment";
+        case ACTION_DECREMENT: return o << "Decrement";
+        case ACTION_CALLMETHOD: return o << "CallMethod";
+        case ACTION_NEWMETHOD: return o << "NewMethod";
+        case ACTION_INSTANCEOF: return o << "InstanceOf";
+        case ACTION_ENUM2: return o << "Enum2";
+        case ACTION_BITWISEAND: return o << "BitwiseAnd";
+        case ACTION_BITWISEOR: return o << "BitwiseOr";
+        case ACTION_BITWISEXOR: return o << "BitwiseXor";
+        case ACTION_SHIFTLEFT: return o << "ShiftLeft";
+        case ACTION_SHIFTRIGHT: return o << "ShiftRight";
+        case ACTION_SHIFTRIGHT2: return o << "ShiftRight2";
+        case ACTION_STRICTEQ: return o << "StrictEq";
+        case ACTION_GREATER: return o << "Greater";
+        case ACTION_STRINGGREATER: return o << "StringGreater";
+        case ACTION_EXTENDS: return o << "Extends";
+        case ACTION_CONSTANTPOOL: return o << "ConstantPool";
+        case ACTION_DEFINEFUNCTION2: return o << "DefineFunction2";
+        case ACTION_TRY: return o << "Try";
+        case ACTION_WITH: return o << "With";
+        case ACTION_DEFINEFUNCTION: return o << "DefineFunction";
+        case ACTION_SETREGISTER: return o << "SetRegister";
+        default: return o << " Unknown Type " << +a;
     }
     return o;
 }
@@ -234,778 +234,179 @@ operator<<(std::ostream& o, ActionType a)
 std::ostream&
 operator<<(std::ostream& os, const abc_action_type& opcode)
 {
-    switch (opcode)
-    {
-        case ABC_ACTION_END:
-            os << "ABC_ACTION_END";
-            break;
-        case ABC_ACTION_BKPT:
-            os << "ABC_ACTION_BKPT";
-            break;
-        case ABC_ACTION_NOP:
-            os << "ABC_ACTION_NOP";
-            break;
-        case ABC_ACTION_THROW:
-            os << "ABC_ACTION_THROW";
-            break;
-        case ABC_ACTION_GETSUPER:
-            os << "ABC_ACTION_GETSUPER";
-            break;
-        case ABC_ACTION_SETSUPER:
-            os << "ABC_ACTION_SETSUPER";
-            break;
-        case ABC_ACTION_DXNS:
-            os << "ABC_ACTION_DXNS";
-            break;
-        case ABC_ACTION_DXNSLATE:
-            os << "ABC_ACTION_DXNSLATE";
-            break;
-        case ABC_ACTION_KILL:
-            os << "ABC_ACTION_KILL";
-            break;
-        case ABC_ACTION_LABEL:
-            os << "ABC_ACTION_LABEL";
-            break;
-        case ABC_ACTION_0x0A:
-            os << "ABC_ACTION_0x0A";
-            break;
-        case ABC_ACTION_0X0B:
-            os << "ABC_ACTION_0X0B";
-            break;
-        case ABC_ACTION_IFNLT:
-            os << "ABC_ACTION_IFNLT";
-            break;
-        case ABC_ACTION_IFNLE:
-            os << "ABC_ACTION_IFNLE";
-            break;
-        case ABC_ACTION_IFNGT:
-            os << "ABC_ACTION_IFNGT";
-            break;
-        case ABC_ACTION_IFNGE:
-            os << "ABC_ACTION_IFNGE";
-            break;
-        case ABC_ACTION_JUMP:
-            os << "ABC_ACTION_JUMP";
-            break;
-        case ABC_ACTION_IFTRUE:
-            os << "ABC_ACTION_IFTRUE";
-            break;
-        case ABC_ACTION_IFFALSE:
-            os << "ABC_ACTION_IFFALSE";
-            break;
-        case ABC_ACTION_IFEQ:
-            os << "ABC_ACTION_IFEQ";
-            break;
-        case ABC_ACTION_IFNE:
-            os << "ABC_ACTION_IFNE";
-            break;
-        case ABC_ACTION_IFLT:
-            os << "ABC_ACTION_IFLT";
-            break;
-        case ABC_ACTION_IFLE:
-            os << "ABC_ACTION_IFLE";
-            break;
-        case ABC_ACTION_IFGT:
-            os << "ABC_ACTION_IFGT";
-            break;
-        case ABC_ACTION_IFGE:
-            os << "ABC_ACTION_IFGE";
-            break;
-        case ABC_ACTION_IFSTRICTEQ:
-            os << "ABC_ACTION_IFSTRICTEQ";
-            break;
-        case ABC_ACTION_IFSTRICTNE:
-            os << "ABC_ACTION_IFSTRICTNE";
-            break;
-        case ABC_ACTION_LOOKUPSWITCH:
-            os << "ABC_ACTION_LOOKUPSWITCH";
-            break;
-        case ABC_ACTION_PUSHWITH:
-            os << "ABC_ACTION_PUSHWITH";
-            break;
-        case ABC_ACTION_POPSCOPE:
-            os << "ABC_ACTION_POPSCOPE";
-            break;
-        case ABC_ACTION_NEXTNAME:
-            os << "ABC_ACTION_NEXTNAME";
-            break;
-        case ABC_ACTION_HASNEXT:
-            os << "ABC_ACTION_HASNEXT";
-            break;
-        case ABC_ACTION_PUSHNULL:
-            os << "ABC_ACTION_PUSHNULL";
-            break;
-        case ABC_ACTION_PUSHUNDEFINED:
-            os << "ABC_ACTION_PUSHUNDEFINED";
-            break;
-        case ABC_ACTION_0x22:
-            os << "ABC_ACTION_0x22";
-            break;
-        case ABC_ACTION_NEXTVALUE:
-            os << "ABC_ACTION_NEXTVALUE";
-            break;
-        case ABC_ACTION_PUSHBYTE:
-            os << "ABC_ACTION_PUSHBYTE";
-            break;
-        case ABC_ACTION_PUSHSHORT:
-            os << "ABC_ACTION_PUSHSHORT";
-            break;
-        case ABC_ACTION_PUSHTRUE:
-            os << "ABC_ACTION_PUSHTRUE";
-            break;
-        case ABC_ACTION_PUSHFALSE:
-            os << "ABC_ACTION_PUSHFALSE";
-            break;
-        case ABC_ACTION_PUSHNAN:
-            os << "ABC_ACTION_PUSHNAN";
-            break;
-        case ABC_ACTION_POP:
-            os << "ABC_ACTION_POP";
-            break;
-        case ABC_ACTION_DUP:
-            os << "ABC_ACTION_DUP";
-            break;
-        case ABC_ACTION_SWAP:
-            os << "ABC_ACTION_SWAP";
-            break;
-        case ABC_ACTION_PUSHSTRING:
-            os << "ABC_ACTION_PUSHSTRING";
-            break;
-        case ABC_ACTION_PUSHINT:
-            os << "ABC_ACTION_PUSHINT";
-            break;
-        case ABC_ACTION_PUSHUINT:
-            os << "ABC_ACTION_PUSHUINT";
-            break;
-        case ABC_ACTION_PUSHDOUBLE:
-            os << "ABC_ACTION_PUSHDOUBLE";
-            break;
-        case ABC_ACTION_PUSHSCOPE:
-            os << "ABC_ACTION_PUSHSCOPE";
-            break;
-        case ABC_ACTION_PUSHNAMESPACE:
-            os << "ABC_ACTION_PUSHNAMESPACE";
-            break;
-        case ABC_ACTION_HASNEXT2:
-            os << "ABC_ACTION_HASNEXT2";
-            break;
-        case ABC_ACTION_0x33:
-            os << "ABC_ACTION_0x33";
-            break;
-        case ABC_ACTION_0x34:
-            os << "ABC_ACTION_0x34";
-            break;
-        case ABC_ACTION_0x35:
-            os << "ABC_ACTION_0x35";
-            break;
-        case ABC_ACTION_0x36:
-            os << "ABC_ACTION_0x36";
-            break;
-        case ABC_ACTION_0x37:
-            os << "ABC_ACTION_0x37";
-            break;
-        case ABC_ACTION_0x38:
-            os << "ABC_ACTION_0x38";
-            break;
-        case ABC_ACTION_0x39:
-            os << "ABC_ACTION_0x39";
-            break;
-        case ABC_ACTION_0x3A:
-            os << "ABC_ACTION_0x3A";
-            break;
-        case ABC_ACTION_0x3B:
-            os << "ABC_ACTION_0x3B";
-            break;
-        case ABC_ACTION_0x3C:
-            os << "ABC_ACTION_0x3C";
-            break;
-        case ABC_ACTION_0x3D:
-            os << "ABC_ACTION_0x3D";
-            break;
-        case ABC_ACTION_0x3E:
-            os << "ABC_ACTION_0x3E";
-            break;
-        case ABC_ACTION_0x3F:
-            os << "ABC_ACTION_0x3F";
-            break;
-        case ABC_ACTION_NEWFUNCTION:
-            os << "ABC_ACTION_NEWFUNCTION";
-            break;
-        case ABC_ACTION_CALL:
-            os << "ABC_ACTION_CALL";
-            break;
-        case ABC_ACTION_CONSTRUCT:
-            os << "ABC_ACTION_CONSTRUCT";
-            break;
-        case ABC_ACTION_CALLMETHOD:
-            os << "ABC_ACTION_CALLMETHOD";
-            break;
-        case ABC_ACTION_CALLSTATIC:
-            os << "ABC_ACTION_CALLSTATIC";
-            break;
-        case ABC_ACTION_CALLSUPER:
-            os << "ABC_ACTION_CALLSUPER";
-            break;
-        case ABC_ACTION_CALLPROPERTY:
-            os << "ABC_ACTION_CALLPROPERTY";
-            break;
-        case ABC_ACTION_RETURNVOID:
-            os << "ABC_ACTION_RETURNVOID";
-            break;
-        case ABC_ACTION_RETURNVALUE:
-            os << "ABC_ACTION_RETURNVALUE";
-            break;
-        case ABC_ACTION_CONSTRUCTSUPER:
-            os << "ABC_ACTION_CONSTRUCTSUPER";
-            break;
-        case ABC_ACTION_CONSTRUCTPROP:
-            os << "ABC_ACTION_CONSTRUCTPROP";
-            break;
-        case ABC_ACTION_CALLSUPERID:
-            os << "ABC_ACTION_CALLSUPERID";
-            break;
-        case ABC_ACTION_CALLPROPLEX:
-            os << "ABC_ACTION_CALLPROPLEX";
-            break;
-        case ABC_ACTION_CALLINTERFACE:
-            os << "ABC_ACTION_CALLINTERFACE";
-            break;
-        case ABC_ACTION_CALLSUPERVOID:
-            os << "ABC_ACTION_CALLSUPERVOID";
-            break;
-        case ABC_ACTION_CALLPROPVOID:
-            os << "ABC_ACTION_CALLPROPVOID";
-            break;
-        case ABC_ACTION_0x50:
-            os << "ABC_ACTION_0x50";
-            break;
-        case ABC_ACTION_0x51:
-            os << "ABC_ACTION_0x51";
-            break;
-        case ABC_ACTION_0x52:
-            os << "ABC_ACTION_0x52";
-            break;
-        case ABC_ACTION_0x53:
-            os << "ABC_ACTION_0x53";
-            break;
-        case ABC_ACTION_0x54:
-            os << "ABC_ACTION_0x54";
-            break;
-        case ABC_ACTION_NEWOBJECT:
-            os << "ABC_ACTION_NEWOBJECT";
-            break;
-        case ABC_ACTION_NEWARRAY:
-            os << "ABC_ACTION_NEWARRAY";
-            break;
-        case ABC_ACTION_NEWACTIVATION:
-            os << "ABC_ACTION_NEWACTIVATION";
-            break;
-        case ABC_ACTION_NEWCLASS:
-            os << "ABC_ACTION_NEWCLASS";
-            break;
-        case ABC_ACTION_GETDESCENDANTS:
-            os << "ABC_ACTION_GETDESCENDANTS";
-            break;
-        case ABC_ACTION_NEWCATCH:
-            os << "ABC_ACTION_NEWCATCH";
-            break;
-        case ABC_ACTION_0x5B:
-            os << "ABC_ACTION_0x5B";
-            break;
-        case ABC_ACTION_0x5C:
-            os << "ABC_ACTION_0x5C";
-            break;
-        case ABC_ACTION_FINDPROPSTRICT:
-            os << "ABC_ACTION_FINDPROPSTRICT";
-            break;
-        case ABC_ACTION_FINDPROPERTY:
-            os << "ABC_ACTION_FINDPROPERTY";
-            break;
-        case ABC_ACTION_FINDDEF:
-            os << "ABC_ACTION_FINDDEF";
-            break;
-        case ABC_ACTION_GETLEX:
-            os << "ABC_ACTION_GETLEX";
-            break;
-        case ABC_ACTION_SETPROPERTY:
-            os << "ABC_ACTION_SETPROPERTY";
-            break;
-        case ABC_ACTION_GETLOCAL:
-            os << "ABC_ACTION_GETLOCAL";
-            break;
-        case ABC_ACTION_SETLOCAL:
-            os << "ABC_ACTION_SETLOCAL";
-            break;
-        case ABC_ACTION_GETGLOBALSCOPE:
-            os << "ABC_ACTION_GETGLOBALSCOPE";
-            break;
-        case ABC_ACTION_GETSCOPEOBJECT:
-            os << "ABC_ACTION_GETSCOPEOBJECT";
-            break;
-        case ABC_ACTION_GETPROPERTY:
-            os << "ABC_ACTION_GETPROPERTY";
-            break;
-        case ABC_ACTION_0x67:
-            os << "ABC_ACTION_0x67";
-            break;
-        case ABC_ACTION_INITPROPERTY:
-            os << "ABC_ACTION_INITPROPERTY";
-            break;
-        case ABC_ACTION_0x69:
-            os << "ABC_ACTION_0x69";
-            break;
-        case ABC_ACTION_DELETEPROPERTY:
-            os << "ABC_ACTION_DELETEPROPERTY";
-            break;
-        case ABC_ACTION_0x6B:
-            os << "ABC_ACTION_0x6B";
-            break;
-        case ABC_ACTION_GETSLOT:
-            os << "ABC_ACTION_GETSLOT";
-            break;
-        case ABC_ACTION_SETSLOT:
-            os << "ABC_ACTION_SETSLOT";
-            break;
-        case ABC_ACTION_GETGLOBALSLOT:
-            os << "ABC_ACTION_GETGLOBALSLOT";
-            break;
-        case ABC_ACTION_SETGLOBALSLOT:
-            os << "ABC_ACTION_SETGLOBALSLOT";
-            break;
-        case ABC_ACTION_CONVERT_S:
-            os << "ABC_ACTION_CONVERT_S";
-            break;
-        case ABC_ACTION_ESC_XELEM:
-            os << "ABC_ACTION_ESC_XELEM";
-            break;
-        case ABC_ACTION_ESC_XATTR:
-            os << "ABC_ACTION_ESC_XATTR";
-            break;
-        case ABC_ACTION_CONVERT_I:
-            os << "ABC_ACTION_CONVERT_I";
-            break;
-        case ABC_ACTION_CONVERT_U:
-            os << "ABC_ACTION_CONVERT_U";
-            break;
-        case ABC_ACTION_CONVERT_D:
-            os << "ABC_ACTION_CONVERT_D";
-            break;
-        case ABC_ACTION_CONVERT_B:
-            os << "ABC_ACTION_CONVERT_B";
-            break;
-        case ABC_ACTION_CONVERT_O:
-            os << "ABC_ACTION_CONVERT_O";
-            break;
-        case ABC_ACTION_CHECKFILTER:
-            os << "ABC_ACTION_CHECKFILTER";
-            break;
-        case ABC_ACTION_0x79:
-            os << "ABC_ACTION_0x79";
-            break;
-        case ABC_ACTION_0x7A:
-            os << "ABC_ACTION_0x7A";
-            break;
-        case ABC_ACTION_0x7B:
-            os << "ABC_ACTION_0x7B";
-            break;
-        case ABC_ACTION_0x7C:
-            os << "ABC_ACTION_0x7C";
-            break;
-        case ABC_ACTION_0x7D:
-            os << "ABC_ACTION_0x7D";
-            break;
-        case ABC_ACTION_0x7E:
-            os << "ABC_ACTION_0x7E";
-            break;
-        case ABC_ACTION_0x7F:
-            os << "ABC_ACTION_0x7F";
-            break;
-        case ABC_ACTION_COERCE:
-            os << "ABC_ACTION_COERCE";
-            break;
-        case ABC_ACTION_COERCE_B:
-            os << "ABC_ACTION_COERCE_B";
-            break;
-        case ABC_ACTION_COERCE_A:
-            os << "ABC_ACTION_COERCE_A";
-            break;
-        case ABC_ACTION_COERCE_I:
-            os << "ABC_ACTION_COERCE_I";
-            break;
-        case ABC_ACTION_COERCE_D:
-            os << "ABC_ACTION_COERCE_D";
-            break;
-        case ABC_ACTION_COERCE_S:
-            os << "ABC_ACTION_COERCE_S";
-            break;
-        case ABC_ACTION_ASTYPE:
-            os << "ABC_ACTION_ASTYPE";
-            break;
-        case ABC_ACTION_ASTYPELATE:
-            os << "ABC_ACTION_ASTYPELATE";
-            break;
-        case ABC_ACTION_COERCE_U:
-            os << "ABC_ACTION_COERCE_U";
-            break;
-        case ABC_ACTION_COERCE_O:
-            os << "ABC_ACTION_COERCE_O";
-            break;
-        case ABC_ACTION_0x8A:
-            os << "ABC_ACTION_0x8A";
-            break;
-        case ABC_ACTION_0x8B:
-            os << "ABC_ACTION_0x8B";
-            break;
-        case ABC_ACTION_0x8C:
-            os << "ABC_ACTION_0x8C";
-            break;
-        case ABC_ACTION_0x8D:
-            os << "ABC_ACTION_0x8D";
-            break;
-        case ABC_ACTION_0x8E:
-            os << "ABC_ACTION_0x8E";
-            break;
-        case ABC_ACTION_0x8F:
-            os << "ABC_ACTION_0x8F";
-            break;
-        case ABC_ACTION_NEGATE:
-            os << "ABC_ACTION_NEGATE";
-            break;
-        case ABC_ACTION_INCREMENT:
-            os << "ABC_ACTION_INCREMENT";
-            break;
-        case ABC_ACTION_INCLOCAL:
-            os << "ABC_ACTION_INCLOCAL";
-            break;
-        case ABC_ACTION_DECREMENT:
-            os << "ABC_ACTION_DECREMENT";
-            break;
-        case ABC_ACTION_DECLOCAL:
-            os << "ABC_ACTION_DECLOCAL";
-            break;
-        case ABC_ACTION_ABC_TYPEOF:
-            os << "ABC_ACTION_ABC_TYPEOF";
-            break;
-        case ABC_ACTION_NOT:
-            os << "ABC_ACTION_NOT";
-            break;
-        case ABC_ACTION_BITNOT:
-            os << "ABC_ACTION_BITNOT";
-            break;
-        case ABC_ACTION_0x98:
-            os << "ABC_ACTION_0x98";
-            break;
-        case ABC_ACTION_0x99:
-            os << "ABC_ACTION_0x99";
-            break;
-        case ABC_ACTION_CONCAT:
-            os << "ABC_ACTION_CONCAT";
-            break;
-        case ABC_ACTION_ADD_D:
-            os << "ABC_ACTION_ADD_D";
-            break;
-        case ABC_ACTION_0x9C:
-            os << "ABC_ACTION_0x9C";
-            break;
-        case ABC_ACTION_0x9D:
-            os << "ABC_ACTION_0x9D";
-            break;
-        case ABC_ACTION_0x9E:
-            os << "ABC_ACTION_0x9E";
-            break;
-        case ABC_ACTION_0x9F:
-            os << "ABC_ACTION_0x9F";
-            break;
-        case ABC_ACTION_ADD     :
-            os << "ABC_ACTION_ADD       ";
-            break;
-        case ABC_ACTION_SUBTRACT:
-            os << "ABC_ACTION_SUBTRACT";
-            break;
-        case ABC_ACTION_MULTIPLY:
-            os << "ABC_ACTION_MULTIPLY";
-            break;
-        case ABC_ACTION_DIVIDE:
-            os << "ABC_ACTION_DIVIDE";
-            break;
-        case ABC_ACTION_MODULO:
-            os << "ABC_ACTION_MODULO";
-            break;
-        case ABC_ACTION_LSHIFT:
-            os << "ABC_ACTION_LSHIFT";
-            break;
-        case ABC_ACTION_RSHIFT:
-            os << "ABC_ACTION_RSHIFT";
-            break;
-        case ABC_ACTION_URSHIFT:
-            os << "ABC_ACTION_URSHIFT";
-            break;
-        case ABC_ACTION_BITAND:
-            os << "ABC_ACTION_BITAND";
-            break;
-        case ABC_ACTION_BITOR:
-            os << "ABC_ACTION_BITOR";
-            break;
-        case ABC_ACTION_BITXOR:
-            os << "ABC_ACTION_BITXOR";
-            break;
-        case ABC_ACTION_EQUALS:
-            os << "ABC_ACTION_EQUALS";
-            break;
-        case ABC_ACTION_STRICTEQUALS:
-            os << "ABC_ACTION_STRICTEQUALS";
-            break;
-        case ABC_ACTION_LESSTHAN:
-            os << "ABC_ACTION_LESSTHAN";
-            break;
-        case ABC_ACTION_LESSEQUALS:
-            os << "ABC_ACTION_LESSEQUALS";
-            break;
-        case ABC_ACTION_GREATERTHAN:
-            os << "ABC_ACTION_GREATERTHAN";
-            break;
-        case ABC_ACTION_GREATEREQUALS:
-            os << "ABC_ACTION_GREATEREQUALS";
-            break;
-        case ABC_ACTION_INSTANCEOF:
-            os << "ABC_ACTION_INSTANCEOF";
-            break;
-        case ABC_ACTION_ISTYPE:
-            os << "ABC_ACTION_ISTYPE";
-            break;
-        case ABC_ACTION_ISTYPELATE:
-            os << "ABC_ACTION_ISTYPELATE";
-            break;
-        case ABC_ACTION_IN:
-            os << "ABC_ACTION_IN";
-            break;
-        case ABC_ACTION_0xB5:
-            os << "ABC_ACTION_0xB5";
-            break;
-        case ABC_ACTION_0xB6:
-            os << "ABC_ACTION_0xB6";
-            break;
-        case ABC_ACTION_0xB7:
-            os << "ABC_ACTION_0xB7";
-            break;
-        case ABC_ACTION_0xB8:
-            os << "ABC_ACTION_0xB8";
-            break;
-        case ABC_ACTION_0xB9:
-            os << "ABC_ACTION_0xB9";
-            break;
-        case ABC_ACTION_0xBA:
-            os << "ABC_ACTION_0xBA";
-            break;
-        case ABC_ACTION_0xBB:
-            os << "ABC_ACTION_0xBB";
-            break;
-        case ABC_ACTION_0xBC:
-            os << "ABC_ACTION_0xBC";
-            break;
-        case ABC_ACTION_0xBD:
-            os << "ABC_ACTION_0xBD";
-            break;
-        case ABC_ACTION_0xBE:
-            os << "ABC_ACTION_0xBE";
-            break;
-        case ABC_ACTION_0xBF:
-            os << "ABC_ACTION_0xBF";
-            break;
-        case ABC_ACTION_INCREMENT_I:
-            os << "ABC_ACTION_INCREMENT_I";
-            break;
-        case ABC_ACTION_DECREMENT_I:
-            os << "ABC_ACTION_DECREMENT_I";
-            break;
-        case ABC_ACTION_INCLOCAL_I:
-            os << "ABC_ACTION_INCLOCAL_I";
-            break;
-        case ABC_ACTION_DECLOCAL_I:
-            os << "ABC_ACTION_DECLOCAL_I";
-            break;
-        case ABC_ACTION_NEGATE_I:
-            os << "ABC_ACTION_NEGATE_I";
-            break;
-        case ABC_ACTION_ADD_I:
-            os << "ABC_ACTION_ADD_I";
-            break;
-        case ABC_ACTION_SUBTRACT_I:
-            os << "ABC_ACTION_SUBTRACT_I";
-            break;
-        case ABC_ACTION_MULTIPLY_I:
-            os << "ABC_ACTION_MULTIPLY_I";
-            break;
-        case ABC_ACTION_0xC8:
-            os << "ABC_ACTION_0xC8";
-            break;
-        case ABC_ACTION_0xC9:
-            os << "ABC_ACTION_0xC9";
-            break;
-        case ABC_ACTION_0xCA:
-            os << "ABC_ACTION_0xCA";
-            break;
-        case ABC_ACTION_0xCB:
-            os << "ABC_ACTION_0xCB";
-            break;
-        case ABC_ACTION_0xCC:
-            os << "ABC_ACTION_0xCC";
-            break;
-        case ABC_ACTION_0xCD:
-            os << "ABC_ACTION_0xCD";
-            break;
-        case ABC_ACTION_0xCE:
-            os << "ABC_ACTION_0xCE";
-            break;
-        case ABC_ACTION_0xCF:
-            os << "ABC_ACTION_0xCF";
-            break;
-        case ABC_ACTION_GETLOCAL0:
-            os << "ABC_ACTION_GETLOCAL0";
-            break;
-        case ABC_ACTION_GETLOCAL1:
-            os << "ABC_ACTION_GETLOCAL1";
-            break;
-        case ABC_ACTION_GETLOCAL2:
-            os << "ABC_ACTION_GETLOCAL2";
-            break;
-        case ABC_ACTION_GETLOCAL3:
-            os << "ABC_ACTION_GETLOCAL3";
-            break;
-        case ABC_ACTION_SETLOCAL0:
-            os << "ABC_ACTION_SETLOCAL0";
-            break;
-        case ABC_ACTION_SETLOCAL1:
-            os << "ABC_ACTION_SETLOCAL1";
-            break;
-        case ABC_ACTION_SETLOCAL2:
-            os << "ABC_ACTION_SETLOCAL2";
-            break;
-        case ABC_ACTION_SETLOCAL3:
-            os << "ABC_ACTION_SETLOCAL3";
-            break;
-        case ABC_ACTION_0xD8:
-            os << "ABC_ACTION_0xD8";
-            break;
-        case ABC_ACTION_0xD9:
-            os << "ABC_ACTION_0xD9";
-            break;
-        case ABC_ACTION_0xDA:
-            os << "ABC_ACTION_0xDA";
-            break;
-        case ABC_ACTION_0xDB:
-            os << "ABC_ACTION_0xDB";
-            break;
-        case ABC_ACTION_0xDC:
-            os << "ABC_ACTION_0xDC";
-            break;
-        case ABC_ACTION_0xDD:
-            os << "ABC_ACTION_0xDD";
-            break;
-        case ABC_ACTION_0xDE:
-            os << "ABC_ACTION_0xDE";
-            break;
-        case ABC_ACTION_0xDF:
-            os << "ABC_ACTION_0xDF";
-            break;
-        case ABC_ACTION_0xE0:
-            os << "ABC_ACTION_0xE0";
-            break;
-        case ABC_ACTION_0xE1:
-            os << "ABC_ACTION_0xE1";
-            break;
-        case ABC_ACTION_0xE2:
-            os << "ABC_ACTION_0xE2";
-            break;
-        case ABC_ACTION_0xE3:
-            os << "ABC_ACTION_0xE3";
-            break;
-        case ABC_ACTION_0xE4:
-            os << "ABC_ACTION_0xE4";
-            break;
-        case ABC_ACTION_0xE5:
-            os << "ABC_ACTION_0xE5";
-            break;
-        case ABC_ACTION_0xE6:
-            os << "ABC_ACTION_0xE6";
-            break;
-        case ABC_ACTION_0xE7:
-            os << "ABC_ACTION_0xE7";
-            break;
-        case ABC_ACTION_0xE8:
-            os << "ABC_ACTION_0xE8";
-            break;
-        case ABC_ACTION_0xE9:
-            os << "ABC_ACTION_0xE9";
-            break;
-        case ABC_ACTION_0xEA:
-            os << "ABC_ACTION_0xEA";
-            break;
-        case ABC_ACTION_0xEB:
-            os << "ABC_ACTION_0xEB";
-            break;
-        case ABC_ACTION_0xEC:
-            os << "ABC_ACTION_0xEC";
-            break;
-        case ABC_ACTION_0xED:
-            os << "ABC_ACTION_0xED";
-            break;
-        case ABC_ACTION_ABS_JUMP:
-            os << "ABC_ACTION_ABS_JUMP";
-            break;
-        case ABC_ACTION_DEBUG:
-            os << "ABC_ACTION_DEBUG";
-            break;
-        case ABC_ACTION_DEBUGLINE:
-            os << "ABC_ACTION_DEBUGLINE";
-            break;
-        case ABC_ACTION_DEBUGFILE:
-            os << "ABC_ACTION_DEBUGFILE";
-            break;
-        case ABC_ACTION_BKPTLINE:
-            os << "ABC_ACTION_BKPTLINE";
-            break;
-        case ABC_ACTION_TIMESTAMP:
-            os << "ABC_ACTION_TIMESTAMP";
-            break;
-        case ABC_ACTION_0xF4:
-            os << "ABC_ACTION_0xF4";
-            break;
-        case ABC_ACTION_VERIFYPASS:
-            os << "ABC_ACTION_VERIFYPASS";
-            break;
-        case ABC_ACTION_ALLOC:
-            os << "ABC_ACTION_ALLOC";
-            break;
-        case ABC_ACTION_MARK:
-            os << "ABC_ACTION_MARK";
-            break;
-        case ABC_ACTION_WB:
-            os << "ABC_ACTION_WB";
-            break;
-        case ABC_ACTION_PROLOGUE:
-            os << "ABC_ACTION_PROLOGUE";
-            break;
-        case ABC_ACTION_SENDENTER:
-            os << "ABC_ACTION_SENDENTER";
-            break;
-        case ABC_ACTION_DOUBLETOATOM:
-            os << "ABC_ACTION_DOUBLETOATOM";
-            break;
-        case ABC_ACTION_SWEEP:
-            os << "ABC_ACTION_SWEEP";
-            break;
-        case ABC_ACTION_CODEGENOP:
-            os << "ABC_ACTION_CODEGENOP";
-            break;
-        case ABC_ACTION_VERIFYOP:
-            os << "ABC_ACTION_VERIFYOP";
-            break;
-        default:
-            os << "UNKNOWN";
-            break;
+    os << "ABC action: ";
+
+    switch (opcode) {
+        case ABC_ACTION_END: return os << "END";
+        case ABC_ACTION_BKPT: return os << "BKPT";
+        case ABC_ACTION_NOP: return os << "NOP";
+        case ABC_ACTION_THROW: return os << "THROW";
+        case ABC_ACTION_GETSUPER: return os << "GETSUPER";
+        case ABC_ACTION_SETSUPER: return os << "SETSUPER";
+        case ABC_ACTION_DXNS: return os << "DXNS";
+        case ABC_ACTION_DXNSLATE: return os << "DXNSLATE";
+        case ABC_ACTION_KILL: return os << "KILL";
+        case ABC_ACTION_LABEL: return os << "LABEL";
+        case ABC_ACTION_IFNLT: return os << "IFNLT";
+        case ABC_ACTION_IFNLE: return os << "IFNLE";
+        case ABC_ACTION_IFNGT: return os << "IFNGT";
+        case ABC_ACTION_IFNGE: return os << "IFNGE";
+        case ABC_ACTION_JUMP: return os << "JUMP";
+        case ABC_ACTION_IFTRUE: return os << "IFTRUE";
+        case ABC_ACTION_IFFALSE: return os << "IFFALSE";
+        case ABC_ACTION_IFEQ: return os << "IFEQ";
+        case ABC_ACTION_IFNE: return os << "IFNE";
+        case ABC_ACTION_IFLT: return os << "IFLT";
+        case ABC_ACTION_IFLE: return os << "IFLE";
+        case ABC_ACTION_IFGT: return os << "IFGT";
+        case ABC_ACTION_IFGE: return os << "IFGE";
+        case ABC_ACTION_IFSTRICTEQ: return os << "IFSTRICTEQ";
+        case ABC_ACTION_IFSTRICTNE: return os << "IFSTRICTNE";
+        case ABC_ACTION_LOOKUPSWITCH: return os << "LOOKUPSWITCH";
+        case ABC_ACTION_PUSHWITH: return os << "PUSHWITH";
+        case ABC_ACTION_POPSCOPE: return os << "POPSCOPE";
+        case ABC_ACTION_NEXTNAME: return os << "NEXTNAME";
+        case ABC_ACTION_HASNEXT: return os << "HASNEXT";
+        case ABC_ACTION_PUSHNULL: return os << "PUSHNULL";
+        case ABC_ACTION_PUSHUNDEFINED: return os << "PUSHUNDEFINED";
+        case ABC_ACTION_NEXTVALUE: return os << "NEXTVALUE";
+        case ABC_ACTION_PUSHBYTE: return os << "PUSHBYTE";
+        case ABC_ACTION_PUSHSHORT: return os << "PUSHSHORT";
+        case ABC_ACTION_PUSHTRUE: return os << "PUSHTRUE";
+        case ABC_ACTION_PUSHFALSE: return os << "PUSHFALSE";
+        case ABC_ACTION_PUSHNAN: return os << "PUSHNAN";
+        case ABC_ACTION_POP: return os << "POP";
+        case ABC_ACTION_DUP: return os << "DUP";
+        case ABC_ACTION_SWAP: return os << "SWAP";
+        case ABC_ACTION_PUSHSTRING: return os << "PUSHSTRING";
+        case ABC_ACTION_PUSHINT: return os << "PUSHINT";
+        case ABC_ACTION_PUSHUINT: return os << "PUSHUINT";
+        case ABC_ACTION_PUSHDOUBLE: return os << "PUSHDOUBLE";
+        case ABC_ACTION_PUSHSCOPE: return os << "PUSHSCOPE";
+        case ABC_ACTION_PUSHNAMESPACE: return os << "PUSHNAMESPACE";
+        case ABC_ACTION_HASNEXT2: return os << "HASNEXT2";
+        case ABC_ACTION_NEWFUNCTION: return os << "NEWFUNCTION";
+        case ABC_ACTION_CALL: return os << "CALL";
+        case ABC_ACTION_CONSTRUCT: return os << "CONSTRUCT";
+        case ABC_ACTION_CALLMETHOD: return os << "CALLMETHOD";
+        case ABC_ACTION_CALLSTATIC: return os << "CALLSTATIC";
+        case ABC_ACTION_CALLSUPER: return os << "CALLSUPER";
+        case ABC_ACTION_CALLPROPERTY: return os << "CALLPROPERTY";
+        case ABC_ACTION_RETURNVOID: return os << "RETURNVOID";
+        case ABC_ACTION_RETURNVALUE: return os << "RETURNVALUE";
+        case ABC_ACTION_CONSTRUCTSUPER: return os << "CONSTRUCTSUPER";
+        case ABC_ACTION_CONSTRUCTPROP: return os << "CONSTRUCTPROP";
+        case ABC_ACTION_CALLSUPERID: return os << "CALLSUPERID";
+        case ABC_ACTION_CALLPROPLEX: return os << "CALLPROPLEX";
+        case ABC_ACTION_CALLINTERFACE: return os << "CALLINTERFACE";
+        case ABC_ACTION_CALLSUPERVOID: return os << "CALLSUPERVOID";
+        case ABC_ACTION_CALLPROPVOID: return os << "CALLPROPVOID";
+        case ABC_ACTION_NEWOBJECT: return os << "NEWOBJECT";
+        case ABC_ACTION_NEWARRAY: return os << "NEWARRAY";
+        case ABC_ACTION_NEWACTIVATION: return os << "NEWACTIVATION";
+        case ABC_ACTION_NEWCLASS: return os << "NEWCLASS";
+        case ABC_ACTION_GETDESCENDANTS: return os << "GETDESCENDANTS";
+        case ABC_ACTION_NEWCATCH: return os << "NEWCATCH";
+        case ABC_ACTION_FINDPROPSTRICT: return os << "FINDPROPSTRICT";
+        case ABC_ACTION_FINDPROPERTY: return os << "FINDPROPERTY";
+        case ABC_ACTION_FINDDEF: return os << "FINDDEF";
+        case ABC_ACTION_GETLEX: return os << "GETLEX";
+        case ABC_ACTION_SETPROPERTY: return os << "SETPROPERTY";
+        case ABC_ACTION_GETLOCAL: return os << "GETLOCAL";
+        case ABC_ACTION_SETLOCAL: return os << "SETLOCAL";
+        case ABC_ACTION_GETGLOBALSCOPE: return os << "GETGLOBALSCOPE";
+        case ABC_ACTION_GETSCOPEOBJECT: return os << "GETSCOPEOBJECT";
+        case ABC_ACTION_GETPROPERTY: return os << "GETPROPERTY";
+        case ABC_ACTION_INITPROPERTY: return os << "INITPROPERTY";
+        case ABC_ACTION_DELETEPROPERTY: return os << "DELETEPROPERTY";
+        case ABC_ACTION_GETSLOT: return os << "GETSLOT";
+        case ABC_ACTION_SETSLOT: return os << "SETSLOT";
+        case ABC_ACTION_GETGLOBALSLOT: return os << "GETGLOBALSLOT";
+        case ABC_ACTION_SETGLOBALSLOT: return os << "SETGLOBALSLOT";
+        case ABC_ACTION_CONVERT_S: return os << "CONVERT_S";
+        case ABC_ACTION_ESC_XELEM: return os << "ESC_XELEM";
+        case ABC_ACTION_ESC_XATTR: return os << "ESC_XATTR";
+        case ABC_ACTION_CONVERT_I: return os << "CONVERT_I";
+        case ABC_ACTION_CONVERT_U: return os << "CONVERT_U";
+        case ABC_ACTION_CONVERT_D: return os << "CONVERT_D";
+        case ABC_ACTION_CONVERT_B: return os << "CONVERT_B";
+        case ABC_ACTION_CONVERT_O: return os << "CONVERT_O";
+        case ABC_ACTION_CHECKFILTER: return os << "CHECKFILTER";
+        case ABC_ACTION_COERCE: return os << "COERCE";
+        case ABC_ACTION_COERCE_B: return os << "COERCE_B";
+        case ABC_ACTION_COERCE_A: return os << "COERCE_A";
+        case ABC_ACTION_COERCE_I: return os << "COERCE_I";
+        case ABC_ACTION_COERCE_D: return os << "COERCE_D";
+        case ABC_ACTION_COERCE_S: return os << "COERCE_S";
+        case ABC_ACTION_ASTYPE: return os << "ASTYPE";
+        case ABC_ACTION_ASTYPELATE: return os << "ASTYPELATE";
+        case ABC_ACTION_COERCE_U: return os << "COERCE_U";
+        case ABC_ACTION_COERCE_O: return os << "COERCE_O";
+        case ABC_ACTION_NEGATE: return os << "NEGATE";
+        case ABC_ACTION_INCREMENT: return os << "INCREMENT";
+        case ABC_ACTION_INCLOCAL: return os << "INCLOCAL";
+        case ABC_ACTION_DECREMENT: return os << "DECREMENT";
+        case ABC_ACTION_DECLOCAL: return os << "DECLOCAL";
+        case ABC_ACTION_ABC_TYPEOF: return os << "ABC_TYPEOF";
+        case ABC_ACTION_NOT: return os << "NOT";
+        case ABC_ACTION_BITNOT: return os << "BITNOT";
+        case ABC_ACTION_CONCAT: return os << "CONCAT";
+        case ABC_ACTION_ADD_D: return os << "ADD_D";
+        case ABC_ACTION_ADD     : return os << "ADD       ";
+        case ABC_ACTION_SUBTRACT: return os << "SUBTRACT";
+        case ABC_ACTION_MULTIPLY: return os << "MULTIPLY";
+        case ABC_ACTION_DIVIDE: return os << "DIVIDE";
+        case ABC_ACTION_MODULO: return os << "MODULO";
+        case ABC_ACTION_LSHIFT: return os << "LSHIFT";
+        case ABC_ACTION_RSHIFT: return os << "RSHIFT";
+        case ABC_ACTION_URSHIFT: return os << "URSHIFT";
+        case ABC_ACTION_BITAND: return os << "BITAND";
+        case ABC_ACTION_BITOR: return os << "BITOR";
+        case ABC_ACTION_BITXOR: return os << "BITXOR";
+        case ABC_ACTION_EQUALS: return os << "EQUALS";
+        case ABC_ACTION_STRICTEQUALS: return os << "STRICTEQUALS";
+        case ABC_ACTION_LESSTHAN: return os << "LESSTHAN";
+        case ABC_ACTION_LESSEQUALS: return os << "LESSEQUALS";
+        case ABC_ACTION_GREATERTHAN: return os << "GREATERTHAN";
+        case ABC_ACTION_GREATEREQUALS: return os << "GREATEREQUALS";
+        case ABC_ACTION_INSTANCEOF: return os << "INSTANCEOF";
+        case ABC_ACTION_ISTYPE: return os << "ISTYPE";
+        case ABC_ACTION_ISTYPELATE: return os << "ISTYPELATE";
+        case ABC_ACTION_IN: return os << "IN";
+        case ABC_ACTION_INCREMENT_I: return os << "INCREMENT_I";
+        case ABC_ACTION_DECREMENT_I: return os << "DECREMENT_I";
+        case ABC_ACTION_INCLOCAL_I: return os << "INCLOCAL_I";
+        case ABC_ACTION_DECLOCAL_I: return os << "DECLOCAL_I";
+        case ABC_ACTION_NEGATE_I: return os << "NEGATE_I";
+        case ABC_ACTION_ADD_I: return os << "ADD_I";
+        case ABC_ACTION_SUBTRACT_I: return os << "SUBTRACT_I";
+        case ABC_ACTION_MULTIPLY_I: return os << "MULTIPLY_I";
+        case ABC_ACTION_GETLOCAL0: return os << "GETLOCAL0";
+        case ABC_ACTION_GETLOCAL1: return os << "GETLOCAL1";
+        case ABC_ACTION_GETLOCAL2: return os << "GETLOCAL2";
+        case ABC_ACTION_GETLOCAL3: return os << "GETLOCAL3";
+        case ABC_ACTION_SETLOCAL0: return os << "SETLOCAL0";
+        case ABC_ACTION_SETLOCAL1: return os << "SETLOCAL1";
+        case ABC_ACTION_SETLOCAL2: return os << "SETLOCAL2";
+        case ABC_ACTION_SETLOCAL3: return os << "SETLOCAL3";
+        case ABC_ACTION_ABS_JUMP: return os << "ABS_JUMP";
+        case ABC_ACTION_DEBUG: return os << "DEBUG";
+        case ABC_ACTION_DEBUGLINE: return os << "DEBUGLINE";
+        case ABC_ACTION_DEBUGFILE: return os << "DEBUGFILE";
+        case ABC_ACTION_BKPTLINE: return os << "BKPTLINE";
+        case ABC_ACTION_TIMESTAMP: return os << "TIMESTAMP";
+        case ABC_ACTION_VERIFYPASS: return os << "VERIFYPASS";
+        case ABC_ACTION_ALLOC: return os << "ALLOC";
+        case ABC_ACTION_MARK: return os << "MARK";
+        case ABC_ACTION_WB: return os << "WB";
+        case ABC_ACTION_PROLOGUE: return os << "PROLOGUE";
+        case ABC_ACTION_SENDENTER: return os << "SENDENTER";
+        case ABC_ACTION_DOUBLETOATOM: return os << "DOUBLETOATOM";
+        case ABC_ACTION_SWEEP: return os << "SWEEP";
+        case ABC_ACTION_CODEGENOP: return os << "CODEGENOP";
+        case ABC_ACTION_VERIFYOP: return os << "VERIFYOP";
+        default: return os << "UNKNOWN " << std::hex << +opcode;
     }
-    return os;
 }
 
 } // namespace gnash::SWF
