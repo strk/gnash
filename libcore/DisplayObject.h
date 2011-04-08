@@ -30,6 +30,7 @@
 #include <cassert>
 #include <boost/cstdint.hpp> // For C99 int types
 #include <boost/noncopyable.hpp>
+#include <boost/logic/tribool.hpp>
 
 #include "ObjectURI.h" 
 #include "GC.h"
@@ -957,6 +958,14 @@ public:
     /// DisplayObjects should mark their own resources in this function.
     virtual void markOwnResources() const {}
 
+    boost::tribool focusRect() const {
+        return _focusRect;
+    }
+
+    void focusRect(boost::tribool focus) {
+        _focusRect = focus;
+    }
+
 protected:
     
     /// Render a dynamic mask for a specified DisplayObject
@@ -1052,6 +1061,8 @@ private:
 
     /// The depth of this DisplayObject.
     boost::int32_t _depth;
+
+    boost::tribool _focusRect;
 
     /// Volume control associated to this DisplayObject
     //

@@ -619,8 +619,8 @@ check_equals(tf._framesloaded, undefined);
 // Check TextField._focusrect
 check(tf._focusrect !== 'null');
 check(tf._focusRect !== 'null');
-xcheck_equals(typeof(tf._focusrect), 'null');
-xcheck_equals(typeof(tf._focusRect), 'null');
+check_equals(typeof(tf._focusrect), 'null');
+check_equals(typeof(tf._focusRect), 'null');
 check(! tf.hasOwnProperty('_focusrect') ); 
 check(! tf.__proto__.hasOwnProperty('_focusrect') ); 
 
