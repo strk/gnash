@@ -24,6 +24,7 @@
 #include <memory> 
 #include <vector> 
 
+#include "Video_as.h"
 #include "RunResources.h"
 #include "Video.h"
 #include "MediaParser.h" // for VideoInfo

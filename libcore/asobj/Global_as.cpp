@@ -76,7 +76,7 @@
 #include "flash/external/ExternalInterface_as.h"
 #include "MovieClipLoader.h"
 #include "movie_definition.h"
-#include "Video.h"
+#include "Video_as.h"
 #include "extension.h"
 #include "VM.h"
 #include "Timers.h"

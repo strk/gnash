@@ -46,6 +46,7 @@ libgnashasobjs_la_SOURCES = \
 	asobj/Stage_as.cpp \
 	asobj/Accessibility_as.cpp \
 	asobj/Sound_as.cpp \
+	asobj/Video_as.cpp \
 	asobj/Microphone_as.cpp \
 	asobj/Camera_as.cpp \
 	asobj/LocalConnection_as.cpp \
@@ -86,6 +87,7 @@ inst_HEADERS = \
 	asobj/Stage_as.h \
 	asobj/Accessibility_as.h \
 	asobj/Sound_as.h \
+	asobj/Video_as.h \
 	asobj/Microphone_as.h \
 	asobj/Camera_as.h \
 	asobj/LocalConnection_as.h \
