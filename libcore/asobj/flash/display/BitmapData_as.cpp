@@ -123,14 +123,14 @@ namespace {
 template<typename RNG = boost::rand48>
 struct Noise
 {
-    Noise(int seed, boost::uint8_t low, boost::uint8_t high)
+    Noise(int seed, int low, int high)
         :
         rng(seed),
         dist(low, high),
         uni(rng, dist)
     {}
 
-    boost::uint8_t operator()() {
+    int operator()() {
         return uni();
     }
 
