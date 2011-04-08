@@ -491,6 +491,9 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // Now that we know about movie size, create gui window.
     _gui->createWindow(_url.c_str(), _width, _height, _xPosition, _yPosition);
 
+    { // we construct movie_root in its own scope, to be sure it's destroyed
+      // (bringing down the MovieLoader) before we clear the MovieLibrary
+
     movie_root root(_gui->getClock(), *_runResources);
     
     _callbacksHandler.reset(new CallbacksHandler(*_gui, *this)); 
@@ -644,7 +647,10 @@ Player::run(int argc, char* argv[], const std::string& infile,
 
     log_debug("Main loop ended, cleaning up");
 
-    // Clean up as much as possible, so valgrind will help find actual leaks.
+    }
+
+    // Clean up the MovieLibrary so left-over SWFMovieDefinitions
+    // get destroyed and join any loader thread
     MovieFactory::clear();
 
 }
