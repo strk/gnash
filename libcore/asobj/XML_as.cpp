@@ -67,6 +67,9 @@ namespace {
             const std::string& match, bool advance = true);
     bool parseNodeWithTerminator( xml_iterator& it, xml_iterator end,
             const std::string& terminator, std::string& content);
+
+    void setIdMap(as_object& xml, XMLNode_as& childNode,
+            const std::string& val);
 	
 	
     typedef std::map<std::string, std::string> Entities;
@@ -345,37 +348,14 @@ XML_as::parseTag(XMLNode_as*& node, xml_iterator& it,
         // Do nothing more if there was an error in attributes parsing.
         if (_status != XML_OK) return;
 
+        // testsuite/swfdec/xml-id-map.as tests that the node is appended
+        // first.
         node->appendChild(childNode);
 
         for (Attributes::const_reverse_iterator i = attributes.rbegin(),
                 e = attributes.rend(); i != e; ++i) {
-
             childNode->setAttribute(i->first, i->second);
-
-            if (i->first == "id") {
-                VM& vm = getVM(*object());
-                const ObjectURI& id = getURI(vm, "idMap");
-
-                if (getSWFVersion(*object()) > 7) {
-                    as_value im;
-                    as_object* idMap;
-                    if (object()->get_member(id, &im)) {
-                        idMap = toObject(im, vm);
-                        if (!idMap) {
-                            // If it's present but not an object just ignore it
-                            // and carry on.
-                            continue;
-                        }
-                    }
-                    else {
-                        // If it's not there at all create it.
-                        idMap = new as_object(getGlobal(*object()));
-                        object()->set_member(id, idMap);
-                    }
-                    idMap->set_member(getURI(vm, i->second), childNode->object());
-                }
-                else object()->set_member(getURI(vm, i->second), childNode->object());
-            }
+            if (i->first == "id") setIdMap(*object(), *childNode, i->second);
         }
 
         if (*it == '/') ++it;
@@ -702,8 +682,12 @@ as_value
 xml_ignoreWhite(const fn_call& fn)
 {
     XML_as* ptr = ensure<ThisIsNative<XML_as> >(fn);
-    if (!fn.nargs) return as_value(ptr->ignoreWhite());
+    if (!fn.nargs) {
+        // Getter
+        return as_value(ptr->ignoreWhite());
+    }
 
+    // Setter
     if (fn.arg(0).is_undefined()) return as_value();
     ptr->ignoreWhite(toBool(fn.arg(0), getVM(fn)));
     return as_value();
@@ -928,6 +912,39 @@ parseNodeWithTerminator(xml_iterator& it, const xml_iterator end,
     it = ourend + terminator.length();
 
     return true;
+}
+
+
+void
+setIdMap(as_object& xml, XMLNode_as& childNode, const std::string& val)
+{
+    VM& vm = getVM(xml);
+
+    const ObjectURI& id = getURI(vm, "idMap");
+
+    if (getSWFVersion(xml) < 8) {
+        // In version 7 or below, properties are added to the XML object.
+        xml.set_member(getURI(vm, val), childNode.object());
+        return;
+    }
+
+    // In version 8 or above, properties are added to an idMap member.
+    as_value im;
+    as_object* idMap;
+    if (xml.get_member(id, &im)) {
+        // If it's present but not an object just ignore it
+        // and carry on.
+        if (!im.is_object()) return;
+
+        idMap = toObject(im, vm);
+        assert(idMap);
+    }
+    else {
+        // If it's not there at all create it.
+        idMap = new as_object(getGlobal(xml));
+        xml.set_member(id, idMap);
+    }
+    idMap->set_member(getURI(vm, val), childNode.object());
 }
 
 const Entities&
