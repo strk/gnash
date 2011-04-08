@@ -27,6 +27,7 @@
 #include <boost/random.hpp>
 #include <boost/iterator/zip_iterator.hpp>
 #include <boost/tuple/tuple.hpp>
+#include <boost/array.hpp>
 
 #include "MovieClip.h"
 #include "GnashImage.h"
@@ -133,6 +134,10 @@ struct Noise
         return uni();
     }
 
+    int operator()(int val) {
+        return uni(val);
+    }
+
 private:
     RNG rng;
     boost::uniform_int<> dist;
@@ -214,6 +219,144 @@ private:
     const boost::uint8_t _destchans;
 
 };
+
+template<typename T> 
+T easeCurve(T t)
+{
+    return t * t * (3.0 - 2.0 * t);
+}
+
+template<typename T>
+void normalize(T& a, T& b)
+{
+    const T s = std::sqrt(a * a + b * b);
+    a /= s;
+    b /= s;
+}
+
+template<typename T, boost::uint32_t B = 0x100>
+struct PerlinNoise
+{
+    PerlinNoise(int seed)
+        :
+        N(0x1000),
+        noise(seed, 0, RAND_MAX)
+    {
+        init();
+    }
+
+    T operator()(T x, T y) {
+
+        // Point to the right
+        size_t bx0;
+        // Point to the left
+        size_t bx1;
+        // Point above
+        size_t by0;
+        // Point below.
+        size_t by1;
+
+        // Actual distance from the respective integer positions.
+        T rx0, rx1, ry0, ry1;
+
+        // Compute integer positions of surrounding points and
+        // vectors.
+        setup(x, bx0, bx1, rx0, rx1);
+        setup(y, by0, by1, ry0, ry1);
+
+        assert(bx0 < permTable.size());
+        assert(bx1 < permTable.size());
+
+        const int i = permTable[bx0];
+        const int j = permTable[bx1];
+
+        assert(i + by0 < permTable.size());
+        assert(j + by0 < permTable.size());
+        assert(i + by1 < permTable.size());
+        assert(j + by0 < permTable.size());
+
+        // Permute values to get indices in the lookup tables.
+        const size_t b00 = permTable[i + by0];
+        const size_t b10 = permTable[j + by0];
+        const size_t b01 = permTable[i + by1];
+        const size_t b11 = permTable[j + by1];
+
+        // Dot product of vectors and gradients.
+        const T u = rx0 * g2[b00][0] + ry0 * g2[b00][1];
+        const T v = rx1 * g2[b10][0] + ry0 * g2[b10][1];
+        const T u1 = rx0 * g2[b01][0] + ry1 * g2[b01][1];
+        const T v1 = rx1 * g2[b11][0] + ry1 * g2[b11][1];
+
+        // Cubic ease curve for interpolation.
+        const T sx = easeCurve(rx0);
+        const T sy = easeCurve(ry0);
+
+        // X-axis interpolation.
+        const T a = lerp<T>(u, v, sx);
+        const T b = lerp<T>(u1, v1, sx);
+
+        // Y-axis interpolation.
+        return lerp<T>(a, b, sy);
+    }
+
+private:
+
+    void setup(T i, size_t& b0, size_t& b1, T& r0, T& r1) {
+        const T t = i + N;
+
+        // Let the compiler optimize this if B is a power of two.
+        b0 = (static_cast<size_t>(t)) % B;
+        b1 = (b0 + 1) % B;
+        
+        // Calculate vectors to surrounding points.
+        r0 = t - static_cast<size_t>(t);
+        r1 = r0 - 1.0;
+    }
+
+    void init() {
+
+        for (size_t i = 0 ; i < B; ++i) {
+            permTable[i] = i;
+            for (size_t j = 0; j < 2; ++j) {
+                // If B is an unsigned int, noise() * 2 * B - B is unsigned
+                // (if it's an unsigned short, the result is signed!) so
+                // cast here in case of any future changes.
+                const int b = B;
+                g2[i][j] = static_cast<T>(noise() % (2 * b) - b) / b;
+            }
+            normalize(g2[i][0], g2[i][1]);
+        }
+
+        std::random_shuffle(permTable.begin(), permTable.begin() + B, noise);
+
+        std::copy(
+                boost::make_zip_iterator(
+                    boost::make_tuple(permTable.begin(), g2.begin())),
+                boost::make_zip_iterator(
+                    boost::make_tuple(permTable.begin(), g2.begin())) + B,
+                boost::make_zip_iterator(
+                    boost::make_tuple(permTable.begin(), g2.begin())) + B);
+
+        std::copy(
+                boost::make_zip_iterator(
+                    boost::make_tuple(permTable.begin(), g2.begin())),
+                boost::make_zip_iterator(
+                    boost::make_tuple(permTable.begin(), g2.begin())) + 2,
+                boost::make_zip_iterator(
+                    boost::make_tuple(permTable.begin(), g2.begin())) + 2 * B);
+    }
+
+    const size_t N;
+
+    // A random permutation table.
+    boost::array<size_t, B * 2 + 2> permTable;
+
+    // The gradient stuff.
+    boost::array<boost::array<T, 2>, B * 2 + 2> g2;
+
+    Noise<> noise;
+};
+
 
 /// Index iterators by x and y position
 //
@@ -1120,8 +1263,47 @@ as_value
 bitmapdata_perlinNoise(const fn_call& fn)
 {
 	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
+
+    if (ptr->disposed()) return as_value();
+
+    if (fn.nargs < 4) {
+        return as_value();
+    }
+    const double baseX = toNumber(fn.arg(0), getVM(fn));
+    const double baseY = toNumber(fn.arg(1), getVM(fn));
+    const int octave = std::max(0, toInt(fn.arg(2), getVM(fn)));
+    const int seed = toInt(fn.arg(3), getVM(fn));
+
+    // 256 square. base 20 = 256 in 20; base 100 = 256 in 100.
+    const double square = 256.0;
+
+#if 0
+    const boost::uint8_t chans = fn.nargs > 3 ?
+        std::abs(toInt(fn.arg(3), getVM(fn))) & 15 : 1 | 2 | 4;
+
+    const bool greyscale = fn.nargs > 4 ?
+        toBool(fn.arg(4), getVM(fn)) : false;
+#endif 
+
+    PerlinNoise<double, 0xff> p(seed);
+
+    for (size_t i = 0; i < ptr->height(); ++i) {
+        for (size_t j = 0; j < ptr->width(); ++j) {
+
+            // Each octave is twice as frequent as the last;
+            // Amplitude seems relatively similar
+            for (int oct = 0; oct < octave; ++oct) {
+                const double freqX = baseX / std::pow(2, oct);
+                const double freqY = baseY / std::pow(2, oct);
+                val = std::abs(p((i / square) * freqX, (j / square) * freqY) * amp);
+            }
+            val = clamp(val, 1, 255);
+            ptr->setPixel(j, i, val | val << 8 | val << 16);
+        }
+    }
+    
+    ptr->updateObjects();
+
 	return as_value();
 }
 
