@@ -910,12 +910,12 @@ myxml.onLoad = function(success)
 #endif
 	{
 #if OUTPUT_VERSION < 6
-		check_totals(429);
+		check_totals(431);
 #else
 # if OUTPUT_VERSION < 8
-		check_totals(466);
+		check_totals(468);
 # else
-		check_totals(447);
+		check_totals(449);
 # endif
 #endif
 		play();
@@ -1005,6 +1005,12 @@ check_equals(myxml2.toString(), "<X1 />");
 myxml2.ignoreWhite = true; 
 myxml2.parseXML("<X1> t </X1>");
 check_equals(myxml2.toString(), "<X1> t </X1>"); 
+
+myxml2.ignoreWhite = 8;
+check_equals(myxml2.ignoreWhite, true);
+
+myxml2.ignoreWhite = 0;
+check_equals(myxml2.ignoreWhite, false);
 
 /// Check various malformed XMLs
 

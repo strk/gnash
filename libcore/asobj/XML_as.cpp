@@ -58,6 +58,7 @@ namespace {
     as_value xml_escape(const fn_call& fn);
     as_value xml_loaded(const fn_call& fn);
     as_value xml_status(const fn_call& fn);
+    as_value xml_ignoreWhite(const fn_call& fn);
 
     typedef XML_as::xml_iterator xml_iterator;
 
@@ -81,7 +82,8 @@ XML_as::XML_as(as_object& object)
     :
     XMLNode_as(getGlobal(object)),
     _loaded(XML_LOADED_UNDEFINED), 
-    _status(XML_OK)
+    _status(XML_OK),
+    _ignoreWhite(false)
 {
     setObject(&object);
 }
@@ -91,7 +93,8 @@ XML_as::XML_as(as_object& object, const std::string& xml)
     :
     XMLNode_as(getGlobal(object)),
     _loaded(XML_LOADED_UNDEFINED), 
-    _status(XML_OK)
+    _status(XML_OK),
+    _ignoreWhite(false)
 {
     setObject(&object);
     parseXML(xml);
@@ -344,7 +347,30 @@ XML_as::parseTag(XMLNode_as*& node, xml_iterator& it,
 
         for (Attributes::const_reverse_iterator i = attributes.rbegin(),
                 e = attributes.rend(); i != e; ++i) {
+
             childNode->setAttribute(i->first, i->second);
+
+            if (i->first == "id") {
+                VM& vm = getVM(*object());
+                const ObjectURI& id = getURI(vm, "idMap");
+
+                as_value im;
+                as_object* idMap;
+                if (object()->get_member(id, &im)) {
+                    idMap = toObject(im, vm);
+                    if (!idMap) {
+                        // If it's present but not an object just ignore it
+                        // and carry on.
+                        continue;
+                    }
+                }
+                else {
+                    // If it's not there at all create it.
+                    idMap = new as_object(getGlobal(*object()));
+                    object()->set_member(id, idMap);
+                }
+                idMap->set_member(getURI(vm, i->second), childNode->object());
+            }
         }
 
         node->appendChild(childNode);
@@ -392,14 +418,14 @@ XML_as::parseTag(XMLNode_as*& node, xml_iterator& it,
 
 void
 XML_as::parseText(XMLNode_as* node, xml_iterator& it,
-        const xml_iterator end)
+        const xml_iterator end, bool iw)
 {
     xml_iterator ourend = std::find(it, end, '<');
     std::string content(it, ourend);
     
     it = ourend;
 
-    if (ignoreWhite() && 
+    if (iw && 
         content.find_first_not_of("\t\r\n ") == std::string::npos) return;
 
     XMLNode_as* childNode = new XMLNode_as(_global);
@@ -451,7 +477,6 @@ XML_as::parseCData(XMLNode_as* node, xml_iterator& it,
 void
 XML_as::parseXML(const std::string& xml)
 {
-
     if (xml.empty()) {
         log_error(_("XML data is empty"));
         return;
@@ -463,6 +488,8 @@ XML_as::parseXML(const std::string& xml)
     xml_iterator it = xml.begin();
     const xml_iterator end = xml.end();
     XMLNode_as* node = this;
+
+    const bool iw = ignoreWhite();
 
     while (it != end && _status == XML_OK)
     {
@@ -491,7 +518,7 @@ XML_as::parseXML(const std::string& xml)
             }
             else parseTag(node, it, end);
         }
-        else parseText(node, it, end);
+        else parseText(node, it, end, iw);
     }
 
     // If everything parsed correctly, check that we've got back to the
@@ -510,23 +537,6 @@ XML_as::clear()
     _docTypeDecl.clear();
     _xmlDecl.clear();
     _status = XML_OK;
-}
-
-bool
-XML_as::ignoreWhite() 
-{
-
-    // TODO: use NSV:
-    const ObjectURI& propnamekey =
-        getURI(getVM(_global), "ignoreWhite");
-    as_value val;
-
-    as_object* obj = object();
-
-    if (!obj->get_member(propnamekey, &val)) {
-        return false;
-    }
-    return toBool(val, getVM(*obj));
 }
 
 // XML.prototype is assigned after the class has been constructed, so it
@@ -570,7 +580,6 @@ namespace {
 void
 attachXMLProperties(as_object& o)
 {
-
     as_object* proto = o.get_prototype();
     if (!proto) return;
     const int flags = 0;
@@ -578,11 +587,10 @@ attachXMLProperties(as_object& o)
             flags);
     proto->init_property("docTypeDecl", &xml_docTypeDecl, &xml_docTypeDecl,
             flags);
-    proto->init_member("ignoreWhite", false, flags);
+    proto->init_property("ignoreWhite", xml_ignoreWhite, xml_ignoreWhite, flags);
     proto->init_property("loaded", xml_loaded, xml_loaded);
     proto->init_property("status", xml_status, xml_status, flags);
     proto->init_property("xmlDecl", &xml_xmlDecl, &xml_xmlDecl, flags);
-
 }
 
 
@@ -683,6 +691,17 @@ xml_status(const fn_call& fn)
     }
 
     ptr->setStatus(static_cast<XML_as::ParseStatus>(int(status)));
+    return as_value();
+}
+    
+as_value
+xml_ignoreWhite(const fn_call& fn)
+{
+    XML_as* ptr = ensure<ThisIsNative<XML_as> >(fn);
+    if (!fn.nargs) return as_value(ptr->ignoreWhite());
+
+    if (fn.arg(0).is_undefined()) return as_value();
+    ptr->ignoreWhite(toBool(fn.arg(0), getVM(fn)));
     return as_value();
 }
 

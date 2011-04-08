@@ -131,6 +131,17 @@ public:
     void setLoaded(LoadStatus st) {
         _loaded = st;
     }
+  
+    /// \brief
+    /// Return true if ignoreWhite property was set to anything evaluating
+    /// to true.
+    bool ignoreWhite() const {
+        return _ignoreWhite;
+    }
+
+    void ignoreWhite(bool ignore) {
+        _ignoreWhite = ignore;
+    }
 
 private:
 
@@ -143,7 +154,8 @@ private:
 
     void parseDocTypeDecl( xml_iterator& it, xml_iterator end);
 
-    void parseText(XMLNode_as* node, xml_iterator& it, xml_iterator end);
+    void parseText(XMLNode_as* node, xml_iterator& it, xml_iterator end,
+            bool ignoreWhite);
 
     void parseXMLDecl(xml_iterator& it, xml_iterator end);
 
@@ -156,11 +168,6 @@ private:
     /// This removes all children, resets doctype and xml decls, and
     /// sets status to XML.
     void clear();
-  
-    /// \brief
-    /// Return true if ignoreWhite property was set to anything evaluating
-    /// to true.
-    bool ignoreWhite();
 
     // -1 if never asked to load anything
     //  0 if asked to load but not yet loaded (or failure)
@@ -173,6 +180,7 @@ private:
 
     std::string _xmlDecl;
 
+    bool _ignoreWhite;
 };
 
 
