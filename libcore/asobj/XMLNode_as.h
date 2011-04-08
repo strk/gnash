@@ -115,16 +115,16 @@ public:
     ///  returns false.
     bool hasChildNodes();
 
-    XMLNode_as* firstChild();
-    XMLNode_as* lastChild();
+    XMLNode_as* firstChild() const;
+    XMLNode_as* lastChild() const;
     
     // Use a list for quick erasing
     typedef std::list<XMLNode_as*> Children;
 
     as_object* childNodes();
 
-    XMLNode_as* previousSibling();
-    XMLNode_as* nextSibling();
+    XMLNode_as* previousSibling() const;
+    XMLNode_as* nextSibling() const;
 
     /// Copy a node
     //  
@@ -132,7 +132,7 @@ public:
     /// name, value, and attributes as the specified XML object. If deep
     /// is set to true, all child nodes are recursively cloned, resulting
     /// in an exact copy of the original object's document tree. 
-    XMLNode_as* cloneNode(bool deep);
+    XMLNode_as* cloneNode(bool deep) const;
 
     /// Append a child node to this XML object
     //

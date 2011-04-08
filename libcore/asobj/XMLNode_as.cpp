@@ -176,21 +176,21 @@ XMLNode_as::hasChildNodes()
 }
 
 XMLNode_as*
-XMLNode_as::firstChild()
+XMLNode_as::firstChild() const
 {
     if (_children.empty()) return 0;
     return _children.front();
 }
 
 XMLNode_as*
-XMLNode_as::cloneNode(bool deep)
+XMLNode_as::cloneNode(bool deep) const
 {
     XMLNode_as* newnode = new XMLNode_as(*this, deep);
     return newnode;
 }
 
 XMLNode_as*
-XMLNode_as::lastChild()
+XMLNode_as::lastChild() const
 {
 	if (_children.empty()) {
         return 0;
@@ -241,8 +241,8 @@ XMLNode_as::insertBefore(XMLNode_as* newnode, XMLNode_as* pos)
     updateChildNodes();
 }
 
-XMLNode_as *
-XMLNode_as::previousSibling()
+XMLNode_as*
+XMLNode_as::previousSibling() const
 {
     if (!_parent) return 0;
  	if (_parent->_children.size() <= 1) return 0;
@@ -259,8 +259,8 @@ XMLNode_as::previousSibling()
     return 0;
 }
 
-XMLNode_as *
-XMLNode_as::nextSibling()
+XMLNode_as*
+XMLNode_as::nextSibling() const
 {
 
     if (!_parent) return 0;
@@ -403,11 +403,10 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
             nodeValue, xml._attributes.size(), xml._children.size());
 #endif
 
-    // Create the beginning of the tag
     if (!nodeName.empty()) {
 
         xmlout << "<" << nodeName;
-    
+
         // Process the attributes, if any
         StringPairs attrs;
         enumerateAttributes(xml, attrs);
@@ -420,16 +419,15 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
             }
         }
 
-    	// If the node has no content, just close the tag now
-    	if (nodeValue.empty() && xml._children.empty()) {
-    		xmlout << " />";
+        // If the node has no content, just close the tag now
+        if (nodeValue.empty() && xml._children.empty()) {
+            xmlout << " />";
             return;
-    	}
+        }
         else {
             // Will use a closing tag later
             xmlout << ">";
         }
-
     }
 
     // Node as_value first, then children
@@ -455,7 +453,7 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
     }
 
     if (!nodeName.empty()) {
-	    xmlout << "</" << nodeName << ">";
+        xmlout << "</" << nodeName << ">";
     }
 }
 

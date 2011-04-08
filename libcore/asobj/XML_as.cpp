@@ -461,13 +461,13 @@ XML_as::parseCData(XMLNode_as* node, xml_iterator& it,
 void
 XML_as::parseXML(const std::string& xml)
 {
+    // Clear current data
+    clear(); 
+
     if (xml.empty()) {
         log_error(_("XML data is empty"));
         return;
     }
-
-    // Clear current data
-    clear(); 
 
     xml_iterator it = xml.begin();
     const xml_iterator end = xml.end();
@@ -715,21 +715,18 @@ xml_escape(const fn_call& fn)
 as_value
 xml_createElement(const fn_call& fn)
 {
-    
-    if (fn.nargs > 0)
-    {
-        const std::string& text = fn.arg(0).to_string();
-        XMLNode_as *xml_obj = new XMLNode_as(getGlobal(fn));
-        xml_obj->nodeNameSet(text);
-        xml_obj->nodeTypeSet(XMLNode_as::Text);
+    if (!fn.nargs || fn.arg(0).is_undefined()) {
+        return as_value();
+    }
 
-        return as_value(xml_obj->object());
-        
-    }
-    else {
-        log_error(_("no text for element creation"));
-    }
-    return as_value();
+    const as_value& arg = fn.arg(0);
+
+    const std::string& text = arg.to_string(getSWFVersion(fn));
+    XMLNode_as *xml_obj = new XMLNode_as(getGlobal(fn));
+    xml_obj->nodeNameSet(text);
+    if (!text.empty()) xml_obj->nodeTypeSet(XMLNode_as::Text);
+
+    return as_value(xml_obj->object());
 }
 
 
@@ -762,18 +759,19 @@ xml_createTextNode(const fn_call& fn)
 as_value
 xml_parseXML(const fn_call& fn)
 {
-
     XML_as* ptr = ensure<ThisIsNative<XML_as> >(fn);
 
-    if (fn.nargs < 1)
-    {
+    if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror("XML.parseXML() needs one argument");
         );
         return as_value();
     }
 
-    const std::string& text = fn.arg(0).to_string();
+    const as_value arg = fn.arg(0);
+    if (arg.is_undefined()) return as_value();
+
+    const std::string& text = arg.to_string(getSWFVersion(fn));
     ptr->parseXML(text);
     
     return as_value();
