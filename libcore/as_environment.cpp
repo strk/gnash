@@ -25,7 +25,6 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/format.hpp>
 
-#include "smart_ptr.h"
 #include "MovieClip.h"
 #include "movie_root.h"
 #include "as_value.h"

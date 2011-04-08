@@ -28,7 +28,6 @@
 #include "movie_root.h" // interface callback
 #include "log.h"
 #include "fn_call.h"
-#include "smart_ptr.h" // for boost intrusive_ptr
 #include "Global_as.h"
 #include "NativeFunction.h" 
 #include "VM.h" // for getPlayerVersion() 

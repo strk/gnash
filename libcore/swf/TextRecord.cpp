@@ -25,7 +25,6 @@
 #include "SWFStream.h"
 #include "SWFMatrix.h"
 #include "SWFCxForm.h"
-#include "smart_ptr.h"
 #include "movie_definition.h"
 #include "DisplayObject.h"
 #include "SWF.h"

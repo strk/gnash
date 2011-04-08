@@ -18,7 +18,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "RunResources.h"
-#include "smart_ptr.h" 
 #include "MovieClip.h"
 #include "sprite_definition.h"
 #include "ControlTag.h" // for dtor visibility

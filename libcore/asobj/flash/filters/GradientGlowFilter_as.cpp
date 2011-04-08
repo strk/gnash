@@ -24,7 +24,6 @@
 #include "as_object.h"
 #include "VM.h"
 #include "Global_as.h"
-#include "smart_ptr.h"
 
 namespace gnash {
 

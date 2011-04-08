@@ -30,7 +30,6 @@
 
 #include "URL.h"
 #include "MovieClip.h" 
-#include "smart_ptr.h"
 
 // Forward declarations
 namespace gnash {

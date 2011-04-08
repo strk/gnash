@@ -24,7 +24,6 @@
 #include "SWF.h" // for TagType definition
 #include "log.h"
 #include "SWFStream.h"
-#include "smart_ptr.h"
 
 namespace gnash {
 namespace SWF {

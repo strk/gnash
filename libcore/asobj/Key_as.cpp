@@ -18,7 +18,6 @@
 //
 
 
-#include "smart_ptr.h" 
 #include "Key_as.h"
 #include "log.h"
 #include "fn_call.h"

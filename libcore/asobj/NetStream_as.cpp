@@ -27,7 +27,6 @@
 
 #include "RunResources.h"
 #include "CharacterProxy.h"
-#include "smart_ptr.h"
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"

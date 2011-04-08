@@ -25,7 +25,6 @@
 #include <boost/cstdint.hpp>
 #include <string>
 #include <map>
-#include "smart_ptr.h" 
 #include "movie_definition.h" // for inheritance
 #include "log.h"
 #include "SWFRect.h"

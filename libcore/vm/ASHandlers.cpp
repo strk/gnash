@@ -31,7 +31,6 @@
 #include <boost/lexical_cast.hpp>
 #include <algorithm> 
 
-#include "smart_ptr.h"
 #include "log.h"
 #include "SWF.h"
 #include "rc.h"

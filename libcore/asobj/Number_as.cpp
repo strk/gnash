@@ -21,7 +21,6 @@
 
 #include "log.h"
 #include "Number_as.h"
-#include "smart_ptr.h"
 #include "fn_call.h"
 #include "Global_as.h"
 #include "as_object.h" // for inheritance

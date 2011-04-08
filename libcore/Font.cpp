@@ -26,7 +26,6 @@
 #include <utility> 
 #include <memory>
 
-#include "smart_ptr.h" 
 #include "log.h"
 #include "ShapeRecord.h"
 #include "DefineFontTag.h"

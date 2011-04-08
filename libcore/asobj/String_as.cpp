@@ -25,7 +25,6 @@
 #include <stdexcept>
 
 #include "SWFCtype.h"
-#include "smart_ptr.h"
 #include "fn_call.h"
 #include "Global_as.h"
 #include "as_object.h"

@@ -26,7 +26,6 @@
 #include "SWFStream.h" // for read()
 #include "movie_definition.h"
 #include "utility.h"
-#include "smart_ptr.h"
 
 namespace gnash {
 namespace SWF {

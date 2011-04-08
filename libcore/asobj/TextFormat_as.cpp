@@ -30,7 +30,6 @@
 #include "VM.h"
 #include "RGBA.h" 
 #include "StringPredicates.h"
-#include "smart_ptr.h" 
 #include "GnashNumeric.h"
 #include "Array_as.h"
 #include "fontlib.h"

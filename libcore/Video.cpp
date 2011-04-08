@@ -32,7 +32,6 @@
 #include "Renderer.h"
 #include "RunResources.h"
 #include "Transform.h"
-#include "smart_ptr.h"
 
 // Define this to get debug logging during embedded video decoding
 //#define DEBUG_EMBEDDED_VIDEO_DECODING

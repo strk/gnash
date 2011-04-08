@@ -42,7 +42,6 @@
 #include "swf_event.h"
 #include "sprite_definition.h"
 #include "ActionExec.h"
-#include "smart_ptr.h" 
 #include "VM.h"
 #include "Range2d.h" // for getBounds
 #include "GnashException.h"

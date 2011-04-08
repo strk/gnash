@@ -24,7 +24,6 @@
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "smart_ptr.h" // for boost intrusive_ptr
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "TextFormat_as.h"
 #include "MovieClip.h"

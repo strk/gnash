@@ -35,7 +35,6 @@
 #include "filter_factory.h"
 #include "GnashAlgorithm.h"
 #include "action_buffer.h"
-#include "smart_ptr.h"
 
 namespace gnash {
 namespace SWF {

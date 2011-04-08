@@ -43,7 +43,6 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/bind.hpp>
 
-#include "smart_ptr.h"
 #include "Renderer.h"
 #include "GnashImage.h"
 #include "PathParser.h"

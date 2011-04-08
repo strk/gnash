@@ -30,7 +30,6 @@
 #include <boost/assign/list_of.hpp>
 #include <boost/bind.hpp>
 
-#include "smart_ptr.h" 
 #include "movie_root.h"
 #include "MovieClip.h"
 #include "VM.h" 

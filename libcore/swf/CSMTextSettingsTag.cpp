@@ -22,7 +22,6 @@
 #include "SWFStream.h"
 #include "movie_definition.h"
 #include "CSMTextSettingsTag.h"
-#include "smart_ptr.h"
 
 namespace gnash {
 namespace SWF {

@@ -25,7 +25,6 @@
 #include <boost/cstdint.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <cassert>
-#include "smart_ptr.h"
 #include <boost/intrusive_ptr.hpp>
 #include <memory>
 

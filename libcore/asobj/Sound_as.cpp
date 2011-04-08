@@ -37,7 +37,6 @@
 #include "Global_as.h"
 #include "GnashException.h" // for ActionException
 #include "NativeFunction.h" // need builtin_function
-#include "smart_ptr.h" // for boost intrusive_ptr
 #include "VM.h"
 #include "namedStrings.h"
 #include "StreamProvider.h"

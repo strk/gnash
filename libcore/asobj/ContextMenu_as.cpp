@@ -24,7 +24,6 @@
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "smart_ptr.h" 
 #include "namedStrings.h"
 #include "Array_as.h"
 

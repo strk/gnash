@@ -28,7 +28,6 @@
 #include <boost/bind.hpp>
 #include <boost/format.hpp>
 
-#include "smart_ptr.h" 
 #include "log.h"
 #include "Renderer.h"
 #include "StringPredicates.h"
