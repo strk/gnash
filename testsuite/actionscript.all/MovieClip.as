@@ -119,15 +119,15 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(925); // SWF6
+	check_totals(926); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(958); // SWF7
+	check_totals(959); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(1075); // SWF8+
+	check_totals(1076); // SWF8+
 #endif
 
 	play();
@@ -380,6 +380,10 @@ check_equals(typeof(mc._focusrect), "number");
 check_equals(typeof(mc._focusrect), "boolean");
 #endif
 
+#if OUTPUT_VERSION > 5
+j = createEmptyMovieClip("j", getNextHighestDepth());
+check_equals(typeof(j._focusrect), "null");
+#endif
 
 check(mc._framesloaded != undefined);
 check(mc._height != undefined);
