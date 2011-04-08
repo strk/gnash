@@ -356,22 +356,25 @@ XML_as::parseTag(XMLNode_as*& node, xml_iterator& it,
                 VM& vm = getVM(*object());
                 const ObjectURI& id = getURI(vm, "idMap");
 
-                as_value im;
-                as_object* idMap;
-                if (object()->get_member(id, &im)) {
-                    idMap = toObject(im, vm);
-                    if (!idMap) {
-                        // If it's present but not an object just ignore it
-                        // and carry on.
-                        continue;
+                if (getSWFVersion(*object()) > 7) {
+                    as_value im;
+                    as_object* idMap;
+                    if (object()->get_member(id, &im)) {
+                        idMap = toObject(im, vm);
+                        if (!idMap) {
+                            // If it's present but not an object just ignore it
+                            // and carry on.
+                            continue;
+                        }
                     }
+                    else {
+                        // If it's not there at all create it.
+                        idMap = new as_object(getGlobal(*object()));
+                        object()->set_member(id, idMap);
+                    }
+                    idMap->set_member(getURI(vm, i->second), childNode->object());
                 }
-                else {
-                    // If it's not there at all create it.
-                    idMap = new as_object(getGlobal(*object()));
-                    object()->set_member(id, idMap);
-                }
-                idMap->set_member(getURI(vm, i->second), childNode->object());
+                else object()->set_member(getURI(vm, i->second), childNode->object());
             }
         }
 
