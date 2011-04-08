@@ -345,6 +345,8 @@ XML_as::parseTag(XMLNode_as*& node, xml_iterator& it,
         // Do nothing more if there was an error in attributes parsing.
         if (_status != XML_OK) return;
 
+        node->appendChild(childNode);
+
         for (Attributes::const_reverse_iterator i = attributes.rbegin(),
                 e = attributes.rend(); i != e; ++i) {
 
@@ -373,7 +375,6 @@ XML_as::parseTag(XMLNode_as*& node, xml_iterator& it,
             }
         }
 
-        node->appendChild(childNode);
         if (*it == '/') ++it;
         else node = childNode;
 
