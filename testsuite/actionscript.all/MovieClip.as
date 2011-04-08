@@ -115,19 +115,19 @@ check(!MovieClip.prototype.hasOwnProperty("_global"));
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(347); // SWF5
+	check_totals(353); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(919); // SWF6
+	check_totals(925); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(952); // SWF7
+	check_totals(958); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(1069); // SWF8+
+	check_totals(1075); // SWF8+
 #endif
 
 	play();
@@ -363,6 +363,24 @@ else
 
 check(mc._focusrect != undefined);
 check_equals(mc._focusrect, true);
+mc._focusrect = false;
+check_equals(mc._focusrect, false);
+mc._focusrect = 8;
+check_equals(mc._focusrect, true);
+mc._focusrect = undefined;
+check_equals(mc._focusrect, true);
+mc._focusrect = null;
+check_equals(mc._focusrect, true);
+mc._focusrect = 0;
+check_equals(mc._focusrect, false);
+
+#if OUTPUT_VERSION == 5
+check_equals(typeof(mc._focusrect), "number");
+#else
+check_equals(typeof(mc._focusrect), "boolean");
+#endif
+
+
 check(mc._framesloaded != undefined);
 check(mc._height != undefined);
 check(mc._highquality != undefined);

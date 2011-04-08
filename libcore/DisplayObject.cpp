@@ -1424,7 +1424,7 @@ getFocusRect(DisplayObject& o)
     LOG_ONCE(log_unimpl("_focusrect"));
 
     const boost::tribool fr = o.focusRect();
-    if (indeterminate(fr)) {
+    if (boost::indeterminate(fr)) {
         as_value null;
         null.set_null();
         return as_value(null);
