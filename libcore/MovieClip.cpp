@@ -936,11 +936,6 @@ MovieClip::restoreDisplayList(size_t tgtFrame)
     //             for jump-forwards would do
     assert(tgtFrame <= _currentFrame);
 
-    // Just invalidate this DisplayObject before jumping back.
-    // Should be optimized, but the invalidating model is not clear enough,
-    // and there are some old questions spreading the source files.
-    set_invalidated();
-
     DisplayList tmplist;
     for (size_t f = 0; f < tgtFrame; ++f) {
         _currentFrame = f;
@@ -952,7 +947,7 @@ MovieClip::restoreDisplayList(size_t tgtFrame)
     executeFrameTags(tgtFrame, tmplist, SWF::ControlTag::TAG_DLIST |
                                         SWF::ControlTag::TAG_ACTION);
 
-    _displayList.mergeDisplayList(tmplist);
+    _displayList.mergeDisplayList(tmplist, *this);
 }
 
 // 0-based frame number !

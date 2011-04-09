@@ -287,9 +287,11 @@ public:
 	///
 	int getNextHighestDepth() const;
 	
-	/// \brief
-	/// merge the given display list
-	void mergeDisplayList(DisplayList& newList);
+	/// Merge the given display list
+    //
+    /// Call set_invalidated on the given DisplayObject if this list changes
+    ///
+	void mergeDisplayList(DisplayList& newList, DisplayObject& o);
 
 	bool operator==(const DisplayList& other) const {
         return _charsByDepth == other._charsByDepth;
