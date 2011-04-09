@@ -130,10 +130,10 @@ attachNumberStaticInterface(as_object& o)
     as_value null; null.set_null();
     o.setPropFlags(null, 0, cflags);
 
-    o.init_member("MAX_VALUE",
-            std::numeric_limits<double>::max(), cflags);
-    o.init_member("MIN_VALUE",
-            std::numeric_limits<double>::denorm_min(), cflags);
+    // Not quite the same as numeric_limits<double>::max()
+    o.init_member("MAX_VALUE", 1.79769313486231e+308, cflags);
+    // This is generally numeric_limits<double>::denorm_min().
+    o.init_member("MIN_VALUE", 4.94065645841247e-324, cflags);
     o.init_member("NaN", as_value(NaN), cflags);
     o.init_member("POSITIVE_INFINITY",
             as_value(std::numeric_limits<double>::infinity()), cflags);
