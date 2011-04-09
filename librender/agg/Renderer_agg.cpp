@@ -798,8 +798,6 @@ public:
       yres(1),
       bpp(bits_per_pixel),
       scale_set(false),
-      m_display_width(0.0),
-      m_display_height(0.0),
       m_drawing_mask(false)
   {
     // TODO: we really don't want to set the scale here as the core should
@@ -2049,10 +2047,6 @@ private:  // private variables
     int bpp;  // bits per pixel
     gnash::SWFMatrix stage_matrix;  // conversion from TWIPS to pixels
     bool scale_set;
-
-    // Output size.
-    float m_display_width;
-    float m_display_height;
 
     agg::rendering_buffer m_rbuf;  
 
