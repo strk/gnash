@@ -201,7 +201,8 @@ struct CopyChannel
     boost::uint32_t operator()(typename iterator_type::value_type p) const {
         // If multiple source channels, we set the destination channel
         // to black. Else to the value of the requested channel.
-        const boost::uint8_t val = _multiple ? 0 : getChannel(boost::get<0>(p), _srcchans);
+        const boost::uint8_t val = _multiple ?
+            0 : getChannel(boost::get<0>(p), _srcchans);
         return setChannel(boost::get<1>(p), _destchans, val);
     }
 
