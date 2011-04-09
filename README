@@ -85,7 +85,7 @@ Building Gnash:
 ---------------
 
 See the generic installation instructions in the file called "INSTALL".
-(If you are building from a fresh bzr checkout, first see the file
+(If you are building from a fresh git checkout, first see the file
 "README.git" for additional instructions.)
 
 Depending on chosen functionality, CPU architecture, and OS the temporary
