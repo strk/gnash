@@ -32,7 +32,6 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_EXEEXT
 AC_PROG_INSTALL
-AM_COMPILER_LIB
 
 dnl Set the default values for Flash Version. These are converted into
 dnl various strings to make JavaScript or ActionScript detectors
