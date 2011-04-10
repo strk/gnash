@@ -385,6 +385,12 @@ NS_DestroyPluginInstance(nsPluginInstanceBase* aPlugin)
 
 namespace gnash {
 
+inline bool HasScripting()
+{
+    return (NPNFuncs.version >= NPVERS_HAS_NPRUNTIME_SCRIPTING);
+}
+
+
 //
 // nsPluginInstance class implementation
 //
@@ -856,6 +862,11 @@ nsPluginInstance::processPlayerRequest()
         } else if (invoke->name == "addMethod") {
             
             assert(!invoke->args.empty());
+
+            if (!HasScripting()) {
+               LOG_ONCE(log_debug("Ignoring addMethod, no scripting."));
+               continue;
+            }
             // Make this flash function accessible to Javascript. The
             // actual callback lives in libcore/movie_root, but it
             // needs to be on the list of supported remote methods so
@@ -866,6 +877,11 @@ nsPluginInstance::processPlayerRequest()
             // log_debug("SCRIPT OBJECT addMethod: %x, %s", (void *)_scriptObject, method);
             this->getScriptObject()->AddMethod(id, remoteCallback);
             continue;
+        }
+
+        if (!HasScripting()) {
+           LOG_ONCE(log_debug("Ignoring invoke, no scripting."));
+           continue;
         }
         
         NPVariant result;
@@ -1000,6 +1016,11 @@ nsPluginInstance::getDocumentProp(const std::string& propname) const
 {
     std::string rv;
 
+    if (!HasScripting()) {
+        LOG_ONCE( gnash::log_debug("Browser doesn't support scripting") );
+        return rv;
+    }
+
     NPObject* windowobj;
     NPError err = NPN_GetValue(_instance, NPNVWindowNPObject, &windowobj);
     if (err != NPERR_NO_ERROR || !windowobj) {
@@ -1047,20 +1068,6 @@ nsPluginInstance::getDocumentProp(const std::string& propname) const
 void
 nsPluginInstance::setupCookies(const std::string& pageurl)
 {
-    // In pre xulrunner 1.9, (Firefox 3.1) this function does not exist,
-    // so we can't use it to read the cookie file. For older browsers
-    // like IceWeasel on Debian lenny, which pre dates the cookie support
-    // in NPAPI, you have to block all Cookie for sites like YouTube to
-    // allow Gnash to work.
-#if NPAPI_VERSION != 190
-    if (!NPNFuncs.getvalueforurl) {
-        LOG_ONCE( gnash::log_debug("Browser doesn't support reading cookies") );
-        return;
-    }
-#else
-    LOG_ONCE( log_debug("Browser doesn't support reading cookies via NPAPI.") );
-#endif
-
     // Cookie appear to drop anything past the domain, so we strip
     // that off.
     std::string::size_type pos;
@@ -1072,11 +1079,14 @@ nsPluginInstance::setupCookies(const std::string& pageurl)
     char *cookie = 0;
     uint32_t length = 0;
 
-#if NPAPI_VERSION != 190
-    NPError rv = NPN_GetValueForURL(_instance, NPNURLVCookie, url.c_str(),
-                       &cookie, &length);
-#else
     NPError rv = NPERR_GENERIC_ERROR;
+#if NPAPI_VERSION != 190
+    if (NPNFuncs.getvalueforurl) {
+        rv = NPN_GetValueForURL(_instance, NPNURLVCookie, url.c_str(),
+                                &cookie, &length);
+    } else {
+        LOG_ONCE( gnash::log_debug("Browser doesn't support getvalueforurl") );
+    }
 #endif
 
     // Firefox does not (always) return the cookies that are associated
