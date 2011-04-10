@@ -28,7 +28,6 @@
 
 #include "log.h"
 #include "RGBA.h"
-#include "smart_ptr.h"
 #include "GnashImage.h"
 #include "GnashNumeric.h"
 #include "FillStyle.h"

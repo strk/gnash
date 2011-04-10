@@ -45,7 +45,6 @@
 #include <cstring>
 #include <cmath>
 
-#include <smart_ptr.h>
 #include "swf/ShapeRecord.h"
 #include "RGBA.h"
 #include "GnashImage.h"
