@@ -170,7 +170,7 @@ XMLNode_as::childNodes()
 }
 
 bool
-XMLNode_as::hasChildNodes()
+XMLNode_as::hasChildNodes() const
 {
     return !_children.empty();
 }
@@ -295,8 +295,9 @@ XMLNode_as::setAttribute(const std::string& name, const std::string& value)
 
 bool
 XMLNode_as::getPrefixForNamespace(const std::string& ns, std::string& prefix)
+    const
 {
-    XMLNode_as* node = this;
+    const XMLNode_as* node = this;
     StringPairs::const_iterator it; 
     StringPairs attrs;
     
@@ -332,8 +333,9 @@ XMLNode_as::getPrefixForNamespace(const std::string& ns, std::string& prefix)
 
 void
 XMLNode_as::getNamespaceForPrefix(const std::string& prefix, std::string& ns)
+    const
 {
-    XMLNode_as* node = this;
+    const XMLNode_as* node = this;
     StringPairs::const_iterator it; 
     StringPairs attrs;
     
@@ -359,7 +361,7 @@ XMLNode_as::getNamespaceForPrefix(const std::string& prefix, std::string& ns)
 }
 
 bool
-XMLNode_as::extractPrefix(std::string& prefix)
+XMLNode_as::extractPrefix(std::string& prefix) const
 {
     prefix.clear();
     if (_name.empty()) return false;

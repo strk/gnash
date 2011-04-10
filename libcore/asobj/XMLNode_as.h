@@ -90,18 +90,20 @@ public:
     /// Set name of this node
     void nodeNameSet(const std::string& name) { _name = name; }
 
-    bool extractPrefix(std::string& prefix);
+    bool extractPrefix(std::string& prefix) const;
 
     /// Set value of this node
     void nodeValueSet(const std::string& value) { _value = value; }
 
     /// Performs a recursive search of node attributes to find a match
-    void getNamespaceForPrefix(const std::string& prefix, std::string& ns);
+    void getNamespaceForPrefix(const std::string& prefix, std::string& ns)
+        const;
 
     /// Performs a recursive search of node attributes to find a match
     //
     /// @return false if no match found.
-    bool getPrefixForNamespace(const std::string& ns, std::string& prefix);
+    bool getPrefixForNamespace(const std::string& ns, std::string& prefix)
+        const;
 
     void setNamespaceURI(const std::string& value) {
         _namespaceURI = value;
@@ -113,7 +115,7 @@ public:
 
     ///  Returns true if the specified node has child nodes; otherwise,
     ///  returns false.
-    bool hasChildNodes();
+    bool hasChildNodes() const;
 
     XMLNode_as* firstChild() const;
     XMLNode_as* lastChild() const;
