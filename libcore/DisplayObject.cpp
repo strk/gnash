@@ -203,13 +203,13 @@ DisplayObject::set_invalidated(const char* debug_file, int debug_line)
     {
         _invalidated = true;
         
-        #ifdef DEBUG_SET_INVALIDATED
+#ifdef DEBUG_SET_INVALIDATED
         log_debug("%p set_invalidated() of %s in %s:%d",
-            (void*)this, get_name(), debug_file, debug_line);
-        #else
+            (void*)this, getTarget(), debug_file, debug_line);
+#else
         UNUSED(debug_file);
         UNUSED(debug_line);
-        #endif
+#endif
         
         // NOTE: the SnappingRanges instance used here is not initialized by the
         // GUI and therefore uses the default settings. This should not be a 

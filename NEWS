@@ -4,7 +4,9 @@ YYYY/MM/DD
 Improvements since 0.8.9 release are:
 
  * Qt4 GUI supports mouse wheel, clipboard, and screen resolution.
- * Enhanced UI support for Script limits (abort popups, user prefs)
+ * Enhanced UI support for script limits (abort popups, user prefs)
+ * BitmapData functions copyPixels(), copyChannel, and noise() 
+   implemented.
 
 Gnash 0.8.9
 2011/03/19

@@ -643,17 +643,40 @@ dest.copyPixels(source, new Rect(0, 0, 100, 100), new Point(200, 50));
  check_equals(dest.getPixel(10, 52), 0xff0000);
  check_equals(dest.getPixel(90, 90), 0xff0000);
 
+// Check self copies!
+
+source = new flash.display.BitmapData(100, 100, false);
+
+// Should be the same
+source.fillRect(new Rect(0, 0, 50, 50), 0x00ff00);
+source.copyPixels(source, new Rect(35, 35, 20, 20), new Point(35, 35));
+
+ check_equals(source.getPixel(55, 45), 0xffffff);
+ check_equals(source.getPixel(60, 60), 0xffffff);
+ check_equals(source.getPixel(45, 55), 0xffffff);
+ check_equals(source.getPixel(45, 45), 0x00ff00);
+
+source.copyPixels(source, new Rect(20, 20, 50, 50), new Point(45, 45));
+ // Bottom right corner is still white
+ check_equals(source.getPixel(90, 90), 0xffffff);
+ check_equals(source.getPixel(55, 42), 0xffffff);
+ check_equals(source.getPixel(42, 55), 0xffffff);
+ check_equals(source.getPixel(55, 55), 0x00ff00);
+ check_equals(source.getPixel(55, 70), 0x00ff00);
+ check_equals(source.getPixel(70, 55), 0x00ff00);
+
 // copyChannel
 
 // This function seems to work as expected for single channel to single 
 // channel.
 // When the destination is a combination of channels, nothing happens. When
-// it is a single channel, it is set to 0!
+// it is a single channel and the source is a combination of channels, it
+// is set to 0!
 
 // Source:
 //    ---------------------
 //    |         |         |
-//    |   R     |    RG   |
+//    |   R     |    BG   |
 //    |         |         |
 //    |         |         |
 //    ---------------------
@@ -673,9 +696,9 @@ src.fillRect(new Rect(50, 50, 50, 50), 0xff007f00); // Green channel
 // Copy red channel to green channel
 dest = new flash.display.BitmapData(100, 100, true, 0xff000000);
 dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 1, 2);
- xcheck_equals(dest.getPixel(25, 25), 0x00ff00); // Green
+ check_equals(dest.getPixel(25, 25), 0x00ff00); // Was red, now green
  check_equals(dest.getPixel(75, 25), 0x000000); // Nothing
- xcheck_equals(dest.getPixel(25, 75), 0x00ff00); // Was red, now green
+ check_equals(dest.getPixel(25, 75), 0x00ff00); // Was red/blue, now green
  check_equals(dest.getPixel(75, 75), 0x000000); // Nothing
 
 // Copy red channel to green and blue channels
@@ -699,6 +722,14 @@ dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 1, 6);
 // Copy red and green channels to blue channel
 dest = new flash.display.BitmapData(100, 100, true, 0xff000000);
 dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 3, 4);
+ check_equals(dest.getPixel(25, 25), 0x000000); // Nothing
+ check_equals(dest.getPixel(75, 25), 0x000000); // Nothing
+ check_equals(dest.getPixel(25, 75), 0x000000); // Nothing
+ check_equals(dest.getPixel(75, 75), 0x000000); // Nothing
+
+// Copy red and blue channels to green channel
+dest = new flash.display.BitmapData(100, 100, true, 0xff000000);
+dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 5, 2);
  check_equals(dest.getPixel(25, 25), 0x000000); // Nothing
  check_equals(dest.getPixel(75, 25), 0x000000); // Nothing
  check_equals(dest.getPixel(25, 75), 0x000000); // Nothing
@@ -741,9 +772,9 @@ dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 2, 3);
 dest = new flash.display.BitmapData(100, 100, true, 0xff000000);
 dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 2, 4);
  check_equals(dest.getPixel(25, 25), 0x000000); // Nothing
- xcheck_equals(dest.getPixel(75, 25), 0x0000ff); // Blue
+ check_equals(dest.getPixel(75, 25), 0x0000ff); // Blue
  check_equals(dest.getPixel(25, 75), 0x000000); // Nothing
- xcheck_equals(dest.getPixel(75, 75), 0x00007f); // Half blue
+ check_equals(dest.getPixel(75, 75), 0x00007f); // Half blue
 
 // -------------------
 // Without alpha
@@ -766,10 +797,10 @@ dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 3, 3);
 // Copy red and green to red
 dest = new flash.display.BitmapData(100, 100, false);
 dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 3, 1);
- xcheck_equals(dest.getPixel(25, 25), 0x00ffff); // Cyan
- xcheck_equals(dest.getPixel(75, 25), 0x00ffff); // Cyan
- xcheck_equals(dest.getPixel(25, 75), 0x00ffff); // Cyan
- xcheck_equals(dest.getPixel(75, 75), 0x00ffff); // Cyan
+ check_equals(dest.getPixel(25, 25), 0x00ffff); // Cyan
+ check_equals(dest.getPixel(75, 25), 0x00ffff); // Cyan
+ check_equals(dest.getPixel(25, 75), 0x00ffff); // Cyan
+ check_equals(dest.getPixel(75, 75), 0x00ffff); // Cyan
 
 // Copy green to red and blue
 dest = new flash.display.BitmapData(100, 100, false);
@@ -782,18 +813,134 @@ dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 2, 5);
 // Copy red and blue to green
 dest = new flash.display.BitmapData(100, 100, false);
 dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 5, 2);
- xcheck_equals(dest.getPixel(25, 25), 0xff00ff); // White
- xcheck_equals(dest.getPixel(75, 25), 0xff00ff); // White
- xcheck_equals(dest.getPixel(25, 75), 0xff00ff); // White
- xcheck_equals(dest.getPixel(75, 75), 0xff00ff); // White
+ check_equals(dest.getPixel(25, 25), 0xff00ff); // Magenta
+ check_equals(dest.getPixel(75, 25), 0xff00ff); // Magenta
+ check_equals(dest.getPixel(25, 75), 0xff00ff); // Magenta
+ check_equals(dest.getPixel(75, 75), 0xff00ff); // Magenta
 
 // Copy green and blue to blue
 dest = new flash.display.BitmapData(100, 100, false);
 dest.copyChannel(src, new Rect(0, 0, 100, 100), new Point(0, 0), 6, 4);
- xcheck_equals(dest.getPixel(25, 25), 0xffff00); // Yellow
- xcheck_equals(dest.getPixel(75, 25), 0xffff00); // Yellow
- xcheck_equals(dest.getPixel(25, 75), 0xffff00); // Yellow
- xcheck_equals(dest.getPixel(75, 75), 0xffff00); // Yellow
+ check_equals(dest.getPixel(25, 25), 0xffff00); // Yellow
+ check_equals(dest.getPixel(75, 25), 0xffff00); // Yellow
+ check_equals(dest.getPixel(25, 75), 0xffff00); // Yellow
+ check_equals(dest.getPixel(75, 75), 0xffff00); // Yellow
+
+// Copy same channel to source range
+// As the source range is transformed while being processed,
+// those transformations accumulate to give unexpected 
+// results.
+dest = new flash.display.BitmapData(100, 100, false, 0x000000);
+dest.fillRect(new Rect(0, 0, 50, 50), 0x0000ff);
+dest.copyChannel(dest, new Rect(0, 0, 100, 100), new Point(4, 4), 4, 4);
+ check_equals(dest.getPixel(52, 6), 0x0000ff);
+ check_equals(dest.getPixel(56, 10), 0x0000ff);
+ check_equals(dest.getPixel(60, 14), 0x0000ff);
+ check_equals(dest.getPixel(96, 50), 0x0000ff);
+ check_equals(dest.getPixel(96, 96), 0x0000ff);
+ check_equals(dest.getPixel(6, 52), 0x0000ff);
+ check_equals(dest.getPixel(10, 56), 0x0000ff);
+ check_equals(dest.getPixel(14, 60), 0x0000ff);
+ check_equals(dest.getPixel(50, 96), 0x0000ff);
+ check_equals(dest.getPixel(96, 96), 0x0000ff);
+
+// noise().
+
+// Tests that a particular color does not appear.
+testNoColor = function(bd, mask) {
+   var width = bd.width;
+   var height = bd.height;
+   for (var i = 0; i < height; ++i) {
+       for (var j = 0; j < width; ++j) {
+           if ( (bd.getPixel32(i, j) & mask) != 0) return false;
+       };
+   };
+   return true;
+};
+
+// Tests that a particular color is within a specified range
+testColorRange = function(bd, mask, low, high) {
+    var width = bd.width;
+    var height = bd.height;
+
+    var shift = 0;
+    if (mask == 0xff00) shift = 8;
+    if (mask == 0xff0000) shift = 16;
+    if (mask == 0xff000000) shift = 24;
+
+    for (var i = 0; i < height; ++i) {
+        for (var j = 0; j < width; ++j) {
+            var pix = (bd.getPixel32(i, j) & mask) >> shift;
+            if (pix < low || pix > high) {
+                return false;
+            };
+        };
+    };
+    return true;
+};
+
+// Tests that a particular color is within a specified range
+testGreys = function(bd, low, high) {
+    var width = bd.width;
+    var height = bd.height;
+
+    for (var i = 0; i < height; ++i) {
+        for (var j = 0; j < width; ++j) {
+            var r = (bd.getPixel32(i, j) & 0xff0000) >> 16;
+            var g = (bd.getPixel32(i, j) & 0xff00) >> 8;
+            var b = (bd.getPixel32(i, j) & 0xff);
+            if (r != g || g != b) return false;
+            if (r < low || r > high) return false;
+        };
+    };
+    return true;
+};
+
+ns = new flash.display.BitmapData(15, 15, false);
+
+// Noise on red and green channels from 0 to 255
+ns.noise(203, 0, 255, 1 | 2);
+ check(testNoColor(ns, 0xff));
+
+ns.noise(203, 0, 255, 1 | 4);
+ check(testNoColor(ns, 0xff00));
+
+// Noise on green and blue from 25 to 150
+ns.noise(203, 25, 150, 2 | 4);
+ check(testNoColor(ns, 0xff0000));
+ // Green should be from 25 to 150
+ check(testColorRange(ns, 0xff00, 25, 150));
+ check(testColorRange(ns, 0xff, 25, 150));
+
+// Noise on green from 200 to 201
+ns.noise(203, 200, 201, 2);
+ check(testColorRange(ns, 0xff00, 200, 201));
+
+// Noise on blue from 200 to 200
+ns.noise(203, 200, 200, 4);
+ check(testColorRange(ns, 0xff, 200, 200));
+
+// Noise on all from 70 to 80
+ns.noise(203, 70, 80);
+ check(testColorRange(ns, 0xff, 70, 80));
+ check(testColorRange(ns, 0xff00, 70, 80));
+ check(testColorRange(ns, 0xff0000, 70, 80));
+
+// Equal noise on all from 70 to 80
+ns.noise(203, 70, 80, 0, true);
+ check(testGreys(ns, 70, 80));
+
+// Equal noise on all from 0, 200
+ns.noise(203, 0, 200, 0, true);
+ check(testGreys(ns, 0, 200));
+
+// Swapped values
+ns.noise(203, 60, 50, 0, true);
+ check(testGreys(ns, 60, 60));
+
+// Negative values
+ns.noise(203, -10, 0, 0, true);
+ check(testGreys(ns, 0, 0));
 
 // clone();
 
@@ -868,6 +1015,6 @@ flash.display.BitmapData.prototype = e;
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(326);
+totals(364);
 
 #endif // OUTPUT_VERSION >= 8

@@ -35,14 +35,7 @@ GNASH_LIBS = \
 AM_LDFLAGS = \
 	$(LIBINTL) \
 	$(LIBADD_DL) \
-	$(BOOST_LIBS) \
-	$(PTHREAD_LIBS) \
 	$(NULL)
-
-# bzip2 is a dependency of some libraries with mingw32
-if WIN32
-AM_LDFLAGS += $(BZ2_LIBS)
-endif
 
 localedir = $(datadir)/locale
 
@@ -76,6 +69,8 @@ AM_CPPFLAGS += $(DIRECTFB_CFLAGS)
 endif
 
 if WIN32
+  # bzip2 is a dependency of some libraries with mingw32
+  AM_LDFLAGS += $(BZ2_LIBS)
   GNASH_LIBS += -lintl -lz -lws2_32
 endif
 
@@ -117,7 +112,7 @@ gprocessor_LDFLAGS = -export-dynamic
 gprocessor_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
 
 rtmpget_SOURCES = rtmpget.cpp 
-rtmpget_LDADD =  $(GNASH_LIBS) $(AM_LDFLAGS)
+rtmpget_LDADD = $(top_builddir)/libbase/libgnashbase.la $(AM_LDFLAGS)
 
 #dumpshm_SOURCES = dumpshm.cpp
 #dumpshm_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
@@ -131,10 +126,12 @@ if USE_GST_ENGINE
 	$(NULL)
 
  findwebcams_SOURCES = findwebcams.cpp
- findwebcams_LDADD = $(GST_STUFF) $(GNASH_LIBS) $(AM_LDFLAGS)
+ findwebcams_LDADD = $(GST_STUFF) $(top_builddir)/libbase/libgnashbase.la \
+                     $(AM_LDFLAGS)
 
  findmicrophones_SOURCES = findmicrophones.cpp
- findmicrophones_LDADD = $(GST_STUFF) $(GNASH_LIBS) $(AM_LDFLAGS)
+ findmicrophones_LDADD = $(GST_STUFF) $(top_builddir)/libbase/libgnashbase.la \
+                         $(AM_LDFLAGS)
 endif
 
 # Wrap a single .as tests in dejagnu_so importer.

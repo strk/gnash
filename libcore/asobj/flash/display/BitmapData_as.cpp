@@ -24,6 +24,9 @@
 #include <sstream>
 #include <algorithm>
 #include <queue>
+#include <boost/random.hpp>
+#include <boost/iterator/zip_iterator.hpp>
+#include <boost/tuple/tuple.hpp>
 
 #include "MovieClip.h"
 #include "GnashImage.h"
@@ -44,6 +47,7 @@
 #include "ASConversions.h"
 #include "flash/geom/ColorTransform_as.h"
 #include "NativeFunction.h"
+#include "GnashNumeric.h"
 
 namespace gnash {
 
@@ -98,11 +102,122 @@ namespace {
     /// @param w    The width of the rectangle.
     /// @param h    The height of the rectangle.
     void adjustRect(int& x, int& y, int& w, int& h, BitmapData_as& b);
+
+    boost::uint32_t setChannel(boost::uint32_t targ, boost::uint8_t bitmask,
+            boost::uint8_t value);
+
+    boost::uint8_t getChannel(boost::uint32_t src, boost::uint8_t bitmask);
+
+    inline bool oneBitSet(boost::uint8_t mask) {
+        return mask == (mask & -mask);
+    }
 }
+
+/// Local functors.
+namespace {
+
+/// Random number generator for noise
+//
+/// This uses the fastest RNG available; it's still more
+/// homogeneous than the Adobe one.
+template<typename RNG = boost::rand48>
+struct Noise
+{
+    Noise(int seed, boost::uint8_t low, boost::uint8_t high)
+        :
+        rng(seed),
+        dist(low, high),
+        uni(rng, dist)
+    {}
+
+    boost::uint8_t operator()() {
+        return uni();
+    }
+
+private:
+    RNG rng;
+    boost::uniform_int<> dist;
+    boost::variate_generator<RNG, boost::uniform_int<> > uni;
+};
+
+template<typename NoiseGenerator>
+struct NoiseAdapter
+{
+    NoiseAdapter(NoiseGenerator& n, boost::uint8_t bitmask, bool grey)
+        :
+        _gen(n),
+        _bitmask(bitmask),
+        _greyscale(grey)
+    {}
+
+    boost::uint32_t operator()() {
+
+        if (_greyscale) {
+            boost::uint8_t val = _gen();
+            return val | val << 8 | val << 16;
+        }
+
+        boost::uint32_t ret = 0;
+
+        if (_bitmask & 1) {
+            ret |= (_gen() << 16);
+        }
+        if (_bitmask & 2) {
+            ret |= _gen() << 8;
+        }
+        if (_bitmask & 4) {
+            ret |= _gen();
+        }
+        if (_bitmask & 8) {
+            ret |= _gen() << 24;
+        }
+        return ret;
+    }
+
+private:
+    NoiseGenerator& _gen;
+    const boost::uint8_t _bitmask;
+    const bool _greyscale;
+};
+
+/// Copy a single channel from one ARGB value to a channel in another.
+//
+/// Due to peculiarities in the Adobe implementation, this also supports
+/// setting them to black.
+template<typename Iterator>
+struct CopyChannel
+{
+    typedef boost::tuple<Iterator, Iterator> iterator_tuple;
+    typedef boost::zip_iterator<iterator_tuple> iterator_type;
+
+    CopyChannel(bool multiple, boost::uint8_t srcchans,
+            boost::uint8_t destchans)
+        :
+        _multiple(multiple),
+        _srcchans(srcchans),
+        _destchans(destchans)
+    {}
+
+    /// 
+    boost::uint32_t operator()(typename iterator_type::value_type p) const {
+        // If multiple source channels, we set the destination channel
+        // to black. Else to the value of the requested channel.
+        const boost::uint8_t val = _multiple ? 0 : getChannel(boost::get<0>(p), _srcchans);
+        return setChannel(boost::get<1>(p), _destchans, val);
+    }
+
+private:
+    const bool _multiple;
+    const boost::uint8_t _srcchans;
+    const boost::uint8_t _destchans;
+
+};
+
+
+} // anonymous namespace
 
 BitmapData_as::BitmapData_as(as_object* owner,
         std::auto_ptr<image::GnashImage> im)
-   
     :
     _owner(owner),
     _cachedBitmap(0)
@@ -399,10 +514,184 @@ as_value
 bitmapdata_copyChannel(const fn_call& fn)
 {
 	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
+
+    if (ptr->disposed()) return as_value();
+
+    if (fn.nargs < 5) {
+        // log error
+        return as_value();
+    }
+
+    as_object* o = toObject(fn.arg(0), getVM(fn));
+    BitmapData_as* source;
+    if (!isNativeType(o, source) || source->disposed()) {
+        // First argument is not a BitmapData or is disposed.
+        return as_value();
+    }
+
+    as_object* rect = toObject(fn.arg(1), getVM(fn));
+    if (!rect) {
+        // Second argument is not an object
+        return as_value();
+    }
+
+    as_value x, y, w, h;
+    
+    rect->get_member(NSV::PROP_X, &x);
+    rect->get_member(NSV::PROP_Y, &y);
+    rect->get_member(NSV::PROP_WIDTH, &w);
+    rect->get_member(NSV::PROP_HEIGHT, &h);    
+    
+    as_object* destpoint = toObject(fn.arg(2), getVM(fn));
+    as_value px, py;
+    
+    destpoint->get_member(NSV::PROP_X, &px);
+    destpoint->get_member(NSV::PROP_Y, &py);
+
+    // TODO: check what should happen if the argument overflows or
+    // is negative (currently it is truncated and made positive.
+
+    // The source channel mask
+    const boost::uint8_t srcchans = 
+        std::abs(toInt(fn.arg(3), getVM(fn))) & 15;
+
+    // The destination channel mask
+    const boost::uint8_t destchans = 
+        std::abs(toInt(fn.arg(4), getVM(fn))) & 15;
+
+    // If more than one destination channel is specified,
+    // nothing happens.
+    if (!oneBitSet(destchans)) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("BitmapData.copyChannel(). Multiple "
+                "destination channels are not supported");
+        );
+        return as_value();
+    }
+
+    const bool multiple = !oneBitSet(srcchans);
+
+    // Find true source rect and true dest rect.
+    int sourceX = toInt(x, getVM(fn));
+    int sourceY = toInt(y, getVM(fn));
+    int sourceW = toInt(w, getVM(fn));
+    int sourceH = toInt(h, getVM(fn));
+
+    int destX = toInt(px, getVM(fn));
+    int destY = toInt(py, getVM(fn));
+
+    // Any part of the source rect that is not in the image (i.e.
+    // above or left) is concatenated to the destination offset.
+    if (sourceX < 0) destX -= sourceX;
+    if (sourceY < 0) destY -= sourceY;
+
+    adjustRect(sourceX, sourceY, sourceW, sourceH, *source);
+    if (sourceW == 0 || sourceH == 0) {
+        // The source rect does not overlap with source bitmap
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("BitmapData.copyChannel(): no part of source rectangle"
+                "overlaps with the source BitmapData");
+        );
+        return as_value();
+    }
+
+    // The dest width starts the same as the adjusted source width.
+    int destW = sourceW;
+    int destH = sourceH;
+
+    adjustRect(destX, destY, destW, destH, *ptr);
+    if (destW == 0 || destH == 0) {
+        // The target rect does not overlap with source bitmap
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("BitmapData.copyChannel(): destination area is "
+                "wholly outside the destination BitmapData");
+        );
+        return as_value();
+    }
+
+    BitmapData_as::iterator targ = pixelAt(*ptr, destX, destY);
+    BitmapData_as::iterator src = pixelAt(*source, sourceX, sourceY);
+
+    // Just being careful...
+    assert(sourceX + destW <= static_cast<int>(source->width()));
+    assert(sourceY + destH <= static_cast<int>(source->height()));
+    assert(destX + destW <= static_cast<int>(ptr->width()));
+    assert(destY + destH <= static_cast<int>(ptr->height()));
+
+    // Copy for the width and height of the *dest* image.
+    // We have already ensured that the copied area
+    // is inside both bitmapdatas
+    typedef CopyChannel<BitmapData_as::iterator> Copier;
+    Copier c(multiple, srcchans, destchans);
+
+    // Note that copying the same channel to a range starting in the
+    // source range produces unexpected effects because the source
+    // range is changed while it is being copied. This is verified
+    // to happen with the Adobe player too.
+    for (int i = 0; i < destH; ++i) {
+        Copier::iterator_type zip(boost::make_tuple(src, targ));
+        std::transform(zip, zip + destW, targ, c);
+        targ += ptr->width();
+        src += source->width();
+    }
+
+    ptr->updateObjects();
+
 	return as_value();
 }
+
+boost::uint8_t
+getChannel(boost::uint32_t src, boost::uint8_t bitmask)
+{
+    if (bitmask & 1) {
+        // Red
+        return (src >> 16) & 0xff;
+    }
+    if (bitmask & 2) {
+        // Green
+        return (src >> 8) & 0xff;
+    }
+    if (bitmask & 4) {
+        // Blue
+        return src & 0xff;
+    }
+    if (bitmask & 8) {
+        // Alpha
+        return src >> 24;
+    }
+    return 0;
+}
+
+boost::uint32_t
+setChannel(boost::uint32_t targ, boost::uint8_t bitmask, boost::uint8_t value)
+{
+    boost::uint32_t bytemask = 0;
+    boost::uint32_t valmask = 0;
+    if (bitmask & 1) {
+        // Red
+        bytemask = 0xff0000;
+        valmask = value << 16;
+    }
+    else if (bitmask & 2) {
+        // Green
+        bytemask = 0xff00;
+        valmask = value << 8;
+    }
+    else if (bitmask & 4) {
+        // Blue
+        bytemask = 0xff;
+        valmask = value;
+    }
+    else if (bitmask & 8) {
+        // Alpha
+        bytemask = 0xff000000;
+        valmask = value << 24;
+    }
+    targ &= ~bytemask;
+    targ |= valmask;
+    return targ;
+}
+
 
 // sourceBitmap: BitmapData,
 // sourceRect: Rectangle,
@@ -495,8 +784,11 @@ bitmapdata_copyPixels(const fn_call& fn)
     BitmapData_as::iterator targ = pixelAt(*ptr, destX, destY);
     BitmapData_as::iterator src = pixelAt(*source, sourceX, sourceY);
 
-    log_debug("Source rect: %sx%s, w: %s, h: %s", sourceX, sourceY, destW, destH);
-    log_debug("Target rect: %sx%s, w: %s, h: %s", destX, destY, destW, destH);
+    const bool sameImage = (ptr == source);
+    const bool copyToXRange = sameImage && 
+        (destX >= sourceX && destX < sourceX + destW);
+    const bool copyToYRange = sameImage &&
+        (destY >= sourceY && destY < sourceY + destH);
 
     // Just being careful...
     assert(sourceX + destW <= static_cast<int>(source->width()));
@@ -507,10 +799,39 @@ bitmapdata_copyPixels(const fn_call& fn)
     // Copy for the width and height of the *dest* image.
     // We have already ensured that the copied area
     // is inside both bitmapdatas.
-    for (int i = 0; i < destH; ++i) {
-        std::copy(src, src + destW, targ);
-        targ += ptr->width();
-        src += source->width();
+    //
+    // If the destination y-range starts within the source y-range, copy from
+    // bottom to top.
+    // If the destination x-range starts within the source x-range, copy from
+    // right to left.
+    if (copyToYRange) {
+        assert(destH > 0);
+        targ += (destH - 1) * ptr->width();
+        src += (destH - 1) * source->width();
+        // Copy from bottom to top.
+        for (int i = destH; i > 0; --i) {
+            if (copyToXRange) {
+                std::copy_backward(src, src + destW, targ + destW);
+            }
+            else {
+                std::copy(src, src + destW, targ);
+            }
+            targ -= ptr->width();
+            src -= source->width();
+        }
+    }
+    else {
+        // Normal copy from top to bottom.
+        for (int i = 0; i < destH; ++i) {
+            if (copyToXRange) {
+                std::copy_backward(src, src + destW, targ + destW);
+            }
+            else {
+                std::copy(src, src + destW, targ);
+            }
+            targ += ptr->width();
+            src += source->width();
+        }
     }
 
     ptr->updateObjects();
@@ -732,8 +1053,34 @@ as_value
 bitmapdata_noise(const fn_call& fn)
 {
 	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
+
+    if (ptr->disposed()) return as_value();
+
+    if (fn.nargs < 1) {
+        return as_value();
+    }
+    const int seed = toInt(fn.arg(0), getVM(fn));
+
+    const boost::uint8_t low = fn.nargs > 1 ?
+        clamp(toInt(fn.arg(1), getVM(fn)), 0, 255) : 0;
+
+    const boost::uint8_t high = fn.nargs > 2 ?
+        clamp<int>(toInt(fn.arg(2), getVM(fn)), low, 255) : 255;
+
+    const boost::uint8_t chans = fn.nargs > 3 ?
+        std::abs(toInt(fn.arg(3), getVM(fn))) & 15 : 1 | 2 | 4;
+
+    const bool greyscale = fn.nargs > 4 ?
+        toBool(fn.arg(4), getVM(fn)) : false;
+
+    Noise<> noise(seed, low, high);
+
+    NoiseAdapter<Noise<> > n(noise, chans, greyscale);
+
+    std::generate(ptr->begin(), ptr->end(), n);
+    
+    ptr->updateObjects();
+
 	return as_value();
 }
 
