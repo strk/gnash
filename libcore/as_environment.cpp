@@ -555,7 +555,6 @@ getVariableRaw(const as_environment& env, const std::string& varname,
         return as_value(global);
     }
 
-    // Version 4 only has local variables.
     if (global->get_member(key, &val)) {
 #ifdef GNASH_DEBUG_GET_VARIABLE
         log_debug("Found %s in _global", varname);
