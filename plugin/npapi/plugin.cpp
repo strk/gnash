@@ -430,7 +430,7 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
         _params[name] = val;
     }
 
-    if (NPNFuncs.version >= 14) { // since NPAPI start to support
+    if (HasScripting()) {
         _scriptObject = (GnashPluginScriptObject*) NPN_CreateObject( _instance,
             GnashPluginScriptObject::marshalGetNPClass());
     }
@@ -1325,8 +1325,10 @@ nsPluginInstance::startProc()
         return NPERR_GENERIC_ERROR;
     }
 
-    _scriptObject->setControlFD(p2c_controlpipe[1]);
-    _scriptObject->setHostFD(c2p_pipe[0]);
+    if (HasScripting() && _scriptObject) {
+        _scriptObject->setControlFD(p2c_controlpipe[1]);
+        _scriptObject->setHostFD(c2p_pipe[0]);
+    }
     
     // Setup the command line for starting Gnash
 
