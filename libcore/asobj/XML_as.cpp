@@ -55,6 +55,7 @@ namespace {
     as_value xml_onLoad(const fn_call& fn);
     as_value xml_xmlDecl(const fn_call& fn);
     as_value xml_docTypeDecl(const fn_call& fn);
+    as_value xml_contentType(const fn_call& fn);
     as_value xml_escape(const fn_call& fn);
     as_value xml_loaded(const fn_call& fn);
     as_value xml_status(const fn_call& fn);
@@ -86,6 +87,7 @@ XML_as::XML_as(as_object& object)
     XMLNode_as(getGlobal(object)),
     _loaded(XML_LOADED_UNDEFINED), 
     _status(XML_OK),
+    _contentType("application/x-www-form-urlencoded"),
     _ignoreWhite(false)
 {
     setObject(&object);
@@ -97,6 +99,7 @@ XML_as::XML_as(as_object& object, const std::string& xml)
     XMLNode_as(getGlobal(object)),
     _loaded(XML_LOADED_UNDEFINED), 
     _status(XML_OK),
+    _contentType("application/x-www-form-urlencoded"),
     _ignoreWhite(false)
 {
     setObject(&object);
@@ -571,9 +574,9 @@ attachXMLProperties(as_object& o)
     as_object* proto = o.get_prototype();
     if (!proto) return;
     const int flags = 0;
-    proto->init_member("contentType", "application/x-www-form-urlencoded",
-            flags);
     proto->init_property("docTypeDecl", &xml_docTypeDecl, &xml_docTypeDecl,
+            flags);
+    proto->init_property("contentType", &xml_contentType, &xml_contentType,
             flags);
     proto->init_property("ignoreWhite", xml_ignoreWhite, xml_ignoreWhite, flags);
     proto->init_property("loaded", xml_loaded, xml_loaded);
@@ -807,12 +810,28 @@ xml_xmlDecl(const fn_call& fn)
 }
 
 as_value
+xml_contentType(const fn_call& fn)
+{
+    XML_as* ptr = ensure<ThisIsNative<XML_as> >(fn);
+
+    if (!fn.nargs) {
+        // Getter
+        return as_value(ptr->getContentType());
+    }
+
+    // Setter
+    const std::string& contentType = fn.arg(0).to_string();
+    ptr->setContentType(contentType);
+    
+    return as_value();
+}
+
+as_value
 xml_docTypeDecl(const fn_call& fn)
 {
     XML_as* ptr = ensure<ThisIsNative<XML_as> >(fn);
 
-    if (!fn.nargs)
-    {
+    if (!fn.nargs) {
         // Getter
         const std::string& docType = ptr->getDocTypeDecl();
         if (docType.empty()) return as_value();
@@ -820,12 +839,10 @@ xml_docTypeDecl(const fn_call& fn)
     }
 
     // Setter
-
     const std::string& docType = fn.arg(0).to_string();
     ptr->setDocTypeDecl(docType);
     
     return as_value();
-
 }
 
 /// XML.prototype has an empty onLoad function defined.

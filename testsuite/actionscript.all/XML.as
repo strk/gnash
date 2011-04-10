@@ -910,12 +910,12 @@ myxml.onLoad = function(success)
 #endif
 	{
 #if OUTPUT_VERSION < 6
-		check_totals(431);
+		check_totals(438);
 #else
 # if OUTPUT_VERSION < 8
-		check_totals(468);
+		check_totals(475);
 # else
-		check_totals(449);
+		check_totals(456);
 # endif
 #endif
 		play();
@@ -1090,6 +1090,19 @@ h.docTypeDecl = 98;
 check_equals(typeof(h.docTypeDecl), "string");
 check_equals(h.docTypeDecl, "98");
 check_equals(h.toString(), "798<tag />");
+
+check_equals(h.contentType, "application/x-www-form-urlencoded");
+
+h.contentType = 88;
+check_equals(typeof(h.contentType), "string");
+check_equals(h.contentType, "88");
+check_equals(h.toString(), "798<tag />");
+
+h.contentType = "";
+check_equals(typeof(h.contentType), "string");
+check_equals(h.contentType, "");
+check_equals(h.toString(), "798<tag />");
+
 
 #if OUTPUT_VERSION > 5
 

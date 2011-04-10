@@ -101,6 +101,14 @@ public:
         _docTypeDecl = docType;
     }
 
+    const std::string& getContentType() const {
+        return _contentType;
+    }
+
+    void setContentType(const std::string& contentType) {
+        _contentType = contentType;
+    }
+
     // Methods
 
     /// Parses an XML document into the specified XML object tree.
@@ -179,6 +187,8 @@ private:
     std::string _docTypeDecl;
 
     std::string _xmlDecl;
+
+    std::string _contentType;
 
     bool _ignoreWhite;
 };
