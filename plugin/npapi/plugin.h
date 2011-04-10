@@ -89,7 +89,7 @@ public:
     GnashPluginScriptObject *getScriptObject() { return _scriptObject; }; // FIXME: debug only!!!
 
 private:
-    void startProc();
+    NPError startProc();
     std::vector<std::string> getCmdLine(int hostfd, int controlfd);
 
     void setupCookies(const std::string& pageURL);

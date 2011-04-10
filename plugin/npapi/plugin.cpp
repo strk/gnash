@@ -566,7 +566,7 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
     // When testing the interface to the plugin, don't start the player
     // as a debug client "nc -l 1111" is used instead.
     if (!_childpid && !_swf_url.empty()) {
-        startProc();
+        return startProc();
     }
 
     return NPERR_NO_ERROR;
@@ -616,7 +616,7 @@ nsPluginInstance::NewStream(NPMIMEType /*type*/, NPStream* stream,
     _swf_url = stream->url;
 
     if (!_swf_url.empty() && _window) {
-        startProc();
+        return startProc();
     }
 
     return NPERR_NO_ERROR;
@@ -1288,7 +1288,7 @@ nsPluginInstance::setupIOChannel(int fd, GIOFunc handler, GIOCondition signals) 
 }
 
 
-void
+NPError
 nsPluginInstance::startProc()
 {
 
@@ -1299,20 +1299,20 @@ nsPluginInstance::startProc()
     int ret = socketpair(AF_UNIX, SOCK_STREAM, 0, p2c_pipe);
     if (ret == -1) {
         gnash::log_error("socketpair(p2c) failed: %s", strerror(errno));
-        return;
+        return NPERR_GENERIC_ERROR;
     }
     _streamfd = p2c_pipe[1];
 
     ret = socketpair(AF_UNIX, SOCK_STREAM, 0, c2p_pipe);
     if (ret == -1) {
         gnash::log_error("socketpair(c2p) failed: %s", strerror(errno));
-        return;
+        return NPERR_GENERIC_ERROR;
     }
 
     ret = socketpair(AF_UNIX, SOCK_STREAM, 0, p2c_controlpipe);
     if (ret == -1) {
         gnash::log_error("socketpair(control) failed: %s", strerror(errno));
-        return;
+        return NPERR_GENERIC_ERROR;
     }
 
     _scriptObject->setControlFD(p2c_controlpipe[1]);
@@ -1325,7 +1325,7 @@ nsPluginInstance::startProc()
 
     if (arg_vec.empty()) {
         gnash::log_error("Failed to obtain command line parameters.");
-        return;
+        return NPERR_GENERIC_ERROR;
     }
     
     std::vector<const char*> args;
@@ -1341,7 +1341,7 @@ nsPluginInstance::startProc()
     // If the fork failed, childpid is -1. So print out an error message.
     if (_childpid == -1) {
         gnash::log_error("dup2() failed: %s", strerror(errno));
-        return;
+        return NPERR_OUT_OF_MEMORY_ERROR;
     }
     
     // If we are the parent and fork() worked, childpid is a positive integer.
@@ -1372,7 +1372,7 @@ nsPluginInstance::startProc()
         
         setupIOChannel(p2c_controlpipe[1], remove_handler, G_IO_HUP);
 
-        return;
+        return NPERR_NO_ERROR;
     }
     
     // This is the child scope.
