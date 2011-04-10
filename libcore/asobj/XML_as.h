@@ -120,10 +120,6 @@ public:
     ///
     void parseXML(const std::string& xml);
 
-    XMLNode_as* createElement(const std::string& name);
-
-    XMLNode_as* createTextNode(const std::string& name);
-
     ParseStatus status() const {
         return _status;
     }
@@ -140,13 +136,12 @@ public:
         _loaded = st;
     }
   
-    /// \brief
-    /// Return true if ignoreWhite property was set to anything evaluating
-    /// to true.
+    /// Return current ignoreWhite property.
     bool ignoreWhite() const {
         return _ignoreWhite;
     }
 
+    /// Set ignoreWhite property.
     void ignoreWhite(bool ignore) {
         _ignoreWhite = ignore;
     }
