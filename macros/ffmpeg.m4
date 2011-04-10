@@ -90,6 +90,9 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
         if test -f ${ffmpeg_top_incl}/${i}/avcodec.h; then
           ac_cv_path_ffmpeg_incl="-I`(cd ${ffmpeg_top_incl}/${i}; pwd)`"
           avcodec_h=${ffmpeg_top_incl}/${i}/avcodec.h
+          if test -f ${ffmpeg_top_incl}/${i}/version.h; then
+            avcodec_version_h=${ffmpeg_top_incl}/${i}/version.h
+          fi
           break
         fi
       done
