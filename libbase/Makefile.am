@@ -196,7 +196,6 @@ EXTENSIONS_API = \
 	StringPredicates.h \
 	Stats.h \
 	GnashEnums.h \
-	smart_ptr.h \
 	string_table.h \
 	ref_counted.h \
 	GC.h \

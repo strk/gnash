@@ -23,7 +23,6 @@
 #include "SWF.h"
 #include "SWFStream.h"
 #include "movie_definition.h"
-#include "smart_ptr.h"
 #include "FillStyle.h"
 #include "Geometry.h"
 #include "GnashNumeric.h"

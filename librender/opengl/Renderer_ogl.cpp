@@ -30,7 +30,6 @@
 #include <cmath>
 #include <boost/scoped_ptr.hpp>
 
-#include "smart_ptr.h"
 #include "swf/ShapeRecord.h"
 #include "GnashEnums.h"
 #include "RGBA.h"

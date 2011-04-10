@@ -615,6 +615,7 @@ getvariable-dotdot-6.swf:becc7079e65bcf47fe2ab0293bbc2c29
 getvariable-dotdot-7.swf:efa5597fe3e61764b6ee937f87d8cf1b
 getvariable-dotdot-8.swf:2861d34a85b5de09f41af572e0b1a6a5
 getvariable-length-5.swf:2d07e2afdf45356cf2df5c1176ed29ad
+getvariable-scopechain-5.swf:d46305206debfb53bb70678c32d2c401
 getvariable-setvariable-5.swf:6bdb4be98bfd34cf5c37d237c13a732a
 getvariable-setvariable-6.swf:eec9c92f5871136bdc444595aa26dbb9
 getvariable-setvariable-7.swf:ca4ed5a192fde844558b9b1b91b48a03
@@ -874,6 +875,10 @@ number-construct-5.swf:088dba71e4cd7a40af90e5e9d587d37d
 number-construct-6.swf:dcc593e3aa5895ba1afb3aacbaf0b6a0
 number-construct-7.swf:983a9fd7016e14aa58b03cd0b4f4cf08
 number-construct-8.swf:cded06557be37197e945a29fd09e0b0f
+number-properties-5.swf:33792346ad69c8f74699480a0183bd03
+number-properties-6.swf:ab737b0ba11b14f15c8784005dcc71b0
+number-properties-7.swf:6faeb469033c0d0310f0d982740ef1b0
+number-properties-8.swf:5d88f881c8b6f3f6e10a244301fcafed
 number.swf:3ef5211bf02f128749453b0ea006061d
 number-tostring-radix-5.swf:9c620b9523efbfc2cd30832d38c3d403
 number-tostring-radix-6.swf:82b91ba51d982a8c27dddffd129051df
@@ -1517,6 +1522,10 @@ xml-errors-8.swf:321a6535952813fadeaef64c99fa467d
 xml-escape-6.swf:302349505514bd60239c7019355f6ab8
 xml-escape-7.swf:31cca7515723685cf0384bf7e059e8ac
 xml-escape-8.swf:cbd1f724a3dc3e73697535468443171d
+xml-id-map-5.swf:cbc2a3b106ee7eafea7a058bb59bfcbf
+xml-id-map-6.swf:42fd72c065f4d14f459a8b3e8f2ba8d8
+xml-id-map-7.swf:49df5d26cdb5c3d1008d28d23ec46ad0
+xml-id-map-8.swf:1901f3cda027e9b3e6cd0b1b372dba12
 xml-init-5.swf:2ba1da174f2b1958749fede5667a60c4
 xml-init-5.swf:bb54cac64e38396084a147266f7d9711
 xml-init-6.swf:d82535b95268d2f426800229232697fd

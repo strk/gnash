@@ -54,4 +54,4 @@ on which you can run ./autogen.sh successfully, then move it back to the
 system you are trying to build on.
 
 Once ./autogen.sh completes successfully, you can go on with the normal
-instructions found in the README file.
+instructions found in the README and INSTALL files.

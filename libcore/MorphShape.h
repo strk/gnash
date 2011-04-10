@@ -20,7 +20,6 @@
 #ifndef GNASH_MORPH_SHAPE_H
 #define GNASH_MORPH_SHAPE_H
 
-#include "smart_ptr.h" 
 #include "DisplayObject.h"
 #include "swf/DefineMorphShapeTag.h"
 #include <boost/intrusive_ptr.hpp>

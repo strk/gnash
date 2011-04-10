@@ -59,7 +59,6 @@
 
 #include "Range2d.h"
 
-#include "smart_ptr.h"
 #include "movie_definition.h" 
 #include "log.h"
 

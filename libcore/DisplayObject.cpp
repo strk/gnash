@@ -29,8 +29,8 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/bind.hpp>
+#include <boost/logic/tribool.hpp>
 
-#include "smart_ptr.h" 
 #include "movie_root.h"
 #include "MovieClip.h"
 #include "VM.h" 
@@ -49,8 +49,7 @@
 
 #undef set_invalidated
 
-namespace gnash
-{
+namespace gnash {
 
 // Forward declarations.
 namespace {
@@ -96,6 +95,8 @@ DisplayObject::DisplayObject(movie_root& mr, as_object* object,
     _yscale(100),
     _rotation(0),
     _depth(0),
+    _focusRect(parent ? boost::tribool(boost::indeterminate) :
+                        boost::tribool(true)),
     _volume(100),
     _ratio(0),
     m_clip_depth(noClipDepthValue),
@@ -1418,16 +1419,36 @@ setWidth(DisplayObject& o, const as_value& val)
 }
 
 as_value
-getFocusRect(DisplayObject& /*o*/)
+getFocusRect(DisplayObject& o)
 {
     LOG_ONCE(log_unimpl("_focusrect"));
-    return as_value(true);
+
+    const boost::tribool fr = o.focusRect();
+    if (boost::indeterminate(fr)) {
+        as_value null;
+        null.set_null();
+        return as_value(null);
+    }
+    const bool ret = static_cast<bool>(fr);
+    if (getSWFVersion(*getObject(&o)) == 5) {
+        return as_value(static_cast<double>(ret));
+    }
+    return as_value(ret);
 }
 
 void
-setFocusRect(DisplayObject& /*o*/, const as_value& /*val*/)
+setFocusRect(DisplayObject& o, const as_value& val)
 {
-    LOG_ONCE(log_unimpl("_focusrect setting"));
+    LOG_ONCE(log_unimpl("_focusrect"));
+
+    VM& vm = getVM(*getObject(&o));
+    if (!o.parent()) {
+        const double d = toNumber(val, vm);
+        if (isNaN(d)) return;
+        o.focusRect(d);
+        return;
+    }
+    o.focusRect(toBool(val, vm));
 }
 
 as_value

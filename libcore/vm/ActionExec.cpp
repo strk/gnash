@@ -34,7 +34,6 @@
 #include "as_environment.h"
 #include "SystemClock.h"
 #include "CallStack.h"
-#include "smart_ptr.h"
 
 #include <sstream>
 #include <string>

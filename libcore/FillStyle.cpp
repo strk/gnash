@@ -22,7 +22,6 @@
 #include <ostream> 
 #include <boost/variant.hpp>
 
-#include "smart_ptr.h"
 #include "CachedBitmap.h"
 #include "movie_definition.h"
 #include "SWF.h"

@@ -101,6 +101,14 @@ public:
         _docTypeDecl = docType;
     }
 
+    const std::string& getContentType() const {
+        return _contentType;
+    }
+
+    void setContentType(const std::string& contentType) {
+        _contentType = contentType;
+    }
+
     // Methods
 
     /// Parses an XML document into the specified XML object tree.
@@ -111,10 +119,6 @@ public:
     /// Calls to this function clear any precedently parsed data.
     ///
     void parseXML(const std::string& xml);
-
-    XMLNode_as* createElement(const std::string& name);
-
-    XMLNode_as* createTextNode(const std::string& name);
 
     ParseStatus status() const {
         return _status;
@@ -131,6 +135,16 @@ public:
     void setLoaded(LoadStatus st) {
         _loaded = st;
     }
+  
+    /// Return current ignoreWhite property.
+    bool ignoreWhite() const {
+        return _ignoreWhite;
+    }
+
+    /// Set ignoreWhite property.
+    void ignoreWhite(bool ignore) {
+        _ignoreWhite = ignore;
+    }
 
 private:
 
@@ -143,7 +157,8 @@ private:
 
     void parseDocTypeDecl( xml_iterator& it, xml_iterator end);
 
-    void parseText(XMLNode_as* node, xml_iterator& it, xml_iterator end);
+    void parseText(XMLNode_as* node, xml_iterator& it, xml_iterator end,
+            bool ignoreWhite);
 
     void parseXMLDecl(xml_iterator& it, xml_iterator end);
 
@@ -156,11 +171,6 @@ private:
     /// This removes all children, resets doctype and xml decls, and
     /// sets status to XML.
     void clear();
-  
-    /// \brief
-    /// Return true if ignoreWhite property was set to anything evaluating
-    /// to true.
-    bool ignoreWhite();
 
     // -1 if never asked to load anything
     //  0 if asked to load but not yet loaded (or failure)
@@ -173,6 +183,9 @@ private:
 
     std::string _xmlDecl;
 
+    std::string _contentType;
+
+    bool _ignoreWhite;
 };
 
 

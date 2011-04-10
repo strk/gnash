@@ -27,7 +27,6 @@
 #include "gnashconfig.h" // for USE_SWFTREE
 #endif
 
-#include "smart_ptr.h" 
 #include "movie_definition.h" // for inheritance
 #include "DefinitionTag.h" // for boost::intrusive_ptr visibility of dtor
 #include "StringPredicates.h" 

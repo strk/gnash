@@ -17,22 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-
-#include "log.h"
-#include "as_function.h" //for as_function
-#include "fn_call.h"
-#include "Global_as.h"
-
-#include "LoadableObject.h"
 #include "XMLNode_as.h"
-#include "XML_as.h"
-#include "NativeFunction.h"
-#include "VM.h"
-#include "namedStrings.h"
-#include "StringPredicates.h"
-#include "smart_ptr.h" // for boost intrusive_ptr
-#include "GnashException.h" // for ActionException
-#include "Object.h"
 
 #include <string>
 #include <sstream>
@@ -42,6 +27,17 @@
 #include <boost/algorithm/string/compare.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
+#include "log.h"
+#include "as_function.h" 
+#include "fn_call.h"
+#include "Global_as.h"
+#include "LoadableObject.h"
+#include "XML_as.h"
+#include "NativeFunction.h"
+#include "VM.h"
+#include "namedStrings.h"
+#include "StringPredicates.h"
+#include "Object.h"
 
 namespace gnash {
 
@@ -56,9 +52,11 @@ namespace {
     as_value xml_onLoad(const fn_call& fn);
     as_value xml_xmlDecl(const fn_call& fn);
     as_value xml_docTypeDecl(const fn_call& fn);
+    as_value xml_contentType(const fn_call& fn);
     as_value xml_escape(const fn_call& fn);
     as_value xml_loaded(const fn_call& fn);
     as_value xml_status(const fn_call& fn);
+    as_value xml_ignoreWhite(const fn_call& fn);
 
     typedef XML_as::xml_iterator xml_iterator;
 
@@ -67,6 +65,9 @@ namespace {
             const std::string& match, bool advance = true);
     bool parseNodeWithTerminator( xml_iterator& it, xml_iterator end,
             const std::string& terminator, std::string& content);
+
+    void setIdMap(as_object& xml, XMLNode_as& childNode,
+            const std::string& val);
 	
 	
     typedef std::map<std::string, std::string> Entities;
@@ -74,7 +75,6 @@ namespace {
 
     void attachXMLProperties(as_object& o);
 	void attachXMLInterface(as_object& o);
-
 }
 
 
@@ -82,7 +82,9 @@ XML_as::XML_as(as_object& object)
     :
     XMLNode_as(getGlobal(object)),
     _loaded(XML_LOADED_UNDEFINED), 
-    _status(XML_OK)
+    _status(XML_OK),
+    _contentType("application/x-www-form-urlencoded"),
+    _ignoreWhite(false)
 {
     setObject(&object);
 }
@@ -92,7 +94,9 @@ XML_as::XML_as(as_object& object, const std::string& xml)
     :
     XMLNode_as(getGlobal(object)),
     _loaded(XML_LOADED_UNDEFINED), 
-    _status(XML_OK)
+    _status(XML_OK),
+    _contentType("application/x-www-form-urlencoded"),
+    _ignoreWhite(false)
 {
     setObject(&object);
     parseXML(xml);
@@ -131,14 +135,17 @@ XML_as::toString(std::ostream& o, bool encode) const
     if (!_xmlDecl.empty()) o << _xmlDecl;
     if (!_docTypeDecl.empty()) o << _docTypeDecl;
 
-    XMLNode_as::toString(o, encode);
+    XMLNode_as* i = firstChild();
+    while (i) {
+        i->XMLNode_as::toString(o, encode);
+        i = i->nextSibling();
+    }
 }
 
 void
 XML_as::parseAttribute(XMLNode_as* node, xml_iterator& it,
         const xml_iterator end, Attributes& attributes)
 {
-
     const std::string terminators("\r\t\n >=");
 
     xml_iterator ourend = std::find_first_of(it, end,
@@ -251,13 +258,11 @@ XML_as::parseDocTypeDecl(xml_iterator& it, const xml_iterator end)
     it = ourend + 1;
 }
 
-
 void
 XML_as::parseXMLDecl(xml_iterator& it, const xml_iterator end)
 {
     std::string content;
-    if (!parseNodeWithTerminator(it, end, "?>", content))
-    {
+    if (!parseNodeWithTerminator(it, end, "?>", content)) {
         _status = XML_UNTERMINATED_XML_DECL;
         return;
     }
@@ -267,7 +272,6 @@ XML_as::parseXMLDecl(xml_iterator& it, const xml_iterator end)
 
     // This is appended to any xmlDecl already there.
     _xmlDecl += os.str();
-
 }
 
 // The iterator should be pointing to the first char after the '<'
@@ -275,7 +279,6 @@ void
 XML_as::parseTag(XMLNode_as*& node, xml_iterator& it,
         const xml_iterator end)
 {
-
     bool closing = (*it == '/');
     if (closing) ++it;
 
@@ -343,12 +346,16 @@ XML_as::parseTag(XMLNode_as*& node, xml_iterator& it,
         // Do nothing more if there was an error in attributes parsing.
         if (_status != XML_OK) return;
 
+        // testsuite/swfdec/xml-id-map.as tests that the node is appended
+        // first.
+        node->appendChild(childNode);
+
         for (Attributes::const_reverse_iterator i = attributes.rbegin(),
                 e = attributes.rend(); i != e; ++i) {
             childNode->setAttribute(i->first, i->second);
+            if (i->first == "id") setIdMap(*object(), *childNode, i->second);
         }
 
-        node->appendChild(childNode);
         if (*it == '/') ++it;
         else node = childNode;
 
@@ -393,14 +400,14 @@ XML_as::parseTag(XMLNode_as*& node, xml_iterator& it,
 
 void
 XML_as::parseText(XMLNode_as* node, xml_iterator& it,
-        const xml_iterator end)
+        const xml_iterator end, bool iw)
 {
     xml_iterator ourend = std::find(it, end, '<');
     std::string content(it, ourend);
     
     it = ourend;
 
-    if (ignoreWhite() && 
+    if (iw && 
         content.find_first_not_of("\t\r\n ") == std::string::npos) return;
 
     XMLNode_as* childNode = new XMLNode_as(_global);
@@ -444,7 +451,6 @@ XML_as::parseCData(XMLNode_as* node, xml_iterator& it,
     childNode->nodeValueSet(content);
     childNode->nodeTypeSet(Text);
     node->appendChild(childNode);
-    
 }
 
 
@@ -452,47 +458,42 @@ XML_as::parseCData(XMLNode_as* node, xml_iterator& it,
 void
 XML_as::parseXML(const std::string& xml)
 {
+    // Clear current data
+    clear(); 
 
     if (xml.empty()) {
         log_error(_("XML data is empty"));
         return;
     }
 
-    // Clear current data
-    clear(); 
-
     xml_iterator it = xml.begin();
     const xml_iterator end = xml.end();
     XMLNode_as* node = this;
 
-    while (it != end && _status == XML_OK)
-    {
-        if (*it == '<')
-        {
+    const bool iw = ignoreWhite();
+
+    while (it != end && _status == XML_OK) {
+        if (*it == '<') {
             ++it;
-            if (textMatch(it, end, "!DOCTYPE", false))
-            {
+            if (textMatch(it, end, "!DOCTYPE", false)) {
                 // We should not advance past the DOCTYPE label, as
                 // the case is preserved.
                 parseDocTypeDecl(it, end);
             }
-            else if (textMatch(it, end, "?xml", false))
-            {
+            else if (textMatch(it, end, "?xml", false)) {
                 // We should not advance past the xml label, as
                 // the case is preserved.
                 parseXMLDecl(it, end);
             }
-            else if (textMatch(it, end, "!--"))
-            {
+            else if (textMatch(it, end, "!--")) {
                 parseComment(node, it, end);
             }
-            else if (textMatch(it, end, "![CDATA["))
-            {
+            else if (textMatch(it, end, "![CDATA[")) {
                 parseCData(node, it, end);
             }
             else parseTag(node, it, end);
         }
-        else parseText(node, it, end);
+        else parseText(node, it, end, iw);
     }
 
     // If everything parsed correctly, check that we've got back to the
@@ -513,30 +514,12 @@ XML_as::clear()
     _status = XML_OK;
 }
 
-bool
-XML_as::ignoreWhite() 
-{
-
-    // TODO: use NSV:
-    const ObjectURI& propnamekey =
-        getURI(getVM(_global), "ignoreWhite");
-    as_value val;
-
-    as_object* obj = object();
-
-    if (!obj->get_member(propnamekey, &val)) {
-        return false;
-    }
-    return toBool(val, getVM(*obj));
-}
-
 // XML.prototype is assigned after the class has been constructed, so it
 // replaces the original prototype and does not have a 'constructor'
 // property.
 void
 xml_class_init(as_object& where, const ObjectURI& uri)
 {
-
     Global_as& gl = getGlobal(where);
     as_object* cl = gl.createClass(&xml_new, 0);
 
@@ -553,7 +536,6 @@ xml_class_init(as_object& where, const ObjectURI& uri)
     }
     
     where.init_member(uri, cl, as_object::DefaultFlags);
-
 }
 
 void
@@ -571,26 +553,23 @@ namespace {
 void
 attachXMLProperties(as_object& o)
 {
-
     as_object* proto = o.get_prototype();
     if (!proto) return;
     const int flags = 0;
-    proto->init_member("contentType", "application/x-www-form-urlencoded",
-            flags);
     proto->init_property("docTypeDecl", &xml_docTypeDecl, &xml_docTypeDecl,
             flags);
-    proto->init_member("ignoreWhite", false, flags);
+    proto->init_property("contentType", &xml_contentType, &xml_contentType,
+            flags);
+    proto->init_property("ignoreWhite", xml_ignoreWhite, xml_ignoreWhite, flags);
     proto->init_property("loaded", xml_loaded, xml_loaded);
     proto->init_property("status", xml_status, xml_status, flags);
     proto->init_property("xmlDecl", &xml_xmlDecl, &xml_xmlDecl, flags);
-
 }
 
 
 void
 attachXMLInterface(as_object& o)
 {
-
     VM& vm = getVM(o);
     Global_as& gl = getGlobal(o);
 
@@ -609,13 +588,11 @@ attachXMLInterface(as_object& o)
     o.init_member("sendAndLoad", vm.getNative(301, 2), flags);
     o.init_member("onData", gl.createFunction(xml_onData), flags);
     o.init_member("onLoad", gl.createFunction(xml_onLoad), flags);
-
 }
 
 as_value
 xml_new(const fn_call& fn)
 {
-
     as_object* obj = ensure<ValidThis>(fn);
 
     if (fn.nargs && !fn.arg(0).is_undefined()) {
@@ -674,6 +651,10 @@ xml_status(const fn_call& fn)
         return as_value(ptr->status());
     }
 
+    if (fn.arg(0).is_undefined()) {
+        return as_value();
+    }
+
     const double status = toNumber(fn.arg(0), getVM(fn));
     if (isNaN(status) ||
             status > std::numeric_limits<boost::int32_t>::max() ||
@@ -682,8 +663,22 @@ xml_status(const fn_call& fn)
         ptr->setStatus(static_cast<XML_as::ParseStatus>(
                     std::numeric_limits<boost::int32_t>::min()));
     }
+    else ptr->setStatus(static_cast<XML_as::ParseStatus>(int(status)));
+    return as_value();
+}
+    
+as_value
+xml_ignoreWhite(const fn_call& fn)
+{
+    XML_as* ptr = ensure<ThisIsNative<XML_as> >(fn);
+    if (!fn.nargs) {
+        // Getter
+        return as_value(ptr->ignoreWhite());
+    }
 
-    ptr->setStatus(static_cast<XML_as::ParseStatus>(int(status)));
+    // Setter
+    if (fn.arg(0).is_undefined()) return as_value();
+    ptr->ignoreWhite(toBool(fn.arg(0), getVM(fn)));
     return as_value();
 }
 
@@ -709,21 +704,18 @@ xml_escape(const fn_call& fn)
 as_value
 xml_createElement(const fn_call& fn)
 {
-    
-    if (fn.nargs > 0)
-    {
-        const std::string& text = fn.arg(0).to_string();
-        XMLNode_as *xml_obj = new XMLNode_as(getGlobal(fn));
-        xml_obj->nodeNameSet(text);
-        xml_obj->nodeTypeSet(XMLNode_as::Text);
+    if (!fn.nargs || fn.arg(0).is_undefined()) {
+        return as_value();
+    }
 
-        return as_value(xml_obj->object());
-        
-    }
-    else {
-        log_error(_("no text for element creation"));
-    }
-    return as_value();
+    const as_value& arg = fn.arg(0);
+
+    const std::string& text = arg.to_string(getSWFVersion(fn));
+    XMLNode_as *xml_obj = new XMLNode_as(getGlobal(fn));
+    xml_obj->nodeNameSet(text);
+    if (!text.empty()) xml_obj->nodeTypeSet(XMLNode_as::Text);
+
+    return as_value(xml_obj->object());
 }
 
 
@@ -738,7 +730,6 @@ xml_createElement(const fn_call& fn)
 as_value
 xml_createTextNode(const fn_call& fn)
 {
-
     if (fn.nargs > 0) {
         const std::string& text = fn.arg(0).to_string();
         XMLNode_as* xml_obj = new XMLNode_as(getGlobal(fn));
@@ -756,18 +747,19 @@ xml_createTextNode(const fn_call& fn)
 as_value
 xml_parseXML(const fn_call& fn)
 {
-
     XML_as* ptr = ensure<ThisIsNative<XML_as> >(fn);
 
-    if (fn.nargs < 1)
-    {
+    if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror("XML.parseXML() needs one argument");
         );
         return as_value();
     }
 
-    const std::string& text = fn.arg(0).to_string();
+    const as_value arg = fn.arg(0);
+    if (arg.is_undefined()) return as_value();
+
+    const std::string& text = arg.to_string(getSWFVersion(fn));
     ptr->parseXML(text);
     
     return as_value();
@@ -778,8 +770,7 @@ xml_xmlDecl(const fn_call& fn)
 {
     XML_as* ptr = ensure<ThisIsNative<XML_as> >(fn);
 
-    if (!fn.nargs)
-    {
+    if (!fn.nargs) {
         // Getter
         const std::string& xml = ptr->getXMLDecl();
         if (xml.empty()) return as_value();
@@ -792,7 +783,23 @@ xml_xmlDecl(const fn_call& fn)
     ptr->setXMLDecl(xml);
     
     return as_value();
+}
 
+as_value
+xml_contentType(const fn_call& fn)
+{
+    XML_as* ptr = ensure<ThisIsNative<XML_as> >(fn);
+
+    if (!fn.nargs) {
+        // Getter
+        return as_value(ptr->getContentType());
+    }
+
+    // Setter
+    const std::string& contentType = fn.arg(0).to_string();
+    ptr->setContentType(contentType);
+    
+    return as_value();
 }
 
 as_value
@@ -800,8 +807,7 @@ xml_docTypeDecl(const fn_call& fn)
 {
     XML_as* ptr = ensure<ThisIsNative<XML_as> >(fn);
 
-    if (!fn.nargs)
-    {
+    if (!fn.nargs) {
         // Getter
         const std::string& docType = ptr->getDocTypeDecl();
         if (docType.empty()) return as_value();
@@ -809,12 +815,10 @@ xml_docTypeDecl(const fn_call& fn)
     }
 
     // Setter
-
     const std::string& docType = fn.arg(0).to_string();
     ptr->setDocTypeDecl(docType);
     
     return as_value();
-
 }
 
 /// XML.prototype has an empty onLoad function defined.
@@ -827,7 +831,6 @@ xml_onLoad(const fn_call& /*fn*/)
 as_value
 xml_onData(const fn_call& fn)
 {
-
     as_object* thisPtr = fn.this_ptr;
     assert(thisPtr);
 
@@ -857,7 +860,6 @@ bool
 textMatch(xml_iterator& it, const xml_iterator end,
         const std::string& match, bool advance)
 {
-
     const std::string::size_type len = match.length();
 
     if (static_cast<size_t>(end - it) < len) return false;
@@ -908,10 +910,42 @@ parseNodeWithTerminator(xml_iterator& it, const xml_iterator end,
     return true;
 }
 
+
+void
+setIdMap(as_object& xml, XMLNode_as& childNode, const std::string& val)
+{
+    VM& vm = getVM(xml);
+
+    const ObjectURI& id = getURI(vm, "idMap");
+
+    if (getSWFVersion(xml) < 8) {
+        // In version 7 or below, properties are added to the XML object.
+        xml.set_member(getURI(vm, val), childNode.object());
+        return;
+    }
+
+    // In version 8 or above, properties are added to an idMap member.
+    as_value im;
+    as_object* idMap;
+    if (xml.get_member(id, &im)) {
+        // If it's present but not an object just ignore it
+        // and carry on.
+        if (!im.is_object()) return;
+
+        idMap = toObject(im, vm);
+        assert(idMap);
+    }
+    else {
+        // If it's not there at all create it.
+        idMap = new as_object(getGlobal(xml));
+        xml.set_member(id, idMap);
+    }
+    idMap->set_member(getURI(vm, val), childNode.object());
+}
+
 const Entities&
 getEntities()
 {
-
     static const Entities entities = boost::assign::map_list_of
         ("&amp;", "&")
         ("&quot;", "\"")
@@ -920,7 +954,6 @@ getEntities()
         ("&apos;", "'");
 
     return entities;
-
 }
 
 } // anonymous namespace 

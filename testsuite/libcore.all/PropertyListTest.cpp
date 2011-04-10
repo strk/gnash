@@ -27,7 +27,6 @@
 #include "as_object.h" // need to set as owner of PropertyList
 #include "as_value.h"
 #include "log.h"
-#include "smart_ptr.h"
 #include "PropFlags.h"
 #include "ManualClock.h"
 #include "RunResources.h"

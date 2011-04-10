@@ -46,7 +46,6 @@
 #include "sound_handler.h"
 #include "Timers.h"
 #include "GnashKey.h"
-#include "MovieFactory.h"
 #include "GnashAlgorithm.h"
 #include "GnashNumeric.h"
 #include "Global_as.h"

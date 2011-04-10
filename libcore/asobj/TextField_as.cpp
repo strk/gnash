@@ -24,7 +24,6 @@
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "smart_ptr.h" // for boost intrusive_ptr
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "TextFormat_as.h"
 #include "MovieClip.h"
@@ -666,24 +665,28 @@ textfield_getTextFormat(const fn_call& fn)
 as_value
 textfield_setTextFormat(const fn_call& fn)
 {
-
     TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
-    if ( ! fn.nargs )
-    {
+    if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror("TextField.setTextFormat(%s) : %s", ss.str(),
-            _("missing arg"))
+            std::stringstream ss; fn.dump_args(ss);
+            log_aserror("TextField.setTextFormat(%s) : %s", ss.str(),
+                _("missing arg"))
         );
         return as_value();
     }
-    else if ( fn.nargs > 2 )
-    {
-        std::stringstream ss; fn.dump_args(ss);
-        log_debug("TextField.setTextFormat(%s) : args past the first are "
-                "unhandled by Gnash", ss.str());
+    else if (fn.nargs > 1) {
+        LOG_ONCE(
+            std::stringstream ss; fn.dump_args(ss);
+            log_unimpl("TextField.setTextFormat(%s) : args past the first are "
+                    "unhandled by Gnash", ss.str());
+        );
     }
+
+    // Note there are three overloads for this functions, each taking
+    // a TextFormat as the last argument.
+    // TODO: handle the cases where text indices are passed as first
+    // and second arguments.
 
     TextFormat_as* tf;
     if (!isNativeType(toObject(fn.arg(0), getVM(fn)), tf)) {
@@ -696,11 +699,9 @@ textfield_setTextFormat(const fn_call& fn)
         return as_value();
     }
 
-    if (tf->font())
-    {
+    if (tf->font()) {
         const std::string& fontName = *tf->font();
-        if ( ! fontName.empty() )
-        {
+        if (!fontName.empty()) {
             bool bold = tf->bold() ? *tf->bold() : false;
             bool italic = tf->italic() ? *tf->italic() : false;
 

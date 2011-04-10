@@ -386,8 +386,25 @@ check_equals(ns.prefix, "");
 xn = new XMLNode(1, "");
 xn.xmlDecl = "hello";
 xn.docTypeDecl = "dtd";
-xcheck_equals(xn.toString(), "< />");
+check_equals(xn.toString(), "< />");
+
+xn = new XMLNode(2, "");
+check_equals(xn.toString(), "");
+
+xn = new XMLNode(3, "");
+check_equals(xn.toString(), "");
+
+xn = new XMLNode(4, "");
+check_equals(xn.toString(), "");
+
+xn = new XMLNode(5, "");
+check_equals(xn.toString(), "");
+
+xn = new XMLNode(6, "");
+check_equals(xn.toString(), "");
+
+xn = new XMLNode(7, "");
+check_equals(xn.toString(), "");
 
 
-
-check_totals(176);
+check_totals(182);

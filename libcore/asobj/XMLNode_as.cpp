@@ -30,7 +30,6 @@
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "smart_ptr.h" // for boost intrusive_ptr
 #include "NativeFunction.h"
 #include "PropertyList.h"
 #include "Global_as.h"
@@ -171,27 +170,27 @@ XMLNode_as::childNodes()
 }
 
 bool
-XMLNode_as::hasChildNodes()
+XMLNode_as::hasChildNodes() const
 {
     return !_children.empty();
 }
 
 XMLNode_as*
-XMLNode_as::firstChild()
+XMLNode_as::firstChild() const
 {
     if (_children.empty()) return 0;
     return _children.front();
 }
 
 XMLNode_as*
-XMLNode_as::cloneNode(bool deep)
+XMLNode_as::cloneNode(bool deep) const
 {
     XMLNode_as* newnode = new XMLNode_as(*this, deep);
     return newnode;
 }
 
 XMLNode_as*
-XMLNode_as::lastChild()
+XMLNode_as::lastChild() const
 {
 	if (_children.empty()) {
         return 0;
@@ -242,8 +241,8 @@ XMLNode_as::insertBefore(XMLNode_as* newnode, XMLNode_as* pos)
     updateChildNodes();
 }
 
-XMLNode_as *
-XMLNode_as::previousSibling()
+XMLNode_as*
+XMLNode_as::previousSibling() const
 {
     if (!_parent) return 0;
  	if (_parent->_children.size() <= 1) return 0;
@@ -260,8 +259,8 @@ XMLNode_as::previousSibling()
     return 0;
 }
 
-XMLNode_as *
-XMLNode_as::nextSibling()
+XMLNode_as*
+XMLNode_as::nextSibling() const
 {
 
     if (!_parent) return 0;
@@ -296,8 +295,9 @@ XMLNode_as::setAttribute(const std::string& name, const std::string& value)
 
 bool
 XMLNode_as::getPrefixForNamespace(const std::string& ns, std::string& prefix)
+    const
 {
-    XMLNode_as* node = this;
+    const XMLNode_as* node = this;
     StringPairs::const_iterator it; 
     StringPairs attrs;
     
@@ -333,8 +333,9 @@ XMLNode_as::getPrefixForNamespace(const std::string& ns, std::string& prefix)
 
 void
 XMLNode_as::getNamespaceForPrefix(const std::string& prefix, std::string& ns)
+    const
 {
-    XMLNode_as* node = this;
+    const XMLNode_as* node = this;
     StringPairs::const_iterator it; 
     StringPairs attrs;
     
@@ -360,7 +361,7 @@ XMLNode_as::getNamespaceForPrefix(const std::string& prefix, std::string& ns)
 }
 
 bool
-XMLNode_as::extractPrefix(std::string& prefix)
+XMLNode_as::extractPrefix(std::string& prefix) const
 {
     prefix.clear();
     if (_name.empty()) return false;
@@ -404,11 +405,10 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
             nodeValue, xml._attributes.size(), xml._children.size());
 #endif
 
-    // Create the beginning of the tag
-    if (!nodeName.empty()) {
+    if (!nodeName.empty() || type == Element) {
 
         xmlout << "<" << nodeName;
-    
+
         // Process the attributes, if any
         StringPairs attrs;
         enumerateAttributes(xml, attrs);
@@ -421,16 +421,15 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
             }
         }
 
-    	// If the node has no content, just close the tag now
-    	if (nodeValue.empty() && xml._children.empty()) {
-    		xmlout << " />";
+        // If the node has no content, just close the tag now
+        if (nodeValue.empty() && xml._children.empty()) {
+            xmlout << " />";
             return;
-    	}
+        }
         else {
             // Will use a closing tag later
             xmlout << ">";
         }
-
     }
 
     // Node as_value first, then children
@@ -455,8 +454,8 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
         (*itx)->toString(xmlout, encode);
     }
 
-    if (!nodeName.empty()) {
-	    xmlout << "</" << nodeName << ">";
+    if (!nodeName.empty() || type == Element) {
+        xmlout << "</" << nodeName << ">";
     }
 }
 

@@ -25,7 +25,6 @@
 #include "Font.h"
 #include "SWFStream.h"
 #include "Global_as.h"
-#include "smart_ptr.h"
 
 namespace gnash {
 namespace SWF {

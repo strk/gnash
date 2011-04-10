@@ -84,6 +84,18 @@ public:
 	long get_ref_count() const { return m_ref_count; }
 };
 
+inline void
+intrusive_ptr_add_ref(const ref_counted* o)
+{
+	o->add_ref();
+}
+
+inline void
+intrusive_ptr_release(const ref_counted* o)
+{
+	o->drop_ref();
+}
+
 } // namespace gnash
 
 #endif // GNASH_REF_COUNTED_H

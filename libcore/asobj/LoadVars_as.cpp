@@ -24,7 +24,6 @@
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "smart_ptr.h" 
 #include "NativeFunction.h" // need builtin_function
 #include "as_function.h" // for calling event handlers
 #include "as_value.h" // for setting up a fn_call

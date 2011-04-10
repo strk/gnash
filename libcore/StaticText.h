@@ -20,7 +20,6 @@
 #ifndef GNASH_STATIC_TEXT_H
 #define GNASH_STATIC_TEXT_H
 
-#include "smart_ptr.h" 
 #include "DisplayObject.h" // for inheritance
 #include "swf/DefineTextTag.h"
 

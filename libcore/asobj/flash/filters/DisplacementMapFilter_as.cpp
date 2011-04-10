@@ -31,7 +31,6 @@
 #include "Global_as.h"
 #include "BitmapFilter_as.h"
 #include "Filters.h"
-#include "smart_ptr.h"
 
 namespace gnash {
 

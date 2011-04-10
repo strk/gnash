@@ -23,7 +23,6 @@
 
 #include "RunResources.h"
 #include "DefineShapeTag.h"
-#include "smart_ptr.h" 
 #include "log.h"
 #include "Shape.h"
 #include "SWFStream.h"

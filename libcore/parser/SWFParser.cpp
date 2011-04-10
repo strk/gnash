@@ -22,7 +22,6 @@
 #include "SWFParser.h"
 #include "TagLoadersTable.h"
 #include "log.h"
-#include "smart_ptr.h"
 
 #include <iomanip>
 

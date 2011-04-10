@@ -35,7 +35,6 @@
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "smart_ptr.h" 
 #include "GnashException.h" 
 #include "VM.h" 
 #include "Renderer.h"
@@ -123,14 +122,14 @@ namespace {
 template<typename RNG = boost::rand48>
 struct Noise
 {
-    Noise(int seed, boost::uint8_t low, boost::uint8_t high)
+    Noise(int seed, int low, int high)
         :
         rng(seed),
         dist(low, high),
         uni(rng, dist)
     {}
 
-    boost::uint8_t operator()() {
+    int operator()() {
         return uni();
     }
 
@@ -202,7 +201,8 @@ struct CopyChannel
     boost::uint32_t operator()(typename iterator_type::value_type p) const {
         // If multiple source channels, we set the destination channel
         // to black. Else to the value of the requested channel.
-        const boost::uint8_t val = _multiple ? 0 : getChannel(boost::get<0>(p), _srcchans);
+        const boost::uint8_t val = _multiple ?
+            0 : getChannel(boost::get<0>(p), _srcchans);
         return setChannel(boost::get<1>(p), _destchans, val);
     }
 
@@ -213,6 +213,22 @@ private:
 
 };
 
+/// Index iterators by x and y position
+//
+/// This is a helper for floodFill to avoid using the expensive
+/// pixelAt() many times.
+struct PixelIndexer
+{
+    PixelIndexer(size_t xpos, size_t ypos, BitmapData_as::iterator p)
+        :
+        x(xpos),
+        y(ypos),
+        pix(p)
+    {}
+    size_t x;
+    size_t y;
+    BitmapData_as::iterator pix;
+};
 
 } // anonymous namespace
 
@@ -346,18 +362,19 @@ BitmapData_as::floodFill(size_t startx, size_t starty, boost::uint32_t old,
     if (!transparent()) fill |= 0xff000000;
     if (old == fill) return;
 
-    std::queue<std::pair<size_t, size_t> > pixelQueue;
-    pixelQueue.push(std::make_pair(startx, starty));
+    std::queue<PixelIndexer> pixelQueue;
+    pixelQueue.push(
+            PixelIndexer(startx, starty, pixelAt(*this, startx, starty)));
 
     while (!pixelQueue.empty()) {
 
-        const std::pair<size_t, size_t>& p = pixelQueue.front();
-        const size_t x = p.first;
-        const size_t y = p.second;
+        const PixelIndexer& p = pixelQueue.front();
+        const size_t x = p.x;
+        const size_t y = p.y;
+        iterator pix = p.pix;
 
         pixelQueue.pop();
 
-        iterator pix = pixelAt(*this, x, y);
         assert(pix != end());
 
         if (*pix != old) continue;
@@ -375,10 +392,12 @@ BitmapData_as::floodFill(size_t startx, size_t starty, boost::uint32_t old,
 
         // Add north pixels
         if (y > 0) {
+            iterator north(pix - width());
+            iterator northend(north + edone);
             const size_t ny = y - 1;
-            for (size_t nx = x; nx != (x + edone); ++nx) {
-                if (*pixelAt(*this, nx, ny) == old) {
-                    pixelQueue.push(std::make_pair(nx, ny));
+            for (size_t nx = x; nx != (x + edone); ++nx, ++north) {
+                if (*north == old) {
+                    pixelQueue.push(PixelIndexer(nx, ny, north));
                 }
             }
         }
@@ -396,10 +415,12 @@ BitmapData_as::floodFill(size_t startx, size_t starty, boost::uint32_t old,
          
         // Add south pixels
         if (y + 1 < height()) {
+            iterator south(pix + width());
+            iterator southend(south - wdone);
             const size_t sy = y + 1;
-            for (size_t sx = x; sx != x - wdone; --sx) {
-                if (*pixelAt(*this, sx, sy) == old) {
-                    pixelQueue.push(std::make_pair(sx, sy));
+            for (size_t sx = x; sx != x - wdone; --sx, --south) {
+                if (*south == old) {
+                    pixelQueue.push(PixelIndexer(sx, sy, south));
                 }
             }
         }

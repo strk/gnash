@@ -28,7 +28,6 @@
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
-#include "smart_ptr.h" // for intrusive_ptr
 #include "GnashException.h"
 #include "ShapeRecord.h"
 #include "log.h"

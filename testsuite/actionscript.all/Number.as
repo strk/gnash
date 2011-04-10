@@ -38,7 +38,7 @@ check(Number.hasOwnProperty('MAX_VALUE'));
 check_equals(typeof(Number.MAX_VALUE), "number");
 // gnash fails in rounding (ends in 2316, we round up to 232)
 // TODO: check that we're close, if not extremely accurate
-xcheck_equals(Number.MAX_VALUE.toString(), "1.79769313486231e+308");
+check_equals(Number.MAX_VALUE.toString(), "1.79769313486231e+308");
 
 check(Number.hasOwnProperty('MIN_VALUE'));
 check_equals(typeof(Number.MIN_VALUE), "number");

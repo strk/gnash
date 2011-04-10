@@ -25,7 +25,7 @@
 // Forward declarations
 namespace gnash {
 	class NetStream_as;
-    class Global_as;
+    class as_object;
     namespace image {
         class GnashImage;
     }
@@ -136,17 +136,6 @@ private:
     bool _smoothing;
 };
 
-/// Native function to create a plain object with Video properties
-//
-/// This adds properties to the prototype, but does not add a Video
-/// DisplayObject.
-as_object* createVideoObject(Global_as& gl);
+} // namespace gnash
 
-void video_class_init(as_object& global, const ObjectURI& uri);
-
-void registerVideoNative(as_object& global);
-
-}	// end namespace gnash
-
-
-#endif // GNASH_VIDEO_STREAM_INSTANCE_H
+#endif 

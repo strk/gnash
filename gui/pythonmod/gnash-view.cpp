@@ -36,7 +36,6 @@
 #include "RunResources.h" // for passing handlers and other data to the core.
 #include "VirtualClock.h"
 #include "SystemClock.h"
-#include "smart_ptr.h"
 #include "DisplayObject.h"
 #include "Global_as.h"
 #include "NamingPolicy.h"

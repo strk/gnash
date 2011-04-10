@@ -31,7 +31,6 @@
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "smart_ptr.h"
 #include "NativeFunction.h" 
 #include "Bitmap.h"
 #include "Array_as.h"

@@ -19,7 +19,6 @@
 #include "movie_root.h"
 #include "as_object.h"
 #include "Relay.h"
-#include "smart_ptr.h"
 
 namespace gnash {
 

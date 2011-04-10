@@ -25,7 +25,6 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/format.hpp>
 
-#include "smart_ptr.h"
 #include "MovieClip.h"
 #include "movie_root.h"
 #include "as_value.h"
@@ -533,17 +532,20 @@ getVariableRaw(const as_environment& env, const std::string& varname,
         }
     }
 
-    // Looking for "this"  (TODO: add NSV::PROP_THIS)
-    if (varname == "this") {
+    // AS1 has neither "this" nor any global object.
+    if (swfVersion < 5) return as_value();
+
+    const ObjectURI::CaseEquals eq(getVM(env).getStringTable(),
+            swfVersion < 7);
+
+    // Looking for "this" 
+    if (eq(key, NSV::PROP_THIS)) {
         val.set_as_object(getObject(env.get_original_target()));
-        if (retTarget) *retTarget = NULL; // correct ??
+        if (retTarget) *retTarget = NULL; 
         return val;
     }
 
     as_object* global = vm.getGlobal();
-
-    // TODO: check if we really want case-sensitive comparison
-    ObjectURI::CaseEquals eq(getVM(env).getStringTable());
     if (swfVersion > 5 && eq(key, NSV::PROP_uGLOBAL)) {
 #ifdef GNASH_DEBUG_GET_VARIABLE
         log_debug("Took %s as _global, returning _global", varname);
@@ -553,8 +555,7 @@ getVariableRaw(const as_environment& env, const std::string& varname,
         return as_value(global);
     }
 
-    // Version 4 only has local variables.
-    if (swfVersion > 4 && global->get_member(key, &val)) {
+    if (global->get_member(key, &val)) {
 #ifdef GNASH_DEBUG_GET_VARIABLE
         log_debug("Found %s in _global", varname);
 #endif

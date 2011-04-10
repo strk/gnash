@@ -33,7 +33,6 @@
 #include <algorithm> 
 
 #include "GnashSleep.h"
-#include "smart_ptr.h" 
 #include "movie_definition.h" 
 #include "zlib_adapter.h"
 #include "IOChannel.h"

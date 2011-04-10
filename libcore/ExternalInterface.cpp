@@ -34,7 +34,6 @@
 #include "StringPredicates.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "smart_ptr.h" // for boost intrusive_ptr
 #include "VM.h"
 #include "rc.h"
 #include "as_value.h"

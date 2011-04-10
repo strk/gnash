@@ -49,7 +49,6 @@
 #include "noseek_fd_adapter.h"
 #include "ManualClock.h"
 #include "StringPredicates.h"
-#include "smart_ptr.h"
 #include "IOChannel.h" // for proper dtor call
 #include "GnashSleep.h" // for usleep comptibility.
 #include "StreamProvider.h"

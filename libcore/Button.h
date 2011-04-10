@@ -23,7 +23,6 @@
 #ifndef GNASH_BUTTON_H
 #define GNASH_BUTTON_H
 
-#include "smart_ptr.h"
 #include "InteractiveObject.h" // for inheritance
 
 #include <boost/intrusive_ptr.hpp>

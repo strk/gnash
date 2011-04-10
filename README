@@ -85,7 +85,7 @@ Building Gnash:
 ---------------
 
 See the generic installation instructions in the file called "INSTALL".
-(If you are building from a fresh bzr checkout, first see the file
+(If you are building from a fresh git checkout, first see the file
 "README.git" for additional instructions.)
 
 Depending on chosen functionality, CPU architecture, and OS the temporary
@@ -94,7 +94,7 @@ Approximately 400MB of virtual memory(RAM + swap) is also needed for linking.
 After installation, the temporary files may be removed with "make clean".
 
 Gnash has three main options: choice of renderer (graphics library used
-to render the SWF movie), choice(s) of GUI toolkit (gtk, kde, etc), and choice
+to render the SWF movie), choice(s) of GUI toolkit (gtk, qt4, etc), and choice
 of multimedia backend (audio and video decoder).
 
 Gnash supports multiple renderers. By default it'll build them all in
@@ -122,10 +122,10 @@ Gnash supports multiple graphics toolkits, and will build multiple
 executables:
 
    --enable-gui=gtk
-   --enable-gui=kde4
-or --enable-gui=gtk,kde4 (default)
+   --enable-gui=qt4
+or --enable-gui=gtk,qt4 (default)
 
-Other guis: dump, raw framebuffer, fltk, kde3, kde4, gtk, sdl, qtopia,
+Other guis: dump, raw framebuffer, fltk, kde3, qt4, gtk, sdl, qtopia,
 hildon, alp, riscos, aqua. Some guis are very specialized (dump writes
 out raw frames to a disk file). Other guis are not very well supported
 and may not even compile (aqua). 
@@ -167,13 +167,9 @@ be installed for the sole user running 'make install-plugins'.
 Keep this in mind as you likely don't want to install plugins
 only for the root user...
 
-You no longer need the Mozilla or Firefox development packages to
-build Gnash. All the required files are now included in Gnash, so the
-plugin can be built whenever the main gnash program can be built.
-
 To build Klash, the Konqueror plugin, you need to have the KDE
-development packages installed. This now installs a KDE executable
-called "kde-gnash" that is used by this plugin.
+development packages installed. This now installs a Qt executable
+called "qt4-gnash" that is used by this plugin.
 
 The Gnash Community:
 --------------------

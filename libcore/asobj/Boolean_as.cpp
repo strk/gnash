@@ -23,7 +23,6 @@
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "smart_ptr.h" // for boost intrusive_ptr
 #include "NativeFunction.h"
 #include "GnashException.h"
 #include "VM.h" 

@@ -31,7 +31,6 @@
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
-#include "smart_ptr.h" // for boost intrusive_ptr
 #include "GnashException.h" // for ActionException
 #include "VM.h"
 #include "namedStrings.h"

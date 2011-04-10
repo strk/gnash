@@ -27,7 +27,6 @@
 #include <boost/bind.hpp>
 #include <utility>
 
-#include "smart_ptr.h" 
 #include "DefineButtonTag.h"
 #include "as_value.h"
 #include "Button.h"

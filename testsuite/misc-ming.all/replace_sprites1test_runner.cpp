@@ -53,6 +53,8 @@ main(int /*argc*/, char** /*argv*/)
 	// Ranges we'll use during the test
 	Range2d<int> redRange1(100,300,160,360);
 	Range2d<int> redRange2(130,330,190,390);
+	Range2d<int> leftRange(20,300,80,390);
+	Range2d<int> rightRange(200,300,260,390);
 
 	Ranges invalidated;
 	MovieClip* root = tester.getRootMovie();
@@ -102,6 +104,9 @@ main(int /*argc*/, char** /*argv*/)
 	//
 	check( invalidated.contains(redRange1) );
 	check( invalidated.contains(redRange2) );
+	// but not the area on the right, nor on the left
+	check( ! invalidated.contains(rightRange) );
+	check( ! invalidated.contains(leftRange) );
 	
 	// check that we have a red square at (130,330 - 190,390)
 	check_pixel(134, 334, 2, red, 2); // UL
@@ -128,6 +133,9 @@ main(int /*argc*/, char** /*argv*/)
 	//
 	check( invalidated.contains(redRange1) );
 	check( invalidated.contains(redRange2) );
+	// but not the area on the right, nor on the left
+	xcheck( ! invalidated.contains(rightRange) );
+	xcheck( ! invalidated.contains(leftRange) );
 
 	// check that we have a red square at (100,300 - 160,360)
 	check_pixel(104, 304, 2, red, 2); // UL

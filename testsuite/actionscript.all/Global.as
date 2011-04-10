@@ -26,6 +26,26 @@
 rcsid="$Id: Global.as,v 1.51 2008/03/31 23:48:33 strk Exp $";
 #include "check.as"
 
+#if OUTPUT_VERSION < 6
+ check_equals(typeof(_global), "undefined");
+#endif
+
+#if OUTPUT_VERSION == 6
+ check_equals(typeof(_gLobal), "object");
+ check_equals(typeof(_gLobal), "object");
+ check_equals(typeof(_GLOBAL), "object");
+ check_equals(_GLOBAL, _global);
+ check_equals(_GlOBAL, _global);
+#endif
+
+#if OUTPUT_VERSION < 7
+ check_equals(this.toString(), "[object Object]");
+ check_equals(thIs.toString(), "[object Object]");
+ check_equals("" + this, "_level0");
+ check_equals(this, This);
+ check_equals(this, THIS);
+#endif
+
 check_equals(typeof(Button), 'function'); // random check
 
 // Check that CustomActions isn't recognized by the player.
@@ -506,10 +526,10 @@ check_equals(r, "l,j,k,");
 
 
 #if OUTPUT_VERSION == 5
-	check_totals(159); // SWF5
+	check_totals(165); // SWF5
 #else
 # if OUTPUT_VERSION == 6
-	check_totals(193); // SWF6
+	check_totals(203); // SWF6
 # else
 #  if OUTPUT_VERSION == 7
 	check_totals(175); // SWF7

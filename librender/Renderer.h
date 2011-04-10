@@ -106,8 +106,7 @@
 /// 1st, it allows a renderer/gui combination to avoid re-rendering of
 /// unchanged parts in the scene. When supported by the rendering engine
 /// this can be a huge performance gain. The original Flash player does
-/// that too, btw. Altough he is able to define multiple smaller regions
-/// for one frame. This could be implemented in Gnash, too.
+/// that too, btw. 
 /// 
 /// 2nd, it can detect still frames (like a stopped movie). gui.cpp can
 /// detect these and completely avoid calling any rendering function.
@@ -124,7 +123,8 @@
 /// off easily in gui.cpp (maybe using a runtime option?).
 ///
 /// Note the updated region is only passed to the gnash::Gui, which is itself 
-/// responsible of informing the renderer (see gnash::Gui::set_invalidated_region).
+/// responsible of informing the renderer
+/// (see gnash::Gui::set_invalidated_region).
 /// This is because it's pointless
 /// to have a renderer which updates only a small part of the stage when
 /// the GUI shows it all since the area around the region is undefined.
@@ -132,7 +132,7 @@
 /// the renderer to do so (for example, to save time during blitting).
 /// The GUI can also completely ignore the region information. 
 ///
-/// It's also importanto to note that the bounds passed to the GUI are just
+/// It's also important to note that the bounds passed to the GUI are just
 /// a hint and the GUI /is/ allowed to further process and alter the information
 /// in any way.
 /// 

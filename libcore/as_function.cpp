@@ -22,7 +22,6 @@
 
 #include <string>
 
-#include "smart_ptr.h"
 #include "log.h"
 #include "as_value.h"
 #include "fn_call.h"
