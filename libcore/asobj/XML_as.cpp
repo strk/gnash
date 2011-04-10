@@ -136,7 +136,11 @@ XML_as::toString(std::ostream& o, bool encode) const
     if (!_xmlDecl.empty()) o << _xmlDecl;
     if (!_docTypeDecl.empty()) o << _docTypeDecl;
 
-    XMLNode_as::toString(o, encode);
+    XMLNode_as* i = firstChild();
+    while (i) {
+        i->XMLNode_as::toString(o, encode);
+        i = i->nextSibling();
+    }
 }
 
 void
@@ -665,6 +669,10 @@ xml_status(const fn_call& fn)
         return as_value(ptr->status());
     }
 
+    if (fn.arg(0).is_undefined()) {
+        return as_value();
+    }
+
     const double status = toNumber(fn.arg(0), getVM(fn));
     if (isNaN(status) ||
             status > std::numeric_limits<boost::int32_t>::max() ||
@@ -673,8 +681,7 @@ xml_status(const fn_call& fn)
         ptr->setStatus(static_cast<XML_as::ParseStatus>(
                     std::numeric_limits<boost::int32_t>::min()));
     }
-
-    ptr->setStatus(static_cast<XML_as::ParseStatus>(int(status)));
+    else ptr->setStatus(static_cast<XML_as::ParseStatus>(int(status)));
     return as_value();
 }
     

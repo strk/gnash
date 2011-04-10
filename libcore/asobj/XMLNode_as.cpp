@@ -403,7 +403,7 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
             nodeValue, xml._attributes.size(), xml._children.size());
 #endif
 
-    if (!nodeName.empty()) {
+    if (!nodeName.empty() || type == Element) {
 
         xmlout << "<" << nodeName;
 
@@ -452,7 +452,7 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
         (*itx)->toString(xmlout, encode);
     }
 
-    if (!nodeName.empty()) {
+    if (!nodeName.empty() || type == Element) {
         xmlout << "</" << nodeName << ">";
     }
 }
