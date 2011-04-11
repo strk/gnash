@@ -153,10 +153,10 @@ struct NoiseAdapter
 
         if (_greyscale) {
             boost::uint8_t val = _gen();
-            return val | val << 8 | val << 16;
+            return 0xff000000 | val | val << 8 | val << 16;
         }
 
-        boost::uint32_t ret = 0;
+        boost::uint32_t ret = 0xff000000;
 
         if (_bitmask & 1) {
             ret |= (_gen() << 16);
@@ -168,7 +168,9 @@ struct NoiseAdapter
             ret |= _gen();
         }
         if (_bitmask & 8) {
-            ret |= _gen() << 24;
+            // Alpha is 0xff by default.
+            const boost::uint8_t rd = _gen();
+            ret &= (~rd) << 24;
         }
         return ret;
     }
