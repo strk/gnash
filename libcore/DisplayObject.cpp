@@ -494,9 +494,11 @@ DisplayObject::hasEventHandler(const event_id& id) const
 
     if (!_object) return false;
 
-    // Don't check resolve!
+    // Don't check resolve! Also don't check if it's a function, as
+    // the swfdec testsuite (onUnload-prototype.as) shows that it
+    // doesn't matter.
     if (Property* prop = _object->findProperty(id.functionURI())) {
-        return prop->getValue(*_object).to_function();
+        return prop; 
     }
     return false;
 
