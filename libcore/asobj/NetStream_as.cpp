@@ -1805,6 +1805,7 @@ as_value
 netstream_liveDelay(const fn_call& fn)
 {
     NetStream_as* ns = ensure<ThisIsNative<NetStream_as> >(fn);
+    UNUSED(ns);
 
     LOG_ONCE(log_unimpl("NetStream.liveDelay"));
 
