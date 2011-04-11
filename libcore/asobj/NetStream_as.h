@@ -269,7 +269,7 @@ public:
     //
     /// @return The size of the buffer in milliseconds.
     ///
-    boost::uint32_t bufferTime() { return m_bufferTime; }
+    boost::uint32_t bufferTime() { return _bufferTime; }
 
     /// Returns the number of bytes of the media file that have been buffered.
     long bytesLoaded();
@@ -287,11 +287,6 @@ public:
     /// buffered and yet to be played
     ///
     long bufferLength();
-
-    /// Tells us if there is a new video frame ready
-    //
-    /// @return true if a frame is ready, false if not
-    bool newFrameReady();
 
     /// Returns the video frame closest to current cursor. See time().
     //
@@ -318,7 +313,7 @@ public:
     static unsigned int audio_streamer(void *udata, boost::int16_t* samples,
             unsigned int nSamples, bool& eof);
 
-protected:
+private:
     
     /// Status codes used for notifications
     enum StatusCode {
@@ -350,74 +345,6 @@ protected:
         /// NetStream.Seek.InvalidTime (level: error)
         invalidTime
     };
-
-    NetConnection_as* _netCon;
-
-    boost::scoped_ptr<CharacterProxy> _audioController;
-
-    /// Set stream status.
-    //
-    /// Valid statuses are:
-    ///
-    /// Status level:
-    ///  - NetStream.Buffer.Empty
-    ///  - NetStream.Buffer.Full
-    ///  - NetStream.Buffer.Flush
-    ///  - NetStream.Play.Start
-    ///  - NetStream.Play.Stop 
-    ///  - NetStream.Seek.Notify 
-    ///
-    /// Error level:
-    ///  - NetStream.Play.StreamNotFound
-    ///  - NetStream.Seek.InvalidTime
-    ///
-    /// This method locks the statusMutex during operations
-    ///
-    void setStatus(StatusCode code);
-
-    /// \brief
-    /// Call any onStatus event handler passing it
-    /// any queued status change, see _statusQueue
-    //
-    /// Will NOT lock the statusMutex itself, rather it will
-    /// iteratively call the popNextPendingStatusNotification()
-    /// private method, which will take care of locking it.
-    /// This is to make sure onStatus handler won't call methods
-    /// possibly trying to obtain the lock again (::play, ::pause, ...)
-    ///
-    void processStatusNotifications();
-    
-    // The size of the buffer in milliseconds
-    boost::uint32_t m_bufferTime;
-
-    // Are a new frame ready to be returned?
-    volatile bool m_newFrameReady;
-
-    // Mutex to insure we don't corrupt the image
-    boost::mutex image_mutex;
-
-    // The image/videoframe which is given to the renderer
-    std::auto_ptr<image::GnashImage> m_imageframe;
-
-    // The video URL
-    std::string url;
-
-    // The input media parser
-    std::auto_ptr<media::MediaParser> m_parser;
-
-    // The position in the inputfile, only used when not playing a FLV
-    long inputPos;
-
-    /// Unplug the advance timer callback
-    void stopAdvanceTimer();
-
-    /// Register the advance timer callback
-    void startAdvanceTimer();
-
-    /// The DisplayObject to invalidate on video updates
-    DisplayObject* _invalidatedVideoCharacter;
-
-private:
 
     enum DecodingState {
         DEC_NONE,
@@ -528,6 +455,69 @@ private:
     /// as possible w/out blocking
     void parseNextChunk();
 
+    /// Set stream status.
+    //
+    /// Valid statuses are:
+    ///
+    /// Status level:
+    ///  - NetStream.Buffer.Empty
+    ///  - NetStream.Buffer.Full
+    ///  - NetStream.Buffer.Flush
+    ///  - NetStream.Play.Start
+    ///  - NetStream.Play.Stop 
+    ///  - NetStream.Seek.Notify 
+    ///
+    /// Error level:
+    ///  - NetStream.Play.StreamNotFound
+    ///  - NetStream.Seek.InvalidTime
+    ///
+    /// This method locks the statusMutex during operations
+    ///
+    void setStatus(StatusCode code);
+
+    /// \brief
+    /// Call any onStatus event handler passing it
+    /// any queued status change, see _statusQueue
+    //
+    /// Will NOT lock the statusMutex itself, rather it will
+    /// iteratively call the popNextPendingStatusNotification()
+    /// private method, which will take care of locking it.
+    /// This is to make sure onStatus handler won't call methods
+    /// possibly trying to obtain the lock again (::play, ::pause, ...)
+    ///
+    void processStatusNotifications();
+
+    /// Unplug the advance timer callback
+    void stopAdvanceTimer();
+
+    /// Register the advance timer callback
+    void startAdvanceTimer();
+
+    NetConnection_as* _netCon;
+
+    boost::scoped_ptr<CharacterProxy> _audioController;
+    
+    // The size of the buffer in milliseconds
+    boost::uint32_t _bufferTime;
+
+    // Mutex to insure we don't corrupt the image
+    boost::mutex image_mutex;
+
+    // The image/videoframe which is given to the renderer
+    std::auto_ptr<image::GnashImage> _imageframe;
+
+    // The video URL
+    std::string url;
+
+    // The input media parser
+    std::auto_ptr<media::MediaParser> _parser;
+
+    // The position in the inputfile, only used when not playing a FLV
+    long _inputPos;
+
+    /// The DisplayObject to invalidate on video updates
+    DisplayObject* _invalidatedVideoCharacter;
+
     DecodingState _decoding_state;
 
     // Mutex protecting _playback_state and _decoding_state
@@ -572,7 +562,7 @@ private:
     StatusCode _statusCode;
 
     /// Mutex protecting _statusQueue
-    boost::mutex statusMutex;
+    boost::mutex _statusMutex;
 
 };
 
