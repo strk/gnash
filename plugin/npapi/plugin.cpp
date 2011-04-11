@@ -1352,7 +1352,7 @@ nsPluginInstance::startProc()
     
     // If the fork failed, childpid is -1. So print out an error message.
     if (_childpid == -1) {
-        gnash::log_error("dup2() failed: %s", strerror(errno));
+        gnash::log_error("fork() failed: %s", strerror(errno));
         return NPERR_OUT_OF_MEMORY_ERROR;
     }
     
