@@ -32,6 +32,8 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/function.hpp>
+#include <boost/bind.hpp>
+#include <algorithm>
 #include <cstdlib>
 #include <utility>
 #include <functional>
@@ -78,6 +80,13 @@ namespace {
     void usage(std::ostream& os, const po::options_description& opts);
     void build_options(std::ostream& os);
     void version_and_copyright(std::ostream& os);
+}
+
+void
+playFile(gnash::Player& player, int argc, char *argv[],
+                              const std::string& filename)
+{
+    player.run(argc, argv, filename, url);
 }
 
 int
@@ -160,7 +169,8 @@ main(int argc, char *argv[])
 
     // We only expect GnashExceptions here. No others should be thrown!
     try {
-        player.run(argc, argv, infiles.front(), url);
+        std::for_each(infiles.begin(), infiles.end(),
+                boost::bind(&playFile, boost::ref(player), argc, argv, _1));
     }
     catch (const gnash::GnashException& ex) {
         std::cerr << "Error: " << ex.what() << "\n";
