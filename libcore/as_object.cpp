@@ -401,7 +401,12 @@ as_object::get_member(const ObjectURI& uri, as_value* val)
     // inheritance chain, try the __resolve property.
     if (!prop) {
 
-        Property* res = findProperty(NSV::PROP_uuRESOLVE);
+        PrototypeRecursor<Exists> pr(this, NSV::PROP_uuRESOLVE);
+        Property* res = pr.getProperty();
+
+        while (!res && pr()) {
+            res = pr.getProperty();
+        }
         
         // No __resolve
         if (!res) return false;
