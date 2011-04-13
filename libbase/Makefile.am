@@ -108,11 +108,8 @@ endif
 endif
 
 
-
-
 # this is where Gnash plugins get installed
 pluginsdir = $(prefix)/lib/gnash/plugins
-
 
 libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	-DSYSCONFDIR=\"$(sysconfdir)\" \
@@ -131,8 +128,6 @@ if ANDROID
 libgnashbase_la_CPPFLAGS += $(ANDROID_NDK)/usr/include
 endif
 
-# These headers get installed
-
 libgnashbase_la_LIBADD = \
 	$(JPEG_LIBS) \
 	$(PNG_LIBS) \
@@ -150,10 +145,6 @@ libgnashbase_la_LIBADD += $(LTDL_LIBS)
 
 if HAIKU
   libgnashbase_la_LIBADD += $(HAIKU_LIBS)
-endif
-
-if WIN32
-  libgnashbase_la_LIBADD += -lws2_32 -lwinmm
 endif
 
 # Maybe use jemalloc, which handles memory fragmentation for
