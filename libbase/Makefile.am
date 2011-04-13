@@ -20,6 +20,96 @@ pkglib_LTLIBRARIES = libgnashbase.la
 sysconf_DATA = gnashrc gnashpluginrc
 EXTRA_DIST = gnashrc.in gnashpluginrc.in
 
+libgnashbase_la_SOURCES = \
+	$(MALLOC) \
+	GnashImage.cpp \
+	SWFCtype.cpp \
+	GnashImageJpeg.cpp \
+	GnashFileUtilities.cpp \
+	AMF.cpp \
+	RTMP.cpp \
+	log.cpp	\
+	memory.cpp \
+	rc.cpp \
+	string_table.cpp \
+	tu_file.cpp \
+	IOChannel.cpp \
+	Socket.cpp \
+	ClockTime.cpp \
+	NamingPolicy.cpp \
+	WallClockTimer.cpp \
+	utf8.cpp \
+	curl_adapter.cpp \
+	noseek_fd_adapter.cpp \
+	zlib_adapter.cpp \
+	URL.cpp \
+	GC.cpp \
+	BitsReader.cpp \
+	arg_parser.cpp \
+	URLAccessManager.cpp \
+	StreamProvider.cpp \
+	$(NULL)
+
+if ANDROID
+libgnashbase_la_SOURCES += SharedMemHaiku.cpp
+else
+if HAIKU
+libgnashbase_la_SOURCES += SharedMemHaiku.cpp
+else
+if WIN32
+libgnashbase_la_SOURCES += SharedMemW32.cpp
+else
+libgnashbase_la_SOURCES += SharedMem.cpp
+endif
+endif
+endif
+
+if ENABLE_EXTENSIONS
+libgnashbase_la_SOURCES += extension.cpp sharedlib.cpp
+endif
+
+if USE_PNG
+libgnashbase_la_SOURCES += GnashImagePng.cpp
+endif
+
+if USE_GIF
+libgnashbase_la_SOURCES += GnashImageGif.cpp
+endif
+
+if BUILD_OGL_RENDERER
+   libgnashbase_la_SOURCES += \
+	GnashTexture.cpp \
+	$(NULL)
+
+   noinst_HEADERS += \
+	GnashTexture.h \
+	$(NULL)
+endif
+
+if HAVE_VAAPI
+   libgnashbase_la_SOURCES += \
+	GnashVaapiImage.cpp \
+	$(NULL)
+
+   noinst_HEADERS += \
+	GnashVaapiImage.h \
+	GnashVaapiImageProxy.h \
+	$(NULL)
+
+if HAVE_VAAPI_GLX
+   libgnashbase_la_SOURCES += \
+	GnashVaapiTexture.cpp \
+	$(NULL)
+
+   noinst_HEADERS += \
+	GnashVaapiTexture.h \
+	$(NULL)
+endif
+endif
+
+
+
+
 # this is where Gnash plugins get installed
 pluginsdir = $(prefix)/lib/gnash/plugins
 
@@ -55,62 +145,6 @@ libgnashbase_la_LIBADD = \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 
-libgnashbase_la_SOURCES = \
-	$(MALLOC) \
-	GnashImage.cpp \
-	SWFCtype.cpp \
-	GnashImageJpeg.cpp \
-	GnashFileUtilities.cpp \
-	AMF.cpp \
-	RTMP.cpp \
-	log.cpp	\
-	memory.cpp \
-	rc.cpp \
-	string_table.cpp \
-	tu_file.cpp \
-	IOChannel.cpp \
-	Socket.cpp \
-	ClockTime.cpp \
-	NamingPolicy.cpp \
-	WallClockTimer.cpp \
-	utf8.cpp \
-	curl_adapter.cpp \
-	noseek_fd_adapter.cpp \
-	zlib_adapter.cpp \
-	URL.cpp \
-	GC.cpp \
-	BitsReader.cpp \
-	arg_parser.cpp \
-	URLAccessManager.cpp \
-	StreamProvider.cpp \
-	$(NULL)
-
-
-if ANDROID
-libgnashbase_la_SOURCES += SharedMemHaiku.cpp
-else
-if HAIKU
-libgnashbase_la_SOURCES += SharedMemHaiku.cpp
-else
-if WIN32
-libgnashbase_la_SOURCES += SharedMemW32.cpp
-else
-libgnashbase_la_SOURCES += SharedMem.cpp
-endif
-endif
-endif
-
-if ENABLE_EXTENSIONS
-libgnashbase_la_SOURCES += extension.cpp sharedlib.cpp
-endif
-
-if USE_PNG
-libgnashbase_la_SOURCES += GnashImagePng.cpp
-endif
-
-if USE_GIF
-libgnashbase_la_SOURCES += GnashImageGif.cpp
-endif
 
 libgnashbase_la_LIBADD += $(LTDL_LIBS)
 
@@ -212,36 +246,6 @@ inst_HEADERS += $(EXTENSIONS_API)
 libgnashbase_la_LDFLAGS = -release $(VERSION)
 libgnashbase_la_DEPENDENCIES =
 
-if BUILD_OGL_RENDERER
-   libgnashbase_la_SOURCES += \
-	GnashTexture.cpp \
-	$(NULL)
-
-   noinst_HEADERS += \
-	GnashTexture.h \
-	$(NULL)
-endif
-
-if HAVE_VAAPI
-   libgnashbase_la_SOURCES += \
-	GnashVaapiImage.cpp \
-	$(NULL)
-
-   noinst_HEADERS += \
-	GnashVaapiImage.h \
-	GnashVaapiImageProxy.h \
-	$(NULL)
-
-if HAVE_VAAPI_GLX
-   libgnashbase_la_SOURCES += \
-	GnashVaapiTexture.cpp \
-	$(NULL)
-
-   noinst_HEADERS += \
-	GnashVaapiTexture.h \
-	$(NULL)
-endif
-
 if HAVE_VAAPI
    libgnashbase_la_CPPFLAGS += \
 	-I$(top_srcdir)/libvaapi \
@@ -254,7 +258,6 @@ if HAVE_VAAPI
    libgnashbase_la_DEPENDENCIES += \
 	$(top_builddir)/libvaapi/libgnashvaapi.la \
 	$(NULL)
-endif
 endif
 
 if WIN32
