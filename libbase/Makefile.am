@@ -16,14 +16,13 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-EXTRA_DIST = gnashrc.in gnashpluginrc.in
-
+pkglib_LTLIBRARIES = libgnashbase.la
 sysconf_DATA = gnashrc gnashpluginrc
+EXTRA_DIST = gnashrc.in gnashpluginrc.in
 
 # this is where Gnash plugins get installed
 pluginsdir = $(prefix)/lib/gnash/plugins
 
-pkglib_LTLIBRARIES = libgnashbase.la
 
 libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	-DSYSCONFDIR=\"$(sysconfdir)\" \
