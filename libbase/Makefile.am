@@ -104,20 +104,6 @@ if ENABLE_EXTENSIONS
 libgnashbase_la_SOURCES += extension.cpp sharedlib.cpp
 endif
 
-edit = sed \
-	-e 's|@DEFAULT_FLASH_PLATFORM_ID[@]|$(DEFAULT_FLASH_PLATFORM_ID)|g' \
-	-e 's|@DEFAULT_FLASH_MAJOR_VERSION[@]|$(DEFAULT_FLASH_MAJOR_VERSION)|g' \
-	-e 's|@DEFAULT_FLASH_MINOR_VERSION[@]|$(DEFAULT_FLASH_MINOR_VERSION)|g' \
-	-e 's|@DEFAULT_FLASH_REV_NUMBER[@]|$(DEFAULT_FLASH_REV_NUMBER)|g' \
-	-e 's|@DEFAULT_STREAMS_TIMEOUT[@]|$(DEFAULT_STREAMS_TIMEOUT)|g' \
-	-e 's|@DEFAULT_SOL_SAFEDIR[@]|$(DEFAULT_SOL_SAFEDIR)|g' 
-
-gnashrc: gnashrc.in Makefile
-	$(edit) '$(srcdir)/$@.in' >$@
-
-gnashpluginrc: gnashpluginrc.in
-	$(edit) '$(srcdir)/$@.in' >$@
-
 if USE_PNG
 libgnashbase_la_SOURCES += GnashImagePng.cpp
 endif
@@ -279,6 +265,20 @@ endif
 if ENABLE_PCH
 AM_CXXFLAGS = $(PCH_FLAGS)
 endif
+
+edit = sed \
+	-e 's|@DEFAULT_FLASH_PLATFORM_ID[@]|$(DEFAULT_FLASH_PLATFORM_ID)|g' \
+	-e 's|@DEFAULT_FLASH_MAJOR_VERSION[@]|$(DEFAULT_FLASH_MAJOR_VERSION)|g' \
+	-e 's|@DEFAULT_FLASH_MINOR_VERSION[@]|$(DEFAULT_FLASH_MINOR_VERSION)|g' \
+	-e 's|@DEFAULT_FLASH_REV_NUMBER[@]|$(DEFAULT_FLASH_REV_NUMBER)|g' \
+	-e 's|@DEFAULT_STREAMS_TIMEOUT[@]|$(DEFAULT_STREAMS_TIMEOUT)|g' \
+	-e 's|@DEFAULT_SOL_SAFEDIR[@]|$(DEFAULT_SOL_SAFEDIR)|g' 
+
+gnashrc: gnashrc.in Makefile
+	$(edit) '$(srcdir)/$@.in' >$@
+
+gnashpluginrc: gnashpluginrc.in
+	$(edit) '$(srcdir)/$@.in' >$@
 
 CLEANFILES = gnashrc gnashpluginrc
 
