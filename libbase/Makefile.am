@@ -72,39 +72,36 @@ libgnashbase_la_SOURCES += extension.cpp sharedlib.cpp
 endif
 
 if USE_PNG
-libgnashbase_la_SOURCES += GnashImagePng.cpp
+libgnashbase_la_SOURCES += \
+	GnashImagePng.cpp \
+	GnashImagePng.h \
+	$(NULL)
 endif
 
 if USE_GIF
-libgnashbase_la_SOURCES += GnashImageGif.cpp
+libgnashbase_la_SOURCES += \
+	GnashImageGif.cpp \
+	GnashImageGif.h \
+	$(NULL)
 endif
 
 if BUILD_OGL_RENDERER
-   libgnashbase_la_SOURCES += \
+libgnashbase_la_SOURCES += \
 	GnashTexture.cpp \
-	$(NULL)
-
-   noinst_HEADERS += \
 	GnashTexture.h \
 	$(NULL)
 endif
 
 if HAVE_VAAPI
-   libgnashbase_la_SOURCES += \
+libgnashbase_la_SOURCES += \
 	GnashVaapiImage.cpp \
-	$(NULL)
-
-   noinst_HEADERS += \
 	GnashVaapiImage.h \
 	GnashVaapiImageProxy.h \
 	$(NULL)
 
 if HAVE_VAAPI_GLX
-   libgnashbase_la_SOURCES += \
+libgnashbase_la_SOURCES += \
 	GnashVaapiTexture.cpp \
-	$(NULL)
-
-   noinst_HEADERS += \
 	GnashVaapiTexture.h \
 	$(NULL)
 endif
@@ -148,8 +145,6 @@ if HAIKU
   libgnashbase_la_LIBADD += $(HAIKU_LIBS)
 endif
 
-noinst_HEADERS =
-
 inst_HEADERS = \
 	accumulator.h \
 	SimpleBuffer.h \
@@ -182,13 +177,6 @@ inst_HEADERS = \
 	URLAccessManager.h \
 	StreamProvider.h \
 	$(NULL)
-
-if USE_PNG
-noinst_HEADERS += GnashImagePng.h
-endif
-if USE_GIF
-noinst_HEADERS += GnashImageGif.h
-endif
 
 if ENABLE_EXTENSIONS
 inst_HEADERS += extension.h sharedlib.h
