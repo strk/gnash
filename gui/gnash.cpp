@@ -86,7 +86,8 @@ void
 playFile(gnash::Player& player, int argc, char *argv[],
                               const std::string& filename)
 {
-    player.run(argc, argv, filename, url);
+    gnash::Player newPlayer(player);
+    newPlayer.run(argc, argv, filename, url);
 }
 
 int
