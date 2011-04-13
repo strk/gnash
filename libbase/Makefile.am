@@ -21,32 +21,32 @@ sysconf_DATA = gnashrc gnashpluginrc
 EXTRA_DIST = gnashrc.in gnashpluginrc.in
 
 libgnashbase_la_SOURCES = \
-	GnashImage.cpp \
-	SWFCtype.cpp \
-	GnashImageJpeg.cpp \
-	GnashFileUtilities.cpp \
 	AMF.cpp \
-	RTMP.cpp \
-	log.cpp	\
-	memory.cpp \
-	rc.cpp \
-	string_table.cpp \
-	tu_file.cpp \
-	IOChannel.cpp \
-	Socket.cpp \
-	ClockTime.cpp \
-	NamingPolicy.cpp \
-	WallClockTimer.cpp \
-	utf8.cpp \
-	curl_adapter.cpp \
-	noseek_fd_adapter.cpp \
-	zlib_adapter.cpp \
-	URL.cpp \
-	GC.cpp \
-	BitsReader.cpp \
 	arg_parser.cpp \
-	URLAccessManager.cpp \
+	BitsReader.cpp \
+	ClockTime.cpp \
+	curl_adapter.cpp \
+	GC.cpp \
+	GnashFileUtilities.cpp \
+	GnashImage.cpp \
+	GnashImageJpeg.cpp \
+	IOChannel.cpp \
+	log.cpp \
+	memory.cpp \
+	NamingPolicy.cpp \
+	noseek_fd_adapter.cpp \
+	rc.cpp \
+	RTMP.cpp \
+	Socket.cpp \
 	StreamProvider.cpp \
+	string_table.cpp \
+	SWFCtype.cpp \
+	tu_file.cpp \
+	URLAccessManager.cpp \
+	URL.cpp \
+	utf8.cpp \
+	WallClockTimer.cpp \
+	zlib_adapter.cpp \
 	$(NULL)
 
 if JEMALLOC
