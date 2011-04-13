@@ -141,10 +141,8 @@ libgnashbase_la_LIBADD = \
 	$(BOOST_LIBS) \
 	$(OPENGL_LIBS) \
 	$(PTHREAD_LIBS) \
+	$(LTDL_LIBS) \
 	$(NULL)
-
-
-libgnashbase_la_LIBADD += $(LTDL_LIBS)
 
 if HAIKU
   libgnashbase_la_LIBADD += $(HAIKU_LIBS)
