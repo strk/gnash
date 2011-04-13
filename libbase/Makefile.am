@@ -22,35 +22,83 @@ EXTRA_DIST = gnashrc.in gnashpluginrc.in
 
 libgnashbase_la_SOURCES = \
 	AMF.cpp \
+	AMF.h \
 	arg_parser.cpp \
+	arg_parser.h \
 	BitsReader.cpp \
+	BitsReader.h \
 	ClockTime.cpp \
+	ClockTime.h \
 	curl_adapter.cpp \
+	dsodefs.h \
 	GC.cpp \
+	GC.h \
+	getclocktime.hpp \
+	gettext.h \
+	gmemory.h \
+	GnashAlgorithm.h \
+	GnashEnums.h \
+	GnashException.h \
 	GnashFileUtilities.cpp \
+	GnashFileUtilities.h \
 	GnashImage.cpp \
+	GnashImage.h \
 	GnashImageJpeg.cpp \
+	GnashImageJpeg.h \
+	GnashNumeric.h \
+	GnashSleep.h \
+	GnashSystemFDHeaders.h \
+	GnashSystemIOHeaders.h \
+	GnashSystemNetHeaders.h \
 	IOChannel.cpp \
+	IOChannel.h \
 	log.cpp \
+	log.h \
 	memory.cpp \
 	NamingPolicy.cpp \
+	NamingPolicy.h \
+	NetworkAdapter.h \
 	noseek_fd_adapter.cpp \
+	noseek_fd_adapter.h \
 	rc.cpp \
+	rc.h \
 	RTMP.cpp \
+	RTMP.h \
+	SharedMem.h \
+	SimpleBuffer.h \
 	Socket.cpp \
+	Socket.h \
+	Stats.h \
 	StreamProvider.cpp \
+	StreamProvider.h \
+	StringPredicates.h \
 	string_table.cpp \
+	string_table.h \
 	SWFCtype.cpp \
+	SWFCtype.h \
 	tu_file.cpp \
+	tu_file.h \
 	URLAccessManager.cpp \
+	URLAccessManager.h \
 	URL.cpp \
+	URL.h \
 	utf8.cpp \
+	utf8.h \
+	utility.h \
 	WallClockTimer.cpp \
+	WallClockTimer.h \
 	zlib_adapter.cpp \
+	zlib_adapter.h \
 	$(NULL)
 
 if JEMALLOC
-libgnashbase_la_SOURCES += jemalloc.c
+libgnashbase_la_SOURCES += \
+	jemalloc.c \
+	jemalloc.h \
+	jemalloc_gnash.h \
+	jemalloc_rb.h \
+	jemalloc_types.h \
+	$(NULL)
 endif
 
 if ANDROID
@@ -68,7 +116,12 @@ endif
 endif
 
 if ENABLE_EXTENSIONS
-libgnashbase_la_SOURCES += extension.cpp sharedlib.cpp
+libgnashbase_la_SOURCES += \
+	extension.cpp \
+	extension.h \
+	sharedlib.cpp \
+	sharedlib.h \
+	$(NULL)
 endif
 
 if USE_PNG
@@ -101,6 +154,7 @@ libgnashbase_la_SOURCES += \
 
 if HAVE_VAAPI_GLX
 libgnashbase_la_SOURCES += \
+	GnashTexture.h \
 	GnashVaapiTexture.cpp \
 	GnashVaapiTexture.h \
 	$(NULL)
