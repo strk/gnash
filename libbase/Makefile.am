@@ -21,7 +21,6 @@ sysconf_DATA = gnashrc gnashpluginrc
 EXTRA_DIST = gnashrc.in gnashpluginrc.in
 
 libgnashbase_la_SOURCES = \
-	$(MALLOC) \
 	GnashImage.cpp \
 	SWFCtype.cpp \
 	GnashImageJpeg.cpp \
@@ -49,6 +48,10 @@ libgnashbase_la_SOURCES = \
 	URLAccessManager.cpp \
 	StreamProvider.cpp \
 	$(NULL)
+
+if JEMALLOC
+libgnashbase_la_SOURCES += jemalloc.c
+endif
 
 if ANDROID
 libgnashbase_la_SOURCES += SharedMemHaiku.cpp
@@ -145,16 +148,6 @@ libgnashbase_la_LIBADD += $(LTDL_LIBS)
 
 if HAIKU
   libgnashbase_la_LIBADD += $(HAIKU_LIBS)
-endif
-
-# Maybe use jemalloc, which handles memory fragmentation for
-# ECAMscript languages better than the regular system malloc.
-# This is controlled by the --enable-jemalloc (disabled by default)
-# configure option.
-if JEMALLOC
-MALLOC = jemalloc.c
-else
-MALLOC = 
 endif
 
 noinst_HEADERS =
