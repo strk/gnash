@@ -33,31 +33,29 @@ bin_PROGRAMS += kde3-gnash
 
 kde3_gnash_CPPFLAGS = -DGUI_KDE3 -DGUI_CONFIG=\"KDE3\" \
 	 $(AM_CPPFLAGS) $(KDE3_CFLAGS) $(QT3_CFLAGS)
-kde3_gnash_SOURCES = $(GUI_SRCS) qt/gui_kde.cpp
+kde3_gnash_SOURCES = $(GUI_SRCS) \
+    qt/gui_kde.cpp \
+	qt/kde.cpp \
+	qt/kdesup.h \
+	qt/kde_glue.h
+
 kde3_gnash_LDFLAGS = -export-dynamic 
 #kde_gnash_DEPENDENCIES = .configline
 kde3_gnash_LDADD = \
+	$(AM_LDFLAGS) \
 	$(GNASH_LIBS) \
-	$(AM_LDFLAGS)
+    $(KDE3_LIBS) \
+    $(QT3_LIBS)
+
 if BUILD_OGL_RENDERER
 kde3_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
-kde3_gnash_LDADD += $(top_builddir)/librender/libgnashrender.la \
-	$(KDE3_LIBS) $(QT3_LIBS) $(OPENGL_LIBS)
-kde3_gnash_SOURCES += qt/kde_glue_opengl.cpp \
-	qt/kde_glue_opengl.h \
-	qt/kde_glue.h \
-	qt/kde.cpp \
-	qt/kdesup.h \
-	qt/kde_glue.h
+kde3_gnash_LDADD += $(OPENGL_LIBS)
+kde3_gnash_SOURCES += qt/kde_glue_opengl.cpp qt/kde_glue_opengl.h 
 endif
+
 if BUILD_AGG_RENDERER
-kde3_gnash_CPPFLAGS += $(AGG_CFLAGS) $(QT3_CFLAGS)
-kde3_gnash_LDADD += $(top_builddir)/librender/libgnashrender.la \
-	$(KDE3_LIBS) $(QT3_LIBS) $(AGG_LIBS)
-kde3_gnash_SOURCES += qt/kde_glue_agg.cpp \
-	qt/kde_glue_agg.h \
-	qt/kde.cpp \
-	qt/kdesup.h \
-	qt/kde_glue.h
+kde3_gnash_CPPFLAGS += $(AGG_CFLAGS)
+kde3_gnash_LDADD += $(AGG_LIBS)
+kde3_gnash_SOURCES += qt/kde_glue_agg.cpp qt/kde_glue_agg.h 
 endif
 endif
