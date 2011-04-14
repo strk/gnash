@@ -25,8 +25,8 @@ AC_DEFUN([GNASH_PATH_KDE3],
              with_kde3_incl=${withval})
   dnl make sure the path is a useable one
   if test x"${with_kde3_incl}" != x ; then
-    if test ! -f ${with_kde3_incl}/kapp.h ; then
-      AC_MSG_ERROR([${with_kde3_incl} directory doesn't contain any KDE 3.x headers])
+    if test ! -f ${with_kde3_incl}/qxembed.h ; then
+      AC_MSG_ERROR([${with_kde3_incl} directory doesn't contain qxembed.h headers])
     fi
   fi
 
@@ -85,7 +85,7 @@ AC_DEFUN([GNASH_PATH_KDE3],
     AC_CACHE_VAL(ac_cv_path_kde3_incl,[
       dnl if the user specified a path, sanity check it and then use it
       if test x"${with_kde3_incl}" != x; then
-        if test -f ${with_kde3_incl}/kapp.h; then
+        if test -f ${with_kde3_incl}/qxembed.h; then
           ac_cv_path_kde3_incl="-I`(cd ${with_kde3_incl}; pwd)`"
         fi
       fi
@@ -95,12 +95,12 @@ AC_DEFUN([GNASH_PATH_KDE3],
         AC_MSG_CHECKING([for KDE 3.x header path])
         dnl incllist is inherited from configure.ac, and lives in /macros
         for i in ${kde3_prefix}/include ${incllist}; do 
-         if test -f $i/kde/kapplication.h; then
+         if test -f $i/kde/qxembed.h; then
             ac_cv_path_kde3_incl="-I$i/kde"
             kde3_prefix=`dirname $i`
             break
           fi
-          if test -f $i/kapplication.h; then
+          if test -f $i/qxembed.h; then
             ac_cv_path_kde3_incl="-I$i"
             kde3_prefix=`dirname $i`
             break
@@ -114,7 +114,7 @@ AC_DEFUN([GNASH_PATH_KDE3],
         if test x${cross_compiling} = xno; then
           dnl if no headers have been found yet, make a last ditch
           dnl attempt to use the compiler to find them.
-          AC_CHECK_HEADERS(kde/kapplication.h, [ac_cv_path_kde3_incl=""])
+          AC_CHECK_HEADERS(kde/qxembed.h, [ac_cv_path_kde3_incl=""])
         fi
       fi
     ])                  dnl end of cache ac_cv_path_kde3_incl
