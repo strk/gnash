@@ -20,15 +20,17 @@
 
 
 #include "FileReference_as.h"
-#include "as_object.h" // for inheritance
+
+#include <sstream>
+
+#include "as_object.h" 
 #include "log.h"
 #include "fn_call.h"
 #include "Global_as.h"
+#include "NativeFunction.h"
 #include "as_function.h" 
-#include "GnashException.h" // for ActionException
 #include "VM.h"
-
-#include <sstream>
+#include "AsBroadcaster.h"
 
 namespace gnash {
 
@@ -53,8 +55,20 @@ namespace {
 void
 filereference_class_init(as_object& where, const ObjectURI& uri)
 {
-    registerBuiltinClass(where, filereference_ctor,
-            attachFileReferenceInterface, 0, uri);
+	// This is going to be the where Number "class"/"function"
+    Global_as& gl = getGlobal(where);
+
+    as_object* proto = createObject(gl);;
+
+    as_object* cl = gl.createClass(&filereference_ctor, proto);
+    attachFileReferenceInterface(*proto);
+  
+	AsBroadcaster::initialize(*proto);
+
+    as_object* null = 0;
+    callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, proto, null, 3);
+
+	where.init_member(uri, cl, as_object::DefaultFlags); 
 }
 
 namespace {
@@ -64,11 +78,9 @@ attachFileReferenceInterface(as_object& o)
 {
     Global_as& gl = getGlobal(o);
     
-    o.init_member("addListener", gl.createFunction(filereference_addListener));
     o.init_member("browse", gl.createFunction(filereference_browse));
     o.init_member("cancel", gl.createFunction(filereference_cancel));
     o.init_member("download", gl.createFunction(filereference_download));
-    o.init_member("removeListener", gl.createFunction(filereference_removeListener));
     o.init_member("upload", gl.createFunction(filereference_upload));
     o.init_property("creationDate", filereference_creationDate, filereference_creationDate);
     o.init_property("creator", filereference_creator, filereference_creator);
@@ -76,12 +88,6 @@ attachFileReferenceInterface(as_object& o)
     o.init_property("name", filereference_name, filereference_name);
     o.init_property("size", filereference_size, filereference_size);
     o.init_property("type", filereference_type, filereference_type);
-}
-
-as_value
-filereference_addListener(const fn_call& /*fn*/)
-{
-    return as_value();
 }
 
 as_value
@@ -98,12 +104,6 @@ filereference_cancel(const fn_call& /*fn*/)
 
 as_value
 filereference_download(const fn_call& /*fn*/)
-{
-    return as_value();
-}
-
-as_value
-filereference_removeListener(const fn_call& /*fn*/)
 {
     return as_value();
 }
@@ -149,7 +149,6 @@ filereference_type(const fn_call& /*fn*/)
 {
     return as_value();
 }
-
 
 as_value
 filereference_ctor(const fn_call& fn)
