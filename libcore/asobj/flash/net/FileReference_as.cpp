@@ -32,29 +32,38 @@
 
 namespace gnash {
 
-static as_value filereference_addListener(const fn_call& fn);
-static as_value filereference_browse(const fn_call& fn);
-static as_value filereference_cancel(const fn_call& fn);
-static as_value filereference_download(const fn_call& fn);
-static as_value filereference_removeListener(const fn_call& fn);
-static as_value filereference_upload(const fn_call& fn);
-static as_value filereference_creationDate(const fn_call& fn);
-static as_value filereference_creator(const fn_call& fn);
-static as_value filereference_modificationDate(const fn_call& fn);
-static as_value filereference_name(const fn_call& fn);
-static as_value filereference_size(const fn_call& fn);
-static as_value filereference_type(const fn_call& fn);
-as_value filereference_ctor(const fn_call& fn);
-
-void attachFileReferenceStaticInterface(as_object& /*o*/)
-{
-
+namespace {
+    as_value filereference_addListener(const fn_call& fn);
+    as_value filereference_browse(const fn_call& fn);
+    as_value filereference_cancel(const fn_call& fn);
+    as_value filereference_download(const fn_call& fn);
+    as_value filereference_removeListener(const fn_call& fn);
+    as_value filereference_upload(const fn_call& fn);
+    as_value filereference_creationDate(const fn_call& fn);
+    as_value filereference_creator(const fn_call& fn);
+    as_value filereference_modificationDate(const fn_call& fn);
+    as_value filereference_name(const fn_call& fn);
+    as_value filereference_size(const fn_call& fn);
+    as_value filereference_type(const fn_call& fn);
+    as_value filereference_ctor(const fn_call& fn);
+    void attachFileReferenceInterface(as_object& o);
 }
 
-static void
+// extern 
+void
+filereference_class_init(as_object& where, const ObjectURI& uri)
+{
+    registerBuiltinClass(where, filereference_ctor,
+            attachFileReferenceInterface, 0, uri);
+}
+
+namespace {
+
+void
 attachFileReferenceInterface(as_object& o)
 {
     Global_as& gl = getGlobal(o);
+    
     o.init_member("addListener", gl.createFunction(filereference_addListener));
     o.init_member("browse", gl.createFunction(filereference_browse));
     o.init_member("cancel", gl.createFunction(filereference_cancel));
@@ -69,78 +78,77 @@ attachFileReferenceInterface(as_object& o)
     o.init_property("type", filereference_type, filereference_type);
 }
 
-static as_value
+as_value
 filereference_addListener(const fn_call& /*fn*/)
 {
     return as_value();
 }
 
-static as_value
+as_value
 filereference_browse(const fn_call& /*fn*/)
 {
     return as_value();
 }
 
-static as_value
+as_value
 filereference_cancel(const fn_call& /*fn*/)
 {
     return as_value();
 }
 
-static as_value
+as_value
 filereference_download(const fn_call& /*fn*/)
 {
     return as_value();
 }
 
-static as_value
+as_value
 filereference_removeListener(const fn_call& /*fn*/)
 {
     return as_value();
 }
 
-static as_value
+as_value
 filereference_upload(const fn_call& /*fn*/)
 {
     return as_value();
 }
 
-static as_value
+as_value
 filereference_creationDate(const fn_call& /*fn*/)
 {
     return as_value();
 }
 
-static as_value
+as_value
 filereference_creator(const fn_call& /*fn*/)
 {
     return as_value();
 }
 
-static as_value
+as_value
 filereference_modificationDate(const fn_call& /*fn*/)
 {
     return as_value();
 }
 
-static as_value
+as_value
 filereference_name(const fn_call& /*fn*/)
 {
     return as_value();
 }
 
-static as_value
+as_value
 filereference_size(const fn_call& /*fn*/)
 {
     return as_value();
 }
 
-static as_value
+as_value
 filereference_type(const fn_call& /*fn*/)
 {
     return as_value();
 }
-
 
 
 as_value
@@ -154,17 +162,8 @@ filereference_ctor(const fn_call& fn)
                 _("arguments discarded"))
         );
     }
-
     return as_value();
 }
 
-// extern 
-void
-filereference_class_init(as_object& where, const ObjectURI& uri)
-{
-    registerBuiltinClass(where, filereference_ctor,
-            attachFileReferenceInterface, 
-            attachFileReferenceStaticInterface, uri);
-}
-
-} // end of gnash namespace
+} // unnamed namespace
+} // gnash namespace
