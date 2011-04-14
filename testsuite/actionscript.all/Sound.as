@@ -30,7 +30,7 @@ endOfTest = function()
     // TODO: test non-streaming sound too !
 
 #if OUTPUT_VERSION > 5
-    check_totals(106);
+    check_totals(108);
 #else
     check_totals(94);
 #endif
@@ -255,14 +255,17 @@ s.onSoundComplete = function()
     // fixing this might fix google dict
     // See https://savannah.gnu.org/bugs/index.php?31314
     xcheck(s.onLoadCalled);
+    xcheck_equals(typeof(s.onLoadArg), 'boolean');
+    xcheck_equals(s.onLoadArg, true);
 
     endOfTest();
 };
 
-s.onLoad = function()
+s.onLoad = function(arg)
 {
     trace("onLoad called");
     s.onLoadCalled = true;
+    s.onLoadArg = arg;
 };
 
 stop();
