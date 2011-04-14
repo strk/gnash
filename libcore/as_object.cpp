@@ -410,7 +410,7 @@ as_object::get_member(const ObjectURI& uri, as_value* val)
             if (res) {
                 resolve = res->isGetterSetter() ? res->getCache() :
                                                   res->getValue(*this);
-                if (version < 6) break;
+                if (version < 7) break;
                 if (resolve.is_object()) break;
             }
             // Finished searching.
@@ -426,8 +426,7 @@ as_object::get_member(const ObjectURI& uri, as_value* val)
         args += undefinedName;
 
         // Invoke the __resolve property.
-        *val = invoke(resolve, as_environment(getVM(*this)),
-                this, args);
+        *val = invoke(resolve, as_environment(getVM(*this)), this, args);
 
         return true;
     }
