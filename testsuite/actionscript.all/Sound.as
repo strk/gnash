@@ -273,12 +273,7 @@ check_equals(typeof(s.getDuration()), "number");
 onSoundCompleteFailed = function()
 {
     clearInterval(intval);
-    // Gnash doesn't really fail this, but gprocessor
-    // does, not using a real sound handler ...
-    // so, you'll get an XPASS with gnash, and an XFAIL
-    // with gprocessor (which is the one currently
-    // running this test anyway).
-    xfail("no onSoundComplete arrived after 3 seconds");
+    fail("no onSoundComplete arrived after 3 seconds");
     endOfTest();
 };
 

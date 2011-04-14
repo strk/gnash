@@ -379,6 +379,45 @@ main(int argc, char *argv[])
     return 0;
 }
 
+struct SamplesFetcher {
+	sound::sound_handler& _sh;
+	unsigned int _samplesFetched;
+	
+	SamplesFetcher(sound::sound_handler& sh)
+        : _sh(sh), _samplesFetched(0)
+    {}
+
+    // Fetch as many samples as needed for `ms' milliseconds of playback
+    void fetch(unsigned int ms)
+    {
+        // We need to fetch as many samples
+        // as needed for a theoretical 44100hz loop.
+        // That is 44100 samples each second.
+        // 44100/1000 = x/ms
+        //  x = (44100*ms) / 1000
+        unsigned int nSamples = (441*ms) / 10;
+
+        // We double because sound_handler interface takes
+        // "mono" samples... (eh.. would be wise to change)
+        unsigned int toFetch = nSamples*2;
+
+        // Now substract what we fetched already
+        toFetch -= _samplesFetched;
+
+        // And update _samplesFetched..
+        _samplesFetched += toFetch;
+
+        //log_debug("SamplesFetcher::fetch(%d) fetching %d samples", ms, toFetch);
+
+        boost::int16_t samples[1024];
+        while (toFetch) {
+            unsigned int n = std::min(toFetch, 1024u);
+            _sh.fetchSamples(samples, n);
+            toFetch -= n;
+        }
+    }
+};
+
 // Load the named movie, make an instance, and play it, virtually.
 // I.e. run through and render all the frames, even though we are not
 // actually doing any output (our output handlers are disabled).
@@ -386,6 +425,11 @@ main(int argc, char *argv[])
 bool
 play_movie(const std::string& filename, const RunResources& runResources)
 {
+
+    sound::sound_handler* sh = runResources.soundHandler();
+    sh->reset();
+    SamplesFetcher sFetcher(*sh);
+
     boost::intrusive_ptr<gnash::movie_definition> md;
 
     quitrequested = false;
@@ -440,6 +484,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
     // Use a clock advanced at every iteration to match exact FPS speed.
     ManualClock cl;
 
+
     // Scope to ensure that movie_root is destroyed before the library
     // is cleared; otherwise movie_root's MovieLoader can continue to
     // add movie_definitions to MovieLibrary, which then keeps them
@@ -476,6 +521,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
             //printf("advancing clock by %lu\n", clockAdvance);
             cl.advance(clockAdvance);
             m.advance();
+            sFetcher.fetch(cl.elapsed());
 
             if ( quitrequested ) 
             {
