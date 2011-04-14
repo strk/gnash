@@ -27,8 +27,10 @@ rcsid="$Id: Sound.as,v 1.1 2008/06/17 12:42:22 strk Exp $";
 
 endOfTest = function()
 {
+    // TODO: test non-streaming sound too !
+
 #if OUTPUT_VERSION > 5
-    check_totals(105);
+    check_totals(106);
 #else
     check_totals(94);
 #endif
@@ -246,8 +248,21 @@ s = new Sound();
 s.onSoundComplete = function()
 {
     clearInterval(intval);
+
+    trace("onSoundComplete called");
     pass("onSoundComplete called");
+
+    // fixing this might fix google dict
+    // See https://savannah.gnu.org/bugs/index.php?31314
+    xcheck(s.onLoadCalled);
+
     endOfTest();
+};
+
+s.onLoad = function()
+{
+    trace("onLoad called");
+    s.onLoadCalled = true;
 };
 
 stop();
@@ -260,7 +275,6 @@ check_equals(typeof(s.getDuration()), "undefined");
 
 // streaming sound doesn't need .start() to play...
 s.loadSound(MEDIA(sound1.mp3), true); 
-
 
 check_equals(typeof(s.getBytesTotal()), "number");
 check_equals(typeof(s.getBytesLoaded()), "number");
