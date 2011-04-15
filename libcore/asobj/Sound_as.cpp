@@ -340,6 +340,7 @@ Sound_as::update()
     VM& vm = getVM(owner());
 
     if (active()) {
+        // TODO: use named strings for "duration" and "position"
         owner().set_member(getURI(vm, "duration"), getDuration());
         owner().set_member(getURI(vm, "position"), getPosition());
     }
@@ -349,11 +350,7 @@ void
 Sound_as::probeAudio()
 {
 
-    if (!_mediaParser) {
-        log_debug("Sound_as::probeAudio: no parser, nothing to probe for");
-        stopProbeTimer();
-        return;
-    }
+    if (!_mediaParser) return; // nothing to do here w/out a media parser
 
     if ( ! _soundLoaded ) {
 #ifdef GNASH_DEBUG_SOUND_AS
