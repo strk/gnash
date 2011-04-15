@@ -28,7 +28,7 @@ rcsid="$Id: Sound.as,v 1.1 2008/06/17 12:42:22 strk Exp $";
 endOfTest = function()
 {
 #if OUTPUT_VERSION > 5
-    check_totals(108);
+    check_totals(111);
 #else
     check_totals(94);
 #endif
@@ -250,6 +250,8 @@ s.onSoundComplete = function()
     trace("onSoundComplete called");
     pass("onSoundComplete called");
 
+    xcheck_equals(s.position, 209);
+
     // fixing this might fix google dict
     // See https://savannah.gnu.org/bugs/index.php?31314
     check(s.onLoadCalled);
@@ -265,6 +267,8 @@ s.onSoundComplete = function()
 s.onLoad = function(arg)
 {
     trace("onLoad called");
+    xcheck_equals(s.duration, 209);
+    check_equals(s.position, 0);
     s.onLoadCalled = true;
     s.onLoadArg = arg;
 };
