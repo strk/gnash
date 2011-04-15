@@ -138,11 +138,13 @@ runAttachedSoundsTest(SWFMovie mo, SWFSound so, int* frame)
     frameDesc[4] = "Nothing";
 
     add_actions(mo, "t = _root.createEmptyMovieClip('mc', 9);"
-            "cs = 0; cs2 = 0;"
+            "cs = 0; cs2 = 0; onLoadCalls = 0; onLoadCalls2 = 0;"
             "s = new Sound(mc);"
             "s2 = new Sound(mc);"
             "s.attachSound('es');"
             "s2.attachSound('es');"
+            "s.onLoad = function() { onLoadCalls++; };"
+            "s2.onLoad = function() { onLoadCalls2++; };"
             "s.onSoundComplete = function() { cs++; };"
             "s2.onSoundComplete = function() { cs2++; };"
             );
@@ -167,16 +169,31 @@ runAttachedSoundsTest(SWFMovie mo, SWFSound so, int* frame)
         add_actions(mo, "s.start();");
     }
 
-    add_actions(mo, "xcheck_equals(cs, 1);");
+    xcheck_equals(mo, "cs", "1");
 
     SWFMovie_nextFrame(mo);
     
-    add_actions(mo, "xcheck_equals(cs, 2);");
+    xcheck_equals(mo, "cs", "2");
     
     // Check that Sound.onSoundComplete isn't executed if the Sound is
     // deleted. This only passes currently because onSoundComplete is never
     // called under any circumstances for embedded sounds.
-    add_actions(mo, "check_equals(cs2, 0);");
+    check_equals(mo, "cs2", "0");
+
+    // Check that Sound.onLoad isn't executed for embedded sounds
+    check_equals(mo, "onLoadCalls", "0");
+    check_equals(mo, "onLoadCalls2", "0");
+
+    check_equals(mo, "s.duration", "3000");
+
+    /* about 2/3 of the sound is played a this time. exact time
+     * is unreliable outside of controlled testing infrastructure:
+     * PP 10 gives 1997 ms, gtk-gnash gives 1973.
+     * MovieTester (controlling exact timeing) gives plain 2000
+     */
+    /* add_actions(mo, "note('Position: '+s.position);"); */
+    check_equals(mo, "Math.round(s.position/1000)", "2");
+
     add_actions(mo, "s.stop();");
 
     printFrameInfo(mo, i, frameDesc[i]);
