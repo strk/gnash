@@ -37,7 +37,24 @@ mySound = new Sound();
 
 mySound.onSoundComplete = function()
 {
-	trace("soundComplete");
+    var s = 'onSoundComplete(';
+    for (var i=0; i<arguments.length; ++i) {
+        if ( i ) s += ', ';
+        s += arguments[i];
+    }
+    s += ')';
+	trace(s);
+};
+
+mySound.onLoad = function(success)
+{
+	var s = "onLoad(";
+    for (var i=0; i<arguments.length; ++i) {
+        if ( i ) s += ', ';
+        s += arguments[i];
+    }
+    s += ')';
+	trace(s);
 };
 
 s_load = function()
