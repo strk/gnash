@@ -623,6 +623,12 @@ MovieTester::restart()
     render();
 }
 
+float
+MovieTester::getFrameRate() const
+{
+    return _movie_def->get_frame_rate();
+}
+
 namespace {
     
 /// Returns the average RGB color for a square block on the stage. The 
