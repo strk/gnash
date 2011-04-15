@@ -27,8 +27,6 @@ rcsid="$Id: Sound.as,v 1.1 2008/06/17 12:42:22 strk Exp $";
 
 endOfTest = function()
 {
-    // TODO: test non-streaming sound too !
-
 #if OUTPUT_VERSION > 5
     check_totals(108);
 #else
@@ -254,9 +252,12 @@ s.onSoundComplete = function()
 
     // fixing this might fix google dict
     // See https://savannah.gnu.org/bugs/index.php?31314
-    xcheck(s.onLoadCalled);
-    xcheck_equals(typeof(s.onLoadArg), 'boolean');
-    xcheck_equals(s.onLoadArg, true);
+    check(s.onLoadCalled);
+    check_equals(typeof(s.onLoadArg), 'boolean');
+    check_equals(s.onLoadArg, true);
+
+    // TODO: test non-streaming sound 
+    // TODO: test loadSound on unexistent sound 
 
     endOfTest();
 };
