@@ -337,8 +337,6 @@ Sound_as::update()
 {
     probeAudio();
 
-    VM& vm = getVM(owner());
-
     if (active()) {
         owner().set_member(NSV::PROP_DURATION, getDuration());
         owner().set_member(NSV::PROP_POSITION, getPosition());
@@ -450,7 +448,6 @@ Sound_as::attachSound(int si, const std::string& name)
     soundId = si;
     soundName = name;
     
-    VM& vm = getVM(owner());
     owner().set_member(NSV::PROP_DURATION, getDuration());
     owner().set_member(NSV::PROP_POSITION, getPosition());
 
@@ -587,7 +584,6 @@ Sound_as::loadSound(const std::string& file, bool streaming)
 
     startProbeTimer();
 
-    VM& vm = getVM(owner());
     owner().set_member(NSV::PROP_DURATION, getDuration());
     owner().set_member(NSV::PROP_POSITION, getPosition());
 }
