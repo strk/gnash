@@ -76,10 +76,6 @@ if USE_GST_ENGINE
 	gst/VideoInputGst.h \
 	$(NULL)
 
-   noinst_HEADERS += \
-	gst/gnash_gst_version.h \
-	$(NULL)
-
    libgnashmedia_la_CPPFLAGS += \
 	-I$(top_srcdir)/libmedia/gst \
 	$(GSTREAMER_CFLAGS) \
