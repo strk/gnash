@@ -136,6 +136,7 @@ endif
 
 if USE_HAIKU_ENGINE
    libgnashmedia_la_SOURCES += \
+	haiku/adipe.h \
 	haiku/AudioDecoderHaiku.cpp \
 	haiku/AudioDecoderHaiku.h \
 	haiku/AudioInputHaiku.cpp \
