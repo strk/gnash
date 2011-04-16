@@ -38,51 +38,46 @@ libgnashmedia_la_LIBADD = \
 	$(NULL)
 
 libgnashmedia_la_SOURCES = \
-	MediaHandler.cpp \
-	AudioDecoderSimple.cpp \
-	MediaParser.cpp \
-	FLVParser.cpp \
-	AudioResampler.cpp \
-	$(NULL)
-
-noinst_HEADERS = \
 	AudioDecoder.h \
-	VideoDecoder.h \
-	VideoConverter.h \
-	MediaParser.h \
-	MediaHandler.h \
-	FLVParser.h \
+	AudioDecoderSimple.cpp \
 	AudioDecoderSimple.h \
-	SoundInfo.h \
+	AudioResampler.cpp \
 	AudioResampler.h \
-	AudioInput.h \
-	VideoInput.h \
+	FLVParser.cpp \
+	FLVParser.h \
+	MediaHandler.cpp \
+	MediaHandler.h \
+	MediaParser.cpp \
+	MediaParser.h \
+	SoundInfo.h \
+	VideoConverter.h \
 	$(NULL)
 
 if USE_GST_ENGINE
    libgnashmedia_la_SOURCES += \
-	gst/MediaHandlerGst.cpp \
-	gst/VideoDecoderGst.cpp \
+	AudioInput.h \
 	gst/AudioDecoderGst.cpp \
-	gst/MediaParserGst.cpp \
-	gst/VideoConverterGst.cpp \
-	gst/GstUtil.cpp \
-	gst/swfdec_codec_gst.c \
-	gst/VideoInputGst.cpp \
+	gst/AudioDecoderGst.h \
 	gst/AudioInputGst.cpp \
+	gst/AudioInputGst.h \
+	gst/GstUtil.cpp \
+	gst/GstUtil.h \
+	gst/MediaHandlerGst.cpp \
+	gst/MediaHandlerGst.h \
+	gst/MediaParserGst.cpp \
+	gst/MediaParserGst.h \
+	gst/swfdec_codec_gst.c \
+	gst/swfdec_codec_gst.h \
+	gst/VideoConverterGst.cpp \
+	gst/VideoConverterGst.h \
+	gst/VideoDecoderGst.cpp \
+	gst/VideoDecoderGst.h \
+	gst/VideoInputGst.cpp \
+	gst/VideoInputGst.h \
 	$(NULL)
 
    noinst_HEADERS += \
-	gst/MediaHandlerGst.h \
-	gst/AudioDecoderGst.h \
-	gst/VideoDecoderGst.h \
-	gst/MediaParserGst.h \
-	gst/VideoConverterGst.h \
-	gst/GstUtil.h \
-	gst/swfdec_codec_gst.h \
 	gst/gnash_gst_version.h \
-	gst/VideoInputGst.h \
-	gst/AudioInputGst.h \
 	$(NULL)
 
    libgnashmedia_la_CPPFLAGS += \
@@ -104,26 +99,26 @@ endif
 
 if USE_FFMPEG_ENGINE
    libgnashmedia_la_SOURCES += \
-	ffmpeg/MediaHandlerFfmpeg.cpp \
-	ffmpeg/MediaParserFfmpeg.cpp \
+	AudioInput.h \
 	ffmpeg/AudioDecoderFfmpeg.cpp \
-	ffmpeg/VideoDecoderFfmpeg.cpp \
-	ffmpeg/AudioResamplerFfmpeg.cpp \
-	ffmpeg/VideoConverterFfmpeg.cpp \
-	ffmpeg/VideoInputFfmpeg.cpp \
-	ffmpeg/AudioInputFfmpeg.cpp \
-	$(NULL)
-
-   noinst_HEADERS += \
-	ffmpeg/MediaHandlerFfmpeg.h \
-	ffmpeg/MediaParserFfmpeg.h \
 	ffmpeg/AudioDecoderFfmpeg.h \
-	ffmpeg/VideoDecoderFfmpeg.h \
+	ffmpeg/AudioInputFfmpeg.cpp \
+	ffmpeg/AudioInputFfmpeg.h \
+	ffmpeg/AudioResamplerFfmpeg.cpp \
 	ffmpeg/AudioResamplerFfmpeg.h \
 	ffmpeg/ffmpegHeaders.h \
+	ffmpeg/MediaHandlerFfmpeg.cpp \
+	ffmpeg/MediaHandlerFfmpeg.h \
+	ffmpeg/MediaParserFfmpeg.cpp \
+	ffmpeg/MediaParserFfmpeg.h \
+	ffmpeg/VideoConverterFfmpeg.cpp \
 	ffmpeg/VideoConverterFfmpeg.h \
+	ffmpeg/VideoDecoderFfmpeg.cpp \
+	ffmpeg/VideoDecoderFfmpeg.h \
+	ffmpeg/VideoInputFfmpeg.cpp \
 	ffmpeg/VideoInputFfmpeg.h \
-	ffmpeg/AudioInputFfmpeg.h \
+	VideoDecoder.h \
+	VideoInput.h \
 	$(NULL)
 
    libgnashmedia_la_LIBADD += \
@@ -137,33 +132,28 @@ if USE_FFMPEG_ENGINE
 if HAVE_VAAPI
    libgnashmedia_la_SOURCES += \
 		ffmpeg/VideoDecoderFfmpegVaapi.cpp \
-		$(NULL)
-
-   noinst_HEADERS += \
 		ffmpeg/VideoDecoderFfmpegVaapi.h \
 		$(NULL)
+
 endif
 endif
 
 if USE_HAIKU_ENGINE
    libgnashmedia_la_SOURCES += \
-	haiku/MediaHandlerHaiku.cpp \
-	haiku/MediaParserHaiku.cpp \
 	haiku/AudioDecoderHaiku.cpp \
-	haiku/VideoDecoderHaiku.cpp \
-	haiku/VideoConverterHaiku.cpp \
-	haiku/VideoInputHaiku.cpp \
-	haiku/AudioInputHaiku.cpp \
-	$(NULL)
-
-   noinst_HEADERS += \
-	haiku/MediaHandlerHaiku.h \
-	haiku/MediaParserHaiku.h \
 	haiku/AudioDecoderHaiku.h \
-	haiku/VideoDecoderHaiku.h \
-	haiku/VideoConverterHaiku.h \
-	haiku/VideoInputHaiku.h \
+	haiku/AudioInputHaiku.cpp \
 	haiku/AudioInputHaiku.h \
+	haiku/MediaHandlerHaiku.cpp \
+	haiku/MediaHandlerHaiku.h \
+	haiku/MediaParserHaiku.cpp \
+	haiku/MediaParserHaiku.h \
+	haiku/VideoConverterHaiku.cpp \
+	haiku/VideoConverterHaiku.h \
+	haiku/VideoDecoderHaiku.cpp \
+	haiku/VideoDecoderHaiku.h \
+	haiku/VideoInputHaiku.cpp \
+	haiku/VideoInputHaiku.h \
 	$(NULL)
 
    libgnashmedia_la_LIBADD += \
@@ -183,8 +173,10 @@ if HAVE_SPEEX
 	$(SPEEX_CFLAGS) \
 	$(SPEEXDSP_CFLAGS) \
 	$(NULL)
-   libgnashmedia_la_SOURCES += AudioDecoderSpeex.cpp
-   noinst_HEADERS += AudioDecoderSpeex.h
+   libgnashmedia_la_SOURCES += \
+	AudioDecoderSpeex.cpp \
+	AudioDecoderSpeex.h \
+	$(NULL)
 endif
 
 libgnashmedia_la_LDFLAGS = -release $(VERSION)
