@@ -16,11 +16,6 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-EXTRA_DIST = 
-
-# this is where Gnash plugins get installed
-pluginsdir = $(prefix)/lib/gnash/plugins
-
 AM_CXXFLAGS = -DREGISTER_MEDIA_HANDLERS
 
 # If we are using an installable libltdl, then it needs to be built
