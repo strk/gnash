@@ -16,9 +16,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-EXTRA_DIST = 
-
-pkglib_LTLIBRARIES =  libgnashsound.la
+pkglib_LTLIBRARIES = libgnashsound.la
 
 libgnashsound_la_CPPFLAGS = \
 	-I$(top_srcdir)/libbase	\
@@ -54,18 +52,19 @@ noinst_HEADERS = \
 	$(NULL)
 
 if USE_SOUND_SDL
- libgnashsound_la_SOURCES += sdl/sound_handler_sdl.cpp 
- noinst_HEADERS += sdl/sound_handler_sdl.h
+libgnashsound_la_SOURCES += sdl/sound_handler_sdl.cpp 
+noinst_HEADERS += sdl/sound_handler_sdl.h
 endif
+
 if USE_SOUND_AHI
- libgnashsound_la_SOURCES += aos4/sound_handler_ahi.cpp 
- noinst_HEADERS += aos4/sound_handler_ahi.h
+libgnashsound_la_SOURCES += aos4/sound_handler_ahi.cpp 
+noinst_HEADERS += aos4/sound_handler_ahi.h
 endif
 
 if USE_SOUND_MKIT
- libgnashsound_la_SOURCES += mkit/sound_handler_mkit.cpp
- libgnashsound_la_LIBADD += -lmedia
- noinst_HEADERS += mkit/sound_handler_mkit.h
+libgnashsound_la_SOURCES += mkit/sound_handler_mkit.cpp
+libgnashsound_la_LIBADD += -lmedia
+noinst_HEADERS += mkit/sound_handler_mkit.h
 endif
 
 if ENABLE_PCH
@@ -75,9 +74,8 @@ endif
 libgnashsound_la_LDFLAGS = -release $(VERSION)
 
 if WIN32
-  libgnashsound_la_LDFLAGS += -no-undefined
-  libgnashsound_la_LIBADD += \
-	-lintl
+libgnashsound_la_LDFLAGS += -no-undefined
+libgnashsound_la_LIBADD += -lintl
 endif
 
 # Remove libtool .la files
