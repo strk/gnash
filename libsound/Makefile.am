@@ -18,21 +18,6 @@ AUTOMAKE_OPTIONS = foreign
 
 pkglib_LTLIBRARIES = libgnashsound.la
 
-libgnashsound_la_CPPFLAGS = \
-	-I$(top_srcdir)/libbase	\
-	-I$(top_srcdir)/libmedia \
-	$(PTHREAD_CFLAGS) \
-	$(BOOST_CFLAGS) \
-	$(SDL_CFLAGS) \
-	$(NULL)
-
-libgnashsound_la_LIBADD = \
-	$(top_builddir)/libmedia/libgnashmedia.la \
-	$(top_builddir)/libbase/libgnashbase.la \
-	$(BOOST_LIBS) \
-	$(SDL_LIBS) \
-	$(NULL)
-
 libgnashsound_la_SOURCES = \
 	AuxStream.h \
 	EmbedSound.cpp \
@@ -45,10 +30,6 @@ libgnashsound_la_SOURCES = \
 	SoundEnvelope.h \
 	WAVWriter.cpp \
 	WAVWriter.h \
-	$(NULL)
-
-noinst_HEADERS = \
-	NullSoundHandler.h \
 	$(NULL)
 
 if USE_SOUND_SDL
@@ -70,11 +51,29 @@ libgnashsound_la_SOURCES += \
 	mkit/sound_handler_mkit.cpp \
 	mkit/sound_handler_mkit.h \
 	$(NULL)
-libgnashsound_la_LIBADD += -lmedia
 endif
 
-if ENABLE_PCH
-AM_CXXFLAGS = $(PCH_FLAGS)
+noinst_HEADERS = \
+	NullSoundHandler.h \
+	$(NULL)
+
+libgnashsound_la_CPPFLAGS = \
+	-I$(top_srcdir)/libbase	\
+	-I$(top_srcdir)/libmedia \
+	$(PTHREAD_CFLAGS) \
+	$(BOOST_CFLAGS) \
+	$(SDL_CFLAGS) \
+	$(NULL)
+
+libgnashsound_la_LIBADD = \
+	$(top_builddir)/libmedia/libgnashmedia.la \
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(BOOST_LIBS) \
+	$(SDL_LIBS) \
+	$(NULL)
+
+if USE_SOUND_MKIT
+libgnashsound_la_LIBADD += -lmedia
 endif
 
 libgnashsound_la_LDFLAGS = -release $(VERSION)
@@ -82,6 +81,10 @@ libgnashsound_la_LDFLAGS = -release $(VERSION)
 if WIN32
 libgnashsound_la_LDFLAGS += -no-undefined
 libgnashsound_la_LIBADD += -lintl
+endif
+
+if ENABLE_PCH
+AM_CXXFLAGS = $(PCH_FLAGS)
 endif
 
 # Remove libtool .la files
