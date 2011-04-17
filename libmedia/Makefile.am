@@ -20,7 +20,7 @@ AM_CXXFLAGS = -DREGISTER_MEDIA_HANDLERS
 
 # If we are using an installable libltdl, then it needs to be built
 # before libgnash, as libgnash depends on it for extensions.
-pkglib_LTLIBRARIES =  libgnashmedia.la
+pkglib_LTLIBRARIES = libgnashmedia.la
 
 libgnashmedia_la_CPPFLAGS = \
 	-I$(top_srcdir)/libbase	\
@@ -29,7 +29,7 @@ libgnashmedia_la_CPPFLAGS = \
 	$(NULL)
 
 if ANDROID
-  libgnashmedia_la_CPPFLAGS += $(ANDROID_NDK)/usr/include
+libgnashmedia_la_CPPFLAGS += $(ANDROID_NDK)/usr/include
 endif
 
 libgnashmedia_la_LIBADD = \
@@ -54,7 +54,7 @@ libgnashmedia_la_SOURCES = \
 	$(NULL)
 
 if USE_GST_ENGINE
-   libgnashmedia_la_SOURCES += \
+libgnashmedia_la_SOURCES += \
 	AudioInput.h \
 	gst/AudioDecoderGst.cpp \
 	gst/AudioDecoderGst.h \
@@ -76,14 +76,14 @@ if USE_GST_ENGINE
 	gst/VideoInputGst.h \
 	$(NULL)
 
-   libgnashmedia_la_CPPFLAGS += \
+libgnashmedia_la_CPPFLAGS += \
 	-I$(top_srcdir)/libmedia/gst \
 	$(GSTREAMER_CFLAGS) \
 	$(GSTAPP_CFLAGS) \
 	$(GSTREAMER_PBUTILS_CFLAGS) \
 	$(NULL)
 
-   libgnashmedia_la_LIBADD += \
+libgnashmedia_la_LIBADD += \
 	-lgstbase-0.10 \
 	$(GSTREAMER_APP_LIBS) \
 	$(GSTREAMER_PBUTILS_LIBS) \
@@ -94,7 +94,7 @@ if USE_GST_ENGINE
 endif
 
 if USE_FFMPEG_ENGINE
-   libgnashmedia_la_SOURCES += \
+libgnashmedia_la_SOURCES += \
 	AudioInput.h \
 	ffmpeg/AudioDecoderFfmpeg.cpp \
 	ffmpeg/AudioDecoderFfmpeg.h \
@@ -117,25 +117,25 @@ if USE_FFMPEG_ENGINE
 	VideoInput.h \
 	$(NULL)
 
-   libgnashmedia_la_LIBADD += \
+libgnashmedia_la_LIBADD += \
 	$(FFMPEG_LIBS) \
 	$(NULL)
 
-   libgnashmedia_la_CPPFLAGS += \
+libgnashmedia_la_CPPFLAGS += \
 	$(FFMPEG_CFLAGS) \
 	$(NULL)
 
 if HAVE_VAAPI
-   libgnashmedia_la_SOURCES += \
-		ffmpeg/VideoDecoderFfmpegVaapi.cpp \
-		ffmpeg/VideoDecoderFfmpegVaapi.h \
-		$(NULL)
+libgnashmedia_la_SOURCES += \
+	ffmpeg/VideoDecoderFfmpegVaapi.cpp \
+	ffmpeg/VideoDecoderFfmpegVaapi.h \
+	$(NULL)
 
 endif
 endif
 
 if USE_HAIKU_ENGINE
-   libgnashmedia_la_SOURCES += \
+libgnashmedia_la_SOURCES += \
 	haiku/adipe.h \
 	haiku/AudioDecoderHaiku.cpp \
 	haiku/AudioDecoderHaiku.h \
@@ -153,24 +153,24 @@ if USE_HAIKU_ENGINE
 	haiku/VideoInputHaiku.h \
 	$(NULL)
 
-   libgnashmedia_la_LIBADD += \
+libgnashmedia_la_LIBADD += \
 	-lmedia \
 	$(NULL)
 
-   libgnashmedia_la_CPPFLAGS += \
+libgnashmedia_la_CPPFLAGS += \
 	$(NULL)
 endif
 
 if HAVE_SPEEX
-   libgnashmedia_la_LIBADD += \
+libgnashmedia_la_LIBADD += \
 	$(SPEEX_LIBS) \
 	$(SPEEXDSP_LIBS) \
 	$(NULL)
-   libgnashmedia_la_CPPFLAGS += \
+libgnashmedia_la_CPPFLAGS += \
 	$(SPEEX_CFLAGS) \
 	$(SPEEXDSP_CFLAGS) \
 	$(NULL)
-   libgnashmedia_la_SOURCES += \
+libgnashmedia_la_SOURCES += \
 	AudioDecoderSpeex.cpp \
 	AudioDecoderSpeex.h \
 	$(NULL)
@@ -178,19 +178,19 @@ endif
 
 libgnashmedia_la_LDFLAGS = -release $(VERSION)
 
-   libgnashmedia_la_CPPFLAGS += \
+libgnashmedia_la_CPPFLAGS += \
 	-I$(top_srcdir)/libvaapi \
 	$(NULL)
 
 if HAVE_VAAPI
-   libgnashmedia_la_LIBADD += \
+libgnashmedia_la_LIBADD += \
 	$(top_builddir)/libvaapi/libgnashvaapi.la \
 	$(NULL)
 endif
 
 if WIN32
-  libgnashmedia_la_LDFLAGS += -no-undefined
-  libgnashmedia_la_LIBADD += \
+libgnashmedia_la_LDFLAGS += -no-undefined
+libgnashmedia_la_LIBADD += \
 	-lintl
 endif
 
