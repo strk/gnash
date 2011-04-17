@@ -170,7 +170,6 @@ libgnashmedia_la_LIBADD = \
 
 if USE_GST_ENGINE
 libgnashmedia_la_LIBADD += \
-	-lgstbase-0.10 \
 	$(GSTREAMER_APP_LIBS) \
 	$(GSTREAMER_PBUTILS_LIBS) \
 	$(GSTREAMER_PLUGINS_BASE_LIBS) \
