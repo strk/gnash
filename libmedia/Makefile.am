@@ -133,7 +133,6 @@ endif
 
 if USE_GST_ENGINE
 libgnashmedia_la_CPPFLAGS += \
-	-I$(top_srcdir)/libmedia/gst \
 	$(GSTREAMER_CFLAGS) \
 	$(GSTAPP_CFLAGS) \
 	$(GSTREAMER_PBUTILS_CFLAGS) \
