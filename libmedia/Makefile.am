@@ -158,9 +158,11 @@ libgnashmedia_la_CPPFLAGS += \
 	$(NULL)
 endif
 
+if HAVE_VAAPI
 libgnashmedia_la_CPPFLAGS += \
 	-I$(top_srcdir)/libvaapi \
 	$(NULL)
+endif
 
 libgnashmedia_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
