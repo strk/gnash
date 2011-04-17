@@ -34,37 +34,43 @@ libgnashsound_la_LIBADD = \
 	$(NULL)
 
 libgnashsound_la_SOURCES = \
-	sound_handler.cpp \
+	AuxStream.h \
 	EmbedSound.cpp \
+	EmbedSound.h \
 	EmbedSoundInst.cpp \
+	EmbedSoundInst.h \
+	InputStream.h \
+	sound_handler.cpp \
+	sound_handler.h \
+	SoundEnvelope.h \
 	WAVWriter.cpp \
+	WAVWriter.h \
 	$(NULL)
 
 noinst_HEADERS = \
 	NullSoundHandler.h \
-	sound_handler.h \
-	SoundEnvelope.h \
-	InputStream.h \
-	EmbedSound.h \
-	EmbedSoundInst.h \
-	AuxStream.h \
-	WAVWriter.h \
 	$(NULL)
 
 if USE_SOUND_SDL
-libgnashsound_la_SOURCES += sdl/sound_handler_sdl.cpp 
-noinst_HEADERS += sdl/sound_handler_sdl.h
+libgnashsound_la_SOURCES += \
+	sdl/sound_handler_sdl.cpp \
+	sdl/sound_handler_sdl.h \
+	$(NULL)
 endif
 
 if USE_SOUND_AHI
-libgnashsound_la_SOURCES += aos4/sound_handler_ahi.cpp 
-noinst_HEADERS += aos4/sound_handler_ahi.h
+libgnashsound_la_SOURCES += \
+	aos4/sound_handler_ahi.cpp \
+	aos4/sound_handler_ahi.h \
+	$(NULL)
 endif
 
 if USE_SOUND_MKIT
-libgnashsound_la_SOURCES += mkit/sound_handler_mkit.cpp
+libgnashsound_la_SOURCES += \
+	mkit/sound_handler_mkit.cpp \
+	mkit/sound_handler_mkit.h \
+	$(NULL)
 libgnashsound_la_LIBADD += -lmedia
-noinst_HEADERS += mkit/sound_handler_mkit.h
 endif
 
 if ENABLE_PCH
