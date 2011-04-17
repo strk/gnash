@@ -145,11 +145,6 @@ libgnashmedia_la_CPPFLAGS += \
 	$(NULL)
 endif
 
-if USE_HAIKU_ENGINE
-libgnashmedia_la_CPPFLAGS += \
-	$(NULL)
-endif
-
 if HAVE_SPEEX
 libgnashmedia_la_CPPFLAGS += \
 	$(SPEEX_CFLAGS) \
