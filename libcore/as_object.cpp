@@ -401,10 +401,21 @@ as_object::get_member(const ObjectURI& uri, as_value* val)
     // inheritance chain, try the __resolve property.
     if (!prop) {
 
-        Property* res = findProperty(NSV::PROP_uuRESOLVE);
-        
-        // No __resolve
-        if (!res) return false;
+        PrototypeRecursor<Exists> pr(this, NSV::PROP_uuRESOLVE);
+
+        as_value resolve;
+
+        for (;;) {
+            Property* res = pr.getProperty();
+            if (res) {
+                resolve = res->isGetterSetter() ? res->getCache() :
+                                                  res->getValue(*this);
+                if (version < 7) break;
+                if (resolve.is_object()) break;
+            }
+            // Finished searching.
+            if (!pr()) return false;
+        }
 
         // If __resolve exists, call it with the name of the undefined
         // property.
@@ -415,8 +426,7 @@ as_object::get_member(const ObjectURI& uri, as_value* val)
         args += undefinedName;
 
         // Invoke the __resolve property.
-        *val = invoke(res->getValue(*this), as_environment(getVM(*this)),
-                this, args);
+        *val = invoke(resolve, as_environment(getVM(*this)), this, args);
 
         return true;
     }

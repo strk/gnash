@@ -243,6 +243,10 @@ if BUILD_QT4_GUI
 	@echo "	QT4_CFLAGS is $(QT4_CFLAGS)"
 	@echo "	QT4_LIBS is $(QT4_LIBS)"
 endif
+if KPARTS4
+	@echo "	KDE4_CFLAGS is $(KDE4_CFLAGS)"
+	@echo "	KDE4_LIBS is $(KDE4_LIBS)"
+endif
 if BUILD_QT4_GUI
 	@echo "	QT4_CFLAGS is $(QT4_CFLAGS)"
 	@echo "	QT4_LIBS is $(QT4_LIBS)"

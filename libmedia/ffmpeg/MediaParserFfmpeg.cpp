@@ -94,44 +94,52 @@ MediaParserFfmpeg::probeStream()
 bool
 MediaParserFfmpeg::seek(boost::uint32_t& pos)
 {
-	LOG_ONCE(log_unimpl("MediaParserFfmpeg::seek()"));
-	return false;
+    // lock the stream while reading from it, so actionscript
+    // won't mess with the parser on seek  or on getBytesLoaded
+    boost::mutex::scoped_lock streamLock(_streamMutex);
 
-	log_debug("MediaParserFfmpeg::seek(%d) TESTING", pos);
+    // NOTE: seeking when timestamps are unknown is a pain
+    // See https://savannah.gnu.org/bugs/index.php?33085
+    // TODO: newer ffmpeg versions seem to have an
+    //  av_seek_frame_generic() function 
+    // which may help us. May be worth taking a look
+    //
+    if ( pos == 0 ) {
+        // Handle 0 by seeking to byte 0
+        // Doing this saves lots of headakes in absence
+        // of correct timestamps (which is the case for mp3)
+        log_debug("Seeking MediaParserFfmpeg input to byte offset zero");
+        if (av_seek_frame(_formatCtx, -1, pos, AVSEEK_FLAG_BYTE) < 0) {
+            log_error(_("%s: seeking failed"), __FUNCTION__);
+            return 0;
+        }
+    }
+    else {
+        // This is most likely wrong
+	    log_debug("MediaParserFfmpeg::seek(%d) TESTING", pos);
+        long newpos = static_cast<long>(pos / AV_TIME_BASE);
+        if (av_seek_frame(_formatCtx, -1, newpos, 0) < 0) {
+            log_error(_("%s: seeking failed"), __FUNCTION__);
+            return 0;
+        }
+    }
 
-	AVStream* videostream = _formatCtx->streams[_videoStreamIndex];
-    	double timebase = static_cast<double>(videostream->time_base.num / videostream->time_base.den);
-	long newpos = static_cast<long>(pos / timebase);
-		
-	if (av_seek_frame(_formatCtx, _videoStreamIndex, newpos, 0) < 0)
-	{
-		log_error(_("%s: seeking failed"), __FUNCTION__);
-		return 0;
-	}
+    // We'll restart parsing
+    _parsingComplete = false;
 
-	AVPacket Packet;
-	av_init_packet(&Packet);
-	double newtime = 0;
-	while (newtime == 0)
-	{
-		if (av_read_frame(_formatCtx, &Packet) < 0) 
-		{
-			log_error("Error in av_read_frame (while seeking)");
-			av_seek_frame(_formatCtx, -1, 0, AVSEEK_FLAG_BACKWARD);
-			//av_free_packet( &Packet );
-			return 0; // ??
-		}
-
-		newtime = timebase * static_cast<double>(_formatCtx->streams[_videoStreamIndex]->cur_dts);
-	}
-
-	//av_free_packet( &Packet );
-	av_seek_frame(_formatCtx, _videoStreamIndex, newpos, 0);
-
-	newtime = static_cast<boost::int32_t>(newtime / 1000.0);
-	log_debug("Seek requested to time %d triggered seek to key frame at "
-            "time %d", pos, newtime);
-	pos = newtime;
+    // Finally, clear the buffers.
+    // The call will also wake the parse up if it was sleeping.
+    // WARNING: a race condition might be pending here:
+    // If we handled to do all the seek work in the *small*
+    // time that the parser runs w/out mutex locked (ie:
+    // after it unlocked the stream mutex and before it locked
+    // the queue mutex), it will still push an old encoded frame
+    // to the queue; if the pushed frame alone makes it block
+    // again (bufferFull) we'll have a problem.
+    // Note though, that a single frame can't reach a bufferFull
+    // condition, as it takes at least two for anything != 0.
+    //
+    clearBuffers();
 
     return true;
 }

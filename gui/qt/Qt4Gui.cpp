@@ -79,7 +79,10 @@ namespace gnash
 {
 
 Qt4Gui::Qt4Gui(unsigned long xid, float scale, bool loop, RunResources& r)
- : Gui(xid, scale, loop, r)
+    :
+    Gui(xid, scale, loop, r),
+    _interval(0),
+    _advanceTimer(0)
 {
 }
 
@@ -99,7 +102,6 @@ Qt4Gui::setClipboard(const std::string& copy)
 bool
 Qt4Gui::init(int /*argc*/, char ** /*argv*/[])
 {
-
     char** r = NULL;
     int* i = new int(0);
 
@@ -296,7 +298,8 @@ Qt4Gui::setTimeout(unsigned int timeout)
 void
 Qt4Gui::setInterval(unsigned int interval)
 {
-    _drawingWidget->startTimer(interval);
+    _interval = interval;
+    _advanceTimer = _drawingWidget->startTimer(_interval);
 }
 
 void
@@ -556,11 +559,17 @@ Qt4Gui::showPreferences()
 bool
 Qt4Gui::yesno(const std::string& question)
 {
+    _drawingWidget->killTimer(_advanceTimer);
+
     QMessageBox* dialog = new QMessageBox(_drawingWidget);
     dialog->setText(QString::fromStdString(question));
     dialog->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     dialog->setDefaultButton(QMessageBox::Yes);
     const int ret = dialog->exec();
+
+    _advanceTimer = _drawingWidget->startTimer(_interval);
+
+
     if (ret == QMessageBox::Yes) return true;
     return false;
 }

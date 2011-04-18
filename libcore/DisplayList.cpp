@@ -729,7 +729,7 @@ DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 }
 
 void
-DisplayList::mergeDisplayList(DisplayList& newList)
+DisplayList::mergeDisplayList(DisplayList& newList, DisplayObject& o)
 {
     testInvariant();
 
@@ -760,6 +760,7 @@ DisplayList::mergeDisplayList(DisplayList& newList)
                 ++itOld;
                 // unload the DisplayObject if it's in static zone(-16384,0)
                 if (depthOld < 0) {
+                    o.set_invalidated();
                     _charsByDepth.erase(itOldBackup);
 
                      if (chOld->unload()) reinsertRemovedCharacter(chOld);
@@ -781,6 +782,7 @@ DisplayList::mergeDisplayList(DisplayList& newList)
                         !isReferenceable(*chOld)) {
                     // replace the DisplayObject in old list with
                     // corresponding DisplayObject in new list
+                    o.set_invalidated();
                     _charsByDepth.insert(itOldBackup, *itNewBackup);
                     _charsByDepth.erase(itOldBackup);
                     
@@ -807,6 +809,7 @@ DisplayList::mergeDisplayList(DisplayList& newList)
             // depth in old list is empty, but occupied in new list.
             ++itNew;
             // add the new DisplayObject to the old list.
+            o.set_invalidated();
             _charsByDepth.insert(itOldBackup, *itNewBackup);
         }
 
@@ -820,6 +823,7 @@ DisplayList::mergeDisplayList(DisplayList& newList)
     while ((itOld != itOldEnd) && ((*itOld)->get_depth() < 0)) {
 
         DisplayObject* chOld = *itOld;
+        o.set_invalidated();
         itOld = _charsByDepth.erase(itOld);
 
         if (chOld->unload()) reinsertRemovedCharacter(chOld);
@@ -829,7 +833,10 @@ DisplayList::mergeDisplayList(DisplayList& newList)
     // step3(only required if scanning of old list finished earlier in step1).
     // continue to scan the new list.
     // add remaining DisplayObjects directly.
-    if (itNew != itNewEnd) _charsByDepth.insert(itOld, itNew, itNewEnd);
+    if (itNew != itNewEnd) {
+        o.set_invalidated();
+        _charsByDepth.insert(itOld, itNew, itNewEnd);
+    }
 
     // step4.
     // Copy all unloaded DisplayObjects from the new display list to the
@@ -844,6 +851,7 @@ DisplayList::mergeDisplayList(DisplayList& newList)
                 std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
                     boost::bind(std::not2(DepthLessThan()), _1, depthNew));
             
+            o.set_invalidated();
             _charsByDepth.insert(it, *itNew);
         }
     }

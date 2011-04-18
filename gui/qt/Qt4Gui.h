@@ -164,6 +164,10 @@ private:
     gnash::key::code qtToGnashKey(QKeyEvent *event);
     int qtToGnashModifier(const Qt::KeyboardModifiers modifiers);
 
+    int _interval;
+
+    int _advanceTimer;
+
     /// QActions and QMenus should be attached to the
     /// QMainWindow so that they are destroyed with it.
     /// Actions may be shared between menus and/or

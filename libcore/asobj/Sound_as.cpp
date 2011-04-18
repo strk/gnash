@@ -43,6 +43,7 @@
 #include "ObjectURI.h"
 #include "Relay.h"
 
+//#define GNASH_DEBUG_SOUND_AS 1
 
 namespace gnash {
 
@@ -234,7 +235,9 @@ private:
 
     /// Thread-safe setter for _soundCompleted
     void markSoundCompleted(bool completed);
-    
+
+    bool _soundLoaded;
+
     // Does this sound have a live input stream?
     bool isAttached() const {
         return (_inputStream);
@@ -257,7 +260,8 @@ Sound_as::Sound_as(as_object* owner)
     _leftOverSize(0),
     _inputStream(0),
     remainingLoops(0),
-    _soundCompleted(false)
+    _soundCompleted(false),
+    _soundLoaded(false)
 {
 }
 
@@ -333,17 +337,34 @@ Sound_as::update()
 {
     probeAudio();
 
-    VM& vm = getVM(owner());
-
     if (active()) {
-        owner().set_member(getURI(vm, "duration"), getDuration());
-        owner().set_member(getURI(vm, "position"), getPosition());
+        owner().set_member(NSV::PROP_DURATION, getDuration());
+        owner().set_member(NSV::PROP_POSITION, getPosition());
     }
 }
 
 void
 Sound_as::probeAudio()
 {
+
+    if (!_mediaParser) return; // nothing to do here w/out a media parser
+
+    if ( ! _soundLoaded ) {
+#ifdef GNASH_DEBUG_SOUND_AS
+        log_debug("Probing audio for load");
+#endif
+        if ( _mediaParser->parsingCompleted() )
+        {
+            _soundLoaded = true;
+            if ( ! isStreaming )
+            {
+                stopProbeTimer(); // will be re-started on Sound.start()
+            }
+            bool success = _mediaParser->getAudioInfo() != 0;
+            callMethod(&owner(), NSV::PROP_ON_LOAD, success);
+        }
+        return; 
+    }
 
     if (isAttached()) {
 #ifdef GNASH_DEBUG_SOUND_AS
@@ -352,9 +373,12 @@ Sound_as::probeAudio()
 
         boost::mutex::scoped_lock lock(_soundCompletedMutex);
         if (_soundCompleted) {
-            // when _soundCompleted is true we're
-            // NOT attached !
-            _mediaParser.reset(); // no use for this anymore...
+            // when _soundCompleted is true we're NOT attached !
+            // MediaParser may be still needed,
+            // if this is a non-streaming sound
+            if ( isStreaming ) {
+                _mediaParser.reset(); // no use for this anymore...
+            }
             _inputStream = 0;
             _soundCompleted = false;
             stopProbeTimer();
@@ -363,13 +387,14 @@ Sound_as::probeAudio()
             callMethod(&owner(), NSV::PROP_ON_SOUND_COMPLETE);
         }
     }
-    else if (_mediaParser) {
+    else {
 #ifdef GNASH_DEBUG_SOUND_AS
         log_debug("Probing audio for start");
 #endif
 
         bool parsingCompleted = _mediaParser->parsingCompleted();
         try {
+            log_debug("Attaching aux streamer");
             _inputStream = attachAuxStreamerIfNeeded();
         } 
         catch (const MediaException& e) {
@@ -423,9 +448,8 @@ Sound_as::attachSound(int si, const std::string& name)
     soundId = si;
     soundName = name;
     
-    VM& vm = getVM(owner());
-    owner().set_member(getURI(vm, "duration"), getDuration());
-    owner().set_member(getURI(vm, "position"), getPosition());
+    owner().set_member(NSV::PROP_DURATION, getDuration());
+    owner().set_member(NSV::PROP_POSITION, getPosition());
 
 }
 
@@ -516,6 +540,11 @@ Sound_as::loadSound(const std::string& file, bool streaming)
         _inputStream = 0;
     }
 
+    
+    /// Mark sound as not being loaded
+    // TODO: should we check for _soundLoaded == true?
+    _soundLoaded = false;
+
     /// Delete any media parser being used (make sure we have detached!)
     _mediaParser.reset();
 
@@ -533,6 +562,8 @@ Sound_as::loadSound(const std::string& file, bool streaming)
                 rcfile.saveStreamingMedia()));
     if ( ! inputStream.get() ) {
         log_error( _("Gnash could not open this url: %s"), url );
+        // dispatch onLoad (false)
+        callMethod(&owner(), NSV::PROP_ON_LOAD, false);
         return;
     }
 
@@ -543,24 +574,18 @@ Sound_as::loadSound(const std::string& file, bool streaming)
     if ( ! _mediaParser ) {
         log_error(_("Unable to create parser for Sound at %s"), url);
         // not necessarely correct, the stream might have been found...
+        // dispatch onLoad (false)
+        callMethod(&owner(), NSV::PROP_ON_LOAD, false);
         return;
     }
 
     // TODO: use global _soundbuftime
     _mediaParser->setBufferTime(60000); // one minute buffer... should be fine
 
-    if (isStreaming) {
-        startProbeTimer();
-    } 
-    else {
-        LOG_ONCE(log_unimpl("Non-streaming Sound.loadSound: will behave "
-                    "as a streaming one"));
-        // if not streaming, we'll probe on .start()
-    }
+    startProbeTimer();
 
-    VM& vm = getVM(owner());
-    owner().set_member(getURI(vm, "duration"), getDuration());
-    owner().set_member(getURI(vm, "position"), getPosition());
+    owner().set_member(NSV::PROP_DURATION, getDuration());
+    owner().set_member(NSV::PROP_POSITION, getPosition());
 }
 
 sound::InputStream*
@@ -641,13 +666,6 @@ Sound_as::start(double secOff, int loops)
             return;
         }
 
-        if (secOff > 0) {
-            _startTime = secOff * 1000;
-            boost::uint32_t seekms = boost::uint32_t(secOff * 1000);
-            // TODO: boost::mutex::scoped_lock parserLock(_parserMutex);
-            _mediaParser->seek(seekms); // well, we try...
-        }
-
         if (isStreaming) {
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Sound.start() has no effect on a streaming Sound"));
@@ -655,13 +673,21 @@ Sound_as::start(double secOff, int loops)
             return;
         }
 
+        // Always seek as we might be called during or after some playing...
+        {
+            _startTime = secOff * 1000;
+            boost::uint32_t seekms = boost::uint32_t(secOff * 1000);
+            // TODO: boost::mutex::scoped_lock parserLock(_parserMutex);
+            bool seeked = _mediaParser->seek(seekms); // well, we try...
+            log_debug("Seeked MediaParser to %d, returned: %d", seekms, seeked);
+        }
+
+
         // Save how many loops to do (not when streaming)
         if (loops > 0) {
             remainingLoops = loops;
         }
 
-        // TODO: we should really be waiting for the sound to be fully
-        //       loaded before starting to play it (!isStreaming case)
         startProbeTimer();
 
     } else {

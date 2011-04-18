@@ -119,8 +119,6 @@ inline as_object*
 registerBuiltinObject(as_object& where, Global_as::Properties p,
         const ObjectURI& uri)
 {
-
-    // This is going to be the global Mouse "class"/"function"
     Global_as& gl = getGlobal(where);
     as_object* obj = createObject(gl);
     if (p) p(*obj);

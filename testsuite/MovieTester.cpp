@@ -279,10 +279,10 @@ void
 MovieTester::advance(bool updateClock)
 {
     if ( updateClock ) {
-	// TODO: cache 'clockAdvance' 
-	float fps = _movie_def->get_frame_rate();
-	unsigned long clockAdvance = long(1000/fps);
-	advanceClock(clockAdvance);
+        // TODO: cache 'clockAdvance' 
+        float fps = _movie_def->get_frame_rate();
+        unsigned long clockAdvance = long(1000/fps);
+        advanceClock(clockAdvance);
     }
     
     _movie_root->advance();

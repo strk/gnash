@@ -126,7 +126,7 @@ main(int /*argc*/, char** /*argv*/)
 			// visually, it seems so, but loop-back is too complex
 			// to be sure (ie: xtrace window text might be reset or something)
 			// I checked that it's not resetDisplayList invalidating it...
-			xcheck( tester.getInvalidatedRanges().isNull() );
+			check( tester.getInvalidatedRanges().isNull() );
 		}
 		else // we did nothing here...
 		{

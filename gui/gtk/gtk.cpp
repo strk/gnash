@@ -2192,6 +2192,7 @@ GtkGui::checkX11Extension(const std::string& ext)
 bool
 GtkGui::yesno(const std::string& question)
 {
+    stopAdvanceTimer();
     bool ret = true;
 
     GtkWidget *dialog = gtk_message_dialog_new(
@@ -2214,6 +2215,8 @@ GtkGui::yesno(const std::string& question)
     }
 
     gtk_widget_destroy(dialog);
+
+    startAdvanceTimer();
 
     return ret;
 }

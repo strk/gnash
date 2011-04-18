@@ -87,17 +87,16 @@ namespace {
 
 /// Contruct a NetStream object.
 //
-/// The default size needed to begin playback (m_bufferTime) of media
+/// The default size needed to begin playback (_bufferTime) of media
 /// is 100 milliseconds.
 NetStream_as::NetStream_as(as_object* owner)
     :
     ActiveRelay(owner),
     _netCon(0),
-    m_bufferTime(100), 
-    m_newFrameReady(false),
-    m_imageframe(),
-    m_parser(NULL),
-    inputPos(0),
+    _bufferTime(100), 
+    _imageframe(),
+    _parser(NULL),
+    _inputPos(0),
     _invalidatedVideoCharacter(0),
     _decoding_state(DEC_NONE),
     _videoDecoder(0),
@@ -156,8 +155,7 @@ NetStream_as::processStatusNotifications()
     StatusCode code = invalidStatus;
 
     {
-        boost::mutex::scoped_lock lock(statusMutex);
-
+        boost::mutex::scoped_lock lock(_statusMutex);
         std::swap(code, _statusCode);
     }
 
@@ -174,7 +172,7 @@ void
 NetStream_as::setStatus(StatusCode status)
 {
     // Get a lock to avoid messing with statuses while processing them
-    boost::mutex::scoped_lock lock(statusMutex);
+    boost::mutex::scoped_lock lock(_statusMutex);
     _statusCode = status;
 }
 
@@ -182,26 +180,15 @@ void
 NetStream_as::setBufferTime(boost::uint32_t time)
 {
     // The argument is in milliseconds,
-    m_bufferTime = time;
-    if ( m_parser.get() ) m_parser->setBufferTime(time);
+    _bufferTime = time;
+    if ( _parser.get() ) _parser->setBufferTime(time);
 }
 
 long
 NetStream_as::bufferLength()
 {
-    if (m_parser.get() == NULL) return 0;
-    return m_parser->getBufferLength();
-}
-
-bool
-NetStream_as::newFrameReady()
-{
-    if (m_newFrameReady) {
-        m_newFrameReady = false;
-        return true;
-    }
-    
-    return false;
+    if (_parser.get() == NULL) return 0;
+    return _parser->getBufferLength();
 }
 
 std::auto_ptr<image::GnashImage>
@@ -209,7 +196,7 @@ NetStream_as::get_video()
 {
     boost::mutex::scoped_lock lock(image_mutex);
 
-    return m_imageframe;    
+    return _imageframe;    
 }
 
 void
@@ -352,9 +339,9 @@ NetStream_as::close()
     _videoDecoder.reset();
     _audioInfoKnown = false;
     _audioDecoder.reset();
-    m_parser.reset();
+    _parser.reset();
 
-    m_imageframe.reset();
+    _imageframe.reset();
 
     stopAdvanceTimer();
 
@@ -500,24 +487,24 @@ NetStream_as::startPlayback()
     }
 
     assert(_inputStream->tell() == static_cast<std::streampos>(0));
-    inputPos = 0;
+    _inputPos = 0;
 
     if (!_mediaHandler) {
         LOG_ONCE( log_error(_("No Media handler registered, can't "
             "parse NetStream input")) );
         return false;
     }
-    m_parser = _mediaHandler->createMediaParser(_inputStream);
+    _parser = _mediaHandler->createMediaParser(_inputStream);
     assert(!_inputStream.get());
 
-    if (!m_parser.get()) {
+    if (!_parser.get()) {
         log_error(_("Unable to create parser for NetStream input"));
         // not necessarily correct, the stream might have been found...
         setStatus(streamNotFound);
         return false;
     }
 
-    m_parser->setBufferTime(m_bufferTime);
+    _parser->setBufferTime(_bufferTime);
 
     // TODO:
     // We do NOT want to initialize decoders right after construction
@@ -558,15 +545,15 @@ NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
 
     std::auto_ptr<image::GnashImage> video;
 
-    assert(m_parser.get());
-    if (!m_parser.get()) {
+    assert(_parser.get());
+    if (!_parser.get()) {
         log_error("getDecodedVideoFrame: no parser available");
         return video; 
     }
 
     boost::uint64_t nextTimestamp;
-    bool parsingComplete = m_parser->parsingCompleted();
-    if (!m_parser->nextVideoFrameTimestamp(nextTimestamp)) {
+    bool parsingComplete = _parser->parsingCompleted();
+    if (!_parser->nextVideoFrameTimestamp(nextTimestamp)) {
 
 #ifdef GNASH_DEBUG_DECODING
         log_debug("getDecodedVideoFrame(%d): "
@@ -576,7 +563,7 @@ NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
             ts, parsingComplete);
 #endif 
 
-        if (parsingComplete && m_parser->isBufferEmpty()) {
+        if (parsingComplete && _parser->isBufferEmpty()) {
 
             decodingStatus(DEC_STOPPED);
 #ifdef GNASH_DEBUG_STATUS
@@ -608,7 +595,7 @@ NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
             break;
         }
 
-        if (!m_parser->nextVideoFrameTimestamp(nextTimestamp)) {
+        if (!_parser->nextVideoFrameTimestamp(nextTimestamp)) {
             // the one we decoded was the last one
 #ifdef GNASH_DEBUG_DECODING
             log_debug("%p.getDecodedVideoFrame(%d): last video frame decoded "
@@ -636,12 +623,12 @@ NetStream_as::decodeNextVideoFrame()
 {
     std::auto_ptr<image::GnashImage> video;
 
-    if (!m_parser.get()) {
+    if (!_parser.get()) {
         log_error("decodeNextVideoFrame: no parser available");
         return video; 
     }
 
-    std::auto_ptr<media::EncodedVideoFrame> frame = m_parser->nextVideoFrame(); 
+    std::auto_ptr<media::EncodedVideoFrame> frame = _parser->nextVideoFrame(); 
     if (!frame.get()) {
 #ifdef GNASH_DEBUG_DECODING
         log_debug("%p.decodeNextVideoFrame(): "
@@ -669,9 +656,9 @@ NetStream_as::decodeNextVideoFrame()
 BufferedAudioStreamer::CursoredBuffer*
 NetStream_as::decodeNextAudioFrame()
 {
-    assert (m_parser.get());
+    assert (_parser.get());
 
-    std::auto_ptr<media::EncodedAudioFrame> frame = m_parser->nextAudioFrame(); 
+    std::auto_ptr<media::EncodedAudioFrame> frame = _parser->nextAudioFrame(); 
     if (!frame.get()) {
 #ifdef GNASH_DEBUG_DECODING
         log_debug("%p.decodeNextAudioFrame: "
@@ -720,7 +707,7 @@ NetStream_as::seek(boost::uint32_t posSeconds)
     GNASH_REPORT_FUNCTION;
 
     // We'll mess with the input here
-    if ( ! m_parser.get() )
+    if ( ! _parser.get() )
     {
         log_debug("NetStream_as::seek(%d): no parser, no party", posSeconds);
         return;
@@ -739,7 +726,7 @@ NetStream_as::seek(boost::uint32_t posSeconds)
 
     // Seek to new position
     boost::uint32_t newpos = pos;
-    if ( ! m_parser->seek(newpos) )
+    if ( ! _parser->seek(newpos) )
     {
 #ifdef GNASH_DEBUG_STATUS
         log_debug("Setting invalidTime status");
@@ -749,7 +736,7 @@ NetStream_as::seek(boost::uint32_t posSeconds)
         _playbackClock->resume(); 
         return;
     }
-    log_debug("m_parser->seek(%d) returned %d", pos, newpos);
+    log_debug("_parser->seek(%d) returned %d", pos, newpos);
 
         // cleanup audio queue, so won't be consumed while seeking
     _audioStreamer.cleanAudioQueue();
@@ -772,19 +759,19 @@ NetStream_as::parseNextChunk()
     // we'll get bufferEmpty often.
     // I guess 2 chunks (frames) would be fine..
     //
-    m_parser->parseNextChunk();
-    m_parser->parseNextChunk();
+    _parser->parseNextChunk();
+    _parser->parseNextChunk();
 }
 
 void
 NetStream_as::refreshAudioBuffer()
 {
-    assert (m_parser.get());
+    assert (_parser.get());
 
 #ifdef GNASH_DEBUG_DECODING
     // bufferLength() would lock the mutex (which we already hold),
     // so this is to avoid that.
-    boost::uint32_t parserTime = m_parser->getBufferLength();
+    boost::uint32_t parserTime = _parser->getBufferLength();
     boost::uint32_t playHeadTime = time();
     boost::uint32_t bufferLen = 
         parserTime > playHeadTime ? parserTime-playHeadTime : 0;
@@ -794,7 +781,7 @@ NetStream_as::refreshAudioBuffer()
 #ifdef GNASH_DEBUG_DECODING
         log_debug("%p.refreshAudioBuffer: doing nothing as playhead "
                 "is paused - bufferLength=%d/%d", this, bufferLength(),
-                m_bufferTime);
+                _bufferTime);
 #endif 
         return;
     }
@@ -804,7 +791,7 @@ NetStream_as::refreshAudioBuffer()
         log_debug("%p.refreshAudioBuffer: doing nothing "
             "as current position was already decoded - "
             "bufferLength=%d/%d",
-            this, bufferLen, m_bufferTime);
+            this, bufferLen, _bufferTime);
 #endif
         return;
     }
@@ -814,7 +801,7 @@ NetStream_as::refreshAudioBuffer()
 
 #ifdef GNASH_DEBUG_DECODING
     log_debug("%p.refreshAudioBuffer: currentPosition=%d, playHeadState=%d, bufferLength=%d, bufferTime=%d",
-        this, curPos, _playHead.getState(), bufferLen, m_bufferTime);
+        this, curPos, _playHead.getState(), bufferLen, _bufferTime);
 #endif // GNASH_DEBUG_DECODING
 
     // TODO: here we should fetch all frames up to the one with
@@ -826,7 +813,7 @@ NetStream_as::refreshAudioBuffer()
 void
 NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
 {
-    assert(m_parser.get());
+    assert(_parser.get());
 
     if (!_audioDecoder.get()) {
 
@@ -850,7 +837,7 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
             return;
         }
 
-        media::AudioInfo* audioInfo = m_parser->getAudioInfo();
+        media::AudioInfo* audioInfo = _parser->getAudioInfo();
         if (!audioInfo) {
             // case 3: no audio found yet
             return;
@@ -962,8 +949,8 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
         // no need to keep the audio queue locked while decoding.
         lock.unlock();
 
-        bool parsingComplete = m_parser->parsingCompleted();
-        if (!m_parser->nextAudioFrameTimestamp(nextTimestamp)) {
+        bool parsingComplete = _parser->parsingCompleted();
+        if (!_parser->nextAudioFrameTimestamp(nextTimestamp)) {
 #ifdef GNASH_DEBUG_DECODING
             log_debug("%p.pushDecodedAudioFrames(%d): "
                 "no more audio frames in input "
@@ -973,7 +960,7 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
 
             if (parsingComplete) {
                 consumed = true;
-                if (m_parser->isBufferEmpty()) {
+                if (_parser->isBufferEmpty()) {
                     decodingStatus(DEC_STOPPED);
 #ifdef GNASH_DEBUG_STATUS
                     log_debug("pushDecodedAudioFrames setting playStop status "
@@ -1052,7 +1039,7 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
 void
 NetStream_as::refreshVideoFrame(bool alsoIfPaused)
 {
-    assert (m_parser.get());
+    assert (_parser.get());
 
     if (!_videoDecoder.get()) {
         // There are 3 possible reasons for _videoDecoder to not be here:
@@ -1076,7 +1063,7 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
             return;
         }
 
-        media::VideoInfo* videoInfo = m_parser->getVideoInfo();
+        media::VideoInfo* videoInfo = _parser->getVideoInfo();
         if (!videoInfo) {
             // case 3: no video found yet
             return;
@@ -1106,7 +1093,7 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
 #ifdef GNASH_DEBUG_DECODING
         log_debug("%p.refreshVideoFrame: doing nothing as playhead is paused - "
             "bufferLength=%d, bufferTime=%d",
-            this, bufferLen, m_bufferTime);
+            this, bufferLen, _bufferTime);
 #endif 
         return;
     }
@@ -1117,7 +1104,7 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
         log_debug("%p.refreshVideoFrame: doing nothing "
             "as current position was already decoded - "
             "bufferLength=%d, bufferTime=%d",
-            this, bufferLen, m_bufferTime);
+            this, bufferLen, _bufferTime);
 #endif // GNASH_DEBUG_DECODING
         return;
     }
@@ -1128,7 +1115,7 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
 #ifdef GNASH_DEBUG_DECODING
     log_debug("%p.refreshVideoFrame: currentPosition=%d, playHeadState=%d, "
             "bufferLength=%d, bufferTime=%d",
-            this, curPos, _playHead.getState(), bufferLen, m_bufferTime);
+            this, curPos, _playHead.getState(), bufferLen, _bufferTime);
 #endif 
 
     // Get next decoded video frame from parser, will have the lowest timestamp
@@ -1162,16 +1149,12 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
     }
     else
     {
-        m_imageframe = video; // ownership transferred
+        _imageframe = video; // ownership transferred
         assert(!video.get());
         // A frame is ready for pickup
         if ( _invalidatedVideoCharacter )
         {
             _invalidatedVideoCharacter->set_invalidated();
-
-            // NOTE: setting the newFrameReady flag this is not needed anymore,
-            // we don't realy on newFrameReady() call anyore to invalidate
-            // the video DisplayObject
         }
     }
 
@@ -1204,7 +1187,7 @@ NetStream_as::update()
     processStatusNotifications();
 
     // Nothing to do if we don't have a parser.
-    if (!m_parser.get()) {
+    if (!_parser.get()) {
         return;
     }
 
@@ -1215,7 +1198,7 @@ NetStream_as::update()
         return;
     }
 
-    bool parsingComplete = m_parser->parsingCompleted();
+    bool parsingComplete = _parser->parsingCompleted();
 #ifndef LOAD_MEDIA_IN_A_SEPARATE_THREAD
     if ( ! parsingComplete ) parseNextChunk();
 #endif
@@ -1251,18 +1234,18 @@ NetStream_as::update()
 
     if ( decodingStatus() == DEC_BUFFERING )
     {
-        if ( bufferLen < m_bufferTime && ! parsingComplete )
+        if ( bufferLen < _bufferTime && ! parsingComplete )
         {
 #ifdef GNASH_DEBUG_DECODING
             log_debug("%p.advance: buffering"
                 " - position=%d, buffer=%d/%d",
-                this, _playHead.getPosition(), bufferLen, m_bufferTime);
+                this, _playHead.getPosition(), bufferLen, _bufferTime);
 #endif
 
             // The very first video frame we want to provide
             // as soon as possible (if not paused),
             // reguardless bufferLength...
-            if (!m_imageframe.get() && 
+            if (!_imageframe.get() && 
                     _playHead.getState() != PlayHead::PLAY_PAUSED)
             {
                 //log_debug("refreshing video frame for the first time");
@@ -1275,7 +1258,7 @@ NetStream_as::update()
 #ifdef GNASH_DEBUG_DECODING
         log_debug("%p.advance: buffer full (or parsing completed), "
                 "resuming playback clock - position=%d, buffer=%d/%d",
-                this, _playHead.getPosition(), bufferLen, m_bufferTime);
+                this, _playHead.getPosition(), bufferLen, _bufferTime);
 #endif
 
         setStatus(bufferFull);
@@ -1290,7 +1273,7 @@ NetStream_as::update()
     if ( curPosition == 0 )
     {
         boost::uint64_t firstFrameTimestamp;
-        if ( m_parser->nextFrameTimestamp(firstFrameTimestamp) )
+        if ( _parser->nextFrameTimestamp(firstFrameTimestamp) )
         {
              _playHead.seekTo(firstFrameTimestamp);
 #ifdef GNASH_DEBUG_PLAYHEAD
@@ -1328,7 +1311,7 @@ NetStream_as::update()
     //  2: the audio buffer is empty, to avoid buffer overrun conditions
     //  3: input audio frames exist with a timestamp in the future
     //
-    if ( ! m_parser->getVideoInfo() ) 
+    if ( ! _parser->getVideoInfo() ) 
     {
         // FIXME: use services of BufferedAudioStreamer for this
         boost::mutex::scoped_lock lock(_audioStreamer._audioQueueMutex);
@@ -1338,7 +1321,7 @@ NetStream_as::update()
         if ( emptyAudioQueue )
         {
             boost::uint64_t nextTimestamp;
-            if ( m_parser->nextAudioFrameTimestamp(nextTimestamp) )
+            if ( _parser->nextAudioFrameTimestamp(nextTimestamp) )
             {
                 log_debug("Moving NetStream playhead "
                           "from timestamp %d to timestamp %d "
@@ -1353,7 +1336,7 @@ NetStream_as::update()
 
     media::MediaParser::OrderedMetaTags tags;
 
-    m_parser->fetchMetaTags(tags, _playHead.getPosition());
+    _parser->fetchMetaTags(tags, _playHead.getPosition());
 
     if (tags.empty()) return;
 
@@ -1402,23 +1385,23 @@ NetStream_as::unpausePlayback()
 long
 NetStream_as::bytesLoaded ()
 {
-    if ( ! m_parser.get() ) {
+    if ( ! _parser.get() ) {
 //        log_debug("bytesLoaded: no parser, no party");
         return 0;
     }
 
-    return m_parser->getBytesLoaded();
+    return _parser->getBytesLoaded();
 }
 
 long
 NetStream_as::bytesTotal ()
 {
-    if ( ! m_parser.get() ) {
+    if ( ! _parser.get() ) {
 //        log_debug("bytesTotal: no parser, no party");
         return 0;
     }
 
-    return m_parser->getBytesTotal();
+    return _parser->getBytesTotal();
 }
 
 NetStream_as::DecodingState
@@ -1824,11 +1807,12 @@ netstream_liveDelay(const fn_call& fn)
     NetStream_as* ns = ensure<ThisIsNative<NetStream_as> >(fn);
     UNUSED(ns);
 
-    LOG_ONCE(log_unimpl("NetStream.liveDelay getter/setter"));
+    LOG_ONCE(log_unimpl("NetStream.liveDelay"));
 
-    if (fn.nargs == 0) {
+    if (!fn.nargs) {
         return as_value();
     }
+
     return as_value();
 }
 

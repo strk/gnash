@@ -28,7 +28,7 @@ rcsid="$Id: Sound.as,v 1.1 2008/06/17 12:42:22 strk Exp $";
 endOfTest = function()
 {
 #if OUTPUT_VERSION > 5
-    check_totals(105);
+    check_totals(111);
 #else
     check_totals(94);
 #endif
@@ -246,8 +246,31 @@ s = new Sound();
 s.onSoundComplete = function()
 {
     clearInterval(intval);
+
+    trace("onSoundComplete called");
     pass("onSoundComplete called");
+
+    xcheck_equals(s.position, 209);
+
+    // fixing this might fix google dict
+    // See https://savannah.gnu.org/bugs/index.php?31314
+    check(s.onLoadCalled);
+    check_equals(typeof(s.onLoadArg), 'boolean');
+    check_equals(s.onLoadArg, true);
+
+    // TODO: test non-streaming sound 
+    // TODO: test loadSound on unexistent sound 
+
     endOfTest();
+};
+
+s.onLoad = function(arg)
+{
+    trace("onLoad called");
+    xcheck_equals(s.duration, 209);
+    check_equals(s.position, 0);
+    s.onLoadCalled = true;
+    s.onLoadArg = arg;
 };
 
 stop();
@@ -261,7 +284,6 @@ check_equals(typeof(s.getDuration()), "undefined");
 // streaming sound doesn't need .start() to play...
 s.loadSound(MEDIA(sound1.mp3), true); 
 
-
 check_equals(typeof(s.getBytesTotal()), "number");
 check_equals(typeof(s.getBytesLoaded()), "number");
 check_equals(typeof(s.getPosition()), "number");
@@ -273,12 +295,7 @@ check_equals(typeof(s.getDuration()), "number");
 onSoundCompleteFailed = function()
 {
     clearInterval(intval);
-    // Gnash doesn't really fail this, but gprocessor
-    // does, not using a real sound handler ...
-    // so, you'll get an XPASS with gnash, and an XFAIL
-    // with gprocessor (which is the one currently
-    // running this test anyway).
-    xfail("no onSoundComplete arrived after 3 seconds");
+    fail("no onSoundComplete arrived after 3 seconds");
     endOfTest();
 };
 

@@ -28,8 +28,8 @@ dnl --------------------------------------------------------
 dnl Figure out development tool stuff
 dnl --------------------------------------------------------
 
-AC_PROG_CC
 AC_PROG_CXX
+AC_PROG_CC
 AM_PROG_CC_C_O
 AC_EXEEXT
 AC_PROG_INSTALL
