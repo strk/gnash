@@ -53,6 +53,7 @@ gtk_gnash_CPPFLAGS	+= \
 	$(NULL)
 gtk_gnash_LDADD += \
 	$(X11_LIBS) \
+	$(LIBVA_LIBS) \
 	$(LIBVA_X11_LIBS) \
 	$(top_builddir)/libvaapi/libgnashvaapi.la \
 	$(NULL)
