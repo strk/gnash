@@ -64,7 +64,12 @@ if BUILD_CAIRO_RENDERER
 gtk_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
 gtk_gnash_SOURCES += gtk/gtk_glue_cairo.cpp gtk/gtk_glue_cairo.h 
 gtk_gnash_LDADD = $(top_builddir)/librender/libgnashrender.la \
-		$(GNASH_LIBS) $(GTK_LIBS) $(CAIRO_LIBS)
+	$(GNASH_LIBS) \
+	$(GTK_LIBS) \
+	$(CAIRO_LIBS) \
+	$(LIBVA_LIBS) \
+	$(LIBVA_X11_LIBS) \
+	$(NULL)
 endif	# BUILD_CAIRO_RENDERER
 
 endif	# BUILD_GTK_GUI
