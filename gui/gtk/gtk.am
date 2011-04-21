@@ -29,20 +29,28 @@ gtk_gnash_SOURCES = $(GUI_SRCS) $(GTK_CANVAS) \
 gtk_gnash_CPPFLAGS = -DGUI_GTK -DGUI_CONFIG=\"GTK\" \
 	$(AM_CPPFLAGS) $(GTK_CFLAGS) $(X11_CFLAGS)
 gtk_gnash_LDFLAGS = -export-dynamic $(AM_LDFLAGS)
+gtk_gnash_LDADD = \
+	$(top_builddir)/librender/libgnashrender.la \
+	$(GNASH_LIBS) \
+	$(GTK_LIBS) \
+	$(NULL)
+
 #gtk_gnash_DEPENDENCIES = .configline
 
 if BUILD_OGL_RENDERER
 gtk_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
 gtk_gnash_SOURCES += gtk/gtk_glue_gtkglext.cpp gtk/gtk_glue_gtkglext.h 
-gtk_gnash_LDADD = $(top_builddir)/librender/libgnashrender.la \
-		$(GNASH_LIBS) $(GTK_LIBS) $(OPENGL_LIBS)
+gtk_gnash_LDADD += \
+	$(OPENGL_LIBS) \
+	$(NULL)
 endif	# BUILD_OGL_RENDERER
 
 if BUILD_AGG_RENDERER
 gtk_gnash_CPPFLAGS += $(AGG_CFLAGS)
 gtk_gnash_SOURCES += gtk/gtk_glue_agg.cpp gtk/gtk_glue_agg.h 
-gtk_gnash_LDADD = $(GNASH_LIBS) $(GTK_LIBS) $(AGG_LIBS) $(CAIRO_LIBS)
-
+gtk_gnash_LDADD += $(GNASH_LIBS) \
+	$(AGG_LIBS) \
+	$(NULL)
 if HAVE_VAAPI
 noinst_HEADERS		+= gtk/gtk_glue_agg_vaapi.h
 gtk_gnash_SOURCES	+= gtk/gtk_glue_agg_vaapi.cpp
@@ -52,10 +60,10 @@ gtk_gnash_CPPFLAGS	+= \
 	-I$(top_srcdir)/libvaapi \
 	$(NULL)
 gtk_gnash_LDADD += \
+	$(top_builddir)/libvaapi/libgnashvaapi.la \
 	$(X11_LIBS) \
 	$(LIBVA_LIBS) \
 	$(LIBVA_X11_LIBS) \
-	$(top_builddir)/libvaapi/libgnashvaapi.la \
 	$(NULL)
 endif   # USE_VAAPI
 endif	# BUILD_AGG_RENDERER
@@ -63,12 +71,8 @@ endif	# BUILD_AGG_RENDERER
 if BUILD_CAIRO_RENDERER
 gtk_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
 gtk_gnash_SOURCES += gtk/gtk_glue_cairo.cpp gtk/gtk_glue_cairo.h 
-gtk_gnash_LDADD = $(top_builddir)/librender/libgnashrender.la \
-	$(GNASH_LIBS) \
-	$(GTK_LIBS) \
+gtk_gnash_LDADD += \
 	$(CAIRO_LIBS) \
-	$(LIBVA_LIBS) \
-	$(LIBVA_X11_LIBS) \
 	$(NULL)
 endif	# BUILD_CAIRO_RENDERER
 
