@@ -1849,8 +1849,6 @@ dnl -----------------------------------------------------------------
 
 AM_CONDITIONAL(LIRC, [test x$lirc_ext = xyes])
 
-AC_CHECK_HEADERS(endian.h machine/endian.h)
-AC_CHECK_HEADERS(malloc.h malloc/malloc.h)
 AC_CHECK_HEADERS(getopt.h)
 AC_CHECK_HEADERS(libgen.h)
 AC_CHECK_HEADERS(pwd.h)
@@ -1858,7 +1856,6 @@ AC_CHECK_HEADERS(sys/utsname.h)
 AC_CHECK_HEADERS(signal.h)
 AC_CHECK_HEADERS(unistd.h)
 AC_CHECK_HEADERS(sys/time.h)
-AC_CHECK_HEADERS(ieeefp.h)
 AC_CHECK_LIB(bz2, BZ2_bzopen, [AC_SUBST(BZ2_LIBS, -lbz2)])
 AC_CHECK_LIB(c, getpwnam, AC_DEFINE(HAVE_GETPWNAM, 1, [Has getpwnam] ))
 
