@@ -2040,14 +2040,11 @@ fi
 
 AC_CHECK_FUNCS(sysconf)
 AC_CHECK_FUNCS(shmget shmat shmdt mmap)
-AC_CHECK_FUNCS(memmove)
 AC_CHECK_FUNCS(scandir)         dnl supported by BSD and Linux, but you never know...
 AC_CHECK_FUNC(clock_gettime, AC_DEFINE(HAVE_CLOCK_GETTIME, 1, [Has clock_gettime()] ))
 dnl Look for Win32 networking stuff
 AC_CHECK_HEADERS(winsock.h)
 AC_CHECK_HEADERS(winsock2.h)
-AC_CHECK_FUNCS(socket)
-AC_CHECK_FUNCS(CreateFileMappingA)
 
 GNASH_PKG_FIND(nspr, [nspr.h], [Netscape Portable Runtime (NSPR)], PR_Init)
 
