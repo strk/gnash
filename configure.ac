@@ -515,6 +515,17 @@ fi
 
 AM_CONDITIONAL(CROSS_COMPILING, [ test x$cross_compiling = xyes ])
 
+for dir in ${incllist}; do
+  test -d ${dir} && pruned_incllist="${pruned_incllist} ${dir}";
+done
+
+for dir in ${libslist}; do
+  test -d ${dir} && pruned_libslist="${pruned_libslist} ${dir}";
+done
+
+libslist="${pruned_libslist}";
+incllist="${pruned_incllist}";
+
 dnl !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 dnl !! 
 dnl !! IMPORTANT NOTICE 
