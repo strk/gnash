@@ -22,7 +22,7 @@
 
 AUTOMAKE_OPTIONS = -Wno-portability
 
-if BUILD_FB_GUI
+if BUILD_DUMP_GUI
 
 # top_builddir and top_srcdir are for revno.h; its location depends on
 # whether we're building from a snapshot or a checkout.
@@ -100,4 +100,4 @@ dump_gnash_LDADD = \
 	$(GNASH_LIBS) \
 	$(AGG_LIBS) 
 
-endif				# BUILD_FB_GUI
+endif				# BUILD_DUMP_GUI
