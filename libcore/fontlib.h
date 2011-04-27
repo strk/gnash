@@ -21,6 +21,8 @@
 #ifndef GNASH_FONTLIB_H
 #define GNASH_FONTLIB_H
 
+#include <boost/intrusive_ptr.hpp>
+
 // Forward declarations
 namespace gnash {
 	class Font;
@@ -47,17 +49,10 @@ namespace fontlib {
 	/// Clean up the font library
 	void clear();
 
-	int	get_font_count();
-
-	Font* get_font(int index);
-
 	Font* get_font(const std::string& name, bool bold, bool italic);
 
 	/// Return a default device font.
 	boost::intrusive_ptr<Font> get_default_font();
-
-	const char*	get_font_name(const Font* f);
-
 	
 }	// end namespace fontlib
 }	// end namespace gnash

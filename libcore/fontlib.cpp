@@ -32,11 +32,11 @@ namespace {
 	//
 
 
-	void	clear()
-	// Release all the fonts we know about.
-	{
-		s_fonts.clear();
-	}
+void
+clear()
+{
+    s_fonts.clear();
+}
 
 boost::intrusive_ptr<Font>
 get_default_font()
@@ -46,57 +46,38 @@ get_default_font()
 	return _defaultFont;
 }
 
-	int	get_font_count()
-	// Return the number of fonts in our library.
-	{
-		return s_fonts.size();
-	}
+Font*
+get_font(const std::string& name, bool bold, bool italic)
+{
+    // Dumb linear search.
+    for (unsigned int i = 0; i < s_fonts.size(); i++)
+    {
+        Font*	f = s_fonts[i].get();
+        assert(f);
+        if ( f->matches(name, bold, italic) )
+        {
+            return f;
+        }
+    }
+    Font* f = new Font(name, bold, italic);
+    s_fonts.push_back(f);
+    return f;
+}
 
-
-	Font*	get_font(int index)
-	// Retrieve one of our fonts, by index.
-	{
-		if (index < 0 || index >= (int) s_fonts.size())
-		{
-			return NULL;
-		}
-
-		return s_fonts[index].get();
-	}
-
-
-	Font*	get_font(const std::string& name, bool bold, bool italic)
-	{
-		// Dumb linear search.
-		for (unsigned int i = 0; i < s_fonts.size(); i++)
-		{
-			Font*	f = s_fonts[i].get();
-			assert(f);
-			if ( f->matches(name, bold, italic) )
-			{
-				return f;
-			}
-		}
-		Font* f = new Font(name, bold, italic);
-		s_fonts.push_back(f);
-		return f;
-	}
-
-	void	add_font(Font* f)
-	// Add the given font to our library.
-	{
-		assert(f);
-
+void
+add_font(Font* f)
+{
+    assert(f);
 #ifndef NDEBUG
-		// Make sure font isn't already in the list.
-		for (unsigned int i = 0; i < s_fonts.size(); i++)
-		{
-			assert(s_fonts[i] != f);
-		}
+    // Make sure font isn't already in the list.
+    for (unsigned int i = 0; i < s_fonts.size(); i++)
+    {
+        assert(s_fonts[i] != f);
+    }
 #endif // not NDEBUG
 
-		s_fonts.push_back(f);
-	}
+    s_fonts.push_back(f);
+}
 
 
 
