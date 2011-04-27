@@ -1105,7 +1105,7 @@ if test x"${build_vaapi}" = x"yes" -a x"${have_ffmpeg}" != x"yes"; then
   AC_MSG_ERROR(["Hardware acceleration currently not supported unless using FFmpeg."])
 fi
 
-AM_CONDITIONAL(HAVE_VAAPI, test x"${found_libva_incl}" = xyes)
+AM_CONDITIONAL(HAVE_VAAPI, test x"${found_va_incl}" = xyes)
 AM_CONDITIONAL(HAVE_VAAPI_GLX, test x"${found_libva_glx_incl}" = xyes)
 AM_CONDITIONAL(HAVE_VAAPI_X11, test x"${found_libva_x11_incl}" = xyes)
 
