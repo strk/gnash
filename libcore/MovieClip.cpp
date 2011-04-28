@@ -907,8 +907,9 @@ MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
 
     if (_swf->initializeCharacter(cid)) {
 #ifdef GNASH_DEBUG
-        log_debug(_("Queuing init actions in frame %d of movieclip %s"),
-                _currentFrame, getTarget());
+        log_debug("Queuing init actions for DisplayObject %1% "
+                    "in frame %2% of MovieClip %3%",
+                cid, _currentFrame, getTarget());
 #endif
         std::auto_ptr<ExecutableCode> code(new GlobalCode(a, this));
 
@@ -916,7 +917,7 @@ MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
     }
     else {
 #ifdef GNASH_DEBUG
-        log_debug(_("Init actions for DisplayObject %d already executed"), cid);
+        log_debug("Init actions for DisplayObject %1% already executed", cid);
 #endif
     }
 }
