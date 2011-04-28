@@ -124,20 +124,13 @@
 # include "fb_glue_ovg.h"
 #endif
 
-#if 0
-// FIXME: this is just to remind us to implement these too
 #ifdef RENDERER_GLES1
 # include "fb_glue_gles1.h"
 #endif
 
-#ifdef RENDERER_GLES2
-# include "fb_glue_gles2.h"
-#endif
-#endif
-
-namespace {
-gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
-}
+// namespace {
+// gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+// }
 namespace gnash {
 
 namespace gui {
@@ -196,8 +189,7 @@ FBGui::init(int argc, char *** argv)
     // GNASH_REPORT_FUNCTION;
 
     // the current renderer as set on the command line or gnashrc file
-//    std::string renderer = _runResources.getRenderBackend();
-    std::string renderer = rcfile.getRenderer();
+    std::string renderer = _runResources.getRenderBackend();
 
     // map framebuffer into memory
     // Create a new Glue layer
@@ -220,7 +212,8 @@ FBGui::init(int argc, char *** argv)
     if (renderer.empty()) {
         renderer = "openvg";
     }
-    if (renderer == "openvg") {
+    if ((renderer == "openvg") || (renderer == "ovg")) {
+        renderer = "openvg";
         _glue.reset(new FBOvgGlue(0));
         // Initialize the glue layer between the renderer and the gui toolkit
         _glue->init(argc, argv);
@@ -230,7 +223,8 @@ FBGui::init(int argc, char *** argv)
         _width =  ovg->getWidth();
         _height = ovg->getHeight();
         log_debug("Width:%d, Height:%d", _width, _height);
-    } else {
+    }
+    if ((renderer != "openvg") && (renderer != "agg")) {
         log_error("No renderer! %s not supported.", renderer);
     }
 #endif
@@ -315,17 +309,17 @@ FBGui::init(int argc, char *** argv)
 
     _validbounds.setTo(0, 0, _width - 1, _height - 1);
 
-#ifdef RENDERER_OPENVG
-    _renderer.reset(renderer::openvg::create_handler(0));
+    if (renderer == "openvg") {
+        _renderer.reset(renderer::openvg::create_handler(0));     
+        renderer::openvg::Renderer_ovg *rend = reinterpret_cast
+            <renderer::openvg::Renderer_ovg *>(_renderer.get());
+        rend->init(_width, _height);
+    }
     
-    renderer::openvg::Renderer_ovg *rend = reinterpret_cast
-        <renderer::openvg::Renderer_ovg *>(_renderer.get());
-    rend->init(_width, _height);
-#else
-# ifdef RENDERER_AGG
-    _renderer.reset(create_Renderer_agg(0));
-# endif
-#endif
+    if (renderer == "agg") {
+        _renderer.reset(create_Renderer_agg(0));
+    }
+
     return true;
 }
 
@@ -480,7 +474,7 @@ FBGui::showMouse(bool /*show*/)
 }
 
 void
-FBGui::setInvalidatedRegion(const SWFRect& bounds)
+FBGui::setInvalidatedRegion(const SWFRect& /* bounds */)
 {
     // GNASH_REPORT_FUNCTION;
 
