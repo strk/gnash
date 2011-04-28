@@ -1758,12 +1758,6 @@ ActionPushData(ActionExec& thread)
         const boost::uint8_t type = code[3 + i];
         ++i;
 
-        IF_VERBOSE_ACTION(
-            log_action(_("\t%d) type=%s, value=%s"),
-                count, pushType[type], env.top(0));
-            ++count;
-        );
-
         switch (type)
         {
             default:
@@ -1876,6 +1870,12 @@ ActionPushData(ActionExec& thread)
                 break;
             }
         }
+
+        IF_VERBOSE_ACTION(
+            log_action(_("\t%d) type=%s, value=%s"),
+                count, pushType[type], env.top(0));
+            ++count;
+        );
 
     }
 }
