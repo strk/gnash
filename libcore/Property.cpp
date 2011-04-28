@@ -103,13 +103,12 @@ Property::getValue(const as_object& this_ptr) const
             return boost::get<as_value>(_bound);
         case TYPE_GETTER_SETTER:
         {
-            const GetterSetter* a = boost::get<const GetterSetter>(&_bound);
+            const GetterSetter& a = boost::get<const GetterSetter>(_bound);
 
-            as_environment env(getVM(this_ptr));
+            const as_environment env(getVM(this_ptr));
             fn_call fn(const_cast<as_object*>(&this_ptr), env);
-            if (_destructive)
-            {
-                as_value ret = a->get(fn);
+            if (_destructive) {
+                const as_value& ret = a.get(fn);
                 // The getter might have called the setter, and we
                 // should not override.
                 if (_destructive) {
@@ -118,7 +117,7 @@ Property::getValue(const as_object& this_ptr) const
                 }
                 return ret;
             }
-            return a->get(fn);
+            return a.get(fn);
         }
 	} 
     return as_value();
@@ -153,17 +152,17 @@ Property::setValue(as_object& this_ptr, const as_value& value) const
                 _bound = value;
             }
             else {
-                GetterSetter* a = boost::get<GetterSetter>(&_bound);
+                GetterSetter& a = boost::get<GetterSetter>(_bound);
 
-                as_environment env(getVM(this_ptr));
+                const as_environment env(getVM(this_ptr));
 
                 fn_call::Args args;
                 args += value;
 
                 fn_call fn(&this_ptr, env, args);
 
-                a->set(fn);
-                a->setCache(value);
+                a.set(fn);
+                a.setCache(value);
             }
     }
     return true;

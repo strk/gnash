@@ -435,17 +435,12 @@ as_object::get_member(const ObjectURI& uri, as_value* val)
         *val = prop->getValue(*this);
         return true;
     }
-    catch (ActionLimitException& exc) {
-        // will be logged by outer catcher
-        throw;
-    }
-    catch (ActionTypeError& exc) {
+    catch (const ActionTypeError& exc) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Caught exception: %s"), exc.what());
             );
         return false;
     }
-
 }
 
 
