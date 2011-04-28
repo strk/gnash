@@ -259,10 +259,35 @@ asm {
 check_equals(o.b.c, 5);
 
 
-totals(27+15);
+_root.e = "hi";
+
+f = function() {
+    check_equals(e, "hi");
+    var e = "hello";
+    check_equals(e, "hello");
+    check_equals(_root.e, "hi");
+
+    ret = delete e;
+    xcheck_equals(ret, false);
+    xcheck_equals(e, "hello");
+    check_equals(_root.e, "hi");
+
+    ret = delete e;
+    xcheck_equals(ret, false);
+    xcheck_equals(e, "hello");
+    xcheck_equals(_root.e, "hi");
+};
+
+f();
+xcheck_equals(_root.e, "hi");
+ret = delete e;
+xcheck_equals(ret, true);
+check_equals(_root.e, undefined);
+
+totals(39+15);
 
 #else
 
-totals(27);
+totals(39);
 
 #endif
