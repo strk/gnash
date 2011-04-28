@@ -64,14 +64,14 @@ public:
     virtual void prepDrawingArea(FbWidget *drawing_area) = 0;
     virtual Renderer* createRenderHandler() = 0;
     virtual void setRenderHandlerSize(int /*width*/, int /*height*/) {}
-    virtual void setInvalidatedRegions(const InvalidatedRanges &ranges) {};
+    virtual void setInvalidatedRegions(const InvalidatedRanges &/* ranges */) {};
     
     virtual void render() = 0;
     
     virtual int width() = 0;
     virtual int height() = 0;
     
-    virtual void render(void* const region) {};
+    virtual void render(void* const /* region */) {};
 
     virtual void beforeRendering(movie_root *) {};
 

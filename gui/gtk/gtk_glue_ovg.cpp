@@ -172,7 +172,7 @@ GtkOvgGlue::createRenderHandler()
     
     GdkVisual* wvisual = gdk_drawable_get_visual(_drawing_area->window);
     GdkImage* tmpimage = gdk_image_new (GDK_IMAGE_FASTEST, wvisual, 1, 1);
-    const GdkVisual* visual = tmpimage->visual;
+    // const GdkVisual* visual = tmpimage->visual;
     gdk_image_destroy(tmpimage);
 
     _renderer.reset(reinterpret_cast<renderer::openvg::Renderer_ovg *>
@@ -273,7 +273,7 @@ GtkOvgGlue::render()
 }
 
 void
-GtkOvgGlue::render(int minx, int miny, int maxx, int maxy)
+GtkOvgGlue::render(int /* minx */, int /* miny */, int /* maxx */, int /* maxy */)
 {
     GNASH_REPORT_FUNCTION;
 

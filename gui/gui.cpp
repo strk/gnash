@@ -805,7 +805,6 @@ Gui::display(movie_root* m)
                     const geometry::Range2d<int>& bounds = 
                         changed_ranges.getRange(rno);
                     
-                    point corners[4];
                     float xmin = bounds.getMinX();
                     float xmax = bounds.getMaxX();
                     float ymin = bounds.getMinY();

@@ -51,25 +51,25 @@ namespace gnash {
 
 namespace gui {
 
-class Renderer;
+class render_handler;
 
 class FBgles1Glue: public FBGlue
 {
 public:
     FBgles1Glue(int fd);
-    virtual ~FBgles1Glue();
-    virtual bool init(int argc, char ***);
+    ~FBgles1Glue();
+    bool init(int argc, char ***);
     
-    virtual Renderer* createRenderHandler();
-    virtual void setInvalidatedRegions(const InvalidatedRanges& /* ranges */) {}
+    Renderer* createRenderHandler();
+    void setInvalidatedRegions(const InvalidatedRanges& /* ranges */) {}
     
-    virtual int width ();
-    virtual int height ();
-    virtual void render ();
+    int width ();
+    int height ();
+    void render ();
     
-    virtual void render_to_pbuffer ();
-    virtual void prepare_copy_from_pbuffer ();
-    virtual void render_to_display ();
+    void render_to_pbuffer ();
+    void prepare_copy_from_pbuffer ();
+    void render_to_display ();
     
 protected:
     int         _fd;

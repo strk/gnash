@@ -58,8 +58,8 @@ FBOvgGlue::init(int /* argc */, char **/*argv*/[])
 {
     // GNASH_REPORT_FUNCTION;
 
-    bool egl = false;
 #if 0
+    bool egl = false;
     bool rawfb = false;
     bool dfb = false;
     bool x11 = false;
@@ -161,7 +161,7 @@ FBOvgGlue::createRenderHandler()
 
 /// Not implemented, Fixme
 void
-FBOvgGlue::setInvalidatedRegions(const InvalidatedRanges& ranges)
+FBOvgGlue::setInvalidatedRegions(const InvalidatedRanges& /* ranges */)
 {
     // GNASH_REPORT_FUNCTION;
     // if (_renderer) {
