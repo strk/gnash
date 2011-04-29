@@ -1162,7 +1162,7 @@ date_setMilliseconds(const fn_call& fn)
 
         if (fn.nargs > 1) {
             IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("Date.setMilliseconds was called with more "
+                log_aserror(_("Date.set%sMilliseconds was called with more "
                              "than one argument"), utc ? "UTC" : "");
             )
         }
