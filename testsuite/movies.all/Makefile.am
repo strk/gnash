@@ -20,11 +20,11 @@ AUTOMAKE_OPTIONS = dejagnu
 
 check_PROGRAMS = \
 	gravity_embedded-TestRunner \
+	tic_tac2-TestRunner \
 	$(NULL)
 
 TEST_DRIVERS = ../simple.exp
-TEST_CASES = \
-	gravity_embedded-TestRunner
+TEST_CASES = $(check_PROGRAMS)
 
 CLEANFILES =  \
       gnash-dbg.log \
@@ -68,9 +68,24 @@ gravity_embedded_TestRunner_DEPENDENCIES = \
 	gravity.swf \
 	$(NULL)
 
+tic_tac2_TestRunner_SOURCES = \
+	tic_tac2-TestRunner.cpp \
+	$(NULL)
+tic_tac2_TestRunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
+	$(NULL)
+tic_tac2_TestRunner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	$(NULL)
+tic_tac2_TestRunner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	tic_tac2.swf \
+	$(NULL)
+
 clean-local: 
 
-EXTRA_DIST = gravity-embedded.swf gravity.swf
+EXTRA_DIST = gravity-embedded.swf gravity.swf tic_tac2.swf
 
 
 check-DEJAGNU: site-update $(check_PROGRAMS)
