@@ -347,7 +347,7 @@ public:
     ///
     virtual void unplugInputStream(InputStream* id);
 
-    virtual ~sound_handler() {};
+    virtual ~sound_handler();
     
     /// \brief
     /// Gets the duration in milliseconds of an event sound connected

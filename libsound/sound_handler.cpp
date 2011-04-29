@@ -740,5 +740,11 @@ sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
     return ret;
 }
 
+sound_handler::~sound_handler()
+{
+    delete_all_sounds();
+    unplugAllInputStreams();
+}
+
 } // gnash.sound namespace 
 } // namespace gnash

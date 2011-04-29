@@ -122,19 +122,13 @@ SDL_sound_handler::reset()
 SDL_sound_handler::~SDL_sound_handler()
 {
     boost::mutex::scoped_lock lock(_mutex);
+
 #ifdef GNASH_DEBUG_SDL_AUDIO_PAUSING
     log_debug("Pausing SDL Audio on destruction");
 #endif
     SDL_PauseAudio(1);
 
-    lock.unlock();
-
-    // we already locked, so we call 
-    // the base class (non-locking) deleter
-    delete_all_sounds();
-
-    unplugAllInputStreams();
-
+    // this one takes 2 seconds on my machine ...
     SDL_CloseAudio();
 
 }
