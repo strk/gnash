@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<swf version="6" compressed="1">
+
+<!--
+  |
+  |  This file test that tag after last advertised SHOWFRAME
+  |  are still executed.
+  |
+  |  Current version only tests DOACTION and DOINITACTION tag,
+  |  as per https://savannah.gnu.org/bugs/?33176
+  |
+  |  Expected output is a 'a1-i1-a2-a3-' trace.
+  |
+  |  The test could be expanded to include more tests.
+  |
+-->
+  <Header framerate="12" frames="1">
+
+    <tags>
+
+      <DefineSprite objectID="1" frames="1">
+        <tags>
+          <ShowFrame/>
+          <End/>
+        </tags>
+      </DefineSprite>
+
+      <DoAction>
+        <actions>
+          <PushData>
+            <items>
+              <StackString value="s"/>
+            </items>
+          </PushData>
+          <Duplicate/>
+          <GetVariable/>
+          <PushData>
+            <items>
+              <StackString value="a1-"/>
+            </items>
+          </PushData>
+          <AddTyped/>
+          <SetVariable/>
+          <EndAction/>
+        </actions>
+      </DoAction>
+
+      <ShowFrame/>
+
+      <DoAction>
+        <actions>
+          <PushData>
+            <items>
+              <StackString value="s"/>
+            </items>
+          </PushData>
+          <Duplicate/>
+          <GetVariable/>
+          <PushData>
+            <items>
+              <StackString value="a2-"/>
+            </items>
+          </PushData>
+          <AddTyped/>
+          <SetVariable/>
+          <EndAction/>
+        </actions>
+      </DoAction>
+
+      <DoInitAction sprite="1">
+        <actions>
+          <PushData>
+            <items>
+              <StackString value="s"/>
+            </items>
+          </PushData>
+          <Duplicate/>
+          <GetVariable/>
+          <PushData>
+            <items>
+              <StackString value="i1-"/>
+            </items>
+          </PushData>
+          <AddTyped/>
+          <SetVariable/>
+          <EndAction/>
+        </actions>
+      </DoInitAction>
+
+      <DoAction>
+        <actions>
+          <PushData>
+            <items>
+              <StackString value="s"/>
+            </items>
+          </PushData>
+          <Duplicate/>
+          <GetVariable/>
+          <PushData>
+            <items>
+              <StackString value="a3-"/>
+            </items>
+          </PushData>
+          <AddTyped/>
+          <SetVariable/>
+          <EndAction/>
+        </actions>
+      </DoAction>
+
+      <DoAction>
+        <actions>
+          <PushData>
+            <items>
+              <StackString value="s"/>
+            </items>
+          </PushData>
+          <Duplicate/>
+          <GetVariable/>
+          <PushData>
+            <items>
+              <StackString value="_framesloaded"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+          <AddTyped/>
+          <SetVariable/>
+          <EndAction/>
+        </actions>
+      </DoAction>
+
+      <DoAction>
+        <actions>
+          <PushData>
+            <items>
+              <StackString value="s"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+          <Trace/>
+          <EndAction/>
+        </actions>
+      </DoAction>
+
+      <End/>
+    </tags>
+  </Header>
+</swf>
