@@ -51,7 +51,7 @@ SC_AS2_XMLTESTS = \
 	registers.xml \
 	Try-without-jump.xml \
 	missing_bitmap.xml \
-	tags_after_last_showframe \
+	tags_after_last_showframe.xml \
 	$(NULL)
 
 SC_AS3_XMLTESTS = \
