@@ -141,7 +141,7 @@ Try-without-jump-runner: $(srcdir)/../generic-testrunner.sh Try-without-jump.swf
 	chmod 755 $@
 
 tags_after_last_showframe-runner: $(srcdir)/../generic-testrunner.sh tags_after_last_showframe.swf Makefile
-	sh $(srcdir)/../generic-testrunner.sh -r 50 -C "a1-i1-a2-a3-1" $(top_builddir) tags_after_last_showframe.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r 50 -C "\<a1-i1-a2-a3-1\>" $(top_builddir) tags_after_last_showframe.swf > $@
 	chmod 755 $@
 
 backgroundTestRunner_SOURCES = \
