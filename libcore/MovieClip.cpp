@@ -484,6 +484,7 @@ MovieClip::MovieClip(as_object* object, const movie_definition* def,
     _currentFrame(0),
     m_sound_stream_id(-1),
     _hasLooped(false),
+    _flushedOrphanedTags(false),
     _callingFrameActions(false),
     _lockroot(false)
 {
@@ -819,7 +820,7 @@ MovieClip::advance()
 {
 #ifdef GNASH_DEBUG
     log_debug(_("Advance movieclip '%s' at frame %u/%u"),
-        getTargetPath(), _currentFrame,
+        getTargetPath(), _currentFrame+1,
         get_frame_count());
 #endif
 
@@ -844,7 +845,7 @@ MovieClip::advance()
     size_t frame_count = _def->get_frame_count();
 
     log_debug(_("Advance_movieclip for movieclip '%s' - frame %u/%u "),
-        getTarget(), _currentFrame,
+        getTarget(), _currentFrame+1,
         frame_count);
 #endif
 
@@ -866,6 +867,25 @@ MovieClip::advance()
 #ifdef GNASH_DEBUG
         log_debug(_("after increment we are at frame %u/%u"), _currentFrame, frame_count);
 #endif
+
+        // Flush any orphaned tags
+        // See https://savannah.gnu.org/bugs/index.php?33176
+        // WARNING: we might be executing these while a parser
+        //          is still pushing on it. The _hasLooped is
+        //          trying to avoid that.
+        // TODO: find a better way to ensure nobody will be pushing
+        //       to orphaned playlist while we execute it.
+        if (_currentFrame == 0 && _hasLooped) {
+
+                const size_t frame_count = get_loaded_frames(); 
+                if ( frame_count != 1 || ! _flushedOrphanedTags ) {
+                    log_debug("Flushing orphaned tags. _currentFrame:%d, _hasLooped:%d, frame_count:%d", _currentFrame, _hasLooped, frame_count);
+                    _flushedOrphanedTags = true;
+                    executeFrameTags(frame_count, _displayList,
+                            SWF::ControlTag::TAG_DLIST |
+                            SWF::ControlTag::TAG_ACTION);
+                }
+        }
 
         // Execute the current frame's tags.
         // First time executeFrameTags(0) executed in dlist.cpp(child) or
