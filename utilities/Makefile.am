@@ -35,6 +35,7 @@ GNASH_LIBS = \
 AM_LDFLAGS = \
 	$(LIBINTL) \
 	$(LIBADD_DL) \
+	$(PTHREAD_LIBS) \
 	$(NULL)
 
 localedir = $(datadir)/locale

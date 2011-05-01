@@ -263,7 +263,7 @@ DumpGui::createWindow(int width, int height)
 void
 DumpGui::writeFrame()
 {
-    if (!_fileStream) return;
+    if (! _fileStream.is_open() ) return;
 
     _fileStream.write(reinterpret_cast<char*>(_offscreenbuf.get()),
             _offscreenbuf_size);

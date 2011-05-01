@@ -274,11 +274,6 @@ FBGui::init(int argc, char *** argv)
         }
     }
     
-#if 0
-    // FIXME: this allows to draw in a subsection of the screen. OpenVG
-    // should be able to support this, but right now it hust gets in
-    // the way of debugging.
-    
     // Let -j -k override "window" size
     optind = 0; opterr = 0; char c;
     while ((c = getopt (argc, *argv, "j:k:X:Y:")) != -1) {
@@ -297,6 +292,11 @@ FBGui::init(int argc, char *** argv)
                 break;
         }
     }
+    
+#if 0
+    // FIXME: this allows to draw in a subsection of the screen. OpenVG
+    // should be able to support this, but right now it just gets in
+    // the way of debugging.
     
     if ( _xpos < 0 ) _xpos += _var_screeninfo.xres - _width;
     _xpos = clamp<int>(_xpos, 0, _var_screeninfo.xres-_width);

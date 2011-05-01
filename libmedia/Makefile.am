@@ -16,16 +16,110 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-EXTRA_DIST = 
-
-# this is where Gnash plugins get installed
-pluginsdir = $(prefix)/lib/gnash/plugins
-
 AM_CXXFLAGS = -DREGISTER_MEDIA_HANDLERS
 
 # If we are using an installable libltdl, then it needs to be built
 # before libgnash, as libgnash depends on it for extensions.
-pkglib_LTLIBRARIES =  libgnashmedia.la
+pkglib_LTLIBRARIES = libgnashmedia.la
+
+libgnashmedia_la_SOURCES = \
+	AudioDecoder.h \
+	AudioDecoderSimple.cpp \
+	AudioDecoderSimple.h \
+	AudioResampler.cpp \
+	AudioResampler.h \
+	FLVParser.cpp \
+	FLVParser.h \
+	MediaHandler.cpp \
+	MediaHandler.h \
+	MediaParser.cpp \
+	MediaParser.h \
+	SoundInfo.h \
+	VideoConverter.h \
+	$(NULL)
+
+if USE_GST_ENGINE
+libgnashmedia_la_SOURCES += \
+	AudioInput.h \
+	gst/AudioDecoderGst.cpp \
+	gst/AudioDecoderGst.h \
+	gst/AudioInputGst.cpp \
+	gst/AudioInputGst.h \
+	gst/GstUtil.cpp \
+	gst/GstUtil.h \
+	gst/MediaHandlerGst.cpp \
+	gst/MediaHandlerGst.h \
+	gst/MediaParserGst.cpp \
+	gst/MediaParserGst.h \
+	gst/swfdec_codec_gst.c \
+	gst/swfdec_codec_gst.h \
+	gst/VideoConverterGst.cpp \
+	gst/VideoConverterGst.h \
+	gst/VideoDecoderGst.cpp \
+	gst/VideoDecoderGst.h \
+	gst/VideoInputGst.cpp \
+	gst/VideoInputGst.h \
+	$(NULL)
+endif
+
+if USE_FFMPEG_ENGINE
+libgnashmedia_la_SOURCES += \
+	AudioInput.h \
+	ffmpeg/AudioDecoderFfmpeg.cpp \
+	ffmpeg/AudioDecoderFfmpeg.h \
+	ffmpeg/AudioInputFfmpeg.cpp \
+	ffmpeg/AudioInputFfmpeg.h \
+	ffmpeg/AudioResamplerFfmpeg.cpp \
+	ffmpeg/AudioResamplerFfmpeg.h \
+	ffmpeg/ffmpegHeaders.h \
+	ffmpeg/MediaHandlerFfmpeg.cpp \
+	ffmpeg/MediaHandlerFfmpeg.h \
+	ffmpeg/MediaParserFfmpeg.cpp \
+	ffmpeg/MediaParserFfmpeg.h \
+	ffmpeg/VideoConverterFfmpeg.cpp \
+	ffmpeg/VideoConverterFfmpeg.h \
+	ffmpeg/VideoDecoderFfmpeg.cpp \
+	ffmpeg/VideoDecoderFfmpeg.h \
+	ffmpeg/VideoInputFfmpeg.cpp \
+	ffmpeg/VideoInputFfmpeg.h \
+	VideoDecoder.h \
+	VideoInput.h \
+	$(NULL)
+
+if HAVE_VAAPI
+libgnashmedia_la_SOURCES += \
+	ffmpeg/VideoDecoderFfmpegVaapi.cpp \
+	ffmpeg/VideoDecoderFfmpegVaapi.h \
+	$(NULL)
+endif
+endif
+
+if USE_HAIKU_ENGINE
+libgnashmedia_la_SOURCES += \
+	haiku/adipe.h \
+	haiku/AudioDecoderHaiku.cpp \
+	haiku/AudioDecoderHaiku.h \
+	haiku/AudioInputHaiku.cpp \
+	haiku/AudioInputHaiku.h \
+	haiku/MediaHandlerHaiku.cpp \
+	haiku/MediaHandlerHaiku.h \
+	haiku/MediaParserHaiku.cpp \
+	haiku/MediaParserHaiku.h \
+	haiku/VideoConverterHaiku.cpp \
+	haiku/VideoConverterHaiku.h \
+	haiku/VideoDecoderHaiku.cpp \
+	haiku/VideoDecoderHaiku.h \
+	haiku/VideoInputHaiku.cpp \
+	haiku/VideoInputHaiku.h \
+	$(NULL)
+endif
+
+if HAVE_SPEEX
+libgnashmedia_la_SOURCES += \
+	AudioDecoderSpeex.cpp \
+	AudioDecoderSpeex.h \
+	$(NULL)
+endif
 
 libgnashmedia_la_CPPFLAGS = \
 	-I$(top_srcdir)/libbase	\
@@ -34,7 +128,34 @@ libgnashmedia_la_CPPFLAGS = \
 	$(NULL)
 
 if ANDROID
-  libgnashmedia_la_CPPFLAGS += $(ANDROID_NDK)/usr/include
+libgnashmedia_la_CPPFLAGS += $(ANDROID_NDK)/usr/include
+endif
+
+if USE_GST_ENGINE
+libgnashmedia_la_CPPFLAGS += \
+	$(GSTREAMER_CFLAGS) \
+	$(GSTAPP_CFLAGS) \
+	$(GSTREAMER_PBUTILS_CFLAGS) \
+	$(NULL)
+endif
+
+if USE_FFMPEG_ENGINE
+libgnashmedia_la_CPPFLAGS += \
+	$(FFMPEG_CFLAGS) \
+	$(NULL)
+endif
+
+if HAVE_SPEEX
+libgnashmedia_la_CPPFLAGS += \
+	$(SPEEX_CFLAGS) \
+	$(SPEEXDSP_CFLAGS) \
+	$(NULL)
+endif
+
+if HAVE_VAAPI
+libgnashmedia_la_CPPFLAGS += \
+	-I$(top_srcdir)/libvaapi \
+	$(NULL)
 endif
 
 libgnashmedia_la_LIBADD = \
@@ -42,172 +163,45 @@ libgnashmedia_la_LIBADD = \
 	$(BOOST_LIBS) \
 	$(NULL)
 
-libgnashmedia_la_SOURCES = \
-	MediaHandler.cpp \
-	AudioDecoderSimple.cpp \
-	MediaParser.cpp \
-	FLVParser.cpp \
-	AudioResampler.cpp \
-	$(NULL)
-
-noinst_HEADERS = \
-	AudioDecoder.h \
-	VideoDecoder.h \
-	VideoConverter.h \
-	MediaParser.h \
-	MediaHandler.h \
-	FLVParser.h \
-	AudioDecoderSimple.h \
-	SoundInfo.h \
-	AudioResampler.h \
-	AudioInput.h \
-	VideoInput.h \
-	$(NULL)
-
 if USE_GST_ENGINE
-   libgnashmedia_la_SOURCES += \
-	gst/MediaHandlerGst.cpp \
-	gst/VideoDecoderGst.cpp \
-	gst/AudioDecoderGst.cpp \
-	gst/MediaParserGst.cpp \
-	gst/VideoConverterGst.cpp \
-	gst/GstUtil.cpp \
-	gst/swfdec_codec_gst.c \
-	gst/VideoInputGst.cpp \
-	gst/AudioInputGst.cpp \
-	$(NULL)
-
-   noinst_HEADERS += \
-	gst/MediaHandlerGst.h \
-	gst/AudioDecoderGst.h \
-	gst/VideoDecoderGst.h \
-	gst/MediaParserGst.h \
-	gst/VideoConverterGst.h \
-	gst/GstUtil.h \
-	gst/swfdec_codec_gst.h \
-	gst/gnash_gst_version.h \
-	gst/VideoInputGst.h \
-	gst/AudioInputGst.h \
-	$(NULL)
-
-   libgnashmedia_la_CPPFLAGS += \
-	-I$(top_srcdir)/libmedia/gst \
-	$(GSTREAMER_CFLAGS) \
-	$(GSTAPP_CFLAGS) \
-	$(GSTREAMER_PBUTILS_CFLAGS) \
-	$(NULL)
-
-   libgnashmedia_la_LIBADD += \
-	-lgstbase-0.10 \
+libgnashmedia_la_LIBADD += \
 	$(GSTREAMER_APP_LIBS) \
 	$(GSTREAMER_PBUTILS_LIBS) \
 	$(GSTREAMER_PLUGINS_BASE_LIBS) \
 	$(GSTREAMER_LIBS) \
 	$(NULL)
-
 endif
 
 if USE_FFMPEG_ENGINE
-   libgnashmedia_la_SOURCES += \
-	ffmpeg/MediaHandlerFfmpeg.cpp \
-	ffmpeg/MediaParserFfmpeg.cpp \
-	ffmpeg/AudioDecoderFfmpeg.cpp \
-	ffmpeg/VideoDecoderFfmpeg.cpp \
-	ffmpeg/AudioResamplerFfmpeg.cpp \
-	ffmpeg/VideoConverterFfmpeg.cpp \
-	ffmpeg/VideoInputFfmpeg.cpp \
-	ffmpeg/AudioInputFfmpeg.cpp \
-	$(NULL)
-
-   noinst_HEADERS += \
-	ffmpeg/MediaHandlerFfmpeg.h \
-	ffmpeg/MediaParserFfmpeg.h \
-	ffmpeg/AudioDecoderFfmpeg.h \
-	ffmpeg/VideoDecoderFfmpeg.h \
-	ffmpeg/AudioResamplerFfmpeg.h \
-	ffmpeg/ffmpegHeaders.h \
-	ffmpeg/VideoConverterFfmpeg.h \
-	ffmpeg/VideoInputFfmpeg.h \
-	ffmpeg/AudioInputFfmpeg.h \
-	$(NULL)
-
-   libgnashmedia_la_LIBADD += \
+libgnashmedia_la_LIBADD += \
 	$(FFMPEG_LIBS) \
 	$(NULL)
-
-   libgnashmedia_la_CPPFLAGS += \
-	$(FFMPEG_CFLAGS) \
-	$(NULL)
-
-if HAVE_VAAPI
-   libgnashmedia_la_SOURCES += \
-		ffmpeg/VideoDecoderFfmpegVaapi.cpp \
-		$(NULL)
-
-   noinst_HEADERS += \
-		ffmpeg/VideoDecoderFfmpegVaapi.h \
-		$(NULL)
-endif
 endif
 
 if USE_HAIKU_ENGINE
-   libgnashmedia_la_SOURCES += \
-	haiku/MediaHandlerHaiku.cpp \
-	haiku/MediaParserHaiku.cpp \
-	haiku/AudioDecoderHaiku.cpp \
-	haiku/VideoDecoderHaiku.cpp \
-	haiku/VideoConverterHaiku.cpp \
-	haiku/VideoInputHaiku.cpp \
-	haiku/AudioInputHaiku.cpp \
-	$(NULL)
-
-   noinst_HEADERS += \
-	haiku/MediaHandlerHaiku.h \
-	haiku/MediaParserHaiku.h \
-	haiku/AudioDecoderHaiku.h \
-	haiku/VideoDecoderHaiku.h \
-	haiku/VideoConverterHaiku.h \
-	haiku/VideoInputHaiku.h \
-	haiku/AudioInputHaiku.h \
-	$(NULL)
-
-   libgnashmedia_la_LIBADD += \
+libgnashmedia_la_LIBADD += \
 	-lmedia \
-	$(NULL)
-
-   libgnashmedia_la_CPPFLAGS += \
 	$(NULL)
 endif
 
 if HAVE_SPEEX
-   libgnashmedia_la_LIBADD += \
+libgnashmedia_la_LIBADD += \
 	$(SPEEX_LIBS) \
 	$(SPEEXDSP_LIBS) \
 	$(NULL)
-   libgnashmedia_la_CPPFLAGS += \
-	$(SPEEX_CFLAGS) \
-	$(SPEEXDSP_CFLAGS) \
-	$(NULL)
-   libgnashmedia_la_SOURCES += AudioDecoderSpeex.cpp
-   noinst_HEADERS += AudioDecoderSpeex.h
 endif
 
-libgnashmedia_la_LDFLAGS = -release $(VERSION)
-
-   libgnashmedia_la_CPPFLAGS += \
-	-I$(top_srcdir)/libvaapi \
-	$(NULL)
-
 if HAVE_VAAPI
-   libgnashmedia_la_LIBADD += \
+libgnashmedia_la_LIBADD += \
 	$(top_builddir)/libvaapi/libgnashvaapi.la \
 	$(NULL)
 endif
 
+libgnashmedia_la_LDFLAGS = -release $(VERSION)
+
 if WIN32
-  libgnashmedia_la_LDFLAGS += -no-undefined
-  libgnashmedia_la_LIBADD += \
-	-lintl
+libgnashmedia_la_LDFLAGS += -no-undefined
+libgnashmedia_la_LIBADD += -lintl
 endif
 
 if ENABLE_PCH

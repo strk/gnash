@@ -16,14 +16,154 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+pkglib_LTLIBRARIES = libgnashbase.la
+sysconf_DATA = gnashrc gnashpluginrc
 EXTRA_DIST = gnashrc.in gnashpluginrc.in
 
-sysconf_DATA = gnashrc gnashpluginrc
+libgnashbase_la_SOURCES = \
+	AMF.cpp \
+	AMF.h \
+	arg_parser.cpp \
+	arg_parser.h \
+	BitsReader.cpp \
+	BitsReader.h \
+	ClockTime.cpp \
+	ClockTime.h \
+	curl_adapter.cpp \
+	dsodefs.h \
+	GC.cpp \
+	GC.h \
+	getclocktime.hpp \
+	gettext.h \
+	gmemory.h \
+	GnashAlgorithm.h \
+	GnashEnums.h \
+	GnashException.h \
+	GnashFileUtilities.cpp \
+	GnashFileUtilities.h \
+	GnashImage.cpp \
+	GnashImage.h \
+	GnashImageJpeg.cpp \
+	GnashImageJpeg.h \
+	GnashNumeric.h \
+	GnashSleep.h \
+	GnashSystemFDHeaders.h \
+	GnashSystemIOHeaders.h \
+	GnashSystemNetHeaders.h \
+	IOChannel.cpp \
+	IOChannel.h \
+	log.cpp \
+	log.h \
+	memory.cpp \
+	NamingPolicy.cpp \
+	NamingPolicy.h \
+	NetworkAdapter.h \
+	noseek_fd_adapter.cpp \
+	noseek_fd_adapter.h \
+	rc.cpp \
+	rc.h \
+	RTMP.cpp \
+	RTMP.h \
+	SharedMem.h \
+	SimpleBuffer.h \
+	Socket.cpp \
+	Socket.h \
+	Stats.h \
+	StreamProvider.cpp \
+	StreamProvider.h \
+	StringPredicates.h \
+	string_table.cpp \
+	string_table.h \
+	SWFCtype.cpp \
+	SWFCtype.h \
+	tu_file.cpp \
+	tu_file.h \
+	URLAccessManager.cpp \
+	URLAccessManager.h \
+	URL.cpp \
+	URL.h \
+	utf8.cpp \
+	utf8.h \
+	utility.h \
+	WallClockTimer.cpp \
+	WallClockTimer.h \
+	zlib_adapter.cpp \
+	zlib_adapter.h \
+	$(NULL)
+
+if JEMALLOC
+libgnashbase_la_SOURCES += \
+	jemalloc.c \
+	jemalloc.h \
+	jemalloc_gnash.h \
+	jemalloc_rb.h \
+	jemalloc_types.h \
+	$(NULL)
+endif
+
+if ANDROID
+libgnashbase_la_SOURCES += SharedMemHaiku.cpp
+else
+if HAIKU
+libgnashbase_la_SOURCES += SharedMemHaiku.cpp
+else
+if WIN32
+libgnashbase_la_SOURCES += SharedMemW32.cpp
+else
+libgnashbase_la_SOURCES += SharedMem.cpp
+endif
+endif
+endif
+
+if ENABLE_EXTENSIONS
+libgnashbase_la_SOURCES += \
+	extension.cpp \
+	extension.h \
+	sharedlib.cpp \
+	sharedlib.h \
+	$(NULL)
+endif
+
+if USE_PNG
+libgnashbase_la_SOURCES += \
+	GnashImagePng.cpp \
+	GnashImagePng.h \
+	$(NULL)
+endif
+
+if USE_GIF
+libgnashbase_la_SOURCES += \
+	GnashImageGif.cpp \
+	GnashImageGif.h \
+	$(NULL)
+endif
+
+if BUILD_OGL_RENDERER
+libgnashbase_la_SOURCES += \
+	GnashTexture.cpp \
+	GnashTexture.h \
+	$(NULL)
+endif
+
+if HAVE_VAAPI
+libgnashbase_la_SOURCES += \
+	GnashVaapiImage.cpp \
+	GnashVaapiImage.h \
+	GnashVaapiImageProxy.h \
+	$(NULL)
+
+if HAVE_VAAPI_GLX
+libgnashbase_la_SOURCES += \
+	GnashTexture.h \
+	GnashVaapiTexture.cpp \
+	GnashVaapiTexture.h \
+	$(NULL)
+endif
+endif
+
 
 # this is where Gnash plugins get installed
 pluginsdir = $(prefix)/lib/gnash/plugins
-
-pkglib_LTLIBRARIES = libgnashbase.la
 
 libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	-DSYSCONFDIR=\"$(sysconfdir)\" \
@@ -42,8 +182,6 @@ if ANDROID
 libgnashbase_la_CPPFLAGS += $(ANDROID_NDK)/usr/include
 endif
 
-# These headers get installed
-
 libgnashbase_la_LIBADD = \
 	$(JPEG_LIBS) \
 	$(PNG_LIBS) \
@@ -51,102 +189,15 @@ libgnashbase_la_LIBADD = \
 	$(Z_LIBS) \
 	$(CURL_LIBS) \
 	$(LIBINTL) \
-	$(LTDL_LIBS) \
-	$(OPENGL_LIBS) \
 	$(BOOST_LIBS) \
+	$(OPENGL_LIBS) \
 	$(PTHREAD_LIBS) \
+	$(LTDL_LIBS) \
 	$(NULL)
-
-libgnashbase_la_SOURCES = \
-	$(MALLOC) \
-	GnashImage.cpp \
-	SWFCtype.cpp \
-	GnashImageJpeg.cpp \
-	GnashFileUtilities.cpp \
-	AMF.cpp \
-	RTMP.cpp \
-	log.cpp	\
-	memory.cpp \
-	rc.cpp \
-	string_table.cpp \
-	tu_file.cpp \
-	IOChannel.cpp \
-	Socket.cpp \
-	ClockTime.cpp \
-	NamingPolicy.cpp \
-	WallClockTimer.cpp \
-	utf8.cpp \
-	curl_adapter.cpp \
-	noseek_fd_adapter.cpp \
-	zlib_adapter.cpp \
-	URL.cpp \
-	GC.cpp \
-	BitsReader.cpp \
-	arg_parser.cpp \
-	URLAccessManager.cpp \
-	StreamProvider.cpp \
-	$(NULL)
-
-
-if ANDROID
-libgnashbase_la_SOURCES += SharedMemHaiku.cpp
-else
-if HAIKU
-libgnashbase_la_SOURCES += SharedMemHaiku.cpp
-else
-if WIN32
-libgnashbase_la_SOURCES += SharedMemW32.cpp
-else
-libgnashbase_la_SOURCES += SharedMem.cpp
-endif
-endif
-endif
-
-if ENABLE_EXTENSIONS
-libgnashbase_la_SOURCES += extension.cpp sharedlib.cpp
-endif
-
-edit = sed \
-	-e 's|@DEFAULT_FLASH_PLATFORM_ID[@]|$(DEFAULT_FLASH_PLATFORM_ID)|g' \
-	-e 's|@DEFAULT_FLASH_MAJOR_VERSION[@]|$(DEFAULT_FLASH_MAJOR_VERSION)|g' \
-	-e 's|@DEFAULT_FLASH_MINOR_VERSION[@]|$(DEFAULT_FLASH_MINOR_VERSION)|g' \
-	-e 's|@DEFAULT_FLASH_REV_NUMBER[@]|$(DEFAULT_FLASH_REV_NUMBER)|g' \
-	-e 's|@DEFAULT_STREAMS_TIMEOUT[@]|$(DEFAULT_STREAMS_TIMEOUT)|g' \
-	-e 's|@DEFAULT_SOL_SAFEDIR[@]|$(DEFAULT_SOL_SAFEDIR)|g' 
-
-gnashrc: gnashrc.in Makefile
-	$(edit) '$(srcdir)/$@.in' >$@
-
-gnashpluginrc: gnashpluginrc.in
-	$(edit) '$(srcdir)/$@.in' >$@
-
-if USE_PNG
-libgnashbase_la_SOURCES += GnashImagePng.cpp
-endif
-
-if USE_GIF
-libgnashbase_la_SOURCES += GnashImageGif.cpp
-endif
 
 if HAIKU
   libgnashbase_la_LIBADD += $(HAIKU_LIBS)
 endif
-
-if WIN32
-  libgnashbase_la_LIBADD += -lws2_32 -lwinmm
-endif
-
-# Maybe use jemalloc, which handles memory fragmentation for
-# ECAMscript languages better than the regular system malloc.
-# This is controlled by the --enable-jemalloc (disabled by default)
-# configure option.
-if JEMALLOC
-MALLOC = jemalloc.c
-else
-MALLOC = 
-endif
-
-noinst_HEADERS =
 
 inst_HEADERS = \
 	accumulator.h \
@@ -180,13 +231,6 @@ inst_HEADERS = \
 	URLAccessManager.h \
 	StreamProvider.h \
 	$(NULL)
-
-if USE_PNG
-noinst_HEADERS += GnashImagePng.h
-endif
-if USE_GIF
-noinst_HEADERS += GnashImageGif.h
-endif
 
 if ENABLE_EXTENSIONS
 inst_HEADERS += extension.h sharedlib.h
@@ -227,26 +271,6 @@ libgnashbase_la_LDFLAGS = -release $(VERSION)
 libgnashbase_la_DEPENDENCIES =
 
 if HAVE_VAAPI
-   libgnashbase_la_SOURCES += \
-	GnashVaapiImage.cpp \
-	$(NULL)
-
-   noinst_HEADERS += \
-	GnashVaapiImage.h \
-	GnashVaapiImageProxy.h \
-	$(NULL)
-
-if HAVE_VAAPI_GLX
-   libgnashbase_la_SOURCES += \
-	GnashVaapiTexture.cpp \
-	$(NULL)
-
-   noinst_HEADERS += \
-	GnashVaapiTexture.h \
-	$(NULL)
-endif
-
-if HAVE_VAAPI
    libgnashbase_la_CPPFLAGS += \
 	-I$(top_srcdir)/libvaapi \
 	$(NULL)
@@ -259,7 +283,6 @@ if HAVE_VAAPI
 	$(top_builddir)/libvaapi/libgnashvaapi.la \
 	$(NULL)
 endif
-endif
 
 if WIN32
   libgnashbase_la_LDFLAGS += -no-undefined
@@ -269,6 +292,20 @@ endif
 if ENABLE_PCH
 AM_CXXFLAGS = $(PCH_FLAGS)
 endif
+
+edit = sed \
+	-e 's|@DEFAULT_FLASH_PLATFORM_ID[@]|$(DEFAULT_FLASH_PLATFORM_ID)|g' \
+	-e 's|@DEFAULT_FLASH_MAJOR_VERSION[@]|$(DEFAULT_FLASH_MAJOR_VERSION)|g' \
+	-e 's|@DEFAULT_FLASH_MINOR_VERSION[@]|$(DEFAULT_FLASH_MINOR_VERSION)|g' \
+	-e 's|@DEFAULT_FLASH_REV_NUMBER[@]|$(DEFAULT_FLASH_REV_NUMBER)|g' \
+	-e 's|@DEFAULT_STREAMS_TIMEOUT[@]|$(DEFAULT_STREAMS_TIMEOUT)|g' \
+	-e 's|@DEFAULT_SOL_SAFEDIR[@]|$(DEFAULT_SOL_SAFEDIR)|g' 
+
+gnashrc: gnashrc.in Makefile
+	$(edit) '$(srcdir)/$@.in' >$@
+
+gnashpluginrc: gnashpluginrc.in
+	$(edit) '$(srcdir)/$@.in' >$@
 
 CLEANFILES = gnashrc gnashpluginrc
 

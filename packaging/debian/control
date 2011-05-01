@@ -48,7 +48,7 @@ Package: gnash-common
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends},
- gstreamer-plugins-base | libgstreamer-plugins-base0.10-0, gstreamer0.10-plugins-bad, gstreamer0.10-fluendo-mp3, gstreamer0.10-ffmpeg, libxv1
+ gstreamer-plugins-base | libgstreamer-plugins-base0.10-0, gstreamer0.10-plugins-bad, gstreamer0.10-ffmpeg, libxv1
 # OpenGL packages are disabled for now
 # libgtkglext1
 Suggests: browser-plugin-gnash (= ${binary:Version}), gnash-lirc-extension (= ${binary:Version}),  gnash-fileio-extension (= ${binary:Version}),  gnash-mysql-extension (= ${binary:Version})

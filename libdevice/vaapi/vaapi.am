@@ -46,6 +46,7 @@ libgnashvaapi_la_LIBADD = \
 	$(NULL)
 
 libgnashvaapi_la_SOURCES = $(SRCS)
+
 if HAVE_VAAPI_GLX
 libgnashvaapi_la_CPPFLAGS += \
 	$(LIBVA_GLX_CFLAGS) \
@@ -56,7 +57,9 @@ libgnashvaapi_la_LIBADD += \
 	$(NULL)
 
 libgnashvaapi_la_SOURCES += \
-	vaapi/VaapiSurfaceGLX.cpp \
+	VaapiDisplayGLX.h \
+	VaapiSurfaceGLX.cpp \
+	VaapiSurfaceGLX.h \
 	$(NULL)
 endif
 

@@ -169,6 +169,9 @@ public:
 		return const_cast<Movie*>(&_movie_root->getRootMovie());
 	}
 
+	/// Get the nominal frame rate of the movie associated with this run
+	float getFrameRate() const;
+
 	/// Notify mouse pointer movement to the given coordinate
 	//
 	/// Coordinates are in pixels

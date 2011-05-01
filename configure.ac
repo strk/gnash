@@ -513,6 +513,17 @@ fi
 
 AM_CONDITIONAL(CROSS_COMPILING, [ test x$cross_compiling = xyes ])
 
+for dir in ${incllist}; do
+  test -d ${dir} && pruned_incllist="${pruned_incllist} ${dir}";
+done
+
+for dir in ${libslist}; do
+  test -d ${dir} && pruned_libslist="${pruned_libslist} ${dir}";
+done
+
+libslist="${pruned_libslist}";
+incllist="${pruned_incllist}";
+
 dnl !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 dnl !! 
 dnl !! IMPORTANT NOTICE 
@@ -1181,14 +1192,14 @@ if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${build_vaapi_device}" = x"yes"; t
   dnl look for VAAPI support so we can use use the VAAPI enabled FFmpeg.
   if test x"${have_ffmpeg_vaapi}" = xyes; then
     use_libva=yes
-    GNASH_PKG_FIND([libva],
+    GNASH_PKG_FIND([va],
       [va/va.h],
       [Video Acceleration API],
       vaInitialize
     )
 
     use_libva_x11=yes
-    GNASH_PKG_FIND([libva_x11],
+    GNASH_PKG_FIND([va_x11],
       [va/va_x11.h],
       [VA API (X11 display)],
       vaGetDisplay,
@@ -1197,7 +1208,7 @@ if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${build_vaapi_device}" = x"yes"; t
 
     if test x$build_ogl = xyes; then
       use_libva_glx=yes
-      GNASH_PKG_FIND([libva_glx],
+      GNASH_PKG_FIND([va_glx],
         [va/va_glx.h],
         [VA API (GLX display)],
         vaGetDisplayGLX,
@@ -1219,7 +1230,7 @@ if test x"${build_vaapi}" = x"yes" -a x"${have_ffmpeg}" != x"yes"; then
   AC_MSG_ERROR(["Hardware acceleration currently not supported unless using FFmpeg."])
 fi
 
-AM_CONDITIONAL(HAVE_VAAPI, test x"${found_libva_incl}" = xyes)
+AM_CONDITIONAL(HAVE_VAAPI, test x"${found_va_incl}" = xyes)
 AM_CONDITIONAL(HAVE_VAAPI_GLX, test x"${found_libva_glx_incl}" = xyes)
 AM_CONDITIONAL(HAVE_VAAPI_X11, test x"${found_libva_x11_incl}" = xyes)
 
@@ -1999,8 +2010,6 @@ dnl -----------------------------------------------------------------
 
 AM_CONDITIONAL(LIRC, [test x$lirc_ext = xyes])
 
-AC_CHECK_HEADERS(endian.h machine/endian.h)
-AC_CHECK_HEADERS(malloc.h malloc/malloc.h)
 AC_CHECK_HEADERS(getopt.h)
 AC_CHECK_HEADERS(libgen.h)
 AC_CHECK_HEADERS(pwd.h)
@@ -2008,7 +2017,6 @@ AC_CHECK_HEADERS(sys/utsname.h)
 AC_CHECK_HEADERS(signal.h)
 AC_CHECK_HEADERS(unistd.h)
 AC_CHECK_HEADERS(sys/time.h)
-AC_CHECK_HEADERS(ieeefp.h)
 AC_CHECK_LIB(bz2, BZ2_bzopen, [AC_SUBST(BZ2_LIBS, -lbz2)])
 AC_CHECK_LIB(c, getpwnam, AC_DEFINE(HAVE_GETPWNAM, 1, [Has getpwnam] ))
 
@@ -2203,14 +2211,11 @@ fi
 
 AC_CHECK_FUNCS(sysconf)
 AC_CHECK_FUNCS(shmget shmat shmdt mmap)
-AC_CHECK_FUNCS(memmove)
 AC_CHECK_FUNCS(scandir)         dnl supported by BSD and Linux, but you never know...
 AC_CHECK_FUNC(clock_gettime, AC_DEFINE(HAVE_CLOCK_GETTIME, 1, [Has clock_gettime()] ))
 dnl Look for Win32 networking stuff
 AC_CHECK_HEADERS(winsock.h)
 AC_CHECK_HEADERS(winsock2.h)
-AC_CHECK_FUNCS(socket)
-AC_CHECK_FUNCS(CreateFileMappingA)
 
 GNASH_PKG_FIND(nspr, [nspr.h], [Netscape Portable Runtime (NSPR)], PR_Init)
 
