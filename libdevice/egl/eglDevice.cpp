@@ -407,7 +407,8 @@ EGLDevice::attachWindow(GnashDevice::native_window_t window)
     if (EGL_NO_CONTEXT == _eglContext) {
         // At least on Ubuntu 10.10, this returns a successful error string
         // with LibeMesa's OpenVG 1.0 implementation. With OpenVG 1.1 on
-        // an ARM board, this works fine.
+        // an ARM board, this works fine. Even the libMesa examples fail
+        // the same way.
         boost::format fmt = boost::format(
                              _("eglCreateContext failed (error %s)")
                                            ) % getErrorString(eglGetError());
@@ -418,8 +419,12 @@ EGLDevice::attachWindow(GnashDevice::native_window_t window)
     
     // step6 - make the context and surface current
     if (EGL_FALSE == eglMakeCurrent(_eglDisplay, _eglSurface, _eglSurface, _eglContext)) {
-        log_error("eglMakeCurrent failed (error %s)",
-                  getErrorString(eglGetError()));
+        // If for some reason we get a context, but can't make it current,
+        // nothing else will work anyway, so don't continue.
+        boost::format fmt = boost::format(
+                             _("eglMakeCurrent failed (error %s)")
+                                           ) % getErrorString(eglGetError());
+        throw GnashException(fmt.str());
     }       // begin user code
 
     return true;
