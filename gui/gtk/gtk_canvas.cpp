@@ -304,7 +304,7 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
         throw gnash::GnashException(fmt.str());
     }
         
-    if ((renderer == "opengl") || (renderer == "openvg")) {
+    if (renderer == "opengl") {
         // OpenGL glue needs to prepare the drawing area for OpenGL
         // rendering before
         // widgets are realized and before the configure event is fired.
