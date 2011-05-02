@@ -405,8 +405,13 @@ EGLDevice::attachWindow(GnashDevice::native_window_t window)
     // step5 - create a context
     _eglContext = eglCreateContext(_eglDisplay, _eglConfig, EGL_NO_CONTEXT, NULL);
     if (EGL_NO_CONTEXT == _eglContext) {
-        log_error("eglCreateContext failed (error %s)",
-                  getErrorString(eglGetError()));
+        // At least on Ubuntu 10.10, this returns a successful error string
+        // with LibeMesa's OpenVG 1.0 implementation. With OpenVG 1.1 on
+        // an ARM board, this works fine.
+        boost::format fmt = boost::format(
+                             _("eglCreateContext failed (error %s)")
+                                           ) % getErrorString(eglGetError());
+        throw GnashException(fmt.str());
     } else {
         printEGLContext(_eglContext);
     }
