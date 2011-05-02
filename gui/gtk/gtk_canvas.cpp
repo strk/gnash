@@ -53,7 +53,7 @@
 // AGG support, which is the default, for rendering in the canvas.
 #include "gtk_glue_agg.h"
 
-#ifdef RENDERER_AGG
+#ifdef HAVE_VA_VA_H
 #include "gtk_glue_agg_vaapi.h"
 #endif
 
