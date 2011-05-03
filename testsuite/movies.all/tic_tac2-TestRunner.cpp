@@ -74,7 +74,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_current_frame(), 1);
 	check_equals(slides->get_current_frame(), 0);
 
-	for (int i=0; i<3; ++i) {
+	for (unsigned int i=0; i<3; ++i) {
 		std::stringstream s; s << "iteration " << i;
 		tester.advance(); 
 		check_equals_label(s.str(), root->get_current_frame(), 2+i);
@@ -87,7 +87,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_current_frame(), 4);
 	check_equals(slides->get_current_frame(), 0);
 
-	for (int i=0; i<12; ++i) {
+	for (unsigned int i=0; i<12; ++i) {
         tester.advanceClock(1000);
         tester.advance(false); 
 		std::stringstream s; s << "i" << i;
