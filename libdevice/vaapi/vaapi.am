@@ -57,9 +57,9 @@ libgnashvaapi_la_LIBADD += \
 	$(NULL)
 
 libgnashvaapi_la_SOURCES += \
-	VaapiDisplayGLX.h \
-	VaapiSurfaceGLX.cpp \
-	VaapiSurfaceGLX.h \
+	vaapi/VaapiDisplayGLX.h \
+	vaapi/VaapiSurfaceGLX.cpp \
+	vaapi/VaapiSurfaceGLX.h \
 	$(NULL)
 endif
 
