@@ -1054,14 +1054,14 @@ if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${build_vaapi}" = x"yes"; then
   dnl look for VAAPI support so we can use use the VAAPI enabled FFmpeg.
   if test x"${have_ffmpeg_vaapi}" = xyes; then
     use_libva=yes
-    GNASH_PKG_FIND([va],
+    GNASH_PKG_FIND([libva],
       [va/va.h],
       [Video Acceleration API],
       vaInitialize
     )
 
     use_libva_x11=yes
-    GNASH_PKG_FIND([va_x11],
+    GNASH_PKG_FIND([libva_x11],
       [va/va_x11.h],
       [VA API (X11 display)],
       vaGetDisplay,
@@ -1070,7 +1070,7 @@ if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${build_vaapi}" = x"yes"; then
 
     if test x$build_ogl = xyes; then
       use_libva_glx=yes
-      GNASH_PKG_FIND([va_glx],
+      GNASH_PKG_FIND([libva_glx],
         [va/va_glx.h],
         [VA API (GLX display)],
         vaGetDisplayGLX,
