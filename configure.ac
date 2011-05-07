@@ -961,7 +961,7 @@ if test x"${build_ogl}" != xno; then # yes or auto
   if test x"${build_ogl}" = xauto; then
     if test xyes = x"${has_opengl}"; then
       build_ogl=yes
-      renderer_list="${renderer_list} OpenGL"
+      renderer_list="${renderer_list} opengl"
     else
       build_ogl=no
     fi
