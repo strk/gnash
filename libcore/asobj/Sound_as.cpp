@@ -1011,7 +1011,7 @@ sound_stop(const fn_call& fn)
         sound_sample* ss = def->get_sound_sample(id);
         if (!ss) {
             IF_VERBOSE_MALFORMED_SWF(
-                log_swferror(_("Export '%s'is not a sound"), name);
+                log_swferror(_("Export '%s' is not a sound"), name);
                 );
             return as_value();
         }

@@ -1025,7 +1025,7 @@ MovieClip::goto_frame(size_t target_frame_number)
         target_frame_number = _def->get_frame_count() - 1;
 
         if (!_def->ensure_frame_loaded(target_frame_number + 1)) {
-            log_error(_("Target frame of a gotoFrame(%d) was never loaded,"
+            log_error(_("Target frame of a gotoFrame(%d) was never loaded, "
                         "although frame count in header (%d) said we "
                         "should have found it"),
                         target_frame_number+1, _def->get_frame_count());
@@ -1058,7 +1058,7 @@ MovieClip::goto_frame(size_t target_frame_number)
     if (target_frame_number >= loaded_frames) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("GotoFrame(%d) targets a yet "
-            "to be loaded frame (%d) loaded). "
+            "to be loaded frame (%d). "
             "We'll wait for it but a more correct form "
             "is explicitly using WaitForFrame instead"),
             target_frame_number+1,

@@ -178,7 +178,7 @@ FBGui::~FBGui()
 
 #ifdef ENABLE_DOUBLE_BUFFERING
     if (buffer) {
-        log_debug(_("Free'ing offscreen buffer"));
+        log_debug(_("Freeing offscreen buffer"));
         free(buffer);
     }
 #endif

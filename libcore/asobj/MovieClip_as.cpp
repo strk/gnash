@@ -1779,7 +1779,7 @@ movieclip_beginGradientFill(const fn_call& fn)
     // this limit.
     if (stops > 15) {
         std::stringstream ss; fn.dump_args(ss);
-        log_debug(_("%s.beginGradientFill(%s) : too many array elements"
+        log_debug(_("%s.beginGradientFill(%s): too many array elements"
             " for colors and ratios (%d), will trim to 8"), 
             movieclip->getTarget(), ss.str(), stops); 
         stops = 15;

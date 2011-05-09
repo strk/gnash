@@ -82,7 +82,7 @@ DefineButtonTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     const boost::uint16_t id = in.read_u16();
 
     IF_VERBOSE_PARSE(
-        log_parse(_("  DefineButton loader: chararacter id = %d"), id);
+        log_parse(_("  DefineButton loader: character id = %d"), id);
     );
 
     std::auto_ptr<DefineButtonTag> bt(new DefineButtonTag(in, m, tag, id));

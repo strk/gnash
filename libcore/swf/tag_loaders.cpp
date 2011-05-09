@@ -166,7 +166,7 @@ define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
     if (sample_rate_in >= arraySize(samplerates)) {
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("DEFINESOUNDLOADER: sound sample rate %d (expected "
-                    "0 to %u"), +sample_rate_in, arraySize(samplerates));
+                    "0 to %u)"), +sample_rate_in, arraySize(samplerates));
         );
         sample_rate_in = 0;
     }
