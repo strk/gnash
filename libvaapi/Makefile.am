@@ -31,6 +31,7 @@ libgnashvaapi_la_LIBADD = \
 	$(BOOST_LIBS) \
 	$(FFMPEG_LIBS) \
 	$(LIBVA_LIBS) \
+	$(LIBVA_GLX_LIBS) \
 	$(LIBVA_X11_LIBS) \
 	$(NULL)
 
