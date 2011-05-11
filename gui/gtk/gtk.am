@@ -54,17 +54,6 @@ gtk_gnash_LDADD += $(GNASH_LIBS) \
 if HAVE_VAAPI
 noinst_HEADERS		+= gtk/gtk_glue_agg_vaapi.h
 gtk_gnash_SOURCES	+= gtk/gtk_glue_agg_vaapi.cpp
-gtk_gnash_CPPFLAGS	+= \
-	$(X11_CFLAGS) \
-	$(LIBVA_X11_CFLAGS) \
-	-I$(top_srcdir)/libvaapi \
-	$(NULL)
-gtk_gnash_LDADD += \
-	$(top_builddir)/libvaapi/libgnashvaapi.la \
-	$(X11_LIBS) \
-	$(LIBVA_LIBS) \
-	$(LIBVA_X11_LIBS) \
-	$(NULL)
 endif   # USE_VAAPI
 endif	# BUILD_AGG_RENDERER
 
