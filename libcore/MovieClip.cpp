@@ -877,14 +877,18 @@ MovieClip::advance()
         //       to orphaned playlist while we execute it.
         if (_currentFrame == 0 && _hasLooped) {
 
-                const size_t frame_count = get_loaded_frames(); 
-                if ( frame_count != 1 || ! _flushedOrphanedTags ) {
-                    log_debug("Flushing orphaned tags. _currentFrame:%d, _hasLooped:%d, frame_count:%d", _currentFrame, _hasLooped, frame_count);
-                    _flushedOrphanedTags = true;
-                    executeFrameTags(frame_count, _displayList,
-                            SWF::ControlTag::TAG_DLIST |
-                            SWF::ControlTag::TAG_ACTION);
-                }
+            const size_t frame_count = get_loaded_frames(); 
+            if ( frame_count != 1 || ! _flushedOrphanedTags ) {
+                IF_VERBOSE_ACTION(
+                log_action(_("Flushing orphaned tags in movieclip %1%. "
+                    "_currentFrame:%2%, _hasLooped:%3%, frame_count:%4%"),
+                    getTargetPath(), _currentFrame, _hasLooped, frame_count)
+                );
+                _flushedOrphanedTags = true;
+                executeFrameTags(frame_count, _displayList,
+                    SWF::ControlTag::TAG_DLIST |
+                    SWF::ControlTag::TAG_ACTION);
+            }
         }
 
         // Execute the current frame's tags.
