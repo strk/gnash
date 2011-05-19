@@ -249,6 +249,9 @@ require-ming:
 # Dependencies for all generated SWF files
 $(ASTESTS_OUT) $(ASTESTS_VERSIONED_OUT) $(ONLINETEST_RULES) $(ALLTESTS_VERSIONED_OUT): require-ming dejagnu.as check.as dejagnu_so_init.as dejagnu_so_fini.as Dejagnu.swf
 
+# Every SWF depends on check.as
+*.swf: check.as dejagnu_so_init.as dejagnu_so_fini.as
+
 # Wrap a single .as tests in dejagnu_so importer.
 # At play time, if the relative url '../ming-misc.all/Dejagnu.swf' 
 # takes to the Dejagnu.swf shared library we'll get visual traces,
