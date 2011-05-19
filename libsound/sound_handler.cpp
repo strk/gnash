@@ -380,6 +380,22 @@ sound_handler::swfToOutSamples(const media::SoundInfo& sinfo,
     return outSamples;
 }
 
+/* public */
+bool
+sound_handler::isSoundPlaying(int sound_handle) const
+{
+    if ( sound_handle < 0 ||
+         static_cast<unsigned int>(sound_handle) >= _sounds.size() )
+    {
+        return false;
+    }
+
+    EmbedSound& sounddata = *(_sounds[sound_handle]);
+
+    // When this is called from a StreamSoundBlockTag,
+    // we only start if this sound isn't already playing.
+    return sounddata.isPlaying();
+}
 
 
 /* private */
