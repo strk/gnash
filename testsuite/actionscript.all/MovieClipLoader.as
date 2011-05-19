@@ -23,7 +23,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: MovieClipLoader.as,v 1.19 2008/03/11 19:31:47 strk Exp $";
+rcsid="MovieClipLoader.as";
 #include "check.as"
 
 //#define MEDIA(x) x

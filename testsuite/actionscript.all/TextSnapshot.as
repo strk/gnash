@@ -25,7 +25,7 @@
 // AS compatibility (return, argument handling).
 
 
-rcsid="$Id: TextSnapshot.as,v 1.12 2008/03/11 19:31:48 strk Exp $";
+rcsid="TextSnapshot.as";
 #include "check.as"
 
 #if OUTPUT_VERSION < 6

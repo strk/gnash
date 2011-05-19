@@ -23,7 +23,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Date.as,v 1.52 2008/04/10 16:55:11 bwy Exp $";
+rcsid="Date.as";
 #include "check.as"
 
 check_equals(typeof(Date), 'function');

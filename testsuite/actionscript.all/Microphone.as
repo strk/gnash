@@ -23,7 +23,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Microphone.as,v 1.18 2008/06/04 13:43:24 bwy Exp $";
+rcsid="Microphone.as";
 #include "check.as"
 
 // There was no Microphone class in SWF5 or lower

@@ -20,7 +20,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: TextField.as,v 1.56 2008/06/05 03:26:32 zoulunkai Exp $";
+rcsid="TextField.as";
 #include "check.as"
 
 printBounds = function(b)

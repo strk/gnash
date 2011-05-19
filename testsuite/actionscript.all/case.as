@@ -23,7 +23,7 @@
  */
 
 
-rcsid="$Id: case.as,v 1.21 2008/06/07 12:11:34 bwy Exp $";
+rcsid="case.as";
 #include "check.as"
 
 #if OUTPUT_VERSION <= 6 // {

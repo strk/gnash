@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Matrix.as,v 1.11 2008/06/19 11:49:17 bwy Exp $";
+rcsid="Matrix.as";
 
 
 // There are lots of floating point calculations here. Comparing them

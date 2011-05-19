@@ -28,7 +28,7 @@
 // is very unlikely). The chance of a failure is very small if Gnash
 // is working correctly.
 
-rcsid="$Id: Random.as,v 1.5 2008/03/11 19:31:48 strk Exp $";
+rcsid="Random.as";
 #include "check.as"
 
 // Number of random numbers to generate.

@@ -22,7 +22,7 @@
 
 
 
-rcsid="$Id: toString_valueOf.as,v 1.33 2008/04/02 01:52:14 zoulunkai Exp $";
+rcsid="toString_valueOf.as";
 #include "check.as"
 
 //

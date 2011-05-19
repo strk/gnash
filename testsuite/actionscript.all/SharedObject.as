@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: SharedObject.as,v 1.23 2008/03/11 19:31:48 strk Exp $";
+rcsid="SharedObject.as";
 #include "check.as"
 
 var sharedobjectObj = new SharedObject;

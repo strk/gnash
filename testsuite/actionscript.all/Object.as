@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Object.as,v 1.66 2008/04/28 16:10:00 bwy Exp $";
+rcsid="Object.as";
 #include "check.as"
 
 // Test things in Class Object (swf5~swf8)

@@ -27,7 +27,7 @@
 // like gprocessor by checking that the instructions to the context menu
 // match what the pp displays.
 
-rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
+rcsid="ContextMenu.as";
 #include "check.as"
 
 #if OUTPUT_VERSION < 7

@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextFormat.as,v 1.4 2008/05/06 11:21:02 bwy Exp $";
+rcsid="TextFormat.as";
 
 #include "check.as"
 

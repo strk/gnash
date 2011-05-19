@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.133 2008/05/09 13:21:08 strk Exp $";
+rcsid="MovieClip.as";
 #include "check.as"
 
 // Utility function to print a Matrix with optional rounding

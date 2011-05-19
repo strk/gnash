@@ -1,5 +1,5 @@
 
-rcsid="$Id: delete.as,v 1.14 2008/03/11 19:31:48 strk Exp $";
+rcsid="delete.as";
 #include "check.as"
 
 anObject = new Object();

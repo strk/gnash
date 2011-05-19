@@ -24,7 +24,7 @@
 
 // We need more than one frame to test the connection properly.
 
-rcsid="$Id: LocalConnection.as,v 1.21 2008/05/05 15:26:38 bwy Exp $";
+rcsid="LocalConnection.as";
 #include "check.as"
 
 snd = new LocalConnection();
