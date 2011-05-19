@@ -74,7 +74,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	// Make sure you adjust this with the test!
 	cerr << "Total frames: " <<  totalFrames << endl;
-	assert (totalFrames == 23);
+	assert (totalFrames == 26);
 
 	int numSoundsStarted[] = {
 		0, 
