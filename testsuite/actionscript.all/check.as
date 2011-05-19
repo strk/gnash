@@ -114,7 +114,8 @@
 		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
 
 #ifndef SUPPRESS_RCSID_DUMP
-info('['+rcsid+']');
+#include "revno.h"
+info('['+rcsid+' ' + BRANCH_NICK+'-'+BRANCH_REVNO+'-'+COMMIT_ID+']');
 #endif
 
 // If using the DEJAGNU_MODULE this info will be printed
