@@ -34,6 +34,7 @@
 #include <unistd.h> // for getpid
 
 #include "GnashAlgorithm.h"
+#include "ClockTime.h"
 
 using std::cout;
 using std::endl;
@@ -76,31 +77,6 @@ hexify(const unsigned char *p, size_t length, bool ascii)
 
 }
 
-std::ostream&
-timestamp(std::ostream& o)
-{
-
-    const char fmt[] = "%H:%M:%S";
-
-    time_t t;
-    char buf[sizeof fmt];
-
-    std::time(&t);
-    std::strftime(buf, sizeof buf, fmt, std::localtime(&t));
-
-    static std::map<int, int> threadMap;
-    int tid = get_thread_id();
-    int& htid = threadMap[tid];
-    if (!htid) {
-        htid = threadMap.size();
-        // TODO: notify actual thread id for index
-    }
-
-    o << getpid() << ":" << htid << "] " << buf;
-    return o;
-
-}
-
 LogFile&
 LogFile::getDefaultInstance()
 {
@@ -108,8 +84,36 @@ LogFile::getDefaultInstance()
     return o;
 }
 
+
 namespace {
+
     LogFile& dbglogfile = LogFile::getDefaultInstance();
+
+    struct Timestamp {
+        boost::uint64_t startTicks;
+        std::map<int, int> threadMap;
+        Timestamp() : startTicks(clocktime::getTicks()) {}
+    };
+
+    std::ostream& operator<< (std::ostream& o, Timestamp& t)
+    {
+        int tid = get_thread_id();
+        int& htid = t.threadMap[tid];
+        if (!htid) {
+            htid = t.threadMap.size();
+            // TODO: notify actual thread id for index
+        }
+
+        boost::uint64_t diff = clocktime::getTicks() - t.startTicks;
+        // should we split in seconds/ms ?
+        o << getpid() << ":" << htid << "] " << diff;
+
+        return o;
+
+    }
+
+    Timestamp timestamp;
+
 }
 
 // boost format functions to process the objects
