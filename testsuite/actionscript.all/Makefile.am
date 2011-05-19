@@ -26,7 +26,7 @@ AUTOMAKE_OPTIONS = dejagnu -Wno-portability
 
 abs_mediadir = $(shell cd $(srcdir)/../media; pwd)
 swfdir = `cd $(top_builddir)/testsuite/actionscript.all; pwd`
-DEF_MAKESWF_FLAGS=-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\"$(abs_mediadir)\"' -DSWFDIR='\"$(swfdir)\"'
+DEF_MAKESWF_FLAGS=-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\"$(abs_mediadir)\"' -DSWFDIR='\"$(swfdir)\"' -I"$(top_builddir)"
 
 quickcheck_RUNNERS = \
 	alltests-v5-Runner \
