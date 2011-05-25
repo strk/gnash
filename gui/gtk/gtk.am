@@ -54,7 +54,7 @@ gtk_gnash_LDADD += $(GNASH_LIBS) \
 if HAVE_VAAPI
 noinst_HEADERS		+= gtk/gtk_glue_agg_vaapi.h
 gtk_gnash_SOURCES	+= gtk/gtk_glue_agg_vaapi.cpp
-endif   # USE_VAAPI
+endif   # HAVE_VAAPI
 endif	# BUILD_AGG_RENDERER
 
 if BUILD_CAIRO_RENDERER

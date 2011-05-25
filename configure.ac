@@ -1084,7 +1084,7 @@ dnl libVA drivers. We declare conditional for both the option being
 dnl selected, as well as whether or not it's found. This we can
 dnl generate better error handling if it's not found.
 AM_CONDITIONAL(BUILD_OMAP, test x"${build_omap}" = xyes)
-AM_CONDITIONAL(USE_VAAPI, test x"${use_libva}" = xyes)
+dnl AM_CONDITIONAL(USE_VAAPI, test x"${use_libva}" = xyes) dnl UNUSED! 
 
 dnl Only build the vaapi support if we have a version of FFmpeg that
 dnl supports it.
