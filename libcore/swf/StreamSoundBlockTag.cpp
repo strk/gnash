@@ -82,12 +82,12 @@ StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         const boost::uint16_t seekSamples = in.read_u16();
 
         if (samplesCount) {
-            log_unimpl(_("MP3 soundblock samples count (%s)"),
-                        samplesCount);
+            LOG_ONCE(log_unimpl(_("MP3 soundblock samples count (%s)"),
+                        samplesCount));
         }
         if (seekSamples) {
-            log_unimpl(_("MP3 soundblock seek samples (%s)"),
-                        seekSamples);
+            LOG_ONCE(log_unimpl(_("MP3 soundblock seek samples (%s)"),
+                        seekSamples));
         }
     }
 
