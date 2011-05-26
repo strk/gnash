@@ -51,10 +51,6 @@ void frame_label_loader(SWFStream&, TagType, movie_definition&,
 void define_sound_loader(SWFStream&, TagType, movie_definition&,
 		const RunResources&);
 
-/// Load SWF::SOUNDSTREAMHEAD or SWF::SOUNDSTREAMHEAD2 tag.
-void sound_stream_head_loader(SWFStream&, TagType, movie_definition&,
-		const RunResources&);
-
 void
 file_attributes_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunResources& r);

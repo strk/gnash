@@ -54,6 +54,7 @@
 #include "VideoFrameTag.h"
 #include "ImportAssetsTag.h"
 #include "ExportAssetsTag.h"
+#include "SoundStreamHeadTag.h"
 #ifdef ENABLE_AVM2
 # include "SymbolClassTag.h"
 # include "DoABCTag.h"
@@ -134,7 +135,7 @@ addDefaultLoaders(TagLoadersTable& table)
         // 17
         (TagPair(SWF::DEFINEBUTTONSOUND, DefineButtonSoundTag::loader))
         // 18
-        (TagPair(SWF::SOUNDSTREAMHEAD, sound_stream_head_loader))
+        (TagPair(SWF::SOUNDSTREAMHEAD, SoundStreamHeadTag::loader))
         // 19
         (TagPair(SWF::SOUNDSTREAMBLOCK, StreamSoundBlockTag::loader))
         (TagPair(SWF::DEFINELOSSLESS, DefineBitsTag::loader))
@@ -163,7 +164,7 @@ addDefaultLoaders(TagLoadersTable& table)
         (TagPair(SWF::FRAMELABEL, frame_label_loader)) // 43
         (TagPair(SWF::DEFINEBEHAVIOR, unexpected)) // 44
         // 45
-        (TagPair(SWF::SOUNDSTREAMHEAD2, sound_stream_head_loader))
+        (TagPair(SWF::SOUNDSTREAMHEAD2, SoundStreamHeadTag::loader))
         // 46
         (TagPair(SWF::DEFINEMORPHSHAPE, DefineMorphShapeTag::loader))
         // 47

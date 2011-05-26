@@ -107,6 +107,7 @@ libgnashcore_la_SOURCES = \
 	swf/CSMTextSettingsTag.cpp \
 	swf/PlaceObject2Tag.cpp \
 	swf/RemoveObjectTag.cpp \
+	swf/SoundStreamHeadTag.cpp	\
 	swf/StartSoundTag.cpp \
 	swf/SetTabIndexTag.cpp \
 	swf/StreamSoundBlockTag.cpp \
@@ -177,6 +178,7 @@ noinst_HEADERS = \
 	swf/DefineShapeTag.h \
 	swf/DefineScalingGridTag.h \
 	swf/DefineMorphShapeTag.h \
+	swf/SoundStreamHeadTag.h \
 	swf/SoundInfoRecord.h \
 	swf/TextRecord.h \
 	swf/DefineButtonSoundTag.h \
