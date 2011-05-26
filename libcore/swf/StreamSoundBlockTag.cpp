@@ -38,27 +38,21 @@ StreamSoundBlockTag::executeActions(MovieClip* m, DisplayList& /*dlist*/) const
 
     if (handler) {
         // This makes it possible to stop only the stream when framejumping.
-        m->setStreamSoundId(m_handler_id);
-
-        handler->playStream(m_handler_id, _blockId);
+        m->setStreamSoundId(_handler_id);
+        handler->playStream(_handler_id, _blockId);
     }
 }
 
-/* public static */
 void
 StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         const RunResources& r)
 {
-    assert(tag == SWF::SOUNDSTREAMBLOCK); // 19
+    assert(tag == SWF::SOUNDSTREAMBLOCK); 
 
     sound::sound_handler* handler = r.soundHandler(); 
 
     // If we don't have a sound_handler registered stop here
-    if (!handler)
-    {
-        // log_debug ?
-        return;
-    }
+    if (!handler) return;
 
     // Get the ID of the sound stream currently being loaded
     const int sId = m.get_loading_sound_stream_id();
@@ -83,9 +77,18 @@ StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     if (format == media::AUDIO_CODEC_MP3) {
         in.ensureBytes(4);
         // FIXME: use these values !
-        unsigned int samplesCount = in.read_u16(); UNUSED(samplesCount);
-        unsigned int seekSamples = in.read_u16();
-        if (seekSamples) LOG_ONCE(log_unimpl(_("MP3 soundblock seek samples")));
+        const boost::uint16_t samplesCount = in.read_u16();
+        UNUSED(samplesCount);
+        const boost::uint16_t seekSamples = in.read_u16();
+
+        if (samplesCount) {
+            log_unimpl(_("MP3 soundblock samples count (%s)"),
+                        samplesCount);
+        }
+        if (seekSamples) {
+            log_unimpl(_("MP3 soundblock seek samples (%s)"),
+                        seekSamples);
+        }
     }
 
     const unsigned int dataLength = in.get_tag_end_position() - in.tell();
