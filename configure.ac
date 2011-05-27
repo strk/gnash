@@ -495,7 +495,7 @@ if test x$cross_compiling = xyes; then
   dnl plain installed in the system tools. This contaminates configure
   dnl when building for variations of the same basic architecture,
   dnl like i686-linux -> i586-mingw32.
-  if test x${pkgroot} = "/usr"; then
+  if test x"${pkgroot}" = x"/usr"; then
     export pkgroot=""
   fi
   export incllist="`eval echo ${with_top_level}/include ${pkgroot}/${host_alias}/include ${pkgroot}/include`"
@@ -1059,7 +1059,6 @@ if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${build_vaapi}" = x"yes"; then
       [Video Acceleration API],
       vaInitialize
     )
-
     use_libva_x11=yes
     GNASH_PKG_FIND([libva_x11],
       [va/va_x11.h],
