@@ -40,7 +40,7 @@
 // jpeglib.h redefines HAVE_STDLIB_H.
 #undef HAVE_STDLIB_H
 extern "C" {
-#ifdef _WIN32
+#if defined(_WIN32) && JPEG_LIB_VERSION_MAJOR == 7
 typedef int boolean;
 #endif
 # include <jpeglib.h>
