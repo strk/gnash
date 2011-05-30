@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Sound.as,v 1.1 2008/06/17 12:42:22 strk Exp $";
+rcsid="Sound.as";
 #include "check.as"
 
 endOfTest = function()

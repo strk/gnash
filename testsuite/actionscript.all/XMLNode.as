@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: XMLNode.as,v 1.17 2008/03/11 19:31:48 strk Exp $";
+rcsid="XMLNode.as";
 #include "check.as"
 
 

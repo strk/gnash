@@ -321,6 +321,9 @@ check_PROGRAMS += \
 endif
 
 
+# This is so check.as finds revno.h
+MAKESWF_FLAGS = -I$(top_builddir)
+
 # TESTS = \
 # 	DefineEditTextVariableNameTest-Runner 
 
@@ -356,9 +359,9 @@ DefineTextTest_Runner_DEPENDENCIES = \
 	$(NULL)
 
 Version4Loader.swf: $(srcdir)/Version4Loader.as 
-	$(MAKESWF) -o $@ -v4 $(srcdir)/Version4Loader.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -o $@ -v4 $(srcdir)/Version4Loader.as
 Version5Loaded.swf: $(srcdir)/Version5Loaded.as Dejagnu.swf
-	$(MAKESWF) -o $@ Dejagnu.swf -v5 $(srcdir)/Version5Loaded.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -o $@ Dejagnu.swf -v5 $(srcdir)/Version5Loaded.as
 MixedVersion4And5Runner: Version4Loader.swf Version5Loaded.swf
 	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) Version5Loaded.swf > $@
 	chmod 755 $@
@@ -989,7 +992,7 @@ attachMovieLoopingTestRunner_DEPENDENCIES = \
 # This will only work with Ming-0.4.0beta2
 # (support for prebuilt clips inclusion)
 attachImported.swf: Dejagnu.swf $(srcdir)/attachImported.as attachMovieTest.swf
-	$(MAKESWF) -DOUTPUT_VERSION=6 -v6 -i attachMovieTest.swf:redsquare -o $@ Dejagnu.swf $(srcdir)/attachImported.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -DOUTPUT_VERSION=6 -v6 -i attachMovieTest.swf:redsquare -o $@ Dejagnu.swf $(srcdir)/attachImported.as
 attachImported-Runner: $(srcdir)/../generic-testrunner.sh attachImported.swf Makefile
 	sh $(srcdir)/../generic-testrunner.sh -r5 -c "END_OF_TEST" $(top_builddir) attachImported.swf > $@
 	chmod 755 $@
@@ -997,7 +1000,7 @@ attachImported-Runner: $(srcdir)/../generic-testrunner.sh attachImported.swf Mak
 # This will only work with Ming-0.4.0beta2
 # (support for prebuilt clips inclusion)
 attachExtImported.swf: Dejagnu.swf $(srcdir)/attachExtImported.as attachImported.swf attachMovieTest.swf
-	$(MAKESWF) -DOUTPUT_VERSION=6 -v6 -i attachImported.swf:redsquare -o $@ Dejagnu.swf $(srcdir)/attachExtImported.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -DOUTPUT_VERSION=6 -v6 -i attachImported.swf:redsquare -o $@ Dejagnu.swf $(srcdir)/attachExtImported.as
 attachExtImported-Runner: $(srcdir)/../generic-testrunner.sh attachExtImported.swf Makefile
 	sh $(srcdir)/../generic-testrunner.sh -r5 -c "END_OF_TEST" $(top_builddir) attachExtImported.swf > $@
 	chmod 755 $@
@@ -1319,28 +1322,28 @@ ResolveEventsTest_Runner_CXXFLAGS = \
 
 # This will only work with Ming-0.4.0beta2 (support for prebuilt clips inclusion)
 VarAndCharClashTest.swf: $(srcdir)/../media/green.swf Dejagnu.swf $(srcdir)/VarAndCharClashTest.as 
-	$(MAKESWF) -o $@ Dejagnu.swf $(srcdir)/../media/green.swf $(srcdir)/VarAndCharClashTest.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -o $@ Dejagnu.swf $(srcdir)/../media/green.swf $(srcdir)/VarAndCharClashTest.as
 VarAndCharClashTest-Runner: $(srcdir)/../generic-testrunner.sh VarAndCharClashTest.swf
 	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) VarAndCharClashTest.swf > $@
 	chmod 755 $@
 
 # This will only work with Ming-0.4.0beta2 (support for prebuilt clips inclusion)
 FlashVarsTest.swf: Dejagnu.swf FlashVarsTest.as 
-	$(MAKESWF) -DOUTPUT_VERSION=6 -v6 -o $@ Dejagnu.swf $(srcdir)/FlashVarsTest.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -DOUTPUT_VERSION=6 -v6 -o $@ Dejagnu.swf $(srcdir)/FlashVarsTest.as
 FlashVarsTest-Runner: $(srcdir)/../generic-testrunner.sh FlashVarsTest.swf Makefile
 	echo "$(top_builddir)/gui/gnash -1 -r0 -v -P 'FlashVars=?a=a_in_fvars&v=v_in_fvars&MixCaseFvars=mixFvars&dejagnu.nested=chFVars&_root.fqv=fqFVars&complex={a:'1',b:2}' 'FlashVarsTest.swf?a=a_in_qstring&q=q_in_qstring&MixCaseQstr=mixQstr&dejagnu.nested=chQstr&_root.fqv=fqQstr'" > $@
 	chmod 755 $@
 
 # This will only work with Ming-0.4.0beta2 (support for prebuilt clips inclusion)
 SharedObjectTest.swf: Dejagnu.swf SharedObjectTest.as 
-	$(MAKESWF) -DOUTPUT_VERSION=6 -v6 -o $@ Dejagnu.swf $(srcdir)/SharedObjectTest.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -DOUTPUT_VERSION=6 -v6 -o $@ Dejagnu.swf $(srcdir)/SharedObjectTest.as
 
 SharedObjectTestRunner: SharedObjectTestRunner.sh Makefile SharedObjectTest.swf
 	sed -e 's#@@TOP_BUILDDIR@@#${abs_top_builddir}#' -e 's#@@BASEINPUTSOLDIR@@#${srcdir}/SharedObjectTest.sol#' $(srcdir)/SharedObjectTestRunner.sh > $@
 	chmod +x $@
 
 StageConfigTest.swf: StageConfigTest.as 
-	$(MAKESWF) -o $@ -s 512x512 $(srcdir)/StageConfigTest.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -o $@ -s 512x512 $(srcdir)/StageConfigTest.as
 
 ButtonPropertiesTest_SOURCES = \
 	ButtonPropertiesTest.c \
@@ -1412,7 +1415,7 @@ init_action_testrunner: $(srcdir)/../generic-testrunner.sh init_action_test.swf
 	chmod 755 $@
 
 intervalTest.swf: $(srcdir)/../media/green.swf Dejagnu.swf intervalTest.as 
-	$(MAKESWF) -o $@ Dejagnu.swf $(srcdir)/intervalTest.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -o $@ Dejagnu.swf $(srcdir)/intervalTest.as
 intervalTestRunner_SOURCES = \
 	intervalTestRunner.cpp \
 	$(NULL)
@@ -1430,7 +1433,7 @@ intervalTestRunner_DEPENDENCIES = \
 	$(NULL)
 
 gotoFrame2Test.swf: $(srcdir)/../media/green.swf Dejagnu.swf gotoFrame2Test.as 
-	$(MAKESWF) -o $@ -iDejagnu.swf:dejagnu $(srcdir)/../actionscript.all/dejagnu_so_init.as \
+	$(MAKESWF) $(MAKESWF_FLAGS) -o $@ -iDejagnu.swf:dejagnu $(srcdir)/../actionscript.all/dejagnu_so_init.as \
 		$(srcdir)/gotoFrame2Test.as 
 
 gotoFrame2Test-Runner: $(srcdir)/../generic-testrunner.sh gotoFrame2Test.swf
@@ -1438,17 +1441,17 @@ gotoFrame2Test-Runner: $(srcdir)/../generic-testrunner.sh gotoFrame2Test.swf
 	chmod 755 $@
 
 LC-Receive.swf: LC-Receive.as 
-	$(MAKESWF) -v 8 -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/LC-Receive.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -v 8 -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/LC-Receive.as
 
 LC-Send.swf: LC-Send.as 
-	$(MAKESWF) -v 8 -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/LC-Send.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -v 8 -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/LC-Send.as
 
 LCTestRunner: $(srcdir)/../simultaneous-testrunner.sh LC-Receive.swf LC-Send.swf
 	sh $(srcdir)/../simultaneous-testrunner.sh -c "ENDOFTEST" $(top_builddir) LC-Receive.swf LC-Send.swf > $@
 	chmod 755 $@
 
 XMLSocketTest.swf: XMLSocketTest.as 
-	$(MAKESWF) -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/XMLSocketTest.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/XMLSocketTest.as
 
 XMLSocketTester: XMLSocketTester.sh XMLSocketTest.swf
 	sh $(srcdir)/XMLSocketTester.sh -c "ENDOFTEST" $(top_builddir) $(top_srcdir) $(PERL) \
@@ -1456,14 +1459,14 @@ XMLSocketTester: XMLSocketTester.sh XMLSocketTest.swf
 	chmod 755 $@
 
 GradientFillTest.swf: GradientFillTest.as 
-	$(MAKESWF) -v 8 -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/GradientFillTest.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -v 8 -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/GradientFillTest.as
 
 GradientFillTestRunner: $(srcdir)/../generic-testrunner.sh GradientFillTest.swf
 	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) GradientFillTest.swf > $@
 	chmod 755 $@
 
 DrawingApiTest.swf: DrawingApiTest.as 
-	$(MAKESWF) -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/DrawingApiTest.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/DrawingApiTest.as
 
 DrawingApiTestRunner_SOURCES = \
 	DrawingApiTestRunner.cpp \
@@ -1482,7 +1485,7 @@ DrawingApiTestRunner_DEPENDENCIES = \
 	$(NULL)
 
 PrototypeEventListeners.swf: PrototypeEventListeners.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
-	$(MAKESWF) -r12 -o $@ -v6 -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 Dejagnu.swf $(srcdir)/PrototypeEventListeners.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -r12 -o $@ -v6 -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 Dejagnu.swf $(srcdir)/PrototypeEventListeners.as
 
 PrototypeEventListenersTestRunner_SOURCES = \
 	PrototypeEventListenersTestRunner.cpp \
@@ -1501,14 +1504,14 @@ PrototypeEventListenersTestRunner_DEPENDENCIES = \
 	$(NULL)
 
 remoting.swf: remoting.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
-	$(MAKESWF) -n network -r12 -o $@ -v7 -DHTTP_TESTSUITE='\"$(HTTP_TESTSUITE)\"' -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 Dejagnu.swf $(srcdir)/remoting.as $(srcdir)/../actionscript.all/dejagnu_so_fini.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -n network -r12 -o $@ -v7 -DHTTP_TESTSUITE='\"$(HTTP_TESTSUITE)\"' -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 Dejagnu.swf $(srcdir)/remoting.as $(srcdir)/../actionscript.all/dejagnu_so_fini.as
 
 remotingTestRunner: $(srcdir)/../generic-testrunner.sh remoting.swf
 	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) remoting.swf > $@
 	chmod 755 $@
 
 red5test.swf: red5test.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
-	$(MAKESWF) -n network -r12 -o $@ -v7 -DRED5_HOST='\"$(RED5_HOST)\"' \
+	$(MAKESWF) $(MAKESWF_FLAGS) -n network -r12 -o $@ -v7 -DRED5_HOST='\"$(RED5_HOST)\"' \
 		-DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 Dejagnu.swf $(srcdir)/red5test.as \
 		$(srcdir)/../actionscript.all/dejagnu_so_fini.as
 
@@ -1517,7 +1520,7 @@ red5test-runner: $(srcdir)/../generic-testrunner.sh red5test.swf
 	chmod 755 $@
 
 rtmpytest.swf: rtmpytest.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
-	$(MAKESWF) -n network -r12 -o $@ -v7 -DRTMPY_HOST='\"$(RTMPY_HOST)\"' \
+	$(MAKESWF) $(MAKESWF_FLAGS) -n network -r12 -o $@ -v7 -DRTMPY_HOST='\"$(RTMPY_HOST)\"' \
 		-DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 Dejagnu.swf $(srcdir)/rtmpytest.as \
 		$(srcdir)/../actionscript.all/dejagnu_so_fini.as
 
@@ -1526,20 +1529,20 @@ rtmpytest-runner: $(srcdir)/../generic-testrunner.sh rtmpytest.swf
 	chmod 755 $@
 
 case6.swf: case6.as Makefile ../actionscript.all/check.as
-	$(MAKESWF) -v6 -o $@ -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 -I$(srcdir)/../actionscript.all $(srcdir)/case6.as 
+	$(MAKESWF) $(MAKESWF_FLAGS) -v6 -o $@ -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 -I$(srcdir)/../actionscript.all $(srcdir)/case6.as 
 
 case7.swf: case7.as Makefile ../actionscript.all/check.as
-	$(MAKESWF) -v7 -o $@ -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 -I$(srcdir)/../actionscript.all $(srcdir)/case7.as 
+	$(MAKESWF) $(MAKESWF_FLAGS) -v7 -o $@ -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 -I$(srcdir)/../actionscript.all $(srcdir)/case7.as 
 
 caseTestRunner: $(srcdir)/../generic-testrunner.sh case6.swf case7.swf Makefile
 	sh $(srcdir)/../generic-testrunner.sh -f10 -r10 -c '#total' $(top_builddir) case6.swf case7.swf > $@
 	chmod 755 $@
 
 DragDropTest.swf: DragDropTest.as Dejagnu.swf DragDropTestLoaded.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
-	$(MAKESWF) -r12 -o $@ -v6 -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 Dejagnu.swf $(srcdir)/DragDropTest.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -r12 -o $@ -v6 -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 Dejagnu.swf $(srcdir)/DragDropTest.as
 
 DragDropTestLoaded.swf: DragDropTest.as Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
-	$(MAKESWF) -r12 -o $@ -v6 -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 -DLOADED_VERSION $(srcdir)/DragDropTest.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -r12 -o $@ -v6 -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 -DLOADED_VERSION $(srcdir)/DragDropTest.as
 
 DragDropTestRunner_SOURCES = \
 	DragDropTestRunner.cpp \

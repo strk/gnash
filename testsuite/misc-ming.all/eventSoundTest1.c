@@ -194,9 +194,16 @@ runAttachedSoundsTest(SWFMovie mo, SWFSound so, int* frame)
     /* add_actions(mo, "note('Position: '+s.position);"); */
     check_equals(mo, "Math.round(s.position/1000)", "2");
 
+    printFrameInfo(mo, i, frameDesc[i]);
+
+    for (i = 0; i < 3; i++)
+        SWFMovie_nextFrame(mo);
+
+    xcheck_equals(mo, "cs", "3");
+    check(mo, "cs > 0"); /* This is a test for bug #23020 */
+
     add_actions(mo, "s.stop();");
 
-    printFrameInfo(mo, i, frameDesc[i]);
 
 }
 

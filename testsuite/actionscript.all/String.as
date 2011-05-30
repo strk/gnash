@@ -17,7 +17,7 @@
 // Original author: Mike Carlson - June 19th, 2006
 
 
-rcsid="$Id: String.as,v 1.56 2008/04/25 11:11:08 bwy Exp $";
+rcsid="String.as";
 
 #include "check.as"
 

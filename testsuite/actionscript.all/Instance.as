@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Boolean.as,v 1.21 2008/04/02 09:39:59 strk Exp $";
+rcsid="Boolean.as";
 #include "check.as"
 
 

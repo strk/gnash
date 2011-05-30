@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Video.as,v 1.16 2008/03/29 22:50:54 strk Exp $";
+rcsid="Video.as";
 #include "check.as"
 
 #if OUTPUT_VERSION < 6

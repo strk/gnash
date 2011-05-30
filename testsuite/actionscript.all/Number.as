@@ -29,7 +29,7 @@
 //  
 
 
-rcsid="$Id: Number.as,v 1.53 2008/04/02 10:55:32 strk Exp $";
+rcsid="Number.as";
 #include "check.as"
 
 Number.hasOwnProperty = ASnative(101, 5);

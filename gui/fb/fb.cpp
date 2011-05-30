@@ -181,6 +181,13 @@ FBGui::~FBGui()
         log_debug(_("Closing framebuffer device"));
         close(_fd);
     }
+
+#ifdef ENABLE_DOUBLE_BUFFERING
+    if (buffer) {
+        log_debug(_("Freeing offscreen buffer"));
+        free(buffer);
+#endif
+    }
 }
 
 bool

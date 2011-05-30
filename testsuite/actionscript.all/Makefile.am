@@ -25,8 +25,12 @@ AUTOMAKE_OPTIONS = dejagnu -Wno-portability
 # so I take responsibility of dropping that for the moment...
 
 abs_mediadir = $(shell cd $(srcdir)/../media; pwd)
-swfdir = `cd $(top_builddir)/testsuite/actionscript.all; pwd`
-DEF_MAKESWF_FLAGS=-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\"$(abs_mediadir)\"' -DSWFDIR='\"$(swfdir)\"'
+swfdir = $(shell cd $(top_builddir)/testsuite/actionscript.all; pwd)
+
+COM_MAKESWF_FLAGS=-DMING_VERSION_CODE=$(MING_VERSION_CODE) -I"$(top_builddir)"
+DEF_MAKESWF_FLAGS=$(COM_MAKESWF_FLAGS) \
+	-DMEDIADIR='\"$(abs_mediadir)\"' \
+	-DSWFDIR='\"$(swfdir)\"' 
 
 quickcheck_RUNNERS = \
 	alltests-v5-Runner \
@@ -52,7 +56,7 @@ TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
 	$(base_RUNNERS)
 
-dist_noinst_SCRIPTS = gen-test.sh
+dist_noinst_SCRIPTS = gen-test.sh gen-index.sh
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
@@ -204,30 +208,34 @@ ONLINETEST_RULES = v5-online-tests v6-online-tests v7-online-tests v8-online-tes
 
 v8-online-tests: 
 	rm -f $(ASTESTS_V8_OUT) # force rebuild
-	$(MAKE) $(ASTESTS_V8_OUT) alltests-v8.swf DEF_MAKESWF_FLAGS="-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\\\"../media\\\"'" DEJAGNU_SO_URL=../Dejagnu.swf
+	$(MAKE) $(ASTESTS_V8_OUT) alltests-v8.swf DEF_MAKESWF_FLAGS="$(COM_MAKESWF_FLAGS) -DMEDIADIR='\\\"../media\\\"'" DEJAGNU_SO_URL=../Dejagnu.swf
 	mkdir -p online-tests/v8
 	mv $(ASTESTS_V8_OUT) alltests-v8.swf online-tests/v8
+	sh $(srcdir)/gen-index.sh alltests-v8.swf $(ASTESTS_V8_OUT)
 	mv index.html embed.html online-tests/v8
 
 v7-online-tests: 
 	rm -f $(ASTESTS_V7_OUT) # force rebuild
-	$(MAKE) $(ASTESTS_V7_OUT) alltests-v7.swf DEF_MAKESWF_FLAGS="-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\\\"../media\\\"'" DEJAGNU_SO_URL=../Dejagnu.swf
+	$(MAKE) $(ASTESTS_V7_OUT) alltests-v7.swf DEF_MAKESWF_FLAGS="$(COM_MAKESWF_FLAGS) -DMEDIADIR='\\\"../media\\\"'" DEJAGNU_SO_URL=../Dejagnu.swf
 	mkdir -p online-tests/v7
 	mv $(ASTESTS_V7_OUT) alltests-v7.swf online-tests/v7
+	sh $(srcdir)/gen-index.sh alltests-v7.swf $(ASTESTS_V7_OUT)
 	mv index.html embed.html online-tests/v7
 
 v6-online-tests: 
 	rm -f $(ASTESTS_V6_OUT) # force rebuild
-	$(MAKE) $(ASTESTS_V6_OUT) alltests-v6.swf DEF_MAKESWF_FLAGS="-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\\\"../media\\\"'" DEJAGNU_SO_URL=../Dejagnu.swf
+	$(MAKE) $(ASTESTS_V6_OUT) alltests-v6.swf DEF_MAKESWF_FLAGS="$(COM_MAKESWF_FLAGS) -DMEDIADIR='\\\"../media\\\"'" DEJAGNU_SO_URL=../Dejagnu.swf
 	mkdir -p online-tests/v6
 	mv $(ASTESTS_V6_OUT) alltests-v6.swf online-tests/v6
+	sh $(srcdir)/gen-index.sh alltests-v6.swf $(ASTESTS_V6_OUT)
 	mv index.html embed.html online-tests/v6
 
 v5-online-tests: 
 	rm -f $(ASTESTS_V5_OUT) # force rebuild
-	$(MAKE) $(ASTESTS_V5_OUT) alltests-v5.swf DEF_MAKESWF_FLAGS="-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\\\"../media\\\"'" DEJAGNU_SO_URL=../Dejagnu.swf
+	$(MAKE) $(ASTESTS_V5_OUT) alltests-v5.swf DEF_MAKESWF_FLAGS="$(COM_MAKESWF_FLAGS) -DMEDIADIR='\\\"../media\\\"'" DEJAGNU_SO_URL=../Dejagnu.swf
 	mkdir -p online-tests/v5
 	mv $(ASTESTS_V5_OUT) alltests-v5.swf online-tests/v5
+	sh $(srcdir)/gen-index.sh alltests-v5.swf $(ASTESTS_V5_OUT)
 	mv index.html embed.html online-tests/v5
 
 index.wiki: gen-index-wiki.sh
@@ -248,6 +256,9 @@ require-ming:
 
 # Dependencies for all generated SWF files
 $(ASTESTS_OUT) $(ASTESTS_VERSIONED_OUT) $(ONLINETEST_RULES) $(ALLTESTS_VERSIONED_OUT): require-ming dejagnu.as check.as dejagnu_so_init.as dejagnu_so_fini.as Dejagnu.swf
+
+# Every SWF depends on check.as
+*.swf: check.as dejagnu_so_init.as dejagnu_so_fini.as
 
 # Wrap a single .as tests in dejagnu_so importer.
 # At play time, if the relative url '../ming-misc.all/Dejagnu.swf' 

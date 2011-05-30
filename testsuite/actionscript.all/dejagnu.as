@@ -33,7 +33,7 @@
 // used to keep DejaGnu happy.
 
 
-rcsid="$Id: dejagnu.as,v 1.12 2008/03/11 19:31:48 strk Exp $";
+rcsid="dejagnu.as";
 #include "check.as"
 
 #define note(text) info(text)

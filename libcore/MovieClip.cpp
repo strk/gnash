@@ -484,6 +484,7 @@ MovieClip::MovieClip(as_object* object, const movie_definition* def,
     _currentFrame(0),
     m_sound_stream_id(-1),
     _hasLooped(false),
+    _flushedOrphanedTags(false),
     _callingFrameActions(false),
     _lockroot(false)
 {
@@ -819,7 +820,7 @@ MovieClip::advance()
 {
 #ifdef GNASH_DEBUG
     log_debug(_("Advance movieclip '%s' at frame %u/%u"),
-        getTargetPath(), _currentFrame,
+        getTargetPath(), _currentFrame+1,
         get_frame_count());
 #endif
 
@@ -844,7 +845,7 @@ MovieClip::advance()
     size_t frame_count = _def->get_frame_count();
 
     log_debug(_("Advance_movieclip for movieclip '%s' - frame %u/%u "),
-        getTarget(), _currentFrame,
+        getTarget(), _currentFrame+1,
         frame_count);
 #endif
 
@@ -866,6 +867,29 @@ MovieClip::advance()
 #ifdef GNASH_DEBUG
         log_debug(_("after increment we are at frame %u/%u"), _currentFrame, frame_count);
 #endif
+
+        // Flush any orphaned tags
+        // See https://savannah.gnu.org/bugs/index.php?33176
+        // WARNING: we might be executing these while a parser
+        //          is still pushing on it. The _hasLooped is
+        //          trying to avoid that.
+        // TODO: find a better way to ensure nobody will be pushing
+        //       to orphaned playlist while we execute it.
+        if (_currentFrame == 0 && _hasLooped) {
+
+            const size_t frame_count = get_loaded_frames(); 
+            if ( frame_count != 1 || ! _flushedOrphanedTags ) {
+                IF_VERBOSE_ACTION(
+                log_action(_("Flushing orphaned tags in movieclip %1%. "
+                    "_currentFrame:%2%, _hasLooped:%3%, frame_count:%4%"),
+                    getTargetPath(), _currentFrame, _hasLooped, frame_count)
+                );
+                _flushedOrphanedTags = true;
+                executeFrameTags(frame_count, _displayList,
+                    SWF::ControlTag::TAG_DLIST |
+                    SWF::ControlTag::TAG_ACTION);
+            }
+        }
 
         // Execute the current frame's tags.
         // First time executeFrameTags(0) executed in dlist.cpp(child) or
@@ -907,8 +931,9 @@ MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
 
     if (_swf->initializeCharacter(cid)) {
 #ifdef GNASH_DEBUG
-        log_debug(_("Queuing init actions in frame %d of movieclip %s"),
-                _currentFrame, getTarget());
+        log_debug("Queuing init actions for DisplayObject %1% "
+                    "in frame %2% of MovieClip %3%",
+                cid, _currentFrame, getTarget());
 #endif
         std::auto_ptr<ExecutableCode> code(new GlobalCode(a, this));
 
@@ -916,7 +941,7 @@ MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
     }
     else {
 #ifdef GNASH_DEBUG
-        log_debug(_("Init actions for DisplayObject %d already executed"), cid);
+        log_debug("Init actions for DisplayObject %1% already executed", cid);
 #endif
     }
 }
@@ -1004,7 +1029,7 @@ MovieClip::goto_frame(size_t target_frame_number)
         target_frame_number = _def->get_frame_count() - 1;
 
         if (!_def->ensure_frame_loaded(target_frame_number + 1)) {
-            log_error(_("Target frame of a gotoFrame(%d) was never loaded,"
+            log_error(_("Target frame of a gotoFrame(%d) was never loaded, "
                         "although frame count in header (%d) said we "
                         "should have found it"),
                         target_frame_number+1, _def->get_frame_count());
@@ -1037,7 +1062,7 @@ MovieClip::goto_frame(size_t target_frame_number)
     if (target_frame_number >= loaded_frames) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("GotoFrame(%d) targets a yet "
-            "to be loaded frame (%d) loaded). "
+            "to be loaded frame (%d). "
             "We'll wait for it but a more correct form "
             "is explicitly using WaitForFrame instead"),
             target_frame_number+1,

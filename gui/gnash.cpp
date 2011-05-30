@@ -386,7 +386,8 @@ getSupportedOptions(gnash::Player& p)
         ).c_str())
 
     ("media,M", po::value<string>()
-        ->default_value(rcfile.getMediaHandler().empty() ? handlers.front()
+        ->default_value(rcfile.getMediaHandler().empty() ?
+            ( handlers.empty() ? "" : handlers.front() )
                                                  : rcfile.getMediaHandler() )
         ->notifier(boost::bind(&Player::setMedia, &p, _1)),
         (string(_("The media handler to use"))

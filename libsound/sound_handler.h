@@ -157,7 +157,7 @@ public:
     /// All scheduled sounds will be played on next output flush.
     ///
     /// @param id
-    ///     Id of the sound buffer slot schedule playback of.
+    ///     Id of the sound buffer slot to schedule playback of.
     ///
     /// @param loops
     ///     loops == 0 means play the sound once (1 means play it twice, etc)
@@ -188,6 +188,13 @@ public:
                    const SoundEnvelopes* env,
                    bool allowMultiple, unsigned int inPoint=0,
                    unsigned int outPoint=std::numeric_limits<unsigned int>::max());
+
+    /// Check if an event sound is playing
+    //
+    /// @param id
+    ///     Id of the sound buffer slot check for being alive
+    ///
+    bool isSoundPlaying(int id) const;
 
     /// Start playback of a streaming sound, if not playing already
     //
@@ -347,7 +354,7 @@ public:
     ///
     virtual void unplugInputStream(InputStream* id);
 
-    virtual ~sound_handler() {};
+    virtual ~sound_handler();
     
     /// \brief
     /// Gets the duration in milliseconds of an event sound connected

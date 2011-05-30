@@ -66,3 +66,17 @@ Wyoming, MI 49509-1455.  The request was made by Greg Trounson.
 
 == Description ==
 
+...
+
+= [tic_tac2.swf] =
+
+== Origin ==
+
+Contributed by Sergio Costas <raster@rastersoft.com>.
+See http://savannah.gnu.org/bugs/?20684
+
+== Description ==
+
+Tests Sound.position against a playing embedded event sound.
+Regressed in 6b478714a7264187cce8bd6d24c458ed94441843
+(see https://savannah.gnu.org/bugs/?33091)

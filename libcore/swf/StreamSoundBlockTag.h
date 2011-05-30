@@ -49,23 +49,7 @@ namespace SWF {
 ///
 class StreamSoundBlockTag : public ControlTag
 {
-
-    /// Id of the stream this tag should play
-    boost::uint16_t m_handler_id;
-
-    /// Offset in the stream buffer to play
-    sound::sound_handler::StreamBlockId _blockId;
-
-    //int       latency;
-
 public:
-
-    /// Get the identifier of the sound stream this block belongs to
-    //
-    /// TODO: why is this an uint16_t if sound_handler::create_sound
-    ///       returns an int ? I vote for a sound_handler::SoundId typedef
-    ///
-    boost::uint16_t getStreamId() const { return m_handler_id; }
 
     /// Start the associated block of sound
     void executeActions(MovieClip* m, DisplayList& dlist) const;
@@ -78,19 +62,23 @@ private:
 
     /// Create a ControlTag playing the given sample when executed.
     //
-    /// @param streamId
-    /// Identifier of the stream to play.
-    ///
-    /// @param blockId
-    /// Identifier of the stream block to play.
+    /// @param streamId     identifier of the stream to play.
+    /// @param blockId      identifier of the stream block to play.
     ///
     /// This should only be constructed using the loader() function.
-    StreamSoundBlockTag(int streamId,
+    StreamSoundBlockTag(boost::uint16_t streamId,
                         sound::sound_handler::StreamBlockId blockId)
         :
-        m_handler_id(streamId),
+        _handler_id(streamId),
         _blockId(blockId)
     {}
+
+    /// Id of the stream this tag should play
+    const boost::uint16_t _handler_id;
+
+    /// Offset in the stream buffer to play
+    const sound::sound_handler::StreamBlockId _blockId;
+
 };
 
 

@@ -16,9 +16,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
-//
-// Original version by Thatcher Ulrich <tu@tulrich.com> 2002
-//
 // Wrapper for jpeg file operations.  The actual work is done by the
 // IJG jpeg lib.
 
@@ -43,6 +40,9 @@
 // jpeglib.h redefines HAVE_STDLIB_H.
 #undef HAVE_STDLIB_H
 extern "C" {
+#if defined(_WIN32) && JPEG_LIB_VERSION_MAJOR == 7
+typedef int boolean;
+#endif
 # include <jpeglib.h>
 }		
 #undef HAVE_STDLIB_H

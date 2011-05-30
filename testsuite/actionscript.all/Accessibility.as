@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Accessibility.as,v 1.19 2008/04/16 11:16:34 bwy Exp $";
+rcsid="Accessibility.as";
 #include "check.as"
 
 check_equals ( typeof(Accessibility), 'object' );

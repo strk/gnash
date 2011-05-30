@@ -752,6 +752,10 @@ private:
     // true if this sprite reached the last frame and restarted
     bool _hasLooped;
 
+    // true if orphaned tags (tags found after last advertised showframe)
+    // have been executed at least once.
+    bool _flushedOrphanedTags;
+
     // true is we're calling frame actions
     bool _callingFrameActions;
 

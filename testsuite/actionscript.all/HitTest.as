@@ -19,7 +19,7 @@
 // methods are correctly applied. So it saves much effort if new tests are added
 // after the end of the present ones.
 
-rcsid="$Id: HitTest.as,v 1.8 2008/04/29 10:23:50 bwy Exp $";
+rcsid="HitTest.as";
 
 #include "check.as"
 

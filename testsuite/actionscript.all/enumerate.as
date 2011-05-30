@@ -23,7 +23,7 @@
  */
 
 
-rcsid="$Id: enumerate.as,v 1.10 2008/03/11 19:31:48 strk Exp $";
+rcsid="enumerate.as";
 #include "check.as"
 
 #if OUTPUT_VERSION > 5

@@ -493,7 +493,7 @@ if test x$cross_compiling = xyes; then
   dnl plain installed in the system tools. This contaminates configure
   dnl when building for variations of the same basic architecture,
   dnl like i686-linux -> i586-mingw32.
-  if test x${pkgroot} = "/usr"; then
+  if test x"${pkgroot}" = x"/usr"; then
     export pkgroot=""
   fi
   export incllist="`eval echo ${with_top_level}/include ${pkgroot}/${host_alias}/include ${pkgroot}/include`"
@@ -1063,7 +1063,7 @@ if test x"${build_ogl}" != xno; then # yes or auto
   if test x"${build_ogl}" = xauto; then
     if test xyes = x"${has_opengl}"; then
       build_ogl=yes
-      renderer_list="${renderer_list} OpenGL"
+      renderer_list="${renderer_list} opengl"
     else
       build_ogl=no
     fi
@@ -1192,14 +1192,13 @@ if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${build_vaapi_device}" = x"yes"; t
   dnl look for VAAPI support so we can use use the VAAPI enabled FFmpeg.
   if test x"${have_ffmpeg_vaapi}" = xyes; then
     use_libva=yes
-    GNASH_PKG_FIND([va],
+    GNASH_PKG_FIND([libva],
       [va/va.h],
       [Video Acceleration API],
       vaInitialize
     )
-
     use_libva_x11=yes
-    GNASH_PKG_FIND([va_x11],
+    GNASH_PKG_FIND([libva_x11],
       [va/va_x11.h],
       [VA API (X11 display)],
       vaGetDisplay,
@@ -1208,7 +1207,7 @@ if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${build_vaapi_device}" = x"yes"; t
 
     if test x$build_ogl = xyes; then
       use_libva_glx=yes
-      GNASH_PKG_FIND([va_glx],
+      GNASH_PKG_FIND([libva_glx],
         [va/va_glx.h],
         [VA API (GLX display)],
         vaGetDisplayGLX,
@@ -1230,7 +1229,7 @@ if test x"${build_vaapi}" = x"yes" -a x"${have_ffmpeg}" != x"yes"; then
   AC_MSG_ERROR(["Hardware acceleration currently not supported unless using FFmpeg."])
 fi
 
-AM_CONDITIONAL(HAVE_VAAPI, test x"${found_va_incl}" = xyes)
+AM_CONDITIONAL(HAVE_VAAPI, test x"${found_libva_incl}" = xyes)
 AM_CONDITIONAL(HAVE_VAAPI_GLX, test x"${found_libva_glx_incl}" = xyes)
 AM_CONDITIONAL(HAVE_VAAPI_X11, test x"${found_libva_x11_incl}" = xyes)
 
@@ -2330,7 +2329,7 @@ if test x$cross_compiling = xno; then
 		  [Enable rtmpy based testing (default host is www.gnashdev.org)]),
 	      [case "${enableval}" in
              no) RTMPY_HOST="" ;;
-            yes) RTMPY_HOST="gnash.keybit.net" ;;
+            yes) RTMPY_HOST="www.gnashdev.org" ;;
               *) RTMPY_HOST="${enableval}";;
            esac])
   AC_SUBST(RTMPY_HOST)

@@ -380,6 +380,22 @@ sound_handler::swfToOutSamples(const media::SoundInfo& sinfo,
     return outSamples;
 }
 
+/* public */
+bool
+sound_handler::isSoundPlaying(int sound_handle) const
+{
+    if ( sound_handle < 0 ||
+         static_cast<unsigned int>(sound_handle) >= _sounds.size() )
+    {
+        return false;
+    }
+
+    EmbedSound& sounddata = *(_sounds[sound_handle]);
+
+    // When this is called from a StreamSoundBlockTag,
+    // we only start if this sound isn't already playing.
+    return sounddata.isPlaying();
+}
 
 
 /* private */
@@ -738,6 +754,12 @@ sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
     plugInputStream(newStreamer);
 
     return ret;
+}
+
+sound_handler::~sound_handler()
+{
+    delete_all_sounds();
+    unplugAllInputStreams();
 }
 
 } // gnash.sound namespace 

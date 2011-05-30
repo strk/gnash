@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Transform.as,v 1.3 2008/06/20 13:28:56 bwy Exp $";
+rcsid="Transform.as";
 
 #include "check.as"
 

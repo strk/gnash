@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: XML.as,v 1.57 2008/04/08 10:09:21 strk Exp $";
+rcsid="XML.as";
 #include "check.as"
 //#include "dejagnu.as"
 #include "utils.as"

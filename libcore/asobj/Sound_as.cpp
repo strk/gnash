@@ -346,6 +346,18 @@ Sound_as::update()
 void
 Sound_as::probeAudio()
 {
+    if ( ! externalSound ) {
+        // Only probe for sound complete
+        assert(_soundHandler);
+        assert(!_soundCompleted);
+        if ( ! _soundHandler->isSoundPlaying(soundId) ) {
+            _soundCompleted = false;
+            stopProbeTimer();
+            // dispatch onSoundComplete 
+            callMethod(&owner(), NSV::PROP_ON_SOUND_COMPLETE);
+        }
+        return;
+    }
 
     if (!_mediaParser) return; // nothing to do here w/out a media parser
 
@@ -706,7 +718,8 @@ Sound_as::start(double secOff, int loops)
                     true, // allow multiple instances (checked)
                     inPoint
                     );
-        startProbeTimer();
+
+        startProbeTimer(); // to dispatch onSoundComplete
     }
 }
 
@@ -1011,7 +1024,7 @@ sound_stop(const fn_call& fn)
         sound_sample* ss = def->get_sound_sample(id);
         if (!ss) {
             IF_VERBOSE_MALFORMED_SWF(
-                log_swferror(_("Export '%s'is not a sound"), name);
+                log_swferror(_("Export '%s' is not a sound"), name);
                 );
             return as_value();
         }

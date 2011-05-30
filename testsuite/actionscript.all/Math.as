@@ -32,7 +32,7 @@
 // actually many different bitwise values that represent NaN.
 // Hence we string expected NaN results and compare the strings.
 
-rcsid="$Id: Math.as,v 1.12 2008/04/15 07:51:20 bwy Exp $";
+rcsid="Math.as";
 #include "check.as"
 
 var mathObj = new Math;

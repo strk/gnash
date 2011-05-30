@@ -25,7 +25,7 @@ pluginsdir = $(libdir)/gnash/plugins
 
 plugins_LTLIBRARIES = fileio.la
 
-DEF_MAKESWF_FLAGS = -I $(top_srcdir)/testsuite/actionscript.all
+DEF_MAKESWF_FLAGS = -I $(top_builddir) -I $(top_srcdir)/testsuite/actionscript.all
 
 INCLUDES =  \
             -I$(top_srcdir)/libbase \

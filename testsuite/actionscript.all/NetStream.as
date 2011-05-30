@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: NetStream.as,v 1.21 2008/03/11 19:31:47 strk Exp $";
+rcsid="NetStream.as";
 #include "check.as"
 
 #if OUTPUT_VERSION < 6

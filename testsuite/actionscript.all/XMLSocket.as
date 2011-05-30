@@ -24,7 +24,7 @@
 // misc-ming.all/XMLSocketTest.c and testsuite/XmlSocketServer.pl
 // for tests with a running server.
 
-rcsid="$Id: XMLSocket.as,v 1.10 2008/04/01 09:26:54 strk Exp $";
+rcsid="XMLSocket.as";
 #include "check.as"
 
 #if OUTPUT_VERSION < 6

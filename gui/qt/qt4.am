@@ -55,7 +55,7 @@ qt4_gnash_LDADD = \
 	$(GNASH_LIBS) \
 	$(AM_LDFLAGS) \
 	$(X11_LIBS) \
-	$(LIBVA_X11_LIBS)
+	$(NULL)
 
 if BUILD_OGL_RENDERER
 qt4_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
@@ -77,3 +77,4 @@ qt4_gnash_LDADD += $(top_builddir)/librender/libgnashrender.la \
 	$(QT4_LIBS) $(AGG_LIBS)
 qt4_gnash_SOURCES += qt/Qt4GlueAgg.cpp qt/Qt4GlueAgg.h
 endif
+

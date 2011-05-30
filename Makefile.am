@@ -144,9 +144,9 @@ revno.h:
         fi; \
 	if test \! -z "$${revno}"; then \
           echo "Generating revno.h ($${nick} $${revno} $${comm_id})"; \
-          echo "static const char* BRANCH_REVNO  = \"$${revno}\";" > revno.h; \
-          echo "static const char* BRANCH_NICK = \"$${nick}\";" >> revno.h; \
-          echo "static const char* COMMIT_ID = \"$${comm_id}\";" >> revno.h; \
+          echo "#define BRANCH_REVNO  \"$${revno}\"" > revno.h; \
+          echo "#define BRANCH_NICK \"$${nick}\"" >> revno.h; \
+          echo "#define COMMIT_ID \"$${comm_id}\"" >> revno.h; \
           touch .lastmod; \
 	fi
 
