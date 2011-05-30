@@ -54,7 +54,7 @@ FBOvgGlue::~FBOvgGlue()
 }
 
 bool
-FBOvgGlue::init(int /* argc */, char **/*argv*/[])
+FBOvgGlue::init(int argc, char **argv[])
 {
     // GNASH_REPORT_FUNCTION;
 
@@ -100,21 +100,18 @@ FBOvgGlue::init(int /* argc */, char **/*argv*/[])
     if (egl) {
         setDevice(renderer::GnashDevice::EGL);
     } else {
-        // OpenVG reauires EGL, so if we don't have it, Gnash won't run
+        // OpenVG requires EGL, so if we don't have it, Gnash won't run
         log_error("OpenVG needs EGL to work!");
         return false;
     }
 #endif
 
-    _device.reset(new renderer::EGLDevice(0, 0));
+    _device.reset(new renderer::EGLDevice(argc, *argv));
 
     // Initialize the display device
     // EGL still reqires us to open the framebuffer
     _device->bindClient(renderer::GnashDevice::OPENVG);
     
-    // You must pass in the file descriptor to the opened
-    // framebuffer when creating a window. Under X11, this is
-    // actually the XID of the created window.
     _display.initDevice(0, 0);
 
     _width = getWidth();
@@ -133,7 +130,11 @@ FBOvgGlue::init(int /* argc */, char **/*argv*/[])
             _stride = _width * 2;
         }
     }
-        
+    close(fd);
+    
+    // You must pass in the file descriptor to the opened
+    // framebuffer when creating a window. Under X11, this is
+    // actually the XID of the created window.
     return _device->attachWindow(_display.getHandle());
 }
 
@@ -174,8 +175,8 @@ FBOvgGlue::prepDrawingArea(void *drawing_area)
 {
     GNASH_REPORT_FUNCTION;
 
-    _device->attachWindow(reinterpret_cast
-            <renderer::GnashDevice::native_window_t>(drawing_area));
+    // _device->attachWindow(reinterpret_cast
+    //         <renderer::GnashDevice::native_window_t>(drawing_area));
 }
 
 void
