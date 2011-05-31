@@ -45,12 +45,6 @@ SoundStreamHeadTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     // If we don't have a sound_handler registered stop here
     if (!handler) return;
 
-    // FIXME:
-    // no DisplayObject id for soundstreams... so we make one up...
-    // This only works if there is only one SWFStream in the movie...
-    // The right way to do it is to make seperate structures for streams
-    // in SWFMovieDefinition.
-
     // 1 byte for playback info, 1 for SWFStream info, 2 for sample count
     in.ensureBytes(4);
 
@@ -65,7 +59,7 @@ SoundStreamHeadTag::loader(SWFStream& in, TagType tag, movie_definition& m,
             log_swferror("SOUNDSTREAMHEAD: playback sound rate %d (expected "
                 "0 to %d)", +pbSoundRate, arraySize(samplerates));
         );
-        pbSoundRate=0;
+        pbSoundRate = 0;
     }
     const boost::uint32_t playbackSoundRate = samplerates[pbSoundRate];
     const bool playbackSound16bit = in.read_bit();
