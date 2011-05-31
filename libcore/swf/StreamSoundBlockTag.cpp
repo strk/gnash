@@ -17,6 +17,11 @@
 //
 
 #include "StreamSoundBlockTag.h"
+
+#include <boost/intrusive_ptr.hpp>
+#include <boost/cstdint.hpp>
+
+#include "utility.h"
 #include "sound_handler.h" 
 #include "movie_root.h"
 #include "movie_definition.h"
