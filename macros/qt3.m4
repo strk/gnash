@@ -135,12 +135,19 @@ dnl   # QT_LIBS =  -lqtui -lqtcore -lqtprint -L/usr/lib/qt-3.3/lib -lqt-mt
     fi
 
     if test x"${ac_cv_path_qt3_lib}" != x; then
-      QT3_LIBS="${ac_cv_path_qt3_lib}"
+      AC_MSG_RESULT(${ac_cv_path_qt3_lib})
+    else
+      AC_MSG_RESULT(no)
+    fi
+
+    dnl Both the headers and the library must be installed
+    if test x"${ac_cv_path_qt3_incl}" != x -a x"${ac_cv_path_qt3_lib}" != x; then
       AC_DEFINE(HAVE_QT3, 1, [Have QT 3.x installed])
+      QT3_LIBS="${ac_cv_path_qt3_lib}"
       has_qt3="yes"
     else
-      QT3_LIBS=""
       has_qt3="no"
+      QT3_LIBS=""
     fi
 
     AC_PATH_PROG(MOC3, moc, ,[ /usr/lib/qt-3.3/bin ${QTDIR}/bin${pathlist}])
