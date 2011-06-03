@@ -3316,6 +3316,21 @@ else
   echo "                     or .rpm users: yum install speex-devel" >&5
 fi
 
+if test x"$SPEEXDSP_LIBS" != x; then
+  if test x"$SPEEXDSP_CFLAGS" != x; then
+    echo "        Speex DSP flags are: $SPEEXDSP_CFLAGS"
+  else
+    echo "        Speex DSP flags are: default include path"
+  fi
+    echo "        Speex DSP libs are: $SPEEXDSP_LIBS"
+else
+  echo "        RECOMMENDED: If you install the Speex DSP library, Gnash will be able" >&5
+  echo "                     to resample Speex encoded audio in FLV files." >&5
+  echo "                     Install libspeexdsp from http://speex.org" >&5
+  echo "                     or .deb users: apt-get install libspeexdsp-dev" >&5
+  echo "                     or .rpm users: yum install speex-devel" >&5
+fi
+
 if test x"$ext_dbus" = xyes; then
   if test x"$DBUS_LIBS" != x; then
     if test x"$DBUS_CFLAGS" != x; then
