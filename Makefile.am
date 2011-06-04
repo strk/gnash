@@ -108,7 +108,7 @@ EXTRA_DIST =  \
 # 	cp -p $(srcdir)/*.am $(top_distdir)/packaging/
 
 CLEANFILES = .configline
-DISTCLEANFILES = revno.h .lastmod
+DISTCLEANFILES = revno.h .lastmod deb-attempt-install-dependencies.sh rpm-attempt-install-dependencies.sh
 MAINTAINERCLEANFILES = revno.h .lastmod
 BUILT_SOURCES = revno.h .configline
 
