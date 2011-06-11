@@ -537,7 +537,7 @@ ActionExec::cleanupAfterRun()
         // check if the stack was smashed
         if (_initialStackSize > env.stack_size()) {
             log_swferror(_("Stack smashed (ActionScript compiler bug, or "
-                "obfuscated SWF).Taking no action to fix (as expected)."));
+                "obfuscated SWF). Taking no action to fix (as expected)."));
         }
         else if (_initialStackSize < env.stack_size()) {
            log_swferror(_("%d elements left on the stack after block "
