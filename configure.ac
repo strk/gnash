@@ -504,8 +504,10 @@ if test x$cross_compiling = xyes; then
   npapi=no
 else
   AC_MSG_NOTICE([Configuring Gnash for native compilation])
+  export DEB_HOST_MULTIARCH="`eval dpkg-architecture -qDEB_HOST_MULTIARCH`"
   export incllist="`eval cat ${srcdir}/macros/incllist`"
-  export libslist="`eval cat ${srcdir}/macros/libslist`"
+  libslist="`cat ${srcdir}/macros/libslist`"
+  export libslist+=" /lib/${DEB_HOST_MULTIARCH} /usr/lib/${DEB_HOST_MULTIARCH}"
   export pathlist=$PATH
 fi
 
