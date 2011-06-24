@@ -40,7 +40,8 @@ cygnal (options)...
 
 <variablelist>
   <varlistentry>
-    <term>(-h) --help</term>
+    <term>-h</term>
+    <term>--help</term>
     <listitem>
       <para>
 	Print usage info.
@@ -58,7 +59,8 @@ cygnal (options)...
   </varlistentry>
   
   <varlistentry>
-    <term>(-v) --verbose</term>
+    <term>-v</term>
+    <term>--verbose</term>
     <listitem>
       <para>
 	Verbose output.
@@ -67,7 +69,8 @@ cygnal (options)...
   </varlistentry>
   
   <varlistentry>
-    <term>(-p) --port-offset</term>
+    <term>-p</term>
+    <term>--port-offset</term>
     <listitem>
       <para>
 	Port offset. This number gets added to the default
