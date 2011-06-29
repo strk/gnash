@@ -26,6 +26,7 @@
 #include "MovieClip.h"
 #include "GnashNumeric.h"
 #include "RunResources.h"
+#include "utility.h"
 
 namespace gnash {
 namespace SWF {
@@ -42,6 +43,7 @@ DefineScalingGridTag::loader(SWFStream& in, TagType /*tag*/,
     );
 
     const SWFRect inner = readRect(in);
+    UNUSED(inner);
 
     log_unimpl("DefineScalingGridTag");
 
