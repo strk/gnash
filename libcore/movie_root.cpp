@@ -2030,9 +2030,9 @@ movie_root::set_background_color(const rgba& color)
     rgba newcolor = color;
     newcolor.m_a = m_background_color.m_a;
 
-    if (m_background_color != color) {
+    if (m_background_color != newcolor) {
         setInvalidated();
-        m_background_color = color;
+        m_background_color = newcolor;
     }
 }
 
