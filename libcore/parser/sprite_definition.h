@@ -70,23 +70,6 @@ public:
 	/// Destructor, releases playlist data
 	~sprite_definition();
 
-	/// Register a class to this definition.
-	//
-	/// New instances of this symbol will get the given class
-	/// interface.
-	///
-	/// @param the_class
-	///	The class constructor to associate with
-	///	new instances of this DisplayObject. If NULL
-	///	new instances will get the MovieClip interface.
-	///
-	void registerClass(as_function* the_class);
-
-	/// Get the Class registered to this definition.
-	as_function* getRegisteredClass() const {
-		return registeredClass;
-	}
-
     virtual void incrementLoadedFrames() {
         ++m_loading_frame;
     }
@@ -295,22 +278,8 @@ private:
 		return true;
 	}
 
-	/// The constructor to use for setting up the interface
-	/// for new instances of this sprite
-	//
-    /// TODO: this really shouldn't be stored in an immutable definition.
-	as_function* registeredClass;
-
 	int	_loadingSoundStream;
 
-protected:
-
-	/// Mark reachable resources of a sprite_definition
-	//
-	/// Reachable resources are:
-	///	- registered class (registeredClass)
-	///
-	void markReachableResources() const;
 };
 
 

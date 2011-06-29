@@ -258,6 +258,20 @@ movie_root::abortOnScriptTimeout(const std::string& what) const
     }
     return disable;
 }
+   
+void
+movie_root::registerClass(const SWF::DefinitionTag* sprite, as_function* cls)
+{
+    _registeredClasses[sprite] = cls;
+}
+
+as_function*
+movie_root::getRegisteredClass(const SWF::DefinitionTag* sprite) const
+{
+    RegisteredClasses::const_iterator it = _registeredClasses.find(sprite);
+    if (it == _registeredClasses.end()) return 0;
+    return it->second;
+}
 
 void
 movie_root::handleActionLimitHit(const std::string& msg)

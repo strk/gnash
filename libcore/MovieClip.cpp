@@ -737,17 +737,14 @@ MovieClip::notifyEvent(const event_id& id)
             // nor if it's dynamic  
             if (isDynamic()) break;
 
-            const sprite_definition* def =
-                dynamic_cast<const sprite_definition*>(_def.get());
-
             // must be a loaded movie (loadMovie doesn't mark it as 
             // "dynamic" - should it? no, or getBytesLoaded will always
             // return 0)  
-            if (!def) break;
+            if (!_def) break;
 
             // if it has a registered class it can have an onLoad 
             // in prototype...
-            if (def->getRegisteredClass()) break;
+            if (stage().getRegisteredClass(_def.get())) break;
 
 #ifdef GNASH_DEBUG
             log_debug(_("Sprite %s (depth %d) won't check for user-defined "
@@ -1634,7 +1631,7 @@ MovieClip::constructAsScriptObject()
         dynamic_cast<const sprite_definition*>(_def.get());
 
     // We won't "construct" top-level movies
-    as_function* ctor = def ? def->getRegisteredClass() : 0;
+    as_function* ctor = def ? stage().getRegisteredClass(def) : 0;
 
 #ifdef GNASH_DEBUG
     log_debug(_("Attached movieclips %s registered class is %p"),

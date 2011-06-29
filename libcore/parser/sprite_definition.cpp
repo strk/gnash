@@ -114,22 +114,9 @@ sprite_definition::sprite_definition(movie_definition& m, SWFStream& in,
 	m_movie_def(m),
 	m_frame_count(0),
 	m_loading_frame(0),
-	registeredClass(0),
 	_loadingSoundStream(-1)
 {
 	read(in, runResources);
-}
-
-void
-sprite_definition::registerClass(as_function* the_class)
-{
-	registeredClass = the_class;
-}
-
-void
-sprite_definition::markReachableResources() const
-{
-	if (registeredClass) registeredClass->setReachable();
 }
 
 } // namespace gnash

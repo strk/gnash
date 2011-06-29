@@ -18,22 +18,23 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "Object.h"
+
+#include <string>
+#include <sstream>
+
 #include "Movie.h"
 #include "DisplayObject.h"
 #include "fn_call.h"
-#include "as_object.h" // for inheritance
+#include "as_object.h" 
 #include "NativeFunction.h" 
 #include "movie_definition.h" 
 #include "sprite_definition.h"
 #include "VM.h" 
 #include "namedStrings.h" // for NSV::PROP_TO_STRING
 #include "Global_as.h"
-#include "Object.h"
-
+#include "movie_root.h"
 #include "log.h"
-
-#include <string>
-#include <sstream>
 
 namespace gnash {
 
@@ -266,8 +267,7 @@ object_registerClass(const fn_call& fn)
     }
 
     const std::string& symbolid = fn.arg(0).to_string();
-    if (symbolid.empty())
-    {
+    if (symbolid.empty()) {
         IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss;
             fn.dump_args(ss);
@@ -331,7 +331,8 @@ object_registerClass(const fn_call& fn)
         return as_value(false);
     }
 
-    exp_clipdef->registerClass(theclass);
+    movie_root& mr = getRoot(fn);
+    mr.registerClass(exp_clipdef, theclass);
     return as_value(true);
 }
 

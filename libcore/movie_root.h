@@ -669,6 +669,10 @@ public:
         return _unreleasedKeys;
     }
 
+    void registerClass(const SWF::DefinitionTag* sprite, as_function* cls);
+
+    as_function* getRegisteredClass(const SWF::DefinitionTag* sprite) const;
+
     /// Set a filedescriptor to use for host application requests
     /// (for browser communication mostly)
     void setHostFD(int fd) {
@@ -997,6 +1001,9 @@ private:
     /// interface to the Movie class definition
     Levels _movies;
 
+    typedef std::map<const SWF::DefinitionTag*, as_function*> RegisteredClasses;
+    RegisteredClasses _registeredClasses;
+
     /// The root movie. This is initially the same as getLevel(0) but might
     /// change during the run. It will be used to setup and retrive initial
     /// stage size
@@ -1086,7 +1093,6 @@ movie_root::callInterface(const HostInterface::Message& e) const
         return T();
     }
 }
-
 
 } // namespace gnash
 
