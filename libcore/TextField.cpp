@@ -1030,9 +1030,6 @@ TextField::format_text()
         return;
     }
     
-    LineStarts::iterator linestartit = _line_starts.begin();
-    LineStarts::const_iterator linestartend = _line_starts.end();
-
     AutoSize autoSize = getAutoSize();
     if (autoSize != AUTOSIZE_NONE) {
         // When doing WordWrap we don't want to change
