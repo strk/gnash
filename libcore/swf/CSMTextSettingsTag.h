@@ -20,6 +20,8 @@
 #ifndef GNASH_SWF_CSMTEXTSETTINGSTAG_H
 #define GNASH_SWF_CSMTEXTSETTINGSTAG_H
 
+#include "SWF.h"
+
 // Forward declarations
 namespace gnash {
 	class movie_definition;
@@ -35,7 +37,8 @@ public:
 
 	CSMTextSettingsTag(movie_definition& m, SWFStream& in);
 
-	static void loader(SWFStream& in, TagType tag, movie_definition& m, const RunResources& r);
+	static void loader(SWFStream& in, TagType tag, movie_definition& m,
+            const RunResources& r);
 
 private:
 

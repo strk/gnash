@@ -17,11 +17,15 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "CSMTextSettingsTag.h"
+
+#include <boost/cstdint.hpp>
+
+#include "utility.h"
 #include "RunResources.h"
 #include "log.h"
 #include "SWFStream.h"
 #include "movie_definition.h"
-#include "CSMTextSettingsTag.h"
 
 namespace gnash {
 namespace SWF {
@@ -59,6 +63,7 @@ CSMTextSettingsTag::loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
 
     // Should be 0:
     boost::uint8_t reserved = in.read_uint(3);
+    UNUSED(reserved);
 
     float thickness = in.read_long_float();
     
