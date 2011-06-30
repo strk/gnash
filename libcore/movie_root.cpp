@@ -27,9 +27,7 @@
 #include <bitset>
 #include <cassert>
 #include <functional>
-#include <boost/algorithm/string/erase.hpp>
 #include <boost/algorithm/string/replace.hpp>
-#include <boost/ptr_container/ptr_map.hpp>
 #include <boost/ptr_container/ptr_deque.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/bind.hpp>
@@ -1549,11 +1547,11 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         std::string var = invoke->args[0].to_string();
         as_value val;
         obj->get_member(getURI(vm, var), &val);
-    // GetVariable sends the value of the variable
-    ss << ExternalInterface::toXML(val);
+        // GetVariable sends the value of the variable
+        ss << ExternalInterface::toXML(val);
     } else if (invoke->name == "GotoFrame") {
         log_unimpl("ExternalInterface::GotoFrame()");
-    // GotoFrame doesn't send a response
+        // GotoFrame doesn't send a response
     } else if (invoke->name == "IsPlaying") {
         const bool result = 
             callInterface<bool>(HostMessage(HostMessage::EXTERNALINTERFACE_ISPLAYING));
