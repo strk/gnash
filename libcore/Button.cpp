@@ -1019,6 +1019,7 @@ as_value
 button_blendMode(const fn_call& fn)
 {
     Button* obj = ensure<IsDisplayObject<Button> >(fn);
+    LOG_ONCE(log_unimpl("Button.blendMode"));
     UNUSED(obj);
     return as_value();
 }
@@ -1027,6 +1028,7 @@ as_value
 button_cacheAsBitmap(const fn_call& fn)
 {
     Button* obj = ensure<IsDisplayObject<Button> >(fn);
+    LOG_ONCE(log_unimpl("Button.cacheAsBitmap"));
     UNUSED(obj);
     return as_value();
 }
@@ -1035,6 +1037,7 @@ as_value
 button_filters(const fn_call& fn)
 {
     Button* obj = ensure<IsDisplayObject<Button> >(fn);
+    LOG_ONCE(log_unimpl("Button.filters"));
     UNUSED(obj);
     return as_value();
 }
@@ -1043,6 +1046,7 @@ as_value
 button_scale9Grid(const fn_call& fn)
 {
     Button* obj = ensure<IsDisplayObject<Button> >(fn);
+    LOG_ONCE(log_unimpl("Button.scale9Grid"));
     UNUSED(obj);
     return as_value();
 }
@@ -1051,6 +1055,7 @@ as_value
 button_getTabIndex(const fn_call& fn)
 {
     Button* obj = ensure<IsDisplayObject<Button> >(fn);
+    LOG_ONCE(log_unimpl("Button.getTabIndex"));
     UNUSED(obj);
     return as_value();
 }
@@ -1059,6 +1064,7 @@ as_value
 button_setTabIndex(const fn_call& fn)
 {
     Button* obj = ensure<IsDisplayObject<Button> >(fn);
+    LOG_ONCE(log_unimpl("Button.setTabIndex"));
     UNUSED(obj);
     return as_value();
 }
@@ -1066,7 +1072,9 @@ button_setTabIndex(const fn_call& fn)
 as_value
 button_getDepth(const fn_call& fn)
 {
-    Button* obj = ensure<IsDisplayObject<Button> >(fn);
+    // This does exactly the same as MovieClip.getDepth, but appears to be
+    // a separate function.
+    DisplayObject* obj = ensure<IsDisplayObject<> >(fn);
     return as_value(obj->get_depth());
 }
 
