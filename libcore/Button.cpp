@@ -26,6 +26,7 @@
 
 #include <boost/bind.hpp>
 #include <utility>
+#include <functional>
 
 #include "DefineButtonTag.h"
 #include "as_value.h"
@@ -204,7 +205,8 @@ private:
     as_environment& _env;
 };
 
-class ButtonActionPusher {
+class ButtonActionPusher
+{
 public:
     ButtonActionPusher(movie_root& mr, DisplayObject* this_ptr)
         :
@@ -222,7 +224,8 @@ private:
     DisplayObject* _tp;
 };
 
-class ButtonKeyRegisterer {
+class ButtonKeyRegisterer : public std::unary_function<int, void>
+{
 public:
     ButtonKeyRegisterer(movie_root& mr, Button* this_ptr)
         :
@@ -230,9 +233,9 @@ public:
         _tp(this_ptr)
     {}
 
-    void operator()(const SWF::ButtonAction& b) const
+    void operator()(int code) const
     {
-        _mr.registerButtonKey(b.getKeyCode(), _tp);
+        _mr.registerButtonKey(code, _tp);
     }
 
 private:
@@ -855,7 +858,7 @@ Button::construct(as_object* initObj)
     // Register key events.
     if (_def->hasKeyPressHandler()) {
         ButtonKeyRegisterer r(stage(), this);
-        _def->forEachAction(r);
+        _def->visitKeyCodes(r);
     }
 
 }

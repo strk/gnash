@@ -157,14 +157,14 @@ public:
         return (_conditions & KEYPRESS);
     }
 
+private:
+
     /// Return the keycode triggering this action
     //
     /// Return 0 if no key is supposed to trigger us
     int getKeyCode() const {
         return (_conditions & KEYPRESS) >> 9;
     }
-
-private:
 
     enum Condition
     {
@@ -251,12 +251,15 @@ public:
         }
     }
 
+    /// Invoke a functor for each key code that should trigger an action.
+    //
+    /// Note: the key code is neither ascii nor a key index, but rather a
+    /// special button key code (the SWF column of GnashKey.h).
     template<class E>
-    void forEachAction(E& f) const {
-        for (size_t i = 0, e = _buttonActions.size(); i < e; ++i) {
-            const ButtonAction& ba = _buttonActions[i];
-            f(ba);
-        }
+    void visitKeyCodes(E& f) const {
+        std::for_each(_buttonActions.begin(), _buttonActions.end(),
+            boost::bind(f, boost::bind(
+                    boost::mem_fn(&ButtonAction::getKeyCode), _1)));
     }
     
 private:

@@ -391,6 +391,12 @@ public:
     }
 
     /// Push a new DisplayObject listener for key events
+    //
+    /// Each button can register several events for its actions. Only one
+    /// event can be registered for each key. The key code is unique to
+    /// Buttons: it is neither ascii nor the key-specific code.
+    //
+    /// @param c    The SWF key code for the button event.
     void registerButtonKey(int c, Button* listener);
 
     /// Remove a DisplayObject listener for key events

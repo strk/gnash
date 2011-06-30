@@ -926,8 +926,6 @@ movie_root::timeToNextFrame() const
 void
 movie_root::display()
 {
-//    GNASH_REPORT_FUNCTION;
-
     assert(testInvariant());
 
     clearInvalidated();
@@ -1797,7 +1795,6 @@ std::string
 movie_root::callExternalJavascript(const std::string &name, 
                                    const std::vector<as_value> &fnargs)
 {
-    // GNASH_REPORT_FUNCTION;
     std::string result;
     // If the browser is connected, we send an Invoke message to the
     // browser.
@@ -1824,7 +1821,6 @@ std::string
 movie_root::callExternalCallback(const std::string &name, 
                  const std::vector<as_value> &fnargs)
 {
-    // GNASH_REPORT_FUNCTION;
 
     MovieClip *mc = getLevel(0);
     as_object *obj = getObject(mc);
@@ -1875,8 +1871,6 @@ movie_root::callExternalCallback(const std::string &name,
 void
 movie_root::removeButtonKey(Button* listener)
 {
-    GNASH_REPORT_FUNCTION;
-
     // Remove the button and the key associated with it from the map.
     for (ButtonKeys::iterator i = _buttonKeys.begin(), e = _buttonKeys.end();
             i != e;) {
@@ -1891,15 +1885,12 @@ movie_root::removeButtonKey(Button* listener)
 void
 movie_root::registerButtonKey(int code, Button* listener)
 {
-    log_debug("Adding listener for code %s", +code);
-
     const size_t frame = _rootMovie->get_current_frame();
-    ButtonKeys::iterator it = _buttonKeys.find(code);
+    ButtonKeys::const_iterator it = _buttonKeys.find(code);
 
     if (it != _buttonKeys.end() && it->second.second < frame) {
         return;
     }
-
     _buttonKeys[code] = std::make_pair(listener, frame);
 }
 
