@@ -173,8 +173,8 @@ main(int argc, char **argv)
             "   check_equals(props(), 'instance' + c++);"
             "};"
             );
-                   
-    //add_actions(mo, "onEnterFrame = function() { props(); trace (s); };");
+             
+    check_equals(mo, "square1.button.getDepth()", "-16383");
     add_actions(mo, "stop();");
 	SWFMovie_nextFrame(mo); /* showFrame */
 

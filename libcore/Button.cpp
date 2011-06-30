@@ -1067,8 +1067,7 @@ as_value
 button_getDepth(const fn_call& fn)
 {
     Button* obj = ensure<IsDisplayObject<Button> >(fn);
-    UNUSED(obj);
-    return as_value();
+    return as_value(obj->get_depth());
 }
 
 } // anonymous namespace
