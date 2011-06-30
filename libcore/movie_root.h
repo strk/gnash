@@ -669,8 +669,18 @@ public:
         return _unreleasedKeys;
     }
 
+    /// Register an actionscript class for construction of a MovieClip
+    //
+    /// @param sprite   The definition tag for the MovieClip to be placed on
+    ///                 stage
+    /// @param class    The ActionScript class to be used in construction.
     void registerClass(const SWF::DefinitionTag* sprite, as_function* cls);
 
+    /// Get the actionscript class for constructing a MovieClip
+    //
+    /// @param sprite   The definition tag for the MovieClip to be placed on
+    ///                 stage
+    /// @return         The class to be used, or 0 if no class is associated.
     as_function* getRegisteredClass(const SWF::DefinitionTag* sprite) const;
 
     /// Set a filedescriptor to use for host application requests
