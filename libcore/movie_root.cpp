@@ -623,11 +623,7 @@ movie_root::keyEvent(key::code k, bool down)
         if (ch->unloaded()) continue;
 
         if (down) {
-            ch->notifyEvent(event_id(event_id::KEY_DOWN, key::INVALID)); 
             ch->notifyEvent(event_id(event_id::KEY_PRESS, k));
-        }
-        else {
-            ch->notifyEvent(event_id(event_id::KEY_UP, key::INVALID));   
         }
     }
 
