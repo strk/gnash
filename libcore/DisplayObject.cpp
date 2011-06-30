@@ -25,8 +25,6 @@
 #include "DisplayObject.h"
 
 #include <utility>
-#include <boost/tuple/tuple.hpp>
-#include <boost/algorithm/string/case_conv.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/bind.hpp>
 #include <boost/logic/tribool.hpp>
