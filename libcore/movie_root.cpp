@@ -619,15 +619,17 @@ movie_root::keyEvent(key::code k, bool down)
         ButtonKeys::const_iterator it =
             _buttonKeys.find(key::codeMap[k][key::SWF]);
 
+        // TODO: this searches through all ButtonActions for the correct
+        // one, even though we could easily know which one it's going to be
+        // because we search through them all to register the key codes.
         if (it != _buttonKeys.end()) {
             if (!it->second.first->unloaded()) {
-                it->second.first->notifyEvent(event_id(event_id::KEY_PRESS, k));
+                it->second.first->keyPress(event_id(event_id::KEY_PRESS, k));
             }
         }
-    }
 
-    // If we're focused on an editable text field, finally the text is updated
-    if (down) {
+        // If we're focused on an editable text field, finally the text
+        // is updated
         TextField* tf = dynamic_cast<TextField*>(_currentFocus);
         if (tf) tf->notifyEvent(event_id(event_id::KEY_PRESS, k));
     }

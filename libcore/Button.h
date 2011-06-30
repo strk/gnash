@@ -86,7 +86,7 @@ public:
     virtual bool trackAsMenu();
 
 	// called from keypress listener only
-	void notifyEvent(const event_id& id);
+	void keyPress(const event_id& id);
 
     /// Render this Button.
 	virtual void display(Renderer& renderer, const Transform& xform);

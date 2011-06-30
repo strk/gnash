@@ -354,7 +354,7 @@ Button::isEnabled()
 
 
 void
-Button::notifyEvent(const event_id& id)
+Button::keyPress(const event_id& id)
 {
     if (unloaded()) {
         // We don't respond to events while unloaded
