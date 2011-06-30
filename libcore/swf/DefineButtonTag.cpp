@@ -386,10 +386,10 @@ ButtonRecord::read(SWFStream& in, TagType t,
         return false;
     }
     in.ensureBytes(2);
-    _id = in.read_u16();
+    const boost::uint16_t id = in.read_u16();
 
     // Get DisplayObject definition now (safer)
-    _definitionTag = m.getDefinitionTag(_id);
+    _definitionTag = m.getDefinitionTag(id);
 
     // If no DisplayObject with given ID is found in the movie
     // definition, we print an error, but keep parsing.
@@ -397,18 +397,18 @@ ButtonRecord::read(SWFStream& in, TagType t,
         IF_VERBOSE_MALFORMED_SWF(
         log_swferror(_("   button record for states [%s] refer to "
             "DisplayObject with id %d, which is not found "
-            "in the chars dictionary"), computeButtonStatesString(flags), _id);
+            "in the chars dictionary"), computeButtonStatesString(flags), id);
         );
     }
     else {
         IF_VERBOSE_PARSE(
         log_parse(_("   button record for states [%s] contain "
             "DisplayObject %d (%s)"), computeButtonStatesString(flags),
-            _id, typeName(*_definitionTag));
+            id, typeName(*_definitionTag));
         );
     }
 
-    if (in.tell()+2 > endPos) {
+    if (in.tell() + 2 > endPos) {
         IF_VERBOSE_MALFORMED_SWF(
         log_swferror(_("   premature end of button record input stream, "
                 "can't read button layer (depth?)"));

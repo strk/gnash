@@ -119,10 +119,9 @@ private:
     bool _down;
     bool _over;
     bool _up;
-    int    _id;
 
-    // This is a GC resource, so not owned by anyone.
-    const DefinitionTag* _definitionTag;
+    // This is a ref-counted resource, so not owned by anyone.
+    boost::intrusive_ptr<const DefinitionTag> _definitionTag;
 
     int _buttonLayer;
 
@@ -167,7 +166,7 @@ public:
 
 private:
 
-    enum condition
+    enum Condition
     {
         IDLE_TO_OVER_UP = 1 << 0,
         OVER_UP_TO_IDLE = 1 << 1,
@@ -180,7 +179,8 @@ private:
         OVER_DOWN_TO_IDLE = 1 << 8,
         KEYPRESS = 0xFE00  // highest 7 bits
     };
-    int _conditions;
+
+    boost::uint16_t _conditions;
 
 };
 
