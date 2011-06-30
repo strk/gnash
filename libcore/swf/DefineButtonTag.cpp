@@ -297,8 +297,7 @@ ButtonAction::ButtonAction(SWFStream& in, TagType t, unsigned long endPos,
 bool
 ButtonAction::triggeredBy(const event_id& ev) const
 {
-    switch ( ev.id() )
-    {
+    switch (ev.id()) {
         case event_id::ROLL_OVER: return _conditions & IDLE_TO_OVER_UP;
         case event_id::ROLL_OUT: return _conditions & OVER_UP_TO_IDLE;
         case event_id::PRESS: return _conditions & OVER_UP_TO_OVER_DOWN;
@@ -309,7 +308,7 @@ ButtonAction::triggeredBy(const event_id& ev) const
         case event_id::KEY_PRESS:
         {
             int keycode = getKeyCode();
-            if (! keycode) return false; // not a keypress event
+            if (!keycode) return false; // not a keypress event
             return key::codeMap[ev.keyCode()][key::SWF] == keycode;
         }
         default: return false;

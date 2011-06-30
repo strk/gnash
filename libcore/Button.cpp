@@ -222,6 +222,24 @@ private:
     DisplayObject* _tp;
 };
 
+class ButtonKeyRegisterer {
+public:
+    ButtonKeyRegisterer(movie_root& mr, Button* this_ptr)
+        :
+        _mr(mr),
+        _tp(this_ptr)
+    {}
+
+    void operator()(const SWF::ButtonAction& b) const
+    {
+        _mr.registerButtonKey(b.getKeyCode(), _tp);
+    }
+
+private:
+    movie_root& _mr;
+    Button* _tp;
+};
+
 }
 
 namespace {
@@ -294,17 +312,10 @@ Button::Button(as_object* object, const SWF::DefineButtonTag* def,
     _def(def)
 {
     assert(object);
-
-    // check up presence Key events
-    if (_def->hasKeyPressHandler()) {
-        stage().add_key_listener(this);
-    }
-
 }
 
 Button::~Button()
 {
-    stage().remove_key_listener(this);
 }
 
 bool
@@ -343,23 +354,21 @@ void
 Button::notifyEvent(const event_id& id)
 {
     if (unloaded()) {
-        // We dont' respond to events while unloaded
+        // We don't respond to events while unloaded
         // See bug #22982
         return; 
     }
 
-    // We only respond keypress events
-    if ( id.id() != event_id::KEY_PRESS ) return;
-
-    // We only respond to valid key code (should we assert here?)
-    if ( id.keyCode() == key::INVALID ) return;
+    assert(id.id() == event_id::KEY_PRESS);
+    assert(id.keyCode() != key::INVALID);
 
     ButtonActionPusher xec(stage(), this); 
     _def->forEachTrigger(id, xec);
 }
 
 bool
-Button::handleFocus() {
+Button::handleFocus()
+{
     /// Nothing to do, but can receive focus.
     return false;
 }
@@ -454,8 +463,7 @@ Button::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 void
 Button::mouseEvent(const event_id& event)
 {
-    if ( unloaded() )
-    {
+    if (unloaded()) {
         // We don't respond to events while unloaded. See bug #22982.
         log_debug("Button %s received %s button event while unloaded: ignored",
             getTarget(), event);
@@ -843,6 +851,13 @@ Button::construct(as_object* initObj)
 
     // There is no INITIALIZE/CONSTRUCT/LOAD/ENTERFRAME/UNLOAD event 
     // for Buttons
+
+    // Register key events.
+    if (_def->hasKeyPressHandler()) {
+        ButtonKeyRegisterer r(stage(), this);
+        _def->forEachAction(r);
+    }
+
 }
 
 void
@@ -866,6 +881,7 @@ Button::markOwnResources() const
 bool
 Button::unloadChildren()
 {
+    GNASH_REPORT_FUNCTION;
 
     bool childsHaveUnload = false;
 
@@ -893,6 +909,9 @@ Button::unloadChildren()
 void
 Button::destroy()
 {
+    GNASH_REPORT_FUNCTION;
+
+    stage().removeButtonKey(this);
 
     for (DisplayObjects::iterator i = _stateCharacters.begin(),
             e=_stateCharacters.end(); i != e; ++i) {

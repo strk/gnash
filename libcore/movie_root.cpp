@@ -518,8 +518,8 @@ movie_root::reset()
     // remove all loadMovie requests
     _movieLoader.clear();
 
-    // remove key listeners
-    _keyListeners.clear();
+    // Remove button key events.
+    _buttonKeys.clear();
 
     // Cleanup the stack.
     _vm.getStack().clear();
@@ -600,10 +600,12 @@ movie_root::keyEvent(key::code k, bool down)
             // A stack limit like that is hardly of any use, but could be used
             // maliciously to crash Gnash.
             if (down) {
-                callMethod(key, getURI(_vm, NSV::PROP_BROADCAST_MESSAGE), "onKeyDown");
+                callMethod(key, getURI(_vm, NSV::PROP_BROADCAST_MESSAGE),
+                        "onKeyDown");
             }
             else {
-                callMethod(key, getURI(_vm,NSV::PROP_BROADCAST_MESSAGE), "onKeyUp");
+                callMethod(key, getURI(_vm,NSV::PROP_BROADCAST_MESSAGE),
+                        "onKeyUp");
             }
         }
         catch (const ActionLimitException &e) {
@@ -613,20 +615,16 @@ movie_root::keyEvent(key::code k, bool down)
         }
     }
     
-    // Then any button keys are notified.
-    Listeners lcopy = _keyListeners;
-    for (Listeners::iterator iter = lcopy.begin(), itEnd = lcopy.end();
-            iter != itEnd; ++iter) {
+    if (down) {
+        ButtonKeys::const_iterator it =
+            _buttonKeys.find(key::codeMap[k][key::SWF]);
 
-        // sprite, button & input_edit_text DisplayObjects
-        Button* const ch = *iter;
-        if (ch->unloaded()) continue;
-
-        if (down) {
-            ch->notifyEvent(event_id(event_id::KEY_PRESS, k));
+        if (it != _buttonKeys.end()) {
+            if (!it->second.first->unloaded()) {
+                it->second.first->notifyEvent(event_id(event_id::KEY_PRESS, k));
+            }
         }
     }
-
 
     // If we're focused on an editable text field, finally the text is updated
     if (down) {
@@ -1728,17 +1726,6 @@ movie_root::markReachableResources() const
     }
 #endif
     
-#if ( GNASH_PARANOIA_LEVEL > 1 ) || defined(ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION)
-    for (Listeners::const_iterator i=_keyListeners.begin(),
-            e=_keyListeners.end(); i!=e; ++i) {
-#ifdef ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION
-        (*i)->setReachable();
-#else
-        assert((*i)->isReachable());
-#endif
-    }
-#endif
-
 }
 
 InteractiveObject*
@@ -1886,20 +1873,34 @@ movie_root::callExternalCallback(const std::string &name,
 }
 
 void
-movie_root::remove_key_listener(Button* listener)
+movie_root::removeButtonKey(Button* listener)
 {
-    _keyListeners.remove_if(std::bind2nd(std::equal_to<Button*>(), listener));
+    GNASH_REPORT_FUNCTION;
+
+    // Remove the button and the key associated with it from the map.
+    for (ButtonKeys::iterator i = _buttonKeys.begin(), e = _buttonKeys.end();
+            i != e;) {
+        if (i->second.first == listener) {
+            _buttonKeys.erase(i++);
+        }
+        else ++i;
+    }
+
 }
 
 void
-movie_root::add_key_listener(Button* listener)
+movie_root::registerButtonKey(int code, Button* listener)
 {
-    assert(listener);
+    log_debug("Adding listener for code %s", +code);
 
-    if (std::find(_keyListeners.begin(), _keyListeners.end(), listener)
-            != _keyListeners.end()) return;
+    const size_t frame = _rootMovie->get_current_frame();
+    ButtonKeys::iterator it = _buttonKeys.find(code);
 
-    _keyListeners.push_front(listener);
+    if (it != _buttonKeys.end() && it->second.second < frame) {
+        return;
+    }
+
+    _buttonKeys[code] = std::make_pair(listener, frame);
 }
 
 void

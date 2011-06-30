@@ -150,9 +150,6 @@ class DSOEXPORT movie_root : public GcRoot, boost::noncopyable
 {
 public:
     
-    /// Listeners container
-    typedef std::list<Button*> Listeners;
-
     class LoadCallback {
     public:
         LoadCallback(boost::shared_ptr<IOChannel> s, as_object* o)
@@ -394,10 +391,10 @@ public:
     }
 
     /// Push a new DisplayObject listener for key events
-    void add_key_listener(Button* listener);
+    void registerButtonKey(int c, Button* listener);
 
     /// Remove a DisplayObject listener for key events
-    void remove_key_listener(Button* listener);
+    void removeButtonKey(Button* listener);
 
     /// Get the DisplayObject having focus
     //
@@ -566,9 +563,7 @@ public:
     /// - Mouse entities (m_mouse_button_state)
     /// - Timer targets (_intervalTimers)
     /// - Resources reachable by ActionQueue code (_actionQueue)
-    /// - Key listeners (_keyListeners)
     /// - Any DisplayObject being dragged 
-    ///
     void markReachableResources() const;
 
     /// \brief
@@ -927,15 +922,13 @@ private:
 
     void handleActionLimitHit(const std::string& ref);
 
-    /// Buttons listening for key events
+    /// A map of SWF key code to Buttons.
     //
-    /// Note that Buttons (the only key listeners left) deregister themselves
-    /// on destruction. This isn't correct behaviour and also requires that
-    /// _keyListeners be alive longer than _gc so that deregistration doesn't
-    /// access a destroyed object.
-    //
-    /// TODO: fix it.
-    Listeners _keyListeners;
+    /// The Buttons are removed on destruction, so there is no need to
+    /// mark them reachable.
+    typedef std::pair<Button*, size_t> ButtonFrame;
+    typedef std::map<int, ButtonFrame> ButtonKeys;
+    ButtonKeys _buttonKeys;
 
     GC _gc;
 

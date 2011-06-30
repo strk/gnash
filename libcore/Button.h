@@ -120,8 +120,7 @@ public:
 
     /// Do ActionScript construction of the Button.
     //
-    /// (1) Register this button instance as a live DisplayObject
-    /// (2) Construct all button state DisplayObjects.
+    /// Construct all button state DisplayObjects.
     //
     /// @param init     An init object, which can be passed when constructing
     ///                 Buttons with attachMovie, but is never used.

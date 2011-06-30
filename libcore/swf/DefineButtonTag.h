@@ -158,14 +158,14 @@ public:
         return (_conditions & KEYPRESS);
     }
 
-private:
-
     /// Return the keycode triggering this action
     //
     /// Return 0 if no key is supposed to trigger us
     int getKeyCode() const {
         return (_conditions & KEYPRESS) >> 9;
     }
+
+private:
 
     enum condition
     {
@@ -248,6 +248,14 @@ public:
         for (size_t i = 0, e = _buttonActions.size(); i < e; ++i) {
             const ButtonAction& ba = _buttonActions[i];
             if (ba.triggeredBy(ev)) f(ba._actions);
+        }
+    }
+
+    template<class E>
+    void forEachAction(E& f) const {
+        for (size_t i = 0, e = _buttonActions.size(); i < e; ++i) {
+            const ButtonAction& ba = _buttonActions[i];
+            f(ba);
         }
     }
     
