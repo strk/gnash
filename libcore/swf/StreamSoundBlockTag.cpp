@@ -76,25 +76,25 @@ StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     }
 
     media::audioCodecType format = sinfo->getFormat();
-    unsigned int sampleCount = sinfo->getSampleCount();
+
+    boost::uint16_t sampleCount;
 
     // MP3 format blocks have additional info
     if (format == media::AUDIO_CODEC_MP3) {
         in.ensureBytes(4);
-        // FIXME: use these values !
-        const boost::uint16_t samplesCount = in.read_u16();
-        UNUSED(samplesCount);
+
+        // MP3 blocks have restrictions on the number of samples they can
+        // contain (due to the codec), so have a variable number of samples
+        // per block.
+        sampleCount = in.read_u16();
         const boost::uint16_t seekSamples = in.read_u16();
 
-        if (samplesCount) {
-            LOG_ONCE(log_unimpl(_("MP3 soundblock samples count (%s)"),
-                        samplesCount));
-        }
         if (seekSamples) {
             LOG_ONCE(log_unimpl(_("MP3 soundblock seek samples (%s)"),
                         seekSamples));
         }
     }
+    else sampleCount = sinfo->getSampleCount();
 
     const unsigned int dataLength = in.get_tag_end_position() - in.tell();
     if (!dataLength) {
