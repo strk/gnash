@@ -198,7 +198,13 @@ public:
 
     /// Start playback of a streaming sound, if not playing already
     //
-    ///
+    /// TODO: the samples count in the stream sound head (stored in a SoundInfo
+    /// object) should drive the timeline while a stream is playing.
+    //
+    /// TODO: only the number of samples advertised in each stream block should
+    /// be played for mp3 sounds, not the complete data! Currently we don't
+    /// store this value.
+    //
     /// @param streamId
     ///     Id of the sound buffer slot schedule playback of.
     ///     It is assumed to refer to a straming sound

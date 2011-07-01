@@ -118,6 +118,10 @@ StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     // for later "start playing from this frame" events.
     //
     // ownership of 'data' is transferred here
+    //
+    // TODO: the amount of sound data used should depend on the sampleCount,
+    // not on the size of the data. Currently the sound_handler ignores
+    // sampleCount completely.
     sound::sound_handler::StreamBlockId blockId =
         handler->addSoundBlock(data, dataLength, sampleCount, sId);
 
