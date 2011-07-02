@@ -19,6 +19,18 @@
 //
 
 #include "as_value.h"
+
+#include <boost/shared_ptr.hpp>
+#include <cmath> 
+#include <cctype> 
+#include <boost/lexical_cast.hpp>
+#include <boost/format.hpp>
+#include <locale>
+#include <sstream>
+#include <iomanip>
+#include <string>
+#include <algorithm>
+
 #include "as_object.h"
 #include "as_function.h" // for as_function
 #include "MovieClip.h" // for DISPLAYOBJECT values
@@ -37,18 +49,6 @@
 #include "Global_as.h"
 #include "String_as.h"
 #include "AMFConverter.h"
-
-#include <boost/shared_ptr.hpp>
-#include <cmath> 
-#include <cctype> 
-#include <boost/algorithm/string/case_conv.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/format.hpp>
-#include <locale>
-#include <sstream>
-#include <iomanip>
-#include <string>
-#include <algorithm>
 
 // Define the macro below to make abstract equality operator verbose
 //#define GNASH_DEBUG_EQUALITY 1
