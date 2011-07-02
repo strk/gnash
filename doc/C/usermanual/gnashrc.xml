@@ -26,6 +26,8 @@
     The variables in the <filename>.gnashrc</filename> file support
     three types of arguments: on/off, numeric values, or in the case
     of the whitelist and blacklist, a list of hostnames as ASCII text. 
+    User configuration variables in <filename>.gnashrc</filename> are
+    case-insensitive.
   </para>
   
   <table id="tb-config-variables">
