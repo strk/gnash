@@ -104,7 +104,9 @@ public:
                                        int streamId);
 
     // See dox in sound_handler.h
-    virtual void    stop_sound(int sound_handle);
+    virtual void stopEventSound(int sound_handle);
+
+    virtual void stopStreamingSound(int sound_handle);
 
     // See dox in sound_handler.h
     virtual void    delete_sound(int sound_handle);

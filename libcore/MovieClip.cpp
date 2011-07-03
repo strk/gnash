@@ -2044,7 +2044,7 @@ MovieClip::stopStreamSound()
 
     sound::sound_handler* handler = getRunResources(*getObject(this)).soundHandler();
     if (handler) {
-        handler->stop_sound(m_sound_stream_id);
+        handler->stopStreamingSound(m_sound_stream_id);
     }
 
     m_sound_stream_id = -1;

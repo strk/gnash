@@ -737,10 +737,10 @@ Sound_as::stop(int si)
                 _inputStream=0;
             }
         } else {
-            _soundHandler->stop_sound(soundId);
+            _soundHandler->stopEventSound(soundId);
         }
     } else {
-        _soundHandler->stop_sound(si);
+        _soundHandler->stopEventSound(si);
     }
 }
 

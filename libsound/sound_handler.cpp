@@ -184,7 +184,13 @@ sound_handler::get_sound_info(int sound_handle) const
 }
 
 void
-sound_handler::stop_sound(int sound_handle)
+sound_handler::stopStreamingSound(int handle)
+{
+    stopEventSound(handle);
+}
+
+void
+sound_handler::stopEventSound(int sound_handle)
 {
     // Check if the sound exists.
     if (sound_handle < 0 || (unsigned int) sound_handle >= _sounds.size())

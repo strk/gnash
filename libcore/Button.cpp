@@ -547,7 +547,7 @@ Button::mouseEvent(const event_id& event)
         if (!bs.sample) break;
 
         if (bs.soundInfo.stopPlayback) {
-            s->stop_sound(bs.sample->m_sound_handler_id);
+            s->stopEventSound(bs.sample->m_sound_handler_id);
         }
         else {
             const SWF::SoundInfoRecord& sinfo = bs.soundInfo;

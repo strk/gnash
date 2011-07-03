@@ -154,10 +154,17 @@ SDL_sound_handler::addSoundBlock(unsigned char* data,
 
 
 void
-SDL_sound_handler::stop_sound(int soundHandle)
+SDL_sound_handler::stopEventSound(int soundHandle)
 {
     boost::mutex::scoped_lock lock(_mutex);
-    sound_handler::stop_sound(soundHandle);
+    sound_handler::stopEventSound(soundHandle);
+}
+
+void
+SDL_sound_handler::stopStreamingSound(int soundHandle)
+{
+    boost::mutex::scoped_lock lock(_mutex);
+    sound_handler::stopStreamingSound(soundHandle);
 }
 
 

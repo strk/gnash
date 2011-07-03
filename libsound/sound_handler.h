@@ -123,6 +123,10 @@ public:
     //
     /// This applies both to streaming and event sounds.
     virtual void stop_all_sounds();
+
+    ////////////////////////////////////////////////
+    /// Event sound functions:
+    ////////////////////////////////////////////////
         
     /// Remove scheduled requests to play the specified sound buffer slot
     //
@@ -136,11 +140,7 @@ public:
     //
     /// @param sound_handle
     /// The sound_handlers id for the sound to be deleted
-    virtual void stop_sound(int sound_handle);
-
-    ////////////////////////////////////////////////
-    /// Event sound functions:
-    ////////////////////////////////////////////////
+    virtual void stopEventSound(int sound_handle);
 
     /// Discard the sound data for an event sound
     //
@@ -219,6 +219,12 @@ public:
     ////////////////////////////////////////////////
     /// Streaming sound functions:
     ////////////////////////////////////////////////
+
+    /// Remove scheduled requests to play the specified sound buffer slot
+    //
+    /// @param sound_handle     The sound_handlers id for the sound to be
+    ///                         stopped.
+    virtual void stopStreamingSound(int sound_handle);
 
     /// Append data for a streaming sound.
     ///
