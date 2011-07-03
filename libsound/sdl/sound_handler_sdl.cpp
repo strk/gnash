@@ -133,6 +133,12 @@ SDL_sound_handler::~SDL_sound_handler()
 
 }
 
+int
+SDL_sound_handler::createStreamingSound(const media::SoundInfo& sinfo)
+{
+    boost::mutex::scoped_lock lock(_mutex);
+    return sound_handler::createStreamingSound(sinfo);
+}
 
 int
 SDL_sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,

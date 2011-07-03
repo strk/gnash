@@ -119,6 +119,8 @@ public:
     virtual int create_sound(std::auto_ptr<SimpleBuffer> data,
             const media::SoundInfo& sinfo);
 
+    virtual int createStreamingSound(const media::SoundInfo& sinfo);
+
     /// Remove all scheduled request for playback of sound buffer slots
     //
     /// This applies both to streaming and event sounds.

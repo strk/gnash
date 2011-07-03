@@ -36,7 +36,8 @@
 
 namespace {
 
-unsigned int silentStream(void*, boost::int16_t* stream, unsigned int len, bool& atEOF)
+unsigned int
+silentStream(void*, boost::int16_t* stream, unsigned int len, bool& atEOF)
 {
     std::fill(stream, stream+len, 0);
     atEOF=false;
@@ -44,7 +45,6 @@ unsigned int silentStream(void*, boost::int16_t* stream, unsigned int len, bool&
 }
 
 }
-
 
 namespace gnash {
 namespace sound {
@@ -56,7 +56,7 @@ sound_handler::addSoundBlock(unsigned char* data,
 {
     // @@ does a negative handle_id have any meaning ?
     //    should we change it to unsigned instead ?
-    if (handleId < 0 || (unsigned int) handleId+1 > _sounds.size())
+    if (handleId < 0 || (unsigned int) handleId+1 > _streamingSounds.size())
     {
         log_error("Invalid (%d) sound_handle passed to fill_stream_data, "
                   "doing nothing", handleId);
@@ -64,9 +64,8 @@ sound_handler::addSoundBlock(unsigned char* data,
         return -1;
     }
 
-    EmbedSound* sounddata = _sounds[handleId];
-    if ( ! sounddata )
-    {
+    EmbedSound* sounddata = _streamingSounds[handleId];
+    if (!sounddata) {
         log_error("sound_handle passed to fill_stream_data (%d) "
                   "was deleted", handleId);
         return -1;
@@ -101,6 +100,22 @@ sound_handler::delete_all_sounds()
         delete sdef; 
     }
     _sounds.clear();
+
+    for (Sounds::iterator i = _streamingSounds.begin(),
+                          e = _streamingSounds.end(); i != e; ++i)
+    {
+        EmbedSound* sdef = *i;
+
+        // Streaming sounds are never deleted.
+        assert(sdef);
+
+        stopEmbedSoundInstances(*sdef);
+        assert(!sdef->numPlayingInstances());
+
+        delete sdef; 
+    }
+    _streamingSounds.clear();
+
 }
 
 void
@@ -142,6 +157,14 @@ sound_handler::stop_all_sounds()
         if ( ! sounddata ) continue; // could have been deleted already
         stopEmbedSoundInstances(*sounddata);
     }
+
+    for (Sounds::iterator i = _streamingSounds.begin(),
+                          e = _streamingSounds.end(); i != e; ++i)
+    {
+        EmbedSound* sounddata = *i;
+        if ( ! sounddata ) continue; 
+        stopEmbedSoundInstances(*sounddata);
+    }
 }
 
 int
@@ -176,9 +199,10 @@ media::SoundInfo*
 sound_handler::get_sound_info(int sound_handle) const
 {
     // Check if the sound exists.
-    if (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < _sounds.size())
+    if (sound_handle >= 0 &&
+            static_cast<size_t>(sound_handle) < _streamingSounds.size())
     {
-        return &_sounds[sound_handle]->soundinfo;
+        return &_streamingSounds[sound_handle]->soundinfo;
     } 
     return NULL;
 }
@@ -186,30 +210,40 @@ sound_handler::get_sound_info(int sound_handle) const
 void
 sound_handler::stopStreamingSound(int handle)
 {
-    stopEventSound(handle);
-}
-
-void
-sound_handler::stopEventSound(int sound_handle)
-{
     // Check if the sound exists.
-    if (sound_handle < 0 || (unsigned int) sound_handle >= _sounds.size())
+    if (handle < 0 || (size_t)handle >= _streamingSounds.size())
     {
-        log_debug("stop_sound(%d): invalid sound id", sound_handle);
+        log_debug("stop_sound(%d): invalid sound id", handle);
         // Invalid handle.
         return;
     }
 
     
-    EmbedSound* sounddata = _sounds[sound_handle];
-    if ( ! sounddata )
-    {
-        log_error("stop_sound(%d): sound was deleted", sound_handle);
+    EmbedSound* sounddata = _streamingSounds[handle];
+    assert(sounddata);
+
+    stopEmbedSoundInstances(*sounddata);
+}
+
+void
+sound_handler::stopEventSound(int handle)
+{
+    // Check if the sound exists.
+    if (handle < 0 || (unsigned int) handle >= _sounds.size()) {
+        log_debug("stop_sound(%d): invalid sound id", handle);
+        // Invalid handle.
+        return;
+    }
+
+    
+    EmbedSound* sounddata = _sounds[handle];
+    if (!sounddata) {
+        log_error("stop_sound(%d): sound was deleted", handle);
         return;
     }
 
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
-    log_debug("stop_sound %d called", sound_handle);
+    log_debug("stop_sound %d called", handle);
 #endif
 
     stopEmbedSoundInstances(*sounddata);
@@ -319,6 +353,21 @@ sound_handler::get_duration(int sound_handle) const
         return ret;
     } 
     return 0;
+}
+
+int
+sound_handler::createStreamingSound(const media::SoundInfo& sinfo)
+{
+    std::auto_ptr<SimpleBuffer> b;
+    std::auto_ptr<EmbedSound> sounddata(
+            new EmbedSound(b, sinfo, 100,
+                _mediaHandler ? _mediaHandler->getInputPaddingSize() : 0));
+
+    int sound_id = _streamingSounds.size();
+    // the vector takes ownership
+    _streamingSounds.push_back(sounddata.release());
+
+    return sound_id;
 }
 
 int
@@ -466,7 +515,8 @@ sound_handler::playStream(int soundId, StreamBlockId blockId)
     unsigned int inPoint=0;
     unsigned int outPoint=std::numeric_limits<unsigned int>::max();
 
-    playSound(*_sounds[soundId], 0, inPoint, outPoint, blockId, 0, false);
+    playSound(*_streamingSounds[soundId], 0, inPoint, outPoint, blockId, 0,
+            false);
 }
 
 /*public*/
@@ -692,7 +742,7 @@ sound_handler::unplugCompletedInputStreams()
             delete is;
 
             // Increment number of sound stop request for the testing framework
-            _soundsStopped++;
+            ++_soundsStopped;
         }
         else
         {

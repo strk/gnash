@@ -92,6 +92,8 @@ public:
 
     ~SDL_sound_handler();
 
+    virtual int createStreamingSound(const media::SoundInfo& sinfo);
+
     // See dox in sound_handler.h
     virtual int create_sound(std::auto_ptr<SimpleBuffer> data,
             const media::SoundInfo& sinfo);

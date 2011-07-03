@@ -153,8 +153,7 @@ SoundStreamHeadTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 
     // Stores the sounddata in the soundhandler, and the ID returned
     // can be used to starting, stopping and deleting that sound
-    const int handler_id =
-        handler->create_sound(std::auto_ptr<SimpleBuffer>(0), sinfo);
+    const int handler_id = handler->createStreamingSound(sinfo);
 
     m.set_loading_sound_stream_id(handler_id);
 }
