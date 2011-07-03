@@ -311,7 +311,6 @@ EmbedSoundInst::decodeNextBlock()
     // If the volume needs adjustments we call a function to do that (why are we doing this manually ?)
     if (_soundDef.volume != 100) // volume is a private member
     {
-        // TODO: have adjust_volume take samples, not bytes
         adjustVolume(samples, samples + nSamples, _soundDef.volume/100.0);
     }
 
@@ -321,7 +320,6 @@ EmbedSoundInst::decodeNextBlock()
     {
         unsigned int firstSample = playbackPosition/2;
 
-        // TODO: have applyEnvelopes take samples, not bytes
         applyEnvelopes(samples, nSamples, firstSample, *envelopes);
     }
 
