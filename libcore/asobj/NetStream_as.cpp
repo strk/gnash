@@ -43,6 +43,7 @@
 #include "sound_handler.h"
 #include "AMFConverter.h"
 #include "AMF.h"
+#include "SoundUtils.h"
 
 // Define the following macro to have status notification handling debugged
 //#define GNASH_DEBUG_STATUS
@@ -73,13 +74,6 @@ namespace {
     as_value netstream_send(const fn_call& fn);
 
     void attachNetStreamInterface(as_object& o);
-
-    /// Transform the volume by the requested amount
-    //
-    /// @param data     The data to transform
-    /// @param size     The length of the array
-    /// @param volume   The volume in percent.
-    void adjustVolume(boost::int16_t* data, size_t size, int volume);
 
     // TODO: see where this can be done more centrally.
     void executeTag(const SimpleBuffer& _buffer, as_object& thisPtr);
@@ -682,8 +676,9 @@ NetStream_as::decodeNextAudioFrame()
                 // NOTE: adjust_volume assumes samples 
                 // are 16 bits in size, and signed.
                 // Size is still given in bytes..
-                adjustVolume(reinterpret_cast<boost::int16_t*>(raw->m_data),
-                        raw->m_size / 2, vol);
+                boost::int16_t* const start =
+                    reinterpret_cast<boost::int16_t*>(raw->m_data);
+                sound::adjustVolume(start, start + raw->m_size / 2, vol);
             }
         }
     }
@@ -1876,14 +1871,6 @@ executeTag(const SimpleBuffer& _buffer, as_object& thisPtr)
 
 	log_debug("Calling %s(%s)", funcName, arg);
 	callMethod(&thisPtr, funcKey, arg);
-}
-
-// AS-volume adjustment
-void
-adjustVolume(boost::int16_t* data, size_t size, int volume)
-{
-    std::transform(data, data + size, data,
-            boost::bind(std::multiplies<double>(), volume / 100.0, _1));
 }
 
 } // anonymous namespace
