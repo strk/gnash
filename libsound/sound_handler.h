@@ -89,6 +89,8 @@ public:
 
     /// Create a sound buffer slot, for on-demand playback.
     //
+    /// Subclasses must override this function and then call it.
+    //
     /// @param data
     ///     The data to be stored. For soundstream this is NULL.
     ///     The data is in encoded format, with format specified
@@ -101,11 +103,8 @@ public:
     ///     The SoundObject must be not-NULL!
     ///
     /// @return the id given by the soundhandler for later identification.
-    ///
-    virtual int create_sound(
-        std::auto_ptr<SimpleBuffer> data,
-        std::auto_ptr<media::SoundInfo> sinfo
-        );
+    virtual int create_sound(std::auto_ptr<SimpleBuffer> data,
+            const media::SoundInfo& sinfo) = 0;
 
     /// Append data to an existing sound buffer slot.
     //

@@ -93,7 +93,8 @@ public:
     ~SDL_sound_handler();
 
     // See dox in sound_handler.h
-    virtual int create_sound(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<media::SoundInfo> sinfo);
+    virtual int create_sound(std::auto_ptr<SimpleBuffer> data,
+            const media::SoundInfo& sinfo);
 
     // See dox in sound_handler.h
     // overridden to serialize access to the data buffer slot

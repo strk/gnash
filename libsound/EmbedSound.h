@@ -66,14 +66,13 @@ public:
     ///
     /// @param nVolume initial volume (0..100). Optional, defaults to 100.
     ///
-    EmbedSound(std::auto_ptr<SimpleBuffer> data,
-            std::auto_ptr<media::SoundInfo> info, int nVolume,
-            size_t paddingBytes);
+    EmbedSound(std::auto_ptr<SimpleBuffer> data, const media::SoundInfo& info,
+            int nVolume, size_t paddingBytes);
 
     ~EmbedSound();
 
     /// Object holding information about the sound
-    std::auto_ptr<media::SoundInfo> soundinfo;
+    media::SoundInfo soundinfo;
 
     typedef std::map<boost::uint32_t,boost::uint32_t> FrameSizeMap;
 

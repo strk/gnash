@@ -180,7 +180,7 @@ sound_handler::get_sound_info(int sound_handle)
     // Check if the sound exists.
     if (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < _sounds.size())
     {
-        return _sounds[sound_handle]->soundinfo.get();
+        return &_sounds[sound_handle]->soundinfo;
     } else {
         return NULL;
     }
@@ -305,15 +305,14 @@ sound_handler::get_duration(int sound_handle)
 
     EmbedSound* sounddata = _sounds[sound_handle];
 
-    boost::uint32_t sampleCount = sounddata->soundinfo->getSampleCount();
-    boost::uint32_t sampleRate = sounddata->soundinfo->getSampleRate();
+    boost::uint32_t sampleCount = sounddata->soundinfo.getSampleCount();
+    boost::uint32_t sampleRate = sounddata->soundinfo.getSampleRate();
 
     // Return the sound duration in milliseconds
     if (sampleCount > 0 && sampleRate > 0) {
         // TODO: should we cache this in the EmbedSound object ?
         unsigned int ret = sampleCount / sampleRate * 1000;
         ret += ((sampleCount % sampleRate) * 1000) / sampleRate;
-        //if (sounddata->soundinfo->isStereo()) ret = ret / 2;
         return ret;
     } else {
         return 0;
@@ -322,10 +321,8 @@ sound_handler::get_duration(int sound_handle)
 
 int
 sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,
-                            std::auto_ptr<media::SoundInfo> sinfo)
+                            const media::SoundInfo& sinfo)
 {
-    assert(sinfo.get());
-
     std::auto_ptr<EmbedSound> sounddata(
             new EmbedSound(data, sinfo, 100,
                 _mediaHandler ? _mediaHandler->getInputPaddingSize() : 0));
@@ -334,10 +331,10 @@ sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,
 
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
     log_debug("create_sound: sound %d, format %s %s %dHz, %d samples (%d bytes)",
-        sound_id, sounddata->soundinfo->getFormat(),
-        sounddata->soundinfo->isStereo() ? "stereo" : "mono",
-        sounddata->soundinfo->getSampleRate(),
-        sounddata->soundinfo->getSampleCount(),
+        sound_id, sounddata->soundinfo.getFormat(),
+        sounddata->soundinfo.isStereo() ? "stereo" : "mono",
+        sounddata->soundinfo.getSampleRate(),
+        sounddata->soundinfo.getSampleCount(),
         sounddata->size());
 #endif
 
@@ -411,7 +408,7 @@ sound_handler::playSound(int sound_handle,
 
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
     log_debug("playSound %d called, SoundInfo format is %s",
-            sound_handle, sounddata.soundinfo->getFormat());
+            sound_handle, sounddata.soundinfo.getFormat());
 #endif
 
     // When this is called from a StreamSoundBlockTag,
@@ -493,7 +490,7 @@ sound_handler::startSound(int soundId, int loops,
     // Handle delaySeek
 
     EmbedSound& sounddata = *(_sounds[soundId]);
-    const media::SoundInfo& sinfo = *(sounddata.soundinfo);
+    const media::SoundInfo& sinfo = sounddata.soundinfo;
 
     int swfDelaySeek = sinfo.getDelaySeek(); 
     if ( swfDelaySeek )

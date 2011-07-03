@@ -88,7 +88,7 @@ EmbedSoundInst::EmbedSoundInst(EmbedSound& soundData,
 void
 EmbedSoundInst::createDecoder(media::MediaHandler& mediaHandler)
 {
-    media::SoundInfo& si = *_soundDef.soundinfo;
+    const media::SoundInfo& si = _soundDef.soundinfo;
 
     media::AudioInfo info(
         (int)si.getFormat(), // codeci
@@ -241,7 +241,7 @@ EmbedSoundInst::decodeNextBlock()
         const EmbedSound& sndData = _soundDef;
 
         // Figure the need to parse..
-        switch (sndData.soundinfo->getFormat())
+        switch (sndData.soundinfo.getFormat())
         {
             case media::AUDIO_CODEC_ADPCM:
 #ifdef GNASH_DEBUG_SOUNDS_DECODING

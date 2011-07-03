@@ -55,7 +55,7 @@ EmbedSound::append(boost::uint8_t* data, unsigned int size)
 }
 
 EmbedSound::EmbedSound(std::auto_ptr<SimpleBuffer> data,
-        std::auto_ptr<media::SoundInfo> info, int nVolume, size_t paddingBytes)
+        const media::SoundInfo& info, int nVolume, size_t paddingBytes)
     :
     _buf(data),
     soundinfo(info),

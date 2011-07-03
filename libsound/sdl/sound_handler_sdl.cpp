@@ -136,7 +136,7 @@ SDL_sound_handler::~SDL_sound_handler()
 
 int
 SDL_sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,
-                                std::auto_ptr<media::SoundInfo> sinfo)
+                                const media::SoundInfo& sinfo)
 {
     boost::mutex::scoped_lock lock(_mutex);
     return sound_handler::create_sound(data, sinfo);
