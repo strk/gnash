@@ -512,11 +512,15 @@ private:
 
     typedef std::vector<EmbedSound*> Sounds;
 
-    /// Vector containing all sounds.
+    /// Vector containing event sounds.
     //
     /// Elements of the vector are owned by this class
-    ///
     Sounds  _sounds;
+
+    /// Vector containing streaming sounds.
+    //
+    /// Elements of the vector are owned by this class
+    Sounds _streamingSounds;
 
     /// Stop all instances of an embedded sound
     void stopEmbedSoundInstances(EmbedSound& def);
