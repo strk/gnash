@@ -569,11 +569,9 @@ private:
     ///     If false, the sound will not be scheduled if there's another
     ///     instance of it already playing.
     ///
-    void playSound(int id, int loops,
-                   unsigned int inPoint,
-                   unsigned int outPoint,
-                   StreamBlockId blockId, const SoundEnvelopes* env,
-                   bool allowMultiple);
+    void playSound(EmbedSound& sound, int loops, unsigned int inPoint,
+                   unsigned int outPoint, StreamBlockId blockId,
+                   const SoundEnvelopes* env, bool allowMultiple);
 
     /// Convert SWF-specified number of samples to output number of samples
     //

@@ -393,14 +393,11 @@ sound_handler::isSoundPlaying(int sound_handle) const
 
 /* private */
 void
-sound_handler::playSound(int sound_handle,
+sound_handler::playSound(EmbedSound& sounddata,
         int loopCount, unsigned int inPoint, unsigned int outPoint,
         StreamBlockId blockId, const SoundEnvelopes* envelopes,
         bool allowMultiples)
 {
-    assert (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < _sounds.size());
-
-    EmbedSound& sounddata = *(_sounds[sound_handle]);
 
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
     log_debug("playSound %d called, SoundInfo format is %s",
@@ -413,7 +410,7 @@ sound_handler::playSound(int sound_handle,
     {
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
         log_debug(" playSound: multiple instances not allowed, "
-                  "and sound %d is already playing", sound_handle);
+                  "and sound is already playing");
 #endif
         // log_debug("Stream sound block play request, "
         //           "but an instance of the stream is "
@@ -463,7 +460,7 @@ sound_handler::playStream(int soundId, StreamBlockId blockId)
     unsigned int inPoint=0;
     unsigned int outPoint=std::numeric_limits<unsigned int>::max();
 
-    playSound(soundId, 0, inPoint, outPoint, blockId, 0, false);
+    playSound(*_sounds[soundId], 0, inPoint, outPoint, blockId, 0, false);
 }
 
 /*public*/
@@ -481,7 +478,6 @@ sound_handler::startSound(int soundId, int loops,
                   "doing nothing", soundId);
         return;
     }
-
 
     // Handle delaySeek
 
@@ -527,7 +523,7 @@ sound_handler::startSound(int soundId, int loops,
 #endif
     }
 
-    playSound(soundId, loops, inPoint, outPoint, 0, env, allowMultiple);
+    playSound(sounddata, loops, inPoint, outPoint, 0, env, allowMultiple);
 }
 
 void
