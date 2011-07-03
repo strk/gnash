@@ -205,20 +205,6 @@ private:
             unsigned int firstSampleNum,
             const SoundEnvelopes& env);
 
-    /// AS-volume adjustment
-    //
-    /// @param samples
-    ///     The 16bit samples to adjust volume of
-    ///
-    /// @param nSamples
-    ///     Number of samples in the array
-    ///
-    /// @param volume
-    ///     Volume factor
-    ///
-    static void adjustVolume(boost::int16_t* samples,
-            unsigned int nSamples, float volume);
-
     /// Returns the data pointer in the encoded datastream
     /// for the given position. Boundaries are checked.
     //

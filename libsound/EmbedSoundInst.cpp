@@ -20,16 +20,17 @@
 
 #include "EmbedSoundInst.h"
 
+#include <cmath>
+#include <vector>
+#include <boost/scoped_array.hpp>
+
 #include "SoundInfo.h" // for use
 #include "MediaHandler.h" // for use
 #include "GnashException.h" // for SoundException
 #include "AudioDecoder.h" // for use
 #include "SoundEnvelope.h" // for use
 #include "log.h" // will import boost::format too
-
-#include <cmath>
-#include <vector>
-#include <boost/scoped_array.hpp>
+#include "SoundUtils.h"
 
 // Debug sound decoding
 //#define GNASH_DEBUG_SOUNDS_DECODING
@@ -311,7 +312,7 @@ EmbedSoundInst::decodeNextBlock()
     if (_soundDef.volume != 100) // volume is a private member
     {
         // TODO: have adjust_volume take samples, not bytes
-        adjustVolume(samples, nSamples, _soundDef.volume/100.0);
+        adjustVolume(samples, samples + nSamples, _soundDef.volume/100.0);
     }
 
     /// @todo is use of envelopes really mutually exclusive with
@@ -340,37 +341,22 @@ EmbedSoundInst::getEncodedData(unsigned long int pos)
     return _soundDef.data(pos);
 }
 
-/* static private */
-void
-EmbedSoundInst::adjustVolume(boost::int16_t* data, unsigned int nSamples, float volume)
-{
-    //log_error("skipping volume adjustment (intentionally)"); return;
-
-    for (unsigned int i=0; i<nSamples; ++i)
-    {
-        data[i] = data[i] * volume;
-    }
-}
-
 /* private */
 void
 EmbedSoundInst::applyEnvelopes(boost::int16_t* samples, unsigned int nSamples,
         unsigned int firstSampleOffset, const SoundEnvelopes& env)
 {
-    //log_error("skipping envelopes (intentionally)"); return;
 
     // Number of envelopes defined
     size_t numEnvs = env.size();
 
     // Nothing to do if we applied all envelopes already
-    if ( numEnvs <= current_env)
-    {
+    if (numEnvs <= current_env) {
         return;
     }
 
     // Not yet time to use the current envelope
-    if (env[current_env].m_mark44 >= firstSampleOffset+nSamples)
-    {
+    if (env[current_env].m_mark44 >= firstSampleOffset+nSamples) {
         return;
     }
 
@@ -378,42 +364,45 @@ EmbedSoundInst::applyEnvelopes(boost::int16_t* samples, unsigned int nSamples,
 
     // Get next envelope position (absolute samples offset)
     boost::uint32_t next_env_pos = 0;
-    if (current_env == (env.size()-1)) {
-        // If there is no "next envelope" then set the next envelope start point to be unreachable
+    if (current_env == (env.size() - 1)) {
+        // If there is no "next envelope" then set the next envelope
+        // start point to be unreachable
         next_env_pos = env[current_env].m_mark44 + nSamples + 1;
-    } else {
-        next_env_pos = env[current_env+1].m_mark44;
+    }
+    else {
+        next_env_pos = env[current_env + 1].m_mark44;
     }
 
     // Scan all samples in the block, applying the envelope
     // which is in effect in each subportion
-    for (unsigned int i=0; i<nSamples/2; i+=2)
-    {
+    for (unsigned int i = 0; i < nSamples / 2; i += 2) {
+
         // @todo cache these left/right floats (in the SoundEnvelope class?)
         float left = env[current_env].m_level0 / 32768.0;
         float right = env[current_env].m_level1 / 32768.0;
 
         samples[i] = samples[i] * left; // Left
-        samples[i+1] = samples[i+1] * right; // Right
+        samples[i + 1] = samples[i + 1] * right; // Right
 
         // TODO: continue from here (what is the code below doing ??
 
         // if we encounter the offset of next envelope,
         // switch to it !
-        if ( (firstSampleOffset+nSamples-i) >= next_env_pos )
+        if ((firstSampleOffset+nSamples-i) >= next_env_pos)
         {
-            if ( numEnvs <= ++current_env )
-            {
+            if (numEnvs <= ++current_env) {
                 // no more envelopes to apply
                 return;
             }
 
             // Get next envelope position (absolute samples offset)
-            if (current_env == (env.size()-1)) {
-                // If there is no "next envelope" then set the next envelope start point to be unreachable
+            if (current_env == (env.size() - 1)) {
+                // If there is no "next envelope" then set the next
+                // envelope start point to be unreachable
                 next_env_pos = env[current_env].m_mark44 + nSamples + 1;
-            } else {
-                next_env_pos = env[current_env+1].m_mark44;
+            }
+            else {
+                next_env_pos = env[current_env + 1].m_mark44;
             }
         }
     }
