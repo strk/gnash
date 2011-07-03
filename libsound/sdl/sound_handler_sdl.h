@@ -58,7 +58,7 @@ private:
     bool _audioOpened;
     
     /// Mutex for making sure threads doesn't mess things up
-    boost::mutex _mutex;
+    mutable boost::mutex _mutex;
 
     /// Mutex protecting _muted (defined in base class)
     mutable boost::mutex _mutedMutex;
@@ -116,13 +116,13 @@ public:
     virtual void    stop_all_sounds();
 
     // See dox in sound_handler.h
-    virtual int get_volume(int sound_handle);
+    virtual int get_volume(int sound_handle) const;
 
     // See dox in sound_handler.h
-    virtual void    set_volume(int sound_handle, int volume);
+    virtual void set_volume(int sound_handle, int volume);
         
     // See dox in sound_handler.h
-    virtual media::SoundInfo* get_sound_info(int soundHandle);
+    virtual media::SoundInfo* get_sound_info(int soundHandle) const;
 
     // See dox in sound_handler.h
     // overridden to serialize access to the _muted member
@@ -145,10 +145,10 @@ public:
     virtual void unpause();
 
     // See dox in sound_handler.h
-    virtual unsigned int get_duration(int sound_handle);
+    virtual unsigned int get_duration(int sound_handle) const;
 
     // See dox in sound_handler.h
-    virtual unsigned int tell(int sound_handle);
+    virtual unsigned int tell(int sound_handle) const;
     
     // See dox in sound_handler.h
     // Overridden to unpause SDL audio

@@ -145,17 +145,15 @@ sound_handler::stop_all_sounds()
 }
 
 int
-sound_handler::get_volume(int soundHandle)
+sound_handler::get_volume(int soundHandle) const
 {
-    int ret;
-    // Check if the sound exists.
-    if (soundHandle >= 0 && static_cast<unsigned int>(soundHandle) < _sounds.size())
+    if (soundHandle >= 0 && static_cast<size_t>(soundHandle) < _sounds.size())
     {
-        ret = _sounds[soundHandle]->volume;
-    } else {
-        ret = 0; // Invalid handle
-    }
-    return ret;
+        return _sounds[soundHandle]->volume;
+    } 
+
+    // Invalid handle.
+    return 0;
 }
 
 void   
@@ -175,15 +173,14 @@ sound_handler::set_volume(int sound_handle, int volume)
 }
 
 media::SoundInfo*
-sound_handler::get_sound_info(int sound_handle)
+sound_handler::get_sound_info(int sound_handle) const
 {
     // Check if the sound exists.
     if (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < _sounds.size())
     {
         return &_sounds[sound_handle]->soundinfo;
-    } else {
-        return NULL;
-    }
+    } 
+    return NULL;
 }
 
 void
@@ -267,7 +264,7 @@ sound_handler::unplugInputStream(InputStream* id)
 }
 
 unsigned int
-sound_handler::tell(int sound_handle)
+sound_handler::tell(int sound_handle) const
 {
     // Check if the sound exists.
     if (sound_handle < 0 || (unsigned int) sound_handle >= _sounds.size())
@@ -276,13 +273,13 @@ sound_handler::tell(int sound_handle)
         return 0;
     }
 
-    EmbedSound* sounddata = _sounds[sound_handle];
+    const EmbedSound* sounddata = _sounds[sound_handle];
 
     // If there is no active sounds, return 0
-    if ( ! sounddata->isPlaying() ) return 0;
+    if (!sounddata->isPlaying()) return 0;
 
     // We use the first active sound of this.
-    InputStream* asound = sounddata->firstPlayingInstance();
+    const InputStream* asound = sounddata->firstPlayingInstance();
 
     // Return the playhead position in milliseconds
     unsigned int samplesPlayed = asound->samplesFetched();
@@ -294,7 +291,7 @@ sound_handler::tell(int sound_handle)
 }
 
 unsigned int
-sound_handler::get_duration(int sound_handle)
+sound_handler::get_duration(int sound_handle) const
 {
     // Check if the sound exists.
     if (sound_handle < 0 || (unsigned int) sound_handle >= _sounds.size())
@@ -303,10 +300,10 @@ sound_handler::get_duration(int sound_handle)
         return 0;
     }
 
-    EmbedSound* sounddata = _sounds[sound_handle];
+    const EmbedSound* sounddata = _sounds[sound_handle];
 
-    boost::uint32_t sampleCount = sounddata->soundinfo.getSampleCount();
-    boost::uint32_t sampleRate = sounddata->soundinfo.getSampleRate();
+    const boost::uint32_t sampleCount = sounddata->soundinfo.getSampleCount();
+    const boost::uint32_t sampleRate = sounddata->soundinfo.getSampleRate();
 
     // Return the sound duration in milliseconds
     if (sampleCount > 0 && sampleRate > 0) {
@@ -314,9 +311,8 @@ sound_handler::get_duration(int sound_handle)
         unsigned int ret = sampleCount / sampleRate * 1000;
         ret += ((sampleCount % sampleRate) * 1000) / sampleRate;
         return ret;
-    } else {
-        return 0;
-    }
+    } 
+    return 0;
 }
 
 int

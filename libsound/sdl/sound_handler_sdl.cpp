@@ -177,7 +177,7 @@ SDL_sound_handler::stop_all_sounds()
 
 
 int
-SDL_sound_handler::get_volume(int soundHandle)
+SDL_sound_handler::get_volume(int soundHandle) const
 {
     boost::mutex::scoped_lock lock(_mutex);
     return sound_handler::get_volume(soundHandle);
@@ -192,21 +192,21 @@ SDL_sound_handler::set_volume(int soundHandle, int volume)
 }
     
 media::SoundInfo*
-SDL_sound_handler::get_sound_info(int soundHandle)
+SDL_sound_handler::get_sound_info(int soundHandle) const
 {
     boost::mutex::scoped_lock lock(_mutex);
     return sound_handler::get_sound_info(soundHandle);
 }
 
 unsigned int
-SDL_sound_handler::get_duration(int soundHandle)
+SDL_sound_handler::get_duration(int soundHandle) const
 {
     boost::mutex::scoped_lock lock(_mutex);
     return sound_handler::get_duration(soundHandle);
 }
 
 unsigned int
-SDL_sound_handler::tell(int soundHandle)
+SDL_sound_handler::tell(int soundHandle) const
 {
     boost::mutex::scoped_lock lock(_mutex);
     return sound_handler::tell(soundHandle);

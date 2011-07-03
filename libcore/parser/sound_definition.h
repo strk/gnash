@@ -33,6 +33,16 @@ namespace gnash {
 //
 /// Definition tags will maintain a mapping between SWF-defined id
 /// of the sound and these identifiers.
+//
+/// A sound_definition is used only by DefineSoundTags for embedded event
+/// sounds. These sounds can be started either through the AS sound class
+/// or using a StartSoundTag.
+//
+/// sound_definitions are not used for:
+///     - embedded streaming sounds
+///     - loaded event sounds.
+//
+/// Streaming event sounds (Sound class).
 ///
 /// Specifying an identifier for use by sound_handler would likely be
 /// claner, anyway this is what it is *currently*.
