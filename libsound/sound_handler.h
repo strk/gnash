@@ -100,27 +100,6 @@ public:
     /// Mixed functions:
     ////////////////////////////////////////////////
 
-    /// Create a sound buffer slot, for on-demand playback.
-    //
-    /// TODO: create a separate function for streaming sounds.
-    //
-    /// @param data
-    ///     The data to be stored. For soundstream this is NULL.
-    ///     The data is in encoded format, with format specified
-    ///     with the sinfo parameter, this is to allow on-demand
-    ///     decoding (if the sound is never played, it's never decoded).
-    ///
-    /// @param sinfo
-    ///     A SoundInfo object contained in an auto_ptr, which contains
-    ///     info about samplerate, samplecount, stereo and more.
-    ///     The SoundObject must be not-NULL!
-    ///
-    /// @return the id given by the soundhandler for later identification.
-    virtual int create_sound(std::auto_ptr<SimpleBuffer> data,
-            const media::SoundInfo& sinfo);
-
-    virtual int createStreamingSound(const media::SoundInfo& sinfo);
-
     /// Remove all scheduled request for playback of sound buffer slots
     //
     /// This applies both to streaming and event sounds.
@@ -129,28 +108,39 @@ public:
     ////////////////////////////////////////////////
     /// Event sound functions:
     ////////////////////////////////////////////////
+    
+    /// Create a sound buffer slot, for on-demand playback.
+    //
+    /// @param data
+    ///     The data to be stored. The data is in encoded format, with
+    ///     format specified with the sinfo parameter, this is to allow
+    ///     on-demand decoding (if the sound is never played, it's never
+    ///     decoded).
+    ///
+    /// @param sinfo
+    ///     A SoundInfo object containing info about samplerate, samplecount,
+    /// stereo and more.
+    ///
+    /// @return the id given by the soundhandler for later identification.
+    virtual int create_sound(std::auto_ptr<SimpleBuffer> data,
+            const media::SoundInfo& sinfo);
         
     /// Remove scheduled requests to play the specified sound buffer slot
     //
-    /// Note: this currently is used for both streaming and events sounds.
-    /// TODO: use a separate function for each.
-    //
-    /// Stop all instances of the specified sound if it's playing.
+    /// Stop all instances of the specified event sound if it's playing.
     /// (Normally a full-featured sound API would take a
     /// handle specifying the *instance* of a playing
     /// sample, but SWF is not expressive that way.)
     //
-    /// @param sound_handle
-    /// The sound_handlers id for the sound to be deleted
+    /// @param sound_handle     id for the sound to be stopped
     virtual void stopEventSound(int sound_handle);
 
-    /// Discard the sound data for an event sound
+    /// Discard the sound data for an embedded event sound
     //
     /// Only embedded event sounds are deleted; this happens when the
-    /// associated sound_definition is deleted.
+    /// associated sound_sample is deleted.
     //
-    /// @param sound_handle     The sound_handlers id for the event sound to be
-    ///                         deleted
+    /// @param sound_handle     The id for the event sound to be deleted
     virtual void delete_sound(int sound_handle);
 
     /// Start playback of an event sound
@@ -222,11 +212,13 @@ public:
     /// Streaming sound functions:
     ////////////////////////////////////////////////
 
+    virtual int createStreamingSound(const media::SoundInfo& sinfo);
+
     /// Remove scheduled requests to play the specified sound buffer slot
     //
     /// @param sound_handle     The sound_handlers id for the sound to be
     ///                         stopped.
-    virtual void stopStreamingSound(int sound_handle);
+    virtual void stopStreamingSound(int handle);
 
     /// Append data for a streaming sound.
     ///
@@ -266,7 +258,7 @@ public:
     ///                     info about.
     /// @return             a pointer to the SoundInfo object for the sound
     ///                     with the given id or 0 if no such sound exists.
-    virtual media::SoundInfo* get_sound_info(int soundHandle) const;
+    virtual media::SoundInfo* get_sound_info(int handle) const;
 
     /// Start playback of a streaming sound, if not playing already
     //
