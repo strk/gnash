@@ -24,6 +24,7 @@ libgnashsound_la_SOURCES = \
 	EmbedSound.h \
 	EmbedSoundInst.cpp \
 	EmbedSoundInst.h \
+	SoundUtils.h \
 	InputStream.h \
 	sound_handler.cpp \
 	sound_handler.h \
