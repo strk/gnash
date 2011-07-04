@@ -18,15 +18,16 @@
 //
 
 #include "sound_handler.h"
+
+#include <boost/cstdint.hpp> // For C99 int types
+#include <vector> // for use
+#include <cmath> // for floor (debugging)
+
 #include "EmbedSound.h" // for use
 #include "InputStream.h" // for use
 #include "EmbedSoundInst.h" // for upcasting to InputStream
 #include "log.h" // for use
 #include "WallClockTimer.h" // for debugging
-
-#include <boost/cstdint.hpp> // For C99 int types
-#include <vector> // for use
-#include <cmath> // for floor (debugging)
 
 // Debug create_sound/delete_sound/playSound/stop_sound, loops
 //#define GNASH_DEBUG_SOUNDS_MANAGEMENT
@@ -39,7 +40,7 @@ namespace {
 unsigned int
 silentStream(void*, boost::int16_t* stream, unsigned int len, bool& atEOF)
 {
-    std::fill(stream, stream+len, 0);
+    std::fill(stream, stream + len, 0);
     atEOF=false;
     return len;
 }
