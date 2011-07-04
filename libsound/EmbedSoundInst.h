@@ -189,11 +189,7 @@ private:
     /// Return full size of the decoded data buffer
     size_t decodedDataSize() const
     {
-        if ( _decodedData.get() )
-        {
-            return _decodedData->size();
-        }
-        else return 0;
+        return _decodedData.size();
     }
 
     /// \brief
@@ -253,11 +249,7 @@ private:
     EmbedSound& _soundDef;
 
     /// The decoded buffer
-    //
-    /// If NULL, the _soundDef will be considered
-    /// decoded instead
-    ///
-    std::auto_ptr<SimpleBuffer> _decodedData;
+    SimpleBuffer _decodedData;
 };
 
 

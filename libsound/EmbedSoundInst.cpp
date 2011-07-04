@@ -73,8 +73,7 @@ EmbedSoundInst::EmbedSoundInst(EmbedSound& soundData,
         current_env(0),
         _samplesFetched(0),
         _decoder(0),
-        _soundDef(soundData),
-        _decodedData(0)
+        _soundDef(soundData)
 {
     playbackPosition = _inPoint; 
 
@@ -107,12 +106,8 @@ EmbedSoundInst::createDecoder(media::MediaHandler& mediaHandler)
 boost::int16_t*
 EmbedSoundInst::getDecodedData(unsigned long int pos)
 {
-    if ( _decodedData.get() )
-    {
-        assert(pos < _decodedData->size());
-        return reinterpret_cast<boost::int16_t*>(_decodedData->data()+pos);
-    }
-    else return 0;
+    assert(pos < _decodedData.size());
+    return reinterpret_cast<boost::int16_t*>(_decodedData.data() + pos);
 }
 
 bool
@@ -128,8 +123,6 @@ unsigned int
 EmbedSoundInst::fetchSamples(boost::int16_t* to, unsigned int nSamples)
 {
     // If there exist no decoder, then we can't decode!
-    // TODO: isn't it documented that an EmbedSoundInst w/out a decoder
-    //       means that the EmbedSound data is already decoded ?
     if (!_decoder.get())
     {
         return 0;
@@ -397,12 +390,7 @@ EmbedSoundInst::~EmbedSoundInst()
 void
 EmbedSoundInst::appendDecodedData(boost::uint8_t* data, unsigned int size)
 {
-    if ( ! _decodedData.get() )
-    {
-        _decodedData.reset( new SimpleBuffer );
-    }
-
-    _decodedData->append(data, size);
+    _decodedData.append(data, size);
 
     delete [] data; // ownership transferred...
 }
