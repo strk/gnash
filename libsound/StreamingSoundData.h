@@ -170,9 +170,6 @@ public:
     Instances _soundInstances;
 
     /// Mutex protecting access to _soundInstances
-    //
-    /// @todo make private
-    ///
     mutable boost::mutex _soundInstancesMutex;
 
     const size_t _paddingBytes;
