@@ -75,6 +75,12 @@ public:
 
 private:
 
+    /// Called when more data is required.
+    //
+    /// StreamingSounds can temporarily run out of data if not enough
+    /// samples are present for a frame.
+    virtual bool moreData();
+
     /// Return true if there's nothing more to decode
     virtual bool decodingCompleted() const {
         return _positionInBlock == 0 && 
@@ -84,7 +90,7 @@ private:
     /// Decode next input block
     //
     /// It's assumed !decodingCompleted()
-    virtual void decodeNextBlock();
+    void decodeNextBlock();
 
     // The current block of sound.
     size_t _currentBlock;

@@ -21,16 +21,20 @@
 #include "LiveSound.h"
 
 #include <algorithm>
+#include <cassert>
 
 #include "log.h"
 #include "SoundInfo.h"
+#include "MediaHandler.h"
 
 namespace gnash {
 namespace sound {
 
-LiveSound::LiveSound(media::MediaHandler& mh, const media::SoundInfo& info, int inPoint)
+LiveSound::LiveSound(media::MediaHandler& mh, const media::SoundInfo& info,
+        size_t inPoint)
     :
-    _playbackPosition(inPoint),
+    _inPoint(inPoint * 4),
+    _playbackPosition(_inPoint),
     _samplesFetched(0)
 {
     createDecoder(mh, info);
@@ -40,7 +44,7 @@ void
 LiveSound::createDecoder(media::MediaHandler& mh, const media::SoundInfo& si)
 {
 
-    media::AudioInfo info((int)si.getFormat(), si.getSampleRate(), 
+    media::AudioInfo info(si.getFormat(), si.getSampleRate(), 
         si.is16bit() ? 2 : 1, si.isStereo(), 0, media::CODEC_TYPE_FLASH);
 
     try {
@@ -54,11 +58,6 @@ LiveSound::createDecoder(media::MediaHandler& mh, const media::SoundInfo& si)
 unsigned int 
 LiveSound::fetchSamples(boost::int16_t* to, unsigned int nSamples)
 {
-    // If there is no decoder, then we can't decode!
-    // TODO: isn't it documented that an StreamingSound w/out a decoder
-    //       means that the StreamingSoundData data is already decoded ?
-    if (!_decoder.get()) return 0;
-
     unsigned int fetchedSamples = 0;
 
     while (nSamples) {
@@ -72,7 +71,7 @@ LiveSound::fetchSamples(boost::int16_t* to, unsigned int nSamples)
                 fetchedSamples += nSamples;
 
                 // Update playback position (samples are 16bit)
-                _playbackPosition += nSamples*2;
+                _playbackPosition += nSamples * 2;
 
                 break; // fetched all
             }
@@ -91,20 +90,13 @@ LiveSound::fetchSamples(boost::int16_t* to, unsigned int nSamples)
             }
         }
 
-        // We haven't finished fetching yet, so see if we
-        // have more to decode or not
-        if (decodingCompleted()) {
-            break; 
-        }
+        // Get more data if it's ready. This could involve looping.
+        // Even if no data is available now, it can become available
+        // later.
+        if (!moreData()) break;
 
-        // Should only be called when no more decoded data
-        // are available for fetching.
-        // Doing so we know what's the sample number
-        // of the first sample in the newly decoded block.
-        assert(_playbackPosition >= _decodedData.size());
-
-        // More to decode, then decode it
-        decodeNextBlock();
+        // We have looped.
+        if (!_samplesFetched) continue;
     }
 
     // update samples played

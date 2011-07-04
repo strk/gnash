@@ -16,7 +16,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-//
 
 #include "EmbedSoundInst.h"
 
@@ -25,10 +24,9 @@
 
 #include "SoundInfo.h" // for use
 #include "MediaHandler.h" // for use
-#include "GnashException.h" // for SoundException
 #include "AudioDecoder.h" // for use
 #include "SoundEnvelope.h" // for use
-#include "log.h" // will import boost::format too
+#include "log.h" 
 #include "SoundUtils.h"
 
 // Debug sound decoding
@@ -39,229 +37,73 @@
 namespace gnash {
 namespace sound {
 
-unsigned int
-EmbedSoundInst::samplesFetched() const
-{
-    return _samplesFetched;
-}
-
 EmbedSoundInst::EmbedSoundInst(EmbedSound& soundData,
             media::MediaHandler& mediaHandler,
-            unsigned int inPoint,
-            unsigned int outPoint,
-            const SoundEnvelopes* env,
-            unsigned int loopCount)
+            unsigned int inPoint, unsigned int outPoint,
+            const SoundEnvelopes* env, unsigned int loopCount)
         :
-
+        LiveSound(mediaHandler, soundData.soundinfo, inPoint),
         decodingPosition(0),
-
         loopCount(loopCount),
-
-        // parameter is in stereo samples (44100 per second)
-        // we double to take 2 channels into account
-        // and double again to use bytes
-        _inPoint(inPoint*4),
-
-        // parameter is in stereo samples (44100 per second)
+        // parameters are in stereo samples (44100 per second)
         // we double to take 2 channels into account
         // and double again to use bytes
         _outPoint( outPoint == std::numeric_limits<unsigned int>::max() ?
                    std::numeric_limits<unsigned long>::max()
                    : outPoint * 4),
-
         envelopes(env),
         current_env(0),
-        _samplesFetched(0),
-        _decoder(0),
         _soundDef(soundData)
 {
-    playbackPosition = _inPoint; 
-
-    createDecoder(mediaHandler);
-}
-
-/*private*/
-void
-EmbedSoundInst::createDecoder(media::MediaHandler& mediaHandler)
-{
-    const media::SoundInfo& si = _soundDef.soundinfo;
-
-    media::AudioInfo info(
-        (int)si.getFormat(), // codeci
-        si.getSampleRate(), // sampleRatei
-        si.is16bit() ? 2 : 1, // sampleSizei
-        si.isStereo(), // stereoi
-        0, // duration unknown, does it matter ?
-        media::CODEC_TYPE_FLASH);
-
-    try {
-        _decoder = mediaHandler.createAudioDecoder(info);
-    }
-    catch (const MediaException& e) {
-        log_error("AudioDecoder initialization failed: %s", e.what());
-    }
-}
-
-// Pointer handling and checking functions
-boost::int16_t*
-EmbedSoundInst::getDecodedData(unsigned long int pos)
-{
-    assert(pos < _decodedData.size());
-    return reinterpret_cast<boost::int16_t*>(_decodedData.data() + pos);
 }
 
 bool
 EmbedSoundInst::reachedCustomEnd() const
 {
-    if ( _outPoint == std::numeric_limits<unsigned long>::max() )
-            return false;
-    if ( playbackPosition >= _outPoint ) return true;
+    if (_outPoint == std::numeric_limits<unsigned long>::max()) return false;
+    if (playbackPosition() >= _outPoint) return true;
     return false;
 }
 
-unsigned int 
-EmbedSoundInst::fetchSamples(boost::int16_t* to, unsigned int nSamples)
+bool
+EmbedSoundInst::moreData()
 {
-    // If there exist no decoder, then we can't decode!
-    if (!_decoder.get())
-    {
-        return 0;
+    if (decodingCompleted() || reachedCustomEnd()) {
+
+        if (loopCount) {
+            --loopCount;
+            restart();
+            return true;
+        }
+        // Nothing more to do.
+        return false;
     }
 
-    unsigned int fetchedSamples=0;
-
-    while ( nSamples )
-    {
-        unsigned int availableSamples = decodedSamplesAhead();
-        if ( availableSamples )
-        {
-            boost::int16_t* data = getDecodedData(playbackPosition);
-            if ( availableSamples >= nSamples )
-            {
-                std::copy(data, data+nSamples, to);
-                fetchedSamples += nSamples;
-
-                // Update playback position (samples are 16bit)
-                playbackPosition += nSamples*2;
-
-                break; // fetched all
-            }
-            else
-            {
-                // not enough decoded samples available:
-                // copy what we have and go on
-                std::copy(data, data+availableSamples, to);
-                fetchedSamples += availableSamples;
-
-                // Update playback position (samples are 16bit)
-                playbackPosition += availableSamples*2;
-
-                to+=availableSamples;
-                nSamples-=availableSamples;
-                assert ( nSamples );
-
-            }
-        }
-
-        // We haven't finished fetching yet, so see if we
-        // have more to decode or not
-
-        if ( decodingCompleted() || reachedCustomEnd() )
-        {
-            if ( loopCount )
-            {
-#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
-                log_debug("Loops left: %d", loopCount);
-#endif
-
-                // loops ahead, reset playbackPosition to the starting 
-                // position and keep looping
-                --loopCount;
-
-                // Start next loop
-                playbackPosition = _inPoint; 
-                _samplesFetched = 0;
-
-                continue;
-            }
-
-#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
-            if ( reachedCustomEnd() )
-            {
-                log_debug("Reached custom end (pos:%d out:%d) and no looping, "
-                          "sound is over", playbackPosition, _outPoint);
-            }
-            else
-            {
-                log_debug("Decoding completed and no looping, sound is over");
-            }
-#endif
-            break; // fetched what possible, filled with silence the rest
-        }
-
-        // More to decode, then decode it
-        decodeNextBlock();
-    }
-
-    // update samples played
-    _samplesFetched += fetchedSamples;
-
-    return fetchedSamples;
+    // It's not clear if this happens for Embedded sounds, but it
+    // would permit incremental decoding.
+    decodeNextBlock();
+    return true;
 }
 
-/*private*/
 void
 EmbedSoundInst::decodeNextBlock()
 {
     assert(!decodingCompleted());
 
-    // Should only be called when no more decoded data
-    // are available for fetching.
-    // Doing so we know what's the sample number
-    // of the first sample in the newly decoded block.
-    //
-    assert(playbackPosition >= _decodedData.size());
-
-    boost::uint32_t inputSize = 0; // or blockSize
-    bool parse = true; // need to parse ?
-
-    // this block figures inputSize (blockSize) and need to parse (parse)
-    // @todo: turn into a private function
-    {
-        const EmbedSound& sndData = _soundDef;
-
-        // Figure the need to parse..
-        switch (sndData.soundinfo.getFormat())
-        {
-            case media::AUDIO_CODEC_ADPCM:
-#ifdef GNASH_DEBUG_SOUNDS_DECODING
-                log_debug(" sound format is ADPCM");
-#endif
-                parse = false;
-                break;
-            default:
-                break;
-        }
-
-        // Figure the frame size ...
-        inputSize = encodedDataSize() - decodingPosition;
-    }
+    const bool parse = requiresParsing(_soundDef.soundinfo);
+    const boost::uint32_t inputSize = _soundDef.size() - decodingPosition;
 
 #ifdef GNASH_DEBUG_SOUNDS_DECODING
     log_debug("  decoding %d bytes, parse:%d", inputSize, parse);
 #endif
 
     assert(inputSize);
-    const boost::uint8_t* input = getEncodedData(decodingPosition);
+    const boost::uint8_t* input = _soundDef.data(decodingPosition);
 
     boost::uint32_t consumed = 0;
     boost::uint32_t decodedDataSize = 0;
-    boost::uint8_t* decodedData = _decoder->decode(
-                                      input, 
-                                      inputSize,
-                                      decodedDataSize,
-                                      consumed,
-                                      parse);
+    boost::uint8_t* decodedData = decoder().decode(input, inputSize,
+            decodedDataSize, consumed, parse);
 
     decodingPosition += consumed;
 
@@ -276,18 +118,15 @@ EmbedSoundInst::decodeNextBlock()
             "of decoded data", decodedDataSize, nSamples);
 #endif
 
-    // If the volume needs adjustments we call a function to do that (why are we doing this manually ?)
-    if (_soundDef.volume != 100) // volume is a private member
-    {
+    // Adjust volume
+    if (_soundDef.volume != 100) {
         adjustVolume(samples, samples + nSamples, _soundDef.volume/100.0);
     }
 
     /// @todo is use of envelopes really mutually exclusive with
     ///       setting the volume ??
-    else if (envelopes) // envelopes are a private member
-    {
-        unsigned int firstSample = playbackPosition/2;
-
+    else if (envelopes) {
+        unsigned int firstSample = playbackPosition() / 2;
         applyEnvelopes(samples, nSamples, firstSample, *envelopes);
     }
 
@@ -300,14 +139,6 @@ EmbedSoundInst::decodeNextBlock()
     appendDecodedData(decodedData, decodedDataSize);
 }
 
-
-const boost::uint8_t*
-EmbedSoundInst::getEncodedData(unsigned long int pos)
-{
-    return _soundDef.data(pos);
-}
-
-/* private */
 void
 EmbedSoundInst::applyEnvelopes(boost::int16_t* samples, unsigned int nSamples,
         unsigned int firstSampleOffset, const SoundEnvelopes& env)
@@ -379,20 +210,13 @@ EmbedSoundInst::eof() const
 {
     // it isn't threaded, but just in case, we call decodingCompleted first
     // and we also check loopCount... (over paranoid?)
-    return ( ( decodingCompleted() || reachedCustomEnd() ) && !loopCount && !decodedSamplesAhead() );
+    return ((decodingCompleted() || reachedCustomEnd())
+            && !loopCount && !decodedSamplesAhead());
 }
 
 EmbedSoundInst::~EmbedSoundInst()
 {
     _soundDef.eraseActiveSound(this);
-}
-
-void
-EmbedSoundInst::appendDecodedData(boost::uint8_t* data, unsigned int size)
-{
-    _decodedData.append(data, size);
-
-    delete [] data; // ownership transferred...
 }
 
 } // gnash.sound namespace 

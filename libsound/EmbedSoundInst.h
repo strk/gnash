@@ -20,17 +20,15 @@
 #ifndef SOUND_EMBEDSOUNDINST_H
 #define SOUND_EMBEDSOUNDINST_H
 
-#include "InputStream.h" // for inheritance
-#include "AudioDecoder.h" // for dtor visibility
-#include "SoundEnvelope.h" // for SoundEnvelopes typedef
-#include "SimpleBuffer.h" // for composition (decoded data)
-#include "EmbedSound.h" // for inlines
-#include "sound_handler.h" // for StreamBlockId typedef
-
 #include <memory>
 #include <cassert>
 #include <boost/cstdint.hpp> // For C99 int types
 
+#include "LiveSound.h"
+#include "AudioDecoder.h" 
+#include "SoundEnvelope.h" 
+#include "EmbedSound.h" 
+#include "sound_handler.h" 
 
 // Forward declarations
 namespace gnash {
@@ -46,14 +44,7 @@ namespace gnash {
 namespace sound {
 
 /// Instance of a defined %sound (EmbedSound)
-//
-/// This class contains a pointer to the EmbedSound used for playing
-/// and a SimpleBuffer to use when decoding is needed.
-///
-/// When the SimpleBuffer is NULL we'll play the EmbedSound bytes directly
-/// (we assume they are decoded already)
-///
-class EmbedSoundInst : public InputStream
+class EmbedSoundInst : public LiveSound
 {
 public:
 
@@ -83,7 +74,6 @@ public:
     ///     Number of times this instance should loop over the defined sound.
     ///     Note that every loop begins and ends at the range given by
     ///     inPoint and outPoint.
-    ///
     EmbedSoundInst(EmbedSound& def, media::MediaHandler& mh,
             unsigned int inPoint,
             unsigned int outPoint,
@@ -91,39 +81,19 @@ public:
             unsigned int loopCount);
 
     // See dox in sound_handler.h (InputStream)
-    unsigned int fetchSamples(boost::int16_t* to, unsigned int nSamples);
-
-    // See dox in sound_handler.h (InputStream)
-    unsigned int samplesFetched() const;
-
-    // See dox in sound_handler.h (InputStream)
-    bool eof() const;
+    virtual bool eof() const;
 
     /// Unregister self from the associated EmbedSound
     //
     /// WARNING: must be thread-safe!
-    ///
-    ~EmbedSoundInst();
+    virtual ~EmbedSoundInst();
 
 private:
 
-    /// Append size bytes to this raw data 
-    //
-    /// @param data
-    /// Data bytes, allocated with new[]. Ownership transferred.
-    ///
-    /// @param size
-    /// Size of the 'data' buffer.
-    ///
-    void appendDecodedData(boost::uint8_t* data, unsigned int size);
-
-    size_t encodedDataSize() const {
-        return _soundDef.size();
-    }
+    virtual bool moreData();
 
     /// Apply envelope-volume adjustments
     //
-    ///
     /// Modified envelopes cursor (current_env)
     ///
     /// @param samples
@@ -143,85 +113,28 @@ private:
     void applyEnvelopes(boost::int16_t* samples, unsigned int nSamples,
             unsigned int firstSampleNum, const SoundEnvelopes& env);
 
-    /// Returns the data pointer in the encoded datastream
-    /// for the given position. Boundaries are checked.
-    //
-    /// Uses _samplesFetched and playbackPosition
-    const boost::uint8_t* getEncodedData(unsigned long int pos);
-
-    /// Return number of already-decoded samples available
-    /// from playback position on
-    unsigned int decodedSamplesAhead() const {
-        unsigned int dds = _decodedData.size();
-        if ( dds <= playbackPosition ) return 0; 
-        unsigned int bytesAhead = dds - playbackPosition;
-        assert(!(bytesAhead%2));
-
-        if ( _outPoint < std::numeric_limits<unsigned long>::max() )
-        {
-            unsigned int toCustomEnd = _outPoint-playbackPosition;
-            if ( toCustomEnd < bytesAhead ) bytesAhead = toCustomEnd;
-        }
-
-        unsigned int samplesAhead = bytesAhead/2;
-
-        return samplesAhead;
-    }
-
     bool reachedCustomEnd() const;
 
     /// Return true if there's nothing more to decode
-    bool decodingCompleted() const
-    {
-        // example: 10 bytes of encoded data, decodingPosition 8 : more to decode
-        // example: 10 bytes of encoded data, decodingPosition 10 : nothing more to decode
-
-        return ( decodingPosition >= encodedDataSize() );
+    virtual bool decodingCompleted() const {
+        return (decodingPosition >= _soundDef.size());
     }
-  
-    /// Create a decoder for this instance
-    //
-    /// If decoder creation fails an error will
-    /// be logged, and _decoder won't be set
-    /// 
-    void createDecoder(media::MediaHandler& mediaHandler);
-
-    /// \brief
-    /// Returns the data pointer in the decoded datastream
-    /// for the given byte-offset.
-    //
-    /// Boundaries are checked.
-    ///
-    /// @param pos offsets in bytes. This should usually be
-    ///        a multiple of two, since decoded data is
-    ///        composed of signed 16bit PCM samples..
-    ///
-    boost::int16_t* getDecodedData(unsigned long int pos);
-
 
     /// Decode next input block
     //
     /// It's assumed !decodingCompleted()
-    ///
-    void decodeNextBlock();
+    virtual void decodeNextBlock();
 
     /// Current decoding position in the encoded stream
     unsigned long decodingPosition;
-
-    /// Current playback position in the decoded stream
-    unsigned long playbackPosition;
 
     /// Numbers of loops: -1 means loop forever, 0 means play once.
     /// For every loop completed, it is decremented.
     long loopCount;
 
-    /// Offset in bytes samples from start of the block
-    /// to begin playback from
-    unsigned long _inPoint;
-
     /// Offset in bytes to end playback at
     /// Never if numeric_limits<unsigned long>::max()
-    unsigned long _outPoint;
+    const unsigned long _outPoint;
 
     /// Sound envelopes for the current sound, which determine the volume level
     /// from a given position. Only used with event sounds.
@@ -230,11 +143,6 @@ private:
     /// Index of current envelope.
     boost::uint32_t current_env;
 
-    /// Number of samples fetched so far.
-    unsigned long _samplesFetched;
-
-    /// The decoder object used to convert the data into the playable format
-    std::auto_ptr<media::AudioDecoder> _decoder;
     /// The encoded data
     //
     /// It is non-const because we deregister ourselves
@@ -242,8 +150,6 @@ private:
     ///
     EmbedSound& _soundDef;
 
-    /// The decoded buffer
-    SimpleBuffer _decodedData;
 };
 
 

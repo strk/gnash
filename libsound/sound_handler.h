@@ -23,20 +23,20 @@
 #include "gnashconfig.h"
 #endif
 
-#include "dsodefs.h" // for DSOEXPORT
-#include "MediaHandler.h" // for inlined ctor
-#include "SoundEnvelope.h" // for SoundEnvelopes typedef
-#include "AuxStream.h" // for aux_stramer_ptr typedef
-#include "WAVWriter.h" // for dtor visibility 
-
 #include <string>
 #include <vector>
 #include <memory>
 #include <cassert>
 #include <cstring>
 #include <limits>
-#include <set> // for composition
+#include <set>
 #include <boost/scoped_ptr.hpp>
+
+#include "dsodefs.h" // for DSOEXPORT
+#include "MediaHandler.h" // for inlined ctor
+#include "SoundEnvelope.h" // for SoundEnvelopes typedef
+#include "AuxStream.h" // for aux_streamer_ptr typedef
+#include "WAVWriter.h" // for dtor visibility 
 
 namespace gnash {
     namespace media {

@@ -149,8 +149,7 @@ sound_handler::delete_sound(int handle)
 #endif
 
     EmbedSound* def = _sounds[handle];
-    if ( ! def )
-    {
+    if (!def) {
         log_error("handle passed to delete_sound (%d) "
                   "already deleted", handle);
         return;
@@ -462,7 +461,7 @@ sound_handler::isSoundPlaying(int handle) const
 void
 sound_handler::playStream(int soundId, StreamBlockId blockId)
 {
-    const unsigned int inPoint=0;
+    const unsigned int inPoint = 0;
 
     StreamingSoundData& s = *_streamingSounds[soundId];
     if (s.isPlaying() || s.empty()) return;
