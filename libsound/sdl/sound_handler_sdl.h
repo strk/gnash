@@ -100,8 +100,7 @@ public:
 
     // See dox in sound_handler.h
     // overridden to serialize access to the data buffer slot
-    virtual StreamBlockId addSoundBlock(unsigned char* data,
-                                       unsigned int data_bytes,
+    virtual StreamBlockId addSoundBlock(std::auto_ptr<SimpleBuffer> buf,
                                        unsigned int sample_count,
                                        int streamId);
 

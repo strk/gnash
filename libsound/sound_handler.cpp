@@ -20,14 +20,16 @@
 #include "sound_handler.h"
 
 #include <boost/cstdint.hpp> // For C99 int types
-#include <vector> // for use
-#include <cmath> // for floor (debugging)
+#include <vector> 
+#include <cmath> 
+#include <boost/scoped_array.hpp>
 
 #include "EmbedSound.h" // for use
 #include "InputStream.h" // for use
 #include "EmbedSoundInst.h" // for upcasting to InputStream
 #include "log.h" // for use
-#include "WallClockTimer.h" // for debugging
+#include "StreamingSound.h"
+#include "StreamingSoundData.h"
 
 // Debug create_sound/delete_sound/playSound/stop_sound, loops
 //#define GNASH_DEBUG_SOUNDS_MANAGEMENT
@@ -58,18 +60,16 @@ namespace gnash {
 namespace sound {
 
 sound_handler::StreamBlockId
-sound_handler::addSoundBlock(unsigned char* data,
-        unsigned int data_bytes, unsigned int /*sample_count*/,
-        int handle)
+sound_handler::addSoundBlock(std::auto_ptr<SimpleBuffer> data,
+        unsigned int sample_count, int handle)
 {
     if (!validHandle(_streamingSounds, handle)) {
         log_error("Invalid (%d) handle passed to fill_stream_data, "
                   "doing nothing", handle);
-        delete [] data;
         return -1;
     }
 
-    EmbedSound* sounddata = _streamingSounds[handle];
+    StreamingSoundData* sounddata = _streamingSounds[handle];
     if (!sounddata) {
         log_error("handle passed to fill_stream_data (%d) "
                   "was deleted", handle);
@@ -77,15 +77,7 @@ sound_handler::addSoundBlock(unsigned char* data,
     }
 
     // Handling of the sound data
-    size_t start_size = sounddata->size();
-    sounddata->append(reinterpret_cast<boost::uint8_t*>(data), data_bytes);
-
-#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
-    log_debug("fill_stream_data: sound %d, %d samples (%d bytes) appended at offset %d",
-        handle, data_bytes/2, data_bytes, start_size);
-#endif
-
-    return start_size;
+    return sounddata->append(data, sample_count);
 }
 
 void
@@ -106,10 +98,10 @@ sound_handler::delete_all_sounds()
     }
     _sounds.clear();
 
-    for (Sounds::iterator i = _streamingSounds.begin(),
+    for (StreamingSounds::iterator i = _streamingSounds.begin(),
                           e = _streamingSounds.end(); i != e; ++i)
     {
-        EmbedSound* sdef = *i;
+        StreamingSoundData* sdef = *i;
 
         // Streaming sounds are never deleted.
         assert(sdef);
@@ -162,11 +154,11 @@ sound_handler::stop_all_sounds()
         stopEmbedSoundInstances(*sounddata);
     }
 
-    for (Sounds::iterator i = _streamingSounds.begin(),
+    for (StreamingSounds::iterator i = _streamingSounds.begin(),
                           e = _streamingSounds.end(); i != e; ++i)
     {
-        EmbedSound* sounddata = *i;
-        if ( ! sounddata ) continue; 
+        StreamingSoundData* sounddata = *i;
+        if (!sounddata) continue; 
         stopEmbedSoundInstances(*sounddata);
     }
 }
@@ -207,7 +199,7 @@ sound_handler::stopStreamingSound(int handle)
         return;
     }
     
-    EmbedSound* sounddata = _streamingSounds[handle];
+    StreamingSoundData* sounddata = _streamingSounds[handle];
     assert(sounddata);
 
     stopEmbedSoundInstances(*sounddata);
@@ -237,10 +229,36 @@ sound_handler::stopEventSound(int handle)
 }
 
 void   
+sound_handler::stopEmbedSoundInstances(StreamingSoundData& def)
+{
+    // Assert _mutex is locked ...
+    typedef std::vector<InputStream*> InputStreamVect;
+    InputStreamVect playing;
+    def.getPlayingInstances(playing);
+
+    // Now, for each playing InputStream, unplug it!
+    // NOTE: could be optimized...
+    for (InputStreamVect::iterator i=playing.begin(), e=playing.end();
+            i!=e; ++i)
+    {
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+        log_debug(" unplugging input stream %p from stopEmbedSoundInstances", *i);
+#endif
+
+        // Explicitly calling the base class implementation
+        // is a (dirty?) way to avoid mutex-locking overrides
+        // in subclasses causing deadlocks.
+        sound_handler::unplugInputStream(*i);
+    }
+
+    def.clearInstances();
+
+}
+
+void   
 sound_handler::stopEmbedSoundInstances(EmbedSound& def)
 {
     // Assert _mutex is locked ...
-
     typedef std::vector<InputStream*> InputStreamVect;
     InputStreamVect playing;
     def.getPlayingInstances(playing);
@@ -336,9 +354,8 @@ sound_handler::get_duration(int handle) const
 int
 sound_handler::createStreamingSound(const media::SoundInfo& sinfo)
 {
-    std::auto_ptr<SimpleBuffer> b;
-    std::auto_ptr<EmbedSound> sounddata(
-            new EmbedSound(b, sinfo, 100,
+    std::auto_ptr<StreamingSoundData> sounddata(
+            new StreamingSoundData(sinfo, 100,
                 _mediaHandler ? _mediaHandler->getInputPaddingSize() : 0));
 
     int sound_id = _streamingSounds.size();
@@ -424,7 +441,7 @@ sound_handler::isSoundPlaying(int handle) const
 void
 sound_handler::playSound(EmbedSound& sounddata,
         int loopCount, unsigned int inPoint, unsigned int outPoint,
-        StreamBlockId blockId, const SoundEnvelopes* envelopes,
+        const SoundEnvelopes* envelopes,
         bool allowMultiples)
 {
 
@@ -465,9 +482,6 @@ sound_handler::playSound(EmbedSound& sounddata,
             // MediaHandler to use for decoding
             *_mediaHandler,
 
-            // Sound block identifier
-            blockId, 
-
             // Samples range
             inPoint, outPoint,
 
@@ -486,11 +500,17 @@ sound_handler::playSound(EmbedSound& sounddata,
 void
 sound_handler::playStream(int soundId, StreamBlockId blockId)
 {
-    unsigned int inPoint=0;
-    unsigned int outPoint=std::numeric_limits<unsigned int>::max();
+    const unsigned int inPoint=0;
 
-    playSound(*_streamingSounds[soundId], 0, inPoint, outPoint, blockId, 0,
-            false);
+    StreamingSoundData& s = *_streamingSounds[soundId];
+    if (s.isPlaying() || s.empty()) return;
+
+    std::auto_ptr<InputStream> is(
+        s.createInstance(*_mediaHandler, blockId, inPoint));
+
+    s._soundInstances.push_back(is.get());
+
+    plugInputStream(is);
 }
 
 /*public*/
@@ -551,7 +571,7 @@ sound_handler::startSound(int handle, int loops,
 #endif
     }
 
-    playSound(sounddata, loops, inPoint, outPoint, 0, env, allowMultiple);
+    playSound(sounddata, loops, inPoint, outPoint, env, allowMultiple);
 }
 
 void

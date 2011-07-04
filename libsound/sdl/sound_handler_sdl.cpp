@@ -149,13 +149,12 @@ SDL_sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,
 }
 
 sound_handler::StreamBlockId
-SDL_sound_handler::addSoundBlock(unsigned char* data,
-        unsigned int dataBytes, unsigned int nSamples,
-        int streamId)
+SDL_sound_handler::addSoundBlock(std::auto_ptr<SimpleBuffer> buf,
+        unsigned int nSamples, int streamId)
 {
 
     boost::mutex::scoped_lock lock(_mutex);
-    return sound_handler::addSoundBlock(data, dataBytes, nSamples, streamId);
+    return sound_handler::addSoundBlock(buf, nSamples, streamId);
 }
 
 

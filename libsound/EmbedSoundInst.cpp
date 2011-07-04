@@ -22,7 +22,6 @@
 
 #include <cmath>
 #include <vector>
-#include <boost/scoped_array.hpp>
 
 #include "SoundInfo.h" // for use
 #include "MediaHandler.h" // for use
@@ -48,15 +47,13 @@ EmbedSoundInst::samplesFetched() const
 
 EmbedSoundInst::EmbedSoundInst(EmbedSound& soundData,
             media::MediaHandler& mediaHandler,
-            sound_handler::StreamBlockId blockOffset,
             unsigned int inPoint,
             unsigned int outPoint,
             const SoundEnvelopes* env,
             unsigned int loopCount)
         :
 
-        // should store blockOffset somewhere else too, for resetting
-        decodingPosition(blockOffset),
+        decodingPosition(0),
 
         loopCount(loopCount),
 
@@ -255,28 +252,6 @@ EmbedSoundInst::decodeNextBlock()
 
         // Figure the frame size ...
         inputSize = encodedDataSize() - decodingPosition;
-        if (!sndData.m_frames_size.empty())
-        {
-            const EmbedSound::FrameSizeMap& m = sndData.m_frames_size;
-            EmbedSound::FrameSizeMap::const_iterator it =
-                        m.find(decodingPosition);
-            if ( it != m.end() )
-            {
-                inputSize = it->second; 
-#ifdef GNASH_DEBUG_SOUNDS_DECODING
-                log_debug(" frame size for frame starting at offset %d is %d",
-                    decodingPosition, inputSize);
-#endif
-            }
-            else
-            {
-                // this should never happen, as we keep track of 
-                // sizes for each audio block in input
-                log_error("Unknown size of audio block starting at offset %d",
-                    " (should never happen)",
-                    decodingPosition);
-            }
-        }
     }
 
 #ifdef GNASH_DEBUG_SOUNDS_DECODING

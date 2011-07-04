@@ -65,10 +65,6 @@ public:
     /// @param mh
     ///     The MediaHandler to use for on-demand decoding
     ///
-    /// @param blockId
-    ///     Identifier of the encoded block to start decoding from.
-    ///     @see gnash::swf::StreamSoundBlockTag
-    ///
     /// @param inPoint
     ///     Offset in output samples this instance should start
     ///     playing from. These are post-resampling samples (44100 
@@ -89,7 +85,6 @@ public:
     ///     inPoint and outPoint.
     ///
     EmbedSoundInst(EmbedSound& def, media::MediaHandler& mh,
-            sound_handler::StreamBlockId blockId,
             unsigned int inPoint,
             unsigned int outPoint,
             const SoundEnvelopes* envelopes,
@@ -112,39 +107,6 @@ public:
 
 private:
 
-    /// Current decoding position in the encoded stream
-    unsigned long decodingPosition;
-
-    /// Current playback position in the decoded stream
-    unsigned long playbackPosition;
-
-    /// Numbers of loops: -1 means loop forever, 0 means play once.
-    /// For every loop completed, it is decremented.
-    long loopCount;
-
-    /// Offset in bytes samples from start of the block
-    /// to begin playback from
-    unsigned long _inPoint;
-
-    /// Offset in bytes to end playback at
-    /// Never if numeric_limits<unsigned long>::max()
-    unsigned long _outPoint;
-
-    /// Sound envelopes for the current sound, which determine the volume level
-    /// from a given position. Only used with event sounds.
-    const SoundEnvelopes* envelopes;
-
-    /// Index of current envelope.
-    boost::uint32_t current_env;
-
-    /// Number of samples fetched so far.
-    unsigned long _samplesFetched;
-
-    /// Get the sound definition this object is an instance of
-    const EmbedSound& getSoundData() {    
-        return _soundDef;
-    }
-
     /// Append size bytes to this raw data 
     //
     /// @param data
@@ -154,29 +116,8 @@ private:
     /// Size of the 'data' buffer.
     ///
     void appendDecodedData(boost::uint8_t* data, unsigned int size);
-  
-    /// Set decoded data
-    //
-    /// @param data
-    /// Data bytes, allocated with new[]. Ownership transferred.
-    ///
-    /// @param size
-    /// Size of the 'data' buffer.
-    ///
-    void setDecodedData(boost::uint8_t* data, unsigned int size)
-    {
-        if ( ! _decodedData.get() )
-        {
-            _decodedData.reset( new SimpleBuffer() );
-        }
 
-        _decodedData->resize(0); // shouldn't release memory
-        _decodedData->append(data, size);
-        delete [] data; // ownership transferred...
-    }
-
-    size_t encodedDataSize() const
-    {
+    size_t encodedDataSize() const {
         return _soundDef.size();
     }
 
@@ -199,25 +140,18 @@ private:
     ///
     /// @param env
     ///     SoundEnvelopes to apply.
-    ///
-    ///
     void applyEnvelopes(boost::int16_t* samples, unsigned int nSamples,
-            unsigned int firstSampleNum,
-            const SoundEnvelopes& env);
+            unsigned int firstSampleNum, const SoundEnvelopes& env);
 
     /// Returns the data pointer in the encoded datastream
     /// for the given position. Boundaries are checked.
     //
     /// Uses _samplesFetched and playbackPosition
-    ///
-    /// @todo make private
-    ///
     const boost::uint8_t* getEncodedData(unsigned long int pos);
 
     /// Return number of already-decoded samples available
     /// from playback position on
-    unsigned int decodedSamplesAhead() const
-    {
+    unsigned int decodedSamplesAhead() const {
         unsigned int dds = decodedDataSize();
         if ( dds <= playbackPosition ) return 0; 
         unsigned int bytesAhead = dds - playbackPosition;
@@ -245,10 +179,6 @@ private:
         return ( decodingPosition >= encodedDataSize() );
     }
   
-
-    /// The decoder object used to convert the data into the playable format
-    std::auto_ptr<media::AudioDecoder> _decoder;
-
     /// Create a decoder for this instance
     //
     /// If decoder creation fails an error will
@@ -278,6 +208,43 @@ private:
     ///
     boost::int16_t* getDecodedData(unsigned long int pos);
 
+
+    /// Decode next input block
+    //
+    /// It's assumed !decodingCompleted()
+    ///
+    void decodeNextBlock();
+
+    /// Current decoding position in the encoded stream
+    unsigned long decodingPosition;
+
+    /// Current playback position in the decoded stream
+    unsigned long playbackPosition;
+
+    /// Numbers of loops: -1 means loop forever, 0 means play once.
+    /// For every loop completed, it is decremented.
+    long loopCount;
+
+    /// Offset in bytes samples from start of the block
+    /// to begin playback from
+    unsigned long _inPoint;
+
+    /// Offset in bytes to end playback at
+    /// Never if numeric_limits<unsigned long>::max()
+    unsigned long _outPoint;
+
+    /// Sound envelopes for the current sound, which determine the volume level
+    /// from a given position. Only used with event sounds.
+    const SoundEnvelopes* envelopes;
+
+    /// Index of current envelope.
+    boost::uint32_t current_env;
+
+    /// Number of samples fetched so far.
+    unsigned long _samplesFetched;
+
+    /// The decoder object used to convert the data into the playable format
+    std::auto_ptr<media::AudioDecoder> _decoder;
     /// The encoded data
     //
     /// It is non-const because we deregister ourselves
@@ -291,12 +258,6 @@ private:
     /// decoded instead
     ///
     std::auto_ptr<SimpleBuffer> _decodedData;
-
-    /// Decode next input block
-    //
-    /// It's assumed !decodingCompleted()
-    ///
-    void decodeNextBlock();
 };
 
 

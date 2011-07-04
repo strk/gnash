@@ -1,4 +1,4 @@
-// EmbedSound.cpp - embedded sound definition, for gnash
+// StreamingSoundData.cpp - embedded sound definition, for gnash
 //
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010,
 //   2011 Free Software Foundation, Inc
@@ -18,66 +18,68 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "EmbedSound.h"
+#include "StreamingSoundData.h"
 
 #include <vector>
-#include <boost/cstdint.hpp>
+#include <boost/cstdint.hpp> 
 
-#include "EmbedSoundInst.h" 
 #include "SoundInfo.h"
 #include "MediaHandler.h" 
 #include "log.h"
 #include "GnashException.h" 
+#include "StreamingSound.h"
+#include "utility.h"
 
 namespace gnash {
 namespace sound {
 
-EmbedSound::EmbedSound(std::auto_ptr<SimpleBuffer> data,
-        const media::SoundInfo& info, int nVolume, size_t paddingBytes)
-    :
-    _buf(data),
-    soundinfo(info),
-    volume(nVolume)
+size_t
+StreamingSoundData::append(std::auto_ptr<SimpleBuffer> data, size_t sampleCount)
 {
-    if (_buf.get()) {
-        if (_buf->capacity() - _buf->size() < paddingBytes) {
-            log_error("EmbedSound creator didn't appropriately pad sound data. "
-                "We'll do now, but will cost memory copies.");
-            _buf->reserve(_buf->size()+paddingBytes);
-        }
+    UNUSED(sampleCount);
+    assert(data.get());
+
+    if (data->capacity() - data->size() < _paddingBytes) {
+        log_error("Streaming sound block creator didn't appropriately pad "
+                "sound data. We'll do so now, but will cost memory copies.");
+        data->reserve(data->size() + _paddingBytes);
     }
-    else {
-        _buf.reset(new SimpleBuffer());
-    }
+
+    _buffers.push_back(data);
+    return _buffers.size() - 1;
+}
+
+StreamingSoundData::StreamingSoundData(const media::SoundInfo& info,
+        int nVolume, size_t paddingBytes)
+    :
+    _buf(new SimpleBuffer()),
+    soundinfo(info),
+    volume(nVolume),
+    _paddingBytes(paddingBytes)
+{
 }
 
 void
-EmbedSound::clearInstances()
+StreamingSoundData::clearInstances()
 {
     boost::mutex::scoped_lock lock(_soundInstancesMutex);
     _soundInstances.clear();
 }
 
-EmbedSound::Instances::iterator
-EmbedSound::eraseActiveSound(Instances::iterator i)
+StreamingSoundData::Instances::iterator
+StreamingSoundData::eraseActiveSound(Instances::iterator i)
 {
     // Mutex intentionally NOT locked...
     return _soundInstances.erase(i);
 }
 
-std::auto_ptr<EmbedSoundInst>
-EmbedSound::createInstance(media::MediaHandler& mh,
-            unsigned int inPoint,
-            unsigned int outPoint,
-            const SoundEnvelopes* envelopes,
-            unsigned int loopCount)
+std::auto_ptr<StreamingSound>
+StreamingSoundData::createInstance(media::MediaHandler& mh,
+            unsigned long blockOffset,
+            unsigned int inPoint)
 {
-    std::auto_ptr<EmbedSoundInst> ret(new EmbedSoundInst(
-                                *this,
-                                mh, 
-                                inPoint, outPoint,
-                                envelopes,
-                                loopCount) );
+    std::auto_ptr<StreamingSound> ret(new StreamingSound(*this, mh,
+                blockOffset, inPoint));
 
     boost::mutex::scoped_lock lock(_soundInstancesMutex);
 
@@ -87,21 +89,24 @@ EmbedSound::createInstance(media::MediaHandler& mh,
     return ret;
 }
 
-EmbedSound::~EmbedSound()
+StreamingSoundData::~StreamingSoundData()
 {
     clearInstances();
 }
 
 void
-EmbedSound::eraseActiveSound(EmbedSoundInst* inst)
+StreamingSoundData::eraseActiveSound(InputStream* inst)
 {
     boost::mutex::scoped_lock lock(_soundInstancesMutex);
 
-    Instances::iterator it = std::find( _soundInstances.begin(),
-            _soundInstances.end(), inst);
+    Instances::iterator it = std::find(
+            _soundInstances.begin(),
+            _soundInstances.end(),
+            inst);
 
     if (it == _soundInstances.end()) {
-        log_error("EmbedSound::eraseActiveSound: instance %p not found!", inst);
+        log_error("StreamingSoundData::eraseActiveSound: instance %p "
+                "not found!", inst);
         return;
     }
     
@@ -109,28 +114,28 @@ EmbedSound::eraseActiveSound(EmbedSoundInst* inst)
 }
 
 bool
-EmbedSound::isPlaying() const
+StreamingSoundData::isPlaying() const
 {
     boost::mutex::scoped_lock lock(_soundInstancesMutex);
     return !_soundInstances.empty();
 }
 
 size_t
-EmbedSound::numPlayingInstances() const
+StreamingSoundData::numPlayingInstances() const
 {
     boost::mutex::scoped_lock lock(_soundInstancesMutex);
     return _soundInstances.size();
 }
 
-EmbedSoundInst*
-EmbedSound::firstPlayingInstance() const
+InputStream*
+StreamingSoundData::firstPlayingInstance() const
 {
     boost::mutex::scoped_lock lock(_soundInstancesMutex);
     return _soundInstances.front();
 }
 
 void
-EmbedSound::getPlayingInstances(std::vector<InputStream*>& to) const
+StreamingSoundData::getPlayingInstances(std::vector<InputStream*>& to) const
 {
     boost::mutex::scoped_lock lock(_soundInstancesMutex);
     for (Instances::const_iterator i=_soundInstances.begin(), e=_soundInstances.end();

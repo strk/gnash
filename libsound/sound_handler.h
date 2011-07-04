@@ -44,6 +44,8 @@ namespace gnash {
     }
     namespace sound {
         class EmbedSound;
+        class StreamingSound;
+        class StreamingSoundData;
         class InputStream;
     }
     class SimpleBuffer;
@@ -223,28 +225,15 @@ public:
     /// Append data for a streaming sound.
     ///
     /// Gnash's parser calls this to fill up soundstreams data.
-    /// TODO: the current code uses memory reallocation to grow the sound,
-    /// which is suboptimal; instead, we should maintain sound sources as a 
-    /// list of buffers, to avoid reallocations.
     ///
-    /// @param data
-    ///     The sound data to be saved, allocated by new[].
-    ///     Ownership is transferred.
-    ///     TODO: use SimpleBuffer ?
-    ///
-    /// @param dataBytes
-    ///     Size of the data in bytes
-    ///
-    /// @param sampleCount
-    ///     Number of samples in the data
-    ///
-    /// @param streamId
-    ///     The soundhandlers id of the sound we want to add data to
+    /// @param data         The sound data to be stored.
+    /// @param sampleCount  Number of samples in the data
+    /// @param streamId     The soundhandlers id of the sound we want
+    ///                     to add data to
     ///
     /// @return an identifier for the new block for use in playSound
     /// @throw SoundException on error
-    virtual StreamBlockId addSoundBlock(unsigned char* data,
-                                       unsigned int dataBytes,
+    virtual StreamBlockId addSoundBlock(std::auto_ptr<SimpleBuffer> data,
                                        unsigned int sampleCount,
                                        int streamId);
 
@@ -517,13 +506,18 @@ private:
     /// Elements of the vector are owned by this class
     Sounds  _sounds;
 
+    typedef std::vector<StreamingSoundData*> StreamingSounds;
+
     /// Vector containing streaming sounds.
     //
     /// Elements of the vector are owned by this class
-    Sounds _streamingSounds;
+    StreamingSounds _streamingSounds;
 
     /// Stop all instances of an embedded sound
     void stopEmbedSoundInstances(EmbedSound& def);
+
+    /// Stop all instances of an embedded sound
+    void stopEmbedSoundInstances(StreamingSoundData& def);
 
     typedef std::set< InputStream* > InputStreams;
 
@@ -558,12 +552,6 @@ private:
     ///     playing at. These are post-resampling samples (44100 
     ///     for one second of samples).
     ///
-    /// @param blockId
-    ///     When starting a soundstream from a random frame, this tells which
-    ///     block to start decoding from.
-    ///     If non-zero, the sound will only start when no other instances of
-    ///     it are already playing.
-    ///
     /// @param env
     ///     Some eventsounds have some volume control mechanism called
     ///     envelopes.
@@ -574,7 +562,7 @@ private:
     ///     instance of it already playing.
     ///
     void playSound(EmbedSound& sound, int loops, unsigned int inPoint,
-                   unsigned int outPoint, StreamBlockId blockId,
+                   unsigned int outPoint, 
                    const SoundEnvelopes* env, bool allowMultiple);
 
     /// Convert SWF-specified number of samples to output number of samples

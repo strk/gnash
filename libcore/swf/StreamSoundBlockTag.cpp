@@ -30,6 +30,7 @@
 #include "SWFStream.h"
 #include "log.h"
 #include "RunResources.h"
+#include "MediaHandler.h"
 
 namespace gnash {
 namespace SWF {
@@ -105,25 +106,27 @@ StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         return;
     }
 
-    unsigned char* data = new unsigned char[dataLength];
-    const unsigned int bytesRead = in.read(reinterpret_cast<char*>(data),
-            dataLength);
+    media::MediaHandler* mh = r.mediaHandler();
+    const size_t padding = mh ? mh->getInputPaddingSize() : 0;
+
+    // Reserve padding too.
+    std::auto_ptr<SimpleBuffer> buf(new SimpleBuffer(dataLength + padding));
+    buf->resize(dataLength);
+
+    const unsigned int bytesRead = in.read((char*)buf->data(), dataLength);
     
     if (bytesRead < dataLength) {
-        delete [] data;
         throw ParserException(_("Tag boundary reported past end of stream!"));
     }
 
     // Fill the data on the apropiate sound, and receives the starting point
     // for later "start playing from this frame" events.
     //
-    // ownership of 'data' is transferred here
-    //
     // TODO: the amount of sound data used should depend on the sampleCount,
     // not on the size of the data. Currently the sound_handler ignores
     // sampleCount completely.
     sound::sound_handler::StreamBlockId blockId =
-        handler->addSoundBlock(data, dataLength, sampleCount, sId);
+        handler->addSoundBlock(buf, sampleCount, sId);
 
     boost::intrusive_ptr<ControlTag> s(new StreamSoundBlockTag(sId, blockId));
 
