@@ -57,8 +57,7 @@ StreamingSound::StreamingSound(StreamingSoundData& soundData,
         _inPoint(inPoint * 4),
         _samplesFetched(0),
         _decoder(0),
-        _soundDef(soundData),
-        _decodedData(0)
+        _soundDef(soundData)
 {
     _playbackPosition = _inPoint; 
     createDecoder(mediaHandler);
@@ -89,11 +88,8 @@ StreamingSound::createDecoder(media::MediaHandler& mediaHandler)
 boost::int16_t*
 StreamingSound::getDecodedData(unsigned long int pos)
 {
-    if (_decodedData.get()) {
-        assert(pos < _decodedData->size());
-        return reinterpret_cast<boost::int16_t*>(_decodedData->data() + pos);
-    }
-    return 0;
+    assert(pos < _decodedData.size());
+    return reinterpret_cast<boost::int16_t*>(_decodedData.data() + pos);
 }
 
 unsigned int 
@@ -162,20 +158,21 @@ StreamingSound::decodeNextBlock()
     // are available for fetching.
     // Doing so we know what's the sample number
     // of the first sample in the newly decoded block.
-    assert(_playbackPosition >= decodedDataSize());
+    assert(_playbackPosition >= _decodedData.size());
 
     const StreamingSoundData& sndData = _soundDef;
     const bool parse =
         sndData.soundinfo.getFormat() == media::AUDIO_CODEC_ADPCM ?
         false : true;
 
+    const SimpleBuffer& block = _soundDef.getBlock(_currentBlock);
+
     // Move onto next block.
     // decode it, add to decoded sound.
 
     // This is a streaming sound. This function is only called if there is
     // data to decode. If there is data, there must be frames.
-    const boost::uint32_t inputSize = sndData._buffers[_currentBlock].size() -
-        _positionInBlock; 
+    const boost::uint32_t inputSize = block.size() - _positionInBlock; 
 
 #ifdef GNASH_DEBUG_SOUNDS_DECODING
     log_debug(" frame size for frame starting at offset %d is %d",
@@ -183,8 +180,7 @@ StreamingSound::decodeNextBlock()
 #endif
 
     assert(inputSize);
-    const boost::uint8_t* input = sndData._buffers[_currentBlock].data() + 
-        _positionInBlock;
+    const boost::uint8_t* input = block.data() + _positionInBlock;
 
     boost::uint32_t consumed = 0;
     boost::uint32_t decodedDataSize = 0;
@@ -195,7 +191,8 @@ StreamingSound::decodeNextBlock()
                                       consumed,
                                       parse);
 
-    if (consumed == sndData._buffers[_currentBlock].size()) {
+    // Check if the entire block was consumed.
+    if (consumed == block.size()) {
         // Go to next block
         ++_currentBlock;
         _positionInBlock = 0;
@@ -234,12 +231,7 @@ StreamingSound::~StreamingSound()
 void
 StreamingSound::appendDecodedData(boost::uint8_t* data, unsigned int size)
 {
-    if (!_decodedData.get()) {
-        _decodedData.reset(new SimpleBuffer);
-    }
-
-    _decodedData->append(data, size);
-
+    _decodedData.append(data, size);
     delete [] data; // ownership transferred...
 }
 

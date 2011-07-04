@@ -220,7 +220,7 @@ EmbedSoundInst::decodeNextBlock()
     // Doing so we know what's the sample number
     // of the first sample in the newly decoded block.
     //
-    assert( playbackPosition >= decodedDataSize() );
+    assert(playbackPosition >= _decodedData.size());
 
     boost::uint32_t inputSize = 0; // or blockSize
     bool parse = true; // need to parse ?

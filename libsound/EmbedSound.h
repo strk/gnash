@@ -20,16 +20,16 @@
 #ifndef SOUND_EMBEDSOUND_H
 #define SOUND_EMBEDSOUND_H
 
-#include "SimpleBuffer.h" // for composition
-#include "SoundInfo.h" // for composition
-#include "SoundEnvelope.h" // for SoundEnvelopes define
-
 #include <vector>
 #include <memory> // for auto_ptr (composition)
 #include <set> // for composition (_soundInstances)
 #include <cassert>
 #include <boost/thread/mutex.hpp>
+#include <boost/scoped_ptr.hpp>
 
+#include "SimpleBuffer.h" // for composition
+#include "SoundInfo.h" // for composition
+#include "SoundEnvelope.h" // for SoundEnvelopes define
 
 // Forward declarations
 namespace gnash {
@@ -48,12 +48,13 @@ namespace sound {
 /// Definition of an embedded sound
 class EmbedSound
 {
-    /// The undecoded data
-    std::auto_ptr<SimpleBuffer> _buf;
-
-    void ensureBufferPadding();
-
 public:
+
+    /// Vector containing the active instances of this sounds being played
+    //
+    /// NOTE: This class does NOT own the active sounds
+    ///
+    typedef std::list<EmbedSoundInst*> Instances;
 
     /// Construct a sound with given data, info and volume.
     //
@@ -70,9 +71,6 @@ public:
 
     ~EmbedSound();
 
-    /// Object holding information about the sound
-    media::SoundInfo soundinfo;
-
     /// Return size of the data buffer
     size_t size() const {
         return _buf->size();
@@ -88,27 +86,12 @@ public:
         return _buf->data();
     }
 
-    /// Return a pointer to the underlying buffer
-    boost::uint8_t* data() {
-        return _buf->data();
-    }
-
     /// Return a pointer to an offset in the underlying buffer
     //
     /// @param pos The offset value.
     ///     An assertion will fail if pos > size()
     ///
     const boost::uint8_t* data(size_t pos) const {
-        assert(pos < _buf->size());
-        return _buf->data()+pos;
-    }
-
-    /// Return a pointer to an offset in the underlying buffer
-    //
-    /// @param pos The offset value.
-    ///     An assertion will fail if pos > size()
-    ///
-    boost::uint8_t* data(size_t pos) {
         assert(pos < _buf->size());
         return _buf->data()+pos;
     }
@@ -158,46 +141,15 @@ public:
     /// @param loopCount
     ///     Number of times this instance should loop over the defined sound.
     ///     @todo document if every loop starts at secsOffset !
-    ///
-    /// @todo split this in createEventSoundInstance
-    ///                 and createStreamingSoundInstance
-    ///
-    ///
     /// Locks the _soundInstancesMutex when pushing to it
     ///
-    std::auto_ptr<EmbedSoundInst> createInstance( media::MediaHandler& mh,
+    std::auto_ptr<EmbedSoundInst> createInstance(media::MediaHandler& mh,
             unsigned int inPoint, unsigned int outPoint,
             const SoundEnvelopes* envelopes, unsigned int loopCount);
-
-    /// Volume for AS-sounds, range: 0-100.
-    /// It's the SWF range that is represented here.
-    int volume;
-
-    /// Vector containing the active instances of this sounds being played
-    //
-    /// NOTE: This class does NOT own the active sounds
-    ///
-    typedef std::list<EmbedSoundInst*> Instances;
-
-    /// Playing instances of this sound definition
-    //
-    /// Multithread access to this member is protected
-    /// by the _soundInstancesMutex mutex
-    ///
-    /// @todo make private
-    ///
-    Instances _soundInstances;
-
-    /// Mutex protecting access to _soundInstances
-    //
-    /// @todo make private
-    ///
-    mutable boost::mutex _soundInstancesMutex;
 
     /// Drop all active sounds
     //
     /// Locks _soundInstancesMutex
-    ///
     void clearInstances();
 
     /// Drop an active sound (by iterator)
@@ -205,7 +157,6 @@ public:
     /// Does *NOT* lock the _soundInstancesMutex
     ///
     /// @return iterator after the one being erased
-    ///
     Instances::iterator eraseActiveSound(Instances::iterator i);
 
     /// Drop an active sound (by pointer)
@@ -221,6 +172,28 @@ public:
     /// @todo make private and mark EmbedSoundInst as friend ?
     ///
     void eraseActiveSound(EmbedSoundInst* inst);
+
+    /// The undecoded data
+    boost::scoped_ptr<SimpleBuffer> _buf;
+
+    /// Object holding information about the sound
+    media::SoundInfo soundinfo;
+
+    /// Volume for AS-sounds, range: 0-100.
+    /// It's the SWF range that is represented here.
+    int volume;
+
+private:
+
+    /// Playing instances of this sound definition
+    //
+    /// Multithread access to this member is protected
+    /// by the _soundInstancesMutex mutex
+    Instances _soundInstances;
+
+    /// Mutex protecting access to _soundInstances
+    //
+    mutable boost::mutex _soundInstancesMutex;
 };
 
 } // gnash.sound namespace 

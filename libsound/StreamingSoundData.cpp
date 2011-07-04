@@ -52,7 +52,6 @@ StreamingSoundData::append(std::auto_ptr<SimpleBuffer> data, size_t sampleCount)
 StreamingSoundData::StreamingSoundData(const media::SoundInfo& info,
         int nVolume, size_t paddingBytes)
     :
-    _buf(new SimpleBuffer()),
     soundinfo(info),
     volume(nVolume),
     _paddingBytes(paddingBytes)

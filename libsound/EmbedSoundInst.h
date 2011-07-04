@@ -152,7 +152,7 @@ private:
     /// Return number of already-decoded samples available
     /// from playback position on
     unsigned int decodedSamplesAhead() const {
-        unsigned int dds = decodedDataSize();
+        unsigned int dds = _decodedData.size();
         if ( dds <= playbackPosition ) return 0; 
         unsigned int bytesAhead = dds - playbackPosition;
         assert(!(bytesAhead%2));
@@ -185,12 +185,6 @@ private:
     /// be logged, and _decoder won't be set
     /// 
     void createDecoder(media::MediaHandler& mediaHandler);
-
-    /// Return full size of the decoded data buffer
-    size_t decodedDataSize() const
-    {
-        return _decodedData.size();
-    }
 
     /// \brief
     /// Returns the data pointer in the decoded datastream

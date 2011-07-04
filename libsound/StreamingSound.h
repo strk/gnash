@@ -48,30 +48,19 @@ namespace sound {
 //
 /// This class contains a pointer to the StreamingSoundData used for playing
 /// and a SimpleBuffer to use when decoding is needed.
-///
-/// When the SimpleBuffer is NULL we'll play the StreamingSoundData bytes directly
-/// (we assume they are decoded already)
-///
 class StreamingSound : public InputStream
 {
 public:
 
     /// Create an embedded %sound instance
     //
-    /// @param def
-    ///     The definition of this sound (where immutable data is kept)
-    ///
-    /// @param mh
-    ///     The MediaHandler to use for on-demand decoding
-    ///
-    /// @param blockId
-    ///     Identifier of the encoded block to start decoding from.
-    ///     @see gnash::swf::StreamSoundBlockTag
-    ///
-    /// @param inPoint
-    ///     Offset in output samples this instance should start
-    ///     playing from. These are post-resampling samples (44100 
-    ///     for one second of samples).
+    /// @param def      The sound data for this sound 
+    /// @param mh       The MediaHandler to use for on-demand decoding
+    /// @param blockId  Identifier of the encoded block to start decoding from.
+    ///                 @see gnash::swf::StreamSoundBlockTag
+    /// @param inPoint  Offset in output samples this instance should start
+    ///                 playing from. These are post-resampling samples (44100 
+    ///                 for one second of samples).
     StreamingSound(StreamingSoundData& def, media::MediaHandler& mh,
             sound_handler::StreamBlockId blockId,
             unsigned int inPoint);
@@ -111,11 +100,11 @@ private:
     /// from playback position on
     unsigned int decodedSamplesAhead() const {
 
-        const unsigned int dds = decodedDataSize();
+        const unsigned int dds = _decodedData.size();
         if (dds <= _playbackPosition) return 0; 
 
         const unsigned int bytesAhead = dds - _playbackPosition;
-        assert(!(bytesAhead%2));
+        assert(!(bytesAhead % 2));
 
         const unsigned int samplesAhead = bytesAhead / 2;
         return samplesAhead;
@@ -124,7 +113,7 @@ private:
     /// Return true if there's nothing more to decode
     bool decodingCompleted() const {
         return _positionInBlock == 0 && 
-            _currentBlock >= _soundDef._buffers.size();
+            _currentBlock >= _soundDef.blockCount();
     }
 
     /// Create a decoder for this instance
@@ -132,11 +121,6 @@ private:
     /// If decoder creation fails an error will
     /// be logged, and _decoder won't be set
     void createDecoder(media::MediaHandler& mediaHandler);
-
-    /// Return full size of the decoded data buffer
-    size_t decodedDataSize() const {
-        return _decodedData.get() ? _decodedData->size() : 0;
-    }
 
     /// Access data in the decoded datastream for the given byte offset.
     //
@@ -150,7 +134,6 @@ private:
     /// Decode next input block
     //
     /// It's assumed !decodingCompleted()
-    ///
     void decodeNextBlock();
 
     // The current block of sound.
@@ -180,11 +163,7 @@ private:
     StreamingSoundData& _soundDef;
 
     /// The decoded buffer
-    //
-    /// If NULL, the _soundDef will be considered
-    /// decoded instead
-    ///
-    boost::scoped_ptr<SimpleBuffer> _decodedData;
+    SimpleBuffer _decodedData;
 };
 
 

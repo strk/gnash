@@ -49,12 +49,12 @@ namespace sound {
 /// Definition of an embedded sound
 class StreamingSoundData
 {
-    /// The undecoded data
-    boost::scoped_ptr<SimpleBuffer> _buf;
-
-    void ensureBufferPadding();
-
 public:
+
+    /// Container for the active instances of this sounds being played
+    //
+    /// NOTE: This class does NOT own the active sounds
+    typedef std::list<InputStream*> Instances;
 
     /// Construct a sound with given data, info and volume.
     //
@@ -71,20 +71,23 @@ public:
 
     ~StreamingSoundData();
 
-    /// Object holding information about the sound
-    media::SoundInfo soundinfo;
-
-    boost::ptr_vector<SimpleBuffer> _buffers;
-
     /// Append a sound data block
     //
     /// @param data             Undecoded sound data.
     /// @param sampleCount      The number of samples when decoded.
     size_t append(std::auto_ptr<SimpleBuffer> data, size_t sampleCount);
 
-    /// Is the data buffer empty ?
+    /// Do we have any data?
     bool empty() const {
         return _buffers.empty();
+    }
+
+    const SimpleBuffer& getBlock(size_t index) const {
+        return _buffers[index];
+    }
+
+    size_t blockCount() const {
+        return _buffers.size();
     }
 
     /// Are there known playing instances of this sound ?
@@ -112,49 +115,18 @@ public:
     //
     /// The returned instance ownership is transferred
     ///
-    /// @param mh
-    ///     The MediaHandler to use for on-demand decoding
-    ///
-    /// @param blockOffset
-    ///     Byte offset in the immutable (encoded) data this
-    ///     instance should start decoding.
-    ///     This is currently used for streaming embedded sounds
-    ///     to refer to a specific StreamSoundBlock.
-    ///     @see gnash::swf::StreamSoundBlockTag
-    ///
-    /// @param inPoint
-    ///     Offset in output samples this instance should start
-    ///     playing from. These are post-resampling samples from
-    ///     the start of the specified blockId.
+    /// @param mh               The MediaHandler to use for on-demand decoding
+    /// @param blockOffset      Block number in the immutable (encoded) data
+    ///                         this instance should start decoding.
+    ///                         This refers to a specific StreamSoundBlock.
+    ///                         @see gnash::swf::StreamSoundBlockTag
+    /// @param inPoint          Offset in output samples this instance
+    ///                         should start playing from. These are
+    ///                         post-resampling samples from
+    ///                         the start of the specified blockId.
     /// Locks the _soundInstancesMutex when pushing to it
-    ///
     std::auto_ptr<StreamingSound> createInstance(media::MediaHandler& mh,
             unsigned long blockOffset, unsigned int inPoint);
-
-    /// Volume for AS-sounds, range: 0-100.
-    /// It's the SWF range that is represented here.
-    int volume;
-
-    /// Vector containing the active instances of this sounds being played
-    //
-    /// NOTE: This class does NOT own the active sounds
-    ///
-    typedef std::list<InputStream*> Instances;
-
-    /// Playing instances of this sound definition
-    //
-    /// Multithread access to this member is protected
-    /// by the _soundInstancesMutex mutex
-    ///
-    /// @todo make private
-    ///
-    Instances _soundInstances;
-
-    /// Mutex protecting access to _soundInstances
-    //
-    /// @todo make private
-    ///
-    mutable boost::mutex _soundInstancesMutex;
 
     /// Drop all active sounds
     //
@@ -181,7 +153,31 @@ public:
     /// Does lock the _soundInstancesMutex
     void eraseActiveSound(InputStream* inst);
 
+    /// Object holding information about the sound
+    media::SoundInfo soundinfo;
+
+    /// Volume for AS-sounds, range: 0-100.
+    /// It's the SWF range that is represented here.
+    int volume;
+
+    /// Playing instances of this sound definition
+    //
+    /// Multithread access to this member is protected
+    /// by the _soundInstancesMutex mutex
+    ///
+    /// @todo make private
+    ///
+    Instances _soundInstances;
+
+    /// Mutex protecting access to _soundInstances
+    //
+    /// @todo make private
+    ///
+    mutable boost::mutex _soundInstancesMutex;
+
     const size_t _paddingBytes;
+
+    boost::ptr_vector<SimpleBuffer> _buffers;
 };
 
 } // gnash.sound namespace 
