@@ -45,6 +45,13 @@ silentStream(void*, boost::int16_t* stream, unsigned int len, bool& atEOF)
     return len;
 }
 
+template<typename T>
+bool
+validHandle(const T& container, int handle)
+{
+    return handle >= 0 && static_cast<size_t>(handle) < container.size();
+}
+
 }
 
 namespace gnash {
@@ -53,22 +60,19 @@ namespace sound {
 sound_handler::StreamBlockId
 sound_handler::addSoundBlock(unsigned char* data,
         unsigned int data_bytes, unsigned int /*sample_count*/,
-        int handleId)
+        int handle)
 {
-    // @@ does a negative handle_id have any meaning ?
-    //    should we change it to unsigned instead ?
-    if (handleId < 0 || (unsigned int) handleId+1 > _streamingSounds.size())
-    {
-        log_error("Invalid (%d) sound_handle passed to fill_stream_data, "
-                  "doing nothing", handleId);
+    if (!validHandle(_streamingSounds, handle)) {
+        log_error("Invalid (%d) handle passed to fill_stream_data, "
+                  "doing nothing", handle);
         delete [] data;
         return -1;
     }
 
-    EmbedSound* sounddata = _streamingSounds[handleId];
+    EmbedSound* sounddata = _streamingSounds[handle];
     if (!sounddata) {
-        log_error("sound_handle passed to fill_stream_data (%d) "
-                  "was deleted", handleId);
+        log_error("handle passed to fill_stream_data (%d) "
+                  "was deleted", handle);
         return -1;
     }
 
@@ -78,7 +82,7 @@ sound_handler::addSoundBlock(unsigned char* data,
 
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
     log_debug("fill_stream_data: sound %d, %d samples (%d bytes) appended at offset %d",
-        handleId, data_bytes/2, data_bytes, start_size);
+        handle, data_bytes/2, data_bytes, start_size);
 #endif
 
     return start_size;
@@ -120,31 +124,30 @@ sound_handler::delete_all_sounds()
 }
 
 void
-sound_handler::delete_sound(int sound_handle)
+sound_handler::delete_sound(int handle)
 {
     // Check if the sound exists
-    if (sound_handle < 0 || static_cast<unsigned int>(sound_handle) >= _sounds.size())
-    {
-        log_error("Invalid (%d) sound_handle passed to delete_sound, "
-                  "doing nothing", sound_handle);
+    if (!validHandle(_sounds, handle)) {
+        log_error("Invalid (%d) handle passed to delete_sound, "
+                  "doing nothing", handle);
         return;
     }
 
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
-    log_debug ("deleting sound :%d", sound_handle);
+    log_debug ("deleting sound :%d", handle);
 #endif
 
-    EmbedSound* def = _sounds[sound_handle];
+    EmbedSound* def = _sounds[handle];
     if ( ! def )
     {
-        log_error("sound_handle passed to delete_sound (%d) "
-                  "already deleted", sound_handle);
+        log_error("handle passed to delete_sound (%d) "
+                  "already deleted", handle);
         return;
     }
     
     stopEmbedSoundInstances(*def);
     delete def;
-    _sounds[sound_handle] = 0;
+    _sounds[handle] = 0;
 
 }
 
@@ -169,56 +172,40 @@ sound_handler::stop_all_sounds()
 }
 
 int
-sound_handler::get_volume(int soundHandle) const
+sound_handler::get_volume(int handle) const
 {
-    if (soundHandle >= 0 && static_cast<size_t>(soundHandle) < _sounds.size())
-    {
-        return _sounds[soundHandle]->volume;
-    } 
+    if (validHandle(_sounds, handle)) return _sounds[handle]->volume; 
 
     // Invalid handle.
     return 0;
 }
 
 void   
-sound_handler::set_volume(int sound_handle, int volume)
+sound_handler::set_volume(int handle, int volume)
 {
-    // Check if the sound exists.
-    if (sound_handle < 0 || static_cast<unsigned int>(sound_handle) >= _sounds.size())
-    {
-        // Invalid handle.
-    } else {
-
-        // Set volume for this sound. Should this only apply to the active sounds?
-        _sounds[sound_handle]->volume = volume;
-    }
-
-
+    // Set volume for this sound.
+    // Should this only apply to the active sounds?
+    if (validHandle(_sounds, handle)) _sounds[handle]->volume = volume;
 }
 
 media::SoundInfo*
-sound_handler::get_sound_info(int sound_handle) const
+sound_handler::get_sound_info(int handle) const
 {
     // Check if the sound exists.
-    if (sound_handle >= 0 &&
-            static_cast<size_t>(sound_handle) < _streamingSounds.size())
-    {
-        return &_streamingSounds[sound_handle]->soundinfo;
+    if (validHandle(_streamingSounds, handle)) {
+        return &_streamingSounds[handle]->soundinfo;
     } 
-    return NULL;
+    return 0;
 }
 
 void
 sound_handler::stopStreamingSound(int handle)
 {
     // Check if the sound exists.
-    if (handle < 0 || (size_t)handle >= _streamingSounds.size())
-    {
+    if (!validHandle(_streamingSounds, handle)) {
         log_debug("stop_sound(%d): invalid sound id", handle);
-        // Invalid handle.
         return;
     }
-
     
     EmbedSound* sounddata = _streamingSounds[handle];
     assert(sounddata);
@@ -230,12 +217,10 @@ void
 sound_handler::stopEventSound(int handle)
 {
     // Check if the sound exists.
-    if (handle < 0 || (unsigned int) handle >= _sounds.size()) {
+    if (!validHandle(_sounds, handle)) {
         log_debug("stop_sound(%d): invalid sound id", handle);
-        // Invalid handle.
         return;
     }
-
     
     EmbedSound* sounddata = _sounds[handle];
     if (!sounddata) {
@@ -305,16 +290,12 @@ sound_handler::unplugInputStream(InputStream* id)
 }
 
 unsigned int
-sound_handler::tell(int sound_handle) const
+sound_handler::tell(int handle) const
 {
     // Check if the sound exists.
-    if (sound_handle < 0 || (unsigned int) sound_handle >= _sounds.size())
-    {
-        // Invalid handle.
-        return 0;
-    }
+    if (!validHandle(_sounds, handle)) return 0;
 
-    const EmbedSound* sounddata = _sounds[sound_handle];
+    const EmbedSound* sounddata = _sounds[handle];
 
     // If there is no active sounds, return 0
     if (!sounddata->isPlaying()) return 0;
@@ -332,16 +313,12 @@ sound_handler::tell(int sound_handle) const
 }
 
 unsigned int
-sound_handler::get_duration(int sound_handle) const
+sound_handler::get_duration(int handle) const
 {
     // Check if the sound exists.
-    if (sound_handle < 0 || (unsigned int) sound_handle >= _sounds.size())
-    {
-        // Invalid handle.
-        return 0;
-    }
+    if (!validHandle(_sounds, handle)) return 0;
 
-    const EmbedSound* sounddata = _sounds[sound_handle];
+    const EmbedSound* sounddata = _sounds[handle];
 
     const boost::uint32_t sampleCount = sounddata->soundinfo.getSampleCount();
     const boost::uint32_t sampleRate = sounddata->soundinfo.getSampleRate();
@@ -431,15 +408,11 @@ sound_handler::swfToOutSamples(const media::SoundInfo& sinfo,
 
 /* public */
 bool
-sound_handler::isSoundPlaying(int sound_handle) const
+sound_handler::isSoundPlaying(int handle) const
 {
-    if ( sound_handle < 0 ||
-         static_cast<unsigned int>(sound_handle) >= _sounds.size() )
-    {
-        return false;
-    }
+    if (!validHandle(_sounds, handle)) return false;
 
-    EmbedSound& sounddata = *(_sounds[sound_handle]);
+    EmbedSound& sounddata = *(_sounds[handle]);
 
     // When this is called from a StreamSoundBlockTag,
     // we only start if this sound isn't already playing.
@@ -522,23 +495,21 @@ sound_handler::playStream(int soundId, StreamBlockId blockId)
 
 /*public*/
 void
-sound_handler::startSound(int soundId, int loops, 
+sound_handler::startSound(int handle, int loops, 
 	               const SoundEnvelopes* env,
 	               bool allowMultiple, unsigned int inPoint,
                    unsigned int outPoint)
 {
     // Check if the sound exists
-    if (soundId < 0 ||
-        static_cast<unsigned int>(soundId) >= _sounds.size())
-    {
+    if (!validHandle(_sounds, handle)) {
         log_error("Invalid (%d) sound_handle passed to startSound, "
-                  "doing nothing", soundId);
+                  "doing nothing", handle);
         return;
     }
 
     // Handle delaySeek
 
-    EmbedSound& sounddata = *(_sounds[soundId]);
+    EmbedSound& sounddata = *(_sounds[handle]);
     const media::SoundInfo& sinfo = sounddata.soundinfo;
 
     int swfDelaySeek = sinfo.getDelaySeek(); 
