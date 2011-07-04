@@ -38,23 +38,15 @@ StreamingSoundData::append(std::auto_ptr<SimpleBuffer> data, size_t sampleCount)
 {
     UNUSED(sampleCount);
     assert(data.get());
-
-    if (data->capacity() - data->size() < _paddingBytes) {
-        log_error("Streaming sound block creator didn't appropriately pad "
-                "sound data. We'll do so now, but will cost memory copies.");
-        data->reserve(data->size() + _paddingBytes);
-    }
-
     _buffers.push_back(data);
     return _buffers.size() - 1;
 }
 
 StreamingSoundData::StreamingSoundData(const media::SoundInfo& info,
-        int nVolume, size_t paddingBytes)
+        int nVolume)
     :
     soundinfo(info),
-    volume(nVolume),
-    _paddingBytes(paddingBytes)
+    volume(nVolume)
 {
 }
 

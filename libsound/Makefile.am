@@ -26,6 +26,8 @@ libgnashsound_la_SOURCES = \
 	StreamingSoundData.h \
 	StreamingSound.cpp \
 	StreamingSound.h \
+	LiveSound.cpp \
+	LiveSound.h \
 	EmbedSoundInst.cpp \
 	EmbedSoundInst.h \
 	SoundUtils.h \

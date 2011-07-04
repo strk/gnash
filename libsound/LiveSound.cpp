@@ -1,0 +1,119 @@
+// LiveSound.cpp - instance of an embedded sound, for gnash
+//
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010,
+//   2011 Free Software Foundation, Inc
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
+
+#include "LiveSound.h"
+
+#include <algorithm>
+
+#include "log.h"
+#include "SoundInfo.h"
+
+namespace gnash {
+namespace sound {
+
+LiveSound::LiveSound(media::MediaHandler& mh, const media::SoundInfo& info, int inPoint)
+    :
+    _playbackPosition(inPoint),
+    _samplesFetched(0)
+{
+    createDecoder(mh, info);
+}
+
+void
+LiveSound::createDecoder(media::MediaHandler& mh, const media::SoundInfo& si)
+{
+
+    media::AudioInfo info((int)si.getFormat(), si.getSampleRate(), 
+        si.is16bit() ? 2 : 1, si.isStereo(), 0, media::CODEC_TYPE_FLASH);
+
+    try {
+        _decoder.reset(mh.createAudioDecoder(info).release());
+    }
+    catch (const MediaException& e) {
+        log_error("AudioDecoder initialization failed: %s", e.what());
+    }
+}
+
+unsigned int 
+LiveSound::fetchSamples(boost::int16_t* to, unsigned int nSamples)
+{
+    // If there is no decoder, then we can't decode!
+    // TODO: isn't it documented that an StreamingSound w/out a decoder
+    //       means that the StreamingSoundData data is already decoded ?
+    if (!_decoder.get()) return 0;
+
+    unsigned int fetchedSamples = 0;
+
+    while (nSamples) {
+        unsigned int availableSamples = decodedSamplesAhead();
+
+        if (availableSamples) {
+            const boost::int16_t* data = getDecodedData(_playbackPosition);
+
+            if (availableSamples >= nSamples) {
+                std::copy(data, data + nSamples, to);
+                fetchedSamples += nSamples;
+
+                // Update playback position (samples are 16bit)
+                _playbackPosition += nSamples*2;
+
+                break; // fetched all
+            }
+            else {
+                // not enough decoded samples available:
+                // copy what we have and go on
+                std::copy(data, data + availableSamples, to);
+                fetchedSamples += availableSamples;
+
+                // Update playback position (samples are 16bit)
+                _playbackPosition += availableSamples * 2;
+
+                to += availableSamples;
+                nSamples -= availableSamples;
+                assert(nSamples);
+            }
+        }
+
+        // We haven't finished fetching yet, so see if we
+        // have more to decode or not
+        if (decodingCompleted()) {
+            break; 
+        }
+
+        // Should only be called when no more decoded data
+        // are available for fetching.
+        // Doing so we know what's the sample number
+        // of the first sample in the newly decoded block.
+        assert(_playbackPosition >= _decodedData.size());
+
+        // More to decode, then decode it
+        decodeNextBlock();
+    }
+
+    // update samples played
+    _samplesFetched += fetchedSamples;
+
+    return fetchedSamples;
+}
+
+
+} // sound namespace 
+} // namespace gnash
+

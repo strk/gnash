@@ -24,7 +24,7 @@
 #include <cassert>
 #include <boost/cstdint.hpp> // For C99 int types
 
-#include "InputStream.h" 
+#include "LiveSound.h" 
 #include "AudioDecoder.h" 
 #include "SoundEnvelope.h"
 #include "SimpleBuffer.h" 
@@ -48,7 +48,7 @@ namespace sound {
 //
 /// This class contains a pointer to the StreamingSoundData used for playing
 /// and a SimpleBuffer to use when decoding is needed.
-class StreamingSound : public InputStream
+class StreamingSound : public LiveSound
 {
 public:
 
@@ -66,13 +66,7 @@ public:
             unsigned int inPoint);
 
     // See dox in sound_handler.h (InputStream)
-    unsigned int fetchSamples(boost::int16_t* to, unsigned int nSamples);
-
-    // See dox in sound_handler.h (InputStream)
-    unsigned int samplesFetched() const;
-
-    // See dox in sound_handler.h (InputStream)
-    bool eof() const;
+    virtual bool eof() const;
 
     /// Unregister self from the associated StreamingSoundData
     //
@@ -81,60 +75,16 @@ public:
 
 private:
 
-    /// Append size bytes to this raw data 
-    //
-    /// @param data
-    /// Data bytes, allocated with new[]. Ownership transferred.
-    ///
-    /// @param size
-    /// Size of the 'data' buffer.
-    void appendDecodedData(boost::uint8_t* data, unsigned int size);
-
-    /// Returns the data pointer in the encoded datastream
-    /// for the given position. Boundaries are checked.
-    //
-    /// Uses _samplesFetched and _playbackPosition
-    const boost::uint8_t* getEncodedData(unsigned long int pos);
-
-    /// Return number of already-decoded samples available
-    /// from playback position on
-    unsigned int decodedSamplesAhead() const {
-
-        const unsigned int dds = _decodedData.size();
-        if (dds <= _playbackPosition) return 0; 
-
-        const unsigned int bytesAhead = dds - _playbackPosition;
-        assert(!(bytesAhead % 2));
-
-        const unsigned int samplesAhead = bytesAhead / 2;
-        return samplesAhead;
-    }
-
     /// Return true if there's nothing more to decode
-    bool decodingCompleted() const {
+    virtual bool decodingCompleted() const {
         return _positionInBlock == 0 && 
             _currentBlock >= _soundDef.blockCount();
     }
 
-    /// Create a decoder for this instance
-    //
-    /// If decoder creation fails an error will
-    /// be logged, and _decoder won't be set
-    void createDecoder(media::MediaHandler& mediaHandler);
-
-    /// Access data in the decoded datastream for the given byte offset.
-    //
-    /// Boundaries are checked.
-    ///
-    /// @param pos offsets in bytes. This should usually be
-    ///        a multiple of two, since decoded data is
-    ///        composed of signed 16bit PCM samples..
-    boost::int16_t* getDecodedData(unsigned long int pos);
-
     /// Decode next input block
     //
     /// It's assumed !decodingCompleted()
-    void decodeNextBlock();
+    virtual void decodeNextBlock();
 
     // The current block of sound.
     size_t _currentBlock;
@@ -142,18 +92,9 @@ private:
     // The position within the current block.
     size_t _positionInBlock;
 
-    /// Current playback position in the decoded stream
-    size_t _playbackPosition;
-
     /// Offset in bytes samples from start of the block
     /// to begin playback from
     unsigned long _inPoint;
-
-    /// Number of samples fetched so far.
-    unsigned long _samplesFetched;
-
-    /// The decoder object used to convert the data into the playable format
-    boost::scoped_ptr<media::AudioDecoder> _decoder;
 
     /// The encoded data
     //
@@ -161,13 +102,10 @@ private:
     /// from its container of playing instances on destruction
     ///
     StreamingSoundData& _soundDef;
-
-    /// The decoded buffer
-    SimpleBuffer _decodedData;
 };
 
 
 } // gnash.sound namespace 
 } // namespace gnash
 
-#endif // SOUND_EMBEDSOUNDINST_H
+#endif

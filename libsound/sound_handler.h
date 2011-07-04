@@ -113,17 +113,13 @@ public:
     
     /// Create a sound buffer slot, for on-demand playback.
     //
-    /// @param data
-    ///     The data to be stored. The data is in encoded format, with
-    ///     format specified with the sinfo parameter, this is to allow
-    ///     on-demand decoding (if the sound is never played, it's never
-    ///     decoded).
-    ///
-    /// @param sinfo
-    ///     A SoundInfo object containing info about samplerate, samplecount,
-    /// stereo and more.
-    ///
-    /// @return the id given by the soundhandler for later identification.
+    /// @param data         The sound data to be stored. May not be null.
+    ///                     This should be appropriately padded (@see
+    ///                     MediaHandler::getInputPaddingBytes()), or a
+    ///                     reallocation will take place here.
+    /// @param sinfo        A SoundInfo object containing info about
+    ///                     samplerate, samplecount, stereo etc.
+    /// @return             handle for later identification.
     virtual int create_sound(std::auto_ptr<SimpleBuffer> data,
             const media::SoundInfo& sinfo);
         
@@ -176,7 +172,7 @@ public:
     ///     If false, the sound will not be scheduled if there's another
     ///     instance of it already playing.
     void startSound(int id, int loops, const SoundEnvelopes* env,
-                   bool allowMultiple, unsigned int inPoint=0,
+                   bool allowMultiple, unsigned int inPoint = 0,
                    unsigned int outPoint = 
                    std::numeric_limits<unsigned int>::max());
 
@@ -226,13 +222,15 @@ public:
     ///
     /// Gnash's parser calls this to fill up soundstreams data.
     ///
-    /// @param data         The sound data to be stored.
+    /// @param data         The sound data to be stored. May not be null.
+    ///                     This should be appropriately padded (@see
+    ///                     MediaHandler::getInputPaddingBytes()), or a
+    ///                     reallocation will take place here.
     /// @param sampleCount  Number of samples in the data
     /// @param streamId     The soundhandlers id of the sound we want
     ///                     to add data to
-    ///
-    /// @return an identifier for the new block for use in playSound
-    /// @throw SoundException on error
+    /// @return             a handler for the new block for use in playStream()
+    /// @throw              SoundException on error
     virtual StreamBlockId addSoundBlock(std::auto_ptr<SimpleBuffer> data,
                                        unsigned int sampleCount,
                                        int streamId);
@@ -531,39 +529,6 @@ private:
 
     /// Unplug any completed input stream
     void unplugCompletedInputStreams();
-
-    /// Schedule playing of a sound buffer slot
-    //
-    /// All scheduled sounds will be played on next output flush.
-    ///
-    /// @param id
-    ///     Id of the sound buffer slot schedule playback of.
-    ///
-    /// @param loops
-    ///     loops == 0 means play the sound once (1 means play it twice, etc)
-    ///
-    /// @param inPoint
-    ///     Offset in output samples this instance should start
-    ///     playing from. These are post-resampling samples (44100 
-    ///     for one second of samples).
-    ///
-    /// @param outPoint
-    ///     Offset in output samples this instance should stop
-    ///     playing at. These are post-resampling samples (44100 
-    ///     for one second of samples).
-    ///
-    /// @param env
-    ///     Some eventsounds have some volume control mechanism called
-    ///     envelopes.
-    ///     They basically tells that from sample X the volume should be Y.
-    ///
-    /// @param allowMultiple
-    ///     If false, the sound will not be scheduled if there's another
-    ///     instance of it already playing.
-    ///
-    void playSound(EmbedSound& sound, int loops, unsigned int inPoint,
-                   unsigned int outPoint, 
-                   const SoundEnvelopes* env, bool allowMultiple);
 
     /// Convert SWF-specified number of samples to output number of samples
     //

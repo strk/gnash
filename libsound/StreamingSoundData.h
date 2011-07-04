@@ -58,23 +58,17 @@ public:
 
     /// Construct a sound with given data, info and volume.
     //
-    /// @param data The encoded sound data.
-    ///     May be the NULL pointer for streaming sounds,
-    ///     in which case data will be appended later using ::append()
-    ///
     /// @param info encoding info
-    ///
-    /// @param nVolume initial volume (0..100). Optional, defaults to 100.
-    ///
-    StreamingSoundData(const media::SoundInfo& info,
-            int nVolume, size_t paddingBytes);
+    /// @param nVolume initial volume (0..100).
+    StreamingSoundData(const media::SoundInfo& info, int nVolume);
 
     ~StreamingSoundData();
 
     /// Append a sound data block
     //
-    /// @param data             Undecoded sound data.
-    /// @param sampleCount      The number of samples when decoded.
+    /// @param data          Undecoded sound data. Must be appropriately
+    ///                      padded (see MediaHandler::getInputPaddingBytes())
+    /// @param sampleCount   The number of samples when decoded.
     size_t append(std::auto_ptr<SimpleBuffer> data, size_t sampleCount);
 
     /// Do we have any data?
@@ -171,8 +165,6 @@ public:
 
     /// Mutex protecting access to _soundInstances
     mutable boost::mutex _soundInstancesMutex;
-
-    const size_t _paddingBytes;
 
     boost::ptr_vector<SimpleBuffer> _buffers;
 };

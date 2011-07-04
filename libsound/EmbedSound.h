@@ -53,21 +53,15 @@ public:
     /// Vector containing the active instances of this sounds being played
     //
     /// NOTE: This class does NOT own the active sounds
-    ///
     typedef std::list<EmbedSoundInst*> Instances;
 
     /// Construct a sound with given data, info and volume.
     //
     /// @param data The encoded sound data.
-    ///     May be the NULL pointer for streaming sounds,
-    ///     in which case data will be appended later using ::append()
-    ///
     /// @param info encoding info
-    ///
     /// @param nVolume initial volume (0..100). Optional, defaults to 100.
-    ///
     EmbedSound(std::auto_ptr<SimpleBuffer> data, const media::SoundInfo& info,
-            int nVolume, size_t paddingBytes);
+            int nVolume);
 
     ~EmbedSound();
 

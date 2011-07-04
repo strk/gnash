@@ -30,12 +30,16 @@
 #include "log.h" // for use
 #include "StreamingSound.h"
 #include "StreamingSoundData.h"
+#include "SimpleBuffer.h"
 
 // Debug create_sound/delete_sound/playSound/stop_sound, loops
 //#define GNASH_DEBUG_SOUNDS_MANAGEMENT
 
 // Debug samples fetching
 //#define GNASH_DEBUG_SAMPLES_FETCHING 1
+
+namespace gnash {
+namespace sound {
 
 namespace {
 
@@ -54,10 +58,22 @@ validHandle(const T& container, int handle)
     return handle >= 0 && static_cast<size_t>(handle) < container.size();
 }
 
+/// Ensure that each buffer has appropriate padding for the decoder.
+//
+/// Note: all callers passing a SimpleBuffer should already do this,
+/// so this is a paranoid check.
+void
+ensurePadding(SimpleBuffer& data, media::MediaHandler* m)
+{
+    const size_t padding = m ? m->getInputPaddingSize() : 0;
+    if (data.capacity() - data.size() < padding) {
+        log_error("Sound data creator didn't appropriately pad "
+                "buffer. We'll do so now, but will cost memory copies.");
+        data.reserve(data.size() + padding);
+    }
 }
 
-namespace gnash {
-namespace sound {
+} // anonymous namespace
 
 sound_handler::StreamBlockId
 sound_handler::addSoundBlock(std::auto_ptr<SimpleBuffer> data,
@@ -75,6 +91,9 @@ sound_handler::addSoundBlock(std::auto_ptr<SimpleBuffer> data,
                   "was deleted", handle);
         return -1;
     }
+
+    assert(data.get());
+    ensurePadding(*data, _mediaHandler);
 
     // Handling of the sound data
     return sounddata->append(data, sample_count);
@@ -355,8 +374,7 @@ int
 sound_handler::createStreamingSound(const media::SoundInfo& sinfo)
 {
     std::auto_ptr<StreamingSoundData> sounddata(
-            new StreamingSoundData(sinfo, 100,
-                _mediaHandler ? _mediaHandler->getInputPaddingSize() : 0));
+            new StreamingSoundData(sinfo, 100));
 
     int sound_id = _streamingSounds.size();
     // the vector takes ownership
@@ -369,9 +387,13 @@ int
 sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,
                             const media::SoundInfo& sinfo)
 {
-    std::auto_ptr<EmbedSound> sounddata(
-            new EmbedSound(data, sinfo, 100,
-                _mediaHandler ? _mediaHandler->getInputPaddingSize() : 0));
+    if (data.get()) {
+        ensurePadding(*data, _mediaHandler);
+    }
+    else {
+        log_debug("Event sound with no data!");
+    }
+    std::auto_ptr<EmbedSound> sounddata(new EmbedSound(data, sinfo, 100));
 
     int sound_id = _sounds.size();
 
@@ -436,66 +458,6 @@ sound_handler::isSoundPlaying(int handle) const
     return sounddata.isPlaying();
 }
 
-
-/* private */
-void
-sound_handler::playSound(EmbedSound& sounddata,
-        int loopCount, unsigned int inPoint, unsigned int outPoint,
-        const SoundEnvelopes* envelopes,
-        bool allowMultiples)
-{
-
-#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
-    log_debug("playSound %d called, SoundInfo format is %s",
-            sound_handle, sounddata.soundinfo.getFormat());
-#endif
-
-    // When this is called from a StreamSoundBlockTag,
-    // we only start if this sound isn't already playing.
-    if ( ! allowMultiples && sounddata.isPlaying() )
-    {
-#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
-        log_debug(" playSound: multiple instances not allowed, "
-                  "and sound is already playing");
-#endif
-        // log_debug("Stream sound block play request, "
-        //           "but an instance of the stream is "
-        //           "already playing, so we do nothing");
-        return;
-    }
-
-    // Make sure sound actually got some data
-    if ( sounddata.empty() )
-    {
-        // @@ should this be a log_error ? or even an assert ?
-        IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("Trying to play sound with size 0"));
-        );
-        return;
-    }
-
-    // Make a "EmbedSoundInst" for this sound and plug it into  
-    // the set of InputStream channels
-    //
-    std::auto_ptr<InputStream> sound ( sounddata.createInstance(
-
-            // MediaHandler to use for decoding
-            *_mediaHandler,
-
-            // Samples range
-            inPoint, outPoint,
-
-            // Volume envelopes to use for this instance
-            envelopes,
-
-            // Loop count
-            loopCount
-
-    ) );
-
-    plugInputStream(sound);
-}
-
 /*public*/
 void
 sound_handler::playStream(int soundId, StreamBlockId blockId)
@@ -515,8 +477,7 @@ sound_handler::playStream(int soundId, StreamBlockId blockId)
 
 /*public*/
 void
-sound_handler::startSound(int handle, int loops, 
-	               const SoundEnvelopes* env,
+sound_handler::startSound(int handle, int loops, const SoundEnvelopes* env,
 	               bool allowMultiple, unsigned int inPoint,
                    unsigned int outPoint)
 {
@@ -532,9 +493,8 @@ sound_handler::startSound(int handle, int loops,
     EmbedSound& sounddata = *(_sounds[handle]);
     const media::SoundInfo& sinfo = sounddata.soundinfo;
 
-    int swfDelaySeek = sinfo.getDelaySeek(); 
-    if ( swfDelaySeek )
-    {
+    const int swfDelaySeek = sinfo.getDelaySeek(); 
+    if (swfDelaySeek) {
         // NOTE: differences between delaySeek and inPoint:
         //
         //      - Sample count semantic:
@@ -571,7 +531,36 @@ sound_handler::startSound(int handle, int loops,
 #endif
     }
 
-    playSound(sounddata, loops, inPoint, outPoint, env, allowMultiple);
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+    log_debug("startSound %d called, SoundInfo format is %s",
+            sound_handle, sounddata.soundinfo.getFormat());
+#endif
+
+    // When this is called from a StreamSoundBlockTag,
+    // we only start if this sound isn't already playing.
+    if (!allowMultiple && sounddata.isPlaying()) {
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+        log_debug(" playSound: multiple instances not allowed, "
+                  "and sound is already playing");
+#endif
+        return;
+    }
+
+    // Make sure sound actually got some data
+    if (sounddata.empty()) {
+        // @@ should this be a log_error ? or even an assert ?
+        IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("Trying to play sound with size 0"));
+        );
+        return;
+    }
+
+    // Make an InputStream for this sound and plug it into  
+    // the set of InputStream channels
+    std::auto_ptr<InputStream> sound(sounddata.createInstance(*_mediaHandler,
+            inPoint, outPoint, env, loops));
+
+    plugInputStream(sound);
 }
 
 void

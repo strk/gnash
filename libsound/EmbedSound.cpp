@@ -33,22 +33,13 @@ namespace gnash {
 namespace sound {
 
 EmbedSound::EmbedSound(std::auto_ptr<SimpleBuffer> data,
-        const media::SoundInfo& info, int nVolume, size_t paddingBytes)
+        const media::SoundInfo& info, int nVolume)
     :
     _buf(data.release()),
     soundinfo(info),
     volume(nVolume)
 {
-    if (_buf.get()) {
-        if (_buf->capacity() - _buf->size() < paddingBytes) {
-            log_error("EmbedSound creator didn't appropriately pad sound data. "
-                "We'll do now, but will cost memory copies.");
-            _buf->reserve(_buf->size()+paddingBytes);
-        }
-    }
-    else {
-        _buf.reset(new SimpleBuffer());
-    }
+    if (!_buf.get()) _buf.reset(new SimpleBuffer());
 }
 
 void
