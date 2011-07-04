@@ -44,7 +44,7 @@ GnashAudio::GnashAudio() {
     _devLocation = NULL;
     _gstreamerSrc = NULL;
     _productName = NULL;
-};
+}
 
 GnashAudioPrivate::GnashAudioPrivate() {
     audioSource = NULL;
@@ -58,7 +58,7 @@ GnashAudioPrivate::GnashAudioPrivate() {
     _audioSaveBin = NULL;
     _pipelineIsPlaying = false;
     _mux = NULL;
-};
+}
 
 AudioInputGst::AudioInputGst() 
     :
