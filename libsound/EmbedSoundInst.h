@@ -75,10 +75,8 @@ public:
     ///     Note that every loop begins and ends at the range given by
     ///     inPoint and outPoint.
     EmbedSoundInst(EmbedSound& def, media::MediaHandler& mh,
-            unsigned int inPoint,
-            unsigned int outPoint,
-            const SoundEnvelopes* envelopes,
-            unsigned int loopCount);
+            unsigned int inPoint, unsigned int outPoint,
+            const SoundEnvelopes* envelopes, int loopCount);
 
     // See dox in sound_handler.h (InputStream)
     virtual bool eof() const;

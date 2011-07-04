@@ -40,7 +40,7 @@ namespace sound {
 EmbedSoundInst::EmbedSoundInst(EmbedSound& soundData,
             media::MediaHandler& mediaHandler,
             unsigned int inPoint, unsigned int outPoint,
-            const SoundEnvelopes* env, unsigned int loopCount)
+            const SoundEnvelopes* env, int loopCount)
         :
         LiveSound(mediaHandler, soundData.soundinfo, inPoint),
         decodingPosition(0),
@@ -71,7 +71,8 @@ EmbedSoundInst::moreData()
     if (decodingCompleted() || reachedCustomEnd()) {
 
         if (loopCount) {
-            --loopCount;
+            // negative count is documented to mean loop forever.
+            if (loopCount > 0) --loopCount;
             restart();
             return true;
         }
