@@ -95,6 +95,8 @@ protected:
         delete [] data;
     }
 
+    virtual void checkCustomEnd(unsigned&) const {}
+
     /// Return number of already-decoded samples available
     /// from playback position on
     unsigned int decodedSamplesAhead() const {
@@ -102,8 +104,10 @@ protected:
         const unsigned int dds = _decodedData.size();
         if (dds <= _playbackPosition) return 0; 
 
-        const unsigned int bytesAhead = dds - _playbackPosition;
+        unsigned int bytesAhead = dds - _playbackPosition;
         assert(!(bytesAhead % 2));
+
+        checkCustomEnd(bytesAhead);
 
         const unsigned int samplesAhead = bytesAhead / 2;
         return samplesAhead;

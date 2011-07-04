@@ -88,6 +88,13 @@ public:
 
 private:
 
+    virtual void checkCustomEnd(unsigned& bytesAhead) const {
+        if (_outPoint < std::numeric_limits<unsigned long>::max()) {
+            unsigned toCustomEnd = _outPoint - playbackPosition();
+            bytesAhead = std::min(toCustomEnd, bytesAhead);
+        }
+    }
+
     virtual bool moreData();
 
     /// Apply envelope-volume adjustments

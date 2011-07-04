@@ -37,6 +37,7 @@ LiveSound::LiveSound(media::MediaHandler& mh, const media::SoundInfo& info,
     _playbackPosition(_inPoint),
     _samplesFetched(0)
 {
+    log_debug("in point: %s, playback pos: %s", _inPoint, _playbackPosition);
     createDecoder(mh, info);
 }
 
