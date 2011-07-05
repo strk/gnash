@@ -683,22 +683,20 @@ sound_handler::setAudioDump(const std::string& wavefile)
 void
 sound_handler::unplugCompletedInputStreams()
 {
-    InputStreams::iterator it = _inputStreams.begin();
-    InputStreams::iterator end = _inputStreams.end();
 
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
     log_debug("Scanning %d input streams for completion", _inputStreams.size());
 #endif
 
-    while (it != end)
-    {
+    for (InputStreams::iterator it = _inputStreams.begin(),
+            end = _inputStreams.end(); it != end;) {
+
         InputStream* is = *it;
 
         // On EOF, detach
-        if (is->eof())
-        {
+        if (is->eof()) {
             // InputStream EOF, detach
-            InputStreams::iterator it2=it;
+            InputStreams::iterator it2 = it;
             ++it2; // before we erase it
             InputStreams::size_type erased = _inputStreams.erase(is);
             if ( erased != 1 ) {
@@ -707,7 +705,6 @@ sound_handler::unplugCompletedInputStreams()
             }
             it = it2;
 
-            //log_debug("fetchSamples: marking stopped InputStream %p (on EOF)", is);
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
             log_debug(" Input stream %p reached EOF, unplugging", is);
 #endif
@@ -724,10 +721,7 @@ sound_handler::unplugCompletedInputStreams()
             // Increment number of sound stop request for the testing framework
             ++_soundsStopped;
         }
-        else
-        {
-            ++it;
-        }
+        else ++it;
     }
 }
 

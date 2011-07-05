@@ -50,30 +50,20 @@ public:
 
     /// Create an embedded %sound instance
     //
-    /// @param def
-    ///     The definition of this sound (where immutable data is kept)
-    ///
-    /// @param mh
-    ///     The MediaHandler to use for on-demand decoding
-    ///
-    /// @param inPoint
-    ///     Offset in output samples this instance should start
-    ///     playing from. These are post-resampling samples (44100 
-    ///     for one second of samples).
-    ///
-    /// @param outPoint
-    ///     Offset in output samples this instance should stop
-    ///     playing at. These are post-resampling samples (44100 
-    ///     for one second of samples).
-    ///     Use numeric_limits<unsigned int>::max() for never
-    ///
-    /// @param envelopes
-    ///     SoundEnvelopes to apply to this sound. May be 0 for none.
-    ///
-    /// @param loopCount
-    ///     Number of times this instance should loop over the defined sound.
-    ///     Note that every loop begins and ends at the range given by
-    ///     inPoint and outPoint.
+    /// @param def       The definition of this sound (the immutable data)
+    /// @param mh        The MediaHandler to use for on-demand decoding
+    /// @param inPoint   Offset in output samples this instance should start
+    ///                  playing from. These are post-resampling samples (44100 
+    ///                  for one second of samples).
+    /// @param outPoint  Offset in output samples this instance should stop
+    ///                  playing at. These are post-resampling samples (44100 
+    ///                  for one second of samples).
+    ///                  Use numeric_limits<unsigned int>::max() for never
+    /// @param envelopes SoundEnvelopes to apply to this sound. May be 0 for
+    ///                  none.
+    /// @param loopCount Number of times this instance should loop over the
+    ///                  defined sound. Note that every loop begins and ends
+    ///                  at the range given by inPoint and outPoint.
     EmbedSoundInst(EmbedSound& def, media::MediaHandler& mh,
             unsigned int inPoint, unsigned int outPoint,
             const SoundEnvelopes* envelopes, int loopCount);
@@ -88,11 +78,12 @@ public:
 
 private:
 
-    virtual void checkCustomEnd(unsigned& bytesAhead) const {
+    virtual size_t checkEarlierEnd(size_t bytesAhead, size_t pos) const {
         if (_outPoint < std::numeric_limits<unsigned long>::max()) {
-            unsigned toCustomEnd = _outPoint - playbackPosition();
-            bytesAhead = std::min(toCustomEnd, bytesAhead);
+            const size_t toCustomEnd = _outPoint - pos;
+            return std::min(toCustomEnd, bytesAhead);
         }
+        return bytesAhead;
     }
 
     virtual bool moreData();

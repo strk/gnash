@@ -70,14 +70,20 @@ protected:
     /// but decoding is not complete.
     virtual bool moreData() = 0;
 
-    /// True if there is no more data.
+    /// True if there is no more data ever.
+    //
+    /// The InputStream will be disconnected when this is true.
     virtual bool eof() const = 0;
 
+    /// Start from the beginning again.
     void restart() {
         _playbackPosition = _inPoint;
         _samplesFetched = 0;
     }
 
+    /// How many samples have been fetched since the beginning
+    //
+    /// Note that this is reset on each loop.
     unsigned int samplesFetched() const {
         return _samplesFetched;
     }
@@ -95,8 +101,6 @@ protected:
         delete [] data;
     }
 
-    virtual void checkCustomEnd(unsigned&) const {}
-
     /// Return number of already-decoded samples available
     /// from playback position on
     unsigned int decodedSamplesAhead() const {
@@ -104,16 +108,24 @@ protected:
         const unsigned int dds = _decodedData.size();
         if (dds <= _playbackPosition) return 0; 
 
-        unsigned int bytesAhead = dds - _playbackPosition;
-        assert(!(bytesAhead % 2));
+        size_t bytesAhead = dds - _playbackPosition;
+        bytesAhead = checkEarlierEnd(bytesAhead, _playbackPosition);
 
-        checkCustomEnd(bytesAhead);
+        assert(!(bytesAhead % 2));
 
         const unsigned int samplesAhead = bytesAhead / 2;
         return samplesAhead;
     }
 
 private:
+
+    /// Check if the sound data ends earlier than expected.
+    //
+    /// This is a way to deal with the outpoint in EmbedSoundInst, but isn't
+    /// very tidy.
+    virtual size_t checkEarlierEnd(size_t left, size_t) const {
+        return left;
+    }
 
     // See dox in sound_handler.h (InputStream)
     unsigned int fetchSamples(boost::int16_t* to, unsigned int nSamples);
