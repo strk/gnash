@@ -58,12 +58,8 @@ public:
     /// @param mh       The MediaHandler to use for on-demand decoding
     /// @param blockId  Identifier of the encoded block to start decoding from.
     ///                 @see gnash::swf::StreamSoundBlockTag
-    /// @param inPoint  Offset in output samples this instance should start
-    ///                 playing from. These are post-resampling samples (44100 
-    ///                 for one second of samples).
     StreamingSound(StreamingSoundData& def, media::MediaHandler& mh,
-            sound_handler::StreamBlockId blockId,
-            unsigned int inPoint);
+            sound_handler::StreamBlockId blockId);
 
     // See dox in sound_handler.h (InputStream)
     virtual bool eof() const;
@@ -97,10 +93,6 @@ private:
 
     // The position within the current block.
     size_t _positionInBlock;
-
-    /// Offset in bytes samples from start of the block
-    /// to begin playback from
-    unsigned long _inPoint;
 
     /// The encoded data
     //

@@ -33,12 +33,15 @@
 namespace gnash {
 namespace sound {
 
+
 size_t
-StreamingSoundData::append(std::auto_ptr<SimpleBuffer> data, size_t sampleCount)
+StreamingSoundData::append(std::auto_ptr<SimpleBuffer> data,
+        size_t sampleCount, int seekSamples)
 {
-    UNUSED(sampleCount);
     assert(data.get());
     _buffers.push_back(data);
+    _blockData.push_back(BlockData(sampleCount, seekSamples));
+    assert(_blockData.size() == _buffers.size());
     return _buffers.size() - 1;
 }
 
@@ -65,12 +68,9 @@ StreamingSoundData::eraseActiveSound(Instances::iterator i)
 }
 
 std::auto_ptr<StreamingSound>
-StreamingSoundData::createInstance(media::MediaHandler& mh,
-            unsigned long blockOffset,
-            unsigned int inPoint)
+StreamingSoundData::createInstance(media::MediaHandler& mh, unsigned long block)
 {
-    std::auto_ptr<StreamingSound> ret(new StreamingSound(*this, mh,
-                blockOffset, inPoint));
+    std::auto_ptr<StreamingSound> ret(new StreamingSound(*this, mh, block));
 
     boost::mutex::scoped_lock lock(_soundInstancesMutex);
 

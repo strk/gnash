@@ -79,21 +79,16 @@ StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     media::audioCodecType format = sinfo->getFormat();
 
     boost::uint16_t sampleCount;
+    boost::int16_t seekSamples = 0;
 
     // MP3 format blocks have additional info
     if (format == media::AUDIO_CODEC_MP3) {
         in.ensureBytes(4);
-
         // MP3 blocks have restrictions on the number of samples they can
         // contain (due to the codec), so have a variable number of samples
         // per block.
         sampleCount = in.read_u16();
-        const boost::uint16_t seekSamples = in.read_u16();
-
-        if (seekSamples) {
-            LOG_ONCE(log_unimpl(_("MP3 soundblock seek samples (%s)"),
-                        seekSamples));
-        }
+        seekSamples = in.read_u16();
     }
     else sampleCount = sinfo->getSampleCount();
 
@@ -119,14 +114,14 @@ StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         throw ParserException(_("Tag boundary reported past end of stream!"));
     }
 
-    // Fill the data on the apropiate sound, and receives the starting point
+    // Fill the data on the appropiate sound, and receives the starting point
     // for later "start playing from this frame" events.
     //
     // TODO: the amount of sound data used should depend on the sampleCount,
     // not on the size of the data. Currently the sound_handler ignores
     // sampleCount completely.
     sound::sound_handler::StreamBlockId blockId =
-        handler->addSoundBlock(buf, sampleCount, sId);
+        handler->addSoundBlock(buf, sampleCount, seekSamples, sId);
 
     boost::intrusive_ptr<ControlTag> s(new StreamSoundBlockTag(sId, blockId));
 

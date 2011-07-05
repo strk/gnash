@@ -24,9 +24,10 @@
 #include <boost/bind.hpp>
 #include <boost/cstdint.hpp>
 
+#include "SoundInfo.h"
+
 namespace gnash {
 namespace sound {
-
 
 /// Volume adjustment
 //
@@ -39,6 +40,30 @@ adjustVolume(T* start, T* end, float volume)
 {
     std::transform(start, end, start,
             boost::bind(std::multiplies<float>(), volume, _1));
+}
+
+/// Convert SWF-specified number of samples to output number of samples
+//
+/// SWF-specified number of samples are: delaySeek in DEFINESOUND,
+/// latency in STREAMSOUNDHEAD and seekSamples in STREAMSOUNDBLOCK.
+/// These refer to samples at the sampleRate of input.
+///
+/// As gnash will resample the sounds to match expected output
+/// (44100 Hz, stereo 16bit) this function is handy to convert
+/// for simpler use later.
+inline size_t
+swfToOutSamples(const media::SoundInfo& sinfo, size_t swfSamples,
+        const size_t outRate = 44100)
+{
+    // NOTE: this was tested with inputs:
+    //     - isStereo?0 is16bit()?1 sampleRate?11025
+    //     - isStereo?0 is16bit()?1 sampleRate?22050
+    //     - isStereo?1 is16bit()?1 sampleRate?22050
+    //     - isStereo?0 is16bit()?1 sampleRate?44100
+    //     - isStereo?1 is16bit()?1 sampleRate?44100
+    //
+    // TODO: test with other sample sizes !
+    return swfSamples * (outRate / sinfo.getSampleRate());
 }
 
 } // namespace sound

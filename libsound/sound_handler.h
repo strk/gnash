@@ -227,13 +227,13 @@ public:
     ///                     MediaHandler::getInputPaddingBytes()), or a
     ///                     reallocation will take place here.
     /// @param sampleCount  Number of samples in the data
+    /// @param seekSamples  Offset of sound to frame data
     /// @param streamId     The soundhandlers id of the sound we want
     ///                     to add data to
     /// @return             a handler for the new block for use in playStream()
     /// @throw              SoundException on error
     virtual StreamBlockId addSoundBlock(std::auto_ptr<SimpleBuffer> data,
-                                       unsigned int sampleCount,
-                                       int streamId);
+               size_t sampleCount, int seekSamples, int streamId);
 
     /// Returns a SoundInfo object for the sound with the given id.
     //
@@ -456,8 +456,6 @@ protected:
         _paused(false),
         _muted(false),
         _volume(100),
-        _sounds(),
-        _inputStreams(),
         _mediaHandler(m)
     {
     }
@@ -517,36 +515,17 @@ private:
     /// Stop all instances of an embedded sound
     void stopEmbedSoundInstances(StreamingSoundData& def);
 
-    typedef std::set< InputStream* > InputStreams;
+    typedef std::set<InputStream*> InputStreams;
 
     /// Sound input streams.
     //
     /// Elements owned by this class.
-    ///
     InputStreams _inputStreams;
 
     media::MediaHandler* _mediaHandler;
 
     /// Unplug any completed input stream
     void unplugCompletedInputStreams();
-
-    /// Convert SWF-specified number of samples to output number of samples
-    //
-    /// SWF-specified number of samples are: delaySeek in DEFINESOUND,
-    /// latency in STREAMSOUNDHEAD and seekSamples in STREAMSOUNDBLOCK.
-    /// These refer to samples at the sampleRate of input.
-    ///
-    /// As gnash will resample the sounds to match expected output
-    /// (44100 Hz, stereo 16bit) this function is handy to convert
-    /// for simpler use later.
-    ///
-    /// It is non-static in the event we'll one day allow different
-    /// sound_handler instances to be configured with different output
-    /// sample rate (would need a lot more changes atm but let's keep
-    /// that in mind).
-    ///
-    unsigned int swfToOutSamples(const media::SoundInfo& sinfo,
-                                          unsigned int swfSamples);
 
     boost::scoped_ptr<WAVWriter> _wavWriter;
 

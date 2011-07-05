@@ -29,17 +29,31 @@
 namespace gnash {
 namespace sound {
 
+namespace {
+
+int
+getInPoint(StreamingSoundData& data, size_t block)
+{
+    if (block >= data.blockCount()) return 0;
+    const int latency = data.soundinfo.getDelaySeek();
+
+    // For the first block just return the latency.
+    if (block == 0) return latency;
+
+    // For subsequent blocks add latency to seekSamples. This is documented
+    // but not verified.
+    return swfToOutSamples(data.soundinfo,
+            latency + data.getSeekSamples(block));
+}
+
+}
+
 StreamingSound::StreamingSound(StreamingSoundData& sd,
-            media::MediaHandler& mh, sound_handler::StreamBlockId block,
-            unsigned int inPoint)
+            media::MediaHandler& mh, sound_handler::StreamBlockId block)
         :
-        LiveSound(mh, sd.soundinfo, inPoint),
+        LiveSound(mh, sd.soundinfo, getInPoint(sd, block)),
         _currentBlock(block),
         _positionInBlock(0),
-        // parameter is in stereo samples (44100 per second)
-        // we double to take 2 channels into account
-        // and double again to use bytes
-        _inPoint(inPoint * 4),
         _soundDef(sd)
 {
 }

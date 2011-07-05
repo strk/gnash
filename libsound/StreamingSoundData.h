@@ -69,7 +69,9 @@ public:
     /// @param data          Undecoded sound data. Must be appropriately
     ///                      padded (see MediaHandler::getInputPaddingBytes())
     /// @param sampleCount   The number of samples when decoded.
-    size_t append(std::auto_ptr<SimpleBuffer> data, size_t sampleCount);
+    /// @param seekSamples   Where to start playing from at a particular frame.
+    size_t append(std::auto_ptr<SimpleBuffer> data, size_t sampleCount,
+            int seekSamples);
 
     /// Do we have any data?
     bool empty() const {
@@ -78,6 +80,14 @@ public:
 
     const SimpleBuffer& getBlock(size_t index) const {
         return _buffers[index];
+    }
+
+    size_t getSampleCount(size_t index) const {
+        return _blockData[index].sampleCount;
+    }
+
+    size_t getSeekSamples(size_t index) const {
+        return _blockData[index].seekSamples;
     }
 
     size_t blockCount() const {
@@ -114,13 +124,9 @@ public:
     ///                         this instance should start decoding.
     ///                         This refers to a specific StreamSoundBlock.
     ///                         @see gnash::swf::StreamSoundBlockTag
-    /// @param inPoint          Offset in output samples this instance
-    ///                         should start playing from. These are
-    ///                         post-resampling samples from
-    ///                         the start of the specified blockId.
     /// Locks the _soundInstancesMutex when pushing to it
     std::auto_ptr<StreamingSound> createInstance(media::MediaHandler& mh,
-            unsigned long blockOffset, unsigned int inPoint);
+            unsigned long blockOffset);
 
     /// Drop all active sounds
     //
@@ -156,6 +162,18 @@ public:
 
 private:
 
+    struct BlockData
+    {
+        BlockData(size_t count, int seek)
+            :
+            sampleCount(count),
+            seekSamples(seek)
+        {}
+
+        size_t sampleCount;
+        size_t seekSamples;
+    };
+
     /// Playing instances of this sound definition
     //
     /// Multithread access to this member is protected
@@ -166,6 +184,8 @@ private:
     mutable boost::mutex _soundInstancesMutex;
 
     boost::ptr_vector<SimpleBuffer> _buffers;
+
+    std::vector<BlockData> _blockData;
 };
 
 } // gnash.sound namespace 

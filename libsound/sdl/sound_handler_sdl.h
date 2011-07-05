@@ -101,8 +101,7 @@ public:
     // See dox in sound_handler.h
     // overridden to serialize access to the data buffer slot
     virtual StreamBlockId addSoundBlock(std::auto_ptr<SimpleBuffer> buf,
-                                       unsigned int sample_count,
-                                       int streamId);
+           size_t sample_count, int seekSamples, int streamId);
 
     // See dox in sound_handler.h
     virtual void stopEventSound(int sound_handle);

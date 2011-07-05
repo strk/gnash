@@ -77,7 +77,7 @@ ensurePadding(SimpleBuffer& data, media::MediaHandler* m)
 
 sound_handler::StreamBlockId
 sound_handler::addSoundBlock(std::auto_ptr<SimpleBuffer> data,
-        unsigned int sample_count, int handle)
+        size_t sampleCount, int seekSamples, int handle)
 {
     if (!validHandle(_streamingSounds, handle)) {
         log_error("Invalid (%d) handle passed to fill_stream_data, "
@@ -95,8 +95,7 @@ sound_handler::addSoundBlock(std::auto_ptr<SimpleBuffer> data,
     assert(data.get());
     ensurePadding(*data, _mediaHandler);
 
-    // Handling of the sound data
-    return sounddata->append(data, sample_count);
+    return sounddata->append(data, sampleCount, seekSamples);
 }
 
 void
@@ -412,39 +411,6 @@ sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,
 
 }
 
-/*static private*/
-unsigned int
-sound_handler::swfToOutSamples(const media::SoundInfo& sinfo,
-                                      unsigned int swfSamples)
-{
-    // swf samples refers to pre-resampled state so we need to
-    // take that into account.
-
-
-    static const unsigned int outSampleRate = 44100;
-
-    unsigned int outSamples = swfSamples *
-                                (outSampleRate/sinfo.getSampleRate());
-
-    // NOTE: this was tested with inputs:
-    //     - isStereo?0 is16bit()?1 sampleRate?11025
-    //     - isStereo?0 is16bit()?1 sampleRate?22050
-    //     - isStereo?1 is16bit()?1 sampleRate?22050
-    //     - isStereo?0 is16bit()?1 sampleRate?44100
-    //     - isStereo?1 is16bit()?1 sampleRate?44100
-    //
-    // TODO: test with other sample sizes !
-    //
-#if 1
-    log_debug("NOTE: isStereo?%d is16bit()?%d sampleRate?%d",
-              sinfo.isStereo(), sinfo.is16bit(), sinfo.getSampleRate());
-#endif
-
-
-    return outSamples;
-}
-
-/* public */
 bool
 sound_handler::isSoundPlaying(int handle) const
 {
@@ -460,13 +426,10 @@ sound_handler::isSoundPlaying(int handle) const
 void
 sound_handler::playStream(int soundId, StreamBlockId blockId)
 {
-    const unsigned int inPoint = 0;
-
     StreamingSoundData& s = *_streamingSounds[soundId];
     if (s.isPlaying() || s.empty()) return;
 
-    std::auto_ptr<InputStream> is(
-        s.createInstance(*_mediaHandler, blockId, inPoint));
+    std::auto_ptr<InputStream> is(s.createInstance(*_mediaHandler, blockId));
 
     plugInputStream(is);
 }
@@ -596,9 +559,9 @@ sound_handler::unplugAllInputStreams()
 }
 
 void
-sound_handler::fetchSamples (boost::int16_t* to, unsigned int nSamples)
+sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
 {
-    if ( isPaused() ) return; // should we write wav file anyway ?
+    if (isPaused()) return; // should we write wav file anyway ?
 
     float finalVolumeFact = getFinalVolume()/100.0;
 
