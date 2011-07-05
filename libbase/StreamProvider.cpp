@@ -81,7 +81,7 @@ StreamProvider::getStream(const URL& url, bool namedCacheFile) const
 			FILE *newin = std::fopen(path.c_str(), "rb");
 			if (!newin)  { 
 				log_error(_("Could not open file %1%: %2%"),
-				          path.c_str(), std::strerror(errno));
+				          path, std::strerror(errno));
 				return stream;
 			}
 			// Close on destruction
