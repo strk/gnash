@@ -154,13 +154,12 @@ public:
     /// It's the SWF range that is represented here.
     int volume;
 
+private:
+
     /// Playing instances of this sound definition
     //
     /// Multithread access to this member is protected
     /// by the _soundInstancesMutex mutex
-    ///
-    /// @todo make private
-    ///
     Instances _soundInstances;
 
     /// Mutex protecting access to _soundInstances
