@@ -457,7 +457,6 @@ sound_handler::isSoundPlaying(int handle) const
     return sounddata.isPlaying();
 }
 
-/*public*/
 void
 sound_handler::playStream(int soundId, StreamBlockId blockId)
 {
@@ -468,8 +467,6 @@ sound_handler::playStream(int soundId, StreamBlockId blockId)
 
     std::auto_ptr<InputStream> is(
         s.createInstance(*_mediaHandler, blockId, inPoint));
-
-    s._soundInstances.push_back(is.get());
 
     plugInputStream(is);
 }
