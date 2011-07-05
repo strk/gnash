@@ -35,9 +35,9 @@ namespace sound {
 EmbedSound::EmbedSound(std::auto_ptr<SimpleBuffer> data,
         const media::SoundInfo& info, int nVolume)
     :
-    _buf(data.release()),
     soundinfo(info),
-    volume(nVolume)
+    volume(nVolume),
+    _buf(data.release())
 {
     if (!_buf.get()) _buf.reset(new SimpleBuffer());
 }

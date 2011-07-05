@@ -59,9 +59,9 @@ public:
     //
     /// @param data The encoded sound data.
     /// @param info encoding info
-    /// @param nVolume initial volume (0..100). Optional, defaults to 100.
+    /// @param volume initial volume (0..100). Optional, defaults to 100.
     EmbedSound(std::auto_ptr<SimpleBuffer> data, const media::SoundInfo& info,
-            int nVolume);
+            int volume);
 
     ~EmbedSound();
 
@@ -167,9 +167,6 @@ public:
     ///
     void eraseActiveSound(EmbedSoundInst* inst);
 
-    /// The undecoded data
-    boost::scoped_ptr<SimpleBuffer> _buf;
-
     /// Object holding information about the sound
     media::SoundInfo soundinfo;
 
@@ -178,6 +175,9 @@ public:
     int volume;
 
 private:
+
+    /// The undecoded data
+    boost::scoped_ptr<SimpleBuffer> _buf;
 
     /// Playing instances of this sound definition
     //
