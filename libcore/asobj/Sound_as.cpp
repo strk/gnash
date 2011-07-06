@@ -348,8 +348,7 @@ Sound_as::probeAudio()
         // Only probe for sound complete
         assert(_soundHandler);
         assert(!_soundCompleted);
-        if ( ! _soundHandler->isSoundPlaying(soundId) ) {
-            _soundCompleted = false;
+        if (!_soundHandler->isSoundPlaying(soundId)) {
             stopProbeTimer();
             // dispatch onSoundComplete 
             callMethod(&owner(), NSV::PROP_ON_SOUND_COMPLETE);
