@@ -19,10 +19,12 @@
 
 
 #include "MediaParser.h"
-#include "log.h"
-#include "GnashSleep.h" // for usleep.
 
 #include <boost/bind.hpp>
+
+#include "log.h"
+#include "GnashSleep.h" // for usleep.
+#include "Id3Info.h"
 
 // Define this to get debugging output from MediaParser
 //#define GNASH_DEBUG_MEDIAPARSER
@@ -74,6 +76,12 @@ MediaParser::isBufferEmpty() const
 	return _videoFrames.empty() && _audioFrames.empty();
 }
 
+boost::optional<Id3Info>
+MediaParser::getId3Info() const
+{
+    log_error("No ID3 support implemented in this MediaParser");
+    return boost::optional<Id3Info>();
+}
 
 boost::uint64_t
 MediaParser::getBufferLengthNoLock() const

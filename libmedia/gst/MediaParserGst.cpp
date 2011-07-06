@@ -131,6 +131,11 @@ MediaParserGst::seek(boost::uint32_t& milliseconds)
                             GST_MSECOND * milliseconds);
 }
 
+boost::optional<Id3Info>
+MediaParserGst::getId3Info() const
+{
+    return boost::optional<Id3Info>();
+}
 
 bool
 MediaParserGst::parseNextChunk()

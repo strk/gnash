@@ -28,7 +28,7 @@ rcsid="Sound.as";
 endOfTest = function()
 {
 #if OUTPUT_VERSION > 5
-    check_totals(111);
+    check_totals(113);
 #else
     check_totals(94);
 #endif
@@ -116,6 +116,48 @@ xcheck_equals(typeof(s1.checkPolicyFile), 'boolean');
 check_equals(typeof(s1.duration), 'undefined');
 check_equals(typeof(s1.ID3), 'undefined');
 check_equals(typeof(s1.position), 'undefined');
+
+#if OUTPUT_VERSION > 5
+
+// We hope that this is loaded in before the test finishes.
+
+#if 0
+
+click = new Sound();
+click.onLoad = function() {
+    note("onLoad");
+    // Is called after onID3
+    check_equals(typeof(click.id3), "object");
+};
+
+click.onID3 = function() {
+    note("onID3");
+    xcheck_equals(typeof(click.id3), "object");
+    xcheck_equals(click.id3.album, "Gnash");
+    xcheck_equals(click.id3.songname, "Clicky");
+    xcheck_equals(click.id3.artist, "Benjamin Wolsey");
+    xcheck_equals(click.id3.comment, "Gnash can read this.");
+    xcheck_equals(click.id3.year, "2011");
+    xcheck_equals(click.id3.genre, "42");
+};
+
+click.loadSound(MEDIA(click.mp3), false);
+
+#endif
+
+wav = new Sound();
+wav.onID3 = function() {
+    fail("Should not be called for wave sounds!");
+};
+wav.loadSound(MEDIA(brokenchord.wav), false);
+
+mp3 = new Sound();
+mp3.onID3 = function() {
+    fail("Should not be called where no tag is present.");
+};
+mp3.loadSound(MEDIA(stereo8.mp3), false);
+
+#endif
 
 
 //

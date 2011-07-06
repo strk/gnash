@@ -42,6 +42,7 @@
 #include "StreamProvider.h"
 #include "ObjectURI.h"
 #include "Relay.h"
+#include "Id3Info.h"
 
 //#define GNASH_DEBUG_SOUND_AS 1
 
@@ -362,11 +363,24 @@ Sound_as::probeAudio()
 #ifdef GNASH_DEBUG_SOUND_AS
         log_debug("Probing audio for load");
 #endif
-        if ( _mediaParser->parsingCompleted() )
-        {
+        if (_mediaParser->parsingCompleted()) {
+
+            boost::optional<media::Id3Info> id3 = _mediaParser->getId3Info();
+            if (id3) {
+                VM& vm = getVM(owner());
+
+                as_object* o = new as_object(getGlobal(owner()));
+                if (id3->album) o->set_member(getURI(vm, "album"), *id3->album);
+
+                const ObjectURI& id3 = getURI(vm, "id3");
+                owner().set_member(id3, o);
+
+                const ObjectURI& onID3 = getURI(vm, "onID3");
+                callMethod(&owner(), onID3);
+            }
             _soundLoaded = true;
-            if ( ! isStreaming )
-            {
+
+            if (!isStreaming) {
                 stopProbeTimer(); // will be re-started on Sound.start()
             }
             bool success = _mediaParser->getAudioInfo() != 0;
@@ -537,18 +551,17 @@ Sound_as::getVolume(int& volume)
 void
 Sound_as::loadSound(const std::string& file, bool streaming)
 {
-    if ( ! _mediaHandler || ! _soundHandler ) {
+    if (!_mediaHandler || !_soundHandler) {
         log_debug("No media or sound handlers, won't load any sound");
         return;
     }
 
     /// If we are already streaming stop doing so as we'll replace
     /// the media parser
-    if ( _inputStream ) {
+    if (_inputStream) {
         _soundHandler->unplugInputStream(_inputStream);
         _inputStream = 0;
     }
-
     
     /// Mark sound as not being loaded
     // TODO: should we check for _soundLoaded == true?
@@ -559,7 +572,7 @@ Sound_as::loadSound(const std::string& file, bool streaming)
 
     /// Start at offset 0, in case a previous ::start() call
     /// changed that.
-    _startTime=0;
+    _startTime = 0;
 
     const RunResources& rr = getRunResources(owner());
     URL url(file, rr.streamProvider().baseURL());
@@ -569,7 +582,8 @@ Sound_as::loadSound(const std::string& file, bool streaming)
     const StreamProvider& streamProvider = rr.streamProvider();
     std::auto_ptr<IOChannel> inputStream(streamProvider.getStream(url,
                 rcfile.saveStreamingMedia()));
-    if ( ! inputStream.get() ) {
+
+    if (!inputStream.get()) {
         log_error( _("Gnash could not open this url: %s"), url );
         // dispatch onLoad (false)
         callMethod(&owner(), NSV::PROP_ON_LOAD, false);
@@ -580,7 +594,7 @@ Sound_as::loadSound(const std::string& file, bool streaming)
     isStreaming = streaming;
 
     _mediaParser.reset(_mediaHandler->createMediaParser(inputStream).release());
-    if ( ! _mediaParser ) {
+    if (!_mediaParser) {
         log_error(_("Unable to create parser for Sound at %s"), url);
         // not necessarely correct, the stream might have been found...
         // dispatch onLoad (false)

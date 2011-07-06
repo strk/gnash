@@ -19,16 +19,16 @@
 #ifndef GNASH_MEDIAPARSER_GST_H
 #define GNASH_MEDIAPARSER_GST_H
 
-#include "MediaParser.h" // for inheritance
-
 #include <deque>
 #include <boost/scoped_array.hpp>
 #include <memory>
 #include <queue>
-
 #include <gst/gst.h>
-#include "ClockTime.h"
+#include <boost/optional.hpp>
 
+#include "MediaParser.h" // for inheritance
+#include "ClockTime.h"
+#include "Id3Info.h"
 
 // Forward declaration
 namespace gnash {
@@ -119,7 +119,9 @@ public:
     bool parseNextChunk();
 
     // See dox in MediaParser.h
-    boost::uint64_t getBytesLoaded() const;
+    virtual boost::uint64_t getBytesLoaded() const;
+
+    virtual boost::optional<Id3Info> getId3Info() const;
 
     void rememberAudioFrame(EncodedAudioFrame* frame);
     void rememberVideoFrame(EncodedVideoFrame* frame);

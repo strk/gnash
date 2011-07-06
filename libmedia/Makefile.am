@@ -23,6 +23,7 @@ AM_CXXFLAGS = -DREGISTER_MEDIA_HANDLERS
 pkglib_LTLIBRARIES = libgnashmedia.la
 
 libgnashmedia_la_SOURCES = \
+	Id3Info.h \
 	AudioDecoder.h \
 	AudioDecoderSimple.cpp \
 	AudioDecoderSimple.h \
