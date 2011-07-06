@@ -26,8 +26,6 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <cassert>
-#include <cstring>
 #include <limits>
 #include <set>
 #include <boost/scoped_ptr.hpp>
