@@ -948,8 +948,6 @@ Gui::start()
 bool
 Gui::advanceMovie(bool doDisplay)
 {
-
-
     if (isStopped()) {
         return false;
     }
@@ -1006,8 +1004,9 @@ Gui::advanceMovie(bool doDisplay)
 	if (doDisplay && visible()) display(m);
 
 	if (!loops()) {
-		size_t curframe = m->getRootMovie().get_current_frame(); // can be 0 on malformed SWF
-		const gnash::MovieClip& si = m->getRootMovie();
+        // can be 0 on malformed SWF
+		const size_t curframe = m->getRootMovie().get_current_frame(); 
+		const MovieClip& si = m->getRootMovie();
 		if (curframe + 1 >= si.get_frame_count()) {
 			quit(); 
 		}
