@@ -129,7 +129,8 @@ void
 StreamingSoundData::getPlayingInstances(std::vector<InputStream*>& to) const
 {
     boost::mutex::scoped_lock lock(_soundInstancesMutex);
-    for (Instances::const_iterator i=_soundInstances.begin(), e=_soundInstances.end();
+    for (Instances::const_iterator i=_soundInstances.begin(),
+            e=_soundInstances.end();
             i!=e; ++i)
     {
         to.push_back(*i);
