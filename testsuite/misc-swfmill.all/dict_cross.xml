@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<swf version="6" compressed="0">
+
+<!--
+
+ Show that constant pool definition crosses boundary
+ of a single DoAction block.
+
+-->
+
+  <Header framerate="12" frames="2">
+    <size>
+      <Rectangle left="0" right="12800" top="0" bottom="9600"/>
+    </size>
+    <tags>
+
+      <DoAction><actions>
+
+	<!-- DICT 1 -->
+          <Dictionary>
+            <strings>
+              <String value="A"/>
+            </strings>
+          </Dictionary>
+
+          <PushData>
+            <items>
+		<!-- Lookup in DICT 1 -->
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+
+	<!-- DICT 2 -->
+          <Dictionary>
+            <strings> <String value="B"/> </strings>
+          </Dictionary>
+
+      </actions> </DoAction>
+
+      <DoAction><actions>
+
+          <PushData>
+            <items>
+		<!-- Lookup in DICT 2 -->
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+
+
+	<!-- DICT 2 (skipped by BranchAlways) -->
+          <BranchAlways byteOffset="7"/>
+          <Dictionary>
+            <strings> <String value="C"/> </strings>
+          </Dictionary>
+
+          <PushData>
+            <items>
+		<!-- Lookup in DICT 2 -->
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+
+	  <AddTyped/>
+	  <AddTyped/>
+          <Duplicate/>
+          <Trace/>
+
+	  // Verify the stack contains 'ABB'
+          <PushData>
+            <items>
+              <StackString value="ABB"/>
+            </items>
+          </PushData>
+	  <EqualTyped/>
+
+	  // If true, jump to PASSED tracing
+	  <BranchIfTrue byteOffset="51"/>
+
+	  // Else, trace XFAILED
+          <PushData>
+            <items>
+              <StackString value="XFAILED: something went wrong with dicts"/>
+            </items>
+          </PushData>
+          <Trace/>
+          <BranchAlways byteOffset="43"/> // get to end 
+
+	  // PASSED tracing
+          <PushData>
+            <items>
+              <StackString value="PASSED: cross boundary dicts all fine"/>
+            </items>
+          </PushData>
+          <Trace/>
+
+	  // END OF TEST tag
+          <PushData>
+            <items>
+              <StackString value="END OF TEST"/>
+            </items>
+          </PushData>
+          <Trace/>
+
+      </actions> </DoAction>
+
+      <ShowFrame/>
+      <End/>
+    </tags>
+  </Header>
+</swf>
+
