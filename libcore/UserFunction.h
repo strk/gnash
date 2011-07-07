@@ -32,7 +32,7 @@ namespace gnash {
 //
 /// 1. Function: functions parsed from a SWF
 /// 2. builtin_function: functions implemented in C++ as though they were
-///    These are used to implement what the API functions that the proprietary
+///    These are used to implement the API functions that the proprietary
 ///    player implements in a startup script.
 class UserFunction : public as_function
 {

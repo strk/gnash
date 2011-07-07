@@ -54,7 +54,7 @@ private:
 /// A simple SWF-defined Function
 //
 /// This represents a callable Function defined in a SWF. The basic version
-/// creates a scope in which and 'arguments' array, 'this', 'super', and the
+/// creates a scope in which 'arguments' array, 'this', 'super', and the
 /// expected argument names are defined.
 //
 /// For a more advanced function, see Function2.
