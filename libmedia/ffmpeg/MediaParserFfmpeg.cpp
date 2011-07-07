@@ -401,8 +401,6 @@ MediaParserFfmpeg::initializeParser()
         }
     }
 
-    setId3Info(&Id3Info::album, std::string("album"), _id3Object);
-
     log_debug("Parsing FFMPEG media file: format:%s; nstreams:%d",
         _inputFmt->name, _formatCtx->nb_streams);
     

@@ -24,6 +24,7 @@
 #include <boost/scoped_array.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/optional.hpp>
 
 #include "RunResources.h"
 #include "log.h"
@@ -70,6 +71,9 @@ namespace {
     as_value sound_stop(const fn_call& fn);
     as_value checkPolicyFile_getset(const fn_call& fn);
     void attachSoundInterface(as_object& o);
+
+    /// If there is Id3 data, create an id3 member and call the onID3 function.
+    void handleId3Data(boost::optional<media::Id3Info> id3, as_object& sound);
 }
 
 /// A Sound object in ActionScript can control and play sound
@@ -365,19 +369,6 @@ Sound_as::probeAudio()
 #endif
         if (_mediaParser->parsingCompleted()) {
 
-            boost::optional<media::Id3Info> id3 = _mediaParser->getId3Info();
-            if (id3) {
-                VM& vm = getVM(owner());
-
-                as_object* o = new as_object(getGlobal(owner()));
-                if (id3->album) o->set_member(getURI(vm, "album"), *id3->album);
-
-                const ObjectURI& id3 = getURI(vm, "id3");
-                owner().set_member(id3, o);
-
-                const ObjectURI& onID3 = getURI(vm, "onID3");
-                callMethod(&owner(), onID3);
-            }
             _soundLoaded = true;
 
             if (!isStreaming) {
@@ -385,6 +376,9 @@ Sound_as::probeAudio()
             }
             bool success = _mediaParser->getAudioInfo() != 0;
             callMethod(&owner(), NSV::PROP_ON_LOAD, success);
+
+            // TODO: check if this should be called anyway.
+            if (success) handleId3Data(_mediaParser->getId3Info(), owner());
         }
         return; 
     }
@@ -1266,6 +1260,27 @@ sound_areSoundsInaccessible(const fn_call& /*fn*/)
     //
     LOG_ONCE( log_unimpl ("Sound.areSoundsInaccessible()") );
     return as_value();
+}
+
+void
+handleId3Data(boost::optional<media::Id3Info> id3, as_object& sound)
+{
+    if (!id3) return;
+    VM& vm = getVM(sound);
+
+    as_object* o = new as_object(getGlobal(sound));
+
+    // TODO: others.
+    if (id3->album) o->set_member(getURI(vm, "album"), *id3->album);
+    if (id3->year) o->set_member(getURI(vm, "year"), *id3->year);
+
+    // Add Sound.id3 member
+    const ObjectURI& id3prop = getURI(vm, "id3");
+    sound.set_member(id3prop, o);
+
+    // Notify onID3 function.
+    const ObjectURI& onID3 = getURI(vm, "onID3");
+    callMethod(&sound, onID3);
 }
 
 } // anonymous namespace 
