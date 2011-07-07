@@ -376,8 +376,14 @@ MediaParserFfmpeg::initializeParser()
 		  );
     
     _byteIOCxt.is_streamed = 1;
- 
+
+#if !defined(LIBAVCODEC_VERSION_MAJOR) || LIBAVCODEC_VERSION_MAJOR < 52
+    // Needed for Lenny.
+    _formatCtx = av_alloc_format_context();
+#else
     _formatCtx = avformat_alloc_context();
+#endif
+
     assert(_formatCtx);
 
     // Otherwise av_open_input_stream will reallocate the context.
