@@ -46,6 +46,7 @@ SC_AS2_XMLTESTS = \
 	jump_to_prev_block.xml \
 	dict_override.xml \
 	func_dict.xml \
+	afunc_dict.xml \
 	initaction_in_definesprite.xml \
 	zeroframe_definesprite.xml \
 	background.xml \
@@ -94,6 +95,7 @@ check_SCRIPTS = \
 	jump_to_prev_block-runner \
 	dict_override-runner \
 	func_dict-runner \
+	afunc_dict-runner \
 	initaction_in_definesprite-runner \
 	zeroframe_definesprite-runner \
 	registers-runner \
@@ -126,8 +128,12 @@ dict_override-runner: $(srcdir)/../generic-testrunner.sh dict_override.swf Makef
 	sh $(srcdir)/../generic-testrunner.sh -r 50 -c "END OF TEST" $(top_builddir) dict_override.swf > $@
 	chmod 755 $@
 
-func_dict-runner: $(srcdir)/../generic-testrunner.sh dict_override.swf Makefile
-	sh $(srcdir)/../generic-testrunner.sh -r 50 -c "END OF TEST" $(top_builddir) dict_override.swf > $@
+func_dict-runner: $(srcdir)/../generic-testrunner.sh func_dict.swf Makefile
+	sh $(srcdir)/../generic-testrunner.sh -r 50 -c "END OF TEST" $(top_builddir) func_dict.swf > $@
+	chmod 755 $@
+
+afunc_dict-runner: $(srcdir)/../generic-testrunner.sh afunc_dict.swf Makefile
+	sh $(srcdir)/../generic-testrunner.sh -r 50 -c "END OF TEST" $(top_builddir) afunc_dict.swf > $@
 	chmod 755 $@
 
 initaction_in_definesprite-runner: $(srcdir)/../generic-testrunner.sh initaction_in_definesprite.swf Makefile

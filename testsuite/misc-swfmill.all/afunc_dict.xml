@@ -10,8 +10,8 @@
  the pool in the action buffer is overridden at time
  of function call.
 
- This file uses named function, see afunc_dict.xml 
- for an anonymous function.
+ This file uses anonymous function, see func_dict.xml 
+ for a named function.
 
 -->
 
@@ -30,8 +30,15 @@
             </strings>
           </Dictionary>
 
+	<!-- Name we'll assign to the function -->
+          <PushData>
+            <items>
+              <StackString value="f"/>
+            </items>
+          </PushData>
+
 	<!-- Function code -->
-          <DeclareFunction name="f" argc="0" length="15">
+          <DeclareFunction name="" argc="0" length="15">
             <args/>
           </DeclareFunction>
           <PushData>
@@ -47,6 +54,9 @@
             </items>
           </PushData>
           <AddTyped/>
+          <SetVariable/>
+
+	<!-- Assigning the anonymous function to the variable `f' -->
           <SetVariable/>
 
 	<!-- Dictionary after function definition -->
