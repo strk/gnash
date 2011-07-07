@@ -29,6 +29,7 @@
 #include "NamingPolicy.h"
 
 #include <cerrno>
+#include <cstring> // for strerror
 #include <cstdio>
 #include <map>
 #include <string>
