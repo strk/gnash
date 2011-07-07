@@ -34,16 +34,16 @@
 namespace gnash {
 
 Function::Function(const action_buffer& ab, as_environment& env,
-			size_t start, const ScopeStack& scopeStack)
-	:
-	UserFunction(getGlobal(env)),
-	_env(env),
-	_action_buffer(ab),
-	_scopeStack(scopeStack),
-	_startPC(start),
-	_length(0)
+            size_t start, const ScopeStack& scopeStack)
+    :
+    UserFunction(getGlobal(env)),
+    _env(env),
+    _action_buffer(ab),
+    _scopeStack(scopeStack),
+    _startPC(start),
+    _length(0)
 {
-	assert( _startPC < _action_buffer.size() );
+    assert( _startPC < _action_buffer.size() );
 }
 
 TargetGuard::TargetGuard(as_environment& e, DisplayObject* ch,
@@ -73,35 +73,35 @@ Function::call(const fn_call& fn)
 
     as_object* caller = vm.calling() ? &vm.currentCall().function() : 0;
 
-	// Set up local stack frame, for parameters and locals.
-	FrameGuard guard(getVM(fn), *this);
+    // Set up local stack frame, for parameters and locals.
+    FrameGuard guard(getVM(fn), *this);
     CallFrame& cf = guard.callFrame();
 
-	DisplayObject* target = _env.target();
-	DisplayObject* orig_target = _env.get_original_target();
+    DisplayObject* target = _env.target();
+    DisplayObject* orig_target = _env.get_original_target();
 
-	// Some features are version-dependant.
-	const int swfversion = getSWFVersion(fn);
+    // Some features are version-dependant.
+    const int swfversion = getSWFVersion(fn);
 
-	if (swfversion < 6) {
-		// In SWF5, when 'this' is a DisplayObject it becomes
-		// the target for this function call.
-		// See actionscript.all/setProperty.as
+    if (swfversion < 6) {
+        // In SWF5, when 'this' is a DisplayObject it becomes
+        // the target for this function call.
+        // See actionscript.all/setProperty.as
         DisplayObject* ch = get<DisplayObject>(fn.this_ptr);
         if (ch) {
             target = ch;
             orig_target = ch;
         }
-	}
+    }
 
-	/// This is only needed for SWF5 (temp switch of target)
-	/// We do always and base 'target' value on SWF version.
-	/// TODO: simplify code by maybe using a custom as_environment
-	///       instead, so to get an "original" target being 
-	///       the one set now (rather then the really original one)
-	/// TODO: test scope when calling functions defined in another timeline
-	///       (target, in particular).
-	TargetGuard targetGuard(_env, target, orig_target);
+    /// This is only needed for SWF5 (temp switch of target)
+    /// We do always and base 'target' value on SWF version.
+    /// TODO: simplify code by maybe using a custom as_environment
+    ///       instead, so to get an "original" target being 
+    ///       the one set now (rather then the really original one)
+    /// TODO: test scope when calling functions defined in another timeline
+    ///       (target, in particular).
+    TargetGuard targetGuard(_env, target, orig_target);
 
     // Push the arguments onto the local frame.
     for (size_t i = 0, n = _args.size(); i < n; ++i) {
@@ -135,7 +135,7 @@ Function::call(const fn_call& fn)
     // Put 'arguments' in a local var.
     setLocal(cf, NSV::PROP_ARGUMENTS, getArguments(*this, *args, fn, caller));
 
-	// Execute the actions.
+    // Execute the actions.
     as_value result;
     ActionExec(*this, _env, &result, fn.this_ptr)();
     return result;
@@ -144,8 +144,8 @@ Function::call(const fn_call& fn)
 void
 Function::setLength(size_t len)
 {
-	assert(_startPC + len <= _action_buffer.size());
-	_length = len;
+    assert(_startPC + len <= _action_buffer.size());
+    _length = len;
 }
 
 void
@@ -154,9 +154,9 @@ Function::markReachableResources() const
     std::for_each(_scopeStack.begin(), _scopeStack.end(),
         std::mem_fun(&as_object::setReachable));
 
-	_env.markReachableResources();
+    _env.markReachableResources();
 
-	// Invoke parent class marker
+    // Invoke parent class marker
     as_object::markReachableResources(); 
 }
 
@@ -165,12 +165,12 @@ getArguments(Function& callee, as_object& args, const fn_call& fn,
         as_object* caller)
 { 
 
-	for (size_t i = 0; i < fn.nargs; ++i) {
-		callMethod(&args, NSV::PROP_PUSH, fn.arg(i));
-	}
+    for (size_t i = 0; i < fn.nargs; ++i) {
+        callMethod(&args, NSV::PROP_PUSH, fn.arg(i));
+    }
 
-	args.init_member(NSV::PROP_CALLEE, &callee);
-	args.init_member(NSV::PROP_CALLER, caller);
+    args.init_member(NSV::PROP_CALLEE, &callee);
+    args.init_member(NSV::PROP_CALLER, caller);
     return &args;
 
 }
