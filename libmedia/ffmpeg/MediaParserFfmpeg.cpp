@@ -396,7 +396,9 @@ MediaParserFfmpeg::initializeParser()
         throw IOException("MediaParserFfmpeg couldn't open input stream");
     }
 
-    // Note: metadata doesn't work here; haven't worked out why.
+#if defined(LIBAVCODEC_VERSION_MAJOR) && LIBAVCODEC_VERSION_MAJOR >= 52
+    // Note: in at least some versions of ffmpeg, av_open_input_stream does
+    // not parse metadata; not sure why.
     AVMetadata* md = _formatCtx->metadata;
     if (md) {
         AVMetadataTag* tag = av_metadata_get(md, "album", 0,
@@ -406,6 +408,7 @@ MediaParserFfmpeg::initializeParser()
                     _id3Object);
         }
     }
+#endif
 
     log_debug("Parsing FFMPEG media file: format:%s; nstreams:%d",
         _inputFmt->name, _formatCtx->nb_streams);
