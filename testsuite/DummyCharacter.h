@@ -56,6 +56,8 @@ public:
 
     virtual bool mouseEnabled() const { return true; }
 
+    virtual void mouseEvent(const event_id&) {}
+
     InteractiveObject* topmostMouseEntity(boost::int32_t, boost::int32_t)
     {
         return 0;

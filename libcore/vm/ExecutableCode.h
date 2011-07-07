@@ -133,7 +133,7 @@ class QueuedEvent : public ExecutableCode
 {
 public:
 
-    QueuedEvent(DisplayObject* nTarget, const event_id& id)
+    QueuedEvent(MovieClip* nTarget, const event_id& id)
         :
         ExecutableCode(nTarget),
         _eventId(id)
@@ -142,7 +142,7 @@ public:
     virtual void execute() {
         // don't execute any events for destroyed DisplayObject.
         if (!target()->isDestroyed()) {
-            target()->notifyEvent(_eventId);
+            static_cast<MovieClip*>(target())->notifyEvent(_eventId);
         }
     }
 

@@ -511,6 +511,13 @@ MovieClip::getDisplayObjectAtDepth(int depth)
     return _displayList.getDisplayObjectAtDepth(depth);
 }
 
+void
+MovieClip::queueEvent(const event_id& id, int lvl)
+{
+    std::auto_ptr<ExecutableCode> event(new QueuedEvent(this, id));
+    stage().pushAction(event, lvl);
+}
+
 /// This handles special properties of MovieClip.
 //
 /// The only genuine special properties are DisplayList members. These
@@ -687,7 +694,8 @@ MovieClip::notifyEvent(const event_id& id)
     // We do not execute ENTER_FRAME if unloaded
     if (id.id() == event_id::ENTER_FRAME && unloaded()) {
 #ifdef GNASH_DEBUG
-        log_debug(_("Sprite %s ignored ENTER_FRAME event (is unloaded)"), getTarget());
+        log_debug(_("Sprite %s ignored ENTER_FRAME event (is unloaded)"),
+                getTarget());
 #endif
         return;
     }
@@ -700,11 +708,17 @@ MovieClip::notifyEvent(const event_id& id)
         return;
     }
 
-    std::auto_ptr<ExecutableCode> code (get_event_handler(id));
+    // Dispatch static event handlers (defined in PlaceObject tags).
+    std::auto_ptr<ExecutableCode> code(get_event_handler(id));
     if (code.get()) {
         // Dispatch.
         code->execute();
     }
+
+    // Now call user-defined event handlers, but not for everything.
+
+    // User-defined key events are never called.
+    if (isKeyEvent(id)) return;
 
     // user-defined onInitialize is never called
     if (id.id() == event_id::INITIALIZE) return;
@@ -758,9 +772,7 @@ MovieClip::notifyEvent(const event_id& id)
     }
 
     // Call the appropriate member function.
-    if (!isKeyEvent(id)) {
-        sendEvent(*getObject(this), get_environment(), id.functionURI());
-    }
+    sendEvent(*getObject(this), get_environment(), id.functionURI());
 
 }
 
@@ -1745,6 +1757,7 @@ MovieClip::construct(as_object* initObj)
 bool
 MovieClip::unloadChildren()
 {
+
 #ifdef GNASH_DEBUG
     log_debug(_("Unloading movieclip '%s'"), getTargetPath());
 #endif
@@ -1757,7 +1770,14 @@ MovieClip::unloadChildren()
     // on itself.
     _drawable.clear();
     
-    return _displayList.unload();
+    const bool childHandler = _displayList.unload();
+
+    if (!unloaded()) {
+        queueEvent(event_id(event_id::UNLOAD), movie_root::PRIORITY_DOACTION);
+    }
+
+    return childHandler;
+
 }
 
 void

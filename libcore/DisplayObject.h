@@ -622,17 +622,6 @@ public:
     // Return true if this DisplayObject should be rendered
     bool visible() const { return _visible; }
 
-    /// Notify clip events (and also user-defined ones).
-    virtual void notifyEvent(const event_id& /*id*/)
-    {
-    }
-
-    /// Queue event in the global action queue.
-    //
-    /// notifyEvent(id) will be called by execution of the queued
-    /// action
-    void queueEvent(const event_id& id, int lvl);
-
     /// Return true if an handler for the given event is defined
     //
     /// NOTE that we look for both clip-defined and user-defined

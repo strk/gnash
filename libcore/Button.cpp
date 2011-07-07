@@ -354,7 +354,7 @@ Button::isEnabled()
 
 
 void
-Button::keyPress(const event_id& id)
+Button::keyPress(key::code c)
 {
     if (unloaded()) {
         // We don't respond to events while unloaded
@@ -362,11 +362,8 @@ Button::keyPress(const event_id& id)
         return; 
     }
 
-    assert(id.id() == event_id::KEY_PRESS);
-    assert(id.keyCode() != key::INVALID);
-
     ButtonActionPusher xec(stage(), this); 
-    _def->forEachTrigger(id, xec);
+    _def->forEachTrigger(event_id(event_id::KEY_PRESS, c), xec);
 }
 
 bool

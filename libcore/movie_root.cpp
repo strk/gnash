@@ -577,8 +577,7 @@ movie_root::keyEvent(key::code k, bool down)
     for (LiveChars::iterator iter = copy.begin(), itEnd=copy.end();
             iter != itEnd; ++iter) {
 
-        // sprite, button & input_edit_text DisplayObjects
-        InteractiveObject* const ch = *iter;
+        MovieClip* const ch = *iter;
         if (ch->unloaded()) continue;
 
         if (down) {
@@ -624,14 +623,14 @@ movie_root::keyEvent(key::code k, bool down)
         // because we search through them all to register the key codes.
         if (it != _buttonKeys.end()) {
             if (!it->second.first->unloaded()) {
-                it->second.first->keyPress(event_id(event_id::KEY_PRESS, k));
+                it->second.first->keyPress(k);
             }
         }
 
         // If we're focused on an editable text field, finally the text
         // is updated
         TextField* tf = dynamic_cast<TextField*>(_currentFocus);
-        if (tf) tf->notifyEvent(event_id(event_id::KEY_PRESS, k));
+        if (tf) tf->keyInput(k);
     }
 
     processActionQueue();
