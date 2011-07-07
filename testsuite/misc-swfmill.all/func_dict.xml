@@ -23,7 +23,7 @@
       <DoAction>
         <actions>
 
-	<!-- Dictionary at time of function definition -->
+	<!-- Dictionary 1 -->
           <Dictionary>
             <strings>
               <String value="a"/>
@@ -31,25 +31,32 @@
           </Dictionary>
 
 	<!-- Function code -->
-          <DeclareFunction name="f" argc="0" length="15">
+          <DeclareFunction name="f" argc="0" length="17">
             <args/>
           </DeclareFunction>
-          <PushData>
-            <items>
-              <StackString value="r"/>
-            </items>
-          </PushData>
-          <Duplicate/>
-          <GetVariable/>
+
           <PushData>
             <items>
               <StackDictionaryLookup index="0"/>
             </items>
           </PushData>
-          <AddTyped/>
-          <SetVariable/>
 
-	<!-- Dictionary after function definition -->
+	<!-- Dictionary 2 (in-function) -->
+          <Dictionary>
+            <strings>
+              <String value="c"/>
+            </strings>
+          </Dictionary>
+
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+
+	<!-- END OF FUNCTION BODY -->
+
+	<!-- Dictionary 3 (after function) -->
           <Dictionary>
             <strings>
               <String value="b"/>
@@ -57,25 +64,21 @@
           </Dictionary>
 
 
-	<!-- Main code -->
-
-	  // Append dict[0] to `r'
+	  // Push "r" (to assign later)
           <PushData>
             <items>
               <StackString value="r"/>
             </items>
           </PushData>
-          <Duplicate/>
-          <GetVariable/>
+
+	  // Push dict[0] (expect 'b')
           <PushData>
             <items>
               <StackDictionaryLookup index="0"/>
             </items>
           </PushData>
-          <AddTyped/>
-          <SetVariable/>
 
-	  // Call the function appending dict[0] to `r'
+	  // Call the function  (pushes 'a' and 'c')
           <PushData>
             <items>
               <StackInteger value="0"/>
@@ -85,14 +88,26 @@
           <CallFunction/>
           <Pop/>
 
-	  // Verify `r' equals 'ba'
+	
+	  // Push dict[0] (expect 'b')
           <PushData>
             <items>
-              <StackString value="ba"/>
-              <StackString value="r"/>
+              <StackDictionaryLookup index="0"/>
             </items>
           </PushData>
-          <GetVariable/>
+
+          <AddTyped/>
+          <AddTyped/>
+          <AddTyped/>
+          <Duplicate/>
+          <Trace/>
+
+	  // Verify we got 'bacb'
+          <PushData>
+            <items>
+              <StackString value="bacb"/>
+            </items>
+          </PushData>
 	  <EqualTyped/>
 
 	  // If true, jump to PASSED tracing
