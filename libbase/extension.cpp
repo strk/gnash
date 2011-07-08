@@ -28,9 +28,9 @@
 #include <cstring>
 #include <iostream>
 #include <sys/types.h>
+#include <ltdl.h>
 
 #include "log.h"
-#include "ltdl.h"
 #include "sharedlib.h"
 #include "extension.h"
 

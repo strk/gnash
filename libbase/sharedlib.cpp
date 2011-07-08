@@ -42,7 +42,7 @@
 # include <libgen.h>
 #endif
 
-#include "ltdl.h"
+#include <ltdl.h>
 #include <boost/thread/mutex.hpp>
 
 #if defined(WIN32) || defined(_WIN32)
