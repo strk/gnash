@@ -29,6 +29,7 @@ EXTRA_DIST = \
 	sound1.wav \
 	sound1.mp3 \
 	mono44.mp2 \
+	click.mp3 \
 	stereo8.mp3 \
 	square.flv \
 	square.ogg \
