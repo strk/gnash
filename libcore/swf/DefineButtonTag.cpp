@@ -356,7 +356,7 @@ ButtonRecord::read(SWFStream& in, TagType t,
         movie_definition& m, unsigned long endPos)
 {
     // caller should check this
-    if (in.tell()+1 > endPos)
+    if (in.tell() + 1 > endPos)
     {
         IF_VERBOSE_MALFORMED_SWF(
         log_swferror(_("   premature end of button record input stream, "
@@ -366,17 +366,17 @@ ButtonRecord::read(SWFStream& in, TagType t,
     }
 
     in.ensureBytes(1);
-    int    flags = in.read_u8();
+    boost::uint8_t flags = in.read_u8();
     if (!flags) return false;
 
     // Upper 4 bits are:
     //
-    bool buttonHasBlendMode = flags & (1<<5); 
-    bool buttonHasFilterList = flags & (1<<4);
-    _hitTest = flags & (1<<3);
-    _down = flags & (1<<2);
-    _over = flags & (1<<1); 
-    _up = flags & (1<<0); 
+    bool buttonHasBlendMode = flags & (1 << 5); 
+    bool buttonHasFilterList = flags & (1 << 4);
+    _hitTest = flags & (1 << 3);
+    _down = flags & (1 << 2);
+    _over = flags & (1 << 1); 
+    _up = flags & (1 << 0); 
 
     if (in.tell() + 2 > endPos) {
         IF_VERBOSE_MALFORMED_SWF(
@@ -448,10 +448,10 @@ std::string
 computeButtonStatesString(int flags)
 {
     std::string ret;
-    if ( flags & (1<<3) ) ret += "hit";
-    if ( flags & (1<<2) ) { if ( ! ret.empty() ) ret += ","; ret += "down"; }
-    if ( flags & (1<<1) ) { if ( ! ret.empty() ) ret += ","; ret += "over"; }
-    if ( flags & (1<<0) ) { if ( ! ret.empty() ) ret += ","; ret += "up"; }
+    if (flags & (1 << 3)) ret += "hit";
+    if (flags & (1 << 2)) { if (!ret.empty()) ret += ","; ret += "down"; }
+    if (flags & (1 << 1)) { if (!ret.empty()) ret += ","; ret += "over"; }
+    if (flags & (1 << 0)) { if (!ret.empty()) ret += ","; ret += "up"; }
     return ret;
 }
 

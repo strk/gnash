@@ -273,16 +273,14 @@ TextField::show_cursor(Renderer& renderer, const SWFMatrix& mat)
 size_t
 TextField::cursorRecord()
 {
-    SWF::TextRecord record;
+    if (_textRecords.empty()) return 0;
+
     size_t i = 0;
 
-    if (_textRecords.size() != 0) {
-        while (i < _textRecords.size() && m_cursor >= _recordStarts[i]) {
-            ++i;
-        }
-        return i-1;
+    while (i < _textRecords.size() && m_cursor >= _recordStarts[i]) {
+        ++i;
     }
-    return 0;
+    return i - 1;
 }
 
 void
@@ -576,7 +574,7 @@ TextField::keyInput(key::code c)
         case key::HOME:
             while ( linestartit < linestartend && *linestartit <= m_cursor ) {
                 cur_cursor = *linestartit;
-                linestartit++;
+                ++linestartit;
             }
             m_cursor = cur_cursor;
             break;
@@ -596,7 +594,7 @@ TextField::keyInput(key::code c)
         case key::UP:
             while ( linestartit < linestartend && *linestartit <= m_cursor ) {
                 cur_cursor = *linestartit;
-                linestartit++;
+                ++linestartit;
             }
             //if there is no previous line
             if ( linestartit-_line_starts.begin() - 2 < 0 ) {
@@ -618,7 +616,7 @@ TextField::keyInput(key::code c)
             
         case key::END:
             while ( linestartit < linestartend && *linestartit <= m_cursor ) {
-                linestartit++;
+                ++linestartit;
             }
             m_cursor = linestartit != linestartend ? *linestartit - 1 : _text.size();
             break;
@@ -648,7 +646,7 @@ TextField::keyInput(key::code c)
             while (linestartit < linestartend &&
                     *linestartit <= m_cursor ) {
                 cur_cursor = *linestartit;
-                linestartit++;
+                ++linestartit;
             }
 
             // linestartit should never be before _line_starts.begin()
@@ -974,9 +972,8 @@ TextField::insertTab(SWF::TextRecord& rec, boost::int32_t& x, float scale)
         
         std::sort(_tabStops.begin(), _tabStops.end()); 
 
-        int tab = 0;
         if (!_tabStops.empty()) {
-            tab = _tabStops.back() + 1;
+            int tab = _tabStops.back() + 1;
             
             for (size_t i = 0; i < tabStops.size(); ++i) {        
                 if (tabStops[i] > x) {
@@ -1829,7 +1826,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                         while (linestartit != linestartend &&
                                 *linestartit + 1 <= currentPos)
                         {
-                            linestartit++;
+                            ++linestartit;
                         }
                         _line_starts.insert(linestartit, currentPos);
                         _recordStarts.push_back(currentPos);
