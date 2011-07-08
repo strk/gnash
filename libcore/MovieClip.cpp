@@ -96,7 +96,7 @@ namespace {
 /// Its execution will call constructAsScriptObject() 
 /// on the target movieclip
 ///
-class ConstructEvent: public ExecutableCode
+class ConstructEvent : public ExecutableCode
 {
 public:
 
@@ -109,6 +109,28 @@ public:
         static_cast<MovieClip*>(target())->constructAsScriptObject();
     }
 
+};
+
+/// Generic event  (constructed by id, invoked using notifyEvent
+class QueuedEvent : public ExecutableCode
+{
+public:
+
+    QueuedEvent(MovieClip* nTarget, const event_id& id)
+        :
+        ExecutableCode(nTarget),
+        _eventId(id)
+    {}
+
+    virtual void execute() {
+        // don't execute any events for destroyed DisplayObject.
+        if (!target()->isDestroyed()) {
+            static_cast<MovieClip*>(target())->notifyEvent(_eventId);
+        }
+    }
+
+private:
+    const event_id _eventId;
 };
 
 /// Find a DisplayObject hit by the given coordinates.
