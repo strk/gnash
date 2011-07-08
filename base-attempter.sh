@@ -30,9 +30,11 @@ if test x"$packages" != x; then
     echo "FAILED: $P"
   done
   if test x"$failed" != x; then
-    echo "Some packages might not have been installed because they are not in your repositories. This is normal. If needed, please install them manually. If packages exist, but were not detected, please tell us so we can add them to the list."
+    echo "Some packages might not have been installed because they are not in your repositories. This is normal. If needed, please install them manually. If packages exist, but were not detected, please tell us so we can add them to the list. For instructions on how to proceed from here, please run configure again."
+  else
+    echo "All dependencies are satisfied -- You should now be able to run configure successfully"
   fi
 else
-  echo All dependencies are satisfied
+  echo "All dependencies are satisfied -- You should now be able to run configure successfully"
 fi
 
