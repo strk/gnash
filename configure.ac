@@ -3923,7 +3923,7 @@ if test x`which apt-get 2>/dev/null` != x; then
     echo "#!/bin/sh" > deb-attempt-install-dependencies.sh
     echo "packages=\"$deb_err $deb_war $deb_rec\"" >> deb-attempt-install-dependencies.sh
     echo "PKGCOMMAND=\"apt-get install -y -q\"" >> deb-attempt-install-dependencies.sh
-    cat base-attempter.sh >> deb-attempt-install-dependencies.sh
+    cat ${srcdir}/base-attempter.sh >> deb-attempt-install-dependencies.sh
     chmod +x deb-attempt-install-dependencies.sh
     echo ""
     echo ".deb users might be able to install most dependencies by executing:"
@@ -3936,7 +3936,7 @@ if test x`which yum 2>/dev/null` != x; then
     echo "#!/bin/sh" > rpm-attempt-install-dependencies.sh
     echo "packages=\"$rpm_err $rpm_war  $rpm_rec\"" >> rpm-attempt-install-dependencies.sh
     echo "PKGCOMMAND=\"yum install -y \""    >> rpm-attempt-install-dependencies.sh
-    cat base-attempter.sh >> rpm-attempt-install-dependencies.sh
+    cat ${srcdir}/base-attempter.sh >> rpm-attempt-install-dependencies.sh
     chmod +x rpm-attempt-install-dependencies.sh
     echo ""
     echo ".rpm users might be able to install most dependencies by executing:"
