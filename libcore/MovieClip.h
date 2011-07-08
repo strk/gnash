@@ -131,6 +131,12 @@ public:
 
     virtual bool trackAsMenu();
 
+    /// Queue event in the global action queue.
+    //
+    /// notifyEvent(id) will be called by execution of the queued
+    /// action
+    void queueEvent(const event_id& id, int lvl);
+
     /// Return the _root ActionScript property of this sprite.
     //
     /// Relative or absolute is determined by the _lockroot property,
@@ -490,9 +496,17 @@ public:
     /// @param init_object
     ///     If not null, will be used to copy properties over.
     MovieClip* duplicateMovieClip(const std::string& newname,
-        int newdepth, as_object* init_object=NULL);
+        int newdepth, as_object* init_object = 0);
+
+    /// Called when a mouse event affects this MovieClip
+    virtual void mouseEvent(const event_id& id) {
+        notifyEvent(id);
+    }
         
     /// Dispatch event handler(s), if any.
+    //
+    /// This handles key, mouse, and specific MovieClip events.
+    /// TODO: split this sensibly.
     virtual void notifyEvent(const event_id& id);
 
     // inherited from DisplayObject class, see dox in DisplayObject.h

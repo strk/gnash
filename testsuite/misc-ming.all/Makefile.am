@@ -171,6 +171,8 @@ check_PROGRAMS = \
 
 if MING_VERSION_0_4_3
 check_PROGRAMS += \
+	StreamSoundTest \
+	StreamSoundTestRunner \
 	EmbeddedSoundTest \
 	EmbeddedSoundTest-Runner \
 	eventSoundTest1 \
@@ -1178,6 +1180,38 @@ EmbeddedSoundTest_Runner_DEPENDENCIES = \
 	EmbeddedSoundTest.swf	\
 	$(NULL)
 
+StreamSoundTest_SOURCES = \
+	StreamSoundTest.c \
+	$(NULL)
+
+StreamSoundTest_CFLAGS = \
+	-DMEDIADIR='"$(abs_mediadir)"' \
+	$(NULL)
+
+StreamSoundTest_LDADD = libgnashmingutils.la
+
+StreamSoundTest.swf: StreamSoundTest
+	./StreamSoundTest $(abs_mediadir)
+
+StreamSoundTestRunner_SOURCES = \
+	StreamSoundTestRunner.cpp \
+	$(NULL)
+
+StreamSoundTestRunner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+
+StreamSoundTestRunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
+	$(NULL)
+
+StreamSoundTestRunner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	StreamSoundTest.swf	\
+	$(NULL)
+
 BitmapSmoothingTest_SOURCES = \
 	BitmapSmoothingTest.c \
 	$(NULL)
@@ -1740,7 +1774,8 @@ TEST_CASES = \
 
 if MING_VERSION_0_4_3
 TEST_CASES += \
-    EmbeddedSoundTest-Runner \
+	StreamSoundTestRunner \
+	EmbeddedSoundTest-Runner \
 	eventSoundTest1-Runner \
     $(NULL)
 endif

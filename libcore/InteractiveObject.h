@@ -115,10 +115,11 @@ public:
     virtual InteractiveObject* topmostMouseEntity(boost::int32_t /*x*/,
             boost::int32_t /*y*/) = 0;
 
-    virtual void mouseEvent(const event_id& id)
-    {
-        notifyEvent(id);
-    }
+    /// Called whenever a mouse event affects this InteractiveObject.
+    //
+    /// All InteractiveObjects (Button, MovieClip, TextField) can handle
+    /// mouse input, so must override this function.
+    virtual void mouseEvent(const event_id& id) = 0;
 
     /// Return true if the given point falls in this DisplayObject's shape
     //

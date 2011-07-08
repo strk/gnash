@@ -257,6 +257,9 @@ public:
 	/// cursor in the current position.
 	bool usingHandCursor();
 
+    /// Return true if a streaming sound is active, false if not.
+    bool streamingSound() const;
+
 	/// \brief
 	/// Return the number of times a sound has been stopped,
 	/// or 0 if sound testing is not supported. See canTestSound().

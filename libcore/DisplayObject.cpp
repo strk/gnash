@@ -430,10 +430,6 @@ void
 DisplayObject::add_event_handler(const event_id& id, const action_buffer& code)
 {
     _event_handlers[id].push_back(&code);
-
-    // todo: drop the DisplayObject as a listener
-    //       if it gets no valid handlers for
-    //       mouse or Key events.
 }
 
 std::auto_ptr<ExecutableCode>
@@ -453,12 +449,7 @@ DisplayObject::get_event_handler(const event_id& id) const
 bool
 DisplayObject::unload()
 {
-
     const bool childHandler = unloadChildren();
-
-    if (!_unloaded) {
-        queueEvent(event_id(event_id::UNLOAD), movie_root::PRIORITY_DOACTION);
-    }
 
     // Unregister this DisplayObject as mask and/or maskee.
     if (_maskee) _maskee->setMask(0);
@@ -474,14 +465,6 @@ DisplayObject::unload()
     _unloaded = true;
 
     return hasEvent;
-}
-
-void
-DisplayObject::queueEvent(const event_id& id, int lvl)
-{
-    if (!_object) return;
-    std::auto_ptr<ExecutableCode> event(new QueuedEvent(this, id));
-    stage().pushAction(event, lvl);
 }
 
 bool
