@@ -41,12 +41,11 @@ easy way to see why a movie isn't playing correctly.
 Plugin:	
 -------
 
-The plugin correctly installs itself into Mozilla, Firefox, or Konqueror.
-It can play some SWF files in cooperation with the browser. It
-should work with any browser that supports Mozilla's NPAPI API plugin
-SDK. Gnash is know to work with Mozilla, Firefox, Iceweasel, Icecat,
-Epiphany, Galeon, Opera, and Chromium. Gnash runs equally well in
-32-bit and 64-bit environments.
+The plugin can play SWF files in cooperation with the browser.
+It works with any browser that supports Mozilla's NPAPI plugin interface.
+Gnash is know to work with Mozilla, Firefox, Iceweasel, Icecat, Konqueror,
+Epiphany, Galeon, Opera, SeaMonkey and Chromium.
+Gnash runs equally well in 32-bit and 64-bit environments.
 
 Configure with --with-plugindir= to set the directory that "make
 install-plugin" will install the plugin in. By default it will be installed
