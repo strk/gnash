@@ -445,6 +445,11 @@ public:
     ///
     void setAudioDump(const std::string& wavefile);
 
+    /// Check if a streaming sound is playing.
+    //
+    /// @return true if any streaming sound is playing, false if not.
+    bool streamingSound() const;
+
 protected:
 
     sound_handler(media::MediaHandler* m)

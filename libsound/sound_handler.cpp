@@ -529,8 +529,7 @@ sound_handler::plugInputStream(std::auto_ptr<InputStream> newStreamer)
     InputStream* newStream = newStreamer.get(); // for debugging
 #endif
 
-    if ( ! _inputStreams.insert(newStreamer.release()).second )
-    {
+    if (!_inputStreams.insert(newStreamer.release()).second) {
         // this should never happen !
         log_error("_inputStreams container still has a pointer "
             "to deleted InputStream %p!", newStreamer.get());
@@ -639,7 +638,19 @@ sound_handler::setAudioDump(const std::string& wavefile)
     }
 }
 
-/*private*/
+bool
+sound_handler::streamingSound() const
+{
+    if (_streamingSounds.empty()) return false;
+    if (_inputStreams.empty()) return false;
+
+    for (StreamingSounds::const_iterator it = _streamingSounds.begin(), 
+            e = _streamingSounds.end(); it != e; ++it) {
+        if ((*it)->isPlaying()) return true;
+    }
+    return false;
+}
+
 void
 sound_handler::unplugCompletedInputStreams()
 {
