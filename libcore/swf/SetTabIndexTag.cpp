@@ -43,7 +43,7 @@ SetTabIndexTag::loader(SWFStream& in, TagType /*tag*/, movie_definition& /*md*/,
     boost::uint16_t tab_index = in.read_u16();
     UNUSED(tab_index);
 
-    log_unimpl("SetTabIndexTag");
+    LOG_ONCE( log_unimpl("SetTabIndexTag") );
 
 }
 
