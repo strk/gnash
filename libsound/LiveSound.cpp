@@ -47,12 +47,7 @@ LiveSound::createDecoder(media::MediaHandler& mh, const media::SoundInfo& si)
     media::AudioInfo info(si.getFormat(), si.getSampleRate(), 
         si.is16bit() ? 2 : 1, si.isStereo(), 0, media::CODEC_TYPE_FLASH);
 
-    try {
-        _decoder.reset(mh.createAudioDecoder(info).release());
-    }
-    catch (const MediaException& e) {
-        log_error("AudioDecoder initialization failed: %s", e.what());
-    }
+    _decoder.reset(mh.createAudioDecoder(info).release());
 }
 
 unsigned int 

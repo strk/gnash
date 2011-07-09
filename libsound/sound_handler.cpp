@@ -429,9 +429,14 @@ sound_handler::playStream(int soundId, StreamBlockId blockId)
     StreamingSoundData& s = *_streamingSounds[soundId];
     if (s.isPlaying() || s.empty()) return;
 
-    std::auto_ptr<InputStream> is(s.createInstance(*_mediaHandler, blockId));
-
-    plugInputStream(is);
+    try {
+        std::auto_ptr<InputStream> is(
+                s.createInstance(*_mediaHandler, blockId));
+        plugInputStream(is);
+    }
+    catch (const MediaException& e) {
+        log_error("Could not start streaming sound: %s", e.what());
+    }
 }
 
 /*public*/
@@ -514,12 +519,18 @@ sound_handler::startSound(int handle, int loops, const SoundEnvelopes* env,
         return;
     }
 
-    // Make an InputStream for this sound and plug it into  
-    // the set of InputStream channels
-    std::auto_ptr<InputStream> sound(sounddata.createInstance(*_mediaHandler,
-            inPoint, outPoint, env, loops));
+    try {
+        // Make an InputStream for this sound and plug it into  
+        // the set of InputStream channels
+        std::auto_ptr<InputStream> sound(
+                sounddata.createInstance(*_mediaHandler, inPoint, outPoint,
+                    env, loops));
+        plugInputStream(sound);
+    }
+    catch (const MediaException& e) {
+        log_error("Could not start event sound: %s", e.what());
+    }
 
-    plugInputStream(sound);
 }
 
 void
