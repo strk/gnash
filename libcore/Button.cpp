@@ -465,8 +465,6 @@ Button::mouseEvent(const event_id& event)
 {
     if (unloaded()) {
         // We don't respond to events while unloaded. See bug #22982.
-        log_debug("Button %s received %s button event while unloaded: ignored",
-            getTarget(), event);
         return;
     }
 
