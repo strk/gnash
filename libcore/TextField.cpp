@@ -280,6 +280,8 @@ TextField::cursorRecord()
     while (i < _textRecords.size() && m_cursor >= _recordStarts[i]) {
         ++i;
     }
+    // TODO: it seems like this could return (size_t) -1, but there's no
+    // evidence this is allowed or handled.
     return i - 1;
 }
 

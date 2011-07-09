@@ -881,8 +881,6 @@ Button::markOwnResources() const
 bool
 Button::unloadChildren()
 {
-    GNASH_REPORT_FUNCTION;
-
     bool childsHaveUnload = false;
 
     // We need to unload all children, or the global instance list
@@ -909,8 +907,6 @@ Button::unloadChildren()
 void
 Button::destroy()
 {
-    GNASH_REPORT_FUNCTION;
-
     stage().removeButtonKey(this);
 
     for (DisplayObjects::iterator i = _stateCharacters.begin(),
