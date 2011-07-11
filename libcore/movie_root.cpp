@@ -551,6 +551,9 @@ movie_root::reset()
     setInvalidated();
 
     _disableScripts = false;
+
+    _streamId = -1;
+    _streamBlock = -1;
 }
 
 void
@@ -866,19 +869,24 @@ movie_root::advance()
             if (!s->streamingSound()) {
                 log_error("movie_root tracking a streaming sound, but "
                         "the sound handler is not streaming!");
+                _streamId = -1;
+                _streamBlock = -1;
             }
 
             // -1 for bad result, 0 for first block.
+            // Get the stream block we are currently at.
             int block = s->getStreamBlock(_streamId);
 
-            // If it's the first block, we should advance as normal.
+            // If we're behind, we should skip; if we're ahead
+            // (_streamBlock > block) we should not advance.
+            //
             while (block != -1 && block > _streamBlock) {
                 advanced = true;
                 advanceMovie();
                 if (_streamId == -1) break;
                 block = s->getStreamBlock(_streamId);
             }
-            _lastMovieAdvancement = now;
+            if (advanced) _lastMovieAdvancement = now;
         }
         else {
             // Driven by frame rate
