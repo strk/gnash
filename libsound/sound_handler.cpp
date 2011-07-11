@@ -667,6 +667,7 @@ int
 sound_handler::getStreamBlock(int handle) const
 {
     if (!validHandle(_streamingSounds, handle)) return -1;
+    if (!_streamingSounds[handle]->isPlaying()) return -1;
     InputStream* i = _streamingSounds[handle]->firstPlayingInstance();
     if (!i) return -1;
     return static_cast<StreamingSound*>(i)->currentBlock();
