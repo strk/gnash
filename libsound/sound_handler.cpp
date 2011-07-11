@@ -439,7 +439,6 @@ sound_handler::playStream(int soundId, StreamBlockId blockId)
     }
 }
 
-/*public*/
 void
 sound_handler::startSound(int handle, int loops, const SoundEnvelopes* env,
 	               bool allowMultiple, unsigned int inPoint,
@@ -453,7 +452,6 @@ sound_handler::startSound(int handle, int loops, const SoundEnvelopes* env,
     }
 
     // Handle delaySeek
-
     EmbedSound& sounddata = *(_sounds[handle]);
     const media::SoundInfo& sinfo = sounddata.soundinfo;
 
@@ -575,13 +573,13 @@ sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
 
     float finalVolumeFact = getFinalVolume()/100.0;
 
-    std::fill(to, to+nSamples, 0);
+    std::fill(to, to + nSamples, 0);
 
     // call NetStream or Sound audio callbacks
-    if ( !_inputStreams.empty() )
-    {
+    if (!_inputStreams.empty()) {
+
         // A buffer to fetch InputStream samples into
-        boost::scoped_array<boost::int16_t> buf ( new boost::int16_t[nSamples] );
+        boost::scoped_array<boost::int16_t> buf(new boost::int16_t[nSamples]);
 
 #ifdef GNASH_DEBUG_SAMPLES_FETCHING 
         log_debug("Fetching %d samples from each of %d input streams", nSamples, _inputStreams.size());
@@ -595,8 +593,7 @@ sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
             InputStream* is = *it;
 
             unsigned int wrote = is->fetchSamples(buf.get(), nSamples);
-            if ( wrote < nSamples )
-            {
+            if (wrote < nSamples) {
                 // fill what wasn't written
                 std::fill(buf.get()+wrote, buf.get()+nSamples, 0);
             }
@@ -614,8 +611,7 @@ sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
     }
 
     // TODO: move this to base class !
-    if (_wavWriter.get())
-    {
+    if (_wavWriter.get()) {
         _wavWriter->pushSamples(to, nSamples);
 
         // now, mute all audio
@@ -624,13 +620,11 @@ sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
 
     // Now, after having "consumed" all sounds, blank out
     // the buffer if muted..
-    if ( is_muted() )
-    {
+    if (is_muted()) {
         std::fill(to, to+nSamples, 0);
     }
 }
 
-/*public*/
 void
 sound_handler::setAudioDump(const std::string& wavefile)
 {
@@ -641,7 +635,7 @@ sound_handler::setAudioDump(const std::string& wavefile)
     }
 
     // TODO: just avoid pausing instead ...
-    if ( ! wasDumping ) {
+    if (!wasDumping) {
         // add a silent stream to the audio pool so that our
         // output file is homogenous;  we actually want silent
         // wave data when no sounds are playing on the stage
@@ -652,7 +646,6 @@ sound_handler::setAudioDump(const std::string& wavefile)
 bool
 sound_handler::streamingSound() const
 {
-    if (_streamingSounds.empty()) return false;
     if (_inputStreams.empty()) return false;
 
     for (StreamingSounds::const_iterator it = _streamingSounds.begin(), 
