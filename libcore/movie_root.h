@@ -816,6 +816,13 @@ public:
 
     bool abortOnScriptTimeout(const std::string& when) const;
 
+    /// Set the current stream block for the driving streaming sound.
+    //
+    /// TODO: we don't know what the driving streaming sound is.
+    void setStreamBlock(int id, int block);
+
+    void stopStream(int id);
+
 private:
 
     /// Set the root movie, replacing the current one if any.
@@ -1069,6 +1076,9 @@ private:
     size_t _unnamedInstance;
 
     MovieLoader _movieLoader;
+
+    int _streamBlock;
+    int _streamId;
 };
 
 /// Return true if the given string can be interpreted as a _level name

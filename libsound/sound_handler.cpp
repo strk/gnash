@@ -303,8 +303,7 @@ sound_handler::unplugInputStream(InputStream* id)
 {
     // WARNING: erasing would break any iteration in the set
     InputStreams::iterator it2=_inputStreams.find(id);
-    if ( it2 == _inputStreams.end() )
-    {
+    if (it2 == _inputStreams.end()) {
         log_error("SDL_sound_handler::unplugInputStream: "
                 "Aux streamer %p not found. ",
                 id);
@@ -653,6 +652,24 @@ sound_handler::streamingSound() const
         if ((*it)->isPlaying()) return true;
     }
     return false;
+}
+
+size_t
+sound_handler::streamSamplesFetched(int handle) const
+{
+    if (!validHandle(_streamingSounds, handle)) return 0;
+    InputStream* i = _streamingSounds[handle]->firstPlayingInstance();
+    if (!i) return 0;
+    return i->samplesFetched();
+}
+
+int 
+sound_handler::getStreamBlock(int handle) const
+{
+    if (!validHandle(_streamingSounds, handle)) return -1;
+    InputStream* i = _streamingSounds[handle]->firstPlayingInstance();
+    if (!i) return -1;
+    return static_cast<StreamingSound*>(i)->currentBlock();
 }
 
 void

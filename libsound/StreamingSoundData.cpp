@@ -53,6 +53,13 @@ StreamingSoundData::StreamingSoundData(const media::SoundInfo& info,
 {
 }
 
+size_t
+StreamingSoundData::playingBlock() const
+{
+    if (_soundInstances.empty()) return 0;
+    return static_cast<StreamingSound*>(_soundInstances.front())->currentBlock();
+}
+
 void
 StreamingSoundData::clearInstances()
 {

@@ -94,6 +94,8 @@ public:
         return _buffers.size();
     }
 
+    size_t playingBlock() const;
+
     /// Are there known playing instances of this sound ?
     //
     /// Locks _soundInstancesMutex

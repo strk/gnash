@@ -1384,6 +1384,8 @@ MovieClip::increment_frame_and_check_for_loop()
         // Loop.
         _currentFrame = 0;
         _hasLooped = true;
+        // Make sure the streaming sound can start again.
+        stopStreamSound();
     }
 }
 
@@ -2098,6 +2100,8 @@ MovieClip::stopStreamSound()
     if (handler) {
         handler->stopStreamingSound(m_sound_stream_id);
     }
+
+    stage().stopStream(m_sound_stream_id);
 
     m_sound_stream_id = -1;
 }

@@ -164,7 +164,9 @@ movie_root::movie_root(VirtualClock& clock, const RunResources& runResources)
     _movieAdvancementDelay(83), // ~12 fps by default
     _lastMovieAdvancement(0),
     _unnamedInstance(0),
-    _movieLoader(*this)
+    _movieLoader(*this),
+    _streamBlock(-1),
+    _streamId(-1)
 {
     // This takes care of informing the renderer (if present) too.
     setQuality(QUALITY_HIGH);
@@ -256,7 +258,23 @@ movie_root::abortOnScriptTimeout(const std::string& what) const
     }
     return disable;
 }
-   
+
+void
+movie_root::setStreamBlock(int id, int block)
+{
+    _streamId = id;
+    _streamBlock = block;
+}
+
+void
+movie_root::stopStream(int id)
+{
+    if (_streamId == id) {
+        _streamId = -1;
+        _streamBlock = -1;
+    }
+}
+
 void
 movie_root::registerClass(const SWF::DefinitionTag* sprite, as_function* cls)
 {
@@ -841,35 +859,57 @@ movie_root::advance()
 
     try {
 
-        const size_t elapsed = now - _lastMovieAdvancement;
-        if (elapsed >= _movieAdvancementDelay)
-        {
-            advanced = true;
-            advanceMovie();
+        sound::sound_handler* s = _runResources.soundHandler();
 
-            // To catch-up lateness we pretend we advanced when 
-            // was time for it. 
-            // NOTE:
-            //   now - _lastMovieAdvancement
-            // gives you actual lateness in milliseconds
-            //
-            // TODO: make 'catchup' setting user-settable
-            //       as it helps A/V sync but sacrifices 
-            //       smoothness of animation which is very
-            //       important for games.
-            static const bool catchup = true;
-            if (catchup) {
-                _lastMovieAdvancement += _movieAdvancementDelay;
-            } else {
-                _lastMovieAdvancement = now;
+        if (s && _streamId != -1 && _streamBlock != -1) {
+
+            if (!s->streamingSound()) {
+                log_error("movie_root tracking a streaming sound, but "
+                        "the sound handler is not streaming!");
             }
 
-        }
+            // -1 for bad result, 0 for first block.
+            int block = s->getStreamBlock(_streamId);
 
-        //log_debug("Lateness: %d", now-_lastMovieAdvancement);
+            // If it's the first block, we should advance as normal.
+            while (block != -1 && block > _streamBlock) {
+                advanced = true;
+                advanceMovie();
+                if (_streamId == -1) break;
+                block = s->getStreamBlock(_streamId);
+            }
+            _lastMovieAdvancement = now;
+        }
+        else {
+            // Driven by frame rate
+
+            const size_t elapsed = now - _lastMovieAdvancement;
+            if (elapsed >= _movieAdvancementDelay) {
+
+                advanced = true;
+                advanceMovie();
+
+                // To catch-up lateness we pretend we advanced when 
+                // was time for it. 
+                // NOTE:
+                //   now - _lastMovieAdvancement
+                // gives you actual lateness in milliseconds
+                //
+                // TODO: make 'catchup' setting user-settable
+                //       as it helps A/V sync but sacrifices 
+                //       smoothness of animation which is very
+                //       important for games.
+                static const bool catchup = false;
+                if (catchup) {
+                    _lastMovieAdvancement += _movieAdvancementDelay;
+                } else {
+                    _lastMovieAdvancement = now;
+                }
+            }
+        }
         
+        // Always do this.
         executeAdvanceCallbacks();
-        
         executeTimers();
     
     }
