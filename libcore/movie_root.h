@@ -1077,8 +1077,13 @@ private:
 
     MovieLoader _movieLoader;
 
-    int _streamBlock;
-    int _streamId;
+    struct SoundStream {
+        SoundStream(int i, int b) : id(i), block(b) {}
+        int id;
+        int block;
+    };
+
+    boost::optional<SoundStream> _timelineSound;
 };
 
 /// Return true if the given string can be interpreted as a _level name

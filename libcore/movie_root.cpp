@@ -164,9 +164,7 @@ movie_root::movie_root(VirtualClock& clock, const RunResources& runResources)
     _movieAdvancementDelay(83), // ~12 fps by default
     _lastMovieAdvancement(0),
     _unnamedInstance(0),
-    _movieLoader(*this),
-    _streamBlock(-1),
-    _streamId(-1)
+    _movieLoader(*this)
 {
     // This takes care of informing the renderer (if present) too.
     setQuality(QUALITY_HIGH);
@@ -262,17 +260,22 @@ movie_root::abortOnScriptTimeout(const std::string& what) const
 void
 movie_root::setStreamBlock(int id, int block)
 {
-    _streamId = id;
-    _streamBlock = block;
+    if (!_timelineSound) {
+        _timelineSound = SoundStream(id, block);
+        return;
+    }
+
+    // Don't replace timeline stream.
+    if (_timelineSound->id != id) return;
+       
+    _timelineSound->block = block;
 }
 
 void
 movie_root::stopStream(int id)
 {
-    if (_streamId == id) {
-        _streamId = -1;
-        _streamBlock = -1;
-    }
+    if (!_timelineSound) return;
+    if (_timelineSound->id == id) _timelineSound.reset();
 }
 
 void
@@ -552,8 +555,7 @@ movie_root::reset()
 
     _disableScripts = false;
 
-    _streamId = -1;
-    _streamBlock = -1;
+    _timelineSound.reset();
 }
 
 void
@@ -864,27 +866,30 @@ movie_root::advance()
 
         sound::sound_handler* s = _runResources.soundHandler();
 
-        if (s && _streamId != -1 && _streamBlock != -1) {
+        if (s && _timelineSound) {
 
             if (!s->streamingSound()) {
                 log_error("movie_root tracking a streaming sound, but "
                         "the sound handler is not streaming!");
-                _streamId = -1;
-                _streamBlock = -1;
+
+                // Give up; we've probably failed to catch up.
+                _timelineSound.reset();
             }
 
             // -1 for bad result, 0 for first block.
             // Get the stream block we are currently at.
-            int block = s->getStreamBlock(_streamId);
+            int block = s->getStreamBlock(_timelineSound->id);
 
             // If we're behind, we should skip; if we're ahead
             // (_streamBlock > block) we should not advance.
             //
-            while (block != -1 && block > _streamBlock) {
+            while (block != -1 && block > _timelineSound->block) {
                 advanced = true;
                 advanceMovie();
-                if (_streamId == -1) break;
-                block = s->getStreamBlock(_streamId);
+
+                // Movie advance can cause streaming sound to be reset.
+                if (!_timelineSound) break;
+                block = s->getStreamBlock(_timelineSound->id);
             }
             if (advanced) _lastMovieAdvancement = now;
         }
