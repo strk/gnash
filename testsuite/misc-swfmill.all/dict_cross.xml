@@ -35,6 +35,8 @@
             <strings> <String value="B"/> </strings>
           </Dictionary>
 
+          <EndAction/>
+
       </actions> </DoAction>
 
       <DoAction><actions>
@@ -100,6 +102,8 @@
             </items>
           </PushData>
           <Trace/>
+
+          <EndAction/>
 
       </actions> </DoAction>
 
