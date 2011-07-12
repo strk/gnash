@@ -1961,6 +1961,8 @@ ActionCallFrame(ActionExec& thread)
         target = env.target();
     }
 
+    env.drop(1);
+
     MovieClip* target_sprite = target ? target->to_movie() : 0;
     if (target_sprite) {
         target_sprite->call_frame_actions(frame_var);
@@ -1971,8 +1973,6 @@ ActionCallFrame(ActionExec& thread)
             " target frame actions will not be called..."), target_path);
         )
     }
-
-    env.drop(1);
 }
 
 void
