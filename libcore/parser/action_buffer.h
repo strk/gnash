@@ -25,6 +25,7 @@
 #include <boost/cstdint.hpp> 
 
 #include "GnashException.h"
+#include "ConstantPool.h"
 #include "log.h"
 
 // Forward declarations
@@ -146,42 +147,33 @@ public:
 	///
 	double read_double_wacky(size_t pc) const;
 
-	/// Return number of entries in the constant pool
-	size_t dictionary_size() const
-	{
-		return m_dictionary.size();
-	}
-
 	/// Return a value from the constant pool
 	const char* dictionary_get(size_t n) const
 	{
-	    assert (n < m_dictionary.size());
-		return m_dictionary[n];
+        if ( _pools.empty() ) return 0;
+
+        // We'll query the last inserted one for now (highest PC)
+        const ConstantPool& pool = _pools.rbegin()->second;
+
+        if ( n < pool.size() ) return pool[n];
+
+        else return 0;
 	}
 
-	/// Interpret the SWF::ACTION_CONSTANTPOOL opcode. 
+	/// Read an SWF::ACTION_CONSTANTPOOL opcode and return as a dictionary
 	//
 	/// Don't read stop_pc or later. 
 	///
 	/// A dictionary is a table of indexed strings to be
 	/// used in action blocks to reduce their size.
+	/// This parser caches dictionaries to avoid reindexing them
+	/// when encountered multiple times.
 	///
-	/// NOTE: Normally the dictionary is declared as the first
-	/// action in an action buffer, but I've seen what looks like
-	/// some form of copy protection that amounts to:
+	/// Note that there can be multiple constant pools in the
+	/// same action buffer.
+	/// See testsuite/misc-swfmill.all/*dict*
 	///
-	/// |start of action buffer|
-	///          push true
-	///          branch_if_true label
-	///          decl_dict   [0]   // this is never executed, but has lots of orphan data declared in the opcode
-	/// label:   // (embedded inside the previous opcode; looks like an invalid jump)
-	///          ... "protected" code here, including the real decl_dict opcode ...
-	///          <end of the dummy decl_dict [0] opcode>
-	///
-	/// Note also that the dictionary may be overridden multiple times.
-	/// See testsuite/misc-swfmill.all/dict_override.xml
-	///
-	void process_decl_dict(size_t start_pc, size_t stop_pc) const;
+	const ConstantPool& readConstantPool(size_t start_pc, size_t stop_pc) const;
 
     /// Return url of the SWF this action block was found in
 	const std::string& getDefinitionURL() const;
@@ -198,11 +190,9 @@ private:
 	/// the code itself, as read from the SWF
 	std::vector<boost::uint8_t> m_buffer;
 
-	/// The dictionary
-	mutable std::vector<const char*> m_dictionary;
-
-	/// FIXME: move to ActionExec
-	mutable int m_decl_dict_processed_at;
+	/// The set of ConstantPools found in this action_buffer
+	typedef std::map<size_t, ConstantPool> PoolsMap;
+	mutable PoolsMap _pools;
 
 	/// The movie_definition containing this action buffer
 	//

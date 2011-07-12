@@ -63,6 +63,7 @@
 #include "Global_as.h"
 #include "RunResources.h"
 #include "Transform.h"
+#include "ConstantPool.h" // for PoolGuard
 
 namespace gnash {
 
@@ -626,6 +627,7 @@ MovieClip::call_frame_actions(const as_value& frame_spec)
     //             to properly queue actions back on the global queue.
     //
     _callingFrameActions = true;
+    PoolGuard poolGuard(getVM(*getObject(this)), 0);
     const PlayList* playlist = _def->getPlaylist(frame_number);
     if (playlist) {
         PlayList::const_iterator it = playlist->begin();

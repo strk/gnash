@@ -111,7 +111,7 @@
 	  // Else, trace XFAILED
           <PushData>
             <items>
-              <StackString value="XFAILED: func used overridden dictionary"/>
+              <StackString value="FAILED: func used overridden dictionary "/>
             </items>
           </PushData>
           <Trace/>
@@ -120,7 +120,7 @@
 	  // PASSED tracing
           <PushData>
             <items>
-              <StackString value="XPASSED: func used original dictionary"/>
+              <StackString value="PASSED: func used original dictionary "/>
             </items>
           </PushData>
           <Trace/>

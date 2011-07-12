@@ -38,6 +38,7 @@ Function::Function(const action_buffer& ab, as_environment& env,
     :
     UserFunction(getGlobal(env)),
     _env(env),
+    _pool(getVM(env).getConstantPool()),
     _action_buffer(ab),
     _scopeStack(scopeStack),
     _startPC(start),
@@ -102,6 +103,10 @@ Function::call(const fn_call& fn)
     /// TODO: test scope when calling functions defined in another timeline
     ///       (target, in particular).
     TargetGuard targetGuard(_env, target, orig_target);
+
+    // Temporarely restore the ConstantPool which was
+    // in effect at the time of function definition
+    PoolGuard poolGuard(getVM(_env), _pool);
 
     // Push the arguments onto the local frame.
     for (size_t i = 0, n = _args.size(); i < n; ++i) {

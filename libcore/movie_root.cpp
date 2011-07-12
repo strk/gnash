@@ -285,6 +285,9 @@ movie_root::cleanupAndCollect()
     // Cleanup the stack.
     _vm.getStack().clear();
 
+    // Reset the constant pool
+    _vm.setConstantPool(0);
+
     cleanupDisplayList();
     _gc.fuzzyCollect();
 }

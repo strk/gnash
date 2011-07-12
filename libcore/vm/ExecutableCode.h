@@ -25,6 +25,7 @@
 #include "ActionExec.h"
 #include "Global_as.h"
 #include "fn_call.h"
+#include "ConstantPool.h"
 
 namespace gnash {
 
@@ -119,6 +120,7 @@ public:
             // still might be also guarded by unloaded()
             if (target()->isDestroyed()) break;
 
+            PoolGuard guard(getVM(target()->get_environment()), 0);
             ActionExec exec(*(*it), target()->get_environment(), false);
             exec();
         }

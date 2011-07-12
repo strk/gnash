@@ -83,6 +83,10 @@ Function2::call(const fn_call& fn)
 	///       (target, in particular).
 	TargetGuard targetGuard(_env, target, orig_target);
 
+    // Temporarely restore the ConstantPool which was
+    // in effect at the time of function definition
+    PoolGuard poolGuard(getVM(_env), _pool);
+
     // function2: most args go in registers; any others get pushed.
 
     // Handle the implicit args.

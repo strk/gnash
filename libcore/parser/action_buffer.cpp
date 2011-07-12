@@ -40,7 +40,7 @@ namespace {
 
 action_buffer::action_buffer(const movie_definition& md)
     :
-    m_decl_dict_processed_at(-1),
+    _pools(),
     _src(md)
 {
 }
@@ -98,25 +98,19 @@ action_buffer::read(SWFStream& in, unsigned long endPos)
     
 }
 
-void
-action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
+const ConstantPool&
+action_buffer::readConstantPool(size_t start_pc, size_t stop_pc) const
 {
-    assert(stop_pc <= m_buffer.size());
-    // Skip if we've already processed this decl_dict, but make sure
-    // the size is the same.
-    if (static_cast<size_t>(m_decl_dict_processed_at) == start_pc) {
-        const int dictSize = read_int16(start_pc + 3);
-        if (static_cast<int>(m_dictionary.size()) != dictSize) {
-            /// TODO: is it possible to continue?
-            throw ActionParserException(_("Constant pool size "
-                "mismatch. This is probably a very malformed SWF"));
-        }
-        return;
-    }
-    
-    m_decl_dict_processed_at = start_pc;
-    
+    assert(stop_pc <= m_buffer.size()); // TODO: drop, be safe instead
+
+    // Return a previously parsed pool at the same position, if any
+    PoolsMap::iterator pi = _pools.find(start_pc);
+    if ( pi != _pools.end() ) return pi->second;
+
     // Actual processing.
+
+    ConstantPool& pool = _pools[start_pc];
+
     size_t i = start_pc;
     const boost::uint16_t length = read_uint16(i + 1);
     const boost::uint16_t count = read_uint16(i + 3); 
@@ -124,28 +118,31 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
     
     assert(start_pc + 3 + length == stop_pc);
     
-    m_dictionary.resize(count);
+    pool.resize(count);
     
     // Index the strings.
     for (int ct = 0; ct < count; ct++) {
         // Point into the current action buffer.
-        m_dictionary[ct] = reinterpret_cast<const char*>(&m_buffer[3 + i]);
+        pool[ct] = reinterpret_cast<const char*>(&m_buffer[3 + i]);
 
+        // TODO: rework this "safety" thing here (doesn't look all that safe)
         while (m_buffer[3 + i]) {
             // safety check.
             if (i >= stop_pc) {
                 log_error(_("action buffer dict length exceeded"));
                 // Jam something into the remaining (invalid) entries.
                 while (ct < count) {
-                    m_dictionary[ct] = "<invalid>";
+                    pool[ct] = "<invalid>";
                     ct++;
                 }
-            return;
+                return pool;
             }
             i++;
         }
         i++;
     }
+
+    return pool;
 }
 
 

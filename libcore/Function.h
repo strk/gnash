@@ -23,6 +23,7 @@
 #include <cassert>
 #include <string>
 
+#include "ConstantPool.h"
 #include "UserFunction.h"
 #include "ObjectURI.h"
 
@@ -30,6 +31,7 @@
 namespace gnash {
     class action_buffer;
     class as_object;
+    class VM;
 }
 
 namespace gnash {
@@ -138,6 +140,9 @@ protected:
 	/// @@ might need some kind of ref count here, but beware cycles
 	as_environment& _env;
 
+    /// The ConstantPool in effect at time of function definition
+    const ConstantPool* _pool;
+
 private:
 
 	/// Action buffer containing the function definition
@@ -157,7 +162,6 @@ private:
 	/// action_buffer is just a blocḱ of memory corresponding
 	/// to a DoAction block
 	size_t _length;
-
 
 };
 

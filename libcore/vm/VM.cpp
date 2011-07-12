@@ -58,7 +58,8 @@ VM::VM(movie_root& root, VirtualClock& clock)
 	_clock(clock),
 	_stack(),
     _shLib(new SharedObjectLibrary(*this)),
-    _rng(clock.elapsed())
+    _rng(clock.elapsed()),
+    _constantPool(0)
 {
 	NSV::loadStrings(_stringTable);
     _global->registerClasses();
@@ -326,6 +327,10 @@ VM::dumpState(std::ostream& out, size_t limit)
         out << (it - _globalRegisters.begin()) << ":" << v;
     }
     out << "\n";
+
+    if ( _constantPool ) {
+        out << "Constant pool: " << *_constantPool  << "\n";
+    }
 
     // Now local registers and variables from the call stack.
     if (_callStack.empty()) return;

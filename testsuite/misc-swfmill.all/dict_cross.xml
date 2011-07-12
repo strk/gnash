@@ -81,7 +81,7 @@
 	  // Else, trace XFAILED
           <PushData>
             <items>
-              <StackString value="XFAILED: something went wrong with dicts"/>
+              <StackString value="FAILED: something went wrong with dicts "/>
             </items>
           </PushData>
           <Trace/>
@@ -90,7 +90,7 @@
 	  // PASSED tracing
           <PushData>
             <items>
-              <StackString value="XPASSED: cross boundary dicts all fine"/>
+              <StackString value="PASSED: cross boundary dicts all fine "/>
             </items>
           </PushData>
           <Trace/>
