@@ -120,12 +120,12 @@
             </items>
           </PushData>
           <Trace/>
-          <BranchAlways byteOffset="43"/> // get to end 
+          <BranchAlways byteOffset="44"/> // get to end 
 
 	  // PASSED tracing
           <PushData>
             <items>
-              <StackString value="PASSED: func used original dictionary"/>
+              <StackString value="XPASSED: func used original dictionary"/>
             </items>
           </PushData>
           <Trace/>

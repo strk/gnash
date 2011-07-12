@@ -85,12 +85,12 @@
             </items>
           </PushData>
           <Trace/>
-          <BranchAlways byteOffset="43"/> // get to end 
+          <BranchAlways byteOffset="44"/> // get to end 
 
 	  // PASSED tracing
           <PushData>
             <items>
-              <StackString value="PASSED: cross boundary dicts all fine"/>
+              <StackString value="XPASSED: cross boundary dicts all fine"/>
             </items>
           </PushData>
           <Trace/>
