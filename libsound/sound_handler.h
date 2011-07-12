@@ -268,9 +268,6 @@ public:
     /// @param blockId    Identifier of the block to start decoding from.
     void playStream(int handle, StreamBlockId blockId);
 
-    /// The number of stream samples fetched
-    size_t streamSamplesFetched(int handle) const;
-
     int getStreamBlock(int handle) const;
 
     ////////////////////////////////////////////////

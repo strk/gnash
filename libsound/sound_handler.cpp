@@ -654,15 +654,6 @@ sound_handler::streamingSound() const
     return false;
 }
 
-size_t
-sound_handler::streamSamplesFetched(int handle) const
-{
-    if (!validHandle(_streamingSounds, handle)) return 0;
-    InputStream* i = _streamingSounds[handle]->firstPlayingInstance();
-    if (!i) return 0;
-    return i->samplesFetched();
-}
-
 int 
 sound_handler::getStreamBlock(int handle) const
 {
