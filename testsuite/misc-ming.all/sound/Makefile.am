@@ -72,6 +72,8 @@ check_PROGRAMS += \
 	eventSoundTest1-Runner \
 	streamingSoundTest1 \
 	streamingSoundTest1-Runner \
+	streamingSoundTest2 \
+	streamingSoundTest2-Runner \
 	$(NULL)
 endif
 
@@ -127,6 +129,35 @@ streamingSoundTest1_Runner_LDADD = \
 streamingSoundTest1_Runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	streamingSoundTest1.swf      \
+	$(NULL)
+
+streamingSoundTest2_SOURCES = streamingSoundTest2.c
+
+streamingSoundTest2_LDADD = ../libgnashmingutils.la
+
+streamingSoundTest2_CFLAGS= \
+	-DMEDIADIR='"$(abs_mediadir)"' \
+	$(NULL)
+
+streamingSoundTest2.swf: streamingSoundTest2
+	./streamingSoundTest2 $(abs_mediadir)
+
+streamingSoundTest2_Runner_SOURCES = \
+	streamingSoundTest2-Runner.cpp \
+	$(NULL)
+
+streamingSoundTest2_Runner_CXXFLAGS = \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+
+streamingSoundTest2_Runner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
+	$(NULL)
+
+streamingSoundTest2_Runner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	streamingSoundTest2.swf      \
 	$(NULL)
 
 StreamSoundTest_SOURCES = \
@@ -204,6 +235,7 @@ TEST_CASES += \
 	EmbeddedSoundTest-Runner \
 	eventSoundTest1-Runner \
 	streamingSoundTest1-Runner \
+	streamingSoundTest2-Runner \
 	$(NULL)
 endif
 
