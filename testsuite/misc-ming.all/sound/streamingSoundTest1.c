@@ -44,14 +44,9 @@ main(int argc, char** argv)
   SWFSoundStream ss;
   FILE* sound_f;
   const char* sound_filename;
-  SWFDisplayItem it;
   struct stat statbuf;
 
-  if ( argc>1 ) {
-    sound_filename=argv[1];
-  } else {
-    sound_filename="sound1.mp3";
-  }
+  sound_filename=MEDIADIR"/click.mp3";
 
   sound_f = fopen(sound_filename, "r");
   if ( ! sound_f ) {
@@ -82,10 +77,13 @@ main(int argc, char** argv)
   ss = newSWFSoundStream(sound_f);
 
   mc = newSWFMovieClip();
-  SWFMovieClip_setSoundStream(mc, ss, 1);
+  SWFMovieClip_setSoundStream(mc, ss, 2);
+  SWFMovieClip_nextFrame(mc);
+  SWFMovieClip_nextFrame(mc);
+  SWFMovieClip_nextFrame(mc);
   SWFMovieClip_nextFrame(mc);
 
-  it = SWFMovie_add(mo, mc);
+  SWFMovie_add(mo, mc);
   SWFMovie_nextFrame(mo);
   SWFMovie_nextFrame(mo);
   SWFMovie_nextFrame(mo);

@@ -295,9 +295,7 @@ MovieTester::advance(bool updateClock)
         advanceClock(clockAdvance);
     }
     
-    _movie_root->advance();
-    
-    render();
+    if (_movie_root->advance()) render();
     
 }
     

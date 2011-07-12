@@ -32,7 +32,7 @@ CLEANFILES =  \
 DISTCLEANFILES = XMLSocketTester
 
 SUBDIRS = . loop loading displaylist_depths action_order register_class \
-          init_action
+          init_action sound
 
 EXTRA_DIST = \
 	DragDropTest.as \
@@ -170,12 +170,6 @@ check_PROGRAMS = \
 
 if MING_VERSION_0_4_3
 check_PROGRAMS += \
-	StreamSoundTest \
-	StreamSoundTestRunner \
-	EmbeddedSoundTest \
-	EmbeddedSoundTest-Runner \
-	eventSoundTest1 \
-	eventSoundTest1-Runner \
 	BitmapSmoothingTest \
 	$(NULL)
 endif
@@ -200,12 +194,6 @@ check_PROGRAMS += \
 	replace_sprites1test \
 	replace_buttons1test \
 	$(NULL)
-endif
-
-if MING_SUPPORTS_STREAMING_SOUND
-check_PROGRAMS += \
-	streamingSoundTest1 \
-	streamingSoundTest1-Runner 
 endif
 
 if MING_SUPPORTS_SWFBUTTON_SET_DEPTH
@@ -445,50 +433,6 @@ PlaceObject2TestRunner: $(srcdir)/../generic-testrunner.sh PlaceObject2Test.swf
 
 RemoveObject2Test_SOURCES = RemoveObject2Test.c
 RemoveObject2Test_LDADD = libgnashmingutils.la
-
-eventSoundTest1_SOURCES = eventSoundTest1.c
-eventSoundTest1_LDADD = libgnashmingutils.la
-
-eventSoundTest1.swf: eventSoundTest1
-	./eventSoundTest1 $(srcdir)/../media/brokenchord.wav \
-	$(srcdir)/../media/
-
-eventSoundTest1_Runner_SOURCES = \
-	eventSoundTest1-Runner.cpp \
-	$(NULL)
-eventSoundTest1_Runner_CXXFLAGS = \
-	-DTGTDIR='"$(abs_builddir)"' \
-	$(NULL)
-eventSoundTest1_Runner_LDADD = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(AM_LDFLAGS) \
-	$(NULL)
-eventSoundTest1_Runner_DEPENDENCIES = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	eventSoundTest1.swf      \
-	$(NULL)
-
-streamingSoundTest1_SOURCES = streamingSoundTest1.c
-streamingSoundTest1_LDADD = libgnashmingutils.la
-
-streamingSoundTest1.swf: streamingSoundTest1
-	./streamingSoundTest1 $(srcdir)/../media/sound1.mp3
-
-streamingSoundTest1_Runner_SOURCES = \
-	streamingSoundTest1-Runner.cpp \
-	$(NULL)
-streamingSoundTest1_Runner_CXXFLAGS = \
-	-DTGTDIR='"$(abs_builddir)"' \
-	$(NULL)
-streamingSoundTest1_Runner_LDADD = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(AM_LDFLAGS) \
-	$(NULL)
-streamingSoundTest1_Runner_DEPENDENCIES = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	streamingSoundTest1.swf      \
-	$(NULL)
-
 
 DefineEditTextVariableNameTest_SOURCES =	\
 	DefineEditTextVariableNameTest.c	\
@@ -1126,70 +1070,6 @@ BeginBitmapFillRunner_DEPENDENCIES = \
 	BeginBitmapFill.swf	\
 	$(NULL)
 
-EmbeddedSoundTest_SOURCES = \
-	EmbeddedSoundTest.c \
-	$(NULL)
-
-EmbeddedSoundTest_CFLAGS = \
-	-DMEDIADIR='"$(abs_mediadir)"' \
-	$(NULL)
-
-EmbeddedSoundTest_LDADD = libgnashmingutils.la
-
-EmbeddedSoundTest.swf: EmbeddedSoundTest
-	./EmbeddedSoundTest $(abs_mediadir)
-
-EmbeddedSoundTest_Runner_SOURCES = \
-	EmbeddedSoundTest-Runner.cpp \
-	$(NULL)
-
-EmbeddedSoundTest_Runner_CXXFLAGS = \
-	-DSRCDIR='"$(srcdir)"' \
-	-DTGTDIR='"$(abs_builddir)"' \
-	$(NULL)
-
-EmbeddedSoundTest_Runner_LDADD = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(AM_LDFLAGS) \
-	$(NULL)
-
-EmbeddedSoundTest_Runner_DEPENDENCIES = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	EmbeddedSoundTest.swf	\
-	$(NULL)
-
-StreamSoundTest_SOURCES = \
-	StreamSoundTest.c \
-	$(NULL)
-
-StreamSoundTest_CFLAGS = \
-	-DMEDIADIR='"$(abs_mediadir)"' \
-	$(NULL)
-
-StreamSoundTest_LDADD = libgnashmingutils.la
-
-StreamSoundTest.swf: StreamSoundTest
-	./StreamSoundTest $(abs_mediadir)
-
-StreamSoundTestRunner_SOURCES = \
-	StreamSoundTestRunner.cpp \
-	$(NULL)
-
-StreamSoundTestRunner_CXXFLAGS = \
-	-DSRCDIR='"$(srcdir)"' \
-	-DTGTDIR='"$(abs_builddir)"' \
-	$(NULL)
-
-StreamSoundTestRunner_LDADD = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(AM_LDFLAGS) \
-	$(NULL)
-
-StreamSoundTestRunner_DEPENDENCIES = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	StreamSoundTest.swf	\
-	$(NULL)
-
 BitmapSmoothingTest_SOURCES = \
 	BitmapSmoothingTest.c \
 	$(NULL)
@@ -1667,9 +1547,6 @@ TEST_CASES = \
 
 if MING_VERSION_0_4_3
 TEST_CASES += \
-	StreamSoundTestRunner \
-	EmbeddedSoundTest-Runner \
-	eventSoundTest1-Runner \
     $(NULL)
 endif
 

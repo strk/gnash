@@ -2747,6 +2747,7 @@ testsuite/samples/Makefile
 testsuite/swfdec/Makefile
 testsuite/misc-ming.all/Makefile
 testsuite/misc-ming.all/action_order/Makefile
+testsuite/misc-ming.all/sound/Makefile
 testsuite/misc-ming.all/displaylist_depths/Makefile
 testsuite/misc-ming.all/init_action/Makefile
 testsuite/misc-ming.all/loop/Makefile
