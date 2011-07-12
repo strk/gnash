@@ -875,23 +875,41 @@ movie_root::advance()
                 // Give up; we've probably failed to catch up.
                 _timelineSound.reset();
             }
+            else {
 
-            // -1 for bad result, 0 for first block.
-            // Get the stream block we are currently at.
-            int block = s->getStreamBlock(_timelineSound->id);
+                // -1 for bad result, 0 for first block.
+                // Get the stream block we are currently at.
+                int block = s->getStreamBlock(_timelineSound->id);
 
-            // If we're behind, we should skip; if we're ahead
-            // (_streamBlock > block) we should not advance.
-            //
-            while (block != -1 && block > _timelineSound->block) {
-                advanced = true;
-                advanceMovie();
+                const int startBlock = _timelineSound->block;
 
-                // Movie advance can cause streaming sound to be reset.
-                if (!_timelineSound) break;
-                block = s->getStreamBlock(_timelineSound->id);
+                // If we're behind, we should skip; if we're ahead
+                // (_timelineSound->block > block) we should not advance,
+                // if we're ahead, skip.
+                while (block != -1 && block > _timelineSound->block) {
+                    advanced = true;
+                    advanceMovie();
+
+                    // Movie advance can cause streaming sound to be reset or,
+                    // if a MovieClip loops, the current timeline sound block
+                    // to be moved earlier. In the latter case we break to
+                    // avoid catching up to the old sound position.
+                    if (!_timelineSound ||
+                            _timelineSound->block < startBlock) break;
+
+                    // Note: advancing the current sound block here makes
+                    // it possible that Gnash will never catch up, if e.g.
+                    // executing ActionScript causes the frame rate to drop
+                    // even further. Not advancing the sound block means
+                    // that Gnash will always catch up to the point we
+                    // stored at the start of the loop, but then the audio
+                    // stream may restart if it has finished before Gnash
+                    // reaches the new position.
+                    block = s->getStreamBlock(_timelineSound->id);
+
+                }
+                if (advanced) _lastMovieAdvancement = now;
             }
-            if (advanced) _lastMovieAdvancement = now;
         }
         else {
             // Driven by frame rate

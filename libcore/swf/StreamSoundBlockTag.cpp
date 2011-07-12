@@ -93,14 +93,9 @@ StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     }
     else sampleCount = sinfo->getSampleCount();
 
+    // Sometimes this will be 0; in this case it serves as a synchronization
+    // point only.
     const unsigned int dataLength = in.get_tag_end_position() - in.tell();
-    if (!dataLength) {
-        IF_VERBOSE_MALFORMED_SWF(
-            LOG_ONCE(log_swferror("Empty SOUNDSTREAMBLOCK tag, seems common "
-                    "waste of space"));
-        );
-        return;
-    }
 
     media::MediaHandler* mh = r.mediaHandler();
     const size_t padding = mh ? mh->getInputPaddingSize() : 0;
