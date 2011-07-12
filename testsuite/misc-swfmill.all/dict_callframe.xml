@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<swf version="6" compressed="0">
+
+<!--
+
+ Test file for https://savannah.gnu.org/bugs/?33521
+
+ Shows that the constant pool is restored after return
+ from a call frame
+
+-->
+
+  <Header framerate="1" frames="2">
+    <size>
+      <Rectangle left="0" right="12800" top="0" bottom="9600"/>
+    </size>
+    <tags>
+
+      <!-- FRAME 1 : push local dict[0] ("a") -->
+
+      <DoAction> <actions>
+
+          <!-- DICT 1 -->
+          <Dictionary>
+            <strings> <String value="a"/> </strings>
+          </Dictionary>
+
+          <!-- Push DICT1[0] -->
+          <PushData>
+            <items> <StackDictionaryLookup index="0"/> </items>
+          </PushData>
+          <!-- <Duplicate/> <Trace/> -->
+
+          <EndAction/>
+
+      </actions> </DoAction>
+
+      <ShowFrame/>
+
+      <!-- FRAME 2 : define another dict, call FRAME1, use local dict -->
+
+      <DoAction> <actions>
+
+          <!-- DICT 2 -->
+          <Dictionary>
+            <strings> <String value="b"/> </strings>
+          </Dictionary>
+
+          <!-- Call frame 1 -->
+          <PushData>
+            <items> <StackString value="1"/> </items>
+          </PushData>
+          <CallFrame/>
+
+          <!-- Push DICT2[0] -->
+          <PushData>
+            <items> <StackDictionaryLookup index="0"/> </items>
+          </PushData>
+
+          <Stop/> 
+
+          <AddTyped/> <!-- Expect: aab -->
+          <Duplicate/> 
+          <Trace/> 
+
+          <!-- Verify the stack contains 'ab' -->
+          <PushData> <items> <StackString value="ab"/> </items> </PushData>
+          <EqualTyped/>
+
+          <!-- If true, jump to PASSED tracing -->
+          <BranchIfTrue byteOffset="51"/>
+
+          <!-- Else, trace FAILED -->
+          <PushData> <items>
+              <StackString value="FAILED: expected 'ab' on call frame...  "/>
+          </items> </PushData>
+          <Trace/>
+
+          <BranchAlways byteOffset="44"/> <!-- get to end -->
+
+          <!-- PASSED tracing -->
+          <PushData>
+            <items>
+              <StackString value="PASSED: callframe with dicts is fine  "/>
+            </items>
+          </PushData>
+          <Trace/>
+
+          <!-- END OF TEST tag -->
+          <PushData>
+            <items>
+              <StackString value="END OF TEST"/>
+            </items>
+          </PushData>
+          <Trace/>
+
+          <EndAction/>
+
+      </actions> </DoAction>
+
+      <ShowFrame/>
+
+      <End/>
+
+    </tags>
+  </Header>
+</swf>

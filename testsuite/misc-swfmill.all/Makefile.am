@@ -48,6 +48,7 @@ SC_AS2_XMLTESTS = \
 	func_dict.xml \
 	afunc_dict.xml \
 	dict_cross.xml \
+	dict_callframe.xml \
 	initaction_in_definesprite.xml \
 	zeroframe_definesprite.xml \
 	background.xml \
@@ -97,6 +98,7 @@ check_SCRIPTS = \
 	dict_override-runner \
 	func_dict-runner \
 	dict_cross-runner \
+	dict_callframe-runner \
 	afunc_dict-runner \
 	initaction_in_definesprite-runner \
 	zeroframe_definesprite-runner \
@@ -132,6 +134,10 @@ dict_override-runner: $(srcdir)/../generic-testrunner.sh dict_override.swf Makef
 
 dict_cross-runner: $(srcdir)/../generic-testrunner.sh dict_cross.swf Makefile
 	sh $(srcdir)/../generic-testrunner.sh -r 1 -c "END OF TEST" $(top_builddir) dict_cross.swf > $@
+	chmod 755 $@
+
+dict_callframe-runner: $(srcdir)/../generic-testrunner.sh dict_callframe.swf Makefile
+	sh $(srcdir)/../generic-testrunner.sh -r 1 -c "END OF TEST" $(top_builddir) dict_callframe.swf > $@
 	chmod 755 $@
 
 func_dict-runner: $(srcdir)/../generic-testrunner.sh func_dict.swf Makefile
