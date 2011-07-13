@@ -118,7 +118,10 @@ main(int argc, char** argv)
   add_actions(mo,
     "theClass1 = function() { this.x = 60; this._alpha=20; };"
     "theClass1.prototype = new MovieClip();"
-    "theClass1.prototype.onLoad = function() { trace('theClass1 proto onLoad'); _root.theClass1onLoadCalls.push(this); };"
+    "theClass1.prototype.onLoad = function() { "
+    " trace('theClass1 proto onLoad ('+this+')');"
+    " _root.theClass1onLoadCalls.push(this);"
+    "};"
     "theClass2 = function() { this.x = 600; this._x = 200; this._alpha=20;}; "
     "Object.registerClass('libItem1', theClass1);"
     "Object.registerClass('libItem2', theClass2);"
