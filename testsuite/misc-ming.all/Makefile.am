@@ -31,7 +31,8 @@ CLEANFILES =  \
 
 DISTCLEANFILES = XMLSocketTester
 
-SUBDIRS = loop loading displaylist_depths action_order register_class
+SUBDIRS = loop loading displaylist_depths action_order register_class \
+          init_action
 
 EXTRA_DIST = \
 	DragDropTest.as \
@@ -193,13 +194,6 @@ check_PROGRAMS += \
 	$(NULL)
 endif
 
-if MING_SUPPORTS_INIT_ACTIONS
-check_PROGRAMS += \
-	init_action_test \
-	InitActionTest2 \
-	$(NULL)
-endif
-
 if MING_SUPPORTS_REPLACE_TAG
 check_PROGRAMS += \
 	replace_shapes1test \
@@ -263,8 +257,6 @@ check_SCRIPTS = \
 	runtime_vm_stack_testrunner \
 	new_child_in_unload_testrunner \
 	instanceNameTestRunner \
-	init_action_testrunner \
-	InitActionTest2Runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -294,12 +286,6 @@ check_SCRIPTS += \
 	opcode_guard_testrunner \
 	get_frame_number_testrunner \
 	$(NULL)	
-endif
-
-if MING_SUPPORTS_INIT_ACTIONS
-check_SCRIPTS += \
-	InitActionTest2Runner \
-	$(NULL)
 endif
 
 if MING_SUPPORTS_REPLACE_TAG
@@ -1356,30 +1342,6 @@ ButtonPropertiesTestRunner_CXXFLAGS = \
 	-DTGTDIR='"$(abs_builddir)"' \
 	$(NULL)
 
-InitActionTest2_SOURCES =	\
-	InitActionTest2.c	\
-	$(NULL)
-InitActionTest2_LDADD = libgnashmingutils.la
-
-InitActionTest2.swf: InitActionTest2
-	./InitActionTest2 $(abs_mediadir)
-
-InitActionTest2Runner: $(srcdir)/../generic-testrunner.sh InitActionTest2.swf
-	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) InitActionTest2.swf > $@
-	chmod 755 $@
-
-init_action_test_SOURCES =	\
-	init_action_test.c	\
-	$(NULL)
-init_action_test_LDADD = libgnashmingutils.la
-
-init_action_test.swf: init_action_test
-	./init_action_test $(abs_mediadir)
-
-init_action_testrunner: $(srcdir)/../generic-testrunner.sh init_action_test.swf
-	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) init_action_test.swf > $@
-	chmod 755 $@
-
 intervalTest.swf: $(srcdir)/../media/green.swf Dejagnu.swf intervalTest.as 
 	$(MAKESWF) $(MAKESWF_FLAGS) -o $@ Dejagnu.swf $(srcdir)/intervalTest.as
 intervalTestRunner_SOURCES = \
@@ -1740,13 +1702,6 @@ endif
 if ENABLE_RTMPY_TESTING
 TEST_CASES += rtmpytest-runner
 endif
-endif
-
-if MING_SUPPORTS_INIT_ACTIONS
-TEST_CASES += \
-	init_action_testrunner \
-	InitActionTest2Runner \
-	$(NULL)
 endif
 
 if MING_SUPPORTS_REPLACE_TAG
