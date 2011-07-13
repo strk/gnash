@@ -171,7 +171,10 @@ main(int argc, char** argv)
   add_clip_init_actions(mc3, " _root.note('mc3.initactions'); "
                              " theClass3 = function () {}; "
                              " theClass3.prototype = new MovieClip(); "
-                             " theClass3.prototype.onLoad = function() { trace('theClass3 proto onLoad'); _root.theClass3onLoadCalls.push(this); };"
+                             " theClass3.prototype.onLoad = function() {"
+			     "  trace('theClass3 proto onLoad ('+this+')');"
+			     "  _root.theClass3onLoadCalls.push(this);"
+			     " };"
                              " Object.registerClass('libItem3', theClass3); "
                              " _root.attachMovie('libItem3', 'clip3', 30); "
                              // clip3.__proto__ is initialized before executing onClipConstruct
