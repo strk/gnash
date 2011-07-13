@@ -114,20 +114,21 @@ check_PROGRAMS = \
 	missing_bitmapTestRunner \
 	$(NULL)
 
+# NOTE: this test is disabled due to missing AVM2 support
 mixed-bytecode-as3-runner: $(srcdir)/../generic-testrunner.sh mixed-bytecode-as3.swf Makefile
-	sh $(srcdir)/../generic-testrunner.sh -r 50 -c "AS3" $(top_builddir) mixed-bytecode-as3.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r 1 -c "AS3" $(top_builddir) mixed-bytecode-as3.swf > $@
 	chmod 755 $@
 
 mixed-bytecode-as2-runner: $(srcdir)/../generic-testrunner.sh mixed-bytecode-as2.swf Makefile
-	sh $(srcdir)/../generic-testrunner.sh -r 50 -c "AS2" $(top_builddir) mixed-bytecode-as2.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r 1 -c "AS2" $(top_builddir) mixed-bytecode-as2.swf > $@
 	chmod 755 $@
 
 jump_after_end-runner: $(srcdir)/../generic-testrunner.sh jump_after_end.swf Makefile
-	sh $(srcdir)/../generic-testrunner.sh -r 50 -c "END OF TEST" $(top_builddir) jump_after_end.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r 1 -c "END OF TEST" $(top_builddir) jump_after_end.swf > $@
 	chmod 755 $@
 
 jump_to_prev_block-runner: $(srcdir)/../generic-testrunner.sh jump_to_prev_block.swf Makefile
-	sh $(srcdir)/../generic-testrunner.sh -r 50 -C "ABA" $(top_builddir) jump_to_prev_block.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r 1 -C "ABA" $(top_builddir) jump_to_prev_block.swf > $@
 	chmod 755 $@
 
 dict_override-runner: $(srcdir)/../generic-testrunner.sh dict_override.swf Makefile
@@ -155,23 +156,23 @@ afunc_dict-runner: $(srcdir)/../generic-testrunner.sh afunc_dict.swf Makefile
 	chmod 755 $@
 
 initaction_in_definesprite-runner: $(srcdir)/../generic-testrunner.sh initaction_in_definesprite.swf Makefile
-	sh $(srcdir)/../generic-testrunner.sh -r 50 -c "END OF TEST" $(top_builddir) initaction_in_definesprite.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r 1 -c "END OF TEST" $(top_builddir) initaction_in_definesprite.swf > $@
 	chmod 755 $@
 
 zeroframe_definesprite-runner: $(srcdir)/../generic-testrunner.sh zeroframe_definesprite.swf Makefile
-	sh $(srcdir)/../generic-testrunner.sh -r 50 -c "END OF TEST" $(top_builddir) zeroframe_definesprite.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r 1 -c "END OF TEST" $(top_builddir) zeroframe_definesprite.swf > $@
 	chmod 755 $@
 
 registers-runner: $(srcdir)/../generic-testrunner.sh registers.swf Makefile
-	sh $(srcdir)/../generic-testrunner.sh -r 50 -c "END OF TEST" $(top_builddir) registers.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r 1 -c "END OF TEST" $(top_builddir) registers.swf > $@
 	chmod 755 $@
 
 Try-without-jump-runner: $(srcdir)/../generic-testrunner.sh Try-without-jump.swf Makefile
-	sh $(srcdir)/../generic-testrunner.sh -r 50 -c "END OF TEST" $(top_builddir) Try-without-jump.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r 1 -c "END OF TEST" $(top_builddir) Try-without-jump.swf > $@
 	chmod 755 $@
 
 tags_after_last_showframe-runner: $(srcdir)/../generic-testrunner.sh tags_after_last_showframe.swf Makefile
-	sh $(srcdir)/../generic-testrunner.sh -r 50 -c "\<a1-i1-a2-a3-1\>" $(top_builddir) tags_after_last_showframe.swf > $@
+	sh $(srcdir)/../generic-testrunner.sh -r 1 -c "\<a1-i1-a2-a3-1\>" $(top_builddir) tags_after_last_showframe.swf > $@
 	chmod 755 $@
 
 backgroundTestRunner_SOURCES = \
