@@ -678,7 +678,7 @@ NetStream_as::decodeNextAudioFrame()
                 // Size is still given in bytes..
                 boost::int16_t* const start =
                     reinterpret_cast<boost::int16_t*>(raw->m_data);
-                sound::adjustVolume(start, start + raw->m_size / 2, vol);
+                sound::adjustVolume(start, start + raw->m_size / 2, vol / 100.0);
             }
         }
     }
