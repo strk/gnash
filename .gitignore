@@ -107,9 +107,11 @@ testsuite/misc-ming.all/BitmapDataDraw
 testsuite/misc-ming.all/definebitsjpeg2
 testsuite/misc-ming.all/Dejagnu
 testsuite/misc-ming.all/displaylist_depths/*.swf
+testsuite/misc-ming.all/init_action/*.swf
 testsuite/misc-ming.all/KeyEventOrder
 testsuite/misc-ming.all/loading/*.swf
 testsuite/misc-ming.all/loop/*.swf
+testsuite/misc-ming.all/register_class/*.swf
 testsuite/misc-ming.all/spritehier
 testsuite/misc-ming.all/static_vs_dynamic1
 testsuite/misc-ming.all/static_vs_dynamic2

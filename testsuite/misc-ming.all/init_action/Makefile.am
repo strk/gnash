@@ -55,25 +55,25 @@ AM_LDFLAGS = \
 if MING_SUPPORTS_INIT_ACTIONS
 
 check_PROGRAMS = \
-	init_action_test \
+	InitActionTest \
 	InitActionTest2 \
 	$(NULL)
 
 check_SCRIPTS = \
-	init_action_testrunner \
+	InitActionTestRunner \
 	InitActionTest2Runner \
 	$(NULL)
 
-init_action_test_SOURCES =	\
-	init_action_test.c	\
+InitActionTest_SOURCES =	\
+	InitActionTest.c	\
 	$(NULL)
-init_action_test_LDADD = ../libgnashmingutils.la
+InitActionTest_LDADD = ../libgnashmingutils.la
 
-init_action_test.swf: init_action_test
-	./init_action_test $(abs_mediadir)
+InitActionTest.swf: InitActionTest
+	./InitActionTest $(abs_mediadir)
 
-init_action_testrunner: $(srcdir)/../../generic-testrunner.sh init_action_test.swf
-	sh $(srcdir)/../../generic-testrunner.sh $(top_builddir) init_action_test.swf > $@
+InitActionTestRunner: $(srcdir)/../../generic-testrunner.sh InitActionTest.swf
+	sh $(srcdir)/../../generic-testrunner.sh $(top_builddir) InitActionTest.swf > $@
 	chmod 755 $@
 
 InitActionTest2_SOURCES =	\
@@ -90,13 +90,13 @@ InitActionTest2Runner: $(srcdir)/../../generic-testrunner.sh InitActionTest2.swf
 
 
 TEST_CASES = \
-	init_action_testrunner \
+	InitActionTestRunner \
 	InitActionTest2Runner \
 	$(NULL)
 
 
 clean-local: 
-	-rm *.swf *.pp *unner
+	-rm *.swf *Runner
 
 CLEANFILES =  \
 	gnash-dbg.log \
