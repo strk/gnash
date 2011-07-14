@@ -31,7 +31,7 @@ CLEANFILES =  \
 
 DISTCLEANFILES = XMLSocketTester
 
-SUBDIRS = loop loading displaylist_depths action_order register_class \
+SUBDIRS = . loop loading displaylist_depths action_order register_class \
           init_action
 
 EXTRA_DIST = \
