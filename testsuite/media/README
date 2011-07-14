@@ -33,10 +33,16 @@ brokenchord.wav
 
 	Produced with csound from default.orc and brokenchord.sco
 
-offspring.swf
-offspring.jpg
 green.jpg
 green.swf
+
+	171x171 image with 5 concentric squares filled with tones of green,
+	from outer to inner (steps of 20 pixels):
+	0x00ff00, 0x008800, 0x004400, 0x002200, 0x000000.
+	The SWF embeds the .jpg.
+
+offspring.swf
+offspring.jpg
 lynch.swf
 lynch.jpg
 

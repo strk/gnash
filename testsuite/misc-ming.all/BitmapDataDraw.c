@@ -277,13 +277,13 @@ main(int argc, char** argv)
     // Cyan square top left corner
     // Note: The following pixels shouldn't suffer from antialiasing,
     // but not sure how accurate Gnash will be.
-    xcheck_equals(mo, "b.getPixel(27, 30)", "0x000010");
+    xcheck_equals(mo, "b.getPixel(27, 30)", "0x00ff00"); /* 65280 */
     // Cyan square bottom left
     check_equals(mo, "b.getPixel(18, 68)", "0x00ffff");
     // Cyan square top right 
-    xcheck_equals(mo, "b.getPixel(65, 36)", "0xfffffd");
+    xcheck_equals(mo, "b.getPixel(65, 36)", "17408"); /* 17408 */
     // Magenta square top left
-    xcheck_equals(mo, "b.getPixel(62, 71)", "0x1000f");
+    xcheck_equals(mo, "b.getPixel(62, 71)", "0x00ff00"); /* 65280 */
     check_equals(mo, "b.getPixel(50, 71)", "0x00ffff");
     // Magenta square bottom right
     check_equals(mo, "b.getPixel(74, 94)", "0xffffff");

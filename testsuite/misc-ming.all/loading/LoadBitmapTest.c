@@ -120,11 +120,11 @@ main(int argc, char** argv)
     check_equals(mo, "f.transparent", "false");
 
     // Pixel checking
-    check(mo, "near(f, 1, 1, 0x05)");
-    check(mo, "near(f, 8, 8, 0x010010)");
-    check(mo, "near(f, 12, 12, 0x05030e)");
-    check(mo, "near(f, 52, 52, 0x020109)");
-    check(mo, "near(f, 56, 56, 0x010010)");
+    check(mo, "near(f, 85, 10, 0x00ff00)");
+    check(mo, "near(f, 85, 30, 0x008800)");
+    check(mo, "near(f, 85, 50, 0x004400)");
+    check(mo, "near(f, 85, 70, 0x002200)");
+    check(mo, "near(f, 85, 85, 0x000000)");
 
     // Now do weird things with the class to see what's called where.
     add_actions(mo, 
