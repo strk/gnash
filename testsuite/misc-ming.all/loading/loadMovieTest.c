@@ -28,7 +28,7 @@
  * run as ./loadMovieTest <mediadir>
  *
  * mediadir is where red.{jpg,swf}, green.{jpg,swf}
- * and offspring.{jpg,swf} are located
+ * and blue.{jpg,swf} are located
  *
  */
 
@@ -253,10 +253,10 @@ main(int argc, char** argv)
 
 	char file_red[256];
 	char file_green[256];
-	char file_offspring[256];
+	char file_blue[256];
 	char url_red[256];
 	char url_green[256];
-	char url_offspring[256];
+	char url_blue[256];
 
 	/*********************************************
 	 *
@@ -273,7 +273,7 @@ main(int argc, char** argv)
 
 	sprintf(file_red, "%s/red.jpg", mediadir);
 	sprintf(file_green, "%s/green.jpg", mediadir);
-	sprintf(file_offspring, "%s/offspring.jpg", mediadir);
+	sprintf(file_blue, "%s/blue.jpg", mediadir);
 
 	/*
 	 * Test both jpeg and swf loading.
@@ -282,7 +282,7 @@ main(int argc, char** argv)
 	 */
 	sprintf(url_red, "%s/red.swf", mediadir);
 	sprintf(url_green, "%s/green.jpg", mediadir);
-	sprintf(url_offspring, "%s/offspring.swf", mediadir);
+	sprintf(url_blue, "%s/blue.swf", mediadir);
 
 
 	puts("Setting things up");
@@ -319,8 +319,8 @@ main(int argc, char** argv)
 	/* Add the GREEN  clip */
 	add_clip(mo, file_green, "green", url_green, 200, 0);
 
-	/* Add the OFFSPRING  clip */
-	add_clip(mo, file_offspring, "offspring", url_offspring, 400, 0);
+	/* Add the BLUE  clip */
+	add_clip(mo, file_blue, "blue", url_blue, 400, 0);
 
 	/* Add the "shaker" button */
 	add_button(mo, 50, 200, "Scribble", newSWFAction(

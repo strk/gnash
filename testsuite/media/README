@@ -49,10 +49,13 @@ red.jpg
 	0xff0000, 0x880000, 0x440000, 0x220000, 0x000000.
 	The SWF embeds the .jpg.
 
-offspring.swf
-offspring.jpg
+blue.swf
+blu.jpg
 
-	The swfs display the associated jpgs.
+	171x171 image with 5 concentric squares filled with tones of blue,
+	from outer to inner (steps of 20 pixels):
+	0x0000ff, 0x000088, 0x000044, 0x000022, 0x000000.
+	The SWF embeds the .jpg.
 
 sound1.wav
 

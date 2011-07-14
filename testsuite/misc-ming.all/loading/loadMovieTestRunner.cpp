@@ -99,7 +99,7 @@ clickCycle(MovieClip* coverart)
 	URL mediaURL(MEDIADIR"/");
 	URL redURL("red.swf", mediaURL);
 	URL greenURL("green.jpg", mediaURL);
-	URL offspringURL("offspring.swf", mediaURL);
+	URL blueURL("blue.swf", mediaURL);
 
 	/*------------------------------------- */
 
@@ -145,7 +145,7 @@ clickCycle(MovieClip* coverart)
 
 	/*------------------------------------- */
 
-	// Click on the third (offspring)
+	// Click on the third (blue)
 	tester->movePointerTo(480, 80);
 	check(tester->isMouseOverMouseEntity());
 
@@ -153,9 +153,9 @@ clickCycle(MovieClip* coverart)
 
 	coverart = waitForLoad(coverart);
 
-	check_equals(coverart->get_root()->url(), offspringURL.str());
+	check_equals(coverart->get_root()->url(), blueURL.str());
 
-	// Check scribbling on the offspring
+	// Check scribbling on the blue
 	checkScribbling();
 
 	// Run 'coverart' tests..

@@ -27,7 +27,7 @@
 /*
  * run as ./movieclip_loader <mediadir>
  *
- * srcdir is where red.jpg, green.jp and offspring.jpg are located
+ * srcdir is where red.jpg, green.jp and blue.jpg are located
  *
  */
 
@@ -86,10 +86,10 @@ main(int argc, char** argv)
 	SWFMovie mo;
 	char file_red[256];
 	char file_green[256];
-	char file_offspring[256];
+	char file_blue[256];
 	char url_red[256];
 	char url_green[256];
-	char url_offspring[256];
+	char url_blue[256];
 	const char *srcdir=".";
 	SWFShape sh_coverart;
 	SWFMovieClip mc_coverart;
@@ -112,7 +112,7 @@ main(int argc, char** argv)
 
 	sprintf(file_red, "%s/red.jpg", srcdir);
 	sprintf(file_green, "%s/green.jpg", srcdir);
-	sprintf(file_offspring, "%s/offspring.jpg", srcdir);
+	sprintf(file_blue, "%s/blue.jpg", srcdir);
 
 	/*
 	 * Test urls with and w/out 'file://' prefix.
@@ -120,7 +120,7 @@ main(int argc, char** argv)
 	 */
 	sprintf(url_red, "file://%s/red.swf", srcdir);
 	sprintf(url_green, "file://%s/green.jpg", srcdir);
-	sprintf(url_offspring, "%s/offspring.swf", srcdir);
+	sprintf(url_blue, "%s/blue.swf", srcdir);
 
 
 	puts("Setting things up");
@@ -156,8 +156,8 @@ CoverArtLoader = new MovieClipLoader(); \
 	/* Add the GREEN  clip */
 	add_clip(mo, file_green, "green", url_green, 3800, 4419);
 
-	/* Add the OFFSPRING  clip */
-	add_clip(mo, file_offspring, "offspring", url_offspring, 7400, 4419);
+	/* Add the BLUE  clip */
+	add_clip(mo, file_blue, "blue", url_blue, 7400, 4419);
 
 	/*****************************************************
 	 *

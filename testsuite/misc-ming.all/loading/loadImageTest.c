@@ -28,7 +28,7 @@
  * run as ./loadMovieTest <mediadir>
  *
  * mediadir is where red.{jpg,swf}, green.{jpg,swf}
- * and offspring.{jpg,swf} are located
+ * and blue.{jpg,swf} are located
  *
  */
 

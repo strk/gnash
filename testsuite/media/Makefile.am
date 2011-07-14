@@ -20,8 +20,8 @@ EXTRA_DIST = \
 	Bitstream-Vera-Sans.fdb \
 	Bitstream-Vera-Sans.COPYRIGHT \
 	gnash.xml \
-	offspring.swf \
-	offspring.jpg \
+	blue.swf \
+	blue.jpg \
 	green.jpg \
 	green.swf \
 	red.swf \
