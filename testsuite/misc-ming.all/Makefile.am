@@ -315,7 +315,7 @@ libgnashmingutils_la_SOURCES =	\
 definebitsjpeg2_SOURCES = definebitsjpeg2.c
 definebitsjpeg2_LDADD = $(MING_LIBS)
 definebitsjpeg2.swf: definebitsjpeg2
-	./definebitsjpeg2 $(srcdir)/../media/lynch.jpg
+	./definebitsjpeg2 $(srcdir)/../media/red.jpg
 
 DefineTextTest.swf: DefineTextTest
 	./DefineTextTest $(abs_mediadir)

@@ -27,7 +27,7 @@
 /*
  * run as ./loadMovieTest <mediadir>
  *
- * mediadir is where lynch.{jpg,swf}, green.{jpg,swf}
+ * mediadir is where red.{jpg,swf}, green.{jpg,swf}
  * and offspring.{jpg,swf} are located
  *
  */

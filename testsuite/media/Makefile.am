@@ -24,8 +24,8 @@ EXTRA_DIST = \
 	offspring.jpg \
 	green.jpg \
 	green.swf \
-	lynch.swf \
-	lynch.jpg \
+	red.swf \
+	red.jpg \
 	sound1.wav \
 	sound1.mp3 \
 	mono44.mp2 \

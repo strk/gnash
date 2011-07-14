@@ -27,7 +27,7 @@
 /*
  * run as ./loadMovieTest <mediadir>
  *
- * mediadir is where lynch.{jpg,swf}, green.{jpg,swf}
+ * mediadir is where red.{jpg,swf}, green.{jpg,swf}
  * and offspring.{jpg,swf} are located
  *
  */
@@ -251,10 +251,10 @@ main(int argc, char** argv)
 	SWFMovieClip dejagnuclip;
 	SWFDisplayItem it;
 
-	char file_lynch[256];
+	char file_red[256];
 	char file_green[256];
 	char file_offspring[256];
-	char url_lynch[256];
+	char url_red[256];
 	char url_green[256];
 	char url_offspring[256];
 
@@ -271,7 +271,7 @@ main(int argc, char** argv)
 		return 1;
 	}
 
-	sprintf(file_lynch, "%s/lynch.jpg", mediadir);
+	sprintf(file_red, "%s/red.jpg", mediadir);
 	sprintf(file_green, "%s/green.jpg", mediadir);
 	sprintf(file_offspring, "%s/offspring.jpg", mediadir);
 
@@ -280,7 +280,7 @@ main(int argc, char** argv)
 	 * NOTE: testing of urls with and w/out 'file://' prefix
 	 *       disabled to reduce test complexity.
 	 */
-	sprintf(url_lynch, "%s/lynch.swf", mediadir);
+	sprintf(url_red, "%s/red.swf", mediadir);
 	sprintf(url_green, "%s/green.jpg", mediadir);
 	sprintf(url_offspring, "%s/offspring.swf", mediadir);
 
@@ -314,7 +314,7 @@ main(int argc, char** argv)
 	 *****************************************************/
 
 	/* Add the LYNCH  clip */
-	add_clip(mo, file_lynch, "lynch", url_lynch, 0, 0);
+	add_clip(mo, file_red, "red", url_red, 0, 0);
 
 	/* Add the GREEN  clip */
 	add_clip(mo, file_green, "green", url_green, 200, 0);

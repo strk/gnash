@@ -27,7 +27,7 @@
 /*
  * run as ./movieclip_loader <mediadir>
  *
- * srcdir is where lynch.jpg, green.jp and offspring.jpg are located
+ * srcdir is where red.jpg, green.jp and offspring.jpg are located
  *
  */
 
@@ -84,10 +84,10 @@ int
 main(int argc, char** argv)
 {
 	SWFMovie mo;
-	char file_lynch[256];
+	char file_red[256];
 	char file_green[256];
 	char file_offspring[256];
-	char url_lynch[256];
+	char url_red[256];
 	char url_green[256];
 	char url_offspring[256];
 	const char *srcdir=".";
@@ -110,7 +110,7 @@ main(int argc, char** argv)
 		return 1;
 	}
 
-	sprintf(file_lynch, "%s/lynch.jpg", srcdir);
+	sprintf(file_red, "%s/red.jpg", srcdir);
 	sprintf(file_green, "%s/green.jpg", srcdir);
 	sprintf(file_offspring, "%s/offspring.jpg", srcdir);
 
@@ -118,7 +118,7 @@ main(int argc, char** argv)
 	 * Test urls with and w/out 'file://' prefix.
 	 * Test both jpeg and swf loading.
 	 */
-	sprintf(url_lynch, "file://%s/lynch.swf", srcdir);
+	sprintf(url_red, "file://%s/red.swf", srcdir);
 	sprintf(url_green, "file://%s/green.jpg", srcdir);
 	sprintf(url_offspring, "%s/offspring.swf", srcdir);
 
@@ -151,7 +151,7 @@ CoverArtLoader = new MovieClipLoader(); \
 	SWFMovie_add(mo, (SWFBlock)ac);
 
 	/* Add the LYNCH  clip */
-	add_clip(mo, file_lynch, "lynch", url_lynch, 200, 4419);
+	add_clip(mo, file_red, "red", url_red, 200, 4419);
 
 	/* Add the GREEN  clip */
 	add_clip(mo, file_green, "green", url_green, 3800, 4419);
