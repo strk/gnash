@@ -55,6 +55,7 @@ libbase/gnashrc
 libnet/gnash.log
 libnet/gnash.sum
 ltmain.sh
+libtool
 macros/argz.m4
 macros/libtool.m4
 macros/lt*.m4
@@ -102,6 +103,7 @@ testsuite/misc-haxe.all/classes.all/*.swf
 testsuite/misc-haxe.all/PP_*
 testsuite/misc-haxe.all/*.swf
 testsuite/misc-ming.all/action_order/*.swf
+testsuite/misc-ming.all/action_order/PlaceAndRemove
 testsuite/misc-ming.all/BeginBitmapFill
 testsuite/misc-ming.all/BitmapDataDraw
 testsuite/misc-ming.all/definebitsjpeg2
