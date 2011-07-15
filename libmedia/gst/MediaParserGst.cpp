@@ -320,58 +320,59 @@ MediaParserGst::link_to_fakesink(GstPad* pad)
 
 // static 
 void
-MediaParserGst::cb_typefound (GstElement* typefind, guint /* probability */,
+MediaParserGst::cb_typefound(GstElement* typefind, guint /*probability*/,
                               GstCaps* caps, gpointer data)
 {
     print_caps(caps);
 
     MediaParserGst* parser = static_cast<MediaParserGst*>(data);
 
-    GstElementFactory* demuxfactory = swfdec_gst_get_demuxer_factory (caps);
+    GstElementFactory* demuxfactory = swfdec_gst_get_demuxer_factory(caps);
     
     if (!demuxfactory) {
-    
-        GstPad* srcpad = gst_element_get_static_pad (typefind, "src");
+        GstPad* srcpad = gst_element_get_static_pad(typefind, "src");
+
         if (!srcpad) {
             throw MediaException(_("MediaParserGst: couldn't get the typefind "
                                    "src element."));
         }
 
         cb_pad_added(typefind, srcpad, parser);
-
         gst_object_unref(GST_OBJECT(srcpad));
-        
         parser->_demux_probe_ended = true;
-
-    } else {
-
-        GstElement* demuxer = gst_element_factory_create (demuxfactory, "demuxer");
-        
-        gst_object_unref(GST_OBJECT(demuxfactory));
-
-        if (!demuxer) {
-            throw MediaException(_("MediaParserGst: couldn't create the demuxer"));
-        }
-        
-        gboolean success = gst_bin_add(GST_BIN(parser->_bin), demuxer);
-        if (!success) {
-            log_error(_("MediaParserGst: failed adding demuxer to bin."));
-            // This error might not be fatal, so we'll continue.
-        }        
-        
-        success = gst_element_link(typefind, demuxer);
-        if (!success) {
-            throw MediaException(_("MediaParserGst: failed adding demuxer to bin."));
-        }
-        
-        g_signal_connect (demuxer, "pad-added", G_CALLBACK (MediaParserGst::cb_pad_added), parser);
-        g_signal_connect (demuxer, "no-more-pads", G_CALLBACK (MediaParserGst::cb_no_more_pads), parser);
-        
-        if (!gst_element_set_state (parser->_bin, GST_STATE_PLAYING) == GST_STATE_CHANGE_SUCCESS) {
-            throw GnashException(_("MediaParserGst could not change element state"));
-        }
+        return;
     }
 
+    // We have a factory, so create the demuxer.
+    GstElement* demuxer = gst_element_factory_create(demuxfactory, "demuxer");
+    gst_object_unref(GST_OBJECT(demuxfactory));
+
+    if (!demuxer) {
+        throw MediaException(_("MediaParserGst: couldn't create the "
+                    "demuxer"));
+    }
+    
+    gboolean success = gst_bin_add(GST_BIN(parser->_bin), demuxer);
+    if (!success) {
+        log_error(_("MediaParserGst: failed adding demuxer to bin."));
+    }        
+    
+    success = gst_element_link(typefind, demuxer);
+    if (!success) {
+        throw MediaException(_("MediaParserGst: failed adding demuxer "
+                    "to bin."));
+    }
+    
+    g_signal_connect(demuxer, "pad-added",
+            G_CALLBACK(MediaParserGst::cb_pad_added), parser);
+    g_signal_connect(demuxer, "no-more-pads", 
+            G_CALLBACK(MediaParserGst::cb_no_more_pads), parser);
+    
+    if (!gst_element_set_state(parser->_bin, GST_STATE_PLAYING) ==
+            GST_STATE_CHANGE_SUCCESS) {
+        throw GnashException(_("MediaParserGst could not change "
+                    "element state"));
+    }
 }
 
 //static 
