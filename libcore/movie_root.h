@@ -78,6 +78,7 @@
 #include <boost/ptr_container/ptr_deque.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/any.hpp>
+#include <boost/optional.hpp>
 
 #include "dsodefs.h" // DSOEXPORT
 #include "MouseButtonState.h" // for composition
@@ -999,7 +1000,7 @@ private:
     DisplayObject* _currentFocus;
 
     /// @todo fold this into m_mouse_button_state?
-    DragState _dragState;
+    boost::optional<DragState> _dragState;
 
     typedef std::map<int, MovieClip*> Levels;
 

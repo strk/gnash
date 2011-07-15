@@ -1205,10 +1205,9 @@ ActionStartDragMovie(ActionExec& thread)
             log_aserror(_("startDrag: unknown target '%s'"), env.top(0));
         );
     }
-    DragState st(tgt);
 
     const bool lock = toBool(env.top(1), getVM(env));
-    st.setLockCentered(lock);
+    DragState st(tgt, lock);
 
     // toNumber because we found out that ming writes "0" for the third
     // argument, and this converts to true when converted to a bool when

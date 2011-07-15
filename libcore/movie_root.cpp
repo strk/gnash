@@ -145,7 +145,6 @@ movie_root::movie_root(VirtualClock& clock, const RunResources& runResources)
     _lastTimerId(0),
     _lastKeyEvent(key::INVALID),
     _currentFocus(0),
-    _dragState(0),
     _movies(),
     _rootMovie(0),
     _invalidated(true),
@@ -730,8 +729,10 @@ void
 movie_root::setDragState(const DragState& st)
 {
     _dragState = st;
-    DisplayObject* ch = st.getCharacter();
-    if (ch && !st.isLockCentered()) {
+
+    DisplayObject* ch = _dragState->getCharacter();
+
+    if (ch && !_dragState->isLockCentered()) {
         // Get coordinates of the DisplayObject's origin
         point origin(0, 0);
         SWFMatrix chmat = getWorldMatrix(*ch);
@@ -739,12 +740,12 @@ movie_root::setDragState(const DragState& st)
         chmat.transform(&world_origin, origin);
 
         // Get current mouse coordinates
-        point world_mouse(pixelsToTwips(_mouseX), pixelsToTwips(_mouseY));
+        const point world_mouse(pixelsToTwips(_mouseX), pixelsToTwips(_mouseY));
 
         boost::int32_t xoffset = world_mouse.x - world_origin.x;
         boost::int32_t yoffset = world_mouse.y - world_origin.y;
 
-        _dragState.setOffset(xoffset, yoffset);
+        _dragState->setOffset(xoffset, yoffset);
     }
     assert(testInvariant());
 }
@@ -769,16 +770,16 @@ movie_root::doMouseDrag()
         parent_world_mat = getWorldMatrix(*p);
     }
 
-    if (!_dragState.isLockCentered()) {
-        world_mouse.x -= _dragState.xOffset();
-        world_mouse.y -= _dragState.yOffset();
+    if (!_dragState->isLockCentered()) {
+        world_mouse.x -= _dragState->xOffset();
+        world_mouse.y -= _dragState->yOffset();
     }
 
-    if (_dragState.hasBounds()) {
+    if (_dragState->hasBounds()) {
         SWFRect bounds;
         // bounds are in local coordinate space
         bounds.enclose_transformed_rect(parent_world_mat,
-                _dragState.getBounds());
+                _dragState->getBounds());
         // Clamp mouse coords within a defined SWFRect.
         bounds.clamp(world_mouse);
     }
@@ -1085,7 +1086,7 @@ movie_root::getActiveEntityUnderPointer() const
 DisplayObject*
 movie_root::getDraggingCharacter() const
 {
-    return _dragState.getCharacter();
+    return _dragState ? _dragState->getCharacter() : 0;
 }
 
 const DisplayObject*
@@ -1710,7 +1711,7 @@ movie_root::markReachableResources() const
     if (_currentFocus) _currentFocus->setReachable();
 
     // Mark DisplayObject being dragged, if any
-    _dragState.markReachableResources();
+    if (_dragState) _dragState->markReachableResources();
 
     // NOTE: cleanupDisplayList() should have cleaned up all
     // unloaded live characters. The remaining ones should be marked

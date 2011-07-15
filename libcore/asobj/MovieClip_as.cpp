@@ -1881,59 +1881,57 @@ movieclip_startDrag(const fn_call& fn)
 {
     MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
-    DragState st(movieclip);
-
     // mark this DisplayObject is transformed.
     movieclip->transformedByScript();
 
-    if (fn.nargs) {
-        st.setLockCentered(toBool(fn.arg(0), getVM(fn)));
+    const bool lock = fn.nargs ? toBool(fn.arg(0), getVM(fn)) : false;
 
-        if (fn.nargs > 4) {
-            double x0 = toNumber(fn.arg(1), getVM(fn));
-            double y0 = toNumber(fn.arg(2), getVM(fn));
-            double x1 = toNumber(fn.arg(3), getVM(fn));
-            double y1 = toNumber(fn.arg(4), getVM(fn));
+    DragState st(movieclip, lock);
 
-            // check for infinite values
-            bool gotinf = false;
-            if (!isFinite(x0)) { x0=0; gotinf=true; }
-            if (!isFinite(y0)) { y0=0; gotinf=true; }
-            if (!isFinite(x1)) { x1=0; gotinf=true; }
-            if (!isFinite(y1)) { y1=0; gotinf=true; }
+    if (fn.nargs > 4) {
+        double x0 = toNumber(fn.arg(1), getVM(fn));
+        double y0 = toNumber(fn.arg(2), getVM(fn));
+        double x1 = toNumber(fn.arg(3), getVM(fn));
+        double y1 = toNumber(fn.arg(4), getVM(fn));
 
-            // check for swapped values
-            bool swapped = false;
-            if (y1 < y0) {
-                std::swap(y1, y0);
-                swapped = true;
-            }
+        // check for infinite values
+        bool gotinf = false;
+        if (!isFinite(x0)) { x0=0; gotinf=true; }
+        if (!isFinite(y0)) { y0=0; gotinf=true; }
+        if (!isFinite(x1)) { x1=0; gotinf=true; }
+        if (!isFinite(y1)) { y1=0; gotinf=true; }
 
-            if (x1 < x0) {
-                std::swap(x1, x0);
-                swapped = true;
-            }
-
-            IF_VERBOSE_ASCODING_ERRORS(
-                if (gotinf || swapped) {
-                    std::stringstream ss; fn.dump_args(ss);
-                    if (swapped) { 
-                        log_aserror(_("min/max bbox values in "
-                            "MovieClip.startDrag(%s) swapped, fixing"),
-                            ss.str());
-                    }
-                    if (gotinf) {
-                        log_aserror(_("non-finite bbox values in "
-                            "MovieClip.startDrag(%s), took as zero"),
-                            ss.str());
-                    }
-                }
-            );
-
-            SWFRect bounds(pixelsToTwips(x0), pixelsToTwips(y0),
-                    pixelsToTwips(x1), pixelsToTwips(y1));
-            st.setBounds(bounds);
+        // check for swapped values
+        bool swapped = false;
+        if (y1 < y0) {
+            std::swap(y1, y0);
+            swapped = true;
         }
+
+        if (x1 < x0) {
+            std::swap(x1, x0);
+            swapped = true;
+        }
+
+        IF_VERBOSE_ASCODING_ERRORS(
+            if (gotinf || swapped) {
+                std::stringstream ss; fn.dump_args(ss);
+                if (swapped) { 
+                    log_aserror(_("min/max bbox values in "
+                        "MovieClip.startDrag(%s) swapped, fixing"),
+                        ss.str());
+                }
+                if (gotinf) {
+                    log_aserror(_("non-finite bbox values in "
+                        "MovieClip.startDrag(%s), took as zero"),
+                        ss.str());
+                }
+            }
+        );
+
+        SWFRect bounds(pixelsToTwips(x0), pixelsToTwips(y0),
+                pixelsToTwips(x1), pixelsToTwips(y1));
+        st.setBounds(bounds);
     }
 
     getRoot(fn).setDragState(st);
