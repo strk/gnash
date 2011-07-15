@@ -180,7 +180,7 @@ LineStyle::set_lerp(const LineStyle& ls1, const LineStyle& ls2, float ratio)
 {
     m_width = static_cast<boost::uint16_t>(
         frnd(lerp<float>(ls1.getThickness(), ls2.getThickness(), ratio)));
-    m_color.set_lerp(ls1.get_color(), ls2.get_color(), ratio);
+    m_color = lerp(ls1.get_color(), ls2.get_color(), ratio);
     if ( ls1._scaleVertically != ls2._scaleVertically )
     {
         LOG_ONCE( log_error("UNTESTED: Dunno how to interpolate line styles with different vertical thickness scaling") );

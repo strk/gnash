@@ -73,6 +73,12 @@ namespace gnash {
 namespace {
     bool getAveragePixel(const Renderer& r, rgba& color_return, int x, int y, 
         unsigned int radius);
+
+    std::string toShortString(const rgba& r) {
+        std::stringstream ss;
+        ss << +r.m_r << "," << +r.m_g << "," << +r.m_b << "," << +r.m_a;
+        return ss.str();
+    }
 }
 
 MovieTester::MovieTester(const std::string& url)
@@ -355,8 +361,9 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 {
     if ( ! canTestRendering() )	{
 	std::stringstream ss;
-	ss << "exp:" << color.toShortString() << " ";
-	cout << "UNTESTED: NORENDERER: pix:" << x << "," << y << " exp:" << color.toShortString() << " " << label << endl;
+	ss << "exp:" << toShortString(color) << " ";
+	cout << "UNTESTED: NORENDERER: pix:" << x << "," << y << " exp:" <<
+        toShortString(color) << " " << label << endl;
     }
     
     FuzzyPixel exp(color, tolerance);
@@ -395,8 +402,8 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 	//unsigned short tol = std::max(tolerance, minRendererTolerance);
 	unsigned short tol = tolerance*minRendererTolerance; 
 	
-	ss << "exp:" << color.toShortString() << " ";
-	ss << "obt:" << obt_col.toShortString() << " ";
+	ss << "exp:" << toShortString(color) << " ";
+	ss << "obt:" << toShortString(obt_col) << " ";
 	ss << "tol:" << tol;
 	
 	FuzzyPixel obt(obt_col, tol);

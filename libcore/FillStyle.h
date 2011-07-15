@@ -257,7 +257,7 @@ public:
 
     /// Set this fill to a lerp of two other SolidFills.
     void setLerp(const SolidFill& a, const SolidFill& b, double ratio) {
-        _color.set_lerp(a.color(), b.color(), ratio);
+        _color = lerp(a.color(), b.color(), ratio);
     }
 
     /// Get the color of the fill.

@@ -18,27 +18,23 @@
 // 
 
 #include "RGBA.h"
+
+#include <sstream> 
+
 #include "GnashNumeric.h"
 #include "log.h"
-#include <sstream> 
 
 namespace gnash {
 
-std::string
-rgba::toShortString() const
+rgba
+lerp(const rgba& a, const rgba& b, float f)
 {
-    std::stringstream ss;
-    ss << +m_r << "," << +m_g << "," << +m_b << "," << +m_a;
-    return ss.str();
-}
-
-void
-rgba::set_lerp(const rgba& a, const rgba& b, float f)
-{
-    m_r = frnd(lerp<float>(a.m_r, b.m_r, f));
-    m_g = frnd(lerp<float>(a.m_g, b.m_g, f));
-    m_b = frnd(lerp<float>(a.m_b, b.m_b, f));
-    m_a = frnd(lerp<float>(a.m_a, b.m_a, f));
+    return rgba(
+            frnd(lerp<float>(a.m_r, b.m_r, f)),
+            frnd(lerp<float>(a.m_g, b.m_g, f)),
+            frnd(lerp<float>(a.m_b, b.m_b, f)),
+            frnd(lerp<float>(a.m_a, b.m_a, f))
+            );
 }
 
 rgba
