@@ -49,7 +49,6 @@ namespace {
     as_value xml_createTextNode(const fn_call& fn);
     as_value xml_parseXML(const fn_call& fn);
     as_value xml_onData(const fn_call& fn);
-    as_value xml_onLoad(const fn_call& fn);
     as_value xml_xmlDecl(const fn_call& fn);
     as_value xml_docTypeDecl(const fn_call& fn);
     as_value xml_contentType(const fn_call& fn);
@@ -587,7 +586,7 @@ attachXMLInterface(as_object& o)
     o.init_member("send", vm.getNative(301, 1), flags);
     o.init_member("sendAndLoad", vm.getNative(301, 2), flags);
     o.init_member("onData", gl.createFunction(xml_onData), flags);
-    o.init_member("onLoad", gl.createFunction(xml_onLoad), flags);
+    o.init_member("onLoad", gl.createFunction(emptyFunction), flags);
 }
 
 as_value
@@ -818,13 +817,6 @@ xml_docTypeDecl(const fn_call& fn)
     const std::string& docType = fn.arg(0).to_string();
     ptr->setDocTypeDecl(docType);
     
-    return as_value();
-}
-
-/// XML.prototype has an empty onLoad function defined.
-as_value
-xml_onLoad(const fn_call& /*fn*/)
-{
     return as_value();
 }
 

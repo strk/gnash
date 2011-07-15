@@ -931,19 +931,13 @@ Button::getDefinitionVersion() const
     return _def->getSWFVersion();
 }
 
-static as_value
-button_ctor(const fn_call& /*fn*/)
-{
-    return as_value();
-}
-
 void
 button_class_init(as_object& global, const ObjectURI& uri)
 {
     // This is going to be the global Button "class"/"function"
     Global_as& gl = getGlobal(global);
     as_object* proto = createObject(gl);
-    as_object* cl = gl.createClass(&button_ctor, proto);
+    as_object* cl = gl.createClass(emptyFunction, proto);
     attachButtonInterface(*proto);
 
     // Register _global.MovieClip

@@ -51,7 +51,6 @@ namespace {
 
     void attachMovieClipAS2Interface(as_object& o);
 
-    as_value movieclip_as2_ctor(const fn_call& fn);
     as_value movieclip_transform(const fn_call& fn);
     as_value movieclip_scale9Grid(const fn_call& fn);
     as_value movieclip_attachVideo(const fn_call& fn);
@@ -118,7 +117,7 @@ movieclip_class_init(as_object& where, const ObjectURI& uri)
     Global_as& gl = getGlobal(where);
     as_object* proto = createObject(gl);
 
-    as_object* cl = gl.createClass(&movieclip_as2_ctor, proto);
+    as_object* cl = gl.createClass(emptyFunction, proto);
     attachMovieClipAS2Interface(*proto);
 
     where.init_member(uri, cl, as_object::DefaultFlags);
@@ -2061,14 +2060,6 @@ movieclip_attachBitmap(const fn_call& fn)
 
     return as_value();
 }
-
-
-as_value
-movieclip_as2_ctor(const fn_call& /*fn*/)
-{
-    return as_value();
-}
-
 
 as_value
 movieclip_transform(const fn_call& fn)

@@ -41,8 +41,6 @@
 namespace gnash {
 
 namespace {
-
-    as_value microphone_ctor(const fn_call& fn);
     as_value microphone_get(const fn_call& fn);
     as_value microphone_setgain(const fn_call& fn);
     as_value microphone_setrate(const fn_call& fn);
@@ -67,7 +65,7 @@ namespace {
 void
 microphone_class_init(as_object& where, const ObjectURI& uri)
 {
-    registerBuiltinClass(where, microphone_ctor, attachMicrophoneInterface,
+    registerBuiltinClass(where, emptyFunction, attachMicrophoneInterface,
                          attachMicrophoneStaticInterface, uri);
 }
 
@@ -231,14 +229,6 @@ private:
     boost::scoped_ptr<media::AudioInput> _input;
 
 };
-
-// There is a constructor for Microphone that returns an object with
-// the correct properties, but it is not usable.
-as_value
-microphone_ctor(const fn_call& /*fn*/)
-{
-    return as_value();
-}
 
 // AS2 static accessor.
 as_value

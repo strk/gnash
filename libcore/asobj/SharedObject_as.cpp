@@ -73,7 +73,6 @@ namespace {
     as_value sharedobject_getRemote(const fn_call& fn);
     as_value sharedobject_data(const fn_call& fn);
     as_value sharedobject_getLocal(const fn_call& fn);
-    as_value sharedobject_ctor(const fn_call& fn);
 
     as_object* readSOL(VM& vm, const std::string& filespec);
 
@@ -598,7 +597,7 @@ sharedobject_class_init(as_object& where, const ObjectURI& uri)
     Global_as& gl = getGlobal(where);
     as_object* proto = createObject(gl);
     attachSharedObjectInterface(*proto);
-    as_object* cl = gl.createClass(&sharedobject_ctor, proto);
+    as_object* cl = gl.createClass(emptyFunction, proto);
     attachSharedObjectStaticInterface(*cl);
     
     // Register _global.SharedObject
@@ -856,12 +855,6 @@ sharedobject_getSize(const fn_call& fn)
 {
     SharedObject_as* obj = ensure<ThisIsNative<SharedObject_as> >(fn);
     return as_value(obj->size());
-}
-
-as_value
-sharedobject_ctor(const fn_call& /*fn*/)
-{
-    return as_value(); 
 }
 
 /// Return true if the name is a valid SOL name.
