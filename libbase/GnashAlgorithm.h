@@ -21,9 +21,6 @@
 #define GNASH_ALGORITHM_H
 
 #include <algorithm>
-#include <boost/checked_delete.hpp>
-#include <boost/intrusive_ptr.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/bind.hpp>
 
 namespace gnash {
