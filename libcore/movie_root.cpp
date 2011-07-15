@@ -677,7 +677,6 @@ movie_root::mouseClick(bool mouse_pressed)
 bool
 movie_root::fire_mouse_event()
 {
-
     assert(testInvariant());
 
     boost::int32_t x = pixelsToTwips(_mouseX);
@@ -687,20 +686,20 @@ movie_root::fire_mouse_event()
     _mouseButtonState.topmostEntity = getTopmostMouseEntity(x, y);
 
     // Set _droptarget if dragging a sprite
-    MovieClip* dragging = 0;
     DisplayObject* draggingChar = getDraggingCharacter();
-    if (draggingChar) dragging = draggingChar->to_movie();
-    if (dragging) {
-        // TODO: optimize making findDropTarget and getTopmostMouseEntity
-        //       use a single scan.
-        const DisplayObject* dropChar = findDropTarget(x, y, dragging);
-        if (dropChar) {
-            // Use target of closest script DisplayObject containing this
-            dropChar = getNearestObject(dropChar);
-            dragging->setDropTarget(dropChar->getTargetPath());
+    if (draggingChar) {
+        MovieClip* dragging = draggingChar->to_movie();
+        if (dragging) {
+            // TODO: optimize making findDropTarget and getTopmostMouseEntity
+            //       use a single scan.
+            const DisplayObject* dropChar = findDropTarget(x, y, dragging);
+            if (dropChar) {
+                // Use target of closest script DisplayObject containing this
+                dropChar = getNearestObject(dropChar);
+                dragging->setDropTarget(dropChar->getTargetPath());
+            }
+            else dragging->setDropTarget("");
         }
-        else dragging->setDropTarget("");
-
     }
 
     bool need_redraw = false;
@@ -999,12 +998,11 @@ movie_root::notify_mouse_listeners(const event_id& event)
         try {
             callMethod(mouseObj, propBroadcastMessage, event.functionName());
         }
-        catch (ActionLimitException &e) {
+        catch (const ActionLimitException& e) {
             log_error(_("ActionLimits hit notifying mouse events: %s."),
                     e.what());
             clear(_actionQueue);
         }
-        
     }
 
     assert(testInvariant());
