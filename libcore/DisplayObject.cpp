@@ -218,7 +218,6 @@ DisplayObject::set_invalidated(const char* debug_file, int debug_line)
         m_old_invalidated_ranges.setNull();
         add_invalidated_bounds(m_old_invalidated_ranges, true);
     }
-
 }
 
 void
@@ -236,11 +235,10 @@ DisplayObject::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 void
 DisplayObject::set_child_invalidated()
 {
-  if ( ! _child_invalidated ) 
-  {
-    _child_invalidated=true;
-      if ( _parent ) _parent->set_child_invalidated();
-  } 
+    if (!_child_invalidated) {
+        _child_invalidated=true;
+        if (_parent) _parent->set_child_invalidated();
+    } 
 }
 
 void
@@ -1100,7 +1098,6 @@ setHighQuality(DisplayObject& o, const as_value& val)
 void
 setY(DisplayObject& o, const as_value& val)
 {
-
     const double newy = toNumber(val, getVM(*getObject(&o)));
 
     // NaN is skipped, Infinite isn't
@@ -1162,7 +1159,6 @@ getX(DisplayObject& o)
 void
 setScaleX(DisplayObject& o, const as_value& val)
 {
-
     const double scale_percent = toNumber(val, getVM(*getObject(&o)));
 
     // NaN is skipped, Infinite is not, see actionscript.all/setProperty.as
@@ -1189,7 +1185,6 @@ getScaleX(DisplayObject& o)
 void
 setScaleY(DisplayObject& o, const as_value& val)
 {
-
     const double scale_percent = toNumber(val, getVM(*getObject(&o)));
 
     // NaN is skipped, Infinite is not, see actionscript.all/setProperty.as
@@ -1222,7 +1217,6 @@ getVisible(DisplayObject& o)
 void
 setVisible(DisplayObject& o, const as_value& val)
 {
-
     /// We cast to number and rely (mostly) on C++'s automatic
     /// cast to bool, as string "0" should be converted to
     /// its numeric equivalent, not interpreted as 'true', which
@@ -1253,7 +1247,6 @@ getAlpha(DisplayObject& o)
 void
 setAlpha(DisplayObject& o, const as_value& val)
 {
-
     // The new internal alpha value is input / 100.0 * 256.
     // We test for finiteness later, but the multiplication
     // won't make any difference.
@@ -1322,7 +1315,6 @@ getRotation(DisplayObject& o)
 void
 setRotation(DisplayObject& o, const as_value& val)
 {
-
     // input is in degrees
     const double rotation_val = toNumber(val, getVM(*getObject(&o)));
 
