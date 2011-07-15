@@ -555,7 +555,6 @@ textformat_align(const fn_call& fn)
 as_value
 textformat_getTextExtent(const fn_call& fn)
 {
-
     TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
     
     if (!fn.nargs) {
@@ -568,7 +567,6 @@ textformat_getTextExtent(const fn_call& fn)
 
     const int version = getSWFVersion(fn);
     const std::string& s = fn.arg(0).to_string(version);
-
 
     const bool limitWidth = (fn.nargs > 1);
     
@@ -597,7 +595,9 @@ textformat_getTextExtent(const fn_call& fn)
     /// 240 twips for a size 12.
     const double scale = size / static_cast<double>(f->unitsPerEM(em));
 
-    double height = size;
+    // If the text is empty, size is 0. Otherwise we start with the font
+    // size.
+    double height = s.empty() ? 0 : size;
     double width = 0;
     double curr = 0;
     
