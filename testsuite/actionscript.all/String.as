@@ -133,6 +133,14 @@ check_equals(r.lastIndexOf("ghi", 17287638764), 6);
 check_equals(r.lastIndexOf(""), 16);
 check_equals(r.lastIndexOf(7), 10);
 
+// UTF8 lastIndexOf
+s = "tést";
+#if OUTPUT_VERSION > 5
+ xcheck_equals(s.lastIndexOf('s'), 2);
+#else
+ check_equals(s.lastIndexOf('s'), 3);
+#endif
+
 
 // Applied to object.
 o = new Object;
@@ -1344,7 +1352,7 @@ _global.String = OrigString;
 
 //----- END OF TESTS
 
-var baseTests = 327;
+var baseTests = 328;
 var asmTests = 23;
 var ge6Tests = 19;
 
