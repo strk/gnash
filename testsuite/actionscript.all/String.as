@@ -136,7 +136,7 @@ check_equals(r.lastIndexOf(7), 10);
 // UTF8 lastIndexOf
 s = "tést";
 #if OUTPUT_VERSION > 5
- xcheck_equals(s.lastIndexOf('s'), 2);
+ check_equals(s.lastIndexOf('s'), 2);
 #else
  check_equals(s.lastIndexOf('s'), 3);
 #endif
