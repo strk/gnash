@@ -453,10 +453,6 @@ DisplayObject::unload()
     if (_maskee) _maskee->setMask(0);
     if (_mask) _mask->setMaskee(0);
 
-    if (!unloadHandler) {
-        stage().removeQueuedConstructor(this);
-    }
-
     _unloaded = true;
 
     return unloadHandler;
@@ -718,11 +714,6 @@ DisplayObject::allowHandCursor() const
 {
     as_object* obj = getObject(this);
     if (!obj) return false;
-
-    // Checking for RELEASE breaks ButtonEventsTest.
-    // I guess such an event would influence wheter or not this
-    // character would become an active one, despite hand cursor
-    //if (!hasEventHandler(event_id::RELEASE)) return false;
 
     as_value val;
     if (!obj->get_member(NSV::PROP_USEHANDCURSOR, &val)) {

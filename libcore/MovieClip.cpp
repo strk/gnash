@@ -1794,7 +1794,14 @@ MovieClip::unloadChildren()
         queueEvent(event_id(event_id::UNLOAD), movie_root::PRIORITY_DOACTION);
     }
 
-    return childHandler || hasEventHandler(event_id(event_id::UNLOAD));
+    const bool unloadHandler = 
+        childHandler || hasEventHandler(event_id(event_id::UNLOAD));
+
+    if (!unloadHandler) {
+        stage().removeQueuedConstructor(this);
+    }
+
+    return unloadHandler;
 }
 
 void
