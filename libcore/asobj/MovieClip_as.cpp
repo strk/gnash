@@ -20,6 +20,10 @@
 #include "MovieClip_as.h"
 
 #include <boost/lexical_cast.hpp>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <algorithm>
 
 #include "MovieClip.h"
 #include "Movie.h"
