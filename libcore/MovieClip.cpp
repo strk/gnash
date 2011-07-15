@@ -1557,12 +1557,6 @@ MovieClip::mouseEnabled() const
 }
 
 void
-MovieClip::stop_drag()
-{
-    stage().stop_drag();
-}
-
-void
 MovieClip::set_background_color(const rgba& color)
 {
     stage().set_background_color(color);
@@ -2049,18 +2043,15 @@ MovieClip::getAsRoot()
     //                we might as well just return _swf, 
     //                the whole chain from this movieclip to it's
     //                _swf should have the same version...
-    //
-    // TODO2: implement this with iteration rather
-    //                then recursion.
-    //                
-
     DisplayObject* p = parent();
-    if (!p) return this; // no parent, we're the root
+
+    // no parent, we're the root
+    if (!p) return this; 
 
     // If we have a parent, we descend to it unless 
     // our _lockroot is true AND our or the VM's
     // SWF version is > 6
-    int topSWFVersion = stage().getRootMovie().version();
+    const int topSWFVersion = stage().getRootMovie().version();
 
     if (getDefinitionVersion() > 6 || topSWFVersion > 6) {
         if (getLockRoot()) return this;

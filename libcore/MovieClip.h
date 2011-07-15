@@ -93,8 +93,6 @@ public:
 
     typedef std::map<std::string, std::string> MovieVariables;
 
-    typedef std::list<const action_buffer*> ActionList;
-
     typedef movie_definition::PlayList PlayList;
 
     enum PlayState
@@ -473,9 +471,6 @@ public:
     //
     /// The frame_spec could be an integer or a string.
     virtual void call_frame_actions(const as_value& frame_spec);
-
-    // delegates to movie_root 
-    virtual void stop_drag();
 
     /// Duplicate this sprite in its timeline
     //
