@@ -1775,7 +1775,6 @@ MovieClip::construct(as_object* initObj)
 bool
 MovieClip::unloadChildren()
 {
-
 #ifdef GNASH_DEBUG
     log_debug(_("Unloading movieclip '%s'"), getTargetPath());
 #endif
@@ -1794,9 +1793,13 @@ MovieClip::unloadChildren()
         queueEvent(event_id(event_id::UNLOAD), movie_root::PRIORITY_DOACTION);
     }
 
+    // Check whether our child MovieClips or this MovieCLip have an unload
+    // handler.
     const bool unloadHandler = 
         childHandler || hasEventHandler(event_id(event_id::UNLOAD));
 
+    // If there's no unload handler, make sure any queued constructor for
+    // this MovieClip is not executed!
     if (!unloadHandler) {
         stage().removeQueuedConstructor(this);
     }
@@ -1853,7 +1856,6 @@ MovieClip::loadVariables(const std::string& urlstr,
 {
     // Host security check will be will be done by LoadVariablesThread
     // (down by getStream, that is)
-    
     const movie_root& mr = stage();
     URL url(urlstr, mr.runResources().streamProvider().baseURL());
 
@@ -2014,9 +2016,8 @@ MovieClip::markOwnResources() const
     // Mark textfields in the TextFieldIndex
     if (_text_variables.get()) {
         for (TextFieldIndex::const_iterator i=_text_variables->begin(),
-                    e=_text_variables->end();
-                i!=e; ++i)
-        {
+                    e=_text_variables->end(); i!=e; ++i) {
+
             const TextFields& tfs=i->second;
             std::for_each(tfs.begin(), tfs.end(), 
                         boost::mem_fn(&DisplayObject::setReachable));
@@ -2083,7 +2084,9 @@ MovieClip::stopStreamSound()
 {
     if (m_sound_stream_id == -1) return; // nothing to do
 
-    sound::sound_handler* handler = getRunResources(*getObject(this)).soundHandler();
+    sound::sound_handler* handler =
+        getRunResources(*getObject(this)).soundHandler();
+
     if (handler) {
         handler->stopStreamingSound(m_sound_stream_id);
     }
