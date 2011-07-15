@@ -1794,8 +1794,7 @@ MovieClip::unloadChildren()
         queueEvent(event_id(event_id::UNLOAD), movie_root::PRIORITY_DOACTION);
     }
 
-    return childHandler;
-
+    return childHandler || hasEventHandler(event_id(event_id::UNLOAD));
 }
 
 void

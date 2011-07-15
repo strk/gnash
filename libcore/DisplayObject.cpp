@@ -447,22 +447,19 @@ DisplayObject::get_event_handler(const event_id& id) const
 bool
 DisplayObject::unload()
 {
-    const bool childHandler = unloadChildren();
+    const bool unloadHandler = unloadChildren();
 
     // Unregister this DisplayObject as mask and/or maskee.
     if (_maskee) _maskee->setMask(0);
     if (_mask) _mask->setMaskee(0);
 
-    const bool hasEvent =
-        hasEventHandler(event_id(event_id::UNLOAD)) || childHandler;
-
-    if (!hasEvent) {
+    if (!unloadHandler) {
         stage().removeQueuedConstructor(this);
     }
 
     _unloaded = true;
 
-    return hasEvent;
+    return unloadHandler;
 }
 
 bool
