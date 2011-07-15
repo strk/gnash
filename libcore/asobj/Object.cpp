@@ -368,12 +368,13 @@ object_isPropertyEnumerable(const fn_call& fn)
 {
     as_object* obj = ensure<ValidThis>(fn);
 
-    if (fn.nargs < 1) {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Object.isPropertyEnumerable() requires one arg"));
-        );
-        return as_value();
+    if (!fn.nargs) {
+         IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Object.isPropertyEnumerable() requires one arg"));
+         );
+        return as_value(false);
     }
+
     const as_value& arg = fn.arg(0);
     const std::string& propname = arg.to_string();
     if (arg.is_undefined() || propname.empty()) {
@@ -401,7 +402,7 @@ object_isPrototypeOf(const fn_call& fn)
 
     if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Object.isPrototypeOf() requires one arg"));
+            log_aserror(_("Object.isPrototypeOf() requires one arg"));
         );
         return as_value(false); 
     }
@@ -425,11 +426,10 @@ object_watch(const fn_call& fn)
 {
     as_object* obj = ensure<ValidThis>(fn);
 
-    if ( fn.nargs < 2 )
-    {
+    if (fn.nargs < 2) {
         IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("Object.watch(%s): missing arguments"));
+            std::stringstream ss; fn.dump_args(ss);
+            log_aserror(_("Object.watch(%s): missing arguments"));
         );
         return as_value(false);
     }
@@ -437,11 +437,11 @@ object_watch(const fn_call& fn)
     const as_value& propval = fn.arg(0);
     const as_value& funcval = fn.arg(1);
 
-    if ( ! funcval.is_function() )
-    {
+    if (!funcval.is_function()) {
         IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("Object.watch(%s): second argument is not a function"));
+            std::stringstream ss; fn.dump_args(ss);
+            log_aserror(_("Object.watch(%s): second argument is not a "
+                    "function"));
         );
         return as_value(false);
     }
@@ -451,7 +451,7 @@ object_watch(const fn_call& fn)
     std::string propname = propval.to_string();
     const ObjectURI& propkey = getURI(vm, propname);
     as_function* trig = funcval.to_function();
-    as_value cust; if ( fn.nargs > 2 ) cust = fn.arg(2);
+    const as_value cust = fn.nargs > 2 ? fn.arg(2) : as_value();
 
     return as_value(obj->watch(propkey, *trig, cust));
 }
