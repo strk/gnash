@@ -184,6 +184,15 @@ o = new Object;
 o.indexOf = String.prototype.indexOf;
 p = o.indexOf("b");
 check_equals(p, 2);
+
+// UTF8 indexOf
+s = "tést";
+#if OUTPUT_VERSION > 5
+ check_equals(s.indexOf('s'), 2);
+#else
+ check_equals(s.indexOf('s'), 3);
+#endif
+
 //----------------------------------------
 // Check String.split
 // See ASNative.as for more tests.
@@ -1352,7 +1361,7 @@ _global.String = OrigString;
 
 //----- END OF TESTS
 
-var baseTests = 328;
+var baseTests = 329;
 var asmTests = 23;
 var ge6Tests = 19;
 
