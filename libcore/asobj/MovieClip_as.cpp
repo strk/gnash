@@ -783,7 +783,8 @@ movieclip_gotoAndPlay(const fn_call& fn)
     return as_value();
 }
 
-as_value movieclip_gotoAndStop(const fn_call& fn)
+as_value
+movieclip_gotoAndStop(const fn_call& fn)
 {
     MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
@@ -812,7 +813,8 @@ as_value movieclip_gotoAndStop(const fn_call& fn)
     return as_value();
 }
 
-as_value movieclip_nextFrame(const fn_call& fn)
+as_value
+movieclip_nextFrame(const fn_call& fn)
 {
     MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
@@ -1880,17 +1882,19 @@ movieclip_beginGradientFill(const fn_call& fn)
 
 // startDrag([lockCenter:Boolean], [left:Number], [top:Number],
 //    [right:Number], [bottom:Number]) : Void`
+//
+//    This can also be applied to other DisplayObjects such as TextFields.
 as_value
 movieclip_startDrag(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
+    DisplayObject* o = ensure<IsDisplayObject<> >(fn);
 
     // mark this DisplayObject is transformed.
-    movieclip->transformedByScript();
+    o->transformedByScript();
 
     const bool lock = fn.nargs ? toBool(fn.arg(0), getVM(fn)) : false;
 
-    DragState st(movieclip, lock);
+    DragState st(o, lock);
 
     if (fn.nargs > 4) {
         double x0 = toNumber(fn.arg(1), getVM(fn));
@@ -1947,8 +1951,6 @@ movieclip_startDrag(const fn_call& fn)
 as_value
 movieclip_stopDrag(const fn_call& fn)
 {
-    // Should this be a MovieClip only function? It isn't
-    // necessary.
     getRoot(fn).stop_drag();
     return as_value();
 }
@@ -2031,7 +2033,6 @@ movieclip_lineGradientStyle(const fn_call& fn)
 as_value
 movieclip_attachBitmap(const fn_call& fn)
 {
-
     MovieClip* ptr = ensure<IsDisplayObject<MovieClip> >(fn);
 
     if (fn.nargs < 2) {
