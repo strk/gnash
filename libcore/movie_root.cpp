@@ -715,7 +715,6 @@ movie_root::fire_mouse_event()
     }
 
     return need_redraw;
-
 }
 
 std::pair<boost::int32_t, boost::int32_t>
@@ -827,7 +826,6 @@ movie_root::clearIntervalTimer(boost::uint32_t x)
     it->second->clearInterval();
 
     return true;
-
 }
 
 bool
@@ -891,7 +889,6 @@ movie_root::advance()
 void
 movie_root::advanceMovie()
 {
-
     // Do mouse drag, if needed
     doMouseDrag();
 
@@ -968,14 +965,12 @@ movie_root::display()
         }
 
         movie->display(*renderer, Transform());
-
     }
 }
 
 bool
 movie_root::notify_mouse_listeners(const event_id& event)
 {
-
     LiveChars copy = _liveChars;
     for (LiveChars::iterator iter = copy.begin(), itEnd=copy.end();
             iter != itEnd; ++iter)
@@ -1018,19 +1013,16 @@ movie_root::notify_mouse_listeners(const event_id& event)
 DisplayObject*
 movie_root::getFocus()
 {
-    assert(testInvariant());
     return _currentFocus;
 }
 
 bool
 movie_root::setFocus(DisplayObject* to)
 {
-
     // Nothing to do if current focus is the same as the new focus. 
     // _level0 also seems unable to receive focus under any circumstances
     // TODO: what about _level1 etc ?
-    if (to == _currentFocus ||
-            to == static_cast<DisplayObject*>(_rootMovie)) {
+    if (to == _currentFocus || to == _rootMovie) {
         return false;
     }
 
@@ -1304,7 +1296,6 @@ movie_root::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
                         ++i) {
         i->second->add_invalidated_bounds(ranges, force);
     }
-
 }
 
 size_t
@@ -1382,11 +1373,10 @@ movie_root::flushHigherPriorityActionQueues()
         return;
     }
 
-    int lvl=minPopulatedPriorityQueue();
+    int lvl = minPopulatedPriorityQueue();
     while (lvl < _processingActionLevel) {
         lvl = processActionQueue(lvl);
     }
-
 }
 
 void
@@ -1425,11 +1415,10 @@ movie_root::processActionQueue()
 
     // Cleanup the stack.
     _vm.getStack().clear();
-
 }
 
 void
-movie_root::removeQueuedConstructor(DisplayObject* target)
+movie_root::removeQueuedConstructor(MovieClip* target)
 {
     ActionQueue::value_type& pr = _actionQueue[PRIORITY_CONSTRUCT];
     pr.erase_if(RemoveTargetCode(target));
@@ -1458,7 +1447,6 @@ movie_root::pushAction(const action_buffer& buf, DisplayObject* target)
 void
 movie_root::executeAdvanceCallbacks()
 {
-
     if (!_objectCallbacks.empty()) {
 
         // We have two considerations:
@@ -1732,7 +1720,6 @@ movie_root::markReachableResources() const
 InteractiveObject*
 movie_root::getTopmostMouseEntity(boost::int32_t x, boost::int32_t y) const
 {
-
     for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend();
             i != e; ++i)
     {
@@ -1747,7 +1734,6 @@ const DisplayObject *
 movie_root::findDropTarget(boost::int32_t x, boost::int32_t y,
         DisplayObject* dragging) const
 {
-
     for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend();
             i!=e; ++i) {
         
@@ -1824,7 +1810,6 @@ std::string
 movie_root::callExternalCallback(const std::string &name, 
                  const std::vector<as_value> &fnargs)
 {
-
     MovieClip *mc = getLevel(0);
     as_object *obj = getObject(mc);
 
@@ -1900,7 +1885,6 @@ movie_root::registerButtonKey(int code, Button* listener)
 void
 movie_root::cleanupDisplayList()
 {
-
 #define GNASH_DEBUG_INSTANCE_LIST 1
 
 #ifdef GNASH_DEBUG_INSTANCE_LIST
@@ -1994,13 +1978,11 @@ movie_root::cleanupDisplayList()
         log_debug("Global instance list grew to %d entries", maxLiveChars);
     }
 #endif
-
 }
 
 void
 movie_root::advanceLiveChars()
 {
-
 #ifdef GNASH_DEBUG
     log_debug("---- movie_root::advance: %d live DisplayObjects in "
             "the global list", _liveChars.size());
@@ -2028,8 +2010,7 @@ movie_root::set_background_color(const rgba& color)
 void
 movie_root::set_background_alpha(float alpha)
 {
-
-    boost::uint8_t newAlpha = clamp<int>(frnd(alpha * 255.0f), 0, 255);
+    const boost::uint8_t newAlpha = clamp<int>(frnd(alpha * 255.0f), 0, 255);
 
     if (m_background_color.m_a != newAlpha) {
         setInvalidated();
@@ -2076,7 +2057,6 @@ void
 movie_root::getURL(const std::string& urlstr, const std::string& target,
         const std::string& data, MovieClip::VariablesMethod method)
 {
-
     log_network("%s: HOSTFD is %d",  __FUNCTION__, _hostfd);
     
     if (_hostfd < 0) {
@@ -2156,14 +2136,12 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
 void
 movie_root::setScriptLimits(boost::uint16_t recursion, boost::uint16_t timeout)
 {
-    
     if ( recursion == _recursionLimit && _timeoutLimit == timeout ) {
         // avoid the debug log...
         return;
     }
 
-    if ( RcInitFile::getDefaultInstance().lockScriptLimits() )
-    {
+    if (RcInitFile::getDefaultInstance().lockScriptLimits()) {
         LOG_ONCE( log_debug(_("SWF ScriptLimits tag attempting to set "
             "recursionLimit=%1% and scriptsTimeout=%2% ignored "
             "as per rcfile directive"), recursion, timeout) );
@@ -2186,7 +2164,6 @@ movie_root::setScriptLimits(boost::uint16_t recursion, boost::uint16_t timeout)
 void
 movie_root::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 {
-
     // Stage
     const movie_definition* def = _rootMovie->definition();
     assert(def);
@@ -2230,7 +2207,6 @@ movie_root::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 void
 movie_root::getCharacterTree(InfoTree& tr, InfoTree::iterator it)
 {
-
     InfoTree::iterator localIter;
 
     /// Stage: number of live MovieClips.
@@ -2244,7 +2220,6 @@ movie_root::getCharacterTree(InfoTree& tr, InfoTree::iterator it)
             i != e; ++i) {
         i->second->getMovieInfo(tr, localIter);
     }
-
 }
 
 #endif
@@ -2273,7 +2248,6 @@ isLevelTarget(int version, const std::string& name, unsigned int& levelno)
     // getting 0 here for "_level" is intentional
     levelno = std::strtoul(name.c_str() + 6, NULL, 0); 
     return true;
-
 }
 
 short
@@ -2312,7 +2286,6 @@ movie_root::LoadCallback::setReachable() const
 bool
 movie_root::LoadCallback::processLoad()
 {
-
     if (!_stream) {
         callMethod(_obj, NSV::PROP_ON_DATA, as_value());
         return true;
@@ -2391,8 +2364,8 @@ void
 movie_root::callInterface(const HostInterface::Message& e) const
 {
     if (!_interfaceHandler) {
-        log_error("Hosting application registered no callback for events/queries"
-            ", can't call %s(%s)");
+        log_error("Hosting application registered no callback for "
+                "events/queries, can't call %s(%s)");
         return;
     }
     _interfaceHandler->call(e);

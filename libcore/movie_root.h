@@ -808,7 +808,7 @@ public:
     /// then removed in skipped frames. Callers are responsible for determining
     /// whether it should be removed, for instance by checking for an 
     /// onUnload handler.
-    void removeQueuedConstructor(DisplayObject* target);
+    void removeQueuedConstructor(MovieClip* target);
 
     GC& gc() {
         return _gc;
