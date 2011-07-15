@@ -47,7 +47,7 @@
 #include "as_object.h"
 #include "DragState.h"
 #include "VM.h" // for getting the root
-#include "movie_root.h" // for set_DragState (ActionStartDragMovie)
+#include "movie_root.h" 
 #include "sound_handler.h"
 #include "namedStrings.h"
 #include "utf8.h"
@@ -464,7 +464,10 @@ ActionNextFrame(ActionExec& thread)
     DisplayObject* tgtch = env.target();
     MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
     if (tgt) tgt->goto_frame(tgt->get_current_frame() + 1);
-    else log_debug(_("ActionNextFrame: as_environment target is null or not a sprite"));
+    else {
+        log_debug(_("ActionNextFrame: as_environment target is null "
+                    "or not a sprite"));
+    }
 }
 
 void
