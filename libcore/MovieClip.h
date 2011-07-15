@@ -507,7 +507,7 @@ public:
     //
     /// This handles key, mouse, and specific MovieClip events.
     /// TODO: split this sensibly.
-    virtual void notifyEvent(const event_id& id);
+    void notifyEvent(const event_id& id);
 
     // inherited from DisplayObject class, see dox in DisplayObject.h
     virtual as_environment& get_environment() {
