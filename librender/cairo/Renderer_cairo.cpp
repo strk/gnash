@@ -551,6 +551,7 @@ Renderer_cairo::drawVideoFrame(image::GnashImage* baseframe, const Transform& xf
             }
         case QUALITY_MEDIUM:
         case QUALITY_LOW:
+        default:
             filter = CAIRO_FILTER_FAST;
     }
     cairo_pattern_set_filter(pattern, filter);
