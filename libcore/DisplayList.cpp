@@ -935,16 +935,19 @@ namespace {
 DisplayList::iterator
 beginNonRemoved(DisplayList::container_type& c)
 {
-    const int depth = DisplayObject::removedDepthOffset -
+    // Depths from -32678 to -16384 are removed
+    const int depth = 1 + DisplayObject::removedDepthOffset -
         DisplayObject::staticDepthOffset;
     
-    return std::find_if(c.begin(), c.end(), boost::bind(std::not2(DepthLessThan()), _1, depth));
+    return std::find_if(c.begin(), c.end(),
+            boost::bind(std::not2(DepthLessThan()), _1, depth));
 }
 
 DisplayList::const_iterator
 beginNonRemoved(const DisplayList::container_type& c)
 {
-    const int depth = DisplayObject::removedDepthOffset -
+    // Depths from -32678 to -16384 are removed
+    const int depth = 1 + DisplayObject::removedDepthOffset -
         DisplayObject::staticDepthOffset;
 
     return std::find_if(c.begin(), c.end(), 
