@@ -315,8 +315,11 @@ test11 = function()
 {
 	note("11. Click on the SECOND GREEN circle.");
 
-    // This should stop any dragging.
-    _root.stopDrag();
+    // Deliberately set target to null and then 
+    // call stopDrag (old version) to make sure it still works.
+    asm { push null settargetexpr };
+    stopDrag();
+
     check_equals(_root.tf._x, 0);
     check_equals(_root.tf._y, 100);
 
