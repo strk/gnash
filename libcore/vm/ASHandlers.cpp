@@ -2486,9 +2486,11 @@ ActionNewAdd(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
-    newAdd(env.top(1), env.top(0), getVM(env));
+    const as_value& op2 = env.pop();
+    as_value op1 = env.pop();
+    newAdd(op1, op2, getVM(env));
 
-    env.drop(1);
+    env.push(op1);
 }
 
 void
