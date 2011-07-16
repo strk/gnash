@@ -28,6 +28,7 @@ TRACE_TESTS = \
 	this.xml \
 	arguments.xml \
 	root_onload.xml \
+	shortstack.xml \
 	$(NULL)	
 
 TRACE_TRACES = $(TRACE_TESTS:.xml=.trace)

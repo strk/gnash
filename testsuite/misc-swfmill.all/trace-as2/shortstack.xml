@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<swf version="6" compressed="0">
+
+<!--
+
+ Test behavior of various opcodes in presence of a short stack
+
+-->
+
+  <Header framerate="12" frames="1">
+    <size>
+      <Rectangle left="0" right="12800" top="0" bottom="9600"/>
+    </size>
+    <tags>
+
+      <DoAction><actions>
+
+
+          <!--
+            |    AddTyped
+            |    https://savannah.gnu.org/bugs/?33754
+           -->
+
+          <AddTyped/> <Trace/>
+
+          <PushData>
+            <items>
+              <StackString value="A"/>
+            </items>
+          </PushData>
+          <AddTyped/> <Trace/>
+
+          <EndAction/>
+
+      </actions> </DoAction>
+
+      <ShowFrame/>
+      <End/>
+    </tags>
+  </Header>
+</swf>
+
