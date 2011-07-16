@@ -821,19 +821,47 @@ check(!null);
 check(!undefined); 
 
 //------------------------------------------------------
+// Less logical not operator (ACTION_NEWADD : 0x47)
+//-----------------------------------------------------
+
+asm {
+	push 'v', undefined, undefined 
+	newadd
+	setvariable
+};
+check_equals(typeof(v), 'number');
+#if OUTPUT_VERSION < 7
+ check_equals(v, '0');
+#else
+ check(isNaN(v));
+#endif
+
+asm {
+	push 'v', 'a', undefined
+	newadd
+	setvariable
+};
+check_equals(typeof(v), 'string');
+#if OUTPUT_VERSION < 7
+ check_equals(v, 'a');
+#else
+ check_equals(v, 'aundefined');
+#endif
+
+//------------------------------------------------------
 // END OF TEST
 //-----------------------------------------------------
 
 #if OUTPUT_VERSION < 7
 # ifndef MING_LOGICAL_ANDOR_BROKEN
- totals(250);
+ totals(254);
 # else
- totals(227);
+ totals(231);
 # endif
 #else
 # ifndef MING_LOGICAL_ANDOR_BROKEN
- totals(252);
+ totals(256);
 # else
- totals(229);
+ totals(233);
 # endif
 #endif
