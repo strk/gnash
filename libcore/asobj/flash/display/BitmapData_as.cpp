@@ -28,6 +28,7 @@
 #include <boost/iterator/zip_iterator.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/array.hpp>
+#include <cmath>
 
 #include "MovieClip.h"
 #include "GnashImage.h"
@@ -123,6 +124,11 @@ namespace {
 template<typename RNG = boost::rand48>
 struct Noise
 {
+    /// Create a PRNG to supply uniformly distributed numbers.
+    //
+    /// @param seed     A seed for the pseudo random numbers.
+    /// @param low      The lowest value in the uniform range.
+    /// @param high     The highest value in the uniform range.
     Noise(int seed, int low, int high)
         :
         rng(seed),
@@ -130,10 +136,14 @@ struct Noise
         uni(rng, dist)
     {}
 
+    /// Get a random int between in the range specified at construction.
     int operator()() {
         return uni();
     }
 
+    /// Get a random int between low and val.
+    //
+    /// This is for use by std::random_shuffle().
     int operator()(int val) {
         return uni(val);
     }
@@ -154,6 +164,7 @@ struct NoiseAdapter
         _greyscale(grey)
     {}
 
+    /// Generate a 32-bit ARGB noise value.
     boost::uint32_t operator()() {
 
         if (_greyscale) {
@@ -234,9 +245,19 @@ void normalize(T& a, T& b)
     b /= s;
 }
 
+/// Generate Perlin noise
+//
+/// @tparam T       A floating point type for the generated values.
+/// @tparam B       The size of the permutation table.
+/// @tparam Offset  An offset for generating non-identical patterns with the
+///                 same Perlin noise generator.
 template<typename T, boost::uint32_t B = 0x100, boost::uint32_t Offset = 1327>
 struct PerlinNoise
 {
+    /// Create a Perlin noise generator with a random seed.
+    //
+    /// @param seed     A seed for the PRNG. Given the same seed the
+    ///                 generator will create the same pseudo-random pattern.
     PerlinNoise(int seed)
         :
         noise(seed, 0, RAND_MAX)
@@ -244,6 +265,7 @@ struct PerlinNoise
         init();
     }
 
+    /// Get a noise value for the co-ordinates x and y.
     T operator()(T x, T y, const size_t step = 0) {
 
         // Point to the right
@@ -300,7 +322,7 @@ struct PerlinNoise
 
 private:
 
-    void setup(T i, size_t& b0, size_t& b1, T& r0, T& r1, size_t step) {
+    static void setup(T i, size_t& b0, size_t& b1, T& r0, T& r1, size_t step) {
 
         const T t = i + Offset * step;
 
