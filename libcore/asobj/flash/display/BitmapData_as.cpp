@@ -234,18 +234,17 @@ void normalize(T& a, T& b)
     b /= s;
 }
 
-template<typename T, boost::uint32_t B = 0x100>
+template<typename T, boost::uint32_t B = 0x100, boost::uint32_t Offset = 1327>
 struct PerlinNoise
 {
     PerlinNoise(int seed)
         :
-        N(0x1000),
         noise(seed, 0, RAND_MAX)
     {
         init();
     }
 
-    T operator()(T x, T y) {
+    T operator()(T x, T y, const size_t step = 0) {
 
         // Point to the right
         size_t bx0;
@@ -261,8 +260,8 @@ struct PerlinNoise
 
         // Compute integer positions of surrounding points and
         // vectors.
-        setup(x, bx0, bx1, rx0, rx1);
-        setup(y, by0, by1, ry0, ry1);
+        setup(x, bx0, bx1, rx0, rx1, step);
+        setup(y, by0, by1, ry0, ry1, step);
 
         assert(bx0 < permTable.size());
         assert(bx1 < permTable.size());
@@ -301,8 +300,9 @@ struct PerlinNoise
 
 private:
 
-    void setup(T i, size_t& b0, size_t& b1, T& r0, T& r1) {
-        const T t = i + N;
+    void setup(T i, size_t& b0, size_t& b1, T& r0, T& r1, size_t step) {
+
+        const T t = i + Offset * step;
 
         // Let the compiler optimize this if B is a power of two.
         b0 = (static_cast<size_t>(t)) % B;
@@ -345,8 +345,6 @@ private:
                 boost::make_zip_iterator(
                     boost::make_tuple(permTable.begin(), g2.begin())) + 2 * B);
     }
-
-    const size_t N;
 
     // A random permutation table.
     boost::array<size_t, B * 2 + 2> permTable;
@@ -1272,34 +1270,61 @@ bitmapdata_perlinNoise(const fn_call& fn)
     const double baseX = toNumber(fn.arg(0), getVM(fn));
     const double baseY = toNumber(fn.arg(1), getVM(fn));
     const int octave = std::max(0, toInt(fn.arg(2), getVM(fn)));
+
+    /// Random seed.
     const int seed = toInt(fn.arg(3), getVM(fn));
 
-    // 256 square. base 20 = 256 in 20; base 100 = 256 in 100.
-    const double square = 256.0;
-
-#if 0
-    const boost::uint8_t chans = fn.nargs > 3 ?
-        std::abs(toInt(fn.arg(3), getVM(fn))) & 15 : 1 | 2 | 4;
-
-    const bool greyscale = fn.nargs > 4 ?
+    // Whether to make a tileable pattern.
+    const bool stitch = fn.nargs > 4 ?
         toBool(fn.arg(4), getVM(fn)) : false;
-#endif 
 
-    PerlinNoise<double, 0xff> p(seed);
+    // If true makes a fractal noise, otherwise turbulence.
+    const bool fractalNoise = fn.nargs > 5 ?
+        toBool(fn.arg(5), getVM(fn)) : false;
 
-    for (size_t i = 0; i < ptr->height(); ++i) {
-        for (size_t j = 0; j < ptr->width(); ++j) {
+    // Which channels to use.
+    const int channels = fn.nargs > 6 ?
+        toInt(fn.arg(6), getVM(fn)) : true;
 
-            // Each octave is twice as frequent as the last;
-            // Amplitude seems relatively similar
-            for (int oct = 0; oct < octave; ++oct) {
-                const double freqX = baseX / std::pow(2, oct);
-                const double freqY = baseY / std::pow(2, oct);
-                val = std::abs(p((i / square) * freqX, (j / square) * freqY) * amp);
-            }
-            val = clamp(val, 1, 255);
-            ptr->setPixel(j, i, val | val << 8 | val << 16);
+    // All channels the same
+    const bool greyscale = fn.nargs > 7 ?
+        toBool(fn.arg(7), getVM(fn)) : false;
+
+    LOG_ONCE(log_unimpl("BitmapData.perlinNoise fractalNoise, channels, and "
+        "stitch"));
+
+    const size_t size = 128;
+
+    PerlinNoise<double, size> p(seed);
+    const double xres = size / baseX;
+    const double yres = size / baseY;
+
+    size_t pixel = 0;
+    const size_t width = ptr->width();
+
+    for (BitmapData_as::iterator it = ptr->begin(), e = ptr->end(); it != e;
+            ++it, ++pixel) {
+
+        const size_t x = pixel % width;
+        const size_t y = pixel / width;
+
+        // Create one noise channel.
+        const double r = p((x * xres) / size, (y * yres) / size);
+        const boost::uint8_t rv = std::abs(r * 0xff);
+
+        // For greyscale apply it to all channels equally.
+        if (greyscale) {
+            *it = (rv | rv << 8 | rv << 16);
+            continue;
         }
+
+        // Otherwise create data for the other channels too by using the
+        // PerlinNoise object's offset.
+        const double g = p((x * xres) / size, (y * yres) / size, 1);
+        const double b = p((x * xres) / size, (y * yres) / size, 2);
+        const boost::uint8_t gv = std::abs(g * 0xff);
+        const boost::uint8_t bv = std::abs(b * 0xff);
+        *it = (bv | gv << 8 | rv << 16);
     }
     
     ptr->updateObjects();
