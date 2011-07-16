@@ -251,9 +251,12 @@ void normalize(T& a, T& b)
 /// @tparam B       The size of the permutation table.
 /// @tparam Offset  An offset for generating non-identical patterns with the
 ///                 same Perlin noise generator.
-template<typename T, boost::uint32_t B = 0x100, boost::uint32_t Offset = 1327>
+template<typename T, boost::uint32_t Size = 0x100,
+    boost::uint32_t Offset = 1327>
 struct PerlinNoise
 {
+    typedef T value_type;
+
     /// Create a Perlin noise generator with a random seed.
     //
     /// @param seed     A seed for the PRNG. Given the same seed the
@@ -263,6 +266,10 @@ struct PerlinNoise
         noise(seed, 0, RAND_MAX)
     {
         init();
+    }
+
+    boost::uint32_t size() const {
+        return Size;
     }
 
     /// Get a noise value for the co-ordinates x and y.
@@ -326,9 +333,9 @@ private:
 
         const T t = i + Offset * step;
 
-        // Let the compiler optimize this if B is a power of two.
-        b0 = (static_cast<size_t>(t)) % B;
-        b1 = (b0 + 1) % B;
+        // Let the compiler optimize this if Size is a power of two.
+        b0 = (static_cast<size_t>(t)) % Size;
+        b1 = (b0 + 1) % Size;
         
         // Calculate vectors to surrounding points.
         r0 = t - static_cast<size_t>(t);
@@ -337,46 +344,94 @@ private:
 
     void init() {
 
-        for (size_t i = 0 ; i < B; ++i) {
+        for (size_t i = 0 ; i < Size; ++i) {
             permTable[i] = i;
             for (size_t j = 0; j < 2; ++j) {
-                // If B is an unsigned int, noise() * 2 * B - B is unsigned
-                // (if it's an unsigned short, the result is signed!) so
-                // cast here in case of any future changes.
-                const int b = B;
+                // If Size is an unsigned int this expression:
+                // noise() * 2 * Size - Size 
+                // is unsigned (but if it's an unsigned short, the result is
+                // signed!) so convert here in case of any future changes.
+                const int b = Size;
                 g2[i][j] = static_cast<T>(noise() % (2 * b) - b) / b;
             }
             normalize(g2[i][0], g2[i][1]);
         }
 
-        std::random_shuffle(permTable.begin(), permTable.begin() + B, noise);
+        std::random_shuffle(permTable.begin(), permTable.begin() + Size, noise);
 
         std::copy(
-                boost::make_zip_iterator(
-                    boost::make_tuple(permTable.begin(), g2.begin())),
-                boost::make_zip_iterator(
-                    boost::make_tuple(permTable.begin(), g2.begin())) + B,
-                boost::make_zip_iterator(
-                    boost::make_tuple(permTable.begin(), g2.begin())) + B);
+            boost::make_zip_iterator(
+                boost::make_tuple(permTable.begin(), g2.begin())),
+            boost::make_zip_iterator(
+                boost::make_tuple(permTable.begin(), g2.begin())) + Size,
+            boost::make_zip_iterator(
+                boost::make_tuple(permTable.begin(), g2.begin())) + Size);
 
         std::copy(
-                boost::make_zip_iterator(
-                    boost::make_tuple(permTable.begin(), g2.begin())),
-                boost::make_zip_iterator(
-                    boost::make_tuple(permTable.begin(), g2.begin())) + 2,
-                boost::make_zip_iterator(
-                    boost::make_tuple(permTable.begin(), g2.begin())) + 2 * B);
+            boost::make_zip_iterator(
+                boost::make_tuple(permTable.begin(), g2.begin())),
+            boost::make_zip_iterator(
+                boost::make_tuple(permTable.begin(), g2.begin())) + 2,
+            boost::make_zip_iterator(
+                boost::make_tuple(permTable.begin(), g2.begin())) + 2 * Size);
     }
 
     // A random permutation table.
-    boost::array<size_t, B * 2 + 2> permTable;
+    boost::array<size_t, Size * 2 + 2> permTable;
 
     // The gradient stuff.
-    boost::array<boost::array<T, 2>, B * 2 + 2> g2;
+    boost::array<boost::array<T, 2>, Size * 2 + 2> g2;
 
     Noise<> noise;
 };
 
+/// Adapt the PerlinNoise generator for ActionScript's needs.
+template<typename Generator>
+struct PerlinAdapter
+{
+    PerlinAdapter(Generator& g, size_t octaves, double baseX, double baseY,
+            bool fractal)
+        :
+        _gen(g),
+        _octaves(octaves),
+        _baseX(baseX),
+        _baseY(baseY),
+        _fractal(fractal)
+    {}
+
+    typename Generator::value_type operator()(size_t x, size_t y,
+            size_t step = 0) {
+        
+        const size_t size = _gen.size();
+        // Starting amplitude
+        size_t amp = 0xff;
+        // Base x frequency.
+        double xfreq = size / _baseX;
+        // Base y frequency.
+        double yfreq = size / _baseY;
+        // Return value.
+        double ret = 0;
+
+        for (size_t i = 0; i < _octaves; ++i) {
+            ret += _gen((x * xfreq) / size, (y * yfreq) / size, step) * amp;
+            // Halve amplitude
+            amp >>= 1;
+            if (!amp) return ret;
+
+            // Double frequency
+            xfreq *= 2;
+            yfreq *= 2;
+        }
+        return ret;
+    }
+
+private:
+    Generator& _gen;
+    const size_t _octaves;
+    const double _baseX;
+    const double _baseY;
+    const bool _fractal;
+};
 
 /// Index iterators by x and y position
 //
@@ -1279,6 +1334,7 @@ bitmapdata_paletteMap(const fn_call& fn)
 	return as_value();
 }
 
+
 as_value
 bitmapdata_perlinNoise(const fn_call& fn)
 {
@@ -1335,18 +1391,12 @@ bitmapdata_perlinNoise(const fn_call& fn)
         return as_value();
     }
 
-    // The size of the gradient table.
-    const size_t size = 256;
-
-    PerlinNoise<double, size> p(seed);
-    const double xres = size / baseX;
-    const double yres = size / baseY;
+    typedef PerlinNoise<double, 256> Generator;
+    Generator gen(seed);
+    PerlinAdapter<Generator> pa(gen, octave, baseX, baseY, fractalNoise);
 
     size_t pixel = 0;
     const size_t width = ptr->width();
-
-    // Amplitude.
-    const boost::uint8_t amp = 0xff;
 
     for (BitmapData_as::iterator it = ptr->begin(), e = ptr->end(); it != e;
             ++it, ++pixel) {
@@ -1355,8 +1405,8 @@ bitmapdata_perlinNoise(const fn_call& fn)
         const size_t y = pixel / width;
 
         // Create one noise channel.
-        const double r = p((x * xres) / size, (y * yres) / size);
-        const boost::uint8_t rv = std::abs(r * amp);
+        const double r = pa(x, y);
+        const boost::uint8_t rv = std::abs(r);
 
         // For greyscale apply it to all channels equally.
         if (greyscale) {
@@ -1366,10 +1416,10 @@ bitmapdata_perlinNoise(const fn_call& fn)
 
         // Otherwise create data for the other channels too by using the
         // PerlinNoise object's offset.
-        const double g = p((x * xres) / size, (y * yres) / size, 1);
-        const double b = p((x * xres) / size, (y * yres) / size, 2);
-        const boost::uint8_t gv = std::abs(g * amp);
-        const boost::uint8_t bv = std::abs(b * amp);
+        const double g = pa(x, y, 1);
+        const double b = pa(x, y, 2);
+        const boost::uint8_t gv = std::abs(g);
+        const boost::uint8_t bv = std::abs(b);
         *it = (bv | gv << 8 | rv << 16);
     }
     
