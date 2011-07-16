@@ -404,7 +404,7 @@ struct PerlinAdapter
         
         const size_t size = _gen.size();
         // Starting amplitude
-        size_t amp = 0xff;
+        size_t amp = _fractal ? 0x80 : 0xff;
         // Base x frequency.
         double xfreq = size / _baseX;
         // Base y frequency.
@@ -416,13 +416,13 @@ struct PerlinAdapter
             ret += _gen((x * xfreq) / size, (y * yfreq) / size, step) * amp;
             // Halve amplitude
             amp >>= 1;
-            if (!amp) return ret;
+            if (!amp) break;
 
             // Double frequency
             xfreq *= 2;
             yfreq *= 2;
         }
-        return ret;
+        return _fractal ? ret + 0x80 :  std::abs(ret);
     }
 
 private:
@@ -1368,26 +1368,17 @@ bitmapdata_perlinNoise(const fn_call& fn)
     const bool greyscale = fn.nargs > 7 ?
         toBool(fn.arg(7), getVM(fn)) : false;
 
-    if (octave > 1) {
-        LOG_ONCE(log_unimpl("BitmapData.perlinNoise() octaves value"));
-    }
-
     if (stitch) {
         LOG_ONCE(log_unimpl("BitmapData.perlinNoise() stitch value"));
-    }
-
-    if (fractalNoise) {
-        LOG_ONCE(log_unimpl("BitmapData.perlinNoise() fractalNoise value"));
     }
 
     if (channels) {
         LOG_ONCE(log_unimpl("BitmapData.perlinNoise() channels value"));
     }
 
-    // Clear the image.
-    std::fill(ptr->begin(), ptr->end(), 0xff000000);
-
     if (!octave) {
+        // Clear the image and return.
+        std::fill(ptr->begin(), ptr->end(), 0xff000000);
         return as_value();
     }
 
@@ -1406,7 +1397,7 @@ bitmapdata_perlinNoise(const fn_call& fn)
 
         // Create one noise channel.
         const double r = pa(x, y);
-        const boost::uint8_t rv = std::abs(r);
+        const boost::uint8_t rv = clamp(r, 0.0, 255.0);
 
         // For greyscale apply it to all channels equally.
         if (greyscale) {
@@ -1415,11 +1406,12 @@ bitmapdata_perlinNoise(const fn_call& fn)
         }
 
         // Otherwise create data for the other channels too by using the
-        // PerlinNoise object's offset.
+        // PerlinNoise object's pattern offset (this is cheaper than using a
+        // separate generator).
         const double g = pa(x, y, 1);
         const double b = pa(x, y, 2);
-        const boost::uint8_t gv = std::abs(g);
-        const boost::uint8_t bv = std::abs(b);
+        const boost::uint8_t gv = clamp(g, 0.0, 255.0);
+        const boost::uint8_t bv = clamp(b, 0.0, 255.0);
         *it = (bv | gv << 8 | rv << 16);
     }
     
