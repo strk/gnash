@@ -399,6 +399,10 @@ struct PerlinAdapter
         _fractal(fractal)
     {}
 
+    ///
+    //
+    /// Fractal noise adds f(i * freq) * amp to the mid value.
+    /// Normal noise adds |f(i * freq) * amp| to 0.
     typename Generator::value_type operator()(size_t x, size_t y,
             size_t step = 0) {
         
@@ -410,10 +414,13 @@ struct PerlinAdapter
         // Base y frequency.
         double yfreq = size / _baseY;
         // Return value.
-        double ret = 0;
+        double ret = _fractal ? 0x80 : 0;
 
         for (size_t i = 0; i < _octaves; ++i) {
-            ret += _gen((x * xfreq) / size, (y * yfreq) / size, step) * amp;
+
+            const double n = _gen((x * xfreq) / size, (y * yfreq) / size, step);
+            ret += amp * (_fractal ? n : std::abs(n));
+
             // Halve amplitude
             amp >>= 1;
             if (!amp) break;
@@ -422,7 +429,7 @@ struct PerlinAdapter
             xfreq *= 2;
             yfreq *= 2;
         }
-        return _fractal ? ret + 0x80 :  std::abs(ret);
+        return ret;
     }
 
 private:
