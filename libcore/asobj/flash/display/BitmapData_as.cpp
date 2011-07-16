@@ -1312,7 +1312,13 @@ bitmapdata_perlinNoise(const fn_call& fn)
     const bool greyscale = fn.nargs > 7 ?
         toBool(fn.arg(7), getVM(fn)) : false;
 
-    if (octave) {
+    if (!octave) {
+        // Fill it black and return.
+        std::fill(ptr->begin(), ptr->end(), 0xff000000);
+        return as_value();
+    }
+
+    if (octave > 1) {
         LOG_ONCE(log_unimpl("BitmapData.perlinNoise() octaves value"));
     }
 
@@ -1328,7 +1334,8 @@ bitmapdata_perlinNoise(const fn_call& fn)
         LOG_ONCE(log_unimpl("BitmapData.perlinNoise() channels value"));
     }
 
-    const size_t size = 128;
+    // The size of the gradient table.
+    const size_t size = 256;
 
     PerlinNoise<double, size> p(seed);
     const double xres = size / baseX;

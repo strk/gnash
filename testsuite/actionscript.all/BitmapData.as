@@ -942,6 +942,33 @@ ns.noise(203, 60, 50, 0, true);
 ns.noise(203, -10, 0, 0, true);
  check(testGreys(ns, 0, 0));
 
+/////////////////
+// Perlin noise
+/////////////////
+
+// No octaves, all black.
+ns.perlinNoise(100, 100, 0, 1, false, false);
+ check(testColorRange(ns, 0xff, 0, 0));
+ check(testColorRange(ns, 0xff00, 0, 0));
+ check(testColorRange(ns, 0xff0000, 0, 0));
+
+// Same if it's greyscale and has no octaves.
+ns.perlinNoise(100, 100, 0, 1, false, false, 0, true);
+ check(testColorRange(ns, 0xff, 0, 0));
+ check(testColorRange(ns, 0xff00, 0, 0));
+ check(testColorRange(ns, 0xff0000, 0, 0));
+
+// A greyscale perlin noise should have its pixels all grey!
+ns.perlinNoise(100, 100, 1, 1, false, false, 0, true);
+ check(testGreys(ns, 0, 0xff));
+
+// Transparent ones.
+nst = new flash.display.BitmapData(15, 15, true);
+nst.perlinNoise(100, 100, 0, 1, false, false, 0, true);
+ check(testColorRange(nst, 0xff, 0, 0));
+ check(testColorRange(nst, 0xff00, 0, 0));
+ check(testColorRange(nst, 0xff0000, 0, 0));
+
 // clone();
 
 orig = new flash.display.BitmapData(10, 10, false, 0x00ff10);
@@ -1015,6 +1042,6 @@ flash.display.BitmapData.prototype = e;
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(364);
+totals(374);
 
 #endif // OUTPUT_VERSION >= 8
