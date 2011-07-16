@@ -1290,8 +1290,21 @@ bitmapdata_perlinNoise(const fn_call& fn)
     const bool greyscale = fn.nargs > 7 ?
         toBool(fn.arg(7), getVM(fn)) : false;
 
-    LOG_ONCE(log_unimpl("BitmapData.perlinNoise fractalNoise, channels, and "
-        "stitch"));
+    if (octave) {
+        LOG_ONCE(log_unimpl("BitmapData.perlinNoise() octaves value"));
+    }
+
+    if (stitch) {
+        LOG_ONCE(log_unimpl("BitmapData.perlinNoise() stitch value"));
+    }
+
+    if (fractalNoise) {
+        LOG_ONCE(log_unimpl("BitmapData.perlinNoise() fractalNoise value"));
+    }
+
+    if (channels) {
+        LOG_ONCE(log_unimpl("BitmapData.perlinNoise() channels value"));
+    }
 
     const size_t size = 128;
 
