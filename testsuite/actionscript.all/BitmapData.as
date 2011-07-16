@@ -858,6 +858,30 @@ testNoColor = function(bd, mask) {
    return true;
 };
 
+// Get an object representing the range of colour values
+// in the bitmap.
+getColorRange = function(bd, mask) {
+
+    var width = bd.width;
+    var height = bd.height;
+
+    var o = { min:0xff, max:0 };
+
+    var shift = 0;
+    if (mask == 0xff00) shift = 8;
+    if (mask == 0xff0000) shift = 16;
+    if (mask == 0xff000000) shift = 24;
+
+    for (var i = 0; i < height; ++i) {
+        for (var j = 0; j < width; ++j) {
+            var pix = (bd.getPixel32(i, j) & mask) >> shift;
+            if (pix < o.min) o.min = pix;
+            if (pix > o.max) o.max = pix;
+        };
+    };
+    return o;
+};
+
 // Tests that a particular color is within a specified range
 testColorRange = function(bd, mask, low, high) {
     var width = bd.width;
@@ -962,7 +986,40 @@ ns.perlinNoise(100, 100, 0, 1, false, false, 0, true);
 ns.perlinNoise(100, 100, 1, 1, false, false, 0, true);
  check(testGreys(ns, 0, 0xff));
 
-// Transparent ones.
+ns = new flash.display.BitmapData(40, 40, false);
+// Colourful image.
+// Check which pixel values are represented for each channels.
+
+// Note: for the pp the maximum value is only 50 here, but Gnash gets 81.
+// Limiting it to 50 makes it look much too dark.
+
+ns.perlinNoise(4, 4, 1, 1, false, false);
+
+ // The maximum values depend on seed and above all the base values. The
+ // smaller the base, the likelier we are to get high values. We always have
+ // low ones. We won't set the bar very high here.
+
+ var range = getColorRange(ns, 0xff);
+ check(range.min < 10 && range.max > 40);
+ trace(range.min + " " +  range.max);
+ range = getColorRange(ns, 0xff00);
+ check(range.min < 10 && range.max > 40);
+ range = getColorRange(ns, 0xff0000);
+ check(range.min < 10 && range.max > 40);
+
+ns.perlinNoise(20, 20, 1, 200, false, false);
+ // We can't necessarily expect the full range, but
+ // it should be relatively wide.
+ range = getColorRange(ns, 0xff);
+ check(range.min < 10 && range.max > 40);
+ range = getColorRange(ns, 0xff00);
+ check(range.min < 10 && range.max > 40);
+ range = getColorRange(ns, 0xff0000);
+ check(range.min < 10 && range.max > 40);
+
+// Transparent BitmapData
+
+// Here with no octaves again.
 nst = new flash.display.BitmapData(15, 15, true);
 nst.perlinNoise(100, 100, 0, 1, false, false, 0, true);
  check(testColorRange(nst, 0xff, 0, 0));
@@ -1042,6 +1099,6 @@ flash.display.BitmapData.prototype = e;
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(374);
+totals(380);
 
 #endif // OUTPUT_VERSION >= 8

@@ -1345,6 +1345,9 @@ bitmapdata_perlinNoise(const fn_call& fn)
     size_t pixel = 0;
     const size_t width = ptr->width();
 
+    // Amplitude.
+    const boost::uint8_t amp = 0xff;
+
     for (BitmapData_as::iterator it = ptr->begin(), e = ptr->end(); it != e;
             ++it, ++pixel) {
 
@@ -1353,7 +1356,7 @@ bitmapdata_perlinNoise(const fn_call& fn)
 
         // Create one noise channel.
         const double r = p((x * xres) / size, (y * yres) / size);
-        const boost::uint8_t rv = std::abs(r * 0xff);
+        const boost::uint8_t rv = std::abs(r * amp);
 
         // For greyscale apply it to all channels equally.
         if (greyscale) {
@@ -1365,8 +1368,8 @@ bitmapdata_perlinNoise(const fn_call& fn)
         // PerlinNoise object's offset.
         const double g = p((x * xres) / size, (y * yres) / size, 1);
         const double b = p((x * xres) / size, (y * yres) / size, 2);
-        const boost::uint8_t gv = std::abs(g * 0xff);
-        const boost::uint8_t bv = std::abs(b * 0xff);
+        const boost::uint8_t gv = std::abs(g * amp);
+        const boost::uint8_t bv = std::abs(b * amp);
         *it = (bv | gv << 8 | rv << 16);
     }
     
