@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
     Ming_init();
     mo = newSWFMovieWithVersion(OUTPUT_VERSION);
     SWFMovie_setDimension(mo, 800, 600);
-    SWFMovie_setRate (mo, 12.0);
+    SWFMovie_setRate (mo, 1.0);
 
     add_actions(mo,
             "if (!_global.hasOwnProperty('arr')) { _global.arr = []; };"
@@ -79,12 +79,12 @@ int main(int argc, char* argv[])
     //  MovieClip 2 
     mc2 = newSWFMovieClip(); // 1 frames 
 
-    // Add mc2
+    // Add mc2 to mc3 (first frame)
     it = SWFMovieClip_add(mc3, (SWFBlock)mc2);
     SWFDisplayItem_setDepth(it, 1);
     SWFDisplayItem_setName(it, "Segments");
 
-    // Frame 2
+    // Frame 2 of mc3
     SWFMovieClip_nextFrame(mc3);
 
     // Remove mc2
@@ -156,6 +156,7 @@ int main(int argc, char* argv[])
         "        gotoAndPlay(2);"
         "   }"
         "   else {"
+        "      mc.stop();"
         "      delete this.onEnterFrame;"
         "      gotoAndPlay(4);"
         "   };"
