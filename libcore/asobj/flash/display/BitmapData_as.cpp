@@ -1369,7 +1369,7 @@ bitmapdata_perlinNoise(const fn_call& fn)
 
     // Which channels to use.
     const boost::uint8_t channels = fn.nargs > 6 ?
-        clamp<int>(toInt(fn.arg(6), getVM(fn)), 0, 255) : 1 | 2 | 4 | 8;
+        clamp<int>(toInt(fn.arg(6), getVM(fn)), 0, 255) : 1 | 2 | 4;
 
     // All channels the same
     const bool greyscale = fn.nargs > 7 ?
@@ -1406,8 +1406,9 @@ bitmapdata_perlinNoise(const fn_call& fn)
             const double r = pa(x, y);
             rv = clamp(r, 0.0, 255.0);
             if (greyscale) {
-                // For greyscale apply it to all channels equally.
-                *it = (rv | rv << 8 | rv << 16);
+                // For greyscale apply it to all colour channels equally; alpha
+                // is always full.
+                *it = (rv | rv << 8 | rv << 16 | 0xff << 24);
                 continue;
             }
         }
