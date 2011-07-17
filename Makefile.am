@@ -83,6 +83,7 @@ EXTRA_DIST =  \
 	README.git \
 	autogen.sh \
 	config.rpath \
+	base-attempter.sh \
 	macros/incllist macros/libslist \
 	ChangeLog-0.8.0 \
 	ChangeLog-0.8.1 \
