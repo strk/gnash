@@ -663,7 +663,7 @@ bitmapdata_class_init(as_object& where, const ObjectURI& uri)
 {
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
-	where.init_destructive_property(uri,
+    where.init_destructive_property(uri,
             get_flash_display_bitmap_data_constructor, flags);
 }
 
@@ -710,17 +710,17 @@ namespace {
 as_value
 bitmapdata_applyFilter(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 bitmapdata_clone(const fn_call& fn)
 {
-	as_object* obj = ensure<ValidThis>(fn);
-	BitmapData_as* bm = ensure<ThisIsNative<BitmapData_as> >(fn);
+    as_object* obj = ensure<ValidThis>(fn);
+    BitmapData_as* bm = ensure<ThisIsNative<BitmapData_as> >(fn);
     if (bm->disposed()) return as_value();
 
     const size_t width = bm->width();
@@ -746,22 +746,22 @@ bitmapdata_clone(const fn_call& fn)
 
     ret->setRelay(new BitmapData_as(ret, im));
 
-	return as_value(ret);
+    return as_value(ret);
 }
 
 as_value
 bitmapdata_colorTransform(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 bitmapdata_copyChannel(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (ptr->disposed()) return as_value();
 
@@ -885,7 +885,7 @@ bitmapdata_copyChannel(const fn_call& fn)
 
     ptr->updateObjects();
 
-	return as_value();
+    return as_value();
 }
 
 boost::uint8_t
@@ -950,7 +950,7 @@ setChannel(boost::uint32_t targ, boost::uint8_t bitmask, boost::uint8_t value)
 as_value
 bitmapdata_copyPixels(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (ptr->disposed()) return as_value();
 
@@ -1084,7 +1084,7 @@ bitmapdata_copyPixels(const fn_call& fn)
 
     ptr->updateObjects();
 
-	return as_value();
+    return as_value();
 }
 
 as_value
@@ -1092,15 +1092,15 @@ bitmapdata_dispose(const fn_call& fn)
 {
     // Should free the memory storing the bitmap.
     // All properties afterwards are -1 (even the rectangle)
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
     ptr->dispose();
-	return as_value();
+    return as_value();
 }
 
 as_value
 bitmapdata_draw(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1138,13 +1138,13 @@ bitmapdata_draw(const fn_call& fn)
     }
 
     ptr->draw(*mc, t);
-	return as_value();
+    return as_value();
 }
 
 as_value
 bitmapdata_fillRect(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (fn.nargs < 2) return as_value();
     
@@ -1176,7 +1176,7 @@ bitmapdata_fillRect(const fn_call& fn)
     ptr->fillRect(toInt(x, getVM(fn)), toInt(y, getVM(fn)),
             toInt(w, getVM(fn)), toInt(h, getVM(fn)), color);
     
-	return as_value();
+    return as_value();
 }
 
 
@@ -1184,7 +1184,7 @@ bitmapdata_fillRect(const fn_call& fn)
 as_value
 bitmapdata_floodFill(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
     
     if (fn.nargs < 3) {
         return as_value();
@@ -1210,31 +1210,31 @@ bitmapdata_floodFill(const fn_call& fn)
     // This checks whether the colours are the same.
     ptr->floodFill(x, y, old, fill);
     
-	return as_value();
+    return as_value();
 }
 
 as_value
 bitmapdata_generateFilterRect(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 bitmapdata_getColorBoundsRect(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 bitmapdata_getPixel(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (fn.nargs < 2) {
         return as_value();
@@ -1258,7 +1258,7 @@ bitmapdata_getPixel(const fn_call& fn)
 as_value
 bitmapdata_getPixel32(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (fn.nargs < 2) {
         return as_value();
@@ -1282,25 +1282,25 @@ bitmapdata_getPixel32(const fn_call& fn)
 as_value
 bitmapdata_hitTest(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 bitmapdata_merge(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 bitmapdata_noise(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (ptr->disposed()) return as_value();
 
@@ -1329,23 +1329,23 @@ bitmapdata_noise(const fn_call& fn)
     
     ptr->updateObjects();
 
-	return as_value();
+    return as_value();
 }
 
 as_value
 bitmapdata_paletteMap(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 
 as_value
 bitmapdata_perlinNoise(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (ptr->disposed()) return as_value();
 
@@ -1442,31 +1442,31 @@ bitmapdata_perlinNoise(const fn_call& fn)
     
     ptr->updateObjects();
 
-	return as_value();
+    return as_value();
 }
 
 as_value
 bitmapdata_pixelDissolve(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 bitmapdata_scroll(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 bitmapdata_setPixel(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (fn.nargs < 3) {
         return as_value();
@@ -1484,13 +1484,13 @@ bitmapdata_setPixel(const fn_call& fn)
 
     ptr->setPixel(x, y, color);
 
-	return as_value();
+    return as_value();
 }
 
 as_value
 bitmapdata_setPixel32(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (fn.nargs < 3) {
         return as_value();
@@ -1508,63 +1508,63 @@ bitmapdata_setPixel32(const fn_call& fn)
 
     ptr->setPixel32(x, y, color);
 
-	return as_value();
+    return as_value();
 }
 
 as_value
 bitmapdata_compare(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 bitmapdata_threshold(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 bitmapdata_width(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
     
     // Returns the immutable width of the bitmap or -1 if dispose() has
     // been called.
     if (ptr->disposed()) return -1;
-	return as_value(ptr->width());
+    return as_value(ptr->width());
 }
 
 as_value
 bitmapdata_height(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
     
     // Returns the immutable height of the bitmap or -1 if dispose() has
     // been called.
     if (ptr->disposed()) return -1;
-	return as_value(ptr->height());
+    return as_value(ptr->height());
 }
 
 as_value
 bitmapdata_transparent(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
     
     // Returns whether bitmap is transparent or -1 if dispose() has been called.
     if (ptr->disposed()) return -1;
-	return as_value(ptr->transparent());
+    return as_value(ptr->transparent());
 }
 
 as_value
 bitmapdata_rectangle(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     // Returns the immutable rectangle of the bitmap or -1 if dispose()
     // has been called.
@@ -1594,7 +1594,7 @@ bitmapdata_loadBitmap(const fn_call& fn)
 {
     // This is a static method, but still requires a parent object for
     // the prototype.
-	as_object* ptr = ensure<ValidThis>(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1641,7 +1641,7 @@ bitmapdata_loadBitmap(const fn_call& fn)
     newImage->update(im.begin());
     ret->setRelay(new BitmapData_as(ret, newImage));
 
-	return as_value(ret);
+    return as_value(ret);
 }
 
 
@@ -1661,13 +1661,13 @@ as_value
 bitmapdata_ctor(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
-	if (fn.nargs < 2) {
+    if (fn.nargs < 2) {
         IF_VERBOSE_ASCODING_ERRORS(
              log_aserror("BitmapData constructor requires at least two "
                  "arguments. Will not construct a BitmapData");
         );
         throw ActionTypeError();
-	}
+    }
 
     size_t width = toInt(fn.arg(0), getVM(fn));
     size_t height = toInt(fn.arg(1), getVM(fn));
@@ -1700,7 +1700,7 @@ bitmapdata_ctor(const fn_call& fn)
 
     ptr->setRelay(new BitmapData_as(ptr, im));
 
-	return as_value(); 
+    return as_value(); 
 }
 
 void
