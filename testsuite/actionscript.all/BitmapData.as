@@ -1017,6 +1017,34 @@ ns.perlinNoise(20, 20, 1, 200, false, false);
  range = getColorRange(ns, 0xff0000);
  check(range.min < 10 && range.max > 40);
 
+// Channel value 0: all black.
+ns.perlinNoise(50, 50, 1, 1, false, false, 0);
+ check(testColorRange(ns, 0xff, 0, 0));
+ check(testColorRange(ns, 0xff00, 0, 0));
+ check(testColorRange(ns, 0xff0000, 0, 0));
+
+// Only red
+ns.perlinNoise(50, 50, 1, 1, false, false, 1);
+ check(testColorRange(ns, 0xff, 0, 0));
+ check(testColorRange(ns, 0xff00, 0, 0));
+ range = getColorRange(ns, 0xff0000);
+ check(range.min < 10 && range.max > 40);
+
+// Only green
+ns.perlinNoise(50, 50, 1, 1, false, false, 2);
+ check(testColorRange(ns, 0xff, 0, 0));
+ range = getColorRange(ns, 0xff00);
+ check(range.min < 10 && range.max > 40);
+ check(testColorRange(ns, 0xff0000, 0, 0));
+
+// Blue and red
+ns.perlinNoise(50, 50, 1, 1, false, false, 5);
+ range = getColorRange(ns, 0xff);
+ check(range.min < 10 && range.max > 40);
+ check(testColorRange(ns, 0xff00, 0, 0));
+ range = getColorRange(ns, 0xff0000);
+ check(range.min < 10 && range.max > 40);
+
 // Transparent BitmapData
 
 // Here with no octaves again.
@@ -1099,6 +1127,6 @@ flash.display.BitmapData.prototype = e;
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(380);
+totals(392);
 
 #endif // OUTPUT_VERSION >= 8
