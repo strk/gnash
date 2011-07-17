@@ -49,6 +49,7 @@
 #include "flash/geom/ColorTransform_as.h"
 #include "NativeFunction.h"
 #include "GnashNumeric.h"
+#include "Array_as.h"
 
 namespace gnash {
 
@@ -275,9 +276,9 @@ struct PerlinNoise
     /// Get a noise value for the co-ordinates x and y.
     T operator()(T x, T y, const size_t step = 0) {
 
-        // Point to the right
-        size_t bx0;
         // Point to the left
+        size_t bx0;
+        // Point to the right
         size_t bx1;
         // Point above
         size_t by0;
@@ -385,19 +386,55 @@ private:
     Noise<> noise;
 };
 
+/// Store offsets.
+struct Point
+{
+    Point(int x, int y) : x(x), y(y) {}
+    int x;
+    int y;
+};
+
+/// Transform negative offsets into positive ones
+//
+/// The PerlinNoise generator only handles positive co-ordinates, so
+/// transform negative ones into an offset from the end of the grid.
+//
+/// We have to take base into account (I think), but not octave because
+/// octaves are all exact factors of the base.
+struct
+PointTransformer
+{
+    PointTransformer(size_t x, size_t y) : _x(x), _y(y) {}
+    Point operator()(Point const& p) const {
+        if (p.x >= 0 && p.y >= 0) return p;
+        const int x = p.x > 0 ? p.x : _x - std::abs(p.x) % _x;
+        const int y = p.y > 0 ? p.y : _y - std::abs(p.y) % _y;
+        return Point(x, y);
+    }
+private:
+    const size_t _x;
+    const size_t _y;
+
+};
+
 /// Adapt the PerlinNoise generator for ActionScript's needs.
 template<typename Generator>
 struct PerlinAdapter
 {
     PerlinAdapter(Generator& g, size_t octaves, double baseX, double baseY,
-            bool fractal)
+            bool fractal, const std::vector<Point>& offsets)
         :
         _gen(g),
         _octaves(octaves),
         _baseX(baseX),
         _baseY(baseY),
         _fractal(fractal)
-    {}
+    {
+        /// Make sure all offsets represent a valid positive value.
+        std::transform(offsets.begin(), offsets.end(), 
+                std::back_inserter(_offsets),
+                PointTransformer(_baseX * _gen.size(), _baseY * _gen.size()));
+    }
 
     ///
     //
@@ -417,8 +454,13 @@ struct PerlinAdapter
         double ret = _fractal ? 0x80 : 0;
 
         for (size_t i = 0; i < _octaves; ++i) {
+   
+            const Point offset = i < _offsets.size() ? _offsets[i] :
+                Point(0, 0);
 
-            const double n = _gen((x * xfreq) / size, (y * yfreq) / size, step);
+            const double n = _gen(((x + offset.x) * xfreq) / size,
+                    ((y + offset.y) * yfreq) / size, step);
+
             ret += amp * (_fractal ? n : std::abs(n));
 
             // Halve amplitude
@@ -438,6 +480,7 @@ private:
     const double _baseX;
     const double _baseY;
     const bool _fractal;
+    std::vector<Point> _offsets;
 };
 
 /// Index iterators by x and y position
@@ -455,6 +498,32 @@ struct PixelIndexer
     size_t x;
     size_t y;
     BitmapData_as::iterator pix;
+};
+
+/// Convert an array to a vector of offsets.
+//
+/// TODO: check what really happens when one is invalid.
+struct PointPusher
+{
+    PointPusher(std::vector<Point>& offsets, VM& vm)
+        :
+        _offsets(offsets),
+        _vm(vm)
+    {}
+
+    void operator()(const as_value& val) {
+        as_object* p = toObject(val, _vm);
+        if (!p) return;
+
+        as_value x, y;
+        if (!p->get_member(NSV::PROP_X, &x)) return;
+        if (!p->get_member(NSV::PROP_Y, &y)) return;
+        _offsets.push_back(Point(toInt(x, _vm), toInt(y, _vm)));
+    }
+
+private:
+    std::vector<Point>& _offsets;
+    VM& _vm;
 };
 
 } // anonymous namespace
@@ -1375,6 +1444,19 @@ bitmapdata_perlinNoise(const fn_call& fn)
     const bool greyscale = fn.nargs > 7 ?
         toBool(fn.arg(7), getVM(fn)) : false;
 
+    /// Collect offsets.
+    //
+    /// We don't currently know what happens when one of the offsets doesn't
+    /// have an x or a y member, or isn't an object etc.
+    std::vector<Point> offsets;
+    if (fn.nargs > 8) {
+        as_object* obj = toObject(fn.arg(8), getVM(fn));
+        if (obj) {
+            PointPusher pp(offsets, getVM(fn));
+            foreachArray(*obj, pp);
+        }
+    }
+
     if (stitch) {
         LOG_ONCE(log_unimpl("BitmapData.perlinNoise() stitch value"));
     }
@@ -1387,7 +1469,8 @@ bitmapdata_perlinNoise(const fn_call& fn)
 
     typedef PerlinNoise<double, 256> Generator;
     Generator gen(seed);
-    PerlinAdapter<Generator> pa(gen, octave, baseX, baseY, fractalNoise);
+    PerlinAdapter<Generator> pa(gen, octave, baseX, baseY, fractalNoise,
+            offsets);
 
     const size_t width = ptr->width();
     const bool transparent = ptr->transparent();
