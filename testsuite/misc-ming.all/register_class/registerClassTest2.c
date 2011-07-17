@@ -95,6 +95,7 @@ main(int argc, char** argv)
 		"_root.theClass1onLoadCalls = new Array();"
 		"_root.theClass2onLoadCalls = new Array();"
 		"_root.theClass3onLoadCalls = new Array();"
+		"_root.mc3frame0 = new Array();"
 	);
   
   // define two movieClips
@@ -159,6 +160,11 @@ main(int argc, char** argv)
   mc3 = newSWFMovieClip();
   sh3 = make_fill_square (0, 300, 100, 100, 255, 255, 0, 255, 255, 0);
   SWFMovieClip_add(mc3, (SWFBlock)sh3);
+
+  add_clip_actions(mc3,
+                 " _root.note(this+'.frame0 actions'); "
+			     " _root.mc3frame0.push(this);"
+                 );
   SWFMovieClip_nextFrame(mc3);
   
   // Export mc3
@@ -172,7 +178,7 @@ main(int argc, char** argv)
                              " theClass3 = function () {}; "
                              " theClass3.prototype = new MovieClip(); "
                              " theClass3.prototype.onLoad = function() {"
-			     "  trace('theClass3 proto onLoad ('+this+')');"
+			     "  _root.note(this+'.onLoad (theClass3 proto)');"
 			     "  _root.theClass3onLoadCalls.push(this);"
 			     " };"
                              " Object.registerClass('libItem3', theClass3); "
@@ -208,7 +214,13 @@ main(int argc, char** argv)
   // Gnash gets the onLoad events of 'clip3' and 'noclipevs' swapped !!
   xcheck_equals(mo, "_root.theClass3onLoadCalls[1]", "_level0.clip3");
   xcheck_equals(mo, "_root.theClass3onLoadCalls[2]", "_level0.noclipevs"); /* it4 ... */
-  add_actions(mo, "totals(27); stop();");
+
+  check_equals(mo, "_root.mc3frame0.length", "3");
+  check_equals(mo, "_root.mc3frame0[0]", "_level0.clipevs");
+  check_equals(mo, "_root.mc3frame0[1]", "_level0.noclipevs");
+  check_equals(mo, "_root.mc3frame0[2]", "_level0.clip3"); 
+
+  add_actions(mo, "totals(31); stop();");
     
   SWFMovie_nextFrame(mo); /* end of frame4 */
      
