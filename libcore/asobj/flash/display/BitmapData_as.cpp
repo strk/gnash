@@ -1368,8 +1368,8 @@ bitmapdata_perlinNoise(const fn_call& fn)
         toBool(fn.arg(5), getVM(fn)) : false;
 
     // Which channels to use.
-    const int channels = fn.nargs > 6 ?
-        toInt(fn.arg(6), getVM(fn)) : true;
+    const boost::uint8_t channels = fn.nargs > 6 ?
+        clamp<int>(toInt(fn.arg(6), getVM(fn)), 0, 255) : 1 | 2 | 4 | 8;
 
     // All channels the same
     const bool greyscale = fn.nargs > 7 ?
@@ -1379,11 +1379,7 @@ bitmapdata_perlinNoise(const fn_call& fn)
         LOG_ONCE(log_unimpl("BitmapData.perlinNoise() stitch value"));
     }
 
-    if (channels) {
-        LOG_ONCE(log_unimpl("BitmapData.perlinNoise() channels value"));
-    }
-
-    if (!octave) {
+    if (!octave || (!channels && !greyscale)) {
         // Clear the image and return.
         std::fill(ptr->begin(), ptr->end(), 0xff000000);
         return as_value();
@@ -1393,33 +1389,50 @@ bitmapdata_perlinNoise(const fn_call& fn)
     Generator gen(seed);
     PerlinAdapter<Generator> pa(gen, octave, baseX, baseY, fractalNoise);
 
-    size_t pixel = 0;
     const size_t width = ptr->width();
+    const bool transparent = ptr->transparent();
 
+    size_t pixel = 0;
     for (BitmapData_as::iterator it = ptr->begin(), e = ptr->end(); it != e;
             ++it, ++pixel) {
 
         const size_t x = pixel % width;
         const size_t y = pixel / width;
 
-        // Create one noise channel.
-        const double r = pa(x, y);
-        const boost::uint8_t rv = clamp(r, 0.0, 255.0);
+        boost::uint8_t rv = 0;
 
-        // For greyscale apply it to all channels equally.
-        if (greyscale) {
-            *it = (rv | rv << 8 | rv << 16);
-            continue;
+        if (greyscale || channels & 1) {
+            // Create one noise channel.
+            const double r = pa(x, y);
+            rv = clamp(r, 0.0, 255.0);
+            if (greyscale) {
+                // For greyscale apply it to all channels equally.
+                *it = (rv | rv << 8 | rv << 16);
+                continue;
+            }
         }
 
         // Otherwise create data for the other channels too by using the
         // PerlinNoise object's pattern offset (this is cheaper than using a
-        // separate generator).
-        const double g = pa(x, y, 1);
-        const double b = pa(x, y, 2);
-        const boost::uint8_t gv = clamp(g, 0.0, 255.0);
-        const boost::uint8_t bv = clamp(b, 0.0, 255.0);
-        *it = (bv | gv << 8 | rv << 16);
+        // separate generator)
+        boost::uint8_t gv = 0;
+        boost::uint8_t bv = 0;
+        boost::uint8_t av = 0xff;
+
+        if (channels & 2) {
+            const double g = pa(x, y, 1);
+            gv = clamp(g, 0.0, 255.0);
+        }
+        if (channels & 4) {
+            const double b = pa(x, y, 2);
+            bv = clamp(b, 0.0, 255.0);
+        }
+        // It's just a waste of time if the BitmapData has no alpha.
+        if (transparent && channels & 8) {
+            const double a = pa(x, y, 3);
+            av = clamp(a, 0.0, 255.0);
+        }
+        *it = (bv | gv << 8 | rv << 16 | av << 24);
     }
     
     ptr->updateObjects();
