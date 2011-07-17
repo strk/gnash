@@ -1405,12 +1405,22 @@ bitmapdata_perlinNoise(const fn_call& fn)
             // Create one noise channel.
             const double r = pa(x, y);
             rv = clamp(r, 0.0, 255.0);
-            if (greyscale) {
-                // For greyscale apply it to all colour channels equally; alpha
-                // is always full.
-                *it = (rv | rv << 8 | rv << 16 | 0xff << 24);
-                continue;
-            }
+        }
+
+        boost::uint8_t av = 0xff;
+
+        // It's just a waste of time if the BitmapData has no alpha.
+        if (transparent && channels & 8) {
+            const double a = pa(x, y, 3);
+            av -= clamp(a, 0.0, 255.0);
+        }
+
+        if (greyscale) {
+            // Greyscale affects all colour channels equally. If alpha the
+            // alpha channel is requested, that's done seperately; otherwise
+            // it's full.
+            *it = (rv | rv << 8 | rv << 16 | av << 24);
+            continue;
         }
 
         // Otherwise create data for the other channels too by using the
@@ -1418,7 +1428,6 @@ bitmapdata_perlinNoise(const fn_call& fn)
         // separate generator)
         boost::uint8_t gv = 0;
         boost::uint8_t bv = 0;
-        boost::uint8_t av = 0xff;
 
         if (channels & 2) {
             const double g = pa(x, y, 1);
@@ -1427,11 +1436,6 @@ bitmapdata_perlinNoise(const fn_call& fn)
         if (channels & 4) {
             const double b = pa(x, y, 2);
             bv = clamp(b, 0.0, 255.0);
-        }
-        // It's just a waste of time if the BitmapData has no alpha.
-        if (transparent && channels & 8) {
-            const double a = pa(x, y, 3);
-            av = clamp(a, 0.0, 255.0);
         }
         *it = (bv | gv << 8 | rv << 16 | av << 24);
     }
