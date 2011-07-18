@@ -89,19 +89,6 @@ public:
         return _cachedBitmap.get();
     }
 
-    /// Set a specified pixel to the specified color.
-    //
-    /// Retains transparency value for BitmapDatas with transparency.
-    void setPixel(size_t x, size_t y, boost::uint32_t color) const;
-
-    /// Set a specified pixel to the specified color.
-    void setPixel32(size_t x, size_t y, boost::uint32_t color) const;
-
-    /// Returns the value of the pixel at (x, y).
-    //
-    /// Returns 0 if the pixel is out of range or the image has been disposed.
-    boost::uint32_t getPixel(size_t x, size_t y) const;
-
     /// Fill the bitmap with a colour starting at x, y
     //
     /// Negative values are handled correctly.

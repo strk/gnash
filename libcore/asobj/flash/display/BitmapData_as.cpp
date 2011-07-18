@@ -90,8 +90,29 @@ namespace {
     void attachBitmapDataStaticProperties(as_object& o);
     as_value get_flash_display_bitmap_data_constructor(const fn_call& fn);
 
+    /// Get an iterator to the pixel at (x, y)
+    //
+    /// Please note: each invocation of this function must check for and
+    /// retrieve the stored bitmap data, so if you need more than one pixel,
+    /// call this once and work out how much you need to move the iterator.
     BitmapData_as::iterator pixelAt(const BitmapData_as& bd, size_t x,
             size_t y);
+
+    /// Set the pixel at (x, y) to the specified ARGB colour.
+    //
+    /// Note: calls pixelAt(), so do not use this more than necessary!
+    void setPixel32(const BitmapData_as& bd, size_t x, size_t y,
+            boost::uint32_t color);
+
+    /// Set the RGB values at (x, y) to the RGB components of a colour.
+    //
+    /// Alpha values of the target pixel are left unchanged.
+    //
+    /// Note: calls pixelAt(), so do not use this more than necessary!
+    void setPixel(const BitmapData_as& bd, size_t x, size_t y,
+            boost::uint32_t color);
+
+    boost::uint32_t getPixel(const BitmapData_as& bd, size_t x, size_t y);
 
     /// Get the overlapping part of a rectangle and a Bitmap
     //
@@ -552,41 +573,11 @@ BitmapData_as::setReachable()
 }
 
 void
-BitmapData_as::setPixel32(size_t x, size_t y, boost::uint32_t color) const
-{
-    if (disposed()) return;
-    if (x >= width() || y >= height()) return;
-
-    iterator it = pixelAt(*this, x, y);
-    *it = color;
-}
-
-void
-BitmapData_as::setPixel(size_t x, size_t y, boost::uint32_t color) const
-{
-    if (disposed()) return;
-    if (x >= width() || y >= height()) return;
-
-    iterator it = pixelAt(*this, x, y);
-    const boost::uint32_t val = *it;
-    *it = (color & 0xffffff) | (val & 0xff000000);
-}
-
-void
 BitmapData_as::updateObjects()
 {
     std::for_each(_attachedObjects.begin(), _attachedObjects.end(),
             std::mem_fun(&DisplayObject::update));
 }
-
-boost::uint32_t
-BitmapData_as::getPixel(size_t x, size_t y) const
-{
-    if (disposed()) return 0;
-    if (x >= width() || y >= height()) return 0;
-    return *pixelAt(*this, x, y);
-}
-
 
 void
 BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
@@ -1318,10 +1309,10 @@ bitmapdata_getPixel(const fn_call& fn)
     
     const int x = toInt(fn.arg(0), getVM(fn));
     const int y = toInt(fn.arg(1), getVM(fn));
-    
-    // Will return 0 if the pixel is outside the image or the image has
-    // been disposed.
-    return static_cast<boost::int32_t>(ptr->getPixel(x, y) & 0xffffff);
+
+    // Note: x and y are converted to size_t, so negative values becomre
+    // very large and are also outside the image. This is perfectly legal!
+    return static_cast<boost::int32_t>(getPixel(*ptr, x, y) & 0xffffff);
 }
 
 as_value
@@ -1340,11 +1331,12 @@ bitmapdata_getPixel32(const fn_call& fn)
         return as_value();
     }
     
-    // TODO: what happens when the pixel is outside the image?
     const int x = toInt(fn.arg(0), getVM(fn));
     const int y = toInt(fn.arg(1), getVM(fn));
     
-    return static_cast<boost::int32_t>(ptr->getPixel(x, y));
+    // Note: x and y are converted to size_t, so negative values becomre
+    // very large and are also outside the image. This is perfectly legal!
+    return static_cast<boost::int32_t>(getPixel(*ptr, x, y));
 }
 
 
@@ -1565,7 +1557,7 @@ bitmapdata_setPixel(const fn_call& fn)
     // Ignore any transparency here.
     const boost::uint32_t color = toInt(fn.arg(2), getVM(fn));
 
-    ptr->setPixel(x, y, color);
+    setPixel(*ptr, x, y, color);
 
     return as_value();
 }
@@ -1589,7 +1581,7 @@ bitmapdata_setPixel32(const fn_call& fn)
     // TODO: multiply.
     const boost::uint32_t color = toInt(fn.arg(2), getVM(fn));
 
-    ptr->setPixel32(x, y, color);
+    setPixel32(*ptr, x, y, color);
 
     return as_value();
 }
@@ -1841,6 +1833,34 @@ pixelAt(const BitmapData_as& bd, size_t x, size_t y)
 {
     if (x >= bd.width() || y >= bd.height()) return bd.end();
     return (bd.begin() + y * bd.width() + x);
+}
+
+boost::uint32_t
+getPixel(const BitmapData_as& bd, size_t x, size_t y)
+{
+    if (x >= bd.width() || y >= bd.height()) return 0;
+    return *pixelAt(bd, x, y);
+}
+
+void
+setPixel(const BitmapData_as& bd, size_t x, size_t y, boost::uint32_t color) 
+{
+    if (bd.disposed()) return;
+    if (x >= bd.width() || y >= bd.height()) return;
+
+    BitmapData_as::iterator it = pixelAt(bd, x, y);
+    const boost::uint32_t val = *it;
+    *it = (color & 0xffffff) | (val & 0xff000000);
+}
+
+void
+setPixel32(const BitmapData_as& bd, size_t x, size_t y, boost::uint32_t color) 
+{
+    if (bd.disposed()) return;
+    if (x >= bd.width() || y >= bd.height()) return;
+
+    BitmapData_as::iterator it = pixelAt(bd, x, y);
+    *it = color;
 }
 
 void
