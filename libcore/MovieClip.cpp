@@ -509,7 +509,8 @@ MovieClip::MovieClip(as_object* object, const movie_definition* def,
     _hasLooped(false),
     _flushedOrphanedTags(false),
     _callingFrameActions(false),
-    _lockroot(false)
+    _lockroot(false),
+    _onLoadCalled(false)
 {
     assert(_swf);
     assert(object);
@@ -847,6 +848,18 @@ MovieClip::unloadMovie()
     LOG_ONCE(log_unimpl("MovieClip.unloadMovie()"));
 }
 
+void
+MovieClip::queueLoad()
+{
+    if ( ! _onLoadCalled ) {
+        _onLoadCalled = true;
+        // We don't call onLoad for _root up to SWF5
+        if ( ! parent() && getSWFVersion(*getObject(this)) < 6 ) return;
+        queueEvent(event_id(event_id::LOAD),
+                    movie_root::PRIORITY_DOACTION);
+    }
+}
+
 // child movieclip advance
 void
 MovieClip::advance()
@@ -881,6 +894,8 @@ MovieClip::advance()
         getTarget(), _currentFrame+1,
         frame_count);
 #endif
+
+    queueLoad();
 
     // I'm not sure ENTERFRAME goes in a different queue then DOACTION...
     queueEvent(event_id(event_id::ENTER_FRAME), movie_root::PRIORITY_DOACTION);
@@ -1708,31 +1723,18 @@ MovieClip::construct(as_object* initObj)
     //
     // DLIST tags are executed immediately while ACTION tags are queued.
     //
-    // For _root movie, LOAD event is invoked *after* actions in first frame
-    // See misc-ming.all/action_execution_order_test4.{c,swf}
+    // For clips w/out event handlers, LOAD event is invoked *after*
+    // actions in first frame
+    // See misc-ming.all/action_order/action_execution_order_test4.{c,swf}
     //
     assert(!_callingFrameActions); // or will not be queuing actions
-    if (!parent()) {
 
-        executeFrameTags(0, _displayList, SWF::ControlTag::TAG_DLIST |
-                SWF::ControlTag::TAG_ACTION);
-
-        if (getSWFVersion(*getObject(this)) > 5) {
-            queueEvent(event_id(event_id::LOAD),
-                    movie_root::PRIORITY_DOACTION);
-        }
-
-    }
-    else {
-        queueEvent(event_id(event_id::LOAD), movie_root::PRIORITY_DOACTION);
-        executeFrameTags(0, _displayList, SWF::ControlTag::TAG_DLIST |
-                SWF::ControlTag::TAG_ACTION);
+    if ( ! get_event_handlers().empty() ) {
+        queueLoad();
     }
 
-    as_object* mc = getObject(this);
-    
-    // A MovieClip should always have an associated object.
-    assert(mc);
+    executeFrameTags(0, _displayList, SWF::ControlTag::TAG_DLIST |
+            SWF::ControlTag::TAG_ACTION);
 
     // We execute events immediately when the stage-placed DisplayObject 
     // is dynamic, This is becase we assume that this means that 
@@ -1761,6 +1763,12 @@ MovieClip::construct(as_object* initObj)
         // after the display list has been populated, so that _height and
         // _width (which depend on bounds) are correct.
         if (initObj) {
+
+            as_object* mc = getObject(this);
+            
+            // A MovieClip should always have an associated object.
+            assert(mc);
+
             mc->copyProperties(*initObj);
         }
         constructAsScriptObject();

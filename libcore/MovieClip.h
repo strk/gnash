@@ -135,6 +135,8 @@ public:
     /// action
     void queueEvent(const event_id& id, int lvl);
 
+    void queueLoad();
+
     /// Return the _root ActionScript property of this sprite.
     //
     /// Relative or absolute is determined by the _lockroot property,
@@ -769,6 +771,8 @@ private:
     bool _callingFrameActions;
 
     bool _lockroot;
+
+    bool _onLoadCalled;
 };
 
 } // end of namespace gnash

@@ -91,6 +91,7 @@ namespace {
     const DisplayObject* getNearestObject(const DisplayObject* o);
     as_object* getBuiltinObject(movie_root& mr, const ObjectURI& cl);
     void advanceLiveChar(MovieClip* ch);
+    void notifyLoad(MovieClip* ch);
 }
 
 // Utility classes
@@ -1990,6 +1991,9 @@ movie_root::advanceLiveChars()
 
     std::for_each(_liveChars.begin(), _liveChars.end(),
             boost::bind(advanceLiveChar, _1));
+
+    std::for_each(_liveChars.begin(), _liveChars.end(),
+            boost::bind(notifyLoad, _1));
 }
 
 void
@@ -2526,6 +2530,14 @@ advanceLiveChar(MovieClip* mo)
                 mo->getTarget());
     }
 #endif
+}
+
+void
+notifyLoad(MovieClip* mo)
+{
+    if ( mo->parent() ) {
+        mo->queueLoad();
+    }
 }
 
 } // anonymous namespace
