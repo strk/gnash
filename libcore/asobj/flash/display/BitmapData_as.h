@@ -54,6 +54,13 @@ class BitmapData_as : public Relay
 {
 public:
 
+    enum Channel {
+        CHANNEL_RED = 1,
+        CHANNEL_GREEN = 2,
+        CHANNEL_BLUE = 4,
+        CHANNEL_ALPHA = 8
+    };
+
     typedef image::pixel_iterator<image::ARGB> iterator;
 
     /// Construct a BitmapData.

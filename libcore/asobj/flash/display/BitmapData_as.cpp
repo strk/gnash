@@ -196,16 +196,16 @@ struct NoiseAdapter
 
         boost::uint32_t ret = 0xff000000;
 
-        if (_bitmask & 1) {
+        if (_bitmask & BitmapData_as::CHANNEL_RED) {
             ret |= (_gen() << 16);
         }
-        if (_bitmask & 2) {
+        if (_bitmask & BitmapData_as::CHANNEL_GREEN) {
             ret |= _gen() << 8;
         }
-        if (_bitmask & 4) {
+        if (_bitmask & BitmapData_as::CHANNEL_BLUE) {
             ret |= _gen();
         }
-        if (_bitmask & 8) {
+        if (_bitmask & BitmapData_as::CHANNEL_ALPHA) {
             // Alpha is 0xff by default.
             const boost::uint8_t rd = _gen();
             ret &= (~rd) << 24;
@@ -951,19 +951,19 @@ bitmapdata_copyChannel(const fn_call& fn)
 boost::uint8_t
 getChannel(boost::uint32_t src, boost::uint8_t bitmask)
 {
-    if (bitmask & 1) {
+    if (bitmask & BitmapData_as::CHANNEL_RED) {
         // Red
         return (src >> 16) & 0xff;
     }
-    if (bitmask & 2) {
+    if (bitmask & BitmapData_as::CHANNEL_GREEN) {
         // Green
         return (src >> 8) & 0xff;
     }
-    if (bitmask & 4) {
+    if (bitmask & BitmapData_as::CHANNEL_BLUE) {
         // Blue
         return src & 0xff;
     }
-    if (bitmask & 8) {
+    if (bitmask & BitmapData_as::CHANNEL_ALPHA) {
         // Alpha
         return src >> 24;
     }
@@ -975,22 +975,22 @@ setChannel(boost::uint32_t targ, boost::uint8_t bitmask, boost::uint8_t value)
 {
     boost::uint32_t bytemask = 0;
     boost::uint32_t valmask = 0;
-    if (bitmask & 1) {
+    if (bitmask & BitmapData_as::CHANNEL_RED) {
         // Red
         bytemask = 0xff0000;
         valmask = value << 16;
     }
-    else if (bitmask & 2) {
+    else if (bitmask & BitmapData_as::CHANNEL_GREEN) {
         // Green
         bytemask = 0xff00;
         valmask = value << 8;
     }
-    else if (bitmask & 4) {
+    else if (bitmask & BitmapData_as::CHANNEL_BLUE) {
         // Blue
         bytemask = 0xff;
         valmask = value;
     }
-    else if (bitmask & 8) {
+    else if (bitmask & BitmapData_as::CHANNEL_ALPHA) {
         // Alpha
         bytemask = 0xff000000;
         valmask = value << 24;
@@ -1377,7 +1377,10 @@ bitmapdata_noise(const fn_call& fn)
         clamp<int>(toInt(fn.arg(2), getVM(fn)), low, 255) : 255;
 
     const boost::uint8_t chans = fn.nargs > 3 ?
-        std::abs(toInt(fn.arg(3), getVM(fn))) & 15 : 1 | 2 | 4;
+        std::abs(toInt(fn.arg(3), getVM(fn))) & 15 :
+            BitmapData_as::CHANNEL_RED |
+            BitmapData_as::CHANNEL_GREEN |
+            BitmapData_as::CHANNEL_BLUE;
 
     const bool greyscale = fn.nargs > 4 ?
         toBool(fn.arg(4), getVM(fn)) : false;
@@ -1430,7 +1433,10 @@ bitmapdata_perlinNoise(const fn_call& fn)
 
     // Which channels to use.
     const boost::uint8_t channels = fn.nargs > 6 ?
-        clamp<int>(toInt(fn.arg(6), getVM(fn)), 0, 255) : 1 | 2 | 4;
+        clamp<int>(toInt(fn.arg(6), getVM(fn)), 0, 255) :
+            BitmapData_as::CHANNEL_RED |
+            BitmapData_as::CHANNEL_GREEN |
+            BitmapData_as::CHANNEL_BLUE;
 
     // All channels the same
     const bool greyscale = fn.nargs > 7 ?
@@ -1476,7 +1482,7 @@ bitmapdata_perlinNoise(const fn_call& fn)
 
         boost::uint8_t rv = 0;
 
-        if (greyscale || channels & 1) {
+        if (greyscale || channels & BitmapData_as::CHANNEL_RED) {
             // Create one noise channel.
             const double r = pa(x, y);
             rv = clamp(r, 0.0, 255.0);
@@ -1485,7 +1491,7 @@ bitmapdata_perlinNoise(const fn_call& fn)
         boost::uint8_t av = 0xff;
 
         // It's just a waste of time if the BitmapData has no alpha.
-        if (transparent && channels & 8) {
+        if (transparent && channels & BitmapData_as::CHANNEL_ALPHA) {
             const double a = pa(x, y, 3);
             av -= clamp(a, 0.0, 255.0);
         }
@@ -1504,11 +1510,11 @@ bitmapdata_perlinNoise(const fn_call& fn)
         boost::uint8_t gv = 0;
         boost::uint8_t bv = 0;
 
-        if (channels & 2) {
+        if (channels & BitmapData_as::CHANNEL_GREEN) {
             const double g = pa(x, y, 1);
             gv = clamp(g, 0.0, 255.0);
         }
-        if (channels & 4) {
+        if (channels & BitmapData_as::CHANNEL_BLUE) {
             const double b = pa(x, y, 2);
             bv = clamp(b, 0.0, 255.0);
         }
@@ -1744,10 +1750,11 @@ bitmapdata_ctor(const fn_call& fn)
         throw ActionTypeError();
     }
 
-    size_t width = toInt(fn.arg(0), getVM(fn));
-    size_t height = toInt(fn.arg(1), getVM(fn));
+    const size_t width = toInt(fn.arg(0), getVM(fn));
+    const size_t height = toInt(fn.arg(1), getVM(fn));
     const bool transparent = fn.nargs > 2 ? toBool(fn.arg(2), getVM(fn)) : true;
-    boost::uint32_t fillColor = fn.nargs > 3 ? toInt(fn.arg(3), getVM(fn)) : 0xffffffff;
+    boost::uint32_t fillColor =
+        fn.nargs > 3 ? toInt(fn.arg(3), getVM(fn)) : 0xffffffff;
     
     if (width > 2880 || height > 2880 || width < 1 || height < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1812,7 +1819,6 @@ attachBitmapDataInterface(as_object& o)
     o.init_readonly_property("height", *vm.getNative(1100, 101), flags);
     o.init_readonly_property("rectangle", *vm.getNative(1100, 102), flags);
     o.init_readonly_property("transparent", *vm.getNative(1100, 103), flags);
-
 }
 
 void
@@ -1822,10 +1828,10 @@ attachBitmapDataStaticProperties(as_object& o)
 
     o.init_member("loadBitmap", vm.getNative(1100, 40));
 
-    o.init_member("RED_CHANNEL", 1.0);
-    o.init_member("GREEN_CHANNEL", 2.0);
-    o.init_member("BLUE_CHANNEL", 4.0);
-    o.init_member("ALPHA_CHANNEL", 8.0);
+    o.init_member("RED_CHANNEL", BitmapData_as::CHANNEL_RED);
+    o.init_member("GREEN_CHANNEL", BitmapData_as::CHANNEL_GREEN);
+    o.init_member("BLUE_CHANNEL", BitmapData_as::CHANNEL_BLUE);
+    o.init_member("ALPHA_CHANNEL", BitmapData_as::CHANNEL_ALPHA);
 }
     
 BitmapData_as::iterator
