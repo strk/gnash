@@ -20,6 +20,8 @@
 #include "Geometry.h"
 
 #include <cmath>
+#include <algorithm>
+#include <boost/cstdint.hpp>
 
 #include "log.h"
 #include "LineStyle.h"
@@ -37,8 +39,9 @@ namespace {
 // x1, y1 = end point of the curve (anchor, aka ax|ay)
 // cx, cy = control point of the curve
 // If there are two crossings, cross1 is the nearest to x0|y0 on the curve.
-int curve_x_crossings(float x0, float y0, float x1, float y1,
-    float cx, float cy, float y, float &cross1, float &cross2)
+template<typename T>
+int curve_x_crossings(const T x0, const T y0, const T x1, const T y1,
+    const T cx, const T cy, const T y, T& cross1, T& cross2)
 {
     int count=0;
 
@@ -62,26 +65,22 @@ int curve_x_crossings(float x0, float y0, float x1, float y1,
     // q = -0.5 [b +sgn(b) sqrt(b^2 - 4ac)]
     // x1 = q/a;  x2 = c/q;
 
-    float A = y1 + y0 - 2 * cy;
-    float B = 2 * (cy - y0);
-    float C = y0 - y;
+    const T A = y1 + y0 - 2 * cy;
+    const T B = 2 * (cy - y0);
+    const T C = y0 - y;
 
-    float rad = B * B - 4 * A * C;
+    const T rad = B * B - 4 * A * C;
 
-    if (rad < 0)
-    {
+    if (rad < 0) {
         return 0;
     }
-    else
-    {
-        float q;
-        float sqrt_rad = std::sqrt(rad);
-        if (B < 0)
-        {
+    else {
+        T q;
+        const T sqrt_rad = std::sqrt(rad);
+        if (B < 0) {
             q = -0.5f * (B - sqrt_rad);
         }
-        else
-        {
+        else {
             q = -0.5f * (B + sqrt_rad);
         }
 
@@ -89,12 +88,11 @@ int curve_x_crossings(float x0, float y0, float x1, float y1,
         // float t0 = (-B + sqrt_rad) / (2 * A);
         // float t1 = (-B - sqrt_rad) / (2 * A);
 
-        if (q != 0)
-        {
-            float t1 = C / q;
-            if (t1 >= 0 && t1 < 1)
-            {
-                float x_at_t1 =
+        if (q != 0) {
+            const T t1 = C / q;
+
+            if (t1 >= 0 && t1 < 1) {
+                const T x_at_t1 =
                     x0 + 2 * (cx - x0) * t1 + (x1 + x0 - 2 * cx) * t1 * t1;
 
                 count++;
@@ -103,15 +101,13 @@ int curve_x_crossings(float x0, float y0, float x1, float y1,
             }
         }
 
-        if (A != 0)
-        {
-            float t0 = q / A;
-            if (t0 >= 0 && t0 < 1)
-            {
-                float x_at_t0 =
+        if (A != 0) {
+            const T t0 = q / A;
+            if (t0 >= 0 && t0 < 1) {
+                const T x_at_t0 =
                     x0 + 2 * (cx - x0) * t0 + (x1 + x0 - 2 * cx) * t0 * t0;
 
-                count++;
+                ++count;
                 // order is important!
                 if (count == 2) cross2 = x_at_t0;
                 else cross1 = x_at_t0;
@@ -252,11 +248,11 @@ pointTest(const std::vector<Path>& paths,
                     crosscount = 0;
                 }
             }
-            else
-            {
+            else {
                 // ==> curve case
-                crosscount = curve_x_crossings(pen_x, pen_y, edg.ap.x, edg.ap.y,
-                    edg.cp.x, edg.cp.y, y, cross1, cross2);
+                crosscount = 
+                    curve_x_crossings<float>(pen_x, pen_y, edg.ap.x, edg.ap.y,
+                        edg.cp.x, edg.cp.y, y, cross1, cross2);
                 dir1 = pen_y > y ? -1 : +1;
                 dir2 = dir1 * (-1); // second crossing always in opposite dir.
             } // curve
