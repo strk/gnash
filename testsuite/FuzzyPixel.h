@@ -24,7 +24,8 @@
 #include "GnashKey.h" // for namespace key
 #include "RGBA.h" // for rgba class (composition)
 
-#include <iostream> 
+#include <cmath>
+#include <ostream> 
 
 namespace gnash {
 
@@ -129,7 +130,7 @@ public:
 	/// Return true if a and b are below a given tolerance
 	static bool fuzzyEqual(int a, int b, int tol)
 	{
-		return abs(a-b) <= tol;
+		return std::abs(a-b) <= tol;
 	}
 
 private:
