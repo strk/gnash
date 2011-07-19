@@ -29,10 +29,11 @@
 #include <string>
 #include <cassert>
 #include <sstream>
+#include <math.h> // round
+#include <cmath>
 
 using namespace gnash;
 using namespace gnash::geometry;
-using namespace std;
 
 /// Return a Range2d<int> defining the square inscribed in a circle
 //
@@ -44,7 +45,7 @@ inscribedRect(int x, int y, int radius)
 {
 	Range2d<int> ret;
 
-	int side = int(round((float)radius * sqrt(2.0f))); 
+	int side = int(::round((float)radius * std::sqrt(2.0f))); 
 	int halfside = int(side/2.0); // round toward zero
 
 	// Simply constructing a stringstream fixes an optimization
@@ -69,7 +70,8 @@ inscribedRect(int x, int y, int radius)
 int
 main(int /*argc*/, char** /*argv*/)
 {
-	string filename = string(TGTDIR) + string("/") + string(INPUT_FILENAME);
+    std::string filename = 
+        std::string(TGTDIR) + "/" + std::string(INPUT_FILENAME);
 	MovieTester tester(filename);
 
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
