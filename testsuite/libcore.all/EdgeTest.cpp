@@ -20,16 +20,17 @@
 #include "gnashconfig.h"
 #endif
 
-#include "Geometry.h" // for edge
-#include <iostream>
+#include <ostream>
 #include <sstream>
 #include <cassert>
 #include <cmath>
+#include <algorithm>
 
+#include "Geometry.h" // for edge
 #include "check.h"
 
-using namespace std;
-using namespace gnash;
+using gnash::Edge;
+using gnash::point;
 
 // for double comparison
 struct D {
@@ -46,7 +47,7 @@ struct D {
 	bool operator==(const D& d)
 	{
 		double tol = std::min(_t, d._t);
-		double delta = fabs(_d - d._d);
+		double delta = std::abs(_d - d._d);
 		bool ret = delta < tol;
 		//cout << "D " << _d << "operator==(const D " << d._d <<") returning " << ret << " (delta is " << delta << ") " << endl;
 		return ret;
