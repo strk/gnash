@@ -54,7 +54,8 @@
 #include <cstdio>
 #include <string>
 #include <memory> // for auto_ptr
-#include <cmath> // for ceil and (possibly) exp2
+#include <cmath> // for ceil
+#include <math.h> // exp2
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 
@@ -396,7 +397,7 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 	unsigned int bpp = handler.getBitsPerPixel();
 	if ( bpp ) {
 	    // UdoG: check_pixel should *always* tolerate at least 2 ^ (8 - bpp/3)
-	    minRendererTolerance = int(ceil(exp2(8 - bpp/3)));
+	    minRendererTolerance = int(std::ceil(::exp2(8 - bpp/3)));
 	}
 	
 	//unsigned short tol = std::max(tolerance, minRendererTolerance);
