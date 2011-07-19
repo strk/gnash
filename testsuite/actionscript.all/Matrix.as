@@ -192,6 +192,11 @@ check (m2.ty == 0);
 /// Test deltaTransform of Point
 ///
 Point = flash.geom.Point;
+Point.prototype.toRoundString = function(prec) {
+	var dp = Math.pow(10, prec);
+	return '(x=' + Math.round(this.x*dp)/dp + ', y='
+		+ Math.round(this.y*dp)/dp + ')';
+};
 p = new Point(34, -23);
 newP = m2.deltaTransformPoint(p);
 check_equals(typeof(newP), "object");
@@ -252,7 +257,11 @@ check_equals(m6.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
 fakematrix = {a:3, b:2, c: 5, d: 3, tx:5, ty: 5};
 fakematrix.invert = Matrix.prototype.invert;
 fakematrix.invert();
-xcheck_equals(fakematrix.tx.toString(), "NaN");
+#if OUTPUT_VERSION < 7
+ xcheck_equals(fakematrix.tx.toString(), "0");
+#else
+ xcheck_equals(fakematrix.tx.toString(), "NaN");
+#endif
 check_equals(fakematrix.a.toString(), -3);
 
 // Valid inverse2.
@@ -269,11 +278,13 @@ check_equals(m6.toString(), "(a=3.51033024756149, b=6.78504050247288, c=-1.91770
 // Matrix.transformPoint (and deltaTransformPoint again)
 p = new Point(23, 95);
 p2 = m6.transformPoint(p);
-check_equals(p2.toString(), "(x=-99.4441089756828, y=348.180517617807)");
+check_equals(p2.toRoundString(11),
+	"(x=-99.44410897568, y=348.18051761781)"); 
 p3 = m6.deltaTransformPoint(p);
 check_equals(p3.toString(), "(x=-101.444108975683, y=345.180517617807)");
 p2 = m6.transformPoint(p2);
-check_equals(p2.toString(), "(x=-1014.78819244077, y=21.420285172384)");
+check_equals(p2.toRoundString(11),
+	"(x=-1014.78819244077, y=21.42028517238)"); // here
 
 // Transforming points with a fake matrix.
 fakematrix = {a:3, b:2, c: 5, d: 3, tx:5, ty: 5};
