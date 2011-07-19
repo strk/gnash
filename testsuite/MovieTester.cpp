@@ -55,7 +55,6 @@
 #include <string>
 #include <memory> // for auto_ptr
 #include <cmath> // for ceil
-#include <math.h> // exp2
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 
@@ -72,6 +71,10 @@ using std::endl;
 namespace gnash {
 
 namespace {
+    // exp2 isn't part of standard C++, so is defined here in case the compiler
+    // doesn't supply it (e.g. in BSD)
+    inline double exp2(double x) { return std::pow(2.0, x); }
+
     bool getAveragePixel(const Renderer& r, rgba& color_return, int x, int y, 
         unsigned int radius);
 
@@ -397,7 +400,7 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 	unsigned int bpp = handler.getBitsPerPixel();
 	if ( bpp ) {
 	    // UdoG: check_pixel should *always* tolerate at least 2 ^ (8 - bpp/3)
-	    minRendererTolerance = int(std::ceil(::exp2(8 - bpp/3)));
+	    minRendererTolerance = int(std::ceil(exp2(8 - bpp/3)));
 	}
 	
 	//unsigned short tol = std::max(tolerance, minRendererTolerance);

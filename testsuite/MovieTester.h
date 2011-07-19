@@ -390,12 +390,6 @@ private:
 	unsigned int _samplesFetched;      
 };
 
-// exp2 isn't part of standard C++, so is defined here in case the compiler
-// doesn't supply it (e.g. in BSD)
-#ifndef HAVE_EXP2
-inline double	exp2(double x) { return std::pow((double)2, double(x)); }
-#endif
-
 } // namespace gnash
 
 #endif // _GNASH_MOVIETESTER_H
