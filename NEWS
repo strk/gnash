@@ -4,13 +4,16 @@ YYYY/MM/DD
 Improvements since 0.8.9 release are:
 
  * Qt4 GUI supports mouse wheel, clipboard, and screen resolution.
- * Enhanced UI support for script limits (abort popups, user prefs)
- * BitmapData functions copyPixels(), copyChannel(), and noise() 
+ * Enhanced UI support for script limits (abort popups, user prefs).
+ * BitmapData functions copyPixels(), copyChannel(), perlinNoise() and noise() 
    implemented.
  * Node id mapping in ActionScript XML class implemented (XML.idMap).
- * Fix dispatching of Sound.onLoad event, fixing google dict audio
- * Fix support for control tags found after last expected frame (#33176)
- * Fix support for uncompressed sound with gstreamer media handler
+ * Fix dispatching of Sound.onLoad event, fixing google dict audio.
+ * Fix support for control tags found after last expected frame (#33176).
+ * Fix support for uncompressed sound with gstreamer media handler.
+ * Implement Button.getDepth(), fix button key events.
+ * Fixes to startDrag and stopDrag opcodes.
+ * Implement onSoundComplete() for event sounds.
 
 Gnash 0.8.9
 2011/03/19
