@@ -149,7 +149,7 @@ main(int argc, char** argv)
   it1 = SWFMovie_add(mo, (SWFBlock)mc1);  //add movieClip3 to the _root
   SWFDisplayItem_setDepth(it1, 3);
   SWFDisplayItem_setName(it1, "movieClip3"); //name movieClip3
-  SWFDisplayItem_setRatio(it1, 2.0); // It's important to set this, don't why yet.
+  SWFDisplayItem_setRatio(it1, 1.0); // It's important to set this, don't why yet.
   SWFDisplayItem_addAction(it1, newSWFAction(
     "_root.note(this+' constructed');"
     "_root.mc3Constructed++;"
