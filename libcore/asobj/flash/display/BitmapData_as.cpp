@@ -425,7 +425,16 @@ struct Point
 struct
 PointTransformer
 {
+    /// Construct a PointTransformer for an x by y grid.
+    //
+    /// @param x    The product of the grid size and the x base.
+    /// @param y    The product of the grid size and the y base.
     PointTransformer(size_t x, size_t y) : _x(x), _y(y) {}
+
+    /// Get a point within the grid.
+    //
+    /// Positive co-ordinates are left unchanged, negative ones translated
+    /// to an offset from the end of the grid.
     Point operator()(Point const& p) const {
         if (p.x >= 0 && p.y >= 0) return p;
         const int x = p.x > 0 ? p.x : _x - std::abs(p.x) % _x;
@@ -435,13 +444,27 @@ PointTransformer
 private:
     const size_t _x;
     const size_t _y;
-
 };
 
 /// Adapt the PerlinNoise generator for ActionScript's needs.
+//
+/// @tparam Generator   A type with a double operator()(size_t, size_t, size_t)
+///                     that returns a perlin noise value when passed two
+///                     positive co-ordinates and a sequence offset value.
 template<typename Generator>
 struct PerlinAdapter
 {
+    /// Create an adapter for Perlin noise.
+    //
+    /// @param g        The PerlinNoise generator.
+    /// @param octaves  The number of octaves to generate
+    /// @param baseX    The scale of the grid along the X axis.
+    /// @param baseY    The scale of the grid along the Y axis.
+    /// @param fractal  Whether to apply |f(n)| (false) or f(n) (true) to
+    ///                 the colour values.
+    /// @param offsets  A vector of offsets; each element applies to a
+    ///                 successive octave. Any remaining octaves will have no
+    ///                 offset applied.
     PerlinAdapter(Generator& g, size_t octaves, double baseX, double baseY,
             bool fractal, const std::vector<Point>& offsets)
         :
@@ -451,13 +474,18 @@ struct PerlinAdapter
         _baseY(baseY),
         _fractal(fractal)
     {
-        /// Make sure all offsets represent a valid positive value.
+        // Make sure all offsets represent a valid positive value within
+        // the grid.
         std::transform(offsets.begin(), offsets.end(), 
                 std::back_inserter(_offsets),
                 PointTransformer(_baseX * _gen.size(), _baseY * _gen.size()));
     }
 
-    ///
+    /// Return a noise value for the co-ordinate (x, y).
+    //
+    /// Optionally you can pass a sequence offset so that the noise pattern
+    /// is overlaid at an offset; this means that the same generator can be
+    /// used for several channels without them appearing to be the same.
     //
     /// Fractal noise adds f(i * freq) * amp to the mid value.
     /// Normal noise adds |f(i * freq) * amp| to 0.
