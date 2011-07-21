@@ -15,56 +15,33 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-//
-
 
 #ifndef GNASH_STRINGPREDICATES_H
 #define GNASH_STRINGPREDICATES_H
 
 #include <string>
 #include <algorithm>
-#include <boost/algorithm/string/compare.hpp>
+#include <functional>
 #include <boost/algorithm/string/predicate.hpp>
+#include <locale>
 
 namespace gnash {
 
 /// A case-insensitive string comparator
-class StringNoCaseLessThan {
+class StringNoCaseLessThan
+{
 public:
-	bool operator() (const std::string& a, const std::string& b) const
-	{
-		return std::lexicographical_compare(a.begin(), a.end(),
-						    b.begin(), b.end(),
-						    nocase_less());
+	bool operator()(const std::string& a, const std::string& b) const {
+		return boost::ilexicographical_compare(a, b);
 	}
-private:
-
-	class nocase_less
-	{
-	public:
-		nocase_less(const std::locale& locale = std::locale())
-			: _locale(locale)
-		{}
-
-		bool operator() (const char& a, const char& b) const
-		{
-			return std::toupper<char>(a, _locale) <
-			       std::toupper<char>(b, _locale);
-		}
-	private:
-		const std::locale& _locale;
-	};
 };
 
-
 /// A case-insensitive string equality operator
-class StringNoCaseEqual {
+class StringNoCaseEqual :
+    public std::binary_function<std::string, std::string, bool>
+{
 public:
-
-    typedef bool result_type;
-
-	bool operator() (const std::string& a, const std::string& b) const
-	{
+	bool operator()(const std::string& a, const std::string& b) const {
 		return boost::iequals(a, b);
 	}
 };
