@@ -124,7 +124,7 @@ namespace {
     /// @param y    The y co-ordinate of the top left corner.
     /// @param w    The width of the rectangle.
     /// @param h    The height of the rectangle.
-    void adjustRect(int& x, int& y, int& w, int& h, BitmapData_as& b);
+    void adjustRect(int& x, int& y, int& w, int& h, const BitmapData_as& b);
 
     boost::uint32_t setChannel(boost::uint32_t targ, boost::uint8_t bitmask,
             boost::uint8_t value);
@@ -133,6 +133,19 @@ namespace {
 
     void floodFill(const BitmapData_as& bd, size_t startx, size_t starty,
             boost::uint32_t old, boost::uint32_t fill);
+
+    /// Fill a rectangle of the BitmapData_as
+    //
+    /// Do not call on a disposed BitmapData_as!
+    //
+    /// @param bd       The BitmapData_as to operate on.
+    /// @param x        The x co-ordinate of the rectangle's top left corner.
+    /// @param y        The y co-ordinate of the rectangle's top left corner.
+    /// @param w        The width of the rectangle.
+    /// @param h        The height of the rectangle.
+    /// @param color    The ARGB colour to fill with.
+    void fillRect(const BitmapData_as& bd, int x, int y, int w, int h,
+            boost::uint32_t color);
 
     inline bool oneBitSet(boost::uint8_t mask) {
         return mask == (mask & -mask);
@@ -240,7 +253,6 @@ struct CopyChannel
         _destchans(destchans)
     {}
 
-    /// 
     boost::uint32_t operator()(typename iterator_type::value_type p) const {
         // If multiple source channels, we set the destination channel
         // to black. Else to the value of the requested channel.
@@ -611,33 +623,6 @@ BitmapData_as::updateObjects() const
 }
 
 void
-BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
-{
-    if (disposed()) return;
-
-    adjustRect(x, y, w, h, *this);
-
-    // Make sure that the rectangle has some area in the 
-    // bitmap and that its bottom corner is within the
-    // the bitmap.    
-    if (w == 0 || h == 0) return;
-    
-    iterator it = begin() + y * width();
-    iterator e = it + width() * h;
-    
-    assert(e <= end());
-
-    while (it != e) {
-        // Fill from x for the width of the rectangle.
-        std::fill_n(it + x, w, color);
-        it += width();
-    }
-
-    updateObjects();
-
-}
-
-void
 BitmapData_as::dispose()
 {
     if (_cachedBitmap) _cachedBitmap->dispose();
@@ -904,59 +889,6 @@ bitmapdata_copyChannel(const fn_call& fn)
     return as_value();
 }
 
-boost::uint8_t
-getChannel(boost::uint32_t src, boost::uint8_t bitmask)
-{
-    if (bitmask & BitmapData_as::CHANNEL_RED) {
-        // Red
-        return (src >> 16) & 0xff;
-    }
-    if (bitmask & BitmapData_as::CHANNEL_GREEN) {
-        // Green
-        return (src >> 8) & 0xff;
-    }
-    if (bitmask & BitmapData_as::CHANNEL_BLUE) {
-        // Blue
-        return src & 0xff;
-    }
-    if (bitmask & BitmapData_as::CHANNEL_ALPHA) {
-        // Alpha
-        return src >> 24;
-    }
-    return 0;
-}
-
-boost::uint32_t
-setChannel(boost::uint32_t targ, boost::uint8_t bitmask, boost::uint8_t value)
-{
-    boost::uint32_t bytemask = 0;
-    boost::uint32_t valmask = 0;
-    if (bitmask & BitmapData_as::CHANNEL_RED) {
-        // Red
-        bytemask = 0xff0000;
-        valmask = value << 16;
-    }
-    else if (bitmask & BitmapData_as::CHANNEL_GREEN) {
-        // Green
-        bytemask = 0xff00;
-        valmask = value << 8;
-    }
-    else if (bitmask & BitmapData_as::CHANNEL_BLUE) {
-        // Blue
-        bytemask = 0xff;
-        valmask = value;
-    }
-    else if (bitmask & BitmapData_as::CHANNEL_ALPHA) {
-        // Alpha
-        bytemask = 0xff000000;
-        valmask = value << 24;
-    }
-    targ &= ~bytemask;
-    targ |= valmask;
-    return targ;
-}
-
-
 // sourceBitmap: BitmapData,
 // sourceRect: Rectangle,
 // destPoint: Point,
@@ -1165,7 +1097,7 @@ bitmapdata_fillRect(const fn_call& fn)
 {
     BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
-    if (fn.nargs < 2) return as_value();
+    if (fn.nargs < 2 || ptr->disposed()) return as_value();
     
     const as_value& arg = fn.arg(0);
     
@@ -1192,7 +1124,7 @@ bitmapdata_fillRect(const fn_call& fn)
 
     const boost::uint32_t color = toInt(fn.arg(1), getVM(fn));
        
-    ptr->fillRect(toInt(x, getVM(fn)), toInt(y, getVM(fn)),
+    fillRect(*ptr, toInt(x, getVM(fn)), toInt(y, getVM(fn)),
             toInt(w, getVM(fn)), toInt(h, getVM(fn)), color);
     
     return as_value();
@@ -1830,6 +1762,32 @@ setPixel32(const BitmapData_as& bd, size_t x, size_t y, boost::uint32_t color)
 }
 
 void
+fillRect(const BitmapData_as& bd, int x, int y, int w, int h,
+        boost::uint32_t color)
+{
+    adjustRect(x, y, w, h, bd);
+
+    // Make sure that the rectangle has some area in the 
+    // bitmap and that its bottom corner is within the
+    // the bitmap.    
+    if (w == 0 || h == 0) return;
+    
+    const size_t width = bd.width();
+
+    BitmapData_as::iterator it = bd.begin() + y * width;
+    BitmapData_as::iterator e = it + width * h;
+    
+    assert(e <= bd.end());
+
+    while (it != e) {
+        // Fill from x for the width of the rectangle.
+        std::fill_n(it + x, w, color);
+        it += width;
+    }
+    bd.updateObjects();
+}
+
+void
 floodFill(const BitmapData_as& bd, size_t startx, size_t starty,
         boost::uint32_t old, boost::uint32_t fill)
 {
@@ -1910,7 +1868,7 @@ floodFill(const BitmapData_as& bd, size_t startx, size_t starty,
 }
 
 void
-adjustRect(int& x, int& y, int& w, int& h, BitmapData_as& b) 
+adjustRect(int& x, int& y, int& w, int& h, const BitmapData_as& b) 
 {
     // No negative width or height
     if (w < 0 || h < 0) {
@@ -1943,6 +1901,59 @@ adjustRect(int& x, int& y, int& w, int& h, BitmapData_as& b)
     // Remove right and bottom excess after x and y adjustments.
     w = std::min<int>(b.width() - x, w);
     h = std::min<int>(b.height() - y, h);
+}
+
+
+boost::uint8_t
+getChannel(boost::uint32_t src, boost::uint8_t bitmask)
+{
+    if (bitmask & BitmapData_as::CHANNEL_RED) {
+        // Red
+        return (src >> 16) & 0xff;
+    }
+    if (bitmask & BitmapData_as::CHANNEL_GREEN) {
+        // Green
+        return (src >> 8) & 0xff;
+    }
+    if (bitmask & BitmapData_as::CHANNEL_BLUE) {
+        // Blue
+        return src & 0xff;
+    }
+    if (bitmask & BitmapData_as::CHANNEL_ALPHA) {
+        // Alpha
+        return src >> 24;
+    }
+    return 0;
+}
+
+boost::uint32_t
+setChannel(boost::uint32_t targ, boost::uint8_t bitmask, boost::uint8_t value)
+{
+    boost::uint32_t bytemask = 0;
+    boost::uint32_t valmask = 0;
+    if (bitmask & BitmapData_as::CHANNEL_RED) {
+        // Red
+        bytemask = 0xff0000;
+        valmask = value << 16;
+    }
+    else if (bitmask & BitmapData_as::CHANNEL_GREEN) {
+        // Green
+        bytemask = 0xff00;
+        valmask = value << 8;
+    }
+    else if (bitmask & BitmapData_as::CHANNEL_BLUE) {
+        // Blue
+        bytemask = 0xff;
+        valmask = value;
+    }
+    else if (bitmask & BitmapData_as::CHANNEL_ALPHA) {
+        // Alpha
+        bytemask = 0xff000000;
+        valmask = value << 24;
+    }
+    targ &= ~bytemask;
+    targ |= valmask;
+    return targ;
 }
 
 

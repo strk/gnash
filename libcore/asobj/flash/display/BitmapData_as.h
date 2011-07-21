@@ -112,11 +112,6 @@ public:
         return _cachedBitmap.get();
     }
 
-    /// Fill the bitmap with a colour starting at x, y
-    //
-    /// Negative values are handled correctly.
-    void fillRect(int x, int y, int w, int h, boost::uint32_t color);
-
     /// Free the bitmap data
     //
     /// This potentially frees the data.
