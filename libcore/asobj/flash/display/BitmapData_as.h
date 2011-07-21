@@ -48,8 +48,18 @@ namespace gnash {
 
 /// Implements the BitmapData native type.
 //
-/// All functions can be called if the BitmapData has been disposed. Callers
-/// do not need to check.
+/// This class gives access to a Bitmap that may be attached to a MovieClip
+/// and rendered directly. The underlying data may therefore be stored
+/// in a Renderer, for instance, and only retrieved from there when a
+/// BitmapData instance requires access to it.
+//
+/// Because this retrieval can be expensive, it is advisable not to call
+/// member functions frequently, but rather to access the data through
+/// iterators. To facilitate this, iterators are random access.
+//
+/// There is also overhead to calling functions such as width() and height(),
+/// again because the image data is retrieve from the Renderer. The size is
+/// immutable, so these dimensions can safely be cached.
 class BitmapData_as : public Relay
 {
 public:
@@ -87,11 +97,17 @@ public:
         return data()->height();
     }
 
+    /// Whether the BitmapData_as has transparency.
+    //
+    /// Do not call if disposed!
     bool transparent() const {
         assert(data());
         return (data()->type() == image::TYPE_RGBA);
     }
 
+    /// Return the image data
+    //
+    /// This is only for use by containes
     const CachedBitmap* bitmapInfo() const {
         return _cachedBitmap.get();
     }
@@ -101,10 +117,9 @@ public:
     /// Negative values are handled correctly.
     void fillRect(int x, int y, int w, int h, boost::uint32_t color);
 
-    void floodFill(size_t x, size_t y, boost::uint32_t old,
-            boost::uint32_t fill);
-    
     /// Free the bitmap data
+    //
+    /// This potentially frees the data.
     void dispose();
     
     /// Draw a MovieClip to a BitmapData
@@ -121,22 +136,29 @@ public:
     virtual void setReachable();
 
     /// Whether the BitmapData has been disposed.
+    //
+    /// Any callers requiring access to the data or any properties should
+    /// check that this is false first. Particularly width(), height(), 
+    /// transparent(), begin(), end() may only be called if the BitmapData_as
+    /// has not been disposed.
     bool disposed() const {
         return !data();
     }
  
+    /// Return a BitmapData_as::iterator to the first pixel in the data.
     iterator begin() const {
         assert(!disposed());
         return image::begin<image::ARGB>(*data());
     }
     
+    /// Return a BitmapData_as::iterator to a one-past-the end pixel.
     iterator end() const {
         assert(!disposed());
         return image::end<image::ARGB>(*data());
     }
 
     /// Inform any attached objects that the data has changed.
-    void updateObjects();
+    void updateObjects() const;
 
 private:
     

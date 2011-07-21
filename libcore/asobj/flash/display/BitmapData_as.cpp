@@ -131,6 +131,9 @@ namespace {
 
     boost::uint8_t getChannel(boost::uint32_t src, boost::uint8_t bitmask);
 
+    void floodFill(const BitmapData_as& bd, size_t startx, size_t starty,
+            boost::uint32_t old, boost::uint32_t fill);
+
     inline bool oneBitSet(boost::uint8_t mask) {
         return mask == (mask & -mask);
     }
@@ -584,7 +587,7 @@ BitmapData_as::BitmapData_as(as_object* owner,
     _cachedBitmap(0)
 {
     assert(im->width() <= 2880);
-    assert(im->width() <= 2880);
+    assert(im->height() <= 2880);
     
     // If there is a renderer, cache the image there, otherwise we store it.
     Renderer* r = getRunResources(*_owner).renderer();
@@ -601,7 +604,7 @@ BitmapData_as::setReachable()
 }
 
 void
-BitmapData_as::updateObjects()
+BitmapData_as::updateObjects() const
 {
     std::for_each(_attachedObjects.begin(), _attachedObjects.end(),
             std::mem_fun(&DisplayObject::update));
@@ -664,84 +667,6 @@ BitmapData_as::draw(MovieClip& mc, const Transform& transform)
     }
 
     mc.draw(*internal, transform);
-    updateObjects();
-}
-
-void
-BitmapData_as::floodFill(size_t startx, size_t starty, boost::uint32_t old,
-        boost::uint32_t fill)
-{
-    if (startx >= width() || starty >= height()) return;
-
-    // We never compare alpha for RGB images.
-    if (!transparent()) fill |= 0xff000000;
-    if (old == fill) return;
-
-    std::queue<PixelIndexer> pixelQueue;
-    pixelQueue.push(
-            PixelIndexer(startx, starty, pixelAt(*this, startx, starty)));
-
-    while (!pixelQueue.empty()) {
-
-        const PixelIndexer& p = pixelQueue.front();
-        const size_t x = p.x;
-        const size_t y = p.y;
-        iterator pix = p.pix;
-
-        pixelQueue.pop();
-
-        assert(pix != end());
-
-        if (*pix != old) continue;
-
-        // Go east!
-        iterator east(pix);
-        if (x + 1 < width()) {
-            ++east;
-            const iterator eaststop(pix + (width() - x));
-            while (east != eaststop && *east == old) ++east;
-            std::fill(pix, east, fill);
-        }
-        size_t edone = (east - pix);
-        if (!edone) ++edone;
-
-        // Add north pixels
-        if (y > 0) {
-            iterator north(pix - width());
-            iterator northend(north + edone);
-            const size_t ny = y - 1;
-            for (size_t nx = x; nx != (x + edone); ++nx, ++north) {
-                if (*north == old) {
-                    pixelQueue.push(PixelIndexer(nx, ny, north));
-                }
-            }
-        }
-
-        // Go west!
-        iterator west(pix);
-        if (x > 0) {
-            --west;
-            const iterator weststop(pix - x);
-            while (west != weststop && *west == old) --west;
-            std::fill(west + 1, pix, fill);
-        }
-        size_t wdone = (pix - west);
-        if (!wdone) ++wdone;
-         
-        // Add south pixels
-        if (y + 1 < height()) {
-            iterator south(pix + width());
-            iterator southend(south - wdone);
-            const size_t sy = y + 1;
-            for (size_t sx = x; sx != x - wdone; --sx, --south) {
-                if (*south == old) {
-                    pixelQueue.push(PixelIndexer(sx, sy, south));
-                }
-            }
-        }
-
-    }
-
     updateObjects();
 }
 
@@ -960,6 +885,9 @@ bitmapdata_copyChannel(const fn_call& fn)
     typedef CopyChannel<BitmapData_as::iterator> Copier;
     Copier c(multiple, srcchans, destchans);
 
+    const size_t ourwidth = ptr->width();
+    const size_t srcwidth = source->width();
+
     // Note that copying the same channel to a range starting in the
     // source range produces unexpected effects because the source
     // range is changed while it is being copied. This is verified
@@ -967,8 +895,8 @@ bitmapdata_copyChannel(const fn_call& fn)
     for (int i = 0; i < destH; ++i) {
         Copier::iterator_type zip(boost::make_tuple(src, targ));
         std::transform(zip, zip + destW, targ, c);
-        targ += ptr->width();
-        src += source->width();
+        targ += ourwidth;
+        src += srcwidth;
     }
 
     ptr->updateObjects();
@@ -1132,6 +1060,9 @@ bitmapdata_copyPixels(const fn_call& fn)
     assert(destX + destW <= static_cast<int>(ptr->width()));
     assert(destY + destH <= static_cast<int>(ptr->height()));
 
+    const size_t ourwidth = ptr->width();
+    const size_t srcwidth = source->width();
+
     // Copy for the width and height of the *dest* image.
     // We have already ensured that the copied area
     // is inside both bitmapdatas.
@@ -1142,8 +1073,8 @@ bitmapdata_copyPixels(const fn_call& fn)
     // right to left.
     if (copyToYRange) {
         assert(destH > 0);
-        targ += (destH - 1) * ptr->width();
-        src += (destH - 1) * source->width();
+        targ += (destH - 1) * ourwidth;
+        src += (destH - 1) * srcwidth;
         // Copy from bottom to top.
         for (int i = destH; i > 0; --i) {
             if (copyToXRange) {
@@ -1152,8 +1083,8 @@ bitmapdata_copyPixels(const fn_call& fn)
             else {
                 std::copy(src, src + destW, targ);
             }
-            targ -= ptr->width();
-            src -= source->width();
+            targ -= ourwidth;
+            src -= srcwidth;
         }
     }
     else {
@@ -1165,8 +1096,8 @@ bitmapdata_copyPixels(const fn_call& fn)
             else {
                 std::copy(src, src + destW, targ);
             }
-            targ += ptr->width();
-            src += source->width();
+            targ += ourwidth;
+            src += srcwidth;
         }
     }
 
@@ -1296,7 +1227,7 @@ bitmapdata_floodFill(const fn_call& fn)
     const boost::uint32_t old = *pixelAt(*ptr, x, y);
 
     // This checks whether the colours are the same.
-    ptr->floodFill(x, y, old, fill);
+    floodFill(*ptr, x, y, old, fill);
     
     return as_value();
 }
@@ -1865,8 +1796,9 @@ attachBitmapDataStaticProperties(as_object& o)
 BitmapData_as::iterator
 pixelAt(const BitmapData_as& bd, size_t x, size_t y)
 {
-    if (x >= bd.width() || y >= bd.height()) return bd.end();
-    return (bd.begin() + y * bd.width() + x);
+    const size_t width = bd.width();
+    if (x >= width || y >= bd.height()) return bd.end();
+    return (bd.begin() + y * width + x);
 }
 
 boost::uint32_t
@@ -1895,6 +1827,86 @@ setPixel32(const BitmapData_as& bd, size_t x, size_t y, boost::uint32_t color)
 
     BitmapData_as::iterator it = pixelAt(bd, x, y);
     *it = color;
+}
+
+void
+floodFill(const BitmapData_as& bd, size_t startx, size_t starty,
+        boost::uint32_t old, boost::uint32_t fill)
+{
+    const size_t width = bd.width();
+    const size_t height = bd.height();
+
+    if (startx >= width || starty >= height) return;
+
+    // We never compare alpha for RGB images.
+    if (!bd.transparent()) fill |= 0xff000000;
+    if (old == fill) return;
+
+    std::queue<PixelIndexer> pixelQueue;
+    pixelQueue.push(PixelIndexer(startx, starty, pixelAt(bd, startx, starty)));
+
+    while (!pixelQueue.empty()) {
+
+        const PixelIndexer& p = pixelQueue.front();
+        const size_t x = p.x;
+        const size_t y = p.y;
+        BitmapData_as::iterator pix = p.pix;
+
+        pixelQueue.pop();
+
+        assert(pix != bd.end());
+
+        if (*pix != old) continue;
+
+        // Go east!
+        BitmapData_as::iterator east(pix);
+        if (x + 1 < width) {
+            ++east;
+            const BitmapData_as::iterator eaststop(pix + (width - x));
+            while (east != eaststop && *east == old) ++east;
+            std::fill(pix, east, fill);
+        }
+        size_t edone = (east - pix);
+        if (!edone) ++edone;
+
+        // Add north pixels
+        if (y > 0) {
+            BitmapData_as::iterator north(pix - width);
+            BitmapData_as::iterator northend(north + edone);
+            const size_t ny = y - 1;
+            for (size_t nx = x; nx != (x + edone); ++nx, ++north) {
+                if (*north == old) {
+                    pixelQueue.push(PixelIndexer(nx, ny, north));
+                }
+            }
+        }
+
+        // Go west!
+        BitmapData_as::iterator west(pix);
+        if (x > 0) {
+            --west;
+            const BitmapData_as::iterator weststop(pix - x);
+            while (west != weststop && *west == old) --west;
+            std::fill(west + 1, pix, fill);
+        }
+        size_t wdone = (pix - west);
+        if (!wdone) ++wdone;
+         
+        // Add south pixels
+        if (y + 1 < height) {
+            BitmapData_as::iterator south(pix + width);
+            BitmapData_as::iterator southend(south - wdone);
+            const size_t sy = y + 1;
+            for (size_t sx = x; sx != x - wdone; --sx, --south) {
+                if (*south == old) {
+                    pixelQueue.push(PixelIndexer(sx, sy, south));
+                }
+            }
+        }
+
+    }
+
+    bd.updateObjects();
 }
 
 void
