@@ -571,7 +571,6 @@ Player::run(int argc, char* argv[], const std::string& infile,
 
     it = _params.find("allowscriptaccess");
     if (it != _params.end()) {
-        std::string access = it->second;
         StringNoCaseEqual noCaseCompare;
         const std::string& str = it->second;
                 
