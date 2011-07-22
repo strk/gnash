@@ -507,13 +507,12 @@ struct PerlinAdapter
     typename Generator::value_type operator()(size_t x, size_t y,
             size_t step = 0) {
         
-        const size_t size = _gen.size();
         // Starting amplitude
         size_t amp = _fractal ? 0x80 : 0xff;
         // Base x frequency.
-        double xfreq = size / _baseX;
+        double xphase = _baseX;
         // Base y frequency.
-        double yfreq = size / _baseY;
+        double yphase = _baseY;
         // Return value.
         double ret = _fractal ? 0x80 : 0;
 
@@ -522,8 +521,8 @@ struct PerlinAdapter
             const Point offset = i < _offsets.size() ? _offsets[i] :
                 Point(0, 0);
 
-            const double n = _gen(((x + offset.x) * xfreq) / size,
-                    ((y + offset.y) * yfreq) / size, step);
+            const double n = _gen((x + offset.x) / xphase,
+                    (y + offset.y) / yphase, step);
 
             ret += amp * (_fractal ? n : std::abs(n));
 
@@ -532,8 +531,8 @@ struct PerlinAdapter
             if (!amp) break;
 
             // Double frequency
-            xfreq *= 2;
-            yfreq *= 2;
+            xphase /= 2;
+            yphase /= 2;
         }
         return ret;
     }
