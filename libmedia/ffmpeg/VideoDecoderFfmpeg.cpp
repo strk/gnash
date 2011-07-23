@@ -204,7 +204,7 @@ VideoDecoderFfmpeg::init(enum CodecID codecId, int /*width*/, int /*height*/,
 
     int ret = avcodec_open(ctx, _videoCodec);
     if (ret < 0) {
-        boost::format msg = boost::format(_("libavcodec"
+        boost::format msg = boost::format(_("libavcodec "
                             "failed to initialize FFMPEG "
                             "codec %s (%d)")) % 
                             _videoCodec->name % (int)codecId;
