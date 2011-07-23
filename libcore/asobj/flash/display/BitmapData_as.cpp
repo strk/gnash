@@ -299,10 +299,8 @@ struct PerlinNoise
     /// @param seed     A seed for the PRNG. Given the same seed the
     ///                 generator will create the same pseudo-random pattern.
     PerlinNoise(int seed)
-        :
-        noise(seed, 0, RAND_MAX)
     {
-        init();
+        init(seed);
     }
 
     boost::uint32_t size() const {
@@ -379,7 +377,9 @@ private:
         r1 = r0 - 1.0;
     }
 
-    void init() {
+    void init(int seed) {
+
+        Noise<> noise(seed, 0, RAND_MAX);
 
         for (size_t i = 0 ; i < Size; ++i) {
             permTable[i] = i;
@@ -418,8 +418,6 @@ private:
 
     // The gradient stuff.
     boost::array<boost::array<T, 2>, Size * 2 + 2> g2;
-
-    Noise<> noise;
 };
 
 /// Store offsets.
