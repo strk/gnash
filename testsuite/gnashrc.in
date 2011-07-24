@@ -54,7 +54,7 @@ set Renderer
 set MediaHandler
 
 # Use a custom key to prevent conflicts with a running plugin
-set LCShmkey 138765373
+set LCShmkey @@SHMKEY@@
 
 # Do not ignore FSCommand while running tests !
 set ignoreFSCommand false
