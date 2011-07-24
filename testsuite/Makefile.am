@@ -111,9 +111,7 @@ abs_tmpsodir = $(shell cd tmpSharedObject; pwd)
 # But when multiple chroot environment exist and run
 # a make check at the same time, there's a key conflict.
 #
-# NOTE: if /dev/random doesn't exist this will be a weak random
-#
-build_shmkey = $(shell test -e /dev/random && od -An -N4 -t x4 -w4 /dev/random || date +'%H%M%S')
+build_shmkey = $(shell date +'%N')
 
 # could not find a way to only build this on make check
 check_LTLIBRARIES = libtestsuite.la 
