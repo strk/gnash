@@ -72,8 +72,6 @@ StreamingSound::decodeNextBlock()
 {
     assert(!decodingCompleted());
 
-    const bool parse = requiresParsing(_soundDef.soundinfo);
-
     // Get the current block of sound data.
     const SimpleBuffer& block = _soundDef.getBlock(_currentBlock);
 
@@ -88,7 +86,7 @@ StreamingSound::decodeNextBlock()
         boost::uint32_t decodedDataSize = 0;
         const boost::uint8_t* input = block.data() + _positionInBlock;
         boost::uint8_t* decodedData = decoder().decode(input, inputSize,
-                decodedDataSize, consumed, parse);
+                decodedDataSize, consumed);
 
         assert(!(decodedDataSize % 2));
 

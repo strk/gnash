@@ -251,7 +251,7 @@ AudioDecoderGst::pullBuffers(boost::uint32_t&  outputSize)
 boost::uint8_t*
 AudioDecoderGst::decode(const boost::uint8_t* input, boost::uint32_t inputSize,
                         boost::uint32_t& outputSize,
-                        boost::uint32_t& decodedData, bool /*parse*/)
+                        boost::uint32_t& decodedData)
 {
     outputSize = decodedData = 0;
 

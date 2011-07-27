@@ -51,7 +51,7 @@ AudioDecoderHaiku::~AudioDecoderHaiku()
 }
 
 boost::uint8_t*
-AudioDecoderHaiku::decode(const boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool parse)
+AudioDecoderHaiku::decode(const boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes)
 {
     (void) input;
     (void) parse;

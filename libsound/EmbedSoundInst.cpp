@@ -91,11 +91,10 @@ EmbedSoundInst::decodeNextBlock()
 {
     assert(!decodingCompleted());
 
-    const bool parse = requiresParsing(_soundDef.soundinfo);
     const boost::uint32_t inputSize = _soundDef.size() - decodingPosition;
 
 #ifdef GNASH_DEBUG_SOUNDS_DECODING
-    log_debug("  decoding %d bytes, parse:%d", inputSize, parse);
+    log_debug("  decoding %d bytes", inputSize);
 #endif
 
     assert(inputSize);
@@ -104,7 +103,7 @@ EmbedSoundInst::decodeNextBlock()
     boost::uint32_t consumed = 0;
     boost::uint32_t decodedDataSize = 0;
     boost::uint8_t* decodedData = decoder().decode(input, inputSize,
-            decodedDataSize, consumed, parse);
+            decodedDataSize, consumed);
 
     decodingPosition += consumed;
 
