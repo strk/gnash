@@ -243,6 +243,9 @@ TEST_ENV = GNASH_GC_TRIGGER_THRESHOLD=0
 TEST_ENV += GNASHRC=../gnashrc
 TEST_ENV += GST_INSTALL_PLUGINS_HELPER=$(top_srcdir)/testsuite/gst_install_plugins_helper.sh
 
+clean-local: 
+	-rm *.swf
+
 check-DEJAGNU: site-update $(check_PROGRAMS)
 	runtest=$(RUNTEST); \
 	if $(SHELL) -c "$$runtest --version" > /dev/null 2>&1; then \
