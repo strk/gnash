@@ -622,14 +622,8 @@ movie_root::keyEvent(key::code k, bool down)
             // i.e. if the stack is at the limit before it contains anything.
             // A stack limit like that is hardly of any use, but could be used
             // maliciously to crash Gnash.
-            if (down) {
-                callMethod(key, getURI(_vm, NSV::PROP_BROADCAST_MESSAGE),
-                        "onKeyDown");
-            }
-            else {
-                callMethod(key, getURI(_vm,NSV::PROP_BROADCAST_MESSAGE),
-                        "onKeyUp");
-            }
+            callMethod(key, getURI(_vm, NSV::PROP_BROADCAST_MESSAGE),
+                    down ? "onKeyDown" : "onKeyUp");
         }
         catch (const ActionLimitException &e) {
             log_error(_("ActionLimits hit notifying key listeners: %s."),
