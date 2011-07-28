@@ -71,12 +71,6 @@
 //
 //#define DEBUG_MOUSE_COORDINATES 1
 
-// Define the following macro if you want to skip rendering
-// when late on FPS time.
-// This is an experimental feature, so it's off by default
-//#define SKIP_RENDERING_IF_LATE 1
-
-
 namespace gnash {
 
 struct Gui::Display
@@ -984,23 +978,6 @@ Gui::advanceMovie(bool doDisplay)
     }
 #endif
     
-#ifdef SKIP_RENDERING_IF_LATE
-    // We want to skip rendering IFF it's time to advance again.
-    // We'll ask the stage about it
-    if (_stage->timeToNextFrame() <= 0) {
-
-        // or should it be if advanced ?
-        if (doDisplay) {
-            // TODO: take note of a frame drop (count them)
-            //log_debug("Frame rendering dropped due to being late");
-#ifdef GNASH_FPS_DEBUG
-            ++frames_dropped;
-#endif
-        }
-        doDisplay = false;
-    }
-#endif // ndef SKIP_RENDERING_IF_LATE
-
 	if (doDisplay && visible()) display(m);
 
 	if (!loops()) {
