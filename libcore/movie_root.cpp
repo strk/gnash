@@ -56,6 +56,7 @@
 #include "Button.h"
 #include "Transform.h"
 #include "StreamProvider.h"
+#include "SystemClock.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -241,17 +242,15 @@ movie_root::setRootMovie(Movie* movie)
 }
 
 bool
-movie_root::abortOnScriptTimeout(const std::string& what) const
+movie_root::queryInterface(const std::string& what) const
 {
-    std::string msg = what + std::string(". Disable scripts? ");
-
     bool disable = true;
     if (_interfaceHandler) {
-        disable = callInterface<bool>(HostMessage(HostMessage::QUERY, msg));
+        disable = callInterface<bool>(HostMessage(HostMessage::QUERY, what));
     }
     else {
         log_error("No user interface registered, assuming 'Yes' answer to "
-            "question: %s", msg);
+            "question: %s", what);
     }
     return disable;
 }
@@ -882,6 +881,9 @@ movie_root::advance()
 
                 const int startBlock = _timelineSound->block;
 
+                const size_t maxTime = getTimeoutLimit() * 1000;
+                SystemClock clock;
+
                 // If we're behind, we should skip; if we're ahead
                 // (_timelineSound->block > block) we should not advance,
                 // if we're ahead, skip.
@@ -893,8 +895,22 @@ movie_root::advance()
                     // if a MovieClip loops, the current timeline sound block
                     // to be moved earlier. In the latter case we break to
                     // avoid catching up to the old sound position.
-                    if (!_timelineSound ||
-                            _timelineSound->block < startBlock) break;
+                    if (!_timelineSound || _timelineSound->block < startBlock) {
+                        break;
+                    }
+
+                    if (clock.elapsed() > maxTime) {
+                        boost::format fmt = 
+                            boost::format(_("Time exceeded (%1% secs) while "
+                                    "attempting to catch up to streaming "
+                                    "sound. Give up on synchronization?"))
+                                    % maxTime;
+
+                        if (queryInterface(fmt.str())) {
+                            _timelineSound.reset();
+                            break;
+                        } 
+                    }
 
                     // Note: advancing the current sound block here makes
                     // it possible that Gnash will never catch up, if e.g.

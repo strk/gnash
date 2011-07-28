@@ -814,7 +814,11 @@ public:
         return _gc;
     }
 
-    bool abortOnScriptTimeout(const std::string& when) const;
+    /// Ask the host interface a question.
+    //
+    /// @param what The question to pose.
+    /// @return     The answer (true for yes, false for no).
+    bool queryInterface(const std::string& what) const;
 
     /// Set the current stream block for the driving streaming sound.
     //
