@@ -268,6 +268,17 @@ public:
     /// @param blockId    Identifier of the block to start decoding from.
     void playStream(int handle, StreamBlockId blockId);
 
+    /// Get the identifier for the block playing in a specific stream.
+    //
+    /// This is used by movie_root to check which part of the stream is
+    /// actually playing. Streaming sound is used to synchronize the frame
+    /// rate. The returned block id can be matched with a specific frame.
+    //
+    /// @param handle   The handle of the stream sound to query.
+    /// @return         The identifier of the stream block that the
+    ///                 sound_handler is currently playing (it may be only
+    ///                 approximate, as we can't really know what's coming out
+    ///                 of the speakers).
     int getStreamBlock(int handle) const;
 
     ////////////////////////////////////////////////

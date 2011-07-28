@@ -818,9 +818,23 @@ public:
 
     /// Set the current stream block for the driving streaming sound.
     //
-    /// TODO: we don't know what the driving streaming sound is.
+    /// The frame rate will be changed so that it advances only when the
+    /// block for a particular frame is reached. Only one sound can drive the
+    /// frame: the first one to be registered.
+    //
+    /// @param id       The id of the stream; if another stream is already
+    ///                 driving the frame rate, nothing happens.
+    /// @param block    The block of sound currently being played. The current
+    ///                 frame will be advanced or delayed until the frame
+    ///                 corresponding to this block is reached.
     void setStreamBlock(int id, int block);
 
+    /// Notify the stage that a sound stream has stopped.
+    //
+    /// If it's the one driving the frame rate, the frame rate will return to
+    /// the nominal rate
+    //
+    /// @param id   The id of the streaming sound.
     void stopStream(int id);
 
 private:
