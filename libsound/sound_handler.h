@@ -278,7 +278,8 @@ public:
     /// @return         The identifier of the stream block that the
     ///                 sound_handler is currently playing (it may be only
     ///                 approximate, as we can't really know what's coming out
-    ///                 of the speakers).
+    ///                 of the speakers). Returns -1 if the specified stream
+    ///                 sound is not playing or doesn't exist.
     int getStreamBlock(int handle) const;
 
     ////////////////////////////////////////////////
