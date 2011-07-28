@@ -2255,6 +2255,10 @@ movie_root::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
                 os.str()));
     localIter = tr.append_child(it, std::make_pair("URL", def->get_url()));
 
+    // Is there a sychronizating sound or not?
+    localIter = tr.append_child(it, std::make_pair("Streaming sound",
+                _timelineSound ? "yes" : "no"));
+
     // TODO: format this better?
     localIter = tr.append_child(it, std::make_pair("Descriptive metadata",
                                         def->getDescriptiveMetadata()));
