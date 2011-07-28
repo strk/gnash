@@ -59,6 +59,8 @@
 #include "GnashSleep.h"
 #include "RunResources.h"
 #include "NullSoundHandler.h"
+#include "as_environment.h"
+#include "as_value.h"
 
 namespace gnash {
 
@@ -89,7 +91,9 @@ DumpGui::DumpGui(unsigned long xid, float scale, bool loop, RunResources& r)
     _fileOutput(),
     _fileOutputFPS(0), // dump at every heart-beat by default
     _lastVideoFrameDump(0), // this will be computed
-    _sleepUS(0)
+    _sleepUS(0),
+    _started(false),
+    _startTime(0)
 {
     if (loop) {
         std::cerr << "# WARNING:  Gnash was told to loop the movie\n";
@@ -116,7 +120,7 @@ DumpGui::init(int argc, char **argv[])
     optind = 0;
     opterr = 0;
     char c;
-    while ((c = getopt(argc, *argv, "D:S:")) != -1) {
+    while ((c = getopt(argc, *argv, "D:S:T:")) != -1) {
         if (c == 'D') {
             // Terminate if no filename is given.
             if (!optarg) {
@@ -136,12 +140,23 @@ DumpGui::init(int argc, char **argv[])
         else if (c == 'S') {
             // Terminate if no filename is given.
             if (!optarg) {
-                std::cerr << 
-                    _("# FATAL:  No sleep ms value given with -S argument.\n");
+                std::cout << 
+                    _("# FATAL:  No sleep ms value given with -S argument.") <<
+                    std::endl;
                 return false;
             }      
             // we take milliseconds
             _sleepUS = std::atoi(optarg) * 1000;
+        }
+        else if (c == 'T') {
+            // Terminate if no filename is given.
+            if (!optarg) {
+                std::cerr << 
+                    _("# FATAL:  No trigger value given with -T argument.\n");
+                return false;
+            }      
+            // we take milliseconds
+            _startTrigger = optarg;
         }
     }
     opterr = origopterr;
@@ -150,6 +165,8 @@ DumpGui::init(int argc, char **argv[])
     std::signal(SIGTERM, terminate_signal);
 
     init_dumpfile();
+
+    if (_startTrigger.empty()) _started = true;
 
     _renderer.reset(create_Renderer_agg(_pixelformat.c_str()));
     _runResources.setRenderer(_renderer);
@@ -183,38 +200,63 @@ DumpGui::run()
     //
     unsigned int clockAdvance = _interval;
 
-    VirtualClock& timer = getClock();
-
     const bool doDisplay = _fileStream.is_open();
 
     terminate_request = false;
+
+    _startTime = _clock.elapsed();
+
     while (!terminate_request) {
 
-        _manualClock.advance(clockAdvance); 
+        _clock.advance(clockAdvance); 
 
         // advance movie now
         advanceMovie(doDisplay);
 
-        writeSamples();
+        if (_started) {
 
-        // Dump a video frame if it's time for it or no frame
-        // was dumped yet
-        size_t elapsed = timer.elapsed();
-        if (!_framecount || 
-                (elapsed - _lastVideoFrameDump) >= _fileOutputAdvance) {
-            writeFrame();
-        }
+            writeSamples();
 
-        // check if we've reached a timeout
-        if (_timeout && timer.elapsed() >= _timeout) {
-            break;
+            // Dump a video frame if it's time for it or no frame
+            // was dumped yet
+            size_t elapsed = _clock.elapsed();
+            if (!_framecount || 
+                    (elapsed - _lastVideoFrameDump) >= _fileOutputAdvance) {
+                writeFrame();
+            }
+
+            // check if we've reached a timeout
+            if (_timeout && _clock.elapsed() >= _timeout) {
+                break;
+            }
         }
 
         if (_sleepUS) gnashSleep(_sleepUS);
 
+        if (!_started && !_startTrigger.empty()) {
+
+            // Check whether to start
+            std::string path;
+            std::string var;
+            if (parsePath(_startTrigger, path, var)) {
+                movie_root& mr = *getStage();
+                const as_environment& env = mr.getRootMovie().get_environment();
+                as_object* o = findObject(env, path);
+                if (o) {
+                    as_value val;
+                    o->get_member(getURI(mr.getVM(), "_ready"), &val);
+                    if (val.equals(true, 8)) {
+                        log_debug("Starting dump");
+                        _started = true;
+                        _startTime = _clock.elapsed();
+                        _lastVideoFrameDump = _startTime;
+                    }
+                }
+            }
+        }
     }
 
-    const boost::uint32_t total_time = timer.elapsed();
+    const boost::uint32_t total_time = _clock.elapsed() - _startTime;
 
     std::cout << "TIME=" << total_time << std::endl;
     std::cout << "FPS_ACTUAL=" << _fileOutputFPS << std::endl;
@@ -256,17 +298,16 @@ DumpGui::writeFrame()
     _fileStream.write(reinterpret_cast<char*>(_offscreenbuf.get()),
             _offscreenbuf_size);
 
-    _lastVideoFrameDump = getClock().elapsed();
+    _lastVideoFrameDump = _clock.elapsed();
     ++_framecount;
 }
 
 void
 DumpGui::writeSamples()
 {
-    VirtualClock& timer = getClock();
     sound::sound_handler* sh = _runResources.soundHandler();
 
-    unsigned int ms = timer.elapsed();
+    unsigned int ms = _clock.elapsed() - _startTime;
 
     // We need to fetch as many samples
     // as needed for a theoretical 44100hz loop.

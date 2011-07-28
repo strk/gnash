@@ -69,7 +69,8 @@ class DSOEXPORT DumpGui : public Gui
     bool want_redraw() { return false; }
     void writeFrame();
     void writeSamples();
-    VirtualClock& getClock() { return _manualClock; }
+
+    virtual VirtualClock& getClock() { return _clock; }
 
 private:
     
@@ -99,12 +100,17 @@ private:
 
     boost::shared_ptr<sound::sound_handler> _soundHandler;
 
-    ManualClock _manualClock;
+    ManualClock _clock;
 
     unsigned long _sleepUS; // micro-seconds sleep between iterations
 
     unsigned int _videoDumpFPS;
 
+    std::string _startTrigger;
+
+    bool _started;
+
+    size_t _startTime;
 
 };
 
