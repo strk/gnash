@@ -58,31 +58,27 @@
 #error Dump gui requires sys/time.h header (POSIX)
 #endif
 
-// Only include signal handlers on OS' that support it
-#ifdef HAVE_SIGNAL_H
-#include <signal.h>
-#endif
+#include <csignal>
 
 #include "dump.h"
 #include "Renderer_agg.h"
 
-namespace gnash 
-{
+namespace gnash {
 
-bool _terminate_request = false;  // signals need to be able to access...
+// signals need to be able to access...
+std::sig_atomic_t terminate_request = false;  
 
-#ifdef HAVE_SIGNAL_H
 // Called on CTRL-C and alike
 void terminate_signal(int /*signo*/) {
-    _terminate_request = true;
-    signal(SIGINT, SIG_DFL);
-    signal(SIGTERM, SIG_DFL);
+    terminate_request = true;
+    std::signal(SIGINT, SIG_DFL);
+    std::signal(SIGTERM, SIG_DFL);
 }
-#endif
 
 // TODO:  Let user decide bits-per-pixel
 // TODO:  let user decide colorspace (see also _bpp above!)
-DumpGui::DumpGui(unsigned long xid, float scale, bool loop, RunResources& r) :
+DumpGui::DumpGui(unsigned long xid, float scale, bool loop, RunResources& r)
+    :
     Gui(xid, scale, loop, r),
     _agg_renderer(0),
     _offscreenbuf(NULL),
@@ -113,7 +109,6 @@ DumpGui::~DumpGui()
 bool
 DumpGui::init(int argc, char **argv[])
 {
-
     int origopterr = opterr;
 
     if (_xid) {
@@ -153,10 +148,8 @@ DumpGui::init(int argc, char **argv[])
     }
     opterr = origopterr;
 
-#ifdef HAVE_SIGNAL_H
-    signal(SIGINT, terminate_signal);
-    signal(SIGTERM, terminate_signal);
-#endif
+    std::signal(SIGINT, terminate_signal);
+    std::signal(SIGTERM, terminate_signal);
 
     init_dumpfile();
 
@@ -183,7 +176,6 @@ DumpGui::run()
         _fileOutputAdvance = _interval;
         _fileOutputFPS = static_cast<int>(1000/_fileOutputAdvance);
     }
-    
 
     log_debug("DumpGui entering main loop with interval of %d ms", _interval);
 
@@ -197,8 +189,8 @@ DumpGui::run()
 
     const bool doDisplay = _fileStream.is_open();
 
-    _terminate_request = false;
-    while (!_terminate_request) {
+    terminate_request = false;
+    while (!terminate_request) {
 
         _manualClock.advance(clockAdvance); 
 
@@ -210,22 +202,21 @@ DumpGui::run()
         // Dump a video frame if it's time for it or no frame
         // was dumped yet
         size_t elapsed = timer.elapsed();
-        if ( ! _framecount ||
-                elapsed - _lastVideoFrameDump >= _fileOutputAdvance )
-        {
+        if (!_framecount || 
+                (elapsed - _lastVideoFrameDump) >= _fileOutputAdvance) {
             writeFrame();
         }
 
         // check if we've reached a timeout
-        if (_timeout && timer.elapsed() >= _timeout ) {
+        if (_timeout && timer.elapsed() >= _timeout) {
             break;
         }
 
-        if ( _sleepUS ) gnashSleep(_sleepUS);
+        if (_sleepUS) gnashSleep(_sleepUS);
 
     }
 
-    boost::uint32_t total_time = timer.elapsed();
+    const boost::uint32_t total_time = timer.elapsed();
 
     std::cout << "TIME=" << total_time << std::endl;
     std::cout << "FPS_ACTUAL=" << _fileOutputFPS << std::endl;
@@ -252,10 +243,9 @@ DumpGui::setInterval(unsigned int interval)
 bool
 DumpGui::createWindow(int width, int height) 
 {
-
     _width = width;
     _height = height;
-    _validbounds.setTo(0, 0, _width-1, _height-1);
+    _validbounds.setTo(0, 0, _width - 1, _height - 1);
     setRenderHandlerSize(_width, _height);
     return true;
 }
@@ -263,7 +253,7 @@ DumpGui::createWindow(int width, int height)
 void
 DumpGui::writeFrame()
 {
-    if (! _fileStream.is_open() ) return;
+    if (!_fileStream.is_open()) return;
 
     _fileStream.write(reinterpret_cast<char*>(_offscreenbuf.get()),
             _offscreenbuf_size);
@@ -285,19 +275,17 @@ DumpGui::writeSamples()
     // That is 44100 samples each second.
     // 44100/1000 = x/ms
     //  x = (44100*ms) / 1000
-    unsigned int nSamples = (441*ms) / 10;
+    const unsigned int nSamples = (441 * ms) / 10;
 
     // We double because sound_handler interface takes
     // "mono" samples... (eh.. would be wise to change)
-    unsigned int toFetch = nSamples*2;
+    unsigned int toFetch = nSamples * 2;
 
     // Now substract what we fetched already
     toFetch -= _samplesFetched;
 
     // And update _samplesFetched..
     _samplesFetched += toFetch;
-
-    //log_debug("DumpGui::writeSamples(%d) fetching %d samples", ms, toFetch);
 
     boost::int16_t samples[1024];
     while (toFetch) {
@@ -323,19 +311,18 @@ DumpGui::init_dumpfile()
     
     if (!_fileStream) {
         log_error(_("Unable to write file '%s'."), _fileOutput);
-        std::cerr << "# FATAL:  Unable to write file '" << _fileOutput << "'" << std::endl;
-        exit(EXIT_FAILURE);
+        std::cerr << "# FATAL:  Unable to write file '" << _fileOutput
+            << "'" << std::endl;
+        std::exit(EXIT_FAILURE);
     }
 
     // Yes, this should go to cout.  The user needs to know this
     // information in order to process the file.  Print out in a
     // format that is easy to source into shell.
     std::cout << 
-        "# Gnash created a raw dump file with the following properties:" << std::endl <<
-        "COLORSPACE=" << _pixelformat << std::endl <<
-        "NAME=" << _fileOutput  << 
-        std::endl;
-    
+        "# Gnash created a raw dump file with the following properties:\n" <<
+        "COLORSPACE=" << _pixelformat << "\n" <<
+        "NAME=" << _fileOutput << "\n";
 }
 
 void
@@ -348,24 +335,24 @@ DumpGui::setRenderHandlerSize(int width, int height)
     if (_offscreenbuf.get() && (width == _width) && (height == _height)) {
         return;
     }
-	   
+
     _width = width;
     _height = height;
-    std::cout << "WIDTH=" << _width  << std::endl <<
+
+    std::cout << "WIDTH=" << _width  << "\n" <<
         "HEIGHT=" << _height  << std::endl;
 
-    int row_size = width*((_bpp+7)/8);
-    int newBufferSize = row_size * height;
-  	
+    const int row_size = width * ((_bpp+7)/8);
+    const int newBufferSize = row_size * height;
+
     // Reallocate the buffer when it shrinks or grows.
     if (newBufferSize != _offscreenbuf_size) {
-
         try {
-              _offscreenbuf.reset(new unsigned char[newBufferSize]);
-              log_debug("DUMP-AGG: %i bytes offscreen buffer allocated", newBufferSize);
+            _offscreenbuf.reset(new unsigned char[newBufferSize]);
+            log_debug("DUMP-AGG: %i bytes offscreen buffer allocated",
+                    newBufferSize);
         }
-        catch (std::bad_alloc &e)
-        {
+        catch (const std::bad_alloc& e) {
             log_error("Could not allocate %i bytes for offscreen buffer: %s",
                   newBufferSize, e.what());
                   
@@ -378,12 +365,8 @@ DumpGui::setRenderHandlerSize(int width, int height)
 
     }
 
-    _agg_renderer->init_buffer(_offscreenbuf.get(),
-         _offscreenbuf_size,
-         _width,
-         _height,
-         row_size
-         );
+    _agg_renderer->init_buffer(_offscreenbuf.get(), _offscreenbuf_size, _width,
+         _height, row_size);
 }
 
 void 
@@ -394,7 +377,7 @@ DumpGui::beforeRendering()
 void
 DumpGui::quitUI()
 {
-    _terminate_request = true;
+    terminate_request = true;
 }
 
 } // end of namespace gnash
