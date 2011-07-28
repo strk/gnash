@@ -906,6 +906,9 @@ movie_root::advance()
                                     "sound. Give up on synchronization?"))
                                     % maxTime;
 
+                        // We'll start synchronizing again anyway when the
+                        // next stream block arrives, but this will at least
+                        // unblock the user interface.
                         if (queryInterface(fmt.str())) {
                             _timelineSound.reset();
                             break;
