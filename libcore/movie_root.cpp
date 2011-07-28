@@ -219,7 +219,6 @@ movie_root::setRootMovie(Movie* movie)
     _stageWidth = static_cast<int>(md->get_width_pixels());
     _stageHeight = static_cast<int>(md->get_height_pixels());
 
-    // assert(movie->get_depth() == 0); ?
     movie->set_depth(DisplayObject::staticDepthOffset);
 
     try {
@@ -913,29 +912,11 @@ movie_root::advance()
         }
         else {
             // Driven by frame rate
-
             const size_t elapsed = now - _lastMovieAdvancement;
             if (elapsed >= _movieAdvancementDelay) {
-
                 advanced = true;
                 advanceMovie();
-
-                // To catch-up lateness we pretend we advanced when 
-                // was time for it. 
-                // NOTE:
-                //   now - _lastMovieAdvancement
-                // gives you actual lateness in milliseconds
-                //
-                // TODO: make 'catchup' setting user-settable
-                //       as it helps A/V sync but sacrifices 
-                //       smoothness of animation which is very
-                //       important for games.
-                static const bool catchup = false;
-                if (catchup) {
-                    _lastMovieAdvancement += _movieAdvancementDelay;
-                } else {
-                    _lastMovieAdvancement = now;
-                }
+                _lastMovieAdvancement = now;
             }
         }
         
