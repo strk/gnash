@@ -1,7 +1,7 @@
 // dump.cpp: headless player that dumps a video and audio stream
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010,
-//   2011 Free Software Foundation, Inc
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free Software
+//   Foundation, Inc
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,8 +27,29 @@
 #include "gnashconfig.h"
 #endif
 
-#include "log.h"
+#ifndef RENDERER_AGG
+#error Dump gui requires AGG renderer
+#endif
 
+#include "dump.h"
+
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/lexical_cast.hpp>
+#include <csignal>
+#include <cstdlib>
+
+#ifndef HAVE_UNISTD_H
+#error Dump gui requires unistd.h
+#else
+#include <unistd.h>
+#endif
+
+#include "Renderer_agg.h"
+#include "log.h"
 #include "WallClockTimer.h"
 #include "gui.h"
 #include "rc.h"
@@ -39,37 +60,14 @@
 #include "RunResources.h"
 #include "NullSoundHandler.h"
 
-#include <iostream>
-#include <string>
-#include <fstream>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/lexical_cast.hpp>
-
-#ifndef RENDERER_AGG
-#error Dump gui requires AGG renderer
-#endif
-
-#ifndef HAVE_UNISTD_H
-#error Dump gui requires unistd.h header (POSIX)
-#endif
-
-#ifndef HAVE_SYS_TIME_H
-#error Dump gui requires sys/time.h header (POSIX)
-#endif
-
-#include <csignal>
-
-#include "dump.h"
-#include "Renderer_agg.h"
-
 namespace gnash {
 
 // signals need to be able to access...
 std::sig_atomic_t terminate_request = false;  
 
 // Called on CTRL-C and alike
-void terminate_signal(int /*signo*/) {
+void terminate_signal(int /*signo*/)
+{
     terminate_request = true;
     std::signal(SIGINT, SIG_DFL);
     std::signal(SIGTERM, SIG_DFL);
@@ -118,7 +116,7 @@ DumpGui::init(int argc, char **argv[])
     optind = 0;
     opterr = 0;
     char c;
-    while ((c = getopt (argc, *argv, "D:S:")) != -1) {
+    while ((c = getopt(argc, *argv, "D:S:")) != -1) {
         if (c == 'D') {
             // Terminate if no filename is given.
             if (!optarg) {
@@ -138,12 +136,12 @@ DumpGui::init(int argc, char **argv[])
         else if (c == 'S') {
             // Terminate if no filename is given.
             if (!optarg) {
-                std::cout << 
-                    _("# FATAL:  No sleep ms value given with -S argument.") <<
-                    std::endl;      
+                std::cerr << 
+                    _("# FATAL:  No sleep ms value given with -S argument.\n");
                 return false;
             }      
-            _sleepUS = atoi(optarg)*1000; // we take milliseconds
+            // we take milliseconds
+            _sleepUS = std::atoi(optarg) * 1000;
         }
     }
     opterr = origopterr;

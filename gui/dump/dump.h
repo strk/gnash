@@ -33,12 +33,9 @@
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
 
-namespace gnash
-{
+namespace gnash {
 
 class Renderer_agg_base;
-
-typedef bool (*callback_t)(void*, int, void *data);
 
 class DSOEXPORT DumpGui : public Gui
 {
@@ -114,5 +111,4 @@ private:
 // end of namespace gnash 
 }
 
-// end of __DUMP_H__
 #endif
