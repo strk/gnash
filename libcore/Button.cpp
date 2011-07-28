@@ -739,7 +739,7 @@ Button::set_current_state(MouseState new_state)
 #endif
 
     // Remember current state
-    _mouseState=new_state;
+    _mouseState = new_state;
      
 }
 
@@ -768,8 +768,9 @@ Button::getBounds() const
     typedef std::vector<const DisplayObject*> Chars;
     Chars actChars;
     getActiveCharacters(actChars);
-    for(Chars::const_iterator i=actChars.begin(),e=actChars.end(); i!=e; ++i)
-    {
+    for (Chars::const_iterator i = actChars.begin(), e = actChars.end();
+            i != e; ++i) {
+
         const DisplayObject* ch = *i;
         // Child bounds need be transformed in our coordinate space
         SWFRect lclBounds = ch->getBounds();
@@ -968,16 +969,22 @@ Button::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
     getActiveCharacters(actChars, true);
     std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
 
-    os << actChars.size() << " active DisplayObjects for state " <<
-        mouseStateName(_mouseState);
-    InfoTree::iterator localIter = tr.append_child(selfIt,
-            std::make_pair(_("Button state"), os.str()));
-
     os.str("");
     os << std::boolalpha << isEnabled();
-    localIter = tr.append_child(selfIt, std::make_pair(_("Enabled"), os.str()));
+    InfoTree::iterator localIter = tr.append_child(selfIt,
+            std::make_pair(_("Enabled"), os.str()));
 
-    std::for_each(actChars.begin(), actChars.end(),
+    os.str("");
+    os << _mouseState;
+    localIter = tr.append_child(selfIt,
+            std::make_pair(_("Button state"), os.str()));
+    
+    os.str("");
+    os << _stateCharacters.size();
+    localIter = tr.append_child(selfIt, std::make_pair(_("Action characters"),
+            os.str()));
+
+    std::for_each(_stateCharacters.begin(), _stateCharacters.end(),
             boost::bind(&DisplayObject::getMovieInfo, _1, tr, localIter)); 
 
     return selfIt;
@@ -985,16 +992,15 @@ Button::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 }
 #endif
 
-const char*
-Button::mouseStateName(MouseState s)
+std::ostream&
+operator<<(std::ostream& o, const Button::MouseState& st)
 {
-    switch (s)
-    {
-        case MOUSESTATE_UP: return "UP";
-        case MOUSESTATE_DOWN: return "DOWN";
-        case MOUSESTATE_OVER: return "OVER";
-        case MOUSESTATE_HIT: return "HIT";
-        default: std::abort();
+    switch (st) {
+        case Button::MOUSESTATE_UP: return o << "UP";
+        case Button::MOUSESTATE_DOWN: return o << "DOWN";
+        case Button::MOUSESTATE_OVER: return o << "OVER";
+        case Button::MOUSESTATE_HIT: return o << "HIT";
+        default: return o << "Unknown state";
     }
 }
 

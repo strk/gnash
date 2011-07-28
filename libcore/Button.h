@@ -77,8 +77,6 @@ public:
             DisplayObject* parent);
 
     ~Button();
-    
-    static const char* mouseStateName(MouseState s);
 
     bool mouseEnabled() const { return true; }
 
@@ -185,8 +183,9 @@ private:
 
     DisplayObjects _hitCharacters;
 
-
 };
+
+std::ostream& operator<<(std::ostream& o, const Button::MouseState& st);
 
 /// Initialize the global Button class
 void button_class_init(as_object& global, const ObjectURI& uri);
