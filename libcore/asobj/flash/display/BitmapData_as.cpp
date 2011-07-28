@@ -1063,6 +1063,13 @@ bitmapdata_draw(const fn_call& fn)
     as_object* o = toObject(fn.arg(0), getVM(fn));
     MovieClip* mc = get<MovieClip>(o);
     if (!mc) {
+
+        BitmapData_as* bitmap;
+        if (isNativeType(o, bitmap)) {
+            LOG_ONCE(log_unimpl("BitmapData.draw() with BitmapData argument"));
+            return as_value();
+        }
+
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
