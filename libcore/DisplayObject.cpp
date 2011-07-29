@@ -1337,7 +1337,6 @@ getNameProperty(DisplayObject& o)
 {
     string_table& st = getStringTable(*getObject(&o));
     const std::string& name = o.get_name().toString(st);
-    if (getSWFVersion(*getObject(&o)) < 6 && name.empty()) return as_value(); 
     return as_value(name);
 }
 
