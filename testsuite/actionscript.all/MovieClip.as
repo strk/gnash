@@ -562,7 +562,10 @@ check(mc3 != undefined);
 check_equals(mc3.getDepth(), 50);
 
 mc3.bd = Button.prototype.getDepth;
-check_equals(mc3.bd(), 50);
+// Tested with: LNX 10,0,12,10
+//              LNX 9,0,115,0
+//              WIN 10,2,152,26
+check_equals(typeof(mc3.bd()), 'undefined');
 
 #if OUTPUT_VERSION > 6 // {
 check_equals(getInstanceAtDepth(50), mc3);

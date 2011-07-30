@@ -1065,7 +1065,7 @@ button_getDepth(const fn_call& fn)
 {
     // This does exactly the same as MovieClip.getDepth, but appears to be
     // a separate function.
-    DisplayObject* obj = ensure<IsDisplayObject<> >(fn);
+    DisplayObject* obj = ensure<IsDisplayObject<Button> >(fn);
     return as_value(obj->get_depth());
 }
 
