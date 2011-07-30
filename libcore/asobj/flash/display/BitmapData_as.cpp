@@ -179,7 +179,7 @@ struct Noise
         return uni();
     }
 
-    /// Get a random int between low and val.
+    /// Get a random int between 0 and val.
     //
     /// This is for use by std::random_shuffle().
     int operator()(int val) {
