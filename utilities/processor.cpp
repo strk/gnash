@@ -503,7 +503,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
         MovieClip::MovieVariables v;
         m.init(md.get(), v);
 
-        log_debug("iteration, timer: %lu, localDelay: %ld\n",
+        log_debug("iteration, timer: %lu, localDelay: %ld",
                 cl.elapsed(), localDelay);
         gnashSleep(localDelay);
         
