@@ -8,13 +8,13 @@ for t in $@; do
 	{
 	echo "== $testname =="
 	echo 
-	echo "Source: http://cvs.savannah.gnu.org/viewcvs/gnash/testsuite/actionscript.all/${testname}.as?root=gnash"
+	echo "Source: http://git.sv.gnu.org/gitweb/?p=gnash.git;a=blob;f=testsuite/actionscript.all/${testname}.as;hb=HEAD"
 	echo 
 	echo "Targets: "
-	echo "[http://www.gnashdev.org/testcases/v5/${testname}-v5.swf SWF5] "
-	echo "[http://www.gnashdev.org/testcases/v6/${testname}-v6.swf SWF6] "
-	echo "[http://www.gnashdev.org/testcases/v7/${testname}-v7.swf SWF7] "
-	echo "[http://www.gnashdev.org/testcases/v8/${testname}-v8.swf SWF8]"
+	echo "[http://gnashdev.org/testcases/v5/${testname}-v5.swf SWF5] "
+	echo "[http://gnashdev.org/testcases/v6/${testname}-v6.swf SWF6] "
+	echo "[http://gnashdev.org/testcases/v7/${testname}-v7.swf SWF7] "
+	echo "[http://gnashdev.org/testcases/v8/${testname}-v8.swf SWF8]"
 	echo 
 	} 
 done; 
