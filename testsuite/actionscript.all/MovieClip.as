@@ -1219,6 +1219,8 @@ check_equals(a, "changed");
 // Tested with: LNX 10,0,12,10
 //              LNX 9,0,115,0
 //              WIN 10,2,152,26
+//              LNX 9,0,48,0
+//              MAC 9,0,47,0
 check_equals(typeof(a), 'string');
 check_equals(a, '');
 #endif
@@ -1245,6 +1247,8 @@ check_equals(a, "changed");
 // Tested with: LNX 10,0,12,10
 //              LNX 9,0,115,0
 //              WIN 10,2,152,26
+//              LNX 9,0,48,0
+//              MAC 9,0,47,0
 check_equals(typeof(a), 'string');
 check_equals(a, '');
 #endif
