@@ -133,31 +133,43 @@ SDL_sound_handler::~SDL_sound_handler()
 
 }
 
+int
+SDL_sound_handler::createStreamingSound(const media::SoundInfo& sinfo)
+{
+    boost::mutex::scoped_lock lock(_mutex);
+    return sound_handler::createStreamingSound(sinfo);
+}
 
 int
 SDL_sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,
-                                std::auto_ptr<media::SoundInfo> sinfo)
+                                const media::SoundInfo& sinfo)
 {
     boost::mutex::scoped_lock lock(_mutex);
     return sound_handler::create_sound(data, sinfo);
 }
 
 sound_handler::StreamBlockId
-SDL_sound_handler::addSoundBlock(unsigned char* data,
-        unsigned int dataBytes, unsigned int nSamples,
-        int streamId)
+SDL_sound_handler::addSoundBlock(std::auto_ptr<SimpleBuffer> buf,
+        size_t sampleCount, int seekSamples, int handle)
 {
 
     boost::mutex::scoped_lock lock(_mutex);
-    return sound_handler::addSoundBlock(data, dataBytes, nSamples, streamId);
+    return sound_handler::addSoundBlock(buf, sampleCount, seekSamples, handle);
 }
 
 
 void
-SDL_sound_handler::stop_sound(int soundHandle)
+SDL_sound_handler::stopEventSound(int soundHandle)
 {
     boost::mutex::scoped_lock lock(_mutex);
-    sound_handler::stop_sound(soundHandle);
+    sound_handler::stopEventSound(soundHandle);
+}
+
+void
+SDL_sound_handler::stopStreamingSound(int soundHandle)
+{
+    boost::mutex::scoped_lock lock(_mutex);
+    sound_handler::stopStreamingSound(soundHandle);
 }
 
 
@@ -177,7 +189,7 @@ SDL_sound_handler::stop_all_sounds()
 
 
 int
-SDL_sound_handler::get_volume(int soundHandle)
+SDL_sound_handler::get_volume(int soundHandle) const
 {
     boost::mutex::scoped_lock lock(_mutex);
     return sound_handler::get_volume(soundHandle);
@@ -192,21 +204,21 @@ SDL_sound_handler::set_volume(int soundHandle, int volume)
 }
     
 media::SoundInfo*
-SDL_sound_handler::get_sound_info(int soundHandle)
+SDL_sound_handler::get_sound_info(int soundHandle) const
 {
     boost::mutex::scoped_lock lock(_mutex);
     return sound_handler::get_sound_info(soundHandle);
 }
 
 unsigned int
-SDL_sound_handler::get_duration(int soundHandle)
+SDL_sound_handler::get_duration(int soundHandle) const
 {
     boost::mutex::scoped_lock lock(_mutex);
     return sound_handler::get_duration(soundHandle);
 }
 
 unsigned int
-SDL_sound_handler::tell(int soundHandle)
+SDL_sound_handler::tell(int soundHandle) const
 {
     boost::mutex::scoped_lock lock(_mutex);
     return sound_handler::tell(soundHandle);

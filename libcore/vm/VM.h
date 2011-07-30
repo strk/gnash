@@ -40,6 +40,7 @@
 #include "as_value.h"
 #include "namedStrings.h"
 #include "ObjectURI.h"
+#include "ConstantPool.h"
 
 // Forward declarations
 namespace gnash {
@@ -246,6 +247,10 @@ public:
     /// Print stack, call stack, and registers to the specified ostream
     void dumpState(std::ostream& o, size_t limit = 0);
 
+    void setConstantPool(const ConstantPool *pool) { _constantPool = pool; }
+
+    const ConstantPool *getConstantPool() const { return _constantPool; }
+
 private:
 
 	/// Stage associated with this VM
@@ -278,6 +283,7 @@ private:
 
     RNG _rng;
 
+    const ConstantPool* _constantPool;
 };
 
 // @param lowerCaseHint if true the caller guarantees

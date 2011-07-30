@@ -110,6 +110,7 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv,
     _withStack(),
     _scopeStack(),
     _func(0),
+    _this_ptr(0),
     _initialStackSize(0),
     _originalTarget(0),
     _origExecSWFVersion(0),
@@ -537,7 +538,7 @@ ActionExec::cleanupAfterRun()
         // check if the stack was smashed
         if (_initialStackSize > env.stack_size()) {
             log_swferror(_("Stack smashed (ActionScript compiler bug, or "
-                "obfuscated SWF).Taking no action to fix (as expected)."));
+                "obfuscated SWF). Taking no action to fix (as expected)."));
         }
         else if (_initialStackSize < env.stack_size()) {
            log_swferror(_("%d elements left on the stack after block "

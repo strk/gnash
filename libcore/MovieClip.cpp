@@ -63,6 +63,7 @@
 #include "Global_as.h"
 #include "RunResources.h"
 #include "Transform.h"
+#include "ConstantPool.h" // for PoolGuard
 
 namespace gnash {
 
@@ -96,7 +97,7 @@ namespace {
 /// Its execution will call constructAsScriptObject() 
 /// on the target movieclip
 ///
-class ConstructEvent: public ExecutableCode
+class ConstructEvent : public ExecutableCode
 {
 public:
 
@@ -109,6 +110,28 @@ public:
         static_cast<MovieClip*>(target())->constructAsScriptObject();
     }
 
+};
+
+/// Generic event  (constructed by id, invoked using notifyEvent
+class QueuedEvent : public ExecutableCode
+{
+public:
+
+    QueuedEvent(MovieClip* nTarget, const event_id& id)
+        :
+        ExecutableCode(nTarget),
+        _eventId(id)
+    {}
+
+    virtual void execute() {
+        // don't execute any events for destroyed DisplayObject.
+        if (!target()->isDestroyed()) {
+            static_cast<MovieClip*>(target())->notifyEvent(_eventId);
+        }
+    }
+
+private:
+    const event_id _eventId;
 };
 
 /// Find a DisplayObject hit by the given coordinates.
@@ -511,6 +534,13 @@ MovieClip::getDisplayObjectAtDepth(int depth)
     return _displayList.getDisplayObjectAtDepth(depth);
 }
 
+void
+MovieClip::queueEvent(const event_id& id, int lvl)
+{
+    std::auto_ptr<ExecutableCode> event(new QueuedEvent(this, id));
+    stage().pushAction(event, lvl);
+}
+
 /// This handles special properties of MovieClip.
 //
 /// The only genuine special properties are DisplayList members. These
@@ -597,6 +627,7 @@ MovieClip::call_frame_actions(const as_value& frame_spec)
     //             to properly queue actions back on the global queue.
     //
     _callingFrameActions = true;
+    PoolGuard poolGuard(getVM(*getObject(this)), 0);
     const PlayList* playlist = _def->getPlaylist(frame_number);
     if (playlist) {
         PlayList::const_iterator it = playlist->begin();
@@ -687,7 +718,8 @@ MovieClip::notifyEvent(const event_id& id)
     // We do not execute ENTER_FRAME if unloaded
     if (id.id() == event_id::ENTER_FRAME && unloaded()) {
 #ifdef GNASH_DEBUG
-        log_debug(_("Sprite %s ignored ENTER_FRAME event (is unloaded)"), getTarget());
+        log_debug(_("Sprite %s ignored ENTER_FRAME event (is unloaded)"),
+                getTarget());
 #endif
         return;
     }
@@ -700,11 +732,17 @@ MovieClip::notifyEvent(const event_id& id)
         return;
     }
 
-    std::auto_ptr<ExecutableCode> code (get_event_handler(id));
+    // Dispatch static event handlers (defined in PlaceObject tags).
+    std::auto_ptr<ExecutableCode> code(get_event_handler(id));
     if (code.get()) {
         // Dispatch.
         code->execute();
     }
+
+    // Now call user-defined event handlers, but not for everything.
+
+    // User-defined key events are never called.
+    if (isKeyEvent(id)) return;
 
     // user-defined onInitialize is never called
     if (id.id() == event_id::INITIALIZE) return;
@@ -737,17 +775,14 @@ MovieClip::notifyEvent(const event_id& id)
             // nor if it's dynamic  
             if (isDynamic()) break;
 
-            const sprite_definition* def =
-                dynamic_cast<const sprite_definition*>(_def.get());
-
             // must be a loaded movie (loadMovie doesn't mark it as 
             // "dynamic" - should it? no, or getBytesLoaded will always
             // return 0)  
-            if (!def) break;
+            if (!_def) break;
 
             // if it has a registered class it can have an onLoad 
             // in prototype...
-            if (def->getRegisteredClass()) break;
+            if (stage().getRegisteredClass(_def.get())) break;
 
 #ifdef GNASH_DEBUG
             log_debug(_("Sprite %s (depth %d) won't check for user-defined "
@@ -761,9 +796,7 @@ MovieClip::notifyEvent(const event_id& id)
     }
 
     // Call the appropriate member function.
-    if (!isKeyEvent(id)) {
-        sendEvent(*getObject(this), get_environment(), id.functionURI());
-    }
+    sendEvent(*getObject(this), get_environment(), id.functionURI());
 
 }
 
@@ -1634,7 +1667,7 @@ MovieClip::constructAsScriptObject()
         dynamic_cast<const sprite_definition*>(_def.get());
 
     // We won't "construct" top-level movies
-    as_function* ctor = def ? def->getRegisteredClass() : 0;
+    as_function* ctor = def ? stage().getRegisteredClass(def) : 0;
 
 #ifdef GNASH_DEBUG
     log_debug(_("Attached movieclips %s registered class is %p"),
@@ -1748,6 +1781,7 @@ MovieClip::construct(as_object* initObj)
 bool
 MovieClip::unloadChildren()
 {
+
 #ifdef GNASH_DEBUG
     log_debug(_("Unloading movieclip '%s'"), getTargetPath());
 #endif
@@ -1760,7 +1794,14 @@ MovieClip::unloadChildren()
     // on itself.
     _drawable.clear();
     
-    return _displayList.unload();
+    const bool childHandler = _displayList.unload();
+
+    if (!unloaded()) {
+        queueEvent(event_id(event_id::UNLOAD), movie_root::PRIORITY_DOACTION);
+    }
+
+    return childHandler;
+
 }
 
 void
@@ -2047,7 +2088,7 @@ MovieClip::stopStreamSound()
 
     sound::sound_handler* handler = getRunResources(*getObject(this)).soundHandler();
     if (handler) {
-        handler->stop_sound(m_sound_stream_id);
+        handler->stopStreamingSound(m_sound_stream_id);
     }
 
     m_sound_stream_id = -1;

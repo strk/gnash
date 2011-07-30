@@ -35,6 +35,7 @@
 #include "filter_factory.h"
 #include "GnashAlgorithm.h"
 #include "action_buffer.h"
+#include "utility.h"
 
 namespace gnash {
 namespace SWF {
@@ -333,15 +334,13 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
     // PlaceObject3 speckfic flags, first 3 bits are unused
     m_has_flags3 = in.read_u8();
     
-    boost::uint8_t bitmask = 0;
-    std::string className;
-
     _depth = in.read_u16() + DisplayObject::staticDepthOffset;
 
     // This is documented to be here, but real instances of 
     // tags with either className or hasImage defined are rare to
     // non-existent. Alexis' SWF reference has neither of them,
     // instead specifying 5 reserved bits in the PlaceObject3 flags.
+    std::string className;
     if (hasClassName() || (hasImage() && hasCharacter())) {
         log_unimpl("PLACEOBJECT3 with associated class name");
         in.read_string(className);
@@ -390,6 +389,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
         LOG_ONCE(log_unimpl("Blend mode in PlaceObject tag"));
     }
 
+    boost::uint8_t bitmask = 0;
     if (hasBitmapCaching()) {
         // cacheAsBitmap is a boolean value, so the flag itself ought to be
         // enough. Alexis' SWF reference is unsure about this, but suggests
@@ -404,6 +404,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
         in.ensureBytes(1);
         bitmask = in.read_u8();
 	    LOG_ONCE(log_unimpl("Bitmap caching"));
+        UNUSED(bitmask);
     }
 
     if (hasClipActions()) {

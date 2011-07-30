@@ -150,9 +150,6 @@ class DSOEXPORT movie_root : public GcRoot, boost::noncopyable
 {
 public:
     
-    /// Listeners container
-    typedef std::list<Button*> Listeners;
-
     class LoadCallback {
     public:
         LoadCallback(boost::shared_ptr<IOChannel> s, as_object* o)
@@ -394,10 +391,16 @@ public:
     }
 
     /// Push a new DisplayObject listener for key events
-    void add_key_listener(Button* listener);
+    //
+    /// Each button can register several events for its actions. Only one
+    /// event can be registered for each key. The key code is unique to
+    /// Buttons: it is neither ascii nor the key-specific code.
+    //
+    /// @param c    The SWF key code for the button event.
+    void registerButtonKey(int c, Button* listener);
 
     /// Remove a DisplayObject listener for key events
-    void remove_key_listener(Button* listener);
+    void removeButtonKey(Button* listener);
 
     /// Get the DisplayObject having focus
     //
@@ -566,9 +569,7 @@ public:
     /// - Mouse entities (m_mouse_button_state)
     /// - Timer targets (_intervalTimers)
     /// - Resources reachable by ActionQueue code (_actionQueue)
-    /// - Key listeners (_keyListeners)
     /// - Any DisplayObject being dragged 
-    ///
     void markReachableResources() const;
 
     /// \brief
@@ -668,6 +669,20 @@ public:
     const Keys& unreleasedKeys() const {
         return _unreleasedKeys;
     }
+
+    /// Register an actionscript class for construction of a MovieClip
+    //
+    /// @param sprite   The definition tag for the MovieClip to be placed on
+    ///                 stage
+    /// @param class    The ActionScript class to be used in construction.
+    void registerClass(const SWF::DefinitionTag* sprite, as_function* cls);
+
+    /// Get the actionscript class for constructing a MovieClip
+    //
+    /// @param sprite   The definition tag for the MovieClip to be placed on
+    ///                 stage
+    /// @return         The class to be used, or 0 if no class is associated.
+    as_function* getRegisteredClass(const SWF::DefinitionTag* sprite) const;
 
     /// Set a filedescriptor to use for host application requests
     /// (for browser communication mostly)
@@ -913,15 +928,13 @@ private:
 
     void handleActionLimitHit(const std::string& ref);
 
-    /// Buttons listening for key events
+    /// A map of SWF key code to Buttons.
     //
-    /// Note that Buttons (the only key listeners left) deregister themselves
-    /// on destruction. This isn't correct behaviour and also requires that
-    /// _keyListeners be alive longer than _gc so that deregistration doesn't
-    /// access a destroyed object.
-    //
-    /// TODO: fix it.
-    Listeners _keyListeners;
+    /// The Buttons are removed on destruction, so there is no need to
+    /// mark them reachable.
+    typedef std::pair<Button*, size_t> ButtonFrame;
+    typedef std::map<int, ButtonFrame> ButtonKeys;
+    ButtonKeys _buttonKeys;
 
     GC _gc;
 
@@ -996,6 +1009,9 @@ private:
     /// to avoid having to replicate all of the base class
     /// interface to the Movie class definition
     Levels _movies;
+
+    typedef std::map<const SWF::DefinitionTag*, as_function*> RegisteredClasses;
+    RegisteredClasses _registeredClasses;
 
     /// The root movie. This is initially the same as getLevel(0) but might
     /// change during the run. It will be used to setup and retrive initial
@@ -1086,7 +1102,6 @@ movie_root::callInterface(const HostInterface::Message& e) const
         return T();
     }
 }
-
 
 } // namespace gnash
 

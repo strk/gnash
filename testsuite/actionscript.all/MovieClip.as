@@ -119,15 +119,15 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(926); // SWF6
+	check_totals(927); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(959); // SWF7
+	check_totals(960); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(1076); // SWF8+
+	check_totals(1077); // SWF8+
 #endif
 
 	play();
@@ -567,6 +567,9 @@ check(!mc2.hasOwnProperty('_parent'));
 var mc3 = createEmptyMovieClip("mc3_mc", 50);
 check(mc3 != undefined);
 check_equals(mc3.getDepth(), 50);
+
+mc3.bd = Button.prototype.getDepth;
+check_equals(mc3.bd(), 50);
 
 #if OUTPUT_VERSION > 6 // {
 check_equals(getInstanceAtDepth(50), mc3);

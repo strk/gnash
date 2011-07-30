@@ -411,7 +411,7 @@ operator<<(std::ostream& o, const CharacterDictionary& cd)
 {
 
        for (CharacterDictionary::CharacterConstIterator it = cd.begin(), 
-            endIt = cd.end(); it != endIt; it++)
+            endIt = cd.end(); it != endIt; ++it)
        {
            o << std::endl
              << "Character: " << it->first

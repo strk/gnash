@@ -200,8 +200,9 @@ invoke(const as_value& method, const as_environment& env, as_object* this_ptr,
 	return val;
 }
 
-/// Helper macro for callMethod arguments.
-#define VALUE_ARG(z, n, t) BOOST_PP_COMMA_IF(n) t arg##n
+/// Helper macros for callMethod arguments.
+#define FUNC_PARAM(z, n, t) BOOST_PP_COMMA_IF(n) t arg##n
+#define VALUE_ARG(z, n, t) BOOST_PP_COMMA_IF(n) arg##n
 
 /// Call a member function of this object in an AS-compatible way
 //
@@ -225,18 +226,23 @@ invoke(const as_value& method, const as_environment& env, as_object* this_ptr,
 #define CALL_METHOD(x, n, t) \
 inline as_value \
 callMethod(as_object* obj, const ObjectURI& uri BOOST_PP_COMMA_IF(n)\
-        BOOST_PP_REPEAT(n, VALUE_ARG, const as_value&)) {\
+        BOOST_PP_REPEAT(n, FUNC_PARAM, const as_value&)) {\
     if (!obj) return as_value();\
     as_value func;\
     if (!obj->get_member(uri, &func)) return as_value();\
     fn_call::Args args;\
-    BOOST_PP_EXPR_IF(n, (args += BOOST_PP_REPEAT(n, VALUE_ARG, ));)\
+    BOOST_PP_EXPR_IF(n, (args += BOOST_PP_REPEAT(n, VALUE_ARG, BOOST_PP_EMPTY));)\
     return invoke(func, as_environment(getVM(*obj)), obj, args);\
 }
 
 /// The maximum number of as_value arguments allowed in callMethod functions.
 #define MAX_ARGS 4
 BOOST_PP_REPEAT(BOOST_PP_INC(MAX_ARGS), CALL_METHOD, BOOST_PP_EMPTY)
+
+#undef VALUE_ARG
+#undef FUNC_PARAM
+#undef MAX_ARGS
+#undef CALL_METHOD
 
 /// Convenience function for finding a class constructor.
 //

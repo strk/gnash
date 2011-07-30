@@ -36,17 +36,17 @@ namespace ffmpeg {
 
 namespace { 
 
-	// Used to calculate a decimal value from a ffmpeg fraction
-	inline double as_double(AVRational time)
-	{
-		return time.num / static_cast<double>(time.den);
-	}
+// Used to calculate a decimal value from a ffmpeg fraction
+inline double as_double(AVRational time) {
+    return time.num / static_cast<double>(time.den);
+}
 
 } // anonymous namespace
 
 
 int
-MediaParserFfmpeg::readPacketWrapper(void* opaque, boost::uint8_t* buf, int buf_size)
+MediaParserFfmpeg::readPacketWrapper(void* opaque, boost::uint8_t* buf,
+        int buf_size)
 {
 	MediaParserFfmpeg* p = static_cast<MediaParserFfmpeg*>(opaque);
 	return p->readPacket(buf, buf_size);
@@ -62,7 +62,7 @@ MediaParserFfmpeg::seekMediaWrapper(void *opaque, boost::int64_t offset, int whe
 AVInputFormat*
 MediaParserFfmpeg::probeStream()
 {
-    const size_t probeSize = 2048;
+    const size_t probeSize = 4096;
     const size_t bufSize = probeSize + FF_INPUT_BUFFER_PADDING_SIZE;
 
 	boost::scoped_array<boost::uint8_t> buffer(new boost::uint8_t[bufSize]);
@@ -75,8 +75,7 @@ MediaParserFfmpeg::probeStream()
 
 	_stream->seek(0);
 
-	if (actuallyRead < 1)
-	{
+	if (actuallyRead < 1) {
  		throw IOException(_("MediaParserFfmpeg could not read probe data "
                     "from input"));
 	}
@@ -310,14 +309,13 @@ MediaParserFfmpeg::parseNextFrame()
 bool
 MediaParserFfmpeg::parseNextChunk()
 {
-	if ( ! parseNextFrame() ) return false;
+	if (!parseNextFrame()) return false;
 	return true;
 }
 
 boost::uint64_t
 MediaParserFfmpeg::getBytesLoaded() const
 {
-	//log_unimpl("%s", __PRETTY_FUNCTION__);
 	return _lastParsedPosition;
 }
 
@@ -348,33 +346,25 @@ MediaParserFfmpeg::initializeParser()
     _byteIOCxt.buffer = NULL;
     
     _inputFmt = probeStream();
+
 #ifdef GNASH_ALLOW_VCODEC_ENV	
-    if ( ! _inputFmt ) {
-	char* defcodec = getenv("GNASH_DEFAULT_VCODEC");
-	if (defcodec && strlen(defcodec))
-	    _inputFmt = av_find_input_format(defcodec);	
-	
+    if (!_inputFmt) {
+        char* defcodec = getenv("GNASH_DEFAULT_VCODEC");
+        if (defcodec && strlen(defcodec)) {
+            _inputFmt = av_find_input_format(defcodec);	
+        }
     }
 #endif	
-    if ( ! _inputFmt ) {
-	throw MediaException("MediaParserFfmpeg couldn't figure out input "
-			     "format");
+    if (! _inputFmt) {
+        throw MediaException("MediaParserFfmpeg couldn't figure out input "
+                     "format");
     }
-    
-// av_alloc_format_context was deprecated on
-// 2009-02-08 (r17047) in favor of avformat_alloc_context() 
-#if !defined (LIBAVCODEC_VERSION_MAJOR) || LIBAVCODEC_VERSION_MAJOR < 52
-    _formatCtx = av_alloc_format_context();
-#else
-    _formatCtx = avformat_alloc_context();
-#endif
-
-    assert(_formatCtx);
     
     // Setup the filereader/seeker mechanism.
     // 7th argument (NULL) is the writer function,
     // which isn't needed.
-    _byteIOBuffer.reset( new unsigned char[byteIOBufferSize] );
+    _byteIOBuffer.reset(new unsigned char[byteIOBufferSize]);
+
     init_put_byte(&_byteIOCxt,
 		  _byteIOBuffer.get(), // buffer
 		  byteIOBufferSize, // buffer size
@@ -386,64 +376,80 @@ MediaParserFfmpeg::initializeParser()
 		  );
     
     _byteIOCxt.is_streamed = 1;
-    
-    // Open the stream. the 4th argument is the filename, which we ignore.
-    if(av_open_input_stream(&_formatCtx, &_byteIOCxt, "", _inputFmt, NULL) < 0)
+
+#if !defined(LIBAVCODEC_VERSION_MAJOR) || LIBAVCODEC_VERSION_MAJOR < 52
+    // Needed for Lenny.
+    _formatCtx = av_alloc_format_context();
+#else
+    _formatCtx = avformat_alloc_context();
+#endif
+
+    assert(_formatCtx);
+
+    // Otherwise av_open_input_stream will reallocate the context.
+    AVFormatParameters ap;
+    std::memset(&ap, 0, sizeof ap);
+    ap.prealloced_context = 1;
+
+    if (av_open_input_stream(&_formatCtx, &_byteIOCxt, "", _inputFmt, &ap) < 0)
     {
         throw IOException("MediaParserFfmpeg couldn't open input stream");
     }
-    
+
+#if defined(LIBAVCODEC_VERSION_MAJOR) && LIBAVCODEC_VERSION_MAJOR >= 52
+    // Note: in at least some versions of ffmpeg, av_open_input_stream does
+    // not parse metadata; not sure why.
+    AVMetadata* md = _formatCtx->metadata;
+    if (md) {
+        AVMetadataTag* tag = av_metadata_get(md, "album", 0,
+                AV_METADATA_MATCH_CASE);
+        if (tag && tag->value) {
+            setId3Info(&Id3Info::album, std::string(tag->value),
+                    _id3Object);
+        }
+    }
+#endif
+
     log_debug("Parsing FFMPEG media file: format:%s; nstreams:%d",
         _inputFmt->name, _formatCtx->nb_streams);
     
-    if ( _formatCtx->title[0] )
-        log_debug(_("  Title:'%s'"), _formatCtx->title);
-    if ( _formatCtx->author[0] )
-        log_debug(_("  Author:'%s'"), _formatCtx->author);
-    if ( _formatCtx->copyright[0] )
-        log_debug(_("  Copyright:'%s'"), _formatCtx->copyright);
-    if ( _formatCtx->comment[0] )
-        log_debug(_("  Comment:'%s'"), _formatCtx->comment);
-    if ( _formatCtx->album[0] )
-        log_debug(_("  Album:'%s'"), _formatCtx->album);
-    
     // Find first audio and video stream
-    for (unsigned int i = 0; i < static_cast<unsigned int>(_formatCtx->nb_streams); i++)
-	{
+    for (size_t i = 0; i < static_cast<size_t>(_formatCtx->nb_streams); ++i) {
+
 	    AVStream* stream = _formatCtx->streams[i];
-	    if ( ! stream ) {
-		log_debug("Stream %d of FFMPEG media file is null ?", i);
-		continue;
+	    if (! stream) {
+            log_debug("Stream %d of FFMPEG media file is null ?", i);
+            continue;
 	    }
 	    
 	    AVCodecContext* enc = stream->codec; 
-	    if ( ! enc ) {
-		log_debug("Stream %d of FFMPEG media file has no codec info", i);
-		continue;
+	    if (!enc) {
+            log_debug("Stream %d of FFMPEG media file has no codec info", i);
+            continue;
 	    }
 	    
 	    switch (enc->codec_type) {
-	    case CODEC_TYPE_AUDIO:
-		if (_audioStreamIndex < 0) {
-		    _audioStreamIndex = i;
-		    _audioStream = _formatCtx->streams[i];
-		    log_debug(_("  Using stream %d for audio: codec id %d"),
-			      i, _audioStream->codec->codec_id);
-		    // codec_name will only be filled by avcodec_find_decoder (later);
-		}
-		break;
+            case CODEC_TYPE_AUDIO:
+                if (_audioStreamIndex < 0) {
+                    _audioStreamIndex = i;
+                    _audioStream = _formatCtx->streams[i];
+                    // codec_name will only be filled by avcodec_find_decoder
+                    // (later);
+                    log_debug(_("  Using stream %d for audio: codec id %d"),
+                          i, _audioStream->codec->codec_id);
+                }
+                break;
 		
-	    case CODEC_TYPE_VIDEO:
-		if (_videoStreamIndex < 0) {
-		    _videoStreamIndex = i;
-		    _videoStream = _formatCtx->streams[i];
-		    log_debug(_("  Using stream %d for video: codec id %d"),
-			      i, _videoStream->codec->codec_id);
-		    // codec_name will only be filled by avcodec_find_decoder (later);
-		}
-		break;
-	    default:
-		break;
+            case CODEC_TYPE_VIDEO:
+                if (_videoStreamIndex < 0) {
+                    _videoStreamIndex = i;
+                    _videoStream = _formatCtx->streams[i];
+                    log_debug(_("  Using stream %d for video: codec id %d"),
+                          i, _videoStream->codec->codec_id);
+                }
+                break;
+            default:
+                break;
 	    }
 	}
     
@@ -452,7 +458,8 @@ MediaParserFfmpeg::initializeParser()
         const int codec = static_cast<int>(_videoStream->codec->codec_id); 
         boost::uint16_t width = _videoStream->codec->width;
         boost::uint16_t height = _videoStream->codec->height;
-        boost::uint16_t frameRate = static_cast<boost::uint16_t>(as_double(_videoStream->r_frame_rate));
+        boost::uint16_t frameRate = static_cast<boost::uint16_t>(
+                as_double(_videoStream->r_frame_rate));
 #if !defined(HAVE_LIBAVFORMAT_AVFORMAT_H) && !defined(HAVE_FFMPEG_AVCODEC_H)
         boost::uint64_t duration = _videoStream->codec_info_duration;
 #else
@@ -476,7 +483,8 @@ MediaParserFfmpeg::initializeParser()
     }
     
     // Create AudioInfo
-    if ( _audioStream) {
+    if (_audioStream) {
+
         const int codec = static_cast<int>(_audioStream->codec->codec_id); 
         boost::uint16_t sampleRate = _audioStream->codec->sample_rate;
         boost::uint16_t sampleSize = SampleFormatToSampleSize(_audioStream->codec->sample_fmt);
@@ -541,6 +549,12 @@ MediaParserFfmpeg::readPacket(boost::uint8_t* buf, int buf_size)
 
 	return ret;
 
+}
+
+boost::optional<Id3Info>
+MediaParserFfmpeg::getId3Info() const
+{
+    return _id3Object;
 }
 
 // NOTE: as this function is used as a callback from FFMPEG, it should not

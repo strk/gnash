@@ -19,11 +19,13 @@
 #ifndef GNASH_MEDIAPARSER_FFMPEG_H
 #define GNASH_MEDIAPARSER_FFMPEG_H
 
-#include "MediaParser.h" // for inheritance
-#include "ffmpegHeaders.h"
-
 #include <boost/scoped_array.hpp>
 #include <memory>
+#include <boost/optional.hpp>
+
+#include "MediaParser.h" // for inheritance
+#include "ffmpegHeaders.h"
+#include "Id3Info.h"
 
 // Forward declaration
 namespace gnash {
@@ -89,6 +91,8 @@ public:
 
 	// See dox in MediaParser.h
 	virtual boost::uint64_t getBytesLoaded() const;
+
+    virtual boost::optional<Id3Info> getId3Info() const;
 
 private:
 
@@ -175,6 +179,8 @@ private:
 
 	/// Make an EncodedAudioFrame from an AVPacket and push to buffer
 	bool parseAudioFrame(AVPacket& packet);
+
+    boost::optional<Id3Info> _id3Object;
 };
 
 

@@ -19,9 +19,6 @@
 #ifndef GNASH_MEDIAPARSER_H
 #define GNASH_MEDIAPARSER_H
 
-#include "IOChannel.h" // for inlines
-#include "dsodefs.h" // DSOEXPORT
-
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/thread.hpp>
@@ -32,12 +29,19 @@
 #include <map>
 #include <vector>
 #include <iosfwd> // for output operator forward declarations
+#include <boost/optional.hpp>
+
+#include "IOChannel.h" // for inlines
+#include "dsodefs.h" // DSOEXPORT
 
 // Undefine this to load/parse media files in main thread
 #define LOAD_MEDIA_IN_A_SEPARATE_THREAD 1
 
 namespace gnash {
     class SimpleBuffer;
+    namespace media {
+        struct Id3Info;
+    }
 }
 
 namespace gnash {
@@ -603,6 +607,11 @@ public:
     /// is a no-op.
     virtual void fetchMetaTags(OrderedMetaTags& tags, boost::uint64_t ts);
 
+    /// Get ID3 data from the parsed stream if it exists.
+    //
+    /// It's best to do this only when parsingComplete is true.
+    virtual boost::optional<Id3Info> getId3Info() const;
+
 protected:
 
 	/// Subclasses *must* set the following variables: @{ 
@@ -693,7 +702,6 @@ protected:
 
 	/// mutex protecting access to the a/v encoded frames queues
 	mutable boost::mutex _qMutex;
-
 
 	/// Mutex protecting _bytesLoaded (read by main, set by parser)
 	mutable boost::mutex _bytesLoadedMutex;

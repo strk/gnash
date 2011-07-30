@@ -45,12 +45,6 @@ SoundStreamHeadTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     // If we don't have a sound_handler registered stop here
     if (!handler) return;
 
-    // FIXME:
-    // no DisplayObject id for soundstreams... so we make one up...
-    // This only works if there is only one SWFStream in the movie...
-    // The right way to do it is to make seperate structures for streams
-    // in SWFMovieDefinition.
-
     // 1 byte for playback info, 1 for SWFStream info, 2 for sample count
     in.ensureBytes(4);
 
@@ -65,7 +59,7 @@ SoundStreamHeadTag::loader(SWFStream& in, TagType tag, movie_definition& m,
             log_swferror("SOUNDSTREAMHEAD: playback sound rate %d (expected "
                 "0 to %d)", +pbSoundRate, arraySize(samplerates));
         );
-        pbSoundRate=0;
+        pbSoundRate = 0;
     }
     const boost::uint32_t playbackSoundRate = samplerates[pbSoundRate];
     const bool playbackSound16bit = in.read_bit();
@@ -154,14 +148,12 @@ SoundStreamHeadTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     );
 
     // Store all the data in a SoundInfo object
-    std::auto_ptr<media::SoundInfo> sinfo;
-    sinfo.reset(new media::SoundInfo(format, streamSoundStereo,
-                streamSoundRate, sampleCount, streamSound16bit, latency));
+    const media::SoundInfo sinfo(format, streamSoundStereo,
+                streamSoundRate, sampleCount, streamSound16bit, latency);
 
     // Stores the sounddata in the soundhandler, and the ID returned
     // can be used to starting, stopping and deleting that sound
-    const int handler_id =
-        handler->create_sound(std::auto_ptr<SimpleBuffer>(0), sinfo);
+    const int handler_id = handler->createStreamingSound(sinfo);
 
     m.set_loading_sound_stream_id(handler_id);
 }

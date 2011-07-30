@@ -161,7 +161,7 @@ pushdef([DASHDOWN], translit([$1], [A-Z_], [a-z-]))dnl Lowercase
 has_$1=no
 ac_manual=yes
 
-if test x"${$1}" = x"yes"; then
+if test x"${$1}" = x"yes" -a x"${found_$1_incl}" = "xyes"; then
   dnl Look for the library
   AC_ARG_WITH($1_lib, AC_HELP_STRING([--with-$1-lib], [directory where $1 library is]), with_$1_lib=${withval})
   AC_CACHE_VAL(ac_cv_path_$1_lib,[

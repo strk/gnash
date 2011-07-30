@@ -24,6 +24,7 @@
 #include <boost/scoped_array.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/optional.hpp>
 
 #include "RunResources.h"
 #include "log.h"
@@ -42,6 +43,7 @@
 #include "StreamProvider.h"
 #include "ObjectURI.h"
 #include "Relay.h"
+#include "Id3Info.h"
 
 //#define GNASH_DEBUG_SOUND_AS 1
 
@@ -69,6 +71,9 @@ namespace {
     as_value sound_stop(const fn_call& fn);
     as_value checkPolicyFile_getset(const fn_call& fn);
     void attachSoundInterface(as_object& o);
+
+    /// If there is Id3 data, create an id3 member and call the onID3 function.
+    void handleId3Data(boost::optional<media::Id3Info> id3, as_object& sound);
 }
 
 /// A Sound object in ActionScript can control and play sound
@@ -287,9 +292,7 @@ sound_class_init(as_object& where, const ObjectURI& uri)
     proto->set_member_flags(NSV::PROP_CONSTRUCTOR, PropFlags::readOnly);
     proto->set_member_flags(NSV::PROP_uuPROTOuu, PropFlags::readOnly, 0);
 
-    // Register _global.String
     where.init_member(uri, cl, as_object::DefaultFlags);
-
 }
 
 void
@@ -350,8 +353,7 @@ Sound_as::probeAudio()
         // Only probe for sound complete
         assert(_soundHandler);
         assert(!_soundCompleted);
-        if ( ! _soundHandler->isSoundPlaying(soundId) ) {
-            _soundCompleted = false;
+        if (!_soundHandler->isSoundPlaying(soundId)) {
             stopProbeTimer();
             // dispatch onSoundComplete 
             callMethod(&owner(), NSV::PROP_ON_SOUND_COMPLETE);
@@ -365,15 +367,18 @@ Sound_as::probeAudio()
 #ifdef GNASH_DEBUG_SOUND_AS
         log_debug("Probing audio for load");
 #endif
-        if ( _mediaParser->parsingCompleted() )
-        {
+        if (_mediaParser->parsingCompleted()) {
+
             _soundLoaded = true;
-            if ( ! isStreaming )
-            {
+
+            if (!isStreaming) {
                 stopProbeTimer(); // will be re-started on Sound.start()
             }
             bool success = _mediaParser->getAudioInfo() != 0;
             callMethod(&owner(), NSV::PROP_ON_LOAD, success);
+
+            // TODO: check if this should be called anyway.
+            if (success) handleId3Data(_mediaParser->getId3Info(), owner());
         }
         return; 
     }
@@ -540,18 +545,17 @@ Sound_as::getVolume(int& volume)
 void
 Sound_as::loadSound(const std::string& file, bool streaming)
 {
-    if ( ! _mediaHandler || ! _soundHandler ) {
+    if (!_mediaHandler || !_soundHandler) {
         log_debug("No media or sound handlers, won't load any sound");
         return;
     }
 
     /// If we are already streaming stop doing so as we'll replace
     /// the media parser
-    if ( _inputStream ) {
+    if (_inputStream) {
         _soundHandler->unplugInputStream(_inputStream);
         _inputStream = 0;
     }
-
     
     /// Mark sound as not being loaded
     // TODO: should we check for _soundLoaded == true?
@@ -562,7 +566,7 @@ Sound_as::loadSound(const std::string& file, bool streaming)
 
     /// Start at offset 0, in case a previous ::start() call
     /// changed that.
-    _startTime=0;
+    _startTime = 0;
 
     const RunResources& rr = getRunResources(owner());
     URL url(file, rr.streamProvider().baseURL());
@@ -572,7 +576,8 @@ Sound_as::loadSound(const std::string& file, bool streaming)
     const StreamProvider& streamProvider = rr.streamProvider();
     std::auto_ptr<IOChannel> inputStream(streamProvider.getStream(url,
                 rcfile.saveStreamingMedia()));
-    if ( ! inputStream.get() ) {
+
+    if (!inputStream.get()) {
         log_error( _("Gnash could not open this url: %s"), url );
         // dispatch onLoad (false)
         callMethod(&owner(), NSV::PROP_ON_LOAD, false);
@@ -583,7 +588,7 @@ Sound_as::loadSound(const std::string& file, bool streaming)
     isStreaming = streaming;
 
     _mediaParser.reset(_mediaHandler->createMediaParser(inputStream).release());
-    if ( ! _mediaParser ) {
+    if (!_mediaParser) {
         log_error(_("Unable to create parser for Sound at %s"), url);
         // not necessarely correct, the stream might have been found...
         // dispatch onLoad (false)
@@ -739,10 +744,10 @@ Sound_as::stop(int si)
                 _inputStream=0;
             }
         } else {
-            _soundHandler->stop_sound(soundId);
+            _soundHandler->stopEventSound(soundId);
         }
     } else {
-        _soundHandler->stop_sound(si);
+        _soundHandler->stopEventSound(si);
     }
 }
 
@@ -1255,6 +1260,27 @@ sound_areSoundsInaccessible(const fn_call& /*fn*/)
     //
     LOG_ONCE( log_unimpl ("Sound.areSoundsInaccessible()") );
     return as_value();
+}
+
+void
+handleId3Data(boost::optional<media::Id3Info> id3, as_object& sound)
+{
+    if (!id3) return;
+    VM& vm = getVM(sound);
+
+    as_object* o = new as_object(getGlobal(sound));
+
+    // TODO: others.
+    if (id3->album) o->set_member(getURI(vm, "album"), *id3->album);
+    if (id3->year) o->set_member(getURI(vm, "year"), *id3->year);
+
+    // Add Sound.id3 member
+    const ObjectURI& id3prop = getURI(vm, "id3");
+    sound.set_member(id3prop, o);
+
+    // Notify onID3 function.
+    const ObjectURI& onID3 = getURI(vm, "onID3");
+    callMethod(&sound, onID3);
 }
 
 } // anonymous namespace 

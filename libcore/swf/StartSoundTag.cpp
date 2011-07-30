@@ -84,7 +84,7 @@ StartSoundTag::executeActions(MovieClip* m, DisplayList& /* dlist */) const
     if (handler) {
         if (_soundInfo.stopPlayback) {
             //log_debug("Execute StartSoundTag with 'stop playback' flag on");
-            handler->stop_sound(m_handler_id);
+            handler->stopEventSound(m_handler_id);
         }
         else {
 

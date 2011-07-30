@@ -495,6 +495,13 @@ MovieTester::getInvalidatedRanges() const
     
 }
 
+bool
+MovieTester::streamingSound() const
+{
+    if (!_sound_handler.get()) return false;
+    return _sound_handler->streamingSound();
+}
+
 int
 MovieTester::soundsStarted()
 {

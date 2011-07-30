@@ -33,14 +33,29 @@ brokenchord.wav
 
 	Produced with csound from default.orc and brokenchord.sco
 
-offspring.swf
-offspring.jpg
 green.jpg
 green.swf
-lynch.swf
-lynch.jpg
 
-	The swfs display the associated jpgs.
+	171x171 image with 5 concentric squares filled with tones of green,
+	from outer to inner (steps of 20 pixels):
+	0x00ff00, 0x008800, 0x004400, 0x002200, 0x000000.
+	The SWF embeds the .jpg.
+
+red.swf
+red.jpg
+
+	171x171 image with 5 concentric squares filled with tones of red,
+	from outer to inner (steps of 20 pixels):
+	0xff0000, 0x880000, 0x440000, 0x220000, 0x000000.
+	The SWF embeds the .jpg.
+
+blue.swf
+blu.jpg
+
+	171x171 image with 5 concentric squares filled with tones of blue,
+	from outer to inner (steps of 20 pixels):
+	0x0000ff, 0x000088, 0x000044, 0x000022, 0x000000.
+	The SWF embeds the .jpg.
 
 sound1.wav
 
@@ -57,6 +72,24 @@ sound1.mp3
 	Sample Encoding: MPEG audio (layer I, II or III)
 	Channels       : 1
 	Sample Rate    : 22050
+    No ID3 data.
+
+stereo8.mp3
+
+    TODO
+
+click.mp3
+
+	Sample Size    : 16-bits
+	Sample Encoding: MPEG audio (layer I, II or III)
+	Channels       : 2
+	Sample Rate    : 44100
+
+Note: this contains 2 sets of ID3 data: one set written by audacity, and one
+set added using mp3info. The pp uses the set added by mp3info. If it encounters
+only data written by audacity, the onID3 function is called, but the id3 object
+contains no data.
+
 
 square.flv
 

@@ -25,6 +25,7 @@
 #include "ActionExec.h"
 #include "Global_as.h"
 #include "fn_call.h"
+#include "ConstantPool.h"
 
 namespace gnash {
 
@@ -119,6 +120,7 @@ public:
             // still might be also guarded by unloaded()
             if (target()->isDestroyed()) break;
 
+            PoolGuard guard(getVM(target()->get_environment()), 0);
             ActionExec exec(*(*it), target()->get_environment(), false);
             exec();
         }
@@ -126,28 +128,6 @@ public:
 
 private:
     BufferList _buffers;
-};
-
-/// Generic event  (constructed by id, invoked using notifyEvent
-class QueuedEvent : public ExecutableCode
-{
-public:
-
-    QueuedEvent(DisplayObject* nTarget, const event_id& id)
-        :
-        ExecutableCode(nTarget),
-        _eventId(id)
-    {}
-
-    virtual void execute() {
-        // don't execute any events for destroyed DisplayObject.
-        if (!target()->isDestroyed()) {
-            target()->notifyEvent(_eventId);
-        }
-    }
-
-private:
-    const event_id _eventId;
 };
 
 /// This class is used to queue a function call action

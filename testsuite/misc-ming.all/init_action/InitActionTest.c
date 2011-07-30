@@ -50,7 +50,7 @@
 #include "ming_utils.h"
 
 #define OUTPUT_VERSION 6
-#define OUTPUT_FILENAME "init_action_test.swf"
+#define OUTPUT_FILENAME "InitActionTest.swf"
 
 
 int

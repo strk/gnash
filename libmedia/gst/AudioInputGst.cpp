@@ -44,7 +44,7 @@ GnashAudio::GnashAudio() {
     _devLocation = NULL;
     _gstreamerSrc = NULL;
     _productName = NULL;
-};
+}
 
 GnashAudioPrivate::GnashAudioPrivate() {
     audioSource = NULL;
@@ -58,7 +58,7 @@ GnashAudioPrivate::GnashAudioPrivate() {
     _audioSaveBin = NULL;
     _pipelineIsPlaying = false;
     _mux = NULL;
-};
+}
 
 AudioInputGst::AudioInputGst() 
     :
@@ -199,8 +199,6 @@ AudioInputGst::getSelectedCaps(int devselect)
     GstMessage *message;
     
     GnashAudio *data_struct = _audioVect[devselect];
-    GstElement *element;
-    element = data_struct->getElementPtr();
     
     //create tester pipeline to enumerate properties
     command = g_strdup_printf ("%s name=src device=%s ! fakesink",
@@ -702,11 +700,10 @@ AudioInputGst::audioPlay(GnashAudioPrivate *audio)
 {
     GstStateChangeReturn state;
     GstBus *bus;
-    gint ret;
     
     //setup bus to watch pipeline for messages
     bus = gst_pipeline_get_bus (GST_PIPELINE (audio->_pipeline));
-    ret = gst_bus_add_watch (bus, audio_bus_call, audio);
+    gst_bus_add_watch (bus, audio_bus_call, audio);
     gst_object_unref (bus);
     
     state = gst_element_set_state (audio->_pipeline, GST_STATE_PLAYING);

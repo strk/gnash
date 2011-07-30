@@ -12,6 +12,7 @@ TAGS
 *.dsc
 *.changes
 *.tar.gz
+*-attempt-install-dependencies.sh
 testsuite/*/*est
 testsuite/*/*est[0-9]
 testsuite/*/*est[0-9][0-9]
@@ -55,6 +56,7 @@ libbase/gnashrc
 libnet/gnash.log
 libnet/gnash.sum
 ltmain.sh
+libtool
 macros/argz.m4
 macros/libtool.m4
 macros/lt*.m4
@@ -102,14 +104,17 @@ testsuite/misc-haxe.all/classes.all/*.swf
 testsuite/misc-haxe.all/PP_*
 testsuite/misc-haxe.all/*.swf
 testsuite/misc-ming.all/action_order/*.swf
+testsuite/misc-ming.all/action_order/PlaceAndRemove
 testsuite/misc-ming.all/BeginBitmapFill
 testsuite/misc-ming.all/BitmapDataDraw
 testsuite/misc-ming.all/definebitsjpeg2
 testsuite/misc-ming.all/Dejagnu
 testsuite/misc-ming.all/displaylist_depths/*.swf
+testsuite/misc-ming.all/init_action/*.swf
 testsuite/misc-ming.all/KeyEventOrder
 testsuite/misc-ming.all/loading/*.swf
 testsuite/misc-ming.all/loop/*.swf
+testsuite/misc-ming.all/register_class/*.swf
 testsuite/misc-ming.all/spritehier
 testsuite/misc-ming.all/static_vs_dynamic1
 testsuite/misc-ming.all/static_vs_dynamic2

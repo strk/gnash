@@ -218,9 +218,8 @@ define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
         }
 
         // Store all the data in a SoundInfo object
-        std::auto_ptr<media::SoundInfo> sinfo;
-        sinfo.reset(new media::SoundInfo(format, stereo, sample_rate,
-                    sample_count, sample_16bit, delaySeek));
+        const media::SoundInfo sinfo(format, stereo, sample_rate,
+                    sample_count, sample_16bit, delaySeek);
 
         // Stores the sounddata in the soundhandler, and the ID returned
         // can be used to starting, stopping and deleting that sound

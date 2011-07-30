@@ -19,7 +19,10 @@
 
 #include "ShapeRecord.h"
 
+#include <vector>
+
 #include "TypesParser.h"
+#include "utility.h"
 #include "SWF.h"
 #include "SWFStream.h"
 #include "movie_definition.h"
@@ -27,8 +30,6 @@
 #include "Geometry.h"
 #include "GnashNumeric.h"
 #include "log.h"
-
-#include <vector>
 
 namespace gnash {
 namespace SWF {
@@ -276,6 +277,7 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
         // TODO: Store and use these. Unfinished.
         if (tag == SWF::DEFINESHAPE4 || tag == SWF::DEFINESHAPE4_) {
             const SWFRect tbound = readRect(in);
+            UNUSED(tbound);
             in.ensureBytes(1);
             static_cast<void>(in.read_u8());
             LOG_ONCE(log_unimpl("DEFINESHAPE4 edge boundaries and scales"));

@@ -28,6 +28,8 @@
 #include "rc.h" // for rcfile
 #include "NamingPolicy.h"
 
+#include <cerrno>
+#include <cstring> // for strerror
 #include <cstdio>
 #include <map>
 #include <string>
@@ -79,6 +81,8 @@ StreamProvider::getStream(const URL& url, bool namedCacheFile) const
 
 			FILE *newin = std::fopen(path.c_str(), "rb");
 			if (!newin)  { 
+				log_error(_("Could not open file %1%: %2%"),
+				          path, std::strerror(errno));
 				return stream;
 			}
 			// Close on destruction
@@ -143,6 +147,8 @@ StreamProvider::getStream(const URL& url, const std::string& postdata,
 
 			FILE *newin = std::fopen(path.c_str(), "rb");
 			if (!newin)  { 
+				log_error(_("Could not open file %1%: %2%"),
+				          path, std::strerror(errno));
 				return stream;
 			}
 			stream = makeFileChannel(newin, false);

@@ -28,6 +28,7 @@
 #include "LineStyle.h" // for LineStyle
 #include "snappingrange.h"
 #include "SWFRect.h" // for inlines
+#include "GnashKey.h"
 
 // Forward declarations
 namespace gnash {
@@ -125,7 +126,10 @@ public:
     virtual int getDefinitionVersion() const;
 
 	/// This function is called as a user-input handler
-	void notifyEvent(const event_id& id);	
+	void mouseEvent(const event_id& id);	
+
+    /// Handle user input from a key press.
+    void keyInput(key::code k);
 
 	const std::string& getVariableName() const
 	{

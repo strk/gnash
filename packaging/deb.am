@@ -143,14 +143,14 @@ deb-edit-utilities:
 # and release. Debian uses site-packages, while Ubuntu uses dist-packages.
 deb-edit-python:
 	@release=`lsb_release -i | sed -e 's/.*:[ \t]//'`; \
-	version=`python --version  2>&1 | tr -d '.' | cut -d ' ' -f 2 | sed -e 's:rc[0-9]*::'`; \
-	if test $${version} -gt 260; then \
-	  echo "Editing $(BUILD_DIR)/debian/gtk-plugin-gnash.install for Python 2.6"; \
-	  pdir=2.6; \
+	pyver=`python --version 2>&1 | cut -d ' ' -f 2 | sed -e 's:rc[0-9]*::'`; \
+	pymaj=`echo $${pyver}|cut -d. -f1`; pymin=`echo $${pyver}|cut -d. -f2`; \
+	pdir=$${pymaj}.$${pymin}; \
+	if test $${pymaj}$${pymin} -ge 26; then \
+	  echo "Editing $(BUILD_DIR)/debian/gtk-plugin-gnash.install for Python 2.6+"; \
 	  packages="dist-packages"; \
 	else \
 	  echo "Editing $(BUILD_DIR)/debian/gtk-plugin-gnash.install for Python 2.5"; \
-	  pdir=2.5; \
 	  packages="site-packages"; \
 	fi; \
 	if test -e $(BUILD_DIR)/debian/python-gtk-gnash.install; then \

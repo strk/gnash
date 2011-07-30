@@ -313,6 +313,13 @@ main(int /*argc*/, char** /*argv*/)
     }
     check(threw);
 
+    { // UTF-8 in path, see http://savannah.gnu.org/bugs/?33718
+        URL u("/home/toto/Téléchargement/testfile.swf");
+        check_equals(u.path(), "/home/toto/Téléchargement/testfile.swf");
+
+        URL u2("testfile.xml", u);
+        check_equals(u2.path(), "/home/toto/Téléchargement/testfile.xml");
+    }
 
 	// TODO: Samba paths
 }

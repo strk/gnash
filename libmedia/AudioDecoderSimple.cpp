@@ -370,7 +370,7 @@ AudioDecoderSimple::decode(const boost::uint8_t* input, boost::uint32_t inputSiz
 {
 
 	unsigned char* decodedData = NULL;
-	int outsize = 0;
+	boost::uint32_t outsize = 0;
 
     switch (_codec) {
 	case AUDIO_CODEC_ADPCM:
@@ -405,10 +405,11 @@ AudioDecoderSimple::decode(const boost::uint8_t* input, boost::uint32_t inputSiz
 			outsize = inputSize * (_stereo ? 4 : 2);
 
 		} else {
+			// Allocate a destination buffer
 			// Read 16-bit data into buffer
 			decodedData = new unsigned char[inputSize];
-			memcpy((char *)decodedData, input, inputSize);
-
+			outsize = inputSize;
+			
 			// Convert 16-bit little-endian data to host-endian.
 
 			// Runtime detection of host endianness costs almost
@@ -423,19 +424,30 @@ AudioDecoderSimple::decode(const boost::uint8_t* input, boost::uint32_t inputSiz
 			} u = { 0x0001 };
 
 			switch (u.c.c0) {
+				default:	// Impossible
+					log_error(_("Host endianness not detected in AudioDecoderSimple"));
+					// Just carry on anyway...
 				case 0x01:	// Little-endian host: sample is already native.
+					// If the input data is the output data, then we probably
+					// can't move the data faster than memcpy.
+					memcpy((char *)decodedData, input, inputSize);
 					break;
 				case 0x00:  // Big-endian host
 					// Swap sample bytes to get big-endian format.
 					assert((inputSize & 1) == 0);
-					for (unsigned i = 0; i < inputSize; i+=2)
+
+					// Cast the buffers to help the compiler understand that we
+					// swapping 16-bit words. This should produce a single-instruction
+					// swap for each 16-bit word.
+					const boost::uint16_t* input16 = reinterpret_cast<const boost::uint16_t*>(input);
+					boost::uint16_t* decodedData16 = reinterpret_cast<boost::uint16_t*>(decodedData);
+					unsigned inputSize16 = inputSize / sizeof(boost::uint16_t);
+					for ( unsigned i = 0; i < inputSize16; i++ )
 					{
-						std::swap(decodedData[i], decodedData[i+1]);
+						boost::uint16_t sample = input16[i];
+						decodedData16[i] = ((sample << 8) & 0xFF00) | ((sample >> 8) & 0x00FF);
 					}
 					break;
-    			default:	// Impossible
-					log_error(_("Host endianness not detected in AudioDecoderSimple"));
-					// Just carry on anyway...
 			}
 		}
 		break;

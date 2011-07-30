@@ -509,7 +509,6 @@ play_movie(const std::string& filename, const RunResources& runResources)
         
         resetLastAdvanceTimer();
         int	kick_count = 0;
-        int stop_count=0;
         size_t loop_back_count=0;
         size_t latest_frame=0;
         size_t end_hitcount=0;
@@ -556,7 +555,6 @@ play_movie(const std::string& filename, const RunResources& runResources)
                 // Max stop counts reached, kick it
                 if ( secondsSinceLastAdvance() > waitforadvance )
                 {
-                    stop_count=0;
 
                     // Kick the movie.
                     if ( last_frame + 1 > md->get_frame_count() -1 )
@@ -595,7 +593,6 @@ play_movie(const std::string& filename, const RunResources& runResources)
             else
             {
                 kick_count = 0;
-                stop_count = 0;
                 resetLastAdvanceTimer();
             }
 

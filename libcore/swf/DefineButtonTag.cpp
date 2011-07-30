@@ -297,8 +297,7 @@ ButtonAction::ButtonAction(SWFStream& in, TagType t, unsigned long endPos,
 bool
 ButtonAction::triggeredBy(const event_id& ev) const
 {
-    switch ( ev.id() )
-    {
+    switch (ev.id()) {
         case event_id::ROLL_OVER: return _conditions & IDLE_TO_OVER_UP;
         case event_id::ROLL_OUT: return _conditions & OVER_UP_TO_IDLE;
         case event_id::PRESS: return _conditions & OVER_UP_TO_OVER_DOWN;
@@ -309,7 +308,7 @@ ButtonAction::triggeredBy(const event_id& ev) const
         case event_id::KEY_PRESS:
         {
             int keycode = getKeyCode();
-            if (! keycode) return false; // not a keypress event
+            if (!keycode) return false; // not a keypress event
             return key::codeMap[ev.keyCode()][key::SWF] == keycode;
         }
         default: return false;
@@ -357,7 +356,7 @@ ButtonRecord::read(SWFStream& in, TagType t,
         movie_definition& m, unsigned long endPos)
 {
     // caller should check this
-    if (in.tell()+1 > endPos)
+    if (in.tell() + 1 > endPos)
     {
         IF_VERBOSE_MALFORMED_SWF(
         log_swferror(_("   premature end of button record input stream, "
@@ -367,17 +366,17 @@ ButtonRecord::read(SWFStream& in, TagType t,
     }
 
     in.ensureBytes(1);
-    int    flags = in.read_u8();
+    boost::uint8_t flags = in.read_u8();
     if (!flags) return false;
 
     // Upper 4 bits are:
     //
-    bool buttonHasBlendMode = flags & (1<<5); 
-    bool buttonHasFilterList = flags & (1<<4);
-    _hitTest = flags & (1<<3);
-    _down = flags & (1<<2);
-    _over = flags & (1<<1); 
-    _up = flags & (1<<0); 
+    bool buttonHasBlendMode = flags & (1 << 5); 
+    bool buttonHasFilterList = flags & (1 << 4);
+    _hitTest = flags & (1 << 3);
+    _down = flags & (1 << 2);
+    _over = flags & (1 << 1); 
+    _up = flags & (1 << 0); 
 
     if (in.tell() + 2 > endPos) {
         IF_VERBOSE_MALFORMED_SWF(
@@ -387,10 +386,10 @@ ButtonRecord::read(SWFStream& in, TagType t,
         return false;
     }
     in.ensureBytes(2);
-    _id = in.read_u16();
+    const boost::uint16_t id = in.read_u16();
 
     // Get DisplayObject definition now (safer)
-    _definitionTag = m.getDefinitionTag(_id);
+    _definitionTag = m.getDefinitionTag(id);
 
     // If no DisplayObject with given ID is found in the movie
     // definition, we print an error, but keep parsing.
@@ -398,18 +397,18 @@ ButtonRecord::read(SWFStream& in, TagType t,
         IF_VERBOSE_MALFORMED_SWF(
         log_swferror(_("   button record for states [%s] refer to "
             "DisplayObject with id %d, which is not found "
-            "in the chars dictionary"), computeButtonStatesString(flags), _id);
+            "in the chars dictionary"), computeButtonStatesString(flags), id);
         );
     }
     else {
         IF_VERBOSE_PARSE(
         log_parse(_("   button record for states [%s] contain "
             "DisplayObject %d (%s)"), computeButtonStatesString(flags),
-            _id, typeName(*_definitionTag));
+            id, typeName(*_definitionTag));
         );
     }
 
-    if (in.tell()+2 > endPos) {
+    if (in.tell() + 2 > endPos) {
         IF_VERBOSE_MALFORMED_SWF(
         log_swferror(_("   premature end of button record input stream, "
                 "can't read button layer (depth?)"));
@@ -449,10 +448,10 @@ std::string
 computeButtonStatesString(int flags)
 {
     std::string ret;
-    if ( flags & (1<<3) ) ret += "hit";
-    if ( flags & (1<<2) ) { if ( ! ret.empty() ) ret += ","; ret += "down"; }
-    if ( flags & (1<<1) ) { if ( ! ret.empty() ) ret += ","; ret += "over"; }
-    if ( flags & (1<<0) ) { if ( ! ret.empty() ) ret += ","; ret += "up"; }
+    if (flags & (1 << 3)) ret += "hit";
+    if (flags & (1 << 2)) { if (!ret.empty()) ret += ","; ret += "down"; }
+    if (flags & (1 << 1)) { if (!ret.empty()) ret += ","; ret += "over"; }
+    if (flags & (1 << 0)) { if (!ret.empty()) ret += ","; ret += "up"; }
     return ret;
 }
 

@@ -26,6 +26,7 @@
 
 #include <boost/bind.hpp>
 #include <utility>
+#include <functional>
 
 #include "DefineButtonTag.h"
 #include "as_value.h"
@@ -204,7 +205,8 @@ private:
     as_environment& _env;
 };
 
-class ButtonActionPusher {
+class ButtonActionPusher
+{
 public:
     ButtonActionPusher(movie_root& mr, DisplayObject* this_ptr)
         :
@@ -220,6 +222,25 @@ public:
 private:
     movie_root& _mr;
     DisplayObject* _tp;
+};
+
+class ButtonKeyRegisterer : public std::unary_function<int, void>
+{
+public:
+    ButtonKeyRegisterer(movie_root& mr, Button* this_ptr)
+        :
+        _mr(mr),
+        _tp(this_ptr)
+    {}
+
+    void operator()(int code) const
+    {
+        _mr.registerButtonKey(code, _tp);
+    }
+
+private:
+    movie_root& _mr;
+    Button* _tp;
 };
 
 }
@@ -294,17 +315,10 @@ Button::Button(as_object* object, const SWF::DefineButtonTag* def,
     _def(def)
 {
     assert(object);
-
-    // check up presence Key events
-    if (_def->hasKeyPressHandler()) {
-        stage().add_key_listener(this);
-    }
-
 }
 
 Button::~Button()
 {
-    stage().remove_key_listener(this);
 }
 
 bool
@@ -340,26 +354,21 @@ Button::isEnabled()
 
 
 void
-Button::notifyEvent(const event_id& id)
+Button::keyPress(key::code c)
 {
     if (unloaded()) {
-        // We dont' respond to events while unloaded
+        // We don't respond to events while unloaded
         // See bug #22982
         return; 
     }
 
-    // We only respond keypress events
-    if ( id.id() != event_id::KEY_PRESS ) return;
-
-    // We only respond to valid key code (should we assert here?)
-    if ( id.keyCode() == key::INVALID ) return;
-
     ButtonActionPusher xec(stage(), this); 
-    _def->forEachTrigger(id, xec);
+    _def->forEachTrigger(event_id(event_id::KEY_PRESS, c), xec);
 }
 
 bool
-Button::handleFocus() {
+Button::handleFocus()
+{
     /// Nothing to do, but can receive focus.
     return false;
 }
@@ -454,11 +463,8 @@ Button::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 void
 Button::mouseEvent(const event_id& event)
 {
-    if ( unloaded() )
-    {
+    if (unloaded()) {
         // We don't respond to events while unloaded. See bug #22982.
-        log_debug("Button %s received %s button event while unloaded: ignored",
-            getTarget(), event);
         return;
     }
 
@@ -536,7 +542,7 @@ Button::mouseEvent(const event_id& event)
         if (!bs.sample) break;
 
         if (bs.soundInfo.stopPlayback) {
-            s->stop_sound(bs.sample->m_sound_handler_id);
+            s->stopEventSound(bs.sample->m_sound_handler_id);
         }
         else {
             const SWF::SoundInfoRecord& sinfo = bs.soundInfo;
@@ -843,6 +849,13 @@ Button::construct(as_object* initObj)
 
     // There is no INITIALIZE/CONSTRUCT/LOAD/ENTERFRAME/UNLOAD event 
     // for Buttons
+
+    // Register key events.
+    if (_def->hasKeyPressHandler()) {
+        ButtonKeyRegisterer r(stage(), this);
+        _def->visitKeyCodes(r);
+    }
+
 }
 
 void
@@ -866,7 +879,6 @@ Button::markOwnResources() const
 bool
 Button::unloadChildren()
 {
-
     bool childsHaveUnload = false;
 
     // We need to unload all children, or the global instance list
@@ -893,6 +905,7 @@ Button::unloadChildren()
 void
 Button::destroy()
 {
+    stage().removeButtonKey(this);
 
     for (DisplayObjects::iterator i = _stateCharacters.begin(),
             e=_stateCharacters.end(); i != e; ++i) {
@@ -997,6 +1010,7 @@ as_value
 button_blendMode(const fn_call& fn)
 {
     Button* obj = ensure<IsDisplayObject<Button> >(fn);
+    LOG_ONCE(log_unimpl("Button.blendMode"));
     UNUSED(obj);
     return as_value();
 }
@@ -1005,6 +1019,7 @@ as_value
 button_cacheAsBitmap(const fn_call& fn)
 {
     Button* obj = ensure<IsDisplayObject<Button> >(fn);
+    LOG_ONCE(log_unimpl("Button.cacheAsBitmap"));
     UNUSED(obj);
     return as_value();
 }
@@ -1013,6 +1028,7 @@ as_value
 button_filters(const fn_call& fn)
 {
     Button* obj = ensure<IsDisplayObject<Button> >(fn);
+    LOG_ONCE(log_unimpl("Button.filters"));
     UNUSED(obj);
     return as_value();
 }
@@ -1021,6 +1037,7 @@ as_value
 button_scale9Grid(const fn_call& fn)
 {
     Button* obj = ensure<IsDisplayObject<Button> >(fn);
+    LOG_ONCE(log_unimpl("Button.scale9Grid"));
     UNUSED(obj);
     return as_value();
 }
@@ -1029,6 +1046,7 @@ as_value
 button_getTabIndex(const fn_call& fn)
 {
     Button* obj = ensure<IsDisplayObject<Button> >(fn);
+    LOG_ONCE(log_unimpl("Button.getTabIndex"));
     UNUSED(obj);
     return as_value();
 }
@@ -1037,6 +1055,7 @@ as_value
 button_setTabIndex(const fn_call& fn)
 {
     Button* obj = ensure<IsDisplayObject<Button> >(fn);
+    LOG_ONCE(log_unimpl("Button.setTabIndex"));
     UNUSED(obj);
     return as_value();
 }
@@ -1044,9 +1063,10 @@ button_setTabIndex(const fn_call& fn)
 as_value
 button_getDepth(const fn_call& fn)
 {
-    Button* obj = ensure<IsDisplayObject<Button> >(fn);
-    UNUSED(obj);
-    return as_value();
+    // This does exactly the same as MovieClip.getDepth, but appears to be
+    // a separate function.
+    DisplayObject* obj = ensure<IsDisplayObject<> >(fn);
+    return as_value(obj->get_depth());
 }
 
 } // anonymous namespace

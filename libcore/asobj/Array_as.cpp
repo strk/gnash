@@ -979,7 +979,7 @@ array_splice(const fn_call& fn)
     ObjectURI propPush = getURI(getVM(fn), NSV::PROP_PUSH);
     for (size_t i = 0; i < remove; ++i) {
         const ObjectURI& key = getKey(fn, start + i);
-        callMethod(ret, NSV::PROP_PUSH, getOwnProperty(*array, key));
+        callMethod(ret, propPush, getOwnProperty(*array, key));
     }
 
     // Shift elements in 'this' array by simple assignment, not delete

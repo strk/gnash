@@ -1716,6 +1716,32 @@ ActionWaitForFrameExpression(ActionExec& thread)
 }
 
 void
+pushConstant(ActionExec& thread, unsigned int id)
+{
+    as_environment& env = thread.env;
+    /* const action_buffer& code = thread.code; */
+
+    const ConstantPool *pool = getVM(env).getConstantPool();
+    if ( ! pool ) {
+        IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("Unknown constant '%1%' (no pool registered with VM)"), id);
+        );
+        env.push(as_value());
+        return;
+    }
+
+    if ( id >= pool->size() ) {
+        IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("Unknown constant '%1%' (registered pool has %2% entries)"), id, pool->size());
+        );
+        env.push(as_value());
+        return;
+    }
+
+    env.push( (*pool)[id] );
+}
+
+void
 ActionPushData(ActionExec& thread)
 {
     as_environment& env = thread.env;
@@ -1842,15 +1868,7 @@ ActionPushData(ActionExec& thread)
             {
                 const boost::uint8_t id = code[3 + i];
                 ++i;
-                if (id < code.dictionary_size()) {
-                    env.push(code.dictionary_get(id));
-                }
-                else {
-                    IF_VERBOSE_MALFORMED_SWF(
-                        log_swferror(_("dict entry %d is out of bounds"), +id);
-                    );
-                    env.push(as_value());
-                }
+                pushConstant(thread, id);    
                 break;
             }
 
@@ -1858,15 +1876,7 @@ ActionPushData(ActionExec& thread)
             {
                 const boost::uint16_t id = code.read_int16(i + 3);
                 i += 2;
-                if (id < code.dictionary_size()) {
-                    env.push(code.dictionary_get(id));
-                }
-                else {
-                    IF_VERBOSE_MALFORMED_SWF(
-                        log_swferror(_("dict entry %d is out of bounds"), id);
-                    );
-                    env.push(as_value());
-                }
+                pushConstant(thread, id);    
                 break;
             }
         }
@@ -1961,6 +1971,8 @@ ActionCallFrame(ActionExec& thread)
         target = env.target();
     }
 
+    env.drop(1);
+
     MovieClip* target_sprite = target ? target->to_movie() : 0;
     if (target_sprite) {
         target_sprite->call_frame_actions(frame_var);
@@ -1971,8 +1983,6 @@ ActionCallFrame(ActionExec& thread)
             " target frame actions will not be called..."), target_path);
         )
     }
-
-    env.drop(1);
 }
 
 void
@@ -3100,7 +3110,10 @@ ActionExtends(ActionExec& thread)
 void
 ActionConstantPool(ActionExec& thread)
 {
-    thread.code.process_decl_dict(thread.getCurrentPC(), thread.getNextPC());
+    /* Register the so-read ConstantPool into the VM */
+    getVM(thread.env).setConstantPool(
+        &thread.code.readConstantPool(thread.getCurrentPC(), thread.getNextPC())
+    );
 }
 
 void

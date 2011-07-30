@@ -553,7 +553,7 @@ global_parseint(const fn_call& fn)
     if (*it == '-' || *it == '+') {
         if (*it == '-') negative = true;
         
-        it++;
+        ++it;
         if (it == expr.end()) return as_value(NaN);
     }
     

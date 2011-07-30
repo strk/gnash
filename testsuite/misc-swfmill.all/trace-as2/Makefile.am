@@ -27,13 +27,10 @@ TRACE_TESTS = \
 	super.xml \
 	this.xml \
 	arguments.xml \
+	root_onload.xml \
 	$(NULL)	
 
-TRACE_TRACES = \
-	super.trace \
-	this.trace \
-	arguments.trace \
-	$(NULL)	
+TRACE_TRACES = $(TRACE_TESTS:.xml=.trace)
 
 EXTRA_DIST = \
 	$(TRACE_TESTS) \

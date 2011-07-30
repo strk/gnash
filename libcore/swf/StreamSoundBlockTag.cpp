@@ -17,6 +17,11 @@
 //
 
 #include "StreamSoundBlockTag.h"
+
+#include <boost/intrusive_ptr.hpp>
+#include <boost/cstdint.hpp>
+
+#include "utility.h"
 #include "sound_handler.h" 
 #include "movie_root.h"
 #include "movie_definition.h"
@@ -25,6 +30,7 @@
 #include "SWFStream.h"
 #include "log.h"
 #include "RunResources.h"
+#include "MediaHandler.h"
 
 namespace gnash {
 namespace SWF {
@@ -71,25 +77,20 @@ StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     }
 
     media::audioCodecType format = sinfo->getFormat();
-    unsigned int sampleCount = sinfo->getSampleCount();
+
+    boost::uint16_t sampleCount;
+    boost::int16_t seekSamples = 0;
 
     // MP3 format blocks have additional info
     if (format == media::AUDIO_CODEC_MP3) {
         in.ensureBytes(4);
-        // FIXME: use these values !
-        const boost::uint16_t samplesCount = in.read_u16();
-        UNUSED(samplesCount);
-        const boost::uint16_t seekSamples = in.read_u16();
-
-        if (samplesCount) {
-            LOG_ONCE(log_unimpl(_("MP3 soundblock samples count (%s)"),
-                        samplesCount));
-        }
-        if (seekSamples) {
-            LOG_ONCE(log_unimpl(_("MP3 soundblock seek samples (%s)"),
-                        seekSamples));
-        }
+        // MP3 blocks have restrictions on the number of samples they can
+        // contain (due to the codec), so have a variable number of samples
+        // per block.
+        sampleCount = in.read_u16();
+        seekSamples = in.read_u16();
     }
+    else sampleCount = sinfo->getSampleCount();
 
     const unsigned int dataLength = in.get_tag_end_position() - in.tell();
     if (!dataLength) {
@@ -100,21 +101,27 @@ StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         return;
     }
 
-    unsigned char* data = new unsigned char[dataLength];
-    const unsigned int bytesRead = in.read(reinterpret_cast<char*>(data),
-            dataLength);
+    media::MediaHandler* mh = r.mediaHandler();
+    const size_t padding = mh ? mh->getInputPaddingSize() : 0;
+
+    // Reserve padding too.
+    std::auto_ptr<SimpleBuffer> buf(new SimpleBuffer(dataLength + padding));
+    buf->resize(dataLength);
+
+    const unsigned int bytesRead = in.read((char*)buf->data(), dataLength);
     
     if (bytesRead < dataLength) {
-        delete [] data;
         throw ParserException(_("Tag boundary reported past end of stream!"));
     }
 
-    // Fill the data on the apropiate sound, and receives the starting point
+    // Fill the data on the appropiate sound, and receives the starting point
     // for later "start playing from this frame" events.
     //
-    // ownership of 'data' is transferred here
+    // TODO: the amount of sound data used should depend on the sampleCount,
+    // not on the size of the data. Currently the sound_handler ignores
+    // sampleCount completely.
     sound::sound_handler::StreamBlockId blockId =
-        handler->addSoundBlock(data, dataLength, sampleCount, sId);
+        handler->addSoundBlock(buf, sampleCount, seekSamples, sId);
 
     boost::intrusive_ptr<ControlTag> s(new StreamSoundBlockTag(sId, blockId));
 

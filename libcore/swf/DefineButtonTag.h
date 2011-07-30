@@ -119,10 +119,9 @@ private:
     bool _down;
     bool _over;
     bool _up;
-    int    _id;
 
-    // This is a GC resource, so not owned by anyone.
-    const DefinitionTag* _definitionTag;
+    // This is a ref-counted resource, so not owned by anyone.
+    boost::intrusive_ptr<const DefinitionTag> _definitionTag;
 
     int _buttonLayer;
 
@@ -167,7 +166,7 @@ private:
         return (_conditions & KEYPRESS) >> 9;
     }
 
-    enum condition
+    enum Condition
     {
         IDLE_TO_OVER_UP = 1 << 0,
         OVER_UP_TO_IDLE = 1 << 1,
@@ -180,7 +179,8 @@ private:
         OVER_DOWN_TO_IDLE = 1 << 8,
         KEYPRESS = 0xFE00  // highest 7 bits
     };
-    int _conditions;
+
+    boost::uint16_t _conditions;
 
 };
 
@@ -249,6 +249,17 @@ public:
             const ButtonAction& ba = _buttonActions[i];
             if (ba.triggeredBy(ev)) f(ba._actions);
         }
+    }
+
+    /// Invoke a functor for each key code that should trigger an action.
+    //
+    /// Note: the key code is neither ascii nor a key index, but rather a
+    /// special button key code (the SWF column of GnashKey.h).
+    template<class E>
+    void visitKeyCodes(E& f) const {
+        std::for_each(_buttonActions.begin(), _buttonActions.end(),
+            boost::bind(f, boost::bind(
+                    boost::mem_fn(&ButtonAction::getKeyCode), _1)));
     }
     
 private:

@@ -271,6 +271,7 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
         // rendering performance issues.
         // Use LibVva, which works on Nvidia, AT, or Intel 965 GPUs
         // with AGG or OpenGL.
+#ifdef RENDERER_AGG
 #ifdef HAVE_VA_VA_H
         if (hwaccel == "vaapi") {
             canvas->glue.reset(new gnash::GtkAggVaapiGlue);
@@ -278,7 +279,6 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
             // if initializing fails.
         } else
 #endif
-#ifdef RENDERER_AGG
         {
             canvas->glue.reset(new gnash::GtkAggGlue);
         }

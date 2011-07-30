@@ -118,7 +118,10 @@ main(int argc, char** argv)
   add_actions(mo,
     "theClass1 = function() { this.x = 60; this._alpha=20; };"
     "theClass1.prototype = new MovieClip();"
-    "theClass1.prototype.onLoad = function() { trace('theClass1 proto onLoad'); _root.theClass1onLoadCalls.push(this); };"
+    "theClass1.prototype.onLoad = function() { "
+    " trace('theClass1 proto onLoad ('+this+')');"
+    " _root.theClass1onLoadCalls.push(this);"
+    "};"
     "theClass2 = function() { this.x = 600; this._x = 200; this._alpha=20;}; "
     "Object.registerClass('libItem1', theClass1);"
     "Object.registerClass('libItem2', theClass2);"
@@ -168,13 +171,17 @@ main(int argc, char** argv)
   add_clip_init_actions(mc3, " _root.note('mc3.initactions'); "
                              " theClass3 = function () {}; "
                              " theClass3.prototype = new MovieClip(); "
-                             " theClass3.prototype.onLoad = function() { trace('theClass3 proto onLoad'); _root.theClass3onLoadCalls.push(this); };"
+                             " theClass3.prototype.onLoad = function() {"
+			     "  trace('theClass3 proto onLoad ('+this+')');"
+			     "  _root.theClass3onLoadCalls.push(this);"
+			     " };"
                              " Object.registerClass('libItem3', theClass3); "
                              " _root.attachMovie('libItem3', 'clip3', 30); "
                              // clip3.__proto__ is initialized before executing onClipConstruct
                              "_root.check_equals(clip3.__proto__, _root.theClass3.prototype); ");
                              
   it3 = SWFMovie_add(mo, mc3);
+  SWFDisplayItem_setName(it3, "clipevs");
   SWFDisplayItem_addAction(it3,
     newSWFAction(" _root.note('mc3.onClipInitialize'); " 
                  " _root.check_equals(typeof(_root.clip3), 'movieclip');" 
@@ -197,7 +204,7 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); /* end of frame3 */
 
   check_equals(mo, "_root.theClass3onLoadCalls.length", "3");
-  check_equals(mo, "_root.theClass3onLoadCalls[0]", "_level0.instance2");
+  check_equals(mo, "_root.theClass3onLoadCalls[0]", "_level0.clipevs");
   // Gnash gets the onLoad events of 'clip3' and 'noclipevs' swapped !!
   xcheck_equals(mo, "_root.theClass3onLoadCalls[1]", "_level0.clip3");
   xcheck_equals(mo, "_root.theClass3onLoadCalls[2]", "_level0.noclipevs"); /* it4 ... */

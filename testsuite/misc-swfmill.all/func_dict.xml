@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<swf version="6" compressed="0">
+
+<!--
+
+ Test file for https://savannah.gnu.org/bugs/?33521
+
+ Shows that functions keep a reference on the constant
+ pool in place at time of their definition, even if
+ the pool in the action buffer is overridden at time
+ of function call.
+
+ This file uses named function, see afunc_dict.xml 
+ for an anonymous function.
+
+-->
+
+  <Header framerate="12" frames="1">
+    <size>
+      <Rectangle left="0" right="12800" top="0" bottom="9600"/>
+    </size>
+    <tags>
+      <DoAction>
+        <actions>
+
+	<!-- Dictionary 1 -->
+          <Dictionary>
+            <strings>
+              <String value="a"/>
+            </strings>
+          </Dictionary>
+
+	<!-- Function code -->
+          <DeclareFunction name="f" argc="0" length="17">
+            <args/>
+          </DeclareFunction>
+
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+
+	<!-- Dictionary 2 (in-function) -->
+          <Dictionary>
+            <strings>
+              <String value="c"/>
+            </strings>
+          </Dictionary>
+
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+
+	<!-- END OF FUNCTION BODY -->
+
+	<!-- Dictionary 3 (after function) -->
+          <Dictionary>
+            <strings>
+              <String value="b"/>
+            </strings>
+          </Dictionary>
+
+
+	  // Push "r" (to assign later)
+          <PushData>
+            <items>
+              <StackString value="r"/>
+            </items>
+          </PushData>
+
+	  // Push dict[0] (expect 'b')
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+
+	  // Call the function  (pushes 'a' and 'c')
+          <PushData>
+            <items>
+              <StackInteger value="0"/>
+              <StackString value="f"/>
+            </items>
+          </PushData>
+          <CallFunction/>
+          <Pop/>
+
+	
+	  // Push dict[0] (expect 'b')
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+
+          <AddTyped/>
+          <AddTyped/>
+          <AddTyped/>
+          <Duplicate/>
+          <Trace/>
+
+	  // Verify we got 'bacb'
+          <PushData>
+            <items>
+              <StackString value="bacb"/>
+            </items>
+          </PushData>
+	  <EqualTyped/>
+
+	  // If true, jump to PASSED tracing
+	  <BranchIfTrue byteOffset="51"/>
+
+	  // Else, trace XFAILED
+          <PushData>
+            <items>
+              <StackString value="FAILED: func used overridden dictionary "/>
+            </items>
+          </PushData>
+          <Trace/>
+          <BranchAlways byteOffset="44"/> // get to end 
+
+	  // PASSED tracing
+          <PushData>
+            <items>
+              <StackString value="PASSED: func used original dictionary "/>
+            </items>
+          </PushData>
+          <Trace/>
+
+	  // END OF TEST tag
+          <PushData>
+            <items>
+              <StackString value="END OF TEST"/>
+            </items>
+          </PushData>
+          <Trace/>
+
+          <EndAction/>
+        </actions>
+      </DoAction>
+      <ShowFrame/>
+      <End/>
+    </tags>
+  </Header>
+</swf>

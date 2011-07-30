@@ -27,7 +27,7 @@ namespace gnash {
 
 /// Texture flags
 enum {
-    GNASH_TEXTURE_VAAPI = 1 << 0,
+    GNASH_TEXTURE_VAAPI = 1 << 0
 };
 
 /// OpenGL texture format

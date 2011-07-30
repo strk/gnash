@@ -27,9 +27,7 @@
 #include <bitset>
 #include <cassert>
 #include <functional>
-#include <boost/algorithm/string/erase.hpp>
 #include <boost/algorithm/string/replace.hpp>
-#include <boost/ptr_container/ptr_map.hpp>
 #include <boost/ptr_container/ptr_deque.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/bind.hpp>
@@ -258,6 +256,20 @@ movie_root::abortOnScriptTimeout(const std::string& what) const
     }
     return disable;
 }
+   
+void
+movie_root::registerClass(const SWF::DefinitionTag* sprite, as_function* cls)
+{
+    _registeredClasses[sprite] = cls;
+}
+
+as_function*
+movie_root::getRegisteredClass(const SWF::DefinitionTag* sprite) const
+{
+    RegisteredClasses::const_iterator it = _registeredClasses.find(sprite);
+    if (it == _registeredClasses.end()) return 0;
+    return it->second;
+}
 
 void
 movie_root::handleActionLimitHit(const std::string& msg)
@@ -272,6 +284,9 @@ movie_root::cleanupAndCollect()
 {
     // Cleanup the stack.
     _vm.getStack().clear();
+
+    // Reset the constant pool
+    _vm.setConstantPool(0);
 
     cleanupDisplayList();
     _gc.fuzzyCollect();
@@ -506,8 +521,8 @@ movie_root::reset()
     // remove all loadMovie requests
     _movieLoader.clear();
 
-    // remove key listeners
-    _keyListeners.clear();
+    // Remove button key events.
+    _buttonKeys.clear();
 
     // Cleanup the stack.
     _vm.getStack().clear();
@@ -565,8 +580,7 @@ movie_root::keyEvent(key::code k, bool down)
     for (LiveChars::iterator iter = copy.begin(), itEnd=copy.end();
             iter != itEnd; ++iter) {
 
-        // sprite, button & input_edit_text DisplayObjects
-        InteractiveObject* const ch = *iter;
+        MovieClip* const ch = *iter;
         if (ch->unloaded()) continue;
 
         if (down) {
@@ -588,10 +602,12 @@ movie_root::keyEvent(key::code k, bool down)
             // A stack limit like that is hardly of any use, but could be used
             // maliciously to crash Gnash.
             if (down) {
-                callMethod(key, getURI(_vm, NSV::PROP_BROADCAST_MESSAGE), "onKeyDown");
+                callMethod(key, getURI(_vm, NSV::PROP_BROADCAST_MESSAGE),
+                        "onKeyDown");
             }
             else {
-                callMethod(key, getURI(_vm,NSV::PROP_BROADCAST_MESSAGE), "onKeyUp");
+                callMethod(key, getURI(_vm,NSV::PROP_BROADCAST_MESSAGE),
+                        "onKeyUp");
             }
         }
         catch (const ActionLimitException &e) {
@@ -601,29 +617,23 @@ movie_root::keyEvent(key::code k, bool down)
         }
     }
     
-    // Then any button keys are notified.
-    Listeners lcopy = _keyListeners;
-    for (Listeners::iterator iter = lcopy.begin(), itEnd = lcopy.end();
-            iter != itEnd; ++iter) {
-
-        // sprite, button & input_edit_text DisplayObjects
-        Button* const ch = *iter;
-        if (ch->unloaded()) continue;
-
-        if (down) {
-            ch->notifyEvent(event_id(event_id::KEY_DOWN, key::INVALID)); 
-            ch->notifyEvent(event_id(event_id::KEY_PRESS, k));
-        }
-        else {
-            ch->notifyEvent(event_id(event_id::KEY_UP, key::INVALID));   
-        }
-    }
-
-
-    // If we're focused on an editable text field, finally the text is updated
     if (down) {
+        ButtonKeys::const_iterator it =
+            _buttonKeys.find(key::codeMap[k][key::SWF]);
+
+        // TODO: this searches through all ButtonActions for the correct
+        // one, even though we could easily know which one it's going to be
+        // because we search through them all to register the key codes.
+        if (it != _buttonKeys.end()) {
+            if (!it->second.first->unloaded()) {
+                it->second.first->keyPress(k);
+            }
+        }
+
+        // If we're focused on an editable text field, finally the text
+        // is updated
         TextField* tf = dynamic_cast<TextField*>(_currentFocus);
-        if (tf) tf->notifyEvent(event_id(event_id::KEY_PRESS, k));
+        if (tf) tf->keyInput(k);
     }
 
     processActionQueue();
@@ -1535,11 +1545,11 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         std::string var = invoke->args[0].to_string();
         as_value val;
         obj->get_member(getURI(vm, var), &val);
-    // GetVariable sends the value of the variable
-    ss << ExternalInterface::toXML(val);
+        // GetVariable sends the value of the variable
+        ss << ExternalInterface::toXML(val);
     } else if (invoke->name == "GotoFrame") {
         log_unimpl("ExternalInterface::GotoFrame()");
-    // GotoFrame doesn't send a response
+        // GotoFrame doesn't send a response
     } else if (invoke->name == "IsPlaying") {
         const bool result = 
             callInterface<bool>(HostMessage(HostMessage::EXTERNALINTERFACE_ISPLAYING));
@@ -1720,17 +1730,6 @@ movie_root::markReachableResources() const
     }
 #endif
     
-#if ( GNASH_PARANOIA_LEVEL > 1 ) || defined(ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION)
-    for (Listeners::const_iterator i=_keyListeners.begin(),
-            e=_keyListeners.end(); i!=e; ++i) {
-#ifdef ALLOW_GC_RUN_DURING_ACTIONS_EXECUTION
-        (*i)->setReachable();
-#else
-        assert((*i)->isReachable());
-#endif
-    }
-#endif
-
 }
 
 InteractiveObject*
@@ -1802,7 +1801,6 @@ std::string
 movie_root::callExternalJavascript(const std::string &name, 
                                    const std::vector<as_value> &fnargs)
 {
-    // GNASH_REPORT_FUNCTION;
     std::string result;
     // If the browser is connected, we send an Invoke message to the
     // browser.
@@ -1829,7 +1827,6 @@ std::string
 movie_root::callExternalCallback(const std::string &name, 
                  const std::vector<as_value> &fnargs)
 {
-    // GNASH_REPORT_FUNCTION;
 
     MovieClip *mc = getLevel(0);
     as_object *obj = getObject(mc);
@@ -1878,20 +1875,29 @@ movie_root::callExternalCallback(const std::string &name,
 }
 
 void
-movie_root::remove_key_listener(Button* listener)
+movie_root::removeButtonKey(Button* listener)
 {
-    _keyListeners.remove_if(std::bind2nd(std::equal_to<Button*>(), listener));
+    // Remove the button and the key associated with it from the map.
+    for (ButtonKeys::iterator i = _buttonKeys.begin(), e = _buttonKeys.end();
+            i != e;) {
+        if (i->second.first == listener) {
+            _buttonKeys.erase(i++);
+        }
+        else ++i;
+    }
+
 }
 
 void
-movie_root::add_key_listener(Button* listener)
+movie_root::registerButtonKey(int code, Button* listener)
 {
-    assert(listener);
+    const size_t frame = _rootMovie->get_current_frame();
+    ButtonKeys::const_iterator it = _buttonKeys.find(code);
 
-    if (std::find(_keyListeners.begin(), _keyListeners.end(), listener)
-            != _keyListeners.end()) return;
-
-    _keyListeners.push_front(listener);
+    if (it != _buttonKeys.end() && it->second.second < frame) {
+        return;
+    }
+    _buttonKeys[code] = std::make_pair(listener, frame);
 }
 
 void
@@ -2016,9 +2022,9 @@ movie_root::set_background_color(const rgba& color)
     rgba newcolor = color;
     newcolor.m_a = m_background_color.m_a;
 
-    if (m_background_color != color) {
+    if (m_background_color != newcolor) {
         setInvalidated();
-        m_background_color = color;
+        m_background_color = newcolor;
     }
 }
 

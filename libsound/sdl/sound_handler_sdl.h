@@ -58,7 +58,7 @@ private:
     bool _audioOpened;
     
     /// Mutex for making sure threads doesn't mess things up
-    boost::mutex _mutex;
+    mutable boost::mutex _mutex;
 
     /// Mutex protecting _muted (defined in base class)
     mutable boost::mutex _mutedMutex;
@@ -92,18 +92,21 @@ public:
 
     ~SDL_sound_handler();
 
+    virtual int createStreamingSound(const media::SoundInfo& sinfo);
+
     // See dox in sound_handler.h
-    virtual int create_sound(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<media::SoundInfo> sinfo);
+    virtual int create_sound(std::auto_ptr<SimpleBuffer> data,
+            const media::SoundInfo& sinfo);
 
     // See dox in sound_handler.h
     // overridden to serialize access to the data buffer slot
-    virtual StreamBlockId addSoundBlock(unsigned char* data,
-                                       unsigned int data_bytes,
-                                       unsigned int sample_count,
-                                       int streamId);
+    virtual StreamBlockId addSoundBlock(std::auto_ptr<SimpleBuffer> buf,
+           size_t sample_count, int seekSamples, int streamId);
 
     // See dox in sound_handler.h
-    virtual void    stop_sound(int sound_handle);
+    virtual void stopEventSound(int sound_handle);
+
+    virtual void stopStreamingSound(int sound_handle);
 
     // See dox in sound_handler.h
     virtual void    delete_sound(int sound_handle);
@@ -115,13 +118,13 @@ public:
     virtual void    stop_all_sounds();
 
     // See dox in sound_handler.h
-    virtual int get_volume(int sound_handle);
+    virtual int get_volume(int sound_handle) const;
 
     // See dox in sound_handler.h
-    virtual void    set_volume(int sound_handle, int volume);
+    virtual void set_volume(int sound_handle, int volume);
         
     // See dox in sound_handler.h
-    virtual media::SoundInfo* get_sound_info(int soundHandle);
+    virtual media::SoundInfo* get_sound_info(int soundHandle) const;
 
     // See dox in sound_handler.h
     // overridden to serialize access to the _muted member
@@ -144,10 +147,10 @@ public:
     virtual void unpause();
 
     // See dox in sound_handler.h
-    virtual unsigned int get_duration(int sound_handle);
+    virtual unsigned int get_duration(int sound_handle) const;
 
     // See dox in sound_handler.h
-    virtual unsigned int tell(int sound_handle);
+    virtual unsigned int tell(int sound_handle) const;
     
     // See dox in sound_handler.h
     // Overridden to unpause SDL audio

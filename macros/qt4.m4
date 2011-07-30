@@ -166,13 +166,18 @@ dnl   fi
 
     if test x"${ac_cv_path_qt4_lib}" != x; then
       AC_MSG_RESULT(${ac_cv_path_qt4_lib})
-      QT4_LIBS="${ac_cv_path_qt4_lib}"
-      AC_DEFINE(HAVE_QT4, 1, [Have QT 4.x installed])
-      has_qt4="yes"
     else
       AC_MSG_RESULT(no)
-      QT4_LIBS=""
+    fi
+
+    dnl Both the headers and the library must be installed
+    if test x"${ac_cv_path_qt4_incl}" != x -a x"${ac_cv_path_qt4_lib}" != x; then
+      AC_DEFINE(HAVE_QT4, 1, [Have QT 4.x installed])
+      QT4_LIBS="${ac_cv_path_qt4_lib}"
+      has_qt4="yes"
+    else
       has_qt4="no"
+      QT4_LIBS=""
     fi
 
     AC_PATH_PROGS(MOC4, [moc-qt4 moc moc4], ,[/usr/bin ${QTDIR}/bin /usr/lib/qt4/bin /usr/share/qt4/bin/ ${pathlist}])

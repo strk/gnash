@@ -18,15 +18,19 @@
 //
 
 #include "sound_handler.h"
+
+#include <boost/cstdint.hpp> // For C99 int types
+#include <vector> 
+#include <cmath> 
+#include <boost/scoped_array.hpp>
+
 #include "EmbedSound.h" // for use
 #include "InputStream.h" // for use
 #include "EmbedSoundInst.h" // for upcasting to InputStream
 #include "log.h" // for use
-#include "WallClockTimer.h" // for debugging
-
-#include <boost/cstdint.hpp> // For C99 int types
-#include <vector> // for use
-#include <cmath> // for floor (debugging)
+#include "StreamingSound.h"
+#include "StreamingSoundData.h"
+#include "SimpleBuffer.h"
 
 // Debug create_sound/delete_sound/playSound/stop_sound, loops
 //#define GNASH_DEBUG_SOUNDS_MANAGEMENT
@@ -34,54 +38,64 @@
 // Debug samples fetching
 //#define GNASH_DEBUG_SAMPLES_FETCHING 1
 
+namespace gnash {
+namespace sound {
+
 namespace {
 
-unsigned int silentStream(void*, boost::int16_t* stream, unsigned int len, bool& atEOF)
+unsigned int
+silentStream(void*, boost::int16_t* stream, unsigned int len, bool& atEOF)
 {
-    std::fill(stream, stream+len, 0);
+    std::fill(stream, stream + len, 0);
     atEOF=false;
     return len;
 }
 
+template<typename T>
+bool
+validHandle(const T& container, int handle)
+{
+    return handle >= 0 && static_cast<size_t>(handle) < container.size();
 }
 
+/// Ensure that each buffer has appropriate padding for the decoder.
+//
+/// Note: all callers passing a SimpleBuffer should already do this,
+/// so this is a paranoid check.
+void
+ensurePadding(SimpleBuffer& data, media::MediaHandler* m)
+{
+    const size_t padding = m ? m->getInputPaddingSize() : 0;
+    if (data.capacity() - data.size() < padding) {
+        log_error("Sound data creator didn't appropriately pad "
+                "buffer. We'll do so now, but will cost memory copies.");
+        data.reserve(data.size() + padding);
+    }
+}
 
-namespace gnash {
-namespace sound {
+} // anonymous namespace
 
 sound_handler::StreamBlockId
-sound_handler::addSoundBlock(unsigned char* data,
-        unsigned int data_bytes, unsigned int /*sample_count*/,
-        int handleId)
+sound_handler::addSoundBlock(std::auto_ptr<SimpleBuffer> data,
+        size_t sampleCount, int seekSamples, int handle)
 {
-    // @@ does a negative handle_id have any meaning ?
-    //    should we change it to unsigned instead ?
-    if (handleId < 0 || (unsigned int) handleId+1 > _sounds.size())
-    {
-        log_error("Invalid (%d) sound_handle passed to fill_stream_data, "
-                  "doing nothing", handleId);
-        delete [] data;
+    if (!validHandle(_streamingSounds, handle)) {
+        log_error("Invalid (%d) handle passed to fill_stream_data, "
+                  "doing nothing", handle);
         return -1;
     }
 
-    EmbedSound* sounddata = _sounds[handleId];
-    if ( ! sounddata )
-    {
-        log_error("sound_handle passed to fill_stream_data (%d) "
-                  "was deleted", handleId);
+    StreamingSoundData* sounddata = _streamingSounds[handle];
+    if (!sounddata) {
+        log_error("handle passed to fill_stream_data (%d) "
+                  "was deleted", handle);
         return -1;
     }
 
-    // Handling of the sound data
-    size_t start_size = sounddata->size();
-    sounddata->append(reinterpret_cast<boost::uint8_t*>(data), data_bytes);
+    assert(data.get());
+    ensurePadding(*data, _mediaHandler);
 
-#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
-    log_debug("fill_stream_data: sound %d, %d samples (%d bytes) appended at offset %d",
-        handleId, data_bytes/2, data_bytes, start_size);
-#endif
-
-    return start_size;
+    return sounddata->append(data, sampleCount, seekSamples);
 }
 
 void
@@ -101,34 +115,48 @@ sound_handler::delete_all_sounds()
         delete sdef; 
     }
     _sounds.clear();
+
+    for (StreamingSounds::iterator i = _streamingSounds.begin(),
+                          e = _streamingSounds.end(); i != e; ++i)
+    {
+        StreamingSoundData* sdef = *i;
+
+        // Streaming sounds are never deleted.
+        assert(sdef);
+
+        stopEmbedSoundInstances(*sdef);
+        assert(!sdef->numPlayingInstances());
+
+        delete sdef; 
+    }
+    _streamingSounds.clear();
+
 }
 
 void
-sound_handler::delete_sound(int sound_handle)
+sound_handler::delete_sound(int handle)
 {
     // Check if the sound exists
-    if (sound_handle < 0 || static_cast<unsigned int>(sound_handle) >= _sounds.size())
-    {
-        log_error("Invalid (%d) sound_handle passed to delete_sound, "
-                  "doing nothing", sound_handle);
+    if (!validHandle(_sounds, handle)) {
+        log_error("Invalid (%d) handle passed to delete_sound, "
+                  "doing nothing", handle);
         return;
     }
 
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
-    log_debug ("deleting sound :%d", sound_handle);
+    log_debug ("deleting sound :%d", handle);
 #endif
 
-    EmbedSound* def = _sounds[sound_handle];
-    if ( ! def )
-    {
-        log_error("sound_handle passed to delete_sound (%d) "
-                  "already deleted", sound_handle);
+    EmbedSound* def = _sounds[handle];
+    if (!def) {
+        log_error("handle passed to delete_sound (%d) "
+                  "already deleted", handle);
         return;
     }
     
     stopEmbedSoundInstances(*def);
     delete def;
-    _sounds[sound_handle] = 0;
+    _sounds[handle] = 0;
 
 }
 
@@ -142,71 +170,75 @@ sound_handler::stop_all_sounds()
         if ( ! sounddata ) continue; // could have been deleted already
         stopEmbedSoundInstances(*sounddata);
     }
+
+    for (StreamingSounds::iterator i = _streamingSounds.begin(),
+                          e = _streamingSounds.end(); i != e; ++i)
+    {
+        StreamingSoundData* sounddata = *i;
+        if (!sounddata) continue; 
+        stopEmbedSoundInstances(*sounddata);
+    }
 }
 
 int
-sound_handler::get_volume(int soundHandle)
+sound_handler::get_volume(int handle) const
 {
-    int ret;
-    // Check if the sound exists.
-    if (soundHandle >= 0 && static_cast<unsigned int>(soundHandle) < _sounds.size())
-    {
-        ret = _sounds[soundHandle]->volume;
-    } else {
-        ret = 0; // Invalid handle
-    }
-    return ret;
+    if (validHandle(_sounds, handle)) return _sounds[handle]->volume; 
+
+    // Invalid handle.
+    return 0;
 }
 
 void   
-sound_handler::set_volume(int sound_handle, int volume)
+sound_handler::set_volume(int handle, int volume)
 {
-    // Check if the sound exists.
-    if (sound_handle < 0 || static_cast<unsigned int>(sound_handle) >= _sounds.size())
-    {
-        // Invalid handle.
-    } else {
-
-        // Set volume for this sound. Should this only apply to the active sounds?
-        _sounds[sound_handle]->volume = volume;
-    }
-
-
+    // Set volume for this sound.
+    // Should this only apply to the active sounds?
+    if (validHandle(_sounds, handle)) _sounds[handle]->volume = volume;
 }
 
 media::SoundInfo*
-sound_handler::get_sound_info(int sound_handle)
+sound_handler::get_sound_info(int handle) const
 {
     // Check if the sound exists.
-    if (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < _sounds.size())
-    {
-        return _sounds[sound_handle]->soundinfo.get();
-    } else {
-        return NULL;
-    }
+    if (validHandle(_streamingSounds, handle)) {
+        return &_streamingSounds[handle]->soundinfo;
+    } 
+    return 0;
 }
 
 void
-sound_handler::stop_sound(int sound_handle)
+sound_handler::stopStreamingSound(int handle)
 {
     // Check if the sound exists.
-    if (sound_handle < 0 || (unsigned int) sound_handle >= _sounds.size())
-    {
-        log_debug("stop_sound(%d): invalid sound id", sound_handle);
-        // Invalid handle.
+    if (!validHandle(_streamingSounds, handle)) {
+        log_debug("stop_sound(%d): invalid sound id", handle);
         return;
     }
-
     
-    EmbedSound* sounddata = _sounds[sound_handle];
-    if ( ! sounddata )
-    {
-        log_error("stop_sound(%d): sound was deleted", sound_handle);
+    StreamingSoundData* sounddata = _streamingSounds[handle];
+    assert(sounddata);
+
+    stopEmbedSoundInstances(*sounddata);
+}
+
+void
+sound_handler::stopEventSound(int handle)
+{
+    // Check if the sound exists.
+    if (!validHandle(_sounds, handle)) {
+        log_debug("stop_sound(%d): invalid sound id", handle);
+        return;
+    }
+    
+    EmbedSound* sounddata = _sounds[handle];
+    if (!sounddata) {
+        log_error("stop_sound(%d): sound was deleted", handle);
         return;
     }
 
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
-    log_debug("stop_sound %d called", sound_handle);
+    log_debug("stop_sound %d called", handle);
 #endif
 
     stopEmbedSoundInstances(*sounddata);
@@ -214,10 +246,36 @@ sound_handler::stop_sound(int sound_handle)
 }
 
 void   
+sound_handler::stopEmbedSoundInstances(StreamingSoundData& def)
+{
+    // Assert _mutex is locked ...
+    typedef std::vector<InputStream*> InputStreamVect;
+    InputStreamVect playing;
+    def.getPlayingInstances(playing);
+
+    // Now, for each playing InputStream, unplug it!
+    // NOTE: could be optimized...
+    for (InputStreamVect::iterator i=playing.begin(), e=playing.end();
+            i!=e; ++i)
+    {
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+        log_debug(" unplugging input stream %p from stopEmbedSoundInstances", *i);
+#endif
+
+        // Explicitly calling the base class implementation
+        // is a (dirty?) way to avoid mutex-locking overrides
+        // in subclasses causing deadlocks.
+        sound_handler::unplugInputStream(*i);
+    }
+
+    def.clearInstances();
+
+}
+
+void   
 sound_handler::stopEmbedSoundInstances(EmbedSound& def)
 {
     // Assert _mutex is locked ...
-
     typedef std::vector<InputStream*> InputStreamVect;
     InputStreamVect playing;
     def.getPlayingInstances(playing);
@@ -267,22 +325,18 @@ sound_handler::unplugInputStream(InputStream* id)
 }
 
 unsigned int
-sound_handler::tell(int sound_handle)
+sound_handler::tell(int handle) const
 {
     // Check if the sound exists.
-    if (sound_handle < 0 || (unsigned int) sound_handle >= _sounds.size())
-    {
-        // Invalid handle.
-        return 0;
-    }
+    if (!validHandle(_sounds, handle)) return 0;
 
-    EmbedSound* sounddata = _sounds[sound_handle];
+    const EmbedSound* sounddata = _sounds[handle];
 
     // If there is no active sounds, return 0
-    if ( ! sounddata->isPlaying() ) return 0;
+    if (!sounddata->isPlaying()) return 0;
 
     // We use the first active sound of this.
-    InputStream* asound = sounddata->firstPlayingInstance();
+    const InputStream* asound = sounddata->firstPlayingInstance();
 
     // Return the playhead position in milliseconds
     unsigned int samplesPlayed = asound->samplesFetched();
@@ -294,50 +348,59 @@ sound_handler::tell(int sound_handle)
 }
 
 unsigned int
-sound_handler::get_duration(int sound_handle)
+sound_handler::get_duration(int handle) const
 {
     // Check if the sound exists.
-    if (sound_handle < 0 || (unsigned int) sound_handle >= _sounds.size())
-    {
-        // Invalid handle.
-        return 0;
-    }
+    if (!validHandle(_sounds, handle)) return 0;
 
-    EmbedSound* sounddata = _sounds[sound_handle];
+    const EmbedSound* sounddata = _sounds[handle];
 
-    boost::uint32_t sampleCount = sounddata->soundinfo->getSampleCount();
-    boost::uint32_t sampleRate = sounddata->soundinfo->getSampleRate();
+    const boost::uint32_t sampleCount = sounddata->soundinfo.getSampleCount();
+    const boost::uint32_t sampleRate = sounddata->soundinfo.getSampleRate();
 
     // Return the sound duration in milliseconds
     if (sampleCount > 0 && sampleRate > 0) {
         // TODO: should we cache this in the EmbedSound object ?
         unsigned int ret = sampleCount / sampleRate * 1000;
         ret += ((sampleCount % sampleRate) * 1000) / sampleRate;
-        //if (sounddata->soundinfo->isStereo()) ret = ret / 2;
         return ret;
-    } else {
-        return 0;
-    }
+    } 
+    return 0;
+}
+
+int
+sound_handler::createStreamingSound(const media::SoundInfo& sinfo)
+{
+    std::auto_ptr<StreamingSoundData> sounddata(
+            new StreamingSoundData(sinfo, 100));
+
+    int sound_id = _streamingSounds.size();
+    // the vector takes ownership
+    _streamingSounds.push_back(sounddata.release());
+
+    return sound_id;
 }
 
 int
 sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,
-                            std::auto_ptr<media::SoundInfo> sinfo)
+                            const media::SoundInfo& sinfo)
 {
-    assert(sinfo.get());
-
-    std::auto_ptr<EmbedSound> sounddata(
-            new EmbedSound(data, sinfo, 100,
-                _mediaHandler ? _mediaHandler->getInputPaddingSize() : 0));
+    if (data.get()) {
+        ensurePadding(*data, _mediaHandler);
+    }
+    else {
+        log_debug("Event sound with no data!");
+    }
+    std::auto_ptr<EmbedSound> sounddata(new EmbedSound(data, sinfo, 100));
 
     int sound_id = _sounds.size();
 
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
     log_debug("create_sound: sound %d, format %s %s %dHz, %d samples (%d bytes)",
-        sound_id, sounddata->soundinfo->getFormat(),
-        sounddata->soundinfo->isStereo() ? "stereo" : "mono",
-        sounddata->soundinfo->getSampleRate(),
-        sounddata->soundinfo->getSampleCount(),
+        sound_id, sounddata->soundinfo.getFormat(),
+        sounddata->soundinfo.isStereo() ? "stereo" : "mono",
+        sounddata->soundinfo.getSampleRate(),
+        sounddata->soundinfo.getSampleCount(),
         sounddata->size());
 #endif
 
@@ -348,156 +411,54 @@ sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,
 
 }
 
-/*static private*/
-unsigned int
-sound_handler::swfToOutSamples(const media::SoundInfo& sinfo,
-                                      unsigned int swfSamples)
-{
-    // swf samples refers to pre-resampled state so we need to
-    // take that into account.
-
-
-    static const unsigned int outSampleRate = 44100;
-
-    unsigned int outSamples = swfSamples *
-                                (outSampleRate/sinfo.getSampleRate());
-
-    // NOTE: this was tested with inputs:
-    //     - isStereo?0 is16bit()?1 sampleRate?11025
-    //     - isStereo?0 is16bit()?1 sampleRate?22050
-    //     - isStereo?1 is16bit()?1 sampleRate?22050
-    //     - isStereo?0 is16bit()?1 sampleRate?44100
-    //     - isStereo?1 is16bit()?1 sampleRate?44100
-    //
-    // TODO: test with other sample sizes !
-    //
-#if 1
-    log_debug("NOTE: isStereo?%d is16bit()?%d sampleRate?%d",
-              sinfo.isStereo(), sinfo.is16bit(), sinfo.getSampleRate());
-#endif
-
-
-    return outSamples;
-}
-
-/* public */
 bool
-sound_handler::isSoundPlaying(int sound_handle) const
+sound_handler::isSoundPlaying(int handle) const
 {
-    if ( sound_handle < 0 ||
-         static_cast<unsigned int>(sound_handle) >= _sounds.size() )
-    {
-        return false;
-    }
+    if (!validHandle(_sounds, handle)) return false;
 
-    EmbedSound& sounddata = *(_sounds[sound_handle]);
+    EmbedSound& sounddata = *(_sounds[handle]);
 
     // When this is called from a StreamSoundBlockTag,
     // we only start if this sound isn't already playing.
     return sounddata.isPlaying();
 }
 
-
-/* private */
-void
-sound_handler::playSound(int sound_handle,
-        int loopCount, unsigned int inPoint, unsigned int outPoint,
-        StreamBlockId blockId, const SoundEnvelopes* envelopes,
-        bool allowMultiples)
-{
-    assert (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < _sounds.size());
-
-    EmbedSound& sounddata = *(_sounds[sound_handle]);
-
-#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
-    log_debug("playSound %d called, SoundInfo format is %s",
-            sound_handle, sounddata.soundinfo->getFormat());
-#endif
-
-    // When this is called from a StreamSoundBlockTag,
-    // we only start if this sound isn't already playing.
-    if ( ! allowMultiples && sounddata.isPlaying() )
-    {
-#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
-        log_debug(" playSound: multiple instances not allowed, "
-                  "and sound %d is already playing", sound_handle);
-#endif
-        // log_debug("Stream sound block play request, "
-        //           "but an instance of the stream is "
-        //           "already playing, so we do nothing");
-        return;
-    }
-
-    // Make sure sound actually got some data
-    if ( sounddata.empty() )
-    {
-        // @@ should this be a log_error ? or even an assert ?
-        IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("Trying to play sound with size 0"));
-        );
-        return;
-    }
-
-    // Make a "EmbedSoundInst" for this sound and plug it into  
-    // the set of InputStream channels
-    //
-    std::auto_ptr<InputStream> sound ( sounddata.createInstance(
-
-            // MediaHandler to use for decoding
-            *_mediaHandler,
-
-            // Sound block identifier
-            blockId, 
-
-            // Samples range
-            inPoint, outPoint,
-
-            // Volume envelopes to use for this instance
-            envelopes,
-
-            // Loop count
-            loopCount
-
-    ) );
-
-    plugInputStream(sound);
-}
-
-/*public*/
 void
 sound_handler::playStream(int soundId, StreamBlockId blockId)
 {
-    unsigned int inPoint=0;
-    unsigned int outPoint=std::numeric_limits<unsigned int>::max();
+    StreamingSoundData& s = *_streamingSounds[soundId];
+    if (s.isPlaying() || s.empty()) return;
 
-    playSound(soundId, 0, inPoint, outPoint, blockId, 0, false);
+    try {
+        std::auto_ptr<InputStream> is(
+                s.createInstance(*_mediaHandler, blockId));
+        plugInputStream(is);
+    }
+    catch (const MediaException& e) {
+        log_error("Could not start streaming sound: %s", e.what());
+    }
 }
 
 /*public*/
 void
-sound_handler::startSound(int soundId, int loops, 
-	               const SoundEnvelopes* env,
+sound_handler::startSound(int handle, int loops, const SoundEnvelopes* env,
 	               bool allowMultiple, unsigned int inPoint,
                    unsigned int outPoint)
 {
     // Check if the sound exists
-    if (soundId < 0 ||
-        static_cast<unsigned int>(soundId) >= _sounds.size())
-    {
+    if (!validHandle(_sounds, handle)) {
         log_error("Invalid (%d) sound_handle passed to startSound, "
-                  "doing nothing", soundId);
+                  "doing nothing", handle);
         return;
     }
 
-
     // Handle delaySeek
 
-    EmbedSound& sounddata = *(_sounds[soundId]);
-    const media::SoundInfo& sinfo = *(sounddata.soundinfo);
+    EmbedSound& sounddata = *(_sounds[handle]);
+    const media::SoundInfo& sinfo = sounddata.soundinfo;
 
-    int swfDelaySeek = sinfo.getDelaySeek(); 
-    if ( swfDelaySeek )
-    {
+    const int swfDelaySeek = sinfo.getDelaySeek(); 
+    if (swfDelaySeek) {
         // NOTE: differences between delaySeek and inPoint:
         //
         //      - Sample count semantic:
@@ -534,7 +495,42 @@ sound_handler::startSound(int soundId, int loops,
 #endif
     }
 
-    playSound(soundId, loops, inPoint, outPoint, 0, env, allowMultiple);
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+    log_debug("startSound %d called, SoundInfo format is %s",
+            sound_handle, sounddata.soundinfo.getFormat());
+#endif
+
+    // When this is called from a StreamSoundBlockTag,
+    // we only start if this sound isn't already playing.
+    if (!allowMultiple && sounddata.isPlaying()) {
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+        log_debug(" playSound: multiple instances not allowed, "
+                  "and sound is already playing");
+#endif
+        return;
+    }
+
+    // Make sure sound actually got some data
+    if (sounddata.empty()) {
+        // @@ should this be a log_error ? or even an assert ?
+        IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("Trying to play sound with size 0"));
+        );
+        return;
+    }
+
+    try {
+        // Make an InputStream for this sound and plug it into  
+        // the set of InputStream channels
+        std::auto_ptr<InputStream> sound(
+                sounddata.createInstance(*_mediaHandler, inPoint, outPoint,
+                    env, loops));
+        plugInputStream(sound);
+    }
+    catch (const MediaException& e) {
+        log_error("Could not start event sound: %s", e.what());
+    }
+
 }
 
 void
@@ -544,8 +540,7 @@ sound_handler::plugInputStream(std::auto_ptr<InputStream> newStreamer)
     InputStream* newStream = newStreamer.get(); // for debugging
 #endif
 
-    if ( ! _inputStreams.insert(newStreamer.release()).second )
-    {
+    if (!_inputStreams.insert(newStreamer.release()).second) {
         // this should never happen !
         log_error("_inputStreams container still has a pointer "
             "to deleted InputStream %p!", newStreamer.get());
@@ -574,9 +569,9 @@ sound_handler::unplugAllInputStreams()
 }
 
 void
-sound_handler::fetchSamples (boost::int16_t* to, unsigned int nSamples)
+sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
 {
-    if ( isPaused() ) return; // should we write wav file anyway ?
+    if (isPaused()) return; // should we write wav file anyway ?
 
     float finalVolumeFact = getFinalVolume()/100.0;
 
@@ -654,26 +649,36 @@ sound_handler::setAudioDump(const std::string& wavefile)
     }
 }
 
-/*private*/
+bool
+sound_handler::streamingSound() const
+{
+    if (_streamingSounds.empty()) return false;
+    if (_inputStreams.empty()) return false;
+
+    for (StreamingSounds::const_iterator it = _streamingSounds.begin(), 
+            e = _streamingSounds.end(); it != e; ++it) {
+        if ((*it)->isPlaying()) return true;
+    }
+    return false;
+}
+
 void
 sound_handler::unplugCompletedInputStreams()
 {
-    InputStreams::iterator it = _inputStreams.begin();
-    InputStreams::iterator end = _inputStreams.end();
 
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
     log_debug("Scanning %d input streams for completion", _inputStreams.size());
 #endif
 
-    while (it != end)
-    {
+    for (InputStreams::iterator it = _inputStreams.begin(),
+            end = _inputStreams.end(); it != end;) {
+
         InputStream* is = *it;
 
         // On EOF, detach
-        if (is->eof())
-        {
+        if (is->eof()) {
             // InputStream EOF, detach
-            InputStreams::iterator it2=it;
+            InputStreams::iterator it2 = it;
             ++it2; // before we erase it
             InputStreams::size_type erased = _inputStreams.erase(is);
             if ( erased != 1 ) {
@@ -682,7 +687,6 @@ sound_handler::unplugCompletedInputStreams()
             }
             it = it2;
 
-            //log_debug("fetchSamples: marking stopped InputStream %p (on EOF)", is);
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
             log_debug(" Input stream %p reached EOF, unplugging", is);
 #endif
@@ -697,12 +701,9 @@ sound_handler::unplugCompletedInputStreams()
             delete is;
 
             // Increment number of sound stop request for the testing framework
-            _soundsStopped++;
+            ++_soundsStopped;
         }
-        else
-        {
-            ++it;
-        }
+        else ++it;
     }
 }
 

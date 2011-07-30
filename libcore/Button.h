@@ -23,11 +23,12 @@
 #ifndef GNASH_BUTTON_H
 #define GNASH_BUTTON_H
 
-#include "InteractiveObject.h" // for inheritance
-
 #include <boost/intrusive_ptr.hpp>
 #include <vector>
 #include <set>
+
+#include "InteractiveObject.h" 
+#include "GnashKey.h"
 
 // Forward declarations.
 namespace gnash {
@@ -37,129 +38,122 @@ namespace gnash {
 }
 
 namespace gnash {
-//
-// Button
-//
 
+/// Button implements Flash buttons.
 class Button : public InteractiveObject
 {
 public:
 
-	typedef std::vector<DisplayObject*> DisplayObjects;
-	typedef std::vector<const DisplayObject*> ConstDisplayObjects;
-	
+    typedef std::vector<DisplayObject*> DisplayObjects;
+    typedef std::vector<const DisplayObject*> ConstDisplayObjects;
+    
     /// A container for holding the id of active button records.
     typedef std::set<int> ActiveRecords;
 
-	enum mouse_flags
-	{
-		FLAG_IDLE = 0,
-		FLAG_OVER = 1,
-		FLAG_DOWN = 2,
-		OVER_DOWN = FLAG_OVER | FLAG_DOWN,
+    enum mouse_flags
+    {
+        FLAG_IDLE = 0,
+        FLAG_OVER = 1,
+        FLAG_DOWN = 2,
+        OVER_DOWN = FLAG_OVER | FLAG_DOWN,
 
-		// aliases
-		OVER_UP = FLAG_OVER,
-		OUT_DOWN = FLAG_DOWN
-	};
+        // aliases
+        OVER_UP = FLAG_OVER,
+        OUT_DOWN = FLAG_DOWN
+    };
 
-	enum MouseState
-	{
-		MOUSESTATE_UP = 0,
-		MOUSESTATE_DOWN,
-		MOUSESTATE_OVER,
-		MOUSESTATE_HIT
-	};
+    enum MouseState
+    {
+        MOUSESTATE_UP = 0,
+        MOUSESTATE_DOWN,
+        MOUSESTATE_OVER,
+        MOUSESTATE_HIT
+    };
 
     /// Construct a Button
     //
     /// A button should always have an associated object.
-	Button(as_object* object, const SWF::DefineButtonTag* def,
+    Button(as_object* object, const SWF::DefineButtonTag* def,
             DisplayObject* parent);
 
-	~Button();
-	
+    ~Button();
+    
     static const char* mouseStateName(MouseState s);
 
-	bool mouseEnabled() const { return true; }
+    bool mouseEnabled() const { return true; }
 
     virtual bool trackAsMenu();
 
-	// called from keypress listener only
-	void notifyEvent(const event_id& id);
+    /// Handle a key press associated with a button event.
+    void keyPress(key::code c);
 
     /// Render this Button.
-	virtual void display(Renderer& renderer, const Transform& xform);
-	
-	void set_current_state(MouseState new_state);
+    virtual void display(Renderer& renderer, const Transform& xform);
+    
+    void set_current_state(MouseState new_state);
 
-	/// \brief
-	/// Return the topmost entity that the given point covers. 
-	/// NULL if none.
-	//
-	/// I.e. check against ourself.
-	///
-	virtual InteractiveObject* topmostMouseEntity(boost::int32_t x,
+    /// Return the topmost entity that the given point covers. NULL if none.
+    //
+    /// I.e. check against ourself.
+    virtual InteractiveObject* topmostMouseEntity(boost::int32_t x,
             boost::int32_t y);
-	
-	virtual void mouseEvent(const event_id& event);
+    
+    /// Called whenever a mouse event affects this Button.
+    virtual void mouseEvent(const event_id& event);
 
+    /// Called when the Button is in focus.
     virtual bool handleFocus();
 
-	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
-	
-	virtual SWFRect getBounds() const;
-	
-	// See dox in DisplayObject.h
-	bool pointInShape(boost::int32_t x, boost::int32_t y) const;
+    void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
+    
+    virtual SWFRect getBounds() const;
+    
+    // See dox in DisplayObject.h
+    bool pointInShape(boost::int32_t x, boost::int32_t y) const;
 
-	bool isEnabled();
+    bool isEnabled();
 
-	/// Properly destroy contained DisplayObjects
-	void destroy();
+    /// Properly destroy contained DisplayObjects
+    void destroy();
 
     /// Do ActionScript construction of the Button.
     //
-    /// (1) Register this button instance as a live DisplayObject
-    /// (2) Construct all button state DisplayObjects.
+    /// Construct all button state DisplayObjects.
     //
     /// @param init     An init object, which can be passed when constructing
     ///                 Buttons with attachMovie, but is never used.
     virtual void construct(as_object* init = 0);
 
 #ifdef USE_SWFTREE
-	// Override to append button DisplayObjects info, see dox in DisplayObject.h
-	virtual InfoTree::iterator getMovieInfo(InfoTree& tr,
+    // Override to append button DisplayObjects info, see dox in DisplayObject.h
+    virtual InfoTree::iterator getMovieInfo(InfoTree& tr,
             InfoTree::iterator it);
 #endif
 
 protected:
-	
-	/// Properly unload contained DisplayObjects
-	virtual bool unloadChildren();
+    
+    /// Properly unload contained DisplayObjects
+    virtual bool unloadChildren();
 
-	/// Mark reachable resources (for the GC)
-	//
-	/// These are:
-	///	- this char's definition (_def)
-	///	- the vector of state DisplayObjects (_stateCharacters)
-	///	- the vector of hit DisplayObjects (_hitCharacters)
-	///
-	void markOwnResources() const;
+    /// Mark reachable resources (for the GC)
+    //
+    /// These are:
+    ///    - this char's definition (_def)
+    ///    - the vector of state DisplayObjects (_stateCharacters)
+    ///    - the vector of hit DisplayObjects (_hitCharacters)
+    ///
+    void markOwnResources() const;
 
 private:
 
-	/// Returns all DisplayObjects that are active based on the current state.
-	//
-	/// The "_visible" property does not matter here. 
-	///
-	/// @param list
-	///	The container to push active DisplayObjects into
-	///
-	/// @param includeUnloaded
-	///	If true, include unloaded but still reachable chars in the records slot.
-	///
-	void getActiveCharacters(DisplayObjects& list, bool includeUnloaded=false);
+    /// Returns all DisplayObjects that are active based on the current state.
+    //
+    /// The "_visible" property does not matter here. 
+    ///
+    /// @param list             The container to push active DisplayObjects into
+    /// @param includeUnloaded  If true, include unloaded but still reachable
+    ///                         chars in the records slot.
+    void getActiveCharacters(DisplayObjects& list, bool includeUnloaded=false);
 
     /// Returns all DisplayObjects that are active based on the current state.
     //
@@ -167,40 +161,39 @@ private:
     /// modified.
     ///
     /// @param list     The container to push unmodifiable DisplayObjects into.
-	void getActiveCharacters(ConstDisplayObjects& list) const;
+    void getActiveCharacters(ConstDisplayObjects& list) const;
 
-	/// Returns all DisplayObjects (record nums) that should be active on
+    /// Returns all DisplayObjects (record nums) that should be active on
     /// the given state.
-	//
-	/// @param list
-	///	The set to push active DisplayObjects record number into
-	///
-	/// @param state
-	///	The state we're interested in
-	///
-	void get_active_records(ActiveRecords& list, MouseState state);
+    //
+    /// @param list
+    ///    The set to push active DisplayObjects record number into
+    ///
+    /// @param state
+    ///    The state we're interested in
+    ///
+    void get_active_records(ActiveRecords& list, MouseState state);
 
-	/// Return version of the SWF containing the button definition.
+    /// Return version of the SWF containing the button definition.
     virtual int getDefinitionVersion() const;
-	
-	MouseState _mouseState;
+    
+    MouseState _mouseState;
     
     const boost::intrusive_ptr<const SWF::DefineButtonTag> _def;
 
-	DisplayObjects _stateCharacters;
+    DisplayObjects _stateCharacters;
 
-	DisplayObjects _hitCharacters;
+    DisplayObjects _hitCharacters;
 
 
 };
-
 
 /// Initialize the global Button class
 void button_class_init(as_object& global, const ObjectURI& uri);
 
 void registerButtonNative(as_object& global);
 
-}	// end namespace gnash
+} // namespace gnash
 
 
 #endif // GNASH_BUTTON_H

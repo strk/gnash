@@ -273,16 +273,16 @@ TextField::show_cursor(Renderer& renderer, const SWFMatrix& mat)
 size_t
 TextField::cursorRecord()
 {
-    SWF::TextRecord record;
+    if (_textRecords.empty()) return 0;
+
     size_t i = 0;
 
-    if (_textRecords.size() != 0) {
-        while (i < _textRecords.size() && m_cursor >= _recordStarts[i]) {
-            ++i;
-        }
-        return i-1;
+    while (i < _textRecords.size() && m_cursor >= _recordStarts[i]) {
+        ++i;
     }
-    return 0;
+    // TODO: it seems like this could return (size_t) -1, but there's no
+    // evidence this is allowed or handled.
+    return i - 1;
 }
 
 void
@@ -524,7 +524,213 @@ TextField::setSelection(int start, int end)
 }
 
 void
-TextField::notifyEvent(const event_id& ev)
+TextField::keyInput(key::code c)
+{
+    // c is the unique gnash::key::code for a DisplayObject/key.
+    // The maximum value is about 265, including function keys.
+    // It seems that typing in DisplayObjects outside the Latin-1 set
+    // (256 DisplayObject codes, identical to the first 256 of UTF-8)
+    // is not supported, though a much greater number UTF-8 codes can be
+    // stored and displayed. See utf.h for more information.
+    // This is a limit on the number of key codes, not on the
+    // capacity of strings.
+
+
+    setHtml(false); //editable html fields are not yet implemented
+    std::wstring s = _text;
+
+    // maybe _text is changed in ActionScript
+    m_cursor = std::min<size_t>(m_cursor, _text.size());
+    
+    size_t cur_cursor = m_cursor;
+    size_t previouslinesize = 0;
+    size_t nextlinesize = 0;
+    size_t manylines = _line_starts.size();
+    LineStarts::iterator linestartit = _line_starts.begin();
+    LineStarts::const_iterator linestartend = _line_starts.end();
+
+    switch (c) {
+        case key::BACKSPACE:
+            if (isReadOnly()) return;
+            if (m_cursor > 0)
+            {
+                s.erase(m_cursor - 1, 1);
+                m_cursor--;
+                setTextValue(s);
+            }
+            break;
+
+        case key::DELETEKEY:
+            if (isReadOnly()) return;
+            if (_glyphcount > m_cursor)
+            {
+                s.erase(m_cursor, 1);
+                setTextValue(s);
+            }
+            break;
+
+        case key::INSERT:        // TODO
+            if (isReadOnly()) return;
+            break;
+
+        case key::HOME:
+            while ( linestartit < linestartend && *linestartit <= m_cursor ) {
+                cur_cursor = *linestartit;
+                ++linestartit;
+            }
+            m_cursor = cur_cursor;
+            break;
+            
+        case key::PGUP:
+            // if going a page up is too far...
+            if(_scroll < _linesindisplay) {
+                _scroll = 0;
+                m_cursor = 0;
+            } else { // go a page up
+                _scroll -= _linesindisplay;
+                m_cursor = _line_starts[_scroll];
+            }
+            scrollLines();
+            break;
+            
+        case key::UP:
+            while ( linestartit < linestartend && *linestartit <= m_cursor ) {
+                cur_cursor = *linestartit;
+                ++linestartit;
+            }
+            //if there is no previous line
+            if ( linestartit-_line_starts.begin() - 2 < 0 ) {
+                m_cursor = 0;
+                break;
+            }
+            previouslinesize = _textRecords[linestartit-_line_starts.begin() - 2].glyphs().size();
+            //if the previous line is smaller
+            if (m_cursor - cur_cursor > previouslinesize) {
+                m_cursor = *(--(--linestartit)) + previouslinesize;
+            } else {
+                m_cursor = *(--(--linestartit)) + (m_cursor - cur_cursor);
+            }
+            if (m_cursor < _line_starts[_scroll] && _line_starts[_scroll] != 0) {
+                --_scroll;
+            }
+            scrollLines();
+            break;
+            
+        case key::END:
+            while ( linestartit < linestartend && *linestartit <= m_cursor ) {
+                ++linestartit;
+            }
+            m_cursor = linestartit != linestartend ? *linestartit - 1 : _text.size();
+            break;
+            
+        case key::PGDN:
+            //if going another page down is too far...
+            if(_scroll + _linesindisplay >= manylines) {
+                if(manylines - _linesindisplay <= 0) {
+                    _scroll = 0;
+                } else {
+                    _scroll = manylines - _linesindisplay;
+                }
+                if(m_cursor < _line_starts[_scroll-1]) {
+                    m_cursor = _line_starts[_scroll-1];
+                } else {
+                    m_cursor = _text.size();
+                }
+            } else { //go a page down
+                _scroll += _linesindisplay;
+                m_cursor = _line_starts[_scroll];
+            }
+            scrollLines();
+            break;
+            
+        case key::DOWN:
+        {
+            while (linestartit < linestartend &&
+                    *linestartit <= m_cursor ) {
+                cur_cursor = *linestartit;
+                ++linestartit;
+            }
+
+            // linestartit should never be before _line_starts.begin()
+            const size_t currentLine = linestartit -
+                _line_starts.begin();
+            
+            //if there is no next line
+            if (currentLine >= manylines ) {
+                m_cursor = _text.size();
+                break;
+            }
+            nextlinesize = _textRecords[currentLine].glyphs().size();
+            
+            //if the next line is smaller
+            if (m_cursor - cur_cursor > nextlinesize) {
+                m_cursor = *linestartit + nextlinesize;
+            } else { 
+                //put the cursor at the same character distance
+                m_cursor = *(linestartit) + (m_cursor - cur_cursor);
+            }
+            if (_line_starts.size() > _linesindisplay &&
+                m_cursor >= _line_starts[_scroll+_linesindisplay]) {
+                ++_scroll;
+            }
+            scrollLines();
+            break;
+        }
+
+        case key::LEFT:
+            m_cursor = m_cursor > 0 ? m_cursor - 1 : 0;
+            break;
+
+        case key::RIGHT:
+            m_cursor = m_cursor < _glyphcount ? m_cursor + 1 :
+                                                _glyphcount;
+            break;
+            
+        case key::ENTER:
+            if (isReadOnly()) return;
+            if (!multiline()) break;
+
+        default:
+        
+            if (maxChars() != 0) {
+                if (_maxChars <= _glyphcount) {
+                    break;
+                }
+            }
+            
+            if (isReadOnly()) return;
+            wchar_t t = static_cast<wchar_t>(
+                    gnash::key::codeMap[c][key::ASCII]);
+            if (t != 0) {
+                
+                if (!_restrictDefined) {
+                    // Insert one copy of the character
+                    // at the cursor position.
+                    s.insert(m_cursor, 1, t);
+                    m_cursor++;
+                } else if (_restrictedchars.count(t)) {
+                    // Insert one copy of the character
+                    // at the cursor position.
+                    s.insert(m_cursor, 1, t);
+                    m_cursor++;
+                } else if (_restrictedchars.count(tolower(t))) {
+                    // restrict substitutes the opposite case
+                    s.insert(m_cursor, 1, tolower(t));
+                    m_cursor++;
+                } else if (_restrictedchars.count(toupper(t))) {
+                    // restrict substitutes the opposite case
+                    s.insert(m_cursor, 1, toupper(t));
+                    m_cursor++;
+                }
+            }
+            setTextValue(s);
+    }
+    onChanged();
+    set_invalidated();
+}
+
+void
+TextField::mouseEvent(const event_id& ev)
 {    
     switch (ev.id())
     {
@@ -558,213 +764,6 @@ TextField::notifyEvent(const event_id& ev)
 
 			break;
 		}
-        case event_id::KEY_PRESS:
-        {
-            setHtml(false); //editable html fields are not yet implemented
-            std::wstring s = _text;
-
-            // id.keyCode is the unique gnash::key::code for a DisplayObject/key.
-            // The maximum value is about 265, including function keys.
-            // It seems that typing in DisplayObjects outside the Latin-1 set
-            // (256 DisplayObject codes, identical to the first 256 of UTF-8)
-            // is not supported, though a much greater number UTF-8 codes can be
-            // stored and displayed. See utf.h for more information.
-            // This is a limit on the number of key codes, not on the
-            // capacity of strings.
-            gnash::key::code c = ev.keyCode();
-			
-
-            // maybe _text is changed in ActionScript
-            m_cursor = std::min<size_t>(m_cursor, _text.size());
-            
-            size_t cur_cursor = m_cursor;
-            size_t previouslinesize = 0;
-            size_t nextlinesize = 0;
-            size_t manylines = _line_starts.size();
-            LineStarts::iterator linestartit = _line_starts.begin();
-            LineStarts::const_iterator linestartend = _line_starts.end();
-
-            switch (c)
-            {
-                case key::BACKSPACE:
-                    if (isReadOnly()) return;
-                    if (m_cursor > 0)
-                    {
-                        s.erase(m_cursor - 1, 1);
-                        m_cursor--;
-                        setTextValue(s);
-                    }
-                    break;
-
-                case key::DELETEKEY:
-                    if (isReadOnly()) return;
-                    if (_glyphcount > m_cursor)
-                    {
-                        s.erase(m_cursor, 1);
-                        setTextValue(s);
-                    }
-                    break;
-
-                case key::INSERT:        // TODO
-                    if (isReadOnly()) return;
-                    break;
-
-                case key::HOME:
-                    while ( linestartit < linestartend && *linestartit <= m_cursor ) {
-                        cur_cursor = *linestartit;
-                        linestartit++;
-                    }
-                    m_cursor = cur_cursor;
-                    break;
-                    
-                case key::PGUP:
-                    // if going a page up is too far...
-                    if(_scroll < _linesindisplay) {
-                        _scroll = 0;
-                        m_cursor = 0;
-                    } else { // go a page up
-                        _scroll -= _linesindisplay;
-                        m_cursor = _line_starts[_scroll];
-                    }
-                    scrollLines();
-                    break;
-                    
-                case key::UP:
-                    while ( linestartit < linestartend && *linestartit <= m_cursor ) {
-                        cur_cursor = *linestartit;
-                        linestartit++;
-                    }
-                    //if there is no previous line
-                    if ( linestartit-_line_starts.begin() - 2 < 0 ) {
-                        m_cursor = 0;
-                        break;
-                    }
-                    previouslinesize = _textRecords[linestartit-_line_starts.begin() - 2].glyphs().size();
-                    //if the previous line is smaller
-                    if (m_cursor - cur_cursor > previouslinesize) {
-                        m_cursor = *(--(--linestartit)) + previouslinesize;
-                    } else {
-                        m_cursor = *(--(--linestartit)) + (m_cursor - cur_cursor);
-                    }
-                    if (m_cursor < _line_starts[_scroll] && _line_starts[_scroll] != 0) {
-                        --_scroll;
-                    }
-                    scrollLines();
-                    break;
-                    
-                case key::END:
-                    while ( linestartit < linestartend && *linestartit <= m_cursor ) {
-                        linestartit++;
-                    }
-                    m_cursor = linestartit != linestartend ? *linestartit - 1 : _text.size();
-                    break;
-                    
-                case key::PGDN:
-                    //if going another page down is too far...
-                    if(_scroll + _linesindisplay >= manylines) {
-                        if(manylines - _linesindisplay <= 0) {
-                            _scroll = 0;
-                        } else {
-                            _scroll = manylines - _linesindisplay;
-                        }
-                        if(m_cursor < _line_starts[_scroll-1]) {
-                            m_cursor = _line_starts[_scroll-1];
-                        } else {
-                            m_cursor = _text.size();
-                        }
-                    } else { //go a page down
-                        _scroll += _linesindisplay;
-                        m_cursor = _line_starts[_scroll];
-                    }
-                    scrollLines();
-                    break;
-                    
-                case key::DOWN:
-                {
-                    while (linestartit < linestartend &&
-                            *linestartit <= m_cursor ) {
-                        cur_cursor = *linestartit;
-                        linestartit++;
-                    }
-
-                    // linestartit should never be before _line_starts.begin()
-                    const size_t currentLine = linestartit -
-                        _line_starts.begin();
-                    
-                    //if there is no next line
-                    if (currentLine >= manylines ) {
-                        m_cursor = _text.size();
-                        break;
-                    }
-                    nextlinesize = _textRecords[currentLine].glyphs().size();
-                    
-                    //if the next line is smaller
-                    if (m_cursor - cur_cursor > nextlinesize) {
-                        m_cursor = *linestartit + nextlinesize;
-                    } else { 
-                        //put the cursor at the same character distance
-                        m_cursor = *(linestartit) + (m_cursor - cur_cursor);
-                    }
-                    if (_line_starts.size() > _linesindisplay &&
-                        m_cursor >= _line_starts[_scroll+_linesindisplay]) {
-                        ++_scroll;
-                    }
-                    scrollLines();
-                    break;
-                }
-
-                case key::LEFT:
-                    m_cursor = m_cursor > 0 ? m_cursor - 1 : 0;
-                    break;
-
-                case key::RIGHT:
-                    m_cursor = m_cursor < _glyphcount ? m_cursor + 1 :
-                                                        _glyphcount;
-                    break;
-                    
-                case key::ENTER:
-                    if (isReadOnly()) return;
-                    if (!multiline()) break;
-
-                default:
-				
-					if (maxChars() != 0) {
-						if (_maxChars <= _glyphcount) {
-							break;
-						}
-					}
-					
-                    if (isReadOnly()) return;
-                    wchar_t t = static_cast<wchar_t>(
-                            gnash::key::codeMap[c][key::ASCII]);
-                    if (t != 0) {
-                        
-                        if (!_restrictDefined) {
-                            // Insert one copy of the character
-                            // at the cursor position.
-                            s.insert(m_cursor, 1, t);
-                            m_cursor++;
-                        } else if (_restrictedchars.count(t)) {
-                            // Insert one copy of the character
-                            // at the cursor position.
-                            s.insert(m_cursor, 1, t);
-                            m_cursor++;
-                        } else if (_restrictedchars.count(tolower(t))) {
-                            // restrict substitutes the opposite case
-                            s.insert(m_cursor, 1, tolower(t));
-                            m_cursor++;
-                        } else if (_restrictedchars.count(toupper(t))) {
-                            // restrict substitutes the opposite case
-                            s.insert(m_cursor, 1, toupper(t));
-                            m_cursor++;
-                        }
-                    }
-                    setTextValue(s);
-            }
-            onChanged();
-            set_invalidated();
-        }
-
         default:
             return;
     };
@@ -975,9 +974,8 @@ TextField::insertTab(SWF::TextRecord& rec, boost::int32_t& x, float scale)
         
         std::sort(_tabStops.begin(), _tabStops.end()); 
 
-        int tab = 0;
         if (!_tabStops.empty()) {
-            tab = _tabStops.back() + 1;
+            int tab = _tabStops.back() + 1;
             
             for (size_t i = 0; i < tabStops.size(); ++i) {        
                 if (tabStops[i] > x) {
@@ -1030,9 +1028,6 @@ TextField::format_text()
         return;
     }
     
-    LineStarts::iterator linestartit = _line_starts.begin();
-    LineStarts::const_iterator linestartend = _line_starts.end();
-
     AutoSize autoSize = getAutoSize();
     if (autoSize != AUTOSIZE_NONE) {
         // When doing WordWrap we don't want to change
@@ -1833,7 +1828,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                         while (linestartit != linestartend &&
                                 *linestartit + 1 <= currentPos)
                         {
-                            linestartit++;
+                            ++linestartit;
                         }
                         _line_starts.insert(linestartit, currentPos);
                         _recordStarts.push_back(currentPos);

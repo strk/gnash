@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<swf version="6" compressed="1">
+
+<!--
+  |
+  |  This file test order of execution between
+  |  onLoad root event, actions in root frame0 and
+  |  actions in child and grandchild frame0.
+  |
+  |  We expect: child.child, child, _root, _root.onload
+  |
+-->
+  <Header framerate="1" frames="1">
+    <size>
+      <Rectangle left="0" right="12800" top="0" bottom="9600"/>
+    </size>
+    <tags>
+
+      <DefineSprite objectID="1" frames="1">
+        <tags>
+
+          <!--
+            |  Child frame0 actions
+           -->
+          <DoAction><actions>
+              <PushData>
+                <items> <StackString value="CC."/> </items>
+              </PushData>
+              <Trace/><EndAction/>
+          </actions> </DoAction>
+          <ShowFrame/>
+          <End/>
+        </tags>
+      </DefineSprite>
+
+      <DefineSprite objectID="2" frames="1">
+        <tags>
+
+          <!--
+            |  Place the first sprite
+           -->
+          <PlaceObject2 replace="0" depth="1" objectID="1"> </PlaceObject2>
+
+          <!--
+            |  Child frame0 actions
+           -->
+          <DoAction><actions>
+              <PushData>
+                <items> <StackString value="C."/> </items>
+              </PushData>
+              <Trace/><EndAction/>
+          </actions> </DoAction>
+          <ShowFrame/>
+          <End/>
+        </tags>
+      </DefineSprite>
+
+      <!--
+        |  Place the first sprite
+       -->
+      <PlaceObject2 replace="0" depth="1" objectID="2"> </PlaceObject2>
+
+      <!--
+        |  Root frame0 actions
+       -->
+      <DoAction><actions>
+
+          <PushData>
+            <items> <StackString value="R."/> </items>
+          </PushData>
+          <Trace/>
+
+          <!--
+            | Rot's onLoad function definition
+           -->
+          <DeclareFunction name="onLoad" argc="0" length="8">
+            <args/>
+          </DeclareFunction>
+          <PushData>
+            <items>
+              <StackString value="L."/>
+            </items>
+          </PushData>
+          <Trace/>
+
+          <EndAction/>
+
+      </actions> </DoAction>
+
+      <ShowFrame/>
+
+      <End/>
+
+    </tags>
+  </Header>
+</swf>

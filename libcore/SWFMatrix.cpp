@@ -50,7 +50,7 @@ rotationX(const SWFMatrix& m)
     const double b = m.b();
     const double a = m.a();
     return std::atan2(b, a);
-};
+}
 
 inline double
 rotationY(const SWFMatrix& m)
@@ -58,7 +58,7 @@ rotationY(const SWFMatrix& m)
     const double c = m.c();
     const double d = m.d();
     return std::atan2(-c, d);
-};
+}
 
 inline boost::int32_t
 toFixed16(double a)

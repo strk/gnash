@@ -30,13 +30,13 @@
 #define OUTPUT_VERSION 6
 #define OUTPUT_FILENAME "definebitsjpeg2.swf"
 
-#define URL_LYNCH "lynch.jpg"
+#define URL_RED "red.jpg"
 
 int
 main(int argc, char **argv)
 {
 	SWFMovie mo;
-	const char *jpeg_filename="lynch.jpg";
+	const char *jpeg_filename="red.jpg";
 	FILE *jpeg_fd;
 	SWFJpegBitmap jpeg_bm;
 	SWFShape jpeg_sh;
@@ -65,11 +65,11 @@ main(int argc, char **argv)
 
 	/*****************************************************
 	 *
-	 * Add the LYNCH  clip
+	 * Add the RED  clip
 	 *
 	 *****************************************************/
 
-	puts("Adding lynch");
+	puts("Adding red");
 
 	jpeg_fd = fopen(jpeg_filename, "r");
 	if ( ! jpeg_fd ) {

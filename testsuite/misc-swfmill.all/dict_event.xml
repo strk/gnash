@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<swf version="6" compressed="1">
+
+<!--
+  |
+  | Test how constant pools remain valid after calls to
+  | clip events.
+  |
+-->
+  <Header framerate="1" frames="1">
+    <size>
+      <Rectangle left="0" right="12800" top="0" bottom="9600"/>
+    </size>
+    <tags>
+
+      <!--
+        |  Define a sprite
+       -->
+      <DefineSprite objectID="1" frames="1">
+        <tags> <ShowFrame/> <End/> </tags>
+      </DefineSprite>
+
+      <DoAction>
+        <actions>
+              <!-- DICT 1 -->
+              <Dictionary>
+                <strings> <String value="A"/> </strings>
+              </Dictionary>
+
+              <!-- Push D1[0] ("A") -->
+              <PushData>
+                <items> <StackDictionaryLookup index="0"/> </items>
+              </PushData>
+              <Duplicate/><Trace/> <!-- for debugging -->
+
+              <EndAction/>
+        </actions>
+      </DoAction>
+
+
+      <!--
+        |  Place the sprite on stage (for events)
+       -->
+      <PlaceObject2 replace="0" depth="1" objectID="1" name=""
+                    allflags1="1" allflags2="0">
+        <events>
+          <Event flags1="1" flags2="0">  <!-- onClipLoad -->
+            <actions>
+
+              <!-- DICT 2 -->
+              <Dictionary>
+                <strings> <String value="B"/> </strings>
+              </Dictionary>
+
+              <!-- Push D2[0] ("B") -->
+              <PushData>
+                <items> <StackDictionaryLookup index="0"/> </items>
+              </PushData>
+
+              <EndAction/>
+            </actions>
+          </Event>
+          <Event flags1="0" flags2="0"/>
+        </events>
+      </PlaceObject2>
+
+      <DoAction>
+        <actions>
+
+              <!-- Push D2[0] ("B") -->
+              <PushData>
+                <items> <StackDictionaryLookup index="0"/> </items>
+              </PushData>
+              <Duplicate/><Trace/> <!-- for debugging -->
+
+              <AddTyped/>
+              <AddTyped/>
+              <Duplicate/>
+              <Trace/>
+
+          <!-- Verify the stack contains 'ab' -->
+          <PushData> <items> <StackString value="ABB"/> </items> </PushData>
+          <EqualTyped/>
+
+          <!-- If true, jump to PASSED tracing -->
+          <BranchIfTrue byteOffset="51"/>
+
+          <!-- Else, trace FAILED -->
+          <PushData> <items>
+              <StackString value="XFAILED: expected 'ABB' on clip event.. "/>
+          </items> </PushData>
+          <Trace/>
+
+          <BranchAlways byteOffset="45"/> <!-- get to end -->
+
+          <!-- PASSED tracing -->
+          <PushData>
+            <items>
+              <StackString value="XPASSED: dict/clip event interaction ok"/>
+            </items>
+          </PushData>
+          <Trace/>
+
+          <!-- END OF TEST tag -->
+          <PushData>
+            <items>
+              <StackString value="END OF TEST"/>
+            </items>
+          </PushData>
+          <Trace/>
+
+              <EndAction/>
+        </actions>
+      </DoAction>
+
+      <ShowFrame/>
+
+      <End/>
+
+    </tags>
+  </Header>
+</swf>

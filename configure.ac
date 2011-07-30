@@ -502,8 +502,10 @@ if test x$cross_compiling = xyes; then
   npapi=no
 else
   AC_MSG_NOTICE([Configuring Gnash for native compilation])
+  export DEB_HOST_MULTIARCH="`eval dpkg-architecture -qDEB_HOST_MULTIARCH`"
   export incllist="`eval cat ${srcdir}/macros/incllist`"
-  export libslist="`eval cat ${srcdir}/macros/libslist`"
+  libslist="`cat ${srcdir}/macros/libslist`"
+  export libslist+=" /lib/${DEB_HOST_MULTIARCH} /usr/lib/${DEB_HOST_MULTIARCH}"
   export pathlist=$PATH
 fi
 
@@ -2928,8 +2930,10 @@ testsuite/swfdec/Makefile
 testsuite/misc-ming.all/Makefile
 testsuite/misc-ming.all/action_order/Makefile
 testsuite/misc-ming.all/displaylist_depths/Makefile
+testsuite/misc-ming.all/init_action/Makefile
 testsuite/misc-ming.all/loop/Makefile
 testsuite/misc-ming.all/loading/Makefile
+testsuite/misc-ming.all/register_class/Makefile
 testsuite/misc-mtasc.all/Makefile
 testsuite/misc-haxe.all/Makefile
 testsuite/misc-haxe.all/classes.all/Makefile
@@ -2968,15 +2972,112 @@ tmp=`mktemp -d ${TMPDIR=/tmp}/gnash-configure-XXXXXX`
 if test \! -n "$tmp" || test \! -d "$tmp"; then
   tmp=`(umask 077 && mkdir -d ${TMPDIR=/tmp}/gnash-configure-${RANDOM}-$$) 2>/dev/null`
 fi
-cerr=${tmp}/errors
-cwarn=${tmp}/warnings
-crec=${tmp}/recommended
+cerr="${tmp}/errors"
+cwarn="${tmp}/warnings"
+crec="${tmp}/recommended"
+deb_err="${tmp}/deb_err"
+deb_war="${tmp}/deb_war"
+deb_rec="${tmp}/deb_rec"
+rpm_err="${tmp}/rpm_err"
+rpm_war="${tmp}/rpm_war"
+rpm_rec="${tmp}/rpm_rec"
+yast_err="${tmp}/yast_err"
+yast_war="${tmp}/yast_war"
+yast_rec="${tmp}/yast_rec"
 echo ""
 
 #trap 'rm cerr' 0 # trap isn't a good idea, might override other traps
 exec 3> $cerr 
 exec 4> $cwarn
 exec 5> $crec
+
+for F in "$deb_err" "$deb_war" "$deb_rec" "$rpm_err" "$rpm_war" "$rpm_rec" "$yast_err" "$yast_war" "$yast_rec"; do
+  touch "$F";
+done
+
+pkg_out_fd=
+deb_dest=
+rpm_dest=
+yast_dest=
+
+dnl These macros should be portable as I checked most things used are in
+dnl POSIX-2008, GNU CoreUtils, and shipped in MinGW. Old unices? No clue.
+dnl In any case, they are hardly relevant on non-GNU systems.
+
+dnl Beware, here comes some long scary shell commands.
+
+AC_DEFUN([PKG_ERR],
+[
+  pkg_out_fd=3
+  echo "          ERROR: `echo "$1" | fold -s -w 62 | sed 's/^/                 /' | tr '\n' '#' | cut -b 18- | tr '#' '\n'`" >&$pkg_out_fd
+  deb_dest="$deb_err"
+  rpm_dest="$rpm_err"
+  yast_dest="$yast_err"
+])
+
+AC_DEFUN([PKG_WAR],
+[
+  pkg_out_fd=4
+  echo "        WARNING: `echo "$1" | fold -s -w 62 | sed 's/^/                 /' | tr '\n' '#' | cut -b 18- | tr '#' '\n'`" >&$pkg_out_fd
+  deb_dest="$deb_war"
+  rpm_dest="$rpm_war"
+  yast_dest="$yast_war"
+])
+
+AC_DEFUN([PKG_REC],
+[
+  pkg_out_fd=5
+  echo "    RECOMMENDED: `echo "$1" | fold -s -w 62 | sed 's/^/                 /' | tr '\n' '#' | cut -b 18- | tr '#' '\n'`" >&$pkg_out_fd
+  deb_dest="$deb_rec"
+  rpm_dest="$rpm_rec"
+  yast_dest="$yast_rec"
+])
+
+AC_DEFUN([PKG_SUGGEST],
+[
+  echo "`echo "$1" | fold -s -w 62 | sed 's/^/                 /'`" >&$pkg_out_fd
+])
+
+AC_DEFUN([DEB_INSTALL],
+[
+  echo "                 or .deb users: `echo "apt-get install $1" | fold -s -w 48 | sed 's/^/                                /' | tr '\n' '#' | cut -b 33- | tr '#' '\n'`" >&$pkg_out_fd
+  echo -n " $1" >> "$deb_dest"
+])
+
+AC_DEFUN([DEB_ALTERNATIVE],
+[
+  echo "                 or maybe     : `echo "apt-get install $1" | fold -s -w 48 | sed 's/^/                                /' | tr '\n' '#' | cut -b 33- | tr '#' '\n'`" >&$pkg_out_fd
+  echo -n "/$1" >> "$deb_dest"
+])
+
+AC_DEFUN([RPM_INSTALL],
+[
+  echo "                 or .rpm users: `echo "yum install $1" | fold -s -w 48 | sed 's/^/                                /' | tr '\n' '#' | cut -b 33- | tr '#' '\n'`" >&$pkg_out_fd
+  echo -n " $1" >> "$rpm_dest"
+])
+
+AC_DEFUN([RPM_ALTERNATIVE],
+[
+  echo "                 or maybe     : `echo "yum install $1" | fold -s -w 48 | sed 's/^/                                /' | tr '\n' '#' | cut -b 33- | tr '#' '\n'`" >&$pkg_out_fd
+  echo -n "/$1" >> "$rpm_dest"
+])
+
+AC_DEFUN([YAST_INSTALL],
+[
+  echo "                 or yast users: `echo "yast install $1" | fold -s -w 48 | sed 's/^/                                /' | tr '\n' '#' | cut -b 33- | tr '#' '\n'`" >&$pkg_out_fd
+  echo -n " $1" >> "$yast_dest"
+])
+
+AC_DEFUN([YAST_ALTERNATIVE],
+[
+  echo "                 or maybe     : `echo "yast install $1" | fold -s -w 48 | sed 's/^/                                /' | tr '\n' '#' | cut -b 33- | tr '#' '\n'`" >&$pkg_out_fd
+  echo -n "/$1" >> "$yast_dest"
+])
+
+AC_DEFUN([PKG_ALTERNATIVE],
+[
+  echo "`echo "$1" | fold -s -w 62 | sed 's/^/                 /'`" >&$pkg_out_fd
+])
 
 echo "Configurable options are:"
 
@@ -2985,14 +3086,14 @@ if test x"${pthreads}" = x"yes"; then
 else
   if test x"${build_haiku}" = x"yes"; then
      echo "        POSIX Thread support built into C library."
-  els
+  else
      echo "        POSIX Thread support disabled."
   fi
 fi
 
 if test x"${npapi}" = x"yes"; then
   echo "        NPAPI plugin enabled (default). Use --disable-npapi to disable."
-  echo "            NPAPI plugin will be installed in ${FIREFOX_PLUGINS}"
+  echo "        NPAPI plugin will be installed in ${FIREFOX_PLUGINS}"
 else
   echo "        NPAPI plugin disabled."
 fi
@@ -3021,6 +3122,7 @@ fi
 # out everything that is missing in one pass, hopefully making it
 # easy for new developers to get everything they need installed.
 
+echo ""
 echo "Configured paths for ${build} are:"
 
 dnl Dump QT3 options is the user specified a QTOPIA3 or KDE3 GUI
@@ -3029,10 +3131,12 @@ if test x"${build_kde3}" = xyes -o x"${build_qtopia3}" = xyes; then
     echo "        QT3 flags are: ${QT3_CFLAGS}"
     echo "        QT3 libs are: ${QT3_LIBS}"
   else
-    echo "        ERROR: No QT 3.x development package installed!" >&3
-    echo "               Install a QT 3.x development environment from http://trolltech.com" >&3
-    echo "               or .deb users: apt-get install libqt3-mt-dev" >&3
-    echo "               or change to a different gui with --enable-gui=..." >&3
+    PKG_ERR([No QT 3.x development package installed!])
+    PKG_SUGGEST([Install a QT 3.x development environment from http://qt.nokia.com/])
+    DEB_INSTALL([libqt3-mt-dev])
+    RPM_INSTALL([qt3-devel])
+    RPM_ALTERNATIVE([qt-devel])
+    PKG_ALTERNATIVE([or change to a different gui with --enable-gui=...])
   fi
 fi
 
@@ -3042,10 +3146,13 @@ if test x"${build_qt4}" = xyes -o x"${build_qtopia4}" = xyes; then
     echo "        QT4 flags are: ${QT4_CFLAGS}"
     echo "        QT4 libs are: ${QT4_LIBS}"
   else
-    echo "        ERROR: No QT 4.x development package installed!" >&3
-    echo "               Install a QT 4.x development environment from http://trolltech.com" >&3
-    echo "               or .deb users: apt-get install qt4-dev-tools" >&3
-    echo "               or change to a different gui with --enable-gui=..." >&3
+    PKG_ERR([No QT 4.x development package installed!])
+    PKG_SUGGEST([Install a QT 4.x development environment from http://qt.nokia.com/])
+    DEB_INSTALL([libqt4-dev])
+    DEB_ALTERNATIVE([qt4-dev-tools]) dnl TODO: Is this required?
+    RPM_INSTALL([qt4-devel])
+    RPM_ALTERNATIVE([qt-devel])
+    PKG_ALTERNATIVE([or change to a different gui with --enable-gui=...])
   fi
 fi
 
@@ -3054,12 +3161,10 @@ if test x"${build_kparts4}" = xyes; then
     echo "        KDE4 flags are: ${KDE4_CFLAGS}"
     echo "        KDE4 libs are: ${KDE4_LIBS}"
   else
-    echo "        kparts4 plugin is disabled"
-    echo "               To enable the KDE 4.x gui," >&3
-    echo "               install version 4.x of the KDE development environment" >&3
-    echo "               from http://kde.org" >&3
-    echo "               or .deb users: apt-get install kdelibs5-dev" >&3
-    echo "               or .rpm users: yum install kdelibs-devel." >&3
+    PKG_WAR([kparts4 plugin is disabled!])
+    PKG_SUGGEST([Install version 4.x of the KDE development environment from http://kde.org])
+    DEB_INSTALL([kdelibs5-dev])
+    RPM_INSTALL([kdelibs-devel])
   fi
 fi
 
@@ -3072,9 +3177,8 @@ if test x"$build_qtopia3" = xyes; then
     fi
     echo "        QTOPIA 3.x libs are: $QTOPIA3_LIBS"
   else
-    echo "        ERROR: No QTOPIA 3.x library development package installed!" >&3
-    echo "               Install it from http://trolltech.com/downloads/" >&3
-    echo "               binary packages are not available." >&3
+    PKG_ERR([No QTOPIA 3.x library development package installed!])
+    PKG_SUGGEST([Install it from http://trolltech.com/downloads/ as binary packages are not available.]) dnl TODO: This link is no longer valid.
   fi
 fi
 
@@ -3087,9 +3191,8 @@ if test x"$build_qtopia4" = xyes; then
     fi
     echo "        QTOPIA 4.x libs are: $QTOPIA4_LIBS"
   else
-    echo "        ERROR: No QTOPIA 4.x library development package installed!" >&3
-    echo "               Install it from http://trolltech.com/downloads/" >&3
-    echo "               binary packages are not available." >&3
+    PKG_ERR([No QTOPIA 4.x library development package installed!])
+    PKG_SUGGEST([Install it from http://trolltech.com/downloads/ as binary packages are not available.]) dnl TODO: This link is no longer valid.
   fi
 fi
 
@@ -3100,16 +3203,11 @@ if test x$build_kde3 = xyes; then
     echo "        KDE 3.x flags are: $KDE3_CFLAGS"
     echo "        KDE 3.x libs are: $KDE3_LIBS"
   else
-      echo "        ERROR: No KDE 3.x development package installed!" >&3
-      echo "               To disable the KDE 3.x gui," >&3
-      echo "               reconfigure using --enable-gui=<list-of-guis>" >&3
-      echo "               and omit "kde" from the list." >&3
-      echo "               or avoid --enable-gui=... as a whole." >&3
-      echo "               To be able to build the kde 3.x gui," >&3
-      echo "               install version 3.x of the KDE development environment" >&3
-      echo "               from http://kde.org" >&3
-      echo "               or .deb users: apt-get install kdelibs4-dev" >&3
-      echo "               or .rpm users: yum install kdelibs3-devel." >&3
+    PKG_ERR([No KDE 3.x development package installed!])
+    PKG_SUGGEST([Install version 3.x of the KDE development environment from http://kde.org])
+    DEB_INSTALL([kdelibs4-dev])
+    RPM_INSTALL([kdelibs3-devel])
+    PKG_ALTERNATIVE([or disable the KDE 3.x gui, and reconfiguring using --enable-gui=<list-of-guis> and omitting kde from the list or avoiding --enable-gui=... as a whole.])
   fi
 fi
 
@@ -3121,10 +3219,10 @@ if test x"${JPEG_LIBS}" != x ; then
   fi
   echo "        JPEG libs are: $JPEG_LIBS"
 else
-  echo "        ERROR: No JPEG library development package installed!" >&3
-  echo "               Install it from http://ijg.org" >&3
-  echo "               or .deb users: apt-get install libjpeg-dev" >&3
-  echo "               or .rpm users: yum install libjpeg-devel" >&3
+  PKG_ERR([No JPEG library development package installed!])
+  PKG_SUGGEST([Install it from http://ijg.org])
+  DEB_INSTALL([libjpeg-dev])
+  RPM_INSTALL([libjpeg-devel])
 fi
 
 if test x"${GIF_LIBS}" != x ; then
@@ -3135,11 +3233,13 @@ if test x"${GIF_LIBS}" != x ; then
   fi
   echo "        GIF libs are: $GIF_LIBS"
 else
-  echo "        ERROR: No GIF library development package installed!" >&3
-  echo "               Install it from http://sourceforge.net/projects/giflib/" >&3
-  echo "               or .deb users: apt-get install libungif-dev" >&3
-  echo "               or maybe     : apt-get install libgif-dev" >&3
-  echo "               or .rpm users: yum install libungif-devel" >&3
+  PKG_ERR([No GIF library development package installed!])
+  PKG_SUGGEST([Install it from http://sourceforge.net/projects/giflib/])
+  DEB_INSTALL([libungif-dev])
+  DEB_ALTERNATIVE([libgif-dev])
+  RPM_INSTALL([libgif-devel])
+  RPM_ALTERNATIVE([giflib-devel])
+  RPM_ALTERNATIVE([libunfif-devel])
 fi
 
 if test x"${PNG_LIBS}" != x ; then
@@ -3150,11 +3250,11 @@ if test x"${PNG_LIBS}" != x ; then
   fi
   echo "        PNG libs are: $PNG_LIBS"
 else
-  echo "        RECOMMENDED: No PNG library development package installed!" >&5
-  echo "                     Gnash will be built without support for dynamic loading of PNG files." >&5
-  echo "                     Install it from http://www.libpng.org" >&5
-  echo "                     or .deb users: apt-get install libpng12-dev" >&5
-  echo "                     or .rpm users: yum install libpng-devel" >&5
+  PKG_REC([No PNG library development package installed!])
+  PKG_SUGGEST([Gnash will be built without support for dynamic loading of PNG files.])
+  PKG_SUGGEST([Install it from http://www.libpng.org])
+  DEB_INSTALL([libpng12-dev])
+  RPM_INSTALL([libpng-devel])
 fi
 
 if test x"${build_ovg}" = x"yes"; then
@@ -3183,11 +3283,12 @@ if test x"${build_ogl}" = x"yes"; then
     fi
     echo "        OpenGL libs are: $OPENGL_LIBS"
     else
-      echo "        ERROR: No OpenGL development package installed!" >&3
-      echo "               You need to install the libmesa development package" >&3
-      echo "               or .deb users: apt-get install libgl1-mesa-dev" >&3
-      echo "               or .rpm users: yum install xorg-x11-Mesa-libGL" >&3
-      echo "               or use a different renderer with --enable-renderer=" >&3
+      PKG_ERR([No OpenGL development package installed!])
+      PKG_SUGGEST([You need to install the libmesa development package])
+      DEB_INSTALL([libgl1-mesa-dev])
+      RPM_INSTALL([mesa-libGL-devel])
+      RPM_ALTERNATIVE([xorg-x11-Mesa-libGL])
+      PKG_ALTERNATIVE([or use a different renderer with --enable-renderer=])
   fi
 fi
 
@@ -3200,9 +3301,9 @@ if test x"${build_gles1}" = x"yes"; then
     fi
     echo "        OpenGLES1 libs are: ${GLES1_LIBS}"
   else
-      echo "        ERROR: No OpenGLES1 development package installed!" >&3
-      echo "               You need to install the this from source proobably" >&3
-      echo "               or use a different renderer with --enable-renderer=" >&3
+      PKG_ERR([No OpenGL-ES development package installed!])
+      PKG_SUGGEST([You need to install the this from source probably])
+      PKG_ALTERNATIVE([or use a different renderer with --enable-renderer=])
   fi
 fi
 
@@ -3216,19 +3317,14 @@ if test x$build_gtk = xyes -a x$build_ogl = xyes ; then
     fi
       echo "        GtkGLExt libs are: $GLEXT_LIBS"
   else
-    if test x$build_gtk = xyes; then
-      if test x$build_ogl = xyes; then
-        echo "        ERROR: No GtkGLExt development package installed!" >&3
-	echo "               It is needed to build the GTK/OpenGL GUI/renderer combination." >&3
-	echo "               Either install it from http://gtkglext.sourceforge.net" >&3
-        echo "               or .deb users: apt-get install libgtkglext1-dev" >&3
-        echo "               or .rpm users: yum install gtkglext-devel" >&3
-        echo "               or --enable-gui=sdl or --enable-renderer=agg" >&3
-      fi
-    fi
+    PKG_ERR([No GtkGLExt development package installed!])
+    PKG_SUGGEST([It is needed to build the GTK/OpenGL GUI/renderer combination.])
+    PKG_SUGGEST([Install it from http://gtkglext.sourceforge.net])
+    DEB_INSTALL([libgtkglext1-dev])
+    RPM_INSTALL([gtkglext-devel])
+    PKG_ALTERNATIVE([or --enable-gui=sdl or --enable-renderer=agg])
   fi
 fi
-
 
 if test x$build_gtk = xyes; then #{
   if test x"$GTK2_LIBS" != x; then
@@ -3239,10 +3335,10 @@ if test x$build_gtk = xyes; then #{
     fi
       echo "        GTK2 libs are: $GTK2_LIBS"
   else
-    echo "        ERROR: No GTK2 development package installed!" >&3
-    echo "               Install it from http://gtk.org" >&3
-    echo "               or .deb users: apt-get install libgtk2.0-dev" >&3
-    echo "               or .rpm users: yum install gtk2-devel" >&3
+    PKG_ERR([No GTK2 development package installed!])
+    PKG_SUGGEST([Install it from http://gtk.org])
+    DEB_INSTALL([libgtk2.0-dev])
+    RPM_INSTALL([gtk2-devel])
   fi
 
   if test x"$PANGO_LIBS" != x; then
@@ -3253,10 +3349,10 @@ if test x$build_gtk = xyes; then #{
     fi
     echo "        Pango libs are: $PANGO_LIBS"
   else
-    echo "        ERROR: No Pango development package installed!" >&3
-    echo "               Install it from http://pango.org" >&3
-    echo "               or .deb users: apt-get install libpango1.0-dev" >&3
-    echo "               or .rpm users: yum install pango-devel" >&3
+    PKG_ERR([No Pango development package installed!])
+    PKG_SUGGEST([Install it from http://pango.org])
+    DEB_INSTALL([libpango1.0-dev])
+    RPM_INSTALL([pango-devel])
   fi
 
   if test x"$GLIB_LIBS" != x; then
@@ -3267,10 +3363,10 @@ if test x$build_gtk = xyes; then #{
     fi
     echo "        GLib libs are: $GLIB_LIBS"
   else
-    echo "        ERROR: No GLib development package installed!" >&3
-    echo "               Install it from http://gtk.org" >&3
-    echo "               or .deb users: apt-get install libglib2.0-dev" >&3
-    echo "               or .rpm users: yum install glib2-devel" >&3
+    PKG_ERR([No GLib development package installed!])
+    PKG_SUGGEST([Install it from http://gtk.org])
+    DEB_INSTALL([libglib2.0-dev])
+    RPM_INSTALL([glib2-devel])
   fi
 
   if test x"$ATK_LIBS" != x; then
@@ -3281,10 +3377,10 @@ if test x$build_gtk = xyes; then #{
     fi
       echo "        ATK libs are: $ATK_LIBS"
   else
-    echo "        ERROR: No ATK development package installed!" >&3
-    echo "               Install it from http://gtk.org" >&3
-    echo "               or .deb users: apt-get install libatk1.0-dev" >&3
-    echo "               or .rpm users: yum install atk-devel" >&3
+    PKG_ERR([No ATK development package installed!])
+    PKG_SUGGEST([Install it from http://atk.org])
+    DEB_INSTALL([libatk1.0-dev])
+    RPM_INSTALL([atk-devel])
   fi
 
 fi
@@ -3301,68 +3397,64 @@ if test x"$build_media_gst" = x"yes"; then
       echo "        Gstreamer flags are: default include path"
     fi
     echo "        Gstreamer libs are: $GSTREAMER_LIBS"
-    if test x"$has_gstreamer_pbutils" != "xyes"; then
-      echo "        RECOMMENDED: If the user has not installed the necessary Gstreamer plugins," >&5
-      echo "                     Gstreamer can pop up a message prompting them to." >&5
-      echo "                     Install gstpbutils (>= 0.10.15) from http://www.gstreamer.net for that to be enabled" >&5
-      echo "                     or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&5
-      echo "                     Also see --with-gstpbutils-incl and --with-gstpbutils-lib" >&5
-    fi
-    if test x"$has_gstreamer_plugins_base" = "xno"; then
-      dnl check if this is really a mandatory asset !
-      echo "        ERROR: base plugins are required for gstreamer media" >&3
-      echo "                        Install gstreamer-plugins-base from http://www.gstreamer.net" >&3
-      echo "                        or .rpm users: yum install gstreamer-plugins-base-devel" >&3
-      echo "                        or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&3
-    fi
   else
-    echo "        ERROR: GST media handling requested but gstreamer-0.10+ not found" >&3
-    echo "               Install it from http://www.gstreamer.net" >&3
-    echo "               or .deb users: apt-get install libgstreamer0.10-dev" >&3
-    echo "               or .rpm users: yum install gstreamer-devel" >&3
-    echo "               or             yast install gstreamer010-devel" >&3
+    PKG_ERR([GST media handling requested but gstreamer-0.10+ not found])
+    PKG_SUGGEST([Install it from http://www.gstreamer.net])
+    DEB_INSTALL([libgstreamer0.10-dev])
+    RPM_INSTALL([gstreamer-devel])
+    YAST_INSTALL([gstreamer010-devel])
+  fi
+  if test x"$has_gstreamer_pbutils" != "xyes"; then
+    PKG_REC([If the user has not installed the necessary Gstreamer plugins, Gstreamer can pop up a message prompting them to.])
+    PKG_SUGGEST([Install gstpbutils (>= 0.10.15) from http://www.gstreamer.net for that to be enabled])
+    DEB_INSTALL([libgstreamer-plugins-base0.10-dev])
+    PKG_SUGGEST([or .rpm users: simply install the below package]) dnl TODO: Can/should this notice be done cleaner?
+    PKG_SUGGEST([Also see --with-gstpbutils-incl and --with-gstpbutils-lib])
+  fi
+  if test x"$has_gstreamer_plugins_base" = "xno"; then
+    dnl TODO: Check if this is really a mandatory asset!
+    PKG_ERR([Base plugins are required for gstreamer media!])
+    PKG_SUGGEST([Install gstreamer-plugins-base from http://www.gstreamer.net])
+    DEB_INSTALL([libgstreamer-plugins-base0.10-dev])
+    RPM_INSTALL([gstreamer-plugins-base-devel])
   fi
 fi
 
-  if test x"${build_media_ffmpeg}" = x"yes"; then
-    if test x"$FFMPEG_LIBS" != x; then
-      echo "        MP3 and video support enabled through FFmpeg"
-      if test x"${ffmpeg_version_check}" != xok; then
-        echo "        ERROR: You have version ${ffmpeg_version} of FFmpeg installed," >&3
-        if test x"${have_ffmpeg_swscale}" = "xno"; then
-          echo "               with no swscale enabled." >&3
-        else
-          echo "               with swscale enabled." >&3
-        fi
-        echo "               This setup isn't supported!" >&3
-        echo "               Version 51.11.0 or newer is required, enabling swscale if >= 52.0.0." >&3
-        echo "               You can install libswscale from http://ffmpeg.org" >&3
-        echo "               or .deb users: apt-get install libswscale-dev" >&3
-      else
-	if test x"${avformat_h}" = x; then
-          echo "        ERROR: FFmpeg's libavcodec header is installed but not libavformat." >&3
-          echo "               You can install FFmpeg from http://ffmpeg.org" >&3
-          echo "               or .deb users: apt-get install libavformat-dev" >&3
-          echo "               or YaST users: yast -i libavformat-api (but currently installs into /usr/lib64)" >&3
-          echo "               or explicitly set the path using --with-ffmpeg-incl=" >&5
-          echo "               or reconfigure with --enable-media=gst" >&3
-	else
-          if test x"$FFMPEG_CFLAGS" != x; then
-            echo "        FFmpeg flags are: $FFMPEG_CFLAGS"
-          else
-            echo "        FFmpeg flags are: default include path"
-          fi
-          echo "        FFmpeg libs are: $FFMPEG_LIBS"
-	fi
-      fi
+dnl TODO: figure out some RPM package names.
+dnl TODO: The following tests is probably incorrect for any/older/exotic systems! Could someone experienced look at it?
+if test x"${build_media_ffmpeg}" = x"yes"; then
+  if test x"$FFMPEG_LIBS" != x; then
+    echo "        MP3 and video support enabled through FFmpeg"
+    if test x"$FFMPEG_CFLAGS" != x; then
+      echo "        FFmpeg flags are: $FFMPEG_CFLAGS"
     else
-      echo "        ERROR: No FFmpeg development package installed!" >&3
-      echo "               You can install FFmpeg from http://ffmpeg.org" >&3
-      echo "               or .deb users: apt-get install libavformat-dev" >&3
-      echo "               or .rpm users: yum install ffmpeg-devel" >&3
-      echo "               or reconfigure with --enable-media=gst" >&3
+      echo "        FFmpeg flags are: default include path"
     fi
+    echo "        FFmpeg libs are: $FFMPEG_LIBS"
+  else
+    PKG_ERR([No FFmpeg development package installed!])
+    PKG_SUGGEST([You can install FFmpeg from http://ffmpeg.org])
+    DEB_INSTALL([libavcodec-dev])
+    RPM_INSTALL([ffmpeg-devel])
+    PKG_ALTERNATIVE(or reconfigure with --enable-media=gst)
   fi
+
+  if test x"${avformat_h}" = x; then
+    PKG_ERR([FFmpeg's avformat header is installed but not libavformat!])
+    PKG_SUGGEST([You can install FFmpeg from http://ffmpeg.org])
+    DEB_INSTALL([libavformat-dev])
+    YAST_INSTALL([libavformat-api]) dnl (but currently installs into /usr/lib64)
+    PKG_ALTERNATIVE(or explicitly set the path using --with-ffmpeg-incl=)
+    PKG_ALTERNATIVE(or reconfigure with --enable-media=gst)
+  fi
+
+  if test x"${have_ffmpeg_swscale}" = "xno"; then
+    PKG_ERR([No libswscale development package installed!])
+    PKG_SUGGEST([You can install libswscale from http://ffmpeg.org])
+    DEB_INSTALL([libswscale-dev])
+    PKG_ALTERNATIVE(or reconfigure with --enable-media=gst)
+  fi
+fi
 
 if test x$build_cairo = xyes; then
   if test x"$CAIRO_LIBS" != x; then
@@ -3373,12 +3465,11 @@ if test x$build_cairo = xyes; then
     fi
     echo "        Cairo libs are: $CAIRO_LIBS"
   else
-    echo "        ERROR: No Cairo development package installed!" >&3
-    echo "               You need to have the Cairo development package installed" >&3
-    echo "               if you have used --enable-render=cairo to configure." >&3
-    echo "               Install it from http://cairographics.org" >&3
-    echo "               or .deb users: apt-get install libcairo-dev" >&3
-    echo "               or .rpm users: yum install cairo-devel" >&3
+    PKG_ERR([No Cairo development package installed!])
+    PKG_SUGGEST([You need to have the Cairo development package installed if you have used --enable-render=cairo to configure.])
+    PKG_SUGGEST([Install it from http://cairographics.org])
+    DEB_INSTALL([libcairo-dev])
+    RPM_INSTALL([cairo-devel])
   fi
 fi
 
@@ -3391,10 +3482,9 @@ if test x$build_fltk = xyes; then
     fi
       echo "        FLTK libs are: $FLTK2_LIBS"
   else
-    echo "        ERROR: No FLTK2 development package installed!" >&3
-    echo "               There are currently no Debian or RPM packages for FLTK2;" >&3
-    echo "               see http://www.fltk.org to install it from source." >&3
-    echo "               or change to a different gui with --enable-gui=..." >&3
+    PKG_ERR([No FLTK2 development package installed!])
+    PKG_SUGGEST([Install it from http://fltk.org])
+    PKG_ALTERNATIVE(or change to a different gui with --enable-gui=...)
   fi
 fi
 
@@ -3405,7 +3495,7 @@ if test x$build_fltk = xyes; then
     else
       echo "        Xft flags are: default include path"
     fi
-      echo "        Xft libs are: $XFT_LIBS"
+    echo "        Xft libs are: $XFT_LIBS"
   fi
 fi
 
@@ -3419,12 +3509,11 @@ if $need_sdl; then
     echo "        SDL flags are: $SDL_CFLAGS"
     echo "        SDL libs are: $SDL_LIBS"
   else
-    echo "        ERROR: No SDL development package installed!" >&3
-    echo "               Install it from http://www.libsdl.org/download-1.2.php" >&3
-    echo "               or .deb users: apt-get install libsdl1.2-dev" >&3
-    echo "               or .rpm users: yum install SDL-devel" >&3
-    test x$build_sdl = xyes &&
-	echo "               or select a different GUI with --enable-gui= " >&3
+    PKG_ERR([No SDL development package installed!])
+    PKG_SUGGEST([Install it from http://www.libsdl.org/download-1.2.php])
+    DEB_INSTALL([libsdl1.2-dev])
+    RPM_INSTALL([SDL-devel])
+    PKG_ALTERNATIVE(or change to a different gui with --enable-gui=...)
   fi
 fi
 unset need_sdl
@@ -3448,28 +3537,28 @@ fi
 
 if test x"${docbook}" = x"yes"; then
   if test x"$MAKEINFO" = x; then
-    echo "        ERROR: no makeinfo tools installed!" >&3
-    echo "               Either install it from http://www.gnu.org/software/texinfo/" >&3
-    echo "               or .deb users: apt-get install texinfo" >&3
-    echo "               or configure without --enable-docbook" >&3
+    PKG_ERR([No makeinfo tools installed!])
+    PKG_SUGGEST([Install it from http://www.gnu.org/software/texinfo/])
+    DEB_INSTALL([texinfo])
+    RPM_INSTALL([texinfo])
+    RPM_ALTERNATIVE([texinfo-tex])
   fi
   dnl low-level tools
   if test x"$DB2X_TEXIXML" = x -o x"$DB2X_MANXML" = x -o x"$DB2X_XSLTPROC" = x; then
     dnl high-level tools
     if test x"${DB2X_TEXI}" = x -o x"${DB2X_MAN}" = x; then
-      echo "        ERROR: No DocBook2X tools installed!" >&3
-      echo "               Either install it from http://docbook2x.sourceforge.net" >&3
-      echo "               or .deb users: apt-get install docbook docbook2x docbook-utils" >&3
-      echo "                              docbook-xml docbook-xsl texinfo xsltproc" >&3
-      echo "               or configure without --enable-docbook" >&3
+      PKG_ERR([No DocBook2X tools installed!])
+      PKG_SUGGEST([Install it from http://docbook2x.sourceforge.net])
+      dnl TODO: Could someone look at this and confirm the needed software is installed?
+      dnl FIXME: I removed the texidocbook and docbook-utilsnfo packages as they are not on my system.
+      DEB_INSTALL([docbook2x docbook-xml docbook-xsl texinfo xsltproc])
+      PKG_ALTERNATIVE([or configure without --enable-docbook])
     fi
   else
     echo "        You have version $db2x_version of the DocBook2X tools."
   fi
 else
-  echo "        WARNING: without --enable-docbook we will use the cached" >&4
-  echo "                 documentation files included in the gnash distribution." >&4
-  echo "                 If you change files in doc/C, you should --enable-docbook." >&4
+  PKG_WAR([without --enable-docbook we will use the cached documentation files included in the gnash distribution. If you change files in doc/C, you should --enable-docbook.])
 fi
 
 if test x"$CURL_LIBS" != x; then
@@ -3480,11 +3569,11 @@ if test x"$CURL_LIBS" != x; then
   fi
     echo "        CURL libs are: $CURL_LIBS"
 else
-  echo "        RECOMMENDED: If you install the CURL library, Gnash will be able to" >&5
-  echo "                     display remote content (streaming from URLs) using CURL." >&5
-  echo "                     Install libcurl from http://curl.haxx.se/libcurl" >&5
-  echo "                     or .deb users: apt-get install libcurl-dev" >&5
-  echo "                     or .rpm users: yum install curl-devel" >&5
+  PKG_REC([If you install the CURL library, Gnash will be able to display remote content (streaming from URLs) using CURL.])
+  PKG_SUGGEST([Install libcurl from http://curl.haxx.se/libcurl])
+  DEB_INSTALL([libcurl4-gnutls-dev]) dnl TODO: Do we prefer this one? GnuTLS is LGPL'd so it's probably more licensively compatible than OpenSSL?
+  DEB_ALTERNATIVE([libcurl-dev])
+  RPM_INSTALL([curl-devel])
 fi
 
 if test x"$SPEEX_LIBS" != x; then
@@ -3495,11 +3584,24 @@ if test x"$SPEEX_LIBS" != x; then
   fi
     echo "        Speex libs are: $SPEEX_LIBS"
 else
-  echo "        RECOMMENDED: If you install the Speex library, Gnash will be able to" >&5
-  echo "                     decoded Speex encoded audio in FLV files." >&5
-  echo "                     Install libspeex from http://speex.org" >&5
-  echo "                     or .deb users: apt-get install libspeex-dev" >&5
-  echo "                     or .rpm users: yum install speex-devel" >&5
+  PKG_REC([If you install the Speex library, Gnash will be able to decoded Speex encoded audio in FLV files.])
+  PKG_SUGGEST([Install libspeex from http://speex.org])
+  DEB_INSTALL([libspeex-dev])
+  RPM_INSTALL([speex-devel])
+fi
+
+if test x"$SPEEXDSP_LIBS" != x; then
+  if test x"$SPEEXDSP_CFLAGS" != x; then
+    echo "        Speex DSP flags are: $SPEEXDSP_CFLAGS"
+  else
+    echo "        Speex DSP flags are: default include path"
+  fi
+    echo "        Speex DSP libs are: $SPEEXDSP_LIBS"
+else
+  PKG_REC([If you install the Speex DSP library, Gnash will be able to resample Speex encoded audio in FLV files.])
+  PKG_SUGGEST([Install libspeexdsp from http://speex.org])
+  DEB_INSTALL([libspeexdsp-dev])
+  RPM_INSTALL([speex-devel])
 fi
 
 if test x"$ext_dbus" = xyes; then
@@ -3511,78 +3613,81 @@ if test x"$ext_dbus" = xyes; then
     fi
       echo "        DBUS libs are: $DBUS_LIBS"
   else
-    echo "        WARNING: DBUS library not found." >&4
-    echo "                 Gnash will be built without support for remote controls." >&4
-    echo "                 Why not install libdbus from http://www.dbus.org" >&4
-    echo "                 or .deb users: apt-get install dbus-dev" >&4
-    echo "                 or .rpm users: yum install dbus-devel" >&4
+    PKG_WAR([No DBUS development package was found! Gnash will be built without support for remote controls.])
+    PKG_SUGGEST([Install libdbus from http://www.dbus.org])
+    DEB_INSTALL([dbus-dev])
+    DEB_ALTERNATIVE([libdbus-1-dev])
+    RPM_INSTALL([dbus-devel])
   fi
 fi
 
 if test x$build_agg = xyes; then # {
   echo "        AGG Pixel format is: $pixelformat"
-    if test x"$AGG_LIBS" != x; then # {
-      if test x"${agg25}" != xyes; then # {
-        echo "        ERROR: Your installation of AGG appears to be version 2.4 or older." >&3
-        echo "               Please upgrade to AGG 2.5 or greater." >&3
-        echo "               Install it from http://www.antigrain.com" >&3
-        echo "               or .deb users: apt-get install libagg-dev" >&3
-        echo "               or .rpm users: yum install agg-devel" >&3
-      else # }{
-        if test x"$AGG_CFLAGS" != x; then # {
-          echo "        AGG flags are: $AGG_CFLAGS"
-        else # }{
-          echo "        AGG flags are: default include path"
-        fi # }
-        echo "        AGG libs are: $AGG_LIBS"
-      fi # }
+  if test x"$AGG_LIBS" != x -a x"${agg25}" == xyes; then # {
+    if test x"$AGG_CFLAGS" != x; then # {
+      echo "        AGG flags are: $AGG_CFLAGS"
     else # }{
-      echo "        ERROR: No AGG development package installed!" >&3
-      echo "               Install it from http://www.antigrain.com" >&3
-      echo "               or .deb users: apt-get install libagg-dev" >&3
-      echo "               or .rpm users: yum install agg-devel" >&3
+      echo "        AGG flags are: default include path"
     fi # }
+    echo "        AGG libs are: $AGG_LIBS"
+  else # }{
+    if test x"$AGG_LIBS" != x -a x"${agg25}" != xyes; then
+      PKG_ERR([Your installation of AGG appears to be version 2.4 or older. Please upgrade to AGG 2.5 or greater.])
+    else
+      PKG_ERR([No AGG development package installed!])
+    fi
+    PKG_SUGGEST([Install it from http://www.antigrain.com])
+    DEB_INSTALL([libagg-dev])
+    RPM_INSTALL([agg-devel])
+  fi # }
 fi # }
 
+dnl TODO: This package is handled a bit stupidly in regard to the package
+dnl suggestion system. It would be better to check for each package
+dnl separately, instead of passing the missing ones in variables..
 if test x"$BOOST_LIBS" != x; then
-	echo "        BOOST flags are: $BOOST_CFLAGS"
-	echo "        BOOST libs are: $BOOST_LIBS"
-	echo "        BOOST libs for cygnal are: $BOOST_CYGNAL_LIBS"
-    dnl fi
-    if test x"${missing_headers}" != x; then
-      for i in ${missing_headers}; do
-	echo "        ERROR: The BOOST $i header file is needed!" >&3
-	echo "               Install it from http://boost.org" >&3
-	echo "               or from a Boost development package" >&3
+  echo "        BOOST flags are: $BOOST_CFLAGS"
+  echo "        BOOST libs are: $BOOST_LIBS"
+  echo "        BOOST libs for cygnal are: $BOOST_CYGNAL_LIBS"
+
+  if test x"${missing_headers}" != x; then
+    for i in ${missing_headers}; do
+      PKG_ERR([The Boost $i header is not installed])
+      PKG_SUGGEST([Install it from http://www.boost.org])
+    done
+  fi
+
+  if test x"${cygnal}" = x"yes"; then
+    if test x"${cygnal_missing_libs}" != x; then
+      for i in ${cygnal_missing_libs}; do
+        PKG_ERR([No Boost $i package installed])
+        PKG_SUGGEST([Install it from http://www.boost.org])
+        debtmppkg="libboost-`echo ${i} | sed 's/_/-/g'`-dev"
+        DEB_INSTALL([$debtmppkg])
+        PKG_ALTERNATIVE([or configure with --disable-cygnal])
       done
     fi
+  fi
 
-    if test x"${cygnal}" = x"yes"; then
-        if test x"${cygnal_missing_libs}" != x; then
-          for i in ${cygnal_missing_libs}; do
-            echo "          ERROR: The BOOST $i library is required for cygnal!" >&4
-            echo "                 Either configure with --disable-cygnal or" >&4
-            echo "                 install it from http://www.boost.org" >&4
-            echo "                 or .deb users: apt-get install libboost-"`echo ${i} | sed 's/_/-/g'`"-dev" >&4
-          done
-        fi
-    fi
-
-    if test x"${missing_libs}" != x; then
-      for i in ${missing_libs}; do
-	echo "        ERROR: The BOOST $i library is needed!" >&3
-	echo "               Install it from http://boost.org" >&3
-	echo "               or .deb users: apt-get install libboost-"`echo ${i} | sed 's/_/-/g'`"-dev" >&3
-      done
-    fi
+  if test x"${missing_libs}" != x; then
+    for i in ${missing_libs}; do
+      PKG_ERR([No Boost $i package installed])
+      PKG_SUGGEST([Install it from http://www.boost.org])
+      debtmppkg="libboost-`echo ${i} | sed 's/_/-/g'`-dev"
+      DEB_INSTALL([$debtmppkg])
+    done
+  fi
 else
-    echo "        ERROR: No BOOST development package installed!" >&3
-    echo "               Install it from http://www.boost.org" >&3
-    echo "               or .deb users: apt-get install libboost-dev libboost-thread-dev" >&3
-    if test x"$cygnal" = xyes; then
-    echo "                              and libboost-date-time-dev (for cygnal)" >&3
-    fi
-    echo "               or .rpm users: yum install boost-devel" >&3
+  PKG_ERR([No Boost development package installed])
+  PKG_SUGGEST([Install it from http://www.boost.org])
+  dnl I am not sure that libboost-program-options-dev should be passed here, but
+  dnl it seems like the cleanest way to get it.
+  if test x"$cygnal" = xyes; then
+    DEB_INSTALL([libboost-dev libboost-thread-dev libboost-program-options-dev libboost-date-time-dev])
+  else
+    DEB_INSTALL([libboost-dev libboost-thread-dev libboost-program-options-dev])
+  fi
+  RPM_INSTALL([boost-devel])
 fi
 
 dnl don't look for the flash compilers when cross compiling.
@@ -3592,21 +3697,21 @@ if test x"$testsuite" = x"yes"; then
       echo "        MING flags are $MING_CFLAGS"
       echo "        MING libs are $MING_LIBS"
     else
-      echo "        WARNING: You need to have the Ming development package" >&4
-      echo "                 installed to run most of the tests in Gnash testsuite." >&4
-      echo "                 Install it from http://www.libming.org/" >&4
-      echo "                 or .deb users: apt-get install libming-dev" >&4
+      PKG_WAR([You need to have the Ming development package installed to run most of the tests in Gnash testsuite.])
+      PKG_SUGGEST([Install it from http://www.libming.org/])
+      DEB_INSTALL([libming-dev])
+      RPM_INSTALL([libming-devel])
     fi
 
     if test x"$MAKESWF" != x; then
       echo "        MING version code is $MING_VERSION_CODE"
       echo "        MAKESWF is $MAKESWF"
     else
-      echo "        WARNING: You need to have the Ming utilities package" >&4
-      echo "                 version 0.4 or higher installed to run" >&4
-      echo "                 many of the tests in Gnash testsuite." >&4
-      echo "                 Install it from http://www.libming.org" >&4
-      echo "                 or .deb users: apt-get install libming-util" >&4
+      PKG_WAR([You need to have the Ming utilities package version 0.4 or higher installed to run many of the tests in Gnash testsuite.])
+      PKG_SUGGEST([Install it from http://www.libming.org/])
+      DEB_INSTALL([libming-util])
+      RPM_INSTALL([ming-util])
+      RPM_ALTERNATIVE([ming-utils])
     fi
 
     if test x"$MAKESWF" != x && test $MING_VERSION_CODE -lt 00040006; then
@@ -3623,52 +3728,48 @@ if test x"$testsuite" = x"yes"; then
       echo "        MTASC is $MTASC"
       echo "        MTASC CLASSPATH is $MTASC_CLASSPATH"
     else
-      echo "        WARNING: You need to have the MTASC compiler packages installed" >&4
-      echo "                 to run some of the tests in Gnash testsuite." >&4
-      echo "                 You can install it from http://mtasc.org" >&4
-      echo "                 or .deb users: apt-get install mtasc" >&4
+      PKG_WAR([You need to have the MTASC compiler packages installed to run some of the tests in Gnash testsuite.])
+      PKG_SUGGEST([Install it from http://mtasc.org])
+      DEB_INSTALL([mtasc])
+      RPM_INSTALL([mtasc])
     fi
 
     if test x"$HAXE" != x; then
       echo "        HAXE is $HAXE"
       echo "        HAXE CLASSPATH is $HAXE_CLASSPATH"
     else
-      echo "        WARNING: You need to have the HAXE compiler package " >&4
-      echo "                 version 2.00 or higher installed" >&4
-      echo "                 to run some of the tests in Gnash testsuite." >&4
-      echo "                 You can install it from http://haxe.org" >&4
-      echo "                 or .deb users: apt-get install haxe" >&4
+      PKG_WAR([You need to have the HAXE compiler package version 2.00 or higher installed to run some of the tests in Gnash testsuite.])
+      PKG_SUGGEST([Install it from http://haxe.org])
+      DEB_INSTALL([haxe])
+      RPM_INSTALL([haxe])
     fi
 
     if test x"$SWFMILL" != x; then
       echo "        SWFMILL is $SWFMILL"
       if test x"$ENABLE_AVM2" != x -a "$SWFMILL_VERSION" -lt 00021206; then
-        echo "        WARNING: You are building Gnash with AVM2 support but" >&4
-        echo "                 your swfmill version is too old to run AS3" >&4
-        echo "                 tests." >&4
+        PKG_WAR([You are building Gnash with AVM2 support but your swfmill version is too old to run AS3 tests.])
       fi
     else
-      echo "        WARNING: You need to have the 'swfmill' tool installed" >&4
-      echo "                 to run some of the tests in Gnash testsuite." >&4
-      echo "                 You can install it from http://swfmill.org/" >&4
-      echo "                 or .deb users: apt-get install swfmill" >&4
+      PKG_WAR([You need to have the swfmill tool installed to run some of the tests in Gnash testsuite.])
+      PKG_SUGGEST([Install it from http://swfmill.org])
+      DEB_INSTALL([swfmill])
+      RPM_INSTALL([swfmill])
     fi
 
     if test x"$SWFC" != x; then
       echo "        SWFC is $SWFC"
     else
-      echo "        WARNING: You need to have 'swfc' from SWFTools installed" >&4
-      echo "                 to run some of the tests in Gnash testsuite." >&4
-      echo "                 You can install it from http://www.swftools.org/" >&4
-      echo "                 or .deb users: apt-get install swftools" >&4
+      PKG_WAR([You need to have swfc from SWFTools installed to run some of the tests in Gnash testsuite.])
+      PKG_SUGGEST([Install it from http://swftools.org])
+      DEB_INSTALL([swftools])
+      RPM_INSTALL([swftools])
     fi
 
     if test x"$AS3COMPILE" != x; then
       echo "        AS3COMPILE is $AS3COMPILE"
     else
-      echo "        WARNING: you need as3compile from SWFTools" >&4
-      echo "                 to run some of the tests in Gnash testsuite." >&4
-      echo "                 You can install it from http://www.swftools.org/" >&4
+      PKG_WAR([You need to have as3compile from SWFTools installed to run some of the tests in Gnash testsuite.])
+      PKG_SUGGEST([Install it from http://swftools.org])
     fi
 
     if test x"$HTTP_TESTSUITE" != x; then
@@ -3684,8 +3785,10 @@ fi
   if test x"$PERL" != x; then
     echo "        PERL is $PERL"
   else
-    echo "        WARNING: You need to have perl installed" >&4
-    echo "                 to run some of the tests in Gnash testsuite." >&4
+    PKG_WAR([You need to have perl installed to run some of the tests in Gnash testsuite.])
+    PKG_SUGGEST([Install it from http://perl.org])
+    DEB_INSTALL([perl])
+    RPM_INSTALL([perl])
   fi
 
 if test x"$testsuite" = x"yes"; then
@@ -3708,13 +3811,11 @@ if test x"$Z_LIBS" != x; then
   fi
   echo "        Z libs are: $Z_LIBS"
 else
-  echo "        RECOMMENDED: You need to have the zlib development packages installed" >&5
-  echo "                     to play compressed SWF (most of them from version 6 up)" >&5
-  echo "                     and to display some kinds of JPEG files." >&5
-  echo "                     Install it from http://www.zlib.net" >&5
-  echo "                     or .deb users: apt-get install zlib1g-dev" >&5
-  echo "                     or .rpm users: yum install zlib-devel." >&5
-  echo "                     It may still be possible to configure without zlib." >&5
+  PKG_REC([You need to have the zlib development packages installed to play compressed SWF (most of them from version 6 up) and to display some kinds of JPEG files.])
+  PKG_SUGGEST([Install it from http://zlib.net])
+  DEB_INSTALL([zlib1g-dev])
+  RPM_INSTALL([zlib-devel])
+  PKG_ALTERNATIVE([It may still be possible to configure without zlib.])
 fi
 
 if test x"$FREETYPE2_LIBS" != x; then
@@ -3725,12 +3826,11 @@ if test x"$FREETYPE2_LIBS" != x; then
   fi
   echo "        FreeType libs are: $FREETYPE2_LIBS"
 else
-  echo "        RECOMMENDED: You need to have the freetype development packages installed" >&5
-  echo "                     to use device fonts." >&5
-  echo "                     Install it from http://www.freetype.org" >&5
-  echo "                     or .deb users: apt-get install libfreetype6-dev" >&5
-  echo "                     or .rpm users: yum install freetype-devel" >&5
-  echo "                     It may still be possible to configure without freetype." >&5
+  PKG_REC([You need to have the freetype development packages installed to use device fonts.])
+  PKG_SUGGEST([Install it from http://freetype.org])
+  DEB_INSTALL([libfreetype6-dev])
+  RPM_INSTALL([freetype-devel])
+  PKG_ALTERNATIVE([It may still be possible to configure without freetype.])
 fi
 
 if test x"$FONTCONFIG_LIBS" != x; then
@@ -3741,12 +3841,11 @@ if test x"$FONTCONFIG_LIBS" != x; then
   fi
   echo "        Fontconfig libs are: $FONTCONFIG_LIBS"
 else
-  echo "        RECOMMENDED: You need to have the fontconfig development packages installed" >&5
-  echo "                     to use device fonts." >&5
-  echo "                     Install it from http://www.fontconfig.org" >&5
-  echo "                     or .deb users: apt-get install libfontconfig1-dev" >&5
-  echo "                     or .rpm users: yum install fontconfig-devel" >&5
-  echo "                     It may still be possible to configure without fontconfig." >&5
+  PKG_REC([You need to have the fontconfig development packages installed to use device fonts.])
+  PKG_SUGGEST([Install it from http://fontconfig.org])
+  DEB_INSTALL([libfontconfig1-dev])
+  RPM_INSTALL([fontconfig-devel])
+  PKG_ALTERNATIVE([It may still be possible to configure without fontconfig.])
 fi
 
 if test x$ext_mysql = xyes; then
@@ -3755,21 +3854,20 @@ if test x$ext_mysql = xyes; then
       echo "        MYSQL flags are: $MYSQL_CFLAGS"
       echo "        MYSQL libs are: $MYSQL_LIBS"
     else
-      echo "        ERROR: No MySQL development package is installed." >&3
-      echo "               Either reconfigure without --enable-extensions=mysql" >&3
-      echo "               or install MySQL header files from http://www.mysql.org" >&3
-      echo "               or .deb users: apt-get install libmysqlclient-dev" >&3
-      echo "                 or .rpm users: yum install mysql-devel" >&4
+      PKG_ERR([No MySQL development package is installed.])
+      PKG_SUGGEST([Install it from http://mysql.org])
+      DEB_INSTALL([libmysqlclient-dev])
+      RPM_INSTALL([mysql-devel])
+      PKG_ALTERNATIVE([or reconfigure without --enable-extensions=mysql])
     fi
   fi
 fi
 
 if test "$GMSGFMT" = ":"; then
-  echo "        WARNING: You need the gettext package installed to use translations." >&4
-  echo "                 Required for building a package or 'make distcheck'" >&4
-  echo "                 Install it from http://www.gnu.org/software/gettext/" >&4
-  echo "                 or .deb users: apt-get install gettext" >&4
-  echo "                 or .rpm users: yum install gettext" >&4
+  PKG_WAR([You need the gettext package installed to use translations. Required for building a package or 'make distcheck'])
+  PKG_SUGGEST([Install it from http://www.gnu.org/software/gettext/])
+  DEB_INSTALL([gettext])
+  RPM_INSTALL([gettext])
 fi
 
 if test x"${build_vaapi}" = x"yes"; then
@@ -3799,10 +3897,7 @@ fi
 
 if test x"$ac_cv_gcc_visibility" != xyes; then
   if test x"$npapi" = xyes; then
-    echo "        WARNING: NPAPI (mozilla) plugin is enabled, but your compiler"
-    echo "                 does not support symbol visibility. This may cause "
-    echo "                 the plugin to malfunction and may result in small "
-    echo "                 children being eaten. You have been warned!"
+    PKG_WAR([NPAPI (mozilla) plugin is enabled, but your compiler does not support symbol visibility. This may cause the plugin to malfunction and may result in small children being eaten. You have been warned!])
   fi
 fi
 
@@ -3810,10 +3905,10 @@ if test x"$npapi" = xyes; then
   if test x"$has_npapi" = xyes; then
     echo "        NPAPI flags are: $NPAPI_CFLAGS"
   else
-    echo "        ERROR : No xulrunner development package is installed" >&3
-    echo "                Install it from http://releases.mozilla.org/pub/mozilla.org/xulrunner" >&3
-    echo "                or .deb users: apt-get install xulrunner-dev" >&3
-    echo "                or .rpm users: yum install xulrunner-devel" >&3
+    PKG_ERR([No xulrunner development package is installed!])
+    PKG_SUGGEST([Install it from http://releases.mozilla.org/pub/mozilla.org/xulrunner])
+    DEB_INSTALL([xulrunner-dev])
+    RPM_INSTALL([xulrunner-devel])
   fi
 else
   echo "        NPAPI plugin is disabled"
@@ -3822,11 +3917,10 @@ fi
 if test x"${DEJAGNU}" != x""; then
   echo "        DEJAGNU's runtest is $DEJAGNU"
 else
-  echo "        WARNING: You need the dejagnu package installed to get a summary" >&4
-  echo "                 report after running ''make check''" >&4
-  echo "                 Install it from http://www.gnu.org/software/dejagnu/" >&4
-  echo "                 or .deb users: apt-get install dejagnu" >&4
-  echo "                 or .rpm users: yum install dejagnu" >&4
+  PKG_WAR([You need the dejagnu package installed to get a summary after running 'make check'.])
+  PKG_SUGGEST([Install it from http://www.gnu.org/software/dejagnu/])
+  DEB_INSTALL([dejagnu])
+  RPM_INSTALL([dejagnu])
 fi
 
 dnl Haiku
@@ -3839,11 +3933,10 @@ if test x"$has_ltdl" = x"yes";then
   echo "        LIBLTDL libs are: $LTDL_LIBS"
 else
   if test x"${extensions_support}" != xno; then
-    echo "        ERROR: No libltdl development package is installed," >&3
-    echo "               yet --disable-extensions was not specified." >&3
-    echo "               Install it from ftp://ftp.gnu.org/gnu/libtool/" >&3
-    echo "               or .deb users: apt-get install libltdl-dev" >&3
-    echo "               or .rpm users: yum install libtool-ltdl-devel" >&3
+    PKG_ERR([No libltdl development package is installed, yet --disable-extensions was not specified.])
+    PKG_SUGGEST([Install it from ftp://ftp.gnu.org/gnu/libtool/])
+    DEB_INSTALL([libltdl-dev])
+    RPM_INSTALL([libtool-ltdl-devel])
   fi
 fi
  
@@ -3853,7 +3946,7 @@ if test x"$python" = x"yes"; then
     echo "        PYTHON libs are: $PYTHON_LIBS"
     echo "        PYTHON executable is: $PYTHON"
   else
-    echo "        ERROR: No Python development package is installed, but it's enabled." >&3
+    PKG_ERR([No Python development package is installed, but it's enabled.])
   fi
 fi
 if test x${build_ssl} = xyes; then
@@ -3865,7 +3958,7 @@ if test x${build_ssl} = xyes; then
     fi
     echo "        SSL libs are: $SSL_LIBS"
   else
-    echo "        ERROR: No SSL development package is installed, but it's enabled." >&3
+    PKG_ERR([No SSL development package is installed, but it's enabled."])
   fi
 fi
 
@@ -3878,7 +3971,7 @@ if test x${build_ssh} = xyes; then
     fi
     echo "        SSH libs are: $SSH_LIBS"
   else
-    echo "        ERROR: No SSH development package is installed, but it's enabled." >&3
+    PKG_ERR([No SSH development package is installed, but it's enabled."])
   fi
 fi
 
@@ -3999,19 +4092,63 @@ else
   rm $crec
 fi
 
-dnl If anything critical is missing, don't bother to continue
 if test -s $cerr; then
   echo ""
   cat $cerr >&2
+fi
+
+deb_err="`cat $deb_err`"
+deb_war="`cat $deb_war`"
+deb_rec="`cat $deb_rec`"
+rpm_err="`cat $rpm_err`"
+rpm_war="`cat $rpm_war`"
+rpm_rec="`cat $rpm_rec`"
+yast_err="`cat $yast_err`"
+yast_war="`cat $yast_war`"
+yast_rec="`cat $yast_rec`"
+
+# Pipe stderr to /dev/null since Fedora complains when target isn't there.
+if test x`which apt-get 2>/dev/null` != x; then
+  if test x"$deb_err" != x -o x"$deb_war" != x -o x"$deb_rec" != x; then
+    echo "#!/bin/sh" > deb-attempt-install-dependencies.sh
+    echo "packages=\"$deb_err $deb_war $deb_rec\"" >> deb-attempt-install-dependencies.sh
+    echo "PKGCOMMAND=\"apt-get install -y -q\"" >> deb-attempt-install-dependencies.sh
+    cat ${srcdir}/base-attempter.sh >> deb-attempt-install-dependencies.sh
+    chmod +x deb-attempt-install-dependencies.sh
+    echo ""
+    echo ".deb users might be able to install most dependencies by executing:"
+    echo "sudo ./deb-attempt-install-dependencies.sh"
+  fi
+fi
+
+if test x`which yum 2>/dev/null` != x; then
+  if test x"$rpm_err" != x -o x"$rpm_war" != x -o x"$deb_rec" != x; then
+    echo "#!/bin/sh" > rpm-attempt-install-dependencies.sh
+    echo "packages=\"$rpm_err $rpm_war  $rpm_rec\"" >> rpm-attempt-install-dependencies.sh
+    echo "PKGCOMMAND=\"yum install -y \""    >> rpm-attempt-install-dependencies.sh
+    cat ${srcdir}/base-attempter.sh >> rpm-attempt-install-dependencies.sh
+    chmod +x rpm-attempt-install-dependencies.sh
+    echo ""
+    echo ".rpm users might be able to install most dependencies by executing:"
+    echo "sudo ./rpm-attempt-install-dependencies.sh"
+  fi
+fi
+
+dnl TODO: Add support for yast here, which AFAIK is used on OpenSuse.
+
+dnl If anything critical is missing, don't bother to continue
+if test -s $cerr; then
+  echo ""
   rm $cerr
   AC_MSG_ERROR([Please install required packages])
 else
   rm $cerr
 fi
 
-rmdir $tmp
+rm -rf $tmp
 
 if test x"$fork" = x"no"; then
+  echo ""
   AC_MSG_ERROR([Currently only forking the standalone player works!])
 fi
 echo ""

@@ -27,8 +27,8 @@
 /*
  * run as ./loadMovieTest <mediadir>
  *
- * mediadir is where lynch.{jpg,swf}, green.{jpg,swf}
- * and offspring.{jpg,swf} are located
+ * mediadir is where red.{jpg,swf}, green.{jpg,swf}
+ * and blue.{jpg,swf} are located
  *
  */
 
@@ -251,12 +251,12 @@ main(int argc, char** argv)
 	SWFMovieClip dejagnuclip;
 	SWFDisplayItem it;
 
-	char file_lynch[256];
+	char file_red[256];
 	char file_green[256];
-	char file_offspring[256];
-	char url_lynch[256];
+	char file_blue[256];
+	char url_red[256];
 	char url_green[256];
-	char url_offspring[256];
+	char url_blue[256];
 
 	/*********************************************
 	 *
@@ -271,18 +271,18 @@ main(int argc, char** argv)
 		return 1;
 	}
 
-	sprintf(file_lynch, "%s/lynch.jpg", mediadir);
+	sprintf(file_red, "%s/red.jpg", mediadir);
 	sprintf(file_green, "%s/green.jpg", mediadir);
-	sprintf(file_offspring, "%s/offspring.jpg", mediadir);
+	sprintf(file_blue, "%s/blue.jpg", mediadir);
 
 	/*
 	 * Test both jpeg and swf loading.
 	 * NOTE: testing of urls with and w/out 'file://' prefix
 	 *       disabled to reduce test complexity.
 	 */
-	sprintf(url_lynch, "%s/lynch.swf", mediadir);
+	sprintf(url_red, "%s/red.swf", mediadir);
 	sprintf(url_green, "%s/green.jpg", mediadir);
-	sprintf(url_offspring, "%s/offspring.swf", mediadir);
+	sprintf(url_blue, "%s/blue.swf", mediadir);
 
 
 	puts("Setting things up");
@@ -314,13 +314,13 @@ main(int argc, char** argv)
 	 *****************************************************/
 
 	/* Add the LYNCH  clip */
-	add_clip(mo, file_lynch, "lynch", url_lynch, 0, 0);
+	add_clip(mo, file_red, "red", url_red, 0, 0);
 
 	/* Add the GREEN  clip */
 	add_clip(mo, file_green, "green", url_green, 200, 0);
 
-	/* Add the OFFSPRING  clip */
-	add_clip(mo, file_offspring, "offspring", url_offspring, 400, 0);
+	/* Add the BLUE  clip */
+	add_clip(mo, file_blue, "blue", url_blue, 400, 0);
 
 	/* Add the "shaker" button */
 	add_button(mo, 50, 200, "Scribble", newSWFAction(

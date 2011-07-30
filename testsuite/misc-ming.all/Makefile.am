@@ -31,7 +31,8 @@ CLEANFILES =  \
 
 DISTCLEANFILES = XMLSocketTester
 
-SUBDIRS = loop loading displaylist_depths action_order
+SUBDIRS = . loop loading displaylist_depths action_order register_class \
+          init_action
 
 EXTRA_DIST = \
 	DragDropTest.as \
@@ -131,8 +132,6 @@ check_PROGRAMS = \
 	attachMovieTestRunner \
 	attachMovieLoopingTest \
 	attachMovieLoopingTestRunner \
-	registerClassTest \
-	registerClassTestRunner \
 	goto_frame_test \
 	consecutive_goto_frame_test \
 	matrix_test \
@@ -171,6 +170,8 @@ check_PROGRAMS = \
 
 if MING_VERSION_0_4_3
 check_PROGRAMS += \
+	StreamSoundTest \
+	StreamSoundTestRunner \
 	EmbeddedSoundTest \
 	EmbeddedSoundTest-Runner \
 	eventSoundTest1 \
@@ -190,16 +191,6 @@ check_PROGRAMS += \
 	intervalTestRunner \
 	DragDropTestRunner   \
 	PrototypeEventListenersTestRunner \
-	$(NULL)
-endif
-
-if MING_SUPPORTS_INIT_ACTIONS
-check_PROGRAMS += \
-	init_action_test \
-	InitActionTest2 \
-	RegisterClassTest4 \
-	RegisterClassTest3 \
-	registerClassTest2 \
 	$(NULL)
 endif
 
@@ -266,8 +257,6 @@ check_SCRIPTS = \
 	runtime_vm_stack_testrunner \
 	new_child_in_unload_testrunner \
 	instanceNameTestRunner \
-	init_action_testrunner \
-	InitActionTest2Runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -299,15 +288,6 @@ check_SCRIPTS += \
 	$(NULL)	
 endif
 
-if MING_SUPPORTS_INIT_ACTIONS
-check_SCRIPTS += \
-	InitActionTest2Runner \
-	RegisterClassTest4Runner \
-	RegisterClassTest3Runner \
-	registerClassTest2runner \
-	$(NULL)
-endif
-
 if MING_SUPPORTS_REPLACE_TAG
 check_SCRIPTS += \
 	PlaceObject2TestRunner \
@@ -335,7 +315,7 @@ libgnashmingutils_la_SOURCES =	\
 definebitsjpeg2_SOURCES = definebitsjpeg2.c
 definebitsjpeg2_LDADD = $(MING_LIBS)
 definebitsjpeg2.swf: definebitsjpeg2
-	./definebitsjpeg2 $(srcdir)/../media/lynch.jpg
+	./definebitsjpeg2 $(srcdir)/../media/red.jpg
 
 DefineTextTest.swf: DefineTextTest
 	./DefineTextTest $(abs_mediadir)
@@ -1178,6 +1158,38 @@ EmbeddedSoundTest_Runner_DEPENDENCIES = \
 	EmbeddedSoundTest.swf	\
 	$(NULL)
 
+StreamSoundTest_SOURCES = \
+	StreamSoundTest.c \
+	$(NULL)
+
+StreamSoundTest_CFLAGS = \
+	-DMEDIADIR='"$(abs_mediadir)"' \
+	$(NULL)
+
+StreamSoundTest_LDADD = libgnashmingutils.la
+
+StreamSoundTest.swf: StreamSoundTest
+	./StreamSoundTest $(abs_mediadir)
+
+StreamSoundTestRunner_SOURCES = \
+	StreamSoundTestRunner.cpp \
+	$(NULL)
+
+StreamSoundTestRunner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+
+StreamSoundTestRunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(AM_LDFLAGS) \
+	$(NULL)
+
+StreamSoundTestRunner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	StreamSoundTest.swf	\
+	$(NULL)
+
 BitmapSmoothingTest_SOURCES = \
 	BitmapSmoothingTest.c \
 	$(NULL)
@@ -1193,42 +1205,6 @@ BitmapSmoothingTest-v7.swf: BitmapSmoothingTest
 
 BitmapSmoothingTest-v8.swf: BitmapSmoothingTest
 	./BitmapSmoothingTest 8
-
-registerClassTest_SOURCES =	\
-	registerClassTest.c	\
-	$(NULL)
-registerClassTest_LDADD = libgnashmingutils.la
-
-registerClassTest.swf: registerClassTest
-	./registerClassTest $(abs_mediadir)
-
-registerClassTestRunner_SOURCES = \
-	registerClassTestRunner.cpp \
-	$(NULL)
-registerClassTestRunner_LDADD = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(AM_LDFLAGS) \
-	$(NULL)
-registerClassTestRunner_CXXFLAGS = \
-	-DSRCDIR='"$(srcdir)"' \
-	-DTGTDIR='"$(abs_builddir)"' \
-	$(NULL)
-registerClassTestRunner_DEPENDENCIES = \
-	registerClassTest.swf \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(NULL)
-
-registerClassTest2_SOURCES =	\
-	registerClassTest2.c	\
-	$(NULL)
-registerClassTest2_LDADD = libgnashmingutils.la
-
-registerClassTest2.swf: registerClassTest2
-	./registerClassTest2 $(abs_mediadir)
-
-registerClassTest2runner: $(srcdir)/../generic-testrunner.sh registerClassTest2.swf
-	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) registerClassTest2.swf > $@
-	chmod 755 $@
 
 spritehier.swf: spritehier
 	./spritehier
@@ -1365,54 +1341,6 @@ ButtonPropertiesTestRunner_DEPENDENCIES = \
 ButtonPropertiesTestRunner_CXXFLAGS = \
 	-DTGTDIR='"$(abs_builddir)"' \
 	$(NULL)
-
-InitActionTest2_SOURCES =	\
-	InitActionTest2.c	\
-	$(NULL)
-InitActionTest2_LDADD = libgnashmingutils.la
-
-InitActionTest2.swf: InitActionTest2
-	./InitActionTest2 $(abs_mediadir)
-
-InitActionTest2Runner: $(srcdir)/../generic-testrunner.sh InitActionTest2.swf
-	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) InitActionTest2.swf > $@
-	chmod 755 $@
-
-RegisterClassTest3_SOURCES =	\
-	RegisterClassTest3.c	\
-	$(NULL)
-RegisterClassTest3_LDADD = libgnashmingutils.la
-
-RegisterClassTest3.swf: RegisterClassTest3
-	./RegisterClassTest3 $(abs_mediadir)
-
-RegisterClassTest3Runner: $(srcdir)/../generic-testrunner.sh RegisterClassTest3.swf
-	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) RegisterClassTest3.swf > $@
-	chmod 755 $@
-
-RegisterClassTest4_SOURCES =	\
-	RegisterClassTest4.c	\
-	$(NULL)
-RegisterClassTest4_LDADD = libgnashmingutils.la
-
-RegisterClassTest4.swf: RegisterClassTest4
-	./RegisterClassTest4 $(abs_mediadir)
-
-RegisterClassTest4Runner: $(srcdir)/../generic-testrunner.sh RegisterClassTest4.swf
-	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) RegisterClassTest4.swf > $@
-	chmod 755 $@
-
-init_action_test_SOURCES =	\
-	init_action_test.c	\
-	$(NULL)
-init_action_test_LDADD = libgnashmingutils.la
-
-init_action_test.swf: init_action_test
-	./init_action_test $(abs_mediadir)
-
-init_action_testrunner: $(srcdir)/../generic-testrunner.sh init_action_test.swf
-	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) init_action_test.swf > $@
-	chmod 755 $@
 
 intervalTest.swf: $(srcdir)/../media/green.swf Dejagnu.swf intervalTest.as 
 	$(MAKESWF) $(MAKESWF_FLAGS) -o $@ Dejagnu.swf $(srcdir)/intervalTest.as
@@ -1709,7 +1637,6 @@ TEST_CASES = \
 	goto_frame_testrunner \
 	consecutive_goto_frame_testrunner \
 	multi_doactions_and_goto_frame_testrunner \
-	registerClassTestRunner \
 	XMLSocketTester \
 	LCTestRunner \
 	DrawingApiTestRunner \
@@ -1740,7 +1667,8 @@ TEST_CASES = \
 
 if MING_VERSION_0_4_3
 TEST_CASES += \
-    EmbeddedSoundTest-Runner \
+	StreamSoundTestRunner \
+	EmbeddedSoundTest-Runner \
 	eventSoundTest1-Runner \
     $(NULL)
 endif
@@ -1774,16 +1702,6 @@ endif
 if ENABLE_RTMPY_TESTING
 TEST_CASES += rtmpytest-runner
 endif
-endif
-
-if MING_SUPPORTS_INIT_ACTIONS
-TEST_CASES += \
-	registerClassTest2runner \
-	init_action_testrunner \
-	InitActionTest2Runner \
-	RegisterClassTest3Runner \
-	RegisterClassTest4Runner \
-	$(NULL)
 endif
 
 if MING_SUPPORTS_REPLACE_TAG

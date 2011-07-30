@@ -59,6 +59,7 @@ endif
 
 libgnashcore_la_SOURCES = \
 	BitmapMovie.cpp \
+	ConstantPool.cpp \
 	Property.cpp \
 	PropertyList.cpp \
 	SystemClock.cpp \
@@ -156,6 +157,7 @@ noinst_HEADERS = \
 	ManualClock.h \
 	Bitmap.h \
 	BitmapMovie.h \
+	ConstantPool.h \
 	Transform.h \
 	Button.h \
 	TextField.h \

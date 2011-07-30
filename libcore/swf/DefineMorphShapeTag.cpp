@@ -95,6 +95,9 @@ DefineMorphShapeTag::read(SWFStream& in, TagType tag, movie_definition& md,
         const SWFRect innerBound1 = readRect(in);
         const SWFRect innerBound2 = readRect(in);
 
+        UNUSED(innerBound1);
+        UNUSED(innerBound2);
+
         // This should be used -- first 6 bits reserved, then
         // 'non-scaling' stroke, then 'scaling' stroke -- these can be
         // used to optimize morphing.

@@ -20,15 +20,16 @@ EXTRA_DIST = \
 	Bitstream-Vera-Sans.fdb \
 	Bitstream-Vera-Sans.COPYRIGHT \
 	gnash.xml \
-	offspring.swf \
-	offspring.jpg \
+	blue.swf \
+	blue.jpg \
 	green.jpg \
 	green.swf \
-	lynch.swf \
-	lynch.jpg \
+	red.swf \
+	red.jpg \
 	sound1.wav \
 	sound1.mp3 \
 	mono44.mp2 \
+	click.mp3 \
 	stereo8.mp3 \
 	square.flv \
 	square.ogg \

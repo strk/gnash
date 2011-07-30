@@ -23,20 +23,18 @@
 #include "gnashconfig.h"
 #endif
 
-#include "dsodefs.h" // for DSOEXPORT
-#include "MediaHandler.h" // for inlined ctor
-#include "SoundEnvelope.h" // for SoundEnvelopes typedef
-#include "AuxStream.h" // for aux_stramer_ptr typedef
-#include "WAVWriter.h" // for dtor visibility 
-
 #include <string>
 #include <vector>
 #include <memory>
-#include <cassert>
-#include <cstring>
 #include <limits>
-#include <set> // for composition
+#include <set>
 #include <boost/scoped_ptr.hpp>
+
+#include "dsodefs.h" // for DSOEXPORT
+#include "MediaHandler.h" // for inlined ctor
+#include "SoundEnvelope.h" // for SoundEnvelopes typedef
+#include "AuxStream.h" // for aux_streamer_ptr typedef
+#include "WAVWriter.h" // for dtor visibility 
 
 namespace gnash {
     namespace media {
@@ -44,6 +42,8 @@ namespace gnash {
     }
     namespace sound {
         class EmbedSound;
+        class StreamingSound;
+        class StreamingSoundData;
         class InputStream;
     }
     class SimpleBuffer;
@@ -77,9 +77,18 @@ namespace sound {
 ///
 /// @todo rename to gnash::sound::Mixer ?
 ///
+/// The sound_handler class stores embedded sounds. Embedded sounds can be
+/// either streaming sounds (embedded in many StreamSoundBlock tags through
+/// the SWF) or event sounds (defined in a single DefineSoundTag).
+//
+/// The interface is partly divided into separate functions for these types
+/// of sound.
+/// TODO: separate the functions fully.
 class DSOEXPORT sound_handler
 {
 public:
+
+    virtual ~sound_handler();
 
     /// Identifier of a streaming sound block
     //
@@ -87,70 +96,48 @@ public:
     ///
     typedef unsigned long StreamBlockId;
 
+    ////////////////////////////////////////////////
+    /// Mixed functions:
+    ////////////////////////////////////////////////
+
+    /// Remove all scheduled request for playback of sound buffer slots
+    //
+    /// This applies both to streaming and event sounds.
+    virtual void stop_all_sounds();
+
+    ////////////////////////////////////////////////
+    /// Event sound functions:
+    ////////////////////////////////////////////////
+    
     /// Create a sound buffer slot, for on-demand playback.
     //
-    /// @param data
-    ///     The data to be stored. For soundstream this is NULL.
-    ///     The data is in encoded format, with format specified
-    ///     with the sinfo parameter, this is to allow on-demand
-    ///     decoding (if the sound is never played, it's never decoded).
-    ///
-    /// @param sinfo
-    ///     A SoundInfo object contained in an auto_ptr, which contains
-    ///     info about samplerate, samplecount, stereo and more.
-    ///     The SoundObject must be not-NULL!
-    ///
-    /// @return the id given by the soundhandler for later identification.
-    ///
-    virtual int create_sound(
-        std::auto_ptr<SimpleBuffer> data,
-        std::auto_ptr<media::SoundInfo> sinfo
-        );
-
-    /// Append data to an existing sound buffer slot.
+    /// @param data         The sound data to be stored. May not be null.
+    ///                     This should be appropriately padded (@see
+    ///                     MediaHandler::getInputPaddingBytes()), or a
+    ///                     reallocation will take place here.
+    /// @param sinfo        A SoundInfo object containing info about
+    ///                     samplerate, samplecount, stereo etc.
+    /// @return             handle for later identification.
+    virtual int create_sound(std::auto_ptr<SimpleBuffer> data,
+            const media::SoundInfo& sinfo);
+        
+    /// Remove scheduled requests to play the specified sound buffer slot
     //
-    ///
-    /// Gnash's parser calls this to fill up soundstreams data.
-    /// TODO: the current code uses memory reallocation to grow the sound,
-    /// which is suboptimal; instead, we should maintain sound sources as a 
-    /// list of buffers, to avoid reallocations.
-    ///
-    /// @param data
-    ///     The sound data to be saved, allocated by new[].
-    ///     Ownership is transferred.
-    ///     TODO: use SimpleBuffer ?
-    ///
-    /// @param dataBytes
-    ///     Size of the data in bytes
-    ///
-    /// @param sampleCount
-    ///     Number of samples in the data
-    ///
-    /// @param streamId
-    ///     The soundhandlers id of the sound we want to add data to
-    ///
-    /// @return an identifier for the new block for use in playSound
-    ///
-    /// @throw SoundException on error
-    ///
-    virtual StreamBlockId addSoundBlock(unsigned char* data,
-                                       unsigned int dataBytes,
-                                       unsigned int sampleCount,
-                                       int streamId);
-
-    /// \brief
-    /// Returns a pointer to the SoundInfo object for the sound
-    /// with the given id.
+    /// Stop all instances of the specified event sound if it's playing.
+    /// (Normally a full-featured sound API would take a
+    /// handle specifying the *instance* of a playing
+    /// sample, but SWF is not expressive that way.)
     //
-    /// The SoundInfo object is still owned by the soundhandler.
-    ///
-    /// @param soundHandle
-    ///     The soundhandlers id of the sound we want some info about.
-    ///
-    /// @return a pointer to the SoundInfo object for the sound with
-    ///         the given id.
-    ///
-    virtual media::SoundInfo* get_sound_info(int soundHandle);
+    /// @param sound_handle     id for the sound to be stopped
+    virtual void stopEventSound(int sound_handle);
+
+    /// Discard the sound data for an embedded event sound
+    //
+    /// Only embedded event sounds are deleted; this happens when the
+    /// associated sound_sample is deleted.
+    //
+    /// @param sound_handle     The id for the event sound to be deleted
+    virtual void delete_sound(int sound_handle);
 
     /// Start playback of an event sound
     //
@@ -182,23 +169,91 @@ public:
     /// @param allowMultiple
     ///     If false, the sound will not be scheduled if there's another
     ///     instance of it already playing.
-    ///
-    ///
-    void startSound(int id, int loops, 
-                   const SoundEnvelopes* env,
-                   bool allowMultiple, unsigned int inPoint=0,
-                   unsigned int outPoint=std::numeric_limits<unsigned int>::max());
+    void startSound(int id, int loops, const SoundEnvelopes* env,
+                   bool allowMultiple, unsigned int inPoint = 0,
+                   unsigned int outPoint = 
+                   std::numeric_limits<unsigned int>::max());
 
     /// Check if an event sound is playing
     //
-    /// @param id
-    ///     Id of the sound buffer slot check for being alive
-    ///
+    /// Note: this should not be used for streaming sounds.
+    //
+    /// @param id   Id of the sound buffer slot check for being alive
     bool isSoundPlaying(int id) const;
+    
+    /// Gets the duration in milliseconds of an event sound.
+    //
+    /// @param sound_handle     The id of the event sound
+    /// @return                 the duration of the sound in milliseconds
+    virtual unsigned int get_duration(int sound_handle) const;
+
+    /// Gets the playhead position in milliseconds of an event sound.
+    //
+    /// @param sound_handle     The id of the event sound
+    /// @return                 The playhead position of the sound in
+    ///                         milliseconds
+    virtual unsigned int tell(int sound_handle) const;
+
+    /// Gets the volume for a given sound buffer slot.
+    //
+    /// Only use for event sounds!
+    ///
+    /// @param sound_handle     The sound to get the volume for.
+    /// @return                 the sound volume level as an integer from
+    ///                         0 to 100, where 0 is off and 100 is full
+    ///                         volume. The default setting is 100.
+    virtual int get_volume(int sound_handle) const;
+
+    ////////////////////////////////////////////////
+    /// Streaming sound functions:
+    ////////////////////////////////////////////////
+
+    virtual int createStreamingSound(const media::SoundInfo& sinfo);
+
+    /// Remove scheduled requests to play the specified sound buffer slot
+    //
+    /// @param sound_handle     The sound_handlers id for the sound to be
+    ///                         stopped.
+    virtual void stopStreamingSound(int handle);
+
+    /// Append data for a streaming sound.
+    ///
+    /// Gnash's parser calls this to fill up soundstreams data.
+    ///
+    /// @param data         The sound data to be stored. May not be null.
+    ///                     This should be appropriately padded (@see
+    ///                     MediaHandler::getInputPaddingBytes()), or a
+    ///                     reallocation will take place here.
+    /// @param sampleCount  Number of samples in the data
+    /// @param seekSamples  Offset of sound to frame data
+    /// @param streamId     The soundhandlers id of the sound we want
+    ///                     to add data to
+    /// @return             a handler for the new block for use in playStream()
+    /// @throw              SoundException on error
+    virtual StreamBlockId addSoundBlock(std::auto_ptr<SimpleBuffer> data,
+               size_t sampleCount, int seekSamples, int streamId);
+
+    /// Returns a SoundInfo object for the sound with the given id.
+    //
+    /// Note: This should only be used for streaming sounds.
+    //
+    /// The SoundInfo object is still owned by the soundhandler.
+    ///
+    /// @param soundHandle  The soundhandlers id of the sound we want some
+    ///                     info about.
+    /// @return             a pointer to the SoundInfo object for the sound
+    ///                     with the given id or 0 if no such sound exists.
+    virtual media::SoundInfo* get_sound_info(int handle) const;
 
     /// Start playback of a streaming sound, if not playing already
     //
-    ///
+    /// TODO: the samples count in the stream sound head (stored in a SoundInfo
+    /// object) should drive the timeline while a stream is playing.
+    //
+    /// TODO: only the number of samples advertised in each stream block should
+    /// be played for mp3 sounds, not the complete data! Currently we don't
+    /// store this value.
+    //
     /// @param streamId
     ///     Id of the sound buffer slot schedule playback of.
     ///     It is assumed to refer to a straming sound
@@ -208,27 +263,16 @@ public:
     ///
     void playStream(int id, StreamBlockId blockId);
 
-    /// Remove all scheduled request for playback of sound buffer slots
-    virtual void    stop_all_sounds();
-
-    /// Gets the volume for a given sound buffer slot.
-    //
-    /// Only used by the AS Sound class
-    ///
-    /// @param sound_handle
-    /// The sound_handlers id for the sound to be deleted
-    ///
-    /// @return the sound volume level as an integer from 0 to 100,
-    ///     where 0 is off and 100 is full volume. The default setting is 100.
-    ///
-    virtual int get_volume(int sound_handle);
+    ////////////////////////////////////////////////
+    /// Sound output functions.
+    ////////////////////////////////////////////////
 
     /// Get the volume to apply to mixed output
     //
     /// @return percent value. 100 is full, 0 is none.
     ///        Can be negative or over 100 too.
     ///
-    int getFinalVolume() { return _volume; }
+    int getFinalVolume() const { return _volume; }
     
     /// Sets the volume for a given sound buffer slot.
     //
@@ -250,28 +294,6 @@ public:
     ///       Can be negative or over 100 too.
     ///
     void setFinalVolume(int v) { _volume=v; }
-        
-    /// Remove scheduled requests to play the specified sound buffer slot
-    //
-    /// Stop the specified sound if it's playing.
-    /// (Normally a full-featured sound API would take a
-    /// handle specifying the *instance* of a playing
-    /// sample, but SWF is not expressive that way.)
-    //
-    /// @param sound_handle
-    /// The sound_handlers id for the sound to be deleted
-    ///
-    virtual void    stop_sound(int sound_handle);
-
-    /// Discard a sound buffer slot
-    //
-    /// @param sound_handle
-    /// The sound_handlers id for the sound to be deleted
-    ///
-    virtual void delete_sound(int sound_handle);
-
-    // Stop and delete all sounds
-    virtual void delete_all_sounds();
 
     /// \brief
     /// Discard all sound inputs (slots and aux streamers)
@@ -354,30 +376,6 @@ public:
     ///
     virtual void unplugInputStream(InputStream* id);
 
-    virtual ~sound_handler();
-    
-    /// \brief
-    /// Gets the duration in milliseconds of an event sound connected
-    /// to an AS Sound obejct.
-    //
-    /// @param sound_handle
-    /// The id of the event sound
-    ///
-    /// @return the duration of the sound in milliseconds
-    ///
-    virtual unsigned int get_duration(int sound_handle);
-
-    /// \brief
-    /// Gets the playhead position in milliseconds of an event sound connected
-    /// to an AS Sound obejct.
-    //
-    /// @param sound_handle
-    /// The id of the event sound
-    ///
-    /// @return the duration of the sound in milliseconds
-    ///
-    virtual unsigned int tell(int sound_handle);
-
     /// Special test-fuction. Reports how many times a sound has been started
     //
     /// @deprecated Use a TestingSoundHanlder !
@@ -440,7 +438,6 @@ public:
     virtual void mix(boost::int16_t* outSamples, boost::int16_t* inSamples,
                 unsigned int nSamples, float volume) = 0;
 
-
     /// Request to dump audio to the given filename
     //
     /// Every call to this function starts recording
@@ -448,8 +445,12 @@ public:
     ///
     void setAudioDump(const std::string& wavefile);
 
-protected:
+    /// Check if a streaming sound is playing.
+    //
+    /// @return true if any streaming sound is playing, false if not.
+    bool streamingSound() const;
 
+protected:
 
     sound_handler(media::MediaHandler* m)
         :
@@ -458,8 +459,6 @@ protected:
         _paused(false),
         _muted(false),
         _volume(100),
-        _sounds(),
-        _inputStreams(),
         _mediaHandler(m)
     {
     }
@@ -476,6 +475,11 @@ protected:
 
     /// Does the mixer have input streams ?
     bool hasInputStreams() const;
+
+    /// Stop and delete all sounds
+    //
+    /// This is used only on reset.
+    virtual void delete_all_sounds();
 
 private:
 
@@ -496,86 +500,35 @@ private:
 
     typedef std::vector<EmbedSound*> Sounds;
 
-    /// Vector containing all sounds.
+    /// Vector containing event sounds.
     //
     /// Elements of the vector are owned by this class
-    ///
     Sounds  _sounds;
+
+    typedef std::vector<StreamingSoundData*> StreamingSounds;
+
+    /// Vector containing streaming sounds.
+    //
+    /// Elements of the vector are owned by this class
+    StreamingSounds _streamingSounds;
 
     /// Stop all instances of an embedded sound
     void stopEmbedSoundInstances(EmbedSound& def);
 
-    typedef std::set< InputStream* > InputStreams;
+    /// Stop all instances of an embedded sound
+    void stopEmbedSoundInstances(StreamingSoundData& def);
+
+    typedef std::set<InputStream*> InputStreams;
 
     /// Sound input streams.
     //
     /// Elements owned by this class.
-    ///
     InputStreams _inputStreams;
 
     media::MediaHandler* _mediaHandler;
 
     /// Unplug any completed input stream
     void unplugCompletedInputStreams();
-
-    /// Schedule playing of a sound buffer slot
-    //
-    /// All scheduled sounds will be played on next output flush.
-    ///
-    /// @param id
-    ///     Id of the sound buffer slot schedule playback of.
-    ///
-    /// @param loops
-    ///     loops == 0 means play the sound once (1 means play it twice, etc)
-    ///
-    /// @param inPoint
-    ///     Offset in output samples this instance should start
-    ///     playing from. These are post-resampling samples (44100 
-    ///     for one second of samples).
-    ///
-    /// @param outPoint
-    ///     Offset in output samples this instance should stop
-    ///     playing at. These are post-resampling samples (44100 
-    ///     for one second of samples).
-    ///
-    /// @param blockId
-    ///     When starting a soundstream from a random frame, this tells which
-    ///     block to start decoding from.
-    ///     If non-zero, the sound will only start when no other instances of
-    ///     it are already playing.
-    ///
-    /// @param env
-    ///     Some eventsounds have some volume control mechanism called
-    ///     envelopes.
-    ///     They basically tells that from sample X the volume should be Y.
-    ///
-    /// @param allowMultiple
-    ///     If false, the sound will not be scheduled if there's another
-    ///     instance of it already playing.
-    ///
-    void playSound(int id, int loops,
-                   unsigned int inPoint,
-                   unsigned int outPoint,
-                   StreamBlockId blockId, const SoundEnvelopes* env,
-                   bool allowMultiple);
-
-    /// Convert SWF-specified number of samples to output number of samples
-    //
-    /// SWF-specified number of samples are: delaySeek in DEFINESOUND,
-    /// latency in STREAMSOUNDHEAD and seekSamples in STREAMSOUNDBLOCK.
-    /// These refer to samples at the sampleRate of input.
-    ///
-    /// As gnash will resample the sounds to match expected output
-    /// (44100 Hz, stereo 16bit) this function is handy to convert
-    /// for simpler use later.
-    ///
-    /// It is non-static in the event we'll one day allow different
-    /// sound_handler instances to be configured with different output
-    /// sample rate (would need a lot more changes atm but let's keep
-    /// that in mind).
-    ///
-    unsigned int swfToOutSamples(const media::SoundInfo& sinfo,
-                                          unsigned int swfSamples);
 
     boost::scoped_ptr<WAVWriter> _wavWriter;
 

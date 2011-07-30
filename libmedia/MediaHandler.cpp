@@ -87,6 +87,7 @@ MediaHandler::createFlashAudioDecoder(const AudioInfo& info)
     {
         case media::AUDIO_CODEC_ADPCM:
         case media::AUDIO_CODEC_RAW:
+        case media::AUDIO_CODEC_UNCOMPRESSED:
         {
             std::auto_ptr<AudioDecoder> ret(new AudioDecoderSimple(info));
             return ret;
