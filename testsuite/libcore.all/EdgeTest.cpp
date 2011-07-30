@@ -20,15 +20,17 @@
 #include "gnashconfig.h"
 #endif
 
-#include "Geometry.h" // for edge
-#include <iostream>
+#include <ostream>
 #include <sstream>
 #include <cassert>
+#include <cmath>
+#include <algorithm>
 
+#include "Geometry.h" // for edge
 #include "check.h"
 
-using namespace std;
-using namespace gnash;
+using gnash::Edge;
+using gnash::point;
 
 // for double comparison
 struct D {
@@ -45,7 +47,7 @@ struct D {
 	bool operator==(const D& d)
 	{
 		double tol = std::min(_t, d._t);
-		double delta = fabs(_d - d._d);
+		double delta = std::abs(_d - d._d);
 		bool ret = delta < tol;
 		//cout << "D " << _d << "operator==(const D " << d._d <<") returning " << ret << " (delta is " << delta << ") " << endl;
 		return ret;
@@ -87,8 +89,8 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(Edge::pointOnCurve(A, C, B, 0), A);
 	check_equals(Edge::pointOnCurve(A, C, B, 1), B);
 	check_equals(Edge::pointOnCurve(A, C, B, 0.5), point(17.5, 12.5));
-	check_equals(sqrt((float)Edge::squareDistancePtCurve(A, C, B, B, 1)), 0);
-	check_equals(sqrt((float)Edge::squareDistancePtCurve(A, C, B, A, 0)), 0);
+	check_equals(std::sqrt((float)Edge::squareDistancePtCurve(A, C, B, B, 1)), 0);
+	check_equals(std::sqrt((float)Edge::squareDistancePtCurve(A, C, B, A, 0)), 0);
 
 	//
 	// A----B---C
@@ -99,7 +101,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(Edge::pointOnCurve(A, C, B, 0), A);
 	check_equals(Edge::pointOnCurve(A, C, B, 1), B);
 	check_equals(Edge::pointOnCurve(A, C, B, 0.5), point(27.5, 10));
-	check_equals(sqrt((float)Edge::squareDistancePtCurve(A, C, B, B, 1)), 0);
-	check_equals(sqrt((float)Edge::squareDistancePtCurve(A, C, B, A, 0)), 0);
+	check_equals(std::sqrt((float)Edge::squareDistancePtCurve(A, C, B, B, 1)), 0);
+	check_equals(std::sqrt((float)Edge::squareDistancePtCurve(A, C, B, A, 0)), 0);
 }
 

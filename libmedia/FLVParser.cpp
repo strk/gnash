@@ -566,13 +566,14 @@ void
 FLVParser::fetchMetaTags(OrderedMetaTags& tags, boost::uint64_t ts)
 {
 	boost::mutex::scoped_lock lock(_metaTagsMutex);
-	if (!_metaTags.empty())
-	{
+	if (!_metaTags.empty()) {
         MetaTags::iterator it = _metaTags.upper_bound(ts);
+
+        // Copy the first value into the return container.
         std::transform(_metaTags.begin(), it, std::back_inserter(tags),
-                SecondElement<MetaTags::value_type>());
+                boost::bind(&MetaTags::value_type::second, _1));
+
         _metaTags.erase(_metaTags.begin(), it);
-       
 	}
 }
 

@@ -20,6 +20,10 @@
 #include "MovieClip_as.h"
 
 #include <boost/lexical_cast.hpp>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <algorithm>
 
 #include "MovieClip.h"
 #include "Movie.h"
@@ -47,7 +51,6 @@ namespace {
 
     void attachMovieClipAS2Interface(as_object& o);
 
-    as_value movieclip_as2_ctor(const fn_call& fn);
     as_value movieclip_transform(const fn_call& fn);
     as_value movieclip_scale9Grid(const fn_call& fn);
     as_value movieclip_attachVideo(const fn_call& fn);
@@ -114,7 +117,7 @@ movieclip_class_init(as_object& where, const ObjectURI& uri)
     Global_as& gl = getGlobal(where);
     as_object* proto = createObject(gl);
 
-    as_object* cl = gl.createClass(&movieclip_as2_ctor, proto);
+    as_object* cl = gl.createClass(emptyFunction, proto);
     attachMovieClipAS2Interface(*proto);
 
     where.init_member(uri, cl, as_object::DefaultFlags);
@@ -779,7 +782,8 @@ movieclip_gotoAndPlay(const fn_call& fn)
     return as_value();
 }
 
-as_value movieclip_gotoAndStop(const fn_call& fn)
+as_value
+movieclip_gotoAndStop(const fn_call& fn)
 {
     MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
@@ -808,7 +812,8 @@ as_value movieclip_gotoAndStop(const fn_call& fn)
     return as_value();
 }
 
-as_value movieclip_nextFrame(const fn_call& fn)
+as_value
+movieclip_nextFrame(const fn_call& fn)
 {
     MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
@@ -1876,64 +1881,64 @@ movieclip_beginGradientFill(const fn_call& fn)
 
 // startDrag([lockCenter:Boolean], [left:Number], [top:Number],
 //    [right:Number], [bottom:Number]) : Void`
+//
+//    This can also be applied to other DisplayObjects such as TextFields.
 as_value
 movieclip_startDrag(const fn_call& fn)
 {
-    MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
-
-    DragState st(movieclip);
+    DisplayObject* o = ensure<IsDisplayObject<> >(fn);
 
     // mark this DisplayObject is transformed.
-    movieclip->transformedByScript();
+    o->transformedByScript();
 
-    if (fn.nargs) {
-        st.setLockCentered(toBool(fn.arg(0), getVM(fn)));
+    const bool lock = fn.nargs ? toBool(fn.arg(0), getVM(fn)) : false;
 
-        if (fn.nargs > 4) {
-            double x0 = toNumber(fn.arg(1), getVM(fn));
-            double y0 = toNumber(fn.arg(2), getVM(fn));
-            double x1 = toNumber(fn.arg(3), getVM(fn));
-            double y1 = toNumber(fn.arg(4), getVM(fn));
+    DragState st(o, lock);
 
-            // check for infinite values
-            bool gotinf = false;
-            if (!isFinite(x0)) { x0=0; gotinf=true; }
-            if (!isFinite(y0)) { y0=0; gotinf=true; }
-            if (!isFinite(x1)) { x1=0; gotinf=true; }
-            if (!isFinite(y1)) { y1=0; gotinf=true; }
+    if (fn.nargs > 4) {
+        double x0 = toNumber(fn.arg(1), getVM(fn));
+        double y0 = toNumber(fn.arg(2), getVM(fn));
+        double x1 = toNumber(fn.arg(3), getVM(fn));
+        double y1 = toNumber(fn.arg(4), getVM(fn));
 
-            // check for swapped values
-            bool swapped = false;
-            if (y1 < y0) {
-                std::swap(y1, y0);
-                swapped = true;
-            }
+        // check for infinite values
+        bool gotinf = false;
+        if (!isFinite(x0)) { x0=0; gotinf=true; }
+        if (!isFinite(y0)) { y0=0; gotinf=true; }
+        if (!isFinite(x1)) { x1=0; gotinf=true; }
+        if (!isFinite(y1)) { y1=0; gotinf=true; }
 
-            if (x1 < x0) {
-                std::swap(x1, x0);
-                swapped = true;
-            }
-
-            IF_VERBOSE_ASCODING_ERRORS(
-                if (gotinf || swapped) {
-                    std::stringstream ss; fn.dump_args(ss);
-                    if (swapped) { 
-                        log_aserror(_("min/max bbox values in "
-                            "MovieClip.startDrag(%s) swapped, fixing"),
-                            ss.str());
-                    }
-                    if (gotinf) {
-                        log_aserror(_("non-finite bbox values in "
-                            "MovieClip.startDrag(%s), took as zero"),
-                            ss.str());
-                    }
-                }
-            );
-
-            SWFRect bounds(pixelsToTwips(x0), pixelsToTwips(y0),
-                    pixelsToTwips(x1), pixelsToTwips(y1));
-            st.setBounds(bounds);
+        // check for swapped values
+        bool swapped = false;
+        if (y1 < y0) {
+            std::swap(y1, y0);
+            swapped = true;
         }
+
+        if (x1 < x0) {
+            std::swap(x1, x0);
+            swapped = true;
+        }
+
+        IF_VERBOSE_ASCODING_ERRORS(
+            if (gotinf || swapped) {
+                std::stringstream ss; fn.dump_args(ss);
+                if (swapped) { 
+                    log_aserror(_("min/max bbox values in "
+                        "MovieClip.startDrag(%s) swapped, fixing"),
+                        ss.str());
+                }
+                if (gotinf) {
+                    log_aserror(_("non-finite bbox values in "
+                        "MovieClip.startDrag(%s), took as zero"),
+                        ss.str());
+                }
+            }
+        );
+
+        SWFRect bounds(pixelsToTwips(x0), pixelsToTwips(y0),
+                pixelsToTwips(x1), pixelsToTwips(y1));
+        st.setBounds(bounds);
     }
 
     getRoot(fn).setDragState(st);
@@ -1945,8 +1950,6 @@ movieclip_startDrag(const fn_call& fn)
 as_value
 movieclip_stopDrag(const fn_call& fn)
 {
-    // Should this be a MovieClip only function? It isn't
-    // necessary.
     getRoot(fn).stop_drag();
     return as_value();
 }
@@ -2029,7 +2032,6 @@ movieclip_lineGradientStyle(const fn_call& fn)
 as_value
 movieclip_attachBitmap(const fn_call& fn)
 {
-
     MovieClip* ptr = ensure<IsDisplayObject<MovieClip> >(fn);
 
     if (fn.nargs < 2) {
@@ -2058,14 +2060,6 @@ movieclip_attachBitmap(const fn_call& fn)
 
     return as_value();
 }
-
-
-as_value
-movieclip_as2_ctor(const fn_call& /*fn*/)
-{
-    return as_value();
-}
-
 
 as_value
 movieclip_transform(const fn_call& fn)

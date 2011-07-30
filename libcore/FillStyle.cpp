@@ -204,7 +204,7 @@ GradientFill::setLerp(const GradientFill& a, const GradientFill& b,
         const GradientRecord& ra = a.record(i);
         const GradientRecord& rb = b.record(i);
         _gradients[i].ratio = frnd(lerp<float>(ra.ratio, rb.ratio, ratio));
-        _gradients[i].color.set_lerp(ra.color, rb.color, ratio);
+        _gradients[i].color = lerp(ra.color, rb.color, ratio);
     }
     _matrix.set_lerp(a.matrix(), b.matrix(), ratio);
 }

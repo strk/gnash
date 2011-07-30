@@ -122,7 +122,7 @@ public:
     static double
     distancePtSeg(const point& pt, const point& A, const point& B)
     {
-        double square = squareDistancePtSeg(pt, A, B);
+        const double square = squareDistancePtSeg(pt, A, B);
         return std::sqrt(square);
     }
 
@@ -131,10 +131,8 @@ public:
     /// @param A The first point
     /// @param C The second point (control point)
     /// @param B The third point (anchor point)
-    /// @param ret The point to write result into
+    /// @return The point.
     /// @param t the step factor between 0 and 1
-    ///
-
     static point
     pointOnCurve(const point& A, const point& C, const point& B, float t)
     {

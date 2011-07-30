@@ -112,6 +112,7 @@ AGG resources
 
 #include <vector>
 #include <cmath>
+#include <math.h> // We use round()!
 #include <climits>
 #include <boost/scoped_array.hpp>
 #include <boost/bind.hpp>
@@ -159,10 +160,6 @@ AGG resources
 
 #include "Renderer_agg_bitmap.h"
 
-#ifndef round
-#  define round(x) rint(x)
-#endif
-
 // Print a debugging warning when rendering of a whole character
 // is skipped 
 //#define GNASH_WARN_WHOLE_CHARACTER_SKIP
@@ -181,6 +178,15 @@ typedef std::vector<agg::path_storage> AggPaths;
 typedef std::vector<geometry::Range2d<int> > ClipBounds;
 typedef boost::ptr_vector<AlphaMask> AlphaMasks;
 typedef std::vector<Path> GnashPaths;
+
+// Note: this is here in case ::round doesn't exist. However, it's not
+// advisable to check using ifdefs (as previously), because ::round is
+// generally a function not a macro!
+template<typename T>
+T round(T t)
+{
+    return ::round(t);
+}
 
 template <class Rasterizer>
 inline void applyClipBox(Rasterizer& ras, const geometry::Range2d<int>& bounds)

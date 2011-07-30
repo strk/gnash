@@ -38,6 +38,7 @@
 #include "Renderer_cairo.h"
 
 #include <cmath>
+#include <math.h> // Non standard rint()
 #include <cairo/cairo.h>
 #include <boost/scoped_array.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -551,6 +552,7 @@ Renderer_cairo::drawVideoFrame(image::GnashImage* baseframe, const Transform& xf
             }
         case QUALITY_MEDIUM:
         case QUALITY_LOW:
+        default:
             filter = CAIRO_FILTER_FAST;
     }
     cairo_pattern_set_filter(pattern, filter);
@@ -654,7 +656,8 @@ Renderer_cairo::begin_display(const rgba& bg_color,
         cairo_matrix_transform_point(&_stage_mat, &x, &y);
         cairo_matrix_transform_point(&_stage_mat, &maxx, &maxy);
 
-        cairo_rectangle(_cr, rint(x), rint(y), rint(maxx - x), rint(maxy - y));
+        cairo_rectangle(_cr, ::rint(x), ::rint(y), ::rint(maxx - x),
+                ::rint(maxy - y));
     }
 
     cairo_clip(_cr);

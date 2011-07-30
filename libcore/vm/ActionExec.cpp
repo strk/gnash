@@ -304,11 +304,12 @@ ActionExec::operator()()
                 if (clock.elapsed() > maxTime) {
                     boost::format fmt = 
                         boost::format(_("Time exceeded (%4% secs) while "
-                            "executing code in %1% between pc %2% and %3%")) %
+                            "executing code in %1% between pc %2% and %3%. "
+                            "Disable scripts?")) %
                             code.getMovieDefinition().get_url() % next_pc %
                             pc % (maxTime/1000);
 
-                    if (getRoot(env).abortOnScriptTimeout(fmt.str())) {
+                    if (getRoot(env).queryInterface(fmt.str())) {
                         throw ActionLimitException(fmt.str());
                     } 
 

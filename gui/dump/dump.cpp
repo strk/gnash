@@ -1,7 +1,7 @@
 // dump.cpp: headless player that dumps a video and audio stream
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010,
-//   2011 Free Software Foundation, Inc
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free Software
+//   Foundation, Inc
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,8 +27,29 @@
 #include "gnashconfig.h"
 #endif
 
-#include "log.h"
+#ifndef RENDERER_AGG
+#error Dump gui requires AGG renderer
+#endif
 
+#include "dump.h"
+
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/lexical_cast.hpp>
+#include <csignal>
+#include <cstdlib>
+
+#ifndef HAVE_UNISTD_H
+#error Dump gui requires unistd.h
+#else
+#include <unistd.h>
+#endif
+
+#include "Renderer_agg.h"
+#include "log.h"
 #include "WallClockTimer.h"
 #include "gui.h"
 #include "rc.h"
@@ -38,51 +59,26 @@
 #include "GnashSleep.h"
 #include "RunResources.h"
 #include "NullSoundHandler.h"
+#include "as_environment.h"
+#include "as_value.h"
 
-#include <iostream>
-#include <string>
-#include <fstream>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/lexical_cast.hpp>
+namespace gnash {
 
-#ifndef RENDERER_AGG
-#error Dump gui requires AGG renderer
-#endif
+// signals need to be able to access...
+std::sig_atomic_t terminate_request = false;  
 
-#ifndef HAVE_UNISTD_H
-#error Dump gui requires unistd.h header (POSIX)
-#endif
-
-#ifndef HAVE_SYS_TIME_H
-#error Dump gui requires sys/time.h header (POSIX)
-#endif
-
-// Only include signal handlers on OS' that support it
-#ifdef HAVE_SIGNAL_H
-#include <signal.h>
-#endif
-
-#include "dump.h"
-#include "Renderer_agg.h"
-
-namespace gnash 
-{
-
-bool _terminate_request = false;  // signals need to be able to access...
-
-#ifdef HAVE_SIGNAL_H
 // Called on CTRL-C and alike
-void terminate_signal(int /*signo*/) {
-    _terminate_request = true;
-    signal(SIGINT, SIG_DFL);
-    signal(SIGTERM, SIG_DFL);
+void terminate_signal(int /*signo*/)
+{
+    terminate_request = true;
+    std::signal(SIGINT, SIG_DFL);
+    std::signal(SIGTERM, SIG_DFL);
 }
-#endif
 
 // TODO:  Let user decide bits-per-pixel
 // TODO:  let user decide colorspace (see also _bpp above!)
-DumpGui::DumpGui(unsigned long xid, float scale, bool loop, RunResources& r) :
+DumpGui::DumpGui(unsigned long xid, float scale, bool loop, RunResources& r)
+    :
     Gui(xid, scale, loop, r),
     _agg_renderer(0),
     _offscreenbuf(NULL),
@@ -95,7 +91,9 @@ DumpGui::DumpGui(unsigned long xid, float scale, bool loop, RunResources& r) :
     _fileOutput(),
     _fileOutputFPS(0), // dump at every heart-beat by default
     _lastVideoFrameDump(0), // this will be computed
-    _sleepUS(0)
+    _sleepUS(0),
+    _started(false),
+    _startTime(0)
 {
     if (loop) {
         std::cerr << "# WARNING:  Gnash was told to loop the movie\n";
@@ -113,7 +111,6 @@ DumpGui::~DumpGui()
 bool
 DumpGui::init(int argc, char **argv[])
 {
-
     int origopterr = opterr;
 
     if (_xid) {
@@ -123,7 +120,7 @@ DumpGui::init(int argc, char **argv[])
     optind = 0;
     opterr = 0;
     char c;
-    while ((c = getopt (argc, *argv, "D:S:")) != -1) {
+    while ((c = getopt(argc, *argv, "D:S:T:")) != -1) {
         if (c == 'D') {
             // Terminate if no filename is given.
             if (!optarg) {
@@ -145,20 +142,31 @@ DumpGui::init(int argc, char **argv[])
             if (!optarg) {
                 std::cout << 
                     _("# FATAL:  No sleep ms value given with -S argument.") <<
-                    std::endl;      
+                    std::endl;
                 return false;
             }      
-            _sleepUS = atoi(optarg)*1000; // we take milliseconds
+            // we take milliseconds
+            _sleepUS = std::atoi(optarg) * 1000;
+        }
+        else if (c == 'T') {
+            // Terminate if no filename is given.
+            if (!optarg) {
+                std::cerr << 
+                    _("# FATAL:  No trigger value given with -T argument.\n");
+                return false;
+            }      
+            // we take milliseconds
+            _startTrigger = optarg;
         }
     }
     opterr = origopterr;
 
-#ifdef HAVE_SIGNAL_H
-    signal(SIGINT, terminate_signal);
-    signal(SIGTERM, terminate_signal);
-#endif
+    std::signal(SIGINT, terminate_signal);
+    std::signal(SIGTERM, terminate_signal);
 
     init_dumpfile();
+
+    if (_startTrigger.empty()) _started = true;
 
     _renderer.reset(create_Renderer_agg(_pixelformat.c_str()));
     _runResources.setRenderer(_renderer);
@@ -183,7 +191,6 @@ DumpGui::run()
         _fileOutputAdvance = _interval;
         _fileOutputFPS = static_cast<int>(1000/_fileOutputAdvance);
     }
-    
 
     log_debug("DumpGui entering main loop with interval of %d ms", _interval);
 
@@ -193,39 +200,63 @@ DumpGui::run()
     //
     unsigned int clockAdvance = _interval;
 
-    VirtualClock& timer = getClock();
-
     const bool doDisplay = _fileStream.is_open();
 
-    _terminate_request = false;
-    while (!_terminate_request) {
+    terminate_request = false;
 
-        _manualClock.advance(clockAdvance); 
+    _startTime = _clock.elapsed();
+
+    while (!terminate_request) {
+
+        _clock.advance(clockAdvance); 
 
         // advance movie now
         advanceMovie(doDisplay);
 
-        writeSamples();
+        if (_started) {
 
-        // Dump a video frame if it's time for it or no frame
-        // was dumped yet
-        size_t elapsed = timer.elapsed();
-        if ( ! _framecount ||
-                elapsed - _lastVideoFrameDump >= _fileOutputAdvance )
-        {
-            writeFrame();
+            writeSamples();
+
+            // Dump a video frame if it's time for it or no frame
+            // was dumped yet
+            size_t elapsed = _clock.elapsed();
+            if (!_framecount || 
+                    (elapsed - _lastVideoFrameDump) >= _fileOutputAdvance) {
+                writeFrame();
+            }
+
+            // check if we've reached a timeout
+            if (_timeout && _clock.elapsed() >= _timeout) {
+                break;
+            }
         }
 
-        // check if we've reached a timeout
-        if (_timeout && timer.elapsed() >= _timeout ) {
-            break;
+        if (_sleepUS) gnashSleep(_sleepUS);
+
+        if (!_started && !_startTrigger.empty()) {
+
+            // Check whether to start
+            std::string path;
+            std::string var;
+            if (parsePath(_startTrigger, path, var)) {
+                movie_root& mr = *getStage();
+                const as_environment& env = mr.getRootMovie().get_environment();
+                as_object* o = findObject(env, path);
+                if (o) {
+                    as_value val;
+                    o->get_member(getURI(mr.getVM(), "_ready"), &val);
+                    if (val.equals(true, 8)) {
+                        log_debug("Starting dump");
+                        _started = true;
+                        _startTime = _clock.elapsed();
+                        _lastVideoFrameDump = _startTime;
+                    }
+                }
+            }
         }
-
-        if ( _sleepUS ) gnashSleep(_sleepUS);
-
     }
 
-    boost::uint32_t total_time = timer.elapsed();
+    const boost::uint32_t total_time = _clock.elapsed() - _startTime;
 
     std::cout << "TIME=" << total_time << std::endl;
     std::cout << "FPS_ACTUAL=" << _fileOutputFPS << std::endl;
@@ -252,10 +283,9 @@ DumpGui::setInterval(unsigned int interval)
 bool
 DumpGui::createWindow(int width, int height) 
 {
-
     _width = width;
     _height = height;
-    _validbounds.setTo(0, 0, _width-1, _height-1);
+    _validbounds.setTo(0, 0, _width - 1, _height - 1);
     setRenderHandlerSize(_width, _height);
     return true;
 }
@@ -263,41 +293,38 @@ DumpGui::createWindow(int width, int height)
 void
 DumpGui::writeFrame()
 {
-    if (! _fileStream.is_open() ) return;
+    if (!_fileStream.is_open()) return;
 
     _fileStream.write(reinterpret_cast<char*>(_offscreenbuf.get()),
             _offscreenbuf_size);
 
-    _lastVideoFrameDump = getClock().elapsed();
+    _lastVideoFrameDump = _clock.elapsed();
     ++_framecount;
 }
 
 void
 DumpGui::writeSamples()
 {
-    VirtualClock& timer = getClock();
     sound::sound_handler* sh = _runResources.soundHandler();
 
-    unsigned int ms = timer.elapsed();
+    unsigned int ms = _clock.elapsed() - _startTime;
 
     // We need to fetch as many samples
     // as needed for a theoretical 44100hz loop.
     // That is 44100 samples each second.
     // 44100/1000 = x/ms
     //  x = (44100*ms) / 1000
-    unsigned int nSamples = (441*ms) / 10;
+    const unsigned int nSamples = (441 * ms) / 10;
 
     // We double because sound_handler interface takes
     // "mono" samples... (eh.. would be wise to change)
-    unsigned int toFetch = nSamples*2;
+    unsigned int toFetch = nSamples * 2;
 
     // Now substract what we fetched already
     toFetch -= _samplesFetched;
 
     // And update _samplesFetched..
     _samplesFetched += toFetch;
-
-    //log_debug("DumpGui::writeSamples(%d) fetching %d samples", ms, toFetch);
 
     boost::int16_t samples[1024];
     while (toFetch) {
@@ -323,19 +350,18 @@ DumpGui::init_dumpfile()
     
     if (!_fileStream) {
         log_error(_("Unable to write file '%s'."), _fileOutput);
-        std::cerr << "# FATAL:  Unable to write file '" << _fileOutput << "'" << std::endl;
-        exit(EXIT_FAILURE);
+        std::cerr << "# FATAL:  Unable to write file '" << _fileOutput
+            << "'" << std::endl;
+        std::exit(EXIT_FAILURE);
     }
 
     // Yes, this should go to cout.  The user needs to know this
     // information in order to process the file.  Print out in a
     // format that is easy to source into shell.
     std::cout << 
-        "# Gnash created a raw dump file with the following properties:" << std::endl <<
-        "COLORSPACE=" << _pixelformat << std::endl <<
-        "NAME=" << _fileOutput  << 
-        std::endl;
-    
+        "# Gnash created a raw dump file with the following properties:\n" <<
+        "COLORSPACE=" << _pixelformat << "\n" <<
+        "NAME=" << _fileOutput << "\n";
 }
 
 void
@@ -348,24 +374,24 @@ DumpGui::setRenderHandlerSize(int width, int height)
     if (_offscreenbuf.get() && (width == _width) && (height == _height)) {
         return;
     }
-	   
+
     _width = width;
     _height = height;
-    std::cout << "WIDTH=" << _width  << std::endl <<
+
+    std::cout << "WIDTH=" << _width  << "\n" <<
         "HEIGHT=" << _height  << std::endl;
 
-    int row_size = width*((_bpp+7)/8);
-    int newBufferSize = row_size * height;
-  	
+    const int row_size = width * ((_bpp+7)/8);
+    const int newBufferSize = row_size * height;
+
     // Reallocate the buffer when it shrinks or grows.
     if (newBufferSize != _offscreenbuf_size) {
-
         try {
-              _offscreenbuf.reset(new unsigned char[newBufferSize]);
-              log_debug("DUMP-AGG: %i bytes offscreen buffer allocated", newBufferSize);
+            _offscreenbuf.reset(new unsigned char[newBufferSize]);
+            log_debug("DUMP-AGG: %i bytes offscreen buffer allocated",
+                    newBufferSize);
         }
-        catch (std::bad_alloc &e)
-        {
+        catch (const std::bad_alloc& e) {
             log_error("Could not allocate %i bytes for offscreen buffer: %s",
                   newBufferSize, e.what());
                   
@@ -378,12 +404,8 @@ DumpGui::setRenderHandlerSize(int width, int height)
 
     }
 
-    _agg_renderer->init_buffer(_offscreenbuf.get(),
-         _offscreenbuf_size,
-         _width,
-         _height,
-         row_size
-         );
+    _agg_renderer->init_buffer(_offscreenbuf.get(), _offscreenbuf_size, _width,
+         _height, row_size);
 }
 
 void 
@@ -394,7 +416,7 @@ DumpGui::beforeRendering()
 void
 DumpGui::quitUI()
 {
-    _terminate_request = true;
+    terminate_request = true;
 }
 
 } // end of namespace gnash

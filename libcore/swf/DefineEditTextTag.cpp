@@ -190,6 +190,7 @@ DefineEditTextTag::DefineEditTextTag(SWFStream& in, movie_definition& m,
 	_useOutlines(false),
 	_fontID(-1),
 	_textHeight(240),
+    _color(0, 0, 0, 255),
 	_maxChars(0),
 	_alignment(TextField::ALIGN_LEFT),
 	_leftMargin(0),
@@ -197,8 +198,6 @@ DefineEditTextTag::DefineEditTextTag(SWFStream& in, movie_definition& m,
 	_indent(0),
 	_leading(0)
 {
-	_color.set(0, 0, 0, 255);
-    
     // Parse the tag from the stream.
     read(in, m);
 }

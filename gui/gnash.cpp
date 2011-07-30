@@ -470,6 +470,8 @@ getSupportedOptions(gnash::Player& p)
         _("Video dump file (raw format) and optional video FPS (@<num>)"))
     (",S", po::value<string>(),
         _("Number of milliseconds to sleep between advances"))
+    (",T", po::value<string>(),
+        _("Trigger expression to start dumping"))
     ;
 
     desc.add(dumpOpts);

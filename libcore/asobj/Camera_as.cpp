@@ -38,8 +38,6 @@
 namespace gnash {
 
 namespace {
-
-    as_value camera_new(const fn_call& fn);
     as_value camera_get(const fn_call& fn);
     as_value camera_setmode(const fn_call& fn);
     as_value camera_setmotionlevel(const fn_call& fn);
@@ -69,7 +67,7 @@ namespace {
 void
 camera_class_init(as_object& where, const ObjectURI& uri)
 {
-    registerBuiltinClass(where, camera_new, attachCameraInterface,
+    registerBuiltinClass(where, emptyFunction, attachCameraInterface,
                          attachCameraStaticInterface, uri);
 }
 
@@ -561,12 +559,6 @@ camera_quality(const fn_call& fn)
         log_aserror(_("Attempt to set quality property of Camera"));
     );
 
-    return as_value();
-}
-
-as_value
-camera_new(const fn_call& /*fn*/)
-{
     return as_value();
 }
 

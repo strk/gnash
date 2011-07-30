@@ -254,6 +254,12 @@ getClassConstructor(const fn_call& fn, const std::string& s)
     return ctor.to_function();
 }
 
+inline as_value
+emptyFunction(const fn_call&)
+{
+    return as_value();
+}
+
 } // namespace gnash
 
 #endif 

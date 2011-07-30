@@ -176,7 +176,6 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
     if (info.type == CODEC_TYPE_CUSTOM)
     {
         codec_id = static_cast<CodecID>(info.codec);
-        _needsParsing=true; // @todo check this !
     }
     else if (info.type == CODEC_TYPE_FLASH)
     {
@@ -198,12 +197,10 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 
             case AUDIO_CODEC_MP3:
                 codec_id = CODEC_ID_MP3;
-                _needsParsing=true;
                 break;
 
             case AUDIO_CODEC_AAC:
                 codec_id = CODEC_ID_AAC;
-                _needsParsing=true;
                 break;
 
 #ifdef FFMPEG_NELLYMOSER
@@ -212,7 +209,6 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
             //       I'd like to take a look at the testcase --strk
             case AUDIO_CODEC_NELLYMOSER:
                 codec_id = CODEC_ID_NELLYMOSER;
-                // needs parsing ?
                 break;
 #endif
 
@@ -249,31 +245,8 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
         }
     }
 
-    // Init the parser
-    if (_needsParsing)
-    {
-#ifdef GNASH_DEBUG_AUDIO_DECODING
-        log_debug("  Initializing ffmpeg parser");
-#endif // GNASH_DEBUG_AUDIO_DECODING
-        _parser = av_parser_init(codec_id);
-        if (!_parser) {
-            boost::format err;
-            if (info.type == CODEC_TYPE_FLASH) {
-                err = boost::format(
-                    _("AudioDecoderFfmpeg: could not initialize a parser for "
-                        "flash codec id %d (%s)")) %
-                        info.codec % (audioCodecType)info.codec;
-            } else {
-                err = boost::format(
-                    _("AudioDecoderFfmpeg: could not initialize a parser "
-                        "for ffmpeg codec id %s")) % codec_id;
-            }
-            throw MediaException(err.str());
-        }
-#ifdef GNASH_DEBUG_AUDIO_DECODING
-        log_debug("  Ffmpeg parser initialized");
-#endif // GNASH_DEBUG_AUDIO_DECODING
-    }
+    _parser = av_parser_init(codec_id);
+    _needsParsing = (_parser != NULL);
 
     // Create an audioCodecCtx from the ffmpeg parser if exists/possible
     _audioCodecCtx = avcodec_alloc_context();
@@ -298,7 +271,6 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
     }
 
     // Setup known configurations for the audio codec context
-    // (should this be done only if ! _needsParsing?)
     // NOTE: this is done before calling avcodec_open, as that might update
     //       some of the variables
     switch (codec_id)
@@ -345,30 +317,9 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 boost::uint8_t*
 AudioDecoderFfmpeg::decode(const boost::uint8_t* input,
         boost::uint32_t inputSize, boost::uint32_t&
-        outputSize, boost::uint32_t& decodedBytes,
-        bool parse)
+        outputSize, boost::uint32_t& decodedBytes)
 {
     //GNASH_REPORT_FUNCTION;
-
-    if ( ! parse )
-    {
-        if ( _needsParsing )
-        {
-            log_error("AudioDecoderFfmpeg::decode called with 'parse' "
-                "parameter off but we know we need parsing for this codec");
-        }
-    }
-    else
-    {
-        if ( !_needsParsing )
-        {
-            assert(!_parser); // so we can directly return here...
-            log_debug("AudioDecoderFfmpeg::decode called with 'parse' "
-                "parameter on but we know we don't need parsing for "
-                "this codec");
-            parse = false; // let's believe in us !
-        }
-    }
 
     size_t retCapacity = AVCODEC_MAX_AUDIO_FRAME_SIZE;
     boost::uint8_t* retBuf = new boost::uint8_t[retCapacity];

@@ -509,7 +509,8 @@ MovieClip::MovieClip(as_object* object, const movie_definition* def,
     _hasLooped(false),
     _flushedOrphanedTags(false),
     _callingFrameActions(false),
-    _lockroot(false)
+    _lockroot(false),
+    _onLoadCalled(false)
 {
     assert(_swf);
     assert(object);
@@ -847,6 +848,18 @@ MovieClip::unloadMovie()
     LOG_ONCE(log_unimpl("MovieClip.unloadMovie()"));
 }
 
+void
+MovieClip::queueLoad()
+{
+    if ( ! _onLoadCalled ) {
+        _onLoadCalled = true;
+        // We don't call onLoad for _root up to SWF5
+        if ( ! parent() && getSWFVersion(*getObject(this)) < 6 ) return;
+        queueEvent(event_id(event_id::LOAD),
+                    movie_root::PRIORITY_DOACTION);
+    }
+}
+
 // child movieclip advance
 void
 MovieClip::advance()
@@ -881,6 +894,8 @@ MovieClip::advance()
         getTarget(), _currentFrame+1,
         frame_count);
 #endif
+
+    queueLoad();
 
     // I'm not sure ENTERFRAME goes in a different queue then DOACTION...
     queueEvent(event_id(event_id::ENTER_FRAME), movie_root::PRIORITY_DOACTION);
@@ -1369,6 +1384,8 @@ MovieClip::increment_frame_and_check_for_loop()
         // Loop.
         _currentFrame = 0;
         _hasLooped = true;
+        // Make sure the streaming sound can start again.
+        stopStreamSound();
     }
 }
 
@@ -1557,12 +1574,6 @@ MovieClip::mouseEnabled() const
 }
 
 void
-MovieClip::stop_drag()
-{
-    stage().stop_drag();
-}
-
-void
 MovieClip::set_background_color(const rgba& color)
 {
     stage().set_background_color(color);
@@ -1714,31 +1725,18 @@ MovieClip::construct(as_object* initObj)
     //
     // DLIST tags are executed immediately while ACTION tags are queued.
     //
-    // For _root movie, LOAD event is invoked *after* actions in first frame
-    // See misc-ming.all/action_execution_order_test4.{c,swf}
+    // For clips w/out event handlers, LOAD event is invoked *after*
+    // actions in first frame
+    // See misc-ming.all/action_order/action_execution_order_test4.{c,swf}
     //
     assert(!_callingFrameActions); // or will not be queuing actions
-    if (!parent()) {
 
-        executeFrameTags(0, _displayList, SWF::ControlTag::TAG_DLIST |
-                SWF::ControlTag::TAG_ACTION);
-
-        if (getSWFVersion(*getObject(this)) > 5) {
-            queueEvent(event_id(event_id::LOAD),
-                    movie_root::PRIORITY_DOACTION);
-        }
-
-    }
-    else {
-        queueEvent(event_id(event_id::LOAD), movie_root::PRIORITY_DOACTION);
-        executeFrameTags(0, _displayList, SWF::ControlTag::TAG_DLIST |
-                SWF::ControlTag::TAG_ACTION);
+    if ( ! get_event_handlers().empty() ) {
+        queueLoad();
     }
 
-    as_object* mc = getObject(this);
-    
-    // A MovieClip should always have an associated object.
-    assert(mc);
+    executeFrameTags(0, _displayList, SWF::ControlTag::TAG_DLIST |
+            SWF::ControlTag::TAG_ACTION);
 
     // We execute events immediately when the stage-placed DisplayObject 
     // is dynamic, This is becase we assume that this means that 
@@ -1767,6 +1765,12 @@ MovieClip::construct(as_object* initObj)
         // after the display list has been populated, so that _height and
         // _width (which depend on bounds) are correct.
         if (initObj) {
+
+            as_object* mc = getObject(this);
+            
+            // A MovieClip should always have an associated object.
+            assert(mc);
+
             mc->copyProperties(*initObj);
         }
         constructAsScriptObject();
@@ -1781,7 +1785,6 @@ MovieClip::construct(as_object* initObj)
 bool
 MovieClip::unloadChildren()
 {
-
 #ifdef GNASH_DEBUG
     log_debug(_("Unloading movieclip '%s'"), getTargetPath());
 #endif
@@ -1800,8 +1803,18 @@ MovieClip::unloadChildren()
         queueEvent(event_id(event_id::UNLOAD), movie_root::PRIORITY_DOACTION);
     }
 
-    return childHandler;
+    // Check whether our child MovieClips or this MovieCLip have an unload
+    // handler.
+    const bool unloadHandler = 
+        childHandler || hasEventHandler(event_id(event_id::UNLOAD));
 
+    // If there's no unload handler, make sure any queued constructor for
+    // this MovieClip is not executed!
+    if (!unloadHandler) {
+        stage().removeQueuedConstructor(this);
+    }
+
+    return unloadHandler;
 }
 
 void
@@ -1853,7 +1866,6 @@ MovieClip::loadVariables(const std::string& urlstr,
 {
     // Host security check will be will be done by LoadVariablesThread
     // (down by getStream, that is)
-    
     const movie_root& mr = stage();
     URL url(urlstr, mr.runResources().streamProvider().baseURL());
 
@@ -2014,9 +2026,8 @@ MovieClip::markOwnResources() const
     // Mark textfields in the TextFieldIndex
     if (_text_variables.get()) {
         for (TextFieldIndex::const_iterator i=_text_variables->begin(),
-                    e=_text_variables->end();
-                i!=e; ++i)
-        {
+                    e=_text_variables->end(); i!=e; ++i) {
+
             const TextFields& tfs=i->second;
             std::for_each(tfs.begin(), tfs.end(), 
                         boost::mem_fn(&DisplayObject::setReachable));
@@ -2049,18 +2060,15 @@ MovieClip::getAsRoot()
     //                we might as well just return _swf, 
     //                the whole chain from this movieclip to it's
     //                _swf should have the same version...
-    //
-    // TODO2: implement this with iteration rather
-    //                then recursion.
-    //                
-
     DisplayObject* p = parent();
-    if (!p) return this; // no parent, we're the root
+
+    // no parent, we're the root
+    if (!p) return this; 
 
     // If we have a parent, we descend to it unless 
     // our _lockroot is true AND our or the VM's
     // SWF version is > 6
-    int topSWFVersion = stage().getRootMovie().version();
+    const int topSWFVersion = stage().getRootMovie().version();
 
     if (getDefinitionVersion() > 6 || topSWFVersion > 6) {
         if (getLockRoot()) return this;
@@ -2086,10 +2094,14 @@ MovieClip::stopStreamSound()
 {
     if (m_sound_stream_id == -1) return; // nothing to do
 
-    sound::sound_handler* handler = getRunResources(*getObject(this)).soundHandler();
+    sound::sound_handler* handler =
+        getRunResources(*getObject(this)).soundHandler();
+
     if (handler) {
         handler->stopStreamingSound(m_sound_stream_id);
     }
+
+    stage().stopStream(m_sound_stream_id);
 
     m_sound_stream_id = -1;
 }

@@ -72,8 +72,6 @@ StreamingSound::decodeNextBlock()
 {
     assert(!decodingCompleted());
 
-    const bool parse = requiresParsing(_soundDef.soundinfo);
-
     // Get the current block of sound data.
     const SimpleBuffer& block = _soundDef.getBlock(_currentBlock);
 
@@ -81,13 +79,28 @@ StreamingSound::decodeNextBlock()
     // can happen.
     const boost::uint32_t inputSize = block.size() - _positionInBlock; 
 
-    assert(inputSize);
-    const boost::uint8_t* input = block.data() + _positionInBlock;
-
     boost::uint32_t consumed = 0;
-    boost::uint32_t decodedDataSize = 0;
-    boost::uint8_t* decodedData = decoder().decode(input, inputSize,
-            decodedDataSize, consumed, parse);
+
+    // Empty blocks serve to synchronize, so don't decode but carry on.
+    if (inputSize) {
+        boost::uint32_t decodedDataSize = 0;
+        const boost::uint8_t* input = block.data() + _positionInBlock;
+        boost::uint8_t* decodedData = decoder().decode(input, inputSize,
+                decodedDataSize, consumed);
+
+        assert(!(decodedDataSize % 2));
+
+        boost::int16_t* samples = 
+            reinterpret_cast<boost::int16_t*>(decodedData);
+        unsigned int nSamples = decodedDataSize / 2;
+
+        if (_soundDef.volume != 100) {
+            adjustVolume(samples, samples + nSamples, _soundDef.volume/100.0);
+        }
+
+        // decodedData ownership transferred here
+        appendDecodedData(decodedData, decodedDataSize);
+    }
 
     // Check if the entire block was consumed.
     if (consumed == block.size()) {
@@ -97,17 +110,6 @@ StreamingSound::decodeNextBlock()
     }
     else _positionInBlock += consumed;
 
-    assert(!(decodedDataSize % 2));
-
-    boost::int16_t* samples = reinterpret_cast<boost::int16_t*>(decodedData);
-    unsigned int nSamples = decodedDataSize / 2;
-
-    if (_soundDef.volume != 100) {
-        adjustVolume(samples, samples + nSamples, _soundDef.volume/100.0);
-    }
-
-    // decodedData ownership transferred here
-    appendDecodedData(decodedData, decodedDataSize);
 }
 
 bool

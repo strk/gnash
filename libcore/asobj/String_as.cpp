@@ -343,10 +343,12 @@ string_lastIndexOf(const fn_call& fn)
     
     std::string str;
     const int version = getStringVersioned(fn, val, str);
+    const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
 
     if (!checkArgs(fn, 1, 2, "String.lastIndexOf()")) return as_value(-1);
 
-    const std::string& toFind = fn.arg(0).to_string(version);
+    const std::wstring& toFind = utf8::decodeCanonicalString(
+        fn.arg(0).to_string(version), version);
 
     int start = str.size();
 
@@ -358,7 +360,7 @@ string_lastIndexOf(const fn_call& fn)
         return as_value(-1);
     }
 
-    size_t found = str.rfind(toFind, start);
+    size_t found = wstr.rfind(toFind, start);
 
     if (found == std::string::npos) {
         return as_value(-1);

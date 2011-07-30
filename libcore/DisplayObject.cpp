@@ -218,7 +218,6 @@ DisplayObject::set_invalidated(const char* debug_file, int debug_line)
         m_old_invalidated_ranges.setNull();
         add_invalidated_bounds(m_old_invalidated_ranges, true);
     }
-
 }
 
 void
@@ -236,11 +235,10 @@ DisplayObject::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 void
 DisplayObject::set_child_invalidated()
 {
-  if ( ! _child_invalidated ) 
-  {
-    _child_invalidated=true;
-      if ( _parent ) _parent->set_child_invalidated();
-  } 
+    if (!_child_invalidated) {
+        _child_invalidated=true;
+        if (_parent) _parent->set_child_invalidated();
+    } 
 }
 
 void
@@ -449,22 +447,15 @@ DisplayObject::get_event_handler(const event_id& id) const
 bool
 DisplayObject::unload()
 {
-    const bool childHandler = unloadChildren();
+    const bool unloadHandler = unloadChildren();
 
     // Unregister this DisplayObject as mask and/or maskee.
     if (_maskee) _maskee->setMask(0);
     if (_mask) _mask->setMaskee(0);
 
-    const bool hasEvent =
-        hasEventHandler(event_id(event_id::UNLOAD)) || childHandler;
-
-    if (!hasEvent) {
-        stage().removeQueuedConstructor(this);
-    }
-
     _unloaded = true;
 
-    return hasEvent;
+    return unloadHandler;
 }
 
 bool
@@ -723,11 +714,6 @@ DisplayObject::allowHandCursor() const
 {
     as_object* obj = getObject(this);
     if (!obj) return false;
-
-    // Checking for RELEASE breaks ButtonEventsTest.
-    // I guess such an event would influence wheter or not this
-    // character would become an active one, despite hand cursor
-    //if (!hasEventHandler(event_id::RELEASE)) return false;
 
     as_value val;
     if (!obj->get_member(NSV::PROP_USEHANDCURSOR, &val)) {
@@ -1100,7 +1086,6 @@ setHighQuality(DisplayObject& o, const as_value& val)
 void
 setY(DisplayObject& o, const as_value& val)
 {
-
     const double newy = toNumber(val, getVM(*getObject(&o)));
 
     // NaN is skipped, Infinite isn't
@@ -1162,7 +1147,6 @@ getX(DisplayObject& o)
 void
 setScaleX(DisplayObject& o, const as_value& val)
 {
-
     const double scale_percent = toNumber(val, getVM(*getObject(&o)));
 
     // NaN is skipped, Infinite is not, see actionscript.all/setProperty.as
@@ -1189,7 +1173,6 @@ getScaleX(DisplayObject& o)
 void
 setScaleY(DisplayObject& o, const as_value& val)
 {
-
     const double scale_percent = toNumber(val, getVM(*getObject(&o)));
 
     // NaN is skipped, Infinite is not, see actionscript.all/setProperty.as
@@ -1222,7 +1205,6 @@ getVisible(DisplayObject& o)
 void
 setVisible(DisplayObject& o, const as_value& val)
 {
-
     /// We cast to number and rely (mostly) on C++'s automatic
     /// cast to bool, as string "0" should be converted to
     /// its numeric equivalent, not interpreted as 'true', which
@@ -1253,7 +1235,6 @@ getAlpha(DisplayObject& o)
 void
 setAlpha(DisplayObject& o, const as_value& val)
 {
-
     // The new internal alpha value is input / 100.0 * 256.
     // We test for finiteness later, but the multiplication
     // won't make any difference.
@@ -1322,7 +1303,6 @@ getRotation(DisplayObject& o)
 void
 setRotation(DisplayObject& o, const as_value& val)
 {
-
     // input is in degrees
     const double rotation_val = toNumber(val, getVM(*getObject(&o)));
 
@@ -1357,7 +1337,6 @@ getNameProperty(DisplayObject& o)
 {
     string_table& st = getStringTable(*getObject(&o));
     const std::string& name = o.get_name().toString(st);
-    if (getSWFVersion(*getObject(&o)) < 6 && name.empty()) return as_value(); 
     return as_value(name);
 }
 

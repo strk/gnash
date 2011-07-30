@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
     Ming_init();
     mo = newSWFMovieWithVersion(OUTPUT_VERSION);
     SWFMovie_setDimension(mo, 800, 600);
-    SWFMovie_setRate (mo, 12.0);
+    SWFMovie_setRate (mo, 1.0);
 
     add_actions(mo,
             "if (!_global.hasOwnProperty('arr')) { _global.arr = []; };"
@@ -79,12 +79,12 @@ int main(int argc, char* argv[])
     //  MovieClip 2 
     mc2 = newSWFMovieClip(); // 1 frames 
 
-    // Add mc2
+    // Add mc2 to mc3 (first frame)
     it = SWFMovieClip_add(mc3, (SWFBlock)mc2);
     SWFDisplayItem_setDepth(it, 1);
     SWFDisplayItem_setName(it, "Segments");
 
-    // Frame 2
+    // Frame 2 of mc3
     SWFMovieClip_nextFrame(mc3);
 
     // Remove mc2
@@ -156,6 +156,7 @@ int main(int argc, char* argv[])
         "        gotoAndPlay(2);"
         "   }"
         "   else {"
+        "      mc.stop();"
         "      delete this.onEnterFrame;"
         "      gotoAndPlay(4);"
         "   };"
@@ -166,24 +167,24 @@ int main(int argc, char* argv[])
     check_equals(mo, "_global.arr.length", "20");
     check_equals(mo, "_global.arr[0]", "'Frame 2 actions: undefined'");
     check_equals(mo, "_global.arr[1]", "'ctor: 0'");
-    xcheck_equals(mo, "_global.arr[2]", "'Frame 3 actions: 0'");
-    xcheck_equals(mo, "_global.arr[3]", "'dynamic load: 0'");
+    check_equals(mo, "_global.arr[2]", "'Frame 3 actions: 0'");
+    check_equals(mo, "_global.arr[3]", "'dynamic load: 0'");
     check_equals(mo, "_global.arr[4]", "'Frame 2 actions: 0'");
     check_equals(mo, "_global.arr[5]", "'Frame 3 actions: 0'");
     check_equals(mo, "_global.arr[6]", "'Frame 2 actions: 0'");
     check_equals(mo, "_global.arr[7]", "'ctor: 1'");
     check_equals(mo, "_global.arr[8]", "'dynamic unload: 0'");
-    xcheck_equals(mo, "_global.arr[9]", "'Frame 3 actions: 0'");
+    check_equals(mo, "_global.arr[9]", "'Frame 3 actions: 0'");
     check_equals(mo, "_global.arr[11]", "'Frame 2 actions: 0'");
     check_equals(mo, "_global.arr[12]", "'Frame 3 actions: 1'");
     check_equals(mo, "_global.arr[13]", "'Frame 2 actions: 1'");
     check_equals(mo, "_global.arr[14]", "'ctor: 2'");
     check_equals(mo, "_global.arr[15]", "'dynamic unload: 1'");
-    xcheck_equals(mo, "_global.arr[16]", "'Frame 3 actions: 1'");
-    xcheck_equals(mo, "_global.arr[17]", "'dynamic load: 2'");
+    check_equals(mo, "_global.arr[16]", "'Frame 3 actions: 1'");
+    check_equals(mo, "_global.arr[17]", "'dynamic load: 2'");
     check_equals(mo, "_global.arr[18]", "'Frame 2 actions: 1'");
     check_equals(mo, "_global.arr[19]", "'Frame 3 actions: 2'");
-    xcheck_equals(mo, "_global.arr.toString()",
+    check_equals(mo, "_global.arr.toString()",
 		    "'Frame 2 actions: undefined,ctor: 0,Frame 3 actions: 0,dynamic load: 0,Frame 2 actions: 0,Frame 3 actions: 0,Frame 2 actions: 0,ctor: 1,dynamic unload: 0,Frame 3 actions: 0,dynamic load: 1,Frame 2 actions: 0,Frame 3 actions: 1,Frame 2 actions: 1,ctor: 2,dynamic unload: 1,Frame 3 actions: 1,dynamic load: 2,Frame 2 actions: 1,Frame 3 actions: 2'");
 
     SWFMovie_nextFrame(mo);

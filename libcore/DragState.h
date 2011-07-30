@@ -19,6 +19,8 @@
 #ifndef GNASH_DRAG_STATE_H
 #define GNASH_DRAG_STATE_H
 
+#include <boost/optional.hpp>
+
 #include "SWFRect.h"
 #include "DisplayObject.h"
 
@@ -34,21 +36,15 @@ class DragState
 {
 public:
 
-    DragState(DisplayObject* d)
+    DragState(DisplayObject* d, bool lock)
         :
-        _hasbounds(false),
-        _bounds(),
         _displayObject(d),
-        _lock_centered(false)
+        _lock_centered(lock)
     {
     }
 
     bool isLockCentered() const {
         return _lock_centered;
-    }
-
-    void setLockCentered(bool lock) {
-        _lock_centered = lock;
     }
 
     /// Set displacement offset from origin
@@ -64,7 +60,7 @@ public:
     boost::int32_t yOffset() const { return _yoffset; }
 
     bool hasBounds() const {
-        return _hasbounds;
+        return (_bounds);
     }
 
     /// \brief
@@ -78,7 +74,7 @@ public:
     /// the returned rectangle is the NULL
     /// rectangle - see SWFRect::is_null().
     ///
-    const SWFRect& getBounds() const { return _bounds; }
+    const SWFRect& getBounds() const { return *_bounds; }
 
     /// \brief
     /// Set the boundaries to constraint
@@ -89,7 +85,6 @@ public:
     ///
     void setBounds(const SWFRect& bounds) {
         _bounds = bounds;
-        _hasbounds = true;
     }
 
     /// May return NULL !!
@@ -100,8 +95,7 @@ public:
     /// Reset drag state to its initial condition
     void reset() {
         _displayObject = 0;
-        _hasbounds = false;
-        _bounds.set_null();
+        _bounds.reset();
         _lock_centered = false;
     }
 
@@ -112,11 +106,9 @@ public:
 
 private:
 
-    bool _hasbounds;
-
     /// Boundaries to constrain the drag into.
     /// Coordinates in TWIPS.
-    SWFRect _bounds;
+    boost::optional<SWFRect> _bounds;
 
     DisplayObject* _displayObject;
 

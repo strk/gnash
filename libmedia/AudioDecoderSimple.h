@@ -60,7 +60,7 @@ public:
 	~AudioDecoderSimple();
 
     // See dox in AudioDecoder.h
-	boost::uint8_t* decode(const boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool parse);
+	boost::uint8_t* decode(const boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes);
 
 private:
 

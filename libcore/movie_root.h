@@ -78,6 +78,7 @@
 #include <boost/ptr_container/ptr_deque.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/any.hpp>
+#include <boost/optional.hpp>
 
 #include "dsodefs.h" // DSOEXPORT
 #include "MouseButtonState.h" // for composition
@@ -807,13 +808,38 @@ public:
     /// then removed in skipped frames. Callers are responsible for determining
     /// whether it should be removed, for instance by checking for an 
     /// onUnload handler.
-    void removeQueuedConstructor(DisplayObject* target);
+    void removeQueuedConstructor(MovieClip* target);
 
     GC& gc() {
         return _gc;
     }
 
-    bool abortOnScriptTimeout(const std::string& when) const;
+    /// Ask the host interface a question.
+    //
+    /// @param what The question to pose.
+    /// @return     The answer (true for yes, false for no).
+    bool queryInterface(const std::string& what) const;
+
+    /// Set the current stream block for the driving streaming sound.
+    //
+    /// The frame rate will be changed so that it advances only when the
+    /// block for a particular frame is reached. Only one sound can drive the
+    /// frame: the first one to be registered.
+    //
+    /// @param id       The id of the stream; if another stream is already
+    ///                 driving the frame rate, nothing happens.
+    /// @param block    The block of sound currently being played. The current
+    ///                 frame will be advanced or delayed until the frame
+    ///                 corresponding to this block is reached.
+    void setStreamBlock(int id, int block);
+
+    /// Notify the stage that a sound stream has stopped.
+    //
+    /// If it's the one driving the frame rate, the frame rate will return to
+    /// the nominal rate
+    //
+    /// @param id   The id of the streaming sound.
+    void stopStream(int id);
 
 private:
 
@@ -999,7 +1025,7 @@ private:
     DisplayObject* _currentFocus;
 
     /// @todo fold this into m_mouse_button_state?
-    DragState _dragState;
+    boost::optional<DragState> _dragState;
 
     typedef std::map<int, MovieClip*> Levels;
 
@@ -1068,6 +1094,14 @@ private:
     size_t _unnamedInstance;
 
     MovieLoader _movieLoader;
+
+    struct SoundStream {
+        SoundStream(int i, int b) : id(i), block(b) {}
+        int id;
+        int block;
+    };
+
+    boost::optional<SoundStream> _timelineSound;
 };
 
 /// Return true if the given string can be interpreted as a _level name

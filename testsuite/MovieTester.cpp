@@ -54,7 +54,7 @@
 #include <cstdio>
 #include <string>
 #include <memory> // for auto_ptr
-#include <cmath> // for ceil and (possibly) exp2
+#include <cmath> // for ceil
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 
@@ -71,8 +71,18 @@ using std::endl;
 namespace gnash {
 
 namespace {
+    // exp2 isn't part of standard C++, so is defined here in case the compiler
+    // doesn't supply it (e.g. in BSD)
+    inline double exp2(double x) { return std::pow(2.0, x); }
+
     bool getAveragePixel(const Renderer& r, rgba& color_return, int x, int y, 
         unsigned int radius);
+
+    std::string toShortString(const rgba& r) {
+        std::stringstream ss;
+        ss << +r.m_r << "," << +r.m_g << "," << +r.m_b << "," << +r.m_a;
+        return ss.str();
+    }
 }
 
 MovieTester::MovieTester(const std::string& url)
@@ -285,9 +295,7 @@ MovieTester::advance(bool updateClock)
         advanceClock(clockAdvance);
     }
     
-    _movie_root->advance();
-    
-    render();
+    if (_movie_root->advance()) render();
     
 }
     
@@ -355,8 +363,9 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 {
     if ( ! canTestRendering() )	{
 	std::stringstream ss;
-	ss << "exp:" << color.toShortString() << " ";
-	cout << "UNTESTED: NORENDERER: pix:" << x << "," << y << " exp:" << color.toShortString() << " " << label << endl;
+	ss << "exp:" << toShortString(color) << " ";
+	cout << "UNTESTED: NORENDERER: pix:" << x << "," << y << " exp:" <<
+        toShortString(color) << " " << label << endl;
     }
     
     FuzzyPixel exp(color, tolerance);
@@ -389,14 +398,14 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 	unsigned int bpp = handler.getBitsPerPixel();
 	if ( bpp ) {
 	    // UdoG: check_pixel should *always* tolerate at least 2 ^ (8 - bpp/3)
-	    minRendererTolerance = int(ceil(exp2(8 - bpp/3)));
+	    minRendererTolerance = int(std::ceil(exp2(8 - bpp/3)));
 	}
 	
 	//unsigned short tol = std::max(tolerance, minRendererTolerance);
 	unsigned short tol = tolerance*minRendererTolerance; 
 	
-	ss << "exp:" << color.toShortString() << " ";
-	ss << "obt:" << obt_col.toShortString() << " ";
+	ss << "exp:" << toShortString(color) << " ";
+	ss << "obt:" << toShortString(obt_col) << " ";
 	ss << "tol:" << tol;
 	
 	FuzzyPixel obt(obt_col, tol);

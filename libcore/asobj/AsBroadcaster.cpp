@@ -42,7 +42,6 @@ namespace {
     as_value asbroadcaster_removeListener(const fn_call& fn);
     as_value asbroadcaster_broadcastMessage(const fn_call& fn);
     as_value asbroadcaster_initialize(const fn_call& fn);
-    as_value asbroadcaster_ctor(const fn_call& fn);
 }
 
 
@@ -218,7 +217,7 @@ AsBroadcaster::init(as_object& where, const ObjectURI& uri)
 {
     // AsBroadcaster is a class, even though it doesn't look much like one.
     // Its prototype has no properties.
-    registerBuiltinClass(where, asbroadcaster_ctor, 0,
+    registerBuiltinClass(where, emptyFunction, 0,
             attachAsBroadcasterStaticInterface, uri);
 }
 
@@ -428,13 +427,6 @@ asbroadcaster_broadcastMessage(const fn_call& fn)
 
     return as_value(); 
 
-}
-
-// The constructor does nothing at all.
-as_value
-asbroadcaster_ctor(const fn_call& /*fn*/)
-{
-    return as_value();
 }
 
 } // anonymous namespace

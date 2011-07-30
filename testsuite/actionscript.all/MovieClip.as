@@ -115,7 +115,7 @@ check(!MovieClip.prototype.hasOwnProperty("_global"));
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(353); // SWF5
+	check_totals(355); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
@@ -132,14 +132,6 @@ endOfTest = function()
 
 	play();
 };
-
-#if OUTPUT_VERSION < 6
-note("WARNING: it has been reported that adobe flash player version 9 fails a few tests here.");
-note("         We believe those are actually adobe player bugs since older versions ");
-note("         of the player are reported to pass all tests. If you have another idea ");
-note("         we'd be glad to hear from you, just check the testcase source code.");
-note();
-#endif
 
 // Get a reference to a MovieClip
 var mc = _root;
@@ -408,9 +400,10 @@ mc._name = "changed";
 check_equals(typeof(mc._name), "string");
 check_equals(typeof(mc), "movieclip");
 #else
-//WARNING: we have player 9 succeeds on this, and also player 7 fails on this
-// don't know which one to trust.
-xcheck_equals(mc._name, "");
+// Tested with: LNX 10,0,12,10
+//              LNX 9,0,115,0
+//              WIN 10,2,152,26
+check_equals(mc._name, "");
 #endif
 
 check(mc._parent == undefined);
@@ -569,7 +562,10 @@ check(mc3 != undefined);
 check_equals(mc3.getDepth(), 50);
 
 mc3.bd = Button.prototype.getDepth;
-check_equals(mc3.bd(), 50);
+// Tested with: LNX 10,0,12,10
+//              LNX 9,0,115,0
+//              WIN 10,2,152,26
+check_equals(typeof(mc3.bd()), 'undefined');
 
 #if OUTPUT_VERSION > 6 // {
 check_equals(getInstanceAtDepth(50), mc3);
@@ -1220,16 +1216,13 @@ asm {
 #if OUTPUT_VERSION > 5
 check_equals(a, "changed");
 #else
-if ( a == undefined )
-{
-    pass("<empty>._name (trough getProperty(13)) returns undefined ["+__FILE__+":"+__LINE__+"]");
-}
-else
-{
-    // this check fails with Adobe Flash Player 9
-    fail("<empty>._name (trough getProperty(13)) returns "+a+" (expected undefined) ["+__FILE__+":"+__LINE__+"]");
-    note("Some version of Adobe Flash Player 9 are reported to have this bug");
-}
+// Tested with: LNX 10,0,12,10
+//              LNX 9,0,115,0
+//              WIN 10,2,152,26
+//              LNX 9,0,48,0
+//              MAC 9,0,47,0
+check_equals(typeof(a), 'string');
+check_equals(a, '');
 #endif
 
 asm {
@@ -1251,16 +1244,13 @@ asm {
 #if OUTPUT_VERSION > 5
 check_equals(a, "changed");
 #else
-if ( a == undefined )
-{
-    pass("_root._name (trough getProperty(13)) returns undefined ["+__FILE__+":"+__LINE__+"]");
-}
-else
-{
-    // this check fails with Adobe Flash Player 9
-    fail("_root._name (trough getProperty(13)) returns "+a+" (expected undefined) ["+__FILE__+":"+__LINE__+"]");
-    note("Some version of Adobe Flash Player 9 are reported to have this bug");
-}
+// Tested with: LNX 10,0,12,10
+//              LNX 9,0,115,0
+//              WIN 10,2,152,26
+//              LNX 9,0,48,0
+//              MAC 9,0,47,0
+check_equals(typeof(a), 'string');
+check_equals(a, '');
 #endif
 
 asm {

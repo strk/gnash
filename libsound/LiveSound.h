@@ -150,13 +150,6 @@ private:
 
 };
 
-inline bool
-requiresParsing(const media::SoundInfo& info)
-{
-    return info.getFormat() != media::AUDIO_CODEC_ADPCM &&
-        info.getFormat() != media::AUDIO_CODEC_RAW;
-}
-
 
 } // gnash.sound namespace 
 } // namespace gnash

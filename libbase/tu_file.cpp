@@ -247,6 +247,16 @@ makeFileChannel(FILE* fp, bool close)
     return ret;
 }
 
+std::auto_ptr<IOChannel>
+makeFileChannel(const char* filepath, const char* mode)
+{
+	FILE* fp = fopen(filepath, mode);
+	if ( fp == 0 ) { return std::auto_ptr<IOChannel>(0); }
+
+	return makeFileChannel(fp, true);
+}
+
+
 } // end namespace gnash
 
 // Local Variables:

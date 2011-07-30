@@ -32,9 +32,11 @@
 #include <string>
 #include <cassert>
 #include <unistd.h> // for usleep
+#include <math.h>
 
 using namespace gnash;
-using namespace std;
+using std::string;
+using ::round;
 
 int
 main(int /*argc*/, char** /*argv*/)

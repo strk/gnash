@@ -69,6 +69,10 @@ public:
     /// WARNING: must be thread-safe!
     ~StreamingSound();
 
+    size_t currentBlock() const {
+        return _currentBlock;
+    }
+
 private:
 
     /// Called when more data is required.

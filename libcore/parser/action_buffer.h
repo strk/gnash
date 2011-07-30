@@ -21,6 +21,7 @@
 
 #include <string>
 #include <vector> 
+#include <map> 
 #include <boost/noncopyable.hpp>
 #include <boost/cstdint.hpp> 
 

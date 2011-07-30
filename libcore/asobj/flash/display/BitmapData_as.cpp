@@ -27,6 +27,8 @@
 #include <boost/random.hpp>
 #include <boost/iterator/zip_iterator.hpp>
 #include <boost/tuple/tuple.hpp>
+#include <boost/array.hpp>
+#include <cmath>
 
 #include "MovieClip.h"
 #include "GnashImage.h"
@@ -47,6 +49,7 @@
 #include "flash/geom/ColorTransform_as.h"
 #include "NativeFunction.h"
 #include "GnashNumeric.h"
+#include "Array_as.h"
 
 namespace gnash {
 
@@ -87,8 +90,29 @@ namespace {
     void attachBitmapDataStaticProperties(as_object& o);
     as_value get_flash_display_bitmap_data_constructor(const fn_call& fn);
 
+    /// Get an iterator to the pixel at (x, y)
+    //
+    /// Please note: each invocation of this function must check for and
+    /// retrieve the stored bitmap data, so if you need more than one pixel,
+    /// call this once and work out how much you need to move the iterator.
     BitmapData_as::iterator pixelAt(const BitmapData_as& bd, size_t x,
             size_t y);
+
+    /// Set the pixel at (x, y) to the specified ARGB colour.
+    //
+    /// Note: calls pixelAt(), so do not use this more than necessary!
+    void setPixel32(const BitmapData_as& bd, size_t x, size_t y,
+            boost::uint32_t color);
+
+    /// Set the RGB values at (x, y) to the RGB components of a colour.
+    //
+    /// Alpha values of the target pixel are left unchanged.
+    //
+    /// Note: calls pixelAt(), so do not use this more than necessary!
+    void setPixel(const BitmapData_as& bd, size_t x, size_t y,
+            boost::uint32_t color);
+
+    boost::uint32_t getPixel(const BitmapData_as& bd, size_t x, size_t y);
 
     /// Get the overlapping part of a rectangle and a Bitmap
     //
@@ -100,12 +124,28 @@ namespace {
     /// @param y    The y co-ordinate of the top left corner.
     /// @param w    The width of the rectangle.
     /// @param h    The height of the rectangle.
-    void adjustRect(int& x, int& y, int& w, int& h, BitmapData_as& b);
+    void adjustRect(int& x, int& y, int& w, int& h, const BitmapData_as& b);
 
     boost::uint32_t setChannel(boost::uint32_t targ, boost::uint8_t bitmask,
             boost::uint8_t value);
 
     boost::uint8_t getChannel(boost::uint32_t src, boost::uint8_t bitmask);
+
+    void floodFill(const BitmapData_as& bd, size_t startx, size_t starty,
+            boost::uint32_t old, boost::uint32_t fill);
+
+    /// Fill a rectangle of the BitmapData_as
+    //
+    /// Do not call on a disposed BitmapData_as!
+    //
+    /// @param bd       The BitmapData_as to operate on.
+    /// @param x        The x co-ordinate of the rectangle's top left corner.
+    /// @param y        The y co-ordinate of the rectangle's top left corner.
+    /// @param w        The width of the rectangle.
+    /// @param h        The height of the rectangle.
+    /// @param color    The ARGB colour to fill with.
+    void fillRect(const BitmapData_as& bd, int x, int y, int w, int h,
+            boost::uint32_t color);
 
     inline bool oneBitSet(boost::uint8_t mask) {
         return mask == (mask & -mask);
@@ -122,6 +162,11 @@ namespace {
 template<typename RNG = boost::rand48>
 struct Noise
 {
+    /// Create a PRNG to supply uniformly distributed numbers.
+    //
+    /// @param seed     A seed for the pseudo random numbers.
+    /// @param low      The lowest value in the uniform range.
+    /// @param high     The highest value in the uniform range.
     Noise(int seed, int low, int high)
         :
         rng(seed),
@@ -129,8 +174,16 @@ struct Noise
         uni(rng, dist)
     {}
 
+    /// Get a random int between in the range specified at construction.
     int operator()() {
         return uni();
+    }
+
+    /// Get a random int between 0 and val.
+    //
+    /// This is for use by std::random_shuffle().
+    int operator()(int val) {
+        return uni(val);
     }
 
 private:
@@ -149,6 +202,7 @@ struct NoiseAdapter
         _greyscale(grey)
     {}
 
+    /// Generate a 32-bit ARGB noise value.
     boost::uint32_t operator()() {
 
         if (_greyscale) {
@@ -158,16 +212,16 @@ struct NoiseAdapter
 
         boost::uint32_t ret = 0xff000000;
 
-        if (_bitmask & 1) {
+        if (_bitmask & BitmapData_as::CHANNEL_RED) {
             ret |= (_gen() << 16);
         }
-        if (_bitmask & 2) {
+        if (_bitmask & BitmapData_as::CHANNEL_GREEN) {
             ret |= _gen() << 8;
         }
-        if (_bitmask & 4) {
+        if (_bitmask & BitmapData_as::CHANNEL_BLUE) {
             ret |= _gen();
         }
-        if (_bitmask & 8) {
+        if (_bitmask & BitmapData_as::CHANNEL_ALPHA) {
             // Alpha is 0xff by default.
             const boost::uint8_t rd = _gen();
             ret &= (~rd) << 24;
@@ -199,7 +253,6 @@ struct CopyChannel
         _destchans(destchans)
     {}
 
-    /// 
     boost::uint32_t operator()(typename iterator_type::value_type p) const {
         // If multiple source channels, we set the destination channel
         // to black. Else to the value of the requested channel.
@@ -213,6 +266,282 @@ private:
     const boost::uint8_t _srcchans;
     const boost::uint8_t _destchans;
 
+};
+
+template<typename T> 
+T easeCurve(T t)
+{
+    return t * t * (3.0 - 2.0 * t);
+}
+
+template<typename T>
+void normalize(T& a, T& b)
+{
+    const T s = std::sqrt(a * a + b * b);
+    a /= s;
+    b /= s;
+}
+
+/// Generate Perlin noise
+//
+/// @tparam T       A floating point type for the generated values.
+/// @tparam B       The size of the permutation table.
+/// @tparam Offset  An offset for generating non-identical patterns with the
+///                 same Perlin noise generator.
+template<typename T, boost::uint32_t Size = 0x100,
+    boost::uint32_t Offset = 1327>
+struct PerlinNoise
+{
+    typedef T value_type;
+
+    /// Create a Perlin noise generator with a random seed.
+    //
+    /// @param seed     A seed for the PRNG. Given the same seed the
+    ///                 generator will create the same pseudo-random pattern.
+    PerlinNoise(int seed)
+    {
+        init(seed);
+    }
+
+    boost::uint32_t size() const {
+        return Size;
+    }
+
+    /// Get a noise value for the co-ordinates x and y.
+    T operator()(T x, T y, const size_t step = 0) {
+
+        // Point to the left
+        size_t bx0;
+        // Point to the right
+        size_t bx1;
+        // Point above
+        size_t by0;
+        // Point below.
+        size_t by1;
+
+        // Actual distance from the respective integer positions.
+        T rx0, rx1, ry0, ry1;
+
+        // Compute integer positions of surrounding points and
+        // vectors.
+        setup(x, bx0, bx1, rx0, rx1, step);
+        setup(y, by0, by1, ry0, ry1, step);
+
+        assert(bx0 < permTable.size());
+        assert(bx1 < permTable.size());
+
+        const int i = permTable[bx0];
+        const int j = permTable[bx1];
+
+        assert(i + by0 < permTable.size());
+        assert(j + by0 < permTable.size());
+        assert(i + by1 < permTable.size());
+        assert(j + by0 < permTable.size());
+
+        // Permute values to get indices in the lookup tables.
+        const size_t b00 = permTable[i + by0];
+        const size_t b10 = permTable[j + by0];
+        const size_t b01 = permTable[i + by1];
+        const size_t b11 = permTable[j + by1];
+
+        // Dot product of vectors and gradients.
+        const T u = rx0 * g2[b00][0] + ry0 * g2[b00][1];
+        const T v = rx1 * g2[b10][0] + ry0 * g2[b10][1];
+        const T u1 = rx0 * g2[b01][0] + ry1 * g2[b01][1];
+        const T v1 = rx1 * g2[b11][0] + ry1 * g2[b11][1];
+
+        // Cubic ease curve for interpolation.
+        const T sx = easeCurve(rx0);
+        const T sy = easeCurve(ry0);
+
+        // X-axis interpolation.
+        const T a = lerp<T>(u, v, sx);
+        const T b = lerp<T>(u1, v1, sx);
+
+        // Y-axis interpolation.
+        return lerp<T>(a, b, sy);
+    }
+
+private:
+
+    static void setup(T i, size_t& b0, size_t& b1, T& r0, T& r1, size_t step) {
+
+        const T t = i + Offset * step;
+
+        // Let the compiler optimize this if Size is a power of two.
+        b0 = (static_cast<size_t>(t)) % Size;
+        b1 = (b0 + 1) % Size;
+        
+        // Calculate vectors to surrounding points.
+        r0 = t - static_cast<size_t>(t);
+        r1 = r0 - 1.0;
+    }
+
+    void init(int seed) {
+
+        Noise<> noise(seed, 0, RAND_MAX);
+
+        for (size_t i = 0 ; i < Size; ++i) {
+            permTable[i] = i;
+            for (size_t j = 0; j < 2; ++j) {
+                // If Size is an unsigned int this expression:
+                // noise() * 2 * Size - Size 
+                // is unsigned (but if it's an unsigned short, the result is
+                // signed!) so convert here in case of any future changes.
+                const int b = Size;
+                g2[i][j] = static_cast<T>(noise() % (2 * b) - b) / b;
+            }
+            normalize(g2[i][0], g2[i][1]);
+        }
+
+        std::random_shuffle(permTable.begin(), permTable.begin() + Size, noise);
+
+        std::copy(
+            boost::make_zip_iterator(
+                boost::make_tuple(permTable.begin(), g2.begin())),
+            boost::make_zip_iterator(
+                boost::make_tuple(permTable.begin(), g2.begin())) + Size,
+            boost::make_zip_iterator(
+                boost::make_tuple(permTable.begin(), g2.begin())) + Size);
+
+        std::copy(
+            boost::make_zip_iterator(
+                boost::make_tuple(permTable.begin(), g2.begin())),
+            boost::make_zip_iterator(
+                boost::make_tuple(permTable.begin(), g2.begin())) + 2,
+            boost::make_zip_iterator(
+                boost::make_tuple(permTable.begin(), g2.begin())) + 2 * Size);
+    }
+
+    // A random permutation table.
+    boost::array<size_t, Size * 2 + 2> permTable;
+
+    // The gradient stuff.
+    boost::array<boost::array<T, 2>, Size * 2 + 2> g2;
+};
+
+/// Store offsets.
+struct Vector
+{
+    Vector(boost::int32_t x, boost::int32_t y) : x(x), y(y) {}
+    boost::int32_t x;
+    boost::int32_t y;
+};
+
+/// Transform negative offsets into positive ones
+//
+/// The PerlinNoise generator only handles positive co-ordinates, so
+/// transform negative ones into an offset from the end of the grid.
+//
+/// We have to take base into account (I think), but not octave because
+/// octaves are all exact factors of the base.
+struct
+VectorTransformer
+{
+    /// Construct a VectorTransformer for an x by y grid.
+    //
+    /// @param x    The product of the grid size and the x base.
+    /// @param y    The product of the grid size and the y base.
+    VectorTransformer(size_t x, size_t y) : _x(x), _y(y) {}
+
+    /// Get a point within the grid.
+    //
+    /// Positive co-ordinates are left unchanged, negative ones translated
+    /// to an offset from the end of the grid.
+    Vector operator()(Vector const& p) const {
+        if (p.x >= 0 && p.y >= 0) return p;
+        const int x = p.x > 0 ? p.x : _x - std::abs(p.x) % _x;
+        const int y = p.y > 0 ? p.y : _y - std::abs(p.y) % _y;
+        return Vector(x, y);
+    }
+private:
+    const size_t _x;
+    const size_t _y;
+};
+
+/// Adapt the PerlinNoise generator for ActionScript's needs.
+//
+/// @tparam Generator   A type with a double operator()(size_t, size_t, size_t)
+///                     that returns a perlin noise value when passed two
+///                     positive co-ordinates and a sequence offset value.
+template<typename Generator>
+struct PerlinAdapter
+{
+    /// Create an adapter for Perlin noise.
+    //
+    /// @param g        The PerlinNoise generator.
+    /// @param octaves  The number of octaves to generate
+    /// @param baseX    The scale of the grid along the X axis.
+    /// @param baseY    The scale of the grid along the Y axis.
+    /// @param fractal  Whether to apply |f(n)| (false) or f(n) (true) to
+    ///                 the colour values.
+    /// @param offsets  A vector of offsets; each element applies to a
+    ///                 successive octave. Any remaining octaves will have no
+    ///                 offset applied.
+    PerlinAdapter(Generator& g, size_t octaves, double baseX, double baseY,
+            bool fractal, const std::vector<Vector>& offsets)
+        :
+        _gen(g),
+        _octaves(octaves),
+        _baseX(baseX),
+        _baseY(baseY),
+        _fractal(fractal)
+    {
+        // Make sure all offsets represent a valid positive value within
+        // the grid.
+        std::transform(offsets.begin(), offsets.end(), 
+                std::back_inserter(_offsets),
+                VectorTransformer(_baseX * _gen.size(), _baseY * _gen.size()));
+    }
+
+    /// Return a noise value for the co-ordinate (x, y).
+    //
+    /// Optionally you can pass a sequence offset so that the noise pattern
+    /// is overlaid at an offset; this means that the same generator can be
+    /// used for several channels without them appearing to be the same.
+    //
+    /// Fractal noise adds f(i * freq) * amp to the mid value.
+    /// Normal noise adds |f(i * freq) * amp| to 0.
+    typename Generator::value_type operator()(size_t x, size_t y,
+            size_t step = 0) {
+        
+        // Starting amplitude
+        size_t amp = _fractal ? 0x80 : 0xff;
+        // Base x frequency.
+        double xphase = _baseX;
+        // Base y frequency.
+        double yphase = _baseY;
+        // Return value.
+        double ret = _fractal ? 0x80 : 0;
+
+        for (size_t i = 0; i < _octaves; ++i) {
+   
+            const Vector offset = i < _offsets.size() ? _offsets[i] :
+                Vector(0, 0);
+
+            const double n = _gen((x + offset.x) / xphase,
+                    (y + offset.y) / yphase, step);
+
+            ret += amp * (_fractal ? n : std::abs(n));
+
+            // Halve amplitude
+            amp >>= 1;
+            if (!amp) break;
+
+            // Double frequency
+            xphase /= 2;
+            yphase /= 2;
+        }
+        return ret;
+    }
+
+private:
+    Generator& _gen;
+    const size_t _octaves;
+    const double _baseX;
+    const double _baseY;
+    const bool _fractal;
+    std::vector<Vector> _offsets;
 };
 
 /// Index iterators by x and y position
@@ -232,6 +561,32 @@ struct PixelIndexer
     BitmapData_as::iterator pix;
 };
 
+/// Convert an array to a vector of offsets.
+//
+/// TODO: check what really happens when one is invalid.
+struct VectorPusher
+{
+    VectorPusher(std::vector<Vector>& offsets, VM& vm)
+        :
+        _offsets(offsets),
+        _vm(vm)
+    {}
+
+    void operator()(const as_value& val) {
+        as_object* p = toObject(val, _vm);
+        if (!p) return;
+
+        as_value x, y;
+        if (!p->get_member(NSV::PROP_X, &x)) return;
+        if (!p->get_member(NSV::PROP_Y, &y)) return;
+        _offsets.push_back(Vector(toInt(x, _vm), toInt(y, _vm)));
+    }
+
+private:
+    std::vector<Vector>& _offsets;
+    VM& _vm;
+};
+
 } // anonymous namespace
 
 BitmapData_as::BitmapData_as(as_object* owner,
@@ -241,7 +596,7 @@ BitmapData_as::BitmapData_as(as_object* owner,
     _cachedBitmap(0)
 {
     assert(im->width() <= 2880);
-    assert(im->width() <= 2880);
+    assert(im->height() <= 2880);
     
     // If there is a renderer, cache the image there, otherwise we store it.
     Renderer* r = getRunResources(*_owner).renderer();
@@ -258,67 +613,10 @@ BitmapData_as::setReachable()
 }
 
 void
-BitmapData_as::setPixel32(size_t x, size_t y, boost::uint32_t color) const
-{
-    if (disposed()) return;
-    if (x >= width() || y >= height()) return;
-
-    iterator it = pixelAt(*this, x, y);
-    *it = color;
-}
-
-void
-BitmapData_as::setPixel(size_t x, size_t y, boost::uint32_t color) const
-{
-    if (disposed()) return;
-    if (x >= width() || y >= height()) return;
-
-    iterator it = pixelAt(*this, x, y);
-    const boost::uint32_t val = *it;
-    *it = (color & 0xffffff) | (val & 0xff000000);
-}
-
-void
-BitmapData_as::updateObjects()
+BitmapData_as::updateObjects() const
 {
     std::for_each(_attachedObjects.begin(), _attachedObjects.end(),
             std::mem_fun(&DisplayObject::update));
-}
-
-boost::uint32_t
-BitmapData_as::getPixel(size_t x, size_t y) const
-{
-    if (disposed()) return 0;
-    if (x >= width() || y >= height()) return 0;
-    return *pixelAt(*this, x, y);
-}
-
-
-void
-BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
-{
-    if (disposed()) return;
-
-    adjustRect(x, y, w, h, *this);
-
-    // Make sure that the rectangle has some area in the 
-    // bitmap and that its bottom corner is within the
-    // the bitmap.    
-    if (w == 0 || h == 0) return;
-    
-    iterator it = begin() + y * width();
-    iterator e = it + width() * h;
-    
-    assert(e <= end());
-
-    while (it != e) {
-        // Fill from x for the width of the rectangle.
-        std::fill_n(it + x, w, color);
-        it += width();
-    }
-
-    updateObjects();
-
 }
 
 void
@@ -354,91 +652,13 @@ BitmapData_as::draw(MovieClip& mc, const Transform& transform)
     updateObjects();
 }
 
-void
-BitmapData_as::floodFill(size_t startx, size_t starty, boost::uint32_t old,
-        boost::uint32_t fill)
-{
-    if (startx >= width() || starty >= height()) return;
-
-    // We never compare alpha for RGB images.
-    if (!transparent()) fill |= 0xff000000;
-    if (old == fill) return;
-
-    std::queue<PixelIndexer> pixelQueue;
-    pixelQueue.push(
-            PixelIndexer(startx, starty, pixelAt(*this, startx, starty)));
-
-    while (!pixelQueue.empty()) {
-
-        const PixelIndexer& p = pixelQueue.front();
-        const size_t x = p.x;
-        const size_t y = p.y;
-        iterator pix = p.pix;
-
-        pixelQueue.pop();
-
-        assert(pix != end());
-
-        if (*pix != old) continue;
-
-        // Go east!
-        iterator east(pix);
-        if (x + 1 < width()) {
-            ++east;
-            const iterator eaststop(pix + (width() - x));
-            while (east != eaststop && *east == old) ++east;
-            std::fill(pix, east, fill);
-        }
-        size_t edone = (east - pix);
-        if (!edone) ++edone;
-
-        // Add north pixels
-        if (y > 0) {
-            iterator north(pix - width());
-            iterator northend(north + edone);
-            const size_t ny = y - 1;
-            for (size_t nx = x; nx != (x + edone); ++nx, ++north) {
-                if (*north == old) {
-                    pixelQueue.push(PixelIndexer(nx, ny, north));
-                }
-            }
-        }
-
-        // Go west!
-        iterator west(pix);
-        if (x > 0) {
-            --west;
-            const iterator weststop(pix - x);
-            while (west != weststop && *west == old) --west;
-            std::fill(west + 1, pix, fill);
-        }
-        size_t wdone = (pix - west);
-        if (!wdone) ++wdone;
-         
-        // Add south pixels
-        if (y + 1 < height()) {
-            iterator south(pix + width());
-            iterator southend(south - wdone);
-            const size_t sy = y + 1;
-            for (size_t sx = x; sx != x - wdone; --sx, --south) {
-                if (*south == old) {
-                    pixelQueue.push(PixelIndexer(sx, sy, south));
-                }
-            }
-        }
-
-    }
-
-    updateObjects();
-}
-
 // extern 
 void
 bitmapdata_class_init(as_object& where, const ObjectURI& uri)
 {
     // TODO: this may not be correct, but it should be enumerable.
     const int flags = 0;
-	where.init_destructive_property(uri,
+    where.init_destructive_property(uri,
             get_flash_display_bitmap_data_constructor, flags);
 }
 
@@ -485,17 +705,17 @@ namespace {
 as_value
 bitmapdata_applyFilter(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 bitmapdata_clone(const fn_call& fn)
 {
-	as_object* obj = ensure<ValidThis>(fn);
-	BitmapData_as* bm = ensure<ThisIsNative<BitmapData_as> >(fn);
+    as_object* obj = ensure<ValidThis>(fn);
+    BitmapData_as* bm = ensure<ThisIsNative<BitmapData_as> >(fn);
     if (bm->disposed()) return as_value();
 
     const size_t width = bm->width();
@@ -521,22 +741,22 @@ bitmapdata_clone(const fn_call& fn)
 
     ret->setRelay(new BitmapData_as(ret, im));
 
-	return as_value(ret);
+    return as_value(ret);
 }
 
 as_value
 bitmapdata_colorTransform(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 bitmapdata_copyChannel(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (ptr->disposed()) return as_value();
 
@@ -647,6 +867,9 @@ bitmapdata_copyChannel(const fn_call& fn)
     typedef CopyChannel<BitmapData_as::iterator> Copier;
     Copier c(multiple, srcchans, destchans);
 
+    const size_t ourwidth = ptr->width();
+    const size_t srcwidth = source->width();
+
     // Note that copying the same channel to a range starting in the
     // source range produces unexpected effects because the source
     // range is changed while it is being copied. This is verified
@@ -654,67 +877,14 @@ bitmapdata_copyChannel(const fn_call& fn)
     for (int i = 0; i < destH; ++i) {
         Copier::iterator_type zip(boost::make_tuple(src, targ));
         std::transform(zip, zip + destW, targ, c);
-        targ += ptr->width();
-        src += source->width();
+        targ += ourwidth;
+        src += srcwidth;
     }
 
     ptr->updateObjects();
 
-	return as_value();
+    return as_value();
 }
-
-boost::uint8_t
-getChannel(boost::uint32_t src, boost::uint8_t bitmask)
-{
-    if (bitmask & 1) {
-        // Red
-        return (src >> 16) & 0xff;
-    }
-    if (bitmask & 2) {
-        // Green
-        return (src >> 8) & 0xff;
-    }
-    if (bitmask & 4) {
-        // Blue
-        return src & 0xff;
-    }
-    if (bitmask & 8) {
-        // Alpha
-        return src >> 24;
-    }
-    return 0;
-}
-
-boost::uint32_t
-setChannel(boost::uint32_t targ, boost::uint8_t bitmask, boost::uint8_t value)
-{
-    boost::uint32_t bytemask = 0;
-    boost::uint32_t valmask = 0;
-    if (bitmask & 1) {
-        // Red
-        bytemask = 0xff0000;
-        valmask = value << 16;
-    }
-    else if (bitmask & 2) {
-        // Green
-        bytemask = 0xff00;
-        valmask = value << 8;
-    }
-    else if (bitmask & 4) {
-        // Blue
-        bytemask = 0xff;
-        valmask = value;
-    }
-    else if (bitmask & 8) {
-        // Alpha
-        bytemask = 0xff000000;
-        valmask = value << 24;
-    }
-    targ &= ~bytemask;
-    targ |= valmask;
-    return targ;
-}
-
 
 // sourceBitmap: BitmapData,
 // sourceRect: Rectangle,
@@ -725,7 +895,7 @@ setChannel(boost::uint32_t targ, boost::uint8_t bitmask, boost::uint8_t value)
 as_value
 bitmapdata_copyPixels(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (ptr->disposed()) return as_value();
 
@@ -819,6 +989,9 @@ bitmapdata_copyPixels(const fn_call& fn)
     assert(destX + destW <= static_cast<int>(ptr->width()));
     assert(destY + destH <= static_cast<int>(ptr->height()));
 
+    const size_t ourwidth = ptr->width();
+    const size_t srcwidth = source->width();
+
     // Copy for the width and height of the *dest* image.
     // We have already ensured that the copied area
     // is inside both bitmapdatas.
@@ -829,8 +1002,8 @@ bitmapdata_copyPixels(const fn_call& fn)
     // right to left.
     if (copyToYRange) {
         assert(destH > 0);
-        targ += (destH - 1) * ptr->width();
-        src += (destH - 1) * source->width();
+        targ += (destH - 1) * ourwidth;
+        src += (destH - 1) * srcwidth;
         // Copy from bottom to top.
         for (int i = destH; i > 0; --i) {
             if (copyToXRange) {
@@ -839,8 +1012,8 @@ bitmapdata_copyPixels(const fn_call& fn)
             else {
                 std::copy(src, src + destW, targ);
             }
-            targ -= ptr->width();
-            src -= source->width();
+            targ -= ourwidth;
+            src -= srcwidth;
         }
     }
     else {
@@ -852,14 +1025,14 @@ bitmapdata_copyPixels(const fn_call& fn)
             else {
                 std::copy(src, src + destW, targ);
             }
-            targ += ptr->width();
-            src += source->width();
+            targ += ourwidth;
+            src += srcwidth;
         }
     }
 
     ptr->updateObjects();
 
-	return as_value();
+    return as_value();
 }
 
 as_value
@@ -867,15 +1040,15 @@ bitmapdata_dispose(const fn_call& fn)
 {
     // Should free the memory storing the bitmap.
     // All properties afterwards are -1 (even the rectangle)
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
     ptr->dispose();
-	return as_value();
+    return as_value();
 }
 
 as_value
 bitmapdata_draw(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -890,6 +1063,13 @@ bitmapdata_draw(const fn_call& fn)
     as_object* o = toObject(fn.arg(0), getVM(fn));
     MovieClip* mc = get<MovieClip>(o);
     if (!mc) {
+
+        BitmapData_as* bitmap;
+        if (isNativeType(o, bitmap)) {
+            LOG_ONCE(log_unimpl("BitmapData.draw() with BitmapData argument"));
+            return as_value();
+        }
+
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
@@ -913,15 +1093,15 @@ bitmapdata_draw(const fn_call& fn)
     }
 
     ptr->draw(*mc, t);
-	return as_value();
+    return as_value();
 }
 
 as_value
 bitmapdata_fillRect(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
-    if (fn.nargs < 2) return as_value();
+    if (fn.nargs < 2 || ptr->disposed()) return as_value();
     
     const as_value& arg = fn.arg(0);
     
@@ -948,10 +1128,10 @@ bitmapdata_fillRect(const fn_call& fn)
 
     const boost::uint32_t color = toInt(fn.arg(1), getVM(fn));
        
-    ptr->fillRect(toInt(x, getVM(fn)), toInt(y, getVM(fn)),
+    fillRect(*ptr, toInt(x, getVM(fn)), toInt(y, getVM(fn)),
             toInt(w, getVM(fn)), toInt(h, getVM(fn)), color);
     
-	return as_value();
+    return as_value();
 }
 
 
@@ -959,7 +1139,7 @@ bitmapdata_fillRect(const fn_call& fn)
 as_value
 bitmapdata_floodFill(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
     
     if (fn.nargs < 3) {
         return as_value();
@@ -983,33 +1163,33 @@ bitmapdata_floodFill(const fn_call& fn)
     const boost::uint32_t old = *pixelAt(*ptr, x, y);
 
     // This checks whether the colours are the same.
-    ptr->floodFill(x, y, old, fill);
+    floodFill(*ptr, x, y, old, fill);
     
-	return as_value();
+    return as_value();
 }
 
 as_value
 bitmapdata_generateFilterRect(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 bitmapdata_getColorBoundsRect(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 bitmapdata_getPixel(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (fn.nargs < 2) {
         return as_value();
@@ -1024,16 +1204,16 @@ bitmapdata_getPixel(const fn_call& fn)
     
     const int x = toInt(fn.arg(0), getVM(fn));
     const int y = toInt(fn.arg(1), getVM(fn));
-    
-    // Will return 0 if the pixel is outside the image or the image has
-    // been disposed.
-    return static_cast<boost::int32_t>(ptr->getPixel(x, y) & 0xffffff);
+
+    // Note: x and y are converted to size_t, so negative values becomre
+    // very large and are also outside the image. This is perfectly legal!
+    return static_cast<boost::int32_t>(getPixel(*ptr, x, y) & 0xffffff);
 }
 
 as_value
 bitmapdata_getPixel32(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (fn.nargs < 2) {
         return as_value();
@@ -1046,36 +1226,37 @@ bitmapdata_getPixel32(const fn_call& fn)
         return as_value();
     }
     
-    // TODO: what happens when the pixel is outside the image?
     const int x = toInt(fn.arg(0), getVM(fn));
     const int y = toInt(fn.arg(1), getVM(fn));
     
-    return static_cast<boost::int32_t>(ptr->getPixel(x, y));
+    // Note: x and y are converted to size_t, so negative values becomre
+    // very large and are also outside the image. This is perfectly legal!
+    return static_cast<boost::int32_t>(getPixel(*ptr, x, y));
 }
 
 
 as_value
 bitmapdata_hitTest(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 bitmapdata_merge(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 bitmapdata_noise(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (ptr->disposed()) return as_value();
 
@@ -1091,7 +1272,10 @@ bitmapdata_noise(const fn_call& fn)
         clamp<int>(toInt(fn.arg(2), getVM(fn)), low, 255) : 255;
 
     const boost::uint8_t chans = fn.nargs > 3 ?
-        std::abs(toInt(fn.arg(3), getVM(fn))) & 15 : 1 | 2 | 4;
+        std::abs(toInt(fn.arg(3), getVM(fn))) & 15 :
+            BitmapData_as::CHANNEL_RED |
+            BitmapData_as::CHANNEL_GREEN |
+            BitmapData_as::CHANNEL_BLUE;
 
     const bool greyscale = fn.nargs > 4 ?
         toBool(fn.arg(4), getVM(fn)) : false;
@@ -1104,49 +1288,161 @@ bitmapdata_noise(const fn_call& fn)
     
     ptr->updateObjects();
 
-	return as_value();
+    return as_value();
 }
 
 as_value
 bitmapdata_paletteMap(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
+
 
 as_value
 bitmapdata_perlinNoise(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+
+    if (ptr->disposed()) return as_value();
+
+    if (fn.nargs < 4) {
+        return as_value();
+    }
+    const double baseX = toNumber(fn.arg(0), getVM(fn));
+    const double baseY = toNumber(fn.arg(1), getVM(fn));
+    const int octave = std::max(0, toInt(fn.arg(2), getVM(fn)));
+
+    /// Random seed.
+    const int seed = toInt(fn.arg(3), getVM(fn));
+
+    // Whether to make a tileable pattern.
+    const bool stitch = fn.nargs > 4 ?
+        toBool(fn.arg(4), getVM(fn)) : false;
+
+    // If true makes a fractal noise, otherwise turbulence.
+    const bool fractalNoise = fn.nargs > 5 ?
+        toBool(fn.arg(5), getVM(fn)) : false;
+
+    // Which channels to use.
+    const boost::uint8_t channels = fn.nargs > 6 ?
+        clamp<int>(toInt(fn.arg(6), getVM(fn)), 0, 255) :
+            BitmapData_as::CHANNEL_RED |
+            BitmapData_as::CHANNEL_GREEN |
+            BitmapData_as::CHANNEL_BLUE;
+
+    // All channels the same
+    const bool greyscale = fn.nargs > 7 ?
+        toBool(fn.arg(7), getVM(fn)) : false;
+
+    /// Collect offsets.
+    //
+    /// We don't currently know what happens when one of the offsets doesn't
+    /// have an x or a y member, or isn't an object etc.
+    std::vector<Vector> offsets;
+    if (fn.nargs > 8) {
+        as_object* obj = toObject(fn.arg(8), getVM(fn));
+        if (obj) {
+            VectorPusher pp(offsets, getVM(fn));
+            foreachArray(*obj, pp);
+        }
+    }
+
+    if (stitch) {
+        LOG_ONCE(log_unimpl("BitmapData.perlinNoise() stitch value"));
+    }
+
+    if (!octave || (!channels && !greyscale)) {
+        // Clear the image and return.
+        std::fill(ptr->begin(), ptr->end(), 0xff000000);
+        return as_value();
+    }
+
+    typedef PerlinNoise<double, 256> Generator;
+    Generator gen(seed);
+    PerlinAdapter<Generator> pa(gen, octave, baseX, baseY, fractalNoise,
+            offsets);
+
+    const size_t width = ptr->width();
+    const bool transparent = ptr->transparent();
+
+    size_t pixel = 0;
+    for (BitmapData_as::iterator it = ptr->begin(), e = ptr->end(); it != e;
+            ++it, ++pixel) {
+
+        const size_t x = pixel % width;
+        const size_t y = pixel / width;
+
+        boost::uint8_t rv = 0;
+
+        if (greyscale || channels & BitmapData_as::CHANNEL_RED) {
+            // Create one noise channel.
+            const double r = pa(x, y);
+            rv = clamp(r, 0.0, 255.0);
+        }
+
+        boost::uint8_t av = 0xff;
+
+        // It's just a waste of time if the BitmapData has no alpha.
+        if (transparent && channels & BitmapData_as::CHANNEL_ALPHA) {
+            const double a = pa(x, y, 3);
+            av -= clamp(a, 0.0, 255.0);
+        }
+
+        if (greyscale) {
+            // Greyscale affects all colour channels equally. If alpha the
+            // alpha channel is requested, that's done seperately; otherwise
+            // it's full.
+            *it = (rv | rv << 8 | rv << 16 | av << 24);
+            continue;
+        }
+
+        // Otherwise create data for the other channels too by using the
+        // PerlinNoise object's pattern offset (this is cheaper than using a
+        // separate generator)
+        boost::uint8_t gv = 0;
+        boost::uint8_t bv = 0;
+
+        if (channels & BitmapData_as::CHANNEL_GREEN) {
+            const double g = pa(x, y, 1);
+            gv = clamp(g, 0.0, 255.0);
+        }
+        if (channels & BitmapData_as::CHANNEL_BLUE) {
+            const double b = pa(x, y, 2);
+            bv = clamp(b, 0.0, 255.0);
+        }
+        *it = (bv | gv << 8 | rv << 16 | av << 24);
+    }
+    
+    ptr->updateObjects();
+
+    return as_value();
 }
 
 as_value
 bitmapdata_pixelDissolve(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 bitmapdata_scroll(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 bitmapdata_setPixel(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (fn.nargs < 3) {
         return as_value();
@@ -1162,15 +1458,15 @@ bitmapdata_setPixel(const fn_call& fn)
     // Ignore any transparency here.
     const boost::uint32_t color = toInt(fn.arg(2), getVM(fn));
 
-    ptr->setPixel(x, y, color);
+    setPixel(*ptr, x, y, color);
 
-	return as_value();
+    return as_value();
 }
 
 as_value
 bitmapdata_setPixel32(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     if (fn.nargs < 3) {
         return as_value();
@@ -1186,65 +1482,65 @@ bitmapdata_setPixel32(const fn_call& fn)
     // TODO: multiply.
     const boost::uint32_t color = toInt(fn.arg(2), getVM(fn));
 
-    ptr->setPixel32(x, y, color);
+    setPixel32(*ptr, x, y, color);
 
-	return as_value();
+    return as_value();
 }
 
 as_value
 bitmapdata_compare(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 bitmapdata_threshold(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    UNUSED(ptr);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 as_value
 bitmapdata_width(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
     
     // Returns the immutable width of the bitmap or -1 if dispose() has
     // been called.
     if (ptr->disposed()) return -1;
-	return as_value(ptr->width());
+    return as_value(ptr->width());
 }
 
 as_value
 bitmapdata_height(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
     
     // Returns the immutable height of the bitmap or -1 if dispose() has
     // been called.
     if (ptr->disposed()) return -1;
-	return as_value(ptr->height());
+    return as_value(ptr->height());
 }
 
 as_value
 bitmapdata_transparent(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
     
     // Returns whether bitmap is transparent or -1 if dispose() has been called.
     if (ptr->disposed()) return -1;
-	return as_value(ptr->transparent());
+    return as_value(ptr->transparent());
 }
 
 as_value
 bitmapdata_rectangle(const fn_call& fn)
 {
-	BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
+    BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
 
     // Returns the immutable rectangle of the bitmap or -1 if dispose()
     // has been called.
@@ -1274,7 +1570,7 @@ bitmapdata_loadBitmap(const fn_call& fn)
 {
     // This is a static method, but still requires a parent object for
     // the prototype.
-	as_object* ptr = ensure<ValidThis>(fn);
+    as_object* ptr = ensure<ValidThis>(fn);
 
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1321,7 +1617,7 @@ bitmapdata_loadBitmap(const fn_call& fn)
     newImage->update(im.begin());
     ret->setRelay(new BitmapData_as(ret, newImage));
 
-	return as_value(ret);
+    return as_value(ret);
 }
 
 
@@ -1341,18 +1637,19 @@ as_value
 bitmapdata_ctor(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
-	if (fn.nargs < 2) {
+    if (fn.nargs < 2) {
         IF_VERBOSE_ASCODING_ERRORS(
              log_aserror("BitmapData constructor requires at least two "
                  "arguments. Will not construct a BitmapData");
         );
         throw ActionTypeError();
-	}
+    }
 
-    size_t width = toInt(fn.arg(0), getVM(fn));
-    size_t height = toInt(fn.arg(1), getVM(fn));
+    const size_t width = toInt(fn.arg(0), getVM(fn));
+    const size_t height = toInt(fn.arg(1), getVM(fn));
     const bool transparent = fn.nargs > 2 ? toBool(fn.arg(2), getVM(fn)) : true;
-    boost::uint32_t fillColor = fn.nargs > 3 ? toInt(fn.arg(3), getVM(fn)) : 0xffffffff;
+    boost::uint32_t fillColor =
+        fn.nargs > 3 ? toInt(fn.arg(3), getVM(fn)) : 0xffffffff;
     
     if (width > 2880 || height > 2880 || width < 1 || height < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1380,7 +1677,7 @@ bitmapdata_ctor(const fn_call& fn)
 
     ptr->setRelay(new BitmapData_as(ptr, im));
 
-	return as_value(); 
+    return as_value(); 
 }
 
 void
@@ -1417,7 +1714,6 @@ attachBitmapDataInterface(as_object& o)
     o.init_readonly_property("height", *vm.getNative(1100, 101), flags);
     o.init_readonly_property("rectangle", *vm.getNative(1100, 102), flags);
     o.init_readonly_property("transparent", *vm.getNative(1100, 103), flags);
-
 }
 
 void
@@ -1427,21 +1723,156 @@ attachBitmapDataStaticProperties(as_object& o)
 
     o.init_member("loadBitmap", vm.getNative(1100, 40));
 
-    o.init_member("RED_CHANNEL", 1.0);
-    o.init_member("GREEN_CHANNEL", 2.0);
-    o.init_member("BLUE_CHANNEL", 4.0);
-    o.init_member("ALPHA_CHANNEL", 8.0);
+    o.init_member("RED_CHANNEL", BitmapData_as::CHANNEL_RED);
+    o.init_member("GREEN_CHANNEL", BitmapData_as::CHANNEL_GREEN);
+    o.init_member("BLUE_CHANNEL", BitmapData_as::CHANNEL_BLUE);
+    o.init_member("ALPHA_CHANNEL", BitmapData_as::CHANNEL_ALPHA);
 }
     
 BitmapData_as::iterator
 pixelAt(const BitmapData_as& bd, size_t x, size_t y)
 {
-    if (x >= bd.width() || y >= bd.height()) return bd.end();
-    return (bd.begin() + y * bd.width() + x);
+    const size_t width = bd.width();
+    if (x >= width || y >= bd.height()) return bd.end();
+    return (bd.begin() + y * width + x);
+}
+
+boost::uint32_t
+getPixel(const BitmapData_as& bd, size_t x, size_t y)
+{
+    if (x >= bd.width() || y >= bd.height()) return 0;
+    return *pixelAt(bd, x, y);
 }
 
 void
-adjustRect(int& x, int& y, int& w, int& h, BitmapData_as& b) 
+setPixel(const BitmapData_as& bd, size_t x, size_t y, boost::uint32_t color) 
+{
+    if (bd.disposed()) return;
+    if (x >= bd.width() || y >= bd.height()) return;
+
+    BitmapData_as::iterator it = pixelAt(bd, x, y);
+    const boost::uint32_t val = *it;
+    *it = (color & 0xffffff) | (val & 0xff000000);
+}
+
+void
+setPixel32(const BitmapData_as& bd, size_t x, size_t y, boost::uint32_t color) 
+{
+    if (bd.disposed()) return;
+    if (x >= bd.width() || y >= bd.height()) return;
+
+    BitmapData_as::iterator it = pixelAt(bd, x, y);
+    *it = color;
+}
+
+void
+fillRect(const BitmapData_as& bd, int x, int y, int w, int h,
+        boost::uint32_t color)
+{
+    adjustRect(x, y, w, h, bd);
+
+    // Make sure that the rectangle has some area in the 
+    // bitmap and that its bottom corner is within the
+    // the bitmap.    
+    if (w == 0 || h == 0) return;
+    
+    const size_t width = bd.width();
+
+    BitmapData_as::iterator it = bd.begin() + y * width;
+    BitmapData_as::iterator e = it + width * h;
+    
+    assert(e <= bd.end());
+
+    while (it != e) {
+        // Fill from x for the width of the rectangle.
+        std::fill_n(it + x, w, color);
+        it += width;
+    }
+    bd.updateObjects();
+}
+
+void
+floodFill(const BitmapData_as& bd, size_t startx, size_t starty,
+        boost::uint32_t old, boost::uint32_t fill)
+{
+    const size_t width = bd.width();
+    const size_t height = bd.height();
+
+    if (startx >= width || starty >= height) return;
+
+    // We never compare alpha for RGB images.
+    if (!bd.transparent()) fill |= 0xff000000;
+    if (old == fill) return;
+
+    std::queue<PixelIndexer> pixelQueue;
+    pixelQueue.push(PixelIndexer(startx, starty, pixelAt(bd, startx, starty)));
+
+    while (!pixelQueue.empty()) {
+
+        const PixelIndexer& p = pixelQueue.front();
+        const size_t x = p.x;
+        const size_t y = p.y;
+        BitmapData_as::iterator pix = p.pix;
+
+        pixelQueue.pop();
+
+        assert(pix != bd.end());
+
+        if (*pix != old) continue;
+
+        // Go east!
+        BitmapData_as::iterator east(pix);
+        if (x + 1 < width) {
+            ++east;
+            const BitmapData_as::iterator eaststop(pix + (width - x));
+            while (east != eaststop && *east == old) ++east;
+            std::fill(pix, east, fill);
+        }
+        size_t edone = (east - pix);
+        if (!edone) ++edone;
+
+        // Add north pixels
+        if (y > 0) {
+            BitmapData_as::iterator north(pix - width);
+            BitmapData_as::iterator northend(north + edone);
+            const size_t ny = y - 1;
+            for (size_t nx = x; nx != (x + edone); ++nx, ++north) {
+                if (*north == old) {
+                    pixelQueue.push(PixelIndexer(nx, ny, north));
+                }
+            }
+        }
+
+        // Go west!
+        BitmapData_as::iterator west(pix);
+        if (x > 0) {
+            --west;
+            const BitmapData_as::iterator weststop(pix - x);
+            while (west != weststop && *west == old) --west;
+            std::fill(west + 1, pix, fill);
+        }
+        size_t wdone = (pix - west);
+        if (!wdone) ++wdone;
+         
+        // Add south pixels
+        if (y + 1 < height) {
+            BitmapData_as::iterator south(pix + width);
+            BitmapData_as::iterator southend(south - wdone);
+            const size_t sy = y + 1;
+            for (size_t sx = x; sx != x - wdone; --sx, --south) {
+                if (*south == old) {
+                    pixelQueue.push(PixelIndexer(sx, sy, south));
+                }
+            }
+        }
+
+    }
+
+    bd.updateObjects();
+}
+
+void
+adjustRect(int& x, int& y, int& w, int& h, const BitmapData_as& b) 
 {
     // No negative width or height
     if (w < 0 || h < 0) {
@@ -1474,6 +1905,59 @@ adjustRect(int& x, int& y, int& w, int& h, BitmapData_as& b)
     // Remove right and bottom excess after x and y adjustments.
     w = std::min<int>(b.width() - x, w);
     h = std::min<int>(b.height() - y, h);
+}
+
+
+boost::uint8_t
+getChannel(boost::uint32_t src, boost::uint8_t bitmask)
+{
+    if (bitmask & BitmapData_as::CHANNEL_RED) {
+        // Red
+        return (src >> 16) & 0xff;
+    }
+    if (bitmask & BitmapData_as::CHANNEL_GREEN) {
+        // Green
+        return (src >> 8) & 0xff;
+    }
+    if (bitmask & BitmapData_as::CHANNEL_BLUE) {
+        // Blue
+        return src & 0xff;
+    }
+    if (bitmask & BitmapData_as::CHANNEL_ALPHA) {
+        // Alpha
+        return src >> 24;
+    }
+    return 0;
+}
+
+boost::uint32_t
+setChannel(boost::uint32_t targ, boost::uint8_t bitmask, boost::uint8_t value)
+{
+    boost::uint32_t bytemask = 0;
+    boost::uint32_t valmask = 0;
+    if (bitmask & BitmapData_as::CHANNEL_RED) {
+        // Red
+        bytemask = 0xff0000;
+        valmask = value << 16;
+    }
+    else if (bitmask & BitmapData_as::CHANNEL_GREEN) {
+        // Green
+        bytemask = 0xff00;
+        valmask = value << 8;
+    }
+    else if (bitmask & BitmapData_as::CHANNEL_BLUE) {
+        // Blue
+        bytemask = 0xff;
+        valmask = value;
+    }
+    else if (bitmask & BitmapData_as::CHANNEL_ALPHA) {
+        // Alpha
+        bytemask = 0xff000000;
+        valmask = value << 24;
+    }
+    targ &= ~bytemask;
+    targ |= valmask;
+    return targ;
 }
 
 

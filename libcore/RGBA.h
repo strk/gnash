@@ -98,22 +98,7 @@ public:
         return toRGB() + (m_a << 24);
     }
 
-    /// Set r, g, b, a values
-    void set(boost::uint8_t r, boost::uint8_t g, boost::uint8_t b,
-            boost::uint8_t a) {
-        m_r = r;
-        m_g = g;
-        m_b = b;
-        m_a = a;
-    }
-
-    /// Used for morphing.
-    void set_lerp(const rgba& a, const rgba& b, float f);
-
-    /// Neater string output (example: "0,0,0,255")
-    std::string toShortString() const;
-
-    friend std::ostream& operator<< (std::ostream& os, const rgba& r);
+    friend std::ostream& operator<<(std::ostream& os, const rgba& r);
 
     bool operator==(const rgba& o) const {
         return m_r == o.m_r && 
@@ -130,7 +115,7 @@ public:
 
 };
 
-std::ostream& operator<< (std::ostream& os, const rgba& r);
+std::ostream& operator<<(std::ostream& os, const rgba& r);
 
 /// Create an RGBA value from a hex string (e.g. FF0000)
 //
@@ -139,6 +124,8 @@ std::ostream& operator<< (std::ostream& os, const rgba& r);
 ///                 responsibility to check it.
 rgba colorFromHexString(const std::string& color);
 
+/// Used for morphing.
+rgba lerp(const rgba& a, const rgba& b, float f);
 
 } // namespace gnash
 

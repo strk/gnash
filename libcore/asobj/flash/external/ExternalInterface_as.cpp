@@ -79,7 +79,6 @@ namespace {
     as_value externalinterface_uToJS(const fn_call& fn);
     as_value externalinterface_uToXML(const fn_call& fn);
     as_value externalinterface_uUnescapeXML(const fn_call& fn);
-    as_value externalinterface_ctor(const fn_call& fn);
 }
 
 namespace {
@@ -384,25 +383,12 @@ externalinterface_objectID(const fn_call& fn)
 }
 
 as_value
-externalinterface_ctor(const fn_call& fn)
-{
-    if (fn.nargs) {
-        std::stringstream ss;
-        fn.dump_args(ss);
-        LOG_ONCE(log_unimpl("ExternalInterface(%s): %s", ss.str(),
-                            _("arguments discarded")) );
-    }
-    
-    return as_value(); 
-}
-
-as_value
 externalInterfaceConstructor(const fn_call& fn)
 {
     log_debug("Loading flash.external.ExternalInterface class");
     Global_as& gl = getGlobal(fn);
     as_object* proto = createObject(gl);
-    as_object* cl = gl.createClass(&externalinterface_ctor, proto);
+    as_object* cl = gl.createClass(emptyFunction, proto);
 
     attachExternalInterfaceStaticInterface(*cl);
     return cl;

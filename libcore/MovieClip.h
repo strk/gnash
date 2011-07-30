@@ -93,8 +93,6 @@ public:
 
     typedef std::map<std::string, std::string> MovieVariables;
 
-    typedef std::list<const action_buffer*> ActionList;
-
     typedef movie_definition::PlayList PlayList;
 
     enum PlayState
@@ -136,6 +134,8 @@ public:
     /// notifyEvent(id) will be called by execution of the queued
     /// action
     void queueEvent(const event_id& id, int lvl);
+
+    void queueLoad();
 
     /// Return the _root ActionScript property of this sprite.
     //
@@ -474,9 +474,6 @@ public:
     /// The frame_spec could be an integer or a string.
     virtual void call_frame_actions(const as_value& frame_spec);
 
-    // delegates to movie_root 
-    virtual void stop_drag();
-
     /// Duplicate this sprite in its timeline
     //
     /// Add the new DisplayObject at a the given depth to this sprite
@@ -507,7 +504,7 @@ public:
     //
     /// This handles key, mouse, and specific MovieClip events.
     /// TODO: split this sensibly.
-    virtual void notifyEvent(const event_id& id);
+    void notifyEvent(const event_id& id);
 
     // inherited from DisplayObject class, see dox in DisplayObject.h
     virtual as_environment& get_environment() {
@@ -774,6 +771,8 @@ private:
     bool _callingFrameActions;
 
     bool _lockroot;
+
+    bool _onLoadCalled;
 };
 
 } // end of namespace gnash

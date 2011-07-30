@@ -500,6 +500,10 @@ emptymovie-frames-bytes-6.swf:40850e9e5980b0f8cac3e2702079eb3f
 emptymovie-frames-bytes-7.swf:26277a3087d867d21225496f42219e5b
 emptymovie-frames-bytes-8.swf:1536a58d30e4ac04bfd3338cef62729d
 empty-stack.swf:47ef885ae85e56e2ba8caae6eed46704
+empty-string-text-extent-5.swf:e388b1778b247e51fae91627b5924b10
+empty-string-text-extent-6.swf:1e4ceba23e2292ec84e68d1d05ae1307
+empty-string-text-extent-7.swf:e66cd0b7cc72a85c9ed26daea1bee403
+empty-string-text-extent-8.swf:302dd3103f794d02a75d1a60c4aeae81
 enumerate2-6.swf:b87294c35a03aacb679d42fa0f99fd01
 enumerate2-7.swf:95f5f2e7297a138c87fd62f3d325a950
 enumerate2-8.swf:46748c91f816425ba2cc3142556b3fd8
@@ -895,6 +899,10 @@ object-hasownproperty-8.swf:6cee106e21a390e63533f0f397bc69d4
 object-hasownproperty-9.swf:1c2d76f1ba3df41216eba9ea315460d0
 object-ispropertyenumerable-5.swf:775ef8e8b0ec09d72adec0bdf64b282e
 object-ispropertyenumerable-5.swf:c30e596479860ddf51fc53c1760cac72
+object-ispropertyenumerable-6.swf:3ad2d4a86333d6176ae0c603184b2793
+object-ispropertyenumerable-7.swf:f7bf012b2a92f7a3b3e93bc54e659a96
+object-ispropertyenumerable-8.swf:f5c825eccee90eb8ff8de57425d34b42
+object-ispropertyenumerable-9.swf:c44f3f097db4ecba8850914b89aa45c3
 object-isprototypeof-5.swf:7f3015ea208dfd1ba11c9b582b0001e2
 object-isprototypeof-6.swf:921831aff06ff5d16c72abaaaeefc813
 object-isprototypeof-7.swf:7349385779a8f6c6707acc7886442089
@@ -1141,6 +1149,9 @@ resolve-parent-6.swf:fbbfc5dd220d0d94ca3c13db171a33ea
 resolve-parent-7.swf:c72cf7eff78f3cc8cdf5b3d3725661e6
 resolve-parent-8.swf:6b5da373437b7a20ca5cd7d133ce4c09
 rewind-remove-5.swf:70780bb0428e3795f6866a1c47bb46b0
+rewind-remove-6.swf:8abeb09223e2fbcb5a60ba686a8eb075
+rewind-remove-7.swf:1e48d09579de0e7baf336093dc649193
+rewind-remove-8.swf:dc4795cd2737736679c71c426dba9516
 root-onload-5.swf:4f41e2bffb53d75ce665c54312f66190
 root-onload-6.swf:0d09109c7f942e8268aa0b9661071f1d
 root-onload-7.swf:baed64fdde7c5f27344daa4268ce6202
@@ -1338,6 +1349,9 @@ string-length-old-8.swf:46b7ef4fee939ddae8f84fb5e3bb1093
 string-length-old-mb-6.swf:388cb02cbd3332aed19c68bda39938a0
 string-length-old-mb-7.swf:cbbab1b31471911335b426c80c3b641c
 string-length-old-mb-8.swf:60b4e211f6c937f953c2acfe02684295
+string-non-ascii-6.swf:be7ba589a93b71e38d2b9d8be0b0e195
+string-non-ascii-7.swf:09ccea050c3f71c1f28a2d82d37ce54d
+string-non-ascii-8.swf:48869f5c85299133730834e08c16f344
 string-object-tostring-5.swf:d45c1785719c3e2607f6ac10f48b2e80
 string-object-tostring-6.swf:f4970a48bfb3c5d5315699263c2a15a1
 string-object-tostring-7.swf:060a8f7ba61ae1501bdcb060cd321313

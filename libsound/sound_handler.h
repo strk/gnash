@@ -181,6 +181,16 @@ public:
     /// @param id   Id of the sound buffer slot check for being alive
     bool isSoundPlaying(int id) const;
     
+    /// Sets the volume for a given event sound.
+    //
+    /// Only used by the AS Sound class
+    ///
+    /// @param sound_handle  The handle of the event sound to set volume for.
+    /// @param volume        A number from 0 to 100 representing a volume
+    ///                      level. 100 is full volume and 0 is no volume.
+    ///                      The default setting is 100.
+    virtual void set_volume(int sound_handle, int volume);
+    
     /// Gets the duration in milliseconds of an event sound.
     //
     /// @param sound_handle     The id of the event sound
@@ -254,14 +264,23 @@ public:
     /// be played for mp3 sounds, not the complete data! Currently we don't
     /// store this value.
     //
-    /// @param streamId
-    ///     Id of the sound buffer slot schedule playback of.
-    ///     It is assumed to refer to a straming sound
-    ///
-    /// @param blockId
-    ///     Identifier of the block to start decoding from.
-    ///
-    void playStream(int id, StreamBlockId blockId);
+    /// @param handle   Id of the sound buffer slot schedule playback of.
+    /// @param blockId    Identifier of the block to start decoding from.
+    void playStream(int handle, StreamBlockId blockId);
+
+    /// Get the identifier for the block playing in a specific stream.
+    //
+    /// This is used by movie_root to check which part of the stream is
+    /// actually playing. Streaming sound is used to synchronize the frame
+    /// rate. The returned block id can be matched with a specific frame.
+    //
+    /// @param handle   The handle of the stream sound to query.
+    /// @return         The identifier of the stream block that the
+    ///                 sound_handler is currently playing (it may be only
+    ///                 approximate, as we can't really know what's coming out
+    ///                 of the speakers). Returns -1 if the specified stream
+    ///                 sound is not playing or doesn't exist.
+    int getStreamBlock(int handle) const;
 
     ////////////////////////////////////////////////
     /// Sound output functions.
@@ -270,30 +289,14 @@ public:
     /// Get the volume to apply to mixed output
     //
     /// @return percent value. 100 is full, 0 is none.
-    ///        Can be negative or over 100 too.
-    ///
+    ///         Can be negative or over 100 too.
     int getFinalVolume() const { return _volume; }
-    
-    /// Sets the volume for a given sound buffer slot.
-    //
-    /// Only used by the AS Sound class
-    ///
-    /// @param sound_handle
-    /// The sound_handlers id for the sound to be deleted
-    ///
-    /// @param volume
-    ///     A number from 0 to 100 representing a volume level. 
-    ///     100 is full volume and 0 is no volume.
-    /// The default setting is 100.
-    ///
-    virtual void set_volume(int sound_handle, int volume);
 
     /// Set the volume to apply to mixed output
     //
     /// @param v percent value. 100 is full, 0 is none.
     ///       Can be negative or over 100 too.
-    ///
-    void setFinalVolume(int v) { _volume=v; }
+    void setFinalVolume(int v) { _volume = v; }
 
     /// \brief
     /// Discard all sound inputs (slots and aux streamers)
@@ -303,7 +306,6 @@ public:
     ///
     /// The function should stop all sounds and get ready
     /// for a "parse from scratch" operation.
-    ///
     virtual void reset();
         
     /// Call this to mute audio
@@ -315,7 +317,6 @@ public:
     /// Returns whether or not sound is muted.
     //
     /// @return true if muted, false if not
-    ///
     virtual bool is_muted() const;
 
     /// gnash calls this to pause audio

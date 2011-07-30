@@ -44,7 +44,6 @@ namespace {
 
     as_value loadvars_tostring(const fn_call& fn);
     as_value loadvars_ctor(const fn_call& fn);
-	as_value loadvars_onLoad(const fn_call& fn);
 	as_value loadvars_onData(const fn_call& fn);
 	void attachLoadVarsInterface(as_object& o);
 }
@@ -76,14 +75,13 @@ attachLoadVarsInterface(as_object& o)
 
     o.init_member("toString", gl.createFunction(loadvars_tostring), flags);
 	o.init_member("onData", gl.createFunction(loadvars_onData), flags);
-	o.init_member("onLoad", gl.createFunction(loadvars_onLoad), flags);
+	o.init_member("onLoad", gl.createFunction(emptyFunction), flags);
     o.init_member("contentType", "application/x-www-form-urlencoded", flags);
 }
 
 as_value
 loadvars_onData(const fn_call& fn)
 {
-
 	as_object* thisPtr = fn.this_ptr;
 	if (!thisPtr) return as_value();
 
@@ -108,14 +106,6 @@ loadvars_onData(const fn_call& fn)
 
 	return as_value();
 }
-
-as_value
-loadvars_onLoad(const fn_call& /*fn*/)
-{
-	//GNASH_REPORT_FUNCTION;
-	return as_value();
-}
-
 
 as_value
 loadvars_tostring(const fn_call& fn)

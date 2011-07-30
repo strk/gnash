@@ -85,16 +85,17 @@ EXTRA_DIST =  \
 	README.git \
 	autogen.sh \
 	config.rpath \
+	base-attempter.sh \
 	macros/incllist macros/libslist \
-	ChangeLog-0.8.0 \
-	ChangeLog-0.8.1 \
-	ChangeLog-0.8.2 \
-	ChangeLog-0.8.3 \
-	ChangeLog-0.8.4 \
-	ChangeLog-0.8.5 \
-	ChangeLog-0.8.6 \
-	ChangeLog-0.8.7 \
-	ChangeLog-0.8.8 \
+	doc/changelogs/ChangeLog-0.8.0 \
+	doc/changelogs/ChangeLog-0.8.1 \
+	doc/changelogs/ChangeLog-0.8.2 \
+	doc/changelogs/ChangeLog-0.8.3 \
+	doc/changelogs/ChangeLog-0.8.4 \
+	doc/changelogs/ChangeLog-0.8.5 \
+	doc/changelogs/ChangeLog-0.8.6 \
+	doc/changelogs/ChangeLog-0.8.7 \
+	doc/changelogs/ChangeLog-0.8.8 \
 	packaging/deb.am \
 	packaging/snapshot.am \
 	packaging/alp.am \

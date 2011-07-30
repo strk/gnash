@@ -56,9 +56,6 @@ public:
 	/// 	The amount of bytes that has been decoded when decoding is done,
 	///		is passed by reference.
 	///
-	/// @param parse
-	/// 	Should we parse the audio? Needed for embedded MP3 sounds.
-	///
 	/// @return a pointer to the decoded data, or NULL if decoding fails.
 	///     The caller owns the decoded data, which was allocated with new [].
 	///
@@ -66,7 +63,7 @@ public:
 	///
 	virtual boost::uint8_t* decode(const boost::uint8_t* input,
         boost::uint32_t inputSize, boost::uint32_t& outputSize,
-        boost::uint32_t& decodedData, bool parse);
+        boost::uint32_t& decodedData);
 
 	/// Decodes an EncodedAudioFrame and returns a pointer to the decoded data
 	//
@@ -88,7 +85,7 @@ public:
 
 inline boost::uint8_t*
 AudioDecoder::decode(const boost::uint8_t*, boost::uint32_t, boost::uint32_t&,
-        boost::uint32_t&, bool)
+        boost::uint32_t&)
 {
     return 0;
 }

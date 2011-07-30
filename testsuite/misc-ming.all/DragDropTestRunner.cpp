@@ -161,7 +161,16 @@ main(int /*argc*/, char** /*argv*/)
 	tester.movePointerTo(bc3.x, bc3.y);
 	tester.click(); 
 
-	// 11. Click ANYWHERE OUT of the THIRD BLUE circle (on another circle makes a better test)
+	// 11. Click on the SECOND GREEN circle.
+    // (Checks that the textfield has moved)
+	tester.movePointerTo(gc2.x, gc2.y);
+
+    // Make sure the position is updated!
+    tester.advance();
+
+	tester.click();
+
+	// 12. Click ANYWHERE OUT of the THIRD BLUE circle (on another circle makes a better test)
 	tester.movePointerTo(rc1.x, rc1.y);
 	tester.click();
 

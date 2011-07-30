@@ -36,7 +36,6 @@ namespace gnash {
 namespace {
     as_value function_apply(const fn_call& fn);
     as_value function_call(const fn_call& fn);
-    as_value function_ctor(const fn_call& fn);
 }
 
 namespace {
@@ -68,7 +67,7 @@ function_class_init(as_object& where, const ObjectURI& uri)
 {
     Global_as& gl = getGlobal(where);
 
-    NativeFunction* func = new NativeFunction(gl, function_ctor);
+    NativeFunction* func = new NativeFunction(gl, emptyFunction);
     as_object* proto = createObject(gl);
 
     func->init_member(NSV::PROP_PROTOTYPE, proto);
@@ -89,12 +88,6 @@ function_class_init(as_object& where, const ObjectURI& uri)
 }
 
 namespace {
-
-as_value
-function_ctor(const fn_call& /*fn*/)
-{
-	return as_value();
-}
 
 as_value
 function_apply(const fn_call& fn)

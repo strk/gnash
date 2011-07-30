@@ -56,6 +56,7 @@
 #include "Button.h"
 #include "Transform.h"
 #include "StreamProvider.h"
+#include "SystemClock.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -91,6 +92,7 @@ namespace {
     const DisplayObject* getNearestObject(const DisplayObject* o);
     as_object* getBuiltinObject(movie_root& mr, const ObjectURI& cl);
     void advanceLiveChar(MovieClip* ch);
+    void notifyLoad(MovieClip* ch);
 }
 
 // Utility classes
@@ -145,7 +147,6 @@ movie_root::movie_root(VirtualClock& clock, const RunResources& runResources)
     _lastTimerId(0),
     _lastKeyEvent(key::INVALID),
     _currentFocus(0),
-    _dragState(0),
     _movies(),
     _rootMovie(0),
     _invalidated(true),
@@ -219,7 +220,6 @@ movie_root::setRootMovie(Movie* movie)
     _stageWidth = static_cast<int>(md->get_width_pixels());
     _stageHeight = static_cast<int>(md->get_height_pixels());
 
-    // assert(movie->get_depth() == 0); ?
     movie->set_depth(DisplayObject::staticDepthOffset);
 
     try {
@@ -242,21 +242,40 @@ movie_root::setRootMovie(Movie* movie)
 }
 
 bool
-movie_root::abortOnScriptTimeout(const std::string& what) const
+movie_root::queryInterface(const std::string& what) const
 {
-    std::string msg = what + std::string(". Disable scripts? ");
-
     bool disable = true;
     if (_interfaceHandler) {
-        disable = callInterface<bool>(HostMessage(HostMessage::QUERY, msg));
+        disable = callInterface<bool>(HostMessage(HostMessage::QUERY, what));
     }
     else {
         log_error("No user interface registered, assuming 'Yes' answer to "
-            "question: %s", msg);
+            "question: %s", what);
     }
     return disable;
 }
-   
+
+void
+movie_root::setStreamBlock(int id, int block)
+{
+    if (!_timelineSound) {
+        _timelineSound = SoundStream(id, block);
+        return;
+    }
+
+    // Don't replace timeline stream.
+    if (_timelineSound->id != id) return;
+       
+    _timelineSound->block = block;
+}
+
+void
+movie_root::stopStream(int id)
+{
+    if (!_timelineSound) return;
+    if (_timelineSound->id == id) _timelineSound.reset();
+}
+
 void
 movie_root::registerClass(const SWF::DefinitionTag* sprite, as_function* cls)
 {
@@ -503,7 +522,7 @@ movie_root::reset()
 
     // reset background color, to allow 
     // next load to set it again.
-    m_background_color.set(255, 255, 255, 255);
+    m_background_color = rgba(255, 255, 255, 255);
     m_background_color_set = false;
 
     // wipe out live chars
@@ -533,6 +552,8 @@ movie_root::reset()
     setInvalidated();
 
     _disableScripts = false;
+
+    _timelineSound.reset();
 }
 
 void
@@ -601,14 +622,8 @@ movie_root::keyEvent(key::code k, bool down)
             // i.e. if the stack is at the limit before it contains anything.
             // A stack limit like that is hardly of any use, but could be used
             // maliciously to crash Gnash.
-            if (down) {
-                callMethod(key, getURI(_vm, NSV::PROP_BROADCAST_MESSAGE),
-                        "onKeyDown");
-            }
-            else {
-                callMethod(key, getURI(_vm,NSV::PROP_BROADCAST_MESSAGE),
-                        "onKeyUp");
-            }
+            callMethod(key, getURI(_vm, NSV::PROP_BROADCAST_MESSAGE),
+                    down ? "onKeyDown" : "onKeyUp");
         }
         catch (const ActionLimitException &e) {
             log_error(_("ActionLimits hit notifying key listeners: %s."),
@@ -677,7 +692,6 @@ movie_root::mouseClick(bool mouse_pressed)
 bool
 movie_root::fire_mouse_event()
 {
-
     assert(testInvariant());
 
     boost::int32_t x = pixelsToTwips(_mouseX);
@@ -687,20 +701,20 @@ movie_root::fire_mouse_event()
     _mouseButtonState.topmostEntity = getTopmostMouseEntity(x, y);
 
     // Set _droptarget if dragging a sprite
-    MovieClip* dragging = 0;
     DisplayObject* draggingChar = getDraggingCharacter();
-    if (draggingChar) dragging = draggingChar->to_movie();
-    if (dragging) {
-        // TODO: optimize making findDropTarget and getTopmostMouseEntity
-        //       use a single scan.
-        const DisplayObject* dropChar = findDropTarget(x, y, dragging);
-        if (dropChar) {
-            // Use target of closest script DisplayObject containing this
-            dropChar = getNearestObject(dropChar);
-            dragging->setDropTarget(dropChar->getTargetPath());
+    if (draggingChar) {
+        MovieClip* dragging = draggingChar->to_movie();
+        if (dragging) {
+            // TODO: optimize making findDropTarget and getTopmostMouseEntity
+            //       use a single scan.
+            const DisplayObject* dropChar = findDropTarget(x, y, dragging);
+            if (dropChar) {
+                // Use target of closest script DisplayObject containing this
+                dropChar = getNearestObject(dropChar);
+                dragging->setDropTarget(dropChar->getTargetPath());
+            }
+            else dragging->setDropTarget("");
         }
-        else dragging->setDropTarget("");
-
     }
 
     bool need_redraw = false;
@@ -717,7 +731,6 @@ movie_root::fire_mouse_event()
     }
 
     return need_redraw;
-
 }
 
 std::pair<boost::int32_t, boost::int32_t>
@@ -731,8 +744,10 @@ void
 movie_root::setDragState(const DragState& st)
 {
     _dragState = st;
-    DisplayObject* ch = st.getCharacter();
-    if (ch && !st.isLockCentered()) {
+
+    DisplayObject* ch = _dragState->getCharacter();
+
+    if (ch && !_dragState->isLockCentered()) {
         // Get coordinates of the DisplayObject's origin
         point origin(0, 0);
         SWFMatrix chmat = getWorldMatrix(*ch);
@@ -740,12 +755,12 @@ movie_root::setDragState(const DragState& st)
         chmat.transform(&world_origin, origin);
 
         // Get current mouse coordinates
-        point world_mouse(pixelsToTwips(_mouseX), pixelsToTwips(_mouseY));
+        const point world_mouse(pixelsToTwips(_mouseX), pixelsToTwips(_mouseY));
 
         boost::int32_t xoffset = world_mouse.x - world_origin.x;
         boost::int32_t yoffset = world_mouse.y - world_origin.y;
 
-        _dragState.setOffset(xoffset, yoffset);
+        _dragState->setOffset(xoffset, yoffset);
     }
     assert(testInvariant());
 }
@@ -770,16 +785,16 @@ movie_root::doMouseDrag()
         parent_world_mat = getWorldMatrix(*p);
     }
 
-    if (!_dragState.isLockCentered()) {
-        world_mouse.x -= _dragState.xOffset();
-        world_mouse.y -= _dragState.yOffset();
+    if (!_dragState->isLockCentered()) {
+        world_mouse.x -= _dragState->xOffset();
+        world_mouse.y -= _dragState->yOffset();
     }
 
-    if (_dragState.hasBounds()) {
+    if (_dragState->hasBounds()) {
         SWFRect bounds;
         // bounds are in local coordinate space
         bounds.enclose_transformed_rect(parent_world_mat,
-                _dragState.getBounds());
+                _dragState->getBounds());
         // Clamp mouse coords within a defined SWFRect.
         bounds.clamp(world_mouse);
     }
@@ -827,7 +842,6 @@ movie_root::clearIntervalTimer(boost::uint32_t x)
     it->second->clearInterval();
 
     return true;
-
 }
 
 bool
@@ -842,35 +856,85 @@ movie_root::advance()
 
     try {
 
-        const size_t elapsed = now - _lastMovieAdvancement;
-        if (elapsed >= _movieAdvancementDelay)
-        {
-            advanced = true;
-            advanceMovie();
+        sound::sound_handler* s = _runResources.soundHandler();
 
-            // To catch-up lateness we pretend we advanced when 
-            // was time for it. 
-            // NOTE:
-            //   now - _lastMovieAdvancement
-            // gives you actual lateness in milliseconds
-            //
-            // TODO: make 'catchup' setting user-settable
-            //       as it helps A/V sync but sacrifices 
-            //       smoothness of animation which is very
-            //       important for games.
-            static const bool catchup = true;
-            if (catchup) {
-                _lastMovieAdvancement += _movieAdvancementDelay;
-            } else {
+        if (s && _timelineSound) {
+
+            if (!s->streamingSound()) {
+                log_error("movie_root tracking a streaming sound, but "
+                        "the sound handler is not streaming!");
+
+                // Give up; we've probably failed to catch up.
+                _timelineSound.reset();
+            }
+            else {
+
+                // -1 for bad result, 0 for first block.
+                // Get the stream block we are currently at.
+                int block = s->getStreamBlock(_timelineSound->id);
+
+                const int startBlock = _timelineSound->block;
+
+                const size_t maxTime = getTimeoutLimit() * 1000;
+                SystemClock clock;
+
+                // If we're behind, we should skip; if we're ahead
+                // (_timelineSound->block > block) we should not advance,
+                // if we're ahead, skip.
+                while (block != -1 && block > _timelineSound->block) {
+                    advanced = true;
+                    advanceMovie();
+
+                    // Movie advance can cause streaming sound to be reset or,
+                    // if a MovieClip loops, the current timeline sound block
+                    // to be moved earlier. In the latter case we break to
+                    // avoid catching up to the old sound position.
+                    if (!_timelineSound || _timelineSound->block < startBlock) {
+                        break;
+                    }
+
+                    if (clock.elapsed() > maxTime) {
+                        boost::format fmt = 
+                            boost::format(_("Time exceeded (%1% secs) while "
+                                    "attempting to catch up to streaming "
+                                    "sound. Give up on synchronization?"))
+                                    % maxTime;
+
+                        // We'll start synchronizing again anyway when the
+                        // next stream block arrives, but this will at least
+                        // unblock the user interface.
+                        if (queryInterface(fmt.str())) {
+                            _timelineSound.reset();
+                            break;
+                        } 
+                    }
+
+                    // Note: advancing the current sound block here makes
+                    // it possible that Gnash will never catch up, if e.g.
+                    // executing ActionScript causes the frame rate to drop
+                    // even further. Not advancing the sound block means
+                    // that Gnash will always catch up to the point we
+                    // stored at the start of the loop, but then the audio
+                    // stream may restart if it has finished before Gnash
+                    // reaches the new position.
+                    block = s->getStreamBlock(_timelineSound->id);
+
+                }
+                if (advanced) _lastMovieAdvancement = now;
+            }
+        }
+        else {
+            // Driven by frame rate
+            const size_t elapsed = now - _lastMovieAdvancement;
+            if (elapsed >= _movieAdvancementDelay) {
+                advanced = true;
+                advanceMovie();
                 _lastMovieAdvancement = now;
             }
-
         }
-
-        //log_debug("Lateness: %d", now-_lastMovieAdvancement);
         
+        // Always do this.
         executeAdvanceCallbacks();
-        
         executeTimers();
     
     }
@@ -891,7 +955,6 @@ movie_root::advance()
 void
 movie_root::advanceMovie()
 {
-
     // Do mouse drag, if needed
     doMouseDrag();
 
@@ -970,14 +1033,12 @@ movie_root::display()
         }
 
         movie->display(*renderer, Transform());
-
     }
 }
 
 bool
 movie_root::notify_mouse_listeners(const event_id& event)
 {
-
     LiveChars copy = _liveChars;
     for (LiveChars::iterator iter = copy.begin(), itEnd=copy.end();
             iter != itEnd; ++iter)
@@ -1001,12 +1062,11 @@ movie_root::notify_mouse_listeners(const event_id& event)
         try {
             callMethod(mouseObj, propBroadcastMessage, event.functionName());
         }
-        catch (ActionLimitException &e) {
+        catch (const ActionLimitException& e) {
             log_error(_("ActionLimits hit notifying mouse events: %s."),
                     e.what());
             clear(_actionQueue);
         }
-        
     }
 
     assert(testInvariant());
@@ -1021,19 +1081,16 @@ movie_root::notify_mouse_listeners(const event_id& event)
 DisplayObject*
 movie_root::getFocus()
 {
-    assert(testInvariant());
     return _currentFocus;
 }
 
 bool
 movie_root::setFocus(DisplayObject* to)
 {
-
     // Nothing to do if current focus is the same as the new focus. 
     // _level0 also seems unable to receive focus under any circumstances
     // TODO: what about _level1 etc ?
-    if (to == _currentFocus ||
-            to == static_cast<DisplayObject*>(_rootMovie)) {
+    if (to == _currentFocus || to == _rootMovie) {
         return false;
     }
 
@@ -1089,7 +1146,7 @@ movie_root::getActiveEntityUnderPointer() const
 DisplayObject*
 movie_root::getDraggingCharacter() const
 {
-    return _dragState.getCharacter();
+    return _dragState ? _dragState->getCharacter() : 0;
 }
 
 const DisplayObject*
@@ -1307,7 +1364,6 @@ movie_root::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
                         ++i) {
         i->second->add_invalidated_bounds(ranges, force);
     }
-
 }
 
 size_t
@@ -1385,11 +1441,10 @@ movie_root::flushHigherPriorityActionQueues()
         return;
     }
 
-    int lvl=minPopulatedPriorityQueue();
+    int lvl = minPopulatedPriorityQueue();
     while (lvl < _processingActionLevel) {
         lvl = processActionQueue(lvl);
     }
-
 }
 
 void
@@ -1428,11 +1483,10 @@ movie_root::processActionQueue()
 
     // Cleanup the stack.
     _vm.getStack().clear();
-
 }
 
 void
-movie_root::removeQueuedConstructor(DisplayObject* target)
+movie_root::removeQueuedConstructor(MovieClip* target)
 {
     ActionQueue::value_type& pr = _actionQueue[PRIORITY_CONSTRUCT];
     pr.erase_if(RemoveTargetCode(target));
@@ -1461,7 +1515,6 @@ movie_root::pushAction(const action_buffer& buf, DisplayObject* target)
 void
 movie_root::executeAdvanceCallbacks()
 {
-
     if (!_objectCallbacks.empty()) {
 
         // We have two considerations:
@@ -1714,7 +1767,7 @@ movie_root::markReachableResources() const
     if (_currentFocus) _currentFocus->setReachable();
 
     // Mark DisplayObject being dragged, if any
-    _dragState.markReachableResources();
+    if (_dragState) _dragState->markReachableResources();
 
     // NOTE: cleanupDisplayList() should have cleaned up all
     // unloaded live characters. The remaining ones should be marked
@@ -1735,7 +1788,6 @@ movie_root::markReachableResources() const
 InteractiveObject*
 movie_root::getTopmostMouseEntity(boost::int32_t x, boost::int32_t y) const
 {
-
     for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend();
             i != e; ++i)
     {
@@ -1750,7 +1802,6 @@ const DisplayObject *
 movie_root::findDropTarget(boost::int32_t x, boost::int32_t y,
         DisplayObject* dragging) const
 {
-
     for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend();
             i!=e; ++i) {
         
@@ -1827,7 +1878,6 @@ std::string
 movie_root::callExternalCallback(const std::string &name, 
                  const std::vector<as_value> &fnargs)
 {
-
     MovieClip *mc = getLevel(0);
     as_object *obj = getObject(mc);
 
@@ -1903,7 +1953,6 @@ movie_root::registerButtonKey(int code, Button* listener)
 void
 movie_root::cleanupDisplayList()
 {
-
 #define GNASH_DEBUG_INSTANCE_LIST 1
 
 #ifdef GNASH_DEBUG_INSTANCE_LIST
@@ -1997,13 +2046,11 @@ movie_root::cleanupDisplayList()
         log_debug("Global instance list grew to %d entries", maxLiveChars);
     }
 #endif
-
 }
 
 void
 movie_root::advanceLiveChars()
 {
-
 #ifdef GNASH_DEBUG
     log_debug("---- movie_root::advance: %d live DisplayObjects in "
             "the global list", _liveChars.size());
@@ -2011,6 +2058,9 @@ movie_root::advanceLiveChars()
 
     std::for_each(_liveChars.begin(), _liveChars.end(),
             boost::bind(advanceLiveChar, _1));
+
+    std::for_each(_liveChars.begin(), _liveChars.end(),
+            boost::bind(notifyLoad, _1));
 }
 
 void
@@ -2031,8 +2081,7 @@ movie_root::set_background_color(const rgba& color)
 void
 movie_root::set_background_alpha(float alpha)
 {
-
-    boost::uint8_t newAlpha = clamp<int>(frnd(alpha * 255.0f), 0, 255);
+    const boost::uint8_t newAlpha = clamp<int>(frnd(alpha * 255.0f), 0, 255);
 
     if (m_background_color.m_a != newAlpha) {
         setInvalidated();
@@ -2079,7 +2128,6 @@ void
 movie_root::getURL(const std::string& urlstr, const std::string& target,
         const std::string& data, MovieClip::VariablesMethod method)
 {
-
     log_network("%s: HOSTFD is %d",  __FUNCTION__, _hostfd);
     
     if (_hostfd < 0) {
@@ -2159,14 +2207,12 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
 void
 movie_root::setScriptLimits(boost::uint16_t recursion, boost::uint16_t timeout)
 {
-    
     if ( recursion == _recursionLimit && _timeoutLimit == timeout ) {
         // avoid the debug log...
         return;
     }
 
-    if ( RcInitFile::getDefaultInstance().lockScriptLimits() )
-    {
+    if (RcInitFile::getDefaultInstance().lockScriptLimits()) {
         LOG_ONCE( log_debug(_("SWF ScriptLimits tag attempting to set "
             "recursionLimit=%1% and scriptsTimeout=%2% ignored "
             "as per rcfile directive"), recursion, timeout) );
@@ -2189,7 +2235,6 @@ movie_root::setScriptLimits(boost::uint16_t recursion, boost::uint16_t timeout)
 void
 movie_root::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 {
-
     // Stage
     const movie_definition* def = _rootMovie->definition();
     assert(def);
@@ -2205,6 +2250,10 @@ movie_root::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
     localIter = tr.append_child(it, std::make_pair("Root SWF version",
                 os.str()));
     localIter = tr.append_child(it, std::make_pair("URL", def->get_url()));
+
+    // Is there a sychronizating sound or not?
+    localIter = tr.append_child(it, std::make_pair("Streaming sound",
+                _timelineSound ? "yes" : "no"));
 
     // TODO: format this better?
     localIter = tr.append_child(it, std::make_pair("Descriptive metadata",
@@ -2233,7 +2282,6 @@ movie_root::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 void
 movie_root::getCharacterTree(InfoTree& tr, InfoTree::iterator it)
 {
-
     InfoTree::iterator localIter;
 
     /// Stage: number of live MovieClips.
@@ -2247,7 +2295,6 @@ movie_root::getCharacterTree(InfoTree& tr, InfoTree::iterator it)
             i != e; ++i) {
         i->second->getMovieInfo(tr, localIter);
     }
-
 }
 
 #endif
@@ -2276,7 +2323,6 @@ isLevelTarget(int version, const std::string& name, unsigned int& levelno)
     // getting 0 here for "_level" is intentional
     levelno = std::strtoul(name.c_str() + 6, NULL, 0); 
     return true;
-
 }
 
 short
@@ -2315,7 +2361,6 @@ movie_root::LoadCallback::setReachable() const
 bool
 movie_root::LoadCallback::processLoad()
 {
-
     if (!_stream) {
         callMethod(_obj, NSV::PROP_ON_DATA, as_value());
         return true;
@@ -2394,8 +2439,8 @@ void
 movie_root::callInterface(const HostInterface::Message& e) const
 {
     if (!_interfaceHandler) {
-        log_error("Hosting application registered no callback for events/queries"
-            ", can't call %s(%s)");
+        log_error("Hosting application registered no callback for "
+                "events/queries, can't call %s(%s)");
         return;
     }
     _interfaceHandler->call(e);
@@ -2556,6 +2601,14 @@ advanceLiveChar(MovieClip* mo)
                 mo->getTarget());
     }
 #endif
+}
+
+void
+notifyLoad(MovieClip* mo)
+{
+    if ( mo->parent() ) {
+        mo->queueLoad();
+    }
 }
 
 } // anonymous namespace

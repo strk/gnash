@@ -22,6 +22,8 @@
 #include "FuzzyPixel.h"
 #include "RGBA.h" // for rgba class
 
+#include <algorithm>
+
 namespace gnash {
 
 bool

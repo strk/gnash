@@ -560,7 +560,7 @@ as_object::executeTriggers(Property* prop, const ObjectURI& uri,
     
     // This is a particularly clear and concise way of removing dead triggers.
     EraseIf(*_trigs, boost::bind(boost::mem_fn(&Trigger::dead), 
-             boost::bind(SecondElement<TriggerContainer::value_type>(), _1)));
+             boost::bind(&TriggerContainer::value_type::second, _1)));
                     
     // The trigger call could have deleted the property,
     // so we check for its existence again, and do NOT put

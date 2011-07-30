@@ -21,34 +21,9 @@
 #define GNASH_ALGORITHM_H
 
 #include <algorithm>
-#include <boost/checked_delete.hpp>
-#include <boost/intrusive_ptr.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/bind.hpp>
 
 namespace gnash {
-
-/// Retrieve the second element of a container with std::pairs.
-template<typename T>
-struct SecondElement
-{
-    typedef typename T::second_type result_type;
-
-    const result_type& operator()(const T& pair) const {
-        return pair.second;
-    }
-};
-
-/// Retrieve the first element of a container with std::pairs.
-template<typename T>
-struct FirstElement
-{
-    typedef typename T::first_type result_type;
-
-    const result_type& operator()(const T& pair) const {
-        return pair.first;
-    }
-};
 
 /// Return a pointer to a type
 template<typename T>
@@ -76,7 +51,6 @@ void EraseIf(Container& c, Predicate p)
     }
 }
 
-
 /// Get the size of an array without passing a pointer by mistake
 template<typename T, size_t N>
 size_t
@@ -97,8 +71,10 @@ template<typename T, typename U>
 void
 foreachSecond(T begin, T end, U op)
 {
-    typedef SecondElement<typename std::iterator_traits<T>::value_type> S;
-    std::for_each(begin, end, boost::bind(op, boost::bind(S(), _1)));
+    typedef typename std::iterator_traits<T>::value_type value_type;
+
+    std::for_each(begin, end, boost::bind(op,
+                boost::bind(&value_type::second, _1)));
 }
 
 } // namespace gnash

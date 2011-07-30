@@ -354,7 +354,7 @@ Cygnal::probePeers(std::vector<boost::shared_ptr<peer_t> > &peers)
 
 // 	createClient();
     std::vector<boost::shared_ptr<Cygnal::peer_t> >::iterator it;
-    for (it = peers.begin(); it != peers.end(); it++) {
+    for (it = peers.begin(); it != peers.end(); ++it) {
 	boost::shared_ptr<Cygnal::peer_t> peer = *it;
 	probePeers(*peer);
 	if (peer->connected) {
@@ -395,7 +395,7 @@ void
 Cygnal::dump()
 {
     std::vector<boost::shared_ptr<Cygnal::peer_t> >::iterator it;
-    for (it = _peers.begin(); it != _peers.end(); it++) {
+    for (it = _peers.begin(); it != _peers.end(); ++it) {
 	cerr << "Remote Peer: " << (*it)->hostname
 	     << ":" << (*it)->port << endl;
     }
@@ -632,7 +632,6 @@ admin_handler(Network::thread_params_t *args)
 
     map<int, Handler *>::iterator hit;
     stringstream response;
-    int index = 0;
     
     Network net;
     Handler::admin_cmd_e cmd = Handler::POLL;
@@ -694,17 +693,14 @@ admin_handler(Network::thread_params_t *args)
 			       << "," << hand->outsize()
 			       << "\r\n";
 		      net.writeNet(response);
-		      index++;
 		  }
 #endif
 	      }
-	      index = 0;
 	      break;
 	      case Handler::POLL:
 #ifdef USE_STATS_QUEUE
-		  index = 0;
 		  response << handlers.size() << " handlers are currently active." << "\r\n";
- 		  for (hit = handlers.begin(); hit != handlers.end(); hit++) {
+ 		  for (hit = handlers.begin(); hit != handlers.end(); ++hit) {
 		      int fd = hit->first;
  		      Handler *hand = hit->second;
 		      struct timespec now;
@@ -726,9 +722,7 @@ admin_handler(Network::thread_params_t *args)
 			       << "," << stats->totalout
 			       << "\r\n";
  		      net.writeNet(response.str());
-		      index++;
 		  }
-		  index = 0;
 #endif
 		  break;
 	      case Handler::INTERVAL:

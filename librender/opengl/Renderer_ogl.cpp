@@ -265,7 +265,8 @@ public:
     }
     
     ptrdiff_t offset = (_height - y) * (_width * 3) + x * 3;
-    color_out.set(_buffer[offset], _buffer[offset+1], _buffer[offset+2], 255);
+    color_out = rgba(_buffer[offset], _buffer[offset+1], _buffer[offset+2],
+            255);
 
     return true;
   }
@@ -1933,9 +1934,7 @@ sampleGradient(const GradientFill& fill, boost::uint8_t ratio)
             );
         }
 
-        rgba result;
-        result.set_lerp(gr0.color, gr1.color, f);
-        return result;
+        return lerp(gr0.color, gr1.color, f);
     }
 
     // Assuming gradients are ordered by ratio? see start comment

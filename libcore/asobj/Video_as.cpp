@@ -34,7 +34,6 @@ namespace gnash {
 namespace {    
     void attachPrototypeProperties(as_object& o);
     void attachVideoInterface(as_object& o);
-    as_value video_ctor(const fn_call& fn);
     as_value video_attach(const fn_call& fn);
     as_value video_clear(const fn_call& fn);
     as_value video_deblocking(const fn_call& fn);
@@ -56,10 +55,9 @@ createVideoObject(Global_as& gl)
 void
 video_class_init(as_object& global, const ObjectURI& uri)
 {
-	// This is going to be the global Video "class"/"function"
     Global_as& gl = getGlobal(global);
     as_object* proto = createObject(gl);
-    as_object* cl = gl.createClass(&video_ctor, proto);
+    as_object* cl = gl.createClass(emptyFunction, proto);
     attachVideoInterface(*proto);
 
 	// Register _global.Video
@@ -70,7 +68,9 @@ void
 registerVideoNative(as_object& global)
 {
     VM& vm = getVM(global);
-    vm.registerNative(video_ctor, 667, 0);
+    // Constructor. Since it's native, this is probably used internally
+    // and isn't the class constructor, which is an empty function.
+    vm.registerNative(emptyFunction, 667, 0);
     vm.registerNative(video_attach, 667, 1);
     vm.registerNative(video_clear, 667, 2);
 }
@@ -171,15 +171,8 @@ as_value
 video_clear(const fn_call& fn)
 {
 	Video* video = ensure<IsDisplayObject<Video> >(fn);
-
     video->clear();
     return as_value();
-}
-
-as_value
-video_ctor(const fn_call& /* fn */)
-{
-	return as_value();
 }
 
 } // anonymous namespace

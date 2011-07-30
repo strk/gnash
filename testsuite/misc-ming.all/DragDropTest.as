@@ -61,7 +61,10 @@ dragOutHandler = function()
 	note(this+'.onDragOver called with args: '+dumpObject(arguments));
 };
 
-createEmptyMovieClip("target10", 10);
+ createTextField("tf", 0, 0, 100, 20, 5004);
+tf.text = "Hello";
+
+ createEmptyMovieClip("target10", 10);
 with (target10)
 {
 	lineStyle(4, 0);
@@ -302,16 +305,38 @@ test10 = function()
 		// move the draggable over the first green square
 		_root.draggable50._x = _root.draggable50._y = 50;
 
-		// and stop the drag 
-		_root.draggable50.stopDrag();
-
 		test11();
 	};
 };
 
+// Check that startDrag works for a textfield.
+// The textfield should no longer be at 0, 100.
 test11 = function()
 {
-	note("11. Click ANYWHERE OUT of the THIRD BLUE circle (on another circle makes a better test)");
+	note("11. Click on the SECOND GREEN circle.");
+
+    // Deliberately set target to null and then 
+    // call stopDrag (old version) to make sure it still works.
+    asm { push null settargetexpr };
+    stopDrag();
+
+    check_equals(_root.tf._x, 0);
+    check_equals(_root.tf._y, 100);
+
+    tf.startDrag = MovieClip.prototype.startDrag;
+    tf.startDrag(true);
+	_root.onMouseDown = function()
+	{
+		check_equals(_root.draggable50._droptarget, "/loadedTarget/target100");
+        check(_root.tf._x != 0);
+        check(_root.tf._y != 100);
+		test12();
+	};
+};
+
+test12 = function()
+{
+	note("12. Click ANYWHERE OUT of the THIRD BLUE circle (on another circle makes a better test)");
 	_root.onMouseDown = function()
 	{
 		check_equals(_root.draggable50._droptarget, "/loadedTarget/target100");
@@ -324,7 +349,7 @@ endOfTest = function()
 {
 	_root.ENDOFTEST = true;
 	note("END OF TEST");
-	check_totals(21);
+	check_totals(26);
 	_root.onMouseDown = undefined;
 };
 

@@ -18,7 +18,7 @@
  *
  */ 
 
-#define INPUT_FILENAME "streamingSoundTest1.swf"
+#define INPUT_FILENAME "streamingSoundTest2.swf"
 
 #include "MovieTester.h"
 #include "MovieClip.h"
@@ -26,6 +26,7 @@
 #include "DisplayList.h"
 #include "log.h"
 #include "GnashException.h"
+#include "GnashSleep.h"
 
 #include "check.h"
 
@@ -40,41 +41,38 @@ using namespace std;
 int
 main(int /*argc*/, char** /*argv*/)
 {
-	string filename = string(TGTDIR) + string("/") + string(INPUT_FILENAME);
-	auto_ptr<MovieTester> t;
+    string filename = string(TGTDIR) + string("/") + string(INPUT_FILENAME);
 
-	try
-	{
-		t.reset(new MovieTester(filename));
-	}
-	catch (const GnashException& e)
-	{
-		std::cerr << "Error initializing MovieTester: " << e.what() << std::endl;
-		exit(EXIT_FAILURE);
-	}
+    gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 
-	MovieTester& tester = *t;
+    MovieTester tester(filename);
 
-	tester.advance();
+    dbglogfile.setVerbosity(1);
 
-	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-	dbglogfile.setVerbosity(1);
-	dbglogfile.setActionDump(1);
+    MovieClip* root = tester.getRootMovie();
+    assert(root);
 
-	MovieClip* root = tester.getRootMovie();
-	assert(root);
+    check_equals(root->get_frame_count(), 48);
 
-	check_equals(root->get_frame_count(), 1);
+    if (!tester.canTestSound()) {
+        cout << "UNTESTED: sounds can't be tested with this build." << endl;
+        return EXIT_SUCCESS; // so testing doesn't abort
+    } 
 
-	if ( ! tester.canTestSound() )
-	{
-		cout << "UNTESTED: sounds can't be tested with this build." << endl;
-		return EXIT_SUCCESS; // so testing doesn't abort
-	} 
+    check_equals(tester.streamingSound(), true);
+    
+    // The Movie contains a sprite with a streaming sound. The sprite
+    // has 4 frames, the movie 8. We expect the streaming sound to play
+    // twice through. 
 
-	check_equals(tester.soundsStarted(), 0);
-	check_equals(tester.soundsStopped(), 0);
+    while (root->get_current_frame() < root->get_frame_count() - 1) {
 
+        // Check twice per frame so we don't get out of sync.
+        tester.advanceClock(10);
+        tester.advance(false);
+
+        check_equals(tester.streamingSound(), true);
+    }
 
 }
 

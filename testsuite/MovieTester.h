@@ -116,13 +116,21 @@ public:
 
 	/// Advance the movie by one frame
 	//
+    /// Note that the default testing behaviour does not mirror actual
+    /// playback; under normal circumstances, movie_root::advance() is
+    /// called at a heartbeat rate, while movie_root calculates when to
+    /// advance the frame. In order to reproduce this behaviour, call
+    /// MovieTester::advance(false), then MovieTester::advanceClock(x), where
+    /// x is the heartbeat interval in ms.
+    //
+    /// Rendering is only triggered when the frame advanced.
+    //
 	/// @param updateClock
 	///	If true (the default), this method also
 	///     advances the clock by the nominal delay expected
 	///     between frame advancements before performing the
 	///     actual playhead advancement.
-	///
-	void advance(bool updateClock=true);
+	void advance(bool updateClock = true);
 
 	/// Advance the clock by the given amount of milliseconds
 	void advanceClock(unsigned long ms);
@@ -389,12 +397,6 @@ private:
 	/// number of samples fetched 
 	unsigned int _samplesFetched;      
 };
-
-// exp2 isn't part of standard C++, so is defined here in case the compiler
-// doesn't supply it (e.g. in BSD)
-#ifndef HAVE_EXP2
-inline double	exp2(double x) { return std::pow((double)2, double(x)); }
-#endif
 
 } // namespace gnash
 

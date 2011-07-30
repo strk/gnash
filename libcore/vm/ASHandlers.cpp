@@ -47,7 +47,7 @@
 #include "as_object.h"
 #include "DragState.h"
 #include "VM.h" // for getting the root
-#include "movie_root.h" // for set_DragState (ActionStartDragMovie)
+#include "movie_root.h" 
 #include "sound_handler.h"
 #include "namedStrings.h"
 #include "utf8.h"
@@ -464,7 +464,10 @@ ActionNextFrame(ActionExec& thread)
     DisplayObject* tgtch = env.target();
     MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
     if (tgt) tgt->goto_frame(tgt->get_current_frame() + 1);
-    else log_debug(_("ActionNextFrame: as_environment target is null or not a sprite"));
+    else {
+        log_debug(_("ActionNextFrame: as_environment target is null "
+                    "or not a sprite"));
+    }
 }
 
 void
@@ -1202,15 +1205,15 @@ ActionStartDragMovie(ActionExec& thread)
             log_aserror(_("startDrag: unknown target '%s'"), env.top(0));
         );
     }
-    DragState st(tgt);
 
-    st.setLockCentered(toBool(env.top(1), getVM(env)));
+    const bool lock = toBool(env.top(1), getVM(env));
+    DragState st(tgt, lock);
 
-    // Handle bounds.
-    if (toBool(env.top(2), getVM(env))) {
-        // strk: this works if we didn't drop any before, in
-        // a contrary case (if we used pop(), which I suggest)
-        // we must remember to updated this as required
+    // toNumber because we found out that ming writes "0" for the third
+    // argument, and this converts to true when converted to a bool when
+    // it should actually convert to false!
+    if (toNumber(env.top(2), getVM(env))) {
+
         boost::int32_t y1 = pixelsToTwips(toNumber(env.top(3), getVM(env)));
         boost::int32_t x1 = pixelsToTwips(toNumber(env.top(4), getVM(env)));
         boost::int32_t y0 = pixelsToTwips(toNumber(env.top(5), getVM(env)));
@@ -1247,11 +1250,9 @@ void
 ActionStopDragMovie(ActionExec& thread)
 {
     as_environment& env = thread.env;
-    DisplayObject* tgtch = env.target();
-    MovieClip* root_movie = tgtch ? tgtch->get_root() : 0;
-    if (root_movie) root_movie->stop_drag();
-    else log_debug(_("ActionStopDragMovie: as_environment target is "
-                "null or not a sprite"));
+    // Previously this checked the target, but manual tests show no
+    // need to do that; the drag is always stopped.
+    getRoot(env).stop_drag();
 }
 
 void
@@ -2485,9 +2486,11 @@ ActionNewAdd(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
-    newAdd(env.top(1), env.top(0), getVM(env));
+    const as_value& op2 = env.pop();
+    as_value op1 = env.pop();
+    newAdd(op1, op2, getVM(env));
 
-    env.drop(1);
+    env.push(op1);
 }
 
 void

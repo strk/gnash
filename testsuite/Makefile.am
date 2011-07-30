@@ -16,7 +16,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-AUTOMAKE_OPTIONS = 
+AUTOMAKE_OPTIONS = -Wno-portability
 
 DIR_MING=
 
@@ -104,8 +104,14 @@ EXTRA_DIST = check.h \
 
 dist_noinst_SCRIPTS = analyse-results.sh generic-testrunner.sh
 
-abs_mediadir = `cd $(srcdir)/media; pwd`
-abs_tmpsodir = `cd tmpSharedObject; pwd`
+abs_mediadir = $(shell cd $(srcdir)/media; pwd)
+abs_tmpsodir = $(shell cd tmpSharedObject; pwd)
+
+# Used to be hard-coded as '138765373'
+# But when multiple chroot environment exist and run
+# a make check at the same time, there's a key conflict.
+#
+build_shmkey = $(shell date +'%N')
 
 # could not find a way to only build this on make check
 check_LTLIBRARIES = libtestsuite.la 
@@ -146,7 +152,7 @@ tmpSharedObject:
 	mkdir tmpSharedObject
 
 gnashrc: gnashrc.in Makefile tmpSharedObject
-	sed -e 's#@@MEDIADIR@@#'$(abs_mediadir)'#g' -e 's#@@TMPSODIR@@#'$(abs_tmpsodir)'#g' $(srcdir)/gnashrc.in > $@
+	sed -e 's#@@MEDIADIR@@#$(abs_mediadir)#g' -e 's#@@TMPSODIR@@#$(abs_tmpsodir)#g' -e 's#@@SHMKEY@@#$(build_shmkey)#g' $(srcdir)/gnashrc.in > $@
 
 if ENABLE_MING
 
