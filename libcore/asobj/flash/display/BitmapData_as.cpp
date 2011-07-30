@@ -421,11 +421,11 @@ private:
 };
 
 /// Store offsets.
-struct Point
+struct Vector
 {
-    Point(int x, int y) : x(x), y(y) {}
-    int x;
-    int y;
+    Vector(boost::int32_t x, boost::int32_t y) : x(x), y(y) {}
+    boost::int32_t x;
+    boost::int32_t y;
 };
 
 /// Transform negative offsets into positive ones
@@ -436,23 +436,23 @@ struct Point
 /// We have to take base into account (I think), but not octave because
 /// octaves are all exact factors of the base.
 struct
-PointTransformer
+VectorTransformer
 {
-    /// Construct a PointTransformer for an x by y grid.
+    /// Construct a VectorTransformer for an x by y grid.
     //
     /// @param x    The product of the grid size and the x base.
     /// @param y    The product of the grid size and the y base.
-    PointTransformer(size_t x, size_t y) : _x(x), _y(y) {}
+    VectorTransformer(size_t x, size_t y) : _x(x), _y(y) {}
 
     /// Get a point within the grid.
     //
     /// Positive co-ordinates are left unchanged, negative ones translated
     /// to an offset from the end of the grid.
-    Point operator()(Point const& p) const {
+    Vector operator()(Vector const& p) const {
         if (p.x >= 0 && p.y >= 0) return p;
         const int x = p.x > 0 ? p.x : _x - std::abs(p.x) % _x;
         const int y = p.y > 0 ? p.y : _y - std::abs(p.y) % _y;
-        return Point(x, y);
+        return Vector(x, y);
     }
 private:
     const size_t _x;
@@ -479,7 +479,7 @@ struct PerlinAdapter
     ///                 successive octave. Any remaining octaves will have no
     ///                 offset applied.
     PerlinAdapter(Generator& g, size_t octaves, double baseX, double baseY,
-            bool fractal, const std::vector<Point>& offsets)
+            bool fractal, const std::vector<Vector>& offsets)
         :
         _gen(g),
         _octaves(octaves),
@@ -491,7 +491,7 @@ struct PerlinAdapter
         // the grid.
         std::transform(offsets.begin(), offsets.end(), 
                 std::back_inserter(_offsets),
-                PointTransformer(_baseX * _gen.size(), _baseY * _gen.size()));
+                VectorTransformer(_baseX * _gen.size(), _baseY * _gen.size()));
     }
 
     /// Return a noise value for the co-ordinate (x, y).
@@ -516,8 +516,8 @@ struct PerlinAdapter
 
         for (size_t i = 0; i < _octaves; ++i) {
    
-            const Point offset = i < _offsets.size() ? _offsets[i] :
-                Point(0, 0);
+            const Vector offset = i < _offsets.size() ? _offsets[i] :
+                Vector(0, 0);
 
             const double n = _gen((x + offset.x) / xphase,
                     (y + offset.y) / yphase, step);
@@ -541,7 +541,7 @@ private:
     const double _baseX;
     const double _baseY;
     const bool _fractal;
-    std::vector<Point> _offsets;
+    std::vector<Vector> _offsets;
 };
 
 /// Index iterators by x and y position
@@ -564,9 +564,9 @@ struct PixelIndexer
 /// Convert an array to a vector of offsets.
 //
 /// TODO: check what really happens when one is invalid.
-struct PointPusher
+struct VectorPusher
 {
-    PointPusher(std::vector<Point>& offsets, VM& vm)
+    VectorPusher(std::vector<Vector>& offsets, VM& vm)
         :
         _offsets(offsets),
         _vm(vm)
@@ -579,11 +579,11 @@ struct PointPusher
         as_value x, y;
         if (!p->get_member(NSV::PROP_X, &x)) return;
         if (!p->get_member(NSV::PROP_Y, &y)) return;
-        _offsets.push_back(Point(toInt(x, _vm), toInt(y, _vm)));
+        _offsets.push_back(Vector(toInt(x, _vm), toInt(y, _vm)));
     }
 
 private:
-    std::vector<Point>& _offsets;
+    std::vector<Vector>& _offsets;
     VM& _vm;
 };
 
@@ -1341,11 +1341,11 @@ bitmapdata_perlinNoise(const fn_call& fn)
     //
     /// We don't currently know what happens when one of the offsets doesn't
     /// have an x or a y member, or isn't an object etc.
-    std::vector<Point> offsets;
+    std::vector<Vector> offsets;
     if (fn.nargs > 8) {
         as_object* obj = toObject(fn.arg(8), getVM(fn));
         if (obj) {
-            PointPusher pp(offsets, getVM(fn));
+            VectorPusher pp(offsets, getVM(fn));
             foreachArray(*obj, pp);
         }
     }
