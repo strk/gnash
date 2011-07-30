@@ -494,7 +494,7 @@ sound_handler::startSound(int handle, int loops, const SoundEnvelopes* env,
 
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
     log_debug("startSound %d called, SoundInfo format is %s",
-            sound_handle, sounddata.soundinfo.getFormat());
+            handle, sounddata.soundinfo.getFormat());
 #endif
 
     // When this is called from a StreamSoundBlockTag,
