@@ -310,9 +310,9 @@ object_registerClass(const fn_call& fn)
 
     if (!d) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Object.registerClass(%s, %s): "
-                "can't find exported symbol"),
-                symbolid, typeName(theclass));
+            log_aserror(_("Object.registerClass('%s', %s): "
+                "can't find exported symbol (id: %d)"),
+                symbolid, typeName(theclass), id);
             );
         return as_value(false);
     }
