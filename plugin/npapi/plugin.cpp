@@ -30,6 +30,7 @@
 #include <cstdlib> // getenv
 #include <stdlib.h> // putenv
 #include <sys/types.h>
+#include "GnashSleep.h" // usleep
 
 #if defined(HAVE_WINSOCK_H) && !defined(__OS2__)
 # include <winsock2.h>
@@ -484,7 +485,7 @@ nsPluginInstance::~nsPluginInstance()
 
         if (rv <= 0) {
              int* pid = new int(_childpid);
-	     usleep(1000);
+             gnashSleep(1000);
 	     cleanup_childpid(pid);
         } else {
             gnash::log_debug("Child process exited with status %d", status);
