@@ -546,16 +546,16 @@ AOS4_sound_handler::audioTask()
 	if ((AHImp=(struct MsgPort*) IExec->AllocSysObjectTags(ASOT_PORT, TAG_DONE)) != NULL)
 	{
 		if ((AHIio=(struct AHIRequest *) IExec->AllocSysObjectTags(ASOT_IOREQUEST,
-																	ASOIOR_Size, 		sizeof(struct AHIRequest),
-																	ASOIOR_ReplyPort, 	AHImp,
-																	TAG_DONE)) != NULL)
+			ASOIOR_Size, 		sizeof(struct AHIRequest),
+			ASOIOR_ReplyPort, 	AHImp,
+			TAG_DONE)) != NULL)
 		{
 			AHIio->ahir_Version = 4;
 			AHIDevice = IExec->OpenDevice(AHINAME, 0, (struct IORequest *)AHIio, 0);
 			if (AHIDevice)
 			{
 				if (AHImp) IExec->FreeSysObject(ASOT_PORT, 		AHImp); AHImp = 0;
-				if (AHIio) IExec->FreeSysObject(ASOT_IOREQUEST, (struct IORequest *)AHIio); AHIio = 0;
+				IExec->FreeSysObject(ASOT_IOREQUEST, (struct IORequest *)AHIio); AHIio = 0;
 				if (PlayBuffer[0]) IExec->FreeMem(PlayBuffer[0],BUFSIZE); PlayBuffer[0] = 0;
 				if (PlayBuffer[1]) IExec->FreeMem(PlayBuffer[1],BUFSIZE); PlayBuffer[1] = 0;
 
