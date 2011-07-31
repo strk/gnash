@@ -135,7 +135,6 @@ namespace gnash {
 
 namespace gui {
 
-
 int terminate_request = false;  // global scope to avoid GUI access
 
 std::auto_ptr<Gui> createFBGui(unsigned long windowid, float scale,
@@ -186,8 +185,8 @@ FBGui::~FBGui()
     if (buffer) {
         log_debug(_("Freeing offscreen buffer"));
         free(buffer);
-#endif
     }
+#endif
 }
 
 bool
@@ -280,7 +279,8 @@ FBGui::init(int argc, char *** argv)
             _inputs.push_back(*it);
         }
     }
-    
+
+#if 0
     // Let -j -k override "window" size
     optind = 0; opterr = 0; char c;
     while ((c = getopt (argc, *argv, "j:k:X:Y:")) != -1) {
@@ -299,6 +299,7 @@ FBGui::init(int argc, char *** argv)
                 break;
         }
     }
+#endif
     
 #if 0
     // FIXME: this allows to draw in a subsection of the screen. OpenVG
