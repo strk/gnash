@@ -633,6 +633,11 @@ movie_root::keyEvent(key::code k, bool down)
     }
     
     if (down) {
+
+        // NB: Button handling is not correct, as only one button should
+        // respond to any key. A test is in misc-ming.all/KeyEventOrder.c.
+        // However, the previous attempt to fix caused real-life failures:
+        // see bug #33889.
         ButtonListeners copy = _buttonListeners;
         for (ButtonListeners::const_iterator it = copy.begin(), e = copy.end();
                 it != e; ++it) {
