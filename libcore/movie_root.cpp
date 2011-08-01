@@ -633,9 +633,9 @@ movie_root::keyEvent(key::code k, bool down)
     }
     
     if (down) {
-        std::list<Button*> copy = _buttonListeners;
-        for (std::list<Button*>::const_iterator it = copy.begin(),
-                e = copy.end(); it != e; ++it) {
+        ButtonListeners copy = _buttonListeners;
+        for (ButtonListeners::const_iterator it = copy.begin(), e = copy.end();
+                it != e; ++it) {
             if ((*it)->unloaded()) continue;
             (*it)->keyPress(k);
         }
