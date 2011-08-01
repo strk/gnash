@@ -398,10 +398,10 @@ public:
     /// Buttons: it is neither ascii nor the key-specific code.
     //
     /// @param c    The SWF key code for the button event.
-    void registerButtonKey(int c, Button* listener);
+    void registerButton(Button* listener);
 
     /// Remove a DisplayObject listener for key events
-    void removeButtonKey(Button* listener);
+    void removeButton(Button* listener);
 
     /// Get the DisplayObject having focus
     //
@@ -954,13 +954,7 @@ private:
 
     void handleActionLimitHit(const std::string& ref);
 
-    /// A map of SWF key code to Buttons.
-    //
-    /// The Buttons are removed on destruction, so there is no need to
-    /// mark them reachable.
-    typedef std::pair<Button*, size_t> ButtonFrame;
-    typedef std::map<int, ButtonFrame> ButtonKeys;
-    ButtonKeys _buttonKeys;
+    std::list<Button*> _buttonListeners;
 
     GC _gc;
 

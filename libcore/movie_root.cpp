@@ -541,7 +541,7 @@ movie_root::reset()
     _movieLoader.clear();
 
     // Remove button key events.
-    _buttonKeys.clear();
+    _buttonListeners.clear();
 
     // Cleanup the stack.
     _vm.getStack().clear();
@@ -633,16 +633,11 @@ movie_root::keyEvent(key::code k, bool down)
     }
     
     if (down) {
-        ButtonKeys::const_iterator it =
-            _buttonKeys.find(key::codeMap[k][key::SWF]);
-
-        // TODO: this searches through all ButtonActions for the correct
-        // one, even though we could easily know which one it's going to be
-        // because we search through them all to register the key codes.
-        if (it != _buttonKeys.end()) {
-            if (!it->second.first->unloaded()) {
-                it->second.first->keyPress(k);
-            }
+        std::list<Button*> copy = _buttonListeners;
+        for (std::list<Button*>::const_iterator it = copy.begin(),
+                e = copy.end(); it != e; ++it) {
+            if ((*it)->unloaded()) continue;
+            (*it)->keyPress(k);
         }
 
         // If we're focused on an editable text field, finally the text
@@ -1923,29 +1918,20 @@ movie_root::callExternalCallback(const std::string &name,
 }
 
 void
-movie_root::removeButtonKey(Button* listener)
+movie_root::removeButton(Button* listener)
 {
-    // Remove the button and the key associated with it from the map.
-    for (ButtonKeys::iterator i = _buttonKeys.begin(), e = _buttonKeys.end();
-            i != e;) {
-        if (i->second.first == listener) {
-            _buttonKeys.erase(i++);
-        }
-        else ++i;
-    }
-
+    _buttonListeners.remove_if(
+            std::bind2nd(std::equal_to<Button*>(), listener));
 }
 
 void
-movie_root::registerButtonKey(int code, Button* listener)
+movie_root::registerButton(Button* listener)
 {
-    const size_t frame = _rootMovie->get_current_frame();
-    ButtonKeys::const_iterator it = _buttonKeys.find(code);
-
-    if (it != _buttonKeys.end() && it->second.second < frame) {
+    if (std::find(_buttonListeners.begin(), _buttonListeners.end(), listener)
+            != _buttonListeners.end()) {
         return;
     }
-    _buttonKeys[code] = std::make_pair(listener, frame);
+    _buttonListeners.push_front(listener);
 }
 
 void
