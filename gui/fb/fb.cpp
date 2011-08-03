@@ -128,9 +128,6 @@
 # include "fb_glue_gles1.h"
 #endif
 
-// namespace {
-// gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
-// }
 namespace gnash {
 
 namespace gui {
@@ -192,7 +189,7 @@ FBGui::~FBGui()
 bool
 FBGui::init(int argc, char *** argv)
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     // the current renderer as set on the command line or gnashrc file
     std::string renderer = _runResources.getRenderBackend();
@@ -229,6 +226,10 @@ FBGui::init(int argc, char *** argv)
         _width =  ovg->getWidth();
         _height = ovg->getHeight();
         log_debug("Width:%d, Height:%d", _width, _height);
+        _renderer.reset(renderer::openvg::create_handler(0));     
+        renderer::openvg::Renderer_ovg *rend = reinterpret_cast
+            <renderer::openvg::Renderer_ovg *>(_renderer.get());
+        rend->init(_width, _height);
     }
     if ((renderer != "openvg") && (renderer != "agg")) {
         log_error("No renderer! %s not supported.", renderer);
@@ -317,12 +318,12 @@ FBGui::init(int argc, char *** argv)
 
     _validbounds.setTo(0, 0, _width - 1, _height - 1);
 
-    if (renderer == "openvg") {
-        _renderer.reset(renderer::openvg::create_handler(0));     
-        renderer::openvg::Renderer_ovg *rend = reinterpret_cast
-            <renderer::openvg::Renderer_ovg *>(_renderer.get());
-        rend->init(_width, _height);
-    }
+    // if (renderer == "openvg") {
+    //     _renderer.reset(renderer::openvg::create_handler(0));     
+    //     renderer::openvg::Renderer_ovg *rend = reinterpret_cast
+    //         <renderer::openvg::Renderer_ovg *>(_renderer.get());
+    //     rend->init(_width, _height);
+    // }
     
     if (renderer == "agg") {
         _renderer.reset(create_Renderer_agg(0));
@@ -357,9 +358,6 @@ FBGui::run()
         
         // check input devices
         checkForData();
-
-        // FIXME: process the input data
-        // boost::shared_ptr<input_event_t> popData();
 
         // advance movie  
         Gui::advance_movie(this);
@@ -414,18 +412,19 @@ bool
 FBGui::createWindow(const char* /*title*/, int /*width*/, int /*height*/,
                      int /*xPosition*/, int /*yPosition*/)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
+    _runResources.setRenderer(_renderer);
+    
 #ifdef RENDERER_AGG
     if (_glue) {
         _glue->prepDrawingArea(0);
-        return true;
+    } else {
+        return false;
     }
 #endif
     
-    _runResources.setRenderer(_renderer);
-    
-    return false;
+    return true;
 }
 
 bool
