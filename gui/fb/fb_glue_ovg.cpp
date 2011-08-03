@@ -56,7 +56,7 @@ FBOvgGlue::~FBOvgGlue()
 bool
 FBOvgGlue::init(int argc, char **argv[])
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
 #if 0
     bool egl = false;
@@ -141,7 +141,7 @@ FBOvgGlue::init(int argc, char **argv[])
 Renderer*
 FBOvgGlue::createRenderHandler()
 {
-    // GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     // Create the renderer
     _renderer.reset(renderer::openvg::create_handler(0));
@@ -173,7 +173,7 @@ FBOvgGlue::setInvalidatedRegions(const InvalidatedRanges& /* ranges */)
 void
 FBOvgGlue::prepDrawingArea(void *drawing_area)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     // _device->attachWindow(reinterpret_cast
     //         <renderer::GnashDevice::native_window_t>(drawing_area));
