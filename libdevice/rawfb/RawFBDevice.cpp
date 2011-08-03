@@ -46,15 +46,16 @@ RawFBDevice::RawFBDevice()
     : _fd(0),
       _fbmem(0)
 {
-    GNASH_REPORT_FUNCTION;
-    dbglogfile.setVerbosity();
+    // GNASH_REPORT_FUNCTION;
+
+    //    dbglogfile.setVerbosity();
 }
 
 RawFBDevice::RawFBDevice(int vid)
     : _fd(0),
       _fbmem(0)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     memset(&_cmap, 0, sizeof(struct fb_cmap));
     
@@ -67,7 +68,8 @@ RawFBDevice::RawFBDevice(int argc, char *argv[])
     : _fd(0),
       _fbmem(0)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     memset(&_cmap, 0, sizeof(struct fb_cmap));    
 }
 
@@ -80,7 +82,7 @@ RawFBDevice::clear()
 
 RawFBDevice::~RawFBDevice()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     if (_fbmem) {
         munmap(_fbmem, 0);

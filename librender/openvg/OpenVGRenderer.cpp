@@ -82,7 +82,8 @@ class eglScopeMatrix : public boost::noncopyable
 public:
     eglScopeMatrix(const SWFMatrix& m)
         {
-            GNASH_REPORT_FUNCTION;            
+            // GNASH_REPORT_FUNCTION;            
+
             vgGetMatrix(_orig_mat);
             // Renderer_ovg::printVGMatrix(_orig_mat);
             
@@ -436,7 +437,7 @@ Renderer_ovg::begin_display(gnash::rgba const&, int width, int height,
 void
 Renderer_ovg::end_display()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 }
 
 /// Draw a line-strip directly, using a thin, solid line. 
@@ -446,7 +447,7 @@ void
 Renderer_ovg::drawLine(const std::vector<point>& coords, const rgba& fill,
                        const SWFMatrix& mat)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     
     VGubyte     gseg[MAX_SEG];
     VGfloat     gdata[MAX_SEG*3*2];
@@ -509,7 +510,8 @@ Renderer_ovg::draw_poly(const std::vector<point>& corners,
                         const rgba& fill, const rgba& /* outline */,
                         const SWFMatrix& mat, bool /* masked */)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     VGubyte     gseg[MAX_SEG];
     VGfloat     gdata[MAX_SEG*3*2];
     int         scount = 0;
@@ -570,7 +572,7 @@ Renderer_ovg::set_antialiased(bool /* enable */)
 void
 Renderer_ovg::begin_submit_mask()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     PathVec mask;
     _masks.push_back(mask);
@@ -580,7 +582,7 @@ Renderer_ovg::begin_submit_mask()
 void
 Renderer_ovg::end_submit_mask()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     // If masking is disabled, rhen we can't use it
     if (_drawing_mask == true) {
@@ -600,7 +602,8 @@ Renderer_ovg::end_submit_mask()
 void
 Renderer_ovg::apply_mask()
 {  
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
+
     if (_masks.empty()) {
         return;
     }
@@ -636,7 +639,7 @@ Renderer_ovg::apply_mask()
 void
 Renderer_ovg::disable_mask()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     
     // if (vgGeti(VG_MASKING) == VG_TRUE) {
         _masks.pop_back();
@@ -652,7 +655,7 @@ Renderer_ovg::disable_mask()
 void
 Renderer_ovg::add_paths(const PathVec& path_vec)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     SWFCxForm dummy_cx;
     
@@ -1046,7 +1049,7 @@ Renderer_ovg::get_contours(const PathPtrVec &paths)
 void
 Renderer_ovg::draw_mask(const PathVec& path_vec)
 { 
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
    
     if (_drawing_mask == true) {
         for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
@@ -1116,7 +1119,7 @@ Renderer_ovg::find_subshapes(const PathVec& path_vec)
 void
 Renderer_ovg::apply_matrix_to_paths(std::vector<Path>& paths, const SWFMatrix& mat)
 {  
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     std::for_each(paths.begin(), paths.end(),
                   boost::bind(&Path::transform, _1, boost::ref(mat)));
@@ -1213,7 +1216,7 @@ Renderer_ovg::draw_submask(const PathVec& path_vec,
                            const SWFCxForm& /* cx */,
                             const FillStyle& /* f_style */)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     
     PathVec normalized = normalize_paths(path_vec);
     
