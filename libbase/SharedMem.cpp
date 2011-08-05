@@ -80,8 +80,10 @@ SharedMem::~SharedMem()
     else {
         // Note that this isn't completely reliable.
         if (!ds.shm_nattch) {
-            log_debug("No shared memory users left. Removing segment.");
+            log_debug("No shared memory users left. Removing segment "
+                    "and semaphore.");
             ::shmctl(_shmid, IPC_RMID, 0);
+            ::semctl(_semid, IPC_RMID, 0);
         }
     }
 #endif
