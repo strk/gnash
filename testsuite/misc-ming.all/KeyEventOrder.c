@@ -195,7 +195,7 @@ main(int argc, char** argv)
 
   SWFMovie_nextFrame(mo);
 
-  check_equals(mo, "_root.order",
+  xcheck_equals(mo, "_root.order",
           "'mc2,mc1,o1,o2,button1,mc2,mc1,o1,o2,button3,'");
   
   SWFMovie_nextFrame(mo);

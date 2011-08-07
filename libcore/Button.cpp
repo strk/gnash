@@ -224,25 +224,6 @@ private:
     DisplayObject* _tp;
 };
 
-class ButtonKeyRegisterer : public std::unary_function<int, void>
-{
-public:
-    ButtonKeyRegisterer(movie_root& mr, Button* this_ptr)
-        :
-        _mr(mr),
-        _tp(this_ptr)
-    {}
-
-    void operator()(int code) const
-    {
-        _mr.registerButtonKey(code, _tp);
-    }
-
-private:
-    movie_root& _mr;
-    Button* _tp;
-};
-
 }
 
 namespace {
@@ -853,8 +834,7 @@ Button::construct(as_object* initObj)
 
     // Register key events.
     if (_def->hasKeyPressHandler()) {
-        ButtonKeyRegisterer r(stage(), this);
-        _def->visitKeyCodes(r);
+        stage().registerButton(this);
     }
 
 }
@@ -906,7 +886,7 @@ Button::unloadChildren()
 void
 Button::destroy()
 {
-    stage().removeButtonKey(this);
+    stage().removeButton(this);
 
     for (DisplayObjects::iterator i = _stateCharacters.begin(),
             e=_stateCharacters.end(); i != e; ++i) {

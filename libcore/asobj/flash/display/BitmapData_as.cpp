@@ -162,6 +162,10 @@ namespace {
 template<typename RNG = boost::rand48>
 struct Noise
 {
+    typedef RNG Rand;
+    typedef boost::uniform_int<> Dist;
+    typedef boost::variate_generator<Rand, boost::uniform_int<> > Gen;
+
     /// Create a PRNG to supply uniformly distributed numbers.
     //
     /// @param seed     A seed for the pseudo random numbers.
@@ -183,13 +187,16 @@ struct Noise
     //
     /// This is for use by std::random_shuffle().
     int operator()(int val) {
-        return uni(val);
+        // Note: in versions of boost newer than 1.35 or so, we can just call
+        // uni(val), but we still aim to support 1.35 (and 1.34 if possible).
+        typedef boost::random_number_generator<Gen> Adapter;
+        return Adapter(uni)(val);
     }
 
 private:
-    RNG rng;
-    boost::uniform_int<> dist;
-    boost::variate_generator<RNG, boost::uniform_int<> > uni;
+    Rand rng;
+    Dist dist;
+    Gen uni;
 };
 
 template<typename NoiseGenerator>
