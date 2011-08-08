@@ -116,6 +116,15 @@ protected:
     std::vector< geometry::Range2d<int> > _drawbounds;
 
     boost::scoped_ptr<Renderer> _renderer;
+
+#ifdef BUILD_RAWFB_DEVICE
+    renderer::rawfb::RawFBDevice        _display;
+#else
+# ifdef BUILD_X11_DEVICE
+    renderer::x11::X11Device            _display;
+# endif
+#endif
+    
 };
 
 } // end of namespace gui
