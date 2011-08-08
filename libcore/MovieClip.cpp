@@ -163,12 +163,14 @@ public:
         assert(!_checked);
         if (ch->get_depth() <= _highestHiddenDepth) {
             if (ch->isMaskLayer()) {
+#ifdef DEBUG_MOUSE_ENTITY_FINDING
                 log_debug(_("CHECKME: nested mask in MouseEntityFinder. "
                             "This mask is %s at depth %d outer mask masked "
                             "up to depth %d."),
                             ch->getTarget(), ch->get_depth(),
                             _highestHiddenDepth);
                 // Hiding mask still in effect...
+#endif
             }
             return;
         }
@@ -397,11 +399,13 @@ public:
         assert(!_checked);
         if (ch->get_depth() <= _highestHiddenDepth) {
             if (ch->isMaskLayer()) {
+#ifdef DEBUG_MOUSE_ENTITY_FINDING
                 log_debug(_("CHECKME: nested mask in DropTargetFinder. "
                         "This mask is %s at depth %d outer mask masked "
                         "up to depth %d."),
                         ch->getTarget(), ch->get_depth(), _highestHiddenDepth);
                 // Hiding mask still in effect...
+#endif
             }
             return;
         }
