@@ -194,23 +194,6 @@ FBGui::init(int argc, char *** argv)
     // the current renderer as set on the command line or gnashrc file
     std::string renderer = _runResources.getRenderBackend();
 
-    // map framebuffer into memory
-    // Create a new Glue layer
-#ifdef RENDERER_AGG
-    if (renderer.empty()) {
-        renderer = "agg";
-    }
-    if (renderer == "agg") {
-        _glue.reset(new FBAggGlue());
-        // Initialize the glue layer between the renderer and the gui toolkit
-        _glue->init(argc, argv);
-        FBAggGlue *agg = reinterpret_cast<FBAggGlue *>(_glue.get());
-        // Set "window" size
-        _width =  agg->width();
-        _height = agg->height();
-        log_debug("Width:%d, Height:%d", _width, _height);
-    }
-#endif
 #ifdef RENDERER_OPENVG
     if (renderer.empty()) {
         renderer = "openvg";
@@ -231,10 +214,33 @@ FBGui::init(int argc, char *** argv)
             <renderer::openvg::Renderer_ovg *>(_renderer.get());
         rend->init(_width, _height);
     }
+#endif
+
+    // map framebuffer into memory
+    // Create a new Glue layer
+#ifdef RENDERER_AGG
+    if (renderer.empty()) {
+        renderer = "agg";
+    }
+    if (renderer == "agg") {
+        _glue.reset(new FBAggGlue());
+        // Initialize the glue layer between the renderer and the gui toolkit
+        _glue->init(argc, argv);
+        FBAggGlue *agg = reinterpret_cast<FBAggGlue *>(_glue.get());
+        // Set "window" size
+        _width =  agg->width();
+        _height = agg->height();
+        log_debug("Width:%d, Height:%d", _width, _height);
+        _renderer.reset(agg->createRenderHandler());
+        // _renderer.reset(create_Renderer_agg(0));
+        // Renderer_agg_base *rend = reinterpret_cast<Renderer_agg_base *>(_renderer.get());
+        // rend->init(_width, _height);
+    }
+#endif
     if ((renderer != "openvg") && (renderer != "agg")) {
         log_error("No renderer! %s not supported.", renderer);
     }
-#endif
+    
     disable_terminal();
     
     // Initialize all the input devices
@@ -325,9 +331,9 @@ FBGui::init(int argc, char *** argv)
     //     rend->init(_width, _height);
     // }
     
-    if (renderer == "agg") {
-        _renderer.reset(create_Renderer_agg(0));
-    }
+    // if (renderer == "agg") {
+    //     _renderer.reset(create_Renderer_agg(0));
+    // }
 
     return true;
 }
@@ -335,6 +341,8 @@ FBGui::init(int argc, char *** argv)
 bool
 FBGui::run()
 {
+    GNASH_REPORT_FUNCTION;
+
 #ifdef USE_TSLIB
     int ts_loop_count;
 #endif
@@ -343,6 +351,14 @@ FBGui::run()
     
     // let the GUI recompute the x/y scale factors to best fit the whole screen
     resize_view(_validbounds.width(), _validbounds.height());
+
+#if 1
+    // FIXME: debug only !!!
+    if (_runResources.renderer() == 0) {
+        fprintf(stderr, "\nNo renderer initialized!\n\n");
+//        return false;
+    }
+#endif
     
     // This loops endlessly at the frame rate
     while (!terminate_request) {  
@@ -412,7 +428,7 @@ bool
 FBGui::createWindow(const char* /*title*/, int /*width*/, int /*height*/,
                      int /*xPosition*/, int /*yPosition*/)
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     _runResources.setRenderer(_renderer);
     
