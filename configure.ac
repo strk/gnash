@@ -1072,6 +1072,15 @@ if test x"${build_ogl}" != xno; then # yes or auto
   fi
 fi
 
+if test x"${build_ovg}" = xyes; then
+  GNASH_PATH_OPENVG
+  dnl If OpenVG isn't installed, disable it
+  if test x"${has_openvg}" = xno; then
+    build_ovg=no
+    AC_MSG_WARN([OpenVG specified but no development files found!])
+  fi
+fi
+
 AM_CONDITIONAL(BUILD_OVG_RENDERER,   [ test x${build_ovg} = xyes ])
 AM_CONDITIONAL(BUILD_GLES1_RENDERER, [ test x${build_gles1} = xyes ])
 AM_CONDITIONAL(BUILD_GLES2_RENDERER, [ test x${build_gles2} = xyes ])
@@ -2479,10 +2488,6 @@ AM_CONDITIONAL(BUILD_EGL_DEVICE, [test x"${build_egl_device}" = xyes])
 AM_CONDITIONAL(BUILD_DIRECTFB_DEVICE, [ test x${build_directfb_device} = xyes])
 AM_CONDITIONAL(BUILD_RAWFB_DEVICE, [ test x${build_rawfb_device} = xyes])
 AM_CONDITIONAL(BUILD_X11_DEVICE, [test x${build_x11_device} = xyes])
-
-if test x"${build_ovg}" = xyes; then
-  GNASH_PATH_OPENVG
-fi
 
 if test x"${build_gtk}" = xyes; then
   AC_ARG_ENABLE(ghelp,

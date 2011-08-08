@@ -16,6 +16,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_DEFUN([GNASH_PATH_OPENVG],
 [
+  has_openvg=yes
   mesavg=no
   dnl Look for the headers.
   AC_ARG_WITH(openvg_includes, AC_HELP_STRING([--with-openvg-includes], [directory where Openvg headers are]), with_openvg_includes=${withval})
