@@ -302,8 +302,21 @@ public:
 /// errors are caught by type-checking and will throw an unhandled exception.
 void setLerp(FillStyle& f, const FillStyle& a, const FillStyle& b, double t);
 
+/// Output operator for bitmap smoothing policy.
 DSOEXPORT std::ostream& operator<<(std::ostream& os,
         const BitmapFill::SmoothingPolicy& p);
+
+/// Output operator for FillStyles.
+std::ostream& operator<<(std::ostream& os, const FillStyle& fs);
+
+/// Output operator for GradientFill type.
+std::ostream& operator<<(std::ostream& o, GradientFill::Type t);
+
+/// Output operator for GradientFill spread mode.
+std::ostream& operator<<(std::ostream& o, GradientFill::SpreadMode t);
+
+/// Output operator for GradientFill interpolation mode.
+std::ostream& operator<<(std::ostream& o, GradientFill::InterpolationMode t);
 
 } // namespace gnash
 

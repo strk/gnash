@@ -204,7 +204,7 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
             
             const boost::uint8_t num_gradients = grad_props & 0xF;
             IF_VERBOSE_PARSE(
-               log_parse("  gradients: num_gradients = %d", +num_gradients);
+               log_parse("  gradients count: %d", +num_gradients);
             );
         
             if (!num_gradients) {
