@@ -82,7 +82,7 @@ class StreamAdapter : public IOChannel
         endPos(maxPos),
         currPos(startPos)
     {
-        assert(endPos > startPos);
+        assert(endPos >= startPos);
     }
 
     virtual ~StreamAdapter() {}
@@ -135,7 +135,7 @@ public:
     /// Get an IOChannel from a gnash::SWFStream
     static std::auto_ptr<IOChannel> getFile(SWFStream& str,
             unsigned long endPos) {
-        std::auto_ptr<IOChannel> ret (new StreamAdapter(str, endPos));
+        std::auto_ptr<IOChannel> ret(new StreamAdapter(str, endPos));
         return ret;
     }
 };
