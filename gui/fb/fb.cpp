@@ -232,7 +232,6 @@ FBGui::init(int argc, char *** argv)
         _height = agg->height();
         log_debug("Width:%d, Height:%d", _width, _height);
         _renderer.reset(agg->createRenderHandler());
-        // _renderer.reset(create_Renderer_agg(0));
         // Renderer_agg_base *rend = reinterpret_cast<Renderer_agg_base *>(_renderer.get());
         // rend->init(_width, _height);
     }
@@ -323,18 +322,7 @@ FBGui::init(int argc, char *** argv)
 #endif
 
     _validbounds.setTo(0, 0, _width - 1, _height - 1);
-
-    // if (renderer == "openvg") {
-    //     _renderer.reset(renderer::openvg::create_handler(0));     
-    //     renderer::openvg::Renderer_ovg *rend = reinterpret_cast
-    //         <renderer::openvg::Renderer_ovg *>(_renderer.get());
-    //     rend->init(_width, _height);
-    // }
     
-    // if (renderer == "agg") {
-    //     _renderer.reset(create_Renderer_agg(0));
-    // }
-
     return true;
 }
 
@@ -352,14 +340,6 @@ FBGui::run()
     // let the GUI recompute the x/y scale factors to best fit the whole screen
     resize_view(_validbounds.width(), _validbounds.height());
 
-#if 1
-    // FIXME: debug only !!!
-    if (_runResources.renderer() == 0) {
-        fprintf(stderr, "\nNo renderer initialized!\n\n");
-//        return false;
-    }
-#endif
-    
     // This loops endlessly at the frame rate
     while (!terminate_request) {  
         // wait the "heartbeat" inteval
