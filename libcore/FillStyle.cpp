@@ -285,11 +285,11 @@ struct FillStyleOutput : boost::static_visitor<>
 {
     FillStyleOutput(std::ostream& o) : _os(o) {}
     void operator()(const BitmapFill& bf) {
-        _os << boost::format("Bitmap fill: type %1%, smoothing %2%,"
+        _os << boost::format("Bitmap fill: type %1%, smoothing %2%, "
                 "matrix %3%") % bf.type() % bf.smoothingPolicy() % bf.matrix();
     }
     void operator()(const GradientFill& gf) {
-        _os << boost::format("Gradient Fill: type %1%, spread mode %2%, "
+        _os << boost::format("Gradient fill: type %1%, spread mode %2%, "
             "interpolation mode %3%, gradient count %4%, matrix %5%")
             % gf.type() % gf.spreadMode % gf.interpolation %
             gf.recordCount() % gf.matrix();

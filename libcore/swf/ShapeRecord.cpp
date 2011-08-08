@@ -699,7 +699,7 @@ readFillStyles(ShapeRecord::FillStyles& styles, SWFStream& in,
         OptionalFillPair fp = readFills(in, tag, m, false);
         styles.push_back(fp.first);
         IF_VERBOSE_PARSE(
-            log_parse(_("  Fill style: %1%"), fp.first);
+            log_parse(_("  Read fill: %1%"), fp.first);
         );
     }
 }
