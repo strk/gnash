@@ -986,6 +986,16 @@ AC_ARG_ENABLE(renderer,
   done
 )
 
+if test x"${build_ovg}" = xyes; then
+  GNASH_PATH_OPENVG
+  dnl If OpenVG isn't installed, disable it
+  if test x"${has_openvg}" = xno; then
+    AC_MSG_WARN([OpenVG specified but no development files found!])
+    renderer_list=`echo ${renderer_list} | sed -e 's/ openvg//' `
+    nrender=$((nrender-1))
+  fi
+fi
+
 dnl 16 bit: RGB555, RGB565
 dnl 24 bit: RGB24, BGR24
 dnl 32 bit: RGBA32, BGRA32
@@ -1072,15 +1082,6 @@ if test x"${build_ogl}" != xno; then # yes or auto
   fi
 fi
 
-if test x"${build_ovg}" = xyes; then
-  GNASH_PATH_OPENVG
-  dnl If OpenVG isn't installed, disable it
-  if test x"${has_openvg}" = xno; then
-    build_ovg=no
-    AC_MSG_WARN([OpenVG specified but no development files found!])
-  fi
-fi
-
 AM_CONDITIONAL(BUILD_OVG_RENDERER,   [ test x${build_ovg} = xyes ])
 AM_CONDITIONAL(BUILD_GLES1_RENDERER, [ test x${build_gles1} = xyes ])
 AM_CONDITIONAL(BUILD_GLES2_RENDERER, [ test x${build_gles2} = xyes ])
@@ -1088,7 +1089,7 @@ AM_CONDITIONAL(BUILD_OGL_RENDERER,   [ test x${build_ogl} = xyes])
 AM_CONDITIONAL(BUILD_AGG_RENDERER,   [ test x${build_agg} = xyes ])
 AM_CONDITIONAL(BUILD_CAIRO_RENDERER, [ test x${build_cairo} = xyes ])
 
-if test x"${build_ovg}" = xyes; then
+if test x"${has_openvg}" = xyes; then
    AC_DEFINE([RENDERER_OPENVG], [1], [Use OpenVG renderer])
 fi
 
@@ -3264,12 +3265,8 @@ else
 fi
 
 if test x"${build_ovg}" = x"yes"; then
-  if test x"$OPENVG_LIBS" != x; then
-    if test x"$OPENVG_CFLAGS" != x; then
-      echo "        OpenVG flags are: $OPENVG_CFLAGS"
-    else
-      echo "        OpenVG flags are: default include path"
-    fi
+  if test x"${has_openvg}" = xyes; then
+    echo "        OpenVG flags are: $OPENVG_CFLAGS"
     echo "        OpenVG libs are: $OPENVG_LIBS"
     else
       echo "        ERROR: No OpenVG development package installed!" >&3

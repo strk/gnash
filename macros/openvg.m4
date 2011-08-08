@@ -16,7 +16,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_DEFUN([GNASH_PATH_OPENVG],
 [
-  has_openvg=yes
+  has_openvg=no
   mesavg=no
   dnl Look for the headers.
   AC_ARG_WITH(openvg_includes, AC_HELP_STRING([--with-openvg-includes], [directory where Openvg headers are]), with_openvg_includes=${withval})
@@ -39,11 +39,12 @@ AC_DEFUN([GNASH_PATH_OPENVG],
         if test -f $i/VG/vgext.h; then
            AC_DEFINE(HAVE_VG_VGEXT_H, 1, [Have LibMESA OpenVG])
            mesavg=yes
-	else 
-	  if test -f $i/VG/ext.h; then
-            AC_DEFINE(HAVE_VG_EXT_H, 1, [Have Freescale OpenVG])
-	  fi
+	    else 
+	      if test -f $i/VG/ext.h; then
+          AC_DEFINE(HAVE_VG_EXT_H, 1, [Have Freescale OpenVG])
+	      fi
         fi
+        has_openvg=yes
         if test x"$i" != x"/usr/include"; then
           ac_cv_path_openvg_includes="-I$i"
           break
@@ -55,14 +56,16 @@ AC_DEFUN([GNASH_PATH_OPENVG],
     done
   fi
 
-  if test x"${ac_cv_path_openvg_includes}" = x; then
-    AC_CHECK_HEADERS([VG/openvg.h], [ac_cv_path_openvg_includes=""])
-  fi
+  dnl if test x"${has_openvg}" = xno; then
+  dnl   AC_CHECK_HEADER([VG/openvg.h], [ac_cv_path_openvg_includes=""])
+  dnl fi
 
   if test x"${mesavg}" = xyes; then
     OPENVG_CFLAGS="${ac_cv_path_openvg_includes}"
   else
-    OPENVG_CFLAGS="-DOPENVG_STATIC_LIBRARY ${ac_cv_path_openvg_includes}"
+    if test x"${ac_cv_header_openvg_includes}" != x; then
+      OPENVG_CFLAGS="-DOPENVG_STATIC_LIBRARY ${ac_cv_path_openvg_includes}"
+    fi
   fi
   AC_MSG_RESULT(${ac_cv_path_openvg_includes})
 
@@ -76,7 +79,7 @@ AC_DEFUN([GNASH_PATH_OPENVG],
     fi
   ])
 
-  if test x"${ac_cv_path_openvg_lib}" = x; then
+  if test x"${ac_cv_path_openvg_lib}" -o x"${has_openvg}" = xyes; then
     for i in $libslist; do
       if test -f $i/libOpenVG.${shlibext} -o -f $i/libOpenVG.a; then
         if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
@@ -103,9 +106,10 @@ AC_DEFUN([GNASH_PATH_OPENVG],
     if test -f $i/libcrypto.${shlibext} -o -f $i/libcrypto.a; then
       EXTRA_EGL_LIBS="${EXTRA_EGL_LIBS} -lcrypto"
     fi
-  fi
-  if test x"${ac_cv_path_openvg_lib}" = x; then
-    AC_CHECK_LIB([OpenVG], [vgClear], [ac_cv_path_openvg_lib="-lOpenVG"])
+    if test x"${ac_cv_path_openvg_lib}" = x; then
+      AC_CHECK_LIB([OpenVG], [vgClear], [ac_cv_path_openvg_lib="-lOpenVG"],
+                                        [ac_cv_path_openvg_lib=""])
+    fi
   fi
 
   if test x"${ac_cv_path_openvg_lib}" != x ; then
