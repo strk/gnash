@@ -144,6 +144,13 @@ FBAggGlue::init (int argc, char ***argv)
 	    return false;
     }
 #endif
+
+    _display.initDevice(0, 0);
+
+    // You must pass in the file descriptor to the opened
+    // framebuffer when creating a window. Under X11, this is
+    // actually the XID of the created window.
+    return _device->attachWindow(_display.getHandle());
     
     return true;
 }
