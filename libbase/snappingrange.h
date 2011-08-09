@@ -579,7 +579,7 @@ private:
     
     /// Calls combineRanges() once in a while, but not always. Avoids too many
     /// combineRanges() checks, which could slow down everything.
-    void combineRangesLazy() {
+    void combineRangesLazy() const {
         const size_type max = 5;
         ++_combineCounter;
         if (_combineCounter > max) combineRanges();
