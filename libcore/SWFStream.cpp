@@ -504,8 +504,7 @@ SWFStream::seek(unsigned long pos)
 unsigned long
 SWFStream::get_tag_end_position()
 {
-    assert(_tagBoundsStack.size() > 0);
-
+    assert(!_tagBoundsStack.empty());
     return _tagBoundsStack.back().second;
 }
 
@@ -590,8 +589,7 @@ SWFStream::open_tag()
 void
 SWFStream::close_tag()
 {
-
-    assert(_tagBoundsStack.size() > 0);
+    assert(!_tagBoundsStack.empty());
     std::streampos endPos = _tagBoundsStack.back().second;
     _tagBoundsStack.pop_back();
 
