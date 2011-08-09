@@ -294,8 +294,7 @@ OpenVGBitmap::applyPatternBitmap(const gnash::SWFMatrix& matrix,
     // Paint the cached VG image into the VG paint surface
     mat = matrix;
     mat.invert();
-    Renderer_ovg::printVGMatrix(matrix);
-    //Renderer_ovg::printVGMatrix(mat);
+    // Renderer_ovg::printVGMatrix(matrix);
     
     memset(vmat, 0, sizeof(vmat));
     // Convert from fixed point to floating point
@@ -306,7 +305,7 @@ OpenVGBitmap::applyPatternBitmap(const gnash::SWFMatrix& matrix,
     vmat[6] = mat.tx();
     vmat[7] = mat.ty();
     
-    Renderer_ovg::printVGMatrix(vmat);
+    // Renderer_ovg::printVGMatrix(vmat);
     
     vgSeti (VG_MATRIX_MODE, VG_MATRIX_FILL_PAINT_TO_USER);
     vgLoadMatrix (vmat);

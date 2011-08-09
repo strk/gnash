@@ -96,7 +96,7 @@ public:
             mat[6] = m.tx();
             mat[7] = m.ty();
             vgMultMatrix(mat);
-            Renderer_ovg::printVGMatrix(mat);
+            // Renderer_ovg::printVGMatrix(mat);
         }
   
     ~eglScopeMatrix()
@@ -623,7 +623,7 @@ Renderer_ovg::apply_mask()
     mat[6] =  0;    // shift tx
     mat[7] =  _display_height;   // shift ty
     vgLoadMatrix(mat);
-    Renderer_ovg::printVGMatrix(mat);
+    // Renderer_ovg::printVGMatrix(mat);
     
 #ifdef OPENVG_VERSION_1_1
     vgMask(_mask_layer, VG_FILL_MASK, 0, 0, _display_width, _display_height);
