@@ -1,5 +1,6 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011
+//   Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -49,7 +50,10 @@ public:
     void dispose()  { _image.reset(); }
     bool disposed() const { return !_image.get(); }
 
-    image::GnashImage& image();
+    image::GnashImage& image() {
+        assert(!disposed());
+        return *_image;
+    };
     VGPaint &vgimage() { return _vgimage; };
     
     // Accessors for the GnashImage internal data

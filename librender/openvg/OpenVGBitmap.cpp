@@ -1,5 +1,6 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011
+//   Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -37,13 +38,14 @@ static const int NUM_STOPS = 10;
 
 /// @param vgpaint the VG paint context
 OpenVGBitmap::OpenVGBitmap(VGPaint paint)
-    : _vgimage(VG_INVALID_HANDLE),
+    :
 #ifdef BUILD_X11_DEVICE
-      _pixel_format(VG_sARGB_8888),
+    _pixel_format(VG_sARGB_8888),
 #else
-      _pixel_format(VG_sRGB_565),
+    _pixel_format(VG_sRGB_565),
 #endif
-      _vgpaint(paint)
+    _vgimage(VG_INVALID_HANDLE),
+    _vgpaint(paint)
 {
     // GNASH_REPORT_FUNCTION;
 }
@@ -53,13 +55,14 @@ OpenVGBitmap::OpenVGBitmap(VGPaint paint)
 /// @param bitmap A CachedBitmap
 /// @param vgpaint the VG paint context
 OpenVGBitmap::OpenVGBitmap(CachedBitmap *bitmap, VGPaint vgpaint)
-    : _vgimage(VG_INVALID_HANDLE),
+    :
 #ifdef BUILD_X11_DEVICE
       _pixel_format(VG_sARGB_8888),
 #else
       _pixel_format(VG_sRGB_565),
 #endif
-       _vgpaint(vgpaint)
+      _vgimage(VG_INVALID_HANDLE),
+      _vgpaint(vgpaint)
 {
     // GNASH_REPORT_FUNCTION;
 
@@ -106,13 +109,13 @@ OpenVGBitmap::OpenVGBitmap(CachedBitmap *bitmap, VGPaint vgpaint)
 /// only the GnashImage is cached.
 OpenVGBitmap::OpenVGBitmap(image::GnashImage *image, VGPaint vgpaint)
     : _image(image),
-      _vgimage(VG_INVALID_HANDLE),
 #ifdef BUILD_X11_DEVICE
       _pixel_format(VG_sARGB_8888),
 #else
       _pixel_format(VG_sRGB_565),
 #endif
-    _vgpaint(vgpaint)
+      _vgimage(VG_INVALID_HANDLE),
+      _vgpaint(vgpaint)
 {
     // GNASH_REPORT_FUNCTION;
 } 
@@ -124,15 +127,6 @@ OpenVGBitmap::~OpenVGBitmap()
     vgDestroyPaint(_vgpaint);
     vgDestroyImage(_vgimage);
 }
-
-image::GnashImage&
-OpenVGBitmap::image()
-{
-    // GNASH_REPORT_FUNCTION;
-    if (_image) {
-        return *_image;
-    }
-}    
 
 /// Create a radial gradient and paint it to the context
 ///
@@ -156,7 +150,7 @@ OpenVGBitmap *
 OpenVGBitmap::createRadialBitmap(float cx, float cy, float fx, float fy,
                                  float radial, const rgba &incolor,
                                  const GradientFill::GradientRecords &records,
-                                 const SWFCxForm& cxform,
+                                 const SWFCxForm& /* cxform */,
                                  VGPaint paint)
 {
     // GNASH_REPORT_FUNCTION;
