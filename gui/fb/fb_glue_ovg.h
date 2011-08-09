@@ -92,7 +92,6 @@ private:
     //Rectangle _bounds;
     std::vector< geometry::Range2d<int> > _drawbounds;
     geometry::Range2d<int>              _validbounds;
-
     
     // EGL needs it's own display device, as that's how it stays platform
     // independent. For a Framebuffer we use that, and on the desktop,
