@@ -35,6 +35,12 @@
 #define MAX_MODES 1000
 #define MAX_SCREENS 10
 
+/* Avoid warning: `ident' defined but not used */
+#ifdef __GNUC__
+# define UNUSED __attribute__ (( unused ))
+#else
+# define UNUSED
+#endif
 
 /**
  * Print table of all available configurations.
@@ -105,7 +111,7 @@ PrintConfigs(EGLDisplay d)
  * Print table of all available configurations.
  */
 static void
-PrintModes(EGLDisplay d)
+PrintModes(EGLDisplay d UNUSED)
 {
 #ifdef EGL_MESA_screen_surface
    const char *extensions = eglQueryString(d, EGL_EXTENSIONS);
@@ -143,7 +149,7 @@ PrintModes(EGLDisplay d)
 
 
 int
-main(int argc, char *argv[])
+main(int argc UNUSED, char **argv UNUSED)
 {
    int maj, min;
    EGLDisplay d = eglGetDisplay(EGL_DEFAULT_DISPLAY);
