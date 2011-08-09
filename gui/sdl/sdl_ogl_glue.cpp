@@ -16,17 +16,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "sdl_ogl_glue.h"
 #include "opengl/Renderer_ogl.h"
 #include "tu_opengl_includes.h"
 #include "SDL.h"
+#include "sdl_ogl_glue.h"
 
 #include "log.h"
 
 #define OVERSIZE 1.0f
 
 using namespace std;
-
 
 namespace gnash
 {
@@ -56,7 +55,7 @@ SdlOglGlue::createRenderHandler(int depth)
 
     _bpp = depth;
 
-    Renderer* renderer = create_Renderer_ogl();
+    Renderer* renderer = renderer::opengl::create_handler();
 
     return renderer;
 }
