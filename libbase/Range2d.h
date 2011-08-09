@@ -20,8 +20,6 @@
 // Original author: Sandro Santilli <strk@keybit.net>
 //
 
-
-
 #ifndef GNASH_RANGE2D_H
 #define GNASH_RANGE2D_H
 
@@ -70,30 +68,6 @@ enum RangeKind {
 template <typename T>
 class Range2d
 {
-private:
-
-	T _xmin, _xmax, _ymin, _ymax;
-
-	T scaleMin(T min, float scale)
-	{
-		return roundMin(static_cast<float>(min) * scale);
-	}
-
-	T scaleMax(T max, float scale)
-	{
-		return roundMax(static_cast<float>(max) * scale);
-	}
-
-	T roundMin(float v)
-	{
-		return static_cast<T>(v);
-	}
-
-	T roundMax(float v)
-	{
-		return static_cast<T>(v);
-	}
-
 public:
 
 	/// Ouput operator
@@ -647,24 +621,22 @@ public:
 		return _ymax;
 	}
 	
-	
 	/// Get area (width*height)
-  ///  
-	T getArea() const
-  {
-    assert ( !isWorld() );
-    if ( isNull() ) return 0;
-    return (_xmax - _xmin) * (_ymax - _ymin);
-    // this implementation is for float types, see specialization below
-    // for ints... 
-  } 
+    ///  
+	T getArea() const {
+        assert ( !isWorld() );
+        if ( isNull() ) return 0;
+        return (_xmax - _xmin) * (_ymax - _ymin);
+        // this implementation is for float types, see specialization below
+        // for ints... 
+    } 
 
 	/// Expand this range to include the given Range2d
 	//
 	/// WORLD ranges force result to be the WORLD range.
 	/// A NULL range will have no effect on the result.
 	///
-	void  expandTo(const Range2d<T>& r)
+	void expandTo(const Range2d<T>& r)
 	{
 		if ( r.isNull() )
 		{
@@ -691,6 +663,26 @@ public:
 		_ymin = std::min(_ymin, r._ymin);
 		_ymax = std::max(_ymax, r._ymax);
 
+	}
+
+private:
+
+	T _xmin, _xmax, _ymin, _ymax;
+
+	T scaleMin(T min, float scale) const {
+		return roundMin(static_cast<float>(min) * scale);
+	}
+
+	T scaleMax(T max, float scale) const {
+		return roundMax(static_cast<float>(max) * scale);
+	}
+
+	T roundMin(float v) const {
+		return static_cast<T>(v);
+	}
+
+	T roundMax(float v) const {
+		return static_cast<T>(v);
 	}
 
 
@@ -784,8 +776,8 @@ Intersection(const Range2d<T>& r1, const Range2d<T>& r2)
 //
 /// Use floor.
 ///
-template <> inline int
-Range2d<int>::roundMin(float min)
+template<> inline int
+Range2d<int>::roundMin(float min) const
 {
 	return static_cast<int>(std::floor(min));
 }
@@ -794,8 +786,8 @@ Range2d<int>::roundMin(float min)
 //
 /// Use floor. 
 ///
-template <> inline unsigned int
-Range2d<unsigned int>::roundMin(float min)
+template<> inline unsigned int
+Range2d<unsigned int>::roundMin(float min) const
 {
 	return static_cast<unsigned int>(std::floor(min));
 }
@@ -804,8 +796,8 @@ Range2d<unsigned int>::roundMin(float min)
 //
 /// Use ceil. 
 ///
-template <> inline int
-Range2d<int>::roundMax(float max)
+template<> inline int
+Range2d<int>::roundMax(float max) const
 {
 	return static_cast<int>(std::ceil(max));
 }
@@ -814,8 +806,8 @@ Range2d<int>::roundMax(float max)
 //
 /// Use ceil.
 ///
-template <> inline unsigned int
-Range2d<unsigned int>::roundMax(float max)
+template<> inline unsigned int
+Range2d<unsigned int>::roundMax(float max) const
 {
 	return static_cast<unsigned int>(std::ceil(static_cast<float>(max)));
 }
@@ -824,23 +816,23 @@ Range2d<unsigned int>::roundMax(float max)
 //
 /// Add one.
 ///
-template <> inline int
+template<> inline int
 Range2d<int>::getArea() const
 {
-  assert ( !isWorld() );
-  if ( isNull() ) return 0;
-  return (_xmax - _xmin + 1) * (_ymax - _ymin + 1);
+    assert ( !isWorld() );
+    if ( isNull() ) return 0;
+    return (_xmax - _xmin + 1) * (_ymax - _ymin + 1);
 }
 
 /// Specialization of area value for unsigned int type.
 //
 /// Add one.
 ///
-template <> inline unsigned int
+template<> inline unsigned int
 Range2d<unsigned int>::getArea() const
 {
-  assert ( isFinite() );
-  return (_xmax - _xmin + 1) * (_ymax - _ymin + 1);
+    assert ( isFinite() );
+    return (_xmax - _xmin + 1) * (_ymax - _ymin + 1);
 }
 
 
