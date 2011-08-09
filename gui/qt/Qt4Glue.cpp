@@ -36,6 +36,9 @@ namespace gnash {
 /// DrawingWidget implementation
 DrawingWidget::DrawingWidget(Qt4Gui& gui)
     :
+#ifdef RENDERER_OPENGL
+    _glWidget(0),
+#endif 
     _gui(gui)
 {
 }
