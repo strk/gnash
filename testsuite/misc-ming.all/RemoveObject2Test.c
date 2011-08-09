@@ -44,15 +44,12 @@ make_square(int x, int y, int width, int height, byte r, byte g, byte b)
 	return sh;
 }
 
-int
-main(int argc, char ** argv)
+int main(void)
 {
 	SWFMovie mo;
 	SWFDisplayItem it1, it2, it3;
 	SWFShape sh1, sh2, sh3;
 	int framenum;
-
-	argc=argc; argv=argv; /* unused... */
 
 	/*********************************************
 	 *

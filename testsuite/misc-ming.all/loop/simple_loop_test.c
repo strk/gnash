@@ -40,21 +40,11 @@ get_shape(int r, int g, int b)
 	return sh;
 }
 
-int
-main(int argc, char** argv)
+int main(void)
 {
   SWFMovie mo;
   SWFShape sh;
   SWFDisplayItem it;
-
-  const char *srcdir=".";
-  if ( argc>1 ) 
-    srcdir=argv[1];
-  else
-  {
-      fprintf(stderr, "Usage: %s <mediadir>\n", argv[0]);
-      return 1;
-  }
 
   Ming_init();
   mo = newSWFMovieWithVersion(OUTPUT_VERSION);

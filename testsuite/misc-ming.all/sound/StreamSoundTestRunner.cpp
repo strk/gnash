@@ -46,8 +46,6 @@ main(int /*argc*/, char** /*argv*/)
 	MovieClip* root = tester.getRootMovie();
 	assert(root);
 
-    VM& vm = getVM(*getObject(root));
-
     const size_t framecount = root->get_frame_count();
 
     // Sanity.
