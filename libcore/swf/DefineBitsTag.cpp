@@ -417,7 +417,7 @@ readLossless(SWFStream& in, TagType tag)
 
     IF_VERBOSE_PARSE(
         log_parse(_("  defbitslossless2: tag = %d, fmt = %d, "
-                "w = %d, h = %d"), tag, bitmap_format, width, height);
+                "w = %d, h = %d"), tag, +bitmap_format, width, height);
     );
 
     std::auto_ptr<image::GnashImage> image;  
