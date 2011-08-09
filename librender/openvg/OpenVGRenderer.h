@@ -21,6 +21,10 @@
 /// git master.
 ///
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
 #ifndef GNASH_RENDER_HANDLER_OVG_H
 #define GNASH_RENDER_HANDLER_OVG_H
 
@@ -38,10 +42,12 @@
 #include "FillStyle.h"
 
 #include <VG/vgu.h>
-#ifdef OPENVG_VERSION_1_1
+#ifdef HAVE_VG_EXT_H
 # include <VG/ext.h>
 #else
-# include <VG/vgext.h>
+# ifdef HAVE_VG_VGEXT_H
+#  include <VG/vgext.h>
+# endif
 #endif
 #include <VG/openvg.h>
 #include "openvg/OpenVGBitmap.h"
