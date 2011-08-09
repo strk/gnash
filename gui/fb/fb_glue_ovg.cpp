@@ -56,7 +56,7 @@ FBOvgGlue::~FBOvgGlue()
 bool
 FBOvgGlue::init(int argc, char **argv[])
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
 #if 0
     bool egl = false;

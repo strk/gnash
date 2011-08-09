@@ -19,7 +19,6 @@
 #ifndef GNASH_RENDER_HANDLER_OGL_H
 #define GNASH_RENDER_HANDLER_OGL_H
 
-
 #if defined(NOT_SGI_GL) || defined(__APPLE_CC__)
 # ifdef __APPLE_CC__
 # include <AGL/agl.h>

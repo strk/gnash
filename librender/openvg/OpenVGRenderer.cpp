@@ -226,7 +226,7 @@ Renderer_ovg::Renderer_ovg(renderer::GnashDevice::dtype_t /* dtype */)
       _strokepaint(VG_INVALID_HANDLE),
       _aspect_ratio(0.75)       // 4:3 aspect ratio
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     set_scale(1.0f, 1.0f);
 
@@ -246,7 +246,7 @@ Renderer_ovg::Renderer_ovg(renderer::GnashDevice::dtype_t /* dtype */)
 void
 Renderer_ovg::init(float x, float y)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     _display_width = x;
     _display_height = y;
@@ -322,7 +322,7 @@ Renderer_ovg::drawVideoFrame(image::GnashImage* /* frame */, const SWFMatrix* /*
 void
 Renderer_ovg::world_to_pixel(int& x, int& y, float world_x, float world_y) const
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     // negative pixels seems ok here... we don't
     // clip to valid range, use world_to_pixel(rect&)
@@ -336,7 +336,7 @@ Renderer_ovg::world_to_pixel(int& x, int& y, float world_x, float world_y) const
 geometry::Range2d<int>
 Renderer_ovg::world_to_pixel(const SWFRect& wb) const
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     using namespace gnash::geometry;
     
@@ -354,7 +354,7 @@ Renderer_ovg::world_to_pixel(const SWFRect& wb) const
 geometry::Range2d<int>
 Renderer_ovg::world_to_pixel(const geometry::Range2d<float>& wb) const
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     if (wb.isNull() || wb.isWorld()) return wb;
     
@@ -369,7 +369,7 @@ Renderer_ovg::world_to_pixel(const geometry::Range2d<float>& wb) const
 point
 Renderer_ovg::pixel_to_world(int x, int y) const
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     point p(x, y);
     SWFMatrix mat = stage_matrix;
@@ -1344,7 +1344,7 @@ Renderer_ovg::drawGlyph(const SWF::ShapeRecord& rec, const rgba& c,
 void
 Renderer_ovg::set_scale(float xscale, float yscale)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     _xscale = xscale;
     _yscale = yscale;
@@ -1355,7 +1355,7 @@ Renderer_ovg::set_scale(float xscale, float yscale)
 void
 Renderer_ovg::set_invalidated_regions(const InvalidatedRanges& /* ranges */)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     // do nothing obviously. This method is required by the base class though,
     // so something has to be here.
