@@ -1876,40 +1876,6 @@ dnl and probably for many other guis too ...
 GNASH_PATH_X11
 AM_CONDITIONAL(HAVE_X11, [test x$x11 = xyes])
 
-AC_CHECK_LIB(rt, shm_unlink)
-AC_CHECK_FUNCS(shm_open shm_unlink)
-
-dnl if test x$cross_compiling = xno; then
-AC_LANG_PUSH(C++)
-AC_MSG_CHECKING([to see if float formatting is broken])
-AC_RUN_IFELSE([
-  AC_LANG_PROGRAM([#include <cmath>
-    void testFloat(double d, double& s)
-    {
-        d /= 1000.0;
-        s = std::fmod(d, 86400.0);
-    }], [
-     double d = 3.0935415006117e+23;
-     double s;
-     testFloat(d, s);
-     if (static_cast<int>(s) != 61440) {
-         return 1;
-     }])],                         dnl end of LANG_PROGRAM
-     broken_float=no,              dnl returns 0, works
-     broken_float=yes,             dnl returns 1, broken
-     broken_float=no               dnl cross compiling
-)                                  dnl end of RUN_IFELSE
-AC_LANG_POP(C++)
-dnl fi
-
-if test x${broken_float} = xyes; then
-  AC_MSG_RESULT([yes])
-  AC_DEFINE(HAVE_BROKEN_FLOAT, [1], [Has broken float support])
-else
-  AC_MSG_RESULT([no])
-fi
-AM_CONDITIONAL(BROKEN_FLOAT, [ test x$broken_float = xyes ])
-
 dnl See if ipc_perm structure has the ipc_perm.key field, and if so,
 dnl which variant of the name is used.
 ipc_key=no
@@ -2053,6 +2019,7 @@ fi
 AC_CHECK_FUNCS(sysconf)
 AC_CHECK_FUNCS(shmget shmat shmdt mmap)
 AC_CHECK_FUNCS(scandir)         dnl supported by BSD and Linux, but you never know...
+AC_CHECK_LIB(rt, clock_gettime)
 AC_CHECK_FUNC(clock_gettime, AC_DEFINE(HAVE_CLOCK_GETTIME, 1, [Has clock_gettime()] ))
 dnl Look for Win32 networking stuff
 AC_CHECK_HEADERS(winsock.h)
