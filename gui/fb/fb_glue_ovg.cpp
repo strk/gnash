@@ -1,6 +1,6 @@
 //
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
-//   Foundation, Inc
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011
+//   Free Software Foundation, Inc
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ namespace gnash {
 
 namespace gui {
 
-FBOvgGlue::FBOvgGlue(int fd)
+FBOvgGlue::FBOvgGlue(int /* fd */)
     : _stride(0)
 {
     // GNASH_REPORT_FUNCTION;    
@@ -171,7 +171,7 @@ FBOvgGlue::setInvalidatedRegions(const InvalidatedRanges& /* ranges */)
 }
 
 void
-FBOvgGlue::prepDrawingArea(void *drawing_area)
+FBOvgGlue::prepDrawingArea(void * /*drawing_area */)
 {
     // GNASH_REPORT_FUNCTION;
 
