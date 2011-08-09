@@ -88,6 +88,10 @@ AC_DEFUN([GNASH_PATH_OPENVG],
           break
         fi
       fi
+      if test -f $i/mesa-egl/libOpenVG.${shlibext} -o -f $i/mesa-egl/libOpenVG.a; then
+        ac_cv_path_openvg_lib="-L$i/mesa-egl -lOpenVG"
+        break
+      fi
     done
     dnl The Babbage board wants libgsl too. We put this in a separate
     dnl vatiable because all the executables need it when statically
