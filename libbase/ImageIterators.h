@@ -48,7 +48,7 @@ public:
     /// Standard assignment just copies bytes.
     //
     /// Underlying bytes are really in RGBA order, so we use that.
-    const ARGB& operator=(const ARGB& other) const {
+    ARGB& operator=(const ARGB& other) {
         switch (_t) {
             case TYPE_RGBA:
                 // RGBA to RGBA
