@@ -63,9 +63,7 @@ AC_DEFUN([GNASH_PATH_OPENVG],
   if test x"${mesavg}" = xyes; then
     OPENVG_CFLAGS="${ac_cv_path_openvg_includes}"
   else
-    if test x"${ac_cv_header_openvg_includes}" != x; then
-      OPENVG_CFLAGS="-DOPENVG_STATIC_LIBRARY ${ac_cv_path_openvg_includes}"
-    fi
+    OPENVG_CFLAGS="-DOPENVG_STATIC_LIBRARY ${ac_cv_path_openvg_includes}"
   fi
   AC_MSG_RESULT(${ac_cv_path_openvg_includes})
 
