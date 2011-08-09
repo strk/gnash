@@ -50,9 +50,13 @@ VideoDecoderGst::height() const
     return _height;
 }
 
+// TODO: either use width and height or remove them!
 VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type,
         int /*width*/, int /*height*/,
         const boost::uint8_t* extradata, size_t extradatasize)
+    :
+    _width(0),
+    _height(0)
 {
     // init GStreamer. TODO: what about doing this in MediaHandlerGst ctor?
     gst_init (NULL, NULL);
