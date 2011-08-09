@@ -109,14 +109,14 @@ DirectFBDevice::initDevice(int argc, char *argv[])
 {
     GNASH_REPORT_FUNCTION;
 
-    DFBResult result;
+    DFBResult result = DFB_FAILURE;
 
-    if ((result = DirectFBInit(&argc, &argv)) != DR_OK) {
+    if ((result = DirectFBInit(&argc, &argv)) != DFB_OK) {
 	log_error("DirectFBInit(): %s", getErrorString(result));
         return false;
     }
 
-    if ((result = DirectFBCreate(&_dfb)) != DR_OK) {
+    if ((result = DirectFBCreate(&_dfb)) != DFB_OK) {
 	log_error("DirectFBCreate(): %s", getErrorString(result));
         return false;
     }
@@ -143,7 +143,7 @@ DirectFBDevice::initDevice(int argc, char *argv[])
 //    dsc.caps = static_cast<DFBSurfaceCapabilities>(DSCAPS_PRIMARY | DSCAPS_DOUBLE | DSCAPS_VIDEOONLY);
     dsc.caps = static_cast<DFBSurfaceCapabilities>(DSCAPS_PRIMARY | DSCAPS_FLIPPING);
     
-    if ((result = _dfb->CreateSurface(_dfb, &dsc, &_surface)) != DR_OK) {
+    if ((result = _dfb->CreateSurface(_dfb, &dsc, &_surface)) != DFB_OK) {
 	log_error("CreateSurface(): %s", getErrorString(result));
         return false;
     }
@@ -191,9 +191,11 @@ DirectFBDevice::initDevice(int argc, char *argv[])
 }
 
 bool
-DirectFBDevice::attachWindow(GnashDevice::native_window_t window)
+DirectFBDevice::attachWindow(GnashDevice::native_window_t /* window */)
 {
     GNASH_REPORT_FUNCTION;
+
+    return false;
 }
 
 void
@@ -492,7 +494,7 @@ DirectFBDevice::printFBScreen(IDirectFBScreen *screen)
 {
     std::stringstream ss;
 
-    DFBResult result;
+    DFBResult result = DFB_FAILURE;
 
     if (screen) {
         // get the screen ID
@@ -1191,7 +1193,7 @@ DirectFBDevice::printSurfacePixelFormat(DFBSurfacePixelFormat format)
 }
 
 void
-DirectFBDevice::printColor(DFBColor color)
+DirectFBDevice::printColor(DFBColor /* color */)
 {
     std::stringstream ss;
 
@@ -1212,10 +1214,8 @@ DirectFBDevice::printFBSurfaceHintFlags(DFBSurfaceHintFlags flags)
 void
 DirectFBDevice::printFBFont(IDirectFBFont *font)
 {
-    std::stringstream ss;
-    
+    std::stringstream ss;    
     int ivalue;
-    const char *cvalue;
 
     if (font) {
         _font->GetHeight(_font, &ivalue);
@@ -1237,10 +1237,9 @@ DirectFBDevice::printFBFont(IDirectFBFont *font)
 
 /// print the data in a DirectFBInputDevice
 void
-DirectFBDevice::printFBInputDevice(IDirectFBInputDevice *input)
+DirectFBDevice::printFBInputDevice(IDirectFBInputDevice * /*input */)
 {
     std::stringstream ss;
-    
 
     std::cerr << ss.str() << std::endl;
 }

@@ -408,9 +408,6 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     //     runtest.fail("EGLDevice::operator[]()");
     // }
 
-    EGLSurface surf2 = egl.createPbuffer(300, 300);
-    EGLSurface surf3 = egl.createPbuffer(400, 400);
-
     if (hwinit) {
         if (egl.totalPbuffers() == 3) {
             runtest.pass("EGLDevice::totalPbuffers(2)");

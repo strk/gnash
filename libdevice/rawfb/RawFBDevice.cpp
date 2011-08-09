@@ -51,7 +51,7 @@ RawFBDevice::RawFBDevice()
     //    dbglogfile.setVerbosity();
 }
 
-RawFBDevice::RawFBDevice(int vid)
+RawFBDevice::RawFBDevice(int /* vid */)
     : _fd(0),
       _fbmem(0)
 {
@@ -64,7 +64,7 @@ RawFBDevice::RawFBDevice(int vid)
     }
 }
 
-RawFBDevice::RawFBDevice(int argc, char *argv[])
+RawFBDevice::RawFBDevice(int /* argc */ , char ** /* argv */)
     : _fd(0),
       _fbmem(0)
 {
@@ -99,7 +99,7 @@ RawFBDevice::initDevice(int /* argc */, char **/* argv[] */)
 {
     GNASH_REPORT_FUNCTION;
     
-    char *devname = 0;
+    const char *devname = 0;
     // Open the framebuffer device
 #ifdef ENABLE_FAKE_FRAMEBUFFER
     _fd = open(FAKEFB, O_RDWR);
@@ -212,19 +212,21 @@ RawFBDevice::attachWindow(GnashDevice::native_window_t window)
 
 // Return a string with the error code as text, instead of a numeric value
 const char *
-RawFBDevice::getErrorString(int error)
+RawFBDevice::getErrorString(int /* error */)
 {
+    return 0;
 }
 
 // Create an RAWFB window to render in. This is only used by testing
 void
-RawFBDevice::createWindow(const char *name, int x, int y, int width, int height)
+RawFBDevice::createWindow(const char * /* name */, int /* x */,
+                          int /* y */, int /* width */, int /* height */)
 {
     GNASH_REPORT_FUNCTION;
 }
 
 void
-RawFBDevice::eventLoop(size_t passes)
+RawFBDevice::eventLoop(size_t /* passes */)
 {
     GNASH_REPORT_FUNCTION;    
 }
