@@ -143,7 +143,6 @@ main(int argc, char *argv[])
     // This is a manual test to see if we can draw a line on the
     // raw framebuffer to make sure it got initialized correctly.
     int x = 0, y = 0;
-    int xoff = 0, yoff = 0;
     long location = 0;
     int line_length = rfb.getWidth() * ((rfb.getDepth()+7)/8);
 
