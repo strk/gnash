@@ -90,14 +90,14 @@ AC_DEFUN([GNASH_PATH_OPENVG],
       fi
       dnl Ubuntu Oneric (11.10) has moved the OpenVG libraries to an architecture
       dnl specific directory, I assume to separate the two library versions between
-      dnl X11 (Mesa) and a frasmebuffer.
+      dnl X11 (Mesa) and a framebuffer.
       if test -f $i/mesa-egl/libOpenVG.${shlibext} -o -f $i/mesa-egl/libOpenVG.a; then
         ac_cv_path_openvg_lib="-L$i/mesa-egl -lOpenVG"
         break
       fi
     done
     dnl The Babbage board wants libgsl too. We put this in a separate
-    dnl vatiable because all the executables need it when statically
+    dnl variable because all the executables need it when statically
     dnl linking. With Ltib, when cross compiling, these are needed at
     dnl link time.
     if test -f $i/libgsl.${shlibext} -o -f $i/libgsl.a; then
