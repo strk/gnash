@@ -565,7 +565,7 @@ MovieTester::initTestingRenderers()
     
 #ifdef RENDERER_OPENGL
     // Initialize opengl renderer
-    handler.reset(create_Renderer_ogl(false));
+    handler.reset(renderer::opengl::create_handler(false));
     addTestingRenderer(handler, "OpenGL");
 #endif
 }
