@@ -62,7 +62,7 @@ SharedLib::SharedLib(const std::string& filespec)
     _filespec = filespec;
 }
 
-SharedLib::SharedLib(const std::string& filespec, const std::string& envvar)
+SharedLib::SharedLib(const std::string& filespec, const std::string& /* envvar */)
 {
     _filespec = filespec;
     scoped_lock lock(_libMutex);
