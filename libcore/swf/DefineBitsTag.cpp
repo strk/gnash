@@ -82,7 +82,7 @@ class StreamAdapter : public IOChannel
         endPos(maxPos),
         currPos(startPos)
     {
-        assert(endPos > startPos);
+        assert(endPos >= startPos);
     }
 
     virtual ~StreamAdapter() {}
@@ -135,7 +135,7 @@ public:
     /// Get an IOChannel from a gnash::SWFStream
     static std::auto_ptr<IOChannel> getFile(SWFStream& str,
             unsigned long endPos) {
-        std::auto_ptr<IOChannel> ret (new StreamAdapter(str, endPos));
+        std::auto_ptr<IOChannel> ret(new StreamAdapter(str, endPos));
         return ret;
     }
 };
@@ -417,7 +417,7 @@ readLossless(SWFStream& in, TagType tag)
 
     IF_VERBOSE_PARSE(
         log_parse(_("  defbitslossless2: tag = %d, fmt = %d, "
-                "w = %d, h = %d"), tag, bitmap_format, width, height);
+                "w = %d, h = %d"), tag, +bitmap_format, width, height);
     );
 
     std::auto_ptr<image::GnashImage> image;  

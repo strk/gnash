@@ -56,8 +56,6 @@ public:
     bool pointTestLocal(boost::int32_t x, boost::int32_t y, 
             const SWFMatrix& wm) const;
 
-protected:
-
 private:
 
     DefineShapeTag(SWFStream& in, TagType tag, movie_definition& m,

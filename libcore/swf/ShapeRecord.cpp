@@ -630,24 +630,26 @@ readFillStyles(ShapeRecord::FillStyles& styles, SWFStream& in,
          SWF::TagType tag, movie_definition& m, const RunResources& /*r*/)
 {
     in.ensureBytes(1);
-    boost::uint16_t FillStyle_count = in.read_u8();
+    boost::uint16_t fillcount = in.read_u8();
     if (tag != SWF::DEFINESHAPE) {
-        if (FillStyle_count == 0xFF) {
+        if (fillcount == 0xff) {
             in.ensureBytes(2);
-            FillStyle_count = in.read_u16();
+            fillcount = in.read_u16();
         }
     }
 
-    IF_VERBOSE_PARSE (
-        log_parse(_("  readFillStyles: count = %u"), FillStyle_count);
+    IF_VERBOSE_PARSE(
+        log_parse(_("  fill styles: %1%"), fillcount);
     );
 
     // Read the styles.
-    styles.reserve(styles.size()+FillStyle_count);
-    for (boost::uint16_t i = 0; i < FillStyle_count; ++i) {
-        // TODO: add a FillStyle constructor directly reading from stream
+    styles.reserve(styles.size() + fillcount);
+    for (boost::uint16_t i = 0; i < fillcount; ++i) {
         OptionalFillPair fp = readFills(in, tag, m, false);
         styles.push_back(fp.first);
+        IF_VERBOSE_PARSE(
+            log_parse(_("  Read fill: %1%"), fp.first);
+        );
     }
 }
 
@@ -713,7 +715,12 @@ computeBounds(SWFRect& bounds, const ShapeRecord::Paths& paths,
 std::ostream&
 operator<<(std::ostream& o, const ShapeRecord& sh)
 {
-    o << "Shape Record: bounds " << sh.getBounds();
+    o << boost::format("Shape Record: bounds %1%") % sh.getBounds();
+
+    const ShapeRecord::FillStyles& fills = sh.fillStyles();
+    std::copy(fills.begin(), fills.end(),
+            std::ostream_iterator<FillStyle>(o, ","));
+
     return o;
 }
 

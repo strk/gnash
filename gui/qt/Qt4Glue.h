@@ -49,6 +49,7 @@ public:
 #ifdef RENDERER_OPENGL
     QGLWidget* _glWidget;
 #endif 
+
 public slots:
     
     void properties();

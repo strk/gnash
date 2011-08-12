@@ -124,7 +124,7 @@ Extension::scanAndLoad(as_object& where)
     }
     
     std::vector<std::string>::iterator it;
-    for (it = _modules.begin(); it != _modules.end(); it++) {
+    for (it = _modules.begin(); it != _modules.end(); ++it) {
         const std::string& mod = *it;
         log_security(_("Loading module: %s from %s"), mod, _pluginsdir);
         initModule(mod, where);
@@ -259,7 +259,7 @@ Extension::dumpModules()
     
     std::cerr << _modules.size() << " plugin(s) for Gnash installed" << std::endl;    
     std::vector<std::string>::iterator it;
-    for (it = _modules.begin(); it != _modules.end(); it++) {
+    for (it = _modules.begin(); it != _modules.end(); ++it) {
         std::cerr << "Module name is: \"" << *(it) << "\"" << std::endl;
     }
 }

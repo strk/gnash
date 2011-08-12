@@ -173,7 +173,7 @@ SdlAggGlue::setInvalidatedRegions(const InvalidatedRanges& ranges)
 void
 SdlAggGlue::render()
 {
-    if ( _drawbounds.size() == 0 ) return; // nothing to do..
+    if (_drawbounds.empty()) return; // nothing to do..
     
     for (unsigned int bno=0; bno < _drawbounds.size(); bno++) {
         geometry::Range2d<int>& bounds = _drawbounds[bno];

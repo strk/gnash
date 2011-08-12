@@ -218,7 +218,7 @@ main(int argc, char *argv[])
 		cout << "FLV Header size: " << headsize << " (should always be 9)" << endl;
 	    }
             // Extract all the Tags
-            size_t total = st.st_size - sizeof(Flv::flv_header_t);
+            //size_t total = st.st_size - sizeof(Flv::flv_header_t);
              while (!ifs.eof()) {
 		 ifs.read(reinterpret_cast<char *>(&previous), sizeof(Flv::previous_size_t));
 		 if (ifs.gcount() != sizeof(Flv::previous_size_t)) {
@@ -226,7 +226,7 @@ main(int argc, char *argv[])
 		 }
 		 
 		 previous = ntohl(previous);
-		 total -= sizeof(Flv::previous_size_t);
+		 //total -= sizeof(Flv::previous_size_t);
 		 if (all) {   
 		     cout << "FLV Previous Tag Size was: " << previous << endl;
 		 }
@@ -236,7 +236,7 @@ main(int argc, char *argv[])
 		 }
 		 tag  = flv.decodeTagHeader(buf);
 		 flv.dump();
-		 total -= sizeof(Flv::previous_size_t);
+		 //total -= sizeof(Flv::previous_size_t);
 		 size_t bodysize = flv.convert24(tag->bodysize);
 		 if (bodysize == 0) {
 		     cerr << "FLV Tag size is zero, skipping reading packet body " << bodysize << endl;
@@ -251,7 +251,7 @@ main(int argc, char *argv[])
 // 		 if (ifs.gcount() != bodysize) {
 // 		     log_error("Couldn't read the entire body");
 // 		 }
-		 total -= bodysize;
+		 //total -= bodysize;
 		 switch (tag->type) {
 		   case Flv::TAG_AUDIO:
 		   {

@@ -55,10 +55,6 @@ int        lt_dlmakeresident   (lt_dlhandle handle);
 lt_dlhandle lt_dlopenext       (const char *filename);
 #endif
 
-#if defined(_WIN32) || defined(WIN32)
-# define PLUGINSDIR "./"
-#endif
-
 namespace gnash {
 
 SharedLib::SharedLib(const std::string& filespec)
@@ -80,14 +76,6 @@ SharedLib::SharedLib(const std::string& filespec, const std::string& envvar)
 #else
 # warning "libltdl not enabled in build".
 #endif    
-    std::string pluginsdir;
-    char *env = std::getenv (envvar.c_str());
-    if (env) {
-        pluginsdir = env;
-    } else {
-        pluginsdir = PLUGINSDIR;
-    }
-    
 }
 
 SharedLib::~SharedLib()

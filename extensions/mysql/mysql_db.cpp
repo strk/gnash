@@ -318,7 +318,8 @@ mysql_qetData(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
 
     if (fn.nargs > 0) {
-        std::string sql = fn.arg(0).to_string();
+        // TODO: maybe use this argument.
+        //std::string sql = fn.arg(0).to_string();
 	    as_object* arr = toObject(fn.arg(1), getVM(fn));
 
         MySQL::query_t qresult;

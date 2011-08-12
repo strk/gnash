@@ -224,7 +224,6 @@ setLerp(FillStyle& f, const FillStyle& a, const FillStyle& b, double t)
     boost::apply_visitor(SetLerp(a.fill, b.fill, t), f.fill);
 }
 
-
 std::ostream&
 operator<<(std::ostream& os, const BitmapFill::SmoothingPolicy& p)
 {
@@ -243,6 +242,72 @@ operator<<(std::ostream& os, const BitmapFill::SmoothingPolicy& p)
             os << "unknown " << +p;
             break;
     }
+    return os;
+}
+
+std::ostream&
+operator<<(std::ostream& o, GradientFill::Type t)
+{
+    switch (t) {
+        case GradientFill::LINEAR:
+            return o << "linear";
+        default:
+        case GradientFill::RADIAL:
+            return o << "radial";
+    }
+}
+
+std::ostream&
+operator<<(std::ostream& o, GradientFill::SpreadMode t)
+{
+    switch (t) {
+        case GradientFill::PAD:
+            return o << "pad";
+        case GradientFill::REPEAT:
+            return o << "repeat";
+        default:
+        case GradientFill::REFLECT:
+            return o << "reflect";
+    }
+}
+
+std::ostream&
+operator<<(std::ostream& o, GradientFill::InterpolationMode t)
+{
+    switch (t) {
+        case GradientFill::RGB:
+            return o << "rgb";
+        default:
+        case GradientFill::LINEAR_RGB:
+            return o << "linear rgb";
+    }
+}
+
+struct FillStyleOutput : boost::static_visitor<>
+{
+    FillStyleOutput(std::ostream& o) : _os(o) {}
+    void operator()(const BitmapFill& bf) {
+        _os << boost::format("Bitmap fill: type %1%, smoothing %2%, "
+                "matrix %3%") % bf.type() % bf.smoothingPolicy() % bf.matrix();
+    }
+    void operator()(const GradientFill& gf) {
+        _os << boost::format("Gradient fill: type %1%, spread mode %2%, "
+            "interpolation mode %3%, gradient count %4%, matrix %5%")
+            % gf.type() % gf.spreadMode % gf.interpolation %
+            gf.recordCount() % gf.matrix();
+    }
+    void operator()(const SolidFill& sf) {
+        _os << boost::format("Solid Fill: color %1%") % sf.color();
+    }
+private:
+    std::ostream& _os;
+};
+
+std::ostream&
+operator<<(std::ostream& os, const FillStyle& fs)
+{
+    FillStyleOutput out(os);
+    boost::apply_visitor(out, fs.fill);
     return os;
 }
 

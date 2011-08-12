@@ -21,8 +21,7 @@
 #include "Shape.h"
 #include "Transform.h"
 
-namespace gnash
-{
+namespace gnash {
 
 bool
 Shape::pointInShape(boost::int32_t x, boost::int32_t y) const

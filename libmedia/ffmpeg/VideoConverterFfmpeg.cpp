@@ -190,7 +190,7 @@ VideoConverterFfmpeg::convert(const ImgBuf& src)
 #endif    
     ret.reset(new ImgBuf(_dst_fmt, dstbuffer, bufsize, src.width,
                          src.height));
-    std::copy(dstpicture.linesize, dstpicture.linesize+4, ret->stride); 
+    std::copy(dstpicture.linesize, dstpicture.linesize+4, ret->stride.begin()); 
  
     return ret;
 }
