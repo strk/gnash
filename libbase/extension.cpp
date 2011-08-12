@@ -128,7 +128,7 @@ Extension::initModule(const std::string& module, as_object &where)
     log_security(_("Initializing module: \"%s\" from %s"), symbol, _pluginsdir);
     
     if (_plugins[module] == 0) {
-        sl = new SharedLib(_pluginsdir + "/" + module, "GNASH_PLUGINS");
+        sl = new SharedLib(_pluginsdir + "/" + module);
         sl->openLib();
         _plugins[module] = sl;
     } else {
