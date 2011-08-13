@@ -299,7 +299,7 @@ Handler::initModule(const std::string& str)
     
     // Update the list of loaded plugins so we only load them once.
     if (_plugins[module] == 0) {
-        sl = new SharedLib(module, "CYGNAL_PLUGINS");
+        sl = new SharedLib(module);
 	lt_dlsetsearchpath(_pluginsdir.c_str());
         sl->openLib();
         _plugins[module] = sl;

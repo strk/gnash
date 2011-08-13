@@ -22,6 +22,9 @@
 #include "CachedBitmap.h"
 #include "GnashImage.h"
 #include "Renderer.h"
+#include "FillStyle.h"
+#include "SWFCxForm.h"
+#include "SWFMatrix.h"
 
 namespace gnash {
 
@@ -29,10 +32,32 @@ class SolidFill;
 class GradientFill;
 class BitmapFill;
 class rgba; 
+class StyleHandler;
  
 namespace renderer {
 
 namespace openvg {
+
+// Forward declarations.
+namespace {
+    /// Creates 8 bitmap functions
+    template<typename FillMode, typename Pixel>
+            void storeBitmap(StyleHandler& st, const OpenVGBitmap* bi,
+            const SWFMatrix& mat, const SWFCxForm& cx,
+            bool smooth);
+    template<typename FillMode> void storeBitmap(StyleHandler& st,
+            const OpenVGBitmap* bi, const SWFMatrix& mat, const SWFCxForm& cx,
+            bool smooth);
+
+    /// Creates many (should be 18) gradient functions.
+    void storeGradient(StyleHandler& st, const GradientFill& fs,
+            const SWFMatrix& mat, const SWFCxForm& cx);
+    template<typename Spread> void storeGradient(StyleHandler& st,
+            const GradientFill& fs, const SWFMatrix& mat, const SWFCxForm& cx);
+    template<typename Spread, typename Interpolation>
+            void storeGradient(StyleHandler& st, const GradientFill& fs,
+            const SWFMatrix& mat, const SWFCxForm& cx);
+}
 
 /// @note These helper functions are used by the boost::variant used
 /// for fill styles. A variant is a C++ style version of the C union.
@@ -40,6 +65,95 @@ namespace openvg {
 /// boost::apply_visitor() to bind one of these classes to the style
 /// to extract the data.
 
+/// Transfer FillStyles to OpenVG styles.
+struct OpenVGStyles : boost::static_visitor<>
+{
+    OpenVGStyles(SWFMatrix stage, SWFMatrix fill, const SWFCxForm& c,
+                 StyleHandler& sh, Quality q)
+        : _stageMatrix(stage.invert()),
+          _fillMatrix(fill.invert()),
+          _cx(c),
+          _sh(sh),
+          _quality(q)
+        {
+            GNASH_REPORT_FUNCTION;
+        }
+    
+    void operator()(const GradientFill& f) const {
+        SWFMatrix m = f.matrix();
+        m.concatenate(_fillMatrix);
+        m.concatenate(_stageMatrix);
+        storeGradient(_sh, f, m, _cx);
+    }
+
+    void operator()(const SolidFill& f) const {
+        const rgba color = _cx.transform(f.color());
+
+        // add the color to our self-made style handler (basically
+        // just a list)
+        // _sh.add_color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b,
+        //           color.m_a));
+    }
+
+    void operator()(const BitmapFill& f) const {
+        SWFMatrix m = f.matrix();
+        m.concatenate(_fillMatrix);
+        m.concatenate(_stageMatrix);
+
+        // Smoothing policy:
+        //
+        // - If unspecified, smooth when _quality >= BEST
+        // - If ON or forced, smooth when _quality > LOW
+        // - If OFF, don't smooth
+        //
+        // TODO: take a forceBitmapSmoothing parameter.
+        //       which should be computed by the VM looking
+        //       at MovieClip.forceSmoothing.
+        bool smooth = false;
+        if (_quality > QUALITY_LOW) {
+            // TODO: if forceSmoothing is true, smooth !
+            switch (f.smoothingPolicy()) {
+                case BitmapFill::SMOOTHING_UNSPECIFIED:
+                    if (_quality >= QUALITY_BEST) {
+                        smooth = true;
+                    }
+                    break;
+                case BitmapFill::SMOOTHING_ON:
+                    smooth = true;
+                    break;
+                default: break;
+            }
+        }
+
+        const bool tiled = (f.type() == BitmapFill::TILED);
+
+        const CachedBitmap* bm = f.bitmap(); 
+
+#if 0
+        if (!bm) {
+            // See misc-swfmill.all/missing_bitmap.swf
+            _sh.add_color(agg::rgba8_pre(255,0,0,255));
+        } else if ( bm->disposed() ) {
+            // See misc-ming.all/BeginBitmapFill.swf
+            _sh.add_color(agg::rgba8_pre(0,0,0,0));
+        } else {
+            _sh.add_bitmap(dynamic_cast<const agg_bitmap_info*>(bm),
+                           m, _cx, tiled, smooth);
+        }
+#endif
+    }
+    
+private:
+    /// The inverted stage matrix.
+    const SWFMatrix _stageMatrix;
+    
+    /// The inverted fill matrix.
+    const SWFMatrix _fillMatrix;
+    const SWFCxForm& _cx;
+    StyleHandler& _sh;
+    const Quality _quality;
+};
+    
 /// Get the color of a style from the variant
 class GetColor : public boost::static_visitor<rgba>
 {

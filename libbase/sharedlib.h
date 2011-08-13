@@ -55,9 +55,7 @@ public:
     typedef bool entrypoint (void *obj);
     typedef void initentry(as_object &obj);
     
-    SharedLib(const std::string& filespec);
-    DSOEXPORT SharedLib(const std::string& filespec, const std::string& envvar);
-    ~SharedLib();
+    DSOEXPORT SharedLib(const std::string& filespec);
 
     DSOEXPORT bool openLib();
     bool openLib(const std::string &filespec);

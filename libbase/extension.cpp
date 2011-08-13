@@ -40,12 +40,6 @@ namespace gnash {
 
 #if defined(WIN32) || defined(_WIN32)
 int        lt_dlsetsearchpath   (const char *search_path);
-int        lt_dlinit           (void);
-void *     lt_dlsym            (lt_dlhandle handle, const char *name);
-const char *lt_dlerror         (void);
-int        lt_dlclose          (lt_dlhandle handle);
-int        lt_dlmakeresident   (lt_dlhandle handle);
-lt_dlhandle lt_dlopenext       (const char *filename);
 #endif
 
 #if HAVE_DIRENT_H || WIN32==1    // win32 hack
@@ -69,11 +63,6 @@ namespace gnash {
 
 Extension::Extension() 
 {
-//    GNASH_REPORT_FUNCTION;
-#ifdef LT_DLMUTEX
-//     return lt_dlmutex_register (gnash_mutex_lock, gnash_mutex_unlock,
-//                                 gnash_mutex_seterror, gnash_mutex_geterror);
-#endif
     char *env = std::getenv("GNASH_PLUGINS");
     if (!env) {
         _pluginsdir = PLUGINSDIR;
@@ -91,11 +80,8 @@ Extension::Extension()
 Extension::Extension(const std::string& dir)
 {
 //    GNASH_REPORT_FUNCTION;
-#ifdef LT_DLMUTEX
-//     return lt_dlmutex_register (gnash_mutex_lock, gnash_mutex_unlock,
-//                                 gnash_mutex_seterror, gnash_mutex_geterror);
-#endif
     _pluginsdir = dir;
+
 #ifdef HAVE_LTDL
     lt_dlsetsearchpath(_pluginsdir.c_str());
 #endif
@@ -142,7 +128,7 @@ Extension::initModule(const std::string& module, as_object &where)
     log_security(_("Initializing module: \"%s\" from %s"), symbol, _pluginsdir);
     
     if (_plugins[module] == 0) {
-        sl = new SharedLib(_pluginsdir + "/" + module, "GNASH_PLUGINS");
+        sl = new SharedLib(_pluginsdir + "/" + module);
         sl->openLib();
         _plugins[module] = sl;
     } else {
