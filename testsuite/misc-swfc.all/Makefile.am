@@ -49,6 +49,7 @@ BOGO_SCTESTS = \
 INTERACTIVE_SCTESTS = \
 	button_test1.sc \
 	button_test2.sc  \
+	sound_stop.sc  \
 	$(NULL)
 
 AM_CPPFLAGS = -I.. \
@@ -81,6 +82,7 @@ EXTRA_DIST = $(SANE_SCTESTS) $(BOGO_SCTESTS) $(AUXMOVIES) $(INTERACTIVE_SCTESTS)
 
 check_PROGRAMS = \
 	button_test1runner \
+	sound_stop_runner \
 	$(NULL)
 
 abs_mediadir = $(abs_top_srcdir)/testsuite/media 
@@ -129,6 +131,21 @@ button_test1runner_DEPENDENCIES = \
 	button_test1.swf \
 	$(GNASH_LIBS) \
 	$(NULL)
+
+sound_stop_runner_SOURCES = \
+	sound_stop_runner.cpp \
+	$(NULL)
+sound_stop_runner_LDADD = \
+	$(GNASH_LIBS) \
+	$(NULL)
+sound_stop_runner_CXXFLAGS = \
+	-DBUILDDIR='"$(top_builddir)/testsuite/misc-swfc.all"' \
+	$(NULL)
+sound_stop_runner_DEPENDENCIES = \
+	sound_stop.swf \
+	$(GNASH_LIBS) \
+	$(NULL)
+
 
 CLEANFILES =  \
 	$(TEST_CASES) \

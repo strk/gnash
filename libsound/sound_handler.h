@@ -131,6 +131,10 @@ public:
     /// @param sound_handle     id for the sound to be stopped
     virtual void stopEventSound(int sound_handle);
 
+    /// Stop all instances of all playing event sounds. 
+    //
+    virtual void stopAllEventSounds();
+
     /// Discard the sound data for an embedded event sound
     //
     /// Only embedded event sounds are deleted; this happens when the

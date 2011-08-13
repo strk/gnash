@@ -245,6 +245,23 @@ sound_handler::stopEventSound(int handle)
 
 }
 
+void
+sound_handler::stopAllEventSounds()
+{
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+    log_debug("stopAllEventSounds called");
+#endif
+
+    for (Sounds::iterator i=_sounds.begin(), e=_sounds.end(); i != e; ++i)
+    {
+        EmbedSound* sounddata = *i;
+        if (!sounddata) continue; // possible ?
+
+        stopEmbedSoundInstances(*sounddata);
+    }
+
+}
+
 void   
 sound_handler::stopEmbedSoundInstances(StreamingSoundData& def)
 {
