@@ -166,6 +166,13 @@ SDL_sound_handler::stopEventSound(int soundHandle)
 }
 
 void
+SDL_sound_handler::stopAllEventSounds()
+{
+    boost::mutex::scoped_lock lock(_mutex);
+    sound_handler::stopAllEventSounds();
+}
+
+void
 SDL_sound_handler::stopStreamingSound(int soundHandle)
 {
     boost::mutex::scoped_lock lock(_mutex);

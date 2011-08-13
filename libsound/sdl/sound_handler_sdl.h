@@ -106,6 +106,9 @@ public:
     // See dox in sound_handler.h
     virtual void stopEventSound(int sound_handle);
 
+    // See dox in sound_handler.h
+    virtual void stopAllEventSounds();
+
     virtual void stopStreamingSound(int sound_handle);
 
     // See dox in sound_handler.h

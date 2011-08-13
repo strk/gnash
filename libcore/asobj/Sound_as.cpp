@@ -744,7 +744,12 @@ Sound_as::stop(int si)
                 _inputStream=0;
             }
         } else {
-            _soundHandler->stopEventSound(soundId);
+            if ( ! _attachedCharacter ) {
+                // See https://savannah.gnu.org/bugs/index.php?33888
+                _soundHandler->stopAllEventSounds();
+            } else {
+                _soundHandler->stopEventSound(soundId);
+            }
         }
     } else {
         _soundHandler->stopEventSound(si);
