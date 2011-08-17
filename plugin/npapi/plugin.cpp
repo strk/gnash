@@ -223,7 +223,7 @@ NS_PluginInitialize()
 
     // Append SYSCONFDIR/gnashpluginrc and ~/.gnashpluginrc to GNASHRC
 
-    std::string newGnashRc("GNASHRC=");
+    std::string newGnashRc;
 
 #if !defined(__OS2__ ) && ! defined(__amigaos4__)
     newGnashRc.append(SYSCONFDIR);
@@ -264,12 +264,7 @@ NS_PluginInitialize()
         newGnashRc.append(gnashrc);
     }
 
-    // putenv doesn't copy the string in standards-conforming implementations
-    gnashrc = new char[PATH_MAX];
-    std::strncpy(gnashrc, newGnashRc.c_str(), PATH_MAX);
-    gnashrc[PATH_MAX-1] = '\0';
-
-    if ( putenv(gnashrc) ) {
+    if ( setenv("GNASHRC", newGnashRc.c_str(), 1) ) {
         gnash::log_debug("WARNING: NPAPI plugin could not append to the GNASHRC env variable");
     } else {
         gnash::log_debug("NOTE: NPAPI plugin set GNASHRC to %d", newGnashRc);
