@@ -30,6 +30,7 @@
 #include <cstdlib> // getenv
 #include <stdlib.h> // putenv
 #include <sys/types.h>
+#include "GnashSleep.h" // usleep
 
 #if defined(HAVE_WINSOCK_H) && !defined(__OS2__)
 # include <winsock2.h>
@@ -222,7 +223,7 @@ NS_PluginInitialize()
 
     // Append SYSCONFDIR/gnashpluginrc and ~/.gnashpluginrc to GNASHRC
 
-    std::string newGnashRc("GNASHRC=");
+    std::string newGnashRc;
 
 #if !defined(__OS2__ ) && ! defined(__amigaos4__)
     newGnashRc.append(SYSCONFDIR);
@@ -263,12 +264,7 @@ NS_PluginInitialize()
         newGnashRc.append(gnashrc);
     }
 
-    // putenv doesn't copy the string in standards-conforming implementations
-    gnashrc = new char[PATH_MAX];
-    std::strncpy(gnashrc, newGnashRc.c_str(), PATH_MAX);
-    gnashrc[PATH_MAX-1] = '\0';
-
-    if ( putenv(gnashrc) ) {
+    if ( setenv("GNASHRC", newGnashRc.c_str(), 1) ) {
         gnash::log_debug("WARNING: NPAPI plugin could not append to the GNASHRC env variable");
     } else {
         gnash::log_debug("NOTE: NPAPI plugin set GNASHRC to %d", newGnashRc);
@@ -484,7 +480,7 @@ nsPluginInstance::~nsPluginInstance()
 
         if (rv <= 0) {
              int* pid = new int(_childpid);
-	     usleep(1000);
+             gnashSleep(1000);
 	     cleanup_childpid(pid);
         } else {
             gnash::log_debug("Child process exited with status %d", status);

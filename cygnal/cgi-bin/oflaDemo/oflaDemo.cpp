@@ -145,7 +145,7 @@ extern "C" {
         vector<boost::shared_ptr<cygnal::Element> > request =
 	    oflaDemo.parseOflaDemoRequest(data, size);
         
-        if (request.size() == 0) {
+        if (request.empty()) {
             // Send the packet to notify the client that the
             // NetConnection::connect() was sucessful. After the client
             // receives this, the handhsake is completed.
@@ -303,7 +303,7 @@ demoService::getListOfAvailableFiles(const std::string &path,
     _path = path;		// store for later
 
     // If we don't have any files yet, look for some.
-    if (_stats.size() == 0) {
+    if (_stats.empty()) {
         struct dirent *entry;
 #ifndef HAVE_SCANDIR
         log_debug(_("Scanning directory \"%s\" for %s files"), path, type);
