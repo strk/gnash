@@ -103,7 +103,7 @@ Renderer_gles1::~Renderer_gles1()
 }
 
 void
-Renderer_gles1::init(float x, float y)
+Renderer_gles1::init(float /* x */, float /* y */)
 {
     GNASH_REPORT_FUNCTION;
 }
@@ -112,11 +112,13 @@ CachedBitmap *
 Renderer_gles1::createCachedBitmap(std::auto_ptr<gnash::image::GnashImage>)
 {
     GNASH_REPORT_FUNCTION;
+
+    return 0;
 }
 
 void
 Renderer_gles1::drawVideoFrame(image::GnashImage* /* frame */,
-                               const gnash::Transform& t/* m */,
+                               const gnash::Transform& /* m */,
                                const SWFRect* /* bounds */, bool /*smooth*/)
 {
     GNASH_REPORT_FUNCTION;
@@ -126,7 +128,7 @@ Renderer_gles1::drawVideoFrame(image::GnashImage* /* frame */,
 
 
 void
-Renderer_gles1::world_to_pixel(int& x, int& y, float world_x, float world_y) const
+Renderer_gles1::world_to_pixel(int& /* x */, int& /* y */, float /* world_x */, float /* world_y */) const
 {
 #if 0
     // negative pixels seems ok here... we don't
@@ -171,12 +173,14 @@ Renderer_gles1::world_to_pixel(const geometry::Range2d<float>& wb) const
 point
 Renderer_gles1::pixel_to_world(int x, int y) const
 {
-#if 0
     point p(x, y);
+#if 0
     SWFMatrix mat = stage_matrix;
     mat.invert().transform(p);
     return p;
 #endif
+
+    return p;
 };
 
 void
@@ -193,15 +197,15 @@ Renderer_gles1::end_display()
 }
 
 void
-Renderer_gles1::drawLine(const std::vector<point>& coords, const rgba& fill,
-                       const SWFMatrix& mat)
+Renderer_gles1::drawLine(const std::vector<point>& /* coords */, const rgba& /* fill */,
+                       const SWFMatrix& /* mat */)
 {
     GNASH_REPORT_FUNCTION;
 }
 void
-Renderer_gles1::draw_poly(const std::vector<point>& corners,
-                       const rgba& fill, const rgba& /* outline */,
-                       const SWFMatrix& mat, bool /* masked */)
+Renderer_gles1::draw_poly(const std::vector<point>& /* corners */,
+                       const rgba& /* fill */, const rgba& /* outline */,
+                          const SWFMatrix& /* mat */, bool /* masked */)
 {
     GNASH_REPORT_FUNCTION;
 }
@@ -217,8 +221,8 @@ Renderer_gles1::drawShape(const gnash::SWF::ShapeRecord&, const gnash::Transform
 //     GNASH_REPORT_FUNCTION;
 // }
 void
-Renderer_gles1::drawGlyph(const SWF::ShapeRecord& rec, const rgba& c,
-                        const SWFMatrix& mat)
+Renderer_gles1::drawGlyph(const SWF::ShapeRecord& /* rec */, const rgba& /* c */,
+                        const SWFMatrix& /* mat */)
 {
     GNASH_REPORT_FUNCTION;
 }
@@ -248,18 +252,21 @@ Renderer_gles1::end_submit_mask()
     apply_mask();
 #endif
 }
+
 void
 Renderer_gles1::apply_mask()
 {
     GNASH_REPORT_FUNCTION;
 }
+
 void
 Renderer_gles1::disable_mask()
 {
     GNASH_REPORT_FUNCTION;
 }
+
 void
-Renderer_gles1::set_scale(float xscale, float yscale)
+Renderer_gles1::set_scale(float /* xscale */, float /* yscale */)
 {
     GNASH_REPORT_FUNCTION;
 #if 0
@@ -277,7 +284,7 @@ Renderer_gles1::set_invalidated_regions(const InvalidatedRanges& /* ranges */)
 }
 
 bool
-Renderer_gles1::initTestBuffer(unsigned int width, unsigned int height)
+Renderer_gles1::initTestBuffer(unsigned int /* width */, unsigned int /* height */)
 {
     GNASH_REPORT_FUNCTION;
 #if 0
@@ -297,6 +304,8 @@ Renderer *
 Renderer_gles1::startInternalRender(gnash::image::GnashImage&)
 {
     GNASH_REPORT_FUNCTION;
+
+    return 0;
 }
 
 void
@@ -306,7 +315,7 @@ Renderer_gles1::endInternalRender()
 }
 
 Renderer *
-create_handler(const char *pixelformat)
+create_handler(const char * /*pixelformat */)
 {
     GNASH_REPORT_FUNCTION;
     Renderer_gles1 *renderer = new Renderer_gles1;
