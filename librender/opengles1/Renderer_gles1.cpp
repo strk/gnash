@@ -16,7 +16,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
@@ -124,8 +123,6 @@ Renderer_gles1::drawVideoFrame(image::GnashImage* /* frame */,
     GNASH_REPORT_FUNCTION;
     log_unimpl("drawVideoFrame");  
 }
-
-
 
 void
 Renderer_gles1::world_to_pixel(int& /* x */, int& /* y */, float /* world_x */, float /* world_y */) const
