@@ -626,7 +626,7 @@ AC_ARG_ENABLE(gui,
     fi
   done],
   [ dnl Run the following code if no --enable-gui is given
-  build_fb=auto
+  build_fb=no
   build_sdl=auto
   if test x"${openbsd}" = xyes; then
     build_gtk=yes
@@ -996,120 +996,6 @@ if test x"${build_ovg}" = xyes; then
   fi
 fi
 
-dnl 16 bit: RGB555, RGB565
-dnl 24 bit: RGB24, BGR24
-dnl 32 bit: RGBA32, BGRA32
-pixelformat=all
-AC_ARG_WITH(pixelformat,
-  AC_HELP_STRING([--with-pixelformat=], [Use the specified pixel format for AGG (default=all)]),
-  [if test -n ${withval}; then
-    pixelformat="${withval}"
-    withval=`echo ${withval} | tr '\054' ' ' `
-  fi
-  while test -n "${withval}" ; do
-    val=`echo ${withval} | cut -d ' ' -f 1`
-    case "${val}" in
-      all)
-        # allow special value "all" set by user (handled below)
-        ;; 
-      argb32|ARGB32)
-        AC_DEFINE(PIXELFORMAT_ARGB32, [1], [ARGB32])
-        ;;
-      abgr32|ABGR32)
-        AC_DEFINE(PIXELFORMAT_ABGR32, [1], [ABGR32])
-        ;;
-      bgra32|BGRA32)
-        AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32])
-        ;;
-      bgr24|BGR24)
-        AC_DEFINE(PIXELFORMAT_BGR24, [1], [BGR24])
-        ;;
-      rgba32|RGBA32)
-        AC_DEFINE(PIXELFORMAT_RGBA32, [1], [RGBA32])
-        ;;
-      rgb24|RGB24)
-        AC_DEFINE(PIXELFORMAT_RGB24, [1], [RGB24])
-        ;;
-      rgb555|RGB555)
-        AC_DEFINE(PIXELFORMAT_RGB555, [1], [RGB555])
-        ;;
-      rgb565|RGB565)
-        AC_DEFINE(PIXELFORMAT_RGB565, [1], [RGB565])
-        ;;
-      *) AC_MSG_ERROR([invalid pixel format ${withval} given (accept: all|RGB555|RGB565|RGB24|BGR24|BGRA32|RGBA32|ARGB32|ABGR32)])
-         ;;
-      esac
-    withval=`echo ${withval} | cut -d ' ' -f 2-6`
-    if test "x$val" = "x$withval"; then
-      break;
-    fi
-  done],
-  [if test x$build_haiku = xyes -a x$build_sdl != xyes; then
-	AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32])
-        pixelformat=BGRA32
-   fi]
-)
-
-if test x$pixelformat = xall; then
-  if test x$build_agg = xyes; then
-    ### The fact that we're building GTK doesn't mean we're not also
-    ### building KDE or SDL, each needing its own pixel format !
-    #if test x$build_gtk = xyes; then
-    #  AC_DEFINE(PIXELFORMAT_RGB24, [1], [RGB24 pixel format])
-    #  pixelformat="RGB24"
-    #else
-      AC_DEFINE(PIXELFORMAT_RGB555, [1], [RGB555 pixel format])
-      AC_DEFINE(PIXELFORMAT_RGB565, [1], [RGB565 pixel format])
-      AC_DEFINE(PIXELFORMAT_RGB24,  [1], [RGB24 pixel format])
-      AC_DEFINE(PIXELFORMAT_BGR24,  [1], [BGR24 pixel format])
-      AC_DEFINE(PIXELFORMAT_RGBA32, [1], [RGBA32 pixel format])
-      AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32 pixel format])
-      AC_DEFINE(PIXELFORMAT_ARGB32, [1], [ARGB32 pixel format])
-      AC_DEFINE(PIXELFORMAT_ABGR32, [1], [ABGR32 pixel format])
-    #fi
-  fi
-fi
-
-if test x"${build_ogl}" != xno; then # yes or auto
-  GNASH_PATH_OPENGL
-  if test x"${build_ogl}" = xauto; then
-    if test xyes = x"${has_opengl}"; then
-      build_ogl=yes
-      renderer_list="${renderer_list} opengl"
-    else
-      build_ogl=no
-    fi
-  fi
-fi
-
-AM_CONDITIONAL(BUILD_OVG_RENDERER,   [ test x${build_ovg} = xyes ])
-AM_CONDITIONAL(BUILD_GLES1_RENDERER, [ test x${build_gles1} = xyes ])
-AM_CONDITIONAL(BUILD_GLES2_RENDERER, [ test x${build_gles2} = xyes ])
-AM_CONDITIONAL(BUILD_OGL_RENDERER,   [ test x${build_ogl} = xyes])
-AM_CONDITIONAL(BUILD_AGG_RENDERER,   [ test x${build_agg} = xyes ])
-AM_CONDITIONAL(BUILD_CAIRO_RENDERER, [ test x${build_cairo} = xyes ])
-
-if test x"${has_openvg}" = xyes; then
-   AC_DEFINE([RENDERER_OPENVG], [1], [Use OpenVG renderer])
-fi
-
-if test x"${build_ogl}" = xyes; then
-   AC_DEFINE([RENDERER_OPENGL], [1], [Use OpenGL renderer])
-fi
-
-if test x"${build_agg}" = xyes; then
-  AC_DEFINE([RENDERER_AGG], [1], [Use AntiGrain renderer])
-fi
-
-if test x"${build_cairo}" = xyes; then
-  GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
-  AC_DEFINE([RENDERER_CAIRO], [1], [Use cairo renderer])
-fi
-
-if test x"${build_agg}" = xyes; then
-   GNASH_PATH_AGG
-fi
-
 dnl VA API is used by default for all H.264 videos. HW requirements:
 dnl     * AMD GPUs with UVD2 and xvba-video VA driver
 dnl     * NVIDIA GPUs with vdpau-video VA driver
@@ -1121,12 +1007,22 @@ dnl GMA500 but you currently will have to build the AGG renderer
 dnl instead of the OGL (OpenGL) one. 
 build_vaapi_device=no
 build_openmax_device=no
+if test x"${build_ovg}" = xyes; then
+  build_egl_device=yes
+else
+  build_egl_device=no
+fi
 build_x11_device=no
 build_directfb_device=no
-build_egl_device=auto
-build_rawfb_device=yes
-device_list="RawFB"
-ndevice=1
+if test x"${build_fb}" = xyes; then
+  build_rawfb_device=yes
+  device_list="RawFB"
+  ndevice=1
+else
+  build_rawfb_device=no
+  device_list=""
+  ndevice=0
+fi
 AC_ARG_ENABLE(device,
   AC_HELP_STRING([--enable-device], [Specify which hardware abstraction to use to support to enable (none,egl,directfb,rawfb,x11,vaapi)]),
   enableval=`echo ${enableval} | tr '\054' ' ' `
@@ -1245,25 +1141,141 @@ AM_CONDITIONAL(HAVE_VAAPI, test x"${found_libva_incl}" = xyes)
 AM_CONDITIONAL(HAVE_VAAPI_GLX, test x"${found_libva_glx_incl}" = xyes)
 AM_CONDITIONAL(HAVE_VAAPI_X11, test x"${found_libva_x11_incl}" = xyes)
 
-if test x"${build_egl_device}" != xno; then # yes or auto
+if test x"${build_egl_device}" = xyes; then
   GNASH_PKG_FIND(EGL, [EGL/egl.h], [EGL library], eglGetDisplay)
   if test xyes = x"${has_EGL}"; then
     AC_DEFINE(BUILD_EGL_DEVICE, [ 1 ],
           [Build the EGL device for OpenVG, OpenGLES1&2, and X11/Mesa])
-    build_egl_device=yes
-    device_list="${device_list} EGL"
-    ndevice=$((ndevice+1))
+      device_list="${device_list} EGL"
+      ndevice=$((ndevice+1))
   else
-    if test xyes = x"${build_egl_device}"; then
-      AC_MSG_ERROR(["EGL requested but development package not found"])
-    fi
+    AC_MSG_ERROR(["EGL requested but development package not found"])
     build_egl_device=no
   fi
+fi
+
+if test ${ndevice} -eq 0; then
+      device_list="none"
+      ndevice=1
 fi
 
 AM_CONDITIONAL(BUILD_DEVICES, test ${ndevice} -gt 0)
 if test ${ndevice} -gt 0; then
   AC_OUTPUT(libdevice/Makefile)
+fi
+
+dnl 16 bit: RGB555, RGB565
+dnl 24 bit: RGB24, BGR24
+dnl 32 bit: RGBA32, BGRA32
+pixelformat=all
+AC_ARG_WITH(pixelformat,
+  AC_HELP_STRING([--with-pixelformat=], [Use the specified pixel format for AGG (default=all)]),
+  [if test -n ${withval}; then
+    pixelformat="${withval}"
+    withval=`echo ${withval} | tr '\054' ' ' `
+  fi
+  while test -n "${withval}" ; do
+    val=`echo ${withval} | cut -d ' ' -f 1`
+    case "${val}" in
+      all)
+        # allow special value "all" set by user (handled below)
+        ;; 
+      argb32|ARGB32)
+        AC_DEFINE(PIXELFORMAT_ARGB32, [1], [ARGB32])
+        ;;
+      abgr32|ABGR32)
+        AC_DEFINE(PIXELFORMAT_ABGR32, [1], [ABGR32])
+        ;;
+      bgra32|BGRA32)
+        AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32])
+        ;;
+      bgr24|BGR24)
+        AC_DEFINE(PIXELFORMAT_BGR24, [1], [BGR24])
+        ;;
+      rgba32|RGBA32)
+        AC_DEFINE(PIXELFORMAT_RGBA32, [1], [RGBA32])
+        ;;
+      rgb24|RGB24)
+        AC_DEFINE(PIXELFORMAT_RGB24, [1], [RGB24])
+        ;;
+      rgb555|RGB555)
+        AC_DEFINE(PIXELFORMAT_RGB555, [1], [RGB555])
+        ;;
+      rgb565|RGB565)
+        AC_DEFINE(PIXELFORMAT_RGB565, [1], [RGB565])
+        ;;
+      *) AC_MSG_ERROR([invalid pixel format ${withval} given (accept: all|RGB555|RGB565|RGB24|BGR24|BGRA32|RGBA32|ARGB32|ABGR32)])
+         ;;
+      esac
+    withval=`echo ${withval} | cut -d ' ' -f 2-6`
+    if test "x$val" = "x$withval"; then
+      break;
+    fi
+  done],
+  [if test x$build_haiku = xyes -a x$build_sdl != xyes; then
+	AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32])
+        pixelformat=BGRA32
+   fi]
+)
+
+if test x$pixelformat = xall; then
+  if test x$build_agg = xyes; then
+    ### The fact that we're building GTK doesn't mean we're not also
+    ### building KDE or SDL, each needing its own pixel format !
+    #if test x$build_gtk = xyes; then
+    #  AC_DEFINE(PIXELFORMAT_RGB24, [1], [RGB24 pixel format])
+    #  pixelformat="RGB24"
+    #else
+      AC_DEFINE(PIXELFORMAT_RGB555, [1], [RGB555 pixel format])
+      AC_DEFINE(PIXELFORMAT_RGB565, [1], [RGB565 pixel format])
+      AC_DEFINE(PIXELFORMAT_RGB24,  [1], [RGB24 pixel format])
+      AC_DEFINE(PIXELFORMAT_BGR24,  [1], [BGR24 pixel format])
+      AC_DEFINE(PIXELFORMAT_RGBA32, [1], [RGBA32 pixel format])
+      AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32 pixel format])
+      AC_DEFINE(PIXELFORMAT_ARGB32, [1], [ARGB32 pixel format])
+      AC_DEFINE(PIXELFORMAT_ABGR32, [1], [ABGR32 pixel format])
+    #fi
+  fi
+fi
+
+if test x"${build_ogl}" != xno; then # yes or auto
+  GNASH_PATH_OPENGL
+  if test x"${build_ogl}" = xauto; then
+    if test xyes = x"${has_opengl}"; then
+      build_ogl=yes
+      renderer_list="${renderer_list} opengl"
+    else
+      build_ogl=no
+    fi
+  fi
+fi
+
+AM_CONDITIONAL(BUILD_OVG_RENDERER,   [ test x${build_ovg} = xyes ])
+AM_CONDITIONAL(BUILD_GLES1_RENDERER, [ test x${build_gles1} = xyes ])
+AM_CONDITIONAL(BUILD_GLES2_RENDERER, [ test x${build_gles2} = xyes ])
+AM_CONDITIONAL(BUILD_OGL_RENDERER,   [ test x${build_ogl} = xyes])
+AM_CONDITIONAL(BUILD_AGG_RENDERER,   [ test x${build_agg} = xyes ])
+AM_CONDITIONAL(BUILD_CAIRO_RENDERER, [ test x${build_cairo} = xyes ])
+
+if test x"${has_openvg}" = xyes; then
+   AC_DEFINE([RENDERER_OPENVG], [1], [Use OpenVG renderer])
+fi
+
+if test x"${build_ogl}" = xyes; then
+   AC_DEFINE([RENDERER_OPENGL], [1], [Use OpenGL renderer])
+fi
+
+if test x"${build_agg}" = xyes; then
+  AC_DEFINE([RENDERER_AGG], [1], [Use AntiGrain renderer])
+fi
+
+if test x"${build_cairo}" = xyes; then
+  GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
+  AC_DEFINE([RENDERER_CAIRO], [1], [Use cairo renderer])
+fi
+
+if test x"${build_agg}" = xyes; then
+   GNASH_PATH_AGG
 fi
 
 AC_PATH_PROG(PERL, perl)
@@ -1846,17 +1858,17 @@ dnl or keyboard attached.
 dnl By default, don't build any of these, as they are only for the Framebuffer
 dnl running without X11.
 if test x"${build_fb}" = xyes; then
-build_ps2mouse=yes
-build_ps2keyboard=no
-build_input_events=yes
-build_tslib=yes
-input_events="PS/2 Mouse, Input Devices, Touchscreen via Tslib"
+  build_ps2mouse=yes
+  build_ps2keyboard=no
+  build_input_events=yes
+  build_tslib=yes
+  input_events="PS/2 Mouse, Input Devices, Touchscreen via Tslib"
 else
-build_ps2mouse=no
-build_ps2keyboard=no
-build_input_events=no
-build_tslib=no
-input_events=
+  build_ps2mouse=no
+  build_ps2keyboard=no
+  build_input_events=no
+  build_tslib=no
+  input_events=
 fi
 AC_ARG_ENABLE(input,
   AC_HELP_STRING([--enable-input=], [Enable support for the specified input devices for the framebuffer GUI (default=ps2mouse|ps2keyboard|events|touchscreen)]),
@@ -2430,15 +2442,6 @@ AM_CONDITIONAL(KPARTS4, [test x"${build_kparts4}" = xyes])
 
 if test x"${build_gles1}"; then
   GNASH_PATH_GLES
-fi
-
-dnl The OpenGLES1, OpenGLES2, and OpenVG all need the EGL support, X11 can use it also
-dnl TODO: move this at the bottom ?
-if test x"${build_gles1}" = xyes -o x"${build_ovg}" = xyes; then
-  if test x"${build_egl_device}" != xyes; then
-    AC_MSG_ERROR(["OpenGLES1 and OpenVG both need EGL support. See --enable-device."])
-    build_egl_device=yes
-  fi
 fi
 
 dnl only Linux supports /dev/fb0
