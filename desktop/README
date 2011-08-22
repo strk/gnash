@@ -1,0 +1,23 @@
+= Thumbnailer =
+
+Thumbnailers are Nautilus specific
+
+Up to 2.32 (Ubuntu 10.04 has 2.30.1) gconftool --makefile-install-rule
+and --makefile-uninstall-rule have to be used
+
+From 2.32 up .thumbnailer files in /usr/share/thumbnailers
+
+16:18 < Company> strk: the thumbnailer stuff was changed for 3.0 afaik
+16:18 < Company> strk: 332:http://git.gnome.org/browse/evince/tree/thumbnailer
+                 is probably a good example of the new way to do a thumbnailer
+16:19 < Company> strk: and
+333:http://git.gnome.org/browse/evince/tree/thumbnailer?h=gnome-2-32 for the
+                 old way
+
+
+When producing thumbnails gnash should prevent any security issue
+so forbid loading of _any_ resource, forbid using shared memory
+(LocalConnection), forbid writing SharedObjects.
+To reduce load, a short AS execution timeout should also be used.
+All of the above can be done using a custom gnashrc, to be installed
+somewhere (/etc/gnashthumbnailerrc?)

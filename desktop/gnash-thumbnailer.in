@@ -1,0 +1,50 @@
+#!/bin/sh
+
+#
+# gnash-thumbnailer :  script to produce thumbnails for SWF files
+#
+#   Copyright (C) 2011 Free Software Foundation, Inc.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+
+
+test -n "$2" || {
+    echo "Usage: $0 <input> <output> [<pixels>]" >&2
+    exit 1
+}
+
+in=$1 && shift
+out=$1 && shift 
+test -n "$1" && size=$1 && shift || size=128
+
+player=@@BINDIR@@/dump-gnash
+
+#echo ${in} ${out} ${size} 
+
+# TODO: 
+#  - security:
+#    - forbid loads
+#    - forbid using shared memory (LocalConnection)
+#    - forbid writing SharedObjects
+#    - reduce AS timeouts
+#  - correctness:
+#    - use size !
+#
+export GNASHRC=${GNASHRC}:@@SYSCONFDIR@@/gnashthumbnailrc
+${player} --screenshot last --screenshot-file ${out} ${in} \
+    --max-advances=100 --timeout=100 --width=${size} --height=${size} \
+    -r1 \
+    > /dev/null 2>&1

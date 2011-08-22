@@ -2856,6 +2856,36 @@ if test x"$BOOST_LIBS" != x; then
   fi
 fi
 
+dnl ========= Check for GConf
+
+AC_MSG_CHECKING([whether GConf support is requested])
+AC_ARG_WITH([gconf],
+  [AS_HELP_STRING([--without-gconf],
+          [Disable the use of gconf])],
+  [],
+  [case "${host}" in
+    *-cygwin* | *-mingw* | *-pw32*) with_gconf=no ;;
+    *) with_gconf=yes ;;
+   esac])
+AC_MSG_RESULT([$with_gconf])
+
+AM_CONDITIONAL([WITH_GCONF],[test "$with_gconf" = "yes"])
+
+if test "$with_gconf" = "yes"; then
+   PKG_CHECK_MODULES([GCONF],[gconf-2.0])
+   AC_DEFINE([WITH_GCONF],[1],[Define if GConf support is enabled])
+
+   AM_GCONF_SOURCE_2
+
+   AC_PATH_PROG([GCONFTOOL], [gconftool-2], [false])
+   if test "$GCONFTOOL" = "false"; then
+      AC_MSG_ERROR([gconftool-2 executable not found in your path - should be installed with GConf])
+   fi
+else
+   AM_CONDITIONAL([GCONF_SCHEMAS_INSTALL],false)
+fi
+
+
 CYGNAL_PATHS
 
 SUPPORTED_GUIS=

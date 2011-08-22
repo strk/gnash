@@ -1,0 +1,23 @@
+###########################################################
+#
+# This file will be used as a config file by the gnash thumbnailer 
+#
+# Focus here is on security concerns: we'll forbid load of any 
+# external resource, writing shared objects and using shared memory.
+# 
+###########################################################
+
+# SECURITY: don't load anything !
+# TODO: gui/Player still adds the input file dir to sandboxes,
+# we should forbid that too !
+set localSandboxPath /dev/null
+set whitelist /dev/null
+
+# SECURITY: don't write SharedObjects
+set SOLReadOnly true
+
+# SECURITY: disable local connection
+set LocalConnection off
+
+# SECURITY: disable extensions
+set enableExtensions off

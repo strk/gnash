@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<gconfschemafile>
+  <schemalist>
+    <schema>
+      <key>/schemas/desktop/gnome/thumbnailers/application@x-shockwave-flash/command</key>
+      <applyto>/desktop/gnome/thumbnailers/application@x-shockwave-flash/command</applyto>
+      <type>string</type>
+      <default>@@BINDIR@@/gnash-thumbnailer %u %o %s</default>
+      <locale name="C">
+        <short>Thumbnail command for SWF files</short>
+        <long>
+          Set this key to the command used to create thumbnails for
+          SWF files.
+        </long>
+      </locale>
+    </schema>
+
+    <schema>
+      <key>/schemas/desktop/gnome/thumbnailers/application@x-shockwave-flash/enable</key>
+      <applyto>/desktop/gnome/thumbnailers/application@x-shockwave-flash/enable</applyto>
+      <type>bool</type>
+      <default>true</default>
+      <locale name="C">
+        <short>Whether to thumbnail SWF files</short>
+        <long>
+          If set to true, then SWF files will be thumbnailed.
+        </long>
+      </locale>
+    </schema>
+
+  </schemalist>
+</gconfschemafile>
