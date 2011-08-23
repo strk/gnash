@@ -1307,6 +1307,22 @@ GNASH_PATH_PYTHON
 AM_CONDITIONAL([USE_PYTHON], test x"$python" = xyes)
 AM_CONDITIONAL([HAS_PYTHON], test x"$has_python" = xyes)
 
+dnl By default debug logging is enabled. For better performance, it can
+dnl be disabled, as when running as a plugin, nobody sees the debug messages
+dnl anyway. Debug logging is primarily for developers, so we can turn it off
+dnl for package builds.
+AC_ARG_ENABLE(log,
+  AC_HELP_STRING([--enable-log],[Enable debug logging]),
+[case "${enableval}" in
+  yes) debuglog=yes ;;
+  no)  debuglog=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-log option]) ;;
+esac],debuglog=yes)
+
+if test x"${debuglog}" = x"yes"; then
+  AC_DEFINE([DEBUG_LOGGING], [1], [Enable debug logging])
+fi
+
 # Maybe use jemalloc, which handles memory fragmentation for
 # ECAMscript languages better than the regular system malloc.
 # This seems like a good idea, as both the other player and
