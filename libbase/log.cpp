@@ -193,7 +193,7 @@ processLog_action(const boost::format& fmt)
 void
 LogFile::log(const std::string& msg)
 {
-#if DEBUG_LOGGING
+#if DEBUG_LOG
     boost::mutex::scoped_lock lock(_ioMutex);
 
     if ( !_verbose ) return; // nothing to do if not verbose
