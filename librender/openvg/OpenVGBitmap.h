@@ -63,25 +63,24 @@ public:
     boost::uint8_t *getData() const { return _image->begin(); }
 
     OpenVGBitmap *createRadialBitmap(float x0, float y0, float x1, float y1,
-                                     float radial, const rgba &incolor,
+                                     float radial, const SWFCxForm& cx,
                                      const GradientFill::GradientRecords &records,
-                                     const SWFCxForm& cx,
                                      VGPaint paint);
     OpenVGBitmap *createLinearBitmap(float x0, float y0, float x1, float y1,
-                                     const rgba &incolor,
-                                     const GradientFill::GradientRecords &records,
                                      const SWFCxForm& cx,
+                                     const GradientFill::GradientRecords &records,
                                      const VGPaint paint);
 
     OpenVGBitmap *applyPatternBitmap(const gnash::SWFMatrix& matrix,
-                                      bitmap_wrap_mode mode, VGPaint paint);
+                                     bitmap_wrap_mode mode,
+                                     CachedBitmap *bitmap, VGPaint paint);
     
 private:
     boost::scoped_ptr<image::GnashImage> _image;
     VGImageFormat   _pixel_format;
     VGImage         _vgimage;
     VGPaint         _vgpaint;
-//    int             _tex_size;
+    double          _aspect_ratio;
 };
 
 } // namespace gnash::renderer::openvg
