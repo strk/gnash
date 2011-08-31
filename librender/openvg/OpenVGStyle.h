@@ -109,10 +109,8 @@ struct StyleHandler : boost::static_visitor<>
 
     void operator()(const BitmapFill& b) const {
         GNASH_REPORT_FUNCTION;
-        // OpenVGBitmap *binfo = new OpenVGBitmap(cb, _fillpaint);          
         SWFMatrix mat = b.matrix();
         const bool type = b.type();
-        //const CachedBitmap *bm = b.bitmap();
         CachedBitmap *cb = const_cast<CachedBitmap *>(b.bitmap());
         OpenVGBitmap* binfo = new OpenVGBitmap(_vgpaint);
         if (!cb) {
