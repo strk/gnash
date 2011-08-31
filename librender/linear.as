@@ -16,17 +16,14 @@ alphas = [100, 100];
 ratios = [0, 255];
 
 // matrixType This value should always be "box".
-// x The x coordinate of the bottom-left corner of the gradient.
-// y The y coordinate of the bottom-left corner of the gradient.
-// width The width of the gradient in pixels.
-// height The height of the gradient in pixels.
-// r The rotation of the gradient in radians (not degrees).
+// x,y: are the left-upper corner of the square.
+// w,h are width and height that the square are going to be stretched to.
+// r is the rotation of the gradient field.
 //
 // For box type, the x should be the left margin, the y can be
-// anything. The w is calculated by right margin-left margin, the h
-// can be anything except 0. 
-// matrix = {matrixType:"box", x:150, y:200, w:350, h:200, r:0/180*Math.PI};
-matrix = {matrixType:"box", x:100, y:100, w:400, h:300, r:0};
+// anything. The w is calculated by right margin-left margin,
+// the h can be anything except 0. 
+matrix = {matrixType:"box", x:300, y:200, w:200, h:50, r:0/180*Math.PI};
 _root.lineStyle(1, 0x000000, 100);
 
 _root.beginGradientFill(fillType, colors, alphas, ratios, matrix);
@@ -42,10 +39,10 @@ _root.beginGradientFill(fillType, colors, alphas, ratios, matrix);
 
 // This is the dimensions of the big black box that is supposed to have
 // a linear gradient in it.
-x0 = 100; // 200 pixels = 4000 twips
-y0 = 100; // 200 pixels = 4000 twips
+x0 = 0; // 200 pixels = 4000 twips
+y0 = 0; // 200 pixels = 4000 twips
 x1 = 500; // 500 pixels = 10000 twips
-y1 = 500; // 400 pixels = 8000 twips
+y1 = 400; // 400 pixels = 8000 twips
 _root.moveTo(x0, y0);
 _root.lineTo(x1, y0);
 _root.lineTo(x1, y1);
