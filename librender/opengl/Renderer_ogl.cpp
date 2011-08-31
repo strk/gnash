@@ -1405,8 +1405,6 @@ public:
       boost::apply_visitor(st, style.fill);
   }
   
-  
-  
   bool apply_line_style(const LineStyle& style, const SWFCxForm& cx, const SWFMatrix& mat)
   {
   //  GNASH_REPORT_FUNCTION;
