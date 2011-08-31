@@ -93,7 +93,7 @@ struct StyleHandler : boost::static_visitor<>
     }
 
     void operator()(const SolidFill& f) const {
-        GNASH_REPORT_FUNCTION;
+        // GNASH_REPORT_FUNCTION;
         const rgba incolor = f.color();
         rgba c = _cxform.transform(incolor);
         VGfloat color[] = {
@@ -137,7 +137,6 @@ private:
     const VGPaint&   _vgpaint;
     float            _x;
     float            _y;
-//    OpenVGBitmap::bitmap_wrap_mode _mode;
 };
 
 } // namespace gnash::renderer::openvg
