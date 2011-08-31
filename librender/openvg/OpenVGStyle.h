@@ -56,7 +56,7 @@ struct StyleHandler : boost::static_visitor<>
           _x(x),
           _y(y)
         {
-            GNASH_REPORT_FUNCTION;
+            // GNASH_REPORT_FUNCTION;
         }
                    
     void operator()(const GradientFill& g) const {
@@ -75,12 +75,11 @@ struct StyleHandler : boost::static_visitor<>
         const GradientFill::Type fill_type = g.type();
         OpenVGBitmap* binfo = new OpenVGBitmap(_vgpaint);
         if (fill_type ==  GradientFill::LINEAR) {
-            // All positions are specified in twips, which are 20 to the
-            // pixel. Use the display size for the extent of the shape, 
-            // as it'll get clipped by OpenVG at the end of the
-            // shape that is being filled with the gradient.
             const std::vector<gnash::GradientRecord> &records = g.getRecords();
             log_debug("Fill Style Type: Linear Gradient, %d records", records.size());
+            // Use the display size for the extent of the shape, 
+            // as it'll get clipped by OpenVG at the end of the
+            // shape that is being filled with the gradient.
             binfo->createLinearBitmap(_x, _y, width, height, _cxform, records,  _vgpaint);
         }
         if (fill_type == GradientFill::RADIAL) {
@@ -88,22 +87,24 @@ struct StyleHandler : boost::static_visitor<>
             const std::vector<gnash::GradientRecord> &records = g.getRecords();
             log_debug("Fill Style Type: Radial Gradient: focal is: %d, %d:%d",
                       focalpt, _x, _y);
-            // All positions are specified in twips, which are 20 to the
-            // pixel. Use the display size for the extent of the shape, 
-            // as it'll get clipped by OpenVG at the end of the
-            // shape that is being filled with the gradient.
             binfo->createRadialBitmap(_x, _y, width, height, focalpt,
                                       _cxform, records, _vgpaint);
         }
     }
 
     void operator()(const SolidFill& f) const {
-        const rgba color = _cxform.transform(f.color());
-
-        // add the color to our self-made style handler (basically
-        // just a list)
-        // _sh.add_color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b,
-        //           color.m_a));
+        GNASH_REPORT_FUNCTION;
+        const rgba incolor = f.color();
+        rgba c = _cxform.transform(incolor);
+        VGfloat color[] = {
+            c.m_r / 255.0f,
+            c.m_g / 255.0f,
+            c.m_b / 255.0f,
+            c.m_a / 255.0f
+        };
+        
+        vgSetParameteri (_vgpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_COLOR);
+        vgSetParameterfv (_vgpaint, VG_PAINT_COLOR, 4, color);
     }
 
     void operator()(const BitmapFill& b) const {

@@ -814,84 +814,6 @@ Renderer_ovg::analyze_paths(const PathVec &paths, bool& have_shape,
     }    
 }
 
-#if 0
-void
-Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& /* mat */,
-                               const SWFCxForm& cx)
-{
-    // GNASH_REPORT_FUNCTION;
-
-    // Renderer_ovg::printVGMatrix(mat);
-    
-    SWF::FillType fill_type = boost::apply_visitor(GetType(), style.fill);
-    SWFMatrix sm = boost::apply_visitor(GetMatrix(), style.fill);
-    rgba incolor = boost::apply_visitor(GetColor(), style.fill);
-    switch (fill_type) {
-        
-      case SWF::FILL_LINEAR_GRADIENT:
-      case SWF::FILL_RADIAL_GRADIENT:
-      case SWF::FILL_FOCAL_GRADIENT:
-      {
-          // This is handled elsewhere, as it's now hardware supported.
-          log_error("Fill Style Type: Gradient, you shouldn't be here!");
-          break;
-      }
-      // FIXME: Bitmap cacheing needs to be improved. Currently the GnashInage
-      // is cached, but the VG image is not. This forces the VG Image to be
-      // recalculated all the time from the GnashImage. Ideally the VG Image
-      // should be cached instead by the Renderer.
-      case SWF::FILL_TILED_BITMAP_HARD:
-      case SWF::FILL_TILED_BITMAP:
-      {
-          log_debug("Fill Style Type: Tiled Bitmap");
-          const StyleHandler st(mat, cx, _fillpaint,
-                                (*(refs[0])).ap.x, (*(refs[0])).ap.y);
-          boost::apply_visitor(st, fill_styles[i].fill);
-          CachedBitmap *cb = boost::apply_visitor(GetBitmap(), style.fill);
-          // Convert the GnashImage to a VG Image
-          OpenVGBitmap *binfo = new OpenVGBitmap(cb, _fillpaint);
-          // Adjust the X scale by the aspect ratio or images get squished
-          //sm.a() = sm.a() * _aspect_ratio;
-          SWFMatrix nsm(sm.a() * _aspect_ratio, sm.b(), sm.c(), sm.d(), sm.tx(), sm.ty());
-          // Apply the transformation and paint
-          binfo->applyPatternBitmap(nsm, OpenVGBitmap::WRAP_FILL, _fillpaint);
-          break;
-      }
-      
-      case SWF::FILL_CLIPPED_BITMAP:
-      case SWF::FILL_CLIPPED_BITMAP_HARD:
-      {     
-          log_debug("Fill Style Type: Clipped Bitmap");
-          CachedBitmap *cb = boost::apply_visitor(GetBitmap(), style.fill);          
-          // Convert the GnashImage to a VG Image
-          OpenVGBitmap *binfo = new OpenVGBitmap(cb, _fillpaint);
-          // Adjust the X scale by the aspect ratio or images get squished
-          // sm.a() = sm.a() * _aspect_ratio;
-          SWFMatrix nsm(sm.a() * _aspect_ratio, sm.b(), sm.c(), sm.d(), sm.tx(), sm.ty());
-          // Apply the transformation and paint
-          binfo->applyPatternBitmap(nsm, OpenVGBitmap::WRAP_FILL, _fillpaint);
-          break;
-      } 
-      case SWF::FILL_SOLID:
-      {
-//          log_debug("Fill Style Type: Solid");
-          rgba incolor = boost::apply_visitor(GetColor(), style.fill);
-          rgba c = cx.transform(incolor);
-          VGfloat color[] = {
-              c.m_r / 255.0f,
-              c.m_g / 255.0f,
-              c.m_b / 255.0f,
-              c.m_a / 255.0f
-          };
-
-          vgSetParameteri (_fillpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_COLOR);
-          vgSetParameterfv (_fillpaint, VG_PAINT_COLOR, 4, color);
-      }
-      
-    } // switch fill_type
-}
-#endif
-
 bool
 Renderer_ovg::apply_line_style(const LineStyle& style, const SWFCxForm& cx, 
                                const SWFMatrix& mat)
@@ -1164,6 +1086,8 @@ Renderer_ovg::draw_subshape(const PathVec& path_vec,
             startpath(vg_path, (*(refs[0])).ap.x, (*(refs[0])).ap.y);
 
             // Create a Linear or Radial gradient
+            // All positions are specified in twips, which are 20 to the
+            // pixel.
             const StyleHandler st(cx, _fillpaint,
                                   (*(refs[0])).ap.x/20, (*(refs[0])).ap.y/20);
             boost::apply_visitor(st, fill_styles[i].fill);
