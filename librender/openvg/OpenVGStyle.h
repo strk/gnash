@@ -25,19 +25,22 @@
 #include "FillStyle.h"
 #include "SWFCxForm.h"
 #include "SWFMatrix.h"
+#include "OpenVGBitmap.h"
 
 namespace gnash {
 
+// Forward declarations.
 class SolidFill;
 class GradientFill;
 class BitmapFill;
 class rgba; 
 class StyleHandler;
- 
+
 namespace renderer {
 
 namespace openvg {
 
+#if 0
 // Forward declarations.
 namespace {
     /// Creates 8 bitmap functions
@@ -58,6 +61,7 @@ namespace {
             void storeGradient(StyleHandler& st, const GradientFill& fs,
             const SWFMatrix& mat, const SWFCxForm& cx);
 }
+#endif
 
 /// @note These helper functions are used by the boost::variant used
 /// for fill styles. A variant is a C++ style version of the C union.
@@ -66,28 +70,70 @@ namespace {
 /// to extract the data.
 
 /// Transfer FillStyles to OpenVG styles.
-struct OpenVGStyles : boost::static_visitor<>
+struct StyleHandler : boost::static_visitor<>
 {
-    OpenVGStyles(SWFMatrix stage, SWFMatrix fill, const SWFCxForm& c,
-                 StyleHandler& sh, Quality q)
-        : _stageMatrix(stage.invert()),
-          _fillMatrix(fill.invert()),
-          _cx(c),
-          _sh(sh),
-          _quality(q)
+    StyleHandler(const SWFMatrix& mat, const SWFCxForm& cx,
+                 const VGPaint &p, float x, float y)
+        : _matrix(mat),
+          _cxform(cx),
+          _vgpaint(p),
+          _x(x),
+          _y(y)
         {
             GNASH_REPORT_FUNCTION;
         }
-    
-    void operator()(const GradientFill& f) const {
-        SWFMatrix m = f.matrix();
-        m.concatenate(_fillMatrix);
-        m.concatenate(_stageMatrix);
-        storeGradient(_sh, f, m, _cx);
+
+                   
+    void operator()(const GradientFill& g) const {
+        GNASH_REPORT_FUNCTION;
+        SWFMatrix mat = g.matrix();
+        Renderer_ovg::printVGMatrix(mat);
+        //      from OpenVG specification PDF
+        //
+        //          dx(x - x0) + dy((y - y0)
+        // g(x,y) = ------------------------
+        //                dx^2 + dy^2
+        // where dx = x1 - x0, dy = y1 - y0
+        //
+        int width = 800;
+        int height = 480;
+#if 0
+        float inv_width = 1.0f / width;
+        float inv_height = 1.0f / height;
+        float p[4] = { 0, 0, 0, 0 };
+        p[0] = mat.a() / 65536.0f * inv_width;
+        p[1] = mat.c() / 65536.0f * inv_width;
+        p[3] = mat.tx() * inv_width;
+#endif
+        std::cerr << "X=" << _x << ", Y=" << _y << std::endl;
+
+        const GradientFill::Type fill_type = g.type();
+        OpenVGBitmap* binfo = new OpenVGBitmap(_vgpaint);
+        if (fill_type ==  GradientFill::LINEAR) {
+            // All positions are specified in twips, which are 20 to the
+            // pixel. Use the display size for the extent of the shape, 
+            // as it'll get clipped by OpenVG at the end of the
+            // shape that is being filled with the gradient.
+            const std::vector<gnash::GradientRecord> &records = g.getRecords();
+            log_debug("Fill Style Type: Linear Gradient, %d records", records.size());
+            binfo->createLinearBitmap(_x, _y, width, height, _cxform, records,  _vgpaint);
+        }
+        if (fill_type == GradientFill::RADIAL) {
+            float focalpt = g.focalPoint();
+            const std::vector<gnash::GradientRecord> &records = g.getRecords();
+            log_debug("Fill Style Type: Radial Gradient: focal is: %d, %d:%d",
+                      focalpt, 200.0f, 200.0f);
+            // All positions are specified in twips, which are 20 to the
+            // pixel. Use the display size for the extent of the shape, 
+            // as it'll get clipped by OpenVG at the end of the
+            // shape that is being filled with the gradient.
+            binfo->createRadialBitmap(200.0f, 200.0f, 200.0f, 200.0f, 100,
+                                      _cxform, records, _vgpaint);
+        }
     }
 
     void operator()(const SolidFill& f) const {
-        const rgba color = _cx.transform(f.color());
+        const rgba color = _cxform.transform(f.color());
 
         // add the color to our self-made style handler (basically
         // just a list)
@@ -96,62 +142,31 @@ struct OpenVGStyles : boost::static_visitor<>
     }
 
     void operator()(const BitmapFill& f) const {
+        // OpenVGBitmap *binfo = new OpenVGBitmap(cb, _fillpaint);          
         SWFMatrix m = f.matrix();
-        m.concatenate(_fillMatrix);
-        m.concatenate(_stageMatrix);
-
-        // Smoothing policy:
-        //
-        // - If unspecified, smooth when _quality >= BEST
-        // - If ON or forced, smooth when _quality > LOW
-        // - If OFF, don't smooth
-        //
-        // TODO: take a forceBitmapSmoothing parameter.
-        //       which should be computed by the VM looking
-        //       at MovieClip.forceSmoothing.
-        bool smooth = false;
-        if (_quality > QUALITY_LOW) {
-            // TODO: if forceSmoothing is true, smooth !
-            switch (f.smoothingPolicy()) {
-                case BitmapFill::SMOOTHING_UNSPECIFIED:
-                    if (_quality >= QUALITY_BEST) {
-                        smooth = true;
-                    }
-                    break;
-                case BitmapFill::SMOOTHING_ON:
-                    smooth = true;
-                    break;
-                default: break;
-            }
-        }
-
+        
         const bool tiled = (f.type() == BitmapFill::TILED);
 
         const CachedBitmap* bm = f.bitmap(); 
 
-#if 0
         if (!bm) {
             // See misc-swfmill.all/missing_bitmap.swf
-            _sh.add_color(agg::rgba8_pre(255,0,0,255));
+            // _sh.add_color(agg::rgba8_pre(255,0,0,255));
         } else if ( bm->disposed() ) {
             // See misc-ming.all/BeginBitmapFill.swf
-            _sh.add_color(agg::rgba8_pre(0,0,0,0));
-        } else {
-            _sh.add_bitmap(dynamic_cast<const agg_bitmap_info*>(bm),
-                           m, _cx, tiled, smooth);
+            // _sh.add_color(agg::rgba8_pre(0,0,0,0));
+        // } else {
+            // _sh.add_bitmap(dynamic_cast<const agg_bitmap_info*>(bm),
+            //                m, _cx, tiled, smooth);
         }
-#endif
     }
     
 private:
-    /// The inverted stage matrix.
-    const SWFMatrix _stageMatrix;
-    
-    /// The inverted fill matrix.
-    const SWFMatrix _fillMatrix;
-    const SWFCxForm& _cx;
-    StyleHandler& _sh;
-    const Quality _quality;
+    const SWFMatrix& _matrix;
+    const SWFCxForm& _cxform;
+    const VGPaint&   _vgpaint;
+    float            _x;
+    float            _y;
 };
     
 /// Get the color of a style from the variant
@@ -287,7 +302,6 @@ public:
     const GradientFill::GradientRecords &operator()(const BitmapFill&) const {
     }
 };
-
 
 } // namespace gnash::renderer::openvg
 } // namespace gnash::renderer
