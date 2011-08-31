@@ -814,6 +814,7 @@ Renderer_ovg::analyze_paths(const PathVec &paths, bool& have_shape,
     }    
 }
 
+#if 0
 void
 Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& /* mat */,
                                const SWFCxForm& cx)
@@ -843,6 +844,9 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& /* mat *
       case SWF::FILL_TILED_BITMAP:
       {
           log_debug("Fill Style Type: Tiled Bitmap");
+          const StyleHandler st(mat, cx, _fillpaint,
+                                (*(refs[0])).ap.x, (*(refs[0])).ap.y);
+          boost::apply_visitor(st, fill_styles[i].fill);
           CachedBitmap *cb = boost::apply_visitor(GetBitmap(), style.fill);
           // Convert the GnashImage to a VG Image
           OpenVGBitmap *binfo = new OpenVGBitmap(cb, _fillpaint);
@@ -886,6 +890,7 @@ Renderer_ovg::apply_fill_style(const FillStyle& style, const SWFMatrix& /* mat *
       
     } // switch fill_type
 }
+#endif
 
 bool
 Renderer_ovg::apply_line_style(const LineStyle& style, const SWFCxForm& cx, 
@@ -1143,13 +1148,6 @@ Renderer_ovg::draw_subshape(const PathVec& path_vec,
             continue;
         }
         
-        SWF::FillType fill_type = boost::apply_visitor(GetType(), fill_styles[i].fill);
-#if 0
-        if ((fill_type != SWF::FILL_LINEAR_GRADIENT)
-            && (fill_type != SWF::FILL_RADIAL_GRADIENT)) {
-            apply_fill_style(fill_styles[i], mat, cx);
-        }
-#endif
         std::list<PathPtrVec> contours = get_contours(paths);
         
         VGPath      vg_path;
@@ -1164,44 +1162,12 @@ Renderer_ovg::draw_subshape(const PathVec& path_vec,
             const PathPtrVec& refs = *iter;
             
             startpath(vg_path, (*(refs[0])).ap.x, (*(refs[0])).ap.y);
-            if (fill_type == SWF::FILL_LINEAR_GRADIENT) {
-#if 1
-                const StyleHandler st(mat, cx, _fillpaint,
-                                      (*(refs[0])).ap.x, (*(refs[0])).ap.y);
-                boost::apply_visitor(st, fill_styles[i].fill);
-#else
-//                rgba incolor = boost::apply_visitor(GetColor(), fill_styles[i].fill);
-                OpenVGBitmap* binfo = new OpenVGBitmap(_fillpaint);
-                // All positions are specified in twips, which are 20 to the
-                // pixel. Use th display size for the extent of the shape, 
-                // as it'll get clipped by OpenVG at the end of the
-                // shape that is being filled with the gradient.
-                const std::vector<gnash::GradientRecord> &records =
-                    boost::apply_visitor(GetGradientRecords(), fill_styles[i].fill);
-                // log_debug("Fill Style Type: Linear Gradient, %d records", records.size());
-                binfo->createLinearBitmap((*(refs[0])).ap.x, (*(refs[0])).ap.y,
-                                          _display_width * 20.0f,
-                                          (_display_height * 20.0f)/2, cx, 
-                                          records,  _fillpaint);
-#endif
-            }
-            if (fill_type == SWF::FILL_RADIAL_GRADIENT) {
-                rgba incolor = boost::apply_visitor(GetColor(), fill_styles[i].fill);
-                double focalpt = boost::apply_visitor(GetFocalPoint(), fill_styles[i].fill);
-                const std::vector<gnash::GradientRecord> &records =
-                    boost::apply_visitor(GetGradientRecords(), fill_styles[i].fill);
-                log_debug("Fill Style Type: Radial Gradient: focal is: %d, %d:%d",
-                          focalpt, (*(refs[0])).ap.x, (*(refs[0])).ap.y);
-                OpenVGBitmap* binfo = new OpenVGBitmap(_fillpaint);
-                // All positions are specified in twips, which are 20 to the
-                // pixel. Use the display size for the extent of the shape, 
-                // as it'll get clipped by OpenVG at the end of the
-                // shape that is being filled with the gradient.
-                binfo->createRadialBitmap((*(refs[0])).ap.x, (*(refs[0])).ap.y,
-                                          (*(refs[0])).ap.x+1000,
-                                          (*(refs[0])).ap.y+1000, focalpt, cx,
-                                          records, _fillpaint);
-            }
+
+            // Create a Linear or Radial gradient
+            const StyleHandler st(cx, _fillpaint,
+                                  (*(refs[0])).ap.x/20, (*(refs[0])).ap.y/20);
+            boost::apply_visitor(st, fill_styles[i].fill);
+
             for (PathPtrVec::const_iterator it = refs.begin(), end = refs.end();
                  it != end; ++it) {
                 const Path& cur_path = *(*it);
@@ -1649,8 +1615,10 @@ Renderer_ovg::printVGPath(VGPath path)
 void
 Renderer_ovg::printVGMatrix(VGfloat *mat)
 {
-    std::cerr << "sx, shx, tx: " << mat[0] << ", " << mat[1]<< ", "  << mat[3] << std::endl;
-    std::cerr << "sy, shy, ty: " << mat[4]<< ", " << mat[6] << ", "<< mat[7] << std::endl;
+    std::cerr << "sx, shx, tx: " << mat[0] << ", " << mat[1]<< ", "
+              << std::fixed << mat[3] << std::endl;
+    std::cerr << "sy, shy, ty: " << mat[4]<< ", " << mat[6] << ", "
+              << std::scientific << mat[7] << std::endl;
 }
 
 void
