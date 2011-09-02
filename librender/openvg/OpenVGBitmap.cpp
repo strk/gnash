@@ -17,6 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 #include <boost/scoped_ptr.hpp>
+#include <iostream>
 
 #include "Geometry.h"
 #include "CachedBitmap.h"
@@ -45,7 +46,8 @@ OpenVGBitmap::OpenVGBitmap(VGPaint paint)
     _pixel_format(VG_sRGB_565),
 #endif
     _vgimage(VG_INVALID_HANDLE),
-    _vgpaint(paint)
+    _vgpaint(paint),
+    _aspect_ratio(0.75)       // 4:3 aspect ratio
 {
     // GNASH_REPORT_FUNCTION;
 }
@@ -62,7 +64,8 @@ OpenVGBitmap::OpenVGBitmap(CachedBitmap *bitmap, VGPaint vgpaint)
       _pixel_format(VG_sRGB_565),
 #endif
       _vgimage(VG_INVALID_HANDLE),
-      _vgpaint(vgpaint)
+      _vgpaint(vgpaint),
+      _aspect_ratio(0.75)       // 4:3 aspect ratio
 {
     // GNASH_REPORT_FUNCTION;
 
@@ -115,7 +118,8 @@ OpenVGBitmap::OpenVGBitmap(image::GnashImage *image, VGPaint vgpaint)
       _pixel_format(VG_sRGB_565),
 #endif
       _vgimage(VG_INVALID_HANDLE),
-      _vgpaint(vgpaint)
+      _vgpaint(vgpaint),
+      _aspect_ratio(0.75)       // 4:3 aspect ratio      
 {
     // GNASH_REPORT_FUNCTION;
 } 
@@ -148,23 +152,15 @@ OpenVGBitmap::~OpenVGBitmap()
 // x1,y1 is the focal point that is forced to be in the circle.
 OpenVGBitmap *
 OpenVGBitmap::createRadialBitmap(float cx, float cy, float fx, float fy,
-                                 float radial, const rgba &incolor,
+                                 float radial, const SWFCxForm& /* cxform */,
                                  const GradientFill::GradientRecords &records,
-                                 const SWFCxForm& /* cxform */,
                                  VGPaint paint)
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
-    VGfloat color[] = {
-        incolor.m_r / 255.0f,
-        incolor.m_g / 255.0f,
-        incolor.m_b / 255.0f,
-        incolor.m_a / 255.0f
-    };
-    vgSetParameteri (paint, VG_PAINT_TYPE, VG_PAINT_TYPE_COLOR);
-    vgSetParameterfv (paint, VG_PAINT_COLOR, 4, color);
-    
     VGfloat rgParams[] = { cx, cy, fx, fy, radial };
+    std::cerr << "Radial params are: " << cx << ", " << cy << ", "
+              << fx << ", " << fy << std::endl;
     
     // Paint Type 
     vgSetParameteri(paint, VG_PAINT_TYPE, VG_PAINT_TYPE_RADIAL_GRADIENT);
@@ -177,10 +173,11 @@ OpenVGBitmap::createRadialBitmap(float cx, float cy, float fx, float fy,
     VGfloat ramps[entries];
     int j = 0;
     for (size_t i=0; i!= records.size(); ++i) {
-        // std::cerr << "The record is: " << records[i].ratio/255.0f;
+        std::cerr << "The record is: " << records[i].ratio/255.0f
+                  << "(" <<  records[i].ratio << ")";
         rgba c = records[i].color;
-        // std::cerr << ", " << c.m_r/255.0f << ", " << c.m_g/255.0f << ", "
-        //           << c.m_b/255.0f << ", " << c.m_a/255.0f << std::endl;
+        std::cerr << ", " << c.m_r/255.0f << ", " << c.m_g/255.0f << ", "
+                  << c.m_b/255.0f << ", " << c.m_a/255.0f << std::endl;
         // The set of 5 for each record is simply: { Offset, R, G, B, A }
         ramps[j++] = records[i].ratio/255.0f;
         ramps[j++] = c.m_r / 255.0f;
@@ -209,32 +206,22 @@ OpenVGBitmap::createRadialBitmap(float cx, float cy, float fx, float fy,
 /// clipped at the boundary instead of x1,y1.
 OpenVGBitmap *
 OpenVGBitmap::createLinearBitmap(float x0, float y0, float x1, float y1,
-                                 const rgba &incolor,
+                                 const SWFCxForm& cxform,
                                  const GradientFill::GradientRecords &records,
-                                 const SWFCxForm& cxform,                                 
                                  const VGPaint paint)
 {
-    // GNASH_REPORT_FUNCTION;
-
-    rgba nc = cxform.transform(incolor);
-
-    VGfloat color[] = {
-        nc.m_r / 255.0f,
-        nc.m_g / 255.0f,
-        nc.m_b / 255.0f,
-        nc.m_a / 255.0f
-    };
-    vgSetParameteri (paint, VG_PAINT_TYPE, VG_PAINT_TYPE_COLOR);
-    vgSetParameterfv (paint, VG_PAINT_COLOR, 4, color);
-
+    GNASH_REPORT_FUNCTION;
+    
     vgSetParameteri(paint, VG_PAINT_TYPE, VG_PAINT_TYPE_LINEAR_GRADIENT);
     vgSetParameteri(paint, VG_PAINT_COLOR_RAMP_SPREAD_MODE,
-                    VG_COLOR_RAMP_SPREAD_PAD);
+                           VG_COLOR_RAMP_SPREAD_PAD);
 
     // This is the origin and size of the gradient
     VGfloat linearGradient[4] = { x0, y0, x1, y1 };
     vgSetParameterfv(paint, VG_PAINT_LINEAR_GRADIENT, 4, linearGradient);
-
+    std::cerr << "Linear params are: " << x0 << ", " << y0 << ", "
+              << x1 << ", " << y1 << std::endl;
+    
     // The application defines the non-premultiplied sRGBA color and alpha value
     // associated with each of a number of values, called stops.
     // A stop is defined by an offset between 0 and 1, inclusive, and a color value.
@@ -250,10 +237,10 @@ OpenVGBitmap::createLinearBitmap(float x0, float y0, float x1, float y1,
     VGfloat ramps[entries];
     int j = 0;
     for (size_t i=0; i!= records.size(); ++i) {
-        // std::cerr << "The record is: " << records[i].ratio/255.0f;
+        std::cerr << "The record ratio is: " << records[i].ratio/255.0f;
         rgba c = cxform.transform(records[i].color);
-        // std::cerr << ", " << c.m_r/255.0f << ", " << c.m_g/255.0f << ", "
-        //           << c.m_b/255.0f << ", " << c.m_a/255.0f << std::endl;
+        std::cerr << "; color: " << c.m_r/255.0f << ", " << c.m_g/255.0f << ", "
+                  << c.m_b/255.0f << ", " << c.m_a/255.0f << std::endl;
         // The set of 5 for each record is simply: { Offset, R, G, B, A }
         ramps[j++] = records[i].ratio/255.0f;
         ramps[j++] = c.m_r / 255.0f;
@@ -261,7 +248,15 @@ OpenVGBitmap::createLinearBitmap(float x0, float y0, float x1, float y1,
         ramps[j++] = c.m_b / 255.0f;
         ramps[j++] = c.m_a / 255.0f;
     }
+#if 1
     vgSetParameterfv(paint, VG_PAINT_COLOR_RAMP_STOPS, entries, ramps);
+#else
+    VGfloat rampStop[] = {0.00f, 1.0f, 1.0f, 1.0f, 1.0f,
+                          0.33f, 1.0f, 0.0f, 0.0f, 1.0f,
+                          0.66f, 0.0f, 1.0f, 0.0f, 1.0f,
+                          1.00f, 0.0f, 0.0f,  1.0f, 1.0f};
+    vgSetParameterfv(paint, VG_PAINT_COLOR_RAMP_STOPS, 20, rampStop);
+#endif
     
     return this;
 }
@@ -273,37 +268,60 @@ OpenVGBitmap::createLinearBitmap(float x0, float y0, float x1, float y1,
 /// @param paint The VG paint context
 /// @return A pointer to the new Bitmap
 OpenVGBitmap *
-OpenVGBitmap::applyPatternBitmap(const gnash::SWFMatrix& matrix,
-                                 bitmap_wrap_mode mode, VGPaint paint)
+OpenVGBitmap::applyPatternBitmap(const gnash::SWFMatrix& mat,
+                                 bitmap_wrap_mode mode,
+                                 CachedBitmap *bitmap, VGPaint /* paint */)
 {
     // GNASH_REPORT_FUNCTION;
 
+    // extract a reference to the image from the cached bitmap
+    image::GnashImage &im = bitmap->image();
+    
+    // Create a VG image
+    _vgimage = vgCreateImage(_pixel_format, im.width(), im.height(),
+                             VG_IMAGE_QUALITY_FASTER);    
     if (_vgimage == VG_INVALID_HANDLE) {
-        log_error("No VG image to paint! %s",
+        log_error("Failed to create VG image! %s",
                   Renderer_ovg::getErrorString(vgGetError()));
-        return 0;
     }
-
-    _vgpaint = paint;
-        
+    
+    switch (im.type()) {
+    case image::TYPE_RGB:
+        log_debug("Image has RGB Pixel Format, Stride is %d, width is %d, height is %d",
+                  im.stride(), im.width(), im.height());
+        vgImageSubData(_vgimage, im.begin(), im.stride(), VG_sRGBX_8888,
+                   0, 0, im.width(), im.height());
+        break;
+    case image::TYPE_RGBA:
+        log_debug("Image has RGBA Pixel Format, Stride is %d, width is %d, height is %d",
+                  im.stride(), im.width(), im.height());
+        // Copy the image data into the VG image container
+        vgImageSubData(_vgimage, im.begin(), im.stride(), VG_sRGBA_8888,
+                   0, 0, im.width(), im.height());
+        break;
+    default:
+        std::abort();
+    }
+    
     vgSetParameteri (_vgpaint, VG_PAINT_TYPE, VG_PAINT_TYPE_PATTERN);
 
-    gnash::SWFMatrix mat;
     VGfloat     vmat[9];
     
-    // Paint the cached VG image into the VG paint surface
-    mat = matrix;
-    mat.invert();
+    // Adjust the X scale by the aspect ratio or images get squished
+    //sm.a() = sm.a() * _aspect_ratio;
+    SWFMatrix nsm(mat.a() * 0.75, mat.b(), mat.c(),
+                  mat.d(), mat.tx(), mat.ty());
+    nsm.invert();
     // Renderer_ovg::printVGMatrix(matrix);
     
     memset(vmat, 0, sizeof(vmat));
     // Convert from fixed point to floating point
-    vmat[0] = mat.a() / 65536.0f;
-    vmat[1] = mat.b() / 65536.0f;
-    vmat[3] = mat.c() / 65536.0f;
-    vmat[4] = mat.d() / 65536.0f;
-    vmat[6] = mat.tx();
-    vmat[7] = mat.ty();
+    vmat[0] = nsm.a() / 65536.0f;
+    vmat[1] = nsm.b() / 65536.0f;
+    vmat[3] = nsm.c() / 65536.0f;
+    vmat[4] = nsm.d() / 65536.0f;
+    vmat[6] = nsm.tx();
+    vmat[7] = nsm.ty();
     
     // Renderer_ovg::printVGMatrix(vmat);
     
