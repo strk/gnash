@@ -29,7 +29,7 @@
 
 #include <gtk/gtkgl.h>
 
-#include "Renderer_ogl.h"
+#include "opengl/Renderer_ogl.h"
 #include "gtk_glue.h"
 #include "tu_opengl_includes.h"
 

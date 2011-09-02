@@ -29,56 +29,62 @@ namespace gnash {
 class Renderer_agg_base : public Renderer
 {
 private:
-
-  unsigned char *_testBuffer; // buffer used by initTestBuffer() only
-  
+    
+    unsigned char *_testBuffer; // buffer used by initTestBuffer() only
+    
 public:
-  
-  Renderer_agg_base() : _testBuffer(0) { }  
-
-  // virtual classes should have virtual destructors
-  virtual ~Renderer_agg_base() {}
-
-  // these methods need to be accessed from outside:
-  virtual void init_buffer(unsigned char *mem, int size, int x, int y, int rowstride)=0;
-
-  virtual unsigned int getBytesPerPixel() const=0;
-
-  unsigned int getBitsPerPixel() const { return getBytesPerPixel()*8; }
-  
-  virtual bool initTestBuffer(unsigned width, unsigned height) {
-    int size = width * height * getBytesPerPixel();
     
-    _testBuffer	= static_cast<unsigned char *>( realloc(_testBuffer, size) );
+    Renderer_agg_base() : _testBuffer(0) { }  
     
-    init_buffer(_testBuffer, size, width, height, width * getBytesPerPixel());
+    // virtual classes should have virtual destructors
+    virtual ~Renderer_agg_base() {}
     
-    return true;
-  }
-  
-  
+    // these methods need to be accessed from outside:
+    virtual void init_buffer(unsigned char *mem, int size, int x, int y,
+                             int rowstride) = 0;
+    
+    virtual unsigned int getBytesPerPixel() const = 0;
+    
+    unsigned int getBitsPerPixel() const { return getBytesPerPixel()*8; }
+    
+    virtual bool initTestBuffer(unsigned width, unsigned height) {
+        int size = width * height * getBytesPerPixel();
+        
+        _testBuffer = static_cast<unsigned char *>(realloc(_testBuffer, size));
+        memset(_testBuffer, 0, size);
+        printf("Renderer Test memory at: %p\n", _testBuffer);
+        
+        init_buffer(_testBuffer, size, width, height, width * getBytesPerPixel());
+        
+        return true;
+    }    
 };
-
 
 /// Create a render handler 
 //
 /// If the given pixelformat is unsupported, or any other error
 /// occurs, NULL is returned.
 ///
-DSOEXPORT Renderer_agg_base*
-  create_Renderer_agg(const char *pixelformat);
+DSOEXPORT Renderer_agg_base *create_Renderer_agg(const char *pixelformat);
   
 /// Detect pixel format based on bit mask. If the pixel format is unknown,
 /// NULL is returned. Note that a successfully detected pixel format does
 /// not necessarily mean that the pixel format is available (compiled in).
 /// The bit offsets are assumed to be in host byte order!
-DSOEXPORT const char* agg_detect_pixel_format(unsigned int rofs, unsigned int rsize,
-  unsigned int gofs, unsigned int gsize,
-  unsigned int bofs, unsigned int bsize,
-  unsigned int bpp);
+DSOEXPORT const char *agg_detect_pixel_format(unsigned int rofs,
+                                              unsigned int rsize,
+                                              unsigned int gofs,
+                                              unsigned int gsize,
+                                              unsigned int bofs,
+                                              unsigned int bsize,
+                                              unsigned int bpp);
   
 
 } // namespace gnash
 
+#endif // BACKEND_RENDER_HANDLER_AGG_H
 
-#endif // BACKEND_RENDER_HANDLER_CAIRO_H
+// Local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:

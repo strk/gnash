@@ -42,6 +42,7 @@ localedir = $(datadir)/locale
 
 AM_CPPFLAGS = \
         -I$(top_srcdir)/libbase \
+        -I$(top_srcdir)/libdevice \
         -I$(top_srcdir)/librender \
 	-I$(top_srcdir)/librender/agg \
 	-I$(top_srcdir)/librender/cairo \
@@ -60,6 +61,13 @@ AM_CPPFLAGS = \
 	$(BOOST_CFLAGS) \
 	$(PTHREAD_CFLAGS) \
 	$(NULL)
+
+if BUILD_EGL_DEVICE
+AM_CPPFLAGS += $(EGL_CFLAGS)
+endif
+if BUILD_DIRECTFB_DEVICE
+AM_CPPFLAGS += $(DIRECTFB_CFLAGS)
+endif
 
 if WIN32
   # bzip2 is a dependency of some libraries with mingw32

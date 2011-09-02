@@ -102,43 +102,44 @@
 #endif
 
 #include "gui.h"
+#include "rc.h"
 #include "fbsup.h"
 #include "log.h"
 #include "movie_root.h"
 #include "RunResources.h"
-
-#include "Renderer.h"
-#include "Renderer_agg.h"
 #include "GnashSleep.h" // for gnashSleep
+#include "Renderer.h"
 
 #include <linux/input.h>    // for /dev/input/event*
+#include <events/InputDevice.h>
 
+#ifdef RENDERER_AGG
+# include "fb_glue_agg.h"
+# include "agg/Renderer_agg.h"
+#endif
 
-// workaround until fatal_error() is implemented
-// that is not silent without -v switch
-//
-// The do { } while (0) strangeness here is the only general way to get a
-// compound statement that is lexically equivalent to a single one. Example:
-//   #define foo() { this(); that(); }
-//   if (a) foo();
-//   else bar();
-// would become
-//   if (a) { this(); that() ; } ; else bar()
-// which is a syntax error.
+#ifdef RENDERER_OPENVG
+# include "VG/openvg.h"
+# include "openvg/OpenVGRenderer.h"
+# include "fb_glue_ovg.h"
+#endif
 
-#define fatal_error(args ...) \
-  do { fprintf(stderr, args); putc('\n', stderr); } while(0)
+#ifdef RENDERER_GLES1
+# include "fb_glue_gles1.h"
+#endif
 
-//--
+namespace gnash {
 
-
-namespace gnash
-{
-
-
-//---------------
+namespace gui {
 
 int terminate_request = false;  // global scope to avoid GUI access
+
+std::auto_ptr<Gui> createFBGui(unsigned long windowid, float scale,
+                               bool do_loop, RunResources& r)
+{
+    // GNASH_REPORT_FUNCTION;
+    return std::auto_ptr<Gui>(new FBGui(windowid, scale, do_loop, r));
+}
 
 /// Called on CTRL-C and alike
 void
@@ -148,21 +149,20 @@ terminate_signal(int /*signo*/) {
 
 FBGui::FBGui(unsigned long xid, float scale, bool loop, RunResources& r)
     : Gui(xid, scale, loop, r),
-      fd(-1),
-      original_vt(-1),
-      original_kd(-1),
-      own_vt(-1),
-      fbmem(0),
-      buffer(0),                // the real value is set by ENABLE_DOUBLE_BUFFERING
+      _fd(-1),
+      _original_vt(-1),
+      _original_kd(-1),
+      _own_vt(-1),
       _xpos(0),
       _ypos(0),  
-      m_rowsize(0),
       _timeout(0)
 {
+    // GNASH_REPORT_FUNCTION;
+    
     // initializing to zero helps with debugging and prevents weird bugs
 //    memset(mouse_buf, 0, 256);
-    memset(&var_screeninfo, 0, sizeof(fb_var_screeninfo));
-    memset(&fix_screeninfo, 0, sizeof(fb_fix_screeninfo));
+    memset(&_var_screeninfo, 0, sizeof(fb_var_screeninfo));
+    memset(&_fix_screeninfo, 0, sizeof(fb_fix_screeninfo));
 
     signal(SIGINT, terminate_signal);
     signal(SIGTERM, terminate_signal);
@@ -170,10 +170,12 @@ FBGui::FBGui(unsigned long xid, float scale, bool loop, RunResources& r)
 
 FBGui::~FBGui()
 {  
-    if (fd > 0) {
+    // GNASH_REPORT_FUNCTION;
+    
+    if (_fd > 0) {
         enable_terminal();
         log_debug(_("Closing framebuffer device"));
-        close(fd);
+        close(_fd);
     }
 
 #ifdef ENABLE_DOUBLE_BUFFERING
@@ -185,106 +187,106 @@ FBGui::~FBGui()
 }
 
 bool
-FBGui::set_grayscale_lut8()
-{
-#define TO_16BIT(x) (x | (x<<8))
-
-    struct fb_cmap cmap;
-    int i;
-
-    log_debug(_("LUT8: Setting up colormap"));
-
-    cmap.start=0;
-    cmap.len=256;
-    cmap.red = (__u16*)malloc(CMAP_SIZE);
-    cmap.green = (__u16*)malloc(CMAP_SIZE);
-    cmap.blue = (__u16*)malloc(CMAP_SIZE);
-    cmap.transp = NULL;
-
-    for (i=0; i<256; i++) {
-        int r = i;
-        int g = i;
-        int b = i;
-
-        cmap.red[i] = TO_16BIT(r);
-        cmap.green[i] = TO_16BIT(g);
-        cmap.blue[i] = TO_16BIT(b);
-    }
-
-#ifdef ENABLE_FAKE_FRAMEBUFFER
-    if (fakefb_ioctl(fd, FBIOPUTCMAP, &cmap))
-#else
-    if (ioctl(fd, FBIOPUTCMAP, &cmap))
-#endif
-    {
-        log_error(_("LUT8: Error setting colormap: %s"), strerror(errno));
-        return false;
-    }
-
-    return true;
-
-#undef TO_16BIT
-}
-
-bool
 FBGui::init(int argc, char *** argv)
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
+    // the current renderer as set on the command line or gnashrc file
+    std::string renderer = _runResources.getRenderBackend();
+
+#ifdef RENDERER_OPENVG
+    if (renderer.empty()) {
+        renderer = "openvg";
+    }
+    if ((renderer == "openvg") || (renderer == "ovg")) {
+        renderer = "openvg";
+        _glue.reset(new FBOvgGlue(0));
+        // Initialize the glue layer between the renderer and the gui toolkit
+        _glue->init(argc, argv);
+        
+        FBOvgGlue *ovg = reinterpret_cast<FBOvgGlue *>(_glue.get());
+        // Set "window" size
+        _width =  ovg->getWidth();
+        _height = ovg->getHeight();
+        log_debug("Width:%d, Height:%d", _width, _height);
+        _renderer.reset(renderer::openvg::create_handler(0));     
+        renderer::openvg::Renderer_ovg *rend = reinterpret_cast
+            <renderer::openvg::Renderer_ovg *>(_renderer.get());
+        rend->init(_width, _height);
+    }
+#endif
+
+    // map framebuffer into memory
+    // Create a new Glue layer
+#ifdef RENDERER_AGG
+    if (renderer.empty()) {
+        renderer = "agg";
+    }
+    if (renderer == "agg") {
+        _glue.reset(new FBAggGlue());
+        // Initialize the glue layer between the renderer and the gui toolkit
+        _glue->init(argc, argv);
+        FBAggGlue *agg = reinterpret_cast<FBAggGlue *>(_glue.get());
+        // Set "window" size
+        _width =  agg->width();
+        _height = agg->height();
+        log_debug("Width:%d, Height:%d", _width, _height);
+        _renderer.reset(agg->createRenderHandler());
+        // Renderer_agg_base *rend = reinterpret_cast<Renderer_agg_base *>(_renderer.get());
+        // rend->init(_width, _height);
+    }
+#endif
+    if ((renderer != "openvg") && (renderer != "agg")) {
+        log_error("No renderer! %s not supported.", renderer);
+    }
+    
+    disable_terminal();
+    
     // Initialize all the input devices
 
     // Look for Mice that use the PS/2 mouse protocol
-    _inputs = InputDevice::scanForDevices(this);
-    if (_inputs.empty()) {
+    std::vector<boost::shared_ptr<InputDevice> > possibles
+        = InputDevice::scanForDevices();
+    if (possibles.empty()) {
         log_error("Found no accessible input event devices");
+    } else {
+        log_debug("Found %d input event devices.", possibles.size());
     }
     
-    // Open the framebuffer device
-#ifdef ENABLE_FAKE_FRAMEBUFFER
-    fd = open(FAKEFB, O_RDWR);
+    std::vector<boost::shared_ptr<InputDevice> >::iterator it;
+    for (it=possibles.begin(); it!=possibles.end(); ++it) {
+        //(*it)->dump();
+        if ((*it)->getType() == InputDevice::MOUSE) {
+            log_debug("WARNING: Mouse support disabled as it conflicts with the input event support.");
+            // For now we only want keyboard input events, as the mouse
+            // interface default of /dev/input/mice supports hotpluging devices,
+            // unlike the regular events.
+            // _inputs.push_back(*it);
+        }
+        if ((*it)->getType() == InputDevice::KEYBOARD) {
+            _inputs.push_back(*it);
+        }
+        // TSLib also supports linux input events, so we
+        // use that instead of handling the events directly. The
+        // Babbage is configured as a tablet when using input events.
+        if ((*it)->getType() == InputDevice::TOUCHSCREEN) {
+            log_debug("Enabling Touchscreen support.");
+            _inputs.push_back(*it);
+        }
+        if ((*it)->getType() == InputDevice::TABLET) {
+#if 1
+            log_debug("WARNING: Babbage Tablet support disabled as it conflicts with TSlib");
 #else
-    fd = open("/dev/fb0", O_RDWR);
+            log_debug("Enabling Babbage Touchscreen support");
+            _inputs.push_back(*it);
 #endif
-    if (fd < 0) {
-        fatal_error("Could not open framebuffer device: %s", strerror(errno));
-        return false;
+        }
+        if ((*it)->getType() == InputDevice::POWERBUTTON) {
+            _inputs.push_back(*it);
+        }
     }
-  
-    // Load framebuffer properties
-#ifdef ENABLE_FAKE_FRAMEBUFFER
-    fakefb_ioctl(fd, FBIOGET_VSCREENINFO, &var_screeninfo);
-    fakefb_ioctl(fd, FBIOGET_FSCREENINFO, &fix_screeninfo);
-#else
-    ioctl(fd, FBIOGET_VSCREENINFO, &var_screeninfo);
-    ioctl(fd, FBIOGET_FSCREENINFO, &fix_screeninfo);
-#endif
-    log_debug(_("Framebuffer device uses %d bytes of memory."),
-              fix_screeninfo.smem_len);
-    log_debug(_("Video mode: %dx%d with %d bits per pixel."),
-              var_screeninfo.xres, var_screeninfo.yres, var_screeninfo.bits_per_pixel);
 
-    // map framebuffer into memory
-    fbmem = (unsigned char *)
-        mmap(0, fix_screeninfo.smem_len, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-
-#ifdef ENABLE_DOUBLE_BUFFERING
-    // allocate offscreen buffer
-    buffer = (unsigned char*)malloc(fix_screeninfo.smem_len);
-    memset(buffer, 0, fix_screeninfo.smem_len);
-#endif  
-
-#ifdef PIXELFORMAT_LUT8
-    // Set grayscale for 8 bit modes
-    if (var_screeninfo.bits_per_pixel==8) {
-        if (!set_grayscale_lut8())
-            return false;
-    }
-#endif
-
-    // Set "window" size
-    _width    = var_screeninfo.xres;
-    _height   = var_screeninfo.yres;
-
+#if 0
     // Let -j -k override "window" size
     optind = 0; opterr = 0; char c;
     while ((c = getopt (argc, *argv, "j:k:X:Y:")) != -1) {
@@ -303,85 +305,35 @@ FBGui::init(int argc, char *** argv)
                 break;
         }
     }
-
-    if ( _xpos < 0 ) _xpos += var_screeninfo.xres - _width;
-    _xpos = clamp<int>(_xpos, 0, var_screeninfo.xres-_width);
-
-    if ( _ypos < 0 ) _ypos += var_screeninfo.yres - _height;
-    _ypos = clamp<int>(_ypos, 0, var_screeninfo.yres-_height);
-
-    log_debug("Width:%d, Height:%d", _width, _height);
-    log_debug("X:%d, Y:%d", _xpos, _ypos);
-
-    _validbounds.setTo(0, 0, _width - 1, _height - 1);    
-
-    return true;
-}
-
-bool
-FBGui::initialize_renderer()
-{
-    // GNASH_REPORT_FUNCTION;
-
-    const int bpp = var_screeninfo.bits_per_pixel;
-    const int size = fix_screeninfo.smem_len; 
-
-    // TODO: should recalculate!  
-    unsigned char* mem;
-    Renderer_agg_base* agg_handler;
-  
-#ifdef ENABLE_DOUBLE_BUFFERING
-    log_debug(_("Double buffering enabled"));
-    mem = buffer;
-#else
-    log_debug(_("Double buffering disabled"));
-    mem = fbmem;
 #endif
-  
-    agg_handler = NULL;
-  
-    // choose apropriate pixel format
-  
-    log_debug(_("red channel: %d / %d"), var_screeninfo.red.offset, 
-              var_screeninfo.red.length);
-    log_debug(_("green channel: %d / %d"), var_screeninfo.green.offset, 
-              var_screeninfo.green.length);
-    log_debug(_("blue channel: %d / %d"), var_screeninfo.blue.offset, 
-              var_screeninfo.blue.length);
-    log_debug(_("Total bits per pixel: %d"), var_screeninfo.bits_per_pixel);
-  
-    const char* pixelformat = agg_detect_pixel_format(
-        var_screeninfo.red.offset, var_screeninfo.red.length,
-        var_screeninfo.green.offset, var_screeninfo.green.length,
-        var_screeninfo.blue.offset, var_screeninfo.blue.length,
-        bpp
-        );
+    
+#if 0
+    // FIXME: this allows to draw in a subsection of the screen. OpenVG
+    // should be able to support this, but right now it just gets in
+    // the way of debugging.
+    
+    if ( _xpos < 0 ) _xpos += _var_screeninfo.xres - _width;
+    _xpos = clamp<int>(_xpos, 0, _var_screeninfo.xres-_width);
 
-    if (pixelformat) {    
-        agg_handler = create_Renderer_agg(pixelformat);      
-    } else {
-        fatal_error("The pixel format of your framebuffer could not be detected.");
-        return false;
-    }
+    if ( _ypos < 0 ) _ypos += _var_screeninfo.yres - _height;
+    _ypos = clamp<int>(_ypos, 0, _var_screeninfo.yres-_height);
 
-    assert(agg_handler);
+    log_debug("X:%d, Y:%d", _xpos, _ypos);
+#endif
 
-    _renderer.reset(agg_handler);
-
-    _runResources.setRenderer(_renderer);
-  
-    m_rowsize = var_screeninfo.xres_virtual*((bpp+7)/8);
-  
-    agg_handler->init_buffer(mem, size, _width, _height, m_rowsize);
-  
-    disable_terminal();
-
+    _validbounds.setTo(0, 0, _width - 1, _height - 1);
+    
     return true;
 }
 
 bool
 FBGui::run()
 {
+    GNASH_REPORT_FUNCTION;
+
+#ifdef USE_TSLIB
+    int ts_loop_count;
+#endif
 
     VirtualClock& timer = getClock();
     
@@ -396,9 +348,13 @@ FBGui::run()
         // up early because of some Linux signal sent to our process (and thus
         // "advance" faster than the "heartbeat" interval)? - Udo
 
+#ifdef USE_TSLIB
+        ts_loop_count++; //increase loopcount
+#endif
+        
         // check input devices
         checkForData();
-        
+
         // advance movie  
         Gui::advance_movie(this);
 
@@ -407,7 +363,7 @@ FBGui::run()
             break;
         }
     }
-  
+
     return true;
 }
 
@@ -416,7 +372,7 @@ FBGui::renderBuffer()
 {
     // GNASH_REPORT_FUNCTION;
 
-    if ( _drawbounds.size() == 0 ) return; // nothing to do..
+//    if ( _drawbounds.size() == 0 ) return; // nothing to do..
 
 #ifdef ENABLE_DOUBLE_BUFFERING
 
@@ -439,20 +395,32 @@ FBGui::renderBuffer()
         for (int y=bounds.getMinY(), y1=y+_ypos; y<=maxy; ++y, ++y1) {
             const unsigned int pix_idx_in = y*m_rowsize + minx*pixel_size;
             const unsigned int pix_idx_out = y1*m_rowsize + minx1*pixel_size;
-            memcpy(&fbmem[pix_idx_out], &buffer[pix_idx_in], row_size);
+            memcpy(&(fbmem[pix_idx_out]), &buffer[pix_idx_in], row_size);
         }
     }  
        
 #endif
-  
+
+    _glue->render();
 }
 
 bool
 FBGui::createWindow(const char* /*title*/, int /*width*/, int /*height*/,
                      int /*xPosition*/, int /*yPosition*/)
 {
-    // Now initialize AGG
-    return initialize_renderer();
+    GNASH_REPORT_FUNCTION;
+
+    _runResources.setRenderer(_renderer);
+    
+#ifdef RENDERER_AGG
+    if (_glue) {
+        _glue->prepDrawingArea(0);
+    } else {
+        return false;
+    }
+#endif
+    
+    return true;
 }
 
 bool
@@ -481,17 +449,17 @@ FBGui::setTimeout(unsigned int timeout)
     _timeout = timeout;
 }
 
-void
-FBGui::setFullscreen()
-{
-    // FB GUI always runs fullscreen; ignore...
-}
+// void
+// FBGui::setFullscreen()
+// {
+//     // FB GUI always runs fullscreen; ignore...
+// }
 
-void
-FBGui::unsetFullscreen()
-{
-  // FB GUI always runs fullscreen; ignore...
-}
+// void
+// FBGui::unsetFullscreen()
+// {
+//   // FB GUI always runs fullscreen; ignore...
+// }
 
 void
 FBGui::showMenu(bool /*show*/)
@@ -509,28 +477,35 @@ FBGui::showMouse(bool /*show*/)
 }
 
 void
-FBGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
+FBGui::setInvalidatedRegion(const SWFRect& /* bounds */)
 {
-    _renderer->set_invalidated_regions(ranges);
-    
-    _drawbounds.clear();
-    
-    for (unsigned int rno=0; rno<ranges.size(); rno++) {
-        geometry::Range2d<int> bounds = Intersection(
-            _renderer->world_to_pixel(ranges.getRange(rno)),
-            _validbounds);
-        
-        // it may happen that a particular range is out of the screen, which 
-        // will lead to bounds==null. 
-        if (bounds.isNull()) continue; 
-        
-        _drawbounds.push_back(bounds);   
-    }
+    // GNASH_REPORT_FUNCTION;
+
+#if 0
+     FBAggGlue *fbag = reinterpret_cast
+        <FBAggGlue *>(_glue.get());
+
+     fbag->setInvalidatedRegion(bounds);
+#endif
+}
+
+void
+FBGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
+ {
+     // GNASH_REPORT_FUNCTION;
+
+#if 0
+     FBAggGlue *fbag = reinterpret_cast<FBAggGlue *>(_glue.get());
+     fbag->setInvalidatedRegions(ranges);
+#endif
+     _glue->setInvalidatedRegions(ranges);     
 }
 
 char *
 FBGui::find_accessible_tty(int no)
 {
+    // GNASH_REPORT_FUNCTION;
+
     char* fn;
     
     fn = find_accessible_tty("/dev/vc/%d", no);   if (fn) return fn;
@@ -564,7 +539,9 @@ FBGui::find_accessible_tty(const char* format, int no)
 bool
 FBGui::disable_terminal() 
 {
-    original_kd = -1;
+    // GNASH_REPORT_FUNCTION;
+
+    _original_kd = -1;
     
     struct vt_stat vts;
     
@@ -591,64 +568,66 @@ FBGui::disable_terminal()
     
     if (ioctl(fd, VT_GETSTATE, &vts) == -1) {
         log_debug(_("WARNING: Could not get current VT state"));
-        close(fd);
+        close(_fd);
         return false;
     }
     
-    original_vt = vts.v_active;
-    log_debug(_("Original TTY NO = %d"), original_vt);   
+    _original_vt = vts.v_active;
+    log_debug(_("Original TTY NO = %d"), _original_vt);
   
 #ifdef REQUEST_NEW_VT
     // Request a new VT number
-    if (ioctl(fd, VT_OPENQRY, &own_vt) == -1) {
+    if (ioctl(fd, VT_OPENQRY, &_own_vt) == -1) {
         log_debug(_("WARNING: Could not request a new VT"));
         close(fd);
         return false;
     }
   
-    log_debug(_("Own TTY NO = %d"), own_vt);
+    log_debug(_("Own TTY NO = %d"), _own_vt);
 
     if (fd > 0) {
         close(fd);
     }
   
     // Activate our new VT
-    tty = find_accessible_tty(own_vt);
+    tty = find_accessible_tty(_own_vt);
     if (!tty) {
-        log_debug(_("WARNING: Could not find device for VT number %d"), own_vt);
+        log_debug(_("WARNING: Could not find device for VT number %d"), _own_vt);
         return false;
     }
   
-    fd = open(tty, O_RDWR);
+    _fd = open(tty, O_RDWR);
     if (fd < 0) {
         log_debug(_("WARNING: Could not open %s"), tty);
         return false;
     }
   
-    if (ioctl(fd, VT_ACTIVATE, own_vt) == -1) {
-        log_debug(_("WARNING: Could not activate VT number %d"), own_vt);
+    if (ioctl(fd, VT_ACTIVATE, _own_vt) == -1) {
+        log_debug(_("WARNING: Could not activate VT number %d"), _own_vt);
         close(fd);
         return false;
     }
   
-    if (ioctl(fd, VT_WAITACTIVE, own_vt) == -1) {
-        log_debug(_("WARNING: Error waiting for VT %d becoming active"), own_vt);
+    if (ioctl(fd, VT_WAITACTIVE, _own_vt) == -1) {
+        log_debug(_("WARNING: Error waiting for VT %d becoming active"),
+                  _own_vt);
         //close(tty);
         //return false;   don't abort
     }
 
 #else
 
-    own_vt = original_vt;   // keep on using the original VT
+    _own_vt = _original_vt;   // keep on using the original VT
   
     if (fd > 0) {
         close(fd);
     }
   
     // Activate our new VT
-    tty = find_accessible_tty(own_vt);
+    tty = find_accessible_tty(_own_vt);
     if (!tty) {
-        log_debug(_("WARNING: Could not find device for VT number %d"), own_vt);
+        log_debug(_("WARNING: Could not find device for VT number %d"),
+                  _own_vt);
         return false;
     }
   
@@ -658,18 +637,18 @@ FBGui::disable_terminal()
         return false;
     }
   
-    /*
+#if 0
     // Become session leader and attach to terminal
     setsid();
     if (ioctl(fd, TIOCSCTTY, 0) == -1) {
     log_debug(_("WARNING: Could not attach controlling terminal (%s)"), tty);
     }
-    */
-#endif  
+#endif
+#endif  // end of if REQUEST_NEW_VT
   
     // Disable keyboard cursor
   
-    if (ioctl(fd, KDGETMODE, &original_kd) == -1) {
+    if (ioctl(fd, KDGETMODE, &_original_kd) == -1) {
         log_debug(_("WARNING: Could not query current keyboard mode on VT"));
     }
 
@@ -681,7 +660,7 @@ FBGui::disable_terminal()
         close(fd);
     }
   
-    log_debug(_("VT %d ready"), own_vt);  
+    log_debug(_("VT %d ready"), _own_vt);  
   
     // NOTE: We could also implement virtual console switching by using 
     // VT_GETMODE / VT_SETMODE ioctl calls and handling their signals, but
@@ -693,11 +672,13 @@ FBGui::disable_terminal()
 bool
 FBGui::enable_terminal() 
 {
+    // GNASH_REPORT_FUNCTION;
+
     log_debug(_("Restoring terminal..."));
 
-    char* tty = find_accessible_tty(own_vt);
+    char* tty = find_accessible_tty(_own_vt);
     if (!tty) {
-        log_debug(_("WARNING: Could not find device for VT number %d"), own_vt);
+        log_debug(_("WARNING: Could not find device for VT number %d"), _own_vt);
         return false;
     }
 
@@ -707,21 +688,22 @@ FBGui::enable_terminal()
         return false;
     }
 
-    if (ioctl(fd, VT_ACTIVATE, original_vt)) {
-        log_debug(_("WARNING: Could not activate VT number %d"), original_vt);
-        close(fd);
+    if (ioctl(fd, VT_ACTIVATE, _original_vt)) {
+        log_debug(_("WARNING: Could not activate VT number %d"), _original_vt);
+        close(_fd);
         return false;
     }
 
-    if (ioctl(fd, VT_WAITACTIVE, original_vt)) {
-        log_debug(_("WARNING: Error waiting for VT %d becoming active"), original_vt);
+    if (ioctl(fd, VT_WAITACTIVE, _original_vt)) {
+        log_debug(_("WARNING: Error waiting for VT %d becoming active"),
+                  _original_vt);
         //close(tty);
         //return false;   don't abort
     }  
   
     // Restore keyboard
   
-    if (ioctl(fd, KDSETMODE, original_kd)) {
+    if (ioctl(fd, KDSETMODE, _original_kd)) {
         log_debug(_("WARNING: Could not restore keyboard mode"));
     }  
 
@@ -741,119 +723,45 @@ FBGui::checkForData()
 
     for (it=_inputs.begin(); it!=_inputs.end(); ++it) {
         (*it)->check();
+        boost::shared_ptr<InputDevice::input_data_t> ie = (*it)->popData();
+        if (ie) {
+#if 1
+            std::cerr << "Got data: " << ((ie->pressed) ? "true" : "false");
+            std::cerr << ", " << ie->key << ", " << ie->modifier;
+            std::cerr << ", " << ie->x << ", " << ie->y << std::endl;
+            // cerr << "X = " << coords[0] << endl;
+            // cerr << "Y = " << coords[1] << endl;
+#endif
+#if 0
+            // Range check and convert the position from relative to
+            // absolute
+            boost::shared_array<int> coords =
+                MouseDevice::convertCoordinates(ie->x, ie->y,
+                                                getStage()->getStageWidth(),
+                                                getStage()->getStageHeight());
+            // The mouse was moved
+            if (coords) {
+                notifyMouseMove(coords[0], coords[1]);
+            }
+#endif
+            // See if a mouse button was clicked
+            if (ie->pressed) {
+                notifyMouseClick(true);
+#if 0
+                double x = 0.655 * ie->x;
+                double y = 0.46875 * ie->y;
+                log_debug("Mouse clicked at: %g:%g", x, y);
+                notifyMouseMove(int(x), int(y));
+#else
+                notifyMouseMove(ie->x, ie->y);
+#endif  
+            }
+        }
     }
 }
 
-// end of namespace gnash
-}
-
-#ifdef ENABLE_FAKE_FRAMEBUFFER
-// Simulate the ioctls used to get information from the framebuffer
-// driver. Since this is an emulator, we have to set these fields
-// to a reasonable default.
-int
-fakefb_ioctl(int /* fd */, int request, void *data)
-{
-    // GNASH_REPORT_FUNCTION;
-    
-    switch (request) {
-      case FBIOGET_VSCREENINFO:
-      {
-          struct fb_var_screeninfo *ptr =
-              reinterpret_cast<struct fb_var_screeninfo *>(data);
-          // If we are using a simulated framebuffer, the default for
-          // fbe us 640x480, 8bits. So use that as a sensible
-          // default. Note that the fake framebuffer is only used for
-          // debugging and development.
-          ptr->xres          = 640; // visible resolution
-          ptr->xres_virtual  = 640; // virtual resolution
-          ptr->yres          = 480; // visible resolution
-          ptr->yres_virtual  = 480; // virtual resolution
-          ptr->width         = 640; // width of picture in mm
-          ptr->height        = 480; // height of picture in mm
-
-          // Android and fbe use a 16bit 5/6/5 framebuffer
-          ptr->bits_per_pixel = 16;
-          ptr->red.length    = 5;
-          ptr->red.offset    = 11;
-          ptr->green.length  = 6;
-          ptr->green.offset  = 5;
-          ptr->blue.length   = 5;
-          ptr->blue.offset   = 0;
-          ptr->transp.offset = 0;
-          ptr->transp.length = 0;
-          // 8bit framebuffer
-          // ptr->bits_per_pixel = 8;
-          // ptr->red.length    = 8;
-          // ptr->red.offset    = 0;
-          // ptr->green.length  = 8;
-          // ptr->green.offset  = 0;
-          // ptr->blue.length   = 8;
-          // ptr->blue.offset   = 0;
-          // ptr->transp.offset = 0;
-          // ptr->transp.length = 0;
-          ptr->grayscale     = 1; // != 0 Graylevels instead of color
-          
-          break;
-      }
-      case FBIOGET_FSCREENINFO:
-      {
-          struct fb_fix_screeninfo *ptr =
-              reinterpret_cast<struct fb_fix_screeninfo *>(data);
-          ptr->smem_len = 307200; // Length of frame buffer mem
-          ptr->type = FB_TYPE_PACKED_PIXELS; // see FB_TYPE_*
-          ptr->visual = FB_VISUAL_PSEUDOCOLOR; // see FB_VISUAL_*
-          ptr->xpanstep = 0;      // zero if no hardware panning
-          ptr->ypanstep = 0;      // zero if no hardware panning
-          ptr->ywrapstep = 0;     // zero if no hardware panning
-          ptr->accel = FB_ACCEL_NONE; // Indicate to driver which specific
-                                  // chip/card we have
-          break;
-      }
-      case FBIOPUTCMAP:
-      {
-          // Fbe uses this name for the fake framebuffer, so in this
-          // case assume we're using fbe, so write to the known fbe
-          // cmap file.
-          std::string str = FAKEFB;
-          if (str == "/tmp/fbe_buffer") {
-              int fd = open("/tmp/fbe_cmap", O_WRONLY);
-              if (fd) {
-                  write(fd, data, sizeof(struct fb_cmap));
-                  close(fd);
-              } else {
-                  gnash::log_error("Couldn't write to the fake cmap!");
-                  return -1;
-              }
-          } else {
-              gnash::log_error("Couldn't write to the fake cmap, unknown type!");
-              return -1;
-          }
-          // If we send a SIGUSR1 signal to fbe, it'll reload the
-          // color map.
-          int fd = open("/tmp/fbe.pid", O_RDONLY);
-          char buf[10];
-          if (fd) {
-              if (read(fd, buf, 10) == 0) {
-                  close(fd);
-                  return -1;
-              } else {
-                  pid_t pid = strtol(buf, 0, NULL);
-                  kill(pid, SIGUSR1);
-                  gnash::log_debug("Signaled fbe to reload it's colormap.");
-              }
-              close(fd);
-          }
-          break;
-      }
-      default:
-          gnash::log_unimpl("fakefb_ioctl(%d)", request);
-          break;
-    }
-
-    return 0;
-}
-#endif  // ENABLE_FAKE_FRAMEBUFFER
+} // end of namespace gui
+} // end of namespace gnash
 
 // Local Variables:
 // mode: C++

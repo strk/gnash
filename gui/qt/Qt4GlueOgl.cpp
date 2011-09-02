@@ -28,7 +28,7 @@
 #include "Qt4GlueOgl.h"
 #include "Qt4Gui.h"
 #include "Renderer.h"
-#include "Renderer_ogl.h"
+#include "opengl/Renderer_ogl.h"
 #include "GnashException.h"
 
 namespace gnash
@@ -85,7 +85,7 @@ Qt4OglGlue::render(const QRect& /*updateRect*/)
 Renderer*
 Qt4OglGlue::createRenderHandler()
 {
-    _renderer = create_Renderer_ogl();
+    _renderer = renderer::opengl::create_handler();
 
     if ( ! _renderer ) {
         throw GnashException("Could not create OpenGL renderer");

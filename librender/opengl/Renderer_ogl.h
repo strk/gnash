@@ -19,7 +19,6 @@
 #ifndef GNASH_RENDER_HANDLER_OGL_H
 #define GNASH_RENDER_HANDLER_OGL_H
 
-
 #if defined(NOT_SGI_GL) || defined(__APPLE_CC__)
 # ifdef __APPLE_CC__
 # include <AGL/agl.h>
@@ -59,13 +58,12 @@
 
 namespace gnash {
 
+namespace renderer {
 
-
+namespace opengl {
 
 typedef std::vector<const Path*> PathRefs;
-
-
-
+ 
 struct oglVertex {
   oglVertex(double x, double y, double z = 0.0)
     : _x(x), _y(y), _z(z)
@@ -150,15 +148,15 @@ private:
 
 };
 
+DSOEXPORT Renderer* create_handler(bool init = true);
 
-
-
-DSOEXPORT Renderer* create_Renderer_ogl(bool init = true);
-
-
-
+} // namespace gnash::renderer::opengl
+} // namespace gnash::renderer
 } // namespace gnash
-
 
 #endif
 
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:

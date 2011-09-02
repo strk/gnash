@@ -28,6 +28,8 @@
 #include <gdk/gdk.h>
 #endif
 
+#include "DeviceGlue.h"
+
 namespace gnash {
     class Renderer;
     class movie_root;
@@ -35,10 +37,10 @@ namespace gnash {
 
 namespace gnash {
 
-class GtkGlue
+class GtkGlue : public DeviceGlue
 {
   public:
-    GtkGlue() : _drawing_area(0) { }
+    GtkGlue() : _drawing_area(0), _needs_area(false) { }
     virtual ~GtkGlue() { }
     virtual bool init(int argc, char **argv[]) = 0;
 
@@ -46,7 +48,6 @@ class GtkGlue
     virtual Renderer* createRenderHandler() = 0;
     virtual void setRenderHandlerSize(int /*width*/, int /*height*/) {}
     virtual void render() = 0;
-    
     virtual void render(int /*minx*/, int /*miny*/, int /*maxx*/, int /*maxy*/)
     {
         render();	
@@ -73,11 +74,19 @@ class GtkGlue
     
     virtual void beforeRendering(movie_root*) {};
 
+    virtual bool needsDrawingArea() { return _needs_area; };
+
   protected:
     GtkWidget *_drawing_area;
+    bool      _needs_area;  
 };
 
 } // namespace gnash
 
 // end of GNASH_GTK_GLUE_H
 #endif
+
+// Local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:

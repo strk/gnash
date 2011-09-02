@@ -23,6 +23,7 @@ noinst_LTLIBRARIES = libgnashvm.la
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/librender \
+	-I$(top_srcdir)/libdevice \
 	-I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/libcore/asobj \
 	-I$(top_srcdir)/libcore/asobj/flash \
@@ -35,6 +36,13 @@ AM_CPPFLAGS = \
 	$(PTHREAD_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(NULL)
+
+if BUILD_EGL_DEVICE
+AM_CPPFLAGS += $(EGL_CFLAGS)
+endif
+if BUILD_DIRECTFB_DEVICE
+AM_CPPFLAGS += $(DIRECTFB_CFLAGS)
+endif
 
 libgnashvm_la_SOURCES = \
 	ASHandlers.cpp \

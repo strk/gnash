@@ -19,10 +19,6 @@ AC_DEFUN([GNASH_PATH_GLES],
 [
   gles=yes
 
-  dnl This changes the default between OpenGL-ES 1.x and 2.x, which are
-  dnl somewhat incomatible with each other. gles1 or gles2 are all that's
-  dnl supported.
-  default_version=gles1
   dnl This changes the default flavor of OpenGL-ES implementations. If only
   dnl one is installed, it doesn't matter, but if you are a developer with
   dnl multiple OpenGL-ES implementations, you can use this to limit the
@@ -40,18 +36,29 @@ AC_DEFUN([GNASH_PATH_GLES],
   fi
 
   dnl Look for the headers.
-  AC_ARG_WITH(gles_includes, AC_HELP_STRING([--with-gles-includes], [directory where OpenGL-ES headers are]), with_gles_includes=${withval})
-  AC_CACHE_VAL(ac_cv_path_gles_includes,[
-    if test x"${with_gles_includes}" != x ; then
-      if test -f ${with_gles_includes}/GLES/egl.h -o -f ${with_gles_includes}/GLES2/gl2.h ; then
-        ac_cv_path_gles_includes="-I`(cd ${with_gles_includes}; pwd)`"
+  AC_ARG_WITH(gles1_includes, AC_HELP_STRING([--with-gles1-includes], [directory where OpenGLES 1 headers are]), with_gles1_includes=${withval})
+  AC_CACHE_VAL(ac_cv_path_gles1_includes,[
+    if test x"${with_gles1_includes}" != x ; then
+      if test -f ${with_gles1_includes}/GLES/egl.h -o -f ${with_gles1_includes}/GLES/gl.h; then
+        ac_cv_path_gles1_includes="-I`(cd ${with_gles1_includes}; pwd)`"
       else
-        AC_MSG_ERROR([${with_gles_includes} directory doesn't contain egl.h or gl2.h])
+        AC_MSG_ERROR([${with_gles1_includes} directory doesn't contain egl.h or gl.h])
       fi
     fi
   ])
 
-  dnl This gets reall fun, as all the implementations I could find
+  AC_ARG_WITH(gles2_includes, AC_HELP_STRING([--with-gles2-includes], [directory where OpenGLES 2 headers are]), with_gles2_includes=${withval})
+  AC_CACHE_VAL(ac_cv_path_gles2_includes,[
+    if test x"${with_gles2_includes}" != x ; then
+      if test -f ${with_gles2_includes}/GLES2/gl2.h ; then
+        ac_cv_path_gles2_includes="-I`(cd ${with_gles2_includes}; pwd)`"
+      else
+        AC_MSG_ERROR([${with_gles2_includes} directory doesn't contain gl2.h])
+      fi
+    fi
+  ])
+
+  dnl This gets really fun, as all the implementations I could find
   dnl have differences. OpenGL-ES 1.x by default doesn't have
   dnl Farmebuffer support, this is added by an extension. For
   dnl OpenGL-ES 2.x, this extension is now in the standard API.
@@ -71,57 +78,54 @@ AC_DEFUN([GNASH_PATH_GLES],
   dnl includes both OpenGL-ES 1.1 and 2.1, but with a twist. The
   dnl OpenGL-ES 1.x implementation is under the EGL, instead of the
   dnl GLES top level directory.
-  if test x"${ac_cv_path_gles_includes}" = x; then
+
+  if test x"${ac_cv_path_gles1_includes}" = x -o x"${ac_cv_path_gles2_includes}" = x; then
     AC_MSG_CHECKING([for OpenGL-ES headers])
     for i in ${newlist}; do
       dnl OpenGL-ES 1.x
-      if test x"${default_version}" = xgles1; then
+      if test x"${ac_cv_path_gles1_includes}" = x -a x"${build_gles1}" = xyes; then
         if test -f $i/GLES/gl.h; then
-          AC_DEFINE(HAVE_GLES_GL_H, [1], [Have OpenGL-ES GLES/gl.h])
-          AC_DEFINE([RENDERER_GLES], [], [Use OpenGL-ES version 1.x])
-          ac_cv_path_gles_includes="-I$i"
+          AC_DEFINE(HAVE_GLES1_GL_H, [1], [Have OpenGL-ES GLES/gl.h])
+          AC_DEFINE([RENDERER_GLES1], [1], [Use OpenGL-ES version 1.x])
+          ac_cv_path_gles1_includes="-I$i"
           dnl Some implementations have this extension, which adds
           dnl framebuffer support.
           if test -f $i/GLES/glext.h; then
-            AC_DEFINE(HAVE_GLES_GLEXT_H, [1], [Have OpenGL-ES GLES/glext.h])
+            AC_DEFINE(HAVE_GLES1_GLEXT_H, [1], [Have OpenGL-ES GLES/glext.h])
           fi
           dnl If it contains the egl.h file, it's probably gles-10c,
           dnl if not, then it's probably the Android implementation.
           if test -f $i/GLES/egl.h; then
+            AC_DEFINE(HAVE_GLES1_EGL_H, [1], [Have OpenGLES 1 egl.h])
             config_flavor=10c
           else
             config_flavor=android
           fi
-        fi
-        if test -f $i/EGL/egl.h; then
-          AC_DEFINE(HAVE_EGL_EGL_H, [1], [Have OpenGL-ES EGL/egl.h])
-          ac_cv_path_gles_includes="-I$i"
-          dnl Only the Mali library has this header file.
-          if test -f $i/EGL/egl_native_types.h; then
-            config_flavor=mali
-          else
-            config_flavor=android
+          if test -f $i/EGL/egl.h; then
+            AC_DEFINE(HAVE_EGL_EGL_H, [1], [Have OpenGL-ES EGL/egl.h])
+            ac_cv_path_gles1_includes="-I$i"
+            dnl Only the Mali library has this header file.
+            if test -f $i/EGL/egl_native_types.h; then
+              config_flavor=mali
+            else
+              config_flavor=android
+            fi
           fi
         fi
       fi
-      dnl If no OpenGL-ES 1.x headers can be found, look for v2 files
-      if test x"${ac_cv_path_gles_includes}" = x; then
-        default_version=gles2
-      fi
       dnl OpenGL-ES 2.x
-      if test x"${default_version}" = xgles2; then
+      if test x"${ac_cv_path_gles2_includes}" = x -a x"${build_gles2}" = xyes; then
         if test -f $i/GLES2/gl2.h; then
-          AC_DEFINE(HAVE_GLES2_GL2_H, [1], [Have OpenGL-ES GLES2/gl2.h])
-          AC_DEFINE([RENDERER_GLES2], [], [Use OpenGL-ES v2 version 2])
-          ac_cv_path_gles_includes="-I$i"
+          AC_DEFINE(HAVE_GLES2_GL2_H, [1], [Have OpenGLES v2 GLES2/gl2.h])
+          AC_DEFINE([RENDERER_GLES2], [1], [Use OpenGLES v2 version 2])
+          ac_cv_path_gles2_includes="-I$i"
           dnl Both OpenGL-ES 2.1 implementations are similar enough
           dnl the flavor doesn't matter.
           config_flavor=android
         fi
         if test -f $i/EGL/egl.h; then
           AC_DEFINE(HAVE_EGL_EGL_H, [1], [Have OpenGL-ES EGL/egl.h])
-          AC_DEFINE([RENDERER_EGL], [], [Use OpenGL-ES version 1.3])
-          ac_cv_path_gles_includes="-I$i"
+          ac_cv_path_gles2_includes="-I$i"
           dnl Only the Mali library has this header file.
           if test -f $i/EGL/egl_native_types.h; then
             config_flavor=mali
@@ -130,27 +134,29 @@ AC_DEFUN([GNASH_PATH_GLES],
           fi
         fi
       fi
-      if test x"${ac_cv_path_gles_includes}" != x; then
-        break;
-      fi
     done
   fi
-  if test x"${ac_cv_path_gles_includes}" != x; then
-    AC_MSG_RESULT(${ac_cv_path_gles_includes})
+
+  if test x"${ac_cv_path_gles1_includes}" = x; then
+    AC_CHECK_HEADERS([GLES/egl.h], [ac_cv_path_gles1_includes=""])
+  fi
+  if test x"${ac_cv_path_gles2_includes}" = x; then
+    AC_CHECK_HEADERS([GLES2/gl2.h], [ac_cv_path_gles2_includes=""])
   fi
 
-  if test x"${ac_cv_path_gles_includes}" = x; then
-    AC_CHECK_HEADERS([GLES2/gl2.h], [ac_cv_path_gles_includes=""])
-  fi
-  if test x"${ac_cv_path_gles_includes}" = x; then
-    AC_CHECK_HEADERS([GLES/egl.h], [ac_cv_path_gles_includes=""])
-  fi
-
-  if test x"${ac_cv_path_gles_includes}" != x; then
-    GLES_CFLAGS="${ac_cv_path_gles_includes}"
+  if test x"${ac_cv_path_gles1_includes}" != x -a x"${ac_cv_path_gles1_includes}" != x/usr/include; then
+    GLES1_CFLAGS="${ac_cv_path_gles1_includes}"
   else
-    GLES_CFLAGS=""
+    GLES1_CFLAGS=""
   fi
+
+  if test x"${ac_cv_path_gles2_includes}" != x -a x"${ac_cv_path_gles2_includes}" != x/usr/include; then
+    GLES2_CFLAGS="${ac_cv_path_gles2_includes}"
+  else
+    GLES2_CFLAGS=""
+  fi
+
+  AC_MSG_RESULT(${ac_cv_path_gles1_includes} ${ac_cv_path_gles2_includes})
 
   if test x"${default_flavor}" = xany; then
     flavor="${config_flavor}"
@@ -168,67 +174,99 @@ AC_DEFUN([GNASH_PATH_GLES],
   dnl multiple OpenGL-ES implementations installed (for testing and
   dnl development), so we don't mix and match headers and libaries
   dnl between implementations.
-  if test x"${default_version}" = xgles1; then
+  if test x"${ac_cv_path_gles1_includes}" != x; then
     AC_MSG_NOTICE([OpenGL-ES implementation being used is: ${flavor} 1.x])
     case "${flavor}" in
-      mali)    gleslist="egl glesv1"  ;;
-      10c)     gleslist="GLES_CL" ;;
-      android) gleslist="EGL GLESv1_CM" ;;
-      *)     gleslist="GLES_CL GLESv1_CM GLESv1" ;;
+      mali)    gleslist1="egl glesv1"  ;;
+      10c)     gleslist1="GLES_CL" ;;
+      android) gleslist1="EGL GLESv1_CM" ;;
+      mesa)    gleslist1="GLESv1" ;;
+      *)       gleslist1="GLES_CL GLESv1_CM GLESv1" ;;
     esac
   fi
 
-  if test x"${default_version}" = xgles2; then
+  if test x"${ac_cv_path_gles2_includes}" != x; then
     AC_MSG_NOTICE([OpenGL-ES implementation being used is: ${flavor} 2.x])
-    gleslist="EGL GLESv2"
+    gleslist2="EGL GLESv2"
+  else
+    gleslist2=""
   fi
 
   dnl Look for the libraries.
-  AC_ARG_WITH(gles_lib, AC_HELP_STRING([--with-gles-lib], [directory where OpenGL-ES libraries are]), with_gles_lib=${withval})
-  AC_CACHE_VAL(ac_cv_path_gles_lib,[
-    if test x"${with_gles_lib}" != x ; then
-      for j in $gleslist; do
-        if test -f ${with_gles_lib}/$i.a -o -f ${with_gles_lib}/$i.${shlibext}; then
-          ac_cv_path_gles_lib="-L`(cd ${with_gles_lib}; pwd)` -l$i"
+  AC_ARG_WITH(gles1_lib, AC_HELP_STRING([--with-gles1-lib], [directory where OpenGLES 1 libraries are]), with_gles1_lib=${withval})
+  AC_CACHE_VAL(ac_cv_path_gles1_lib,[
+    if test x"${with_gles1_lib}" != x ; then
+      for j in $gleslist1; do
+        if test -f ${with_gles1_lib}/$i.a -o -f ${with_gles1_lib}/$i.${shlibext}; then
+          ac_cv_path_gles1_lib="-L`(cd ${with_gles1_lib}; pwd)` -l$i"
+          break;
+        fi
+      done
+    fi
+  ])
+  AC_ARG_WITH(gles2_lib, AC_HELP_STRING([--with-gles2-lib], [directory where OpenGLES 2 libraries are]), with_gles2_lib=${withval})
+  AC_CACHE_VAL(ac_cv_path_gles2_lib,[
+    if test x"${with_gles2_lib}" != x ; then
+      for j in $gleslist2; do
+        if test -f ${with_gles2_lib}/$i.a -o -f ${with_gles2_lib}/$i.${shlibext}; then
+          ac_cv_path_gles2_lib="-L`(cd ${with_gles2_lib}; pwd)` -l$i"
           break;
         fi
       done
     fi
   ])
 
+  has_gles1=no
+  has_gles2=no
+
   dnl add the default path to the Android NDK
   newlist="${android_ndk}/usr/lib ${libslist}"
-  if test x"${ac_cv_path_gles_lib}" = x; then
+  if test x"${ac_cv_path_gles1_lib}" = x; then
     for dir in ${newlist}; do
-      for lib in ${gleslist}; do
+      for lib in ${gleslist1}; do
         if test -f ${dir}/lib${lib}.${shlibext} -o -f ${dir}/lib${lib}.a; then
-          has_gles="yes"
+          has_gles1="yes"
           if test ! x"${dir}" = x"/usr/lib" -a ! x"${dir}" = x"/usr/lib64"; then
-            ac_cv_path_gles_lib="-L${dir} -l${lib}"
+            ac_cv_path_gles1_lib="-L${dir} -l${lib}"
           else
-            ac_cv_path_gles_lib="-l${lib}"
+            ac_cv_path_gles1_lib="-l${lib}"
           fi
-          dnl add the additiontal library need to link
-          if test x"${default_version}" = xgles2; then
-            ac_cv_path_gles_lib="${ac_cv_path_gles_lib} -lGLESv2"
-          fi
-          break
         fi
       done
-      if test x"${ac_cv_path_gles_lib}" != x ; then
-          break
-      fi
+    done
+  fi
+  if test x"${ac_cv_path_gles2_lib}" = x; then
+    for dir in ${newlist}; do
+      for lib in ${gleslist2}; do
+        if test -f ${dir}/lib${lib}.${shlibext} -o -f ${dir}/lib${lib}.a; then
+          has_gles2="yes"
+          if test ! x"${dir}" = x"/usr/lib" -a ! x"${dir}" = x"/usr/lib64"; then
+            ac_cv_path_gles2_lib="-L${dir} -l${lib}"
+          else
+            ac_cv_path_gles2_lib="-l${lib}"
+          fi
+        fi
+      done
     done
   fi
 
-  if test x"${ac_cv_path_gles_lib}" != x ; then
-      GLES_LIBS="${ac_cv_path_gles_lib}"
+  if test x"${ac_cv_path_gles1_lib}" != x; then
+      GLES1_LIBS="${ac_cv_path_gles1_lib}"
   else
-      GLES_LIBS=""
+      GLES1_LIBS=""
   fi
 
-  AC_SUBST(GLES_CFLAGS)
-  AC_SUBST(GLES_LIBS)
+  if test x"${ac_cv_path_gles2_lib}" != x; then
+      GLES2_LIBS="${ac_cv_path_gles2_lib}"
+  else
+      GLES2_LIBS=""
+  fi
+
+  AC_SUBST(GLES1_CFLAGS)
+  AC_SUBST(GLES1_LIBS)
+
+  AC_SUBST(GLES2_CFLAGS)
+  AC_SUBST(GLES2_LIBS)
 ])
 
 # Local Variables:

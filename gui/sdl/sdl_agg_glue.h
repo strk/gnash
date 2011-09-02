@@ -42,7 +42,7 @@ class SdlAggGlue : public SdlGlue
     SDL_Surface     *_sdl_surface;
     unsigned char   *_offscreenbuf;
     SDL_Surface     *_screen;
-    Renderer  *_agg_renderer;
+    Renderer        *_agg_renderer;
     
     geometry::Range2d<int> _validbounds;
     std::vector< geometry::Range2d<int> > _drawbounds;

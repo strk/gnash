@@ -23,6 +23,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <boost/shared_array.hpp>
 
 #include "GnashSleep.h"
 #include "log.h"
@@ -34,18 +35,11 @@ static const char *MOUSE_DEVICE = "/dev/input/mice";
 
 MouseDevice::MouseDevice()
 {
-    GNASH_REPORT_FUNCTION;
-}
-
-MouseDevice::MouseDevice(Gui *gui)
-{
     // GNASH_REPORT_FUNCTION;
-
-    _gui = gui;
 }
 
 std::vector<boost::shared_ptr<InputDevice> >
-MouseDevice::scanForDevices(Gui *gui)
+MouseDevice::scanForDevices()
 {
     // GNASH_REPORT_FUNCTION;
 
@@ -99,7 +93,7 @@ MouseDevice::scanForDevices(Gui *gui)
             
             boost::shared_ptr<InputDevice> dev;
 #if defined(USE_MOUSE_PS2) || defined(USE_MOUSE_ETT)
-            dev = boost::shared_ptr<InputDevice>(new MouseDevice(gui));
+            dev = boost::shared_ptr<InputDevice>(new MouseDevice());
             if (dev->init(mice[i].filespec, DEFAULT_BUFFER_SIZE)) {
                 devices.push_back(dev);
             }
@@ -115,7 +109,7 @@ MouseDevice::scanForDevices(Gui *gui)
 bool
 MouseDevice::init()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     return init(MOUSE_DEVICE, DEFAULT_BUFFER_SIZE);
 }
@@ -123,7 +117,7 @@ MouseDevice::init()
 bool
 MouseDevice::init(const std::string &filespec, size_t size)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     _type = MOUSE;
     _filespec = filespec;
@@ -219,7 +213,7 @@ MouseDevice::init(const std::string &filespec, size_t size)
 bool
 MouseDevice::check()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     if (_fd < 0) {
         return false;   // no mouse available
@@ -248,7 +242,7 @@ MouseDevice::check()
     // A Touchscreen works similar to a Mouse, but not exactly.
     // At least for the eTurboTouch, it has a different layout
     // in the packet for the location as it has an additional byte
-    btn   = buf[0] & 1;
+    btn   = buf[0] & 0x7;
     if (_type == InputDevice::TOUCHMOUSE) {
         xmove = (buf[1] << 7) | (buf[2]);
         ymove = (buf[3] << 7) | (buf[4]);
@@ -262,10 +256,21 @@ MouseDevice::check()
                                   * 1536 + 256));
         ymove = static_cast<int>(((static_cast<double>(ymove) - 482) / (1771 - 482)
                                   * 1536 + 256));
-        
+#if 0
+        // FIXME: don't calculate here, this should be done by the GUI
         xmove = xmove * _gui->getStage()->getStageWidth() / 2048;
         ymove = (2048-ymove) * _gui->getStage()->getStageHeight() / 2048;
-    } else {                    // end of InputDevice::MOUSE
+#endif
+    } else {                    // end of InputDevice::TOUCHMOUSE
+        // PS/2 Mouse
+        // The movement values are 9-bit 2's complement integers,
+        // where the most significant bit appears as a "sign" bit in
+        // byte 1 of the movement data packet. Their value represents
+        // the mouse's offset relative to its position when the
+        // previous packet was sent, in units determined by the
+        // current resolution. The range of values that can be
+        // expressed is -255 to +255. If this range is exceeded, the
+        // appropriate overflow bit is set.  
         xmove = buf[1];
         ymove = buf[2];
     
@@ -281,31 +286,36 @@ MouseDevice::check()
         log_debug(_("x/y %d/%d button %d"), xmove, ymove, btn);
         
         // movement    
-        _x += xmove;
-        _y += ymove;
+        _input_data.x += xmove;
+        _input_data.y += ymove;
         
-        if (_x < 0) {
-            _x = 0;
+        if (_input_data.x < 0) {
+            _input_data.x = 0;
         }
-        if (_y < 0) {
-            _y = 0;
+        if (_input_data.y < 0) {
+            _input_data.y = 0;
         }
-        if (_x > static_cast<int>(_gui->getStage()->getStageWidth())) {
-            _x = static_cast<int>(_gui->getStage()->getStageWidth());
-        }
-        if (_y > static_cast<int>(_gui->getStage()->getStageHeight())) {
-            _y = static_cast<int>(_gui->getStage()->getStageHeight());
-        }
+        // FIXME: this is a bit of a temporary hack. The last two
+        // arguments are a range, so hardcoding them is safe for
+        // now. In the future more conversion may be done, making this
+        // then be incorrect.
+        boost::shared_array<int> coords =
+            MouseDevice::convertCoordinates(_input_data.x, _input_data.y, 1024, 768);
+//          MouseDevice::convertCoordinates(_x, _y,
+//                                 _gui->getStage()->getStageWidth(),
+//                                 _gui->getStage()->getStageHeight());
+        _input_data.x = coords[0];
+        _input_data.y = coords[1];
     } // end of InputDevice::MOUSE
     
-    log_debug(_("read mouse @ %d / %d, btn %d"), _x, _y, _button);
-    _gui->notifyMouseMove(_x, _y);
+    log_debug(_("read mouse @ %d / %d, btn %d"), _input_data.x, _input_data.y, _input_data.button);
+    addData(false, gnash::key::INVALID, 0, _input_data.x, _input_data.y);
     
     // button
-    if (btn != _button) {
-        _button = btn;
+    if (btn != _input_data.button) {
+        _input_data.button = btn;
         log_debug("clicked: %d", btn); 
-        _gui->notifyMouseClick(btn); 
+        addData(true, gnash::key::INVALID, 0, _input_data.x, _input_data.y);
         log_debug(_("mouse click! %d"), btn);
     }
     
@@ -315,7 +325,7 @@ MouseDevice::check()
 bool
 MouseDevice::command(unsigned char cmd, unsigned char *buf, int count)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     int n;
     
@@ -346,6 +356,30 @@ MouseDevice::command(unsigned char cmd, unsigned char *buf, int count)
     return true;
     
 } // command()
+
+/// \brief. Mouse movements are relative to the last position, so
+/// this method is used to convert from relative position to
+/// the absolute position Gnash needs.
+boost::shared_array<int>
+MouseDevice::convertCoordinates(int x, int y, int width, int height)
+{
+    // GNASH_REPORT_FUNCTION;
+    
+    boost::shared_array<int> coords(new int[2]);
+
+    if (x > width) {
+        coords[0] = width;
+    } else {
+        coords[0] = x;
+    }
+    if (y > height) {
+        coords[1] = height;
+    } else {
+        coords[1] = y;
+    }
+    
+    return coords;
+}
 
 // end of namespace
 }

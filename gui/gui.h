@@ -89,13 +89,12 @@ public:
 
     virtual ~Gui();
 
-    /** \brief
-     * Initialise the gui and the associated renderer.
-     * 
-     * @param argc The commandline argument count.
-     * @param argv The commandline arguments.
-     * @return True on success; false on failure.
-     */
+    /// \brief/
+    ///  Initialise the gui and the associated renderer.
+    /// 
+    /// @param argc The commandline argument count.
+    /// @param argv The commandline arguments.
+    /// @return True on success; false on failure.
     virtual bool init(int argc, char **argv[]) = 0;
 
     /// Set main loop delay in milliseconds. 
@@ -115,15 +114,14 @@ public:
 
     void setScreenShotter(std::auto_ptr<ScreenShotter> ss);
 
-    /** \brief
-     * Create and display our window.
-     *
-     * @param title The window title.
-     * @param width The desired window width in pixels.
-     * @param height The desired window height in pixels.
-     * @param xPosition The desired window X position from the top left corner.
-     * @param yPosition The desired window Y position from the top left corner.
-     */   
+    /// \brief
+    /// Create and display our window.
+    ///
+    /// @param title The window title.
+    /// @param width The desired window width in pixels.
+    /// @param height The desired window height in pixels.
+    /// @param xPosition The desired window X position from the top left corner.
+    /// @param yPosition The desired window Y position from the top left corner.
     virtual bool createWindow(const char* title, int width, int height,
                        int xPosition = 0, int yPosition = 0) = 0;
 
@@ -610,12 +608,14 @@ private:
 };
 
 /// Named constructors
+namespace gui {
+  std::auto_ptr<Gui> createFBGui(unsigned long xid, float scale, bool loop, RunResources& r);
+}
 std::auto_ptr<Gui> createGTKGui(unsigned long xid, float scale, bool loop, RunResources& r);
 std::auto_ptr<Gui> createKDEGui(unsigned long xid, float scale, bool loop, RunResources& r);
 std::auto_ptr<Gui> createQt4Gui(unsigned long xid, float scale, bool loop, RunResources& r);
 std::auto_ptr<Gui> createSDLGui(unsigned long xid, float scale, bool loop, RunResources& r);
 std::auto_ptr<Gui> createFLTKGui(unsigned long xid, float scale, bool loop, RunResources& r);
-std::auto_ptr<Gui> createFBGui(unsigned long xid, float scale, bool loop, RunResources& r);
 std::auto_ptr<Gui> createAQUAGui(unsigned long xid, float scale, bool loop, RunResources& r);
 std::auto_ptr<Gui> createRISCOSGui(unsigned long xid, float scale, bool loop, RunResources& r);
 std::auto_ptr<Gui> createAOS4Gui(unsigned long xid, float scale, bool loop, RunResources& r);

@@ -28,7 +28,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_array.hpp>
 #include <memory>
-#include "VaapiImageFormat.h"
+#include "vaapi/VaapiImageFormat.h"
 
 namespace gnash
 {

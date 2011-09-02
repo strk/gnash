@@ -42,6 +42,7 @@ GtkAggGlue::GtkAggGlue()
 :   _offscreenbuf(NULL),
     _agg_renderer(NULL)
 {
+    GNASH_REPORT_FUNCTION;
 }
 
 GtkAggGlue::~GtkAggGlue()
@@ -54,12 +55,14 @@ GtkAggGlue::~GtkAggGlue()
 bool
 GtkAggGlue::init(int /*argc*/, char ** /*argv*/[])
 {
+    GNASH_REPORT_FUNCTION;
     return true;
 }
 
 void
 GtkAggGlue::prepDrawingArea(GtkWidget *drawing_area)
 {
+    GNASH_REPORT_FUNCTION;
     _drawing_area = drawing_area;
 
     // Disable double buffering, otherwise gtk tries to update widget
@@ -70,6 +73,7 @@ GtkAggGlue::prepDrawingArea(GtkWidget *drawing_area)
 Renderer*
 GtkAggGlue::createRenderHandler()
 {
+    GNASH_REPORT_FUNCTION;
     GdkVisual* wvisual = gdk_drawable_get_visual(_drawing_area->window);
 
     GdkImage* tmpimage = gdk_image_new (GDK_IMAGE_FASTEST, wvisual, 1, 1);
@@ -100,6 +104,8 @@ GtkAggGlue::createRenderHandler()
 void
 GtkAggGlue::setRenderHandlerSize(int width, int height)
 {
+    GNASH_REPORT_FUNCTION;
+
     assert(width > 0);
     assert(height > 0);
     assert(_agg_renderer != NULL);

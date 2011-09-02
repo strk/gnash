@@ -28,6 +28,7 @@ noinst_LTLIBRARIES = libgnashparser.la
 #
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/librender \
+	-I$(top_srcdir)/libdevice \
 	-I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libcore/abc \
@@ -41,6 +42,14 @@ AM_CPPFLAGS = \
 	$(PTHREAD_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(NULL)
+
+
+if BUILD_EGL_DEVICE
+AM_CPPFLAGS += $(EGL_CFLAGS)
+endif
+if BUILD_DIRECTFB_DEVICE
+AM_CPPFLAGS += $(DIRECTFB_CFLAGS)
+endif
 
 libgnashparser_la_SOURCES = \
 	action_buffer.cpp \

@@ -138,13 +138,6 @@ libgnashbase_la_SOURCES += \
 	$(NULL)
 endif
 
-if BUILD_OGL_RENDERER
-libgnashbase_la_SOURCES += \
-	GnashTexture.cpp \
-	GnashTexture.h \
-	$(NULL)
-endif
-
 if HAVE_VAAPI
 libgnashbase_la_SOURCES += \
 	GnashVaapiImage.cpp \
@@ -152,13 +145,6 @@ libgnashbase_la_SOURCES += \
 	GnashVaapiImageProxy.h \
 	$(NULL)
 
-if HAVE_VAAPI_GLX
-libgnashbase_la_SOURCES += \
-	GnashTexture.h \
-	GnashVaapiTexture.cpp \
-	GnashVaapiTexture.h \
-	$(NULL)
-endif
 endif
 
 

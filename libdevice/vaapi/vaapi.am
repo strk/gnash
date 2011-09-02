@@ -14,9 +14,20 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AUTOMAKE_OPTIONS = foreign
+SRCS = \
+	vaapi/vaapi_utils.cpp	\
+	vaapi/VaapiContext.cpp \
+	vaapi/VaapiDisplay.cpp \
+	vaapi/VaapiGlobalContext.cpp \
+	vaapi/VaapiImage.cpp \
+	vaapi/VaapiImageFormat.cpp \
+	vaapi/VaapiSubpicture.cpp \
+	vaapi/VaapiSurface.cpp \
+	vaapi/VaapiSurfaceProxy.cpp \
+	$(NULL)
 
-pkglib_LTLIBRARIES = libgnashvaapi.la
+if USE_VAAPI
+pkglib_LTLIBRARIES += libgnashvaapi.la
 
 libgnashvaapi_la_CPPFLAGS = \
 	-I$(top_srcdir)/libbase	\
@@ -35,29 +46,7 @@ libgnashvaapi_la_LIBADD = \
 	$(LIBVA_X11_LIBS) \
 	$(NULL)
 
-libgnashvaapi_la_SOURCES = \
-	vaapi_common.h \
-	vaapi_utils.cpp	\
-	vaapi_utils.h \
-	VaapiContext.cpp \
-	VaapiContext.h \
-	VaapiDisplay.cpp \
-	VaapiDisplay.h \
-	VaapiDisplayX11.h \
-	VaapiException.h \
-	VaapiGlobalContext.cpp \
-	VaapiGlobalContext.h \
-	VaapiImage.cpp \
-	VaapiImage.h \
-	VaapiImageFormat.cpp \
-	VaapiImageFormat.h \
-	VaapiSubpicture.cpp \
-	VaapiSubpicture.h \
-	VaapiSurface.cpp \
-	VaapiSurface.h \
-	VaapiSurfaceProxy.cpp \
-	VaapiSurfaceProxy.h \
-	$(NULL)
+libgnashvaapi_la_SOURCES = $(SRCS)
 
 if HAVE_VAAPI_GLX
 libgnashvaapi_la_CPPFLAGS += \
@@ -69,11 +58,45 @@ libgnashvaapi_la_LIBADD += \
 	$(NULL)
 
 libgnashvaapi_la_SOURCES += \
-	VaapiDisplayGLX.h \
-	VaapiSurfaceGLX.cpp \
-	VaapiSurfaceGLX.h \
+	vaapi/VaapiDisplayGLX.h \
+	vaapi/VaapiSurfaceGLX.cpp \
+	vaapi/VaapiSurfaceGLX.h \
 	$(NULL)
 endif
 
 libgnashvaapi_la_LDFLAGS = -release $(VERSION)
+endif
+
+noinst_HEADERS += \
+	vaapi/vaapi_common.h \
+	vaapi/vaapi_utils.h \
+	vaapi/VaapiContext.h \
+	vaapi/VaapiDisplay.h \
+	vaapi/VaapiDisplayX11.h \
+	vaapi/VaapiDisplayGLX.h \
+	vaapi/VaapiException.h \
+	vaapi/VaapiGlobalContext.h \
+	vaapi/VaapiImage.h \
+	vaapi/VaapiImageFormat.h \
+	vaapi/VaapiSubpicture.h \
+	vaapi/VaapiSurface.h \
+	vaapi/VaapiSurfaceGLX.h \
+	vaapi/VaapiSurfaceProxy.h \
+	$(NULL)
+
+EXTRA_DIST = $(SRCS) $(noinst_HEADERS)
+
+libgnashdevice_la_CPPFLAGS += $(VAAPI_CFLAGS)
+libgnashdevice_la_SOURCES += \
+	vaapi/VaapiDevice.cpp \
+	vaapi/VaapiDevice.h
+libgnashdevice_la_LIBADD += $(VAAPI_LIBS)
+
+check_PROGRAMS += test_vaapi
+test_vaapi_SOURCES = vaapi/test_vaapi.cpp
+test_vaapi_CPPFLAGS = $(AM_CPPFLAGS) $(VAAPI_CFLAGS)
+test_vaapi_LDADD = \
+	libgnashdevice.la \
+	$(VAAPI_LIBS) \
+	$(GNASH_LIBS)
 

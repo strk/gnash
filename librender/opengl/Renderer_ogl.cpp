@@ -92,7 +92,6 @@
 ///    us. The GLU tesselator will take care of shapes having inner boundaries
 ///    (for example a donut shape). This makes life a LOT easier!
 
-
 // TODO:
 // - Profiling!
 // - Optimize code:
@@ -107,15 +106,15 @@
 // that would give "exact two-dimensional rasterization". AGG uses a similar
 // system; consider the benefits and drawbacks of switching.
 
-
 namespace gnash {
+
+namespace renderer {
+
+namespace opengl {
 
 namespace {
     const CachedBitmap* createGradientBitmap(const GradientFill& gf,
             Renderer& renderer);
-}
-
-namespace {
 
 class bitmap_info_ogl : public CachedBitmap
 {
@@ -306,7 +305,6 @@ private:
   GLenum _cap;
 };
 
-
 class oglScopeMatrix : public boost::noncopyable
 {
 public:
@@ -407,8 +405,6 @@ void trace_curve(const point& startP, const point& controlP,
   }
 }
 
-
-
 std::vector<oglVertex> interpolate(const std::vector<Edge>& edges,
         const float& anchor_x, const float& anchor_y)
 {
@@ -435,7 +431,6 @@ std::vector<oglVertex> interpolate(const std::vector<Edge>& edges,
   
   return shape_points;  
 }
-
 
 // FIXME: OSX doesn't like void (*)().
 Tesselator::Tesselator()
@@ -515,8 +510,6 @@ Tesselator::rememberVertex(GLdouble* v)
   _vertices.push_back(v);
 }
 
-
-
 // static
 void
 Tesselator::error(GLenum error)
@@ -542,12 +535,10 @@ Tesselator::combine(GLdouble coords [3], void **/*vertex_data[4] */,
   tess->rememberVertex(v);
 }
 
-
 bool isEven(const size_t& n)
 {
   return n % 2 == 0;
 }
-
 
 bitmap_info_ogl::bitmap_info_ogl(std::auto_ptr<image::GnashImage> image,
         GLenum pixelformat, bool ogl_accessible)
@@ -1414,8 +1405,6 @@ public:
       boost::apply_visitor(st, style.fill);
   }
   
-  
-  
   bool apply_line_style(const LineStyle& style, const SWFCxForm& cx, const SWFMatrix& mat)
   {
   //  GNASH_REPORT_FUNCTION;
@@ -1891,7 +1880,7 @@ private:
 #endif
 }; // class Renderer_ogl
   
-Renderer* create_Renderer_ogl(bool init)
+Renderer* create_handler(bool init)
 // Factory.
 {
   Renderer_ogl* renderer = new Renderer_ogl;
@@ -2003,5 +1992,11 @@ createGradientBitmap(const GradientFill& gf, Renderer& renderer)
 
 } 
   
+} // namespace gnash::renderer::opengl
+} // namespace gnash::renderer
 } // namespace gnash
 
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:

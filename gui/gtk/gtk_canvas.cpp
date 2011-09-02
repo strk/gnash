@@ -41,8 +41,13 @@
 #endif
 
 // Cairo support for rendering in the canvas.
-#ifdef HAVE_CAIRO_H
+#ifdef RENDERER_CAIRO
 #include "gtk_glue_cairo.h"
+#endif
+
+// Cairo support for rendering in the canvas.
+#ifdef RENDERER_OPENVG
+#include "gtk_glue_ovg.h"
 #endif
 
 // AGG support, which is the default, for rendering in the canvas.
@@ -209,6 +214,8 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
         renderer = "cairo";
 #elif defined (RENDERER_OGL)
         renderer = "opengl";
+#elif defined (RENDERER_OPENVG)
+        renderer = "openvg";
 #endif
     }
 
@@ -239,6 +246,16 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
     else if (renderer == "opengl") {
 #ifdef RENDERER_OPENGL
         canvas->glue.reset(new gnash::GtkGlExtGlue);
+#else
+        boost::format fmt = boost::format("Support for renderer %1% "
+                " was not built") % renderer;
+        throw gnash::GnashException(fmt.str());
+#endif
+    }
+    else if ((renderer == "openvg") || (renderer == "ovg")) {
+	renderer = "openvg";
+#ifdef RENDERER_OPENVG
+        canvas->glue.reset(new gnash::gui::GtkOvgGlue);
 #else
         boost::format fmt = boost::format("Support for renderer %1% "
                 " was not built") % renderer;

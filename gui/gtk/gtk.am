@@ -48,14 +48,34 @@ endif	# BUILD_OGL_RENDERER
 if BUILD_AGG_RENDERER
 gtk_gnash_CPPFLAGS += $(AGG_CFLAGS)
 gtk_gnash_SOURCES += gtk/gtk_glue_agg.cpp gtk/gtk_glue_agg.h 
-gtk_gnash_LDADD += $(GNASH_LIBS) \
+gtk_gnash_LDADD += \
 	$(AGG_LIBS) \
 	$(NULL)
+
 if HAVE_VAAPI
 noinst_HEADERS		+= gtk/gtk_glue_agg_vaapi.h
 gtk_gnash_SOURCES	+= gtk/gtk_glue_agg_vaapi.cpp
-endif   # HAVE_VAAPI
+gtk_gnash_CPPFLAGS	+= \
+	$(X11_CFLAGS) \
+	$(LIBVA_X11_CFLAGS) \
+	-I$(top_srcdir)/libdevice/vaapi \
+	$(NULL)
+gtk_gnash_LDADD += \
+	$(X11_LIBS) \
+	$(LIBVA_LIBS) \
+	$(LIBVA_X11_LIBS) \
+	$(top_builddir)/libdevice/libgnashvaapi.la \
+	$(NULL)
+endif   # USE_VAAPI
 endif	# BUILD_AGG_RENDERER
+
+if BUILD_OVG_RENDERER
+gtk_gnash_CPPFLAGS += $(OPENVG_CFLAGS) $(EGL_CFLAGS)
+gtk_gnash_SOURCES += gtk/gtk_glue_ovg.cpp gtk/gtk_glue_ovg.h 
+gtk_gnash_LDADD += \
+	$(OPENVG_LIBS) \
+	$(EGL_LIBS)
+endif	# BUILD_OVG_RENDERER
 
 if BUILD_CAIRO_RENDERER
 gtk_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
@@ -63,6 +83,7 @@ gtk_gnash_SOURCES += gtk/gtk_glue_cairo.cpp gtk/gtk_glue_cairo.h
 gtk_gnash_LDADD += \
 	$(CAIRO_LIBS) \
 	$(NULL)
+
 endif	# BUILD_CAIRO_RENDERER
 
 endif	# BUILD_GTK_GUI

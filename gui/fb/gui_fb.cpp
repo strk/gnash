@@ -31,17 +31,24 @@
 
 namespace gnash {
 
+namespace gui {
+
 #ifdef GUI_FB
 std::auto_ptr<Gui> createFBGui(unsigned long windowid, float scale, bool do_loop, RunResources& r)
 {
-	return std::auto_ptr<Gui>(new FBGui(windowid, scale, do_loop, r));
+    return std::auto_ptr<Gui>(new FBGui(windowid, scale, do_loop, r));
 }
 #else // ! GUI_FB
 std::auto_ptr<Gui> createFBGui(unsigned long , float, bool, RunResourcesfloat , bool , unsigned int )
 {
-	throw GnashException("Support for FB gui was not compiled in");
+    throw GnashException("Support for FB gui was not compiled in");
 }
 #endif // ! GUI_FB
 
-} // namespace gnash
+} // end of namespace gui
+} // end of namespace gnash
 
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:

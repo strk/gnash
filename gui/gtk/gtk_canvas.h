@@ -37,7 +37,7 @@ typedef struct _GnashCanvasClass       GnashCanvasClass;
 
 #define GNASH_TYPE_CANVAS              (gnash_canvas_get_type())
 #define GNASH_CANVAS(object)           (G_TYPE_CHECK_INSTANCE_CAST((object), GNASH_TYPE_CANVAS, GnashCanvas))
-#define GNASH_CANVAS_CLASS(klass)	   (G_TYPE_CHECK_CLASS_CAST((klass), GNASH_TYPE_CANVAS, GnashCanvasClass))
+#define GNASH_CANVAS_CLASS(klass)      (G_TYPE_CHECK_CLASS_CAST((klass), GNASH_TYPE_CANVAS, GnashCanvasClass))
 #define GNASH_IS_CANVAS(object)        (G_TYPE_CHECK_INSTANCE_TYPE((object), GNASH_TYPE_CANVAS))
 #define GNASH_IS_CANVAS_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE((klass), GNASH_TYPE_CANVAS))
 #define GNASH_CANVAS_GET_CLASS(object) (G_TYPE_INSTANCE_GET_CLASS((object), GNASH_TYPE_CANVAS, GnashCanvasClass))
@@ -46,12 +46,19 @@ struct _GnashCanvasClass {
     GtkDrawingAreaClass base_class;
 };
 
-GType            gnash_canvas_get_type              ();
-GtkWidget       *gnash_canvas_new                   ();
+GType gnash_canvas_get_type();
 
-void             gnash_canvas_setup                 (GnashCanvas *canvas, std::string &hwaccel, std::string &renderer, int argc, char **argv[]);
-void             gnash_canvas_before_rendering      (GnashCanvas *canvas, gnash::movie_root* stage);
-boost::shared_ptr<gnash::Renderer>  gnash_canvas_get_renderer   (GnashCanvas *canvas);
+/// allocate memory for canvas to draw in
+GtkWidget *gnash_canvas_new();
+
+/// Select renderer and hwaccel, prep canvas for drawing
+void gnash_canvas_setup (GnashCanvas *canvas, std::string &hwaccel,
+                         std::string &renderer, int argc, char **argv[]);
+
+void gnash_canvas_before_rendering (GnashCanvas *canvas, gnash::movie_root* stage);
+
+/// Get the Renderer for this canvas
+boost::shared_ptr<gnash::Renderer> gnash_canvas_get_renderer(GnashCanvas *canvas);
 
 G_END_DECLS
 

@@ -993,6 +993,8 @@ movie_root::timeToNextFrame() const
 void
 movie_root::display()
 {
+    // GNASH_REPORT_FUNCTION;
+
     assert(testInvariant());
 
     clearInvalidated();

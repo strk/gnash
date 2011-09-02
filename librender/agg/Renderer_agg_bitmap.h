@@ -26,7 +26,6 @@
 #include "GnashImage.h"
 #include "CachedBitmap.h"
 
-
 namespace gnash {
 
 class agg_bitmap_info : public CachedBitmap
@@ -40,16 +39,16 @@ public:
     {
     }
   
-    virtual image::GnashImage& image() {
+    image::GnashImage& image() {
         assert(!disposed());
         return *_image;
     }
   
-    virtual void dispose() {
+    void dispose() {
         _image.reset();
     }
 
-    virtual bool disposed() const {
+    bool disposed() const {
         return !_image.get();
     }
    

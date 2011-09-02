@@ -37,6 +37,7 @@ class GtkAggGlue : public GtkGlue
     ~GtkAggGlue();
 
     bool init(int argc, char **argv[]);
+    bool needsDrawingArea() { return true; };
     void prepDrawingArea(GtkWidget *drawing_area);
     Renderer* createRenderHandler();
     void setRenderHandlerSize(int width, int height);

@@ -1,0 +1,58 @@
+There is a process here that has to happen in a specific order. The
+first step is to initialize the base hardware platform. Normally for
+X11 you can assume this has already happened. If using EGL from Mesa
+on X11, then we stil need to do this step, as EGL is out interface,
+not X11.
+
+After the device layer is initialized, then the renderer gets
+created. This is just the base initilization though, as the rest needs
+a window to draw into. So the next step after initilizing the renderer
+is to initialize the GUI. For a framebuffer, either EGL or DirectFB
+are used on the bare device.
+
+Once the GUI is initilized, it can then pass the window for the
+renderer to draw into. The renderer initizlizes a surface using the
+window handle, and then make that surface the current context.
+
+Rendering always happens in a back buffer, and is merely swapped with
+the displayed one after rendering.
+
+The main difference between how the Gnash renderers used to work and
+the way they work now is they have gained device knowledge. In the
+embedded world, all GPUs have varying levels of acceleration
+support. This functionality is probed at runtime now, and the optimal
+acceleration support selected automatically. For the features without
+hardware accleration available, they will be renderered in software.
+
+This allows us Gnash to take advantage of each GPUs support where it
+best makes sense. Until recently, Gnash just depended on whatever the
+X11 desktop supplied. To run properly without X11 though, requires the
+ability in Gnash to supply the missing support.
+
+Currently 3 devices are supported, as these are the most portable. The
+primary default device is EGL, as it's used by OpenVG, OpenGLES1, and
+OpenGLES2, on both embedded and desktop platforms. When using Gallium
+drivers under libMesa, EGL supports hardware acceleration for the
+higher level libraries.
+
+The DirectFB device is a bit of a special case, as it's both an
+accleration library and a GUI toolkit. So this one has support in both
+librender and gui libraries. For rendering, only the device specific
+parts of DirectFB are used.
+
+The X11 device is primarily for testing and for running EGL on
+X11. This makes X11 follow the same API as the other devices, and
+allows simple window creation via xlib for testing renderers.
+
+GnashDevice
+	> EglDevice
+	> X11Device
+	> DirectFBDevice
+
+Renderer
+	> Renderer_base_agg
+	  > Renderer_agg
+	> Renderer_ogl
+	> Renderer_gles1
+	> Renderer_gles2
+	> Renderer_ovg

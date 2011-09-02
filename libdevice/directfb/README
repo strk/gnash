@@ -1,0 +1,6 @@
+The DirectFB GUI code is for running in a raw framebuffer. Currently
+Gnash uses it's own framebuffer code to handle everything. Using
+DirectFB would reduce the amount of code that needs to be in Gnash
+that deals with devices and the framebuffer. At this time thought this
+is only partially implemented, mostly to make sure the GnashDevice API
+would support DirectFB if this was ever fully implemented.
