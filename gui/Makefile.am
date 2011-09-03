@@ -30,9 +30,9 @@ if HAS_PYTHON
 SUBDIRS += pythonmod
 endif
 
-if BUILD_DUMP_GUI
-SUBDIRS += dump
-endif
+# if BUILD_DUMP_GUI
+# SUBDIRS += dump
+# endif
 
 localedir = $(datadir)/locale
 
