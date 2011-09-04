@@ -135,7 +135,6 @@ CONFIGURE_FLAGS = CFLAGS="$(CFLAGS)" \
 	--disable-testsuite \
 	--disable-rpath \
 	--enable-cygnal \
-	--enable-python \
 	--enable-renderer=agg,cairo \
 	--enable-extensions=fileio,lirc,mysql \
 	$(BUILD_FLAGS)

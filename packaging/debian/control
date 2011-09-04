@@ -17,11 +17,9 @@ Build-Depends: dpkg-dev (>= 1.13.19),
 	       libboost-date-time-dev,
 	       libgtk2.0-dev, 
 	       libatk1.0-dev,
-	       python2.6-dev | python2.5-dev,
 	       kdelibs5-dev | kdelibs-dev,
 	       kdelibs-bin,
 	       libqt4-dev,
-	       python-gtk2-dev,
 	       qt4-qmake,
 	       docbook,
 	       docbook2x,
@@ -151,19 +149,6 @@ Description: free SWF movie player - Plugin for Konqueror
  plugin for Firefox/Mozilla, Konqueror, or Chromium.
  .
  This package includes the plugin for Konqueror.
-
-Package: python-gtk-gnash
-Section: utils
-Architecture: any
-Conflicts: gtk-plugin-gnash
-Depends: gnash-common (= ${binary:Version}),
- ${shlibs:Depends},  ${misc:Depends}
-Xb-Npp-Applications: ec8030f7-c20a-464f-9b0e-13a3a9e97384,92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a,aa5ca914-c309-495d-91cf-3141bbb04115
-Xb-Npp-MimeType: application/x-shockwave-flash
-Xb-Npp-Name: Gnash SWF Player
-Description: free SWF movie player - Plugin for Gtk and PyGtk donated by Sugar Labs
- .
- This package includes the plugin for Gtk and PyGtk..
 
 Package: gnash-dev
 Section: utils
