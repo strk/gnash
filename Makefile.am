@@ -62,6 +62,7 @@ STD_DIRS = \
 	librender \
 	gui \
 	plugin \
+	$(CYGNAL_DIR) \
 	utilities \
 	doc \
 	po \
