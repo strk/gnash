@@ -24,7 +24,8 @@ GNASH_INCLUDES = \
 	-I$(top_srcdir)/gui/gtk \
 	-I$(top_srcdir)/gui/pythonmod \
 	-I$(top_srcdir)/libbase	\
-	-I$(top_srcdir)/librender	\
+	-I$(top_srcdir)/libdevice \
+	-I$(top_srcdir)/librender \
 	-I$(top_srcdir)/librender/opengl \
 	-I$(top_srcdir)/librender/cairo \
 	-I$(top_srcdir)/librender/agg \
