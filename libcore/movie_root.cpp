@@ -830,7 +830,9 @@ bool
 movie_root::clearIntervalTimer(boost::uint32_t x)
 {
     TimerMap::iterator it = _intervalTimers.find(x);
-    if (it == _intervalTimers.end()) return false;
+    if (it == _intervalTimers.end()) {
+        return false;
+    }
 
     // We do not remove the element here because
     // we might have been called during execution
@@ -866,8 +868,7 @@ movie_root::advance()
 
                 // Give up; we've probably failed to catch up.
                 _timelineSound.reset();
-            }
-            else {
+            } else {
 
                 // -1 for bad result, 0 for first block.
                 // Get the stream block we are currently at.
@@ -920,7 +921,9 @@ movie_root::advance()
                     block = s->getStreamBlock(_timelineSound->id);
 
                 }
-                if (advanced) _lastMovieAdvancement = now;
+                if (advanced) {
+                    _lastMovieAdvancement = now;
+                }
             }
         }
         else {
