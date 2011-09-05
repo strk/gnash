@@ -157,6 +157,11 @@ public:
     //
     /// @return a std::vector of strings containing blocked domains    
     const PathList& getBlackList() const { return _blacklist; }
+
+    /// Whether to forcibly show the mouse pointer even if the SWF file
+    /// disables it. THis allows touchscreen based SWF files to
+    /// work on a normal non-touchscreen desktop.
+    bool showMouse() const { return _showMouse; }
     
     /// Sets the RcInitFile blacklist of domains to block
     //
@@ -497,7 +502,10 @@ protected:
     
     /// Only access network resources on the local host
     bool _localhostOnly;
-    
+
+    /// Show the mouse pointer
+    bool _showMouse;
+
     /// Allowed domains
     PathList _whitelist;
     
