@@ -281,7 +281,9 @@ GtkGui::error(const std::string& msg)
     
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
     
-    if (!rcfile.popupMessages()) return;
+    if (!rcfile.popupMessages()) {
+        return;
+    }
 
     GtkWidget* popup = gtk_dialog_new_with_buttons("Gnash Error",
             GTK_WINDOW(_window),
@@ -431,8 +433,19 @@ GtkGui::showMouse(bool show)
 
     bool state = _mouseShown;
 
-    if (show == _mouseShown) return state;
-
+    RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+    
+    // Whether to forcibly show the mouse pointer even if the SWF file
+    // disables it. This allows touchscreen based SWF files to
+    // work on a normal non-touchscreen desktop.
+    if (rcfile.showMouse()) {
+        return true;
+    } else {
+        if (show == _mouseShown) {
+            return state;
+        }
+    }
+    
     if (!show) {
         GdkPixmap *pixmap;
         GdkColor *color;
@@ -451,7 +464,9 @@ GtkGui::showMouse(bool show)
         _mouseShown = false;
 
     }
-    else if (show) _mouseShown = true;
+    else if (show) {
+        _mouseShown = true;
+    }
     
     return state;
 }
@@ -611,7 +626,9 @@ GtkGui::setInterval(unsigned int interval)
 {
     _interval = interval;
 
-    if ( ! isStopped() ) startAdvanceTimer();
+    if ( ! isStopped() ) {
+        startAdvanceTimer();
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
