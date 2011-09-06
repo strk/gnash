@@ -107,10 +107,6 @@
 #include <fstream>
 #include <sstream>
 
-#ifndef PATH_MAX
-#define PATH_MAX 1024
-#endif
-
 // Macro to prevent repeated logging calls for the same
 // event
 #define LOG_ONCE(x) { \
