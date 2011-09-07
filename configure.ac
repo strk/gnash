@@ -626,7 +626,7 @@ AC_ARG_ENABLE(gui,
     fi
   done],
   [ dnl Run the following code if no --enable-gui is given
-  build_fb=no
+  build_fb=auto
   build_sdl=auto
   if test x"${openbsd}" = xyes; then
     build_gtk=yes
