@@ -1096,6 +1096,13 @@ AC_ARG_ENABLE(device,
   done
 )
 
+dnl Lenny doesn't support this filed for Linux Input events
+AC_TRY_COMPILE([#include <linux/input.h>], [
+  struct input_absinfo abs;
+  abs.resolution = 0;; ],
+ AC_DEFINE([ABSINFO_RESOLUTION], [1], [ABS Resolution field])
+)
+
 if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${build_vaapi_device}" = x"yes"; then
   use_libva=no
   use_libva_x11=no
