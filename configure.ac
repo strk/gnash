@@ -1014,7 +1014,11 @@ else
 fi
 build_x11_device=no
 build_directfb_device=no
-if test x"${build_fb}" = xyes; then
+if test x"${build_fb}" = xyes -o x"${build_fb}" = xauto; then
+  build_fb_agg=yes
+fi
+dnl AGG support for the framebuffer requires the rawfb device
+if test x"${build_fb_agg}" = xyes -a x"${build_agg}" = xyes; then
   build_rawfb_device=yes
   device_list="RawFB"
   ndevice=1
@@ -1073,7 +1077,7 @@ AC_ARG_ENABLE(device,
         build_vaapi_device=no
         build_egl_device=yes
         build_rawfb_device=yes
-        build_directfb_device=yes
+        build_directfb_device=no
         build_x11_device=yes
         ndevice=5
         ;;
