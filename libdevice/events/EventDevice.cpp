@@ -26,6 +26,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <errno.h>
 #include <linux/input.h>
 #include <linux/kd.h>
 
@@ -208,7 +209,9 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
     abs.minimum = 0;
     abs.fuzz = 4;
     abs.flat = 8;
+#ifdef ABSINFO_RESOLUTION
     abs.resolution = 0;
+#endif
     abs.maximum = 800;
     if (ioctl(_fd, EVIOCSABS(ABS_X), &abs) < 0) {
         perror("ioctl(EVIOCSABS(ABS_X))");
