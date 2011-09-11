@@ -429,7 +429,11 @@ MediaParserFfmpeg::initializeParser()
 	    }
 	    
 	    switch (enc->codec_type) {
+#if LIBAVCODEC_VERSION_MAJOR >= 53
+            case AVMEDIA_TYPE_AUDIO:
+#else
             case CODEC_TYPE_AUDIO:
+#endif
                 if (_audioStreamIndex < 0) {
                     _audioStreamIndex = i;
                     _audioStream = _formatCtx->streams[i];
@@ -440,7 +444,11 @@ MediaParserFfmpeg::initializeParser()
                 }
                 break;
 		
+#if LIBAVCODEC_VERSION_MAJOR >= 53
+            case AVMEDIA_TYPE_VIDEO:
+#else
             case CODEC_TYPE_VIDEO:
+#endif
                 if (_videoStreamIndex < 0) {
                     _videoStreamIndex = i;
                     _videoStream = _formatCtx->streams[i];
