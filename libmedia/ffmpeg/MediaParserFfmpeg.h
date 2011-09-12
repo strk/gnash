@@ -96,10 +96,9 @@ public:
 
 private:
 
-#if defined (LIBAVFORMAT_VERSION_INT) && LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT( 52, 31, 0 )
-       /// Log debugging information about a metadata entry
-       void logMetadataEntry(const char *format, const char* key);
-#endif
+        /// Log debugging information about a metadata entry
+        void logMetadataEntry(const char *format, const char* key);
+
         /// Initialize parser, figuring format and 
 	/// creating VideoInfo and AudioInfo objects
 	void initializeParser();

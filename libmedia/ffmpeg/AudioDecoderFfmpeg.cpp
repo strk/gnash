@@ -625,9 +625,9 @@ AudioDecoderFfmpeg::parseInput(const boost::uint8_t* input,
     if ( _needsParsing ) {
 #if !defined (LIBAVCODEC_VERSION_MAJOR) || LIBAVCODEC_VERSION_MAJOR < 53
         return av_parser_parse(_parser, _audioCodecCtx,
-                               outFrameSize,
-                               input, inputSize,
-                    0, 0); // pts & dts
+                               reinterpret_cast<boost::uint8_t**>(outFrameSize),
+                               outFrameSize, input, inputSize,
+                               0, 0); // pts & dts
 #else
         return av_parser_parse2(_parser, _audioCodecCtx,
                     // as of 2008-10-28 SVN, ffmpeg doesn't
