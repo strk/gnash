@@ -24,6 +24,7 @@
 #include <cmath>
 #include <vector>
 #include <boost/scoped_array.hpp>
+#include <libavcodec/avcodec.h>
 
 namespace gnash {
 namespace media {
