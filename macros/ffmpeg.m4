@@ -43,7 +43,11 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
       ffmpeg_top_incl=`dirname ${with_ffmpeg_incl}`
       if test -f ${with_ffmpeg_incl}/avcodec.h; then
         ac_cv_path_ffmpeg_incl="-I`(cd ${ffmpeg_top_incl}; pwd)`"
-        avcodec_h=${with_ffmpeg_incl}/avcodec.h
+        if test -f ${with_ffmpeg_incl}/version.h && $EGREP LIBAVCODEC_VERSION ${with_ffmpeg_incl}/version.h >/dev/null; then
+          avcodec_h=${with_ffmpeg_incl}/version.h
+        else
+          avcodec_h=${with_ffmpeg_incl}/avcodec.h
+        fi
       else
         AC_MSG_ERROR([${with_ffmpeg_incl} directory does not contain the avcodec.h header])
       fi
@@ -69,7 +73,11 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
         for i in "" ffmpeg libavcodec ffmpeg/libavcodec; do
           if test -f ${ffmpeg_top_incl}/${i}/avcodec.h; then
             ac_cv_path_ffmpeg_incl="-I`(cd ${ffmpeg_top_incl}; pwd)`"
-            avcodec_h="${ffmpeg_top_incl}/${i}/avcodec.h"
+            if test -f ${ffmpeg_top_incl}/${i}/version.h && $EGREP LIBAVCODEC_VERSION ${ffmpeg_top_incl}/${i}/version.h 2>/dev/null; then
+              avcodec_h="${ffmpeg_top_incl}/${i}/version.h"
+            else
+              avcodec_h="${ffmpeg_top_incl}/${i}/avcodec.h"
+            fi
             if test -f ${ffmpeg_top_incl}/${i}/version.h; then
               avcodec_version_h=${ffmpeg_top_incl}/${i}/version.h
             fi
@@ -89,7 +97,11 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
       for i in ffmpeg libavcodec ffmpeg/libavcodec; do
         if test -f ${ffmpeg_top_incl}/${i}/avcodec.h; then
           ac_cv_path_ffmpeg_incl="-I`(cd ${ffmpeg_top_incl}/${i}; pwd)`"
-          avcodec_h=${ffmpeg_top_incl}/${i}/avcodec.h
+          if test -f ${ffmpeg_top_incl}/${i}/version.h && $EGREP LIBAVCODEC_VERSION ${ffmpeg_top_incl}/${i}/version.h 2>/dev/null; then
+            avcodec_h=${ffmpeg_top_incl}/${i}/version.h
+          else
+            avcodec_h=${ffmpeg_top_incl}/${i}/avcodec.h
+          fi
           if test -f ${ffmpeg_top_incl}/${i}/version.h; then
             avcodec_version_h=${ffmpeg_top_incl}/${i}/version.h
           fi

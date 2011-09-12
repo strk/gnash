@@ -30,9 +30,9 @@
 //#define GNASH_DEBUG_AUDIO_DECODING
 
 #if LIBAVCODEC_VERSION_MAJOR >= 53
-#define AVCODEC_DECODE_AUDIO avcodec_decode_audio3
+# define AVCODEC_DECODE_AUDIO avcodec_decode_audio3
 #else
-#define AVCODEC_DECODE_AUDIO avcodec_decode_audio2
+# define AVCODEC_DECODE_AUDIO avcodec_decode_audio2
 #endif
 
 namespace gnash {
@@ -504,21 +504,22 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 #endif
 
     // older ffmpeg versions didn't accept a const input..
-#if LIBAVCODEC_VERSION_MAJOR >= 53
-    AVPacket pkt;
-    av_init_packet(&pkt);
-    pkt.data = (uint8_t*) input;
-    pkt.size = inputSize;
-#endif
-    int tmp = AVCODEC_DECODE_AUDIO(_audioCodecCtx, outPtr, &outSize,
-#if LIBAVCODEC_VERSION_MAJOR >= 53
-                                   &pkt);
+#if !defined (LIBAVCODEC_VERSION_MAJOR) || LIBAVCODEC_VERSION_MAJOR < 53
+    int tmp = avcodec_decode_audio2(_audioCodecCtx, outPtr, &outSize,
+                                    input, inputSize);
 #else
-                                   input, inputSize);
+    AVPacket packet;
+    av_init_packet(&packet);
+    // avcodec_decode_audio3 doesn't actually change packet.data
+    packet.data = const_cast<boost::uint8_t*>(input);
+    packet.size = inputSize;
+    int tmp = avcodec_decode_audio3(_audioCodecCtx, outPtr, &outSize, &packet);
+    packet.data = NULL;
+    av_free_packet(&packet);
 #endif
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
-    log_debug(" avcodec_decode_audio[2](ctx, bufptr, %d, input, %d) "
+    log_debug(" avcodec_decode_audio[23](ctx, bufptr, %d, input, %d) "
             "returned %d; set frame_size=%d",
             bufsize, inputSize, tmp, outSize);
 #endif
@@ -621,26 +622,22 @@ AudioDecoderFfmpeg::parseInput(const boost::uint8_t* input,
         boost::uint32_t inputSize,
         boost::uint8_t const ** outFrame, int* outFrameSize)
 {
-    if ( _needsParsing )
-    {
-#if LIBAVCODEC_VERSION_MAJOR >= 53
-        return av_parser_parse2(_parser, _audioCodecCtx,
-#else
+    if ( _needsParsing ) {
+#if !defined (LIBAVCODEC_VERSION_MAJOR) || LIBAVCODEC_VERSION_MAJOR < 53
         return av_parser_parse(_parser, _audioCodecCtx,
-#endif
+                               outFrameSize,
+                               input, inputSize,
+                    0, 0); // pts & dts
+#else
+        return av_parser_parse2(_parser, _audioCodecCtx,
                     // as of 2008-10-28 SVN, ffmpeg doesn't
                     // accept a pointer to pointer to const..
                     const_cast<boost::uint8_t**>(outFrame),
                     outFrameSize,
                     input, inputSize,
-#if LIBAVCODEC_VERSION_MAJOR >= 53
                     0, 0, AV_NOPTS_VALUE); // pts, dts, pos
-#else
-                    0, 0); // pts & dts
 #endif
-    }
-    else
-    {
+    } else {
         // democratic value for a chunk to decode...
         // @todo this might be constrained by codec id, check that !
 
