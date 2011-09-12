@@ -29,7 +29,7 @@
 #include <vector>
 #include <boost/scoped_array.hpp>
 #ifdef HAVE_FFMPEG_AVCODEC_H
-# include <libavcodec/avcodec.h>
+# include <avcodec.h>
 #endif
 
 namespace gnash {
