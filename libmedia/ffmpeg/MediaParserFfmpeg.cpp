@@ -30,6 +30,11 @@
 // type is just "mixed/multipart"). Perhaps the codec will be configurable via
 // ActionScript sometime. - Udo 
 
+// Older versions of ffmpeg don't have this macros for converting version numbers.
+#ifndef AV_VERSION_INT
+# define AV_VERSION_INT(a, b, c) (a<<16 | b<<8 | c)
+#endif
+
 namespace gnash {
 namespace media {
 namespace ffmpeg {
@@ -341,7 +346,8 @@ MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<IOChannel> stream)
 void
 MediaParserFfmpeg::logMetadataEntry(const char *format, const char* key)
 {
-#if !defined (LIBAVFORMAT_VERSION_MAJOR) || LIBAVFORMAT_VERSION_MAJOR < AV_VERSION_INT( 51, 5, 0 )
+#if !defined (LIBAVCODEC_VERSION_INT) || LIBAVCODEC_VERSION_INT > AV_VERSION_INT( 51, 50, 0 )
+# if !defined (LIBAVFORMAT_VERSION_INT) || LIBAVFORMAT_VERSION_INT > AV_VERSION_INT( 51, 5, 0 )
     const AVMetadataTag* entry = av_metadata_get(_formatCtx->metadata, key, 0, 0);
 #else
     const AVDictionaryEntry* entry = av_dict_get(_formatCtx->metadata, key, 0, 0);
@@ -349,6 +355,7 @@ MediaParserFfmpeg::logMetadataEntry(const char *format, const char* key)
     if ( entry->value[0] ) {
         log_debug(format, entry->value);
     }
+#endif
 }
 void
 MediaParserFfmpeg::initializeParser()
