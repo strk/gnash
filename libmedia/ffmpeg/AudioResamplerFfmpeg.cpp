@@ -18,13 +18,19 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
 #include "AudioResamplerFfmpeg.h"
 #include "log.h"
 
 #include <cmath>
 #include <vector>
 #include <boost/scoped_array.hpp>
-#include <libavcodec/avcodec.h>
+#ifdef HAVE_FFMPEG_AVCODEC_H
+# include <libavcodec/avcodec.h>
+#endif
 
 namespace gnash {
 namespace media {
