@@ -53,14 +53,14 @@ AudioResamplerFfmpeg::init( AVCodecContext* ctx )
 {
   if ( (ctx->sample_rate != 44100) || (ctx->channels != 2) ) {
     if ( ! _context ) {
-#if !defined (LIBAVFORMAT_VERSION_MAJOR) || LIBAVFORMAT_VERSION_MAJOR >= 53
+#if !defined (LIBAVFORMAT_VERSION_MAJOR) || LIBAVFORMAT_VERSION_MAJOR < 53
+      _context = audio_resample_init(
+		2, ctx->channels, 44100, ctx->sample_rate
+#else        
       _context = av_audio_resample_init(
 		2, ctx->channels, 44100, ctx->sample_rate,
 		AV_SAMPLE_FMT_S16, AV_SAMPLE_FMT_S16,
 		16, 10, 0, 0.8
-#else
-      _context = audio_resample_init(
-		2, ctx->channels, 44100, ctx->sample_rate
 #endif
 	);
     }
