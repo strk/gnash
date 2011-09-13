@@ -1690,8 +1690,10 @@ void
 movie_root::executeTimers()
 {
 #ifdef GNASH_DEBUG_TIMERS_EXPIRATION
-        log_debug("Checking %d timers for expiry", _intervalTimers.size());
+    log_debug("Checking %d timers for expiry", _intervalTimers.size());
 #endif
+
+    if (_intervalTimers.empty()) return;
 
     unsigned long now = _vm.getTime();
 
