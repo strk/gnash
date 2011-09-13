@@ -18,12 +18,19 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
 #include "AudioResamplerFfmpeg.h"
 #include "log.h"
 
 #include <cmath>
 #include <vector>
 #include <boost/scoped_array.hpp>
+#ifdef HAVE_FFMPEG_AVCODEC_H
+# include <avcodec.h>
+#endif
 
 namespace gnash {
 namespace media {
@@ -46,14 +53,14 @@ AudioResamplerFfmpeg::init( AVCodecContext* ctx )
 {
   if ( (ctx->sample_rate != 44100) || (ctx->channels != 2) ) {
     if ( ! _context ) {
-#if LIBAVCODEC_VERSION_MAJOR >= 53
+#if !defined (LIBAVFORMAT_VERSION_MAJOR) || LIBAVFORMAT_VERSION_MAJOR < 53
+      _context = audio_resample_init(
+		2, ctx->channels, 44100, ctx->sample_rate
+#else        
       _context = av_audio_resample_init(
 		2, ctx->channels, 44100, ctx->sample_rate,
 		AV_SAMPLE_FMT_S16, AV_SAMPLE_FMT_S16,
 		16, 10, 0, 0.8
-#else
-      _context = audio_resample_init(
-		2, ctx->channels, 44100, ctx->sample_rate
 #endif
 	);
     }
