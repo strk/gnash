@@ -542,8 +542,8 @@ Player::run(int argc, char* argv[], const std::string& infile,
     _movieDef->completeLoad();
 
     if (! _delay) {
-        // 10ms per heart beat
-        _delay = 10; 
+        // 50ms per heart beat, which works out to be about 20fps
+        _delay = 50; 
     }
     _gui->setInterval(_delay);
 
