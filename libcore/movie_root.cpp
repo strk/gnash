@@ -2056,11 +2056,12 @@ movie_root::advanceLiveChars()
             "the global list", _liveChars.size());
 #endif
 
-    std::for_each(_liveChars.begin(), _liveChars.end(),
-            boost::bind(advanceLiveChar, _1));
-
-    std::for_each(_liveChars.begin(), _liveChars.end(),
-            boost::bind(notifyLoad, _1));
+    // Iterate through the array once, instead of twice like it used to be.
+    LiveChars::iterator it;
+    for (it=_liveChars.begin(); it != _liveChars.end(); ++it) {
+        advanceLiveChar(*it);
+        notifyLoad(*it);
+    }
 }
 
 void
@@ -2591,7 +2592,7 @@ advanceLiveChar(MovieClip* mo)
 {
     if (!mo->unloaded()) {
 #ifdef GNASH_DEBUG
-        log_debug("    advancing DisplayObject %s", ch->getTarget());
+        log_debug("    advancing DisplayObject %s", mo->getTarget());
 #endif
         mo->advance();
     }
