@@ -1553,7 +1553,7 @@ movie_root::executeAdvanceCallbacks()
     // _controlfd is set when running as a child process of a hosting
     // application. If it is set, we have to check the socket connection
     // for XML messages.
-    if (_controlfd) {
+    if (_controlfd > 0) {
     boost::shared_ptr<ExternalInterface::invoke_t> invoke = 
         ExternalInterface::ExternalEventCheck(_controlfd);
         if (invoke) {
