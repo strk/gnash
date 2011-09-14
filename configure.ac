@@ -4011,7 +4011,7 @@ else
   echo "        Building Cygnal media server disabled."
 fi
 
-if test x"${with-top_level}" != x; then
+if test x"${with_top_level}" != x; then
   echo "        Top level for cross compiling support files is: $with_top_level"
 fi
 
