@@ -4045,7 +4045,6 @@ echo "        Renderers supported: ${renderer_list}"
 echo "        Hardware Acceleration: ${device_list}"
 echo "        Media handlers: ${media_list}"
 echo "        Using ${add_sound} for sound handling"
-echo "        Using $with_shm mode for shared memory"
 
 if test x"$docbook" = x"yes"; then
   echo '        DocBook document processing enabled (for "make html" and "make pdf")'
