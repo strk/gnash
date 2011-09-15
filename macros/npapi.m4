@@ -34,7 +34,11 @@ AC_DEFUN([GNASH_PATH_NPAPI],
 
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_npapi_incl}" = x; then
-      $PKG_CONFIG --exists mozilla-plugin && NPAPI_CFLAGS="`$PKG_CONFIG --cflags mozilla-plugin`"
+      if $PKG_CONFIG --exists npapi-sdk; then
+        NPAPI_CFLAGS="`$PKG_CONFIG --cflags npapi-sdk`"
+      elif $PKG_CONFIG --exists mozilla-plugin; then
+        NPAPI_CFLAGS="`$PKG_CONFIG --cflags mozilla-plugin`"
+      fi
     fi
   fi
 
