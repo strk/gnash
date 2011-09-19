@@ -960,11 +960,11 @@ Button::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
             std::make_pair(_("Button state"), os.str()));
     
     os.str("");
-    os << _stateCharacters.size();
+    os << actChars.size();
     localIter = tr.append_child(selfIt, std::make_pair(_("Action characters"),
             os.str()));
 
-    std::for_each(_stateCharacters.begin(), _stateCharacters.end(),
+    std::for_each(actChars.begin(), actChars.end(),
             boost::bind(&DisplayObject::getMovieInfo, _1, tr, localIter)); 
 
     return selfIt;

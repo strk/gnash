@@ -24,6 +24,7 @@
 #include "InputDevice.h"
 #include "GnashKey.h"
 #include "iostream"
+#include <errno.h>
 
 namespace gnash {
 

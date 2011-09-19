@@ -46,8 +46,15 @@ AudioResamplerFfmpeg::init( AVCodecContext* ctx )
 {
   if ( (ctx->sample_rate != 44100) || (ctx->channels != 2) ) {
     if ( ! _context ) {
-      _context = audio_resample_init( 
-		2, ctx->channels, 44100, ctx->sample_rate 
+#if LIBAVCODEC_VERSION_MAJOR >= 53
+      _context = av_audio_resample_init(
+		2, ctx->channels, 44100, ctx->sample_rate,
+		AV_SAMPLE_FMT_S16, AV_SAMPLE_FMT_S16,
+		16, 10, 0, 0.8
+#else
+      _context = audio_resample_init(
+		2, ctx->channels, 44100, ctx->sample_rate
+#endif
 	);
     }
 

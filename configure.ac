@@ -626,7 +626,7 @@ AC_ARG_ENABLE(gui,
     fi
   done],
   [ dnl Run the following code if no --enable-gui is given
-  build_fb=no
+  build_fb=auto
   build_sdl=auto
   if test x"${openbsd}" = xyes; then
     build_gtk=yes
@@ -1014,7 +1014,11 @@ else
 fi
 build_x11_device=no
 build_directfb_device=no
-if test x"${build_fb}" = xyes; then
+if test x"${build_fb}" = xyes -o x"${build_fb}" = xauto; then
+  build_fb_agg=yes
+fi
+dnl AGG support for the framebuffer requires the rawfb device
+if test x"${build_fb_agg}" = xyes -a x"${build_agg}" = xyes; then
   build_rawfb_device=yes
   device_list="RawFB"
   ndevice=1
@@ -1073,7 +1077,7 @@ AC_ARG_ENABLE(device,
         build_vaapi_device=no
         build_egl_device=yes
         build_rawfb_device=yes
-        build_directfb_device=yes
+        build_directfb_device=no
         build_x11_device=yes
         ndevice=5
         ;;
@@ -1090,6 +1094,13 @@ AC_ARG_ENABLE(device,
       break;
     fi
   done
+)
+
+dnl Lenny doesn't support this filed for Linux Input events
+AC_TRY_COMPILE([#include <linux/input.h>], [
+  struct input_absinfo abs;
+  abs.resolution = 0;; ],
+ AC_DEFINE([ABSINFO_RESOLUTION], [1], [ABS Resolution field])
 )
 
 if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${build_vaapi_device}" = x"yes"; then
@@ -1149,7 +1160,7 @@ if test x"${build_egl_device}" = xyes; then
       device_list="${device_list} EGL"
       ndevice=$((ndevice+1))
   else
-    AC_MSG_ERROR(["EGL requested but development package not found"])
+    AC_MSG_WARN(["EGL requested but development package not found"])
     build_egl_device=no
   fi
 fi
@@ -4000,7 +4011,7 @@ else
   echo "        Building Cygnal media server disabled."
 fi
 
-if test x"${with-top_level}" != x; then
+if test x"${with_top_level}" != x; then
   echo "        Top level for cross compiling support files is: $with_top_level"
 fi
 
@@ -4034,7 +4045,6 @@ echo "        Renderers supported: ${renderer_list}"
 echo "        Hardware Acceleration: ${device_list}"
 echo "        Media handlers: ${media_list}"
 echo "        Using ${add_sound} for sound handling"
-echo "        Using $with_shm mode for shared memory"
 
 if test x"$docbook" = x"yes"; then
   echo '        DocBook document processing enabled (for "make html" and "make pdf")'

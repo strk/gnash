@@ -29,7 +29,11 @@
 
 //#define GNASH_DEBUG_AUDIO_DECODING
 
+#if LIBAVCODEC_VERSION_MAJOR >= 53
+#define AVCODEC_DECODE_AUDIO avcodec_decode_audio3
+#else
 #define AVCODEC_DECODE_AUDIO avcodec_decode_audio2
+#endif
 
 namespace gnash {
 namespace media {
@@ -500,8 +504,18 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 #endif
 
     // older ffmpeg versions didn't accept a const input..
+#if LIBAVCODEC_VERSION_MAJOR >= 53
+    AVPacket pkt;
+    av_init_packet(&pkt);
+    pkt.data = (uint8_t*) input;
+    pkt.size = inputSize;
+#endif
     int tmp = AVCODEC_DECODE_AUDIO(_audioCodecCtx, outPtr, &outSize,
+#if LIBAVCODEC_VERSION_MAJOR >= 53
+                                   &pkt);
+#else
                                    input, inputSize);
+#endif
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
     log_debug(" avcodec_decode_audio[2](ctx, bufptr, %d, input, %d) "
@@ -609,13 +623,21 @@ AudioDecoderFfmpeg::parseInput(const boost::uint8_t* input,
 {
     if ( _needsParsing )
     {
+#if LIBAVCODEC_VERSION_MAJOR >= 53
+        return av_parser_parse2(_parser, _audioCodecCtx,
+#else
         return av_parser_parse(_parser, _audioCodecCtx,
+#endif
                     // as of 2008-10-28 SVN, ffmpeg doesn't
                     // accept a pointer to pointer to const..
                     const_cast<boost::uint8_t**>(outFrame),
                     outFrameSize,
                     input, inputSize,
+#if LIBAVCODEC_VERSION_MAJOR >= 53
+                    0, 0, AV_NOPTS_VALUE); // pts, dts, pos
+#else
                     0, 0); // pts & dts
+#endif
     }
     else
     {

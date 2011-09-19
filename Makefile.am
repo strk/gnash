@@ -41,6 +41,7 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--with-plugins-install=prefix \
 	--enable-extensions=all \
 	--enable-gui=all \
+	--enable-device=all \
 	--enable-python \
 	--enable-cygnal
 

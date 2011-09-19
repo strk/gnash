@@ -356,8 +356,17 @@ VideoDecoderFfmpeg::decode(const boost::uint8_t* input,
 
     int bytes = 0;    
     // no idea why avcodec_decode_video wants a non-const input...
+#if LIBAVCODEC_VERSION_MAJOR >= 53
+    AVPacket pkt;
+    av_init_packet(&pkt);
+    pkt.data = (uint8_t*) input;
+    pkt.size = input_size;
+    avcodec_decode_video2(_videoCodecCtx->getContext(), frame, &bytes,
+            &pkt);
+#else
     avcodec_decode_video(_videoCodecCtx->getContext(), frame, &bytes,
             input, input_size);
+#endif
     
     if (!bytes) {
         log_error("Decoding of a video frame failed");
