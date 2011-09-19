@@ -92,14 +92,11 @@ public:
 	// See dox in MediaParser.h
 	virtual boost::uint64_t getBytesLoaded() const;
 
-        virtual boost::optional<Id3Info> getId3Info() const;
+    virtual boost::optional<Id3Info> getId3Info() const;
 
 private:
 
-        /// Log debugging information about a metadata entry
-        void logMetadataEntry(const char *format, const char* key);
-
-        /// Initialize parser, figuring format and 
+	/// Initialize parser, figuring format and 
 	/// creating VideoInfo and AudioInfo objects
 	void initializeParser();
 
@@ -156,9 +153,7 @@ private:
 	AVStream* _audioStream;
 
 	/// ?
-#if !defined (LIBAVFORMAT_VERSION_MAJOR) || LIBAVFORMAT_VERSION_MAJOR < 53
-        ByteIOContext _byteIOCxt;
-#endif
+	ByteIOContext _byteIOCxt;
 
 	/// Size of the ByteIO context buffer
 	//
