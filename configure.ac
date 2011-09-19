@@ -1160,7 +1160,7 @@ if test x"${build_egl_device}" = xyes; then
       device_list="${device_list} EGL"
       ndevice=$((ndevice+1))
   else
-    AC_MSG_ERROR(["EGL requested but development package not found"])
+    AC_MSG_WARN(["EGL requested but development package not found"])
     build_egl_device=no
   fi
 fi
