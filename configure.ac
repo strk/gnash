@@ -903,9 +903,10 @@ dnl compile anymore, it was all hardcoded into the framebuffer
 dnl code. This version compiles with the latest internal rendering
 dnl API, and works properly with the glue code for the Gnash GUIs.
 build_gles1=no
-dnl OpenGL works, but suffers from performance problems. This should
-dnl eventually be replacd by the OpenGLES1 and OpenVG renders.
-build_ogl=yes
+dnl OpenGL works, but suffers from performance and rendering quality
+dnl problems. This should eventually be replacd by the OpenGLES1 and
+dnl OpenVG renders.
+build_ogl=no
 dnl AGG is a software only renderer
 build_agg=yes
 build_cairo=yes
@@ -1160,7 +1161,7 @@ if test x"${build_egl_device}" = xyes; then
       device_list="${device_list} EGL"
       ndevice=$((ndevice+1))
   else
-    AC_MSG_WARN(["EGL requested but development package not found"])
+    AC_MSG_WARN(["EGL requested but development package not found!"])
     build_egl_device=no
   fi
 fi
