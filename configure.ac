@@ -850,7 +850,11 @@ AC_ARG_ENABLE(input,
       a*) dnl all
         build_ps2mouse=yes
         build_ps2keyboard=yes
-        build_input_events=yes
+        if test x"${bsd} = x"yes"; then
+          build_input_events=no
+        else
+          build_input_events=yes
+        fi
         build_tslib=yes
         input_events="PS/2 Mouse, PS/2 Keyboard, Input Devices, Touchscreen via Tslib"                
         ;;
