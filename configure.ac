@@ -850,12 +850,12 @@ AC_ARG_ENABLE(input,
       a*) dnl all
         build_ps2mouse=yes
         build_ps2keyboard=yes
-        if test x"${bsd} = x"yes"; then
-          build_input_events=no
-        else
-          build_input_events=yes
-        fi
         build_tslib=yes
+        if test x"${build_fb}" = xyes -a x"${linux}" = xyes; then
+          build_input_events=yes
+        else
+          build_input_events=no
+        fi
         input_events="PS/2 Mouse, PS/2 Keyboard, Input Devices, Touchscreen via Tslib"                
         ;;
       *) AC_MSG_ERROR([invalid input device list! ${enableval} given (accept: ps2mouse|keyboard|events,touchscreen)])
