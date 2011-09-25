@@ -45,32 +45,22 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--enable-python \
 	--enable-cygnal
 
-if CYGNAL
-CYGNAL_DIR = cygnal
-endif
-
-if BUILD_DEVICES
-DEVICES_DIR = libdevice
-endif
-
 STD_DIRS = \
 	desktop \
 	libbase \
 	libmedia \
 	libsound \
 	libcore \
-	$(DEVICES_DIR) \
 	librender \
 	gui \
 	plugin \
-	$(CYGNAL_DIR) \
 	utilities \
 	doc \
 	po \
 	$(NULL)
 
-SUBDIRS = $(STD_DIRS)
-DIST_SUBDIRS = $(STD_DIRS) extensions testsuite
+SUBDIRS = $(STD_DIRS) 
+DIST_SUBDIRS = $(STD_DIRS) testsuite extensions cygnal libdevice
 
 if TESTSUITE
 SUBDIRS += testsuite
@@ -79,6 +69,15 @@ endif
 if BUILD_EXTENSIONS
 SUBDIRS += extensions
 endif
+
+if CYGNAL
+SUBDIRS += cygnal
+endif
+
+if BUILD_DEVICES
+SUBDIRS += libdevice
+endif
+
 
 # man_MANS = doc/gnash.1 doc/gprocessor.1 doc/dumpshm.1 soldumper.1
 
