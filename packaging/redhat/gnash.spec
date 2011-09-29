@@ -26,11 +26,11 @@ BuildRequires:  gstreamer-devel >= 0.10, gstreamer-plugins-base-devel >= 0.10
 # these are for the kde4 support
 BuildRequires:  kdelibs-devel >= 4.0, kdebase-devel >= 4.0, qt-devel >= 4.0
 # these are needed for the various renderers, which now all get built
-BuildRequires:  libXt-devel agg-devel gtkglext-devel libstdc++
+BuildRequires:  libXt-devel agg-devel libstdc++
 
 # The default Gnash package only includes the GTK parts, the rest
 # is in gnash-common.
-Requires:  gtkglext gtk2 pygtk2 python
+Requires:  gtk2 pygtk2 python
 Requires:  gnash-common
 
 # Fedora 12 packages the boost libraries as separate packages,
