@@ -41,9 +41,14 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--with-plugins-install=prefix \
 	--enable-extensions=all \
 	--enable-gui=all \
-	--enable-device=all \
 	--enable-python \
 	--enable-cygnal
+
+# Only build all devices on Linux, as Input Events are
+# primarily a Linux only thing.
+if LINUX
+DISTCHECK_CONFIGURE_FLAGS += --enable-device=all
+endif
 
 if CYGNAL
 CYGNAL_DIR = cygnal
@@ -70,7 +75,9 @@ STD_DIRS = \
 	$(NULL)
 
 SUBDIRS = $(STD_DIRS)
-DIST_SUBDIRS = $(STD_DIRS) extensions testsuite
+# all optional build directories must be in DIST_SUBDIRS to be
+# included in the source tarball.
+DIST_SUBDIRS = $(STD_DIRS) cygnal libdevice extensions testsuite
 
 if TESTSUITE
 SUBDIRS += testsuite
