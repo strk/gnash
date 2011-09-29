@@ -226,7 +226,7 @@ Gui::quit()
 void
 Gui::hideMenu()
 {
-    log_unimpl(_("Menu hiding not yet supported in this GUI"));
+    LOG_ONCE(log_unimpl(_("Menu show/hide not yet supported in this GUI")));
 }
 
 bool
@@ -239,7 +239,7 @@ Gui::showMouse(bool /* show */)
 void
 Gui::showMenu(bool /* show */)
 {
-    LOG_ONCE(log_unimpl(_("menushow not yet supported in this GUI")));
+    LOG_ONCE(log_unimpl(_("Menu show/hide not yet supported in this GUI")));
 }
 
 void

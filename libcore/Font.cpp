@@ -167,7 +167,7 @@ Font::setCodeTable(std::auto_ptr<CodeTable> table)
             log_swferror(_("Attempt to add an embedded glyph CodeTable to "
                     "a font that already has one. This should mean there "
                     "are several DefineFontInfo tags, or a DefineFontInfo "
-                    "tag refers to a font created by DefineFone2 or "
+                    "tag refers to a font created by DefineFont2 or "
                     "DefineFont3. Don't know what should happen in this "
                     "case, so ignoring."));
         );
