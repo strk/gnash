@@ -204,6 +204,7 @@ case "${host}" in
 esac
 
 
+AM_CONDITIONAL(LINUX, test x$linux = xyes)
 AM_CONDITIONAL(WIN32, test x$windows = xyes)
 AM_CONDITIONAL(HAIKU, test x$haiku = xyes)
 AM_CONDITIONAL(AMIGAOS4, test x$amigaos4 = xyes)
@@ -853,10 +854,11 @@ AC_ARG_ENABLE(input,
         build_tslib=yes
         if test x"${build_fb}" = xyes -a x"${linux}" = xyes; then
           build_input_events=yes
+          input_events="PS/2 Mouse, PS/2 Keyboard, Input Devices, Touchscreen via Tslib"                
         else
           build_input_events=no
+          input_events="PS/2 Mouse, PS/2 Keyboard, Touchscreen via Tslib"                
         fi
-        input_events="PS/2 Mouse, PS/2 Keyboard, Input Devices, Touchscreen via Tslib"                
         ;;
       *) AC_MSG_ERROR([invalid input device list! ${enableval} given (accept: ps2mouse|keyboard|events,touchscreen)])
          ;;
@@ -1176,9 +1178,7 @@ if test ${ndevice} -eq 0; then
 fi
 
 AM_CONDITIONAL(BUILD_DEVICES, test ${ndevice} -gt 0)
-if test ${ndevice} -gt 0; then
-  AC_OUTPUT(libdevice/Makefile)
-fi
+AC_OUTPUT(libdevice/Makefile)
 
 dnl 16 bit: RGB555, RGB565
 dnl 24 bit: RGB24, BGR24
@@ -1668,8 +1668,7 @@ AC_ARG_ENABLE(cygnal,
 esac],cygnal=no)
 AM_CONDITIONAL(CYGNAL, test x$cygnal = xyes)
 
-if test x$cygnal = xyes; then
- AC_OUTPUT(cygnal/Makefile
+AC_OUTPUT(cygnal/Makefile
     cygnal/libnet/Makefile
     cygnal/libamf/Makefile
     cygnal/cgi-bin/Makefile
@@ -1681,7 +1680,6 @@ if test x$cygnal = xyes; then
     cygnal/testsuite/libnet.all/Makefile
     cygnal/testsuite/cygnal.all/Makefile
 )
-fi
 
 dnl --------------------------------------------------------
 dnl Build the cgibins server if specified.
