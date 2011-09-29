@@ -1178,7 +1178,6 @@ if test ${ndevice} -eq 0; then
 fi
 
 AM_CONDITIONAL(BUILD_DEVICES, test ${ndevice} -gt 0)
-AC_OUTPUT(libdevice/Makefile)
 
 dnl 16 bit: RGB555, RGB565
 dnl 24 bit: RGB24, BGR24
@@ -1667,19 +1666,6 @@ AC_ARG_ENABLE(cygnal,
   *)   AC_MSG_ERROR([bad value ${enableval} for enable-cygnal option]) ;;
 esac],cygnal=no)
 AM_CONDITIONAL(CYGNAL, test x$cygnal = xyes)
-
-AC_OUTPUT(cygnal/Makefile
-    cygnal/libnet/Makefile
-    cygnal/libamf/Makefile
-    cygnal/cgi-bin/Makefile
-    cygnal/cgi-bin/echo/Makefile
-    cygnal/cgi-bin/oflaDemo/Makefile
-    cygnal/cgi-bin/fitcDemo/Makefile
-    cygnal/testsuite/Makefile
-    cygnal/testsuite/libamf.all/Makefile
-    cygnal/testsuite/libnet.all/Makefile
-    cygnal/testsuite/cygnal.all/Makefile
-)
 
 dnl --------------------------------------------------------
 dnl Build the cgibins server if specified.
@@ -2968,6 +2954,18 @@ plugin/klash/Makefile
 plugin/klash4/Makefile
 plugin/win32/Makefile
 plugin/aos4/Makefile
+libdevice/Makefile
+cygnal/Makefile
+cygnal/libnet/Makefile
+cygnal/libamf/Makefile
+cygnal/cgi-bin/Makefile
+cygnal/cgi-bin/echo/Makefile
+cygnal/cgi-bin/oflaDemo/Makefile
+cygnal/cgi-bin/fitcDemo/Makefile
+cygnal/testsuite/Makefile
+cygnal/testsuite/libamf.all/Makefile
+cygnal/testsuite/libnet.all/Makefile
+cygnal/testsuite/cygnal.all/Makefile
 )
 
 ###
