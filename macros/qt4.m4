@@ -66,7 +66,11 @@ dnl     fi
      AC_MSG_CHECKING([for QT 4.x headers])
     if test x$cross_compiling = xno; then
       if test x"${PKG_CONFIG}" != x -a x"${ac_cv_path_qt4_incl}" = x; then
-        ${PKG_CONFIG} --exists  QtOpenGL QtCore QtGui && ac_cv_path_qt4_incl="`$PKG_CONFIG --cflags-only-I QtOpenGL QtCore QtGui`"
+	if test ${PKG_CONFIG} --exists QtOpenGL; then
+	  ac_cv_path_qt4_incl="`$PKG_CONFIG --cflags-only-I QtOpenGL`"
+	else
+	  ac_cv_path_qt4_incl="`$PKG_CONFIG --cflags-only-I QtGui`"
+	fi
 	gnash_qt4_topdir=`echo "${ac_cv_path_qt4_incl}"`
       fi
     fi
