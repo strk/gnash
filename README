@@ -44,7 +44,7 @@ Plugin:
 The plugin can play SWF files in cooperation with the browser.
 It works with any browser that supports Mozilla's NPAPI plugin interface.
 Gnash is know to work with Mozilla, Firefox, Iceweasel, Icecat, Konqueror,
-Epiphany, Galeon, Opera, SeaMonkey and Chromium.
+Epiphany, Galeon, Opera, SeaMonkey, Midori and Chromium.
 Gnash runs equally well in 32-bit and 64-bit environments.
 
 Configure with --with-plugindir= to set the directory that "make
