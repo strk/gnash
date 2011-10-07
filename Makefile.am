@@ -36,13 +36,15 @@ noinst_SCRIPT = autogen.sh
 ## --prefix is given, but that's another story --strk)
 ##
 ## We also want to build everything possible, since we're
-## testing builds.
+## testing builds. We also don't use optimization, is makes
+## the build go faster.
 DISTCHECK_CONFIGURE_FLAGS = \
 	--with-plugins-install=prefix \
 	--enable-extensions=all \
 	--enable-gui=all \
 	--enable-python \
-	--enable-cygnal
+	--enable-cygnal \
+	CXXFLAGS="-O0"
 
 # Only build all devices on Linux, as Input Events are
 # primarily a Linux only thing.
@@ -58,7 +60,15 @@ if BUILD_DEVICES
 DEVICES_DIR = libdevice
 endif
 
-STD_DIRS = \
+if TESTSUITE
+TEST_DIR = testsuite
+endif
+
+if BUILD_EXTENSIONS
+EXT_DIR = extensions
+endif
+
+SUBDIRS = \
 	desktop \
 	libbase \
 	libmedia \
@@ -70,22 +80,11 @@ STD_DIRS = \
 	plugin \
 	$(CYGNAL_DIR) \
 	utilities \
+	$(EXT_DIR) \
 	doc \
 	po \
+	$(TEST_DIR) \
 	$(NULL)
-
-SUBDIRS = $(STD_DIRS)
-# all optional build directories must be in DIST_SUBDIRS to be
-# included in the source tarball.
-DIST_SUBDIRS = $(STD_DIRS) cygnal libdevice extensions testsuite
-
-if TESTSUITE
-SUBDIRS += testsuite
-endif
-
-if BUILD_EXTENSIONS
-SUBDIRS += extensions
-endif
 
 # man_MANS = doc/gnash.1 doc/gprocessor.1 doc/dumpshm.1 soldumper.1
 
