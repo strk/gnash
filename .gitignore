@@ -35,6 +35,10 @@ config.log
 config.status
 config.sub
 configure
+cygnal/cygnal
+cygnal/cygnalrc
+cygnal/gnash.*
+cygnal/libnet/gnash.*
 cygnal/testsuite/cygnal.all/cygnalrc
 deb-copy-stamp
 doc/C/*.1
@@ -53,6 +57,7 @@ gui/Info.plist
 gui/pythonmod/gen-gnash.c
 libbase/gnashpluginrc
 libbase/gnashrc
+libdevice/test_rawfb
 libnet/gnash.log
 libnet/gnash.sum
 ltmain.sh
