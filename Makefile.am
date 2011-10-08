@@ -43,8 +43,7 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--enable-extensions=all \
 	--enable-gui=all \
 	--enable-python \
-	--enable-cygnal \
-	CXXFLAGS="-O0"
+	--enable-cygnal
 
 # Only build all devices on Linux, as Input Events are
 # primarily a Linux only thing.
