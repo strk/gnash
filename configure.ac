@@ -1691,7 +1691,7 @@ dnl If defined, an internal software-buffer is used for rendering and is then
 dnl copied to the video RAM. This avoids flicker and is faster for complex 
 dnl graphics, as video RAM access is usually slower. (strongly suggested)
 AC_ARG_ENABLE(doublebuf,
-  AC_HELP_STRING([--enable-doublebuf], [Enable support for double buffering when rendering]),
+  AC_HELP_STRING([--enable-doublebuf], [Enable support for double buffering when rendering with AGG]),
   [case "${enableval}" in
     yes) doublebuf=yes ;;
     no)  doublebuf=no ;;
@@ -1700,7 +1700,7 @@ AC_ARG_ENABLE(doublebuf,
 )
 AM_CONDITIONAL(ENABLE_DBUF, [test x"$doublebuf" = xyes])
 if test x$doublebuf = xyes; then
-    AC_DEFINE(ENABLE_DOUBLE_BUFFERING, [1], [Enable double buffering])
+    AC_DEFINE(ENABLE_DOUBLE_BUFFERING, [1], [Enable double buffering for AGG])
 fi
 
 dnl --------------------------------------------------------
