@@ -77,7 +77,12 @@ void
 RawFBDevice::clear()
 {
     GNASH_REPORT_FUNCTION;
-    memset(_fbmem, 0, _fixinfo.smem_len);
+    if (_fbmem) {
+        memset(_fbmem.get(), 0, _fixinfo.smem_len);
+    }
+    if (_offscreen_buffer) {
+        memset(_offscreen_buffer.get(), 0, _fixinfo.smem_len);
+    }
 }
 
 RawFBDevice::~RawFBDevice()
@@ -85,12 +90,19 @@ RawFBDevice::~RawFBDevice()
     // GNASH_REPORT_FUNCTION;
 
     if (_fbmem) {
-        munmap(_fbmem, 0);
-        _fbmem = 0;
-        if (_fd) {
-            close (_fd);
-            _fd = -1;
-        }
+        munmap(_fbmem.get(), 0);
+        log_debug(_("Freeing framebuffer memory"));
+        _fbmem.reset();
+    }
+    
+    if (_fd) {
+        close (_fd);
+        _fd = -1;
+    }
+    
+    if (_offscreen_buffer) {
+        log_debug(_("Freeing offscreen buffer"));
+        _offscreen_buffer.reset();
     }
 }
 
@@ -138,6 +150,11 @@ RawFBDevice::initDevice(int /* argc */, char **/* argv[] */)
               _varinfo.xres, _varinfo.yres,
               _varinfo.bits_per_pixel);    
 
+#ifdef ENABLE_DOUBLE_BUFFERING
+    boost::uint8_t *mem = new boost::uint8_t[getWidth() * getHeight()];
+    _offscreen_buffer.reset(mem);
+#endif
+    
     return true;
 }
 
@@ -195,9 +212,9 @@ RawFBDevice::attachWindow(GnashDevice::native_window_t window)
     // of the opened device. EGL wants the descriptor here too, so
     // this way we work in a similar manner.
     if (window) {
-        _fbmem = (unsigned char *)mmap(0, _fixinfo.smem_len,
+        _fbmem.reset((boost::uint8_t *)mmap(0, _fixinfo.smem_len,
                                        PROT_READ|PROT_WRITE, MAP_SHARED,
-                                       window, 0);
+                                           window, 0));
     }
         
     if (!_fbmem) {
