@@ -166,7 +166,7 @@ public:
     };
 
     /// Bind the client API to the device. As EGL can support different
-    /// renderers, namely OpenG:, OpenGLES1, OpenGLES2, amd OpenVG. This
+    /// renderers, namely OpenGL, OpenGLES1, OpenGLES2, and OpenVG. This
     /// is how the underlying hardware knows which API to implement.
     bool bindClient(renderer::GnashDevice::rtype_t rtype) {
         return (_device) ? _device->bindClient(rtype) : false;
