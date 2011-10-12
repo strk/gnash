@@ -109,7 +109,12 @@ class RawFBDevice : public GnashDevice
     // Create an RAWFB window to render in. This is only used by testing
     void createWindow(const char *name, int x, int y, int width, int height);
 
-    boost::uint8_t *getFBMemory() { return _fbmem; };
+    // Get the memory from the real framebuffer
+    boost::uint8_t *getFBMemory() { return _fbmem.get(); };
+
+    // Get the memory from an offscreen buffer to support Double Buffering
+    boost::uint8_t *getOffscreenBuffer() { return _offscreen_buffer.get(); };
+
     size_t getFBMemSize() { return _fixinfo.smem_len; };
     int getHandle() { return _fd; };
     
@@ -123,18 +128,20 @@ class RawFBDevice : public GnashDevice
     
     /// For 8 bit (palette / LUT) modes, sets a grayscale palette.
     /// This GUI currently does not support palette modes. 
-    bool setGrayscaleLUT8();    
+    bool setGrayscaleLUT8();
+    
 protected:
     /// Clear the framebuffer memory
     void clear();
 
-    int                      _fd;
-    std::string              _filespec;
-    struct fb_fix_screeninfo _fixinfo;
-    struct fb_var_screeninfo _varinfo;
-    boost::uint8_t           *_fbmem;
-    struct fb_cmap           _cmap;       // the colormap
+    int                                 _fd;
+    std::string                         _filespec;
+    struct fb_fix_screeninfo            _fixinfo;
+    struct fb_var_screeninfo            _varinfo;
+    boost::scoped_ptr<boost::uint8_t>   _fbmem;
     
+    boost::scoped_ptr<boost::uint8_t>   _offscreen_buffer;
+    struct fb_cmap                      _cmap;       // the colormap    
 };
 
 #ifdef ENABLE_FAKE_FRAMEBUFFER
