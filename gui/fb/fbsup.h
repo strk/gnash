@@ -192,14 +192,14 @@ private:
     int         _ypos;          // Y position of the output window
     size_t      _timeout;       // timeout period for the event loop
 
-    struct fb_var_screeninfo _var_screeninfo;
-    struct fb_fix_screeninfo _fix_screeninfo;
-    boost::shared_ptr<FBGlue> _glue;
+    struct fb_var_screeninfo    _var_screeninfo;
+    struct fb_fix_screeninfo    _fix_screeninfo;
+    boost::shared_ptr<FBGlue>   _glue;
 
     /// This is the array of functioning input devices.
     std::vector<boost::shared_ptr<InputDevice> > _inputs;
 
-    boost::shared_ptr<Renderer> _renderer;
+    boost::shared_ptr<Renderer>         _renderer;
 };
 
 } // end of namespace gui
