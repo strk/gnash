@@ -113,7 +113,14 @@ struct GnashDevice
     /// Is this renderering natively
     virtual bool isNativeRender() = 0;
 
+    // These are only used for the Framebuffer
+
+    /// Get the memory from the real framebuffer
     virtual boost::uint8_t *getFBMemory() { return 0; };
+    
+    /// Get the memory from an offscreen buffer to support Double Buffering
+    virtual boost::uint8_t *getOffscreenBuffer() { return 0; };
+
     virtual size_t getFBMemSize() { return 0; };
 
     // bindClient() is used by OpenVG, OpenGLES1, and OpenGLES2
