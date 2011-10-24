@@ -1,9 +1,12 @@
+#
+# This spec file is specific to the ltib build system
+#
 %define pfx /opt/freescale/rootfs/%{_target_cpu}
 
 Name:           gnash
-Version:        0.8.9dev
+Version:        20110912
 Release:        0
-Epoch: 		1
+Epoch: 		0
 Distribution:	ltib
 Summary:        GNU SWF player
 
@@ -12,10 +15,11 @@ Vendor:		Gnash Project
 Packager:	Rob Savoye <rob@senecass.com>
 License:        GPLv3
 URL:            http://www.gnu.org/software/gnash/
-Source:         gnash-0.8.9dev.tar.gz
+Source:         gnash-%{version}.tar.bz2
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%{_target_cpu}
 
 # BuildRequires:  ffmpeg libpng libjpeg giflib boost agg curl freetype libstdc++ fontconfig
+Prefix:         /usr
 
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
@@ -23,75 +27,57 @@ Requires(postun): /sbin/ldconfig
 %description
 Gnash is a GNU SWF movie player that supports many SWF v7 features,
 with growing support for swf v8, v9, and v10.
-
-%package common
-Summary:   Web-client SWF player plugin 
-Group:     Applications/Multimedia
-# Installation requirements
 Requires:  ffmpeg libpng libjpeg giflib boost curl freetype
-
-%description common
-Common files Shared between Gnash and Klash, Gnash/Klash is a GNU SWF movie
-player that supports many SWF v7 features, with growing support for
-swf v8, v9, and v10.
-
-%package devel
-Summary:   Gnash header files
-Group:     Applications/Multimedia
-Requires:  gnash-common
-
-%description devel
-Gnash header files can be used to write external Gnash extensions.
 
 %prep
 %setup -q
 
 %build
 
-CROSS_OPTS="--host=arm-none-linux=gnueabi --with-sysroot=/opt/L2.6.31_10.07.11_ER/ltib/rootfs/usr"
-# these are actually the default values, but this way they get added
-# to the build so they appear in "gnash --version".
-GUI="--enable-gui=fb"	# could be kde3, qt4, aqua, sdl
-SOUND="--enable-media=ffmpeg"
-OTHER="--disable-jemalloc"
-RENDERER="--enable-renderer=agg"		# could be opengl or cairo
-OPTIONAL=""
+# Allow to change the sysroot path used by Gnash to find all headers and libraries
+# using a GNASH_SYSROOT environment variable
+if test x"${GNASH_SYSROOT}" = x; then
+  # If no default sysroot is specified, look for one that should be at this location
+  absroot=`cd ../../../rootfs/usr/ ; pwd`
+  echo "GNASH_SYSROOT not set in the users environment, using \"${absroot}\" for sysroot"
+  CROSS_OPTS="--host=arm-none-linux-gnueabi --with-sysroot=$absroot"
+else
+  CROSS_OPTS="--host=arm-none-linux-gnueabi --with-sysroot=${GNASH_SYSROOT}"
+fi
 
-# we disable the testsuites by default, as when building packages we
-# should have already been running the testsuites as part of the 
-# normal build & test development cycle.
-
-# The default options for the configure aren't suitable for
-# cross configuring, so we force them to be what we know is correct.
 # uncommenting these will produce huge volumes of debug info from the
 # shell, but sometimes that's what you need to do.
 # export CONFIG_SHELL="sh -x"
-# sh -x ./configure \
 sh ./configure \
 	$CROSS_OPTS \
-	$SOUND $GUI \
-	$RENDERER \
-	$OTHER \
-	$OPTIONAL \
         --prefix=/usr \
 	--mandir=%{_prefix}/share/man \
 	--infodir=%{_prefix}/share/info \
 	--disable-dependency-tracking \
 	--disable-testsuite \
 	--disable-rpath \
-        --enable-sound=none
-make $MAKEFLAGS dumpconfig all
+        --disable-jemalloc \
+        --enable-gui=fb \
+	--disable-sound \
+        --enable-media=ffmpeg \
+        --enable-renderer=ovg \
+        --enable-device=egl,rawfb  \
+        CXXFLAGS='-g -O0'
+# Only uncomment this for debugging
+#        2>&1 | tee tmp/xxx
+
+make $MAKEFLAGS all -w
+make $MAKEFLAGS -C libdevice check -w
+make $MAKEFLAGS -C librender check -w
 
 # When testing the spec file, try setting MAKEFLAGS to
 # "CXXFLAGS-O0 -j4" to speed up getting results. Note *don't*
 # do that for release builds, as the performance will suffer.
 
 %install
-strip gui/.libs/*-gnash
-strip utilities/.libs/g* utilities/.libs/soldumper utilities/.libs/flvdumper
+#strip gui/.libs/*-gnash
 rm -rf $RPM_BUILD_ROOT
-make $MAKEFLAGS install DESTDIR=$RPM_BUILD_ROOT LDFLAGS="-Wl,--build-id"
-make $MAKEFLAGS install-plugins DESTDIR=$RPM_BUILD_ROOT LDFLAGS="-Wl,--build-id"
+make $MAKEFLAGS install DESTDIR=$RPM_BUILD_ROOT
 rm $RPM_BUILD_ROOT%{_libdir}/gnash/*.*a
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -106,58 +92,21 @@ fi
 
 %postun
 /sbin/ldconfig
-%if !%{cross_compile}
-scrollkeeper-update -q || :
-%endif
 
 %files
 %defattr(-,root,root,-)
 %{_bindir}/fb-gnash
-# %{_datadir}/man/man1/gtk-gnash.1.gz
-
-%files common
 %defattr(-,root,root,-)
-%dump
+#%dump
 %doc README AUTHORS COPYING NEWS 
 %{_bindir}/gnash
-%{_datadir}/man/man1/gnash.1.gz
 %{_bindir}/gprocessor
-%{_bindir}/soldumper
-%{_bindir}/flvdumper
-%{_bindir}/findmicrophones
-%{_bindir}/findwebcams
 #%{_bindir}/dumpshm
 %{_bindir}/rtmpget
 %{_libdir}/gnash/*.so*
 %{_prefix}/share/gnash/GnashG.png
 %{_prefix}/share/gnash/gnash_128_96.ico
-%{_datadir}/man/man1/gprocessor.1.gz
-%{_datadir}/man/man1/soldumper.1.gz
-%{_datadir}/man/man1/flvdumper.1.gz
-%{_datadir}/man/man1/findmicrophones.1.gz
-%{_datadir}/man/man1/findwebcams.1.gz
-%{_datadir}/man/man1/rtmpget.1.gz
 %{_datadir}/locale/*/LC_MESSAGES/gnash.mo
-%if !%{cross_compile}
-#%{_prefix}/share/info/*.info*
-%{_prefix}/share/doc/gnash/*.html
-%{_prefix}/share/doc/gnash/images/*.png
-%{_prefix}/etc/gnashrc
-%{_prefix}/etc/gnashpluginrc
-# %{_infodir}/*.info*
-#%doc doc/C/gnash*.html 
-#%doc doc/C/images/*.png
-#%doc doc/C/images/*.txt
-# %doc %{_prefix}/share/gnash/doc/gnash/C/images
-# %doc %{_prefix}/share/gnash/doc/gnash/C/*.xml
-%endif
-
-%files devel
-%{_prefix}/include/gnash/*.h*
-%{_prefix}/include/gnash/vm/*.h
-%{_prefix}/include/gnash/asobj/*.h
-%{_prefix}/include/gnash/parser/*.h
-%{_prefix}/lib/pkgconfig/gnash.pc
 
 %changelog
 * Sat Nov 30 2010 Rob Savoye <rob@welcomehome.org> - %{version}-%{release}

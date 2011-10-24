@@ -204,6 +204,7 @@ case "${host}" in
 esac
 
 
+AM_CONDITIONAL(LINUX, test x$linux = xyes)
 AM_CONDITIONAL(WIN32, test x$windows = xyes)
 AM_CONDITIONAL(HAIKU, test x$haiku = xyes)
 AM_CONDITIONAL(AMIGAOS4, test x$amigaos4 = xyes)
@@ -850,9 +851,14 @@ AC_ARG_ENABLE(input,
       a*) dnl all
         build_ps2mouse=yes
         build_ps2keyboard=yes
-        build_input_events=yes
         build_tslib=yes
-        input_events="PS/2 Mouse, PS/2 Keyboard, Input Devices, Touchscreen via Tslib"                
+        if test x"${build_fb}" = xyes -a x"${linux}" = xyes; then
+          build_input_events=yes
+          input_events="PS/2 Mouse, PS/2 Keyboard, Input Devices, Touchscreen via Tslib"                
+        else
+          build_input_events=no
+          input_events="PS/2 Mouse, PS/2 Keyboard, Touchscreen via Tslib"                
+        fi
         ;;
       *) AC_MSG_ERROR([invalid input device list! ${enableval} given (accept: ps2mouse|keyboard|events,touchscreen)])
          ;;
@@ -903,9 +909,10 @@ dnl compile anymore, it was all hardcoded into the framebuffer
 dnl code. This version compiles with the latest internal rendering
 dnl API, and works properly with the glue code for the Gnash GUIs.
 build_gles1=no
-dnl OpenGL works, but suffers from performance problems. This should
-dnl eventually be replacd by the OpenGLES1 and OpenVG renders.
-build_ogl=yes
+dnl OpenGL works, but suffers from performance and rendering quality
+dnl problems. This should eventually be replacd by the OpenGLES1 and
+dnl OpenVG renders.
+build_ogl=no
 dnl AGG is a software only renderer
 build_agg=yes
 build_cairo=yes
@@ -1160,7 +1167,7 @@ if test x"${build_egl_device}" = xyes; then
       device_list="${device_list} EGL"
       ndevice=$((ndevice+1))
   else
-    AC_MSG_WARN(["EGL requested but development package not found"])
+    AC_MSG_WARN(["EGL requested but development package not found!"])
     build_egl_device=no
   fi
 fi
@@ -1171,9 +1178,6 @@ if test ${ndevice} -eq 0; then
 fi
 
 AM_CONDITIONAL(BUILD_DEVICES, test ${ndevice} -gt 0)
-if test ${ndevice} -gt 0; then
-  AC_OUTPUT(libdevice/Makefile)
-fi
 
 dnl 16 bit: RGB555, RGB565
 dnl 24 bit: RGB24, BGR24
@@ -1662,21 +1666,6 @@ AC_ARG_ENABLE(cygnal,
   *)   AC_MSG_ERROR([bad value ${enableval} for enable-cygnal option]) ;;
 esac],cygnal=no)
 AM_CONDITIONAL(CYGNAL, test x$cygnal = xyes)
-
-if test x$cygnal = xyes; then
- AC_OUTPUT(cygnal/Makefile
-    cygnal/libnet/Makefile
-    cygnal/libamf/Makefile
-    cygnal/cgi-bin/Makefile
-    cygnal/cgi-bin/echo/Makefile
-    cygnal/cgi-bin/oflaDemo/Makefile
-    cygnal/cgi-bin/fitcDemo/Makefile
-    cygnal/testsuite/Makefile
-    cygnal/testsuite/libamf.all/Makefile
-    cygnal/testsuite/libnet.all/Makefile
-    cygnal/testsuite/cygnal.all/Makefile
-)
-fi
 
 dnl --------------------------------------------------------
 dnl Build the cgibins server if specified.
@@ -2965,6 +2954,18 @@ plugin/klash/Makefile
 plugin/klash4/Makefile
 plugin/win32/Makefile
 plugin/aos4/Makefile
+libdevice/Makefile
+cygnal/Makefile
+cygnal/libnet/Makefile
+cygnal/libamf/Makefile
+cygnal/cgi-bin/Makefile
+cygnal/cgi-bin/echo/Makefile
+cygnal/cgi-bin/oflaDemo/Makefile
+cygnal/cgi-bin/fitcDemo/Makefile
+cygnal/testsuite/Makefile
+cygnal/testsuite/libamf.all/Makefile
+cygnal/testsuite/libnet.all/Makefile
+cygnal/testsuite/cygnal.all/Makefile
 )
 
 ###

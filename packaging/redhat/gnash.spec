@@ -4,7 +4,7 @@ Version:        0.8.10dev
 Release:        0
 Epoch: 		1
 # This next field gets edited by "make gnash.spec" when building an rpm
-Distribution:	fc13
+Distribution:	fc14
 Summary:        GNU SWF player
 
 Group:          Applications/Multimedia
@@ -15,7 +15,10 @@ URL:            http://www.gnu.org/software/gnash/
 Source0:        http://www.getgnash.org/packages/snapshots/fedora/%{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%{_target_cpu}
 
-BuildRequires:  redhat-lsb mysql-devel
+%if %{_target_cpu} != "armv7l"
+BuildRequires:  redhat-lsb
+%endif
+BuildRequires:  mysql-devel
 # bitmap libraries for loading images
 BuildRequires:  libpng-devel libjpeg-devel giflib-devel
 # these are needed for the python gtk widget
@@ -23,14 +26,17 @@ BuildRequires:  pygtk2-devel python-devel
 BuildRequires:  gtk2-devel freetype-devel fontconfig-devel
 BuildRequires:  openssl-devel curl-devel boost-devel
 BuildRequires:  gstreamer-devel >= 0.10, gstreamer-plugins-base-devel >= 0.10
-# these are for the kde4 support
+# these are for the kde4 support, which isn't supported by the OLPC XO 1.75.
+# which is armv7l based.
+%if %{_target_cpu} != "armv7l"
 BuildRequires:  kdelibs-devel >= 4.0, kdebase-devel >= 4.0, qt-devel >= 4.0
+%endif
 # these are needed for the various renderers, which now all get built
-BuildRequires:  libXt-devel agg-devel gtkglext-devel libstdc++
+BuildRequires:  libXt-devel agg-devel libstdc++
 
 # The default Gnash package only includes the GTK parts, the rest
 # is in gnash-common.
-Requires:  gtkglext gtk2 pygtk2 python
+Requires:  gtk2 pygtk2 python
 Requires:  gnash-common
 
 # Fedora 12 packages the boost libraries as separate packages,
@@ -69,6 +75,7 @@ Common files Shared between Gnash and Klash, Gnash/Klash is a GNU SWF movie
 player that supports many SWF v7 features, with growing support for
 swf v8, v9, and v10.
 
+%if %{_target_cpu} != "armv7l"
 %package klash4
 Summary:   Konqueror SWF player plugin for KDE 4
 Group:     Applications/Multimedia
@@ -77,6 +84,8 @@ Requires:  kdelibs >= 4, kdebase >= 4, qt >= 4, gnash
 
 %description klash4
 The gnash (klash) SWF player plugin for Konqueror in KDE4.
+
+%endif
 
 %package plugin
 Summary:   Web-client SWF player plugin 
@@ -209,6 +218,13 @@ RPM_TARGET=%{_target}
   SOUND="--enable-media=gst" 
 %endif
 
+%if %{_target_cpu} == "armv7l"
+  GUI="--enable-gui=gtk"
+  SOUND="--enable-media=gst"
+  RENDERER="--enable-renderer=agg,cairo"
+  OPTIONAL="--enable-python"
+%endif
+
 # we disable the testsuites by default, as when building packages we
 # should have already been running the testsuites as part of the 
 # normal build & test development cycle.
@@ -305,6 +321,7 @@ if [ -x %{_bindir}/gtk-update-icon-cache ] ; then
   %{_bindir}/gtk-update-icon-cache --quiet %{_datadir}/icons/hicolor || :
 fi
 
+%if %{_target_cpu} != "armv7l"
 %post klash4
 update-desktop-database &> /dev/null || :
 touch --no-create %{_datadir}/icons/hicolor
@@ -312,7 +329,7 @@ touch --no-create %{_datadir}/icons/hicolor
 %postun klash4
 update-desktop-database &> /dev/null || :
 touch --no-create %{_datadir}/icons/hicolor
-
+%endif
 
 %files
 %defattr(-,root,root,-)
@@ -387,6 +404,7 @@ touch --no-create %{_datadir}/icons/hicolor
 %{_prefix}/include/gnash/*.h
 %{_prefix}/lib*/python*/site-packages/gtk-2.0/gnash.*
 
+%if %{_target_cpu} != "armv7l"
 %files klash4
 %defattr(-,root,root,-)
 %{_bindir}/gnash-qt-launcher
@@ -401,6 +419,7 @@ touch --no-create %{_datadir}/icons/hicolor
 %{_prefix}/share/kde4/services/klash_part.desktop
 %{_prefix}/share/applications/klash.desktop
 %{_prefix}/share/icons/hicolor/32x32/apps/klash.xpm
+%endif
 
 %files fileio-extension
 %defattr(-,root,root,-)
@@ -419,6 +438,9 @@ touch --no-create %{_datadir}/icons/hicolor
 %{_libdir}/gnash/plugins/mysql.so
 
 %changelog
+* Fri Oct 14 2011 Rob Savoye <rob@welcomehome.org> - %{version}-%{release}
+- Tweak for recent OLPC builds of fc14, which don't support kde.
+
 * Sat Mar 27 2010 Rob Savoye <rob@welcomehome.org> - %{version}-%{release}
 - add gnash-common package for non GUI files so as not to contaminate
   the gtk or kde packages. 
