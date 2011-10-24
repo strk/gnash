@@ -47,7 +47,9 @@ createVideoObject(Global_as& gl)
 {
     as_object* obj = getObjectWithPrototype(gl, NSV::CLASS_VIDEO);
     as_object* proto = obj->get_prototype();
-    if (proto) attachPrototypeProperties(*proto);
+    if (proto) {
+        attachPrototypeProperties(*proto);
+    }
     return obj;
 }
 
@@ -59,9 +61,9 @@ video_class_init(as_object& global, const ObjectURI& uri)
     as_object* proto = createObject(gl);
     as_object* cl = gl.createClass(emptyFunction, proto);
     attachVideoInterface(*proto);
-
-	// Register _global.Video
-	global.init_member(uri, cl, as_object::DefaultFlags);
+    
+    // Register _global.Video
+    global.init_member(uri, cl, as_object::DefaultFlags);
 }
 
 void
@@ -81,8 +83,8 @@ void
 attachVideoInterface(as_object& o)
 {
     VM& vm = getVM(o);
-	o.init_member("attachVideo", vm.getNative(667, 1));
-	o.init_member("clear", vm.getNative(667, 2));
+    o.init_member("attachVideo", vm.getNative(667, 1));
+    o.init_member("clear", vm.getNative(667, 2));
 }
 
 void
@@ -105,35 +107,33 @@ attachPrototypeProperties(as_object& proto)
 as_value
 video_attach(const fn_call& fn)
 {
-	Video* video = ensure<IsDisplayObject<Video> >(fn);
-
-	if (fn.nargs < 1)
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("attachVideo needs 1 arg"));
-		);
-		return as_value();
-	}
+    Video* video = ensure<IsDisplayObject<Video> >(fn);
+    
+    if (fn.nargs < 1) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("attachVideo needs 1 arg"));
+            );
+        return as_value();
+    }
 
     as_object* obj = toObject(fn.arg(0), getVM(fn));
-	NetStream_as* ns;
+    NetStream_as* ns;
 
     if (isNativeType(obj, ns)) {
-		video->setStream(ns);
-	}
-	else {
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("attachVideo(%s) first arg is not a NetStream instance"),
+        video->setStream(ns);
+    } else {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("attachVideo(%s) first arg is not a NetStream instance"),
 			fn.arg(0));
-		);
-	}
-	return as_value();
+            );
+    }
+    return as_value();
 }
 
 as_value
 video_deblocking(const fn_call& fn)
 {
-	Video* video = ensure<IsDisplayObject<Video> >(fn);
+    Video* video = ensure<IsDisplayObject<Video> >(fn);
     UNUSED(video);
 
     log_unimpl("Video.deblocking");
@@ -143,9 +143,11 @@ video_deblocking(const fn_call& fn)
 as_value
 video_smoothing(const fn_call& fn)
 {
-	Video* video = ensure<IsDisplayObject<Video> >(fn);
+    Video* video = ensure<IsDisplayObject<Video> >(fn);
 
-    if (!fn.nargs) return as_value(video->smoothing());
+    if (!fn.nargs) {
+        return as_value(video->smoothing());
+    }
 
     const bool smooth = toBool(fn.arg(0), getVM(fn));
     video->setSmoothing(smooth);
@@ -156,24 +158,29 @@ video_smoothing(const fn_call& fn)
 as_value
 video_width(const fn_call& fn)
 {
-	Video* video = ensure<IsDisplayObject<Video> >(fn);
+    Video* video = ensure<IsDisplayObject<Video> >(fn);
     return as_value(video->width());
 }
 
 as_value
 video_height(const fn_call& fn)
 {
-	Video* video = ensure<IsDisplayObject<Video> >(fn);
+    Video* video = ensure<IsDisplayObject<Video> >(fn);
     return as_value(video->height());
 }
 
 as_value
 video_clear(const fn_call& fn)
 {
-	Video* video = ensure<IsDisplayObject<Video> >(fn);
+    Video* video = ensure<IsDisplayObject<Video> >(fn);
     video->clear();
     return as_value();
 }
 
 } // anonymous namespace
 } // namespace gnash
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: nil
+// End:
