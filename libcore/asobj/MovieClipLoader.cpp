@@ -112,7 +112,7 @@ moviecliploader_loadClip(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss; fn.dump_args(ss);
             log_aserror(_("MovieClipLoader.loadClip(%s): first argument must"
-                    "be a string"), ss.str());
+                    " be a string"), ss.str());
         );
         return as_value(false);
     }
