@@ -19,8 +19,7 @@ AUTOMAKE_OPTIONS = -Wno-portability
 
 POFILES = AUTO
 
-
-translations = cs de es fi fr it ja 
+translations = cs da de en_GB es fi fr it ja 
 
 # This is GNU make specific, so if you are building Gnash on a BSD
 # machine, you probably want to install GNU make in additional to
@@ -33,26 +32,16 @@ CLEANFILES = \
 
 dirs =  libbase \
 	librender \
-	libamf \
 	libmedia \
-	libmedia/ffmpeg \
-	libmedia/gst \
 	libcore \
-	libcore/vm \
-	libcore/swf \
-	libcore/parser \
-	libcore/asobj \
+	libdevice \
+	libsound \
 	utilities \
 	plugin \
+	desktop \
+	cygnal \
 	gui \
-	extensions \
-	extensions/dbus \
-	extensions/dejagnu \
-	extensions/fileio \
-	extensions/lirc \
-	extensions/gtk2 \
-	extensions/metome \
-	extensions/mysql
+	extensions
 	
 EXTRA_DIST = $(pofiles) gnash.pot 
 
@@ -79,8 +68,9 @@ update-po:
 	$(MAKE) gnash.pot
 	for i in $(pofiles); do \
 	  echo "Merging $$i..." ; \
-	  $(MSGMERGE) --update $(srcdir)/$$i $(srcdir)/gnash.pot; \
+	  $(MSGMERGE) --update $(srcdir)/$$i $(top_srcdir)/gnash.pot; \
 	done
+	mv $(top_srcdir)/gnash.pot $(srcdir)/gnash.pot
 
 SUFFIXES = .po .gmo
 .po.gmo:
@@ -111,4 +101,3 @@ uninstall-hook:
 	for i in $(translations); do \
 	  rm -f "$(DESTDIR)$(datadir)/locale/$$i/LC_MESSAGES/gnash.mo"; \
 	done
-
