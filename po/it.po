@@ -22,17 +22,17 @@ msgstr "Non posso ottenere le informazioni sul fuso orario"
 #: libbase/GC.cpp:46
 #, c-format
 msgid "GC %p created"
-msgstr ""
+msgstr "creato GC %p"
 
 #: libbase/GC.cpp:58
 #, fuzzy, c-format
 msgid "GC deleted, deleting all managed resources - collector run %d times"
 msgstr ""
-"GC %p cancellato, cancellero' tutte le risorse gestite - vai col collettore"
+"GC cancellato, cancellero' tutte le risorse gestite - il collettore ha girato %d volte"
 
 #: libbase/GC.cpp:71
 msgid "GC: sweep scan started"
-msgstr ""
+msgstr "GC: partita scansione di pulizia"
 
 #: libbase/GC.cpp:81
 #, fuzzy, c-format
@@ -42,14 +42,14 @@ msgstr "GC %p: cleanUnreachable sta cancellando l'oggetto %p (%s)"
 #: libbase/GC.cpp:96
 #, c-format
 msgid "GC: recycled %d unreachable resources - %d left"
-msgstr ""
+msgstr "GC: riciclati %d oggetti non raggiungibili - %d rimasti"
 
 #: libbase/GC.cpp:115
 #, c-format
 msgid ""
 "GC: collection cycle started - %d/%d new resources allocated since last run "
 "(from %d to %d)"
-msgstr ""
+msgstr "GC: partito ciclo di collezione - %d/%d nuove risorse allocate dall'ultimo giro (da %d a %d)"
 
 #: libbase/GnashImageGif.cpp:175
 msgid "GIF: Error retrieving image description"
@@ -88,7 +88,7 @@ msgstr "Errore jpeg interno: "
 
 #: libbase/GnashImageJpeg.cpp:273
 msgid "Lack of data during JPEG header parsing"
-msgstr ""
+msgstr "Carenza di dati durante l'interpretazione dell'header JPEG"
 
 #: libbase/GnashImageJpeg.cpp:283
 #, c-format
