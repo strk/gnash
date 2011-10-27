@@ -57,7 +57,7 @@ gnash.pot:
 	  echo "$$i" >> po/POTFILES;\
 	done; \
 	$(XGETTEXT) --language=C++ --files-from=po/POTFILES \
-	  -o $(srcdir)/gnash.pot \
+	  -o po/gnash.pot \
 	  --default-domain=gnash --force \
 	  --flag=_:1:pass-c-format --keyword=_ --keyword=_q \
 	  --copyright-holder='Free Software Foundation, Inc.';  \
@@ -68,9 +68,8 @@ update-po:
 	$(MAKE) gnash.pot
 	for i in $(pofiles); do \
 	  echo "Merging $$i..." ; \
-	  $(MSGMERGE) --update $(srcdir)/$$i $(top_srcdir)/gnash.pot; \
+	  $(MSGMERGE) --update $(srcdir)/$$i $(srcdir)/gnash.pot; \
 	done
-	mv $(top_srcdir)/gnash.pot $(srcdir)/gnash.pot
 
 SUFFIXES = .po .gmo
 .po.gmo:
