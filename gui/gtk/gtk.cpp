@@ -410,7 +410,7 @@ GtkGui::setCursor(gnash_cursor_type newcursor)
             cursortype = GDK_LAST_CURSOR;
     }
   
-    GdkCursor* gdkcursor = NULL;
+    GdkCursor* gdkcursor = __null;
   
     if (cursortype != GDK_LAST_CURSOR) {
          gdkcursor = gdk_cursor_new(cursortype);
@@ -1225,7 +1225,7 @@ PreferencesDialog::PreferencesDialog(GtkWidget* window)
                     // The buttons and their response codes:
                     GTK_STOCK_OK, GTK_RESPONSE_OK,
                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                    NULL);
+                    __null);
     // Add Gnash icon
     addGnashIcon(GTK_WINDOW(_prefsDialog));
 
