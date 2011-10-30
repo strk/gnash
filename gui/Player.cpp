@@ -543,7 +543,9 @@ Player::run(int argc, char* argv[], const std::string& infile,
 
     if (! _delay) {
         // 10ms per heart beat
-        _delay = 10; 
+        float fps = _movieDef->get_frame_rate();
+        _delay = static_cast<int>(1000/fps);
+//        _delay = 10; 
     }
     _gui->setInterval(_delay);
 
