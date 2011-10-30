@@ -3244,7 +3244,7 @@ else
   DEB_ALTERNATIVE([libgif-dev])
   RPM_INSTALL([libgif-devel])
   RPM_ALTERNATIVE([giflib-devel])
-  RPM_ALTERNATIVE([libunfif-devel])
+  RPM_ALTERNATIVE([libungif-devel])
 fi
 
 if test x"${PNG_LIBS}" != x ; then

@@ -57,6 +57,7 @@
 #include "Transform.h"
 #include "StreamProvider.h"
 #include "SystemClock.h"
+#include "as_function.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -1782,7 +1783,8 @@ movie_root::markReachableResources() const
 #endif
     }
 #endif
-    
+
+    foreachSecond(_registeredClasses.begin(), _registeredClasses.end(), &as_function::setReachable);
 }
 
 InteractiveObject*
