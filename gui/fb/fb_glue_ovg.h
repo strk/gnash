@@ -79,19 +79,10 @@ public:
     int height() { return _height; };
     int stride() { return _stride; };
 
-    // these are used only for debugging purpose to access private data
-    size_t getBounds() { return _drawbounds.size(); };
-    // size_t getMemSize() { return _fixinfo.smem_len; };
-
 private:
     int         _stride;
     int         _width;
     int         _height;
-    boost::uint8_t *_offscreenbuf; // FIXME: I think this should go away
-    
-    //Rectangle _bounds;
-    std::vector< geometry::Range2d<int> > _drawbounds;
-    geometry::Range2d<int>              _validbounds;
     
     // EGL needs it's own display device, as that's how it stays platform
     // independent. For a Framebuffer we use that, and on the desktop,
@@ -105,7 +96,6 @@ private:
     renderer::x11::X11Device            _display;
 # endif
 #endif
-    //    boost::scoped_ptr<Renderer> _renderer;
 };
 
 } // end of namespace gui
