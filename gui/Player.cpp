@@ -542,15 +542,17 @@ Player::run(int argc, char* argv[], const std::string& infile,
     _movieDef->completeLoad();
 
     if (! _delay) {
-        // 10ms per heart beat
         float fps = _movieDef->get_frame_rate();
         log_debug("Movie Frame Rate is %d, adjusting delay", fps);
         if (fps > 12) {
             _delay = static_cast<int>(1000/fps);
         } else {
+            // 10ms per heart beat
             _delay = 10;
         }
     }
+    // This is the time between the main loop waking up and processing
+    // network messages, external calls, and displaying the next frame.
     _gui->setInterval(_delay);
 
     if (_exitTimeout) {
