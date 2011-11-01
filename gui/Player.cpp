@@ -544,6 +544,9 @@ Player::run(int argc, char* argv[], const std::string& infile,
     if (! _delay) {
         float fps = _movieDef->get_frame_rate();
         log_debug("Movie Frame Rate is %d, adjusting delay", fps);
+        // FIXME: this value is arbitrary, and will make any movie with
+        // less than 12 frames eat up more of the cpu. It should probably
+        // be a much lower value, like 2.
         if (fps > 12) {
             _delay = static_cast<int>(1000/fps);
         } else {
