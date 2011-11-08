@@ -146,13 +146,15 @@ revno.h:
             nick="`cd $(top_srcdir) ; $(GIT) branch | grep '^\*' | cut -d ' ' -f 2`"; \
 	  fi \
         else \
-          revno="$(NOW)"; \
-          comm_id="none"; \
-          nick="$(VERSION)"; \
+          if test \! -f revno.h; then \
+            revno="$(NOW)"; \
+            comm_id="none"; \
+            nick="$(VERSION)"; \
+          fi; \
         fi; \
 	if test \! -z "$${revno}"; then \
           echo "Generating revno.h ($${nick} $${revno} $${comm_id})"; \
-          echo "#define BRANCH_REVNO  \"$${revno}\"" > revno.h; \
+          echo "#define BRANCH_REVNO \"$${revno}\"" > revno.h; \
           echo "#define BRANCH_NICK \"$${nick}\"" >> revno.h; \
           echo "#define COMMIT_ID \"$${comm_id}\"" >> revno.h; \
           touch .lastmod; \
