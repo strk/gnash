@@ -1108,6 +1108,7 @@ nsPluginInstance::setupCookies(const std::string& pageurl)
     ss << "/tmp/gnash-cookies." << getpid();
 
     cookiefile.open(ss.str().c_str(), std::ios::out | std::ios::trunc);
+    chmod (ss.str().c_str(), 0600);
 
     // Firefox provides cookies in the following format:
     //
