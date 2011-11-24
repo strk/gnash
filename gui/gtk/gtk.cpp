@@ -264,6 +264,9 @@ GtkGui::init(int argc, char **argv[])
 bool
 GtkGui::run()
 {
+    // Kick-start before setting the interval timeout
+    advance_movie(this);
+
     gtk_main();
     return true;
 }
