@@ -129,6 +129,9 @@ NPBool plugInitialized = FALSE;
 }
 
 /// \brief Return the MIME Type description for this plugin.
+#ifdef NPAPI_CONST
+const
+#endif
 char*
 NPP_GetMIMEDescription(void)
 {
