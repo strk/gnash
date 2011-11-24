@@ -79,7 +79,9 @@ libgnashdevice_la_LIBADD = \
 libgnashdevice_la_LDFLAGS =  -release $(VERSION) 
 libgnashdevice_la_SOURCES = \
 	GnashDevice.h \
-	DeviceGlue.h
+	DeviceGlue.h \
+	DeviceGlue.cpp \
+	$(NULL)       
 
 if BUILD_X11_DEVICE
 libgnashdevice_la_CPPFLAGS += $(X11_CFLAGS)

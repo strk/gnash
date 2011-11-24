@@ -238,6 +238,9 @@ NP_Initialize(NPNetscapeFuncs* aNPNFuncs, NPPluginFuncs* aNPPFuncs)
     return NS_PluginInitialize();
 }
 
+#ifdef NPAPI_CONST
+const
+#endif
 char *
 NP_GetMIMEDescription(void)
 {

@@ -264,6 +264,9 @@ GtkGui::init(int argc, char **argv[])
 bool
 GtkGui::run()
 {
+    // Kick-start before setting the interval timeout
+    advance_movie(this);
+
     gtk_main();
     return true;
 }
@@ -412,7 +415,7 @@ GtkGui::setCursor(gnash_cursor_type newcursor)
             cursortype = GDK_LAST_CURSOR;
     }
   
-    GdkCursor* gdkcursor = NULL;
+    GdkCursor* gdkcursor = NULL; 
   
     if (cursortype != GDK_LAST_CURSOR) {
          gdkcursor = gdk_cursor_new(cursortype);
