@@ -1103,13 +1103,6 @@ AC_ARG_ENABLE(device,
   done
 )
 
-dnl Lenny doesn't support this filed for Linux Input events
-AC_TRY_COMPILE([#include <linux/input.h>], [
-  struct input_absinfo abs;
-  abs.resolution = 0;; ],
- AC_DEFINE([ABSINFO_RESOLUTION], [1], [ABS Resolution field])
-)
-
 if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${build_vaapi_device}" = x"yes"; then
   use_libva=no
   use_libva_x11=no
@@ -2042,6 +2035,25 @@ fi
 
 
 GNASH_PATH_FIREFOX
+
+dnl 
+dnl New versions of the NPAPI require const for this prototype, which currently
+dnl seems to only be wit Ubuntu Oneiric.
+AC_MSG_CHECKING([for const needed for NPP_GetMIMEDescription() prototype])
+npapi_flags="`echo "${NPAPI_CFLAGS}" | sed -e 's/-I//' -e 's/-DXP_UNIX//' | tr -d ' '`/npapi.h"
+const_test="`grep NPP_GetMIMEDescription ${npapi_flags} | grep -c const`"
+if test ${const_test} -eq 1; then
+  AC_DEFINE(NPAPI_CONST, [1], [Newer versions use const in prototypes])
+  AC_MSG_RESULT([yes])
+else
+  AC_MSG_RESULT([no])
+fi
+
+AC_TRY_COMPILE([#include <linux/input.h>], [
+  struct input_absinfo abs;
+  abs.resolution = 0;; ],
+ AC_DEFINE([ABSINFO_RESOLUTION], [1], [ABS Resolution field])
+)
 
 dnl -----------------------------------------------------------------
 dnl END OF PLUGIN RELATED STUFF
@@ -3908,7 +3920,8 @@ if test x"$npapi" = xyes; then
   else
     PKG_ERR([No xulrunner development package is installed!])
     PKG_SUGGEST([Install it from http://releases.mozilla.org/pub/mozilla.org/xulrunner])
-    DEB_INSTALL([xulrunner-dev])
+    DEB_INSTALL([xulrunner-dev]) or 
+    DEB_INSTALL([firefox-dev])
     RPM_INSTALL([xulrunner-devel])
   fi
 else
