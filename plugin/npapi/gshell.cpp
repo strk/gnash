@@ -382,6 +382,9 @@ NS_PluginShutdown()
     cerr << "UNIMPLEMENTED: " << __PRETTY_FUNCTION__ << endl;
 }
 
+#ifdef NPAPI_CONST
+const
+#endif
 char*
 NPP_GetMIMEDescription(void)
 {
