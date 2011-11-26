@@ -103,7 +103,7 @@ SSHClient::setUser()
 
 // Read bytes from the already opened SSH connection
 int
-SSHClient::sshRead(amf::Buffer &buf)
+SSHClient::sshRead(cygnal::Buffer &buf)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -125,7 +125,7 @@ SSHClient::sshRead(boost::uint8_t *buf, size_t size)
 
 // Write bytes to the already opened SSH connection
 int
-SSHClient::sshWrite(amf::Buffer &buf)
+SSHClient::sshWrite(cygnal::Buffer &buf)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -401,7 +401,7 @@ SSHClient::openChannel(ssh_session session)
 }
 
 int 
-SSHClient::readChannel(ssh_channel channel, amf::Buffer &buf)
+SSHClient::readChannel(ssh_channel channel, cygnal::Buffer &buf)
 {
 //    GNASH_REPORT_FUNCTION;
     int ret = -1;
@@ -416,7 +416,7 @@ SSHClient::readChannel(ssh_channel channel, amf::Buffer &buf)
 }
 
 int 
-SSHClient::writeChannel(ssh_channel channel, amf::Buffer &buf)
+SSHClient::writeChannel(ssh_channel channel, cygnal::Buffer &buf)
 {
 //    GNASH_REPORT_FUNCTION;
     int ret = -1;
