@@ -1695,7 +1695,7 @@ movie_root::executeTimers()
 
     if (_intervalTimers.empty()) return;
 
-    unsigned long now = _vm.getTime();
+    const unsigned long now = _vm.getTime();
 
     typedef std::multimap<unsigned int, boost::shared_ptr<Timer> >
         ExpiredTimers;
