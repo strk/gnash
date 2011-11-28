@@ -81,6 +81,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libcore/vm \
 	-I$(top_srcdir)/libcore/asobj \
 	-I$(top_srcdir)/testsuite \
+	$(BOOST_CFLAGS) \
 	$(NULL)
 
 AM_LDFLAGS = \
