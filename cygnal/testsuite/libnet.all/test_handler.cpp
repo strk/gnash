@@ -58,11 +58,10 @@
 #include "handler.h"
 #include "amf.h"
 
-using namespace amf;
+using namespace cygnal;
 using namespace std;
 using namespace gnash;
 using namespace boost;
-using namespace amf;
 
 TestState runtest;
 LogFile& dbglogfile = LogFile::getDefaultInstance();

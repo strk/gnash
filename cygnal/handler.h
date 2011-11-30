@@ -79,7 +79,7 @@ public:
 	POLL,
 	HELP,
 	INTERVAL,
-	QUIT,
+	QUIT
     } admin_cmd_e;
     /// This enum contains the possible values for streaming video
     /// types.

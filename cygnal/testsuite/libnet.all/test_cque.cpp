@@ -50,11 +50,10 @@
 #include "cque.h"
 #include "amf.h"
 
-using namespace amf;
+using namespace cygnal;
 using namespace std;
 using namespace gnash;
 using namespace boost;
-using namespace amf;
 
 TestState runtest;
 //LogFile& dbglogfile = LogFile::getDefaultInstance();
@@ -66,7 +65,7 @@ main (int /*argc*/, char** /*argv*/) {
 
     CQue que;
 
-    boost::shared_ptr<amf::Buffer> buf(new Buffer(50));
+    boost::shared_ptr<cygnal::Buffer> buf(new Buffer(50));
     // populate the buffer
     boost::uint8_t *ptr = buf->reference();
     for (Network::byte_t i=1; i< buf->size(); i++) {
@@ -81,19 +80,19 @@ main (int /*argc*/, char** /*argv*/) {
     // which is the one where data flows from the network to the queue.
     que.push(buf);
     if (que.size() == 1) {
-        runtest.pass ("CQue::push(boost::shared_ptr<amf::Buffer> )");
+        runtest.pass ("CQue::push(boost::shared_ptr<cygnal::Buffer> )");
     } else {
-        runtest.fail ("CQue::push(boost::shared_ptr<amf::Buffer> )");
+        runtest.fail ("CQue::push(boost::shared_ptr<cygnal::Buffer> )");
     }
     
     // Test push. When dumpimg, the second address should be different than the first,
     // as well as the size. The outgoing queue should be uneffected.
-    boost::shared_ptr<amf::Buffer> buf1(new Buffer(112));
+    boost::shared_ptr<cygnal::Buffer> buf1(new Buffer(112));
     que.push(buf1);
     if (que.size() == 2) {
-        runtest.pass ("CQue::pushin(boost::shared_ptr<amf::Buffer> )");
+        runtest.pass ("CQue::pushin(boost::shared_ptr<cygnal::Buffer> )");
     } else {
-        runtest.fail ("CQue::pushin(boost::shared_ptr<amf::Buffer> )");
+        runtest.fail ("CQue::pushin(boost::shared_ptr<cygnal::Buffer> )");
     }
 
     // Nuke the array
@@ -106,14 +105,14 @@ main (int /*argc*/, char** /*argv*/) {
 
     
     que.push(buf);
-    boost::shared_ptr<amf::Buffer> buf2 = que.peek();
+    boost::shared_ptr<cygnal::Buffer> buf2 = que.peek();
     if ((buf2 == buf) && (que.size() == 1)) {
         runtest.pass ("CQue::peek()");
     } else {
         runtest.fail ("CQue::peek()");
     }
 
-    boost::shared_ptr<amf::Buffer> buf3 = que.peek();
+    boost::shared_ptr<cygnal::Buffer> buf3 = que.peek();
      if ((buf3 == buf) && (que.size() == 1)) {
          runtest.pass ("CQue::pop()");
      } else {
@@ -131,18 +130,18 @@ main (int /*argc*/, char** /*argv*/) {
      }
 
      // Make some test buffers
-     boost::shared_ptr<amf::Buffer> merge1(new Buffer);
-     boost::shared_ptr<amf::Buffer> merge2(new Buffer);
-     boost::shared_ptr<amf::Buffer> merge3(new Buffer);
+     boost::shared_ptr<cygnal::Buffer> merge1(new Buffer);
+     boost::shared_ptr<cygnal::Buffer> merge2(new Buffer);
+     boost::shared_ptr<cygnal::Buffer> merge3(new Buffer);
      size_t i;
      ptr = merge1->reference();
-     for (i=0; i<amf::NETBUFSIZE; i++) {
+     for (i=0; i<cygnal::NETBUFSIZE; i++) {
          ptr[i] = i*'A';
      }
      que.push(merge1);
      
      ptr = merge2->reference();
-     for (i=0; i<amf::NETBUFSIZE; i++) {
+     for (i=0; i<cygnal::NETBUFSIZE; i++) {
          ptr[i] = i+'a';
      }
      que.push(merge2);
@@ -156,11 +155,11 @@ main (int /*argc*/, char** /*argv*/) {
 
 //     que.dump();
      // A merge gives us one big buffer where there were several buffers
-     boost::shared_ptr<amf::Buffer> foo = que.merge(merge1);
+     boost::shared_ptr<cygnal::Buffer> foo = que.merge(merge1);
      if (foo == 0) {
          runtest.unresolved("CQue::merge()");
      } else {
-         if (foo->size() == (amf::NETBUFSIZE * 2) + 120) {
+         if (foo->size() == (cygnal::NETBUFSIZE * 2) + 120) {
              runtest.pass("CQue::merge()");
          } else {
              runtest.fail("CQue::merge()");

@@ -727,7 +727,7 @@ usage()
 #else
 
 int
-main(int /*argc*/, char /* *argv[]*/)
+main(int /*argc*/, char** /* *argv */)
 {
   // nop
   return 0;  
