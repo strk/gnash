@@ -23,6 +23,7 @@
 #endif
 
 #include <sys/types.h>
+#include <boost/cstdint.hpp>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <iostream>
@@ -339,7 +340,7 @@ DiskStream::fullyPopulated()
 	return true;
     }
     return false;
-};
+}
 
 /// \brief Close the open disk file, but stay resident in memory.
 void
@@ -660,7 +661,7 @@ DiskStream::open(const string &filespec, int netfd, Statistics &statistics)
 	_filefd = ::open(_filespec.c_str(), O_RDONLY);
 	log_debug (_("Opening file %s (fd #%d), %lld bytes in size."),
 		   _filespec, _filefd,
-		 (long long int) _filesize);
+		   (boost::int64_t) _filesize);
 	_state = OPEN;
 	_filetype = determineFileType(filespec);
 	loadToMem(0); // load the first page into memory

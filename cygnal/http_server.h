@@ -100,6 +100,7 @@ public:
 
     void dump();    
 private:
+    cygnal::Buffer _buf;
     boost::shared_ptr<gnash::DiskStream> _diskstream;
 };
 
