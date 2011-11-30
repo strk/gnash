@@ -170,7 +170,8 @@ OpenVGBitmap::createRadialBitmap(float cx, float cy, float fx, float fy,
 
     // Color Ramp is the same as for linear gradient
     size_t entries = records.size() * 5;
-    VGfloat ramps[entries];
+    boost::scoped_array<VGfloat> ramps(new VGfloat[entries]);
+    
     int j = 0;
     for (size_t i=0; i!= records.size(); ++i) {
         std::cerr << "The record is: " << records[i].ratio/255.0f
@@ -185,7 +186,7 @@ OpenVGBitmap::createRadialBitmap(float cx, float cy, float fx, float fy,
         ramps[j++] = c.m_b / 255.0f;
         ramps[j++] = c.m_a / 255.0f;
     }
-    vgSetParameterfv(paint, VG_PAINT_COLOR_RAMP_STOPS, entries, ramps);
+    vgSetParameterfv(paint, VG_PAINT_COLOR_RAMP_STOPS, entries, ramps.get());
 
     return this;
 }
@@ -234,7 +235,7 @@ OpenVGBitmap::createLinearBitmap(float x0, float y0, float x1, float y1,
     // function will generate an error if the number of values
     // submitted is not a multiple of 5 (zero is acceptable)
     size_t entries = records.size() * 5;
-    VGfloat ramps[entries];
+    boost::scoped_array<VGfloat> ramps(new VGfloat[entries]);    
     int j = 0;
     for (size_t i=0; i!= records.size(); ++i) {
         std::cerr << "The record ratio is: " << records[i].ratio/255.0f;
@@ -249,7 +250,7 @@ OpenVGBitmap::createLinearBitmap(float x0, float y0, float x1, float y1,
         ramps[j++] = c.m_a / 255.0f;
     }
 #if 1
-    vgSetParameterfv(paint, VG_PAINT_COLOR_RAMP_STOPS, entries, ramps);
+    vgSetParameterfv(paint, VG_PAINT_COLOR_RAMP_STOPS, entries, ramps.get());
 #else
     VGfloat rampStop[] = {0.00f, 1.0f, 1.0f, 1.0f, 1.0f,
                           0.33f, 1.0f, 0.0f, 0.0f, 1.0f,
