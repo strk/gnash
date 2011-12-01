@@ -25,6 +25,8 @@
 #include <boost/scoped_array.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/find.hpp>
+#include <boost/iostreams/device/file_descriptor.hpp>
+#include <boost/iostreams/stream.hpp>
 #include <cassert>
 #include <string>
 #include <cstdlib> // getenv
@@ -148,6 +150,17 @@ getPluginDescription()
         if (desc == NULL) desc = PLUGIN_DESCRIPTION;
     }
     return desc;
+}
+
+boost::iostreams::file_descriptor_sink getfdsink(char mkstemplate[]);
+
+boost::iostreams::file_descriptor_sink
+getfdsink(char mksTemplate[])
+{
+  int suffix = std::string(mksTemplate).size() - std::string(mksTemplate).find("XXXXXX") - 6;
+  int fd = mkstemps (mksTemplate, suffix);
+  boost::iostreams::file_descriptor_sink fdsink(fd, boost::iostreams::close_handle);
+  return fdsink;
 }
 
 //
@@ -965,22 +978,23 @@ create_standalone_launcher(const std::string& page_url, const std::string& swf_u
         return;
     }
 
-    std::ofstream saLauncher;
-
-    std::stringstream ss;
-    static int debugno = 0;
-    debugno = (debugno + 1) % 10;
-    ss << "/tmp/gnash-debug-" << debugno << ".sh";
-    saLauncher.open(ss.str().c_str(), std::ios::out | std::ios::trunc);
+    char debugname[] = "/tmp/gnash-debug-XXXXXX.sh";
+    boost::iostreams::file_descriptor_sink fdsink = getfdsink(debugname);
+    if (fdsink.handle() == -1) {
+        gnash::log_error("Failed to create sink: %s", debugname);
+        return;
+    }
+    boost::iostreams::stream<boost::iostreams::file_descriptor_sink>
+        saLauncher (fdsink);
 
     if (!saLauncher) {
-        gnash::log_error("Failed to open new file for standalone launcher: " + ss.str());
+        gnash::log_error("Failed to open new file for standalone launcher: %s", debugname);
         return;
     }
 
     saLauncher << "#!/bin/sh" << std::endl
                << "export GNASH_COOKIES_IN="
-               << "/tmp/gnash-cookies." << getpid() << std::endl
+               << std::getenv("GNASH_COOKIES_IN") << std::endl
                << getGnashExecutable() << " ";
 
     if (!page_url.empty()) {
@@ -1003,6 +1017,7 @@ create_standalone_launcher(const std::string& page_url, const std::string& swf_u
                << std::endl;
 
     saLauncher.close();
+    fdsink.close();
 #endif
 }
 
@@ -1102,12 +1117,14 @@ nsPluginInstance::setupCookies(const std::string& pageurl)
     }
 
     gnash::log_debug("The Cookie for %s is %s", url, ncookie);
-    std::ofstream cookiefile;
-    std::stringstream ss;
-    ss << "/tmp/gnash-cookies." << getpid();
-
-    cookiefile.open(ss.str().c_str(), std::ios::out | std::ios::trunc);
-    chmod (ss.str().c_str(), 0600);
+    char cookiename[] = "/tmp/gnash-cookies.XXXXXX";
+    boost::iostreams::file_descriptor_sink fdsink = getfdsink(cookiename);
+    if (fdsink.handle() == -1) {
+        gnash::log_error("Failed to create sink: %s", cookiename);
+        return;
+    }
+    boost::iostreams::stream<boost::iostreams::file_descriptor_sink>
+        cookiefile (fdsink);
 
     // Firefox provides cookies in the following format:
     //
@@ -1127,8 +1144,9 @@ nsPluginInstance::setupCookies(const std::string& pageurl)
     }
  
     cookiefile.close();
+    fdsink.close();
   
-    if (setenv("GNASH_COOKIES_IN", ss.str().c_str(), 1) < 0) {
+    if (setenv("GNASH_COOKIES_IN", cookiename, 1) < 0) {
         gnash::log_error(
             "Couldn't set environment variable GNASH_COOKIES_IN to %s",
             ncookie);
