@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2010 Free Software Foundation, Inc
+//   Copyright (C) 2010, 2011 Free Software Foundation, Inc
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -76,6 +76,8 @@ main(int argc, char *argv[])
     } else {
         runtest.fail("RawFBDevice::getOffscreenBuffer()");
     }
+#else
+    runtest.untested("RawFBDevice::getOffscreenBuffer()");
 #endif
     
     if (ret && rfb.getStride()) {
@@ -159,10 +161,11 @@ main(int argc, char *argv[])
     // raw framebuffer to make sure it got initialized correctly.
     int x = 0, y = 0;
     long location = 0;
-    int line_length = rfb.getWidth() * ((rfb.getDepth()+7)/8);
+    int line_length = rfb.getStride();
 
-    boost::uint8_t *fbp = rfb.getFBMemory();
-
+    boost::uint8_t *fbp = 0;
+    fbp = rfb.getFBMemory();
+    
     for(y=100; y<102; y++);            /* Where we are going to put the pixel */
     
     for(x=0; x<200; x++) {
@@ -174,7 +177,6 @@ main(int argc, char *argv[])
         *(fbp + location + 2) = 200; /* A lot of red */
         *(fbp + location + 3) = 0; /* No transparency */
     }
-
 }
 
 // Local Variables:
