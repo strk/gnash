@@ -155,7 +155,6 @@ main(int argc, char *argv[])
     }
 #endif
 
-#if 0
     // This is a manual test to see if we can draw a line on the
     // raw framebuffer to make sure it got initialized correctly.
     int x = 0, y = 0;
@@ -175,7 +174,6 @@ main(int argc, char *argv[])
         *(fbp + location + 2) = 200; /* A lot of red */
         *(fbp + location + 3) = 0; /* No transparency */
     }
-#endif
 
 }
 

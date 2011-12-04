@@ -223,7 +223,7 @@ RawFBDevice::attachWindow(GnashDevice::native_window_t window)
 #ifdef ENABLE_DOUBLE_BUFFERING
     // Create an offscreen buffer the same size as the Framebuffer
     _offscreen_buffer.reset(new boost::uint8_t[_fixinfo.smem_len]);
-#endif    
+#endif
     
     return true;
 }

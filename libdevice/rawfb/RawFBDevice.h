@@ -132,11 +132,20 @@ class RawFBDevice : public GnashDevice
     bool setGrayscaleLUT8();
 
     bool swapBuffers() {
+#ifdef ENABLE_DOUBLE_BUFFERING
+        // When using AGG, the pointer to the offscreen buffer has been
+        // passed to AGG, so it renders in the offscreen buffer by default,
+        // leaving it up to us to manually copy the data from the offscreeen
+        // buffer into the real framebuffer memory.
         if (_fbmem && _offscreen_buffer) {
             std::copy(_fbmem, _fbmem + _fixinfo.smem_len,
                       _offscreen_buffer.get());
             return true;
         }
+#else
+        // When single buffered, there is no data to copy, so always true
+        return true;
+#endif
         return false;
     }
     
