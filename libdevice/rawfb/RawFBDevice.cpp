@@ -78,7 +78,7 @@ RawFBDevice::clear()
 {
     GNASH_REPORT_FUNCTION;
     if (_fbmem) {
-        memset(_fbmem.get(), 0, _fixinfo.smem_len);
+        memset(_fbmem, 0, _fixinfo.smem_len);
     }
     if (_offscreen_buffer) {
         memset(_offscreen_buffer.get(), 0, _fixinfo.smem_len);
@@ -90,19 +90,19 @@ RawFBDevice::~RawFBDevice()
     // GNASH_REPORT_FUNCTION;
 
     if (_fbmem) {
-        munmap(_fbmem.get(), 0);
+        munmap(_fbmem, 0);
         log_debug(_("Freeing framebuffer memory"));
-        _fbmem.reset();
-    }
-    
-    if (_fd) {
-        close (_fd);
-        _fd = -1;
+        _fbmem = 0;
     }
     
     if (_offscreen_buffer) {
         log_debug(_("Freeing offscreen buffer"));
         _offscreen_buffer.reset();
+    }
+    
+    if (_fd) {
+        close (_fd);
+        _fd = -1;
     }
 }
 
@@ -148,13 +148,10 @@ RawFBDevice::initDevice(int /* argc */, char **/* argv[] */)
               _fixinfo.smem_len);
     log_debug(_("Video mode: %dx%d with %d bits per pixel."),
               _varinfo.xres, _varinfo.yres,
-              _varinfo.bits_per_pixel);    
+              _varinfo.bits_per_pixel);
 
-#ifdef ENABLE_DOUBLE_BUFFERING
-    boost::uint8_t *mem = new boost::uint8_t[getWidth() * getHeight()];
-    _offscreen_buffer.reset(mem);
-#endif
-    
+    log_debug("Framebuffer stride is: %d.",  _fixinfo.line_length);    
+
     return true;
 }
 
@@ -212,9 +209,9 @@ RawFBDevice::attachWindow(GnashDevice::native_window_t window)
     // of the opened device. EGL wants the descriptor here too, so
     // this way we work in a similar manner.
     if (window) {
-        _fbmem.reset((boost::uint8_t *)mmap(0, _fixinfo.smem_len,
-                                       PROT_READ|PROT_WRITE, MAP_SHARED,
-                                           window, 0));
+        _fbmem = reinterpret_cast<boost::uint8_t *>(mmap(0, _fixinfo.smem_len,
+                                        PROT_READ|PROT_WRITE, MAP_SHARED,
+                                        window, 0));
     }
         
     if (!_fbmem) {
@@ -222,7 +219,12 @@ RawFBDevice::attachWindow(GnashDevice::native_window_t window)
                   _fixinfo.smem_len);
         return false;
     }
-
+    
+#ifdef ENABLE_DOUBLE_BUFFERING
+    // Create an offscreen buffer the same size as the Framebuffer
+    _offscreen_buffer.reset(new boost::uint8_t[_fixinfo.smem_len]);
+#endif    
+    
     return true;
 }
     

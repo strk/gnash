@@ -110,11 +110,12 @@ class RawFBDevice : public GnashDevice
     void createWindow(const char *name, int x, int y, int width, int height);
 
     // Get the memory from the real framebuffer
-    boost::uint8_t *getFBMemory() { return _fbmem.get(); };
+    boost::uint8_t *getFBMemory() { return _fbmem; };
 
-    // Get the memory from an offscreen buffer to support Double Buffering
+    // // Get the memory from an offscreen buffer to support Double Buffering
     boost::uint8_t *getOffscreenBuffer() { return _offscreen_buffer.get(); };
 
+    size_t getStride() { return _fixinfo.line_length; };
     size_t getFBMemSize() { return _fixinfo.smem_len; };
     int getHandle() { return _fd; };
     
@@ -129,6 +130,15 @@ class RawFBDevice : public GnashDevice
     /// For 8 bit (palette / LUT) modes, sets a grayscale palette.
     /// This GUI currently does not support palette modes. 
     bool setGrayscaleLUT8();
+
+    bool swapBuffers() {
+        if (_fbmem && _offscreen_buffer) {
+            std::copy(_fbmem, _fbmem + _fixinfo.smem_len,
+                      _offscreen_buffer.get());
+            return true;
+        }
+        return false;
+    }
     
 protected:
     /// Clear the framebuffer memory
@@ -138,10 +148,10 @@ protected:
     std::string                         _filespec;
     struct fb_fix_screeninfo            _fixinfo;
     struct fb_var_screeninfo            _varinfo;
-    boost::scoped_ptr<boost::uint8_t>   _fbmem;
+    boost::uint8_t                     *_fbmem;
     
     boost::scoped_ptr<boost::uint8_t>   _offscreen_buffer;
-    struct fb_cmap                      _cmap;       // the colormap    
+    struct fb_cmap                      _cmap;       // the colormap
 };
 
 #ifdef ENABLE_FAKE_FRAMEBUFFER

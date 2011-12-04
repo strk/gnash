@@ -56,18 +56,28 @@ main(int argc, char *argv[])
     dbglogfile.setVerbosity();
 
     rawfb::RawFBDevice rfb;
+    
+    if (!rfb.initDevice(argc, argv)) {
+        runtest.fail("RawFBDevice:InitDevice()");
+    } else {
+        runtest.pass("RawFBDevice:InitDevice()");
+    }
 
-    bool ret = rfb.initDevice(argc, argv);
-    if (ret <= 0) {
-        exit(0);
+    bool ret = rfb.attachWindow(rfb.getHandle());
+    if (rfb.getFBMemory()) {
+        runtest.pass("RawFBDevice::attachWindow()");
+    } else {
+        runtest.fail("RawFBDevice::attachWindow()");
     }
     
-    if (ret && (rfb.getHandle() > 0)) {
-        runtest.pass("RawFBDevice:InitDevice()");
+#ifdef ENABLE_DOUBLE_BUFFERING
+    if (rfb.getOffscreenBuffer()) {
+        runtest.pass("RawFBDevice::getOffscreenBuffer()");
     } else {
-        runtest.fail("RawFBDevice:InitDevice()");
+        runtest.fail("RawFBDevice::getOffscreenBuffer()");
     }
-
+#endif
+    
     if (ret && rfb.getStride()) {
         runtest.pass("RawFBDevice::getStride()");
     } else {
