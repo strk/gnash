@@ -68,6 +68,12 @@ main(int argc, char *argv[])
         runtest.fail("RawFBDevice:InitDevice()");
     }
 
+    if (ret && rfb.getStride()) {
+        runtest.pass("RawFBDevice::getStride()");
+    } else {
+        runtest.fail("RawFBDevice::getStride()");
+    }
+    
     if (ret && rfb.getWidth()) {
         runtest.pass("RawFBDevice::getWidth()");
     } else {
