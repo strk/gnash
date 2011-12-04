@@ -1,5 +1,5 @@
 //
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free Software
 //   Foundation, Inc
 //
 // This program is free software; you can redistribute it and/or modify
@@ -74,8 +74,6 @@ class RawFBDevice : public GnashDevice
     size_t getWidth() { return _varinfo.xres; };
     size_t getHeight() { return _varinfo.yres; };
     
-    bool isSingleBuffered() { return true; }
-    
     bool supportsRenderer(GnashDevice::rtype_t /* rtype */) { return false; }
     
     bool isBufferDestroyed() { return false; }
@@ -131,21 +129,27 @@ class RawFBDevice : public GnashDevice
     /// This GUI currently does not support palette modes. 
     bool setGrayscaleLUT8();
 
+    bool isSingleBuffered() {
+        if (_offscreen_buffer) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     bool swapBuffers() {
-#ifdef ENABLE_DOUBLE_BUFFERING
         // When using AGG, the pointer to the offscreen buffer has been
         // passed to AGG, so it renders in the offscreen buffer by default,
         // leaving it up to us to manually copy the data from the offscreeen
         // buffer into the real framebuffer memory.
-        if (_fbmem && _offscreen_buffer) {
+        if (_offscreen_buffer) {
             std::copy(_fbmem, _fbmem + _fixinfo.smem_len,
                       _offscreen_buffer.get());
             return true;
-        }
-#else
-        // When single buffered, there is no data to copy, so always true
-        return true;
-#endif
+        } else {
+            // When single buffered, there is no data to copy, so always true
+            return true;
+        }     
         return false;
     }
     
