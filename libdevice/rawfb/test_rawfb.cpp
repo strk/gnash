@@ -139,7 +139,7 @@ main(int argc, char *argv[])
     }
 #endif
 
-#if 1
+#if 0
     // This is a manual test to see if we can draw a line on the
     // raw framebuffer to make sure it got initialized correctly.
     int x = 0, y = 0;
