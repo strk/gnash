@@ -80,6 +80,9 @@ struct GnashDevice
     // int queryGNASHConfig() { return queryGNASHConfig(_gnashDisplay); };
     // int queryGNASHConfig(GNASHDisplay display);
 
+    /// Get the stride of the device
+    virtual size_t getStride() = 0;
+ 
     /// Get the width of the device
     virtual size_t getWidth() = 0;
 
