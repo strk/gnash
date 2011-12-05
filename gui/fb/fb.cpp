@@ -222,8 +222,6 @@ FBGui::init(int argc, char *** argv)
         _height = agg->height();
         log_debug("Width:%d, Height:%d", _width, _height);
         _renderer.reset(agg->createRenderHandler());
-        // Renderer_agg_base *rend = reinterpret_cast<Renderer_agg_base *>(_renderer.get());
-        // rend->init(_width, _height);
     }
 #endif
     if ((renderer != "openvg") && (renderer != "agg")) {
@@ -294,7 +292,7 @@ FBGui::init(int argc, char *** argv)
                 break;
         }
     }
-    
+
 #if 0
     // FIXME: this allows to draw in a subsection of the screen. OpenVG
     // should be able to support this, but right now it just gets in
@@ -305,12 +303,23 @@ FBGui::init(int argc, char *** argv)
 
     if ( _ypos < 0 ) _ypos += _var_screeninfo.yres - _height;
     _ypos = clamp<int>(_ypos, 0, _var_screeninfo.yres-_height);
-#endif
 
     log_debug("X:%d, Y:%d", _xpos, _ypos);
+#endif
 
     _validbounds.setTo(0, 0, _width - 1, _height - 1);
     
+    return true;
+}
+
+bool
+FBGui::resize_view(int width, int height)
+{
+    GNASH_REPORT_FUNCTION;
+
+//   _glue.prepDrawingArea(width, height, 0);
+    Gui::resize_view(width, height);
+
     return true;
 }
 
@@ -358,8 +367,8 @@ FBGui::run()
 void
 FBGui::renderBuffer()
 {
-//  GNASH_REPORT_FUNCTION;    
-    
+//    GNASH_REPORT_FUNCTION;    
+
     _glue->render();
 }
 
@@ -370,15 +379,7 @@ FBGui::createWindow(const char* /*title*/, int /*width*/, int /*height*/,
 //  GNASH_REPORT_FUNCTION;
 
     _runResources.setRenderer(_renderer);
-    
-#ifdef RENDERER_AGG
-    if (_glue) {
-        _glue->prepDrawingArea(0);
-    } else {
-        return false;
-    }
-#endif
-    
+
     return true;
 }
 
@@ -440,15 +441,15 @@ FBGui::setInvalidatedRegion(const SWFRect& bounds)
 {
 //  GNASH_REPORT_FUNCTION;
 
-    setInvalidatedRegion(bounds);
+   setInvalidatedRegion(bounds);
 }
 
 void
 FBGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
  {
-//   GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
 
-//   setInvalidatedRegions(ranges);
+     _glue->setInvalidatedRegions(ranges);
 }
 
 char *
