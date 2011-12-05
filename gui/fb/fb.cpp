@@ -1,6 +1,6 @@
 //
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010,
-//   2011 Free Software Foundation, Inc
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free Software
+//   Foundation, Inc
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -177,13 +177,6 @@ FBGui::~FBGui()
         log_debug(_("Closing framebuffer device"));
         close(_fd);
     }
-
-#ifdef ENABLE_DOUBLE_BUFFERING
-    if (buffer) {
-        log_debug(_("Freeing offscreen buffer"));
-        free(buffer);
-    }
-#endif
 }
 
 bool
@@ -370,37 +363,51 @@ FBGui::run()
 void
 FBGui::renderBuffer()
 {
-    // GNASH_REPORT_FUNCTION;
-
-//    if ( _drawbounds.size() == 0 ) return; // nothing to do..
-
-#ifdef ENABLE_DOUBLE_BUFFERING
-
-    // Size of a pixel in bytes
-    // NOTE: +7 to support 15 bpp
-    const unsigned int pixel_size = (var_screeninfo.bits_per_pixel+7)/8;
+    GNASH_REPORT_FUNCTION;
     
-    for (unsigned int bno=0; bno < _drawbounds.size(); bno++) {  
-        geometry::Range2d<int>& bounds = _drawbounds[bno];
-        assert ( ! bounds.isWorld() );  
+#if 0
+    if ( _drawbounds.size() == 0 ) {
+        log_debug("No Drawbounds set!");
+        return; // nothing to do..
+    }
     
-        // Size, in bytes, of a row that has to be copied
-        const unsigned int row_size = (bounds.width()+1) * pixel_size;
-      
-        // copy each row
-        const int minx = bounds.getMinX();
-        const int maxy = bounds.getMaxY();
+    renderer::rawfb::RawFBDevice *rawfb = reinterpret_cast
+        <renderer::rawfb::RawFBDevice *>(_glue.get());
 
-        const int minx1 = minx+_xpos;
-        for (int y=bounds.getMinY(), y1=y+_ypos; y<=maxy; ++y, ++y1) {
-            const unsigned int pix_idx_in = y*m_rowsize + minx*pixel_size;
-            const unsigned int pix_idx_out = y1*m_rowsize + minx1*pixel_size;
-            memcpy(&(fbmem[pix_idx_out]), &buffer[pix_idx_in], row_size);
-        }
-    }  
-       
+    // If we have a valid pointer to offscreen memory, then we're
+    // using software double buffering.
+    if (rawfb->getOffscreenBuffer()) {
+
+        // Size of a pixel in bytes
+        // NOTE: +7 to support 15 bpp
+        const unsigned int pixel_size = (_var_screeninfo.bits_per_pixel+7)/8;
+        
+        for (unsigned int bno=0; bno < _drawbounds.size(); bno++) {  
+            geometry::Range2d<int>& bounds = _drawbounds[bno];
+            assert ( ! bounds.isWorld() );  
+            
+            // Size, in bytes, of a row that has to be copied
+            const unsigned int row_size = (bounds.width()+1) * pixel_size;
+            
+            // copy each row
+            const int minx = bounds.getMinX();
+            const int maxy = bounds.getMaxY();
+            
+            boost::uint8_t *srcmem = rawfb->getOffscreenBuffer();
+            boost::uint8_t *dstmem = rawfb->getFBMemory();
+            size_t rowsize = rawfb->getWidth()
+                * ((rawfb->getDepth() + 7)/8);
+            
+            const int minx1 = minx+_xpos;
+            for (int y=bounds.getMinY(), y1=y+_ypos; y<=maxy; ++y, ++y1) {
+                const unsigned int pix_idx_in = y * rowsize + minx * pixel_size;
+                const unsigned int pix_idx_out = y1 * rowsize + minx1 * pixel_size;
+                memcpy(&(dstmem[pix_idx_out]), &srcmem[pix_idx_in], row_size);
+            }
+        }  
+    }
 #endif
-
+    
     _glue->render();
 }
 
@@ -477,28 +484,19 @@ FBGui::showMouse(bool /*show*/)
 }
 
 void
-FBGui::setInvalidatedRegion(const SWFRect& /* bounds */)
+FBGui::setInvalidatedRegion(const SWFRect& bounds)
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
-#if 0
-     FBAggGlue *fbag = reinterpret_cast
-        <FBAggGlue *>(_glue.get());
-
-     fbag->setInvalidatedRegion(bounds);
-#endif
+    setInvalidatedRegion(bounds);
 }
 
 void
 FBGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
  {
-     // GNASH_REPORT_FUNCTION;
+     GNASH_REPORT_FUNCTION;
 
-#if 0
-     FBAggGlue *fbag = reinterpret_cast<FBAggGlue *>(_glue.get());
-     fbag->setInvalidatedRegions(ranges);
-#endif
-     _glue->setInvalidatedRegions(ranges);     
+//   setInvalidatedRegions(ranges);
 }
 
 char *
@@ -725,7 +723,7 @@ FBGui::checkForData()
         (*it)->check();
         boost::shared_ptr<InputDevice::input_data_t> ie = (*it)->popData();
         if (ie) {
-#if 1
+#if 0
             std::cerr << "Got data: " << ((ie->pressed) ? "true" : "false");
             std::cerr << ", " << ie->key << ", " << ie->modifier;
             std::cerr << ", " << ie->x << ", " << ie->y << std::endl;
