@@ -84,12 +84,12 @@ FBAggGlue::setInvalidatedRegions(const InvalidatedRanges &ranges)
 //    GNASH_REPORT_FUNCTION;
 
     if (!_renderer) {
-        log_error("No renderer set!");
+        log_error("No renderer set in %s!", __FUNCTION__);
         return;
     }
-
-    _renderer->set_invalidated_regions(ranges);
     
+    _renderer->set_invalidated_regions(ranges);
+
     _drawbounds.clear();
 
     for (size_t rno = 0; rno<ranges.size(); rno++) {
@@ -194,10 +194,12 @@ FBAggGlue::createRenderHandler()
         log_debug(_("Double buffering enabled"));
         mem = rawfb->getOffscreenBuffer();
     }
-    
+
     // This attaches the memory from the device to the AGG renderer
     agg_handler->init_buffer((unsigned char *)mem, rawfb->getFBMemSize(),
                              width, height, rawfb->getStride());
+
+    _renderer.reset(agg_handler);
     
     return (Renderer *)agg_handler;
 }    
@@ -216,8 +218,8 @@ FBAggGlue::render()
 //    GNASH_REPORT_FUNCTION;
 
     if (_drawbounds.size() == 0 ) {
-        log_debug("No Drawbounds set!");
-//        return; // nothing to do..
+        log_debug("No Drawbounds set in %s!", __FUNCTION__);
+        return; // nothing to do..
     }
 
     _device->swapBuffers();
