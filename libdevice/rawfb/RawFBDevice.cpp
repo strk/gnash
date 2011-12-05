@@ -228,8 +228,26 @@ RawFBDevice::attachWindow(GnashDevice::native_window_t window)
     
     return true;
 }
-    
 
+bool
+RawFBDevice::swapBuffers()
+{
+    // When using AGG, the pointer to the offscreen buffer has been
+    // passed to AGG, so it renders in the offscreen buffer by default,
+    // leaving it up to us to manually copy the data from the offscreeen
+    // buffer into the real framebuffer memory.
+    if (_fbmem && _offscreen_buffer) {
+        std::copy(_offscreen_buffer.get(),
+                  _offscreen_buffer.get() + _fixinfo.smem_len,
+                  _fbmem);
+        return true;
+    } else {
+        // When single buffered, there is no data to copy, so always true
+        return true;
+    }     
+    return false;
+}
+    
 // Return a string with the error code as text, instead of a numeric value
 const char *
 RawFBDevice::getErrorString(int /* error */)
