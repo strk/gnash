@@ -220,10 +220,11 @@ RawFBDevice::attachWindow(GnashDevice::native_window_t window)
         return false;
     }
     
-#ifdef ENABLE_DOUBLE_BUFFERING
-    // Create an offscreen buffer the same size as the Framebuffer
-    _offscreen_buffer.reset(new boost::uint8_t[_fixinfo.smem_len]);
-#endif
+    if (!isSingleBuffered()) {
+        // Create an offscreen buffer the same size as the Framebuffer
+        _offscreen_buffer.reset(new boost::uint8_t[_fixinfo.smem_len]);
+        memset(_offscreen_buffer.get(), 0, _fixinfo.smem_len);
+    }
     
     return true;
 }

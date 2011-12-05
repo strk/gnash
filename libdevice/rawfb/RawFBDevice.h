@@ -130,11 +130,11 @@ class RawFBDevice : public GnashDevice
     bool setGrayscaleLUT8();
 
     bool isSingleBuffered() {
-        if (_offscreen_buffer) {
-            return true;
-        } else {
-            return false;
-        }
+#ifdef ENABLE_DOUBLE_BUFFERING
+        return true;
+#else
+        return false;
+#endif
     }
 
     bool swapBuffers() {
