@@ -1,5 +1,5 @@
 //
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free Software
 //   Foundation, Inc
 //
 // This program is free software; you can redistribute it and/or modify
@@ -81,6 +81,7 @@ public:
     //
     void setInvalidatedRegion(const SWFRect& bounds);
     void setInvalidatedRegions(const InvalidatedRanges &ranges);
+
     /// \brief
     ///  The Width of the drawing area, in pixels. For framebuffer
     ///  based devices, this is the size of the display screen.
@@ -94,37 +95,20 @@ public:
     void render();
     void render(void* const /* region */) { };
 
-    // these are used only for debugging purpose to access private data
-    size_t getBounds() { return _drawbounds.size(); };
-    size_t getMemSize() { return _fixinfo.smem_len; };
+    size_t getWidth()  { return (_device) ? _device->getWidth() : 0; };
+    size_t getHeight() { return (_device) ? _device->getWidth() : 0; };
+    size_t getDepth()  { return (_device) ? _device->getDepth() : 0; };
     
-    size_t getWidth()  { return (_Device) ? _Device->getWidth() : 0; };
-    size_t getHeight() { return (_Device) ? _Device->getWidth() : 0; };
-    size_t getDepth()  { return (_Device) ? _Device->getDepth() : 0; };
-    boost::scoped_ptr<renderer::GnashDevice> _Device;
 protected:
     /// This is the file descriptor for the framebuffer memory
-    int                      _fd;
-    struct fb_fix_screeninfo _fixinfo;
-    struct fb_var_screeninfo _varinfo;
-    boost::shared_ptr<boost::uint8_t> _fbmem;  // framebuffer memory
+    int                                 _fd;
+    struct fb_fix_screeninfo            _fixinfo;
+    struct fb_var_screeninfo            _varinfo;
     
-#ifdef ENABLE_DOUBLE_BUFFERING
-    boost::shared_ptr<boost::uint8_t> _buffer; // offscreen buffer
-#endif
-    geometry::Range2d<int> _validbounds;
-    std::vector< geometry::Range2d<int> > _drawbounds;
+    boost::scoped_ptr<Renderer>         _renderer;
 
-    boost::scoped_ptr<Renderer> _renderer;
-
-#ifdef BUILD_RAWFB_DEVICE
-    renderer::rawfb::RawFBDevice        _display;
-#else
-# ifdef BUILD_X11_DEVICE
-    renderer::x11::X11Device            _display;
-# endif
-#endif
-    
+    geometry::Range2d<int>              _validbounds;
+    std::vector< geometry::Range2d<int> > _drawbounds;    
 };
 
 } // end of namespace gui
