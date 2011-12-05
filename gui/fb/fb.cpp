@@ -155,7 +155,8 @@ FBGui::FBGui(unsigned long xid, float scale, bool loop, RunResources& r)
       _own_vt(-1),
       _xpos(0),
       _ypos(0),  
-      _timeout(0)
+      _timeout(0),
+      _fullscreen(true)
 {
     // GNASH_REPORT_FUNCTION;
     
@@ -409,17 +410,20 @@ FBGui::setTimeout(unsigned int timeout)
     _timeout = timeout;
 }
 
-// void
-// FBGui::setFullscreen()
-// {
-//     // FB GUI always runs fullscreen; ignore...
-// }
+// The Framebuffer GUI usually always runs fullscreen, which is
+// the default, but occasionally users want to run the SWF movie
+// it's actual size, or in different locations.
+void
+FBGui::setFullscreen()
+{
+    _fullscreen = true;
+}
 
-// void
-// FBGui::unsetFullscreen()
-// {
-//   // FB GUI always runs fullscreen; ignore...
-// }
+void
+FBGui::unsetFullscreen()
+{
+    _fullscreen = false;
+}
 
 void
 FBGui::showMenu(bool /*show*/)

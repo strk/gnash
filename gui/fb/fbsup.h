@@ -159,8 +159,8 @@ public:
 
     // For the framebuffer, these are mostly just stubs.
 
-    // void setFullscreen() {};
-    // void unsetFullscreen() {};
+    void setFullscreen();
+    void unsetFullscreen();
     
     bool createMenu();
     bool setupEvents();
@@ -194,6 +194,7 @@ private:
     int         _xpos;          // X position of the output window
     int         _ypos;          // Y position of the output window
     size_t      _timeout;       // timeout period for the event loop
+    bool        _fullscreen;
 
     boost::shared_ptr<FBGlue>   _glue;
 
