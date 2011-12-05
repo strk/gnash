@@ -184,16 +184,14 @@ private:
     bool enable_terminal();
     
     int         _fd;
-    int         _original_vt; // virtual terminal that was active at startup
-    int         _original_kd; // keyboard mode at startup
-    int         _own_vt;      // virtual terminal we are running in   
+    int         _original_vt;   // virtual terminal that was active at startup
+    int         _original_kd;   // keyboard mode at startup
+    int         _own_vt;        // virtual terminal we are running in   
     
     int         _xpos;          // X position of the output window
     int         _ypos;          // Y position of the output window
     size_t      _timeout;       // timeout period for the event loop
 
-    struct fb_var_screeninfo    _var_screeninfo;
-    struct fb_fix_screeninfo    _fix_screeninfo;
     boost::shared_ptr<FBGlue>   _glue;
 
     /// This is the array of functioning input devices.

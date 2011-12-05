@@ -161,9 +161,6 @@ FBGui::FBGui(unsigned long xid, float scale, bool loop, RunResources& r)
     
     // initializing to zero helps with debugging and prevents weird bugs
 //    memset(mouse_buf, 0, 256);
-    memset(&_var_screeninfo, 0, sizeof(fb_var_screeninfo));
-    memset(&_fix_screeninfo, 0, sizeof(fb_fix_screeninfo));
-
     signal(SIGINT, terminate_signal);
     signal(SIGTERM, terminate_signal);
 }
@@ -279,7 +276,6 @@ FBGui::init(int argc, char *** argv)
         }
     }
 
-#if 0
     // Let -j -k override "window" size
     optind = 0; opterr = 0; char c;
     while ((c = getopt (argc, *argv, "j:k:X:Y:")) != -1) {
@@ -298,7 +294,6 @@ FBGui::init(int argc, char *** argv)
                 break;
         }
     }
-#endif
     
 #if 0
     // FIXME: this allows to draw in a subsection of the screen. OpenVG
@@ -310,9 +305,9 @@ FBGui::init(int argc, char *** argv)
 
     if ( _ypos < 0 ) _ypos += _var_screeninfo.yres - _height;
     _ypos = clamp<int>(_ypos, 0, _var_screeninfo.yres-_height);
+#endif
 
     log_debug("X:%d, Y:%d", _xpos, _ypos);
-#endif
 
     _validbounds.setTo(0, 0, _width - 1, _height - 1);
     
@@ -363,50 +358,7 @@ FBGui::run()
 void
 FBGui::renderBuffer()
 {
-//  GNASH_REPORT_FUNCTION;
-    
-#if 0
-    if ( _drawbounds.size() == 0 ) {
-        log_debug("No Drawbounds set!");
-        return; // nothing to do..
-    }
-    
-    renderer::rawfb::RawFBDevice *rawfb = reinterpret_cast
-        <renderer::rawfb::RawFBDevice *>(_glue.get());
-
-    // If we have a valid pointer to offscreen memory, then we're
-    // using software double buffering.
-    if (rawfb->getOffscreenBuffer()) {
-
-        // Size of a pixel in bytes
-        // NOTE: +7 to support 15 bpp
-        const unsigned int pixel_size = (_var_screeninfo.bits_per_pixel+7)/8;
-        
-        for (unsigned int bno=0; bno < _drawbounds.size(); bno++) {  
-            geometry::Range2d<int>& bounds = _drawbounds[bno];
-            assert ( ! bounds.isWorld() );  
-            
-            // Size, in bytes, of a row that has to be copied
-            const unsigned int row_size = (bounds.width()+1) * pixel_size;
-            
-            // copy each row
-            const int minx = bounds.getMinX();
-            const int maxy = bounds.getMaxY();
-            
-            boost::uint8_t *srcmem = rawfb->getOffscreenBuffer();
-            boost::uint8_t *dstmem = rawfb->getFBMemory();
-            size_t rowsize = rawfb->getWidth()
-                * ((rawfb->getDepth() + 7)/8);
-            
-            const int minx1 = minx+_xpos;
-            for (int y=bounds.getMinY(), y1=y+_ypos; y<=maxy; ++y, ++y1) {
-                const unsigned int pix_idx_in = y * rowsize + minx * pixel_size;
-                const unsigned int pix_idx_out = y1 * rowsize + minx1 * pixel_size;
-                memcpy(&(dstmem[pix_idx_out]), &srcmem[pix_idx_in], row_size);
-            }
-        }  
-    }
-#endif
+//  GNASH_REPORT_FUNCTION;    
     
     _glue->render();
 }
