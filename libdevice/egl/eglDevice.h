@@ -74,11 +74,16 @@ class EGLDevice : public GnashDevice
     /// Return a string with the error code as text, instead of a numeric value
     const char *getErrorString(int error);
 
+    size_t getStride() {
+        return getDepth() * getWidth();
+    };
+
     // Accessors for the settings needed by higher level code.
     // Surface accessors
     size_t getWidth() {
         return getWidth(_eglSurface);
     };
+    
     size_t getHeight() {
         return getHeight(_eglSurface);
     }
