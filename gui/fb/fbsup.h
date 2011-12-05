@@ -121,6 +121,9 @@ public:
     /// Start main rendering loop.
     bool run();
 
+    // Resize the viewing area within the total framebuffer display
+    bool resize_view(int width, int height);
+    
     /// Gives the GUI a *hint* which region of the stage should be redrawn.
     //
     /// There is *no* restriction what the GUI might do with these coordinates. 
