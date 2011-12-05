@@ -1,5 +1,5 @@
 //
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free Software
 //   Foundation, Inc
 //
 // This program is free software; you can redistribute it and/or modify
@@ -42,16 +42,6 @@ namespace gnash {
 
 namespace gui {
 
-// FBGlue::FBGlue()
-// {
-//     GNASH_REPORT_FUNCTION;
-// }
-
-// FBGlue::~FBGlue()
-// {
-//     GNASH_REPORT_FUNCTION;
-// }
-
 //---------------------------------------------
 FBAggGlue::FBAggGlue()
     : _fd(-1)
@@ -91,7 +81,7 @@ FBAggGlue::setInvalidatedRegion(const SWFRect &/*bounds */)
 void
 FBAggGlue::setInvalidatedRegions(const InvalidatedRanges &ranges)
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     if (!_renderer) {
         log_error("No renderer set!");
@@ -112,7 +102,6 @@ FBAggGlue::setInvalidatedRegions(const InvalidatedRanges &ranges)
         
         _drawbounds.push_back(bounds);   
     }
-
 }
 
 bool
@@ -125,6 +114,14 @@ FBAggGlue::init (int argc, char ***argv)
     _device.reset(new renderer::rawfb::RawFBDevice);
     _device->initDevice(argc, *argv);    
 
+    renderer::rawfb::RawFBDevice *rawfb = reinterpret_cast
+        <renderer::rawfb::RawFBDevice *>(_device.get());
+
+    // You must pass in the file descriptor to the opened
+    // framebuffer when creating a window. Under X11, this is
+    // actually the XID of the created window.
+    return _device->attachWindow(rawfb->getHandle());
+
     // Set the renderer for the AGG glue layer
     gnash::Renderer *rend = reinterpret_cast<gnash::Renderer *>
                                                 (createRenderHandler());
@@ -135,23 +132,12 @@ FBAggGlue::init (int argc, char ***argv)
         return false;
     }
 
-#ifdef PIXELFORMAT_LUT8
     // Set grayscale for 8 bit modes
-    renderer::rawfb::RawFBDevice *rawfb = reinterpret_cast
-        <renderer::rawfb::RawFBDevice *>(_device.get());    
     if (_varinfo.bits_per_pixel == 8) {
 	if (!rawfb->setGrayscaleLUT8())
 	    return false;
     }
-#endif
 
-    _display.initDevice(0, 0);
-
-    // You must pass in the file descriptor to the opened
-    // framebuffer when creating a window. Under X11, this is
-    // actually the XID of the created window.
-    return _device->attachWindow(_display.getHandle());
-    
     return true;
 }
 
@@ -169,26 +155,9 @@ FBAggGlue::createRenderHandler()
     
     const int width     = _device->getWidth();
     const int height    = _device->getHeight();
-    const int bpp       = _device->getDepth();
     
-    // TODO: should recalculate!  
-    boost::uint8_t       *mem;
-    Renderer_agg_base   *agg_handler;
-
-    agg_handler = NULL;
-
     _validbounds.setTo(0, 0, width - 1, height - 1);
     
-#ifdef ENABLE_DOUBLE_BUFFERING
-    log_debug(_("Double buffering enabled"));
-    mem = _buffer;
-#else
-    log_debug(_("Double buffering disabled"));
-    mem = _device->getFBMemory();
-#endif
-    
-    agg_handler = NULL;
-  
     // choose apropriate pixel format
 
     renderer::rawfb::RawFBDevice *rawfb = reinterpret_cast
@@ -199,14 +168,15 @@ FBAggGlue::createRenderHandler()
 	      rawfb->getGreenSize());
     log_debug(_("blue channel: %d / %d"), rawfb->getBlueOffset(), 
               rawfb->getBlueSize());
-    log_debug(_("Total bits per pixel: %d"), bpp);
+    log_debug(_("Total bits per pixel: %d"),  rawfb->getDepth());
     
     const char* pixelformat = agg_detect_pixel_format(
         rawfb->getRedOffset(),   rawfb->getRedSize(),
         rawfb->getGreenOffset(), rawfb->getGreenSize(),
         rawfb->getBlueOffset(),  rawfb->getBlueSize(),
-        bpp);
+        rawfb->getDepth());
 
+    Renderer_agg_base *agg_handler = 0;
     if (pixelformat) {
 	agg_handler = create_Renderer_agg(pixelformat);
     } else {
@@ -216,11 +186,19 @@ FBAggGlue::createRenderHandler()
     
     assert(agg_handler != NULL);
 
-    // This attaches the memory from the framebuffer to the AGG
+    // Get the memory buffer to have AGG render into.
+    boost::uint8_t *mem = rawfb->getOffscreenBuffer();
+    if (mem) {
+        log_debug(_("Double buffering enabled"));
+    } else {
+        log_debug(_("Double buffering disabled"));
+        mem = rawfb->getFBMemory();
+    }
+    
+    // This attaches the memory from the device to the AGG
     // renderer.
-    size_t rowsize = width*((bpp+7)/8);
-    agg_handler->init_buffer((unsigned char *)mem, _device->getFBMemSize(),
-                             width, height, rowsize);
+    agg_handler->init_buffer((unsigned char *)mem, rawfb->getFBMemSize(),
+                             width, height, rawfb->getStride());
     
     return (Renderer *)agg_handler;
 }    
@@ -233,48 +211,44 @@ FBAggGlue::prepDrawingArea(FbWidget */* drawing_area */)
     // creating the renderer.
 }
 
-#if 0
-void
-FBGlue::render(void * /* region */)
-{
-    GNASH_REPORT_FUNCTION;
-}
-#endif
-
 void
 FBAggGlue::render()
 {
     GNASH_REPORT_FUNCTION;
 
-    if ( _drawbounds.size() == 0 ) {
-        return; // nothing to do..
+    if (_drawbounds.size() == 0 ) {
+        log_debug("No Drawbounds set!");
+//        return; // nothing to do..
     }
-    
-#ifdef ENABLE_DOUBLE_BUFFERING
+
+#if 0
     // Size of a pixel in bytes
     // NOTE: +7 to support 15 bpp
-    const unsigned int pixel_size = (var_screeninfo.bits_per_pixel+7)/8;
+    const unsigned int pixel_size = (getDepth()+7)/8;
     
     for (unsigned int bno=0; bno < _drawbounds.size(); bno++) {
-	geometry::Range2d<int>& bounds = _drawbounds[bno];
+        geometry::Range2d<int>& bounds = _drawbounds[bno];
         
-	assert ( ! bounds.isWorld() );
-	
-	// Size, in bytes, of a row that has to be copied
-	const unsigned int row_size = (bounds.width()+1) * pixel_size;
-	
-	// copy each row
-	const int minx = bounds.getMinX();
-	const int maxy = bounds.getMaxY();
-	
-	for (int y=bounds.getMinY(); y<=maxy; ++y) {    
-	    const unsigned int pixel_index = y * _rowsize + minx*pixel_size;
-	    memcpy(&(_fbmem[pixel_index]), &buffer[pixel_index], row_size);
-	    
-	}
-    }  
-    
+        assert ( ! bounds.isWorld() );
+        
+        // Size, in bytes, of a row that has to be copied
+        const unsigned int row_size = (bounds.width()+1) * pixel_size;
+        
+        // copy each row
+        const int minx = bounds.getMinX();
+        const int maxy = bounds.getMaxY();
+        
+        boost::uint8_t *srcmem = _device->getOffscreenBuffer();
+        boost::uint8_t *dstmem = _device->getFBMemory();
+        
+        for (int y=bounds.getMinY(); y<=maxy; ++y) {    
+            const unsigned int pixel_index = y * row_size + minx*pixel_size;
+            memcpy(&(dstmem[pixel_index]), &srcmem[pixel_index], row_size);
+        }
+    }    
 #endif
+    
+    _device->swapBuffers();
     
 #ifdef DEBUG_SHOW_FPS
     profile();
