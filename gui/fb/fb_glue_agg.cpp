@@ -46,7 +46,7 @@ namespace gui {
 FBAggGlue::FBAggGlue()
     : _fd(-1)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     memset(&_varinfo, 0, sizeof(fb_var_screeninfo));
     memset(&_fixinfo, 0, sizeof(fb_fix_screeninfo));
 }
@@ -54,12 +54,12 @@ FBAggGlue::FBAggGlue()
 FBAggGlue::FBAggGlue(int fd)
     : _fd(fd)
 {
-    GNASH_REPORT_FUNCTION;    
+//    GNASH_REPORT_FUNCTION;    
 }
 
 FBAggGlue::~FBAggGlue()
 {
-    GNASH_REPORT_FUNCTION;    
+//    GNASH_REPORT_FUNCTION;    
 
     // Close the memory
     if (_fd) {
@@ -81,7 +81,7 @@ FBAggGlue::setInvalidatedRegion(const SWFRect &/*bounds */)
 void
 FBAggGlue::setInvalidatedRegions(const InvalidatedRanges &ranges)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     if (!_renderer) {
         log_error("No renderer set!");
@@ -107,7 +107,7 @@ FBAggGlue::setInvalidatedRegions(const InvalidatedRanges &ranges)
 bool
 FBAggGlue::init (int argc, char ***argv)
 {
-    GNASH_REPORT_FUNCTION;    
+//    GNASH_REPORT_FUNCTION;    
 
     // The device must be initialized before the renderer. AGG only supports
     // The Raw framebuffer, so we use that.
@@ -145,7 +145,7 @@ FBAggGlue::init (int argc, char ***argv)
 Renderer *
 FBAggGlue::createRenderHandler()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     if (!_device) {
         log_error("No Device layer initialized yet!");
@@ -205,7 +205,7 @@ FBAggGlue::createRenderHandler()
 void
 FBAggGlue::prepDrawingArea(FbWidget */* drawing_area */)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     // nothing to do here, the memory was attached when
     // creating the renderer.
 }
@@ -213,40 +213,13 @@ FBAggGlue::prepDrawingArea(FbWidget */* drawing_area */)
 void
 FBAggGlue::render()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     if (_drawbounds.size() == 0 ) {
         log_debug("No Drawbounds set!");
 //        return; // nothing to do..
     }
 
-#if 0
-    // Size of a pixel in bytes
-    // NOTE: +7 to support 15 bpp
-    const unsigned int pixel_size = (getDepth()+7)/8;
-    
-    for (unsigned int bno=0; bno < _drawbounds.size(); bno++) {
-        geometry::Range2d<int>& bounds = _drawbounds[bno];
-        
-        assert ( ! bounds.isWorld() );
-        
-        // Size, in bytes, of a row that has to be copied
-        const unsigned int row_size = (bounds.width()+1) * pixel_size;
-        
-        // copy each row
-        const int minx = bounds.getMinX();
-        const int maxy = bounds.getMaxY();
-        
-        boost::uint8_t *srcmem = _device->getOffscreenBuffer();
-        boost::uint8_t *dstmem = _device->getFBMemory();
-        
-        for (int y=bounds.getMinY(); y<=maxy; ++y) {    
-            const unsigned int pixel_index = y * row_size + minx*pixel_size;
-            memcpy(&(dstmem[pixel_index]), &srcmem[pixel_index], row_size);
-        }
-    }    
-#endif
-    
     _device->swapBuffers();
     
 #ifdef DEBUG_SHOW_FPS
@@ -257,7 +230,7 @@ FBAggGlue::render()
 int
 FBAggGlue::width()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     if (_device) {
         return _device->getWidth();
@@ -268,7 +241,7 @@ FBAggGlue::width()
 int
 FBAggGlue::height()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     if (_device) {
         return _device->getHeight();
