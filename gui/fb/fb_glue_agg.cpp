@@ -118,8 +118,7 @@ FBAggGlue::init (int argc, char ***argv)
         <renderer::rawfb::RawFBDevice *>(_device.get());
 
     // You must pass in the file descriptor to the opened
-    // framebuffer when creating a window. Under X11, this is
-    // actually the XID of the created window.
+    // framebuffer when creating a window.
     return _device->attachWindow(rawfb->getHandle());
 
     // Set the renderer for the AGG glue layer
@@ -187,16 +186,16 @@ FBAggGlue::createRenderHandler()
     assert(agg_handler != NULL);
 
     // Get the memory buffer to have AGG render into.
-    boost::uint8_t *mem = rawfb->getOffscreenBuffer();
-    if (mem) {
-        log_debug(_("Double buffering enabled"));
-    } else {
+    boost::uint8_t *mem = 0;
+    if (rawfb->isSingleBuffered()) {
         log_debug(_("Double buffering disabled"));
         mem = rawfb->getFBMemory();
+    } else {
+        log_debug(_("Double buffering enabled"));
+        mem = rawfb->getOffscreenBuffer();
     }
     
-    // This attaches the memory from the device to the AGG
-    // renderer.
+    // This attaches the memory from the device to the AGG renderer
     agg_handler->init_buffer((unsigned char *)mem, rawfb->getFBMemSize(),
                              width, height, rawfb->getStride());
     
