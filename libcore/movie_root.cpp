@@ -57,6 +57,7 @@
 #include "Transform.h"
 #include "StreamProvider.h"
 #include "SystemClock.h"
+#include "as_function.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -1689,10 +1690,12 @@ void
 movie_root::executeTimers()
 {
 #ifdef GNASH_DEBUG_TIMERS_EXPIRATION
-        log_debug("Checking %d timers for expiry", _intervalTimers.size());
+    log_debug("Checking %d timers for expiry", _intervalTimers.size());
 #endif
 
-    unsigned long now = _vm.getTime();
+    if (_intervalTimers.empty()) return;
+
+    const unsigned long now = _vm.getTime();
 
     typedef std::multimap<unsigned int, boost::shared_ptr<Timer> >
         ExpiredTimers;
@@ -1782,7 +1785,8 @@ movie_root::markReachableResources() const
 #endif
     }
 #endif
-    
+
+    foreachSecond(_registeredClasses.begin(), _registeredClasses.end(), &as_function::setReachable);
 }
 
 InteractiveObject*

@@ -77,6 +77,9 @@ static int module_initialized = FALSE;
 static PRLock* playerLock = NULL;
 static int instances = 0;
 
+#ifdef NPAPI_CONST
+const
+#endif
 char* NPP_GetMIMEDescription(void);
 static void playerThread(void *arg);
 static LRESULT CALLBACK PluginWinProc(HWND, UINT, WPARAM, LPARAM);
@@ -119,6 +122,9 @@ NS_PluginShutdown(void)
 }
 
 /// \brief Return the MIME Type description for this plugin.
+#ifdef NPAPI_CONST
+const
+#endif
 char*
 NPP_GetMIMEDescription(void)
 {

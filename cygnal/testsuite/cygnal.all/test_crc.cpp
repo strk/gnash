@@ -37,15 +37,14 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "log.h"
+#include "crc.h"
 
 #ifdef HAVE_DEJAGNU_H
 #include "dejagnu.h"
 #else
 #include "check.h"
 #endif
-
-#include "log.h"
-#include "crc.h"
 
 using namespace std;
 using namespace gnash;

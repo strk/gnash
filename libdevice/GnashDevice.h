@@ -24,9 +24,8 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/scoped_array.hpp>
-
-#include "Geometry.h"
+#include <boost/cstdint.hpp>
+#include "log.h"
 
 /// @note This file is the base class for all low level rendering and display
 /// devices. These devices must be probed and initialized first, before any
@@ -39,11 +38,6 @@ namespace renderer {
 
 struct GnashDevice
 {
-    typedef std::vector<const Path*> PathRefs;
-    typedef std::vector<Path> PathVec;
-    typedef std::vector<geometry::Range2d<int> > ClipBounds;
-    typedef std::vector<const Path*> PathPtrVec;
-    
     /// Handle multiple window types. The derived classes will cast this to
     /// the proper data type.
     typedef long native_window_t;

@@ -33,6 +33,7 @@ gtk_gnash_LDADD = \
 	$(top_builddir)/librender/libgnashrender.la \
 	$(GNASH_LIBS) \
 	$(GTK_LIBS) \
+	$(BZ2_LIBS) \
 	$(NULL)
 
 #gtk_gnash_DEPENDENCIES = .configline

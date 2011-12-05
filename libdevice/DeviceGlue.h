@@ -24,25 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/scoped_array.hpp>
 #include <boost/shared_array.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include "GnashDevice.h"
 
-#ifdef BUILD_EGL_DEVICE
-#include "egl/eglDevice.h"
-#endif
-#ifdef BUILD_RAWFB_DEVICE
-#include "rawfb/RawFBDevice.h"
-#endif
-#ifdef BUILD_DIRECTFB_DEVICE
-#include "directfb/DirectFBDevice.h"
-#endif
-#ifdef BUILD_X11_DEVICE
-#include "x11/X11Device.h"
-#endif
 
 /// @note This file is a simple base class for any GUI glue layer code
 /// That needs to use libdevice devices. Currently this is used by both
@@ -108,46 +94,8 @@ public:
     }
     
     /// Set the display device for later use. After this is called,
-    /// the display device is active.
-    void setDevice(renderer::GnashDevice::dtype_t dtype) {
-        switch (dtype) {
-#ifdef BUILD_EGL_DEVICE
-          case renderer::GnashDevice::EGL:
-          {
-              _device.reset(new renderer::EGLDevice(0, 0));
-              break;
-          }
-#endif
-#ifdef BUILD_RAWFB_DEVICE
-          case renderer::GnashDevice::RAWFB:
-          {
-              _device.reset(new renderer::rawfb::RawFBDevice(0, 0));
-              break;
-          }
-#endif
-#ifdef BUILD_DIRECTFB_DEVICE
-          case renderer::GnashDevice::DIRECTFB:
-          {
-              _device.reset(new renderer::directfb::DirectFBDevice(0, 0));
-              break;
-          }
-#endif
-#ifdef BUILD_X11_DEVICE
-          case renderer::GnashDevice::X11:
-          {
-              _device.reset(new renderer::x11::X11Device(0, 0));
-              break;
-          }
-#endif
-          default:
-              log_error("unsupported Display Device!");
-        }
-        // // EGL doesn't care about command line argument, so pass NULL
-        // _device->initDevice(0, 0);
-        // renderer::EGLDevice *egl = (renderer::EGLDevice*)_device.get();
-        // egl->printEGLConfig();
-        // egl->printEGLSurface();
-    }
+    /// the display device is active
+    void setDevice(renderer::GnashDevice::dtype_t dtype);
 
     /// Initialze the device
     ///

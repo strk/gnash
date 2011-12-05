@@ -26,14 +26,14 @@ libcygnal_la_SOURCES = \
 	$(top_builddir)/cygnal/crc.cpp
 
 libcygnal_la_LDFLAGS = \
-	$(top_builddir)/libamf/libgnashamf.la
+	$(top_builddir)/cygnal/libamf/libgnashamf.la
 
 AM_CPPFLAGS = # -Wall
 
 AM_LDFLAGS = \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/libamf/libgnashamf.la \
-	$(top_builddir)/libnet/libgnashnet.la \
+	$(top_builddir)/cygnal/libamf/libgnashamf.la \
+	$(top_builddir)//cygnal/libnet/libgnashnet.la \
 	$(top_builddir)/cygnal/libcygnal.la \
 	$(BOOST_LIBS) \
 	$(NULL)
@@ -41,10 +41,11 @@ AM_LDFLAGS = \
 localedir = $(datadir)/locale
 
 INCLUDES = \
-        -I$(top_srcdir)/libamf \
-        -I$(top_srcdir)/libnet \
+        -I$(top_srcdir)/cygnal/libamf \
+        -I$(top_srcdir)/cygnal/libnet \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/cygnal \
+        -I$(top_srcdir)/testsuite \
         -I$(top_srcdir)/libcore \
         -DLOCALEDIR=\"$(localedir)\" \
 		$(BOOST_CFLAGS) \

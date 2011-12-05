@@ -326,23 +326,25 @@ SharedObject_as::flush(int space) const
 
     const std::string& filespec = getFilespec();
 
-    if (!mkdirRecursive(filespec)) {
-        log_error("Couldn't create dir for flushing SharedObject %s", filespec);
-        return false;
-    }
-
+    if (!rcfile.getSOLReadOnly()) {
+        if (!mkdirRecursive(filespec)) {
+            log_error("Couldn't create dir for flushing SharedObject %s", filespec);
+            return false;
+        }
+        
 #ifdef USE_SOL_READONLY
-    log_debug(_("SharedObject %s not flushed (compiled as read-only mode)"),
-            filespec);
-    return false;
+        log_debug(_("SharedObject %s not flushed (compiled as read-only mode)"),
+                  filespec);
+        return false;
 #endif
+    }
 
     if (rcfile.getSOLReadOnly()) {
         log_security("Attempting to write object %s when it's SOL "
-                "Read Only is set! Refusing...", filespec);
+                     "Read Only is set! Refusing...", filespec);
         return false;
     }
-    
+
     // Open file
     std::ofstream ofs(filespec.c_str(), std::ios::binary);
     if (!ofs) {

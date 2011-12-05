@@ -182,7 +182,7 @@ FBGui::~FBGui()
 bool
 FBGui::init(int argc, char *** argv)
 {
-    GNASH_REPORT_FUNCTION;
+//  GNASH_REPORT_FUNCTION;
 
     // the current renderer as set on the command line or gnashrc file
     std::string renderer = _runResources.getRenderBackend();
@@ -322,7 +322,7 @@ FBGui::init(int argc, char *** argv)
 bool
 FBGui::run()
 {
-    GNASH_REPORT_FUNCTION;
+//  GNASH_REPORT_FUNCTION;
 
 #ifdef USE_TSLIB
     int ts_loop_count;
@@ -363,7 +363,7 @@ FBGui::run()
 void
 FBGui::renderBuffer()
 {
-    GNASH_REPORT_FUNCTION;
+//  GNASH_REPORT_FUNCTION;
     
 #if 0
     if ( _drawbounds.size() == 0 ) {
@@ -415,7 +415,7 @@ bool
 FBGui::createWindow(const char* /*title*/, int /*width*/, int /*height*/,
                      int /*xPosition*/, int /*yPosition*/)
 {
-    GNASH_REPORT_FUNCTION;
+//  GNASH_REPORT_FUNCTION;
 
     _runResources.setRenderer(_renderer);
     
@@ -486,7 +486,7 @@ FBGui::showMouse(bool /*show*/)
 void
 FBGui::setInvalidatedRegion(const SWFRect& bounds)
 {
-    GNASH_REPORT_FUNCTION;
+//  GNASH_REPORT_FUNCTION;
 
     setInvalidatedRegion(bounds);
 }
@@ -494,7 +494,7 @@ FBGui::setInvalidatedRegion(const SWFRect& bounds)
 void
 FBGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
  {
-     GNASH_REPORT_FUNCTION;
+//   GNASH_REPORT_FUNCTION;
 
 //   setInvalidatedRegions(ranges);
 }

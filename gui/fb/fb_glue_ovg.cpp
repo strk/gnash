@@ -162,8 +162,28 @@ FBOvgGlue::createRenderHandler()
 
 /// Not implemented, Fixme
 void
-FBOvgGlue::setInvalidatedRegions(const InvalidatedRanges& /* ranges */)
+FBOvgGlue::setInvalidatedRegions(const InvalidatedRanges& ranges)
 {
+    if (!_renderer) {
+        log_error("No renderer set!");
+        return;
+    }
+
+    _renderer->set_invalidated_regions(ranges);
+    
+    _drawbounds.clear();
+
+    for (size_t rno = 0; rno<ranges.size(); rno++) {
+        geometry::Range2d<int> bounds = Intersection(
+            _renderer->world_to_pixel(ranges.getRange(rno)),
+            _validbounds);
+        // it may happen that a particular range is out of the screen, which 
+        // will lead to bounds==null. 
+        if (bounds.isNull()) continue; 
+        
+        _drawbounds.push_back(bounds);   
+    }
+    
     // GNASH_REPORT_FUNCTION;
     // if (_renderer) {
     //     _renderer->setInvalidatedRegions(ranges);

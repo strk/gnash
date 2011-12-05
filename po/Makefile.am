@@ -19,8 +19,7 @@ AUTOMAKE_OPTIONS = -Wno-portability
 
 POFILES = AUTO
 
-
-translations = cs de es fi fr it ja 
+translations = cs da de en_GB es fi fr it ja 
 
 # This is GNU make specific, so if you are building Gnash on a BSD
 # machine, you probably want to install GNU make in additional to
@@ -33,26 +32,16 @@ CLEANFILES = \
 
 dirs =  libbase \
 	librender \
-	libamf \
 	libmedia \
-	libmedia/ffmpeg \
-	libmedia/gst \
 	libcore \
-	libcore/vm \
-	libcore/swf \
-	libcore/parser \
-	libcore/asobj \
+	libdevice \
+	libsound \
 	utilities \
 	plugin \
+	desktop \
+	cygnal \
 	gui \
-	extensions \
-	extensions/dbus \
-	extensions/dejagnu \
-	extensions/fileio \
-	extensions/lirc \
-	extensions/gtk2 \
-	extensions/metome \
-	extensions/mysql
+	extensions
 	
 EXTRA_DIST = $(pofiles) gnash.pot 
 
@@ -68,7 +57,7 @@ gnash.pot:
 	  echo "$$i" >> po/POTFILES;\
 	done; \
 	$(XGETTEXT) --language=C++ --files-from=po/POTFILES \
-	  -o $(srcdir)/gnash.pot \
+	  -o po/gnash.pot \
 	  --default-domain=gnash --force \
 	  --flag=_:1:pass-c-format --keyword=_ --keyword=_q \
 	  --copyright-holder='Free Software Foundation, Inc.';  \
@@ -111,4 +100,3 @@ uninstall-hook:
 	for i in $(translations); do \
 	  rm -f "$(DESTDIR)$(datadir)/locale/$$i/LC_MESSAGES/gnash.mo"; \
 	done
-

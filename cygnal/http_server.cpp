@@ -191,8 +191,8 @@ HTTPServer::processGetRequest(Handler *hand, int fd, cygnal::Buffer *buf)
     if (buf == 0) {
      //	log_debug("Que empty, net connection dropped for fd #%d", getFileFd());
 	log_debug("Que empty, net connection dropped for fd #%d", fd);
-	cygnal::Buffer buf;
-	return buf;
+//	cygnal::Buffer buf;
+	return _buf;
     }
     
     clearHeader();

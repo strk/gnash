@@ -518,25 +518,24 @@ readLossless(SWFStream& in, TagType tag)
         }
 
         case 4:
-            // 16 bits / pixel
+            // 15 bits / pixel
 
             for (size_t j = 0; j < height; ++j) {
 
                 boost::uint8_t* inRow = buffer.get() + j * pitch;
                 boost::uint8_t* outRow = scanline(*image, j);
                 for (size_t i = 0; i < width; ++i) {
-                    const boost::uint16_t pixel = inRow[i * 2] |
-                        (inRow[i * 2 + 1] << 8);
+                    const boost::uint16_t pix = ( inRow[i * 2]     << 8 )
+                                              | ( inRow[i * 2 + 1]      ) ;
+                    const double g = 255.0/31.0; // gamma correction
 
-                    // How is the data packed??? Whoever wrote this was
-                    // just guessing here that it's 565!
-                    outRow[i * channels + 0] = (pixel >> 8) & 0xF8;    // red
-                    outRow[i * channels + 1] = (pixel >> 3) & 0xFC;    // green
-                    outRow[i * channels + 2] = (pixel << 3) & 0xF8;    // blue
- 
-                    // This was saved to the first byte before, but that
-                    // can hardly be correct.
-                    // Real examples of this format are rare to non-existent.
+                    // 555 packing
+                    // For a testcase, see:
+                    // https://savannah.gnu.org/bugs/index.php?34625
+                    outRow[i * channels + 0] = ( (pix >> 10) & 0x1F ) * g; // R
+                    outRow[i * channels + 1] = ( (pix >>  5) & 0x1F ) * g; // G
+                    outRow[i * channels + 2] = ( (pix      ) & 0x1F ) * g; // B
+
                     if (alpha) {
                         outRow[i * channels + 3] = 255;
                     }

@@ -68,7 +68,7 @@ LogFile& dbglogfile = LogFile::getDefaultInstance();
 RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
 int
-main(int argc, char *argv[])
+main(int argc, char **argv)
 {
     const Arg_parser::Option opts[] =
         {

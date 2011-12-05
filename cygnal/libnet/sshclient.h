@@ -56,12 +56,12 @@ public:
     ~SSHClient();
 
     // Read bytes from the already opened SSH connection
-    int sshRead(amf::Buffer &buf);
+    int sshRead(cygnal::Buffer &buf);
     int sshRead(boost::uint8_t *buf, size_t length);
     int sshRead(std::string &buf);
 
     // Write bytes to the already opened SSH connection
-    int sshWrite(amf::Buffer &buf);
+    int sshWrite(cygnal::Buffer &buf);
     int sshWrite(const boost::uint8_t *buf, size_t length);
     int sshWrite(std::string &buf);
 
@@ -104,13 +104,13 @@ public:
     // Accessors
     ssh_channel getChannel() { return _channel; };
     ssh_session getSession() { return _session; };
-    boost::shared_ptr<amf::Buffer> &getBuffer()  { return _buffer; };
+    boost::shared_ptr<cygnal::Buffer> &getBuffer()  { return _buffer; };
 
     // Dump internal data to the screen for debugging
     void dump();
  protected:
-    int readChannel (ssh_channel channel, amf::Buffer &buf);
-    int writeChannel(ssh_channel channel, amf::Buffer &buf);
+    int readChannel (ssh_channel channel, cygnal::Buffer &buf);
+    int writeChannel(ssh_channel channel, cygnal::Buffer &buf);
 
     std::string		_hostname;
     std::string		_user;
@@ -126,7 +126,7 @@ public:
     ssh_session _session;
     ssh_channel	_channel;
 #endif
-    boost::shared_ptr<amf::Buffer> _buffer;
+    boost::shared_ptr<cygnal::Buffer> _buffer;
 };
     
 } // end of gnash namespace
@@ -136,5 +136,5 @@ public:
 
 // local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

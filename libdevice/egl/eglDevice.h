@@ -38,6 +38,8 @@
 # error "This file needs EGL, which is part of OpenGL-ES"
 #endif
 
+#include "Point2d.h"
+
 namespace gnash {
 
 namespace renderer {

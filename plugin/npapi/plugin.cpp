@@ -107,10 +107,6 @@
 #include <fstream>
 #include <sstream>
 
-#ifndef PATH_MAX
-#define PATH_MAX 1024
-#endif
-
 // Macro to prevent repeated logging calls for the same
 // event
 #define LOG_ONCE(x) { \
@@ -129,6 +125,9 @@ NPBool plugInitialized = FALSE;
 }
 
 /// \brief Return the MIME Type description for this plugin.
+#ifdef NPAPI_CONST
+const
+#endif
 char*
 NPP_GetMIMEDescription(void)
 {
@@ -1108,6 +1107,7 @@ nsPluginInstance::setupCookies(const std::string& pageurl)
     ss << "/tmp/gnash-cookies." << getpid();
 
     cookiefile.open(ss.str().c_str(), std::ios::out | std::ios::trunc);
+    chmod (ss.str().c_str(), 0600);
 
     // Firefox provides cookies in the following format:
     //

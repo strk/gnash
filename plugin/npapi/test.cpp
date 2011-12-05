@@ -408,6 +408,9 @@ NS_PluginShutdown()
 {
 }
 
+#ifdef NPAPI_CONST
+const
+#endif
 char*
 NPP_GetMIMEDescription(void)
 {

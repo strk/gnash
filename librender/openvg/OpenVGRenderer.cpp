@@ -375,7 +375,7 @@ Renderer_ovg::pixel_to_world(int x, int y) const
     SWFMatrix mat = stage_matrix;
     mat.invert().transform(p);
     return p;
-};
+}
 
 /// Setup the renderer to display by setting the Matrix for scaling,
 /// shearing, and transformations.
