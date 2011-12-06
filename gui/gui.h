@@ -428,6 +428,10 @@ public:
     /// Height of a window pixel, in stage pseudopixel units.
     float getYScale() const { return _yscale; };
 
+    /// Height of a window pixel, in stage pseudopixel units.
+    float getFPS() const { return (_movieDef) ? _movieDef->get_frame_rate() : 0;
+    };
+
 protected:
 
     /// Default constructor. Initialises members to safe defaults.
