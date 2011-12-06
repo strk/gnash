@@ -25,6 +25,7 @@
 #include <boost/scoped_array.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/find.hpp>
+#define BOOST_IOSTREAMS_USE_DEPRECATED
 #include <boost/iostreams/device/file_descriptor.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <cassert>
@@ -157,9 +158,29 @@ boost::iostreams::file_descriptor_sink getfdsink(char mkstemplate[]);
 boost::iostreams::file_descriptor_sink
 getfdsink(char mksTemplate[])
 {
-  int suffix = std::string(mksTemplate).size() - std::string(mksTemplate).find("XXXXXX") - 6;
-  int fd = mkstemps (mksTemplate, suffix);
+  int fd, suffix = std::string(mksTemplate).size() - std::string(mksTemplate).find("XXXXXX") - 6;
+#if (__GLIBC__ >= 2 && __GLIBC_MINOR__ >= 11)
+  fd = mkstemps (mksTemplate, suffix);
+#else
+  if (suffix > 0) {
+    char *mksTNoSuff = const_cast<char*>(std::string(mksTemplate).substr(0, std::string(mksTemplate).size() - suffix).c_str());
+    fd = mkstemp (mksTNoSuff);
+    const char *mksTSuffix = std::string(mksTemplate).substr(std::string(mksTemplate).size() - suffix, suffix).c_str();
+    std::stringstream mksTFull;
+    mksTFull << mksTNoSuff << mksTSuffix;
+    if (rename (mksTNoSuff, mksTFull.str().c_str()) != 0) {
+      gnash::log_error("Failed to rename %s", mksTNoSuff);
+    }
+    strcpy (mksTemplate, mksTFull.str().c_str());
+  } else {
+    fd = mkstemp (mksTemplate);
+  }
+#endif
+#if BOOST_VERSION < 104400
+  boost::iostreams::file_descriptor_sink fdsink(fd, true);
+#else
   boost::iostreams::file_descriptor_sink fdsink(fd, boost::iostreams::close_handle);
+#endif
   return fdsink;
 }
 
@@ -980,10 +1001,12 @@ create_standalone_launcher(const std::string& page_url, const std::string& swf_u
 
     char debugname[] = "/tmp/gnash-debug-XXXXXX.sh";
     boost::iostreams::file_descriptor_sink fdsink = getfdsink(debugname);
+#if BOOST_VERSION >= 104400
     if (fdsink.handle() == -1) {
         gnash::log_error("Failed to create sink: %s", debugname);
         return;
     }
+#endif
     boost::iostreams::stream<boost::iostreams::file_descriptor_sink>
         saLauncher (fdsink);
 
@@ -1119,10 +1142,12 @@ nsPluginInstance::setupCookies(const std::string& pageurl)
     gnash::log_debug("The Cookie for %s is %s", url, ncookie);
     char cookiename[] = "/tmp/gnash-cookies.XXXXXX";
     boost::iostreams::file_descriptor_sink fdsink = getfdsink(cookiename);
+#if BOOST_VERSION >= 104400
     if (fdsink.handle() == -1) {
         gnash::log_error("Failed to create sink: %s", cookiename);
         return;
     }
+#endif
     boost::iostreams::stream<boost::iostreams::file_descriptor_sink>
         cookiefile (fdsink);
 
