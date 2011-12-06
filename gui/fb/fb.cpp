@@ -344,7 +344,7 @@ FBGui::run()
     // FIXME: this value is arbitrary, and will make any movie with
     // less than 12 frames eat up more of the cpu. It should probably
     // be a much lower value, like 2.
-    if (fps >= 12) {
+    if (fps > 12) {
         delay = static_cast<int>(100000/fps);
     } else {
         // 10ms per heart beat

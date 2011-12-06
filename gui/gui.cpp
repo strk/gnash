@@ -966,21 +966,23 @@ Gui::advanceMovie(bool doDisplay)
     }
 #endif
     
-	if (doDisplay && visible()) display(m);
-
-	if (!loops()) {
+    if (doDisplay && visible()) {
+        display(m);
+    }
+    
+    if (!loops()) {
         // can be 0 on malformed SWF
-		const size_t curframe = m->getRootMovie().get_current_frame(); 
-		const MovieClip& si = m->getRootMovie();
-		if (curframe + 1 >= si.get_frame_count()) {
-			quit(); 
-		}
-	}
-
+        const size_t curframe = m->getRootMovie().get_current_frame(); 
+        const MovieClip& si = m->getRootMovie();
+        if (curframe + 1 >= si.get_frame_count()) {
+            quit(); 
+        }
+    }
+    
     if (_screenShotter.get() && _renderer.get()) {
         _screenShotter->screenShot(*_renderer, _advances, doDisplay ? 0 : &dis);
     }
-
+    
     // Only increment advances and check for exit condition when we've
     // really changed frame.
     if (advanced) {

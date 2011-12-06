@@ -61,7 +61,7 @@ video_class_init(as_object& global, const ObjectURI& uri)
     as_object* proto = createObject(gl);
     as_object* cl = gl.createClass(emptyFunction, proto);
     attachVideoInterface(*proto);
-
+    //
     // Register _global.Video
     global.init_member(uri, cl, as_object::DefaultFlags);
 }
@@ -184,4 +184,3 @@ video_clear(const fn_call& fn)
 // mode: C++
 // indent-tabs-mode: nil
 // End:
-

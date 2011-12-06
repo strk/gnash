@@ -533,6 +533,9 @@ RcInitFile::parseFile(const std::string& filespec)
                  extractSetting(_localhostOnly, "localhost", variable,
                            value)
             || 
+                 extractSetting(_showMouse, "showMouse", variable,
+                           value)
+            || 
                  extractSetting(_localdomainOnly, "localdomain", variable,
                            value)
             ||
@@ -750,6 +753,7 @@ RcInitFile::updateFile(const std::string& filespec)
     << endl <<
     cmd << "splashScreen " << _splashScreen << endl <<
     cmd << "localHost " << _localhostOnly << endl <<
+    cmd << "showMouse " << _showMouse << endl <<
     cmd << "localDomain " << _localdomainOnly << endl <<
     cmd << "insecureSSL " << _insecureSSL << endl <<
     cmd << "debugger " << _debugger << endl <<
