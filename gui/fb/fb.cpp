@@ -334,14 +334,28 @@ FBGui::run()
 #endif
 
     VirtualClock& timer = getClock();
+    int delay = 0;
     
     // let the GUI recompute the x/y scale factors to best fit the whole screen
     resize_view(_validbounds.width(), _validbounds.height());
 
+    float fps = getFPS();
+    
+    // FIXME: this value is arbitrary, and will make any movie with
+    // less than 12 frames eat up more of the cpu. It should probably
+    // be a much lower value, like 2.
+    if (fps >= 12) {
+        delay = static_cast<int>(100000/fps);
+    } else {
+        // 10ms per heart beat
+        delay = 10000;
+    }
+    log_debug("Movie Frame Rate is %d, adjusting delay to %dms", fps, delay);
+    
     // This loops endlessly at the frame rate
     while (!terminate_request) {  
         // wait the "heartbeat" inteval
-        gnashSleep(_interval * 1000);    
+        gnashSleep(_interval * delay);
         // TODO: Do we need to check the real time slept or is it OK when we woke
         // up early because of some Linux signal sent to our process (and thus
         // "advance" faster than the "heartbeat" interval)? - Udo
