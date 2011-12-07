@@ -247,7 +247,7 @@ EventDevice::check()
     }
 
     /// @note
-    /// A typical touchscreen event is actuall a series of events, one for each
+    /// A typical touchscreen event is actually a series of events, one for each
     /// piece of data. The sequence is terminated by the EV_SYN message. An
     /// example from evtests looks like this:
     /// Event: time 697585.633672, type 3 (Absolute), code 0 (X), value 127
@@ -261,7 +261,7 @@ EventDevice::check()
     /// in the queue by the time the main event loop comes around to process the
     /// events.
     struct input_event *ev = reinterpret_cast<struct input_event *>(buf.get());
-    // log_debug("Type is: %hd, Code is: %hd, Val us: %d", ev->type, ev->code, ev->value);
+    log_debug("Type is: %hd, Code is: %hd, Val us: %d", ev->type, ev->code, ev->value);
     switch (ev->type) {
       case EV_SYN:
       {
@@ -300,19 +300,19 @@ EventDevice::check()
           // value == 0  key has been released
           // value == 1  key has been pressed
           // value == 2  repeated key reporting (while holding the key)
-          if (ev->code == KEY_LEFTSHIFT) {
+          if (ev->code == KEY_LEFTSHIFT) {              // 42
               keyb_lshift = ev->value;
-          } else if (ev->code == KEY_RIGHTSHIFT) {
+          } else if (ev->code == KEY_RIGHTSHIFT) {      // 54
               keyb_rshift = ev->value;
-          } else if (ev->code == KEY_LEFTCTRL) {
+          } else if (ev->code == KEY_LEFTCTRL) {        // 29
               keyb_lctrl = ev->value;
-          } else if (ev->code == KEY_RIGHTCTRL) {
+          } else if (ev->code == KEY_RIGHTCTRL) {       // 97
               keyb_rctrl = ev->value;
-          } else if (ev->code == KEY_LEFTALT) {
+          } else if (ev->code == KEY_LEFTALT) {         // 56
               keyb_lalt = ev->value;
-          } else if (ev->code == KEY_RIGHTALT) {
+          } else if (ev->code == KEY_RIGHTALT) {        // 100
               keyb_ralt = ev->value;
-          } else if (ev->code == BTN_TOUCH) {
+          } else if (ev->code == BTN_TOUCH) {           // 0x14a
               // keyb_ralt = ev->value;
           } else {
               _input_data.key = scancode_to_gnash_key(ev->code,
@@ -413,8 +413,39 @@ EventDevice::check()
           }
           break;
       }
+      // EV_MSC is also used for the keyboard
       case EV_MSC:
-          log_unimpl("Misc event from Input Event Device");
+          switch (ev->code) {
+            case MSC_SERIAL:
+            case MSC_PULSELED:
+            case MSC_GESTURE:
+            case MSC_RAW:
+                log_unimpl("Misc event from Input Event Device");
+                break;
+            case MSC_SCAN:
+                
+                _input_data.key = scancode_to_gnash_key(ev->value,
+                                                        keyb_lshift || keyb_rshift);
+                _input_data.modifier = gnash::key::GNASH_MOD_NONE;
+                
+                if (keyb_lshift || keyb_rshift) {
+                    _input_data.modifier = _input_data.modifier | gnash::key::GNASH_MOD_SHIFT;
+                }
+                
+                if (keyb_lctrl || keyb_rctrl) {
+                    _input_data.modifier = _input_data.modifier | gnash::key::GNASH_MOD_CONTROL;
+                }
+                
+                if (keyb_lalt || keyb_ralt) {
+                    _input_data.modifier = _input_data.modifier | gnash::key::GNASH_MOD_ALT;
+                }
+                activity = true;
+                break;
+            case MSC_MAX:
+            case MSC_CNT:
+            default:
+                log_unimpl("Misc event from Input Event Device");
+          }
           break;
       case EV_LED:
           log_unimpl("LED event from Input Event Device");
