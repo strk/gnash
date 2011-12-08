@@ -30,7 +30,19 @@ namespace gnash {
 
 InputDevice::InputDevice()
     : _type(InputDevice::UNKNOWN),
-      _fd(-1)
+      _fd(-1),
+      _screen_width(0),
+      _screen_height(0)
+{
+    // GNASH_REPORT_FUNCTION;
+    memset(&_input_data, 0, sizeof(InputDevice::input_data_t));
+}
+
+InputDevice::InputDevice(int x, int y)
+    : _type(InputDevice::UNKNOWN),
+      _fd(-1),
+      _screen_width(x),
+      _screen_height(y)
 {
     // GNASH_REPORT_FUNCTION;
     memset(&_input_data, 0, sizeof(InputDevice::input_data_t));
@@ -143,6 +155,7 @@ InputDevice::dump() const
     const char *debug[] = {
         "UNKNOWN",
         "Keyboard",
+        "User mode Mouse",
         "Mouse",
         "Tablet",
         "Touchscreen",
@@ -167,6 +180,7 @@ InputDevice::dump() const
 boost::shared_array<int>
 InputDevice::convertAbsCoords(int x, int y, int width, int height)
 {
+    // GNASH_REPORT_FUNCTION;
     boost::shared_array<int> coords(new int[2]);
 
     coords[0] = (x/width) * x;

@@ -30,6 +30,7 @@
 #include <vector>
 #include <queue>
 #include <linux/input.h>
+#include <linux/uinput.h>
 
 #include "GnashKey.h"
 
@@ -55,6 +56,7 @@ public:
         int modifier;
         int x;
         int y;
+        int z;
         int button;
         int position;
         int pressure;
@@ -73,6 +75,7 @@ public:
     typedef enum {
         UNKNOWN,
         KEYBOARD,
+        UMOUSE,
         MOUSE,
         TABLET,
         TOUCHSCREEN,
@@ -83,6 +86,8 @@ public:
         INFRARED
     } devicetype_e;
     InputDevice();
+    // Instantiate with the screen size
+    InputDevice(int x, int y);
     virtual ~InputDevice();
 
     virtual const char *id() = 0;
@@ -98,6 +103,7 @@ public:
     static std::vector<boost::shared_ptr<InputDevice> > scanForDevices();
     
     InputDevice::devicetype_e getType() { return _type; };
+    void setType(InputDevice::devicetype_e x) { _type = x; };
 
     // Read data into the Device input buffer.
     boost::shared_array<boost::uint8_t> readData(size_t size);
@@ -115,6 +121,11 @@ public:
     static boost::shared_array<int> convertAbsCoords(int x, int y,
                                                      int width, int height);
 
+    void setScreenSize(int x, int y)
+    {
+        _screen_width = x;
+        _screen_height = y;
+    }
     void dump() const;
 
 protected:
@@ -127,12 +138,15 @@ protected:
     // These hold the data queue
     boost::scoped_array<boost::uint8_t> _buffer;
     std::queue<boost::shared_ptr<input_data_t> > _data;
+    int                 _screen_width;
+    int                 _screen_height;    
 };
 
 class MouseDevice : public InputDevice
 {
 public:
     MouseDevice();
+    ~MouseDevice();
     const char *id() { return "Mouse"; };
     bool init();
     bool init(const std::string &filespec, size_t size);
@@ -146,8 +160,16 @@ public:
     /// \brief. Mouse movements are relative to the last position, so
     /// this method is used to convert from relative position to
     /// the absolute position Gnash needs.
-    static boost::shared_array<int> convertCoordinates(int x, int y,
-                                                       int width, int height);
+    static boost::shared_array<int> convertCoordinates(int x, int y, int width,
+        int height);
+
+    // Move the mouse cursor to a specified location
+    bool moveToUMouse(int x, int y);
+    bool initUMouse();
+    
+private:
+    int _previous_x;
+    int _previous_y;
 };
 
 class TouchDevice : public InputDevice

@@ -26,7 +26,7 @@
 ///
 /// Since there can be multiple input devices in /dev/input/ you have to
 /// specify which device to use using the 
-///  POINTING_DEVICE environment variable for the mouse and
+//  POINTING_DEVICE environment variable for the mouse and
 ///  KEYBOARD_DEVICE environment variable for the keyboard
 
 /// \page fb_calibration FB GUI Touchscreen Calibration
@@ -244,13 +244,16 @@ FBGui::init(int argc, char *** argv)
     
     std::vector<boost::shared_ptr<InputDevice> >::iterator it;
     for (it=possibles.begin(); it!=possibles.end(); ++it) {
-        //(*it)->dump();
+        // Set the screen size, which is used for calculating absolute
+        // mouse locations from relative ones.
+        (*it)->setScreenSize(_width, _height);
+        (*it)->dump();
         if ((*it)->getType() == InputDevice::MOUSE) {
             log_debug("WARNING: Mouse support disabled as it conflicts with the input event support.");
             // For now we only want keyboard input events, as the mouse
             // interface default of /dev/input/mice supports hotpluging devices,
             // unlike the regular events.
-            // _inputs.push_back(*it);
+            _inputs.push_back(*it);
         }
         if ((*it)->getType() == InputDevice::KEYBOARD) {
             _inputs.push_back(*it);
@@ -307,7 +310,7 @@ FBGui::init(int argc, char *** argv)
 
     log_debug("X:%d, Y:%d", _xpos, _ypos);
 #endif
-
+    
     _validbounds.setTo(0, 0, _width - 1, _height - 1);
     
     return true;
@@ -320,7 +323,7 @@ FBGui::resize_view(int width, int height)
 
 //   _glue.prepDrawingArea(width, height, 0);
     Gui::resize_view(width, height);
-
+ 
     return true;
 }
 
@@ -350,12 +353,14 @@ FBGui::run()
         // 10ms per heart beat
         delay = 10000;
     }
-    log_debug("Movie Frame Rate is %d, adjusting delay to %dms", fps, delay);
+    log_debug("Movie Frame Rate is %d, adjusting delay to %dms", fps,
+              _interval * delay);
     
     // This loops endlessly at the frame rate
     while (!terminate_request) {  
-        // wait the "heartbeat" inteval
-        gnashSleep(_interval * delay);
+        // wait the "heartbeat" inteval. _interval is in milliseconds,
+        // but gnashSleep() wants nanoseconds, so adjust by 1000.
+        gnashSleep(_interval * 1000);
         // TODO: Do we need to check the real time slept or is it OK when we woke
         // up early because of some Linux signal sent to our process (and thus
         // "advance" faster than the "heartbeat" interval)? - Udo
@@ -693,8 +698,9 @@ FBGui::checkForData()
     for (it=_inputs.begin(); it!=_inputs.end(); ++it) {
         (*it)->check();
         boost::shared_ptr<InputDevice::input_data_t> ie = (*it)->popData();
-        if (ie) {
-#if 0
+        if (ie) {            
+            // notifyMouseMove(ie->x, ie->y);
+#if 1
             std::cerr << "Got data: " << ((ie->pressed) ? "true" : "false");
             std::cerr << ", " << ie->key << ", " << ie->modifier;
             std::cerr << ", " << ie->x << ", " << ie->y << std::endl;
@@ -716,7 +722,7 @@ FBGui::checkForData()
             // See if a mouse button was clicked
             if (ie->pressed) {
                 notifyMouseClick(true);
-#if 0
+#if 1
                 double x = 0.655 * ie->x;
                 double y = 0.46875 * ie->y;
                 log_debug("Mouse clicked at: %g:%g", x, y);

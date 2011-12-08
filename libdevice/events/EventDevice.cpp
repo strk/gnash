@@ -231,7 +231,7 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
 bool
 EventDevice::check()
 {
-//    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     
     bool activity = false;
   
@@ -260,8 +260,32 @@ EventDevice::check()
     /// queue of events. As the GUI polls for events, there may be multiple events
     /// in the queue by the time the main event loop comes around to process the
     /// events.
+#if 1
+    // FIXME: debug crap
+    const char *debug[] = {
+        "EV_SYN",
+        "EV_KEY",
+        "EV_REL",
+        "EV_ABS",
+        "EV_MSC",
+        "EV_SW",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "EV_LED",
+        "EV_SND",
+        "EV_REP",
+        "EV_FF",
+        "EV_PWR",
+        "EV_FF_STATUS"
+    };    
     struct input_event *ev = reinterpret_cast<struct input_event *>(buf.get());
-    log_debug("Type is: %hd, Code is: %hd, Val us: %d", ev->type, ev->code, ev->value);
+    log_debug("Type is: %s(%hd), Code is: %hd, Val us: %d", debug[ev->type],
+              ev->type, ev->type, ev->code, ev->value);
+#endif
+    
     switch (ev->type) {
       case EV_SYN:
       {
@@ -337,7 +361,43 @@ EventDevice::check()
       } // case EV_KEY
       // Mouse
       case EV_REL:
-          log_unimpl("Relative move event from Input Event Device");
+          switch (ev->code) {
+            case REL_X:
+                log_debug("REL_X: %d", ev->value);
+                _input_data.x = ev->value;
+                break;
+            case REL_Y:
+                log_debug("REL_Y: %d", ev->value);
+                _input_data.y = ev->value;
+                break;
+            case REL_Z:
+                log_debug("REL_Z: %d", ev->value);
+                _input_data.z = ev->value;
+                break;
+            case REL_RX:
+                log_debug("REL_RX: %d", ev->value);
+                _input_data.rx = ev->value;
+                break;
+            case REL_RY:
+                log_debug("REL_RY: %d", ev->value);
+                _input_data.ry = ev->value;
+                break;
+            case REL_RZ:
+                log_debug("REL_RZ: %d", ev->value);
+                _input_data.rz = ev->value;
+                break;
+            case REL_HWHEEL:
+                log_debug("REL_HWHEEL: %d", ev->value);
+            case REL_DIAL:
+                log_debug("REL_DIAL: %d", ev->value);
+            case REL_WHEEL:
+                log_debug("REL_WHEEL: %d", ev->value);
+            case REL_MISC:
+                log_debug("REL_MISC: %d", ev->value);
+            default:
+                log_unimpl("Relative move event %d from Input Event Device",
+                           ev->value);
+          }
           // Touchscreen or joystick
           break;
           // Absolute coordinates come as multiple events, one for
