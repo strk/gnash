@@ -289,8 +289,8 @@ RTMPServer::handShakeResponse(int fd, cygnal::Buffer &handshake)
 {
     GNASH_REPORT_FUNCTION;
 
-    boost::uint8_t byte;
-    byte = RTMP_VERSION;
+    // boost::uint8_t byte;
+    // byte = RTMP_VERSION;
 
     // the response handshake is twice the size of the one we just
     // received for a total of 3072 bytes, plus room for the version.
@@ -1064,9 +1064,13 @@ RTMPServer::encodeAudio(boost::uint8_t *data, size_t size)
 }
 
 boost::shared_ptr<cygnal::Buffer>
-RTMPServer::encodeVideo(boost::uint8_t *data, size_t size)
+RTMPServer::encodeVideo(boost::uint8_t * /* data */, size_t /* size */)
 {
     GNASH_REPORT_FUNCTION;
+
+    boost::shared_ptr<cygnal::Buffer> buf;
+    
+    return buf;
 }
 
 #if 0
@@ -1351,7 +1355,7 @@ rtmp_handler(Network::thread_params_t *args)
     url = docroot;
     bool done = false;
     boost::shared_ptr<RTMPMsg> body;
-    static bool initialize = true;
+    // static bool initialize = true;
 //     bool sendfile = false;
     log_network(_("Starting RTMP Handler for fd #%d, cgi-bin is \"%s\""),
 		args->netfd, args->filespec);
@@ -1694,13 +1698,13 @@ rtmp_handler(Network::thread_params_t *args)
 		    log_error("Couldn't send Ping to client!");
 		}
 #endif
-		initialize = true;
+		// initialize = true;
 		return true;
 	    }
 	} else {
 	    // log_error("Communication error with client using fd #%d", args->netfd);
 	    rtmp->closeNet(args->netfd);
-	    initialize = true;
+	    // initialize = true;
 	    return false;
 	}
     } while (!done);
