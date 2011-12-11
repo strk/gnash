@@ -163,7 +163,7 @@ main(int argc, char *argv[])
     }
 
     EchoTest net;
-    int netfd;
+    int netfd = 0;
     
     if (infile.empty()) {
         if (netdebug) {
