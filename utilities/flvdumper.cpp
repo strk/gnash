@@ -235,7 +235,9 @@ main(int argc, char *argv[])
 		     log_error("Couldn't read the entire tag");
 		 }
 		 tag  = flv.decodeTagHeader(buf);
-		 flv.dump();
+		 if (dump) {
+		     flv.dump();
+		 }
 		 //total -= sizeof(Flv::previous_size_t);
 		 size_t bodysize = flv.convert24(tag->bodysize);
 		 if (bodysize == 0) {
