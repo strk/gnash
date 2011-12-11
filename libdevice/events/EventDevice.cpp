@@ -60,25 +60,29 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
     _filespec = filespec;
     
     // Try to open mouse device, be error tolerant (FD is kept open all the time)
-    _fd = open(filespec.c_str(), O_RDONLY);
+    _fd = open(filespec.c_str(), O_RDONLY | O_NONBLOCK);
   
     if (_fd < 0) {
-        log_debug(_("Could not open %s: %s"), filespec.c_str(), strerror(errno));    
+        log_debug(_("Could not open %s: %s"), filespec, strerror(errno));    
         return false;
     }
-  
+
+#if 0
     if (fcntl(_fd, F_SETFL, fcntl(_fd, F_GETFL) | O_NONBLOCK) < 0) {
         log_error(_("Could not set non-blocking mode for pointing device: %s"),
                   strerror(errno));
-        close(_fd);
-        _fd = -1;
-        return false; 
+        if (_fd) {
+            close(_fd);
+            _fd = -1;
+            return false;
+        }
     }
-
+#endif
+    
     // Get the version number of the input event subsystem
     int version;
     if (ioctl(_fd, EVIOCGVERSION, &version)) {
-        perror("evdev ioctl");
+        log_error("ioctl (EVIOCGVERSION)");
     }
 #if 0
     log_debug("evdev driver version is %d.%d.%d",
@@ -87,12 +91,12 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
 #endif
     
     if(ioctl(_fd, EVIOCGID, &_device_info)) {
-        perror("evdev ioctl");
+        log_error("ioctl (EVIOCGID): %s", strerror(errno));
     }
     
     char name[256]= "Unknown";
     if(ioctl(_fd, EVIOCGNAME(sizeof(name)), name) < 0) {
-        perror("evdev ioctl");
+        log_error("ioctl (EVIOCGNAME): %s", strerror(errno));
     }
     log_debug("The device on %s says its name is %s", filespec, name);
     // /dev/mxc_ts is the Touchscreen driver used by the Freescale Babbage board
@@ -115,7 +119,10 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
           // device things truly are.          
           log_debug("is on a Universal Serial Bus");
           // ID 0eef:0001 D-WAV Scientific Co., Ltd eGalax TouchScreen
-          if ((_device_info.product == 0x0001) && (_device_info.vendor == 0x0eef)) {
+          if ((_device_info.product == 0) && (_device_info.vendor == 0)) {
+              _type = InputDevice::UMOUSE;
+              // ID 046d:c001 Logitech, Inc. N48/M-BB48 [FirstMouse Plus]
+          } else if ((_device_info.product == 0x0001) && (_device_info.vendor == 0x0eef)) {
               _type = InputDevice::TOUCHMOUSE;
               // ID 046d:c001 Logitech, Inc. N48/M-BB48 [FirstMouse Plus]
           } else if ((_device_info.product == 0xc001) && (_device_info.vendor == 0x046d)) {
@@ -202,29 +209,36 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
     }
     
     log_debug("Event enabled for %s on fd #%d", _filespec, _fd);
-    
-    // Set the scale of the display so the absolute postions
-    // we get from the touchscreen driver are correct.
-    struct input_absinfo abs;
-    abs.minimum = 0;
-    abs.fuzz = 4;
-    abs.flat = 8;
-#ifdef ABSINFO_RESOLUTION
-    abs.resolution = 0;
-#endif
-    abs.maximum = 800;
-    if (ioctl(_fd, EVIOCSABS(ABS_X), &abs) < 0) {
-        perror("ioctl(EVIOCSABS(ABS_X))");
-    }
-    abs.maximum = 480;
-    if (ioctl(_fd, EVIOCSABS(ABS_Y), &abs) < 0) {
-        perror("ioctl(EVIOCSABS(ABS_Y))");
-    }
+
 #if 0
-    if (ioctl(_fd, EVIOCGRAB, (void *)1) < 0) {
-        perror("ioctl(EVIOCGRAB(1))");
-    }
+    // FIXME: this has probably been replaced by the uinput device code
+    if (_type == InputDevice::MOUSE) {
+        // Get the existing absolute info
+        struct input_absinfo abs;
+        memset(&abs, 0, sizeof(struct input_absinfo));
+        if (ioctl (_fd, EVIOCGABS(ABS_X), &abs) < 0) {
+            log_error("ioctl (EVIOCGABS(ABS_X)): %s", strerror(errno));
+        }
+#ifdef ABSINFO_RESOLUTION
+        abs.resolution = 0;
 #endif
+        abs.minimum = 0;
+        abs.maximum = _screen_width;
+        // Set the scale of the display so the absolute postions
+        // we get from the touchscreen driver are correct.
+        if (ioctl (_fd, EVIOCSABS(ABS_X), &abs) < 0) {
+            log_error("ioctl (EVIOCSABS(ABS_X)): %s", strerror(errno));
+        }
+        if (ioctl(_fd, EVIOCGABS(ABS_Y), &abs) < 0) {
+            log_error("ioctl (EVIOCGABS(ABS_Y)): %s", strerror(errno));
+        }
+        abs.maximum = _screen_height;
+        if (ioctl (_fd, EVIOCSABS(ABS_Y), &abs) < 0) {
+            log_error("ioctl (EVIOCSABS(ABS_Y)): %s", strerror(errno));
+        }
+    }  // end of _type
+#endif
+    
     return true;
 }
 
@@ -653,7 +667,7 @@ EventDevice::scancode_to_gnash_key(int code, bool shift)
 std::vector<boost::shared_ptr<InputDevice> > 
 EventDevice::scanForDevices()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     struct stat st;
 
@@ -689,13 +703,13 @@ EventDevice::scanForDevices()
 
         char name[256] = "Unknown";
         if(ioctl(fd, EVIOCGNAME(sizeof(name)), name) < 0) {
-            perror("evdev ioctl");
+            log_error("ioctl (EVIOCGNAME): %s", strerror(errno));
         }
         log_debug("The device on %s says its name is %s", filespec, name);
 
         struct input_id device_info;
         if(ioctl(fd, EVIOCGID, &device_info)) {
-            perror("evdev ioctl");
+            log_error("ioctl (EVIOCGID): %s", strerror(errno));
         }
         log_debug("vendor %04hx product %04hx version %04hx",
                   device_info.vendor, device_info.product,
@@ -703,10 +717,19 @@ EventDevice::scanForDevices()
         close(fd);
         boost::shared_ptr<InputDevice> dev;
         dev = boost::shared_ptr<InputDevice>(new EventDevice());
-        if (dev->init(filespec, DEFAULT_BUFFER_SIZE)) {
-            devices.push_back(dev);
+        // The Uinput device has no product, vendor, or version data.
+        if ((device_info.vendor + device_info.product + device_info.version) > 0) {
+            if (dev->init(filespec, DEFAULT_BUFFER_SIZE)) {
+                // dev->dump();
+                // We don't care about power buttons, we mostly just want
+                // keyboards, mice, and touchscreens. Power buttons don't have
+                // a vendor ID.
+                if (device_info.vendor != 0) {
+                    log_debug("Enabling USB device: %s", name);
+                    devices.push_back(dev);
+                }
+            }
         }
-//        dev->dump();
         
         // setup the next device filespec to try
         total++;

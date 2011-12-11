@@ -153,7 +153,7 @@ InputDevice::dump() const
 {
     // Debug strings to make output more readable
     const char *debug[] = {
-        "UNKNOWN",
+        "Sleep Button",
         "Keyboard",
         "User mode Mouse",
         "Mouse",
@@ -172,19 +172,17 @@ InputDevice::dump() const
 //    std::cerr << "\tX is: " << _x << ", Y is: " << _y << std::endl;
 }
 
-// The Babbage touchscreen gives is absolute coordinates, but they don't
+// The Babbage touchscreen gives is relative coordinates, but they don't
 // match the actual screen resolution. So we convert the coordinates
 // to a new absolute location.
-// For example, if the LCD is 480 x 800, the tablet thinks this is 1010 x 960.
-// This should really use a calibration function, but as we know the numbers...
 boost::shared_array<int>
 InputDevice::convertAbsCoords(int x, int y, int width, int height)
 {
     // GNASH_REPORT_FUNCTION;
     boost::shared_array<int> coords(new int[2]);
 
-    coords[0] = (x/width) * x;
-    coords[1] = (y/height) * y;
+    coords[0] = int((x/256) * width);
+    coords[1] = int((y/256) * height);
     
     return coords;
 }
@@ -209,6 +207,8 @@ InputDevice::scanForDevices()
     for (it=id.begin(); it!=id.end(); ++it) {
         devices.push_back(*it);
     }
+#else
+    log_debug("WARNING: PS/2 Mouse support disabled as it conflicts with the input event support.");
 #endif
 #if defined(HAVE_TSLIB_H) && defined(USE_TSLIB)
     id = TouchDevice::scanForDevices();

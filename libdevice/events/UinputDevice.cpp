@@ -33,22 +33,23 @@
 namespace gnash {
 
 UinputDevice::UinputDevice()
+    : _fd(-1)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 }
 
 UinputDevice::~UinputDevice()
 {
-    GNASH_REPORT_FUNCTION;
-    if (_type == InputDevice::UMOUSE && _fd) {
-        if (ioctl(_fd, UI_DEV_DESTROY) < 0) {
+    // GNASH_REPORT_FUNCTION;
+    if (_fd) {
+        if (ioctl(_fd, UI_DEV_DESTROY, 0) < 0) {
             log_error("ioctl(UI_DEV_DESTROY)");
         }
     }
 }
 
-boost::shared_ptr<UinputDevice>
-UinputDevice::scanForDevices()
+bool
+UinputDevice::scanForDevice()
 {
     // GNASH_REPORT_FUNCTION;
 
@@ -61,7 +62,8 @@ UinputDevice::scanForDevices()
     };    
 
     // The Uinput device is found in one of these two locations.
-    const char mice[] = {
+    const char *mice[] = {
+        "/dev/input/event4",
         "/dev/uinput",
         "/dev/input/uinput",
         0
@@ -69,51 +71,51 @@ UinputDevice::scanForDevices()
 
     int i = 0;
     while (mice[i]) {
-        int fd = 0;
         if (stat(mice[i], &st) == 0) {
-            // Then see if we can open it
-            if ((fd = open(mice[i].filespec, O_RDWR|O_NONBLOCK)) < 0) {
+            // Then see if we can open it, this is a write only device
+            if ((_fd = open(mice[i], O_WRONLY)) < 0) {
                 log_error("You don't have the proper permissions to open %s",
                           mice[i]);
                 i++;
                 continue;
             }
-            if (fd) {
-                close(fd);
-            }
-            log_debug("Found a Uinput device for mouse input using %s", mice[i]);
+            log_debug("Found a User mode input device at %s", mice[i]);
+            return true;
             
-        }     // stat()        
+        }     // stat()      
         i++;
     }         // while()
     
-    return devices;
+    return false;
 }
 
 bool
 UinputDevice::init()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
-    _type = UMOUSE;
-
+    if (_fd < 0) {
+        log_error("User Mode Input device not initialized yet!");
+        return false;
+    }
+    
     if (ioctl(_fd, UI_SET_EVBIT, EV_KEY) < 0) {
         log_error("ioctl(UI_SET_EVBIT, EV_KEY)");
-        return false;
+        // return false;
     }
 
 #if 0 // USE_RELATIVE_POINTER
     if (ioctl(_fd, UI_SET_EVBIT, EV_REL) < 0) {
         log_error("ioctl(UI_SET_EVBIT, EV_REL)");
-        return false;
+        // return false;
     }
     if (ioctl(_fd, UI_SET_RELBIT, REL_X) < 0) {
         log_error("ioctl(UI_SET_RELBIT, REL_X)");
-        return false;
+        // return false;
     }
     if (ioctl(_fd, UI_SET_RELBIT, REL_Y) < 0) {
         log_error("ioctl( UI_SET_RELBIT, REL_Y)");
-        return false;
+        // return false;
     }
 #else
 #if 1 // USE_ABSOLUTE_POINTER
@@ -121,7 +123,7 @@ UinputDevice::init()
 
     memset(&uidev, 0, sizeof(uidev));
     snprintf(uidev.name, UINPUT_MAX_NAME_SIZE, "uinput");
-    // uidev.id.bustype = BUS_USB;
+    uidev.id.bustype = BUS_USB;
     // uidev.id.vendor  = 0x1;
     // uidev.id.product = 0x1;
     // uidev.id.version = 1;
@@ -138,97 +140,49 @@ UinputDevice::init()
 
     if (::write(_fd, (char *)&uidev, sizeof(uidev)) < 0) {
         log_error("write uidev");
-        return false;
+        // return false;
     }
 #endif
     if (ioctl(_fd, UI_SET_EVBIT, EV_ABS) < 0) {
-        log_error("ioctl(UI_SET_EVBIT, EV_ABS)");
-        return false;
+        log_error("ioctl(UI_SET_EVBIT, EV_ABS): %s", strerror(errno));
+        // return false;
     }
     if (ioctl(_fd, UI_SET_ABSBIT,ABS_X) < 0) {
-        log_error("ioctl(UI_SET_ABSBIT,ABS_X)");
-        return false;
+        log_error("ioctl(UI_SET_ABSBIT,ABS_X): %s", strerror(errno));
+        // return false;
     }
     if (ioctl(_fd, UI_SET_ABSBIT, ABS_Y) < 0) {
-        log_error("ioctl(UI_SET_ABSBIT, ABS_Y)");
-        return false;
+        log_error("ioctl(UI_SET_ABSBIT, ABS_Y): %s", strerror(errno));
+        // return false;
     }
 #endif
     
     if (ioctl(_fd, UI_SET_KEYBIT, BTN_LEFT) < 0) {
-        log_error("ioctl(UI_SET_KEYBIT, BTN_LEFT))");
-        return false;
+        log_error("ioctl(UI_SET_KEYBIT, BTN_LEFT)): %s", strerror(errno));
+        // return false;
     }
     if (ioctl(_fd, UI_SET_KEYBIT, BTN_RIGHT) < 0) {
-        log_error("ioctl(UI_SET_KEYBIT, BTN_RIGHT)");
-        return false;
+        log_error("ioctl(UI_SET_KEYBIT, BTN_RIGHT): %s", strerror(errno));
+        // return false;
     }
     if (ioctl(_fd, UI_SET_EVBIT, ABS_PRESSURE) < 0) {
-        log_error("ioctl(UI_SET_EVBIT, ABS_PRESSURE)");
-        return false;
+        log_error("ioctl(UI_SET_EVBIT, ABS_PRESSURE): %s", strerror(errno));
+        // return false;
     }
     // if (ioctl(_fd, UI_SET_EVBIT, ABS_TOUCH) < 0) {
     //     log_error("ioctl(UI_SET_EVBIT, ABS_TOUCH)");
     //     return false;
     // }
     if (ioctl(_fd, UI_SET_KEYBIT, BTN_MOUSE) < 0) {
-        log_error("ioctl(UI_SET_KEYBIT, BTN_MOUSE)");
-        return false;
+        log_error("ioctl(UI_SET_KEYBIT, BTN_MOUSE): %s", strerror(errno));
+        // return false;
     }
-
-#if 0
-    for (int i=0; i<256; i++) {
-        if (ioctl(_fd, UI_SET_KEYBIT, i) < 0) {
-            log_error("ioctl(UI_SET_KEYBIT, i)");
-            return false;
-        }
-    }
-#endif
 
     if (ioctl(_fd, UI_DEV_CREATE, 0) < 0) {
         perror("UI_DEV_CREATE");
         log_error("ioctl(UI_DEV_CREATED) failed!");
-        return false;
+        // return false;
     }
-
-#if 1
-    ///////////////////
-    struct input_event ev;
-    memset(&ev, 0, sizeof(ev));
-    gettimeofday(&ev.time, NULL);
-    ev.type = EV_ABS;
-    ev.code = ABS_X;
-    ev.value = 10;
-    if (::write(_fd, &ev, sizeof(struct input_event)) < 0) {
-        log_error("write ABS_X");
-        return false;
-    }
-    
-    ev.type = EV_ABS;
-    ev.code = ABS_Y;
-    ev.value = 10;
-    if (::write(_fd, &ev, sizeof(struct input_event)) < 0) {
-        log_error("write ABS_Y");
-        return false;
-    }
-    
-    memset(&ev, 0, sizeof(ev));
-    gettimeofday(&ev.time, NULL);
-    ev.type = EV_REL;
-    ev.code = REL_X;
-    ev.value = 10;
-    if (::write(_fd, &ev, sizeof(struct input_event)) < 0) {
-        log_error("write ABS_X");
-        return false;
-    }
-    
-    ev.type = EV_SYN;
-    ev.code = SYN_REPORT;
-    if (::write(_fd, &ev, sizeof(struct input_event)) < 0) {
-        log_error("write SYN");
-        return false;
-    }
-#endif
     
     return true;
 }
@@ -237,7 +191,7 @@ UinputDevice::init()
 bool
 UinputDevice::moveTo(int x, int y)
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     struct input_event ev;
     
@@ -272,32 +226,6 @@ UinputDevice::moveTo(int x, int y)
         log_error("write SYN");
         return false;
     }
-
-    // ////////////////////////////
-    // gettimeofday(&ev.time, NULL);
-    // ev.type = EV_KEY;
-    // ev.code = BTN_LEFT;
-    // ev.value = 0;
-    // if (::write(_fd, &ev, sizeof(struct input_event)) < 0) {
-    //     log_error("write SYN");
-    //     return false;
-    // }
-    // gettimeofday(&ev.time, NULL);
-    // ev.type = EV_KEY;
-    // ev.code = BTN_LEFT;
-    // ev.value = 1;
-    // if (::write(_fd, &ev, sizeof(struct input_event)) < 0) {
-    //     log_error("write SYN");
-    //     return false;
-    // }
-    
-    // gettimeofday(&ev.time, NULL);
-    // ev.type = EV_SYN;
-    // ev.code = SYN_REPORT;
-    // if (::write(_fd, &ev, sizeof(struct input_event)) < 0) {
-    //     log_error("write SYN");
-    //     return false;
-    // }
 
     return true;
 }   

@@ -45,6 +45,26 @@ namespace gnash {
 // default size.
 static const int DEFAULT_BUFFER_SIZE = 256;
 
+
+// The Uinput device is write only, and is used to control the mouse movements.
+// It's not really an input device, but uses the same subsystem.
+class UinputDevice
+{
+public:
+    UinputDevice();
+    ~UinputDevice();
+    const char *id() { return "Uinput"; };
+    bool init();
+
+    bool scanForDevice();
+    
+    // Move the mouse cursor to a specified location
+    bool moveTo(int x, int y);
+private:
+    int _fd;
+    std::string _filespec;
+};
+
 // This is an InputDevice class to cover the various touchscreens, Mice, or
 // keyboards supported.
 class InputDevice
@@ -83,7 +103,9 @@ public:
         POWERBUTTON,
         SLEEPBUTTON,
         SERIALUSB,
-        INFRARED
+        INFRARED,
+        UINPUT,
+        TSLIB
     } devicetype_e;
     InputDevice();
     // Instantiate with the screen size
@@ -157,16 +179,6 @@ public:
     /// Sends a command to the mouse and waits for the response
     bool command(unsigned char cmd, unsigned char *buf, int count);
 
-    /// \brief. Mouse movements are relative to the last position, so
-    /// this method is used to convert from relative position to
-    /// the absolute position Gnash needs.
-    static boost::shared_array<int> convertCoordinates(int x, int y, int width,
-        int height);
-
-    // Move the mouse cursor to a specified location
-    bool moveToUMouse(int x, int y);
-    bool initUMouse();
-    
 private:
     int _previous_x;
     int _previous_y;

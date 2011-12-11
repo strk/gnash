@@ -85,6 +85,7 @@ main(int argc, char *argv[])
         cerr << "Found " << id->id() << " device" << endl;
         if (id->init()) {
             runtest.pass("InputDevice::init()");
+            id->setScreenSize(1024, 768);        
         } else {
             runtest.fail("InputDevice::init()()");
         }
