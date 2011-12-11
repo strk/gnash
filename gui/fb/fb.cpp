@@ -257,16 +257,15 @@ FBGui::init(int argc, char *** argv)
         // mouse locations from relative ones.
         (*it)->setScreenSize(_width, _height);
         // (*it)->dump();
+#if defined(USE_MOUSE_PS2) || defined(USE_MOUSE_ETT)
         if ((*it)->getType() == InputDevice::MOUSE) {
-#if 0
-            log_debug("WARNING: Mouse support disabled as it conflicts with the input event support.");
+            log_debug("WARNING: Mouse support may conflict with the input event support.");
             // For now we only want keyboard input events, as the mouse
             // interface default of /dev/input/mice supports hotpluging devices,
             // unlike the regular events.
-#else
             _inputs.push_back(*it);
-#endif
         }
+#endif
         if ((*it)->getType() == InputDevice::KEYBOARD) {
             _inputs.push_back(*it);
         }
@@ -286,6 +285,7 @@ FBGui::init(int argc, char *** argv)
 #endif
         }
         if ((*it)->getType() == InputDevice::POWERBUTTON) {
+            log_debug("Enabling Power Button support");
             _inputs.push_back(*it);
         }
     }
@@ -719,19 +719,18 @@ FBGui::checkForData()
             // cerr << "X = " << coords[0] << endl;
             // cerr << "Y = " << coords[1] << endl;
 #endif
-#if 0
             // Range check and convert the position from relative to
             // absolute
             boost::shared_array<int> coords =
-                MouseDevice::convertCoordinates(ie->x, ie->y,
-                                                getStage()->getStageWidth(),
-                                                getStage()->getStageHeight());
+                InputDevice::convertAbsCoords(ie->x, ie->y,
+                                              getStage()->getStageWidth(),
+                                              getStage()->getStageHeight());
             // The mouse was moved
-            _uinput.moveTo(ie.x, ie.y);
+            _uinput.moveTo(coords[0], coords[1]);
             if (coords) {
                 notifyMouseMove(coords[0], coords[1]);
             }
-#endif
+            
             // See if a mouse button was clicked
             if (ie->pressed) {
                 notifyMouseClick(true);
