@@ -38,8 +38,16 @@ static const char *INPUT_DEVICE = "/dev/input/event0";
 static LogFile& dbglogfile = LogFile::getDefaultInstance();
 
 EventDevice::EventDevice()
+    :  keyb_lshift(false),
+       keyb_rshift(false),
+       keyb_lctrl(false),
+       keyb_rctrl(false),
+       keyb_lalt(false),
+       keyb_ralt(false)
 {
     // GNASH_REPORT_FUNCTION;
+
+    memset(&_device_info, 0, sizeof(struct input_id));
 }
 
 bool
