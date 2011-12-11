@@ -230,7 +230,16 @@ FBGui::init(int argc, char *** argv)
     }
     
     disable_terminal();
-    
+
+    // Look for the User Mode Input (Uinput) device, which is used to
+    // control the movement and coordinates of the mouse cursor.
+    if (_uinput.scanForDevice()) {
+        _uinput.init();
+        _uinput.moveTo(0, 0);
+    } else {
+        log_error("Found no accessible User mode input event device");
+    }
+        
     // Initialize all the input devices
 
     // Look for Mice that use the PS/2 mouse protocol
@@ -247,13 +256,16 @@ FBGui::init(int argc, char *** argv)
         // Set the screen size, which is used for calculating absolute
         // mouse locations from relative ones.
         (*it)->setScreenSize(_width, _height);
-        (*it)->dump();
+        // (*it)->dump();
         if ((*it)->getType() == InputDevice::MOUSE) {
+#if 0
             log_debug("WARNING: Mouse support disabled as it conflicts with the input event support.");
             // For now we only want keyboard input events, as the mouse
             // interface default of /dev/input/mice supports hotpluging devices,
             // unlike the regular events.
+#else
             _inputs.push_back(*it);
+#endif
         }
         if ((*it)->getType() == InputDevice::KEYBOARD) {
             _inputs.push_back(*it);
@@ -517,7 +529,6 @@ FBGui::disable_terminal()
 
     _original_kd = -1;
     
-    struct vt_stat vts;
     
     // Find the TTY device name
     
@@ -540,6 +551,7 @@ FBGui::disable_terminal()
         return false;
     }
     
+    struct vt_stat vts;
     if (ioctl(fd, VT_GETSTATE, &vts) == -1) {
         log_debug(_("WARNING: Could not get current VT state"));
         close(_fd);
@@ -700,7 +712,7 @@ FBGui::checkForData()
         boost::shared_ptr<InputDevice::input_data_t> ie = (*it)->popData();
         if (ie) {            
             // notifyMouseMove(ie->x, ie->y);
-#if 1
+#if 0
             std::cerr << "Got data: " << ((ie->pressed) ? "true" : "false");
             std::cerr << ", " << ie->key << ", " << ie->modifier;
             std::cerr << ", " << ie->x << ", " << ie->y << std::endl;
@@ -715,6 +727,7 @@ FBGui::checkForData()
                                                 getStage()->getStageWidth(),
                                                 getStage()->getStageHeight());
             // The mouse was moved
+            _uinput.moveTo(ie.x, ie.y);
             if (coords) {
                 notifyMouseMove(coords[0], coords[1]);
             }
