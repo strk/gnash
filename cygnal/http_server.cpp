@@ -87,13 +87,13 @@ HTTPServer::~HTTPServer()
 }
 
 HTTP::http_method_e
-HTTPServer::processClientRequest(int fd)
+HTTPServer::processClientRequest(int /* fd */)
 {
     GNASH_REPORT_FUNCTION;
     
-    cygnal::Buffer *buf = new cygnal::Buffer;
-
+    //cygnal::Buffer *buf = new cygnal::Buffer;
     // return processClientRequest(fd, buf);
+    
     return HTTP::HTTP_NONE;
 }
 
@@ -270,7 +270,7 @@ HTTPServer::processGetRequest(Handler *hand, int fd, cygnal::Buffer *buf)
 // the header like we normally do, we then read the amount of bytes specified by
 // the "content-length" field, and then write that data to disk, or decode the amf.
 boost::shared_ptr<cygnal::Buffer>
-HTTPServer::processPostRequest(int fd, cygnal::Buffer *bufFIXME)
+HTTPServer::processPostRequest(int fd, cygnal::Buffer * /* bufFIXME */)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -301,6 +301,9 @@ HTTPServer::processPostRequest(int fd, cygnal::Buffer *bufFIXME)
     } else {	
 //	cerr << "Need to read more data, only have "  << buf->allocated() << " bytes" << endl;
 	ret = readNet(fd, *content, 2);
+	if (ret < 0) {
+	    log_error("couldn't read data!");
+	}
 	data = content->reference();
     }    
     

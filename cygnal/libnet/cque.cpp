@@ -249,7 +249,8 @@ CQue::merge(boost::shared_ptr<cygnal::Buffer> start)
     }
 
     // Finally erase all merged elements, and replace with the composite one
-    que_t::iterator nextIter = _que.erase(from, to);
+    _que.erase(from, to);
+    //que_t::iterator nextIter = _que.erase(from, to);
 //    _que.insert(nextIter, newbuf.get()); FIXME:
 
     return newbuf; //->release(); // ownership is transferred. TODO: return auto_ptr
