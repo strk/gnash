@@ -831,7 +831,9 @@ bool
 movie_root::clearIntervalTimer(boost::uint32_t x)
 {
     TimerMap::iterator it = _intervalTimers.find(x);
-    if (it == _intervalTimers.end()) return false;
+    if (it == _intervalTimers.end()) {
+        return false;
+    }
 
     // We do not remove the element here because
     // we might have been called during execution
@@ -867,8 +869,7 @@ movie_root::advance()
 
                 // Give up; we've probably failed to catch up.
                 _timelineSound.reset();
-            }
-            else {
+            } else {
 
                 // -1 for bad result, 0 for first block.
                 // Get the stream block we are currently at.
@@ -921,7 +922,9 @@ movie_root::advance()
                     block = s->getStreamBlock(_timelineSound->id);
 
                 }
-                if (advanced) _lastMovieAdvancement = now;
+                if (advanced) {
+                    _lastMovieAdvancement = now;
+                }
             }
         }
         else {
@@ -1551,7 +1554,7 @@ movie_root::executeAdvanceCallbacks()
     // _controlfd is set when running as a child process of a hosting
     // application. If it is set, we have to check the socket connection
     // for XML messages.
-    if (_controlfd) {
+    if (_controlfd > 0) {
     boost::shared_ptr<ExternalInterface::invoke_t> invoke = 
         ExternalInterface::ExternalEventCheck(_controlfd);
         if (invoke) {
@@ -1693,9 +1696,13 @@ movie_root::executeTimers()
     log_debug("Checking %d timers for expiry", _intervalTimers.size());
 #endif
 
-    if (_intervalTimers.empty()) return;
+    // Don't do anything if we have no timers, just return so we don't
+    // waste cpu cycles.
+    if (_intervalTimers.size() == 0) {
+        return;
+    }
 
-    const unsigned long now = _vm.getTime();
+    unsigned long now = _vm.getTime();
 
     typedef std::multimap<unsigned int, boost::shared_ptr<Timer> >
         ExpiredTimers;
@@ -2051,11 +2058,12 @@ movie_root::advanceLiveChars()
             "the global list", _liveChars.size());
 #endif
 
-    std::for_each(_liveChars.begin(), _liveChars.end(),
-            boost::bind(advanceLiveChar, _1));
-
-    std::for_each(_liveChars.begin(), _liveChars.end(),
-            boost::bind(notifyLoad, _1));
+    // Iterate through the array once, instead of twice like it used to be.
+    LiveChars::iterator it;
+    for (it=_liveChars.begin(); it != _liveChars.end(); ++it) {
+        advanceLiveChar(*it);
+        notifyLoad(*it);
+    }
 }
 
 void
@@ -2586,7 +2594,7 @@ advanceLiveChar(MovieClip* mo)
 {
     if (!mo->unloaded()) {
 #ifdef GNASH_DEBUG
-        log_debug("    advancing DisplayObject %s", ch->getTarget());
+        log_debug("    advancing DisplayObject %s", mo->getTarget());
 #endif
         mo->advance();
     }

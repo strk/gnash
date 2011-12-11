@@ -419,12 +419,12 @@ Player::run(int argc, char* argv[], const std::string& infile,
 
     /// The StreamProvider uses the actual URL of the loaded movie.
     boost::shared_ptr<StreamProvider> sp(new StreamProvider(_url, baseURL, np));
-
     _runResources->setStreamProvider(sp);
 
     // Set the Hardware video decoding resources. none, vaapi, omap
     _runResources->setHWAccelBackend(_hwaccel);
-    // Set the Renderer resource, opengl, agg, or cairo
+    
+    // Set the Renderer resource, opengl, openvg, agg, or cairo
     _runResources->setRenderBackend(_renderer);
 
     _mediaHandler.reset(media::MediaFactory::instance().get(_media));
@@ -542,9 +542,20 @@ Player::run(int argc, char* argv[], const std::string& infile,
     _movieDef->completeLoad();
 
     if (! _delay) {
-        // 10ms per heart beat
-        _delay = 10; 
+        float fps = _movieDef->get_frame_rate();
+        log_debug("Movie Frame Rate is %d, adjusting delay", fps);
+        // FIXME: this value is arbitrary, and will make any movie with
+        // less than 12 frames eat up more of the cpu. It should probably
+        // be a much lower value, like 2.
+        if (fps > 12) {
+            _delay = static_cast<int>(1000/fps);
+        } else {
+            // 10ms per heart beat
+            _delay = 10;
+        }
     }
+    // This is the time between the main loop waking up and processing
+    // network messages, external calls, and displaying the next frame.
     _gui->setInterval(_delay);
 
     if (_exitTimeout) {
@@ -636,7 +647,8 @@ Player::run(int argc, char* argv[], const std::string& infile,
         }
         if (!last && v.empty()) return;
         
-        std::auto_ptr<ScreenShotter> ss(new ScreenShotter(_screenshotFile, _screenshotQuality));
+        std::auto_ptr<ScreenShotter> ss(new ScreenShotter(_screenshotFile,
+                                                          _screenshotQuality));
         if (last) ss->lastFrame();
         ss->setFrames(v);
         _gui->setScreenShotter(ss);

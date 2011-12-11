@@ -810,7 +810,7 @@ dnl or keyboard attached.
 dnl By default, don't build any of these, as they are only for the 
 dnl Framebuffer running without X11.
 if test x"${build_fb}" = xyes -a x"${linux}" = xyes; then
-  build_ps2mouse=yes
+  build_ps2mouse=no
   build_ps2keyboard=yes
   build_input_events=yes
   build_tslib=yes
@@ -854,7 +854,7 @@ AC_ARG_ENABLE(input,
         build_ps2mouse=yes
         build_ps2keyboard=yes
         build_tslib=yes
-        if test x"${build_fb}" = xyes -a x"${linux}" = xyes; then
+        if test x"${linux}" = xyes; then
           build_input_events=yes
           input_events="PS/2 Mouse, PS/2 Keyboard, Input Devices, Touchscreen via Tslib"                
         else
@@ -1869,11 +1869,11 @@ dnl or keyboard attached.
 dnl By default, don't build any of these, as they are only for the Framebuffer
 dnl running without X11.
 if test x"${build_fb}" = xyes; then
-  build_ps2mouse=yes
-  build_ps2keyboard=no
+  build_ps2mouse=no
+  build_ps2keyboard=yes
   build_input_events=yes
   build_tslib=yes
-  input_events="PS/2 Mouse, Input Devices, Touchscreen via Tslib"
+  input_events="Input Devices, Touchscreen via Tslib"
 else
   build_ps2mouse=no
   build_ps2keyboard=no

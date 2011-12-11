@@ -35,6 +35,13 @@ namespace gnash {
 static const char *MOUSE_DEVICE = "/dev/input/mice";
 
 MouseDevice::MouseDevice()
+    : _previous_x(0),
+      _previous_y(0)
+{
+    // GNASH_REPORT_FUNCTION;
+}
+
+MouseDevice::~MouseDevice()
 {
     // GNASH_REPORT_FUNCTION;
 }
@@ -58,7 +65,8 @@ MouseDevice::scanForDevices()
     const char *debug[] = {
         "UNKNOWN",
         "Keyboard",
-        "Mouse",
+        "User Mode Mouse",
+        "PS/2 Mouse",
         "Touchscreen",
         "Touchscreen Mouse",
         "Power Button",
@@ -68,7 +76,7 @@ MouseDevice::scanForDevices()
     };    
 
     struct mouse_types mice[] = {
-        {InputDevice::MOUSE, "/dev/input/mice"},      // PS/2 Mouse
+        {InputDevice::MOUSE, "/dev/input/mice"},       // PS/2 Mouse
 #ifdef MULTIPLE_DEVICES
         {InputDevice::MOUSE, "/dev/input/mouse0"},
         {InputDevice::MOUSE, "/dev/input/mouse1"},
@@ -82,25 +90,34 @@ MouseDevice::scanForDevices()
         int fd = 0;
         if (stat(mice[i].filespec, &st) == 0) {
             // Then see if we can open it
-            if ((fd = open(mice[i].filespec, O_RDWR)) < 0) {
+            if ((fd = open(mice[i].filespec, O_RDWR|O_NONBLOCK)) < 0) {
                 log_error("You don't have the proper permissions to open %s",
                           mice[i].filespec);
                 i++;
                 continue;
             }
-            close(fd);
             log_debug("Found a %s device for mouse input using %s",
                       debug[mice[i].type], mice[i].filespec);
             
             boost::shared_ptr<InputDevice> dev;
 #if defined(USE_MOUSE_PS2) || defined(USE_MOUSE_ETT)
             dev = boost::shared_ptr<InputDevice>(new MouseDevice());
+            // The User Mode Mouse is write only, so we don't consider
+            // it an input device.
+            dev->setType(mice[i].type);
+            // Close the device now that we know the permissions are
+            // correct. It's reopened correctly by init() when each
+            // found device is instantiated.
+            if (fd) {
+                close(fd);
+            }
             if (dev->init(mice[i].filespec, DEFAULT_BUFFER_SIZE)) {
                 devices.push_back(dev);
             }
-//            dev->dump();
+            // dev->dump();
 #endif
         }     // stat()
+        
         i++;
     }         // while()
     
@@ -118,41 +135,43 @@ MouseDevice::init()
 bool
 MouseDevice::init(const std::string &filespec, size_t size)
 {
-    // GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
-    _type = MOUSE;
     _filespec = filespec;
-    _buffer.reset(new boost::uint8_t[size]);
 
-    // see http://www.computer-engineering.org/ps2mouse/ 
-    
-    // Try to open mouse device, be error tolerant (FD is kept open all the time)
-    _fd = open(filespec.c_str(), O_RDWR);
+    _fd = open(filespec.c_str(), O_RDWR | O_NDELAY);
     
     if (_fd < 0) {
         log_debug("Could not open %s: %s", filespec, strerror(errno));
         return false;
     }
     
+#if 0
     if (fcntl(_fd, F_SETFL, fcntl(_fd, F_GETFL) | O_NONBLOCK) < 0) {
         log_error("Could not set non-blocking mode for mouse device: %s", strerror(errno));
-        close(_fd);
-        _fd = -1;
-        return false; 
+        if (_fd) {
+            close(_fd);
+            _fd = -1;
+            return false; 
+        }
     }
-    
+#endif
+
+    // see http://www.computer-engineering.org/ps2mouse/    
     // Clear input buffer
     unsigned char buf[10], byte;
-    while (read(_fd, buf, sizeof buf) > 0 ) { }
-
+    while (read(_fd, buf, size) > 0 ) { }
+    
     // A touchscreen works similar to a Mouse, but not exactly...
     if (_type == InputDevice::MOUSE) {
         // Reset mouse
         if ((!command(0xFF, buf, 3)) || (buf[0] != 0xFA)) {
-            log_debug(_("Mouse reset failed"));
-            close(_fd);
-            _fd = -1;
-            return false; 
+            log_error(_("Mouse reset failed"));
+            if (_fd) {
+                close(_fd);
+                _fd = -1;
+                return false;
+            }
         }
         
         // Get Device ID (not crucial, debug only)
@@ -167,9 +186,11 @@ MouseDevice::init(const std::string &filespec, size_t size)
         // Enable mouse data reporting
         if ((!command(0xF4, &byte, 1)) || (byte != 0xFA)) {
             log_debug(_("Could not activate Data Reporting mode for mouse"));
-            close(_fd);
-            _fd = -1;
-            return false; 
+            if (_fd) {
+                close(_fd);
+                _fd = -1;
+                return false;
+            }
         }  
         
         log_debug("Mouse enabled for %s on fd #%d", _filespec, _fd);
@@ -216,17 +237,13 @@ MouseDevice::check()
 {
     // GNASH_REPORT_FUNCTION;
 
-    if (_fd < 0) {
-        return false;   // no mouse available
-    }
-    
     int xmove, ymove, btn;
     boost::shared_array<boost::uint8_t> buf;
     if (_type == InputDevice::TOUCHMOUSE) {
         // The eTurboTouch has a 4 byte packet
         buf = readData(4);
-    } else {
-        // PS/2 Mouse packets are always 3 bytes
+    } else if (_type == InputDevice::MOUSE) {
+            // PS/2 Mouse packets are always 3 bytes
         buf = readData(3);
     }
     
@@ -243,7 +260,7 @@ MouseDevice::check()
     // A Touchscreen works similar to a Mouse, but not exactly.
     // At least for the eTurboTouch, it has a different layout
     // in the packet for the location as it has an additional byte
-    btn   = buf[0] & 0x7;
+    btn = buf[0] & 0x7;
     if (_type == InputDevice::TOUCHMOUSE) {
         xmove = (buf[1] << 7) | (buf[2]);
         ymove = (buf[3] << 7) | (buf[4]);
@@ -257,11 +274,9 @@ MouseDevice::check()
                                   * 1536 + 256));
         ymove = static_cast<int>(((static_cast<double>(ymove) - 482) / (1771 - 482)
                                   * 1536 + 256));
-#if 0
         // FIXME: don't calculate here, this should be done by the GUI
-        xmove = xmove * _gui->getStage()->getStageWidth() / 2048;
-        ymove = (2048-ymove) * _gui->getStage()->getStageHeight() / 2048;
-#endif
+        xmove = xmove * _screen_width / 2048;
+        ymove = (2048-ymove) * _screen_height / 2048;
     } else {                    // end of InputDevice::TOUCHMOUSE
         // PS/2 Mouse
         // The movement values are 9-bit 2's complement integers,
@@ -271,51 +286,77 @@ MouseDevice::check()
         // previous packet was sent, in units determined by the
         // current resolution. The range of values that can be
         // expressed is -255 to +255. If this range is exceeded, the
-        // appropriate overflow bit is set.  
-        xmove = buf[1];
-        ymove = buf[2];
-    
+        // appropriate overflow bit is set.
+        // (from the manpage for the psm driver)
+        // Byte 1
+        //     bit 7  One indicates overflow in the vertical movement count.
+        //     bit 6  One indicates overflow in the horizontal movement count.
+        //     bit 5  Set if the vertical movement count is negative.
+        //     bit 4  Set if the horizontal movement count is negative.
+        //     bit 3  Always one.
+        //     bit 2  Middle button status; set if pressed.  For devices without
+        //             the middle button, this bit is always zero.
+        //     bit 1  Right button status; set if pressed.
+        //     bit 0  Left button status; set if pressed.
+        // Byte 2  Horizontal movement count in two’s complement; -256 through 255.
+        //     Note that the sign bit is in the first byte.
+        // Byte 3  Vertical movement count in two’s complement; -256 through 255.
+        //  Note that the sign bit is in the first byte.
+        //
+        xmove = (~buf[1])+1;
+        ymove = (~buf[2])+1;
+ 
+        if (buf[0] & 0x40) {
+            log_debug("Vertical mouse movement overflow bit set");
+        }
+        if (buf[0] & 0x80) {
+            log_debug("Horizontal mouse movement overflow bit set");
+        }
+        // 0,0 is the lower left of the display, so the negative bits are set
+        // when going from the upper left to the lower right.
+        
         if (buf[0] & 0x10) {
-            xmove = -(256-xmove);
+            log_debug("Horizontal mouse movement negative bit set");
+        } else {
+            xmove *= -1;
         }
         if (buf[0] & 0x20) {
-            ymove = -(256-ymove);
+            log_debug("Vertical mouse movement negative bit set");
+        } else {
+            ymove *= -1;
         }
         
-        ymove *= -1; // vertical movement is upside-down
+        log_debug(_("PS/2 Mouse: Xmove=%d, Ymove=%d,  Button %d"),
+                  xmove, ymove, btn);
         
-        log_debug(_("x/y %d/%d button %d"), xmove, ymove, btn);
-        
-        // movement    
         _input_data.x += xmove;
-        _input_data.y += ymove;
-        
         if (_input_data.x < 0) {
             _input_data.x = 0;
         }
+
+        _input_data.y += ymove;
         if (_input_data.y < 0) {
             _input_data.y = 0;
         }
-        // FIXME: this is a bit of a temporary hack. The last two
-        // arguments are a range, so hardcoding them is safe for
-        // now. In the future more conversion may be done, making this
-        // then be incorrect.
         boost::shared_array<int> coords =
-            MouseDevice::convertCoordinates(_input_data.x, _input_data.y, 1024, 768);
-//          MouseDevice::convertCoordinates(_x, _y,
-//                                 _gui->getStage()->getStageWidth(),
-//                                 _gui->getStage()->getStageHeight());
+            InputDevice::convertAbsCoords(_input_data.x, _input_data.y,
+                                          _screen_width, _screen_height);
+        // MouseDevice::convertCoordinates(_input_data.x, _input_data.y,
+        //                          _screen_width, _screen_height);
+        log_debug(_("convert: Xin=%d, Yin=%d, Xout=%d, Yout=%d"),
+                  _input_data.x, _input_data.y, coords[0],coords[1]);
+        
         _input_data.x = coords[0];
         _input_data.y = coords[1];
     } // end of InputDevice::MOUSE
     
-    log_debug(_("read mouse @ %d / %d, btn %d"), _input_data.x, _input_data.y, _input_data.button);
+    log_debug(_("read mouse: X=%d, Y=%d, Btn: btn %d"), _input_data.x,
+              _input_data.y, _input_data.button);
     addData(false, gnash::key::INVALID, 0, _input_data.x, _input_data.y);
     
     // button
     if (btn != _input_data.button) {
         _input_data.button = btn;
-        log_debug("clicked: %d", btn); 
         addData(true, gnash::key::INVALID, 0, _input_data.x, _input_data.y);
         log_debug(_("mouse click! %d"), btn);
     }
@@ -333,13 +374,13 @@ MouseDevice::command(unsigned char cmd, unsigned char *buf, int count)
     // flush input buffer
     char trash[16];
     do {
-        n = read(_fd, trash, sizeof trash);
+        n = ::read(_fd, trash, sizeof trash);
         if (n > 0) 
             log_debug(_("mouse_command: discarded %d bytes from input buffer"), n);
     } while (n > 0);
     
     // send command
-    if ( -1 == write(_fd, &cmd, 1) ) {
+    if ( -1 == ::write(_fd, &cmd, 1) ) {
         return false;
     }
 
@@ -349,7 +390,9 @@ MouseDevice::command(unsigned char cmd, unsigned char *buf, int count)
         // TODO: use select() instead
         
         n = read(_fd, buf, count);
-        if (n <= 0) return false;
+        if (n <= 0) {
+            return false;
+        }
         count -= n;
         buf += n;
     }
@@ -357,30 +400,6 @@ MouseDevice::command(unsigned char cmd, unsigned char *buf, int count)
     return true;
     
 } // command()
-
-/// \brief. Mouse movements are relative to the last position, so
-/// this method is used to convert from relative position to
-/// the absolute position Gnash needs.
-boost::shared_array<int>
-MouseDevice::convertCoordinates(int x, int y, int width, int height)
-{
-    // GNASH_REPORT_FUNCTION;
-    
-    boost::shared_array<int> coords(new int[2]);
-
-    if (x > width) {
-        coords[0] = width;
-    } else {
-        coords[0] = x;
-    }
-    if (y > height) {
-        coords[1] = height;
-    } else {
-        coords[1] = y;
-    }
-    
-    return coords;
-}
 
 // end of namespace
 }

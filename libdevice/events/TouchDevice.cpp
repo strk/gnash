@@ -122,8 +122,13 @@ TouchDevice::check()
     if (n == 1) {
         if (event.pressure > 0) {
             // the screen is touched
+            // FIXME: this is a bit of a temporary hack. The last two
+            // arguments are a range, so hardcoding them is safe for
+            // now. In the future more conversion may be done, making this
+            // then be incorrect.
             boost::shared_array<int> coords =
-                MouseDevice::convertCoordinates(event.x, event.y, 800, 480);
+                InputDevice::convertAbsCoords(event.x, event.y,
+                                                _screen_width, _screen_height);
             log_debug("Touched x: %d, y: %d", event.x , event.y);
             addData(true, gnash::key::INVALID, 0, event.x, event.y);
         } else {
@@ -135,7 +140,7 @@ TouchDevice::check()
     return true;
 }
 
-// FIXME: this currently is lacking thw swf program used to generate the
+// FIXME: this currently is lacking the swf program used to generate the
 // input data. Instead use the tslib utility 'ts_calibrate', as Gnash now
 // has TSlib support.
 void

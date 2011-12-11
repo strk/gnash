@@ -26,7 +26,7 @@
 ///
 /// Since there can be multiple input devices in /dev/input/ you have to
 /// specify which device to use using the 
-///  POINTING_DEVICE environment variable for the mouse and
+//  POINTING_DEVICE environment variable for the mouse and
 ///  KEYBOARD_DEVICE environment variable for the keyboard
 
 /// \page fb_calibration FB GUI Touchscreen Calibration
@@ -230,7 +230,16 @@ FBGui::init(int argc, char *** argv)
     }
     
     disable_terminal();
-    
+
+    // Look for the User Mode Input (Uinput) device, which is used to
+    // control the movement and coordinates of the mouse cursor.
+    if (_uinput.scanForDevice()) {
+        _uinput.init();
+        _uinput.moveTo(0, 0);
+    } else {
+        log_error("Found no accessible User mode input event device");
+    }
+        
     // Initialize all the input devices
 
     // Look for Mice that use the PS/2 mouse protocol
@@ -244,14 +253,19 @@ FBGui::init(int argc, char *** argv)
     
     std::vector<boost::shared_ptr<InputDevice> >::iterator it;
     for (it=possibles.begin(); it!=possibles.end(); ++it) {
-        //(*it)->dump();
+        // Set the screen size, which is used for calculating absolute
+        // mouse locations from relative ones.
+        (*it)->setScreenSize(_width, _height);
+        // (*it)->dump();
+#if defined(USE_MOUSE_PS2) || defined(USE_MOUSE_ETT)
         if ((*it)->getType() == InputDevice::MOUSE) {
-            log_debug("WARNING: Mouse support disabled as it conflicts with the input event support.");
+            log_debug("WARNING: Mouse support may conflict with the input event support.");
             // For now we only want keyboard input events, as the mouse
             // interface default of /dev/input/mice supports hotpluging devices,
             // unlike the regular events.
-            // _inputs.push_back(*it);
+            _inputs.push_back(*it);
         }
+#endif
         if ((*it)->getType() == InputDevice::KEYBOARD) {
             _inputs.push_back(*it);
         }
@@ -271,6 +285,7 @@ FBGui::init(int argc, char *** argv)
 #endif
         }
         if ((*it)->getType() == InputDevice::POWERBUTTON) {
+            log_debug("Enabling Power Button support");
             _inputs.push_back(*it);
         }
     }
@@ -307,7 +322,7 @@ FBGui::init(int argc, char *** argv)
 
     log_debug("X:%d, Y:%d", _xpos, _ypos);
 #endif
-
+    
     _validbounds.setTo(0, 0, _width - 1, _height - 1);
     
     return true;
@@ -320,7 +335,7 @@ FBGui::resize_view(int width, int height)
 
 //   _glue.prepDrawingArea(width, height, 0);
     Gui::resize_view(width, height);
-
+ 
     return true;
 }
 
@@ -344,18 +359,20 @@ FBGui::run()
     // FIXME: this value is arbitrary, and will make any movie with
     // less than 12 frames eat up more of the cpu. It should probably
     // be a much lower value, like 2.
-    if (fps >= 12) {
+    if (fps > 12) {
         delay = static_cast<int>(100000/fps);
     } else {
         // 10ms per heart beat
         delay = 10000;
     }
-    log_debug("Movie Frame Rate is %d, adjusting delay to %dms", fps, delay);
+    log_debug("Movie Frame Rate is %d, adjusting delay to %dms", fps,
+              _interval * delay);
     
     // This loops endlessly at the frame rate
     while (!terminate_request) {  
-        // wait the "heartbeat" inteval
-        gnashSleep(_interval * delay);
+        // wait the "heartbeat" inteval. _interval is in milliseconds,
+        // but gnashSleep() wants nanoseconds, so adjust by 1000.
+        gnashSleep(_interval * 1000);
         // TODO: Do we need to check the real time slept or is it OK when we woke
         // up early because of some Linux signal sent to our process (and thus
         // "advance" faster than the "heartbeat" interval)? - Udo
@@ -512,7 +529,6 @@ FBGui::disable_terminal()
 
     _original_kd = -1;
     
-    struct vt_stat vts;
     
     // Find the TTY device name
     
@@ -535,6 +551,7 @@ FBGui::disable_terminal()
         return false;
     }
     
+    struct vt_stat vts;
     if (ioctl(fd, VT_GETSTATE, &vts) == -1) {
         log_debug(_("WARNING: Could not get current VT state"));
         close(_fd);
@@ -693,7 +710,8 @@ FBGui::checkForData()
     for (it=_inputs.begin(); it!=_inputs.end(); ++it) {
         (*it)->check();
         boost::shared_ptr<InputDevice::input_data_t> ie = (*it)->popData();
-        if (ie) {
+        if (ie) {            
+            // notifyMouseMove(ie->x, ie->y);
 #if 0
             std::cerr << "Got data: " << ((ie->pressed) ? "true" : "false");
             std::cerr << ", " << ie->key << ", " << ie->modifier;
@@ -701,22 +719,22 @@ FBGui::checkForData()
             // cerr << "X = " << coords[0] << endl;
             // cerr << "Y = " << coords[1] << endl;
 #endif
-#if 0
             // Range check and convert the position from relative to
             // absolute
             boost::shared_array<int> coords =
-                MouseDevice::convertCoordinates(ie->x, ie->y,
-                                                getStage()->getStageWidth(),
-                                                getStage()->getStageHeight());
+                InputDevice::convertAbsCoords(ie->x, ie->y,
+                                              getStage()->getStageWidth(),
+                                              getStage()->getStageHeight());
             // The mouse was moved
+            _uinput.moveTo(coords[0], coords[1]);
             if (coords) {
                 notifyMouseMove(coords[0], coords[1]);
             }
-#endif
+            
             // See if a mouse button was clicked
             if (ie->pressed) {
                 notifyMouseClick(true);
-#if 0
+#if 1
                 double x = 0.655 * ie->x;
                 double y = 0.46875 * ie->y;
                 log_debug("Mouse clicked at: %g:%g", x, y);

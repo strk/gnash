@@ -956,7 +956,6 @@ sound_new(const fn_call& fn)
             }
         );
 
-
         const as_value& arg0 = fn.arg(0);
 
         if (!arg0.is_null() && !arg0.is_undefined()) {

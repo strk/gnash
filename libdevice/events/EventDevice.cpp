@@ -60,25 +60,29 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
     _filespec = filespec;
     
     // Try to open mouse device, be error tolerant (FD is kept open all the time)
-    _fd = open(filespec.c_str(), O_RDONLY);
+    _fd = open(filespec.c_str(), O_RDONLY | O_NONBLOCK);
   
     if (_fd < 0) {
-        log_debug(_("Could not open %s: %s"), filespec.c_str(), strerror(errno));    
+        log_debug(_("Could not open %s: %s"), filespec, strerror(errno));    
         return false;
     }
-  
+
+#if 0
     if (fcntl(_fd, F_SETFL, fcntl(_fd, F_GETFL) | O_NONBLOCK) < 0) {
         log_error(_("Could not set non-blocking mode for pointing device: %s"),
                   strerror(errno));
-        close(_fd);
-        _fd = -1;
-        return false; 
+        if (_fd) {
+            close(_fd);
+            _fd = -1;
+            return false;
+        }
     }
-
+#endif
+    
     // Get the version number of the input event subsystem
     int version;
     if (ioctl(_fd, EVIOCGVERSION, &version)) {
-        perror("evdev ioctl");
+        log_error("ioctl (EVIOCGVERSION)");
     }
 #if 0
     log_debug("evdev driver version is %d.%d.%d",
@@ -87,12 +91,12 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
 #endif
     
     if(ioctl(_fd, EVIOCGID, &_device_info)) {
-        perror("evdev ioctl");
+        log_error("ioctl (EVIOCGID): %s", strerror(errno));
     }
     
     char name[256]= "Unknown";
     if(ioctl(_fd, EVIOCGNAME(sizeof(name)), name) < 0) {
-        perror("evdev ioctl");
+        log_error("ioctl (EVIOCGNAME): %s", strerror(errno));
     }
     log_debug("The device on %s says its name is %s", filespec, name);
     // /dev/mxc_ts is the Touchscreen driver used by the Freescale Babbage board
@@ -115,7 +119,10 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
           // device things truly are.          
           log_debug("is on a Universal Serial Bus");
           // ID 0eef:0001 D-WAV Scientific Co., Ltd eGalax TouchScreen
-          if ((_device_info.product == 0x0001) && (_device_info.vendor == 0x0eef)) {
+          if ((_device_info.product == 0) && (_device_info.vendor == 0)) {
+              _type = InputDevice::UMOUSE;
+              // ID 046d:c001 Logitech, Inc. N48/M-BB48 [FirstMouse Plus]
+          } else if ((_device_info.product == 0x0001) && (_device_info.vendor == 0x0eef)) {
               _type = InputDevice::TOUCHMOUSE;
               // ID 046d:c001 Logitech, Inc. N48/M-BB48 [FirstMouse Plus]
           } else if ((_device_info.product == 0xc001) && (_device_info.vendor == 0x046d)) {
@@ -202,36 +209,43 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
     }
     
     log_debug("Event enabled for %s on fd #%d", _filespec, _fd);
-    
-    // Set the scale of the display so the absolute postions
-    // we get from the touchscreen driver are correct.
-    struct input_absinfo abs;
-    abs.minimum = 0;
-    abs.fuzz = 4;
-    abs.flat = 8;
-#ifdef ABSINFO_RESOLUTION
-    abs.resolution = 0;
-#endif
-    abs.maximum = 800;
-    if (ioctl(_fd, EVIOCSABS(ABS_X), &abs) < 0) {
-        perror("ioctl(EVIOCSABS(ABS_X))");
-    }
-    abs.maximum = 480;
-    if (ioctl(_fd, EVIOCSABS(ABS_Y), &abs) < 0) {
-        perror("ioctl(EVIOCSABS(ABS_Y))");
-    }
+
 #if 0
-    if (ioctl(_fd, EVIOCGRAB, (void *)1) < 0) {
-        perror("ioctl(EVIOCGRAB(1))");
-    }
+    // FIXME: this has probably been replaced by the uinput device code
+    if (_type == InputDevice::MOUSE) {
+        // Get the existing absolute info
+        struct input_absinfo abs;
+        memset(&abs, 0, sizeof(struct input_absinfo));
+        if (ioctl (_fd, EVIOCGABS(ABS_X), &abs) < 0) {
+            log_error("ioctl (EVIOCGABS(ABS_X)): %s", strerror(errno));
+        }
+#ifdef ABSINFO_RESOLUTION
+        abs.resolution = 0;
 #endif
+        abs.minimum = 0;
+        abs.maximum = _screen_width;
+        // Set the scale of the display so the absolute postions
+        // we get from the touchscreen driver are correct.
+        if (ioctl (_fd, EVIOCSABS(ABS_X), &abs) < 0) {
+            log_error("ioctl (EVIOCSABS(ABS_X)): %s", strerror(errno));
+        }
+        if (ioctl(_fd, EVIOCGABS(ABS_Y), &abs) < 0) {
+            log_error("ioctl (EVIOCGABS(ABS_Y)): %s", strerror(errno));
+        }
+        abs.maximum = _screen_height;
+        if (ioctl (_fd, EVIOCSABS(ABS_Y), &abs) < 0) {
+            log_error("ioctl (EVIOCSABS(ABS_Y)): %s", strerror(errno));
+        }
+    }  // end of _type
+#endif
+    
     return true;
 }
 
 bool
 EventDevice::check()
 {
-//    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
     
     bool activity = false;
   
@@ -247,7 +261,7 @@ EventDevice::check()
     }
 
     /// @note
-    /// A typical touchscreen event is actuall a series of events, one for each
+    /// A typical touchscreen event is actually a series of events, one for each
     /// piece of data. The sequence is terminated by the EV_SYN message. An
     /// example from evtests looks like this:
     /// Event: time 697585.633672, type 3 (Absolute), code 0 (X), value 127
@@ -260,8 +274,32 @@ EventDevice::check()
     /// queue of events. As the GUI polls for events, there may be multiple events
     /// in the queue by the time the main event loop comes around to process the
     /// events.
+#if 1
+    // FIXME: debug crap
+    const char *debug[] = {
+        "EV_SYN",
+        "EV_KEY",
+        "EV_REL",
+        "EV_ABS",
+        "EV_MSC",
+        "EV_SW",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "EV_LED",
+        "EV_SND",
+        "EV_REP",
+        "EV_FF",
+        "EV_PWR",
+        "EV_FF_STATUS"
+    };    
     struct input_event *ev = reinterpret_cast<struct input_event *>(buf.get());
-    // log_debug("Type is: %hd, Code is: %hd, Val us: %d", ev->type, ev->code, ev->value);
+    log_debug("Type is: %s(%hd), Code is: %hd, Val us: %d", debug[ev->type],
+              ev->type, ev->type, ev->code, ev->value);
+#endif
+    
     switch (ev->type) {
       case EV_SYN:
       {
@@ -300,19 +338,19 @@ EventDevice::check()
           // value == 0  key has been released
           // value == 1  key has been pressed
           // value == 2  repeated key reporting (while holding the key)
-          if (ev->code == KEY_LEFTSHIFT) {
+          if (ev->code == KEY_LEFTSHIFT) {              // 42
               keyb_lshift = ev->value;
-          } else if (ev->code == KEY_RIGHTSHIFT) {
+          } else if (ev->code == KEY_RIGHTSHIFT) {      // 54
               keyb_rshift = ev->value;
-          } else if (ev->code == KEY_LEFTCTRL) {
+          } else if (ev->code == KEY_LEFTCTRL) {        // 29
               keyb_lctrl = ev->value;
-          } else if (ev->code == KEY_RIGHTCTRL) {
+          } else if (ev->code == KEY_RIGHTCTRL) {       // 97
               keyb_rctrl = ev->value;
-          } else if (ev->code == KEY_LEFTALT) {
+          } else if (ev->code == KEY_LEFTALT) {         // 56
               keyb_lalt = ev->value;
-          } else if (ev->code == KEY_RIGHTALT) {
+          } else if (ev->code == KEY_RIGHTALT) {        // 100
               keyb_ralt = ev->value;
-          } else if (ev->code == BTN_TOUCH) {
+          } else if (ev->code == BTN_TOUCH) {           // 0x14a
               // keyb_ralt = ev->value;
           } else {
               _input_data.key = scancode_to_gnash_key(ev->code,
@@ -337,7 +375,43 @@ EventDevice::check()
       } // case EV_KEY
       // Mouse
       case EV_REL:
-          log_unimpl("Relative move event from Input Event Device");
+          switch (ev->code) {
+            case REL_X:
+                log_debug("REL_X: %d", ev->value);
+                _input_data.x = ev->value;
+                break;
+            case REL_Y:
+                log_debug("REL_Y: %d", ev->value);
+                _input_data.y = ev->value;
+                break;
+            case REL_Z:
+                log_debug("REL_Z: %d", ev->value);
+                _input_data.z = ev->value;
+                break;
+            case REL_RX:
+                log_debug("REL_RX: %d", ev->value);
+                _input_data.rx = ev->value;
+                break;
+            case REL_RY:
+                log_debug("REL_RY: %d", ev->value);
+                _input_data.ry = ev->value;
+                break;
+            case REL_RZ:
+                log_debug("REL_RZ: %d", ev->value);
+                _input_data.rz = ev->value;
+                break;
+            case REL_HWHEEL:
+                log_debug("REL_HWHEEL: %d", ev->value);
+            case REL_DIAL:
+                log_debug("REL_DIAL: %d", ev->value);
+            case REL_WHEEL:
+                log_debug("REL_WHEEL: %d", ev->value);
+            case REL_MISC:
+                log_debug("REL_MISC: %d", ev->value);
+            default:
+                log_unimpl("Relative move event %d from Input Event Device",
+                           ev->value);
+          }
           // Touchscreen or joystick
           break;
           // Absolute coordinates come as multiple events, one for
@@ -413,8 +487,39 @@ EventDevice::check()
           }
           break;
       }
+      // EV_MSC is also used for the keyboard
       case EV_MSC:
-          log_unimpl("Misc event from Input Event Device");
+          switch (ev->code) {
+            case MSC_SERIAL:
+            case MSC_PULSELED:
+            case MSC_GESTURE:
+            case MSC_RAW:
+                log_unimpl("Misc event from Input Event Device");
+                break;
+            case MSC_SCAN:
+                
+                _input_data.key = scancode_to_gnash_key(ev->value,
+                                                        keyb_lshift || keyb_rshift);
+                _input_data.modifier = gnash::key::GNASH_MOD_NONE;
+                
+                if (keyb_lshift || keyb_rshift) {
+                    _input_data.modifier = _input_data.modifier | gnash::key::GNASH_MOD_SHIFT;
+                }
+                
+                if (keyb_lctrl || keyb_rctrl) {
+                    _input_data.modifier = _input_data.modifier | gnash::key::GNASH_MOD_CONTROL;
+                }
+                
+                if (keyb_lalt || keyb_ralt) {
+                    _input_data.modifier = _input_data.modifier | gnash::key::GNASH_MOD_ALT;
+                }
+                activity = true;
+                break;
+            case MSC_MAX:
+            case MSC_CNT:
+            default:
+                log_unimpl("Misc event from Input Event Device");
+          }
           break;
       case EV_LED:
           log_unimpl("LED event from Input Event Device");
@@ -562,7 +667,7 @@ EventDevice::scancode_to_gnash_key(int code, bool shift)
 std::vector<boost::shared_ptr<InputDevice> > 
 EventDevice::scanForDevices()
 {
-    GNASH_REPORT_FUNCTION;
+    // GNASH_REPORT_FUNCTION;
 
     struct stat st;
 
@@ -598,13 +703,13 @@ EventDevice::scanForDevices()
 
         char name[256] = "Unknown";
         if(ioctl(fd, EVIOCGNAME(sizeof(name)), name) < 0) {
-            perror("evdev ioctl");
+            log_error("ioctl (EVIOCGNAME): %s", strerror(errno));
         }
         log_debug("The device on %s says its name is %s", filespec, name);
 
         struct input_id device_info;
         if(ioctl(fd, EVIOCGID, &device_info)) {
-            perror("evdev ioctl");
+            log_error("ioctl (EVIOCGID): %s", strerror(errno));
         }
         log_debug("vendor %04hx product %04hx version %04hx",
                   device_info.vendor, device_info.product,
@@ -612,10 +717,19 @@ EventDevice::scanForDevices()
         close(fd);
         boost::shared_ptr<InputDevice> dev;
         dev = boost::shared_ptr<InputDevice>(new EventDevice());
-        if (dev->init(filespec, DEFAULT_BUFFER_SIZE)) {
-            devices.push_back(dev);
+        // The Uinput device has no product, vendor, or version data.
+        if ((device_info.vendor + device_info.product + device_info.version) > 0) {
+            if (dev->init(filespec, DEFAULT_BUFFER_SIZE)) {
+                // dev->dump();
+                // We don't care about power buttons, we mostly just want
+                // keyboards, mice, and touchscreens. Power buttons don't have
+                // a vendor ID.
+                if (device_info.vendor != 0) {
+                    log_debug("Enabling USB device: %s", name);
+                    devices.push_back(dev);
+                }
+            }
         }
-//        dev->dump();
         
         // setup the next device filespec to try
         total++;

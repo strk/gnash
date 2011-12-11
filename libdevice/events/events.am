@@ -40,7 +40,11 @@ libgnashdevice_la_SOURCES += events/EventDevice.cpp
 endif
 endif
 
-if ENABLE_DEVELOPER_TESTS
+# The Uinput device is write only, and is used to control the mouse
+# movements.
+libgnashdevice_la_SOURCES += events/UinputDevice.cpp
+
+# if ENABLE_DEVELOPER_TESTS
 check_PROGRAMS += test_events evtest
 test_events_SOURCES = events/test_events.cpp
 test_events_CPPFLAGS = $(AM_CPPFLAGS)
@@ -59,4 +63,5 @@ evtest_LDADD = \
 	$(TS_LIBS) \
 	$(EVENTS_LIBS) \
 	$(GNASH_LIBS)
-endif
+#endif
+

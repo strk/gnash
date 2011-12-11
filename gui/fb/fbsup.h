@@ -201,7 +201,8 @@ private:
     /// This is the array of functioning input devices.
     std::vector<boost::shared_ptr<InputDevice> > _inputs;
 
-    boost::shared_ptr<Renderer>         _renderer;
+    boost::shared_ptr<Renderer> _renderer;
+    UinputDevice                _uinput;
 };
 
 } // end of namespace gui
