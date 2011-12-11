@@ -1163,5 +1163,5 @@ event_handler(Network::thread_params_t *args)
 
 // local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:
