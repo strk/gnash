@@ -27,6 +27,7 @@ eglinfo_LDADD = \
 	$(EGL_LIBS) \
 	$(NULL)
 
+if ENABLE_INPUT_DEVICES
 # this tests the low level EGL interface, used by OpenVG, OpenGLES1, and OpenGLES2.
 bin_PROGRAMS += test_egl 
 test_egl_SOURCES = egl/test_egl.cpp
@@ -48,3 +49,4 @@ libgnashdevice_la_SOURCES += \
 	egl/configTemplates.h  \
 	$(NULL)
 libgnashdevice_la_LIBADD += $(EGL_LIBS)
+endif
