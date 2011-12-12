@@ -143,6 +143,7 @@ libgnashbase_la_SOURCES += \
 	GnashVaapiImage.cpp \
 	GnashVaapiImage.h \
 	GnashVaapiImageProxy.h \
+	GnashVaapiTexture.cpp \
 	$(NULL)
 
 endif
@@ -162,6 +163,7 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	$(BOOST_CFLAGS) \
 	$(OPENGL_CFLAGS) \
 	$(LTDL_CFLAGS) \
+	-I$(top_srcdir)/librender \
 	$(NULL)
 
 if ANDROID
