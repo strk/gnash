@@ -69,11 +69,11 @@ endif
 
 SUBDIRS = \
 	desktop \
+	$(DEVICES_DIR) \
 	libbase \
 	libmedia \
 	libsound \
 	libcore \
-	$(DEVICES_DIR) \
 	librender \
 	gui \
 	plugin \
