@@ -54,7 +54,6 @@ AM_CPPFLAGS = -I.. \
 	$(NULL)
 
 GNASH_LIBS = \
-	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(NULL)
 

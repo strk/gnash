@@ -71,7 +71,6 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/librender/opengl \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
-	-I$(top_srcdir)/libvaapi \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DPLUGINSDIR=\"$(pluginsdir)\" \
 	-DLIBAVCODEC_IDENT=\"$(LIBAVCODEC_IDENT)\" \
@@ -123,7 +122,7 @@ GNASH_LIBS = \
 
 if HAVE_VAAPI
 GNASH_LIBS += \
-	$(top_builddir)/libvaapi/libgnashvaapi.la \
+	$(top_builddir)/libdevice/libgnashvaapi.la \
 	$(LIBVA_LIBS) \
 	$(LIBVA_X11_LIBS)
 if BUILD_OGL_RENDERER

@@ -258,15 +258,15 @@ libgnashbase_la_DEPENDENCIES =
 
 if HAVE_VAAPI
    libgnashbase_la_CPPFLAGS += \
-	-I$(top_srcdir)/libvaapi \
+	-I$(top_srcdir)/libdevice/vaapi \
 	$(NULL)
 
    libgnashbase_la_LIBADD += \
-	$(top_builddir)/libvaapi/libgnashvaapi.la \
+	$(top_builddir)/libdevice/libgnashvaapi.la \
 	$(NULL)
 
    libgnashbase_la_DEPENDENCIES += \
-	$(top_builddir)/libvaapi/libgnashvaapi.la \
+	$(top_builddir)/libdevice/libgnashvaapi.la \
 	$(NULL)
 endif
 

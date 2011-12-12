@@ -35,7 +35,7 @@ GNASH_INCLUDES = \
 	-I$(top_srcdir)/libcore/parser \
 	-I$(top_srcdir)/libcore/asobj \
 	-I$(top_srcdir)/libmedia \
-	-I$(top_srcdir)/libvaapi \
+	-I$(top_srcdir)/libdevice/vaapi \
 	-I$(top_srcdir)/libsound
 
 INCLUDES = \

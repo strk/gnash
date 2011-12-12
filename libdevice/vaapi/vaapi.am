@@ -87,9 +87,9 @@ noinst_HEADERS += \
 EXTRA_DIST = $(SRCS) $(noinst_HEADERS)
 
 libgnashdevice_la_CPPFLAGS += $(VAAPI_CFLAGS)
-libgnashdevice_la_SOURCES += \
-	vaapi/VaapiDevice.cpp \
-	vaapi/VaapiDevice.h
+# libgnashdevice_la_SOURCES += \
+# 	vaapi/VaapiDevice.cpp \
+# 	vaapi/VaapiDevice.h
 libgnashdevice_la_LIBADD += $(VAAPI_LIBS)
 
 check_PROGRAMS += test_vaapi

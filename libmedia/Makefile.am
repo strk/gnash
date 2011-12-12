@@ -155,7 +155,7 @@ endif
 
 if HAVE_VAAPI
 libgnashmedia_la_CPPFLAGS += \
-	-I$(top_srcdir)/libvaapi \
+	-I$(top_srcdir)/libdevice/vaapi \
 	$(NULL)
 endif
 
@@ -194,7 +194,7 @@ endif
 
 if HAVE_VAAPI
 libgnashmedia_la_LIBADD += \
-	$(top_builddir)/libvaapi/libgnashvaapi.la \
+	$(top_builddir)/libdevice/libgnashvaapi.la \
 	$(NULL)
 endif
 
