@@ -53,9 +53,9 @@ AM_CPPFLAGS = -I.. \
 	$(CAIRO_CFLAGS) \
 	$(NULL)
 
-GNASH_LIBS = \
-	$(top_builddir)/libbase/libgnashbase.la \
-	$(NULL)
+# GNASH_LIBS = \
+# 	$(top_builddir)/libbase/libgnashbase.la \
+# 	$(NULL)
 
 instdir = $(includedir)/gnash
 
