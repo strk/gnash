@@ -56,6 +56,8 @@ class X11Device : public GnashDevice
 
     dtype_t getType() { return X11; };
 
+    size_t getStride() { return 0; };
+    
     // Initialize X11 Device layer
     bool initDevice(int argc, char *argv[]);
 

@@ -273,7 +273,7 @@ X11Device::eventLoop(size_t passes)
               if (reshape) {
                   width = event.xconfigure.width;
                   height = event.xconfigure.height;
-                  reshape(event.xconfigure.width, event.xconfigure.height);
+                  reshape(width, height);
               }
               break;
           case KeyPress:
