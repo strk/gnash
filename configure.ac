@@ -954,8 +954,8 @@ AC_ARG_ENABLE(renderer,
         build_ogl=yes
         build_agg=yes
         build_cairo=yes
-        build_ovg=yes
-        nrender=4
+        build_ovg=no
+        nrender=3
         ;;
       ogl|OGL|OpenGL|opengl)
         renderer_list="${renderer_list} opengl"
