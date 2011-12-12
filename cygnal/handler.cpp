@@ -244,6 +244,8 @@ Handler::recvMsg(int fd)
 	  log_error("FD #%d has no protocol handler registered", fd);
 	  break;
     }
+
+    return 0;
 }
 
 void
