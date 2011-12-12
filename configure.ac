@@ -1016,11 +1016,7 @@ dnl GMA500 but you currently will have to build the AGG renderer
 dnl instead of the OGL (OpenGL) one. 
 build_vaapi_device=no
 build_openmax_device=no
-if test x"${build_ovg}" = xyes; then
-  build_egl_device=yes
-else
-  build_egl_device=no
-fi
+build_egl_device=no
 build_x11_device=no
 build_directfb_device=no
 if test x"${build_fb}" = xyes -o x"${build_fb}" = xauto; then
@@ -1081,14 +1077,14 @@ AC_ARG_ENABLE(device,
         ndevice=$((ndevice+1))
         ;;
       all|ALL)
-        device_list="EGL DirectFB X11"
+        device_list="EGL RawFB X11"
         build_openmax_device=no
         build_vaapi_device=no
         build_egl_device=yes
         build_rawfb_device=yes
         build_directfb_device=no
         build_x11_device=yes
-        ndevice=5
+        ndevice=3
         ;;
       op*|Op*|OP*)
         device_list="${device_list} OpenMAX"
