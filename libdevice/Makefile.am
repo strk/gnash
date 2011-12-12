@@ -53,10 +53,6 @@ AM_CPPFLAGS = -I.. \
 	$(CAIRO_CFLAGS) \
 	$(NULL)
 
-# GNASH_LIBS = \
-# 	$(top_builddir)/libbase/libgnashbase.la \
-# 	$(NULL)
-
 instdir = $(includedir)/gnash
 
 noinst_HEADERS = \
@@ -124,7 +120,9 @@ if BUILD_DIRECTFB_DEVICE
 include directfb/directfb.am
 endif
 
+if ENABLE_DEVELOPER_TESTS
 if BUILD_X11_DEVICE
+
 check_PROGRAMS += test_x11
 test_x11_SOURCES = x11/test_x11.cpp
 test_x11_CPPFLAGS = $(AM_CPPFLAGS) $(X11_CFLAGS)
@@ -132,6 +130,7 @@ test_x11_LDADD = \
 	libgnashdevice.la \
 	$(X11_LIBS) \
 	$(GNASH_LIBS)
+endif
 endif
 
 if BUILD_VAAPI_DEVICE
