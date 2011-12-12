@@ -42,6 +42,7 @@ test_egl_LDADD = \
 	$(LTDL_LIBS) \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(NULL)
+endif
 
 libgnashdevice_la_CPPFLAGS += $(EGL_CFLAGS)
 libgnashdevice_la_SOURCES += \
@@ -50,4 +51,3 @@ libgnashdevice_la_SOURCES += \
 	egl/configTemplates.h  \
 	$(NULL)
 libgnashdevice_la_LIBADD += $(EGL_LIBS)
-endif
