@@ -1,6 +1,18 @@
 [Desktop Entry]
 Type=Application
 Name=Gnash SWF Viewer for KDE
+Name[ca]=Visualitzador d'SWF Gnash per a KDE
+Name[cs]=Přehrávač SWF souborů Gnash pro KDE
+Name[de]=Gnash-SWF-Betrachter für KDE
+Name[es]=Visualizador de SWF Gnash para KDE
+Name[fi]=Gnash SWF-katselin KDE:lle
+Name[it]=Visualizzatore di SWF per KDE Gnash
+Name[ja]=KDE 用 Gnash SWF ビューア
+Name[pl]=Przeglądarka animacji SWF Gnash do KDE
+Name[ru]=Просмотрщик SWF Gnash для KDE
+Name[sv]=Gnash SWF-visare för KDE
+Name[vi]=Bộ xem SWF Gnash cho KDE
+Name[zh_CN]=KDE 上的Gnash SWF 查看器
 GenericName=SWF Viewer
 Comment=View SWF Files
 Icon=klash

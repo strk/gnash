@@ -1,6 +1,18 @@
 [Desktop Entry]
 Type=Application
 Name=Gnash SWF Viewer
+Name[ca]=Visualitzador d'SWF Gnash
+Name[cs]=Přehrávač SWF souborů Gnash
+Name[de]=Gnash-SWF-Betrachter
+Name[es]=Visualizador de SWF Gnash
+Name[fi]=Gnash SWF-katselin
+Name[it]=Visualizzatore di SWF Gnash
+Name[ja]=Gnash SWF ビューア
+Name[pl]=Przeglądarka animacji SWF Gnash
+Name[ru]=Просмотрщик SWF Gnash
+Name[sv]=Gnash SWF-visare
+Name[vi]=Bộ xem SWF Gnash
+Name[zh_CN]=Gnash SWF 查看器
 GenericName=SWF Viewer
 Comment=View SWF Files
 Icon=gnash
