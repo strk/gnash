@@ -2224,6 +2224,7 @@ if test "x$ac_cv_long_timezone" = "xyes" ; then
   AC_DEFINE(HAVE_LONG_TIMEZONE, [1], [extern timezone is a long integer, not a function])
 fi
 
+AC_CHECK_FUNCS(mkstemps)
 AC_CHECK_FUNCS(sysconf)
 AC_CHECK_FUNCS(shmget shmat shmdt mmap)
 AC_CHECK_FUNCS(scandir)         dnl supported by BSD and Linux, but you never know...

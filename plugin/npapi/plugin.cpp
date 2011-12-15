@@ -159,7 +159,7 @@ boost::iostreams::file_descriptor_sink
 getfdsink(char mksTemplate[])
 {
   int fd, suffix = std::string(mksTemplate).size() - std::string(mksTemplate).find("XXXXXX") - 6;
-#if (__GLIBC__ >= 2 && __GLIBC_MINOR__ >= 11)
+#ifdef HAVE_MKSTEMPS
   fd = mkstemps (mksTemplate, suffix);
 #else
   if (suffix > 0) {
