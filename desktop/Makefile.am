@@ -32,6 +32,7 @@ EXTRA_DIST = gnash-splash.swf \
              gnash-gtk-launcher.in \
              gnash-qt-launcher.in \
              gnash-thumbnailer.in \
+             gnashthumbnailrc.in \
              gnash.schemas.in
 
 if BUILD_GTK_GUI
