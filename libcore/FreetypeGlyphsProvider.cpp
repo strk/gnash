@@ -153,7 +153,7 @@ private:
     int moveTo(const FT_Vector* to)
     {
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-        log_debug("moveTo: %ld,%ld", to->x, to->y);
+        log_debug(_("moveTo: %ld,%ld"), to->x, to->y);
 #endif
         _x = static_cast<boost::int32_t>(to->x * _scale);
         _y = - static_cast<boost::int32_t>(to->y * _scale);
@@ -166,7 +166,7 @@ private:
     int lineTo(const FT_Vector* to)
     {
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-        log_debug("lineTo: %ld,%ld", to->x, to->y);
+        log_debug(_("lineTo: %ld,%ld"), to->x, to->y);
 #endif
         _x = static_cast<boost::int32_t>(to->x * _scale);
         _y = - static_cast<boost::int32_t>(to->y * _scale);
@@ -178,7 +178,7 @@ private:
     int conicTo(const FT_Vector* ctrl, const FT_Vector* to)
     {
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-        log_debug("conicTo: %ld,%ld %ld,%ld", ctrl->x, ctrl->y, to->x, to->y);
+        log_debug(_("conicTo: %ld,%ld %ld,%ld"), ctrl->x, ctrl->y, to->x, to->y);
 #endif
         boost::int32_t x1 = static_cast<boost::int32_t>(ctrl->x * _scale);
         boost::int32_t y1 = static_cast<boost::int32_t>(ctrl->y * _scale);
@@ -193,7 +193,7 @@ private:
     cubicTo(const FT_Vector* ctrl1, const FT_Vector* ctrl2, const FT_Vector* to)
     {
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-        log_debug("cubicTo: %ld,%ld %ld,%ld %ld,%ld", ctrl1->x,
+        log_debug(_("cubicTo: %ld,%ld %ld,%ld %ld,%ld"), ctrl1->x,
                 ctrl1->y, ctrl2->x, ctrl2->y, to->x, to->y);
 #endif
         float x = ctrl1->x + ( (ctrl2->x - ctrl1->x) * 0.5 );
@@ -325,15 +325,16 @@ FreetypeGlyphsProvider::getFontFilename(const std::string &name,
 
     if ( fs ) {
 #ifdef GNASH_DEBUG_DEVICEFONTS
-        log_debug("Found %d fonts matching the family %s (using "
-                "first)", fs->nfont, name);
+        log_debug(_("Found %d fonts matching the family %s (using "
+                    "first)"), fs->nfont, name);
 #endif
 
         for (int j = 0; j < fs->nfont; j++) {
             FcChar8 *file;
             if (FcPatternGetString (fs->fonts[j], FC_FILE, 0, &file) != FcResultMatch) {
 #ifdef GNASH_DEBUG_DEVICEFONTS
-        log_debug("Matching font %d has unknown filename, skipping", j);
+                log_debug(_("Matching font %d has unknown filename, skipping"),
+                          j);
 #endif
         continue;
             }
@@ -342,7 +343,7 @@ FreetypeGlyphsProvider::getFontFilename(const std::string &name,
             FcFontSetDestroy(fs);
 
 #ifdef GNASH_DEBUG_DEVICEFONTS
-            log_debug("Loading font from file %d", filename);
+            log_debug(_("Loading font from file %d"), filename);
 #endif
             return true;
 
@@ -351,13 +352,13 @@ FreetypeGlyphsProvider::getFontFilename(const std::string &name,
         FcFontSetDestroy(fs);
     }
 
-    log_error("No device font matches the name '%s', using hard-coded"
-            " font filename", name);
+    log_error(_("No device font matches the name '%s', using hard-coded"
+                " font filename"), name);
     filename = DEFAULT_FONTFILE;
     return true;
 #else
-    log_error("Font filename matching not implemented (no fontconfig"
-            " support built-in), using hard-coded font filename",
+    log_error(_("Font filename matching not implemented (no fontconfig"
+                " support built-in), using hard-coded font filename"),
             DEFAULT_FONTFILE);
     filename = DEFAULT_FONTFILE;
     return true;
@@ -389,7 +390,7 @@ FreetypeGlyphsProvider::createFace(const std::string& name, bool bold, bool ital
 std::auto_ptr<FreetypeGlyphsProvider>
 FreetypeGlyphsProvider::createFace(const std::string&, bool, bool)
 {
-    log_error("Freetype not supported");
+    log_error(_("Freetype not supported"));
     return std::auto_ptr<FreetypeGlyphsProvider>(NULL);
 }
 #endif 
@@ -465,7 +466,8 @@ FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string& name,
     scale = (float)unitsPerEM()/_face->units_per_EM;
 
 #ifdef GNASH_DEBUG_DEVICEFONTS
-    log_debug("EM square for font '%s' is %d, scale is thus %g", name, _face->units_per_EM, scale);
+    log_debug(_("EM square for font '%s' is %d, scale is this %g"),
+              name, _face->units_per_EM, scale);
 #endif
 }
 #else // ndef(USE_FREETYPE)
@@ -485,24 +487,24 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
                                                 FT_LOAD_NO_SCALE);
 
     if (error) {
-        log_error("Error loading freetype outline glyph for char '%c' "
-                "(error: %d)", code, error);
+        log_error(_("Error loading freetype outline glyph for char '%c' "
+                    "(error: %d)"), code, error);
         return glyph;
     }
 
     // Scale advance by current scale, to match expected output coordinate space
     advance = _face->glyph->metrics.horiAdvance * scale;
 #ifdef GNASH_DEBUG_DEVICEFONTS 
-    log_debug("Advance value for glyph '%c' is %g (horiAdvance:%ld, "
-            "scale:%g)", code, advance, 
-            _face->glyph->metrics.horiAdvance, scale);
+    log_debug(_("Advance value for glyph '%c' is %g (horiAdvance:%ld, "
+                "scale:%g)"), code, advance, 
+              _face->glyph->metrics.horiAdvance, scale);
 #endif
 
     if ( _face->glyph->format != FT_GLYPH_FORMAT_OUTLINE )
     {
         unsigned long gf = _face->glyph->format;
-        log_unimpl("FT_Load_Char() returned a glyph format != "
-            "FT_GLYPH_FORMAT_OUTLINE (%c%c%c%c)",
+        log_unimpl(_("FT_Load_Char() returned a glyph format != "
+                     "FT_GLYPH_FORMAT_OUTLINE (%c%c%c%c)"),
             static_cast<char>((gf>>24)&0xff),
             static_cast<char>((gf>>16)&0xff),
             static_cast<char>((gf>>8)&0xff),
@@ -521,7 +523,7 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
     walk.delta = 0; // ?
 
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-    log_debug("Decomposing glyph outline for DisplayObject %u", code);
+    log_debug(_("Decomposing glyph outline for DisplayObject %u"), code);
 #endif
     
     glyph.reset(new SWF::ShapeRecord);
@@ -533,7 +535,7 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 #if 0
     // Don't use VM::get if this is to be re-enabled.
     SWFRect bound; sh->compute_bound(&bound, VM::get().getSWFVersion());
-    log_debug("Decomposed glyph for DisplayObject '%c' has bounds %s",
+    log_debug(_("Decomposed glyph for DisplayObject '%c' has bounds %s"),
             code, bound.toString());
 #endif
 #endif
@@ -556,7 +558,7 @@ FreetypeGlyphsProvider::~FreetypeGlyphsProvider()
 #ifdef USE_FREETYPE 
     if (_face) {
         if (FT_Done_Face(_face) != 0) {
-            log_error("Could not release FT face resources");
+            log_error(_("Could not release FT face resources"));
         }
     }
 #endif

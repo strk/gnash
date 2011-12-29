@@ -849,7 +849,7 @@ MovieClip::setTextFieldVariables(const ObjectURI& uri, const as_value& val)
 void
 MovieClip::unloadMovie()
 {
-    LOG_ONCE(log_unimpl("MovieClip.unloadMovie()"));
+    LOG_ONCE(log_unimpl(_("MovieClip.unloadMovie()")));
 }
 
 void
@@ -983,8 +983,8 @@ MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
 
     if (_swf->initializeCharacter(cid)) {
 #ifdef GNASH_DEBUG
-        log_debug("Queuing init actions for DisplayObject %1% "
-                    "in frame %2% of MovieClip %3%",
+        log_debug(_("Queuing init actions for DisplayObject %1% "
+                    "in frame %2% of MovieClip %3%"),
                 cid, _currentFrame, getTarget());
 #endif
         std::auto_ptr<ExecutableCode> code(new GlobalCode(a, this));
@@ -993,7 +993,7 @@ MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
     }
     else {
 #ifdef GNASH_DEBUG
-        log_debug("Init actions for DisplayObject %1% already executed", cid);
+        log_debug(_("Init actions for DisplayObject %1% already executed"), cid);
 #endif
     }
 }

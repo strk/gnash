@@ -74,21 +74,21 @@ public:
     virtual as_value call(const fn_call& fn)
     {
         string_table& st = getStringTable(fn);
-        log_debug("Loading native class %s", st.value(getName(_decl.uri)));
+        log_debug(_("Loading native class %s"), st.value(getName(_decl.uri)));
 
         _decl.initializer(*mTarget, _decl.uri);
         // Successfully loaded it, now find it, set its proto, and return.
         as_value us;
         if (mTarget->get_member(_decl.uri, &us)) {
             if (!toObject(us, getVM(fn))) {
-                log_error("Native class %s is not an object after "
-                        "initialization (%s)",
+                log_error(_("Native class %s is not an object after "
+			  "initialization (%s)"),
                         st.value(getName(_decl.uri)), us);
             }
         }
         else
         {
-            log_error("Native class %s is not found after initialization", 
+            log_error(_("Native class %s is not found after initialization"),
                 st.value(getName(_decl.uri)));
         }
         return us;

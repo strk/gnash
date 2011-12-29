@@ -118,8 +118,8 @@ DisplayObject::DisplayObject(movie_root& mr, as_object* object,
 void
 DisplayObject::getLoadedMovie(Movie* extern_movie)
 {
-    LOG_ONCE(
-    log_unimpl("loadMovie against a %s DisplayObject", typeName(*this))
+    LOG_ONCE(log_unimpl(_("loadMovie against a %s DisplayObject"),
+			  typeName(*this))
     );
 
     // TODO: look at the MovieClip implementation, but most importantly
@@ -203,7 +203,7 @@ DisplayObject::set_invalidated(const char* debug_file, int debug_line)
         _invalidated = true;
         
 #ifdef DEBUG_SET_INVALIDATED
-        log_debug("%p set_invalidated() of %s in %s:%d",
+        log_debug(_("%p set_invalidated() of %s in %s:%d"),
             (void*)this, getTarget(), debug_file, debug_line);
 #else
         UNUSED(debug_file);
@@ -1349,7 +1349,7 @@ setName(DisplayObject& o, const as_value& val)
 void
 setSoundBufTime(DisplayObject& /*o*/, const as_value& /*val*/)
 {
-    LOG_ONCE(log_unimpl("_soundbuftime setting"));
+    LOG_ONCE(log_unimpl(_("_soundbuftime setting")));
 }
 
 as_value
@@ -1383,7 +1383,7 @@ setWidth(DisplayObject& o, const as_value& val)
 as_value
 getFocusRect(DisplayObject& o)
 {
-    LOG_ONCE(log_unimpl("_focusrect"));
+    LOG_ONCE(log_unimpl(_("_focusrect")));
 
     const boost::tribool fr = o.focusRect();
     if (boost::indeterminate(fr)) {
@@ -1401,7 +1401,7 @@ getFocusRect(DisplayObject& o)
 void
 setFocusRect(DisplayObject& o, const as_value& val)
 {
-    LOG_ONCE(log_unimpl("_focusrect"));
+    LOG_ONCE(log_unimpl(_("_focusrect")));
 
     VM& vm = getVM(*getObject(&o));
     if (!o.parent()) {

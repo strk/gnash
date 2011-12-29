@@ -130,7 +130,7 @@ ExternalInterface::_toXML(const as_value &val)
         as_object *obj = val.get_object();
         ss << _objectToXML(obj);
     } else {
-        log_error("Can't convert unknown type %d", val.to_string());
+        log_error(_("Can't convert unknown type %d"), val.to_string());
     }
 
     return ss.str();
@@ -149,7 +149,7 @@ ExternalInterface::ExternalEventCheck(int fd)
         if (bytes == 0) {
             return error;
         }
-        log_debug("There are %d bytes in the network buffer", bytes);
+        log_debug(_("There are %d bytes in the network buffer"), bytes);
         boost::scoped_array<char> buffer(new char[bytes + 1]);
         // Since we know how bytes are in the network buffer, allocate
         // some memory to read the data.
@@ -260,7 +260,7 @@ ExternalInterface::parseXML(const std::string &xml)
         }
     }
 
-//    log_debug("Argument is: %s", value.to_string());
+//    log_debug(_("Argument is: %s"), value.to_string());
     return value;
 }
 
@@ -344,7 +344,7 @@ ExternalInterface::readBrowser(int fd)
         return empty;
     }
 
-    log_debug("There are %d bytes in the network buffer", bytes);
+    log_debug(_("There are %d bytes in the network buffer"), bytes);
 
     std::string buf(bytes, '\0');
 

@@ -682,7 +682,8 @@ Button::set_current_state(MouseState new_state)
                     int oldDepth = oldch->get_depth();
                     int newDepth = DisplayObject::removedDepthOffset - oldDepth;
 #ifdef GNASH_DEBUG_BUTTON_DISPLAYLIST
-                    log_debug("Removed button record shifted from depth %d to depth %d", oldDepth, newDepth);
+                    log_debug(_("Removed button record shifted from depth %d to depth %d"),
+			      oldDepth, newDepth);
 #endif
                     oldch->set_depth(newDepth);
                 }
@@ -784,8 +785,8 @@ Button::construct(as_object* initObj)
     // (see misc-ming.all/attachMovieTest.swf).
     if (initObj) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("Button placed with an init object. This will "
-                "be ignored.");
+		log_aserror(_("Button placed with an init object. This will "
+			      "be ignored."));
         );
     }
 
@@ -990,7 +991,7 @@ as_value
 button_blendMode(const fn_call& fn)
 {
     Button* obj = ensure<IsDisplayObject<Button> >(fn);
-    LOG_ONCE(log_unimpl("Button.blendMode"));
+    LOG_ONCE(log_unimpl(_("Button.blendMode")));
     UNUSED(obj);
     return as_value();
 }
@@ -999,7 +1000,7 @@ as_value
 button_cacheAsBitmap(const fn_call& fn)
 {
     Button* obj = ensure<IsDisplayObject<Button> >(fn);
-    LOG_ONCE(log_unimpl("Button.cacheAsBitmap"));
+    LOG_ONCE(log_unimpl(_("Button.cacheAsBitmap")));
     UNUSED(obj);
     return as_value();
 }
@@ -1008,7 +1009,7 @@ as_value
 button_filters(const fn_call& fn)
 {
     Button* obj = ensure<IsDisplayObject<Button> >(fn);
-    LOG_ONCE(log_unimpl("Button.filters"));
+    LOG_ONCE(log_unimpl(_("Button.filters")));
     UNUSED(obj);
     return as_value();
 }
@@ -1017,7 +1018,7 @@ as_value
 button_scale9Grid(const fn_call& fn)
 {
     Button* obj = ensure<IsDisplayObject<Button> >(fn);
-    LOG_ONCE(log_unimpl("Button.scale9Grid"));
+    LOG_ONCE(log_unimpl(_("Button.scale9Grid")));
     UNUSED(obj);
     return as_value();
 }
@@ -1026,7 +1027,7 @@ as_value
 button_getTabIndex(const fn_call& fn)
 {
     Button* obj = ensure<IsDisplayObject<Button> >(fn);
-    LOG_ONCE(log_unimpl("Button.getTabIndex"));
+    LOG_ONCE(log_unimpl(_("Button.getTabIndex")));
     UNUSED(obj);
     return as_value();
 }
@@ -1035,7 +1036,7 @@ as_value
 button_setTabIndex(const fn_call& fn)
 {
     Button* obj = ensure<IsDisplayObject<Button> >(fn);
-    LOG_ONCE(log_unimpl("Button.setTabIndex"));
+    LOG_ONCE(log_unimpl(_("Button.setTabIndex")));
     UNUSED(obj);
     return as_value();
 }
@@ -1057,5 +1058,5 @@ button_getDepth(const fn_call& fn)
 // mode: C++
 // c-basic-offset: 8 
 // tab-width: 8
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

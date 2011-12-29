@@ -198,7 +198,7 @@ Font::codeTableLookup(int glyph, bool embedded) const
         // that defines the same font twice and ends up with a glyph
         // table shorter than the number of glyphs. We don't know
         // whether it's a SWF or a Gnash bug.
-        log_error("Failed to find glyph %s in %s font %s",
+        log_error(_("Failed to find glyph %s in %s font %s"),
                 glyph, embedded ? "embedded" : "device", _name);
         return 0;
     }
@@ -273,8 +273,8 @@ Font::unitsPerEM(bool embed) const
     
     FreetypeGlyphsProvider* ft = ftProvider();
     if (!ft) {
-        log_error("Device font provider was not initialized, "
-                    "can't get unitsPerEM");
+        log_error(_("Device font provider was not initialized, "
+                    "can't get unitsPerEM"));
         return 0; 
     }
 
@@ -295,9 +295,9 @@ Font::add_os_glyph(boost::uint16_t code)
     std::auto_ptr<SWF::ShapeRecord> sh = ft->getGlyph(code, advance);
 
     if (!sh.get()) {
-        log_error("Could not create shape "
+        log_error(_("Could not create shape "
                 "glyph for DisplayObject code %u (%c) with "
-                "device font %s (%p)", code, code, _name, ft);
+		    "device font %s (%p)"), code, code, _name, ft);
         return -1;
     }
 
@@ -329,15 +329,15 @@ Font::ftProvider() const
     if (_ftProvider.get()) return _ftProvider.get();
 
     if (_name.empty()) {
-        log_error("No name associated with this font, can't use device "
-                "fonts (should I use a default one?)");
+        log_error(_("No name associated with this font, can't use device "
+		    "fonts (should I use a default one?)"));
         return 0;
     }
 
     _ftProvider = FreetypeGlyphsProvider::createFace(_name, _bold, _italic);
     
     if (!_ftProvider.get()) {
-        log_error("Could not create a freetype face %s", _name);
+        log_error(_("Could not create a freetype face %s"), _name);
         return 0;
     }
     

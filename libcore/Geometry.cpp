@@ -195,8 +195,8 @@ pointTest(const std::vector<Path>& paths,
             else if (ls.scaleThicknessVertically() != 
                     ls.scaleThicknessHorizontally())
             {
-                LOG_ONCE(log_unimpl("Collision detection for "
-                            "unidirectionally scaled strokes"));
+                LOG_ONCE(log_unimpl(_("Collision detection for "
+                                      "unidirectionally scaled strokes")));
             }
 
             double dist = thickness / 2.0;

@@ -103,7 +103,7 @@ PropertyList::setValue(const ObjectURI& uri, const as_value& val,
 		_props.push_back(a);
 #ifdef GNASH_DEBUG_PROPERTY
         ObjectURI::Logger l(getStringTable(_owner));
-		log_debug("Simple AS property %s inserted with flags %s",
+        log_debug(_("Simple AS property %s inserted with flags %s"),
 			l(uri), a.getFlags());
 #endif
 		return true;
@@ -192,7 +192,7 @@ PropertyList::dump()
     ObjectURI::Logger l(getStringTable(_owner));
 	for (const_iterator it=_props.begin(), itEnd=_props.end();
             it != itEnd; ++it) {
-		log_debug("  %s: %s", l(it->uri()), it->getValue(_owner));
+            log_debug(_("  %s: %s"), l(it->uri()), it->getValue(_owner));
 	}
 }
 
@@ -212,7 +212,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_function& getter,
 
 #ifdef GNASH_DEBUG_PROPERTY
         ObjectURI::Logger l(getStringTable(_owner));
-		log_debug("AS GetterSetter %s replaced copying flags %s", l(uri),
+        log_debug(_("AS GetterSetter %s replaced copying flags %s"), l(uri),
                 a.getFlags());
 #endif
 
@@ -222,7 +222,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_function& getter,
 		_props.push_back(a);
 #ifdef GNASH_DEBUG_PROPERTY
         ObjectURI::Logger l(getStringTable(_owner));
-		log_debug("AS GetterSetter %s inserted with flags %s", l(uri),
+        log_debug(_("AS GetterSetter %s inserted with flags %s"), l(uri),
                 a.getFlags());
 #endif
 	}
@@ -245,7 +245,7 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_c_function_ptr getter,
 
 #ifdef GNASH_DEBUG_PROPERTY
         ObjectURI::Logger l(getStringTable(_owner));
-		log_debug("Native GetterSetter %s replaced copying flags %s", l(uri),
+        log_debug(_("Native GetterSetter %s replaced copying flags %s"), l(uri),
                 a.getFlags());
 #endif
 
@@ -255,8 +255,8 @@ PropertyList::addGetterSetter(const ObjectURI& uri, as_c_function_ptr getter,
 		_props.push_back(a);
 #ifdef GNASH_DEBUG_PROPERTY
 		string_table& st = getStringTable(_owner);
-		log_debug("Native GetterSetter %s in namespace %s inserted with "
-                "flags %s", st.value(key), st.value(nsId), a.getFlags());
+		log_debug(_("Native GetterSetter %s in namespace %s inserted with "
+                          "flags %s"), st.value(key), st.value(nsId), a.getFlags());
 #endif
 	}
 
@@ -271,7 +271,7 @@ PropertyList::addDestructiveGetter(const ObjectURI& uri, as_function& getter,
 	if (found != _props.end())
 	{
         ObjectURI::Logger l(getStringTable(_owner));
-		log_error("Property %s already exists, can't addDestructiveGetter",
+        log_error(_("Property %s already exists, can't addDestructiveGetter"),
                 l(uri));
 		return false; // Already exists.
 	}
@@ -283,7 +283,7 @@ PropertyList::addDestructiveGetter(const ObjectURI& uri, as_function& getter,
 
 #ifdef GNASH_DEBUG_PROPERTY
     ObjectURI::Logger l(getStringTable(_owner));
-	log_debug("Destructive AS property %s inserted with flags %s",
+    log_debug(_("Destructive AS property %s inserted with flags %s"),
             l(uri), a.getFlags());
 #endif
 
@@ -303,7 +303,7 @@ PropertyList::addDestructiveGetter(const ObjectURI& uri,
 
 #ifdef GNASH_DEBUG_PROPERTY
     ObjectURI::Logger l(getStringTable(_owner));
-	log_debug("Destructive native property %s with flags %s", l(uri),
+    log_debug(_("Destructive native property %s with flags %s"), l(uri),
             a.getFlags());
 #endif
 	return true;

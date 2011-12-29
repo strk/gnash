@@ -44,8 +44,8 @@ colorFromHexString(const std::string& color)
     boost::uint32_t hexnumber;
     
     if (!(ss >> std::hex >> hexnumber)) {
-        log_error("Failed to convert string to RGBA value! This is a "
-                "Gnash bug");
+	    log_error(_("Failed to convert string to RGBA value! This is a "
+			"Gnash bug"));
         return rgba();
     }
 

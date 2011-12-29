@@ -54,7 +54,7 @@ Video::Video(as_object* object,
 
     media::MediaHandler* mh = getRunResources(*object).mediaHandler();
 	if (!mh) {
-		LOG_ONCE( log_error(_("No Media handler registered, "
+		LOG_ONCE(log_error(_("No Media handler registered, "
 			"won't be able to decode embedded video")) );
 		return;
 	}
@@ -66,7 +66,7 @@ Video::Video(as_object* object,
 	    _decoder = mh->createVideoDecoder(*info);
 	}
 	catch (const MediaException& e) {
-	    log_error("Could not create Video Decoder: %s", e.what());
+	    log_error(_("Could not create Video Decoder: %s"), e.what());
 	}
 }
 
@@ -142,7 +142,7 @@ Video::getVideoFrame()
         const boost::uint16_t current_frame = get_ratio(); 
 
 #ifdef DEBUG_EMBEDDED_VIDEO_DECODING
-		log_debug("Video instance %s need display video frame (ratio) %d",
+        log_debug(_("Video instance %s need display video frame (ratio) %d"),
 			getTarget(), current_frame);
 #endif
 
@@ -151,7 +151,7 @@ Video::getVideoFrame()
 		if (_lastDecodedVideoFrameNum >= 0 &&
                 _lastDecodedVideoFrameNum == current_frame) {
 #ifdef DEBUG_EMBEDDED_VIDEO_DECODING
-			log_debug("  current frame == _lastDecodedVideoFrameNum (%d)",
+                    log_debug(_("  current frame == _lastDecodedVideoFrameNum (%d)"),
                     current_frame);
 #endif
 			return _lastDecodedVideoFrame.get();
@@ -166,7 +166,7 @@ Video::getVideoFrame()
 		// we restart decoding from scratch
 		if (current_frame < static_cast<size_t>(_lastDecodedVideoFrameNum)) {
 #ifdef DEBUG_EMBEDDED_VIDEO_DECODING
-			log_debug("  current frame (%d) < _lastDecodedVideoFrameNum (%d)",
+                    log_debug(_("  current frame (%d) < _lastDecodedVideoFrameNum (%d)"),
                     current_frame, _lastDecodedVideoFrameNum);
 #endif
 			from_frame = 0;
@@ -177,8 +177,7 @@ Video::getVideoFrame()
 		_lastDecodedVideoFrameNum = current_frame;
 
 #ifdef DEBUG_EMBEDDED_VIDEO_DECODING
-		log_debug("  decoding embedded frames from %d to %d for Video "
-                "object %s", from_frame, current_frame, getTarget());
+		log_debug(_("  decoding embedded frames from %d to %d for Video object %s"), from_frame, current_frame, getTarget());
 #endif
 
         const size_t frames = m_def->visitSlice(

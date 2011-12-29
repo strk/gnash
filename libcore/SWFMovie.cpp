@@ -51,7 +51,7 @@ SWFMovie::construct(as_object* /*init*/)
     if ( !_def->ensure_frame_loaded(nextframe) )
     {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror("Frame %d never loaded. Total frames: %d",
+            log_swferror(_("Frame %d never loaded. Total frames: %d"),
                         nextframe, get_frame_count());
         );
     }
@@ -74,7 +74,7 @@ SWFMovie::advance()
 	if ( !_def->ensure_frame_loaded(nextframe) )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror("Frame %d never loaded. Total frames: %d.",
+                    log_swferror(_("Frame %d never loaded. Total frames: %d."),
 		            nextframe, get_frame_count());
 		);
 	}
@@ -106,8 +106,8 @@ SWFMovie::initializeCharacter(boost::uint16_t cid)
     Characters::iterator it = _characters.find(cid);
     if (it == _characters.end()) {
         IF_VERBOSE_MALFORMED_SWF(
-            log_swferror("Attempt to perform initialized for a character %s "
-                "that does not exist (either not exported or not defined)",
+            log_swferror(_("Attempt to perform initialized for a character %s "
+                           "that does not exist (either not exported or not defined)"),
                 cid);
         );
         return false;

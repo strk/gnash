@@ -228,7 +228,7 @@ getFileType(IOChannel& in)
         return GNASH_FILETYPE_SWF;
     }
 
-    log_error("unknown file type, buf is %c%c%c", buf[0], buf[1], buf[2]);
+    log_error(_("unknown file type, buf is %c%c%c"), buf[0], buf[1], buf[2]);
     return GNASH_FILETYPE_UNKNOWN;
 }
 

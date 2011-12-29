@@ -329,7 +329,7 @@ setVariable(const as_environment& env, const std::string& varname,
     const as_value& val, const as_environment::ScopeStack& scope)
 {
     IF_VERBOSE_ACTION(
-        log_action("-------------- %s = %s", varname, val);
+        log_action(_("-------------- %s = %s"), varname, val);
     );
 
     // Path lookup rigamarole.
@@ -404,7 +404,7 @@ parsePath(const std::string& var_path_in, std::string& path, std::string& var)
     const std::string v(var_path_in, lastDotOrColon + 1, var_path_in.size());
 
 #ifdef DEBUG_TARGET_FINDING 
-    log_debug("path: %s, var: %s", p, v);
+    log_debug(_("path: %s, var: %s"), p, v);
 #endif
 
     if (p.empty()) return false;
@@ -471,9 +471,7 @@ setVariableRaw(const as_environment& env, const std::string& varname,
         getObject(env.get_original_target())->set_member(varkey, val);
     }
     else {
-        log_error("as_environment::setVariableRaw(%s, %s): "
-           "neither current target nor original target are defined, "
-           "can't set the variable",
+        log_error(_("as_environment::setVariableRaw(%s, %s): neither current target nor original target are defined, can't set the variable"),
            varname, val);
     }
 }
@@ -548,7 +546,7 @@ getVariableRaw(const as_environment& env, const std::string& varname,
     as_object* global = vm.getGlobal();
     if (swfVersion > 5 && eq(key, NSV::PROP_uGLOBAL)) {
 #ifdef GNASH_DEBUG_GET_VARIABLE
-        log_debug("Took %s as _global, returning _global", varname);
+        log_debug(_("Took %s as _global, returning _global"), varname);
 #endif
         // The "_global" ref was added in SWF6
         if (retTarget) *retTarget = NULL; // correct ??
@@ -557,7 +555,7 @@ getVariableRaw(const as_environment& env, const std::string& varname,
 
     if (global->get_member(key, &val)) {
 #ifdef GNASH_DEBUG_GET_VARIABLE
-        log_debug("Found %s in _global", varname);
+        log_debug(_("Found %s in _global"), varname);
 #endif
         if (retTarget) *retTarget = global;
         return val;

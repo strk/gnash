@@ -50,7 +50,7 @@ StaticText::pointInShape(boost::int32_t x, boost::int32_t y) const
 {
     // TODO: check actual point in shape, as tested 
     //       in misc-ming.all/DefineTextTest.swf
-    LOG_ONCE(log_unimpl("StaticText::pointInShape"));
+    LOG_ONCE(log_unimpl(_("StaticText::pointInShape")));
     return pointInBounds(x, y);
 }
 

@@ -231,7 +231,7 @@ TextField::removeTextField()
     MovieClip* parentSprite = p->to_movie();
 
     if (!parentSprite) {
-        log_error("FIXME: attempt to remove a TextField being a child of a %s",
+        log_error(_("FIXME: attempt to remove a TextField being a child of a %s"),
                 typeName(*p));
         return;
     }
@@ -325,7 +325,7 @@ TextField::display(Renderer& renderer, const Transform& base)
         if (drawBackground) backgroundColor = cx.transform(backgroundColor);
         
 #ifdef GNASH_DEBUG_TEXTFIELDS
-    log_debug("rendering a Pol composed by corners %s", _bounds);
+	log_debug(_("rendering a Pol composed by corners %s"), _bounds);
 #endif
 
         renderer.draw_poly(coords, backgroundColor, 
@@ -410,7 +410,7 @@ TextField::setRestrict(const std::string& restrict)
     while (rit != re) {
         while (rit != re && *rit != '^') { //This loop allows chars
             if (*rit == '-') {
-                log_error("invalid restrict string");
+                log_error(_("invalid restrict string"));
                 return;
             } else if (*(rit+1) == '-') {
                 if (re - (rit+2) != 0) {
@@ -420,7 +420,7 @@ TextField::setRestrict(const std::string& restrict)
                     }
                     rit += 3;
                 } else {
-                    log_error("invalid restrict string");
+                    log_error(_("invalid restrict string"));
                     return;
                 }
             } else if (*rit == '\\') {
@@ -438,7 +438,7 @@ TextField::setRestrict(const std::string& restrict)
         while (rit != re && *rit != '^') { //This loop restricts chars
             locate = _restrictedchars.find(*rit);
             if (*rit == '-') {
-                log_error("invalid restrict string");
+                log_error(_("invalid restrict string"));
                 return;
             } else if (*(rit+1) == '-') {
                 if (re - (rit+2) != 0) {
@@ -453,7 +453,7 @@ TextField::setRestrict(const std::string& restrict)
                     ++rit;
                     ++rit;
                 } else {
-                    log_error("invalid restrict string");
+                    log_error(_("invalid restrict string"));
                     return;
                 }
             } else if (*rit == '\\') {
@@ -839,10 +839,7 @@ TextField::setTextValue(const std::wstring& wstr)
         }
         else {
             // nothing to do (too early ?)
-            log_debug("setTextValue: variable name %s points to a non-existent"
-                    " target, I guess we would not be registered if this was "
-                    "true, or the sprite we've registered our variable name "
-                    "has been unloaded", _variable_name);
+            log_debug(_("setTextValue: variable name %s points to a non-existent target, I guess we would not be registered if this was true, or the sprite we've registered our variable name has been unloaded"), _variable_name);
         }
     }
 }
@@ -1441,8 +1438,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                                     // FIXME: should this be a log_aserror
                                     //        or log_unimpl ? It is triggered
                                     //        by TextFieldHTML.as
-                                    log_error("Unexpected value '%s' in "
-                                        "TextField font color attribute",
+                                    log_error(_("Unexpected value '%s' in TextField font color attribute"),
                                         hexval);
                                 }
                                 else {
@@ -1511,7 +1507,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                         }
                         else if (s == "IMG") {
                             //image
-                            log_unimpl("<img> html tag in TextField");
+                            log_unimpl(_("<img> html tag in TextField"));
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
                         }
@@ -1549,12 +1545,12 @@ TextField::handleChar(std::wstring::const_iterator& it,
                         }
                         else if (s == "SPAN") {
                             //span
-                            log_unimpl("<span> html tag in TextField");
+                            log_unimpl(_("<span> html tag in TextField"));
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
                         }
                         else if (s == "TEXTFORMAT") {
-                            log_debug("in textformat");
+                            log_debug(_("in textformat"));
                             //textformat
                             boost::uint16_t originalblockindent = getBlockIndent();
                             boost::uint16_t originalindent = getIndent();
@@ -1621,7 +1617,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             attloc = attributes.find("TABSTOPS");
                             if (attloc != attributes.end()) {
                                 //textformat TABSTOPS attribute
-                                log_unimpl("html <textformat> tag tabstops attribute");
+                                log_unimpl(_("html <textformat> tag tabstops attribute"));
                             }
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
@@ -1655,7 +1651,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
 										last_line_start_record, 1.0);
                         }
                         else {
-                            log_debug("<%s> tag is unsupported", s);
+                            log_debug(_("<%s> tag is unsupported"), s);
                             if (!selfclosing) { //then recurse, look for closing tag
                             handleChar(it, e, x, y, newrec, last_code,
                                                 last_space_glyph, last_line_start_record);
@@ -1740,7 +1736,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
         if (x >= width - getRightMargin() - PADDING_TWIPS)
         {
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
-            log_debug("Text in TextField %s exceeds width [ _bounds %s ]", 
+            log_debug(_("Text in TextField %s exceeds width [ _bounds %s ]"), 
                     getTarget(), _bounds);
 #endif
 
@@ -1748,7 +1744,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
             if (!doWordWrap() && getAutoSize() == AUTOSIZE_NONE)
             {
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
-                log_debug(" wordWrap=false, autoSize=none");
+                log_debug(_(" wordWrap=false, autoSize=none"));
 #endif 
                 // Truncate long line, but keep expanding text box
                 bool newlinefound = false;
@@ -1765,7 +1761,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                     // of each glyph, even if we don't display it 
                     m_text_bounding_box.expand_to_point(x, y + fontDescent);
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
-                    log_debug("Text bbox expanded to %s (width: %f)",
+                    log_debug(_("Text bbox expanded to %s (width: %f)"),
                             m_text_bounding_box, m_text_bounding_box.width());
 #endif
 
@@ -1785,7 +1781,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
             else if (doWordWrap()) {
 
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
-                log_debug(" wordWrap=true");
+                log_debug(_(" wordWrap=true"));
 #endif
 
                 // Insert newline if there's space or autosize != none
@@ -1872,7 +1868,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
             else
             {
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
-                log_debug(" wordWrap=%d, autoSize=%d", _wordWrap, _autoSize);
+                log_debug(_(" wordWrap=%d, autoSize=%d"), _wordWrap, _autoSize);
 #endif 
             }
         }
@@ -2022,7 +2018,7 @@ TextField::parseHTML(std::wstring& tag,
                 while (it != e) {
                     ++it;
                 }
-                log_error("invalid html tag");
+                log_error(_("invalid html tag"));
                 return false;
             }
         }
@@ -2033,7 +2029,7 @@ TextField::parseHTML(std::wstring& tag,
         
         // Check for NULL character
         if (*it == 0) {
-            log_error("found NULL character in htmlText");
+            log_error(_("found NULL character in htmlText"));
             return false;
         }
         tag.push_back(std::toupper(*it));
@@ -2056,7 +2052,7 @@ TextField::parseHTML(std::wstring& tag,
             while (it != e) {
                 ++it;
             }
-            log_error("invalid html tag");
+            log_error(_("invalid html tag"));
             return false;
         }
     }
@@ -2069,11 +2065,11 @@ TextField::parseHTML(std::wstring& tag,
         while (it != e && *it != '=' && *it != ' ') {
             
             if (*it == 0) {
-                log_error("found NULL character in htmlText");
+                log_error(_("found NULL character in htmlText"));
                 return false;
             }
             if (*it == '>') {
-                log_error("malformed HTML tag, invalid attribute name");
+                log_error(_("malformed HTML tag, invalid attribute name"));
                 while (it != e) {
                     ++it;
                 }
@@ -2100,7 +2096,7 @@ TextField::parseHTML(std::wstring& tag,
         while (it != e && *it != q) {
 
             if (*it == 0) {
-                log_error("found NULL character in htmlText");
+                log_error(_("found NULL character in htmlText"));
                 return false;
             }
 
@@ -2123,7 +2119,7 @@ TextField::parseHTML(std::wstring& tag,
         attvalue.clear();
 
         if ((*it != ' ') && (*it != '/') && (*it != '>')) {
-            log_error("malformed HTML tag, invalid attribute value");
+            log_error(_("malformed HTML tag, invalid attribute value"));
             while (it != e) {
                 ++it;
             }
@@ -2147,16 +2143,16 @@ TextField::parseHTML(std::wstring& tag,
                 while (it != e) {
                     ++it;
                 }
-                log_error("invalid html tag");
+                log_error(_("invalid html tag"));
                 return false;
             }
         }
     }
     
 #ifdef GNASH_DEBUG_TEXTFIELDS
-    log_debug ("HTML tag: %s", utf8::encodeCanonicalString(tag, 7));
+    log_debug(_("HTML tag: %s"), utf8::encodeCanonicalString(tag, 7));
 #endif
-    log_error("I declare this a HTML syntax error");
+    log_error(_("I declare this a HTML syntax error"));
     return false; //since we did not return already, must be malformed...?
 }
 
@@ -2172,7 +2168,7 @@ TextField::set_variable_name(const std::string& newname)
         _text_variable_registered = false;
 
 #ifdef DEBUG_DYNTEXT_VARIABLES
-        log_debug("Calling updateText after change of variable name");
+        log_debug(_("Calling updateText after change of variable name"));
 #endif
 
         // Use the original definition text if this isn't dynamically
@@ -2180,8 +2176,8 @@ TextField::set_variable_name(const std::string& newname)
         if (_tag) updateText(_tag->defaultText());
 
 #ifdef DEBUG_DYNTEXT_VARIABLES
-        log_debug("Calling registerTextVariable after change of variable "
-                "name and updateText call");
+        log_debug(_("Calling registerTextVariable after change of variable "
+		    "name and updateText call"));
 #endif
         registerTextVariable();
     }
@@ -2424,13 +2420,13 @@ TextField::typeValueName(TypeValue val)
 {
     switch (val) {
         case typeInput:
-            //log_debug("typeInput returned as 'input'");
+            //log_debug(_("typeInput returned as 'input'"));
             return "input";
         case typeDynamic:
-            //log_debug("typeDynamic returned as 'dynamic'");
+            //log_debug(_("typeDynamic returned as 'dynamic'"));
             return "dynamic";
         default:
-            //log_debug("invalid type %d returned as 'invalid'", (int)val);
+            //log_debug(_("invalid type %d returned as 'invalid'"), (int)val);
             return "invalid";
     }
 

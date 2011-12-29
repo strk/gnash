@@ -66,7 +66,7 @@ public:
 
         // Tested with SharedObject and AMFPHP
         if (val.is_function()) {
-            log_debug("AMF0: skip serialization of FUNCTION property");
+            log_debug(_("AMF0: skip serialization of FUNCTION property"));
             return true;
         }
 
@@ -81,7 +81,7 @@ public:
         if (key == NSV::PROP_uuPROTOuu || key == NSV::PROP_CONSTRUCTOR)
         {
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-            log_debug(" skip serialization of specially-named property %s",
+            log_debug(_(" skip serialization of specially-named property %s"),
                     _st.value(key));
 #endif
             return true;
@@ -91,11 +91,11 @@ public:
         const std::string& name = _st.value(key);
 
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-        log_debug(" serializing property %s", name);
+        log_debug(_(" serializing property %s"), name);
 #endif
         _writer.writePropertyName(name);
         if (!val.writeAMF0(_writer)) {
-            log_error("Problems serializing an object's member");
+            log_error(_("Problems serializing an object's member"));
             _error = true;
         }
         return true;
@@ -209,8 +209,8 @@ Writer::writeObject(as_object* obj)
                 for (size_t i = 0; i < len; ++i) {
                     elem = getMember(*obj,arrayKey(vm, i));
                     if (!elem.writeAMF0(*this)) {
-                        log_error("Problems serializing strict array "
-                                "member %d=%s", i, elem);
+                        log_error(_("Problems serializing strict array "
+                                    "member %d=%s"), i, elem);
                         return false;
                     }
                 }
@@ -239,7 +239,7 @@ Writer::writeObject(as_object* obj)
     ObjectSerializer props(*this, vm);
     obj->visitProperties<IsEnumerable>(props);
     if (!props.success()) {
-        log_error("Could not serialize object");
+        log_error(_("Could not serialize object"));
         return false;
     }
     _buf.appendNetworkShort(0);
@@ -316,7 +316,7 @@ Reader::operator()(as_value& val, Type t)
         switch (t) {
             
             default:
-                log_error("Unknown AMF type %s! Cannot proceed", t);
+                log_error(_("Unknown AMF type %s! Cannot proceed"), t);
                 // A fatal error, since we don't know how much to parse
                 return false;
 
@@ -373,7 +373,7 @@ Reader::operator()(as_value& val, Type t)
         }
     }
     catch (const AMFException& e) {
-        log_error("AMF parsing error: %s", e.what());
+        log_error(_("AMF parsing error: %s"), e.what());
         return false;
     }
 
@@ -404,14 +404,14 @@ as_value
 Reader::readStrictArray()
 {
     if (_end - _pos < 4) {
-        throw AMFException("Read past _end of buffer for strict array length");
+        throw AMFException(_("Read past _end of buffer for strict array length"));
     }
 
     const boost::uint32_t li = readNetworkLong(_pos);
     _pos += 4;
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug("amf0 starting read of STRICT_ARRAY with %i elements", li);
+    log_debug(_("amf0 starting read of STRICT_ARRAY with %i elements"), li);
 #endif
     
     as_object* array = _global.createArray();
@@ -422,7 +422,7 @@ Reader::readStrictArray()
 
         // Recurse.
         if (!operator()(arrayElement)) {
-            throw AMFException("Unable to read array elements");
+            throw AMFException(_("Unable to read array elements"));
         }
 
         callMethod(array, NSV::PROP_PUSH, arrayElement);
@@ -439,7 +439,7 @@ Reader::readArray()
 {
 
     if (_end - _pos < 4) {
-        throw AMFException("Read past _end of buffer for array length");
+        throw AMFException(_("Read past _end of buffer for array length"));
     }
 
     const boost::uint32_t li = readNetworkLong(_pos);
@@ -455,7 +455,7 @@ Reader::readArray()
     array->set_member(NSV::PROP_LENGTH, li);
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug("amf0 starting read of ECMA_ARRAY with %i elements", li);
+    log_debug(_("amf0 starting read of ECMA_ARRAY with %i elements"), li);
 #endif
 
     as_value objectElement;
@@ -465,8 +465,8 @@ Reader::readArray()
         // It seems we don't mind about this situation, although it means
         // the next read will fail.
         if (_end - _pos < 2) {
-            log_error("MALFORMED AMF: premature _end of ECMA_ARRAY "
-                    "block");
+            log_error(_("MALFORMED AMF: premature _end of ECMA_ARRAY "
+                        "block"));
             break;
         }
         const boost::uint16_t strlen = readNetworkShort(_pos);
@@ -477,8 +477,8 @@ Reader::readArray()
         if (!strlen) {
             // expect an object terminator here
             if (*_pos != OBJECT_END_AMF0) {
-                log_error("MALFORMED AMF: empty member name not "
-                        "followed by OBJECT_END_AMF0 byte");
+                log_error(_("MALFORMED AMF: empty member name not "
+                            "followed by OBJECT_END_AMF0 byte"));
             }
             ++_pos;
             break;
@@ -486,22 +486,22 @@ Reader::readArray()
         
         // Throw exception instead?
         if (_end - _pos < strlen) {
-            log_error("MALFORMED AMF: premature _end of ECMA_ARRAY "
-                    "block");
+            log_error(_("MALFORMED AMF: premature _end of ECMA_ARRAY "
+                      "block"));
             break;
         }
 
         const std::string name(reinterpret_cast<const char*>(_pos), strlen);
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-        log_debug("amf0 ECMA_ARRAY prop name is %s", name);
+        log_debug(_("amf0 ECMA_ARRAY prop name is %s"), name);
 #endif
 
         _pos += strlen;
 
         // Recurse to read element.
         if (!operator()(objectElement)) {
-            throw AMFException("Unable to read array element");
+            throw AMFException(_("Unable to read array element"));
         }
         array->set_member(getURI(vm, name), objectElement);
     }
@@ -515,7 +515,7 @@ Reader::readObject()
     as_object* obj = createObject(_global); 
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug("amf0 starting read of OBJECT");
+    log_debug(_("amf0 starting read of OBJECT"));
 #endif
 
     _objectRefs.push_back(obj);
@@ -525,7 +525,7 @@ Reader::readObject()
     for (;;) {
 
         if (!operator()(tmp, STRING_AMF0)) {
-            throw AMFException("Could not read object property name");
+            throw AMFException(_("Could not read object property name"));
         }
         keyString = tmp.to_string();
 
@@ -536,8 +536,8 @@ Reader::readObject()
             }
             else {
                 // What is the point?
-                log_error("AMF buffer terminated just before "
-                        "object _end byte. continuing anyway.");
+                log_error(_("AMF buffer terminated just before "
+                            "object _end byte. continuing anyway."));
             }
             return as_value(obj);
         }
@@ -560,11 +560,11 @@ Reader::readReference()
     _pos += 2;
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug("readAMF0: reference #%d", si);
+    log_debug(_("readAMF0: reference #%d"), si);
 #endif
     if (si < 1 || si > _objectRefs.size()) {
-        log_error("readAMF0: invalid reference to object %d (%d known "
-                "objects)", si, _objectRefs.size());
+        log_error(_("readAMF0: invalid reference to object %d (%d known "
+                  "objects)"), si, _objectRefs.size());
         throw AMFException("Reference to invalid object reference");
     }
     return as_value(_objectRefs[si - 1]);
@@ -576,7 +576,7 @@ Reader::readDate()
     const double d = readNumber(_pos, _end);
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug("amf0 read date: %e", dub);
+    log_debug(_("amf0 read date: %e"), dub);
 #endif
 
     as_function* ctor = getMember(_global, NSV::CLASS_DATE).to_function();

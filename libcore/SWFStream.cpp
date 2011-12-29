@@ -200,7 +200,7 @@ SWFStream::read_sint(unsigned short bitcount)
         value |= -1 << bitcount;
     }
 
-//        IF_DEBUG(log_debug("SWFStream::read_sint(%d) == %d\n", bitcount, value));
+//        IF_DEBUG(log_debug(_("SWFStream::read_sint(%d) == %d\n", bitcount, value)));
 
     return value;
 }
@@ -472,7 +472,7 @@ SWFStream::seek(unsigned long pos)
         unsigned long endPos = tb.second;
         if ( pos > endPos )
         {
-            log_error("Attempt to seek past the end of an opened tag");
+		log_error(_("Attempt to seek past the end of an opened tag"));
             // abort(); // ?
             // throw ParserException ?
             return false;
@@ -480,7 +480,7 @@ SWFStream::seek(unsigned long pos)
         unsigned long startPos = tb.first;
         if ( pos < startPos )
         {
-            log_error("Attempt to seek before start of an opened tag");
+		log_error(_("Attempt to seek before start of an opened tag"));
             // abort(); // ?
             // throw ParserException ?
             return false;
@@ -536,7 +536,7 @@ SWFStream::open_tag()
 
     if ( tagLength > 1024*64 )
     {
-        //log_debug("Tag %d has a size of %d bytes !!", tagType, tagLength);
+        //log_debug(_("Tag %d has a size of %d bytes !!"), tagType, tagLength);
     }
 
     unsigned long tagEnd = tell() + tagLength;
@@ -578,7 +578,7 @@ SWFStream::open_tag()
     _tagBoundsStack.push_back(std::make_pair(tagStart, tagEnd));
 
     IF_VERBOSE_PARSE (
-        log_parse("SWF[%lu]: tag type = %d, tag length = %d, end tag = %lu",
+	    log_parse(_("SWF[%lu]: tag type = %d, tag length = %d, end tag = %lu"),
         tagStart, tagType, tagLength, tagEnd);
     );
 
@@ -593,7 +593,7 @@ SWFStream::close_tag()
     std::streampos endPos = _tagBoundsStack.back().second;
     _tagBoundsStack.pop_back();
 
-    //log_debug("Close tag called at %d, stream size: %d", endPos);
+    //log_debug(_("Close tag called at %d, stream size: %d"), endPos);
 
     if (!m_input->seek(endPos))
     {
@@ -614,8 +614,8 @@ SWFStream::consumeInput()
 		m_input->go_to_end();
 	}
     catch (IOException& ex) {
-		log_error("SWFStream::consumeInput: underlying stream couldn't "
-                "go_to_end: %s", ex.what());
+	    log_error(_("SWFStream::consumeInput: underlying stream couldn't "
+			"go_to_end: %s"), ex.what());
 		// eh.. and now ?!
 	}
 }

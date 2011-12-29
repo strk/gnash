@@ -34,7 +34,7 @@ void
 LoadVariablesThread::completeLoad()
 {
 #ifdef DEBUG_LOAD_VARIABLES
-	log_debug("completeLoad called");
+    log_debug(_("completeLoad called"));
 #endif
 
 
@@ -54,7 +54,7 @@ LoadVariablesThread::completeLoad()
 	while ( size_t bytesRead = _stream->read(buf.get(), chunkSize) )
 	{
 #ifdef DEBUG_LOAD_VARIABLES
-		log_debug("Read %u bytes", bytesRead);
+            log_debug(_("Read %u bytes"), bytesRead);
 #endif
 
 		if ( _bytesLoaded )
@@ -71,9 +71,9 @@ LoadVariablesThread::completeLoad()
 			if ( encoding != utf8::encUTF8 &&
 			     encoding != utf8::encUNSPECIFIED )
 			{
-				log_unimpl("%s to utf8 conversion in "
+                            log_unimpl(_("%s to utf8 conversion in "
 					    "MovieClip.loadVariables "
-					    "input parsing",
+                                         "input parsing"),
 					    utf8::textEncodingName(encoding));
 			}
 			std::string chunk(ptr, dataSize);
@@ -81,7 +81,7 @@ LoadVariablesThread::completeLoad()
 		}
 
 #ifdef DEBUG_LOAD_VARIABLES
-		log_debug("toparse: %s", toparse);
+		log_debug(_("toparse: %s"), toparse);
 #endif
 
 		// parse remainder
@@ -90,12 +90,12 @@ LoadVariablesThread::completeLoad()
 		{
 			std::string parseable = toparse.substr(0, lastamp);
 #ifdef DEBUG_LOAD_VARIABLES
-			log_debug("parseable: %s", parseable);
+			log_debug(_("parseable: %s"), parseable);
 #endif
 			parse(parseable);
 			toparse = toparse.substr(lastamp+1);
 #ifdef DEBUG_LOAD_VARIABLES
-			log_debug("toparse nextline: %s", toparse);
+			log_debug(_("toparse nextline: %s"), toparse);
 #endif
 			++parsedLines;
 		}
@@ -105,31 +105,28 @@ LoadVariablesThread::completeLoad()
 		// eof, get out !
 		if ( _stream->eof() ) break;
 
-		if ( cancelRequested() )
-		{
-			log_debug("Cancelling LoadVariables download thread...");
+		if ( cancelRequested() ) {
+                    log_debug(_("Cancelling LoadVariables download thread..."));
 			_stream.reset();
 			return;
 		}
 	}
 
-	if ( ! toparse.empty() )
-	{
+	if ( ! toparse.empty() ) {
 		parse(toparse);
 	}
 
 	try {
 		_stream->go_to_end();
 	}
-    catch (IOException& ex) {
-		log_error("Stream couldn't seek to end: %s", ex.what());
+        catch (IOException& ex) {
+        log_error(_("Stream couldn't seek to end: %s"), ex.what());
 	}
 	
     _bytesLoaded = _stream->tell();
-	if ( _bytesTotal !=  _bytesLoaded )
-	{
-		log_error("Size of 'variables' stream advertised to be %d bytes,"
-		         " but turned out to be %d bytes.",
+	if ( _bytesTotal !=  _bytesLoaded ) {
+            log_error(_("Size of 'variables' stream advertised to be %d bytes,"
+                          " but turned out to be %d bytes."),
 			_bytesTotal, _bytesLoaded);
 		_bytesTotal = _bytesLoaded;
 	}

@@ -309,7 +309,7 @@ DisplayList::moveDisplayObject(int depth, const SWFCxForm* color_xform,
     }
 
     if (ch->unloaded()) {
-        log_error("Request to move an unloaded DisplayObject");
+        log_error(_("Request to move an unloaded DisplayObject"));
         assert(!ch->unloaded());
     }
 
@@ -377,8 +377,8 @@ DisplayList::swapDepths(DisplayObject* ch1, int newdepth)
 
     if (newdepth < DisplayObject::staticDepthOffset) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror("%s.swapDepth(%d) : ignored call with target depth "
-            "less then %d", ch1->getTarget(), newdepth,
+	    log_aserror(_("%s.swapDepth(%d) : ignored call with target depth "
+			  "less then %d"), ch1->getTarget(), newdepth,
             DisplayObject::staticDepthOffset);
         );
         return;
@@ -401,8 +401,8 @@ DisplayList::swapDepths(DisplayObject* ch1, int newdepth)
             boost::bind(std::not2(DepthLessThan()), _1, newdepth));
 
     if (it1 == _charsByDepth.end()) {
-        log_error("First argument to DisplayList::swapDepth() "
-                "is NOT a DisplayObject in the list. Call ignored.");
+        log_error(_("First argument to DisplayList::swapDepth() "
+		    "is NOT a DisplayObject in the list. Call ignored."));
         return;
     }
 
@@ -872,10 +872,10 @@ DisplayList::mergeDisplayList(DisplayList& newList, DisplayObject& o)
             
             if (found == _charsByDepth.end())
             {
-                log_error("mergeDisplayList: DisplayObject %s (%s at depth "
+                log_error)_("mergeDisplayList: DisplayObject %s (%s at depth "
                         "%d [%d]) about to be discarded in given display list"
                         " is not marked as unloaded and not found in the"
-                        " merged current displaylist",
+			    " merged current displaylist"),
                         ch->getTarget(), typeName(*ch), ch->get_depth(),
                         ch->get_depth()-DisplayObject::staticDepthOffset);
                 std::abort();

@@ -91,8 +91,8 @@ as_function::construct(as_object& newobj, const as_environment& env,
         // This is very effective at confusing debugging tools.
         // We only throw GnashExceptions. A std::bad_alloc may also be
         // reasonable, but anything else shouldn't be caught here.
-        log_debug("Native function called as constructor threw exception: "
-                "%s", ex.what());
+        log_debug(_("Native function called as constructor threw exception: %s")
+                  , ex.what());
 
         // If a constructor throws an exception, throw it back to the
         // caller. This is the only way to signal that a constructor
