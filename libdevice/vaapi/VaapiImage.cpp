@@ -35,7 +35,7 @@ VaapiImage::VaapiImage(unsigned int     width,
     : _format(format)
     , _image_data(NULL)
 {
-    log_debug("VaapiImage::VaapiImage(): format '%s'\n", string_of_FOURCC(format));
+    log_debug(_("VaapiImage::VaapiImage(): format '%s'\n", string_of_FOURCC(format)));
 
     memset(&_image, 0, sizeof(_image));
     _image.image_id = VA_INVALID_ID;
@@ -79,7 +79,7 @@ bool VaapiImage::create(unsigned int width, unsigned int height)
     if (!vaapi_check_status(status, "vaCreateImage()"))
         return false;
 
-    log_debug("  image 0x%08x, format '%s'\n", get(), string_of_FOURCC(_format));
+    log_debug(_("  image 0x%08x, format '%s'\n", get(), string_of_FOURCC(_format)));
 
     return true;
 }

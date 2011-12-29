@@ -85,7 +85,7 @@ X11Device::X11Device(int vid)
     GNASH_REPORT_FUNCTION;
 
     if (!initDevice(0, 0)) {
-        log_error("Couldn't initialize X11 device!");
+        log_error(_("Couldn't initialize X11 device!"));
     }
 }
 
@@ -103,7 +103,7 @@ X11Device::X11Device(int argc, char *argv[])
     GNASH_REPORT_FUNCTION;
     
     if (!initDevice(argc, argv)) {
-        log_error("Couldn't initialize X11 device!");
+        log_error(_("Couldn't initialize X11 device!"));
     }
 }
 
@@ -139,7 +139,7 @@ X11Device::initDevice(int argc, char *argv[])
 
     _display = XOpenDisplay(dpyName);
     if (!_display) {
-        log_error("couldn't open X11 display!");
+        log_error(_("couldn't open X11 display!"));
         return false;
     }
 
@@ -159,7 +159,7 @@ X11Device::initDevice(int argc, char *argv[])
     _vinfo = XGetVisualInfo(_display, VisualIDMask, &visTemplate, &num_visuals);
     std::cerr << "Num Visuals: " << num_visuals << std::endl;
     if (!_vinfo) {
-         log_error("Error: couldn't get X visual\n");
+        log_error(_("Error: couldn't get X visual\n"));
          exit(1);
     }
     std::cerr << "X11 visual is: " << _vinfo->visual << std::endl;
@@ -196,7 +196,7 @@ X11Device::getErrorString(int error)
     if (_display) {
         XGetErrorText(_display, error, msg, 80);
     } else {
-        log_error("The default Display is not set!");
+        log_error(_("The default Display is not set!"));
     }
 
     return msg;
@@ -209,12 +209,12 @@ X11Device::createWindow(const char *name, int x, int y, int width, int height)
     GNASH_REPORT_FUNCTION;
 
     if (!_display) {
-        log_error("No Display device set!");
+        log_error(_("No Display device set!"));
         return;
     }
     
     if (!_root) {
-        log_error("No drawable window set!");
+        log_error(_("No drawable window set!"));
         return;
     }
 
@@ -279,11 +279,11 @@ X11Device::eventLoop(size_t passes)
           case KeyPress:
           {
               char buffer[10];
-              int r, code;
+              int code;
               code = XLookupKeysym(&event.xkey, 0);
               if (!keyPress || !keyPress(code)) {
-                  r = XLookupString(&event.xkey, buffer, sizeof(buffer),
-                                    NULL, NULL);
+                  // int r = XLookupString(&event.xkey, buffer, sizeof(buffer),
+                  //                   NULL, NULL);
                   if (buffer[0] == 27) {
                       // escape
                       return;

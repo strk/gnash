@@ -32,7 +32,7 @@ VaapiSubpicture::VaapiSubpicture(boost::shared_ptr<VaapiImage> image)
     : _image(image)
     , _subpicture(VA_INVALID_ID)
 {
-    log_debug("VaapiSubpicture::VaapiSubpicture(): format '%s'\n", string_of_FOURCC(image->format()));
+    log_debug(_("VaapiSubpicture::VaapiSubpicture(): format '%s'\n", string_of_FOURCC(image->format())));
 
     if (!create()) {
         boost::format msg;

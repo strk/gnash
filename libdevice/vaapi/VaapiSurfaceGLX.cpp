@@ -202,14 +202,14 @@ VaapiSurfaceGLXImpl::VaapiSurfaceGLXImpl(GLenum target, GLuint texture)
 
     reset(reinterpret_cast<uintptr_t>(surface));
 
-    log_debug("  -> surface %p\n", this->surface());
+    log_debug(_("  -> surface %p\n", this->surface()));
 }
 
 VaapiSurfaceGLXImpl::~VaapiSurfaceGLXImpl()
 {
     // GNASH_REPORT_FUNCTION;
 
-    log_debug("VaapiSurface::~VaapiSurface(): surface %p\n", surface());
+    log_debug(_("VaapiSurface::~VaapiSurface(): surface %p\n", surface()));
 
     if (!surface()) {
         return;
@@ -263,7 +263,7 @@ VaapiSurfaceGLX::VaapiSurfaceGLX(GLenum target, GLuint texture)
 
 bool VaapiSurfaceGLX::update(boost::shared_ptr<VaapiSurface> surface)
 {
-    log_debug("VaapiSurfaceGLX::update(): from surface 0x%08x\n", surface->get());
+    log_debug(_("VaapiSurfaceGLX::update(): from surface 0x%08x\n", surface->get()));
 
     return dynamic_cast<VaapiSurfaceGLXImpl *>(_impl.get())->update(surface);
 }

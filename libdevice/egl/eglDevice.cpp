@@ -84,7 +84,7 @@ EGLDevice::EGLDevice(int argc, char *argv[])
     setAttrib(_bpp);
 
     if (!initDevice(argc, argv)) {
-        log_error("Couldn't initialize EGL device!");
+        log_error(_("Couldn't initialize EGL device!"));
     }
 }
 
@@ -106,10 +106,10 @@ EGLDevice::EGLDevice(GnashDevice::rtype_t rtype)
     setAttrib(_bpp);
 
     if (!initDevice(0, 0)) {
-        log_error("Couldn't initialize EGL device!");
+        log_error(_("Couldn't initialize EGL device!"));
     }
     if (!bindClient(rtype)) {
-        log_error("Couldn't bind client to type %d!", rtype);
+        log_error(_("Couldn't bind client to type %d!"), rtype);
     }
 }
 
@@ -179,13 +179,13 @@ EGLDevice::initDevice(int /* argc */, char **/*argv[] */)
 //    _eglDisplay = eglGetDisplay(XOpenDisplay(0));
     _eglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if (EGL_NO_DISPLAY == _eglDisplay) {
-        log_error( "eglGetDisplay() failed (error 0x%x)", eglGetError());
+        log_error(_( "eglGetDisplay() failed (error 0x%x)"), eglGetError());
         return false;
     }
 
     // This can be called multiple times safely
     if (eglInitialize(_eglDisplay, 0, 0) != EGL_TRUE) {
-        log_error( "eglInitialize() failed (error %s)",
+        log_error(_( "eglInitialize() failed (error %s)"),
                    getErrorString(eglGetError()));
         return false;
     }
@@ -195,26 +195,26 @@ EGLDevice::initDevice(int /* argc */, char **/*argv[] */)
     // bindClient(GnashDevice::OPENVG);
     // queryEGLConfig(_eglDisplay);
    
-    log_debug("EGL_CLIENT_APIS = %s", eglQueryString(_eglDisplay, EGL_CLIENT_APIS));
-    log_debug("EGL_EXTENSIONS = %s",  eglQueryString(_eglDisplay, EGL_EXTENSIONS));
-    log_debug("EGL_VERSION = %s, EGL_VENDOR = %s",
+    log_debug(_("EGL_CLIENT_APIS = %s"), eglQueryString(_eglDisplay, EGL_CLIENT_APIS));
+    log_debug(_("EGL_EXTENSIONS = %s"), eglQueryString(_eglDisplay, EGL_EXTENSIONS));
+    log_debug(_("EGL_VERSION = %s, EGL_VENDOR = %s"),
               eglQueryString(_eglDisplay, EGL_VERSION),
-              eglQueryString(_eglDisplay, EGL_VENDOR));
+                eglQueryString(_eglDisplay, EGL_VENDOR));
 
     // step3 - find a suitable config
     EGLint max_num_config = 0;
     
     // Get the number of supported configurations
     if ( EGL_FALSE == eglGetConfigs(_eglDisplay, 0, 0, &max_num_config) ) {
-        log_error("eglGetConfigs() failed to retrive the number of configs (error %s)",
-                  getErrorString(eglGetError()));
+        log_error(_("eglGetConfigs() failed to retrive the number of configs (error %s)"),
+                    getErrorString(eglGetError()));
         return 0;
     }
     if(max_num_config <= 0) {
-        printf( "No EGLconfigs found\n" );
+        log_error(_( "No EGLconfigs found\n" ));
         return 0;
     }
-    log_debug("Max number of EGL Configs is %d", max_num_config);
+    log_debug(_("Max number of EGL Configs is %d"), max_num_config);
 
     // The quality of the rendering is controlled by the number of samples
     // and sample buffers as specified in the configuration. Higher quality
@@ -229,15 +229,15 @@ EGLDevice::initDevice(int /* argc */, char **/*argv[] */)
           eglChooseConfig(_eglDisplay, attrib32_low, &_eglConfig,
                           1, &eglNumOfConfigs);
           if (eglNumOfConfigs) {
-              log_debug("Using the 32bpp, low quality configuration");
+              log_debug(_("Using the 32bpp, low quality configuration"));
           } else {
-              log_error("eglChooseConfig(32-low) failed");
+              log_error(_("eglChooseConfig(32-low) failed"));
               eglChooseConfig(_eglDisplay, attrib16_low, &_eglConfig,
                               1, &eglNumOfConfigs);
               if (eglNumOfConfigs) {
-                  log_debug("Using the 16bpp, low quality configuration");
+                  log_debug(_("Using the 16bpp, low quality configuration"));
               } else {
-                  log_error("eglChooseConfig(16-low) failed");
+                  log_error(_("eglChooseConfig(16-low) failed"));
                   return false;
               }
           }
@@ -246,15 +246,15 @@ EGLDevice::initDevice(int /* argc */, char **/*argv[] */)
           eglChooseConfig(_eglDisplay, attrib32_medium, &_eglConfig,
                           1, &eglNumOfConfigs);
           if (eglNumOfConfigs) {
-              log_debug("Using the 32bpp, medium quality configuration");
+              log_debug(_("Using the 32bpp, medium quality configuration"));
           } else {
-              log_error("eglChooseConfig(32-medium) failed");
+              log_error(_("eglChooseConfig(32-medium) failed"));
               eglChooseConfig(_eglDisplay, attrib16_medium, &_eglConfig,
                               1, &eglNumOfConfigs);
               if (eglNumOfConfigs) {
-                  log_debug("Using the 16bpp, medium quality configuration");
+                  log_debug(_("Using the 16bpp, medium quality configuration"));
               } else {
-                  log_error("eglChooseConfig(16-medium) failed");
+                  log_error(_("eglChooseConfig(16-medium) failed"));
                   return false;
               }
           }
@@ -263,15 +263,15 @@ EGLDevice::initDevice(int /* argc */, char **/*argv[] */)
           eglChooseConfig(_eglDisplay, attrib32_high, &_eglConfig,
                           1, &eglNumOfConfigs);
           if (eglNumOfConfigs) {
-              log_debug("Using the 32bpp, high quality configuration");
+              log_debug(_("Using the 32bpp, high quality configuration"));
           } else {
-              log_error("eglChooseConfig(32-high) failed");
+              log_error(_("eglChooseConfig(32-high) failed"));
               eglChooseConfig(_eglDisplay, attrib16_high, &_eglConfig,
                               1, &eglNumOfConfigs);
               if (eglNumOfConfigs) {
-                  log_debug("Using the 16bpp, medium quality configuration");
+                  log_debug(_("Using the 16bpp, medium quality configuration"));
               } else {
-                  log_error("eglChooseConfig(16-high) failed");
+                  log_error(_("eglChooseConfig(16-high) failed"));
                   return false;
               }
           }
@@ -281,7 +281,7 @@ EGLDevice::initDevice(int /* argc */, char **/*argv[] */)
     }
 
    if (!checkEGLConfig(_eglConfig)) {
-       log_error("EGL configuration doesn't match!");
+       log_error(_("EGL configuration doesn't match!"));
        //return false;
    } else {
        printEGLConfig(_eglConfig);
@@ -317,11 +317,11 @@ EGLDevice::getNativeVisual()
     EGLint vid;
     if (_eglDisplay && _eglConfig) {
         if (!eglGetConfigAttrib(_eglDisplay, _eglConfig, EGL_NATIVE_VISUAL_ID, &vid)) {
-            log_error("eglGetConfigAttrib() failed (error %s)",
-                      getErrorString(eglGetError()));
+            log_error(_("eglGetConfigAttrib() failed (error %s)"),
+                        getErrorString(eglGetError()));
             return 0;
         } else {
-            log_debug("EGL native visual is: %d", vid);
+            log_debug(_("EGL native visual is: %d"), vid);
         }
     }
 
@@ -337,30 +337,30 @@ EGLDevice::bindClient(rtype_t rtype)
     switch (rtype) {
       case GnashDevice::OPENGLES2:
       {
-          log_debug("Initializing EGL for OpenGLES2");
+          log_debug(_("Initializing EGL for OpenGLES2"));
           if(EGL_FALSE == eglBindAPI(EGL_OPENGL_ES_API)) {
-              log_error("eglBindAPI() failed to retrive the number of configs (error %s)",
-                        getErrorString(eglGetError()));
+              log_error(_("eglBindAPI() failed to retrive the number of configs (error %s)"),
+                          getErrorString(eglGetError()));
               return false;
           }
           break;
       }
       case GnashDevice::OPENGLES1:
       {
-          log_debug("Initializing EGL for OpenGLES1");
+          log_debug(_("Initializing EGL for OpenGLES1"));
           if(EGL_FALSE == eglBindAPI(EGL_OPENGL_ES_API)) {
-              log_error("eglBindAPI() failed to retrive the number of configs (error %s)",
-                        getErrorString(eglGetError()));
+              log_error(_("eglBindAPI() failed to retrive the number of configs (error %s)"),
+                          getErrorString(eglGetError()));
               return false;
           }
           break;
       }
       case GnashDevice::OPENVG:
       {
-          log_debug("Initializing EGL for OpenVG");
+          log_debug(_("Initializing EGL for OpenVG"));
           if(EGL_FALSE == eglBindAPI(EGL_OPENVG_API)) {
-              log_error("eglBindAPI() failed to retrive the number of configs (error %s)",
-                        getErrorString(eglGetError()));
+              log_error(("eglBindAPI() failed to retrive the number of configs (error %s)"),
+                         getErrorString(eglGetError()));
               return false;
           }
           break;
@@ -388,15 +388,15 @@ EGLDevice::attachWindow(GnashDevice::native_window_t window)
         eglDestroySurface(_eglDisplay, _eglSurface);
     }
     
-    log_debug("Initializing EGL Surface");
+    log_debug(_("Initializing EGL Surface"));
     if (_eglDisplay && _eglConfig) {
         _eglSurface = eglCreateWindowSurface(_eglDisplay, _eglConfig,
                                              _nativeWindow, surface_attributes);
     }
     
     if (EGL_NO_SURFACE == _eglSurface) {
-        log_error("eglCreateWindowSurface failed (error %s)", 
-                  getErrorString(eglGetError()));
+        log_error(_("eglCreateWindowSurface failed (error %s)"),
+                    getErrorString(eglGetError()));
     } else {
         printEGLSurface(_eglSurface);
     }
@@ -541,25 +541,25 @@ EGLDevice::queryEGLConfig(EGLDisplay display)
 
      // Get the number of supported configurations
      if ( EGL_FALSE == eglGetConfigs(display, 0, 0, &max_num_config) ) {
-         log_error("eglGetConfigs() failed to retrive the number of configs (error %s)",
-                   getErrorString(eglGetError()));
+         log_error(_("eglGetConfigs() failed to retrive the number of configs (error %s)"),
+                     getErrorString(eglGetError()));
          return 0;
      }
      if(max_num_config <= 0) {
-         printf( "No EGLconfigs found\n" );
+         log_error(_("No EGLconfigs found\n"));
          return 0;
      }
-     log_debug("Max number of EGL Configs is %d", max_num_config);     
+     log_debug(_("Max number of EGL Configs is %d"), max_num_config);
      
      configs = new EGLConfig[max_num_config];
      if (0 == configs) {
-         log_error( "Out of memory\n" );
+         log_error(_("Out of memory\n"));
          return 0;
      }
 
      if ( EGL_FALSE == eglGetConfigs(display, configs, max_num_config, &max_num_config)) {
-         log_error("eglGetConfigs() failed to retrive the configs (error %s)",
-                   getErrorString(eglGetError()));
+         log_error(_("eglGetConfigs() failed to retrive the configs (error %s)"),
+                     getErrorString(eglGetError()));
          return 0;
      }
      
@@ -771,7 +771,7 @@ EGLDevice::createPbuffer(int width, int height)
 
     EGLSurface pbuf = eglCreatePbufferSurface(_eglDisplay, _eglConfig, attribs);
     if (pbuf == EGL_NO_SURFACE) {
-        log_error( "eglCreatePbufferSurface() failed (error 0x%x)", eglGetError());
+        log_error(_( "eglCreatePbufferSurface() failed (error 0x%x)"), eglGetError());
         return EGL_NO_SURFACE;
     }
 
@@ -791,8 +791,8 @@ EGLDevice::createPbuffer(int width, int height, EGLClientBuffer buf, EGLenum typ
     EGLSurface pbuf = eglCreatePbufferFromClientBuffer(_eglDisplay, type, buf,
                                               _eglConfig, attribs);
     if (pbuf == EGL_NO_SURFACE) {
-        log_error( "eglCreatePbufferFromClientBuffer() failed (error 0x%x)",
-                   eglGetError());
+        log_error(_("eglCreatePbufferFromClientBuffer() failed (error 0x%x)"),
+                    eglGetError());
         return EGL_NO_SURFACE;
     }
 
@@ -812,7 +812,7 @@ EGLDevice::createPixmap(int width, int height, NativePixmapType buf)
 
       EGLSurface pbuf = eglCreatePixmapSurface(_eglDisplay, _eglConfig, buf, attribs);
     if (pbuf == EGL_NO_SURFACE) {
-        log_error( "eglCreatePbufferFromClientBuffer() failed (error 0x%x)",
+        log_error(_("eglCreatePbufferFromClientBuffer() failed (error 0x%x)"),
                    eglGetError());
         return EGL_NO_SURFACE;
     }
