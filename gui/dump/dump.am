@@ -31,4 +31,6 @@ dump_gnash_CPPFLAGS = -DGUI_DUMP -DGUI_CONFIG=\"DUMP\" \
 	$(AGG_CFLAGS)
 dump_gnash_LDADD = \
 	$(GNASH_LIBS) \
-	$(AGG_LIBS) 
+	$(top_builddir)/libdevice/libgnashdevice.la \
+	$(AGG_LIBS) \
+	$(NULL)

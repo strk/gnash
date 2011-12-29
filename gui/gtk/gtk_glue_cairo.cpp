@@ -220,7 +220,7 @@ GtkCairoGlue::configure(GtkWidget *const /*widget*/,
     }
 
     if (!surface) {
-      log_error("Cairo: failed to create a rendering buffer!");
+        log_error(_("Cairo: failed to create a rendering buffer!"));
       return;
     }
 

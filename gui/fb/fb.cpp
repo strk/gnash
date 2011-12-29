@@ -199,7 +199,7 @@ FBGui::init(int argc, char *** argv)
         // Set "window" size
         _width =  ovg->getWidth();
         _height = ovg->getHeight();
-        log_debug("Width:%d, Height:%d", _width, _height);
+        log_debug(_("Width:%d, Height:%d"), _width, _height);
         _renderer.reset(renderer::openvg::create_handler(0));     
         renderer::openvg::Renderer_ovg *rend = reinterpret_cast
             <renderer::openvg::Renderer_ovg *>(_renderer.get());
@@ -221,12 +221,12 @@ FBGui::init(int argc, char *** argv)
         // Set "window" size
         _width =  agg->width();
         _height = agg->height();
-        log_debug("Width:%d, Height:%d", _width, _height);
+        log_debug(_("Width:%d, Height:%d"), _width, _height);
         _renderer.reset(agg->createRenderHandler());
     }
 #endif
     if ((renderer != "openvg") && (renderer != "agg")) {
-        log_error("No renderer! %s not supported.", renderer);
+        log_error(_("No renderer! %s not supported."), renderer);
     }
     
     disable_terminal();
@@ -237,7 +237,7 @@ FBGui::init(int argc, char *** argv)
         _uinput.init();
         _uinput.moveTo(0, 0);
     } else {
-        log_error("Found no accessible User mode input event device");
+        log_error(_("Found no accessible User mode input event device"));
     }
         
     // Initialize all the input devices
@@ -246,9 +246,9 @@ FBGui::init(int argc, char *** argv)
     std::vector<boost::shared_ptr<InputDevice> > possibles
         = InputDevice::scanForDevices();
     if (possibles.empty()) {
-        log_error("Found no accessible input event devices");
+        log_error(_("Found no accessible input event devices"));
     } else {
-        log_debug("Found %d input event devices.", possibles.size());
+        log_debug(_("Found %d input event devices."), possibles.size());
     }
     
     std::vector<boost::shared_ptr<InputDevice> >::iterator it;
@@ -259,7 +259,7 @@ FBGui::init(int argc, char *** argv)
         // (*it)->dump();
 #if defined(USE_MOUSE_PS2) || defined(USE_MOUSE_ETT)
         if ((*it)->getType() == InputDevice::MOUSE) {
-            log_debug("WARNING: Mouse support may conflict with the input event support.");
+            log_debug(_("WARNING: Mouse support may conflict with the input event support."));
             // For now we only want keyboard input events, as the mouse
             // interface default of /dev/input/mice supports hotpluging devices,
             // unlike the regular events.
@@ -273,19 +273,19 @@ FBGui::init(int argc, char *** argv)
         // use that instead of handling the events directly. The
         // Babbage is configured as a tablet when using input events.
         if ((*it)->getType() == InputDevice::TOUCHSCREEN) {
-            log_debug("Enabling Touchscreen support.");
+            log_debug(_("Enabling Touchscreen support."));
             _inputs.push_back(*it);
         }
         if ((*it)->getType() == InputDevice::TABLET) {
 #if 1
-            log_debug("WARNING: Babbage Tablet support disabled as it conflicts with TSlib");
+            log_debug(_("WARNING: Babbage Tablet support disabled as it conflicts with TSlib"));
 #else
-            log_debug("Enabling Babbage Touchscreen support");
+            log_debug(_("Enabling Babbage Touchscreen support"));
             _inputs.push_back(*it);
 #endif
         }
         if ((*it)->getType() == InputDevice::POWERBUTTON) {
-            log_debug("Enabling Power Button support");
+            log_debug(_("Enabling Power Button support"));
             _inputs.push_back(*it);
         }
     }
@@ -320,7 +320,7 @@ FBGui::init(int argc, char *** argv)
     if ( _ypos < 0 ) _ypos += _var_screeninfo.yres - _height;
     _ypos = clamp<int>(_ypos, 0, _var_screeninfo.yres-_height);
 
-    log_debug("X:%d, Y:%d", _xpos, _ypos);
+    log_debug(_("X:%d, Y:%d"), _xpos, _ypos);
 #endif
     
     _validbounds.setTo(0, 0, _width - 1, _height - 1);
@@ -365,7 +365,7 @@ FBGui::run()
         // 10ms per heart beat
         delay = 10000;
     }
-    log_debug("Movie Frame Rate is %d, adjusting delay to %dms", fps,
+    log_debug(_("Movie Frame Rate is %d, adjusting delay to %dms"), fps,
               _interval * delay);
     
     // This loops endlessly at the frame rate
@@ -737,7 +737,7 @@ FBGui::checkForData()
 #if 1
                 double x = 0.655 * ie->x;
                 double y = 0.46875 * ie->y;
-                log_debug("Mouse clicked at: %g:%g", x, y);
+                log_debug(_("Mouse clicked at: %g:%g"), x, y);
                 notifyMouseMove(int(x), int(y));
 #else
                 notifyMouseMove(ie->x, ie->y);

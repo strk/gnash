@@ -70,24 +70,24 @@ FBOvgGlue::init(int argc, char **argv[])
         while (devs[i] != renderer::GnashDevice::NODEV) {
             switch (devs[i++]) {
               case renderer::GnashDevice::EGL:
-                  log_debug("Probing found an EGL display device");
+                  log_debug(_("Probing found an EGL display device"));
                   egl = true;
                   break;
               case renderer::GnashDevice::RAWFB:
-                  log_debug("Probing found a raw Framebuffer display device");
+                  log_debug(_("Probing found a raw Framebuffer display device"));
                   rawfb = true;
                   break;
               case renderer::GnashDevice::X11:
-                  log_debug("Probing found an X11 display device");
+                  log_debug(_("Probing found an X11 display device"));
                   x11 = true;
                   break;
               case renderer::GnashDevice::DIRECTFB:
-                  log_debug("Probing found a DirectFB display device");
+                  log_debug(_("Probing found a DirectFB display device"));
                   dfb = true;
                   break;
               case renderer::GnashDevice::NODEV:
               default:
-                  log_error("No display devices found by probing!");
+                  log_error(_("No display devices found by probing!"));
                   break;
             }
         }
@@ -165,7 +165,7 @@ void
 FBOvgGlue::setInvalidatedRegions(const InvalidatedRanges& ranges)
 {
     if (!_renderer) {
-        log_error("No renderer set!");
+        log_error(_("No renderer set!"));
         return;
     }
 

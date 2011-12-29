@@ -201,9 +201,8 @@ GtkAggVaapiGlue::createRenderHandler()
     const char *agg_pixel_format;
     agg_pixel_format = find_pixel_format(_vaapi_image_format);
     if (!agg_pixel_format) {
-        log_debug("GTK-AGG: Unknown RGB format %s reported by VA-API."
-                  "  Please report this to the gnash-dev "
-                  "mailing list.", string_of_FOURCC(_vaapi_image_format));
+        log_debug(_("GTK-AGG: Unknown RGB format %s reported by VA-API. Please report this to the gnash-dev mailing list."),
+                  string_of_FOURCC(_vaapi_image_format));
         return NULL;
     }
 

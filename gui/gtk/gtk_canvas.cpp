@@ -120,8 +120,8 @@ gnash_canvas_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
 {
     GnashCanvas *canvas = GNASH_CANVAS(widget);
 
-    gnash::log_debug("gnash_canvas_size_allocate %d %d", allocation->width,
-            allocation->height);
+    gnash::log_debug(_("gnash_canvas_size_allocate %d %d"), allocation->width,
+                allocation->height);
 
     if (canvas->renderer.get()) {
         canvas->glue->setRenderHandlerSize(allocation->width,

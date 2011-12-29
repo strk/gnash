@@ -156,7 +156,7 @@ GtkGui::init(int argc, char **argv[])
 {
 #ifdef HAVE_X11
     if (!XInitThreads()) {
-        log_debug("Failed to initialize X threading support\n");
+        log_debug(_("Failed to initialize X threading support\n"));
         return false;
     }
 #endif
@@ -186,20 +186,20 @@ GtkGui::init(int argc, char **argv[])
         // there is no point in trying to use OpenGL.
         bool dri = false;
         if (checkX11Extension("DRI")) {
-            log_debug("DRI extension found");
+            log_debug(_("DRI extension found"));
             dri = true;
         }
         bool glx = false;
         // See if our X11 server supports the GLX extension, otherwise
         // there is no point in trying to use OpenGL.
         if (checkX11Extension("GLX")) {
-            log_debug("GLX extension found");
+            log_debug(_("GLX extension found"));
             glx = true;
         }
         // If we don't have these extensions, don't bother with OpenGl,
         // drop back to AGG.
         if (!glx || !dri) {
-            g_warning("This system lacks a hardware OpenGL driver!");
+            log_error(_("This system lacks a hardware OpenGL driver!"));
         }
     }
 
@@ -208,7 +208,7 @@ GtkGui::init(int argc, char **argv[])
         // See if our X11 server supports the Xvideo extension, otherwise
         // there is no point in trying to use Xvideo for scaling.
         if (checkX11Extension("XVideo")) {
-            log_debug("Xvideo extension found");
+            log_debug(_("Xvideo extension found"));
         }
     }
 
@@ -2273,7 +2273,7 @@ createPixbuf (const gchar *filename)
 
     if (!pathname) {
         log_error (_("Couldn't find pixmap file: %s"), filename);
-        g_warning (_("Couldn't find pixmap file: %s"), filename);
+        g_warning(_("Couldn't find pixmap file: %s"), filename);
         return NULL;
     }
 
@@ -2588,7 +2588,7 @@ openFile(GtkWidget *widget, gpointer /* user_data */)
     // run() will return. If run() is then changed to return a pointer to the
     // next file to be played, then the Player class can play the next file,
     // unless run() returns NULL.
-    log_error (_("Attempting to open file %s.\n"
+    log_error(_("Attempting to open file %s.\n"
                "NOTE: the file open functionality is not yet implemented!"),
                filename);
 

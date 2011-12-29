@@ -95,39 +95,39 @@ FBgles1Glue::init(int /*argc*/, char *** /*argv*/)
     if (_display == EGL_NO_DISPLAY) {
         return false;
     }
-    log_trace("EGL: getDisplay ok");
+    log_trace(_("EGL: getDisplay ok"));
     
     result = eglInitialize(_display, &majorVersion, &minorVersion);
     if (result == EGL_FALSE) {
         return false;
     }
-    log_trace("EGL: initialize ok");
+    log_trace(_("EGL: initialize ok"));
     
     result = eglChooseConfig(_display, main_attrib_list, &_config, 1,
                              &numOfConfigs);
     if (result == EGL_FALSE || numOfConfigs != 1) {
         return false;
     }
-    log_trace("EGL: config ok");
+    log_trace(_("EGL: config ok"));
     
     _surface = eglCreateWindowSurface(_display, _config, (NativeWindowType)0,
                                       NULL);
     if (eglGetError () != EGL_SUCCESS) {
         return false;
     }
-    log_trace("EGL: surface ok");
+    log_trace(_("EGL: surface ok"));
     
     _context = eglCreateContext(_display, _config, NULL, NULL);
     if (eglGetError () != EGL_SUCCESS) {
         return false;
     }
-    log_trace("EGL: context ok");
+    log_trace(_("EGL: context ok"));
     
     eglMakeCurrent(_display, _surface, _surface, _context);
     if (eglGetError () != EGL_SUCCESS) {
         return false;
     }
-    log_trace("EGL: current ok");
+    log_trace(_("EGL: current ok"));
     
     const EGLint pbuffer_config_list[] = {
         EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
@@ -143,7 +143,7 @@ FBgles1Glue::init(int /*argc*/, char *** /*argv*/)
     if (result == EGL_FALSE || numOfConfigs == 0) {
         return false;
     }
-    log_trace("EGL: pbuffer config ok");
+    log_trace(_("EGL: pbuffer config ok"));
     
     const EGLint pbuffer_attrib_list[] = {
         EGL_WIDTH, EGL_MAX_PBUFFER_WIDTH,
@@ -159,7 +159,7 @@ FBgles1Glue::init(int /*argc*/, char *** /*argv*/)
     if (eglGetError () != EGL_SUCCESS) {
         return false;
     }
-    log_trace("EGL: pbuffer surface ok");
+    log_trace(_("EGL: pbuffer surface ok"));
     
     return true;
 }
@@ -168,7 +168,7 @@ int
 FBgles1Glue::width() {
     EGLint result;
     eglQuerySurface (_display, _surface, EGL_WIDTH, &result);
-    log_trace("EGL: width %d", result);
+    log_trace(_("EGL: width %d"), result);
     return result;
 }
 
@@ -176,7 +176,7 @@ int
 FBgles1Glue::height() {
     EGLint result;
     eglQuerySurface (_display, _surface, EGL_HEIGHT, &result);
-    log_trace("EGL: height %d", result);
+    log_trace(_("EGL: height %d"), result);
     return result;
 }
 

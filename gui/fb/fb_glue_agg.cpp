@@ -73,7 +73,7 @@ FBAggGlue::setInvalidatedRegion(const SWFRect &/*bounds */)
     // GNASH_REPORT_FUNCTION;
     
     if (!_renderer) {
-        log_error("No renderer set!");
+        log_error(_("No renderer set!"));
         return;
     }
 }
@@ -84,7 +84,7 @@ FBAggGlue::setInvalidatedRegions(const InvalidatedRanges &ranges)
 //    GNASH_REPORT_FUNCTION;
 
     if (!_renderer) {
-        log_error("No renderer set in %s!", __FUNCTION__);
+        log_error(_("No renderer set in %s!"), __FUNCTION__);
         return;
     }
     
@@ -127,7 +127,7 @@ FBAggGlue::init (int argc, char ***argv)
     if (rend) {
         _renderer.reset(rend);
     } else {
-        log_error("failed to create a render handler for AGG!");
+        log_error(_("failed to create a render handler for AGG!"));
         return false;
     }
 
@@ -148,7 +148,7 @@ FBAggGlue::createRenderHandler()
 //    GNASH_REPORT_FUNCTION;
 
     if (!_device) {
-        log_error("No Device layer initialized yet!");
+        log_error(_("No Device layer initialized yet!"));
         return 0;
     }
     
@@ -179,7 +179,7 @@ FBAggGlue::createRenderHandler()
     if (pixelformat) {
 	agg_handler = create_Renderer_agg(pixelformat);
     } else {
-	log_error("The pixel format of your framebuffer could not be detected.");
+	log_error(_("The pixel format of your framebuffer could not be detected."));
 	return false;
     }
     
@@ -218,7 +218,7 @@ FBAggGlue::render()
 //    GNASH_REPORT_FUNCTION;
 
     if (_drawbounds.size() == 0 ) {
-        log_debug("No Drawbounds set in %s!", __FUNCTION__);
+        log_debug(_("No Drawbounds set in %s!"), __FUNCTION__);
         return; // nothing to do..
     }
 

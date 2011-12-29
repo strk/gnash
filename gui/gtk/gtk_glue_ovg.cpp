@@ -85,24 +85,24 @@ GtkOvgGlue::init(int /*argc*/, char ** /*argv*/[])
         while (devs[i] != renderer::GnashDevice::NODEV) {
             switch (devs[i++]) {
               case renderer::GnashDevice::EGL:
-                  log_debug("Probing found an EGL display device");
+                  log_debug(_("Probing found an EGL display device"));
                   egl = true;
                   break;
               case renderer::GnashDevice::RAWFB:
-                  log_debug("Probing found a raw Framebuffer display device");
+                  log_debug(_("Probing found a raw Framebuffer display device"));
                   rawfb = true;
                   break;
               case renderer::GnashDevice::X11:
-                  log_debug("Probing found an X11 display device");
+                  log_debug(_("Probing found an X11 display device"));
                   x11 = true;
                   break;
               case renderer::GnashDevice::DIRECTFB:
-                  log_debug("Probing found a DirectFB display device");
+                  log_debug(_("Probing found a DirectFB display device"));
                   dfb = true;
                   break;
               case renderer::GnashDevice::NODEV:
               default:
-                  log_error("No display devices found by probing!");
+                  log_error(_("No display devices found by probing!"));
                   break;
             }
         }
@@ -262,7 +262,7 @@ GtkOvgGlue::render()
     }
 
     if (!_offscreenbuf) {
-        log_error("No off screen buffer!");
+        log_error(_("No off screen buffer!"));
         return;
     }
     
@@ -279,7 +279,7 @@ GtkOvgGlue::render(int /* minx */, int /* miny */, int /* maxx */, int /* maxy *
 
 #ifdef ENABLE_EGL_OFFSCREEN
     if (!_offscreenbuf) {
-        log_error("No off screen buffer!");
+        log_error(_("No off screen buffer!"));
         return;
     }
     
@@ -380,29 +380,29 @@ GtkOvgGlue::queryEGLConfig(EGLDisplay display)
 
      // Get the number of supported configurations
      if ( EGL_FALSE == eglGetConfigs(display, 0, 0, &max_num_config) ) {
-         log_error("eglGetConfigs() failed to retrive the number of configs (error %s)",
+         log_error(_("eglGetConfigs() failed to retrive the number of configs (error %s)"),
                    getErrorString(eglGetError()));
          return 0;
      }
      if(max_num_config <= 0) {
-         printf( "No EGLconfigs found\n" );
+         log_error(_("No EGLconfigs found\n"));
          return 0;
      }
-     log_debug("Max number of EGL Configs is %d", max_num_config);     
+     log_debug(_("Max number of EGL Configs is %d"), max_num_config);     
      
      configs = new EGLConfig[max_num_config];
      if (0 == configs) {
-         log_error( "Out of memory\n" );
+         log_error(_("Out of memory\n"));
          return 0;
      }
 
      if ( EGL_FALSE == eglGetConfigs(display, configs, max_num_config, &max_num_config)) {
-         log_error("eglGetConfigs() failed to retrive the configs (error %s)",
+         log_error(_("eglGetConfigs() failed to retrive the configs (error %s)"),
                    getErrorString(eglGetError()));
          return 0;
      }
      for (int i=0; i<max_num_config; i++ ) {
-         log_debug("Config[%d] is:", i);
+         log_debug(_("Config[%d] is:"), i);
          printEGLConfig(configs[i]);
      }
 
