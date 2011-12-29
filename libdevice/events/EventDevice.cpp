@@ -90,42 +90,42 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
     // Get the version number of the input event subsystem
     int version;
     if (ioctl(_fd, EVIOCGVERSION, &version)) {
-        log_error("ioctl (EVIOCGVERSION)");
+        log_error(_("ioctl (EVIOCGVERSION)"));
     }
 #if 0
-    log_debug("evdev driver version is %d.%d.%d",
+    log_debug(_("evdev driver version is %d.%d.%d"),
               version >> 16, (version >> 8) & 0xff,
               version & 0xff);
 #endif
     
     if(ioctl(_fd, EVIOCGID, &_device_info)) {
-        log_error("ioctl (EVIOCGID): %s", strerror(errno));
+        log_error(_("ioctl (EVIOCGID): %s"), strerror(errno));
     }
     
     char name[256]= "Unknown";
     if(ioctl(_fd, EVIOCGNAME(sizeof(name)), name) < 0) {
-        log_error("ioctl (EVIOCGNAME): %s", strerror(errno));
+        log_error(_("ioctl (EVIOCGNAME): %s"), strerror(errno));
     }
-    log_debug("The device on %s says its name is %s", filespec, name);
+    log_debug(_("The device on %s says its name is %s"), filespec, name);
     // /dev/mxc_ts is the Touchscreen driver used by the Freescale Babbage board
     // For some reason it has an empty device info structure other than the name.
     if (strstr(name, "mxc_ts") != 0) {
         _device_info.bustype = BUS_HOST;
     }
-    log_debug("vendor %04hx product %04hx version %04hx",
+    log_debug(_("vendor %04hx product %04hx version %04hx"),
               _device_info.vendor, _device_info.product,
               _device_info.version);
     switch (_device_info.bustype) {
       case BUS_PCI:
-          log_unimpl("is a PCI bus type");
+          log_unimpl(_("is a PCI bus type"));
           break;
       case BUS_ISAPNP:
-          log_unimpl("is a PNP bus type");
+          log_unimpl(_("is a PNP bus type"));
           break;          
       case BUS_USB:
           // FIXME: this probably needs a better way of checking what
           // device things truly are.          
-          log_debug("is on a Universal Serial Bus");
+          log_debug(_("is on a Universal Serial Bus"));
           // ID 0eef:0001 D-WAV Scientific Co., Ltd eGalax TouchScreen
           if ((_device_info.product == 0) && (_device_info.vendor == 0)) {
               _type = InputDevice::UMOUSE;
@@ -147,22 +147,22 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
           }
           break;
       case BUS_HIL:
-          log_unimpl("is a HIL bus type");
+          log_unimpl(_("is a HIL bus type"));
           break;
       case BUS_BLUETOOTH:
-          log_unimpl("is Bluetooth bus type ");
+          log_unimpl(_("is Bluetooth bus type "));
           break;
 #ifdef BUS_VIRTUAL
       case BUS_VIRTUAL:
-          log_unimpl("is a Virtual bus type ");
+          log_unimpl(_("is a Virtual bus type "));
           break;
 #endif
       case BUS_ISA:
-          log_unimpl("is an ISA bus type");
+          log_unimpl(_("is an ISA bus type"));
           break;
       case BUS_I8042:
           // This is for keyboards and mice
-          log_debug("is an I8042 bus type");
+          log_debug(_("is an I8042 bus type"));
           if (strstr(name, "keyboard") != 0) {
               _type = InputDevice::KEYBOARD;
           } else {
@@ -172,51 +172,51 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
           }
           break;
       case BUS_XTKBD:
-          log_unimpl("is an XTKBD bus type");
+          log_unimpl(_("is an XTKBD bus type"));
           break;
       case BUS_RS232:
-          log_unimpl("is a serial port bus type");
+          log_unimpl(_("is a serial port bus type"));
           break;
       case BUS_GAMEPORT:
-          log_unimpl("is a gameport bus type");
+          log_unimpl(_("is a gameport bus type"));
           break;
       case BUS_PARPORT:
-          log_unimpl("is a parallel port bus type");
+          log_unimpl(_("is a parallel port bus type"));
           break;
       case BUS_AMIGA:
-          log_unimpl("is an Amiga bus type");
+          log_unimpl(_("is an Amiga bus type"));
           break;
       case BUS_ADB:
-          log_unimpl("is an AOB bus type");
+          log_unimpl(_("is an AOB bus type"));
           break;
       case BUS_I2C:
-          log_unimpl("is an i2C bus type ");
+          log_unimpl(_("is an i2C bus type "));
           break;
       case BUS_HOST:
           // log_debug("is Host bus type");
           // ON the Babbage board, this is the evdev driver version 1.0.0 
           if (strstr(name, "mxc_ts") != 0) {
-              log_debug("Babbage Touchscreen found!");
+              log_debug(_("Babbage Touchscreen found!"));
               _type = InputDevice::TABLET;
           }
           if (strstr(name, "mxckpd") != 0) {
-              log_debug("Babbage Power Button found!");
+              log_debug(_("Babbage Power Button found!"));
               _type = InputDevice::POWERBUTTON;
           }
           break;
       case BUS_GSC:
-          log_unimpl("is a GSC bus type");
+          log_unimpl(_("is a GSC bus type"));
           break;
 #ifdef BUS_ATARI
       case BUS_ATARI:
-          log_unimpl("is an Atari bus type");
+          log_unimpl(_("is an Atari bus type"));
           break;
 #endif
       default:
-          log_error("Unknown bus type %d!", _device_info.bustype);
+          log_error(_("Unknown bus type %d!"), _device_info.bustype);
     }
     
-    log_debug("Event enabled for %s on fd #%d", _filespec, _fd);
+    log_debug(_("Event enabled for %s on fd #%d"), _filespec, _fd);
 
 #if 0
     // FIXME: this has probably been replaced by the uinput device code
@@ -225,7 +225,7 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
         struct input_absinfo abs;
         memset(&abs, 0, sizeof(struct input_absinfo));
         if (ioctl (_fd, EVIOCGABS(ABS_X), &abs) < 0) {
-            log_error("ioctl (EVIOCGABS(ABS_X)): %s", strerror(errno));
+            log_error(_("ioctl (EVIOCGABS(ABS_X)): %s"), strerror(errno));
         }
 #ifdef ABSINFO_RESOLUTION
         abs.resolution = 0;
@@ -235,14 +235,14 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
         // Set the scale of the display so the absolute postions
         // we get from the touchscreen driver are correct.
         if (ioctl (_fd, EVIOCSABS(ABS_X), &abs) < 0) {
-            log_error("ioctl (EVIOCSABS(ABS_X)): %s", strerror(errno));
+            log_error(_("ioctl (EVIOCSABS(ABS_X)): %s"), strerror(errno));
         }
         if (ioctl(_fd, EVIOCGABS(ABS_Y), &abs) < 0) {
-            log_error("ioctl (EVIOCGABS(ABS_Y)): %s", strerror(errno));
+            log_error(_("ioctl (EVIOCGABS(ABS_Y)): %s"), strerror(errno));
         }
         abs.maximum = _screen_height;
         if (ioctl (_fd, EVIOCSABS(ABS_Y), &abs) < 0) {
-            log_error("ioctl (EVIOCSABS(ABS_Y)): %s", strerror(errno));
+            log_error(_("ioctl (EVIOCSABS(ABS_Y)): %s"), strerror(errno));
         }
     }  // end of _type
 #endif
@@ -304,7 +304,7 @@ EventDevice::check()
         "EV_FF_STATUS"
     };    
     struct input_event *ev = reinterpret_cast<struct input_event *>(buf.get());
-    log_debug("Type is: %s(%hd), Code is: %hd, Val us: %d", debug[ev->type],
+    log_debug(_("Type is: %s(%hd), Code is: %hd, Val us: %d"), debug[ev->type],
               ev->type, ev->type, ev->code, ev->value);
 #endif
     
@@ -385,39 +385,39 @@ EventDevice::check()
       case EV_REL:
           switch (ev->code) {
             case REL_X:
-                log_debug("REL_X: %d", ev->value);
+                log_debug(_("REL_X: %d"), ev->value);
                 _input_data.x = ev->value;
                 break;
             case REL_Y:
-                log_debug("REL_Y: %d", ev->value);
+                log_debug(_("REL_Y: %d"), ev->value);
                 _input_data.y = ev->value;
                 break;
             case REL_Z:
-                log_debug("REL_Z: %d", ev->value);
+                log_debug(_("REL_Z: %d"), ev->value);
                 _input_data.z = ev->value;
                 break;
             case REL_RX:
-                log_debug("REL_RX: %d", ev->value);
+                log_debug(_("REL_RX: %d"), ev->value);
                 _input_data.rx = ev->value;
                 break;
             case REL_RY:
-                log_debug("REL_RY: %d", ev->value);
+                log_debug(_("REL_RY: %d"), ev->value);
                 _input_data.ry = ev->value;
                 break;
             case REL_RZ:
-                log_debug("REL_RZ: %d", ev->value);
+                log_debug(_("REL_RZ: %d"), ev->value);
                 _input_data.rz = ev->value;
                 break;
             case REL_HWHEEL:
-                log_debug("REL_HWHEEL: %d", ev->value);
+                log_debug(_("REL_HWHEEL: %d"), ev->value);
             case REL_DIAL:
-                log_debug("REL_DIAL: %d", ev->value);
+                log_debug(_("REL_DIAL: %d"), ev->value);
             case REL_WHEEL:
-                log_debug("REL_WHEEL: %d", ev->value);
+                log_debug(_("REL_WHEEL: %d"), ev->value);
             case REL_MISC:
-                log_debug("REL_MISC: %d", ev->value);
+                log_debug(_("REL_MISC: %d"), ev->value);
             default:
-                log_unimpl("Relative move event %d from Input Event Device",
+                log_unimpl(_("Relative move event %d from Input Event Device"),
                            ev->value);
           }
           // Touchscreen or joystick
@@ -440,54 +440,54 @@ EventDevice::check()
                 // FIXME: Currently the Z axis is ignored
             case ABS_Z:
             case ABS_WHEEL:
-                log_debug("ABS_Z: %d", ev->value);
+                log_debug(_("ABS_Z: %d"), ev->value);
                 break;
             case ABS_PRESSURE:
                 //log_debug("Pressure: %d", ev->value);
                 _input_data.pressure = ev->value;
                 break;
             case ABS_VOLUME:
-                log_debug("ABS_VOLUME: %d", ev->value);
+                log_debug(_("ABS_VOLUME: %d"), ev->value);
                 _input_data.volumne = ev->value;
                 break;
             case ABS_DISTANCE:
-                log_debug("ABS_DISTANCE: %d", ev->value);
+                log_debug(_("ABS_DISTANCE: %d"), ev->value);
                 _input_data.distance = ev->value;
                 break;
             case ABS_RX:
-                log_debug("ABS_RX: %d", ev->value);
+                log_debug(_("ABS_RX: %d"), ev->value);
                 _input_data.rx = ev->value;
                 break;
             case ABS_RY:
-                log_debug("ABS_RY: %d", ev->value);
+                log_debug(_("ABS_RY: %d"), ev->value);
                 _input_data.ry = ev->value;
                 break;
             case ABS_RZ:
-                log_debug("ABS_RZ: %d", ev->value);
+                log_debug(_("ABS_RZ: %d"), ev->value);
                 _input_data.rz = ev->value;
                 break;
             case ABS_THROTTLE:
-                log_debug("ABS_THROTTLE: %d", ev->value);
+                log_debug(_("ABS_THROTTLE: %d"), ev->value);
                 _input_data.throttle = ev->value;
                 break;
             case ABS_RUDDER:
-                log_debug("ABS_RUDDER: %d", ev->value);
+                log_debug(_("ABS_RUDDER: %d"), ev->value);
                 _input_data.rudder = ev->value;
                 break;
             case ABS_GAS:
-                log_debug("ABS_GAS: %d", ev->value);
+                log_debug(_("ABS_GAS: %d"), ev->value);
                 _input_data.gas = ev->value;
                 break;
             case ABS_BRAKE:
-                log_debug("ABS_BRAKE: %d", ev->value);
+                log_debug(_("ABS_BRAKE: %d"), ev->value);
                 _input_data.brake = ev->value;
                 break;
             case ABS_TILT_X:
-                log_debug("ABS_TILT_X: %d", ev->value);
+                log_debug(_("ABS_TILT_X: %d"), ev->value);
                 _input_data.tiltX = ev->value;
                 break;
             case ABS_TILT_Y:
-                log_debug("ABS_TILT_Y: %d", ev->value);
+                log_debug(_("ABS_TILT_Y: %d"), ev->value);
                 _input_data.tiltY = ev->value;
                 break;
             default:
@@ -502,7 +502,7 @@ EventDevice::check()
             case MSC_PULSELED:
             case MSC_GESTURE:
             case MSC_RAW:
-                log_unimpl("Misc event from Input Event Device");
+                log_unimpl(_("Misc event from Input Event Device"));
                 break;
             case MSC_SCAN:
                 
@@ -526,26 +526,26 @@ EventDevice::check()
             case MSC_MAX:
             case MSC_CNT:
             default:
-                log_unimpl("Misc event from Input Event Device");
+                log_unimpl(_("Misc event from Input Event Device"));
           }
           break;
       case EV_LED:
-          log_unimpl("LED event from Input Event Device");
+          log_unimpl(_("LED event from Input Event Device"));
           break;
       case EV_SND:
-          log_unimpl("Sound event from Input Event Device");
+          log_unimpl(_("Sound event from Input Event Device"));
           break;
       case EV_REP:
-          log_unimpl("Key autorepeat event from Input Event Device");
+          log_unimpl(_("Key autorepeat event from Input Event Device"));
           break;
       case EV_FF:
-          log_unimpl("Force Feedback event from Input Event Device");
+          log_unimpl(_("Force Feedback event from Input Event Device"));
           break;
       case EV_FF_STATUS:  
-          log_unimpl("Force Feedback status event from Input Event Device");
+          log_unimpl(_("Force Feedback status event from Input Event Device"));
           break;
       case EV_PWR:
-          log_unimpl("Power event from Input Event Device");
+          log_unimpl(_("Power event from Input Event Device"));
           break;
     }
 
@@ -696,7 +696,7 @@ EventDevice::scanForDevices()
         if (stat(filespec, &st) == 0) {
             // Then see if we can open it
             if ((fd = open(filespec, O_RDWR)) < 0) {
-                log_error("You don't have the proper permissions to open %s",
+                log_error(_("You don't have the proper permissions to open %s"),
                           filespec);
                 // Try the next input event device file
                 total++;
@@ -711,15 +711,15 @@ EventDevice::scanForDevices()
 
         char name[256] = "Unknown";
         if(ioctl(fd, EVIOCGNAME(sizeof(name)), name) < 0) {
-            log_error("ioctl (EVIOCGNAME): %s", strerror(errno));
+            log_error(_("ioctl (EVIOCGNAME): %s"), strerror(errno));
         }
-        log_debug("The device on %s says its name is %s", filespec, name);
+        log_debug(_("The device on %s says its name is %s"), filespec, name);
 
         struct input_id device_info;
         if(ioctl(fd, EVIOCGID, &device_info)) {
-            log_error("ioctl (EVIOCGID): %s", strerror(errno));
+            log_error(_("ioctl (EVIOCGID): %s"), strerror(errno));
         }
-        log_debug("vendor %04hx product %04hx version %04hx",
+        log_debug(_("vendor %04hx product %04hx version %04hx"),
                   device_info.vendor, device_info.product,
                   device_info.version);
         close(fd);
@@ -733,7 +733,7 @@ EventDevice::scanForDevices()
                 // keyboards, mice, and touchscreens. Power buttons don't have
                 // a vendor ID.
                 if (device_info.vendor != 0) {
-                    log_debug("Enabling USB device: %s", name);
+                    log_debug(_("Enabling USB device: %s"), name);
                     devices.push_back(dev);
                 }
             }

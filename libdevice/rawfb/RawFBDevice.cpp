@@ -60,7 +60,7 @@ RawFBDevice::RawFBDevice(int /* vid */)
     memset(&_cmap, 0, sizeof(struct fb_cmap));
     
     if (!initDevice(0, 0)) {
-        log_error("Couldn't initialize RAWFB device!");
+        log_error(_("Couldn't initialize RAWFB device!"));
     }
 }
 
@@ -115,7 +115,7 @@ RawFBDevice::initDevice(int /* argc */, char **/* argv[] */)
     // Open the framebuffer device
 #ifdef ENABLE_FAKE_FRAMEBUFFER
     _fd = open(FAKEFB, O_RDWR);
-    log_debug("WARNING: Using %s as a fake framebuffer!", FAKEFB);
+    log_debug(_("WARNING: Using %s as a fake framebuffer!"), FAKEFB);
 #else
     devname = getenv("FRAMEBUFFER");
     if (!devname) {
@@ -130,10 +130,10 @@ RawFBDevice::initDevice(int /* argc */, char **/* argv[] */)
     _fd = open(devname, O_RDWR);
 #endif
     if (_fd < 0) {
-        log_error("Could not open framebuffer device: %s", strerror(errno));
+        log_error(_("Could not open framebuffer device: %s"), strerror(errno));
         return false;
     } else {
-        log_debug("Opened framebuffer device: %s", devname);
+        log_debug(_("Opened framebuffer device: %s"), devname);
     }
     
     // Load framebuffer properties
@@ -150,7 +150,7 @@ RawFBDevice::initDevice(int /* argc */, char **/* argv[] */)
               _varinfo.xres, _varinfo.yres,
               _varinfo.bits_per_pixel);
 
-    log_debug("Framebuffer stride is: %d.",  _fixinfo.line_length);    
+    log_debug(_("Framebuffer stride is: %d."),  _fixinfo.line_length);    
 
     return true;
 }
@@ -215,7 +215,7 @@ RawFBDevice::attachWindow(GnashDevice::native_window_t window)
     }
         
     if (!_fbmem) {
-        log_error("Couldn't mmap() %d bytes of memory!",
+        log_error(("Couldn't mmap() %d bytes of memory!"),
                   _fixinfo.smem_len);
         return false;
     }
@@ -373,11 +373,11 @@ fakefb_ioctl(int /* fd */, int request, void *data)
                   write(fd, data, sizeof(struct fb_cmap));
                   close(fd);
               } else {
-                  gnash::log_error("Couldn't write to the fake cmap!");
+                  log_error(_("Couldn't write to the fake cmap!"));
                   return -1;
               }
           } else {
-              gnash::log_error("Couldn't write to the fake cmap, unknown type!");
+              log_error(_("Couldn't write to the fake cmap, unknown type!"));
               return -1;
           }
           // If we send a SIGUSR1 signal to fbe, it'll reload the
@@ -391,14 +391,14 @@ fakefb_ioctl(int /* fd */, int request, void *data)
               } else {
                   pid_t pid = strtol(buf, 0, NULL);
                   kill(pid, SIGUSR1);
-                  gnash::log_debug("Signaled fbe to reload it's colormap.");
+                  log_debug(_("Signaled fbe to reload it's colormap."));
               }
               close(fd);
           }
           break;
       }
       default:
-          gnash::log_unimpl("fakefb_ioctl(%d)", request);
+          log_unimpl(_("fakefb_ioctl(%d)"), request);
           break;
     }
 
