@@ -147,7 +147,7 @@ clocktime::getTimeZoneOffset(double time)
 
     // tm_gmtoff is in seconds east of GMT; convert to minutes.
     offset = tm.tm_gmtoff / 60;
-    //gnash::log_debug("Using tm.tm_gmtoff. Offset is %d", offset);
+    //gnash::log_debug(_("Using tm.tm_gmtoff. Offset is %d"), offset);
     return offset;
 
 #else
@@ -167,7 +167,7 @@ clocktime::getTimeZoneOffset(double time)
     tzset();
     // timezone is seconds west of GMT
     offset = -timezone / 60;
-    //gnash::log_debug("Using tzset. Offset is %d", offset);
+    //gnash::log_debug(_("Using tzset. Offset is %d"), offset);
 
 # elif !defined(WIN32) && defined(HAVE_GETTIMEOFDAY)
 
@@ -185,7 +185,7 @@ clocktime::getTimeZoneOffset(double time)
     struct timezone tz;
     gettimeofday(&tv, &tz);
     offset = -tz.tz_minuteswest;
-    //gnash::log_debug("Using gettimeofday. Offset is %d", offset);
+    //gnash::log_debug(_("Using gettimeofday. Offset is %d"), offset);
 
 # elif defined(HAVE_FTIME)
     // ftime(3): "These days the contents of the timezone and dstflag
@@ -220,8 +220,7 @@ clocktime::getTimeZoneOffset(double time)
     else {
         // tm_isdst is negative: cannot get TZ info.
         // Convert and print in UTC instead.
-        LOG_ONCE(
-            gnash::log_error(_("Cannot get requested timezone information"));
+        LOG_ONCE(log_error(_("Cannot get requested timezone information"));
         );
         offset = 0;
     }

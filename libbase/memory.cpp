@@ -91,7 +91,7 @@ Memory::startStats()
 //    GNASH_REPORT_FUNCTION;
     _collecting = true;
     if (_info == 0) {
-        log_debug("Allocating buffer for %d data samples", _size);
+        log_debug(_("Allocating buffer for %d data samples"), _size);
         _info = new struct small_mallinfo[_size];
         reset();
 	addStats();
@@ -298,9 +298,9 @@ Memory::analyze()
 
     // Sanity check on our calculations
     if (total_allocated != (accumulate_allocated - accumulate_freed)) { 
-        log_error("Calculations don't equal");
+        log_error(_("Calculations don't equal"));
     } else {
-        log_debug("Zero memory leaks for this program");
+        log_debug(_("Zero memory leaks for this program"));
     }
     if ((_checkpoint[0].uordblks != 0) && (_checkpoint[1].uordblks != 0)) {
         if (_checkpoint[1].uordblks == _checkpoint[0].uordblks) {
@@ -381,5 +381,5 @@ Memory::dumpCSV()
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

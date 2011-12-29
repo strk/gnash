@@ -66,7 +66,7 @@ SharedLib::SharedLib(const std::string& filespec)
 #ifdef HAVE_LTDL
     int errors = lt_dlinit ();
     if (errors) {
-        log_error (_("Couldn't initialize ltdl: %s"), lt_dlerror());
+        log_error(_("Couldn't initialize ltdl: %s"), lt_dlerror());
     }
 #else
 # warning "libltdl not enabled in build".
@@ -95,13 +95,13 @@ SharedLib::openLib (const std::string& filespec)
     
     scoped_lock lock(_libMutex);
 
-    log_debug ("Trying to open shared library \"%s\"", filespec);
+    log_debug(_("Trying to open shared library \"%s\""), filespec);
 
 #ifdef HAVE_LTDL
     _dlhandle = lt_dlopenext (filespec.c_str());
     
     if (_dlhandle == NULL) {
-        log_error ("%s", lt_dlerror());
+        log_error("%s", lt_dlerror());
         return false;
     }
 
@@ -128,10 +128,10 @@ SharedLib::getInitEntry (const std::string& symbol)
     run  = lt_dlsym (_dlhandle, symbol.c_str());
     
     if (run == NULL) {
-        log_error (_("Couldn't find symbol: %s"), symbol);
+        log_error(_("Couldn't find symbol: %s"), symbol);
         return NULL;
     } else {
-        log_debug (_("Found symbol %s @ %p"), symbol, (void *)run);
+        log_debug(_("Found symbol %s @ %p"), symbol, (void *)run);
     }
 #else
     (void)symbol;

@@ -47,13 +47,13 @@ GnashVaapiImage::GnashVaapiImage(boost::shared_ptr<VaapiSurface> surface,
     _surface(surface),
     _creation_time(get_ticks_usec())
 {
-    log_debug("GnashVaapiImage::GnashVaapiImage(): surface 0x%08x, size %dx%d\n",
+    log_debug(_("GnashVaapiImage::GnashVaapiImage(): surface 0x%08x, size %dx%d\n"),
           _surface->get(), _width, _height);
 }
 
 GnashVaapiImage::~GnashVaapiImage()
 {
-    log_debug("GnashVaapiImage::~GnashVaapiImage(): surface 0x%08x\n",
+    log_debug(_("GnashVaapiImage::~GnashVaapiImage(): surface 0x%08x\n"),
           _surface->get());
 }
 
@@ -65,7 +65,7 @@ void GnashVaapiImage::update(boost::shared_ptr<VaapiSurface> surface)
 
 void GnashVaapiImage::update(boost::uint8_t* data)
 {
-    log_debug("GnashVaapi::update(): data %p\n", data);
+    log_debug(_("GnashVaapi::update(): data %p\n"), data);
 
     // XXX: use vaPutImage()
     _creation_time = get_ticks_usec();
@@ -97,7 +97,7 @@ bool GnashVaapiImage::transfer()
     //       should not have to retrieve the VA surface underlying pixels.
     //       Mark this usage scenario as a fatal error and fix the code
     //       instead.
-    log_error("GnashVaapiImage: VA surface to SW pixels are not supported\n");
+    log_error(_("GnashVaapiImage: VA surface to SW pixels are not supported\n"));
     assert(0);
 
     _data.reset();
@@ -108,8 +108,8 @@ bool GnashVaapiImage::transfer()
 image::GnashImage::iterator
 GnashVaapiImage::begin()
 {
-    log_debug("GnashVaapiImage::data(): surface 0x%08x\n", _surface->get());
-    log_debug("  -> %u usec from creation\n",
+    log_debug(_("GnashVaapiImage::data(): surface 0x%08x\n"), _surface->get());
+    log_debug(_("  -> %u usec from creation\n"),
               (boost::uint32_t)(get_ticks_usec() - _creation_time));
 
     if (!transfer()) {
@@ -123,8 +123,9 @@ GnashVaapiImage::begin()
 image::GnashImage::const_iterator
 GnashVaapiImage::begin() const
 {
-    log_debug("GnashVaapiImage::data() const: surface 0x%08x\n", _surface->get());
-    log_debug("  -> %u usec from creation\n",
+    log_debug(_("GnashVaapiImage::data() const: surface 0x%08x\n"),
+	      _surface->get());
+    log_debug(_("  -> %u usec from creation\n"),
           (boost::uint32_t)(get_ticks_usec() - _creation_time));
 
     /* XXX: awful hack... */
@@ -139,5 +140,5 @@ GnashVaapiImage::begin() const
 
 // local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

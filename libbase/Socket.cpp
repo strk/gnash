@@ -74,7 +74,7 @@ Socket::connected() const
             // for POSIX.
             if (::getsockopt(_socket, SOL_SOCKET, SO_ERROR,
                         reinterpret_cast<char*>(&val), &len) < 0) {
-                log_debug("Error");
+                log_debug(_("Error"));
                 _error = true;
                 return false;
             }
@@ -122,7 +122,7 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     // We use _socket here because connected() or _connected might not
     // be true if a connection attempt is underway but not completed.
     if (_socket) {
-        log_error("Connection attempt while already connected");
+        log_error(_("Connection attempt while already connected"));
         return false;
     }
 
@@ -151,7 +151,7 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     
     if (_socket < 0) {
         const int err = errno;
-        log_debug("Socket creation failed: %s", std::strerror(err));
+        log_debug(_("Socket creation failed: %s"), std::strerror(err));
         _socket = 0;
         return false;
     }
@@ -168,7 +168,7 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
         const int err = errno;
 #ifndef _WIN32
         if (err != EINPROGRESS) {
-            log_error("Failed to connect socket: %s", std::strerror(err));
+            log_error(_("Failed to connect socket: %s"), std::strerror(err));
             _socket = 0;
             return false;
         }
@@ -184,7 +184,7 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     // for POSIX.
     if (::setsockopt(_socket, SOL_SOCKET, SO_RCVTIMEO,
                 reinterpret_cast<const char*>(&tv), sizeof(tv))) {
-        log_error("Setting socket timeout failed");
+        log_error(_("Setting socket timeout failed"));
     }
 
     const int on = 1;
@@ -234,7 +234,7 @@ Socket::fillCache()
                 return;
             }
 #endif
-            log_error("Socket receive error %s", std::strerror(err));
+            log_error(_("Socket receive error %s"), std::strerror(err));
             _error = true;
             return;
         }
@@ -337,7 +337,7 @@ Socket::write(const void* src, std::streamsize num)
         bytesSent = ::send(_socket, buf, toWrite, 0);
         if (bytesSent < 0) {
             const int err = errno;
-            log_error("Socket send error %s", std::strerror(err));
+            log_error(_("Socket send error %s"), std::strerror(err));
             _error = true;
             return 0;
         }
@@ -352,21 +352,21 @@ Socket::write(const void* src, std::streamsize num)
 std::streampos
 Socket::tell() const
 {
-    log_error("tell() called for Socket");
+    log_error(_("tell() called for Socket"));
     return static_cast<std::streamsize>(-1);
 }
 
 bool
 Socket::seek(std::streampos)
 {
-    log_error("seek() called for Socket");
+    log_error(_("seek() called for Socket"));
     return false;
 }
 
 void
 Socket::go_to_end()
 {
-    log_error("go_to_end() called for Socket");
+    log_error(_("go_to_end() called for Socket"));
 }
 
 bool

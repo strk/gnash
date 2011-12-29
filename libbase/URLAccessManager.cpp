@@ -185,7 +185,7 @@ host_check(const std::string& host)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    //log_security("Checking security of host: %s", host.c_str());
+    //log_security(_("Checking security of host: %s"), host.c_str());
     
     assert( ! host.empty() );
 
@@ -259,7 +259,7 @@ bool
 allowXMLSocket(const std::string& host, short port)
 {
     if (port < 1024) {
-        log_security("Attempt to connect to disallowed port %s", port);
+        log_security(_("Attempt to connect to disallowed port %s"), port);
         return false;
     }
 	return allowHost(host);

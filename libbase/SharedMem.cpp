@@ -65,14 +65,14 @@ SharedMem::~SharedMem()
 
     if (::shmdt(_addr) < 0) {
         const int err = errno;
-        log_error("Error detaching shared memory: %s", std::strerror(err));
+        log_error(_("Error detaching shared memory: %s"), std::strerror(err));
     }
 
     // We can still try to shut it down.
     struct ::shmid_ds ds;
     if (::shmctl(_shmid, IPC_STAT, &ds) < 0) {
         const int err = errno;
-        log_error("Error during stat of shared memory segment: %s",
+        log_error(_("Error during stat of shared memory segment: %s"),
                 std::strerror(err));
     }
 
@@ -80,8 +80,7 @@ SharedMem::~SharedMem()
     else {
         // Note that this isn't completely reliable.
         if (!ds.shm_nattch) {
-            log_debug("No shared memory users left. Removing segment "
-                    "and semaphore.");
+            log_debug(_("No shared memory users left. Removing segment and semaphore."));
             ::shmctl(_shmid, IPC_RMID, 0);
             ::semctl(_semid, IPC_RMID, 0);
         }
@@ -119,12 +118,11 @@ SharedMem::attach()
 
     // Check rcfile for key; if there isn't one, use the Adobe key.
     if (_shmkey == 0) {
-        log_debug("No shared memory key specified in rcfile. Using default "
-                "for communication with other players");
+        log_debug(_("No shared memory key specified in rcfile. Using default for communication with other players"));
         _shmkey = 0xdd3adabd;
     }
     
-    log_debug("Using shared memory key %s",
+    log_debug(_("Using shared memory key %s"),
             boost::io::group(std::hex, std::showbase, _shmkey));
 
     // First get semaphore.
@@ -149,14 +147,14 @@ SharedMem::attach()
         _semid = ::semget(_shmkey, 1, IPC_CREAT | 0600);
         
         if (_semid < 0) {
-            log_error("Failed to get semaphore for shared memory!");
+            log_error(_("Failed to get semaphore for shared memory!"));
             return false;
         }    
 
         s.val = 1;
         const int ret = ::semctl(_semid, 0, SETVAL, s);
         if (ret < 0) {
-            log_error("Failed to set semaphore value");
+            log_error(_("Failed to set semaphore value"));
             return false;
         }
     }
@@ -166,8 +164,7 @@ SharedMem::attach()
     const int semval = ::semctl(_semid, 0, GETVAL, s);
 
     if (semval != 1) {
-        log_error("Need semaphore value of 1 for locking. Cannot "
-                "attach shared memory!");
+        log_error(_("Need semaphore value of 1 for locking. Cannot attach shared memory!"));
         return false;
     }
 
@@ -182,14 +179,14 @@ SharedMem::attach()
     }
 
     if (_shmid < 0) {
-        log_error("Unable to get shared memory segment!");
+        log_error(_("Unable to get shared memory segment!"));
         return false;
     }
 
     _addr = static_cast<iterator>(::shmat(_shmid, 0, 0));
 
     if (!_addr) {
-        log_error("Unable to attach shared memory: %s",
+        log_error(_("Unable to attach shared memory: %s"),
                 std::strerror(errno));
         return false;
     }

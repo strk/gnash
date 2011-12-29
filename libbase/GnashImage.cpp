@@ -176,7 +176,7 @@ Output::writeImageData(FileType type,
             outChannel = JpegOutput::create(out, width, height, quality);
             break;
         default:
-            log_error("Requested to write image as unsupported filetype");
+            log_error(_("Requested to write image as unsupported filetype"));
             break;
     }
 
@@ -232,7 +232,7 @@ Input::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
                 im.reset(new ImageRGBA(width, height));
                 break;
             default:
-                log_error("Invalid image returned");
+                log_error(_("Invalid image returned"));
                 return im;
         }
     }
@@ -240,7 +240,7 @@ Input::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
         // This should be caught here because ~JpegInput can also
         // throw an exception on stack unwinding and this confuses
         // remote catchers.
-        log_error("Out of memory while trying to create %dx%d image",
+        log_error(_("Out of memory while trying to create %dx%d image"),
                 width, height);
         return im;
     }

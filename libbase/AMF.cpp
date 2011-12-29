@@ -56,7 +56,7 @@ readBoolean(const boost::uint8_t*& pos, const boost::uint8_t* _end)
     const bool val = *pos;
     ++pos;
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug("amf0 read bool: %d", val);
+    log_debug(_("amf0 read bool: %d"), val);
 #endif
     return val;
 }
@@ -77,7 +77,7 @@ readNumber(const boost::uint8_t*& pos, const boost::uint8_t* end)
     swapBytes(&d, 8);
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug("amf0 read double: %e", dub);
+    log_debug(_("amf0 read double: %e"), dub);
 #endif
 
     return d;
@@ -87,20 +87,20 @@ std::string
 readString(const boost::uint8_t*& pos, const boost::uint8_t* end)
 {
     if (end - pos < 2) {
-        throw AMFException("Read past _end of buffer for string length");
+        throw AMFException(_("Read past _end of buffer for string length"));
     }
 
     const boost::uint16_t si = readNetworkShort(pos);
     pos += 2;
 
     if (end - pos < si) {
-        throw AMFException("Read past _end of buffer for string type");
+        throw AMFException(_("Read past _end of buffer for string type"));
     }
 
     const std::string str(reinterpret_cast<const char*>(pos), si);
     pos += si;
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug("amf0 read string: %s", str);
+    log_debug(_("amf0 read string: %s"), str);
 #endif
     return str;
 }
@@ -122,7 +122,7 @@ readLongString(const boost::uint8_t*& pos, const boost::uint8_t* end)
     pos += si;
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug("amf0 read long string: %s", str);
+    log_debug(_("amf0 read long string: %s"), str);
 #endif
 
     return str;
@@ -135,7 +135,7 @@ writePlainString(SimpleBuffer& buf, const std::string& str, Type t)
     const size_t len = str.size();
     switch (t) {
         default:
-            log_error("writePlainString called with invalid type!");
+            log_error(_("writePlainString called with invalid type!"));
             return;
        
         case LONG_STRING_AMF0:

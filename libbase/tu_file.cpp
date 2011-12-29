@@ -226,8 +226,8 @@ tu_file::size() const
     struct stat statbuf;
     if (fstat(fileno(_data), &statbuf) < 0)
     {
-	    log_error("Could not fstat file");
-	    return static_cast<size_t>(-1);
+	log_error(_("Could not fstat file"));
+	return static_cast<size_t>(-1);
     }
     return statbuf.st_size;
 }

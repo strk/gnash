@@ -202,7 +202,7 @@ RTMP::call(const SimpleBuffer& amf)
 bool
 RTMP::connect(const URL& url)
 {
-    log_debug("Connecting to %s", url.str());
+    log_debug(_("Connecting to %s"), url.str());
 
     const std::string& hostname = url.hostname();
     const std::string& p = url.port();
@@ -218,7 +218,7 @@ RTMP::connect(const URL& url)
 
     // Basic connection attempt.
     if (!_socket.connect(hostname, port)) {
-        log_error("Initial connection failed");
+        log_error(_("Initial connection failed"));
         return false;
     }
     
@@ -254,7 +254,7 @@ RTMP::update()
         // If we haven't finished reading a packet, retrieve it; otherwise
         // use an empty one.
         if (_incompletePacket.get()) {
-            log_debug("Doing incomplete packet");
+            log_debug(_("Doing incomplete packet"));
             p = *_incompletePacket;
             _incompletePacket.reset();
         }
@@ -289,7 +289,7 @@ RTMP::handlePacket(const RTMPPacket& packet)
 {
     const PacketType t = packet.header.packetType;
 
-    log_debug("Received %s", t);
+    log_debug(_("Received %s"), t);
 
     switch (t) {
 
@@ -321,17 +321,17 @@ RTMP::handlePacket(const RTMPPacket& packet)
             break;
 
         case PACKET_TYPE_FLEX_STREAM_SEND:
-            LOG_ONCE(log_unimpl("unsupported packet %s received"));
+            LOG_ONCE(log_unimpl(_("unsupported packet received")));
             break;
 
         case PACKET_TYPE_FLEX_SHARED_OBJECT:
-            LOG_ONCE(log_unimpl("unsupported packet %s received"));
+            LOG_ONCE(log_unimpl(_("unsupported packet received")));
             break;
 
         case PACKET_TYPE_FLEX_MESSAGE:
         {
-            LOG_ONCE(log_unimpl("partially supported packet %s received"));
-            _messageQueue.push_back(packet.buffer);    
+            LOG_ONCE(log_unimpl(_("partially supported packet %s received")));
+            _messageQueue.push_back(packet.buffer);
             break;
         }
     
@@ -340,7 +340,7 @@ RTMP::handlePacket(const RTMPPacket& packet)
             break;
 
         case PACKET_TYPE_SHARED_OBJECT:
-            LOG_ONCE(log_unimpl("packet %s received"));
+            LOG_ONCE(log_unimpl(_("packet %s received")));
             break;
 
         case PACKET_TYPE_INVOKE:
@@ -352,7 +352,7 @@ RTMP::handlePacket(const RTMPPacket& packet)
             break;
     
         default:
-            log_error("Unknown packet %s received", t);
+            log_error(_("Unknown packet %s received"), t);
     
     }
   
@@ -379,7 +379,7 @@ RTMP::readSocket(boost::uint8_t* buffer, int n)
     // Doesn't seem very likely to be the way the pp does it.
     if (_bytesIn > _bytesInSent + _bandwidth / 2) {
         sendBytesReceived(this);
-        log_debug("Sent bytes received");
+        log_debug(_("Sent bytes received"));
     }
 
     buffer += bytesRead;
@@ -440,13 +440,13 @@ RTMP::readPacketHeader(RTMPPacket& packet)
         return false;
     }
 
-    //log_debug("Packet is %s", boost::io::group(std::hex, (unsigned)hbuf[0]));
+    //log_debug(_("Packet is %s"), boost::io::group(std::hex, (unsigned)hbuf[0]));
 
     const int htype = ((hbuf[0] & 0xc0) >> 6);
-    //log_debug("Thingy whatsit (packet size type): %s", htype);
+    //log_debug(_("Thingy whatsit (packet size type): %s"), htype);
 
     const int channel = (hbuf[0] & 0x3f);
-    //log_debug("Channel: %s", channel);
+    //log_debug(_("Channel: %s"), channel);
 
     hr.headerType = static_cast<PacketSize>(htype);
     hr.channel = channel;
@@ -454,7 +454,7 @@ RTMP::readPacketHeader(RTMPPacket& packet)
 
     if (hr.channel == 0) {
         if (readSocket(&hbuf[1], 1) != 1) {
-          log_error("failed to read RTMP packet header 2nd byte");
+          log_error(_("failed to read RTMP packet header 2nd byte"));
           return false;
         }
         hr.channel = hbuf[1] + 64;
@@ -462,13 +462,13 @@ RTMP::readPacketHeader(RTMPPacket& packet)
     }
     else if (hr.channel == 1) {
         if (readSocket(&hbuf[1], 2) != 2) {
-            log_error("Failed to read RTMP packet header 3nd byte");
+            log_error(_("Failed to read RTMP packet header 3nd byte"));
              return false;
         }
       
         const boost::uint32_t tmp = (hbuf[2] << 8) + hbuf[1];
         hr.channel = tmp + 64;
-        log_debug( "%s, channel: %0x", __FUNCTION__, hr.channel);
+        log_debug(_("%s, channel: %0x"), __FUNCTION__, hr.channel);
         header += 2;
     }
   
@@ -480,7 +480,7 @@ RTMP::readPacketHeader(RTMPPacket& packet)
     if (htype != RTMP_PACKET_SIZE_LARGE) {
 
         if (!hasPacket(CHANNELS_IN, hr.channel)) {
-            log_error("Incomplete packet received on channel %s", channel);
+            log_error(_("Incomplete packet received on channel %s"), channel);
             return false;
         }
 
@@ -493,7 +493,7 @@ RTMP::readPacketHeader(RTMPPacket& packet)
     --nSize;
   
     if (nSize > 0 && readSocket(header, nSize) != nSize) {
-        log_error( "Failed to read RTMP packet header. type: %s",
+        log_error(_("Failed to read RTMP packet header. type: %s"),
                 static_cast<unsigned>(hbuf[0]));
         return false;
     }
@@ -538,7 +538,7 @@ RTMP::readPacketHeader(RTMPPacket& packet)
 
     if (hr._timestamp == 0xffffff) {
       if (readSocket(header+nSize, 4) != 4) {
-              log_error( "%s, failed to read extended timestamp",
+          log_error(_("%s, failed to read extended timestamp"),
               __FUNCTION__);
               return false;
             }
@@ -625,19 +625,19 @@ RTMP::sendPacket(RTMPPacket& packet)
         // If this timestamp is later than the other and the difference fits
         // in 3 bytes, encode a relative one.
         if (uptime >= oldh._timestamp && uptime - prevTimestamp < 0xffffff) {
-            //log_debug("Shrinking to medium");
+            //log_debug(_("Shrinking to medium"));
             hr.headerType = RTMP_PACKET_SIZE_MEDIUM;
             hr._timestamp = uptime - prevTimestamp;
 
             // It can be still smaller if the data size is the same.
             if (oldh.dataSize == hr.dataSize &&
                     oldh.packetType == hr.packetType) {
-                //log_debug("Shrinking to small");
+                //log_debug(_("Shrinking to small"));
                 hr.headerType = RTMP_PACKET_SIZE_SMALL;
                 // If there is no timestamp difference, the minimum size
                 // is possible.
                 if (hr._timestamp == 0) {
-                    //log_debug("Shrinking to minimum");
+                    //log_debug(_("Shrinking to minimum"));
                     hr.headerType = RTMP_PACKET_SIZE_MINIMUM;
                 }
             }
@@ -780,7 +780,7 @@ RTMP::sendPacket(RTMPPacket& packet)
         const boost::uint8_t* pos = payloadData(packet) + 1;
         const boost::uint8_t* end = payloadEnd(packet);
         const std::string& s = amf::readString(pos, end);
-        log_debug( "Calling remote method %s", s);
+        log_debug(_("Calling remote method %s"), s);
     }
 
     RTMPPacket& storedpacket = storePacket(CHANNELS_OUT, hr.channel, packet);
@@ -854,7 +854,7 @@ HandShaker::call()
             _stage = 3;
         case 3:
             if (!stage3()) return;
-            log_debug("Handshake completed");
+            log_debug(_("Handshake completed"));
             _complete = true;
     }
 }
@@ -867,13 +867,13 @@ HandShaker::stage0()
     // This should probably not happen, but we can try again. An error will
     // be signalled later if the socket is no longer usable.
     if (!sent) {
-        log_error("Stage 1 socket not ready. This should not happen.");
+        log_error(_("Stage 1 socket not ready. This should not happen."));
         return false;
     }
 
     /// If we sent the wrong amount of data, we can't recover.
     if (sent != sigSize + 1) {
-        log_error("Could not send stage 1 data");
+        log_error(_("Could not send stage 1 data"));
         _error = true;
         return false;
     }
@@ -895,7 +895,7 @@ HandShaker::stage1()
     assert (read == sigSize + 1);
 
     if (_recvBuf[0] != _sendBuf[0]) {
-        log_error( "Type mismatch: client sent %d, server answered %d",
+        log_error(_("Type mismatch: client sent %d, server answered %d"),
 	        _recvBuf[0], _sendBuf[0]);
     }
     
@@ -906,8 +906,8 @@ HandShaker::stage1()
     std::memcpy(&suptime, serverSig, 4);
     suptime = ntohl(suptime);
 
-    log_debug("Server Uptime : %d", suptime);
-    log_debug("FMS Version   : %d.%d.%d.%d",
+    log_debug(_("Server Uptime : %d"), suptime);
+              log_debug(_("FMS Version   : %d.%d.%d.%d"),
             +serverSig[4], +serverSig[5], +serverSig[6], +serverSig[7]);
 
     return true;
@@ -923,7 +923,7 @@ HandShaker::stage2()
     if (!sent) return false;
 
     if (sent != sigSize) {
-        log_error("Could not send complete signature.");
+        log_error(_("Could not send complete signature."));
         _error = true;
         return false;
     }
@@ -949,7 +949,7 @@ HandShaker::stage3()
 
     // Should we set an error here?
     if (!match) {
-        log_error( "Signatures do not match during handshake!");
+        log_error(_("Signatures do not match during handshake!"));
     }
     return true;
 }
@@ -969,7 +969,7 @@ HandShaker::stage3()
 bool
 sendCtrl(RTMP& r, ControlType t, unsigned int nObject, unsigned int nTime)
 {
-    log_debug( "Sending control type %s %s", +t, t);
+    log_debug(_("Sending control type %s %s"), +t, t);
   
     RTMPPacket packet(256);
   
@@ -1026,7 +1026,7 @@ handleChangeChunkSize(RTMP& r, const RTMPPacket& packet)
 {
     if (payloadSize(packet) >= 4) {
         r._inChunkSize = amf::readNetworkLong(payloadData(packet));
-        log_debug( "Changed chunk size to %d", r._inChunkSize);
+        log_debug(_("Changed chunk size to %d"), r._inChunkSize);
     }
 }
 
@@ -1037,7 +1037,7 @@ handleControl(RTMP& r, const RTMPPacket& packet)
     const size_t size = payloadSize(packet);
 
     if (size < 2) {
-        log_error("Control packet too short");
+        log_error(_("Control packet too short"));
         return;
     }
     
@@ -1045,12 +1045,12 @@ handleControl(RTMP& r, const RTMPPacket& packet)
         static_cast<ControlType>(amf::readNetworkShort(payloadData(packet)));
     
     if (size < 6) {
-        log_error("Control packet (%s) data too short", t);
+        log_error(_("Control packet (%s) data too short"), t);
         return;
     }
     
     const int arg = amf::readNetworkLong(payloadData(packet) + 2);
-    log_debug( "Received control packet %s with argument %s", t, arg);
+    log_debug(_("Received control packet %s with argument %s"), t, arg);
   
     switch (t)
     {
@@ -1067,7 +1067,7 @@ handleControl(RTMP& r, const RTMPPacket& packet)
             break;
   
         case CONTROL_RESET_STREAM:
-            log_debug("Stream is recorded: %s", arg);
+            log_debug(_("Stream is recorded: %s"), arg);
             break;
   
         case CONTROL_PING:
@@ -1083,7 +1083,7 @@ handleControl(RTMP& r, const RTMPPacket& packet)
             break;
   
         default:
-            log_error("Received unknown or unhandled control %s", t);
+            log_error(_("Received unknown or unhandled control %s"), t);
             break;
     }
   
@@ -1093,7 +1093,7 @@ void
 handleServerBW(RTMP& r, const RTMPPacket& packet)
 {
     const boost::uint32_t bw = amf::readNetworkLong(payloadData(packet));
-    log_debug( "Server bandwidth is %s", bw);
+    log_debug(_("Server bandwidth is %s"), bw);
     r.setServerBandwidth(bw);
 }
 
@@ -1107,7 +1107,7 @@ handleClientBW(RTMP& r, const RTMPPacket& packet)
     if (payloadSize(packet) > 4) r.m_nClientBW2 = payloadData(packet)[4];
     else r.m_nClientBW2 = -1;
       
-    log_debug( "Client bandwidth is %d %d", r.bandwidth(), +r.m_nClientBW2);
+    log_debug(_("Client bandwidth is %d %d"), r.bandwidth(), +r.m_nClientBW2);
 }
 
 

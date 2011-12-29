@@ -168,7 +168,7 @@ private:
 	{
 		if ( ++ptr == end )
 		{
-			log_debug("Going round");
+			log_debug(_("Going round"));
 			ptr=start;
 		}
 		usedBits=0;

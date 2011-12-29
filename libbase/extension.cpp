@@ -71,7 +71,7 @@ Extension::Extension()
         _pluginsdir = env;
     }
 
-    log_debug("Plugins path: %s", _pluginsdir);
+    log_debug(_("Plugins path: %s"), _pluginsdir);
 #ifdef HAVE_LTDL
     lt_dlsetsearchpath(_pluginsdir.c_str());
 #endif
