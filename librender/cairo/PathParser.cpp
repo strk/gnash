@@ -87,7 +87,7 @@ PathParser::run(const SWFCxForm& cx, const SWFMatrix& /*mat*/)
      
       if (it == path_list.end()) {
         if (!closed_shape()) {
-          log_error("path not closed!");
+            log_error(_("path not closed!"));
           _cur_endpoint = _shape_origin;
         }
       } else {

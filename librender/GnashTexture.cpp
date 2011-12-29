@@ -66,7 +66,7 @@ static inline bool gl_do_check_error(int report)
     bool is_error = false;
     while ((error = glGetError()) != GL_NO_ERROR) {
         if (report)
-            log_error("glError: %s caught\n", gl_get_error_string(error));
+            log_error(_("glError: %s caught\n"), gl_get_error_string(error));
         is_error = true;
     }
     return is_error;

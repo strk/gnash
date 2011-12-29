@@ -79,19 +79,19 @@ OpenVGBitmap::OpenVGBitmap(CachedBitmap *bitmap, VGPaint vgpaint)
     _vgimage = vgCreateImage(_pixel_format, im.width(), im.height(),
                              VG_IMAGE_QUALITY_FASTER);    
     if (_vgimage == VG_INVALID_HANDLE) {
-        log_error("Failed to create VG image! %s",
+        log_error(_("Failed to create VG image! %s"),
                   Renderer_ovg::getErrorString(vgGetError()));
     }
     
     switch (im.type()) {
     case image::TYPE_RGB:
-        log_debug("Image has RGB Pixel Format, Stride is %d, width is %d, height is %d",
+        log_debug(_("Image has RGB Pixel Format, Stride is %d, width is %d, height is %d"),
                   im.stride(), im.width(), im.height());
         vgImageSubData(_vgimage, im.begin(), im.stride(), VG_sRGBX_8888,
                    0, 0, im.width(), im.height());
         break;
     case image::TYPE_RGBA:
-        log_debug("Image has RGBA Pixel Format, Stride is %d, width is %d, height is %d",
+        log_debug(_("Image has RGBA Pixel Format, Stride is %d, width is %d, height is %d"),
                   im.stride(), im.width(), im.height());
         // Copy the image data into the VG image container
         vgImageSubData(_vgimage, im.begin(), im.stride(), VG_sRGBA_8888,
@@ -282,19 +282,19 @@ OpenVGBitmap::applyPatternBitmap(const gnash::SWFMatrix& mat,
     _vgimage = vgCreateImage(_pixel_format, im.width(), im.height(),
                              VG_IMAGE_QUALITY_FASTER);    
     if (_vgimage == VG_INVALID_HANDLE) {
-        log_error("Failed to create VG image! %s",
+        log_error(_("Failed to create VG image! %s"),
                   Renderer_ovg::getErrorString(vgGetError()));
     }
     
     switch (im.type()) {
     case image::TYPE_RGB:
-        log_debug("Image has RGB Pixel Format, Stride is %d, width is %d, height is %d",
+        log_debug(_("Image has RGB Pixel Format, Stride is %d, width is %d, height is %d"),
                   im.stride(), im.width(), im.height());
         vgImageSubData(_vgimage, im.begin(), im.stride(), VG_sRGBX_8888,
                    0, 0, im.width(), im.height());
         break;
     case image::TYPE_RGBA:
-        log_debug("Image has RGBA Pixel Format, Stride is %d, width is %d, height is %d",
+        log_debug(_("Image has RGBA Pixel Format, Stride is %d, width is %d, height is %d"),
                   im.stride(), im.width(), im.height());
         // Copy the image data into the VG image container
         vgImageSubData(_vgimage, im.begin(), im.stride(), VG_sRGBA_8888,
@@ -346,7 +346,7 @@ OpenVGBitmap::applyPatternBitmap(const gnash::SWFMatrix& mat,
           vgSetParameteri (_vgpaint, VG_PAINT_PATTERN_TILING_MODE, VG_TILE_REFLECT);
           break;
       default:
-          log_error("No supported wrap mode specified!");
+          log_error(_("No supported wrap mode specified!"));
           break;
     }
 

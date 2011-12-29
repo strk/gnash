@@ -92,7 +92,7 @@ Renderer_gles1::Renderer_gles1()
 {
 //    if (!initDevice(EGLDevice::OPENVG))
     if (!initDevice(0, 0)) {
-        log_error("Couldn't initialize EGL Device!");
+        log_error(_("Couldn't initialize EGL Device!"));
     }
 }
 
@@ -121,7 +121,7 @@ Renderer_gles1::drawVideoFrame(image::GnashImage* /* frame */,
                                const SWFRect* /* bounds */, bool /*smooth*/)
 {
     GNASH_REPORT_FUNCTION;
-    log_unimpl("drawVideoFrame");  
+    log_unimpl(_("drawVideoFrame"));
 }
 
 void
@@ -227,7 +227,7 @@ Renderer_gles1::drawGlyph(const SWF::ShapeRecord& /* rec */, const rgba& /* c */
 void
 Renderer_gles1::set_antialiased(bool /* enable */)
 {
-    log_unimpl("set_antialiased");
+    log_unimpl(_("set_antialiased"));
 }
 
 void

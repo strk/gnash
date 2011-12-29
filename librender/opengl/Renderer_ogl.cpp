@@ -229,23 +229,23 @@ public:
 #else
       _context(OSMesaCreateContext(OSMESA_RGB, NULL))
 #endif
-  {
+   {
     if (!_context) {
-      log_error("OSMesaCreateContext failed!");
-      return; // FIXME: throw an exception?
+        log_error(_("OSMesaCreateContext failed!"));
+        return; // FIXME: throw an exception?
     }
 
     if (!OSMesaMakeCurrent(_context, _buffer.get(), GL_UNSIGNED_BYTE, width,
                            height)) {
-      log_error("OSMesaMakeCurrent failed!");
+        log_error(_("OSMesaMakeCurrent failed!"));
       return;
     }
    
     // FIXME: is there any reason to do this?
     OSMesaColorClamp(GL_TRUE);
 
-    log_debug("OSMesa handle successfully created. with width %d"
-            " and height %d.", width, height);  
+    log_debug(_("OSMesa handle successfully created. with width %d and height %d."),
+              width, height);
   }
   
   ~OSRenderMesa()
@@ -341,7 +341,7 @@ check_error()
     return;
   }
   
-  log_error("OpenGL: %s", gluErrorString(error));
+  log_error(_("OpenGL: %s"), gluErrorString(error));
 }
 
 /// @ret A point in the middle of points a and b, that is, the middle of a line
@@ -514,7 +514,7 @@ Tesselator::rememberVertex(GLdouble* v)
 void
 Tesselator::error(GLenum error)
 {  
-  log_error("GLU: %s", gluErrorString(error));
+    log_error(_("GLU: %s"), gluErrorString(error));
 }
 
 // static
@@ -865,8 +865,7 @@ public:
     glGetIntegerv(GL_LIST_INDEX, &index);
 
     if (index >= 255) {
-      log_error("An insane number of video frames have been requested to be "
-                "drawn. Further video frames will be ignored.");
+        log_error(_("An insane number of video frames have been requested to be drawn. Further video frames will be ignored."));
       return;
     }
 
@@ -1140,7 +1139,7 @@ public:
 
   virtual void  set_antialiased(bool /* enable */ )
   {
-    log_unimpl("set_antialiased");
+      log_unimpl(_("set_antialiased"));
   }
     
   virtual void begin_submit_mask()
@@ -1448,8 +1447,7 @@ public:
       glGetFloatv(GL_LINE_WIDTH_RANGE, width_info);          
       
       if (width > width_info[1]) {
-        LOG_ONCE( log_unimpl("Your OpenGL implementation does not support the line width" \
-                  " requested. Lines will be drawn with reduced width.") );
+          LOG_ONCE(log_unimpl(_("Your OpenGL implementation does not support the line width requested. Lines will be drawn with reduced width.")));
         width = width_info[1];
       }
       

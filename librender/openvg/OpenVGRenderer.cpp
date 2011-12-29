@@ -272,10 +272,10 @@ Renderer_ovg::init(float x, float y)
     _mask_layer = vgCreateMaskLayer(x, y);
 #endif
 
-    log_debug("VG Vendor is %s, VG Version is %s, VG Renderer is %s",
+    log_debug(_("VG Vendor is %s, VG Version is %s, VG Renderer is %s"),
               vgGetString(VG_VENDOR), vgGetString(VG_VERSION),
               vgGetString(VG_RENDERER));
-    log_debug("VG Extensions are: ", vgGetString(VG_EXTENSIONS));
+    log_debug(_("VG Extensions are: "), vgGetString(VG_EXTENSIONS));
     printVGParams();
     
     // vgSeti(VG_SCISSORING, VG_FALSE);
@@ -316,7 +316,7 @@ void
 Renderer_ovg::drawVideoFrame(image::GnashImage* /* frame */, const SWFMatrix* /* m */,
                              const SWFRect* /* bounds */, bool /*smooth*/)
 {
-    log_unimpl("drawVideoFrame");  
+    log_unimpl(_("drawVideoFrame"));
 }
 
 void
@@ -566,7 +566,7 @@ Renderer_ovg::draw_poly(const std::vector<point>& corners,
 void
 Renderer_ovg::set_antialiased(bool /* enable */)
 {
-    log_unimpl("set_antialiased");
+    log_unimpl(_("set_antialiased"));
 }
 
 void
@@ -833,7 +833,7 @@ Renderer_ovg::apply_line_style(const LineStyle& style, const SWFCxForm& cx,
           vgSetf (VG_STROKE_JOIN_STYLE, VG_JOIN_MITER);
           break;
       default:
-          log_unimpl("join style");
+          log_unimpl(_("join style"));
     }
     
     switch(style.startCapStyle()) {
@@ -847,7 +847,7 @@ Renderer_ovg::apply_line_style(const LineStyle& style, const SWFCxForm& cx,
           vgSetf (VG_STROKE_CAP_STYLE, VG_CAP_SQUARE);
           break;
       default:
-          log_unimpl("cap style");
+          log_unimpl(_("cap style"));
     }
     
     vgSetf (VG_STROKE_MITER_LIMIT, style.miterLimitFactor());
@@ -1296,9 +1296,9 @@ Renderer_ovg::printVGParams()
           break;
 #endif
       default:
-          log_error("unsupported VG_MATRIX_MODE!");
+          log_error(_("unsupported VG_MATRIX_MODE!"));
     }
-    log_debug("VG_MATRIX_MODE is %s", str);
+    log_debug(_("VG_MATRIX_MODE is %s"), str);
     str.clear();
 
     switch(vgGeti(VG_FILL_RULE)) {
@@ -1309,9 +1309,9 @@ Renderer_ovg::printVGParams()
           str = "VG_NON_ZERO";
           break;
       default:
-          log_error("unsupported VG_FILL_RULE!");          
+          log_error(_("unsupported VG_FILL_RULE!")); 
     }
-    log_debug("VG_FILL_RULE is %s", str);
+    log_debug(_("VG_FILL_RULE is %s"), str);
     str.clear();
 
     switch(vgGeti(VG_IMAGE_QUALITY)) {
@@ -1330,9 +1330,9 @@ Renderer_ovg::printVGParams()
           break;
 #endif
       default:
-          log_error("unsupported VG_IMAGE_QUALITY!");
+          log_error(_("unsupported VG_IMAGE_QUALITY!"));
     }
-    log_debug("VG_IMAGE_QUALITY is %s", str);
+    log_debug(_("VG_IMAGE_QUALITY is %s"), str);
     str.clear();
     
     switch(vgGeti(VG_RENDERING_QUALITY)) {
@@ -1351,9 +1351,9 @@ Renderer_ovg::printVGParams()
           break;
 #endif
       default:
-          log_error("unsupported VG_RENDERING_QUALITY!");
+          log_error(_("unsupported VG_RENDERING_QUALITY!"));
     }
-    log_debug("VG_RENDERING_QUALITY is %s", str);
+    log_debug(_("VG_RENDERING_QUALITY is %s"), str);
     str.clear();
     
     switch(vgGeti(VG_BLEND_MODE)) {
@@ -1388,9 +1388,9 @@ Renderer_ovg::printVGParams()
           str = "VG_BLEND_ADDITIVE";
           break;
       default:
-          log_error("unsupported VG_BLEND_MODE!");
+          log_error(_("unsupported VG_BLEND_MODE!"));
     }
-    log_debug("VG_BLEND_MODE is %s", str);    
+    log_debug(_("VG_BLEND_MODE is %s"), str);    
     str.clear();
     
     switch(vgGeti(VG_IMAGE_MODE)) {
@@ -1409,12 +1409,12 @@ Renderer_ovg::printVGParams()
           break;
 #endif
       default:
-          log_error("unsupported VG_IMAGE_MODE!");
+          log_error(_("unsupported VG_IMAGE_MODE!"));
     }
-    log_debug("VG_IMAGE_MODE is %s", str);
+    log_debug(_("VG_IMAGE_MODE is %s"), str);
     str.clear();
     
-    log_debug("VG_STROKE_LINE_WIDTH is %d", vgGeti(VG_STROKE_LINE_WIDTH));    
+    log_debug(_("VG_STROKE_LINE_WIDTH is %d"), vgGeti(VG_STROKE_LINE_WIDTH));
     str.clear();
     
     switch(vgGeti(VG_STROKE_CAP_STYLE)) {
@@ -1433,9 +1433,9 @@ Renderer_ovg::printVGParams()
           break;
 #endif
       default:
-          log_error("unsupported VG_STROKE_CAP_STYLE!");
+          log_error(_("unsupported VG_STROKE_CAP_STYLE!"));
     }
-    log_debug("VG_STROKE_CAP_STYLE is %s", str);
+    log_debug(_("VG_STROKE_CAP_STYLE is %s"), str);
     str.clear();
     
     switch(vgGeti(VG_STROKE_JOIN_STYLE)) {
@@ -1454,14 +1454,14 @@ Renderer_ovg::printVGParams()
           break;
 #endif
       default:
-          log_error("unsupported VG_STROKE_JOIN_STYLE!");
+          log_error(_("unsupported VG_STROKE_JOIN_STYLE!"));
     }
-    log_debug("VG_STROKE_JOIN_STYLE is %s", str);
+    log_debug(_("VG_STROKE_JOIN_STYLE is %s"), str);
     str.clear();
     
-    log_debug("VG_STROKE_MITER_LIMIT is %d", vgGeti(VG_STROKE_MITER_LIMIT));
-    log_debug("VG_MASKING is %d", vgGeti(VG_MASKING));
-    log_debug("VG_SCISSORING is %d", vgGeti(VG_SCISSORING));    
+    log_debug(_("VG_STROKE_MITER_LIMIT is %d"), vgGeti(VG_STROKE_MITER_LIMIT));
+    log_debug(_("VG_MASKING is %d"), vgGeti(VG_MASKING));
+    log_debug(_("VG_SCISSORING is %d"), vgGeti(VG_SCISSORING));    
     str.clear();
     
     switch(vgGeti(VG_PIXEL_LAYOUT)) {
@@ -1486,15 +1486,15 @@ Renderer_ovg::printVGParams()
           break;
 #endif
       default:
-          log_error("unsupported VG_PIXEL_LAYOUT!");
+          log_error(_("unsupported VG_PIXEL_LAYOUT!"));
     }
-    log_debug("VG_PIXEL_LAYOUT is %s", str);
+    log_debug(_("VG_PIXEL_LAYOUT is %s"), str);
     
-    log_debug("VG_STROKE_DASH_PHASE_RESET is %s",
+    log_debug(_("VG_STROKE_DASH_PHASE_RESET is %s"),
               (vgGeti(VG_STROKE_DASH_PHASE_RESET) == true) ? "true" : "false");
-    log_debug("VG_FILTER_FORMAT_LINEAR is %s",
+    log_debug(_("VG_FILTER_FORMAT_LINEAR is %s"),
               (vgGeti(VG_FILTER_FORMAT_LINEAR) == true) ? "true" : "false");
-    log_debug("VG_FILTER_FORMAT_PREMULTIPLIED is %s",
+    log_debug(_("VG_FILTER_FORMAT_PREMULTIPLIED is %s"),
               (vgGeti(VG_FILTER_FORMAT_PREMULTIPLIED) == true) ? "true" : "false");
     str.clear();
     
@@ -1511,26 +1511,26 @@ Renderer_ovg::printVGParams()
     if (value & VG_ALPHA) {
         str += " VG_ALPHA";
     }
-    log_debug("VG_FILTER_CHANNEL_MASK is %s", str);
+    log_debug(_("VG_FILTER_CHANNEL_MASK is %s"), str);
     
-    log_debug("VG_MAX_IMAGE_WIDTH is %d", vgGeti(VG_MAX_IMAGE_WIDTH));
-    log_debug("VG_MAX_IMAGE_HEIGHT is %d", vgGeti(VG_MAX_IMAGE_HEIGHT));
-    log_debug("VG_MAX_IMAGE_PIXELS is %d", vgGeti(VG_MAX_IMAGE_PIXELS));
-    log_debug("VG_MAX_IMAGE_BYTES is %d", vgGeti(VG_MAX_IMAGE_BYTES));
+    log_debug(_("VG_MAX_IMAGE_WIDTH is %d"), vgGeti(VG_MAX_IMAGE_WIDTH));
+    log_debug(_("VG_MAX_IMAGE_HEIGHT is %d"), vgGeti(VG_MAX_IMAGE_HEIGHT));
+    log_debug(_("VG_MAX_IMAGE_PIXELS is %d"), vgGeti(VG_MAX_IMAGE_PIXELS));
+    log_debug(_("VG_MAX_IMAGE_BYTES is %d"), vgGeti(VG_MAX_IMAGE_BYTES));
 
 }
 
 void
 Renderer_ovg::printVGPath(VGPath path)
 {
-    log_debug("VG_PATH_FORMAT is %d", vgGetParameteri(path, VG_PATH_FORMAT));
-    log_debug("VG_PATH_DATATYPE is %d", vgGetParameteri(path, VG_PATH_DATATYPE));
-    log_debug("VG_PATH_CAPABILITY_APPEND_TO is %d", vgGetParameteri(path, VG_PATH_CAPABILITY_APPEND_TO));
-    log_debug("VG_PATH_SCALE is %g", vgGetParameteri(path, VG_PATH_SCALE));
-    log_debug("VG_PATH_BIA is %g", vgGetParameteri(path, VG_PATH_BIAS));
+    log_debug(_("VG_PATH_FORMAT is %d"), vgGetParameteri(path, VG_PATH_FORMAT));
+    log_debug(_("VG_PATH_DATATYPE is %d"), vgGetParameteri(path, VG_PATH_DATATYPE));
+    log_debug(_("VG_PATH_CAPABILITY_APPEND_TO is %d"), vgGetParameteri(path, VG_PATH_CAPABILITY_APPEND_TO));
+    log_debug(_("VG_PATH_SCALE is %g"), vgGetParameteri(path, VG_PATH_SCALE));
+    log_debug(_("VG_PATH_BIA is %g"), vgGetParameteri(path, VG_PATH_BIAS));
 
-    log_debug("VG_PATH_NUM_SEGMENTS is %d", vgGetParameteri(path, VG_PATH_NUM_SEGMENTS));
-    log_debug("VG_PATH_NUM_COORDS is %d", vgGetParameteri(path, VG_PATH_NUM_COORDS));
+    log_debug(_("VG_PATH_NUM_SEGMENTS is %d"), vgGetParameteri(path, VG_PATH_NUM_SEGMENTS));
+    log_debug(_("VG_PATH_NUM_COORDS is %d"), vgGetParameteri(path, VG_PATH_NUM_COORDS));
 }
 
 // Print an OpenVG matric, which is 3 x 3. Elements 2 and 5 are

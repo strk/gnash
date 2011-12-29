@@ -187,7 +187,7 @@ main(int argc, char *argv[])
     if (win) {
         egl.attachWindow(win);
     } else {
-        log_error("Couldn't get Drawable window from X11");
+        log_error(_("Couldn't get Drawable window from X11"));
         exit(1);
     }    
     // Set initial projection/viewing transformation.

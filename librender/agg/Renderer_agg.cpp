@@ -791,7 +791,7 @@ public:
                 renderVideo<agg::pixfmt_rgb24_pre>(*frame, mtx, path, smooth);
                 break;
             default:
-                log_error("Can't render this type of frame");
+                log_error(_("Can't render this type of frame"));
                 break;
         }
 
@@ -1761,9 +1761,9 @@ public:
           if ((!lstyle.scaleThicknessVertically()) ||
                   (!lstyle.scaleThicknessHorizontally()))
           {
-             LOG_ONCE( log_unimpl(_("Unidirectionally scaled strokes in "
-                             "AGG renderer (we'll scale by the "
-                             "scalable one)")) );
+             LOG_ONCE(log_unimpl(_("Unidirectionally scaled strokes in "
+				   "AGG renderer (we'll scale by the "
+				   "scalable one)")) );
           }
           stroke.width(std::max(1.0f, thickness*stroke_scale));
         }
@@ -1989,7 +1989,7 @@ public:
       
       ++count;
     }
-    //log_debug("%d inv. bounds in frame", count);
+    //log_debug(_("%d inv. bounds in frame"), count);
     
   }
   
@@ -2148,7 +2148,7 @@ DSOEXPORT Renderer_agg_base*  create_Renderer_agg(const char *pixelformat)
   else 
 #endif
   {
-    log_error("Unknown pixelformat: %s\n", pixelformat);
+      log_error(_("Unknown pixelformat: %s\n"), pixelformat);
     return NULL;
     //abort();
   }
