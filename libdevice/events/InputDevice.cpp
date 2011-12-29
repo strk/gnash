@@ -128,19 +128,19 @@ InputDevice::readData(size_t size)
     errno = 0;
     int ret = ::select(_fd+1, &fdset, NULL, NULL, &tval);
     if (ret == 0) {
-//            log_debug ("The pipe for fd #%d timed out waiting to read", fd);
+//            log_debug(_("The pipe for fd #%d timed out waiting to read"), fd);
         return inbuf;
     } else if (ret == 1) {
-        // log_debug ("The device for fd #%d is ready", _fd);
+        // log_debug(_("The device for fd #%d is ready"), _fd);
     } else {
-        log_error("The device has this error: %s", strerror(errno));
+        log_error(_("The device has this error: %s"), strerror(errno));
         return inbuf;
     }
     
     inbuf.reset(new boost::uint8_t[size]);
     ret = ::read(_fd, inbuf.get(), size);
     if (ret > 0) {
-        // log_debug("Read %d bytes, %s", ret, hexify(inbuf.get(), ret, false));
+        // log_debug(_("Read %d bytes, %s"), ret, hexify(inbuf.get(), ret, false));
     } else {
         inbuf.reset();
     }
@@ -208,7 +208,7 @@ InputDevice::scanForDevices()
         devices.push_back(*it);
     }
 #else
-    log_debug("WARNING: PS/2 Mouse support disabled as it conflicts with the input event support.");
+    log_debug(_("WARNING: PS/2 Mouse support disabled as it conflicts with the input event support."));
 #endif
 #if defined(HAVE_TSLIB_H) && defined(USE_TSLIB)
     id = TouchDevice::scanForDevices();

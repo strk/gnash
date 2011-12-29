@@ -91,12 +91,12 @@ MouseDevice::scanForDevices()
         if (stat(mice[i].filespec, &st) == 0) {
             // Then see if we can open it
             if ((fd = open(mice[i].filespec, O_RDWR|O_NONBLOCK)) < 0) {
-                log_error("You don't have the proper permissions to open %s",
+                log_error(_("You don't have the proper permissions to open %s"),
                           mice[i].filespec);
                 i++;
                 continue;
             }
-            log_debug("Found a %s device for mouse input using %s",
+            log_debug(_("Found a %s device for mouse input using %s"),
                       debug[mice[i].type], mice[i].filespec);
             
             boost::shared_ptr<InputDevice> dev;
@@ -142,13 +142,14 @@ MouseDevice::init(const std::string &filespec, size_t size)
     _fd = open(filespec.c_str(), O_RDWR | O_NDELAY);
     
     if (_fd < 0) {
-        log_debug("Could not open %s: %s", filespec, strerror(errno));
+        log_debug(_("Could not open %s: %s"), filespec, strerror(errno));
         return false;
     }
     
 #if 0
     if (fcntl(_fd, F_SETFL, fcntl(_fd, F_GETFL) | O_NONBLOCK) < 0) {
-        log_error("Could not set non-blocking mode for mouse device: %s", strerror(errno));
+        log_error(_("Could not set non-blocking mode for mouse device: %s"),
+                  strerror(errno));
         if (_fd) {
             close(_fd);
             _fd = -1;
@@ -193,7 +194,7 @@ MouseDevice::init(const std::string &filespec, size_t size)
             }
         }  
         
-        log_debug("Mouse enabled for %s on fd #%d", _filespec, _fd);
+        log_debug(_("Mouse enabled for %s on fd #%d"), _filespec, _fd);
     }
       
     return true;
@@ -253,7 +254,7 @@ MouseDevice::check()
     
     // resync
     if (!buf[0] & 8) { // bit 3 us always set in the first byte
-        log_error("No sync in first byte!");
+        log_error(_("No sync in first byte!"));
         return false;
     }
 
@@ -307,21 +308,21 @@ MouseDevice::check()
         ymove = (~buf[2])+1;
  
         if (buf[0] & 0x40) {
-            log_debug("Vertical mouse movement overflow bit set");
+            log_debug(_("Vertical mouse movement overflow bit set"));
         }
         if (buf[0] & 0x80) {
-            log_debug("Horizontal mouse movement overflow bit set");
+            log_debug(_("Horizontal mouse movement overflow bit set"));
         }
         // 0,0 is the lower left of the display, so the negative bits are set
         // when going from the upper left to the lower right.
         
         if (buf[0] & 0x10) {
-            log_debug("Horizontal mouse movement negative bit set");
+            log_debug(_("Horizontal mouse movement negative bit set"));
         } else {
             xmove *= -1;
         }
         if (buf[0] & 0x20) {
-            log_debug("Vertical mouse movement negative bit set");
+            log_debug(_("Vertical mouse movement negative bit set"));
         } else {
             ymove *= -1;
         }

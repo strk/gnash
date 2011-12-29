@@ -43,7 +43,7 @@ UinputDevice::~UinputDevice()
     // GNASH_REPORT_FUNCTION;
     if (_fd) {
         if (ioctl(_fd, UI_DEV_DESTROY, 0) < 0) {
-            log_error("ioctl(UI_DEV_DESTROY)");
+            log_error(_("ioctl(UI_DEV_DESTROY)"));
         }
     }
 }
@@ -74,12 +74,12 @@ UinputDevice::scanForDevice()
         if (stat(mice[i], &st) == 0) {
             // Then see if we can open it, this is a write only device
             if ((_fd = open(mice[i], O_WRONLY)) < 0) {
-                log_error("You don't have the proper permissions to open %s",
+                log_error(_("You don't have the proper permissions to open %s"),
                           mice[i]);
                 i++;
                 continue;
             }
-            log_debug("Found a User mode input device at %s", mice[i]);
+            log_debug(_("Found a User mode input device at %s"), mice[i]);
             return true;
             
         }     // stat()      
@@ -95,26 +95,26 @@ UinputDevice::init()
     // GNASH_REPORT_FUNCTION;
 
     if (_fd < 0) {
-        log_error("User Mode Input device not initialized yet!");
+        log_error(_("User Mode Input device not initialized yet!"));
         return false;
     }
     
     if (ioctl(_fd, UI_SET_EVBIT, EV_KEY) < 0) {
-        log_error("ioctl(UI_SET_EVBIT, EV_KEY)");
+        log_error(_("ioctl(UI_SET_EVBIT, EV_KEY)"));
         // return false;
     }
 
 #if 0 // USE_RELATIVE_POINTER
     if (ioctl(_fd, UI_SET_EVBIT, EV_REL) < 0) {
-        log_error("ioctl(UI_SET_EVBIT, EV_REL)");
+        log_error(_("ioctl(UI_SET_EVBIT, EV_REL)"));
         // return false;
     }
     if (ioctl(_fd, UI_SET_RELBIT, REL_X) < 0) {
-        log_error("ioctl(UI_SET_RELBIT, REL_X)");
+        log_error(_("ioctl(UI_SET_RELBIT, REL_X)"));
         // return false;
     }
     if (ioctl(_fd, UI_SET_RELBIT, REL_Y) < 0) {
-        log_error("ioctl( UI_SET_RELBIT, REL_Y)");
+        log_error(_("ioctl( UI_SET_RELBIT, REL_Y)"));
         // return false;
     }
 #else
@@ -139,34 +139,34 @@ UinputDevice::init()
     uidev.absmax[ABS_PRESSURE]=400;
 
     if (::write(_fd, (char *)&uidev, sizeof(uidev)) < 0) {
-        log_error("write uidev");
+        log_error(_("write uidev"));
         // return false;
     }
 #endif
     if (ioctl(_fd, UI_SET_EVBIT, EV_ABS) < 0) {
-        log_error("ioctl(UI_SET_EVBIT, EV_ABS): %s", strerror(errno));
+        log_error(_("ioctl(UI_SET_EVBIT, EV_ABS): %s"), strerror(errno));
         // return false;
     }
     if (ioctl(_fd, UI_SET_ABSBIT,ABS_X) < 0) {
-        log_error("ioctl(UI_SET_ABSBIT,ABS_X): %s", strerror(errno));
+        log_error(_("ioctl(UI_SET_ABSBIT,ABS_X): %s"), strerror(errno));
         // return false;
     }
     if (ioctl(_fd, UI_SET_ABSBIT, ABS_Y) < 0) {
-        log_error("ioctl(UI_SET_ABSBIT, ABS_Y): %s", strerror(errno));
+        log_error(_("ioctl(UI_SET_ABSBIT, ABS_Y): %s"), strerror(errno));
         // return false;
     }
 #endif
     
     if (ioctl(_fd, UI_SET_KEYBIT, BTN_LEFT) < 0) {
-        log_error("ioctl(UI_SET_KEYBIT, BTN_LEFT)): %s", strerror(errno));
+        log_error(_("ioctl(UI_SET_KEYBIT, BTN_LEFT)): %s"), strerror(errno));
         // return false;
     }
     if (ioctl(_fd, UI_SET_KEYBIT, BTN_RIGHT) < 0) {
-        log_error("ioctl(UI_SET_KEYBIT, BTN_RIGHT): %s", strerror(errno));
+        log_error(_("ioctl(UI_SET_KEYBIT, BTN_RIGHT): %s"), strerror(errno));
         // return false;
     }
     if (ioctl(_fd, UI_SET_EVBIT, ABS_PRESSURE) < 0) {
-        log_error("ioctl(UI_SET_EVBIT, ABS_PRESSURE): %s", strerror(errno));
+        log_error(_("ioctl(UI_SET_EVBIT, ABS_PRESSURE): %s"), strerror(errno));
         // return false;
     }
     // if (ioctl(_fd, UI_SET_EVBIT, ABS_TOUCH) < 0) {
@@ -174,13 +174,12 @@ UinputDevice::init()
     //     return false;
     // }
     if (ioctl(_fd, UI_SET_KEYBIT, BTN_MOUSE) < 0) {
-        log_error("ioctl(UI_SET_KEYBIT, BTN_MOUSE): %s", strerror(errno));
+        log_error(_("ioctl(UI_SET_KEYBIT, BTN_MOUSE): %s"), strerror(errno));
         // return false;
     }
 
     if (ioctl(_fd, UI_DEV_CREATE, 0) < 0) {
-        perror("UI_DEV_CREATE");
-        log_error("ioctl(UI_DEV_CREATED) failed!");
+        log_error(_("ioctl(UI_DEV_CREATED) failed!"),  strerror(errno));
         // return false;
     }
     

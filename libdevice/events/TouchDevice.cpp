@@ -80,25 +80,27 @@ TouchDevice::init(const std::string &filespec, size_t /* size */)
         if (!filespec.empty()) {
             devname = const_cast<char *>(_filespec.c_str());
         } else {
-            log_error("No filespec specified for the touchscreen device.");
+            log_error(_("No filespec specified for the touchscreen device."));
         }
     }
     
     _tsDev = ts_open(devname, 1);  //Open tslib non-blocking
     if (_tsDev == 0) {
-        log_error("Could not open touchscreen %s: %s", devname, strerror(errno));
+        log_error(_("Could not open touchscreen %s: %s"), devname,
+                  strerror(errno));
         return false;
     }
     
     ts_config(_tsDev); 
     if (ts_fd(_tsDev) < 0) {
-        log_error("Could not get touchscreen fd %s: %s", devname, strerror(errno));
+        log_error(_("Could not get touchscreen fd %s: %s"), devname,
+                  strerror(errno));
         return false;
     }
     
     _fd = ts_fd(_tsDev);
     
-    log_debug("Using TSLIB on %s", devname);
+    log_debug(_("Using TSLIB on %s"), devname);
     
     return true;
 }
@@ -129,11 +131,11 @@ TouchDevice::check()
             boost::shared_array<int> coords =
                 InputDevice::convertAbsCoords(event.x, event.y,
                                                 _screen_width, _screen_height);
-            log_debug("Touched x: %d, y: %d", event.x , event.y);
+            log_debug(_("Touched x: %d, y: %d"), event.x , event.y);
             addData(true, gnash::key::INVALID, 0, event.x, event.y);
         } else {
             addData(false, gnash::key::INVALID, 0, event.x, event.y);
-            log_debug("lifted x: %d y: %d", event.x, event.y); //debug
+            log_debug(_("lifted x: %d y: %d"), event.x, event.y); //debug
         }
     }
 
@@ -303,17 +305,17 @@ TouchDevice::scanForDevices()
     int i = 0;
     while (touch[i].type != InputDevice::UNKNOWN) {
         int fd = 0;
-        // log_debug("Checking for device %s...", touch[i].filespec);
+        // log_debug(_("Checking for device %s..."), touch[i].filespec);
         if (stat(touch[i].filespec, &st) == 0) {
             // Then see if we can open it
             if ((fd = open(touch[i].filespec, O_RDWR)) < 0) {
-                log_error("You don't have the proper permissions to open %s",
+                log_error(_("You don't have the proper permissions to open %s"),
                           touch[i].filespec);
                 i++;
                 continue;
             }
             close(fd);
-            log_debug("Found a %s device for touchscreen input using %s",
+            log_debug(_("Found a %s device for touchscreen input using %s",
                       debug[touch[i].type], touch[i].filespec);
             boost::shared_ptr<InputDevice> dev
                 = boost::shared_ptr<InputDevice>(new TouchDevice());
