@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-29 13:17-0700\n"
+"POT-Creation-Date: 2011-12-29 13:58-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,6 +31,159 @@ msgstr ""
 msgid "%s on w32"
 msgstr ""
 
+#: libbase/RTMP.cpp:205
+#, c-format
+msgid "Connecting to %s"
+msgstr ""
+
+#: libbase/RTMP.cpp:221
+msgid "Initial connection failed"
+msgstr ""
+
+#: libbase/RTMP.cpp:257
+msgid "Doing incomplete packet"
+msgstr ""
+
+#: libbase/RTMP.cpp:292
+#, c-format
+msgid "Received %s"
+msgstr ""
+
+#: libbase/RTMP.cpp:324 libbase/RTMP.cpp:328
+msgid "unsupported packet received"
+msgstr ""
+
+#: libbase/RTMP.cpp:333
+#, c-format
+msgid "partially supported packet %s received"
+msgstr ""
+
+#: libbase/RTMP.cpp:343
+#, c-format
+msgid "packet %s received"
+msgstr ""
+
+#: libbase/RTMP.cpp:355
+#, c-format
+msgid "Unknown packet %s received"
+msgstr ""
+
+#: libbase/RTMP.cpp:382
+msgid "Sent bytes received"
+msgstr ""
+
+#: libbase/RTMP.cpp:457
+msgid "failed to read RTMP packet header 2nd byte"
+msgstr ""
+
+#: libbase/RTMP.cpp:465
+msgid "Failed to read RTMP packet header 3nd byte"
+msgstr ""
+
+#: libbase/RTMP.cpp:471
+#, c-format
+msgid "%s, channel: %0x"
+msgstr ""
+
+#: libbase/RTMP.cpp:483
+#, c-format
+msgid "Incomplete packet received on channel %s"
+msgstr ""
+
+#: libbase/RTMP.cpp:496
+#, c-format
+msgid "Failed to read RTMP packet header. type: %s"
+msgstr ""
+
+#: libbase/RTMP.cpp:541
+#, c-format
+msgid "%s, failed to read extended timestamp"
+msgstr ""
+
+#: libbase/RTMP.cpp:783
+#, c-format
+msgid "Calling remote method %s"
+msgstr ""
+
+#: libbase/RTMP.cpp:857
+msgid "Handshake completed"
+msgstr ""
+
+#: libbase/RTMP.cpp:870
+msgid "Stage 1 socket not ready. This should not happen."
+msgstr ""
+
+#: libbase/RTMP.cpp:876
+msgid "Could not send stage 1 data"
+msgstr ""
+
+#: libbase/RTMP.cpp:898
+#, c-format
+msgid "Type mismatch: client sent %d, server answered %d"
+msgstr ""
+
+#: libbase/RTMP.cpp:909
+#, c-format
+msgid "Server Uptime : %d"
+msgstr ""
+
+#: libbase/RTMP.cpp:910
+#, c-format
+msgid "FMS Version   : %d.%d.%d.%d"
+msgstr ""
+
+#: libbase/RTMP.cpp:926
+msgid "Could not send complete signature."
+msgstr ""
+
+#: libbase/RTMP.cpp:952
+msgid "Signatures do not match during handshake!"
+msgstr ""
+
+#: libbase/RTMP.cpp:972
+#, c-format
+msgid "Sending control type %s %s"
+msgstr ""
+
+#: libbase/RTMP.cpp:1029
+#, c-format
+msgid "Changed chunk size to %d"
+msgstr ""
+
+#: libbase/RTMP.cpp:1040
+msgid "Control packet too short"
+msgstr ""
+
+#: libbase/RTMP.cpp:1048
+#, c-format
+msgid "Control packet (%s) data too short"
+msgstr ""
+
+#: libbase/RTMP.cpp:1053
+#, c-format
+msgid "Received control packet %s with argument %s"
+msgstr ""
+
+#: libbase/RTMP.cpp:1070
+#, c-format
+msgid "Stream is recorded: %s"
+msgstr ""
+
+#: libbase/RTMP.cpp:1086
+#, c-format
+msgid "Received unknown or unhandled control %s"
+msgstr ""
+
+#: libbase/RTMP.cpp:1096
+#, c-format
+msgid "Server bandwidth is %s"
+msgstr ""
+
+#: libbase/RTMP.cpp:1110
+#, c-format
+msgid "Client bandwidth is %d %d"
+msgstr ""
+
 #: libbase/GnashImagePng.cpp:51
 msgid "PNG error: "
 msgstr ""
@@ -40,17 +193,73 @@ msgstr ""
 msgid "PNG warning: %s"
 msgstr ""
 
-#: libbase/StreamProvider.cpp:84 libbase/StreamProvider.cpp:150
+#: libbase/GnashImagePng.cpp:248
+msgid "Converting palette PNG to RGB(A)"
+msgstr ""
+
+#: libbase/GnashImagePng.cpp:254
+#, c-format
+msgid "Setting grey bit depth(%d) to 8"
+msgstr ""
+
+#: libbase/GnashImagePng.cpp:264
+msgid "Applying transparency block, image is RGBA"
+msgstr ""
+
+#: libbase/GnashImagePng.cpp:275
+msgid "Loading PNG image with alpha"
+msgstr ""
+
+#: libbase/GnashImagePng.cpp:279
+msgid "Loading PNG image without alpha"
+msgstr ""
+
+#: libbase/GnashImagePng.cpp:286
+msgid "Converting greyscale PNG to RGB(A)"
+msgstr ""
+
+#: libbase/zlib_adapter.cpp:141
+#, c-format
+msgid "inflater_impl::reset() inflateReset() returned %d"
+msgstr ""
+
+#: libbase/zlib_adapter.cpp:260
+msgid "Inflater is in error condition"
+msgstr ""
+
+#: libbase/zlib_adapter.cpp:266
+#, c-format
+msgid "inflater reset due to seek back from %d to %d"
+msgstr ""
+
+#: libbase/zlib_adapter.cpp:284
+msgid "Trouble: can't seek any further.. "
+msgstr ""
+
+#: libbase/zlib_adapter.cpp:307
+#, c-format
+msgid "inflateInit() returned %d"
+msgstr ""
+
+#: libbase/StreamProvider.cpp:84 libbase/StreamProvider.cpp:149
 msgid "Could not open file %1%: %2%"
 msgstr ""
 
-#: libbase/StreamProvider.cpp:136
+#: libbase/StreamProvider.cpp:112
+msgid "Request Headers discarded while getting stream from file: uri"
+msgstr ""
+
+#: libbase/StreamProvider.cpp:135
 msgid "POST data discarded while getting a stream from file: uri"
 msgstr ""
 
 #: libbase/noseek_fd_adapter.cpp:223
 #, c-format
 msgid "Error reading %d bytes from input stream"
+msgstr ""
+
+#: libbase/Socket.cpp:77
+msgid "Error"
 msgstr ""
 
 #: libbase/Socket.cpp:94
@@ -61,8 +270,52 @@ msgstr ""
 msgid "XMLSocket: The socket was never available"
 msgstr ""
 
+#: libbase/Socket.cpp:125
+msgid "Connection attempt while already connected"
+msgstr ""
+
+#: libbase/Socket.cpp:154
+#, c-format
+msgid "Socket creation failed: %s"
+msgstr ""
+
+#: libbase/Socket.cpp:171
+#, c-format
+msgid "Failed to connect socket: %s"
+msgstr ""
+
+#: libbase/Socket.cpp:187
+msgid "Setting socket timeout failed"
+msgstr ""
+
+#: libbase/Socket.cpp:237
+#, c-format
+msgid "Socket receive error %s"
+msgstr ""
+
+#: libbase/Socket.cpp:340
+#, c-format
+msgid "Socket send error %s"
+msgstr ""
+
+#: libbase/Socket.cpp:355
+msgid "tell() called for Socket"
+msgstr ""
+
+#: libbase/Socket.cpp:362
+msgid "seek() called for Socket"
+msgstr ""
+
+#: libbase/Socket.cpp:369
+msgid "go_to_end() called for Socket"
+msgstr ""
+
 #: libbase/tu_file.cpp:193
 msgid "Error while seeking to end: %1%"
+msgstr ""
+
+#: libbase/tu_file.cpp:229
+msgid "Could not fstat file"
 msgstr ""
 
 #: libbase/rc.cpp:171 libbase/rc.cpp:702
@@ -106,6 +359,11 @@ msgstr ""
 
 #: libbase/rc.cpp:752
 msgid "# Generated by Gnash. Manual changes to this file may be overridden."
+msgstr ""
+
+#: libbase/extension.cpp:74
+#, c-format
+msgid "Plugins path: %s"
 msgstr ""
 
 #: libbase/extension.cpp:115
@@ -152,22 +410,284 @@ msgid ""
 "libcurl is not available, but Gnash has attempted to use the curl adapter"
 msgstr ""
 
-#: libbase/curl_adapter.cpp:675
+#: libbase/curl_adapter.cpp:238
+msgid "~CurlSession"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:245
+#, c-format
+msgid "Failed cleaning up share handle: %s. Giving up after %d retries."
+msgstr ""
+
+#: libbase/curl_adapter.cpp:249
+#, c-format
+msgid "Failed cleaning up share handle: %s. Will try again in a second."
+msgstr ""
+
+#: libbase/curl_adapter.cpp:339
+msgid "lockSharedHandle: SSL session locking unsupported"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:342
+msgid "lockSharedHandle: connect locking unsupported"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:345
+msgid "lockSharedHandle: last locking unsupported ?!"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:348
+#, c-format
+msgid "lockSharedHandle: unknown shared data %d"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:374
+msgid "unlockSharedHandle: SSL session locking unsupported"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:377
+msgid "unlockSharedHandle: connect locking unsupported"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:380
+msgid "unlockSharedHandle: last locking unsupported ?!"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:383
+#, c-format
+msgid "unlockSharedHandle: unknown shared data %d"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:534
+#, c-format
+msgid "curl write callback called for (%d) bytes"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:575
+msgid "Not running: fillCacheNonBlocking returning"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:601
+#, c-format
+msgid "fillCache(%d), called, currently cached: %d"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:608
+msgid "Not running: returning"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:609
+msgid "Already enough bytes cached: returning"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:628
+#, c-format
+msgid "User timeout is %u milliseconds"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:659
+#, c-format
+msgid "Max fd: %d"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:665
+msgid "curl_multi_fdset: maxfd == %1%"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:672
 #, c-format
 msgid "FIXME: Timeout (%u milliseconds) while loading from url %s"
 msgstr ""
 
-#: libbase/curl_adapter.cpp:723
+#: libbase/curl_adapter.cpp:685
+#, c-format
+msgid "select() with %d milliseconds timeout"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:700
+msgid "select() was interrupted by a signal"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:716
+#, c-format
+msgid "select() timed out, elapsed is %u"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:720
 #, c-format
 msgid "Timeout (%u milliseconds) while loading from url %s"
 msgstr ""
 
-#: libbase/curl_adapter.cpp:829
+#: libbase/curl_adapter.cpp:728
+msgid "FD activity, resetting progress timer"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:763 libbase/curl_adapter.cpp:768
+#, c-format
+msgid "HTTP response %ld from url %s"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:774
+#, c-format
+msgid "CURL: %s"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:807
+msgid ""
+"Could not open specified path as cache file. Using a temporary file instead"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:815
+msgid "Could not create temporary cache file"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:825
 msgid "Allowing connections to SSL sites with invalid certificates"
 msgstr ""
 
-#: libbase/ClockTime.cpp:224
+#: libbase/curl_adapter.cpp:917 libbase/curl_adapter.cpp:931
+#: libbase/curl_adapter.cpp:984
+#, c-format
+msgid "CurlStreamFile %p created"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:1050
+#, c-format
+msgid "CurlStreamFile %p deleted"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:1065
+#, c-format
+msgid "read(%d) called"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:1072
+#, c-format
+msgid "_cache.tell = %d"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:1084
+#, c-format
+msgid "readNonBlocking(%d) called"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:1092
+msgid ""
+"curl adaptor's fillCacheNonBlocking set _error rather then throwing an "
+"exception"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:1114
+#, c-format
+msgid "eof() returning %d"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:1127
+#, c-format
+msgid "tell() returning %ld"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:1148
+#, c-format
+msgid "Warning: seek backward requested (%ld from %ld)"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:1157
+#, c-format
+msgid "Warning: could not cache enough bytes on seek: %d requested, %d cached"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:1163
+msgid "Warning: fseek failed"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:1213
+#, c-format
+msgid "get_stream_size() returning %lu"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:1274
+#, c-format
+msgid "Importing cookies from file '%s'"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:1318
+#, c-format
+msgid "Exporting cookies file '%s'"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:1334 libbase/curl_adapter.cpp:1353
+#, c-format
+msgid "making curl stream for %s"
+msgstr ""
+
+#: libbase/curl_adapter.cpp:1343 libbase/curl_adapter.cpp:1362
+#: libbase/curl_adapter.cpp:1378
+#, c-format
+msgid "curl stream: %s"
+msgstr ""
+
+#: libbase/ClockTime.cpp:223
 msgid "Cannot get requested timezone information"
+msgstr ""
+
+#: libbase/SharedMem.cpp:68
+#, c-format
+msgid "Error detaching shared memory: %s"
+msgstr ""
+
+#: libbase/SharedMem.cpp:75
+#, c-format
+msgid "Error during stat of shared memory segment: %s"
+msgstr ""
+
+#: libbase/SharedMem.cpp:83
+msgid "No shared memory users left. Removing segment and semaphore."
+msgstr ""
+
+#: libbase/SharedMem.cpp:121
+msgid ""
+"No shared memory key specified in rcfile. Using default for communication "
+"with other players"
+msgstr ""
+
+#: libbase/SharedMem.cpp:125
+#, c-format
+msgid "Using shared memory key %s"
+msgstr ""
+
+#: libbase/SharedMem.cpp:150
+msgid "Failed to get semaphore for shared memory!"
+msgstr ""
+
+#: libbase/SharedMem.cpp:157
+msgid "Failed to set semaphore value"
+msgstr ""
+
+#: libbase/SharedMem.cpp:167
+msgid "Need semaphore value of 1 for locking. Cannot attach shared memory!"
+msgstr ""
+
+#: libbase/SharedMem.cpp:182
+msgid "Unable to get shared memory segment!"
+msgstr ""
+
+#: libbase/SharedMem.cpp:189
+#, c-format
+msgid "Unable to attach shared memory: %s"
+msgstr ""
+
+#: libbase/GnashImage.cpp:179
+msgid "Requested to write image as unsupported filetype"
+msgstr ""
+
+#: libbase/GnashImage.cpp:235
+msgid "Invalid image returned"
+msgstr ""
+
+#: libbase/GnashImage.cpp:243
+#, c-format
+msgid "Out of memory while trying to create %dx%d image"
 msgstr ""
 
 #: libbase/GnashImageGif.cpp:175
@@ -196,9 +716,61 @@ msgstr ""
 msgid "GIF: Error retrieving record type"
 msgstr ""
 
+#: libbase/memory.cpp:94
+#, c-format
+msgid "Allocating buffer for %d data samples"
+msgstr ""
+
+#: libbase/memory.cpp:301
+msgid "Calculations don't equal"
+msgstr ""
+
+#: libbase/memory.cpp:303
+msgid "Zero memory leaks for this program"
+msgstr ""
+
+#: libbase/GnashVaapiImage.cpp:50
+#, c-format
+msgid "GnashVaapiImage::GnashVaapiImage(): surface 0x%08x, size %dx%d\n"
+msgstr ""
+
+#: libbase/GnashVaapiImage.cpp:56
+#, c-format
+msgid "GnashVaapiImage::~GnashVaapiImage(): surface 0x%08x\n"
+msgstr ""
+
+#: libbase/GnashVaapiImage.cpp:68
+#, c-format
+msgid "GnashVaapi::update(): data %p\n"
+msgstr ""
+
+#: libbase/GnashVaapiImage.cpp:100
+msgid "GnashVaapiImage: VA surface to SW pixels are not supported\n"
+msgstr ""
+
+#: libbase/GnashVaapiImage.cpp:111
+#, c-format
+msgid "GnashVaapiImage::data(): surface 0x%08x\n"
+msgstr ""
+
+#: libbase/GnashVaapiImage.cpp:112 libbase/GnashVaapiImage.cpp:128
+#, c-format
+msgid "  -> %u usec from creation\n"
+msgstr ""
+
+#: libbase/GnashVaapiImage.cpp:126
+#, c-format
+msgid "GnashVaapiImage::data() const: surface 0x%08x\n"
+msgstr ""
+
 #: libbase/sharedlib.cpp:69
 #, c-format
 msgid "Couldn't initialize ltdl: %s"
+msgstr ""
+
+#: libbase/sharedlib.cpp:98
+#, c-format
+msgid "Trying to open shared library \"%s\""
 msgstr ""
 
 #: libbase/sharedlib.cpp:112
@@ -251,6 +823,10 @@ msgstr ""
 msgid "Internal jpeg error during decompression: "
 msgstr ""
 
+#: libbase/GnashImageJpeg.cpp:432
+msgid "Long jump: banzaaaaaai!"
+msgstr ""
+
 #: libbase/GnashImageJpeg.cpp:519
 msgid "rw_dest_IOChannel couldn't write data."
 msgstr ""
@@ -288,6 +864,38 @@ msgstr ""
 msgid ""
 "GC: collection cycle started - %d/%d new resources allocated since last run "
 "(from %d to %d)"
+msgstr ""
+
+#: libbase/AMF.cpp:59
+#, c-format
+msgid "amf0 read bool: %d"
+msgstr ""
+
+#: libbase/AMF.cpp:80
+#, c-format
+msgid "amf0 read double: %e"
+msgstr ""
+
+#: libbase/AMF.cpp:90
+msgid "Read past _end of buffer for string length"
+msgstr ""
+
+#: libbase/AMF.cpp:97
+msgid "Read past _end of buffer for string type"
+msgstr ""
+
+#: libbase/AMF.cpp:103
+#, c-format
+msgid "amf0 read string: %s"
+msgstr ""
+
+#: libbase/AMF.cpp:125
+#, c-format
+msgid "amf0 read long string: %s"
+msgstr ""
+
+#: libbase/AMF.cpp:138
+msgid "writePlainString called with invalid type!"
 msgstr ""
 
 #: libbase/URLAccessManager.cpp:90
@@ -338,6 +946,11 @@ msgstr ""
 #: libbase/URLAccessManager.cpp:240
 #, c-format
 msgid "Load from host %s forbidden (not on the local host)"
+msgstr ""
+
+#: libbase/URLAccessManager.cpp:262
+#, c-format
+msgid "Attempt to connect to disallowed port %s"
 msgstr ""
 
 #: libbase/URLAccessManager.cpp:272
@@ -4875,15 +5488,18 @@ msgid "EGL_VERSION = %s, EGL_VENDOR = %s"
 msgstr ""
 
 #: libdevice/egl/eglDevice.cpp:209 libdevice/egl/eglDevice.cpp:544
+#: gui/gtk/gtk_glue_ovg.cpp:383
 #, c-format
 msgid "eglGetConfigs() failed to retrive the number of configs (error %s)"
 msgstr ""
 
 #: libdevice/egl/eglDevice.cpp:214 libdevice/egl/eglDevice.cpp:549
+#: gui/gtk/gtk_glue_ovg.cpp:388
 msgid "No EGLconfigs found\n"
 msgstr ""
 
 #: libdevice/egl/eglDevice.cpp:217 libdevice/egl/eglDevice.cpp:552
+#: gui/gtk/gtk_glue_ovg.cpp:391
 #, c-format
 msgid "Max number of EGL Configs is %d"
 msgstr ""
@@ -4982,11 +5598,11 @@ msgstr ""
 msgid "eglMakeCurrent failed (error %s)"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:556
+#: libdevice/egl/eglDevice.cpp:556 gui/gtk/gtk_glue_ovg.cpp:395
 msgid "Out of memory\n"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:561
+#: libdevice/egl/eglDevice.cpp:561 gui/gtk/gtk_glue_ovg.cpp:400
 #, c-format
 msgid "eglGetConfigs() failed to retrive the configs (error %s)"
 msgstr ""
@@ -6731,6 +7347,59 @@ msgstr ""
 msgid "Closing framebuffer device"
 msgstr ""
 
+#: gui/fb/fb.cpp:202 gui/fb/fb.cpp:224
+#, c-format
+msgid "Width:%d, Height:%d"
+msgstr ""
+
+#: gui/fb/fb.cpp:229
+#, c-format
+msgid "No renderer! %s not supported."
+msgstr ""
+
+#: gui/fb/fb.cpp:240
+msgid "Found no accessible User mode input event device"
+msgstr ""
+
+#: gui/fb/fb.cpp:249
+msgid "Found no accessible input event devices"
+msgstr ""
+
+#: gui/fb/fb.cpp:251
+#, c-format
+msgid "Found %d input event devices."
+msgstr ""
+
+#: gui/fb/fb.cpp:262
+msgid "WARNING: Mouse support may conflict with the input event support."
+msgstr ""
+
+#: gui/fb/fb.cpp:276
+msgid "Enabling Touchscreen support."
+msgstr ""
+
+#: gui/fb/fb.cpp:281
+msgid "WARNING: Babbage Tablet support disabled as it conflicts with TSlib"
+msgstr ""
+
+#: gui/fb/fb.cpp:283
+msgid "Enabling Babbage Touchscreen support"
+msgstr ""
+
+#: gui/fb/fb.cpp:288
+msgid "Enabling Power Button support"
+msgstr ""
+
+#: gui/fb/fb.cpp:323
+#, c-format
+msgid "X:%d, Y:%d"
+msgstr ""
+
+#: gui/fb/fb.cpp:368
+#, c-format
+msgid "Movie Frame Rate is %d, adjusting delay to %dms"
+msgstr ""
+
 #: gui/fb/fb.cpp:462
 msgid "This GUI does not yet support menus"
 msgstr ""
@@ -6807,8 +7476,92 @@ msgstr ""
 msgid "WARNING: Could not restore keyboard mode"
 msgstr ""
 
+#: gui/fb/fb.cpp:740
+#, c-format
+msgid "Mouse clicked at: %g:%g"
+msgstr ""
+
+#: gui/fb/fb_glue_ovg.cpp:73 gui/gtk/gtk_glue_ovg.cpp:88
+msgid "Probing found an EGL display device"
+msgstr ""
+
+#: gui/fb/fb_glue_ovg.cpp:77 gui/gtk/gtk_glue_ovg.cpp:92
+msgid "Probing found a raw Framebuffer display device"
+msgstr ""
+
+#: gui/fb/fb_glue_ovg.cpp:81 gui/gtk/gtk_glue_ovg.cpp:96
+msgid "Probing found an X11 display device"
+msgstr ""
+
+#: gui/fb/fb_glue_ovg.cpp:85 gui/gtk/gtk_glue_ovg.cpp:100
+msgid "Probing found a DirectFB display device"
+msgstr ""
+
+#: gui/fb/fb_glue_ovg.cpp:90 gui/gtk/gtk_glue_ovg.cpp:105
+msgid "No display devices found by probing!"
+msgstr ""
+
 #: gui/fb/fb_glue_ovg.cpp:156
 msgid "Could not create OpenVG renderer"
+msgstr ""
+
+#: gui/fb/fb_glue_ovg.cpp:168 gui/fb/fb_glue_agg.cpp:76
+msgid "No renderer set!"
+msgstr ""
+
+#: gui/fb/fb_glue_gles1.cpp:98
+msgid "EGL: getDisplay ok"
+msgstr ""
+
+#: gui/fb/fb_glue_gles1.cpp:104
+msgid "EGL: initialize ok"
+msgstr ""
+
+#: gui/fb/fb_glue_gles1.cpp:111
+msgid "EGL: config ok"
+msgstr ""
+
+#: gui/fb/fb_glue_gles1.cpp:118
+msgid "EGL: surface ok"
+msgstr ""
+
+#: gui/fb/fb_glue_gles1.cpp:124
+msgid "EGL: context ok"
+msgstr ""
+
+#: gui/fb/fb_glue_gles1.cpp:130
+msgid "EGL: current ok"
+msgstr ""
+
+#: gui/fb/fb_glue_gles1.cpp:146
+msgid "EGL: pbuffer config ok"
+msgstr ""
+
+#: gui/fb/fb_glue_gles1.cpp:162
+msgid "EGL: pbuffer surface ok"
+msgstr ""
+
+#: gui/fb/fb_glue_gles1.cpp:171
+#, c-format
+msgid "EGL: width %d"
+msgstr ""
+
+#: gui/fb/fb_glue_gles1.cpp:179
+#, c-format
+msgid "EGL: height %d"
+msgstr ""
+
+#: gui/fb/fb_glue_agg.cpp:87
+#, c-format
+msgid "No renderer set in %s!"
+msgstr ""
+
+#: gui/fb/fb_glue_agg.cpp:130
+msgid "failed to create a render handler for AGG!"
+msgstr ""
+
+#: gui/fb/fb_glue_agg.cpp:151
+msgid "No Device layer initialized yet!"
 msgstr ""
 
 #: gui/fb/fb_glue_agg.cpp:164
@@ -6831,12 +7584,21 @@ msgstr ""
 msgid "Total bits per pixel: %d"
 msgstr ""
 
+#: gui/fb/fb_glue_agg.cpp:182
+msgid "The pixel format of your framebuffer could not be detected."
+msgstr ""
+
 #: gui/fb/fb_glue_agg.cpp:191
 msgid "Double buffering disabled"
 msgstr ""
 
 #: gui/fb/fb_glue_agg.cpp:194
 msgid "Double buffering enabled"
+msgstr ""
+
+#: gui/fb/fb_glue_agg.cpp:221
+#, c-format
+msgid "No Drawbounds set in %s!"
 msgstr ""
 
 #: gui/gnash.cpp:125
@@ -7584,30 +8346,59 @@ msgstr ""
 msgid "FsCommand '%s(%s)' not handled internally"
 msgstr ""
 
+#: gui/gtk/gtk_canvas.cpp:123
+#, c-format
+msgid "gnash_canvas_size_allocate %d %d"
+msgstr ""
+
+#: gui/gtk/gtk_glue_cairo.cpp:223
+msgid "Cairo: failed to create a rendering buffer!"
+msgstr ""
+
 #: gui/gtk/gtk_glue_ovg.cpp:182
 msgid "Could not create OPENVG renderer"
+msgstr ""
+
+#: gui/gtk/gtk_glue_ovg.cpp:265 gui/gtk/gtk_glue_ovg.cpp:282
+msgid "No off screen buffer!"
+msgstr ""
+
+#: gui/gtk/gtk_glue_ovg.cpp:405
+#, c-format
+msgid "Config[%d] is:"
 msgstr ""
 
 #: gui/gtk/gtk_glue_agg_vaapi.cpp:163
 msgid "WARNING: failed to create VA-API display."
 msgstr ""
 
-#: gui/gtk/gtk_glue_agg_vaapi.cpp:231 gui/gtk/gtk_glue_agg_vaapi.cpp:289
+#: gui/gtk/gtk_glue_agg_vaapi.cpp:204
+#, c-format
+msgid ""
+"GTK-AGG: Unknown RGB format %s reported by VA-API. Please report this to the "
+"gnash-dev mailing list."
+msgstr ""
+
+#: gui/gtk/gtk_glue_agg_vaapi.cpp:230 gui/gtk/gtk_glue_agg_vaapi.cpp:288
 msgid "ERROR: failed to map VA-API image."
 msgstr ""
 
-#: gui/gtk/gtk_glue_agg_vaapi.cpp:237
+#: gui/gtk/gtk_glue_agg_vaapi.cpp:236
 msgid "ERROR: failed to associate VA-API subpicture."
 msgstr ""
 
-#: gui/gtk/gtk_glue_agg_vaapi.cpp:371
+#: gui/gtk/gtk_glue_agg_vaapi.cpp:370
 #, c-format
 msgid "ERROR: failed to setup video window for surface 0x%08x."
 msgstr ""
 
-#: gui/gtk/gtk_glue_agg_vaapi.cpp:378
+#: gui/gtk/gtk_glue_agg_vaapi.cpp:377
 #, c-format
 msgid "ERROR: failed to associate subpicture to surface 0x%08x."
+msgstr ""
+
+#: gui/gtk/gtk.cpp:159
+msgid "Failed to initialize X threading support\n"
 msgstr ""
 
 #: gui/gtk/gtk.cpp:173
@@ -7616,6 +8407,22 @@ msgstr ""
 
 #: gui/gtk/gtk.cpp:176
 msgid "Created top level window"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:189
+msgid "DRI extension found"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:196
+msgid "GLX extension found"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:202
+msgid "This system lacks a hardware OpenGL driver!"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:211
+msgid "Xvideo extension found"
 msgstr ""
 
 #: gui/gtk/gtk.cpp:223
