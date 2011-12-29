@@ -76,7 +76,7 @@ DirectFBDevice::DirectFBDevice(int argc, char *argv[])
     GNASH_REPORT_FUNCTION;
     
     if (!initDevice(argc, argv)) {
-        log_error("Couldn't initialize DirectFB device!");
+        log_error(_("Couldn't initialize DirectFB device!"));
     }
 }
 
@@ -112,12 +112,12 @@ DirectFBDevice::initDevice(int argc, char *argv[])
     DFBResult result = DFB_FAILURE;
 
     if ((result = DirectFBInit(&argc, &argv)) != DFB_OK) {
-	log_error("DirectFBInit(): %s", getErrorString(result));
+	log_error(_("DirectFBInit(): %s"), getErrorString(result));
         return false;
     }
 
     if ((result = DirectFBCreate(&_dfb)) != DFB_OK) {
-	log_error("DirectFBCreate(): %s", getErrorString(result));
+	log_error(_("DirectFBCreate(): %s"), getErrorString(result));
         return false;
     }
 
@@ -144,7 +144,7 @@ DirectFBDevice::initDevice(int argc, char *argv[])
     dsc.caps = static_cast<DFBSurfaceCapabilities>(DSCAPS_PRIMARY | DSCAPS_FLIPPING);
     
     if ((result = _dfb->CreateSurface(_dfb, &dsc, &_surface)) != DFB_OK) {
-	log_error("CreateSurface(): %s", getErrorString(result));
+	log_error(_("CreateSurface(): %s"), getErrorString(result));
         return false;
     }
 
@@ -156,24 +156,24 @@ DirectFBDevice::initDevice(int argc, char *argv[])
     fdesc.height = y/10;
     
     if ((result == _dfb->CreateFont(_dfb, FONT, &fdesc, &_font)) == DR_OK) {
-	log_error("CreateFont(): %s", getErrorString(result));
+	log_error(_("CreateFont(): %s"), getErrorString(result));
     }
     _surface->SetFont(_surface, _font);
 
 #if 0
     DFBSurfaceDescription sdesc;
     if ((result == _dfb->CreateImageProvider(_dfb, "/tmp/img832a.jpg", &_provider)) != DR_OK) {
-	log_error("CreateImageProvider(): %s", getErrorString(result));
+	log_error(_("CreateImageProvider(): %s"), getErrorString(result));
     }
     _provider->GetSurfaceDescription(_provider, &sdesc);
 #endif
 
     if ((result == _dfb->GetDisplayLayer(_dfb, DLID_PRIMARY, &_layer)) == DR_OK) {
-	log_error("GetDisplayLayer(): %s", getErrorString(result));
+	log_error(_("GetDisplayLayer(): %s"), getErrorString(result));
     }
     
     if ((result == _layer->GetScreen(_layer, &_screen)) == DR_OK) {
-	log_error("GetScreen(): %s", getErrorString(result));
+	log_error(_("GetScreen(): %s"_, getErrorString(result));
     }
     
     DFBSurfacePixelFormat format;
@@ -510,7 +510,7 @@ DirectFBDevice::printFBScreen(IDirectFBScreen *screen)
         DFBScreenDescription sdesc;
         // FIXME: On Ubuntu, this returns the wrong result
         if ((result == screen->GetDescription(screen, &sdesc)) == DR_OK) {
-            log_error("GetDescription(): %s", getErrorString(result));
+            log_error(_("GetDescription(): %s"), getErrorString(result));
         }
 
         if (sdesc.name) {
@@ -899,7 +899,7 @@ DirectFBDevice::printDirectFB(IDirectFB *fb)
         printSurfaceDrawingFlags(desc.drawing_flags);
 
     } else {
-        log_error("iDirectFB data not set!");
+        log_error(_("iDirectFB data not set!"));
     }
 }
 
