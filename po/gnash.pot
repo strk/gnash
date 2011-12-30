@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-29 16:00-0700\n"
+"POT-Creation-Date: 2011-12-29 17:10-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2964,6 +2964,10 @@ msgstr ""
 msgid "Stage.height is a read-only property!"
 msgstr ""
 
+#: libcore/asobj/Stage_as.cpp:202
+msgid "Stage.showMenu implemented by setting gnashrc option and for gtk only"
+msgstr ""
+
 #: libcore/asobj/Video_as.cpp:114
 msgid "attachVideo needs 1 arg"
 msgstr ""
@@ -2971,6 +2975,10 @@ msgstr ""
 #: libcore/asobj/Video_as.cpp:126
 #, c-format
 msgid "attachVideo(%s) first arg is not a NetStream instance"
+msgstr ""
+
+#: libcore/asobj/Video_as.cpp:139
+msgid "Video.deblocking"
 msgstr ""
 
 #: libcore/asobj/TextField_as.cpp:218
@@ -3003,16 +3011,89 @@ msgstr ""
 msgid "Invalid value given to TextField.type: %s"
 msgstr ""
 
-#: libcore/asobj/TextField_as.cpp:674
+#: libcore/asobj/TextField_as.cpp:597
+msgid "TextField.getFontList()"
+msgstr ""
+
+#: libcore/asobj/TextField_as.cpp:608
+msgid "TextField.getNewTextFormat()"
+msgstr ""
+
+#: libcore/asobj/TextField_as.cpp:658
+msgid ""
+"TextField.getTextFormat() discards url, target, tabStops, bullet and display"
+msgstr ""
+
+#: libcore/asobj/TextField_as.cpp:672 libcore/asobj/TextField_as.cpp:694
+#, c-format
+msgid "TextField.setTextFormat(%s) : %s"
+msgstr ""
+
+#: libcore/asobj/TextField_as.cpp:673
 msgid "missing arg"
 msgstr ""
 
-#: libcore/asobj/TextField_as.cpp:697
+#: libcore/asobj/TextField_as.cpp:679
+#, c-format
+msgid ""
+"TextField.setTextFormat(%s) : args past the first are unhandled by Gnash"
+msgstr ""
+
+#: libcore/asobj/TextField_as.cpp:695
 msgid "first argument is not a TextFormat"
 msgstr ""
 
-#: libcore/asobj/TextField_as.cpp:985
+#: libcore/asobj/TextField_as.cpp:729
+msgid "TextField.setNewTextFormat(), we'll delegate to setTextFormat"
+msgstr ""
+
+#: libcore/asobj/TextField_as.cpp:789
+msgid "TextField.bottomScroll is not complete"
+msgstr ""
+
+#: libcore/asobj/TextField_as.cpp:809
+msgid "TextField.maxhscroll is not complete"
+msgstr ""
+
+#: libcore/asobj/TextField_as.cpp:905
+#, c-format
+msgid "TextField.replaceSel(%s) requires exactly one argument"
+msgstr ""
+
+#: libcore/asobj/TextField_as.cpp:944
+msgid "TextField._hscroll is not complete"
+msgstr ""
+
+#: libcore/asobj/TextField_as.cpp:962
+msgid "TextField.maxscroll is not complete"
+msgstr ""
+
+#: libcore/asobj/TextField_as.cpp:983
 msgid "TextField.replaceText() called with less than 3 args"
+msgstr ""
+
+#: libcore/asobj/TextField_as.cpp:993
+#, c-format
+msgid "TextField.replaceText(%s): negative endIndex - doing nothing"
+msgstr ""
+
+#: libcore/asobj/TextField_as.cpp:1019
+#, c-format
+msgid "TextField.replaceText(%s): beginIndex out of range - doing nothing"
+msgstr ""
+
+#: libcore/asobj/TextField_as.cpp:1036
+#, c-format
+msgid ""
+"TextField.replaceText(%s): endIndex out of range - taking as end of string"
+msgstr ""
+
+#: libcore/asobj/TextField_as.cpp:1058
+msgid "TextField.removeTextField() TESTING"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:324
+msgid "Initial connection complete"
 msgstr ""
 
 #: libcore/asobj/NetConnection_as.cpp:440
@@ -3030,12 +3111,168 @@ msgstr ""
 msgid "Gnash is not allowed to connect to %s"
 msgstr ""
 
+#: libcore/asobj/NetConnection_as.cpp:517
+#, c-format
+msgid "NetConnection.connect(%s): unsupported connection protocol"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:523
+#, c-format
+msgid "NetConnection.connect(%s): unknown connection protocol"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:569
+msgid "NetConnection.call: can't call while not connected"
+msgstr ""
+
 #: libcore/asobj/NetConnection_as.cpp:658
 msgid "NetConnection.call(): needs at least one argument"
 msgstr ""
 
+#: libcore/asobj/NetConnection_as.cpp:668
+#, c-format
+msgid "NetConnection.call(%s)"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:681
+#, c-format
+msgid "NetConnection.call(%s): second argument must be an object"
+msgstr ""
+
 #: libcore/asobj/NetConnection_as.cpp:771
 msgid "NetConnection.connect(): needs at least one argument"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:793
+#, c-format
+msgid "NetConnection.connect(%s): args after the first are not supported"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:808
+msgid "NetConnection.addHeader()"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:888
+#, c-format
+msgid "Invoke name %s"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:892
+msgid "Invoke buffer too short"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:899
+msgid "Invoke argument not present"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:905
+#, c-format
+msgid "Invoking %s(%s)"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:990
+#, c-format
+msgid "Unknown HTTP Remoting response identifier '%s'"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:1006
+#, c-format
+msgid "Unsupported HTTP Remoting response callback: '%s' (size %d)"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:1012
+msgid "callback called"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:1048
+msgid "creating connection"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:1055
+msgid "NetConnection.call(): encoded args from %1% calls: %2%"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:1077
+#, c-format
+msgid "Attempt to read %d bytes"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:1086
+#, c-format
+msgid ""
+"NetConnection.call: reply buffer capacity (%d) is too small to accept next "
+"%d bytes of chunk (current size is %d). Reserving %d bytes."
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:1100
+msgid "read '%1%' bytes: %2%"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:1119
+msgid "connection is in error condition, calling NetConnection.onStatus"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:1136
+msgid "hit eof"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:1155
+#, c-format
+msgid "Error parsing server AMF: %s"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:1202
+#, c-format
+msgid "Could not serialize NetConnection.call argument %d"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:1230
+msgid "Sanity failed. no string method in invoke packet"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:1237
+#, c-format
+msgid "Invoke: read method string %s"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:1241
+#, c-format
+msgid "Server invoking <%s>"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:1249
+#, c-format
+msgid "Received result for method call %s"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:1258
+#: libcore/asobj/NetConnection_as.cpp:1304
+#: libcore/asobj/NetConnection_as.cpp:1320
+#, c-format
+msgid "Value: %s"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:1268
+#, c-format
+msgid "Received server call %s %s"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:1277
+msgid "Server called _onbwcheck without a callback"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:1287
+#, c-format
+msgid "AMF buffer for _onbwdone: %s\n"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:1292
+#, c-format
+msgid "Latency: %s, bandwidth %s"
+msgstr ""
+
+#: libcore/asobj/NetConnection_as.cpp:1307
+msgid "rtmp server sent error"
 msgstr ""
 
 #: libcore/asobj/Function_as.cpp:105
@@ -3077,8 +3314,45 @@ msgid ""
 "them.  Ignoring them"
 msgstr ""
 
+#: libcore/asobj/System_as.cpp:310
+msgid "System.security.allowDomain"
+msgstr ""
+
+#: libcore/asobj/System_as.cpp:321
+msgid "System.security.allowInsecureDomain"
+msgstr ""
+
+#: libcore/asobj/System_as.cpp:329
+msgid "System.security.loadPolicyFile"
+msgstr ""
+
+#: libcore/asobj/System_as.cpp:350
+msgid "System.showSettings"
+msgstr ""
+
+#: libcore/asobj/System_as.cpp:367
+msgid "System.exactSettings"
+msgstr ""
+
+#: libcore/asobj/System_as.cpp:385
+msgid "System.useCodepage"
+msgstr ""
+
+#: libcore/asobj/Key_as.cpp:40
+msgid "Key.isAccessible"
+msgstr ""
+
 #: libcore/asobj/Key_as.cpp:70
 msgid "Key.isDown needs one argument (the key code)"
+msgstr ""
+
+#: libcore/asobj/Key_as.cpp:79
+#, c-format
+msgid "Key.isKeyDown(%d): keycode out of range"
+msgstr ""
+
+#: libcore/asobj/Key_as.cpp:97
+msgid "Key.isToggled"
 msgstr ""
 
 #: libcore/asobj/Object.cpp:148
@@ -3126,6 +3400,12 @@ msgstr ""
 msgid ""
 "Invalid call to Object.registerClass(%s) - second argument (class) is not a "
 "function)"
+msgstr ""
+
+#: libcore/asobj/Object.cpp:298
+msgid ""
+"current environment has no target, wouldn't know where to look for symbol "
+"required for registerClass"
 msgstr ""
 
 #: libcore/asobj/Object.cpp:313
@@ -3182,8 +3462,19 @@ msgstr ""
 msgid "Object.unwatch(%s): missing argument"
 msgstr ""
 
+#: libcore/asobj/PlayHead.cpp:96
+msgid ""
+"PlayHead::advance(): not all consumers consumed current position, won't "
+"advance"
+msgstr ""
+
 #: libcore/asobj/String_as.cpp:451
 msgid "string.slice() called with end < start"
+msgstr ""
+
+#: libcore/asobj/String_as.cpp:496
+#, c-format
+msgid "String.indexOf(%s, %s): second argument casts to invalid offset (%d)"
 msgstr ""
 
 #: libcore/asobj/String_as.cpp:569
@@ -3192,6 +3483,10 @@ msgstr ""
 
 #: libcore/asobj/String_as.cpp:578
 msgid "string.charCodeAt has more than one argument"
+msgstr ""
+
+#: libcore/asobj/String_as.cpp:756
+msgid "No fn_call::callerDef in string function call"
 msgstr ""
 
 #: libcore/asobj/String_as.cpp:780
@@ -3220,7 +3515,7 @@ msgstr ""
 #: libcore/asobj/flash/geom/Point_as.cpp:501
 #: libcore/asobj/flash/geom/Point_as.cpp:582
 #: libcore/asobj/flash/geom/Point_as.cpp:590
-#: libcore/asobj/MovieClip_as.cpp:531
+#: libcore/asobj/MovieClip_as.cpp:532
 msgid "missing arguments"
 msgstr ""
 
@@ -3337,9 +3632,45 @@ msgstr ""
 msgid "MovieClipLoader.getProgress(%s): first argument is not an sprite"
 msgstr ""
 
+#: libcore/asobj/Sound_as.cpp:333
+msgid "stopProbeTimer called"
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:368
+msgid "Probing audio for load"
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:388
+msgid "Probing audio for end"
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:409
+msgid "Probing audio for start"
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:414
+msgid "Attaching aux streamer"
+msgstr ""
+
 #: libcore/asobj/Sound_as.cpp:420
 #, c-format
 msgid "Could not create audio decoder: %s"
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:428
+msgid "No audio in Sound input."
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:516 libcore/asobj/Sound_as.cpp:646
+msgid "Character attached to Sound was unloaded and couldn't rebind"
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:528
+msgid "We have no sound handler here..."
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:549
+msgid "No media or sound handlers, won't load any sound"
 msgstr ""
 
 #: libcore/asobj/Sound_as.cpp:581
@@ -3352,56 +3683,145 @@ msgstr ""
 msgid "Unable to create parser for Sound at %s"
 msgstr ""
 
+#: libcore/asobj/Sound_as.cpp:619
+msgid "Attaching the aux streamer"
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:676
+msgid "No sound handler, nothing to start..."
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:682
+msgid "No MediaParser initialized, can't start an external sound"
+msgstr ""
+
 #: libcore/asobj/Sound_as.cpp:688
 msgid "Sound.start() has no effect on a streaming Sound"
 msgstr ""
 
-#: libcore/asobj/Sound_as.cpp:986
+#: libcore/asobj/Sound_as.cpp:699
+#, c-format
+msgid "Seeked MediaParser to %d, returned: %d"
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:717
+#, c-format
+msgid "Sound.start: secOff:%d"
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:735
+msgid "No sound handler, nothing to stop..."
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:763
+msgid "No sound handler, can't check duration..."
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:788
+msgid ""
+"No sound handler, can't check position (we're likely not playing anyway)..."
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:855
+#, c-format
+msgid "No samples decoded from input of %d bytes"
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:955
+#, c-format
+msgid "new Sound(%d) : args after first one ignored"
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:969
+#, c-format
+msgid ""
+"new Sound(%s) : first argument isn't null or undefined, and isn't a "
+"DisplayObject. We'll take as an invalid DisplayObject ref."
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:987
 msgid "-- start sound"
 msgstr ""
 
-#: libcore/asobj/Sound_as.cpp:1011
+#: libcore/asobj/Sound_as.cpp:1012
 msgid "-- stop sound "
 msgstr ""
 
-#: libcore/asobj/Sound_as.cpp:1027 libcore/asobj/Sound_as.cpp:1082
+#: libcore/asobj/Sound_as.cpp:1028 libcore/asobj/Sound_as.cpp:1083
 #, c-format
 msgid "No such export '%s'"
 msgstr ""
 
-#: libcore/asobj/Sound_as.cpp:1036
+#: libcore/asobj/Sound_as.cpp:1037
 #, c-format
 msgid "Export '%s' is not a sound"
 msgstr ""
 
-#: libcore/asobj/Sound_as.cpp:1052
+#: libcore/asobj/Sound_as.cpp:1053
 msgid "-- attach sound"
 msgstr ""
 
-#: libcore/asobj/Sound_as.cpp:1057
+#: libcore/asobj/Sound_as.cpp:1058
 msgid "attach sound needs one argument"
 msgstr ""
 
-#: libcore/asobj/Sound_as.cpp:1067
+#: libcore/asobj/Sound_as.cpp:1068
 msgid "attachSound needs a non-empty string"
 msgstr ""
 
-#: libcore/asobj/Sound_as.cpp:1091
+#: libcore/asobj/Sound_as.cpp:1092
 #, c-format
 msgid "Export '%s'is not a sound"
 msgstr ""
 
-#: libcore/asobj/Sound_as.cpp:1192
+#: libcore/asobj/Sound_as.cpp:1127
+msgid "Sound.getPan()"
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:1142
+msgid "Sound.setDuration()"
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:1157
+msgid "Sound.setPosition()"
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:1164
+msgid "Sound.getTransform()"
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:1177
+#, c-format
+msgid "Sound.getVolume(%s) : arguments ignored"
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:1193
 msgid "Sound.loadSound() needs at least 1 argument"
 msgstr ""
 
-#: libcore/asobj/Sound_as.cpp:1207
+#: libcore/asobj/Sound_as.cpp:1208
 #, c-format
 msgid "Sound.loadSound(%s): arguments after first 2 discarded"
 msgstr ""
 
-#: libcore/asobj/Sound_as.cpp:1237
+#: libcore/asobj/Sound_as.cpp:1222
+msgid "Sound.setPan()"
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:1229
+msgid "Sound.setTransform()"
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:1238
 msgid "set volume of sound needs one argument"
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:1253
+msgid "Sound.checkPolicyFile"
+msgstr ""
+
+#: libcore/asobj/Sound_as.cpp:1266
+msgid "Sound.areSoundsInaccessible()"
 msgstr ""
 
 #: libcore/asobj/XML_as.cpp:464
@@ -3410,6 +3830,10 @@ msgstr ""
 
 #: libcore/asobj/XML_as.cpp:740
 msgid "no text for text node creation"
+msgstr ""
+
+#: libcore/asobj/XML_as.cpp:753
+msgid "XML.parseXML() needs one argument"
 msgstr ""
 
 #: libcore/asobj/MovieClip_as.cpp:297
@@ -3476,276 +3900,362 @@ msgid ""
 "if it wasn't given"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:583
+#: libcore/asobj/MovieClip_as.cpp:531
+#, c-format
+msgid "MovieClip.attachAudio(): %s"
+msgstr ""
+
+#: libcore/asobj/MovieClip_as.cpp:541
+#, c-format
+msgid "MovieClip.attachAudio(%s): first arg doesn't cast to a NetStream"
+msgstr ""
+
+#: libcore/asobj/MovieClip_as.cpp:559
+msgid "MovieClip.attachVideo()"
+msgstr ""
+
+#: libcore/asobj/MovieClip_as.cpp:584
 #, c-format
 msgid "%s.swapDepths() needs one arg"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:594
+#: libcore/asobj/MovieClip_as.cpp:595
 #, c-format
 msgid "%s.swapDepths(%s): won't swap a clip below depth %d (%d)"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:612
+#: libcore/asobj/MovieClip_as.cpp:613
 #, c-format
 msgid "%s.swapDepths(%s): invalid call, swapping to self?"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:624
+#: libcore/asobj/MovieClip_as.cpp:625
 #, c-format
 msgid ""
 "%s.swapDepths(%s): invalid call, the two DisplayObjects don't have the same "
 "parent"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:641
+#: libcore/asobj/MovieClip_as.cpp:642
 #, c-format
 msgid ""
 "%s.swapDepths(%s): ignored, source and target DisplayObjects have the same "
 "depth %d"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:656
+#: libcore/asobj/MovieClip_as.cpp:657
 #, c-format
 msgid ""
 "%s.swapDepths(%s): first argument invalid (neither a movieclip nor a number)"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:665
+#: libcore/asobj/MovieClip_as.cpp:666
 #, c-format
 msgid "%s.swapDepths(%s): requested depth is above the accessible range."
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:681
+#: libcore/asobj/MovieClip_as.cpp:682
 #, c-format
 msgid "%s.swapDepths(%s): ignored, DisplayObject already at depth %d"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:715
+#: libcore/asobj/MovieClip_as.cpp:716
 msgid "MovieClip.duplicateMovieClip() needs 2 or 3 args"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:731
+#: libcore/asobj/MovieClip_as.cpp:732
 #, c-format
 msgid "MovieClip.duplicateMovieClip: invalid depth %d passed; not duplicating"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:763
+#: libcore/asobj/MovieClip_as.cpp:764
 msgid "movieclip_goto_and_play needs one arg"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:773
+#: libcore/asobj/MovieClip_as.cpp:774
 #, c-format
 msgid "movieclip_goto_and_play('%s') -- invalid frame"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:793
+#: libcore/asobj/MovieClip_as.cpp:794
 msgid "movieclip_goto_and_stop needs one arg"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:803
+#: libcore/asobj/MovieClip_as.cpp:804
 #, c-format
 msgid "movieclip_goto_and_stop('%s') -- invalid frame"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:878
+#: libcore/asobj/MovieClip_as.cpp:879
 #, c-format
 msgid ""
 "MovieClip.loadMovie() expected 1 or 2 args, got %d - returning undefined"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:890
+#: libcore/asobj/MovieClip_as.cpp:891
 #, c-format
 msgid ""
 "First argument of MovieClip.loadMovie(%s) evaluates to an empty string - "
 "returning undefined"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:940
+#: libcore/asobj/MovieClip_as.cpp:941
 #, c-format
 msgid ""
 "MovieClip.loadVariables() expected 1 or 2 args, got %d - returning undefined"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:952
+#: libcore/asobj/MovieClip_as.cpp:953
 #, c-format
 msgid ""
 "First argument passed to MovieClip.loadVariables(%s) evaluates to an empty "
 "string - returning undefined"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:994
+#: libcore/asobj/MovieClip_as.cpp:965
+#, c-format
+msgid "MovieClip.loadVariables(%s) - TESTING "
+msgstr ""
+
+#: libcore/asobj/MovieClip_as.cpp:995
 #, c-format
 msgid "Can't find hitTest target %s"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1036
+#: libcore/asobj/MovieClip_as.cpp:1037
 #, c-format
 msgid "hitTest() called with %u args"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1107
+#: libcore/asobj/MovieClip_as.cpp:1066
+msgid "MovieClip.getInstanceAtDepth(): missing or undefined depth argument"
+msgstr ""
+
+#: libcore/asobj/MovieClip_as.cpp:1108
 msgid "No arguments passed to MovieClip.getURL()"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1116
+#: libcore/asobj/MovieClip_as.cpp:1117
 #, c-format
 msgid "MovieClip.getURL(%s): extra arguments dropped"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1224
+#: libcore/asobj/MovieClip_as.cpp:1195
+msgid ""
+"MovieClip.getTextSnapshot: failed to construct TextSnapshot (object probably "
+"overridden)"
+msgstr ""
+
+#: libcore/asobj/MovieClip_as.cpp:1225
 #, c-format
 msgid ""
 "MovieClip.getBounds(%s): invalid call, first arg must be a DisplayObject"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1272
+#: libcore/asobj/MovieClip_as.cpp:1273
 msgid "MovieClip.globalToLocal() takes one arg"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1280
+#: libcore/asobj/MovieClip_as.cpp:1281
 #, c-format
 msgid "MovieClip.globalToLocal(%s): first argument doesn't cast to an object"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1294
+#: libcore/asobj/MovieClip_as.cpp:1295
 #, c-format
 msgid ""
 "MovieClip.globalToLocal(%s): object parameter doesn't have an 'x' member"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1305
+#: libcore/asobj/MovieClip_as.cpp:1306
 #, c-format
 msgid ""
 "MovieClip.globalToLocal(%s): object parameter doesn't have an 'y' member"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1333
+#: libcore/asobj/MovieClip_as.cpp:1334
 msgid "MovieClip.localToGlobal() takes one arg"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1341
+#: libcore/asobj/MovieClip_as.cpp:1342
 #, c-format
 msgid "MovieClip.localToGlobal(%s): first argument doesn't cast to an object"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1354
+#: libcore/asobj/MovieClip_as.cpp:1355
 #, c-format
 msgid ""
 "MovieClip.localToGlobal(%s): object parameter doesn't have an 'x' member"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1365
+#: libcore/asobj/MovieClip_as.cpp:1366
 #, c-format
 msgid ""
 "MovieClip.localToGlobal(%s): object parameter doesn't have an 'y' member"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1394
+#: libcore/asobj/MovieClip_as.cpp:1395
 #, c-format
 msgid "%s.setMask() : needs an argument"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1413
+#: libcore/asobj/MovieClip_as.cpp:1414
 #, c-format
 msgid "%s.setMask(%s) : first argument is not a DisplayObject"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1443
+#: libcore/asobj/MovieClip_as.cpp:1444
 msgid "MovieClip.lineTo() needs at least two arguments"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1469
+#: libcore/asobj/MovieClip_as.cpp:1456
+#, c-format
+msgid "%s.lineTo(%g,%g);"
+msgstr ""
+
+#: libcore/asobj/MovieClip_as.cpp:1470
 msgid "MovieClip.moveTo() takes two args"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1520
+#: libcore/asobj/MovieClip_as.cpp:1521
 #, c-format
 msgid "MovieClip.lineStyle(%s): args after the first three will be discarded"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1540
+#: libcore/asobj/MovieClip_as.cpp:1541
 #, c-format
 msgid ""
 "MovieClip.lineStyle(%s): invalid joinStylevalue '%s' (valid values: %s|%s|%s)"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1556
+#: libcore/asobj/MovieClip_as.cpp:1557
 #, c-format
 msgid ""
 "MovieClip.lineStyle(%s): invalid capStyle value '%s' (valid values: none|"
 "round|square)"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1581
+#: libcore/asobj/MovieClip_as.cpp:1582
 #, c-format
 msgid ""
 "MovieClip.lineStyle(%s): invalid noScale value '%s' (valid values: %s|%s|%s|"
 "%s)"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1629
+#: libcore/asobj/MovieClip_as.cpp:1630
 msgid "MovieClip.curveTo() takes four args"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1645
+#: libcore/asobj/MovieClip_as.cpp:1646
 #, c-format
 msgid "%s.curveTo(%g,%g,%g,%g);"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1714
+#: libcore/asobj/MovieClip_as.cpp:1671
+msgid "beginFill() with no args is a no-op"
+msgstr ""
+
+#: libcore/asobj/MovieClip_as.cpp:1715
 #, c-format
 msgid "%s.beginGradientFill(%s): invalid call: 5 arguments needed"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1725
+#: libcore/asobj/MovieClip_as.cpp:1726
 #, c-format
 msgid "%s.beginGradientFill(%s): extra arguments invalidate call!"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1745
+#: libcore/asobj/MovieClip_as.cpp:1746
 #, c-format
 msgid ""
 "%s.beginGradientFill(%s): first arg must be 'radial', 'focal', or 'linear'"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1761
+#: libcore/asobj/MovieClip_as.cpp:1762
 #, c-format
 msgid ""
 "%s.beginGradientFill(%s): one or more of the  args from 2nd to 5th don't "
 "cast to objects"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1775
+#: libcore/asobj/MovieClip_as.cpp:1776
 #, c-format
 msgid ""
 "%s.beginGradientFill(%s): colors, alphas and ratios args don't have same "
 "length"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1787
+#: libcore/asobj/MovieClip_as.cpp:1788
 #, c-format
 msgid ""
 "%s.beginGradientFill(%s): too many array elements for colors and ratios "
 "(%d), will trim to 8"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1927
+#: libcore/asobj/MovieClip_as.cpp:1928
 #, c-format
 msgid "min/max bbox values in MovieClip.startDrag(%s) swapped, fixing"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1932
+#: libcore/asobj/MovieClip_as.cpp:1933
 #, c-format
 msgid "non-finite bbox values in MovieClip.startDrag(%s), took as zero"
+msgstr ""
+
+#: libcore/asobj/MovieClip_as.cpp:1972 libcore/asobj/MovieClip_as.cpp:2051
+msgid "MovieClip.attachBitmap: first argument should be a valid BitmapData"
+msgstr ""
+
+#: libcore/asobj/MovieClip_as.cpp:2040
+#, c-format
+msgid "MovieClip.attachBitmap: expected 2 args, got %d"
+msgstr ""
+
+#: libcore/asobj/MovieClip_as.cpp:2077
+msgid "Failed to construct flash.geom.Transform!"
+msgstr ""
+
+#: libcore/asobj/MovieClip_as.cpp:2095
+msgid "MovieClip.beginMeshFill"
+msgstr ""
+
+#: libcore/asobj/LoadVars_as.cpp:145
+#, c-format
+msgid "new LoadVars(%s) - arguments discarded"
+msgstr ""
+
+#: libcore/asobj/Selection_as.cpp:189
+#, c-format
+msgid "Selection.setFocus: expected 1 argument, got %d"
 msgstr ""
 
 #: libcore/asobj/Camera_as.cpp:259
 msgid "No MediaHandler exists! Cannot create a Camera object"
 msgstr ""
 
+#: libcore/asobj/Camera_as.cpp:271
+#, c-format
+msgid "%s: the camera is automatically chosen from gnashrc"
+msgstr ""
+
+#: libcore/asobj/Camera_as.cpp:312
+msgid "Camera::motionLevel can be set, but it's not implemented"
+msgstr ""
+
+#: libcore/asobj/Camera_as.cpp:331
+msgid "Camera::quality can be set, but it's not implemented"
+msgstr ""
+
+#: libcore/asobj/Camera_as.cpp:353
+msgid "Camera::activityLevel only has default value"
+msgstr ""
+
 #: libcore/asobj/Camera_as.cpp:358
 msgid "Attempt to set activity property of Camera"
+msgstr ""
+
+#: libcore/asobj/Camera_as.cpp:370
+msgid "Camera::bandwidth only has default value"
 msgstr ""
 
 #: libcore/asobj/Camera_as.cpp:375
@@ -3768,12 +4278,24 @@ msgstr ""
 msgid "Attempt to set index property of Camera"
 msgstr ""
 
+#: libcore/asobj/Camera_as.cpp:458
+msgid "Camera::motionLevel only has default value"
+msgstr ""
+
 #: libcore/asobj/Camera_as.cpp:463
 msgid "Attempt to set motionLevel property of Camera"
 msgstr ""
 
+#: libcore/asobj/Camera_as.cpp:475
+msgid "Camera::motionTimeout"
+msgstr ""
+
 #: libcore/asobj/Camera_as.cpp:480
 msgid "Attempt to set motionTimeout property of Camera"
+msgstr ""
+
+#: libcore/asobj/Camera_as.cpp:492
+msgid "Camera.muted"
 msgstr ""
 
 #: libcore/asobj/Camera_as.cpp:497
@@ -3788,39 +4310,214 @@ msgstr ""
 msgid "Attempt to set names property of Camera"
 msgstr ""
 
+#: libcore/asobj/Camera_as.cpp:554
+msgid "Camera::quality has only default values"
+msgstr ""
+
 #: libcore/asobj/Camera_as.cpp:559
 msgid "Attempt to set quality property of Camera"
+msgstr ""
+
+#: libcore/asobj/Camera_as.cpp:587
+msgid "Camera.setCursor"
+msgstr ""
+
+#: libcore/asobj/Camera_as.cpp:594
+msgid "Camera.setKeyFrameInterval"
 msgstr ""
 
 #: libcore/asobj/Camera_as.cpp:608
 msgid "Attempt to set width property of Camera, use setMode"
 msgstr ""
 
-#: libcore/asobj/SharedObject_as.cpp:336
+#: libcore/asobj/SharedObject_as.cpp:138
+msgid "SOL: skip serialization of FUNCTION property"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:163
+#, c-format
+msgid "Problems serializing an object's member %s=%s"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:323
+#, c-format
+msgid ""
+"SharedObject.flush() called with a minimum disk space argument (%d), which "
+"is currently ignored"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:331
+#, c-format
+msgid "Couldn't create dir for flushing SharedObject %s"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:337
 #, c-format
 msgid "SharedObject %s not flushed (compiled as read-only mode)"
 msgstr ""
 
-#: libcore/asobj/SharedObject_as.cpp:520
+#: libcore/asobj/SharedObject_as.cpp:344
+#, c-format
+msgid ""
+"Attempting to write object %s when it's SOL Read Only is set! Refusing..."
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:352
+#, c-format
+msgid "SharedObject::flush(): Failed opening file '%s' in binary mode"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:371
+msgid "Error writing SOL header"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:378
+#, c-format
+msgid "Error writing %d bytes to output file %s"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:384
+#, c-format
+msgid "SharedObject '%s' written to filesystem."
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:400
+msgid "Empty SOLSafeDir directive: we'll use '/tmp'"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:407
+#, c-format
+msgid "Invalid SOL safe dir %s: %s. Will try to create on flush/exit."
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:493
+msgid "Attempting to open SOL file from non localhost-loaded SWF"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:521
 #, c-format
 msgid ""
 "SharedObject path %s is outside the SWF domain %s. Cannot access this object."
 msgstr ""
 
-#: libcore/asobj/SharedObject_as.cpp:533
+#: libcore/asobj/SharedObject_as.cpp:534
 #, c-format
 msgid ""
 "SharedObject path %s is not part of the SWF path %s. Cannot access this "
 "object."
 msgstr ""
 
-#: libcore/asobj/SharedObject_as.cpp:702
+#: libcore/asobj/SharedObject_as.cpp:565
+#, c-format
+msgid "SharedObject %s already known, returning it"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:569
+#, c-format
+msgid "SharedObject %s not loaded. Loading it now"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:583
+#, c-format
+msgid "SharedObject path: %s"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:703
 msgid "SharedObject.connect(): needs at least one argument"
 msgstr ""
 
-#: libcore/asobj/SharedObject_as.cpp:755
+#: libcore/asobj/SharedObject_as.cpp:709
+msgid "SharedObject.connect()"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:730
+msgid "SharedObject.setFps"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:739
+msgid "SharedObject.send"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:756
 #, c-format
 msgid "Arguments to SharedObject.flush(%s) will be ignored"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:787
+#, c-format
+msgid "SharedObject.getLocal(%s): missing object name"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:799
+#, c-format
+msgid "SO name:%s, root:%s"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:806
+#, c-format
+msgid "SharedObject.getLocal returning %s"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:813
+msgid "SharedObject.getRemote()"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:828
+msgid "SharedObject.deleteAll()"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:843
+msgid "SharedObject.getDiskUsage()"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:895
+#, c-format
+msgid "No existing SOL %s found. Will create on flush/exit."
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:904
+#, c-format
+msgid "readSOL: SOL file %s is too short (only %s bytes long) to be valid."
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:929
+msgid "readSOL: file ends before data segment"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:937
+#, c-format
+msgid "readSOL: reading property name at byte %s"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:942
+msgid "SharedObject: end of buffer while reading length"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:951
+msgid "readSOL: empty property name"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:956
+msgid "SharedObject::readSOL: premature end of input"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:967
+#, c-format
+msgid "SharedObject: error parsing SharedObject '%s'"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:972
+#, c-format
+msgid "parsed sol member named '%s' (len %s),  value '%s'"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:986
+#, c-format
+msgid "readSOL: Reading SharedObject %s: %s"
+msgstr ""
+
+#: libcore/asobj/SharedObject_as.cpp:1064
+msgid "Did not serialize object"
 msgstr ""
 
 #: libcore/asobj/Date_as.cpp:463
@@ -3973,6 +4670,52 @@ msgstr ""
 msgid "ASnative(%s): args must be 0 or above"
 msgstr ""
 
+#: libcore/asobj/Global_as.cpp:734
+msgid "ASNative (2, 0) - old ASnew"
+msgstr ""
+
+#: libcore/asobj/Global_as.cpp:884
+msgid "updateAfterEvent()"
+msgstr ""
+
+#: libcore/asobj/Global_as.cpp:946
+#, c-format
+msgid "Invalid call to setInterval(%s) - need at least 2 arguments"
+msgstr ""
+
+#: libcore/asobj/Global_as.cpp:960 libcore/asobj/Global_as.cpp:1032
+#, c-format
+msgid ""
+"Invalid call to setInterval(%s) - first argument is not an object or function"
+msgstr ""
+
+#: libcore/asobj/Global_as.cpp:980
+#, c-format
+msgid "Invalid call to setInterval(%s) - missing timeout argument"
+msgstr ""
+
+#: libcore/asobj/Global_as.cpp:1019
+#, c-format
+msgid "Invalid call to setTimeout(%s) - need at least 2 arguments"
+msgstr ""
+
+#: libcore/asobj/Global_as.cpp:1052
+#, c-format
+msgid "Invalid call to setTimeout(%s): missing timeout argument"
+msgstr ""
+
+#: libcore/asobj/Global_as.cpp:1088
+msgid "clearInterval requires one argument, got none"
+msgstr ""
+
+#: libcore/asobj/Global_as.cpp:1102
+msgid "_global.showRedrawRegions"
+msgstr ""
+
+#: libcore/asobj/Global_as.cpp:1109
+msgid "_global.enableDebugConsole"
+msgstr ""
+
 #: libcore/asobj/XMLNode_as.cpp:227
 msgid ""
 "XMLNode.insertBefore(): positional parameter is not a child of this node"
@@ -4007,6 +4750,11 @@ msgstr ""
 msgid "Second argument to XMLNode.insertBefore(%s) is not an XMLNode"
 msgstr ""
 
+#: libcore/asobj/NetStream_as.cpp:299
+#, c-format
+msgid "::pause(%d) called "
+msgstr ""
+
 #: libcore/asobj/NetStream_as.cpp:355
 msgid "No NetConnection associated with this NetStream, won't play"
 msgstr ""
@@ -4015,9 +4763,37 @@ msgstr ""
 msgid "NetConnection is not connected. Won't play."
 msgstr ""
 
+#: libcore/asobj/NetStream_as.cpp:379
+#, c-format
+msgid "Couldn't load URL %s"
+msgstr ""
+
 #: libcore/asobj/NetStream_as.cpp:386
 #, c-format
 msgid "Connecting to movie: %s"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:392
+#, c-format
+msgid "NetStream.play(%s): failed starting playback"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:415
+msgid "NetStream_as::initVideoDecoder: hot-plugging video consumer"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:420
+#, c-format
+msgid "NetStream: Could not create Video decoder: %s"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:444
+msgid "NetStream_as::initAudioDecoder: hot-plugging audio consumer"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:451
+#, c-format
+msgid "Could not create Audio decoder: %s"
 msgstr ""
 
 #: libcore/asobj/NetStream_as.cpp:477
@@ -4033,28 +4809,344 @@ msgstr ""
 msgid "Unable to create parser for NetStream input"
 msgstr ""
 
-#: libcore/asobj/NetStream_as.cpp:644
+#: libcore/asobj/NetStream_as.cpp:520
+#, c-format
+msgid "%p.startPlayback: playHead position reset to 0"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:526
+msgid "Setting playStart status"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:544
+msgid "getDecodedVideoFrame: no parser available"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:553
+#, c-format
+msgid ""
+"getDecodedVideoFrame(%d): no more video frames in input "
+"(nextVideoFrameTimestamp returned false, parsingComplete=%d)"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:564
+msgid ""
+"getDecodedVideoFrame setting playStop status (parsing complete and "
+"nextVideoFrameTimestamp() returned false)"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:575
+#, c-format
+msgid "%p.getDecodedVideoFrame(%d): next video frame is in the future (%d)"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:586
+#, c-format
+msgid ""
+"nextVideoFrameTimestamp returned true (%d), but decodeNextVideoFrame "
+"returned null, I don't think this should ever happen"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:596
+#, c-format
+msgid ""
+"%p.getDecodedVideoFrame(%d): last video frame decoded (should set playback "
+"status to STOP?)"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:604
+#, c-format
+msgid ""
+"%p.getDecodedVideoFrame(%d): next video frame is in the future, we'll return "
+"this one"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:622
+msgid "decodeNextVideoFrame: no parser available"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:629
+#, c-format
+msgid "%p.decodeNextVideoFrame(): no more video frames in input"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:645
 msgid "Error decoding encoded video frame in NetStream input"
 msgstr ""
 
-#: libcore/asobj/NetStream_as.cpp:1564
+#: libcore/asobj/NetStream_as.cpp:659
+#, c-format
+msgid "%p.decodeNextAudioFrame: no more video frames in input"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:688
+#, c-format
+msgid ""
+"NetStream_as::decodeNextAudioFrame: %d bytes of encoded audio decoded to %d "
+"bytes"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:708
+#, c-format
+msgid "NetStream_as::seek(%d): no parser, no party"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:728
+msgid "Setting invalidTime status"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:735
+#, c-format
+msgid "_parser->seek(%d) returned %d"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:742
+#, c-format
+msgid "%p.seek: playHead position set to %d"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:778
+#, c-format
+msgid ""
+"%p.refreshAudioBuffer: doing nothing as playhead is paused - bufferLength=%d/"
+"%d"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:787
+#, c-format
+msgid ""
+"%p.refreshAudioBuffer: doing nothing as current position was already decoded "
+"- bufferLength=%d/%d"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:799
+#, c-format
+msgid ""
+"%p.refreshAudioBuffer: currentPosition=%d, playHeadState=%d, bufferLength="
+"%d, bufferTime=%d"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:935
+#, c-format
+msgid "%p.pushDecodedAudioFrames(%d) : buffer overrun (%d/%d)."
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:951
+#, c-format
+msgid ""
+"%p.pushDecodedAudioFrames(%d): no more audio frames in input "
+"(nextAudioFrameTimestamp returned false, parsingComplete=%d)"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:962
+msgid ""
+"pushDecodedAudioFrames setting playStop status (parsing complete and "
+"nextAudioFrameTimestamp returned false)"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:975
+#, c-format
+msgid "%p.pushDecodedAudioFrames(%d): next audio frame is in the future (%d)"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:988
+#, c-format
+msgid ""
+"nextAudioFrameTimestamp returned true (%d), but decodeNextAudioFrame "
+"returned null, I don't think this should ever happen"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:997
+#, c-format
+msgid "pushDecodedAudioFrames(%d): Decoded audio frame contains no samples"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1006
+#, c-format
+msgid "pushDecodedAudioFrames(%d) pushing %dth frame with timestamp %d"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1024
+msgid "resuming playback clock on audio consume"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1090
+#, c-format
+msgid ""
+"%p.refreshVideoFrame: doing nothing as playhead is paused - bufferLength=%d, "
+"bufferTime=%d"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1100
+#, c-format
+msgid ""
+"%p.refreshVideoFrame: doing nothing as current position was already decoded "
+"- bufferLength=%d, bufferTime=%d"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1112
+#, c-format
+msgid ""
+"%p.refreshVideoFrame: currentPosition=%d, playHeadState=%d, bufferLength=%d, "
+"bufferTime=%d"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1126
+#, c-format
+msgid ""
+"%p.refreshVideoFrame(): no more video frames to decode (DEC_STOPPED, null "
+"from getDecodedVideoFrame)"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1135
+#, c-format
+msgid ""
+"%p.refreshVideoFrame(): last video frame was good enough for current position"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1210
+#, c-format
+msgid ""
+"%p.advance: buffer empty while decoding, setting buffer to buffering and "
+"pausing playback clock"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1215
+msgid "Setting bufferEmpty status"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1224
+#, c-format
+msgid "%p.advance : bufferLength=%d, parsing completed"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1236
+#, c-format
+msgid "%p.advance: buffering - position=%d, buffer=%d/%d"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1255
+#, c-format
+msgid ""
+"%p.advance: buffer full (or parsing completed), resuming playback clock - "
+"position=%d, buffer=%d/%d"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1276
+#, c-format
+msgid "%p.advance: playHead position set to timestamp of first frame: %d"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1283
+#, c-format
+msgid ""
+"%p.advance: playHead position is 0 and parser still doesn't have a frame to "
+"set it to"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1323
+#, c-format
+msgid ""
+"Moving NetStream playhead from timestamp %d to timestamp %d as there are no "
+"video frames yet, audio buffer is empty and next audio frame timestamp is "
+"there (see bug #26687)"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1424
+msgid "attachAuxStreamer called while already attached"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1435
+#, c-format
+msgid "Could not attach NetStream aux streamer to sound handler: %s"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1446
+msgid "detachAuxStreamer called while not attached"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1484
+#, c-format
+msgid ""
+"audio_streamer called, audioQueue size: %d, requested %d bytes of fill-up"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1566
 #, c-format
 msgid ""
 "First argument to NetStream constructor doesn't cast to a NetConnection (%s)"
 msgstr ""
 
-#: libcore/asobj/NetStream_as.cpp:1610
+#: libcore/asobj/NetStream_as.cpp:1612
 msgid "NetStream_as play needs args"
 msgstr ""
 
-#: libcore/asobj/NetStream_as.cpp:1617
+#: libcore/asobj/NetStream_as.cpp:1619
 #, c-format
 msgid "NetStream.play(%s): stream is not connected"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1668
+msgid "NetStream.attachAudio"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1679
+msgid "NetStream.attachVideo"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1690
+msgid "NetStream.publish"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1701
+msgid "NetStream.receiveAudio"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1712
+msgid "NetStream.receiveVideo"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1723
+msgid "NetStream.send"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1807
+msgid "NetStream.liveDelay"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1859
+msgid "Invalid AMF data in FLV tag"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1870
+msgid "Could not convert FLV metatag to as_value, passing undefined"
+msgstr ""
+
+#: libcore/asobj/NetStream_as.cpp:1874
+#, c-format
+msgid "Calling %s(%s)"
 msgstr ""
 
 #: libcore/asobj/Number_as.cpp:78
 #, c-format
 msgid "Number.toString(%s): radix must be in the 2..36 range (%d is invalid)"
+msgstr ""
+
+#: libcore/asobj/TextSnapshot_as.cpp:521
+msgid "TextSnapshot.findText() requires 3 arguments"
+msgstr ""
+
+#: libcore/asobj/TextSnapshot_as.cpp:545
+msgid "TextSnapshot.getCount() takes no arguments"
+msgstr ""
+
+#: libcore/asobj/TextSnapshot_as.cpp:601
+msgid "TextSnapshot.getText requires exactly 2 arguments"
+msgstr ""
+
+#: libcore/asobj/XMLSocket_as.cpp:213
+#, c-format
+msgid "read: %d, this string ends: %d"
 msgstr ""
 
 #: libcore/asobj/XMLSocket_as.cpp:245
@@ -4115,9 +5207,37 @@ msgstr ""
 msgid "%p.addListener(%s): this object's _listener isn't an object: %s"
 msgstr ""
 
+#: libcore/asobj/AsBroadcaster.cpp:415
+#, c-format
+msgid "%p.broadcastMessage() needs an argument"
+msgstr ""
+
 #: libcore/asobj/TextFormat_as.cpp:406
 #, c-format
 msgid "Too many args (%d) passed to TextFormat"
+msgstr ""
+
+#: libcore/asobj/TextFormat_as.cpp:483
+msgid "Getter for textformat_tabStops"
+msgstr ""
+
+#: libcore/asobj/TextFormat_as.cpp:562
+msgid "TextFormat.getTextExtent requires at least oneargument"
+msgstr ""
+
+#: libcore/asobj/TextFormat_as.cpp:708
+#, c-format
+msgid "Invalid display string %s "
+msgstr ""
+
+#: libcore/asobj/TextFormat_as.cpp:726
+#, c-format
+msgid "Uknown alignment value: %d, take as left"
+msgstr ""
+
+#: libcore/asobj/TextFormat_as.cpp:741
+#, c-format
+msgid "Unknown display value: %d "
 msgstr ""
 
 #: libcore/asobj/Color_as.cpp:153
@@ -4131,6 +5251,35 @@ msgstr ""
 #: libcore/asobj/Color_as.cpp:196
 #, c-format
 msgid "Color.setTransform(%s) : first argument doesn't cast to an object"
+msgstr ""
+
+#: libcore/asobj/LocalConnection_as.cpp:279
+msgid "Attempting to write to disabled LocalConnection!"
+msgstr ""
+
+#: libcore/asobj/LocalConnection_as.cpp:288
+msgid "Failed to attach shared memory segment"
+msgstr ""
+
+#: libcore/asobj/LocalConnection_as.cpp:296
+msgid "Failed to get shm lock"
+msgstr ""
+
+#: libcore/asobj/LocalConnection_as.cpp:332
+msgid "Invalid connection name data"
+msgstr ""
+
+#: libcore/asobj/LocalConnection_as.cpp:347
+#, c-format
+msgid "Data %s expired at %s. Removing its target as a listener"
+msgstr ""
+
+#: libcore/asobj/LocalConnection_as.cpp:431
+msgid "Failed to get lock on shared memory! Will not remove listener"
+msgstr ""
+
+#: libcore/asobj/LocalConnection_as.cpp:461
+msgid "Failed to open shared memory segment"
 msgstr ""
 
 #: libcore/asobj/LocalConnection_as.cpp:534
@@ -4148,12 +5297,89 @@ msgstr ""
 msgid "LocalConnection.send(%s): requires at least 2 arguments"
 msgstr ""
 
+#: libcore/asobj/LocalConnection_as.cpp:774
+msgid "Not adding duplicated listener"
+msgstr ""
+
+#: libcore/asobj/LocalConnection_as.cpp:783
+msgid "No space for listener in shared memory!"
+msgstr ""
+
+#: libcore/asobj/LocalConnection_as.cpp:844
+#, c-format
+msgid "Invalid domain %s"
+msgstr ""
+
+#: libcore/asobj/LocalConnection_as.cpp:848
+#, c-format
+msgid "Domain: %s"
+msgstr ""
+
+#: libcore/asobj/LocalConnection_as.cpp:851
+#, c-format
+msgid "Invalid function name %s"
+msgstr ""
+
+#: libcore/asobj/LocalConnection_as.cpp:862
+#, c-format
+msgid "First bool: %s"
+msgstr ""
+
+#: libcore/asobj/LocalConnection_as.cpp:863
+#, c-format
+msgid "Second Bool: %s"
+msgstr ""
+
+#: libcore/asobj/LocalConnection_as.cpp:867
+#, c-format
+msgid "First Number: %s"
+msgstr ""
+
+#: libcore/asobj/LocalConnection_as.cpp:873
+#, c-format
+msgid "Second Number: %s"
+msgstr ""
+
+#: libcore/asobj/LocalConnection_as.cpp:877
+msgid "Fewer AMF fields than expected."
+msgstr ""
+
+#: libcore/asobj/LocalConnection_as.cpp:880
+#, c-format
+msgid "Data: %s"
+msgstr ""
+
 #: libcore/asobj/Microphone_as.cpp:252
 msgid "No MediaHandler exists! Cannot create a Microphone object"
 msgstr ""
 
+#: libcore/asobj/Microphone_as.cpp:284
+msgid "Microphone.gain(): wrong number of parameters passed"
+msgstr ""
+
+#: libcore/asobj/Microphone_as.cpp:300
+msgid "Microphone.setRate: wrong number of parameters passed"
+msgstr ""
+
+#: libcore/asobj/Microphone_as.cpp:313
+msgid "Microphone::activityLevel only has default value (-1)"
+msgstr ""
+
 #: libcore/asobj/Microphone_as.cpp:318
 msgid "Attempt to set activity property of Microphone"
+msgstr ""
+
+#: libcore/asobj/Microphone_as.cpp:353
+msgid "Microphone::muted is always false (always allows access)"
+msgstr ""
+
+#: libcore/asobj/Microphone_as.cpp:413
+msgid "Microphone::silenceTimeout can be set, but is unimplemented"
+msgstr ""
+
+#: libcore/asobj/Microphone_as.cpp:436
+#, c-format
+msgid "%s: Too many arguments"
 msgstr ""
 
 #: libcore/asobj/LoadableObject.cpp:176
@@ -4188,6 +5414,11 @@ msgstr ""
 
 #: libcore/asobj/LoadableObject.cpp:319
 msgid "sendAndLoad(): invalid target (must be an XML or LoadVars object)"
+msgstr ""
+
+#: libcore/asobj/LoadableObject.cpp:393
+#, c-format
+msgid "Using GET method for sendAndLoad: %s"
 msgstr ""
 
 #: libcore/asobj/LoadableObject.cpp:397
