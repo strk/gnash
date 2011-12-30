@@ -714,7 +714,7 @@ bitmapdata_applyFilter(const fn_call& fn)
 {
     BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
     UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 
@@ -756,7 +756,7 @@ bitmapdata_colorTransform(const fn_call& fn)
 {
     BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
     UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 
@@ -813,8 +813,8 @@ bitmapdata_copyChannel(const fn_call& fn)
     // nothing happens.
     if (!oneBitSet(destchans)) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("BitmapData.copyChannel(). Multiple "
-                "destination channels are not supported");
+            log_aserror(_("BitmapData.copyChannel(). Multiple "
+                          "destination channels are not supported"));
         );
         return as_value();
     }
@@ -839,8 +839,8 @@ bitmapdata_copyChannel(const fn_call& fn)
     if (sourceW == 0 || sourceH == 0) {
         // The source rect does not overlap with source bitmap
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("BitmapData.copyChannel(): no part of source rectangle"
-                "overlaps with the source BitmapData");
+            log_aserror(_("BitmapData.copyChannel(): no part of source rectangle"
+                          "overlaps with the source BitmapData"));
         );
         return as_value();
     }
@@ -853,8 +853,8 @@ bitmapdata_copyChannel(const fn_call& fn)
     if (destW == 0 || destH == 0) {
         // The target rect does not overlap with source bitmap
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("BitmapData.copyChannel(): destination area is "
-                "wholly outside the destination BitmapData");
+            log_aserror(_("BitmapData.copyChannel(): destination area is "
+                          "wholly outside the destination BitmapData"));
         );
         return as_value();
     }
@@ -911,8 +911,8 @@ bitmapdata_copyPixels(const fn_call& fn)
         return as_value();
     }
     if (fn.nargs > 3) {
-        LOG_ONCE(log_unimpl("BitmapData.copyPixels(): arguments after "
-                    "the first three are discarded"));
+        LOG_ONCE(log_unimpl(_("BitmapData.copyPixels(): arguments after "
+                              "the first three are discarded")));
     }
 
     as_object* o = toObject(fn.arg(0), getVM(fn));
@@ -961,8 +961,8 @@ bitmapdata_copyPixels(const fn_call& fn)
     if (sourceW == 0 || sourceH == 0) {
         // The source rect does not overlap with source bitmap
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("BitmapData.copyPixels(): no part of source rectangle"
-                "overlaps with the source BitmapData");
+            log_aserror(_("BitmapData.copyPixels(): no part of source rectangle"
+                          "overlaps with the source BitmapData"));
         );
         return as_value();
     }
@@ -975,8 +975,8 @@ bitmapdata_copyPixels(const fn_call& fn)
     if (destW == 0 || destH == 0) {
         // The target rect does not overlap with source bitmap
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("BitmapData.copyPixels(): destination area is "
-                "wholly outside the destination BitmapData");
+            log_aserror(_("BitmapData.copyPixels(): destination area is "
+                          "wholly outside the destination BitmapData"));
         );
         return as_value();
     }
@@ -1061,7 +1061,7 @@ bitmapdata_draw(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("BitmapData.draw(%s) requires at least one argument",
+            log_aserror(_("BitmapData.draw(%s) requires at least one argument"),
                 ss.str());
         );
         return as_value();
@@ -1073,15 +1073,15 @@ bitmapdata_draw(const fn_call& fn)
 
         BitmapData_as* bitmap;
         if (isNativeType(o, bitmap)) {
-            LOG_ONCE(log_unimpl("BitmapData.draw() with BitmapData argument"));
+            LOG_ONCE(log_unimpl(_("BitmapData.draw() with BitmapData argument")));
             return as_value();
         }
 
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("BitmapData.draw(%s): first argument must be a "
-                "MovieClip", ss.str());
+            log_aserror(_("BitmapData.draw(%s): first argument must be a "
+                          "MovieClip"), ss.str());
         );
         return as_value();
     }
@@ -1117,7 +1117,7 @@ bitmapdata_fillRect(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("BitmapData.fillRect(%s): needs an object", ss.str());
+            log_aserror(_("BitmapData.fillRect(%s): needs an object"), ss.str());
         );
         return as_value();
     }
@@ -1154,7 +1154,7 @@ bitmapdata_floodFill(const fn_call& fn)
 
     if (ptr->disposed()) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("floodFill called on disposed BitmapData!");
+            log_aserror(_("floodFill called on disposed BitmapData!"));
         );
         return as_value();
     }
@@ -1180,7 +1180,7 @@ bitmapdata_generateFilterRect(const fn_call& fn)
 {
     BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
     UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 
@@ -1189,7 +1189,7 @@ bitmapdata_getColorBoundsRect(const fn_call& fn)
 {
     BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
     UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 
@@ -1228,7 +1228,7 @@ bitmapdata_getPixel32(const fn_call& fn)
 
     if (ptr->disposed()) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("getPixel32 called on disposed BitmapData!");
+            log_aserror(_("getPixel32 called on disposed BitmapData!"));
         );
         return as_value();
     }
@@ -1247,7 +1247,7 @@ bitmapdata_hitTest(const fn_call& fn)
 {
     BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
     UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 
@@ -1256,7 +1256,7 @@ bitmapdata_merge(const fn_call& fn)
 {
     BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
     UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 
@@ -1303,7 +1303,7 @@ bitmapdata_paletteMap(const fn_call& fn)
 {
     BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
     UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 
@@ -1358,7 +1358,7 @@ bitmapdata_perlinNoise(const fn_call& fn)
     }
 
     if (stitch) {
-        LOG_ONCE(log_unimpl("BitmapData.perlinNoise() stitch value"));
+        LOG_ONCE(log_unimpl(_("BitmapData.perlinNoise() stitch value")));
     }
 
     if (!octave || (!channels && !greyscale)) {
@@ -1433,7 +1433,7 @@ bitmapdata_pixelDissolve(const fn_call& fn)
 {
     BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
     UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 
@@ -1442,7 +1442,7 @@ bitmapdata_scroll(const fn_call& fn)
 {
     BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
     UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 
@@ -1499,7 +1499,7 @@ bitmapdata_compare(const fn_call& fn)
 {
     BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
     UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 
@@ -1508,7 +1508,7 @@ bitmapdata_threshold(const fn_call& fn)
 {
     BitmapData_as* ptr = ensure<ThisIsNative<BitmapData_as> >(fn);
     UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 
@@ -1559,7 +1559,7 @@ bitmapdata_rectangle(const fn_call& fn)
 
     if (!rectCtor) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("Failed to construct flash.geom.Rectangle!");
+            log_aserror(_("Failed to construct flash.geom.Rectangle!"));
         );
         return -1;
     }
@@ -1581,7 +1581,7 @@ bitmapdata_loadBitmap(const fn_call& fn)
 
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("BitmapData.loadBitmap requires one argument");
+            log_aserror(_("BitmapData.loadBitmap requires one argument"));
         );
         return as_value();
     }
@@ -1631,7 +1631,7 @@ bitmapdata_loadBitmap(const fn_call& fn)
 as_value
 get_flash_display_bitmap_data_constructor(const fn_call& fn)
 {
-    log_debug("Loading flash.display.BitmapData class");
+    log_debug(_("Loading flash.display.BitmapData class"));
     Global_as& gl = getGlobal(fn);
     as_object* proto = createObject(gl);
     attachBitmapDataInterface(*proto);
@@ -1646,8 +1646,8 @@ bitmapdata_ctor(const fn_call& fn)
     as_object* ptr = ensure<ValidThis>(fn);
     if (fn.nargs < 2) {
         IF_VERBOSE_ASCODING_ERRORS(
-             log_aserror("BitmapData constructor requires at least two "
-                 "arguments. Will not construct a BitmapData");
+             log_aserror(_("BitmapData constructor requires at least two "
+                           "arguments. Will not construct a BitmapData"));
         );
         throw ActionTypeError();
     }
@@ -1660,8 +1660,8 @@ bitmapdata_ctor(const fn_call& fn)
     
     if (width > 2880 || height > 2880 || width < 1 || height < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
-             log_aserror("BitmapData width and height must be between "
-                 "1 and 2880. Will not construct a BitmapData");
+             log_aserror(_("BitmapData width and height must be between "
+                           "1 and 2880. Will not construct a BitmapData"));
         );
         throw ActionTypeError();
     }

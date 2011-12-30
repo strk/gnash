@@ -119,7 +119,7 @@ transform_colorTransform(const fn_call& fn)
 
         if (!colorTransformCtor) {
             IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror("Failed to construct flash.geom.ColorTransform!");
+                log_aserror(_("Failed to construct flash.geom.ColorTransform!"));
             );
             return as_value();
         }
@@ -142,8 +142,8 @@ transform_colorTransform(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Transform.colorTransform(%s): extra arguments "
-                "discarded", ss.str());
+            log_aserror(_("Transform.colorTransform(%s): extra arguments "
+                          "discarded"), ss.str());
         );
     }
 
@@ -152,8 +152,8 @@ transform_colorTransform(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Transform.colorTransform(%s): argument is not an "
-                "object", ss.str());
+            log_aserror(_("Transform.colorTransform(%s): argument is not an "
+                          "object"), ss.str());
         );
         return as_value();
     }
@@ -167,8 +167,8 @@ transform_colorTransform(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Transform.colorTransform(%s): argument is not a "
-                "ColorTransform", ss.str());
+            log_aserror(_("Transform.colorTransform(%s): argument is not a "
+                          "ColorTransform"), ss.str());
         );
         return as_value();
     }
@@ -195,7 +195,7 @@ transform_concatenatedColorTransform(const fn_call& fn)
 
         if (!colorTransformCtor) {
             IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror("Failed to construct flash.geom.ColorTransform!");
+                log_aserror(_("Failed to construct flash.geom.ColorTransform!"));
             );
             return as_value();
         }
@@ -233,7 +233,7 @@ transform_concatenatedMatrix(const fn_call& fn)
 
         if (!matrixCtor) {
             IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror("Failed to construct flash.geom.Matrix!");
+                log_aserror(_("Failed to construct flash.geom.Matrix!"));
             );
             return as_value();
         }
@@ -302,7 +302,7 @@ transform_matrix(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Transform.matrix(%s): extra arguments discarded",
+            log_aserror(_("Transform.matrix(%s): extra arguments discarded"),
                 ss.str());
         );
     }
@@ -312,7 +312,7 @@ transform_matrix(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Transform.matrix(%s): argument is not an object",
+            log_aserror(_("Transform.matrix(%s): argument is not an object"),
                 ss.str());
         );
         return as_value();
@@ -343,7 +343,7 @@ transform_ctor(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("flash.geom.Transform(%s): needs one argument",
+            log_aserror(_("flash.geom.Transform(%s): needs one argument"),
                 ss.str());
         );
         throw ActionTypeError();
@@ -353,7 +353,7 @@ transform_ctor(const fn_call& fn)
     if (fn.nargs > 1) {
         std::stringstream ss;
         fn.dump_args(ss);
-        LOG_ONCE(log_unimpl("Transform(%s): %s", ss.str(),
+        LOG_ONCE(log_unimpl(_("Transform(%s): %s"), ss.str(),
                     _("arguments discarded")) );
     }
 
@@ -371,7 +371,7 @@ transform_ctor(const fn_call& fn)
 as_value
 get_flash_geom_transform_constructor(const fn_call& fn)
 {
-    log_debug("Loading flash.geom.Transform class");
+    log_debug(_("Loading flash.geom.Transform class"));
     Global_as& gl = getGlobal(fn);
     as_object* proto = createObject(gl);
     attachTransformInterface(*proto);

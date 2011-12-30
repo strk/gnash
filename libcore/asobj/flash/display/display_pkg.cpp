@@ -34,7 +34,7 @@ namespace gnash {
 static as_value
 get_flash_display_package(const fn_call& fn)
 {
-	log_debug("Loading flash.display package");
+    log_debug(_("Loading flash.display package"));
 
     Global_as& gl = getGlobal(fn);
 

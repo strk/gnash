@@ -63,14 +63,14 @@ attachTextRendererStaticProperties(as_object& o)
 as_value
 textrenderer_setAdvancedAntialiasingTable(const fn_call& /*fn*/)
 {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 
 as_value
 textrenderer_maxLevel(const fn_call& /*fn*/)
 {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 

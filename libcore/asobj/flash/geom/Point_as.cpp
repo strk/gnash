@@ -125,7 +125,8 @@ point_add(const fn_call& fn)
         if ( fn.nargs > 1 )
         {
             std::stringstream ss; fn.dump_args(ss);
-            log_aserror("Point.add(%s): %s", ss.str(), _("arguments after first discarded"));
+            log_aserror(_("Point.add(%s): %s"), ss.str(),
+                        _("arguments after first discarded"));
         }
         );
         const as_value& arg1 = fn.arg(0);
@@ -134,7 +135,8 @@ point_add(const fn_call& fn)
         {
             IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss; fn.dump_args(ss);
-            log_aserror("Point.add(%s): %s", ss.str(), _("first argument doesn't cast to object"));
+            log_aserror(_("Point.add(%s): %s"), ss.str(),
+                        _("first argument doesn't cast to object"));
             );
         }
         else
@@ -143,7 +145,7 @@ point_add(const fn_call& fn)
             {
                 IF_VERBOSE_ASCODING_ERRORS(
                 std::stringstream ss; fn.dump_args(ss);
-                log_aserror("Point.add(%s): %s", ss.str(),
+                log_aserror(_("Point.add(%s): %s"), ss.str(),
                     _("first argument cast to object doesn't contain an 'x' member"));
                 );
             }
@@ -151,7 +153,7 @@ point_add(const fn_call& fn)
             {
                 IF_VERBOSE_ASCODING_ERRORS(
                 std::stringstream ss; fn.dump_args(ss);
-                log_aserror("Point.add(%s): %s", ss.str(),
+                log_aserror(_("Point.add(%s): %s"), ss.str(),
                     _("first argument cast to object doesn't contain an 'y' member"));
                 );
             }
@@ -195,8 +197,8 @@ point_equals(const fn_call& fn)
     {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
-        log_aserror("Point.equals(%s): %s", ss.str(),
-            _("First arg must be an object"));
+        log_aserror(_("Point.equals(%s): %s"), ss.str(),
+                    _("First arg must be an object"));
         );
         return as_value(false);
     }
@@ -206,7 +208,7 @@ point_equals(const fn_call& fn)
     {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
-        log_aserror("Point.equals(%s): %s %s", ss.str(),
+        log_aserror(_("Point.equals(%s): %s %s"), ss.str(),
             _("First arg must be an instance of"), "flash.geom.Point");
         );
         return as_value(false);
@@ -243,7 +245,8 @@ point_normalize(const fn_call& fn)
         if ( fn.nargs > 1 )
         {
             std::stringstream ss; fn.dump_args(ss);
-            log_aserror("Point.normalize(%s): %s", ss.str(), _("arguments after first discarded"));
+            log_aserror(_("Point.normalize(%s): %s"), ss.str(),
+                        _("arguments after first discarded"));
         }
         );
 
@@ -326,7 +329,8 @@ point_subtract(const fn_call& fn)
         if ( fn.nargs > 1 )
         {
             std::stringstream ss; fn.dump_args(ss);
-            log_aserror("Point.add(%s): %s", ss.str(), _("arguments after first discarded"));
+            log_aserror(_("Point.add(%s): %s"), ss.str(),
+                        _("arguments after first discarded"));
         }
         );
         const as_value& arg1 = fn.arg(0);
@@ -335,7 +339,8 @@ point_subtract(const fn_call& fn)
         {
             IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss; fn.dump_args(ss);
-            log_aserror("Point.add(%s): %s", ss.str(), _("first argument doesn't cast to object"));
+            log_aserror(_("Point.add(%s): %s"), ss.str(),
+                        _("first argument doesn't cast to object"));
             );
         }
         else
@@ -344,15 +349,15 @@ point_subtract(const fn_call& fn)
             {
                 IF_VERBOSE_ASCODING_ERRORS(
                 std::stringstream ss; fn.dump_args(ss);
-                log_aserror("Point.add(%s): %s", ss.str(),
-                    _("first argument casted to object doesn't contain an 'x' member"));
+                log_aserror(_("Point.add(%s): %s"), ss.str(),
+                              _("first argument casted to object doesn't contain an 'x' member"));
                 );
             }
             if ( ! o->get_member(NSV::PROP_Y, &y1) )
             {
                 IF_VERBOSE_ASCODING_ERRORS(
                 std::stringstream ss; fn.dump_args(ss);
-                log_aserror("Point.add(%s): %s", ss.str(),
+                log_aserror(_("Point.add(%s): %s"), ss.str(),
                     _("first argument casted to object doesn't contain an 'y' member"));
                 );
             }
@@ -418,7 +423,8 @@ point_distance(const fn_call& fn)
     {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
-        log_aserror("Point.distance(%s): %s", ss.str(), _("missing arguments"));
+        log_aserror(_("Point.distance(%s): %s"), ss.str(),
+                    _("missing arguments"));
         );
         return as_value();
     }
@@ -427,7 +433,8 @@ point_distance(const fn_call& fn)
     if ( fn.nargs > 2 )
     {
         std::stringstream ss; fn.dump_args(ss);
-        log_aserror("Point.distance(%s): %s", ss.str(), _("arguments after first two discarded"));
+        log_aserror(_("Point.distance(%s): %s"), ss.str(),
+                    _("arguments after first two discarded"));
     }
     );
 
@@ -436,7 +443,8 @@ point_distance(const fn_call& fn)
     {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
-        log_aserror("Point.distance(%s): %s", ss.str(), _("First arg must be an object"));
+        log_aserror(_("Point.distance(%s): %s"), ss.str(),
+                    _("First arg must be an object"));
         );
         return as_value();
     }
@@ -446,7 +454,8 @@ point_distance(const fn_call& fn)
     {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
-        log_aserror("Point.equals(%s): %s %s", ss.str(), _("First arg must be an instance of"), "flash.geom.Point");
+        log_aserror(_("Point.equals(%s): %s %s"), ss.str(),
+                    _("First arg must be an instance of"), "flash.geom.Point");
         );
         return as_value();
     }
@@ -498,7 +507,8 @@ point_interpolate(const fn_call& fn)
     {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
-        log_aserror("Point.interpolate(%s): %s", ss.str(), _("missing arguments"));
+        log_aserror(_("Point.interpolate(%s): %s"), ss.str(),
+                    _("missing arguments"));
         );
     }
     else
@@ -507,7 +517,8 @@ point_interpolate(const fn_call& fn)
         if ( fn.nargs > 3 )
         {
         std::stringstream ss; fn.dump_args(ss);
-        log_aserror("Point.interpolate(%s): %s", ss.str(), _("arguments after first three discarded"));
+        log_aserror(_("Point.interpolate(%s): %s"), ss.str(),
+                    _("arguments after first three discarded"));
         }
         );
 
@@ -517,7 +528,8 @@ point_interpolate(const fn_call& fn)
         {
             IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss; fn.dump_args(ss);
-            log_aserror("Point.interpolate(%s): %s", ss.str(), _("first argument doesn't cast to object"));
+            log_aserror(_("Point.interpolate(%s): %s"), ss.str(),
+                        _("first argument doesn't cast to object"));
             );
         }
         else
@@ -532,7 +544,8 @@ point_interpolate(const fn_call& fn)
         {
             IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss; fn.dump_args(ss);
-            log_aserror("Point.interpolate(%s): %s", ss.str(), _("second argument doesn't cast to object"));
+            log_aserror(_("Point.interpolate(%s): %s"), ss.str(),
+                        _("second argument doesn't cast to object"));
             );
         }
         else
@@ -579,7 +592,8 @@ point_polar(const fn_call& fn)
         {
             IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss; fn.dump_args(ss);
-            log_aserror("Point.polar(%s): %s", ss.str(), _("missing arguments"));
+            log_aserror(_("Point.polar(%s): %s"), ss.str(),
+                        _("missing arguments"));
             );
         }
     }
@@ -587,7 +601,7 @@ point_polar(const fn_call& fn)
     {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
-        log_aserror("Point.polar(%s): %s", ss.str(), _("missing arguments"));
+        log_aserror(_("Point.polar(%s): %s"), ss.str(), _("missing arguments"));
         );
     }
     
@@ -623,7 +637,7 @@ point_ctor(const fn_call& fn)
 as_value
 get_flash_geom_point_constructor(const fn_call& fn)
 {
-    log_debug("Loading flash.geom.Point class");
+    log_debug(_("Loading flash.geom.Point class"));
     Global_as& gl = getGlobal(fn);
     as_object* proto = createObject(gl);
     as_object* cl = gl.createClass(&point_ctor, proto);

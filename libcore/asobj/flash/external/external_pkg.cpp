@@ -35,7 +35,7 @@ as_value
 get_flash_external_package(const fn_call& fn)
 {
 
-    log_debug("Loading flash.external package");
+    log_debug(_("Loading flash.external package"));
 
     Global_as& gl = getGlobal(fn);
 

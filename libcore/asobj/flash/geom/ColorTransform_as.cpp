@@ -362,8 +362,8 @@ colortransform_ctor(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("ColorTransform(%s): not enough arguments (need 8). "
-                        "Constructing with default values", ss.str());
+            log_aserror(_("ColorTransform(%s): not enough arguments (need 8). "
+                          "Constructing with default values"), ss.str());
         );
 
         obj->setRelay(new ColorTransform_as(1, 1, 1, 1, 0, 0, 0, 0));
@@ -377,7 +377,7 @@ colortransform_ctor(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("ColorTransform(%s): discarding extra arguments",
+            log_aserror(_("ColorTransform(%s): discarding extra arguments"),
                 ss.str());
         );
     }
@@ -398,7 +398,7 @@ colortransform_ctor(const fn_call& fn)
 as_value
 get_flash_geom_color_transform_constructor(const fn_call& fn)
 {
-    log_debug("Loading flash.geom.ColorTransform class");
+    log_debug(_("Loading flash.geom.ColorTransform class"));
     Global_as& gl = getGlobal(fn);
     as_object* proto = createObject(gl);
     as_object* cl = gl.createClass(&colortransform_ctor, proto);

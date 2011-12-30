@@ -150,7 +150,7 @@ Rectangle_contains(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss;
             fn.dump_args(ss);
-            log_aserror("flash.geom.Rectangle(%s): %s", ss.str(), 
+            log_aserror(_("flash.geom.Rectangle(%s): %s"), ss.str(), 
                 _("missing arguments"));
         );
         return as_value();
@@ -244,7 +244,7 @@ Rectangle_containsRectangle(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 
@@ -290,7 +290,7 @@ Rectangle_inflate(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 
@@ -299,7 +299,7 @@ Rectangle_inflatePoint(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 
@@ -308,7 +308,7 @@ Rectangle_intersection(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 
@@ -317,7 +317,7 @@ Rectangle_intersects(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 
@@ -423,7 +423,7 @@ Rectangle_union(const fn_call& fn)
 {
     as_object* ptr = ensure<ValidThis>(fn);
     UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 
@@ -468,7 +468,7 @@ Rectangle_bottomRight(const fn_call& fn)
 
         if (!pointCtor) {
             IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror("Failed to construct flash.geom.Point!");
+                log_aserror(_("Failed to construct flash.geom.Point!"));
             );
             return as_value();
         }
@@ -542,7 +542,7 @@ Rectangle_size(const fn_call& fn)
         as_function* pointCtor = getClassConstructor(fn, "flash.geom.Point");
         if (!pointCtor) {
             IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror("Failed to construct flash.geom.Point!");
+                log_aserror(_("Failed to construct flash.geom.Point!"));
             );
             return as_value();
         }
@@ -600,7 +600,7 @@ Rectangle_topLeft(const fn_call& fn)
         as_function* pointCtor = getClassConstructor(fn, "flash.geom.Point");
         if (!pointCtor) {
             IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror("Failed to construct flash.geom.Point!");
+                log_aserror(_("Failed to construct flash.geom.Point!"));
             );
             return as_value();
         }
@@ -646,7 +646,7 @@ Rectangle_ctor(const fn_call& fn)
 as_value
 get_flash_geom_rectangle_constructor(const fn_call& fn)
 {
-    log_debug("Loading flash.geom.Rectangle class");
+    log_debug(_("Loading flash.geom.Rectangle class"));
     Global_as& gl = getGlobal(fn);
     as_object* proto = createObject(gl);
     attachRectangleInterface(*proto);

@@ -88,10 +88,8 @@ filereferencelist_ctor(const fn_call& fn)
     if (fn.nargs) {
         std::stringstream ss;
         fn.dump_args(ss);
-        LOG_ONCE(
-            log_unimpl("FileReferenceList(%s): %s", ss.str(),
-                 _("arguments discarded"))
-        );
+        LOG_ONCE(log_unimpl(_("FileReferenceList(%s): %s"), ss.str(),
+                              _("arguments discarded")));
     }
 
     return as_value(); 

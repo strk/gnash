@@ -181,7 +181,7 @@ matrix_concat(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Matrix.concat(%s): needs one argument", ss.str());
+            log_aserror(_("Matrix.concat(%s): needs one argument"), ss.str());
         );
         return as_value();
     }
@@ -195,7 +195,7 @@ matrix_concat(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Matrix.concat(%s): needs a Matrix object", ss.str());
+            log_aserror(_("Matrix.concat(%s): needs a Matrix object"), ss.str());
         );
         return as_value();
     }
@@ -212,14 +212,17 @@ matrix_concat(const fn_call& fn)
     fillMatrix(currentMatrix, *ptr);
 
 #ifdef GNASH_DEBUG_GEOM_MATRIX
-    log_debug("(Matrix.concat) This matrix (pre-transform): %s", currentMatrix);
-    log_debug("(Matrix.concat) Transform matrix: %s", concatMatrix);
+    log_debug(_("(Matrix.concat) This matrix (pre-transform): %s"),
+              currentMatrix);
+    log_debug(_("(Matrix.concat) Transform matrix: %s"),
+              concatMatrix);
 #endif
     
     currentMatrix = boost::numeric::ublas::prod(concatMatrix, currentMatrix);
  
 #ifdef GNASH_DEBUG_GEOM_MATRIX
-    log_debug("(Matrix.concat) This matrix (post-transform): %s", currentMatrix);
+    log_debug(_("(Matrix.concat) This matrix (post-transform): %s"),
+              currentMatrix);
 #endif 
     
     // Set values of current matrix
@@ -249,7 +252,7 @@ matrix_createBox(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Matrix.createBox(%s): needs at least two arguments", ss.str());
+            log_aserror(_("Matrix.createBox(%s): needs at least two arguments"), ss.str());
         );
         return as_value();
     }
@@ -308,8 +311,8 @@ matrix_createGradientBox(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Matrix.createGradientBox(%s): needs at least "
-                "two arguments", ss.str());
+            log_aserror(_("Matrix.createGradientBox(%s): needs at least "
+                          "two arguments"), ss.str());
         );
         return as_value();
     }
@@ -382,7 +385,7 @@ matrix_deltaTransformPoint(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Matrix.deltaTransformPoint(%s): needs one argument",
+            log_aserror(_("Matrix.deltaTransformPoint(%s): needs one argument"),
                 ss.str());
         );
         return as_value();
@@ -396,7 +399,7 @@ matrix_deltaTransformPoint(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Matrix.deltaTransformPoint(%s): needs an object",
+            log_aserror(_("Matrix.deltaTransformPoint(%s): needs an object"),
                 ss.str());
         );
         return as_value();
@@ -415,7 +418,7 @@ matrix_deltaTransformPoint(const fn_call& fn)
     as_function* pointCtor = pointClass.to_function();
 
     if (!pointCtor) {
-        log_error("Failed to construct flash.geom.Point!");
+        log_error(_("Failed to construct flash.geom.Point!"));
         return as_value();
     }
 
@@ -517,7 +520,7 @@ matrix_rotate(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Matrix.rotate(%s): needs one argument", ss.str());
+            log_aserror(_("Matrix.rotate(%s): needs one argument"), ss.str());
         );
         return as_value();
     }
@@ -550,15 +553,17 @@ matrix_rotate(const fn_call& fn)
     currentMatrix(1, 1) = toNumber(d, getVM(fn));
 
 #ifdef GNASH_DEBUG_GEOM_MATRIX
-    log_debug("(Matrix.rotate) This matrix (pre-transform): %s", currentMatrix);
+    log_debug(_("(Matrix.rotate) This matrix (pre-transform): %s"),
+              currentMatrix);
 #endif
 
     // Apply rotation to current matrix.
     currentMatrix = boost::numeric::ublas::prod(currentMatrix, transformMatrix);
 
 #ifdef GNASH_DEBUG_GEOM_MATRIX
-    log_debug("(Matrix.rotate) Transformation matrix: %s", transformMatrix);
-    log_debug("(Matrix.rotate) This matrix (post-transform): %s", currentMatrix);
+    log_debug(_("(Matrix.rotate) Transformation matrix: %s"), transformMatrix);
+    log_debug(_("(Matrix.rotate) This matrix (post-transform): %s"),
+              currentMatrix);
 #endif
 
     ptr->set_member(NSV::PROP_A, as_value(currentMatrix(0, 0)));
@@ -591,7 +596,7 @@ matrix_scale(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Matrix.translate(%s): needs two arguments", ss.str());
+            log_aserror(_("Matrix.translate(%s): needs two arguments"), ss.str());
         );
         return as_value();
     }
@@ -625,15 +630,17 @@ matrix_scale(const fn_call& fn)
     currentMatrix(1, 1) = toNumber(d, getVM(fn));
     
 #ifdef GNASH_DEBUG_GEOM_MATRIX
-    log_debug("(Matrix.scale) This matrix (pre-transform): %s", currentMatrix);
+    log_debug(_("(Matrix.scale) This matrix (pre-transform): %s"),
+              currentMatrix);
 #endif
     
     // Apply scale to current matrix.
     currentMatrix = boost::numeric::ublas::prod(currentMatrix, transformMatrix);
 
 #ifdef GNASH_DEBUG_GEOM_MATRIX
-    log_debug("(Matrix.scale) Transformation matrix: %s", transformMatrix);
-    log_debug("(Matrix.scale) This matrix (post-transform): %s", currentMatrix);
+    log_debug(_("(Matrix.scale) Transformation matrix: %s"), transformMatrix);
+    log_debug(_("(Matrix.scale) This matrix (post-transform): %s"),
+              currentMatrix);
 #endif
 
     ptr->set_member(NSV::PROP_A, currentMatrix(0, 0));
@@ -694,7 +701,7 @@ matrix_transformPoint(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Matrix.translate(%s): needs one argument", ss.str());
+            log_aserror(_("Matrix.translate(%s): needs one argument"), ss.str());
         );
         return as_value();
     }
@@ -707,7 +714,7 @@ matrix_transformPoint(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Matrix.transformPoint(%s): needs an object", ss.str());
+            log_aserror(_("Matrix.transformPoint(%s): needs an object"), ss.str());
         );
         return as_value();
     }
@@ -719,7 +726,7 @@ matrix_transformPoint(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Matrix.transformPoint(%s): object must be a Point",
+            log_aserror(_("Matrix.transformPoint(%s): object must be a Point"),
                 ss.str());
         );
         return as_value();
@@ -737,7 +744,7 @@ matrix_transformPoint(const fn_call& fn)
     as_function* pointCtor = pointClass.to_function();
 
     if (!pointCtor) {
-        log_error("Failed to construct flash.geom.Point!");
+        log_error(_("Failed to construct flash.geom.Point!"));
         return as_value();
     }
 
@@ -760,7 +767,7 @@ matrix_translate(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Matrix.translate(%s): needs two arguments", ss.str());
+            log_aserror(_("Matrix.translate(%s): needs two arguments"), ss.str());
         );
         return as_value();    
     }
@@ -888,7 +895,7 @@ matrix_ctor(const fn_call& fn)
 as_value
 get_flash_geom_matrix_constructor(const fn_call& fn)
 {
-    log_debug("Loading flash.geom.Matrix class");
+    log_debug(_("Loading flash.geom.Matrix class"));
     Global_as& gl = getGlobal(fn);
     as_object* proto = createObject(gl);
     attachMatrixInterface(*proto);

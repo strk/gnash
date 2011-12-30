@@ -33,7 +33,7 @@ namespace gnash {
 static as_value
 get_flash_net_package(const fn_call& fn)
 {
-    log_debug("Loading flash.net package");
+    log_debug(_("Loading flash.net package"));
  
     Global_as& gl = getGlobal(fn);
 
