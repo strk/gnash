@@ -117,7 +117,7 @@ SSHClient::sshRead(boost::uint8_t *buf, size_t size)
     
     int ret = channel_read(_channel, buf, size, 0);
     if (ret < 0) {
- 	log_error("SSH read error was: \"%s\"!", ssh_get_error(_session));
+ 	log_error(_("SSH read error was: \"%s\"!"), ssh_get_error(_session));
     }
     
     return ret;
@@ -139,7 +139,7 @@ SSHClient::sshWrite(const boost::uint8_t *buf, size_t size)
     
     int ret = channel_write(_channel, buf, size);
     if (ret < 0) {
- 	log_error("SSH write error was: \"%s\"!", ssh_get_error(_session));
+ 	log_error(_("SSH write error was: \"%s\"!"), ssh_get_error(_session));
     }
     return ret;
 }
@@ -177,14 +177,14 @@ SSHClient::sshConnect(int /* fd */, std::string &hostname)
 
     // We always need a hostname to connect to
     if (ssh_options_set(_session, SSH_OPTIONS_HOST, hostname.c_str()) < 0) {
-	log_error("Couldn't set hostname option");
+	log_error(_("Couldn't set hostname option"));
 	return false;
     }
 
     // We always need a user name for the connection
     if (_user.empty()) {
 	if (ssh_options_set(_session, SSH_OPTIONS_USER, _user.c_str()) < 0) {
-	    log_error("Couldn't set user name option");
+	    log_error(_("Couldn't set user name option"));
 	    return false;
 	}
     }
@@ -192,7 +192,7 @@ SSHClient::sshConnect(int /* fd */, std::string &hostname)
     // Start a new session
     _session = ssh_new();
     if(ssh_connect(_session)){
-        log_error("Connection failed : %s\n", ssh_get_error(_session));
+        log_error(_("Connection failed : %s\n"), ssh_get_error(_session));
 	sshShutdown();
         return false;
     }
@@ -207,20 +207,20 @@ SSHClient::sshConnect(int /* fd */, std::string &hostname)
     }
     switch(_state){
       case SSH_SERVER_KNOWN_OK:	// ok
-	  log_debug("SSH Server is currently known: %d", _state);
+	  log_debug(_("SSH Server is currently known: %d"), _state);
 	  break; 
       case SSH_SERVER_KNOWN_CHANGED:
-	  log_error("Host key for server changed : server's one is now: ");
-	  ssh_print_hexa("Public key hash", hash, hlen);
+	  log_error(_("Host key for server changed : server's one is now: "));
+	  ssh_print_hexa(_("Public key hash"), hash, hlen);
 	  free(hash);
-	  log_error("For security reason, connection will be stopped");
+	  log_error(_("For security reason, connection will be stopped"));
 	  sshShutdown();
 	  return false;;
       case SSH_SERVER_FOUND_OTHER:
-	  log_error("The host key for this server was not found but an other type of key exists.");
-	  log_error("An attacker might change the default server key to confuse your client"
+	  log_error(_("The host key for this server was not found but an other type of key exists."));
+	  log_error(_("An attacker might change the default server key to confuse your client"
 		    "into thinking the key does not exist\n"
-		    "We advise you to rerun the client with -d or -r for more safety.");
+		      "We advise you to rerun the client with -d or -r for more safety."));
 	  sshShutdown();
 	  return false;;
       case SSH_SERVER_NOT_KNOWN:
@@ -229,29 +229,29 @@ SSHClient::sshConnect(int /* fd */, std::string &hostname)
 	  // FIXME: for now, accecpt all new keys, and update the 
 	  // $HOME/.ssh/know_hosts file.
 #if 0
-	  log_error("The server is unknown. Do you trust the host key ? (yes,no)");
-	  log_error("Public key hash: %s", hexa);
+	  log_error(_("The server is unknown. Do you trust the host key ? (yes,no)"));
+	  log_error(_("Public key hash: %s"), hexa);
 	  free(hexa);
 	  fgets(buf, sizeof(buf), stdin);
 	  if(strncasecmp(buf, "yes", 3) != 0){
 	      sshShutdown();
 	      return false;
 	  }
-	  log_error("This new key will be written on disk for further usage. do you agree? (yes,no) ");
+	  log_error(_("This new key will be written on disk for further usage. do you agree? (yes,no) "));
 	  fgets(buf, sizeof(buf), stdin);
 	  if(strncasecmp(buf, "yes", 3)==0){
 	      if(ssh_write_knownhost(_session))
-		  log_error("%s", ssh_get_error(_session));
+		  log_error(ssh_get_error(_session));
 	  }
 #else
 	  if(ssh_write_knownhost(_session)) {
-	      log_error("%s", ssh_get_error(_session));
+	      log_error(ssh_get_error(_session));
 	  }
 #endif  
 	  break;
       case SSH_SERVER_ERROR:
 	  free(hash);
-	  log_error("%s", ssh_get_error(_session));
+	  log_error(ssh_get_error(_session));
 	  sshShutdown();
 	  return false;
     }
@@ -263,30 +263,30 @@ SSHClient::sshConnect(int /* fd */, std::string &hostname)
     int auth = ssh_auth_list(_session);
 
 //    log_debug("auth: 0x%04x", auth);
-    log_debug("supported auth methods: ");
+    log_debug(_("supported auth methods: "));
     if (auth & SSH_AUTH_METHOD_PUBLICKEY) {
-      log_debug("\tpublickey");
+	log_debug(_("\tpublickey"));
     }
     if (auth & SSH_AUTH_METHOD_INTERACTIVE) {
-      log_debug("\tkeyboard-interactive");
+	log_debug(_("\tkeyboard-interactive"));
     }
 
     /* no ? you should :) */
     auth=ssh_userauth_autopubkey(_session, NULL);
     if(auth == SSH_AUTH_ERROR){
-        log_debug("Authenticating with pubkey: %s",ssh_get_error(_session));
+        log_debug(_("Authenticating with pubkey: %s"), ssh_get_error(_session));
 	ssh_finalize();
         return false;
     }
     banner = ssh_get_issue_banner(_session);
     if(banner){
-        log_debug("%s", banner);
+        log_debug(banner);
         free(banner);
     }
     if(auth != SSH_AUTH_SUCCESS){
         auth = authKbdint(_session);
         if(auth == SSH_AUTH_ERROR){
-            log_error("authenticating with keyb-interactive: %s",
+            log_error(_("authenticating with keyb-interactive: %s"),
 		      ssh_get_error(_session));
 	    ssh_finalize();
             return false;
@@ -295,7 +295,7 @@ SSHClient::sshConnect(int /* fd */, std::string &hostname)
     if(auth != SSH_AUTH_SUCCESS){
         password = getpass("Password: ");
         if(ssh_userauth_password(_session, NULL, password) != SSH_AUTH_SUCCESS){
-            log_error("Authentication failed: %s",ssh_get_error(_session));
+            log_error(_("Authentication failed: %s"), ssh_get_error(_session));
             ssh_disconnect(_session);
                 ssh_finalize();
             return false;
@@ -345,13 +345,13 @@ SSHClient::authKbdint(ssh_session session)
         instruction = const_cast<char *>(ssh_userauth_kbdint_getinstruction(session));
         n=ssh_userauth_kbdint_getnprompts(session);
         if(strlen(name)>0)
-            log_debug("%s", name);
+            log_debug(name);
         if(strlen(instruction)>0)
-            log_debug("%s", instruction);
+            log_debug(instruction);
         for(i=0; i<n; ++i){
             prompt = const_cast<char *>(ssh_userauth_kbdint_getprompt(session, i, &echo));
             if(echo){
-                log_debug("%s", prompt);
+                log_debug(prompt);
                 fgets(buffer,sizeof(buffer),stdin);
                 buffer[sizeof(buffer)-1]=0;
                 if((ptr=strchr(buffer,'\n')))
@@ -390,10 +390,10 @@ SSHClient::openChannel(ssh_session session)
 	_channel = channel_new(session);
 	if (_channel) {
 	    if (channel_open_session(_channel) != SSH_OK) {
-		log_error("Can't open the SSH channel!");
+		log_error(_("Can't open the SSH channel!"));
 	    }
 	} else {
-	    log_error("Can't allocate memory for new SSH channel!");
+	    log_error(_("Can't allocate memory for new SSH channel!"));
 	}
     }
 
@@ -409,7 +409,7 @@ SSHClient::readChannel(ssh_channel channel, cygnal::Buffer &buf)
     if (channel) {
 	ret = channel_read(channel, buf.reference(), buf.size(), 0);
     } else {
-	log_error("Can't read from a non-existant channel!");
+	log_error(_("Can't read from a non-existant channel!"));
     }
 
     return ret;
@@ -424,7 +424,7 @@ SSHClient::writeChannel(ssh_channel channel, cygnal::Buffer &buf)
     if (channel) {
 	ret = channel_write(channel, buf.reference(), buf.size());
     } else {
-	log_error("Can't write to a non-existant channel!");
+	log_error(_("Can't write to a non-existant channel!"));
     }
 
     return ret;
@@ -466,5 +466,5 @@ SSHClient::dump() {
 
 // local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

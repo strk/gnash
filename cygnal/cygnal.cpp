@@ -261,7 +261,7 @@ Cygnal::loadPeersFile(const std::string &filespec)
     in.open(filespec.c_str());
     
     if (!in) {
-	log_error(": couldn't open file: ", filespec);
+	log_error(_(": couldn't open file: "), filespec);
 	return false;
     }
 
@@ -338,7 +338,7 @@ Cygnal::probePeers(peer_t &peer)
 	
 	gnash::URL url(uri.str());
 	if (!(peer.fd = net.connectToServer(uri.str()))) {
-	    log_network("Couldn't connect to %s", uri.str());
+	    log_network(_("Couldn't connect to %s"), uri.str());
 	    peer.connected = false;
 	} else {
 	    peer.connected = true;
@@ -358,7 +358,7 @@ Cygnal::probePeers(std::vector<boost::shared_ptr<peer_t> > &peers)
 	boost::shared_ptr<Cygnal::peer_t> peer = *it;
 	probePeers(*peer);
 	if (peer->connected) {
-	    log_network("%s is active on fd #%d.", peer->hostname,
+	    log_network(_("%s is active on fd #%d."), peer->hostname,
 			peer->fd);
  	    _active_peers.push_back(*it);
 	}
@@ -472,7 +472,7 @@ main(int argc, char *argv[])
 	      break;
 	  case 'v':
 	      dbglogfile.setVerbosity();
-	      LOG_ONCE(log_network (_("Verbose output turned on")))
+	      LOG_ONCE(log_network(_("Verbose output turned on")))
 	      break;
 	  case 'p':
 	      port_offset = parser.argument<int>(i);
@@ -496,11 +496,11 @@ main(int argc, char *argv[])
 	      exit(EXIT_SUCCESS);
 	      break;
 	  default:
-	      log_error (_("Extraneous argument: %s"), parser.argument(i).c_str());
+	      log_error(_("Extraneous argument: %s"), parser.argument(i).c_str());
         }
     }
     
-    log_network (_("Document Root for media files is: %s"), docroot);
+    log_network(_("Document Root for media files is: %s"), docroot);
     crcfile.setDocumentRoot(docroot);
     
     // load the file of peers. A peer is another instance of Cygnal we
@@ -582,7 +582,7 @@ main(int argc, char *argv[])
     // Wait for all the threads to die.
     alldone.wait(lk);
     
-    log_network (_("Cygnal done..."));
+    log_network(_("Cygnal done..."));
 
     // Delete the data we allowcated to pass to each connection_handler.
     delete rtmp_data;
@@ -647,7 +647,7 @@ admin_handler(Network::thread_params_t *args)
 	    const char *ptr = reinterpret_cast<const char *>(data);
 	    ret = net.readNet(data, ADMINPKTSIZE, 100);
 	    if (ret < 0) {
-		log_network("no more admin data, exiting...\n");
+		log_network(_("no more admin data, exiting...\n"));
 		if ((ret == 0) && cmd != Handler::POLL) {
 		    break;
 		}
@@ -732,7 +732,7 @@ admin_handler(Network::thread_params_t *args)
 		  break;
 	    };
 	} while (ret > 0);
-        log_network("admin_handler: Done...!\n");
+        log_network(_("admin_handler: Done...!\n"));
 	net.closeNet();		// this shuts down this socket connection
     }
     net.closeConnection();		// this shuts down the server on this connection
@@ -761,11 +761,11 @@ connection_handler(Network::thread_params_t *args)
     // Start a server on this tcp/ip port.
     fd = net.createServer(args->port);
     if (fd <= 0) {
-	log_error("Can't start %s Connection Handler for fd #%d, port %hd",
+	log_error(_("Can't start %s Connection Handler for fd #%d, port %hd"),
 		  proto_str[args->protocol], fd, args->port);
 	return;
     } else {
-	log_network("Starting %s Connection Handler for fd #%d, port %hd",
+	log_network(_("Starting %s Connection Handler for fd #%d, port %hd"),
 		    proto_str[args->protocol], fd, args->port);
     }
 
@@ -776,7 +776,7 @@ connection_handler(Network::thread_params_t *args)
     // handling part of the total active file descriptors.
 #ifdef HAVE_SYSCONF
     long ncpus = sysconf(_SC_NPROCESSORS_ONLN);
-    LOG_ONCE(log_network("This system has %d cpus.", ncpus));
+    LOG_ONCE(log_network(_("This system has %d cpus."), ncpus));
 #endif	
     size_t nfds = crcfile.getFDThread();
     
@@ -813,10 +813,11 @@ connection_handler(Network::thread_params_t *args)
 	// things when you have a heavily threaded application.
 	args->netfd = net.newConnection(true, fd);
 	if (args->netfd <= 0) {
-	    log_network("No new %s network connections", proto_str[args->protocol]);
+	    log_network(_("No new %s network connections"),
+                        proto_str[args->protocol]);
 	    continue;
 	} else {
-	    log_network("*** New %s network connection for thread ID #%d, fd #%d ***",
+	    log_network(_("*** New %s network connection for thread ID #%d, fd #%d ***"),
 			proto_str[args->protocol], tid, args->netfd);
 	}
 
@@ -862,7 +863,7 @@ connection_handler(Network::thread_params_t *args)
 		    }
 		} while (retries);
 		string &key = hand->getKey(args->netfd);
-		log_network("Creating new %s Handler for %s using fd #%d",
+		log_network(_("Creating new %s Handler for %s using fd #%d"),
 			    proto_str[hargs->protocol], key, hargs->netfd);
 		hargs->handler = hand;
 		hargs->buffer = buf;
@@ -880,7 +881,7 @@ connection_handler(Network::thread_params_t *args)
 		    // We're done, close this network connection
 		}
 	    } else {
-		log_network("Resuing %s Handler for %s using fd #%d",
+		log_network(_("Resuing %s Handler for %s using fd #%d"),
 			    proto_str[hargs->protocol], key, hargs->netfd);
 		hand->addClient(args->netfd, Network::HTTP);
 	    }
@@ -906,7 +907,7 @@ connection_handler(Network::thread_params_t *args)
 	    string key = url.hostname() + url.path();
 	    boost::shared_ptr<Handler> hand = cyg.findHandler(url.path());
 	    if (!hand) {
-		log_network("Creating new %s Handler for: %s for fd %#d",
+		log_network(_("Creating new %s Handler for: %s for fd %#d"),
 			    proto_str[args->protocol], key, args->netfd);
 		hand.reset(new Handler);
 		cyg.addHandler(key, hand);
@@ -930,7 +931,7 @@ connection_handler(Network::thread_params_t *args)
 		}
 		if (crcfile.getCgiRoot().size() > 0) {
 		    cgiroot += ":" + crcfile.getCgiRoot();
-		    log_network (_("Cygnal Plugin paths are: %s"), cgiroot);
+		    log_network(_("Cygnal Plugin paths are: %s"), cgiroot);
 		} else {
 		    cgiroot = PLUGINSDIR;
 		}
@@ -951,7 +952,7 @@ connection_handler(Network::thread_params_t *args)
 			net.closeNet(args->netfd);
 		    }
 		} else {
-		    log_error("Couldn't load plugin for %s", key); 
+		    log_error(_("Couldn't load plugin for %s"), key); 
 		}
 		
 		// // We're done, close this network connection
@@ -962,10 +963,11 @@ connection_handler(Network::thread_params_t *args)
 	    // delete rtmp;
 	} // end of if RTMP	
 	
-	log_network("Number of active Threads is %d", tids.num_of_tids());
+	log_network(_("Number of active Threads is %d"), tids.num_of_tids());
 	
 //	net.closeNet(args->netfd); 		// this shuts down this socket connection
-	log_network("Restarting loop for next connection for port %d...", args->port);
+	log_network(_("Restarting loop for next connection for port %d..."),
+                    args->port);
     } while(!done);
 
     // All threads should wake up now.
@@ -1004,12 +1006,12 @@ event_handler(Network::thread_params_t *args)
     // for select. We may want to do this elsewhere, as it could
     // be a performance hit as the number of file descriptors gets
     // larger.
-    log_debug("Handler has %d clients attached, %d threads",
+    log_debug(_("Handler has %d clients attached, %d threads"),
 	      hand->getClients().size(), tids.num_of_tids());
     
     int max = 0;
     for (size_t i = 0; i<hand->getClients().size(); i++) {
-	log_debug("Handler client[%d] is: %d", i, hand->getClient(i));
+	log_debug(_("Handler client[%d] is: %d"), i, hand->getClient(i));
 	if (hand->getClient(i) >= max) {
 	    max = hand->getClient(i);
 	    // hand->dump();
@@ -1022,7 +1024,7 @@ event_handler(Network::thread_params_t *args)
 	// 0 is a reserved stream, so we start with 1, as the reserved
 	// stream isn't one we care about here.
 	if (hand->getActiveDiskStreams()) {
-	    log_network("%d active disk streams",
+	    log_network(_("%d active disk streams"),
 			hand->getActiveDiskStreams());
 	    // hand->dump();
 	}
@@ -1062,11 +1064,11 @@ event_handler(Network::thread_params_t *args)
 	for (int i=0; i <= max + 1; i++) {
 	    if (FD_ISSET(i, &hits)) {
 		FD_CLR(i, &hits);
-		log_network("Got a hit for fd #%d, protocol %s", i,
+		log_network(_("Got a hit for fd #%d, protocol %s"), i,
 			    proto_str[hand->getProtocol(i)]);
 		switch (hand->getProtocol(i)) {
 		  case Network::NONE:
-		      log_error("No protocol specified!");
+		      log_error(_("No protocol specified!"));
 		      break;
 		  case Network::HTTP:
 		  {
@@ -1074,12 +1076,12 @@ event_handler(Network::thread_params_t *args)
 		      // largs.filespec = fullpath;
 		      boost::shared_ptr<HTTPServer> &http = hand->getHTTPHandler(i);
 		      if (!http->http_handler(hand, args->netfd, args->buffer)) {
-			  log_network("Done with HTTP connection for fd #%d, CGI %s", i, args->filespec);
+			  log_network(_("Done with HTTP connection for fd #%d, CGI %s"), i, args->filespec);
 			  net.closeNet(args->netfd);
 			  hand->removeClient(args->netfd);
 			  done = true;
 		      } else {
-			  log_network("Not Done with HTTP connection for fd #%d, it's a persistent connection.", i);
+			  log_network(_("Not Done with HTTP connection for fd #%d, it's a persistent connection."), i);
 			  
 		      }
 		      continue;
@@ -1088,7 +1090,7 @@ event_handler(Network::thread_params_t *args)
 		      args->netfd = i;
 		      // args->filespec = path;
 		      if (!rtmp_handler(args)) {
-			  log_network("Done with RTMP connection for fd #%d, CGI ", i, args->filespec);
+			  log_network(_("Done with RTMP connection for fd #%d, CGI "), i, args->filespec);
 			  done = true;
 		      }
 		      break;
@@ -1099,7 +1101,7 @@ event_handler(Network::thread_params_t *args)
 		      boost::shared_ptr<HTTPServer> &http = hand->getHTTPHandler(i);
 		      // args->filespec = path;
 		      if (!http->http_handler(hand, args->netfd, args->buffer)) {
-			  log_network("Done with HTTP connection for fd #%d, CGI %s", i, largs.filespec);
+			  log_network(_("Done with HTTP connection for fd #%d, CGI %s"), i, largs.filespec);
 			  return;
 		      }		      
 		      break;
@@ -1110,7 +1112,7 @@ event_handler(Network::thread_params_t *args)
 		      // args->filespec = path;
 		      boost::shared_ptr<HTTPServer> &http = hand->getHTTPHandler(i);
 		      if (!http->http_handler(hand, args->netfd, args->buffer)) {
-			  log_network("Done with HTTP connection for fd #%d, CGI %s", i, args->filespec);
+			  log_network(_("Done with HTTP connection for fd #%d, CGI %s"), i, args->filespec);
 			  return;
 		      }		      
 		      break;
@@ -1122,7 +1124,7 @@ event_handler(Network::thread_params_t *args)
 		  case Network::DTN:
 		      break;
 		  default:
-		      log_error("Unsupported network protocol for fd #%d, %d",
+		      log_error(_("Unsupported network protocol for fd #%d, %d"),
 				largs.netfd, hand->getProtocol(i));
 		      done = true;
 		      break;
@@ -1142,7 +1144,7 @@ event_handler(Network::thread_params_t *args)
 	hits = net.waitForNetData(hand->getClients());
 	if (FD_ISSET(0, &hits)) {
 	    FD_CLR(0, &hits);
-	    log_network("Got no hits, %d retries", retries);
+	    log_network(_("Got no hits, %d retries"), retries);
 	    // net.closeNet(args->netfd);
 	    // hand->removeClient(args->netfd);
 	    // done = true;

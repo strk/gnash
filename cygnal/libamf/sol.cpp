@@ -247,7 +247,7 @@ SOL::writeFile(const std::string &filespec, const std::string &name)
 //    GNASH_REPORT_FUNCTION;
     std::ofstream ofs(filespec.c_str(), std::ios::binary);
     if ( ! ofs ) {
-        log_error("Failed opening file '%s' in binary mode", filespec.c_str());
+        log_error(_("Failed opening file '%s' in binary mode"), filespec.c_str());
         return false;
     }
     
@@ -334,14 +334,14 @@ SOL::writeFile(const std::string &filespec, const std::string &name)
     
     if ( ofs.write(head.get(), _header.size()).fail() )
     {
-        log_error("Error writing %d bytes of header to output file %s", 
+        log_error(_("Error writing %d bytes of header to output file %s"),
                 _header.size(), filespec);
         return false;
     }
 
     if ( ofs.write(body.get(), _filesize).fail() )
     {
-        log_error("Error writing %d bytes of body to output file %s",
+        log_error(_("Error writing %d bytes of body to output file %s"),
                 _filesize, filespec);
         return false;
     }
@@ -401,16 +401,16 @@ SOL::readFile(const std::string &filespec)
 	    // consistency check
 	    if ((buf[0] == 0) && (buf[1] == 0xbf)) {
             if (bodysize == length) {
-                log_debug("%s is an SOL file", filespec);
+                log_debug(_("%s is an SOL file"), filespec);
             }
             else {
-		    log_error("%s looks like an SOL file, but the length is wrong. "
-                    "Should be %d, got %d",
+		    log_error(_("%s looks like an SOL file, but the length is wrong. "
+				"Should be %d, got %d"),
                     filespec, (_filesize - 6), length);
             }
         }
         else {
-            log_error("%s isn't an SOL file", filespec);
+            log_error(_("%s isn't an SOL file"), filespec);
 	    }
 	    
 #ifndef GNASH_TRUST_AMF
@@ -452,7 +452,7 @@ SOL::readFile(const std::string &filespec)
 	    return true;
 	}
     catch (std::exception& e) {
-	    log_error("Reading SharedObject %s: %s", filespec, e.what());
+	log_error(_("Reading SharedObject %s: %s"), filespec, e.what());
 	    return false;
 	}
     

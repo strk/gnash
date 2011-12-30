@@ -173,7 +173,7 @@ HTTP::processHeaderFields(cygnal::Buffer *buf)
 	    }
 	    if (name == "content-length") {
 		_filesize = strtol(value.c_str(), NULL, 0);
-		log_debug("Setting Content Length to %d", _filesize);
+		log_debug(_("Setting Content Length to %d"), _filesize);
 	    }
 	    if (name == "content-type") {
 		// This is the type used by flash when sending a AMF data via POST
@@ -186,7 +186,7 @@ HTTP::processHeaderFields(cygnal::Buffer *buf)
 //		    log_debug("Got file data in the POST request");
 		    _filetype = DiskStream::FILETYPE_ENCODED;
 		}
-		log_debug("Setting Content Type to %d", _filetype);
+		log_debug(_("Setting Content Type to %d"), _filetype);
 	    }
 	    
 //	    cerr << "FIXME: " << (void *)i << " : " << dec <<  end << endl;
@@ -196,7 +196,7 @@ HTTP::processHeaderFields(cygnal::Buffer *buf)
 		break;
 #if 1
 	    } else {
-		log_debug("Got a request, parsing \"%s\"", *i);
+		log_debug(_("Got a request, parsing \"%s\""), *i);
 		string::size_type start = i->find(" ");
 		string::size_type params = i->find("?");
 		string::size_type pos = i->find("HTTP/");
@@ -213,16 +213,16 @@ HTTP::processHeaderFields(cygnal::Buffer *buf)
 		    if (params != string::npos) {
 			_params = i->substr(params+1, end);
 			_filespec = i->substr(start+1, params);
-			log_debug("Parameters for file: \"%s\"", _params);
+			log_debug(_("Parameters for file: \"%s\""), _params);
 		    } else {
 			_filespec = i->substr(start+1, pos-start-2);
 		    }
-		    log_debug("Requesting file: \"%s\"", _filespec);
+		    log_debug(_("Requesting file: \"%s\""), _filespec);
 
 		    // HTTP 1.1 enables persistent network connections
 		    // by default.
 		    if (_version.minor > 0) {
-			log_debug("Enabling Keep Alive by default for HTTP > 1.0");
+			log_debug(_("Enabling Keep Alive by default for HTTP > 1.0"));
 			_keepalive = true;
 		    }
 		}
@@ -419,7 +419,7 @@ HTTP::processGetRequest(int fd)
     
     if (buf == 0) {
      //	log_debug("Que empty, net connection dropped for fd #%d", getFileFd());
-	log_debug("Que empty, net connection dropped for fd #%d", fd);
+	log_debug(_("Que empty, net connection dropped for fd #%d"), fd);
 	return false;
     }
     
@@ -430,7 +430,7 @@ HTTP::processGetRequest(int fd)
     // See if the file is in the cache and already opened.
     boost::shared_ptr<DiskStream> filestream(cache.findFile(url));
     if (filestream) {
-	log_network("FIXME: found file in cache!");
+	log_network(_("FIXME: found file in cache!"));
     } else {
 	filestream.reset(new DiskStream);
 //	    cerr << "New Filestream at 0x" << hex << filestream.get() << endl;
@@ -496,7 +496,8 @@ HTTP::processGetRequest(int fd)
 #endif
     }
 
-    log_debug("http_handler all done transferring requested file \"%s\".", _filespec);
+    log_debug(_("http_handler all done transferring requested file \"%s\"."),
+	      _filespec);
     
     return true;
 }
@@ -517,7 +518,7 @@ HTTP::processPostRequest(int fd)
     
     boost::shared_ptr<cygnal::Buffer> buf(_que.pop());
     if (buf == 0) {
-	log_debug("Que empty, net connection dropped for fd #%d", getFileFd());
+	log_debug(_("Que empty, net connection dropped for fd #%d"), getFileFd());
 	return false;
     }
 //    cerr << __FUNCTION__ << buf->allocated() << " : " << hexify(buf->reference(), buf->allocated(), true) << endl;
@@ -538,14 +539,14 @@ HTTP::processPostRequest(int fd)
     }    
     
     if (getField("content-type") == "application/x-www-form-urlencoded") {
-	log_debug("Got file data in POST");
+	log_debug(_("Got file data in POST"));
 	string url = _docroot + _filespec;
 	DiskStream ds(url, *content);
 	ds.writeToDisk();
 //    ds.close();
 	// oh boy, we got ourselves some encoded AMF objects instead of a boring file.
     } else if (getField("content-type") == "application/x-amf") {
-	log_debug("Got AMF data in POST");
+	log_debug(_("Got AMF data in POST"));
 #if 0
 	amf::AMF amf;
 	boost::shared_ptr<cygnal::Element> el = amf.extractAMF(content.reference(), content.end());
@@ -560,7 +561,7 @@ HTTP::processPostRequest(int fd)
     if ((_filespec == "/echo/gateway")
 	&& (getField("content-type") == "application/x-amf")) {
 //	const char *num = (const char *)buf->at(10);
-	log_debug("Got CGI echo request in POST");
+	log_debug(_("Got CGI echo request in POST"));
 //	cerr << "FIXME 2: " << hexify(content->reference(), content->allocated(), true) << endl;
 
 	vector<boost::shared_ptr<cygnal::Element> > headers = parseEchoRequest(*content);
@@ -588,7 +589,7 @@ bool
 HTTP::processPutRequest(int /* fd */)
 {
 //    GNASH_REPORT_FUNCTION;
-    log_unimpl("PUT request");
+    log_unimpl(_("PUT request"));
 
     return false;
 }
@@ -597,7 +598,7 @@ bool
 HTTP::processDeleteRequest(int /* fd */)
 {
 //    GNASH_REPORT_FUNCTION;
-    log_unimpl("DELETE request");
+    log_unimpl(_("DELETE request"));
     return false;
 }
 
@@ -605,7 +606,7 @@ bool
 HTTP::processConnectRequest(int /* fd */)
 {
 //    GNASH_REPORT_FUNCTION;
-    log_unimpl("CONNECT request");
+    log_unimpl(_("CONNECT request"));
     return false;
 }
 
@@ -613,7 +614,7 @@ bool
 HTTP::processOptionsRequest(int /* fd */)
 {
 //    GNASH_REPORT_FUNCTION;
-    log_unimpl("OPTIONS request");
+    log_unimpl(_("OPTIONS request"));
     return false;
 }
 
@@ -621,7 +622,7 @@ bool
 HTTP::processHeadRequest(int /* fd */)
 {
 //    GNASH_REPORT_FUNCTION;
-    log_unimpl("HEAD request");
+    log_unimpl(_("HEAD request"));
     return false;
 }
 
@@ -629,7 +630,7 @@ bool
 HTTP::processTraceRequest(int /* fd */)
 {
 //    GNASH_REPORT_FUNCTION;
-    log_unimpl("TRACE request");
+    log_unimpl(_("TRACE request"));
     return false;
 }
 #endif
@@ -1291,7 +1292,7 @@ HTTP::extractCommand(boost::uint8_t *data)
 	if (params != end) {
 	    _params = std::string(params+1, end);
 	    _filespec = std::string(start, params);
-	    log_debug("Parameters for file: \"%s\"", _params);
+	    log_debug(_("Parameters for file: \"%s\""), _params);
 	} else {
 	    // This is fine as long as end is within the buffer.
 	    _filespec = std::string(start, end);
@@ -1381,7 +1382,7 @@ HTTP::recvChunked(boost::uint8_t *data, size_t size)
 	std::string bytes(data, start-2);
 	size_t sizesize = start-data;
 	total = static_cast<size_t>(strtol(bytes.c_str(), NULL, 16));
-	log_debug("%s: Total size for first chunk is: %d, data size %d (%d)",
+	log_debug(_("%s: Total size for first chunk is: %d, data size %d (%d)"),
 		  __PRETTY_FUNCTION__, total, size, sizesize);
 	buf.reset(new cygnal::Buffer(total+2));
 	// Add the existing data from the previous packet
@@ -1415,7 +1416,8 @@ HTTP::recvChunked(boost::uint8_t *data, size_t size)
  	    //buf->dump();
 	    // We got data.
 	    if (ret == 0) {
-		log_debug("no data yet for fd #%d, continuing...", getFileFd());
+		log_debug(_("no data yet for fd #%d, continuing..."),
+			  getFileFd());
 		done = true;
 	    }
 	    if (ret) {
@@ -1431,7 +1433,7 @@ HTTP::recvChunked(boost::uint8_t *data, size_t size)
 			total = static_cast<size_t>(strtol(bytes.c_str(), NULL, 16));
 			// The total size of the last chunk is always "0"
 			if (total == 0) {
-			    log_debug("%s: end of chunks!", __PRETTY_FUNCTION__);
+			    log_debug(_("%s: end of chunks!"), __PRETTY_FUNCTION__);
 			    pktsize = 0;
 			    done = true;
 			    chunks = false;
@@ -1497,7 +1499,7 @@ HTTP::recvMsg(int fd, size_t size)
 	size = cygnal::NETBUFSIZE;
     }
     
-    log_debug("Starting to wait for data in net for fd #%d", fd);
+    log_debug(_("Starting to wait for data in net for fd #%d"), fd);
     Network net;
 
     do {
@@ -1507,13 +1509,13 @@ HTTP::recvMsg(int fd, size_t size)
 
 	// the read timed out as there was no data, but the socket is still open.
  	if (ret == 0) {
-	    log_debug("no data yet for fd #%d, continuing...", fd);
+	    log_debug(_("no data yet for fd #%d, continuing..."), fd);
  	    continue;
  	}
 	// ret is "no position" when the socket is closed from the other end of the connection,
 	// so we're done.
 	if ((ret == static_cast<size_t>(string::npos)) || (static_cast<int>(ret) == -1)) {
-	    log_debug("socket for fd #%d was closed...", fd);
+	    log_debug(_("socket for fd #%d was closed..."), fd);
 	    return 0;
 	}
 	// We got data. Resize the buffer if necessary.
@@ -1533,17 +1535,17 @@ HTTP::recvMsg(int fd, size_t size)
 		continue;
 	    }
 	} else {
-	    log_debug("no more data for fd #%d, exiting...", fd);
+	    log_debug(_("no more data for fd #%d, exiting..."), fd);
 	    return 0;
 	}
 	if (static_cast<int>(ret) == -1) {
-	  log_debug("Handler done for fd #%d, can't read any data...", fd);
+	    log_debug(_("Handler done for fd #%d, can't read any data..."), fd);
 	  return -1;
 	}
     } while (ret);
     
     // We're done. Notify the other threads the socket is closed, and tell them to die.
-    log_debug("Done receiving data for fd #%d...", fd);
+    log_debug(_("Done receiving data for fd #%d..."), fd);
 
     return ret;
 }
@@ -1561,13 +1563,13 @@ HTTP::dump() {
 
     std::map<string, string>::const_iterator it;
     for (it = _fields.begin(); it != _fields.end(); ++it) {
-	log_debug("Field: \"%s\" = \"%s\"", it->first, it->second);
+	log_debug(_("Field: \"%s\" = \"%s\""), it->first, it->second);
     }
     
     // Dump the RTMPT fields
-    log_debug("RTMPT optional index is: ", _index);
-    log_debug("RTMPT optional client ID is: ", _clientid);
-    log_debug (_("==== ==== ===="));
+    log_debug(_("RTMPT optional index is: "), _index);
+    log_debug(_("RTMPT optional client ID is: "), _clientid);
+    log_debug(_("==== ==== ===="));
 }
 
 } // end of gnash namespace

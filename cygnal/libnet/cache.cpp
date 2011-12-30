@@ -59,7 +59,7 @@ Cache::Cache()
       _pagesize(0)
 {
 //    GNASH_REPORT_FUNCTION;
-    log_error("using this constructor is only allowed for testing purposes.");
+    log_error(_("using this constructor is only allowed for testing purposes."));
 #ifdef USE_STATS_CACHE
     clock_gettime (CLOCK_REALTIME, &_last_access);
 #endif
@@ -102,7 +102,7 @@ Cache::addFile(const std::string &name, boost::shared_ptr<DiskStream> &file)
     // GNASH_REPORT_FUNCTION;
 
     boost::mutex::scoped_lock lock(cache_mutex);
-    log_network("Adding file %s to cache.", name);
+    log_network(_("Adding file %s to cache."), name);
     _files[name] = file;
 }
 
@@ -145,7 +145,7 @@ Cache::findFile(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    log_network("Trying to find %s in the cache.", name);
+    log_network(_("Trying to find %s in the cache."), name);
     boost::mutex::scoped_lock lock(cache_mutex);
 #ifdef USE_STATS_CACHE
     clock_gettime (CLOCK_REALTIME, &_last_access);

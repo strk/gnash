@@ -133,7 +133,7 @@ SSLServer::loadDhParams(SSL_CTX *ctx, char *file)
 
     if (dh && ctx) {
 	if (SSL_CTX_set_tmp_dh(ctx, dh) < 0) {
-	    log_error("ssl!!", "Couldn't set DH parameters: %s ",
+	    log_error(_("ssl!!", "Couldn't set DH parameters: %s "),
 		      ERR_reason_error_string(ERR_get_error()));
 	    return false;
 	}
@@ -166,8 +166,8 @@ SSLServer::sslAccept(int fd)
 
     int ret = 0;
     if((ret = SSL_accept(_ssl.get()) <= 0)) {
- 	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
-	
+ 	log_error(_("Error was: \"%s\"!"),
+		  ERR_reason_error_string(ERR_get_error()));
     }
 
     return 0;

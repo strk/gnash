@@ -134,7 +134,8 @@ SSLClient::sslRead(boost::uint8_t *buf, size_t size)
     ERR_clear_error();
     int ret = SSL_read(_ssl.get(), buf, size);
     if (ret < 0) {
-	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
+	log_error(_("Error was: \"%s\"!"),
+		  ERR_reason_error_string(ERR_get_error()));
     }
     
     return ret;
@@ -157,7 +158,8 @@ SSLClient::sslWrite(const boost::uint8_t *buf, size_t length)
     ERR_clear_error();
     int ret = SSL_write(_ssl.get(), buf, length);
     if (ret < 0) {
-	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
+	log_error(_("Error was: \"%s\"!"),
+		  ERR_reason_error_string(ERR_get_error()));
     }
     return ret;
 }
@@ -206,20 +208,21 @@ SSLClient::sslSetupCTX(std::string &keyspec, std::string &caspec)
     ERR_clear_error();
     if (!(SSL_CTX_load_verify_locations(_ctx.get(), cafile.c_str(),
 					_rootpath.c_str()))) {
-	log_error("Can't read CA list from \"%s\"!", cafile);
- 	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
+	log_error(_("Can't read CA list from \"%s\"!"), cafile);
+ 	log_error(_("Error was: \"%s\"!"),
+		  ERR_reason_error_string(ERR_get_error()));
 	return false;
     } else {
-	log_debug("Read CA list from \"%s\"", cafile);
+	log_debug(_("Read CA list from \"%s\""), cafile);
     }
     
     // Load our keys and certificates
     ERR_clear_error();
     if ((ret = SSL_CTX_use_certificate_chain_file(_ctx.get(), keyfile.c_str())) != 1) {
-	log_error("Can't read certificate file \"%s\"!", keyfile);
+	log_error(_("Can't read certificate file \"%s\"!"), keyfile);
 	return false;
     } else {
-	log_debug("Read certificate file \"%s\".", keyfile);
+	log_debug(_("Read certificate file \"%s\"."), keyfile);
     }
 
     // Set the password as a callback, otherwise we get prompted for it
@@ -229,11 +232,12 @@ SSLClient::sslSetupCTX(std::string &keyspec, std::string &caspec)
     ERR_clear_error();
     if((ret = SSL_CTX_use_PrivateKey_file(_ctx.get(), keyfile.c_str(),
 					  SSL_FILETYPE_PEM)) != 1) {
-	log_error("Can't read CERT file \"%s\"!", keyfile);
- 	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
+	log_error(_("Can't read CERT file \"%s\"!"), keyfile);
+	log_error(_("Error was: \"%s\"!"),
+		  ERR_reason_error_string(ERR_get_error()));
 	return false;
     } else {
-	log_debug("Read key file \"%s\".", keyfile);
+	log_debug(_("Read key file \"%s\"."), keyfile);
     }
 
      SSL_CTX_set_verify(_ctx.get(), SSL_VERIFY_PEER, verify_callback);
@@ -294,10 +298,10 @@ SSLClient::sslConnect(int fd, std::string &hostname, short port)
     _bio.reset(BIO_new_connect(const_cast<char *>(_hostname.c_str())));
 
     BIO_set_conn_int_port(_bio.get(), &port);
-    log_debug("PORT is: %d", BIO_get_conn_port(_bio.get()));
+    log_debug(_("PORT is: %d"), BIO_get_conn_port(_bio.get()));
 
     if (BIO_do_connect(_bio.get()) <= 0) {
-        log_error("Error connecting to remote machine: %s",
+        log_error(_("Error connecting to remote machine: %s"),
 		  ERR_reason_error_string(ERR_get_error()));
     }
 #endif
@@ -306,11 +310,12 @@ SSLClient::sslConnect(int fd, std::string &hostname, short port)
     SSL_set_connect_state(_ssl.get());
     
     if ((ret = SSL_connect(_ssl.get())) < 0) {
-        log_error("Can't connect to SSL server %s", hostname);
- 	log_error("Error was: \"%s\"!", ERR_reason_error_string(ERR_get_error()));
+        log_error(_("Can't connect to SSL server %s"), hostname);
+ 	log_error(_("Error was: \"%s\"!"),
+		  ERR_reason_error_string(ERR_get_error()));
         return false;
     } else {
-        log_debug("Connected to SSL server %s", hostname);
+        log_debug(_("Connected to SSL server %s"), hostname);
     }
 
     ERR_clear_error();
@@ -343,10 +348,10 @@ SSLClient::checkCert(std::string &hostname)
     char peer_CN[256];
     
     if (SSL_get_verify_result(_ssl.get()) != X509_V_OK) {
-	log_error("Certificate doesn't verify");
+	log_error(_("Certificate doesn't verify"));
 	return false;
     } else {
-	log_debug("Certificate verified.");
+	log_debug(_("Certificate verified."));
     }
 
     // Check the cert chain. The chain length
@@ -355,10 +360,10 @@ SSLClient::checkCert(std::string &hostname)
 
     // Check the common name
     if ((peer = SSL_get_peer_certificate(_ssl.get())) == 0) {
-	log_debug("Couldn't get Peer certificate!");
+	log_debug(_("Couldn't get Peer certificate!"));
 	return false;
     } else {
-	log_debug("Got Peer certificate.");
+	log_debug(_("Got Peer certificate."));
     }
     
     ERR_clear_error();
@@ -366,7 +371,7 @@ SSLClient::checkCert(std::string &hostname)
 			       NID_commonName, peer_CN, 256);
 
     if (strcasecmp(peer_CN, hostname.c_str())) {
-	log_error("Common name doesn't match host name");
+	log_error(_("Common name doesn't match host name"));
     }
 
     return true;
@@ -378,7 +383,7 @@ SSLClient::dump() {
     
     boost::mutex::scoped_lock lock(stl_mutex);
         
-    log_debug (_("==== The SSL header breaks down as follows: ===="));
+    log_debug(_("==== The SSL header breaks down as follows: ===="));
 }
 
 // The password is a global variable so it can be set from a C function
@@ -401,11 +406,11 @@ password_cb(char *buf, int size, int /* rwflag */, void * /* userdata */)
 {
     GNASH_REPORT_FUNCTION;
 
-    log_debug("Callback executed to set the SSL password, size is: %d",
+    log_debug(_("Callback executed to set the SSL password, size is: %d"),
 	      password.size());
     
     if(size <= static_cast<int>(password.size()+1)) {
-	log_error("The buffer for the password needs to be %d bytes larger",
+	log_error(_("The buffer for the password needs to be %d bytes larger"),
 		  password.size() - size);
 	return(0);
     }
@@ -431,12 +436,12 @@ verify_callback(int ok, X509_STORE_CTX *store)
         int  depth = X509_STORE_CTX_get_error_depth(store);
         int  err = X509_STORE_CTX_get_error(store);
 	
-        log_error("-Error with certificate at depth: %i\n", depth);
+        log_error(_("-Error with certificate at depth: %i\n"), depth);
         X509_NAME_oneline(X509_get_issuer_name(cert), data, 256);
-        log_error("  issuer   = %s\n", data);
+        log_error(_("  issuer   = %s\n"), data);
         X509_NAME_oneline(X509_get_subject_name(cert), data, 256);
-        log_error("  subject  = %s\n", data);
-        log_error("err %i:%s\n", err, X509_verify_cert_error_string(err));
+        log_error(_("  subject  = %s\n"), data);
+        log_error(_("err %i:%s\n"), err, X509_verify_cert_error_string(err));
     }
  
     return ok;
@@ -449,5 +454,5 @@ verify_callback(int ok, X509_STORE_CTX *store)
 
 // local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

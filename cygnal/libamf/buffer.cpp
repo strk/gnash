@@ -176,7 +176,7 @@ Buffer::~Buffer()
 #ifdef USE_STATS_BUFFERS
 	struct timespec now;
 	clock_gettime (CLOCK_REALTIME, &now);
-	log_debug("Buffer %x (%d) stayed in queue for %f seconds",
+	log_debug(_("Buffer %x (%d) stayed in queue for %f seconds"),
 		  (void *)_data.get(), _nbytes,
 		  (float)((now.tv_sec - _stamp.tv_sec) + ((now.tv_nsec - _stamp.tv_nsec)/1e9)));
 #endif
@@ -708,7 +708,7 @@ Buffer::resize(size_t size)
 	// deleted when this method returns.
 	// We loose data if we resize smaller than the data currently held.
 	if (size < used) {
-	    gnash::log_error("cygnal::Buffer::resize(%d): Truncating data (%d bytes) while resizing!", size, used - size);
+	    gnash::log_error(_("cygnal::Buffer::resize(%d): Truncating data (%d bytes) while resizing!"), size, used - size);
 	    used = size;
 	}
 	boost::uint8_t *newptr = new boost::uint8_t[size];
@@ -763,7 +763,7 @@ Buffer::corrupt(int factor)
     // Pick the number of errors to create based on the Buffer's data size
     boost::uniform_int<> errs(1, (_nbytes/factor));
     int errors = errs(seed);
-    gnash::log_debug("Creating %d errors in the buffer", errors);
+    gnash::log_debug(_("Creating %d errors in the buffer"), errors);
     
     for (int i=0; i<errors; i++) {
 	// find a location someplace within the file.

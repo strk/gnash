@@ -101,7 +101,7 @@ Handler::addClient(int fd, Network::protocols_supported_e proto)
 
     boost::mutex::scoped_lock lock(_mutex);
     
-    log_debug("Adding %d to the client array.", fd);
+    log_debug(_("Adding %d to the client array."), fd);
     switch (proto) {
       case Network::NONE:
 	  break;
@@ -125,7 +125,7 @@ Handler::addClient(int fd, Network::protocols_supported_e proto)
       case Network::RTMPS:
       case Network::DTN:
       default:
-	  log_unimpl("Protocol %d for Handler::AddClient()", proto);
+	  log_unimpl(_("Protocol %d for Handler::AddClient()"), proto);
 	  break;
     }
 
@@ -165,10 +165,10 @@ Handler::parseFirstRequest(int fd, gnash::Network::protocols_supported_e proto)
 	      }
 	      path = _http[fd]->getFilespec();
 	      key = hostname + path;
-	      log_debug("HTTP key is: %s", key);
+	      log_debug(_("HTTP key is: %s"), key);
 	      _keys[fd] = key;
 	  } else {
-	      log_error("HTTP key couldn't be read!");
+	      log_error(_("HTTP key couldn't be read!"));
 	  }
 #else
 	  HTTPServer http;
@@ -190,10 +190,10 @@ Handler::parseFirstRequest(int fd, gnash::Network::protocols_supported_e proto)
 	      }
 	      path = http.getFilespec();
 	      key = hostname + path;
-	      log_debug("HTTP key is: %s", key);
+	      log_debug(_("HTTP key is: %s"), key);
 	      _keys[fd] = key;
 	  } else {
-	      log_error("HTTP key couldn't be read!");
+	      log_error(_("HTTP key couldn't be read!"));
 	  }	  
 #endif
 	  break;
@@ -211,7 +211,7 @@ Handler::parseFirstRequest(int fd, gnash::Network::protocols_supported_e proto)
       case Network::RTMPS:
       case Network::DTN:
       default:
-	  log_error("FD #%d has no protocol handler registered", fd);
+	  log_error(_("FD #%d has no protocol handler registered"), fd);
 	  break;
     };
 
@@ -241,7 +241,7 @@ Handler::recvMsg(int fd)
       case Network::RTMPS:
       case Network::DTN:
       default:
-	  log_error("FD #%d has no protocol handler registered", fd);
+	  log_error(_("FD #%d has no protocol handler registered"), fd);
 	  break;
     }
 
@@ -258,7 +258,7 @@ Handler::removeClient(int x)
     vector<int>::iterator it;
     for (it = _clients.begin(); it < _clients.end(); ++it) {
 	if (*it == x) {
-	    log_debug("Removing %d from the client array.", *it);
+	    log_debug(_("Removing %d from the client array."), *it);
 	    _clients.erase(it);
 	}
     }
@@ -319,7 +319,7 @@ Handler::initModule(const std::string& str)
 	log_network(_("No %s symbol in plugin"), symbol);
     } else {
 	boost::shared_ptr<cygnal_init_t> info = init_symptr(_netconnect);
-	log_network("Initialized Plugin: \"%s\": %s", info->version,
+	log_network(_("Initialized Plugin: \"%s\": %s"), info->version,
 		    info->description);
     }
     
@@ -459,7 +459,7 @@ Handler::playStream(const std::string &filespec)
     string fullpath = crcfile.getDocumentRoot();
     fullpath += "/";
     fullpath += filespec;
-    log_debug("FILENAME: %s", fullpath);
+    log_debug(_("FILENAME: %s"), fullpath);
 
     // gnash::DiskStream &ds = findStream(filespec);
     if (ds->getState() == DiskStream::CREATED) {

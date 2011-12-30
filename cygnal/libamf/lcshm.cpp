@@ -369,7 +369,7 @@ LcShm::parseHeader(boost::uint8_t *data, boost::uint8_t* tooFar)
     boost::uint8_t *ptr = data;
 
     if (data == 0) {
-        log_debug("No data pointer to parse!");
+        log_debug(_("No data pointer to parse!"));
         return 0;
     }
 
@@ -388,7 +388,7 @@ LcShm::parseHeader(boost::uint8_t *data, boost::uint8_t* tooFar)
     AMF amf;
     boost::shared_ptr<Element> el = amf.extractAMF(ptr, tooFar);
     if (el == 0) {
-        log_debug("Didn't extract an element from the byte stream!");
+        log_debug(_("Didn't extract an element from the byte stream!"));
         return 0;
     }
     _object.connection_name = el->to_string();
@@ -500,10 +500,11 @@ LcShm::connect(const string& names)
     //GNASH_REPORT_FUNCTION;
 
     //log_debug(" The connect function is called");	
-	log_debug(" The size of %s is %d ",names, names.size()); 
+    log_debug(_(" The size of %s is %d "), names, names.size()); 
 	
-	if (names == "")
-		return false;
+    if (names == "") {
+	return false;
+    }
     
     _name = names;
 
@@ -516,7 +517,7 @@ LcShm::connect(const string& names)
     }
 
     if (SharedMem::begin() <= 0) {
-        log_error("Failed to open shared memory segment: \"%s\"", names.c_str());
+        log_error(_("Failed to open shared memory segment: \"%s\""), names.c_str());
         return false; 
     }
     
@@ -557,7 +558,7 @@ LcShm::connect(key_t key)
     }
 
     if (SharedMem::begin() <= 0) {
-        log_error("Failed to open shared memory segment: 0x%x", key);
+        log_error(_("Failed to open shared memory segment: 0x%x"), key);
         return false; 
     }
     

@@ -172,7 +172,7 @@ Element::Element(bool /* flag */, double /* unknown1 */, double /* unknown2 */,
       _referenceid(0)
 {
 //    GNASH_REPORT_FUNCTION;
-    log_unimpl("Can't create remote function calls yet");
+    log_unimpl(_("Can't create remote function calls yet"));
 }
 
 Element &
@@ -476,7 +476,7 @@ Element::encode(bool notobject)
 	    size += _properties[i]->getNameSize();
 	    size += AMF_PROP_HEADER_SIZE;
 	}
-	gnash::log_debug("Size of Element \"%s\" is: %d", _name, size);
+	gnash::log_debug(_("Size of Element \"%s\" is: %d"), _name, size);
 	buf.reset(new Buffer(size+AMF_PROP_HEADER_SIZE));
 	if (!notobject) {
 	    *buf = Element::OBJECT_AMF0;
@@ -1531,7 +1531,7 @@ Element::dump(std::ostream& os) const
 	  break;
       case Element::AMF3_DATA:
 	  if (getDataSize() != 0) {
-	      gnash::log_debug("FIXME: got AMF3 data!");
+	      gnash::log_debug(_("FIXME: got AMF3 data!"));
 	  }
 //	  cerr << "AMF3 data is: 0x" << hexify(_data, _length, false) << endl;
 	  break;

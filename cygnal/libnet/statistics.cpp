@@ -27,7 +27,6 @@
 #include "netstats.h"
 #include "statistics.h"
 
-
 static boost::mutex io_mutex;
 
 // The string versions of the codec, used for debugging. If you add

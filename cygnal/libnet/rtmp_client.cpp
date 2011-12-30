@@ -149,17 +149,17 @@ RTMPClient::encodeConnect(const char *uri,
     swfUrl = "http://localhost:1935/demos/videoConference.swf";
     pageUrl = "http://gnashdev.org";
     
-    log_network("URL is %s", url);
-    log_network("Protocol is %s", protocol);
-    log_network("Host is %s", hostname);
-    log_network("Port is %s", port);
-    log_network("Path is %s", path);
-    log_network("Filename is %s", filename);
-    log_network("App is %s", app);
-    log_network("Query is %s", query);
-    log_network("tcUrl is %s", tcUrl);
-    log_network("swfUrl is %s", swfUrl);
-    log_network("pageUrl is %s", pageUrl);
+    log_network(_("URL is %s"), url);
+    log_network(_("Protocol is %s"), protocol);
+    log_network(_("Host is %s"), hostname);
+    log_network(_("Port is %s"), port);
+    log_network(_("Path is %s"), path);
+    log_network(_("Filename is %s"), filename);
+    log_network(_("App is %s"), app);
+    log_network(_("Query is %s"), query);
+    log_network(_("tcUrl is %s"), tcUrl);
+    log_network(_("swfUrl is %s"), swfUrl);
+    log_network(_("pageUrl is %s"), pageUrl);
 
     return encodeConnect(app.c_str(), swfUrl.c_str(), tcUrl.c_str(),
 			 audioCodecs, videoCodecs, videoFunction,
@@ -310,7 +310,7 @@ RTMPClient::connectToServer(const std::string &url)
 	// server.
 	boost::shared_ptr<cygnal::Buffer> handshake1 = handShakeRequest();
 	if (!handshake1) {
-	    log_error("RTMP handshake request failed");
+	    log_error(_("RTMP handshake request failed"));
 	    return false;
 	}
 	
@@ -333,7 +333,7 @@ RTMPClient::connectToServer(const std::string &url)
 	handshake2->dump();
         if (!clientFinish(*handshake2)) {
 #endif
-	    log_error("RTMP handshake completion failed!");
+	    log_error(_("RTMP handshake completion failed!"));
 //	    return (false);
 	}
 	
@@ -347,10 +347,10 @@ RTMPClient::connectToServer(const std::string &url)
 	    boost::shared_ptr<RTMPMsg> msg = msgque.front();
 	    msgque.pop_front();
 	    if (msg->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
-		log_network("Sent NetConnection Connect message successfully");
+		log_network(_("Sent NetConnection Connect message successfully"));
 	    }		    
 	    if (msg->getStatus() ==  RTMPMsg::NC_CONNECT_FAILED) {
-		log_error("Couldn't send NetConnection Connect message,");
+		log_error(_("Couldn't send NetConnection Connect message,"));
 	    }
 	}
     }
@@ -619,7 +619,7 @@ RTMPClient::clientFinish(cygnal::Buffer &data)
 	    done = true;
 	}
 	if (ret < 0) {
-	    log_error (_("Couldn't read data block in handshake!"));
+	    log_error(_("Couldn't read data block in handshake!"));
 	    handshake1.reset();
 	    return handshake1;
 	}
@@ -632,17 +632,18 @@ RTMPClient::clientFinish(cygnal::Buffer &data)
     } while (!done);
 
     if (handshake1->allocated() == boost::lexical_cast<size_t>(max_size)) {
-	log_network (_("Read data block in handshake, got %d bytes."),
+	log_network(_("Read data block in handshake, got %d bytes."),
 		   handshake1->allocated());
     } else {
-	log_error("Couldn't read data block in handshake, read %d bytes!",
+	log_error(_("Couldn't read data block in handshake, read %d bytes!"),
 		  handshake1->allocated());
     }    
 
     _handshake_header.uptime = ntohl(*reinterpret_cast<boost::uint32_t *>
 				     (handshake1->reference() + 1));
 
-    log_network("RTMP Handshake header: Uptime: %u", _handshake_header.uptime);
+    log_network(_("RTMP Handshake header: Uptime: %u"),
+		_handshake_header.uptime);
 
 #if 0
     if (memcmp(handshake2->reference() + RTMP_HANDSHAKE_SIZE + 8,
@@ -684,11 +685,13 @@ RTMPClient::clientFinish(cygnal::Buffer &data)
     *handshake2 += data;
 
     // Write the second chunk to the server
-    log_network("About to write %d bytes, data is: %d bytes.",
+    log_network(_("About to write %d bytes, data is: %d bytes."),
 	      handshake2->allocated(),
 	      data.allocated());
-    log_network("Client response header for handshake 2: %s", hexify(handshake2->reference(), 12, false));
-    log_network("Data in response for handshake 2: %s", hexify(handshake1->reference() + RTMP_HANDSHAKE_SIZE + 1, 12, false));
+    log_network(_("Client response header for handshake 2: %s"),
+		hexify(handshake2->reference(), 12, false));
+    log_network(_("Data in response for handshake 2: %s"),
+		hexify(handshake1->reference() + RTMP_HANDSHAKE_SIZE + 1, 12, false));
 #if 0
     ret = writeNet(handshake2->reference()+RTMP_HANDSHAKE_SIZE,
 		   RTMP_HANDSHAKE_SIZE + data.allocated() + 1);
@@ -696,7 +699,7 @@ RTMPClient::clientFinish(cygnal::Buffer &data)
     ret = writeNet(*handshake2);
 #endif
     if ( ret <= 0 ) {
-	log_error("Couldn't write the second handshake packet!");
+	log_error(_("Couldn't write the second handshake packet!"));
 	handshake1.reset();
 	return handshake1;
     } else {
@@ -723,7 +726,7 @@ RTMPClient::recvResponse()
     // messages on channel 2, and the response message on channel 3 from our request.
     boost::shared_ptr<cygnal::Buffer> response = recvMsg();
     if (!response) {
-	log_error("Got no response from the RTMP server");
+	log_error(_("Got no response from the RTMP server"));
 	return msgque;
     }
 
@@ -731,7 +734,7 @@ RTMPClient::recvResponse()
     // but when I do streaming, it's always there, so we need to remove it.
     boost::uint8_t *pktstart = response->reference();
     if (*pktstart == 0xff) {
-	log_network("Got empty packet in buffer.");
+	log_network(_("Got empty packet in buffer."));
 	pktstart++;
     }
 
@@ -742,15 +745,14 @@ RTMPClient::recvResponse()
 
     // If we got no responses, something obviously went wrong.
     if (!que->size()) {
-        log_error("No response from INVOKE of NetConnection connect");
-	
+        log_error(_("No response from INVOKE of NetConnection connect"));
     }
 
     // There is a queue of queues used to hold all the messages. The first queue
     // is indexed by the channel number, the second queue is all the messages that
     // have arrived for that channel.
     while (que->size()) {	// see if there are any messages at all
-	log_network("%s: There are %d channel queues in the RTMP input queue, %d messages in front queue",
+	log_network(_("%s: There are %d channel queues in the RTMP input queue, %d messages in front queue"),
 		  __PRETTY_FUNCTION__, que->size(), que->front()->size());
 	// Get the CQue for the first channel
 	CQue *channel_q = que->front();
@@ -763,36 +765,38 @@ RTMPClient::recvResponse()
 	    if (ptr) {		// If there is legit data
 		rthead = decodeHeader(ptr->reference());
 		if (!rthead) {
-		    log_error("Couldn't decode RTMP message header");
+		    log_error(_("Couldn't decode RTMP message header"));
 		    continue;
 		}
 		switch (rthead->type) {
 		  case RTMP::NONE:
-		      log_error("RTMP packet can't be of none type!");
+		      log_error(_("RTMP packet can't be of none type!"));
+                      
 		      break;
 		  case RTMP::CHUNK_SIZE:
-		      log_unimpl("Server message data packet");
+		      log_unimpl(_("Server message data packet"));
+                      
 		      break;
 		  case RTMP::ABORT:
-		      log_unimpl("Abort packet");
+		      log_unimpl(_("Abort packet"));
 		      break;
 		  case RTMP::BYTES_READ:
-		      log_unimpl("Bytes Read data packet");
+		      log_unimpl(_("Bytes Read data packet"));
 		      break;
 		  case RTMP::USER:
 		  {
 		      boost::shared_ptr<RTMP::rtmp_ping_t> ping = decodePing(ptr->reference() + rthead->head_size);
-		      log_network("Got a Ping type %s", ping_str[ping->type]);
+		      log_network(_("Got a Ping type %s"), ping_str[ping->type]);
 		      break;
 		  }
 		  case RTMP::WINDOW_SIZE:
-		      log_unimpl("Set Window Size message data packet");
+		      log_unimpl(_("Set Window Size message data packet"));
 		      break;
 		  case RTMP::SET_BANDWITH:
-		      log_unimpl("Set Bandwidthmessage data packet");
+		      log_unimpl(_("Set Bandwidthmessage data packet"));
 		      break;
 		  case RTMP::ROUTE:
-		      log_unimpl("Route from other server packet");
+		      log_unimpl(_("Route from other server packet"));
 		      break;
 		  case RTMP::AUDIO_DATA:
 		  {
@@ -811,19 +815,19 @@ RTMPClient::recvResponse()
 		      break;
 		  }
 		  case RTMP::SHARED_OBJ:
-		      log_unimpl("AMF0 Shared Object data packet message");
+		      log_unimpl(_("AMF0 Shared Object data packet message"));
 		      break;
 		  case RTMP::AMF3_NOTIFY:
-		      log_unimpl("AMF3 Notify data packet message");
+		      log_unimpl(_("AMF3 Notify data packet message"));
 		      break;
 		  case RTMP::AMF3_SHARED_OBJ:
-		      log_unimpl("AMF3 Shared Object data packet message");
+		      log_unimpl(_("AMF3 Shared Object data packet message"));
 		      break;
 		  case RTMP::AMF3_INVOKE:
-		      log_unimpl("AMF0 Invoke packet message");
+		      log_unimpl(_("AMF0 Invoke packet message"));
 		      break;
 		  case RTMP::NOTIFY:
-		      log_unimpl("AMF0 Notify data packet message");
+		      log_unimpl(_("AMF0 Notify data packet message"));
 		      break;
 		  case RTMP::INVOKE:
 		  {
@@ -834,10 +838,10 @@ RTMPClient::recvResponse()
 		      break;
 		  }
 		  case RTMP::FLV_DATA:
-		      log_unimpl("Flv data packet message");
+		      log_unimpl(_("Flv data packet message"));
 		      break;
 		  default :
-		      log_error("Couldn't decode RTMP message Body");
+		      log_error(_("Couldn't decode RTMP message Body"));
 		      break;
 		}
 	    }
@@ -859,5 +863,5 @@ RTMPClient::recvResponse()
 
 // local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

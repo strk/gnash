@@ -304,7 +304,7 @@ DiskStream::DiskStream(const string &str, int netfd)
 DiskStream::~DiskStream()
 {
     GNASH_REPORT_FUNCTION;
-    log_debug("Deleting %s on fd #%d", _filespec, _filefd);
+    log_debug(_("Deleting %s on fd #%d"), _filespec, _filefd);
 
     if (_filefd) {
         ::close(_filefd);
@@ -348,7 +348,7 @@ DiskStream::close()
 {
     // GNASH_REPORT_FUNCTION;
 
-    log_debug("Closing %s on fd #%d", _filespec, _filefd);
+    log_debug(_("Closing %s on fd #%d"), _filespec, _filefd);
 
     if (_filefd) {
         ::close(_filefd);
@@ -401,7 +401,8 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
 {
     GNASH_REPORT_FUNCTION;
 
-    log_debug("%s: offset is: %d", __FUNCTION__, offset);
+
+    log_debug(_("%s: offset is: %d"), __FUNCTION__, offset);
 
     // store the offset we came in with so next time we know where to start
     _offset = offset;
@@ -415,20 +416,22 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
 	if (offset % _pagesize) {
 	    // calculate the number of pages
 	    page = ((offset - (offset % _pagesize)) / _pagesize) * _pagesize;
- 	    log_debug("Adjusting offset from %d to %d so it's page aligned.",
+ 	    log_debug(_("Adjusting offset from %d to %d so it's page aligned."),
  		      offset, page);
 	} else {
-	    log_debug("Offset is page aligned already");
+	    log_debug(_("Offset is page aligned already"));
 	}
     }
 
     // Figure out the maximum number of bytes we can load into memory.
     size_t loadsize = 0;
     if (filesize < _max_memload) {
-	log_debug("Loading entire file of %d bytes into memory segment", filesize);
+	log_debug(_("Loading entire file of %d bytes into memory segment"),
+		    filesize);
 	loadsize = filesize;
     } else {
-	log_debug("Loading partial file of %d bytes into memory segment", filesize, _max_memload);
+	log_debug(_("Loading partial file of %d bytes into memory segment"),
+		  filesize, _max_memload);
 	loadsize = _max_memload;
     }
     
@@ -436,7 +439,7 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
     // this DiskStream, so sufficient memory will already be allocated for this data.
     // If the data came from a disk based file, then we allocate enough memory to hold it.
     if (_dataptr) {
-	log_debug("Using existing Buffer for file");
+	log_debug(_("Using existing Buffer for file"));
 	return _dataptr + offset;
     }
     
@@ -487,16 +490,16 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
 						     _filefd, page));
 #endif
     } else {
-	log_error (_("Couldn't load file %s"), _filespec);
+	log_error(_("Couldn't load file %s"), _filespec);
 	return 0;
     }
     
     if (dataptr == MAP_FAILED) {
-	log_error (_("Couldn't map file %s into memory: %s"),
+	log_error(_("Couldn't map file %s into memory: %s"),
 		   _filespec, strerror(errno));
 	return 0;
     } else {
-	log_debug (_("File %s a offset %d mapped to: %p"), _filespec, offset, (void *)dataptr);
+	log_debug(_("File %s a offset %d mapped to: %p"), _filespec, offset, (void *)dataptr);
 	clock_gettime (CLOCK_REALTIME, &_last_access);
 	_dataptr = dataptr;
 	// map the seekptr to the end of data
@@ -580,7 +583,7 @@ DiskStream::writeToDisk(const std::string &filespec, boost::uint8_t *data, size_
     if (fd < 0) {
         log_error(strerror(errno));
     }
-    log_debug("Writing data (%d bytes) to disk: \"%s\"", size, filespec);
+    log_debug(_("Writing data (%d bytes) to disk: \"%s\""), size, filespec);
     ::write(fd, data, size);
     ::close(fd);
 
@@ -654,7 +657,7 @@ DiskStream::open(const string &filespec, int netfd, Statistics &statistics)
     _statistics = statistics;
     _filespec = filespec;
 
-    log_debug("Trying to open %s", filespec);
+    log_debug(_("Trying to open %s"), filespec);
     
     if (getFileStats(filespec)) {
 	boost::mutex::scoped_lock lock(io_mutex);
@@ -721,12 +724,14 @@ DiskStream::play(int netfd, bool flag)
 	}
         switch (_state) {
 	  case NO_STATE:
-	      log_network("No Diskstream open %s for net fd #%d", _filespec, netfd);
+	      log_network(_("No Diskstream open %s for net fd #%d"),
+			  _filespec, netfd);
 	      break;
           case CREATED:
           case CLOSED:
 	      if (_dataptr) {
-		  log_network("Diskstream %s is closed on net fd #%d.", _filespec, netfd);
+		  log_network(_("Diskstream %s is closed on net fd #%d."),
+			      _filespec, netfd);
 	      }
 	      done = true;
 	      continue;
@@ -745,12 +750,13 @@ DiskStream::play(int netfd, bool flag)
 #else
 		  ret = net.writeNet(netfd, (_dataptr + _offset), (_filesize - _offset));
 		  if (ret != (_filesize - _offset)) {
-		      log_error("In %s(%d): couldn't write %d bytes to net fd #%d! %s",
+		      log_error(_("In %s(%d): couldn't write %d bytes to net fd #%d! %s"),
 				__FUNCTION__, __LINE__, (_filesize - _offset),
 				netfd, strerror(errno));
 		  }
 #endif
-		  log_network("Done playing file %s, size was: %d", _filespec, _filesize);
+		  log_network(_("Done playing file %s, size was: %d"),
+			      _filespec, _filesize);
  		  close();
 		  done = true;
 		  // reset to the beginning of the file
@@ -762,7 +768,7 @@ DiskStream::play(int netfd, bool flag)
 #else
 		  ret = net.writeNet(netfd, (_dataptr + _offset), _pagesize);
 		  if (ret != _pagesize) {
-		      log_error("In %s(%d): couldn't write %d of bytes of data to net fd #%d! Got %d, %s",
+		      log_error(_("In %s(%d): couldn't write %d of bytes of data to net fd #%d! Got %d, %s"),
 				__FUNCTION__, __LINE__, _pagesize, netfd,
 				ret, strerror(errno));
 		      return false;
@@ -774,7 +780,7 @@ DiskStream::play(int netfd, bool flag)
 		case EINVAL:
 		case ENOSYS:
 		case EFAULT:
-		    log_network("ERROR: %s", strerror(errno));
+		    log_error("%s", strerror(errno));
 		    break;
 		default:
 		    break;
@@ -794,7 +800,7 @@ DiskStream::play(int netfd, bool flag)
           case MULTICAST:
               break;
           case DONE:
-	      log_debug("Restarting Disk Stream from the beginning");
+	      log_debug(_("Restarting Disk Stream from the beginning"));
 	      _offset = 0;
 	      _filefd = 0;
 	      _state = PLAY;
@@ -839,7 +845,7 @@ DiskStream::preview(const string & /*filespec*/, int /*frames*/)
 //    GNASH_REPORT_FUNCTION;
 
     _state = PREVIEW;
-    log_unimpl("%s", __PRETTY_FUNCTION__);
+    log_unimpl(__PRETTY_FUNCTION__);
     return true; // Default to true    
 }
 
@@ -860,7 +866,7 @@ DiskStream::thumbnail(const string & /*filespec*/, int /*quantity*/)
 //    GNASH_REPORT_FUNCTION;
     
     _state = THUMBNAIL;
-    log_unimpl("%s", __PRETTY_FUNCTION__);
+    log_unimpl(__PRETTY_FUNCTION__);
     return true; // Default to true
 }
 
@@ -873,7 +879,7 @@ DiskStream::pause()
 //    GNASH_REPORT_FUNCTION;
     
     _state = PAUSE;
-    log_unimpl("%s", __PRETTY_FUNCTION__);
+    log_unimpl(__PRETTY_FUNCTION__);
     return true; // Default to true
 }
 
@@ -907,7 +913,7 @@ DiskStream::upload(const string & /*filespec*/)
 //    GNASH_REPORT_FUNCTION;
     
     _state = UPLOAD;
-    log_unimpl("%s", __PRETTY_FUNCTION__);
+    log_unimpl( __PRETTY_FUNCTION__);
     return true; // Default to true
 }
 
@@ -918,7 +924,7 @@ DiskStream::multicast(const string & /*filespec*/)
 //    GNASH_REPORT_FUNCTION;
     
     _state = MULTICAST;
-    log_unimpl("%s", __PRETTY_FUNCTION__);
+    log_unimpl(__PRETTY_FUNCTION__);
     return true; // Default to true    
 }
 
@@ -947,7 +953,7 @@ DiskStream::getFileStats(const std::string &filespec)
 	// does, which is to load the index.html file in that
 	// directry if it exists.
 	if (S_ISDIR(st.st_mode)) {
-	  log_debug("%s is a directory, appending index.html\n",
+	    log_debug(_("%s is a directory, appending index.html"),
 		    actual_filespec.c_str());
 	  if (actual_filespec[actual_filespec.size()-1] != '/') {
 	    actual_filespec += '/';

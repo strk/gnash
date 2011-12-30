@@ -68,7 +68,7 @@ CQue::wait()
     boost::mutex::scoped_lock lk(_cond_mutex);
 #ifndef _WIN32
     _cond.wait(lk);
-    log_unimpl("CQue::wait(win32)");
+    log_unimpl(_("CQue::wait(win32)"));
 #endif
 //    log_debug("wait mutex released for \"%s\"", _name);
 }
@@ -80,7 +80,7 @@ CQue::notify()
 //    GNASH_REPORT_FUNCTION;
 #ifndef _WIN32
     _cond.notify_one();
-    log_unimpl("CQue::notify(win32)");
+    log_unimpl(_("CQue::notify(win32)"));
 #endif
 //    log_debug("wait mutex triggered for \"%s\"", _name);
 }

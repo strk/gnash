@@ -175,13 +175,13 @@ AMF_msg::parseMessageHeader(boost::uint8_t *data, size_t size)
     msg->size = ntohl((*(boost::uint32_t *)tmpptr));
 
     if (msg->target.empty()) {
-        log_error("AMF Message \'target\' field missing!");
+        log_error(_("AMF Message \'target\' field missing!"));
     }
     if (msg->response.empty()) {
-        log_error("AMF Message \'reply\' field missing!");
+        log_error(_("AMF Message \'reply\' field missing!"));
     }
     if (msg->size == 0) {
-        log_error("AMF Message \'size\' field missing!");
+        log_error(_("AMF Message \'size\' field missing!"));
     } else {
         msg->size = size;
     }
@@ -228,7 +228,7 @@ AMF_msg::parseAMFPacket(boost::uint8_t *data, size_t size)
             }
         }
     } catch(std::exception& e) {
-        log_error("Error parsing the AMF packet: \n\t%s", e.what());
+        log_error(_("Error parsing the AMF packet: \n\t%s"), e.what());
     }
         
     return header;

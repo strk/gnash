@@ -91,14 +91,14 @@ Flv::decodeHeader(boost::uint8_t *data)
 
     // test the magic number
     if (memcmp(header->sig, "FLV", 3) != 0) {
-	log_error("Bad magic number for FLV file!");
+	log_error(_("Bad magic number for FLV file!"));
 	header.reset();
 	return header;
     }
 
     // Make sure the version is legit, it should alwys be 1
     if (header->version != 0x1) {
-	log_error("Bad version in FLV header! %d", _header.version);
+	log_error(_("Bad version in FLV header! %d"), _header.version);
 	header.reset();
 	return header;
     }
@@ -107,7 +107,7 @@ Flv::decodeHeader(boost::uint8_t *data)
     if (((header->type & Flv::FLV_AUDIO) && (header->type & Flv::FLV_VIDEO))
 	|| (header->type & Flv::FLV_AUDIO) || (header->type & Flv::FLV_VIDEO)) {
     } else {
-	    log_error("Bad FLV file Type: %d", header->type);
+	log_error(_("Bad FLV file Type: %d"), header->type);
     }
     
     // Be lazy, as head_size is an array of 4 bytes, and not an integer in the data
@@ -120,7 +120,7 @@ Flv::decodeHeader(boost::uint8_t *data)
     // The header size is always 9, guess it could change some day in the far future, so
     // we should use it.
     if (ntohl(size) != 0x9) {
-	log_error("Bad header size in FLV header! %d", size);
+	log_error(_("Bad header size in FLV header! %d"), size);
 	header.reset();
     }
     
@@ -153,7 +153,7 @@ Flv::decodeMetaData(boost::uint8_t *buf, size_t size)
     boost::uint16_t length;
     length = ntohs((*(boost::uint16_t *)ptr) & 0xffff);
     if (length >= SANE_STR_SIZE) {
-	log_error("%d bytes for a string is over the safe limit of %d",
+	log_error(_("%d bytes for a string is over the safe limit of %d"),
 		  length, SANE_STR_SIZE);
     }
     ptr += sizeof(boost::uint16_t);
@@ -183,7 +183,7 @@ Flv::decodeAudioData(boost::uint8_t byte)
     } else if (!byte && Flv::AUDIO_STEREO) {
 	audio->type = Flv::AUDIO_MONO;
     } else {
-	log_error("Bad FLV Audio Sound Type: %x", byte + 0);
+	log_error(_("Bad FLV Audio Sound Type: %x"), byte + 0);
     }
 
     // Get the sound size
@@ -192,7 +192,7 @@ Flv::decodeAudioData(boost::uint8_t byte)
     } else if (!(byte >> 1) && Flv::AUDIO_16BIT) {
 	audio->size = Flv::AUDIO_8BIT;	
     } else {
-	log_error("Bad FLV Audio Sound size: %d", byte >> 1);
+	log_error(_("Bad FLV Audio Sound size: %d"), byte >> 1);
     }
 
     // Get the sound rate
@@ -206,7 +206,7 @@ Flv::decodeAudioData(boost::uint8_t byte)
     } else if ((byte >> 2) == 0) {
 	audio->rate = Flv::AUDIO_55KHZ;
     } else {
-	log_error("Bad FLV Audio Sound Rate: %d", byte >> 2);
+	log_error(_("Bad FLV Audio Sound Rate: %d"), byte >> 2);
     }
 
     // Get the sound format
@@ -223,7 +223,7 @@ Flv::decodeAudioData(boost::uint8_t byte)
     } else if (!(byte >> 4) && Flv::AUDIO_ADPCM) {
 	audio->format = Flv::AUDIO_UNCOMPRESSED;
     } else {
-	log_error("Bad FLV Audio Sound format: %d", byte >> 4);
+	log_error(_("Bad FLV Audio Sound format: %d"), byte >> 4);
     }
     
     return audio;
@@ -254,7 +254,7 @@ Flv::decodeVideoData(boost::uint8_t byte)
     } else if (byte && Flv::VIDEO_SPEEX) {
 	video->codecID = Flv::VIDEO_SPEEX;
     } else {
-	log_error("Bad FLV Video Codec CodecID: 0x%x", byte + 0);
+	log_error(_("Bad FLV Video Codec CodecID: 0x%x"), byte + 0);
     }
 
     if (byte && Flv::KEYFRAME) {
@@ -264,7 +264,7 @@ Flv::decodeVideoData(boost::uint8_t byte)
     } else if (byte && Flv::DISPOSABLE) {
 	video->type = Flv::DISPOSABLE;
     } else {
-	log_error("Bad FLV Video Frame CodecID: 0x%x", byte + 0);
+	log_error(_("Bad FLV Video Frame CodecID: 0x%x"), byte + 0);
     }
     
     return video;
@@ -337,11 +337,11 @@ Flv::dump()
             // an onMetaData packet of an FLV stream only contains number or
             // boolean bydefault
             if (el->getType() == Element::NUMBER_AMF0) {
-                log_debug("FLV MetaData: %s: %s", el->getName(), el->to_number());
+                log_debug(_("FLV MetaData: %s: %s"), el->getName(), el->to_number());
             } else if (el->getType() == Element::BOOLEAN_AMF0) {
-                log_debug("FLV MetaData: %s: %s", el->getName(), (el->to_bool() ? "true" : "false") );
+                log_debug(_("FLV MetaData: %s: %s"), el->getName(), (el->to_bool() ? "true" : "false") );
             } else {
-                log_debug("FLV MetaData: %s: %s", el->getName(), el->to_string());
+                log_debug(_("FLV MetaData: %s: %s"), el->getName(), el->to_string());
             }
 	}
     } else {

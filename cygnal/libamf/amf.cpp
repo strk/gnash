@@ -177,7 +177,7 @@ AMF::encodeObject(const cygnal::Element &data)
 //    GNASH_REPORT_FUNCTION;
     boost::uint32_t length;
     length = data.propertySize();
-    gnash::log_debug("Encoded data size has %d properties", length);
+    gnash::log_debug(_("Encoded data size has %d properties"), length);
     boost::shared_ptr<cygnal::Buffer> buf;
     if (length) {
 	buf.reset(new cygnal::Buffer);
@@ -297,7 +297,7 @@ AMF::encodeXMLObject(const boost::uint8_t * /*data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<Buffer> buf;
-    gnash::log_unimpl("XML AMF objects not supported yet");
+    gnash::log_unimpl(_("XML AMF objects not supported yet"));
     buf.reset();
     return buf;
 }
@@ -401,7 +401,7 @@ AMF::encodeMovieClip(const boost::uint8_t * /*data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<Buffer> buf;
-    gnash::log_unimpl("Movie Clip AMF objects not supported yet");
+    gnash::log_unimpl(_("Movie Clip AMF objects not supported yet"));
     
     return buf;
 }
@@ -492,7 +492,7 @@ AMF::encodeLongString(const boost::uint8_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<Buffer> buf;
-    gnash::log_unimpl("Long String AMF objects not supported yet");
+    gnash::log_unimpl(_("Long String AMF objects not supported yet"));
     
     return buf;
 }
@@ -509,7 +509,7 @@ AMF::encodeRecordSet(const boost::uint8_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<Buffer> buf;
-    gnash::log_unimpl("Reecord Set AMF objects not supported yet");
+    gnash::log_unimpl(_("Reecord Set AMF objects not supported yet"));
     
     return buf;
 }
@@ -558,7 +558,7 @@ AMF::encodeStrictArray(const cygnal::Element &data)
 	    // array which is more compact. At least this is what Red5 does.
 	    if (el->getType() == Element::UNDEFINED_AMF0) {
 		if (!sparse) {
-		    gnash::log_debug("Encoding a strict array as an ecma array");
+		    gnash::log_debug(_("Encoding a strict array as an ecma array"));
 		    *buf->reference() = Element::ECMA_ARRAY_AMF0;
 		    // When returning an ECMA array for a sparsely populated
 		    // array, Red5 adds one more to the count to be 1 based,
@@ -781,7 +781,7 @@ AMF::encodeElement(const cygnal::Element& el)
 //       case Element::FUNCTION:
 //          break;
       case Element::AMF3_DATA:
-	  gnash::log_error("FIXME: got AMF3 data type");
+	  gnash::log_error(_("FIXME: got AMF3 data type"));
 	  break;
       default:
 	  buf.reset();
@@ -945,7 +945,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
     switch (type) {
         case Element::NOTYPE:
         {
-	    gnash::log_error("Element has no type!");
+	    gnash::log_error(_("Element has no type!"));
 	    break;
 	}
         case Element::NUMBER_AMF0:
@@ -975,8 +975,8 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
             length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
             tmpptr += sizeof(boost::uint16_t);
             if (length >= SANE_STR_SIZE) {
-                gnash::log_error("%d bytes for a string is over the safe "
-                        "limit of %d, line %d", length,
+                gnash::log_error(_("%d bytes for a string is over the safe "
+                                   "limit of %d, line %d"), length,
                         SANE_STR_SIZE, __LINE__);
                 el.reset();
                 return el;
@@ -1018,7 +1018,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
             break;
         }
         case Element::MOVIECLIP_AMF0:
-            gnash::log_debug("AMF0 MovieClip frame");
+            gnash::log_debug(_("AMF0 MovieClip frame"));
             break;
         case Element::NULL_AMF0:
             el->makeNull();
@@ -1148,7 +1148,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
             while (tmpptr < tooFar - length) { 
                 // FIXME: was tooFar - AMF_HEADER_SIZE)
                 if (*(tmpptr +3) == TERMINATOR) {
-                    gnash::log_debug("Found object terminator byte");
+                    gnash::log_debug(_("Found object terminator byte"));
                     tmpptr++;
                     break;
                 }
@@ -1166,7 +1166,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
         }
         case Element::AMF3_DATA:
         default:
-            gnash::log_unimpl("%s: type %d", __PRETTY_FUNCTION__, (int)type);
+            gnash::log_unimpl(_("%s: type %d"), __PRETTY_FUNCTION__, (int)type);
             el.reset();
             return el;
     }
@@ -1259,7 +1259,7 @@ AMF::extractProperty(boost::uint8_t *in, boost::uint8_t* tooFar)
     // If we get a NULL object, there is no data. In that case, we only return
     // the name of the property.
     if (type == Element::NULL_AMF0) {
-	gnash::log_debug("No data associated with Property \"%s\"", name);
+	gnash::log_debug(_("No data associated with Property \"%s\""), name);
 	el.reset(new Element);
 	el->setName(name.c_str(), name.size());
 	tmpptr += 1;

@@ -142,7 +142,7 @@ SSHServer::processSSHMessage(ssh_message message)
  	    break;
 	case SSH_AUTH_METHOD_PASSWORD:
 	    {
-		log_debug("User %s wants to auth with pass %s\n",
+		log_debug(_("User %s wants to auth with pass %s\n"),
 			  ssh_message_auth_user(message),
 			  ssh_message_auth_password(message));
 		string user = ssh_message_auth_user(message);
@@ -207,5 +207,5 @@ SSHServer::dump() {
 
 // local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

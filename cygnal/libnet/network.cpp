@@ -159,7 +159,7 @@ Network::createServer(short port)
     int             retries = 0;
 
     if (_listenfd >= 2) {
-	log_debug("already connected to port %hd", port);
+	log_debug(_("already connected to port %hd"), port);
 	return _listenfd;
     }
     
@@ -323,16 +323,16 @@ Network::newConnection(bool block, int fd)
 	    ret = pselect(fd+1, &fdset, NULL, NULL, &tval, &blockset);
 	}
 	if (sig_number) {
-	    log_debug("Have a SIGINT interupt waiting!");
+	    log_debug(_("Have a SIGINT interupt waiting!"));
 	}
 	sigpending(&pending);
 	if (sigismember(&pending, SIGINT)) {
-	    log_debug("Have a pending SIGINT interupt waiting!");
+	    log_debug(_("Have a pending SIGINT interupt waiting!"));
 	    int sig;
 	    sigwait(&blockset, &sig);
 	}
 	if (sigismember(&pending, SIGPIPE)) {
-	    log_debug("Have a pending SIGPIPE interupt waiting!");
+	    log_debug(_("Have a pending SIGPIPE interupt waiting!"));
 	    int sig;
 	    sigwait(&blockset, &sig);
 	}
@@ -763,7 +763,7 @@ Network::closeConnection(int fd)
 
     if (fd > 0) {
         ::close(fd);
-	log_debug("%s: Closed fd #%d", __FUNCTION__, fd);
+	log_debug(_("%s: Closed fd #%d"), __FUNCTION__, fd);
 //        closeNet(fd);
     }
 
@@ -875,7 +875,7 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 //     boost::mutex::scoped_lock lock(_net_mutex);
 
     if (_debug) {
-	log_debug (_("Trying to read %d bytes from fd #%d"), nbytes, fd);
+	log_debug(_("Trying to read %d bytes from fd #%d"), nbytes, fd);
     }
 #ifdef NET_TIMING
     if (_timing_debug)
@@ -919,13 +919,13 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 	    ret = pselect(fd+1, &fdset, NULL, NULL, &tval, &blockset);
 	    sigpending(&pending);
 	    if (sigismember(&pending, SIGINT)) {
-		log_debug("Have a pending SIGINT interupt waiting!");
+		log_debug(_("Have a pending SIGINT interupt waiting!"));
 		int sig;
 		sigwait(&blockset, &sig);
 		cntrlc_handler(SIGINT);
 	    }
 	    if (sigismember(&pending, SIGPIPE)) {
-		log_debug("Have a pending SIGPIPE interupt waiting!");
+		log_debug(_("Have a pending SIGPIPE interupt waiting!"));
 		int sig;
 		sigwait(&blockset, &sig);
 		cntrlc_handler(SIGINT);
@@ -939,17 +939,17 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 
         // If interrupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
-            log_error (_("The socket for fd #%d was interrupted by a system call"), fd);
+            log_error(_("The socket for fd #%d was interrupted by a system call"), fd);
         }
 
         if (ret == -1) {
-            log_error (_("The socket for fd #%d was never available for reading"), fd);
+            log_error(_("The socket for fd #%d was never available for reading"), fd);
             return -1;
         }
 
         if (ret == 0) {
 	    if (_debug) {
-		log_debug (_("The socket for #fd %d timed out waiting to read"), fd);
+		log_debug(_("The socket for #fd %d timed out waiting to read"), fd);
 	    }
             return 0;
         }
@@ -966,7 +966,7 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 
 	// If we read zero bytes, the network may be closed, as we returned from the select()
         if (ret == -1) {
-            log_error (_("The socket for fd #%d was never available for reading data"), fd);
+            log_error(_("The socket for fd #%d was never available for reading data"), fd);
             return -1;
         }
 
@@ -1100,7 +1100,7 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
 	ret = pselect(fd+1, NULL, &fdset, NULL, &tval, &blockset);
 	sigpending(&pending);
 	if (sigismember(&pending, SIGINT)) {
-	    log_debug("Have a pending SIGINT interupt waiting!");
+	    log_debug(_("Have a pending SIGINT interupt waiting!"));
 	    int sig;
 	    sigwait(&blockset, &sig);
 	    cntrlc_handler(SIGINT);
@@ -1190,7 +1190,7 @@ Network::addPollFD(struct pollfd &fd, Network::entry_t *func)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    log_debug("%s: adding fd #%d to pollfds", __PRETTY_FUNCTION__, fd.fd);
+    log_debug(_("%s: adding fd #%d to pollfds"), __PRETTY_FUNCTION__, fd.fd);
     boost::mutex::scoped_lock lock(_poll_mutex);
     _handlers[fd.fd] = func;
      _pollfds.push_back(fd);
@@ -1201,7 +1201,7 @@ void
 Network::addPollFD(struct pollfd &fd)
 {
 //    GNASH_REPORT_FUNCTION;
-    log_debug("%s: adding fd #%d to pollfds", __PRETTY_FUNCTION__, fd.fd);
+    log_debug(_("%s: adding fd #%d to pollfds"), __PRETTY_FUNCTION__, fd.fd);
     boost::mutex::scoped_lock lock(_poll_mutex);
      _pollfds.push_back(fd);
 //     notify();
@@ -1227,7 +1227,7 @@ void
 Network::erasePollFD(int fd)
 {
 //    GNASH_REPORT_FUNCTION;
-    log_debug("%s: erasing fd #%d from pollfds", __PRETTY_FUNCTION__, fd);
+    log_debug(_("%s: erasing fd #%d from pollfds"), __PRETTY_FUNCTION__, fd);
     boost::mutex::scoped_lock lock(_poll_mutex);
     if (_pollfds.size() > 0) {
 	vector<struct pollfd>::iterator it;
@@ -1275,7 +1275,7 @@ Network::waitForNetData(int limit, struct pollfd *fds)
 
     boost::shared_ptr<vector<struct pollfd> > hits(new vector<struct pollfd>);
 
-    log_debug("%s: waiting for %d fds", __FUNCTION__, limit);
+    log_debug(_("%s: waiting for %d fds"), __FUNCTION__, limit);
 
     if ((fds == 0) || (limit == 0)) {
 	return hits;
@@ -1298,7 +1298,7 @@ Network::waitForNetData(int limit, struct pollfd *fds)
 	int ret = ppoll(fds, limit, &tval, &blockset);
 	sigpending(&pending);
 	if (sigismember(&pending, SIGINT)) {
-	    log_debug("Have a pending SIGINT interupt waiting!");
+	    log_debug(_("Have a pending SIGINT interupt waiting!"));
 	    int sig;
 	    sigwait(&blockset, &sig);
 	}
@@ -1314,7 +1314,7 @@ Network::waitForNetData(int limit, struct pollfd *fds)
 #endif
 #endif
 
-    log_debug("Poll returned: %d, timeout is: %d", ret, _timeout);
+	log_debug(_("Poll returned: %d, timeout is: %d"), ret, _timeout);
 
     while (ret--) {
 	for (int i = 0; i<limit; i++) {
@@ -1428,12 +1428,12 @@ Network::waitForNetData(int limit, fd_set files)
     int ret = pselect(limit+1, &fdset, NULL, NULL, &tval, &sigmask);
     sigpending(&pending);
     if (sigismember(&pending, SIGINT)) {
-	log_debug("Have a pending SIGINT interupt waiting!");
+	log_debug(_("Have a pending SIGINT interupt waiting!"));
 	int sig;
 	sigwait(&sigmask, &sig);
     }
     if (sigismember(&pending, SIGPIPE)) {
-	log_debug("Have a pending SIGPIPE interupt waiting!");
+	log_debug(_("Have a pending SIGPIPE interupt waiting!"));
 	int sig;
 	sigwait(&sigmask, &sig);
     }
@@ -1463,11 +1463,11 @@ Network::waitForNetData(int limit, fd_set files)
     }
 
     if (ret < 0) {
-	log_error("select() got an error: %s.", strerror(errno));
+	log_error(_("select() got an error: %s."), strerror(errno));
 	FD_ZERO(&fdset);
 	FD_SET(0, &fdset);
     } else {
-	log_network("select() saw activity on %d file descriptors.", ret);
+	log_network(_("select() saw activity on %d file descriptors."), ret);
     }
 
     return fdset;
@@ -1543,7 +1543,7 @@ Network::initSSL(std::string &hostname, std::string &passwd,
 
     if (_sockfd == 0) {
 	if ((_sockfd = createClient(hostname, SSL_PORT) == false)) {
-	    log_error("Can't connect to server %s", hostname);
+	    log_error(_("Can't connect to server %s"), hostname);
 	    return false;
 	}
     }
@@ -1555,35 +1555,35 @@ Network::initSSL(std::string &hostname, std::string &passwd,
     if (!hostname.empty()) {
 	_ssl->setHostname(hostname);
     } else {
-	log_debug("Using default hostname: \"%s\"", _host);
+	log_debug(_("Using default hostname: \"%s\""), _host);
     }
     if (!keyfile.empty()) {
 	_ssl->setKeyfile(keyfile);
     } else {
-	log_debug("Using default keyfile: \"%s\"", _ssl->getKeyfile());
+	log_debug(_("Using default keyfile: \"%s\""), _ssl->getKeyfile());
     }
     if (!calist.empty()) {
 	_ssl->setCAlist(calist);
     } else {
-	log_debug("Using default CA List: \"%s\"", _ssl->getCAlist());
+	log_debug(_("Using default CA List: \"%s\""), _ssl->getCAlist());
     }
 
     if (!passwd.empty()) {
 	_ssl->setPassword(passwd);
     } else {
-	log_debug("Using default Password: \"%s\"", _ssl->getPassword());
+	log_debug(_("Using default Password: \"%s\""), _ssl->getPassword());
     }
     if (!rootpath.empty()) {
 	_ssl->setRootPath(rootpath);
     } else {
-	log_debug("Using default Root Path to PEM files: \"%s\"",
+	log_debug(_("Using default Root Path to PEM files: \"%s\""),
 		  _ssl->getRootPath());
     }
 
     if (_ssl->sslConnect(_sockfd)) {
-        log_debug("Connected to SSL server");
+        log_debug(_("Connected to SSL server"));
     } else {
-        log_error("Couldn't connect to SSL server");
+        log_error(_("Couldn't connect to SSL server"));
 	return false;
     }
 
@@ -1616,7 +1616,7 @@ Network::sniffBytesReady(int fd)
 	}
     }
 
-    log_network("#%d bytes waiting in kernel network buffer.", bytes);
+    log_network(_("#%d bytes waiting in kernel network buffer."), bytes);
     
     return bytes;
 }
