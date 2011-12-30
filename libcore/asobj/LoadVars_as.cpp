@@ -142,7 +142,7 @@ loadvars_ctor(const fn_call& fn)
         if (fn.nargs) {
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("new LoadVars(%s) - arguments discarded",
+            log_aserror(_("new LoadVars(%s) - arguments discarded"),
                 ss.str());
         }
     );

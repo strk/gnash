@@ -281,7 +281,7 @@ microphone_setgain(const fn_call& fn)
     
     // Really return if there are 2 args?
     if (fn.nargs != 1) {
-        log_error("Microphone.gain(): wrong number of parameters passed");
+        log_error(_("Microphone.gain(): wrong number of parameters passed"));
         return as_value();
     } 
 
@@ -297,7 +297,7 @@ microphone_setrate(const fn_call& fn)
     Microphone_as* ptr = ensure<ThisIsNative<Microphone_as> >(fn);
     
     if (fn.nargs != 1) {
-        log_error("Microphone.setRate: wrong number of parameters passed");
+        log_error(_("Microphone.setRate: wrong number of parameters passed"));
         return as_value();
     }
     ptr->setRate(toInt(fn.arg(0), getVM(fn)));
@@ -310,7 +310,7 @@ microphone_activityLevel(const fn_call& fn)
     Microphone_as* ptr = ensure<ThisIsNative<Microphone_as> >(fn);
         
     if (!fn.nargs) {
-        log_unimpl("Microphone::activityLevel only has default value (-1)");
+        log_unimpl(_("Microphone::activityLevel only has default value (-1)"));
         return as_value(ptr->activityLevel());
     }
 
@@ -350,7 +350,7 @@ microphone_muted(const fn_call& fn)
     Microphone_as* ptr = ensure<ThisIsNative<Microphone_as> >(fn);
     
     if (!fn.nargs) {
-        log_unimpl("Microphone::muted is always false (always allows access)");
+        log_unimpl(_("Microphone::muted is always false (always allows access)"));
         return as_value(ptr->muted());
     }
 
@@ -410,7 +410,7 @@ microphone_silenceTimeout(const fn_call& fn)
 {
     Microphone_as* ptr = ensure<ThisIsNative<Microphone_as> >(fn);
         
-    log_unimpl("Microphone::silenceTimeout can be set, but is unimplemented");
+    log_unimpl(_("Microphone::silenceTimeout can be set, but is unimplemented"));
     return as_value(ptr->silenceTimeout());
 }
 
@@ -433,7 +433,7 @@ microphone_setsilencelevel(const fn_call& fn)
     
     const size_t numargs = fn.nargs;
     if (numargs > 2) {
-        log_error("%s: Too many arguments", __FUNCTION__);
+        log_error(_("%s: Too many arguments"), __FUNCTION__);
         return as_value();
     }
 

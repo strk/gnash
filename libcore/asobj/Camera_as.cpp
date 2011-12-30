@@ -268,7 +268,7 @@ camera_get(const fn_call& fn)
 
     const size_t nargs = fn.nargs;
     if (nargs > 0) {
-        log_debug("%s: the camera is automatically chosen from gnashrc",
+        log_debug(_("%s: the camera is automatically chosen from gnashrc"),
                 "Camera.get()");
     }
 
@@ -309,7 +309,7 @@ camera_setmode(const fn_call& fn)
 as_value
 camera_setmotionlevel(const fn_call& fn)
 {
-    log_unimpl ("Camera::motionLevel can be set, but it's not implemented");
+    log_unimpl(_("Camera::motionLevel can be set, but it's not implemented"));
     Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
     
     const size_t nargs = fn.nargs;
@@ -328,7 +328,7 @@ camera_setmotionlevel(const fn_call& fn)
 as_value
 camera_setquality(const fn_call& fn)
 {
-    log_unimpl ("Camera::quality can be set, but it's not implemented");
+    log_unimpl(_("Camera::quality can be set, but it's not implemented"));
     Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
 
     const size_t nargs = fn.nargs;
@@ -350,7 +350,7 @@ camera_activitylevel(const fn_call& fn)
     Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
 
     if (!fn.nargs) {
-        log_unimpl("Camera::activityLevel only has default value");
+        log_unimpl(_("Camera::activityLevel only has default value"));
         return as_value(ptr->activityLevel());
     }
 
@@ -367,7 +367,7 @@ camera_bandwidth(const fn_call& fn)
     Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
 
     if (!fn.nargs) {
-        log_unimpl("Camera::bandwidth only has default value");
+        log_unimpl(_("Camera::bandwidth only has default value"));
         return as_value(ptr->bandwidth());
     }
 
@@ -455,7 +455,7 @@ camera_motionLevel(const fn_call& fn)
     Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
 
     if (!fn.nargs) {
-        log_unimpl("Camera::motionLevel only has default value");
+        log_unimpl(_("Camera::motionLevel only has default value"));
         return as_value(ptr->motionLevel());
     }
 
@@ -472,7 +472,7 @@ camera_motionTimeout(const fn_call& fn)
     Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
 
     if (!fn.nargs) {
-        log_unimpl("Camera::motionTimeout");
+        log_unimpl(_("Camera::motionTimeout"));
         return as_value(ptr->motionTimeout());
     }
 
@@ -489,7 +489,7 @@ camera_muted(const fn_call& fn)
     Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
 
     if (!fn.nargs) {
-        log_unimpl("Camera.muted");
+        log_unimpl(_("Camera.muted"));
         return as_value(ptr->muted());
     }
 
@@ -551,7 +551,7 @@ camera_quality(const fn_call& fn)
     Camera_as* ptr = ensure<ThisIsNative<Camera_as> >(fn);
 
     if (!fn.nargs) {
-        log_unimpl("Camera::quality has only default values");
+        log_unimpl(_("Camera::quality has only default values"));
         return as_value(ptr->quality());
     }
 
@@ -584,14 +584,14 @@ camera_setLoopback(const fn_call& fn)
 as_value
 camera_setCursor(const fn_call& /*fn*/)
 {
-    LOG_ONCE(log_unimpl("Camera.setCursor"));
+    LOG_ONCE(log_unimpl(_("Camera.setCursor")));
     return as_value();
 }
 
 as_value
 camera_setKeyFrameInterval(const fn_call& /*fn*/)
 {
-    LOG_ONCE(log_unimpl("Camera.setKeyFrameInterval"));
+    LOG_ONCE(log_unimpl(_("Camera.setKeyFrameInterval")));
     return as_value();
 }
 

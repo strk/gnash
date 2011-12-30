@@ -518,7 +518,7 @@ textsnapshot_findText(const fn_call& fn)
 
     if (fn.nargs != 3) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("TextSnapshot.findText() requires 3 arguments");
+            log_aserror(_("TextSnapshot.findText() requires 3 arguments"));
         );
         return as_value();
     }
@@ -542,7 +542,7 @@ textsnapshot_getCount(const fn_call& fn)
 
     if (fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("TextSnapshot.getCount() takes no arguments");
+            log_aserror(_("TextSnapshot.getCount() takes no arguments"));
         );
         return as_value();
     }
@@ -598,7 +598,7 @@ textsnapshot_getText(const fn_call& fn)
     if (fn.nargs < 2 || fn.nargs > 3)
     {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("TextSnapshot.getText requires exactly 2 arguments");
+            log_aserror(_("TextSnapshot.getText requires exactly 2 arguments"));
         );
         return as_value();
     }
@@ -621,7 +621,7 @@ textsnapshot_hitTestTextNearPos(const fn_call& fn)
 
     if (!ts->valid()) return as_value();
 
-    log_unimpl (__FUNCTION__);
+    log_unimpl(__FUNCTION__);
     return as_value();
 }
 
@@ -633,7 +633,7 @@ textsnapshot_setSelectColor(const fn_call& fn)
     TextSnapshot_as* ts = ensure<ThisIsNative<TextSnapshot_as> >(fn);
     UNUSED(ts);
 
-    log_unimpl (__FUNCTION__);
+    log_unimpl(__FUNCTION__);
     return as_value();
 }
 

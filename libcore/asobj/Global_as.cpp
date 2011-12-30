@@ -731,7 +731,7 @@ global_asnative(const fn_call& fn)
 as_value
 global_asnew(const fn_call& /*fn*/)
 {
-    LOG_ONCE(log_unimpl("ASNative (2, 0) - old ASnew"));
+    LOG_ONCE(log_unimpl(_("ASNative (2, 0) - old ASnew")));
     return as_value();
 }
 
@@ -881,7 +881,7 @@ global_assetnativeaccessor(const fn_call& fn)
 as_value
 global_updateAfterEvent(const fn_call& /*fn*/)
 {
-    LOG_ONCE(log_unimpl("updateAfterEvent()"));
+    LOG_ONCE(log_unimpl(_("updateAfterEvent()")));
     return as_value();
 }
 
@@ -943,8 +943,8 @@ global_setInterval(const fn_call& fn)
 	if (fn.nargs < 2) {
 		IF_VERBOSE_ASCODING_ERRORS(
 			std::stringstream ss; fn.dump_args(ss);
-			log_aserror("Invalid call to setInterval(%s) "
-				"- need at least 2 arguments",
+			log_aserror(_("Invalid call to setInterval(%s) "
+                                      "- need at least 2 arguments"),
 				ss.str());
 		);
 		return as_value();
@@ -957,8 +957,8 @@ global_setInterval(const fn_call& fn)
 
 		IF_VERBOSE_ASCODING_ERRORS(
 			std::stringstream ss; fn.dump_args(ss);
-			log_aserror("Invalid call to setInterval(%s) "
-				"- first argument is not an object or function",
+			log_aserror(_("Invalid call to setInterval(%s) "
+                                      "- first argument is not an object or function"),
 				ss.str());
 		);
 		return as_value();
@@ -977,8 +977,8 @@ global_setInterval(const fn_call& fn)
 	if (fn.nargs < timer_arg + 1) {
 		IF_VERBOSE_ASCODING_ERRORS(
 			std::stringstream ss; fn.dump_args(ss);
-			log_aserror("Invalid call to setInterval(%s) "
-				"- missing timeout argument",
+			log_aserror(_("Invalid call to setInterval(%s) "
+                                      "- missing timeout argument"),
 				ss.str());
         );
 		return as_value();
@@ -1016,8 +1016,8 @@ global_setTimeout(const fn_call& fn)
 	if (fn.nargs < 2) {
 		IF_VERBOSE_ASCODING_ERRORS(
 			std::stringstream ss; fn.dump_args(ss);
-			log_aserror("Invalid call to setTimeout(%s) "
-			"- need at least 2 arguments",
+			log_aserror(_("Invalid call to setTimeout(%s) "
+                                      "- need at least 2 arguments"),
 			ss.str());
 		);
 		return as_value();
@@ -1029,8 +1029,8 @@ global_setTimeout(const fn_call& fn)
 	if (!obj) {
 		IF_VERBOSE_ASCODING_ERRORS(
 			std::stringstream ss; fn.dump_args(ss);
-			log_aserror("Invalid call to setInterval(%s) "
-				"- first argument is not an object or function",
+			log_aserror(_("Invalid call to setInterval(%s) "
+                                      "- first argument is not an object or function"),
 				ss.str());
 		);
 		return as_value();
@@ -1049,8 +1049,8 @@ global_setTimeout(const fn_call& fn)
 	if (fn.nargs < timer_arg + 1) {
 		IF_VERBOSE_ASCODING_ERRORS(
 			std::stringstream ss; fn.dump_args(ss);
-			log_aserror("Invalid call to setTimeout(%s): missing "
-                "timeout argument", ss.str());
+			log_aserror(_("Invalid call to setTimeout(%s): missing "
+                                      "timeout argument"), ss.str());
 		);
 		return as_value();
 	}
@@ -1085,7 +1085,7 @@ global_clearInterval(const fn_call& fn)
 {
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror("clearInterval requires one argument, got none");
+            log_aserror(_("clearInterval requires one argument, got none"));
         );
         return as_value();
     }
@@ -1099,14 +1099,14 @@ global_clearInterval(const fn_call& fn)
 as_value
 global_showRedrawRegions(const fn_call& /*fn*/)
 {
-    LOG_ONCE(log_unimpl("_global.showRedrawRegions"));
+    LOG_ONCE(log_unimpl(_("_global.showRedrawRegions")));
     return as_value();
 }
 
 as_value
 global_enableDebugConsole(const fn_call& /*fn*/)
 {
-    LOG_ONCE(log_unimpl("_global.enableDebugConsole"));
+    LOG_ONCE(log_unimpl(_("_global.enableDebugConsole")));
     return as_value();
 }
 

@@ -480,7 +480,7 @@ textformat_tabStops(const fn_call& fn)
     TextFormat_as* relay = ensure<ThisIsNative<TextFormat_as> >(fn);
 	
     if (!fn.nargs) {
-		LOG_ONCE( log_unimpl("Getter for textformat_tabStops") );
+        LOG_ONCE(log_unimpl(_("Getter for textformat_tabStops")));
         as_value null;
         null.set_null();
         return null;
@@ -559,8 +559,8 @@ textformat_getTextExtent(const fn_call& fn)
     
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("TextFormat.getTextExtent requires at least one"
-                "argument");
+            log_aserror(_("TextFormat.getTextExtent requires at least one"
+                          "argument"));
         );
         return as_value();
     }
@@ -705,7 +705,7 @@ parseDisplayString(const std::string& display)
 	if (cmp(display, "block")) return TextField::TEXTFORMAT_BLOCK;
 	
     // Is this correct? We have to return something here...
-	log_debug("Invalid display string %s ", display);
+	log_debug(_("Invalid display string %s "), display);
     return TextField::TEXTFORMAT_BLOCK;
 }
 
@@ -723,7 +723,7 @@ getAlignString(TextField::TextAlignment a)
 		case TextField::ALIGN_JUSTIFY:
 			return "justify";
 		default:
-			log_error("Uknown alignment value: %d, take as left", a);
+                    log_error(_("Uknown alignment value: %d, take as left"), a);
 			return "left";
 	}
 }
@@ -738,7 +738,7 @@ getDisplayString(TextField::TextFormatDisplay a)
 		case TextField::TEXTFORMAT_BLOCK:
 			return "block";
 		default:
-			log_error("Unknown display value: %d ", a);
+                    log_error(_("Unknown display value: %d "), a);
             return "";
 	}
 }

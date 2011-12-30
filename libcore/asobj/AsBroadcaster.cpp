@@ -412,7 +412,7 @@ asbroadcaster_broadcastMessage(const fn_call& fn)
 
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror("%p.broadcastMessage() needs an argument", 
+            log_aserror(_("%p.broadcastMessage() needs an argument"), 
             (void*)fn.this_ptr);
         );
         return as_value();

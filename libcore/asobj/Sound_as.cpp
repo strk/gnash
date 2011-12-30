@@ -330,7 +330,7 @@ void
 Sound_as::stopProbeTimer()
 {
 #ifdef GNASH_DEBUG_SOUND_AS
-    log_debug("stopProbeTimer called");
+    log_debug(_("stopProbeTimer called"));
 #endif
     getRoot(owner()).removeAdvanceCallback(this);
 }
@@ -365,7 +365,7 @@ Sound_as::probeAudio()
 
     if ( ! _soundLoaded ) {
 #ifdef GNASH_DEBUG_SOUND_AS
-        log_debug("Probing audio for load");
+        log_debug(_("Probing audio for load"));
 #endif
         if (_mediaParser->parsingCompleted()) {
 
@@ -385,7 +385,7 @@ Sound_as::probeAudio()
 
     if (isAttached()) {
 #ifdef GNASH_DEBUG_SOUND_AS
-        log_debug("Probing audio for end");
+        log_debug(_("Probing audio for end"));
 #endif
 
         boost::mutex::scoped_lock lock(_soundCompletedMutex);
@@ -406,12 +406,12 @@ Sound_as::probeAudio()
     }
     else {
 #ifdef GNASH_DEBUG_SOUND_AS
-        log_debug("Probing audio for start");
+        log_debug(_("Probing audio for start"));
 #endif
 
         bool parsingCompleted = _mediaParser->parsingCompleted();
         try {
-            log_debug("Attaching aux streamer");
+            log_debug(_("Attaching aux streamer"));
             _inputStream = attachAuxStreamerIfNeeded();
         } 
         catch (const MediaException& e) {
@@ -425,7 +425,7 @@ Sound_as::probeAudio()
 
         if ( ! _inputStream ) {
             if ( parsingCompleted ) {
-                log_debug("No audio in Sound input.");
+                log_error(_("No audio in Sound input."));
                 stopProbeTimer();
                 _mediaParser.reset(); // no use for this anymore...
             } else {
@@ -510,11 +510,11 @@ Sound_as::getVolume(int& volume)
     //       some other sound...
     //
     if ( _attachedCharacter ) {
-        //log_debug("Sound has an attached DisplayObject");
+        //log_debug(_("Sound has an attached DisplayObject"));
         DisplayObject* ch = _attachedCharacter->get();
         if (! ch) {
-            log_debug("Character attached to Sound was unloaded and "
-                    "couldn't rebind");
+            log_debug(_("Character attached to Sound was unloaded and "
+                        "couldn't rebind"));
             return false;
         }
         volume = ch->getVolume();
@@ -525,7 +525,7 @@ Sound_as::getVolume(int& volume)
     // sound_handler for volume. If we have no sound handler, we
     // can't do much, so we'll return false
     if (!_soundHandler) {
-        log_debug("We have no sound handler here...");
+        log_debug(_("We have no sound handler here..."));
         return false;
     }
 
@@ -546,7 +546,7 @@ void
 Sound_as::loadSound(const std::string& file, bool streaming)
 {
     if (!_mediaHandler || !_soundHandler) {
-        log_debug("No media or sound handlers, won't load any sound");
+        log_debug(_("No media or sound handlers, won't load any sound"));
         return;
     }
 
@@ -578,7 +578,7 @@ Sound_as::loadSound(const std::string& file, bool streaming)
                 rcfile.saveStreamingMedia()));
 
     if (!inputStream.get()) {
-        log_error( _("Gnash could not open this url: %s"), url );
+        log_error(_("Gnash could not open this url: %s"), url );
         // dispatch onLoad (false)
         callMethod(&owner(), NSV::PROP_ON_LOAD, false);
         return;
@@ -616,7 +616,7 @@ Sound_as::attachAuxStreamerIfNeeded()
 
     // start playing ASAP, a call to ::start will just change _startTime
 #ifdef GNASH_DEBUG_SOUND_AS
-    log_debug("Attaching the aux streamer");
+    log_debug(_("Attaching the aux streamer"));
 #endif
     return _soundHandler->attach_aux_streamer(getAudioWrapper, (void*) this);
 }
@@ -643,8 +643,8 @@ Sound_as::setVolume(int volume)
     if ( _attachedCharacter ) {
         DisplayObject* ch = _attachedCharacter->get();
         if ( ! ch ) {
-            log_debug("Character attached to Sound was unloaded and "
-                      "couldn't rebind");
+            log_debug(_("Character attached to Sound was unloaded and "
+                        "couldn't rebind"));
             return;
         }
         ch->setVolume(volume);
@@ -673,13 +673,13 @@ void
 Sound_as::start(double secOff, int loops)
 {
     if ( ! _soundHandler ) {
-        log_error("No sound handler, nothing to start...");
+        log_error(_("No sound handler, nothing to start..."));
         return;
     }
 
     if (externalSound) {
         if ( ! _mediaParser ) {
-            log_error("No MediaParser initialized, can't start an external sound");
+            log_error(_("No MediaParser initialized, can't start an external sound"));
             return;
         }
 
@@ -696,7 +696,7 @@ Sound_as::start(double secOff, int loops)
             boost::uint32_t seekms = boost::uint32_t(secOff * 1000);
             // TODO: boost::mutex::scoped_lock parserLock(_parserMutex);
             bool seeked = _mediaParser->seek(seekms); // well, we try...
-            log_debug("Seeked MediaParser to %d, returned: %d", seekms, seeked);
+            log_debug(_("Seeked MediaParser to %d, returned: %d"), seekms, seeked);
         }
 
 
@@ -714,7 +714,7 @@ Sound_as::start(double secOff, int loops)
             inPoint = (secOff*44100);
         }
 
-        log_debug("Sound.start: secOff:%d", secOff);
+        log_debug(_("Sound.start: secOff:%d"), secOff);
 
         _soundHandler->startSound(
                     soundId,
@@ -732,7 +732,7 @@ void
 Sound_as::stop(int si)
 {
     if ( ! _soundHandler ) {
-        log_error("No sound handler, nothing to stop...");
+        log_error(_("No sound handler, nothing to stop..."));
         return;
     }
 
@@ -760,7 +760,7 @@ size_t
 Sound_as::getDuration() const
 {
     if ( ! _soundHandler ) {
-        log_error("No sound handler, can't check duration...");
+        log_error(_("No sound handler, can't check duration..."));
         return 0;
     }
 
@@ -785,8 +785,8 @@ size_t
 Sound_as::getPosition() const
 {
     if (!_soundHandler) {
-        log_error("No sound handler, can't check position (we're "
-                "likely not playing anyway)...");
+        log_error(_("No sound handler, can't check position (we're "
+                    "likely not playing anyway)..."));
         return 0;
     }
 
@@ -822,14 +822,14 @@ Sound_as::getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF)
             if ( ! frame.get() ) {
                 // just wait some more if parsing isn't complete yet
                 if ( ! parsingComplete ) {
-                    //log_debug("Parsing not complete and no more audio frames in input, try again later");
+                    //log_debug(_("Parsing not complete and no more audio frames in input, try again later"));
                     break;
                 }
 
                 // or detach and stop here...
                 // (should really honour loopings if any,
                 // but that should be only done for non-streaming sound!)
-                //log_debug("Parsing complete and no more audio frames in input, detaching");
+                //log_debug(_("Parsing complete and no more audio frames in input, detaching"));
 
                 markSoundCompleted(true);
 
@@ -845,24 +845,25 @@ Sound_as::getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF)
             // if we've been asked to start at a specific time, skip
             // any frame with earlier timestamp
             if ( frame->timestamp < _startTime ) {
-                //log_debug("This audio frame timestamp (%d) < requested start time (%d)", frame->timestamp, _startTime);
+                //log_debug(_("This audio frame timestamp (%d) < requested start time (%d)"), frame->timestamp, _startTime);
                 continue;
             }
 
             _leftOverData.reset( _audioDecoder->decode(*frame, _leftOverSize) );
             _leftOverPtr = _leftOverData.get();
             if ( ! _leftOverData ) {
-                log_error("No samples decoded from input of %d bytes", frame->dataSize);
+                log_error(_("No samples decoded from input of %d bytes"),
+                          frame->dataSize);
                 continue;
             }
 
-            //log_debug(" decoded %d bytes of audio", _leftOverSize);
+            //log_debug(_(" decoded %d bytes of audio"), _leftOverSize);
         }
 
         assert( !(_leftOverSize%2) );
 
         int n = std::min<int>(_leftOverSize, len);
-        //log_debug(" consuming %d bytes of decoded audio", n);
+        //log_debug(_(" consuming %d bytes of decoded audio"), n);
 
         std::copy(_leftOverPtr, _leftOverPtr+n, stream);
 
@@ -951,7 +952,7 @@ sound_new(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             if (fn.nargs > 1) {
                 std::stringstream ss; fn.dump_args(ss);
-                log_aserror("new Sound(%d) : args after first one ignored",
+                log_aserror(_("new Sound(%d) : args after first one ignored"),
                     ss.str());
             }
         );
@@ -965,9 +966,9 @@ sound_new(const fn_call& fn)
             IF_VERBOSE_ASCODING_ERRORS(
                 if (!ch) {
                     std::stringstream ss; fn.dump_args(ss);
-                    log_aserror("new Sound(%s) : first argument isn't null "
+                    log_aserror(_("new Sound(%s) : first argument isn't null "
                         "or undefined, and isn't a DisplayObject. "
-                        "We'll take as an invalid DisplayObject ref.",
+                                  "We'll take as an invalid DisplayObject ref."),
                         ss.str());
                 }
             );
@@ -1123,7 +1124,7 @@ sound_getbytestotal(const fn_call& fn)
 as_value
 sound_getpan(const fn_call& /*fn*/)
 {
-    LOG_ONCE( log_unimpl ("Sound.getPan()") );
+    LOG_ONCE(log_unimpl(_("Sound.getPan()")));
     return as_value();
 }
 
@@ -1138,7 +1139,7 @@ sound_getDuration(const fn_call& fn)
 as_value
 sound_setDuration(const fn_call& /*fn*/)
 {
-    LOG_ONCE( log_unimpl ("Sound.setDuration()") );
+    LOG_ONCE(log_unimpl(_("Sound.setDuration()")));
     return as_value();
 }
 
@@ -1153,14 +1154,14 @@ sound_getPosition(const fn_call& fn)
 as_value
 sound_setPosition(const fn_call& /*fn*/)
 {
-    LOG_ONCE( log_unimpl ("Sound.setPosition()") );
+    LOG_ONCE(log_unimpl(_("Sound.setPosition()")));
     return as_value();
 }
 
 as_value
 sound_gettransform(const fn_call& /*fn*/)
 {
-    LOG_ONCE( log_unimpl ("Sound.getTransform()") );
+    LOG_ONCE( log_unimpl(_("Sound.getTransform()")));
     return as_value();
 }
 
@@ -1172,8 +1173,8 @@ sound_getvolume(const fn_call& fn)
 
     if ( fn.nargs ) {
         IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror("Sound.getVolume(%s) : arguments ignored");
+            std::stringstream ss; fn.dump_args(ss);
+            log_aserror(_("Sound.getVolume(%s) : arguments ignored"));
         );
     }
 
@@ -1218,14 +1219,14 @@ sound_loadsound(const fn_call& fn)
 as_value
 sound_setpan(const fn_call& /*fn*/)
 {
-    LOG_ONCE( log_unimpl ("Sound.setPan()") );
+    LOG_ONCE(log_unimpl(_("Sound.setPan()")));
     return as_value();
 }
 
 as_value
 sound_settransform(const fn_call& /*fn*/)
 {
-    LOG_ONCE( log_unimpl ("Sound.setTransform()") );
+    LOG_ONCE(log_unimpl(_("Sound.setTransform()")));
     return as_value();
 }
 
@@ -1249,7 +1250,7 @@ sound_setvolume(const fn_call& fn)
 as_value
 checkPolicyFile_getset(const fn_call& /*fn*/)
 {
-    LOG_ONCE( log_unimpl ("Sound.checkPolicyFile") );
+    LOG_ONCE(log_unimpl(_("Sound.checkPolicyFile")));
     return as_value();
 }
 
@@ -1262,7 +1263,7 @@ sound_areSoundsInaccessible(const fn_call& /*fn*/)
     // 
     // naive test shows this always being undefined..
     //
-    LOG_ONCE( log_unimpl ("Sound.areSoundsInaccessible()") );
+    LOG_ONCE(log_unimpl(_("Sound.areSoundsInaccessible()")));
     return as_value();
 }
 

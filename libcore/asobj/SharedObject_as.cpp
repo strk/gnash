@@ -135,7 +135,7 @@ public:
         assert(!_error);
 
         if (val.is_function()) {
-            log_debug("SOL: skip serialization of FUNCTION property");
+            log_debug(_("SOL: skip serialization of FUNCTION property"));
             return true;
         }
 
@@ -160,7 +160,7 @@ public:
 
         // Strict array are never encoded in SharedObject
         if (!val.writeAMF0(_writer)) {
-            log_error("Problems serializing an object's member %s=%s",
+            log_error(_("Problems serializing an object's member %s=%s"),
                     name, val);
             _error = true;
 
@@ -320,15 +320,16 @@ SharedObject_as::flush(int space) const
     if (!_data) return false;
 
     if (space > 0) {
-        log_unimpl("SharedObject.flush() called with a minimum disk space "
-                "argument (%d), which is currently ignored", space);
+        log_unimpl(_("SharedObject.flush() called with a minimum disk space "
+                     "argument (%d), which is currently ignored"), space);
     }
 
     const std::string& filespec = getFilespec();
 
     if (!rcfile.getSOLReadOnly()) {
         if (!mkdirRecursive(filespec)) {
-            log_error("Couldn't create dir for flushing SharedObject %s", filespec);
+            log_error(_("Couldn't create dir for flushing SharedObject %s"),
+                        filespec);
             return false;
         }
         
@@ -340,16 +341,16 @@ SharedObject_as::flush(int space) const
     }
 
     if (rcfile.getSOLReadOnly()) {
-        log_security("Attempting to write object %s when it's SOL "
-                     "Read Only is set! Refusing...", filespec);
+        log_security(_("Attempting to write object %s when it's SOL "
+                       "Read Only is set! Refusing..."), filespec);
         return false;
     }
 
     // Open file
     std::ofstream ofs(filespec.c_str(), std::ios::binary);
     if (!ofs) {
-        log_error("SharedObject::flush(): Failed opening file '%s' in "
-                "binary mode", filespec.c_str());
+        log_error(_("SharedObject::flush(): Failed opening file '%s' in "
+                    "binary mode"), filespec.c_str());
         return false;
     }
 
@@ -367,20 +368,20 @@ SharedObject_as::flush(int space) const
     // Write header
     ofs.write(reinterpret_cast<const char*>(header.data()), header.size());
     if (!ofs) {
-        log_error("Error writing SOL header");
+        log_error(_("Error writing SOL header"));
         return false;
     }
 
     // Write AMF data
     ofs.write(reinterpret_cast<const char*>(buf.data()), buf.size());
     if (!ofs) {
-        log_error("Error writing %d bytes to output file %s",
+        log_error(_("Error writing %d bytes to output file %s"),
                 buf.size(), filespec.c_str());
         return false;
     }
     ofs.close();
 
-    log_security("SharedObject '%s' written to filesystem.", filespec);
+    log_security(_("SharedObject '%s' written to filesystem."), filespec);
     return true;
 }
 
@@ -396,15 +397,15 @@ SharedObjectLibrary::SharedObjectLibrary(VM& vm)
 
     _solSafeDir = rcfile.getSOLSafeDir();
     if (_solSafeDir.empty()) {
-        log_debug("Empty SOLSafeDir directive: we'll use '/tmp'");
+        log_debug(_("Empty SOLSafeDir directive: we'll use '/tmp'"));
         _solSafeDir = "/tmp/";
     }
 
     // Check if the base dir exists here
     struct stat statbuf;
     if (stat(_solSafeDir.c_str(), &statbuf) == -1) {
-       log_debug("Invalid SOL safe dir %s: %s. Will try to create on "
-               "flush/exit.", _solSafeDir, std::strerror(errno));
+        log_debug(_("Invalid SOL safe dir %s: %s. Will try to create on "
+                    "flush/exit."), _solSafeDir, std::strerror(errno));
     }
 
     // Which URL we should use here is under research.
@@ -489,8 +490,8 @@ SharedObjectLibrary::getLocal(const std::string& objName,
 
     if (rcfile.getSOLLocalDomain() && !_baseDomain.empty()) 
     {
-        log_security("Attempting to open SOL file from non "
-                "localhost-loaded SWF");
+        log_security(_("Attempting to open SOL file from non "
+                       "localhost-loaded SWF"));
         return 0;
     }
 
@@ -561,11 +562,11 @@ SharedObjectLibrary::getLocal(const std::string& objName,
     // If the shared object was already opened, use it.
     SoLib::iterator it = _soLib.find(key);
     if (it != _soLib.end()) {
-        log_debug("SharedObject %s already known, returning it", key);
+        log_debug(_("SharedObject %s already known, returning it"), key);
         return &it->second->owner();
     }
 
-    log_debug("SharedObject %s not loaded. Loading it now", key);
+    log_debug(_("SharedObject %s not loaded. Loading it now"), key);
 
     // Otherwise create a new one and register to the lib
     SharedObject_as* sh = createSharedObject(*_vm.getGlobal());
@@ -579,7 +580,7 @@ SharedObjectLibrary::getLocal(const std::string& objName,
     newspec += ".sol";
     sh->setFilespec(newspec);
 
-    log_debug("SharedObject path: %s", newspec);
+    log_debug(_("SharedObject path: %s"), newspec);
         
     as_object* data = readSOL(_vm, newspec);
 
@@ -684,7 +685,7 @@ sharedobject_clear(const fn_call& fn)
     SharedObject_as* obj = ensure<ThisIsNative<SharedObject_as> >(fn);
     UNUSED(obj);
     
-    LOG_ONCE(log_unimpl (__FUNCTION__));
+    LOG_ONCE(log_unimpl(__FUNCTION__));
 
     return as_value();
 }
@@ -705,7 +706,7 @@ sharedobject_connect(const fn_call& fn)
         return as_value();
     }
 
-    LOG_ONCE(log_unimpl("SharedObject.connect()"));
+    LOG_ONCE(log_unimpl(_("SharedObject.connect()")));
 
     return as_value();
 }
@@ -726,7 +727,7 @@ sharedobject_setFps(const fn_call& fn)
     SharedObject_as* obj = ensure<ThisIsNative<SharedObject_as> >(fn);
     UNUSED(obj);
 
-    LOG_ONCE(log_unimpl("SharedObject.setFps"));
+    LOG_ONCE(log_unimpl(_("SharedObject.setFps")));
     return as_value();
 }
 
@@ -735,7 +736,7 @@ sharedobject_send(const fn_call& fn)
 {
     SharedObject_as* obj = ensure<ThisIsNative<SharedObject_as> >(fn);
     UNUSED(obj);
-    LOG_ONCE(log_unimpl("SharedObject.send"));
+    LOG_ONCE(log_unimpl(_("SharedObject.send")));
     return as_value();
 }
 
@@ -783,7 +784,7 @@ sharedobject_getLocal(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("SharedObject.getLocal(%s): missing object name");
+            log_aserror(_("SharedObject.getLocal(%s): missing object name"));
         );
         as_value ret;
         ret.set_null();
@@ -795,21 +796,21 @@ sharedobject_getLocal(const fn_call& fn)
         root = fn.arg(1).to_string(swfVersion);
     }
 
-    log_debug("SO name:%s, root:%s", objName, root);
+    log_debug(_("SO name:%s, root:%s"), objName, root);
 
     VM& vm = getVM(fn);
 
     as_object* obj = vm.getSharedObjectLibrary().getLocal(objName, root);
 
     as_value ret(obj);
-    log_debug("SharedObject.getLocal returning %s", ret);
+    log_debug(_("SharedObject.getLocal returning %s"), ret);
     return ret;
 }
 
 as_value
 sharedobject_getRemote(const fn_call& /*fn*/)
 {
-    LOG_ONCE(log_unimpl("SharedObject.getRemote()"));
+    LOG_ONCE(log_unimpl(_("SharedObject.getRemote()")));
     return as_value();
 }
 
@@ -824,7 +825,7 @@ sharedobject_deleteAll(const fn_call& fn)
 
     UNUSED(obj);
 
-    LOG_ONCE(log_unimpl("SharedObject.deleteAll()"));
+    LOG_ONCE(log_unimpl(_("SharedObject.deleteAll()")));
     return as_value();
 }
 
@@ -839,7 +840,7 @@ sharedobject_getDiskUsage(const fn_call& fn)
 
     UNUSED(obj);
 
-    LOG_ONCE(log_unimpl("SharedObject.getDiskUsage()"));
+    LOG_ONCE(log_unimpl(_("SharedObject.getDiskUsage()")));
     return as_value();
 }
 
@@ -891,7 +892,7 @@ readSOL(VM& vm, const std::string& filespec)
 
     if (stat(filespec.c_str(), &st) != 0) {
         // No existing SOL file. A new one will be created.
-        log_debug("No existing SOL %s found. Will create on flush/exit.",
+        log_debug(_("No existing SOL %s found. Will create on flush/exit."),
 		  filespec);
         return data;
     }
@@ -900,8 +901,8 @@ readSOL(VM& vm, const std::string& filespec)
 
     if (size < 28) {
         // A SOL file exists, but it was invalid. Count it as not existing.
-        log_error("readSOL: SOL file %s is too short "
-		  "(only %s bytes long) to be valid.", filespec, st.st_size);
+        log_error(_("readSOL: SOL file %s is too short "
+                    "(only %s bytes long) to be valid."), filespec, st.st_size);
         return data;
     }
 
@@ -925,7 +926,7 @@ readSOL(VM& vm, const std::string& filespec)
 
         if (buf >= end) {
             // In this case there is no data member.
-            log_error("readSOL: file ends before data segment");
+            log_error(_("readSOL: file ends before data segment"));
             return data;
         }
 
@@ -933,12 +934,12 @@ readSOL(VM& vm, const std::string& filespec)
 
         while (buf != end) {
 
-            log_debug("readSOL: reading property name at "
-                    "byte %s", buf - sbuf.get());
+            log_debug(_("readSOL: reading property name at "
+                      "byte %s"), buf - sbuf.get());
             // read property name
             
             if (end - buf < 2) {
-                log_error("SharedObject: end of buffer while reading length");
+                log_error(_("SharedObject: end of buffer while reading length"));
                 break;
             }
 
@@ -947,12 +948,12 @@ readSOL(VM& vm, const std::string& filespec)
             buf += 2;
 
             if (!len) {
-                log_error("readSOL: empty property name");
+                log_error(_("readSOL: empty property name"));
                 break;
             }
 
             if (end - buf < len) {
-                log_error("SharedObject::readSOL: premature end of input");
+                log_error(_("SharedObject::readSOL: premature end of input"));
                 break;
             }
 
@@ -963,12 +964,12 @@ readSOL(VM& vm, const std::string& filespec)
             as_value as;
 
             if (!rd(as)) {
-                log_error("SharedObject: error parsing SharedObject '%s'",
+                log_error(_("SharedObject: error parsing SharedObject '%s'"),
                         filespec);
                 return 0;
             }
 
-            log_debug("parsed sol member named '%s' (len %s),  value '%s'",
+            log_debug(_("parsed sol member named '%s' (len %s),  value '%s'"),
                     prop_name, len, as);
 
             // set name/value as a member of this (SharedObject) object
@@ -982,7 +983,7 @@ readSOL(VM& vm, const std::string& filespec)
     }
 
     catch (std::exception& e) {
-        log_error("readSOL: Reading SharedObject %s: %s", 
+        log_error(_("readSOL: Reading SharedObject %s: %s"),
 		  filespec, e.what());
         return 0;
     }
@@ -1060,7 +1061,7 @@ encodeData(const std::string& name, as_object& data, SimpleBuffer& buf)
     if (!props.success()) {
         // There are good reasons for this to fail, so it's not an error. Real
         // errors are logged during serialization.
-        log_debug("Did not serialize object");
+        log_debug(_("Did not serialize object"));
         return false;
     }
     return true;

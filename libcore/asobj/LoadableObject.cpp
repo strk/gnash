@@ -390,7 +390,7 @@ loadableobject_sendAndLoad(const fn_call& fn)
             url.set_querystring(existingQS + dataString);
         }
 
-        log_debug("Using GET method for sendAndLoad: %s", url.str());
+        log_debug(_("Using GET method for sendAndLoad: %s"), url.str());
         str = ri.streamProvider().getStream(url.str());
     }
 

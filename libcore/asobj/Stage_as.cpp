@@ -199,8 +199,8 @@ stage_showMenu(const fn_call& fn)
         return as_value(m.getShowMenuState());
     }
     
-    LOG_ONCE(log_unimpl("Stage.showMenu implemented by setting gnashrc "
-                "option and for gtk only"));
+    LOG_ONCE(log_unimpl(_("Stage.showMenu implemented by setting gnashrc "
+                          "option and for gtk only")));
 
     const bool state = toBool(fn.arg(0), getVM(fn));
     

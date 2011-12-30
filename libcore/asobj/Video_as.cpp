@@ -136,7 +136,7 @@ video_deblocking(const fn_call& fn)
     Video* video = ensure<IsDisplayObject<Video> >(fn);
     UNUSED(video);
 
-    log_unimpl("Video.deblocking");
+    log_unimpl(_("Video.deblocking"));
     return as_value();
 }
 

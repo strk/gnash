@@ -195,7 +195,7 @@ string_slice(const fn_call& fn)
 
     size_t retlen = end - start;
 
-    //log_debug("start: %d, end: %d, retlen: %d", start, end, retlen);
+    //log_debug(_("start: %d, end: %d, retlen: %d"), start, end, retlen);
 
     return as_value(utf8::encodeCanonicalString(
                 wstr.substr(start, retlen), version));
@@ -459,7 +459,7 @@ string_substring(const fn_call& fn)
     }
     
     end -= start;
-    //log_debug("Start: %d, End: %d", start, end);
+    //log_debug(_("Start: %d, End: %d"), start, end);
 
     return as_value(utf8::encodeCanonicalString(wstr.substr(start, end), version));
 }
@@ -493,8 +493,8 @@ string_indexOf(const fn_call& fn)
         else {
             IF_VERBOSE_ASCODING_ERRORS(
                 if (start_arg < 0) {
-                    log_aserror("String.indexOf(%s, %s): second argument casts "
-                        "to invalid offset (%d)", tfarg, saval, start_arg);
+                    log_aserror(_("String.indexOf(%s, %s): second argument casts "
+                                  "to invalid offset (%d)"), tfarg, saval, start_arg);
                 }
             );
         }
@@ -753,7 +753,7 @@ getStringVersioned(const fn_call& fn, const as_value& val, std::string& str)
     ///       in most cases a null callerDef means the caller forgot to 
     ///       set the field (ie: a programmatic error)
     if (!fn.callerDef) {
-        log_error("No fn_call::callerDef in string function call");
+        log_error(_("No fn_call::callerDef in string function call"));
     }
 
     const int version = fn.callerDef ? fn.callerDef->get_version() :

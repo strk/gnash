@@ -210,7 +210,7 @@ XMLSocket_as::checkForIncomingData()
     while (static_cast<size_t>(ptr - buf.get()) < bytesRead) {
 
 #ifdef GNASH_XMLSOCKET_DEBUG
-        log_debug ("read: %d, this string ends: %d", bytesRead,
+        log_debug(_("read: %d, this string ends: %d"), bytesRead,
                 ptr + std::strlen(ptr) - buf.get());
 #endif
 

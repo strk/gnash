@@ -594,7 +594,7 @@ textfield_getFontList(const fn_call& fn)
     TextField* text = ensure<IsDisplayObject<TextField> >(fn);
     UNUSED(text);
 
-    LOG_ONCE(log_unimpl("TextField.getFontList()"));
+    LOG_ONCE(log_unimpl(_("TextField.getFontList()")));
 
     return as_value();
 }
@@ -605,7 +605,7 @@ textfield_getNewTextFormat(const fn_call& fn)
     TextField* text = ensure<IsDisplayObject<TextField> >(fn);
     UNUSED(text);
 
-    LOG_ONCE(log_unimpl("TextField.getNewTextFormat()"));
+    LOG_ONCE(log_unimpl(_("TextField.getNewTextFormat()")));
 
     return as_value();
 }
@@ -655,9 +655,8 @@ textfield_getTextFormat(const fn_call& fn)
     // TODO: add font color and some more
 
     LOG_ONCE(
-        log_unimpl("TextField.getTextFormat() discards url, target, "
-            "tabStops, bullet and display")
-    );
+        log_unimpl(_("TextField.getTextFormat() discards url, target, "
+                     "tabStops, bullet and display")));
 
     return as_value(textformat);
 }
@@ -670,16 +669,15 @@ textfield_setTextFormat(const fn_call& fn)
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss; fn.dump_args(ss);
-            log_aserror("TextField.setTextFormat(%s) : %s", ss.str(),
-                _("missing arg"))
-        );
+            log_aserror(_("TextField.setTextFormat(%s) : %s"), ss.str(),
+                _("missing arg")));
         return as_value();
     }
     else if (fn.nargs > 1) {
         LOG_ONCE(
             std::stringstream ss; fn.dump_args(ss);
-            log_unimpl("TextField.setTextFormat(%s) : args past the first are "
-                    "unhandled by Gnash", ss.str());
+            log_unimpl(_("TextField.setTextFormat(%s) : args past the first are "
+                         "unhandled by Gnash"), ss.str());
         );
     }
 
@@ -693,7 +691,7 @@ textfield_setTextFormat(const fn_call& fn)
 
         IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss; fn.dump_args(ss);
-            log_aserror("TextField.setTextFormat(%s) : %s", ss.str(), 
+            log_aserror(_("TextField.setTextFormat(%s) : %s"), ss.str(), 
                 _("first argument is not a TextFormat"))
             );
         return as_value();
@@ -728,8 +726,8 @@ textfield_setNewTextFormat(const fn_call& fn)
     TextField* text = ensure<IsDisplayObject<TextField> >(fn);
     UNUSED(text);
 
-    LOG_ONCE( log_unimpl("TextField.setNewTextFormat(), we'll delegate "
-                "to setTextFormat") );
+    LOG_ONCE(log_unimpl(_("TextField.setNewTextFormat(), we'll delegate "
+                          "to setTextFormat")));
     return textfield_setTextFormat(fn);
 }
 
@@ -788,7 +786,7 @@ textfield_bottomScroll(const fn_call& fn)
     TextField* text = ensure<IsDisplayObject<TextField> >(fn);
     UNUSED(text);
 
-    LOG_ONCE(log_unimpl("TextField.bottomScroll is not complete"));
+    LOG_ONCE(log_unimpl(_("TextField.bottomScroll is not complete")));
 
 
     if (!fn.nargs)
@@ -808,7 +806,7 @@ textfield_maxhscroll(const fn_call& fn)
     TextField* text = ensure<IsDisplayObject<TextField> >(fn);
     UNUSED(text);
 
-        LOG_ONCE(log_unimpl("TextField.maxhscroll is not complete"));
+    LOG_ONCE(log_unimpl(_("TextField.maxhscroll is not complete")));
 
 
     if (!fn.nargs)
@@ -904,8 +902,8 @@ textfield_replaceSel(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream os;
             fn.dump_args(os);
-            log_aserror("TextField.replaceSel(%s) requires exactly one "
-                "argument", os.str());
+            log_aserror(_("TextField.replaceSel(%s) requires exactly one "
+                          "argument"), os.str());
         );
         return as_value();
     }
@@ -943,7 +941,7 @@ textfield_hscroll(const fn_call& fn)
 {
     TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
-    LOG_ONCE(log_unimpl("TextField._hscroll is not complete"));
+    LOG_ONCE(log_unimpl(_("TextField._hscroll is not complete")));
 
     if (!fn.nargs)
     {
@@ -961,7 +959,7 @@ textfield_maxscroll(const fn_call& fn)
 {
     TextField* text = ensure<IsDisplayObject<TextField> >(fn);
 
-    LOG_ONCE(log_unimpl("TextField.maxscroll is not complete"));
+    LOG_ONCE(log_unimpl(_("TextField.maxscroll is not complete")));
 
     if (!fn.nargs) {
         // Getter
@@ -992,8 +990,8 @@ textfield_replaceText(const fn_call& fn)
     {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
-        log_aserror("TextField.replaceText(%s): negative endIndex"
-            " - doing nothing", ss.str());
+        log_aserror(_("TextField.replaceText(%s): negative endIndex"
+                      " - doing nothing"), ss.str());
         );
         return as_value();
     }
@@ -1018,8 +1016,8 @@ textfield_replaceText(const fn_call& fn)
     {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
-        log_aserror("TextField.replaceText(%s): beginIndex out of range"
-            " - doing nothing", ss.str());
+        log_aserror(_("TextField.replaceText(%s): beginIndex out of range"
+                      " - doing nothing"), ss.str());
         );
         return as_value();
     }
@@ -1035,8 +1033,8 @@ textfield_replaceText(const fn_call& fn)
         //log_aserror...
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
-        log_aserror("TextField.replaceText(%s): endIndex out of range"
-            " - taking as end of string", ss.str());
+        log_aserror(_("TextField.replaceText(%s): endIndex out of range"
+                      " - taking as end of string"), ss.str());
         );
     }
     else
@@ -1057,7 +1055,7 @@ textfield_removeTextField(const fn_call& fn)
 
     text->removeTextField();
 
-    LOG_ONCE(log_debug("TextField.removeTextField() TESTING"));
+    LOG_ONCE(log_debug(_("TextField.removeTextField() TESTING")));
 
     return as_value();
 }

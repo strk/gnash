@@ -37,7 +37,7 @@ namespace gnash {
 as_value
 key_is_accessible(const fn_call& /*fn*/)
 {
-    log_unimpl("Key.isAccessible");
+    log_unimpl(_("Key.isAccessible"));
     return as_value();
 }
 
@@ -76,7 +76,7 @@ key_is_down(const fn_call& fn)
     if (keycode < 0 || keycode >= key::KEYCOUNT) {
         // AS coding error !
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("Key.isKeyDown(%d): keycode out of range", keycode);
+            log_aserror(_("Key.isKeyDown(%d): keycode out of range"), keycode);
         );
         return as_value(false);
     }
@@ -94,7 +94,7 @@ key_is_down(const fn_call& fn)
 as_value   
 key_is_toggled(const fn_call& /* fn */)
 {
-    log_unimpl("Key.isToggled");
+    log_unimpl(_("Key.isToggled"));
     // @@ TODO
     return as_value(false);
 }

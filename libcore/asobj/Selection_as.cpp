@@ -186,7 +186,7 @@ selection_setFocus(const fn_call& fn)
     /// taken.
     if (!fn.nargs || fn.nargs > 1) {
         IF_VERBOSE_ASCODING_ERRORS(
-           log_aserror("Selection.setFocus: expected 1 argument, got %d",
+            log_aserror(_("Selection.setFocus: expected 1 argument, got %d"),
                fn.nargs);
         );
         return as_value(false);

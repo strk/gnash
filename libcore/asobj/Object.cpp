@@ -295,8 +295,8 @@ object_registerClass(const fn_call& fn)
     // https://savannah.gnu.org/bugs/index.php?23130
     DisplayObject* tgt = fn.env().target();
     if (!tgt) {
-        log_error("current environment has no target, wouldn't know "
-                "where to look for symbol required for registerClass"); 
+        log_error(_("current environment has no target, wouldn't know "
+                    "where to look for symbol required for registerClass"));
         return as_value(false);
     }
 

@@ -528,7 +528,8 @@ movieclip_attachAudio(const fn_call& fn)
 
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("MovieClip.attachAudio(): %s", _("missing arguments"));
+            log_aserror(_("MovieClip.attachAudio(): %s"),
+			  _("missing arguments"));
         );
         return as_value();
     }
@@ -537,8 +538,8 @@ movieclip_attachAudio(const fn_call& fn)
     if (!isNativeType(toObject(fn.arg(0), getVM(fn)), ns)) { 
         std::stringstream ss; fn.dump_args(ss);
         // TODO: find out what to do here
-        log_error("MovieClip.attachAudio(%s): first arg doesn't cast to a "
-                "NetStream", ss.str());
+        log_error(_("MovieClip.attachAudio(%s): first arg doesn't cast to a "
+		    "NetStream"), ss.str());
         return as_value();
     }
 
@@ -555,7 +556,7 @@ movieclip_attachVideo(const fn_call& fn)
     MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
     UNUSED(movieclip);
 
-    LOG_ONCE( log_unimpl("MovieClip.attachVideo()") );
+    LOG_ONCE(log_unimpl(_("MovieClip.attachVideo()")));
     return as_value();
 }
 
@@ -961,7 +962,7 @@ movieclip_loadVariables(const fn_call& fn)
         static_cast<MovieClip::VariablesMethod>(toInt(val, getVM(fn)));
 
     movieclip->loadVariables(urlstr, method);
-    log_debug("MovieClip.loadVariables(%s) - TESTING ", urlstr);
+    log_debug(_("MovieClip.loadVariables(%s) - TESTING "), urlstr);
 
     return as_value();
 }
@@ -1062,8 +1063,8 @@ movieclip_getInstanceAtDepth(const fn_call& fn)
 
     if (fn.nargs < 1 || fn.arg(0).is_undefined()) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror("MovieClip.getInstanceAtDepth(): missing or "
-            "undefined depth argument");
+        log_aserror(_("MovieClip.getInstanceAtDepth(): missing or "
+		      "undefined depth argument"));
         );
         return as_value();
     }
@@ -1191,8 +1192,8 @@ movieclip_getTextSnapshot(const fn_call& fn)
 
     if (!tsCtor) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("MovieClip.getTextSnapshot: failed to construct "
-                "TextSnapshot (object probably overridden)");
+            log_aserror(_("MovieClip.getTextSnapshot: failed to construct "
+			  "TextSnapshot (object probably overridden)"));
         );
         return as_value();
     }
@@ -1420,7 +1421,7 @@ movieclip_setMask(const fn_call& fn)
         maskee->setMask(mask);
     }
 
-    //log_debug("MovieClip.setMask() TESTING");
+    //log_debug(_("MovieClip.setMask() TESTING"));
 
     return as_value(true);
 }
@@ -1452,7 +1453,7 @@ movieclip_lineTo(const fn_call& fn)
     if (!isFinite(y)) y = 0;
 
 #ifdef DEBUG_DRAWING_API
-    log_debug("%s.lineTo(%g,%g);", movieclip->getTarget(), x, y);
+    log_debug(_("%s.lineTo(%g,%g);"), movieclip->getTarget(), x, y);
 #endif
     movieclip->graphics().lineTo(pixelsToTwips(x), pixelsToTwips(y),
             movieclip->getDefinitionVersion());
@@ -1667,7 +1668,7 @@ movieclip_beginFill(const fn_call& fn)
 
     if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("beginFill() with no args is a no-op");
+            log_aserror(_("beginFill() with no args is a no-op"));
         );
         return as_value();
     }
@@ -1968,8 +1969,8 @@ movieclip_beginBitmapFill(const fn_call& fn)
 
     if (!isNativeType(obj, bd) || bd->disposed()) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_debug("MovieClip.attachBitmap: first argument should be a "
-                "valid BitmapData", fn.arg(1));
+            log_debug(_("MovieClip.attachBitmap: first argument should be a "
+			"valid BitmapData"), fn.arg(1));
         );
         return as_value();
     }
@@ -2014,7 +2015,7 @@ movieclip_getRect(const fn_call& fn)
 {
     MovieClip* ptr = ensure<IsDisplayObject<MovieClip> >(fn);
     UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 
@@ -2024,7 +2025,7 @@ movieclip_lineGradientStyle(const fn_call& fn)
 {
     MovieClip* ptr = ensure<IsDisplayObject<MovieClip> >(fn);
     UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 
@@ -2036,7 +2037,7 @@ movieclip_attachBitmap(const fn_call& fn)
 
     if (fn.nargs < 2) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_debug("MovieClip.attachBitmap: expected 2 args, got %d",
+            log_debug(_("MovieClip.attachBitmap: expected 2 args, got %d"),
                 fn.nargs);
         );
         return as_value();
@@ -2047,8 +2048,8 @@ movieclip_attachBitmap(const fn_call& fn)
 
     if (!isNativeType(obj, bd) || bd->disposed()) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_debug("MovieClip.attachBitmap: first argument should be a "
-                "valid BitmapData", fn.arg(1));
+            log_debug(_("MovieClip.attachBitmap: first argument should be a "
+		      "valid BitmapData"), fn.arg(1));
         );
         return as_value();
     }
@@ -2073,7 +2074,7 @@ movieclip_transform(const fn_call& fn)
 
     if (!transCtor) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("Failed to construct flash.geom.Transform!");
+            log_aserror(_("Failed to construct flash.geom.Transform!"));
         );
         return as_value();
     }
@@ -2091,7 +2092,7 @@ as_value
 movieclip_beginMeshFill(const fn_call& /*fn*/)
 {
 
-    LOG_ONCE(log_unimpl("MovieClip.beginMeshFill"));
+    LOG_ONCE(log_unimpl(_("MovieClip.beginMeshFill")));
     return as_value();
 }
 

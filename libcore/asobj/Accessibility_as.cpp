@@ -84,21 +84,21 @@ attachAccessibilityStaticInterface(as_object& o)
 as_value
 accessibility_isActive(const fn_call& /*fn*/)
 {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 
 as_value
 accessibility_updateProperties(const fn_call& /*fn*/)
 {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 
 as_value
 accessibility_sendEvent(const fn_call& /*fn*/)
 {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    LOG_ONCE(log_unimpl(__FUNCTION__) );
     return as_value();
 }
 
@@ -107,6 +107,6 @@ accessibility_sendEvent(const fn_call& /*fn*/)
 
 // local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:
 

@@ -276,7 +276,7 @@ LocalConnection_as::update()
     // Check whether local connection is disabled(!): brilliant choice of
     // function name.
     if (rcfile.getLocalConnection()) {
-        log_security("Attempting to write to disabled LocalConnection!");
+        log_security(_("Attempting to write to disabled LocalConnection!"));
         movie_root& mr = getRoot(owner());
         mr.removeAdvanceCallback(this);
         return;
@@ -285,7 +285,7 @@ LocalConnection_as::update()
     // No-op if already attached. Nothing to do if it fails, but we
     // should probably stop trying.
     if (!_shm.attach()) {
-        log_error("Failed to attach shared memory segment");
+        log_error(_("Failed to attach shared memory segment"));
         return;
     }
 
@@ -293,7 +293,7 @@ LocalConnection_as::update()
     // processes.
     SharedMem::Lock lock(_shm);
     if (!lock.locked()) {
-        log_debug("Failed to get shm lock");
+        log_debug(_("Failed to get shm lock"));
         return;
     }
 
@@ -329,7 +329,7 @@ LocalConnection_as::update()
         // Get the connection name. That's all we need to remove expired
         // data.
         if (!rd(a)) {
-            log_error("Invalid connection name data");
+            log_error(_("Invalid connection name data"));
             return;
         }
         const std::string& connection = a.to_string();
@@ -344,8 +344,8 @@ LocalConnection_as::update()
             const boost::uint32_t timeNow = getTimestamp(vm);
 
             if (timeNow - timestamp > timeout) {
-                log_debug("Data %s expired at %s. Removing its target "
-                        "as a listener", timestamp, timeNow);
+                log_debug(_("Data %s expired at %s. Removing its target "
+                            "as a listener"), timestamp, timeNow);
                 removeListener(connection, _shm);
                 markRead(_shm);
                 _lastTime = 0;
@@ -428,8 +428,8 @@ LocalConnection_as::close()
     
     SharedMem::Lock lock(_shm);
     if (!lock.locked()) {
-        log_error("Failed to get lock on shared memory! Will not remove "
-                "listener");
+        log_error(_("Failed to get lock on shared memory! Will not remove "
+                    "listener"));
         return;
     }
 
@@ -458,7 +458,7 @@ LocalConnection_as::connect(const std::string& name)
     _name = name;
     
     if (!_shm.attach()) {
-        log_error("Failed to open shared memory segment");
+        log_error(_("Failed to open shared memory segment"));
         return;
     }
 
@@ -771,7 +771,7 @@ addListener(const std::string& name, SharedMem& mem)
             getMarker(next, mem.end());
             
             if (std::equal(name.c_str(), name.c_str() + name.size(), ptr)) {
-                log_debug("Not adding duplicated listener");
+                log_debug(_("Not adding duplicated listener"));
                 return false;
             }
 
@@ -780,7 +780,7 @@ addListener(const std::string& name, SharedMem& mem)
             ptr = next;
         }
         if (next == mem.end()) {
-            log_error("No space for listener in shared memory!");
+            log_error(_("No space for listener in shared memory!"));
             return false;
         }
     }
@@ -841,14 +841,14 @@ executeAMFFunction(as_object& o, amf::Reader& rd)
     as_value a;
 
     if (!rd(a) || !a.is_string()) {
-        log_error("Invalid domain %s", a);
+        log_error(_("Invalid domain %s"), a);
         return;
     }
     const std::string& domain = a.to_string();
-    log_debug("Domain: %s", domain);
+    log_debug(_("Domain: %s"), domain);
     
     if (!rd(a)) {
-        log_error("Invalid function name %s", a);
+        log_error(_("Invalid function name %s"), a);
         return;
     }
 
@@ -859,25 +859,25 @@ executeAMFFunction(as_object& o, amf::Reader& rd)
     if (a.is_bool()) {
 
         // Both bools have been false in all the examples I've seen.
-        log_debug("First bool: %s", a);
-        if (rd(a)) log_debug("Second Bool: %s", a);
+        log_debug(_("First bool: %s"), a);
+        if (rd(a)) log_debug(_("Second Bool: %s"), a);
 
         // We guess that the first number describes the number of data fields
         // after the second number, before the function name.
-        if (rd(a)) log_debug("First Number: %s", a);
+        if (rd(a)) log_debug(_("First Number: %s"), a);
 
         // Handle negative numbers.
         const size_t count = std::max<int>(0, toInt(a, getVM(o)));
 
         // We don't know what the second number signifies.
-        if (rd(a)) log_debug("Second Number: %s", a);
+        if (rd(a)) log_debug(_("Second Number: %s"), a);
 
         for (size_t i = 0; i < count; ++i) {
             if (!rd(a)) {
-                log_error("Fewer AMF fields than expected.");
+                log_error(_("Fewer AMF fields than expected."));
                 return;
             }
-            log_debug("Data: %s", a);
+            log_debug(_("Data: %s"), a);
         }
 
         // Now we expect the next field to be the method to call.

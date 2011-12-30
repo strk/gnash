@@ -382,7 +382,7 @@ XML_as::parseTag(XMLNode_as*& node, xml_iterator& it,
         // Malformed. Search for the parent node.
         XMLNode_as* s = node;
         while (s && !noCaseCompare(s->nodeName(), tagName)) {
-            //log_debug("parent: %s, this: %s", s->nodeName(), tagName);
+            //log_debug(_("parent: %s, this: %s"), s->nodeName(), tagName);
             s = s->getParent();
         }
         if (s) {
@@ -750,7 +750,7 @@ xml_parseXML(const fn_call& fn)
 
     if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("XML.parseXML() needs one argument");
+            log_aserror(_("XML.parseXML() needs one argument"));
         );
         return as_value();
     }

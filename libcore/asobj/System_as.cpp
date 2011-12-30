@@ -307,7 +307,7 @@ attachSystemInterface(as_object& proto)
 as_value
 system_security_allowdomain(const fn_call& fn)
 {
-    LOG_ONCE(log_unimpl("System.security.allowDomain"));
+    LOG_ONCE(log_unimpl(_("System.security.allowDomain")));
     if (!fn.nargs) {
         return as_value(false);
     }
@@ -318,7 +318,7 @@ system_security_allowdomain(const fn_call& fn)
 as_value
 system_security_allowinsecuredomain(const fn_call& /*fn*/)
 {
-    LOG_ONCE(log_unimpl("System.security.allowInsecureDomain"));
+    LOG_ONCE(log_unimpl(_("System.security.allowInsecureDomain")));
     return as_value();
 }
 
@@ -326,7 +326,7 @@ system_security_allowinsecuredomain(const fn_call& /*fn*/)
 as_value
 system_security_loadpolicyfile(const fn_call& /*fn*/)
 {
-    LOG_ONCE(log_unimpl("System.security.loadPolicyFile"));
+    LOG_ONCE(log_unimpl(_("System.security.loadPolicyFile")));
     return as_value();
 }
 
@@ -347,7 +347,7 @@ system_setClipboard(const fn_call& fn)
 as_value
 system_showsettings(const fn_call& /*fn*/)
 {
-    LOG_ONCE(log_unimpl("System.showSettings"));
+    LOG_ONCE(log_unimpl(_("System.showSettings")));
     return as_value();
 }
 
@@ -364,7 +364,7 @@ system_exactsettings(const fn_call& fn)
         return as_value(true);   
     }
     else {
-        LOG_ONCE(log_unimpl("System.exactSettings"));
+        LOG_ONCE(log_unimpl(_("System.exactSettings")));
         return as_value();
     }
 }
@@ -382,7 +382,7 @@ system_usecodepage(const fn_call& fn)
         return as_value(false);   
     }
     else {
-        LOG_ONCE(log_unimpl ("System.useCodepage") );
+        LOG_ONCE(log_unimpl(_("System.useCodepage")));
         return as_value();
     }
 }
