@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-31 09:29-0700\n"
+"POT-Creation-Date: 2011-12-31 09:40-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -994,7 +994,6 @@ msgstr ""
 #: librender/opengl/Renderer_ogl.cpp:1142
 #: librender/openvg/OpenVGRenderer.cpp:569
 #: librender/opengles1/Renderer_gles1.cpp:230
-#: librender/cairo/Renderer_cairo.cpp:764
 msgid "set_antialiased"
 msgstr ""
 
@@ -1257,38 +1256,10 @@ msgstr ""
 msgid "Can't render this type of frame"
 msgstr ""
 
-#: librender/agg/Renderer_agg.cpp:929
-msgid "Warning: rendering ended while drawing a mask"
-msgstr ""
-
-#: librender/agg/Renderer_agg.cpp:933
-msgid "Warning: rendering ended while masks were still active"
-msgstr ""
-
-#: librender/agg/Renderer_agg.cpp:1077
-msgid ""
-"Warning: select_clipbounds encountered a character definition with null "
-"bounds"
-msgstr ""
-
-#: librender/agg/Renderer_agg.cpp:1179
-msgid "Warning: AGG renderer skipping a whole character"
-msgstr ""
-
 #: librender/agg/Renderer_agg.cpp:1764
 msgid ""
 "Unidirectionally scaled strokes in AGG renderer (we'll scale by the scalable "
 "one)"
-msgstr ""
-
-#: librender/agg/Renderer_agg.cpp:2105
-#, c-format
-msgid "Framebuffer pixel format is %s (little-endian host)"
-msgstr ""
-
-#: librender/agg/Renderer_agg.cpp:2107
-#, c-format
-msgid "Framebuffer pixel format is %s (big-endian host)"
 msgstr ""
 
 #: librender/agg/Renderer_agg.cpp:2151
