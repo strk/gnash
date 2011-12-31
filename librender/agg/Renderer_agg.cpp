@@ -926,12 +926,12 @@ public:
     void end_display()
     {
         if (m_drawing_mask) {
-            log_debug(_("Warning: rendering ended while drawing a mask"));
+            log_debug("Warning: rendering ended while drawing a mask");
         }
 
         while (! _alphaMasks.empty()) {
-            log_debug(_("Warning: rendering ended while masks "
-                        "were still active"));
+            log_debug("Warning: rendering ended while masks "
+                        "were still active");
             disable_mask();      
         }
     }
@@ -1074,8 +1074,8 @@ public:
     _clipbounds_selected.reserve(_clipbounds.size());
 
     if (objectBounds.is_null()) {
-      log_debug(_("Warning: select_clipbounds encountered a character "
-                  "definition with null bounds"));
+      log_debug("Warning: select_clipbounds encountered a character "
+                  "definition with null bounds");
       return;
     }   
 
@@ -1176,7 +1176,7 @@ public:
 
         if (_clipbounds_selected.empty()) {
 #ifdef GNASH_WARN_WHOLE_CHARACTER_SKIP
-            log_debug(_("Warning: AGG renderer skipping a whole character"));
+            log_debug("Warning: AGG renderer skipping a whole character");
 #endif
             return; 
         }
@@ -2102,9 +2102,9 @@ DSOEXPORT Renderer_agg_base*  create_Renderer_agg(const char *pixelformat)
   if (!pixelformat) return NULL;
 
   if (is_little_endian_host())
-    log_debug(_("Framebuffer pixel format is %s (little-endian host)"), pixelformat);
+    log_debug("Framebuffer pixel format is %s (little-endian host)", pixelformat);
   else
-    log_debug(_("Framebuffer pixel format is %s (big-endian host)"), pixelformat);
+    log_debug("Framebuffer pixel format is %s (big-endian host)", pixelformat);
   
 #ifdef PIXELFORMAT_RGB555  
   if (!strcmp(pixelformat, "RGB555"))

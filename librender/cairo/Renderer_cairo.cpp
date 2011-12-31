@@ -761,7 +761,7 @@ Renderer_cairo::draw_poly(const std::vector<point>& corners,
 void
 Renderer_cairo::set_antialiased(bool /*enable*/)
 {
-    log_unimpl(_("set_antialiased"));
+    LOG_ONCE(log_unimpl(__FUNCTION__));
 }
     
 void
@@ -861,12 +861,12 @@ Renderer_cairo::apply_line_style(const LineStyle& style, const SWFCxForm& cx,
         case JOIN_MITER:
             break;
         default:
-            log_unimpl(_("join style"));
+            LOG_ONCE(log_unimpl(_("join style")));
     }
     cairo_set_line_join(_cr, join_style);
 
     if (style.startCapStyle() != style.endCapStyle()) {
-        log_unimpl(_("differing start and end cap styles"));
+        LOG_ONCE(log_unimpl(_("differing start and end cap styles")));
     }
 
     cairo_line_cap_t cap_style = CAIRO_LINE_CAP_ROUND;
@@ -880,7 +880,7 @@ Renderer_cairo::apply_line_style(const LineStyle& style, const SWFCxForm& cx,
             cap_style = CAIRO_LINE_CAP_SQUARE;
             break;
         default:
-            log_unimpl(_("cap style"));
+            LOG_ONCE(log_unimpl(_("cap style")));
     }
 
     cairo_set_line_cap(_cr, cap_style);
