@@ -60,8 +60,7 @@ GtkGlExtGlue::init(int argc, char** argv[])
 
     gint major, minor;
     gdk_gl_query_version (&major, &minor);
-    log_debug (_("OpenGL extension version - %d.%d"),
-              (int)major, (int)minor);
+    log_debug ("OpenGL extension version - %d.%d", (int)major, (int)minor);
 
     GdkGLConfigMode glcmode = (GdkGLConfigMode)(GDK_GL_MODE_RGB |
                                                 GDK_GL_MODE_STENCIL |
@@ -79,10 +78,10 @@ GtkGlExtGlue::init(int argc, char** argv[])
         log_error (_("No appropriate OpenGL-capable visual found."));
         gtk_main_quit(); // XXX
       } else {
-        log_debug (_("Got single-buffered visual."));
+        log_debug ("Got single-buffered visual.");
       }
     } else {
-      log_debug (_("Got double-buffered visual."));
+      log_debug ("Got double-buffered visual.");
     }
     
     return true;

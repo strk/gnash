@@ -172,7 +172,7 @@ FBGui::~FBGui()
     
     if (_fd > 0) {
         enable_terminal();
-        log_debug(_("Closing framebuffer device"));
+        // log_debug("Closing framebuffer device");
         close(_fd);
     }
 }
@@ -199,7 +199,7 @@ FBGui::init(int argc, char *** argv)
         // Set "window" size
         _width =  ovg->getWidth();
         _height = ovg->getHeight();
-        log_debug(_("Width:%d, Height:%d"), _width, _height);
+        log_debug("Width:%d, Height:%d", _width, _height);
         _renderer.reset(renderer::openvg::create_handler(0));     
         renderer::openvg::Renderer_ovg *rend = reinterpret_cast
             <renderer::openvg::Renderer_ovg *>(_renderer.get());
@@ -221,7 +221,7 @@ FBGui::init(int argc, char *** argv)
         // Set "window" size
         _width =  agg->width();
         _height = agg->height();
-        log_debug(_("Width:%d, Height:%d"), _width, _height);
+        log_debug("Width:%d, Height:%d", _width, _height);
         _renderer.reset(agg->createRenderHandler());
     }
 #endif
@@ -248,7 +248,7 @@ FBGui::init(int argc, char *** argv)
     if (possibles.empty()) {
         log_error(_("Found no accessible input event devices"));
     } else {
-        log_debug(_("Found %d input event devices."), possibles.size());
+        log_debug("Found %d input event devices.", possibles.size());
     }
     
     std::vector<boost::shared_ptr<InputDevice> >::iterator it;
@@ -320,7 +320,7 @@ FBGui::init(int argc, char *** argv)
     if ( _ypos < 0 ) _ypos += _var_screeninfo.yres - _height;
     _ypos = clamp<int>(_ypos, 0, _var_screeninfo.yres-_height);
 
-    log_debug(_("X:%d, Y:%d"), _xpos, _ypos);
+    log_debug("X:%d, Y:%d", _xpos, _ypos);
 #endif
     
     _validbounds.setTo(0, 0, _width - 1, _height - 1);
@@ -529,7 +529,6 @@ FBGui::disable_terminal()
 
     _original_kd = -1;
     
-    
     // Find the TTY device name
     
     char* tty = find_accessible_tty(0);
@@ -537,39 +536,38 @@ FBGui::disable_terminal()
     int fd;
   
     if (!tty) {
-        log_debug(_("WARNING: Could not detect controlling TTY"));
+        log_error(_("Could not detect controlling TTY"));
         return false;
     }
-    
     
     // Detect the currently active virtual terminal (so we can switch back to
     // it later)
     
     fd = open(tty, O_RDWR);
     if (fd < 0) {
-        log_debug(_("WARNING: Could not open %s"), tty);
+        log_error(_("Could not open %s"), tty);
         return false;
     }
     
     struct vt_stat vts;
     if (ioctl(fd, VT_GETSTATE, &vts) == -1) {
-        log_debug(_("WARNING: Could not get current VT state"));
+        log_error(_("Could not get current VT state"));
         close(_fd);
         return false;
     }
     
     _original_vt = vts.v_active;
-    log_debug(_("Original TTY NO = %d"), _original_vt);
+    // log_debug("Original TTY NO = %d", _original_vt);
   
 #ifdef REQUEST_NEW_VT
     // Request a new VT number
     if (ioctl(fd, VT_OPENQRY, &_own_vt) == -1) {
-        log_debug(_("WARNING: Could not request a new VT"));
+        log_error(_("Could not request a new VT"));
         close(fd);
         return false;
     }
   
-    log_debug(_("Own TTY NO = %d"), _own_vt);
+    // log_debug("Own TTY NO = %d", _own_vt);
 
     if (fd > 0) {
         close(fd);
@@ -578,24 +576,24 @@ FBGui::disable_terminal()
     // Activate our new VT
     tty = find_accessible_tty(_own_vt);
     if (!tty) {
-        log_debug(_("WARNING: Could not find device for VT number %d"), _own_vt);
+        log_error(_("Could not find device for VT number %d"), _own_vt);
         return false;
     }
   
     _fd = open(tty, O_RDWR);
     if (fd < 0) {
-        log_debug(_("WARNING: Could not open %s"), tty);
+        log_error(_("Could not open %s"), tty);
         return false;
     }
   
     if (ioctl(fd, VT_ACTIVATE, _own_vt) == -1) {
-        log_debug(_("WARNING: Could not activate VT number %d"), _own_vt);
+        log_error(_("Could not activate VT number %d"), _own_vt);
         close(fd);
         return false;
     }
   
     if (ioctl(fd, VT_WAITACTIVE, _own_vt) == -1) {
-        log_debug(_("WARNING: Error waiting for VT %d becoming active"),
+        log_error(_("Error waiting for VT %d becoming active"),
                   _own_vt);
         //close(tty);
         //return false;   don't abort
@@ -612,14 +610,13 @@ FBGui::disable_terminal()
     // Activate our new VT
     tty = find_accessible_tty(_own_vt);
     if (!tty) {
-        log_debug(_("WARNING: Could not find device for VT number %d"),
-                  _own_vt);
+        log_error(_("Could not find device for VT number %d"), _own_vt);
         return false;
     }
   
     fd = open(tty, O_RDWR);
     if (fd < 0) {
-        log_debug(_("WARNING: Could not open %s"), tty);
+        log_error(_("Could not open %s"), tty);
         return false;
     }
   
@@ -627,7 +624,7 @@ FBGui::disable_terminal()
     // Become session leader and attach to terminal
     setsid();
     if (ioctl(fd, TIOCSCTTY, 0) == -1) {
-    log_debug(_("WARNING: Could not attach controlling terminal (%s)"), tty);
+    log_error(_("Could not attach controlling terminal (%s)"), tty);
     }
 #endif
 #endif  // end of if REQUEST_NEW_VT
@@ -635,18 +632,18 @@ FBGui::disable_terminal()
     // Disable keyboard cursor
   
     if (ioctl(fd, KDGETMODE, &_original_kd) == -1) {
-        log_debug(_("WARNING: Could not query current keyboard mode on VT"));
+        log_error(_("Could not query current keyboard mode on VT"));
     }
 
     if (ioctl(fd, KDSETMODE, KD_GRAPHICS) == -1) {
-        log_debug(_("WARNING: Could not switch to graphics mode on new VT"));
+        log_error(_("Could not switch to graphics mode on new VT"));
     }
 
     if (fd > 0) {
         close(fd);
     }
   
-    log_debug(_("VT %d ready"), _own_vt);  
+    // log_debug("VT %d ready", _own_vt);  
   
     // NOTE: We could also implement virtual console switching by using 
     // VT_GETMODE / VT_SETMODE ioctl calls and handling their signals, but
@@ -660,28 +657,28 @@ FBGui::enable_terminal()
 {
     // GNASH_REPORT_FUNCTION;
 
-    log_debug(_("Restoring terminal..."));
+    // log_debug("Restoring terminal...");
 
     char* tty = find_accessible_tty(_own_vt);
     if (!tty) {
-        log_debug(_("WARNING: Could not find device for VT number %d"), _own_vt);
+        log_error(_("Could not find device for VT number %d"), _own_vt);
         return false;
     }
 
     int fd = open(tty, O_RDWR);
     if (fd < 0) {
-        log_debug(_("WARNING: Could not open %s"), tty);
+        log_error(_("Could not open %s"), tty);
         return false;
     }
 
     if (ioctl(fd, VT_ACTIVATE, _original_vt)) {
-        log_debug(_("WARNING: Could not activate VT number %d"), _original_vt);
+        log_error(_("Could not activate VT number %d"), _original_vt);
         close(_fd);
         return false;
     }
 
     if (ioctl(fd, VT_WAITACTIVE, _original_vt)) {
-        log_debug(_("WARNING: Error waiting for VT %d becoming active"),
+        log_error(_("Error waiting for VT %d becoming active"),
                   _original_vt);
         //close(tty);
         //return false;   don't abort
@@ -690,7 +687,7 @@ FBGui::enable_terminal()
     // Restore keyboard
   
     if (ioctl(fd, KDSETMODE, _original_kd)) {
-        log_debug(_("WARNING: Could not restore keyboard mode"));
+        log_error(_("Could not restore keyboard mode"));
     }  
 
     if (fd > 0) {
@@ -737,7 +734,7 @@ FBGui::checkForData()
 #if 1
                 double x = 0.655 * ie->x;
                 double y = 0.46875 * ie->y;
-                log_debug(_("Mouse clicked at: %g:%g"), x, y);
+                // log_debug("Mouse clicked at: %g:%g", x, y);
                 notifyMouseMove(int(x), int(y));
 #else
                 notifyMouseMove(ie->x, ie->y);

@@ -205,11 +205,11 @@ Qt4Gui::createWindow(const char* windowtitle, int width, int height,
     _validbounds.setTo(0, 0, _width, _height);
     _glue->initBuffer(_width, _height);
     
-    log_debug(_("Setting renderer"));
+    // log_debug("Setting renderer");
 
     _runResources.setRenderer(_renderer);
     
-    log_debug(_("Set renderer"));
+    // log_debug("Set renderer");
    
     return true;
 }

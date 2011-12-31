@@ -388,7 +388,7 @@ GtkOvgGlue::queryEGLConfig(EGLDisplay display)
          log_error(_("No EGLconfigs found\n"));
          return 0;
      }
-     log_debug(_("Max number of EGL Configs is %d"), max_num_config);     
+     log_debug("Max number of EGL Configs is %d", max_num_config);
      
      configs = new EGLConfig[max_num_config];
      if (0 == configs) {
@@ -402,7 +402,7 @@ GtkOvgGlue::queryEGLConfig(EGLDisplay display)
          return 0;
      }
      for (int i=0; i<max_num_config; i++ ) {
-         log_debug(_("Config[%d] is:"), i);
+         log_debug("Config[%d] is:", i);
          printEGLConfig(configs[i]);
      }
 

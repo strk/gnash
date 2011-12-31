@@ -156,7 +156,7 @@ GtkGui::init(int argc, char **argv[])
 {
 #ifdef HAVE_X11
     if (!XInitThreads()) {
-        log_debug(_("Failed to initialize X threading support\n"));
+        log_error(_("Failed to initialize X threading support\n"));
         return false;
     }
 #endif
@@ -170,10 +170,10 @@ GtkGui::init(int argc, char **argv[])
 #else
         _window = gtk_plug_new(_xid);
 #endif
-        log_debug (_("Created XEmbedded window"));
+        // log_debug("Created XEmbedded window");
     } else {
         _window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-        log_debug (_("Created top level window"));
+        // log_debug ("Created top level window");
     }
     
     addGnashIcon(GTK_WINDOW(_window));
@@ -186,14 +186,14 @@ GtkGui::init(int argc, char **argv[])
         // there is no point in trying to use OpenGL.
         bool dri = false;
         if (checkX11Extension("DRI")) {
-            log_debug(_("DRI extension found"));
+            log_debug("DRI extension found");
             dri = true;
         }
         bool glx = false;
         // See if our X11 server supports the GLX extension, otherwise
         // there is no point in trying to use OpenGL.
         if (checkX11Extension("GLX")) {
-            log_debug(_("GLX extension found"));
+            log_debug("GLX extension found");
             glx = true;
         }
         // If we don't have these extensions, don't bother with OpenGl,
@@ -208,7 +208,7 @@ GtkGui::init(int argc, char **argv[])
         // See if our X11 server supports the Xvideo extension, otherwise
         // there is no point in trying to use Xvideo for scaling.
         if (checkX11Extension("XVideo")) {
-            log_debug(_("Xvideo extension found"));
+            log_debug("Xvideo extension found");
         }
     }
 
@@ -730,7 +730,7 @@ GtkGui::createMenuAlt()
 void
 GtkGui::resizeWindow(int width, int height)
 {
-    log_debug(_("GtkGui: Window resize request received"));
+    // log_debug("GtkGui: Window resize request received");
 
     if (!_xid) {
     

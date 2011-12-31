@@ -96,7 +96,7 @@ ScreenShotter::saveImage(const Renderer& r, const std::string& id) const
         r.renderToImage(t, _type, _quality);
     }
     else {
-        log_error("Failed to open screenshot file \"%s\"!", outfile);
+        log_error(_("Failed to open screenshot file \"%s\"!"), outfile);
     }
 }
 

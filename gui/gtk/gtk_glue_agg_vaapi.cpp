@@ -160,7 +160,7 @@ GtkAggVaapiGlue::init(int /*argc*/, char ** /*argv*/[])
 {
     VaapiGlobalContext *const gvactx = VaapiGlobalContext::get();
     if (!gvactx) {
-        log_debug(_("WARNING: failed to create VA-API display."));
+        log_error(_("WARNING: failed to create VA-API display."));
         return false;
     }
     return true;
@@ -201,7 +201,8 @@ GtkAggVaapiGlue::createRenderHandler()
     const char *agg_pixel_format;
     agg_pixel_format = find_pixel_format(_vaapi_image_format);
     if (!agg_pixel_format) {
-        log_debug(_("GTK-AGG: Unknown RGB format %s reported by VA-API. Please report this to the gnash-dev mailing list."),
+        log_error(_("GTK-AGG: Unknown RGB format %s reported by VA-API."
+                    "Please report this to the gnash-dev mailing list."),
                   string_of_FOURCC(_vaapi_image_format));
         return NULL;
     }
@@ -217,8 +218,8 @@ GtkAggVaapiGlue::resetRenderSurface(unsigned int width, unsigned int height)
     /* XXX: round up to 128-byte boundaries to workaround GMA500 bugs */
     const unsigned int aligned_width = (width + 31) & -32U;
 
-    dprintf("GtkAggVaapiGlue::resetRenderSurface(): size %ux%u\n",
-            width, height);
+    // dprintf("GtkAggVaapiGlue::resetRenderSurface(): size %ux%u\n",
+    //         width, height);
 
     _vaapi_surface.reset(new VaapiSurface(width, height));
     _vaapi_image.reset(new VaapiImage(aligned_width, height, _vaapi_image_format));
@@ -227,13 +228,13 @@ GtkAggVaapiGlue::resetRenderSurface(unsigned int width, unsigned int height)
     _vaapi_subpicture.reset(new VaapiSubpicture(_vaapi_image));
 
     if (!_vaapi_image->map()) {
-        log_debug(_("ERROR: failed to map VA-API image."));
+        log_error(_("failed to map VA-API image."));
         return;
     }
 
     VaapiRectangle r(width, height);
     if (!_vaapi_surface->associateSubpicture(_vaapi_subpicture, r, r)) {
-        log_debug(_("ERROR: failed to associate VA-API subpicture."));
+        log_error(_("failed to associate VA-API subpicture."));
         return;
     }
     _vaapi_surface->clear();
@@ -285,7 +286,7 @@ GtkAggVaapiGlue::beforeRendering(movie_root* stage)
         resetRenderSurface(_window_width, _window_height);
 
     if (!_vaapi_image->map()) {
-        log_debug(_("ERROR: failed to map VA-API image."));
+        log_error(_("failed to map VA-API image."));
         return;
     }
 }
@@ -367,14 +368,14 @@ GtkAggVaapiGlue::render()
              VaapiVideoWindow *videoWindow;
              videoWindow = getVideoWindow(surface, _drawing_area->window, dst_rect);
              if (!videoWindow) {
-                 log_debug(_("ERROR: failed to setup video window for surface 0x%08x."), surface->get());
+                 log_error(_("failed to setup video window for surface 0x%08x."), surface->get());
                  continue;
              }
              videoWindow->moveResize(dst_rect);
 
              VaapiRectangle pic_rect(surface->width(), surface->height());
              if (!surface->associateSubpicture(_vaapi_subpicture, src_rect, pic_rect)) {
-                 log_debug(_("ERROR: failed to associate subpicture to surface 0x%08x."), surface->get());
+                 log_error(_("failed to associate subpicture to surface 0x%08x."), surface->get());
                  continue;
              }
 

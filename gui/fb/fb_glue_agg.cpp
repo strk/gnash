@@ -161,13 +161,13 @@ FBAggGlue::createRenderHandler()
 
     renderer::rawfb::RawFBDevice *rawfb = reinterpret_cast
         <renderer::rawfb::RawFBDevice *>(_device.get());
-    log_debug(_("red channel: %d / %d"), rawfb->getRedOffset(), 
+    log_debug("red channel: %d / %d", rawfb->getRedOffset(), 
 	      rawfb->getRedSize());
-    log_debug(_("green channel: %d / %d"), rawfb->getGreenOffset(), 
+    log_debug("green channel: %d / %d", rawfb->getGreenOffset(), 
 	      rawfb->getGreenSize());
-    log_debug(_("blue channel: %d / %d"), rawfb->getBlueOffset(), 
+    log_debug("blue channel: %d / %d", rawfb->getBlueOffset(), 
               rawfb->getBlueSize());
-    log_debug(_("Total bits per pixel: %d"),  rawfb->getDepth());
+    log_debug("Total bits per pixel: %d",  rawfb->getDepth());
     
     const char* pixelformat = agg_detect_pixel_format(
         rawfb->getRedOffset(),   rawfb->getRedSize(),
@@ -218,7 +218,7 @@ FBAggGlue::render()
 //    GNASH_REPORT_FUNCTION;
 
     if (_drawbounds.size() == 0 ) {
-        log_debug(_("No Drawbounds set in %s!"), __FUNCTION__);
+        log_error(_("No Drawbounds set in %s!"), __FUNCTION__);
         return; // nothing to do..
     }
 

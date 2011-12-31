@@ -143,7 +143,7 @@ FBgles1Glue::init(int /*argc*/, char *** /*argv*/)
     if (result == EGL_FALSE || numOfConfigs == 0) {
         return false;
     }
-    log_trace(_("EGL: pbuffer config ok"));
+    // log_trace("EGL: pbuffer config ok");
     
     const EGLint pbuffer_attrib_list[] = {
         EGL_WIDTH, EGL_MAX_PBUFFER_WIDTH,
@@ -159,7 +159,7 @@ FBgles1Glue::init(int /*argc*/, char *** /*argv*/)
     if (eglGetError () != EGL_SUCCESS) {
         return false;
     }
-    log_trace(_("EGL: pbuffer surface ok"));
+    log_trace("EGL: pbuffer surface ok");
     
     return true;
 }
@@ -168,7 +168,7 @@ int
 FBgles1Glue::width() {
     EGLint result;
     eglQuerySurface (_display, _surface, EGL_WIDTH, &result);
-    log_trace(_("EGL: width %d"), result);
+    log_trace("EGL: width %d", result);
     return result;
 }
 
@@ -176,7 +176,7 @@ int
 FBgles1Glue::height() {
     EGLint result;
     eglQuerySurface (_display, _surface, EGL_HEIGHT, &result);
-    log_trace(_("EGL: height %d"), result);
+    log_trace("EGL: height %d", result);
     return result;
 }
 

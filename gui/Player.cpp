@@ -128,7 +128,7 @@ public:
                 return (_gui.isStopped()) ? false : true;
 
             case HostMessage::EXTERNALINTERFACE_PAN:
-                log_unimpl("GUI ExternalInterface.Pan event");
+                log_unimpl(_("GUI ExternalInterface.Pan event"));
                 return boost::blank();
 
             case HostMessage::EXTERNALINTERFACE_PLAY:
@@ -140,7 +140,7 @@ public:
                 return boost::blank();
 
             case HostMessage::EXTERNALINTERFACE_SETZOOMRECT:
-                log_unimpl("GUI ExternalInterface.SetZoomRect event");
+                log_unimpl(_("GUI ExternalInterface.SetZoomRect event"));
                 return boost::blank();
 
             case HostMessage::EXTERNALINTERFACE_STOPPLAY:
@@ -148,7 +148,7 @@ public:
                 return boost::blank();
 
             case HostMessage::EXTERNALINTERFACE_ZOOM:
-                log_unimpl("GUI ExternalInterface.Zoom event");
+                log_unimpl(_("GUI ExternalInterface.Zoom event"));
                 return boost::blank();
 
             case HostMessage::SCREEN_RESOLUTION:
@@ -259,7 +259,7 @@ Player::init_logfile()
     //
     if (!_delay && rcfile.getTimerDelay() > 0) {
         _delay = rcfile.getTimerDelay();
-        log_debug (_("Timer delay set to %d milliseconds"), _delay);
+        log_debug ("Timer delay set to %d milliseconds", _delay);
     }    
 
 }
@@ -305,7 +305,7 @@ Player::init_gui()
 
 #ifdef GNASH_FPS_DEBUG
     if (_fpsDebugTime) {
-        log_debug(_("Activating FPS debugging every %g seconds"),
+        log_debug("Activating FPS debugging every %g seconds",
                 _fpsDebugTime);
         _gui->setFpsTimerInterval(_fpsDebugTime);
     }
@@ -329,7 +329,7 @@ Player::load_movie()
         size_t lastSlash = path.find_last_of('/');
         std::string dir = path.substr(0, lastSlash+1);
         rcfile.addLocalSandboxPath(dir);
-        log_debug(_("%s appended to local sandboxes"), dir.c_str());
+        log_debug("%s appended to local sandboxes", dir.c_str());
     }
 
     try {
@@ -350,7 +350,7 @@ Player::load_movie()
                 // would not be able to load anything
                 //
                 rcfile.addLocalSandboxPath(path);
-                log_debug(_("%s appended to local sandboxes"), path.c_str());
+                log_debug("%s appended to local sandboxes", path.c_str());
             }
 
             // _url should be always set at this point...
@@ -478,9 +478,9 @@ Player::run(int argc, char* argv[], const std::string& infile,
     }
 
     if (!_width || !_height) {
-        log_debug(_("Input movie has collapsed dimensions "
-                    "%d/%d. Setting to 1/1 and going on."),
-                     _width, _height);
+        log_debug("Input movie has collapsed dimensions "
+                  "%d/%d. Setting to 1/1 and going on.",
+                  _width, _height);
         if (!_width) _width = 1;
         if (!_height) _height = 1;
     }
@@ -505,8 +505,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // Register Player to receive FsCommand events from the core.
     root.registerFSCommandCallback(_callbacksHandler.get());
 
-    log_debug("Player Host FD #%d, Player Control FD #%d", 
-                     _hostfd, _controlfd);
+    // log_debug("Player Host FD #%d, Player Control FD #%d", _hostfd, _controlfd);
     
     // Set host requests fd (if any)
     if ( _hostfd != -1 ) {
@@ -543,7 +542,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
 
     if (! _delay) {
         float fps = _movieDef->get_frame_rate();
-        log_debug("Movie Frame Rate is %d, adjusting delay", fps);
+        log_debug(_("Movie Frame Rate is %d, adjusting delay"), fps);
         // FIXME: this value is arbitrary, and will make any movie with
         // less than 12 frames eat up more of the cpu. It should probably
         // be a much lower value, like 2.
@@ -711,18 +710,18 @@ Player::CallbacksHandler::notify(const std::string& command,
         //log_debug("Attempt to write INVOKE requests fd %d", hostfd);
         int ret = write(hostfd, cmd, len);
         if ( ret == -1 ) {
-            log_error("Could not write to user-provided host "
-                      "requests fd %d: %s", hostfd, strerror(errno));
+            log_error(_("Could not write to user-provided host "
+                        "requests fd %d: %s"), hostfd, strerror(errno));
         }
         if ( static_cast<size_t>(ret) < len ) {
-            log_error("Could only write %d bytes over %d required to "
-                      "user-provided host requests fd %d",
+            log_error(_("Could only write %d bytes over %d required to "
+                        "user-provided host requests fd %d"),
                       ret, len, hostfd);
         }
 
         // Remove the newline for logging
         requestString.resize(requestString.size() - 1);
-        log_debug(_("Sent FsCommand '%s' to host fd %d"),
+        log_debug("Sent FsCommand '%s' to host fd %d",
                     requestString, hostfd);
     }
 
@@ -730,8 +729,8 @@ Player::CallbacksHandler::notify(const std::string& command,
     /// plugin they are always ignored.
     if (_gui.isPlugin()) {
         // We log the request to the fd above
-        log_debug(_("Running as plugin: skipping internal "
-                    "handling of FsCommand %s%s."));
+        log_debug("Running as plugin: skipping internal "
+                    "handling of FsCommand %s%s.");
         return;
     }
     

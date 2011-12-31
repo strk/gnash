@@ -279,7 +279,7 @@ Gui::updateStageMatrix()
     if (!_stage) {
         // When VM initializes, we'll get a call to resize_view, which
         // would call us again.
-        log_debug("Can't update stage matrix till VM is initialized");
+        log_error(_("Can't update stage matrix till VM is initialized"));
         return;
     }
     
@@ -331,7 +331,7 @@ Gui::updateStageMatrix()
             break;
         
         default:
-            log_error("Invalid scaleMode %d", scaleMode);
+            log_error(_("Invalid scaleMode %d"), scaleMode);
             break;
     }
     
@@ -371,7 +371,7 @@ Gui::updateStageMatrix()
         
       default:
       {
-          log_error("Invalid horizontal align %d", valign);
+          log_error(_("Invalid horizontal align %d"), valign);
           break;
       }
     }
@@ -402,7 +402,7 @@ Gui::updateStageMatrix()
         
       default:
       {
-          log_error("Invalid vertical align %d", valign);
+          log_error(_("Invalid vertical align %d"), valign);
           break;
       }
     }
@@ -480,7 +480,7 @@ Gui::notifyMouseMove(int ux, int uy)
     boost::int32_t y = (uy-_yoffset) / _yscale;
     
 #ifdef DEBUG_MOUSE_COORDINATES
-    log_debug(_("mouse @ %d,%d"), x, y);
+    log_debug("mouse @ %d,%d", x, y);
 #endif
     
     if ( m->mouseMoved(x, y) ) {
@@ -839,7 +839,7 @@ Gui::play()
         sound::sound_handler* s = _stage->runResources().soundHandler();
         if ( s ) s->unpause();
 
-        log_debug("Starting virtual clock");
+        // log_debug("Starting virtual clock");
         _virtualClock.resume();
     }
 
@@ -862,7 +862,7 @@ Gui::stop()
     sound::sound_handler* s = _stage->runResources().soundHandler();
     if ( s ) s->pause();
 
-    log_debug("Pausing virtual clock");
+    // log_debug("Pausing virtual clock");
     _virtualClock.pause();
 
     stopHook();
@@ -886,7 +886,7 @@ Gui::pause()
     if (s) s->pause();
     _stopped = true;
 
-    log_debug("Pausing virtual clock");
+    // log_debug("Pausing virtual clock");
     _virtualClock.pause();
 
     stopHook();
@@ -897,7 +897,7 @@ Gui::start()
 {
     assert ( ! _started );
     if (_stopped) {
-        log_debug("Gui is in stop mode, won't start application");
+        log_error(_("Gui is in stop mode, won't start application"));
         return;
     }
 
@@ -920,9 +920,8 @@ Gui::start()
         s->unpause();
     }
     _started = true;
-    
 
-    log_debug("Starting virtual clock");
+    // log_debug("Starting virtual clock");
     _virtualClock.resume();
 
 }
@@ -956,7 +955,7 @@ Gui::advanceMovie(bool doDisplay)
     m->getRootMovie().ensureFrameLoaded(tot_frames);
     m->goto_frame(cur_frame + 1);
     m->getRootMovie().setPlayState(gnash::MovieClip::PLAYSTATE_PLAY);
-    log_debug(_("Frame %d"), m->getRootMovie().get_current_frame());
+    // log_debug("Frame %d", m->getRootMovie().get_current_frame());
 #endif
     
 #ifdef GNASH_FPS_DEBUG
@@ -1259,8 +1258,8 @@ Gui::setStage(movie_root* stage)
 bool
 Gui::yesno(const std::string& question)
 {
-    log_error("This gui didn't override 'yesno', assuming 'yes' answer to "
-            "question: %s", question);
+    log_error(_("This gui didn't override 'yesno', assuming 'yes' answer to "
+                "question: %s"), question);
     return true;
 }
 
@@ -1268,7 +1267,7 @@ void
 Gui::setQuality(Quality q)
 {
     if (!_stage) {
-        log_error("Gui::setQuality called before a movie_root was available");
+        log_error(_("Gui::setQuality called before a movie_root was available"));
         return;
     }
     _stage->setQuality(q);
@@ -1278,7 +1277,7 @@ Quality
 Gui::getQuality() const
 {
     if (!_stage) {
-	log_error("Gui::getQuality called before a movie_root was available");
+	log_error(_("Gui::getQuality called before a movie_root was available"));
 	// just a guess..
 	return QUALITY_HIGH;
     }
