@@ -97,7 +97,7 @@ AudioInputGst::findAudioDevs()
     element = gst_element_factory_make ("audiotestsrc", "audtestsrc");
     
     if (element == NULL) {
-        log_error("%s: Could not create audio test source", __FUNCTION__);
+        log_error(_("%s: Could not create audio test source"), __FUNCTION__);
 	return;
     } else {
         _audioVect.push_back(new GnashAudio);
@@ -114,12 +114,12 @@ AudioInputGst::findAudioDevs()
 
     element = gst_element_factory_make ("pulsesrc", "pulsesrc");
     if ( ! element ) {
-        log_error("%s: Could not create pulsesrc element", __FUNCTION__);
+        log_error(_("%s: Could not create pulsesrc element"), __FUNCTION__);
         return;
     }
     probe = GST_PROPERTY_PROBE (element);
     if ( ! probe ) {
-        log_error("%s: Could not get property probe from pulsesrc element",
+        log_error(_("%s: Could not get property probe from pulsesrc element"),
             __FUNCTION__);
         return;
     }
@@ -187,7 +187,7 @@ AudioInputGst::getSelectedCaps(int devselect)
 
     if (devselect < 0 ||
             (static_cast<size_t>(devselect) >= _audioVect.size())) {
-        log_error("%s: passed an invalid devselect argument", __FUNCTION__);
+        log_error(_("%s: passed an invalid devselect argument"), __FUNCTION__);
         exit(EXIT_FAILURE);
     }
 
@@ -217,7 +217,7 @@ AudioInputGst::getSelectedCaps(int devselect)
         if (GST_IS_OBJECT(bus)){
             gst_object_unref (bus);
         } else {
-            log_error("%s: Pipeline bus isn't an object for some reason",
+            log_error(_("%s: Pipeline bus isn't an object for some reason"),
                 __FUNCTION__);
         }
         //if everything above worked properly, begin probing for values
@@ -236,12 +236,12 @@ AudioInputGst::getSelectedCaps(int devselect)
             if (GST_IS_OBJECT(pad)) {
                 gst_object_unref (pad);
             } else {
-                log_error("%s: Template pad isn't an object for some reason",
+                log_error(_("%s: Template pad isn't an object for some reason"),
                     __FUNCTION__);
             }
             bool ok = checkSupportedFormats(caps);
             if (ok) {
-                log_error("The input device you selected isn't supported (yet)");
+                log_error(_("The input device you selected isn't supported (yet)"));
             } else {
                 gst_caps_unref(caps);
             }
@@ -250,7 +250,7 @@ AudioInputGst::getSelectedCaps(int devselect)
         if (GST_IS_OBJECT(pipeline)){
             gst_object_unref (pipeline);
         } else {
-            log_error("%s: pipeline isn't an object for some reason",
+            log_error(_("%s: pipeline isn't an object for some reason"),
                 __FUNCTION__);
         }
     }
@@ -267,7 +267,7 @@ AudioInputGst::transferToPrivate(int devselect) {
     if (devselect < 0 ||
             (static_cast<size_t>(devselect) >= _audioVect.size())) {
 
-        log_error("%s: Passed a bad devselect value", __FUNCTION__);
+        log_error(_("%s: Passed a bad devselect value"), __FUNCTION__);
         exit (EXIT_FAILURE);
     }
     GnashAudioPrivate *audio = new GnashAudioPrivate;
@@ -276,7 +276,7 @@ AudioInputGst::transferToPrivate(int devselect) {
         audio->setDeviceName(_audioVect[devselect]->getProductName());
         _globalAudio = audio;
     } else {
-        log_error("%s: was passed a NULL pointer", __FUNCTION__);
+        log_error(_("%s: was passed a NULL pointer"), __FUNCTION__);
     }
     return audio;
 }
@@ -321,9 +321,9 @@ AudioInputGst::audioChangeSourceBin(GnashAudioPrivate *audio)
     audio->_audioSourceBin = gst_parse_bin_from_description(command, TRUE,
                                 &error);
     if (audio->_audioSourceBin == NULL) {
-        log_error ("%s: Creation of the audioSourceBin failed",
+        log_error(_("%s: Creation of the audioSourceBin failed"),
             __FUNCTION__);
-        log_error ("the error was %s\n", error->message);
+        log_error(_("the error was %s"), error->message);
         return false;
     }
     g_free(command);
@@ -334,7 +334,7 @@ AudioInputGst::audioChangeSourceBin(GnashAudioPrivate *audio)
     result = gst_bin_add(GST_BIN(audio->_audioMainBin),
             audio->_audioSourceBin);
     if (!result) {
-        log_error("%s: couldn't drop the sourcebin back into the main bin",
+        log_error(_("%s: couldn't drop the sourcebin back into the main bin"),
             __FUNCTION__);
         return false;
     }
@@ -344,7 +344,7 @@ AudioInputGst::audioChangeSourceBin(GnashAudioPrivate *audio)
     result = gst_element_link(audio->_audioSourceBin, tee);
 
     if (!result) {
-        log_error("%s: couldn't link up sourcebin and tee", __FUNCTION__);
+        log_error(_("%s: couldn't link up sourcebin and tee"), __FUNCTION__);
         return false;
     } 
     _globalAudio = audio;
@@ -377,9 +377,9 @@ AudioInputGst::audioCreateSourceBin(GnashAudioPrivate *audio)
     audio->_audioSourceBin = gst_parse_bin_from_description(command, TRUE,
                                 &error);
     if (audio->_audioSourceBin == NULL) {
-        log_error ("%s: Creation of the audioSourceBin failed",
+        log_error(_("%s: Creation of the audioSourceBin failed"),
             __FUNCTION__);
-        log_error ("the error was %s", error->message);
+        log_error(_("the error was %s"), error->message);
         return false;
     }
     g_free(command);
@@ -403,37 +403,37 @@ AudioInputGst::audioCreateMainBin(GnashAudioPrivate *audio)
     
     ok = audioCreateSourceBin(audio);
     if (ok != true) {
-        log_error("%s: audioCreateSourceBin failed!", __FUNCTION__);
+        log_error(_("%s: audioCreateSourceBin failed!"), __FUNCTION__);
         return false;
     }
     if ((tee = gst_element_factory_make ("tee", "tee")) == NULL) {
-        log_error("%s: problem creating tee element", __FUNCTION__);
+        log_error(_("%s: problem creating tee element"), __FUNCTION__);
         return false;
     }
     if ((saveQueue = gst_element_factory_make("queue", "saveQueue")) == NULL) {
-        log_error("%s: problem creating save_queue element", __FUNCTION__);
+        log_error(_("%s: problem creating save_queue element"), __FUNCTION__);
         return false;
     }
     if ((audioPlaybackQueue = 
         gst_element_factory_make("queue", "audioPlaybackQueue")) == NULL) {
-        log_error("%s: problem creating audioPlaybackQueue element", __FUNCTION__);
+        log_error(_("%s: problem creating audioPlaybackQueue element"), __FUNCTION__);
         return false;
     }
     gst_bin_add_many (GST_BIN (audio->_audioMainBin), audio->_audioSourceBin,
                     tee, saveQueue, audioPlaybackQueue, NULL);
     ok = gst_element_link(audio->_audioSourceBin, tee);
     if (ok != true) {
-        log_error("%s: couldn't link audioSourceBin and tee", __FUNCTION__);
+        log_error(_("%s: couldn't link audioSourceBin and tee"), __FUNCTION__);
         return false;
     }
     ok &= gst_element_link_many (tee, saveQueue, NULL);
     if (ok != true) {
-        log_error("%s: couldn't link tee and saveQueue", __FUNCTION__);
+        log_error(_("%s: couldn't link tee and saveQueue"), __FUNCTION__);
         return false;
     }
     ok &= gst_element_link_many (tee, audioPlaybackQueue, NULL);
     if (ok != true) {
-        log_error("%s: couldn't link tee and audioPlaybackQueue", __FUNCTION__);
+        log_error(_("%s: couldn't link tee and audioPlaybackQueue"), __FUNCTION__);
         return false;
     }
     
@@ -442,7 +442,7 @@ AudioInputGst::audioCreateMainBin(GnashAudioPrivate *audio)
     //add ghostpad to saveQueue (allows connections between bins)
     pad = gst_element_get_pad (saveQueue, "src");
     if (pad == NULL) {
-        log_error("%s: couldn't get saveQueueSrcPad", __FUNCTION__);
+        log_error(_("%s: couldn't get saveQueueSrcPad"), __FUNCTION__);
         return false;
     }
     gst_element_add_pad (audio->_audioMainBin,
@@ -452,7 +452,7 @@ AudioInputGst::audioCreateMainBin(GnashAudioPrivate *audio)
     //add ghostpad to video_display_queue
     pad = gst_element_get_pad (audioPlaybackQueue, "src");
     if (pad == NULL) {
-        log_error("%s: couldn't get audioPlaybackQueue", __FUNCTION__);
+        log_error(_("%s: couldn't get audioPlaybackQueue"), __FUNCTION__);
         return false;
     }
     gst_element_add_pad (audio->_audioMainBin,
@@ -461,7 +461,7 @@ AudioInputGst::audioCreateMainBin(GnashAudioPrivate *audio)
 
 
     if (!ok) {
-        log_error("%s: Unable to create main pipeline", __FUNCTION__);
+        log_error(_("%s: Unable to create main pipeline"), __FUNCTION__);
         return false;
     } else {
         return true;
@@ -478,7 +478,7 @@ AudioInputGst::audioCreatePlaybackBin(GnashAudioPrivate *audio)
     audio->_audioPlaybackBin = gst_bin_new("playbackBin");
     
     if ((autosink = gst_element_factory_make ("autoaudiosink", "audiosink")) == NULL) {
-         log_error("%s: There was a problem making the audiosink!", __FUNCTION__);
+        log_error(_("%s: There was a problem making the audiosink!"), __FUNCTION__);
          return false;
     }
     
@@ -514,7 +514,7 @@ AudioInputGst::makeAudioSourcePlaybackLink(GnashAudioPrivate *audio)
     if (padreturn == GST_PAD_LINK_OK) {
         return true;
     } else {
-        log_error("something went wrong in the makeSourcePlaybackLink function");
+        log_error(_("something went wrong in the makeSourcePlaybackLink function"));
         return false;
     }
 }
@@ -537,7 +537,7 @@ AudioInputGst::breakAudioSourcePlaybackLink(GnashAudioPrivate *audio)
     
     ok = gst_pad_unlink(audioPlaybackQueueSrc, audioPlaybackBinSink);
     if (ok != true) {
-        log_error("%s: unlink failed", __FUNCTION__);
+        log_error(_("%s: unlink failed"), __FUNCTION__);
         return false;
     } else {
         state = gst_element_set_state(audio->_audioPlaybackBin, GST_STATE_NULL);
@@ -545,14 +545,15 @@ AudioInputGst::breakAudioSourcePlaybackLink(GnashAudioPrivate *audio)
             //return true;
             ok = gst_bin_remove(GST_BIN(audio->_pipeline), audio->_audioPlaybackBin);
             if (ok != true) {
-                log_error("%s: couldn't remove audioPlaybackBin from pipeline",
+                log_error(_("%s: couldn't remove audioPlaybackBin from pipeline"),
                     __FUNCTION__);
                 return false;
             } else {
                 return true;
             }
         } else {
-            log_error("%s: changing state of audioPlaybackBin failed", __FUNCTION__);
+            log_error(_("%s: changing state of audioPlaybackBin failed"),
+                      __FUNCTION__);
             return false;
         }
     }
@@ -575,7 +576,7 @@ audio_bus_call (GstBus* /*bus*/, GstMessage *msg, gpointer /*data*/)
         gst_message_parse_error (msg, &error, &debug);
         g_free (debug);
 
-        log_error ("Error: %s\n", error->message);
+        log_error(_("Error: %s"), error->message);
         g_error_free (error);
         break;
     }
@@ -595,19 +596,19 @@ AudioInputGst::audioCreateSaveBin(GnashAudioPrivate* audio)
     audio->_audioSaveBin = gst_bin_new ("audioSaveBin");
     
     if ((audioConvert = gst_element_factory_make("audioconvert", "audio_convert")) == NULL) {
-        log_error("%s: Couldn't make audioconvert element", __FUNCTION__);
+        log_error(_("%s: Couldn't make audioconvert element"), __FUNCTION__);
         return false;
     }
     if ((audioEnc = gst_element_factory_make("vorbisenc", "audio_enc")) == NULL){
-        log_error("%s: Couldn't make vorbisenc element", __FUNCTION__);
+        log_error(_("%s: Couldn't make vorbisenc element"), __FUNCTION__);
         return false;
     }
     if ((audio->_mux = gst_element_factory_make("oggmux", "mux")) == NULL) {
-        log_error("%s: Couldn't make oggmux element", __FUNCTION__);
+        log_error(_("%s: Couldn't make oggmux element"), __FUNCTION__);
         return false;
     }
     if ((filesink = gst_element_factory_make("filesink", "filesink")) == NULL) {
-        log_error("%s: Couldn't make filesink element", __FUNCTION__);
+        log_error(_("%s: Couldn't make filesink element"), __FUNCTION__);
         return false;
     } else {
         g_object_set(filesink, "location", "audioOut.ogg", NULL);
@@ -626,7 +627,7 @@ AudioInputGst::audioCreateSaveBin(GnashAudioPrivate* audio)
             filesink, NULL);
 
     if (!ok) {
-        log_error("%s: Something went wrong in linking", __FUNCTION__);
+        log_error(_("%s: Something went wrong in linking"), __FUNCTION__);
         return false;
     }
 
@@ -654,7 +655,7 @@ AudioInputGst::makeAudioSourceSaveLink (GnashAudioPrivate* audio)
     if (padreturn == GST_PAD_LINK_OK) {
         return true;
     } else {
-        log_error("something went wrong in the makeAudioSourceSaveLink function");
+        log_error(_("something went wrong in the makeAudioSourceSaveLink function"));
         return false;
     }
 }
@@ -676,20 +677,21 @@ AudioInputGst::breakAudioSourceSaveLink (GnashAudioPrivate *audio)
     
     ok = gst_pad_unlink(audioSaveQueueSrc, audioSaveBinSink);
     if (ok != true) {
-        log_error("%s: unlink failed", __FUNCTION__);
+        log_error(_("%s: unlink failed"), __FUNCTION__);
         return false;
     } else {
         state = gst_element_set_state(audio->_audioSaveBin, GST_STATE_NULL);
         if (state != GST_STATE_CHANGE_FAILURE) {
             ok = gst_bin_remove(GST_BIN(audio->_pipeline), audio->_audioSaveBin);
             if (ok != true) {
-                log_error("%s: couldn't remove saveBin from pipeline", __FUNCTION__);
+                log_error(_("%s: couldn't remove saveBin from pipeline"),
+                          __FUNCTION__);
                 return false;
             } else {
                 return true;
             }
         } else {
-            log_error("%s: audioSaveBin state change failed", __FUNCTION__);
+            log_error(_("%s: audioSaveBin state change failed"), __FUNCTION__);
             return false;
         }
     }
@@ -750,8 +752,8 @@ AudioInputGst::makeAudioDevSelection()
 
     if (audioDevice < 0 ||
             static_cast<size_t>(audioDevice) >= _audioVect.size()) {
-        log_error("You have an invalid microphone selected. Check "
-                "your gnashrc file");
+        log_error(_("You have an invalid microphone selected. Check "
+                    "your gnashrc file"));
         exit(EXIT_FAILURE);
     } else {
         //set _name value for actionscript

@@ -79,7 +79,7 @@ MediaParser::isBufferEmpty() const
 boost::optional<Id3Info>
 MediaParser::getId3Info() const
 {
-    log_error("No ID3 support implemented in this MediaParser");
+    log_error(_("No ID3 support implemented in this MediaParser"));
     return boost::optional<Id3Info>();
 }
 

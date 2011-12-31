@@ -183,7 +183,7 @@ FLVParser::parseAudioTag(const FLVTag& flvtag, const FLVAudioTag& audiotag, boos
 
 	frame = readAudioFrame(bodyLength-1, flvtag.timestamp);
 	if ( ! frame.get() ) {
-		log_error("could not read audio frame?");
+            log_error(_("could not read audio frame?"));
 	}
 
 	// If this is the first audioframe no info about the
@@ -260,7 +260,7 @@ FLVParser::parseVideoTag(const FLVTag& flvtag, const FLVVideoTag& videotag, boos
 	std::auto_ptr<EncodedVideoFrame> frame = readVideoFrame(bodyLength-1,
             flvtag.timestamp);
 	if ( ! frame.get() ) {
-		log_error("could not read video frame?");
+            log_error(_("could not read video frame?"));
 	}
 
 	// If this is the first videoframe no info about the
@@ -318,7 +318,8 @@ FLVParser::parseNextTag(bool index_only)
 	//log_debug("FLVParser::parseNextTag seeking to %d", thisTagPos+4);
 	if (!_stream->seek(thisTagPos+4))
 	{
-		log_error("FLVParser::parseNextTag: can't seek to %d", thisTagPos+4);
+            log_error(_("FLVParser::parseNextTag: can't seek to %d"),
+                      thisTagPos+4);
 
 		completed = true;
 		return false;
@@ -331,8 +332,8 @@ FLVParser::parseNextTag(bool index_only)
 	if ( actuallyRead < 12 )
 	{
 		if ( actuallyRead )
-			log_error("FLVParser::parseNextTag: can't read tag info "
-                    "(needed 12 bytes, only got %d)", actuallyRead);
+                    log_error(_("FLVParser::parseNextTag: can't read tag info "
+                                "(needed 12 bytes, only got %d)"), actuallyRead);
 		// else { assert(_stream->eof(); } ?
 
 		completed = true;
@@ -430,8 +431,8 @@ FLVParser::parseNextTag(bool index_only)
 
         if ( actuallyRead < flvtag.body_size-1 )
 		{
-			log_error("FLVParser::parseNextTag: can't read metaTag (%d) "
-                    "body (needed %d bytes, only got %d)",
+                    log_error(_("FLVParser::parseNextTag: can't read metaTag (%d) "
+                                "body (needed %d bytes, only got %d)"),
 				FLV_META_TAG, flvtag.body_size, actuallyRead);
 			return false;
 		}
@@ -476,7 +477,7 @@ FLVParser::parseHeader()
 	boost::uint8_t header[9];
 	if ( _stream->read(header, 9) != 9 )
 	{
-		log_error("FLVParser::parseHeader: couldn't read 9 bytes of header");
+            log_error(_("FLVParser::parseHeader: couldn't read 9 bytes of header"));
 		return false;
 	}
 
@@ -528,7 +529,7 @@ FLVParser::readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
     std::fill(data + bytesRead, data + bufSize, 0);
 
 	if (bytesRead < dataSize) {
-		log_error("FLVParser::readAudioFrame: could only read %d/%d bytes",
+            log_error(_("FLVParser::readAudioFrame: could only read %d/%d bytes"),
                 bytesRead, dataSize);
 	}
 

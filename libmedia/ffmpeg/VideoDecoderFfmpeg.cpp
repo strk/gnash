@@ -302,7 +302,7 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
             im.reset(new image::ImageRGB(width, height));
             break;
         default:
-            log_error("Pixel format not handled");
+            log_error(_("Pixel format not handled"));
             return im;
     }
 
@@ -369,7 +369,7 @@ VideoDecoderFfmpeg::decode(const boost::uint8_t* input,
 #endif
     
     if (!bytes) {
-        log_error("Decoding of a video frame failed");
+        log_error(_("Decoding of a video frame failed"));
         av_free(frame);
         return ret;
     }

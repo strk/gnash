@@ -122,7 +122,7 @@ AOS4_sound_handler::openAudio()
 {
     if ( _audioOpened ) return; // nothing to do
 
-	log_debug(_("AOS4: Spawn Audio Process.."));
+	log_debug(_("AOS4: Spawn Audio Process."));
 	
 	_DMreplyport = (struct MsgPort*) IExec->AllocSysObjectTags(ASOT_PORT, TAG_DONE);
 	_dmsg 		 = (struct DeathMessage*) IExec->AllocSysObjectTags(ASOT_MESSAGE,
@@ -159,7 +159,7 @@ AOS4_sound_handler::openAudio()
 		audioTaskID = (int)AudioPump;
 		
 		_audioOpened = true;
-		log_debug(_("AOS4: Audio Process spawned.."));
+		log_debug(_("AOS4: Audio Process spawned."));
 	}
 	else
 	{

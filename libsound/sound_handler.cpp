@@ -67,8 +67,8 @@ ensurePadding(SimpleBuffer& data, media::MediaHandler* m)
 {
     const size_t padding = m ? m->getInputPaddingSize() : 0;
     if (data.capacity() - data.size() < padding) {
-        log_error("Sound data creator didn't appropriately pad "
-                "buffer. We'll do so now, but will cost memory copies.");
+        log_error(_("Sound data creator didn't appropriately pad "
+                    "buffer. We'll do so now, but will cost memory copies."));
         data.reserve(data.size() + padding);
     }
 }
@@ -80,15 +80,15 @@ sound_handler::addSoundBlock(std::auto_ptr<SimpleBuffer> data,
         size_t sampleCount, int seekSamples, int handle)
 {
     if (!validHandle(_streamingSounds, handle)) {
-        log_error("Invalid (%d) handle passed to fill_stream_data, "
-                  "doing nothing", handle);
+        log_error(_("Invalid (%d) handle passed to fill_stream_data, "
+                    "doing nothing"), handle);
         return -1;
     }
 
     StreamingSoundData* sounddata = _streamingSounds[handle];
     if (!sounddata) {
-        log_error("handle passed to fill_stream_data (%d) "
-                  "was deleted", handle);
+        log_error(_("handle passed to fill_stream_data (%d) "
+                    "was deleted"), handle);
         return -1;
     }
 
@@ -138,19 +138,19 @@ sound_handler::delete_sound(int handle)
 {
     // Check if the sound exists
     if (!validHandle(_sounds, handle)) {
-        log_error("Invalid (%d) handle passed to delete_sound, "
-                  "doing nothing", handle);
+        log_error(_("Invalid (%d) handle passed to delete_sound, "
+                    "doing nothing"), handle);
         return;
     }
 
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
-    log_debug ("deleting sound :%d", handle);
+    log_debug("deleting sound :%d", handle);
 #endif
 
     EmbedSound* def = _sounds[handle];
     if (!def) {
-        log_error("handle passed to delete_sound (%d) "
-                  "already deleted", handle);
+        log_error(_("handle passed to delete_sound (%d) "
+                    "already deleted"), handle);
         return;
     }
     
@@ -233,7 +233,7 @@ sound_handler::stopEventSound(int handle)
     
     EmbedSound* sounddata = _sounds[handle];
     if (!sounddata) {
-        log_error("stop_sound(%d): sound was deleted", handle);
+        log_error(_("stop_sound(%d): sound was deleted"), handle);
         return;
     }
 
@@ -321,8 +321,8 @@ sound_handler::unplugInputStream(InputStream* id)
     // WARNING: erasing would break any iteration in the set
     InputStreams::iterator it2=_inputStreams.find(id);
     if (it2 == _inputStreams.end()) {
-        log_error("SDL_sound_handler::unplugInputStream: "
-                "Aux streamer %p not found. ",
+        log_error(_("SDL_sound_handler::unplugInputStream: "
+                    "Aux streamer %p not found. "),
                 id);
         return; // we won't delete it, as it's likely deleted already
     }
@@ -451,7 +451,7 @@ sound_handler::playStream(int soundId, StreamBlockId blockId)
         plugInputStream(is);
     }
     catch (const MediaException& e) {
-        log_error("Could not start streaming sound: %s", e.what());
+        log_error(_("Could not start streaming sound: %s"), e.what());
     }
 }
 
@@ -462,8 +462,8 @@ sound_handler::startSound(int handle, int loops, const SoundEnvelopes* env,
 {
     // Check if the sound exists
     if (!validHandle(_sounds, handle)) {
-        log_error("Invalid (%d) sound_handle passed to startSound, "
-                  "doing nothing", handle);
+        log_error(_("Invalid (%d) sound_handle passed to startSound, "
+                    "doing nothing"), handle);
         return;
     }
 
@@ -542,7 +542,7 @@ sound_handler::startSound(int handle, int loops, const SoundEnvelopes* env,
         plugInputStream(sound);
     }
     catch (const MediaException& e) {
-        log_error("Could not start event sound: %s", e.what());
+        log_error(_("Could not start event sound: %s"), e.what());
     }
 
 }
@@ -556,8 +556,8 @@ sound_handler::plugInputStream(std::auto_ptr<InputStream> newStreamer)
 
     if (!_inputStreams.insert(newStreamer.release()).second) {
         // this should never happen !
-        log_error("_inputStreams container still has a pointer "
-            "to deleted InputStream %p!", newStreamer.get());
+        log_error(_("_inputStreams container still has a pointer "
+                    "to deleted InputStream %p!"), newStreamer.get());
         // FIXME: replace the old element with the new one !
         abort();
     }
@@ -701,7 +701,7 @@ sound_handler::unplugCompletedInputStreams()
             ++it2; // before we erase it
             InputStreams::size_type erased = _inputStreams.erase(is);
             if ( erased != 1 ) {
-                log_error("Expected 1 InputStream element, found %d", erased);
+                log_error(_("Expected 1 InputStream element, found %d"), erased);
                 abort();
             }
             it = it2;

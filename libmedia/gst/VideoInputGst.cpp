@@ -314,7 +314,7 @@ VideoInputGst::VideoInputGst()
     if (_devSelection < 10) {
         _index = _devSelection;
     } else {
-        log_error("too high an index value, will cause segfault");
+        log_error(_("too high an index value, will cause segfault"));
     }
     
     setWebcam(_devSelection);
@@ -364,7 +364,7 @@ VideoInputGst::findVidDevs(std::vector<GnashWebcam*>& cameraList)
     element = gst_element_factory_make ("videotestsrc", "vidtestsrc");
     
     if (element == NULL) {
-        log_error("%s: Could not create video test source.", __FUNCTION__);
+        log_error(_("%s: Could not create video test source."), __FUNCTION__);
 	return;
     } else {
         cameraList.push_back(new GnashWebcam);
@@ -382,12 +382,12 @@ VideoInputGst::findVidDevs(std::vector<GnashWebcam*>& cameraList)
     
     element = gst_element_factory_make ("v4lsrc", "v4lvidsrc");
     if ( ! element ) {
-        log_error("%s: Could not create pulsesrc element", __FUNCTION__);
+        log_error(_("%s: Could not create pulsesrc element"), __FUNCTION__);
         return;
     }
     probe = GST_PROPERTY_PROBE (element);
     if ( ! probe ) {
-        log_error("%s: Could not get property probe from pulsesrc element",
+        log_error(_("%s: Could not get property probe from pulsesrc element"),
             __FUNCTION__);
         return;
     }
@@ -623,8 +623,8 @@ VideoInputGst::makeWebcamDeviceSelection()
     if (webcamDevice < 0 ||
             static_cast<size_t>(webcamDevice) >= _vidVect.size()) {
 
-        log_error("You have an invalid camera selected. Please "
-                "check your gnashrc file");
+        log_error(_("You have an invalid camera selected. Please "
+                    "check your gnashrc file"));
         exit(EXIT_FAILURE);
     }
         
@@ -654,8 +654,8 @@ VideoInputGst::getSelectedCaps(gint dev_select)
     
     if (dev_select < 0 ||
             static_cast<size_t>(dev_select) >= _vidVect.size()) {
-        log_error("%s: Passed an invalid argument (not a valid "
-            "dev_select value)", __FUNCTION__);
+        log_error(_("%s: Passed an invalid argument (not a valid "
+                    "dev_select value)"), __FUNCTION__);
         exit(EXIT_FAILURE);
     }
 
@@ -682,7 +682,7 @@ VideoInputGst::getSelectedCaps(gint dev_select)
         if (GST_IS_OBJECT(bus)){
             gst_object_unref (bus);
         } else {
-            log_error("%s: Pipeline bus isn't an object for some reason",
+            log_error(_("%s: Pipeline bus isn't an object for some reason"),
                 __FUNCTION__);
         }
         
@@ -702,7 +702,7 @@ VideoInputGst::getSelectedCaps(gint dev_select)
             if (GST_IS_OBJECT(pad)) {
                 gst_object_unref (pad);
             } else {
-                log_error("%s: Template pad isn't an object for some reason",
+                log_error(_("%s: Template pad isn't an object for some reason"),
                     __FUNCTION__);
             }
             if (dev_select != 0) {
@@ -715,7 +715,7 @@ VideoInputGst::getSelectedCaps(gint dev_select)
         if (GST_IS_OBJECT(pipeline)){
             gst_object_unref (pipeline);
         } else {
-            log_error("%s: pipeline isn't an object for some reason",
+            log_error(_("%s: pipeline isn't an object for some reason"),
                 __FUNCTION__);
         }
     }
@@ -801,7 +801,7 @@ VideoInputGst::getSupportedFormats(GnashWebcam *cam, GstCaps *caps)
             }
         }
         else {
-            log_error("%s: type %s, cannot be handled for resolution width",
+            log_error(_("%s: type %s, cannot be handled for resolution width"),
                 __FUNCTION__, G_VALUE_TYPE_NAME (const_cast<GValue *>(width)));
         }
     }
@@ -822,7 +822,7 @@ VideoInputGst::setWebcam(size_t dev_select)
         _name = name;
         _globalWebcam = webcam;
     } else {
-        log_error("%s: was passed a NULL pointer", __FUNCTION__);
+        log_error(_("%s: was passed a NULL pointer"), __FUNCTION__);
     }
     return webcam;
 }
@@ -928,9 +928,9 @@ VideoInputGst::webcamCreateSourceBin()
             webcam->_webcamSourceBin =
                 gst_parse_bin_from_description (command, TRUE, &error);
             if (webcam->_webcamSourceBin == NULL) {
-                log_error ("%s: Creation of the webcam_source_bin failed",
+                log_error(_("%s: Creation of the webcam_source_bin failed"),
                     __FUNCTION__);
-                log_error ("the error was %s", error->message);
+                log_error(_("the error was %s"), error->message);
                 return false;
             }
             
@@ -958,7 +958,7 @@ VideoInputGst::checkForSupportedFramerate(GnashWebcamPrivate *webcam,
 {
     
     if (!webcam) {
-	log_error("%s: webam isn't set!", __FUNCTION__);
+	log_error(_("%s: webam isn't set!"), __FUNCTION__);
     }
     for (int i = 0; i < webcam->_currentFormat->numFramerates; ++i) {
         int val = std::ceil(static_cast<double>(
@@ -1021,8 +1021,8 @@ VideoInputGst::webcamChangeSourceBin()
         //if format didn't get set, something went wrong. try picking
         //the first supported format and a different supported resolution
         if (!format) {
-            log_error("%s: the resolution you chose isn't supported, picking \
-                a supported value", __FUNCTION__);
+            log_error(_("%s: the resolution you chose isn't supported, picking \
+                a supported value"), __FUNCTION__);
             format = &g_array_index (webcam->_webcamDevice->videoFormats,
                  WebcamVidFormat, 0);
 
@@ -1101,9 +1101,9 @@ VideoInputGst::webcamChangeSourceBin()
             webcam->_webcamSourceBin =
                 gst_parse_bin_from_description (command, TRUE, &error);
             if (webcam->_webcamSourceBin == NULL) {
-                log_error ("%s: Creation of the webcam_source_bin failed",
+                log_error(_("%s: Creation of the webcam_source_bin failed"),
                     __FUNCTION__);
-                log_error ("the error was %s", error->message);
+                log_error(_("the error was %s"), error->message);
                 return false;
             }
             
@@ -1125,7 +1125,7 @@ VideoInputGst::webcamChangeSourceBin()
             result = gst_bin_add(GST_BIN(webcam->_webcamMainBin),
                 webcam->_webcamSourceBin);
             if (result != true) {
-                log_error("%s: couldn't drop the sourcebin back into the main bin",
+                log_error(_("%s: couldn't drop the sourcebin back into the main bin"),
                     __FUNCTION__);
                 return false;
             } else {
@@ -1134,7 +1134,7 @@ VideoInputGst::webcamChangeSourceBin()
                     "tee");
                 result = gst_element_link(webcam->_webcamSourceBin, tee);
                 if (result != true) {
-                    log_error("%s: couldn't link up sourcebin and tee", __FUNCTION__);
+                    log_error(_("%s: couldn't link up sourcebin and tee"), __FUNCTION__);
                     return false;
                 } else {
                     return true;
@@ -1166,23 +1166,24 @@ VideoInputGst::webcamCreateMainBin()
     
     ok = webcamCreateSourceBin();
     if (ok != true) {
-        log_error("%s: problem creating source bin", __FUNCTION__);
+        log_error(_("%s: problem creating source bin"), __FUNCTION__);
         return false;
     }
 
     assert(webcam->_webcamSourceBin);
     
     if ((tee = gst_element_factory_make ("tee", "tee")) == NULL) {
-        log_error("%s: problem creating tee element", __FUNCTION__);
+        log_error(_("%s: problem creating tee element"), __FUNCTION__);
         return false;
     }
     if ((save_queue = gst_element_factory_make("queue", "save_queue")) == NULL) {
-        log_error("%s: problem creating save_queue element", __FUNCTION__);
+        log_error(_("%s: problem creating save_queue element"), __FUNCTION__);
         return false;
     }
     if ((video_display_queue = 
         gst_element_factory_make("queue", "video_display_queue")) == NULL) {
-        log_error("%s: problem creating video_display_queue element", __FUNCTION__);
+        log_error(_("%s: problem creating video_display_queue element"),
+                  __FUNCTION__);
         return false;
     }
     
@@ -1192,19 +1193,20 @@ VideoInputGst::webcamCreateMainBin()
                     
     ok = gst_element_link(webcam->_webcamSourceBin, tee);
     if (ok != true) {
-        log_error("%s: couldn't link webcam_source_bin and tee", __FUNCTION__);
+        log_error(_("%s: couldn't link webcam_source_bin and tee"),
+                  __FUNCTION__);
         return false;
     }
     
     ok &= gst_element_link_many (tee, save_queue, NULL);
     if (ok != true) {
-        log_error("%s: couldn't link tee and save_queue", __FUNCTION__);
+        log_error(_("%s: couldn't link tee and save_queue"), __FUNCTION__);
         return false;
     }
     
     ok &= gst_element_link_many (tee, video_display_queue, NULL);
     if (ok != true) {
-        log_error("%s: couldn't link tee and video_display_queue", __FUNCTION__);
+        log_error(_("%s: couldn't link tee and video_display_queue"), __FUNCTION__);
         return false;
     }
     
@@ -1213,7 +1215,7 @@ VideoInputGst::webcamCreateMainBin()
     //add ghostpad to save_queue (allows connections between bins)
     pad = gst_element_get_pad (save_queue, "src");
     if (pad == NULL) {
-        log_error("%s: couldn't get save_queue_src_pad", __FUNCTION__);
+        log_error(_("%s: couldn't get save_queue_src_pad"), __FUNCTION__);
         return false;
     }
     gst_element_add_pad (webcam->_webcamMainBin,
@@ -1223,7 +1225,7 @@ VideoInputGst::webcamCreateMainBin()
     //add ghostpad to video_display_queue
     pad = gst_element_get_pad (video_display_queue, "src");
     if (pad == NULL) {
-        log_error("%s: couldn't get video_display_queue_pad", __FUNCTION__);
+        log_error(_("%s: couldn't get video_display_queue_pad"), __FUNCTION__);
         return false;
     }
     gst_element_add_pad (webcam->_webcamMainBin,
@@ -1235,7 +1237,7 @@ VideoInputGst::webcamCreateMainBin()
     assert(_devSelection == 0 || webcam->_currentFormat);
 
     if (!ok) {
-        log_error("%s: Unable to create main pipeline", __FUNCTION__);
+        log_error(_("%s: Unable to create main pipeline"), __FUNCTION__);
         return false;
     }
     return true;
@@ -1253,13 +1255,13 @@ VideoInputGst::webcamCreateDisplayBin()
     webcam->_videoDisplayBin = gst_bin_new("video_display_bin");
     
     if (webcam->_videoDisplayBin == NULL) {
-        log_error("%s: something went wrong creating the new video_display_bin",
+        log_error(_("%s: something went wrong creating the new video_display_bin"),
             __FUNCTION__);
         return false;
     }
     
     if ((video_scale = gst_element_factory_make("videoscale", "video_scale")) == NULL) {
-        log_error("%s: problem creating video_scale element", __FUNCTION__);
+        log_error(_("%s: problem creating video_scale element"), __FUNCTION__);
         return false;
     }
     else {
@@ -1268,7 +1270,7 @@ VideoInputGst::webcamCreateDisplayBin()
     }
     
     if ((video_sink = gst_element_factory_make("autovideosink", "video_sink")) == NULL) {
-        log_error("%s: problem creating the video_sink element", __FUNCTION__);
+        log_error(_("%s: problem creating the video_sink element"), __FUNCTION__);
         return false;
     }
     
@@ -1277,7 +1279,7 @@ VideoInputGst::webcamCreateDisplayBin()
     
     ok = gst_element_link_many(video_scale, video_sink, NULL);
     if (ok != true) {
-        log_error("%s: something went wrong in linking elements in video_display_bin",
+        log_error(_("%s: something went wrong in linking elements in video_display_bin"),
             __FUNCTION__);
         return false;
     }
@@ -1319,7 +1321,7 @@ VideoInputGst::webcamMakeVideoDisplayLink()
     if (padreturn == GST_PAD_LINK_OK) {
         return true;
     } else {
-        log_error("something went wrong in the make_video_display_link function");
+        log_error(_("something went wrong in the make_video_display_link function"));
         return false;
     }
 }
@@ -1351,7 +1353,7 @@ VideoInputGst::webcamBreakVideoDisplayLink()
     ok = gst_pad_unlink(videoDisplayQueueSrc, videoDisplayBinSink);
     
     if (ok != true) {
-        log_error("%s: the unlinking of the pads failed", __FUNCTION__);
+        log_error(_("%s: the unlinking of the pads failed"), __FUNCTION__);
         return false;
     } else {
         return true;
@@ -1381,7 +1383,7 @@ VideoInputGst::webcamMakeVideoSaveLink()
     if (padreturn == GST_PAD_LINK_OK) {
         return true;
     } else {
-        log_error("%s: something went wrong in the make_video_display_link function",
+        log_error(_("%s: something went wrong in the make_video_display_link function"),
             __FUNCTION__);
         return false;
     }
@@ -1411,20 +1413,21 @@ VideoInputGst::webcamBreakVideoSaveLink()
     
     ok = gst_pad_unlink(videoSaveQueueSrc, videoSaveSink);
     if (ok != true) {
-        log_error("%s: unlink failed", __FUNCTION__);
+        log_error(_("%s: unlink failed"), __FUNCTION__);
         return false;
     } else {
         state = gst_element_set_state(webcam->_videoSaveBin, GST_STATE_NULL);
         if (state != GST_STATE_CHANGE_FAILURE) {
             ok = gst_bin_remove(GST_BIN(webcam->_pipeline), webcam->_videoSaveBin);
             if (ok != true) {
-                log_error("%s: couldn't remove saveBin from pipeline", __FUNCTION__);
+                log_error(_("%s: couldn't remove saveBin from pipeline"),
+                          __FUNCTION__);
                 return false;
             } else {
                 return true;
             }
         } else {
-            log_error("%s: videoSaveBin state change failed", __FUNCTION__);
+            log_error(_("%s: videoSaveBin state change failed"), __FUNCTION__);
             return false;
         }
     }
@@ -1447,34 +1450,34 @@ VideoInputGst::webcamCreateSaveBin()
     if ((video_save_csp =
         gst_element_factory_make("ffmpegcolorspace", "video_save_csp"))
             == NULL) {
-        log_error("%s: problem with creating video_save_csp element",
+        log_error(_("%s: problem with creating video_save_csp element"),
             __FUNCTION__);
         return false;
     }
     if ((video_enc = gst_element_factory_make("theoraenc", "video_enc")) == NULL) {
-        log_error("%s: problem with creating video_enc element", __FUNCTION__);
+        log_error(_("%s: problem with creating video_enc element"), __FUNCTION__);
         return false;
     } else {
         g_object_set (video_enc, "keyframe-force", 1, NULL);
     }
     
     if ((video_save_rate = gst_element_factory_make("videorate", "video_save_rate")) == NULL) {
-        log_error("%s: problem with creating video_save_rate element", __FUNCTION__);
+        log_error(_("%s: problem with creating video_save_rate element"), __FUNCTION__);
         return false;
     }
     if ((video_save_scale = gst_element_factory_make("videoscale", "video_save_scale")) == NULL) {
-        log_error("%s: problem with creating video_save_scale element", __FUNCTION__);
+        log_error(_("%s: problem with creating video_save_scale element"), __FUNCTION__);
         return false;
     } else {
         //Use bilinear scaling
         g_object_set (video_save_scale, "method", 1, NULL);
     }
     if ((mux = gst_element_factory_make("oggmux", "mux")) == NULL) {
-        log_error("%s: problem with creating mux element", __FUNCTION__);
+        log_error(_("%s: problem with creating mux element"), __FUNCTION__);
         return false;
     }
     if ((webcam->_videoFileSink = gst_element_factory_make("filesink", "video_file_sink")) == NULL) {
-        log_error("%s: problem with creating video_file_sink element", __FUNCTION__);
+        log_error(_("%s: problem with creating video_file_sink element"), __FUNCTION__);
         return false;
     } else {
         g_object_set(webcam->_videoFileSink, "location", "vidoutput.ogg", NULL);
@@ -1494,7 +1497,7 @@ VideoInputGst::webcamCreateSaveBin()
         video_save_scale, video_enc, mux, webcam->_videoFileSink, NULL);
     
     if (ok != true) {
-        log_error("%s: there was some problem in linking!", __FUNCTION__);
+        log_error(_("%s: there was some problem in linking!"), __FUNCTION__);
     }
     return true;
 }
@@ -1516,7 +1519,7 @@ bus_call (GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/)
         gst_message_parse_error (msg, &error, &debug);
         g_free (debug);
 
-        log_error ("Error: %s", error->message);
+        log_error("%s", error->message);
         g_error_free (error);
         
         break;

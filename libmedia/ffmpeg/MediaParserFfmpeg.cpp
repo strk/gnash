@@ -207,8 +207,8 @@ MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
         //   mdb:93, lastbuf:0 skiping granule 0
         // When playing: http://downloads.bbc.co.uk/news/nol/shared/spl/hi/audio_slideshow/kenadamptw/slideshow_629.swf
         //
-        LOG_ONCE(log_error("FIXME: FFmpeg packet decompression "
-                    "timestamp has no value, taking as zero"));
+        LOG_ONCE(log_error(_("FIXME: FFmpeg packet decompression "
+                             "timestamp has no value, taking as zero")));
         dts = 0;
     }
 	boost::uint64_t timestamp = static_cast<boost::uint64_t>(dts * as_double(_audioStream->time_base) * 1000.0); 
@@ -474,7 +474,7 @@ MediaParserFfmpeg::initializeParser()
         boost::uint64_t duration = _videoStream->duration;
 #endif
         if (duration == AV_NOPTS_VALUE) {
-            log_error("Duration of video stream unknown");
+            log_error(_("Duration of video stream unknown"));
             duration=0; // TODO: guess!
         } else {
             duration = duration / as_double(_videoStream->time_base); // TODO: check this
@@ -503,7 +503,7 @@ MediaParserFfmpeg::initializeParser()
         boost::uint64_t duration = _audioStream->duration;
 #endif
         if (duration == AV_NOPTS_VALUE) {
-            log_error("Duration of audio stream unknown to ffmpeg");
+            log_error(_("Duration of audio stream unknown to ffmpeg"));
             duration=0; // TODO: guess!
         } 
         else {
