@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-29 18:59-0700\n"
+"POT-Creation-Date: 2011-12-31 09:29-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -7651,7 +7651,7 @@ msgstr ""
 msgid "Attempt to write response to ExternalInterface requests fd %d"
 msgstr ""
 
-#: libcore/movie_root.cpp:1676
+#: libcore/movie_root.cpp:1676 gui/Player.cpp:713
 #, c-format
 msgid "Could not write to user-provided host requests fd %d: %s"
 msgstr ""
@@ -8164,7 +8164,6 @@ msgid "No EGLconfigs found\n"
 msgstr ""
 
 #: libdevice/egl/eglDevice.cpp:217 libdevice/egl/eglDevice.cpp:552
-#: gui/gtk/gtk_glue_ovg.cpp:391
 #, c-format
 msgid "Max number of EGL Configs is %d"
 msgstr ""
@@ -9182,7 +9181,7 @@ msgstr ""
 
 #: utilities/processor.cpp:456 utilities/processor.cpp:459 cygnal/cvm.cpp:407
 #: cygnal/cvm.cpp:410 gui/pythonmod/gnash-view.cpp:438
-#: gui/pythonmod/gnash-view.cpp:441 gui/Player.cpp:332 gui/Player.cpp:353
+#: gui/pythonmod/gnash-view.cpp:441
 #, c-format
 msgid "%s appended to local sandboxes"
 msgstr ""
@@ -11696,15 +11695,6 @@ msgstr ""
 msgid "Stopping \"%s\""
 msgstr ""
 
-#: gui/fb/fb.cpp:175
-msgid "Closing framebuffer device"
-msgstr ""
-
-#: gui/fb/fb.cpp:202 gui/fb/fb.cpp:224
-#, c-format
-msgid "Width:%d, Height:%d"
-msgstr ""
-
 #: gui/fb/fb.cpp:229
 #, c-format
 msgid "No renderer! %s not supported."
@@ -11716,11 +11706,6 @@ msgstr ""
 
 #: gui/fb/fb.cpp:249
 msgid "Found no accessible input event devices"
-msgstr ""
-
-#: gui/fb/fb.cpp:251
-#, c-format
-msgid "Found %d input event devices."
 msgstr ""
 
 #: gui/fb/fb.cpp:262
@@ -11743,11 +11728,6 @@ msgstr ""
 msgid "Enabling Power Button support"
 msgstr ""
 
-#: gui/fb/fb.cpp:323
-#, c-format
-msgid "X:%d, Y:%d"
-msgstr ""
-
 #: gui/fb/fb.cpp:368
 #, c-format
 msgid "Movie Frame Rate is %d, adjusting delay to %dms"
@@ -11761,77 +11741,53 @@ msgstr ""
 msgid "This GUI does not yet support a mouse pointer"
 msgstr ""
 
-#: gui/fb/fb.cpp:540
-msgid "WARNING: Could not detect controlling TTY"
+#: gui/fb/fb.cpp:539
+msgid "Could not detect controlling TTY"
 msgstr ""
 
-#: gui/fb/fb.cpp:550 gui/fb/fb.cpp:587 gui/fb/fb.cpp:622 gui/fb/fb.cpp:673
+#: gui/fb/fb.cpp:548 gui/fb/fb.cpp:585 gui/fb/fb.cpp:619 gui/fb/fb.cpp:670
 #, c-format
-msgid "WARNING: Could not open %s"
+msgid "Could not open %s"
 msgstr ""
 
-#: gui/fb/fb.cpp:556
-msgid "WARNING: Could not get current VT state"
+#: gui/fb/fb.cpp:554
+msgid "Could not get current VT state"
 msgstr ""
 
-#: gui/fb/fb.cpp:562
+#: gui/fb/fb.cpp:565
+msgid "Could not request a new VT"
+msgstr ""
+
+#: gui/fb/fb.cpp:579 gui/fb/fb.cpp:613 gui/fb/fb.cpp:664
 #, c-format
-msgid "Original TTY NO = %d"
+msgid "Could not find device for VT number %d"
 msgstr ""
 
-#: gui/fb/fb.cpp:567
-msgid "WARNING: Could not request a new VT"
-msgstr ""
-
-#: gui/fb/fb.cpp:572
+#: gui/fb/fb.cpp:590 gui/fb/fb.cpp:675
 #, c-format
-msgid "Own TTY NO = %d"
+msgid "Could not activate VT number %d"
 msgstr ""
 
-#: gui/fb/fb.cpp:581 gui/fb/fb.cpp:615 gui/fb/fb.cpp:667
+#: gui/fb/fb.cpp:596 gui/fb/fb.cpp:681
 #, c-format
-msgid "WARNING: Could not find device for VT number %d"
+msgid "Error waiting for VT %d becoming active"
 msgstr ""
 
-#: gui/fb/fb.cpp:592 gui/fb/fb.cpp:678
+#: gui/fb/fb.cpp:627
 #, c-format
-msgid "WARNING: Could not activate VT number %d"
+msgid "Could not attach controlling terminal (%s)"
 msgstr ""
 
-#: gui/fb/fb.cpp:598 gui/fb/fb.cpp:684
-#, c-format
-msgid "WARNING: Error waiting for VT %d becoming active"
+#: gui/fb/fb.cpp:635
+msgid "Could not query current keyboard mode on VT"
 msgstr ""
 
-#: gui/fb/fb.cpp:630
-#, c-format
-msgid "WARNING: Could not attach controlling terminal (%s)"
+#: gui/fb/fb.cpp:639
+msgid "Could not switch to graphics mode on new VT"
 msgstr ""
 
-#: gui/fb/fb.cpp:638
-msgid "WARNING: Could not query current keyboard mode on VT"
-msgstr ""
-
-#: gui/fb/fb.cpp:642
-msgid "WARNING: Could not switch to graphics mode on new VT"
-msgstr ""
-
-#: gui/fb/fb.cpp:649
-#, c-format
-msgid "VT %d ready"
-msgstr ""
-
-#: gui/fb/fb.cpp:663
-msgid "Restoring terminal..."
-msgstr ""
-
-#: gui/fb/fb.cpp:693
-msgid "WARNING: Could not restore keyboard mode"
-msgstr ""
-
-#: gui/fb/fb.cpp:740
-#, c-format
-msgid "Mouse clicked at: %g:%g"
+#: gui/fb/fb.cpp:690
+msgid "Could not restore keyboard mode"
 msgstr ""
 
 #: gui/fb/fb_glue_ovg.cpp:73 gui/gtk/gtk_glue_ovg.cpp:88
@@ -11886,24 +11842,6 @@ msgstr ""
 msgid "EGL: current ok"
 msgstr ""
 
-#: gui/fb/fb_glue_gles1.cpp:146
-msgid "EGL: pbuffer config ok"
-msgstr ""
-
-#: gui/fb/fb_glue_gles1.cpp:162
-msgid "EGL: pbuffer surface ok"
-msgstr ""
-
-#: gui/fb/fb_glue_gles1.cpp:171
-#, c-format
-msgid "EGL: width %d"
-msgstr ""
-
-#: gui/fb/fb_glue_gles1.cpp:179
-#, c-format
-msgid "EGL: height %d"
-msgstr ""
-
 #: gui/fb/fb_glue_agg.cpp:87
 #, c-format
 msgid "No renderer set in %s!"
@@ -11915,26 +11853,6 @@ msgstr ""
 
 #: gui/fb/fb_glue_agg.cpp:151
 msgid "No Device layer initialized yet!"
-msgstr ""
-
-#: gui/fb/fb_glue_agg.cpp:164
-#, c-format
-msgid "red channel: %d / %d"
-msgstr ""
-
-#: gui/fb/fb_glue_agg.cpp:166
-#, c-format
-msgid "green channel: %d / %d"
-msgstr ""
-
-#: gui/fb/fb_glue_agg.cpp:168
-#, c-format
-msgid "blue channel: %d / %d"
-msgstr ""
-
-#: gui/fb/fb_glue_agg.cpp:170
-#, c-format
-msgid "Total bits per pixel: %d"
 msgstr ""
 
 #: gui/fb/fb_glue_agg.cpp:182
@@ -11963,224 +11881,219 @@ msgstr ""
 msgid "Error: no input file was specified. Exiting.\n"
 msgstr ""
 
-#: gui/gnash.cpp:209
-#, c-format
-msgid "Host FD #%d, Control FD #%d\n"
-msgstr ""
-
-#: gui/gnash.cpp:213
+#: gui/gnash.cpp:212
 msgid "Invalid host communication filedescriptor %1%\n"
 msgstr ""
 
-#: gui/gnash.cpp:220
+#: gui/gnash.cpp:219
 msgid "Invalid control communication filedescriptor %1%\n"
 msgstr ""
 
-#: gui/gnash.cpp:252
+#: gui/gnash.cpp:251
 msgid "ERROR: -r must be followed by 0, 1, 2 or 3 "
 msgstr ""
 
-#: gui/gnash.cpp:268
+#: gui/gnash.cpp:267
 msgid "Debugging options"
 msgstr ""
 
-#: gui/gnash.cpp:274
+#: gui/gnash.cpp:273
 msgid "Produce verbose output"
 msgstr ""
 
-#: gui/gnash.cpp:281
+#: gui/gnash.cpp:280
 msgid "Produce the disk based debug log"
 msgstr ""
 
-#: gui/gnash.cpp:286
+#: gui/gnash.cpp:285
 msgid "Be (very) verbose about action execution"
 msgstr ""
 
-#: gui/gnash.cpp:292
+#: gui/gnash.cpp:291
 msgid "Be (very) verbose about parsing"
 msgstr ""
 
-#: gui/gnash.cpp:298
+#: gui/gnash.cpp:297
 msgid "Print FPS every num seconds"
 msgstr ""
 
-#: gui/gnash.cpp:321
+#: gui/gnash.cpp:320
 msgid "Options"
 msgstr ""
 
-#: gui/gnash.cpp:326
+#: gui/gnash.cpp:325
 msgid "Print this help and exit"
 msgstr ""
 
-#: gui/gnash.cpp:329
+#: gui/gnash.cpp:328
 msgid "Print version information and exit"
 msgstr ""
 
-#: gui/gnash.cpp:334
+#: gui/gnash.cpp:333
 msgid "Scale the movie by the specified factor"
 msgstr ""
 
-#: gui/gnash.cpp:338
+#: gui/gnash.cpp:337
 msgid "Number of milliseconds to delay in main loop"
 msgstr ""
 
-#: gui/gnash.cpp:342
+#: gui/gnash.cpp:341
 msgid "Audio dump file (wave format)"
 msgstr ""
 
-#: gui/gnash.cpp:347
+#: gui/gnash.cpp:346
 msgid "Hardware Video Accelerator to use"
 msgstr ""
 
-#: gui/gnash.cpp:352
+#: gui/gnash.cpp:351
 msgid "X11 Window ID for display"
 msgstr ""
 
-#: gui/gnash.cpp:356
+#: gui/gnash.cpp:355
 msgid "Set window width"
 msgstr ""
 
-#: gui/gnash.cpp:360
+#: gui/gnash.cpp:359
 msgid "Set window height"
 msgstr ""
 
-#: gui/gnash.cpp:364
+#: gui/gnash.cpp:363
 msgid "Set window x position"
 msgstr ""
 
-#: gui/gnash.cpp:368
+#: gui/gnash.cpp:367
 msgid "Set window y position"
 msgstr ""
 
-#: gui/gnash.cpp:373
+#: gui/gnash.cpp:372
 msgid "Exit when/if movie reaches the last frame"
 msgstr ""
 
-#: gui/gnash.cpp:379
+#: gui/gnash.cpp:378
 msgid "disable rendering and sound"
 msgstr ""
 
-#: gui/gnash.cpp:381
+#: gui/gnash.cpp:380
 msgid "enable rendering, disable sound"
 msgstr ""
 
-#: gui/gnash.cpp:383
+#: gui/gnash.cpp:382
 msgid "enable sound, disable rendering"
 msgstr ""
 
-#: gui/gnash.cpp:385
+#: gui/gnash.cpp:384
 msgid "enable rendering and sound"
 msgstr ""
 
-#: gui/gnash.cpp:393
+#: gui/gnash.cpp:392
 msgid "The media handler to use"
 msgstr ""
 
-#: gui/gnash.cpp:401
+#: gui/gnash.cpp:400
 msgid "The renderer to use"
 msgstr ""
 
-#: gui/gnash.cpp:407
+#: gui/gnash.cpp:406
 msgid "Exit after the specified number of seconds"
 msgstr ""
 
-#: gui/gnash.cpp:410
+#: gui/gnash.cpp:409
 msgid "Set \"real\" URL of the movie"
 msgstr ""
 
-#: gui/gnash.cpp:414
+#: gui/gnash.cpp:413
 msgid "Set \"base\" URL for resolving relative URLs"
 msgstr ""
 
-#: gui/gnash.cpp:419
+#: gui/gnash.cpp:418
 msgid "Set parameter (e.g. \"FlashVars=A=1&b=2\")"
 msgstr ""
 
-#: gui/gnash.cpp:423
+#: gui/gnash.cpp:422
 msgid "Filedescriptor to use for external communications"
 msgstr ""
 
-#: gui/gnash.cpp:429
+#: gui/gnash.cpp:428
 msgid "Exit after specified number of frame advances"
 msgstr ""
 
-#: gui/gnash.cpp:433
+#: gui/gnash.cpp:432
 msgid "Start in fullscreen mode"
 msgstr ""
 
-#: gui/gnash.cpp:438
+#: gui/gnash.cpp:437
 msgid "Start without displaying the menu bar"
 msgstr ""
 
-#: gui/gnash.cpp:443
+#: gui/gnash.cpp:442
 msgid "List of frames to save as screenshots"
 msgstr ""
 
-#: gui/gnash.cpp:447
+#: gui/gnash.cpp:446
 msgid "Filename pattern for screenshot images"
 msgstr ""
 
-#: gui/gnash.cpp:451
+#: gui/gnash.cpp:450
 msgid "Quality for screenshot output (not all formats)"
 msgstr ""
 
-#: gui/gnash.cpp:454
+#: gui/gnash.cpp:453
 msgid "Input files"
 msgstr ""
 
-#: gui/gnash.cpp:465
+#: gui/gnash.cpp:464
 msgid "Dump options"
 msgstr ""
 
-#: gui/gnash.cpp:470
+#: gui/gnash.cpp:469
 msgid "Video dump file (raw format) and optional video FPS (@<num>)"
 msgstr ""
 
-#: gui/gnash.cpp:472
+#: gui/gnash.cpp:471
 msgid "Number of milliseconds to sleep between advances"
 msgstr ""
 
-#: gui/gnash.cpp:474
+#: gui/gnash.cpp:473
 msgid "Trigger expression to start dumping"
 msgstr ""
 
-#: gui/gnash.cpp:486
+#: gui/gnash.cpp:485
 msgid "Keys:\n"
 msgstr ""
 
-#: gui/gnash.cpp:488
+#: gui/gnash.cpp:487
 msgid "Quit\n"
 msgstr ""
 
-#: gui/gnash.cpp:490
+#: gui/gnash.cpp:489
 msgid "Toggle fullscreen\n"
 msgstr ""
 
-#: gui/gnash.cpp:492
+#: gui/gnash.cpp:491
 msgid "Toggle pause\n"
 msgstr ""
 
-#: gui/gnash.cpp:494
+#: gui/gnash.cpp:493
 msgid "Restart the movie\n"
 msgstr ""
 
-#: gui/gnash.cpp:496
+#: gui/gnash.cpp:495
 msgid "Take a screenshot\n"
 msgstr ""
 
-#: gui/gnash.cpp:498
+#: gui/gnash.cpp:497
 msgid "Force immediate redraw\n"
 msgstr ""
 
-#: gui/gnash.cpp:504
+#: gui/gnash.cpp:503
 msgid "Usage: gnash [options] movie_file.swf\n"
 msgstr ""
 
-#: gui/gnash.cpp:505
+#: gui/gnash.cpp:504
 msgid "Plays a SWF (Shockwave Flash) movie\n"
 msgstr ""
 
-#: gui/gnash.cpp:522
+#: gui/gnash.cpp:521
 msgid ""
 "Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free Software "
 "Foundation, Inc.\n"
@@ -12190,31 +12103,31 @@ msgid ""
 "\n"
 msgstr ""
 
-#: gui/gnash.cpp:533
+#: gui/gnash.cpp:532
 msgid "Build options "
 msgstr ""
 
-#: gui/gnash.cpp:534
+#: gui/gnash.cpp:533
 msgid "   Renderers: "
 msgstr ""
 
-#: gui/gnash.cpp:535
+#: gui/gnash.cpp:534
 msgid "   Hardware Acceleration: "
 msgstr ""
 
-#: gui/gnash.cpp:536
+#: gui/gnash.cpp:535
 msgid "   GUI: "
 msgstr ""
 
-#: gui/gnash.cpp:537
+#: gui/gnash.cpp:536
 msgid "   Media handlers: "
 msgstr ""
 
-#: gui/gnash.cpp:539
+#: gui/gnash.cpp:538
 msgid "   Configured with: "
 msgstr ""
 
-#: gui/gnash.cpp:540
+#: gui/gnash.cpp:539
 msgid "   CXXFLAGS: "
 msgstr ""
 
@@ -12241,6 +12154,11 @@ msgstr ""
 #: gui/dump/dump.cpp:352
 #, c-format
 msgid "Unable to write file '%s'."
+msgstr ""
+
+#: gui/ScreenShotter.cpp:99
+#, c-format
+msgid "Failed to open screenshot file \"%s\"!"
 msgstr ""
 
 #: gui/haiku/haiku.cpp:141
@@ -12286,14 +12204,6 @@ msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:136
 msgid "AGG renderer not supported!"
-msgstr ""
-
-#: gui/qt/Qt4Gui.cpp:208
-msgid "Setting renderer"
-msgstr ""
-
-#: gui/qt/Qt4Gui.cpp:212
-msgid "Set renderer"
 msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:467 gui/gtk/gtk.cpp:1708
@@ -12635,14 +12545,52 @@ msgstr ""
 msgid "Mouse show/hide not yet supported in this GUI"
 msgstr ""
 
-#: gui/gui.cpp:483
-#, c-format
-msgid "mouse @ %d,%d"
+#: gui/gui.cpp:282
+msgid "Can't update stage matrix till VM is initialized"
 msgstr ""
 
-#: gui/gui.cpp:959
+#: gui/gui.cpp:334
 #, c-format
-msgid "Frame %d"
+msgid "Invalid scaleMode %d"
+msgstr ""
+
+#: gui/gui.cpp:374
+#, c-format
+msgid "Invalid horizontal align %d"
+msgstr ""
+
+#: gui/gui.cpp:405
+#, c-format
+msgid "Invalid vertical align %d"
+msgstr ""
+
+#: gui/gui.cpp:900
+msgid "Gui is in stop mode, won't start application"
+msgstr ""
+
+#: gui/gui.cpp:1261
+#, c-format
+msgid "This gui didn't override 'yesno', assuming 'yes' answer to question: %s"
+msgstr ""
+
+#: gui/gui.cpp:1270
+msgid "Gui::setQuality called before a movie_root was available"
+msgstr ""
+
+#: gui/gui.cpp:1280
+msgid "Gui::getQuality called before a movie_root was available"
+msgstr ""
+
+#: gui/Player.cpp:131
+msgid "GUI ExternalInterface.Pan event"
+msgstr ""
+
+#: gui/Player.cpp:143
+msgid "GUI ExternalInterface.SetZoomRect event"
+msgstr ""
+
+#: gui/Player.cpp:151
+msgid "GUI ExternalInterface.Zoom event"
 msgstr ""
 
 #: gui/Player.cpp:169
@@ -12650,58 +12598,39 @@ msgstr ""
 msgid "Unhandled callback %s with arguments %s"
 msgstr ""
 
-#: gui/Player.cpp:262
-#, c-format
-msgid "Timer delay set to %d milliseconds"
-msgstr ""
-
-#: gui/Player.cpp:308
-#, c-format
-msgid "Activating FPS debugging every %g seconds"
-msgstr ""
-
 #: gui/Player.cpp:434
 msgid "Non-existent media handler %1% specified"
 msgstr ""
 
-#: gui/Player.cpp:481
+#: gui/Player.cpp:545
 #, c-format
-msgid ""
-"Input movie has collapsed dimensions %d/%d. Setting to 1/1 and going on."
+msgid "Movie Frame Rate is %d, adjusting delay"
 msgstr ""
 
-#: gui/Player.cpp:683
+#: gui/Player.cpp:682
 msgid "Got unexpected argument type for message %1%"
 msgstr ""
 
-#: gui/Player.cpp:725
+#: gui/Player.cpp:717
 #, c-format
-msgid "Sent FsCommand '%s' to host fd %d"
+msgid ""
+"Could only write %d bytes over %d required to user-provided host requests fd "
+"%d"
 msgstr ""
 
-#: gui/Player.cpp:733
-#, c-format
-msgid "Running as plugin: skipping internal handling of FsCommand %s%s."
-msgstr ""
-
-#: gui/Player.cpp:774
+#: gui/Player.cpp:773
 #, c-format
 msgid "FsCommand exec called with argument %s"
 msgstr ""
 
-#: gui/Player.cpp:791
+#: gui/Player.cpp:790
 #, c-format
 msgid "FsCommand trapallkeys called with argument %s"
 msgstr ""
 
-#: gui/Player.cpp:797
+#: gui/Player.cpp:796
 #, c-format
 msgid "FsCommand '%s(%s)' not handled internally"
-msgstr ""
-
-#: gui/gtk/gtk_canvas.cpp:123
-#, c-format
-msgid "gnash_canvas_size_allocate %d %d"
 msgstr ""
 
 #: gui/gtk/gtk_glue_cairo.cpp:223
@@ -12716,11 +12645,6 @@ msgstr ""
 msgid "No off screen buffer!"
 msgstr ""
 
-#: gui/gtk/gtk_glue_ovg.cpp:405
-#, c-format
-msgid "Config[%d] is:"
-msgstr ""
-
 #: gui/gtk/gtk_glue_agg_vaapi.cpp:163
 msgid "WARNING: failed to create VA-API display."
 msgstr ""
@@ -12728,54 +12652,34 @@ msgstr ""
 #: gui/gtk/gtk_glue_agg_vaapi.cpp:204
 #, c-format
 msgid ""
-"GTK-AGG: Unknown RGB format %s reported by VA-API. Please report this to the "
+"GTK-AGG: Unknown RGB format %s reported by VA-API.Please report this to the "
 "gnash-dev mailing list."
 msgstr ""
 
-#: gui/gtk/gtk_glue_agg_vaapi.cpp:230 gui/gtk/gtk_glue_agg_vaapi.cpp:288
-msgid "ERROR: failed to map VA-API image."
+#: gui/gtk/gtk_glue_agg_vaapi.cpp:231 gui/gtk/gtk_glue_agg_vaapi.cpp:289
+msgid "failed to map VA-API image."
 msgstr ""
 
-#: gui/gtk/gtk_glue_agg_vaapi.cpp:236
-msgid "ERROR: failed to associate VA-API subpicture."
+#: gui/gtk/gtk_glue_agg_vaapi.cpp:237
+msgid "failed to associate VA-API subpicture."
 msgstr ""
 
-#: gui/gtk/gtk_glue_agg_vaapi.cpp:370
+#: gui/gtk/gtk_glue_agg_vaapi.cpp:371
 #, c-format
-msgid "ERROR: failed to setup video window for surface 0x%08x."
+msgid "failed to setup video window for surface 0x%08x."
 msgstr ""
 
-#: gui/gtk/gtk_glue_agg_vaapi.cpp:377
+#: gui/gtk/gtk_glue_agg_vaapi.cpp:378
 #, c-format
-msgid "ERROR: failed to associate subpicture to surface 0x%08x."
+msgid "failed to associate subpicture to surface 0x%08x."
 msgstr ""
 
 #: gui/gtk/gtk.cpp:159
 msgid "Failed to initialize X threading support\n"
 msgstr ""
 
-#: gui/gtk/gtk.cpp:173
-msgid "Created XEmbedded window"
-msgstr ""
-
-#: gui/gtk/gtk.cpp:176
-msgid "Created top level window"
-msgstr ""
-
-#: gui/gtk/gtk.cpp:189
-msgid "DRI extension found"
-msgstr ""
-
-#: gui/gtk/gtk.cpp:196
-msgid "GLX extension found"
-msgstr ""
-
 #: gui/gtk/gtk.cpp:202
 msgid "This system lacks a hardware OpenGL driver!"
-msgstr ""
-
-#: gui/gtk/gtk.cpp:211
-msgid "Xvideo extension found"
 msgstr ""
 
 #: gui/gtk/gtk.cpp:223
@@ -12789,10 +12693,6 @@ msgstr ""
 
 #: gui/gtk/gtk.cpp:686
 msgid "Sound"
-msgstr ""
-
-#: gui/gtk/gtk.cpp:733
-msgid "GtkGui: Window resize request received"
 msgstr ""
 
 #: gui/gtk/gtk.cpp:1274
@@ -13022,27 +12922,14 @@ msgstr ""
 msgid "Open file"
 msgstr ""
 
-#: gui/gtk/gtk_glue_gtkglext.cpp:63
-#, c-format
-msgid "OpenGL extension version - %d.%d"
-msgstr ""
-
-#: gui/gtk/gtk_glue_gtkglext.cpp:73
+#: gui/gtk/gtk_glue_gtkglext.cpp:72
 msgid ""
 "Cannot find the double-buffered visual.\n"
 "Trying single-buffered visual."
 msgstr ""
 
-#: gui/gtk/gtk_glue_gtkglext.cpp:79
+#: gui/gtk/gtk_glue_gtkglext.cpp:78
 msgid "No appropriate OpenGL-capable visual found."
-msgstr ""
-
-#: gui/gtk/gtk_glue_gtkglext.cpp:82
-msgid "Got single-buffered visual."
-msgstr ""
-
-#: gui/gtk/gtk_glue_gtkglext.cpp:85
-msgid "Got double-buffered visual."
 msgstr ""
 
 #: extensions/mysql/mysql_db.cpp:186
