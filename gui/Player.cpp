@@ -286,7 +286,7 @@ Player::init_sound()
 
         } catch (const SoundException& ex) {
             log_error(_("Could not create sound handler: %s."
-                " Will continue w/out sound."), ex.what());
+                " Will continue without sound."), ex.what());
         }
     }
 }

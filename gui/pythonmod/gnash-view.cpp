@@ -218,7 +218,7 @@ gnash_view_init(GnashView *view)
                 view->media_handler.get()));
     } catch (gnash::SoundException& ex) {
         gnash::log_error(_("Could not create sound handler: %s."
-                           " Will continue w/out sound."), ex.what());
+                           " Will continue without sound."), ex.what());
     }
     gnash::log_error(_("Sound requested but no sound support compiled in"));
 #endif
