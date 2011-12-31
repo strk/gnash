@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-31 12:07-0700\n"
+"POT-Creation-Date: 2011-12-31 13:03-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -919,6 +919,10 @@ msgstr ""
 msgid "glError: %s caught\n"
 msgstr ""
 
+#: libmedia/MediaParser.cpp:82
+msgid "No ID3 support implemented in this MediaParser"
+msgstr ""
+
 #: libmedia/ffmpeg/MediaParserFfmpeg.cpp:79
 msgid "MediaParserFfmpeg could not read probe data from input"
 msgstr ""
@@ -927,6 +931,11 @@ msgstr ""
 #: libmedia/ffmpeg/MediaParserFfmpeg.cpp:121
 #, c-format
 msgid "%s: seeking failed"
+msgstr ""
+
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:210
+msgid ""
+"FIXME: FFmpeg packet decompression timestamp has no value, taking as zero"
 msgstr ""
 
 #: libmedia/ffmpeg/MediaParserFfmpeg.cpp:271
@@ -944,6 +953,14 @@ msgstr ""
 #: libmedia/ffmpeg/MediaParserFfmpeg.cpp:455
 #, c-format
 msgid "  Using stream %d for video: codec id %d"
+msgstr ""
+
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:477
+msgid "Duration of video stream unknown"
+msgstr ""
+
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:506
+msgid "Duration of audio stream unknown to ffmpeg"
 msgstr ""
 
 #: libmedia/ffmpeg/MediaParserFfmpeg.cpp:586
@@ -1042,6 +1059,13 @@ msgid ""
 "issue."
 msgstr ""
 
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:400
+#, c-format
+msgid ""
+"AudioDecoderFfmpeg: could not find a complete frame in the last %d bytes of "
+"input (malformed SWF or FLV?)"
+msgstr ""
+
 #: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:489
 msgid "failed to allocate audio buffer."
 msgstr ""
@@ -1058,6 +1082,13 @@ msgstr ""
 msgid ""
 "outputSize:%d after decoding %d bytes of input audio data. Upgrading ffmpeg/"
 "libavcodec might fix this issue."
+msgstr ""
+
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:586
+#, c-format
+msgid ""
+" --- Computation of resampled samples (%d) < then the actual returned "
+"samples (%d)"
 msgstr ""
 
 #: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:140
@@ -1079,8 +1110,16 @@ msgstr ""
 msgid "VideoDecoder: initialized FFMPEG codec %s (%d)"
 msgstr ""
 
+#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:305
+msgid "Pixel format not handled"
+msgstr ""
+
 #: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:353
 msgid "Out of memory while allocating avcodec frame"
+msgstr ""
+
+#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:372
+msgid "Decoding of a video frame failed"
 msgstr ""
 
 #: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:433
@@ -1116,6 +1155,10 @@ msgid ""
 "header. We'll warn only once for each FLV, expecting any further audio tag."
 msgstr ""
 
+#: libmedia/FLVParser.cpp:186
+msgid "could not read audio frame?"
+msgstr ""
+
 #: libmedia/FLVParser.cpp:224
 #, c-format
 msgid ""
@@ -1128,23 +1171,54 @@ msgstr ""
 msgid "AVC packet type: %d"
 msgstr ""
 
-#: libmedia/FLVParser.cpp:421
+#: libmedia/FLVParser.cpp:263
+msgid "could not read video frame?"
+msgstr ""
+
+#: libmedia/FLVParser.cpp:321
+#, c-format
+msgid "FLVParser::parseNextTag: can't seek to %d"
+msgstr ""
+
+#: libmedia/FLVParser.cpp:335
+#, c-format
+msgid ""
+"FLVParser::parseNextTag: can't read tag info (needed 12 bytes, only got %d)"
+msgstr ""
+
+#: libmedia/FLVParser.cpp:422
 #, c-format
 msgid "First byte of FLV_META_TAG is %d, expected 0x02 (STRING AMF0 type)"
 msgstr ""
 
-#: libmedia/FLVParser.cpp:444
+#: libmedia/FLVParser.cpp:434
+#, c-format
+msgid ""
+"FLVParser::parseNextTag: can't read metaTag (%d) body (needed %d bytes, only "
+"got %d)"
+msgstr ""
+
+#: libmedia/FLVParser.cpp:445
 msgid "Corrupt FLV: Meta tag unterminated!"
 msgstr ""
 
-#: libmedia/FLVParser.cpp:452
+#: libmedia/FLVParser.cpp:453
 #, c-format
 msgid "FLVParser::parseNextTag: unknown FLV tag type %d"
 msgstr ""
 
-#: libmedia/FLVParser.cpp:461
+#: libmedia/FLVParser.cpp:462
 msgid ""
 "Corrupt FLV: previous tag size record (%1%) unexpected (actual size: %2%)"
+msgstr ""
+
+#: libmedia/FLVParser.cpp:480
+msgid "FLVParser::parseHeader: couldn't read 9 bytes of header"
+msgstr ""
+
+#: libmedia/FLVParser.cpp:532
+#, c-format
+msgid "FLVParser::readAudioFrame: could only read %d/%d bytes"
 msgstr ""
 
 #: libmedia/gst/VideoConverterGst.cpp:37
@@ -1392,6 +1466,227 @@ msgstr ""
 msgid "AudioDecoderGst: buffer push failed."
 msgstr ""
 
+#: libmedia/gst/VideoInputGst.cpp:317
+msgid "too high an index value, will cause segfault"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:367
+#, c-format
+msgid "%s: Could not create video test source."
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:385 libmedia/gst/AudioInputGst.cpp:117
+#, c-format
+msgid "%s: Could not create pulsesrc element"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:390 libmedia/gst/AudioInputGst.cpp:122
+#, c-format
+msgid "%s: Could not get property probe from pulsesrc element"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:626
+msgid "You have an invalid camera selected. Please check your gnashrc file"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:657
+#, c-format
+msgid "%s: Passed an invalid argument (not a valid dev_select value)"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:685 libmedia/gst/AudioInputGst.cpp:220
+#, c-format
+msgid "%s: Pipeline bus isn't an object for some reason"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:705 libmedia/gst/AudioInputGst.cpp:239
+#, c-format
+msgid "%s: Template pad isn't an object for some reason"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:718 libmedia/gst/AudioInputGst.cpp:253
+#, c-format
+msgid "%s: pipeline isn't an object for some reason"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:804
+#, c-format
+msgid "%s: type %s, cannot be handled for resolution width"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:825 libmedia/gst/AudioInputGst.cpp:279
+#, c-format
+msgid "%s: was passed a NULL pointer"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:931 libmedia/gst/VideoInputGst.cpp:1104
+#, c-format
+msgid "%s: Creation of the webcam_source_bin failed"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:933 libmedia/gst/VideoInputGst.cpp:1106
+#: libmedia/gst/AudioInputGst.cpp:326 libmedia/gst/AudioInputGst.cpp:382
+#, c-format
+msgid "the error was %s"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:961
+#, c-format
+msgid "%s: webam isn't set!"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1024
+#, c-format
+msgid ""
+"%s: the resolution you chose isn't supported, picking                 a "
+"supported value"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1128 libmedia/gst/AudioInputGst.cpp:337
+#, c-format
+msgid "%s: couldn't drop the sourcebin back into the main bin"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1137 libmedia/gst/AudioInputGst.cpp:347
+#, c-format
+msgid "%s: couldn't link up sourcebin and tee"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1169
+#, c-format
+msgid "%s: problem creating source bin"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1176 libmedia/gst/AudioInputGst.cpp:410
+#, c-format
+msgid "%s: problem creating tee element"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1180 libmedia/gst/AudioInputGst.cpp:414
+#, c-format
+msgid "%s: problem creating save_queue element"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1185
+#, c-format
+msgid "%s: problem creating video_display_queue element"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1196
+#, c-format
+msgid "%s: couldn't link webcam_source_bin and tee"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1203
+#, c-format
+msgid "%s: couldn't link tee and save_queue"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1209
+#, c-format
+msgid "%s: couldn't link tee and video_display_queue"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1218
+#, c-format
+msgid "%s: couldn't get save_queue_src_pad"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1228
+#, c-format
+msgid "%s: couldn't get video_display_queue_pad"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1240 libmedia/gst/AudioInputGst.cpp:464
+#, c-format
+msgid "%s: Unable to create main pipeline"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1258
+#, c-format
+msgid "%s: something went wrong creating the new video_display_bin"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1264
+#, c-format
+msgid "%s: problem creating video_scale element"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1273
+#, c-format
+msgid "%s: problem creating the video_sink element"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1282
+#, c-format
+msgid "%s: something went wrong in linking elements in video_display_bin"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1324
+msgid "something went wrong in the make_video_display_link function"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1356
+#, c-format
+msgid "%s: the unlinking of the pads failed"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1386
+#, c-format
+msgid "%s: something went wrong in the make_video_display_link function"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1416 libmedia/gst/AudioInputGst.cpp:540
+#: libmedia/gst/AudioInputGst.cpp:680
+#, c-format
+msgid "%s: unlink failed"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1423 libmedia/gst/AudioInputGst.cpp:687
+#, c-format
+msgid "%s: couldn't remove saveBin from pipeline"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1430
+#, c-format
+msgid "%s: videoSaveBin state change failed"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1453
+#, c-format
+msgid "%s: problem with creating video_save_csp element"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1458
+#, c-format
+msgid "%s: problem with creating video_enc element"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1465
+#, c-format
+msgid "%s: problem with creating video_save_rate element"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1469
+#, c-format
+msgid "%s: problem with creating video_save_scale element"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1476
+#, c-format
+msgid "%s: problem with creating mux element"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1480
+#, c-format
+msgid "%s: problem with creating video_file_sink element"
+msgstr ""
+
+#: libmedia/gst/VideoInputGst.cpp:1500
+#, c-format
+msgid "%s: there was some problem in linking!"
+msgstr ""
+
 #: libmedia/gst/MediaHandlerGst.cpp:89
 msgid "Wrong arguments given to GST VideoDecoder"
 msgstr ""
@@ -1399,6 +1694,127 @@ msgstr ""
 #: libmedia/gst/MediaHandlerGst.cpp:136
 #, c-format
 msgid "MediaHandlerGst::createAudioDecoder: %s -- %s"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:100
+#, c-format
+msgid "%s: Could not create audio test source"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:190
+#, c-format
+msgid "%s: passed an invalid devselect argument"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:244
+msgid "The input device you selected isn't supported (yet)"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:270
+#, c-format
+msgid "%s: Passed a bad devselect value"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:324 libmedia/gst/AudioInputGst.cpp:380
+#, c-format
+msgid "%s: Creation of the audioSourceBin failed"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:406
+#, c-format
+msgid "%s: audioCreateSourceBin failed!"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:419
+#, c-format
+msgid "%s: problem creating audioPlaybackQueue element"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:426
+#, c-format
+msgid "%s: couldn't link audioSourceBin and tee"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:431
+#, c-format
+msgid "%s: couldn't link tee and saveQueue"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:436
+#, c-format
+msgid "%s: couldn't link tee and audioPlaybackQueue"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:445
+#, c-format
+msgid "%s: couldn't get saveQueueSrcPad"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:455
+#, c-format
+msgid "%s: couldn't get audioPlaybackQueue"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:481
+#, c-format
+msgid "%s: There was a problem making the audiosink!"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:517
+msgid "something went wrong in the makeSourcePlaybackLink function"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:548
+#, c-format
+msgid "%s: couldn't remove audioPlaybackBin from pipeline"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:555
+#, c-format
+msgid "%s: changing state of audioPlaybackBin failed"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:579
+#, c-format
+msgid "Error: %s"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:599
+#, c-format
+msgid "%s: Couldn't make audioconvert element"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:603
+#, c-format
+msgid "%s: Couldn't make vorbisenc element"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:607
+#, c-format
+msgid "%s: Couldn't make oggmux element"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:611
+#, c-format
+msgid "%s: Couldn't make filesink element"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:630
+#, c-format
+msgid "%s: Something went wrong in linking"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:658
+msgid "something went wrong in the makeAudioSourceSaveLink function"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:694
+#, c-format
+msgid "%s: audioSaveBin state change failed"
+msgstr ""
+
+#: libmedia/gst/AudioInputGst.cpp:755
+msgid "You have an invalid microphone selected. Check your gnashrc file"
 msgstr ""
 
 #: libmedia/AudioDecoderSimple.cpp:162
@@ -1482,7 +1898,7 @@ msgstr ""
 
 #: libcore/FreetypeGlyphsProvider.cpp:266
 #, c-format
-msgid "Can't close FreeType! Error %d"
+msgid "Can't close FreeType! Error = %d"
 msgstr ""
 
 #: libcore/FreetypeGlyphsProvider.cpp:280
@@ -2372,7 +2788,7 @@ msgstr ""
 
 #: libcore/asobj/TextField_as.cpp:658
 msgid ""
-"TextField.getTextFormat() discards url, target, tabStops, bullet and display"
+"TextField.getTextFormat() discards URL, target, tabStops, bullet and display"
 msgstr ""
 
 #: libcore/asobj/TextField_as.cpp:672 libcore/asobj/TextField_as.cpp:694
@@ -2439,22 +2855,9 @@ msgid ""
 "TextField.replaceText(%s): endIndex out of range - taking as end of string"
 msgstr ""
 
-#: libcore/asobj/TextField_as.cpp:1058
-msgid "TextField.removeTextField() TESTING"
-msgstr ""
-
-#: libcore/asobj/NetConnection_as.cpp:324
-msgid "Initial connection complete"
-msgstr ""
-
 #: libcore/asobj/NetConnection_as.cpp:440
 #, c-format
 msgid "Gnash is not allowed to open this url: %s"
-msgstr ""
-
-#: libcore/asobj/NetConnection_as.cpp:444
-#, c-format
-msgid "Connection to movie: %s"
 msgstr ""
 
 #: libcore/asobj/NetConnection_as.cpp:496
@@ -2480,11 +2883,6 @@ msgstr ""
 msgid "NetConnection.call(): needs at least one argument"
 msgstr ""
 
-#: libcore/asobj/NetConnection_as.cpp:668
-#, c-format
-msgid "NetConnection.call(%s)"
-msgstr ""
-
 #: libcore/asobj/NetConnection_as.cpp:681
 #, c-format
 msgid "NetConnection.call(%s): second argument must be an object"
@@ -2503,22 +2901,12 @@ msgstr ""
 msgid "NetConnection.addHeader()"
 msgstr ""
 
-#: libcore/asobj/NetConnection_as.cpp:888
-#, c-format
-msgid "Invoke name %s"
-msgstr ""
-
 #: libcore/asobj/NetConnection_as.cpp:892
 msgid "Invoke buffer too short"
 msgstr ""
 
 #: libcore/asobj/NetConnection_as.cpp:899
 msgid "Invoke argument not present"
-msgstr ""
-
-#: libcore/asobj/NetConnection_as.cpp:905
-#, c-format
-msgid "Invoking %s(%s)"
 msgstr ""
 
 #: libcore/asobj/NetConnection_as.cpp:990
@@ -2529,42 +2917,6 @@ msgstr ""
 #: libcore/asobj/NetConnection_as.cpp:1006
 #, c-format
 msgid "Unsupported HTTP Remoting response callback: '%s' (size %d)"
-msgstr ""
-
-#: libcore/asobj/NetConnection_as.cpp:1012
-msgid "callback called"
-msgstr ""
-
-#: libcore/asobj/NetConnection_as.cpp:1048
-msgid "creating connection"
-msgstr ""
-
-#: libcore/asobj/NetConnection_as.cpp:1055
-msgid "NetConnection.call(): encoded args from %1% calls: %2%"
-msgstr ""
-
-#: libcore/asobj/NetConnection_as.cpp:1077
-#, c-format
-msgid "Attempt to read %d bytes"
-msgstr ""
-
-#: libcore/asobj/NetConnection_as.cpp:1086
-#, c-format
-msgid ""
-"NetConnection.call: reply buffer capacity (%d) is too small to accept next "
-"%d bytes of chunk (current size is %d). Reserving %d bytes."
-msgstr ""
-
-#: libcore/asobj/NetConnection_as.cpp:1100
-msgid "read '%1%' bytes: %2%"
-msgstr ""
-
-#: libcore/asobj/NetConnection_as.cpp:1119
-msgid "connection is in error condition, calling NetConnection.onStatus"
-msgstr ""
-
-#: libcore/asobj/NetConnection_as.cpp:1136
-msgid "hit eof"
 msgstr ""
 
 #: libcore/asobj/NetConnection_as.cpp:1155
@@ -2581,45 +2933,8 @@ msgstr ""
 msgid "Sanity failed. no string method in invoke packet"
 msgstr ""
 
-#: libcore/asobj/NetConnection_as.cpp:1237
-#, c-format
-msgid "Invoke: read method string %s"
-msgstr ""
-
-#: libcore/asobj/NetConnection_as.cpp:1241
-#, c-format
-msgid "Server invoking <%s>"
-msgstr ""
-
-#: libcore/asobj/NetConnection_as.cpp:1249
-#, c-format
-msgid "Received result for method call %s"
-msgstr ""
-
-#: libcore/asobj/NetConnection_as.cpp:1258
-#: libcore/asobj/NetConnection_as.cpp:1304
-#: libcore/asobj/NetConnection_as.cpp:1320
-#, c-format
-msgid "Value: %s"
-msgstr ""
-
-#: libcore/asobj/NetConnection_as.cpp:1268
-#, c-format
-msgid "Received server call %s %s"
-msgstr ""
-
 #: libcore/asobj/NetConnection_as.cpp:1277
 msgid "Server called _onbwcheck without a callback"
-msgstr ""
-
-#: libcore/asobj/NetConnection_as.cpp:1287
-#, c-format
-msgid "AMF buffer for _onbwdone: %s\n"
-msgstr ""
-
-#: libcore/asobj/NetConnection_as.cpp:1292
-#, c-format
-msgid "Latency: %s, bandwidth %s"
 msgstr ""
 
 #: libcore/asobj/NetConnection_as.cpp:1307
@@ -2813,12 +3128,6 @@ msgstr ""
 msgid "Object.unwatch(%s): missing argument"
 msgstr ""
 
-#: libcore/asobj/PlayHead.cpp:96
-msgid ""
-"PlayHead::advance(): not all consumers consumed current position, won't "
-"advance"
-msgstr ""
-
 #: libcore/asobj/String_as.cpp:451
 msgid "string.slice() called with end < start"
 msgstr ""
@@ -2848,24 +3157,6 @@ msgstr ""
 msgid "%1%(%2%) has more than %3% argument(s)"
 msgstr ""
 
-#: libcore/asobj/flash/external/ExternalInterface_as.cpp:250
-msgid "ExternalInterface not accessible when running standalone."
-msgstr ""
-
-#: libcore/asobj/flash/external/ExternalInterface_as.cpp:258
-#, c-format
-msgid "adding callback %s"
-msgstr ""
-
-#: libcore/asobj/flash/external/ExternalInterface_as.cpp:276
-msgid "ExternalInterface not accessible on call."
-msgstr ""
-
-#: libcore/asobj/flash/external/ExternalInterface_as.cpp:285
-#, c-format
-msgid "Calling External method \"%s\""
-msgstr ""
-
 #: libcore/asobj/flash/external/ExternalInterface_as.cpp:292
 #, c-format
 msgid "VAL: %s"
@@ -2878,14 +3169,6 @@ msgid ""
 "object."
 msgstr ""
 
-#: libcore/asobj/flash/external/ExternalInterface_as.cpp:388
-msgid "Loading flash.external.ExternalInterface class"
-msgstr ""
-
-#: libcore/asobj/flash/external/external_pkg.cpp:38
-msgid "Loading flash.external package"
-msgstr ""
-
 #: libcore/asobj/flash/net/FileReferenceList_as.cpp:91
 #, c-format
 msgid "FileReferenceList(%s): %s"
@@ -2895,10 +3178,6 @@ msgstr ""
 #: libcore/asobj/flash/net/FileReference_as.cpp:160
 #: libcore/asobj/flash/geom/Transform_as.cpp:357
 msgid "arguments discarded"
-msgstr ""
-
-#: libcore/asobj/flash/net/net_pkg.cpp:36
-msgid "Loading flash.net package"
 msgstr ""
 
 #: libcore/asobj/flash/net/FileReference_as.cpp:159
@@ -2934,14 +3213,6 @@ msgstr ""
 #: libcore/asobj/flash/geom/Point_as.cpp:411
 #, c-format
 msgid "Attempt to set read-only property %s"
-msgstr ""
-
-#: libcore/asobj/flash/geom/Rectangle_as.cpp:649
-msgid "Loading flash.geom.Rectangle class"
-msgstr ""
-
-#: libcore/asobj/flash/geom/geom_pkg.cpp:41
-msgid "Loading flash.geom package"
 msgstr ""
 
 #: libcore/asobj/flash/geom/Point_as.cpp:119
@@ -3051,10 +3322,6 @@ msgstr ""
 msgid "Point.polar(%s): %s"
 msgstr ""
 
-#: libcore/asobj/flash/geom/Point_as.cpp:640
-msgid "Loading flash.geom.Point class"
-msgstr ""
-
 #: libcore/asobj/flash/geom/ColorTransform_as.cpp:365
 #, c-format
 msgid ""
@@ -3067,10 +3334,6 @@ msgstr ""
 msgid "ColorTransform(%s): discarding extra arguments"
 msgstr ""
 
-#: libcore/asobj/flash/geom/ColorTransform_as.cpp:401
-msgid "Loading flash.geom.ColorTransform class"
-msgstr ""
-
 #: libcore/asobj/flash/geom/Matrix_as.cpp:184
 #, c-format
 msgid "Matrix.concat(%s): needs one argument"
@@ -3079,21 +3342,6 @@ msgstr ""
 #: libcore/asobj/flash/geom/Matrix_as.cpp:198
 #, c-format
 msgid "Matrix.concat(%s): needs a Matrix object"
-msgstr ""
-
-#: libcore/asobj/flash/geom/Matrix_as.cpp:215
-#, c-format
-msgid "(Matrix.concat) This matrix (pre-transform): %s"
-msgstr ""
-
-#: libcore/asobj/flash/geom/Matrix_as.cpp:217
-#, c-format
-msgid "(Matrix.concat) Transform matrix: %s"
-msgstr ""
-
-#: libcore/asobj/flash/geom/Matrix_as.cpp:224
-#, c-format
-msgid "(Matrix.concat) This matrix (post-transform): %s"
 msgstr ""
 
 #: libcore/asobj/flash/geom/Matrix_as.cpp:255
@@ -3121,40 +3369,10 @@ msgstr ""
 msgid "Matrix.rotate(%s): needs one argument"
 msgstr ""
 
-#: libcore/asobj/flash/geom/Matrix_as.cpp:556
-#, c-format
-msgid "(Matrix.rotate) This matrix (pre-transform): %s"
-msgstr ""
-
-#: libcore/asobj/flash/geom/Matrix_as.cpp:564
-#, c-format
-msgid "(Matrix.rotate) Transformation matrix: %s"
-msgstr ""
-
-#: libcore/asobj/flash/geom/Matrix_as.cpp:565
-#, c-format
-msgid "(Matrix.rotate) This matrix (post-transform): %s"
-msgstr ""
-
 #: libcore/asobj/flash/geom/Matrix_as.cpp:599
 #: libcore/asobj/flash/geom/Matrix_as.cpp:770
 #, c-format
 msgid "Matrix.translate(%s): needs two arguments"
-msgstr ""
-
-#: libcore/asobj/flash/geom/Matrix_as.cpp:633
-#, c-format
-msgid "(Matrix.scale) This matrix (pre-transform): %s"
-msgstr ""
-
-#: libcore/asobj/flash/geom/Matrix_as.cpp:641
-#, c-format
-msgid "(Matrix.scale) Transformation matrix: %s"
-msgstr ""
-
-#: libcore/asobj/flash/geom/Matrix_as.cpp:642
-#, c-format
-msgid "(Matrix.scale) This matrix (post-transform): %s"
 msgstr ""
 
 #: libcore/asobj/flash/geom/Matrix_as.cpp:704
@@ -3170,10 +3388,6 @@ msgstr ""
 #: libcore/asobj/flash/geom/Matrix_as.cpp:729
 #, c-format
 msgid "Matrix.transformPoint(%s): object must be a Point"
-msgstr ""
-
-#: libcore/asobj/flash/geom/Matrix_as.cpp:898
-msgid "Loading flash.geom.Matrix class"
 msgstr ""
 
 #: libcore/asobj/flash/geom/Transform_as.cpp:122
@@ -3218,34 +3432,6 @@ msgstr ""
 #: libcore/asobj/flash/geom/Transform_as.cpp:356
 #, c-format
 msgid "Transform(%s): %s"
-msgstr ""
-
-#: libcore/asobj/flash/geom/Transform_as.cpp:374
-msgid "Loading flash.geom.Transform class"
-msgstr ""
-
-#: libcore/asobj/flash/filters/filters_pkg.cpp:48
-msgid "Loading flash.filters package"
-msgstr ""
-
-#: libcore/asobj/flash/filters/BitmapFilter_as.cpp:117
-msgid "Loading flash.filters.BitmapFilter class"
-msgstr ""
-
-#: libcore/asobj/flash/text/text_pkg.cpp:34
-msgid "Loading flash.text package"
-msgstr ""
-
-#: libcore/asobj/flash/display/display_pkg.cpp:37
-msgid "Loading flash.display package"
-msgstr ""
-
-#: libcore/asobj/flash/display/BitmapData_as.cpp:647
-msgid "BitmapData.draw() called without an active renderer"
-msgstr ""
-
-#: libcore/asobj/flash/display/BitmapData_as.cpp:654
-msgid "Current renderer does not support internal rendering"
 msgstr ""
 
 #: libcore/asobj/flash/display/BitmapData_as.cpp:816
@@ -3320,10 +3506,6 @@ msgstr ""
 msgid "BitmapData.loadBitmap requires one argument"
 msgstr ""
 
-#: libcore/asobj/flash/display/BitmapData_as.cpp:1634
-msgid "Loading flash.display.BitmapData class"
-msgstr ""
-
 #: libcore/asobj/flash/display/BitmapData_as.cpp:1649
 msgid ""
 "BitmapData constructor requires at least two arguments. Will not construct a "
@@ -3353,7 +3535,7 @@ msgstr ""
 
 #: libcore/asobj/MovieClipLoader.cpp:149
 #, c-format
-msgid "MovieClipLoader.unloadClip(%s): expected at leastone argument"
+msgid "MovieClipLoader.unloadClip(%s): expected at least one argument"
 msgstr ""
 
 #: libcore/asobj/MovieClipLoader.cpp:156
@@ -3375,26 +3557,6 @@ msgstr ""
 msgid "MovieClipLoader.getProgress(%s): first argument is not an sprite"
 msgstr ""
 
-#: libcore/asobj/Sound_as.cpp:333
-msgid "stopProbeTimer called"
-msgstr ""
-
-#: libcore/asobj/Sound_as.cpp:368
-msgid "Probing audio for load"
-msgstr ""
-
-#: libcore/asobj/Sound_as.cpp:388
-msgid "Probing audio for end"
-msgstr ""
-
-#: libcore/asobj/Sound_as.cpp:409
-msgid "Probing audio for start"
-msgstr ""
-
-#: libcore/asobj/Sound_as.cpp:414
-msgid "Attaching aux streamer"
-msgstr ""
-
 #: libcore/asobj/Sound_as.cpp:420
 #, c-format
 msgid "Could not create audio decoder: %s"
@@ -3402,18 +3564,6 @@ msgstr ""
 
 #: libcore/asobj/Sound_as.cpp:428
 msgid "No audio in Sound input."
-msgstr ""
-
-#: libcore/asobj/Sound_as.cpp:516 libcore/asobj/Sound_as.cpp:646
-msgid "Character attached to Sound was unloaded and couldn't rebind"
-msgstr ""
-
-#: libcore/asobj/Sound_as.cpp:528
-msgid "We have no sound handler here..."
-msgstr ""
-
-#: libcore/asobj/Sound_as.cpp:549
-msgid "No media or sound handlers, won't load any sound"
 msgstr ""
 
 #: libcore/asobj/Sound_as.cpp:581
@@ -3426,10 +3576,6 @@ msgstr ""
 msgid "Unable to create parser for Sound at %s"
 msgstr ""
 
-#: libcore/asobj/Sound_as.cpp:619
-msgid "Attaching the aux streamer"
-msgstr ""
-
 #: libcore/asobj/Sound_as.cpp:676
 msgid "No sound handler, nothing to start..."
 msgstr ""
@@ -3440,16 +3586,6 @@ msgstr ""
 
 #: libcore/asobj/Sound_as.cpp:688
 msgid "Sound.start() has no effect on a streaming Sound"
-msgstr ""
-
-#: libcore/asobj/Sound_as.cpp:699
-#, c-format
-msgid "Seeked MediaParser to %d, returned: %d"
-msgstr ""
-
-#: libcore/asobj/Sound_as.cpp:717
-#, c-format
-msgid "Sound.start: secOff:%d"
 msgstr ""
 
 #: libcore/asobj/Sound_as.cpp:735
@@ -3755,11 +3891,6 @@ msgid ""
 "string - returning undefined"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:965
-#, c-format
-msgid "MovieClip.loadVariables(%s) - TESTING "
-msgstr ""
-
 #: libcore/asobj/MovieClip_as.cpp:995
 #, c-format
 msgid "Can't find hitTest target %s"
@@ -3851,11 +3982,6 @@ msgstr ""
 msgid "MovieClip.lineTo() needs at least two arguments"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1456
-#, c-format
-msgid "%s.lineTo(%g,%g);"
-msgstr ""
-
 #: libcore/asobj/MovieClip_as.cpp:1470
 msgid "MovieClip.moveTo() takes two args"
 msgstr ""
@@ -3889,11 +4015,6 @@ msgstr ""
 msgid "MovieClip.curveTo() takes four args"
 msgstr ""
 
-#: libcore/asobj/MovieClip_as.cpp:1646
-#, c-format
-msgid "%s.curveTo(%g,%g,%g,%g);"
-msgstr ""
-
 #: libcore/asobj/MovieClip_as.cpp:1671
 msgid "beginFill() with no args is a no-op"
 msgstr ""
@@ -3917,8 +4038,8 @@ msgstr ""
 #: libcore/asobj/MovieClip_as.cpp:1762
 #, c-format
 msgid ""
-"%s.beginGradientFill(%s): one or more of the  args from 2nd to 5th don't "
-"cast to objects"
+"%s.beginGradientFill(%s): one or more of the args from 2nd to 5th don't cast "
+"to objects"
 msgstr ""
 
 #: libcore/asobj/MovieClip_as.cpp:1776
@@ -3926,13 +4047,6 @@ msgstr ""
 msgid ""
 "%s.beginGradientFill(%s): colors, alphas and ratios args don't have same "
 "length"
-msgstr ""
-
-#: libcore/asobj/MovieClip_as.cpp:1788
-#, c-format
-msgid ""
-"%s.beginGradientFill(%s): too many array elements for colors and ratios "
-"(%d), will trim to 8"
 msgstr ""
 
 #: libcore/asobj/MovieClip_as.cpp:1928
@@ -3943,15 +4057,6 @@ msgstr ""
 #: libcore/asobj/MovieClip_as.cpp:1933
 #, c-format
 msgid "non-finite bbox values in MovieClip.startDrag(%s), took as zero"
-msgstr ""
-
-#: libcore/asobj/MovieClip_as.cpp:1972 libcore/asobj/MovieClip_as.cpp:2051
-msgid "MovieClip.attachBitmap: first argument should be a valid BitmapData"
-msgstr ""
-
-#: libcore/asobj/MovieClip_as.cpp:2040
-#, c-format
-msgid "MovieClip.attachBitmap: expected 2 args, got %d"
 msgstr ""
 
 #: libcore/asobj/MovieClip_as.cpp:2077
@@ -3974,11 +4079,6 @@ msgstr ""
 
 #: libcore/asobj/Camera_as.cpp:259
 msgid "No MediaHandler exists! Cannot create a Camera object"
-msgstr ""
-
-#: libcore/asobj/Camera_as.cpp:271
-#, c-format
-msgid "%s: the camera is automatically chosen from gnashrc"
 msgstr ""
 
 #: libcore/asobj/Camera_as.cpp:312
@@ -4073,10 +4173,6 @@ msgstr ""
 msgid "Attempt to set width property of Camera, use setMode"
 msgstr ""
 
-#: libcore/asobj/SharedObject_as.cpp:138
-msgid "SOL: skip serialization of FUNCTION property"
-msgstr ""
-
 #: libcore/asobj/SharedObject_as.cpp:163
 #, c-format
 msgid "Problems serializing an object's member %s=%s"
@@ -4092,11 +4188,6 @@ msgstr ""
 #: libcore/asobj/SharedObject_as.cpp:331
 #, c-format
 msgid "Couldn't create dir for flushing SharedObject %s"
-msgstr ""
-
-#: libcore/asobj/SharedObject_as.cpp:337
-#, c-format
-msgid "SharedObject %s not flushed (compiled as read-only mode)"
 msgstr ""
 
 #: libcore/asobj/SharedObject_as.cpp:344
@@ -4124,15 +4215,6 @@ msgstr ""
 msgid "SharedObject '%s' written to filesystem."
 msgstr ""
 
-#: libcore/asobj/SharedObject_as.cpp:400
-msgid "Empty SOLSafeDir directive: we'll use '/tmp'"
-msgstr ""
-
-#: libcore/asobj/SharedObject_as.cpp:407
-#, c-format
-msgid "Invalid SOL safe dir %s: %s. Will try to create on flush/exit."
-msgstr ""
-
 #: libcore/asobj/SharedObject_as.cpp:493
 msgid "Attempting to open SOL file from non localhost-loaded SWF"
 msgstr ""
@@ -4148,21 +4230,6 @@ msgstr ""
 msgid ""
 "SharedObject path %s is not part of the SWF path %s. Cannot access this "
 "object."
-msgstr ""
-
-#: libcore/asobj/SharedObject_as.cpp:565
-#, c-format
-msgid "SharedObject %s already known, returning it"
-msgstr ""
-
-#: libcore/asobj/SharedObject_as.cpp:569
-#, c-format
-msgid "SharedObject %s not loaded. Loading it now"
-msgstr ""
-
-#: libcore/asobj/SharedObject_as.cpp:583
-#, c-format
-msgid "SharedObject path: %s"
 msgstr ""
 
 #: libcore/asobj/SharedObject_as.cpp:703
@@ -4191,16 +4258,6 @@ msgstr ""
 msgid "SharedObject.getLocal(%s): missing object name"
 msgstr ""
 
-#: libcore/asobj/SharedObject_as.cpp:799
-#, c-format
-msgid "SO name:%s, root:%s"
-msgstr ""
-
-#: libcore/asobj/SharedObject_as.cpp:806
-#, c-format
-msgid "SharedObject.getLocal returning %s"
-msgstr ""
-
 #: libcore/asobj/SharedObject_as.cpp:813
 msgid "SharedObject.getRemote()"
 msgstr ""
@@ -4213,11 +4270,6 @@ msgstr ""
 msgid "SharedObject.getDiskUsage()"
 msgstr ""
 
-#: libcore/asobj/SharedObject_as.cpp:895
-#, c-format
-msgid "No existing SOL %s found. Will create on flush/exit."
-msgstr ""
-
 #: libcore/asobj/SharedObject_as.cpp:904
 #, c-format
 msgid "readSOL: SOL file %s is too short (only %s bytes long) to be valid."
@@ -4225,11 +4277,6 @@ msgstr ""
 
 #: libcore/asobj/SharedObject_as.cpp:929
 msgid "readSOL: file ends before data segment"
-msgstr ""
-
-#: libcore/asobj/SharedObject_as.cpp:937
-#, c-format
-msgid "readSOL: reading property name at byte %s"
 msgstr ""
 
 #: libcore/asobj/SharedObject_as.cpp:942
@@ -4249,18 +4296,9 @@ msgstr ""
 msgid "SharedObject: error parsing SharedObject '%s'"
 msgstr ""
 
-#: libcore/asobj/SharedObject_as.cpp:972
-#, c-format
-msgid "parsed sol member named '%s' (len %s),  value '%s'"
-msgstr ""
-
 #: libcore/asobj/SharedObject_as.cpp:986
 #, c-format
 msgid "readSOL: Reading SharedObject %s: %s"
-msgstr ""
-
-#: libcore/asobj/SharedObject_as.cpp:1064
-msgid "Did not serialize object"
 msgstr ""
 
 #: libcore/asobj/Date_as.cpp:463
@@ -4403,11 +4441,6 @@ msgstr ""
 msgid "ASconstructor(%s): args must be 0 or above"
 msgstr ""
 
-#: libcore/asobj/Global_as.cpp:681 libcore/asobj/Global_as.cpp:724
-#, c-format
-msgid "No ASnative(%d, %d) registered with the VM"
-msgstr ""
-
 #: libcore/asobj/Global_as.cpp:712
 #, c-format
 msgid "ASnative(%s): args must be 0 or above"
@@ -4462,12 +4495,6 @@ msgstr ""
 #: libcore/asobj/XMLNode_as.cpp:227
 msgid ""
 "XMLNode.insertBefore(): positional parameter is not a child of this node"
-msgstr ""
-
-#: libcore/asobj/XMLNode_as.cpp:403
-#, c-format
-msgid ""
-"Stringifying node %p with name %s, as_value %s, %u attributes and %u children"
 msgstr ""
 
 #: libcore/asobj/XMLNode_as.cpp:596
@@ -4804,16 +4831,6 @@ msgstr ""
 msgid "Could not attach NetStream aux streamer to sound handler: %s"
 msgstr ""
 
-#: libcore/asobj/NetStream_as.cpp:1446
-msgid "detachAuxStreamer called while not attached"
-msgstr ""
-
-#: libcore/asobj/NetStream_as.cpp:1484
-#, c-format
-msgid ""
-"audio_streamer called, audioQueue size: %d, requested %d bytes of fill-up"
-msgstr ""
-
 #: libcore/asobj/NetStream_as.cpp:1566
 #, c-format
 msgid ""
@@ -4865,11 +4882,6 @@ msgstr ""
 msgid "Could not convert FLV metatag to as_value, passing undefined"
 msgstr ""
 
-#: libcore/asobj/NetStream_as.cpp:1874
-#, c-format
-msgid "Calling %s(%s)"
-msgstr ""
-
 #: libcore/asobj/Number_as.cpp:78
 #, c-format
 msgid "Number.toString(%s): radix must be in the 2..36 range (%d is invalid)"
@@ -4887,23 +4899,8 @@ msgstr ""
 msgid "TextSnapshot.getText requires exactly 2 arguments"
 msgstr ""
 
-#: libcore/asobj/XMLSocket_as.cpp:213
-#, c-format
-msgid "read: %d, this string ends: %d"
-msgstr ""
-
-#: libcore/asobj/XMLSocket_as.cpp:245
-#, c-format
-msgid " Message %d: %s "
-msgstr ""
-
 #: libcore/asobj/XMLSocket_as.cpp:268
 msgid "XMLSocket.send(): socket not initialized"
-msgstr ""
-
-#: libcore/asobj/XMLSocket_as.cpp:306
-#, c-format
-msgid "XMLSocket.connect(%s) called"
 msgstr ""
 
 #: libcore/asobj/XMLSocket_as.cpp:312
@@ -4968,11 +4965,6 @@ msgstr ""
 msgid "TextFormat.getTextExtent requires at least oneargument"
 msgstr ""
 
-#: libcore/asobj/TextFormat_as.cpp:708
-#, c-format
-msgid "Invalid display string %s "
-msgstr ""
-
 #: libcore/asobj/TextFormat_as.cpp:726
 #, c-format
 msgid "Uknown alignment value: %d, take as left"
@@ -5012,11 +5004,6 @@ msgstr ""
 msgid "Invalid connection name data"
 msgstr ""
 
-#: libcore/asobj/LocalConnection_as.cpp:347
-#, c-format
-msgid "Data %s expired at %s. Removing its target as a listener"
-msgstr ""
-
 #: libcore/asobj/LocalConnection_as.cpp:431
 msgid "Failed to get lock on shared memory! Will not remove listener"
 msgstr ""
@@ -5040,10 +5027,6 @@ msgstr ""
 msgid "LocalConnection.send(%s): requires at least 2 arguments"
 msgstr ""
 
-#: libcore/asobj/LocalConnection_as.cpp:774
-msgid "Not adding duplicated listener"
-msgstr ""
-
 #: libcore/asobj/LocalConnection_as.cpp:783
 msgid "No space for listener in shared memory!"
 msgstr ""
@@ -5053,43 +5036,13 @@ msgstr ""
 msgid "Invalid domain %s"
 msgstr ""
 
-#: libcore/asobj/LocalConnection_as.cpp:848
-#, c-format
-msgid "Domain: %s"
-msgstr ""
-
 #: libcore/asobj/LocalConnection_as.cpp:851
 #, c-format
 msgid "Invalid function name %s"
 msgstr ""
 
-#: libcore/asobj/LocalConnection_as.cpp:862
-#, c-format
-msgid "First bool: %s"
-msgstr ""
-
-#: libcore/asobj/LocalConnection_as.cpp:863
-#, c-format
-msgid "Second Bool: %s"
-msgstr ""
-
-#: libcore/asobj/LocalConnection_as.cpp:867
-#, c-format
-msgid "First Number: %s"
-msgstr ""
-
-#: libcore/asobj/LocalConnection_as.cpp:873
-#, c-format
-msgid "Second Number: %s"
-msgstr ""
-
 #: libcore/asobj/LocalConnection_as.cpp:877
 msgid "Fewer AMF fields than expected."
-msgstr ""
-
-#: libcore/asobj/LocalConnection_as.cpp:880
-#, c-format
-msgid "Data: %s"
 msgstr ""
 
 #: libcore/asobj/Microphone_as.cpp:252
@@ -5139,7 +5092,7 @@ msgstr ""
 
 #: libcore/asobj/LoadableObject.cpp:222
 #, c-format
-msgid "XML.addRequestHeader(%s): arguments after thesecond will be discarded"
+msgid "XML.addRequestHeader(%s): arguments after the second will be discarded"
 msgstr ""
 
 #: libcore/asobj/LoadableObject.cpp:237
@@ -5157,11 +5110,6 @@ msgstr ""
 
 #: libcore/asobj/LoadableObject.cpp:319
 msgid "sendAndLoad(): invalid target (must be an XML or LoadVars object)"
-msgstr ""
-
-#: libcore/asobj/LoadableObject.cpp:393
-#, c-format
-msgid "Using GET method for sendAndLoad: %s"
 msgstr ""
 
 #: libcore/asobj/LoadableObject.cpp:397
@@ -5949,7 +5897,7 @@ msgstr ""
 
 #: libcore/vm/ASHandlers.cpp:2952
 #, c-format
-msgid "Top of stack not an object %s at ActionEnum2  execution"
+msgid "Top of stack not an object %s at ActionEnum2 execution"
 msgstr ""
 
 #: libcore/vm/ASHandlers.cpp:3086
@@ -6011,7 +5959,7 @@ msgstr ""
 
 #: libcore/vm/ASHandlers.cpp:3512
 msgid ""
-"Bogus GetUrl2 send vars method  in SWF file (both GET and POST requested). "
+"Bogus GetUrl2 send vars method in SWF file (both GET and POST requested). "
 "Using GET"
 msgstr ""
 
@@ -7723,7 +7671,7 @@ msgid "Mkit: unpaused"
 msgstr ""
 
 #: libsound/aos4/sound_handler_ahi.cpp:125
-msgid "AOS4: Spawn Audio Process.."
+msgid "AOS4: Spawn Audio Process."
 msgstr ""
 
 #: libsound/aos4/sound_handler_ahi.cpp:136
@@ -7731,7 +7679,7 @@ msgid "Unable to create Death Message for child!!"
 msgstr ""
 
 #: libsound/aos4/sound_handler_ahi.cpp:162
-msgid "AOS4: Audio Process spawned.."
+msgid "AOS4: Audio Process spawned."
 msgstr ""
 
 #: libsound/aos4/sound_handler_ahi.cpp:167
@@ -7812,8 +7760,69 @@ msgstr ""
 msgid "Zero buffer length in sdl_audio_callback"
 msgstr ""
 
+#: libsound/sound_handler.cpp:70
+msgid ""
+"Sound data creator didn't appropriately pad buffer. We'll do so now, but "
+"will cost memory copies."
+msgstr ""
+
+#: libsound/sound_handler.cpp:83
+#, c-format
+msgid "Invalid (%d) handle passed to fill_stream_data, doing nothing"
+msgstr ""
+
+#: libsound/sound_handler.cpp:90
+#, c-format
+msgid "handle passed to fill_stream_data (%d) was deleted"
+msgstr ""
+
+#: libsound/sound_handler.cpp:141
+#, c-format
+msgid "Invalid (%d) handle passed to delete_sound, doing nothing"
+msgstr ""
+
+#: libsound/sound_handler.cpp:152
+#, c-format
+msgid "handle passed to delete_sound (%d) already deleted"
+msgstr ""
+
+#: libsound/sound_handler.cpp:236
+#, c-format
+msgid "stop_sound(%d): sound was deleted"
+msgstr ""
+
+#: libsound/sound_handler.cpp:324
+#, c-format
+msgid "SDL_sound_handler::unplugInputStream: Aux streamer %p not found. "
+msgstr ""
+
+#: libsound/sound_handler.cpp:454
+#, c-format
+msgid "Could not start streaming sound: %s"
+msgstr ""
+
+#: libsound/sound_handler.cpp:465
+#, c-format
+msgid "Invalid (%d) sound_handle passed to startSound, doing nothing"
+msgstr ""
+
 #: libsound/sound_handler.cpp:531
 msgid "Trying to play sound with size 0"
+msgstr ""
+
+#: libsound/sound_handler.cpp:545
+#, c-format
+msgid "Could not start event sound: %s"
+msgstr ""
+
+#: libsound/sound_handler.cpp:559
+#, c-format
+msgid "_inputStreams container still has a pointer to deleted InputStream %p!"
+msgstr ""
+
+#: libsound/sound_handler.cpp:704
+#, c-format
+msgid "Expected 1 InputStream element, found %d"
 msgstr ""
 
 #: utilities/soldumper.cpp:72
@@ -11181,7 +11190,7 @@ msgstr ""
 
 #: gui/pythonmod/gnash-view.cpp:220 gui/Player.cpp:288
 #, c-format
-msgid "Could not create sound handler: %s. Will continue w/out sound."
+msgid "Could not create sound handler: %s. Will continue without sound."
 msgstr ""
 
 #: gui/pythonmod/gnash-view.cpp:223 gui/Player.cpp:283
