@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-31 11:40-0700\n"
+"POT-Creation-Date: 2011-12-31 12:07-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1455,34 +1455,9 @@ msgstr ""
 msgid "Can't convert unknown type %d"
 msgstr ""
 
-#: libcore/ExternalInterface.cpp:152 libcore/ExternalInterface.cpp:347
-#, c-format
-msgid "There are %d bytes in the network buffer"
-msgstr ""
-
-#: libcore/as_value.cpp:269
-#, c-format
-msgid "to_primitive(%s)"
-msgstr ""
-
-#: libcore/as_value.cpp:309
-#, c-format
-msgid "to_primitive: method call returned %s"
-msgstr ""
-
-#: libcore/as_value.cpp:398
-#, c-format
-msgid "to_primitive(%s, NUMBER) threw an ActionTypeError %s"
-msgstr ""
-
 #: libcore/as_value.cpp:768
 #, c-format
 msgid "serialization of as_value of type %d"
-msgstr ""
-
-#: libcore/ClassHierarchy.cpp:77
-#, c-format
-msgid "Loading native class %s"
 msgstr ""
 
 #: libcore/ClassHierarchy.cpp:84
@@ -1495,184 +1470,9 @@ msgstr ""
 msgid "Native class %s is not found after initialization"
 msgstr ""
 
-#: libcore/MovieLoader.cpp:63
-msgid "Starting movie loader thread"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:72
-msgid "Loader thread killed"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:78
-msgid "processRequests: lock on requests: trying"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:84
-msgid "processRequests: lock on requests: obtained"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:95
-msgid "Movie loader thread getting to sleep (nothing more to do)"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:101
-msgid "Movie loader thread waked up"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:105 libcore/MovieLoader.cpp:114
-msgid "processRequests: lock on requests: release"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:135
-#, c-format
-msgid "Movie loader thread processing request for target %s"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:146
-#, c-format
-msgid "Movie loader thread completed request for target %s"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:159
-msgid "clear: lock on requests: trying"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:165
-msgid "clear: lock on requests: obtained"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:169
-msgid "clear: lock on kill: trying"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:175
-msgid "clear: lock on kill: obtained"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:181
-msgid "clear: lock on kill: release for kill"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:186
-msgid "waking up loader thread"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:191
-msgid "clear: lock on requests: release ater notify_all"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:195
-msgid "MovieLoader notified, joining"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:197
-msgid "MovieLoader joined"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:205
-msgid "clear: lock on requests: release if not after notify_all"
-msgstr ""
-
 #: libcore/MovieLoader.cpp:259
 #, c-format
 msgid "Can't create Movie instance for definition loaded from %s"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:276
-#, c-format
-msgid "processCompletedRequest: _level loading (level %u)"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:282
-#, c-format
-msgid "Target %s of a loadMovie request doesn't exist at load complete time"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:344
-msgid "processCompletedRequests: lock on requests: trying"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:350
-msgid "processCompletedRequests: lock on requests: obtained"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:354
-#, c-format
-msgid "Checking %d requests for completeness"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:366
-msgid "processCompletedRequests: lock on requests: releasing"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:373
-#, c-format
-msgid "Load request for target %s completed"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:381
-msgid "processCompletedRequests: lock on requests for removal: trying"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:388
-msgid "processCompletedRequests: lock on requests for removal: obtained"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:395
-msgid "processCompletedRequests: lock on requests for removal: release"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:434
-#, c-format
-msgid "MovieLoader::loadMovie(%s, %s)"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:440
-msgid "loadMovie: lock on requests: trying"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:446
-msgid "loadMovie: lock on requests: obtained"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:461
-msgid "loadMovie: waking up existing thread"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:466
-msgid "loadMovie: lock on requests: release"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:484
-msgid "setReachable: lock on requests: trying"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:490
-msgid "setReachable: lock on requests: obtained"
-msgstr ""
-
-#: libcore/MovieLoader.cpp:497
-msgid "setReachable: lock on requests: release"
-msgstr ""
-
-#: libcore/FreetypeGlyphsProvider.cpp:156
-#, c-format
-msgid "moveTo: %ld,%ld"
-msgstr ""
-
-#: libcore/FreetypeGlyphsProvider.cpp:169
-#, c-format
-msgid "lineTo: %ld,%ld"
-msgstr ""
-
-#: libcore/FreetypeGlyphsProvider.cpp:181
-#, c-format
-msgid "conicTo: %ld,%ld %ld,%ld"
-msgstr ""
-
-#: libcore/FreetypeGlyphsProvider.cpp:196
-#, c-format
-msgid "cubicTo: %ld,%ld %ld,%ld %ld,%ld"
 msgstr ""
 
 #: libcore/FreetypeGlyphsProvider.cpp:254
@@ -1693,21 +1493,6 @@ msgstr ""
 #: libcore/FreetypeGlyphsProvider.cpp:293
 #, c-format
 msgid "Can't init fontconfig library, using hard-coded font filename \"%s\""
-msgstr ""
-
-#: libcore/FreetypeGlyphsProvider.cpp:328
-#, c-format
-msgid "Found %d fonts matching the family %s (using first)"
-msgstr ""
-
-#: libcore/FreetypeGlyphsProvider.cpp:336
-#, c-format
-msgid "Matching font %d has unknown filename, skipping"
-msgstr ""
-
-#: libcore/FreetypeGlyphsProvider.cpp:346
-#, c-format
-msgid "Loading font from file %d"
 msgstr ""
 
 #: libcore/FreetypeGlyphsProvider.cpp:355
@@ -1740,35 +1525,15 @@ msgstr ""
 msgid "Some error opening font '%s'"
 msgstr ""
 
-#: libcore/FreetypeGlyphsProvider.cpp:469
-#, c-format
-msgid "EM square for font '%s' is %d, scale is this %g"
-msgstr ""
-
 #: libcore/FreetypeGlyphsProvider.cpp:490
 #, c-format
 msgid "Error loading freetype outline glyph for char '%c' (error: %d)"
-msgstr ""
-
-#: libcore/FreetypeGlyphsProvider.cpp:498
-#, c-format
-msgid "Advance value for glyph '%c' is %g (horiAdvance:%ld, scale:%g)"
 msgstr ""
 
 #: libcore/FreetypeGlyphsProvider.cpp:506
 #, c-format
 msgid ""
 "FT_Load_Char() returned a glyph format != FT_GLYPH_FORMAT_OUTLINE (%c%c%c%c)"
-msgstr ""
-
-#: libcore/FreetypeGlyphsProvider.cpp:526
-#, c-format
-msgid "Decomposing glyph outline for DisplayObject %u"
-msgstr ""
-
-#: libcore/FreetypeGlyphsProvider.cpp:538
-#, c-format
-msgid "Decomposed glyph for DisplayObject '%c' has bounds %s"
 msgstr ""
 
 #: libcore/FreetypeGlyphsProvider.cpp:561
@@ -2435,37 +2200,9 @@ msgstr ""
 msgid "inflateWrapper() inflateEnd() return %d (%s)"
 msgstr ""
 
-#: libcore/LoadVariablesThread.cpp:37
-msgid "completeLoad called"
-msgstr ""
-
-#: libcore/LoadVariablesThread.cpp:57
-#, c-format
-msgid "Read %u bytes"
-msgstr ""
-
 #: libcore/LoadVariablesThread.cpp:74
 #, c-format
 msgid "%s to utf8 conversion in MovieClip.loadVariables input parsing"
-msgstr ""
-
-#: libcore/LoadVariablesThread.cpp:84
-#, c-format
-msgid "toparse: %s"
-msgstr ""
-
-#: libcore/LoadVariablesThread.cpp:93
-#, c-format
-msgid "parseable: %s"
-msgstr ""
-
-#: libcore/LoadVariablesThread.cpp:98
-#, c-format
-msgid "toparse nextline: %s"
-msgstr ""
-
-#: libcore/LoadVariablesThread.cpp:109
-msgid "Cancelling LoadVariables download thread..."
 msgstr ""
 
 #: libcore/LoadVariablesThread.cpp:123
@@ -5476,21 +5213,9 @@ msgstr ""
 msgid "Collision detection for unidirectionally scaled strokes"
 msgstr ""
 
-#: libcore/TextField.cpp:221
-#, c-format
-msgid ""
-"CHECKME: removeTextField(%s): TextField depth (%d) out of the 'dynamic' zone "
-"[0..1048575], won't remove"
-msgstr ""
-
 #: libcore/TextField.cpp:234
 #, c-format
 msgid "FIXME: attempt to remove a TextField being a child of a %s"
-msgstr ""
-
-#: libcore/TextField.cpp:328
-#, c-format
-msgid "rendering a Pol composed by corners %s"
 msgstr ""
 
 #: libcore/TextField.cpp:413 libcore/TextField.cpp:423
@@ -5498,123 +5223,60 @@ msgstr ""
 msgid "invalid restrict string"
 msgstr ""
 
-#: libcore/TextField.cpp:842
-#, c-format
-msgid ""
-"setTextValue: variable name %s points to a non-existent target, I guess we "
-"would not be registered if this was true, or the sprite we've registered our "
-"variable name has been unloaded"
-msgstr ""
-
-#: libcore/TextField.cpp:907
-#, c-format
-msgid ""
-"TextField text doesn't fit in its boundaries: width %g, margin %g - nothing "
-"to align"
-msgstr ""
-
-#: libcore/TextField.cpp:962
+#: libcore/TextField.cpp:965
 #, c-format
 msgid ""
 "TextField: missing glyph for space char (needed for TAB). Make sure "
 "DisplayObject shapes for font %s are being exported into your SWF file."
 msgstr ""
 
-#: libcore/TextField.cpp:1041
+#: libcore/TextField.cpp:1044
 msgid "No font for TextField!"
 msgstr ""
 
-#: libcore/TextField.cpp:1373
-msgid ""
-"HTML in a text field is unsupported, gnash will just ignore the tags and "
-"print their content"
-msgstr ""
-
-#: libcore/TextField.cpp:1441
+#: libcore/TextField.cpp:1444
 #, c-format
 msgid "Unexpected value '%s' in TextField font color attribute"
 msgstr ""
 
-#: libcore/TextField.cpp:1456
+#: libcore/TextField.cpp:1459
 msgid "Expected a font name in FACE attribute."
 msgstr ""
 
-#: libcore/TextField.cpp:1510
+#: libcore/TextField.cpp:1513
 msgid "<img> html tag in TextField"
 msgstr ""
 
-#: libcore/TextField.cpp:1548
+#: libcore/TextField.cpp:1551
 msgid "<span> html tag in TextField"
 msgstr ""
 
-#: libcore/TextField.cpp:1553
-msgid "in textformat"
-msgstr ""
-
-#: libcore/TextField.cpp:1620
+#: libcore/TextField.cpp:1623
 msgid "html <textformat> tag tabstops attribute"
 msgstr ""
 
-#: libcore/TextField.cpp:1654
-#, c-format
-msgid "<%s> tag is unsupported"
-msgstr ""
-
-#: libcore/TextField.cpp:1703
+#: libcore/TextField.cpp:1706
 #, c-format
 msgid ""
 "TextField: missing embedded glyph for char %d. Make sure DisplayObject "
 "shapes for font %s are being exported into your SWF file"
 msgstr ""
 
-#: libcore/TextField.cpp:1711
+#: libcore/TextField.cpp:1714
 #, c-format
 msgid ""
 "TextField: missing device glyph for char %d. Maybe you don't have font '%s' "
 "installed in your system."
 msgstr ""
 
-#: libcore/TextField.cpp:1739
-#, c-format
-msgid "Text in TextField %s exceeds width [ _bounds %s ]"
-msgstr ""
-
-#: libcore/TextField.cpp:1747
-msgid " wordWrap=false, autoSize=none"
-msgstr ""
-
-#: libcore/TextField.cpp:1764
-#, c-format
-msgid "Text bbox expanded to %s (width: %f)"
-msgstr ""
-
-#: libcore/TextField.cpp:1784
-msgid " wordWrap=true"
-msgstr ""
-
-#: libcore/TextField.cpp:1871
-#, c-format
-msgid " wordWrap=%d, autoSize=%d"
-msgstr ""
-
-#: libcore/TextField.cpp:1893
-#, c-format
-msgid "VariableName: %s"
-msgstr ""
-
-#: libcore/TextField.cpp:1902
+#: libcore/TextField.cpp:1905
 #, c-format
 msgid ""
 "Current environment has no target, can't bind VariableName (%s) associated "
 "to text field. Gnash will try to register again on next access."
 msgstr ""
 
-#: libcore/TextField.cpp:1917
-#, c-format
-msgid "Variable text Path: %s, Var: %s"
-msgstr ""
-
-#: libcore/TextField.cpp:1928
+#: libcore/TextField.cpp:1931
 #, c-format
 msgid ""
 "VariableName associated to text field refers to an unknown target (%s). It "
@@ -5622,53 +5284,26 @@ msgid ""
 "stream. Gnash will try to register again on next access."
 msgstr ""
 
-#: libcore/TextField.cpp:1949
-msgid "registerTextVariable() called"
-msgstr ""
-
-#: libcore/TextField.cpp:1964
-#, c-format
-msgid ""
-"VariableName associated to text field (%s) refer to an unknown target. It is "
-"possible that the DisplayObject will be instantiated later in the SWF "
-"stream. Gnash will try to register again on next access."
-msgstr ""
-
-#: libcore/TextField.cpp:2021 libcore/TextField.cpp:2055
-#: libcore/TextField.cpp:2146
+#: libcore/TextField.cpp:2024 libcore/TextField.cpp:2058
+#: libcore/TextField.cpp:2149
 msgid "invalid html tag"
 msgstr ""
 
-#: libcore/TextField.cpp:2032 libcore/TextField.cpp:2068
-#: libcore/TextField.cpp:2099
+#: libcore/TextField.cpp:2035 libcore/TextField.cpp:2071
+#: libcore/TextField.cpp:2102
 msgid "found NULL character in htmlText"
 msgstr ""
 
-#: libcore/TextField.cpp:2072
+#: libcore/TextField.cpp:2075
 msgid "malformed HTML tag, invalid attribute name"
 msgstr ""
 
-#: libcore/TextField.cpp:2122
+#: libcore/TextField.cpp:2125
 msgid "malformed HTML tag, invalid attribute value"
 msgstr ""
 
-#: libcore/TextField.cpp:2153
-#, c-format
-msgid "HTML tag: %s"
-msgstr ""
-
-#: libcore/TextField.cpp:2155
+#: libcore/TextField.cpp:2158
 msgid "I declare this a HTML syntax error"
-msgstr ""
-
-#: libcore/TextField.cpp:2171
-msgid "Calling updateText after change of variable name"
-msgstr ""
-
-#: libcore/TextField.cpp:2179
-msgid ""
-"Calling registerTextVariable after change of variable name and updateText "
-"call"
 msgstr ""
 
 #: libcore/SWFMovie.cpp:54
@@ -5703,11 +5338,6 @@ msgstr ""
 #: libcore/DisplayObject.cpp:121
 #, c-format
 msgid "loadMovie against a %s DisplayObject"
-msgstr ""
-
-#: libcore/DisplayObject.cpp:206
-#, c-format
-msgid "%p set_invalidated() of %s in %s:%d"
 msgstr ""
 
 #: libcore/DisplayObject.cpp:258
@@ -5828,43 +5458,8 @@ msgstr ""
 msgid "StaticText::pointInShape"
 msgstr ""
 
-#: libcore/CharacterProxy.cpp:37
-#, c-format
-msgid ""
-"char %s (%s) was destroyed, stored its orig target (%s) for later rebinding"
-msgstr ""
-
-#: libcore/AMFConverter.cpp:69
-msgid "AMF0: skip serialization of FUNCTION property"
-msgstr ""
-
-#: libcore/AMFConverter.cpp:84
-#, c-format
-msgid " skip serialization of specially-named property %s"
-msgstr ""
-
-#: libcore/AMFConverter.cpp:94
-#, c-format
-msgid " serializing property %s"
-msgstr ""
-
 #: libcore/AMFConverter.cpp:98
 msgid "Problems serializing an object's member"
-msgstr ""
-
-#: libcore/AMFConverter.cpp:135
-#, c-format
-msgid "amf: serializing object (or function) as reference to %d"
-msgstr ""
-
-#: libcore/AMFConverter.cpp:155
-#, c-format
-msgid "amf: serializing date object with index %d and value %g"
-msgstr ""
-
-#: libcore/AMFConverter.cpp:201
-#, c-format
-msgid "amf: serializing array of %d elements as STRICT_ARRAY (index %d)"
 msgstr ""
 
 #: libcore/AMFConverter.cpp:212
@@ -5872,26 +5467,8 @@ msgstr ""
 msgid "Problems serializing strict array member %d=%s"
 msgstr ""
 
-#: libcore/AMFConverter.cpp:223
-#, c-format
-msgid "amf: serializing array of %d elements as ECMA_ARRAY (index %d) "
-msgstr ""
-
-#: libcore/AMFConverter.cpp:233
-#, c-format
-msgid "amf: serializing object (or function) with index %d"
-msgstr ""
-
 #: libcore/AMFConverter.cpp:242
 msgid "Could not serialize object"
-msgstr ""
-
-#: libcore/AMFConverter.cpp:276
-msgid "amf: serializing undefined"
-msgstr ""
-
-#: libcore/AMFConverter.cpp:286
-msgid "amf: serializing null"
 msgstr ""
 
 #: libcore/AMFConverter.cpp:319
@@ -5908,22 +5485,12 @@ msgstr ""
 msgid "Read past _end of buffer for strict array length"
 msgstr ""
 
-#: libcore/AMFConverter.cpp:414
-#, c-format
-msgid "amf0 starting read of STRICT_ARRAY with %i elements"
-msgstr ""
-
 #: libcore/AMFConverter.cpp:425
 msgid "Unable to read array elements"
 msgstr ""
 
 #: libcore/AMFConverter.cpp:442
 msgid "Read past _end of buffer for array length"
-msgstr ""
-
-#: libcore/AMFConverter.cpp:458
-#, c-format
-msgid "amf0 starting read of ECMA_ARRAY with %i elements"
 msgstr ""
 
 #: libcore/AMFConverter.cpp:468 libcore/AMFConverter.cpp:489
@@ -5934,17 +5501,8 @@ msgstr ""
 msgid "MALFORMED AMF: empty member name not followed by OBJECT_END_AMF0 byte"
 msgstr ""
 
-#: libcore/AMFConverter.cpp:497
-#, c-format
-msgid "amf0 ECMA_ARRAY prop name is %s"
-msgstr ""
-
 #: libcore/AMFConverter.cpp:504
 msgid "Unable to read array element"
-msgstr ""
-
-#: libcore/AMFConverter.cpp:518
-msgid "amf0 starting read of OBJECT"
 msgstr ""
 
 #: libcore/AMFConverter.cpp:528
@@ -5955,19 +5513,9 @@ msgstr ""
 msgid "AMF buffer terminated just before object _end byte. continuing anyway."
 msgstr ""
 
-#: libcore/AMFConverter.cpp:563
-#, c-format
-msgid "readAMF0: reference #%d"
-msgstr ""
-
 #: libcore/AMFConverter.cpp:566
 #, c-format
 msgid "readAMF0: invalid reference to object %d (%d known objects)"
-msgstr ""
-
-#: libcore/AMFConverter.cpp:579
-#, c-format
-msgid "amf0 read date: %e"
 msgstr ""
 
 #: libcore/AMFConverter.cpp:597
@@ -6619,11 +6167,6 @@ msgstr ""
 msgid "Unhandled button event %s"
 msgstr ""
 
-#: libcore/Button.cpp:685
-#, c-format
-msgid "Removed button record shifted from depth %d to depth %d"
-msgstr ""
-
 #: libcore/Button.cpp:788
 msgid "Button placed with an init object. This will be ignored."
 msgstr ""
@@ -6684,11 +6227,6 @@ msgstr ""
 msgid "Path target '%s' not found while setting %s=%s"
 msgstr ""
 
-#: libcore/as_environment.cpp:407
-#, c-format
-msgid "path: %s, var: %s"
-msgstr ""
-
 #: libcore/as_environment.cpp:445
 #, c-format
 msgid "Won't set invalid raw variable name: %s"
@@ -6706,54 +6244,9 @@ msgstr ""
 msgid "Won't get invalid raw variable name: %s"
 msgstr ""
 
-#: libcore/as_environment.cpp:549
-#, c-format
-msgid "Took %s as _global, returning _global"
-msgstr ""
-
-#: libcore/as_environment.cpp:558
-#, c-format
-msgid "Found %s in _global"
-msgstr ""
-
 #: libcore/as_environment.cpp:567
 #, c-format
 msgid "reference to non-existent variable '%s'"
-msgstr ""
-
-#: libcore/MovieClip.cpp:167
-#, c-format
-msgid ""
-"CHECKME: nested mask in MouseEntityFinder. This mask is %s at depth %d outer "
-"mask masked up to depth %d."
-msgstr ""
-
-#: libcore/MovieClip.cpp:181 libcore/MovieClip.cpp:419
-#, c-format
-msgid ""
-"Character %s at depth %d is a mask not hitting the query point %g,%g and "
-"masking up to depth %d"
-msgstr ""
-
-#: libcore/MovieClip.cpp:190 libcore/MovieClip.cpp:428
-#, c-format
-msgid "Character %s at depth %d is a mask hitting the query point %g,%g"
-msgstr ""
-
-#: libcore/MovieClip.cpp:220
-#, c-format
-msgid "MouseEntityFinder found DisplayObject %s (depth %d) hitting point %g,%g"
-msgstr ""
-
-#: libcore/MovieClip.cpp:403
-#, c-format
-msgid ""
-"CHECKME: nested mask in DropTargetFinder. This mask is %s at depth %d outer "
-"mask masked up to depth %d."
-msgstr ""
-
-#: libcore/MovieClip.cpp:415
-msgid "FIXME: invisible mask in MouseEntityFinder."
 msgstr ""
 
 #: libcore/MovieClip.cpp:621
@@ -6770,58 +6263,13 @@ msgstr ""
 msgid "%s parent is not a movieclip, can't clone"
 msgstr ""
 
-#: libcore/MovieClip.cpp:720
-#, c-format
-msgid "Event %s invoked for movieclip %s"
-msgstr ""
-
-#: libcore/MovieClip.cpp:726
-#, c-format
-msgid "Sprite %s ignored ENTER_FRAME event (is unloaded)"
-msgstr ""
-
-#: libcore/MovieClip.cpp:734
-#, c-format
-msgid "Sprite %s ignored button-like event %s as not 'enabled'"
-msgstr ""
-
-#: libcore/MovieClip.cpp:793
-#, c-format
-msgid ""
-"Sprite %s (depth %d) won't check for user-defined LOAD event (is not "
-"dynamic, has a parent, no registered class and no clip events defined)"
-msgstr ""
-
 #: libcore/MovieClip.cpp:852
 msgid "MovieClip.unloadMovie()"
-msgstr ""
-
-#: libcore/MovieClip.cpp:872
-#, c-format
-msgid "Advance movieclip '%s' at frame %u/%u"
 msgstr ""
 
 #: libcore/MovieClip.cpp:885
 #, c-format
 msgid "advance_movieclip: no frames loaded for movieclip/movie %s"
-msgstr ""
-
-#: libcore/MovieClip.cpp:897
-#, c-format
-msgid "Advance_movieclip for movieclip '%s' - frame %u/%u "
-msgstr ""
-
-#: libcore/MovieClip.cpp:910
-msgid "MovieClip::advance_movieclip we're in PLAYSTATE_PLAY mode"
-msgstr ""
-
-#: libcore/MovieClip.cpp:916
-msgid "on_event_load called, incrementing"
-msgstr ""
-
-#: libcore/MovieClip.cpp:920
-#, c-format
-msgid "after increment we are at frame %u/%u"
 msgstr ""
 
 #: libcore/MovieClip.cpp:935
@@ -6830,37 +6278,9 @@ msgid ""
 "frame_count:%4%"
 msgstr ""
 
-#: libcore/MovieClip.cpp:953
-#, c-format
-msgid "Jumping back to frame 0 of movieclip %s"
-msgstr ""
-
-#: libcore/MovieClip.cpp:960
-#, c-format
-msgid "Executing frame%d (0-based) tags of movieclip %s"
-msgstr ""
-
-#: libcore/MovieClip.cpp:974
-msgid "MovieClip::advance_movieclip we're in STOP mode"
-msgstr ""
-
-#: libcore/MovieClip.cpp:986
-msgid ""
-"Queuing init actions for DisplayObject %1% in frame %2% of MovieClip %3%"
-msgstr ""
-
-#: libcore/MovieClip.cpp:996
-msgid "Init actions for DisplayObject %1% already executed"
-msgstr ""
-
 #: libcore/MovieClip.cpp:1046
 #, c-format
 msgid "Executing %d tags in frame %d/%d of movieclip %s"
-msgstr ""
-
-#: libcore/MovieClip.cpp:1070
-#, c-format
-msgid "movieclip %s ::goto_frame(%d) - current frame is %d"
 msgstr ""
 
 #: libcore/MovieClip.cpp:1084 libcore/MovieClip.cpp:1125
@@ -6899,37 +6319,6 @@ msgid ""
 "%d"
 msgstr ""
 
-#: libcore/MovieClip.cpp:1432
-#, c-format
-msgid ""
-"%s is a dynamic mask and can't handle mouse events, no point will hit it"
-msgstr ""
-
-#: libcore/MovieClip.cpp:1440
-#, c-format
-msgid "%s is dynamically masked by %s, which doesn't hit point %g,%g"
-msgstr ""
-
-#: libcore/MovieClip.cpp:1688
-#, c-format
-msgid "Attached movieclips %s registered class is %p"
-msgstr ""
-
-#: libcore/MovieClip.cpp:1719
-#, c-format
-msgid "Sprite '%s' placed on stage"
-msgstr ""
-
-#: libcore/MovieClip.cpp:1758
-#, c-format
-msgid "Queuing INITIALIZE and CONSTRUCT events for movieclip %s"
-msgstr ""
-
-#: libcore/MovieClip.cpp:1793
-#, c-format
-msgid "Unloading movieclip '%s'"
-msgstr ""
-
 #: libcore/MovieClip.cpp:1905
 #, c-format
 msgid "Could not load variables from %s"
@@ -6940,11 +6329,6 @@ msgstr ""
 msgid ""
 "removeMovieClip(%s): movieclip depth (%d) out of the 'dynamic' zone "
 "[0..1048575], won't remove"
-msgstr ""
-
-#: libcore/MovieClip.cpp:2089
-#, c-format
-msgid "Stream sound id from %d to %d, stopping old"
 msgstr ""
 
 #: libcore/parser/TypesParser.cpp:212
@@ -7091,26 +6475,6 @@ msgstr ""
 msgid "No Video info in video definition"
 msgstr ""
 
-#: libcore/Video.cpp:145
-#, c-format
-msgid "Video instance %s need display video frame (ratio) %d"
-msgstr ""
-
-#: libcore/Video.cpp:154
-#, c-format
-msgid "  current frame == _lastDecodedVideoFrameNum (%d)"
-msgstr ""
-
-#: libcore/Video.cpp:169
-#, c-format
-msgid "  current frame (%d) < _lastDecodedVideoFrameNum (%d)"
-msgstr ""
-
-#: libcore/Video.cpp:180
-#, c-format
-msgid "  decoding embedded frames from %d to %d for Video object %s"
-msgstr ""
-
 #: libcore/as_function.cpp:94
 #, c-format
 msgid "Native function called as constructor threw exception: %s"
@@ -7126,42 +6490,11 @@ msgstr ""
 msgid "No user interface registered, assuming 'Yes' answer to question: %s"
 msgstr ""
 
-#: libcore/movie_root.cpp:296
-msgid "Disabling scripts: %1%"
-msgstr ""
-
-#: libcore/movie_root.cpp:338
-msgid "Replacing starting movie"
-msgstr ""
-
-#: libcore/movie_root.cpp:343
-msgid "Loading into _level0"
-msgstr ""
-
-#: libcore/movie_root.cpp:391
-#, c-format
-msgid "Before swapLevels (source depth %d, target depth %d) levels are: "
-msgstr ""
-
-#: libcore/movie_root.cpp:394 libcore/movie_root.cpp:445
-#, c-format
-msgid " %d: %p (%s @ depth %d)"
-msgstr ""
-
 #: libcore/movie_root.cpp:402 libcore/movie_root.cpp:412
 #, c-format
 msgid ""
 "%s.swapDepth(%d): movie has a depth (%d) below static depth zone (%d), won't "
 "swap its depth"
-msgstr ""
-
-#: libcore/movie_root.cpp:423
-#, c-format
-msgid "%s.swapDepth(%d): target depth (%d) contains no movie"
-msgstr ""
-
-#: libcore/movie_root.cpp:443
-msgid "After swapLevels levels are: "
 msgstr ""
 
 #: libcore/movie_root.cpp:470
@@ -7203,53 +6536,14 @@ msgstr ""
 msgid "Buffer overread during advance: %s"
 msgstr ""
 
-#: libcore/movie_root.cpp:1008
-msgid "original root movie had null bounds, not displaying"
-msgstr ""
-
-#: libcore/movie_root.cpp:1031
-#, c-format
-msgid "_level%u has null frame size, skipping"
-msgstr ""
-
 #: libcore/movie_root.cpp:1066
 #, c-format
 msgid "ActionLimits hit notifying mouse events: %s."
 msgstr ""
 
-#: libcore/movie_root.cpp:1316
-#, c-format
-msgid "Going to or from scaleMode=noScale. Viewport:%dx%d Def:%dx%d"
-msgstr ""
-
-#: libcore/movie_root.cpp:1390
-#, c-format
-msgid "Processing %d actions in priority queue %d (call %u)"
-msgstr ""
-
-#: libcore/movie_root.cpp:1406
-#, c-format
-msgid "Actions pushed in priority %d (< %d), restarting the scan (call %u)"
-msgstr ""
-
-#: libcore/movie_root.cpp:1417
-#, c-format
-msgid "Done processing actions in priority queue %d (call %u)"
-msgstr ""
-
-#: libcore/movie_root.cpp:1505
-#, c-format
-msgid "Pushed action buffer for target %s"
-msgstr ""
-
 #: libcore/movie_root.cpp:1558
 #, c-format
 msgid "Couldn't process ExternalInterface Call %s"
-msgstr ""
-
-#: libcore/movie_root.cpp:1575
-#, c-format
-msgid "Processing %s call from the Browser."
 msgstr ""
 
 #: libcore/movie_root.cpp:1603
@@ -7260,24 +6554,9 @@ msgstr ""
 msgid "ExternalInterface::LoadMovie()"
 msgstr ""
 
-#: libcore/movie_root.cpp:1672
-#, c-format
-msgid "Attempt to write response to ExternalInterface requests fd %d"
-msgstr ""
-
 #: libcore/movie_root.cpp:1676 gui/Player.cpp:713
 #, c-format
 msgid "Could not write to user-provided host requests fd %d: %s"
-msgstr ""
-
-#: libcore/movie_root.cpp:1681
-#, c-format
-msgid "No response needed for %s request"
-msgstr ""
-
-#: libcore/movie_root.cpp:1691
-#, c-format
-msgid "Checking %d timers for expiry"
 msgstr ""
 
 #: libcore/movie_root.cpp:1837 libcore/movie_root.cpp:1869
@@ -7286,92 +6565,30 @@ msgstr ""
 msgid "Could not write to browser fd #%d: %s"
 msgstr ""
 
-#: libcore/movie_root.cpp:2043
-#, c-format
-msgid "Global instance list grew to %d entries"
-msgstr ""
-
-#: libcore/movie_root.cpp:2052
-#, c-format
-msgid "---- movie_root::advance: %d live DisplayObjects in the global list"
-msgstr ""
-
-#: libcore/movie_root.cpp:2114
-#, c-format
-msgid ""
-"Evaluating DisplayObject target path: element '%s' of path '%s' not found"
-msgstr ""
-
-#: libcore/movie_root.cpp:2128
-#, c-format
-msgid "%s: HOSTFD is %d"
-msgstr ""
-
-#: libcore/movie_root.cpp:2149
-#, c-format
-msgid "Launching URL: %s"
-msgstr ""
-
-#: libcore/movie_root.cpp:2152
+#: libcore/movie_root.cpp:2153
 #, c-format
 msgid "Fork failed launching url opener '%s'"
 msgstr ""
 
-#: libcore/movie_root.cpp:2193
-#, c-format
-msgid "Attempt to write geturl requests fd #%d"
-msgstr ""
-
-#: libcore/movie_root.cpp:2199
+#: libcore/movie_root.cpp:2200
 #, c-format
 msgid "Could only write %d bytes to fd #%d"
 msgstr ""
 
-#: libcore/movie_root.cpp:2213
-msgid ""
-"SWF ScriptLimits tag attempting to set recursionLimit=%1% and scriptsTimeout="
-"%2% ignored as per rcfile directive"
-msgstr ""
-
-#: libcore/movie_root.cpp:2222
-#, c-format
-msgid "Setting script limits: max recursion %d, timeout %d seconds"
-msgstr ""
-
-#: libcore/movie_root.cpp:2287
+#: libcore/movie_root.cpp:2288
 msgid "Live MovieClips"
 msgstr ""
 
-#: libcore/movie_root.cpp:2389
-#, c-format
-msgid "LoadableObject Loaded %d bytes, reaching %d/%d"
-msgstr ""
-
-#: libcore/movie_root.cpp:2396
-#, c-format
-msgid "LoadableObject reached EOF (%d/%d loaded)"
-msgstr ""
-
-#: libcore/movie_root.cpp:2416
+#: libcore/movie_root.cpp:2417
 #, c-format
 msgid "%s to utf8 conversion in LoadableObject input parsing"
 msgstr ""
 
-#: libcore/movie_root.cpp:2439
+#: libcore/movie_root.cpp:2440
 #, c-format
 msgid ""
 "Hosting application registered no callback for events/queries, can't call %s"
 "(%s)"
-msgstr ""
-
-#: libcore/movie_root.cpp:2590
-#, c-format
-msgid "    advancing DisplayObject %s"
-msgstr ""
-
-#: libcore/movie_root.cpp:2596
-#, c-format
-msgid "    DisplayObject %s is unloaded, not advancing it"
 msgstr ""
 
 #: libcore/abc/AbcBlock.cpp:64 libcore/abc/AbcBlock.cpp:132
@@ -7542,24 +6759,9 @@ msgstr ""
 msgid "Unknown file type"
 msgstr ""
 
-#: libcore/MovieFactory.cpp:121
-#, c-format
-msgid "Movie %s already in library"
-msgstr ""
-
 #: libcore/MovieFactory.cpp:133
 #, c-format
 msgid "Couldn't load library movie '%s'"
-msgstr ""
-
-#: libcore/MovieFactory.cpp:140
-#, c-format
-msgid "Movie %s (SWF%d) added to library"
-msgstr ""
-
-#: libcore/MovieFactory.cpp:144
-#, c-format
-msgid "Movie %s (SWF%d) NOT added to library (resulted from a POST)"
 msgstr ""
 
 #: libcore/MovieFactory.cpp:173
@@ -7599,67 +6801,9 @@ msgstr ""
 msgid "streamProvider opener can't open '%s'"
 msgstr ""
 
-#: libcore/PropertyList.cpp:106
-#, c-format
-msgid "Simple AS property %s inserted with flags %s"
-msgstr ""
-
-#: libcore/PropertyList.cpp:195
-#, c-format
-msgid "  %s: %s"
-msgstr ""
-
-#: libcore/PropertyList.cpp:215
-#, c-format
-msgid "AS GetterSetter %s replaced copying flags %s"
-msgstr ""
-
-#: libcore/PropertyList.cpp:225
-#, c-format
-msgid "AS GetterSetter %s inserted with flags %s"
-msgstr ""
-
-#: libcore/PropertyList.cpp:248
-#, c-format
-msgid "Native GetterSetter %s replaced copying flags %s"
-msgstr ""
-
-#: libcore/PropertyList.cpp:258
-#, c-format
-msgid "Native GetterSetter %s in namespace %s inserted with flags %s"
-msgstr ""
-
 #: libcore/PropertyList.cpp:274
 #, c-format
 msgid "Property %s already exists, can't addDestructiveGetter"
-msgstr ""
-
-#: libcore/PropertyList.cpp:286
-#, c-format
-msgid "Destructive AS property %s inserted with flags %s"
-msgstr ""
-
-#: libcore/PropertyList.cpp:306
-#, c-format
-msgid "Destructive native property %s with flags %s"
-msgstr ""
-
-#: libcore/as_object.cpp:151
-msgid "Super has no associated prototype"
-msgstr ""
-
-#: libcore/as_object.cpp:169
-msgid "Super has no associated constructor"
-msgstr ""
-
-#: libcore/as_object.cpp:353
-#, c-format
-msgid "add_property: property %s is being watched"
-msgstr ""
-
-#: libcore/as_object.cpp:361
-#, c-format
-msgid "Property %s deleted by trigger on create (getter-setter)"
 msgstr ""
 
 #: libcore/as_object.cpp:439
@@ -7687,49 +6831,8 @@ msgstr ""
 msgid "Attempt to initialize read-only property '%s' on object '%p' twice"
 msgstr ""
 
-#: libcore/as_object.cpp:779
-#, c-format
-msgid "Object %p can't be an instance of an object (%p) with no 'prototype'"
-msgstr ""
-
-#: libcore/as_object.cpp:788
-#, c-format
-msgid ""
-"Object %p can't be an instance of an object (%p) with non-object "
-"'prototype' (%s)"
-msgstr ""
-
-#: libcore/as_object.cpp:807
-#, c-format
-msgid ""
-"Object %p is an instance of constructor %p as the constructor exposes our "
-"__proto__ %p"
-msgstr ""
-
-#: libcore/as_object.cpp:819
-#, c-format
-msgid ""
-"Object %p __proto__ %p had one interface matching with the constructor "
-"prototype %p"
-msgstr ""
-
 #: libcore/as_object.cpp:845
 msgid "Circular inheritance chain detected during isPrototypeOf call"
-msgstr ""
-
-#: libcore/as_object.cpp:855
-#, c-format
-msgid "%d members of object %p follow"
-msgstr ""
-
-#: libcore/as_object.cpp:997
-#, c-format
-msgid "No watch for property %s"
-msgstr ""
-
-#: libcore/as_object.cpp:1003
-#, c-format
-msgid "Watch on %s not removed (is a getter-setter)"
 msgstr ""
 
 #: libdevice/egl/eglDevice.cpp:87 libdevice/egl/eglDevice.cpp:109
