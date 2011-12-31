@@ -218,8 +218,8 @@ TextField::removeTextField()
     if ( depth < 0 || depth > 1048575 )
     {
         //IF_VERBOSE_ASCODING_ERRORS(
-        log_debug(_("CHECKME: removeTextField(%s): TextField depth (%d) "
-            "out of the 'dynamic' zone [0..1048575], won't remove"),
+        log_debug("CHECKME: removeTextField(%s): TextField depth (%d) "
+            "out of the 'dynamic' zone [0..1048575], won't remove",
             getTarget(), depth);
         //);
         return;
@@ -325,7 +325,7 @@ TextField::display(Renderer& renderer, const Transform& base)
         if (drawBackground) backgroundColor = cx.transform(backgroundColor);
         
 #ifdef GNASH_DEBUG_TEXTFIELDS
-	log_debug(_("rendering a Pol composed by corners %s"), _bounds);
+	log_debug("rendering a Pol composed by corners %s", _bounds);
 #endif
 
         renderer.draw_poly(coords, backgroundColor, 
@@ -839,7 +839,10 @@ TextField::setTextValue(const std::wstring& wstr)
         }
         else {
             // nothing to do (too early ?)
-            log_debug(_("setTextValue: variable name %s points to a non-existent target, I guess we would not be registered if this was true, or the sprite we've registered our variable name has been unloaded"), _variable_name);
+            log_debug("setTextValue: variable name %s points to a non-existent"
+		      "target, I guess we would not be registered if this was"
+		      "true, or the sprite we've registered our variable name"
+		      "has been unloaded", _variable_name);
         }
     }
 }
@@ -904,8 +907,8 @@ TextField::align_line(TextAlignment align, int last_line_start_record, float x)
 
     if (extra_space <= 0.0f) {
 #ifdef GNASH_DEBUG_TEXTFIELDS
-        log_debug(_("TextField text doesn't fit in its boundaries: "
-                "width %g, margin %g - nothing to align"),
+        log_debug("TextField text doesn't fit in its boundaries: "
+                "width %g, margin %g - nothing to align",
                 width, right_margin);
 #endif
         return 0.0f;
@@ -1370,9 +1373,9 @@ TextField::handleChar(std::wstring::const_iterator& it,
                         ++it;
                         return;
                     }
-                    LOG_ONCE(log_debug(_("HTML in a text field is unsupported, "
+                    LOG_ONCE(log_debug("HTML in a text field is unsupported, "
                                          "gnash will just ignore the tags and "
-                                         "print their content")));
+                                         "print their content"));
             
                     std::wstring discard;
                     std::map<std::string,std::string> attributes;
@@ -1550,7 +1553,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                                     last_space_glyph, last_line_start_record);
                         }
                         else if (s == "TEXTFORMAT") {
-                            log_debug(_("in textformat"));
+                            log_debug("in textformat");
                             //textformat
                             boost::uint16_t originalblockindent = getBlockIndent();
                             boost::uint16_t originalindent = getIndent();
@@ -1651,7 +1654,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
 										last_line_start_record, 1.0);
                         }
                         else {
-                            log_debug(_("<%s> tag is unsupported"), s);
+                            log_debug("<%s> tag is unsupported", s);
                             if (!selfclosing) { //then recurse, look for closing tag
                             handleChar(it, e, x, y, newrec, last_code,
                                                 last_space_glyph, last_line_start_record);
@@ -1736,7 +1739,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
         if (x >= width - getRightMargin() - PADDING_TWIPS)
         {
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
-            log_debug(_("Text in TextField %s exceeds width [ _bounds %s ]"), 
+            log_debug("Text in TextField %s exceeds width [ _bounds %s ]",
                     getTarget(), _bounds);
 #endif
 
@@ -1744,7 +1747,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
             if (!doWordWrap() && getAutoSize() == AUTOSIZE_NONE)
             {
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
-                log_debug(_(" wordWrap=false, autoSize=none"));
+                log_debug(" wordWrap=false, autoSize=none");
 #endif 
                 // Truncate long line, but keep expanding text box
                 bool newlinefound = false;
@@ -1761,7 +1764,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                     // of each glyph, even if we don't display it 
                     m_text_bounding_box.expand_to_point(x, y + fontDescent);
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
-                    log_debug(_("Text bbox expanded to %s (width: %f)"),
+                    log_debug("Text bbox expanded to %s (width: %f)",
                             m_text_bounding_box, m_text_bounding_box.width());
 #endif
 
@@ -1781,7 +1784,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
             else if (doWordWrap()) {
 
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
-                log_debug(_(" wordWrap=true"));
+                log_debug(" wordWrap=true");
 #endif
 
                 // Insert newline if there's space or autosize != none
@@ -1868,7 +1871,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
             else
             {
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
-                log_debug(_(" wordWrap=%d, autoSize=%d"), _wordWrap, _autoSize);
+                log_debug(" wordWrap=%d, autoSize=%d", _wordWrap, _autoSize);
 #endif 
             }
         }
@@ -1890,7 +1893,7 @@ TextField::parseTextVariableRef(const std::string& variableName) const
     ret.first = 0;
 
 #ifdef DEBUG_DYNTEXT_VARIABLES
-    log_debug(_("VariableName: %s"), variableName);
+    log_debug("VariableName: %s", variableName);
 #endif
 
     /// Why isn't get_environment const again ?
@@ -1914,7 +1917,7 @@ TextField::parseTextVariableRef(const std::string& variableName) const
     std::string path, var;
     if (parsePath(variableName, path, var)) {
 #ifdef DEBUG_DYNTEXT_VARIABLES
-        log_debug(_("Variable text Path: %s, Var: %s"), path, var);
+        log_debug("Variable text Path: %s, Var: %s", path, var);
 #endif
         // find target for the path component
         // we use our parent's environment for this
@@ -1946,7 +1949,7 @@ TextField::registerTextVariable()
 //#define DEBUG_DYNTEXT_VARIABLES 1
 
 #ifdef DEBUG_DYNTEXT_VARIABLES
-    log_debug(_("registerTextVariable() called"));
+    log_debug("registerTextVariable() called");
 #endif
 
     if (_text_variable_registered) {
@@ -1961,10 +1964,10 @@ TextField::registerTextVariable()
     VariableRef varRef = parseTextVariableRef(_variable_name);
     as_object* target = varRef.first;
     if (!target) {
-        log_debug(_("VariableName associated to text field (%s) refer to "
+        log_debug("VariableName associated to text field (%s) refer to "
                     "an unknown target. It is possible that the DisplayObject "
                     "will be instantiated later in the SWF stream. "
-                    "Gnash will try to register again on next access."),
+                    "Gnash will try to register again on next access.",
                 _variable_name);
         return;
     }
@@ -2150,7 +2153,7 @@ TextField::parseHTML(std::wstring& tag,
     }
     
 #ifdef GNASH_DEBUG_TEXTFIELDS
-    log_debug(_("HTML tag: %s"), utf8::encodeCanonicalString(tag, 7));
+    log_debug("HTML tag: %s", utf8::encodeCanonicalString(tag, 7));
 #endif
     log_error(_("I declare this a HTML syntax error"));
     return false; //since we did not return already, must be malformed...?
@@ -2168,7 +2171,7 @@ TextField::set_variable_name(const std::string& newname)
         _text_variable_registered = false;
 
 #ifdef DEBUG_DYNTEXT_VARIABLES
-        log_debug(_("Calling updateText after change of variable name"));
+        log_debug("Calling updateText after change of variable name");
 #endif
 
         // Use the original definition text if this isn't dynamically
@@ -2176,8 +2179,8 @@ TextField::set_variable_name(const std::string& newname)
         if (_tag) updateText(_tag->defaultText());
 
 #ifdef DEBUG_DYNTEXT_VARIABLES
-        log_debug(_("Calling registerTextVariable after change of variable "
-		    "name and updateText call"));
+        log_debug("Calling registerTextVariable after change of variable "
+		    "name and updateText call");
 #endif
         registerTextVariable();
     }
@@ -2420,13 +2423,13 @@ TextField::typeValueName(TypeValue val)
 {
     switch (val) {
         case typeInput:
-            //log_debug(_("typeInput returned as 'input'"));
+            //log_debug("typeInput returned as 'input'");
             return "input";
         case typeDynamic:
-            //log_debug(_("typeDynamic returned as 'dynamic'"));
+            //log_debug("typeDynamic returned as 'dynamic'");
             return "dynamic";
         default:
-            //log_debug(_("invalid type %d returned as 'invalid'"), (int)val);
+            //log_debug("invalid type %d returned as 'invalid'", (int)val);
             return "invalid";
     }
 

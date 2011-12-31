@@ -118,7 +118,7 @@ MovieFactory::makeMovie(const URL& url, const RunResources& runResources,
     // Is the movie already in the library? (don't check if we have post data!)
     if (!postdata) {
         if (movieLibrary.get(cache_label, &mov)) {
-            log_debug(_("Movie %s already in library"), cache_label);
+            log_debug("Movie %s already in library", cache_label);
             return mov;
         }
     }
@@ -137,12 +137,12 @@ MovieFactory::makeMovie(const URL& url, const RunResources& runResources,
     // Movie is good, add to the library, but not if we used POST
     if (!postdata) {
         movieLibrary.add(cache_label, mov.get());
-        log_debug(_("Movie %s (SWF%d) added to library"),
+        log_debug("Movie %s (SWF%d) added to library",
                 cache_label, mov->get_version());
     }
     else {
-        log_debug(_("Movie %s (SWF%d) NOT added to library (resulted from "
-                    "a POST)"), cache_label, mov->get_version());
+        log_debug("Movie %s (SWF%d) NOT added to library (resulted from "
+                    "a POST)", cache_label, mov->get_version());
     }
 
     /// Now complete the load if the movie is an SWF movie

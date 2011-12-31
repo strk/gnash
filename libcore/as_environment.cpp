@@ -404,7 +404,7 @@ parsePath(const std::string& var_path_in, std::string& path, std::string& var)
     const std::string v(var_path_in, lastDotOrColon + 1, var_path_in.size());
 
 #ifdef DEBUG_TARGET_FINDING 
-    log_debug(_("path: %s, var: %s"), p, v);
+    log_debug("path: %s, var: %s", p, v);
 #endif
 
     if (p.empty()) return false;
@@ -546,7 +546,7 @@ getVariableRaw(const as_environment& env, const std::string& varname,
     as_object* global = vm.getGlobal();
     if (swfVersion > 5 && eq(key, NSV::PROP_uGLOBAL)) {
 #ifdef GNASH_DEBUG_GET_VARIABLE
-        log_debug(_("Took %s as _global, returning _global"), varname);
+        log_debug("Took %s as _global, returning _global", varname);
 #endif
         // The "_global" ref was added in SWF6
         if (retTarget) *retTarget = NULL; // correct ??
@@ -555,7 +555,7 @@ getVariableRaw(const as_environment& env, const std::string& varname,
 
     if (global->get_member(key, &val)) {
 #ifdef GNASH_DEBUG_GET_VARIABLE
-        log_debug(_("Found %s in _global"), varname);
+        log_debug("Found %s in _global", varname);
 #endif
         if (retTarget) *retTarget = global;
         return val;

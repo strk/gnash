@@ -200,7 +200,7 @@ SWFStream::read_sint(unsigned short bitcount)
         value |= -1 << bitcount;
     }
 
-//        IF_DEBUG(log_debug(_("SWFStream::read_sint(%d) == %d\n", bitcount, value)));
+//        IF_DEBUG(log_debug("SWFStream::read_sint(%d) == %d\n", bitcount, value)));
 
     return value;
 }
@@ -536,7 +536,7 @@ SWFStream::open_tag()
 
     if ( tagLength > 1024*64 )
     {
-        //log_debug(_("Tag %d has a size of %d bytes !!"), tagType, tagLength);
+        //log_debug("Tag %d has a size of %d bytes !!", tagType, tagLength);
     }
 
     unsigned long tagEnd = tell() + tagLength;
@@ -593,7 +593,7 @@ SWFStream::close_tag()
     std::streampos endPos = _tagBoundsStack.back().second;
     _tagBoundsStack.pop_back();
 
-    //log_debug(_("Close tag called at %d, stream size: %d"), endPos);
+    //log_debug("Close tag called at %d, stream size: %d", endPos);
 
     if (!m_input->seek(endPos))
     {

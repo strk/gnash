@@ -74,7 +74,7 @@ public:
     virtual as_value call(const fn_call& fn)
     {
         string_table& st = getStringTable(fn);
-        log_debug(_("Loading native class %s"), st.value(getName(_decl.uri)));
+        log_debug("Loading native class %s", st.value(getName(_decl.uri)));
 
         _decl.initializer(*mTarget, _decl.uri);
         // Successfully loaded it, now find it, set its proto, and return.

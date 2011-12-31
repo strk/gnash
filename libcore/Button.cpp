@@ -682,7 +682,7 @@ Button::set_current_state(MouseState new_state)
                     int oldDepth = oldch->get_depth();
                     int newDepth = DisplayObject::removedDepthOffset - oldDepth;
 #ifdef GNASH_DEBUG_BUTTON_DISPLAYLIST
-                    log_debug(_("Removed button record shifted from depth %d to depth %d"),
+                    log_debug("Removed button record shifted from depth %d to depth %d",
 			      oldDepth, newDepth);
 #endif
                     oldch->set_depth(newDepth);

@@ -153,7 +153,7 @@ private:
     int moveTo(const FT_Vector* to)
     {
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-        log_debug(_("moveTo: %ld,%ld"), to->x, to->y);
+        log_debug("moveTo: %ld,%ld", to->x, to->y);
 #endif
         _x = static_cast<boost::int32_t>(to->x * _scale);
         _y = - static_cast<boost::int32_t>(to->y * _scale);
@@ -166,7 +166,7 @@ private:
     int lineTo(const FT_Vector* to)
     {
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-        log_debug(_("lineTo: %ld,%ld"), to->x, to->y);
+        log_debug("lineTo: %ld,%ld", to->x, to->y);
 #endif
         _x = static_cast<boost::int32_t>(to->x * _scale);
         _y = - static_cast<boost::int32_t>(to->y * _scale);
@@ -178,7 +178,7 @@ private:
     int conicTo(const FT_Vector* ctrl, const FT_Vector* to)
     {
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-        log_debug(_("conicTo: %ld,%ld %ld,%ld"), ctrl->x, ctrl->y, to->x, to->y);
+        log_debug("conicTo: %ld,%ld %ld,%ld", ctrl->x, ctrl->y, to->x, to->y);
 #endif
         boost::int32_t x1 = static_cast<boost::int32_t>(ctrl->x * _scale);
         boost::int32_t y1 = static_cast<boost::int32_t>(ctrl->y * _scale);
@@ -193,7 +193,7 @@ private:
     cubicTo(const FT_Vector* ctrl1, const FT_Vector* ctrl2, const FT_Vector* to)
     {
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-        log_debug(_("cubicTo: %ld,%ld %ld,%ld %ld,%ld"), ctrl1->x,
+        log_debug("cubicTo: %ld,%ld %ld,%ld %ld,%ld", ctrl1->x,
                 ctrl1->y, ctrl2->x, ctrl2->y, to->x, to->y);
 #endif
         float x = ctrl1->x + ( (ctrl2->x - ctrl1->x) * 0.5 );
@@ -325,15 +325,15 @@ FreetypeGlyphsProvider::getFontFilename(const std::string &name,
 
     if ( fs ) {
 #ifdef GNASH_DEBUG_DEVICEFONTS
-        log_debug(_("Found %d fonts matching the family %s (using "
-                    "first)"), fs->nfont, name);
+        log_debug("Found %d fonts matching the family %s (using "
+                    "first)", fs->nfont, name);
 #endif
 
         for (int j = 0; j < fs->nfont; j++) {
             FcChar8 *file;
             if (FcPatternGetString (fs->fonts[j], FC_FILE, 0, &file) != FcResultMatch) {
 #ifdef GNASH_DEBUG_DEVICEFONTS
-                log_debug(_("Matching font %d has unknown filename, skipping"),
+                log_debug("Matching font %d has unknown filename, skipping",
                           j);
 #endif
         continue;
@@ -343,7 +343,7 @@ FreetypeGlyphsProvider::getFontFilename(const std::string &name,
             FcFontSetDestroy(fs);
 
 #ifdef GNASH_DEBUG_DEVICEFONTS
-            log_debug(_("Loading font from file %d"), filename);
+            log_debug("Loading font from file %d", filename);
 #endif
             return true;
 
@@ -466,7 +466,7 @@ FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string& name,
     scale = (float)unitsPerEM()/_face->units_per_EM;
 
 #ifdef GNASH_DEBUG_DEVICEFONTS
-    log_debug(_("EM square for font '%s' is %d, scale is this %g"),
+    log_debug("EM square for font '%s' is %d, scale is this %g",
               name, _face->units_per_EM, scale);
 #endif
 }
@@ -495,8 +495,8 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
     // Scale advance by current scale, to match expected output coordinate space
     advance = _face->glyph->metrics.horiAdvance * scale;
 #ifdef GNASH_DEBUG_DEVICEFONTS 
-    log_debug(_("Advance value for glyph '%c' is %g (horiAdvance:%ld, "
-                "scale:%g)"), code, advance, 
+    log_debug("Advance value for glyph '%c' is %g (horiAdvance:%ld, "
+                "scale:%g)", code, advance, 
               _face->glyph->metrics.horiAdvance, scale);
 #endif
 
@@ -523,7 +523,7 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
     walk.delta = 0; // ?
 
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-    log_debug(_("Decomposing glyph outline for DisplayObject %u"), code);
+    log_debug("Decomposing glyph outline for DisplayObject %u", code);
 #endif
     
     glyph.reset(new SWF::ShapeRecord);
@@ -535,7 +535,7 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 #if 0
     // Don't use VM::get if this is to be re-enabled.
     SWFRect bound; sh->compute_bound(&bound, VM::get().getSWFVersion());
-    log_debug(_("Decomposed glyph for DisplayObject '%c' has bounds %s"),
+    log_debug("Decomposed glyph for DisplayObject '%c' has bounds %s",
             code, bound.toString());
 #endif
 #endif

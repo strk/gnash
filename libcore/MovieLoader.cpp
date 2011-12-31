@@ -60,7 +60,7 @@ MovieLoader::processRequests()
     _barrier.wait();
 
 #ifdef GNASH_DEBUG_LOADMOVIE_REQUESTS_PROCESSING
-    log_debug(_("Starting movie loader thread"));
+    log_debug("Starting movie loader thread");
 #endif
 
 
@@ -69,19 +69,19 @@ MovieLoader::processRequests()
         // check for shutdown/cancel request
         if (killed()) {
 #ifdef GNASH_DEBUG_LOADMOVIE_REQUESTS_PROCESSING
-            log_debug(_("Loader thread killed"));
+            log_debug("Loader thread killed");
 #endif
             return;
         }
 
 #ifdef GNASH_DEBUG_LOCKING
-        log_debug(_("processRequests: lock on requests: trying"));
+        log_debug("processRequests: lock on requests: trying");
 #endif
 
         boost::mutex::scoped_lock lock(_requestsMutex);
 
 #ifdef GNASH_DEBUG_LOCKING
-        log_debug(_("processRequests: lock on requests: obtained"));
+        log_debug("processRequests: lock on requests: obtained");
 #endif
 
         // Find first non-completed request (the others we'll wait)
@@ -92,17 +92,17 @@ MovieLoader::processRequests()
         if (it == endIt) {
 
 #ifdef GNASH_DEBUG_LOADMOVIE_REQUESTS_PROCESSING
-            log_debug(_("Movie loader thread getting to sleep (nothing more to do)"));
+            log_debug("Movie loader thread getting to sleep (nothing more to do)");
 #endif
             // all completed, we can get to sleep
             _wakeup.wait(lock);
 
 #ifdef GNASH_DEBUG_LOADMOVIE_REQUESTS_PROCESSING
-            log_debug(_("Movie loader thread waked up"));
+            log_debug("Movie loader thread waked up");
 #endif
 
 #ifdef GNASH_DEBUG_LOCKING
-            log_debug(_("processRequests: lock on requests: release"));
+            log_debug("processRequests: lock on requests: release");
 #endif
 
             continue;
@@ -111,7 +111,7 @@ MovieLoader::processRequests()
         Request& lr = *it;
 
 #ifdef GNASH_DEBUG_LOCKING
-        log_debug(_("processRequests: lock on requests: release"));
+        log_debug("processRequests: lock on requests: release");
 #endif
 
         lock.unlock(); // now main thread can continue to push requests
@@ -132,7 +132,7 @@ MovieLoader::processRequest(Request& r)
     const std::string* postdata = usePost ? &(r.getPostData()) : 0;
 
 #ifdef GNASH_DEBUG_LOADMOVIE_REQUESTS_PROCESSING
-    log_debug(_("Movie loader thread processing request for target %s"),
+    log_debug("Movie loader thread processing request for target %s",
         r.getTarget());
 #endif
 
@@ -143,7 +143,7 @@ MovieLoader::processRequest(Request& r)
     r.setCompleted(md);
 
 #ifdef GNASH_DEBUG_LOADMOVIE_REQUESTS_PROCESSING
-    log_debug(_("Movie loader thread completed request for target %s"),
+    log_debug("Movie loader thread completed request for target %s",
         r.getTarget());
 #endif
 }
@@ -156,45 +156,45 @@ MovieLoader::clear()
     if (_thread.get()) {
 
 #ifdef GNASH_DEBUG_LOCKING
-        log_debug(_("clear: lock on requests: trying"));
+        log_debug("clear: lock on requests: trying");
 #endif
 
         boost::mutex::scoped_lock requestsLock(_requestsMutex);
 
 #ifdef GNASH_DEBUG_LOCKING
-        log_debug(_("clear: lock on requests: obtained"));
+        log_debug("clear: lock on requests: obtained");
 #endif
 
 #ifdef GNASH_DEBUG_LOCKING
-        log_debug(_("clear: lock on kill: trying"));
+        log_debug("clear: lock on kill: trying");
 #endif
 
         boost::mutex::scoped_lock lock(_killMutex);
 
 #ifdef GNASH_DEBUG_LOCKING
-        log_debug(_("clear: lock on kill: obtained"));
+        log_debug("clear: lock on kill: obtained");
 #endif
 
         _killed = true;
 
 #ifdef GNASH_DEBUG_LOCKING
-        log_debug(_("clear: lock on kill: release for kill"));
+        log_debug("clear: lock on kill: release for kill");
 #endif
 
         lock.unlock();
 
-        log_debug(_("waking up loader thread"));
+        log_debug("waking up loader thread");
 
         _wakeup.notify_all(); // in case it was sleeping
 
 #ifdef GNASH_DEBUG_LOCKING
-        log_debug(_("clear: lock on requests: release ater notify_all"));
+        log_debug("clear: lock on requests: release ater notify_all");
 #endif
         requestsLock.unlock(); // allow the thread to die
 
-        log_debug(_("MovieLoader notified, joining"));
+        log_debug("MovieLoader notified, joining");
         _thread->join();
-        log_debug(_("MovieLoader joined"));
+        log_debug("MovieLoader joined");
         _thread.reset();
     }
 
@@ -202,7 +202,7 @@ MovieLoader::clear()
     clearRequests();
 
 #ifdef GNASH_DEBUG_LOCKING
-    log_debug(_("clear: lock on requests: release if not after notify_all"));
+    log_debug("clear: lock on requests: release if not after notify_all");
 #endif
 }
 
@@ -273,14 +273,14 @@ MovieLoader::processCompletedRequest(const Request& r)
         unsigned int levelno;
         const int version = _movieRoot.getVM().getSWFVersion();
         if (isLevelTarget(version, target, levelno)) {
-            log_debug(_("processCompletedRequest: _level loading "
-                    "(level %u)"), levelno);
+            log_debug("processCompletedRequest: _level loading "
+                    "(level %u)", levelno);
 	        extern_movie->set_depth(levelno + DisplayObject::staticDepthOffset);
             _movieRoot.setLevel(levelno, extern_movie);
         }
         else {
-            log_debug(_("Target %s of a loadMovie request doesn't exist at "
-                        "load complete time"), target);
+            log_debug("Target %s of a loadMovie request doesn't exist at "
+                        "load complete time", target);
             return true;
         }
     }
@@ -341,17 +341,17 @@ MovieLoader::processCompletedRequests()
     for (;;) {
 
 #ifdef GNASH_DEBUG_LOCKING
-        log_debug(_("processCompletedRequests: lock on requests: trying"));
+        log_debug("processCompletedRequests: lock on requests: trying");
 #endif
 
         boost::mutex::scoped_lock requestsLock(_requestsMutex);
 
 #ifdef GNASH_DEBUG_LOCKING
-        log_debug(_("processCompletedRequests: lock on requests: obtained"));
+        log_debug("processCompletedRequests: lock on requests: obtained");
 #endif
 
 #ifdef GNASH_DEBUG_LOADMOVIE_REQUESTS_PROCESSING
-        log_debug(_("Checking %d requests for completeness"),
+        log_debug("Checking %d requests for completeness",
             _requests.size());
 #endif
 
@@ -363,14 +363,14 @@ MovieLoader::processCompletedRequests()
         if (it == endIt) break;
 
 #ifdef GNASH_DEBUG_LOCKING
-        log_debug(_("processCompletedRequests: lock on requests: releasing"));
+        log_debug("processCompletedRequests: lock on requests: releasing");
 #endif
         requestsLock.unlock();
 
         Request& firstCompleted = *it;
 
 #ifdef GNASH_DEBUG_LOADMOVIE_REQUESTS_PROCESSING
-        log_debug(_("Load request for target %s completed"),
+        log_debug("Load request for target %s completed",
             firstCompleted->getTarget());
 #endif
 
@@ -378,22 +378,22 @@ MovieLoader::processCompletedRequests()
         assert(checkit);
 
 #ifdef GNASH_DEBUG_LOCKING
-        log_debug(_("processCompletedRequests: lock on requests for removal: "
-                    "trying"));
+        log_debug("processCompletedRequests: lock on requests for removal: "
+                    "trying");
 #endif
 
         requestsLock.lock();
 
 #ifdef GNASH_DEBUG_LOCKING
-        log_debug(_("processCompletedRequests: lock on requests for removal: "
-                  "obtained"));
+        log_debug("processCompletedRequests: lock on requests for removal: "
+                  "obtained")
 #endif
 
         _requests.erase(it);
 
 #ifdef GNASH_DEBUG_LOCKING
-        log_debug(_("processCompletedRequests: lock on requests for removal: "
-                    "release"));
+        log_debug("processCompletedRequests: lock on requests for removal: "
+                    "release");
 #endif
     }
 }
@@ -431,19 +431,19 @@ MovieLoader::loadMovie(const std::string& urlstr,
         url.set_querystring(qs + varsToSend);
     }
 
-    log_debug(_("MovieLoader::loadMovie(%s, %s)"), url.str(), target);
+    log_debug("MovieLoader::loadMovie(%s, %s)", url.str(), target);
 
     const std::string* postdata = (method == MovieClip::METHOD_POST) ? &data
                                                                      : 0;
 
 #ifdef GNASH_DEBUG_LOCKING
-    log_debug(_("loadMovie: lock on requests: trying"));
+    log_debug("loadMovie: lock on requests: trying");
 #endif
 
     boost::mutex::scoped_lock lock(_requestsMutex);
 
 #ifdef GNASH_DEBUG_LOCKING
-    log_debug(_("loadMovie: lock on requests: obtained"));
+    log_debug("loadMovie: lock on requests: obtained");
 #endif
 
     _requests.push_front(
@@ -458,12 +458,12 @@ MovieLoader::loadMovie(const std::string& urlstr,
 	    _barrier.wait(); // let execution start before proceeding
     }
     else {
-        log_debug(_("loadMovie: waking up existing thread"));
+        log_debug("loadMovie: waking up existing thread");
         _wakeup.notify_all();
     }
 
 #ifdef GNASH_DEBUG_LOCKING
-    log_debug(_("loadMovie: lock on requests: release"));
+    log_debug("loadMovie: lock on requests: release");
 #endif
 }
 
@@ -481,20 +481,20 @@ MovieLoader::setReachable() const
 {
 
 #ifdef GNASH_DEBUG_LOCKING
-    log_debug(_("setReachable: lock on requests: trying"));
+    log_debug("setReachable: lock on requests: trying");
 #endif
 
     boost::mutex::scoped_lock lock(_requestsMutex);
 
 #ifdef GNASH_DEBUG_LOCKING
-    log_debug(_("setReachable: lock on requests: obtained"));
+    log_debug("setReachable: lock on requests: obtained");
 #endif
 
     std::for_each(_requests.begin(), _requests.end(),
             boost::mem_fn(&Request::setReachable));
 
 #ifdef GNASH_DEBUG_LOCKING
-    log_debug(_("setReachable: lock on requests: release"));
+    log_debug("setReachable: lock on requests: release");
 #endif
 }
 

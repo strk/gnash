@@ -34,7 +34,7 @@ void
 LoadVariablesThread::completeLoad()
 {
 #ifdef DEBUG_LOAD_VARIABLES
-    log_debug(_("completeLoad called"));
+    log_debug("completeLoad called");
 #endif
 
 
@@ -54,7 +54,7 @@ LoadVariablesThread::completeLoad()
 	while ( size_t bytesRead = _stream->read(buf.get(), chunkSize) )
 	{
 #ifdef DEBUG_LOAD_VARIABLES
-            log_debug(_("Read %u bytes"), bytesRead);
+            log_debug("Read %u bytes", bytesRead);
 #endif
 
 		if ( _bytesLoaded )
@@ -81,7 +81,7 @@ LoadVariablesThread::completeLoad()
 		}
 
 #ifdef DEBUG_LOAD_VARIABLES
-		log_debug(_("toparse: %s"), toparse);
+		log_debug("toparse: %s", toparse);
 #endif
 
 		// parse remainder
@@ -90,12 +90,12 @@ LoadVariablesThread::completeLoad()
 		{
 			std::string parseable = toparse.substr(0, lastamp);
 #ifdef DEBUG_LOAD_VARIABLES
-			log_debug(_("parseable: %s"), parseable);
+			log_debug("parseable: %s", parseable);
 #endif
 			parse(parseable);
 			toparse = toparse.substr(lastamp+1);
 #ifdef DEBUG_LOAD_VARIABLES
-			log_debug(_("toparse nextline: %s"), toparse);
+			log_debug("toparse nextline: %s", toparse);
 #endif
 			++parsedLines;
 		}
@@ -106,7 +106,7 @@ LoadVariablesThread::completeLoad()
 		if ( _stream->eof() ) break;
 
 		if ( cancelRequested() ) {
-                    log_debug(_("Cancelling LoadVariables download thread..."));
+                    log_debug("Cancelling LoadVariables download thread...");
 			_stream.reset();
 			return;
 		}

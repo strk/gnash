@@ -266,7 +266,7 @@ as_value::to_primitive(AsType hint) const
     if (_type != OBJECT) return *this; 
 
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-    log_debug(_("to_primitive(%s)"), hint==NUMBER ? "NUMBER" : "STRING");
+    log_debug("to_primitive(%s)", hint==NUMBER ? "NUMBER" : "STRING");
 #endif 
 
     // TODO: implement as_object::DefaultValue (ECMA-262 - 8.6.2.6)
@@ -306,7 +306,7 @@ as_value::to_primitive(AsType hint) const
     as_value ret = invoke(method, env, obj, args);
 
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-    log_debug(_("to_primitive: method call returned %s"), ret);
+    log_debug("to_primitive: method call returned %s", ret);
 #endif
 
     if (ret._type == OBJECT) {
@@ -395,8 +395,8 @@ as_value::to_number(const int version) const
             }
             catch (const ActionTypeError& e) {
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-                log_debug(_("to_primitive(%s, NUMBER) threw an "
-                            "ActionTypeError %s"), *this, e.what());
+                log_debug("to_primitive(%s, NUMBER) threw an "
+                            "ActionTypeError %s", *this, e.what());
 #endif
                 if (is_function() && version < 6) {
                     return 0;

@@ -293,7 +293,7 @@ movie_root::getRegisteredClass(const SWF::DefinitionTag* sprite) const
 void
 movie_root::handleActionLimitHit(const std::string& msg)
 {
-    log_debug(_("Disabling scripts: %1%"), msg);
+    log_debug("Disabling scripts: %1%", msg);
     disableScripts();
     clear(_actionQueue);
 }
@@ -335,12 +335,12 @@ movie_root::setLevel(unsigned int num, Movie* movie)
             //       use swapDepths against _level0
             //       and load into the new target while
             //       a timeout/interval is active.
-            log_debug(_("Replacing starting movie"));
+            log_debug("Replacing starting movie");
         }
 
         if (num == 0) {
 
-            log_debug(_("Loading into _level0"));
+            log_debug("Loading into _level0");
 
             // NOTE: this was tested but not automated, the
             //       test sets an interval and then loads something
@@ -388,10 +388,10 @@ movie_root::swapLevels(MovieClip* movie, int depth)
     const int oldDepth = movie->get_depth();
 
 #ifdef GNASH_DEBUG_LEVELS_SWAPPING
-    log_debug(_("Before swapLevels (source depth %d, target depth %d) levels are: "),
+    log_debug("Before swapLevels (source depth %d, target depth %d) levels are: ",
               oldDepth, depth);
     for (Levels::const_iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i) {
-        log_debug(_(" %d: %p (%s @ depth %d)"), i->first,
+        log_debug(" %d: %p (%s @ depth %d)", i->first,
                 (void*)(i->second), i->second->getTarget(),
                 i->second->get_depth());
     }
@@ -420,7 +420,7 @@ movie_root::swapLevels(MovieClip* movie, int depth)
     const int oldNum = oldDepth; 
     Levels::iterator oldIt = _movies.find(oldNum);
     if (oldIt == _movies.end()) {
-        log_debug(_("%s.swapDepth(%d): target depth (%d) contains no movie"),
+        log_debug("%s.swapDepth(%d): target depth (%d) contains no movie",
             movie->getTarget(), depth, oldNum);
         return;
     }
@@ -440,9 +440,9 @@ movie_root::swapLevels(MovieClip* movie, int depth)
     }
     
 #ifdef GNASH_DEBUG_LEVELS_SWAPPING
-    log_debug(_("After swapLevels levels are: "));
+    log_debug("After swapLevels levels are: ");
     for (Levels::const_iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i) {
-        log_debug(_(" %d: %p (%s @ depth %d)"), i->first, 
+        log_debug(" %d: %p (%s @ depth %d)", i->first, 
                 (void*)(i->second), i->second->getTarget(),
                 i->second->get_depth());
     }
@@ -1005,7 +1005,7 @@ movie_root::display()
     {
         // TODO: check what we should do if other levels
         //       have valid bounds
-        log_debug(_("original root movie had null bounds, not displaying"));
+        log_debug("original root movie had null bounds, not displaying");
         return;
     }
 
@@ -1028,7 +1028,7 @@ movie_root::display()
         const SWFRect& sub_frame_size = movie->get_frame_size();
 
         if (sub_frame_size.is_null()) {
-            log_debug(_("_level%u has null frame size, skipping"), i->first);
+            log_debug("_level%u has null frame size, skipping", i->first);
             continue;
         }
 
@@ -1313,7 +1313,7 @@ movie_root::setStageScaleMode(ScaleMode sm)
             (sm == SCALEMODE_NOSCALE || _scaleMode == SCALEMODE_NOSCALE)) {
 
         const movie_definition* md = _rootMovie->definition();
-        log_debug(_("Going to or from scaleMode=noScale. Viewport:%dx%d Def:%dx%d"),
+        log_debug("Going to or from scaleMode=noScale. Viewport:%dx%d Def:%dx%d",
                     _stageWidth, _stageHeight,
                 md->get_width_pixels(), md->get_height_pixels());
 
@@ -1387,7 +1387,7 @@ movie_root::processActionQueue(size_t lvl)
     ++calls;
     bool actionsToProcess = !q.empty();
     if (actionsToProcess) {
-        log_debug(_("Processing %d actions in priority queue %d (call %u)"),
+        log_debug("Processing %d actions in priority queue %d (call %u)",
                     q.size(), lvl, calls);
     }
 #endif
@@ -1403,7 +1403,7 @@ movie_root::processActionQueue(size_t lvl)
         size_t minLevel = minPopulatedPriorityQueue();
         if (minLevel < lvl) {
 #ifdef GNASH_DEBUG
-            log_debug(_("Actions pushed in priority %d (< %d), restarting the scan (call %u)"),
+            log_debug("Actions pushed in priority %d (< %d), restarting the scan (call %u)",
                       minLevel, lvl, calls);
 #endif
             return minLevel;
@@ -1414,7 +1414,7 @@ movie_root::processActionQueue(size_t lvl)
 
 #ifdef GNASH_DEBUG
     if (actionsToProcess) {
-        log_debug(_("Done processing actions in priority queue %d (call %u)"),
+        log_debug("Done processing actions in priority queue %d (call %u)",
                     lvl, calls);
     }
 #endif
@@ -1502,7 +1502,7 @@ void
 movie_root::pushAction(const action_buffer& buf, DisplayObject* target)
 {
 #ifdef GNASH_DEBUG
-    log_debug(_("Pushed action buffer for target %s"),
+    log_debug("Pushed action buffer for target %s",
             target->getTargetPath());
 #endif
 
@@ -1572,7 +1572,7 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
 
     if (!invoke || invoke->name.empty()) return false;
 
-    log_debug(_("Processing %s call from the Browser."), invoke->name);
+    log_debug("Processing %s call from the Browser.", invoke->name);
 
     std::stringstream ss;       // ss is the response string
 
@@ -1669,8 +1669,8 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
 
     if (!ss.str().empty()) {
         if (_hostfd >= 0) {
-            log_debug(_("Attempt to write response to ExternalInterface "
-                        "requests fd %d"), _hostfd);
+            log_debug("Attempt to write response to ExternalInterface "
+                        "requests fd %d", _hostfd);
             int ret = write(_hostfd, ss.str().c_str(), ss.str().size());
             if (ret == -1) {
             log_error(_("Could not write to user-provided host requests "
@@ -1678,7 +1678,7 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
             }
         }
     } else {
-        log_debug(_("No response needed for %s request"), invoke->name);
+        log_debug("No response needed for %s request", invoke->name);
     }
 
     return true;
@@ -1688,7 +1688,7 @@ void
 movie_root::executeTimers()
 {
 #ifdef GNASH_DEBUG_TIMERS_EXPIRATION
-    log_debug(_("Checking %d timers for expiry"), _intervalTimers.size());
+    log_debug("Checking %d timers for expiry", _intervalTimers.size());
 #endif
 
     // Don't do anything if we have no timers, just return so we don't
@@ -2040,7 +2040,7 @@ movie_root::cleanupDisplayList()
 #ifdef GNASH_DEBUG_INSTANCE_LIST
     if (_liveChars.size() > maxLiveChars) {
         maxLiveChars = _liveChars.size();
-        log_debug(_("Global instance list grew to %d entries"), maxLiveChars);
+        log_debug("Global instance list grew to %d entries", maxLiveChars);
     }
 #endif
 }
@@ -2049,7 +2049,7 @@ void
 movie_root::advanceLiveChars()
 {
 #ifdef GNASH_DEBUG
-    log_debug(_("---- movie_root::advance: %d live DisplayObjects in the global list"),
+    log_debug("---- movie_root::advance: %d live DisplayObjects in the global list",
                 _liveChars.size());
 #endif
 
@@ -2111,7 +2111,8 @@ movie_root::findCharacterByTarget(const std::string& tgtstr) const
 
         if (!o) {
 #ifdef GNASH_DEBUG_TARGET_RESOLUTION
-            log_debug(_("Evaluating DisplayObject target path: element '%s' of path '%s' not found"), part, tgtstr);
+            log_debug("Evaluating DisplayObject target path: element"
+                      "'%s' of path '%s' not found", part, tgtstr);
 #endif
             return NULL;
         }
@@ -2125,7 +2126,7 @@ void
 movie_root::getURL(const std::string& urlstr, const std::string& target,
         const std::string& data, MovieClip::VariablesMethod method)
 {
-    log_network(_("%s: HOSTFD is %d"),  __FUNCTION__, _hostfd);
+    log_network("%s: HOSTFD is %d",  __FUNCTION__, _hostfd);
     
     if (_hostfd < 0) {
         /// If there is no hosting application, call the URL launcher. For
@@ -2146,7 +2147,7 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
         std::string safeurl = url.encode(urlstr);
         boost::replace_all(command, "%u", safeurl);
         
-        log_debug(_("Launching URL: %s"), command);
+        log_debug("Launching URL: %s", command);
         const int ret = std::system(command.c_str());
         if (ret == -1) {
             log_error(_("Fork failed launching url opener '%s'"), command);
@@ -2190,7 +2191,7 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
     // TODO: should mutex-protect this ?
     // NOTE: we are assuming the hostfd is set in blocking mode here..
 
-    log_debug(_("Attempt to write geturl requests fd #%d"), _hostfd);
+    log_debug("Attempt to write geturl requests fd #%d", _hostfd);
 
     std::string msg = ExternalInterface::makeInvoke("getURL", fnargs);
 
@@ -2210,17 +2211,17 @@ movie_root::setScriptLimits(boost::uint16_t recursion, boost::uint16_t timeout)
     }
 
     if (RcInitFile::getDefaultInstance().lockScriptLimits()) {
-        LOG_ONCE(log_debug(_("SWF ScriptLimits tag attempting to set "
+        LOG_ONCE(log_debug("SWF ScriptLimits tag attempting to set "
             "recursionLimit=%1% and scriptsTimeout=%2% ignored "
-            "as per rcfile directive"), recursion, timeout) );
+            "as per rcfile directive", recursion, timeout) );
         return;
     }
 
     // This tag reported in some sources to be ignored for movies
     // below SWF7. However, on Linux with PP version 9, the tag
     // takes effect on SWFs of any version.
-    log_debug(_("Setting script limits: max recursion %d, "
-            "timeout %d seconds"), recursion, timeout);
+    log_debug("Setting script limits: max recursion %d, "
+            "timeout %d seconds", recursion, timeout);
 
     _recursionLimit = recursion;
     _timeoutLimit = timeout;
@@ -2386,14 +2387,14 @@ movie_root::LoadCallback::processLoad()
 
         _obj->set_member(NSV::PROP_uBYTES_LOADED, _buf.size());
 
-        log_debug(_("LoadableObject Loaded %d bytes, reaching %d/%d"),
+        log_debug("LoadableObject Loaded %d bytes, reaching %d/%d",
             actuallyRead, _buf.size(), _stream->size());
     }
 
     // We haven't finished till EOF 
     if (!_stream->eof()) return false;
 
-    log_debug(_("LoadableObject reached EOF (%d/%d loaded)"),
+    log_debug("LoadableObject reached EOF (%d/%d loaded)",
                 _buf.size(), _stream->size());
 
     // got nothing, won't bother BOFs of nulls
@@ -2587,13 +2588,13 @@ advanceLiveChar(MovieClip* mo)
 {
     if (!mo->unloaded()) {
 #ifdef GNASH_DEBUG
-        log_debug(_("    advancing DisplayObject %s"), mo->getTarget());
+        log_debug("    advancing DisplayObject %s", mo->getTarget());
 #endif
         mo->advance();
     }
 #ifdef GNASH_DEBUG
     else {
-        log_debug(_("    DisplayObject %s is unloaded, not advancing it"),
+        log_debug("    DisplayObject %s is unloaded, not advancing it",
                 mo->getTarget());
     }
 #endif

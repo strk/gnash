@@ -148,7 +148,7 @@ public:
 	{
         as_object* proto = prototype();
         if (proto) return proto->get_member(uri, val);
-        log_debug(_("Super has no associated prototype"));
+        log_debug("Super has no associated prototype");
         return false;
 	}
 
@@ -166,7 +166,7 @@ public:
         assert(fn2.isInstantiation());
         as_function* ctor = constructor();
         if (ctor) return ctor->call(fn2);
-        log_debug(_("Super has no associated constructor"));
+        log_debug("Super has no associated constructor");
         return as_value();
 	}
 
@@ -350,7 +350,7 @@ as_object::add_property(const std::string& name, as_function& getter,
 
             Trigger& trig = trigIter->second;
 
-            log_debug(_("add_property: property %s is being watched"), name);
+            log_debug("add_property: property %s is being watched", name);
             as_value v = trig.call(as_value(), as_value(), *this);
 
             // The trigger call could have deleted the property,
@@ -358,7 +358,7 @@ as_object::add_property(const std::string& name, as_function& getter,
             // it back in if it was deleted
             prop = _members.getProperty(uri);
             if (!prop) {
-                log_debug(_("Property %s deleted by trigger on create (getter-setter)"), name);
+                log_debug("Property %s deleted by trigger on create (getter-setter)", name);
                 return;
             }
             prop->setCache(v);
@@ -776,7 +776,7 @@ as_object::instanceOf(as_object* ctor)
     as_value protoVal;
     if (!ctor->get_member(NSV::PROP_PROTOTYPE, &protoVal)) {
 #ifdef GNASH_DEBUG_INSTANCE_OF
-        log_debug(_("Object %p can't be an instance of an object (%p) with no 'prototype'"),
+        log_debug("Object %p can't be an instance of an object (%p) with no 'prototype'",
                   (void*)this, (void*)ctor);
 #endif
         return false;
@@ -785,7 +785,7 @@ as_object::instanceOf(as_object* ctor)
     as_object* ctorProto = toObject(protoVal, getVM(*this));
     if (!ctorProto) {
 #ifdef GNASH_DEBUG_INSTANCE_OF
-        log_debug(_("Object %p can't be an instance of an object (%p) with non-object 'prototype' (%s)"),
+        log_debug("Object %p can't be an instance of an object (%p) with non-object 'prototype' (%s)",
                   (void*)this, (void*)ctor, protoVal);
 #endif
         return false;
@@ -804,7 +804,7 @@ as_object::instanceOf(as_object* ctor)
         // Check our proto
         if (thisProto == ctorProto) {
 #ifdef GNASH_DEBUG_INSTANCE_OF
-            log_debug(_("Object %p is an instance of constructor %p as the constructor exposes our __proto__ %p"),
+            log_debug("Object %p is an instance of constructor %p as the constructor exposes our __proto__ %p",
                       (void*)obj, (void*)ctor, (void*)thisProto);
 #endif
             return true;
@@ -816,7 +816,7 @@ as_object::instanceOf(as_object* ctor)
             != thisProto->_interfaces.end()) {
 
 #ifdef GNASH_DEBUG_INSTANCE_OF
-            log_debug(_("Object %p __proto__ %p had one interface matching with the constructor prototype %p"),
+            log_debug("Object %p __proto__ %p had one interface matching with the constructor prototype %p",
                       (void*)obj, (void*)thisProto, (void*)ctorProto);
 #endif
             return true;
@@ -852,7 +852,7 @@ as_object::prototypeOf(as_object& instance)
 void
 as_object::dump_members() 
 {
-    log_debug(_("%d members of object %p follow"), _members.size(),
+    log_debug("%d members of object %p follow", _members.size(),
             static_cast<const void*>(this));
     _members.dump();
 }
@@ -994,13 +994,13 @@ as_object::unwatch(const ObjectURI& uri)
 
     TriggerContainer::iterator trigIter = _trigs->find(uri);
     if (trigIter == _trigs->end()) {
-        log_debug(_("No watch for property %s"),
+        log_debug("No watch for property %s",
                   getStringTable(*this).value(getName(uri)));
         return false;
     }
     Property* prop = _members.getProperty(uri);
     if (prop && prop->isGetterSetter()) {
-        log_debug(_("Watch on %s not removed (is a getter-setter)"),
+        log_debug("Watch on %s not removed (is a getter-setter)",
                   getStringTable(*this).value(getName(uri)));
         return false;
     }

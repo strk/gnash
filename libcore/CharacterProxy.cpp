@@ -34,8 +34,8 @@ CharacterProxy::checkDangling() const
 	if (_ptr && _ptr->isDestroyed()) {
 		_tgt = _ptr->getOrigTarget();
 #ifdef GNASH_DEBUG_SOFT_REFERENCES
-		log_debug(_("char %s (%s) was destroyed, stored its orig target "
-                            "(%s) for later rebinding"), _ptr->getTarget(), typeName(*_ptr),
+		log_debug("char %s (%s) was destroyed, stored its orig target "
+                            "(%s) for later rebinding", _ptr->getTarget(), typeName(*_ptr),
                 _tgt);
 #endif
 		_ptr = 0;

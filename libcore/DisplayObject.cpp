@@ -203,7 +203,7 @@ DisplayObject::set_invalidated(const char* debug_file, int debug_line)
         _invalidated = true;
         
 #ifdef DEBUG_SET_INVALIDATED
-        log_debug(_("%p set_invalidated() of %s in %s:%d"),
+        log_debug("%p set_invalidated() of %s in %s:%d",
             (void*)this, getTarget(), debug_file, debug_line);
 #else
         UNUSED(debug_file);

@@ -164,9 +164,9 @@ public:
         if (ch->get_depth() <= _highestHiddenDepth) {
             if (ch->isMaskLayer()) {
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
-                log_debug(_("CHECKME: nested mask in MouseEntityFinder. "
+                log_debug("CHECKME: nested mask in MouseEntityFinder. "
                             "This mask is %s at depth %d outer mask masked "
-                            "up to depth %d."),
+                            "up to depth %d.",
                             ch->getTarget(), ch->get_depth(),
                             _highestHiddenDepth);
                 // Hiding mask still in effect...
@@ -178,17 +178,17 @@ public:
         if (ch->isMaskLayer()) {
             if (!ch->pointInShape(_wp.x, _wp.y)) {
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
-                log_debug(_("Character %s at depth %d is a mask not hitting "
+                log_debug("Character %s at depth %d is a mask not hitting "
                         "the query point %g,%g and masking up to "
-                        "depth %d"), ch->getTarget(), ch->get_depth(), 
+                        "depth %d", ch->getTarget(), ch->get_depth(), 
                         _wp.x, _wp.y, ch->get_clip_depth());
 #endif
                 _highestHiddenDepth = ch->get_clip_depth();
             }
             else {
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
-                log_debug(_("Character %s at depth %d is a mask hitting the "
-                        "query point %g,%g"),
+                log_debug("Character %s at depth %d is a mask hitting the "
+                        "query point %g,%g",
                         ch->getTarget(), ch->get_depth(), _wp.x, _wp.y);
 #endif 
             }
@@ -217,8 +217,8 @@ public:
         checkCandidates();
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
         if (_m) {
-            log_debug(_("MouseEntityFinder found DisplayObject %s (depth %d) "
-                    "hitting point %g,%g"),
+            log_debug("MouseEntityFinder found DisplayObject %s (depth %d) "
+                    "hitting point %g,%g",
                     _m->getTarget(), _m->get_depth(), _wp.x, _wp.y);
         }
 #endif // DEBUG_MOUSE_ENTITY_FINDING
@@ -400,9 +400,9 @@ public:
         if (ch->get_depth() <= _highestHiddenDepth) {
             if (ch->isMaskLayer()) {
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
-                log_debug(_("CHECKME: nested mask in DropTargetFinder. "
+                log_debug("CHECKME: nested mask in DropTargetFinder. "
                         "This mask is %s at depth %d outer mask masked "
-                        "up to depth %d."),
+                        "up to depth %d.",
                         ch->getTarget(), ch->get_depth(), _highestHiddenDepth);
                 // Hiding mask still in effect...
 #endif
@@ -412,12 +412,12 @@ public:
 
         if (ch->isMaskLayer()) {
             if (!ch->visible()) {
-                log_debug(_("FIXME: invisible mask in MouseEntityFinder."));
+                log_debug("FIXME: invisible mask in MouseEntityFinder.");
             }
             if (!ch->pointInShape(_x, _y)) {
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
-                log_debug(_("Character %s at depth %d is a mask not hitting "
-                        "the query point %g,%g and masking up to depth %d"),
+                log_debug("Character %s at depth %d is a mask not hitting "
+                        "the query point %g,%g and masking up to depth %d",
                     ch->getTarget(), ch->get_depth(), _x, _y,
                     ch->get_clip_depth());
 #endif 
@@ -425,8 +425,8 @@ public:
             }
             else {
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
-                log_debug(_("Character %s at depth %d is a mask "
-                            "hitting the query point %g,%g"),
+                log_debug("Character %s at depth %d is a mask "
+                            "hitting the query point %g,%g",
                             ch->getTarget(), ch->get_depth(), _x, _y);
 #endif
             }
@@ -717,13 +717,13 @@ void
 MovieClip::notifyEvent(const event_id& id)
 {
 #ifdef GNASH_DEBUG
-    log_debug(_("Event %s invoked for movieclip %s"), id, getTarget());
+    log_debug("Event %s invoked for movieclip %s", id, getTarget());
 #endif
 
     // We do not execute ENTER_FRAME if unloaded
     if (id.id() == event_id::ENTER_FRAME && unloaded()) {
 #ifdef GNASH_DEBUG
-        log_debug(_("Sprite %s ignored ENTER_FRAME event (is unloaded)"),
+        log_debug("Sprite %s ignored ENTER_FRAME event (is unloaded)",
                 getTarget());
 #endif
         return;
@@ -731,7 +731,7 @@ MovieClip::notifyEvent(const event_id& id)
 
     if (isButtonEvent(id) && !isEnabled()) {
 #ifdef GNASH_DEBUG
-        log_debug(_("Sprite %s ignored button-like event %s as not 'enabled'"),
+        log_debug("Sprite %s ignored button-like event %s as not 'enabled'",
             getTarget(), id);
 #endif
         return;
@@ -790,9 +790,9 @@ MovieClip::notifyEvent(const event_id& id)
             if (stage().getRegisteredClass(_def.get())) break;
 
 #ifdef GNASH_DEBUG
-            log_debug(_("Sprite %s (depth %d) won't check for user-defined "
+            log_debug("Sprite %s (depth %d) won't check for user-defined "
                         "LOAD event (is not dynamic, has a parent, "
-                        "no registered class and no clip events defined)"),
+                        "no registered class and no clip events defined)",
                         getTarget(), get_depth());
 #endif
             return;
@@ -869,7 +869,7 @@ void
 MovieClip::advance()
 {
 #ifdef GNASH_DEBUG
-    log_debug(_("Advance movieclip '%s' at frame %u/%u"),
+    log_debug("Advance movieclip '%s' at frame %u/%u",
         getTargetPath(), _currentFrame+1,
         get_frame_count());
 #endif
@@ -894,7 +894,7 @@ MovieClip::advance()
 #ifdef GNASH_DEBUG
     size_t frame_count = _def->get_frame_count();
 
-    log_debug(_("Advance_movieclip for movieclip '%s' - frame %u/%u "),
+    log_debug("Advance_movieclip for movieclip '%s' - frame %u/%u ",
         getTarget(), _currentFrame+1,
         frame_count);
 #endif
@@ -907,17 +907,17 @@ MovieClip::advance()
     // Update current and next frames.
     if (_playState == PLAYSTATE_PLAY) {
 #ifdef GNASH_DEBUG
-        log_debug(_("MovieClip::advance_movieclip we're in PLAYSTATE_PLAY mode"));
+        log_debug("MovieClip::advance_movieclip we're in PLAYSTATE_PLAY mode");
 #endif
 
         const size_t prev_frame = _currentFrame;
 
 #ifdef GNASH_DEBUG
-        log_debug(_("on_event_load called, incrementing"));
+        log_debug("on_event_load called, incrementing");
 #endif
         increment_frame_and_check_for_loop();
 #ifdef GNASH_DEBUG
-        log_debug(_("after increment we are at frame %u/%u"), _currentFrame, frame_count);
+        log_debug("after increment we are at frame %u/%u", _currentFrame, frame_count);
 #endif
 
         // Flush any orphaned tags
@@ -950,15 +950,15 @@ MovieClip::advance()
 
             if (_currentFrame == 0 && _hasLooped) {
 #ifdef GNASH_DEBUG
-                log_debug(_("Jumping back to frame 0 of movieclip %s"),
+                log_debug("Jumping back to frame 0 of movieclip %s",
                         getTarget());
 #endif
                 restoreDisplayList(0); // seems OK to me.
             }
             else {
 #ifdef GNASH_DEBUG
-                log_debug(_("Executing frame%d (0-based) tags of movieclip "
-                            "%s"), _currentFrame, getTarget());
+                log_debug("Executing frame%d (0-based) tags of movieclip "
+                            "%s", _currentFrame, getTarget());
 #endif
                 // Make sure _currentFrame is 0-based during execution of
                 // DLIST tags
@@ -971,7 +971,7 @@ MovieClip::advance()
     }
 #ifdef GNASH_DEBUG
     else {
-        log_debug(_("MovieClip::advance_movieclip we're in STOP mode"));
+        log_debug("MovieClip::advance_movieclip we're in STOP mode");
     }
 #endif
 }
@@ -983,8 +983,8 @@ MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
 
     if (_swf->initializeCharacter(cid)) {
 #ifdef GNASH_DEBUG
-        log_debug(_("Queuing init actions for DisplayObject %1% "
-                    "in frame %2% of MovieClip %3%"),
+        log_debug("Queuing init actions for DisplayObject %1% "
+                    "in frame %2% of MovieClip %3%",
                 cid, _currentFrame, getTarget());
 #endif
         std::auto_ptr<ExecutableCode> code(new GlobalCode(a, this));
@@ -993,7 +993,7 @@ MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
     }
     else {
 #ifdef GNASH_DEBUG
-        log_debug(_("Init actions for DisplayObject %1% already executed"), cid);
+        log_debug("Init actions for DisplayObject %1% already executed", cid);
 #endif
     }
 }
@@ -1067,7 +1067,7 @@ void
 MovieClip::goto_frame(size_t target_frame_number)
 {
 #if defined(DEBUG_GOTOFRAME) || defined(GNASH_DEBUG_TIMELINE)
-    log_debug(_("movieclip %s ::goto_frame(%d) - current frame is %d"),
+    log_debug("movieclip %s ::goto_frame(%d) - current frame is %d",
         getTargetPath(), target_frame_number, _currentFrame);
 #endif
 
@@ -1429,16 +1429,16 @@ MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
     if (isDynamicMask() && ! mouseEnabled()) {
         // see testsuite/misc-ming.all/masks_test.swf
 #ifdef GNASH_DEBUG_HITTEST
-        log_debug(_("%s is a dynamic mask and can't handle mouse "
-                    "events, no point will hit it"), getTarget());
+        log_debug("%s is a dynamic mask and can't handle mouse "
+                    "events, no point will hit it", getTarget());
 #endif
         return false;
     }
     const DisplayObject* mask = getMask(); // dynamic one
     if (mask && mask->visible() && !mask->pointInShape(x, y)) {
 #ifdef GNASH_DEBUG_HITTEST
-        log_debug(_("%s is dynamically masked by %s, which "
-                "doesn't hit point %g,%g"), getTarget(),
+        log_debug("%s is dynamically masked by %s, which "
+                "doesn't hit point %g,%g", getTarget(),
                 mask->getTarget(), x, y);
 #endif
         return false;
@@ -1685,7 +1685,7 @@ MovieClip::constructAsScriptObject()
     as_function* ctor = def ? stage().getRegisteredClass(def) : 0;
 
 #ifdef GNASH_DEBUG
-    log_debug(_("Attached movieclips %s registered class is %p"),
+    log_debug("Attached movieclips %s registered class is %p",
             getTarget(), (void*)ctor); 
 #endif
 
@@ -1716,7 +1716,7 @@ MovieClip::construct(as_object* initObj)
     saveOriginalTarget();
 
 #ifdef GNASH_DEBUG
-    log_debug(_("Sprite '%s' placed on stage"), getTarget());
+    log_debug("Sprite '%s' placed on stage", getTarget());
 #endif
 
     // Register this movieclip as a live one
@@ -1755,7 +1755,7 @@ MovieClip::construct(as_object* initObj)
     if (!isDynamic()) {
 
 #ifdef GNASH_DEBUG
-        log_debug(_("Queuing INITIALIZE and CONSTRUCT events for movieclip %s"),
+        log_debug("Queuing INITIALIZE and CONSTRUCT events for movieclip %s",
                 getTarget());
 #endif
 
@@ -1790,7 +1790,7 @@ bool
 MovieClip::unloadChildren()
 {
 #ifdef GNASH_DEBUG
-    log_debug(_("Unloading movieclip '%s'"), getTargetPath());
+    log_debug("Unloading movieclip '%s'", getTargetPath());
 #endif
 
     // stop any pending streaming sounds
@@ -2086,7 +2086,7 @@ void
 MovieClip::setStreamSoundId(int id)
 {
     if (id != m_sound_stream_id) {
-        log_debug(_("Stream sound id from %d to %d, stopping old"),
+        log_debug("Stream sound id from %d to %d, stopping old",
                 m_sound_stream_id, id);
         stopStreamSound();
     }

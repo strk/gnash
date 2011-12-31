@@ -66,7 +66,7 @@ public:
 
         // Tested with SharedObject and AMFPHP
         if (val.is_function()) {
-            log_debug(_("AMF0: skip serialization of FUNCTION property"));
+            log_debug("AMF0: skip serialization of FUNCTION property");
             return true;
         }
 
@@ -81,7 +81,7 @@ public:
         if (key == NSV::PROP_uuPROTOuu || key == NSV::PROP_CONSTRUCTOR)
         {
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-            log_debug(_(" skip serialization of specially-named property %s"),
+            log_debug(" skip serialization of specially-named property %s",
                     _st.value(key));
 #endif
             return true;
@@ -91,7 +91,7 @@ public:
         const std::string& name = _st.value(key);
 
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-        log_debug(_(" serializing property %s"), name);
+        log_debug(" serializing property %s", name);
 #endif
         _writer.writePropertyName(name);
         if (!val.writeAMF0(_writer)) {
@@ -132,8 +132,8 @@ Writer::writeObject(as_object* obj)
     if (it != _offsets.end()) {
         const size_t idx = it->second;
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-        log_debug(_("amf: serializing object (or function) "
-                    "as reference to %d"), idx);
+        log_debug("amf: serializing object (or function) "
+                    "as reference to %d", idx);
 #endif
         _buf.appendByte(REFERENCE_AMF0);
         _buf.appendNetworkShort(idx);
@@ -152,8 +152,8 @@ Writer::writeObject(as_object* obj)
 
             double d = date->getTimeValue(); 
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-            log_debug(_("amf: serializing date object "
-                        "with index %d and value %g"), idx, d);
+            log_debug("amf: serializing date object "
+                        "with index %d and value %g", idx, d);
 #endif
             _buf.appendByte(DATE_AMF0);
             writePlainNumber(_buf, d);
@@ -198,8 +198,8 @@ Writer::writeObject(as_object* obj)
             if (s.strict()) {
 
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-                log_debug(_("amf: serializing array of %d "
-                            "elements as STRICT_ARRAY (index %d)"),
+                log_debug("amf: serializing array of %d "
+                            "elements as STRICT_ARRAY (index %d)",
                             len, idx);
 #endif
                 _buf.appendByte(STRICT_ARRAY_AMF0);
@@ -220,8 +220,8 @@ Writer::writeObject(as_object* obj)
 
         // A normal array.
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-        log_debug(_("amf: serializing array of %d "
-                    "elements as ECMA_ARRAY (index %d) "),
+        log_debug("amf: serializing array of %d "
+                    "elements as ECMA_ARRAY (index %d) ",
                     len, idx);
 #endif
         _buf.appendByte(ECMA_ARRAY_AMF0);
@@ -230,8 +230,8 @@ Writer::writeObject(as_object* obj)
     else {
         // It's a simple object
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-        log_debug(_("amf: serializing object (or function) "
-                    "with index %d"), idx);
+        log_debug("amf: serializing object (or function) "
+                    "with index %d", idx);
 #endif
         _buf.appendByte(OBJECT_AMF0);
     }
@@ -273,7 +273,7 @@ bool
 Writer::writeUndefined()
 {
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-    log_debug(_("amf: serializing undefined"));
+    log_debug("amf: serializing undefined");
 #endif
     _buf.appendByte(UNDEFINED_AMF0);
     return true;
@@ -283,7 +283,7 @@ bool
 Writer::writeNull()
 {
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-    log_debug(_("amf: serializing null"));
+    log_debug("amf: serializing null");
 #endif
     _buf.appendByte(NULL_AMF0);
     return true;
@@ -411,7 +411,7 @@ Reader::readStrictArray()
     _pos += 4;
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug(_("amf0 starting read of STRICT_ARRAY with %i elements"), li);
+    log_debug("amf0 starting read of STRICT_ARRAY with %i elements", li);
 #endif
     
     as_object* array = _global.createArray();
@@ -455,7 +455,7 @@ Reader::readArray()
     array->set_member(NSV::PROP_LENGTH, li);
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug(_("amf0 starting read of ECMA_ARRAY with %i elements"), li);
+    log_debug("amf0 starting read of ECMA_ARRAY with %i elements", li);
 #endif
 
     as_value objectElement;
@@ -494,7 +494,7 @@ Reader::readArray()
         const std::string name(reinterpret_cast<const char*>(_pos), strlen);
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-        log_debug(_("amf0 ECMA_ARRAY prop name is %s"), name);
+        log_debug("amf0 ECMA_ARRAY prop name is %s", name);
 #endif
 
         _pos += strlen;
@@ -515,7 +515,7 @@ Reader::readObject()
     as_object* obj = createObject(_global); 
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug(_("amf0 starting read of OBJECT"));
+    log_debug("amf0 starting read of OBJECT");
 #endif
 
     _objectRefs.push_back(obj);
@@ -560,7 +560,7 @@ Reader::readReference()
     _pos += 2;
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug(_("readAMF0: reference #%d"), si);
+    log_debug("readAMF0: reference #%d", si);
 #endif
     if (si < 1 || si > _objectRefs.size()) {
         log_error(_("readAMF0: invalid reference to object %d (%d known "
@@ -576,7 +576,7 @@ Reader::readDate()
     const double d = readNumber(_pos, _end);
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug(_("amf0 read date: %e"), dub);
+    log_debug("amf0 read date: %e", dub);
 #endif
 
     as_function* ctor = getMember(_global, NSV::CLASS_DATE).to_function();
