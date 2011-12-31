@@ -56,7 +56,7 @@ readBoolean(const boost::uint8_t*& pos, const boost::uint8_t* _end)
     const bool val = *pos;
     ++pos;
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug(_("amf0 read bool: %d"), val);
+    log_debug("amf0 read bool: %d", val);
 #endif
     return val;
 }
@@ -77,7 +77,7 @@ readNumber(const boost::uint8_t*& pos, const boost::uint8_t* end)
     swapBytes(&d, 8);
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug(_("amf0 read double: %e"), dub);
+    log_debug("amf0 read double: %e", dub);
 #endif
 
     return d;
@@ -100,7 +100,7 @@ readString(const boost::uint8_t*& pos, const boost::uint8_t* end)
     const std::string str(reinterpret_cast<const char*>(pos), si);
     pos += si;
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug(_("amf0 read string: %s"), str);
+    log_debug("amf0 read string: %s", str);
 #endif
     return str;
 }
@@ -122,7 +122,7 @@ readLongString(const boost::uint8_t*& pos, const boost::uint8_t* end)
     pos += si;
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-    log_debug(_("amf0 read long string: %s"), str);
+    log_debug("amf0 read long string: %s", str);
 #endif
 
     return str;

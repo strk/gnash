@@ -207,7 +207,7 @@ GifInput::processRecord(GifRecordType record)
 
             // Handle interlaced data in four passes.
             if (_gif->Image.Interlace) {
-                log_debug(_("Found interlaced GIF (%d x %d)"),
+                log_debug("Found interlaced GIF (%d x %d)",
                         screenWidth, screenHeight);
 
                 // The order of interlaced GIFs.
@@ -234,7 +234,7 @@ GifInput::processRecord(GifRecordType record)
             }
 
             // Non-interlaced data.
-            log_debug(_("Found non-interlaced GIF (%d x %d)"),
+            log_debug("Found non-interlaced GIF (%d x %d)",
                     screenWidth, screenHeight);
 
             for (size_t i = imageTop; i < imageHeight; ++i) {

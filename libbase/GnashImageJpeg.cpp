@@ -280,7 +280,7 @@ JpegInput::readHeader(unsigned int maxHeaderBytes)
                 // Found valid table-specs-only datastream
                 break;
             default:
-                log_debug(_("unexpected: jpeg_read_header returned %d"), ret);
+                log_error(_("unexpected: jpeg_read_header returned %d"), ret);
                 break;
         }
 
@@ -326,7 +326,7 @@ JpegInput::read()
                 // Found valid table-specs-only datastream
                 break;
             default:
-                log_debug(_("unexpected: jpeg_read_header returned %d [%s:%d]"),
+                log_error(_("unexpected: jpeg_read_header returned %d [%s:%d]"),
                         ret, __FILE__, __LINE__);
                 break;
         }
@@ -429,7 +429,8 @@ JpegInput::readScanline(unsigned char* rgb_data)
 void
 JpegInput::errorOccurred(const char* msg)
 {
-	log_debug(_("Long jump: banzaaaaaai!"));
+	log_error("Long jump: banzaaaaaai!");
+	
 	_errorOccurred = msg;
 	
 	// Mark the compressor as closed so we can open another image

@@ -235,7 +235,7 @@ CurlSession::get()
 
 CurlSession::~CurlSession()
 {
-    log_debug(_("~CurlSession"));
+    log_debug("~CurlSession");
     exportCookies();
 
     CURLSHcode code;
@@ -321,19 +321,19 @@ CurlSession::lockSharedHandle(CURL* handle, curl_lock_data data,
 
     switch (data) {
         case CURL_LOCK_DATA_DNS:
-            //log_debug(_("Locking DNS cache mutex"));
+            //log_debug("Locking DNS cache mutex");
             lock(_dnscacheMutex);
-            //log_debug(_("DNS cache mutex locked"));
+            //log_debug("DNS cache mutex locked");
             break;
         case CURL_LOCK_DATA_COOKIE:
-            //log_debug(_("Locking cookies mutex"));
+            //log_debug("Locking cookies mutex");
             lock(_cookieMutex); 
-            //log_debug(_("Cookies mutex locked"));
+            //log_debug("Cookies mutex locked");
             break;
         case CURL_LOCK_DATA_SHARE:
-            //log_debug(_("Locking share mutex"));
+            //log_debug("Locking share mutex");
             lock(_shareMutex); 
-            //log_debug(_("Share mutex locked"));
+            //log_debug("Share mutex locked");
             break;
         case CURL_LOCK_DATA_SSL_SESSION:
             log_error(_("lockSharedHandle: SSL session locking unsupported"));
@@ -359,15 +359,15 @@ CurlSession::unlockSharedHandle(CURL* handle, curl_lock_data data)
     // sure that only one lock is given at any time for each kind of data.
     switch (data) {
     case CURL_LOCK_DATA_DNS:
-	//log_debug(_("Unlocking DNS cache mutex"));
+	//log_debug("Unlocking DNS cache mutex");
 	unlock(_dnscacheMutex);
 	break;
     case CURL_LOCK_DATA_COOKIE:
-	//log_debug(_("Unlocking cookies mutex"));
+	//log_debug("Unlocking cookies mutex");
 	unlock(_cookieMutex);
 	break;
     case CURL_LOCK_DATA_SHARE:
-	//log_debug(_("Unlocking share mutex"));
+	//log_debug("Unlocking share mutex");
 	unlock(_shareMutex);
 	break;
     case CURL_LOCK_DATA_SSL_SESSION:
@@ -531,7 +531,7 @@ size_t
 CurlStreamFile::recv(void *buf, size_t size, size_t nmemb, void *userp)
 {
 #ifdef GNASH_CURL_VERBOSE
-    log_debug(_("curl write callback called for (%d) bytes"),
+    log_debug("curl write callback called for (%d) bytes",
         size * nmemb);
 #endif
     CurlStreamFile* stream = static_cast<CurlStreamFile*>(userp);
@@ -572,7 +572,7 @@ CurlStreamFile::fillCacheNonBlocking()
 {
     if ( ! _running ) {
 #if GNASH_CURL_VERBOSE
-        log_debug(_("Not running: fillCacheNonBlocking returning"));
+        log_debug("Not running: fillCacheNonBlocking returning");
 #endif
         return;
     }
@@ -598,15 +598,15 @@ CurlStreamFile::fillCache(std::streampos size)
 {
 
 #if GNASH_CURL_VERBOSE
-    log_debug(_("fillCache(%d), called, currently cached: %d"), size, _cached);
+    log_debug("fillCache(%d), called, currently cached: %d", size, _cached);
 #endif 
 
     assert(size >= 0);
 
     if ( ! _running || _cached >= size) {
 #if GNASH_CURL_VERBOSE
-        if (!_running) log_debug(_("Not running: returning"));
-        else log_debug(_("Already enough bytes cached: returning"));
+        if (!_running) log_debug("Not running: returning");
+        else log_debug("Already enough bytes cached: returning");
 #endif
         return;
     }
@@ -625,7 +625,7 @@ CurlStreamFile::fillCache(std::streampos size)
             RcInitFile::getDefaultInstance().getStreamsTimeout()*1000);
 
 #ifdef GNASH_CURL_VERBOSE
-    log_debug(_("User timeout is %u milliseconds"), userTimeout);
+    log_debug("User timeout is %u milliseconds", userTimeout);
 #endif
 
     WallClockTimer lastProgress; // timer since last progress
@@ -638,7 +638,7 @@ CurlStreamFile::fillCache(std::streampos size)
         if (_cached >= size || !_running) break; 
 	
 #if GNASH_CURL_VERBOSE
-        //log_debug(_("cached: %d, size: %d"), _cached, size);
+        //log_debug("cached: %d, size: %d", _cached, size);
 #endif
 	
         // Zero these out _before_ calling curl_multi_fdset!
@@ -656,13 +656,13 @@ CurlStreamFile::fillCache(std::streampos size)
         }
 
 #ifdef GNASH_CURL_VERBOSE
-        log_debug(_("Max fd: %d"), maxfd);
+        log_debug("Max fd: %d", maxfd);
 #endif
 
         // A value of -1 means no file descriptors were added.
         if (maxfd < 0) {
 #if GNASH_CURL_VERBOSE
-            log_debug(_("curl_multi_fdset: maxfd == %1%"), maxfd);
+            log_debug("curl_multi_fdset: maxfd == %1%", maxfd);
 #endif
 	    // As of libcurl 7.21.x, the DNS resolving appears to be going
 	    // on in the background, so curl_multi_fdset fails to return
@@ -682,7 +682,7 @@ CurlStreamFile::fillCache(std::streampos size)
         tv.tv_usec = maxSleepUsec;
 
 #ifdef GNASH_CURL_VERBOSE
-        log_debug(_("select() with %d milliseconds timeout"), maxSleepUsec*1000);
+        log_debug("select() with %d milliseconds timeout", maxSleepUsec*1000);
 #endif
 
         // Wait for data on the filedescriptors until a timeout set
@@ -697,7 +697,7 @@ CurlStreamFile::fillCache(std::streampos size)
                 // we got interrupted by a signal
                 // let's consider this as a timeout
 #ifdef GNASH_CURL_VERBOSE
-                log_debug(_("select() was interrupted by a signal"));
+                log_debug("select() was interrupted by a signal");
 #endif
                 ret = 0;
             } else {
@@ -713,7 +713,7 @@ CurlStreamFile::fillCache(std::streampos size)
             // Timeout, check the clock to see
             // if we expired the user Timeout
 #ifdef GNASH_CURL_VERBOSE
-            log_debug(_("select() timed out, elapsed is %u"),
+            log_debug("select() timed out, elapsed is %u",
 		      lastProgress.elapsed());
 #endif
             if (userTimeout && lastProgress.elapsed() > userTimeout) {
@@ -725,7 +725,7 @@ CurlStreamFile::fillCache(std::streampos size)
         } else {
             // Activity, reset the timer...
 #ifdef GNASH_CURL_VERBOSE
-            log_debug(_("FD activity, resetting progress timer"));
+            log_debug("FD activity, resetting progress timer");
 #endif
             lastProgress.restart();
         }
@@ -765,7 +765,7 @@ CurlStreamFile::processMessages()
                     _error = true;
                     _running = false;
                 } else {
-                    log_debug(_("HTTP response %ld from url %s"),
+                    log_debug("HTTP response %ld from url %s",
 				code, _url);
                 }
 
@@ -914,7 +914,7 @@ are not honored during the DNS lookup - which you can  work  around  by
 CurlStreamFile::CurlStreamFile(const std::string& url,
         const std::string& cachefile)
 {
-    log_debug(_("CurlStreamFile %p created"), this);
+    log_debug("CurlStreamFile %p created", this);
     init(url, cachefile);
 
     // CURLMcode ret =
@@ -928,7 +928,7 @@ CurlStreamFile::CurlStreamFile(const std::string& url,
 CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars,
        const std::string& cachefile)
 {
-    log_debug(_("CurlStreamFile %p created"), this);
+    log_debug("CurlStreamFile %p created", this);
     init(url, cachefile);
 
     _postdata = vars;
@@ -981,7 +981,7 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars,
         const NetworkAdapter::RequestHeaders& headers,
         const std::string& cachefile)
 {
-    log_debug(_("CurlStreamFile %p created"), this);
+    log_debug("CurlStreamFile %p created", this);
     init(url, cachefile);
 
     _postdata = vars;
@@ -1047,7 +1047,7 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars,
 /*public*/
 CurlStreamFile::~CurlStreamFile()
 {
-    log_debug(_("CurlStreamFile %p deleted"), this);
+    log_debug("CurlStreamFile %p deleted", this);
     curl_multi_remove_handle(_mhandle, _handle);
     curl_easy_cleanup(_handle);
     curl_multi_cleanup(_mhandle);
@@ -1062,18 +1062,17 @@ CurlStreamFile::read(void *dst, std::streamsize bytes)
     if ( eof() || _error ) return 0;
 
 #ifdef GNASH_CURL_VERBOSE
-    log_debug(_("read(%d) called"), bytes);
+    log_debug("read(%d) called", bytes);
 #endif
 
     fillCache(bytes + tell());
     if ( _error ) return 0; // error can be set by fillCache
 
 #ifdef GNASH_CURL_VERBOSE
-    log_debug(_("_cache.tell = %d"), tell());
+    log_debug("_cache.tell = %d", tell());
 #endif
 
     return std::fread(dst, 1, bytes, _cache);
-
 }
 
 /*public*/
@@ -1081,7 +1080,7 @@ std::streamsize
 CurlStreamFile::readNonBlocking(void *dst, std::streamsize bytes)
 {
 #ifdef GNASH_CURL_VERBOSE
-    log_debug(_("readNonBlocking(%d) called"), bytes);
+    log_debug("readNonBlocking(%d) called", bytes);
 #endif
 
     if ( eof() || _error ) return 0;
@@ -1111,7 +1110,7 @@ CurlStreamFile::eof() const
     bool ret = ( ! _running && feof(_cache) );
 
 #ifdef GNASH_CURL_VERBOSE
-    log_debug(_("eof() returning %d"), ret);
+    log_debug("eof() returning %d", ret);
 #endif
     return ret;
 
@@ -1124,7 +1123,7 @@ CurlStreamFile::tell() const
     std::streampos ret = std::ftell(_cache);
 
 #ifdef GNASH_CURL_VERBOSE
-    log_debug(_("tell() returning %ld"), ret);
+    log_debug("tell() returning %ld", ret);
 #endif
 
     return ret;
@@ -1145,7 +1144,7 @@ CurlStreamFile::seek(std::streampos pos)
 
 #ifdef GNASH_CURL_WARN_SEEKSBACK
     if ( pos < tell() ) {
-        log_debug(_("Warning: seek backward requested (%ld from %ld)"),
+        log_debug("Warning: seek backward requested (%ld from %ld)",
             pos, tell());
     }
 #endif
@@ -1210,7 +1209,7 @@ CurlStreamFile::size() const
     }
 
 #ifdef GNASH_CURL_VERBOSE
-    log_debug(_("get_stream_size() returning %lu"), _size);
+    log_debug("get_stream_size() returning %lu", _size);
 #endif
 
     return _size;
@@ -1271,7 +1270,7 @@ CurlSession::importCookies()
     //       there's no way to detect actual cookies import errors
     //       other then using curl debugging output routines
     //
-    log_debug(_("Importing cookies from file '%s'"), cookiesIn);
+    log_debug("Importing cookies from file '%s'", cookiesIn);
     curl_easy_perform(fakeHandle);
 
     curl_easy_cleanup(fakeHandle);
@@ -1315,7 +1314,7 @@ CurlSession::exportCookies()
     }
 
     // Cleanup, to trigger actual cookie file flushing
-    log_debug(_("Exporting cookies file '%s'"), cookiesOut);
+    log_debug("Exporting cookies file '%s'", cookiesOut);
     curl_easy_cleanup(fakeHandle);
 
 }
@@ -1331,7 +1330,7 @@ std::auto_ptr<IOChannel>
 NetworkAdapter::makeStream(const std::string& url, const std::string& cachefile)
 {
 #ifdef GNASH_CURL_VERBOSE
-    log_debug(_("making curl stream for %s"), url);
+    log_debug("making curl stream for %s", url);
 #endif
 
     std::auto_ptr<IOChannel> stream;
@@ -1350,7 +1349,7 @@ NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
         const std::string& cachefile)
 {
 #ifdef GNASH_CURL_VERBOSE
-    log_debug(_("making curl stream for %s"), url);
+    log_debug("making curl stream for %s", url);
 #endif
 
     std::auto_ptr<IOChannel> stream;
@@ -1427,5 +1426,5 @@ NetworkAdapter::reservedNames()
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: nill
+// indent-tabs-mode: nil
 // End:

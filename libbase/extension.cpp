@@ -71,7 +71,7 @@ Extension::Extension()
         _pluginsdir = env;
     }
 
-    log_debug(_("Plugins path: %s"), _pluginsdir);
+    log_debug("Plugins path: %s", _pluginsdir);
 #ifdef HAVE_LTDL
     lt_dlsetsearchpath(_pluginsdir.c_str());
 #endif
@@ -195,7 +195,7 @@ Extension::scanDir(const std::string& dirlist)
 
         const std::string& dir = *i;
 
-        log_debug(_("Scanning directory \"%s\" for plugins"), dir);
+        log_debug("Scanning directory \"%s\" for plugins", dir);
         DIR *libdir = opendir(dir.c_str());
 
         if (!libdir) {
@@ -223,7 +223,7 @@ Extension::scanDir(const std::string& dirlist)
             name.erase(pos);
 
             if (suffix == ".so") {
-                log_debug(_("Gnash Plugin name: %s"), name);
+                log_debug("Gnash Plugin name: %s", name);
                 _modules.push_back(name);
             }
             else {

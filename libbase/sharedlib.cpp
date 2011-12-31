@@ -158,10 +158,10 @@ SharedLib::getDllSymbol(const std::string& symbol)
     Markus: 'Id est NULL.'
     */
     if (run == NULL) {
-        log_error (_("Couldn't find symbol: %s"), symbol);
+        log_error("Couldn't find symbol: %s", symbol);
         return NULL;
     } else {
-        log_debug (_("Found symbol %s @ %p"), symbol, (void *)run);
+        log_debug("Found symbol %s @ %p", symbol, (void *)run);
     }
     
     return (entrypoint*)(run);

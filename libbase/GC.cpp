@@ -43,7 +43,7 @@ GC::GC(GcRoot& root)
 #endif
 {
 #ifdef GNASH_GC_DEBUG 
-    log_debug(_("GC %p created"), (void*)this);
+    log_debug("GC %p created", (void*)this);
 #endif
     char* gcgap = std::getenv("GNASH_GC_TRIGGER_THRESHOLD");
     if (gcgap) {
@@ -55,7 +55,7 @@ GC::GC(GcRoot& root)
 GC::~GC()
 {
 #ifdef GNASH_GC_DEBUG 
-    log_debug(_("GC deleted, deleting all managed resources - collector run %d times"), _collectorRuns);
+    log_debug("GC deleted, deleting all managed resources - collector run %d times", _collectorRuns);
 #endif
     for (ResList::const_iterator i = _resList.begin(), e = _resList.end();
             i != e; ++i) {
@@ -68,7 +68,7 @@ GC::cleanUnreachable()
 {
 
 #if (GNASH_GC_DEBUG > 1)
-    log_debug(_("GC: sweep scan started"));
+    log_debug("GC: sweep scan started");
 #endif
 
     size_t deleted = 0;
@@ -78,7 +78,7 @@ GC::cleanUnreachable()
         if (!res->isReachable()) {
 
 #if GNASH_GC_DEBUG > 1
-            log_debug(_("GC: recycling object %p (%s)"), res, typeName(*res));
+            log_debug("GC: recycling object %p (%s)", res, typeName(*res));
 #endif
             ++deleted;
             delete res;
@@ -93,7 +93,7 @@ GC::cleanUnreachable()
     _resListSize -= deleted;
 
 #ifdef GNASH_GC_DEBUG 
-    log_debug(_("GC: recycled %d unreachable resources - %d left"),
+    log_debug("GC: recycled %d unreachable resources - %d left",
             deleted, _resListSize);
 #endif
 
@@ -112,8 +112,8 @@ GC::runCycle()
 #endif
 
 #ifdef GNASH_GC_DEBUG 
-    log_debug(_("GC: collection cycle started - %d/%d new resources "
-            "allocated since last run (from %d to %d)"),
+    log_debug("GC: collection cycle started - %d/%d new resources "
+            "allocated since last run (from %d to %d)",
             _resListSize - _lastResCount, _maxNewCollectablesCount,
             _lastResCount, _resListSize);
 #endif // GNASH_GC_DEBUG

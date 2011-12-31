@@ -138,7 +138,7 @@ InflaterIOChannel::reset()
     m_at_eof = 0;
     const int err = inflateReset(&m_zstream);
     if (err != Z_OK) {
-	    log_error(_("inflater_impl::reset() inflateReset() returned %d"),
+	    log_error("inflater_impl::reset() inflateReset() returned %d",
 		      err);
         m_error = 1;
         return;
@@ -257,14 +257,14 @@ bool
 InflaterIOChannel::seek(std::streampos pos)
 {
     if (m_error) {
-	    log_debug(_("Inflater is in error condition"));
+	    log_error("Inflater is in error condition");
         return false;
     }
 
     // If we're seeking backwards, then restart from the beginning.
     if (pos < m_logical_stream_pos) {
-	    log_debug(_("inflater reset due to seek back from %d to %d"),
-                m_logical_stream_pos, pos );
+	    log_debug("inflater reset due to seek back from %d to %d",
+		      m_logical_stream_pos, pos );
         reset();
     }
 
@@ -281,7 +281,7 @@ InflaterIOChannel::seek(std::streampos pos)
         std::streamsize bytes_read = inflate_from_stream(temp, readNow);
         assert(bytes_read <= readNow);
         if (bytes_read == 0) {
-		log_debug(_("Trouble: can't seek any further.. "));
+		log_error("Trouble: can't seek any further.. ");
             return false;
         }
     }
@@ -304,7 +304,7 @@ InflaterIOChannel::InflaterIOChannel(std::auto_ptr<IOChannel> in)
 
     const int err = inflateInit(&m_zstream);
     if (err != Z_OK) {
-	    log_error(_("inflateInit() returned %d"), err);
+	    log_error("inflateInit() returned %d", err);
         m_error = 1;
         return;
     }
@@ -326,5 +326,5 @@ std::auto_ptr<IOChannel> make_inflater(std::auto_ptr<IOChannel> in)
 // mode: C++
 // c-basic-offset: 8 
 // tab-width: 8
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

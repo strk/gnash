@@ -202,7 +202,7 @@ RTMP::call(const SimpleBuffer& amf)
 bool
 RTMP::connect(const URL& url)
 {
-    log_debug(_("Connecting to %s"), url.str());
+    log_debug("Connecting to %s", url.str());
 
     const std::string& hostname = url.hostname();
     const std::string& p = url.port();
@@ -254,7 +254,7 @@ RTMP::update()
         // If we haven't finished reading a packet, retrieve it; otherwise
         // use an empty one.
         if (_incompletePacket.get()) {
-            log_debug(_("Doing incomplete packet"));
+            log_debug("Doing incomplete packet");
             p = *_incompletePacket;
             _incompletePacket.reset();
         }
@@ -289,7 +289,7 @@ RTMP::handlePacket(const RTMPPacket& packet)
 {
     const PacketType t = packet.header.packetType;
 
-    log_debug(_("Received %s"), t);
+    log_debug("Received %s", t);
 
     switch (t) {
 
@@ -379,7 +379,7 @@ RTMP::readSocket(boost::uint8_t* buffer, int n)
     // Doesn't seem very likely to be the way the pp does it.
     if (_bytesIn > _bytesInSent + _bandwidth / 2) {
         sendBytesReceived(this);
-        log_debug(_("Sent bytes received"));
+        log_debug("Sent bytes received");
     }
 
     buffer += bytesRead;
@@ -440,13 +440,13 @@ RTMP::readPacketHeader(RTMPPacket& packet)
         return false;
     }
 
-    //log_debug(_("Packet is %s"), boost::io::group(std::hex, (unsigned)hbuf[0]));
+    //log_debug("Packet is %s", boost::io::group(std::hex, (unsigned)hbuf[0]));
 
     const int htype = ((hbuf[0] & 0xc0) >> 6);
-    //log_debug(_("Thingy whatsit (packet size type): %s"), htype);
+    //log_debug("Thingy whatsit (packet size type): %s", htype);
 
     const int channel = (hbuf[0] & 0x3f);
-    //log_debug(_("Channel: %s"), channel);
+    //log_debug("Channel: %s", channel);
 
     hr.headerType = static_cast<PacketSize>(htype);
     hr.channel = channel;
@@ -468,7 +468,7 @@ RTMP::readPacketHeader(RTMPPacket& packet)
       
         const boost::uint32_t tmp = (hbuf[2] << 8) + hbuf[1];
         hr.channel = tmp + 64;
-        log_debug(_("%s, channel: %0x"), __FUNCTION__, hr.channel);
+        log_debug("%s, channel: %0x", __FUNCTION__, hr.channel);
         header += 2;
     }
   
@@ -625,19 +625,19 @@ RTMP::sendPacket(RTMPPacket& packet)
         // If this timestamp is later than the other and the difference fits
         // in 3 bytes, encode a relative one.
         if (uptime >= oldh._timestamp && uptime - prevTimestamp < 0xffffff) {
-            //log_debug(_("Shrinking to medium"));
+            //log_debug("Shrinking to medium");
             hr.headerType = RTMP_PACKET_SIZE_MEDIUM;
             hr._timestamp = uptime - prevTimestamp;
 
             // It can be still smaller if the data size is the same.
             if (oldh.dataSize == hr.dataSize &&
                     oldh.packetType == hr.packetType) {
-                //log_debug(_("Shrinking to small"));
+                //log_debug("Shrinking to small");
                 hr.headerType = RTMP_PACKET_SIZE_SMALL;
                 // If there is no timestamp difference, the minimum size
                 // is possible.
                 if (hr._timestamp == 0) {
-                    //log_debug(_("Shrinking to minimum"));
+                    //log_debug("Shrinking to minimum");
                     hr.headerType = RTMP_PACKET_SIZE_MINIMUM;
                 }
             }
@@ -780,7 +780,7 @@ RTMP::sendPacket(RTMPPacket& packet)
         const boost::uint8_t* pos = payloadData(packet) + 1;
         const boost::uint8_t* end = payloadEnd(packet);
         const std::string& s = amf::readString(pos, end);
-        log_debug(_("Calling remote method %s"), s);
+        log_debug("Calling remote method %s", s);
     }
 
     RTMPPacket& storedpacket = storePacket(CHANNELS_OUT, hr.channel, packet);
@@ -854,7 +854,7 @@ HandShaker::call()
             _stage = 3;
         case 3:
             if (!stage3()) return;
-            log_debug(_("Handshake completed"));
+            log_debug("Handshake completed");
             _complete = true;
     }
 }
@@ -906,9 +906,9 @@ HandShaker::stage1()
     std::memcpy(&suptime, serverSig, 4);
     suptime = ntohl(suptime);
 
-    log_debug(_("Server Uptime : %d"), suptime);
-              log_debug(_("FMS Version   : %d.%d.%d.%d"),
-            +serverSig[4], +serverSig[5], +serverSig[6], +serverSig[7]);
+    log_debug("Server Uptime : %d", suptime);
+    log_debug("FMS Version   : %d.%d.%d.%d",
+              +serverSig[4], +serverSig[5], +serverSig[6], +serverSig[7]);
 
     return true;
 }
@@ -969,7 +969,7 @@ HandShaker::stage3()
 bool
 sendCtrl(RTMP& r, ControlType t, unsigned int nObject, unsigned int nTime)
 {
-    log_debug(_("Sending control type %s %s"), +t, t);
+    log_debug("Sending control type %s %s", +t, t);
   
     RTMPPacket packet(256);
   
@@ -1026,7 +1026,7 @@ handleChangeChunkSize(RTMP& r, const RTMPPacket& packet)
 {
     if (payloadSize(packet) >= 4) {
         r._inChunkSize = amf::readNetworkLong(payloadData(packet));
-        log_debug(_("Changed chunk size to %d"), r._inChunkSize);
+        log_debug("Changed chunk size to %d", r._inChunkSize);
     }
 }
 
@@ -1050,7 +1050,7 @@ handleControl(RTMP& r, const RTMPPacket& packet)
     }
     
     const int arg = amf::readNetworkLong(payloadData(packet) + 2);
-    log_debug(_("Received control packet %s with argument %s"), t, arg);
+    log_debug("Received control packet %s with argument %s", t, arg);
   
     switch (t)
     {
@@ -1067,7 +1067,7 @@ handleControl(RTMP& r, const RTMPPacket& packet)
             break;
   
         case CONTROL_RESET_STREAM:
-            log_debug(_("Stream is recorded: %s"), arg);
+            log_debug("Stream is recorded: %s", arg);
             break;
   
         case CONTROL_PING:
@@ -1093,7 +1093,7 @@ void
 handleServerBW(RTMP& r, const RTMPPacket& packet)
 {
     const boost::uint32_t bw = amf::readNetworkLong(payloadData(packet));
-    log_debug(_("Server bandwidth is %s"), bw);
+    log_debug("Server bandwidth is %s", bw);
     r.setServerBandwidth(bw);
 }
 
@@ -1107,7 +1107,7 @@ handleClientBW(RTMP& r, const RTMPPacket& packet)
     if (payloadSize(packet) > 4) r.m_nClientBW2 = payloadData(packet)[4];
     else r.m_nClientBW2 = -1;
       
-    log_debug(_("Client bandwidth is %d %d"), r.bandwidth(), +r.m_nClientBW2);
+    log_debug("Client bandwidth is %d %d", r.bandwidth(), +r.m_nClientBW2);
 }
 
 

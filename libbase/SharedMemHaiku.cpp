@@ -51,32 +51,32 @@ SharedMem::SharedMem(size_t size)
     _shmid(0),
     _shmkey(0)
 {
-    log_unimpl(_("%s on Haiku"), __FUNCTION__);
+    log_unimpl("%s on Haiku", __FUNCTION__);
 }
 
 SharedMem::~SharedMem()
 {
-    log_unimpl(_("%s on Haiku"), __FUNCTION__);
+    log_unimpl("%s on Haiku", __FUNCTION__);
 }
 
 bool
 SharedMem::lock() const
 {
-    log_unimpl(_("%s on Haiku"), __FUNCTION__);
+    log_unimpl("%s on Haiku", __FUNCTION__);
     return false;
 }
 
 bool
 SharedMem::unlock() const
 {
-    log_unimpl(_("%s on Haiku"), __FUNCTION__);
+    log_unimpl("%s on Haiku", __FUNCTION__);
     return false;
 }
 
 bool
 SharedMem::attach()
 {
-    log_unimpl(_("%s on Haiku"), __FUNCTION__);
+    log_unimpl("%s on Haiku", __FUNCTION__);
     return false;
 }
 
@@ -84,5 +84,5 @@ SharedMem::attach()
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

@@ -74,7 +74,7 @@ Socket::connected() const
             // for POSIX.
             if (::getsockopt(_socket, SOL_SOCKET, SO_ERROR,
                         reinterpret_cast<char*>(&val), &len) < 0) {
-                log_debug(_("Error"));
+                log_debug("Socket Error");
                 _error = true;
                 return false;
             }
@@ -91,7 +91,7 @@ Socket::connected() const
         if (ret == -1) {
             const int err = errno;
             if (err == EINTR) {
-                log_debug(_("Socket interrupted by a system call"));
+                log_debug("Socket interrupted by a system call");
                 continue;
             }
 
@@ -151,7 +151,7 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     
     if (_socket < 0) {
         const int err = errno;
-        log_debug(_("Socket creation failed: %s"), std::strerror(err));
+        log_error(_("Socket creation failed: %s"), std::strerror(err));
         _socket = 0;
         return false;
     }

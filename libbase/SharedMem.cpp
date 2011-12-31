@@ -118,11 +118,11 @@ SharedMem::attach()
 
     // Check rcfile for key; if there isn't one, use the Adobe key.
     if (_shmkey == 0) {
-        log_debug(_("No shared memory key specified in rcfile. Using default for communication with other players"));
+        log_debug("No shared memory key specified in rcfile. Using default for communication with other players");
         _shmkey = 0xdd3adabd;
     }
     
-    log_debug(_("Using shared memory key %s"),
+    log_debug("Using shared memory key %s",
             boost::io::group(std::hex, std::showbase, _shmkey));
 
     // First get semaphore.
