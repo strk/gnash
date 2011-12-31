@@ -135,7 +135,7 @@ public:
         assert(!_error);
 
         if (val.is_function()) {
-            log_debug(_("SOL: skip serialization of FUNCTION property"));
+            log_debug("SOL: skip serialization of FUNCTION property");
             return true;
         }
 
@@ -334,7 +334,7 @@ SharedObject_as::flush(int space) const
         }
         
 #ifdef USE_SOL_READONLY
-        log_debug(_("SharedObject %s not flushed (compiled as read-only mode)"),
+        log_debug("SharedObject %s not flushed (compiled as read-only mode)",
                   filespec);
         return false;
 #endif
@@ -397,15 +397,15 @@ SharedObjectLibrary::SharedObjectLibrary(VM& vm)
 
     _solSafeDir = rcfile.getSOLSafeDir();
     if (_solSafeDir.empty()) {
-        log_debug(_("Empty SOLSafeDir directive: we'll use '/tmp'"));
+        log_debug("Empty SOLSafeDir directive: we'll use '/tmp'");
         _solSafeDir = "/tmp/";
     }
 
     // Check if the base dir exists here
     struct stat statbuf;
     if (stat(_solSafeDir.c_str(), &statbuf) == -1) {
-        log_debug(_("Invalid SOL safe dir %s: %s. Will try to create on "
-                    "flush/exit."), _solSafeDir, std::strerror(errno));
+        log_debug("Invalid SOL safe dir %s: %s. Will try to create on "
+                  "flush/exit.", _solSafeDir, std::strerror(errno));
     }
 
     // Which URL we should use here is under research.
@@ -562,11 +562,11 @@ SharedObjectLibrary::getLocal(const std::string& objName,
     // If the shared object was already opened, use it.
     SoLib::iterator it = _soLib.find(key);
     if (it != _soLib.end()) {
-        log_debug(_("SharedObject %s already known, returning it"), key);
+        log_debug("SharedObject %s already known, returning it", key);
         return &it->second->owner();
     }
 
-    log_debug(_("SharedObject %s not loaded. Loading it now"), key);
+    log_debug("SharedObject %s not loaded. Loading it now", key);
 
     // Otherwise create a new one and register to the lib
     SharedObject_as* sh = createSharedObject(*_vm.getGlobal());
@@ -580,7 +580,7 @@ SharedObjectLibrary::getLocal(const std::string& objName,
     newspec += ".sol";
     sh->setFilespec(newspec);
 
-    log_debug(_("SharedObject path: %s"), newspec);
+    log_debug("SharedObject path: %s", newspec);
         
     as_object* data = readSOL(_vm, newspec);
 
@@ -796,14 +796,14 @@ sharedobject_getLocal(const fn_call& fn)
         root = fn.arg(1).to_string(swfVersion);
     }
 
-    log_debug(_("SO name:%s, root:%s"), objName, root);
+    log_debug("SO name:%s, root:%s", objName, root);
 
     VM& vm = getVM(fn);
 
     as_object* obj = vm.getSharedObjectLibrary().getLocal(objName, root);
 
     as_value ret(obj);
-    log_debug(_("SharedObject.getLocal returning %s"), ret);
+    log_debug("SharedObject.getLocal returning %s", ret);
     return ret;
 }
 
@@ -892,7 +892,7 @@ readSOL(VM& vm, const std::string& filespec)
 
     if (stat(filespec.c_str(), &st) != 0) {
         // No existing SOL file. A new one will be created.
-        log_debug(_("No existing SOL %s found. Will create on flush/exit."),
+        log_debug("No existing SOL %s found. Will create on flush/exit.",
 		  filespec);
         return data;
     }
@@ -934,8 +934,8 @@ readSOL(VM& vm, const std::string& filespec)
 
         while (buf != end) {
 
-            log_debug(_("readSOL: reading property name at "
-                      "byte %s"), buf - sbuf.get());
+            log_debug("readSOL: reading property name at "
+                      "byte %s", buf - sbuf.get());
             // read property name
             
             if (end - buf < 2) {
@@ -969,7 +969,7 @@ readSOL(VM& vm, const std::string& filespec)
                 return 0;
             }
 
-            log_debug(_("parsed sol member named '%s' (len %s),  value '%s'"),
+            log_debug("parsed sol member named '%s' (len %s),  value '%s'",
                     prop_name, len, as);
 
             // set name/value as a member of this (SharedObject) object
@@ -1061,7 +1061,7 @@ encodeData(const std::string& name, as_object& data, SimpleBuffer& buf)
     if (!props.success()) {
         // There are good reasons for this to fail, so it's not an error. Real
         // errors are logged during serialization.
-        log_debug(_("Did not serialize object"));
+        log_debug("Did not serialize object");
         return false;
     }
     return true;

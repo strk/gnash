@@ -705,7 +705,7 @@ parseDisplayString(const std::string& display)
 	if (cmp(display, "block")) return TextField::TEXTFORMAT_BLOCK;
 	
     // Is this correct? We have to return something here...
-	log_debug(_("Invalid display string %s "), display);
+	log_debug("Invalid display string %s ", display);
     return TextField::TEXTFORMAT_BLOCK;
 }
 

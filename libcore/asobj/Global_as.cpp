@@ -678,7 +678,7 @@ global_asconstructor(const fn_call& fn)
     VM& vm = getVM(fn);
     as_function* fun = vm.getNative(x, y);
     if (!fun) {
-        log_debug(_("No ASnative(%d, %d) registered with the VM"), x, y);
+        log_debug("No ASnative(%d, %d) registered with the VM", x, y);
         return as_value();
     }
 
@@ -721,7 +721,7 @@ global_asnative(const fn_call& fn)
     VM& vm = getVM(fn);
     as_function* fun = vm.getNative(x, y);
     if (!fun) {
-        log_debug(_("No ASnative(%d, %d) registered with the VM"), x, y);
+        log_debug("No ASnative(%d, %d) registered with the VM", x, y);
         return as_value();
     }
     return as_value(fun);

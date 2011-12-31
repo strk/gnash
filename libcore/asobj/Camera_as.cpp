@@ -268,7 +268,7 @@ camera_get(const fn_call& fn)
 
     const size_t nargs = fn.nargs;
     if (nargs > 0) {
-        log_debug(_("%s: the camera is automatically chosen from gnashrc"),
+        log_debug("%s: the camera is automatically chosen from gnashrc",
                 "Camera.get()");
     }
 

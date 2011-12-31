@@ -1443,7 +1443,7 @@ BufferedAudioStreamer::detachAuxStreamer()
     if ( ! _soundHandler ) return;
     if ( !_auxStreamer )
     {
-        log_debug(_("detachAuxStreamer called while not attached"));
+        log_debug("detachAuxStreamer called while not attached");
         return;
     }
     _soundHandler->unplugInputStream(_auxStreamer);
@@ -1481,8 +1481,8 @@ BufferedAudioStreamer::fetch(boost::int16_t* samples, unsigned int nSamples, boo
     boost::mutex::scoped_lock lock(_audioQueueMutex);
 
 #if 0
-    log_debug(_("audio_streamer called, audioQueue size: %d, "
-                "requested %d bytes of fill-up"),
+    log_debug("audio_streamer called, audioQueue size: %d, "
+                "requested %d bytes of fill-up",
         _audioQueue.size(), len);
 #endif
 
@@ -1871,7 +1871,7 @@ executeTag(const SimpleBuffer& _buffer, as_object& thisPtr)
                           "undefined"));
 	}
 
-	log_debug(_("Calling %s(%s)"), funcName, arg);
+	log_debug("Calling %s(%s)", funcName, arg);
 	callMethod(&thisPtr, funcKey, arg);
 }
 

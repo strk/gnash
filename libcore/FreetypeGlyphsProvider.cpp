@@ -263,7 +263,7 @@ FreetypeGlyphsProvider::close()
 {
     const int error = FT_Done_FreeType(m_lib);
     if (error) {
-        log_error(_("Can't close FreeType! Error %d"), error);
+        log_error(_("Can't close FreeType! Error = %d"), error);
     }
 }
 

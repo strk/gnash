@@ -188,7 +188,7 @@ MovieLoader::clear()
         _wakeup.notify_all(); // in case it was sleeping
 
 #ifdef GNASH_DEBUG_LOCKING
-        log_debug("clear: lock on requests: release ater notify_all");
+        log_debug("clear: lock on requests: release after notify_all");
 #endif
         requestsLock.unlock(); // allow the thread to die
 

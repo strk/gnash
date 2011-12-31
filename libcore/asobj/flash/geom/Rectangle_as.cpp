@@ -646,7 +646,7 @@ Rectangle_ctor(const fn_call& fn)
 as_value
 get_flash_geom_rectangle_constructor(const fn_call& fn)
 {
-    log_debug(_("Loading flash.geom.Rectangle class"));
+    log_debug("Loading flash.geom.Rectangle class");
     Global_as& gl = getGlobal(fn);
     as_object* proto = createObject(gl);
     attachRectangleInterface(*proto);

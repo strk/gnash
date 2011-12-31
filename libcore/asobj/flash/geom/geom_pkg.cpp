@@ -38,7 +38,7 @@ namespace {
 as_value
 get_flash_geom_package(const fn_call& fn)
 {
-    log_debug(_("Loading flash.geom package"));
+    log_debug("Loading flash.geom package");
     Global_as& gl = getGlobal(fn);
 
     as_object *pkg = createObject(gl);

@@ -114,7 +114,7 @@ attachBitmapFilterInterface(as_object& o)
 as_value
 getBitmapFilterConstructor(const fn_call& fn)
 {
-    log_debug(_("Loading flash.filters.BitmapFilter class"));
+    log_debug("Loading flash.filters.BitmapFilter class");
     Global_as& gl = getGlobal(fn);
     VM& vm = getVM(fn);
     

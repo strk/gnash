@@ -293,7 +293,7 @@ LocalConnection_as::update()
     // processes.
     SharedMem::Lock lock(_shm);
     if (!lock.locked()) {
-        log_debug(_("Failed to get shm lock"));
+        log_error(_("Failed to get shm lock"));
         return;
     }
 
@@ -344,8 +344,8 @@ LocalConnection_as::update()
             const boost::uint32_t timeNow = getTimestamp(vm);
 
             if (timeNow - timestamp > timeout) {
-                log_debug(_("Data %s expired at %s. Removing its target "
-                            "as a listener"), timestamp, timeNow);
+                log_debug("Data %s expired at %s. Removing its target "
+                            "as a listener", timestamp, timeNow);
                 removeListener(connection, _shm);
                 markRead(_shm);
                 _lastTime = 0;
@@ -771,7 +771,7 @@ addListener(const std::string& name, SharedMem& mem)
             getMarker(next, mem.end());
             
             if (std::equal(name.c_str(), name.c_str() + name.size(), ptr)) {
-                log_debug(_("Not adding duplicated listener"));
+                log_debug("Not adding duplicated listener");
                 return false;
             }
 
@@ -845,7 +845,7 @@ executeAMFFunction(as_object& o, amf::Reader& rd)
         return;
     }
     const std::string& domain = a.to_string();
-    log_debug(_("Domain: %s"), domain);
+    log_debug("Domain: %s", domain);
     
     if (!rd(a)) {
         log_error(_("Invalid function name %s"), a);
@@ -859,25 +859,25 @@ executeAMFFunction(as_object& o, amf::Reader& rd)
     if (a.is_bool()) {
 
         // Both bools have been false in all the examples I've seen.
-        log_debug(_("First bool: %s"), a);
-        if (rd(a)) log_debug(_("Second Bool: %s"), a);
+        log_debug("First bool: %s", a);
+        if (rd(a)) log_debug("Second Bool: %s", a);
 
         // We guess that the first number describes the number of data fields
         // after the second number, before the function name.
-        if (rd(a)) log_debug(_("First Number: %s"), a);
+        if (rd(a)) log_debug("First Number: %s", a);
 
         // Handle negative numbers.
         const size_t count = std::max<int>(0, toInt(a, getVM(o)));
 
         // We don't know what the second number signifies.
-        if (rd(a)) log_debug(_("Second Number: %s"), a);
+        if (rd(a)) log_debug("Second Number: %s", a);
 
         for (size_t i = 0; i < count; ++i) {
             if (!rd(a)) {
                 log_error(_("Fewer AMF fields than expected."));
                 return;
             }
-            log_debug(_("Data: %s"), a);
+            log_debug("Data: %s", a);
         }
 
         // Now we expect the next field to be the method to call.

@@ -212,16 +212,16 @@ matrix_concat(const fn_call& fn)
     fillMatrix(currentMatrix, *ptr);
 
 #ifdef GNASH_DEBUG_GEOM_MATRIX
-    log_debug(_("(Matrix.concat) This matrix (pre-transform): %s"),
+    log_debug("(Matrix.concat) This matrix (pre-transform): %s",
               currentMatrix);
-    log_debug(_("(Matrix.concat) Transform matrix: %s"),
+    log_debug("(Matrix.concat) Transform matrix: %s",
               concatMatrix);
 #endif
     
     currentMatrix = boost::numeric::ublas::prod(concatMatrix, currentMatrix);
  
 #ifdef GNASH_DEBUG_GEOM_MATRIX
-    log_debug(_("(Matrix.concat) This matrix (post-transform): %s"),
+    log_debug("(Matrix.concat) This matrix (post-transform): %s",
               currentMatrix);
 #endif 
     
@@ -553,7 +553,7 @@ matrix_rotate(const fn_call& fn)
     currentMatrix(1, 1) = toNumber(d, getVM(fn));
 
 #ifdef GNASH_DEBUG_GEOM_MATRIX
-    log_debug(_("(Matrix.rotate) This matrix (pre-transform): %s"),
+    log_debug("(Matrix.rotate) This matrix (pre-transform): %s",
               currentMatrix);
 #endif
 
@@ -561,8 +561,8 @@ matrix_rotate(const fn_call& fn)
     currentMatrix = boost::numeric::ublas::prod(currentMatrix, transformMatrix);
 
 #ifdef GNASH_DEBUG_GEOM_MATRIX
-    log_debug(_("(Matrix.rotate) Transformation matrix: %s"), transformMatrix);
-    log_debug(_("(Matrix.rotate) This matrix (post-transform): %s"),
+    log_debug("(Matrix.rotate) Transformation matrix: %s", transformMatrix);
+    log_debug("(Matrix.rotate) This matrix (post-transform): %s",
               currentMatrix);
 #endif
 
@@ -630,7 +630,7 @@ matrix_scale(const fn_call& fn)
     currentMatrix(1, 1) = toNumber(d, getVM(fn));
     
 #ifdef GNASH_DEBUG_GEOM_MATRIX
-    log_debug(_("(Matrix.scale) This matrix (pre-transform): %s"),
+    log_debug("(Matrix.scale) This matrix (pre-transform): %s",
               currentMatrix);
 #endif
     
@@ -638,8 +638,8 @@ matrix_scale(const fn_call& fn)
     currentMatrix = boost::numeric::ublas::prod(currentMatrix, transformMatrix);
 
 #ifdef GNASH_DEBUG_GEOM_MATRIX
-    log_debug(_("(Matrix.scale) Transformation matrix: %s"), transformMatrix);
-    log_debug(_("(Matrix.scale) This matrix (post-transform): %s"),
+    log_debug("(Matrix.scale) Transformation matrix: %s", transformMatrix);
+    log_debug("(Matrix.scale) This matrix (post-transform): %s",
               currentMatrix);
 #endif
 
@@ -895,7 +895,7 @@ matrix_ctor(const fn_call& fn)
 as_value
 get_flash_geom_matrix_constructor(const fn_call& fn)
 {
-    log_debug(_("Loading flash.geom.Matrix class"));
+    log_debug("Loading flash.geom.Matrix class");
     Global_as& gl = getGlobal(fn);
     as_object* proto = createObject(gl);
     attachMatrixInterface(*proto);

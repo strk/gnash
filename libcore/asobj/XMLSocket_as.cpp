@@ -210,7 +210,7 @@ XMLSocket_as::checkForIncomingData()
     while (static_cast<size_t>(ptr - buf.get()) < bytesRead) {
 
 #ifdef GNASH_XMLSOCKET_DEBUG
-        log_debug(_("read: %d, this string ends: %d"), bytesRead,
+        log_debug("read: %d, this string ends: %d", bytesRead,
                 ptr + std::strlen(ptr) - buf.get());
 #endif
 
@@ -242,7 +242,7 @@ XMLSocket_as::checkForIncomingData()
     
 #ifdef GNASH_XMLSOCKET_DEBUG
     for (size_t i = 0, e = msgs.size(); i != e; ++i) {
-        log_debug(_(" Message %d: %s "), i, msgs[i]);
+        log_debug(" Message %d: %s ", i, msgs[i]);
     }
 #endif
 
@@ -303,7 +303,7 @@ xmlsocket_connect(const fn_call& fn)
 #ifdef GNASH_XMLSOCKET_DEBUG
     std::stringstream ss;
     fn.dump_args(ss);
-    log_debug(_("XMLSocket.connect(%s) called"), ss.str());
+    log_debug("XMLSocket.connect(%s) called", ss.str());
 #endif
 
     XMLSocket_as* ptr = ensure<ThisIsNative<XMLSocket_as> >(fn);

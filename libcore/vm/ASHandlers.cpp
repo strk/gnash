@@ -2949,7 +2949,7 @@ ActionEnum2(ActionExec& thread)
     as_object* obj = safeToObject(getVM(thread.env), obj_val);
     if (!obj || !obj_val.is_object()) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Top of stack not an object %s at ActionEnum2 "
+        log_aserror(_("Top of stack not an object %s at ActionEnum2"
             " execution"), obj_val);
         );
         return;
@@ -3509,7 +3509,7 @@ commonGetURL(as_environment& env, as_value target,
 
     // handle malformed sendVarsMethod
     if ((method & 3) == 3) {
-        log_error(_("Bogus GetUrl2 send vars method "
+        log_error(_("Bogus GetUrl2 send vars method"
             " in SWF file (both GET and POST requested). Using GET"));
         sendVarsMethod = MovieClip::METHOD_GET;
     }

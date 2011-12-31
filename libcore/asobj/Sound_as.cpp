@@ -330,7 +330,7 @@ void
 Sound_as::stopProbeTimer()
 {
 #ifdef GNASH_DEBUG_SOUND_AS
-    log_debug(_("stopProbeTimer called"));
+    log_debug("stopProbeTimer called");
 #endif
     getRoot(owner()).removeAdvanceCallback(this);
 }
@@ -365,7 +365,7 @@ Sound_as::probeAudio()
 
     if ( ! _soundLoaded ) {
 #ifdef GNASH_DEBUG_SOUND_AS
-        log_debug(_("Probing audio for load"));
+        log_debug("Probing audio for load");
 #endif
         if (_mediaParser->parsingCompleted()) {
 
@@ -385,7 +385,7 @@ Sound_as::probeAudio()
 
     if (isAttached()) {
 #ifdef GNASH_DEBUG_SOUND_AS
-        log_debug(_("Probing audio for end"));
+        log_debug("Probing audio for end");
 #endif
 
         boost::mutex::scoped_lock lock(_soundCompletedMutex);
@@ -406,12 +406,12 @@ Sound_as::probeAudio()
     }
     else {
 #ifdef GNASH_DEBUG_SOUND_AS
-        log_debug(_("Probing audio for start"));
+        log_debug("Probing audio for start");
 #endif
 
         bool parsingCompleted = _mediaParser->parsingCompleted();
         try {
-            log_debug(_("Attaching aux streamer"));
+            log_debug("Attaching aux streamer");
             _inputStream = attachAuxStreamerIfNeeded();
         } 
         catch (const MediaException& e) {
@@ -510,11 +510,11 @@ Sound_as::getVolume(int& volume)
     //       some other sound...
     //
     if ( _attachedCharacter ) {
-        //log_debug(_("Sound has an attached DisplayObject"));
+        //log_debug("Sound has an attached DisplayObject");
         DisplayObject* ch = _attachedCharacter->get();
         if (! ch) {
-            log_debug(_("Character attached to Sound was unloaded and "
-                        "couldn't rebind"));
+            log_debug("Character attached to Sound was unloaded and "
+                        "couldn't rebind");
             return false;
         }
         volume = ch->getVolume();
@@ -525,7 +525,7 @@ Sound_as::getVolume(int& volume)
     // sound_handler for volume. If we have no sound handler, we
     // can't do much, so we'll return false
     if (!_soundHandler) {
-        log_debug(_("We have no sound handler here..."));
+        log_debug("We have no sound handler here...");
         return false;
     }
 
@@ -546,7 +546,7 @@ void
 Sound_as::loadSound(const std::string& file, bool streaming)
 {
     if (!_mediaHandler || !_soundHandler) {
-        log_debug(_("No media or sound handlers, won't load any sound"));
+        log_debug("No media or sound handlers, won't load any sound");
         return;
     }
 
@@ -616,7 +616,7 @@ Sound_as::attachAuxStreamerIfNeeded()
 
     // start playing ASAP, a call to ::start will just change _startTime
 #ifdef GNASH_DEBUG_SOUND_AS
-    log_debug(_("Attaching the aux streamer"));
+    log_debug("Attaching the aux streamer");
 #endif
     return _soundHandler->attach_aux_streamer(getAudioWrapper, (void*) this);
 }
@@ -643,8 +643,8 @@ Sound_as::setVolume(int volume)
     if ( _attachedCharacter ) {
         DisplayObject* ch = _attachedCharacter->get();
         if ( ! ch ) {
-            log_debug(_("Character attached to Sound was unloaded and "
-                        "couldn't rebind"));
+            log_debug("Character attached to Sound was unloaded and "
+                      "couldn't rebind");
             return;
         }
         ch->setVolume(volume);
@@ -696,7 +696,7 @@ Sound_as::start(double secOff, int loops)
             boost::uint32_t seekms = boost::uint32_t(secOff * 1000);
             // TODO: boost::mutex::scoped_lock parserLock(_parserMutex);
             bool seeked = _mediaParser->seek(seekms); // well, we try...
-            log_debug(_("Seeked MediaParser to %d, returned: %d"), seekms, seeked);
+            log_debug("Seeked MediaParser to %d, returned: %d", seekms, seeked);
         }
 
 
@@ -714,7 +714,7 @@ Sound_as::start(double secOff, int loops)
             inPoint = (secOff*44100);
         }
 
-        log_debug(_("Sound.start: secOff:%d"), secOff);
+        log_debug("Sound.start: secOff:%d", secOff);
 
         _soundHandler->startSound(
                     soundId,
@@ -822,14 +822,14 @@ Sound_as::getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF)
             if ( ! frame.get() ) {
                 // just wait some more if parsing isn't complete yet
                 if ( ! parsingComplete ) {
-                    //log_debug(_("Parsing not complete and no more audio frames in input, try again later"));
+                    //log_debug("Parsing not complete and no more audio frames in input, try again later");
                     break;
                 }
 
                 // or detach and stop here...
                 // (should really honour loopings if any,
                 // but that should be only done for non-streaming sound!)
-                //log_debug(_("Parsing complete and no more audio frames in input, detaching"));
+                //log_debug("Parsing complete and no more audio frames in input, detaching");
 
                 markSoundCompleted(true);
 
@@ -845,7 +845,7 @@ Sound_as::getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF)
             // if we've been asked to start at a specific time, skip
             // any frame with earlier timestamp
             if ( frame->timestamp < _startTime ) {
-                //log_debug(_("This audio frame timestamp (%d) < requested start time (%d)"), frame->timestamp, _startTime);
+                //log_debug("This audio frame timestamp (%d) < requested start time (%d)", frame->timestamp, _startTime);
                 continue;
             }
 
@@ -857,13 +857,13 @@ Sound_as::getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF)
                 continue;
             }
 
-            //log_debug(_(" decoded %d bytes of audio"), _leftOverSize);
+            //log_debug(" decoded %d bytes of audio", _leftOverSize);
         }
 
         assert( !(_leftOverSize%2) );
 
         int n = std::min<int>(_leftOverSize, len);
-        //log_debug(_(" consuming %d bytes of decoded audio"), n);
+        //log_debug(" consuming %d bytes of decoded audio", n);
 
         std::copy(_leftOverPtr, _leftOverPtr+n, stream);
 

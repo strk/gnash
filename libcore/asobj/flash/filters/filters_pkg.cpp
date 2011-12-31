@@ -45,7 +45,7 @@ as_value
 get_flash_filters_package(const fn_call& fn)
 {
 
-    log_debug(_("Loading flash.filters package"));
+    log_debug("Loading flash.filters package");
     Global_as& gl = getGlobal(fn);
     as_object* pkg = createObject(gl);
 

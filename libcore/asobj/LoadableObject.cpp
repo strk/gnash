@@ -220,7 +220,7 @@ loadableobject_addRequestHeader(const fn_call& fn)
             std::ostringstream ss;
             fn.dump_args(ss);
             log_aserror(_("XML.addRequestHeader(%s): arguments after the"
-                            "second will be discarded"), ss.str());
+                            " second will be discarded"), ss.str());
         );
     }
     
@@ -390,7 +390,7 @@ loadableobject_sendAndLoad(const fn_call& fn)
             url.set_querystring(existingQS + dataString);
         }
 
-        log_debug(_("Using GET method for sendAndLoad: %s"), url.str());
+        log_debug("Using GET method for sendAndLoad: %s", url.str());
         str = ri.streamProvider().getStream(url.str());
     }
 

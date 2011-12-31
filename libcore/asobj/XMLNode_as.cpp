@@ -400,8 +400,8 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
     NodeType type = xml.nodeType();
 
 #ifdef GNASH_DEBUG
-    log_debug(_("Stringifying node %p with name %s, as_value %s, %u "
-                "attributes and %u children"), (void*)&xml, nodeName,
+    log_debug("Stringifying node %p with name %s, as_value %s, %u "
+	      "attributes and %u children", (void*)&xml, nodeName,
             nodeValue, xml._attributes.size(), xml._children.size());
 #endif
 

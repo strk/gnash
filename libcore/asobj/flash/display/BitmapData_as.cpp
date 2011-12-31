@@ -644,14 +644,14 @@ BitmapData_as::draw(MovieClip& mc, const Transform& transform)
 
     Renderer* base = getRunResources(*_owner).renderer();
     if (!base) {
-        log_debug(_("BitmapData.draw() called without an active renderer"));
+        log_debug("BitmapData.draw() called without an active renderer");
         return;
     }
 
     Renderer::Internal in(*base, im);
     Renderer* internal = in.renderer();
     if (!internal) {
-        log_debug(_("Current renderer does not support internal rendering"));
+        log_debug("Current renderer does not support internal rendering");
         return;
     }
 
@@ -1631,7 +1631,7 @@ bitmapdata_loadBitmap(const fn_call& fn)
 as_value
 get_flash_display_bitmap_data_constructor(const fn_call& fn)
 {
-    log_debug(_("Loading flash.display.BitmapData class"));
+    log_debug("Loading flash.display.BitmapData class");
     Global_as& gl = getGlobal(fn);
     as_object* proto = createObject(gl);
     attachBitmapDataInterface(*proto);

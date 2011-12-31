@@ -371,7 +371,7 @@ transform_ctor(const fn_call& fn)
 as_value
 get_flash_geom_transform_constructor(const fn_call& fn)
 {
-    log_debug(_("Loading flash.geom.Transform class"));
+    log_debug("Loading flash.geom.Transform class");
     Global_as& gl = getGlobal(fn);
     as_object* proto = createObject(gl);
     attachTransformInterface(*proto);

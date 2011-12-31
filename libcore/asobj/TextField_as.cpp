@@ -655,7 +655,7 @@ textfield_getTextFormat(const fn_call& fn)
     // TODO: add font color and some more
 
     LOG_ONCE(
-        log_unimpl(_("TextField.getTextFormat() discards url, target, "
+        log_unimpl(_("TextField.getTextFormat() discards URL, target, "
                      "tabStops, bullet and display")));
 
     return as_value(textformat);
@@ -1055,7 +1055,7 @@ textfield_removeTextField(const fn_call& fn)
 
     text->removeTextField();
 
-    LOG_ONCE(log_debug(_("TextField.removeTextField() TESTING")));
+    LOG_ONCE(log_debug("TextField.removeTextField() TESTING"));
 
     return as_value();
 }

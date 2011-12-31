@@ -962,7 +962,7 @@ movieclip_loadVariables(const fn_call& fn)
         static_cast<MovieClip::VariablesMethod>(toInt(val, getVM(fn)));
 
     movieclip->loadVariables(urlstr, method);
-    log_debug(_("MovieClip.loadVariables(%s) - TESTING "), urlstr);
+    log_debug("MovieClip.loadVariables(%s) - TESTING ", urlstr);
 
     return as_value();
 }
@@ -1421,7 +1421,7 @@ movieclip_setMask(const fn_call& fn)
         maskee->setMask(mask);
     }
 
-    //log_debug(_("MovieClip.setMask() TESTING"));
+    //log_debug("MovieClip.setMask() TESTING");
 
     return as_value(true);
 }
@@ -1453,7 +1453,7 @@ movieclip_lineTo(const fn_call& fn)
     if (!isFinite(y)) y = 0;
 
 #ifdef DEBUG_DRAWING_API
-    log_debug(_("%s.lineTo(%g,%g);"), movieclip->getTarget(), x, y);
+    log_debug("%s.lineTo(%g,%g);", movieclip->getTarget(), x, y);
 #endif
     movieclip->graphics().lineTo(pixelsToTwips(x), pixelsToTwips(y),
             movieclip->getDefinitionVersion());
@@ -1643,7 +1643,7 @@ movieclip_curveTo(const fn_call& fn)
     if (!isFinite(ay)) ay = 0;
 
 #ifdef DEBUG_DRAWING_API
-    log_debug(_("%s.curveTo(%g,%g,%g,%g);"), movieclip->getTarget(),
+    log_debug("%s.curveTo(%g,%g,%g,%g);", movieclip->getTarget(),
             cx, cy, ax, ay);
 #endif
     movieclip->graphics().curveTo(pixelsToTwips(cx), pixelsToTwips(cy),
@@ -1759,7 +1759,7 @@ movieclip_beginGradientFill(const fn_call& fn)
     if (!colors || !alphas || !ratios || !matrix) {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("%s.beginGradientFill(%s): one or more of the "
+        log_aserror(_("%s.beginGradientFill(%s): one or more of the"
             " args from 2nd to 5th don't cast to objects"),
             movieclip->getTarget(), ss.str());
         );
@@ -1785,8 +1785,8 @@ movieclip_beginGradientFill(const fn_call& fn)
     // this limit.
     if (stops > 15) {
         std::stringstream ss; fn.dump_args(ss);
-        log_debug(_("%s.beginGradientFill(%s): too many array elements"
-            " for colors and ratios (%d), will trim to 8"), 
+        log_debug("%s.beginGradientFill(%s): too many array elements"
+            " for colors and ratios (%d), will trim to 8", 
             movieclip->getTarget(), ss.str(), stops); 
         stops = 15;
     }
@@ -1969,8 +1969,8 @@ movieclip_beginBitmapFill(const fn_call& fn)
 
     if (!isNativeType(obj, bd) || bd->disposed()) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_debug(_("MovieClip.attachBitmap: first argument should be a "
-			"valid BitmapData"), fn.arg(1));
+            log_debug("MovieClip.attachBitmap: first argument should be a "
+			"valid BitmapData", fn.arg(1));
         );
         return as_value();
     }
@@ -2037,7 +2037,7 @@ movieclip_attachBitmap(const fn_call& fn)
 
     if (fn.nargs < 2) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_debug(_("MovieClip.attachBitmap: expected 2 args, got %d"),
+            log_debug("MovieClip.attachBitmap: expected 2 args, got %d",
                 fn.nargs);
         );
         return as_value();
@@ -2048,8 +2048,8 @@ movieclip_attachBitmap(const fn_call& fn)
 
     if (!isNativeType(obj, bd) || bd->disposed()) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_debug(_("MovieClip.attachBitmap: first argument should be a "
-		      "valid BitmapData"), fn.arg(1));
+            log_debug("MovieClip.attachBitmap: first argument should be a "
+		      "valid BitmapData", fn.arg(1));
         );
         return as_value();
     }

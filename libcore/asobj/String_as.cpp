@@ -195,7 +195,7 @@ string_slice(const fn_call& fn)
 
     size_t retlen = end - start;
 
-    //log_debug(_("start: %d, end: %d, retlen: %d"), start, end, retlen);
+    //log_debug("start: %d, end: %d, retlen: %d", start, end, retlen);
 
     return as_value(utf8::encodeCanonicalString(
                 wstr.substr(start, retlen), version));
@@ -459,7 +459,7 @@ string_substring(const fn_call& fn)
     }
     
     end -= start;
-    //log_debug(_("Start: %d, End: %d"), start, end);
+    //log_debug("Start: %d, End: %d", start, end);
 
     return as_value(utf8::encodeCanonicalString(wstr.substr(start, end), version));
 }

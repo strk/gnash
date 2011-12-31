@@ -147,7 +147,7 @@ moviecliploader_unloadClip(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss; fn.dump_args(ss);
             log_aserror(_("MovieClipLoader.unloadClip(%s): expected at least"
-                    "one argument"), ss.str());
+                    " one argument"), ss.str());
         );
         return as_value();
     }

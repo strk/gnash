@@ -398,7 +398,7 @@ colortransform_ctor(const fn_call& fn)
 as_value
 get_flash_geom_color_transform_constructor(const fn_call& fn)
 {
-    log_debug(_("Loading flash.geom.ColorTransform class"));
+    log_debug("Loading flash.geom.ColorTransform class");
     Global_as& gl = getGlobal(fn);
     as_object* proto = createObject(gl);
     as_object* cl = gl.createClass(&colortransform_ctor, proto);

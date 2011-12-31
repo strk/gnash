@@ -321,7 +321,7 @@ public:
             if (!_rtmp.connected()) return true;
             
             _connectionComplete = true;
-            log_debug(_("Initial connection complete"));
+            log_debug("Initial connection complete");
 
             const RunResources& r = getRunResources(_nc.owner());
             Global_as& gl = getGlobal(_nc.owner());
@@ -441,7 +441,7 @@ NetConnection_as::validateURL() const
         return "";
     }
 
-    log_debug(_("Connection to movie: %s"), uriStr);
+    log_debug("Connection to movie: %s", uriStr);
 
     return uriStr;
 }
@@ -665,7 +665,7 @@ netconnection_call(const fn_call& fn)
 
 #ifdef GNASH_DEBUG_REMOTING
     std::stringstream ss; fn.dump_args(ss);
-    log_debug(_("NetConnection.call(%s)"), ss.str());
+    log_debug("NetConnection.call(%s)", ss.str());
 #endif
 
     // TODO: arg(1) is the response object. let it know when data comes back
@@ -885,7 +885,7 @@ handleAMFInvoke(amf::Reader& rd, const boost::uint8_t*& b,
         std::string headerName((char*)b, namelength);
 
 #ifdef GNASH_DEBUG_REMOTING
-        log_debug(_("Invoke name %s"), headerName);
+        log_debug("Invoke name %s", headerName);
 #endif
         b += namelength;
         if (b + 5 > end) {
@@ -902,7 +902,7 @@ handleAMFInvoke(amf::Reader& rd, const boost::uint8_t*& b,
         VM& vm = getVM(owner);
         ObjectURI key = getURI(vm, headerName);
 #ifdef GNASH_DEBUG_REMOTING
-        log_debug(_("Invoking %s(%s)"), headerName, arg);
+        log_debug("Invoking %s(%s)", headerName, arg);
 #endif
         callMethod(&owner, key, arg);
     }
@@ -1009,7 +1009,7 @@ HTTPRequest::handleAMFReplies(amf::Reader& rd, const boost::uint8_t*& b,
         }
 
 #ifdef GNASH_DEBUG_REMOTING
-        log_debug(_("callback called"));
+        log_debug("callback called");
 #endif
 
         callMethod(callback, methodKey, replyval);
@@ -1045,14 +1045,14 @@ HTTPRequest::send(const URL& url, NetConnection_as& nc)
 {
     // We should never have a request without any calls.
     assert(_calls);
-    log_debug(_("creating connection"));
+    log_debug("creating connection");
 
     // Fill in header
     (reinterpret_cast<boost::uint16_t*>(_data.data() + 4))[0] = htons(_calls);
     std::string postdata(reinterpret_cast<char*>(_data.data()), _data.size());
 
 #ifdef GNASH_DEBUG_REMOTING
-    log_debug(_("NetConnection.call(): encoded args from %1% calls: %2%"),
+    log_debug("NetConnection.call(): encoded args from %1% calls: %2%",
             _calls, hexify(_data.data(), _data.size(), false));
 #endif
 
@@ -1074,7 +1074,7 @@ HTTPRequest::process(NetConnection_as& nc)
     if (!toRead) toRead = NCCALLREPLYCHUNK;
 
 #ifdef GNASH_DEBUG_REMOTING
-    log_debug(_("Attempt to read %d bytes"), toRead);
+    log_debug("Attempt to read %d bytes", toRead);
 #endif
 
     // See if we need to allocate more bytes for the next
@@ -1083,9 +1083,9 @@ HTTPRequest::process(NetConnection_as& nc)
         const size_t newCapacity = _reply.size() + toRead;
 
 #ifdef GNASH_DEBUG_REMOTING
-        log_debug(_("NetConnection.call: reply buffer capacity (%d) "
+        log_debug("NetConnection.call: reply buffer capacity (%d) "
                 "is too small to accept next %d bytes of chunk "
-		    "(current size is %d). Reserving %d bytes."),
+		    "(current size is %d). Reserving %d bytes.",
                 _reply.capacity(), toRead, _reply.size(), newCapacity);
 #endif
 
@@ -1097,8 +1097,8 @@ HTTPRequest::process(NetConnection_as& nc)
 
     if (read > 0) {
 #ifdef GNASH_DEBUG_REMOTING
-        log_debug(_("read '%1%' bytes: %2%"), read, 
-                hexify(_reply.data() + _reply.size(), read, false));
+        log_debug("read '%1%' bytes: %2%", read, 
+		  hexify(_reply.data() + _reply.size(), read, false));
 #endif
         _reply.resize(_reply.size() + read);
     }
@@ -1116,8 +1116,8 @@ HTTPRequest::process(NetConnection_as& nc)
     // the buffer is full, 2) when we have a "length in bytes" value
     // thas is satisfied
     if (_connection->bad()) {
-        log_debug(_("connection is in error condition, calling "
-		    "NetConnection.onStatus"));
+        log_debug("connection is in error condition, calling "
+		    "NetConnection.onStatus");
 
         // If the connection fails, it is manually verified
         // that the pp calls onStatus with 1 undefined argument.
@@ -1133,7 +1133,7 @@ HTTPRequest::process(NetConnection_as& nc)
     if (_reply.size() > 8) {
 
 #ifdef GNASH_DEBUG_REMOTING
-        log_debug(_("hit eof"));
+        log_debug("hit eof");
 #endif
         const boost::uint8_t *b = _reply.data();
         const boost::uint8_t *end = _reply.data() + _reply.size();
@@ -1234,11 +1234,11 @@ RTMPConnection::handleInvoke(const boost::uint8_t* payload,
     ++payload;
     std::string method = amf::readString(payload, end);
 
-    log_debug(_("Invoke: read method string %s"), method);
+    log_debug("Invoke: read method string %s", method);
     if (*payload != amf::NUMBER_AMF0) return;
     ++payload;
 
-    log_debug(_("Server invoking <%s>"), method);
+    log_debug("Server invoking <%s>", method);
     
     const ObjectURI methodname = getURI(getVM(_nc.owner()), method);
 
@@ -1246,7 +1246,7 @@ RTMPConnection::handleInvoke(const boost::uint8_t* payload,
     // by us.
     if (method == "_result") {
         const double id = amf::readNumber(payload, end);
-        log_debug(_("Received result for method call %s"),
+        log_debug("Received result for method call %s",
                 boost::io::group(std::setprecision(15), id));
 
         as_value arg;
@@ -1255,7 +1255,7 @@ RTMPConnection::handleInvoke(const boost::uint8_t* payload,
         // TODO: use all args and check the order! We currently only use
         // the last one!
         while (rd(arg)) {
-            log_debug(_("Value: %s"), arg);
+            log_debug("Value: %s", arg);
         }
 
         as_object* o = popCallback(id);
@@ -1265,7 +1265,7 @@ RTMPConnection::handleInvoke(const boost::uint8_t* payload,
     
     /// These are remote function calls initiated by the server.
     const double id = amf::readNumber(payload, end);
-    log_debug(_("Received server call %s %s"),
+    log_debug("Received server call %s %s",
             boost::io::group(std::setprecision(15), id),
             id ? "" : "(no reply expected)");
 
@@ -1284,12 +1284,12 @@ RTMPConnection::handleInvoke(const boost::uint8_t* payload,
         if (*payload != amf::NULL_AMF0) return;
         ++payload;
 #ifdef GNASH_DEBUG_REMOTING
-        log_debug(_("AMF buffer for _onbwdone: %s\n"),
+        log_debug("AMF buffer for _onbwdone: %s\n",
                 hexify(payload, end - payload, false));
 #endif
         double latency = amf::readNumber(payload, end);
         double bandwidth = amf::readNumber(payload, end);
-        log_debug(_("Latency: %s, bandwidth %s"), latency, bandwidth);
+        log_debug("Latency: %s, bandwidth %s", latency, bandwidth);
         return;
     }
 
@@ -1301,7 +1301,7 @@ RTMPConnection::handleInvoke(const boost::uint8_t* payload,
         // TODO: use all args and check the order! We currently only use
         // the last one!
         while (rd(arg)) {
-            log_debug(_("Value: %s"), arg);
+            log_debug("Value: %s", arg);
         }
 
         log_error(_("rtmp server sent error"));
@@ -1317,7 +1317,7 @@ RTMPConnection::handleInvoke(const boost::uint8_t* payload,
     // TODO: use all args and check the order! We currently only use
     // the last one!
     while (rd(arg)) {
-        log_debug(_("Value: %s"), arg);
+        log_debug("Value: %s", arg);
     }
     
     // Call method on the NetConnection object.    

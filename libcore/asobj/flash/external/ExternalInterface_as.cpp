@@ -247,7 +247,7 @@ externalinterface_addCallback(const fn_call& fn)
     movie_root& mr = getRoot(fn);
 
     if (mr.getControlFD() <= 0) {
-        log_debug(_("ExternalInterface not accessible when running standalone."));
+        log_debug("ExternalInterface not accessible when running standalone.");
         return as_value(false);
     }
 
@@ -255,7 +255,7 @@ externalinterface_addCallback(const fn_call& fn)
         const as_value& name_as = fn.arg(0);
         std::string name = name_as.to_string();
         if (fn.arg(1).is_object()) {
-            log_debug(_("adding callback %s"), name);
+            log_debug("adding callback %s", name);
             as_object* asCallback = toObject(fn.arg(1), getVM(fn));
             mr.addExternalCallback(name, asCallback);
         }
@@ -273,7 +273,7 @@ externalinterface_call(const fn_call& fn)
     as_value val;
 
     if (mr.getControlFD() <= 0) {
-        log_debug(_("ExternalInterface not accessible on call."));
+        log_debug("ExternalInterface not accessible on call.");
         val.set_null();
         return as_value(val);
     }
@@ -282,7 +282,7 @@ externalinterface_call(const fn_call& fn)
         const as_value& methodName_as = fn.arg(0);
         const std::string methodName = methodName_as.to_string();
         const std::vector<as_value>& args = fn.getArgs();
-        log_debug(_("Calling External method \"%s\""), methodName);
+        log_debug("Calling External method \"%s\"", methodName);
         std::string result = mr.callExternalJavascript(methodName, args);
         if (!result.empty()) {
             val = ExternalInterface::parseXML(result);
@@ -385,7 +385,7 @@ externalinterface_objectID(const fn_call& fn)
 as_value
 externalInterfaceConstructor(const fn_call& fn)
 {
-    log_debug(_("Loading flash.external.ExternalInterface class"));
+    log_debug("Loading flash.external.ExternalInterface class");
     Global_as& gl = getGlobal(fn);
     as_object* proto = createObject(gl);
     as_object* cl = gl.createClass(emptyFunction, proto);
