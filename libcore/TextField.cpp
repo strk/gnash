@@ -1764,7 +1764,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                     // of each glyph, even if we don't display it 
                     m_text_bounding_box.expand_to_point(x, y + fontDescent);
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
-                    log_debug("Text bbox expanded to %s (width: %f)",
+                    log_debug("Text box expanded to %s (width: %f)",
                             m_text_bounding_box, m_text_bounding_box.width());
 #endif
 

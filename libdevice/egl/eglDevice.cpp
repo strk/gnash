@@ -206,7 +206,7 @@ EGLDevice::initDevice(int /* argc */, char **/*argv[] */)
     
     // Get the number of supported configurations
     if ( EGL_FALSE == eglGetConfigs(_eglDisplay, 0, 0, &max_num_config) ) {
-        log_error(_("eglGetConfigs() failed to retrive the number of configs (error %s)"),
+        log_error(_("eglGetConfigs() failed to retrieve the number of configs (error %s)"),
                     getErrorString(eglGetError()));
         return 0;
     }
@@ -339,7 +339,7 @@ EGLDevice::bindClient(rtype_t rtype)
       {
           log_debug(_("Initializing EGL for OpenGLES2"));
           if(EGL_FALSE == eglBindAPI(EGL_OPENGL_ES_API)) {
-              log_error(_("eglBindAPI() failed to retrive the number of configs (error %s)"),
+              log_error(_("eglBindAPI() failed to retrieve the number of configs (error %s)"),
                           getErrorString(eglGetError()));
               return false;
           }
@@ -359,7 +359,7 @@ EGLDevice::bindClient(rtype_t rtype)
       {
           log_debug(_("Initializing EGL for OpenVG"));
           if(EGL_FALSE == eglBindAPI(EGL_OPENVG_API)) {
-              log_error(("eglBindAPI() failed to retrive the number of configs (error %s)"),
+              log_error(_("eglBindAPI() failed to retrieve the number of configs (error %s)"),
                          getErrorString(eglGetError()));
               return false;
           }
@@ -541,7 +541,7 @@ EGLDevice::queryEGLConfig(EGLDisplay display)
 
      // Get the number of supported configurations
      if ( EGL_FALSE == eglGetConfigs(display, 0, 0, &max_num_config) ) {
-         log_error(_("eglGetConfigs() failed to retrive the number of configs (error %s)"),
+         log_error(_("eglGetConfigs() failed to retrieve the number of configs (error %s)"),
                      getErrorString(eglGetError()));
          return 0;
      }

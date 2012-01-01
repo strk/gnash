@@ -560,7 +560,7 @@ textformat_getTextExtent(const fn_call& fn)
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("TextFormat.getTextExtent requires at least one"
-                          "argument"));
+                          " argument"));
         );
         return as_value();
     }

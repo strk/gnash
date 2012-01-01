@@ -380,7 +380,7 @@ GtkOvgGlue::queryEGLConfig(EGLDisplay display)
 
      // Get the number of supported configurations
      if ( EGL_FALSE == eglGetConfigs(display, 0, 0, &max_num_config) ) {
-         log_error(_("eglGetConfigs() failed to retrive the number of configs (error %s)"),
+         log_error(_("eglGetConfigs() failed to retrieve the number of configs (error %s)"),
                    getErrorString(eglGetError()));
          return 0;
      }

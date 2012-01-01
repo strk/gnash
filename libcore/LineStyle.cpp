@@ -183,11 +183,13 @@ LineStyle::set_lerp(const LineStyle& ls1, const LineStyle& ls2, float ratio)
     m_color = lerp(ls1.get_color(), ls2.get_color(), ratio);
     if ( ls1._scaleVertically != ls2._scaleVertically )
     {
-        LOG_ONCE(log_error(_("UNTESTED: Dunno how to interpolate line styles with different vertical thickness scaling")));
+        LOG_ONCE(log_error(_("UNTESTED: Do not know how to interpolate"
+            " line styles with different vertical thickness scaling")));
     }
     if ( ls1._scaleHorizontally != ls2._scaleHorizontally )
     {
-        LOG_ONCE(log_error(_("UNTESTED: Dunno how to interpolate line styles with different horizontal thickness scaling")));
+        LOG_ONCE(log_error(_("UNTESTED: Do not know how to interpolate"
+            " line styles with different horizontal thickness scaling")));
     }
 }
 
