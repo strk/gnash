@@ -670,7 +670,7 @@ CurlStreamFile::fillCache(std::streampos size)
 	    // give DNS enough time to resolve the lookup.
             if (userTimeout && lastProgress.elapsed() > userTimeout) {
                 log_error(_("FIXME: Timeout (%u milliseconds) while loading "
-			    "from url %s"), userTimeout, _url);
+			    "from URL %s"), userTimeout, _url);
                 // TODO: should we set _error here ?
                 return;
             } else {
@@ -718,7 +718,7 @@ CurlStreamFile::fillCache(std::streampos size)
 #endif
             if (userTimeout && lastProgress.elapsed() > userTimeout) {
                 log_error(_("Timeout (%u milliseconds) while loading "
-                            "from url %s"), userTimeout, _url);
+                            "from URL %s"), userTimeout, _url);
                 // TODO: should we set _error here ?
                 return;
             }
@@ -760,12 +760,12 @@ CurlStreamFile::processMessages()
 				  CURLINFO_RESPONSE_CODE, &code);
 		
                 if ( code >= 400 ) {
-                    log_error(_("HTTP response %ld from url %s"),
+                    log_error(_("HTTP response %ld from URL %s"),
 			      code, _url);
                     _error = true;
                     _running = false;
                 } else {
-                    log_debug("HTTP response %ld from url %s",
+                    log_debug("HTTP response %ld from URL %s",
 				code, _url);
                 }
 

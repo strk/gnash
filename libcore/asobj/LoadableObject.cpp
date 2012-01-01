@@ -309,7 +309,7 @@ loadableobject_sendAndLoad(const fn_call& fn)
     const std::string& urlstr = fn.arg(0).to_string();
     if ( urlstr.empty() ) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("sendAndLoad(): invalid empty url"));
+        log_aserror(_("sendAndLoad(): invalid empty URL"));
         );
         return as_value(false);
     }
@@ -394,7 +394,7 @@ loadableobject_sendAndLoad(const fn_call& fn)
         str = ri.streamProvider().getStream(url.str());
     }
 
-    log_security(_("Loading from url: '%s'"), url.str());
+    log_security(_("Loading from URL: '%s'"), url.str());
     
     movie_root& mr = getRoot(*obj);
     
@@ -423,7 +423,7 @@ loadableobject_load(const fn_call& fn)
     if ( urlstr.empty() )
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("load(): invalid empty url"));
+        log_aserror(_("load(): invalid empty URL"));
         );
         return as_value(false);
     }

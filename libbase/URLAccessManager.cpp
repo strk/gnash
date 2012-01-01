@@ -145,7 +145,7 @@ local_check(const std::string& path, const URL& baseUrl)
     // Don't allow local access if starting movie is a network resource.
    if (baseUrl.protocol() != "file") {
       log_security(_("Load of file %s forbidden"
-          " (starting url %s is not a local resource)"),
+          " (starting URL %s is not a local resource)"),
           path, baseUrl.str());
       return false;
    }

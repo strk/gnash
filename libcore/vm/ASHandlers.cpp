@@ -592,7 +592,7 @@ ActionGetUrl(ActionExec& thread)
     const std::string target(code.read_string(pc + 3 + urlLength));
 
     IF_VERBOSE_ACTION (
-        log_action(_("GetUrl: target=%s url=%s"), target, url);
+        log_action(_("GetUrl: target=%s URL=%s"), target, url);
     );
 
     commonGetURL(env, target, url, 0u);
@@ -1914,7 +1914,7 @@ ActionGetUrl2(ActionExec& thread)
 
     as_value url_val = env.top(1);
     if (url_val.is_undefined()) {
-        log_error(_("Undefined GetUrl2 url on stack, skipping"));
+        log_error(_("Undefined GetUrl2 URL on stack, skipping"));
     }
     else {
         const std::string& url = url_val.to_string();
@@ -3497,7 +3497,7 @@ commonGetURL(as_environment& env, as_value target,
         const std::string& url, boost::uint8_t method)
 {
     if (url.empty()) {
-        log_error(_("Bogus empty GetUrl url in SWF file, skipping"));
+        log_error(_("Bogus empty GetUrl URL in SWF file, skipping"));
         return;
     }
 
@@ -3556,8 +3556,8 @@ commonGetURL(as_environment& env, as_value target,
     // The base url must be set with the set_base_url() command.
     //
 
-    log_debug(_("get url: target=%s, url=%s, method=%x "
-                "(sendVars:%X, loadTarget:%d, loadVariable:%d)"),
+    log_debug("get url: target=%s, URL=%s, method=%x "
+                "(sendVars:%X, loadTarget:%d, loadVariable:%d)",
             target_string, url, static_cast<int>(method),
             sendVarsMethod, loadTargetFlag, loadVariableFlag);
 
@@ -3565,7 +3565,7 @@ commonGetURL(as_environment& env, as_value target,
     MovieClip* target_movie = target_ch ? target_ch->to_movie() : 0;
 
     if (loadVariableFlag) {
-        log_debug(_("getURL2 loadVariable"));
+        log_debug("getURL2 loadVariable");
 
         if (!target_ch) {
             log_error(_("getURL: target %s not found"), target_string);

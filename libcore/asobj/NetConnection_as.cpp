@@ -437,7 +437,7 @@ NetConnection_as::validateURL() const
 
     // Check if we're allowed to open url
     if (!r.streamProvider().allow(uri)) {
-        log_security(_("Gnash is not allowed to open this url: %s"), uriStr);
+        log_security(_("Gnash is not allowed to open this URL: %s"), uriStr);
         return "";
     }
 

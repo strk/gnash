@@ -578,7 +578,7 @@ Sound_as::loadSound(const std::string& file, bool streaming)
                 rcfile.saveStreamingMedia()));
 
     if (!inputStream.get()) {
-        log_error(_("Gnash could not open this url: %s"), url );
+        log_error(_("Gnash could not open this URL: %s"), url );
         // dispatch onLoad (false)
         callMethod(&owner(), NSV::PROP_ON_LOAD, false);
         return;

@@ -2150,7 +2150,7 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
         log_debug("Launching URL: %s", command);
         const int ret = std::system(command.c_str());
         if (ret == -1) {
-            log_error(_("Fork failed launching url opener '%s'"), command);
+            log_error(_("Fork failed launching URL opener '%s'"), command);
         }
         return;
     }
