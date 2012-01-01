@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-31 13:03-0700\n"
+"POT-Creation-Date: 2012-01-01 09:28-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -294,17 +294,17 @@ msgstr ""
 
 #: libbase/curl_adapter.cpp:672
 #, c-format
-msgid "FIXME: Timeout (%u milliseconds) while loading from url %s"
+msgid "FIXME: Timeout (%u milliseconds) while loading from URL %s"
 msgstr ""
 
 #: libbase/curl_adapter.cpp:720
 #, c-format
-msgid "Timeout (%u milliseconds) while loading from url %s"
+msgid "Timeout (%u milliseconds) while loading from URL %s"
 msgstr ""
 
 #: libbase/curl_adapter.cpp:763
 #, c-format
-msgid "HTTP response %ld from url %s"
+msgid "HTTP response %ld from URL %s"
 msgstr ""
 
 #: libbase/curl_adapter.cpp:774
@@ -563,7 +563,7 @@ msgstr ""
 
 #: libbase/URLAccessManager.cpp:147
 #, c-format
-msgid "Load of file %s forbidden (starting url %s is not a local resource)"
+msgid "Load of file %s forbidden (starting URL %s is not a local resource)"
 msgstr ""
 
 #: libbase/URLAccessManager.cpp:164
@@ -2857,7 +2857,7 @@ msgstr ""
 
 #: libcore/asobj/NetConnection_as.cpp:440
 #, c-format
-msgid "Gnash is not allowed to open this url: %s"
+msgid "Gnash is not allowed to open this URL: %s"
 msgstr ""
 
 #: libcore/asobj/NetConnection_as.cpp:496
@@ -3568,7 +3568,7 @@ msgstr ""
 
 #: libcore/asobj/Sound_as.cpp:581
 #, c-format
-msgid "Gnash could not open this url: %s"
+msgid "Gnash could not open this URL: %s"
 msgstr ""
 
 #: libcore/asobj/Sound_as.cpp:592
@@ -4962,7 +4962,7 @@ msgid "Getter for textformat_tabStops"
 msgstr ""
 
 #: libcore/asobj/TextFormat_as.cpp:562
-msgid "TextFormat.getTextExtent requires at least oneargument"
+msgid "TextFormat.getTextExtent requires at least one argument"
 msgstr ""
 
 #: libcore/asobj/TextFormat_as.cpp:726
@@ -5105,7 +5105,7 @@ msgid "sendAndLoad() requires at least two arguments"
 msgstr ""
 
 #: libcore/asobj/LoadableObject.cpp:312
-msgid "sendAndLoad(): invalid empty url"
+msgid "sendAndLoad(): invalid empty URL"
 msgstr ""
 
 #: libcore/asobj/LoadableObject.cpp:319
@@ -5114,7 +5114,7 @@ msgstr ""
 
 #: libcore/asobj/LoadableObject.cpp:397
 #, c-format
-msgid "Loading from url: '%s'"
+msgid "Loading from URL: '%s'"
 msgstr ""
 
 #: libcore/asobj/LoadableObject.cpp:417
@@ -5122,7 +5122,7 @@ msgid "load() requires at least one argument"
 msgstr ""
 
 #: libcore/asobj/LoadableObject.cpp:426
-msgid "load(): invalid empty url"
+msgid "load(): invalid empty URL"
 msgstr ""
 
 #: libcore/DisplayObjectContainer.cpp:75
@@ -5273,14 +5273,14 @@ msgstr ""
 
 #: libcore/LineStyle.cpp:186
 msgid ""
-"UNTESTED: Dunno how to interpolate line styles with different vertical "
+"UNTESTED: Do not know how to interpolate line styles with different vertical "
 "thickness scaling"
 msgstr ""
 
-#: libcore/LineStyle.cpp:190
+#: libcore/LineStyle.cpp:191
 msgid ""
-"UNTESTED: Dunno how to interpolate line styles with different horizontal "
-"thickness scaling"
+"UNTESTED: Do not know how to interpolate line styles with different "
+"horizontal thickness scaling"
 msgstr ""
 
 #: libcore/DisplayObject.cpp:121
@@ -5482,29 +5482,9 @@ msgstr ""
 msgid "%s: CHECKME: was broken"
 msgstr ""
 
-#: libcore/vm/ASHandlers.cpp:468
-msgid "ActionNextFrame: as_environment target is null or not a sprite"
-msgstr ""
-
-#: libcore/vm/ASHandlers.cpp:485
-msgid "ActionPrevFrame: as_environment target is null or not a sprite"
-msgstr ""
-
-#: libcore/vm/ASHandlers.cpp:500
-msgid "ActionPlay: as_environment target is null or not a sprite"
-msgstr ""
-
-#: libcore/vm/ASHandlers.cpp:515
-msgid "ActionStop: as_environment target is null or not a sprite"
-msgstr ""
-
-#: libcore/vm/ASHandlers.cpp:561
-msgid "ActionGotoFrame: as_environment target is null or not a sprite"
-msgstr ""
-
 #: libcore/vm/ASHandlers.cpp:595
 #, c-format
-msgid "GetUrl: target=%s url=%s"
+msgid "GetUrl: target=%s URL=%s"
 msgstr ""
 
 #: libcore/vm/ASHandlers.cpp:615
@@ -5659,6 +5639,21 @@ msgstr ""
 msgid "Prototype of interface object for IMPLEMENTSOP is not an object (%s)."
 msgstr ""
 
+#: libcore/vm/ASHandlers.cpp:1392
+#, c-format
+msgid "%s (with .prototype %p) implements %s (with .prototype %p)"
+msgstr ""
+
+#: libcore/vm/ASHandlers.cpp:1427
+#, c-format
+msgid "fscommand2:%s"
+msgstr ""
+
+#: libcore/vm/ASHandlers.cpp:1558
+#, c-format
+msgid " ActionMbSubString(%s, %d, %d)"
+msgstr ""
+
 #: libcore/vm/ASHandlers.cpp:1580
 msgid "Base is less then 1 in ActionMbSubString, setting to 1."
 msgstr ""
@@ -5676,7 +5671,7 @@ msgid ""
 "based on length:%d and start:%d"
 msgstr ""
 
-#: libcore/vm/ASHandlers.cpp:1648
+#: libcore/vm/ASHandlers.cpp:1623 libcore/vm/ASHandlers.cpp:1648
 msgid "Not properly implemented for SWF5"
 msgstr ""
 
@@ -5717,7 +5712,7 @@ msgid "\t%d) type=%s, value=%s"
 msgstr ""
 
 #: libcore/vm/ASHandlers.cpp:1917
-msgid "Undefined GetUrl2 url on stack, skipping"
+msgid "Undefined GetUrl2 URL on stack, skipping"
 msgstr ""
 
 #: libcore/vm/ASHandlers.cpp:1949
@@ -5795,11 +5790,6 @@ msgstr ""
 #, c-format
 msgid ""
 "Top of stack doesn't evaluate to an object (%s) at ActionEnumerate execution"
-msgstr ""
-
-#: libcore/vm/ASHandlers.cpp:2521 libcore/vm/ASHandlers.cpp:2528
-#, c-format
-msgid "to_primitive(%s) threw an ActionTypeError %s"
 msgstr ""
 
 #: libcore/vm/ASHandlers.cpp:2581
@@ -5954,24 +5944,13 @@ msgid "Unsupported action handler invoked, code at pc is %#x"
 msgstr ""
 
 #: libcore/vm/ASHandlers.cpp:3500
-msgid "Bogus empty GetUrl url in SWF file, skipping"
+msgid "Bogus empty GetUrl URL in SWF file, skipping"
 msgstr ""
 
 #: libcore/vm/ASHandlers.cpp:3512
 msgid ""
 "Bogus GetUrl2 send vars method in SWF file (both GET and POST requested). "
 "Using GET"
-msgstr ""
-
-#: libcore/vm/ASHandlers.cpp:3559
-#, c-format
-msgid ""
-"get url: target=%s, url=%s, method=%x (sendVars:%X, loadTarget:%d, "
-"loadVariable:%d)"
-msgstr ""
-
-#: libcore/vm/ASHandlers.cpp:3568
-msgid "getURL2 loadVariable"
 msgstr ""
 
 #: libcore/vm/ASHandlers.cpp:3571
@@ -5986,15 +5965,6 @@ msgstr ""
 
 #: libcore/vm/ASHandlers.cpp:3596
 msgid "commonGetURL: current target is undefined"
-msgstr ""
-
-#: libcore/vm/ASHandlers.cpp:3604
-msgid "getURL2 target load"
-msgstr ""
-
-#: libcore/vm/ASHandlers.cpp:3610 libcore/vm/ASHandlers.cpp:3664
-#, c-format
-msgid "Testing _level loading (level %u)"
 msgstr ""
 
 #: libcore/vm/ASHandlers.cpp:3616
@@ -6055,6 +6025,17 @@ msgid ""
 "codeVersion=%d"
 msgstr ""
 
+#: libcore/vm/ActionExec.cpp:152 libcore/vm/ActionExec.cpp:285
+#: libcore/vm/ActionExec.cpp:296
+#, c-format
+msgid "%s"
+msgstr ""
+
+#: libcore/vm/ActionExec.cpp:222
+#, c-format
+msgid "PC:%d - EX: %s"
+msgstr ""
+
 #: libcore/vm/ActionExec.cpp:239
 #, c-format
 msgid ""
@@ -6103,11 +6084,6 @@ msgstr ""
 #: libcore/vm/VM.cpp:250
 #, c-format
 msgid "Recursion limit reached (%u)"
-msgstr ""
-
-#: libcore/vm/VM.cpp:372
-#, c-format
-msgid "(%s + %s) [primitive conversion done]"
 msgstr ""
 
 #: libcore/Button.cpp:477
@@ -6279,8 +6255,36 @@ msgid ""
 "[0..1048575], won't remove"
 msgstr ""
 
+#: libcore/parser/TypesParser.cpp:145
+#, c-format
+msgid "Invalid rectangle: minx=%g maxx=%g miny=%g maxy=%g"
+msgstr ""
+
+#: libcore/parser/TypesParser.cpp:161
+#, c-format
+msgid "  FillStyle read type = 0x%X"
+msgstr ""
+
+#: libcore/parser/TypesParser.cpp:207
+#, c-format
+msgid "  gradients count: %d"
+msgstr ""
+
 #: libcore/parser/TypesParser.cpp:212
 msgid "No gradients!"
+msgstr ""
+
+#: libcore/parser/TypesParser.cpp:266
+msgid "Illegal spread mode in gradient definition."
+msgstr ""
+
+#: libcore/parser/TypesParser.cpp:283
+msgid "Illegal interpolation mode in gradient definition."
+msgstr ""
+
+#: libcore/parser/TypesParser.cpp:408
+#, c-format
+msgid "  color: %s"
 msgstr ""
 
 #: libcore/parser/sprite_definition.cpp:64
@@ -6299,6 +6303,11 @@ msgstr ""
 msgid "  -- sprite END --"
 msgstr ""
 
+#: libcore/parser/filter_factory.cpp:53
+#, c-format
+msgid "   number of filters: %d"
+msgstr ""
+
 #: libcore/parser/filter_factory.cpp:91
 #, c-format
 msgid "Invalid filter type %d."
@@ -6307,6 +6316,46 @@ msgstr ""
 #: libcore/parser/filter_factory.cpp:101
 #, c-format
 msgid "Filter %d could not read."
+msgstr ""
+
+#: libcore/parser/filter_factory.cpp:133
+#, c-format
+msgid "   DropShadowFilter: blurX=%f blurY=%f"
+msgstr ""
+
+#: libcore/parser/filter_factory.cpp:152
+#, c-format
+msgid "   BlurFilter: blurX=%f blurY=%f quality=%d"
+msgstr ""
+
+#: libcore/parser/filter_factory.cpp:179
+msgid "   GlowFilter "
+msgstr ""
+
+#: libcore/parser/filter_factory.cpp:217
+msgid "   BevelFilter "
+msgstr ""
+
+#: libcore/parser/filter_factory.cpp:264
+msgid "   GradientGlowFilter "
+msgstr ""
+
+#: libcore/parser/filter_factory.cpp:300
+msgid "   ConvolutionFilter "
+msgstr ""
+
+#: libcore/parser/filter_factory.cpp:317
+msgid "   ColorMatrixFilter: "
+msgstr ""
+
+#: libcore/parser/filter_factory.cpp:318 libcore/parser/filter_factory.cpp:321
+#: libcore/parser/filter_factory.cpp:324 libcore/parser/filter_factory.cpp:327
+#, c-format
+msgid "     %g, %g, %g, %g, %g"
+msgstr ""
+
+#: libcore/parser/filter_factory.cpp:374
+msgid "   GradientBevelFilter "
 msgstr ""
 
 #: libcore/parser/action_buffer.cpp:57
@@ -6327,11 +6376,20 @@ msgstr ""
 msgid "Native double floating point format not recognised"
 msgstr ""
 
+#: libcore/parser/SWFParser.cpp:90
+msgid "SHOWFRAME tag"
+msgstr ""
+
 #: libcore/parser/SWFParser.cpp:100
 #, c-format
 msgid ""
 "Encountered unknown tag %d. These usually store creation tool data and do "
 "not affect playback"
+msgstr ""
+
+#: libcore/parser/SWFParser.cpp:105
+#, c-format
+msgid "tag dump follows: %s"
 msgstr ""
 
 #: libcore/parser/SWFParser.cpp:113
@@ -6362,6 +6420,10 @@ msgstr ""
 
 #: libcore/parser/SWFMovieDefinition.cpp:301
 msgid "file is compressed"
+msgstr ""
+
+#: libcore/parser/SWFMovieDefinition.cpp:320
+msgid "non-finite movie bounds"
 msgstr ""
 
 #: libcore/parser/SWFMovieDefinition.cpp:336
@@ -6515,7 +6577,7 @@ msgstr ""
 
 #: libcore/movie_root.cpp:2153
 #, c-format
-msgid "Fork failed launching url opener '%s'"
+msgid "Fork failed launching URL opener '%s'"
 msgstr ""
 
 #: libcore/movie_root.cpp:2200
@@ -6820,7 +6882,7 @@ msgstr ""
 #: libdevice/egl/eglDevice.cpp:209 libdevice/egl/eglDevice.cpp:544
 #: gui/gtk/gtk_glue_ovg.cpp:383
 #, c-format
-msgid "eglGetConfigs() failed to retrive the number of configs (error %s)"
+msgid "eglGetConfigs() failed to retrieve the number of configs (error %s)"
 msgstr ""
 
 #: libdevice/egl/eglDevice.cpp:214 libdevice/egl/eglDevice.cpp:549
@@ -6895,13 +6957,18 @@ msgstr ""
 msgid "Initializing EGL for OpenGLES2"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:342 libdevice/egl/eglDevice.cpp:352
+#: libdevice/egl/eglDevice.cpp:342 libdevice/egl/eglDevice.cpp:362
 #, c-format
-msgid "eglBindAPI() failed to retrive the number of configs (error %s)"
+msgid "eglBindAPI() failed to retrieve the number of configs (error %s)"
 msgstr ""
 
 #: libdevice/egl/eglDevice.cpp:350
 msgid "Initializing EGL for OpenGLES1"
+msgstr ""
+
+#: libdevice/egl/eglDevice.cpp:352
+#, c-format
+msgid "eglBindAPI() failed to retrive the number of configs (error %s)"
 msgstr ""
 
 #: libdevice/egl/eglDevice.cpp:360
@@ -7852,7 +7919,7 @@ msgid "Gnash soldumper version: %s, Gnash version: %s\n"
 msgstr ""
 
 #: utilities/soldumper.cpp:121 utilities/processor.cpp:276
-#: utilities/flvdumper.cpp:154 cygnal/cvm.cpp:268 cygnal/cygnal.cpp:475
+#: utilities/flvdumper.cpp:154 cygnal/cygnal.cpp:475
 #: cygnal/cgi-bin/echo/echo.cpp:144 cygnal/cgi-bin/echo/gateway.cpp:119
 #: cygnal/cgi-bin/fitcDemo/fitcDemo.cpp:149
 #: cygnal/cgi-bin/oflaDemo/oflaDemo.cpp:216
@@ -7878,12 +7945,12 @@ msgstr ""
 msgid "List .sol files in the default directory"
 msgstr ""
 
-#: utilities/processor.cpp:148 cygnal/cvm.cpp:145
+#: utilities/processor.cpp:148
 #, c-format
 msgid "fs_callback(%p): %s %s"
 msgstr ""
 
-#: utilities/processor.cpp:166 cygnal/cvm.cpp:157
+#: utilities/processor.cpp:166
 #, c-format
 msgid "eventCallback: %s %s"
 msgstr ""
@@ -7905,9 +7972,8 @@ msgstr ""
 msgid "Verbose parsing disabled at compile time"
 msgstr ""
 
-#: utilities/processor.cpp:456 utilities/processor.cpp:459 cygnal/cvm.cpp:407
-#: cygnal/cvm.cpp:410 gui/pythonmod/gnash-view.cpp:438
-#: gui/pythonmod/gnash-view.cpp:441
+#: utilities/processor.cpp:456 utilities/processor.cpp:459
+#: gui/pythonmod/gnash-view.cpp:438 gui/pythonmod/gnash-view.cpp:441
 #, c-format
 msgid "%s appended to local sandboxes"
 msgstr ""
@@ -8345,19 +8411,9 @@ msgstr ""
 msgid "Creating %d errors in the buffer"
 msgstr ""
 
-#: cygnal/handler.cpp:104
-#, c-format
-msgid "Adding %d to the client array."
-msgstr ""
-
 #: cygnal/handler.cpp:128
 #, c-format
 msgid "Protocol %d for Handler::AddClient()"
-msgstr ""
-
-#: cygnal/handler.cpp:168 cygnal/handler.cpp:193
-#, c-format
-msgid "HTTP key is: %s"
 msgstr ""
 
 #: cygnal/handler.cpp:171 cygnal/handler.cpp:196
@@ -8367,11 +8423,6 @@ msgstr ""
 #: cygnal/handler.cpp:214 cygnal/handler.cpp:244
 #, c-format
 msgid "FD #%d has no protocol handler registered"
-msgstr ""
-
-#: cygnal/handler.cpp:261
-#, c-format
-msgid "Removing %d from the client array."
 msgstr ""
 
 #: cygnal/handler.cpp:319
@@ -8389,60 +8440,13 @@ msgstr ""
 msgid "Couldn't get %s symbol"
 msgstr ""
 
-#: cygnal/handler.cpp:462
-#, c-format
-msgid "FILENAME: %s"
-msgstr ""
-
-#: cygnal/cvm.cpp:274
-msgid "Setting debugger ON"
-msgstr ""
-
 #: cygnal/cvm.cpp:276
 msgid "The debugger has been disabled at configuration time"
-msgstr ""
-
-#: cygnal/cvm.cpp:430
-#, c-format
-msgid ""
-"Will sleep %ld microseconds between iterations - fps is %g, clockAdvance is "
-"%lu"
-msgstr ""
-
-#: cygnal/cvm.cpp:451 cygnal/cvm.cpp:542
-#, c-format
-msgid "iteration, timer: %lu, localDelay: %ld\n"
-msgstr ""
-
-#: cygnal/cvm.cpp:487
-#, c-format
-msgid "exiting after %d advances"
-msgstr ""
-
-#: cygnal/cvm.cpp:497
-#, c-format
-msgid "exiting after %d times last frame was reached"
-msgstr ""
-
-#: cygnal/cvm.cpp:531
-#, c-format
-msgid "%d loop backs; jumping one-after latest frame (%d)"
-msgstr ""
-
-#: cygnal/http_server.cpp:150
-#, c-format
-msgid "FIXME: found filestream %s in cache!"
 msgstr ""
 
 #: cygnal/http_server.cpp:154 cygnal/http_server.cpp:211
 #, c-format
 msgid "New filestream %s"
-msgstr ""
-
-#: cygnal/http_server.cpp:193 cygnal/http_server.cpp:287
-#: cygnal/libnet/http.cpp:422 cygnal/libnet/http.cpp:521
-#, c-format
-msgid "Que empty, net connection dropped for fd #%d"
 msgstr ""
 
 #: cygnal/http_server.cpp:213
@@ -8452,14 +8456,6 @@ msgstr ""
 
 #: cygnal/http_server.cpp:306
 msgid "couldn't read data!"
-msgstr ""
-
-#: cygnal/http_server.cpp:312 cygnal/libnet/http.cpp:542
-msgid "Got file data in POST"
-msgstr ""
-
-#: cygnal/http_server.cpp:319 cygnal/libnet/http.cpp:549
-msgid "Got AMF data in POST"
 msgstr ""
 
 #: cygnal/http_server.cpp:373 cygnal/libnet/http.cpp:592
@@ -8486,53 +8482,6 @@ msgstr ""
 msgid "TRACE request"
 msgstr ""
 
-#: cygnal/http_server.cpp:488 cygnal/http_server.cpp:520
-msgid "Sent GET Reply"
-msgstr ""
-
-#: cygnal/http_server.cpp:492
-msgid "Couldn't send GET Reply, no header data"
-msgstr ""
-
-#: cygnal/http_server.cpp:524
-msgid "Couldn't send POST Reply, no header data"
-msgstr ""
-
-#: cygnal/http_server.cpp:557 cygnal/http_server.cpp:578
-#, c-format
-msgid "Caught corrupted string! length was %d, null at %d"
-msgstr ""
-
-#: cygnal/http_server.cpp:874 cygnal/http_server.cpp:969
-#: cygnal/libnet/http.cpp:216 cygnal/libnet/http.cpp:1295
-#, c-format
-msgid "Parameters for file: \"%s\""
-msgstr ""
-
-#: cygnal/http_server.cpp:918
-#, c-format
-msgid "Setting Max Requests for Keep-Alive to %d"
-msgstr ""
-
-#: cygnal/http_server.cpp:929 cygnal/libnet/http.cpp:176
-#, c-format
-msgid "Setting Content Length to %d"
-msgstr ""
-
-#: cygnal/http_server.cpp:942 cygnal/libnet/http.cpp:189
-#, c-format
-msgid "Setting Content Type to %d"
-msgstr ""
-
-#: cygnal/http_server.cpp:952 cygnal/libnet/http.cpp:199
-#, c-format
-msgid "Got a request, parsing \"%s\""
-msgstr ""
-
-#: cygnal/http_server.cpp:978 cygnal/libnet/http.cpp:225
-msgid "Enabling Keep Alive by default for HTTP > 1.0"
-msgstr ""
-
 #: cygnal/http_server.cpp:1013
 #, c-format
 msgid "Processing HTTP data for fd #%d"
@@ -8544,34 +8493,6 @@ msgstr ""
 
 #: cygnal/http_server.cpp:1024
 msgid "FIXME: No existing data in packet!"
-msgstr ""
-
-#: cygnal/http_server.cpp:1027
-#, c-format
-msgid "Net HTTP server failed to read from fd #%d..."
-msgstr ""
-
-#: cygnal/http_server.cpp:1035
-#, c-format
-msgid "No active DiskStreams for fd #%d: %s..."
-msgstr ""
-
-#: cygnal/http_server.cpp:1039
-#, c-format
-msgid "Found active DiskStream! for fd #%d: %s"
-msgstr ""
-
-#: cygnal/http_server.cpp:1073
-msgid "Keep-Alive is off"
-msgstr ""
-
-#: cygnal/http_server.cpp:1075
-msgid "Keep-Alive is on"
-msgstr ""
-
-#: cygnal/http_server.cpp:1080
-#, c-format
-msgid "Processing time for GET request was %f seconds"
 msgstr ""
 
 #: cygnal/libnet/cache.cpp:62
@@ -8642,12 +8563,12 @@ msgstr ""
 msgid "RTMP %s: channel: %d, head size %d, body size: %d"
 msgstr ""
 
-#: cygnal/libnet/rtmp.cpp:482 cygnal/rtmp_server.cpp:435
+#: cygnal/libnet/rtmp.cpp:482
 #, c-format
 msgid "The Header size is: %d"
 msgstr ""
 
-#: cygnal/libnet/rtmp.cpp:483 cygnal/rtmp_server.cpp:436
+#: cygnal/libnet/rtmp.cpp:483
 #, c-format
 msgid "The AMF index is: 0x%x"
 msgstr ""
@@ -8657,16 +8578,16 @@ msgstr ""
 msgid "END is %x"
 msgstr ""
 
-#: cygnal/libnet/rtmp.cpp:510 cygnal/rtmp_server.cpp:489
+#: cygnal/libnet/rtmp.cpp:510
 msgid "Reading AMF packets till we're done..."
 msgstr ""
 
-#: cygnal/libnet/rtmp.cpp:519 cygnal/rtmp_server.cpp:499
+#: cygnal/libnet/rtmp.cpp:519
 #, c-format
 msgid "Total size in header is %d, buffer size is: %d"
 msgstr ""
 
-#: cygnal/libnet/rtmp.cpp:523 cygnal/rtmp_server.cpp:503
+#: cygnal/libnet/rtmp.cpp:523
 msgid "FIXME: MERGING"
 msgstr ""
 
@@ -8851,8 +8772,8 @@ msgstr ""
 msgid "unable to get protocol entry for %s"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:201 cygnal/libnet/network.cpp:424
-#: cygnal/libnet/network.cpp:582
+#: cygnal/libnet/network.cpp:201 cygnal/libnet/network.cpp:425
+#: cygnal/libnet/network.cpp:583
 #, c-format
 msgid "unable to create socket: %s"
 msgstr ""
@@ -8881,21 +8802,6 @@ msgstr ""
 msgid "Waiting to accept net traffic on fd #%d for port %d"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:326
-msgid "Have a SIGINT interupt waiting!"
-msgstr ""
-
-#: cygnal/libnet/network.cpp:330 cygnal/libnet/network.cpp:922
-#: cygnal/libnet/network.cpp:1103 cygnal/libnet/network.cpp:1301
-#: cygnal/libnet/network.cpp:1431
-msgid "Have a pending SIGINT interupt waiting!"
-msgstr ""
-
-#: cygnal/libnet/network.cpp:335 cygnal/libnet/network.cpp:928
-#: cygnal/libnet/network.cpp:1436
-msgid "Have a pending SIGPIPE interupt waiting!"
-msgstr ""
-
 #: cygnal/libnet/network.cpp:351
 msgid "There is a new network connection request."
 msgstr ""
@@ -8905,252 +8811,242 @@ msgstr ""
 msgid "The accept() socket for fd #%d was interrupted by a system call"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:362
-#, c-format
-msgid "The accept() socket for fd #%d never was available"
-msgstr ""
-
-#: cygnal/libnet/network.cpp:368
-#, c-format
-msgid "The accept() socket for fd #%d timed out waitingfor data"
-msgstr ""
-
-#: cygnal/libnet/network.cpp:381
+#: cygnal/libnet/network.cpp:382
 #, c-format
 msgid "unable to accept: %s"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:386
+#: cygnal/libnet/network.cpp:387
 #, c-format
-msgid "Accepting tcp/ip connection on fd #%d for port %d"
+msgid "Accepting TCP/IP connection on fd #%d for port %d"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:445 cygnal/libnet/network.cpp:603
+#: cygnal/libnet/network.cpp:446 cygnal/libnet/network.cpp:604
 #, c-format
 msgid "The connect() socket for fd %d was interrupted by a system call"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:451 cygnal/libnet/network.cpp:476
-#: cygnal/libnet/network.cpp:609 cygnal/libnet/network.cpp:649
+#: cygnal/libnet/network.cpp:452 cygnal/libnet/network.cpp:477
+#: cygnal/libnet/network.cpp:610 cygnal/libnet/network.cpp:650
 #, c-format
 msgid "The connect() socket for fd %d never was available for writing"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:462 cygnal/libnet/network.cpp:627
+#: cygnal/libnet/network.cpp:463 cygnal/libnet/network.cpp:628
 #, c-format
 msgid "The connect() socket for fd %d timed out waiting to write"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:470
+#: cygnal/libnet/network.cpp:471
 #, c-format
 msgid "\tsocket name %s for fd %d"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:552
+#: cygnal/libnet/network.cpp:553
 #, c-format
 msgid "%s: to host %s at port %d"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:558
+#: cygnal/libnet/network.cpp:559
 #, c-format
 msgid "The hostname for this machine is %s"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:560
+#: cygnal/libnet/network.cpp:561
 msgid "Couldn't get the hostname for this machine"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:575
+#: cygnal/libnet/network.cpp:576
 #, c-format
 msgid "The IP address for this client socket is %s"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:642
+#: cygnal/libnet/network.cpp:643
 #, c-format
 msgid "\tport %d at IP %s for fd %d"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:729
+#: cygnal/libnet/network.cpp:730
 #, c-format
 msgid "Unable to close the socket for fd #%d: %s"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:737
+#: cygnal/libnet/network.cpp:738
 #, c-format
 msgid "Closed the socket on fd #%d"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:766
+#: cygnal/libnet/network.cpp:767
 #, c-format
 msgid "%s: Closed fd #%d"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:878
+#: cygnal/libnet/network.cpp:879
 #, c-format
 msgid "Trying to read %d bytes from fd #%d"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:942 cygnal/libnet/network.cpp:1116
+#: cygnal/libnet/network.cpp:943 cygnal/libnet/network.cpp:1117
 #, c-format
 msgid "The socket for fd #%d was interrupted by a system call"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:946
+#: cygnal/libnet/network.cpp:947
 #, c-format
 msgid "The socket for fd #%d was never available for reading"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:952
+#: cygnal/libnet/network.cpp:953
 #, c-format
 msgid "The socket for #fd %d timed out waiting to read"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:969
+#: cygnal/libnet/network.cpp:970
 #, c-format
 msgid "The socket for fd #%d was never available for reading data"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:975
+#: cygnal/libnet/network.cpp:976
 #, c-format
 msgid "The socket for #fd %d timed out waiting to read data"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:981
+#: cygnal/libnet/network.cpp:982
 #, c-format
 msgid "read %d bytes from fd #%d from port %d"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:985
+#: cygnal/libnet/network.cpp:986
 #, c-format
 msgid ""
 "%s: Read packet data from fd #%d (%d bytes): \n"
 "%s"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1120
+#: cygnal/libnet/network.cpp:1121
 #, c-format
 msgid "The socket for fd #%d was never available for writing"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1124
+#: cygnal/libnet/network.cpp:1125
 #, c-format
 msgid "The socket for fd #%d timed out waiting to write"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1138
+#: cygnal/libnet/network.cpp:1139
 #, c-format
 msgid "Wrote zero out of %d bytes to fd #%d: %s"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1143
+#: cygnal/libnet/network.cpp:1144
 #, c-format
 msgid "Couldn't write %d bytes to fd #%d: %s"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1151
+#: cygnal/libnet/network.cpp:1152
 #, c-format
 msgid "wrote %d bytes to fd #%d, expected %d"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1156
+#: cygnal/libnet/network.cpp:1157
 #, c-format
 msgid "wrote %d bytes to fd #%d for port %d"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1164
+#: cygnal/libnet/network.cpp:1165
 #, c-format
 msgid ""
 "%s: Wrote packet data to fd #%d: \n"
 "%s"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1178
+#: cygnal/libnet/network.cpp:1179
 #, c-format
 msgid "took %d usec to write (%d bytes)"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1193 cygnal/libnet/network.cpp:1204
+#: cygnal/libnet/network.cpp:1194 cygnal/libnet/network.cpp:1205
 #, c-format
 msgid "%s: adding fd #%d to pollfds"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1230
+#: cygnal/libnet/network.cpp:1231
 #, c-format
 msgid "%s: erasing fd #%d from pollfds"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1278
+#: cygnal/libnet/network.cpp:1279
 #, c-format
 msgid "%s: waiting for %d fds"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1317
+#: cygnal/libnet/network.cpp:1318
 #, c-format
 msgid "Poll returned: %d, timeout is: %d"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1448
+#: cygnal/libnet/network.cpp:1449
 msgid "Waiting for data was interrupted by a system call"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1452
+#: cygnal/libnet/network.cpp:1453
 msgid "Waiting for data for fdset, was never available for reading"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1466
+#: cygnal/libnet/network.cpp:1467
 #, c-format
 msgid "select() got an error: %s."
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1470
+#: cygnal/libnet/network.cpp:1471
 #, c-format
 msgid "select() saw activity on %d file descriptors."
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1546
+#: cygnal/libnet/network.cpp:1547
 #, c-format
 msgid "Can't connect to server %s"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1558
+#: cygnal/libnet/network.cpp:1559
 #, c-format
 msgid "Using default hostname: \"%s\""
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1563
+#: cygnal/libnet/network.cpp:1564
 #, c-format
 msgid "Using default keyfile: \"%s\""
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1568
+#: cygnal/libnet/network.cpp:1569
 #, c-format
 msgid "Using default CA List: \"%s\""
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1574
+#: cygnal/libnet/network.cpp:1575
 #, c-format
 msgid "Using default Password: \"%s\""
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1579
+#: cygnal/libnet/network.cpp:1580
 #, c-format
 msgid "Using default Root Path to PEM files: \"%s\""
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1584
+#: cygnal/libnet/network.cpp:1585
 msgid "Connected to SSL server"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1586
+#: cygnal/libnet/network.cpp:1587
 msgid "Couldn't connect to SSL server"
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1619
+#: cygnal/libnet/network.cpp:1620
 #, c-format
 msgid "#%d bytes waiting in kernel network buffer."
 msgstr ""
 
-#: cygnal/libnet/network.cpp:1630
+#: cygnal/libnet/network.cpp:1631
 #, c-format
 msgid "Got an %d interrupt while blocked on pselect()"
 msgstr ""
@@ -9485,9 +9381,38 @@ msgstr ""
 msgid "err %i:%s\n"
 msgstr ""
 
+#: cygnal/libnet/http.cpp:176
+#, c-format
+msgid "Setting Content Length to %d"
+msgstr ""
+
+#: cygnal/libnet/http.cpp:189
+#, c-format
+msgid "Setting Content Type to %d"
+msgstr ""
+
+#: cygnal/libnet/http.cpp:199
+#, c-format
+msgid "Got a request, parsing \"%s\""
+msgstr ""
+
+#: cygnal/libnet/http.cpp:216 cygnal/libnet/http.cpp:1295
+#, c-format
+msgid "Parameters for file: \"%s\""
+msgstr ""
+
 #: cygnal/libnet/http.cpp:220
 #, c-format
 msgid "Requesting file: \"%s\""
+msgstr ""
+
+#: cygnal/libnet/http.cpp:225
+msgid "Enabling Keep Alive by default for HTTP > 1.0"
+msgstr ""
+
+#: cygnal/libnet/http.cpp:422 cygnal/libnet/http.cpp:521
+#, c-format
+msgid "Que empty, net connection dropped for fd #%d"
 msgstr ""
 
 #: cygnal/libnet/http.cpp:433
@@ -9497,6 +9422,14 @@ msgstr ""
 #: cygnal/libnet/http.cpp:499
 #, c-format
 msgid "http_handler all done transferring requested file \"%s\"."
+msgstr ""
+
+#: cygnal/libnet/http.cpp:542
+msgid "Got file data in POST"
+msgstr ""
+
+#: cygnal/libnet/http.cpp:549
+msgid "Got AMF data in POST"
 msgstr ""
 
 #: cygnal/libnet/http.cpp:564
@@ -9984,17 +9917,7 @@ msgstr ""
 msgid "Restarting loop for next connection for port %d..."
 msgstr ""
 
-#: cygnal/cygnal.cpp:1009
-#, c-format
-msgid "Handler has %d clients attached, %d threads"
-msgstr ""
-
-#: cygnal/cygnal.cpp:1014
-#, c-format
-msgid "Handler client[%d] is: %d"
-msgstr ""
-
-#: cygnal/cygnal.cpp:1027 cygnal/rtmp_server.cpp:1388
+#: cygnal/cygnal.cpp:1027
 #, c-format
 msgid "%d active disk streams"
 msgstr ""
@@ -10064,25 +9987,12 @@ msgstr ""
 msgid "Gnash media file name: %s"
 msgstr ""
 
-#: cygnal/rtmp_server.cpp:99
-#, c-format
-msgid "Processing RTMP Handshake for fd #%d"
-msgstr ""
-
 #: cygnal/rtmp_server.cpp:124
 msgid "Failed to read the handshake from the client."
 msgstr ""
 
-#: cygnal/rtmp_server.cpp:127
-msgid "Read first handshake from the client."
-msgstr ""
-
 #: cygnal/rtmp_server.cpp:139
 msgid "failed to read the handshake from the client."
-msgstr ""
-
-#: cygnal/rtmp_server.cpp:142
-msgid "Read second handshake from the client."
 msgstr ""
 
 #: cygnal/rtmp_server.cpp:149
@@ -10098,62 +10008,24 @@ msgstr ""
 msgid "NetConnection unusually large! %d"
 msgstr ""
 
-#: cygnal/rtmp_server.cpp:185
-msgid "De chunkifying the NetConnection packet."
-msgstr ""
-
 #: cygnal/rtmp_server.cpp:202
 msgid "failed to read the body of the handshake data from the client."
-msgstr ""
-
-#: cygnal/rtmp_server.cpp:205
-msgid "Read handshake data body from the client."
 msgstr ""
 
 #: cygnal/rtmp_server.cpp:210
 msgid "Didn't receive NetConnection object in handshake!"
 msgstr ""
 
-#: cygnal/rtmp_server.cpp:213
-msgid "Got NetConnection ::connect() INVOKE."
-msgstr ""
-
-#: cygnal/rtmp_server.cpp:232
-msgid "Sent onBWDone to client"
-msgstr ""
-
 #: cygnal/rtmp_server.cpp:234
 msgid "Couldn't send onBWDone to client!"
-msgstr ""
-
-#: cygnal/rtmp_server.cpp:247
-msgid "Sent set Client Window Size to client"
-msgstr ""
-
-#: cygnal/rtmp_server.cpp:249
-msgid "Couldn't send set Client Window Size to client!"
-msgstr ""
-
-#: cygnal/rtmp_server.cpp:259 cygnal/rtmp_server.cpp:1700
-msgid "Sent Ping to client"
 msgstr ""
 
 #: cygnal/rtmp_server.cpp:261 cygnal/rtmp_server.cpp:1702
 msgid "Couldn't send Ping to client!"
 msgstr ""
 
-#: cygnal/rtmp_server.cpp:273 cygnal/rtmp_server.cpp:1657
-#: cygnal/rtmp_server.cpp:1680
-msgid "Sent response to client."
-msgstr ""
-
 #: cygnal/rtmp_server.cpp:275
 msgid "Couldn't send response to client!"
-msgstr ""
-
-#: cygnal/rtmp_server.cpp:336
-#, c-format
-msgid "Sent RTMP Handshake response at %d"
 msgstr ""
 
 #: cygnal/rtmp_server.cpp:338
@@ -10169,18 +10041,9 @@ msgstr ""
 msgid "No data in response handshake buffer."
 msgstr ""
 
-#: cygnal/rtmp_server.cpp:385
-msgid "Handshake Finish Data matched"
-msgstr ""
-
 #: cygnal/rtmp_server.cpp:387
 #, c-format
 msgid "Handshake Finish Data didn't match by %d bytes"
-msgstr ""
-
-#: cygnal/rtmp_server.cpp:397
-#, c-format
-msgid "Got AMF data in handshake, %d bytes for fd #%d"
 msgstr ""
 
 #: cygnal/rtmp_server.cpp:555
@@ -10208,18 +10071,9 @@ msgstr ""
 msgid "Couldn't reliably extract the echo data!"
 msgstr ""
 
-#: cygnal/rtmp_server.cpp:1361
-#, c-format
-msgid "Starting RTMP Handler for fd #%d, cgi-bin is \"%s\""
-msgstr ""
-
 #: cygnal/rtmp_server.cpp:1400
 #, c-format
-msgid "ERROR: No stream for client %d"
-msgstr ""
-
-#: cygnal/rtmp_server.cpp:1411
-msgid "data left from previous packet"
+msgid "No stream for client %d"
 msgstr ""
 
 #: cygnal/rtmp_server.cpp:1442
@@ -10239,29 +10093,8 @@ msgstr ""
 msgid "Stream Set Buffer: %d"
 msgstr ""
 
-#: cygnal/rtmp_server.cpp:1460
-#, c-format
-msgid "Processed Ping message from client, type %d"
-msgstr ""
-
 #: cygnal/rtmp_server.cpp:1465
 msgid "Stream Pong"
-msgstr ""
-
-#: cygnal/rtmp_server.cpp:1471
-msgid "Got the 1st Audio packet!"
-msgstr ""
-
-#: cygnal/rtmp_server.cpp:1473
-msgid "Got the 1st Video packet!"
-msgstr ""
-
-#: cygnal/rtmp_server.cpp:1475
-msgid "Got the Window Set Size packet!"
-msgstr ""
-
-#: cygnal/rtmp_server.cpp:1477
-msgid "Got unknown system message!"
 msgstr ""
 
 #: cygnal/rtmp_server.cpp:1484
@@ -10280,11 +10113,6 @@ msgstr ""
 msgid "Set Bandwidth"
 msgstr ""
 
-#: cygnal/rtmp_server.cpp:1505
-#, c-format
-msgid "SharedObject name is \"%s\""
-msgstr ""
-
 #: cygnal/rtmp_server.cpp:1509 cygnal/rtmp_server.cpp:1512
 #: cygnal/rtmp_server.cpp:1515 cygnal/rtmp_server.cpp:1518
 #: cygnal/rtmp_server.cpp:1665
@@ -10297,25 +10125,6 @@ msgstr ""
 msgid "Error INVOKING method \"%s\"!"
 msgstr ""
 
-#: cygnal/rtmp_server.cpp:1528
-#, c-format
-msgid "INVOKEing method \"%s\""
-msgstr ""
-
-#: cygnal/rtmp_server.cpp:1537
-#, c-format
-msgid "The Transaction ID from the client is: %g"
-msgstr ""
-
-#: cygnal/rtmp_server.cpp:1621
-#, c-format
-msgid "Sending %s to client"
-msgstr ""
-
-#: cygnal/rtmp_server.cpp:1627
-msgid "Sent first page to client"
-msgstr ""
-
 #: cygnal/rtmp_server.cpp:1648
 msgid "Received an _error message from the client!"
 msgstr ""
@@ -10323,11 +10132,6 @@ msgstr ""
 #: cygnal/rtmp_server.cpp:1668
 #, c-format
 msgid "ERROR: Unidentified AMF header data type 0x%x"
-msgstr ""
-
-#: cygnal/rtmp_server.cpp:1692
-#, c-format
-msgid "Never read any data from fd #%d"
 msgstr ""
 
 #: cygnal/testsuite/libnet.all/test_handler.cpp:113
@@ -10396,29 +10200,9 @@ msgstr ""
 msgid "Usage: test_buffer [options...]"
 msgstr ""
 
-#: cygnal/proc.cpp:106
-#, c-format
-msgid "Document Root for CGI files is: %s"
-msgstr ""
-
-#: cygnal/proc.cpp:115
-#, c-format
-msgid "Starting \"%s\""
-msgstr ""
-
 #: cygnal/proc.cpp:119
 #, c-format
 msgid "Invalid filespec for CGI: \"%s\""
-msgstr ""
-
-#: cygnal/proc.cpp:187
-#, c-format
-msgid "Finding \"%s\""
-msgstr ""
-
-#: cygnal/proc.cpp:207
-#, c-format
-msgid "Stopping \"%s\""
 msgstr ""
 
 #: gui/fb/fb.cpp:229
