@@ -87,7 +87,7 @@ SWFParser::read(std::streamsize bytes)
 
             if (_tag == SWF::SHOWFRAME) {
                 // show frame tag -- advance to the next frame.
-                IF_VERBOSE_PARSE(log_parse("SHOWFRAME tag"));
+                IF_VERBOSE_PARSE(log_parse(_("SHOWFRAME tag")));
                 _md->incrementLoadedFrames();
             }
             else if (tagLoaders.get(_tag, lf)) {
@@ -102,7 +102,7 @@ SWFParser::read(std::streamsize bytes)
                 IF_VERBOSE_PARSE(
                     std::ostringstream ss;
                     dumpTagBytes(_stream, ss);
-                    log_error("tag dump follows: %s", ss.str());
+                    log_error(_("tag dump follows: %s"), ss.str());
                 );
             }
 

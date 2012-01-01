@@ -50,7 +50,7 @@ filter_factory::read(SWFStream& in, bool read_multiple, Filters* store)
     }
 
     IF_VERBOSE_PARSE(
-    log_parse("   number of filters: %d", count);
+        log_parse(_("   number of filters: %d"), count);
     );
 
     for (int i = 0; i < count; ++i)
@@ -130,7 +130,7 @@ bool DropShadowFilter::read(SWFStream& in)
     static_cast<void> (in.read_uint(5)); // Throw these away on purpose.
 
     IF_VERBOSE_PARSE(
-    log_parse("   DropShadowFilter: blurX=%f blurY=%f",
+        log_parse(_("   DropShadowFilter: blurX=%f blurY=%f"),
         m_blurX, m_blurY);
     );
 
@@ -149,7 +149,7 @@ bool BlurFilter::read(SWFStream& in)
     static_cast<void> (in.read_uint(3)); // Throw these away.
 
     IF_VERBOSE_PARSE(
-    log_parse("   BlurFilter: blurX=%f blurY=%f quality=%d",
+        log_parse(_("   BlurFilter: blurX=%f blurY=%f quality=%d"),
         m_blurX, m_blurY, m_quality);
     );
 
@@ -176,7 +176,7 @@ bool GlowFilter::read(SWFStream& in)
     static_cast<void> (in.read_uint(6)); // Throw these away.
 
     IF_VERBOSE_PARSE(
-    log_parse("   GlowFilter ");
+        log_parse(_("   GlowFilter "));
     );
 
     return true;
@@ -214,7 +214,7 @@ bool BevelFilter::read(SWFStream& in)
     static_cast<void> (in.read_uint(4)); // Throw these away.
 
     IF_VERBOSE_PARSE(
-    log_parse("   BevelFilter ");
+        log_parse(_("   BevelFilter "));
     );
 
     return true;
@@ -261,7 +261,7 @@ bool GradientGlowFilter::read(SWFStream& in)
     m_quality = static_cast<boost::uint8_t> (in.read_uint(4));
 
     IF_VERBOSE_PARSE(
-    log_parse("   GradientGlowFilter ");
+        log_parse(_("   GradientGlowFilter "));
     );
 
     return true;
@@ -297,7 +297,7 @@ ConvolutionFilter::read(SWFStream& in)
     _preserveAlpha = in.read_bit(); 
 
     IF_VERBOSE_PARSE(
-    log_parse("   ConvolutionFilter ");
+        log_parse(_("   ConvolutionFilter "));
     );
 
     return true;
@@ -314,15 +314,19 @@ bool ColorMatrixFilter::read(SWFStream& in)
     }
 
     IF_VERBOSE_PARSE(
-    log_parse("   ColorMatrixFilter: ");
-    log_parse("     %g, %g, %g, %g, %g",
-        m_matrix[0], m_matrix[1], m_matrix[2], m_matrix[3], m_matrix[4]);
-    log_parse("     %g, %g, %g, %g, %g",
-        m_matrix[5], m_matrix[6], m_matrix[7], m_matrix[8], m_matrix[9]);
-    log_parse("     %g, %g, %g, %g, %g",
-        m_matrix[10], m_matrix[11], m_matrix[12], m_matrix[13], m_matrix[14]);
-    log_parse("     %g, %g, %g, %g, %g",
-        m_matrix[15], m_matrix[16], m_matrix[17], m_matrix[18], m_matrix[19]);
+        log_parse(_("   ColorMatrixFilter: "));
+        log_parse(_("     %g, %g, %g, %g, %g"),
+                  m_matrix[0], m_matrix[1], m_matrix[2],
+                  m_matrix[3], m_matrix[4]);
+        log_parse(_("     %g, %g, %g, %g, %g"),
+                  m_matrix[5], m_matrix[6], m_matrix[7],
+                  m_matrix[8], m_matrix[9]);
+        log_parse(_("     %g, %g, %g, %g, %g"),
+                  m_matrix[10], m_matrix[11], m_matrix[12],
+                  m_matrix[13], m_matrix[14]);
+        log_parse(_("     %g, %g, %g, %g, %g"),
+                    m_matrix[15], m_matrix[16], m_matrix[17],
+                  m_matrix[18], m_matrix[19]);
     );
 
     return true;
@@ -367,7 +371,7 @@ bool GradientBevelFilter::read(SWFStream& in)
     m_quality = static_cast<boost::uint8_t> (in.read_uint(4));
 
     IF_VERBOSE_PARSE(
-    log_parse("   GradientBevelFilter ");
+        log_parse(_("   GradientBevelFilter "));
     );
 
     return true;

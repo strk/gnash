@@ -96,7 +96,7 @@ RTMPServer::processClientHandShake(int fd)
 {
     GNASH_REPORT_FUNCTION;
 
-    log_network(_("Processing RTMP Handshake for fd #%d"), fd);
+    log_network("Processing RTMP Handshake for fd #%d", fd);
     
 #ifdef USE_STATISTICS
     struct timespec start;
@@ -124,7 +124,7 @@ RTMPServer::processClientHandShake(int fd)
 	log_error(_("Failed to read the handshake from the client."));
 	return tcurl;		// nc is empty
     } else {
-	log_network(_("Read first handshake from the client."));
+	log_network("Read first handshake from the client.");
     }
     
     // Send our response to the handshake, which primarily is the bytes
@@ -139,7 +139,7 @@ RTMPServer::processClientHandShake(int fd)
 	log_error(_("failed to read the handshake from the client."));
 	return tcurl;		// nc is empty
     } else {
-	log_network(_("Read second handshake from the client."));
+	log_network("Read second handshake from the client.");
     }
     
     // Don't assume the data we just read is a handshake.
@@ -182,7 +182,7 @@ RTMPServer::processClientHandShake(int fd)
     // are 1 byte ones.
     boost::scoped_ptr<cygnal::Buffer> newptr(new cygnal::Buffer(qhead->bodysize));
     if (qhead->bodysize > RTMP_VIDEO_PACKET_SIZE) {
-	log_network(_("De chunkifying the NetConnection packet."));
+	log_network("De chunkifying the NetConnection packet.");
 	int nbytes = 0;
 	while (nbytes < qhead->bodysize) {
 	    size_t chunk = RTMP_VIDEO_PACKET_SIZE;
@@ -202,7 +202,7 @@ RTMPServer::processClientHandShake(int fd)
 	log_error(_("failed to read the body of the handshake data from the client."));
 	return tcurl;		// nc is empty
     } else {
-	log_network(_("Read handshake data body from the client."));
+	log_network("Read handshake data body from the client.");
     }
 
     // make sure this is actually a NetConnection packet.
@@ -210,7 +210,7 @@ RTMPServer::processClientHandShake(int fd)
 	log_error(_("Didn't receive NetConnection object in handshake!"));
 	return tcurl;		// nc is empty
     } else {
-	log_network(_("Got NetConnection ::connect() INVOKE."));
+	log_network("Got NetConnection ::connect() INVOKE.");
 	_netconnect->dump();	// FIXME: debug crap
     }
     
@@ -229,7 +229,7 @@ RTMPServer::processClientHandShake(int fd)
 	boost::shared_ptr<cygnal::Buffer> bwdone = encodeBWDone(2.0);
 	if (RTMP::sendMsg(fd, qhead->channel, RTMP::HEADER_8,
 			  bwdone->size(), RTMP::INVOKE, RTMPMsg::FROM_SERVER, *bwdone)) {
-	    log_network(_("Sent onBWDone to client"));
+	    log_network("Sent onBWDone to client");
 	} else {
 	    log_error(_("Couldn't send onBWDone to client!"));
 	    tcurl.reset();
@@ -244,9 +244,9 @@ RTMPServer::processClientHandShake(int fd)
     *winsize += swapped;
     if (RTMP::sendMsg(fd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_12,
 		      winsize->size(), RTMP::WINDOW_SIZE, RTMPMsg::FROM_CLIENT, *winsize)) {
-	log_network(_("Sent set Client Window Size to client"));
+	log_network("Sent set Client Window Size to client");
     } else {
-	log_error(_("Couldn't send set Client Window Size to client!"));
+	log_error("Couldn't send set Client Window Size to client!");
 	tcurl.reset();
 	return tcurl;		// nc is empty
     }
@@ -256,7 +256,7 @@ RTMPServer::processClientHandShake(int fd)
 	encodePing(RTMP::PING_RESET, 0);
     if (RTMP::sendMsg(fd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_8,
 		      ping_reset->size(), RTMP::USER, RTMPMsg::FROM_SERVER, *ping_reset)) {
-	log_network(_("Sent Ping to client"));
+	log_network("Sent Ping to client");
     } else {
 	log_error(_("Couldn't send Ping to client!"));
 	tcurl.reset();
@@ -270,7 +270,7 @@ RTMPServer::processClientHandShake(int fd)
 	encodeResult(RTMPMsg::NC_CONNECT_SUCCESS);
     if (RTMP::sendMsg(fd, 3, RTMP::HEADER_8, response->allocated(),
 		      RTMP::INVOKE, RTMPMsg::FROM_SERVER, *response)) {
-	log_network(_("Sent response to client."));
+	log_network("Sent response to client.");
     } else {
 	log_error(_("Couldn't send response to client!"));
 	tcurl.reset();
@@ -333,7 +333,7 @@ RTMPServer::handShakeResponse(int fd, cygnal::Buffer &handshake)
     size_t ret = writeNet(fd, *zeros);
     
     if (ret == zeros->allocated()) {
-	log_network(_("Sent RTMP Handshake response at %d"), timestamp);
+	log_network("Sent RTMP Handshake response at %d", timestamp);
     } else {
 	log_error(_("Couldn't sent RTMP Handshake response at %d!"), timestamp);
     }
@@ -382,7 +382,7 @@ RTMPServer::serverFinish(int fd, cygnal::Buffer &handshake1, cygnal::Buffer &han
 	   + pkt_size + RTMP_HANDSHAKE_HEADER_SIZE,
 			   RTMP_RANDOM_SIZE);
     if (diff <= 1) {
-	log_network (_("Handshake Finish Data matched"));
+	log_network ("Handshake Finish Data matched");
     } else {
 	log_error (_("Handshake Finish Data didn't match by %d bytes"), diff);
 // 	return buf;		// return empty buffer
@@ -394,7 +394,7 @@ RTMPServer::serverFinish(int fd, cygnal::Buffer &handshake1, cygnal::Buffer &han
     // real performance hit from it.
     size_t amf_size = handshake2.allocated() - pkt_size;
     if (handshake2.allocated() >= pkt_size) {
-	log_network(_("Got AMF data in handshake, %d bytes for fd #%d"),
+	log_network("Got AMF data in handshake, %d bytes for fd #%d",
 		    amf_size, fd);
 	buf.reset(new Buffer(amf_size));
 	// populate the buffer with the AMF data
@@ -432,13 +432,13 @@ RTMPServer::packetRead(cygnal::Buffer &buf)
     
     amf_index = *ptr & RTMP_INDEX_MASK;
     headersize = headerSize(*ptr);
-    log_network(_("The Header size is: %d"), headersize);
-    log_network(_("The AMF index is: 0x%x"), amf_index);
+    log_network("The Header size is: %d", headersize);
+    log_network("The AMF index is: 0x%x", amf_index);
 
 //     if (headersize > 1) {
 // 	packetsize = parseHeader(ptr);
 //         if (packetsize) {
-//             log_network (_("Read first RTMP packet header of size %d"), packetsize);
+//             log_network ("Read first RTMP packet header of size %d", packetsize);
 //         } else {
 //             log_error (_("Couldn't read first RTMP packet header"));
 //             return false;
@@ -486,7 +486,7 @@ RTMPServer::packetRead(cygnal::Buffer &buf)
     el.dump();
     ptr = amf.extractElement(&el, ptr) + 1;
     el.dump();
-    log_network(_("Reading AMF packets till we're done..."));
+    log_network("Reading AMF packets till we're done...");
     // buf->dump();
     while (ptr < end) {
 	boost::shared_ptr<cygnal::Element> el(new cygnal::Element);
@@ -496,11 +496,11 @@ RTMPServer::packetRead(cygnal::Buffer &buf)
     }
     ptr += 1;
     size_t actual_size = _total_size - RTMP_HEADER_SIZE;
-    log_network(_("Total size in header is %d, buffer size is: %d"),
+    log_network("Total size in header is %d, buffer size is: %d",
 		_total_size, buf->size());
 //    buf->dump();
     if (buf->size() < actual_size) {
-	log_network(_("FIXME: MERGING"));
+	log_network("FIXME: MERGING");
 	buf = _que->merge(buf);
     }
     while ((ptr - buf->begin()) < static_cast<int>(actual_size)) {
@@ -1358,7 +1358,7 @@ rtmp_handler(Network::thread_params_t *args)
     boost::shared_ptr<RTMPMsg> body;
     // static bool initialize = true;
 //     bool sendfile = false;
-    log_network(_("Starting RTMP Handler for fd #%d, cgi-bin is \"%s\""),
+    log_network("Starting RTMP Handler for fd #%d, cgi-bin is \"%s\"",
 		args->netfd, args->filespec);
     
 #ifdef USE_STATISTICS
@@ -1385,7 +1385,7 @@ rtmp_handler(Network::thread_params_t *args)
     // If we have active disk streams, send those packets first.
     // 0 is a reserved stream, so we start with 1, as the reserved
     // stream isn't one we care about here.
-    log_network(_("%d active disk streams"), hand->getActiveDiskStreams());
+    log_network("%d active disk streams", hand->getActiveDiskStreams());
     for (int i=1; i <= hand->getActiveDiskStreams(); i++) {
 	hand->getDiskStream(i)->dump();
 	if (hand->getDiskStream(i)->getState() == DiskStream::PLAY) {
@@ -1397,7 +1397,7 @@ rtmp_handler(Network::thread_params_t *args)
 			ptr, 4096)) {
 		}
 	    } else {
-		log_network(_("ERROR: No stream for client %d"), i);
+		log_error(_("No stream for client %d"), i);
 	    }
 	}
     }
@@ -1408,7 +1408,7 @@ rtmp_handler(Network::thread_params_t *args)
 	// If there is no data left from the previous chunk, process
 	// that before reading more data.
 	if (pkt != 0) {
-	    log_network(_("data left from previous packet"));
+	    log_network("data left from previous packet");
 	} else {
 	    pkt = rtmp->recvMsg(args->netfd);
 	}
@@ -1457,7 +1457,7 @@ rtmp_handler(Network::thread_params_t *args)
 				  {
 				      boost::shared_ptr<RTMP::rtmp_ping_t> ping
 					  = rtmp->decodePing(tmpptr);
-				      log_network(_("Processed Ping message from client, type %d"),
+				      log_network("Processed Ping message from client, type %d",
 						  ping->type);
 				      break;
 				  }
@@ -1468,13 +1468,13 @@ rtmp_handler(Network::thread_params_t *args)
 				      break;
 				};
 			    } else if (qhead->type == RTMP::AUDIO_DATA) {
-				log_network(_("Got the 1st Audio packet!"));
+				log_network("Got the 1st Audio packet!");
 			    } else if (qhead->type == RTMP::VIDEO_DATA) {
-				log_network(_("Got the 1st Video packet!"));
+				log_network("Got the 1st Video packet!");
 			    } else if (qhead->type == RTMP::WINDOW_SIZE) {
-				log_network(_("Got the Window Set Size packet!"));
+				log_network("Got the Window Set Size packet!");
 			    } else {
-				log_network(_("Got unknown system message!"));
+				log_network("Got unknown system message!");
 				bufptr->dump();
 			    }
 			}
@@ -1502,7 +1502,7 @@ rtmp_handler(Network::thread_params_t *args)
 		      case RTMP::VIDEO_DATA:
 		      case RTMP::SHARED_OBJ:
 			  body = rtmp->decodeMsgBody(tmpptr, qhead->bodysize);
-			  log_network(_("SharedObject name is \"%s\""),
+			  log_network("SharedObject name is \"%s\"",
 				      body->getMethodName());
 			  break;
 		      case RTMP::AMF3_NOTIFY:
@@ -1525,7 +1525,7 @@ rtmp_handler(Network::thread_params_t *args)
 					body->getMethodName());
 			      continue;
 			  }
-			  log_network(_("INVOKEing method \"%s\""),
+			  log_network("INVOKEing method \"%s\"",
 				      body->getMethodName());
 			  // log_network("%s", hexify(tmpptr, qhead->bodysize, true));
 			  
@@ -1534,7 +1534,7 @@ rtmp_handler(Network::thread_params_t *args)
 			  // is a speacial one handled directly by the
 			  // server instead of any cgi-bin plugins.
 			  double transid  = body->getTransactionID();
-			  log_network(_("The Transaction ID from the client is: %g"), transid);
+			  log_network("The Transaction ID from the client is: %g", transid);
 			  if (body->getMethodName() == "createStream") {
 			      hand->createStream(transid);
 			      response = rtmp->encodeResult(RTMPMsg::NS_CREATE_STREAM, transid);
@@ -1618,13 +1618,13 @@ rtmp_handler(Network::thread_params_t *args)
 			      int active_stream = hand->getActiveDiskStreams();
 			      boost::uint8_t *ptr = hand->getDiskStream(active_stream)->get();
 			      if (ptr) {
-				  log_network(_("Sending %s to client"),
+				  log_network("Sending %s to client",
 					      hand->getDiskStream(active_stream)->getFilespec());
 				  if (rtmp->sendMsg(args->netfd, 5,
 					RTMP::HEADER_12, 400,
 					RTMP::NOTIFY, RTMPMsg::FROM_SERVER,
 					ptr, 400)) {
-				      log_network(_("Sent first page to client"));
+				      log_network("Sent first page to client");
 				  }
 			      }  
 			  } else if (body->getMethodName() == "seek") {
@@ -1654,7 +1654,7 @@ rtmp_handler(Network::thread_params_t *args)
 						    RTMP::HEADER_8, result->allocated(),
 						    RTMP::INVOKE, RTMPMsg::FROM_SERVER,
 						    *result)) {
-				      log_network(_("Sent response to client."));
+				      log_network("Sent response to client.");
 				  }
 			      }
 			      done = true;
@@ -1677,11 +1677,11 @@ rtmp_handler(Network::thread_params_t *args)
  		    if (result) { // FIXME: this needs a real channel number
 			if (rtmp->sendMsg(args->netfd, 0x3, RTMP::HEADER_8, ret,
 					  RTMP::INVOKE, RTMPMsg::FROM_SERVER, *result)) {
-			    log_network(_("Sent response to client."));
+			    log_network("Sent response to client.");
 			}
  		    }
 #endif		    
-// 		    log_network(_("RET is: %d"), ret);
+// 		    log_network("RET is: %d", ret);
 		} // end of processing all the messages in the que
 		
 		// we're done processing these packets, so get rid of them
@@ -1689,7 +1689,7 @@ rtmp_handler(Network::thread_params_t *args)
 
 		
 	    } else {
-		log_network(_("Never read any data from fd #%d"), args->netfd);
+		log_network("Never read any data from fd #%d", args->netfd);
 #if 0
 		// Send a ping to reset the new stream
 		boost::shared_ptr<cygnal::Buffer> ping_reset =
@@ -1697,7 +1697,7 @@ rtmp_handler(Network::thread_params_t *args)
 		if (rtmp->sendMsg(args->netfd, RTMP_SYSTEM_CHANNEL,
 			  RTMP::HEADER_12, ping_reset->size(),
 			  RTMP::PING, RTMPMsg::FROM_SERVER, *ping_reset)) {
-		    log_network(_("Sent Ping to client"));
+		    log_network("Sent Ping to client");
 		} else {
 		    log_error(_("Couldn't send Ping to client!"));
 		}

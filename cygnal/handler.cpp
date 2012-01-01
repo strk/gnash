@@ -101,7 +101,7 @@ Handler::addClient(int fd, Network::protocols_supported_e proto)
 
     boost::mutex::scoped_lock lock(_mutex);
     
-    log_debug(_("Adding %d to the client array."), fd);
+    log_debug("Adding %d to the client array.", fd);
     switch (proto) {
       case Network::NONE:
 	  break;
@@ -165,7 +165,7 @@ Handler::parseFirstRequest(int fd, gnash::Network::protocols_supported_e proto)
 	      }
 	      path = _http[fd]->getFilespec();
 	      key = hostname + path;
-	      log_debug(_("HTTP key is: %s"), key);
+	      log_debug("HTTP key is: %s", key);
 	      _keys[fd] = key;
 	  } else {
 	      log_error(_("HTTP key couldn't be read!"));
@@ -190,7 +190,7 @@ Handler::parseFirstRequest(int fd, gnash::Network::protocols_supported_e proto)
 	      }
 	      path = http.getFilespec();
 	      key = hostname + path;
-	      log_debug(_("HTTP key is: %s"), key);
+	      log_debug("HTTP key is: %s", key);
 	      _keys[fd] = key;
 	  } else {
 	      log_error(_("HTTP key couldn't be read!"));
@@ -258,7 +258,7 @@ Handler::removeClient(int x)
     vector<int>::iterator it;
     for (it = _clients.begin(); it < _clients.end(); ++it) {
 	if (*it == x) {
-	    log_debug(_("Removing %d from the client array."), *it);
+	    log_debug("Removing %d from the client array.", *it);
 	    _clients.erase(it);
 	}
     }
@@ -459,7 +459,7 @@ Handler::playStream(const std::string &filespec)
     string fullpath = crcfile.getDocumentRoot();
     fullpath += "/";
     fullpath += filespec;
-    log_debug(_("FILENAME: %s"), fullpath);
+    log_debug("FILENAME: %s", fullpath);
 
     // gnash::DiskStream &ds = findStream(filespec);
     if (ds->getState() == DiskStream::CREATED) {

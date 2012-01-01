@@ -369,7 +369,7 @@ newAdd(as_value& op1, const as_value& op2, const VM& vm)
 	catch (ActionTypeError& e) {}
 
 #if GNASH_DEBUG
-	log_debug(_("(%s + %s) [primitive conversion done]"), op1, r);
+	log_debug("(%s + %s) [primitive conversion done]", op1, r);
 #endif
 
 	if (op1.is_string() || r.is_string()) {

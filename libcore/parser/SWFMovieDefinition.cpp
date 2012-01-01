@@ -317,7 +317,7 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
     // the error are better context.
     if (m_frame_size.is_null()) {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror("non-finite movie bounds");
+            log_swferror(_("non-finite movie bounds"));
         );
     }
 

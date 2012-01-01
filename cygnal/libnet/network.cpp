@@ -323,16 +323,16 @@ Network::newConnection(bool block, int fd)
 	    ret = pselect(fd+1, &fdset, NULL, NULL, &tval, &blockset);
 	}
 	if (sig_number) {
-	    log_debug(_("Have a SIGINT interupt waiting!"));
+	    log_debug("Have a SIGINT interrupt waiting!");
 	}
 	sigpending(&pending);
 	if (sigismember(&pending, SIGINT)) {
-	    log_debug(_("Have a pending SIGINT interupt waiting!"));
+	    log_debug("Have a pending SIGINT interrupt waiting!");
 	    int sig;
 	    sigwait(&blockset, &sig);
 	}
 	if (sigismember(&pending, SIGPIPE)) {
-	    log_debug(_("Have a pending SIGPIPE interupt waiting!"));
+	    log_debug("Have a pending SIGPIPE interrupt waiting!");
 	    int sig;
 	    sigwait(&blockset, &sig);
 	}
@@ -359,13 +359,14 @@ Network::newConnection(bool block, int fd)
         }
 
         if (ret == -1) {
-            log_debug(_("The accept() socket for fd #%d never was available"), fd);
+            log_debug("The accept() socket for fd #%d never was available", fd);
             return -1;
         }
 
         if (ret == 0) {
             if (_debug) {
-                log_debug(_("The accept() socket for fd #%d timed out waitingfor data"), fd);
+                log_debug("The accept() socket for fd #%d timed out"
+                    " waitingfor data", fd);
 		return 0;
             }
         }
@@ -383,7 +384,7 @@ Network::newConnection(bool block, int fd)
     }
 
     if (_debug) {
-	log_debug(_("Accepting tcp/ip connection on fd #%d for port %d"), _sockfd, _port);
+	log_debug(_("Accepting TCP/IP connection on fd #%d for port %d"), _sockfd, _port);
     }
 
     return _sockfd;
@@ -919,13 +920,13 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 	    ret = pselect(fd+1, &fdset, NULL, NULL, &tval, &blockset);
 	    sigpending(&pending);
 	    if (sigismember(&pending, SIGINT)) {
-		log_debug(_("Have a pending SIGINT interupt waiting!"));
+		log_debug("Have a pending SIGINT interrupt waiting!");
 		int sig;
 		sigwait(&blockset, &sig);
 		cntrlc_handler(SIGINT);
 	    }
 	    if (sigismember(&pending, SIGPIPE)) {
-		log_debug(_("Have a pending SIGPIPE interupt waiting!"));
+		log_debug("Have a pending SIGPIPE interrupt waiting!");
 		int sig;
 		sigwait(&blockset, &sig);
 		cntrlc_handler(SIGINT);
@@ -1100,7 +1101,7 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
 	ret = pselect(fd+1, NULL, &fdset, NULL, &tval, &blockset);
 	sigpending(&pending);
 	if (sigismember(&pending, SIGINT)) {
-	    log_debug(_("Have a pending SIGINT interupt waiting!"));
+	    log_debug("Have a pending SIGINT interrupt waiting!");
 	    int sig;
 	    sigwait(&blockset, &sig);
 	    cntrlc_handler(SIGINT);
@@ -1298,7 +1299,7 @@ Network::waitForNetData(int limit, struct pollfd *fds)
 	int ret = ppoll(fds, limit, &tval, &blockset);
 	sigpending(&pending);
 	if (sigismember(&pending, SIGINT)) {
-	    log_debug(_("Have a pending SIGINT interupt waiting!"));
+	    log_debug("Have a pending SIGINT interrupt waiting!");
 	    int sig;
 	    sigwait(&blockset, &sig);
 	}
@@ -1428,12 +1429,12 @@ Network::waitForNetData(int limit, fd_set files)
     int ret = pselect(limit+1, &fdset, NULL, NULL, &tval, &sigmask);
     sigpending(&pending);
     if (sigismember(&pending, SIGINT)) {
-	log_debug(_("Have a pending SIGINT interupt waiting!"));
+	log_debug("Have a pending SIGINT interrupt waiting!");
 	int sig;
 	sigwait(&sigmask, &sig);
     }
     if (sigismember(&pending, SIGPIPE)) {
-	log_debug(_("Have a pending SIGPIPE interupt waiting!"));
+	log_debug("Have a pending SIGPIPE interrupt waiting!");
 	int sig;
 	sigwait(&sigmask, &sig);
     }
@@ -1635,5 +1636,5 @@ cntrlc_handler (int sig)
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

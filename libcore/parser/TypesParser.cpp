@@ -142,8 +142,8 @@ readRect(SWFStream& in)
         // want to actually swap the values if the proprietary player
         // does so. TODO: check it out.
         IF_VERBOSE_MALFORMED_SWF(
-            log_swferror("Invalid rectangle: "
-                "minx=%g maxx=%g miny=%g maxy=%g", minx, maxx, miny, maxy);
+            log_swferror(_("Invalid rectangle: "
+                           "minx=%g maxx=%g miny=%g maxy=%g"), minx, maxx, miny, maxy);
         );
         return SWFRect();
     } 
@@ -158,7 +158,7 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
     const SWF::FillType type = static_cast<SWF::FillType>(in.read_u8());
         
     IF_VERBOSE_PARSE(
-        log_parse("  FillStyle read type = 0x%X", +type);
+        log_parse(_("  FillStyle read type = 0x%X"), +type);
     );
 
     switch (type) {
@@ -204,7 +204,7 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
             
             const boost::uint8_t num_gradients = grad_props & 0xF;
             IF_VERBOSE_PARSE(
-               log_parse("  gradients count: %d", +num_gradients);
+                log_parse(_("  gradients count: %d"), +num_gradients);
             );
         
             if (!num_gradients) {
@@ -263,8 +263,8 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
                         break;
                     default: 
                         IF_VERBOSE_MALFORMED_SWF(
-                            log_swferror("Illegal spread mode in gradient "
-                                "definition.");
+                            log_swferror(_("Illegal spread mode in gradient "
+                                           "definition."));
                         );
                 }
         
@@ -280,8 +280,8 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
                         break;
                     default:
                         IF_VERBOSE_MALFORMED_SWF(
-                            log_swferror("Illegal interpolation mode in "
-                                "gradient definition.");
+                            log_swferror(_("Illegal interpolation mode in "
+                                           "gradient definition."));
                         );
                 }
             }
@@ -405,7 +405,7 @@ readSolidFill(SWFStream& in, SWF::TagType t, bool readMorph)
     }
 
     IF_VERBOSE_PARSE(
-        log_parse("  color: %s", color);
+        log_parse(_("  color: %s"), color);
     );
     return std::make_pair(SolidFill(color), morph);
 }

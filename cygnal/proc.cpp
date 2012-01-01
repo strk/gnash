@@ -103,7 +103,7 @@ Proc::startCGI(const string &filespec, bool outflag, boost::uint16_t port)
     string path;
     if (crcfile.getCgiRoot().size() > 0) {
         path = crcfile.getCgiRoot().c_str();
-        log_debug(_("Document Root for CGI files is: %s"), path);
+        log_debug("Document Root for CGI files is: %s", path);
     } else {
         // Yes, I know this is a hack.
         path = "/var/www/html/cygnal/cgi-bin";
@@ -112,7 +112,7 @@ Proc::startCGI(const string &filespec, bool outflag, boost::uint16_t port)
     path += filespec;
         
     // simple debug junk
-    log_debug(_("Starting \"%s\""), path);
+    log_debug("Starting \"%s\"", path);
 
     // See if the file actually exists, otherwise we can't spawn it
     if (stat(path.c_str(), &procstats) == -1) {
@@ -184,7 +184,7 @@ int
 Proc::findCGI(const string &filespec)
 {
 //    GNASH_REPORT_FUNCTION;
-    log_debug(_("Finding \"%s\""), filespec);    
+    log_debug("Finding \"%s\"", filespec);
     boost::mutex::scoped_lock lock(_mutex);
 
     return _pids[filespec];
@@ -204,7 +204,7 @@ bool
 Proc::stopCGI(const string &filespec)
 {
 //    GNASH_REPORT_FUNCTION;
-    log_debug(_("Stopping \"%s\""), filespec);
+    log_debug("Stopping \"%s\"", filespec);
 
     boost::mutex::scoped_lock lock(_mutex);
     pid_t pid = _pids[filespec];

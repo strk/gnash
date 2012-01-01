@@ -142,7 +142,7 @@ class FsCommandExecutor: public movie_root::AbstractFsCallback {
 public:
 	void notify(const std::string& command, const std::string& args)
 	{
-	    log_debug(_("fs_callback(%p): %s %s"), command, args);
+	    log_debug("fs_callback(%p): %s %s", command, args);
 
 	    StringNoCaseEqual ncasecomp;
 	   
@@ -154,7 +154,7 @@ class EventCallback: public movie_root::AbstractIfaceCallback {
 public:
 	std::string call(const std::string& event, const std::string& arg)
 	{
-	    log_debug(_("eventCallback: %s %s"), event, arg);
+	    log_debug("eventCallback: %s %s", event, arg);
 
 	    static bool mouseShown = true;
 
@@ -265,13 +265,13 @@ vm_main(int argc, char *argv[])
 	      break;
 	  case 'v':
 	      dbglogfile.setVerbosity();
-	      log_debug (_("Verbose output turned on"));
+	      log_debug ("Verbose output turned on");
 	      break;
           case 'g':
 #ifdef USE_DEBUGGER
               debugger.enabled(true);
               debugger.console();
-              log_debug (_("Setting debugger ON"));
+              log_debug ("Setting debugger ON");
 #else
               log_error (_("The debugger has been disabled at configuration time"));
 #endif
@@ -404,10 +404,10 @@ play_movie(const std::string& filename, const RunResources& runResources)
              size_t lastSlash = path.find_last_of('/');
              std::string dir = path.substr(0, lastSlash+1);
              rcfile.addLocalSandboxPath(dir);
-             log_debug(_("%s appended to local sandboxes"), dir.c_str());
+             log_debug("%s appended to local sandboxes", dir.c_str());
 #else // add the *file* to be loaded to the local sandbox path
              rcfile.addLocalSandboxPath(path);
-             log_debug(_("%s appended to local sandboxes"), path.c_str());
+             log_debug("%s appended to local sandboxes", path.c_str());
 #endif
          }
          md = gnash::MovieFactory::makeMovie(url, runResources, NULL, false);
@@ -427,8 +427,8 @@ play_movie(const std::string& filename, const RunResources& runResources)
     long clockAdvance = fpsDelay/1000;
     long localDelay = delay == -1 ? fpsDelay : delay; // microseconds
 
-    log_debug(_("Will sleep %ld microseconds between iterations - "
-		"fps is %g, clockAdvance is %lu"), localDelay, fps, clockAdvance);
+    log_debug("Will sleep %ld microseconds between iterations - "
+		"fps is %g, clockAdvance is %lu", localDelay, fps, clockAdvance);
 
 
     // Use a clock advanced at every iteration to match exact FPS speed.
@@ -448,7 +448,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
         return md;
     }
 
-    log_debug(_("iteration, timer: %lu, localDelay: %ld\n"),
+    log_debug("iteration, timer: %lu, localDelay: %ld\n",
             cl.elapsed(), localDelay);
     gnashSleep(localDelay);
     
@@ -484,7 +484,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
         m.display(); // FIXME: for which reason are we calling display here ??
         ++nadvances;
         if ( limit_advances && nadvances >= limit_advances) {
-            log_debug(_("exiting after %d advances"), nadvances);
+            log_debug("exiting after %d advances", nadvances);
             break;
         }
 
@@ -494,8 +494,8 @@ play_movie(const std::string& filename, const RunResources& runResources)
         if (curr_frame >= md->get_frame_count() - 1 ) {
             if ( allowed_end_hits && ++end_hitcount >= allowed_end_hits )
             {
-                log_debug(_("exiting after %d" 
-			    " times last frame was reached"), end_hitcount);
+                log_debug("exiting after %d" 
+			    " times last frame was reached", end_hitcount);
                     break;
             }
         }
@@ -528,8 +528,8 @@ play_movie(const std::string& filename, const RunResources& runResources)
         else if (m.get_current_frame() < last_frame) {
             if ( last_frame > latest_frame ) latest_frame = last_frame;
             if ( ++loop_back_count > allowloopbacks ) {
-                log_debug(_("%d loop backs; jumping one-after "
-			    "latest frame (%d)"),
+                log_debug("%d loop backs; jumping one-after "
+			    "latest frame (%d)",
                         loop_back_count, latest_frame+1);
                 m.goto_frame(latest_frame + 1);
                 loop_back_count = 0;
@@ -539,7 +539,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
             resetLastAdvanceTimer();
         }
 
-        log_debug(_("iteration, timer: %lu, localDelay: %ld\n"),
+        log_debug("iteration, timer: %lu, localDelay: %ld\n",
                 cl.elapsed(), localDelay);
         gnashSleep(localDelay);
     }

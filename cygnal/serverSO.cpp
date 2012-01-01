@@ -72,6 +72,6 @@ ServerSO::dump(std::ostream& os) const
 
 // local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:
 

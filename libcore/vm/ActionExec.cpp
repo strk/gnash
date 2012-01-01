@@ -149,7 +149,7 @@ ActionExec::operator()()
                 pc, stop_pc, code.size(), _func ? _func : 0, codeVersion);
         std::stringstream ss;
         getVM(env).dumpState(ss, STACK_DUMP_LIMIT);
-        log_action("%s", ss.str());
+	    log_action(_("%s"), ss.str());
     );
 #endif
 
@@ -219,7 +219,7 @@ ActionExec::operator()()
             boost::uint8_t action_id = code[pc];
 
             IF_VERBOSE_ACTION (
-                log_action("PC:%d - EX: %s", pc, code.disasm(pc));
+                log_action(_("PC:%d - EX: %s"), pc, code.disasm(pc));
             );
 
             // Set default next_pc offset, control flow action handlers
@@ -282,7 +282,7 @@ ActionExec::operator()()
                     ss << "Discarding " << stop_pc-next_pc
                         << " bytes of remaining opcodes: " << std::endl;
                     dumpActions(next_pc, stop_pc, ss);
-                    log_action("%s", ss.str());
+                    log_action(_("%s"), ss.str());
                 );
                 break;
             }
@@ -293,7 +293,7 @@ ActionExec::operator()()
                         "stack follows"), pc, next_pc);
                 std::stringstream ss;
                 getVM(env).dumpState(ss, STACK_DUMP_LIMIT);
-                log_action("%s", ss.str());
+                log_action(_("%s"), ss.str());
             );
 #endif
 

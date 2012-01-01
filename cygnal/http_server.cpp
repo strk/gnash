@@ -147,7 +147,7 @@ HTTPServer::processClientRequest(Handler *hand, int fd, cygnal::Buffer *buf)
     // See if the file is in the cache and already opened.
     boost::shared_ptr<DiskStream> filestream(cache.findFile(_filespec));
     if (filestream) {
-	log_debug(_("FIXME: found filestream %s in cache!"), _filespec);
+	log_debug("FIXME: found filestream %s in cache!", _filespec);
 	filestream->dump();
     } else {
 	filestream.reset(new DiskStream);
@@ -189,8 +189,8 @@ HTTPServer::processGetRequest(Handler *hand, int fd, cygnal::Buffer *buf)
 //    cerr << hexify(buf->reference(), buf->allocated(), false) << endl;
     
     if (buf == 0) {
-     //	log_debug(_("Que empty, net connection dropped for fd #%d"), getFileFd());
-	log_debug(_("Que empty, net connection dropped for fd #%d"), fd);
+     //	log_debug("Queue empty, net connection dropped for fd #%d", getFileFd());
+	log_debug("Queue empty, net connection dropped for fd #%d", fd);
 //	cygnal::Buffer buf;
 	return _buf;
     }
@@ -284,7 +284,7 @@ HTTPServer::processPostRequest(int fd, cygnal::Buffer * /* bufFIXME */)
     
     buf = _que.pop();
     if (buf == 0) {
-	log_debug(_("Que empty, net connection dropped for fd #%d"),
+	log_debug("Queue empty, net connection dropped for fd #%d",
 		  getFileFd());
 	return buf;
     }
@@ -309,14 +309,14 @@ HTTPServer::processPostRequest(int fd, cygnal::Buffer * /* bufFIXME */)
     }    
     
     if (getField("content-type") == "application/x-www-form-urlencoded") {
-	log_debug(_("Got file data in POST"));
+	log_debug("Got file data in POST");
 	string url = _docroot + _filespec;
 	DiskStream ds(url, *content);
 	ds.writeToDisk();
 //    ds.close();
 	// oh boy, we got ourselves some encoded AMF objects instead of a boring file.
     } else if (getField("content-type") == "application/x-amf") {
-	log_debug(_("Got AMF data in POST"));
+	log_debug("Got AMF data in POST");
 #if 0
 	amf::AMF amf;
 	boost::shared_ptr<cygnal::Element> el = amf.extractAMF(content.reference(), content.end());
@@ -485,11 +485,11 @@ HTTPServer::formatGetReply(size_t size, http_status_e code)
 
 #if 0
     if (_header.str().size()) {
-        log_debug (_("Sent GET Reply"));
+        log_debug ("Sent GET Reply");
 	return _buffer;
     } else {
 	clearHeader();
-	log_debug (_("Couldn't send GET Reply, no header data"));
+	log_debug ("Couldn't send GET Reply, no header data");
     }    
 #endif
     
@@ -517,11 +517,11 @@ HTTPServer::formatPostReply(rtmpt_cmd_e /* code */)
 	buf->copy(str);
 	_handler->pushout(buf);
 	_handler->notifyout();
-        log_debug (_("Sent GET Reply"));
+        log_debug ("Sent GET Reply");
 	return true; // Default to true
     } else {
 	clearHeader();
-	log_debug (_("Couldn't send POST Reply, no header data"));
+	log_debug ("Couldn't send POST Reply, no header data");
     }
 #endif
 
@@ -554,7 +554,7 @@ HTTPServer::parseEchoRequest(boost::uint8_t *data, size_t size)
     // reduces memory errors caused by some of the corrupted tes cases.
     boost::uint8_t *endstr = std::find(tmpptr, tmpptr+length, '\0');
     if (endstr != tmpptr+length) {
-	log_debug(_("Caught corrupted string! length was %d, null at %d"),
+	log_debug("Caught corrupted string! length was %d, null at %d",
 		  length,  endstr-tmpptr);
 	length = endstr-tmpptr;
     }
@@ -575,7 +575,7 @@ HTTPServer::parseEchoRequest(boost::uint8_t *data, size_t size)
     // reduces memory errors caused by some of the corrupted tes cases.
     endstr = std::find(tmpptr, tmpptr+length, '\0');
     if (endstr != tmpptr+length) {
-	log_debug(_("Caught corrupted string! length was %d, null at %d"),
+	log_debug("Caught corrupted string! length was %d, null at %d",
 		  length,  endstr-tmpptr);
 	length = endstr-tmpptr;
     }
@@ -871,12 +871,12 @@ HTTPServer::extractCommand(boost::uint8_t *data)
 	if (params != end) {
 	    _params = std::string(params+1, end);
 	    _filespec = std::string(start, params);
-	    log_debug(_("Parameters for file: \"%s\""), _params);
+	    log_debug("Parameters for file: \"%s\"", _params);
 	} else {
 	    // This is fine as long as end is within the buffer.
 	    _filespec = std::string(start, end);
 	}
-	// log_debug(_("Requesting file: \"%s\""), _filespec);
+	// log_debug("Requesting file: \"%s\"", _filespec);
 
 	// The third field is always the HTTP version
 	// The version is the last field and is the protocol name
@@ -885,7 +885,7 @@ HTTPServer::extractCommand(boost::uint8_t *data)
 	// in it. It's actually two separate integers.
 	_version.major = *(end+6) - '0';
 	_version.minor = *(end+8) - '0';
-	// log_debug(_("Version: %d.%d"), _version.major, _version.minor);
+	// log_debug("Version: %d.%d", _version.major, _version.minor);
     }
 
     return cmd;
@@ -915,7 +915,7 @@ HTTPServer::processHeaderFields(cygnal::Buffer &buf)
 		_keepalive = true;
 		if ((value != "on") && (value != "off")) {
 		    _max_requests = strtol(value.c_str(), NULL, 0);
-		    log_debug(_("Setting Max Requests for Keep-Alive to %d"),
+		    log_debug("Setting Max Requests for Keep-Alive to %d",
 			      _max_requests);
 		}
 	    }
@@ -926,20 +926,20 @@ HTTPServer::processHeaderFields(cygnal::Buffer &buf)
 	    }
 	    if (name == "content-length") {
 		_filesize = strtol(value.c_str(), NULL, 0);
-		log_debug(_("Setting Content Length to %d"), _filesize);
+		log_debug("Setting Content Length to %d", _filesize);
 	    }
 	    if (name == "content-type") {
 		// This is the type used by flash when sending a AMF data via POST
 		if (value == "application/x-amf") {
-//		    log_debug(_("Got AMF data in the POST request!"));
+//		    log_debug("Got AMF data in the POST request!");
 		    _filetype = DiskStream::FILETYPE_AMF;
 		}
 		// This is the type used by wget when sending a file via POST
 		if (value == "application/x-www-form-urlencoded") {
-//		    log_debug(_("Got file data in the POST request"));
+//		    log_debug("Got file data in the POST request");
 		    _filetype = DiskStream::FILETYPE_ENCODED;
 		}
-		log_debug(_("Setting Content Type to %d"), _filetype);
+		log_debug("Setting Content Type to %d", _filetype);
 	    }
 	    
 //	    cerr << "FIXME: " << (void *)i << " : " << dec <<  end << endl;
@@ -949,7 +949,7 @@ HTTPServer::processHeaderFields(cygnal::Buffer &buf)
 		break;
 #if 1
 	    } else {
-		log_debug(_("Got a request, parsing \"%s\""), *i);
+		log_debug("Got a request, parsing \"%s\"", *i);
 		string::size_type start = i->find(" ");
 		string::size_type params = i->find("?");
 		string::size_type pos = i->find("HTTP/");
@@ -960,13 +960,13 @@ HTTPServer::processHeaderFields(cygnal::Buffer &buf)
 		    // in it. It's actually two separate integers.
 		    _version.major = i->at(pos+5) - '0';
 		    _version.minor = i->at(pos+7) - '0';
-		    // log_debug (_("Version: %d.%d"), _version.major, _version.minor);
+		    // log_debug ("Version: %d.%d", _version.major, _version.minor);
 		    // the filespec in the request is the middle field, deliminated
 		    // by a space on each end.
 		    if (params != string::npos) {
 			_params = i->substr(params+1, end);
 			_filespec = i->substr(start+1, params);
-			log_debug(_("Parameters for file: \"%s\""), _params);
+			log_debug("Parameters for file: \"%s\"", _params);
 		    } else {
 			_filespec = i->substr(start+1, pos-start-2);
 		    }
@@ -975,7 +975,7 @@ HTTPServer::processHeaderFields(cygnal::Buffer &buf)
 		    // HTTP 1.1 enables persistent network connections
 		    // by default.
 		    if (_version.minor > 0) {
-			log_debug(_("Enabling Keep Alive by default for HTTP > 1.0"));
+			log_debug("Enabling Keep Alive by default for HTTP > 1.0");
 			_keepalive = true;
 		    }
 		}
@@ -1024,7 +1024,7 @@ HTTPServer::http_handler(Handler *hand, int netfd, cygnal::Buffer *buf)
 	log_network(_("FIXME: No existing data in packet!"));
 	// See if we have any messages waiting
 	if (recvMsg(netfd) == 0) {
-	    log_debug(_("Net HTTP server failed to read from fd #%d..."), netfd);
+	    log_debug("Net HTTP server failed to read from fd #%d...", netfd);
 	    return false;
 	}
     }
@@ -1032,11 +1032,11 @@ HTTPServer::http_handler(Handler *hand, int netfd, cygnal::Buffer *buf)
     // Process incoming messages
     HTTP::http_method_e cmd = processClientRequest(hand, netfd, buf);    
     if (cmd != HTTP::HTTP_GET) {
-	log_debug(_("No active DiskStreams for fd #%d: %s..."), netfd,
+	log_debug("No active DiskStreams for fd #%d: %s...", netfd,
 		  _filespec);
     } else {
 	if (_diskstream) {
-	    log_debug(_("Found active DiskStream! for fd #%d: %s"), netfd,
+	    log_debug("Found active DiskStream! for fd #%d: %s", netfd,
 		      _filespec);
 	    hand->setDiskStream(netfd, _diskstream);
  	    cache.addFile(_filespec, _diskstream);
@@ -1070,14 +1070,14 @@ HTTPServer::http_handler(Handler *hand, int netfd, cygnal::Buffer *buf)
     // Unless the Keep-Alive flag is set, this isn't a persisant network
     // connection.
     if (!keepAlive()) {
-	log_debug(_("Keep-Alive is off"), keepAlive());
+	log_debug("Keep-Alive is off", keepAlive());
     } else {
-	log_debug(_("Keep-Alive is on"), keepAlive());
+	log_debug("Keep-Alive is on", keepAlive());
     }
 #ifdef USE_STATISTICS
     struct timespec end;
     clock_gettime (CLOCK_REALTIME, &end);
-    log_debug(_("Processing time for GET request was %f seconds"),
+    log_debug("Processing time for GET request was %f seconds",
 	      static_cast<float>(((end.tv_sec - start.tv_sec) +
 				  ((end.tv_nsec - start.tv_nsec)/1e9))));
 #endif

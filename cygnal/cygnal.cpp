@@ -1006,12 +1006,12 @@ event_handler(Network::thread_params_t *args)
     // for select. We may want to do this elsewhere, as it could
     // be a performance hit as the number of file descriptors gets
     // larger.
-    log_debug(_("Handler has %d clients attached, %d threads"),
+    log_debug("Handler has %d clients attached, %d threads",
 	      hand->getClients().size(), tids.num_of_tids());
     
     int max = 0;
     for (size_t i = 0; i<hand->getClients().size(); i++) {
-	log_debug(_("Handler client[%d] is: %d"), i, hand->getClient(i));
+	log_debug("Handler client[%d] is: %d", i, hand->getClient(i));
 	if (hand->getClient(i) >= max) {
 	    max = hand->getClient(i);
 	    // hand->dump();

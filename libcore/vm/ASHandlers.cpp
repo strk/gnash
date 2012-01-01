@@ -465,8 +465,8 @@ ActionNextFrame(ActionExec& thread)
     MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
     if (tgt) tgt->goto_frame(tgt->get_current_frame() + 1);
     else {
-        log_debug(_("ActionNextFrame: as_environment target is null "
-                    "or not a sprite"));
+        log_debug("ActionNextFrame: as_environment target is null "
+                    "or not a sprite");
     }
 }
 
@@ -482,7 +482,7 @@ ActionPrevFrame(ActionExec& thread)
     DisplayObject* tgtch = env.target();
     MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
     if (tgt) tgt->goto_frame(tgt->get_current_frame() - 1);
-    else log_debug(_("ActionPrevFrame: as_environment target is null or not a sprite"));
+    else log_debug("ActionPrevFrame: as_environment target is null or not a sprite");
 }
 
 void
@@ -497,7 +497,7 @@ ActionPlay(ActionExec& thread)
     DisplayObject* tgtch = env.target();
     MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
     if (tgt) tgt->setPlayState(MovieClip::PLAYSTATE_PLAY);
-    else log_debug(_("ActionPlay: as_environment target is null or not a sprite"));
+    else log_debug("ActionPlay: as_environment target is null or not a sprite");
 }
 
 void
@@ -512,7 +512,7 @@ ActionStop(ActionExec& thread)
     DisplayObject* tgtch = env.target();
     MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
     if (tgt) tgt->setPlayState(MovieClip::PLAYSTATE_STOP);
-    else log_debug(_("ActionStop: as_environment target is null or not a sprite"));
+    else log_debug("ActionStop: as_environment target is null or not a sprite");
 }
 
 void
@@ -558,8 +558,8 @@ ActionGotoFrame(ActionExec& thread)
     // frame number within this tag is hard-coded and 0-based
     if (tgt) tgt->goto_frame(frame);
     else {
-        log_debug(_("ActionGotoFrame: as_environment target is null "
-                "or not a sprite"));
+        log_debug("ActionGotoFrame: as_environment target is null "
+                "or not a sprite");
     }
 }
 
@@ -1389,8 +1389,8 @@ ActionImplementsOp(ActionExec& thread)
         }
 
         IF_VERBOSE_ACTION(
-            log_action("%s (with .prototype %p) implements %s (with "
-                ".prototype %p)", objval, (void*)obj, ctorval, (void*)inter);
+            log_action(_("%s (with .prototype %p) implements %s (with "
+                         ".prototype %p)"), objval, (void*)obj, ctorval, (void*)inter);
         );
         obj->addInterface(inter);
     }
@@ -1424,7 +1424,7 @@ ActionFscommand2(ActionExec& thread)
     }
     ss << ")";
 
-    LOG_ONCE( log_unimpl("fscommand2:%s", ss.str()) );
+    LOG_ONCE(log_unimpl(_("fscommand2:%s"), ss.str()) );
 
     // TODO: check wheter or not we should drop anything from
     //       the stack, some reports and the Canonical tests
@@ -1555,7 +1555,7 @@ ActionMbSubString(ActionExec& thread)
     as_value& string_val = env.top(2);
 
     IF_VERBOSE_ACTION(
-        log_action(" ActionMbSubString(%s, %d, %d)", string_val, arg0, arg1);
+        log_action(_(" ActionMbSubString(%s, %d, %d)"), string_val, arg0, arg1);
     );
 
     env.drop(2);
@@ -1620,7 +1620,7 @@ ActionMbOrd(ActionExec& thread)
     as_environment& env = thread.env;
 
     if (env.get_version() == 5) {
-        log_unimpl("Not properly implemented for SWF5");
+        log_unimpl(_("Not properly implemented for SWF5"));
         // No need to return - it works a bit.
     }
 
@@ -2518,14 +2518,14 @@ ActionNewEquals(ActionExec& thread)
         as_value op1 = env.top(0);
         try { convertToPrimitive(op1, vm); }
         catch (const ActionTypeError& e) {
-            log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),
+            log_debug("to_primitive(%s) threw an ActionTypeError %s",
                     op1, e.what());
         }
 
         as_value op2 = env.top(1);
         try { convertToPrimitive(op2, vm); }
         catch (const ActionTypeError& e) {
-            log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),
+            log_debug("to_primitive(%s) threw an ActionTypeError %s",
                     op2, e.what());
         }
 
@@ -3601,13 +3601,13 @@ commonGetURL(as_environment& env, as_value target,
 
 
     if (loadTargetFlag) {
-        log_debug(_("getURL2 target load"));
+        log_debug("getURL2 target load");
 
         if (!target_ch) {
 
             unsigned int levelno;
             if (isLevelTarget(getSWFVersion(env), target_string, levelno)) {
-                log_debug(_("Testing _level loading (level %u)"), levelno);
+                log_debug("Testing _level loading (level %u)", levelno);
                 m.loadMovie(url, target_string, varsToSend, sendVarsMethod);
                 return;
             }
@@ -3661,7 +3661,7 @@ commonGetURL(as_environment& env, as_value target,
 
     unsigned int levelno;
     if (isLevelTarget(getSWFVersion(env), target_string, levelno)) {
-        log_debug(_("Testing _level loading (level %u)"), levelno);
+        log_debug("Testing _level loading (level %u)", levelno);
         m.loadMovie(url, target_string, varsToSend, sendVarsMethod);
         return;
     }
