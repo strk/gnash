@@ -219,7 +219,7 @@ SSHClient::sshConnect(int /* fd */, std::string &hostname)
       case SSH_SERVER_FOUND_OTHER:
 	  log_error(_("The host key for this server was not found but an other type of key exists."));
 	  log_error(_("An attacker might change the default server key to confuse your client"
-		    "into thinking the key does not exist\n"
+		    " into thinking the key does not exist"
 		      "We advise you to rerun the client with -d or -r for more safety."));
 	  sshShutdown();
 	  return false;;
