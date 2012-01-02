@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-01-01 09:28-0700\n"
+"POT-Creation-Date: 2012-01-02 07:56-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -9656,9 +9656,9 @@ msgstr ""
 
 #: cygnal/libnet/sshclient.cpp:221
 msgid ""
-"An attacker might change the default server key to confuse your clientinto "
-"thinking the key does not exist\n"
-"We advise you to rerun the client with -d or -r for more safety."
+"An attacker might change the default server key to confuse your client into "
+"thinking the key does not existWe advise you to rerun the client with -d or -"
+"r for more safety."
 msgstr ""
 
 #: cygnal/libnet/sshclient.cpp:232
@@ -9712,11 +9712,11 @@ msgid "Can't allocate memory for new SSH channel!"
 msgstr ""
 
 #: cygnal/libnet/sshclient.cpp:412
-msgid "Can't read from a non-existant channel!"
+msgid "Can't read from a non-existent channel!"
 msgstr ""
 
 #: cygnal/libnet/sshclient.cpp:427
-msgid "Can't write to a non-existant channel!"
+msgid "Can't write to a non-existent channel!"
 msgstr ""
 
 #: cygnal/crc.cpp:145
@@ -9889,7 +9889,7 @@ msgstr ""
 
 #: cygnal/cygnal.cpp:884
 #, c-format
-msgid "Resuing %s Handler for %s using fd #%d"
+msgid "Reusing %s Handler for %s using fd #%d"
 msgstr ""
 
 #: cygnal/cygnal.cpp:910
