@@ -881,7 +881,7 @@ connection_handler(Network::thread_params_t *args)
 		    // We're done, close this network connection
 		}
 	    } else {
-		log_network(_("Resuing %s Handler for %s using fd #%d"),
+		log_network(_("Reusing %s Handler for %s using fd #%d"),
 			    proto_str[hargs->protocol], key, hargs->netfd);
 		hand->addClient(args->netfd, Network::HTTP);
 	    }

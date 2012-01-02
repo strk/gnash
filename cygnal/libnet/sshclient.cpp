@@ -409,7 +409,7 @@ SSHClient::readChannel(ssh_channel channel, cygnal::Buffer &buf)
     if (channel) {
 	ret = channel_read(channel, buf.reference(), buf.size(), 0);
     } else {
-	log_error(_("Can't read from a non-existant channel!"));
+	log_error(_("Can't read from a non-existent channel!"));
     }
 
     return ret;
@@ -424,7 +424,7 @@ SSHClient::writeChannel(ssh_channel channel, cygnal::Buffer &buf)
     if (channel) {
 	ret = channel_write(channel, buf.reference(), buf.size());
     } else {
-	log_error(_("Can't write to a non-existant channel!"));
+	log_error(_("Can't write to a non-existent channel!"));
     }
 
     return ret;
