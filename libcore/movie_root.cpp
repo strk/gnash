@@ -2053,10 +2053,12 @@ movie_root::advanceLiveChars()
                 _liveChars.size());
 #endif
 
-    // Iterate through the array once, instead of twice like it used to be.
+    // Advance all characters, then notify them.
     LiveChars::iterator it;
     for (it=_liveChars.begin(); it != _liveChars.end(); ++it) {
         advanceLiveChar(*it);
+    }
+    for (it=_liveChars.begin(); it != _liveChars.end(); ++it) {
         notifyLoad(*it);
     }
 }
