@@ -2,20 +2,21 @@
 # Copyright (C) YEAR Free Software Foundation, Inc.
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-01-01 09:28-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2012-01-14 00:20+0200\n"
+"Last-Translator: Chris <cjl@laptop.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Translate Toolkit 1.7.0\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Pootle 2.0.5\n"
 
 #: libbase/RTMP.cpp:221
 msgid "Initial connection failed"
@@ -221,9 +222,8 @@ msgstr ""
 
 #: libbase/extension.cpp:128 cygnal/handler.cpp:300
 #, c-format
-#, c-format, fuzzy
 msgid "Initializing module: \"%s\" from %s"
-msgstr "Alustetaan moduulia: \"%s\""
+msgstr ""
 
 #: libbase/extension.cpp:145
 msgid "Couldn't get class_init symbol"
@@ -232,7 +232,7 @@ msgstr ""
 #: libbase/extension.cpp:159
 #, c-format
 msgid "Initializing module: \"%s\""
-msgstr "Alustetaan moduulia: \"%s\""
+msgstr ""
 
 #: libbase/extension.cpp:174
 #, c-format
@@ -242,7 +242,7 @@ msgstr ""
 #: libbase/extension.cpp:202 cygnal/cgi-bin/oflaDemo/oflaDemo.cpp:313
 #, c-format
 msgid "Can't open directory %s"
-msgstr "Hakemistoa %s ei voi avata"
+msgstr ""
 
 #: libbase/curl_adapter.cpp:48
 msgid ""
@@ -295,14 +295,13 @@ msgstr ""
 
 #: libbase/curl_adapter.cpp:672
 #, c-format
-#, fuzzy
 msgid "FIXME: Timeout (%u milliseconds) while loading from URL %s"
-msgstr "Aikakatkaisu (%u millisekuntia) ladattaessa url:stä %s"
+msgstr ""
 
 #: libbase/curl_adapter.cpp:720
-#, c-format, fuzzy
+#, c-format
 msgid "Timeout (%u milliseconds) while loading from URL %s"
-msgstr "Aikakatkaisu (%u millisekuntia) ladattaessa url:stä %s"
+msgstr ""
 
 #: libbase/curl_adapter.cpp:763
 #, c-format
@@ -325,7 +324,7 @@ msgstr ""
 
 #: libbase/curl_adapter.cpp:825
 msgid "Allowing connections to SSL sites with invalid certificates"
-msgstr "Sallitaan SSL-yhteydet sivustoille joilla epäkelpo varmenne"
+msgstr ""
 
 #: libbase/curl_adapter.cpp:1091
 msgid ""
@@ -1276,22 +1275,16 @@ msgid ""
 "Missing plugin, but plugin installing not supported. Will try anyway, but "
 "expect failure."
 msgstr ""
-"Liitännäinen puuttuu, mutta liitännäisen asentaminen ei ole tuettu. "
-"Yritetään joka tapauksessa, mutta epäonnistuminen on odotettavissa."
 
 #: libmedia/gst/GstUtil.cpp:121
 msgid "Missing plugin, but failed to convert it to gst missing plugin detail."
 msgstr ""
-"Liitännäinen puuttuu, mutta sen muuntaminen tiedoksi puuttuvasta tietystä "
-"gst-liitännäiestä epäonnistui."
 
 #: libmedia/gst/GstUtil.cpp:134
 msgid ""
 "gst_update_registry failed. You'll need to restart Gnash to use the new "
 "plugins."
 msgstr ""
-"gst_update_registry epäonnistui. Käynnistä Gnash uudelleen käyttääksesi "
-"uusia liitännäisiä."
 
 #: libmedia/gst/GstUtil.cpp:141
 msgid "Missing plugin, but automatic plugin installation not available."
@@ -1299,7 +1292,7 @@ msgstr ""
 
 #: libmedia/gst/VideoDecoderGst.cpp:97
 msgid "Video codec is zero.  Streaming video expected later."
-msgstr "Videokoodekki on ”nolla”. Videovirtaa odotetaan myöhemmäksi."
+msgstr ""
 
 #: libmedia/gst/VideoDecoderGst.cpp:100
 #, c-format
@@ -1313,11 +1306,11 @@ msgstr ""
 #: libmedia/gst/VideoDecoderGst.cpp:130
 #, c-format
 msgid "Couldn't find a plugin for video type %s!"
-msgstr "Liitännäistä ei löydy videotyypille %s."
+msgstr ""
 
 #: libmedia/gst/VideoDecoderGst.cpp:134
 msgid " Please make sure you have gstreamer-ffmpeg installed."
-msgstr " Varmista, että gstreamer-ffmpeg on asennettu."
+msgstr ""
 
 #: libmedia/gst/VideoDecoderGst.cpp:158
 #, c-format
@@ -1439,13 +1432,12 @@ msgstr ""
 #: libmedia/gst/AudioDecoderGst.cpp:110
 #, c-format
 msgid "AudioDecoderGst: cannot handle codec %d (%s)"
-msgstr "AudioDecoderGst: ei voi käsitellä koodekkia %d (%s)"
+msgstr ""
 
 #: libmedia/gst/AudioDecoderGst.cpp:120
 #, c-format
 msgid "AudioDecoderGst: cannot handle codec %d (no ExtraInfoGst attached)"
 msgstr ""
-"AudioDecoderGst: ei voi käsitellä koodekkia %d (ExtraInfoGst ei liitetty)"
 
 #: libmedia/gst/AudioDecoderGst.cpp:149
 msgid ""
@@ -1459,9 +1451,8 @@ msgstr ""
 
 #: libmedia/gst/AudioDecoderGst.cpp:175
 #, c-format
-#, c-format, fuzzy
 msgid "Couldn't find a plugin for audio type %s!"
-msgstr "Liitännäistä ei löydy videotyypille %s."
+msgstr ""
 
 #: libmedia/gst/AudioDecoderGst.cpp:199
 #, c-format
@@ -1867,7 +1858,7 @@ msgstr ""
 #: libmedia/MediaHandler.cpp:70
 #, c-format
 msgid "Exception while reading from stream: %s"
-msgstr "Poikkeus luettaessa virtaa: %s"
+msgstr ""
 
 #: libmedia/MediaHandler.cpp:107
 #, c-format
@@ -4551,7 +4542,7 @@ msgstr ""
 #: libcore/asobj/NetStream_as.cpp:386
 #, c-format
 msgid "Connecting to movie: %s"
-msgstr "Yhdistetään elokuvaan: %s"
+msgstr ""
 
 #: libcore/asobj/NetStream_as.cpp:392
 #, c-format
@@ -5123,9 +5114,9 @@ msgid "sendAndLoad(): invalid target (must be an XML or LoadVars object)"
 msgstr ""
 
 #: libcore/asobj/LoadableObject.cpp:397
-#, c-format, fuzzy
+#, c-format
 msgid "Loading from URL: '%s'"
-msgstr "Ladataan URLista: '%s'"
+msgstr ""
 
 #: libcore/asobj/LoadableObject.cpp:417
 msgid "load() requires at least one argument"
@@ -5317,7 +5308,7 @@ msgstr ""
 
 #: libcore/DisplayObject.cpp:803
 msgid "Depth"
-msgstr "Syvyys"
+msgstr ""
 
 #: libcore/DisplayObject.cpp:809
 msgid "Ratio"
@@ -6300,7 +6291,7 @@ msgstr ""
 #: libcore/parser/sprite_definition.cpp:64
 #, c-format
 msgid "  frames = %d"
-msgstr "  kehyksiä = %d"
+msgstr ""
 
 #: libcore/parser/sprite_definition.cpp:77
 #, c-format
@@ -6448,7 +6439,7 @@ msgstr ""
 #: libcore/parser/SWFMovieDefinition.cpp:431
 #, c-format
 msgid "Could not find char %d, dump is: %s"
-msgstr "Merkkiä %d ei löydy, vedos on: %s"
+msgstr ""
 
 #: libcore/parser/SWFMovieDefinition.cpp:490
 msgid "Error while parsing SWF stream."
@@ -6794,7 +6785,7 @@ msgstr ""
 
 #: libcore/MovieFactory.cpp:222
 msgid "Could not find SWF inside an exe file"
-msgstr "SWF:ää ei löydy exe-tiedoston sisältä"
+msgstr ""
 
 #: libcore/MovieFactory.cpp:231
 #, c-format
@@ -6804,7 +6795,7 @@ msgstr ""
 #: libcore/MovieFactory.cpp:273
 #, c-format
 msgid "Can't read image file from %s"
-msgstr "Kuvatiedostoa ei voi lukea kohteesta: %s"
+msgstr ""
 
 #: libcore/MovieFactory.cpp:283
 #, c-format
@@ -6891,19 +6882,20 @@ msgstr ""
 
 #: libdevice/egl/eglDevice.cpp:209 libdevice/egl/eglDevice.cpp:544
 #: gui/gtk/gtk_glue_ovg.cpp:383
-#, c-format
+#, c-format, fuzzy
 msgid "eglGetConfigs() failed to retrieve the number of configs (error %s)"
 msgstr ""
+"eglGetConfigs() не удалось получить количество конфигураций (ошибка: %s)"
 
 #: libdevice/egl/eglDevice.cpp:214 libdevice/egl/eglDevice.cpp:549
 #: gui/gtk/gtk_glue_ovg.cpp:388
 msgid "No EGLconfigs found\n"
-msgstr ""
+msgstr "Конфигурации EGL не найдены\n"
 
 #: libdevice/egl/eglDevice.cpp:217 libdevice/egl/eglDevice.cpp:552
 #, c-format
 msgid "Max number of EGL Configs is %d"
-msgstr ""
+msgstr "Макс. кол-во конфигураций EGL — %d"
 
 #: libdevice/egl/eglDevice.cpp:232
 msgid "Using the 32bpp, low quality configuration"
@@ -6968,18 +6960,20 @@ msgid "Initializing EGL for OpenGLES2"
 msgstr ""
 
 #: libdevice/egl/eglDevice.cpp:342 libdevice/egl/eglDevice.cpp:362
-#, c-format
+#, c-format, fuzzy
 msgid "eglBindAPI() failed to retrieve the number of configs (error %s)"
 msgstr ""
+"eglGetConfigs() не удалось получить количество конфигураций (ошибка: %s)"
 
 #: libdevice/egl/eglDevice.cpp:350
 msgid "Initializing EGL for OpenGLES1"
 msgstr ""
 
 #: libdevice/egl/eglDevice.cpp:352
-#, c-format
+#, c-format, fuzzy
 msgid "eglBindAPI() failed to retrive the number of configs (error %s)"
 msgstr ""
+"eglGetConfigs() не удалось получить количество конфигураций (ошибка: %s)"
 
 #: libdevice/egl/eglDevice.cpp:360
 msgid "Initializing EGL for OpenVG"
@@ -7006,12 +7000,12 @@ msgstr ""
 
 #: libdevice/egl/eglDevice.cpp:556 gui/gtk/gtk_glue_ovg.cpp:395
 msgid "Out of memory\n"
-msgstr ""
+msgstr "Недостаточно памяти\n"
 
 #: libdevice/egl/eglDevice.cpp:561 gui/gtk/gtk_glue_ovg.cpp:400
 #, c-format
 msgid "eglGetConfigs() failed to retrive the configs (error %s)"
-msgstr ""
+msgstr "eglGetConfigs() не удалось получить конфигурации (ошибка: %s)"
 
 #: libdevice/egl/eglDevice.cpp:774
 #, c-format
@@ -7091,7 +7085,7 @@ msgstr ""
 
 #: libdevice/events/MouseDevice.cpp:170
 msgid "Mouse reset failed"
-msgstr "Hiiren alustus epäonnistui"
+msgstr ""
 
 #: libdevice/events/MouseDevice.cpp:180
 msgid "WARNING: Could not detect mouse device ID"
@@ -7162,10 +7156,13 @@ msgid "The device has this error: %s"
 msgstr ""
 
 #: libdevice/events/InputDevice.cpp:211
+#, fuzzy
 msgid ""
 "WARNING: PS/2 Mouse support disabled as it conflicts with the input event "
 "support."
 msgstr ""
+"ПРЕДУПРЕЖДЕНИЕ: устройство мыши может конфликтовать с поддержкой событий "
+"ввода."
 
 #: libdevice/events/EventDevice.cpp:80
 #, c-format
@@ -7613,12 +7610,12 @@ msgstr ""
 #: libdevice/rawfb/RawFBDevice.cpp:147
 #, c-format
 msgid "Framebuffer device uses %d bytes of memory."
-msgstr "Kuvapuskurilaite käyttää %d tavua muistia."
+msgstr ""
 
 #: libdevice/rawfb/RawFBDevice.cpp:149
 #, c-format
 msgid "Video mode: %dx%d with %d bits per pixel."
-msgstr "Näyttötila: %dx%d, %d bittiä pikseliä kohden."
+msgstr ""
 
 #: libdevice/rawfb/RawFBDevice.cpp:153
 #, c-format
@@ -7627,7 +7624,7 @@ msgstr ""
 
 #: libdevice/rawfb/RawFBDevice.cpp:167
 msgid "LUT8: Setting up colormap"
-msgstr "LUT8: Asetetaan värikarttaa"
+msgstr ""
 
 #: libdevice/rawfb/RawFBDevice.cpp:192
 #, c-format
@@ -7726,7 +7723,7 @@ msgstr ""
 #: libsound/WAVWriter.cpp:65
 #, fuzzy
 msgid "Unable to write file %1%"
-msgstr "Ei voida kirjoittaa tiedostoon '%s'."
+msgstr "Не удалось записать файл «%1%»"
 
 #: libsound/mkit/sound_handler_mkit.cpp:75
 msgid "Unable to open audio"
@@ -7927,7 +7924,7 @@ msgstr ""
 #: utilities/soldumper.cpp:105
 #, c-format
 msgid "Gnash soldumper version: %s, Gnash version: %s\n"
-msgstr "Gnash soldumper -versio: %s, Gnash-versio: %s\n"
+msgstr ""
 
 #: utilities/soldumper.cpp:121 utilities/processor.cpp:276
 #: utilities/flvdumper.cpp:154 cygnal/cygnal.cpp:475
@@ -7973,7 +7970,7 @@ msgstr ""
 #: utilities/processor.cpp:237 cygnal/cvm.cpp:227
 #, c-format
 msgid "Gnash gprocessor version: %s, Gnash version: %s\n"
-msgstr "Gnash gprocessor -versio: %s, Gnash-versio: %s\n"
+msgstr ""
 
 #: utilities/processor.cpp:285 cygnal/cvm.cpp:282
 msgid "Verbose actions disabled at compile time"
@@ -7987,7 +7984,7 @@ msgstr ""
 #: gui/pythonmod/gnash-view.cpp:438 gui/pythonmod/gnash-view.cpp:441
 #, c-format
 msgid "%s appended to local sandboxes"
-msgstr ""
+msgstr "%s добавлен в локальную «песочницу»"
 
 #: utilities/processor.cpp:631
 #, c-format
@@ -8035,7 +8032,7 @@ msgstr ""
 #: utilities/dumpshm.cpp:136
 #, c-format
 msgid "Gnash dumpshm version: %s, Gnash version: %s\n"
-msgstr "Gnash dumpshm -versio: %s, Gnash-versio: %s\n"
+msgstr ""
 
 #: utilities/dumpshm.cpp:214
 #, c-format
@@ -8148,8 +8145,9 @@ msgid "This is a Gnash flvdumper bug."
 msgstr ""
 
 #: utilities/flvdumper.cpp:178
+#, fuzzy
 msgid "Error: no input file was specified. Exiting."
-msgstr ""
+msgstr "Ошибка: не указан входной файл. Выход."
 
 #: utilities/flvdumper.cpp:302
 msgid "This program dumps the internal data of an FLV video file"
@@ -9816,9 +9814,8 @@ msgstr ""
 
 #: cygnal/cygnal.cpp:341
 #, c-format
-#, c-format, fuzzy
 msgid "Couldn't connect to %s"
-msgstr "Tietokantaan ei voi yhdistää"
+msgstr ""
 
 #: cygnal/cygnal.cpp:361
 #, c-format
@@ -9851,6 +9848,11 @@ msgid ""
 "You may redistribute copies of Cygnal under the terms of the GNU General\n"
 "Public License V3. For more information, see the file named COPYING.\n"
 msgstr ""
+"Авторские права (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.\n"
+"Cygnal распространяется без каких-либо ГАРАНТИЙ в рамках, разрешённых "
+"законом.\n"
+"Вы можете распространять Cygnal на условиях GNU General\n"
+"Public License.  Дополнительную информацию можно найти в файле COPYING.\n"
 
 #: cygnal/cygnal.cpp:640
 #, c-format
@@ -9991,9 +9993,8 @@ msgstr ""
 
 #: cygnal/cgi-bin/oflaDemo/oflaDemo.cpp:309
 #, c-format
-#, c-format, fuzzy
 msgid "Scanning directory \"%s\" for %s files"
-msgstr "Tarkistetaan liitännäisiä hakemistosta \"%s\""
+msgstr ""
 
 #: cygnal/cgi-bin/oflaDemo/oflaDemo.cpp:340
 #, c-format
@@ -10190,7 +10191,7 @@ msgstr ""
 #: cygnal/testsuite/libamf.all/test_buffer.cpp:116
 #: cygnal/testsuite/libamf.all/test_amf.cpp:118
 msgid "Logging to disk enabled"
-msgstr "Levylle lokin kirjoittaminen otettu käyttöön"
+msgstr ""
 
 #: cygnal/testsuite/libnet.all/generate_amfbins.cpp:299
 #: cygnal/testsuite/libamf.all/test_el.cpp:490
@@ -10221,52 +10222,59 @@ msgstr ""
 #: gui/fb/fb.cpp:229
 #, c-format
 msgid "No renderer! %s not supported."
-msgstr ""
+msgstr "Нет компонента для отрисовки! %s не поддерживается."
 
 #: gui/fb/fb.cpp:240
 msgid "Found no accessible User mode input event device"
 msgstr ""
+"Не найдено ни одного доступного устройства событийного ввода режима "
+"пользователя"
 
 #: gui/fb/fb.cpp:249
 msgid "Found no accessible input event devices"
-msgstr ""
+msgstr "Не найдено ни одного доступного устройства событийного ввода"
 
 #: gui/fb/fb.cpp:262
 msgid "WARNING: Mouse support may conflict with the input event support."
 msgstr ""
+"ПРЕДУПРЕЖДЕНИЕ: устройство мыши может конфликтовать с поддержкой событий "
+"ввода."
 
 #: gui/fb/fb.cpp:276
 msgid "Enabling Touchscreen support."
-msgstr ""
+msgstr "Включение поддержки сенсорного экрана."
 
 #: gui/fb/fb.cpp:281
 msgid "WARNING: Babbage Tablet support disabled as it conflicts with TSlib"
 msgstr ""
+"ПРЕДУПРЕЖДЕНИЕ: поддержка планшетов Babbage отключена из-за конфликтов с "
+"TSlib"
 
 #: gui/fb/fb.cpp:283
 msgid "Enabling Babbage Touchscreen support"
-msgstr ""
+msgstr "Включение поддержки сенсорного экрана Babbage"
 
 #: gui/fb/fb.cpp:288
 msgid "Enabling Power Button support"
-msgstr ""
+msgstr "Включение поддержки кнопки управления питанием"
 
 #: gui/fb/fb.cpp:368
 #, c-format
 msgid "Movie Frame Rate is %d, adjusting delay to %dms"
-msgstr ""
+msgstr "Частота смены кадров — %d; установка задержки %d мс"
 
 #: gui/fb/fb.cpp:462
 msgid "This GUI does not yet support menus"
-msgstr "Tämä käyttöliittymä ei vielä tue valikoita"
+msgstr "Этот интерфейс пока что не поддерживает меню"
 
 #: gui/fb/fb.cpp:468
 msgid "This GUI does not yet support a mouse pointer"
-msgstr "Tämä käyttöliittymä ei vielä tue hiiren osoitinta"
+msgstr "Этот интерфейс пока что не поддерживает указатель мыши"
 
 #: gui/fb/fb.cpp:539
+#, fuzzy
 msgid "Could not detect controlling TTY"
-msgstr ""
+msgstr "ПРЕДУПРЕЖДЕНИЕ: не удалось обнаружить управляющий терминал TTY"
 
 #: gui/fb/fb.cpp:548 gui/fb/fb.cpp:585 gui/fb/fb.cpp:619 gui/fb/fb.cpp:670
 #, c-format
@@ -10274,349 +10282,353 @@ msgid "Could not open %s"
 msgstr ""
 
 #: gui/fb/fb.cpp:554
+#, fuzzy
 msgid "Could not get current VT state"
 msgstr ""
+"ПРЕДУПРЕЖДЕНИЕ: не удалось получить текущее состояние виртуального терминала"
 
 #: gui/fb/fb.cpp:565
 msgid "Could not request a new VT"
 msgstr ""
 
 #: gui/fb/fb.cpp:579 gui/fb/fb.cpp:613 gui/fb/fb.cpp:664
-#, c-format
+#, c-format, fuzzy
 msgid "Could not find device for VT number %d"
-msgstr ""
+msgstr "ПРЕДУПРЕЖДЕНИЕ: не удалось найти устройство для ВТ под номером %d"
 
 #: gui/fb/fb.cpp:590 gui/fb/fb.cpp:675
-#, c-format
+#, c-format, fuzzy
 msgid "Could not activate VT number %d"
-msgstr ""
+msgstr "ПРЕДУПРЕЖДЕНИЕ: не удалось активировать ВТ под номером %d"
 
 #: gui/fb/fb.cpp:596 gui/fb/fb.cpp:681
-#, c-format
+#, c-format, fuzzy
 msgid "Error waiting for VT %d becoming active"
-msgstr ""
+msgstr "ПРЕДУПРЕЖДЕНИЕ: ошибка ожидания активации ВТ %d"
 
 #: gui/fb/fb.cpp:627
-#, c-format
+#, c-format, fuzzy
 msgid "Could not attach controlling terminal (%s)"
-msgstr ""
+msgstr "ПРЕДУПРЕЖДЕНИЕ: не удалось присоединить управляющий терминал (%s)"
 
 #: gui/fb/fb.cpp:635
+#, fuzzy
 msgid "Could not query current keyboard mode on VT"
-msgstr ""
+msgstr "ПРЕДУПРЕЖДЕНИЕ: не удалось получить текущий режим клавиатуры ВТ"
 
 #: gui/fb/fb.cpp:639
+#, fuzzy
 msgid "Could not switch to graphics mode on new VT"
 msgstr ""
+"ПРЕДУПРЕЖДЕНИЕ: не удалось переключиться на графический режим в новом ВТ"
 
 #: gui/fb/fb.cpp:690
 #, fuzzy
 msgid "Could not restore keyboard mode"
-msgstr "VAROITUS: Näppäimistötilaa ei voi palauttaa"
+msgstr "ПРЕДУПРЕЖДЕНИЕ: не удалось восстановить режим клавиатуры"
 
 #: gui/fb/fb_glue_ovg.cpp:73 gui/gtk/gtk_glue_ovg.cpp:88
 msgid "Probing found an EGL display device"
-msgstr ""
+msgstr "Проверка найденного устройства экрана EGL"
 
 #: gui/fb/fb_glue_ovg.cpp:77 gui/gtk/gtk_glue_ovg.cpp:92
 msgid "Probing found a raw Framebuffer display device"
-msgstr ""
+msgstr "Проверка найденного устройства экрана необработанного фрейм-буфера"
 
 #: gui/fb/fb_glue_ovg.cpp:81 gui/gtk/gtk_glue_ovg.cpp:96
 msgid "Probing found an X11 display device"
-msgstr ""
+msgstr "Проверка найденного устройства экрана X11"
 
 #: gui/fb/fb_glue_ovg.cpp:85 gui/gtk/gtk_glue_ovg.cpp:100
 msgid "Probing found a DirectFB display device"
-msgstr ""
+msgstr "Проверка найденного устройства экрана DirectFB"
 
 #: gui/fb/fb_glue_ovg.cpp:90 gui/gtk/gtk_glue_ovg.cpp:105
 msgid "No display devices found by probing!"
-msgstr ""
+msgstr "Не найдено ни одного устройства экрана для проверки!"
 
 #: gui/fb/fb_glue_ovg.cpp:156
 msgid "Could not create OpenVG renderer"
-msgstr ""
+msgstr "Не удалось создать компонент отрисовки OpenVG"
 
 #: gui/fb/fb_glue_ovg.cpp:168 gui/fb/fb_glue_agg.cpp:76
 msgid "No renderer set!"
-msgstr ""
+msgstr "Компонент отрисовки не установлен!"
 
 #: gui/fb/fb_glue_gles1.cpp:98
 msgid "EGL: getDisplay ok"
-msgstr ""
+msgstr "EGL: getDisplay ok"
 
 #: gui/fb/fb_glue_gles1.cpp:104
 msgid "EGL: initialize ok"
-msgstr ""
+msgstr "EGL: инициализация ok"
 
 #: gui/fb/fb_glue_gles1.cpp:111
 msgid "EGL: config ok"
-msgstr ""
+msgstr "EGL: конфигурация ok"
 
 #: gui/fb/fb_glue_gles1.cpp:118
 msgid "EGL: surface ok"
-msgstr ""
+msgstr "EGL: поверхность ok"
 
 #: gui/fb/fb_glue_gles1.cpp:124
 msgid "EGL: context ok"
-msgstr ""
+msgstr "EGL: контекст ok"
 
 #: gui/fb/fb_glue_gles1.cpp:130
 msgid "EGL: current ok"
-msgstr ""
+msgstr "EGL: привязка к текущему потоку ok"
 
 #: gui/fb/fb_glue_agg.cpp:87
 #, c-format
 msgid "No renderer set in %s!"
-msgstr ""
+msgstr "Для %s не установлен компонент отрисовки!"
 
 #: gui/fb/fb_glue_agg.cpp:130
 msgid "failed to create a render handler for AGG!"
-msgstr ""
+msgstr "сбой при создании обработчика отрисовки для AGG!"
 
 #: gui/fb/fb_glue_agg.cpp:151
 msgid "No Device layer initialized yet!"
-msgstr ""
+msgstr "Слой устройств ещё не инициализирован!"
 
 #: gui/fb/fb_glue_agg.cpp:182
 msgid "The pixel format of your framebuffer could not be detected."
-msgstr ""
+msgstr "Не удалось определить пикселный формат фрейм-буфера."
 
 #: gui/fb/fb_glue_agg.cpp:191
 msgid "Double buffering disabled"
-msgstr "Kaksoispuskurointi pois käytöstä"
+msgstr "Двойная буферизация отключена"
 
 #: gui/fb/fb_glue_agg.cpp:194
 msgid "Double buffering enabled"
-msgstr "Kaksoispuskurointi käytössä"
+msgstr "Двойная буферизация включена"
 
 #: gui/fb/fb_glue_agg.cpp:221
 #, c-format
 msgid "No Drawbounds set in %s!"
-msgstr ""
+msgstr "Для %s не установлены границы рисования!"
 
 #: gui/gnash.cpp:125
 #, c-format
 msgid "Error parsing options: %s\n"
-msgstr ""
+msgstr "Ошибка разбора параметров: %s\n"
 
 #: gui/gnash.cpp:166
 msgid "Error: no input file was specified. Exiting.\n"
-msgstr ""
+msgstr "Ошибка: не указан входной файл. Выход.\n"
 
 #: gui/gnash.cpp:212
 msgid "Invalid host communication filedescriptor %1%\n"
-msgstr ""
+msgstr "Неверный коммуникационный файловый дескриптор узла %1%\n"
 
 #: gui/gnash.cpp:219
 msgid "Invalid control communication filedescriptor %1%\n"
-msgstr ""
+msgstr "Недопустимый файловый дескриптор управления коммуникациями %1%\n"
 
 #: gui/gnash.cpp:251
 msgid "ERROR: -r must be followed by 0, 1, 2 or 3 "
-msgstr "VIRHE: -r-valitsimen kanssa tulee määrittää 0, 1, 2, tai 3 "
+msgstr "ОШИБКА: после -r должно быть указано 0, 1, 2 или 3 "
 
 #: gui/gnash.cpp:267
 msgid "Debugging options"
-msgstr ""
+msgstr "Параметры отладки"
 
 #: gui/gnash.cpp:273
 msgid "Produce verbose output"
-msgstr ""
+msgstr "Выводить подробную информацию"
 
 #: gui/gnash.cpp:280
 msgid "Produce the disk based debug log"
-msgstr ""
+msgstr "Сохранить журнал отладки"
 
 #: gui/gnash.cpp:285
 msgid "Be (very) verbose about action execution"
-msgstr ""
+msgstr "Подробная информация о выполнении действий"
 
 #: gui/gnash.cpp:291
 msgid "Be (very) verbose about parsing"
-msgstr ""
+msgstr "Подробная информация о разборе"
 
 #: gui/gnash.cpp:297
 msgid "Print FPS every num seconds"
-msgstr ""
+msgstr "Выводить FPS через указанное кол-во секунд"
 
 #: gui/gnash.cpp:320
 msgid "Options"
-msgstr ""
+msgstr "Параметры"
 
 #: gui/gnash.cpp:325
 msgid "Print this help and exit"
-msgstr ""
+msgstr "Показать эту справку и выйти"
 
 #: gui/gnash.cpp:328
 msgid "Print version information and exit"
-msgstr ""
+msgstr "Показать информацию о версии и выйти"
 
 #: gui/gnash.cpp:333
 msgid "Scale the movie by the specified factor"
-msgstr ""
+msgstr "Масштабировать ролик согласно указанному соотношению сторон"
 
 #: gui/gnash.cpp:337
 msgid "Number of milliseconds to delay in main loop"
-msgstr ""
+msgstr "Задержка в основном цикле в милисекундах"
 
 #: gui/gnash.cpp:341
 msgid "Audio dump file (wave format)"
-msgstr ""
+msgstr "Файл для сохранения звука (формат wave)"
 
 #: gui/gnash.cpp:346
 msgid "Hardware Video Accelerator to use"
-msgstr ""
+msgstr "Используемый аппаратный видеоускоритель"
 
 #: gui/gnash.cpp:351
 msgid "X11 Window ID for display"
-msgstr ""
+msgstr "ID окна X11 для отображения"
 
 #: gui/gnash.cpp:355
 msgid "Set window width"
-msgstr ""
+msgstr "Задать ширину окна"
 
 #: gui/gnash.cpp:359
 msgid "Set window height"
-msgstr ""
+msgstr "Задать высоту окна"
 
 #: gui/gnash.cpp:363
 msgid "Set window x position"
-msgstr ""
+msgstr "Установить положение окна по оси X"
 
 #: gui/gnash.cpp:367
 msgid "Set window y position"
-msgstr ""
+msgstr "Установить положение окна по оси Y"
 
 #: gui/gnash.cpp:372
 msgid "Exit when/if movie reaches the last frame"
-msgstr ""
+msgstr "Выйти, когда ролик достигнет последнего кадра"
 
 #: gui/gnash.cpp:378
 msgid "disable rendering and sound"
-msgstr ""
+msgstr "отключить отрисовку и звук"
 
 #: gui/gnash.cpp:380
 msgid "enable rendering, disable sound"
-msgstr ""
+msgstr "включить отрисовку, выключить звук"
 
 #: gui/gnash.cpp:382
 msgid "enable sound, disable rendering"
-msgstr ""
+msgstr "включить звук, выключить отрисовку"
 
 #: gui/gnash.cpp:384
 msgid "enable rendering and sound"
-msgstr ""
+msgstr "включить отрисовку и звук"
 
 #: gui/gnash.cpp:392
 msgid "The media handler to use"
-msgstr ""
+msgstr "Используемый медиаобработчик"
 
 #: gui/gnash.cpp:400
 msgid "The renderer to use"
-msgstr ""
+msgstr "Используемый отрисовщик"
 
 #: gui/gnash.cpp:406
 msgid "Exit after the specified number of seconds"
-msgstr ""
+msgstr "Выйти после указанного количества секунд"
 
 #: gui/gnash.cpp:409
 msgid "Set \"real\" URL of the movie"
-msgstr ""
+msgstr "Установить действительный URL ролика"
 
 #: gui/gnash.cpp:413
 msgid "Set \"base\" URL for resolving relative URLs"
-msgstr ""
+msgstr "Установить базовый URL ролика для разрешения относительных URL"
 
 #: gui/gnash.cpp:418
 msgid "Set parameter (e.g. \"FlashVars=A=1&b=2\")"
-msgstr ""
+msgstr "Установить параметр (напр., «FlashVars=A=1&b=2»)"
 
 #: gui/gnash.cpp:422
 msgid "Filedescriptor to use for external communications"
-msgstr ""
+msgstr "Используемый файловый дескриптор для внешних коммуникаций"
 
 #: gui/gnash.cpp:428
 msgid "Exit after specified number of frame advances"
-msgstr ""
+msgstr "Выход при достижении указанного количества кадров"
 
 #: gui/gnash.cpp:432
 msgid "Start in fullscreen mode"
-msgstr ""
+msgstr "Запустить в полноэкранном режиме"
 
 #: gui/gnash.cpp:437
 msgid "Start without displaying the menu bar"
-msgstr ""
+msgstr "Запустить без панели меню"
 
 #: gui/gnash.cpp:442
 msgid "List of frames to save as screenshots"
-msgstr ""
+msgstr "Список кадров для сохранения в качестве снимков экрана"
 
 #: gui/gnash.cpp:446
 msgid "Filename pattern for screenshot images"
-msgstr ""
+msgstr "Шаблон для имён файлов для изображений снимков экрана"
 
 #: gui/gnash.cpp:450
 msgid "Quality for screenshot output (not all formats)"
-msgstr ""
+msgstr "Качество вывода снимков экрана (не все форматы)"
 
 #: gui/gnash.cpp:453
 msgid "Input files"
-msgstr ""
+msgstr "Входные файлы"
 
 #: gui/gnash.cpp:464
 msgid "Dump options"
-msgstr ""
+msgstr "Параметры дампа"
 
 #: gui/gnash.cpp:469
 msgid "Video dump file (raw format) and optional video FPS (@<num>)"
-msgstr ""
+msgstr "Видеофайл (формат raw) и опциональное значение FPS (@<num>)"
 
 #: gui/gnash.cpp:471
 msgid "Number of milliseconds to sleep between advances"
-msgstr ""
+msgstr "Задержка в милисекундах между переключениями кадров"
 
 #: gui/gnash.cpp:473
 msgid "Trigger expression to start dumping"
-msgstr ""
+msgstr "Выражение триггера для начала дампа"
 
 #: gui/gnash.cpp:485
 msgid "Keys:\n"
-msgstr ""
+msgstr "Ключи:\n"
 
 #: gui/gnash.cpp:487
 msgid "Quit\n"
-msgstr ""
+msgstr "Выйти\n"
 
 #: gui/gnash.cpp:489
-#, fuzzy
 msgid "Toggle fullscreen\n"
-msgstr "Kytke kokonäyttötila"
+msgstr "На полный экран\n"
 
 #: gui/gnash.cpp:491
 msgid "Toggle pause\n"
-msgstr ""
+msgstr "Пауза\n"
 
 #: gui/gnash.cpp:493
 msgid "Restart the movie\n"
-msgstr ""
+msgstr "Перезапустить ролик\n"
 
 #: gui/gnash.cpp:495
 msgid "Take a screenshot\n"
-msgstr ""
+msgstr "Сделать снимок экрана\n"
 
 #: gui/gnash.cpp:497
 msgid "Force immediate redraw\n"
-msgstr ""
+msgstr "Перерисовать принудительно\n"
 
 #: gui/gnash.cpp:503
 msgid "Usage: gnash [options] movie_file.swf\n"
-msgstr ""
+msgstr "Использование: gnash [параметры] файл_ролика.swf\n"
 
 #: gui/gnash.cpp:504
 msgid "Plays a SWF (Shockwave Flash) movie\n"
-msgstr ""
+msgstr "Воспроизводит ролик SWF (Shockwave Flash)\n"
 
 #: gui/gnash.cpp:521
 msgid ""
@@ -10627,30 +10639,37 @@ msgid ""
 "Public License.  For more information, see the file named COPYING.\n"
 "\n"
 msgstr ""
+"Авторские права (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free Software "
+"Foundation, Inc.\n"
+"Gnash распространяется без каких-либо ГАРАНТИЙ в рамках, разрешённых "
+"законом.\n"
+"Вы можете распространять Gnash на условиях GNU General\n"
+"Public License.  Дополнительную информацию можно найти в файле COPYING.\n"
+"\n"
 
 #: gui/gnash.cpp:532
 msgid "Build options "
-msgstr "Rakennusvalinnat "
+msgstr "Параметры сборки "
 
 #: gui/gnash.cpp:533
 msgid "   Renderers: "
-msgstr ""
+msgstr "   Модули отрисовки: "
 
 #: gui/gnash.cpp:534
 msgid "   Hardware Acceleration: "
-msgstr ""
+msgstr "   Аппаратное ускорение: "
 
 #: gui/gnash.cpp:535
 msgid "   GUI: "
-msgstr ""
+msgstr "   Графический интерфейс: "
 
 #: gui/gnash.cpp:536
 msgid "   Media handlers: "
-msgstr ""
+msgstr "   Медиаобработчики: "
 
 #: gui/gnash.cpp:538
 msgid "   Configured with: "
-msgstr "   Tehdyt asetukset: "
+msgstr "   Параметры конфигурации: "
 
 #: gui/gnash.cpp:539
 msgid "   CXXFLAGS: "
@@ -10658,28 +10677,28 @@ msgstr "   CXXFLAGS: "
 
 #: gui/fltk/fltk_glue_agg.cpp:50
 msgid "Could not create AGG renderer with pixelformat RGB24"
-msgstr ""
+msgstr "Не удалось создать модуль отрисовки AGG с пикселным форматом RGB24"
 
 #: gui/dump/dump.cpp:117
 msgid "Ignoring request to display in X11 window"
-msgstr "Ohitetaan pyyntö näyttää X11-ikkunassa"
+msgstr "Игнорирование запроса на отображение в окне X11"
 
 #: gui/dump/dump.cpp:128 gui/haiku/haiku.cpp:384
 msgid "# FATAL:  No filename given with -D argument."
-msgstr ""
+msgstr "# ФАТАЛЬНАЯ ОШИБКА:  с аргументом -D не указано имя файла."
 
 #: gui/dump/dump.cpp:144
 msgid "# FATAL:  No sleep ms value given with -S argument."
-msgstr ""
+msgstr "# ФАТАЛЬНАЯ ОШИБКА:  с аргументом -S не указано значение сна в мс."
 
 #: gui/dump/dump.cpp:155
 msgid "# FATAL:  No trigger value given with -T argument.\n"
-msgstr ""
+msgstr "# ФАТАЛЬНАЯ ОШИБКА:  с аргументом -T не указано значение триггера.\n"
 
 #: gui/dump/dump.cpp:352
 #, c-format
 msgid "Unable to write file '%s'."
-msgstr "Ei voida kirjoittaa tiedostoon '%s'."
+msgstr "Не удалось записать файл «%s»."
 
 #: gui/ScreenShotter.cpp:99
 #, c-format
@@ -10688,319 +10707,318 @@ msgstr ""
 
 #: gui/haiku/haiku.cpp:141
 msgid "spawn_thread failed"
-msgstr ""
+msgstr "сбой spawn_thread"
 
 #: gui/haiku/haiku.cpp:144
 msgid "resume_thread failed"
-msgstr ""
+msgstr "сбой resume_thread"
 
 #: gui/haiku/haiku.cpp:157
 #, c-format
 msgid "pulses thread returned %d"
-msgstr ""
+msgstr "поток pulses вернул %d"
 
 #: gui/haiku/haiku.cpp:248
 msgid "send_data failed"
-msgstr ""
+msgstr "сбой send_data"
 
 #: gui/haiku/haiku_agg_glue.cpp:290 gui/aos4/aos4_agg_glue.cpp:116
 #: gui/sdl/sdl_agg_glue.cpp:78
 #, c-format
 msgid "AGG's bit depth must be 16, 24 or 32 bits, not %d."
-msgstr "AGG:n värisyvyyden tulee olla 16, 24 tai 32 bittiä, ei %d."
+msgstr "Битовая глубина AGG должна быть равна 16, 24 или 32 битам, но не %d."
 
 #: gui/haiku/haiku_agg_glue.cpp:297 gui/gtk/gtk_glue_agg.cpp:96
 #, c-format
 msgid "Could not create AGG renderer with pixelformat %s"
-msgstr ""
+msgstr "Не удалось создать модуль отрисовки AGG с пикселным форматом %s"
 
 #: gui/haiku/haiku_agg_glue.cpp:416 gui/sdl/sdl_agg_glue.cpp:132
 #, c-format
 msgid "SDL-AGG: %i byte offscreen buffer allocated"
-msgstr "SDL-AGG: varattiin %i tavun kuvan ulkopuolinen puskuri"
+msgstr "SDL-AGG: для внеэкранного буфера выделено %i байт"
 
 #: gui/qt/Qt4Gui.cpp:120
 msgid "Cairo renderer not supported!"
-msgstr ""
+msgstr "Отрисовка с помощью Cairo не поддерживается!"
 
 #: gui/qt/Qt4Gui.cpp:128
 msgid "OpenGL renderer not supported!"
-msgstr ""
+msgstr "Отрисовка с помощью OpenGL не поддерживается!"
 
 #: gui/qt/Qt4Gui.cpp:136
 msgid "AGG renderer not supported!"
-msgstr ""
+msgstr "Отрисовка с помощью AGG не поддерживается!"
 
 #: gui/qt/Qt4Gui.cpp:467 gui/gtk/gtk.cpp:1708
 msgid "Movie properties"
-msgstr "Elokuvan ominaisuudet"
+msgstr "Свойства ролика"
 
 #: gui/qt/Qt4Gui.cpp:486 gui/gtk/gtk.cpp:1778
 msgid "Variable"
-msgstr "Muuttuja"
+msgstr "Переменная"
 
 #: gui/qt/Qt4Gui.cpp:487 gui/gtk/gtk.cpp:1790
 msgid "Value"
-msgstr "Arvo"
+msgstr "Значение"
 
 #: gui/qt/Qt4Gui.cpp:588
 msgid "Properties"
-msgstr "Ominaisuudet"
+msgstr "Свойства"
 
 #: gui/qt/Qt4Gui.cpp:592 gui/qt/kde.cpp:424
 msgid "Quit Gnash"
-msgstr "Lopeta Gnash"
+msgstr "Выйти из Gnash"
 
 #: gui/qt/Qt4Gui.cpp:599
 msgid "Preferences"
-msgstr "Asetukset"
+msgstr "Настройки"
 
 #: gui/qt/Qt4Gui.cpp:604 gui/gtk/gtk.cpp:2119
 msgid "Play"
-msgstr "Toista"
+msgstr "Воспроизвести"
 
 #: gui/qt/Qt4Gui.cpp:608 gui/gtk/gtk.cpp:2130
 msgid "Pause"
-msgstr "Tauko"
+msgstr "Приостановить"
 
 #: gui/qt/Qt4Gui.cpp:612 gui/gtk/gtk.cpp:2140
 msgid "Stop"
-msgstr "Pysäytä"
+msgstr "Остановить"
 
 #: gui/qt/Qt4Gui.cpp:616
 msgid "Restart"
-msgstr "Käynnistä uudelleen"
+msgstr "Перезапустить"
 
 #: gui/qt/Qt4Gui.cpp:621 gui/qt/kde.cpp:423
 msgid "Refresh"
-msgstr "Päivitä"
+msgstr "Обновить"
 
 #: gui/qt/Qt4Gui.cpp:625
 msgid "Fullscreen"
-msgstr "Kokonäyttötila"
+msgstr "Полный экран"
 
 #: gui/qt/Qt4Gui.cpp:640
 msgid "File"
-msgstr "Tiedosto"
+msgstr "Файл"
 
 #: gui/qt/Qt4Gui.cpp:645
 msgid "Edit"
-msgstr "Muokkaa"
+msgstr "Правка"
 
 #: gui/qt/Qt4Gui.cpp:649
 msgid "Movie Control"
-msgstr "Elokuvan hallinta"
+msgstr "Управление роликом"
 
 #: gui/qt/Qt4Gui.cpp:656
 msgid "View"
-msgstr "Näytä"
+msgstr "Вид"
 
 #: gui/qt/Qt4Gui.cpp:738
-#, fuzzy
 msgid "Click to Play"
-msgstr "Napsauta toistaaksesi"
+msgstr "Нажмите, чтобы воспроизвести"
 
 #: gui/qt/Qt4Gui.cpp:770 gui/gtk/gtk.cpp:1239
 msgid "Gnash preferences"
-msgstr "Gnash-asetukset"
+msgstr "Настройки Gnash"
 
 #: gui/qt/Qt4Gui.cpp:785
 msgid "Logging"
-msgstr "Lokiinkirjaus"
+msgstr "Журналирование"
 
 #: gui/qt/Qt4Gui.cpp:788 gui/gtk/gtk.cpp:1310
 msgid "<b>Logging options</b>"
-msgstr "<b>Lokivalinnat</b>"
+msgstr "<b>Параметры журналирования</b>"
 
 #: gui/qt/Qt4Gui.cpp:791
 msgid "Verbosity level"
-msgstr "Tulosteen määrä"
+msgstr "Уровень информативности"
 
 #: gui/qt/Qt4Gui.cpp:809
 msgid "Log to file"
-msgstr "Loki tiedostoon"
+msgstr "Сохранять журнал в файл"
 
 #: gui/qt/Qt4Gui.cpp:816
 msgid "Log parser output"
-msgstr "Jäsentimen ulostulo lokiin"
+msgstr "Журналировать вывод парсера"
 
 #: gui/qt/Qt4Gui.cpp:820
 msgid "Log SWF actions"
-msgstr "SWF-toiminnot lokiin"
+msgstr "Журналировать действия SWF"
 
 #: gui/qt/Qt4Gui.cpp:824
 msgid "Log malformed SWF errors"
-msgstr "Väärin muodostetun SWF:n virheet lokiin"
+msgstr "Сохранять ошибки, связанные с некорректными SWF"
 
 #: gui/qt/Qt4Gui.cpp:829
 msgid "Log ActionScript coding errors"
-msgstr "ActionScript-ohjelmavirheet lokiin"
+msgstr "Журналировать ошибки кодирования ActionScript"
 
 #: gui/qt/Qt4Gui.cpp:836
 msgid "Security"
-msgstr "Turvallisuus"
+msgstr "Безопасность"
 
 #: gui/qt/Qt4Gui.cpp:839 gui/gtk/gtk.cpp:1393
 msgid "<b>Network connections</b>"
-msgstr "<b>Verkkoyhteydet</b>"
+msgstr "<b>Сетевые соединения</b>"
 
 #: gui/qt/Qt4Gui.cpp:842
 msgid "Connect only to local host"
-msgstr "Yhdistä vain paikalliseen isäntäkoneeseen"
+msgstr "Соединяться только с локальным узлом"
 
 #: gui/qt/Qt4Gui.cpp:847
 msgid "Connect only to local domain"
-msgstr "Yhdistä vain paikalliseen verkkoalueeseen"
+msgstr "Соединяться только с локальным доменом"
 
 #: gui/qt/Qt4Gui.cpp:852
 msgid "Disable SSL verification"
-msgstr "Ota SSL-tarkistus pois käytöstä"
+msgstr "Отключить проверку SSL"
 
 #: gui/qt/Qt4Gui.cpp:857 gui/gtk/gtk.cpp:1438
 msgid "<b>Privacy</b>"
-msgstr "<b>Yksityisyys</b>"
+msgstr "<b>Конфиденциальность</b>"
 
 #: gui/qt/Qt4Gui.cpp:860 gui/gtk/gtk.cpp:1442
 msgid "Shared objects directory:"
-msgstr "Jaettujen objektien hakemisto:"
+msgstr "Каталог разделяемых объектов:"
 
 #: gui/qt/Qt4Gui.cpp:866
 msgid "Do not write Shared Object files"
-msgstr "Älä kirjoita jaettujen objektien tiedostoja"
+msgstr "Не записывать файлы разделяемых объектов"
 
 #: gui/qt/Qt4Gui.cpp:872
 msgid "Only access local Shared Object files"
-msgstr "Saanti vain paikallisiin jaettujen objektien tiedostoihin"
+msgstr "Доступ только к локальным разделяемым объектным файлам"
 
 #: gui/qt/Qt4Gui.cpp:877
 msgid "Disable Local Connection object"
-msgstr "Ota paikallisyhteyden objekti pois käytöstä"
+msgstr "Отключить объект локальных подключений"
 
 #: gui/qt/Qt4Gui.cpp:884
 msgid "Network"
-msgstr "Verkko"
+msgstr "Сеть"
 
 #: gui/qt/Qt4Gui.cpp:887 gui/gtk/gtk.cpp:1278
 msgid "<b>Network preferences</b>"
-msgstr "<b>Verkkoasetukset</b>"
+msgstr "<b>Сетевые параметры</b>"
 
 #: gui/qt/Qt4Gui.cpp:890
 msgid "Network timeout in seconds"
-msgstr "Verkon aikakatkaisu sekunneissa"
+msgstr "Таймаут сети в секундах"
 
 #: gui/qt/Qt4Gui.cpp:902
 msgid "Media"
-msgstr "Media"
+msgstr "Медиа"
 
 #: gui/qt/Qt4Gui.cpp:905 gui/gtk/gtk.cpp:1488
 msgid "<b>Sound</b>"
-msgstr "<b>Ääni</b>"
+msgstr "<b>Звук</b>"
 
 #: gui/qt/Qt4Gui.cpp:908
 msgid "Use sound handler"
-msgstr "Käytä äänenkäsittelijää"
+msgstr "Использовать обработчик звука"
 
 #: gui/qt/Qt4Gui.cpp:912 gui/gtk/gtk.cpp:1507
 msgid "Save media streams to disk"
-msgstr "Tallenna mediavirrat levylle"
+msgstr "Сохранять медиапотоки на диск"
 
 #: gui/qt/Qt4Gui.cpp:918 gui/gtk/gtk.cpp:1516
 msgid "Save dynamically loaded media to disk"
-msgstr "Tallenna dynaamisesti ladatut mediat levylle"
+msgstr "Сохранять динамически загружаемые данные на диск"
 
 #: gui/qt/Qt4Gui.cpp:922 gui/gtk/gtk.cpp:1524
 msgid "Saved media directory:"
-msgstr "Medioiden tallennuksen hakemisto:"
+msgstr "Каталог сохранённых медиаданных:"
 
 #: gui/qt/Qt4Gui.cpp:931
 msgid "Player"
-msgstr "Soitin"
+msgstr "Проигрыватель"
 
 #: gui/qt/Qt4Gui.cpp:934 gui/gtk/gtk.cpp:1550
 msgid "<b>Player description</b>"
-msgstr "<b>Soittimen kuvaus</b>"
+msgstr "<b>Описание проигрывателя</b>"
 
 #: gui/qt/Qt4Gui.cpp:937 gui/gtk/gtk.cpp:1558
 msgid "Player version:"
-msgstr "Soittimen versio:"
+msgstr "Версия проигрывателя:"
 
 #: gui/qt/Qt4Gui.cpp:943 gui/gtk/gtk.cpp:1574
 msgid "Operating system:"
-msgstr "Käyttöjärjestelmä:"
+msgstr "Операционная система:"
 
 #: gui/qt/Qt4Gui.cpp:948 gui/qt/Qt4Gui.cpp:1021
 msgid "<Autodetect>"
-msgstr "<automaattinen tunnistus>"
+msgstr "<Автоопределение>"
 
 #: gui/qt/Qt4Gui.cpp:954 gui/gtk/gtk.cpp:1594
 msgid "URL opener:"
-msgstr "URL-avaaja:"
+msgstr "Открывание URL:"
 
 #: gui/qt/Qt4Gui.cpp:961 gui/gtk/gtk.cpp:1606
 msgid "<b>Performance</b>"
-msgstr "<b>Suorituskyky</b>"
+msgstr "<b>Производительность</b>"
 
 #: gui/qt/Qt4Gui.cpp:964 gui/gtk/gtk.cpp:1620
 msgid "Max size of movie library:"
-msgstr "Elokuvakirjaston suurin koko:"
+msgstr "Макс. размер библиотеки роликов:"
 
 #: gui/qt/Qt4Gui.cpp:973
 msgid "Start Gnash in pause mode"
-msgstr "Käynnistä Gnash pysäytetyssä tilassa"
+msgstr "Запустить Gnash в режиме приостановки"
 
 #: gui/qt/Qt4GlueAgg.cpp:115
 msgid "Could not create AGG renderer with pixelformat ABGR32"
-msgstr ""
+msgstr "Не удалось создать компонент отрисовки AGG с пикселным форматом ABGR32"
 
 #: gui/qt/kde_glue_agg.cpp:156
 msgid "Could not create AGG renderer with pixelformat BGRA32"
-msgstr ""
+msgstr "Не удалось создать компонент отрисовки AGG с пикселным форматом BGRA32"
 
 #: gui/qt/kde.cpp:413
 msgid "Play Movie"
-msgstr "Toista elokuva"
+msgstr "Воспроизвести ролик"
 
 #: gui/qt/kde.cpp:414
 msgid "Pause Movie"
-msgstr "Tauko"
+msgstr "Приостановить ролик"
 
 #: gui/qt/kde.cpp:415
 msgid "Stop Movie"
-msgstr "Pysäytä elokuva"
+msgstr "Остановить ролик"
 
 #: gui/qt/kde.cpp:416 gui/gtk/gtk.cpp:2152
 msgid "Restart Movie"
-msgstr "Käynnistä elokuva uudelleen"
+msgstr "Перезапустить ролик"
 
 #: gui/qt/kde.cpp:418
 msgid "Step Forward"
-msgstr "Askel eteenpäin"
+msgstr "Шаг вперёд"
 
 #: gui/qt/kde.cpp:419
 msgid "Step Backward"
-msgstr "Askel taaksepäin"
+msgstr "Шаг назад"
 
 #: gui/qt/kde.cpp:420
 msgid "Jump Forward"
-msgstr "Hyppää eteenpäin"
+msgstr "Перейти вперёд"
 
 #: gui/qt/kde.cpp:421
 msgid "Jump Backward"
-msgstr "Hyppää taaksepäin"
+msgstr "Перейти назад"
 
 #: gui/pythonmod/gnash-view.cpp:220 gui/Player.cpp:288
 #, c-format, fuzzy
 msgid "Could not create sound handler: %s. Will continue without sound."
-msgstr "Äänenkäsittelijää ei voi luoda: %s. Jatketaan ilman ääntä."
+msgstr "Не удалось создать обработчик звука: %s. Будет продолжено без звука."
 
 #: gui/pythonmod/gnash-view.cpp:223 gui/Player.cpp:283
 msgid "Sound requested but no sound support compiled in"
-msgstr "Ääntä pyydetty, mutta äänitukea ei ole käännetty mukaan"
+msgstr "Запрошен звук, но компиляция была произведена без поддержки звука"
 
 #: gui/aos4/aos4.cpp:70
 #, c-format
 msgid "Exception: %s on file %s line %d"
-msgstr ""
+msgstr "Исключение: %s в файле %s в строке %d"
 
 #: gui/aos4/aos4.cpp:266 gui/gtk/gtk.cpp:2591
 #, c-format
@@ -11008,75 +11026,70 @@ msgid ""
 "Attempting to open file %s.\n"
 "NOTE: the file open functionality is not yet implemented!"
 msgstr ""
-"Yritetään avata tiedostoa %s.\n"
-"Huom: tiedoston avaustoiminto ei ole vielä toteutettu."
+"Попытка открытия файла %s.\n"
+"ПРИМЕЧАНИЕ: функциональность для открытия файлов пока что не реализована!"
 
 #: gui/aos4/aos4.cpp:274
 msgid "Cannot open File Requester!\n"
-msgstr ""
+msgstr "Не удалось открыть окно выбора файла!\n"
 
 #: gui/aos4/aos4.cpp:609
 msgid "error creating RenderHandler!\n"
-msgstr ""
+msgstr "ошибка при создании RenderHandler!\n"
 
 #: gui/aos4/aos4_cairo_glue.cpp:124
 #, c-format
-#, c-format, fuzzy
 msgid "Cairo's bit depth must be 16, 24 or 32 bits, not %d."
-msgstr "AGG:n värisyvyyden tulee olla 16, 24 tai 32 bittiä, ei %d."
+msgstr "Битовая глубина Cairo должна быть равно 16, 24 или 32 битам, но не %d."
 
 #: gui/aos4/aos4_cairo_glue.cpp:212 gui/aos4/aos4_agg_glue.cpp:216
 msgid "Cannot layout Menu!!\n"
-msgstr ""
+msgstr "Не удалось выстроить меню!!\n"
 
 #: gui/aos4/aos4_cairo_glue.cpp:216 gui/aos4/aos4_agg_glue.cpp:220
 msgid "Cannot create Menu!!\n"
-msgstr ""
+msgstr "Не удалось создать меню!!\n"
 
 #: gui/aos4/aos4_cairo_glue.cpp:219 gui/aos4/aos4_agg_glue.cpp:223
 msgid "Cannot get Visual Info!!\n"
-msgstr ""
+msgstr "Не удалось получить информацию о средстве вывода!!\n"
 
 #: gui/aos4/aos4_cairo_glue.cpp:222 gui/aos4/aos4_agg_glue.cpp:226
 msgid "Cannot get WB Screen pointer!!\n"
-msgstr ""
+msgstr "Не удалось получить указатель экрана WB!!\n"
 
 #: gui/aos4/aos4_cairo_glue.cpp:259 gui/aos4/aos4_agg_glue.cpp:264
 msgid "prepDrawingArea() failed.\n"
-msgstr ""
+msgstr "Сбой функции prepDrawingArea().\n"
 
 #: gui/aos4/aos4_agg_glue.cpp:277
 #, c-format
-#, c-format, fuzzy
 msgid "AOS4-AGG: %i byte offscreen buffer allocated"
-msgstr "SDL-AGG: varattiin %i tavun kuvan ulkopuolinen puskuri"
+msgstr "AOS4-AGG: для внеэкранного буфера выделено %i байт"
 
 #: gui/sdl/sdl_agg_glue.cpp:95
 msgid "SDL_SetVideoMode() failed for SdlAggGlue."
-msgstr "SDL_SetVideoMode() epäonnistui kohteelle SdlAggGlue."
+msgstr "Сбой функции SDL_SetVideoMode() для SdlAggGlue."
 
 #: gui/gui.cpp:193
-#, fuzzy
 msgid "Clipboard not yet supported in this GUI"
-msgstr "Kokonäyttötilaa ei vielä tuettu tässä käyttöliittymässä"
+msgstr "Буфер обмена пока что не поддерживается в этом интерфейсе"
 
 #: gui/gui.cpp:199 gui/gui.cpp:211
 msgid "Fullscreen not yet supported in this GUI"
-msgstr "Kokonäyttötilaa ei vielä tuettu tässä käyttöliittymässä"
+msgstr "Полный экран пока что не поддерживается в этом интерфейсе"
 
 #: gui/gui.cpp:205
-#, fuzzy
 msgid "Window resize not yet supported in this GUI"
-msgstr "Hiiren näyttö/piilotus ei vielä tuettu tässä käyttöliittymässä"
+msgstr "Изменение размеров окна пока что не поддерживается в этом интерфейсе"
 
 #: gui/gui.cpp:229 gui/gui.cpp:242
-#, fuzzy
 msgid "Menu show/hide not yet supported in this GUI"
-msgstr "Hiiren näyttö/piilotus ei vielä tuettu tässä käyttöliittymässä"
+msgstr "Скрытие меню пока что не поддерживается в этом интерфейсе"
 
 #: gui/gui.cpp:235
 msgid "Mouse show/hide not yet supported in this GUI"
-msgstr "Hiiren näyttö/piilotus ei vielä tuettu tässä käyttöliittymässä"
+msgstr "Скрытие курсора мыши пока что не поддерживается в этом интерфейсе"
 
 #: gui/gui.cpp:282
 msgid "Can't update stage matrix till VM is initialized"
@@ -11129,20 +11142,20 @@ msgstr ""
 #: gui/Player.cpp:169
 #, c-format
 msgid "Unhandled callback %s with arguments %s"
-msgstr ""
+msgstr "Необрабатываемый обратный вызов %s с аргументами %s"
 
 #: gui/Player.cpp:434
 msgid "Non-existent media handler %1% specified"
-msgstr ""
+msgstr "Указан несуществующий медиаобработчик %1%"
 
 #: gui/Player.cpp:545
-#, c-format
+#, c-format, fuzzy
 msgid "Movie Frame Rate is %d, adjusting delay"
-msgstr ""
+msgstr "Частота смены кадров — %d; установка задержки %d мс"
 
 #: gui/Player.cpp:682
 msgid "Got unexpected argument type for message %1%"
-msgstr ""
+msgstr "Для сообщения %1% получен неожиданный тип аргумента"
 
 #: gui/Player.cpp:717
 #, c-format
@@ -11154,191 +11167,197 @@ msgstr ""
 #: gui/Player.cpp:773
 #, c-format
 msgid "FsCommand exec called with argument %s"
-msgstr ""
+msgstr "Команда FsCommand exec вызвана с аргументом %s"
 
 #: gui/Player.cpp:790
 #, c-format
 msgid "FsCommand trapallkeys called with argument %s"
-msgstr ""
+msgstr "Команда FsCommand trapallkeys вызвана с аргументом %s"
 
 #: gui/Player.cpp:796
 #, c-format
 msgid "FsCommand '%s(%s)' not handled internally"
-msgstr ""
+msgstr "Команда FsCommand «%s(%s)» не обрабатывается внутри"
 
 #: gui/gtk/gtk_glue_cairo.cpp:223
 msgid "Cairo: failed to create a rendering buffer!"
-msgstr ""
+msgstr "Cairo: сбой при создании буфера отрисовки!"
 
 #: gui/gtk/gtk_glue_ovg.cpp:182
 msgid "Could not create OPENVG renderer"
-msgstr ""
+msgstr "Не удалось создать компонент отрисовки OPENVG"
 
 #: gui/gtk/gtk_glue_ovg.cpp:265 gui/gtk/gtk_glue_ovg.cpp:282
 msgid "No off screen buffer!"
-msgstr ""
+msgstr "Отсутствует внеэкранный буфер!"
 
 #: gui/gtk/gtk_glue_agg_vaapi.cpp:163
 msgid "WARNING: failed to create VA-API display."
-msgstr ""
+msgstr "ПРЕДУПРЕЖДЕНИЕ: сбой при создании экрана VA-API."
 
 #: gui/gtk/gtk_glue_agg_vaapi.cpp:204
-#, c-format
+#, c-format, fuzzy
 msgid ""
 "GTK-AGG: Unknown RGB format %s reported by VA-API.Please report this to the "
 "gnash-dev mailing list."
 msgstr ""
+"GTK-AGG: VA-API сообщил о неизвестном формате %s. Сообщите об этом в список "
+"рассылки gnash-dev."
 
 #: gui/gtk/gtk_glue_agg_vaapi.cpp:231 gui/gtk/gtk_glue_agg_vaapi.cpp:289
+#, fuzzy
 msgid "failed to map VA-API image."
-msgstr ""
+msgstr "ОШИБКА: сбой при отображении изображения VA-API."
 
 #: gui/gtk/gtk_glue_agg_vaapi.cpp:237
+#, fuzzy
 msgid "failed to associate VA-API subpicture."
-msgstr ""
+msgstr "ОШИБКА: сбой при ассоциировании фрагмента изображения VA-API."
 
 #: gui/gtk/gtk_glue_agg_vaapi.cpp:371
-#, c-format
+#, c-format, fuzzy
 msgid "failed to setup video window for surface 0x%08x."
-msgstr ""
+msgstr "ОШИБКА: сбой при настройке окна видео для поверхности 0x%08x."
 
 #: gui/gtk/gtk_glue_agg_vaapi.cpp:378
-#, c-format
+#, c-format, fuzzy
 msgid "failed to associate subpicture to surface 0x%08x."
-msgstr ""
+msgstr "ОШИБКИ: сбой при привязке изображения к поверхности 0x%08x."
 
 #: gui/gtk/gtk.cpp:159
 msgid "Failed to initialize X threading support\n"
-msgstr ""
+msgstr "Сбой при инициализации поддержки потоков в X\n"
 
 #: gui/gtk/gtk.cpp:202
 msgid "This system lacks a hardware OpenGL driver!"
-msgstr ""
+msgstr "В этой системе отсутствует аппаратный драйвер OpenGL!"
 
 #: gui/gtk/gtk.cpp:223
 msgid "Click to play"
-msgstr "Napsauta toistaaksesi"
+msgstr "Нажмите, чтобы воспроизвести"
 
 #: gui/gtk/gtk.cpp:612
 #, c-format
 msgid "Advance interval timer set to %d ms (~ %d FPS)"
-msgstr ""
+msgstr "Таймер переключения кадров установлен в значение %d мс (~ %d кадр/с)"
 
 #: gui/gtk/gtk.cpp:686
 msgid "Sound"
-msgstr "Ääni"
+msgstr "Звук"
 
 #: gui/gtk/gtk.cpp:1274
 msgid "_Network"
-msgstr "_Verkko"
+msgstr "_Сеть"
 
 #: gui/gtk/gtk.cpp:1286
 msgid "Network timeout in seconds (0 for no timeout):"
-msgstr "Verkon aikakatkaisu sekunneissa (0 - ei aikakatkaisua):"
+msgstr "Таймаут сети в секундах (0 — без таймаута):"
 
 #: gui/gtk/gtk.cpp:1305
 msgid "_Logging"
-msgstr "_Lokiinkirjaus"
+msgstr "_Журналирование"
 
 #: gui/gtk/gtk.cpp:1314
 msgid "Verbosity level:"
-msgstr "Tulosteen määrä:"
+msgstr "Уровень информативности:"
 
 #: gui/gtk/gtk.cpp:1327
 msgid "Log to _file"
-msgstr "Loki _tiedostoon"
+msgstr "Сохранять журнал в _файл"
 
 #: gui/gtk/gtk.cpp:1333
 msgid "Logfile name:"
-msgstr "Lokitiedoston nimi:"
+msgstr "Имя файла журнала:"
 
 #: gui/gtk/gtk.cpp:1346
 msgid "Log _parser output"
-msgstr "_Jäsentimen ulostulo lokiin"
+msgstr "Сохранять вывод модуля _разбора"
 
 #: gui/gtk/gtk.cpp:1354
 msgid "Log SWF _actions"
-msgstr "SWF-_toiminnot lokiin"
+msgstr "Сохранять _действия SWF"
 
 #: gui/gtk/gtk.cpp:1362
 msgid "Log malformed SWF _errors"
-msgstr "Väärin muodostetun SWF:n virh_eet lokiin"
+msgstr "Сохранять _ошибки о некорректности SWF"
 
 #: gui/gtk/gtk.cpp:1370
 msgid "Log ActionScript _coding errors"
-msgstr "ActionScript-_ohjelmavirheet lokiin"
+msgstr "Сохранять ошибки _кодирования ActionScript"
 
 #: gui/gtk/gtk.cpp:1386
 msgid "_Security"
-msgstr "_Turvallisuus"
+msgstr "_Безопасность"
 
 #: gui/gtk/gtk.cpp:1399
 msgid "Connect only to local _host"
-msgstr "Yhdistä vain paikall_iseen isäntäkoneeseen"
+msgstr "Соединяться только с локальным _узлом"
 
 #: gui/gtk/gtk.cpp:1406
 msgid "Connect only to local _domain"
-msgstr "Yhdistä vain paikalliseen _verkkoalueeseen"
+msgstr "Соединяться только с локальным _доменом"
 
 #: gui/gtk/gtk.cpp:1413
 msgid "Disable SSL _verification"
-msgstr "Ota SSL-_tarkistus pois käytöstä"
+msgstr "Отключить проверку _SSL"
 
 #: gui/gtk/gtk.cpp:1420
 msgid "_Whitelist"
-msgstr "_Sallittujen luettelo"
+msgstr "_Белый список"
 
 #: gui/gtk/gtk.cpp:1429
 msgid "_Blacklist"
-msgstr "_Estettyjen luettelo"
+msgstr "_Чёрный список"
 
 #: gui/gtk/gtk.cpp:1454
 msgid "Do _not write Shared Object files"
-msgstr "Älä _kirjoita jaettujen objektien tiedostoja"
+msgstr "Не записывать файлы _совместных объектов"
 
 #: gui/gtk/gtk.cpp:1461
 msgid "Only _access local Shared Object files"
-msgstr "Saanti v_ain paikallisiin jaettujen objektien tiedostoihin"
+msgstr "_Доступ только к локальным разделяемым объектным файлам"
 
 #: gui/gtk/gtk.cpp:1468
 msgid "Disable Local _Connection object"
-msgstr "Ota paikallis_yhteyden objekti pois käytöstä"
+msgstr "Отключить _объект локального подключения"
 
 #: gui/gtk/gtk.cpp:1482
 msgid "_Media"
-msgstr "_Media"
+msgstr "_Медиа"
 
 #: gui/gtk/gtk.cpp:1493
 msgid "Use sound _handler"
-msgstr "Käytä äänen_käsittelijää"
+msgstr "Использовать _обработчик звука"
 
 #: gui/gtk/gtk.cpp:1501
 msgid "<b>Media Streams</b>"
-msgstr "<b>Mediavirrat</b>"
+msgstr "<b>Медиапотоки</b>"
 
 #: gui/gtk/gtk.cpp:1544
 msgid "_Player"
-msgstr "_Soitin"
+msgstr "_Проигрыватель"
 
 #: gui/gtk/gtk.cpp:1584
 msgid "<i>If blank, Gnash will detect your OS</i>"
-msgstr "<i>Jos tyhjä, Gnash tunnistaa käyttöjärjestelmän</i>"
+msgstr "<i>Если пусто, Gnash определит ОС</i>"
 
 #: gui/gtk/gtk.cpp:1637
 msgid "Max scripts execution time (in seconds):"
-msgstr ""
+msgstr "Макс. время выполнения сценария (в секундах):"
 
 #: gui/gtk/gtk.cpp:1656
 msgid "Max scripts recursion limit (stack depth):"
-msgstr ""
+msgstr "Макс. ограничение рекурсии сценария (глубина стека):"
 
 #: gui/gtk/gtk.cpp:1672
 msgid "Lock script limits so that SWF tags can't override"
 msgstr ""
+"Заблокировать ограничения сценария, чтобы метки SWF не смогли выполнить "
+"перезапись"
 
 #: gui/gtk/gtk.cpp:1684
 msgid "Start _Gnash in pause mode"
-msgstr "Käynnistä _Gnash pysäytetyssä tilassa"
+msgstr "Запустить _Gnash в режиме паузы"
 
 #: gui/gtk/gtk.cpp:1843
 msgid ""
@@ -11359,7 +11378,7 @@ msgstr ""
 
 #: gui/gtk/gtk.cpp:1859
 msgid "Gnash is the GNU SWF Player based on GameSWF."
-msgstr "Gnash on GNU-projektin SWF-soitin, joka perustuu GameSWF:ään."
+msgstr "Gnash — проигрыватель GNU SWF, основанный на GameSWF."
 
 #: gui/gtk/gtk.cpp:1860
 msgid ""
@@ -11367,13 +11386,15 @@ msgid ""
 "Renderer: "
 msgstr ""
 "\n"
-"Piirto: "
+"Компонент отрисовки: "
 
 #: gui/gtk/gtk.cpp:1862
 msgid ""
 "\n"
 "Hardware Acceleration: "
 msgstr ""
+"\n"
+"Аппаратное ускорение: "
 
 #: gui/gtk/gtk.cpp:1864
 msgid ""
@@ -11381,7 +11402,7 @@ msgid ""
 "GUI: "
 msgstr ""
 "\n"
-"Käyttöliittymä: "
+"GUI: "
 
 #: gui/gtk/gtk.cpp:1866
 msgid ""
@@ -11389,102 +11410,102 @@ msgid ""
 "Media: "
 msgstr ""
 "\n"
-"Media: "
+"Медиа: "
 
 #: gui/gtk/gtk.cpp:1896
 msgid "translator-credits"
-msgstr "Timo Jyrinki <timo.jyrinki@iki.fi>, 2008-2009."
+msgstr "Юрий Мясоедов <omerta13@yandex.ru>, 2011"
 
 #: gui/gtk/gtk.cpp:1923
 msgid "_File"
-msgstr "_Tiedosto"
+msgstr "_Файл"
 
 #: gui/gtk/gtk.cpp:1976
 msgid "_Edit"
-msgstr "_Muokkaa"
+msgstr "_Правка"
 
 #: gui/gtk/gtk.cpp:1996
 msgid "_Help"
-msgstr "O_hje"
+msgstr "_Справка"
 
 #: gui/gtk/gtk.cpp:2016
 msgid "_View"
-msgstr "_Näytä"
+msgstr "_Вид"
 
 #: gui/gtk/gtk.cpp:2024
 msgid "Redraw"
-msgstr "Piirrä uudelleen"
+msgstr "Перерисовать"
 
 #: gui/gtk/gtk.cpp:2034 gui/gtk/gtk.cpp:2039
 msgid "Toggle fullscreen"
-msgstr "Kytke kokonäyttötila"
+msgstr "На полный экран"
 
 #: gui/gtk/gtk.cpp:2048
 msgid "Show updated ranges"
-msgstr "Näytä päivitetyt vaihteluvälit"
+msgstr "Показать обновлённых диапазоны"
 
 #: gui/gtk/gtk.cpp:2067
 msgid "_Quality"
-msgstr ""
+msgstr "_Качество"
 
 #: gui/gtk/gtk.cpp:2077
 msgid "Low"
-msgstr ""
+msgstr "Низкое"
 
 #: gui/gtk/gtk.cpp:2083
 msgid "Medium"
-msgstr ""
+msgstr "Среднее"
 
 #: gui/gtk/gtk.cpp:2089
 msgid "High"
-msgstr ""
+msgstr "Высокое"
 
 #: gui/gtk/gtk.cpp:2095
 msgid "Best"
-msgstr ""
+msgstr "Наилучшее"
 
 #: gui/gtk/gtk.cpp:2108
 msgid "Movie _Control"
-msgstr "Elokuvan _hallinta"
+msgstr "_Управление роликом"
 
 #: gui/gtk/gtk.cpp:2275 gui/gtk/gtk.cpp:2276
 #, c-format
 msgid "Couldn't find pixmap file: %s"
-msgstr "pixmap-tiedostoa ei löydy: %s"
+msgstr "Не удалось найти файл пиксельного отображения: %s"
 
 #: gui/gtk/gtk.cpp:2282
 #, c-format
 msgid "Failed to load pixbuf file: %s: %s"
-msgstr "pixbuf-tiedoston lataus epäonnistui: %s: %s"
+msgstr "Сбой при загрузке файла пиксельного отображения: %s: %s"
 
 #: gui/gtk/gtk.cpp:2608 gui/gtk/gtk.cpp:2621
 msgid "Open file"
-msgstr "Avaa tiedosto"
+msgstr "Открыть файл"
 
 #: gui/gtk/gtk_glue_gtkglext.cpp:72
 msgid ""
 "Cannot find the double-buffered visual.\n"
 "Trying single-buffered visual."
 msgstr ""
-"Kaksoispuskuroitua näkymää ei löydy.\n"
-"Yritetään yhden puskurin näkymän käyttöä."
+"Не удалось найти средство вывода с двойной буферизацией.\n"
+"Будет использована одиночная буферизация."
 
 #: gui/gtk/gtk_glue_gtkglext.cpp:78
 msgid "No appropriate OpenGL-capable visual found."
-msgstr "Sopivaa OpenGL-kykyistä näkymää ei löydy."
+msgstr "Не найдено подходящее средство вывода для OpenGL."
 
 #: extensions/mysql/mysql_db.cpp:186
 msgid "Couldn't initialize database"
-msgstr "Tietokantaa ei voi alustaa"
+msgstr ""
 
 #: extensions/mysql/mysql_db.cpp:191
 msgid "Couldn't connect to database"
-msgstr "Tietokantaan ei voi yhdistää"
+msgstr ""
 
 #: extensions/mysql/mysql_db.cpp:217 extensions/mysql/mysql_db.cpp:245
 #, c-format
 msgid "MySQL connection error: %s"
-msgstr "MySQL-yhteysvirhe: %s"
+msgstr ""
 
 #: extensions/mysql/mysql_db.cpp:224 extensions/mysql/mysql_db.cpp:252
 #, c-format
@@ -11493,116 +11514,153 @@ msgid ""
 "\t%s\n"
 "Query was: %s"
 msgstr ""
-"MySQL-virhe kyselyssä:\n"
-"\t%s\n"
-"Kysely oli: %s"
 
 #: extensions/mysql/mysql_db.cpp:266
 #, c-format
 msgid "Field name is: %s: "
-msgstr "Kentän nimi on: %s: "
+msgstr ""
 
 #, c-format
-#~ msgid "Scanning directory \"%s\" for plugins"
-#~ msgstr "Tarkistetaan liitännäisiä hakemistosta \"%s\""
+#~ msgid "gnash_canvas_size_allocate %d %d"
+#~ msgstr "gnash_canvas_size_allocate %d %d"
 
-#, c-format
-#~ msgid "Gnash Plugin name: %s"
-#~ msgstr "Gnash-liitännäisen nimi: %s"
-
-#, c-format, fuzzy
-#~ msgid "Connection to movie: %s"
-#~ msgstr "Yhdistetään elokuvaan: %s"
-
-#, c-format
-#~ msgid "Unloading movieclip '%s'"
-#~ msgstr "Poistetaan videota muistista: '%s'"
-
-#~ msgid "Closing framebuffer device"
-#~ msgstr "Suljetaan kuvapuskurilaite"
-
-#, c-format
-#~ msgid "WARNING: Could not open %s"
-#~ msgstr "VAROITUS: Ei voi avata %s"
+#~ msgid "Restoring terminal..."
+#~ msgstr "Восстановление терминала..."
 
 #, c-format
 #~ msgid "Original TTY NO = %d"
-#~ msgstr "Alkuperäinen TTY-numero = %d"
+#~ msgstr "Исходный TTY NO = %d"
 
 #, c-format
-#~ msgid "Own TTY NO = %d"
-#~ msgstr "Oma TTY-nro = %d"
+#~ msgid "Mouse clicked at: %g:%g"
+#~ msgstr "Координата нажатия кнопки мыши: %g:%g"
+
+#~ msgid "EGL: pbuffer config ok"
+#~ msgstr "EGL: конфигурация pbuffer ok"
+
+#~ msgid "Got single-buffered visual."
+#~ msgstr "Получено средство вывода с одиночной буферизацией."
 
 #, c-format
-#~ msgid "VT %d ready"
-#~ msgstr "VT %d valmis"
+#~ msgid "Found %d input event devices."
+#~ msgstr "Найдено устройств событийного ввода: %d."
 
-#~ msgid "Restoring terminal..."
-#~ msgstr "Palautetaan päätettä..."
-
-#, c-format
-#~ msgid "red channel: %d / %d"
-#~ msgstr "punainen kanava: %d / %d"
-
-#, c-format
-#~ msgid "green channel: %d / %d"
-#~ msgstr "vihreä kanava: %d / %d"
+#~ msgid "Set renderer"
+#~ msgstr "Установить компонент отрисовки"
 
 #, c-format
 #~ msgid "blue channel: %d / %d"
-#~ msgstr "sininen kanava: %d / %d"
+#~ msgstr "синий канал: %d / %d"
+
+#~ msgid "Xvideo extension found"
+#~ msgstr "Найдено расширение Xvideo"
 
 #, c-format
 #~ msgid "Total bits per pixel: %d"
-#~ msgstr "Yhteensä bittejä pikseliä kohden: %d"
+#~ msgstr "Всего бит на пиксел: %d"
 
 #, c-format
-#~ msgid "mouse @ %d,%d"
-#~ msgstr "hiiri @ %d,%d"
+#~ msgid "VT %d ready"
+#~ msgstr "VT %d готов"
+
+#~ msgid "DRI extension found"
+#~ msgstr "Найдено расширение DRI"
 
 #, c-format
-#~ msgid "Frame %d"
-#~ msgstr "Kehys %d"
+#~ msgid "Input movie has collapsed dimensions %d/%d. Setting to 1/1 and going on."
+#~ msgstr "Входной ролик имеет разрешение %d/%d. Устанавливается разрешение 1/1."
+
+#~ msgid "WARNING: Could not request a new VT"
+#~ msgstr "ПРЕДУПРЕЖДЕНИЕ: не удалось запросить новый ВТ"
 
 #, c-format
-#~ msgid "Timer delay set to %d milliseconds"
-#~ msgstr "Ajastimen viive asetettu %d millisekuntiin"
+#~ msgid "Config[%d] is:"
+#~ msgstr "Config[%d]:"
 
-#, c-format
-#~ msgid "Activating FPS debugging every %g seconds"
-#~ msgstr "Aktivoidaan FPS-virheenjäljitys joka %g sekunti"
-
-#, c-format
-#~ msgid ""
-#~ "Input movie has collapsed dimensions %d/%d. Setting to 1/1 and going on."
-#~ msgstr ""
-#~ "Annetulla elokuvalla on kokoontaittuneet mitat %d/%d. Asetetaan 1/1 ja "
-#~ "jatketaan."
+#~ msgid "GtkGui: Window resize request received"
+#~ msgstr "GtkGui: получен запрос на изменение размеров окна"
 
 #, c-format
 #~ msgid "Running as plugin: skipping internal handling of FsCommand %s%s."
-#~ msgstr "Suoritetaan liitännäisenä: ohitetaan FsCommand %s%s sisäinen käsittely"
+#~ msgstr "Запущено в виде модуля: пропускается внутренняя обработка FsCommand %s%s."
+
+#, c-format
+#~ msgid "green channel: %d / %d"
+#~ msgstr "зелёный канал: %d / %d"
+
+#, c-format
+#~ msgid "WARNING: Could not open %s"
+#~ msgstr "ПРЕДУПРЕЖДЕНИЕ: не удалось открыть %s"
+
+#, c-format
+#~ msgid "X:%d, Y:%d"
+#~ msgstr "X: %d; Y: %d"
+
+#, c-format
+#~ msgid "mouse @ %d,%d"
+#~ msgstr "мышь @ %d,%d"
+
+#~ msgid "Setting renderer"
+#~ msgstr "Настройка компонента отрисовки"
+
+#~ msgid "Got double-buffered visual."
+#~ msgstr "Получено средство вывода с двойной буферизацией."
+
+#~ msgid "GLX extension found"
+#~ msgstr "Найдено расширение GLX"
 
 #~ msgid "Created XEmbedded window"
-#~ msgstr "Luotiin XEmbedded-ikkuna"
+#~ msgstr "Создано окно XEmbedded"
 
-#~ msgid "Created top level window"
-#~ msgstr "Luotiin päätason ikkuna"
+#, c-format
+#~ msgid "Frame %d"
+#~ msgstr "Кадр %d"
+
+#, c-format
+#~ msgid "Activating FPS debugging every %g seconds"
+#~ msgstr "Включение сообщений FPS каждые %g сек."
+
+#, c-format
+#~ msgid "EGL: width %d"
+#~ msgstr "EGL: ширина %d"
+
+#~ msgid "Closing framebuffer device"
+#~ msgstr "Закрытие устройства фрейм-буфера"
+
+#, c-format
+#~ msgid "Own TTY NO = %d"
+#~ msgstr "Собственный TTY NO = %d"
+
+#, c-format
+#~ msgid "Sent FsCommand '%s' to host fd %d"
+#~ msgstr "Команда FsCommand «%s» отправлена файловому дескриптору узла %d"
 
 #, c-format
 #~ msgid "OpenGL extension version - %d.%d"
-#~ msgstr "OpenGL-laajennoksen versio - %d.%d"
+#~ msgstr "Версия расширения OpenGL — %d.%d"
 
-#~ msgid "Got single-buffered visual."
-#~ msgstr "Saatiin yhden puskurin näkymä."
+#, c-format
+#~ msgid "Width:%d, Height:%d"
+#~ msgstr "Ширина: %d; высота:%d"
 
-#~ msgid "Got double-buffered visual."
-#~ msgstr "Saatiin kaksoispuskuroitu näkymä."
+#, c-format
+#~ msgid "red channel: %d / %d"
+#~ msgstr "красный канал: %d / %d"
 
-#, fuzzy, c-format
-#~ msgid "read mouse @ %d / %d, btn %d"
-#~ msgstr "hiiri @ %d,%d"
+#, c-format
+#~ msgid "Timer delay set to %d milliseconds"
+#~ msgstr "Таймер установлен на %d мс"
 
-#, fuzzy, c-format
-#~ msgid "x/y %d/%d button %d"
-#~ msgstr "x/y %d/%d pnk %d"
+#~ msgid "Created top level window"
+#~ msgstr "Создано окно верхнего уровня"
+
+#~ msgid "EGL: pbuffer surface ok"
+#~ msgstr "EGL: поверхность pbuffer ok"
+
+#, c-format
+#~ msgid "Host FD #%d, Control FD #%d\n"
+#~ msgstr "Файловый дескриптор узла #%d, управляющий файловый дескриптор #%d\n"
+
+#, c-format
+#~ msgid "EGL: height %d"
+#~ msgstr "EGL: высота %d"

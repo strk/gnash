@@ -2,20 +2,20 @@
 # Copyright (C) YEAR Free Software Foundation, Inc.
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-01-01 09:28-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2012-01-13 07:10+0200\n"
+"Last-Translator: Chris <cjl@laptop.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"Language: km\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Translate Toolkit 1.7.0\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Pootle 2.0.5\n"
 
 #: libbase/RTMP.cpp:221
 msgid "Initial connection failed"
@@ -221,9 +221,8 @@ msgstr ""
 
 #: libbase/extension.cpp:128 cygnal/handler.cpp:300
 #, c-format
-#, c-format, fuzzy
 msgid "Initializing module: \"%s\" from %s"
-msgstr "Alustetaan moduulia: \"%s\""
+msgstr ""
 
 #: libbase/extension.cpp:145
 msgid "Couldn't get class_init symbol"
@@ -232,7 +231,7 @@ msgstr ""
 #: libbase/extension.cpp:159
 #, c-format
 msgid "Initializing module: \"%s\""
-msgstr "Alustetaan moduulia: \"%s\""
+msgstr ""
 
 #: libbase/extension.cpp:174
 #, c-format
@@ -242,7 +241,7 @@ msgstr ""
 #: libbase/extension.cpp:202 cygnal/cgi-bin/oflaDemo/oflaDemo.cpp:313
 #, c-format
 msgid "Can't open directory %s"
-msgstr "Hakemistoa %s ei voi avata"
+msgstr "មិន​អាច​បើក​ថត %s"
 
 #: libbase/curl_adapter.cpp:48
 msgid ""
@@ -295,14 +294,13 @@ msgstr ""
 
 #: libbase/curl_adapter.cpp:672
 #, c-format
-#, fuzzy
 msgid "FIXME: Timeout (%u milliseconds) while loading from URL %s"
-msgstr "Aikakatkaisu (%u millisekuntia) ladattaessa url:stä %s"
+msgstr ""
 
 #: libbase/curl_adapter.cpp:720
-#, c-format, fuzzy
+#, c-format
 msgid "Timeout (%u milliseconds) while loading from URL %s"
-msgstr "Aikakatkaisu (%u millisekuntia) ladattaessa url:stä %s"
+msgstr ""
 
 #: libbase/curl_adapter.cpp:763
 #, c-format
@@ -325,7 +323,7 @@ msgstr ""
 
 #: libbase/curl_adapter.cpp:825
 msgid "Allowing connections to SSL sites with invalid certificates"
-msgstr "Sallitaan SSL-yhteydet sivustoille joilla epäkelpo varmenne"
+msgstr ""
 
 #: libbase/curl_adapter.cpp:1091
 msgid ""
@@ -1276,22 +1274,16 @@ msgid ""
 "Missing plugin, but plugin installing not supported. Will try anyway, but "
 "expect failure."
 msgstr ""
-"Liitännäinen puuttuu, mutta liitännäisen asentaminen ei ole tuettu. "
-"Yritetään joka tapauksessa, mutta epäonnistuminen on odotettavissa."
 
 #: libmedia/gst/GstUtil.cpp:121
 msgid "Missing plugin, but failed to convert it to gst missing plugin detail."
 msgstr ""
-"Liitännäinen puuttuu, mutta sen muuntaminen tiedoksi puuttuvasta tietystä "
-"gst-liitännäiestä epäonnistui."
 
 #: libmedia/gst/GstUtil.cpp:134
 msgid ""
 "gst_update_registry failed. You'll need to restart Gnash to use the new "
 "plugins."
 msgstr ""
-"gst_update_registry epäonnistui. Käynnistä Gnash uudelleen käyttääksesi "
-"uusia liitännäisiä."
 
 #: libmedia/gst/GstUtil.cpp:141
 msgid "Missing plugin, but automatic plugin installation not available."
@@ -1299,7 +1291,7 @@ msgstr ""
 
 #: libmedia/gst/VideoDecoderGst.cpp:97
 msgid "Video codec is zero.  Streaming video expected later."
-msgstr "Videokoodekki on ”nolla”. Videovirtaa odotetaan myöhemmäksi."
+msgstr ""
 
 #: libmedia/gst/VideoDecoderGst.cpp:100
 #, c-format
@@ -1313,11 +1305,11 @@ msgstr ""
 #: libmedia/gst/VideoDecoderGst.cpp:130
 #, c-format
 msgid "Couldn't find a plugin for video type %s!"
-msgstr "Liitännäistä ei löydy videotyypille %s."
+msgstr ""
 
 #: libmedia/gst/VideoDecoderGst.cpp:134
 msgid " Please make sure you have gstreamer-ffmpeg installed."
-msgstr " Varmista, että gstreamer-ffmpeg on asennettu."
+msgstr ""
 
 #: libmedia/gst/VideoDecoderGst.cpp:158
 #, c-format
@@ -1439,13 +1431,12 @@ msgstr ""
 #: libmedia/gst/AudioDecoderGst.cpp:110
 #, c-format
 msgid "AudioDecoderGst: cannot handle codec %d (%s)"
-msgstr "AudioDecoderGst: ei voi käsitellä koodekkia %d (%s)"
+msgstr ""
 
 #: libmedia/gst/AudioDecoderGst.cpp:120
 #, c-format
 msgid "AudioDecoderGst: cannot handle codec %d (no ExtraInfoGst attached)"
 msgstr ""
-"AudioDecoderGst: ei voi käsitellä koodekkia %d (ExtraInfoGst ei liitetty)"
 
 #: libmedia/gst/AudioDecoderGst.cpp:149
 msgid ""
@@ -1459,9 +1450,8 @@ msgstr ""
 
 #: libmedia/gst/AudioDecoderGst.cpp:175
 #, c-format
-#, c-format, fuzzy
 msgid "Couldn't find a plugin for audio type %s!"
-msgstr "Liitännäistä ei löydy videotyypille %s."
+msgstr ""
 
 #: libmedia/gst/AudioDecoderGst.cpp:199
 #, c-format
@@ -1867,7 +1857,7 @@ msgstr ""
 #: libmedia/MediaHandler.cpp:70
 #, c-format
 msgid "Exception while reading from stream: %s"
-msgstr "Poikkeus luettaessa virtaa: %s"
+msgstr ""
 
 #: libmedia/MediaHandler.cpp:107
 #, c-format
@@ -2187,7 +2177,7 @@ msgstr ""
 
 #: libcore/swf/tag_loaders.cpp:270 libcore/swf/tag_loaders.cpp:271
 msgid "true"
-msgstr ""
+msgstr "ពិត"
 
 #: libcore/swf/tag_loaders.cpp:270 libcore/swf/tag_loaders.cpp:271
 msgid "false"
@@ -3098,7 +3088,7 @@ msgstr ""
 
 #: libcore/asobj/Object.cpp:348
 msgid "Object.hasOwnProperty() requires one arg"
-msgstr ""
+msgstr "Object.hasOwnProperty() ត្រូវការ​អាគុយម៉ង់ ១"
 
 #: libcore/asobj/Object.cpp:357
 #, c-format
@@ -3107,7 +3097,7 @@ msgstr ""
 
 #: libcore/asobj/Object.cpp:373
 msgid "Object.isPropertyEnumerable() requires one arg"
-msgstr ""
+msgstr "Object.isPropertyEnumerable() ត្រូវការ​អាគុយម៉ង់ ១"
 
 #: libcore/asobj/Object.cpp:382
 #, c-format
@@ -3116,7 +3106,7 @@ msgstr ""
 
 #: libcore/asobj/Object.cpp:405
 msgid "Object.isPrototypeOf() requires one arg"
-msgstr ""
+msgstr "Object.isPrototypeOf() ត្រូវការ​អាគុយម៉ង់ ១"
 
 #: libcore/asobj/Object.cpp:413
 #, c-format
@@ -3149,7 +3139,7 @@ msgstr ""
 
 #: libcore/asobj/String_as.cpp:569
 msgid "string.charCodeAt needs one argument"
-msgstr ""
+msgstr "string.charCodeAt ត្រូវការ​អាគុយម៉ង់ ១"
 
 #: libcore/asobj/String_as.cpp:578
 msgid "string.charCodeAt has more than one argument"
@@ -3207,7 +3197,7 @@ msgstr ""
 #: libcore/asobj/flash/geom/Point_as.cpp:604
 #: libcore/asobj/MovieClip_as.cpp:532
 msgid "missing arguments"
-msgstr ""
+msgstr "អាគុយម៉ង់​បាត់"
 
 #: libcore/asobj/flash/geom/Rectangle_as.cpp:471
 #: libcore/asobj/flash/geom/Rectangle_as.cpp:545
@@ -3230,8 +3220,9 @@ msgstr ""
 #: libcore/asobj/flash/geom/Point_as.cpp:238
 #: libcore/asobj/flash/geom/Point_as.cpp:323
 #, c-format
+#, c-format, fuzzy
 msgid "%s: missing arguments"
-msgstr ""
+msgstr "អាគុយម៉ង់​បាត់"
 
 #: libcore/asobj/flash/geom/Point_as.cpp:128
 #: libcore/asobj/flash/geom/Point_as.cpp:138
@@ -3652,7 +3643,7 @@ msgstr ""
 
 #: libcore/asobj/Sound_as.cpp:1058
 msgid "attach sound needs one argument"
-msgstr ""
+msgstr "attach sound ត្រូវការ​អាគុយម៉ង់ ១"
 
 #: libcore/asobj/Sound_as.cpp:1068
 msgid "attachSound needs a non-empty string"
@@ -3806,7 +3797,7 @@ msgstr ""
 #: libcore/asobj/MovieClip_as.cpp:584
 #, c-format
 msgid "%s.swapDepths() needs one arg"
-msgstr ""
+msgstr "%s.swapDepths() ត្រូវការ​អាគុយម៉ង់ ១"
 
 #: libcore/asobj/MovieClip_as.cpp:595
 #, c-format
@@ -3859,7 +3850,7 @@ msgstr ""
 
 #: libcore/asobj/MovieClip_as.cpp:764
 msgid "movieclip_goto_and_play needs one arg"
-msgstr ""
+msgstr "movieclip_goto_and_play ត្រូវការ​អាគុយម៉ង់ ១"
 
 #: libcore/asobj/MovieClip_as.cpp:774
 #, c-format
@@ -3868,7 +3859,7 @@ msgstr ""
 
 #: libcore/asobj/MovieClip_as.cpp:794
 msgid "movieclip_goto_and_stop needs one arg"
-msgstr ""
+msgstr "movieclip_goto_and_stop ត្រូវការ​អាគុយម៉ង់ ១"
 
 #: libcore/asobj/MovieClip_as.cpp:804
 #, c-format
@@ -3938,7 +3929,7 @@ msgstr ""
 
 #: libcore/asobj/MovieClip_as.cpp:1273
 msgid "MovieClip.globalToLocal() takes one arg"
-msgstr ""
+msgstr "MovieClip.globalToLocal() ត្រូវការ​អាគុយម៉ង់ ១"
 
 #: libcore/asobj/MovieClip_as.cpp:1281
 #, c-format
@@ -3959,7 +3950,7 @@ msgstr ""
 
 #: libcore/asobj/MovieClip_as.cpp:1334
 msgid "MovieClip.localToGlobal() takes one arg"
-msgstr ""
+msgstr "MovieClip.localToGlobal() ត្រូវការ​អាគុយម៉ង់ ១"
 
 #: libcore/asobj/MovieClip_as.cpp:1342
 #, c-format
@@ -4317,7 +4308,7 @@ msgstr ""
 
 #: libcore/asobj/Date_as.cpp:723
 msgid "Date.setTime needs one argument"
-msgstr ""
+msgstr "Date.setTime ត្រូវការ​អាគុយម៉ង់ ១"
 
 #: libcore/asobj/Date_as.cpp:743
 msgid "Date.setTime was called with more than one argument"
@@ -4325,11 +4316,11 @@ msgstr ""
 
 #: libcore/asobj/Date_as.cpp:834
 msgid "Date.setFullYear needs one argument"
-msgstr ""
+msgstr "Date.setFullYear ត្រូវការ​អាគុយម៉ង់ ១"
 
 #: libcore/asobj/Date_as.cpp:874
 msgid "Date.setYear needs one argument"
-msgstr ""
+msgstr "Date.setYear ត្រូវការ​អាគុយម៉ង់ ១"
 
 #: libcore/asobj/Date_as.cpp:897
 msgid "Date.setYear was called with more than three arguments"
@@ -4338,7 +4329,7 @@ msgstr ""
 #: libcore/asobj/Date_as.cpp:928
 #, c-format
 msgid "Date.set%sMonth needs one argument"
-msgstr ""
+msgstr "Date.set%sMonth ត្រូវការ​អាគុយម៉ង់ ១"
 
 #: libcore/asobj/Date_as.cpp:961
 #, c-format
@@ -4348,7 +4339,7 @@ msgstr ""
 #: libcore/asobj/Date_as.cpp:983
 #, c-format
 msgid "Date.set%sDate needs one argument"
-msgstr ""
+msgstr "Date.set%sDate ត្រូវការ​អាគុយម៉ង់ ១"
 
 #: libcore/asobj/Date_as.cpp:997
 #, c-format
@@ -4358,7 +4349,7 @@ msgstr ""
 #: libcore/asobj/Date_as.cpp:1024
 #, c-format
 msgid "Date.set%sHours needs one argument"
-msgstr ""
+msgstr "Date.set%sHours ត្រូវការ​អាគុយម៉ង់ ១"
 
 #: libcore/asobj/Date_as.cpp:1043
 #, c-format
@@ -4368,7 +4359,7 @@ msgstr ""
 #: libcore/asobj/Date_as.cpp:1069
 #, c-format
 msgid "Date.set%sMinutes needs one argument"
-msgstr ""
+msgstr "Date.set%sMinutes ត្រូវការ​អាគុយម៉ង់ ១"
 
 #: libcore/asobj/Date_as.cpp:1087 libcore/asobj/Date_as.cpp:1130
 #, c-format
@@ -4378,12 +4369,12 @@ msgstr ""
 #: libcore/asobj/Date_as.cpp:1110
 #, c-format
 msgid "Date.set%sSeconds needs one argument"
-msgstr ""
+msgstr "Date.set%sSeconds ត្រូវការ​អាគុយម៉ង់ ១"
 
 #: libcore/asobj/Date_as.cpp:1148
 #, c-format
 msgid "Date.set%sMilliseconds needs one argument"
-msgstr ""
+msgstr "Date.set%sMilliseconds ត្រូវការ​អាគុយម៉ង់ ១"
 
 #: libcore/asobj/Date_as.cpp:1165
 #, c-format
@@ -4392,7 +4383,7 @@ msgstr ""
 
 #: libcore/asobj/Date_as.cpp:1227
 msgid "Date.UTC needs one argument"
-msgstr ""
+msgstr "Date.UTC ត្រូវការ​អាគុយម៉ង់ ១"
 
 #: libcore/asobj/Date_as.cpp:1251
 msgid "Date.UTC was called with more than 7 arguments"
@@ -4401,7 +4392,7 @@ msgstr ""
 #: libcore/asobj/Global_as.cpp:100
 #, c-format
 msgid "%s needs one argument"
-msgstr ""
+msgstr "%s ត្រូវការ​អាគុយម៉ង់ ១"
 
 #: libcore/asobj/Global_as.cpp:106
 #, c-format
@@ -4419,7 +4410,7 @@ msgstr ""
 #: libcore/asobj/Global_as.cpp:493
 #, c-format
 msgid "%s needs at least one argument"
-msgstr ""
+msgstr "%s ត្រូវការ​អាគុយម៉ង់​យ៉ាង​តិច ១"
 
 #: libcore/asobj/Global_as.cpp:500
 #, c-format
@@ -4429,7 +4420,7 @@ msgstr ""
 #: libcore/asobj/Global_as.cpp:594
 #, c-format
 msgid "%s needs at least three arguments"
-msgstr ""
+msgstr "%s ត្រូវការ​អាគុយម៉ង់​យ៉ាង​តិច ៣"
 
 #: libcore/asobj/Global_as.cpp:601
 #, c-format
@@ -4444,7 +4435,7 @@ msgstr ""
 #: libcore/asobj/Global_as.cpp:657 libcore/asobj/Global_as.cpp:700
 #, c-format
 msgid "ASNative(%s): needs at least two arguments"
-msgstr ""
+msgstr "ASNative(%s): ត្រូវការ​អាគុយម៉ង់​យ៉ាង​តិច ២"
 
 #: libcore/asobj/Global_as.cpp:669
 #, c-format
@@ -4551,7 +4542,7 @@ msgstr ""
 #: libcore/asobj/NetStream_as.cpp:386
 #, c-format
 msgid "Connecting to movie: %s"
-msgstr "Yhdistetään elokuvaan: %s"
+msgstr ""
 
 #: libcore/asobj/NetStream_as.cpp:392
 #, c-format
@@ -5123,9 +5114,9 @@ msgid "sendAndLoad(): invalid target (must be an XML or LoadVars object)"
 msgstr ""
 
 #: libcore/asobj/LoadableObject.cpp:397
-#, c-format, fuzzy
+#, c-format
 msgid "Loading from URL: '%s'"
-msgstr "Ladataan URLista: '%s'"
+msgstr ""
 
 #: libcore/asobj/LoadableObject.cpp:417
 msgid "load() requires at least one argument"
@@ -5309,19 +5300,19 @@ msgstr ""
 
 #: libcore/DisplayObject.cpp:796
 msgid "yes"
-msgstr ""
+msgstr "បាទ/ចាស"
 
 #: libcore/DisplayObject.cpp:797
 msgid "no"
-msgstr ""
+msgstr "ទេ"
 
 #: libcore/DisplayObject.cpp:803
 msgid "Depth"
-msgstr "Syvyys"
+msgstr "ជម្រៅ"
 
 #: libcore/DisplayObject.cpp:809
 msgid "Ratio"
-msgstr ""
+msgstr "សមាមាត្រ"
 
 #: libcore/DisplayObject.cpp:819
 msgid "Clipping depth"
@@ -5329,15 +5320,16 @@ msgstr ""
 
 #: libcore/DisplayObject.cpp:824
 msgid "Dimensions"
-msgstr ""
+msgstr "វិមាត្រ"
 
 #: libcore/DisplayObject.cpp:826
 msgid "Dynamic"
-msgstr ""
+msgstr "ថាមវន្ត"
 
 #: libcore/DisplayObject.cpp:827
+#, fuzzy
 msgid "Mask"
-msgstr ""
+msgstr "សម្គាល់"
 
 #: libcore/DisplayObject.cpp:828
 msgid "Destroyed"
@@ -5345,11 +5337,11 @@ msgstr ""
 
 #: libcore/DisplayObject.cpp:830
 msgid "Unloaded"
-msgstr ""
+msgstr "មិន​បាន​ផ្ទុក"
 
 #: libcore/DisplayObject.cpp:834
 msgid "Blend mode"
-msgstr ""
+msgstr "របៀប​លាយ"
 
 #: libcore/DisplayObject.cpp:837
 msgid "Invalidated"
@@ -5436,8 +5428,9 @@ msgstr ""
 
 #: libcore/AMFConverter.cpp:376
 #, c-format
+#, c-format, fuzzy
 msgid "AMF parsing error: %s"
-msgstr ""
+msgstr "កំហុស​ក្នុង​ការ​ញែក ៖ %s"
 
 #: libcore/AMFConverter.cpp:407
 msgid "Read past _end of buffer for strict array length"
@@ -6107,7 +6100,7 @@ msgstr ""
 
 #: libcore/Button.cpp:956
 msgid "Enabled"
-msgstr ""
+msgstr "បាន​អនុញ្ញាត"
 
 #: libcore/Button.cpp:961
 msgid "Button state"
@@ -6300,7 +6293,7 @@ msgstr ""
 #: libcore/parser/sprite_definition.cpp:64
 #, c-format
 msgid "  frames = %d"
-msgstr "  kehyksiä = %d"
+msgstr ""
 
 #: libcore/parser/sprite_definition.cpp:77
 #, c-format
@@ -6448,7 +6441,7 @@ msgstr ""
 #: libcore/parser/SWFMovieDefinition.cpp:431
 #, c-format
 msgid "Could not find char %d, dump is: %s"
-msgstr "Merkkiä %d ei löydy, vedos on: %s"
+msgstr ""
 
 #: libcore/parser/SWFMovieDefinition.cpp:490
 msgid "Error while parsing SWF stream."
@@ -6777,7 +6770,7 @@ msgstr ""
 
 #: libcore/MovieFactory.cpp:98
 msgid "Unknown file type"
-msgstr ""
+msgstr "មិនស្គាល់​ប្រភេទ​ឯកសារ"
 
 #: libcore/MovieFactory.cpp:133
 #, c-format
@@ -6794,7 +6787,7 @@ msgstr ""
 
 #: libcore/MovieFactory.cpp:222
 msgid "Could not find SWF inside an exe file"
-msgstr "SWF:ää ei löydy exe-tiedoston sisältä"
+msgstr ""
 
 #: libcore/MovieFactory.cpp:231
 #, c-format
@@ -6804,12 +6797,12 @@ msgstr ""
 #: libcore/MovieFactory.cpp:273
 #, c-format
 msgid "Can't read image file from %s"
-msgstr "Kuvatiedostoa ei voi lukea kohteesta: %s"
+msgstr ""
 
 #: libcore/MovieFactory.cpp:283
 #, c-format
 msgid "Parsing error: %s"
-msgstr ""
+msgstr "កំហុស​ក្នុង​ការ​ញែក ៖ %s"
 
 #: libcore/MovieFactory.cpp:309
 #, c-format
@@ -6829,7 +6822,7 @@ msgstr ""
 #: libcore/as_object.cpp:439
 #, c-format
 msgid "Caught exception: %s"
-msgstr ""
+msgstr "បាន​ទទួល​ករណី​លើកលែង​ ៖ %s"
 
 #: libcore/as_object.cpp:627
 #, c-format
@@ -6839,7 +6832,7 @@ msgstr ""
 #: libcore/as_object.cpp:639
 #, c-format
 msgid "%s: %s"
-msgstr ""
+msgstr "%s: %s"
 
 #: libcore/as_object.cpp:654
 #, c-format
@@ -7081,8 +7074,9 @@ msgstr ""
 
 #: libdevice/events/MouseDevice.cpp:145 libdevice/events/EventDevice.cpp:74
 #, c-format
+#, c-format, fuzzy
 msgid "Could not open %s: %s"
-msgstr ""
+msgstr "មិន​អាច​បើក​ឯកសារ %s បាន​ឡើយ"
 
 #: libdevice/events/MouseDevice.cpp:151
 #, c-format
@@ -7091,7 +7085,7 @@ msgstr ""
 
 #: libdevice/events/MouseDevice.cpp:170
 msgid "Mouse reset failed"
-msgstr "Hiiren alustus epäonnistui"
+msgstr ""
 
 #: libdevice/events/MouseDevice.cpp:180
 msgid "WARNING: Could not detect mouse device ID"
@@ -7613,12 +7607,12 @@ msgstr ""
 #: libdevice/rawfb/RawFBDevice.cpp:147
 #, c-format
 msgid "Framebuffer device uses %d bytes of memory."
-msgstr "Kuvapuskurilaite käyttää %d tavua muistia."
+msgstr ""
 
 #: libdevice/rawfb/RawFBDevice.cpp:149
 #, c-format
 msgid "Video mode: %dx%d with %d bits per pixel."
-msgstr "Näyttötila: %dx%d, %d bittiä pikseliä kohden."
+msgstr ""
 
 #: libdevice/rawfb/RawFBDevice.cpp:153
 #, c-format
@@ -7627,7 +7621,7 @@ msgstr ""
 
 #: libdevice/rawfb/RawFBDevice.cpp:167
 msgid "LUT8: Setting up colormap"
-msgstr "LUT8: Asetetaan värikarttaa"
+msgstr ""
 
 #: libdevice/rawfb/RawFBDevice.cpp:192
 #, c-format
@@ -7724,9 +7718,8 @@ msgid "No drawable window set!"
 msgstr ""
 
 #: libsound/WAVWriter.cpp:65
-#, fuzzy
 msgid "Unable to write file %1%"
-msgstr "Ei voida kirjoittaa tiedostoon '%s'."
+msgstr ""
 
 #: libsound/mkit/sound_handler_mkit.cpp:75
 msgid "Unable to open audio"
@@ -7914,7 +7907,7 @@ msgstr ""
 #: utilities/soldumper.cpp:75 utilities/dumpshm.cpp:344
 #: utilities/flvdumper.cpp:305
 msgid "-h\tHelp"
-msgstr ""
+msgstr "ជំនួយ"
 
 #: utilities/soldumper.cpp:76
 msgid "-f\tForce local directory access"
@@ -7927,7 +7920,7 @@ msgstr ""
 #: utilities/soldumper.cpp:105
 #, c-format
 msgid "Gnash soldumper version: %s, Gnash version: %s\n"
-msgstr "Gnash soldumper -versio: %s, Gnash-versio: %s\n"
+msgstr ""
 
 #: utilities/soldumper.cpp:121 utilities/processor.cpp:276
 #: utilities/flvdumper.cpp:154 cygnal/cygnal.cpp:475
@@ -7973,7 +7966,7 @@ msgstr ""
 #: utilities/processor.cpp:237 cygnal/cvm.cpp:227
 #, c-format
 msgid "Gnash gprocessor version: %s, Gnash version: %s\n"
-msgstr "Gnash gprocessor -versio: %s, Gnash-versio: %s\n"
+msgstr ""
 
 #: utilities/processor.cpp:285 cygnal/cvm.cpp:282
 msgid "Verbose actions disabled at compile time"
@@ -8035,7 +8028,7 @@ msgstr ""
 #: utilities/dumpshm.cpp:136
 #, c-format
 msgid "Gnash dumpshm version: %s, Gnash version: %s\n"
-msgstr "Gnash dumpshm -versio: %s, Gnash-versio: %s\n"
+msgstr ""
 
 #: utilities/dumpshm.cpp:214
 #, c-format
@@ -9816,9 +9809,8 @@ msgstr ""
 
 #: cygnal/cygnal.cpp:341
 #, c-format
-#, c-format, fuzzy
 msgid "Couldn't connect to %s"
-msgstr "Tietokantaan ei voi yhdistää"
+msgstr ""
 
 #: cygnal/cygnal.cpp:361
 #, c-format
@@ -9991,9 +9983,8 @@ msgstr ""
 
 #: cygnal/cgi-bin/oflaDemo/oflaDemo.cpp:309
 #, c-format
-#, c-format, fuzzy
 msgid "Scanning directory \"%s\" for %s files"
-msgstr "Tarkistetaan liitännäisiä hakemistosta \"%s\""
+msgstr ""
 
 #: cygnal/cgi-bin/oflaDemo/oflaDemo.cpp:340
 #, c-format
@@ -10190,7 +10181,7 @@ msgstr ""
 #: cygnal/testsuite/libamf.all/test_buffer.cpp:116
 #: cygnal/testsuite/libamf.all/test_amf.cpp:118
 msgid "Logging to disk enabled"
-msgstr "Levylle lokin kirjoittaminen otettu käyttöön"
+msgstr ""
 
 #: cygnal/testsuite/libnet.all/generate_amfbins.cpp:299
 #: cygnal/testsuite/libamf.all/test_el.cpp:490
@@ -10258,11 +10249,11 @@ msgstr ""
 
 #: gui/fb/fb.cpp:462
 msgid "This GUI does not yet support menus"
-msgstr "Tämä käyttöliittymä ei vielä tue valikoita"
+msgstr ""
 
 #: gui/fb/fb.cpp:468
 msgid "This GUI does not yet support a mouse pointer"
-msgstr "Tämä käyttöliittymä ei vielä tue hiiren osoitinta"
+msgstr ""
 
 #: gui/fb/fb.cpp:539
 msgid "Could not detect controlling TTY"
@@ -10270,8 +10261,9 @@ msgstr ""
 
 #: gui/fb/fb.cpp:548 gui/fb/fb.cpp:585 gui/fb/fb.cpp:619 gui/fb/fb.cpp:670
 #, c-format
+#, fuzzy
 msgid "Could not open %s"
-msgstr ""
+msgstr "មិន​អាច​បើក​ឯកសារ %s បាន​ឡើយ"
 
 #: gui/fb/fb.cpp:554
 msgid "Could not get current VT state"
@@ -10310,9 +10302,8 @@ msgid "Could not switch to graphics mode on new VT"
 msgstr ""
 
 #: gui/fb/fb.cpp:690
-#, fuzzy
 msgid "Could not restore keyboard mode"
-msgstr "VAROITUS: Näppäimistötilaa ei voi palauttaa"
+msgstr ""
 
 #: gui/fb/fb_glue_ovg.cpp:73 gui/gtk/gtk_glue_ovg.cpp:88
 msgid "Probing found an EGL display device"
@@ -10385,11 +10376,11 @@ msgstr ""
 
 #: gui/fb/fb_glue_agg.cpp:191
 msgid "Double buffering disabled"
-msgstr "Kaksoispuskurointi pois käytöstä"
+msgstr ""
 
 #: gui/fb/fb_glue_agg.cpp:194
 msgid "Double buffering enabled"
-msgstr "Kaksoispuskurointi käytössä"
+msgstr ""
 
 #: gui/fb/fb_glue_agg.cpp:221
 #, c-format
@@ -10415,7 +10406,7 @@ msgstr ""
 
 #: gui/gnash.cpp:251
 msgid "ERROR: -r must be followed by 0, 1, 2 or 3 "
-msgstr "VIRHE: -r-valitsimen kanssa tulee määrittää 0, 1, 2, tai 3 "
+msgstr ""
 
 #: gui/gnash.cpp:267
 msgid "Debugging options"
@@ -10442,8 +10433,9 @@ msgid "Print FPS every num seconds"
 msgstr ""
 
 #: gui/gnash.cpp:320
+#, fuzzy
 msgid "Options"
-msgstr ""
+msgstr "ជម្រើស ៖"
 
 #: gui/gnash.cpp:325
 msgid "Print this help and exit"
@@ -10543,7 +10535,7 @@ msgstr ""
 
 #: gui/gnash.cpp:432
 msgid "Start in fullscreen mode"
-msgstr ""
+msgstr "ចាប់ផ្ដើម​ជារបៀប​ពេញអេក្រង់"
 
 #: gui/gnash.cpp:437
 msgid "Start without displaying the menu bar"
@@ -10582,29 +10574,33 @@ msgid "Trigger expression to start dumping"
 msgstr ""
 
 #: gui/gnash.cpp:485
+#, fuzzy
 msgid "Keys:\n"
-msgstr ""
+msgstr "គ្រាប់ចុច ៖\n"
 
 #: gui/gnash.cpp:487
+#, fuzzy
 msgid "Quit\n"
-msgstr ""
+msgstr "បោះបង់\n"
 
 #: gui/gnash.cpp:489
 #, fuzzy
 msgid "Toggle fullscreen\n"
-msgstr "Kytke kokonäyttötila"
+msgstr "បិទ​បើក ពេញ​អេក្រង់\n"
 
 #: gui/gnash.cpp:491
+#, fuzzy
 msgid "Toggle pause\n"
-msgstr ""
+msgstr "បិទបើក​ការ​ផ្អាក\n"
 
 #: gui/gnash.cpp:493
 msgid "Restart the movie\n"
 msgstr ""
 
 #: gui/gnash.cpp:495
+#, fuzzy
 msgid "Take a screenshot\n"
-msgstr ""
+msgstr "ថត​អេក្រង់\n"
 
 #: gui/gnash.cpp:497
 msgid "Force immediate redraw\n"
@@ -10630,11 +10626,11 @@ msgstr ""
 
 #: gui/gnash.cpp:532
 msgid "Build options "
-msgstr "Rakennusvalinnat "
+msgstr ""
 
 #: gui/gnash.cpp:533
 msgid "   Renderers: "
-msgstr ""
+msgstr "   nកម្មវិធី​បង្ហាញ ៖ "
 
 #: gui/gnash.cpp:534
 msgid "   Hardware Acceleration: "
@@ -10650,11 +10646,11 @@ msgstr ""
 
 #: gui/gnash.cpp:538
 msgid "   Configured with: "
-msgstr "   Tehdyt asetukset: "
+msgstr ""
 
 #: gui/gnash.cpp:539
 msgid "   CXXFLAGS: "
-msgstr "   CXXFLAGS: "
+msgstr ""
 
 #: gui/fltk/fltk_glue_agg.cpp:50
 msgid "Could not create AGG renderer with pixelformat RGB24"
@@ -10662,7 +10658,7 @@ msgstr ""
 
 #: gui/dump/dump.cpp:117
 msgid "Ignoring request to display in X11 window"
-msgstr "Ohitetaan pyyntö näyttää X11-ikkunassa"
+msgstr ""
 
 #: gui/dump/dump.cpp:128 gui/haiku/haiku.cpp:384
 msgid "# FATAL:  No filename given with -D argument."
@@ -10679,7 +10675,7 @@ msgstr ""
 #: gui/dump/dump.cpp:352
 #, c-format
 msgid "Unable to write file '%s'."
-msgstr "Ei voida kirjoittaa tiedostoon '%s'."
+msgstr ""
 
 #: gui/ScreenShotter.cpp:99
 #, c-format
@@ -10707,7 +10703,7 @@ msgstr ""
 #: gui/sdl/sdl_agg_glue.cpp:78
 #, c-format
 msgid "AGG's bit depth must be 16, 24 or 32 bits, not %d."
-msgstr "AGG:n värisyvyyden tulee olla 16, 24 tai 32 bittiä, ei %d."
+msgstr ""
 
 #: gui/haiku/haiku_agg_glue.cpp:297 gui/gtk/gtk_glue_agg.cpp:96
 #, c-format
@@ -10717,7 +10713,7 @@ msgstr ""
 #: gui/haiku/haiku_agg_glue.cpp:416 gui/sdl/sdl_agg_glue.cpp:132
 #, c-format
 msgid "SDL-AGG: %i byte offscreen buffer allocated"
-msgstr "SDL-AGG: varattiin %i tavun kuvan ulkopuolinen puskuri"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:120
 msgid "Cairo renderer not supported!"
@@ -10732,221 +10728,221 @@ msgid "AGG renderer not supported!"
 msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:467 gui/gtk/gtk.cpp:1708
+#, fuzzy
 msgid "Movie properties"
-msgstr "Elokuvan ominaisuudet"
+msgstr "คุณสมบัติหน้า"
 
 #: gui/qt/Qt4Gui.cpp:486 gui/gtk/gtk.cpp:1778
 msgid "Variable"
-msgstr "Muuttuja"
+msgstr "អថេរ"
 
 #: gui/qt/Qt4Gui.cpp:487 gui/gtk/gtk.cpp:1790
 msgid "Value"
-msgstr "Arvo"
+msgstr "តម្លៃ"
 
 #: gui/qt/Qt4Gui.cpp:588
 msgid "Properties"
-msgstr "Ominaisuudet"
+msgstr "លក្ខណ​សម្បត្តិ"
 
 #: gui/qt/Qt4Gui.cpp:592 gui/qt/kde.cpp:424
 msgid "Quit Gnash"
-msgstr "Lopeta Gnash"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:599
 msgid "Preferences"
-msgstr "Asetukset"
+msgstr "ចំណូល​ចិត្ត"
 
 #: gui/qt/Qt4Gui.cpp:604 gui/gtk/gtk.cpp:2119
 msgid "Play"
-msgstr "Toista"
+msgstr "ចាក់"
 
 #: gui/qt/Qt4Gui.cpp:608 gui/gtk/gtk.cpp:2130
 msgid "Pause"
-msgstr "Tauko"
+msgstr "ផ្អាក"
 
 #: gui/qt/Qt4Gui.cpp:612 gui/gtk/gtk.cpp:2140
 msgid "Stop"
-msgstr "Pysäytä"
+msgstr "បញ្ឈប់"
 
 #: gui/qt/Qt4Gui.cpp:616
 msgid "Restart"
-msgstr "Käynnistä uudelleen"
+msgstr "ចាប់​ផ្តើមឡើង​វិញ"
 
 #: gui/qt/Qt4Gui.cpp:621 gui/qt/kde.cpp:423
 msgid "Refresh"
-msgstr "Päivitä"
+msgstr "ធ្វើ​ឲ្យ​ស្រស់"
 
 #: gui/qt/Qt4Gui.cpp:625
 msgid "Fullscreen"
-msgstr "Kokonäyttötila"
+msgstr "ពេញ​អេក្រង់"
 
 #: gui/qt/Qt4Gui.cpp:640
 msgid "File"
-msgstr "Tiedosto"
+msgstr "ឯកសារ"
 
 #: gui/qt/Qt4Gui.cpp:645
 msgid "Edit"
-msgstr "Muokkaa"
+msgstr "កែសម្រួល"
 
 #: gui/qt/Qt4Gui.cpp:649
 msgid "Movie Control"
-msgstr "Elokuvan hallinta"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:656
 msgid "View"
-msgstr "Näytä"
+msgstr "ទិដ្ឋភាព"
 
 #: gui/qt/Qt4Gui.cpp:738
-#, fuzzy
 msgid "Click to Play"
-msgstr "Napsauta toistaaksesi"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:770 gui/gtk/gtk.cpp:1239
 msgid "Gnash preferences"
-msgstr "Gnash-asetukset"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:785
 msgid "Logging"
-msgstr "Lokiinkirjaus"
+msgstr "ការ​ចូល"
 
 #: gui/qt/Qt4Gui.cpp:788 gui/gtk/gtk.cpp:1310
 msgid "<b>Logging options</b>"
-msgstr "<b>Lokivalinnat</b>"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:791
 msgid "Verbosity level"
-msgstr "Tulosteen määrä"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:809
 msgid "Log to file"
-msgstr "Loki tiedostoon"
+msgstr "ចុះ​​កំណត់ហេតុ​ទៅ​ឯកសារ"
 
 #: gui/qt/Qt4Gui.cpp:816
 msgid "Log parser output"
-msgstr "Jäsentimen ulostulo lokiin"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:820
 msgid "Log SWF actions"
-msgstr "SWF-toiminnot lokiin"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:824
 msgid "Log malformed SWF errors"
-msgstr "Väärin muodostetun SWF:n virheet lokiin"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:829
 msgid "Log ActionScript coding errors"
-msgstr "ActionScript-ohjelmavirheet lokiin"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:836
 msgid "Security"
-msgstr "Turvallisuus"
+msgstr "សុវត្ថិភាព"
 
 #: gui/qt/Qt4Gui.cpp:839 gui/gtk/gtk.cpp:1393
 msgid "<b>Network connections</b>"
-msgstr "<b>Verkkoyhteydet</b>"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:842
 msgid "Connect only to local host"
-msgstr "Yhdistä vain paikalliseen isäntäkoneeseen"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:847
 msgid "Connect only to local domain"
-msgstr "Yhdistä vain paikalliseen verkkoalueeseen"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:852
 msgid "Disable SSL verification"
-msgstr "Ota SSL-tarkistus pois käytöstä"
+msgstr "បិទ​ការ​ផ្ទៀងផ្ទាត់ SSL"
 
 #: gui/qt/Qt4Gui.cpp:857 gui/gtk/gtk.cpp:1438
 msgid "<b>Privacy</b>"
-msgstr "<b>Yksityisyys</b>"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:860 gui/gtk/gtk.cpp:1442
 msgid "Shared objects directory:"
-msgstr "Jaettujen objektien hakemisto:"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:866
 msgid "Do not write Shared Object files"
-msgstr "Älä kirjoita jaettujen objektien tiedostoja"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:872
 msgid "Only access local Shared Object files"
-msgstr "Saanti vain paikallisiin jaettujen objektien tiedostoihin"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:877
 msgid "Disable Local Connection object"
-msgstr "Ota paikallisyhteyden objekti pois käytöstä"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:884
 msgid "Network"
-msgstr "Verkko"
+msgstr "បណ្ដាញ"
 
 #: gui/qt/Qt4Gui.cpp:887 gui/gtk/gtk.cpp:1278
 msgid "<b>Network preferences</b>"
-msgstr "<b>Verkkoasetukset</b>"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:890
 msgid "Network timeout in seconds"
-msgstr "Verkon aikakatkaisu sekunneissa"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:902
 msgid "Media"
-msgstr "Media"
+msgstr "មេឌៀ"
 
 #: gui/qt/Qt4Gui.cpp:905 gui/gtk/gtk.cpp:1488
 msgid "<b>Sound</b>"
-msgstr "<b>Ääni</b>"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:908
 msgid "Use sound handler"
-msgstr "Käytä äänenkäsittelijää"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:912 gui/gtk/gtk.cpp:1507
 msgid "Save media streams to disk"
-msgstr "Tallenna mediavirrat levylle"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:918 gui/gtk/gtk.cpp:1516
 msgid "Save dynamically loaded media to disk"
-msgstr "Tallenna dynaamisesti ladatut mediat levylle"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:922 gui/gtk/gtk.cpp:1524
 msgid "Saved media directory:"
-msgstr "Medioiden tallennuksen hakemisto:"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:931
 msgid "Player"
-msgstr "Soitin"
+msgstr "អ្ន​ក​លេង"
 
 #: gui/qt/Qt4Gui.cpp:934 gui/gtk/gtk.cpp:1550
 msgid "<b>Player description</b>"
-msgstr "<b>Soittimen kuvaus</b>"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:937 gui/gtk/gtk.cpp:1558
 msgid "Player version:"
-msgstr "Soittimen versio:"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:943 gui/gtk/gtk.cpp:1574
 msgid "Operating system:"
-msgstr "Käyttöjärjestelmä:"
+msgstr "ប្រព័ន្ធ​ប្រតិបត្តិការ ៖"
 
 #: gui/qt/Qt4Gui.cpp:948 gui/qt/Qt4Gui.cpp:1021
 msgid "<Autodetect>"
-msgstr "<automaattinen tunnistus>"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:954 gui/gtk/gtk.cpp:1594
 msgid "URL opener:"
-msgstr "URL-avaaja:"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:961 gui/gtk/gtk.cpp:1606
 msgid "<b>Performance</b>"
-msgstr "<b>Suorituskyky</b>"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:964 gui/gtk/gtk.cpp:1620
 msgid "Max size of movie library:"
-msgstr "Elokuvakirjaston suurin koko:"
+msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:973
 msgid "Start Gnash in pause mode"
-msgstr "Käynnistä Gnash pysäytetyssä tilassa"
+msgstr ""
 
 #: gui/qt/Qt4GlueAgg.cpp:115
 msgid "Could not create AGG renderer with pixelformat ABGR32"
@@ -10958,44 +10954,44 @@ msgstr ""
 
 #: gui/qt/kde.cpp:413
 msgid "Play Movie"
-msgstr "Toista elokuva"
+msgstr ""
 
 #: gui/qt/kde.cpp:414
 msgid "Pause Movie"
-msgstr "Tauko"
+msgstr ""
 
 #: gui/qt/kde.cpp:415
 msgid "Stop Movie"
-msgstr "Pysäytä elokuva"
+msgstr ""
 
 #: gui/qt/kde.cpp:416 gui/gtk/gtk.cpp:2152
 msgid "Restart Movie"
-msgstr "Käynnistä elokuva uudelleen"
+msgstr ""
 
 #: gui/qt/kde.cpp:418
 msgid "Step Forward"
-msgstr "Askel eteenpäin"
+msgstr ""
 
 #: gui/qt/kde.cpp:419
 msgid "Step Backward"
-msgstr "Askel taaksepäin"
+msgstr ""
 
 #: gui/qt/kde.cpp:420
 msgid "Jump Forward"
-msgstr "Hyppää eteenpäin"
+msgstr ""
 
 #: gui/qt/kde.cpp:421
 msgid "Jump Backward"
-msgstr "Hyppää taaksepäin"
+msgstr ""
 
 #: gui/pythonmod/gnash-view.cpp:220 gui/Player.cpp:288
-#, c-format, fuzzy
+#, c-format
 msgid "Could not create sound handler: %s. Will continue without sound."
-msgstr "Äänenkäsittelijää ei voi luoda: %s. Jatketaan ilman ääntä."
+msgstr ""
 
 #: gui/pythonmod/gnash-view.cpp:223 gui/Player.cpp:283
 msgid "Sound requested but no sound support compiled in"
-msgstr "Ääntä pyydetty, mutta äänitukea ei ole käännetty mukaan"
+msgstr ""
 
 #: gui/aos4/aos4.cpp:70
 #, c-format
@@ -11008,8 +11004,6 @@ msgid ""
 "Attempting to open file %s.\n"
 "NOTE: the file open functionality is not yet implemented!"
 msgstr ""
-"Yritetään avata tiedostoa %s.\n"
-"Huom: tiedoston avaustoiminto ei ole vielä toteutettu."
 
 #: gui/aos4/aos4.cpp:274
 msgid "Cannot open File Requester!\n"
@@ -11021,9 +11015,8 @@ msgstr ""
 
 #: gui/aos4/aos4_cairo_glue.cpp:124
 #, c-format
-#, c-format, fuzzy
 msgid "Cairo's bit depth must be 16, 24 or 32 bits, not %d."
-msgstr "AGG:n värisyvyyden tulee olla 16, 24 tai 32 bittiä, ei %d."
+msgstr ""
 
 #: gui/aos4/aos4_cairo_glue.cpp:212 gui/aos4/aos4_agg_glue.cpp:216
 msgid "Cannot layout Menu!!\n"
@@ -11047,36 +11040,32 @@ msgstr ""
 
 #: gui/aos4/aos4_agg_glue.cpp:277
 #, c-format
-#, c-format, fuzzy
 msgid "AOS4-AGG: %i byte offscreen buffer allocated"
-msgstr "SDL-AGG: varattiin %i tavun kuvan ulkopuolinen puskuri"
+msgstr ""
 
 #: gui/sdl/sdl_agg_glue.cpp:95
 msgid "SDL_SetVideoMode() failed for SdlAggGlue."
-msgstr "SDL_SetVideoMode() epäonnistui kohteelle SdlAggGlue."
+msgstr ""
 
 #: gui/gui.cpp:193
-#, fuzzy
 msgid "Clipboard not yet supported in this GUI"
-msgstr "Kokonäyttötilaa ei vielä tuettu tässä käyttöliittymässä"
+msgstr ""
 
 #: gui/gui.cpp:199 gui/gui.cpp:211
 msgid "Fullscreen not yet supported in this GUI"
-msgstr "Kokonäyttötilaa ei vielä tuettu tässä käyttöliittymässä"
+msgstr ""
 
 #: gui/gui.cpp:205
-#, fuzzy
 msgid "Window resize not yet supported in this GUI"
-msgstr "Hiiren näyttö/piilotus ei vielä tuettu tässä käyttöliittymässä"
+msgstr ""
 
 #: gui/gui.cpp:229 gui/gui.cpp:242
-#, fuzzy
 msgid "Menu show/hide not yet supported in this GUI"
-msgstr "Hiiren näyttö/piilotus ei vielä tuettu tässä käyttöliittymässä"
+msgstr ""
 
 #: gui/gui.cpp:235
 msgid "Mouse show/hide not yet supported in this GUI"
-msgstr "Hiiren näyttö/piilotus ei vielä tuettu tässä käyttöliittymässä"
+msgstr ""
 
 #: gui/gui.cpp:282
 msgid "Can't update stage matrix till VM is initialized"
@@ -11217,7 +11206,7 @@ msgstr ""
 
 #: gui/gtk/gtk.cpp:223
 msgid "Click to play"
-msgstr "Napsauta toistaaksesi"
+msgstr ""
 
 #: gui/gtk/gtk.cpp:612
 #, c-format
@@ -11226,103 +11215,103 @@ msgstr ""
 
 #: gui/gtk/gtk.cpp:686
 msgid "Sound"
-msgstr "Ääni"
+msgstr "សំឡេង"
 
 #: gui/gtk/gtk.cpp:1274
 msgid "_Network"
-msgstr "_Verkko"
+msgstr "_បណ្តាញ"
 
 #: gui/gtk/gtk.cpp:1286
 msgid "Network timeout in seconds (0 for no timeout):"
-msgstr "Verkon aikakatkaisu sekunneissa (0 - ei aikakatkaisua):"
+msgstr ""
 
 #: gui/gtk/gtk.cpp:1305
 msgid "_Logging"
-msgstr "_Lokiinkirjaus"
+msgstr "_ចុះ​កំណត់​ហេតុ"
 
 #: gui/gtk/gtk.cpp:1314
 msgid "Verbosity level:"
-msgstr "Tulosteen määrä:"
+msgstr ""
 
 #: gui/gtk/gtk.cpp:1327
 msgid "Log to _file"
-msgstr "Loki _tiedostoon"
+msgstr "ចុះ​​កំណត់ហេតុ​ទៅ​ឯកសារ"
 
 #: gui/gtk/gtk.cpp:1333
 msgid "Logfile name:"
-msgstr "Lokitiedoston nimi:"
+msgstr ""
 
 #: gui/gtk/gtk.cpp:1346
 msgid "Log _parser output"
-msgstr "_Jäsentimen ulostulo lokiin"
+msgstr ""
 
 #: gui/gtk/gtk.cpp:1354
 msgid "Log SWF _actions"
-msgstr "SWF-_toiminnot lokiin"
+msgstr ""
 
 #: gui/gtk/gtk.cpp:1362
 msgid "Log malformed SWF _errors"
-msgstr "Väärin muodostetun SWF:n virh_eet lokiin"
+msgstr ""
 
 #: gui/gtk/gtk.cpp:1370
 msgid "Log ActionScript _coding errors"
-msgstr "ActionScript-_ohjelmavirheet lokiin"
+msgstr ""
 
 #: gui/gtk/gtk.cpp:1386
 msgid "_Security"
-msgstr "_Turvallisuus"
+msgstr "_សុវត្ថិភាព"
 
 #: gui/gtk/gtk.cpp:1399
 msgid "Connect only to local _host"
-msgstr "Yhdistä vain paikall_iseen isäntäkoneeseen"
+msgstr ""
 
 #: gui/gtk/gtk.cpp:1406
 msgid "Connect only to local _domain"
-msgstr "Yhdistä vain paikalliseen _verkkoalueeseen"
+msgstr ""
 
 #: gui/gtk/gtk.cpp:1413
 msgid "Disable SSL _verification"
-msgstr "Ota SSL-_tarkistus pois käytöstä"
+msgstr "បិទ​ការ​ផ្ទៀងផ្ទាត់ SSL"
 
 #: gui/gtk/gtk.cpp:1420
 msgid "_Whitelist"
-msgstr "_Sallittujen luettelo"
+msgstr "_បញ្ជី​ស"
 
 #: gui/gtk/gtk.cpp:1429
 msgid "_Blacklist"
-msgstr "_Estettyjen luettelo"
+msgstr "_បញ្ជី​ខ្មៅ"
 
 #: gui/gtk/gtk.cpp:1454
 msgid "Do _not write Shared Object files"
-msgstr "Älä _kirjoita jaettujen objektien tiedostoja"
+msgstr ""
 
 #: gui/gtk/gtk.cpp:1461
 msgid "Only _access local Shared Object files"
-msgstr "Saanti v_ain paikallisiin jaettujen objektien tiedostoihin"
+msgstr ""
 
 #: gui/gtk/gtk.cpp:1468
 msgid "Disable Local _Connection object"
-msgstr "Ota paikallis_yhteyden objekti pois käytöstä"
+msgstr ""
 
 #: gui/gtk/gtk.cpp:1482
 msgid "_Media"
-msgstr "_Media"
+msgstr "_មេឌៀ"
 
 #: gui/gtk/gtk.cpp:1493
 msgid "Use sound _handler"
-msgstr "Käytä äänen_käsittelijää"
+msgstr ""
 
 #: gui/gtk/gtk.cpp:1501
 msgid "<b>Media Streams</b>"
-msgstr "<b>Mediavirrat</b>"
+msgstr ""
 
 #: gui/gtk/gtk.cpp:1544
 msgid "_Player"
-msgstr "_Soitin"
+msgstr "_អ្ន​ក​លេង"
 
 #: gui/gtk/gtk.cpp:1584
 msgid "<i>If blank, Gnash will detect your OS</i>"
-msgstr "<i>Jos tyhjä, Gnash tunnistaa käyttöjärjestelmän</i>"
+msgstr ""
 
 #: gui/gtk/gtk.cpp:1637
 msgid "Max scripts execution time (in seconds):"
@@ -11338,7 +11327,7 @@ msgstr ""
 
 #: gui/gtk/gtk.cpp:1684
 msgid "Start _Gnash in pause mode"
-msgstr "Käynnistä _Gnash pysäytetyssä tilassa"
+msgstr ""
 
 #: gui/gtk/gtk.cpp:1843
 msgid ""
@@ -11359,7 +11348,7 @@ msgstr ""
 
 #: gui/gtk/gtk.cpp:1859
 msgid "Gnash is the GNU SWF Player based on GameSWF."
-msgstr "Gnash on GNU-projektin SWF-soitin, joka perustuu GameSWF:ään."
+msgstr ""
 
 #: gui/gtk/gtk.cpp:1860
 msgid ""
@@ -11367,7 +11356,7 @@ msgid ""
 "Renderer: "
 msgstr ""
 "\n"
-"Piirto: "
+"កម្មវិធី​បង្ហាញ ៖ "
 
 #: gui/gtk/gtk.cpp:1862
 msgid ""
@@ -11380,111 +11369,105 @@ msgid ""
 "\n"
 "GUI: "
 msgstr ""
-"\n"
-"Käyttöliittymä: "
 
 #: gui/gtk/gtk.cpp:1866
 msgid ""
 "\n"
 "Media: "
 msgstr ""
-"\n"
-"Media: "
 
 #: gui/gtk/gtk.cpp:1896
 msgid "translator-credits"
-msgstr "Timo Jyrinki <timo.jyrinki@iki.fi>, 2008-2009."
+msgstr "ខឹម សុខែម; អេង វណ្ណៈ; អោក ពិសិដ្ឋ"
 
 #: gui/gtk/gtk.cpp:1923
 msgid "_File"
-msgstr "_Tiedosto"
+msgstr "_ឯកសារ"
 
 #: gui/gtk/gtk.cpp:1976
 msgid "_Edit"
-msgstr "_Muokkaa"
+msgstr "_កែសម្រួល"
 
 #: gui/gtk/gtk.cpp:1996
 msgid "_Help"
-msgstr "O_hje"
+msgstr "_ជំនួយ"
 
 #: gui/gtk/gtk.cpp:2016
 msgid "_View"
-msgstr "_Näytä"
+msgstr "_មើល"
 
 #: gui/gtk/gtk.cpp:2024
 msgid "Redraw"
-msgstr "Piirrä uudelleen"
+msgstr "គូរ​ឡើង​វិញ"
 
 #: gui/gtk/gtk.cpp:2034 gui/gtk/gtk.cpp:2039
 msgid "Toggle fullscreen"
-msgstr "Kytke kokonäyttötila"
+msgstr "បិទ​បើក ពេញ​អេក្រង់"
 
 #: gui/gtk/gtk.cpp:2048
 msgid "Show updated ranges"
-msgstr "Näytä päivitetyt vaihteluvälit"
+msgstr ""
 
 #: gui/gtk/gtk.cpp:2067
 msgid "_Quality"
-msgstr ""
+msgstr "_គុណភាព"
 
 #: gui/gtk/gtk.cpp:2077
 msgid "Low"
-msgstr ""
+msgstr "ទាប"
 
 #: gui/gtk/gtk.cpp:2083
 msgid "Medium"
-msgstr ""
+msgstr "មធ្យម"
 
 #: gui/gtk/gtk.cpp:2089
 msgid "High"
-msgstr ""
+msgstr "ខ្ពស់"
 
 #: gui/gtk/gtk.cpp:2095
 msgid "Best"
-msgstr ""
+msgstr "ល្អបំផុត"
 
 #: gui/gtk/gtk.cpp:2108
 msgid "Movie _Control"
-msgstr "Elokuvan _hallinta"
+msgstr ""
 
 #: gui/gtk/gtk.cpp:2275 gui/gtk/gtk.cpp:2276
 #, c-format
 msgid "Couldn't find pixmap file: %s"
-msgstr "pixmap-tiedostoa ei löydy: %s"
+msgstr ""
 
 #: gui/gtk/gtk.cpp:2282
 #, c-format
 msgid "Failed to load pixbuf file: %s: %s"
-msgstr "pixbuf-tiedoston lataus epäonnistui: %s: %s"
+msgstr ""
 
 #: gui/gtk/gtk.cpp:2608 gui/gtk/gtk.cpp:2621
 msgid "Open file"
-msgstr "Avaa tiedosto"
+msgstr "បើកឯកសារ"
 
 #: gui/gtk/gtk_glue_gtkglext.cpp:72
 msgid ""
 "Cannot find the double-buffered visual.\n"
 "Trying single-buffered visual."
 msgstr ""
-"Kaksoispuskuroitua näkymää ei löydy.\n"
-"Yritetään yhden puskurin näkymän käyttöä."
 
 #: gui/gtk/gtk_glue_gtkglext.cpp:78
 msgid "No appropriate OpenGL-capable visual found."
-msgstr "Sopivaa OpenGL-kykyistä näkymää ei löydy."
+msgstr ""
 
 #: extensions/mysql/mysql_db.cpp:186
 msgid "Couldn't initialize database"
-msgstr "Tietokantaa ei voi alustaa"
+msgstr ""
 
 #: extensions/mysql/mysql_db.cpp:191
 msgid "Couldn't connect to database"
-msgstr "Tietokantaan ei voi yhdistää"
+msgstr ""
 
 #: extensions/mysql/mysql_db.cpp:217 extensions/mysql/mysql_db.cpp:245
 #, c-format
 msgid "MySQL connection error: %s"
-msgstr "MySQL-yhteysvirhe: %s"
+msgstr ""
 
 #: extensions/mysql/mysql_db.cpp:224 extensions/mysql/mysql_db.cpp:252
 #, c-format
@@ -11493,116 +11476,31 @@ msgid ""
 "\t%s\n"
 "Query was: %s"
 msgstr ""
-"MySQL-virhe kyselyssä:\n"
-"\t%s\n"
-"Kysely oli: %s"
 
 #: extensions/mysql/mysql_db.cpp:266
 #, c-format
 msgid "Field name is: %s: "
-msgstr "Kentän nimi on: %s: "
+msgstr ""
 
 #, c-format
-#~ msgid "Scanning directory \"%s\" for plugins"
-#~ msgstr "Tarkistetaan liitännäisiä hakemistosta \"%s\""
-
-#, c-format
-#~ msgid "Gnash Plugin name: %s"
-#~ msgstr "Gnash-liitännäisen nimi: %s"
-
 #, c-format, fuzzy
-#~ msgid "Connection to movie: %s"
-#~ msgstr "Yhdistetään elokuvaan: %s"
-
-#, c-format
-#~ msgid "Unloading movieclip '%s'"
-#~ msgstr "Poistetaan videota muistista: '%s'"
-
-#~ msgid "Closing framebuffer device"
-#~ msgstr "Suljetaan kuvapuskurilaite"
-
-#, c-format
-#~ msgid "WARNING: Could not open %s"
-#~ msgstr "VAROITUS: Ei voi avata %s"
-
-#, c-format
-#~ msgid "Original TTY NO = %d"
-#~ msgstr "Alkuperäinen TTY-numero = %d"
-
-#, c-format
-#~ msgid "Own TTY NO = %d"
-#~ msgstr "Oma TTY-nro = %d"
-
-#, c-format
-#~ msgid "VT %d ready"
-#~ msgstr "VT %d valmis"
-
-#~ msgid "Restoring terminal..."
-#~ msgstr "Palautetaan päätettä..."
-
-#, c-format
-#~ msgid "red channel: %d / %d"
-#~ msgstr "punainen kanava: %d / %d"
-
-#, c-format
-#~ msgid "green channel: %d / %d"
-#~ msgstr "vihreä kanava: %d / %d"
-
-#, c-format
-#~ msgid "blue channel: %d / %d"
-#~ msgstr "sininen kanava: %d / %d"
-
-#, c-format
-#~ msgid "Total bits per pixel: %d"
-#~ msgstr "Yhteensä bittejä pikseliä kohden: %d"
-
-#, c-format
-#~ msgid "mouse @ %d,%d"
-#~ msgstr "hiiri @ %d,%d"
+#~ msgid "  %s: %s"
+#~ msgstr "%s: %s"
 
 #, c-format
 #~ msgid "Frame %d"
-#~ msgstr "Kehys %d"
+#~ msgstr "ស៊ុម %d"
+
+#~ msgid "invalid arguments"
+#~ msgstr "អាគុយម៉ង់​​​មិន​ត្រឹមត្រូវ"
 
 #, c-format
-#~ msgid "Timer delay set to %d milliseconds"
-#~ msgstr "Ajastimen viive asetettu %d millisekuntiin"
+#~ msgid "get_variable(%s)"
+#~ msgstr "get_variable(%s)"
 
 #, c-format
-#~ msgid "Activating FPS debugging every %g seconds"
-#~ msgstr "Aktivoidaan FPS-virheenjäljitys joka %g sekunti"
+#~ msgid "get_variable_raw(%s)"
+#~ msgstr "get_variable_raw(%s)"
 
-#, c-format
-#~ msgid ""
-#~ "Input movie has collapsed dimensions %d/%d. Setting to 1/1 and going on."
-#~ msgstr ""
-#~ "Annetulla elokuvalla on kokoontaittuneet mitat %d/%d. Asetetaan 1/1 ja "
-#~ "jatketaan."
-
-#, c-format
-#~ msgid "Running as plugin: skipping internal handling of FsCommand %s%s."
-#~ msgstr "Suoritetaan liitännäisenä: ohitetaan FsCommand %s%s sisäinen käsittely"
-
-#~ msgid "Created XEmbedded window"
-#~ msgstr "Luotiin XEmbedded-ikkuna"
-
-#~ msgid "Created top level window"
-#~ msgstr "Luotiin päätason ikkuna"
-
-#, c-format
-#~ msgid "OpenGL extension version - %d.%d"
-#~ msgstr "OpenGL-laajennoksen versio - %d.%d"
-
-#~ msgid "Got single-buffered visual."
-#~ msgstr "Saatiin yhden puskurin näkymä."
-
-#~ msgid "Got double-buffered visual."
-#~ msgstr "Saatiin kaksoispuskuroitu näkymä."
-
-#, fuzzy, c-format
-#~ msgid "read mouse @ %d / %d, btn %d"
-#~ msgstr "hiiri @ %d,%d"
-
-#, fuzzy, c-format
-#~ msgid "x/y %d/%d button %d"
-#~ msgstr "x/y %d/%d pnk %d"
+#~ msgid "   Version: "
+#~ msgstr "   កំណែ ៖ "

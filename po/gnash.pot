@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-01-02 07:56-0700\n"
+"POT-Creation-Date: 2012-01-13 18:49-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -6575,26 +6575,26 @@ msgstr ""
 msgid "Could not write to browser fd #%d: %s"
 msgstr ""
 
-#: libcore/movie_root.cpp:2153
+#: libcore/movie_root.cpp:2155
 #, c-format
 msgid "Fork failed launching URL opener '%s'"
 msgstr ""
 
-#: libcore/movie_root.cpp:2200
+#: libcore/movie_root.cpp:2202
 #, c-format
 msgid "Could only write %d bytes to fd #%d"
 msgstr ""
 
-#: libcore/movie_root.cpp:2288
+#: libcore/movie_root.cpp:2290
 msgid "Live MovieClips"
 msgstr ""
 
-#: libcore/movie_root.cpp:2417
+#: libcore/movie_root.cpp:2419
 #, c-format
 msgid "%s to utf8 conversion in LoadableObject input parsing"
 msgstr ""
 
-#: libcore/movie_root.cpp:2440
+#: libcore/movie_root.cpp:2442
 #, c-format
 msgid ""
 "Hosting application registered no callback for events/queries, can't call %s"
