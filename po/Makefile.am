@@ -19,7 +19,8 @@ AUTOMAKE_OPTIONS = -Wno-portability
 
 POFILES = AUTO
 
-translations = cs da de en_GB es fi fr it ja 
+translations = cs da de en_GB es fi fr it ja el km ne ru zh_TW
+
 
 # This is GNU make specific, so if you are building Gnash on a BSD
 # machine, you probably want to install GNU make in additional to
