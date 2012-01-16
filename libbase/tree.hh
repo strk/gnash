@@ -2705,6 +2705,3 @@ typename tree<T, tree_node_allocator>::leaf_iterator& tree<T, tree_node_allocato
 
 #endif
 
-// Local variables:
-// default-tab-width: 3
-// End:
