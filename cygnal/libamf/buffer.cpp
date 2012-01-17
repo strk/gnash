@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2008, 2009, 2010, 2011 Free Software Foundation, Inc.
+//   Copyright (C) 2008, 2009, 2010, 2011, 2012 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -785,5 +785,5 @@ Buffer::corrupt(int factor)
 
 // local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:
