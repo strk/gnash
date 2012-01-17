@@ -301,7 +301,7 @@ memory=no
 cache=yes
 stat_proplookup=no
 AC_ARG_WITH(statistics,
-  AC_HELP_STRING([--with-statistics=], [Specify which statistics features to enable]),
+  AC_HELP_STRING([--with-statistics], [Specify which statistics features to enable]),
   if test -n ${withval}; then
     if test "x${withval}" != "xno"; then
       extlist="${withval}"
@@ -403,7 +403,7 @@ solreadonly=no
 localconnection=yes
 
 AC_ARG_WITH(security,
-  AC_HELP_STRING([--with-security=], [Specify which security features to enable]),
+  AC_HELP_STRING([--with-security], [Specify which security features to enable]),
   if test -n ${withval}; then
     if test "x${withval}" != "xno"; then
       extlist="${withval}"
@@ -566,7 +566,7 @@ build_sdl=no
 build_aqua=no                   dnl Native MacOSX
 build_dump=no
 AC_ARG_ENABLE(gui,
-  AC_HELP_STRING([--enable-gui=], [Enable support for the specified GUI toolkits (default=gtk,qt4)]),
+  AC_HELP_STRING([--enable-gui], [Enable support for the specified GUI toolkits (default=gtk,qt4)]),
   [if test -n ${enableval}; then
     enableval=`echo ${enableval} | tr '\054' ' ' `
   fi
@@ -1879,7 +1879,7 @@ else
   input_events=
 fi
 AC_ARG_ENABLE(input,
-  AC_HELP_STRING([--enable-input=], [Enable support for the specified input devices for the framebuffer GUI (default=ps2mouse|ps2keyboard|events|touchscreen)]),
+  AC_HELP_STRING([--enable-input], [Enable support for the specified input devices for the framebuffer GUI (default=ps2mouse|ps2keyboard|events|touchscreen)]),
   [if test -n ${enableval}; then
     enableval=`echo ${enableval} | tr '\054' ' ' `
   fi
