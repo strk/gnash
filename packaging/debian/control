@@ -188,6 +188,26 @@ Description: Debug symbols for Gnash
  socket, and parse the incoming XML message. This lets a movie be a remote
  control for other devices or applications.
 
+Package: gnash-framebuffer
+Architecture: any
+Section: utils
+Priority: extra
+Depends: gnash-common (= ${binary:Version}),
+ ${shlibs:Depends}, ${misc:Depends}
+Description: Standalone Gnash for a Linux Framebuffer.
+ This package let one play SWF files in a Framebuffer using the standalone
+ version of Gnash.
+
+Package: gnash-dump
+Architecture: any
+Section: utils
+Priority: extra
+Depends: gnash-common (= ${binary:Version}),
+ ${shlibs:Depends}, ${misc:Depends}
+Description: Standalone Gnash that dumps frames to disk.
+ This package let one record screenshots of SWF files to disk using
+ the standalone version of Gnash.
+
 Package: gnash-fileio-extension
 Architecture: any
 Section: utils
