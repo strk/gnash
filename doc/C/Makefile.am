@@ -107,11 +107,6 @@ EXTRA_DIST = \
 	preformatted/rtmpget.1.in \
 	preformatted/findmicrophones.1.in \
 	preformatted/findwebcams.1.in \
-	preformatted/gtk-gnash.1.in \
-	preformatted/qt4-gnash.1.in \
-	preformatted/sdl-gnash.1.in \
-	preformatted/dump-gnash.1.in \
-	preformatted/fb-gnash.1.in \
 	preformatted/gnash-gtk-launcher.1.in \
 	preformatted/gnash-qt-launcher.1.in
 #	preformatted/dumpshm.1.in
@@ -408,7 +403,7 @@ link-extra-man:
 	-for file in $(EXTRAMANPAGES); do \
 	  if test ! -e $$file; then \
 	    echo "NOTE: Linking alias of $$file to default manpage"; \
-	    $(LN_S) -f gnash.1 $$file; \
+	    $(LN_S) -f preformatted/gnash.1.in $$file; \
 	  fi; \
 	done
 
