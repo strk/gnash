@@ -315,7 +315,7 @@ TouchDevice::scanForDevices()
                 continue;
             }
             close(fd);
-            log_debug(_("Found a %s device for touchscreen input using %s",
+            log_debug("Found a %s device for touchscreen input using %s",
                       debug[touch[i].type], touch[i].filespec);
             boost::shared_ptr<InputDevice> dev
                 = boost::shared_ptr<InputDevice>(new TouchDevice());
