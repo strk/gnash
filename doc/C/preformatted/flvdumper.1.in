@@ -5,7 +5,7 @@
 \\$2 \(la\\$1\(ra\\$3
 ..
 .if \n(.g .mso www.tmac
-.TH flvdumper 1 "30 January 2011" "" ""
+.TH flvdumper 1 "17 January 2012" "" ""
 .SH NAME
 flvdumper \- Gnash FLash Video File Dumper
 .SH Synopsis

@@ -5,7 +5,7 @@
 \\$2 \(la\\$1\(ra\\$3
 ..
 .if \n(.g .mso www.tmac
-.TH soldumper 1 "30 January 2011" "" ""
+.TH soldumper 1 "17 January 2012" "" ""
 .SH NAME
 soldumper \- Gnash Local Shared Object (LSO) File Dumper
 .SH Synopsis

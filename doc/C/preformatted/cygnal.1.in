@@ -5,7 +5,7 @@
 \\$2 \(la\\$1\(ra\\$3
 ..
 .if \n(.g .mso www.tmac
-.TH cygnal 1 "30 January 2011" "" ""
+.TH cygnal 1 "17 January 2012" "" ""
 .SH NAME
 cygnal \- Cygnal
 .SH Synopsis
@@ -19,16 +19,16 @@ video conferencing. Cygnal supports several protocols used by SWF
 file players, including RTMP, RTMPTS, and RTMPT, while encouraging the
 use of patent-free codecs.
 .TP 
-(-h) --help
+-h, --help
 Print usage info.
 .TP 
 --version
 Print version information.
 .TP 
-(-v) --verbose
+-v, --verbose
 Verbose output.
 .TP 
-(-p) --port-offset
+-p, --port-offset
 Port offset. This number gets added to the default
 ports for RTMPS and RTMPS. This is only used by
 developers. 

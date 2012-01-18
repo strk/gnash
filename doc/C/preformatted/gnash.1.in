@@ -5,9 +5,9 @@
 \\$2 \(la\\$1\(ra\\$3
 ..
 .if \n(.g .mso www.tmac
-.TH gnash 1 "30 January 2011" "" ""
+.TH gnash 1 "17 January 2012" "" ""
 .SH NAME
-gnash, gtk-gnash, qt4-gnash \- GNU Flash (SWF) Player
+gnash, gtk-gnash, qt4-gnash, fb-gnash, sdl-gnash, gnash-gtk-launcher, gnash-qt-launcher \- GNU Flash (SWF) Player
 .SH Synopsis
 .nf
 
