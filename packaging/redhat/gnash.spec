@@ -1,6 +1,6 @@
 Name:           gnash
 # This next field gets edited by "make gnash.spec" when building an rpm
-Version:        0.8.10dev
+Version:        0.8.11dev
 Release:        0
 Epoch: 		1
 # This next field gets edited by "make gnash.spec" when building an rpm
@@ -18,7 +18,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%{_target_cpu}
 %if %{_target_cpu} != "armv7l"
 BuildRequires:  redhat-lsb
 %endif
-BuildRequires:  mysql-devel
+BuildRequires:  mysql-devel docbook2X
 # bitmap libraries for loading images
 BuildRequires:  libpng-devel libjpeg-devel giflib-devel
 # these are needed for the python gtk widget
@@ -111,6 +111,23 @@ Requires:  gnash-common
 %description devel
 Gnash header files can be used to write external Gnash extensions.
 
+%package framebuffer
+Summary:   Standalone SWF file player for the framebuffer.
+Group:     Applications/Multimedia
+Requires:  gnash-common
+
+%description framebuffer
+Framebuffer Gnash is a standalone SWF file player for the Linux framebuffer.
+
+%package dump
+Summary:   Standalone SWF file player that dumps screenshots.
+Group:     Applications/Multimedia
+Requires:  gnash-common
+
+%description dump
+Gnash Dump is a standalone SWF file player that dumps screenshots of each
+frame to disk.
+
 %package widget
 Summary:   Gnash widgets for Gtk and Python
 Group:     Applications/Multimedia
@@ -199,23 +216,17 @@ RPM_TARGET=%{_target}
   %ifarch arm
     SOUND="--enable-media=none --disable-nsapi --disable-kparts"
   %else
-    SOUND="--enable-media=gst"			# could also be sdl
+    SOUND="--enable-media=gst"
   %endif
 %else
 # Native RPM build
-  CROSS_OPTS="" # "--enable-ghelp --enable-docbook"
   # these are actually the default values, but this way they get added
   # to the build so they appear in "gnash --version".
-  GUI="--enable-gui=gtk,qt4"	# could be kde3, qt4, aqua, sdl
-  SOUND="--enable-media=gst"	# could be ffmpeg
-  OTHER="--enable-cygnal"
-  RENDERER="--enable-renderer=all"		# could be opengl or cairo
+  RENDERER="--enable-renderer=agg,cairo"    # opengl or openvg too
   # These are not the defaults
-  OPTIONAL="--enable-python"
-%endif
-
-%if %{distribution} != "ydl6"
-  SOUND="--enable-media=gst" 
+  SOUND="--enable-media=gst"		# we can't distribute ffmpeg support
+  OPTIONAL="--enable-python --enable-cygnal"
+  GUI="--enable-gui=gtk,qt4,fb,dump"		# aqua, sdl
 %endif
 
 %if %{_target_cpu} == "armv7l"
@@ -254,10 +265,9 @@ make MAKEFLAGS=$MAKEFLAGS dumpconfig all
 # export CONFIG_SHELL="sh -x"
 # sh -x ./configure
 sh ./configure \
-	$CROSS_OPTS \
-	$SOUND $GUI \
+	$SOUND \
+	$GUI \
 	$RENDERER \
-	$OTHER \
 	$OPTIONAL \
         --prefix=/usr \
 	--libdir=%{_libdir} \
@@ -266,9 +276,6 @@ sh ./configure \
 	--disable-dependency-tracking \
 	--disable-testsuite \
 	--disable-rpath \
-	--enable-renderer=agg,cairo \
-	--enable-cygnal \
-	--enable-python \
 	--with-plugins-install=system \
 	--with-plugindir=%{_libdir}/mozilla/plugins \
 	--enable-extensions=fileio,lirc,dejagnu,mysql
@@ -335,7 +342,6 @@ touch --no-create %{_datadir}/icons/hicolor
 %defattr(-,root,root,-)
 %{_bindir}/gnash-gtk-launcher
 %{_bindir}/gtk-gnash
-%{_bindir}/gnash-gtk-launcher
 %{_mandir}/man1/gtk-gnash.1.gz
 %{_mandir}/man1/gnash-gtk-launcher.1.gz
 %{_datadir}/icons/hicolor/32x32/apps/gnash.xpm
@@ -366,6 +372,7 @@ touch --no-create %{_datadir}/icons/hicolor
 %{_mandir}/man1/gnash-gtk-launcher.1.gz
 %{_datadir}/locale/*/LC_MESSAGES/gnash.mo
 %{_prefix}/share/applications/gnash.desktop
+%{_prefix}/share/applications/gnash.schemas
 %{_prefix}/share/icons/hicolor/32x32/apps/gnash.xpm
 %{_prefix}/share/gnash/gnash-splash.swf
 %if !%{cross_compile}
@@ -409,10 +416,8 @@ touch --no-create %{_datadir}/icons/hicolor
 %defattr(-,root,root,-)
 %{_bindir}/gnash-qt-launcher
 %{_bindir}/qt4-gnash
-%{_mandir}/man1/gnash-qt-launcher.1.gz
 %{_mandir}/man1/qt4-gnash.1.gz
 %{_mandir}/man1/gnash-qt-launcher.1.gz
-%{_datadir}/applications/klash.desktop
 %{_prefix}/lib*/kde4/libklashpart.*
 %{_prefix}/share/kde4/apps/klash/klashpartui.rc
 %{_prefix}/share/kde4/apps/klash/pluginsinfo
@@ -420,6 +425,18 @@ touch --no-create %{_datadir}/icons/hicolor
 %{_prefix}/share/applications/klash.desktop
 %{_prefix}/share/icons/hicolor/32x32/apps/klash.xpm
 %endif
+
+%files framebuffer
+%defattr(-,root,root,-)
+%{_bindir}/fb-gnash
+%{_mandir}/man1/fb-gnash.1.gz
+
+%files dump
+%defattr(-,root,root,-)
+%{_bindir}/dump-gnash
+%{_bindir}/gnash-thumbnailer
+%{_prefix}/etc/gnashthumbnailrc
+#%{_mandir}/man1/dump-gnash.1.gz
 
 %files fileio-extension
 %defattr(-,root,root,-)
