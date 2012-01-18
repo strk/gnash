@@ -379,7 +379,7 @@ uninstall-html-hook:
 
 # gtk-gnash.1, qt4-gnash.1, fb-gnash.1, sdl-gnash.1,gnash-gtk-launcher.1 and gnash-qt-launcher.1 are special,
 # as they  are created by the --solinks option to the docbook2 tools for creating man pages.
-install-man1: $(MANPAGES) $(EXTRAMANPAGES)
+install-man1: $(MANPAGES)
 	-test -d "$(DESTDIR)$(man1dir)/" || $(mkinstalldirs) "$(DESTDIR)$(man1dir)/"
 	-for file in $(MANPAGES); do \
 	   $(INSTALL_DATA) $$file $(DESTDIR)$(man1dir)/$$file; \
