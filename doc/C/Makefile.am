@@ -110,6 +110,7 @@ EXTRA_DIST = \
 	preformatted/gtk-gnash.1.in \
 	preformatted/qt4-gnash.1.in \
 	preformatted/sdl-gnash.1.in \
+	preformatted/dump-gnash.1.in \
 	preformatted/fb-gnash.1.in \
 	preformatted/gnash-gtk-launcher.1.in \
 	preformatted/gnash-qt-launcher.1.in
@@ -147,6 +148,10 @@ endif
 
 if BUILD_FB_GUI
 EXTRAMANPAGES += fb-gnash.1
+endif
+
+if BUILD_DUMP_GUI
+EXTRAMANPAGES += dump-gnash.1
 endif
 
 MANSRC = $(MANPAGES:.1=.man-xml)
@@ -259,7 +264,7 @@ else
 	fi
 endif
 
-gnash.1: $(srcdir)/gnash.man-xml
+gnash.1 gtk-gnash.1 fb-gnash.1 qt4-gnash.1 dump-gnash.1: $(srcdir)/gnash.man-xml
 gprocessor.1: $(srcdir)/gprocessor.man-xml
 #dumpshm.1: $(srcdir)/dumpshm.man-xml
 soldumper.1: $(srcdir)/soldumper.man-xml
@@ -394,15 +399,16 @@ uninstall-man1:
 	   $(RM) $(DESTDIR)$(man1dir)/$$file; \
 	done
 
-# gtk-gnash.1, qt-gnash.1, fb-gnash.1, sdl-gnash.1,gnash-gtk-launcher.1 and gnash-qt-launcher.1
-# manpages are generated as aliases for the gnash.1 man page, so we can't use the suffix rules to build
+# The gtk-gnash.1, qt-gnash.1, fb-gnash.1, sdl-gnash.1,gnash-gtk-launcher.1
+# dump-gnash.1, and gnash-qt-launcher.1 manpages are generated as aliases
+# for the gnash.1 man page, so we can't use the suffix rules to build
 # them, but we need to install the ".so gnash.1" manpages also, or
-# they aren;t in the tarball.
+# they aren't in the tarball.
 link-extra-man:
 	-for file in $(EXTRAMANPAGES); do \
 	  if test ! -e $$file; then \
-	    echo "WARNING: Linking to preformatted version of $$file, it could be out of date."; \
-	    $(LN_S) -f $(srcdir)/preformatted/$$file.in $$file; \
+	    echo "NOTE: Linking alias of $$file to default manpage"; \
+	    $(LN_S) -f gnash.1 $$file; \
 	  fi; \
 	done
 
