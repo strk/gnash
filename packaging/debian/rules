@@ -32,9 +32,13 @@ CFLAGS = -Wall -g -Werror-implicit-function-declaration
 # testing package building.
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
+	CXXFLAGS += -O0
 else
 	CFLAGS += -O2
+	CXXFLAGS += -O2
 endif
+
+MAKEFLAGS = "CXXFLAGS=$CXXFLAGS"
 
 # Enable debugging in the package instead of using the debug package
 ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
@@ -76,54 +80,13 @@ BUILD_FLAGS = --enable-jemalloc
 # produces a path that doens't work.
 BUILD_DIRECTORY = _build
 
-# Optionally build an OpenGL enabled package, AGG is the default
-ifneq (,$(findstring ogl,$(DEB_BUILD_OPTIONS)))
-	BUILD_FLAGS += --enable-renderer=ogl
-	BUILD_DIRECTORY = _build.ogl
-	BUILD_DEBUG = -opengl
-	BUILD_VERSION = $(MAIN_VERSION).ogl.$(BUILD_VERSION)
-endif
-
-# Optionally build an ffmpeg enabled package, Gstreamer is the default
-ifneq (,$(findstring ffmpeg,$(DEB_BUILD_OPTIONS)))
-	BUILD_FLAGS += --enable-media=ffmpeg
-	BUILD_VERSION = $(MAIN_VERSION).ffmpeg.$(BUILD_VERSION)
-ifneq (,$(findstring ogl,$(DEB_BUILD_OPTIONS)))
-	BUILD_DIRECTORY = _build.ogl.ffmpeg
-	BUILD_VERSION = $(MAIN_VERSION).ogl.ffmpeg.$(BUILD_VERSION)
-	BUILD_DEBUG = -opengl-ffmpeg
-else
-	BUILD_DIRECTORY = _build.ffmpeg
-	BUILD_DEBUG = -ffmpeg
-endif
-else
-	BUILD_FLAGS += --enable-media=gst,ffmpeg
-endif
-
-# Optionally build the older kde3 package, Qt4 is the default
-ifneq (,$(findstring kde3,$(DEB_BUILD_OPTIONS)))
-	BUILD_FLAGS += --enable-gui=gtk,kde3
-	BUILD_VERSION = $(MAIN_VERSION).kde3.$(BUILD_VERSION)
-ifneq (,$(findstring ogl,$(DEB_BUILD_OPTIONS)))
-	BUILD_DIRECTORY = _build.ogl.kde3
-	BUILD_VERSION = $(MAIN_VERSION).ogl.kde3.$(BUILD_VERSION)
-	BUILD_DEBUG = -opengl-kde3
-else
-	BUILD_DIRECTORY = _build.kde3
-	BUILD_DEBUG = -kde3
-endif
-else
-	BUILD_FLAGS += --enable-gui=gtk,qt4
-endif
-
 # Configure Gnash. We use a different set of options, as when building
 # packages, we want to enable everything that Gnash can do, like
 # python support, the SDK cygnal, etc... These are not enabled by
 # default to make it less complicated for end users building Gnash
 # from source.
 # for now, only build the qt4 support, as kde3 is being depreciated.
-CONFIGURE_FLAGS = CFLAGS="$(CFLAGS)" \
-	CXXFLAGS="$(CXXFLAGS)" \
+CONFIGURE_FLAGS = \
 	--host=$(DEB_HOST_GNU_TYPE) \
 	--build=$(DEB_BUILD_GNU_TYPE) \
 	--prefix=/usr \
@@ -135,6 +98,7 @@ CONFIGURE_FLAGS = CFLAGS="$(CFLAGS)" \
 	--disable-testsuite \
 	--disable-rpath \
 	--enable-cygnal \
+	--enable-gui=gtk,qt4,fb,dump \
 	--enable-renderer=agg,cairo \
 	--enable-extensions=fileio,lirc,mysql \
 	$(BUILD_FLAGS)
@@ -215,10 +179,10 @@ clean:
 	fi
 	rm -fr $(BUILD_DIRECTORY)
 
-	@printf "\n == CLEANING PATCHES ==\n\n"
-	echo " we have no patches, we're the developers!"
+#	@printf "\n == CLEANING PATCHES ==\n\n"
+	@echo " we have no patches, we're the developers!"
 #	$(MAKE) -f /usr/share/quilt/quilt.make unpatch
-	@printf "\n ---- End of CLEANING PATCHES ---- \n\n"
+#	@printf "\n ---- End of CLEANING PATCHES ---- \n\n"
 
 	dh_clean 
 
