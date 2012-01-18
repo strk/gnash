@@ -106,9 +106,7 @@ EXTRA_DIST = \
 	preformatted/gnash_user.info.in \
 	preformatted/rtmpget.1.in \
 	preformatted/findmicrophones.1.in \
-	preformatted/findwebcams.1.in \
-	preformatted/gnash-gtk-launcher.1.in \
-	preformatted/gnash-qt-launcher.1.in
+	preformatted/findwebcams.1.in
 #	preformatted/dumpshm.1.in
 
 #noinst_SCRIPT = gen-doc.sh
