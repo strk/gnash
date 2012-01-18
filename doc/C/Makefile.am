@@ -127,6 +127,7 @@ MANPAGES = \
 	findwebcams.1
 #	dumpshm.1
 
+# These are just aliases for the defauklt gnash man page.
 EXTRAMANPAGES =
 
 if BUILD_GTK_GUI
@@ -155,7 +156,7 @@ HTMLS  = $(XML_MAIN:.xml=.html)
 PDFS   = $(XML_MAIN:.xml=.pdf)
 TEXIS  = gnash_user.texi gnashuser.texi gnash_ref.texi gnashref.texi
 
-all-local: info html man link-extra-man
+all-local: info html man
 
 gnashuser.html gnashuser.pdf gnash_user.info: gnashuser.xml $(USERMAN) $(COMMON)
 gnashref.html gnashref.pdf gnash_ref.info: gnashref.xml $(REFMAN) $(COMMON)
@@ -247,7 +248,7 @@ if ENABLE_MAN
 	  $(DB2X_MAN) $?; \
         else \
 	  $(DB2X_XSLTPROC) -s man $? -o $*.mxml; \
-	  $(DB2X_MANXML) --solinks $*.mxml; \
+	  $(DB2X_MANXML) $*.mxml; \
 	  $(RM) $*.mxml; \
 	fi
 else
@@ -375,41 +376,38 @@ uninstall-html-hook:
 	-$(RM) $(DESTDIR)$(htmldir)/gnashref.html
 	-$(RM) $(DESTDIR)$(htmldir)/images/*png
 
-uninstall-man1-hook:
-	-$(RM) $(DESTDIR)$(htmldir)/gnashuser.html
-
 # install-data-hook: install-data-hook-omf
 # uninstall-local: uninstall-local-doc uninstall-local-omf
 
 # gtk-gnash.1, qt4-gnash.1, fb-gnash.1, sdl-gnash.1,gnash-gtk-launcher.1 and gnash-qt-launcher.1 are special,
 # as they  are created by the --solinks option to the docbook2 tools for creating man pages.
-install-man1: $(MANPAGES)
+install-man1: $(MANPAGES) $(EXTRAMANPAGES)
 	-test -d "$(DESTDIR)$(man1dir)/" || $(mkinstalldirs) "$(DESTDIR)$(man1dir)/"
-	-for file in $(MANPAGES) $(EXTRAMANPAGES); do \
+	-for file in $(MANPAGES); do \
 	   $(INSTALL_DATA) $$file $(DESTDIR)$(man1dir)/$$file; \
 	done
-
-uninstall-man1:
-	-for file in $(MANPAGES) $(EXTRAMANPAGES); do \
-	   $(RM) $(DESTDIR)$(man1dir)/$$file; \
-	done
-
-# The gtk-gnash.1, qt-gnash.1, fb-gnash.1, sdl-gnash.1,gnash-gtk-launcher.1
-# dump-gnash.1, and gnash-qt-launcher.1 manpages are generated as aliases
-# for the gnash.1 man page, so we can't use the suffix rules to build
-# them, but we need to install the ".so gnash.1" manpages also, or
-# they aren't in the tarball.
-link-extra-man:
 	-for file in $(EXTRAMANPAGES); do \
-	  if test ! -e $$file; then \
-	    echo "NOTE: Linking alias of $$file to default manpage"; \
-	    $(LN_S) -f preformatted/gnash.1.in $$file; \
-	  fi; \
+	   $(INSTALL_DATA) $(top_srcdir)/doc/C/$$file $(DESTDIR)$(man1dir)/$$file; \
 	done
+
+# # The gtk-gnash.1, qt-gnash.1, fb-gnash.1, sdl-gnash.1,gnash-gtk-launcher.1
+# # dump-gnash.1, and gnash-qt-launcher.1 manpages are generated as aliases
+# # for the gnash.1 man page, so we can't use the suffix rules to build
+# # them, but we need to install the ".so gnash.1" manpages also, or
+# # they aren't in the tarball.
+# link-extra-man:
+# 	-for file in $(EXTRAMANPAGES); do \
+# 	  if test ! -e $$file; then \
+# 	    echo "NOTE: Linking alias of $$file to default manpage"; \
+# 	    $(LN_S) -f preformatted/gnash.1.in $$file; \
+# 	  fi; \
+# 	done
 
 install-data-hook: $(MANPAGES) install-man1 install-info-hook install-html-hook 
 uninstall-hook: uninstall-info-hook uninstall-html-hook
-	-$(RM) -f $(DESTDIR)$(man1dir)/*.1 
+	-for file in $(MANPAGES) $(EXTRAMANPAGES); do \
+	   $(RM) $(DESTDIR)$(man1dir)/$$file; \
+	done
 
 #
 # GNOME Help support, which currently isn't supported
