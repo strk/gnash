@@ -436,7 +436,7 @@ touch --no-create %{_datadir}/icons/hicolor
 %{_bindir}/dump-gnash
 %{_bindir}/gnash-thumbnailer
 %{_prefix}/etc/gnashthumbnailrc
-#%{_mandir}/man1/dump-gnash.1.gz
+%{_mandir}/man1/dump-gnash.1.gz
 
 %files fileio-extension
 %defattr(-,root,root,-)
