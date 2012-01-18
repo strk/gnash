@@ -42,7 +42,6 @@ cygnal/gnash.*
 cygnal/libnet/gnash.*
 cygnal/testsuite/cygnal.all/cygnalrc
 deb-copy-stamp
-doc/C/*.1
 doc/C/*.html
 doc/C/*.info
 doc/Doxyfile
