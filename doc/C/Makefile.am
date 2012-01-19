@@ -106,7 +106,14 @@ EXTRA_DIST = \
 	preformatted/gnash_user.info.in \
 	preformatted/rtmpget.1.in \
 	preformatted/findmicrophones.1.in \
-	preformatted/findwebcams.1.in
+	preformatted/findwebcams.1.in \
+	fb-gnash.1 \
+	sdl-gnash.1 \
+	dump-gnash.1 \
+	gtk-gnash.1 \
+	qt4-gnash.1 \
+	gnash-gtk-launcher.1 \
+	gnash-qt-launcher.1
 #	preformatted/dumpshm.1.in
 
 #noinst_SCRIPT = gen-doc.sh
@@ -164,7 +171,7 @@ gnashref.html gnashref.pdf gnash_ref.info: gnashref.xml $(REFMAN) $(COMMON)
 # and working correctly.
 html: $(HTMLS)
 pdf:  $(PDFS)
-man:  $(MANPAGES)
+man:  $(MANPAGES) $(EXTRAMANPAGES)
 info: $(INFOS)
 if DOCBOOK
 texi: $(TEXIS)
@@ -258,7 +265,13 @@ else
 	fi
 endif
 
-gnash.1 gtk-gnash.1 fb-gnash.1 qt4-gnash.1 dump-gnash.1:
+# As these man page alias files are very small, we just copy them
+# into the build rather than symbolically link them like we used to.
+$(EXTRAMANPAGES): gnash.1
+	@if ! test -e $@; then \
+	  cp $(srcdir)/$@ .; \
+	fi
+
 gprocessor.1: $(srcdir)/gprocessor.man-xml
 #dumpshm.1: $(srcdir)/dumpshm.man-xml
 soldumper.1: $(srcdir)/soldumper.man-xml
@@ -379,32 +392,10 @@ uninstall-html-hook:
 
 # gtk-gnash.1, qt4-gnash.1, fb-gnash.1, sdl-gnash.1,gnash-gtk-launcher.1 and gnash-qt-launcher.1 are special,
 # as they  are created by the --solinks option to the docbook2 tools for creating man pages.
-install-man1: $(MANPAGES)
+install-man1: $(MANPAGES) $(EXTRAMANPAGES)
 	-test -d "$(DESTDIR)$(man1dir)/" || $(mkinstalldirs) "$(DESTDIR)$(man1dir)/"
-	-for file in $(MANPAGES); do \
+	-for file in $(MANPAGES) $(EXTRAMANPAGES); do \
 	   $(INSTALL_DATA) $$file $(DESTDIR)$(man1dir)/$$file; \
-	done
-	-for file in $(EXTRAMANPAGES); do \
-	   $(INSTALL_DATA) $(srcdir)/$$file $(DESTDIR)$(man1dir)/$$file; \
-	done
-
-force:
-
-$(EXTRAMANPAGES): force
-	echo $?
-	echo $@
-	echo $*
-	echo $<
-
-# The gtk-gnash.1, qt-gnash.1, fb-gnash.1, sdl-gnash.1,gnash-gtk-launcher.1
-# dump-gnash.1, and gnash-qt-launcher.1 manpages are generated as aliases
-# for the gnash.1 man page, so we can't use the suffix rules to build
-# them, but we need to install the ".so gnash.1" manpages also, or
-# they aren't in the tarball.
-link-extra-man:
-	-@for file in $(EXTRAMANPAGES); do \
-	  echo "NOTE: Linking alias of $$file to default manpage"; \
-	  $(LN_S) -f $(srcdir)/$$file $$file; \
 	done
 
 install-data-hook: $(MANPAGES) install-man1 install-info-hook install-html-hook 
@@ -463,6 +454,7 @@ CLEANFILES = \
 	gnashref.mxml \
 	omf_timestamp \
 	images \
+	dump-gnash.1 \
 	gtk-gnash.1 \
 	qt4-gnash.1 \
 	fb-gnash.1 \
