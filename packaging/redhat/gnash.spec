@@ -276,6 +276,7 @@ sh ./configure \
 	--disable-dependency-tracking \
 	--disable-testsuite \
 	--disable-rpath \
+	--enable-docbook \
 	--with-plugins-install=system \
 	--with-plugindir=%{_libdir}/mozilla/plugins \
 	--enable-extensions=fileio,lirc,dejagnu,mysql
@@ -381,7 +382,8 @@ touch --no-create %{_datadir}/icons/hicolor
 %{_prefix}/share/doc/gnash/images/*.png
 %{_prefix}/etc/gnashrc
 %{_prefix}/etc/gnashpluginrc
-# %{_infodir}/*.info*
+%{_infodir}/gnash_ref.info.gz
+%{_infodir}/gnash_user.info.gz
 #%doc doc/C/gnash*.html
 #%doc doc/C/images/*.png
 #%doc doc/C/images/*.txt
