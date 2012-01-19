@@ -98,6 +98,7 @@ CONFIGURE_FLAGS = \
 	--disable-testsuite \
 	--disable-rpath \
 	--enable-cygnal \
+	--enable-docbook \
 	--enable-gui=gtk,qt4,fb,dump \
 	--enable-renderer=agg,cairo \
 	--enable-extensions=fileio,lirc,mysql \
@@ -225,8 +226,9 @@ install: build
 	cp packaging/*.xpm $(CURDIR)/debian/tmp/usr/share/pixmaps/
 	install -d $(CURDIR)/debian/tmp/usr/share/applications/
 	cp debian/*.desktop $(CURDIR)/debian/tmp/usr/share/applications/
-	gzip -f9 $(CURDIR)/debian/tmp/usr/share/man/man1/gtk-gnash.1
-	gzip -f9 $(CURDIR)/debian/tmp/usr/share/man/man1/qt4-gnash.1
+	# for i in $(CURDIR)/debian/tmp/usr/share/man/man1/*.1; do \
+	#   gzip -f9 $$i; \
+	# done
 
 # CREATE PACKAGES
 
