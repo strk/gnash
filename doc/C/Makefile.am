@@ -258,7 +258,7 @@ else
 	fi
 endif
 
-gnash.1 gtk-gnash.1 fb-gnash.1 qt4-gnash.1 dump-gnash.1: $(srcdir)/gnash.man-xml
+gnash.1 gtk-gnash.1 fb-gnash.1 qt4-gnash.1 dump-gnash.1:
 gprocessor.1: $(srcdir)/gprocessor.man-xml
 #dumpshm.1: $(srcdir)/dumpshm.man-xml
 soldumper.1: $(srcdir)/soldumper.man-xml
@@ -385,21 +385,27 @@ install-man1: $(MANPAGES)
 	   $(INSTALL_DATA) $$file $(DESTDIR)$(man1dir)/$$file; \
 	done
 	-for file in $(EXTRAMANPAGES); do \
-	   $(INSTALL_DATA) $(top_srcdir)/doc/C/$$file $(DESTDIR)$(man1dir)/$$file; \
+	   $(INSTALL_DATA) $(srcdir)/$$file $(DESTDIR)$(man1dir)/$$file; \
 	done
 
-# # The gtk-gnash.1, qt-gnash.1, fb-gnash.1, sdl-gnash.1,gnash-gtk-launcher.1
-# # dump-gnash.1, and gnash-qt-launcher.1 manpages are generated as aliases
-# # for the gnash.1 man page, so we can't use the suffix rules to build
-# # them, but we need to install the ".so gnash.1" manpages also, or
-# # they aren't in the tarball.
-# link-extra-man:
-# 	-for file in $(EXTRAMANPAGES); do \
-# 	  if test ! -e $$file; then \
-# 	    echo "NOTE: Linking alias of $$file to default manpage"; \
-# 	    $(LN_S) -f preformatted/gnash.1.in $$file; \
-# 	  fi; \
-# 	done
+force:
+
+$(EXTRAMANPAGES): force
+	echo $?
+	echo $@
+	echo $*
+	echo $<
+
+# The gtk-gnash.1, qt-gnash.1, fb-gnash.1, sdl-gnash.1,gnash-gtk-launcher.1
+# dump-gnash.1, and gnash-qt-launcher.1 manpages are generated as aliases
+# for the gnash.1 man page, so we can't use the suffix rules to build
+# them, but we need to install the ".so gnash.1" manpages also, or
+# they aren't in the tarball.
+link-extra-man:
+	-@for file in $(EXTRAMANPAGES); do \
+	  echo "NOTE: Linking alias of $$file to default manpage"; \
+	  $(LN_S) -f $(srcdir)/$$file $$file; \
+	done
 
 install-data-hook: $(MANPAGES) install-man1 install-info-hook install-html-hook 
 uninstall-hook: uninstall-info-hook uninstall-html-hook
@@ -483,5 +489,5 @@ update-preformats:
 endif
 
 # Always execute these targets as they have no real dependencies.
-.PHONY: images install-info-hook uninstall-info-hook install-html-hook uninstall-html-hook uninstall-data-hook install-data-hook images install-man1 update-preformats
+.PHONY: images install-info-hook uninstall-info-hook install-html-hook uninstall-html-hook uninstall-data-hook install-data-hook images install-man1 update-preformats $(EXTRAMANPAGES)
 
