@@ -838,7 +838,7 @@ RTMPClient::recvResponse()
 		      break;
 		  }
 		  case RTMP::FLV_DATA:
-		      log_unimpl(_("Flv data packet message"));
+		      log_unimpl(_("FLV data packet message"));
 		      break;
 		  default :
 		      log_error(_("Couldn't decode RTMP message Body"));

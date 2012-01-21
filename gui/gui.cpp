@@ -897,7 +897,7 @@ Gui::start()
 {
     assert ( ! _started );
     if (_stopped) {
-        log_error(_("Gui is in stop mode, won't start application"));
+        log_error(_("GUI is in stop mode, won't start application"));
         return;
     }
 

@@ -104,7 +104,7 @@ VideoConverterGst::init(const ImgBuf& src)
 
     bool rv = swfdec_gst_colorspace_init (&_decoder, srccaps, sinkcaps);
     if (!rv) {
-        log_error(_("VideoConverterGst: initialisation failed."));
+        log_error(_("VideoConverterGst: initialization failed."));
         return false;
     }
 

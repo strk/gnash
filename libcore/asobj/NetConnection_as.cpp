@@ -1304,7 +1304,7 @@ RTMPConnection::handleInvoke(const boost::uint8_t* payload,
             log_debug("Value: %s", arg);
         }
 
-        log_error(_("rtmp server sent error"));
+        log_error(_("RTMP server sent error"));
 
         callMethod(&_nc.owner(), NSV::PROP_ON_STATUS, arg);
         return;

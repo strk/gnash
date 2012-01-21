@@ -557,7 +557,7 @@ EGLDevice::queryEGLConfig(EGLDisplay display)
      }
 
      if ( EGL_FALSE == eglGetConfigs(display, configs, max_num_config, &max_num_config)) {
-         log_error(_("eglGetConfigs() failed to retrive the configs (error %s)"),
+         log_error(_("eglGetConfigs() failed to retrieve the configs (error %s)"),
                      getErrorString(eglGetError()));
          return 0;
      }

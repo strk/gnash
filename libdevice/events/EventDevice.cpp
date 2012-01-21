@@ -1,4 +1,4 @@
-// 
+/bdevice/events/EventDevice.cpp/ 
 //   Copyright (C) 2010, 2011, 2012 Free Software Foundation, Inc
 // 
 // This program is free software; you can redistribute it and/or modify
@@ -304,7 +304,7 @@ EventDevice::check()
         "EV_FF_STATUS"
     };    
     struct input_event *ev = reinterpret_cast<struct input_event *>(buf.get());
-    log_debug(_("Type is: %s(%hd), Code is: %hd, Val us: %d"), debug[ev->type],
+    log_debug(_("Type is: %s(%hd), Code is: %hd, Val is: %d"), debug[ev->type],
               ev->type, ev->type, ev->code, ev->value);
 #endif
     

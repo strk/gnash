@@ -133,7 +133,7 @@ SSLServer::loadDhParams(SSL_CTX *ctx, char *file)
 
     if (dh && ctx) {
 	if (SSL_CTX_set_tmp_dh(ctx, dh) < 0) {
-	    log_error(_("ssl!!", "Couldn't set DH parameters: %s "),
+	    log_error(_("SSL!!", "Couldn't set DH parameters: %s "),
 		      ERR_reason_error_string(ERR_get_error()));
 	    return false;
 	}

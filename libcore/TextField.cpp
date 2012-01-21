@@ -1510,7 +1510,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                         }
                         else if (s == "IMG") {
                             //image
-                            log_unimpl(_("<img> html tag in TextField"));
+                            log_unimpl(_("<img> HTML tag in TextField"));
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
                         }
@@ -1548,7 +1548,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                         }
                         else if (s == "SPAN") {
                             //span
-                            log_unimpl(_("<span> html tag in TextField"));
+                            log_unimpl(_("<span> HTML tag in TextField"));
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
                         }
@@ -1620,7 +1620,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             attloc = attributes.find("TABSTOPS");
                             if (attloc != attributes.end()) {
                                 //textformat TABSTOPS attribute
-                                log_unimpl(_("html <textformat> tag tabstops attribute"));
+                                log_unimpl(_("HTML <textformat> tag tabstops attribute"));
                             }
                             handleChar(it, e, x, y, newrec, last_code,
                                     last_space_glyph, last_line_start_record);
@@ -2021,7 +2021,7 @@ TextField::parseHTML(std::wstring& tag,
                 while (it != e) {
                     ++it;
                 }
-                log_error(_("invalid html tag"));
+                log_error(_("invalid HTML tag"));
                 return false;
             }
         }
@@ -2055,7 +2055,7 @@ TextField::parseHTML(std::wstring& tag,
             while (it != e) {
                 ++it;
             }
-            log_error(_("invalid html tag"));
+            log_error(_("invalid HTML tag"));
             return false;
         }
     }
@@ -2146,7 +2146,7 @@ TextField::parseHTML(std::wstring& tag,
                 while (it != e) {
                     ++it;
                 }
-                log_error(_("invalid html tag"));
+                log_error(_("invalid HTML tag"));
                 return false;
             }
         }

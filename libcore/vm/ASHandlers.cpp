@@ -3627,7 +3627,7 @@ commonGetURL(as_environment& env, as_value target,
         }
 
         if (!target_movie) {
-            log_error(_("get url: target %s is not a sprite"), target_string);
+            log_error(_("get URL: target %s is not a sprite"), target_string);
             return;
         }
 

@@ -604,10 +604,10 @@ AOS4_sound_handler::audioTask()
 	AHIios[0]=AHIio;
 	AHIios[1]=(AHIRequest*)AHIiocopy;
 
-	log_debug(_("AOS4: audioTask:Initialize timer.."));
+	log_debug(_("AOS4: audioTask:Initialize timer."));
 	TimerInit();
 
-	log_debug(_("AOS4: audioTask:Starting Timer.."));
+	log_debug(_("AOS4: audioTask:Starting Timer."));
 	TimerReset(RESET_TIME);
     while (true)
     {
@@ -618,7 +618,7 @@ AOS4_sound_handler::audioTask()
 	    if (sigGot & SIGBREAKF_CTRL_C)
 	    {
 			_closing = true;
-			log_debug(_("AOS4: Closing Audio Thread.."));
+			log_debug(_("AOS4: Closing Audio Thread."));
 			break;
 		}
 		if (sigGot & _timerSig)
@@ -638,7 +638,7 @@ AOS4_sound_handler::audioTask()
 	    }
 	}
 
-	log_debug(_("AOS4: Cleaning Audio Stuff.."));
+	log_debug(_("AOS4: Cleaning Audio Stuff."));
 
 	if (AHIios[0])
 	{
@@ -672,9 +672,9 @@ AOS4_sound_handler::audioTask()
 	if (PlayBuffer[0]) IExec->FreeMem(PlayBuffer[0],BUFSIZE); PlayBuffer[0] = 0;
 	if (PlayBuffer[1]) IExec->FreeMem(PlayBuffer[1],BUFSIZE); PlayBuffer[1] = 0;
 
-	log_debug(_("AOS4: Exit Audio Thread.."));
+	log_debug(_("AOS4: Exit Audio Thread."));
 
-	log_debug(_("AOS4: audioTask:Close timer.."));
+	log_debug(_("AOS4: audioTask:Close timer."));
 	TimerExit();
     return(RETURN_OK);
 }
