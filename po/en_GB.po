@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-01-01 09:28-0700\n"
-"PO-Revision-Date: 2012-01-02 18:57+0200\n"
+"POT-Creation-Date: 2012-01-20 17:11-0700\n"
+"PO-Revision-Date: 2012-01-20 23:41+0200\n"
 "Last-Translator: Chris <cjl@laptop.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: en_GB\n"
@@ -17,83 +17,83 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.0.5\n"
 
-#: libbase/RTMP.cpp:221
+#: libbase/RTMP.cpp:222
 msgid "Initial connection failed"
 msgstr "Initial connection failed"
 
-#: libbase/RTMP.cpp:324 libbase/RTMP.cpp:328
+#: libbase/RTMP.cpp:325 libbase/RTMP.cpp:329
 msgid "unsupported packet received"
 msgstr "unsupported packet received"
 
-#: libbase/RTMP.cpp:333
+#: libbase/RTMP.cpp:334
 #, c-format
 msgid "partially supported packet %s received"
 msgstr "partially supported packet %s received"
 
-#: libbase/RTMP.cpp:343
+#: libbase/RTMP.cpp:344
 #, c-format
 msgid "packet %s received"
 msgstr "packet %s received"
 
-#: libbase/RTMP.cpp:355
+#: libbase/RTMP.cpp:356
 #, c-format
 msgid "Unknown packet %s received"
 msgstr "Unknown packet %s received"
 
-#: libbase/RTMP.cpp:457
+#: libbase/RTMP.cpp:458
 msgid "failed to read RTMP packet header 2nd byte"
 msgstr "failed to read RTMP packet header 2nd byte"
 
-#: libbase/RTMP.cpp:465
+#: libbase/RTMP.cpp:466
 msgid "Failed to read RTMP packet header 3nd byte"
 msgstr "Failed to read RTMP packet header 3nd byte"
 
-#: libbase/RTMP.cpp:483
+#: libbase/RTMP.cpp:484
 #, c-format
 msgid "Incomplete packet received on channel %s"
 msgstr "Incomplete packet received on channel %s"
 
-#: libbase/RTMP.cpp:496
+#: libbase/RTMP.cpp:497
 #, c-format
 msgid "Failed to read RTMP packet header. type: %s"
 msgstr "Failed to read RTMP packet header. type: %s"
 
-#: libbase/RTMP.cpp:541
+#: libbase/RTMP.cpp:542
 #, c-format
 msgid "%s, failed to read extended timestamp"
 msgstr "%s, failed to read extended timestamp"
 
-#: libbase/RTMP.cpp:870
+#: libbase/RTMP.cpp:871
 msgid "Stage 1 socket not ready. This should not happen."
 msgstr "Stage 1 socket not ready. This should not happen."
 
-#: libbase/RTMP.cpp:876
+#: libbase/RTMP.cpp:877
 msgid "Could not send stage 1 data"
 msgstr "Could not send stage 1 data"
 
-#: libbase/RTMP.cpp:898
+#: libbase/RTMP.cpp:899
 #, c-format
 msgid "Type mismatch: client sent %d, server answered %d"
 msgstr "Type mismatch: client sent %d, server answered %d"
 
-#: libbase/RTMP.cpp:926
+#: libbase/RTMP.cpp:927
 msgid "Could not send complete signature."
 msgstr "Could not send complete signature."
 
-#: libbase/RTMP.cpp:952
+#: libbase/RTMP.cpp:953
 msgid "Signatures do not match during handshake!"
 msgstr "Signatures do not match during handshake!"
 
-#: libbase/RTMP.cpp:1040
+#: libbase/RTMP.cpp:1041
 msgid "Control packet too short"
 msgstr "Control packet too short"
 
-#: libbase/RTMP.cpp:1048
+#: libbase/RTMP.cpp:1049
 #, c-format
 msgid "Control packet (%s) data too short"
 msgstr "Control packet (%s) data too short"
 
-#: libbase/RTMP.cpp:1086
+#: libbase/RTMP.cpp:1087
 #, c-format
 msgid "Received unknown or unhandled control %s"
 msgstr "Received unknown or unhandled control %s"
@@ -199,12 +199,10 @@ msgstr "Warning: empty include specification in rcfile %s, line %d"
 msgid ""
 "Warning: include specification must be an absolute path in rcfile %s, line %d"
 msgstr ""
-"Warning: include specification must be an absolute path in rcfile %s, line %"
-"d"
+"Warning: include specification must be an absolute path in rcfile %s, line %d"
 
 #: libbase/rc.cpp:651
 #, c-format
-#, c-format,
 msgid "Warning: unrecognized action \"%s\" in rcfile %s, line %d"
 msgstr "Warning: unrecognised action \"%s\" in rcfile %s, line %d"
 
@@ -224,7 +222,6 @@ msgstr "Loading module: %s from %s"
 
 #: libbase/extension.cpp:128 cygnal/handler.cpp:300
 #, c-format
-#, c-format,
 msgid "Initializing module: \"%s\" from %s"
 msgstr "Initialising module: \"%s\" from %s"
 
@@ -234,7 +231,6 @@ msgstr "Couldn't get class_init symbol"
 
 #: libbase/extension.cpp:159
 #, c-format
-#, c-format,
 msgid "Initializing module: \"%s\""
 msgstr "Initialising module: \"%s\""
 
@@ -300,19 +296,16 @@ msgstr "unlockSharedHandle: unknown shared data %d"
 
 #: libbase/curl_adapter.cpp:672
 #, c-format
-#, c-format,
 msgid "FIXME: Timeout (%u milliseconds) while loading from URL %s"
 msgstr "FIXME: Timeout (%u milliseconds) while loading from URL %s"
 
 #: libbase/curl_adapter.cpp:720
 #, c-format
-#, c-format,
 msgid "Timeout (%u milliseconds) while loading from URL %s"
 msgstr "Timeout (%u milliseconds) while loading from URL %s"
 
 #: libbase/curl_adapter.cpp:763
 #, c-format
-#, c-format,
 msgid "HTTP response %ld from URL %s"
 msgstr "HTTP response %ld from URL %s"
 
@@ -439,36 +432,36 @@ msgstr "Calculations don't equal"
 msgid "Zero memory leaks for this program"
 msgstr "Zero memory leaks for this program"
 
-#: libbase/GnashVaapiImage.cpp:50
+#: libbase/GnashVaapiImage.cpp:51
 #, c-format
 msgid "GnashVaapiImage::GnashVaapiImage(): surface 0x%08x, size %dx%d\n"
 msgstr "GnashVaapiImage::GnashVaapiImage(): surface 0x%08x, size %dx%d\n"
 
-#: libbase/GnashVaapiImage.cpp:56
+#: libbase/GnashVaapiImage.cpp:57
 #, c-format
 msgid "GnashVaapiImage::~GnashVaapiImage(): surface 0x%08x\n"
 msgstr "GnashVaapiImage::~GnashVaapiImage(): surface 0x%08x\n"
 
-#: libbase/GnashVaapiImage.cpp:68
+#: libbase/GnashVaapiImage.cpp:69
 #, c-format
 msgid "GnashVaapi::update(): data %p\n"
 msgstr "GnashVaapi::update(): data %p\n"
 
-#: libbase/GnashVaapiImage.cpp:100
+#: libbase/GnashVaapiImage.cpp:101
 msgid "GnashVaapiImage: VA surface to SW pixels are not supported\n"
 msgstr "GnashVaapiImage: VA surface to SW pixels are not supported\n"
 
-#: libbase/GnashVaapiImage.cpp:111
+#: libbase/GnashVaapiImage.cpp:112
 #, c-format
 msgid "GnashVaapiImage::data(): surface 0x%08x\n"
 msgstr "GnashVaapiImage::data(): surface 0x%08x\n"
 
-#: libbase/GnashVaapiImage.cpp:112 libbase/GnashVaapiImage.cpp:128
+#: libbase/GnashVaapiImage.cpp:113 libbase/GnashVaapiImage.cpp:129
 #, c-format
 msgid "  -> %u usec from creation\n"
 msgstr "  -> %u usec from creation\n"
 
-#: libbase/GnashVaapiImage.cpp:126
+#: libbase/GnashVaapiImage.cpp:127
 #, c-format
 msgid "GnashVaapiImage::data() const: surface 0x%08x\n"
 msgstr "GnashVaapiImage::data() const: surface 0x%08x\n"
@@ -498,46 +491,46 @@ msgstr "Couldn't find symbol: %s"
 msgid "Found symbol %s @ %p"
 msgstr "Found symbol %s @ %p"
 
-#: libbase/GnashImageJpeg.cpp:115
+#: libbase/GnashImageJpeg.cpp:116
 msgid "JPEG: Empty jpeg source stream."
 msgstr "JPEG: Empty jpeg source stream."
 
-#: libbase/GnashImageJpeg.cpp:262 libbase/GnashImageJpeg.cpp:289
-#: libbase/GnashImageJpeg.cpp:307 libbase/GnashImageJpeg.cpp:363
+#: libbase/GnashImageJpeg.cpp:263 libbase/GnashImageJpeg.cpp:290
+#: libbase/GnashImageJpeg.cpp:308 libbase/GnashImageJpeg.cpp:364
 msgid "Internal jpeg error: "
 msgstr "Internal jpeg error: "
 
-#: libbase/GnashImageJpeg.cpp:273
+#: libbase/GnashImageJpeg.cpp:274
 msgid "Lack of data during JPEG header parsing"
 msgstr "Lack of data during JPEG header parsing"
 
-#: libbase/GnashImageJpeg.cpp:283
+#: libbase/GnashImageJpeg.cpp:284
 #, c-format
 msgid "unexpected: jpeg_read_header returned %d"
 msgstr "unexpected: jpeg_read_header returned %d"
 
-#: libbase/GnashImageJpeg.cpp:319
+#: libbase/GnashImageJpeg.cpp:320
 msgid "lack of data during JPEG header parsing"
 msgstr "lack of data during JPEG header parsing"
 
-#: libbase/GnashImageJpeg.cpp:329
+#: libbase/GnashImageJpeg.cpp:330
 #, c-format
 msgid "unexpected: jpeg_read_header returned %d [%s:%d]"
 msgstr "unexpected: jpeg_read_header returned %d [%s:%d]"
 
-#: libbase/GnashImageJpeg.cpp:337
+#: libbase/GnashImageJpeg.cpp:338
 msgid "Internal jpeg error during header parsing: "
 msgstr "Internal jpeg error during header parsing: "
 
-#: libbase/GnashImageJpeg.cpp:345
+#: libbase/GnashImageJpeg.cpp:346
 msgid "Internal jpeg error during decompression: "
 msgstr "Internal jpeg error during decompression: "
 
-#: libbase/GnashImageJpeg.cpp:520
+#: libbase/GnashImageJpeg.cpp:521
 msgid "rw_dest_IOChannel couldn't write data."
 msgstr "rw_dest_IOChannel couldn't write data."
 
-#: libbase/GnashImageJpeg.cpp:545
+#: libbase/GnashImageJpeg.cpp:546
 msgid "rw_dest_IOChannel::term_destination couldn't write data."
 msgstr "rw_dest_IOChannel::term_destination couldn't write data."
 
@@ -575,7 +568,6 @@ msgstr "Load from host %s granted (default)"
 
 #: libbase/URLAccessManager.cpp:147
 #, c-format
-#, c-format,
 msgid "Load of file %s forbidden (starting URL %s is not a local resource)"
 msgstr "Load of file %s forbidden (starting URL %s is not a local resource)"
 
@@ -894,7 +886,7 @@ msgstr "VG_PATH_NUM_COORDS is %d"
 
 #: librender/opengles1/Renderer_gles1.cpp:95
 msgid "Couldn't initialize EGL Device!"
-msgstr "Couldn't initialize EGL Device!"
+msgstr "Couldn't initialise EGL Device!"
 
 #: librender/cairo/Renderer_cairo.cpp:498
 msgid "Can't render videos with alpha"
@@ -933,32 +925,32 @@ msgstr "Unknown pixelformat: %s\n"
 msgid "Couldn't get Drawable window from X11"
 msgstr "Couldn't get Drawable window from X11"
 
-#: librender/GnashTexture.cpp:69
+#: librender/GnashTexture.cpp:70
 #, c-format
 msgid "glError: %s caught\n"
 msgstr "glError: %s caught\n"
 
-#: libmedia/MediaParser.cpp:82
+#: libmedia/MediaParser.cpp:83
 msgid "No ID3 support implemented in this MediaParser"
 msgstr "No ID3 support implemented in this MediaParser"
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:79
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:80
 msgid "MediaParserFfmpeg could not read probe data from input"
 msgstr "MediaParserFfmpeg could not read probe data from input"
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:112
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:121
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:113
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:122
 #, c-format
 msgid "%s: seeking failed"
 msgstr "%s: seeking failed"
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:210
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:211
 msgid ""
 "FIXME: FFmpeg packet decompression timestamp has no value, taking as zero"
 msgstr ""
 "FIXME: FFmpeg packet decompression timestamp has no value, taking as zero"
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:271
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:272
 #, c-format
 msgid ""
 "MediaParserFfmpeg::parseNextFrame: Problems parsing next frame "
@@ -967,25 +959,25 @@ msgstr ""
 "MediaParserFfmpeg::parseNextFrame: Problems parsing next frame "
 "(av_read_frame returned %d). We'll consider the stream fully parsed."
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:442
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:443
 #, c-format
 msgid "  Using stream %d for audio: codec id %d"
 msgstr "  Using stream %d for audio: codec id %d"
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:455
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:456
 #, c-format
 msgid "  Using stream %d for video: codec id %d"
 msgstr "  Using stream %d for video: codec id %d"
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:477
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:478
 msgid "Duration of video stream unknown"
 msgstr "Duration of video stream unknown"
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:506
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:507
 msgid "Duration of audio stream unknown to ffmpeg"
 msgstr "Duration of audio stream unknown to ffmpeg"
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:586
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:587
 msgid ""
 "MediaParserFfmpeg couldn't parse input format: tried to seek at negative "
 "offset %1%."
@@ -993,84 +985,82 @@ msgstr ""
 "MediaParserFfmpeg couldn't parse input format: tried to seek at negative "
 "offset %1%."
 
-#: libmedia/ffmpeg/VideoConverterFfmpeg.cpp:121
+#: libmedia/ffmpeg/VideoConverterFfmpeg.cpp:122
 msgid "VideoConverterFfmpeg cannot convert to the requested format"
 msgstr "VideoConverterFfmpeg cannot convert to the requested format"
 
-#: libmedia/ffmpeg/MediaHandlerFfmpeg.cpp:121
+#: libmedia/ffmpeg/MediaHandlerFfmpeg.cpp:122
 #, c-format
-#, c-format,
 msgid "MediaHandlerFfmpeg::createAudioDecoder: %s -- %s"
 msgstr "MediaHandlerFfmpeg::createAudioDecoder: %s -- %s"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:52
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:53
 #, c-format
 msgid "AudioDecoderFfmpeg: initialized FFmpeg codec %d (%s)"
 msgstr "AudioDecoderFfmpeg: initialised FFmpeg codec %d (%s)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:55
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:56
 #, c-format
 msgid ""
 "AudioDecoderFfmpeg: initialized FFmpeg codec %d (%s) for flash codec %d (%s)"
 msgstr ""
 "AudioDecoderFfmpeg: initialised FFmpeg codec %d (%s) for flash codec %d (%s)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:70
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:71
 #, c-format
 msgid "AudioDecoderFfmpeg: initialized FFmpeg codec %s (%d)"
 msgstr "AudioDecoderFfmpeg: initialised FFmpeg codec %s (%d)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:109
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:110
 #, c-format
 msgid "Unsupported audio codec %d"
 msgstr "Unsupported audio codec %d"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:118
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:119
 #, c-format
 msgid "libavcodec could not find a decoder for codec %d (%s)"
 msgstr "libavcodec could not find a decoder for codec %d (%s)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:128
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:129
 msgid "AudioDecoderFfmpeg can't initialize MP3 parser"
 msgstr "AudioDecoderFfmpeg can't initialise MP3 parser"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:135
-#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:184
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:136
+#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:185
 msgid "libavcodec couldn't allocate context"
 msgstr "libavcodec couldn't allocate context"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:143
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:314
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:144
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:315
 #, c-format
 msgid ""
 "AudioDecoderFfmpeg: avcodec_open failed to initialize FFmpeg codec %s (%d)"
 msgstr ""
 "AudioDecoderFfmpeg: avcodec_open failed to initialise FFmpeg codec %s (%d)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:148
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:149
 #, c-format
-#, c-format,
 msgid "AudioDecoder: initialized FFMPEG codec %s (%d)"
-msgstr "AudioDecoder: initialized FFMPEG codec %s (%d)"
+msgstr "AudioDecoder: initialised FFMPEG codec %s (%d)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:221
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:222
 #, c-format
 msgid "AudioDecoderFfmpeg: unsupported flash audio codec %d (%s)"
 msgstr "AudioDecoderFfmpeg: unsupported flash audio codec %d (%s)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:230
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:231
 #, c-format
 msgid "AudioDecoderFfmpeg: unknown codec type %d (should never happen)"
 msgstr "AudioDecoderFfmpeg: unknown codec type %d (should never happen)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:240
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:241
 #, c-format
 msgid ""
 "AudioDecoderFfmpeg: libavcodec could not find a decoder for codec %d (%s)"
 msgstr ""
 "AudioDecoderFfmpeg: libavcodec could not find a decoder for codec %d (%s)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:246
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:247
 #, c-format
 msgid ""
 "AudioDecoderFfmpeg: libavcodec could not find a decoder for ffmpeg codec id "
@@ -1079,11 +1069,11 @@ msgstr ""
 "AudioDecoderFfmpeg: libavcodec could not find a decoder for ffmpeg codec id "
 "%s"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:258
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:259
 msgid "AudioDecoderFfmpeg: libavcodec couldn't allocate context"
 msgstr "AudioDecoderFfmpeg: libavcodec couldn't allocate context"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:347
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:348
 #, c-format
 msgid ""
 "av_parser_parse returned %d. Upgrading ffmpeg/libavcodec might fix this "
@@ -1092,7 +1082,7 @@ msgstr ""
 "av_parser_parse returned %d. Upgrading ffmpeg/libavcodec might fix this "
 "issue."
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:400
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:401
 #, c-format
 msgid ""
 "AudioDecoderFfmpeg: could not find a complete frame in the last %d bytes of "
@@ -1101,11 +1091,11 @@ msgstr ""
 "AudioDecoderFfmpeg: could not find a complete frame in the last %d bytes of "
 "input (malformed SWF or FLV?)"
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:489
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:490
 msgid "failed to allocate audio buffer."
 msgstr "failed to allocate audio buffer."
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:527
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:528
 #, c-format
 msgid ""
 "avcodec_decode_audio returned %d. Upgrading ffmpeg/libavcodec might fix this "
@@ -1114,16 +1104,16 @@ msgstr ""
 "avcodec_decode_audio returned %d. Upgrading ffmpeg/libavcodec might fix this "
 "issue."
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:536
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:537
 #, c-format
 msgid ""
 "outputSize:%d after decoding %d bytes of input audio data. Upgrading ffmpeg/"
 "libavcodec might fix this issue."
 msgstr ""
-"outputSize:%d after decoding %d bytes of input audio data. Upgrading "
-"ffmpeg/libavcodec might fix this issue."
+"outputSize:%d after decoding %d bytes of input audio data. Upgrading ffmpeg/"
+"libavcodec might fix this issue."
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:586
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:587
 #, c-format
 msgid ""
 " --- Computation of resampled samples (%d) < then the actual returned "
@@ -1132,66 +1122,64 @@ msgstr ""
 " --- Computation of resampled samples (%d) < then the actual returned "
 "samples (%d)"
 
-#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:140
+#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:141
 #, c-format
 msgid "Cannot find suitable decoder for flash codec %d"
 msgstr "Cannot find suitable decoder for flash codec %d"
 
-#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:179
+#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:180
 msgid "libavcodec can't decode this video format"
 msgstr "libavcodec can't decode this video format"
 
-#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:207
+#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:208
 #, c-format
-#, c-format,
 msgid "libavcodec failed to initialize FFMPEG codec %s (%d)"
 msgstr "libavcodec failed to initialise FFMPEG codec %s (%d)"
 
-#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:215
+#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:216
 #, c-format
-#, c-format,
 msgid "VideoDecoder: initialized FFMPEG codec %s (%d)"
 msgstr "VideoDecoder: initialised FFMPEG codec %s (%d)"
 
-#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:305
+#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:306
 msgid "Pixel format not handled"
 msgstr "Pixel format not handled"
 
-#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:353
+#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:354
 msgid "Out of memory while allocating avcodec frame"
 msgstr "Out of memory while allocating avcodec frame"
 
-#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:372
+#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:373
 msgid "Decoding of a video frame failed"
 msgstr "Decoding of a video frame failed"
 
-#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:433
+#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:434
 #, c-format
 msgid "Unsupported video codec %d"
 msgstr "Unsupported video codec %d"
 
-#: libmedia/haiku/MediaHandlerHaiku.cpp:114
+#: libmedia/haiku/MediaHandlerHaiku.cpp:115
 #, c-format
 msgid "MediaHandlerHaiku::createAudioDecoder: %s -- %s"
 msgstr "MediaHandlerHaiku::createAudioDecoder: %s -- %s"
 
-#: libmedia/AudioDecoderSpeex.cpp:40
+#: libmedia/AudioDecoderSpeex.cpp:41
 msgid "AudioDecoderSpeex: state initialization failed."
 msgstr "AudioDecoderSpeex: state initialisation failed."
 
-#: libmedia/AudioDecoderSpeex.cpp:53
+#: libmedia/AudioDecoderSpeex.cpp:54
 msgid "AudioDecoderSpeex: initialization failed."
 msgstr "AudioDecoderSpeex: initialisation failed."
 
-#: libmedia/AudioDecoderSpeex.cpp:108
+#: libmedia/AudioDecoderSpeex.cpp:109
 msgid "Corrupt Speex stream!"
 msgstr "Corrupt Speex stream!"
 
-#: libmedia/AudioDecoderSpeex.cpp:132
+#: libmedia/AudioDecoderSpeex.cpp:133
 msgid "Failed to resample Speex frame."
 msgstr "Failed to resample Speex frame."
 
-#: libmedia/FLVParser.cpp:169
+#: libmedia/FLVParser.cpp:170
 #, c-format
 msgid ""
 "Unexpected audio tag found at offset %d FLV stream advertising no audio in "
@@ -1200,11 +1188,11 @@ msgstr ""
 "Unexpected audio tag found at offset %d FLV stream advertising no audio in "
 "header. We'll warn only once for each FLV, expecting any further audio tag."
 
-#: libmedia/FLVParser.cpp:186
+#: libmedia/FLVParser.cpp:187
 msgid "could not read audio frame?"
 msgstr "could not read audio frame?"
 
-#: libmedia/FLVParser.cpp:224
+#: libmedia/FLVParser.cpp:225
 #, c-format
 msgid ""
 "Unexpected video tag found at offset %d of FLV stream advertising no video "
@@ -1213,33 +1201,33 @@ msgstr ""
 "Unexpected video tag found at offset %d of FLV stream advertising no video "
 "in header. We'll warn only once per FLV, expecting any further video tag."
 
-#: libmedia/FLVParser.cpp:244
+#: libmedia/FLVParser.cpp:245
 #, c-format
 msgid "AVC packet type: %d"
 msgstr "AVC packet type: %d"
 
-#: libmedia/FLVParser.cpp:263
+#: libmedia/FLVParser.cpp:264
 msgid "could not read video frame?"
 msgstr "could not read video frame?"
 
-#: libmedia/FLVParser.cpp:321
+#: libmedia/FLVParser.cpp:322
 #, c-format
 msgid "FLVParser::parseNextTag: can't seek to %d"
 msgstr "FLVParser::parseNextTag: can't seek to %d"
 
-#: libmedia/FLVParser.cpp:335
+#: libmedia/FLVParser.cpp:336
 #, c-format
 msgid ""
 "FLVParser::parseNextTag: can't read tag info (needed 12 bytes, only got %d)"
 msgstr ""
 "FLVParser::parseNextTag: can't read tag info (needed 12 bytes, only got %d)"
 
-#: libmedia/FLVParser.cpp:422
+#: libmedia/FLVParser.cpp:423
 #, c-format
 msgid "First byte of FLV_META_TAG is %d, expected 0x02 (STRING AMF0 type)"
 msgstr "First byte of FLV_META_TAG is %d, expected 0x02 (STRING AMF0 type)"
 
-#: libmedia/FLVParser.cpp:434
+#: libmedia/FLVParser.cpp:435
 #, c-format
 msgid ""
 "FLVParser::parseNextTag: can't read metaTag (%d) body (needed %d bytes, only "
@@ -1248,63 +1236,64 @@ msgstr ""
 "FLVParser::parseNextTag: can't read metaTag (%d) body (needed %d bytes, only "
 "got %d)"
 
-#: libmedia/FLVParser.cpp:445
+#: libmedia/FLVParser.cpp:446
 msgid "Corrupt FLV: Meta tag unterminated!"
 msgstr "Corrupt FLV: Meta tag unterminated!"
 
-#: libmedia/FLVParser.cpp:453
+#: libmedia/FLVParser.cpp:454
 #, c-format
 msgid "FLVParser::parseNextTag: unknown FLV tag type %d"
 msgstr "FLVParser::parseNextTag: unknown FLV tag type %d"
 
-#: libmedia/FLVParser.cpp:462
+#: libmedia/FLVParser.cpp:463
 msgid ""
 "Corrupt FLV: previous tag size record (%1%) unexpected (actual size: %2%)"
 msgstr ""
 "Corrupt FLV: previous tag size record (%1%) unexpected (actual size: %2%)"
 
-#: libmedia/FLVParser.cpp:480
+#: libmedia/FLVParser.cpp:481
 msgid "FLVParser::parseHeader: couldn't read 9 bytes of header"
 msgstr "FLVParser::parseHeader: couldn't read 9 bytes of header"
 
-#: libmedia/FLVParser.cpp:532
+#: libmedia/FLVParser.cpp:533
 #, c-format
 msgid "FLVParser::readAudioFrame: could only read %d/%d bytes"
 msgstr "FLVParser::readAudioFrame: could only read %d/%d bytes"
 
-#: libmedia/gst/VideoConverterGst.cpp:37
+#: libmedia/gst/VideoConverterGst.cpp:39
 msgid "VideoConverterGst: ffmpegcolorspace element missing"
 msgstr "VideoConverterGst: ffmpegcolorspace element missing"
 
-#: libmedia/gst/VideoConverterGst.cpp:70
+#: libmedia/gst/VideoConverterGst.cpp:72
 msgid "VideoConverterGst: can't output requested format"
 msgstr "VideoConverterGst: can't output requested format"
 
-#: libmedia/gst/VideoConverterGst.cpp:98
+#: libmedia/gst/VideoConverterGst.cpp:100
 msgid "VideoConverterGst: internal error (caps creation failed)"
 msgstr "VideoConverterGst: internal error (caps creation failed)"
 
-#: libmedia/gst/VideoConverterGst.cpp:105
-msgid "VideoConverterGst: initialisation failed."
+#: libmedia/gst/VideoConverterGst.cpp:107
+#, fuzzy
+msgid "VideoConverterGst: initialization failed."
 msgstr "VideoConverterGst: initialisation failed."
 
-#: libmedia/gst/VideoConverterGst.cpp:140
+#: libmedia/gst/VideoConverterGst.cpp:142
 msgid "VideoConverterGst: buffer push failed."
 msgstr "VideoConverterGst: buffer push failed."
 
-#: libmedia/gst/VideoConverterGst.cpp:147
+#: libmedia/gst/VideoConverterGst.cpp:149
 msgid "VideoConverterGst: buffer pull failed."
 msgstr "VideoConverterGst: buffer pull failed."
 
-#: libmedia/gst/GstUtil.cpp:75
+#: libmedia/gst/GstUtil.cpp:76
 msgid "Unable to retrieve a valid audio sink from ~/.gnashrc"
 msgstr "Unable to retrieve a valid audio sink from ~/.gnashrc"
 
-#: libmedia/gst/GstUtil.cpp:81
+#: libmedia/gst/GstUtil.cpp:82
 msgid "Unable to retrieve a valid audio sink from autoaudiosink"
 msgstr "Unable to retrieve a valid audio sink from autoaudiosink"
 
-#: libmedia/gst/GstUtil.cpp:86
+#: libmedia/gst/GstUtil.cpp:87
 #, c-format
 msgid ""
 "Unable to retrieve a valid audio sink from gconfaudiosink\n"
@@ -1313,16 +1302,16 @@ msgstr ""
 "Unable to retrieve a valid audio sink from gconfaudiosink\n"
 "%s"
 
-#: libmedia/gst/GstUtil.cpp:87
+#: libmedia/gst/GstUtil.cpp:88
 msgid "Sink search exhausted: you won't be able to hear sound!"
 msgstr "Sink search exhausted: you won't be able to hear sound!"
 
-#: libmedia/gst/GstUtil.cpp:93
+#: libmedia/gst/GstUtil.cpp:94
 #, c-format
 msgid "Got a non-NULL audio sink; its wrapper name is: %s"
 msgstr "Got a non-NULL audio sink; its wrapper name is: %s"
 
-#: libmedia/gst/GstUtil.cpp:115
+#: libmedia/gst/GstUtil.cpp:116
 msgid ""
 "Missing plugin, but plugin installing not supported. Will try anyway, but "
 "expect failure."
@@ -1330,11 +1319,11 @@ msgstr ""
 "Missing plugin, but plugin installing not supported. Will try anyway, but "
 "expect failure."
 
-#: libmedia/gst/GstUtil.cpp:121
+#: libmedia/gst/GstUtil.cpp:122
 msgid "Missing plugin, but failed to convert it to gst missing plugin detail."
 msgstr "Missing plugin, but failed to convert it to gst missing plugin detail."
 
-#: libmedia/gst/GstUtil.cpp:134
+#: libmedia/gst/GstUtil.cpp:135
 msgid ""
 "gst_update_registry failed. You'll need to restart Gnash to use the new "
 "plugins."
@@ -1342,7 +1331,7 @@ msgstr ""
 "gst_update_registry failed. You'll need to restart Gnash to use the new "
 "plugins."
 
-#: libmedia/gst/GstUtil.cpp:141
+#: libmedia/gst/GstUtil.cpp:142
 msgid "Missing plugin, but automatic plugin installation not available."
 msgstr "Missing plugin, but automatic plugin installation not available."
 
@@ -1377,30 +1366,30 @@ msgstr "VideoDecoderGst: initialisation failed for video type %s!"
 msgid "VideoDecoderGst: buffer push failed."
 msgstr "VideoDecoderGst: buffer push failed."
 
-#: libmedia/gst/MediaParserGst.cpp:54
+#: libmedia/gst/MediaParserGst.cpp:55
 msgid "MediaParserGst couldn't create a bin"
 msgstr "MediaParserGst couldn't create a bin"
 
-#: libmedia/gst/MediaParserGst.cpp:59
+#: libmedia/gst/MediaParserGst.cpp:60
 msgid "MediaParserGst couldn't create a typefind element."
 msgstr "MediaParserGst couldn't create a typefind element."
 
-#: libmedia/gst/MediaParserGst.cpp:71 libmedia/gst/MediaParserGst.cpp:93
-#: libmedia/gst/MediaParserGst.cpp:316 libmedia/gst/MediaParserGst.cpp:373
-#: libmedia/gst/MediaParserGst.cpp:527
+#: libmedia/gst/MediaParserGst.cpp:72 libmedia/gst/MediaParserGst.cpp:94
+#: libmedia/gst/MediaParserGst.cpp:317 libmedia/gst/MediaParserGst.cpp:374
+#: libmedia/gst/MediaParserGst.cpp:528
 msgid "MediaParserGst could not change element state"
 msgstr "MediaParserGst could not change element state"
 
-#: libmedia/gst/MediaParserGst.cpp:84
+#: libmedia/gst/MediaParserGst.cpp:85
 #, c-format
 msgid "Needed %d dead iterations to detect audio type."
 msgstr "Needed %d dead iterations to detect audio type."
 
-#: libmedia/gst/MediaParserGst.cpp:88
+#: libmedia/gst/MediaParserGst.cpp:89
 msgid "MediaParserGst failed to detect any stream types."
 msgstr "MediaParserGst failed to detect any stream types."
 
-#: libmedia/gst/MediaParserGst.cpp:186
+#: libmedia/gst/MediaParserGst.cpp:187
 msgid ""
 "MediaParserGst failed to read the stream, but it did not reach EOF or enter "
 "a bad state."
@@ -1408,54 +1397,55 @@ msgstr ""
 "MediaParserGst failed to read the stream, but it did not reach EOF or enter "
 "a bad state."
 
-#: libmedia/gst/MediaParserGst.cpp:200
+#: libmedia/gst/MediaParserGst.cpp:201
 msgid "MediaParserGst failed to push more data into the demuxer! Seeking back."
-msgstr "MediaParserGst failed to push more data into the demuxer! Seeking back."
+msgstr ""
+"MediaParserGst failed to push more data into the demuxer! Seeking back."
 
-#: libmedia/gst/MediaParserGst.cpp:279
+#: libmedia/gst/MediaParserGst.cpp:280
 #, c-format
 msgid "MediaParserGst/typefound: Detected media type %s"
 msgstr "MediaParserGst/typefound: Detected media type %s"
 
-#: libmedia/gst/MediaParserGst.cpp:291 libmedia/gst/MediaParserGst.cpp:298
+#: libmedia/gst/MediaParserGst.cpp:292 libmedia/gst/MediaParserGst.cpp:299
 msgid "MediaParserGst Failed to create fakesink."
 msgstr "MediaParserGst Failed to create fakesink."
 
-#: libmedia/gst/MediaParserGst.cpp:304
+#: libmedia/gst/MediaParserGst.cpp:305
 msgid "MediaParserGst: couldn't get the fakesink src element."
 msgstr "MediaParserGst: couldn't get the fakesink src element."
 
-#: libmedia/gst/MediaParserGst.cpp:312
+#: libmedia/gst/MediaParserGst.cpp:313
 msgid "MediaParserGst: couln't link fakesink"
 msgstr "MediaParserGst: couln't link fakesink"
 
-#: libmedia/gst/MediaParserGst.cpp:336
+#: libmedia/gst/MediaParserGst.cpp:337
 msgid "MediaParserGst: couldn't get the typefind src element."
 msgstr "MediaParserGst: couldn't get the typefind src element."
 
-#: libmedia/gst/MediaParserGst.cpp:351
+#: libmedia/gst/MediaParserGst.cpp:352
 msgid "MediaParserGst: couldn't create the demuxer"
 msgstr "MediaParserGst: couldn't create the demuxer"
 
-#: libmedia/gst/MediaParserGst.cpp:357 libmedia/gst/MediaParserGst.cpp:362
+#: libmedia/gst/MediaParserGst.cpp:358 libmedia/gst/MediaParserGst.cpp:363
 msgid "MediaParserGst: failed adding demuxer to bin."
 msgstr "MediaParserGst: failed adding demuxer to bin."
 
-#: libmedia/gst/MediaParserGst.cpp:389
+#: libmedia/gst/MediaParserGst.cpp:390
 msgid "MediaParserGst: couldn't get structure name."
 msgstr "MediaParserGst: couldn't get structure name."
 
-#: libmedia/gst/MediaParserGst.cpp:403
+#: libmedia/gst/MediaParserGst.cpp:404
 #, c-format
 msgid "MediaParserGst: ignoring stream of type %s."
 msgstr "MediaParserGst: ignoring stream of type %s."
 
-#: libmedia/gst/MediaParserGst.cpp:427
+#: libmedia/gst/MediaParserGst.cpp:428
 #, c-format
 msgid "MediaParserGst: Failed to find a parser (media: %s)."
 msgstr "MediaParserGst: Failed to find a parser (media: %s)."
 
-#: libmedia/gst/MediaParserGst.cpp:436
+#: libmedia/gst/MediaParserGst.cpp:437
 msgid ""
 "MediaParserGst: Failed to find a parser. We'll continue, but either audio or "
 "video will not work!"
@@ -1463,24 +1453,24 @@ msgstr ""
 "MediaParserGst: Failed to find a parser. We'll continue, but either audio or "
 "video will not work!"
 
-#: libmedia/gst/MediaParserGst.cpp:445
+#: libmedia/gst/MediaParserGst.cpp:446
 msgid "MediaParserGst: couldn't add parser."
 msgstr "MediaParserGst: couldn't add parser."
 
-#: libmedia/gst/MediaParserGst.cpp:458
+#: libmedia/gst/MediaParserGst.cpp:459
 msgid "MediaParserGst: couldn't link parser."
 msgstr "MediaParserGst: couldn't link parser."
 
-#: libmedia/gst/MediaParserGst.cpp:470 libmedia/gst/MediaParserGst.cpp:503
+#: libmedia/gst/MediaParserGst.cpp:471 libmedia/gst/MediaParserGst.cpp:504
 msgid "MediaParserGst: couldn't link \"fake\" sink."
 msgstr "MediaParserGst: couldn't link \"fake\" sink."
 
-#: libmedia/gst/MediaParserGst.cpp:489
+#: libmedia/gst/MediaParserGst.cpp:490
 #, c-format
 msgid "MediaParserGst: Linked audio source (type: %s)"
 msgstr "MediaParserGst: Linked audio source (type: %s)"
 
-#: libmedia/gst/MediaParserGst.cpp:519
+#: libmedia/gst/MediaParserGst.cpp:520
 #, c-format
 msgid "MediaParserGst: Linked video source (type: %s)"
 msgstr "MediaParserGst: Linked video source (type: %s)"
@@ -1752,11 +1742,11 @@ msgstr "%s: problem with creating video_file_sink element"
 msgid "%s: there was some problem in linking!"
 msgstr "%s: there was some problem in linking!"
 
-#: libmedia/gst/MediaHandlerGst.cpp:89
+#: libmedia/gst/MediaHandlerGst.cpp:90
 msgid "Wrong arguments given to GST VideoDecoder"
 msgstr "Wrong arguments given to GST VideoDecoder"
 
-#: libmedia/gst/MediaHandlerGst.cpp:136
+#: libmedia/gst/MediaHandlerGst.cpp:137
 #, c-format
 msgid "MediaHandlerGst::createAudioDecoder: %s -- %s"
 msgstr "MediaHandlerGst::createAudioDecoder: %s -- %s"
@@ -1882,38 +1872,38 @@ msgstr "%s: audioSaveBin state change failed"
 msgid "You have an invalid microphone selected. Check your gnashrc file"
 msgstr "You have an invalid microphone selected. Check your gnashrc file"
 
-#: libmedia/AudioDecoderSimple.cpp:162
+#: libmedia/AudioDecoderSimple.cpp:163
 msgid "corrupted ADPCM header"
 msgstr "corrupted ADPCM header"
 
-#: libmedia/AudioDecoderSimple.cpp:290 libmedia/AudioDecoderSimple.cpp:303
+#: libmedia/AudioDecoderSimple.cpp:291 libmedia/AudioDecoderSimple.cpp:304
 #, c-format
 msgid "AudioDecoderSimple: initialized flash codec %s (%d)"
 msgstr "AudioDecoderSimple: initialised flash codec %s (%d)"
 
-#: libmedia/AudioDecoderSimple.cpp:329 libmedia/AudioDecoderSimple.cpp:360
+#: libmedia/AudioDecoderSimple.cpp:330 libmedia/AudioDecoderSimple.cpp:361
 #, c-format
 msgid "AudioDecoderSimple: unsupported flash codec %d (%s)"
 msgstr "AudioDecoderSimple: unsupported flash codec %d (%s)"
 
-#: libmedia/AudioDecoderSimple.cpp:340
+#: libmedia/AudioDecoderSimple.cpp:341
 #, c-format
 msgid "AudioDecoderSimple: unable to intepret custom audio codec id %s"
 msgstr "AudioDecoderSimple: unable to intepret custom audio codec id %s"
 
-#: libmedia/AudioDecoderSimple.cpp:427
+#: libmedia/AudioDecoderSimple.cpp:428
 msgid "Host endianness not detected in AudioDecoderSimple"
 msgstr "Host endianness not detected in AudioDecoderSimple"
 
-#: libmedia/AudioDecoderSimple.cpp:477
+#: libmedia/AudioDecoderSimple.cpp:478
 msgid "Error in sound sample conversion"
 msgstr "Error in sound sample conversion"
 
-#: libmedia/MediaHandler.cpp:48
+#: libmedia/MediaHandler.cpp:49
 msgid "MediaHandler::isFLV: Could not read 3 bytes from input stream"
 msgstr "MediaHandler::isFLV: Could not read 3 bytes from input stream"
 
-#: libmedia/MediaHandler.cpp:64
+#: libmedia/MediaHandler.cpp:65
 msgid ""
 "MediaHandler::createMediaParser: only FLV input is supported by this "
 "MediaHandler"
@@ -1921,12 +1911,12 @@ msgstr ""
 "MediaHandler::createMediaParser: only FLV input is supported by this "
 "MediaHandler"
 
-#: libmedia/MediaHandler.cpp:70
+#: libmedia/MediaHandler.cpp:71
 #, c-format
 msgid "Exception while reading from stream: %s"
 msgstr "Exception while reading from stream: %s"
 
-#: libmedia/MediaHandler.cpp:107
+#: libmedia/MediaHandler.cpp:108
 #, c-format
 msgid ""
 "MediaHandler::createFlashAudioDecoder: no available flash decoders for codec "
@@ -1945,12 +1935,12 @@ msgstr "Can't convert unknown type %d"
 msgid "serialization of as_value of type %d"
 msgstr "serialisation of as_value of type %d"
 
-#: libcore/ClassHierarchy.cpp:84
+#: libcore/ClassHierarchy.cpp:85
 #, c-format
 msgid "Native class %s is not an object after initialization (%s)"
 msgstr "Native class %s is not an object after initialisation (%s)"
 
-#: libcore/ClassHierarchy.cpp:91
+#: libcore/ClassHierarchy.cpp:92
 #, c-format
 msgid "Native class %s is not found after initialization"
 msgstr "Native class %s is not found after initialisation"
@@ -2115,7 +2105,7 @@ msgstr "DefineFontInfo tag loader: can't find font with id %d"
 msgid "DefineFontInfo2 partially implemented"
 msgstr "DefineFontInfo2 partially implemented"
 
-#: libcore/swf/CSMTextSettingsTag.cpp:76
+#: libcore/swf/CSMTextSettingsTag.cpp:77
 #, c-format
 msgid ""
 "  CSMTextSettings: TextID=%d, FlashType=%d, GridFit=%d, Thickness=%d, "
@@ -2124,7 +2114,7 @@ msgstr ""
 "  CSMTextSettings: TextID=%d, FlashType=%d, GridFit=%d, Thickness=%d, "
 "Sharpness=%d"
 
-#: libcore/swf/CSMTextSettingsTag.cpp:84
+#: libcore/swf/CSMTextSettingsTag.cpp:85
 msgid "CSMTextSettings"
 msgstr "CSMTextSettings"
 
@@ -2166,17 +2156,17 @@ msgstr "  GlyphEntries: count = %d"
 msgid "   glyph%d: index=%d, advance=%g"
 msgstr "   glyph%d: index=%d, advance=%g"
 
-#: libcore/swf/StartSoundTag.cpp:55
+#: libcore/swf/StartSoundTag.cpp:56
 #, c-format
 msgid "start_sound_loader: sound_id %d is not defined"
 msgstr "start_sound_loader: sound_id %d is not defined"
 
-#: libcore/swf/StartSoundTag.cpp:63
+#: libcore/swf/StartSoundTag.cpp:64
 #, c-format
 msgid "StartSound: id=%d"
 msgstr "StartSound: id=%d"
 
-#: libcore/swf/StartSoundTag.cpp:113
+#: libcore/swf/StartSoundTag.cpp:114
 msgid "STARTSOUND2 tag not parsed and not used"
 msgstr "STARTSOUND2 tag not parsed and not used"
 
@@ -2230,7 +2220,6 @@ msgstr "Sprite %d advertise no frames"
 
 #: libcore/swf/tag_loaders.cpp:168
 #, c-format
-#, c-format,
 msgid "DEFINESOUNDLOADER: sound sample rate %d (expected 0 to %u)"
 msgstr "DEFINESOUNDLOADER: sound sample rate %d (expected 0 to %u)"
 
@@ -2304,17 +2293,17 @@ msgstr "Descriptive metadata from movie %s: %s"
 msgid "  reflex = \"%c%c%c\""
 msgstr "  reflex = \"%c%c%c\""
 
-#: libcore/swf/DefineFontAlignZonesTag.cpp:53
+#: libcore/swf/DefineFontAlignZonesTag.cpp:54
 #, c-format
 msgid "DefineFontAlignZones tag references an undefined font %d"
 msgstr "DefineFontAlignZones tag references an undefined font %d"
 
-#: libcore/swf/DefineFontAlignZonesTag.cpp:72
+#: libcore/swf/DefineFontAlignZonesTag.cpp:73
 #, c-format
 msgid "DefineFontAlignZones: font=%d, flags=%d, table int: %s"
 msgstr "DefineFontAlignZones: font=%d, flags=%d, table int: %s"
 
-#: libcore/swf/DefineFontAlignZonesTag.cpp:109
+#: libcore/swf/DefineFontAlignZonesTag.cpp:110
 msgid "DefineFontAlignZoneTag"
 msgstr "DefineFontAlignZoneTag"
 
@@ -2387,7 +2376,8 @@ msgstr ""
 #: libcore/swf/ShapeRecord.cpp:494
 #, c-format
 msgid "Invalid fill style %d in lineStyleChange record - %d defined. Set to 0."
-msgstr "Invalid fill style %d in lineStyleChange record - %d defined. Set to 0."
+msgstr ""
+"Invalid fill style %d in lineStyleChange record - %d defined. Set to 0."
 
 #: libcore/swf/ShapeRecord.cpp:504
 #, c-format
@@ -2426,27 +2416,27 @@ msgstr "  readLineStyles: count = %d"
 msgid "  readLineStyles: count2 = %d"
 msgstr "  readLineStyles: count2 = %d"
 
-#: libcore/swf/PlaceObject2Tag.cpp:84
+#: libcore/swf/PlaceObject2Tag.cpp:85
 #, c-format
 msgid "  PLACEOBJECT: depth=%d(%d) char=%d"
 msgstr "  PLACEOBJECT: depth=%d(%d) char=%d"
 
-#: libcore/swf/PlaceObject2Tag.cpp:88 libcore/swf/PlaceObject2Tag.cpp:310
+#: libcore/swf/PlaceObject2Tag.cpp:89 libcore/swf/PlaceObject2Tag.cpp:311
 #, c-format
 msgid "  SWFCxForm: %s"
 msgstr "  SWFCxForm: %s"
 
-#: libcore/swf/PlaceObject2Tag.cpp:104
+#: libcore/swf/PlaceObject2Tag.cpp:105
 #, c-format
 msgid "Reserved field in PlaceObject actions == %u (expected 0)"
 msgstr "Reserved field in PlaceObject actions == %u (expected 0)"
 
-#: libcore/swf/PlaceObject2Tag.cpp:122
+#: libcore/swf/PlaceObject2Tag.cpp:123
 #, c-format
 msgid "  actions: flags = 0x%X"
 msgstr "  actions: flags = 0x%X"
 
-#: libcore/swf/PlaceObject2Tag.cpp:157
+#: libcore/swf/PlaceObject2Tag.cpp:158
 #, c-format
 msgid ""
 "swf_event::read(), even_length = %u, but only %lu bytes left to the end of "
@@ -2455,77 +2445,77 @@ msgstr ""
 "swf_event::read(), even_length = %u, but only %lu bytes left to the end of "
 "current tag. Breaking for safety."
 
-#: libcore/swf/PlaceObject2Tag.cpp:218
+#: libcore/swf/PlaceObject2Tag.cpp:219
 #, c-format
 msgid ""
 "swf_event::read() -- unknown / unhandled event type received, flags = 0x%x"
 msgstr ""
 "swf_event::read() -- unknown / unhandled event type received, flags = 0x%x"
 
-#: libcore/swf/PlaceObject2Tag.cpp:247
+#: libcore/swf/PlaceObject2Tag.cpp:248
 msgid "Unexpected end of tag while parsing PlaceObject tag events"
 msgstr "Unexpected end of tag while parsing PlaceObject tag events"
 
-#: libcore/swf/PlaceObject2Tag.cpp:303
+#: libcore/swf/PlaceObject2Tag.cpp:304
 #, c-format
 msgid "  PLACEOBJECT2: depth = %d (%d)"
 msgstr "  PLACEOBJECT2: depth = %d (%d)"
 
-#: libcore/swf/PlaceObject2Tag.cpp:305 libcore/swf/PlaceObject2Tag.cpp:418
+#: libcore/swf/PlaceObject2Tag.cpp:306 libcore/swf/PlaceObject2Tag.cpp:419
 #, c-format
 msgid "  char id = %d"
 msgstr "  char id = %d"
 
-#: libcore/swf/PlaceObject2Tag.cpp:307 libcore/swf/PlaceObject2Tag.cpp:419
+#: libcore/swf/PlaceObject2Tag.cpp:308 libcore/swf/PlaceObject2Tag.cpp:420
 #, c-format
 msgid "  SWFMatrix: %s"
 msgstr "  SWFMatrix: %s"
 
-#: libcore/swf/PlaceObject2Tag.cpp:312 libcore/swf/PlaceObject2Tag.cpp:421
+#: libcore/swf/PlaceObject2Tag.cpp:313 libcore/swf/PlaceObject2Tag.cpp:422
 #, c-format
 msgid "  ratio: %d"
 msgstr "  ratio: %d"
 
-#: libcore/swf/PlaceObject2Tag.cpp:313 libcore/swf/PlaceObject2Tag.cpp:422
+#: libcore/swf/PlaceObject2Tag.cpp:314 libcore/swf/PlaceObject2Tag.cpp:423
 #, c-format
 msgid "  name = %s"
 msgstr "  name = %s"
 
-#: libcore/swf/PlaceObject2Tag.cpp:315 libcore/swf/PlaceObject2Tag.cpp:424
+#: libcore/swf/PlaceObject2Tag.cpp:316 libcore/swf/PlaceObject2Tag.cpp:425
 #, c-format
 msgid "  clip_depth = %d (%d)"
 msgstr "  clip_depth = %d (%d)"
 
-#: libcore/swf/PlaceObject2Tag.cpp:318 libcore/swf/PlaceObject2Tag.cpp:427
+#: libcore/swf/PlaceObject2Tag.cpp:319 libcore/swf/PlaceObject2Tag.cpp:428
 #, c-format
 msgid " m_place_type: %d"
 msgstr " m_place_type: %d"
 
-#: libcore/swf/PlaceObject2Tag.cpp:416
+#: libcore/swf/PlaceObject2Tag.cpp:417
 #, c-format
 msgid "  PLACEOBJECT3: depth = %d (%d)"
 msgstr "  PLACEOBJECT3: depth = %d (%d)"
 
-#: libcore/swf/PlaceObject2Tag.cpp:420
+#: libcore/swf/PlaceObject2Tag.cpp:421
 #, c-format
 msgid "  SWFCxForm: %d"
 msgstr "  SWFCxForm: %d"
 
-#: libcore/swf/PlaceObject2Tag.cpp:423
+#: libcore/swf/PlaceObject2Tag.cpp:424
 #, c-format
 msgid "  class name = %s"
 msgstr "  class name = %s"
 
-#: libcore/swf/PlaceObject2Tag.cpp:426
+#: libcore/swf/PlaceObject2Tag.cpp:427
 msgid "   bitmapCaching enabled"
 msgstr "   bitmapCaching enabled"
 
-#: libcore/swf/SoundStreamHeadTag.cpp:75
+#: libcore/swf/SoundStreamHeadTag.cpp:76
 #, c-format
 msgid "SOUNDSTREAMHEAD: stream sample rate %d (expected 0 to %u)"
 msgstr "SOUNDSTREAMHEAD: stream sample rate %d (expected 0 to %u)"
 
-#: libcore/swf/SoundStreamHeadTag.cpp:85
+#: libcore/swf/SoundStreamHeadTag.cpp:86
 #, c-format
 msgid ""
 "Different stream/playback sound rate (%d/%d). This seems common in SWF "
@@ -2534,7 +2524,7 @@ msgstr ""
 "Different stream/playback sound rate (%d/%d). This seems common in SWF "
 "files, so we'll warn only once."
 
-#: libcore/swf/SoundStreamHeadTag.cpp:92
+#: libcore/swf/SoundStreamHeadTag.cpp:93
 #, c-format
 msgid ""
 "Different stream/playback sample size (%d/%d). This seems common in SWF "
@@ -2543,7 +2533,7 @@ msgstr ""
 "Different stream/playback sample size (%d/%d). This seems common in SWF "
 "files, so we'll warn only once."
 
-#: libcore/swf/SoundStreamHeadTag.cpp:98
+#: libcore/swf/SoundStreamHeadTag.cpp:99
 #, c-format
 msgid ""
 "Different stream/playback channels (%s/%s). This seems common in SWF files, "
@@ -2552,25 +2542,25 @@ msgstr ""
 "Different stream/playback channels (%s/%s). This seems common in SWF files, "
 "so we'll warn only once."
 
-#: libcore/swf/SoundStreamHeadTag.cpp:118
+#: libcore/swf/SoundStreamHeadTag.cpp:119
 msgid ""
 "No samples advertised for sound stream, pretty common so will warn only once"
 msgstr ""
 "No samples advertised for sound stream, pretty common so will warn only once"
 
-#: libcore/swf/SoundStreamHeadTag.cpp:145
+#: libcore/swf/SoundStreamHeadTag.cpp:146
 #, c-format
 msgid ""
 "sound stream head: format=%s, rate=%d, 16=%d, stereo=%d, ct=%d, latency=%d"
 msgstr ""
 "sound stream head: format=%s, rate=%d, 16=%d, stereo=%d, ct=%d, latency=%d"
 
-#: libcore/swf/DefineButtonCxformTag.cpp:48
+#: libcore/swf/DefineButtonCxformTag.cpp:49
 #, c-format
 msgid "DefineButtonCxform refers to an unknown DisplayObject %d"
 msgstr "DefineButtonCxform refers to an unknown DisplayObject %d"
 
-#: libcore/swf/DefineButtonCxformTag.cpp:59
+#: libcore/swf/DefineButtonCxformTag.cpp:60
 #, c-format
 msgid ""
 "DefineButtonCxform refers to DisplayObject ID %d (%s). Expected a button "
@@ -2579,22 +2569,21 @@ msgstr ""
 "DefineButtonCxform refers to DisplayObject ID %d (%s). Expected a button "
 "definition"
 
-#: libcore/swf/RemoveObjectTag.cpp:70
+#: libcore/swf/RemoveObjectTag.cpp:71
 #, c-format
 msgid "  remove_object_2(%d)"
 msgstr "  remove_object_2(%d)"
 
-#: libcore/swf/StreamSoundBlockTag.cpp:74
+#: libcore/swf/StreamSoundBlockTag.cpp:75
 msgid "Found SOUNDSTREAMBLOCK tag w/out preceding SOUNDSTREAMHEAD"
 msgstr "Found SOUNDSTREAMBLOCK tag w/out preceding SOUNDSTREAMHEAD"
 
-#: libcore/swf/StreamSoundBlockTag.cpp:110
+#: libcore/swf/StreamSoundBlockTag.cpp:111
 msgid "Tag boundary reported past end of stream!"
 msgstr "Tag boundary reported past end of stream!"
 
 #: libcore/swf/DefineButtonTag.cpp:85
 #, c-format
-#, c-format,
 msgid "  DefineButton loader: character id = %d"
 msgstr "  DefineButton loader: character id = %d"
 
@@ -2617,8 +2606,7 @@ msgstr "Next Button2 actionOffset (%u) points past the end of tag (%lu)"
 msgid ""
 "Next action offset (%u) in Button2ActionConditions points past the end of tag"
 msgstr ""
-"Next action offset (%u) in Button2ActionConditions points past the end of "
-"tag"
+"Next action offset (%u) in Button2ActionConditions points past the end of tag"
 
 #: libcore/swf/DefineButtonTag.cpp:279
 msgid "Premature end of button action input: can't read conditions"
@@ -2691,8 +2679,7 @@ msgstr "Adding bitmap id %1%"
 msgid ""
 "DEFINEBITS: No jpeg loader registered in movie definition - discarding bitmap"
 msgstr ""
-"DEFINEBITS: No jpeg loader registered in movie definition - discarding "
-"bitmap"
+"DEFINEBITS: No jpeg loader registered in movie definition - discarding bitmap"
 
 #: libcore/swf/DefineBitsTag.cpp:374
 msgid "gnash is not linked to zlib -- can't load jpeg3 image data"
@@ -2739,8 +2726,8 @@ msgid "inflateWrapper() inflateEnd() return %d (%s)"
 msgstr "inflateWrapper() inflateEnd() return %d (%s)"
 
 #: libcore/LoadVariablesThread.cpp:74
-#, c-format
-msgid "%s to utf8 conversion in MovieClip.loadVariables input parsing"
+#, fuzzy, c-format
+msgid "%s to UTF8 conversion in MovieClip.loadVariables input parsing"
 msgstr "%s to utf8 conversion in MovieClip.loadVariables input parsing"
 
 #: libcore/LoadVariablesThread.cpp:123
@@ -2754,8 +2741,8 @@ msgid ""
 "Size of 'variables' stream advertised to be %d bytes, but turned out to be "
 "%d bytes."
 msgstr ""
-"Size of 'variables' stream advertised to be %d bytes, but turned out to be %"
-"d bytes."
+"Size of 'variables' stream advertised to be %d bytes, but turned out to be "
+"%d bytes."
 
 #: libcore/SWFStream.cpp:285 libcore/parser/action_buffer.cpp:537
 msgid "Native floating point format not recognised"
@@ -2998,7 +2985,6 @@ msgstr ""
 
 #: libcore/asobj/NetConnection_as.cpp:440
 #, c-format
-#, c-format,
 msgid "Gnash is not allowed to open this URL: %s"
 msgstr "Gnash is not allowed to open this URL: %s"
 
@@ -3080,7 +3066,8 @@ msgid "Server called _onbwcheck without a callback"
 msgstr "Server called _onbwcheck without a callback"
 
 #: libcore/asobj/NetConnection_as.cpp:1307
-msgid "rtmp server sent error"
+#, fuzzy
+msgid "RTMP server sent error"
 msgstr "rtmp server sent error"
 
 #: libcore/asobj/Function_as.cpp:105
@@ -3123,8 +3110,8 @@ msgid ""
 "More than 2 arguments to Array.slice, and I don't know what to do with "
 "them.  Ignoring them"
 msgstr ""
-"More than 2 arguments to Array.slice, and I don't know what to do with them. "
-" Ignoring them"
+"More than 2 arguments to Array.slice, and I don't know what to do with "
+"them.  Ignoring them"
 
 #: libcore/asobj/System_as.cpp:310
 msgid "System.security.allowDomain"
@@ -3234,7 +3221,6 @@ msgstr ""
 
 #: libcore/asobj/Object.cpp:313
 #, c-format
-#, c-format,
 msgid "Object.registerClass('%s', %s): can't find exported symbol (id: %d)"
 msgstr "Object.registerClass('%s', %s): can't find exported symbol (id: %d)"
 
@@ -3442,7 +3428,7 @@ msgstr "First arg must be an instance of"
 #: libcore/asobj/flash/geom/Point_as.cpp:248
 #, c-format
 msgid "Point.normalize(%s): %s"
-msgstr "Point.normalize(%s): %s"
+msgstr "Point.normalise(%s): %s"
 
 #: libcore/asobj/flash/geom/Point_as.cpp:353
 msgid "first argument casted to object doesn't contain an 'x' member"
@@ -3703,7 +3689,6 @@ msgstr "MovieClipLoader.loadClip(%s): missing arguments"
 
 #: libcore/asobj/MovieClipLoader.cpp:114
 #, c-format
-#, c-format,
 msgid "MovieClipLoader.loadClip(%s): first argument must be a string"
 msgstr "MovieClipLoader.loadClip(%s): first argument must be a string"
 
@@ -3714,7 +3699,6 @@ msgstr "Could not find target %s (evaluated from %s)"
 
 #: libcore/asobj/MovieClipLoader.cpp:149
 #, c-format
-#, c-format,
 msgid "MovieClipLoader.unloadClip(%s): expected at least one argument"
 msgstr "MovieClipLoader.unloadClip(%s): expected at least one argument"
 
@@ -3748,7 +3732,6 @@ msgstr "No audio in Sound input."
 
 #: libcore/asobj/Sound_as.cpp:581
 #, c-format
-#, c-format,
 msgid "Gnash could not open this URL: %s"
 msgstr "Gnash could not open this URL: %s"
 
@@ -3763,7 +3746,7 @@ msgstr "No sound handler, nothing to start..."
 
 #: libcore/asobj/Sound_as.cpp:682
 msgid "No MediaParser initialized, can't start an external sound"
-msgstr "No MediaParser initialized, can't start an external sound"
+msgstr "No MediaParser initialised, can't start an external sound"
 
 #: libcore/asobj/Sound_as.cpp:688
 msgid "Sound.start() has no effect on a streaming Sound"
@@ -3817,7 +3800,6 @@ msgstr "No such export '%s'"
 
 #: libcore/asobj/Sound_as.cpp:1037
 #, c-format
-#, c-format,
 msgid "Export '%s' is not a sound"
 msgstr "Export '%s' is not a sound"
 
@@ -4205,8 +4187,7 @@ msgstr "MovieClip.lineStyle(%s): args after the first three will be discarded"
 msgid ""
 "MovieClip.lineStyle(%s): invalid joinStylevalue '%s' (valid values: %s|%s|%s)"
 msgstr ""
-"MovieClip.lineStyle(%s): invalid joinStylevalue '%s' (valid values: %s|%s|%"
-"s)"
+"MovieClip.lineStyle(%s): invalid joinStylevalue '%s' (valid values: %s|%s|%s)"
 
 #: libcore/asobj/MovieClip_as.cpp:1557
 #, c-format
@@ -4214,8 +4195,8 @@ msgid ""
 "MovieClip.lineStyle(%s): invalid capStyle value '%s' (valid values: none|"
 "round|square)"
 msgstr ""
-"MovieClip.lineStyle(%s): invalid capStyle value '%s' (valid values: "
-"none|round|square)"
+"MovieClip.lineStyle(%s): invalid capStyle value '%s' (valid values: none|"
+"round|square)"
 
 #: libcore/asobj/MovieClip_as.cpp:1582
 #, c-format
@@ -4253,7 +4234,6 @@ msgstr ""
 
 #: libcore/asobj/MovieClip_as.cpp:1762
 #, c-format
-#, c-format,
 msgid ""
 "%s.beginGradientFill(%s): one or more of the args from 2nd to 5th don't cast "
 "to objects"
@@ -4448,8 +4428,7 @@ msgstr "Attempting to open SOL file from non localhost-loaded SWF"
 msgid ""
 "SharedObject path %s is outside the SWF domain %s. Cannot access this object."
 msgstr ""
-"SharedObject path %s is outside the SWF domain %s. Cannot access this "
-"object."
+"SharedObject path %s is outside the SWF domain %s. Cannot access this object."
 
 #: libcore/asobj/SharedObject_as.cpp:534
 #, c-format
@@ -4605,7 +4584,6 @@ msgstr "Date.set%sMilliseconds needs one argument"
 
 #: libcore/asobj/Date_as.cpp:1165
 #, c-format
-#, c-format,
 msgid "Date.set%sMilliseconds was called with more than one argument"
 msgstr "Date.set%sMilliseconds was called with more than one argument"
 
@@ -4693,8 +4671,7 @@ msgstr "Invalid call to setInterval(%s) - need at least 2 arguments"
 msgid ""
 "Invalid call to setInterval(%s) - first argument is not an object or function"
 msgstr ""
-"Invalid call to setInterval(%s) - first argument is not an object or "
-"function"
+"Invalid call to setInterval(%s) - first argument is not an object or function"
 
 #: libcore/asobj/Global_as.cpp:980
 #, c-format
@@ -4795,7 +4772,6 @@ msgstr "NetStream_as::initAudioDecoder: hot-plugging audio consumer"
 
 #: libcore/asobj/NetStream_as.cpp:451
 #, c-format
-#, c-format,
 msgid "Could not create Audio decoder: %s"
 msgstr "Could not create Audio decoder: %s"
 
@@ -4926,8 +4902,8 @@ msgid ""
 "%p.refreshAudioBuffer: doing nothing as playhead is paused - bufferLength=%d/"
 "%d"
 msgstr ""
-"%p.refreshAudioBuffer: doing nothing as playhead is paused - bufferLength=%"
-"d/%d"
+"%p.refreshAudioBuffer: doing nothing as playhead is paused - bufferLength=%d/"
+"%d"
 
 #: libcore/asobj/NetStream_as.cpp:787
 #, c-format
@@ -4944,8 +4920,8 @@ msgid ""
 "%p.refreshAudioBuffer: currentPosition=%d, playHeadState=%d, bufferLength="
 "%d, bufferTime=%d"
 msgstr ""
-"%p.refreshAudioBuffer: currentPosition=%d, playHeadState=%d, bufferLength=%"
-"d, bufferTime=%d"
+"%p.refreshAudioBuffer: currentPosition=%d, playHeadState=%d, bufferLength="
+"%d, bufferTime=%d"
 
 #: libcore/asobj/NetStream_as.cpp:935
 #, c-format
@@ -4954,7 +4930,6 @@ msgstr "%p.pushDecodedAudioFrames(%d) : buffer overrun (%d/%d)."
 
 #: libcore/asobj/NetStream_as.cpp:951
 #, c-format
-#, c-format,
 msgid ""
 "%p.pushDecodedAudioFrames(%d): no more audio frames in input "
 "(nextAudioFrameTimestamp returned false, parsingComplete=%d)"
@@ -4972,13 +4947,11 @@ msgstr ""
 
 #: libcore/asobj/NetStream_as.cpp:975
 #, c-format
-#, c-format,
 msgid "%p.pushDecodedAudioFrames(%d): next audio frame is in the future (%d)"
 msgstr "%p.pushDecodedAudioFrames(%d): next audio frame is in the future (%d)"
 
 #: libcore/asobj/NetStream_as.cpp:988
 #, c-format
-#, c-format,
 msgid ""
 "nextAudioFrameTimestamp returned true (%d), but decodeNextAudioFrame "
 "returned null, I don't think this should ever happen"
@@ -5041,8 +5014,7 @@ msgstr ""
 msgid ""
 "%p.refreshVideoFrame(): last video frame was good enough for current position"
 msgstr ""
-"%p.refreshVideoFrame(): last video frame was good enough for current "
-"position"
+"%p.refreshVideoFrame(): last video frame was good enough for current position"
 
 #: libcore/asobj/NetStream_as.cpp:1210
 #, c-format
@@ -5181,7 +5153,7 @@ msgstr "TextSnapshot.getText requires exactly 2 arguments"
 
 #: libcore/asobj/XMLSocket_as.cpp:268
 msgid "XMLSocket.send(): socket not initialized"
-msgstr "XMLSocket.send(): socket not initialized"
+msgstr "XMLSocket.send(): socket not initialised"
 
 #: libcore/asobj/XMLSocket_as.cpp:312
 msgid "XMLSocket.connect() called while already connected, ignored"
@@ -5374,7 +5346,6 @@ msgstr "XML.addRequestHeader: single argument is not an array"
 
 #: libcore/asobj/LoadableObject.cpp:222
 #, c-format
-#, c-format,
 msgid "XML.addRequestHeader(%s): arguments after the second will be discarded"
 msgstr "XML.addRequestHeader(%s): arguments after the second will be discarded"
 
@@ -5397,7 +5368,6 @@ msgstr "sendAndLoad(): invalid target (must be an XML or LoadVars object)"
 
 #: libcore/asobj/LoadableObject.cpp:397
 #, c-format
-#, c-format,
 msgid "Loading from URL: '%s'"
 msgstr "Loading from URL: '%s'"
 
@@ -5483,15 +5453,18 @@ msgid "Expected a font name in FACE attribute."
 msgstr "Expected a font name in FACE attribute."
 
 #: libcore/TextField.cpp:1513
-msgid "<img> html tag in TextField"
+#, fuzzy
+msgid "<img> HTML tag in TextField"
 msgstr "<img> HTML tag in TextField"
 
 #: libcore/TextField.cpp:1551
-msgid "<span> html tag in TextField"
+#, fuzzy
+msgid "<span> HTML tag in TextField"
 msgstr "<span> HTML tag in TextField"
 
 #: libcore/TextField.cpp:1623
-msgid "html <textformat> tag tabstops attribute"
+#, fuzzy
+msgid "HTML <textformat> tag tabstops attribute"
 msgstr "HTML <textformat> tag tabstops attribute"
 
 #: libcore/TextField.cpp:1706
@@ -5534,7 +5507,8 @@ msgstr ""
 
 #: libcore/TextField.cpp:2024 libcore/TextField.cpp:2058
 #: libcore/TextField.cpp:2149
-msgid "invalid html tag"
+#, fuzzy
+msgid "invalid HTML tag"
 msgstr "invalid HTML tag"
 
 #: libcore/TextField.cpp:2035 libcore/TextField.cpp:2071
@@ -5570,7 +5544,7 @@ msgid ""
 "Attempt to perform initialized for a character %s that does not exist "
 "(either not exported or not defined)"
 msgstr ""
-"Attempt to perform initialized for a character %s that does not exist "
+"Attempt to perform initialised for a character %s that does not exist "
 "(either not exported or not defined)"
 
 #: libcore/LineStyle.cpp:186
@@ -5732,7 +5706,6 @@ msgstr "Unknown AMF type %s! Cannot proceed"
 
 #: libcore/AMFConverter.cpp:376
 #, c-format
-#, c-format,
 msgid "AMF parsing error: %s"
 msgstr "AMF parsing error: %s"
 
@@ -5793,7 +5766,6 @@ msgstr "%s: CHECKME: was broken"
 
 #: libcore/vm/ASHandlers.cpp:595
 #, c-format
-#, c-format,
 msgid "GetUrl: target=%s URL=%s"
 msgstr "GetUrl: target=%s URL=%s"
 
@@ -5882,7 +5854,6 @@ msgstr "ActionSetProperty: can't find target %s for setting property %s"
 
 #: libcore/vm/ASHandlers.cpp:1110
 #, c-format
-#, c-format,
 msgid "duplicateMovieClip: invalid depth %d passed; not duplicating"
 msgstr "duplicateMovieClip: invalid depth %d passed; not duplicating"
 
@@ -6130,7 +6101,8 @@ msgstr ""
 #: libcore/vm/ASHandlers.cpp:2581
 #, c-format
 msgid "getMember called against a value that does not cast to an as_object: %s"
-msgstr "getMember called against a value that does not cast to an as_object: %s"
+msgstr ""
+"getMember called against a value that does not cast to an as_object: %s"
 
 #: libcore/vm/ASHandlers.cpp:2590
 #, c-format
@@ -6227,7 +6199,6 @@ msgstr "-- %s instanceof %s (invalid args?)"
 
 #: libcore/vm/ASHandlers.cpp:2952
 #, c-format
-#, c-format,
 msgid "Top of stack not an object %s at ActionEnum2 execution"
 msgstr "Top of stack not an object %s at ActionEnum2 execution"
 
@@ -6321,9 +6292,9 @@ msgid "Unknown loadMovie target: %s"
 msgstr "Unknown loadMovie target: %s"
 
 #: libcore/vm/ASHandlers.cpp:3630
-#, c-format
-msgid "get url: target %s is not a sprite"
-msgstr "get URL: target %s is not a sprite"
+#, fuzzy, c-format
+msgid "get URL: target %s is not a sprite"
+msgstr "getURL: target %s is not a sprite"
 
 #: libcore/vm/ASHandlers.cpp:3695
 #, c-format
@@ -6335,35 +6306,34 @@ msgstr "Couldn't find movie \"%s\" to set target to! Setting target to NULL..."
 msgid "-------------- local register[%d] = '%s'"
 msgstr "-------------- local register[%d] = '%s'"
 
-#: libcore/vm/Machine.cpp:894
+#: libcore/vm/Machine.cpp:895
 #, c-format
 msgid "Can't push a null value onto the scope stack (%s)."
 msgstr "Can't push a null value onto the scope stack (%s)."
 
-#: libcore/vm/Machine.cpp:1437
+#: libcore/vm/Machine.cpp:1438
 #, c-format
 msgid ""
 "CALLPROP: Can't call a method of a value that doesn't cast to an object (%s)."
 msgstr ""
-"CALLPROP: Can't call a method of a value that doesn't cast to an object (%"
-"s)."
+"CALLPROP: Can't call a method of a value that doesn't cast to an object (%s)."
 
-#: libcore/vm/Machine.cpp:1454
+#: libcore/vm/Machine.cpp:1455
 #, c-format
 msgid "CALLPROP: Property '%s' of object '%s' is '%s', cannot call as method"
 msgstr "CALLPROP: Property '%s' of object '%s' is '%s', cannot call as method"
 
-#: libcore/vm/Machine.cpp:1982
+#: libcore/vm/Machine.cpp:1983
 #, c-format
 msgid "GETPROPERTY: Looking for property %s of object %s"
 msgstr "GETPROPERTY: Looking for property %s of object %s"
 
-#: libcore/vm/Machine.cpp:1986
+#: libcore/vm/Machine.cpp:1987
 #, c-format
 msgid "GETPROPERTY: expecting object on stack, got %s."
 msgstr "GETPROPERTY: expecting object on stack, got %s."
 
-#: libcore/vm/Machine.cpp:2121
+#: libcore/vm/Machine.cpp:2122
 #, c-format
 msgid "ABC_ACTION_SETSLOT: unexpected non-object stack value %s"
 msgstr "ABC_ACTION_SETSLOT: unexpected non-object stack value %s"
@@ -6581,7 +6551,6 @@ msgstr ""
 
 #: libcore/MovieClip.cpp:1116
 #, c-format
-#, c-format,
 msgid ""
 "GotoFrame(%d) targets a yet to be loaded frame (%d). We'll wait for it but a "
 "more correct form is explicitly using WaitForFrame instead"
@@ -6677,58 +6646,58 @@ msgstr ""
 msgid "  -- sprite END --"
 msgstr "  -- sprite END --"
 
-#: libcore/parser/filter_factory.cpp:53
+#: libcore/parser/filter_factory.cpp:54
 #, c-format
 msgid "   number of filters: %d"
 msgstr "   number of filters: %d"
 
-#: libcore/parser/filter_factory.cpp:91
+#: libcore/parser/filter_factory.cpp:92
 #, c-format
 msgid "Invalid filter type %d."
 msgstr "Invalid filter type %d."
 
-#: libcore/parser/filter_factory.cpp:101
+#: libcore/parser/filter_factory.cpp:102
 #, c-format
 msgid "Filter %d could not read."
 msgstr "Filter %d could not read."
 
-#: libcore/parser/filter_factory.cpp:133
+#: libcore/parser/filter_factory.cpp:134
 #, c-format
 msgid "   DropShadowFilter: blurX=%f blurY=%f"
 msgstr "   DropShadowFilter: blurX=%f blurY=%f"
 
-#: libcore/parser/filter_factory.cpp:152
+#: libcore/parser/filter_factory.cpp:153
 #, c-format
 msgid "   BlurFilter: blurX=%f blurY=%f quality=%d"
 msgstr "   BlurFilter: blurX=%f blurY=%f quality=%d"
 
-#: libcore/parser/filter_factory.cpp:179
+#: libcore/parser/filter_factory.cpp:180
 msgid "   GlowFilter "
 msgstr "   GlowFilter "
 
-#: libcore/parser/filter_factory.cpp:217
+#: libcore/parser/filter_factory.cpp:218
 msgid "   BevelFilter "
 msgstr "   BevelFilter "
 
-#: libcore/parser/filter_factory.cpp:264
+#: libcore/parser/filter_factory.cpp:265
 msgid "   GradientGlowFilter "
 msgstr "   GradientGlowFilter "
 
-#: libcore/parser/filter_factory.cpp:300
+#: libcore/parser/filter_factory.cpp:301
 msgid "   ConvolutionFilter "
 msgstr "   ConvolutionFilter "
 
-#: libcore/parser/filter_factory.cpp:317
+#: libcore/parser/filter_factory.cpp:318
 msgid "   ColorMatrixFilter: "
 msgstr "   ColourMatrixFilter: "
 
-#: libcore/parser/filter_factory.cpp:318 libcore/parser/filter_factory.cpp:321
-#: libcore/parser/filter_factory.cpp:324 libcore/parser/filter_factory.cpp:327
+#: libcore/parser/filter_factory.cpp:319 libcore/parser/filter_factory.cpp:322
+#: libcore/parser/filter_factory.cpp:325 libcore/parser/filter_factory.cpp:328
 #, c-format
 msgid "     %g, %g, %g, %g, %g"
 msgstr "     %g, %g, %g, %g, %g"
 
-#: libcore/parser/filter_factory.cpp:374
+#: libcore/parser/filter_factory.cpp:375
 msgid "   GradientBevelFilter "
 msgstr "   GradientBevelFilter "
 
@@ -6794,7 +6763,7 @@ msgid ""
 "SWFMovieDefinition::read(): unable to read zipped SWF data; gnash was "
 "compiled without zlib support"
 msgstr ""
-"SWFMovieDefinition::read(): unable to read zipped SWF data; gnash was "
+"SWFMovieDefinition::read(): unable to read zipped SWF data; Gnash was "
 "compiled without zlib support"
 
 #: libcore/parser/SWFMovieDefinition.cpp:301
@@ -6861,7 +6830,6 @@ msgstr "No Media handler registered, won't be able to decode embedded video"
 
 #: libcore/Video.cpp:69
 #, c-format
-#, c-format,
 msgid "Could not create Video Decoder: %s"
 msgstr "Could not create Video Decoder: %s"
 
@@ -6969,186 +6937,185 @@ msgstr "Could not write to user-provided host requests fd %d: %s"
 msgid "Could not write to browser fd #%d: %s"
 msgstr "Could not write to browser fd #%d: %s"
 
-#: libcore/movie_root.cpp:2153
+#: libcore/movie_root.cpp:2155
 #, c-format
-#, c-format,
 msgid "Fork failed launching URL opener '%s'"
 msgstr "Fork failed launching URL opener '%s'"
 
-#: libcore/movie_root.cpp:2200
+#: libcore/movie_root.cpp:2202
 #, c-format
 msgid "Could only write %d bytes to fd #%d"
 msgstr "Could only write %d bytes to fd #%d"
 
-#: libcore/movie_root.cpp:2288
+#: libcore/movie_root.cpp:2290
 msgid "Live MovieClips"
 msgstr "Live MovieClips"
 
-#: libcore/movie_root.cpp:2417
-#, c-format
-msgid "%s to utf8 conversion in LoadableObject input parsing"
+#: libcore/movie_root.cpp:2419
+#, fuzzy, c-format
+msgid "%s to UTF8 conversion in LoadableObject input parsing"
 msgstr "%s to utf8 conversion in LoadableObject input parsing"
 
-#: libcore/movie_root.cpp:2440
+#: libcore/movie_root.cpp:2442
 #, c-format
 msgid ""
 "Hosting application registered no callback for events/queries, can't call %s"
 "(%s)"
 msgstr ""
-"Hosting application registered no callback for events/queries, can't call %"
-"s(%s)"
+"Hosting application registered no callback for events/queries, can't call %s"
+"(%s)"
 
-#: libcore/abc/AbcBlock.cpp:64 libcore/abc/AbcBlock.cpp:132
+#: libcore/abc/AbcBlock.cpp:65 libcore/abc/AbcBlock.cpp:133
 msgid "ABC: Finalizing trait yielded bad type for slot."
 msgstr "ABC: Finalizing trait yielded bad type for slot."
 
-#: libcore/abc/AbcBlock.cpp:187
+#: libcore/abc/AbcBlock.cpp:188
 msgid "ABC: Bad name for trait."
 msgstr "ABC: Bad name for trait."
 
-#: libcore/abc/AbcBlock.cpp:192
+#: libcore/abc/AbcBlock.cpp:193
 msgid "ABC: Trait name must be fully qualified."
 msgstr "ABC: Trait name must be fully qualified."
 
-#: libcore/abc/AbcBlock.cpp:239 libcore/abc/AbcBlock.cpp:265
+#: libcore/abc/AbcBlock.cpp:240 libcore/abc/AbcBlock.cpp:266
 msgid "Bad method id in trait."
 msgstr "Bad method id in trait."
 
-#: libcore/abc/AbcBlock.cpp:255
+#: libcore/abc/AbcBlock.cpp:256
 msgid "Bad Class id in trait."
 msgstr "Bad Class id in trait."
 
-#: libcore/abc/AbcBlock.cpp:273
+#: libcore/abc/AbcBlock.cpp:274
 msgid "ABC: Unknown type of trait."
 msgstr "ABC: Unknown type of trait."
 
-#: libcore/abc/AbcBlock.cpp:467
+#: libcore/abc/AbcBlock.cpp:468
 #, c-format
 msgid "Abc Version: %d.%d"
 msgstr "Abc Version: %d.%d"
 
-#: libcore/abc/AbcBlock.cpp:566
+#: libcore/abc/AbcBlock.cpp:567
 msgid "ABC: Bad string given for namespace."
 msgstr "ABC: Bad string given for namespace."
 
-#: libcore/abc/AbcBlock.cpp:608
+#: libcore/abc/AbcBlock.cpp:609
 msgid "ABC: Bad namespace for namespace set."
 msgstr "ABC: Bad namespace for namespace set."
 
-#: libcore/abc/AbcBlock.cpp:678
+#: libcore/abc/AbcBlock.cpp:679
 #, c-format
 msgid "Action Block: Unknown multiname type (%d)."
 msgstr "Action Block: Unknown multiname type (%d)."
 
-#: libcore/abc/AbcBlock.cpp:711 libcore/abc/AbcBlock.cpp:721
-#: libcore/abc/AbcBlock.cpp:731 libcore/abc/AbcBlock.cpp:741
+#: libcore/abc/AbcBlock.cpp:712 libcore/abc/AbcBlock.cpp:722
+#: libcore/abc/AbcBlock.cpp:732 libcore/abc/AbcBlock.cpp:742
 msgid "Action Block: Bad index in optional argument."
 msgstr "Action Block: Bad index in optional argument."
 
-#: libcore/abc/AbcBlock.cpp:751
+#: libcore/abc/AbcBlock.cpp:752
 msgid "ABC: Bad index in optional argument, namespaces."
 msgstr "ABC: Bad index in optional argument, namespaces."
 
-#: libcore/abc/AbcBlock.cpp:773
+#: libcore/abc/AbcBlock.cpp:774
 #, c-format
 msgid "ABC: Bad default value type (%X), but continuing."
 msgstr "ABC: Bad default value type (%X), but continuing."
 
-#: libcore/abc/AbcBlock.cpp:811
+#: libcore/abc/AbcBlock.cpp:812
 msgid "ABC: Bad return type for method info."
 msgstr "ABC: Bad return type for method info."
 
-#: libcore/abc/AbcBlock.cpp:824
+#: libcore/abc/AbcBlock.cpp:825
 msgid "ABC: Unknown return type."
 msgstr "ABC: Unknown return type."
 
-#: libcore/abc/AbcBlock.cpp:841
+#: libcore/abc/AbcBlock.cpp:842
 msgid "ABC: Bad parameter type in method."
 msgstr "ABC: Bad parameter type in method."
 
-#: libcore/abc/AbcBlock.cpp:850
+#: libcore/abc/AbcBlock.cpp:851
 msgid "ABC: Unknown parameter type."
 msgstr "ABC: Unknown parameter type."
 
-#: libcore/abc/AbcBlock.cpp:939
+#: libcore/abc/AbcBlock.cpp:940
 msgid "ABC: Out of bounds instance name."
 msgstr "ABC: Out of bounds instance name."
 
-#: libcore/abc/AbcBlock.cpp:947
+#: libcore/abc/AbcBlock.cpp:948
 msgid "ABC: QName required for instance."
 msgstr "ABC: QName required for instance."
 
-#: libcore/abc/AbcBlock.cpp:952
+#: libcore/abc/AbcBlock.cpp:953
 msgid "ABC: No namespace to use for storing class."
 msgstr "ABC: No namespace to use for storing class."
 
-#: libcore/abc/AbcBlock.cpp:967
+#: libcore/abc/AbcBlock.cpp:968
 msgid "Duplicate class registration."
 msgstr "Duplicate class registration."
 
-#: libcore/abc/AbcBlock.cpp:983
+#: libcore/abc/AbcBlock.cpp:984
 msgid "ABC: Bad super type."
 msgstr "ABC: Bad super type."
 
-#: libcore/abc/AbcBlock.cpp:994
+#: libcore/abc/AbcBlock.cpp:995
 #, c-format
 msgid "ABC: Super type not found (%s)"
 msgstr "ABC: Super type not found (%s)"
 
-#: libcore/abc/AbcBlock.cpp:1001
+#: libcore/abc/AbcBlock.cpp:1002
 msgid "ABC: Can't extend a class which is final."
 msgstr "ABC: Can't extend a class which is final."
 
-#: libcore/abc/AbcBlock.cpp:1007
+#: libcore/abc/AbcBlock.cpp:1008
 msgid "ABC: Can't extend an interface type."
 msgstr "ABC: Can't extend an interface type."
 
-#: libcore/abc/AbcBlock.cpp:1013
+#: libcore/abc/AbcBlock.cpp:1014
 msgid "ABC: Class cannot be its own supertype."
 msgstr "ABC: Class cannot be its own supertype."
 
-#: libcore/abc/AbcBlock.cpp:1034
+#: libcore/abc/AbcBlock.cpp:1035
 msgid "ABC: Bad namespace for protected."
 msgstr "ABC: Bad namespace for protected."
 
-#: libcore/abc/AbcBlock.cpp:1053
+#: libcore/abc/AbcBlock.cpp:1054
 msgid "ABC: Bad name for interface."
 msgstr "ABC: Bad name for interface."
 
-#: libcore/abc/AbcBlock.cpp:1060
+#: libcore/abc/AbcBlock.cpp:1061
 msgid "ABC: Can't implement a non-interface type."
 msgstr "ABC: Can't implement a non-interface type."
 
-#: libcore/abc/AbcBlock.cpp:1072
+#: libcore/abc/AbcBlock.cpp:1073
 msgid "ABC: Out of bounds method for initializer."
-msgstr "ABC: Out of bounds method for initializer."
+msgstr "ABC: Out of bounds method for initialiser."
 
-#: libcore/abc/AbcBlock.cpp:1107
+#: libcore/abc/AbcBlock.cpp:1108
 msgid "ABC: Out of bound static constructor for class."
 msgstr "ABC: Out of bound static constructor for class."
 
-#: libcore/abc/AbcBlock.cpp:1146
+#: libcore/abc/AbcBlock.cpp:1147
 msgid "ABC: Out of bounds method for script."
 msgstr "ABC: Out of bounds method for script."
 
-#: libcore/abc/AbcBlock.cpp:1182
+#: libcore/abc/AbcBlock.cpp:1183
 msgid "ABC: Out of bounds for method body."
 msgstr "ABC: Out of bounds for method body."
 
-#: libcore/abc/AbcBlock.cpp:1189
+#: libcore/abc/AbcBlock.cpp:1190
 msgid "ABC: Only one body per method."
 msgstr "ABC: Only one body per method."
 
-#: libcore/abc/AbcBlock.cpp:1235
+#: libcore/abc/AbcBlock.cpp:1236
 msgid "ABC: Out of bound type for exception."
 msgstr "ABC: Out of bound type for exception."
 
-#: libcore/abc/AbcBlock.cpp:1245
+#: libcore/abc/AbcBlock.cpp:1246
 #, c-format
 msgid "ABC: Unknown type of object to catch. (%s)"
 msgstr "ABC: Unknown type of object to catch. (%s)"
 
-#: libcore/abc/AbcBlock.cpp:1263
+#: libcore/abc/AbcBlock.cpp:1264
 msgid "ABC: Out of bound name for caught exception."
 msgstr "ABC: Out of bound name for caught exception."
 
@@ -7182,12 +7149,13 @@ msgid "Can't read 3 bytes after an MZ (.exe) header"
 msgstr "Can't read 3 bytes after an MZ (.exe) header"
 
 #: libcore/MovieFactory.cpp:222
-msgid "Could not find SWF inside an exe file"
+#, fuzzy
+msgid "Could not find SWF inside an .exe file"
 msgstr "Could not find SWF inside an exe file"
 
 #: libcore/MovieFactory.cpp:231
-#, c-format
-msgid "unknown file type, buf is %c%c%c"
+#, fuzzy, c-format
+msgid "unknown file type, buffer is %c%c%c"
 msgstr "unknown file type, buf is %c%c%c"
 
 #: libcore/MovieFactory.cpp:273
@@ -7244,173 +7212,170 @@ msgstr "Attempt to initialise read-only property '%s' on object '%p' twice"
 msgid "Circular inheritance chain detected during isPrototypeOf call"
 msgstr "Circular inheritance chain detected during isPrototypeOf call"
 
-#: libdevice/egl/eglDevice.cpp:87 libdevice/egl/eglDevice.cpp:109
+#: libdevice/egl/eglDevice.cpp:86 libdevice/egl/eglDevice.cpp:108
 msgid "Couldn't initialize EGL device!"
 msgstr "Couldn't initialise EGL Device!"
 
-#: libdevice/egl/eglDevice.cpp:112
+#: libdevice/egl/eglDevice.cpp:111
 #, c-format
 msgid "Couldn't bind client to type %d!"
 msgstr "Couldn't bind client to type %d!"
 
-#: libdevice/egl/eglDevice.cpp:182
+#: libdevice/egl/eglDevice.cpp:181
 #, c-format
 msgid "eglGetDisplay() failed (error 0x%x)"
 msgstr "eglGetDisplay() failed (error 0x%x)"
 
-#: libdevice/egl/eglDevice.cpp:188
+#: libdevice/egl/eglDevice.cpp:187
 #, c-format
-#, c-format,
 msgid "eglInitialize() failed (error %s)"
 msgstr "eglInitialise() failed (error %s)"
 
-#: libdevice/egl/eglDevice.cpp:198
+#: libdevice/egl/eglDevice.cpp:197
 #, c-format
 msgid "EGL_CLIENT_APIS = %s"
 msgstr "EGL_CLIENT_APIS = %s"
 
-#: libdevice/egl/eglDevice.cpp:199
+#: libdevice/egl/eglDevice.cpp:198
 #, c-format
 msgid "EGL_EXTENSIONS = %s"
 msgstr "EGL_EXTENSIONS = %s"
 
-#: libdevice/egl/eglDevice.cpp:200
+#: libdevice/egl/eglDevice.cpp:199
 #, c-format
 msgid "EGL_VERSION = %s, EGL_VENDOR = %s"
 msgstr "EGL_VERSION = %s, EGL_VENDOR = %s"
 
-#: libdevice/egl/eglDevice.cpp:209 libdevice/egl/eglDevice.cpp:544
+#: libdevice/egl/eglDevice.cpp:208 libdevice/egl/eglDevice.cpp:543
 #: gui/gtk/gtk_glue_ovg.cpp:383
 #, c-format
-#, c-format,
 msgid "eglGetConfigs() failed to retrieve the number of configs (error %s)"
 msgstr "eglGetConfigs() failed to retrieve the number of configs (error %s)"
 
-#: libdevice/egl/eglDevice.cpp:214 libdevice/egl/eglDevice.cpp:549
+#: libdevice/egl/eglDevice.cpp:213 libdevice/egl/eglDevice.cpp:548
 #: gui/gtk/gtk_glue_ovg.cpp:388
 msgid "No EGLconfigs found\n"
 msgstr "No EGLconfigs found\n"
 
-#: libdevice/egl/eglDevice.cpp:217 libdevice/egl/eglDevice.cpp:552
+#: libdevice/egl/eglDevice.cpp:216 libdevice/egl/eglDevice.cpp:551
 #, c-format
 msgid "Max number of EGL Configs is %d"
 msgstr "Max number of EGL Configs is %d"
 
-#: libdevice/egl/eglDevice.cpp:232
+#: libdevice/egl/eglDevice.cpp:231
 msgid "Using the 32bpp, low quality configuration"
 msgstr "Using the 32bpp, low quality configuration"
 
-#: libdevice/egl/eglDevice.cpp:234
+#: libdevice/egl/eglDevice.cpp:233
 msgid "eglChooseConfig(32-low) failed"
 msgstr "eglChooseConfig(32-low) failed"
 
-#: libdevice/egl/eglDevice.cpp:238
+#: libdevice/egl/eglDevice.cpp:237
 msgid "Using the 16bpp, low quality configuration"
 msgstr "Using the 16bpp, low quality configuration"
 
-#: libdevice/egl/eglDevice.cpp:240
+#: libdevice/egl/eglDevice.cpp:239
 msgid "eglChooseConfig(16-low) failed"
 msgstr "eglChooseConfig(16-low) failed"
 
-#: libdevice/egl/eglDevice.cpp:249
+#: libdevice/egl/eglDevice.cpp:248
 msgid "Using the 32bpp, medium quality configuration"
 msgstr "Using the 32bpp, medium quality configuration"
 
-#: libdevice/egl/eglDevice.cpp:251
+#: libdevice/egl/eglDevice.cpp:250
 msgid "eglChooseConfig(32-medium) failed"
 msgstr "eglChooseConfig(32-medium) failed"
 
-#: libdevice/egl/eglDevice.cpp:255 libdevice/egl/eglDevice.cpp:272
+#: libdevice/egl/eglDevice.cpp:254 libdevice/egl/eglDevice.cpp:271
 msgid "Using the 16bpp, medium quality configuration"
 msgstr "Using the 16bpp, medium quality configuration"
 
-#: libdevice/egl/eglDevice.cpp:257
+#: libdevice/egl/eglDevice.cpp:256
 msgid "eglChooseConfig(16-medium) failed"
 msgstr "eglChooseConfig(16-medium) failed"
 
-#: libdevice/egl/eglDevice.cpp:266
+#: libdevice/egl/eglDevice.cpp:265
 msgid "Using the 32bpp, high quality configuration"
 msgstr "Using the 32bpp, high quality configuration"
 
-#: libdevice/egl/eglDevice.cpp:268
+#: libdevice/egl/eglDevice.cpp:267
 msgid "eglChooseConfig(32-high) failed"
 msgstr "eglChooseConfig(32-high) failed"
 
-#: libdevice/egl/eglDevice.cpp:274
+#: libdevice/egl/eglDevice.cpp:273
 msgid "eglChooseConfig(16-high) failed"
 msgstr "eglChooseConfig(16-high) failed"
 
-#: libdevice/egl/eglDevice.cpp:284
+#: libdevice/egl/eglDevice.cpp:283
 msgid "EGL configuration doesn't match!"
 msgstr "EGL configuration doesn't match!"
 
-#: libdevice/egl/eglDevice.cpp:320
+#: libdevice/egl/eglDevice.cpp:319
 #, c-format
 msgid "eglGetConfigAttrib() failed (error %s)"
 msgstr "eglGetConfigAttrib() failed (error %s)"
 
-#: libdevice/egl/eglDevice.cpp:324
+#: libdevice/egl/eglDevice.cpp:323
 #, c-format
 msgid "EGL native visual is: %d"
 msgstr "EGL native visual is: %d"
 
-#: libdevice/egl/eglDevice.cpp:340
+#: libdevice/egl/eglDevice.cpp:339
 msgid "Initializing EGL for OpenGLES2"
 msgstr "Initialising EGL for OpenGLES2"
 
-#: libdevice/egl/eglDevice.cpp:342 libdevice/egl/eglDevice.cpp:362
+#: libdevice/egl/eglDevice.cpp:341 libdevice/egl/eglDevice.cpp:361
 #, c-format
-#, c-format,
 msgid "eglBindAPI() failed to retrieve the number of configs (error %s)"
 msgstr "eglBindAPI() failed to retrieve the number of configs (error %s)"
 
-#: libdevice/egl/eglDevice.cpp:350
+#: libdevice/egl/eglDevice.cpp:349
 msgid "Initializing EGL for OpenGLES1"
 msgstr "Initialising EGL for OpenGLES1"
 
-#: libdevice/egl/eglDevice.cpp:352
+#: libdevice/egl/eglDevice.cpp:351
 #, c-format
 msgid "eglBindAPI() failed to retrive the number of configs (error %s)"
 msgstr "eglBindAPI() failed to retrieve the number of configs (error %s)"
 
-#: libdevice/egl/eglDevice.cpp:360
+#: libdevice/egl/eglDevice.cpp:359
 msgid "Initializing EGL for OpenVG"
 msgstr "Initialising EGL for OpenVG"
 
-#: libdevice/egl/eglDevice.cpp:391
+#: libdevice/egl/eglDevice.cpp:390
 msgid "Initializing EGL Surface"
 msgstr "Initialising EGL Surface"
 
-#: libdevice/egl/eglDevice.cpp:398
+#: libdevice/egl/eglDevice.cpp:397
 #, c-format
 msgid "eglCreateWindowSurface failed (error %s)"
 msgstr "eglCreateWindowSurface failed (error %s)"
 
-#: libdevice/egl/eglDevice.cpp:412
+#: libdevice/egl/eglDevice.cpp:411
 #, c-format
 msgid "eglCreateContext failed (error %s)"
 msgstr "eglCreateContext failed (error %s)"
 
-#: libdevice/egl/eglDevice.cpp:424
+#: libdevice/egl/eglDevice.cpp:423
 #, c-format
 msgid "eglMakeCurrent failed (error %s)"
 msgstr "eglMakeCurrent failed (error %s)"
 
-#: libdevice/egl/eglDevice.cpp:556 gui/gtk/gtk_glue_ovg.cpp:395
+#: libdevice/egl/eglDevice.cpp:555 gui/gtk/gtk_glue_ovg.cpp:395
 msgid "Out of memory\n"
 msgstr "Out of memory\n"
 
-#: libdevice/egl/eglDevice.cpp:561 gui/gtk/gtk_glue_ovg.cpp:400
-#, c-format
-msgid "eglGetConfigs() failed to retrive the configs (error %s)"
-msgstr "eglGetConfigs() failed to retrive the configs (error %s)"
+#: libdevice/egl/eglDevice.cpp:560
+#, fuzzy, c-format
+msgid "eglGetConfigs() failed to retrieve the configs (error %s)"
+msgstr "eglGetConfigs() failed to retrieve the configs (error %s)"
 
-#: libdevice/egl/eglDevice.cpp:774
+#: libdevice/egl/eglDevice.cpp:773
 #, c-format
 msgid "eglCreatePbufferSurface() failed (error 0x%x)"
 msgstr "eglCreatePbufferSurface() failed (error 0x%x)"
 
-#: libdevice/egl/eglDevice.cpp:794 libdevice/egl/eglDevice.cpp:815
+#: libdevice/egl/eglDevice.cpp:793 libdevice/egl/eglDevice.cpp:814
 #, c-format
 msgid "eglCreatePbufferFromClientBuffer() failed (error 0x%x)"
 msgstr "eglCreatePbufferFromClientBuffer() failed (error 0x%x)"
@@ -7478,7 +7443,6 @@ msgstr "Could not open %s: %s"
 
 #: libdevice/events/MouseDevice.cpp:151
 #, c-format
-#, c-format,
 msgid "Could not set non-blocking mode for mouse device: %s"
 msgstr "Could not set non-blocking mode for mouse device: %s"
 
@@ -7703,8 +7667,8 @@ msgid "ioctl (EVIOCSABS(ABS_Y)): %s"
 msgstr "ioctl (EVIOCSABS(ABS_Y)): %s"
 
 #: libdevice/events/EventDevice.cpp:307
-#, c-format
-msgid "Type is: %s(%hd), Code is: %hd, Val us: %d"
+#, fuzzy, c-format
+msgid "Type is: %s(%hd), Code is: %hd, Val is: %d"
 msgstr "Type is: %s(%hd), Code is: %hd, Val us: %d"
 
 #: libdevice/events/EventDevice.cpp:388
@@ -7905,11 +7869,6 @@ msgstr ""
 "probably won't work precisely. Set TSCALIB environment variable with correct "
 "values for better results"
 
-#: libdevice/events/TouchDevice.cpp:318
-#, c-format
-msgid "Found a %s device for touchscreen input using %s"
-msgstr "Found a %s device for touchscreen input using %s"
-
 #: libdevice/events/UinputDevice.cpp:46
 msgid "ioctl(UI_DEV_DESTROY)"
 msgstr "ioctl(UI_DEV_DESTROY)"
@@ -7921,7 +7880,7 @@ msgstr "Found a User mode input device at %s"
 
 #: libdevice/events/UinputDevice.cpp:98
 msgid "User Mode Input device not initialized yet!"
-msgstr "User Mode Input device not initialized yet!"
+msgstr "User Mode Input device not initialised yet!"
 
 #: libdevice/events/UinputDevice.cpp:103
 msgid "ioctl(UI_SET_EVBIT, EV_KEY)"
@@ -7984,7 +7943,7 @@ msgstr "ioctl(UI_DEV_CREATED) failed!"
 
 #: libdevice/rawfb/RawFBDevice.cpp:63
 msgid "Couldn't initialize RAWFB device!"
-msgstr "Couldn't initialize RAWFB device!"
+msgstr "Couldn't initialise RAWFB device!"
 
 #: libdevice/rawfb/RawFBDevice.cpp:94
 msgid "Freeing framebuffer memory"
@@ -8050,57 +8009,57 @@ msgstr "Signaled fbe to reload it's colourmap."
 msgid "fakefb_ioctl(%d)"
 msgstr "fakefb_ioctl(%d)"
 
-#: libdevice/directfb/DirectFBDevice.cpp:79
+#: libdevice/directfb/DirectFBDevice.cpp:78
 msgid "Couldn't initialize DirectFB device!"
 msgstr "Couldn't initialise DirectFB device!"
 
-#: libdevice/directfb/DirectFBDevice.cpp:115
+#: libdevice/directfb/DirectFBDevice.cpp:114
 #, c-format
 msgid "DirectFBInit(): %s"
 msgstr "DirectFBInit(): %s"
 
-#: libdevice/directfb/DirectFBDevice.cpp:120
+#: libdevice/directfb/DirectFBDevice.cpp:119
 #, c-format
 msgid "DirectFBCreate(): %s"
 msgstr "DirectFBCreate(): %s"
 
-#: libdevice/directfb/DirectFBDevice.cpp:147
+#: libdevice/directfb/DirectFBDevice.cpp:146
 #, c-format
 msgid "CreateSurface(): %s"
 msgstr "CreateSurface(): %s"
 
-#: libdevice/directfb/DirectFBDevice.cpp:159
+#: libdevice/directfb/DirectFBDevice.cpp:158
 #, c-format
 msgid "CreateFont(): %s"
 msgstr "CreateFont(): %s"
 
-#: libdevice/directfb/DirectFBDevice.cpp:166
+#: libdevice/directfb/DirectFBDevice.cpp:165
 #, c-format
 msgid "CreateImageProvider(): %s"
 msgstr "CreateImageProvider(): %s"
 
-#: libdevice/directfb/DirectFBDevice.cpp:172
+#: libdevice/directfb/DirectFBDevice.cpp:171
 #, c-format
 msgid "GetDisplayLayer(): %s"
 msgstr "GetDisplayLayer(): %s"
 
-#: libdevice/directfb/DirectFBDevice.cpp:176
+#: libdevice/directfb/DirectFBDevice.cpp:175
 #, c-format
 msgid "GetScreen(): %s"
 msgstr "GetScreen(): %s"
 
-#: libdevice/directfb/DirectFBDevice.cpp:513
+#: libdevice/directfb/DirectFBDevice.cpp:512
 #, c-format
 msgid "GetDescription(): %s"
 msgstr "GetDescription(): %s"
 
-#: libdevice/directfb/DirectFBDevice.cpp:902
+#: libdevice/directfb/DirectFBDevice.cpp:901
 msgid "iDirectFB data not set!"
 msgstr "iDirectFB data not set!"
 
 #: libdevice/x11/X11Device.cpp:88 libdevice/x11/X11Device.cpp:106
 msgid "Couldn't initialize X11 device!"
-msgstr "Couldn't initialize X11 device!"
+msgstr "Couldn't initialise X11 device!"
 
 #: libdevice/x11/X11Device.cpp:142
 msgid "couldn't open X11 display!"
@@ -8199,27 +8158,33 @@ msgid "AOS4: Not enough memory for AHIiocopy!"
 msgstr "AOS4: Not enough memory for AHIiocopy!"
 
 #: libsound/aos4/sound_handler_ahi.cpp:607
-msgid "AOS4: audioTask:Initialize timer.."
-msgstr "AOS4: audioTask:Initialize timer.."
+#, fuzzy
+msgid "AOS4: audioTask:Initialize timer."
+msgstr "AOS4: audioTask:Initialise timer.."
 
 #: libsound/aos4/sound_handler_ahi.cpp:610
-msgid "AOS4: audioTask:Starting Timer.."
+#, fuzzy
+msgid "AOS4: audioTask:Starting Timer."
 msgstr "AOS4: audioTask:Starting Timer.."
 
 #: libsound/aos4/sound_handler_ahi.cpp:621
-msgid "AOS4: Closing Audio Thread.."
+#, fuzzy
+msgid "AOS4: Closing Audio Thread."
 msgstr "AOS4: Closing Audio Thread.."
 
 #: libsound/aos4/sound_handler_ahi.cpp:641
-msgid "AOS4: Cleaning Audio Stuff.."
+#, fuzzy
+msgid "AOS4: Cleaning Audio Stuff."
 msgstr "AOS4: Cleaning Audio Stuff.."
 
 #: libsound/aos4/sound_handler_ahi.cpp:675
-msgid "AOS4: Exit Audio Thread.."
+#, fuzzy
+msgid "AOS4: Exit Audio Thread."
 msgstr "AOS4: Exit Audio Thread.."
 
 #: libsound/aos4/sound_handler_ahi.cpp:677
-msgid "AOS4: audioTask:Close timer.."
+#, fuzzy
+msgid "AOS4: audioTask:Close timer."
 msgstr "AOS4: audioTask:Close timer.."
 
 #: libsound/sdl/sound_handler_sdl.cpp:91
@@ -8330,13 +8295,13 @@ msgid "Gnash soldumper version: %s, Gnash version: %s\n"
 msgstr "Gnash soldumper version: %s, Gnash version: %s\n"
 
 #: utilities/soldumper.cpp:121 utilities/processor.cpp:276
-#: utilities/flvdumper.cpp:154 cygnal/cygnal.cpp:475
+#: utilities/flvdumper.cpp:154 cygnal/cygnal.cpp:476
 #: cygnal/cgi-bin/echo/echo.cpp:144 cygnal/cgi-bin/echo/gateway.cpp:119
 #: cygnal/cgi-bin/fitcDemo/fitcDemo.cpp:149
 #: cygnal/cgi-bin/oflaDemo/oflaDemo.cpp:216
 #: cygnal/testsuite/libnet.all/test_handler.cpp:103
 #: cygnal/testsuite/libnet.all/generate_amfbins.cpp:95
-#: cygnal/testsuite/libnet.all/test_rtmp.cpp:109
+#: cygnal/testsuite/libnet.all/test_rtmp.cpp:110
 #: cygnal/testsuite/libnet.all/test_diskstream.cpp:91
 #: cygnal/testsuite/libnet.all/test_cache.cpp:94
 #: cygnal/testsuite/libamf.all/test_amfmsg.cpp:103
@@ -8553,7 +8518,7 @@ msgstr "\tTotal # of bytes: "
 #: utilities/flvdumper.cpp:172
 #: cygnal/testsuite/libnet.all/test_handler.cpp:112
 #: cygnal/testsuite/libnet.all/generate_amfbins.cpp:111
-#: cygnal/testsuite/libnet.all/test_rtmp.cpp:119
+#: cygnal/testsuite/libnet.all/test_rtmp.cpp:120
 #: cygnal/testsuite/libnet.all/test_diskstream.cpp:100
 #: cygnal/testsuite/libnet.all/test_cache.cpp:103
 #: cygnal/testsuite/libamf.all/test_amfmsg.cpp:119
@@ -8715,13 +8680,11 @@ msgstr "Failed opening file '%s' in binary mode"
 
 #: cygnal/libamf/sol.cpp:337
 #, c-format
-#, c-format,
 msgid "Error writing %d bytes of header to output file %s"
 msgstr "Error writing %d bytes of header to output file %s"
 
 #: cygnal/libamf/sol.cpp:344
 #, c-format
-#, c-format,
 msgid "Error writing %d bytes of body to output file %s"
 msgstr "Error writing %d bytes of body to output file %s"
 
@@ -8744,7 +8707,6 @@ msgstr "%s isn't an SOL file"
 
 #: cygnal/libamf/sol.cpp:455
 #, c-format
-#, c-format,
 msgid "Reading SharedObject %s: %s"
 msgstr "Reading SharedObject %s: %s"
 
@@ -9259,7 +9221,6 @@ msgstr "unable to accept: %s"
 
 #: cygnal/libnet/network.cpp:387
 #, c-format
-#, c-format,
 msgid "Accepting TCP/IP connection on fd #%d for port %d"
 msgstr "Accepting TCP/IP connection on fd #%d for port %d"
 
@@ -9384,7 +9345,6 @@ msgstr "Wrote zero out of %d bytes to fd #%d: %s"
 
 #: cygnal/libnet/network.cpp:1144
 #, c-format
-#, c-format,
 msgid "Couldn't write %d bytes to fd #%d: %s"
 msgstr "Couldn't write %d bytes to fd #%d: %s"
 
@@ -9696,7 +9656,8 @@ msgid "AMF0 Notify data packet message"
 msgstr "AMF0 Notify data packet message"
 
 #: cygnal/libnet/rtmp_client.cpp:841
-msgid "Flv data packet message"
+#, fuzzy
+msgid "FLV data packet message"
 msgstr "Flv data packet message"
 
 #: cygnal/libnet/rtmp_client.cpp:844
@@ -9704,8 +9665,8 @@ msgid "Couldn't decode RTMP message Body"
 msgstr "Couldn't decode RTMP message Body"
 
 #: cygnal/libnet/sslserver.cpp:136
-msgid "ssl!!"
-msgstr "ssl!!"
+msgid "SSL!!"
+msgstr ""
 
 #: cygnal/libnet/sslserver.cpp:159
 msgid "Got an incoming SSL connection request"
@@ -9860,8 +9821,7 @@ msgid "Enabling Keep Alive by default for HTTP > 1.0"
 msgstr "Enabling Keep Alive by default for HTTP > 1.0"
 
 #: cygnal/libnet/http.cpp:422 cygnal/libnet/http.cpp:521
-#, c-format
-#, c-format, fuzzy
+#, fuzzy, c-format
 msgid "Que empty, net connection dropped for fd #%d"
 msgstr "Queue empty, net connection dropped for fd #%d"
 
@@ -9927,13 +9887,11 @@ msgstr "==== The HTTP header breaks down as follows: ===="
 
 #: cygnal/libnet/http.cpp:1561
 #, c-format
-#, c-format,
 msgid "Filespec: %s"
 msgstr "Filespec: %s"
 
 #: cygnal/libnet/http.cpp:1562
 #, c-format
-#, c-format,
 msgid "Version: %d.%d"
 msgstr "Version: %d.%d"
 
@@ -9994,7 +9952,6 @@ msgstr "Using existing Buffer for file"
 
 #: cygnal/libnet/diskstream.cpp:493
 #, c-format
-#, c-format,
 msgid "Couldn't load file %s"
 msgstr "Couldn't load file %s"
 
@@ -10051,7 +10008,8 @@ msgstr "Done playing file %s, size was: %d"
 #: cygnal/libnet/diskstream.cpp:771
 #, c-format
 msgid "In %s(%d): couldn't write %d of bytes of data to net fd #%d! Got %d, %s"
-msgstr "In %s(%d): couldn't write %d of bytes of data to net fd #%d! Got %d, %s"
+msgstr ""
+"In %s(%d): couldn't write %d of bytes of data to net fd #%d! Got %d, %s"
 
 #: cygnal/libnet/diskstream.cpp:803
 msgid "Restarting Disk Stream from the beginning"
@@ -10109,10 +10067,11 @@ msgstr ""
 "The host key for this server was not found but an other type of key exists."
 
 #: cygnal/libnet/sshclient.cpp:221
+#, fuzzy
 msgid ""
-"An attacker might change the default server key to confuse your clientinto "
-"thinking the key does not exist\n"
-"We advise you to rerun the client with -d or -r for more safety."
+"An attacker might change the default server key to confuse your client into "
+"thinking the key does not existWe advise you to rerun the client with -d or -"
+"r for more safety."
 msgstr ""
 "An attacker might change the default server key to confuse your client into "
 "thinking the key does not exist\n"
@@ -10132,8 +10091,8 @@ msgid ""
 "This new key will be written on disk for further usage. do you agree? (yes,"
 "no) "
 msgstr ""
-"This new key will be written on disk for further usage. do you agree? "
-"(yes,no) "
+"This new key will be written on disk for further usage. do you agree? (yes,"
+"no) "
 
 #: cygnal/libnet/sshclient.cpp:266
 msgid "supported auth methods: "
@@ -10171,28 +10130,29 @@ msgid "Can't allocate memory for new SSH channel!"
 msgstr "Can't allocate memory for new SSH channel!"
 
 #: cygnal/libnet/sshclient.cpp:412
-msgid "Can't read from a non-existant channel!"
+#, fuzzy
+msgid "Can't read from a non-existent channel!"
 msgstr "Can't read from a non-existent channel!"
 
 #: cygnal/libnet/sshclient.cpp:427
-msgid "Can't write to a non-existant channel!"
+#, fuzzy
+msgid "Can't write to a non-existent channel!"
 msgstr "Can't write to a non-existent channel!"
 
 #: cygnal/crc.cpp:145
 #, c-format
-#, c-format,
 msgid "Couldn't open file: %s"
 msgstr "Couldn't open file: %s"
 
-#: cygnal/cygnal.cpp:189
+#: cygnal/cygnal.cpp:190
 msgid "cygnal -- a streaming media server."
 msgstr "cygnal -- a streaming media server."
 
-#: cygnal/cygnal.cpp:191
+#: cygnal/cygnal.cpp:192
 msgid "Usage: cygnal [options...]"
 msgstr "Usage: cygnal [options...]"
 
-#: cygnal/cygnal.cpp:192 cygnal/cgi-bin/echo/echo.cpp:316
+#: cygnal/cygnal.cpp:193 cygnal/cgi-bin/echo/echo.cpp:316
 #: cygnal/cgi-bin/echo/gateway.cpp:406
 #: cygnal/cgi-bin/fitcDemo/fitcDemo.cpp:321
 #: cygnal/cgi-bin/oflaDemo/oflaDemo.cpp:596
@@ -10208,11 +10168,11 @@ msgstr "Usage: cygnal [options...]"
 msgid "  -h,  --help          Print this help and exit"
 msgstr "  -h,  --help          Print this help and exit"
 
-#: cygnal/cygnal.cpp:193
+#: cygnal/cygnal.cpp:194
 msgid "  -V,  --version       Print version information and exit"
 msgstr "  -V,  --version       Print version information and exit"
 
-#: cygnal/cygnal.cpp:194 cygnal/cgi-bin/echo/echo.cpp:317
+#: cygnal/cygnal.cpp:195 cygnal/cgi-bin/echo/echo.cpp:317
 #: cygnal/cgi-bin/echo/gateway.cpp:407
 #: cygnal/cgi-bin/fitcDemo/fitcDemo.cpp:322
 #: cygnal/cgi-bin/oflaDemo/oflaDemo.cpp:597
@@ -10228,72 +10188,71 @@ msgstr "  -V,  --version       Print version information and exit"
 msgid "  -v,  --verbose       Output verbose debug info"
 msgstr "  -v,  --verbose       Output verbose debug info"
 
-#: cygnal/cygnal.cpp:195
+#: cygnal/cygnal.cpp:196
 msgid "  -s,  --singlethread  Disable Multi Threading"
 msgstr "  -s,  --singlethread  Disable Multi Threading"
 
-#: cygnal/cygnal.cpp:196 cygnal/cgi-bin/echo/echo.cpp:318
+#: cygnal/cygnal.cpp:197 cygnal/cgi-bin/echo/echo.cpp:318
 #: cygnal/cgi-bin/echo/gateway.cpp:408
 #: cygnal/cgi-bin/fitcDemo/fitcDemo.cpp:323
 #: cygnal/cgi-bin/oflaDemo/oflaDemo.cpp:598
 msgid "  -n,  --netdebug      Turn on net debugging messages"
 msgstr "  -n,  --netdebug      Turn on net debugging messages"
 
-#: cygnal/cygnal.cpp:197
+#: cygnal/cygnal.cpp:198
 msgid "  -o   --only-port     Only use port for debugging"
 msgstr "  -o   --only-port     Only use port for debugging"
 
-#: cygnal/cygnal.cpp:198
+#: cygnal/cygnal.cpp:199
 msgid "  -p   --port-offset   Port offset for debugging"
 msgstr "  -p   --port-offset   Port offset for debugging"
 
-#: cygnal/cygnal.cpp:199
+#: cygnal/cygnal.cpp:200
 msgid "  -t,  --testing       Turn on special Gnash testing support"
 msgstr "  -t,  --testing       Turn on special Gnash testing support"
 
-#: cygnal/cygnal.cpp:200
+#: cygnal/cygnal.cpp:201
 msgid "  -a,  --admin         Enable the administration thread"
 msgstr "  -a,  --admin         Enable the administration thread"
 
-#: cygnal/cygnal.cpp:201
+#: cygnal/cygnal.cpp:202
 msgid "  -r,  --root          Document root for all files"
 msgstr "  -r,  --root          Document root for all files"
 
-#: cygnal/cygnal.cpp:264
+#: cygnal/cygnal.cpp:265
 msgid ": couldn't open file: "
 msgstr ": couldn't open file: "
 
-#: cygnal/cygnal.cpp:341
+#: cygnal/cygnal.cpp:342
 #, c-format
-#, c-format,
 msgid "Couldn't connect to %s"
 msgstr "Couldn't connect to %s"
 
-#: cygnal/cygnal.cpp:361
+#: cygnal/cygnal.cpp:362
 #, c-format
 msgid "%s is active on fd #%d."
 msgstr "%s is active on fd #%d."
 
-#: cygnal/cygnal.cpp:499
+#: cygnal/cygnal.cpp:500
 #, c-format
 msgid "Extraneous argument: %s"
 msgstr "Extraneous argument: %s"
 
-#: cygnal/cygnal.cpp:503 cygnal/cgi-bin/oflaDemo/oflaDemo.cpp:441
+#: cygnal/cygnal.cpp:504 cygnal/cgi-bin/oflaDemo/oflaDemo.cpp:441
 #, c-format
 msgid "Document Root for media files is: %s"
 msgstr "Document Root for media files is: %s"
 
-#: cygnal/cygnal.cpp:585
+#: cygnal/cygnal.cpp:586
 msgid "Cygnal done..."
 msgstr "Cygnal done..."
 
-#: cygnal/cygnal.cpp:598
+#: cygnal/cygnal.cpp:599
 #, c-format
 msgid "Got a %d interrupt"
 msgstr "Got a %d interrupt"
 
-#: cygnal/cygnal.cpp:618
+#: cygnal/cygnal.cpp:619
 msgid ""
 "Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.\n"
 "Cygnal comes with NO WARRANTY, to the extent permitted by law.\n"
@@ -10305,119 +10264,119 @@ msgstr ""
 "You may redistribute copies of Cygnal under the terms of the GNU General\n"
 "Public License V3. For more information, see the file named COPYING.\n"
 
-#: cygnal/cygnal.cpp:640
+#: cygnal/cygnal.cpp:641
 #, c-format
 msgid "Starting Admin Handler for port %d"
 msgstr "Starting Admin Handler for port %d"
 
-#: cygnal/cygnal.cpp:642
+#: cygnal/cygnal.cpp:643
 msgid "Got an incoming Admin request"
 msgstr "Got an incoming Admin request"
 
-#: cygnal/cygnal.cpp:650
+#: cygnal/cygnal.cpp:651
 msgid "no more admin data, exiting...\n"
 msgstr "no more admin data, exiting...\n"
 
-#: cygnal/cygnal.cpp:735
+#: cygnal/cygnal.cpp:736
 msgid "admin_handler: Done...!\n"
 msgstr "admin_handler: Done...!\n"
 
-#: cygnal/cygnal.cpp:764
+#: cygnal/cygnal.cpp:765
 #, c-format
 msgid "Can't start %s Connection Handler for fd #%d, port %hd"
 msgstr "Can't start %s Connection Handler for fd #%d, port %hd"
 
-#: cygnal/cygnal.cpp:768
+#: cygnal/cygnal.cpp:769
 #, c-format
 msgid "Starting %s Connection Handler for fd #%d, port %hd"
 msgstr "Starting %s Connection Handler for fd #%d, port %hd"
 
-#: cygnal/cygnal.cpp:779
+#: cygnal/cygnal.cpp:780
 #, c-format
 msgid "This system has %d cpus."
 msgstr "This system has %d cpus."
 
-#: cygnal/cygnal.cpp:816
+#: cygnal/cygnal.cpp:817
 #, c-format
 msgid "No new %s network connections"
 msgstr "No new %s network connections"
 
-#: cygnal/cygnal.cpp:820
+#: cygnal/cygnal.cpp:821
 #, c-format
 msgid "*** New %s network connection for thread ID #%d, fd #%d ***"
 msgstr "*** New %s network connection for thread ID #%d, fd #%d ***"
 
-#: cygnal/cygnal.cpp:866
+#: cygnal/cygnal.cpp:867
 #, c-format
 msgid "Creating new %s Handler for %s using fd #%d"
 msgstr "Creating new %s Handler for %s using fd #%d"
 
-#: cygnal/cygnal.cpp:884
-#, c-format
-#, c-format, fuzzy
-msgid "Resuing %s Handler for %s using fd #%d"
+#: cygnal/cygnal.cpp:885
+#, fuzzy, c-format
+msgid "Reusing %s Handler for %s using fd #%d"
 msgstr "Reusing %s Handler for %s using fd #%d"
 
-#: cygnal/cygnal.cpp:910
+#: cygnal/cygnal.cpp:911
 #, c-format
 msgid "Creating new %s Handler for: %s for fd %#d"
 msgstr "Creating new %s Handler for: %s for fd %#d"
 
-#: cygnal/cygnal.cpp:934
+#: cygnal/cygnal.cpp:935
 #, c-format
 msgid "Cygnal Plugin paths are: %s"
 msgstr "Cygnal Plugin paths are: %s"
 
-#: cygnal/cygnal.cpp:955
+#: cygnal/cygnal.cpp:956
 #, c-format
 msgid "Couldn't load plugin for %s"
 msgstr "Couldn't load plugin for %s"
 
-#: cygnal/cygnal.cpp:966
+#: cygnal/cygnal.cpp:967
 #, c-format
 msgid "Number of active Threads is %d"
 msgstr "Number of active Threads is %d"
 
-#: cygnal/cygnal.cpp:969
+#: cygnal/cygnal.cpp:970
 #, c-format
 msgid "Restarting loop for next connection for port %d..."
 msgstr "Restarting loop for next connection for port %d..."
 
-#: cygnal/cygnal.cpp:1027
+#: cygnal/cygnal.cpp:1028
 #, c-format
 msgid "%d active disk streams"
 msgstr "%d active disk streams"
 
-#: cygnal/cygnal.cpp:1067
+#: cygnal/cygnal.cpp:1068
 #, c-format
 msgid "Got a hit for fd #%d, protocol %s"
 msgstr "Got a hit for fd #%d, protocol %s"
 
-#: cygnal/cygnal.cpp:1071
+#: cygnal/cygnal.cpp:1072
 msgid "No protocol specified!"
 msgstr "No protocol specified!"
 
-#: cygnal/cygnal.cpp:1079 cygnal/cygnal.cpp:1104 cygnal/cygnal.cpp:1115
+#: cygnal/cygnal.cpp:1080 cygnal/cygnal.cpp:1105 cygnal/cygnal.cpp:1116
 #, c-format
 msgid "Done with HTTP connection for fd #%d, CGI %s"
 msgstr "Done with HTTP connection for fd #%d, CGI %s"
 
-#: cygnal/cygnal.cpp:1084
+#: cygnal/cygnal.cpp:1085
 #, c-format
 msgid "Not Done with HTTP connection for fd #%d, it's a persistent connection."
-msgstr "Not Done with HTTP connection for fd #%d, it's a persistent connection."
+msgstr ""
+"Not Done with HTTP connection for fd #%d, it's a persistent connection."
 
-#: cygnal/cygnal.cpp:1093
+#: cygnal/cygnal.cpp:1094
 #, c-format
 msgid "Done with RTMP connection for fd #%d, CGI "
 msgstr "Done with RTMP connection for fd #%d, CGI "
 
-#: cygnal/cygnal.cpp:1127
+#: cygnal/cygnal.cpp:1128
 #, c-format
 msgid "Unsupported network protocol for fd #%d, %d"
 msgstr "Unsupported network protocol for fd #%d, %d"
 
-#: cygnal/cygnal.cpp:1147
+#: cygnal/cygnal.cpp:1148
 #, c-format
 msgid "Got no hits, %d retries"
 msgstr "Got no hits, %d retries"
@@ -10426,7 +10385,6 @@ msgstr "Got no hits, %d retries"
 #: cygnal/cgi-bin/fitcDemo/fitcDemo.cpp:166
 #: cygnal/cgi-bin/oflaDemo/oflaDemo.cpp:233
 #, c-format
-#, c-format,
 msgid "Error parsing command line options: %s"
 msgstr "Error parsing command line options: %s"
 
@@ -10446,7 +10404,6 @@ msgstr "  -p,  --netdebug      port for network"
 
 #: cygnal/cgi-bin/oflaDemo/oflaDemo.cpp:309
 #, c-format
-#, c-format,
 msgid "Scanning directory \"%s\" for %s files"
 msgstr "Scanning directory \"%s\" for %s files"
 
@@ -10604,7 +10561,7 @@ msgstr "ERROR: Unidentified AMF header data type 0x%x"
 
 #: cygnal/testsuite/libnet.all/test_handler.cpp:113
 #: cygnal/testsuite/libnet.all/generate_amfbins.cpp:112
-#: cygnal/testsuite/libnet.all/test_rtmp.cpp:120
+#: cygnal/testsuite/libnet.all/test_rtmp.cpp:121
 #: cygnal/testsuite/libnet.all/test_diskstream.cpp:101
 #: cygnal/testsuite/libnet.all/test_cache.cpp:104
 #: cygnal/testsuite/libamf.all/test_amfmsg.cpp:120
@@ -10629,7 +10586,7 @@ msgid "  -d,  --dump          Dump data structures"
 msgstr "  -d,  --dump          Dump data structures"
 
 #: cygnal/testsuite/libnet.all/generate_amfbins.cpp:99
-#: cygnal/testsuite/libnet.all/test_rtmp.cpp:112
+#: cygnal/testsuite/libnet.all/test_rtmp.cpp:113
 #: cygnal/testsuite/libamf.all/test_amfmsg.cpp:107
 #: cygnal/testsuite/libamf.all/test_sol.cpp:106
 #: cygnal/testsuite/libamf.all/test_el.cpp:95
@@ -10725,7 +10682,6 @@ msgstr "Could not detect controlling TTY"
 
 #: gui/fb/fb.cpp:548 gui/fb/fb.cpp:585 gui/fb/fb.cpp:619 gui/fb/fb.cpp:670
 #, c-format
-#, c-format,
 msgid "Could not open %s"
 msgstr "Could not open %s"
 
@@ -10739,19 +10695,16 @@ msgstr "Could not request a new VT"
 
 #: gui/fb/fb.cpp:579 gui/fb/fb.cpp:613 gui/fb/fb.cpp:664
 #, c-format
-#, c-format,
 msgid "Could not find device for VT number %d"
 msgstr "Could not find device for VT number %d"
 
 #: gui/fb/fb.cpp:590 gui/fb/fb.cpp:675
 #, c-format
-#, c-format,
 msgid "Could not activate VT number %d"
 msgstr "Could not activate VT number %d"
 
 #: gui/fb/fb.cpp:596 gui/fb/fb.cpp:681
 #, c-format
-#, c-format,
 msgid "Error waiting for VT %d becoming active"
 msgstr "Error waiting for VT %d becoming active"
 
@@ -10806,7 +10759,7 @@ msgstr "EGL: getDisplay ok"
 
 #: gui/fb/fb_glue_gles1.cpp:104
 msgid "EGL: initialize ok"
-msgstr "EGL: initialize ok"
+msgstr "EGL: initialise ok"
 
 #: gui/fb/fb_glue_gles1.cpp:111
 msgid "EGL: config ok"
@@ -10835,7 +10788,7 @@ msgstr "failed to create a render handler for AGG!"
 
 #: gui/fb/fb_glue_agg.cpp:151
 msgid "No Device layer initialized yet!"
-msgstr "No Device layer initialized yet!"
+msgstr "No Device layer initialised yet!"
 
 #: gui/fb/fb_glue_agg.cpp:182
 msgid "The pixel format of your framebuffer could not be detected."
@@ -11452,7 +11405,6 @@ msgstr "Jump Backward"
 
 #: gui/pythonmod/gnash-view.cpp:220 gui/Player.cpp:288
 #, c-format
-#, c-format,
 msgid "Could not create sound handler: %s. Will continue without sound."
 msgstr "Could not create sound handler: %s. Will continue without sound."
 
@@ -11538,7 +11490,7 @@ msgstr "Mouse show/hide not yet supported in this GUI"
 
 #: gui/gui.cpp:282
 msgid "Can't update stage matrix till VM is initialized"
-msgstr "Can't update stage matrix till VM is initialized"
+msgstr "Can't update stage matrix till VM is initialised"
 
 #: gui/gui.cpp:334
 #, c-format
@@ -11556,13 +11508,15 @@ msgid "Invalid vertical align %d"
 msgstr "Invalid vertical align %d"
 
 #: gui/gui.cpp:900
-msgid "Gui is in stop mode, won't start application"
+#, fuzzy
+msgid "GUI is in stop mode, won't start application"
 msgstr "GUI is in stop mode, won't start application"
 
 #: gui/gui.cpp:1261
 #, c-format
 msgid "This gui didn't override 'yesno', assuming 'yes' answer to question: %s"
-msgstr "This GUI didn't override 'yesno', assuming 'yes' answer to question: %s"
+msgstr ""
+"This GUI didn't override 'yesno', assuming 'yes' answer to question: %s"
 
 #: gui/gui.cpp:1270
 msgid "Gui::setQuality called before a movie_root was available"
@@ -11638,6 +11592,11 @@ msgstr "Could not create OPENVG renderer"
 msgid "No off screen buffer!"
 msgstr "No off screen buffer!"
 
+#: gui/gtk/gtk_glue_ovg.cpp:400
+#, c-format
+msgid "eglGetConfigs() failed to retrive the configs (error %s)"
+msgstr "eglGetConfigs() failed to retrieve the configs (error %s)"
+
 #: gui/gtk/gtk_glue_agg_vaapi.cpp:163
 msgid "WARNING: failed to create VA-API display."
 msgstr "WARNING: failed to create VA-API display."
@@ -11661,19 +11620,17 @@ msgstr "failed to associate VA-API subpicture."
 
 #: gui/gtk/gtk_glue_agg_vaapi.cpp:371
 #, c-format
-#, c-format,
 msgid "failed to setup video window for surface 0x%08x."
 msgstr "failed to setup video window for surface 0x%08x."
 
 #: gui/gtk/gtk_glue_agg_vaapi.cpp:378
 #, c-format
-#, c-format,
 msgid "failed to associate subpicture to surface 0x%08x."
 msgstr "failed to associate subpicture to surface 0x%08x."
 
 #: gui/gtk/gtk.cpp:159
 msgid "Failed to initialize X threading support\n"
-msgstr "Failed to initialize X threading support\n"
+msgstr "Failed to initialise X threading support\n"
 
 #: gui/gtk/gtk.cpp:202
 msgid "This system lacks a hardware OpenGL driver!"
@@ -11981,79 +11938,72 @@ msgstr ""
 msgid "Field name is: %s: "
 msgstr "Field name is: %s: "
 
-#, c-format
+#~ msgid "get url: target %s is not a sprite"
+#~ msgstr "get URL: target %s is not a sprite"
+
+#~ msgid "Found a %s device for touchscreen input using %s"
+#~ msgstr "Found a %s device for touchscreen input using %s"
+
+#~ msgid "ssl!!"
+#~ msgstr "ssl!!"
+
 #~ msgid "%s on Haiku"
 #~ msgstr "%s on Haiku"
 
-#, c-format
 #~ msgid "%s on w32"
 #~ msgstr "%s on w32"
 
-#, c-format
 #~ msgid "Connecting to %s"
 #~ msgstr "Connecting to %s"
 
 #~ msgid "Doing incomplete packet"
 #~ msgstr "Doing incomplete packet"
 
-#, c-format
 #~ msgid "Received %s"
 #~ msgstr "Received %s"
 
 #~ msgid "Sent bytes received"
 #~ msgstr "Sent bytes received"
 
-#, c-format
 #~ msgid "%s, channel: %0x"
 #~ msgstr "%s, channel: %0x"
 
-#, c-format
 #~ msgid "Calling remote method %s"
 #~ msgstr "Calling remote method %s"
 
 #~ msgid "Handshake completed"
 #~ msgstr "Handshake completed"
 
-#, c-format
 #~ msgid "Server Uptime : %d"
 #~ msgstr "Server Uptime : %d"
 
-#, c-format
 #~ msgid "FMS Version   : %d.%d.%d.%d"
 #~ msgstr "FMS Version   : %d.%d.%d.%d"
 
-#, c-format
 #~ msgid "Sending control type %s %s"
 #~ msgstr "Sending control type %s %s"
 
-#, c-format
 #~ msgid "Changed chunk size to %d"
 #~ msgstr "Changed chunk size to %d"
 
-#, c-format
 #~ msgid "Received control packet %s with argument %s"
 #~ msgstr "Received control packet %s with argument %s"
 
-#, c-format
 #~ msgid "Stream is recorded: %s"
 #~ msgstr "Stream is recorded: %s"
 
-#, c-format
 #~ msgid "Server bandwidth is %s"
 #~ msgstr "Server bandwidth is %s"
 
-#, c-format
 #~ msgid "Client bandwidth is %d %d"
 #~ msgstr "Client bandwidth is %d %d"
 
-#, c-format
 #~ msgid "PNG warning: %s"
 #~ msgstr "PNG warning: %s"
 
 #~ msgid "Converting palette PNG to RGB(A)"
 #~ msgstr "Converting palette PNG to RGB(A)"
 
-#, c-format
 #~ msgid "Setting grey bit depth(%d) to 8"
 #~ msgstr "Setting grey bit depth(%d) to 8"
 
@@ -12069,21 +12019,18 @@ msgstr "Field name is: %s: "
 #~ msgid "Converting greyscale PNG to RGB(A)"
 #~ msgstr "Converting greyscale PNG to RGB(A)"
 
-#, c-format
 #~ msgid "inflater_impl::reset() inflateReset() returned %d"
 #~ msgstr "inflater_impl::reset() inflateReset() returned %d"
 
 #~ msgid "Inflater is in error condition"
 #~ msgstr "Inflater is in error condition"
 
-#, c-format
 #~ msgid "inflater reset due to seek back from %d to %d"
 #~ msgstr "inflater reset due to seek back from %d to %d"
 
 #~ msgid "Trouble: can't seek any further.. "
 #~ msgstr "Trouble: can't seek any further.. "
 
-#, c-format
 #~ msgid "inflateInit() returned %d"
 #~ msgstr "inflateInit() returned %d"
 
@@ -12093,29 +12040,24 @@ msgstr "Field name is: %s: "
 #~ msgid "Socket interrupted by a system call"
 #~ msgstr "Socket interrupted by a system call"
 
-#, c-format
 #~ msgid "Plugins path: %s"
 #~ msgstr "Plugins path: %s"
 
-#, c-format
 #~ msgid "Scanning directory \"%s\" for plugins"
 #~ msgstr "Scanning directory \"%s\" for plugins"
 
-#, c-format
 #~ msgid "Gnash Plugin name: %s"
 #~ msgstr "Gnash Plugin name: %s"
 
 #~ msgid "~CurlSession"
 #~ msgstr "~CurlSession"
 
-#, c-format
 #~ msgid "curl write callback called for (%d) bytes"
 #~ msgstr "curl write callback called for (%d) bytes"
 
 #~ msgid "Not running: fillCacheNonBlocking returning"
 #~ msgstr "Not running: fillCacheNonBlocking returning"
 
-#, c-format
 #~ msgid "fillCache(%d), called, currently cached: %d"
 #~ msgstr "fillCache(%d), called, currently cached: %d"
 
@@ -12125,76 +12067,60 @@ msgstr "Field name is: %s: "
 #~ msgid "Already enough bytes cached: returning"
 #~ msgstr "Already enough bytes cached: returning"
 
-#, c-format
 #~ msgid "User timeout is %u milliseconds"
 #~ msgstr "User timeout is %u milliseconds"
 
-#, c-format
 #~ msgid "Max fd: %d"
 #~ msgstr "Max fd: %d"
 
 #~ msgid "curl_multi_fdset: maxfd == %1%"
 #~ msgstr "curl_multi_fdset: maxfd == %1%"
 
-#, c-format
 #~ msgid "select() with %d milliseconds timeout"
 #~ msgstr "select() with %d milliseconds timeout"
 
 #~ msgid "select() was interrupted by a signal"
 #~ msgstr "select() was interrupted by a signal"
 
-#, c-format
 #~ msgid "select() timed out, elapsed is %u"
 #~ msgstr "select() timed out, elapsed is %u"
 
 #~ msgid "FD activity, resetting progress timer"
 #~ msgstr "FD activity, resetting progress timer"
 
-#, c-format
 #~ msgid "CurlStreamFile %p created"
 #~ msgstr "CurlStreamFile %p created"
 
-#, c-format
 #~ msgid "CurlStreamFile %p deleted"
 #~ msgstr "CurlStreamFile %p deleted"
 
-#, c-format
 #~ msgid "read(%d) called"
 #~ msgstr "read(%d) called"
 
-#, c-format
 #~ msgid "_cache.tell = %d"
 #~ msgstr "_cache.tell = %d"
 
-#, c-format
 #~ msgid "readNonBlocking(%d) called"
 #~ msgstr "readNonBlocking(%d) called"
 
-#, c-format
 #~ msgid "eof() returning %d"
 #~ msgstr "eof() returning %d"
 
-#, c-format
 #~ msgid "tell() returning %ld"
 #~ msgstr "tell() returning %ld"
 
-#, c-format
 #~ msgid "Warning: seek backward requested (%ld from %ld)"
 #~ msgstr "Warning: seek backward requested (%ld from %ld)"
 
-#, c-format
 #~ msgid "get_stream_size() returning %lu"
 #~ msgstr "get_stream_size() returning %lu"
 
-#, c-format
 #~ msgid "Importing cookies from file '%s'"
 #~ msgstr "Importing cookies from file '%s'"
 
-#, c-format
 #~ msgid "Exporting cookies file '%s'"
 #~ msgstr "Exporting cookies file '%s'"
 
-#, c-format
 #~ msgid "making curl stream for %s"
 #~ msgstr "making curl stream for %s"
 
@@ -12205,61 +12131,49 @@ msgstr "Field name is: %s: "
 #~ "No shared memory key specified in rcfile. Using default for communication "
 #~ "with other players"
 
-#, c-format
 #~ msgid "Using shared memory key %s"
 #~ msgstr "Using shared memory key %s"
 
-#, c-format
 #~ msgid "Found interlaced GIF (%d x %d)"
 #~ msgstr "Found interlaced GIF (%d x %d)"
 
-#, c-format
 #~ msgid "Found non-interlaced GIF (%d x %d)"
 #~ msgstr "Found non-interlaced GIF (%d x %d)"
 
 #~ msgid "Long jump: banzaaaaaai!"
 #~ msgstr "Long jump: banzaaaaaai!"
 
-#, c-format
 #~ msgid "GC %p created"
 #~ msgstr "GC %p created"
 
-#, c-format
 #~ msgid "GC deleted, deleting all managed resources - collector run %d times"
 #~ msgstr "GC deleted, deleting all managed resources - collector run %d times"
 
 #~ msgid "GC: sweep scan started"
 #~ msgstr "GC: sweep scan started"
 
-#, c-format
 #~ msgid "GC: recycling object %p (%s)"
 #~ msgstr "GC: recycling object %p (%s)"
 
-#, c-format
 #~ msgid "GC: recycled %d unreachable resources - %d left"
 #~ msgstr "GC: recycled %d unreachable resources - %d left"
 
-#, c-format
 #~ msgid ""
-#~ "GC: collection cycle started - %d/%d new resources allocated since last run "
-#~ "(from %d to %d)"
+#~ "GC: collection cycle started - %d/%d new resources allocated since last "
+#~ "run (from %d to %d)"
 #~ msgstr ""
-#~ "GC: collection cycle started - %d/%d new resources allocated since last run "
-#~ "(from %d to %d)"
+#~ "GC: collection cycle started - %d/%d new resources allocated since last "
+#~ "run (from %d to %d)"
 
-#, c-format
 #~ msgid "amf0 read bool: %d"
 #~ msgstr "amf0 read bool: %d"
 
-#, c-format
 #~ msgid "amf0 read double: %e"
 #~ msgstr "amf0 read double: %e"
 
-#, c-format
 #~ msgid "amf0 read string: %s"
 #~ msgstr "amf0 read string: %s"
 
-#, c-format
 #~ msgid "amf0 read long string: %s"
 #~ msgstr "amf0 read long string: %s"
 
@@ -12279,31 +12193,24 @@ msgstr "Field name is: %s: "
 #~ msgid "Warning: AGG renderer skipping a whole character"
 #~ msgstr "Warning: AGG renderer skipping a whole character"
 
-#, c-format
 #~ msgid "Framebuffer pixel format is %s (little-endian host)"
 #~ msgstr "Framebuffer pixel format is %s (little-endian host)"
 
-#, c-format
 #~ msgid "Framebuffer pixel format is %s (big-endian host)"
 #~ msgstr "Framebuffer pixel format is %s (big-endian host)"
 
-#, c-format
 #~ msgid "There are %d bytes in the network buffer"
 #~ msgstr "There are %d bytes in the network buffer"
 
-#, c-format
 #~ msgid "to_primitive(%s)"
 #~ msgstr "to_primitive(%s)"
 
-#, c-format
 #~ msgid "to_primitive: method call returned %s"
 #~ msgstr "to_primitive: method call returned %s"
 
-#, c-format
 #~ msgid "to_primitive(%s, NUMBER) threw an ActionTypeError %s"
 #~ msgstr "to_primitive(%s, NUMBER) threw an ActionTypeError %s"
 
-#, c-format
 #~ msgid "Loading native class %s"
 #~ msgstr "Loading native class %s"
 
@@ -12328,11 +12235,9 @@ msgstr "Field name is: %s: "
 #~ msgid "processRequests: lock on requests: release"
 #~ msgstr "processRequests: lock on requests: release"
 
-#, c-format
 #~ msgid "Movie loader thread processing request for target %s"
 #~ msgstr "Movie loader thread processing request for target %s"
 
-#, c-format
 #~ msgid "Movie loader thread completed request for target %s"
 #~ msgstr "Movie loader thread completed request for target %s"
 
@@ -12367,13 +12272,12 @@ msgstr "Field name is: %s: "
 #~ msgid "clear: lock on requests: release if not after notify_all"
 #~ msgstr "clear: lock on requests: release if not after notify_all"
 
-#, c-format
 #~ msgid "processCompletedRequest: _level loading (level %u)"
 #~ msgstr "processCompletedRequest: _level loading (level %u)"
 
-#, c-format
 #~ msgid "Target %s of a loadMovie request doesn't exist at load complete time"
-#~ msgstr "Target %s of a loadMovie request doesn't exist at load complete time"
+#~ msgstr ""
+#~ "Target %s of a loadMovie request doesn't exist at load complete time"
 
 #~ msgid "processCompletedRequests: lock on requests: trying"
 #~ msgstr "processCompletedRequests: lock on requests: trying"
@@ -12381,14 +12285,12 @@ msgstr "Field name is: %s: "
 #~ msgid "processCompletedRequests: lock on requests: obtained"
 #~ msgstr "processCompletedRequests: lock on requests: obtained"
 
-#, c-format
 #~ msgid "Checking %d requests for completeness"
 #~ msgstr "Checking %d requests for completeness"
 
 #~ msgid "processCompletedRequests: lock on requests: releasing"
 #~ msgstr "processCompletedRequests: lock on requests: releasing"
 
-#, c-format
 #~ msgid "Load request for target %s completed"
 #~ msgstr "Load request for target %s completed"
 
@@ -12401,7 +12303,6 @@ msgstr "Field name is: %s: "
 #~ msgid "processCompletedRequests: lock on requests for removal: release"
 #~ msgstr "processCompletedRequests: lock on requests for removal: release"
 
-#, c-format
 #~ msgid "MovieLoader::loadMovie(%s, %s)"
 #~ msgstr "MovieLoader::loadMovie(%s, %s)"
 
@@ -12426,66 +12327,51 @@ msgstr "Field name is: %s: "
 #~ msgid "setReachable: lock on requests: release"
 #~ msgstr "setReachable: lock on requests: release"
 
-#, c-format
 #~ msgid "moveTo: %ld,%ld"
 #~ msgstr "moveTo: %ld,%ld"
 
-#, c-format
 #~ msgid "lineTo: %ld,%ld"
 #~ msgstr "lineTo: %ld,%ld"
 
-#, c-format
 #~ msgid "conicTo: %ld,%ld %ld,%ld"
 #~ msgstr "conicTo: %ld,%ld %ld,%ld"
 
-#, c-format
 #~ msgid "cubicTo: %ld,%ld %ld,%ld %ld,%ld"
 #~ msgstr "cubicTo: %ld,%ld %ld,%ld %ld,%ld"
 
-#, c-format
 #~ msgid "Found %d fonts matching the family %s (using first)"
 #~ msgstr "Found %d fonts matching the family %s (using first)"
 
-#, c-format
 #~ msgid "Matching font %d has unknown filename, skipping"
 #~ msgstr "Matching font %d has unknown filename, skipping"
 
-#, c-format
 #~ msgid "Loading font from file %d"
 #~ msgstr "Loading font from file %d"
 
-#, c-format
 #~ msgid "EM square for font '%s' is %d, scale is this %g"
 #~ msgstr "EM square for font '%s' is %d, scale is this %g"
 
-#, c-format
 #~ msgid "Advance value for glyph '%c' is %g (horiAdvance:%ld, scale:%g)"
 #~ msgstr "Advance value for glyph '%c' is %g (horiAdvance:%ld, scale:%g)"
 
-#, c-format
 #~ msgid "Decomposing glyph outline for DisplayObject %u"
 #~ msgstr "Decomposing glyph outline for DisplayObject %u"
 
-#, c-format
 #~ msgid "Decomposed glyph for DisplayObject '%c' has bounds %s"
 #~ msgstr "Decomposed glyph for DisplayObject '%c' has bounds %s"
 
 #~ msgid "completeLoad called"
 #~ msgstr "completeLoad called"
 
-#, c-format
 #~ msgid "Read %u bytes"
 #~ msgstr "Read %u bytes"
 
-#, c-format
 #~ msgid "toparse: %s"
 #~ msgstr "toparse: %s"
 
-#, c-format
 #~ msgid "parseable: %s"
 #~ msgstr "parseable: %s"
 
-#, c-format
 #~ msgid "toparse nextline: %s"
 #~ msgstr "toparse nextline: %s"
 
@@ -12498,19 +12384,15 @@ msgstr "Field name is: %s: "
 #~ msgid "Initial connection complete"
 #~ msgstr "Initial connection complete"
 
-#, c-format
 #~ msgid "Connection to movie: %s"
 #~ msgstr "Connection to movie: %s"
 
-#, c-format
 #~ msgid "NetConnection.call(%s)"
 #~ msgstr "NetConnection.call(%s)"
 
-#, c-format
 #~ msgid "Invoke name %s"
 #~ msgstr "Invoke name %s"
 
-#, c-format
 #~ msgid "Invoking %s(%s)"
 #~ msgstr "Invoking %s(%s)"
 
@@ -12523,17 +12405,15 @@ msgstr "Field name is: %s: "
 #~ msgid "NetConnection.call(): encoded args from %1% calls: %2%"
 #~ msgstr "NetConnection.call(): encoded args from %1% calls: %2%"
 
-#, c-format
 #~ msgid "Attempt to read %d bytes"
 #~ msgstr "Attempt to read %d bytes"
 
-#, c-format
 #~ msgid ""
-#~ "NetConnection.call: reply buffer capacity (%d) is too small to accept next "
-#~ "%d bytes of chunk (current size is %d). Reserving %d bytes."
+#~ "NetConnection.call: reply buffer capacity (%d) is too small to accept "
+#~ "next %d bytes of chunk (current size is %d). Reserving %d bytes."
 #~ msgstr ""
-#~ "NetConnection.call: reply buffer capacity (%d) is too small to accept next %"
-#~ "d bytes of chunk (current size is %d). Reserving %d bytes."
+#~ "NetConnection.call: reply buffer capacity (%d) is too small to accept "
+#~ "next %d bytes of chunk (current size is %d). Reserving %d bytes."
 
 #~ msgid "read '%1%' bytes: %2%"
 #~ msgstr "read '%1%' bytes: %2%"
@@ -12544,31 +12424,24 @@ msgstr "Field name is: %s: "
 #~ msgid "hit eof"
 #~ msgstr "hit eof"
 
-#, c-format
 #~ msgid "Invoke: read method string %s"
 #~ msgstr "Invoke: read method string %s"
 
-#, c-format
 #~ msgid "Server invoking <%s>"
 #~ msgstr "Server invoking <%s>"
 
-#, c-format
 #~ msgid "Received result for method call %s"
 #~ msgstr "Received result for method call %s"
 
-#, c-format
 #~ msgid "Value: %s"
 #~ msgstr "Value: %s"
 
-#, c-format
 #~ msgid "Received server call %s %s"
 #~ msgstr "Received server call %s %s"
 
-#, c-format
 #~ msgid "AMF buffer for _onbwdone: %s\n"
 #~ msgstr "AMF buffer for _onbwdone: %s\n"
 
-#, c-format
 #~ msgid "Latency: %s, bandwidth %s"
 #~ msgstr "Latency: %s, bandwidth %s"
 
@@ -12582,14 +12455,12 @@ msgstr "Field name is: %s: "
 #~ msgid "ExternalInterface not accessible when running standalone."
 #~ msgstr "ExternalInterface not accessible when running standalone."
 
-#, c-format
 #~ msgid "adding callback %s"
 #~ msgstr "adding callback %s"
 
 #~ msgid "ExternalInterface not accessible on call."
 #~ msgstr "ExternalInterface not accessible on call."
 
-#, c-format
 #~ msgid "Calling External method \"%s\""
 #~ msgstr "Calling External method \"%s\""
 
@@ -12614,39 +12485,30 @@ msgstr "Field name is: %s: "
 #~ msgid "Loading flash.geom.ColorTransform class"
 #~ msgstr "Loading flash.geom.ColourTransform class"
 
-#, c-format
 #~ msgid "(Matrix.concat) This matrix (pre-transform): %s"
 #~ msgstr "(Matrix.concat) This matrix (pre-transform): %s"
 
-#, c-format
 #~ msgid "(Matrix.concat) Transform matrix: %s"
 #~ msgstr "(Matrix.concat) Transform matrix: %s"
 
-#, c-format
 #~ msgid "(Matrix.concat) This matrix (post-transform): %s"
 #~ msgstr "(Matrix.concat) This matrix (post-transform): %s"
 
-#, c-format
 #~ msgid "(Matrix.rotate) This matrix (pre-transform): %s"
 #~ msgstr "(Matrix.rotate) This matrix (pre-transform): %s"
 
-#, c-format
 #~ msgid "(Matrix.rotate) Transformation matrix: %s"
 #~ msgstr "(Matrix.rotate) Transformation matrix: %s"
 
-#, c-format
 #~ msgid "(Matrix.rotate) This matrix (post-transform): %s"
 #~ msgstr "(Matrix.rotate) This matrix (post-transform): %s"
 
-#, c-format
 #~ msgid "(Matrix.scale) This matrix (pre-transform): %s"
 #~ msgstr "(Matrix.scale) This matrix (pre-transform): %s"
 
-#, c-format
 #~ msgid "(Matrix.scale) Transformation matrix: %s"
 #~ msgstr "(Matrix.scale) Transformation matrix: %s"
 
-#, c-format
 #~ msgid "(Matrix.scale) This matrix (post-transform): %s"
 #~ msgstr "(Matrix.scale) This matrix (post-transform): %s"
 
@@ -12704,102 +12566,82 @@ msgstr "Field name is: %s: "
 #~ msgid "Attaching the aux streamer"
 #~ msgstr "Attaching the aux streamer"
 
-#, c-format
 #~ msgid "Seeked MediaParser to %d, returned: %d"
 #~ msgstr "Seeked MediaParser to %d, returned: %d"
 
-#, c-format
 #~ msgid "Sound.start: secOff:%d"
 #~ msgstr "Sound.start: secOff:%d"
 
-#, c-format
 #~ msgid "MovieClip.loadVariables(%s) - TESTING "
 #~ msgstr "MovieClip.loadVariables(%s) - TESTING "
 
-#, c-format
 #~ msgid "%s.lineTo(%g,%g);"
 #~ msgstr "%s.lineTo(%g,%g);"
 
-#, c-format
 #~ msgid "%s.curveTo(%g,%g,%g,%g);"
 #~ msgstr "%s.curveTo(%g,%g,%g,%g);"
 
-#, c-format
-#, c-format,
 #~ msgid ""
 #~ "%s.beginGradientFill(%s): too many array elements for colors and ratios "
 #~ "(%d), will trim to 8"
 #~ msgstr ""
-#~ "%s.beginGradientFill(%s) : too many array elements for colours and ratios (%"
-#~ "d), will trim to 8"
+#~ "%s.beginGradientFill(%s) : too many array elements for colours and ratios "
+#~ "(%d), will trim to 8"
 
 #~ msgid "MovieClip.attachBitmap: first argument should be a valid BitmapData"
 #~ msgstr "MovieClip.attachBitmap: first argument should be a valid BitmapData"
 
-#, c-format
 #~ msgid "MovieClip.attachBitmap: expected 2 args, got %d"
 #~ msgstr "MovieClip.attachBitmap: expected 2 args, got %d"
 
-#, c-format
 #~ msgid "%s: the camera is automatically chosen from gnashrc"
 #~ msgstr "%s: the camera is automatically chosen from gnashrc"
 
 #~ msgid "SOL: skip serialization of FUNCTION property"
 #~ msgstr "SOL: skip serialisation of FUNCTION property"
 
-#, c-format
 #~ msgid "SharedObject %s not flushed (compiled as read-only mode)"
 #~ msgstr "SharedObject %s not flushed (compiled as read-only mode)"
 
 #~ msgid "Empty SOLSafeDir directive: we'll use '/tmp'"
 #~ msgstr "Empty SOLSafeDir directive: we'll use '/tmp'"
 
-#, c-format
 #~ msgid "Invalid SOL safe dir %s: %s. Will try to create on flush/exit."
 #~ msgstr "Invalid SOL safe dir %s: %s. Will try to create on flush/exit."
 
-#, c-format
 #~ msgid "SharedObject %s already known, returning it"
 #~ msgstr "SharedObject %s already known, returning it"
 
-#, c-format
 #~ msgid "SharedObject %s not loaded. Loading it now"
 #~ msgstr "SharedObject %s not loaded. Loading it now"
 
-#, c-format
 #~ msgid "SharedObject path: %s"
 #~ msgstr "SharedObject path: %s"
 
-#, c-format
 #~ msgid "SO name:%s, root:%s"
 #~ msgstr "SO name:%s, root:%s"
 
-#, c-format
 #~ msgid "SharedObject.getLocal returning %s"
 #~ msgstr "SharedObject.getLocal returning %s"
 
-#, c-format
 #~ msgid "No existing SOL %s found. Will create on flush/exit."
 #~ msgstr "No existing SOL %s found. Will create on flush/exit."
 
-#, c-format
 #~ msgid "readSOL: reading property name at byte %s"
 #~ msgstr "readSOL: reading property name at byte %s"
 
-#, c-format
 #~ msgid "parsed sol member named '%s' (len %s),  value '%s'"
 #~ msgstr "parsed sol member named '%s' (len %s),  value '%s'"
 
 #~ msgid "Did not serialize object"
 #~ msgstr "Did not serialise object"
 
-#, c-format
 #~ msgid "No ASnative(%d, %d) registered with the VM"
 #~ msgstr "No ASnative(%d, %d) registered with the VM"
 
-#, c-format
 #~ msgid ""
-#~ "Stringifying node %p with name %s, as_value %s, %u attributes and %u children"
+#~ "Stringifying node %p with name %s, as_value %s, %u attributes and %u "
+#~ "children"
 #~ msgstr ""
 #~ "Stringifying node %p with name %s, as_value %s, %u attributes and %u "
 #~ "children"
@@ -12807,96 +12649,78 @@ msgstr "Field name is: %s: "
 #~ msgid "detachAuxStreamer called while not attached"
 #~ msgstr "detachAuxStreamer called while not attached"
 
-#, c-format
 #~ msgid ""
 #~ "audio_streamer called, audioQueue size: %d, requested %d bytes of fill-up"
 #~ msgstr ""
 #~ "audio_streamer called, audioQueue size: %d, requested %d bytes of fill-up"
 
-#, c-format
 #~ msgid "Calling %s(%s)"
 #~ msgstr "Calling %s(%s)"
 
-#, c-format
 #~ msgid "read: %d, this string ends: %d"
 #~ msgstr "read: %d, this string ends: %d"
 
-#, c-format
 #~ msgid " Message %d: %s "
 #~ msgstr " Message %d: %s "
 
-#, c-format
 #~ msgid "XMLSocket.connect(%s) called"
 #~ msgstr "XMLSocket.connect(%s) called"
 
-#, c-format
 #~ msgid "Invalid display string %s "
 #~ msgstr "Invalid display string %s "
 
-#, c-format
 #~ msgid "Data %s expired at %s. Removing its target as a listener"
 #~ msgstr "Data %s expired at %s. Removing its target as a listener"
 
 #~ msgid "Not adding duplicated listener"
 #~ msgstr "Not adding duplicated listener"
 
-#, c-format
 #~ msgid "Domain: %s"
 #~ msgstr "Domain: %s"
 
-#, c-format
 #~ msgid "First bool: %s"
 #~ msgstr "First bool: %s"
 
-#, c-format
 #~ msgid "Second Bool: %s"
 #~ msgstr "Second Bool: %s"
 
-#, c-format
 #~ msgid "First Number: %s"
 #~ msgstr "First Number: %s"
 
-#, c-format
 #~ msgid "Second Number: %s"
 #~ msgstr "Second Number: %s"
 
-#, c-format
 #~ msgid "Data: %s"
 #~ msgstr "Data: %s"
 
-#, c-format
 #~ msgid "Using GET method for sendAndLoad: %s"
 #~ msgstr "Using GET method for sendAndLoad: %s"
 
-#, c-format
 #~ msgid ""
-#~ "CHECKME: removeTextField(%s): TextField depth (%d) out of the 'dynamic' zone "
-#~ "[0..1048575], won't remove"
+#~ "CHECKME: removeTextField(%s): TextField depth (%d) out of the 'dynamic' "
+#~ "zone [0..1048575], won't remove"
 #~ msgstr ""
-#~ "CHECKME: removeTextField(%s): TextField depth (%d) out of the 'dynamic' zone "
-#~ "[0..1048575], won't remove"
+#~ "CHECKME: removeTextField(%s): TextField depth (%d) out of the 'dynamic' "
+#~ "zone [0..1048575], won't remove"
 
-#, c-format
 #~ msgid "rendering a Pol composed by corners %s"
 #~ msgstr "rendering a Pol composed by corners %s"
 
-#, c-format
 #~ msgid ""
-#~ "setTextValue: variable name %s points to a non-existent target, I guess we "
-#~ "would not be registered if this was true, or the sprite we've registered our "
-#~ "variable name has been unloaded"
+#~ "setTextValue: variable name %s points to a non-existent target, I guess "
+#~ "we would not be registered if this was true, or the sprite we've "
+#~ "registered our variable name has been unloaded"
 #~ msgstr ""
-#~ "setTextValue: variable name %s points to a non-existent target, I guess we "
-#~ "would not be registered if this was true, or the sprite we've registered our "
-#~ "variable name has been unloaded"
+#~ "setTextValue: variable name %s points to a non-existent target, I guess "
+#~ "we would not be registered if this was true, or the sprite we've "
+#~ "registered our variable name has been unloaded"
 
-#, c-format
 #~ msgid ""
-#~ "TextField text doesn't fit in its boundaries: width %g, margin %g - nothing "
-#~ "to align"
+#~ "TextField text doesn't fit in its boundaries: width %g, margin %g - "
+#~ "nothing to align"
 #~ msgstr ""
-#~ "TextField text doesn't fit in its boundaries: width %g, margin %g - nothing "
-#~ "to align"
+#~ "TextField text doesn't fit in its boundaries: width %g, margin %g - "
+#~ "nothing to align"
 
 #~ msgid ""
 #~ "HTML in a text field is unsupported, gnash will just ignore the tags and "
@@ -12908,50 +12732,43 @@ msgstr "Field name is: %s: "
 #~ msgid "in textformat"
 #~ msgstr "in textformat"
 
-#, c-format
 #~ msgid "<%s> tag is unsupported"
 #~ msgstr "<%s> tag is unsupported"
 
-#, c-format
 #~ msgid "Text in TextField %s exceeds width [ _bounds %s ]"
 #~ msgstr "Text in TextField %s exceeds width [ _bounds %s ]"
 
 #~ msgid " wordWrap=false, autoSize=none"
 #~ msgstr " wordWrap=false, autoSize=none"
 
-#, c-format, fuzzy
+#, fuzzy
 #~ msgid "Text bbox expanded to %s (width: %f)"
 #~ msgstr "Text box expanded to %s (width: %f)"
 
 #~ msgid " wordWrap=true"
 #~ msgstr " wordWrap=true"
 
-#, c-format
 #~ msgid " wordWrap=%d, autoSize=%d"
 #~ msgstr " wordWrap=%d, autoSize=%d"
 
-#, c-format
 #~ msgid "VariableName: %s"
 #~ msgstr "VariableName: %s"
 
-#, c-format
 #~ msgid "Variable text Path: %s, Var: %s"
 #~ msgstr "Variable text Path: %s, Var: %s"
 
 #~ msgid "registerTextVariable() called"
 #~ msgstr "registerTextVariable() called"
 
-#, c-format
 #~ msgid ""
-#~ "VariableName associated to text field (%s) refer to an unknown target. It is "
-#~ "possible that the DisplayObject will be instantiated later in the SWF "
+#~ "VariableName associated to text field (%s) refer to an unknown target. It "
+#~ "is possible that the DisplayObject will be instantiated later in the SWF "
 #~ "stream. Gnash will try to register again on next access."
 #~ msgstr ""
-#~ "VariableName associated to text field (%s) refer to an unknown target. It is "
-#~ "possible that the DisplayObject will be instantiated later in the SWF "
+#~ "VariableName associated to text field (%s) refer to an unknown target. It "
+#~ "is possible that the DisplayObject will be instantiated later in the SWF "
 #~ "stream. Gnash will try to register again on next access."
 
-#, c-format
 #~ msgid "HTML tag: %s"
 #~ msgstr "HTML tag: %s"
 
@@ -12965,44 +12782,37 @@ msgstr "Field name is: %s: "
 #~ "Calling registerTextVariable after change of variable name and updateText "
 #~ "call"
 
-#, c-format
 #~ msgid "%p set_invalidated() of %s in %s:%d"
 #~ msgstr "%p set_invalidated() of %s in %s:%d"
 
-#, c-format
 #~ msgid ""
-#~ "char %s (%s) was destroyed, stored its orig target (%s) for later rebinding"
+#~ "char %s (%s) was destroyed, stored its orig target (%s) for later "
+#~ "rebinding"
 #~ msgstr ""
-#~ "char %s (%s) was destroyed, stored its orig target (%s) for later rebinding"
+#~ "char %s (%s) was destroyed, stored its orig target (%s) for later "
+#~ "rebinding"
 
 #~ msgid "AMF0: skip serialization of FUNCTION property"
 #~ msgstr "AMF0: skip serialisation of FUNCTION property"
 
-#, c-format
 #~ msgid " skip serialization of specially-named property %s"
 #~ msgstr " skip serialisation of specially-named property %s"
 
-#, c-format
 #~ msgid " serializing property %s"
 #~ msgstr " serialising property %s"
 
-#, c-format
 #~ msgid "amf: serializing object (or function) as reference to %d"
 #~ msgstr "amf: serialising object (or function) as reference to %d"
 
-#, c-format
 #~ msgid "amf: serializing date object with index %d and value %g"
 #~ msgstr "amf: serialising date object with index %d and value %g"
 
-#, c-format
 #~ msgid "amf: serializing array of %d elements as STRICT_ARRAY (index %d)"
 #~ msgstr "amf: serialising array of %d elements as STRICT_ARRAY (index %d)"
 
-#, c-format
 #~ msgid "amf: serializing array of %d elements as ECMA_ARRAY (index %d) "
 #~ msgstr "amf: serialising array of %d elements as ECMA_ARRAY (index %d) "
 
-#, c-format
 #~ msgid "amf: serializing object (or function) with index %d"
 #~ msgstr "amf: serialising object (or function) with index %d"
 
@@ -13012,26 +12822,21 @@ msgstr "Field name is: %s: "
 #~ msgid "amf: serializing null"
 #~ msgstr "amf: serialising null"
 
-#, c-format
 #~ msgid "amf0 starting read of STRICT_ARRAY with %i elements"
 #~ msgstr "amf0 starting read of STRICT_ARRAY with %i elements"
 
-#, c-format
 #~ msgid "amf0 starting read of ECMA_ARRAY with %i elements"
 #~ msgstr "amf0 starting read of ECMA_ARRAY with %i elements"
 
-#, c-format
 #~ msgid "amf0 ECMA_ARRAY prop name is %s"
 #~ msgstr "amf0 ECMA_ARRAY prop name is %s"
 
 #~ msgid "amf0 starting read of OBJECT"
 #~ msgstr "amf0 starting read of OBJECT"
 
-#, c-format
 #~ msgid "readAMF0: reference #%d"
 #~ msgstr "readAMF0: reference #%d"
 
-#, c-format, 
 #~ msgid "amf0 read date: %e"
 #~ msgstr "amf0 read date: %e"
 
@@ -13050,12 +12855,9 @@ msgstr "Field name is: %s: "
 #~ msgid "ActionGotoFrame: as_environment target is null or not a sprite"
 #~ msgstr "ActionGotoFrame: as_environment target is null or not a sprite"
 
-#, c-format
-#, c-format,
 #~ msgid "to_primitive(%s) threw an ActionTypeError %s"
 #~ msgstr "to_primitive(%s) threw an ActionTypeError %s"
 
-#, c-format
 #~ msgid ""
 #~ "get url: target=%s, url=%s, method=%x (sendVars:%X, loadTarget:%d, "
 #~ "loadVariable:%d)"
@@ -13069,39 +12871,31 @@ msgstr "Field name is: %s: "
 #~ msgid "getURL2 target load"
 #~ msgstr "getURL2 target load"
 
-#, c-format
 #~ msgid "Testing _level loading (level %u)"
 #~ msgstr "Testing _level loading (level %u)"
 
-#, c-format
 #~ msgid "(%s + %s) [primitive conversion done]"
 #~ msgstr "(%s + %s) [primitive conversion done]"
 
-#, c-format
 #~ msgid "Removed button record shifted from depth %d to depth %d"
 #~ msgstr "Removed button record shifted from depth %d to depth %d"
 
-#, c-format
 #~ msgid "path: %s, var: %s"
 #~ msgstr "path: %s, var: %s"
 
-#, c-format
 #~ msgid "Took %s as _global, returning _global"
 #~ msgstr "Took %s as _global, returning _global"
 
-#, c-format
 #~ msgid "Found %s in _global"
 #~ msgstr "Found %s in _global"
 
-#, c-format
 #~ msgid ""
-#~ "CHECKME: nested mask in MouseEntityFinder. This mask is %s at depth %d outer "
-#~ "mask masked up to depth %d."
+#~ "CHECKME: nested mask in MouseEntityFinder. This mask is %s at depth %d "
+#~ "outer mask masked up to depth %d."
 #~ msgstr ""
-#~ "CHECKME: nested mask in MouseEntityFinder. This mask is %s at depth %d outer "
-#~ "mask masked up to depth %d."
+#~ "CHECKME: nested mask in MouseEntityFinder. This mask is %s at depth %d "
+#~ "outer mask masked up to depth %d."
 
-#, c-format
 #~ msgid ""
 #~ "Character %s at depth %d is a mask not hitting the query point %g,%g and "
 #~ "masking up to depth %d"
@@ -13109,38 +12903,33 @@ msgstr "Field name is: %s: "
 #~ "Character %s at depth %d is a mask not hitting the query point %g,%g and "
 #~ "masking up to depth %d"
 
-#, c-format
 #~ msgid "Character %s at depth %d is a mask hitting the query point %g,%g"
 #~ msgstr "Character %s at depth %d is a mask hitting the query point %g,%g"
 
-#, c-format
-#~ msgid "MouseEntityFinder found DisplayObject %s (depth %d) hitting point %g,%g"
-#~ msgstr "MouseEntityFinder found DisplayObject %s (depth %d) hitting point %g,%g"
-
-#, c-format
 #~ msgid ""
-#~ "CHECKME: nested mask in DropTargetFinder. This mask is %s at depth %d outer "
-#~ "mask masked up to depth %d."
+#~ "MouseEntityFinder found DisplayObject %s (depth %d) hitting point %g,%g"
 #~ msgstr ""
-#~ "CHECKME: nested mask in DropTargetFinder. This mask is %s at depth %d outer "
-#~ "mask masked up to depth %d."
+#~ "MouseEntityFinder found DisplayObject %s (depth %d) hitting point %g,%g"
+
+#~ msgid ""
+#~ "CHECKME: nested mask in DropTargetFinder. This mask is %s at depth %d "
+#~ "outer mask masked up to depth %d."
+#~ msgstr ""
+#~ "CHECKME: nested mask in DropTargetFinder. This mask is %s at depth %d "
+#~ "outer mask masked up to depth %d."
 
 #~ msgid "FIXME: invisible mask in MouseEntityFinder."
 #~ msgstr "FIXME: invisible mask in MouseEntityFinder."
 
-#, c-format
 #~ msgid "Event %s invoked for movieclip %s"
 #~ msgstr "Event %s invoked for movieclip %s"
 
-#, c-format
 #~ msgid "Sprite %s ignored ENTER_FRAME event (is unloaded)"
 #~ msgstr "Sprite %s ignored ENTER_FRAME event (is unloaded)"
 
-#, c-format
 #~ msgid "Sprite %s ignored button-like event %s as not 'enabled'"
 #~ msgstr "Sprite %s ignored button-like event %s as not 'enabled'"
 
-#, c-format
 #~ msgid ""
 #~ "Sprite %s (depth %d) won't check for user-defined LOAD event (is not "
 #~ "dynamic, has a parent, no registered class and no clip events defined)"
@@ -13148,11 +12937,9 @@ msgstr "Field name is: %s: "
 #~ "Sprite %s (depth %d) won't check for user-defined LOAD event (is not "
 #~ "dynamic, has a parent, no registered class and no clip events defined)"
 
-#, c-format
 #~ msgid "Advance movieclip '%s' at frame %u/%u"
 #~ msgstr "Advance movieclip '%s' at frame %u/%u"
 
-#, c-format
 #~ msgid "Advance_movieclip for movieclip '%s' - frame %u/%u "
 #~ msgstr "Advance_movieclip for movieclip '%s' - frame %u/%u "
 
@@ -13162,15 +12949,12 @@ msgstr "Field name is: %s: "
 #~ msgid "on_event_load called, incrementing"
 #~ msgstr "on_event_load called, incrementing"
 
-#, c-format
 #~ msgid "after increment we are at frame %u/%u"
 #~ msgstr "after increment we are at frame %u/%u"
 
-#, c-format
 #~ msgid "Jumping back to frame 0 of movieclip %s"
 #~ msgstr "Jumping back to frame 0 of movieclip %s"
 
-#, c-format
 #~ msgid "Executing frame%d (0-based) tags of movieclip %s"
 #~ msgstr "Executing frame%d (0-based) tags of movieclip %s"
 
@@ -13185,53 +12969,41 @@ msgstr "Field name is: %s: "
 #~ msgid "Init actions for DisplayObject %1% already executed"
 #~ msgstr "Init actions for DisplayObject %1% already executed"
 
-#, c-format
 #~ msgid "movieclip %s ::goto_frame(%d) - current frame is %d"
 #~ msgstr "movieclip %s ::goto_frame(%d) - current frame is %d"
 
-#, c-format
 #~ msgid ""
 #~ "%s is a dynamic mask and can't handle mouse events, no point will hit it"
 #~ msgstr ""
 #~ "%s is a dynamic mask and can't handle mouse events, no point will hit it"
 
-#, c-format
 #~ msgid "%s is dynamically masked by %s, which doesn't hit point %g,%g"
 #~ msgstr "%s is dynamically masked by %s, which doesn't hit point %g,%g"
 
-#, c-format
 #~ msgid "Attached movieclips %s registered class is %p"
 #~ msgstr "Attached movieclips %s registered class is %p"
 
-#, c-format
 #~ msgid "Sprite '%s' placed on stage"
 #~ msgstr "Sprite '%s' placed on stage"
 
-#, c-format
 #~ msgid "Queuing INITIALIZE and CONSTRUCT events for movieclip %s"
 #~ msgstr "Queuing INITIALIZE and CONSTRUCT events for movieclip %s"
 
-#, c-format
 #~ msgid "Unloading movieclip '%s'"
 #~ msgstr "Unloading movieclip '%s'"
 
-#, c-format
 #~ msgid "Stream sound id from %d to %d, stopping old"
 #~ msgstr "Stream sound id from %d to %d, stopping old"
 
-#, c-format
 #~ msgid "Video instance %s need display video frame (ratio) %d"
 #~ msgstr "Video instance %s need display video frame (ratio) %d"
 
-#, c-format
 #~ msgid "  current frame == _lastDecodedVideoFrameNum (%d)"
 #~ msgstr "  current frame == _lastDecodedVideoFrameNum (%d)"
 
-#, c-format
 #~ msgid "  current frame (%d) < _lastDecodedVideoFrameNum (%d)"
 #~ msgstr "  current frame (%d) < _lastDecodedVideoFrameNum (%d)"
 
-#, c-format
 #~ msgid "  decoding embedded frames from %d to %d for Video object %s"
 #~ msgstr "  decoding embedded frames from %d to %d for Video object %s"
 
@@ -13244,15 +13016,12 @@ msgstr "Field name is: %s: "
 #~ msgid "Loading into _level0"
 #~ msgstr "Loading into _level0"
 
-#, c-format
 #~ msgid "Before swapLevels (source depth %d, target depth %d) levels are: "
 #~ msgstr "Before swapLevels (source depth %d, target depth %d) levels are: "
 
-#, c-format
 #~ msgid " %d: %p (%s @ depth %d)"
 #~ msgstr " %d: %p (%s @ depth %d)"
 
-#, c-format
 #~ msgid "%s.swapDepth(%d): target depth (%d) contains no movie"
 #~ msgstr "%s.swapDepth(%d): target depth (%d) contains no movie"
 
@@ -13262,141 +13031,108 @@ msgstr "Field name is: %s: "
 #~ msgid "original root movie had null bounds, not displaying"
 #~ msgstr "original root movie had null bounds, not displaying"
 
-#, c-format
 #~ msgid "_level%u has null frame size, skipping"
 #~ msgstr "_level%u has null frame size, skipping"
 
-#, c-format
 #~ msgid "Going to or from scaleMode=noScale. Viewport:%dx%d Def:%dx%d"
 #~ msgstr "Going to or from scaleMode=noScale. Viewport:%dx%d Def:%dx%d"
 
-#, c-format
 #~ msgid "Processing %d actions in priority queue %d (call %u)"
 #~ msgstr "Processing %d actions in priority queue %d (call %u)"
 
-#, c-format
 #~ msgid "Actions pushed in priority %d (< %d), restarting the scan (call %u)"
 #~ msgstr "Actions pushed in priority %d (< %d), restarting the scan (call %u)"
 
-#, c-format
 #~ msgid "Done processing actions in priority queue %d (call %u)"
 #~ msgstr "Done processing actions in priority queue %d (call %u)"
 
-#, c-format
 #~ msgid "Pushed action buffer for target %s"
 #~ msgstr "Pushed action buffer for target %s"
 
-#, c-format
 #~ msgid "Processing %s call from the Browser."
 #~ msgstr "Processing %s call from the Browser."
 
-#, c-format
 #~ msgid "Attempt to write response to ExternalInterface requests fd %d"
 #~ msgstr "Attempt to write response to ExternalInterface requests fd %d"
 
-#, c-format
 #~ msgid "No response needed for %s request"
 #~ msgstr "No response needed for %s request"
 
-#, c-format
 #~ msgid "Checking %d timers for expiry"
 #~ msgstr "Checking %d timers for expiry"
 
-#, c-format
 #~ msgid "Global instance list grew to %d entries"
 #~ msgstr "Global instance list grew to %d entries"
 
-#, c-format
 #~ msgid "---- movie_root::advance: %d live DisplayObjects in the global list"
 #~ msgstr "---- movie_root::advance: %d live DisplayObjects in the global list"
 
-#, c-format
 #~ msgid ""
 #~ "Evaluating DisplayObject target path: element '%s' of path '%s' not found"
 #~ msgstr ""
 #~ "Evaluating DisplayObject target path: element '%s' of path '%s' not found"
 
-#, c-format
 #~ msgid "%s: HOSTFD is %d"
 #~ msgstr "%s: HOSTFD is %d"
 
-#, c-format
 #~ msgid "Launching URL: %s"
 #~ msgstr "Launching URL: %s"
 
-#, c-format
 #~ msgid "Attempt to write geturl requests fd #%d"
 #~ msgstr "Attempt to write geturl requests fd #%d"
 
 #~ msgid ""
-#~ "SWF ScriptLimits tag attempting to set recursionLimit=%1% and scriptsTimeout="
-#~ "%2% ignored as per rcfile directive"
+#~ "SWF ScriptLimits tag attempting to set recursionLimit=%1% and "
+#~ "scriptsTimeout=%2% ignored as per rcfile directive"
 #~ msgstr ""
 #~ "SWF ScriptLimits tag attempting to set recursionLimit=%1% and "
 #~ "scriptsTimeout=%2% ignored as per rcfile directive"
 
-#, c-format
 #~ msgid "Setting script limits: max recursion %d, timeout %d seconds"
 #~ msgstr "Setting script limits: max recursion %d, timeout %d seconds"
 
-#, c-format
 #~ msgid "LoadableObject Loaded %d bytes, reaching %d/%d"
 #~ msgstr "LoadableObject Loaded %d bytes, reaching %d/%d"
 
-#, c-format
 #~ msgid "LoadableObject reached EOF (%d/%d loaded)"
 #~ msgstr "LoadableObject reached EOF (%d/%d loaded)"
 
-#, c-format
 #~ msgid "    advancing DisplayObject %s"
 #~ msgstr "    advancing DisplayObject %s"
 
-#, c-format
 #~ msgid "    DisplayObject %s is unloaded, not advancing it"
 #~ msgstr "    DisplayObject %s is unloaded, not advancing it"
 
-#, c-format
 #~ msgid "Movie %s already in library"
 #~ msgstr "Movie %s already in library"
 
-#, c-format
 #~ msgid "Movie %s (SWF%d) added to library"
 #~ msgstr "Movie %s (SWF%d) added to library"
 
-#, c-format
 #~ msgid "Movie %s (SWF%d) NOT added to library (resulted from a POST)"
 #~ msgstr "Movie %s (SWF%d) NOT added to library (resulted from a POST)"
 
-#, c-format
 #~ msgid "Simple AS property %s inserted with flags %s"
 #~ msgstr "Simple AS property %s inserted with flags %s"
 
-#, c-format
-#, c-format,
 #~ msgid "  %s: %s"
 #~ msgstr "  %s: %s"
 
-#, c-format
 #~ msgid "AS GetterSetter %s replaced copying flags %s"
 #~ msgstr "AS GetterSetter %s replaced copying flags %s"
 
-#, c-format
 #~ msgid "AS GetterSetter %s inserted with flags %s"
 #~ msgstr "AS GetterSetter %s inserted with flags %s"
 
-#, c-format
 #~ msgid "Native GetterSetter %s replaced copying flags %s"
 #~ msgstr "Native GetterSetter %s replaced copying flags %s"
 
-#, c-format
 #~ msgid "Native GetterSetter %s in namespace %s inserted with flags %s"
 #~ msgstr "Native GetterSetter %s in namespace %s inserted with flags %s"
 
-#, c-format
 #~ msgid "Destructive AS property %s inserted with flags %s"
 #~ msgstr "Destructive AS property %s inserted with flags %s"
 
-#, c-format
 #~ msgid "Destructive native property %s with flags %s"
 #~ msgstr "Destructive native property %s with flags %s"
 
@@ -13406,27 +13142,23 @@ msgstr "Field name is: %s: "
 #~ msgid "Super has no associated constructor"
 #~ msgstr "Super has no associated constructor"
 
-#, c-format
 #~ msgid "add_property: property %s is being watched"
 #~ msgstr "add_property: property %s is being watched"
 
-#, c-format
 #~ msgid "Property %s deleted by trigger on create (getter-setter)"
 #~ msgstr "Property %s deleted by trigger on create (getter-setter)"
 
-#, c-format
 #~ msgid "Object %p can't be an instance of an object (%p) with no 'prototype'"
-#~ msgstr "Object %p can't be an instance of an object (%p) with no 'prototype'"
+#~ msgstr ""
+#~ "Object %p can't be an instance of an object (%p) with no 'prototype'"
 
-#, c-format
 #~ msgid ""
 #~ "Object %p can't be an instance of an object (%p) with non-object "
 #~ "'prototype' (%s)"
 #~ msgstr ""
-#~ "Object %p can't be an instance of an object (%p) with non-object 'prototype' "
-#~ "(%s)"
+#~ "Object %p can't be an instance of an object (%p) with non-object "
+#~ "'prototype' (%s)"
 
-#, c-format
 #~ msgid ""
 #~ "Object %p is an instance of constructor %p as the constructor exposes our "
 #~ "__proto__ %p"
@@ -13434,7 +13166,6 @@ msgstr "Field name is: %s: "
 #~ "Object %p is an instance of constructor %p as the constructor exposes our "
 #~ "__proto__ %p"
 
-#, c-format
 #~ msgid ""
 #~ "Object %p __proto__ %p had one interface matching with the constructor "
 #~ "prototype %p"
@@ -13442,62 +13173,49 @@ msgstr "Field name is: %s: "
 #~ "Object %p __proto__ %p had one interface matching with the constructor "
 #~ "prototype %p"
 
-#, c-format
 #~ msgid "%d members of object %p follow"
 #~ msgstr "%d members of object %p follow"
 
-#, c-format
 #~ msgid "No watch for property %s"
 #~ msgstr "No watch for property %s"
 
-#, c-format
 #~ msgid "Watch on %s not removed (is a getter-setter)"
 #~ msgstr "Watch on %s not removed (is a getter-setter)"
 
-#, c-format
 #~ msgid "Adding %d to the client array."
 #~ msgstr "Adding %d to the client array."
 
-#, c-format
 #~ msgid "HTTP key is: %s"
 #~ msgstr "HTTP key is: %s"
 
-#, c-format
 #~ msgid "Removing %d from the client array."
 #~ msgstr "Removing %d from the client array."
 
-#, c-format
 #~ msgid "FILENAME: %s"
 #~ msgstr "FILENAME: %s"
 
 #~ msgid "Setting debugger ON"
 #~ msgstr "Setting debugger ON"
 
-#, c-format
 #~ msgid ""
-#~ "Will sleep %ld microseconds between iterations - fps is %g, clockAdvance is "
-#~ "%lu"
+#~ "Will sleep %ld microseconds between iterations - fps is %g, clockAdvance "
+#~ "is %lu"
 #~ msgstr ""
-#~ "Will sleep %ld microseconds between iterations - fps is %g, clockAdvance is "
-#~ "%lu"
+#~ "Will sleep %ld microseconds between iterations - fps is %g, clockAdvance "
+#~ "is %lu"
 
-#, c-format
 #~ msgid "iteration, timer: %lu, localDelay: %ld\n"
 #~ msgstr "iteration, timer: %lu, localDelay: %ld\n"
 
-#, c-format
 #~ msgid "exiting after %d advances"
 #~ msgstr "exiting after %d advances"
 
-#, c-format
 #~ msgid "exiting after %d times last frame was reached"
 #~ msgstr "exiting after %d times last frame was reached"
 
-#, c-format
 #~ msgid "%d loop backs; jumping one-after latest frame (%d)"
 #~ msgstr "%d loop backs; jumping one-after latest frame (%d)"
 
-#, c-format
 #~ msgid "FIXME: found filestream %s in cache!"
 #~ msgstr "FIXME: found filestream %s in cache!"
 
@@ -13510,23 +13228,18 @@ msgstr "Field name is: %s: "
 #~ msgid "Couldn't send POST Reply, no header data"
 #~ msgstr "Couldn't send POST Reply, no header data"
 
-#, c-format
 #~ msgid "Caught corrupted string! length was %d, null at %d"
 #~ msgstr "Caught corrupted string! length was %d, null at %d"
 
-#, c-format
 #~ msgid "Setting Max Requests for Keep-Alive to %d"
 #~ msgstr "Setting Max Requests for Keep-Alive to %d"
 
-#, c-format
 #~ msgid "Net HTTP server failed to read from fd #%d..."
 #~ msgstr "Net HTTP server failed to read from fd #%d..."
 
-#, c-format
 #~ msgid "No active DiskStreams for fd #%d: %s..."
 #~ msgstr "No active DiskStreams for fd #%d: %s..."
 
-#, c-format
 #~ msgid "Found active DiskStream! for fd #%d: %s"
 #~ msgstr "Found active DiskStream! for fd #%d: %s"
 
@@ -13536,7 +13249,6 @@ msgstr "Field name is: %s: "
 #~ msgid "Keep-Alive is on"
 #~ msgstr "Keep-Alive is on"
 
-#, c-format
 #~ msgid "Processing time for GET request was %f seconds"
 #~ msgstr "Processing time for GET request was %f seconds"
 
@@ -13549,56 +13261,45 @@ msgstr "Field name is: %s: "
 #~ msgid "Have a pending SIGPIPE interupt waiting!"
 #~ msgstr "Have a pending SIGPIPE interrupt waiting!"
 
-#, c-format
 #~ msgid "The accept() socket for fd #%d never was available"
 #~ msgstr "The accept() socket for fd #%d never was available"
 
-#, c-format
 #~ msgid "The accept() socket for fd #%d timed out waitingfor data"
 #~ msgstr "The accept() socket for fd #%d timed out waiting for data"
 
 #~ msgid "Closing framebuffer device"
 #~ msgstr "Closing framebuffer device"
 
-#, c-format
 #~ msgid "WARNING: Could not open %s"
 #~ msgstr "WARNING: Could not open %s"
 
-#, c-format
 #~ msgid "Original TTY NO = %d"
 #~ msgstr "Original TTY NO = %d"
 
 #~ msgid "WARNING: Could not request a new VT"
 #~ msgstr "WARNING: Could not request a new VT"
 
-#, c-format
 #~ msgid "Own TTY NO = %d"
 #~ msgstr "Own TTY NO = %d"
 
-#, c-format
 #~ msgid "VT %d ready"
 #~ msgstr "VT %d ready"
 
 #~ msgid "Restoring terminal..."
 #~ msgstr "Restoring terminal..."
 
-#, c-format
 #~ msgid "red channel: %d / %d"
 #~ msgstr "red channel: %d / %d"
 
-#, c-format
 #~ msgid "green channel: %d / %d"
 #~ msgstr "green channel: %d / %d"
 
-#, c-format
 #~ msgid "blue channel: %d / %d"
 #~ msgstr "blue channel: %d / %d"
 
-#, c-format
 #~ msgid "Total bits per pixel: %d"
 #~ msgstr "Total bits per pixel: %d"
 
-#, c-format
 #~ msgid "Host FD #%d, Control FD #%d\n"
 #~ msgstr "Host FD #%d, Control FD #%d\n"
 
@@ -13608,33 +13309,26 @@ msgstr "Field name is: %s: "
 #~ msgid "Set renderer"
 #~ msgstr "Set renderer"
 
-#, c-format
 #~ msgid "mouse @ %d,%d"
 #~ msgstr "mouse @ %d,%d"
 
-#, c-format
 #~ msgid "Frame %d"
 #~ msgstr "Frame %d"
 
-#, c-format
 #~ msgid "Timer delay set to %d milliseconds"
 #~ msgstr "Timer delay set to %d milliseconds"
 
-#, c-format
 #~ msgid "Activating FPS debugging every %g seconds"
 #~ msgstr "Activating FPS debugging every %g seconds"
 
-#, c-format
 #~ msgid ""
 #~ "Input movie has collapsed dimensions %d/%d. Setting to 1/1 and going on."
 #~ msgstr ""
 #~ "Input movie has collapsed dimensions %d/%d. Setting to 1/1 and going on."
 
-#, c-format
 #~ msgid "Sent FsCommand '%s' to host fd %d"
 #~ msgstr "Sent FsCommand '%s' to host fd %d"
 
-#, c-format
 #~ msgid "Running as plugin: skipping internal handling of FsCommand %s%s."
 #~ msgstr "Running as plugin: skipping internal handling of FsCommand %s%s."
 
@@ -13647,7 +13341,6 @@ msgstr "Field name is: %s: "
 #~ msgid "GtkGui: Window resize request received"
 #~ msgstr "GtkGui: Window resize request received"
 
-#, c-format
 #~ msgid "OpenGL extension version - %d.%d"
 #~ msgstr "OpenGL extension version - %d.%d"
 
@@ -13666,43 +13359,36 @@ msgstr "Field name is: %s: "
 #~ msgid "AudioDecoderGst: initialisation failed."
 #~ msgstr "AudioDecoderGst: initialisation failed."
 
-#, c-format
 #~ msgid "  Title:'%s'"
 #~ msgstr "  Title:'%s'"
 
-#, c-format
 #~ msgid "  Author:'%s'"
 #~ msgstr "  Author:'%s'"
 
-#, c-format
 #~ msgid "  Copyright:'%s'"
 #~ msgstr "  Copyright:'%s'"
 
-#, c-format
 #~ msgid "  Comment:'%s'"
 #~ msgstr "  Comment:'%s'"
 
-#, c-format
 #~ msgid "  Album:'%s'"
 #~ msgstr "  Album:'%s'"
 
-#, c-format
 #~ msgid ""
-#~ "AudioDecoderFfmpeg: could not initialize a parser for flash codec id %d (%s)"
+#~ "AudioDecoderFfmpeg: could not initialize a parser for flash codec id %d "
+#~ "(%s)"
 #~ msgstr ""
-#~ "AudioDecoderFfmpeg: could not initialise a parser for flash codec id %d (%s)"
+#~ "AudioDecoderFfmpeg: could not initialise a parser for flash codec id %d "
+#~ "(%s)"
 
-#, c-format
 #~ msgid ""
 #~ "AudioDecoderFfmpeg: could not initialize a parser for ffmpeg codec id %s"
 #~ msgstr ""
 #~ "AudioDecoderFfmpeg: could not initialise a parser for ffmpeg codec id %s"
 
-#, c-format
 #~ msgid "Queuing init actions in frame %d of movieclip %s"
 #~ msgstr "Queuing init actions in frame %d of movieclip %s"
 
-#, c-format
 #~ msgid ""
 #~ "Target frame of a gotoFrame(%d) was never loaded,although frame count in "
 #~ "header (%d) said we should have found it"
@@ -13716,27 +13402,23 @@ msgstr "Field name is: %s: "
 #~ msgid "string is empty, consider as registered"
 #~ msgstr "string is empty, consider as registered"
 
-#, c-format
 #~ msgid "target object (%s @ %p) does have a member named %s"
 #~ msgstr "target object (%s @ %p) does have a member named %s"
 
-#, c-format
 #~ msgid ""
-#~ "target sprite (%s @ %p) does NOT have a member named %s (no problem, we'll "
-#~ "add it with value %s)"
+#~ "target sprite (%s @ %p) does NOT have a member named %s (no problem, "
+#~ "we'll add it with value %s)"
 #~ msgstr ""
-#~ "target sprite (%s @ %p) does NOT have a member named %s (no problem, we'll "
-#~ "add it with value %s)"
+#~ "target sprite (%s @ %p) does NOT have a member named %s (no problem, "
+#~ "we'll add it with value %s)"
 
-#, c-format
 #~ msgid ""
-#~ "target sprite (%s @ %p) does NOT have a member named %s, and we don't have "
-#~ "text defined"
+#~ "target sprite (%s @ %p) does NOT have a member named %s, and we don't "
+#~ "have text defined"
 #~ msgstr ""
-#~ "target sprite (%s @ %p) does NOT have a member named %s, and we don't have "
-#~ "text defined"
+#~ "target sprite (%s @ %p) does NOT have a member named %s, and we don't "
+#~ "have text defined"
 
-#, c-format
 #~ msgid ""
 #~ "Item %d(%s) at depth %d (char name %s, type %s)Destroyed: %s, unloaded: %s"
 #~ msgstr ""
@@ -13749,94 +13431,84 @@ msgstr "Field name is: %s: "
 #~ msgstr "invalid rectangle"
 
 #~ msgid ""
-#~ "Your locale probably can't convert non-ascii DisplayObjects to upper case. "
-#~ "Using a UTF8 locale may fix this."
+#~ "Your locale probably can't convert non-ascii DisplayObjects to upper "
+#~ "case. Using a UTF8 locale may fix this."
 #~ msgstr ""
-#~ "Your locale probably can't convert non-ascii DisplayObjects to upper case. "
-#~ "Using a UTF8 locale may fix this."
+#~ "Your locale probably can't convert non-ascii DisplayObjects to upper "
+#~ "case. Using a UTF8 locale may fix this."
 
 #~ msgid "bad_cast caught"
 #~ msgstr "bad_cast caught"
 
 #~ msgid ""
-#~ "Your locale probably can't convert non-ascii DisplayObjects to lower case. "
-#~ "Using a UTF8 locale may fix this"
+#~ "Your locale probably can't convert non-ascii DisplayObjects to lower "
+#~ "case. Using a UTF8 locale may fix this"
 #~ msgstr ""
-#~ "Your locale probably can't convert non-ascii DisplayObjects to lower case. "
-#~ "Using a UTF8 locale may fix this"
+#~ "Your locale probably can't convert non-ascii DisplayObjects to lower "
+#~ "case. Using a UTF8 locale may fix this"
 
-#, c-format
 #~ msgid "Could not attach DisplayObject at depth %d"
 #~ msgstr "Could not attach DisplayObject at depth %d"
 
 #~ msgid "no text for element creation"
 #~ msgstr "no text for element creation"
 
-#, c-format
 #~ msgid "XMLNode_as %p has no children"
 #~ msgstr "XMLNode_as %p has no children"
 
 #~ msgid "Builtin XMLSocket.onData() needs an argument"
 #~ msgstr "Builtin XMLSocket.onData() needs an argument"
 
-#, c-format
 #~ msgid ""
-#~ "Builtin XMLSocket.onData() called with an argument that resolves to an empty "
-#~ "string: %s"
+#~ "Builtin XMLSocket.onData() called with an argument that resolves to an "
+#~ "empty string: %s"
 #~ msgstr ""
-#~ "Builtin XMLSocket.onData() called with an argument that resolves to an empty "
-#~ "string: %s"
+#~ "Builtin XMLSocket.onData() called with an argument that resolves to an "
+#~ "empty string: %s"
 
-#, c-format
 #~ msgid "ActionLimits hit during setRootMovie: %s. Disable scripts?"
 #~ msgstr "ActionLimits hit during setRootMovie: %s. Disable scripts?"
 
-#, c-format
-#~ msgid "ActionLimits hit during mouse event processing: %s. Disable scripts ?"
-#~ msgstr "ActionLimits hit during mouse event processing: %s. Disable scripts ?"
+#~ msgid ""
+#~ "ActionLimits hit during mouse event processing: %s. Disable scripts ?"
+#~ msgstr ""
+#~ "ActionLimits hit during mouse event processing: %s. Disable scripts ?"
 
-#, c-format
 #~ msgid "Action limit hit during advance: %s"
 #~ msgstr "Action limit hit during advance: %s"
 
-#, c-format
 #~ msgid "%s: Exception %s. Will create a new member"
 #~ msgstr "%s: Exception %s. Will create a new member"
 
-#, c-format
 #~ msgid "reading code table at offset %lu"
 #~ msgstr "reading code table at offset %lu"
 
 #~ msgid "MP3 soundblock seek samples"
 #~ msgstr "MP3 soundblock seek samples"
 
-#, c-format
 #~ msgid "  readFillStyles: count = %u"
 #~ msgstr "  readFillStyles: count = %u"
 
-#, c-format
 #~ msgid "Loaded frame %u/%u"
 #~ msgstr "Loaded frame %u/%u"
 
-#, c-format
-#~ msgid "looking for exported resource: frame load advancement (from %d to %d)"
-#~ msgstr "looking for exported resource: frame load advancement (from %d to %d)"
+#~ msgid ""
+#~ "looking for exported resource: frame load advancement (from %d to %d)"
+#~ msgstr ""
+#~ "looking for exported resource: frame load advancement (from %d to %d)"
 
 #~ msgid "Constant pool size mismatch. This is probably a very malformed SWF"
 #~ msgstr "Constant pool size mismatch. This is probably a very malformed SWF"
 
-#, c-format
 #~ msgid "Instantiating sprite_def %p"
 #~ msgstr "Instantiating sprite_def %p"
 
-#, c-format
 #~ msgid "Registered class %p for sprite_def %p"
 #~ msgstr "Registered class %p for sprite_def %p"
 
 #~ msgid " Exported interface: "
 #~ msgstr " Exported interface: "
 
-#, c-format
 #~ msgid "Property %s is read-only %s, not setting it to %s"
 #~ msgstr "Property %s is read-only %s, not setting it to %s"
 
@@ -13846,45 +13518,38 @@ msgstr "Field name is: %s: "
 #~ msgid "ActionStopDragMovie: as_environment target is null or not a sprite"
 #~ msgstr "ActionStopDragMovie: as_environment target is null or not a sprite"
 
-#, c-format
 #~ msgid "dict entry %d is out of bounds"
 #~ msgstr "dict entry %d is out of bounds"
 
 #~ msgid "TESTME: target of a loadMovie changed its target path"
 #~ msgstr "TESTME: target of a loadMovie changed its target path"
 
-#, c-format
 #~ msgid "get_variable(%s)"
 #~ msgstr "get_variable(%s)"
 
-#, c-format
-#~ msgid "find_object(\"%s\") [ varname = '%s' - current target = '%s' ] failed"
-#~ msgstr "find_object(\"%s\") [ varname = '%s' - current target = '%s' ] failed"
+#~ msgid ""
+#~ "find_object(\"%s\") [ varname = '%s' - current target = '%s' ] failed"
+#~ msgstr ""
+#~ "find_object(\"%s\") [ varname = '%s' - current target = '%s' ] failed"
 
-#, c-format
 #~ msgid "...but get_variable_raw(%s, <scopeStack>) succeeded (%s)!"
 #~ msgstr "...but get_variable_raw(%s, <scopeStack>) succeeded (%s)!"
 
-#, c-format
 #~ msgid "get_variable_raw(%s)"
 #~ msgstr "get_variable_raw(%s)"
 
-#, c-format
 #~ msgid "Invoking get_path_element(%s) on object %p"
 #~ msgstr "Invoking get_path_element(%s) on object %p"
 
-#, c-format
 #~ msgid "Path element %s not found in object %p"
 #~ msgstr "Path element %s not found in object %p"
 
 #~ msgid "Gnash"
 #~ msgstr "Gnash"
 
-#, c-format
 #~ msgid "x/y %d/%d button %d"
 #~ msgstr "x/y %d/%d button %d"
 
-#, c-format
 #~ msgid "read mouse @ %d / %d, btn %d"
 #~ msgstr "read mouse @ %d / %d, btn %d"
 
@@ -13906,23 +13571,18 @@ msgstr "Field name is: %s: "
 #~ msgid "No verbose parsing; disabled at compile time"
 #~ msgstr "No verbose parsing; disabled at compile time"
 
-#, c-format
 #~ msgid "Setting root URL to %s"
 #~ msgstr "Setting root URL to %s"
 
-#, c-format
 #~ msgid "Setting base URL to %s"
 #~ msgstr "Setting base URL to %s"
 
-#, c-format
 #~ msgid "Setting width to %d"
 #~ msgstr "Setting width to %d"
 
-#, c-format
 #~ msgid "Setting height to %d"
 #~ msgstr "Setting height to %d"
 
-#, c-format
 #~ msgid "Setting x position to %d"
 #~ msgstr "Setting x position to %d"
 

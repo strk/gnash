@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-01-01 09:28-0700\n"
+"POT-Creation-Date: 2012-01-20 17:11-0700\n"
 "PO-Revision-Date: 2012-01-13 07:10+0200\n"
 "Last-Translator: Chris <cjl@laptop.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,83 +17,83 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.0.5\n"
 
-#: libbase/RTMP.cpp:221
+#: libbase/RTMP.cpp:222
 msgid "Initial connection failed"
 msgstr ""
 
-#: libbase/RTMP.cpp:324 libbase/RTMP.cpp:328
+#: libbase/RTMP.cpp:325 libbase/RTMP.cpp:329
 msgid "unsupported packet received"
 msgstr ""
 
-#: libbase/RTMP.cpp:333
+#: libbase/RTMP.cpp:334
 #, c-format
 msgid "partially supported packet %s received"
 msgstr ""
 
-#: libbase/RTMP.cpp:343
+#: libbase/RTMP.cpp:344
 #, c-format
 msgid "packet %s received"
 msgstr ""
 
-#: libbase/RTMP.cpp:355
+#: libbase/RTMP.cpp:356
 #, c-format
 msgid "Unknown packet %s received"
 msgstr ""
 
-#: libbase/RTMP.cpp:457
+#: libbase/RTMP.cpp:458
 msgid "failed to read RTMP packet header 2nd byte"
 msgstr ""
 
-#: libbase/RTMP.cpp:465
+#: libbase/RTMP.cpp:466
 msgid "Failed to read RTMP packet header 3nd byte"
 msgstr ""
 
-#: libbase/RTMP.cpp:483
+#: libbase/RTMP.cpp:484
 #, c-format
 msgid "Incomplete packet received on channel %s"
 msgstr ""
 
-#: libbase/RTMP.cpp:496
+#: libbase/RTMP.cpp:497
 #, c-format
 msgid "Failed to read RTMP packet header. type: %s"
 msgstr ""
 
-#: libbase/RTMP.cpp:541
+#: libbase/RTMP.cpp:542
 #, c-format
 msgid "%s, failed to read extended timestamp"
 msgstr ""
 
-#: libbase/RTMP.cpp:870
+#: libbase/RTMP.cpp:871
 msgid "Stage 1 socket not ready. This should not happen."
 msgstr ""
 
-#: libbase/RTMP.cpp:876
+#: libbase/RTMP.cpp:877
 msgid "Could not send stage 1 data"
 msgstr ""
 
-#: libbase/RTMP.cpp:898
+#: libbase/RTMP.cpp:899
 #, c-format
 msgid "Type mismatch: client sent %d, server answered %d"
 msgstr ""
 
-#: libbase/RTMP.cpp:926
+#: libbase/RTMP.cpp:927
 msgid "Could not send complete signature."
 msgstr ""
 
-#: libbase/RTMP.cpp:952
+#: libbase/RTMP.cpp:953
 msgid "Signatures do not match during handshake!"
 msgstr ""
 
-#: libbase/RTMP.cpp:1040
+#: libbase/RTMP.cpp:1041
 msgid "Control packet too short"
 msgstr ""
 
-#: libbase/RTMP.cpp:1048
+#: libbase/RTMP.cpp:1049
 #, c-format
 msgid "Control packet (%s) data too short"
 msgstr ""
 
-#: libbase/RTMP.cpp:1086
+#: libbase/RTMP.cpp:1087
 #, c-format
 msgid "Received unknown or unhandled control %s"
 msgstr ""
@@ -427,36 +427,36 @@ msgstr ""
 msgid "Zero memory leaks for this program"
 msgstr ""
 
-#: libbase/GnashVaapiImage.cpp:50
+#: libbase/GnashVaapiImage.cpp:51
 #, c-format
 msgid "GnashVaapiImage::GnashVaapiImage(): surface 0x%08x, size %dx%d\n"
 msgstr ""
 
-#: libbase/GnashVaapiImage.cpp:56
+#: libbase/GnashVaapiImage.cpp:57
 #, c-format
 msgid "GnashVaapiImage::~GnashVaapiImage(): surface 0x%08x\n"
 msgstr ""
 
-#: libbase/GnashVaapiImage.cpp:68
+#: libbase/GnashVaapiImage.cpp:69
 #, c-format
 msgid "GnashVaapi::update(): data %p\n"
 msgstr ""
 
-#: libbase/GnashVaapiImage.cpp:100
+#: libbase/GnashVaapiImage.cpp:101
 msgid "GnashVaapiImage: VA surface to SW pixels are not supported\n"
 msgstr ""
 
-#: libbase/GnashVaapiImage.cpp:111
+#: libbase/GnashVaapiImage.cpp:112
 #, c-format
 msgid "GnashVaapiImage::data(): surface 0x%08x\n"
 msgstr ""
 
-#: libbase/GnashVaapiImage.cpp:112 libbase/GnashVaapiImage.cpp:128
+#: libbase/GnashVaapiImage.cpp:113 libbase/GnashVaapiImage.cpp:129
 #, c-format
 msgid "  -> %u usec from creation\n"
 msgstr ""
 
-#: libbase/GnashVaapiImage.cpp:126
+#: libbase/GnashVaapiImage.cpp:127
 #, c-format
 msgid "GnashVaapiImage::data() const: surface 0x%08x\n"
 msgstr ""
@@ -486,46 +486,46 @@ msgstr ""
 msgid "Found symbol %s @ %p"
 msgstr ""
 
-#: libbase/GnashImageJpeg.cpp:115
+#: libbase/GnashImageJpeg.cpp:116
 msgid "JPEG: Empty jpeg source stream."
 msgstr ""
 
-#: libbase/GnashImageJpeg.cpp:262 libbase/GnashImageJpeg.cpp:289
-#: libbase/GnashImageJpeg.cpp:307 libbase/GnashImageJpeg.cpp:363
+#: libbase/GnashImageJpeg.cpp:263 libbase/GnashImageJpeg.cpp:290
+#: libbase/GnashImageJpeg.cpp:308 libbase/GnashImageJpeg.cpp:364
 msgid "Internal jpeg error: "
 msgstr ""
 
-#: libbase/GnashImageJpeg.cpp:273
+#: libbase/GnashImageJpeg.cpp:274
 msgid "Lack of data during JPEG header parsing"
 msgstr ""
 
-#: libbase/GnashImageJpeg.cpp:283
+#: libbase/GnashImageJpeg.cpp:284
 #, c-format
 msgid "unexpected: jpeg_read_header returned %d"
 msgstr ""
 
-#: libbase/GnashImageJpeg.cpp:319
+#: libbase/GnashImageJpeg.cpp:320
 msgid "lack of data during JPEG header parsing"
 msgstr ""
 
-#: libbase/GnashImageJpeg.cpp:329
+#: libbase/GnashImageJpeg.cpp:330
 #, c-format
 msgid "unexpected: jpeg_read_header returned %d [%s:%d]"
 msgstr ""
 
-#: libbase/GnashImageJpeg.cpp:337
+#: libbase/GnashImageJpeg.cpp:338
 msgid "Internal jpeg error during header parsing: "
 msgstr ""
 
-#: libbase/GnashImageJpeg.cpp:345
+#: libbase/GnashImageJpeg.cpp:346
 msgid "Internal jpeg error during decompression: "
 msgstr ""
 
-#: libbase/GnashImageJpeg.cpp:520
+#: libbase/GnashImageJpeg.cpp:521
 msgid "rw_dest_IOChannel couldn't write data."
 msgstr ""
 
-#: libbase/GnashImageJpeg.cpp:545
+#: libbase/GnashImageJpeg.cpp:546
 msgid "rw_dest_IOChannel::term_destination couldn't write data."
 msgstr ""
 
@@ -914,378 +914,378 @@ msgstr ""
 msgid "Couldn't get Drawable window from X11"
 msgstr ""
 
-#: librender/GnashTexture.cpp:69
+#: librender/GnashTexture.cpp:70
 #, c-format
 msgid "glError: %s caught\n"
 msgstr ""
 
-#: libmedia/MediaParser.cpp:82
+#: libmedia/MediaParser.cpp:83
 msgid "No ID3 support implemented in this MediaParser"
 msgstr ""
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:79
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:80
 msgid "MediaParserFfmpeg could not read probe data from input"
 msgstr ""
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:112
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:121
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:113
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:122
 #, c-format
 msgid "%s: seeking failed"
 msgstr ""
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:210
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:211
 msgid ""
 "FIXME: FFmpeg packet decompression timestamp has no value, taking as zero"
 msgstr ""
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:271
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:272
 #, c-format
 msgid ""
 "MediaParserFfmpeg::parseNextFrame: Problems parsing next frame "
 "(av_read_frame returned %d). We'll consider the stream fully parsed."
 msgstr ""
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:442
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:443
 #, c-format
 msgid "  Using stream %d for audio: codec id %d"
 msgstr ""
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:455
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:456
 #, c-format
 msgid "  Using stream %d for video: codec id %d"
 msgstr ""
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:477
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:478
 msgid "Duration of video stream unknown"
 msgstr ""
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:506
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:507
 msgid "Duration of audio stream unknown to ffmpeg"
 msgstr ""
 
-#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:586
+#: libmedia/ffmpeg/MediaParserFfmpeg.cpp:587
 msgid ""
 "MediaParserFfmpeg couldn't parse input format: tried to seek at negative "
 "offset %1%."
 msgstr ""
 
-#: libmedia/ffmpeg/VideoConverterFfmpeg.cpp:121
+#: libmedia/ffmpeg/VideoConverterFfmpeg.cpp:122
 msgid "VideoConverterFfmpeg cannot convert to the requested format"
 msgstr ""
 
-#: libmedia/ffmpeg/MediaHandlerFfmpeg.cpp:121
+#: libmedia/ffmpeg/MediaHandlerFfmpeg.cpp:122
 #, c-format
 msgid "MediaHandlerFfmpeg::createAudioDecoder: %s -- %s"
 msgstr ""
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:52
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:53
 #, c-format
 msgid "AudioDecoderFfmpeg: initialized FFmpeg codec %d (%s)"
 msgstr ""
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:55
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:56
 #, c-format
 msgid ""
 "AudioDecoderFfmpeg: initialized FFmpeg codec %d (%s) for flash codec %d (%s)"
 msgstr ""
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:70
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:71
 #, c-format
 msgid "AudioDecoderFfmpeg: initialized FFmpeg codec %s (%d)"
 msgstr ""
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:109
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:110
 #, c-format
 msgid "Unsupported audio codec %d"
 msgstr ""
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:118
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:119
 #, c-format
 msgid "libavcodec could not find a decoder for codec %d (%s)"
 msgstr ""
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:128
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:129
 msgid "AudioDecoderFfmpeg can't initialize MP3 parser"
 msgstr ""
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:135
-#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:184
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:136
+#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:185
 msgid "libavcodec couldn't allocate context"
 msgstr ""
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:143
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:314
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:144
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:315
 #, c-format
 msgid ""
 "AudioDecoderFfmpeg: avcodec_open failed to initialize FFmpeg codec %s (%d)"
 msgstr ""
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:148
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:149
 #, c-format
 msgid "AudioDecoder: initialized FFMPEG codec %s (%d)"
 msgstr ""
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:221
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:222
 #, c-format
 msgid "AudioDecoderFfmpeg: unsupported flash audio codec %d (%s)"
 msgstr ""
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:230
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:231
 #, c-format
 msgid "AudioDecoderFfmpeg: unknown codec type %d (should never happen)"
 msgstr ""
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:240
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:241
 #, c-format
 msgid ""
 "AudioDecoderFfmpeg: libavcodec could not find a decoder for codec %d (%s)"
 msgstr ""
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:246
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:247
 #, c-format
 msgid ""
 "AudioDecoderFfmpeg: libavcodec could not find a decoder for ffmpeg codec id "
 "%s"
 msgstr ""
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:258
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:259
 msgid "AudioDecoderFfmpeg: libavcodec couldn't allocate context"
 msgstr ""
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:347
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:348
 #, c-format
 msgid ""
 "av_parser_parse returned %d. Upgrading ffmpeg/libavcodec might fix this "
 "issue."
 msgstr ""
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:400
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:401
 #, c-format
 msgid ""
 "AudioDecoderFfmpeg: could not find a complete frame in the last %d bytes of "
 "input (malformed SWF or FLV?)"
 msgstr ""
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:489
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:490
 msgid "failed to allocate audio buffer."
 msgstr ""
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:527
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:528
 #, c-format
 msgid ""
 "avcodec_decode_audio returned %d. Upgrading ffmpeg/libavcodec might fix this "
 "issue."
 msgstr ""
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:536
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:537
 #, c-format
 msgid ""
 "outputSize:%d after decoding %d bytes of input audio data. Upgrading ffmpeg/"
 "libavcodec might fix this issue."
 msgstr ""
 
-#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:586
+#: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:587
 #, c-format
 msgid ""
 " --- Computation of resampled samples (%d) < then the actual returned "
 "samples (%d)"
 msgstr ""
 
-#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:140
+#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:141
 #, c-format
 msgid "Cannot find suitable decoder for flash codec %d"
 msgstr ""
 
-#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:179
+#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:180
 msgid "libavcodec can't decode this video format"
 msgstr ""
 
-#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:207
+#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:208
 #, c-format
 msgid "libavcodec failed to initialize FFMPEG codec %s (%d)"
 msgstr ""
 
-#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:215
+#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:216
 #, c-format
 msgid "VideoDecoder: initialized FFMPEG codec %s (%d)"
 msgstr ""
 
-#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:305
+#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:306
 msgid "Pixel format not handled"
 msgstr ""
 
-#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:353
+#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:354
 msgid "Out of memory while allocating avcodec frame"
 msgstr ""
 
-#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:372
+#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:373
 msgid "Decoding of a video frame failed"
 msgstr ""
 
-#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:433
+#: libmedia/ffmpeg/VideoDecoderFfmpeg.cpp:434
 #, c-format
 msgid "Unsupported video codec %d"
 msgstr ""
 
-#: libmedia/haiku/MediaHandlerHaiku.cpp:114
+#: libmedia/haiku/MediaHandlerHaiku.cpp:115
 #, c-format
 msgid "MediaHandlerHaiku::createAudioDecoder: %s -- %s"
 msgstr ""
 
-#: libmedia/AudioDecoderSpeex.cpp:40
+#: libmedia/AudioDecoderSpeex.cpp:41
 msgid "AudioDecoderSpeex: state initialization failed."
 msgstr ""
 
-#: libmedia/AudioDecoderSpeex.cpp:53
+#: libmedia/AudioDecoderSpeex.cpp:54
 msgid "AudioDecoderSpeex: initialization failed."
 msgstr ""
 
-#: libmedia/AudioDecoderSpeex.cpp:108
+#: libmedia/AudioDecoderSpeex.cpp:109
 msgid "Corrupt Speex stream!"
 msgstr ""
 
-#: libmedia/AudioDecoderSpeex.cpp:132
+#: libmedia/AudioDecoderSpeex.cpp:133
 msgid "Failed to resample Speex frame."
 msgstr ""
 
-#: libmedia/FLVParser.cpp:169
+#: libmedia/FLVParser.cpp:170
 #, c-format
 msgid ""
 "Unexpected audio tag found at offset %d FLV stream advertising no audio in "
 "header. We'll warn only once for each FLV, expecting any further audio tag."
 msgstr ""
 
-#: libmedia/FLVParser.cpp:186
+#: libmedia/FLVParser.cpp:187
 msgid "could not read audio frame?"
 msgstr ""
 
-#: libmedia/FLVParser.cpp:224
+#: libmedia/FLVParser.cpp:225
 #, c-format
 msgid ""
 "Unexpected video tag found at offset %d of FLV stream advertising no video "
 "in header. We'll warn only once per FLV, expecting any further video tag."
 msgstr ""
 
-#: libmedia/FLVParser.cpp:244
+#: libmedia/FLVParser.cpp:245
 #, c-format
 msgid "AVC packet type: %d"
 msgstr ""
 
-#: libmedia/FLVParser.cpp:263
+#: libmedia/FLVParser.cpp:264
 msgid "could not read video frame?"
 msgstr ""
 
-#: libmedia/FLVParser.cpp:321
+#: libmedia/FLVParser.cpp:322
 #, c-format
 msgid "FLVParser::parseNextTag: can't seek to %d"
 msgstr ""
 
-#: libmedia/FLVParser.cpp:335
+#: libmedia/FLVParser.cpp:336
 #, c-format
 msgid ""
 "FLVParser::parseNextTag: can't read tag info (needed 12 bytes, only got %d)"
 msgstr ""
 
-#: libmedia/FLVParser.cpp:422
+#: libmedia/FLVParser.cpp:423
 #, c-format
 msgid "First byte of FLV_META_TAG is %d, expected 0x02 (STRING AMF0 type)"
 msgstr ""
 
-#: libmedia/FLVParser.cpp:434
+#: libmedia/FLVParser.cpp:435
 #, c-format
 msgid ""
 "FLVParser::parseNextTag: can't read metaTag (%d) body (needed %d bytes, only "
 "got %d)"
 msgstr ""
 
-#: libmedia/FLVParser.cpp:445
+#: libmedia/FLVParser.cpp:446
 msgid "Corrupt FLV: Meta tag unterminated!"
 msgstr ""
 
-#: libmedia/FLVParser.cpp:453
+#: libmedia/FLVParser.cpp:454
 #, c-format
 msgid "FLVParser::parseNextTag: unknown FLV tag type %d"
 msgstr ""
 
-#: libmedia/FLVParser.cpp:462
+#: libmedia/FLVParser.cpp:463
 msgid ""
 "Corrupt FLV: previous tag size record (%1%) unexpected (actual size: %2%)"
 msgstr ""
 
-#: libmedia/FLVParser.cpp:480
+#: libmedia/FLVParser.cpp:481
 msgid "FLVParser::parseHeader: couldn't read 9 bytes of header"
 msgstr ""
 
-#: libmedia/FLVParser.cpp:532
+#: libmedia/FLVParser.cpp:533
 #, c-format
 msgid "FLVParser::readAudioFrame: could only read %d/%d bytes"
 msgstr ""
 
-#: libmedia/gst/VideoConverterGst.cpp:37
+#: libmedia/gst/VideoConverterGst.cpp:39
 msgid "VideoConverterGst: ffmpegcolorspace element missing"
 msgstr ""
 
-#: libmedia/gst/VideoConverterGst.cpp:70
+#: libmedia/gst/VideoConverterGst.cpp:72
 msgid "VideoConverterGst: can't output requested format"
 msgstr ""
 
-#: libmedia/gst/VideoConverterGst.cpp:98
+#: libmedia/gst/VideoConverterGst.cpp:100
 msgid "VideoConverterGst: internal error (caps creation failed)"
 msgstr ""
 
-#: libmedia/gst/VideoConverterGst.cpp:105
-msgid "VideoConverterGst: initialisation failed."
+#: libmedia/gst/VideoConverterGst.cpp:107
+msgid "VideoConverterGst: initialization failed."
 msgstr ""
 
-#: libmedia/gst/VideoConverterGst.cpp:140
+#: libmedia/gst/VideoConverterGst.cpp:142
 msgid "VideoConverterGst: buffer push failed."
 msgstr ""
 
-#: libmedia/gst/VideoConverterGst.cpp:147
+#: libmedia/gst/VideoConverterGst.cpp:149
 msgid "VideoConverterGst: buffer pull failed."
 msgstr ""
 
-#: libmedia/gst/GstUtil.cpp:75
+#: libmedia/gst/GstUtil.cpp:76
 msgid "Unable to retrieve a valid audio sink from ~/.gnashrc"
 msgstr ""
 
-#: libmedia/gst/GstUtil.cpp:81
+#: libmedia/gst/GstUtil.cpp:82
 msgid "Unable to retrieve a valid audio sink from autoaudiosink"
 msgstr ""
 
-#: libmedia/gst/GstUtil.cpp:86
+#: libmedia/gst/GstUtil.cpp:87
 #, c-format
 msgid ""
 "Unable to retrieve a valid audio sink from gconfaudiosink\n"
 "%s"
 msgstr ""
 
-#: libmedia/gst/GstUtil.cpp:87
+#: libmedia/gst/GstUtil.cpp:88
 msgid "Sink search exhausted: you won't be able to hear sound!"
 msgstr ""
 
-#: libmedia/gst/GstUtil.cpp:93
+#: libmedia/gst/GstUtil.cpp:94
 #, c-format
 msgid "Got a non-NULL audio sink; its wrapper name is: %s"
 msgstr ""
 
-#: libmedia/gst/GstUtil.cpp:115
+#: libmedia/gst/GstUtil.cpp:116
 msgid ""
 "Missing plugin, but plugin installing not supported. Will try anyway, but "
 "expect failure."
 msgstr ""
 
-#: libmedia/gst/GstUtil.cpp:121
+#: libmedia/gst/GstUtil.cpp:122
 msgid "Missing plugin, but failed to convert it to gst missing plugin detail."
 msgstr ""
 
-#: libmedia/gst/GstUtil.cpp:134
+#: libmedia/gst/GstUtil.cpp:135
 msgid ""
 "gst_update_registry failed. You'll need to restart Gnash to use the new "
 "plugins."
 msgstr ""
 
-#: libmedia/gst/GstUtil.cpp:141
+#: libmedia/gst/GstUtil.cpp:142
 msgid "Missing plugin, but automatic plugin installation not available."
 msgstr ""
 
@@ -1320,106 +1320,106 @@ msgstr ""
 msgid "VideoDecoderGst: buffer push failed."
 msgstr ""
 
-#: libmedia/gst/MediaParserGst.cpp:54
+#: libmedia/gst/MediaParserGst.cpp:55
 msgid "MediaParserGst couldn't create a bin"
 msgstr ""
 
-#: libmedia/gst/MediaParserGst.cpp:59
+#: libmedia/gst/MediaParserGst.cpp:60
 msgid "MediaParserGst couldn't create a typefind element."
 msgstr ""
 
-#: libmedia/gst/MediaParserGst.cpp:71 libmedia/gst/MediaParserGst.cpp:93
-#: libmedia/gst/MediaParserGst.cpp:316 libmedia/gst/MediaParserGst.cpp:373
-#: libmedia/gst/MediaParserGst.cpp:527
+#: libmedia/gst/MediaParserGst.cpp:72 libmedia/gst/MediaParserGst.cpp:94
+#: libmedia/gst/MediaParserGst.cpp:317 libmedia/gst/MediaParserGst.cpp:374
+#: libmedia/gst/MediaParserGst.cpp:528
 msgid "MediaParserGst could not change element state"
 msgstr ""
 
-#: libmedia/gst/MediaParserGst.cpp:84
+#: libmedia/gst/MediaParserGst.cpp:85
 #, c-format
 msgid "Needed %d dead iterations to detect audio type."
 msgstr ""
 
-#: libmedia/gst/MediaParserGst.cpp:88
+#: libmedia/gst/MediaParserGst.cpp:89
 msgid "MediaParserGst failed to detect any stream types."
 msgstr ""
 
-#: libmedia/gst/MediaParserGst.cpp:186
+#: libmedia/gst/MediaParserGst.cpp:187
 msgid ""
 "MediaParserGst failed to read the stream, but it did not reach EOF or enter "
 "a bad state."
 msgstr ""
 
-#: libmedia/gst/MediaParserGst.cpp:200
+#: libmedia/gst/MediaParserGst.cpp:201
 msgid "MediaParserGst failed to push more data into the demuxer! Seeking back."
 msgstr ""
 
-#: libmedia/gst/MediaParserGst.cpp:279
+#: libmedia/gst/MediaParserGst.cpp:280
 #, c-format
 msgid "MediaParserGst/typefound: Detected media type %s"
 msgstr ""
 
-#: libmedia/gst/MediaParserGst.cpp:291 libmedia/gst/MediaParserGst.cpp:298
+#: libmedia/gst/MediaParserGst.cpp:292 libmedia/gst/MediaParserGst.cpp:299
 msgid "MediaParserGst Failed to create fakesink."
 msgstr ""
 
-#: libmedia/gst/MediaParserGst.cpp:304
+#: libmedia/gst/MediaParserGst.cpp:305
 msgid "MediaParserGst: couldn't get the fakesink src element."
 msgstr ""
 
-#: libmedia/gst/MediaParserGst.cpp:312
+#: libmedia/gst/MediaParserGst.cpp:313
 msgid "MediaParserGst: couln't link fakesink"
 msgstr ""
 
-#: libmedia/gst/MediaParserGst.cpp:336
+#: libmedia/gst/MediaParserGst.cpp:337
 msgid "MediaParserGst: couldn't get the typefind src element."
 msgstr ""
 
-#: libmedia/gst/MediaParserGst.cpp:351
+#: libmedia/gst/MediaParserGst.cpp:352
 msgid "MediaParserGst: couldn't create the demuxer"
 msgstr ""
 
-#: libmedia/gst/MediaParserGst.cpp:357 libmedia/gst/MediaParserGst.cpp:362
+#: libmedia/gst/MediaParserGst.cpp:358 libmedia/gst/MediaParserGst.cpp:363
 msgid "MediaParserGst: failed adding demuxer to bin."
 msgstr ""
 
-#: libmedia/gst/MediaParserGst.cpp:389
+#: libmedia/gst/MediaParserGst.cpp:390
 msgid "MediaParserGst: couldn't get structure name."
 msgstr ""
 
-#: libmedia/gst/MediaParserGst.cpp:403
+#: libmedia/gst/MediaParserGst.cpp:404
 #, c-format
 msgid "MediaParserGst: ignoring stream of type %s."
 msgstr ""
 
-#: libmedia/gst/MediaParserGst.cpp:427
+#: libmedia/gst/MediaParserGst.cpp:428
 #, c-format
 msgid "MediaParserGst: Failed to find a parser (media: %s)."
 msgstr ""
 
-#: libmedia/gst/MediaParserGst.cpp:436
+#: libmedia/gst/MediaParserGst.cpp:437
 msgid ""
 "MediaParserGst: Failed to find a parser. We'll continue, but either audio or "
 "video will not work!"
 msgstr ""
 
-#: libmedia/gst/MediaParserGst.cpp:445
+#: libmedia/gst/MediaParserGst.cpp:446
 msgid "MediaParserGst: couldn't add parser."
 msgstr ""
 
-#: libmedia/gst/MediaParserGst.cpp:458
+#: libmedia/gst/MediaParserGst.cpp:459
 msgid "MediaParserGst: couldn't link parser."
 msgstr ""
 
-#: libmedia/gst/MediaParserGst.cpp:470 libmedia/gst/MediaParserGst.cpp:503
+#: libmedia/gst/MediaParserGst.cpp:471 libmedia/gst/MediaParserGst.cpp:504
 msgid "MediaParserGst: couldn't link \"fake\" sink."
 msgstr ""
 
-#: libmedia/gst/MediaParserGst.cpp:489
+#: libmedia/gst/MediaParserGst.cpp:490
 #, c-format
 msgid "MediaParserGst: Linked audio source (type: %s)"
 msgstr ""
 
-#: libmedia/gst/MediaParserGst.cpp:519
+#: libmedia/gst/MediaParserGst.cpp:520
 #, c-format
 msgid "MediaParserGst: Linked video source (type: %s)"
 msgstr ""
@@ -1687,11 +1687,11 @@ msgstr ""
 msgid "%s: there was some problem in linking!"
 msgstr ""
 
-#: libmedia/gst/MediaHandlerGst.cpp:89
+#: libmedia/gst/MediaHandlerGst.cpp:90
 msgid "Wrong arguments given to GST VideoDecoder"
 msgstr ""
 
-#: libmedia/gst/MediaHandlerGst.cpp:136
+#: libmedia/gst/MediaHandlerGst.cpp:137
 #, c-format
 msgid "MediaHandlerGst::createAudioDecoder: %s -- %s"
 msgstr ""
@@ -1817,49 +1817,49 @@ msgstr ""
 msgid "You have an invalid microphone selected. Check your gnashrc file"
 msgstr ""
 
-#: libmedia/AudioDecoderSimple.cpp:162
+#: libmedia/AudioDecoderSimple.cpp:163
 msgid "corrupted ADPCM header"
 msgstr ""
 
-#: libmedia/AudioDecoderSimple.cpp:290 libmedia/AudioDecoderSimple.cpp:303
+#: libmedia/AudioDecoderSimple.cpp:291 libmedia/AudioDecoderSimple.cpp:304
 #, c-format
 msgid "AudioDecoderSimple: initialized flash codec %s (%d)"
 msgstr ""
 
-#: libmedia/AudioDecoderSimple.cpp:329 libmedia/AudioDecoderSimple.cpp:360
+#: libmedia/AudioDecoderSimple.cpp:330 libmedia/AudioDecoderSimple.cpp:361
 #, c-format
 msgid "AudioDecoderSimple: unsupported flash codec %d (%s)"
 msgstr ""
 
-#: libmedia/AudioDecoderSimple.cpp:340
+#: libmedia/AudioDecoderSimple.cpp:341
 #, c-format
 msgid "AudioDecoderSimple: unable to intepret custom audio codec id %s"
 msgstr ""
 
-#: libmedia/AudioDecoderSimple.cpp:427
+#: libmedia/AudioDecoderSimple.cpp:428
 msgid "Host endianness not detected in AudioDecoderSimple"
 msgstr ""
 
-#: libmedia/AudioDecoderSimple.cpp:477
+#: libmedia/AudioDecoderSimple.cpp:478
 msgid "Error in sound sample conversion"
 msgstr ""
 
-#: libmedia/MediaHandler.cpp:48
+#: libmedia/MediaHandler.cpp:49
 msgid "MediaHandler::isFLV: Could not read 3 bytes from input stream"
 msgstr ""
 
-#: libmedia/MediaHandler.cpp:64
+#: libmedia/MediaHandler.cpp:65
 msgid ""
 "MediaHandler::createMediaParser: only FLV input is supported by this "
 "MediaHandler"
 msgstr ""
 
-#: libmedia/MediaHandler.cpp:70
+#: libmedia/MediaHandler.cpp:71
 #, c-format
 msgid "Exception while reading from stream: %s"
 msgstr ""
 
-#: libmedia/MediaHandler.cpp:107
+#: libmedia/MediaHandler.cpp:108
 #, c-format
 msgid ""
 "MediaHandler::createFlashAudioDecoder: no available flash decoders for codec "
@@ -1876,12 +1876,12 @@ msgstr ""
 msgid "serialization of as_value of type %d"
 msgstr ""
 
-#: libcore/ClassHierarchy.cpp:84
+#: libcore/ClassHierarchy.cpp:85
 #, c-format
 msgid "Native class %s is not an object after initialization (%s)"
 msgstr ""
 
-#: libcore/ClassHierarchy.cpp:91
+#: libcore/ClassHierarchy.cpp:92
 #, c-format
 msgid "Native class %s is not found after initialization"
 msgstr ""
@@ -2040,14 +2040,14 @@ msgstr ""
 msgid "DefineFontInfo2 partially implemented"
 msgstr ""
 
-#: libcore/swf/CSMTextSettingsTag.cpp:76
+#: libcore/swf/CSMTextSettingsTag.cpp:77
 #, c-format
 msgid ""
 "  CSMTextSettings: TextID=%d, FlashType=%d, GridFit=%d, Thickness=%d, "
 "Sharpness=%d"
 msgstr ""
 
-#: libcore/swf/CSMTextSettingsTag.cpp:84
+#: libcore/swf/CSMTextSettingsTag.cpp:85
 msgid "CSMTextSettings"
 msgstr ""
 
@@ -2089,17 +2089,17 @@ msgstr ""
 msgid "   glyph%d: index=%d, advance=%g"
 msgstr ""
 
-#: libcore/swf/StartSoundTag.cpp:55
+#: libcore/swf/StartSoundTag.cpp:56
 #, c-format
 msgid "start_sound_loader: sound_id %d is not defined"
 msgstr ""
 
-#: libcore/swf/StartSoundTag.cpp:63
+#: libcore/swf/StartSoundTag.cpp:64
 #, c-format
 msgid "StartSound: id=%d"
 msgstr ""
 
-#: libcore/swf/StartSoundTag.cpp:113
+#: libcore/swf/StartSoundTag.cpp:114
 msgid "STARTSOUND2 tag not parsed and not used"
 msgstr ""
 
@@ -2213,17 +2213,17 @@ msgstr ""
 msgid "  reflex = \"%c%c%c\""
 msgstr ""
 
-#: libcore/swf/DefineFontAlignZonesTag.cpp:53
+#: libcore/swf/DefineFontAlignZonesTag.cpp:54
 #, c-format
 msgid "DefineFontAlignZones tag references an undefined font %d"
 msgstr ""
 
-#: libcore/swf/DefineFontAlignZonesTag.cpp:72
+#: libcore/swf/DefineFontAlignZonesTag.cpp:73
 #, c-format
 msgid "DefineFontAlignZones: font=%d, flags=%d, table int: %s"
 msgstr ""
 
-#: libcore/swf/DefineFontAlignZonesTag.cpp:109
+#: libcore/swf/DefineFontAlignZonesTag.cpp:110
 msgid "DefineFontAlignZoneTag"
 msgstr ""
 
@@ -2327,156 +2327,156 @@ msgstr ""
 msgid "  readLineStyles: count2 = %d"
 msgstr ""
 
-#: libcore/swf/PlaceObject2Tag.cpp:84
+#: libcore/swf/PlaceObject2Tag.cpp:85
 #, c-format
 msgid "  PLACEOBJECT: depth=%d(%d) char=%d"
 msgstr ""
 
-#: libcore/swf/PlaceObject2Tag.cpp:88 libcore/swf/PlaceObject2Tag.cpp:310
+#: libcore/swf/PlaceObject2Tag.cpp:89 libcore/swf/PlaceObject2Tag.cpp:311
 #, c-format
 msgid "  SWFCxForm: %s"
 msgstr ""
 
-#: libcore/swf/PlaceObject2Tag.cpp:104
+#: libcore/swf/PlaceObject2Tag.cpp:105
 #, c-format
 msgid "Reserved field in PlaceObject actions == %u (expected 0)"
 msgstr ""
 
-#: libcore/swf/PlaceObject2Tag.cpp:122
+#: libcore/swf/PlaceObject2Tag.cpp:123
 #, c-format
 msgid "  actions: flags = 0x%X"
 msgstr ""
 
-#: libcore/swf/PlaceObject2Tag.cpp:157
+#: libcore/swf/PlaceObject2Tag.cpp:158
 #, c-format
 msgid ""
 "swf_event::read(), even_length = %u, but only %lu bytes left to the end of "
 "current tag. Breaking for safety."
 msgstr ""
 
-#: libcore/swf/PlaceObject2Tag.cpp:218
+#: libcore/swf/PlaceObject2Tag.cpp:219
 #, c-format
 msgid ""
 "swf_event::read() -- unknown / unhandled event type received, flags = 0x%x"
 msgstr ""
 
-#: libcore/swf/PlaceObject2Tag.cpp:247
+#: libcore/swf/PlaceObject2Tag.cpp:248
 msgid "Unexpected end of tag while parsing PlaceObject tag events"
 msgstr ""
 
-#: libcore/swf/PlaceObject2Tag.cpp:303
+#: libcore/swf/PlaceObject2Tag.cpp:304
 #, c-format
 msgid "  PLACEOBJECT2: depth = %d (%d)"
 msgstr ""
 
-#: libcore/swf/PlaceObject2Tag.cpp:305 libcore/swf/PlaceObject2Tag.cpp:418
+#: libcore/swf/PlaceObject2Tag.cpp:306 libcore/swf/PlaceObject2Tag.cpp:419
 #, c-format
 msgid "  char id = %d"
 msgstr ""
 
-#: libcore/swf/PlaceObject2Tag.cpp:307 libcore/swf/PlaceObject2Tag.cpp:419
+#: libcore/swf/PlaceObject2Tag.cpp:308 libcore/swf/PlaceObject2Tag.cpp:420
 #, c-format
 msgid "  SWFMatrix: %s"
 msgstr ""
 
-#: libcore/swf/PlaceObject2Tag.cpp:312 libcore/swf/PlaceObject2Tag.cpp:421
+#: libcore/swf/PlaceObject2Tag.cpp:313 libcore/swf/PlaceObject2Tag.cpp:422
 #, c-format
 msgid "  ratio: %d"
 msgstr ""
 
-#: libcore/swf/PlaceObject2Tag.cpp:313 libcore/swf/PlaceObject2Tag.cpp:422
+#: libcore/swf/PlaceObject2Tag.cpp:314 libcore/swf/PlaceObject2Tag.cpp:423
 #, c-format
 msgid "  name = %s"
 msgstr ""
 
-#: libcore/swf/PlaceObject2Tag.cpp:315 libcore/swf/PlaceObject2Tag.cpp:424
+#: libcore/swf/PlaceObject2Tag.cpp:316 libcore/swf/PlaceObject2Tag.cpp:425
 #, c-format
 msgid "  clip_depth = %d (%d)"
 msgstr ""
 
-#: libcore/swf/PlaceObject2Tag.cpp:318 libcore/swf/PlaceObject2Tag.cpp:427
+#: libcore/swf/PlaceObject2Tag.cpp:319 libcore/swf/PlaceObject2Tag.cpp:428
 #, c-format
 msgid " m_place_type: %d"
 msgstr ""
 
-#: libcore/swf/PlaceObject2Tag.cpp:416
+#: libcore/swf/PlaceObject2Tag.cpp:417
 #, c-format
 msgid "  PLACEOBJECT3: depth = %d (%d)"
 msgstr ""
 
-#: libcore/swf/PlaceObject2Tag.cpp:420
+#: libcore/swf/PlaceObject2Tag.cpp:421
 #, c-format
 msgid "  SWFCxForm: %d"
 msgstr ""
 
-#: libcore/swf/PlaceObject2Tag.cpp:423
+#: libcore/swf/PlaceObject2Tag.cpp:424
 #, c-format
 msgid "  class name = %s"
 msgstr ""
 
-#: libcore/swf/PlaceObject2Tag.cpp:426
+#: libcore/swf/PlaceObject2Tag.cpp:427
 msgid "   bitmapCaching enabled"
 msgstr ""
 
-#: libcore/swf/SoundStreamHeadTag.cpp:75
+#: libcore/swf/SoundStreamHeadTag.cpp:76
 #, c-format
 msgid "SOUNDSTREAMHEAD: stream sample rate %d (expected 0 to %u)"
 msgstr ""
 
-#: libcore/swf/SoundStreamHeadTag.cpp:85
+#: libcore/swf/SoundStreamHeadTag.cpp:86
 #, c-format
 msgid ""
 "Different stream/playback sound rate (%d/%d). This seems common in SWF "
 "files, so we'll warn only once."
 msgstr ""
 
-#: libcore/swf/SoundStreamHeadTag.cpp:92
+#: libcore/swf/SoundStreamHeadTag.cpp:93
 #, c-format
 msgid ""
 "Different stream/playback sample size (%d/%d). This seems common in SWF "
 "files, so we'll warn only once."
 msgstr ""
 
-#: libcore/swf/SoundStreamHeadTag.cpp:98
+#: libcore/swf/SoundStreamHeadTag.cpp:99
 #, c-format
 msgid ""
 "Different stream/playback channels (%s/%s). This seems common in SWF files, "
 "so we'll warn only once."
 msgstr ""
 
-#: libcore/swf/SoundStreamHeadTag.cpp:118
+#: libcore/swf/SoundStreamHeadTag.cpp:119
 msgid ""
 "No samples advertised for sound stream, pretty common so will warn only once"
 msgstr ""
 
-#: libcore/swf/SoundStreamHeadTag.cpp:145
+#: libcore/swf/SoundStreamHeadTag.cpp:146
 #, c-format
 msgid ""
 "sound stream head: format=%s, rate=%d, 16=%d, stereo=%d, ct=%d, latency=%d"
 msgstr ""
 
-#: libcore/swf/DefineButtonCxformTag.cpp:48
+#: libcore/swf/DefineButtonCxformTag.cpp:49
 #, c-format
 msgid "DefineButtonCxform refers to an unknown DisplayObject %d"
 msgstr ""
 
-#: libcore/swf/DefineButtonCxformTag.cpp:59
+#: libcore/swf/DefineButtonCxformTag.cpp:60
 #, c-format
 msgid ""
 "DefineButtonCxform refers to DisplayObject ID %d (%s). Expected a button "
 "definition"
 msgstr ""
 
-#: libcore/swf/RemoveObjectTag.cpp:70
+#: libcore/swf/RemoveObjectTag.cpp:71
 #, c-format
 msgid "  remove_object_2(%d)"
 msgstr ""
 
-#: libcore/swf/StreamSoundBlockTag.cpp:74
+#: libcore/swf/StreamSoundBlockTag.cpp:75
 msgid "Found SOUNDSTREAMBLOCK tag w/out preceding SOUNDSTREAMHEAD"
 msgstr ""
 
-#: libcore/swf/StreamSoundBlockTag.cpp:110
+#: libcore/swf/StreamSoundBlockTag.cpp:111
 msgid "Tag boundary reported past end of stream!"
 msgstr ""
 
@@ -2618,7 +2618,7 @@ msgstr ""
 
 #: libcore/LoadVariablesThread.cpp:74
 #, c-format
-msgid "%s to utf8 conversion in MovieClip.loadVariables input parsing"
+msgid "%s to UTF8 conversion in MovieClip.loadVariables input parsing"
 msgstr ""
 
 #: libcore/LoadVariablesThread.cpp:123
@@ -2938,7 +2938,7 @@ msgid "Server called _onbwcheck without a callback"
 msgstr ""
 
 #: libcore/asobj/NetConnection_as.cpp:1307
-msgid "rtmp server sent error"
+msgid "RTMP server sent error"
 msgstr ""
 
 #: libcore/asobj/Function_as.cpp:105
@@ -3219,8 +3219,7 @@ msgstr ""
 #: libcore/asobj/flash/geom/Point_as.cpp:190
 #: libcore/asobj/flash/geom/Point_as.cpp:238
 #: libcore/asobj/flash/geom/Point_as.cpp:323
-#, c-format
-#, c-format, fuzzy
+#, fuzzy, c-format
 msgid "%s: missing arguments"
 msgstr "អាគុយម៉ង់​បាត់"
 
@@ -5193,15 +5192,15 @@ msgid "Expected a font name in FACE attribute."
 msgstr ""
 
 #: libcore/TextField.cpp:1513
-msgid "<img> html tag in TextField"
+msgid "<img> HTML tag in TextField"
 msgstr ""
 
 #: libcore/TextField.cpp:1551
-msgid "<span> html tag in TextField"
+msgid "<span> HTML tag in TextField"
 msgstr ""
 
 #: libcore/TextField.cpp:1623
-msgid "html <textformat> tag tabstops attribute"
+msgid "HTML <textformat> tag tabstops attribute"
 msgstr ""
 
 #: libcore/TextField.cpp:1706
@@ -5235,8 +5234,9 @@ msgstr ""
 
 #: libcore/TextField.cpp:2024 libcore/TextField.cpp:2058
 #: libcore/TextField.cpp:2149
-msgid "invalid html tag"
-msgstr ""
+#, fuzzy
+msgid "invalid HTML tag"
+msgstr "អាគុយម៉ង់​​​មិន​ត្រឹមត្រូវ"
 
 #: libcore/TextField.cpp:2035 libcore/TextField.cpp:2071
 #: libcore/TextField.cpp:2102
@@ -5427,8 +5427,7 @@ msgid "Unknown AMF type %s! Cannot proceed"
 msgstr ""
 
 #: libcore/AMFConverter.cpp:376
-#, c-format
-#, c-format, fuzzy
+#, fuzzy, c-format
 msgid "AMF parsing error: %s"
 msgstr "កំហុស​ក្នុង​ការ​ញែក ៖ %s"
 
@@ -5977,7 +5976,7 @@ msgstr ""
 
 #: libcore/vm/ASHandlers.cpp:3630
 #, c-format
-msgid "get url: target %s is not a sprite"
+msgid "get URL: target %s is not a sprite"
 msgstr ""
 
 #: libcore/vm/ASHandlers.cpp:3695
@@ -5990,33 +5989,33 @@ msgstr ""
 msgid "-------------- local register[%d] = '%s'"
 msgstr ""
 
-#: libcore/vm/Machine.cpp:894
+#: libcore/vm/Machine.cpp:895
 #, c-format
 msgid "Can't push a null value onto the scope stack (%s)."
 msgstr ""
 
-#: libcore/vm/Machine.cpp:1437
+#: libcore/vm/Machine.cpp:1438
 #, c-format
 msgid ""
 "CALLPROP: Can't call a method of a value that doesn't cast to an object (%s)."
 msgstr ""
 
-#: libcore/vm/Machine.cpp:1454
+#: libcore/vm/Machine.cpp:1455
 #, c-format
 msgid "CALLPROP: Property '%s' of object '%s' is '%s', cannot call as method"
 msgstr ""
 
-#: libcore/vm/Machine.cpp:1982
+#: libcore/vm/Machine.cpp:1983
 #, c-format
 msgid "GETPROPERTY: Looking for property %s of object %s"
 msgstr ""
 
-#: libcore/vm/Machine.cpp:1986
+#: libcore/vm/Machine.cpp:1987
 #, c-format
 msgid "GETPROPERTY: expecting object on stack, got %s."
 msgstr ""
 
-#: libcore/vm/Machine.cpp:2121
+#: libcore/vm/Machine.cpp:2122
 #, c-format
 msgid "ABC_ACTION_SETSLOT: unexpected non-object stack value %s"
 msgstr ""
@@ -6306,58 +6305,58 @@ msgstr ""
 msgid "  -- sprite END --"
 msgstr ""
 
-#: libcore/parser/filter_factory.cpp:53
+#: libcore/parser/filter_factory.cpp:54
 #, c-format
 msgid "   number of filters: %d"
 msgstr ""
 
-#: libcore/parser/filter_factory.cpp:91
+#: libcore/parser/filter_factory.cpp:92
 #, c-format
 msgid "Invalid filter type %d."
 msgstr ""
 
-#: libcore/parser/filter_factory.cpp:101
+#: libcore/parser/filter_factory.cpp:102
 #, c-format
 msgid "Filter %d could not read."
 msgstr ""
 
-#: libcore/parser/filter_factory.cpp:133
+#: libcore/parser/filter_factory.cpp:134
 #, c-format
 msgid "   DropShadowFilter: blurX=%f blurY=%f"
 msgstr ""
 
-#: libcore/parser/filter_factory.cpp:152
+#: libcore/parser/filter_factory.cpp:153
 #, c-format
 msgid "   BlurFilter: blurX=%f blurY=%f quality=%d"
 msgstr ""
 
-#: libcore/parser/filter_factory.cpp:179
+#: libcore/parser/filter_factory.cpp:180
 msgid "   GlowFilter "
 msgstr ""
 
-#: libcore/parser/filter_factory.cpp:217
+#: libcore/parser/filter_factory.cpp:218
 msgid "   BevelFilter "
 msgstr ""
 
-#: libcore/parser/filter_factory.cpp:264
+#: libcore/parser/filter_factory.cpp:265
 msgid "   GradientGlowFilter "
 msgstr ""
 
-#: libcore/parser/filter_factory.cpp:300
+#: libcore/parser/filter_factory.cpp:301
 msgid "   ConvolutionFilter "
 msgstr ""
 
-#: libcore/parser/filter_factory.cpp:317
+#: libcore/parser/filter_factory.cpp:318
 msgid "   ColorMatrixFilter: "
 msgstr ""
 
-#: libcore/parser/filter_factory.cpp:318 libcore/parser/filter_factory.cpp:321
-#: libcore/parser/filter_factory.cpp:324 libcore/parser/filter_factory.cpp:327
+#: libcore/parser/filter_factory.cpp:319 libcore/parser/filter_factory.cpp:322
+#: libcore/parser/filter_factory.cpp:325 libcore/parser/filter_factory.cpp:328
 #, c-format
 msgid "     %g, %g, %g, %g, %g"
 msgstr ""
 
-#: libcore/parser/filter_factory.cpp:374
+#: libcore/parser/filter_factory.cpp:375
 msgid "   GradientBevelFilter "
 msgstr ""
 
@@ -6578,183 +6577,183 @@ msgstr ""
 msgid "Could not write to browser fd #%d: %s"
 msgstr ""
 
-#: libcore/movie_root.cpp:2153
+#: libcore/movie_root.cpp:2155
 #, c-format
 msgid "Fork failed launching URL opener '%s'"
 msgstr ""
 
-#: libcore/movie_root.cpp:2200
+#: libcore/movie_root.cpp:2202
 #, c-format
 msgid "Could only write %d bytes to fd #%d"
 msgstr ""
 
-#: libcore/movie_root.cpp:2288
+#: libcore/movie_root.cpp:2290
 msgid "Live MovieClips"
 msgstr ""
 
-#: libcore/movie_root.cpp:2417
+#: libcore/movie_root.cpp:2419
 #, c-format
-msgid "%s to utf8 conversion in LoadableObject input parsing"
+msgid "%s to UTF8 conversion in LoadableObject input parsing"
 msgstr ""
 
-#: libcore/movie_root.cpp:2440
+#: libcore/movie_root.cpp:2442
 #, c-format
 msgid ""
 "Hosting application registered no callback for events/queries, can't call %s"
 "(%s)"
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:64 libcore/abc/AbcBlock.cpp:132
+#: libcore/abc/AbcBlock.cpp:65 libcore/abc/AbcBlock.cpp:133
 msgid "ABC: Finalizing trait yielded bad type for slot."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:187
+#: libcore/abc/AbcBlock.cpp:188
 msgid "ABC: Bad name for trait."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:192
+#: libcore/abc/AbcBlock.cpp:193
 msgid "ABC: Trait name must be fully qualified."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:239 libcore/abc/AbcBlock.cpp:265
+#: libcore/abc/AbcBlock.cpp:240 libcore/abc/AbcBlock.cpp:266
 msgid "Bad method id in trait."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:255
+#: libcore/abc/AbcBlock.cpp:256
 msgid "Bad Class id in trait."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:273
+#: libcore/abc/AbcBlock.cpp:274
 msgid "ABC: Unknown type of trait."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:467
+#: libcore/abc/AbcBlock.cpp:468
 #, c-format
 msgid "Abc Version: %d.%d"
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:566
+#: libcore/abc/AbcBlock.cpp:567
 msgid "ABC: Bad string given for namespace."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:608
+#: libcore/abc/AbcBlock.cpp:609
 msgid "ABC: Bad namespace for namespace set."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:678
+#: libcore/abc/AbcBlock.cpp:679
 #, c-format
 msgid "Action Block: Unknown multiname type (%d)."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:711 libcore/abc/AbcBlock.cpp:721
-#: libcore/abc/AbcBlock.cpp:731 libcore/abc/AbcBlock.cpp:741
+#: libcore/abc/AbcBlock.cpp:712 libcore/abc/AbcBlock.cpp:722
+#: libcore/abc/AbcBlock.cpp:732 libcore/abc/AbcBlock.cpp:742
 msgid "Action Block: Bad index in optional argument."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:751
+#: libcore/abc/AbcBlock.cpp:752
 msgid "ABC: Bad index in optional argument, namespaces."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:773
+#: libcore/abc/AbcBlock.cpp:774
 #, c-format
 msgid "ABC: Bad default value type (%X), but continuing."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:811
+#: libcore/abc/AbcBlock.cpp:812
 msgid "ABC: Bad return type for method info."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:824
+#: libcore/abc/AbcBlock.cpp:825
 msgid "ABC: Unknown return type."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:841
+#: libcore/abc/AbcBlock.cpp:842
 msgid "ABC: Bad parameter type in method."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:850
+#: libcore/abc/AbcBlock.cpp:851
 msgid "ABC: Unknown parameter type."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:939
+#: libcore/abc/AbcBlock.cpp:940
 msgid "ABC: Out of bounds instance name."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:947
+#: libcore/abc/AbcBlock.cpp:948
 msgid "ABC: QName required for instance."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:952
+#: libcore/abc/AbcBlock.cpp:953
 msgid "ABC: No namespace to use for storing class."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:967
+#: libcore/abc/AbcBlock.cpp:968
 msgid "Duplicate class registration."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:983
+#: libcore/abc/AbcBlock.cpp:984
 msgid "ABC: Bad super type."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:994
+#: libcore/abc/AbcBlock.cpp:995
 #, c-format
 msgid "ABC: Super type not found (%s)"
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:1001
+#: libcore/abc/AbcBlock.cpp:1002
 msgid "ABC: Can't extend a class which is final."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:1007
+#: libcore/abc/AbcBlock.cpp:1008
 msgid "ABC: Can't extend an interface type."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:1013
+#: libcore/abc/AbcBlock.cpp:1014
 msgid "ABC: Class cannot be its own supertype."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:1034
+#: libcore/abc/AbcBlock.cpp:1035
 msgid "ABC: Bad namespace for protected."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:1053
+#: libcore/abc/AbcBlock.cpp:1054
 msgid "ABC: Bad name for interface."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:1060
+#: libcore/abc/AbcBlock.cpp:1061
 msgid "ABC: Can't implement a non-interface type."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:1072
+#: libcore/abc/AbcBlock.cpp:1073
 msgid "ABC: Out of bounds method for initializer."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:1107
+#: libcore/abc/AbcBlock.cpp:1108
 msgid "ABC: Out of bound static constructor for class."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:1146
+#: libcore/abc/AbcBlock.cpp:1147
 msgid "ABC: Out of bounds method for script."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:1182
+#: libcore/abc/AbcBlock.cpp:1183
 msgid "ABC: Out of bounds for method body."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:1189
+#: libcore/abc/AbcBlock.cpp:1190
 msgid "ABC: Only one body per method."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:1235
+#: libcore/abc/AbcBlock.cpp:1236
 msgid "ABC: Out of bound type for exception."
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:1245
+#: libcore/abc/AbcBlock.cpp:1246
 #, c-format
 msgid "ABC: Unknown type of object to catch. (%s)"
 msgstr ""
 
-#: libcore/abc/AbcBlock.cpp:1263
+#: libcore/abc/AbcBlock.cpp:1264
 msgid "ABC: Out of bound name for caught exception."
 msgstr ""
 
@@ -6786,13 +6785,13 @@ msgid "Can't read 3 bytes after an MZ (.exe) header"
 msgstr ""
 
 #: libcore/MovieFactory.cpp:222
-msgid "Could not find SWF inside an exe file"
+msgid "Could not find SWF inside an .exe file"
 msgstr ""
 
 #: libcore/MovieFactory.cpp:231
-#, c-format
-msgid "unknown file type, buf is %c%c%c"
-msgstr ""
+#, fuzzy, c-format
+msgid "unknown file type, buffer is %c%c%c"
+msgstr "មិនស្គាល់​ប្រភេទ​ឯកសារ"
 
 #: libcore/MovieFactory.cpp:273
 #, c-format
@@ -6848,170 +6847,170 @@ msgstr ""
 msgid "Circular inheritance chain detected during isPrototypeOf call"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:87 libdevice/egl/eglDevice.cpp:109
+#: libdevice/egl/eglDevice.cpp:86 libdevice/egl/eglDevice.cpp:108
 msgid "Couldn't initialize EGL device!"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:112
+#: libdevice/egl/eglDevice.cpp:111
 #, c-format
 msgid "Couldn't bind client to type %d!"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:182
+#: libdevice/egl/eglDevice.cpp:181
 #, c-format
 msgid "eglGetDisplay() failed (error 0x%x)"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:188
+#: libdevice/egl/eglDevice.cpp:187
 #, c-format
 msgid "eglInitialize() failed (error %s)"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:198
+#: libdevice/egl/eglDevice.cpp:197
 #, c-format
 msgid "EGL_CLIENT_APIS = %s"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:199
+#: libdevice/egl/eglDevice.cpp:198
 #, c-format
 msgid "EGL_EXTENSIONS = %s"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:200
+#: libdevice/egl/eglDevice.cpp:199
 #, c-format
 msgid "EGL_VERSION = %s, EGL_VENDOR = %s"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:209 libdevice/egl/eglDevice.cpp:544
+#: libdevice/egl/eglDevice.cpp:208 libdevice/egl/eglDevice.cpp:543
 #: gui/gtk/gtk_glue_ovg.cpp:383
 #, c-format
 msgid "eglGetConfigs() failed to retrieve the number of configs (error %s)"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:214 libdevice/egl/eglDevice.cpp:549
+#: libdevice/egl/eglDevice.cpp:213 libdevice/egl/eglDevice.cpp:548
 #: gui/gtk/gtk_glue_ovg.cpp:388
 msgid "No EGLconfigs found\n"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:217 libdevice/egl/eglDevice.cpp:552
+#: libdevice/egl/eglDevice.cpp:216 libdevice/egl/eglDevice.cpp:551
 #, c-format
 msgid "Max number of EGL Configs is %d"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:232
+#: libdevice/egl/eglDevice.cpp:231
 msgid "Using the 32bpp, low quality configuration"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:234
+#: libdevice/egl/eglDevice.cpp:233
 msgid "eglChooseConfig(32-low) failed"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:238
+#: libdevice/egl/eglDevice.cpp:237
 msgid "Using the 16bpp, low quality configuration"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:240
+#: libdevice/egl/eglDevice.cpp:239
 msgid "eglChooseConfig(16-low) failed"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:249
+#: libdevice/egl/eglDevice.cpp:248
 msgid "Using the 32bpp, medium quality configuration"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:251
+#: libdevice/egl/eglDevice.cpp:250
 msgid "eglChooseConfig(32-medium) failed"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:255 libdevice/egl/eglDevice.cpp:272
+#: libdevice/egl/eglDevice.cpp:254 libdevice/egl/eglDevice.cpp:271
 msgid "Using the 16bpp, medium quality configuration"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:257
+#: libdevice/egl/eglDevice.cpp:256
 msgid "eglChooseConfig(16-medium) failed"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:266
+#: libdevice/egl/eglDevice.cpp:265
 msgid "Using the 32bpp, high quality configuration"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:268
+#: libdevice/egl/eglDevice.cpp:267
 msgid "eglChooseConfig(32-high) failed"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:274
+#: libdevice/egl/eglDevice.cpp:273
 msgid "eglChooseConfig(16-high) failed"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:284
+#: libdevice/egl/eglDevice.cpp:283
 msgid "EGL configuration doesn't match!"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:320
+#: libdevice/egl/eglDevice.cpp:319
 #, c-format
 msgid "eglGetConfigAttrib() failed (error %s)"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:324
+#: libdevice/egl/eglDevice.cpp:323
 #, c-format
 msgid "EGL native visual is: %d"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:340
+#: libdevice/egl/eglDevice.cpp:339
 msgid "Initializing EGL for OpenGLES2"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:342 libdevice/egl/eglDevice.cpp:362
+#: libdevice/egl/eglDevice.cpp:341 libdevice/egl/eglDevice.cpp:361
 #, c-format
 msgid "eglBindAPI() failed to retrieve the number of configs (error %s)"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:350
+#: libdevice/egl/eglDevice.cpp:349
 msgid "Initializing EGL for OpenGLES1"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:352
+#: libdevice/egl/eglDevice.cpp:351
 #, c-format
 msgid "eglBindAPI() failed to retrive the number of configs (error %s)"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:360
+#: libdevice/egl/eglDevice.cpp:359
 msgid "Initializing EGL for OpenVG"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:391
+#: libdevice/egl/eglDevice.cpp:390
 msgid "Initializing EGL Surface"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:398
+#: libdevice/egl/eglDevice.cpp:397
 #, c-format
 msgid "eglCreateWindowSurface failed (error %s)"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:412
+#: libdevice/egl/eglDevice.cpp:411
 #, c-format
 msgid "eglCreateContext failed (error %s)"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:424
+#: libdevice/egl/eglDevice.cpp:423
 #, c-format
 msgid "eglMakeCurrent failed (error %s)"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:556 gui/gtk/gtk_glue_ovg.cpp:395
+#: libdevice/egl/eglDevice.cpp:555 gui/gtk/gtk_glue_ovg.cpp:395
 msgid "Out of memory\n"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:561 gui/gtk/gtk_glue_ovg.cpp:400
+#: libdevice/egl/eglDevice.cpp:560
 #, c-format
-msgid "eglGetConfigs() failed to retrive the configs (error %s)"
+msgid "eglGetConfigs() failed to retrieve the configs (error %s)"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:774
+#: libdevice/egl/eglDevice.cpp:773
 #, c-format
 msgid "eglCreatePbufferSurface() failed (error 0x%x)"
 msgstr ""
 
-#: libdevice/egl/eglDevice.cpp:794 libdevice/egl/eglDevice.cpp:815
+#: libdevice/egl/eglDevice.cpp:793 libdevice/egl/eglDevice.cpp:814
 #, c-format
 msgid "eglCreatePbufferFromClientBuffer() failed (error 0x%x)"
 msgstr ""
@@ -7073,8 +7072,7 @@ msgid "Found a %s device for mouse input using %s"
 msgstr ""
 
 #: libdevice/events/MouseDevice.cpp:145 libdevice/events/EventDevice.cpp:74
-#, c-format
-#, c-format, fuzzy
+#, fuzzy, c-format
 msgid "Could not open %s: %s"
 msgstr "មិន​អាច​បើក​ឯកសារ %s បាន​ឡើយ"
 
@@ -7303,7 +7301,7 @@ msgstr ""
 
 #: libdevice/events/EventDevice.cpp:307
 #, c-format
-msgid "Type is: %s(%hd), Code is: %hd, Val us: %d"
+msgid "Type is: %s(%hd), Code is: %hd, Val is: %d"
 msgstr ""
 
 #: libdevice/events/EventDevice.cpp:388
@@ -7500,11 +7498,6 @@ msgid ""
 "values for better results"
 msgstr ""
 
-#: libdevice/events/TouchDevice.cpp:318
-#, c-format
-msgid "Found a %s device for touchscreen input using %s"
-msgstr ""
-
 #: libdevice/events/UinputDevice.cpp:46
 msgid "ioctl(UI_DEV_DESTROY)"
 msgstr ""
@@ -7645,51 +7638,51 @@ msgstr ""
 msgid "fakefb_ioctl(%d)"
 msgstr ""
 
-#: libdevice/directfb/DirectFBDevice.cpp:79
+#: libdevice/directfb/DirectFBDevice.cpp:78
 msgid "Couldn't initialize DirectFB device!"
 msgstr ""
 
-#: libdevice/directfb/DirectFBDevice.cpp:115
+#: libdevice/directfb/DirectFBDevice.cpp:114
 #, c-format
 msgid "DirectFBInit(): %s"
 msgstr ""
 
-#: libdevice/directfb/DirectFBDevice.cpp:120
+#: libdevice/directfb/DirectFBDevice.cpp:119
 #, c-format
 msgid "DirectFBCreate(): %s"
 msgstr ""
 
-#: libdevice/directfb/DirectFBDevice.cpp:147
+#: libdevice/directfb/DirectFBDevice.cpp:146
 #, c-format
 msgid "CreateSurface(): %s"
 msgstr ""
 
-#: libdevice/directfb/DirectFBDevice.cpp:159
+#: libdevice/directfb/DirectFBDevice.cpp:158
 #, c-format
 msgid "CreateFont(): %s"
 msgstr ""
 
-#: libdevice/directfb/DirectFBDevice.cpp:166
+#: libdevice/directfb/DirectFBDevice.cpp:165
 #, c-format
 msgid "CreateImageProvider(): %s"
 msgstr ""
 
-#: libdevice/directfb/DirectFBDevice.cpp:172
+#: libdevice/directfb/DirectFBDevice.cpp:171
 #, c-format
 msgid "GetDisplayLayer(): %s"
 msgstr ""
 
-#: libdevice/directfb/DirectFBDevice.cpp:176
+#: libdevice/directfb/DirectFBDevice.cpp:175
 #, c-format
 msgid "GetScreen(): %s"
 msgstr ""
 
-#: libdevice/directfb/DirectFBDevice.cpp:513
+#: libdevice/directfb/DirectFBDevice.cpp:512
 #, c-format
 msgid "GetDescription(): %s"
 msgstr ""
 
-#: libdevice/directfb/DirectFBDevice.cpp:902
+#: libdevice/directfb/DirectFBDevice.cpp:901
 msgid "iDirectFB data not set!"
 msgstr ""
 
@@ -7794,27 +7787,27 @@ msgid "AOS4: Not enough memory for AHIiocopy!"
 msgstr ""
 
 #: libsound/aos4/sound_handler_ahi.cpp:607
-msgid "AOS4: audioTask:Initialize timer.."
+msgid "AOS4: audioTask:Initialize timer."
 msgstr ""
 
 #: libsound/aos4/sound_handler_ahi.cpp:610
-msgid "AOS4: audioTask:Starting Timer.."
+msgid "AOS4: audioTask:Starting Timer."
 msgstr ""
 
 #: libsound/aos4/sound_handler_ahi.cpp:621
-msgid "AOS4: Closing Audio Thread.."
+msgid "AOS4: Closing Audio Thread."
 msgstr ""
 
 #: libsound/aos4/sound_handler_ahi.cpp:641
-msgid "AOS4: Cleaning Audio Stuff.."
+msgid "AOS4: Cleaning Audio Stuff."
 msgstr ""
 
 #: libsound/aos4/sound_handler_ahi.cpp:675
-msgid "AOS4: Exit Audio Thread.."
+msgid "AOS4: Exit Audio Thread."
 msgstr ""
 
 #: libsound/aos4/sound_handler_ahi.cpp:677
-msgid "AOS4: audioTask:Close timer.."
+msgid "AOS4: audioTask:Close timer."
 msgstr ""
 
 #: libsound/sdl/sound_handler_sdl.cpp:91
@@ -7923,13 +7916,13 @@ msgid "Gnash soldumper version: %s, Gnash version: %s\n"
 msgstr ""
 
 #: utilities/soldumper.cpp:121 utilities/processor.cpp:276
-#: utilities/flvdumper.cpp:154 cygnal/cygnal.cpp:475
+#: utilities/flvdumper.cpp:154 cygnal/cygnal.cpp:476
 #: cygnal/cgi-bin/echo/echo.cpp:144 cygnal/cgi-bin/echo/gateway.cpp:119
 #: cygnal/cgi-bin/fitcDemo/fitcDemo.cpp:149
 #: cygnal/cgi-bin/oflaDemo/oflaDemo.cpp:216
 #: cygnal/testsuite/libnet.all/test_handler.cpp:103
 #: cygnal/testsuite/libnet.all/generate_amfbins.cpp:95
-#: cygnal/testsuite/libnet.all/test_rtmp.cpp:109
+#: cygnal/testsuite/libnet.all/test_rtmp.cpp:110
 #: cygnal/testsuite/libnet.all/test_diskstream.cpp:91
 #: cygnal/testsuite/libnet.all/test_cache.cpp:94
 #: cygnal/testsuite/libamf.all/test_amfmsg.cpp:103
@@ -8124,7 +8117,7 @@ msgstr ""
 #: utilities/flvdumper.cpp:172
 #: cygnal/testsuite/libnet.all/test_handler.cpp:112
 #: cygnal/testsuite/libnet.all/generate_amfbins.cpp:111
-#: cygnal/testsuite/libnet.all/test_rtmp.cpp:119
+#: cygnal/testsuite/libnet.all/test_rtmp.cpp:120
 #: cygnal/testsuite/libnet.all/test_diskstream.cpp:100
 #: cygnal/testsuite/libnet.all/test_cache.cpp:103
 #: cygnal/testsuite/libamf.all/test_amfmsg.cpp:119
@@ -9251,7 +9244,7 @@ msgid "AMF0 Notify data packet message"
 msgstr ""
 
 #: cygnal/libnet/rtmp_client.cpp:841
-msgid "Flv data packet message"
+msgid "FLV data packet message"
 msgstr ""
 
 #: cygnal/libnet/rtmp_client.cpp:844
@@ -9259,7 +9252,7 @@ msgid "Couldn't decode RTMP message Body"
 msgstr ""
 
 #: cygnal/libnet/sslserver.cpp:136
-msgid "ssl!!"
+msgid "SSL!!"
 msgstr ""
 
 #: cygnal/libnet/sslserver.cpp:159
@@ -9660,9 +9653,9 @@ msgstr ""
 
 #: cygnal/libnet/sshclient.cpp:221
 msgid ""
-"An attacker might change the default server key to confuse your clientinto "
-"thinking the key does not exist\n"
-"We advise you to rerun the client with -d or -r for more safety."
+"An attacker might change the default server key to confuse your client into "
+"thinking the key does not existWe advise you to rerun the client with -d or -"
+"r for more safety."
 msgstr ""
 
 #: cygnal/libnet/sshclient.cpp:232
@@ -9716,11 +9709,11 @@ msgid "Can't allocate memory for new SSH channel!"
 msgstr ""
 
 #: cygnal/libnet/sshclient.cpp:412
-msgid "Can't read from a non-existant channel!"
+msgid "Can't read from a non-existent channel!"
 msgstr ""
 
 #: cygnal/libnet/sshclient.cpp:427
-msgid "Can't write to a non-existant channel!"
+msgid "Can't write to a non-existent channel!"
 msgstr ""
 
 #: cygnal/crc.cpp:145
@@ -9728,15 +9721,15 @@ msgstr ""
 msgid "Couldn't open file: %s"
 msgstr ""
 
-#: cygnal/cygnal.cpp:189
+#: cygnal/cygnal.cpp:190
 msgid "cygnal -- a streaming media server."
 msgstr ""
 
-#: cygnal/cygnal.cpp:191
+#: cygnal/cygnal.cpp:192
 msgid "Usage: cygnal [options...]"
 msgstr ""
 
-#: cygnal/cygnal.cpp:192 cygnal/cgi-bin/echo/echo.cpp:316
+#: cygnal/cygnal.cpp:193 cygnal/cgi-bin/echo/echo.cpp:316
 #: cygnal/cgi-bin/echo/gateway.cpp:406
 #: cygnal/cgi-bin/fitcDemo/fitcDemo.cpp:321
 #: cygnal/cgi-bin/oflaDemo/oflaDemo.cpp:596
@@ -9752,11 +9745,11 @@ msgstr ""
 msgid "  -h,  --help          Print this help and exit"
 msgstr ""
 
-#: cygnal/cygnal.cpp:193
+#: cygnal/cygnal.cpp:194
 msgid "  -V,  --version       Print version information and exit"
 msgstr ""
 
-#: cygnal/cygnal.cpp:194 cygnal/cgi-bin/echo/echo.cpp:317
+#: cygnal/cygnal.cpp:195 cygnal/cgi-bin/echo/echo.cpp:317
 #: cygnal/cgi-bin/echo/gateway.cpp:407
 #: cygnal/cgi-bin/fitcDemo/fitcDemo.cpp:322
 #: cygnal/cgi-bin/oflaDemo/oflaDemo.cpp:597
@@ -9772,71 +9765,71 @@ msgstr ""
 msgid "  -v,  --verbose       Output verbose debug info"
 msgstr ""
 
-#: cygnal/cygnal.cpp:195
+#: cygnal/cygnal.cpp:196
 msgid "  -s,  --singlethread  Disable Multi Threading"
 msgstr ""
 
-#: cygnal/cygnal.cpp:196 cygnal/cgi-bin/echo/echo.cpp:318
+#: cygnal/cygnal.cpp:197 cygnal/cgi-bin/echo/echo.cpp:318
 #: cygnal/cgi-bin/echo/gateway.cpp:408
 #: cygnal/cgi-bin/fitcDemo/fitcDemo.cpp:323
 #: cygnal/cgi-bin/oflaDemo/oflaDemo.cpp:598
 msgid "  -n,  --netdebug      Turn on net debugging messages"
 msgstr ""
 
-#: cygnal/cygnal.cpp:197
+#: cygnal/cygnal.cpp:198
 msgid "  -o   --only-port     Only use port for debugging"
 msgstr ""
 
-#: cygnal/cygnal.cpp:198
+#: cygnal/cygnal.cpp:199
 msgid "  -p   --port-offset   Port offset for debugging"
 msgstr ""
 
-#: cygnal/cygnal.cpp:199
+#: cygnal/cygnal.cpp:200
 msgid "  -t,  --testing       Turn on special Gnash testing support"
 msgstr ""
 
-#: cygnal/cygnal.cpp:200
+#: cygnal/cygnal.cpp:201
 msgid "  -a,  --admin         Enable the administration thread"
 msgstr ""
 
-#: cygnal/cygnal.cpp:201
+#: cygnal/cygnal.cpp:202
 msgid "  -r,  --root          Document root for all files"
 msgstr ""
 
-#: cygnal/cygnal.cpp:264
+#: cygnal/cygnal.cpp:265
 msgid ": couldn't open file: "
 msgstr ""
 
-#: cygnal/cygnal.cpp:341
+#: cygnal/cygnal.cpp:342
 #, c-format
 msgid "Couldn't connect to %s"
 msgstr ""
 
-#: cygnal/cygnal.cpp:361
+#: cygnal/cygnal.cpp:362
 #, c-format
 msgid "%s is active on fd #%d."
 msgstr ""
 
-#: cygnal/cygnal.cpp:499
+#: cygnal/cygnal.cpp:500
 #, c-format
 msgid "Extraneous argument: %s"
 msgstr ""
 
-#: cygnal/cygnal.cpp:503 cygnal/cgi-bin/oflaDemo/oflaDemo.cpp:441
+#: cygnal/cygnal.cpp:504 cygnal/cgi-bin/oflaDemo/oflaDemo.cpp:441
 #, c-format
 msgid "Document Root for media files is: %s"
 msgstr ""
 
-#: cygnal/cygnal.cpp:585
+#: cygnal/cygnal.cpp:586
 msgid "Cygnal done..."
 msgstr ""
 
-#: cygnal/cygnal.cpp:598
+#: cygnal/cygnal.cpp:599
 #, c-format
 msgid "Got a %d interrupt"
 msgstr ""
 
-#: cygnal/cygnal.cpp:618
+#: cygnal/cygnal.cpp:619
 msgid ""
 "Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.\n"
 "Cygnal comes with NO WARRANTY, to the extent permitted by law.\n"
@@ -9844,118 +9837,118 @@ msgid ""
 "Public License V3. For more information, see the file named COPYING.\n"
 msgstr ""
 
-#: cygnal/cygnal.cpp:640
+#: cygnal/cygnal.cpp:641
 #, c-format
 msgid "Starting Admin Handler for port %d"
 msgstr ""
 
-#: cygnal/cygnal.cpp:642
+#: cygnal/cygnal.cpp:643
 msgid "Got an incoming Admin request"
 msgstr ""
 
-#: cygnal/cygnal.cpp:650
+#: cygnal/cygnal.cpp:651
 msgid "no more admin data, exiting...\n"
 msgstr ""
 
-#: cygnal/cygnal.cpp:735
+#: cygnal/cygnal.cpp:736
 msgid "admin_handler: Done...!\n"
 msgstr ""
 
-#: cygnal/cygnal.cpp:764
+#: cygnal/cygnal.cpp:765
 #, c-format
 msgid "Can't start %s Connection Handler for fd #%d, port %hd"
 msgstr ""
 
-#: cygnal/cygnal.cpp:768
+#: cygnal/cygnal.cpp:769
 #, c-format
 msgid "Starting %s Connection Handler for fd #%d, port %hd"
 msgstr ""
 
-#: cygnal/cygnal.cpp:779
+#: cygnal/cygnal.cpp:780
 #, c-format
 msgid "This system has %d cpus."
 msgstr ""
 
-#: cygnal/cygnal.cpp:816
+#: cygnal/cygnal.cpp:817
 #, c-format
 msgid "No new %s network connections"
 msgstr ""
 
-#: cygnal/cygnal.cpp:820
+#: cygnal/cygnal.cpp:821
 #, c-format
 msgid "*** New %s network connection for thread ID #%d, fd #%d ***"
 msgstr ""
 
-#: cygnal/cygnal.cpp:866
+#: cygnal/cygnal.cpp:867
 #, c-format
 msgid "Creating new %s Handler for %s using fd #%d"
 msgstr ""
 
-#: cygnal/cygnal.cpp:884
+#: cygnal/cygnal.cpp:885
 #, c-format
-msgid "Resuing %s Handler for %s using fd #%d"
+msgid "Reusing %s Handler for %s using fd #%d"
 msgstr ""
 
-#: cygnal/cygnal.cpp:910
+#: cygnal/cygnal.cpp:911
 #, c-format
 msgid "Creating new %s Handler for: %s for fd %#d"
 msgstr ""
 
-#: cygnal/cygnal.cpp:934
+#: cygnal/cygnal.cpp:935
 #, c-format
 msgid "Cygnal Plugin paths are: %s"
 msgstr ""
 
-#: cygnal/cygnal.cpp:955
+#: cygnal/cygnal.cpp:956
 #, c-format
 msgid "Couldn't load plugin for %s"
 msgstr ""
 
-#: cygnal/cygnal.cpp:966
+#: cygnal/cygnal.cpp:967
 #, c-format
 msgid "Number of active Threads is %d"
 msgstr ""
 
-#: cygnal/cygnal.cpp:969
+#: cygnal/cygnal.cpp:970
 #, c-format
 msgid "Restarting loop for next connection for port %d..."
 msgstr ""
 
-#: cygnal/cygnal.cpp:1027
+#: cygnal/cygnal.cpp:1028
 #, c-format
 msgid "%d active disk streams"
 msgstr ""
 
-#: cygnal/cygnal.cpp:1067
+#: cygnal/cygnal.cpp:1068
 #, c-format
 msgid "Got a hit for fd #%d, protocol %s"
 msgstr ""
 
-#: cygnal/cygnal.cpp:1071
+#: cygnal/cygnal.cpp:1072
 msgid "No protocol specified!"
 msgstr ""
 
-#: cygnal/cygnal.cpp:1079 cygnal/cygnal.cpp:1104 cygnal/cygnal.cpp:1115
+#: cygnal/cygnal.cpp:1080 cygnal/cygnal.cpp:1105 cygnal/cygnal.cpp:1116
 #, c-format
 msgid "Done with HTTP connection for fd #%d, CGI %s"
 msgstr ""
 
-#: cygnal/cygnal.cpp:1084
+#: cygnal/cygnal.cpp:1085
 #, c-format
 msgid "Not Done with HTTP connection for fd #%d, it's a persistent connection."
 msgstr ""
 
-#: cygnal/cygnal.cpp:1093
+#: cygnal/cygnal.cpp:1094
 #, c-format
 msgid "Done with RTMP connection for fd #%d, CGI "
 msgstr ""
 
-#: cygnal/cygnal.cpp:1127
+#: cygnal/cygnal.cpp:1128
 #, c-format
 msgid "Unsupported network protocol for fd #%d, %d"
 msgstr ""
 
-#: cygnal/cygnal.cpp:1147
+#: cygnal/cygnal.cpp:1148
 #, c-format
 msgid "Got no hits, %d retries"
 msgstr ""
@@ -10140,7 +10133,7 @@ msgstr ""
 
 #: cygnal/testsuite/libnet.all/test_handler.cpp:113
 #: cygnal/testsuite/libnet.all/generate_amfbins.cpp:112
-#: cygnal/testsuite/libnet.all/test_rtmp.cpp:120
+#: cygnal/testsuite/libnet.all/test_rtmp.cpp:121
 #: cygnal/testsuite/libnet.all/test_diskstream.cpp:101
 #: cygnal/testsuite/libnet.all/test_cache.cpp:104
 #: cygnal/testsuite/libamf.all/test_amfmsg.cpp:120
@@ -10165,7 +10158,7 @@ msgid "  -d,  --dump          Dump data structures"
 msgstr ""
 
 #: cygnal/testsuite/libnet.all/generate_amfbins.cpp:99
-#: cygnal/testsuite/libnet.all/test_rtmp.cpp:112
+#: cygnal/testsuite/libnet.all/test_rtmp.cpp:113
 #: cygnal/testsuite/libamf.all/test_amfmsg.cpp:107
 #: cygnal/testsuite/libamf.all/test_sol.cpp:106
 #: cygnal/testsuite/libamf.all/test_el.cpp:95
@@ -10260,8 +10253,7 @@ msgid "Could not detect controlling TTY"
 msgstr ""
 
 #: gui/fb/fb.cpp:548 gui/fb/fb.cpp:585 gui/fb/fb.cpp:619 gui/fb/fb.cpp:670
-#, c-format
-#, fuzzy
+#, fuzzy, c-format
 msgid "Could not open %s"
 msgstr "មិន​អាច​បើក​ឯកសារ %s បាន​ឡើយ"
 
@@ -11087,7 +11079,7 @@ msgid "Invalid vertical align %d"
 msgstr ""
 
 #: gui/gui.cpp:900
-msgid "Gui is in stop mode, won't start application"
+msgid "GUI is in stop mode, won't start application"
 msgstr ""
 
 #: gui/gui.cpp:1261
@@ -11165,6 +11157,11 @@ msgstr ""
 
 #: gui/gtk/gtk_glue_ovg.cpp:265 gui/gtk/gtk_glue_ovg.cpp:282
 msgid "No off screen buffer!"
+msgstr ""
+
+#: gui/gtk/gtk_glue_ovg.cpp:400
+#, c-format
+msgid "eglGetConfigs() failed to retrive the configs (error %s)"
 msgstr ""
 
 #: gui/gtk/gtk_glue_agg_vaapi.cpp:163
@@ -11482,23 +11479,16 @@ msgstr ""
 msgid "Field name is: %s: "
 msgstr ""
 
-#, c-format
-#, c-format, fuzzy
+#, fuzzy
 #~ msgid "  %s: %s"
 #~ msgstr "%s: %s"
 
-#, c-format
 #~ msgid "Frame %d"
 #~ msgstr "ស៊ុម %d"
 
-#~ msgid "invalid arguments"
-#~ msgstr "អាគុយម៉ង់​​​មិន​ត្រឹមត្រូវ"
-
-#, c-format
 #~ msgid "get_variable(%s)"
 #~ msgstr "get_variable(%s)"
 
-#, c-format
 #~ msgid "get_variable_raw(%s)"
 #~ msgstr "get_variable_raw(%s)"
 
