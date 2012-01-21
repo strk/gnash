@@ -1258,7 +1258,7 @@ Gui::setStage(movie_root* stage)
 bool
 Gui::yesno(const std::string& question)
 {
-    log_error(_("This gui didn't override 'yesno', assuming 'yes' answer to "
+    log_error(_("This GUI didn't override 'yesno', assuming 'yes' answer to "
                 "question: %s"), question);
     return true;
 }

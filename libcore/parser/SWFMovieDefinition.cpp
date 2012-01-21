@@ -294,7 +294,7 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
     if (compressed) {
 #ifndef HAVE_ZLIB_H
         log_error(_("SWFMovieDefinition::read(): unable to read "
-            "zipped SWF data; gnash was compiled without zlib support"));
+            "zipped SWF data; Gnash was compiled without zlib support"));
         return false;
 #else
         IF_VERBOSE_PARSE(
