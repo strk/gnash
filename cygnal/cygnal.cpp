@@ -619,7 +619,7 @@ version_and_copyright()
         << _("Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.\n"
         "Cygnal comes with NO WARRANTY, to the extent permitted by law.\n"
         "You may redistribute copies of Cygnal under the terms of the GNU General\n"
-        "Public License V3. For more information, see the file named COPYING.\n")
+        "Public License V3 or later. For more information, see the file named COPYING.\n")
     << endl;
 }
 
