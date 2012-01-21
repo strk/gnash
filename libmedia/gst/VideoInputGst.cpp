@@ -1021,8 +1021,8 @@ VideoInputGst::webcamChangeSourceBin()
         //if format didn't get set, something went wrong. try picking
         //the first supported format and a different supported resolution
         if (!format) {
-            log_error(_("%s: the resolution you chose isn't supported, picking \
-                a supported value"), __FUNCTION__);
+            log_error(_("%s: the resolution you chose isn't supported, picking"
+                " a supported value"), __FUNCTION__);
             format = &g_array_index (webcam->_webcamDevice->videoFormats,
                  WebcamVidFormat, 0);
 
