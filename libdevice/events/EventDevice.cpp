@@ -1,4 +1,4 @@
-/bdevice/events/EventDevice.cpp/ 
+// 
 //   Copyright (C) 2010, 2011, 2012 Free Software Foundation, Inc
 // 
 // This program is free software; you can redistribute it and/or modify
