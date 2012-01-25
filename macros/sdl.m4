@@ -58,7 +58,7 @@ AC_DEFUN([GNASH_PATH_SDL], [
 	fi
     fi
     if test "x$SDL_LIBS" = "x" ; then
-      SDL_LIBS=`$SDL_CONFIG --libs | sed -e 's:-L/usr/lib\>::'`
+      SDL_LIBS=`$SDL_CONFIG --libs | sed -e 's:-L/usr/lib/.* ::'`
 	if test x${cross_compiling} = xno; then
 		ac_cv_path_sdl_lib=$SDL_LIBS
 	fi
