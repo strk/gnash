@@ -144,6 +144,7 @@ libgnashbase_la_SOURCES += \
 	GnashVaapiImage.h \
 	GnashVaapiImageProxy.h \
 	GnashVaapiTexture.cpp \
+	GnashVaapiTexture.h \
 	$(NULL)
 
 endif
