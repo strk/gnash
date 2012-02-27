@@ -429,7 +429,7 @@ void *_mmap(void *addr, size_t length, int prot, int flags,
 static const bool __isthreaded = true;
 #endif
 
-#if defined(MOZ_MEMORY_SOLARIS) && defined(MAP_ALIGN) && !defined(JEMALLOC_NEVER_USES_MAP_ALIGN)
+#if defined(MOZ_MEMORY_SOLARIS) && defined(MAP_ALIGN) && !defined(JEMALLOC_NEVER_USES_MAP_ALIGN) || defined(MOZ_MEMORY_LINUX)
 #define JEMALLOC_USES_MAP_ALIGN	 /* Required on Solaris 10. Might improve performance elsewhere. */
 #endif
 
@@ -2238,6 +2238,7 @@ pages_map_align(size_t size, int pfd, size_t alignment)
 	 * We don't use MAP_FIXED here, because it can cause the *replacement*
 	 * of existing mappings, and we only want to create new mappings.
 	 */
+#ifdef MOZ_MEMORY_SOLARIS
 #ifdef MALLOC_PAGEFILE
 	if (pfd != -1) {
 		ret = mmap((void *)alignment, size, PROT_READ | PROT_WRITE, MAP_PRIVATE |
@@ -2252,6 +2253,31 @@ pages_map_align(size_t size, int pfd, size_t alignment)
 
 	if (ret == MAP_FAILED)
 		ret = NULL;
+#else /* !MOZ_MEMORY_SOLARIS */
+#ifdef MALLOC_PAGEFILE
+	if (pfd != -1) {
+		ret = mmap((void *)alignment, size, PROT_READ | PROT_WRITE, MAP_PRIVATE |
+		    MAP_NOSYNC, pfd, 0);
+	} else
+#endif
+	       {
+		ret = mmap(NULL, size + alignment, PROT_READ | PROT_WRITE, MAP_PRIVATE |
+		    MAP_NOSYNC | MAP_ANON, -1, 0);
+	}
+	assert(ret != NULL);
+
+	if (ret == MAP_FAILED)
+		return NULL;
+	
+	uintptr_t aligned_ret;
+	size_t extra_size;
+	aligned_ret = (uintptr_t)ret + alignment - 1;
+	aligned_ret &= ~(alignment - 1);
+	extra_size = aligned_ret - (uintptr_t)ret;
+	munmap(ret, extra_size);
+	munmap(ret + extra_size + size, alignment - extra_size);
+	ret = (void*)aligned_ret;
+#endif /* ifdef MOZ_MEMORY_SOLARIS*/
 	return (ret);
 }
 #endif
