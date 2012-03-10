@@ -26,6 +26,7 @@
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
 #include <algorithm>
+#include <cassert>
 
 #ifdef USE_PNG
 # include "GnashImagePng.h"
@@ -44,6 +45,21 @@ namespace image {
 
 namespace {
     void processAlpha(GnashImage::iterator imageData, size_t pixels);
+    bool checkValidSize(size_t width, size_t height, size_t channels) {
+
+        if (width == 0 || height == 0) return false;
+
+        assert(channels > 0);
+
+        boost::uint32_t maxSize = std::numeric_limits<boost::int32_t>::max();
+        if (width >= maxSize || height >= maxSize) return false;
+
+        maxSize /= channels;
+        maxSize /= width;
+        maxSize /= height;
+
+        return maxSize > 0;
+    }
 }
 
 GnashImage::GnashImage(iterator data, size_t width, size_t height,
@@ -55,6 +71,8 @@ GnashImage::GnashImage(iterator data, size_t width, size_t height,
     _height(height),
     _data(data)
 {
+    // Callers should check dimensions
+    assert(checkValidSize(_width, _height, channels()));
 }
 
 /// Create an image allocating a buffer of height*pitch bytes
@@ -66,8 +84,9 @@ GnashImage::GnashImage(size_t width, size_t height, ImageType type,
     _width(width),
     _height(height)
 {
-    const size_t max = std::numeric_limits<boost::int32_t>::max();
-    if (size() > max) {
+    // Constructed from external input, so restrict dimensions to avoid
+    // overflow in size calculations
+    if (!checkValidSize(_width, _height, channels())) {
         throw std::bad_alloc();
     }
     _data.reset(new value_type[size()]);
