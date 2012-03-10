@@ -1,3 +1,15 @@
+= [test_15bpp_bitmap.swf] =
+
+== Origin ==
+
+Produced by Jan Flanders for Gnash testing.
+See http://savannah.gnu.org/bugs/?34625
+
+== Description ==
+
+A shape filled by a 15bpp bitmap (DEFINELOSSLESS, fmt = 4).
+Uses well-defined colors to aim for easier color checking.
+
 = [gotoFrameOnKeyEvent.swf] =
 
 == Origin == 
