@@ -56,6 +56,7 @@ check_PROGRAMS = \
 	clip_as_button2-TestRunner \
 	subshapes-TestRunner \
 	gotoFrameOnKeyEvent-TestRunner \
+	test_15bpp_bitmap-TestRunner \
 	$(NULL)
 
 check_SCRIPTS = \
@@ -100,6 +101,16 @@ GotoAndPlayTestRunner: Makefile $(srcdir)/../generic-testrunner.sh $(srcdir)/Got
 lastopcode_v6_TestRunner: Makefile $(srcdir)/../generic-testrunner.sh $(srcdir)/test_lastopcode_v6.swf
 	sh $(srcdir)/../generic-testrunner.sh -c done $(top_builddir) $(srcdir)/test_lastopcode_v6.swf > $@
 	chmod 755 $@
+
+test_15bpp_bitmap_TestRunner_SOURCES = \
+	test_15bpp_bitmap-TestRunner.cpp \
+	$(NULL)
+test_15bpp_bitmap_TestRunner_LDADD = \
+	$(GNASH_LIBS) \
+	$(NULL)
+test_15bpp_bitmap_TestRunner_CXXFLAGS = \
+	-DSRCDIR=\"$(srcdir)\" \
+	$(NULL)
 
 clean-local: 
 
