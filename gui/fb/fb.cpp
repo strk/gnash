@@ -553,6 +553,7 @@ FBGui::disable_terminal()
     if (ioctl(fd, VT_GETSTATE, &vts) == -1) {
         log_error(_("Could not get current VT state"));
         close(_fd);
+        close(fd);
         return false;
     }
     
@@ -674,6 +675,7 @@ FBGui::enable_terminal()
     if (ioctl(fd, VT_ACTIVATE, _original_vt)) {
         log_error(_("Could not activate VT number %d"), _original_vt);
         close(_fd);
+        close(fd);
         return false;
     }
 
