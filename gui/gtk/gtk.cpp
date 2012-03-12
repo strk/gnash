@@ -42,10 +42,6 @@
 # include <X11/keysym.h>
 # include <gdk/gdkx.h>
 # include <X11/Xlib.h>
-# ifdef HAVE_XV
-#  include <X11/extensions/Xv.h>
-#  include <X11/extensions/Xvlib.h>
-# endif
 #endif
 
 #include "log.h"
@@ -200,15 +196,6 @@ GtkGui::init(int argc, char **argv[])
         // drop back to AGG.
         if (!glx || !dri) {
             log_error(_("This system lacks a hardware OpenGL driver!"));
-        }
-    }
-
-    // Gnash can only use the XVideo extension if our X server supports it.
-    if (hwaccel == "xv") {
-        // See if our X11 server supports the Xvideo extension, otherwise
-        // there is no point in trying to use Xvideo for scaling.
-        if (checkX11Extension("XVideo")) {
-            log_debug("Xvideo extension found");
         }
     }
 

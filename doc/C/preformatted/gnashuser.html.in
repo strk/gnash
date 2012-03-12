@@ -428,8 +428,8 @@
 	    </pre>
 	  </td></tr><tr><td align="left">HWAccel</td><td align="left">string</td><td align="left">
 	    Specify the type of Hardware Video Decoder. Currently only
-	    <span class="emphasis"><em>vaapi</em></span>, <span class="emphasis"><em>omap</em></span>,
-	    <span class="emphasis"><em>xv</em></span> or <span class="emphasis"><em>none</em></span> are
+	    <span class="emphasis"><em>vaapi</em></span>
+	    or <span class="emphasis"><em>none</em></span> are
 	    supported. None disables any acceleration support (the
 	    default).
 	  </td></tr><tr><td align="left">Renderer</td><td align="left">string</td><td align="left">

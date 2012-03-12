@@ -202,7 +202,7 @@ gnash_canvas_setup(GnashCanvas *canvas, std::string& hwaccel,
         std::string& renderer, int argc, char **argv[])
 {
 
-    // Order should be VAAPI, Xv, X11
+    // Order should be VAAPI, X11
     bool initialized_renderer = false;
 
     // If a renderer hasn't been defined in gnashrc, or on the command

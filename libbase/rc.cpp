@@ -113,7 +113,6 @@ RcInitFile::RcInitFile()
     _saveStreamingMedia(false),
     _saveLoadedMedia(false),
     _popups(true),
-    _useXv(false),
     _webcamDevice(-1),
     _microphoneDevice(-1),
     _certfile("client.pem"),

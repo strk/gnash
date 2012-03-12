@@ -300,8 +300,8 @@
 	  <entry>string</entry>
 	  <entry>
 	    Specify the type of Hardware Video Decoder. Currently only
-	    <emphasis>vaapi</emphasis>, <emphasis>omap</emphasis>,
-	    <emphasis>xv</emphasis> or <emphasis>none</emphasis> are
+	    <emphasis>vaapi</emphasis>
+	    or <emphasis>none</emphasis> are
 	    supported. None disables any acceleration support (the
 	    default).
 	  </entry>

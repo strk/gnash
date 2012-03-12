@@ -133,10 +133,10 @@ gnash [option]... [URL]
   </varlistentry>
 
   <varlistentry>
-    <term>--hwaccel none|vaapi|xv</term>
+    <term>--hwaccel none|vaapi</term>
     <listitem>
       <para>
-        Hardware Video Accelerator to use none|vaapi|xv|omap (default: none)
+        Hardware Video Accelerator to use none|vaapi (default: none)
       </para>
     </listitem>
   </varlistentry>

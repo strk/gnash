@@ -172,8 +172,8 @@ public:
     /// --renderer option to gnash.
     void setRenderer(const std::string& x) { _renderer = x; }
     
-    /// Set the hardware video accleration backend, none, vaapi, xv,
-    /// or cairo. This is set in the users gnashrc file, or can be
+    /// Set the hardware video accleration backend, none, vaapi.
+    /// This is set in the users gnashrc file, or can be
     /// overridden with the --hwaccel option to gnash.
     void setHWAccel(const std::string& x) { _hwaccel = x; }
 
@@ -204,8 +204,8 @@ public:
 private:
 
     /// Whether to ue HW video decoding support, no value means disabled.
-    /// The only currently supported values are: none, vaapi, or xv (omap)
-    /// support coming.  The default is none,
+    /// The only currently supported values are: none or vaapi.
+    /// The default is none,
     std::string _hwaccel;
     
     /// Which renderer backend to use, no value means use the default.

@@ -202,13 +202,6 @@
 # This is the shared memory key for your system
 #set LCShmKey 3711621821
 
-# Enable support for the X Video extension. Note that this requires a
-# kernel/X11 driver, and compile-time gstreamer or ffmpeg and libXv.
-#
-# Default: false
-#
-#set XVideo true
-
 # Force rendering quality to "BEST".
 #
 # Possible values:

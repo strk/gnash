@@ -579,8 +579,6 @@ protected:
 
     bool _popups;
 
-    bool _useXv;
-	
     ///FIXME: this should probably eventually be changed to a more readable
     ///config option instead of an integer
     int _webcamDevice;
@@ -604,7 +602,7 @@ protected:
     bool _ignoreShowMenu;
 
     /// Whether to use HW video decoding support, no value means disabled.
-    /// The only currently supported values are: none, vaapi, or xv.  omap
+    /// The only currently supported values are: none or vaapi
     /// support is coming. 
     std::string _hwaccel;
 

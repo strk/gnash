@@ -46,8 +46,8 @@ Be very verbose about parsing. Must be used in conjunction with -v.
 -A file
 Audio dump file (wave format).
 .TP 
---hwaccel none|vaapi|xv
-Hardware Video Accelerator to use none|vaapi|xv|omap (default: none)
+--hwaccel none|vaapi
+Hardware Video Accelerator to use none|vaapi (default: none)
 .TP 
 -x xid, --xid xid
 The XID of the parent window Gnash should use instead of
