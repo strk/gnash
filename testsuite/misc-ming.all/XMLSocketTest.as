@@ -77,7 +77,7 @@ myXML.onData = handleData;
 myXML.onClose = handleDisconnect;
 receivedArray = new Array();
 
- ret = myXML.connect("localhost", 2229);
+ ret = myXML.connect("localhost.localdomain", 2229);
  check_equals(ret, true);
  stop();
 
