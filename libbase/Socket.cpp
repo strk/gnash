@@ -18,6 +18,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#ifdef HAVE_CONFIG_H
+# include "gnashconfig.h"
+#endif
+
 #include "Socket.h"
 
 #include <cstring>
@@ -33,6 +37,10 @@
 #include "utility.h"
 #include "GnashAlgorithm.h"
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
 namespace gnash {
 
 Socket::Socket()
@@ -41,14 +49,21 @@ Socket::Socket()
     _socket(0),
     _size(0),
     _pos(0),
-    _error(false)
-{}
+    _error(false),
+    _ipv6(false)
+{ }
 
 bool
 Socket::connected() const
 {
-    if (_connected) return true;
-    if (!_socket) return false;
+    GNASH_REPORT_FUNCTION;
+
+    if (_connected) {
+        return true;
+    }
+    if (!_socket) {
+        return false;
+    }
 
     size_t retries = 10;
     fd_set fdset;
@@ -107,6 +122,8 @@ Socket::connected() const
 void
 Socket::close()
 {
+    GNASH_REPORT_FUNCTION;
+
     if (_socket) ::close(_socket);
     _socket = 0;
     _size = 0;
@@ -118,7 +135,8 @@ Socket::close()
 bool
 Socket::connect(const std::string& hostname, boost::uint16_t port)
 {
-
+    GNASH_REPORT_FUNCTION;
+    
     // We use _socket here because connected() or _connected might not
     // be true if a connection attempt is underway but not completed.
     if (_socket) {
@@ -130,11 +148,54 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     // been called. There must not be an error in either case.
     assert(!_error);
 
-    if (hostname.empty()) return false;
+    if (hostname.empty()) {
+        return false;
+    }
 
+#ifdef HAVE_IPV6
+    // struct sockaddr_in6 addr6;
+    // std::memset(&addr6, 0, sizeof(addr6));
+    // addr.sin6_family = AF_INET6;
+    // addr.sin6_port = htons(port);
+    int code = 0;
+    struct addrinfo req, *ans;
+    std::memset(&req, 0, sizeof(struct addrinfo));
+    req.ai_family = AF_UNSPEC;  // Allow IPv4 or IPv6
+    req.ai_socktype = SOCK_STREAM;
+
+    if ((code = getaddrinfo("www.youtube.com", "http", &req, &ans)) != 0) {
+        log_error(_("getaddrinfo() failed with code: #%d - %s\n"),
+                  code, gai_strerror(code));
+        return false;
+    }
+
+    // Multiple IPV$ and IPV6 numbers may bve returned, so we try them all if
+    // required
+    struct addrinfo *it = ans;
+    while (it) {    
+        char clienthost   [NI_MAXHOST];
+        std::memset(&clienthost, 0, NI_MAXHOST);
+        char clientservice[NI_MAXSERV];
+        std::memset(&clientservice, 0, NI_MAXSERV);
+        getnameinfo(it->ai_addr, it->ai_addrlen,
+                    clienthost, sizeof(clienthost),
+                    clientservice, sizeof(clientservice),
+                    NI_NUMERICHOST);
+
+        char straddr[INET6_ADDRSTRLEN];
+        std::memset(&straddr, 0, INET6_ADDRSTRLEN);
+        ::inet_ntop(AF_INET6, it->ai_addr, straddr,
+                    sizeof(straddr));
+        std::cerr << "IPV6 address for host " << clienthost
+                  << " is: " << straddr << std::endl;
+        it = it->ai_next;
+    }
+    freeaddrinfo(ans);          // free the response data
+#else
     struct sockaddr_in addr;
     std::memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
+    addr.sin_port = htons(port);
 
     addr.sin_addr.s_addr = ::inet_addr(hostname.c_str());
     if (addr.sin_addr.s_addr == INADDR_NONE) {
@@ -143,10 +204,8 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
             return false;
         }
         addr.sin_addr = *reinterpret_cast<in_addr*>(host->h_addr);
+        
     }
-
-    addr.sin_port = htons(port);
-
     _socket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     
     if (_socket < 0) {
@@ -176,6 +235,7 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
         return false;
 #endif
     }
+#endif
 
     // Magic timeout number. Use rcfile ?
     const struct timeval tv = { 120, 0 };
