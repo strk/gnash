@@ -958,7 +958,7 @@ VideoInputGst::checkForSupportedFramerate(GnashWebcamPrivate *webcam,
 {
     
     if (!webcam) {
-	log_error(_("%s: webam isn't set!"), __FUNCTION__);
+	log_error(_("%s: webcam isn't set!"), __FUNCTION__);
     }
     for (int i = 0; i < webcam->_currentFormat->numFramerates; ++i) {
         int val = std::ceil(static_cast<double>(
