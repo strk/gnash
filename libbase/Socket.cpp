@@ -147,13 +147,15 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     // If _socket is 0, either there has been no connection, or close() has
     // been called. There must not be an error in either case.
     assert(!_error);
-
+    
     if (hostname.empty()) {
         return false;
     }
 
+    struct sockaddr saddr;
+    
 #ifdef HAVE_IPV6
-    // struct sockaddr_in6 addr6;
+    struct sockaddr_in6 addr6;
     // std::memset(&addr6, 0, sizeof(addr6));
     // addr.sin6_family = AF_INET6;
     // addr.sin6_port = htons(port);
@@ -163,7 +165,7 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     req.ai_family = AF_UNSPEC;  // Allow IPv4 or IPv6
     req.ai_socktype = SOCK_STREAM;
 
-    if ((code = getaddrinfo("www.youtube.com", "http", &req, &ans)) != 0) {
+    if ((code = getaddrinfo(hostname.c_str(), "login", &req, &ans)) != 0) {
         log_error(_("getaddrinfo() failed with code: #%d - %s\n"),
                   code, gai_strerror(code));
         return false;
@@ -188,8 +190,25 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
                     sizeof(straddr));
         std::cerr << "IPV6 address for host " << clienthost
                   << " is: " << straddr << std::endl;
-        it = it->ai_next;
+
+        addr6.sin6_family = AF_INET6;
+        addr6.sin6_port = htons(port);
+        _socket = ::socket(it->ai_family, it->ai_socktype, it->ai_protocol);
+        
+        if (_socket < 0) {
+            const int err = errno;
+            log_error(_("Socket creation failed: %s"), std::strerror(err));
+            _socket = 0;
+            it = 0;
+        } else {
+            it = it->ai_next;
+        }
     }
+
+    // cache the data we need later
+    std::memcpy(&saddr, ans->ai_addr, ans->ai_addrlen);
+    const int addrlen = ans->ai_addrlen;    
+
     freeaddrinfo(ans);          // free the response data
 #else
     struct sockaddr_in addr;
@@ -204,26 +223,27 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
             return false;
         }
         addr.sin_addr = *reinterpret_cast<in_addr*>(host->h_addr);
-        
+        _socket = ::socket(addr.sin_family, SOCK_STREAM, IPPROTO_TCP);        
+
+        if (_socket < 0) {
+            const int err = errno;
+            log_error(_("Socket creation failed: %s"), std::strerror(err));
+            _socket = 0;
+            return false;
+        }
     }
-    _socket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    
-    if (_socket < 0) {
-        const int err = errno;
-        log_error(_("Socket creation failed: %s"), std::strerror(err));
-        _socket = 0;
-        return false;
-    }
+    std::memcpy(&saddr, &addr, sizeof(struct sockaddr));
+    const int addrlen = sizeof(struct sockaddr);
+#endif
+
 #ifndef _WIN32
     // Set non-blocking.
     const int flag = ::fcntl(_socket, F_GETFL, 0);
     ::fcntl(_socket, F_SETFL, flag | O_NONBLOCK);
 #endif
 
-    const struct sockaddr* a = reinterpret_cast<struct sockaddr*>(&addr);
-
     // Attempt connection
-    if (::connect(_socket, a, sizeof(struct sockaddr)) < 0) {
+    if (::connect(_socket, &saddr, addrlen) < 0) {
         const int err = errno;
 #ifndef _WIN32
         if (err != EINPROGRESS) {
@@ -235,24 +255,23 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
         return false;
 #endif
     }
-#endif
 
     // Magic timeout number. Use rcfile ?
     const struct timeval tv = { 120, 0 };
-
+    
     // NB: the cast to const char* is needed for windows and is harmless
     // for POSIX.
     if (::setsockopt(_socket, SOL_SOCKET, SO_RCVTIMEO,
-                reinterpret_cast<const char*>(&tv), sizeof(tv))) {
+                     reinterpret_cast<const char*>(&tv), sizeof(tv))) {
         log_error(_("Setting socket timeout failed"));
     }
-
+    
     const int on = 1;
     // NB: the cast to const char* is needed for windows and is harmless
     // for POSIX.
     ::setsockopt(_socket, IPPROTO_TCP, TCP_NODELAY,
-            reinterpret_cast<const char*>(&on), sizeof(on));
-
+                 reinterpret_cast<const char*>(&on), sizeof(on));
+    
     assert(_socket);
     return true;
 }
