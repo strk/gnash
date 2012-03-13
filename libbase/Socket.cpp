@@ -49,8 +49,7 @@ Socket::Socket()
     _socket(0),
     _size(0),
     _pos(0),
-    _error(false),
-    _ipv6(false)
+    _error(false)
 { }
 
 bool
@@ -188,8 +187,7 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
         std::memset(&straddr, 0, INET6_ADDRSTRLEN);
         ::inet_ntop(AF_INET6, it->ai_addr, straddr,
                     sizeof(straddr));
-        std::cerr << "IPV6 address for host " << clienthost
-                  << " is: " << straddr << std::endl;
+        log_debug("IPV6 address for host %s is %s", clienthost, straddr);
 
         addr6.sin6_family = AF_INET6;
         addr6.sin6_port = htons(port);
