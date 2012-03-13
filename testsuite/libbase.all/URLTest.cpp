@@ -321,6 +321,24 @@ main(int /*argc*/, char** /*argv*/)
         check_equals(u2.path(), "/home/toto/Téléchargement/testfile.xml");
     }
 
+    // IPV6 paths
+    // http://[2a00:1450:4001:c01::88]/
+    URL v6("http://[2a00:1450:4001:c01::88]/");
+    check_equals (v6.protocol(), "http");
+    check_equals (v6.hostname(), "[2a00:1450:4001:c01::88]");
+    check_equals (v6.port(), "");
+    check_equals (v6.path(), "/");
+    check_equals (v6.querystring(), "");
+    check_equals (v6.anchor(), "");
+
+    URL v66("https://[2a00:1450:4001:c01::88]:8080/");
+    check_equals (v66.protocol(), "https");
+    check_equals (v66.hostname(), "[2a00:1450:4001:c01::88]");
+    check_equals (v66.port(), "8080");
+    check_equals (v66.path(), "/");
+    check_equals (v66.querystring(), "");
+    check_equals (v66.anchor(), "");
+    
 	// TODO: Samba paths
 }
 
