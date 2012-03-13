@@ -45,8 +45,6 @@ namespace gnash {
 
 URL::URL(const std::string& relative_url, const URL& baseurl)
 {
-    GNASH_REPORT_FUNCTION;
-
     init_relative(relative_url, baseurl);
 }
 
@@ -54,8 +52,6 @@ URL::URL(const std::string& relative_url, const URL& baseurl)
 void
 URL::normalize_path(std::string& path)
 {
-    GNASH_REPORT_FUNCTION;
-
 #if defined(_WIN32) || defined(WIN32) || defined(__OS2__) || defined(__amigaos4__)
     return;
 #endif
@@ -96,8 +92,6 @@ URL::normalize_path(std::string& path)
 void
 URL::init_absolute(const std::string& in)
 {
-    GNASH_REPORT_FUNCTION;
-
     // Find protocol
     std::string::size_type pos = in.find("://");
     if ( pos != std::string::npos ) {
@@ -148,9 +142,7 @@ URL::init_absolute(const std::string& in)
 
 URL::URL(const std::string& absolute_url)
 {
-    GNASH_REPORT_FUNCTION;
-    
-    std::cerr << "URL(" << absolute_url << ")" << std::endl;
+    // std::cerr << "URL(" << absolute_url << ")" << std::endl;
     if ( ( absolute_url.size() && absolute_url[0] == '/' )
          || absolute_url.find("://") != std::string::npos 
          || ( absolute_url.size() > 1 && absolute_url[1] == ':' )        //for win32
@@ -193,8 +185,6 @@ URL::URL(const std::string& absolute_url)
 void
 URL::init_relative(const std::string& relative_url, const URL& baseurl)
 {
-    GNASH_REPORT_FUNCTION;
-    
     // If relative url starts with an hash, it's just
     // an anchor change
     if ( relative_url[0] == '#' ){
@@ -283,8 +273,6 @@ URL::init_relative(const std::string& relative_url, const URL& baseurl)
 std::string
 URL::str() const
 {
-    GNASH_REPORT_FUNCTION;
-
     std::string ret = _proto + "://" + _host;
 
     if (!_port.empty()) {
@@ -306,8 +294,6 @@ URL::str() const
 void
 URL::split_anchor_from_path()
 {
-    GNASH_REPORT_FUNCTION;
-
     assert(_anchor == "");
 
     // Extract anchor from path, if any
@@ -321,8 +307,6 @@ URL::split_anchor_from_path()
 void
 URL::split_port_from_host()
 {
-    GNASH_REPORT_FUNCTION;
-
     assert(_port == "");
 
     // Extract anchor from path, if any
@@ -351,8 +335,6 @@ URL::split_port_from_host()
 void
 URL::split_querystring_from_path()
 {
-    GNASH_REPORT_FUNCTION;
-
     assert(_querystring == "");
 
     // extract the parameters from the URL
@@ -374,8 +356,6 @@ void
 URL::parse_querystring(const std::string& query_string,
                        std::map<std::string, std::string>& target_map)
 {
-    GNASH_REPORT_FUNCTION;
-
     if ( query_string.empty() ) return; // nothing to do
 
     std::string qstring=query_string;;
