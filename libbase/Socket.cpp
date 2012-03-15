@@ -55,8 +55,6 @@ Socket::Socket()
 bool
 Socket::connected() const
 {
-    GNASH_REPORT_FUNCTION;
-
     if (_connected) {
         return true;
     }
@@ -121,8 +119,6 @@ Socket::connected() const
 void
 Socket::close()
 {
-    GNASH_REPORT_FUNCTION;
-
     if (_socket) ::close(_socket);
     _socket = 0;
     _size = 0;
@@ -134,8 +130,6 @@ Socket::close()
 bool
 Socket::connect(const std::string& hostname, boost::uint16_t port)
 {
-    GNASH_REPORT_FUNCTION;
-    
     // We use _socket here because connected() or _connected might not
     // be true if a connection attempt is underway but not completed.
     if (_socket) {
@@ -164,13 +158,13 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     req.ai_family = AF_UNSPEC;  // Allow IPv4 or IPv6
     req.ai_socktype = SOCK_STREAM;
 
-    if ((code = getaddrinfo(hostname.c_str(), "login", &req, &ans)) != 0) {
+    if ((code = getaddrinfo(hostname.c_str(), 0, &req, &ans)) != 0) {
         log_error(_("getaddrinfo() failed with code: #%d - %s\n"),
                   code, gai_strerror(code));
         return false;
     }
 
-    // Multiple IPV$ and IPV6 numbers may bve returned, so we try them all if
+    // Multiple IPV$ and IPV6 numbers may be returned, so we try them all if
     // required
     struct addrinfo *it = ans;
     while (it) {    
@@ -187,7 +181,7 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
         std::memset(&straddr, 0, INET6_ADDRSTRLEN);
         ::inet_ntop(AF_INET6, it->ai_addr, straddr,
                     sizeof(straddr));
-        log_debug("IPV6 address for host %s is %s", clienthost, straddr);
+        log_debug("IPV6 address for host %s is %s", hostname, straddr);
 
         addr6.sin6_family = AF_INET6;
         addr6.sin6_port = htons(port);
@@ -197,9 +191,9 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
             const int err = errno;
             log_error(_("Socket creation failed: %s"), std::strerror(err));
             _socket = 0;
-            it = 0;
-        } else {
             it = it->ai_next;
+        } else {
+            break;
         }
     }
 
@@ -213,7 +207,6 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     std::memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
-
     addr.sin_addr.s_addr = ::inet_addr(hostname.c_str());
     if (addr.sin_addr.s_addr == INADDR_NONE) {
         struct hostent* host = ::gethostbyname(hostname.c_str());
