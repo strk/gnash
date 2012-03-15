@@ -145,13 +145,10 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
         return false;
     }
 
-    struct sockaddr saddr;
+    // This is used for ::connect()
+    struct sockaddr *saddr = 0;
     
 #ifdef HAVE_IPV6
-    struct sockaddr_in6 addr6;
-    // std::memset(&addr6, 0, sizeof(addr6));
-    // addr.sin6_family = AF_INET6;
-    // addr.sin6_port = htons(port);
     int code = 0;
     struct addrinfo req, *ans;
     std::memset(&req, 0, sizeof(struct addrinfo));
@@ -183,14 +180,12 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
                     sizeof(straddr));
         log_debug("IPV6 address for host %s is %s", hostname, straddr);
 
-        addr6.sin6_family = AF_INET6;
-        addr6.sin6_port = htons(port);
         _socket = ::socket(it->ai_family, it->ai_socktype, it->ai_protocol);
-        
         if (_socket < 0) {
             const int err = errno;
             log_error(_("Socket creation failed: %s"), std::strerror(err));
             _socket = 0;
+            // Try the next IP number
             it = it->ai_next;
         } else {
             break;
@@ -198,8 +193,12 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     }
 
     // cache the data we need later
-    std::memcpy(&saddr, ans->ai_addr, ans->ai_addrlen);
-    const int addrlen = ans->ai_addrlen;    
+    struct sockaddr_in6 *addr6 = reinterpret_cast<struct sockaddr_in6 *>(it->ai_addr);
+    // When NULL is passed to getaddrinfo(), the port isn't set in
+    // the returned data, so we do it here.
+    addr6->sin6_port = htons(port);
+    saddr = it->ai_addr;
+    const int addrlen = it->ai_addrlen;
 
     freeaddrinfo(ans);          // free the response data
 #else
@@ -223,8 +222,9 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
             return false;
         }
     }
-    std::memcpy(&saddr, &addr, sizeof(struct sockaddr));
+    // cache the data we need later
     const int addrlen = sizeof(struct sockaddr);
+    saddr = reinterpret_cast<struct sockaddr *>(&addr);
 #endif
 
 #ifndef _WIN32
@@ -234,11 +234,11 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
 #endif
 
     // Attempt connection
-    if (::connect(_socket, &saddr, addrlen) < 0) {
+    if (::connect(_socket, saddr, addrlen) < 0) {
         const int err = errno;
 #ifndef _WIN32
         if (err != EINPROGRESS) {
-            log_error(_("Failed to connect socket: %s"), std::strerror(err));
+            log_error(_("Failed to connect to socket: %s"), std::strerror(err));
             _socket = 0;
             return false;
         }
