@@ -49,7 +49,7 @@ AC_DEFUN([GNASH_PATH_KDE4],
              [Directory to install KDE 4.x plugin in]),
              with_kde4_plugindir=${withval})
   if test x"${with_kde4_plugindir}" != x ; then 
-    if test ! -d ${with_kde4_plugindir}/imageformats; then
+    if test ! -d ${with_kde4_plugindir}/plugins; then
       AC_MSG_ERROR([${with_kde4_plugindir} directory doesn't contain any KDE 4.x plugins!])
     fi
   fi
