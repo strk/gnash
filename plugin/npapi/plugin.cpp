@@ -824,14 +824,12 @@ nsPluginInstance::processPlayerRequest()
             assert(invoke->args.size() > 1);
             
             // The first argument is the URL string.
-            std::string url = NPStringToString(NPVARIANT_TO_STRING(
-                                                   invoke->args[0].get()));
+            std::string url = NPVariantToString(invoke->args[0].get());
 #if 0
             gnash::log_debug("Got a getURL() request: %s", url);
 #endif
             // The second is the method, namely GET or POST.
-            std::string op = NPStringToString(NPVARIANT_TO_STRING(
-                                                  invoke->args[1].get()));
+            std::string op = NPVariantToString(invoke->args[1].get());
             // The third is the optional target, which is something like
             // _blank or _self.
             std::string target;
@@ -841,8 +839,7 @@ nsPluginInstance::processPlayerRequest()
             std::string data;
             
             if (invoke->args.size() >= 3) {
-                target = NPStringToString(NPVARIANT_TO_STRING(
-                                              invoke->args[2].get()));
+                target = NPVariantToString(invoke->args[2].get());
             }
             
             // An empty target defaults to "_self"
@@ -851,8 +848,7 @@ nsPluginInstance::processPlayerRequest()
             if ( target.empty() ) target = "_self";
             
             if (invoke->args.size() == 4) {
-                data = NPStringToString(NPVARIANT_TO_STRING(
-                                            invoke->args[3].get()));
+                data = NPVariantToString(invoke->args[3].get());
             }
             if (op == "GET") {
                 gnash::log_debug("Asked to getURL '%s' in target %s", url,
@@ -871,10 +867,8 @@ nsPluginInstance::processPlayerRequest()
         } else if (invoke->name == "fsCommand") {
             
             assert(invoke->args.size() > 1);
-            std::string command = NPStringToString(NPVARIANT_TO_STRING(
-                                                       invoke->args[0].get()));
-            std::string arg = NPStringToString(NPVARIANT_TO_STRING(
-                                                   invoke->args[1].get()));            
+            std::string command = NPVariantToString(invoke->args[0].get());
+            std::string arg = NPVariantToString(invoke->args[1].get());            
             std::string name = _name; 
             std::stringstream jsurl;
             jsurl << "javascript:" << name << "_DoFSCommand('" << command
@@ -900,8 +894,7 @@ nsPluginInstance::processPlayerRequest()
             // actual callback lives in libcore/movie_root, but it
             // needs to be on the list of supported remote methods so
             // it can be called by Javascript.
-            std::string method = NPStringToString(NPVARIANT_TO_STRING(
-                                                      invoke->args[0].get()));
+            std::string method = NPVariantToString(invoke->args[0].get());
             NPIdentifier id = NPN_GetStringIdentifier(method.c_str());
             // log_debug("SCRIPT OBJECT addMethod: %x, %s", (void *)_scriptObject, method);
             this->getScriptObject()->AddMethod(id, remoteCallback);
