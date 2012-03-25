@@ -198,9 +198,9 @@ MediaParserGst::pushGstBuffer()
 
     GstFlowReturn rv = gst_pad_push (_srcpad, buffer);
     if (!GST_FLOW_IS_SUCCESS (rv)) {
-	// This is not (necessarily) an error situation, because some streams
-	// contain garbage. However, Gstreamer will continue accepting new
-	// frames.
+        // This is not (necessarily) an error situation, because some streams
+        // contain garbage. However, Gstreamer will continue accepting new
+        // frames.
         log_debug(_("MediaParserGst failed to push more data into the demuxer."));
         return true;
     }
