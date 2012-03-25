@@ -89,6 +89,19 @@ NPStringToString(const NPString& str)
     return std::string(GetNPStringChars(str), GetNPStringLen(str));
 }
 
+/// Construct a std::string from an NPVariant.
+//
+/// @return a std::string containing the string value of the NPVariant, if it
+///         is an NPString; otherwise an empty string.
+inline std::string
+NPVariantToString(const NPVariant& val)
+{
+    if (!NPVARIANT_IS_STRING(val)) {
+        return std::string();
+    }
+
+    return NPStringToString(NPVARIANT_TO_STRING(val));
+}
 
 /// This class holds ownership of (a copy of) an NPVariant.
 //
