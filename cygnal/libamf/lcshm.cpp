@@ -516,7 +516,7 @@ LcShm::connect(const string& names)
         return false;
     }
 
-    if (SharedMem::begin() <= 0) {
+    if (SharedMem::begin() <= static_cast<unsigned char *>(0)) {
         log_error(_("Failed to open shared memory segment: \"%s\""), names.c_str());
         return false; 
     }
@@ -557,7 +557,7 @@ LcShm::connect(key_t key)
         return false;
     }
 
-    if (SharedMem::begin() <= 0) {
+    if (SharedMem::begin() <= static_cast<unsigned char *>(0)) {
         log_error(_("Failed to open shared memory segment: 0x%x"), key);
         return false; 
     }

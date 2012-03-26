@@ -173,7 +173,7 @@ main(int argc, char *argv[])
             entry = readdir(library_dir);
         }
         if (library_dir != NULL) {
-            for (i=0; entry>0; i++) {
+            for (i=0; entry>static_cast<struct dirent *>(0); i++) {
                 entry = readdir(library_dir);
                 if (entry != NULL) {
                     //string::size_type pos;

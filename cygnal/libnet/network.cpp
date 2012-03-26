@@ -564,7 +564,7 @@ Network::createClient(const string &hostname, short port)
     }
 
     const struct hostent *hent = ::gethostbyname(hostname.c_str());
-    if (hent > 0) {
+    if (hent > static_cast< const struct hostent *>(0)) {
         ::memcpy(&sock_in.sin_addr, hent->h_addr, hent->h_length);
     }
     sock_in.sin_family = AF_INET;

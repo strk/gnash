@@ -481,7 +481,7 @@ Element::encode(bool notobject)
 	if (!notobject) {
 	    *buf = Element::OBJECT_AMF0;
 	}
-	if (_name > 0) {
+	if (_name > static_cast<char *>(0)) {
 	    size_t length = getNameSize();
 	    boost::uint16_t enclength = length;
 	    swapBytes(&enclength, 2);
