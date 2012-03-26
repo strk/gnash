@@ -882,7 +882,7 @@ handleAMFInvoke(amf::Reader& rd, const boost::uint8_t*& b,
         if (b + namelength > end) {
             throw amf::AMFException("Invoke buffer too short");
         }
-        std::string headerName((char*)b, namelength);
+        std::string headerName((const char*)b, namelength);
 
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("Invoke name %s", headerName);
