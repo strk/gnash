@@ -43,6 +43,7 @@
 #include "klash_part.h"
 
 #include <csignal>
+#include "GnashSystemIOHeaders.h"
 
 //-----------------------------------------------------------------------------
 

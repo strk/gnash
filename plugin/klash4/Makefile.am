@@ -23,7 +23,9 @@ AM_CPPFLAGS = \
 	$(KDE4_CFLAGS) \
 	$(QT4_CFLAGS) \
 	$(X11_CFLAGS) \
-	-DGNASHBINDIR=\"${bindir}\"
+	-I$(top_srcdir)/libbase \
+	-DGNASHBINDIR=\"${bindir}\" \
+	$(NULL)
 
 plugindir   = $(KDE4_PLUGINDIR)
 kde_servicesdir = $(KDE4_SERVICESDIR)
