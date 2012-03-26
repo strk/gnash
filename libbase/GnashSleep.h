@@ -32,12 +32,12 @@ namespace gnash {
 /// Sleep compatibly for the specified number of microseconds
 //
 /// @param useconds     microseconds to sleep.
-inline void gnashSleep(size_t useconds)
+inline void gnashSleep(time_t useconds)
 {
 #if defined(_WIN32) || defined(WIN32)
     Sleep(useconds / 1000);
 #else
-    const size_t m = 1000000;
+    const time_t m = 1000000;
     const struct timespec t = { useconds / m, (useconds % m) * 1000 };
     ::nanosleep(&t, 0);
 #endif
