@@ -132,7 +132,7 @@ MANPAGES = \
 	findwebcams.1
 #	dumpshm.1
 
-# These are just aliases for the defauklt gnash man page.
+# These are just aliases for the default gnash man page.
 EXTRAMANPAGES =
 
 if BUILD_GTK_GUI
@@ -454,13 +454,7 @@ CLEANFILES = \
 	gnashref.mxml \
 	omf_timestamp \
 	images \
-	dump-gnash.1 \
-	gtk-gnash.1 \
-	qt4-gnash.1 \
-	fb-gnash.1 \
-	sdl-gnash.1 \
-	gnash-gtk-launcher.1 \
-	gnash-qt-launcher.1
+	gnash.1
 
 # This updates the copies of the manuals that are stored preformatted
 # so not everyone needs to get Docbook working well enough to produce
