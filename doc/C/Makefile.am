@@ -398,7 +398,7 @@ install-man1: $(MANPAGES) $(EXTRAMANPAGES)
 	   $(INSTALL_DATA) $$file $(DESTDIR)$(man1dir)/$$file; \
 	done
 
-install-data-hook: $(MANPAGES) install-man1 install-info-hook install-html-hook 
+install-data-hook: install-man1 install-info-hook install-html-hook 
 uninstall-hook: uninstall-info-hook uninstall-html-hook
 	-for file in $(MANPAGES) $(EXTRAMANPAGES); do \
 	   $(RM) $(DESTDIR)$(man1dir)/$$file; \
@@ -437,9 +437,18 @@ uninstall-omf-hook:
 	-rmdir $(DESTDIR)$(omf_dest_dir)
 	-$(SCROLLUPDATE) -v 
 
+# All but gnash.1 aren't generated, but are just copied from the source
+# tree. If building in thew source directory, we don't want to remove
+# these, but when building in a separate directory, we do want to remove them.
+MAN_ALIASES = \
+	`if test x"$(srcdir)" != x"."; then \
+	   echo $(EXTRAMANPAGES); \
+	fi`
+
 CLEANFILES = \
         $(PDFS) \
 	$(MANPAGES) \
+	$(MAN_ALIASES) \
 	$(INFOS) \
         $(HTMLS) \
 	$(TEXIS) \
@@ -453,8 +462,7 @@ CLEANFILES = \
 	gnashref.txml \
 	gnashref.mxml \
 	omf_timestamp \
-	images \
-	gnash.1
+	images
 
 # This updates the copies of the manuals that are stored preformatted
 # so not everyone needs to get Docbook working well enough to produce
