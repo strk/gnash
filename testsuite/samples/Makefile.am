@@ -120,6 +120,7 @@ EXTRA_DIST = \
 	gotoFrameOnKeyEvent.swf \
 	subshapes.swf \
 	test_lastopcode_v6.swf \
+	test_15bpp_bitmap.swf \
 	README \
 	$(NULL)
 
