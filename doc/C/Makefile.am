@@ -445,6 +445,11 @@ MAN_ALIASES = \
 	   echo $(EXTRAMANPAGES); \
 	fi`
 
+IMAGES = \
+	`if test x"$(srcdir)" != x"."; then \
+	   echo "images"; \
+	fi`
+
 CLEANFILES = \
         $(PDFS) \
 	$(MANPAGES) \
@@ -462,7 +467,7 @@ CLEANFILES = \
 	gnashref.txml \
 	gnashref.mxml \
 	omf_timestamp \
-	images
+	$(IMAGES)
 
 # This updates the copies of the manuals that are stored preformatted
 # so not everyone needs to get Docbook working well enough to produce
