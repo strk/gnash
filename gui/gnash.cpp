@@ -518,7 +518,7 @@ version_and_copyright(std::ostream& os)
        << VERSION " ("
        << BRANCH_NICK << "-" << BRANCH_REVNO << "-" << COMMIT_ID
        << ")" << endl << endl
-       << _("Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 "
+       << _("Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 "
             "Free Software Foundation, Inc.\n"
             "Gnash comes with NO WARRANTY, to the extent permitted "
             "by law.\nYou may redistribute copies of Gnash under the "
