@@ -1135,6 +1135,10 @@ if test x"${have_ffmpeg_vaapi}" = x"yes" -a x"${build_vaapi_device}" = x"yes"; t
   fi
 fi
 
+if test x"${build_fb_agg}" = xyes -a x"${build_rawfb_device}" = xno; then
+  AC_MSG_ERROR([Framebuffer GUI requires the rawfb device.])
+fi
+
 dnl libVA drivers. We declare conditional for both the option being
 dnl selected, as well as whether or not it's found. This we can
 dnl generate better error handling if it's not found.
