@@ -44,9 +44,9 @@
 #include "amf.h"
 #include "element.h"
 
-using amf::AMF;
-using amf::Element;
-using amf::Buffer;
+using cygnal::AMF;
+using cygnal::Element;
+using cygnal::Buffer;
 using namespace gnash;
 using namespace std;
 
@@ -178,46 +178,46 @@ main(int argc, char *argv[])
     string str = "Guten Tag";
 
     Element elnum1(dub);
-    boost::shared_ptr<Buffer> bnum1 = amf::AMF::encodeElement(elnum1);
+    boost::shared_ptr<Buffer> bnum1 = cygnal::AMF::encodeElement(elnum1);
     int fd = ::open("amf0-number.bin" ,O_WRONLY|O_CREAT, S_IRWXU);
     ::write(fd, bnum1->reference(), bnum1->allocated()); ::close(fd);
 
     flag = true;
     Element elbool1(flag);
-    boost::shared_ptr<Buffer> bbool1 = amf::AMF::encodeElement(elbool1);
+    boost::shared_ptr<Buffer> bbool1 = cygnal::AMF::encodeElement(elbool1);
     fd = ::open("amf0-boolean.bin" ,O_WRONLY|O_CREAT, S_IRWXU);
     ::write(fd, bbool1->reference(), bbool1->allocated()); ::close(fd);
     
     Element elstr1(str);
-    boost::shared_ptr<Buffer> bstr1 = amf::AMF::encodeElement(elstr1);
+    boost::shared_ptr<Buffer> bstr1 = cygnal::AMF::encodeElement(elstr1);
     fd = ::open("amf0-string.bin" ,O_WRONLY|O_CREAT, S_IRWXU);
     ::write(fd, bstr1->reference(), bstr1->allocated()); ::close(fd);
 
     Element el3;
     el3.clear();
     el3.makeNull();
-    boost::shared_ptr<Buffer> bel3 = amf::AMF::encodeElement(el3);
+    boost::shared_ptr<Buffer> bel3 = cygnal::AMF::encodeElement(el3);
     fd = ::open("amf0-null-object.bin" ,O_WRONLY|O_CREAT, S_IRWXU);
     ::write(fd, bel3->reference(), bel3->allocated()); ::close(fd);
 
 
     Element el4;
     el4.makeUndefined();
-    boost::shared_ptr<Buffer> bel4 = amf::AMF::encodeElement(el4);
+    boost::shared_ptr<Buffer> bel4 = cygnal::AMF::encodeElement(el4);
     fd = ::open("amf0-undefined-object.bin" ,O_WRONLY|O_CREAT, S_IRWXU);
     ::write(fd, bel4->reference(), bel4->allocated()); ::close(fd);
 
     Element el6;
     el6.clear();
     el6.makeNullString();
-    boost::shared_ptr<Buffer> bel6 = amf::AMF::encodeElement(el6);
+    boost::shared_ptr<Buffer> bel6 = cygnal::AMF::encodeElement(el6);
     fd = ::open("amf0-null-string.bin" ,O_WRONLY|O_CREAT, S_IRWXU);
     ::write(fd, bel6->reference(), bel6->allocated()); ::close(fd);    
 
     Element el15;
     el15.clear();
     el15.makeUnsupported();
-    boost::shared_ptr<Buffer> bel15 = amf::AMF::encodeElement(el15);
+    boost::shared_ptr<Buffer> bel15 = cygnal::AMF::encodeElement(el15);
     fd = ::open("amf0-unsupported-object.bin" ,O_WRONLY|O_CREAT, S_IRWXU);
     ::write(fd, bel15->reference(), bel15->allocated()); ::close(fd);
 
@@ -265,7 +265,7 @@ main(int argc, char *argv[])
     rel1.makeBoolean(true);
     rel1.makeNumber(num);
     if ((rel1.getType() == Element::NUMBER_AMF0) &&
-        (rel1.getDataSize() == amf::AMF0_NUMBER_SIZE) &&
+        (rel1.getDataSize() == cygnal::AMF0_NUMBER_SIZE) &&
         (rel1.to_number() == num)) {
         runtest.pass("Remade boolean as a double element");
     } else {

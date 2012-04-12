@@ -43,7 +43,7 @@
 #include "buffer.h"
 #include "diskstream.h"
 
-using namespace amf;
+using namespace cygnal;
 using namespace gnash;
 using namespace std;
 
@@ -203,7 +203,7 @@ test()
 void
 test_mem()
 {
-    boost::shared_ptr<amf::Buffer> buf1(new amf::Buffer(12));
+    boost::shared_ptr<cygnal::Buffer> buf1(new cygnal::Buffer(12));
     *buf1 = "Hello World";
     // drop the null terminator byte we inherit when using a simnple
     // string for testing
