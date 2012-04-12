@@ -29,6 +29,7 @@
 #include <csignal>
 #include <boost/lexical_cast.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
             
 #include "GnashSystemNetHeaders.h"
 #include "GnashSystemFDHeaders.h"
@@ -153,7 +154,7 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     struct addrinfo req, *ans;
     std::memset(&req, 0, sizeof(struct addrinfo));
     req.ai_family = AF_UNSPEC;  // Allow IPv4 or IPv6
-    req.ai_socktype = SOCK_STREAM;
+    req.ai_socktype = 0; // SOCK_STREAM;
 
     if ((code = getaddrinfo(hostname.c_str(), 0, &req, &ans)) != 0) {
         log_error(_("getaddrinfo() failed with code: #%d - %s\n"),
@@ -161,25 +162,43 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
         return false;
     }
 
-    // Multiple IPV$ and IPV6 numbers may be returned, so we try them all if
-    // required
-    struct addrinfo *it = ans;
-    while (it) {    
+    // display all the IP numbers
+    struct addrinfo *ot = ans;
+    while (ot) {
+        // We only want the SOCK_STREAM type
+        if (ot->ai_socktype == SOCK_DGRAM) {
+            // log_debug("SockType is SOCK_DGRAM");
+            ot = ot->ai_next;
+            continue;
+        }
         char clienthost   [NI_MAXHOST];
         std::memset(&clienthost, 0, NI_MAXHOST);
         char clientservice[NI_MAXSERV];
         std::memset(&clientservice, 0, NI_MAXSERV);
-        getnameinfo(it->ai_addr, it->ai_addrlen,
+        getnameinfo(ot->ai_addr, ot->ai_addrlen,
                     clienthost, sizeof(clienthost),
                     clientservice, sizeof(clientservice),
                     NI_NUMERICHOST);
+        
+        boost::shared_ptr<char> straddr = getIPString(ot);
+        
+        if (ot->ai_family == AF_INET6) {
+            log_debug("%s has IPV6 address of: %s", hostname, straddr.get());
+        } else if (ot->ai_family == AF_INET) {
+            log_debug("%s has IPV4 address of: %s", hostname, straddr.get());
+        }
+        ot = ot->ai_next;
+    }
 
-        char straddr[INET6_ADDRSTRLEN];
-        std::memset(&straddr, 0, INET6_ADDRSTRLEN);
-        ::inet_ntop(AF_INET6, it->ai_addr, straddr,
-                    sizeof(straddr));
-        log_debug("IPV6 address for host %s is %s", hostname, straddr);
-
+    // Multiple IPV$ and IPV6 numbers may be returned, so we try them all if
+    // required
+    struct addrinfo *it = ans;
+    while (it) {
+        // We only want a SOCK_STREAM
+        if (it->ai_socktype == SOCK_DGRAM) {
+            it = it->ai_next;
+            continue;
+        }
         _socket = ::socket(it->ai_family, it->ai_socktype, it->ai_protocol);
         if (_socket < 0) {
             const int err = errno;
@@ -265,6 +284,27 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     
     assert(_socket);
     return true;
+}
+
+// Return the string representation of the IPV4 or IPV6 number
+boost::shared_ptr<char>
+Socket::getIPString(struct addrinfo *ai)
+{
+    boost::shared_ptr<char> straddr(new char[INET6_ADDRSTRLEN]);
+    std::memset(straddr.get(), 0, INET6_ADDRSTRLEN);    
+    if (ai->ai_family == AF_INET6) {
+        struct sockaddr_in6 *sock6 = reinterpret_cast<struct sockaddr_in6 *>(ai->ai_addr);
+        struct in6_addr sin6_addr = sock6->sin6_addr;
+        ::inet_ntop(AF_INET6, &sin6_addr, straddr.get(), INET6_ADDRSTRLEN);
+//        log_debug("IPV6 address: %s", straddr.get());
+    } else if (ai->ai_family == AF_INET) {
+        struct sockaddr_in *sock = reinterpret_cast<struct sockaddr_in *>(ai->ai_addr);
+        struct in_addr sin_addr = sock->sin_addr;
+        ::inet_ntop(AF_INET, &sin_addr, straddr.get(), INET_ADDRSTRLEN);
+//        log_debug("IPV4 address: %s", straddr);
+    }
+    
+    return straddr;
 }
 
 void
