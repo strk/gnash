@@ -186,7 +186,10 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
             log_debug("%s has IPV6 address of: %s", hostname, straddr.get());
         } else if (ot->ai_family == AF_INET) {
             log_debug("%s has IPV4 address of: %s", hostname, straddr.get());
+        } else {
+            log_error("%s has no IP address!", hostname);
         }
+        
         ot = ot->ai_next;
     }
 
@@ -302,6 +305,8 @@ Socket::getIPString(struct addrinfo *ai)
         struct in_addr sin_addr = sock->sin_addr;
         ::inet_ntop(AF_INET, &sin_addr, straddr.get(), INET_ADDRSTRLEN);
 //        log_debug("IPV4 address: %s", straddr);
+    } else {
+        log_error("no IP address in addrinfo!");
     }
     
     return straddr;
