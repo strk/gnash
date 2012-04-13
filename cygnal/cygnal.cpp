@@ -200,6 +200,7 @@ usage()
         << _("  -t,  --testing       Turn on special Gnash testing support") << endl
 	<< _("  -a,  --admin         Enable the administration thread") << endl
 	<< _("  -r,  --root          Document root for all files") << endl
+	<< _("  -m,  --machine       Hostname for this machine") << endl
 	<< endl;
 }
 
@@ -412,24 +413,29 @@ main(int argc, char *argv[])
     textdomain (PACKAGE);
 #endif
 
-   const Arg_parser::Option opts[] =
+    // This becomes the default hostname, which becomes
+    // 127.0.0.1 or ::1 for the localhost. The --machine
+    // otion can change this.
+    std::string hostname = "localhost.localdomain";
+    
+    const Arg_parser::Option opts[] =
         {
-        { 'h', "help",          Arg_parser::no  },
-        { 'V', "version",       Arg_parser::no  },
-        { 'p', "port-offset",   Arg_parser::yes },
-        { 'v', "verbose",       Arg_parser::no  },
-        { 'd', "dump",          Arg_parser::no  },
-        { 'n', "netdebug",      Arg_parser::no  },
-        { 't', "testing",       Arg_parser::no  },
-        { 'a', "admin",         Arg_parser::no  },
-        { 'r', "root",          Arg_parser::yes },
-        { 'o', "only-port",     Arg_parser::yes },
-        { 's', "singlethreaded", Arg_parser::no }
+            { 'h', "help",          Arg_parser::no  },
+            { 'V', "version",       Arg_parser::no  },
+            { 'p', "port-offset",   Arg_parser::yes },
+            { 'v', "verbose",       Arg_parser::no  },
+            { 'd', "dump",          Arg_parser::no  },
+            { 'n', "netdebug",      Arg_parser::no  },
+            { 't', "testing",       Arg_parser::no  },
+            { 'a', "admin",         Arg_parser::no  },
+            { 'r', "root",          Arg_parser::yes },
+            { 'o', "only-port",     Arg_parser::yes },
+            { 's', "singlethreaded", Arg_parser::no },
+            { 'm', "machine",       Arg_parser::yes }
         };
-
+    
     Arg_parser parser(argc, argv, opts);
-    if( ! parser.error().empty() )	
-    {
+    if( ! parser.error().empty() ) {
         cout << parser.error() << endl;
         exit(EXIT_FAILURE);
     }
@@ -451,9 +457,9 @@ main(int argc, char *argv[])
 	crcfile.setDocumentRoot(docroot);
     }
     if (crcfile.getPortOffset()) {
-      port_offset = crcfile.getPortOffset();
+        port_offset = crcfile.getPortOffset();
     }
-
+    
     // Handle command line arguments
     for( int i = 0; i < parser.arguments(); ++i ) {
 	const int code = parser.code(i);
@@ -496,6 +502,9 @@ main(int argc, char *argv[])
 	      crcfile.dump();
 	      exit(EXIT_SUCCESS);
 	      break;
+	  case 'm':
+	      hostname = parser.argument(i);
+	      break;
 	  default:
 	      log_error(_("Extraneous argument: %s"), parser.argument(i).c_str());
         }
@@ -508,9 +517,9 @@ main(int argc, char *argv[])
     // can use for distributed processing.
     cyg.loadPeersFile();
     cyg.probePeers();
-
+    
 //    cyg.dump();
-
+    
     // Trap ^C (SIGINT) so we can kill all the threads
     act1.sa_handler = cntrlc_handler;
     sigaction (SIGINT, &act1, NULL);
@@ -556,6 +565,7 @@ main(int argc, char *argv[])
 	http_data->filespec = docroot;
 	http_data->protocol = Network::HTTP;
 	http_data->port = port_offset + gnash::HTTP_PORT;
+        http_data->hostname = hostname;
 	if (crcfile.getThreadingFlag()) {
 	    boost::thread http_thread(boost::bind(&connection_handler, http_data));
 	} else {
@@ -573,6 +583,7 @@ main(int argc, char *argv[])
 	rtmp_data->filespec = docroot;
 	rtmp_data->protocol = Network::RTMP;
 	rtmp_data->port = port_offset + gnash::RTMP_PORT;
+        rtmp_data->hostname = hostname;
 	if (crcfile.getThreadingFlag()) {
 	    boost::thread rtmp_thread(boost::bind(&connection_handler, rtmp_data));
 	} else {
@@ -636,7 +647,7 @@ admin_handler(Network::thread_params_t *args)
     
     Network net;
     Handler::admin_cmd_e cmd = Handler::POLL;
-    net.createServer(args->port);
+    net.createServer(args->hostname, args->port);
     while (retries > 0) {
 	log_network(_("Starting Admin Handler for port %d"), args->port);
 	net.newConnection(true);
@@ -760,7 +771,7 @@ connection_handler(Network::thread_params_t *args)
 	net.toggleDebug(true);
     }
     // Start a server on this tcp/ip port.
-    fd = net.createServer(args->port);
+    fd = net.createServer(args->hostname, args->port);
     if (fd <= 0) {
 	log_error(_("Can't start %s Connection Handler for fd #%d, port %hd"),
 		  proto_str[args->protocol], fd, args->port);
