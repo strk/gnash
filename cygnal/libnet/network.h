@@ -28,6 +28,8 @@
 # include <netinet/in.h>
 # include <arpa/inet.h>
 # include <sys/select.h>
+# include <sys/socket.h>
+# include <netdb.h>
 #ifdef HAVE_POLL_H
 # include <poll.h>
 #else 
@@ -140,6 +142,7 @@ public:
 	void *handler;
 	cygnal::Buffer *buffer;
 	std::string filespec;
+        std::string hostname;
 	protocols_supported_e protocol;
     } thread_params_t;
     typedef boost::uint8_t byte_t;
@@ -158,6 +161,7 @@ public:
     /// @return The file descritor to wait for connections on.
     int createServer(void);
     int createServer(short port);
+    int createServer(std::string hostname, short port);
     
     /// \brief Accept a client connection for the current server.
     ///
@@ -328,6 +332,9 @@ public:
     size_t sniffBytesReady(int fd);
     
  protected:
+    // Return the string representation of the IPV4 or IPV6 number
+    boost::shared_ptr<char> getIPString(struct addrinfo *ai);
+
     in_addr_t   _ipaddr;
     int         _sockfd;	// the file descriptor used for reading and writing
     int         _listenfd;	// the file descriptor used to listen for new connections
