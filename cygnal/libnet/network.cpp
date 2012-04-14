@@ -157,7 +157,7 @@ Network::createServer(short port)
 int
 Network::createServer(std::string hostname, short port)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     int             on, type;
     int             retries = 0;
@@ -208,13 +208,6 @@ Network::createServer(std::string hostname, short port)
         ot = ot->ai_next;
     }
 
-    // struct protoent *ppe;
-    // if ((ppe = getprotobyname(DEFAULTPROTO)) == 0) {
-    //     log_error(_("unable to get protocol entry for %s"),
-    //               DEFAULTPROTO);
-    //     return -1;
-    // }
-
     struct addrinfo *it = ans;
     while (it) {
         // Get a file descriptor for this socket connection
@@ -226,7 +219,7 @@ Network::createServer(std::string hostname, short port)
             it = it->ai_next;
         } else {
             boost::shared_ptr<char> straddr = getIPString(it);
-            log_debug("Socket created for %s, %d", straddr, it->ai_protocol); 
+            log_debug("Socket created for %s", straddr); 
             break;
         }
     }
@@ -244,21 +237,6 @@ Network::createServer(std::string hostname, short port)
         freeaddrinfo(ans);          // free the response data
         return -1;
     }
-
-//     struct sockaddr_in6 sock_in;
-//     memset((char *)&sock_in, 0, sizeof(sock_in));
-//     sock_in.sin6_family = it->ai_family;
-// #if 1
-//     // Accept incoming connections only on our IP number
-//     memcpy(&sock_in.sin6_addr, &it->ai_addr, it->ai_addrlen);
-// #else
-//     // Accept incoming connections on any IP number
-//     sock_in.sin6_addr = in6addr_any;
-// #endif
-//     sock_in.sin6_port = htons(port);
-// //    sock_in.sin6_len = sizeof(sock_in);
-    
-// //     _ipaddr = sock_in.sin6_addr.s_addr;
     
     retries = 0;
     while (retries < 5) {
