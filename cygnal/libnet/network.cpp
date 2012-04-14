@@ -176,7 +176,10 @@ Network::createServer(std::string hostname, short port)
     req.ai_socktype = SOCK_STREAM;
     req.ai_protocol = 0;        // default is tcp
 
-    if ((code = getaddrinfo(hostname.c_str(), 0, &req, &ans)) != 0) {
+    std::stringstream portstr;
+    portstr << port;
+    if ((code = getaddrinfo(hostname.c_str(), portstr.str().c_str(),
+                            &req, &ans)) != 0) {
         log_error(_("getaddrinfo() failed with code: #%d - %s\n"),
                   code, gai_strerror(code));
         freeaddrinfo(ans);          // free the response data
