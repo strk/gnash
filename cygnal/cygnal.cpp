@@ -650,7 +650,11 @@ admin_handler(Network::thread_params_t *args)
     net.createServer(args->hostname, args->port);
     while (retries > 0) {
 	log_network(_("Starting Admin Handler for port %d"), args->port);
-	net.newConnection(true);
+
+	if (net.newConnection(true) <= 0) {
+            return;
+        }
+        
 	log_network(_("Got an incoming Admin request"));
 	sleep(1);
 	do {
@@ -827,7 +831,7 @@ connection_handler(Network::thread_params_t *args)
 	if (args->netfd <= 0) {
 	    log_network(_("No new %s network connections"),
                         proto_str[args->protocol]);
-	    continue;
+	    return;
 	} else {
 	    log_network(_("*** New %s network connection for thread ID #%d, fd #%d ***"),
 			proto_str[args->protocol], tid, args->netfd);
