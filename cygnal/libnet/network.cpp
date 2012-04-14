@@ -102,7 +102,7 @@ Network::Network()
 	_listenfd(0),
 	_port(0),
 	_connected(false),
-	_debug(false),
+	_debug(true),
 	_timeout(0)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -147,14 +147,18 @@ Network::createServer(void)
     return createServer(port);
 }
 
-// FIXME: Should also support IPv6 (AF_INET6)
 int
 Network::createServer(short port)
 {
 //    GNASH_REPORT_FUNCTION;
+    return createServer("localhost.localdomain", port);
+}
 
-    struct protoent *ppe;
-    struct sockaddr_in sock_in;
+int
+Network::createServer(std::string hostname, short port)
+{
+    GNASH_REPORT_FUNCTION;
+
     int             on, type;
     int             retries = 0;
 
@@ -162,85 +166,122 @@ Network::createServer(short port)
 	log_debug(_("already connected to port %hd"), port);
 	return _listenfd;
     }
-    
-    const struct hostent *host = gethostbyname("localhost");
-    struct in_addr *thisaddr = reinterpret_cast<struct in_addr *>(host->h_addr_list[0]);
-    _ipaddr = thisaddr->s_addr;
-    memset(&sock_in, 0, sizeof(sock_in));
 
-#if 0
-    // Accept incoming connections only on our IP number
-    sock_in.sin_addr.s_addr = thisaddr->s_addr;
-#else
-    // Accept incoming connections on any IP number
-    sock_in.sin_addr.s_addr = INADDR_ANY;
-#endif
+    int code = 0;
+    struct addrinfo req, *ans;
+    std::memset(&req, 0, sizeof(struct addrinfo));
+    // For wildcard IP address
+    req.ai_flags    = AI_PASSIVE;
+    req.ai_family   = AF_UNSPEC; // Allow IPv4 or IPv6
+    req.ai_socktype = SOCK_STREAM;
+    req.ai_protocol = 0;        // default is tcp
 
-    _ipaddr = sock_in.sin_addr.s_addr;
-    sock_in.sin_family = AF_INET;
-    sock_in.sin_port = htons(port);
-
-    if ((ppe = getprotobyname(DEFAULTPROTO)) == 0) {
-        log_error(_("unable to get protocol entry for %s"),
-                DEFAULTPROTO);
-        return -1;
+    if ((code = getaddrinfo(hostname.c_str(), 0, &req, &ans)) != 0) {
+        log_error(_("getaddrinfo() failed with code: #%d - %s\n"),
+                  code, gai_strerror(code));
+        freeaddrinfo(ans);          // free the response data
+        return false;
     }
 
-    // set protocol type
-    if ( strcmp(DEFAULTPROTO, "udp") == 0) {
-        type = SOCK_DGRAM;
-    } else {
-        type = SOCK_STREAM;
+    // display all the IP numbers
+    struct addrinfo *ot = ans;
+    while (ot) {
+        char clienthost   [NI_MAXHOST];
+        std::memset(&clienthost, 0, NI_MAXHOST);
+        char clientservice[NI_MAXSERV];
+        std::memset(&clientservice, 0, NI_MAXSERV);
+        getnameinfo(ot->ai_addr, ot->ai_addrlen,
+                    clienthost, sizeof(clienthost),
+                    clientservice, sizeof(clientservice),
+                    NI_NUMERICHOST);
+        
+        boost::shared_ptr<char> straddr = getIPString(ot);
+        
+        if (ot->ai_family == AF_INET6) {
+            log_debug("%s has IPV6 address of: %s", hostname, straddr.get());
+        } else if (ot->ai_family == AF_INET) {
+            log_debug("%s has IPV4 address of: %s", hostname, straddr.get());
+        } else {
+            log_error("%s has no IP address!", hostname);
+        }
+        
+        ot = ot->ai_next;
     }
 
-    // Get a file descriptor for this socket connection
-    _listenfd = socket(PF_INET, type, ppe->p_proto);
+    // struct protoent *ppe;
+    // if ((ppe = getprotobyname(DEFAULTPROTO)) == 0) {
+    //     log_error(_("unable to get protocol entry for %s"),
+    //               DEFAULTPROTO);
+    //     return -1;
+    // }
+
+    struct addrinfo *it = ans;
+    while (it) {
+        // Get a file descriptor for this socket connection
+        _listenfd = socket(it->ai_family, it->ai_socktype, it->ai_protocol);
+        
+        if (_listenfd < 0) {
+            log_debug("unable to create socket: %s"), strerror(errno);
+            // Try the next IP number
+            it = it->ai_next;
+        } else {
+            boost::shared_ptr<char> straddr = getIPString(it);
+            log_debug("Socket created for %s, %d", straddr, it->ai_protocol); 
+            break;
+        }
+    }
 
     // error, wasn't able to create a socket
-    if (_listenfd < 0) {
+    if (it == 0) {
         log_error(_("unable to create socket: %s"), strerror(errno));
         return -1;
     }
-
+    
     on = 1;
     if (setsockopt(_listenfd, SOL_SOCKET, SO_REUSEADDR,
                    (char *)&on, sizeof(on)) < 0) {
         log_error(_("setsockopt SO_REUSEADDR failed"));
+        freeaddrinfo(ans);          // free the response data
         return -1;
     }
 
+//     struct sockaddr_in6 sock_in;
+//     memset((char *)&sock_in, 0, sizeof(sock_in));
+//     sock_in.sin6_family = it->ai_family;
+// #if 1
+//     // Accept incoming connections only on our IP number
+//     memcpy(&sock_in.sin6_addr, &it->ai_addr, it->ai_addrlen);
+// #else
+//     // Accept incoming connections on any IP number
+//     sock_in.sin6_addr = in6addr_any;
+// #endif
+//     sock_in.sin6_port = htons(port);
+// //    sock_in.sin6_len = sizeof(sock_in);
+    
+// //     _ipaddr = sock_in.sin6_addr.s_addr;
+    
     retries = 0;
-
-//     in_addr_t       nodeaddr;
-//     nodeaddr = inet_lnaof(*thisaddr);
     while (retries < 5) {
-        if (bind(_listenfd, reinterpret_cast<struct sockaddr *>(&sock_in),
-                 sizeof(sock_in)) == -1) {
+        if (bind(_listenfd, it->ai_addr, it->ai_addrlen)) {
             log_error(_("unable to bind to port %hd: %s"),
                     port, strerror(errno));
 //                    inet_ntoa(sock_in.sin_addr), strerror(errno));
             retries++;
         }
-
-	if (_debug) {
-//		char  ascip[INET_ADDRSTRLEN];
-//		inet_ntop(sock_in.sin_family, &_ipaddr, ascip, INET_ADDRSTRLEN);
-		char *ascip = ::inet_ntoa(sock_in.sin_addr);
-		log_debug(_("Server bound to service on %s, port %hd, using fd #%d"),
-		    ascip, ntohs(sock_in.sin_port),
-		    _listenfd);
-	}
-
-        if (type == SOCK_STREAM && listen(_listenfd, 5) < 0) {
+        
+        if (listen(_listenfd, 5) < 0) {
             log_error(_("unable to listen on port: %hd: %s "),
                 port, strerror(errno));
-            return -1;
+            break;
         }
-
+        
 	// We have a socket created
         _port = port;
+        
         return _listenfd;
     }
+    
+    freeaddrinfo(ans);          // free the response data
     return -1;
 }
 
@@ -536,12 +577,10 @@ Network::createClient(const string &hostname, short port)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    struct sockaddr_in  sock_in;
     fd_set              fdset;
     struct timeval      tval;
     int                 ret;
     int                 retries;
-    char                thishostname[MAXHOSTNAMELEN];
     struct protoent     *proto;
 
 //    assert( ! connected() );
@@ -552,7 +591,9 @@ Network::createClient(const string &hostname, short port)
     _port = port;    
     log_debug(_("%s: to host %s at port %d"), __FUNCTION__, hostname, port);
 
-    memset(&sock_in, 0, sizeof(struct sockaddr_in));
+#if 0
+    // If a hostname isn't supplied, get the localhost name.
+    char thishostname[MAXHOSTNAMELEN];
     memset(&thishostname, 0, MAXHOSTNAMELEN);
     if (hostname.size() == 0) {
         if (gethostname(thishostname, MAXHOSTNAMELEN) == 0) {
@@ -562,6 +603,55 @@ Network::createClient(const string &hostname, short port)
             return false;
         }
     }
+#endif
+
+#if 0 // def HAVE_IPV6
+    int code = 0;
+    struct addrinfo req, *ans;
+    std::memset(&req, 0, sizeof(struct addrinfo));
+    req.ai_family = AF_UNSPEC;  // Allow IPv4 or IPv6
+    req.ai_socktype = SOCK_STREAM;
+    
+    if ((code = getaddrinfo(hostname.c_str(), 0, &req, &ans)) != 0) {
+        log_error(_("getaddrinfo() failed with code: #%d - %s\n"),
+                  code, gai_strerror(code));
+        return false;
+    }
+    
+    // display all the IP numbers
+    struct addrinfo *ot = ans;
+    while (ot) {
+        // // We only want the SOCK_STREAM type
+        // if (ot->ai_socktype == SOCK_DGRAM) {
+        //     // log_debug("SockType is SOCK_DGRAM");
+        //     ot = ot->ai_next;
+        //     continue;
+        // }
+        char clienthost   [NI_MAXHOST];
+        std::memset(&clienthost, 0, NI_MAXHOST);
+        char clientservice[NI_MAXSERV];
+        std::memset(&clientservice, 0, NI_MAXSERV);
+        getnameinfo(ot->ai_addr, ot->ai_addrlen,
+                    clienthost, sizeof(clienthost),
+                    clientservice, sizeof(clientservice),
+                    NI_NUMERICHOST);
+        
+        boost::shared_ptr<char> straddr = getIPString(ot);
+        
+        if (ot->ai_family == AF_INET6) {
+            log_debug("%s has IPV6 address of: %s", hostname, straddr.get());
+        } else if (ot->ai_family == AF_INET) {
+            log_debug("%s has IPV4 address of: %s", hostname, straddr.get());
+        } else {
+            log_error("%s has no IP address!", hostname);
+        }
+        
+        ot = ot->ai_next;
+    }
+
+#else // IPV4
+    struct sockaddr_in  sock_in;
+    memset(&sock_in, 0, sizeof(struct sockaddr_in));
 
     const struct hostent *hent = ::gethostbyname(hostname.c_str());
     if (hent > 0) {
@@ -575,10 +665,11 @@ Network::createClient(const string &hostname, short port)
     inet_ntop(sock_in.sin_family, &sock_in.sin_addr.s_addr, ascip, INET_ADDRSTRLEN);
     log_debug(_("The IP address for this client socket is %s"), ascip);
 #endif
-
+#endif
+    
     proto = ::getprotobyname("TCP");
 
-    _sockfd = ::socket(PF_INET, SOCK_STREAM, proto->p_proto);
+    _sockfd = ::socket(AF_INET, SOCK_STREAM, proto->p_proto);
     if (_sockfd < 0) {
         log_error(_("unable to create socket: %s"), strerror(errno));
         _sockfd = -1;
@@ -1620,6 +1711,29 @@ Network::sniffBytesReady(int fd)
     log_network(_("#%d bytes waiting in kernel network buffer."), bytes);
     
     return bytes;
+}
+
+// Return the string representation of the IPV4 or IPV6 number
+boost::shared_ptr<char>
+Network::getIPString(struct addrinfo *ai)
+{
+    boost::shared_ptr<char> straddr(new char[INET6_ADDRSTRLEN]);
+    std::memset(straddr.get(), 0, INET6_ADDRSTRLEN);    
+    if (ai->ai_family == AF_INET6) {
+        struct sockaddr_in6 *sock6 = reinterpret_cast<struct sockaddr_in6 *>(ai->ai_addr);
+        struct in6_addr sin6_addr = sock6->sin6_addr;
+        ::inet_ntop(AF_INET6, &sin6_addr, straddr.get(), INET6_ADDRSTRLEN);
+//        log_debug("IPV6 address: %s", straddr.get());
+    } else if (ai->ai_family == AF_INET) {
+        struct sockaddr_in *sock = reinterpret_cast<struct sockaddr_in *>(ai->ai_addr);
+        struct in_addr sin_addr = sock->sin_addr;
+        ::inet_ntop(AF_INET, &sin_addr, straddr.get(), INET_ADDRSTRLEN);
+//        log_debug("IPV4 address: %s", straddr);
+    } else {
+        log_error(_("no IP address in addrinfo!"));
+    }
+    
+    return straddr;
 }
 
 // Trap Control-C so we can cleanly exit
