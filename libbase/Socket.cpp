@@ -154,7 +154,7 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     struct addrinfo req, *ans;
     std::memset(&req, 0, sizeof(struct addrinfo));
     req.ai_family = AF_UNSPEC;  // Allow IPv4 or IPv6
-    req.ai_socktype = 0; // SOCK_STREAM;
+    req.ai_socktype = SOCK_STREAM;
 
     if ((code = getaddrinfo(hostname.c_str(), 0, &req, &ans)) != 0) {
         log_error(_("getaddrinfo() failed with code: #%d - %s\n"),
@@ -165,12 +165,6 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     // display all the IP numbers
     struct addrinfo *ot = ans;
     while (ot) {
-        // We only want the SOCK_STREAM type
-        if (ot->ai_socktype == SOCK_DGRAM) {
-            // log_debug("SockType is SOCK_DGRAM");
-            ot = ot->ai_next;
-            continue;
-        }
         char clienthost   [NI_MAXHOST];
         std::memset(&clienthost, 0, NI_MAXHOST);
         char clientservice[NI_MAXSERV];
@@ -197,11 +191,6 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     // required
     struct addrinfo *it = ans;
     while (it) {
-        // We only want a SOCK_STREAM
-        if (it->ai_socktype == SOCK_DGRAM) {
-            it = it->ai_next;
-            continue;
-        }
         _socket = ::socket(it->ai_family, it->ai_socktype, it->ai_protocol);
         if (_socket < 0) {
             const int err = errno;
@@ -241,6 +230,7 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
             const int err = errno;
             log_error(_("Socket creation failed: %s"), std::strerror(err));
             _socket = 0;
+            freeaddrinfo(ans);
             return false;
         }
     }
@@ -262,9 +252,11 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
         if (err != EINPROGRESS) {
             log_error(_("Failed to connect to socket: %s"), std::strerror(err));
             _socket = 0;
+            freeaddrinfo(ans);
             return false;
         }
 #else
+            freeaddrinfo(ans);
         return false;
 #endif
     }
@@ -286,6 +278,8 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
                  reinterpret_cast<const char*>(&on), sizeof(on));
     
     assert(_socket);
+    freeaddrinfo(ans);
+
     return true;
 }
 
