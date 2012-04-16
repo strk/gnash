@@ -586,7 +586,6 @@ Network::createClient(const string &hostname, short port)
     }
 #endif
 
-#if 0 // def HAVE_IPV6
     int code = 0;
     struct addrinfo req, *ans;
     std::memset(&req, 0, sizeof(struct addrinfo));
@@ -630,33 +629,35 @@ Network::createClient(const string &hostname, short port)
         ot = ot->ai_next;
     }
 
-#else // IPV4
-    struct sockaddr_in  sock_in;
-    memset(&sock_in, 0, sizeof(struct sockaddr_in));
-
-    const struct hostent *hent = ::gethostbyname(hostname.c_str());
-    if (hent > 0) {
-        ::memcpy(&sock_in.sin_addr, hent->h_addr, hent->h_length);
+    // Multiple IPV$ and IPV6 numbers may be returned, so we try them all if
+    // required
+    struct addrinfo *it = ans;
+    while (it) {
+        _sockfd = ::socket(it->ai_family, it->ai_socktype, it->ai_protocol);
+        if (_sockfd < 0) {
+            const int err = errno;
+            log_error(_("Socket creation failed: %s"), std::strerror(err));
+            _sockfd = 0;
+            // Try the next IP number
+            it = it->ai_next;
+        } else {
+            break;
+        }
     }
-    sock_in.sin_family = AF_INET;
-    sock_in.sin_port = ntohs(static_cast<short>(port));
-
-#if 0
-    char ascip[INET_ADDRSTRLEN];
-    inet_ntop(sock_in.sin_family, &sock_in.sin_addr.s_addr, ascip, INET_ADDRSTRLEN);
-    log_debug(_("The IP address for this client socket is %s"), ascip);
-#endif
-#endif
     
-    proto = ::getprotobyname("TCP");
+    // cache the data we need later
+    struct sockaddr_in6 *addr6 = reinterpret_cast<struct sockaddr_in6 *>(it->ai_addr);
+    // When NULL is passed to getaddrinfo(), the port isn't set in
+    // the returned data, so we do it here.
+    addr6->sin6_port = htons(port);
+    // This is used for ::connect()
+    struct sockaddr *saddr = it->ai_addr;
 
-    _sockfd = ::socket(AF_INET, SOCK_STREAM, proto->p_proto);
-    if (_sockfd < 0) {
-        log_error(_("unable to create socket: %s"), strerror(errno));
-        _sockfd = -1;
-        return false;
-    }
+    const int addrlen = it->ai_addrlen;
+    boost::shared_ptr<char> straddr = getIPString(it);
 
+    freeaddrinfo(ans);          // free the response data
+    
     retries = 2;
     while (retries-- > 0) {
         // We use select to wait for the read file descriptor to be
@@ -704,16 +705,11 @@ Network::createClient(const string &hostname, short port)
         }
 
         if (ret > 0) {
-            ret = ::connect(_sockfd, 
-                    reinterpret_cast<struct sockaddr *>(&sock_in),
-                    sizeof(sock_in));
+            ret = ::connect(_sockfd, saddr, addrlen);
 
             if (ret == 0) {
-                char *ascip = ::inet_ntoa(sock_in.sin_addr);
-        // 		char ascip[INET_ADDRSTRLEN];
-        // 		inet_ntop(sock_in.sin_family, &sock_in.sin_addr.s_addr, ascip, INET_ADDRSTRLEN);
                 log_debug(_("\tport %d at IP %s for fd %d"), port,
-                        ascip, _sockfd);
+                          straddr, _sockfd);
                 _connected = true;
                 assert(_sockfd > 0);
                 return true;
@@ -733,11 +729,8 @@ Network::createClient(const string &hostname, short port)
             }
         }
     }
-    //  ::close(_sockfd);
-    //  return false;
-
-    printf("\tConnected at port %d on IP %s for fd #%d", port,
-           ::inet_ntoa(sock_in.sin_addr), _sockfd);
+    // printf("\tConnected at port %d on IP %s for fd #%d", port,
+    //        ::inet_ntoa(sock_in.sin_addr), _sockfd);
 
 #ifndef HAVE_WINSOCK_H
     fcntl(_sockfd, F_SETFL, O_NONBLOCK);
@@ -746,6 +739,7 @@ Network::createClient(const string &hostname, short port)
     _connected = true;
     _port = port;
     assert(_sockfd > 0);
+
     return true;
 }
 
