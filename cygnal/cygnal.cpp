@@ -857,7 +857,7 @@ connection_handler(Network::thread_params_t *args)
 	    if (pos != string::npos) {
 		hostname += http->getField("host").substr(0, pos);
 	    } else {
-		hostname += "localhost";
+		hostname += "localhost.localdomain";
 	    }
 	    path = http->getFilespec();
 	    string key = hostname + path;
