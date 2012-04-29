@@ -18,6 +18,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#ifdef HAVE_CONFIG_H
+# include "gnashconfig.h"
+#endif
+
 #include "Socket.h"
 
 #include <cstring>
@@ -25,6 +29,7 @@
 #include <csignal>
 #include <boost/lexical_cast.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
             
 #include "GnashSystemNetHeaders.h"
 #include "GnashSystemFDHeaders.h"
@@ -32,6 +37,10 @@
 #include "log.h"
 #include "utility.h"
 #include "GnashAlgorithm.h"
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
 
 namespace gnash {
 
@@ -42,13 +51,17 @@ Socket::Socket()
     _size(0),
     _pos(0),
     _error(false)
-{}
+{ }
 
 bool
 Socket::connected() const
 {
-    if (_connected) return true;
-    if (!_socket) return false;
+    if (_connected) {
+        return true;
+    }
+    if (!_socket) {
+        return false;
+    }
 
     size_t retries = 10;
     fd_set fdset;
@@ -118,7 +131,6 @@ Socket::close()
 bool
 Socket::connect(const std::string& hostname, boost::uint16_t port)
 {
-
     // We use _socket here because connected() or _connected might not
     // be true if a connection attempt is underway but not completed.
     if (_socket) {
@@ -129,13 +141,82 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     // If _socket is 0, either there has been no connection, or close() has
     // been called. There must not be an error in either case.
     assert(!_error);
+    
+    if (hostname.empty()) {
+        return false;
+    }
 
-    if (hostname.empty()) return false;
+    // This is used for ::connect()
+    struct sockaddr *saddr = 0;
+    
+#ifdef HAVE_IPV6
+    int code = 0;
+    struct addrinfo req, *ans;
+    std::memset(&req, 0, sizeof(struct addrinfo));
+    req.ai_family = AF_UNSPEC;  // Allow IPv4 or IPv6
+    req.ai_socktype = SOCK_STREAM;
 
+    if ((code = getaddrinfo(hostname.c_str(), 0, &req, &ans)) != 0) {
+        log_error(_("getaddrinfo() failed with code: #%d - %s\n"),
+                  code, gai_strerror(code));
+        return false;
+    }
+
+    // display all the IP numbers
+    struct addrinfo *ot = ans;
+    while (ot) {
+        char clienthost   [NI_MAXHOST];
+        std::memset(&clienthost, 0, NI_MAXHOST);
+        char clientservice[NI_MAXSERV];
+        std::memset(&clientservice, 0, NI_MAXSERV);
+        getnameinfo(ot->ai_addr, ot->ai_addrlen,
+                    clienthost, sizeof(clienthost),
+                    clientservice, sizeof(clientservice),
+                    NI_NUMERICHOST);
+        
+        boost::shared_ptr<char> straddr = getIPString(ot);
+        
+        if (ot->ai_family == AF_INET6) {
+            log_debug("%s has IPV6 address of: %s", hostname, straddr.get());
+        } else if (ot->ai_family == AF_INET) {
+            log_debug("%s has IPV4 address of: %s", hostname, straddr.get());
+        } else {
+            log_error("%s has no IP address!", hostname);
+        }
+        
+        ot = ot->ai_next;
+    }
+
+    // Multiple IPV$ and IPV6 numbers may be returned, so we try them all if
+    // required
+    struct addrinfo *it = ans;
+    while (it) {
+        _socket = ::socket(it->ai_family, it->ai_socktype, it->ai_protocol);
+        if (_socket < 0) {
+            const int err = errno;
+            log_error(_("Socket creation failed: %s"), std::strerror(err));
+            _socket = 0;
+            // Try the next IP number
+            it = it->ai_next;
+        } else {
+            break;
+        }
+    }
+
+    // cache the data we need later
+    struct sockaddr_in6 *addr6 = reinterpret_cast<struct sockaddr_in6 *>(it->ai_addr);
+    // When NULL is passed to getaddrinfo(), the port isn't set in
+    // the returned data, so we do it here.
+    addr6->sin6_port = htons(port);
+    saddr = it->ai_addr;
+    const int addrlen = it->ai_addrlen;
+
+    freeaddrinfo(ans);          // free the response data
+#else
     struct sockaddr_in addr;
     std::memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
-
+    addr.sin_port = htons(port);
     addr.sin_addr.s_addr = ::inet_addr(hostname.c_str());
     if (addr.sin_addr.s_addr == INADDR_NONE) {
         struct hostent* host = ::gethostbyname(hostname.c_str());
@@ -143,58 +224,86 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
             return false;
         }
         addr.sin_addr = *reinterpret_cast<in_addr*>(host->h_addr);
-    }
+        _socket = ::socket(addr.sin_family, SOCK_STREAM, IPPROTO_TCP);        
 
-    addr.sin_port = htons(port);
-
-    _socket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    
-    if (_socket < 0) {
-        const int err = errno;
-        log_error(_("Socket creation failed: %s"), std::strerror(err));
-        _socket = 0;
-        return false;
+        if (_socket < 0) {
+            const int err = errno;
+            log_error(_("Socket creation failed: %s"), std::strerror(err));
+            _socket = 0;
+            freeaddrinfo(ans);
+            return false;
+        }
     }
+    // cache the data we need later
+    const int addrlen = sizeof(struct sockaddr);
+    saddr = reinterpret_cast<struct sockaddr *>(&addr);
+#endif
+
 #ifndef _WIN32
     // Set non-blocking.
     const int flag = ::fcntl(_socket, F_GETFL, 0);
     ::fcntl(_socket, F_SETFL, flag | O_NONBLOCK);
 #endif
 
-    const struct sockaddr* a = reinterpret_cast<struct sockaddr*>(&addr);
-
     // Attempt connection
-    if (::connect(_socket, a, sizeof(struct sockaddr)) < 0) {
+    if (::connect(_socket, saddr, addrlen) < 0) {
         const int err = errno;
 #ifndef _WIN32
         if (err != EINPROGRESS) {
-            log_error(_("Failed to connect socket: %s"), std::strerror(err));
+            log_error(_("Failed to connect to socket: %s"), std::strerror(err));
             _socket = 0;
+            freeaddrinfo(ans);
             return false;
         }
 #else
+            freeaddrinfo(ans);
         return false;
 #endif
     }
 
     // Magic timeout number. Use rcfile ?
     const struct timeval tv = { 120, 0 };
-
+    
     // NB: the cast to const char* is needed for windows and is harmless
     // for POSIX.
     if (::setsockopt(_socket, SOL_SOCKET, SO_RCVTIMEO,
-                reinterpret_cast<const char*>(&tv), sizeof(tv))) {
+                     reinterpret_cast<const char*>(&tv), sizeof(tv))) {
         log_error(_("Setting socket timeout failed"));
     }
-
+    
     const int on = 1;
     // NB: the cast to const char* is needed for windows and is harmless
     // for POSIX.
     ::setsockopt(_socket, IPPROTO_TCP, TCP_NODELAY,
-            reinterpret_cast<const char*>(&on), sizeof(on));
-
+                 reinterpret_cast<const char*>(&on), sizeof(on));
+    
     assert(_socket);
+    freeaddrinfo(ans);
+
     return true;
+}
+
+// Return the string representation of the IPV4 or IPV6 number
+boost::shared_ptr<char>
+Socket::getIPString(struct addrinfo *ai)
+{
+    boost::shared_ptr<char> straddr(new char[INET6_ADDRSTRLEN]);
+    std::memset(straddr.get(), 0, INET6_ADDRSTRLEN);    
+    if (ai->ai_family == AF_INET6) {
+        struct sockaddr_in6 *sock6 = reinterpret_cast<struct sockaddr_in6 *>(ai->ai_addr);
+        struct in6_addr sin6_addr = sock6->sin6_addr;
+        ::inet_ntop(AF_INET6, &sin6_addr, straddr.get(), INET6_ADDRSTRLEN);
+//        log_debug("IPV6 address: %s", straddr.get());
+    } else if (ai->ai_family == AF_INET) {
+        struct sockaddr_in *sock = reinterpret_cast<struct sockaddr_in *>(ai->ai_addr);
+        struct in_addr sin_addr = sock->sin_addr;
+        ::inet_ntop(AF_INET, &sin_addr, straddr.get(), INET_ADDRSTRLEN);
+//        log_debug("IPV4 address: %s", straddr);
+    } else {
+        log_error("no IP address in addrinfo!");
+    }
+    
+    return straddr;
 }
 
 void

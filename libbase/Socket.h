@@ -23,7 +23,11 @@
 
 #include "dsodefs.h"
 #include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
 #include "IOChannel.h"
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
 
 namespace gnash {
     class URL;
@@ -119,6 +123,9 @@ public:
 
 private:
 
+    // Return the string representation of the IPV4 or IPV6 number
+    boost::shared_ptr<char> getIPString(struct addrinfo *ai);
+	
     /// Fill the cache.
     void fillCache();
 
@@ -143,8 +150,7 @@ private:
 
 #endif // GNASH_IOCHANNEL_H
 
-
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

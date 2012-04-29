@@ -17,6 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "URL.h"
+#include "log.h"
 
 #include <iostream>
 #include <string>
@@ -51,7 +52,6 @@ URL::URL(const std::string& relative_url, const URL& baseurl)
 void
 URL::normalize_path(std::string& path)
 {
-
 #if defined(_WIN32) || defined(WIN32) || defined(__OS2__) || defined(__amigaos4__)
     return;
 #endif
@@ -142,7 +142,7 @@ URL::init_absolute(const std::string& in)
 
 URL::URL(const std::string& absolute_url)
 {
-    //cerr << "URL(" << absolute_url << ")" << endl;
+    // std::cerr << "URL(" << absolute_url << ")" << std::endl;
     if ( ( absolute_url.size() && absolute_url[0] == '/' )
          || absolute_url.find("://") != std::string::npos 
          || ( absolute_url.size() > 1 && absolute_url[1] == ':' )        //for win32
@@ -185,7 +185,6 @@ URL::URL(const std::string& absolute_url)
 void
 URL::init_relative(const std::string& relative_url, const URL& baseurl)
 {
-    
     // If relative url starts with an hash, it's just
     // an anchor change
     if ( relative_url[0] == '#' ){
@@ -311,10 +310,25 @@ URL::split_port_from_host()
     assert(_port == "");
 
     // Extract anchor from path, if any
-    std::string::size_type hashpos = _host.find(':');
-    if ( hashpos != std::string::npos ) {
-        _port = _host.substr(hashpos+1);
-        _host.erase(hashpos);
+
+    // IPV4 addresses have square brackets around the adress like this:
+    // http://[2a00:1450:4001:c01::88]/
+    
+    std::string::size_type ipv6 = _host.find(']');
+    if (ipv6 == std::string::npos) {
+        // IPV6 address
+        std::string::size_type hashpos = _host.find(':');
+        if ( hashpos != std::string::npos ) {
+            _port = _host.substr(hashpos+1);
+            _host.erase(hashpos);
+        }
+    } else {
+        // IPV4 address
+        std::string::size_type hashpos = _host.find(':', ipv6);
+        if ( hashpos != std::string::npos ) {
+            _port = _host.substr(hashpos+1);
+            _host.erase(hashpos);
+        }        
     }
 }
 
@@ -342,7 +356,6 @@ void
 URL::parse_querystring(const std::string& query_string,
                        std::map<std::string, std::string>& target_map)
 {
-
     if ( query_string.empty() ) return; // nothing to do
 
     std::string qstring=query_string;;

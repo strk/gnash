@@ -1551,6 +1551,11 @@ AC_SEARCH_LIBS([mallinfo], [c malloc],
 AM_CONDITIONAL([HAVE_MALLINFO], test x$mallinfo = xyes)
 AM_CONDITIONAL(JEMALLOC, test x$jemalloc = xyes)
 
+AC_SEARCH_LIBS([getaddrinfo], [c],
+               AC_DEFINE(HAVE_IPV6, [1], [Has IPV6 support])
+               ipv6=yes
+               )
+
 AC_ARG_ENABLE(fps-debug,
   AC_HELP_STRING([--enable-fps-debug],[Enable FPS debugging code]),
 [case "${enableval}" in
