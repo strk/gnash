@@ -89,7 +89,7 @@ AC_DEFUN([GNASH_PATH_NPAPI],
     AC_COMPILE_IFELSE([AC_LANG_SOURCE([
                   #include "npapi.h" 
                   #include "npruntime.h"
-                  int main(int argc, char* argv[]){
+                  int main(int argc, char** argv){
 	            NPString str;
                     uint32_t len = str.UTF8Length;
 	            return 0;
