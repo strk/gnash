@@ -157,14 +157,14 @@ public:
         return (_conditions & KEYPRESS);
     }
 
-private:
-
     /// Return the keycode triggering this action
     //
     /// Return 0 if no key is supposed to trigger us
     int getKeyCode() const {
         return (_conditions & KEYPRESS) >> 9;
     }
+
+private:
 
     enum Condition
     {
