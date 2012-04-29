@@ -292,7 +292,7 @@ private:
 inline ObjectURI
 getURI(const VM& vm, const std::string& str, bool lowerCaseHint=false)
 {
-    lowerCaseHint=lowerCaseHint; // TODO pass hint to ObjectURI ctor
+    UNUSED(lowerCaseHint); // TODO pass hint to ObjectURI ctor
     // Possible optimization here is to directly compute
     // noCase value if VM version is < 7
     return ObjectURI((NSV::NamedStrings)vm.getStringTable().find(str));
