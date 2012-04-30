@@ -572,19 +572,6 @@ Network::createClient(const string &hostname, short port)
     _port = port;    
     log_debug(_("%s: to host %s at port %d"), __FUNCTION__, hostname, port);
 
-#if 0
-    // If a hostname isn't supplied, get the localhost name.
-    char thishostname[MAXHOSTNAMELEN];
-    memset(&thishostname, 0, MAXHOSTNAMELEN);
-    if (hostname.size() == 0) {
-        if (gethostname(thishostname, MAXHOSTNAMELEN) == 0) {
-            log_debug(_("The hostname for this machine is %s"), thishostname);
-        } else {
-            log_debug(_("Couldn't get the hostname for this machine"));
-            return false;
-        }
-    }
-
     int code = 0;
     struct addrinfo req, *ans;
     std::memset(&req, 0, sizeof(struct addrinfo));
