@@ -1,6 +1,6 @@
 dnl  
 dnl  Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010,
-dnl  2011 Free Software Foundation, Inc.
+dnl  2011, 2012 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
@@ -43,6 +43,8 @@ AC_DEFUN([GNASH_PATH_X11],
         break
     	fi
     done
+  else
+    AC_DEFINE(HAVE_X11_X_H, [1], [Have the X11 X.h header file])
   fi
 
   AC_MSG_CHECKING([for X11 headers])
