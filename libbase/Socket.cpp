@@ -177,7 +177,7 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
                           code, gai_strerror(code));
                 return false;
             }
-            log_error(_("getaddrinfo() needed to change localhost, edit your /etc/host file!"));
+            log_error(_("getaddrinfo() needed to change localhost, check your /etc/hosts file!"));
         } else {
             log_error(_("getaddrinfo() failed with code: #%d - %s\n"),
                       code, gai_strerror(code));
@@ -253,7 +253,6 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
             const int err = errno;
             log_error(_("Socket creation failed: %s"), std::strerror(err));
             _socket = 0;
-            freeaddrinfo(ans);
             return false;
         }
     }
@@ -275,11 +274,9 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
         if (err != EINPROGRESS) {
             log_error(_("Failed to connect to socket: %s"), std::strerror(err));
             _socket = 0;
-            freeaddrinfo(ans);
             return false;
         }
 #else
-            freeaddrinfo(ans);
         return false;
 #endif
     }
@@ -301,8 +298,7 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
                  reinterpret_cast<const char*>(&on), sizeof(on));
     
     assert(_socket);
-    freeaddrinfo(ans);
-
+    
     return true;
 }
 
