@@ -192,7 +192,7 @@ bool delVariable(const as_environment& ctx, const std::string& varname,
 ///
 /// TODO: return an integer: 0 not a path, 1 a slash-based path, 2 a
 /// dot-based path
-bool parsePath(const std::string& var_path, std::string& path,
+DSOEXPORT bool parsePath(const std::string& var_path, std::string& path,
         std::string& var);
 
 /// Find the object referenced by the given path.
@@ -204,7 +204,7 @@ bool parsePath(const std::string& var_path, std::string& path,
 /// @param ctx     Timeline context to use for variable finding.
 /// @param path    Variable path. 
 /// @param scope   The Scope stack to use for lookups.
-as_object* findObject(const as_environment& ctx, const std::string& path,
+DSOEXPORT as_object* findObject(const as_environment& ctx, const std::string& path,
         const as_environment::ScopeStack* scope = 0);
 
 /// Find the DisplayObject referenced by the given path.

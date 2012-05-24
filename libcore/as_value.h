@@ -381,7 +381,7 @@ public:
     ///	  evaluation of A and B.
     ///
     /// @param v     The as_value to compare to
-    bool equals(const as_value& v, int version) const;
+    DSOEXPORT bool equals(const as_value& v, int version) const;
     
     /// Set any object value as reachable (for the GC)
     //
