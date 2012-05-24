@@ -48,7 +48,7 @@ static const int DEFAULT_BUFFER_SIZE = 256;
 
 // The Uinput device is write only, and is used to control the mouse movements.
 // It's not really an input device, but uses the same subsystem.
-class UinputDevice
+class DSOEXPORT UinputDevice
 {
 public:
     UinputDevice();
@@ -122,7 +122,7 @@ public:
     virtual bool init(const std::string &filespec, size_t size) = 0;
     virtual bool check() = 0;
 
-    static std::vector<boost::shared_ptr<InputDevice> > scanForDevices();
+    static DSOEXPORT std::vector<boost::shared_ptr<InputDevice> > scanForDevices();
     
     InputDevice::devicetype_e getType() { return _type; };
     void setType(InputDevice::devicetype_e x) { _type = x; };
@@ -140,7 +140,7 @@ public:
         return input;
     }
 
-    static boost::shared_array<int> convertAbsCoords(int x, int y,
+    static DSOEXPORT boost::shared_array<int> convertAbsCoords(int x, int y,
                                                      int width, int height);
 
     void setScreenSize(int x, int y)

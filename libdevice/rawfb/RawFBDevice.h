@@ -43,7 +43,7 @@ namespace rawfb {
 
 #define CMAP_SIZE (256*2)
 
-class RawFBDevice : public GnashDevice
+class DSOEXPORT RawFBDevice : public GnashDevice
 {
   public:
     
