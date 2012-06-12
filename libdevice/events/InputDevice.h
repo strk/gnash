@@ -30,7 +30,9 @@
 #include <vector>
 #include <queue>
 #include <linux/input.h>
+#ifdef HAVE_LINUX_UINPUT_H
 #include <linux/uinput.h>
+#endif
 
 #include "GnashKey.h"
 
