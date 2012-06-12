@@ -42,7 +42,9 @@ endif
 
 # The Uinput device is write only, and is used to control the mouse
 # movements.
+if HAS_UINPUT
 libgnashdevice_la_SOURCES += events/UinputDevice.cpp
+endif
 
 if ENABLE_DEVELOPER_TESTS
 check_PROGRAMS += test_events evtest
