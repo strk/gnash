@@ -241,7 +241,7 @@ dnl different development libraries.
 AC_ARG_WITH(sysroot,
   AC_HELP_STRING([--with-sysroot],
   [system root directory for cross compiling]),
-  with_top_level=${withval} ;
+  if test -d ${withval}/usr; then with_top_level=${withval}/usr; fi ;
   cross_compiling=yes)
 
 dnl Android is a little different when using a standard cross toolchain,
@@ -262,19 +262,20 @@ AC_ARG_WITH([android],
         if test x"${withval}" != x; then
           android_ndk=${withval}
         else
-          android_ndk=/opt/android-ndk-r3/build/platforms/android-5/arch-arm
+          android_ndk=/opt/android-ndk-r8/build/platforms/android-9/arch-arm
         fi
 )
-CROSS_CXXFLAGS=
 if test x"${android_ndk}" != xno; then
-  CROSS_CXXFLAGS=-mandroid -fexceptions
+  CROSS_CXXFLAGS="-mandroid -fexceptions -frtti"
   if test x"${with_top_level}" = x; then
     with_top_level=/usr/local/android-arm/sysroot/usr
     cross_compiling=yes
   fi
   ANDROID_NDK=${android_ndk}
   AC_DEFINE(ANDROID, [1], [This is an Android build])
+  CXXFLAGS="${CXXFLAGS} ${SROSS_CXXFLAGS}"
 else
+  CROSS_CXXFLAGS=
   ANDROID_NDK=
 fi
 AC_SUBST(ANDROID_NDK)
@@ -2076,6 +2077,10 @@ AC_CHECK_HEADERS(sys/utsname.h)
 AC_CHECK_HEADERS(signal.h)
 AC_CHECK_HEADERS(unistd.h)
 AC_CHECK_HEADERS(sys/time.h)
+AC_CHECK_HEADERS(linux/uinput.h, [uinput=yes], [uinput=no])
+
+AM_CONDITIONAL(HAS_UINPUT, [test x$uinput = xyes])
+
 AC_CHECK_LIB(bz2, BZ2_bzopen, [AC_SUBST(BZ2_LIBS, -lbz2)])
 AC_CHECK_LIB(c, getpwnam, AC_DEFINE(HAVE_GETPWNAM, 1, [Has getpwnam] ))
 
@@ -2723,7 +2728,7 @@ fi
 #
 if test x"$GCC" = x"yes"; then
   CXXFLAGS="$CXXFLAGS \
-    $CROSS_CXXFLAGS \
+    ${CROSS_CXXFLAGS} \
     -W \
     -Wall \
     -Wcast-align \
@@ -2734,7 +2739,7 @@ if test x"$GCC" = x"yes"; then
     -Wunused \
     "
   CFLAGS="$CFLAGS \
-    $CROSS_CXXFLAGS \
+    ${CROSS_CXXFLAGS} \
     -W \
     -Wall \
     -Wcast-align \
