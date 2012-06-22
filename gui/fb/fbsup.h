@@ -202,7 +202,9 @@ private:
     std::vector<boost::shared_ptr<InputDevice> > _inputs;
 
     boost::shared_ptr<Renderer> _renderer;
+#ifdef HAVE_LINUX_UINPUT_H
     UinputDevice                _uinput;
+#endif
 };
 
 } // end of namespace gui

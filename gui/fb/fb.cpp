@@ -230,7 +230,8 @@ FBGui::init(int argc, char *** argv)
     }
     
     disable_terminal();
-
+    
+#ifdef HAVE_LINUX_UINPUT_H
     // Look for the User Mode Input (Uinput) device, which is used to
     // control the movement and coordinates of the mouse cursor.
     if (_uinput.scanForDevice()) {
@@ -239,7 +240,8 @@ FBGui::init(int argc, char *** argv)
     } else {
         log_error(_("Found no accessible User mode input event device"));
     }
-        
+#endif
+    
     // Initialize all the input devices
 
     // Look for Mice that use the PS/2 mouse protocol
@@ -724,11 +726,13 @@ FBGui::checkForData()
                 InputDevice::convertAbsCoords(ie->x, ie->y,
                                               getStage()->getStageWidth(),
                                               getStage()->getStageHeight());
+#ifdef HAVE_LINUX_UINPUT_H
             // The mouse was moved
             _uinput.moveTo(coords[0], coords[1]);
             if (coords) {
                 notifyMouseMove(coords[0], coords[1]);
             }
+#endif
             
             // See if a mouse button was clicked
             if (ie->pressed) {
