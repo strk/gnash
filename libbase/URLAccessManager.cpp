@@ -204,7 +204,7 @@ host_check(const std::string& host)
     // Get hostname
     //
 
-    #define MAXHOSTNAMELEN 200
+//  #define MAXHOSTNAMELEN 200
     char name[MAXHOSTNAMELEN];
     if (::gethostname(name, MAXHOSTNAMELEN) == -1)
     {
