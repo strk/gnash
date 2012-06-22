@@ -265,8 +265,9 @@ AC_ARG_WITH([android],
           android_ndk=/opt/android-ndk-r8/build/platforms/android-9/arch-arm
         fi
 )
+dnl -fshort-wchar
 if test x"${android_ndk}" != xno; then
-  CROSS_CXXFLAGS="-mandroid -fexceptions -frtti" dnl -fshort-wchar
+  CROSS_CXXFLAGS='-mandroid -fexceptions -frtti'
   if test x"${with_top_level}" = x; then
     with_top_level=/usr/local/android-arm/sysroot/usr
     cross_compiling=yes
