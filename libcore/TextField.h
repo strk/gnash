@@ -40,6 +40,16 @@ namespace gnash {
     class Font;
 }
 
+#ifdef __ANDROID__
+namespace std {
+typedef basic_string
+   <wchar_t
+   ,std::char_traits<wchar_t>
+   ,std::allocator<wchar_t> >
+wstring;
+}
+#endif
+
 namespace gnash {
 
 /// An instance of a DefineEditTextTag 
