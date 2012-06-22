@@ -266,7 +266,7 @@ AC_ARG_WITH([android],
         fi
 )
 if test x"${android_ndk}" != xno; then
-  CROSS_CXXFLAGS="-mandroid -fexceptions -frtti"
+  CROSS_CXXFLAGS="-mandroid -fexceptions -frtti" dnl -fshort-wchar
   if test x"${with_top_level}" = x; then
     with_top_level=/usr/local/android-arm/sysroot/usr
     cross_compiling=yes
@@ -280,6 +280,14 @@ else
 fi
 AC_SUBST(ANDROID_NDK)
 AM_CONDITIONAL(ANDROID, [ test x"${android_ndk}" != xno ])
+
+dnl Android needs this test
+dnl #include <wchar_t> 
+dnl const std::wstring& wstr
+dnl namespace std {
+dnl typedef basic_string<wchar_t> wstring;
+dnl };
+
 
 AC_C_BIGENDIAN
 AC_C_CONST
@@ -2725,13 +2733,12 @@ fi
 #
 # -ansi was actually dropped because it hides 'fileno', which
 # is used in a few places
-#
+#    -Wcast-align 
 if test x"$GCC" = x"yes"; then
   CXXFLAGS="$CXXFLAGS \
     ${CROSS_CXXFLAGS} \
     -W \
     -Wall \
-    -Wcast-align \
     -Wcast-qual \
     -Wpointer-arith \
     -Wreturn-type \
@@ -2742,7 +2749,6 @@ if test x"$GCC" = x"yes"; then
     ${CROSS_CXXFLAGS} \
     -W \
     -Wall \
-    -Wcast-align \
     -Wcast-qual \
     -Wpointer-arith \
     -Wreturn-type \
