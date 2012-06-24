@@ -45,13 +45,11 @@ libgnashasobjs_la_SOURCES = \
 	asobj/MovieClip_as.cpp \
 	asobj/Stage_as.cpp \
 	asobj/Accessibility_as.cpp \
-	asobj/Sound_as.cpp \
 	asobj/Video_as.cpp \
 	asobj/Microphone_as.cpp \
 	asobj/Camera_as.cpp \
 	asobj/LocalConnection_as.cpp \
 	asobj/NetConnection_as.cpp \
-	asobj/NetStream_as.cpp \
 	asobj/SharedObject_as.cpp \
 	asobj/XMLSocket_as.cpp \
 	asobj/XML_as.cpp \
@@ -65,6 +63,13 @@ libgnashasobjs_la_SOURCES = \
 	asobj/TextFormat_as.cpp \
 	asobj/TextSnapshot_as.cpp \
 	asobj/Object.cpp
+
+if BUILD_LIBSOUND
+  libgnashasobjs_la_SOURCES += asobj/Sound_as.cpp
+endif
+if BUILD_LIBMEDIA
+  libgnashasobjs_la_SOURCES += asobj/NetStream_as.cpp
+endif
 
 inst_HEADERS = \
 	asobj/ASConversions.h \
