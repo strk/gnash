@@ -91,8 +91,11 @@ libgnashsound_la_LDFLAGS += -no-undefined
 libgnashsound_la_LIBADD += -lintl
 endif
 
+AM_CXXFLAGS = $(CROSS_CXXFLAGS)
+AM_LDFLAGS = $(CROSS_LDFLAGS)
+
 if ENABLE_PCH
-AM_CXXFLAGS = $(PCH_FLAGS)
+AM_CXXFLAGS += $(PCH_FLAGS)
 endif
 
 # Remove libtool .la files

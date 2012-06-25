@@ -16,7 +16,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-AM_CXXFLAGS = -DREGISTER_MEDIA_HANDLERS
+AM_CXXFLAGS = $(CROSS_CXXFLAGS) -DREGISTER_MEDIA_HANDLERS
+AM_LDFLAGS = $(CROSS_LDFLAGS)
 
 # If we are using an installable libltdl, then it needs to be built
 # before libgnash, as libgnash depends on it for extensions.

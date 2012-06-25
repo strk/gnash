@@ -44,9 +44,12 @@ AM_CPPFLAGS = -I.. \
 
 GNASH_LIBS = \
 	$(top_builddir)/libcore/libgnashcore.la \
-	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(NULL)
+
+if BUILD_LIBMEDIA
+GNASH_LIBS += $(top_builddir)/libmedia/libgnashmedia.la
+endif
 
 instdir = $(includedir)/gnash
 
@@ -125,8 +128,11 @@ endif
 clean-hook:
 	-rm -f core.*
 
+AM_CXXFLAGS = $(CROSS_CXXFLAGS)
+AM_LDFLAGS = $(CROSS_LDFLAGS)
+
 if ENABLE_PCH
-AM_CXXFLAGS = $(PCH_FLAGS)
+AM_CXXFLAGS += $(PCH_FLAGS)
 endif
 
 # Remove libtool .la files

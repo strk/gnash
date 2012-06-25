@@ -278,8 +278,11 @@ if WIN32
   libgnashbase_la_LIBADD += -lws2_32 -lwinmm
 endif
 
+AM_CXXFLAGS = $(CROSS_CXXFLAGS)
+AM_LDFLAGS = $(CROSS_LDFLAGS)
+
 if ENABLE_PCH
-AM_CXXFLAGS = $(PCH_FLAGS)
+AM_CXXFLAGS += $(PCH_FLAGS)
 endif
 
 edit = sed \
