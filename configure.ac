@@ -268,6 +268,7 @@ AC_ARG_WITH([android],
 dnl -fshort-wchar
 if test x"${android_ndk}" != xno; then
   CROSS_CXXFLAGS='-mandroid -fexceptions -frtti'
+  CROSS_LDFLAGS=-all-static
   if test x"${with_top_level}" = x; then
     with_top_level=/usr/local/android-arm/sysroot/usr
     cross_compiling=yes
@@ -281,6 +282,9 @@ else
 fi
 AC_SUBST(ANDROID_NDK)
 AM_CONDITIONAL(ANDROID, [ test x"${android_ndk}" != xno ])
+
+AC_SUBST(CROSS_LDFLAGS)
+AC_SUBST(CROSS_CXXFLAGS)
 
 dnl Android needs this test
 dnl #include <wchar_t> 
@@ -739,6 +743,11 @@ AC_ARG_ENABLE(sound,
    fi]
 )
 
+AM_CONDITIONAL(BUILD_LIBSOUND, test x${build_sound_none} != xyes)
+if test x${build_sound_none} != xyes; then
+  AC_DEFINE(USE_SOUND, [1], [Build any sound code])
+fi
+
 dnl --------------------------------------------------------
 dnl  Media handler selection
 dnl --------------------------------------------------------
@@ -790,6 +799,11 @@ AC_ARG_ENABLE(media,
         media_list="gst"
     fi]
 )
+
+AM_CONDITIONAL(BUILD_LIBMEDIA, test x${build_media_none} != xyes)
+if test x${build_media_none} != xyes; then
+  AC_DEFINE(USE_MEDIA, [1], [Build any media code])
+fi
 
 dnl If no render is selected, and media handling isn't disabled, them enable gst
 if test x${build_media_none} = xno -a x${build_media_gst} = xno -a x${build_media_ffmpeg} = xno; then
