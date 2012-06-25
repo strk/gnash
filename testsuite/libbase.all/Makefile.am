@@ -24,6 +24,9 @@ LDADD = \
 	$(top_builddir)/librender/libgnashrender.la \
 	$(LIBINTL)
 
+AM_LDFLAGS = $(CROSS_LDFLAGS)
+AM_CXXFLAGS = $(CROSS_CXXFLAGS)
+
 # AM_CPPFLAGS isn't right here since per-program *_CPPFLAGS override global
 # AM_CPPFLAGS
 AM_CPPFLAGS = \

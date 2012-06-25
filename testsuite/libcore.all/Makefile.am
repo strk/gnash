@@ -19,6 +19,8 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
+AM_CXXFLAGS = $(CROSS_CXXFLAGS)
+
 AM_CPPFLAGS = \
         -I$(top_srcdir)/testsuite  \
         -I$(top_srcdir)/librender  \
@@ -63,9 +65,15 @@ CLEANFILES = \
 AM_LDFLAGS = \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/libmedia/libgnashmedia.la \
-	$(top_builddir)/libsound/libgnashsound.la \
+	$(CROSS_LDFLAGS) \
 	$(BOOST_LIBS) 
+
+if BUILD_LIBMEDIA
+AM_LDFLAGS += $(top_builddir)/libmedia/libgnashmedia.la
+endif
+if BUILD_LIBSOUND
+AM_LDFLAGS += $(top_builddir)/libsound/libgnashsound.la
+endif
 
 BitsReaderTest_SOURCES = BitsReaderTest.cpp
 BitsReaderTest_LDADD = $(AM_LDFLAGS)

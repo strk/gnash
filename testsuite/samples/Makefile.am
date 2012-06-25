@@ -42,8 +42,11 @@ AM_CPPFLAGS = \
         $(NULL)
 
 AM_LDFLAGS = \
+	$(CROSS_LDFLAGS) \
 	$(OPENGL_LIBS) \
 	$(NULL)
+
+AM_CXXFLAGS = $(CROSS_CXXFLAGS)
 
 GNASH_LIBS = \
 	$(top_builddir)/testsuite/libtestsuite.la \
@@ -72,6 +75,7 @@ clip_as_button2_TestRunner_LDADD = \
 	$(NULL)
 clip_as_button2_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(srcdir)\" \
+	$(CROSS_CXXFLAGS) \
 	$(NULL)
 
 subshapes_TestRunner_SOURCES = \
@@ -82,6 +86,7 @@ subshapes_TestRunner_LDADD = \
 	$(NULL)
 subshapes_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(srcdir)\" \
+	$(CROSS_CXXFLAGS) \
 	$(NULL)
 
 gotoFrameOnKeyEvent_TestRunner_SOURCES = \
@@ -92,6 +97,7 @@ gotoFrameOnKeyEvent_TestRunner_LDADD = \
 	$(NULL)
 gotoFrameOnKeyEvent_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(srcdir)\" \
+	$(CROSS_CXXFLAGS) \
 	$(NULL)
 
 GotoAndPlayTestRunner: Makefile $(srcdir)/../generic-testrunner.sh $(srcdir)/GotoAndPlayTest.swf
@@ -110,6 +116,7 @@ test_15bpp_bitmap_TestRunner_LDADD = \
 	$(NULL)
 test_15bpp_bitmap_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(srcdir)\" \
+	$(CROSS_CXXFLAGS) \
 	$(NULL)
 
 clean-local: 

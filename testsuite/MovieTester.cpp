@@ -38,8 +38,6 @@
 #include "swf/TagLoadersTable.h"
 #include "swf/DefaultTagLoaders.h"
 
-#include "MediaHandler.h"
-
 #ifdef RENDERER_CAIRO
 # include "Renderer_cairo.h"
 #endif
@@ -92,15 +90,20 @@ MovieTester::MovieTester(const std::string& url)
     _samplesFetched(0)
 {
     
+#ifdef USE_MEDIA
     // Initialize the testing media handlers
     initTestingMediaHandlers();
-    
-    // Initialize the sound handler(s)
-    initTestingSoundHandlers();
+#endif
     
     _runResources.reset(new RunResources());
+#ifdef USE_SOUND
+    // Initialize the sound handler(s)
+    initTestingSoundHandlers();
     _runResources->setSoundHandler(_sound_handler);
+#endif
+#ifdef USE_MEDIA
     _runResources->setMediaHandler(_mediaHandler);
+#endif
     
     boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
     addDefaultLoaders(*loaders);
@@ -509,14 +512,18 @@ bool
 MovieTester::streamingSound() const
 {
     if (!_sound_handler.get()) return false;
+#ifdef USE_SOUND
     return _sound_handler->streamingSound();
+#endif
 }
 
 int
 MovieTester::soundsStarted()
 {
     if ( ! _sound_handler.get() ) return 0;
+#ifdef USE_SOUND
     return _sound_handler->numSoundsStarted();
+#endif
 }
 
 int
@@ -611,6 +618,7 @@ MovieTester::canTestVideo() const
 void
 MovieTester::initTestingSoundHandlers()
 {
+#ifdef USE_SOUND
     // Currently, SoundHandler can't be constructed
     // w/out a registered MediaHandler .
     // Should be fixed though...
@@ -620,13 +628,16 @@ MovieTester::initTestingSoundHandlers()
         log_error("No media handler available, "
             "could not construct sound handler");
     }
+#endif  // USE_SOUND
 }
 
 void
 MovieTester::initTestingMediaHandlers()
 {
+#ifdef USE_SOUND
     // TODO: allow selection.
     _mediaHandler.reset(media::MediaFactory::instance().get(""));
+#endif
 }
 
 void
