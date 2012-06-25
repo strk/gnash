@@ -512,7 +512,7 @@ Button::mouseEvent(const event_id& event)
 
         // no sound for this transition
         if (bi < 0) break;
-
+#ifdef USE_SOUND
         const SWF::DefineButtonSoundTag::ButtonSound& bs = 
             _def->buttonSound(bi);
 
@@ -539,7 +539,8 @@ Button::mouseEvent(const event_id& event)
                     sinfo.outPoint
                     );
         }
-
+#endif  // USE_SOUND
+        
     } while(0);
 
     // From: "ActionScript - The Definitive Guide" by Colin Moock

@@ -17,6 +17,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
 #include "Sound_as.h"
 
 #include <string>
@@ -349,6 +353,7 @@ Sound_as::update()
 void
 Sound_as::probeAudio()
 {
+#ifdef USE_SOUND
     if ( ! externalSound ) {
         // Only probe for sound complete
         assert(_soundHandler);
@@ -436,6 +441,7 @@ Sound_as::probeAudio()
             assert(_audioDecoder.get());
         }
     }
+#endif  // USE_SOUND
 }
 
 void
@@ -677,6 +683,7 @@ Sound_as::start(double secOff, int loops)
         return;
     }
 
+#ifdef USE_SOUND
     if (externalSound) {
         if ( ! _mediaParser ) {
             log_error(_("No MediaParser initialized, can't start an external sound"));
@@ -726,6 +733,7 @@ Sound_as::start(double secOff, int loops)
 
         startProbeTimer(); // to dispatch onSoundComplete
     }
+#endif  // USE_SOUND
 }
 
 void
@@ -736,6 +744,7 @@ Sound_as::stop(int si)
         return;
     }
 
+#ifdef USE_SOUND
     // stop the sound
     if (si < 0) {
         if (externalSound) {
@@ -754,6 +763,7 @@ Sound_as::stop(int si)
     } else {
         _soundHandler->stopEventSound(si);
     }
+#endif  // USE_SOUND
 }
 
 size_t
@@ -789,7 +799,7 @@ Sound_as::getPosition() const
                     "likely not playing anyway)..."));
         return 0;
     }
-
+#ifdef USE_SOUND
     // If this is a event sound get the info from the soundhandler
     if (!externalSound) {
         return _soundHandler->tell(soundId);
@@ -801,9 +811,9 @@ Sound_as::getPosition() const
             return ts;
         }
     }
-
+#endif  // USE_SOUND
+    
     return 0;
-
 }
 
 
@@ -813,6 +823,7 @@ Sound_as::getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF)
     boost::uint8_t* stream = reinterpret_cast<boost::uint8_t*>(samples);
     int len = nSamples*2;
 
+#ifdef USE_SOUND
     //GNASH_REPORT_FUNCTION;
 
     while (len) {
@@ -884,6 +895,7 @@ Sound_as::getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF)
 
     atEOF=false;
     return nSamples-(len/2);
+#endif  // USE_SOUND
 }
 
 // audio callback is running in sound handler thread

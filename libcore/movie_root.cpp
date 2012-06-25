@@ -854,8 +854,9 @@ movie_root::advance()
 
     bool advanced = false;
 
+#ifdef USE_SOUND
     try {
-
+        
         sound::sound_handler* s = _runResources.soundHandler();
 
         if (s && _timelineSound) {
@@ -948,7 +949,8 @@ movie_root::advance()
         log_error(_("Buffer overread during advance: %s"), e.what());
         clear(_actionQueue);
     }
-
+#endif  // USE_SOUND
+    
     return advanced;
 }
     

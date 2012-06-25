@@ -71,6 +71,7 @@
 // Define this to get debugging info about text formatting
 //#define GNASH_DEBUG_TEXT_FORMATTING 1
 
+
 namespace gnash {
 
 TextField::TextField(as_object* object, DisplayObject* parent,

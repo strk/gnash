@@ -18,6 +18,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
 #include "NetStream_as.h"
 
 #include <functional>
@@ -181,8 +185,10 @@ NetStream_as::setBufferTime(boost::uint32_t time)
 long
 NetStream_as::bufferLength()
 {
+#ifdef USE_MEDIA
     if (_parser.get() == NULL) return 0;
     return _parser->getBufferLength();
+#endif  // USE_MEDIA
 }
 
 std::auto_ptr<image::GnashImage>
@@ -535,20 +541,23 @@ NetStream_as::startPlayback()
 std::auto_ptr<image::GnashImage> 
 NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
 {
-    assert(_videoDecoder.get()); 
-
+    assert(_videoDecoder.get());
+    
     std::auto_ptr<image::GnashImage> video;
 
+#ifdef USE_MEDIA
     assert(_parser.get());
     if (!_parser.get()) {
         log_error(_("getDecodedVideoFrame: no parser available"));
         return video; 
     }
 
+#if MEDIA_CONFIG == none
     boost::uint64_t nextTimestamp;
     bool parsingComplete = _parser->parsingCompleted();
     if (!_parser->nextVideoFrameTimestamp(nextTimestamp)) {
-
+#endif
+        
 #ifdef GNASH_DEBUG_DECODING
         log_debug(_("getDecodedVideoFrame(%d): "
                     "no more video frames in input "
@@ -609,7 +618,8 @@ NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
             break; 
         }
     }
-
+#endif  // USE_MEDIA
+    
     return video;
 }
 
@@ -618,6 +628,7 @@ NetStream_as::decodeNextVideoFrame()
 {
     std::auto_ptr<image::GnashImage> video;
 
+#ifdef USE_MEDIA
     if (!_parser.get()) {
         log_error(_("decodeNextVideoFrame: no parser available"));
         return video; 
@@ -644,7 +655,8 @@ NetStream_as::decodeNextVideoFrame()
         // TODO: tell more about the failure
         log_error(_("Error decoding encoded video frame in NetStream input"));
     }
-
+#endif  // USE_MEDIA
+    
     return video;
 }
 
@@ -653,6 +665,11 @@ NetStream_as::decodeNextAudioFrame()
 {
     assert (_parser.get());
 
+    // TODO: make the buffer cursored later ?
+    BufferedAudioStreamer::CursoredBuffer* raw =
+        new BufferedAudioStreamer::CursoredBuffer();
+
+#ifdef USE_MEDIA
     std::auto_ptr<media::EncodedAudioFrame> frame = _parser->nextAudioFrame(); 
     if (!frame.get()) {
 #ifdef GNASH_DEBUG_DECODING
@@ -663,9 +680,6 @@ NetStream_as::decodeNextAudioFrame()
         return 0;
     }
 
-    // TODO: make the buffer cursored later ?
-    BufferedAudioStreamer::CursoredBuffer* raw =
-        new BufferedAudioStreamer::CursoredBuffer();
     raw->m_data = _audioDecoder->decode(*frame, raw->m_size);
 
     // TODO: let the sound_handler do this .. sounds cleaner
@@ -693,7 +707,8 @@ NetStream_as::decodeNextAudioFrame()
 #endif 
 
     raw->m_ptr = raw->m_data;
-
+#endif  // USE_MEDIA
+    
     return raw;
 }
 
@@ -764,6 +779,8 @@ NetStream_as::refreshAudioBuffer()
 {
     assert (_parser.get());
 
+#ifdef USE_MEDIA
+    
 #ifdef GNASH_DEBUG_DECODING
     // bufferLength() would lock the mutex (which we already hold),
     // so this is to avoid that.
@@ -804,13 +821,15 @@ NetStream_as::refreshAudioBuffer()
     // timestamp >= curPos and push them into the buffer to be 
     // consumed by audio_streamer
     pushDecodedAudioFrames(curPos);
+#endif  // USE_MEDIA
 }
 
 void
 NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
 {
     assert(_parser.get());
-
+    
+#ifdef USE_MEDIA
     if (!_audioDecoder.get()) {
 
         // There are 3 possible reasons for _audioDecoder to not be here:
@@ -1028,9 +1047,8 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
 
         _playHead.setAudioConsumed();
     }
-
+#endif  // USE_MEDIA
 }
-
 
 void
 NetStream_as::refreshVideoFrame(bool alsoIfPaused)
@@ -1125,7 +1143,7 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
 #ifdef GNASH_DEBUG_DECODING
             log_debug(_("%p.refreshVideoFrame(): "
                 "no more video frames to decode "
-                        "(DEC_STOPPED, null from getDecodedVideoFrame)"),
+                        "(DEC_STOPPED, null from getDeodedVideoFrame)"),
                 this);
 #endif
         }
@@ -1178,6 +1196,8 @@ NetStream_as::videoWidth() const
 void
 NetStream_as::update()
 {
+    
+#ifdef USE_MEDIA
     // Check if there are any new status messages, and if we should
     // pass them to a event handler
     processStatusNotifications();
@@ -1341,6 +1361,7 @@ NetStream_as::update()
             e = tags.end(); i != e; ++i) {
         executeTag(**i, owner());
     }
+#endif  // USE_MEDIA
 }
 
 boost::int32_t

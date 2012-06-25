@@ -427,8 +427,10 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // Set the Renderer resource, opengl, openvg, agg, or cairo
     _runResources->setRenderBackend(_renderer);
 
+#ifdef USE_MEDIA
     _mediaHandler.reset(media::MediaFactory::instance().get(_media));
-
+#endif
+    
     if (!_media.empty() && !_mediaHandler.get()) {
         boost::format fmt =
             boost::format(_("Non-existent media handler %1% specified"))

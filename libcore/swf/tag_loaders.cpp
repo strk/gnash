@@ -158,6 +158,7 @@ define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
 
     const boost::uint16_t id = in.read_u16();
 
+#ifdef USE_SOUND
     media::audioCodecType format = static_cast<media::audioCodecType>(
             in.read_uint(4));
 
@@ -237,6 +238,7 @@ define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
             "so DisplayObject with id %d will not be added to "
             "the dictionary"), id);
     }
+#endif	// USE_SOUND
 }
 
 

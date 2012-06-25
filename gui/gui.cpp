@@ -455,14 +455,15 @@ Gui::toggleSound()
     assert (_stage);
     // @todo since we registered the sound handler, shouldn't we know
     //       already what it is ?!
+#ifdef USE_SOUND
     sound::sound_handler* s = _stage->runResources().soundHandler();
-
+    
     if (!s) return;
 
     if (s->is_muted()) s->unmute();
     else s->mute();
+#endif  // USE_SOUND
 }
-
 
 void
 Gui::notifyMouseMove(int ux, int uy) 
@@ -834,11 +835,12 @@ Gui::play()
         start();
     } else {
         assert (_stage);
+#ifdef USE_SOUND
         // @todo since we registered the sound handler, shouldn't we know
         //       already what it is ?!
         sound::sound_handler* s = _stage->runResources().soundHandler();
         if ( s ) s->unpause();
-
+#endif  // USE_SOUND
         // log_debug("Starting virtual clock");
         _virtualClock.resume();
     }
@@ -912,6 +914,7 @@ Gui::start()
 
     // @todo since we registered the sound handler, shouldn't we know
     //       already what it is ?!
+#ifdef USE_SOUND
     sound::sound_handler* s = _stage->runResources().soundHandler();
     if ( s ) {
         if ( ! _audioDump.empty() ) {
@@ -920,7 +923,8 @@ Gui::start()
         s->unpause();
     }
     _started = true;
-
+#endif  // USE_SOUND
+    
     // log_debug("Starting virtual clock");
     _virtualClock.resume();
 

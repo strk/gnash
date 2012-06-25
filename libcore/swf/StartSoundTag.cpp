@@ -82,6 +82,7 @@ StartSoundTag::executeActions(MovieClip* m, DisplayList& /* dlist */) const
     sound::sound_handler* handler = 
         getRunResources(*getObject(m)).soundHandler();
 
+#ifdef USE_SOUND
     if (handler) {
         if (_soundInfo.stopPlayback) {
             //log_debug("Execute StartSoundTag with 'stop playback' flag on");
@@ -101,6 +102,7 @@ StartSoundTag::executeActions(MovieClip* m, DisplayList& /* dlist */) const
                 );
         }
     }
+#endif	// USE_SOUND
 }
 
 void
