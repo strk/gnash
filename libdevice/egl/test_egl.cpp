@@ -154,6 +154,9 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
 #else
 # ifdef BUILD_RAWFB_DEVICE
     win = open("/dev/fb0", O_RDWR);
+    if (win <= 0) {
+        win = open("/dev/graphicsfb0", O_RDWR);
+    }    
 # endif
 # ifdef BUILD_X11_DEVICE
     x11::X11Device x11(egl.getNativeVisual());
