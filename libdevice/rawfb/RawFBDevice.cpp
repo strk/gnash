@@ -124,7 +124,11 @@ RawFBDevice::initDevice(int /* argc */, char **/* argv[] */)
         // lets us redefine this at runtime.
         devname = getenv("FAKE_FRAMEBUFFER");
         if (!devname) {
+#ifdef __ANDROID__
+            devname = "/dev/graphics/fb0";
+#else
             devname = "/dev/fb0";
+#endif
         }
     }
     _fd = open(devname, O_RDWR);
