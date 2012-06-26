@@ -936,6 +936,7 @@ dnl compile anymore, it was all hardcoded into the framebuffer
 dnl code. This version compiles with the latest internal rendering
 dnl API, and works properly with the glue code for the Gnash GUIs.
 build_gles1=no
+build_gles2=no
 dnl OpenGL works, but suffers from performance and rendering quality
 dnl problems. This should eventually be replacd by the OpenGLES1 and
 dnl OpenVG renders.
@@ -986,9 +987,15 @@ AC_ARG_ENABLE(renderer,
         renderer_list="${renderer_list} opengl"
         build_ogl=yes
         ;;
-      gles|GLES|gles1|GLES1)
+      gles1|GLES1)
         renderer_list="${renderer_list} opengles1"
         build_gles1=yes
+        build_ogl=no
+        nrender=$((nrender+1))
+        ;;
+      gles2|GLES2)
+        renderer_list="${renderer_list} opengles1"
+        build_gles2=yes
         build_ogl=no
         nrender=$((nrender+1))
         ;;
@@ -1041,7 +1048,12 @@ dnl GMA500 but you currently will have to build the AGG renderer
 dnl instead of the OGL (OpenGL) one. 
 build_vaapi_device=no
 build_openmax_device=no
+dnl These renders always require EGL support
+if test x${build_gles1} = xyes -o x${build_gles2} = xyes -o x${build_ovg} = xyes; then
+build_egl_device=yes
+else
 build_egl_device=no
+fi
 build_x11_device=no
 build_directfb_device=no
 if test x"${build_fb}" = xyes -o x"${build_fb}" = xauto; then
