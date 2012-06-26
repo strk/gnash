@@ -44,7 +44,6 @@ AM_LDFLAGS = \
 	$(LIBADD_DL) \
 	$(PTHREAD_LIBS) \
 	$(GNASH_LIBS) \
-	$(CROSS_LDFLAGS) \
 	$(NULL)
 
 localedir = $(datadir)/locale
