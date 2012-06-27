@@ -2140,15 +2140,43 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
         std::string command = rcfile.getURLOpenerFormat();
 
         /// Try to avoid letting flash movies execute
-        /// arbitrary commands (sic)
+        /// arbitrary commands (sic).
         ///
-        /// Maybe we should exec here, but if we do we might have problems
-        /// with complex urlOpenerFormats like:
-        ///    firefox -remote 'openurl(%u)'
+        /// NOTE: it is assumed that the user-provided command
+        ///       puts the url place-holder within single quotes.
+        ///       Failing that, there will be the possibility 
+        ///       for malicious SWF files to run arbitrary commands.
+        /// 
         ///
-        std::string safeurl = url.encode(urlstr);
+        /// Check safety of user provided command
+        ///
+        /// TODO: improve this check
+        ///       - quote nested in double quote
+        ///       - %u after second quote
+        ///       - use regexp ?
+        /// TODO: check only once
+        ///
+        bool command_is_safe = false;
+        do {
+            std::string::size_type loc = command.find('\'');
+            if ( loc == std::string::npos ) break;
+            loc = command.find("%u", loc);
+            if ( loc == std::string::npos ) break;
+            loc = command.find('\'', loc);
+            if ( loc == std::string::npos ) break;
+            command_is_safe = true;
+        } while (0);
+
+        if ( ! command_is_safe ) {
+            log_error("The '%%u' token in urlOpenerFormat rc directive should be within single quotes");
+            return;
+        } 
+
+        std::string safeurl = urlstr; 
+        boost::replace_all(safeurl, "'", "'\\''");
+
         boost::replace_all(command, "%u", safeurl);
-        
+
         log_debug("Launching URL: %s", command);
         const int ret = std::system(command.c_str());
         if (ret == -1) {

@@ -1,6 +1,10 @@
 Gnash 0.8.11
 YYYY/MM/DD
 
+Improvements since 0.8.10 release are:
+
+ * Fix opening of external URL with Gnash Standalone (#31833)
+
 Gnash 0.8.10
 2012/02/04
 
