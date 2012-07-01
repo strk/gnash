@@ -2843,6 +2843,21 @@ if test x"$ac_cv_gcc_visibility" = xyes -a x"$enable_visibility" != xno; then
   CXXFLAGS="$CXXFLAGS -fvisibility=hidden"
 fi
 
+AC_ARG_ENABLE([harden],
+  AC_HELP_STRING([--disable-harden],[Disable hardening]),
+  [case "${enableval}" in
+    yes) harden=yes ;;
+    no)  harden=no ;;
+    *) AC_MSG_ERROR([bad value ${enableval} for --enable-harden option]) ;;
+  esac],
+  [harden=yes]
+)
+
+if test x"$harden" = x"yes"; then
+   dnl -D_FORTIFY_SOURCE=2
+    CXXFLAGS="${CXXFLAGS} -fpie -fPIE -fstack-protector --param ssp-buffer-size=4 "
+fi
+
 dnl Define convenience constants so Gnash can print out the
 dnl default configuration of the build.
 RENDERER_CONFIG="${renderer_list}"
