@@ -108,11 +108,6 @@ GUI_CPPFLAGS =
 
 AM_CXXFLAGS = $(CROSS_CXXFLAGS)
 
-AM_LDFLAGS =  \
-	$(INTLLIBS) \
-	$(BOOST_LIBS) \
-	$(NULL)
-
 GNASH_LIBS = \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libdevice/libgnashdevice.la \

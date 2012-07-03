@@ -29,11 +29,13 @@ fb_gnash_CPPFLAGS = \
 	-DGUI_CONFIG=\"FB\" \
 	-DFAKEFB=\"$(FAKEFB)\" \
 	$(AM_CPPFLAGS) 
-fb_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
+fb_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic
 fb_gnash_LDADD = \
+	$(INTLLIBS) \
 	$(GNASH_LIBS) \
 	$(TS_LIBS) \
-	$(BOOST_LIBS)
+	$(BOOST_LIBS) \
+	$(NULL)
 
 # Build support for AntiGrain.
 if BUILD_AGG_RENDERER
