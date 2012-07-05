@@ -293,7 +293,7 @@ FBGui::init(int argc, char *** argv)
     }
 
     // Let -j -k override "window" size
-    optind = 0; opterr = 0; char c;
+    optind = 0; opterr = 0; int c;
     while ((c = getopt (argc, *argv, "j:k:X:Y:")) != -1) {
         switch (c) {
             case 'j':
