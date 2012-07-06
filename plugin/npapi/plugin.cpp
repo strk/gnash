@@ -1203,10 +1203,16 @@ nsPluginInstance::setupProxy(const std::string& url)
         // no proxy
     }
     else if ( parts[0] == "PROXY" ) {
-        if (setenv("http_proxy", parts[1].c_str(), 1) < 0) {
-            gnash::log_error(
-                "Couldn't set environment variable http_proxy to %s",
-                nproxy);
+        char *http_proxy=getenv("http_proxy");
+        if (!http_proxy) {
+            gnash::log_debug("Setting http_proxy to %s", parts[1].c_str());
+            if (setenv("http_proxy", parts[1].c_str(), 1) < 0) {
+                gnash::log_error(
+                    "Couldn't set environment variable http_proxy to %s",
+                    parts[1].c_str());
+            }
+        } else {
+            gnash::log_debug("http_proxy already set to %s", http_proxy);
         }
     }
     else {
