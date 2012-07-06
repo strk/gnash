@@ -367,8 +367,8 @@ FBGui::run()
         // 10ms per heart beat
         delay = 10000;
     }
-    log_debug(_("Movie Frame Rate is %d, adjusting delay to %dms"), fps,
-              _interval * delay);
+    // log_debug(_("Movie Frame Rate is %g, adjusting delay to %dms"), fps,
+    //           _interval * delay);
     
     // This loops endlessly at the frame rate
     while (!terminate_request) {  

@@ -922,8 +922,8 @@ Gui::start()
         }
         s->unpause();
     }
-    _started = true;
 #endif  // USE_SOUND
+    _started = true;
     
     // log_debug("Starting virtual clock");
     _virtualClock.resume();
