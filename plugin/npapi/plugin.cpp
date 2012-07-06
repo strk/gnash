@@ -1203,6 +1203,9 @@ nsPluginInstance::setupProxy(const std::string& url)
         // no proxy
     }
     else if ( parts[0] == "PROXY" ) {
+        // authenticated proxies: need to specify proxy credentials through
+        // http_proxy env var set to user:pass@proxy:port. If set, it won't be
+        // overridden. See https://savannah.gnu.org/bugs/?26713
         char *http_proxy=getenv("http_proxy");
         if (!http_proxy) {
             gnash::log_debug("Setting http_proxy to %s", parts[1].c_str());
