@@ -196,6 +196,12 @@ LogFile::log(const std::string& msg)
 
     boost::mutex::scoped_lock lock(_ioMutex);
 
+    // Print messages to the Android log, where they can be retrieved with
+    // logcat.
+#ifdef __ANDROID__
+    __android_log_print(ANDROID_LOG_DEBUG, "Gnash", msg.c_str());
+#endif
+    
     if ( !_verbose ) return; // nothing to do if not verbose
 
     if (openLogIfNeeded()) {
@@ -374,6 +380,6 @@ inline unsigned long int /* pthread_t */ get_thread_id(void)
 
 // Local Variables:
 // mode: C++
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:
 

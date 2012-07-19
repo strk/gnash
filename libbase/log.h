@@ -30,6 +30,12 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/format.hpp>
 
+// This is needed so we can print to the Android log file, which can
+// be retrieved with logcat.
+#ifdef __ANDROID__
+#include <android/log.h>
+#endif
+
 // the default name for the debug log
 #define DEFAULT_LOGFILE "gnash-dbg.log"
 
@@ -392,19 +398,19 @@ public:
     // Only print function tracing messages when multiple -v
     // options have been supplied. 
     HostFunctionReport() : _func(0) {
-        log_debug("entering");
+        log_trace("entering");
     }
 
     HostFunctionReport(const char* func) : _func(func) {
         if (func) {
-            log_debug("%s enter", func);
+            log_trace("%s enter", func);
         }
         else {
-            log_debug("No Function Name! enter");
+            log_trace("No Function Name! enter");
         }
     }
     ~HostFunctionReport() {
-        log_debug("%s returning", _func);
+        log_trace("%s returning", _func);
     }
 private:
     const char* _func;
@@ -430,14 +436,13 @@ private:
 #define GNASH_REPORT_RETURN
 #else
 #define GNASH_REPORT_FUNCTION \
-    gnash::log_debug("entering")
+    gnash::log_trace"entering")
 
 #define GNASH_REPORT_RETURN \
-    gnash::log_debug("returning")
+    gnash::log_trace("returning")
 #endif
 
 }
-
 
 #endif // GNASH_LOG_H
 
