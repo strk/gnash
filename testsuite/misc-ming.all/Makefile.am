@@ -93,6 +93,10 @@ AM_LDFLAGS = \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(NULL)
 
+if ANDROID
+AM_LDFLAGS +=  -lui -llog
+endif	# ANDROID
+
 check_PROGRAMS = \
 	ResolveEventsTest \
 	ResolveEventsTest-Runner \

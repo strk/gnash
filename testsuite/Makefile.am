@@ -135,6 +135,10 @@ libtestsuite_la_LIBADD = \
 	$(top_builddir)/librender/libgnashrender.la \
 	$(NULL)
 
+if ANDROID
+libtestsuite_la_LIBADD += -lui -llog
+endif	# ANDROID
+
 if BUILD_LIBMEDIA
 libtestsuite_la_LIBADD += $(top_builddir)/libmedia/libgnashmedia.la
 endif

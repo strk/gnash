@@ -62,61 +62,69 @@ CLEANFILES = \
 	gnash-dbg.log \
 	$(NULL)
 
-AM_LDFLAGS = \
+LDADD = \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(CROSS_LDFLAGS) \
-	$(BOOST_LIBS) 
+	$(BOOST_LIBS) \
+	$(AGG_LIBS) \
+	$(OPENVG_LIBS) \
+	$(EGL_LIBS) \
+	$(NULL)
+
+if ANDROID
+LDADD += -lui -llog
+endif	# ANDROID
 
 if BUILD_LIBMEDIA
-AM_LDFLAGS += $(top_builddir)/libmedia/libgnashmedia.la
+LDADD += $(top_builddir)/libmedia/libgnashmedia.la
 endif
 if BUILD_LIBSOUND
-AM_LDFLAGS += $(top_builddir)/libsound/libgnashsound.la
+LDADD += $(top_builddir)/libsound/libgnashsound.la
 endif
 
 BitsReaderTest_SOURCES = BitsReaderTest.cpp
-BitsReaderTest_LDADD = $(AM_LDFLAGS)
+BitsReaderTest_LDADD = $(LDADD)
 
 StreamTest_SOURCES = StreamTest.cpp
-StreamTest_LDADD = $(AM_LDFLAGS)
+StreamTest_LDADD = $(LDADD)
 
 MatrixTest_SOURCES = MatrixTest.cpp
-MatrixTest_LDADD = $(AM_LDFLAGS)
+MatrixTest_LDADD = $(LDADD)
 
 PointTest_SOURCES = PointTest.cpp
-PointTest_LDADD = $(AM_LDFLAGS)
+PointTest_LDADD = $(LDADD)
 
 EdgeTest_SOURCES = EdgeTest.cpp
-EdgeTest_LDADD = $(AM_LDFLAGS)
+EdgeTest_LDADD = $(LDADD)
 
 PropertyListTest_SOURCES = PropertyListTest.cpp
-PropertyListTest_LDADD = $(AM_LDFLAGS)
+PropertyListTest_LDADD = $(LDADD)
 
 PropFlagsTest_SOURCES = PropFlagsTest.cpp
-PropFlagsTest_LDADD = $(AM_LDFLAGS)
+PropFlagsTest_LDADD = $(LDADD)
 
 DisplayListTest_SOURCES = DisplayListTest.cpp
-DisplayListTest_LDADD = $(AM_LDFLAGS)
+DisplayListTest_LDADD = $(LDADD)
 
 # if CYGNAL
 check_PROGRAMS += AsValueTest
 AsValueTest_SOURCES = AsValueTest.cpp
-AsValueTest_LDADD = $(AM_LDFLAGS)
+AsValueTest_LDADD = $(LDADD)
 # endif
 
 ClassSizes_SOURCES = ClassSizes.cpp
-ClassSizes_LDADD = $(AM_LDFLAGS)
+ClassSizes_LDADD = $(LDADD)
 
 SafeStackTest_SOURCES = SafeStackTest.cpp
-SafeStackTest_LDADD = $(AM_LDFLAGS)
+SafeStackTest_LDADD = $(LDADD)
 
 CxFormTest_SOURCES = CxFormTest.cpp
-CxFormTest_LDADD = $(AM_LDFLAGS)
+CxFormTest_LDADD = $(LDADD)
 
 CodeStreamTest_SOURCES = CodeStreamTest.cpp
-CodeStreamTest_LDADD = $(AM_LDFLAGS)
-CodeStreamTest_DEPENDENCIES = $(AM_LDFLAGS)
+CodeStreamTest_LDADD = $(LDADD)
+CodeStreamTest_DEPENDENCIES = $(LDADD)
 
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = $(check_PROGRAMS)

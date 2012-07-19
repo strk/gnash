@@ -53,6 +53,10 @@ fb_gnash_CPPFLAGS += \
 fb_gnash_LDADD += $(OPENVG_LIBS) $(EGL_LIBS)
 endif	# BUILD_OVG_RENDERER
 
+if ANDROID
+fb_gnash_LDADD +=  -lui -llog
+endif	# ANDROID
+
 # # This supports only OpenGLES 1.1 with EGL support.
 # if BUILD_GLES1_RENDERER
 # fb_gnash_SOURCES += fb/fb_glue_gles1.cpp fb/fb_glue_gles1.h

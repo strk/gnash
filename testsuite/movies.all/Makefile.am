@@ -53,6 +53,10 @@ AM_LDFLAGS = \
 	$(OPENGL_LIBS) \
 	$(NULL)
 
+if ANDROID
+AM_LDFLAGS +=  -lui -llog
+endif	# ANDROID
+
 gravity_embedded_TestRunner_SOURCES = \
 	gravity_embedded-TestRunner.cpp \
 	$(NULL)

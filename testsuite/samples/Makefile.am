@@ -44,7 +44,12 @@ AM_CPPFLAGS = \
 AM_LDFLAGS = \
 	$(CROSS_LDFLAGS) \
 	$(OPENGL_LIBS) \
+	$(EGL_LIBS) \
 	$(NULL)
+
+if ANDROID
+LDADD =  -lui -llog
+endif	# ANDROID
 
 AM_CXXFLAGS = $(CROSS_CXXFLAGS)
 
@@ -72,6 +77,7 @@ clip_as_button2_TestRunner_SOURCES = \
 	$(NULL)
 clip_as_button2_TestRunner_LDADD = \
 	$(GNASH_LIBS) \
+	$(LDADD) \
 	$(NULL)
 clip_as_button2_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(srcdir)\" \
@@ -83,6 +89,7 @@ subshapes_TestRunner_SOURCES = \
 	$(NULL)
 subshapes_TestRunner_LDADD = \
 	$(GNASH_LIBS) \
+	$(LDADD) \
 	$(NULL)
 subshapes_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(srcdir)\" \
@@ -94,6 +101,7 @@ gotoFrameOnKeyEvent_TestRunner_SOURCES = \
 	$(NULL)
 gotoFrameOnKeyEvent_TestRunner_LDADD = \
 	$(GNASH_LIBS) \
+	$(LDADD) \
 	$(NULL)
 gotoFrameOnKeyEvent_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(srcdir)\" \
@@ -113,6 +121,7 @@ test_15bpp_bitmap_TestRunner_SOURCES = \
 	$(NULL)
 test_15bpp_bitmap_TestRunner_LDADD = \
 	$(GNASH_LIBS) \
+	$(LDADD) \
 	$(NULL)
 test_15bpp_bitmap_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(srcdir)\" \

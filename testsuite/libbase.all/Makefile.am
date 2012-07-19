@@ -22,7 +22,15 @@ AUTOMAKE_OPTIONS = dejagnu
 LDADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/librender/libgnashrender.la \
-	$(LIBINTL)
+	$(LIBINTL) \
+	$(AGG_LIBS) \
+	$(OPENVG_LIBS) \
+	$(EGL_LIBS) \
+	$(NULL)
+
+if ANDROID
+LDADD +=  -lui -llog
+endif	# ANDROID
 
 AM_LDFLAGS = $(CROSS_LDFLAGS)
 AM_CXXFLAGS = $(CROSS_CXXFLAGS)
@@ -70,30 +78,40 @@ check_PROGRAMS = \
 NoSeekFileTest_SOURCES = NoSeekFileTest.cpp
 NoSeekFileTest_CPPFLAGS = $(AM_CPPFLAGS) \
 	'-DINPUT="$(srcdir)/NoSeekFileTest.cpp"'
+NoSeekFileTest_LDADD = $(LDADD)
 
 URLTest_SOURCES = URLTest.cpp
 URLTest_CPPFLAGS =  $(AM_CPPFLAGS) \
 	'-DBUILDDIR="$(abs_builddir)"'
+URLTest_LDADD = $(LDADD)
 
 RcTest_SOURCES = RcTest.cpp
 RcTest_CPPFLAGS =  $(AM_CPPFLAGS) \
 	-DSRCDIR="$(srcdir)"
+RcTest_LDADD = $(LDADD)
 
 IntTypesTest_SOURCES = IntTypesTest.cpp
 IntTypesTest_CPPFLAGS =  $(AM_CPPFLAGS) \
 	-DSRCDIR="$(srcdir)"
+IntTypesTest_LDADD = $(LDADD)
 
 # Test the Memory class
 #memtest_SOURCES = memtest.cpp
 
 Point2dTest_SOURCES = Point2dTest.cpp
+Point2dTest_LDADD = $(LDADD)
+
 Range2dTest_SOURCES = Range2dTest.cpp
+Range2dTest_LDADD = $(LDADD)
+
 snappingrangetest_SOURCES = snappingrangetest.cpp
+snappingrangetest_LDADD= $(LDADD)
 
 string_tableTest_SOURCES = string_tableTest.cpp
 string_tableTest_CPPFLAGS =  $(AM_CPPFLAGS) \
 	-DSRCDIR="$(srcdir)"
 string_tableTest_LDFLAGS = $(BOOST_LIBS)
+string_tableTest_LDADD = $(LDADD)
 
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \

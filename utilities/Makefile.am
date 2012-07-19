@@ -46,6 +46,10 @@ AM_LDFLAGS = \
 	$(GNASH_LIBS) \
 	$(NULL)
 
+if ANDROID
+AM_LDFLAGS +=  -lui -llog
+endif	# ANDROID
+
 localedir = $(datadir)/locale
 
 AM_CPPFLAGS = \
