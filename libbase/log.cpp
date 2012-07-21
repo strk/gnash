@@ -123,6 +123,11 @@ void
 processLog_trace(const boost::format& fmt)
 {
     dbglogfile.log(N_("TRACE"), fmt.str());
+    // Print messages to the Android log, where they can be retrieved with
+    // logcat.    
+#ifdef __ANDROID__
+    __android_log_print(ANDROID_LOG_INFO, "Gnash", fmt.str().c_str());
+#endif    
 }
 
 void
@@ -130,6 +135,11 @@ processLog_debug(const boost::format& fmt)
 {
     if (dbglogfile.getVerbosity() < LogFile::LOG_DEBUG) return;
     dbglogfile.log(N_("DEBUG"), fmt.str());
+    // Print messages to the Android log, where they can be retrieved with
+    // logcat.    
+#ifdef __ANDROID__
+    __android_log_print(ANDROID_LOG_DEBUG, "Gnash", fmt.str().c_str());
+#endif    
 }
 
 void
@@ -137,48 +147,88 @@ processLog_abc(const boost::format& fmt)
 {
     if (dbglogfile.getVerbosity() < LogFile::LOG_EXTRA) return;
     dbglogfile.log(N_("ABC"), fmt.str());
+    // Print messages to the Android log, where they can be retrieved with
+    // logcat.    
+#ifdef __ANDROID__
+    __android_log_print(ANDROID_LOG_VERBOSE, "Gnash", fmt.str().c_str());
+#endif    
 }
 
 void
 processLog_parse(const boost::format& fmt)
 {
     dbglogfile.log(fmt.str());
+    // Print messages to the Android log, where they can be retrieved with
+    // logcat.    
+#ifdef __ANDROID__
+    __android_log_print(ANDROID_LOG_VERBOSE, "Gnash", fmt.str().c_str());
+#endif    
 }
 
 void
 processLog_network(const boost::format& fmt)
 {
     dbglogfile.log(N_("NETWORK"), fmt.str());
+    // Print messages to the Android log, where they can be retrieved with
+    // logcat.    
+#ifdef __ANDROID__
+    __android_log_print(ANDROID_LOG_DEBUG, "Gnash", fmt.str().c_str());
+#endif    
 }
 
 void
 processLog_error(const boost::format& fmt)
 {
     dbglogfile.log(N_("ERROR"), fmt.str());
+    // Print messages to the Android log, where they can be retrieved with
+    // logcat.    
+#ifdef __ANDROID__
+    __android_log_print(ANDROID_LOG_ERROR, "Gnash", fmt.str().c_str());
+#endif    
 }
 
 void
 processLog_unimpl(const boost::format& fmt)
 {
     dbglogfile.log(N_("UNIMPLEMENTED"), fmt.str());
+    // Print messages to the Android log, where they can be retrieved with
+    // logcat.    
+#ifdef __ANDROID__
+    __android_log_print(ANDROID_LOG_WARN, "Gnash", fmt.str().c_str());
+#endif    
 }
 
 void
 processLog_security(const boost::format& fmt)
 {
     dbglogfile.log(N_("SECURITY"), fmt.str());
+    // Print messages to the Android log, where they can be retrieved with
+    // logcat.    
+#ifdef __ANDROID__
+    __android_log_print(ANDROID_LOG_WARN, "Gnash", fmt.str().c_str());
+#endif    
 }
 
 void
 processLog_swferror(const boost::format& fmt)
 {
     dbglogfile.log(N_("MALFORMED SWF"), fmt.str());
+    // Print messages to the Android log, where they can be retrieved with
+    // logcat.    
+#ifdef __ANDROID__
+    __android_log_print(ANDROID_LOG_WARN, "Gnash", fmt.str().c_str());
+#endif    
 }
 
 void
 processLog_aserror(const boost::format& fmt)
 {
     dbglogfile.log(N_("ACTIONSCRIPT ERROR"), fmt.str());
+    // Print messages to the Android log, where they can be retrieved with
+    // logcat.    
+#ifdef __ANDROID__
+    __android_log_print(ANDROID_LOG_WARN, "Gnash", fmt.str().c_str());
+#endif    
 }
 
 void
@@ -196,12 +246,6 @@ LogFile::log(const std::string& msg)
 
     boost::mutex::scoped_lock lock(_ioMutex);
 
-    // Print messages to the Android log, where they can be retrieved with
-    // logcat.
-#ifdef __ANDROID__
-    __android_log_print(ANDROID_LOG_DEBUG, "Gnash", msg.c_str());
-#endif
-    
     if ( !_verbose ) return; // nothing to do if not verbose
 
     if (openLogIfNeeded()) {
