@@ -32,6 +32,11 @@
 #include <vector>
 #include <cassert>
 
+// Android fails to define this constant
+#ifndef MAXHOSTNAMELEN
+# define MAXHOSTNAMELEN 256
+#endif
+
 namespace gnash {
 namespace URLAccessManager {
 

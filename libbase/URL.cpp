@@ -86,7 +86,6 @@ URL::normalize_path(std::string& path)
          i!=e; ++i) {
         path += "/" + *i;
     }
-    
 }
 
 void
