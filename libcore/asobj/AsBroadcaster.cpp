@@ -127,7 +127,7 @@ private:
     /// Name of the event being broadcasted
     /// appropriately cased based on SWF version
     /// of the current VM
-    const ObjectURI& _eventURI;
+    const ObjectURI _eventURI;
 
     /// Number of event dispatches
     size_t _dispatched;
