@@ -129,10 +129,6 @@ libgnashmedia_la_CPPFLAGS = \
 	$(BOOST_CFLAGS) \
 	$(NULL)
 
-if ANDROID
-libgnashmedia_la_CPPFLAGS += $(ANDROID_NDK)/usr/include
-endif
-
 if USE_GST_ENGINE
 libgnashmedia_la_CPPFLAGS += \
 	$(GSTREAMER_CFLAGS) \
