@@ -109,7 +109,7 @@ FBOvgGlue::init(int argc, char **argv[])
     _device.reset(new renderer::EGLDevice(argc, *argv));
 
     // Initialize the display device
-    // EGL still reqires us to open the framebuffer
+    // EGL still reqires us to open the framebuffer, except on Android
     _device->bindClient(renderer::GnashDevice::OPENVG);
 
 #ifndef __ANDROID__
