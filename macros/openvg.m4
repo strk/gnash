@@ -23,7 +23,7 @@ AC_DEFUN([GNASH_PATH_OPENVG],
   AC_CACHE_VAL(ac_cv_path_openvg_includes,[
     if test x"${with_openvg_includes}" != x; then
       if test -f ${with_openvg_includes}/VG/openvg.h; then
-        ac_cv_path_openvg_includes="`(cd ${with_openvg_includes}; pwd)`"
+        ac_cv_path_openvg_includes="-I`(cd ${with_openvg_includes}; pwd)`"
       else
         AC_MSG_ERROR([${with_openvg_includes} directory doesn't contain VG/openvg.h])
       fi
