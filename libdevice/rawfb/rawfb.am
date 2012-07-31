@@ -9,18 +9,4 @@ libgnashdevice_la_SOURCES += \
 libgnashdevice_la_LIBADD += \
 	$(TSLIB_LIBS) \
 	$(EXTRA_EGL_LIBS)
-
-
-if ENABLE_DEVELOPER_TESTS
-check_PROGRAMS += test_rawfb
-
-# this tests the low level EGL interface, used by OpenVG, OpenGLES1,
-# and OpenGLES2.
-test_rawfb_SOURCES = rawfb/test_rawfb.cpp
-test_rawfb_CPPFLAGS = $(AM_CPPFLAGS)
-test_rawfb_LDADD = \
-	libgnashdevice.la \
-	$(TS_LIBS) \
-	$(GNASH_LIBS)
-endif
 endif

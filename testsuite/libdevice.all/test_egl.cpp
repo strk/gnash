@@ -34,13 +34,12 @@
 #include <fcntl.h>
 
 #include "log.h"
-#include "dejagnu.h"
 #include "eglDevice.h"
 #include "configTemplates.h"
 #include "GnashDevice.h"
 
-#ifdef BUILD_X11_DEVICE
-# include "x11/X11Device.h"
+#ifdef HAVE_DEJAGNU_H
+#include "dejagnu.h"
 #endif
 
 #ifdef HAVE_EGL_EGL_H
@@ -52,7 +51,6 @@
 TestState runtest;
 
 using namespace gnash;
-using namespace std;
 using namespace renderer;
 
 void test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[]);
@@ -108,7 +106,7 @@ test_egl(EGLDevice &egl, GnashDevice::rtype_t rtype, int argc, char *argv[])
     
     // This is a utility method for converting integer error codes to
     // something human readable for debugging.
-    string result = "EGL_BAD_CONFIG";
+    std::string result = "EGL_BAD_CONFIG";
     if (egl.getErrorString(EGL_BAD_CONFIG) == result) {
         runtest.pass("EGLDevice::getErrorString()");
     } else {
