@@ -3004,6 +3004,7 @@ doc/Doxyfile
 testsuite/Makefile
 testsuite/media/Makefile
 testsuite/libbase.all/Makefile
+testsuite/libdevice.all/Makefile
 testsuite/as3compile.all/Makefile
 testsuite/actionscript.all/Makefile
 testsuite/samples/Makefile
