@@ -131,7 +131,6 @@ DEFAULT_SOL_SAFEDIR="~/.gnash/SharedObjects"
 AC_SUBST(DEFAULT_SOL_SAFEDIR)
 AC_DEFINE_UNQUOTED([DEFAULT_SOL_SAFEDIR], ["${DEFAULT_SOL_SAFEDIR}"], [Default SharedObject base directory])
 
-
 dnl Some things you can only do by looking at the platform name.
 case "${host}" in
   powerpc-apple-darwin*)
@@ -165,6 +164,12 @@ case "${host}" in
     solaris=yes
     AC_DEFINE([SOLARIS_HOST], [1], [this is a Solaris platform])
     ;;
+  *-android*)
+    android=yes
+    linux=yes
+    AC_DEFINE([LINUX_HOST], [1], [this is a Linux platform])
+    AC_DEFINE([ANDROID_HOST], [1], [this is an Android platform])
+    ;;
   *-*linux*)
     linux=yes
     AC_DEFINE([LINUX_HOST], [1], [this is a Linux platform])
@@ -197,10 +202,6 @@ case "${host}" in
     wince=yes
     AC_DEFINE([WINCE_HOST], [1], [this is a WINCE platform])
     AC_DEFINE([WINCE6_HOST], [1], [this is a WINCE6 platform])
-    ;;
-  *-android*)
-    android=yes
-    AC_DEFINE([ANDROID_HOST], [1], [this is an Android platform])
     ;;
 esac
 
