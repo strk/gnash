@@ -335,7 +335,7 @@ main(int argc, char *argv[])
     std::string mh = rcfile.getMediaHandler();
     mediaHandler.reset(media::MediaFactory::instance().get(mh));
 #endif
-#ifdef USE_SOUND
+#if defined(USE_SOUND) && defined(USE_MEDIA)
     boost::shared_ptr<sound::sound_handler> soundHandler;
     soundHandler.reset(new sound::NullSoundHandler(mediaHandler.get()));
 #endif
@@ -360,7 +360,7 @@ main(int argc, char *argv[])
     {
 
         RunResources runResources;
-#ifdef USE_SOUND
+#if defined(USE_SOUND) && defined(USE_MEDIA)
         runResources.setSoundHandler(soundHandler);
 #endif
 #ifdef USE_MEDIA
