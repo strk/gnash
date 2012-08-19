@@ -43,6 +43,13 @@
 #endif
 #endif
 
+#include "fbsup.h"
+#include "fb_glue.h"
+
+#ifdef BUILD_EGL_DEVICE
+# include "egl/eglDevice.h"
+#endif
+
 #include <boost/scoped_ptr.hpp>
 
 #include "fbsup.h"
@@ -70,6 +77,13 @@ public:
     void render_to_pbuffer ();
     void prepare_copy_from_pbuffer ();
     void render_to_display ();
+       /// \brief
+    ///  Hand off a handle to the native drawing area to the renderer
+    void prepDrawingArea(void *drawing_area);
+    
+    void initBuffer(int width, int height);
+    void resize(int width, int height);
+    // void render(geometry::Range2d<int>& bounds);
     
 protected:
     int         _fd;
