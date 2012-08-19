@@ -171,7 +171,7 @@ FBGui::~FBGui()
     // GNASH_REPORT_FUNCTION;
     
     if (_fd > 0) {
-        enable_terminal();
+        disable_terminal();
         // log_debug("Closing framebuffer device");
         close(_fd);
     }
@@ -193,7 +193,9 @@ FBGui::init(int argc, char *** argv)
         renderer = "openvg";
         _glue.reset(new FBOvgGlue(0));
         // Initialize the glue layer between the renderer and the gui toolkit
-        _glue->init(argc, argv);
+        if (!_glue->init(argc, argv)) {
+            return false;
+        }
         
         FBOvgGlue *ovg = reinterpret_cast<FBOvgGlue *>(_glue.get());
         // Set "window" size
@@ -207,6 +209,27 @@ FBGui::init(int argc, char *** argv)
     }
 #endif
 
+#ifdef RENDERER_GLES1
+    if ((renderer == "opengles1") || (renderer == "gles1")) {
+        renderer = "opengles1";
+        _glue.reset(new FBgles1Glue(0));
+        // Initialize the glue layer between the renderer and the gui toolkit
+        if (!_glue->init(argc, argv)) {
+            return false;
+        }
+        
+        FBgles1Glue *gles1 = reinterpret_cast<FBgles1Glue *>(_glue.get());
+        // Set "window" size
+        _width =  gles1->getWidth();
+        _height = gles1->getHeight();
+        log_debug("Width:%d, Height:%d", _width, _height);
+        _renderer.reset(renderer::openvg::create_handler(0));     
+        // renderer::openvg::Renderer_gles1 *rend = reinterpret_cast
+        //     <renderer::openvg::Renderer_ovg *>(_renderer.get());
+        // rend->init(_width, _height);
+    }
+#endif
+    
     // map framebuffer into memory
     // Create a new Glue layer
 #ifdef RENDERER_AGG
@@ -316,11 +339,11 @@ FBGui::init(int argc, char *** argv)
     // should be able to support this, but right now it just gets in
     // the way of debugging.
     
-    if ( _xpos < 0 ) _xpos += _var_screeninfo.xres - _width;
-    _xpos = clamp<int>(_xpos, 0, _var_screeninfo.xres-_width);
+    if ( _xpos < 0 ) _xpos += _varinfo.xres - _width;
+    _xpos = clamp<int>(_xpos, 0, _varinfo.xres-_width);
 
-    if ( _ypos < 0 ) _ypos += _var_screeninfo.yres - _height;
-    _ypos = clamp<int>(_ypos, 0, _var_screeninfo.yres-_height);
+    if ( _ypos < 0 ) _ypos += _varinfo.yres - _height;
+    _ypos = clamp<int>(_ypos, 0, _varinfo.yres-_height);
 
     log_debug("X:%d, Y:%d", _xpos, _ypos);
 #endif
@@ -367,7 +390,7 @@ FBGui::run()
         // 10ms per heart beat
         delay = 10000;
     }
-    // log_debug(_("Movie Frame Rate is %g, adjusting delay to %dms"), fps,
+    // log_debug(_("Movie Frame Rate is %d, adjusting delay to %dms"), fps,
     //           _interval * delay);
     
     // This loops endlessly at the frame rate
@@ -502,7 +525,7 @@ FBGui::find_accessible_tty(int no)
     fn = find_accessible_tty("/dev/tty%x", no);   if (fn) return fn;
     fn = find_accessible_tty("/dev/tty%02d", no); if (fn) return fn;
   
-    if (no==0) {
+    if (no == 0) {
         fn = find_accessible_tty("/dev/tty", no);  // just "/dev/tty" 
         if (fn) return fn;
     }
@@ -534,6 +557,8 @@ FBGui::disable_terminal()
     // Find the TTY device name
     
     char* tty = find_accessible_tty(0);
+
+    log_debug("Disabling terminal %s", tty);
     
     int fd;
   
@@ -663,6 +688,8 @@ FBGui::enable_terminal()
     // log_debug("Restoring terminal...");
 
     char* tty = find_accessible_tty(_own_vt);
+    log_debug("Enabling terminal %s", tty);
+
     if (!tty) {
         log_error(_("Could not find device for VT number %d"), _own_vt);
         return false;
