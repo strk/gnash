@@ -167,14 +167,22 @@ if test x"${$1}" = x"yes" -a x"${found_$1_incl}" = "xyes"; then
   AC_CACHE_VAL(ac_cv_path_$1_lib,[
   if test x"${with_$1_lib}" != x ; then
     AC_MSG_CHECKING([for lib$1 library in specified directory])
+    dnl look for the library with the lower case name
     if test -f ${with_$1_lib}/lib$name.a -o -f ${with_$1_lib}/lib$name.${shlibext}; then
       tmp="`(cd ${with_$1_lib}; pwd)`"
       ac_cv_path_$1_lib="-L${tmp} -l$name"
       AC_MSG_RESULT([yes])
-          else
-      AC_MSG_ERROR([${with_$1_lib} directory doesn't contain library $name.])
-      AC_MSG_RESULT([no])
-          fi
+    else
+      dnl look for the library with the unchanged case name
+      if test x"${ac_cv_path_$1_lib}" = x -a -f ${with_$1_lib}/lib$1.a -o -f ${with_$1_lib}/lib$1.${shlibext}; then
+        tmp="`(cd ${with_$1_lib}; pwd)`"
+        ac_cv_path_$1_lib="-L${tmp} -l$1"
+        AC_MSG_RESULT([yes])
+      else
+        AC_MSG_ERROR([${with_$1_lib} directory doesn't contain library $name.])
+        AC_MSG_RESULT([no])
+      fi
+    fi
   fi
   ])
 
