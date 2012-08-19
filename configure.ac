@@ -239,10 +239,15 @@ dnl like pentium->geode, which can use the same compiler, but have
 dnl different development libraries.
 
 AC_ARG_WITH(sysroot,
-  AC_HELP_STRING([--with-sysroot],
-  [system root directory for cross compiling]),
-  with_top_level=${withval} ;
+  AC_HELP_STRING([--with-sysroot], [system root directory for cross compiling]),
+  with_top_level=${withval};
   cross_compiling=yes)
+
+if test x"${cross_compiling}" != x; then
+  if test ! -d ${with_top_level}/usr; then
+    AC_MSG_ERROR([Specified sysroot \"${with_top_level}\" doesn't exist!])
+  fi
+fi
 
 dnl Android is a little different when using a standard cross toolchain,
 dnl so we have to configure especially for it for now. Usually it's
