@@ -39,6 +39,8 @@ AC_DEFUN([GNASH_PATH_BOOST],
   dnl test will return a failure, and Gnash won't build.
   boost_libs="thread program_options iostreams system"
 
+  dnl 1.47 adds libchrono
+
   dnl this is a list of *recommended* libraries. If any of these are missing, this
   dnl test will return a warning, and Gnash will build, but testing won't work.
   cygnal_boost_libs="serialization date_time"
@@ -82,7 +84,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
       	gnash_boost_subdir="`dirname ${gnash_boost_topdir}`"
       	gnash_boost_version="`echo ${gnash_boost_topdir} | sed -e 's:.*boost-::'`"
       	dnl Fix for packaging systems not adding extra fluff to the path-name.
-     	for k in ${boost_headers}; do
+     	  for k in ${boost_headers}; do
        		if test ! -f ${gnash_boost_topdir}/boost/$k; then
         	  if test ! -f ${gnash_boost_subdir}/boost/$k; then
 		    	    missing_headers="${missing_headers} $k"
@@ -103,6 +105,11 @@ AC_DEFUN([GNASH_PATH_BOOST],
     done
   done
 
+  dnl As of boost 1.47, the chrono library is required.
+  gnash_boost_version=`grep "define.*BOOST_VERSION " ${gnash_boost_topdir}/boost/version.hpp | cut -d ' ' -f 3`
+  if test ${gnash_boost_version} -ge 104700; then
+    boost_libs="${boost_libs} chrono"
+  fi
   dnl this is the default list for paths to search. This gets
   dnl redefined if --with-boost-lib= is specified.
   newlist=$libslist
