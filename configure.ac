@@ -244,8 +244,16 @@ AC_ARG_WITH(sysroot,
   cross_compiling=yes)
 
 if test x"${cross_compiling}" != x; then
-  if test ! -d ${with_top_level}/usr; then
-    AC_MSG_ERROR([Specified sysroot \"${with_top_level}\" doesn't exist!])
+  dnl Check if /usr isn't part of the specified path
+  if test -d ${with_top_level}/usr; then
+    with_top_level=${withval}/usr
+  else 
+    dnl Check if the specified path supplies /usr
+    if test -d ${with_top_level}/include; then
+      with_top_level=${withval}
+    else
+      AC_MSG_ERROR([Specified sysroot \"${with_top_level}\" doesn't exist!])
+    fi
   fi
 fi
 
