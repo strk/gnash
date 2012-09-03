@@ -1173,11 +1173,25 @@ if test x"${build_egl_device}" = xyes; then
   if test xyes = x"${has_EGL}"; then
     AC_DEFINE(BUILD_EGL_DEVICE, [ 1 ],
           [Build the EGL device for OpenVG, OpenGLES1&2, and X11/Mesa])
-      device_list="${device_list} EGL"
-      ndevice=$((ndevice+1))
   else
     AC_MSG_WARN(["EGL requested but development package not found!"])
     build_egl_device=no
+  fi
+  save_CFLAGS="$CFLAGS"
+  CFLAGS="$CFLAGS -Wall -Werror"
+  native_window_type=none
+  AC_MSG_CHECKING([For EGLNativeWindowType type])
+  AC_TRY_COMPILE([#include <EGL/eglplatform.h>], [
+    EGLNativeWindowType foo = 1;
+    int bar = foo;
+    bar++; ],
+    native_window_type=int,
+    native_window_type=void
+  )
+  CFLAGS="$save_CFLAGS"
+  AC_MSG_RESULT([${native_window_type}])
+  if test x"${native_window_type}" = x"int"; then
+    AC_DEFINE([EGL_NATIVE_WINDOW_INT], [1], [EGLNativeWindowType type])
   fi
 fi
 

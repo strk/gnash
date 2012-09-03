@@ -380,7 +380,11 @@ EGLDevice::attachWindow(GnashDevice::native_window_t window)
     if (!window) {
         throw GnashException("bogus window handle!");
     } else {
+#ifdef EGL_NATIVE_WINDOW_INT
         _nativeWindow = static_cast<EGLNativeWindowType>(window);
+#else
+        _nativeWindow = reinterpret_cast<EGLNativeWindowType>(window);
+#endif
     }
 
     if (_eglSurface != EGL_NO_SURFACE) {
