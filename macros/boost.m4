@@ -37,7 +37,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   boost_headers="detail/lightweight_mutex.hpp thread/thread.hpp multi_index_container.hpp multi_index/key_extractors.hpp thread/mutex.hpp program_options/options_description.hpp iostreams/stream.hpp"
   dnl this is a list of *required* libraries. If any of these are missing, this
   dnl test will return a failure, and Gnash won't build.
-  boost_libs="thread program_options iostreams system"
+  boost_libs="thread program_options iostreams"
 
   dnl this is a list of *recommended* libraries. If any of these are missing, this
   dnl test will return a warning, and Gnash will build, but testing won't work.
