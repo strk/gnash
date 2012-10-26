@@ -24,7 +24,6 @@
 
 #include "gnashconfig.h"
 #include <cassert>
-#include <cunistd>
 #include <QByteArray>
 #include <QMenu>
 #include <QTimer>

@@ -24,7 +24,6 @@
 
 #include "gnashconfig.h"
 #include <cassert>
-#include <cunistd>
 #include <qcstring.h>
 #include <qpopupmenu.h>
 #include <qtimer.h>
