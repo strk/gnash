@@ -364,7 +364,9 @@ NPN_ReleaseVariantValue(NPVariant *variant)
         NPNFuncs.releasevariantvalue(variant);
     } else {
         if (variant->type == NPVariantType_String) {
-           NPN_MemFree((void*)gnash::GetNPStringChars(NPVARIANT_TO_STRING(*variant)));
+           NPString& strVar = NPVARIANT_TO_STRING(*variant);   
+           NPUTF8* buffer = const_cast<NPUTF8*>(gnash::GetNPStringChars(strVar));
+           NPN_MemFree(buffer);
         } else if (variant->type == NPVariantType_Object) {
            NPN_ReleaseObject(NPVARIANT_TO_OBJECT(*variant));
         }
