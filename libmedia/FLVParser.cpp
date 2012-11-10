@@ -447,7 +447,7 @@ FLVParser::parseNextTag(bool index_only)
 		}
 
 		boost::mutex::scoped_lock lock(_metaTagsMutex);
-		_metaTags.insert(std::make_pair(flvtag.timestamp, metaTag.release()));
+		_metaTags.insert(std::make_pair(flvtag.timestamp, MetaTags::mapped_type(metaTag)));
 	}
 	else
 	{
