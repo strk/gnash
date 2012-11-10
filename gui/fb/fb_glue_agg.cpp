@@ -180,7 +180,7 @@ FBAggGlue::createRenderHandler()
 	agg_handler = create_Renderer_agg(pixelformat);
     } else {
 	log_error(_("The pixel format of your framebuffer could not be detected."));
-	return false;
+	return 0;
     }
     
     assert(agg_handler != NULL);
@@ -196,12 +196,12 @@ FBAggGlue::createRenderHandler()
     }
 
     // This attaches the memory from the device to the AGG renderer
-    agg_handler->init_buffer((unsigned char *)mem, rawfb->getFBMemSize(),
+    agg_handler->init_buffer(mem, rawfb->getFBMemSize(),
                              width, height, rawfb->getStride());
 
     _renderer.reset(agg_handler);
     
-    return (Renderer *)agg_handler;
+    return agg_handler;
 }    
 
 void
