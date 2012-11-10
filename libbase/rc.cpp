@@ -83,7 +83,7 @@ RcInitFile::RcInitFile()
         DEFAULT_FLASH_REV_NUMBER ",0"),
     // An empty string leaves detection to VM.cpp:
     _flashSystemOS(""),
-    _flashSystemManufacturer("Gnash "DEFAULT_FLASH_SYSTEM_OS),
+    _flashSystemManufacturer("Gnash " DEFAULT_FLASH_SYSTEM_OS),
     _actionDump(false),
     _parserDump(false),
     _verboseASCodingErrors(false),
