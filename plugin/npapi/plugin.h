@@ -107,7 +107,7 @@ private:
     /// @param handler the function to invoke
     /// @param signals the signals for which to invoke the handler
     /// See GIOChannel documentation for more information on the parameters.
-    void setupIOChannel(int fd, GIOFunc handler, GIOCondition signals) const;
+    void setupIOChannel(int fd, GIOFunc handler, GIOCondition signals);
 
 
     /// Process requests from the player.
