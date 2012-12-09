@@ -103,7 +103,10 @@ AC_DEFUN([GNASH_PATH_BOOST],
     done
   done
 
-  dnl As of boost 1.47, the chrono library is required.
+  dnl As of boost 1.47, the chrono library is required. You can get a list of
+  dnl when a Boost library was added at:
+  dnl http://www.boost.org/doc/libs/?sort=boost-version
+
   gnash_boost_version=`grep "define.*BOOST_VERSION " ${gnash_boost_topdir}/boost/version.hpp | cut -d ' ' -f 3`
   if test ${gnash_boost_version} -ge 104700; then
     boost_libs="${boost_libs} chrono"
