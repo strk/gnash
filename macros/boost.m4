@@ -1,6 +1,6 @@
 dnl  
 dnl  Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010,
-dnl  2011  Free Software Foundation, Inc.
+dnl  2011, 2012 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
@@ -15,9 +15,8 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
 dnl Boost modules are:
-dnl date-time, filesystem. graph. iostreams, program options,
+dnl date-time, filesystem. graph. iostreams, program options, system, chrono
 dnl regex, serialization, signals, unit test, thead, and wave.
 
 AC_DEFUN([GNASH_PATH_BOOST],
@@ -37,10 +36,11 @@ AC_DEFUN([GNASH_PATH_BOOST],
   boost_headers="detail/lightweight_mutex.hpp thread/thread.hpp multi_index_container.hpp multi_index/key_extractors.hpp thread/mutex.hpp program_options/options_description.hpp iostreams/stream.hpp"
   dnl this is a list of *required* libraries. If any of these are missing, this
   dnl test will return a failure, and Gnash won't build.
-  boost_libs="thread program_options iostreams"
+  boost_libs="thread program_options iostreams system"
 
-  dnl this is a list of *recommended* libraries. If any of these are missing, this
-  dnl test will return a warning, and Gnash will build, but testing won't work.
+  dnl this is a list of *recommended* libraries. If any of these are missing,
+  dnl this test will return a warning, and Gnash will build, but testing
+  dnl won't work.
   cygnal_boost_libs="serialization date_time"
 
   dnl this is the default list for paths to search. This gets
@@ -82,7 +82,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
       	gnash_boost_subdir="`dirname ${gnash_boost_topdir}`"
       	gnash_boost_version="`echo ${gnash_boost_topdir} | sed -e 's:.*boost-::'`"
       	dnl Fix for packaging systems not adding extra fluff to the path-name.
-     	for k in ${boost_headers}; do
+     	  for k in ${boost_headers}; do
        		if test ! -f ${gnash_boost_topdir}/boost/$k; then
         	  if test ! -f ${gnash_boost_subdir}/boost/$k; then
 		    	    missing_headers="${missing_headers} $k"
@@ -103,6 +103,11 @@ AC_DEFUN([GNASH_PATH_BOOST],
     done
   done
 
+  dnl As of boost 1.47, the chrono library is required.
+  gnash_boost_version=`grep "define.*BOOST_VERSION " ${gnash_boost_topdir}/boost/version.hpp | cut -d ' ' -f 3`
+  if test ${gnash_boost_version} -ge 104700; then
+    boost_libs="${boost_libs} chrono"
+  fi
   dnl this is the default list for paths to search. This gets
   dnl redefined if --with-boost-lib= is specified.
   newlist=$libslist
