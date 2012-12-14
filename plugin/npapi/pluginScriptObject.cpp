@@ -273,7 +273,9 @@ GnashPluginScriptObject::GnashPluginScriptObject()
 
 // Constructor
 GnashPluginScriptObject::GnashPluginScriptObject(NPP npp)
-    : _nppinstance (npp)
+    : _nppinstance (npp),
+      _controlfd(-1),
+      _hostfd(-1)
 {
 //    log_debug(__PRETTY_FUNCTION__);
     
