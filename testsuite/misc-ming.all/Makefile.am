@@ -1478,10 +1478,12 @@ instanceNameTestRunner: $(srcdir)/../generic-testrunner.sh instanceNameTest.swf
 	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) instanceNameTest.swf > $@
 	chmod 755 $@
 
-Dejagnu_SOURCES =	\
-	Dejagnu.c	\
+Dejagnu_SOURCES = Dejagnu.c
+Dejagnu_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	libgnashmingutils.la \
+	$(AM_LDFLAGS) \
 	$(NULL)
-Dejagnu_LDADD = libgnashmingutils.la
 
 Dejagnu.swf: Dejagnu
 	./Dejagnu $(abs_mediadir)
