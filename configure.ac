@@ -67,6 +67,10 @@ case "${host}" in
     DEFAULT_FLASH_PLATFORM_ID="BSD"
     DEFAULT_FLASH_SYSTEM_OS="NetBSD"
     ;;
+  *-amdroid*)
+    DEFAULT_FLASH_PLATFORM_ID="AND"
+    DEFAULT_FLASH_SYSTEM_OS="Linux"
+    ;;
   *-linux-gnu)
     DEFAULT_FLASH_PLATFORM_ID="LNX"
     DEFAULT_FLASH_SYSTEM_OS="GNU/Linux"
@@ -165,6 +169,10 @@ case "${host}" in
     solaris=yes
     AC_DEFINE([SOLARIS_HOST], [1], [this is a Solaris platform])
     ;;
+  *-android*)
+    android=yes
+    AC_DEFINE([ANDROID_HOST], [1], [this is an Android platform])
+    ;;
   *-*linux*)
     linux=yes
     AC_DEFINE([LINUX_HOST], [1], [this is a Linux platform])
@@ -197,10 +205,6 @@ case "${host}" in
     wince=yes
     AC_DEFINE([WINCE_HOST], [1], [this is a WINCE platform])
     AC_DEFINE([WINCE6_HOST], [1], [this is a WINCE6 platform])
-    ;;
-  *-android*)
-    android=yes
-    AC_DEFINE([ANDROID_HOST], [1], [this is an Android platform])
     ;;
 esac
 
@@ -274,24 +278,27 @@ AC_ARG_WITH([android],
         android_ndk=${withval}
         if test x"${withval}" != x; then
           android_ndk=${withval}
-        else
-          android_ndk=/opt/android-ndk-r3/build/platforms/android-5/arch-arm
         fi
 )
 CROSS_CXXFLAGS=
-if test x"${android_ndk}" != xno; then
-  CROSS_CXXFLAGS=-mandroid -fexceptions
+if test x"${android}" = xyes; then
+  CROSS_CXXFLAGS='-fexceptions -frtti -I${prefix}/include'
+  CROSS_LDFLAGS='-all-static -L${prefix}/lib'
   if test x"${with_top_level}" = x; then
     with_top_level=/usr/local/android-arm/sysroot/usr
     cross_compiling=yes
   fi
   ANDROID_NDK=${android_ndk}
   AC_DEFINE(ANDROID, [1], [This is an Android build])
+  CXXFLAGS="${CXXFLAGS} ${CROSS_CXXFLAGS}"
 else
+  CROSS_CXXFLAGS=
   ANDROID_NDK=
 fi
 AC_SUBST(ANDROID_NDK)
 AM_CONDITIONAL(ANDROID, [ test x"${android_ndk}" != xno ])
+AC_SUBST(CROSS_LDFLAGS)
+AC_SUBST(CROSS_CXXFLAGS)
 
 AC_C_BIGENDIAN
 AC_C_CONST
@@ -742,6 +749,11 @@ AC_ARG_ENABLE(sound,
    fi]
 )
 
+AM_CONDITIONAL(BUILD_LIBSOUND, test x${build_sound_none} != xyes)
+if test x${build_sound_none} != xyes; then
+  AC_DEFINE(USE_SOUND, [1], [Build any sound code])
+fi
+
 dnl --------------------------------------------------------
 dnl  Media handler selection
 dnl --------------------------------------------------------
@@ -793,6 +805,11 @@ AC_ARG_ENABLE(media,
         media_list="gst"
     fi]
 )
+
+AM_CONDITIONAL(BUILD_LIBMEDIA, test x${build_media_none} != xyes)
+if test x${build_media_none} != xyes; then
+  AC_DEFINE(USE_MEDIA, [1], [Build any media code])
+fi
 
 dnl If no render is selected, and media handling isn't disabled, them enable gst
 if test x${build_media_none} = xno -a x${build_media_gst} = xno -a x${build_media_ffmpeg} = xno; then
@@ -1030,7 +1047,12 @@ dnl GMA500 but you currently will have to build the AGG renderer
 dnl instead of the OGL (OpenGL) one. 
 build_vaapi_device=no
 build_openmax_device=no
-build_egl_device=no
+dnl These renders always require EGL support
+if test x${build_gles1} = xyes -o x${build_ovg} = xyes; then
+  build_egl_device=yes
+else
+  build_egl_device=no
+fi
 build_x11_device=no
 build_directfb_device=no
 if test x"${build_fb}" = xyes -o x"${build_fb}" = xauto; then
@@ -1875,14 +1897,14 @@ fi
 dnl Check possibility to build FB gui, if requested
 dnl FB dependency is a linux system (linux/fb.h)
 if test x"${build_fb}" != xno; then
-  if test x"${linux}" = xyes; then
+  if test x"${linux}" = xyes -o x"${android}" = xyes; then
       build_fb=yes
   else
     if test x"${build_fb}" = xyes; then
       dnl SHOULD we just check at the end of file instead ?
-      AC_MSG_ERROR(fb GUI cannot be built on non-linux platforms);
+      AC_MSG_ERROR(framebuffer GUI cannot be built on non-linux platforms);
     fi
-    AC_MSG_NOTICE([fb GUI won't be built (non-linux platform)])
+    AC_MSG_NOTICE([framebuffer GUI won't be built (non-linux platform)])
     build_fb=no
   fi
 fi
@@ -2103,8 +2125,11 @@ AC_CHECK_HEADERS(sys/utsname.h)
 AC_CHECK_HEADERS(signal.h)
 AC_CHECK_HEADERS(unistd.h)
 AC_CHECK_HEADERS(sys/time.h)
+AC_CHECK_HEADERS(linux/uinput.h, [uinput=yes], [uinput=no])
 AC_CHECK_LIB(bz2, BZ2_bzopen, [AC_SUBST(BZ2_LIBS, -lbz2)])
 AC_CHECK_LIB(c, getpwnam, AC_DEFINE(HAVE_GETPWNAM, 1, [Has getpwnam] ))
+
+AM_CONDITIONAL(HAS_UINPUT, [test x$uinput = xyes])
 
 dnl X11 is needed for fltk (at least),
 dnl and probably for many other guis too ...
@@ -2753,7 +2778,6 @@ if test x"$GCC" = x"yes"; then
     $CROSS_CXXFLAGS \
     -W \
     -Wall \
-    -Wcast-align \
     -Wcast-qual \
     -Wpointer-arith \
     -Wreturn-type \
@@ -4202,30 +4226,32 @@ yast_err="`cat $yast_err`"
 yast_war="`cat $yast_war`"
 yast_rec="`cat $yast_rec`"
 
-# Pipe stderr to /dev/null since Fedora complains when target isn't there.
-if test x`which apt-get 2>/dev/null` != x; then
-  if test x"$deb_err" != x -o x"$deb_war" != x -o x"$deb_rec" != x; then
-    echo "#!/bin/sh" > deb-attempt-install-dependencies.sh
-    echo "packages=\"$deb_err $deb_war $deb_rec\"" >> deb-attempt-install-dependencies.sh
-    echo "PKGCOMMAND=\"apt-get install -y -q\"" >> deb-attempt-install-dependencies.sh
-    cat ${srcdir}/base-attempter.sh >> deb-attempt-install-dependencies.sh
-    chmod +x deb-attempt-install-dependencies.sh
-    echo ""
-    echo ".deb users might be able to install most dependencies by executing:"
-    echo "sudo ./deb-attempt-install-dependencies.sh"
+if test x"${linux}" -a x"${android}" = xno; then
+  # Pipe stderr to /dev/null since Fedora complains when target isn't there.
+  if test x`which apt-get 2>/dev/null` != x; then
+    if test x"$deb_err" != x -o x"$deb_war" != x -o x"$deb_rec" != x; then
+      echo "#!/bin/sh" > deb-attempt-install-dependencies.sh
+      echo "packages=\"$deb_err $deb_war $deb_rec\"" >> deb-attempt-install-dependencies.sh
+      echo "PKGCOMMAND=\"apt-get install -y -q\"" >> deb-attempt-install-dependencies.sh
+      cat ${srcdir}/base-attempter.sh >> deb-attempt-install-dependencies.sh
+      chmod +x deb-attempt-install-dependencies.sh
+      echo ""
+      echo ".deb users might be able to install most dependencies by executing:"
+      echo "sudo ./deb-attempt-install-dependencies.sh"
+    fi
   fi
-fi
 
-if test x`which yum 2>/dev/null` != x; then
-  if test x"$rpm_err" != x -o x"$rpm_war" != x -o x"$deb_rec" != x; then
-    echo "#!/bin/sh" > rpm-attempt-install-dependencies.sh
-    echo "packages=\"$rpm_err $rpm_war  $rpm_rec\"" >> rpm-attempt-install-dependencies.sh
-    echo "PKGCOMMAND=\"yum install -y \""    >> rpm-attempt-install-dependencies.sh
-    cat ${srcdir}/base-attempter.sh >> rpm-attempt-install-dependencies.sh
-    chmod +x rpm-attempt-install-dependencies.sh
-    echo ""
-    echo ".rpm users might be able to install most dependencies by executing:"
-    echo "sudo ./rpm-attempt-install-dependencies.sh"
+  if test x`which yum 2>/dev/null` != x; then
+    if test x"$rpm_err" != x -o x"$rpm_war" != x -o x"$deb_rec" != x; then
+      echo "#!/bin/sh" > rpm-attempt-install-dependencies.sh
+      echo "packages=\"$rpm_err $rpm_war  $rpm_rec\"" >> rpm-attempt-install-dependencies.sh
+      echo "PKGCOMMAND=\"yum install -y \""    >> rpm-attempt-install-dependencies.sh
+      cat ${srcdir}/base-attempter.sh >> rpm-attempt-install-dependencies.sh
+      chmod +x rpm-attempt-install-dependencies.sh
+      echo ""
+      echo ".rpm users might be able to install most dependencies by executing:"
+      echo "sudo ./rpm-attempt-install-dependencies.sh"
+    fi
   fi
 fi
 
