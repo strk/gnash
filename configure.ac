@@ -67,7 +67,7 @@ case "${host}" in
     DEFAULT_FLASH_PLATFORM_ID="BSD"
     DEFAULT_FLASH_SYSTEM_OS="NetBSD"
     ;;
-  *-amdroid*)
+  *-android*)
     DEFAULT_FLASH_PLATFORM_ID="AND"
     DEFAULT_FLASH_SYSTEM_OS="Linux"
     ;;
