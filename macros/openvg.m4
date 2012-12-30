@@ -22,8 +22,8 @@ AC_DEFUN([GNASH_PATH_OPENVG],
   AC_ARG_WITH(openvg_includes, AC_HELP_STRING([--with-openvg-includes], [directory where Openvg headers are]), with_openvg_includes=${withval})
   AC_CACHE_VAL(ac_cv_path_openvg_includes,[
     if test x"${with_openvg_includes}" != x; then
-      if test -f ${with_openvg_includes}/openvg.h; then
-        ac_cv_path_openvg_includes="`(cd ${with_openvg_includes}; pwd)`"
+      if test -f ${with_openvg_includes}/VG/openvg.h; then
+        ac_cv_path_openvg_includes="-I`(cd ${with_openvg_includes}; pwd)`"
       else
         AC_MSG_ERROR([${with_openvg_includes} directory doesn't contain VG/openvg.h])
       fi
@@ -77,7 +77,7 @@ AC_DEFUN([GNASH_PATH_OPENVG],
     fi
   ])
 
-  if test x"${ac_cv_path_openvg_lib}" -o x"${has_openvg}" = xyes; then
+  if test x"${ac_cv_path_openvg_lib}" = x; then
     for i in $libslist; do
       if test -f $i/libOpenVG.${shlibext} -o -f $i/libOpenVG.a; then
         if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
