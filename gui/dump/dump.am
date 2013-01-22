@@ -33,4 +33,5 @@ dump_gnash_LDADD = \
 	$(GNASH_LIBS) \
 	$(top_builddir)/libdevice/libgnashdevice.la \
 	$(AGG_LIBS) \
+    $(BOOST_LIBS) \
 	$(NULL)
