@@ -24,6 +24,7 @@
 
 #include <cmath>
 #include <iomanip>
+#include <iostream>
 
 #include "log.h"
 #include "GnashNumeric.h"
