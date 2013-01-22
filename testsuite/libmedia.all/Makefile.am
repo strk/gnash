@@ -30,7 +30,12 @@ AM_LDFLAGS = \
 	$(GSTREAMER_APP_LIBS) \
 	$(GSTREAMER_LIBS) \
 	$(BOOST_LIBS) \
+	$(EGL_LIBS) \
 	$(NULL)
+
+if ANDROID
+AM_LDFLAGS +=  -lui -llog
+endif	# ANDROID
 
 localedir = $(datadir)/locale
 

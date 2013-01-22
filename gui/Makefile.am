@@ -106,19 +106,20 @@ GTK_LIBS =  \
 # The following will be filled up later
 GUI_CPPFLAGS = 
 
-AM_LDFLAGS =  \
-	$(INTLLIBS) \
-	$(BOOST_LIBS) \
-	$(NULL)
-
+AM_CXXFLAGS = $(CROSS_CXXFLAGS)
 
 GNASH_LIBS = \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libdevice/libgnashdevice.la \
 	$(top_builddir)/librender/libgnashrender.la \
-	$(top_builddir)/libsound/libgnashsound.la \
-	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libbase/libgnashbase.la
+
+if BUILD_LIBMEDIA
+GNASH_LIBS += $(top_builddir)/libmedia/libgnashmedia.la
+endif
+if BUILD_LIBSOUND
+GNASH_LIBS += $(top_builddir)/libsound/libgnashsound.la
+endif
 
 if HAVE_VAAPI
 GNASH_LIBS += \

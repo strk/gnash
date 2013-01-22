@@ -634,7 +634,7 @@ string_toUpperCase(const fn_call& fn)
 
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
-#if !defined(__HAIKU__) && !defined(__amigaos4__)
+#if !defined(__HAIKU__) && !defined(__amigaos4__) && !defined(__ANDROID__)
     static const std::locale swfLocale((std::locale()), new SWFCtype());
     boost::to_upper(wstr, swfLocale);
 #else
@@ -660,7 +660,7 @@ string_toLowerCase(const fn_call& fn)
 
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
-#if !defined(__HAIKU__) && !defined(__amigaos4__)
+#if !defined(__HAIKU__) && !defined(__amigaos4__) && !defined(__ANDROID__)
     static const std::locale swfLocale((std::locale()), new SWFCtype());
     boost::to_lower(wstr, swfLocale);
 #else

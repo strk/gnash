@@ -296,7 +296,7 @@ else
   ANDROID_NDK=
 fi
 AC_SUBST(ANDROID_NDK)
-AM_CONDITIONAL(ANDROID, [ test x"${android_ndk}" != xno ])
+AM_CONDITIONAL(ANDROID, [ test x"${android}" = xyes ])
 AC_SUBST(CROSS_LDFLAGS)
 AC_SUBST(CROSS_CXXFLAGS)
 
@@ -1059,7 +1059,7 @@ if test x"${build_fb}" = xyes -o x"${build_fb}" = xauto; then
   build_fb_agg=yes
 fi
 dnl AGG support for the framebuffer requires the rawfb device
-if test x"${build_fb_agg}" = xyes -a x"${build_agg}" = xyes; then
+if test x"${build_fb_agg}" = xyes -o x"${build_agg}" = xyes; then
   build_rawfb_device=yes
   device_list="RawFB"
   ndevice=1
@@ -2534,7 +2534,7 @@ if test x"${build_gles1}"; then
 fi
 
 dnl only Linux supports /dev/fb0
-if test x"${build_rawfb_device}" = xyes -a x"${linux}" = xyes; then
+if test x"${build_rawfb_device}" = xyes; then
    AC_DEFINE([BUILD_RAWFB_DEVICE], [1], [Use raw Framebuffer device support])
 fi
 
@@ -2904,7 +2904,7 @@ AC_ARG_ENABLE([harden],
   [harden=yes]
 )
 
-if test x"$harden" = x"yes" -a x"${host_cpu}" != mips; then
+if test x"$harden" = x"yes" -a x"${host_cpu}" != mips -a x"${android}" != xyes; then
     CPPFLAGS="${CPPFLAGS} -D_FORTIFY_SOURCE=2"
     CXXFLAGS="${CXXFLAGS} -fPIE -fstack-protector --param ssp-buffer-size=4 -Wformat -Werror=format-security"
     LDFLAGS="${LDFLAGS} -fPIE -pie -Wl,-z,relro -Wl,-z,now"

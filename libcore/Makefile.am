@@ -20,8 +20,11 @@ AUTOMAKE_OPTIONS =
 
 SUBDIRS = parser vm
 
+AM_CXXFLAGS = $(CROSS_CXXFLAGS)
+AM_LDFLAGS = $(CROSS_LDFLAGS)
+
 if ENABLE_PCH
-AM_CXXFLAGS = $(PCH_FLAGS)
+AM_CXXFLAGS += $(PCH_FLAGS)
 endif
 
 pkglib_LTLIBRARIES = libgnashcore.la
@@ -289,13 +292,18 @@ inst_HEADERS += $(EXTENSIONS_API)
 libgnashcore_la_LIBADD = \
 	$(top_builddir)/libcore/parser/libgnashparser.la \
 	$(top_builddir)/libcore/vm/libgnashvm.la \
-	$(top_builddir)/libmedia/libgnashmedia.la \
-	$(top_builddir)/libsound/libgnashsound.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(BOOST_LIBS) \
 	$(FREETYPE2_LIBS) \
 	$(FONTCONFIG_LIBS) \
 	$(NULL)
+
+if BUILD_LIBMEDIA
+libgnashcore_la_LIBADD += $(top_builddir)/libmedia/libgnashmedia.la
+endif
+if BUILD_LIBSOUND
+libgnashcore_la_LIBADD += $(top_builddir)/libsound/libgnashsound.la
+endif
 
 libgnashcore_la_LDFLAGS = -release $(VERSION) -export-dynamic
 

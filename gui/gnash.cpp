@@ -311,8 +311,9 @@ getSupportedOptions(gnash::Player& p)
     using gnash::RcInitFile;
 
     std::vector<std::string> handlers;
+#ifdef USE_MEDIA
     gnash::media::MediaFactory::instance().listKeys(back_inserter(handlers));
-
+#endif
     std::vector<std::string> renderers;
     boost::split(renderers, RENDERER_CONFIG,
         boost::is_any_of(" "), boost::token_compress_on);

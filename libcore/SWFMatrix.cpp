@@ -30,6 +30,24 @@
 #include "SWFRect.h"
 #include "Point2d.h"
 
+// The Bionic libm doesn't build sincos for ARM, but older versions
+// of boost want it. It also turns out AGG using this causes a
+// segfault by passing in 0 as an argument for x, so for now we
+// ignore that error so debugging can continue.
+#ifdef __ANDROID__
+void
+sincos(double x, double *psin, double *pcos)
+{
+    if (x > 0) {
+        *psin = sin(x);
+        *pcos = cos(x);
+    } else {
+        std::cerr << "FIXME: sincos(0) will segfault!" << std::endl;
+        // *psin = 0.244287;
+        // *pcos = 0.969703;
+    }
+}
+#endif
 
 // This class intentionally uses overflows, which are not allowed in
 // signed types; apart from being UB always, in practice it produces
@@ -206,7 +224,11 @@ void
 SWFMatrix::set_scale(double xscale, double yscale)
 {
     const double rotation = get_rotation();
-    set_scale_rotation(xscale, yscale, rotation); 
+    if ((xscale == 0.0) || (yscale == 0.0)) {
+        std::cerr << "FIXME: sincos(0) will segfault!" << std::endl;
+    } else {
+        set_scale_rotation(xscale, yscale, rotation);
+    }
 }
 
 void
@@ -352,7 +374,5 @@ operator<<(std::ostream& o, const SWFMatrix& m)
 
 // Local Variables:
 // mode: C++
-// c-basic-offset: 8 
-// tab-width: 8
-// indent-tabs-mode: t
+// indent-tabs-mode: nil
 // End:

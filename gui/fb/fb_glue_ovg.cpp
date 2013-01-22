@@ -109,14 +109,15 @@ FBOvgGlue::init(int argc, char **argv[])
     _device.reset(new renderer::EGLDevice(argc, *argv));
 
     // Initialize the display device
-    // EGL still reqires us to open the framebuffer
+    // EGL still reqires us to open the framebuffer, except on Android
     _device->bindClient(renderer::GnashDevice::OPENVG);
-    
+
+#ifndef __ANDROID__
     _display.initDevice(0, 0);
 
     _width = getWidth();
     _height = getHeight();
-
+    
     // Some linux distros like ltib have more information available
     // about the framebuffer
     int fd = ::open("/sys/class/graphics/fb0/stride", O_RDONLY);
@@ -136,6 +137,9 @@ FBOvgGlue::init(int argc, char **argv[])
     // framebuffer when creating a window. Under X11, this is
     // actually the XID of the created window.
     return _device->attachWindow(_display.getHandle());
+#else
+    return _device->attachWindow(0);
+#endif    
 }
 
 Renderer*

@@ -27,10 +27,17 @@ AUTOMAKE_OPTIONS = # dejagnu
 GNASH_LIBS = \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/libmedia/libgnashmedia.la \
-	$(top_builddir)/libsound/libgnashsound.la \
 	$(top_builddir)/librender/libgnashrender.la \
 	$(NULL)
+
+if BUILD_LIBMEDIA
+GNASH_LIBS += $(top_builddir)/libmedia/libgnashmedia.la
+endif
+if BUILD_LIBSOUND
+GNASH_LIBS += $(top_builddir)/libsound/libgnashsound.la
+endif
+
+AM_CXXFLAGS = $(CROSS_CXXFLAGS)
 
 AM_LDFLAGS = \
 	$(LIBINTL) \
@@ -38,6 +45,10 @@ AM_LDFLAGS = \
 	$(PTHREAD_LIBS) \
 	$(GNASH_LIBS) \
 	$(NULL)
+
+if ANDROID
+AM_LDFLAGS +=  -lui -llog
+endif	# ANDROID
 
 localedir = $(datadir)/locale
 

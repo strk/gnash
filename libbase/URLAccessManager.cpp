@@ -32,6 +32,11 @@
 #include <vector>
 #include <cassert>
 
+// Android fails to define this constant
+#ifndef MAXHOSTNAMELEN
+# define MAXHOSTNAMELEN 256
+#endif
+
 namespace gnash {
 namespace URLAccessManager {
 
@@ -204,7 +209,7 @@ host_check(const std::string& host)
     // Get hostname
     //
 
-    #define MAXHOSTNAMELEN 200
+//  #define MAXHOSTNAMELEN 200
     char name[MAXHOSTNAMELEN];
     if (::gethostname(name, MAXHOSTNAMELEN) == -1)
     {

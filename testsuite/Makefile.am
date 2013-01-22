@@ -18,6 +18,9 @@
 
 AUTOMAKE_OPTIONS = -Wno-portability
 
+AM_CXXFLAGS = $(CROSS_CXXFLAGS)
+AM_LDFLAGS = $(CROSS_LDFLAGS)
+
 DIR_MING=
 
 if ENABLE_MING
@@ -86,9 +89,12 @@ SUBDIRS = \
 	$(DIR_SWFC) \
 	movies.all \
 	libbase.all	\
-	libmedia.all \
 	libcore.all \
 	$(NULL)
+
+if BUILD_LIBMEDIA
+SUBDIRS += libmedia.all
+endif
 
 EXTRA_DIST = check.h \
 	DummyMovieDefinition.h \
@@ -124,12 +130,21 @@ libtestsuite_la_SOURCES = \
 	$(NULL)
 libtestsuite_la_LIBADD = \
 	$(RENDERER_LIBS) \
-	$(top_builddir)/libmedia/libgnashmedia.la \
-	$(top_builddir)/libsound/libgnashsound.la \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/librender/libgnashrender.la \
 	$(NULL)
+
+if ANDROID
+libtestsuite_la_LIBADD += -lui -llog
+endif	# ANDROID
+
+if BUILD_LIBMEDIA
+libtestsuite_la_LIBADD += $(top_builddir)/libmedia/libgnashmedia.la
+endif
+if BUILD_LIBSOUND
+libtestsuite_la_LIBADD += $(top_builddir)/libsound/libgnashsound.la
+endif
 
 libtestsuite_la_CXXFLAGS = \
 	-I$(top_srcdir)/libbase \
@@ -146,6 +161,7 @@ libtestsuite_la_CXXFLAGS = \
 	-I$(top_srcdir)/libcore/vm  \
 	$(BOOST_CFLAGS) \
 	$(CAIRO_CFLAGS) \
+	$(CROSS_CXXFLAGS) \
 	$(NULL)
 
 tmpSharedObject: 

@@ -100,34 +100,42 @@ FBgles1Glue::init(int /*argc*/, char *** /*argv*/)
     result = eglInitialize(_display, &majorVersion, &minorVersion);
     if (result == EGL_FALSE) {
         return false;
+    } else {
+        log_trace(_("EGL: initialize ok"));
     }
-    log_trace(_("EGL: initialize ok"));
     
     result = eglChooseConfig(_display, main_attrib_list, &_config, 1,
                              &numOfConfigs);
     if (result == EGL_FALSE || numOfConfigs != 1) {
         return false;
+    } else {
+        log_trace(_("EGL: config ok"));
     }
-    log_trace(_("EGL: config ok"));
     
     _surface = eglCreateWindowSurface(_display, _config, (NativeWindowType)0,
                                       NULL);
     if (eglGetError () != EGL_SUCCESS) {
-        return false;
+        log_error("FIXME: eglCreateWindowSurface failed! %d", eglGetError());
+        // return false;
+    } else {
+        log_trace(_("EGL: surface ok"));
     }
-    log_trace(_("EGL: surface ok"));
     
     _context = eglCreateContext(_display, _config, NULL, NULL);
     if (eglGetError () != EGL_SUCCESS) {
-        return false;
+        log_error("FIXME: eglCreateContext failed! %d", eglGetError());
+        // return false;
+    } else {
+        log_trace(_("EGL: context ok"));
     }
-    log_trace(_("EGL: context ok"));
     
     eglMakeCurrent(_display, _surface, _surface, _context);
     if (eglGetError () != EGL_SUCCESS) {
-        return false;
+        log_error("FIXME: eglMakeCurrent failed! %d", eglGetError());
+        // return false;
+    } else {
+        log_trace(_("EGL: current ok"));
     }
-    log_trace(_("EGL: current ok"));
     
     const EGLint pbuffer_config_list[] = {
         EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
@@ -158,8 +166,9 @@ FBgles1Glue::init(int /*argc*/, char *** /*argv*/)
                                        pbuffer_attrib_list);
     if (eglGetError () != EGL_SUCCESS) {
         return false;
+    } else {
+        log_trace("EGL: pbuffer surface ok");
     }
-    log_trace("EGL: pbuffer surface ok");
     
     return true;
 }
@@ -201,6 +210,15 @@ void
 FBgles1Glue::render_to_display () {
     if (_pbuffer != EGL_NO_SURFACE)
         eglMakeCurrent(_display, _surface, _surface, _context);
+}
+
+void
+FBgles1Glue::prepDrawingArea(void * /*drawing_area */)
+{
+    // GNASH_REPORT_FUNCTION;
+
+    // _device->attachWindow(reinterpret_cast
+    //         <renderer::GnashDevice::native_window_t>(drawing_area));
 }
 
 } // end of namespace gui

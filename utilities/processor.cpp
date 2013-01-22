@@ -61,6 +61,7 @@
 #endif
 
 extern "C"{
+
 #ifdef HAVE_GETOPT_H
 	#include <getopt.h>
 #endif
@@ -81,6 +82,7 @@ namespace boost
 	}
 }
 #endif
+
 
 // How many seconds to wait for a frame advancement 
 // before kicking the movie (forcing it to next frame)
@@ -328,12 +330,15 @@ main(int argc, char *argv[])
 	    return EXIT_FAILURE;
     }
 
+#ifdef USE_MEDIA
     boost::shared_ptr<gnash::media::MediaHandler> mediaHandler;
-    boost::shared_ptr<sound::sound_handler> soundHandler;
-
     std::string mh = rcfile.getMediaHandler();
     mediaHandler.reset(media::MediaFactory::instance().get(mh));
+#endif
+#if defined(USE_SOUND) && defined(USE_MEDIA)
+    boost::shared_ptr<sound::sound_handler> soundHandler;
     soundHandler.reset(new sound::NullSoundHandler(mediaHandler.get()));
+#endif
 
     boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
     addDefaultLoaders(*loaders);
@@ -355,8 +360,12 @@ main(int argc, char *argv[])
     {
 
         RunResources runResources;
+#if defined(USE_SOUND) && defined(USE_MEDIA)
         runResources.setSoundHandler(soundHandler);
+#endif
+#ifdef USE_MEDIA
         runResources.setMediaHandler(mediaHandler);
+#endif
         runResources.setTagLoaders(loaders);
         boost::shared_ptr<StreamProvider> sp(new StreamProvider(*i, *i));
         runResources.setStreamProvider(sp);

@@ -138,7 +138,8 @@ class DSOEXPORT RawFBDevice : public GnashDevice
     }
 
     bool swapBuffers();
-    
+
+    void dump();
 protected:
     /// Clear the framebuffer memory
     void clear();

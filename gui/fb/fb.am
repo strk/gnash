@@ -29,11 +29,13 @@ fb_gnash_CPPFLAGS = \
 	-DGUI_CONFIG=\"FB\" \
 	-DFAKEFB=\"$(FAKEFB)\" \
 	$(AM_CPPFLAGS) 
-fb_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
+fb_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic
 fb_gnash_LDADD = \
+	$(INTLLIBS) \
 	$(GNASH_LIBS) \
 	$(TS_LIBS) \
-	$(BOOST_LIBS)
+	$(BOOST_LIBS) \
+	$(NULL)
 
 # Build support for AntiGrain.
 if BUILD_AGG_RENDERER
@@ -50,6 +52,19 @@ fb_gnash_CPPFLAGS += \
 	$(EGL_CFLAGS)
 fb_gnash_LDADD += $(OPENVG_LIBS) $(EGL_LIBS)
 endif	# BUILD_OVG_RENDERER
+
+# Build support for OpenGLES1.
+if BUILD_GLES1_RENDERER
+fb_gnash_SOURCES += fb/fb_glue_gles1.cpp fb/fb_glue_gles1.h
+fb_gnash_CPPFLAGS += \
+	$(GLES1_CFLAGS) \
+	$(EGL_CFLAGS)
+fb_gnash_LDADD += $(GLES1_LIBS) $(EGL_LIBS)
+endif	# BUILD_OVG_RENDERER
+
+if ANDROID
+fb_gnash_LDADD +=  -lui -llog
+endif	# ANDROID
 
 # # This supports only OpenGLES 1.1 with EGL support.
 # if BUILD_GLES1_RENDERER

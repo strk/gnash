@@ -42,8 +42,16 @@ AM_CPPFLAGS = \
         $(NULL)
 
 AM_LDFLAGS = \
+	$(CROSS_LDFLAGS) \
 	$(OPENGL_LIBS) \
+	$(EGL_LIBS) \
 	$(NULL)
+
+if ANDROID
+LDADD =  -lui -llog
+endif	# ANDROID
+
+AM_CXXFLAGS = $(CROSS_CXXFLAGS)
 
 GNASH_LIBS = \
 	$(top_builddir)/testsuite/libtestsuite.la \
@@ -69,9 +77,11 @@ clip_as_button2_TestRunner_SOURCES = \
 	$(NULL)
 clip_as_button2_TestRunner_LDADD = \
 	$(GNASH_LIBS) \
+	$(LDADD) \
 	$(NULL)
 clip_as_button2_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(srcdir)\" \
+	$(CROSS_CXXFLAGS) \
 	$(NULL)
 
 subshapes_TestRunner_SOURCES = \
@@ -79,9 +89,11 @@ subshapes_TestRunner_SOURCES = \
 	$(NULL)
 subshapes_TestRunner_LDADD = \
 	$(GNASH_LIBS) \
+	$(LDADD) \
 	$(NULL)
 subshapes_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(srcdir)\" \
+	$(CROSS_CXXFLAGS) \
 	$(NULL)
 
 gotoFrameOnKeyEvent_TestRunner_SOURCES = \
@@ -89,9 +101,11 @@ gotoFrameOnKeyEvent_TestRunner_SOURCES = \
 	$(NULL)
 gotoFrameOnKeyEvent_TestRunner_LDADD = \
 	$(GNASH_LIBS) \
+	$(LDADD) \
 	$(NULL)
 gotoFrameOnKeyEvent_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(srcdir)\" \
+	$(CROSS_CXXFLAGS) \
 	$(NULL)
 
 GotoAndPlayTestRunner: Makefile $(srcdir)/../generic-testrunner.sh $(srcdir)/GotoAndPlayTest.swf
@@ -107,9 +121,11 @@ test_15bpp_bitmap_TestRunner_SOURCES = \
 	$(NULL)
 test_15bpp_bitmap_TestRunner_LDADD = \
 	$(GNASH_LIBS) \
+	$(LDADD) \
 	$(NULL)
 test_15bpp_bitmap_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(srcdir)\" \
+	$(CROSS_CXXFLAGS) \
 	$(NULL)
 
 clean-local: 

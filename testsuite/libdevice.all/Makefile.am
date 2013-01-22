@@ -21,11 +21,7 @@ AUTOMAKE_OPTIONS = dejagnu
 
 LDADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/librender/libgnashrender.la \
 	$(LIBINTL) \
-	$(AGG_LIBS) \
-	$(OPENVG_LIBS) \
-	$(EGL_LIBS) \
 	$(NULL)
 
 if ANDROID
@@ -39,11 +35,8 @@ AM_CXXFLAGS = $(CROSS_CXXFLAGS)
 # AM_CPPFLAGS
 AM_CPPFLAGS = \
         -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/libcore  \
+        -I$(top_srcdir)/libdevice \
         -I$(top_srcdir)/testsuite \
-        $(MING_CFLAGS) \
-	$(BOOST_CFLAGS) \
-	$(PTHREAD_CFLAGS) \
 	$(DEJAGNU_CFLAGS) \
 	$(NULL)
 
@@ -57,62 +50,70 @@ CLEANFILES = \
 	NoSeekFileTestCache \
 	$(NULL)
 
-check_PROGRAMS = \
-	NoSeekFileTest \
-	URLTest \
-	RcTest \
-	IntTypesTest \
-	Point2dTest \
-	snappingrangetest \
-	Range2dTest \
-	string_tableTest \
+check_PROGRAMS = 
+
+if BUILD_EGL_DEVICE
+# this tests the low level EGL interface, used by OpenVG, OpenGLES1, and OpenGLES2.
+check_PROGRAMS += test_egl 
+
+test_egl_SOURCES = test_egl.cpp
+test_egl_CPPFLAGS = $(AM_CPPFLAGS) $(EGL_CFLAGS) -I$(top_srcdir)/libdevice/egl
+test_egl_LDADD = \
+	../../libdevice/libgnashdevice.la \
+	../../libbase/libgnashbase.la \
+	$(EXTRA_EGL_LIBS) \
+	$(EGL_LIBS) \
+	$(BOOST_LIBS) \
 	$(NULL)
+endif
 
-#if CURL
-## This test needs an http server running to be useful
-#check_PROGRAMS += CurlStreamTest
-#CurlStreamTest_SOURCES = CurlStreamTest.cpp
-#CurlStreamTest_CPPFLAGS = '-DINPUT="$(srcdir)/CurlStreamTest.cpp"'
-#endif
+# if BUILD_X11_DEVICE
+# check_PROGRAMS += test_x11
+# endif
 
-NoSeekFileTest_SOURCES = NoSeekFileTest.cpp
-NoSeekFileTest_CPPFLAGS = $(AM_CPPFLAGS) \
-	'-DINPUT="$(srcdir)/NoSeekFileTest.cpp"'
-NoSeekFileTest_LDADD = $(LDADD)
+if BUILD_DIRECTFB_DEVICE
+check_PROGRAMS += test_directfb
+endif
 
-URLTest_SOURCES = URLTest.cpp
-URLTest_CPPFLAGS =  $(AM_CPPFLAGS) \
-	'-DBUILDDIR="$(abs_builddir)"'
-URLTest_LDADD = $(LDADD)
+if ENABLE_INPUT_EVENTS
+check_PROGRAMS += test_events
 
-RcTest_SOURCES = RcTest.cpp
-RcTest_CPPFLAGS =  $(AM_CPPFLAGS) \
-	-DSRCDIR="$(srcdir)"
-RcTest_LDADD = $(LDADD)
+test_events_SOURCES = test_events.cpp
+test_events_CPPFLAGS = $(AM_CPPFLAGS) \
+	-I$(top_srcdir)/libdevice/events \
+	-I$(top_srcdir)/libcore
+test_events_LDADD = \
+	../../libdevice/libgnashdevice.la \
+	../../libbase/libgnashbase.la \
+        $(EXTRA_EVENTS_LIBS) \
+        $(TS_LIBS) \
+        $(CURL_LIBS) \
+        $(EVENTS_LIBS) \
+        $(NULL)
+endif
 
-IntTypesTest_SOURCES = IntTypesTest.cpp
-IntTypesTest_CPPFLAGS =  $(AM_CPPFLAGS) \
-	-DSRCDIR="$(srcdir)"
-IntTypesTest_LDADD = $(LDADD)
+if BUILD_RAWFB_DEVICE
+check_PROGRAMS += test_rawfb
 
-# Test the Memory class
-#memtest_SOURCES = memtest.cpp
+# this tests the low level EGL interface, used by OpenVG, OpenGLES1,
+# and OpenGLES2.
+test_rawfb_SOURCES = test_rawfb.cpp
+test_rawfb_CPPFLAGS = $(AM_CPPFLAGS) \
+	 -I$(top_srcdir)/libbase \
+	 -I$(top_srcdir)/libdevice/rawfb
+test_rawfb_LDADD = \
+	../../libdevice/libgnashdevice.la \
+	../../libbase/libgnashbase.la \
+	$(NULL)
+endif
 
-Point2dTest_SOURCES = Point2dTest.cpp
-Point2dTest_LDADD = $(LDADD)
+if BUILD_VAAPI_DEVICE
+check_PROGRAMS += test_vaapi
+endif
 
-Range2dTest_SOURCES = Range2dTest.cpp
-Range2dTest_LDADD = $(LDADD)
-
-snappingrangetest_SOURCES = snappingrangetest.cpp
-snappingrangetest_LDADD= $(LDADD)
-
-string_tableTest_SOURCES = string_tableTest.cpp
-string_tableTest_CPPFLAGS =  $(AM_CPPFLAGS) \
-	-DSRCDIR="$(srcdir)"
-string_tableTest_LDFLAGS = $(BOOST_LIBS)
-string_tableTest_LDADD = $(LDADD)
-
+#
+# Testing stuff
+#
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
         $(check_PROGRAMS) \

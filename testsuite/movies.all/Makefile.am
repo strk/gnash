@@ -53,6 +53,10 @@ AM_LDFLAGS = \
 	$(OPENGL_LIBS) \
 	$(NULL)
 
+if ANDROID
+AM_LDFLAGS +=  -lui -llog
+endif	# ANDROID
+
 gravity_embedded_TestRunner_SOURCES = \
 	gravity_embedded-TestRunner.cpp \
 	$(NULL)
@@ -62,6 +66,7 @@ gravity_embedded_TestRunner_LDADD = \
 	$(NULL)
 gravity_embedded_TestRunner_CXXFLAGS = \
 	-DSRCDIR='"$(srcdir)"' \
+	$(CROSS_CXXFLAGS) \
 	$(NULL)
 gravity_embedded_TestRunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
@@ -78,6 +83,7 @@ tic_tac2_TestRunner_LDADD = \
 	$(NULL)
 tic_tac2_TestRunner_CXXFLAGS = \
 	-DSRCDIR='"$(srcdir)"' \
+	$(CROSS_CXXFLAGS) \
 	$(NULL)
 tic_tac2_TestRunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \

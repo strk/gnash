@@ -38,6 +38,8 @@ void
 SoundStreamHeadTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunResources& r)
 {
+#ifdef USE_SOUND
+    
     // 18 || 45
     assert(tag == SWF::SOUNDSTREAMHEAD || tag == SWF::SOUNDSTREAMHEAD2);
 
@@ -157,6 +159,7 @@ SoundStreamHeadTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     const int handler_id = handler->createStreamingSound(sinfo);
 
     m.set_loading_sound_stream_id(handler_id);
+#endif  // USE_SOUND
 }
 
 } // namespace SWF

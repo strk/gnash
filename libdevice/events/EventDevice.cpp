@@ -524,7 +524,7 @@ EventDevice::check()
                 activity = true;
                 break;
             case MSC_MAX:
-            case MSC_CNT:
+//            case MSC_CNT:
             default:
                 log_unimpl(_("Misc event from Input Event Device"));
           }

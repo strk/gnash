@@ -33,7 +33,10 @@ sdl_gnash_LDFLAGS = -export-dynamic
 sdl_gnash_LDADD = \
 	$(GNASH_LIBS) \
 	$(AM_LDFLAGS) \
-	$(SDL_LIBS)
+	$(SDL_LIBS) \
+	$(INTLLIBS) \
+	$(BOOST_LIBS) \
+	$(NULL)
 
 if BUILD_OGL_RENDERER
 sdl_gnash_CPPFLAGS += $(OPENGL_CFLAGS)

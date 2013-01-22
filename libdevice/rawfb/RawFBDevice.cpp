@@ -77,6 +77,7 @@ void
 RawFBDevice::clear()
 {
     GNASH_REPORT_FUNCTION;
+    
     if (_fbmem) {
         memset(_fbmem, 0, _fixinfo.smem_len);
     }
@@ -124,7 +125,11 @@ RawFBDevice::initDevice(int /* argc */, char **/* argv[] */)
         // lets us redefine this at runtime.
         devname = getenv("FAKE_FRAMEBUFFER");
         if (!devname) {
+#ifdef __ANDROID__
+            devname = "/dev/graphics/fb0";
+#else
             devname = "/dev/fb0";
+#endif
         }
     }
     _fd = open(devname, O_RDWR);
@@ -144,13 +149,18 @@ RawFBDevice::initDevice(int /* argc */, char **/* argv[] */)
     ioctl(_fd, FBIOGET_VSCREENINFO, &_varinfo);
     ioctl(_fd, FBIOGET_FSCREENINFO, &_fixinfo);
 #endif
-    log_debug(_("Framebuffer device uses %d bytes of memory."),
-              _fixinfo.smem_len);
-    log_debug(_("Video mode: %dx%d with %d bits per pixel."),
-              _varinfo.xres, _varinfo.yres,
-              _varinfo.bits_per_pixel);
 
-    log_debug(_("Framebuffer stride is: %d."),  _fixinfo.line_length);    
+    // dump();
+    
+    log_debug("Framebuffer device uses %d bytes of memory.",
+               _fixinfo.smem_len);
+    log_debug("Video mode: %dx%d with %d bits per pixel. (Virtual: %dx%d)",
+              _varinfo.xres, _varinfo.yres,
+              _varinfo.bits_per_pixel,
+              _varinfo.xres_virtual, _varinfo.yres_virtual
+        );
+
+    log_debug("Framebuffer stride is: %d.",  _fixinfo.line_length);
 
     return true;
 }
@@ -267,6 +277,27 @@ void
 RawFBDevice::eventLoop(size_t /* passes */)
 {
     GNASH_REPORT_FUNCTION;    
+}
+
+void
+RawFBDevice::dump()
+{
+    // dump the fb_var_screeninfo data
+    std::cerr << "X res visible  = " << _varinfo.xres << std::endl;
+    std::cerr << "Y res visible  = " << _varinfo.yres << std::endl;
+    std::cerr << "X res virtual  = " << _varinfo.xres_virtual << std::endl;
+    std::cerr << "Y res virtual  = " << _varinfo.yres_virtual << std::endl;
+    std::cerr << "X offset       = " << _varinfo.xoffset << std::endl;
+    std::cerr << "Y offset       = " << _varinfo.yoffset << std::endl;
+    std::cerr << "bits per pixel = " << _varinfo.bits_per_pixel << std::endl;
+
+    // dump the fb_fix_screeninfo data    
+    std::cerr << "Screen Memory = " << _fixinfo.smem_len << std::endl;
+    std::cerr << "Screen Type   = " << _fixinfo.type << std::endl;
+    std::cerr << "X Pan step    = " << _fixinfo.xpanstep << std::endl;
+    std::cerr << "Y Pan step    = " << _fixinfo.ypanstep << std::endl;
+    std::cerr << "Y wrap step   = " << _fixinfo.ywrapstep << std::endl;
+    std::cerr << "line length   = " << _fixinfo.line_length << std::endl;
 }
 
 #ifdef ENABLE_FAKE_FRAMEBUFFER

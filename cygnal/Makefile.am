@@ -51,8 +51,6 @@ AM_LDFLAGS = \
 	libamf/libgnashamf.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libcore/libgnashcore.la \
-	$(top_builddir)/libmedia/libgnashmedia.la \
-	$(top_builddir)/libsound/libgnashsound.la \
 	$(top_builddir)/librender/libgnashrender.la \
 	$(GLIB_LIBS) \
 	$(LIBINTL) \
@@ -60,6 +58,13 @@ AM_LDFLAGS = \
 	$(BOOST_LIBS) \
 	$(BOOST_CYGNAL_LIBS) \
 	$(NULL)
+
+if BUILD_LIBMEDIA
+AM_LDFLAGS += $(top_builddir)/libmedia/libgnashmedia.la
+endif
+if BUILD_LIBSOUND
+AM_LDFLAGS += $(top_builddir)/libsound/libgnashsound.la
+endif
 
 localedir = $(datadir)/locale
 

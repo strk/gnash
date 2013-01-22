@@ -1826,7 +1826,7 @@ RETURN:
 	if (pfd != -1)
 		pagefile_close(pfd);
 #endif
-	return (false);
+	return (ret);
 }
 
 static bool
@@ -2275,7 +2275,7 @@ pages_map_align(size_t size, int pfd, size_t alignment)
 	aligned_ret &= ~(alignment - 1);
 	extra_size = aligned_ret - (uintptr_t)ret;
 	munmap(ret, extra_size);
-	munmap(ret + extra_size + size, alignment - extra_size);
+	munmap((char *)ret + extra_size + size, alignment - extra_size);
 	ret = (void*)aligned_ret;
 #endif /* ifdef MOZ_MEMORY_SOLARIS*/
 	return (ret);

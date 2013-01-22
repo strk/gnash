@@ -165,6 +165,13 @@ main(int argc, char *argv[])
 
     boost::uint8_t *fbp = 0;
     fbp = rfb.getFBMemory();
+
+    if (fbp > 0) {
+        runtest.pass("RawFBDevice::getFBMemory()");
+    } else {
+        runtest.fail("RawFBDevice::getFBMemory()");
+        exit;
+    }
     
     for(y=100; y<102; y++);            /* Where we are going to put the pixel */
     

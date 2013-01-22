@@ -167,10 +167,6 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	-I$(top_srcdir)/librender \
 	$(NULL)
 
-if ANDROID
-libgnashbase_la_CPPFLAGS += $(ANDROID_NDK)/usr/include
-endif
-
 libgnashbase_la_LIBADD = \
 	$(JPEG_LIBS) \
 	$(PNG_LIBS) \
@@ -180,9 +176,15 @@ libgnashbase_la_LIBADD = \
 	$(LIBINTL) \
 	$(BOOST_LIBS) \
 	$(OPENGL_LIBS) \
+	$(OPENVG_LIBS) \
+	$(EGL_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(LTDL_LIBS) \
 	$(NULL)
+
+if ANDROID
+libgnashbase_la_LIBADD += -lui -llog
+endif	# ANDROID
 
 if HAIKU
   libgnashbase_la_LIBADD += $(HAIKU_LIBS)
@@ -278,8 +280,11 @@ if WIN32
   libgnashbase_la_LIBADD += -lws2_32 -lwinmm
 endif
 
+AM_CXXFLAGS = $(CROSS_CXXFLAGS)
+AM_LDFLAGS = $(CROSS_LDFLAGS)
+
 if ENABLE_PCH
-AM_CXXFLAGS = $(PCH_FLAGS)
+AM_CXXFLAGS += $(PCH_FLAGS)
 endif
 
 edit = sed \

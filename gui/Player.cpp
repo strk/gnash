@@ -427,8 +427,10 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // Set the Renderer resource, opengl, openvg, agg, or cairo
     _runResources->setRenderBackend(_renderer);
 
+#ifdef USE_MEDIA
     _mediaHandler.reset(media::MediaFactory::instance().get(_media));
-
+#endif
+    
     if (!_media.empty() && !_mediaHandler.get()) {
         boost::format fmt =
             boost::format(_("Non-existent media handler %1% specified"))
@@ -542,7 +544,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
 
     if (! _delay) {
         float fps = _movieDef->get_frame_rate();
-        log_debug(_("Movie Frame Rate is %d, adjusting delay"), fps);
+        // log_debug("Movie Frame Rate is %g, adjusting delay", fps);
         // FIXME: this value is arbitrary, and will make any movie with
         // less than 12 frames eat up more of the cpu. It should probably
         // be a much lower value, like 2.

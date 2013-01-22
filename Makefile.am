@@ -24,6 +24,9 @@ AUTOMAKE_OPTIONS = 1.6.0 -Wno-portability
 ACLOCAL_AMFLAGS = -I macros -I cygnal
 noinst_SCRIPT = autogen.sh
 
+CXXFLAGS += $(CROSS_CXXFLAGS)
+LDFLAGS += $(CROSS_LDFLAGS)
+
 ##
 ## Any custom ./configure switch we want to be
 ## given at 'make distcheck' time should go here
@@ -70,12 +73,20 @@ if BUILD_EXTENSIONS
 EXT_DIR = extensions
 endif
 
+if BUILD_LIBSOUND
+SOUND_DIR = libsound
+endif
+
+if BUILD_LIBMEDIA
+MEDIA_DIR = libmedia
+endif
+
 SUBDIRS = \
 	desktop \
 	$(DEVICES_DIR) \
 	libbase \
-	libmedia \
-	libsound \
+	$(MEDIA_DIR) \
+	$(SOUND_DIR) \
 	libcore \
 	librender \
 	gui \
@@ -218,6 +229,7 @@ dumpconfig:
 	@uname -a
 	$(CXX) -v
 	@echo "CXXFLAGS: $(CXXFLAGS)"
+	@echo "LDFLAGS: $(LDFLAGS)"
 	@echo ""
 	@echo "Image decoding support..."
 	@echo "	JPEG_CFLAGS is $(JPEG_CFLAGS)"
@@ -520,6 +532,6 @@ package:
 
 packageclean:
 	-test -z "$(CLEANFILES)" || rm -rf $(CLEANFILES)
- 
+
 # these files are created when building packages
 CLEANFILES += *.deb *.dsc *.gz *.bz2 *.changes deb-copy-stamp gnash*git* gnash-* rpmbuild gnash.spec .rpmmacros
