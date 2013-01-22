@@ -54,6 +54,7 @@ qt4_gnash_LDFLAGS = -export-dynamic
 qt4_gnash_LDADD = \
 	$(GNASH_LIBS) \
 	$(AM_LDFLAGS) \
+    $(BOOST_LIBS) \
 	$(X11_LIBS) \
 	$(NULL)
 
