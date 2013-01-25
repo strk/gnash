@@ -75,6 +75,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
 
   AC_MSG_CHECKING([for boost header])
   for i in $newlist; do
+    gnash_boost_topdir=/usr/include/boost
     dirs="`ls -dr $i/boost* 2>/dev/null | xargs`"
     for u in ${dirs}; do
     	if test -n "$u" -a -d "$u" -a x"$u" != x"/usr/include/boost"; then
@@ -107,7 +108,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   dnl when a Boost library was added at:
   dnl http://www.boost.org/doc/libs/?sort=boost-version
 
-  gnash_boost_version=`grep "define.*BOOST_VERSION " ${gnash_boost_topdir}/boost/version.hpp | cut -d ' ' -f 3`
+  gnash_boost_version=`grep "define.*BOOST_VERSION " ${gnash_boost_topdir}/version.hpp | cut -d ' ' -f 3`
   if test ${gnash_boost_version} -ge 104700; then
     boost_libs="${boost_libs} chrono"
   fi
