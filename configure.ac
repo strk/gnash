@@ -2837,7 +2837,7 @@ AC_DEFUN([CHECK_VISIBILITY_GCC_BUG],
         AC_LANG_PUSH(C++)
         save_CXXFLAGS=$CXXFLAGS
         save_LDFLAGS=$LDFLAGS
-        CFLAGS="-fPIC -fvisibility-inlines-hidden -O0"
+        CFLAGS="-fPIC -O0"
         CXXFLAGS="-fPIC -fvisibility-inlines-hidden -O0"
         LDFLAGS="$LDFLAGS -shared -fPIC"
 
