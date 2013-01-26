@@ -71,14 +71,75 @@ function handleDisconnect() {
     checkResults();
 };                                     
 
-myXML = new XMLSocket;
-myXML.onConnect = handleConnect;
-myXML.onData = handleData;
-myXML.onClose = handleDisconnect;
-receivedArray = new Array();
+function test1()
+{
+  trace("-- RUNNING TEST1 --");
+  myXML = new XMLSocket;
+  myXML.onConnect = handleConnect;
+  myXML.onData = handleData;
+  myXML.onClose = handleDisconnect;
+  receivedArray = new Array();
 
-ret = myXML.connect("localhost.localdomain", 2229);
-check_equals(ret, true);
+  ret = myXML.connect("localhost.localdomain", 2229);
+  check_equals(ret, true);
+}
+
+// Check that XMLSocket can be instanciated from subclass
+// See https://savannah.gnu.org/bugs/?38084
+function test2()
+{
+  trace("-- RUNNING TEST2 --");
+  receivedArray = new Array();
+
+  SC1 = function() { };
+  SC1.name = 'SC1 ctor';
+  SC1.prototype = new XMLSocket();
+
+  // None of these get called
+  SC1.prototype.onConnect = function() { fail("SC1 prototype onConnect called"); };
+  SC1.prototype.onData = function() { fail("SC1 prototype onData called"); };
+  SC1.prototype.onClose = function() { fail("SC1 prototype onClose called"); };
+
+  //trace("SC1.constructor is: " + SC1.constructor);
+  //trace("SC1.constructor.name is: " + SC1.constructor.name);
+  //trace("SC1.__constructor__ is: " + SC1.__constructor__);
+  
+  SC2 = function() { };
+  SC2.prototype = new SC1();
+
+  // None of these get called
+  SC2.prototype.onConnect = function() { fail("SC2 prototype onConnect called"); };
+  SC2.prototype.onData = function() { fail("SC2 prototype onData called"); };
+  SC2.prototype.onClose = function() { fail("SC2 prototype onClose called"); };
+  
+  
+  trace('About to instanciate an SC2 now');
+  o = new SC2();
+  o.onConnect = function() { fail("instance onConnect called"); };
+  o.onData = function() { fail("instance onData called"); };
+  o.onClose = function() { fail("instance onClose called"); };
+
+  ret = o.connect("localhost.localdomain", 2229);
+  xcheck_equals(ret, true);
+  nextTest();
+}
+
+currtest = 0;
+tests = new Array();
+tests.push(test1);
+tests.push(test2);
+
+function nextTest()
+{
+  if ( tests.length > currtest ) {
+    tests[currtest++]();
+  } else {
+    trace("ENDOFTEST");
+    loadMovie ("FSCommand:quit", "");
+  }
+}
+
+nextTest();
 stop();
 
 
@@ -96,15 +157,13 @@ function checkResults() {
     check_equals(receivedArray[9], expectedArray[9]);
     check_equals(receivedArray[10], expectedArray[10]);    
     check_equals(receivedArray[11], expectedArray[11]); 
+    // NOTE: this ('undefined') fails with LNX 10,0,12,10
     check_equals(receivedArray[12], expectedArray[12]); 
     check_equals(receivedArray[13], expectedArray[13]);         
     check_equals(receivedArray[14], expectedArray[14]);
     check_equals(receivedArray[15].length, 15000);         
     check_equals(receivedArray[15].charAt(0), 'a');         
     check_equals(receivedArray[16], expectedArray[16]);
-
-    trace("ENDOFTEST");
-
-    loadMovie ("FSCommand:quit", "");
+    nextTest();
 };
     
