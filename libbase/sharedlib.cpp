@@ -101,7 +101,7 @@ SharedLib::openLib (const std::string& filespec)
     _dlhandle = lt_dlopenext (filespec.c_str());
     
     if (_dlhandle == NULL) {
-        log_error("%s", lt_dlerror());
+        log_error("lt_dlopenext(\"%s\") failed: %s", filespec.c_str(), lt_dlerror());
         return false;
     }
 
