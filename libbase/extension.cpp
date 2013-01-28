@@ -152,7 +152,7 @@ bool
 Extension::initModuleWithFunc(const std::string& module,
         const std::string& func, as_object &obj)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     SharedLib *sl;
 
@@ -188,7 +188,7 @@ Extension::scanDir()
 bool
 Extension::scanDir(const std::string& dirlist)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     Tok t(dirlist, Sep(":"));
     for (Tok::iterator i = t.begin(), e = t.end(); i != e; ++i) {
@@ -241,7 +241,7 @@ Extension::scanDir(const std::string& dirlist)
 void
 Extension::dumpModules()
 {
-    GNASH_REPORT_FUNCTION;
+//   GNASH_REPORT_FUNCTION;
     
     std::cerr << _modules.size() << " plugin(s) for Gnash installed" << std::endl;    
     std::vector<std::string>::iterator it;
