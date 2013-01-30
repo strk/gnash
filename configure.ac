@@ -2882,6 +2882,7 @@ AC_ARG_ENABLE([harden],
 
 if test x"$harden" = x"yes" -a x"${host_cpu}" != mips; then
     CPPFLAGS="${CPPFLAGS} -D_FORTIFY_SOURCE=2"
+    CFLAGS="${CFLAGS} -fPIE -fstack-protector --param ssp-buffer-size=4 -Wformat -Werror=format-security"
     CXXFLAGS="${CXXFLAGS} -fPIE -fstack-protector --param ssp-buffer-size=4 -Wformat -Werror=format-security"
     LDFLAGS="${LDFLAGS} -fPIE -pie -Wl,-z,relro -Wl,-z,now"
 fi
