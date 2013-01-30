@@ -74,7 +74,7 @@ public:
 
 VaapiSurfaceImpl::~VaapiSurfaceImpl()
 {
-    log_debug(_("VaapiSurface::~VaapiSurface(): surface 0x%08x\n", surface()));
+    log_debug(_("VaapiSurface::~VaapiSurface(): surface 0x%08x\n"), surface());
 
     if (surface() == VA_INVALID_SURFACE) {
         return;
