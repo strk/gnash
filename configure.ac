@@ -2835,6 +2835,7 @@ AC_DEFUN([CHECK_VISIBILITY_GCC_BUG],
   [
     AC_CACHE_CHECK([if -fvisibility-inlines-hidden is broken], ac_cv_gcc_visibility_bug, [
         AC_LANG_PUSH(C++)
+        save_CFLAGS=$CFLAGS
         save_CXXFLAGS=$CXXFLAGS
         save_LDFLAGS=$LDFLAGS
         CFLAGS="-fPIC -O0"
@@ -2861,6 +2862,7 @@ AC_DEFUN([CHECK_VISIBILITY_GCC_BUG],
         ], [],
         ac_cv_gcc_visibility_bug=no, ac_cv_gcc_visibility_bug=yes)
 
+        CFLAGS=$save_CFLAGS
         CXXFLAGS=$save_CXXFLAGS
         LDFLAGS=$save_LDFLAGS
         AC_LANG_POP(C++)
