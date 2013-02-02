@@ -1680,6 +1680,17 @@ ret = "" + t.sort();
 check_equals(rescount, 0);
 check_equals(ret, "");
 
+// Check for correct array prototype inheritance
+// (see http://savannah.gnu.org/bugs/?38084)
+
+function X() { trace('X ctor'); }
+X.prototype = new Array();
+trace("creating new object");
+o = new X();
+o.push("Array data");
+ret = o.pop();
+xcheck_equals(ret, "Array data");
+
 #if OUTPUT_VERSION > 5
 
 Empty = function() {};
@@ -1783,13 +1794,12 @@ check_equals(ar.__proto__, "string");
 // ASnative(252, 12) - [Array.prototype] sortOn 
 //
 
-
 #if OUTPUT_VERSION < 6
- check_totals(549);
+ check_totals(550);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(633);
+  check_totals(634);
 # else
-  check_totals(643);
+  check_totals(644);
 # endif
 #endif
