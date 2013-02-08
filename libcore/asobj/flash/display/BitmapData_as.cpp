@@ -1099,7 +1099,11 @@ bitmapdata_draw(const fn_call& fn)
         }
     }
 
+    SWFMatrix oldM = mc->transform().matrix;
+    mc->setMatrix(t.matrix, true);
     ptr->draw(*mc, t);
+    mc->setMatrix(oldM, true);
+
     return as_value();
 }
 

@@ -535,7 +535,7 @@ check(near(bm, 5, 5, 0xffffff));
 check(near(bm, 5, 15, 0xffffff));
 check(near(bm, 5, 25, 0xffffff));
 check(near(bm, 15, 5, 0xffffff));
-xcheck(near(bm, 15, 15, 0x00ff00));
+check(near(bm, 15, 15, 0x00ff00));
 check(near(bm, 15, 25, 0xffffff));
 check(near(bm, 25, 5, 0xffffff));
 check(near(bm, 25, 15, 0xffffff));
@@ -556,7 +556,7 @@ check(near(bm, 15, 5, 0xffffff));
 check(near(bm, 15, 15, 0xffffff));
 check(near(bm, 15, 25, 0xffffff));
 check(near(bm, 25, 5, 0xffffff));
-xcheck(near(bm, 25, 15, 0x0000ff));
+check(near(bm, 25, 15, 0x0000ff));
 check(near(bm, 25, 25, 0xffffff));
 
 bm = new flash.display.BitmapData(50, 50, false);
@@ -570,7 +570,7 @@ check(near(bm, 15, 5, 0xffffff));
 check(near(bm, 15, 15, 0xffffff));
 check(near(bm, 15, 25, 0xffffff));
 check(near(bm, 25, 5, 0xffffff));
-xcheck(near(bm, 23, 15, 0x00ff00));
+check(near(bm, 23, 15, 0x00ff00));
 xcheck(near(bm, 25, 15, 0x0000ff));
 check(near(bm, 25, 25, 0xffffff));
 
