@@ -541,8 +541,6 @@ check(near(bm, 25, 5, 0xffffff));
 check(near(bm, 25, 15, 0xffffff));
 check(near(bm, 25, 25, 0xffffff));
 
-disp.attachBitmap(bm, 400);
-
 // Mask with different transform, MovieClip with different transform
 mask._x = 10;
 bm = new flash.display.BitmapData(50, 50, false);
@@ -562,7 +560,7 @@ check(near(bm, 25, 25, 0xffffff));
 bm = new flash.display.BitmapData(50, 50, false);
 bm.draw(mc, new flash.geom.Matrix(1, 0, 0, 1, 5, 5));
 
-// A bit of the blue and green blue stripe is visible.
+// A bit of the green and blue stripe is visible.
 check(near(bm, 5, 5, 0xffffff));
 check(near(bm, 5, 15, 0xffffff));
 check(near(bm, 5, 25, 0xffffff));
@@ -571,8 +569,29 @@ check(near(bm, 15, 15, 0xffffff));
 check(near(bm, 15, 25, 0xffffff));
 check(near(bm, 25, 5, 0xffffff));
 check(near(bm, 23, 15, 0x00ff00));
-xcheck(near(bm, 25, 15, 0x0000ff));
+check(near(bm, 24, 15, 0x00ff00));
+xcheck(near(bm, 25, 15, 0x0000ff)); // gnash: 0x0b0bfe
+check(near(bm, 26, 15, 0x0000ff));
 check(near(bm, 25, 25, 0xffffff));
+
+bm = new flash.display.BitmapData(50, 50, false);
+bm.draw(mc, new flash.geom.Matrix(2, 0, 0, 2, 5, 5));
+
+// A bit of the red and green stripe is visible.
+check(near(bm, 5, 5, 0xffffff));
+check(near(bm, 5, 15, 0xffffff));
+check(near(bm, 5, 25, 0xffffff));
+check(near(bm, 15, 5, 0xffffff));
+check(near(bm, 15, 15, 0xffffff));
+check(near(bm, 15, 25, 0xffffff));
+check(near(bm, 25, 5, 0xffffff));
+check(near(bm, 23, 15, 0xff0000));
+check(near(bm, 24, 15, 0xff0000));
+xcheck(near(bm, 25, 15, 0x00ff00)); // gnash: 0x0bfe0b
+check(near(bm, 26, 15, 0x00ff00));
+check(near(bm, 25, 25, 0xffffff));
+
+disp.attachBitmap(bm, 400);
 
 bm = new flash.display.BitmapData(10, 10, true, 0x5010eeff);
 xcheck_equals(bm.getPixel32(5, 5), 0x5010efff);
@@ -1127,6 +1146,6 @@ flash.display.BitmapData.prototype = e;
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(392);
+totals(406);
 
 #endif // OUTPUT_VERSION >= 8
