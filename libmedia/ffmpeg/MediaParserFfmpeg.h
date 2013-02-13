@@ -154,7 +154,7 @@ private:
 	AVStream* _audioStream;
 
 	/// ?
-        AVIOContext* _avIOCxt;
+	ByteIOContext _byteIOCxt;
 
 	/// Size of the ByteIO context buffer
 	//
@@ -172,7 +172,7 @@ private:
 	//
 	/// TODO: move somewhere in ffmpeg utils..
 	///
-	boost::uint16_t SampleFormatToSampleSize(AVSampleFormat fmt);
+	boost::uint16_t SampleFormatToSampleSize(SampleFormat fmt);
 
 	/// Make an EncodedVideoFrame from an AVPacket and push to buffer
 	//
