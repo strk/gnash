@@ -73,7 +73,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
         for i in "" ffmpeg libavcodec ffmpeg/libavcodec; do
           if test -f ${ffmpeg_top_incl}/${i}/avcodec.h; then
             ac_cv_path_ffmpeg_incl="-I`(cd ${ffmpeg_top_incl}; pwd)`"
-            if test -f ${ffmpeg_top_incl}/${i}/version.h && $EGREP LIBAVCODEC_VERSION ${ffmpeg_top_incl}/${i}/version.h 2>/dev/null; then
+            if test -f ${ffmpeg_top_incl}/${i}/version.h && $EGREP LIBAVCODEC_VERSION ${ffmpeg_top_incl}/${i}/version.h >/dev/null; then
               avcodec_h="${ffmpeg_top_incl}/${i}/version.h"
             else
               avcodec_h="${ffmpeg_top_incl}/${i}/avcodec.h"
@@ -97,7 +97,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
       for i in ffmpeg libavcodec ffmpeg/libavcodec; do
         if test -f ${ffmpeg_top_incl}/${i}/avcodec.h; then
           ac_cv_path_ffmpeg_incl="-I`(cd ${ffmpeg_top_incl}/${i}; pwd)`"
-          if test -f ${ffmpeg_top_incl}/${i}/version.h && $EGREP LIBAVCODEC_VERSION ${ffmpeg_top_incl}/${i}/version.h 2>/dev/null; then
+          if test -f ${ffmpeg_top_incl}/${i}/version.h && $EGREP LIBAVCODEC_VERSION ${ffmpeg_top_incl}/${i}/version.h >/dev/null; then
             avcodec_h=${ffmpeg_top_incl}/${i}/version.h
           else
             avcodec_h=${ffmpeg_top_incl}/${i}/avcodec.h
