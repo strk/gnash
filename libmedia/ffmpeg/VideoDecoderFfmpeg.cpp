@@ -171,7 +171,10 @@ VideoDecoderFfmpeg::init(enum CodecID codecId, int /*width*/, int /*height*/,
         boost::uint8_t* extradata, int extradataSize)
 {
     // Init the avdecoder-decoder
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(52,6,2)
+    // Starting from this version avcodec_register calls avcodec_init
     avcodec_init();
+#endif
     avcodec_register_all();// change this to only register need codec?
 
     _videoCodec = avcodec_find_decoder(codecId); 
@@ -529,7 +532,11 @@ get_buffer(AVCodecContext* avctx, AVFrame* pic)
 
     static unsigned int pic_num = 0;
     pic->type = FF_BUFFER_TYPE_USER;
+#if LIBAVCODEC_VERSION_MAJOR < 54
+    // This field has been unused for longer but has been removed with
+    // libavcodec 54.
     pic->age  = ++pic_num - surface->getPicNum();
+#endif
     surface->setPicNum(pic_num);
     return 0;
 #endif

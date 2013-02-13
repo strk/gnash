@@ -154,7 +154,13 @@ private:
 	AVStream* _audioStream;
 
 	/// ?
-	ByteIOContext _byteIOCxt;
+#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(52,107,0)
+// AVIOContext was introduced a bit earlier but without version bump, so let's
+// be safe
+        ByteIOContext _byteIOCxt;
+#else
+        AVIOContext* _avIOCxt;
+#endif
 
 	/// Size of the ByteIO context buffer
 	//
@@ -172,7 +178,7 @@ private:
 	//
 	/// TODO: move somewhere in ffmpeg utils..
 	///
-	boost::uint16_t SampleFormatToSampleSize(SampleFormat fmt);
+	boost::uint16_t SampleFormatToSampleSize(AVSampleFormat fmt);
 
 	/// Make an EncodedVideoFrame from an AVPacket and push to buffer
 	//
