@@ -344,8 +344,6 @@ MediaParserFfmpeg::initializeParser()
 {
     av_register_all(); // TODO: needs to be invoked only once ?
 
-    _byteIOCxt.buffer = NULL;
-    
     _inputFmt = probeStream();
 
 #ifdef GNASH_ALLOW_VCODEC_ENV	
@@ -366,7 +364,7 @@ MediaParserFfmpeg::initializeParser()
     // which isn't needed.
     _byteIOBuffer.reset(new unsigned char[byteIOBufferSize]);
 
-    init_put_byte(&_byteIOCxt,
+    _avIOCxt = avio_alloc_context(
 		  _byteIOBuffer.get(), // buffer
 		  byteIOBufferSize, // buffer size
 		  0, // write flags
@@ -376,7 +374,7 @@ MediaParserFfmpeg::initializeParser()
 		  MediaParserFfmpeg::seekMediaWrapper // seeker callback
 		  );
     
-    _byteIOCxt.is_streamed = 1;
+    _avIOCxt->seekable = 0;
 
 #if !defined(LIBAVCODEC_VERSION_MAJOR) || LIBAVCODEC_VERSION_MAJOR < 52
     // Needed for Lenny.
@@ -386,13 +384,9 @@ MediaParserFfmpeg::initializeParser()
 #endif
 
     assert(_formatCtx);
+    _formatCtx->pb = _avIOCxt;
 
-    // Otherwise av_open_input_stream will reallocate the context.
-    AVFormatParameters ap;
-    std::memset(&ap, 0, sizeof ap);
-    ap.prealloced_context = 1;
-
-    if (av_open_input_stream(&_formatCtx, &_byteIOCxt, "", _inputFmt, &ap) < 0)
+    if (avformat_open_input(&_formatCtx, "", _inputFmt, NULL) < 0)
     {
         throw IOException("MediaParserFfmpeg couldn't open input stream");
     }
@@ -400,10 +394,10 @@ MediaParserFfmpeg::initializeParser()
 #if defined(LIBAVCODEC_VERSION_MAJOR) && LIBAVCODEC_VERSION_MAJOR >= 52
     // Note: in at least some versions of ffmpeg, av_open_input_stream does
     // not parse metadata; not sure why.
-    AVMetadata* md = _formatCtx->metadata;
+    AVDictionary* md = _formatCtx->metadata;
     if (md) {
-        AVMetadataTag* tag = av_metadata_get(md, "album", 0,
-                AV_METADATA_MATCH_CASE);
+        AVDictionaryEntry* tag = av_dict_get(md, "album", 0,
+                AV_DICT_MATCH_CASE);
         if (tag && tag->value) {
             setId3Info(&Id3Info::album, std::string(tag->value),
                     _id3Object);
@@ -620,27 +614,27 @@ MediaParserFfmpeg::seekMedia(boost::int64_t offset, int whence)
 }
 
 boost::uint16_t
-MediaParserFfmpeg::SampleFormatToSampleSize(SampleFormat fmt)
+MediaParserFfmpeg::SampleFormatToSampleSize(AVSampleFormat fmt)
 {
 	switch (fmt)
 	{
-		case SAMPLE_FMT_U8: // unsigned 8 bits
+		case AV_SAMPLE_FMT_U8: // unsigned 8 bits
 			return 1;
 
-		case SAMPLE_FMT_S16: // signed 16 bits
-		case SAMPLE_FMT_FLT: // float
+		case AV_SAMPLE_FMT_S16: // signed 16 bits
+		case AV_SAMPLE_FMT_FLT: // float
 			return 2;
 
 #if !defined (LIBAVCODEC_VERSION_MAJOR) || LIBAVCODEC_VERSION_MAJOR < 52
 // Was dropped for version 52.0.0
-		case SAMPLE_FMT_S24: // signed 24 bits
+		case AV_SAMPLE_FMT_S24: // signed 24 bits
 			return 3;
 #endif
 
-		case SAMPLE_FMT_S32: // signed 32 bits
+		case AV_SAMPLE_FMT_S32: // signed 32 bits
 			return 4;
 
-		case SAMPLE_FMT_NONE:
+		case AV_SAMPLE_FMT_NONE:
 		default:
 			return 8; // arbitrary value
 	}

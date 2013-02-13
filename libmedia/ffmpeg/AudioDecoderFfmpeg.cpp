@@ -84,9 +84,7 @@ AudioDecoderFfmpeg::~AudioDecoderFfmpeg()
 
 void AudioDecoderFfmpeg::setup(SoundInfo& info)
 {
-    // Init the avdecoder-decoder
-    avcodec_init();
-    avcodec_register_all();// change this to only register need codec?
+    avcodec_register_all();// change this to only register need codec? no - it is required for initializing the library
 
     enum CodecID codec_id;
 
@@ -158,14 +156,14 @@ void AudioDecoderFfmpeg::setup(SoundInfo& info)
             case CODEC_ID_PCM_U16LE:
                 _audioCodecCtx->channels = (info.isStereo() ? 2 : 1);
                 _audioCodecCtx->sample_rate = info.getSampleRate();
-                _audioCodecCtx->sample_fmt = SAMPLE_FMT_S16; // ?! arbitrary ?
+                _audioCodecCtx->sample_fmt = AV_SAMPLE_FMT_S16; // ?! arbitrary ?
                 _audioCodecCtx->frame_size = 1; 
                 break;
 
             default:
                 _audioCodecCtx->channels = (info.isStereo() ? 2 : 1);
                 _audioCodecCtx->sample_rate = info.getSampleRate();
-                _audioCodecCtx->sample_fmt = SAMPLE_FMT_S16; // ?! arbitrary ?
+                _audioCodecCtx->sample_fmt = AV_SAMPLE_FMT_S16; // ?! arbitrary ?
                 break;
     }
 }
@@ -173,8 +171,7 @@ void AudioDecoderFfmpeg::setup(SoundInfo& info)
 void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 {
     // Init the avdecoder-decoder
-    avcodec_init();
-    avcodec_register_all();// change this to only register need codec?
+    avcodec_register_all();// change this to only register need codec? no - it is required for initializing the library
 
     enum CodecID codec_id = CODEC_ID_NONE;
 
@@ -297,7 +294,7 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
                 _audioCodecCtx->channels = (info.stereo ? 2 : 1);
                 _audioCodecCtx->sample_rate = info.sampleRate;
                 // was commented out (why?):
-                _audioCodecCtx->sample_fmt = SAMPLE_FMT_S16; 
+                _audioCodecCtx->sample_fmt = AV_SAMPLE_FMT_S16; 
                 break;
     }
 
