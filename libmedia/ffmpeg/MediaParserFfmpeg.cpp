@@ -646,6 +646,9 @@ MediaParserFfmpeg::seekMedia(boost::int64_t offset, int whence)
 boost::uint16_t
 MediaParserFfmpeg::SampleFormatToSampleSize(AVSampleFormat fmt)
 {
+#if LIBAVUTIL_VERSION_INT > AV_VERSION_INT(51,4,0)
+        return av_get_bytes_per_sample(fmt);
+#else
 	switch (fmt)
 	{
 		case AV_SAMPLE_FMT_U8: // unsigned 8 bits
@@ -668,6 +671,7 @@ MediaParserFfmpeg::SampleFormatToSampleSize(AVSampleFormat fmt)
 		default:
 			return 8; // arbitrary value
 	}
+#endif
 }
 
 
