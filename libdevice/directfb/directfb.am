@@ -1,5 +1,6 @@
 # 
-#   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2012,
+#	2013 Free Software Foundation, Inc.
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -21,12 +22,3 @@ libgnashdevice_la_SOURCES += \
 	directfb/DirectFBDevice.cpp \
 	directfb/DirectFBDevice.h
 libgnashdevice_la_LIBADD += $(DIRECTFB_LIBS)
-
-check_PROGRAMS += test_dfb
-test_dfb_SOURCES = directfb/test_dfb.cpp
-test_dfb_CPPFLAGS = $(AM_CPPFLAGS) $(DIRECTFB_CFLAGS)
-test_dfb_LDADD = \
-	libgnashdevice.la \
-	$(TS_LIBS) \
-	$(DIRECTFB_LIBS) \
-	$(GNASH_LIBS)
