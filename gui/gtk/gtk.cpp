@@ -597,7 +597,7 @@ GtkGui::startAdvanceTimer()
             (GSourceFunc)advance_movie, this, NULL);
 
     log_debug(_("Advance interval timer set to %d ms (~ %d FPS)"),
-            _interval, 1000/_interval);
+            _interval, _interval ? 1000 : 1000/_interval);
 }
 
 /*private*/
