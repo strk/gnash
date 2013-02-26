@@ -76,8 +76,16 @@ namespace {
     as_value netstream_receiveAudio(const fn_call& fn);
     as_value netstream_receiveVideo(const fn_call& fn);
     as_value netstream_send(const fn_call& fn);
+    as_value netstream_time(const fn_call& fn);
+    as_value netstream_bytesloaded(const fn_call& fn);
+    as_value netstream_bytestotal(const fn_call& fn);
+    as_value netstream_currentFPS(const fn_call& fn);
+    as_value netstream_bufferLength(const fn_call& fn);
+    as_value netstream_bufferTime(const fn_call& fn);
+    as_value netstream_liveDelay(const fn_call& fn);
 
     void attachNetStreamInterface(as_object& o);
+    void attachPrototypeProperties(as_object& proto);
 
     // TODO: see where this can be done more centrally.
     void executeTag(const SimpleBuffer& _buffer, as_object& thisPtr);
@@ -122,7 +130,7 @@ netstream_class_init(as_object& where, const ObjectURI& uri)
     // NetStream is genuinely a built-in class, but its constructor calls
     // several native functions. It also calls NetConnection.call.
     registerBuiltinClass(where, netstream_new, attachNetStreamInterface,
-            0, uri);
+            attachPrototypeProperties, uri);
 }
 
 void
@@ -1852,8 +1860,14 @@ attachNetStreamInterface(as_object& o)
     o.init_member("receiveVideo", gl.createFunction(netstream_receiveVideo));
     o.init_member("send", vm.getNative(2101, 3));
 
-    // Properties
-    // TODO: attach to each instance rather then to the class ? check it ..
+}
+
+// Function to attach the properties of prototype
+// Attaching to all instances rather than to a class
+// 
+void
+attachPrototypeProperties(as_object& o)
+{
 
     o.init_readonly_property("time", &netstream_time);
     o.init_readonly_property("bytesLoaded", &netstream_bytesloaded);
