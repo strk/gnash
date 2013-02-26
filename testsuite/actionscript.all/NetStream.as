@@ -1,5 +1,6 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2009, 2010 Free Software
+//   Copyright (C) 2005, 2006, 2007, 2009, 2010, 2011, 2012
+//      2013 Free Software
 //   Foundation, Inc
 //
 // This program is free software; you can redistribute it and/or modify
@@ -51,26 +52,26 @@ check_equals ( typeof(netstreamObj), 'object' );
  * when the NetStream connection is established.             *
  *                                                           */
 
-xcheck(! NetStream.prototype.hasOwnProperty('currentFps'));
+check(! NetStream.prototype.hasOwnProperty('currentFps'));
 check(! netstreamObj.hasOwnProperty('currentFps'));
 
-xcheck(! NetStream.prototype.hasOwnProperty('bufferLength'));
+check(! NetStream.prototype.hasOwnProperty('bufferLength'));
 check(! netstreamObj.hasOwnProperty('bufferLength'));
 
-xcheck(! NetStream.prototype.hasOwnProperty('bufferTime'));
+check(! NetStream.prototype.hasOwnProperty('bufferTime'));
 check(! netstreamObj.hasOwnProperty('bufferTime'));
 
-xcheck(! NetStream.prototype.hasOwnProperty('liveDelay'));
+check(! NetStream.prototype.hasOwnProperty('liveDelay'));
 check(! netstreamObj.hasOwnProperty('liveDelay'));
 
-xcheck(! NetStream.prototype.hasOwnProperty('time'));
+check(! NetStream.prototype.hasOwnProperty('time'));
 check(! netstreamObj.hasOwnProperty('time'));
 
 /* Added in SWF7 (still apply to SWF6) */
-xcheck(! NetStream.prototype.hasOwnProperty('bytesLoaded'));
+check(! NetStream.prototype.hasOwnProperty('bytesLoaded'));
 check(! netstreamObj.hasOwnProperty('bytesLoaded'));
 
-xcheck(! NetStream.prototype.hasOwnProperty('bytesTotal'));
+check(! NetStream.prototype.hasOwnProperty('bytesTotal'));
 check(! netstreamObj.hasOwnProperty('bytesTotal'));
 
 
@@ -153,41 +154,41 @@ check_equals(typeof(netstreamObj.onMetaData), 'string');
 // currentFps (read-only)
 check_equals ( typeof(netstreamObj.currentFps), 'undefined' );
 netstreamObj.currentFps = 'string';
-xcheck_equals ( typeof(netstreamObj.currentFps), 'string' );
+check_equals ( typeof(netstreamObj.currentFps), 'string' );
 netstreamObj.currentFps = false;
-xcheck_equals ( typeof(netstreamObj.currentFps), 'boolean' );
+check_equals ( typeof(netstreamObj.currentFps), 'boolean' );
 
 // bufferLength (read-only)
-xcheck_equals ( typeof(netstreamObj.bufferLength), 'undefined' );
+check_equals ( typeof(netstreamObj.bufferLength), 'undefined' );
 netstreamObj.bufferLength = 'string';
-xcheck_equals ( typeof(netstreamObj.bufferLength), 'string' );
+check_equals ( typeof(netstreamObj.bufferLength), 'string' );
 netstreamObj.bufferLength = false;
-xcheck_equals ( typeof(netstreamObj.bufferLength), 'boolean' );
+check_equals ( typeof(netstreamObj.bufferLength), 'boolean' );
 
 // bufferTime
-xcheck_equals ( typeof(netstreamObj.bufferTime), 'undefined' );
+check_equals ( typeof(netstreamObj.bufferTime), 'undefined' );
 netstreamObj.setBufferTime(10);
-xcheck_equals(netstreamObj.bufferTime, NULL);
+check_equals(netstreamObj.bufferTime, NULL);
 netstreamObj.bufferTime = 20;
-xcheck_equals(netstreamObj.bufferTime, 20);
+check_equals(netstreamObj.bufferTime, 20);
 netstreamObj.setBufferTime = 30;
-xcheck_equals(netstreamObj.bufferTime, 20);
+check_equals(netstreamObj.bufferTime, 20);
 netstreamObj.setBufferTime(false);
-xcheck_equals(netstreamObj.bufferTime, 20);
+check_equals(netstreamObj.bufferTime, 20);
 netstreamObj.setBufferTime('string');
-xcheck_equals(netstreamObj.bufferTime, 20);
+check_equals(netstreamObj.bufferTime, 20);
 xnetstreamObj.setBufferTime('5');
-xcheck_equals(netstreamObj.bufferTime, 20);
+check_equals(netstreamObj.bufferTime, 20);
 
 // liveDelay (read-only)
 check_equals ( typeof(netstreamObj.liveDelay), 'undefined' );
 netstreamObj.liveDelay = 'string';
-xcheck_equals ( typeof(netstreamObj.liveDelay), 'string' );
+check_equals ( typeof(netstreamObj.liveDelay), 'string' );
 
 // time (read-only)
-xcheck_equals ( typeof(netstreamObj.time), 'undefined' );
+check_equals ( typeof(netstreamObj.time), 'undefined' );
 netstreamObj.time = 'string';
-xcheck_equals ( typeof(netstreamObj.time), 'string' );
+check_equals ( typeof(netstreamObj.time), 'string' );
 
 
 /* Two properties added in SWF7 */
