@@ -74,50 +74,50 @@ class NetStream_as {
 	// existance of a property, and don't test the functionality at all. This
 	// is primarily useful only to test completeness of the API implementation.
 	//FIXME: This read-only property must be initialized before it can be tested
-	if (Type.typeof(x1.bufferLength) == ValueType.TNull) {
+	if (Type.typeof(x1.bufferLength) == ValueType.TInt) {
 	    DejaGnu.pass("NetStream.bufferLength property exists");
 	} else {
 	    DejaGnu.fail("NetStream.bufferLength property doesn't exist");
 	}
-	if (Type.typeof(x1.bufferTime) == ValueType.TNull) {
+	if (Type.typeof(x1.bufferTime) == ValueType.TFloat) {
 	    DejaGnu.pass("NetStream.bufferTime property exists");
 	} else {
 	    DejaGnu.fail("NetStream.bufferTime property doesn't exist");
 	}
-	if (Type.typeof(x1.bytesLoaded) == ValueType.TNull) {
+	if (Type.typeof(x1.bytesLoaded) == ValueType.TInt) {
 	    DejaGnu.pass("NetStream.bytesLoaded property exists");
 	} else {
 	    DejaGnu.fail("NetStream.bytesLoaded property doesn't exist");
 	}
 #if flash9
-	if (Type.typeof(x1.bytesTotal) == ValueType.TNull) {
+	if (Type.typeof(x1.bytesTotal) == ValueType.TFloat) {
 	    DejaGnu.pass("NetStream.bytesTotal property exists");
 	} else {
 	    DejaGnu.fail("NetStream.bytesTotal property doesn't exist");
 	}
 #end
-	if (Type.typeof(x1.time) == ValueType.TNull) {
+	if (Type.typeof(x1.time) == ValueType.TInt) {
 	    DejaGnu.pass("NetStream.time property exists");
 	} else {
 	    DejaGnu.fail("NetStream.time property doesn't exist");
 	}
 #if !flash9
-	if (Type.typeof(x1.bytesTotal) == ValueType.TNull) {
+	if (Type.typeof(x1.bytesTotal) == ValueType.TInt) {
 	    DejaGnu.pass("NetStream.bytesTotal property exists");
 	} else {
 	    DejaGnu.fail("NetStream.bytesTotal property doesn't exist");
 	}
-	if (Type.typeof(x1.currentFps) == ValueType.TNull) {
+	if (Type.typeof(x1.currentFps) == ValueType.TInt) {
 	    DejaGnu.pass("NetStream.currentFps property exists");
 	} else {
 	    DejaGnu.fail("NetStream.currentFps property doesn't exist");
 	}
 #end
 	// Not implemented for gnash
-	if (Type.typeof(x1.liveDelay) == ValueType.TNull) {
-	    DejaGnu.pass("NetStream.liveDelay property exists");
+	if (Type.typeof(x1.liveDelay) == ValueType.TInt) {
+	    DejaGnu.xpass("NetStream.liveDelay property exists");
 	} else {
-	    DejaGnu.fail("NetStream.liveDelay property doesn't exist");
+	    DejaGnu.xfail("NetStream.liveDelay property doesn't exist");
 	}
 #if flash9
 	if (Type.typeof(x1.currentFPS) == ValueType.TInt) {
