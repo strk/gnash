@@ -54,7 +54,7 @@ AC_DEFUN([GNASH_PATH_PYTHON],
     dnl If the path hasn't been specified, go look for it.
     if test x"${ac_cv_path_python_incl}" = x; then
       if test x"${pythonconfig}" != "x"; then
-        ac_cv_path_python_incl="`${pythonconfig} --include`"
+        ac_cv_path_python_incl="`${pythonconfig} --includes`"
       else
         for i in $incllist; do
           for j in `ls -dr $i/python2.* 2>/dev/null`;do
