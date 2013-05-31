@@ -127,18 +127,18 @@ Proc::startCGI(const string &filespec, bool outflag, boost::uint16_t port)
 
     // If the parent has verbosity on, chances are the child should too.
 //     if (dbglogfile.getVerbosity() > 0) {
-    cmd_line[1] = new char(3);
+    cmd_line[1] = new char[3];
     strcpy(cmd_line[1], "-n");
-    cmd_line[2] = new char(4);
+    cmd_line[2] = new char[4];
     strcpy(cmd_line[2], "-vv");
     cmd_line[3] = 0;
 //     }
     
     // When running multiple cgis, we prefer to specify the port it's using.
     if (port > 0) {
-        cmd_line[3] = new char(3);
+        cmd_line[3] = new char[3];
         strcpy(cmd_line[3], "-p");
-        cmd_line[4] = new char(10);
+        cmd_line[4] = new char[10];
         sprintf(cmd_line[4], "%d", port);
         cmd_line[5] = 0;
     }
