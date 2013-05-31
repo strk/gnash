@@ -122,7 +122,7 @@ Proc::startCGI(const string &filespec, bool outflag, boost::uint16_t port)
     }
 
     // setup a command line. By default, argv[0] is the name of the process
-    cmd_line[0] = new char(filespec.size()+1);
+    cmd_line[0] = new char[filespec.size()+1];
     strcpy(cmd_line[0], filespec.c_str());
 
     // If the parent has verbosity on, chances are the child should too.
