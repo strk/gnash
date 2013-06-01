@@ -169,7 +169,7 @@ boost::shared_ptr<cygnal::Element>
 RTMPMsg::operator[](size_t index)
 {
 //    GNASH_REPORT_FUNCTION;
-    if (index <= _amfobjs.size()) {
+    if (index < _amfobjs.size()) {
 	return _amfobjs[index];
     }
     
