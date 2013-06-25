@@ -122,7 +122,7 @@ namespace {
 void
 processLog_trace(const boost::format& fmt)
 {
-    dbglogfile.log(N_("FUNCTION"), fmt.str());
+    dbglogfile.log(N_("TRACE"), fmt.str());
     // Print messages to the Android log, where they can be retrieved with
     // logcat.    
 #ifdef __ANDROID__
