@@ -398,19 +398,19 @@ public:
     // Only print function tracing messages when multiple -v
     // options have been supplied. 
     HostFunctionReport() : _func(0) {
-        log_trace("entering");
+        log_debug("entering");
     }
 
     HostFunctionReport(const char* func) : _func(func) {
         if (func) {
-            log_trace("%s enter", func);
+            log_debug("%s enter", func);
         }
         else {
-            log_trace("No Function Name! enter");
+            log_debug("No Function Name! enter");
         }
     }
     ~HostFunctionReport() {
-        log_trace("%s returning", _func);
+        log_debug("%s returning", _func);
     }
 private:
     const char* _func;
@@ -436,10 +436,10 @@ private:
 #define GNASH_REPORT_RETURN
 #else
 #define GNASH_REPORT_FUNCTION \
-    gnash::log_trace"entering")
+    gnash::log_debug("entering")
 
 #define GNASH_REPORT_RETURN \
-    gnash::log_trace("returning")
+    gnash::log_debug("returning")
 #endif
 
 }
