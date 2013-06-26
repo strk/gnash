@@ -189,7 +189,7 @@ xcheck_equals ( typeof(netstreamObj.liveDelay), 'string' );
 // time (read-only)
 xcheck_equals ( typeof(netstreamObj.time), 'undefined' );
 netstreamObj.time = 'string';
-xcheck_equals ( typeof(netstreamObj.timxe), 'string' );
+xcheck_equals ( typeof(netstreamObj.time), 'string' );
 
 
 /* Two properties added in SWF7 */
