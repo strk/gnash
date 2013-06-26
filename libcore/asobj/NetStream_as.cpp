@@ -1859,14 +1859,6 @@ attachNetStreamInterface(as_object& o)
     o.init_member("receiveAudio", gl.createFunction(netstream_receiveAudio));
     o.init_member("receiveVideo", gl.createFunction(netstream_receiveVideo));
     o.init_member("send", vm.getNative(2101, 3));
-   
-    // Attching to the object itself the prototype properties 
-    // in case of swf7 and above 
-    if (vm.getSWFVersion () >= 7) {
-       
-        attachPrototypeProperties (o);
-    }
-
 }
 
 // Function to attach the properties of prototype
