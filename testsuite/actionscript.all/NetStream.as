@@ -74,6 +74,15 @@ check(! netstreamObj.hasOwnProperty('bytesLoaded'));
 check(! NetStream.prototype.hasOwnProperty('bytesTotal'));
 check(! netstreamObj.hasOwnProperty('bytesTotal'));
 
+check( NetStream.prototype.hasOwnProperty('close'));
+check(! netstreamObj.hasOwnProperty('close'));
+
+check( NetStream.prototype.hasOwnProperty('pause'));
+check(! netstreamObj.hasOwnProperty('pause'));
+
+check( NetStream.prototype.hasOwnProperty('play'));
+check(! netstreamObj.hasOwnProperty('play'));
+
 
 /* Subscriber Methods */
 
@@ -204,5 +213,5 @@ check_equals ( typeof(netstreamObj.bytesTotal), 'undefined' );
 #if OUTPUT_VERSION < 6
 check_totals(0);
 #else
-check_totals(60);
+check_totals(66);
 #endif
