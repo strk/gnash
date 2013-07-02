@@ -130,7 +130,7 @@ netstream_class_init(as_object& where, const ObjectURI& uri)
     // NetStream is genuinely a built-in class, but its constructor calls
     // several native functions. It also calls NetConnection.call.
     registerBuiltinClass(where, netstream_new, attachNetStreamInterface,
-            attachPrototypeProperties, uri);
+            NULL, uri); 
 }
 
 void
@@ -1589,6 +1589,14 @@ netstream_new(const fn_call& fn)
         NetConnection_as* nc;
         if (isNativeType(toObject(fn.arg(0), getVM(fn)), nc)) {
             ns->setNetCon(nc);
+            if ( nc->isConnected() ) {
+                // TODO: initialize only once ?
+                // Test it (but keep re-entrancy, in case)
+                as_object* proto = obj->get_prototype();
+                if ( proto ) {
+                    attachPrototypeProperties(*proto);
+                }
+            }
         }
         else {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -1600,7 +1608,6 @@ netstream_new(const fn_call& fn)
         }
     }
     obj->setRelay(ns);
-
 
     return as_value();
 

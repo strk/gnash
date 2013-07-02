@@ -91,7 +91,7 @@ main(int argc, char** argv)
 	"nc.connect(null);"
 	"check(nc.isConnected, 'NetConnection is connected after .connect(null)');"
 	"check(!NetStream.prototype.hasOwnProperty('currentFPS'));" // version 7 here
-	"xcheck(!NetStream.prototype.hasOwnProperty('currentFps'));"
+	"check(!NetStream.prototype.hasOwnProperty('currentFps'));"
 	"stream = new NetStream();"
 	"check_equals ( typeof(stream.bytesTotal), 'undefined' );" // not connected..
 	"stream.play('fake');" // just test not to segfault..
