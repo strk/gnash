@@ -301,18 +301,25 @@ Input::readSWFJpeg3(boost::shared_ptr<IOChannel> in)
 
     im.reset(new ImageRGBA(width, height));
 
-    boost::scoped_array<GnashImage::value_type> line(
+    if (j_in->imageType() == TYPE_RGBA) {
+
+        for (size_t y = 0; y < height; ++y) {
+            j_in->readScanline(scanline(*im, y));
+        }
+    } else {
+        boost::scoped_array<GnashImage::value_type> line(
             new GnashImage::value_type[3 * width]);
 
-    for (size_t y = 0; y < height; ++y) {
-        j_in->readScanline(line.get());
+        for (size_t y = 0; y < height; ++y) {
+            j_in->readScanline(line.get());
 
-        GnashImage::iterator data = scanline(*im, y);
-        for (size_t x = 0; x < width; ++x) {
-            data[4*x+0] = line[3*x+0];
-            data[4*x+1] = line[3*x+1];
-            data[4*x+2] = line[3*x+2];
-            data[4*x+3] = 255;
+            GnashImage::iterator data = scanline(*im, y);
+            for (size_t x = 0; x < width; ++x) {
+                data[4*x+0] = line[3*x+0];
+                data[4*x+1] = line[3*x+1];
+                data[4*x+2] = line[3*x+2];
+                data[4*x+3] = 255;
+            }
         }
     }
 
