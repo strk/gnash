@@ -234,7 +234,6 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     saddr = it->ai_addr;
     const int addrlen = it->ai_addrlen;
 
-    freeaddrinfo(ans);          // free the response data
 #else
     struct sockaddr_in addr;
     std::memset(&addr, 0, sizeof(addr));
@@ -268,7 +267,11 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
 #endif
 
     // Attempt connection
-    if (::connect(_socket, saddr, addrlen) < 0) {
+    int ret = ::connect(_socket, saddr, addrlen);
+#ifdef HAVE_IPV6
+    freeaddrinfo(ans);          // free the response data
+#endif
+    if (ret < 0) {
         const int err = errno;
 #ifndef _WIN32
         if (err != EINPROGRESS) {
