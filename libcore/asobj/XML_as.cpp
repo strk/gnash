@@ -506,7 +506,6 @@ XML_as::parseXML(const std::string& xml)
 void
 XML_as::clear()
 {
-    // TODO: should set childs's parent to NULL ?
     clearChildren();
     _docTypeDecl.clear();
     _xmlDecl.clear();

@@ -110,6 +110,12 @@ XMLNode_as::XMLNode_as(const XMLNode_as& tpl, bool deep)
 
 XMLNode_as::~XMLNode_as()
 {
+    // In practice it is quite likely that the child will be garbage-collected
+    // before the parent. See Savannah bug #39404.
+    if (_parent ) {
+        _parent->removeChild(this);
+    }
+
     clearChildren();
 }
 
@@ -378,10 +384,14 @@ XMLNode_as::extractPrefix(std::string& prefix) const
 void
 XMLNode_as::clearChildren()
 {
-    for (Children::const_iterator it = _children.begin(), e = _children.end();
+    for (Children::iterator it = _children.begin(), e = _children.end();
             it != e; ++it) {
-        const XMLNode_as* node = *it;
+        XMLNode_as* node = *it;
+
+        node->setParent(0);
         if (!node->_object) {
+            // The node is not GC'd because it has no associated object. 
+            // See XMLNode_as class docs.
             delete node;
         }
     }
