@@ -23,7 +23,7 @@
 
 #include "dsodefs.h"
 #include <boost/cstdint.hpp>
-#include <boost/shared_ptr.hpp>
+#include <boost/shared_array.hpp>
 #include "IOChannel.h"
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -124,7 +124,7 @@ public:
 private:
 
     // Return the string representation of the IPV4 or IPV6 number
-    boost::shared_ptr<char> getIPString(struct addrinfo *ai);
+    boost::shared_array<char> getIPString(struct addrinfo *ai);
 	
     /// Fill the cache.
     void fillCache();

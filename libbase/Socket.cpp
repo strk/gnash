@@ -29,7 +29,7 @@
 #include <csignal>
 #include <boost/lexical_cast.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/shared_ptr.hpp>
+#include <boost/shared_array.hpp>
             
 #include "GnashSystemNetHeaders.h"
 #include "GnashSystemFDHeaders.h"
@@ -197,7 +197,7 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
                     clientservice, sizeof(clientservice),
                     NI_NUMERICHOST);
         
-        boost::shared_ptr<char> straddr = getIPString(ot);
+        boost::shared_array<char> straddr = getIPString(ot);
         
         if (ot->ai_family == AF_INET6) {
             log_debug("%s has IPV6 address of: %s", hostname, straddr.get());
@@ -303,10 +303,10 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
 }
 
 // Return the string representation of the IPV4 or IPV6 number
-boost::shared_ptr<char>
+boost::shared_array<char>
 Socket::getIPString(struct addrinfo *ai)
 {
-    boost::shared_ptr<char> straddr(new char[INET6_ADDRSTRLEN]);
+    boost::shared_array<char> straddr(new char[INET6_ADDRSTRLEN]);
     std::memset(straddr.get(), 0, INET6_ADDRSTRLEN);    
     if (ai->ai_family == AF_INET6) {
         struct sockaddr_in6 *sock6 = reinterpret_cast<struct sockaddr_in6 *>(ai->ai_addr);
