@@ -406,5 +406,13 @@ check_equals(xn.toString(), "");
 xn = new XMLNode(7, "");
 check_equals(xn.toString(), "");
 
+// Test for https://savannah.gnu.org/bugs/index.php?39404
+// NOTE: you need to run under valgrind to determine 
+//       if the test was successful or not...
+x = new XML('<t></t>'); x.appendChild(new XML('<t></t>'));
+var x2 = new XML('<t></t>'); x2.appendChild(x); delete x2;
+// many allocations force GC run
+for (var i=0; i<256; ++i) x = {};
+
 
 check_totals(182);
