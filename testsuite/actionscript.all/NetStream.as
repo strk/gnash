@@ -208,10 +208,30 @@ check_equals ( typeof(netstreamObj.bytesLoaded), 'undefined' );
 // bytesLoaded (read-only)
 check_equals ( typeof(netstreamObj.bytesTotal), 'undefined' );
 
+// See when NetStream object is populated
+check(! NetStream.prototype.hasOwnProperty('currentFps'));
+nc = { isConnected: true };
+netstreamObj = new NetStream(nc);
+check(! NetStream.prototype.hasOwnProperty('currentFps'));
+nc = new NetConnection();
+check(! NetStream.prototype.hasOwnProperty('currentFps'));
+netstreamObj = new NetStream(nc);
+check(! NetStream.prototype.hasOwnProperty('currentFps'));
+nc.connect(null);
+check(! NetStream.prototype.hasOwnProperty('currentFps'));
+netstreamObj = new NetStream(nc); // Here's when !
+check(NetStream.prototype.hasOwnProperty('currentFps')); 
+var NetStreamProtoBackup = NetStream.prototype;
+NetStream.prototype = {};
+netstreamObj = new NetStream(); 
+check(!NetStream.prototype.hasOwnProperty('currentFps')); 
+netstreamObj = new NetStream(nc); // And prototype is populated again!
+check(NetStream.prototype.hasOwnProperty('currentFps')); 
+
 #endif // OUTPUT_VERSION >= 6
 
 #if OUTPUT_VERSION < 6
 check_totals(0);
 #else
-check_totals(66);
+check_totals(74);
 #endif
