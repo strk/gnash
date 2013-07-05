@@ -1590,13 +1590,11 @@ netstream_new(const fn_call& fn)
         if (isNativeType(toObject(fn.arg(0), getVM(fn)), nc)) {
             ns->setNetCon(nc);
             if ( nc->isConnected() ) {
-                static as_object* proto = NULL;
-                // initialize prototype only once
-                if ( ! proto ) {
-                    proto = obj->get_prototype();
-                    if ( proto ) {
-                        attachPrototypeProperties(*proto);
-                    }
+                // TODO: initialize only once ?
+                // Test it (but keep re-entrancy, in case)
+                as_object* proto = obj->get_prototype();
+                if ( proto ) {
+                    attachPrototypeProperties(*proto);
                 }
             }
         }
