@@ -2138,8 +2138,6 @@ dnl AC_PATH_XTRA
 dnl AC_CHECK_LIB(Xmu, XmuCvtStringToOrientation)
 dnl AC_CHECK_LIB(gmp, _gmp_get_memory_functions)
 GNASH_PATH_X11
-AC_CHECK_LIB(Xi, XInput_find_display)
-AC_CHECK_LIB(X11, XDisableAccessControl)
 dnl fi
 AM_CONDITIONAL(HAVE_X11, [test x${has_x11} = xyes])
 if test x${build_x11_device} = xyes -a  x${has_x11} = xyes; then
