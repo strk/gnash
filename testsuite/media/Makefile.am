@@ -41,6 +41,7 @@ EXTRA_DIST = \
 	majorscale.sco \
 	brokenchord.wav \
 	audio_timewarp.flv \
+	silence.mp3 \
 	$(NULL)
 
 .sco.wav:

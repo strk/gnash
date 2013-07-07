@@ -28,7 +28,7 @@ rcsid="Sound.as";
 endOfTest = function()
 {
 #if OUTPUT_VERSION > 5
-    check_totals(111);
+    xcheck_totals(112);
 #else
     check_totals(94);
 #endif
@@ -156,6 +156,18 @@ mp3.onID3 = function() {
     fail("Should not be called where no tag is present.");
 };
 mp3.loadSound(MEDIA(stereo8.mp3), false);
+
+// Test for #33760:
+// Try to load an mp3 sound (without any tags) that is longer than the
+// (at the time of writing) hard-coded single minute of buffer time.
+longsilence = new Sound();
+longsilence.onLoad = function()
+{
+    trace("onLoad called");
+    pass("onLoad called");
+};
+
+longsilence.loadSound(MEDIA(silence.mp3), false);
 
 #endif
 
