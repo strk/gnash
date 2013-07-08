@@ -31,7 +31,7 @@ AC_DEFUN([GNASH_PATH_QT4], [
         ac_cv_path_qt4_incl="${ac_cv_path_qt4_incl} -I`(cd ${with_qt4_incl}; pwd)`"
         for i in ${qt4_include_subdirs}; do
           if test -d "${with_qt4_incl}/$i"; then
-            ac_cv_path_qt4_incl="${ac_cv_path_qt4_incl} -I`(cd ${with_qt4_incl}\$i; pwd)`"
+            ac_cv_path_qt4_incl="${ac_cv_path_qt4_incl} -I`(cd ${with_qt4_incl}/$i; pwd)`"
           fi
         done
       else
