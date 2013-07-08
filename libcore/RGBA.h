@@ -125,7 +125,7 @@ std::ostream& operator<<(std::ostream& os, const rgba& r);
 rgba colorFromHexString(const std::string& color);
 
 /// Used for morphing.
-rgba lerp(const rgba& a, const rgba& b, float f);
+rgba DSOEXPORT lerp(const rgba& a, const rgba& b, float f);
 
 } // namespace gnash
 
