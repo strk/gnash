@@ -567,6 +567,12 @@ public:
 	///
 	bool parsingCompleted() const { return _parsingComplete; }
 
+	/// @ret true if the buffer (configured by setBufferTime) is full.
+	bool bufferFull() {
+	    boost::mutex::scoped_lock lock(_qMutex);
+	    return bufferFullInternal();
+	}
+
 	/// Return true of indexing is completed
 	//
 	/// If this function returns false, parseNextChunk will
@@ -714,7 +720,7 @@ protected:
 	/// is passed a locked lock on _qMutex, and by parseNextChunk
 	/// to determine whether to index-only or also push on queue.
 	///
-	bool bufferFull() const;
+	bool bufferFullInternal() const;
 
 	/// On seek, this flag will be set, while holding a lock on _streamMutex.
 	/// The parser, when obtained a lock on _streamMutex, will check this
