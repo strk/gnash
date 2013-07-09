@@ -275,7 +275,7 @@ externalinterface_call(const fn_call& fn)
     if (mr.getControlFD() <= 0) {
         log_debug("ExternalInterface not accessible on call.");
         val.set_null();
-        return as_value(val);
+        return val;
     }
 
     if (fn.nargs > 1) {

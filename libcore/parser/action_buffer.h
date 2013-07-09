@@ -94,8 +94,8 @@ public:
     /// Get a pointer to the current instruction within the code
 	const unsigned char* getFramePointer(size_t pc) const
 	{
-	    assert (pc < m_buffer.size());
-		return reinterpret_cast<const unsigned char*>(&m_buffer.at(pc));
+		assert (pc < m_buffer.size());
+		return &m_buffer.at(pc);
 	}
 
 	/// Get a signed integer value from given offset

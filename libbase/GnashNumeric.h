@@ -86,7 +86,7 @@ frnd(float f)
 inline double
 twipsToPixels(int i) 
 { 
-    return static_cast<double>(i / 20.0); 
+    return i / 20.0;
 }
 
 template<size_t Factor>

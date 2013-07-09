@@ -809,7 +809,7 @@ Range2d<int>::roundMax(float max) const
 template<> inline unsigned int
 Range2d<unsigned int>::roundMax(float max) const
 {
-	return static_cast<unsigned int>(std::ceil(static_cast<float>(max)));
+	return static_cast<unsigned int>(std::ceil(max));
 }
 
 /// Specialization of area value for int type.
