@@ -385,7 +385,12 @@ Sound_as::probeAudio()
             // TODO: check if this should be called anyway.
             if (success) handleId3Data(_mediaParser->getId3Info(), owner());
         }
-        return; 
+
+        // If this is an event sound, we are done. Otherwise, if there is
+        // any data available, we should start playback.
+        if (!isStreaming || _mediaParser->isBufferEmpty()) {
+            return; 
+        }
     }
 
     if (isAttached()) {
@@ -603,7 +608,13 @@ Sound_as::loadSound(const std::string& file, bool streaming)
     }
 
     // TODO: use global _soundbuftime
-    _mediaParser->setBufferTime(60000); // one minute buffer... should be fine
+    if (isStreaming) {
+        _mediaParser->setBufferTime(60000); // one minute buffer... should be fine
+    } else {
+        // If this is an event sound, we must not limit buffering (parsing),
+        // because onLoad will not be called until we have finished doing so.
+        _mediaParser->setBufferTime(std::numeric_limits<boost::uint64_t>::max());
+    }
 
     startProbeTimer();
 

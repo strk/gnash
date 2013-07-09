@@ -28,7 +28,7 @@ rcsid="Sound.as";
 endOfTest = function()
 {
 #if OUTPUT_VERSION > 5
-    xcheck_totals(112);
+    check_totals(112);
 #else
     check_totals(94);
 #endif
@@ -161,13 +161,7 @@ mp3.loadSound(MEDIA(stereo8.mp3), false);
 // Try to load an mp3 sound (without any tags) that is longer than the
 // (at the time of writing) hard-coded single minute of buffer time.
 longsilence = new Sound();
-longsilence.onLoad = function()
-{
-    trace("onLoad called");
-    pass("onLoad called");
-};
-
-longsilence.loadSound(MEDIA(silence.mp3), false);
+longsilence.loadSound(MEDIA(silence.mp3), true);
 
 #endif
 
@@ -311,6 +305,10 @@ s.onSoundComplete = function()
     check(s.onLoadCalled);
     check_equals(typeof(s.onLoadArg), 'boolean');
     check_equals(s.onLoadArg, true);
+
+    // Test for #33760, continued: Having this test here is a hack, but the
+    // delay in calling this function will ensure the sound has started.
+    check(longsilence.position > 0);
 
     // TODO: test non-streaming sound 
     // TODO: test loadSound on unexistent sound 

@@ -424,8 +424,8 @@ bool
 MediaParser::bufferFull() const
 {
 	// Callers are expected to hold a lock on _qMutex
-	int bl = getBufferLengthNoLock();
-	int bt = getBufferTime();
+	boost::uint64_t bl = getBufferLengthNoLock();
+	boost::uint64_t bt = getBufferTime();
 #ifdef GNASH_DEBUG_MEDIAPARSER
 	log_debug("MediaParser::bufferFull: %d/%d", bl, bt);
 #endif // GNASH_DEBUG_MEDIAPARSER
