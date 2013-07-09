@@ -720,7 +720,7 @@ protected:
 	/// is passed a locked lock on _qMutex, and by parseNextChunk
 	/// to determine whether to index-only or also push on queue.
 	///
-	bool bufferFullInternal() const;
+	DSOEXPORT bool bufferFullInternal() const;
 
 	/// On seek, this flag will be set, while holding a lock on _streamMutex.
 	/// The parser, when obtained a lock on _streamMutex, will check this
