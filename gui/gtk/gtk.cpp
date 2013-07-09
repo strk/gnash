@@ -1891,7 +1891,7 @@ GtkGui::showAboutDialog()
 
     gtk_widget_show (aboutWidget);
 
-    if (logo_pixbuf) gdk_pixbuf_unref(logo_pixbuf);
+    if (logo_pixbuf) g_object_unref(logo_pixbuf);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2241,7 +2241,7 @@ addGnashIcon(GtkWindow* window)
     GdkPixbuf *window_icon_pixbuf = createPixbuf ("GnashG.png");
     if (window_icon_pixbuf) {
         gtk_window_set_icon (GTK_WINDOW (window), window_icon_pixbuf);
-        gdk_pixbuf_unref (window_icon_pixbuf);
+        g_object_unref (window_icon_pixbuf);
     }
 }
 
