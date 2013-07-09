@@ -28,7 +28,7 @@ rcsid="Sound.as";
 endOfTest = function()
 {
 #if OUTPUT_VERSION > 5
-    check_totals(112);
+    xcheck_totals(112);
 #else
     check_totals(94);
 #endif

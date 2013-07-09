@@ -372,7 +372,7 @@ Sound_as::probeAudio()
 #ifdef GNASH_DEBUG_SOUND_AS
         log_debug("Probing audio for load");
 #endif
-        if (_mediaParser->parsingCompleted() || _mediaParser->bufferFull()) {
+        if (_mediaParser->parsingCompleted()) {
 
             _soundLoaded = true;
 

@@ -124,7 +124,7 @@ FLVParser::seek(boost::uint32_t& time)
 bool
 FLVParser::parseNextChunk()
 {
-	bool indexOnly = bufferFullInternal(); // won't lock, but our caller locked...
+	bool indexOnly = bufferFull(); // won't lock, but our caller locked...
 	return parseNextTag(indexOnly);
 }
 

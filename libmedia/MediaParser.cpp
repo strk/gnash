@@ -407,7 +407,7 @@ MediaParser::waitIfNeeded(boost::mutex::scoped_lock& lock)
 	//  We hold a lock on the queue here...
 	bool pc=parsingCompleted();
 	bool ic=indexingCompleted();
-	bool bf=bufferFullInternal();
+	bool bf=bufferFull();
 	if (( pc || (bf && ic)) && !parserThreadKillRequested()) // TODO: or seekRequested ?
 	{
 #ifdef GNASH_DEBUG_MEDIAPARSER
@@ -421,13 +421,13 @@ MediaParser::waitIfNeeded(boost::mutex::scoped_lock& lock)
 }
 
 bool
-MediaParser::bufferFullInternal() const
+MediaParser::bufferFull() const
 {
 	// Callers are expected to hold a lock on _qMutex
 	int bl = getBufferLengthNoLock();
 	int bt = getBufferTime();
 #ifdef GNASH_DEBUG_MEDIAPARSER
-	log_debug("MediaParser::bufferFullInternal: %d/%d", bl, bt);
+	log_debug("MediaParser::bufferFull: %d/%d", bl, bt);
 #endif // GNASH_DEBUG_MEDIAPARSER
 	return bl > bt;
 }
