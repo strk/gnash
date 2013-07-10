@@ -235,7 +235,7 @@ public:
     ///
     boost::int32_t time();
 
-    /// Called at the SWF heart-beat. Used to process queued status messages
+    /// Called at the heart-beat frequency. Used to process queued status messages
     /// and (re)start after a buffering pause. In NetStreamFfmpeg it is also
     /// used to find the next video frame to be shown, though this might
     /// change.

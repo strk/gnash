@@ -88,7 +88,10 @@ public:
     /// Make sure we are removed from the list of callbacks on destruction.
     virtual ~ActiveRelay();
 
-    /// ActiveRelay objects must have an advanceState method.
+    /// ActiveRelay objects must have an update() method.
+    //
+    /// The method will be called at the heart-beat frequency.
+    ///
     virtual void update() = 0;
 
     /// Mark any other reachable resources, and finally mark our owner
