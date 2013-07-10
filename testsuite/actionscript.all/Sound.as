@@ -157,11 +157,6 @@ mp3.onID3 = function() {
 };
 mp3.loadSound(MEDIA(stereo8.mp3), false);
 
-// Test for #33760:
-// Try to load an mp3 sound (without any tags) that is longer than the
-// (at the time of writing) hard-coded single minute of buffer time.
-longsilence = new Sound();
-longsilence.loadSound(MEDIA(silence.mp3), true);
 
 #endif
 
@@ -306,14 +301,25 @@ s.onSoundComplete = function()
     check_equals(typeof(s.onLoadArg), 'boolean');
     check_equals(s.onLoadArg, true);
 
-    // Test for #33760, continued: Having this test here is a hack, but the
-    // delay in calling this function will ensure the sound has started.
-    check(longsilence.position > 0);
+    // Test for #33760:
+    // Try to load an mp3 sound (without any tags) that is longer than the
+    // (at the time of writing) hard-coded single minute of buffer time.
+    longsilence = new Sound();
+    longsilence.onLoad = function(success) {
+        // Test for #33760, continued: Having this test here is a hack, but the
+        // delay in calling this function will ensure the sound has started.
+        check(longsilence.position > 0);
+
+        endOfTest();
+    };
+
+    longsilence.loadSound(MEDIA(silence.mp3), true);
+
+    stop();
 
     // TODO: test non-streaming sound 
     // TODO: test loadSound on unexistent sound 
 
-    endOfTest();
 };
 
 s.onLoad = function(arg)
