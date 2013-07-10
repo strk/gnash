@@ -406,7 +406,7 @@ externalinterface_uArgumentsToXML(const fn_call& fn)
             ArgsToXML tx(ret, fn);
             size_t size = arrayLength(*obj);
             if (size) {
-                for (size_t i = 1; i < static_cast<size_t>(size); ++i) {
+                for (size_t i = 1; i < size; ++i) {
                     tx(getOwnProperty(*obj, arrayKey(vm, i)));
                 }
             }

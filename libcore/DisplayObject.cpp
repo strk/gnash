@@ -1389,7 +1389,7 @@ getFocusRect(DisplayObject& o)
     if (boost::indeterminate(fr)) {
         as_value null;
         null.set_null();
-        return as_value(null);
+        return null;
     }
     const bool ret = static_cast<bool>(fr);
     if (getSWFVersion(*getObject(&o)) == 5) {

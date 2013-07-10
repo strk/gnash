@@ -229,14 +229,14 @@ float    SWFStream::read_ufixed()
 float   SWFStream::read_short_ufixed()
 {
     // align(); // read_u16 will align 
-    return static_cast<float> ( read_u16() / 256.0f );
+    return read_u16() / 256.0f;
 }
 
 // Read a short fixed value, signed.
 float    SWFStream::read_short_sfixed()
 {
     // align(); // read_s16 will align 
-    return static_cast<float> ( read_s16() / 256.0f );
+    return read_s16() / 256.0f;
 }
 
 /// Read a 16bit (1:sign 5:exp 10:mantissa) floating point value

@@ -777,8 +777,7 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "SOLSafeDir " << _solsandbox << endl <<
     cmd << "localConnection " << _lcdisabled << endl <<
     cmd << "LCTrace " << _lctrace << endl <<
-    cmd << "LCShmkey " << std::hex << (boost::uint32_t) _lcshmkey
-        << std::dec << endl <<
+    cmd << "LCShmkey " << std::hex << _lcshmkey << std::dec << endl <<
     cmd << "ignoreFSCommand " << _ignoreFSCommand << endl <<    
     cmd << "ignoreShowMenu " << _ignoreShowMenu << endl <<
     cmd << "saveStreamingMedia " << _saveStreamingMedia << endl <<    
