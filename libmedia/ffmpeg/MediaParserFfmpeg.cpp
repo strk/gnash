@@ -625,7 +625,7 @@ MediaParserFfmpeg::seekMedia(boost::int64_t offset, int whence)
 	else if (whence == SEEK_END)
 	{
 		// New position is offset + end of file
-		log_unimpl("MediaParserFfmpeg seek from end of file");
+		LOG_ONCE(log_unimpl("MediaParserFfmpeg seek from end of file"));
 		// This is (most likely) a streamed file, so we can't seek to the end!
 		// Instead we seek to byteIOBufferSize bytes... seems to work fine...
 		_stream->seek(byteIOBufferSize);
@@ -635,7 +635,7 @@ MediaParserFfmpeg::seekMedia(boost::int64_t offset, int whence)
 	{
 		// ffmpeg uses whence=AVSEEK_SIZE and offset=0 to request
 		// stream size !
-		log_unimpl("MediaParserFfmpeg: unsupported whence value %d", whence);
+		LOG_ONCE(log_unimpl("MediaParserFfmpeg: unsupported whence value %d", whence));
 		return -1;
 	}
 
