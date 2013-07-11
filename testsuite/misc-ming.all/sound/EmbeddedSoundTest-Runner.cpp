@@ -47,7 +47,6 @@ main(int /*argc*/, char** /*argv*/)
 	assert(root);
 
     VM& vm = getVM(*getObject(root));
-    string_table& st = vm.getStringTable();
 
     const size_t framecount = root->get_frame_count();
 

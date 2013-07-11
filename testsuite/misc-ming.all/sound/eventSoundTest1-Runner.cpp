@@ -62,7 +62,6 @@ main(int /*argc*/, char** /*argv*/)
 	assert(root);
 
 	VM& vm = getVM(*getObject(root));
-	string_table& st = vm.getStringTable();
 
 	if ( ! tester.canTestSound() )
 	{
