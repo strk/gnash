@@ -238,7 +238,7 @@ operator==(const SWFMatrix& a, const SWFMatrix& b)
         a._ty  == b._ty;
 }
 
-std::ostream& operator<<(std::ostream& o, const SWFMatrix& m);
+DSOTEXPORT std::ostream& operator<<(std::ostream& o, const SWFMatrix& m);
 
 } // namespace gnash
 

@@ -24,6 +24,7 @@
 #include <boost/cstdint.hpp>
 
 #include "ControlTag.h"
+#include "dsodefs.h" // for DSOTEXPORT
 
 // Forward declarations
 
@@ -68,7 +69,7 @@ public:
     //
     /// The process is different for imported DefinitionTags, which are added
     /// with a new id.
-	virtual void executeState(MovieClip* m,  DisplayList& /*dlist*/) const;
+	DSOTEXPORT virtual void executeState(MovieClip* m,  DisplayList& /*dlist*/) const;
 
     /// The immutable id of the DefinitionTag.
     //

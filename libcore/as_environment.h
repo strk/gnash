@@ -23,6 +23,7 @@
 #include <vector>
 #include <algorithm>
 
+#include "dsodefs.h" // for DSOTEXPORT
 #include "as_value.h" 
 #include "SafeStack.h"
 
@@ -53,7 +54,7 @@ public:
     /// A stack of objects used for variables/members lookup
     typedef std::vector<as_object*> ScopeStack;
 
-    as_environment(VM& vm);
+    DSOTEXPORT as_environment(VM& vm);
 
     VM& getVM() const { return _vm; }
 
@@ -226,7 +227,7 @@ getVM(const as_environment& env)
 movie_root& getRoot(const as_environment& env);
 string_table& getStringTable(const as_environment& env);
 int getSWFVersion(const as_environment& env);
-Global_as& getGlobal(const as_environment &env);
+DSOTEXPORT Global_as& getGlobal(const as_environment &env);
 
 } // namespace gnash
 

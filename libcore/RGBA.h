@@ -24,7 +24,7 @@
 #include <string>
 #include <boost/cstdint.hpp> 
 
-#include "dsodefs.h"
+#include "dsodefs.h" // for DSOTEXPORT
 #include "SWF.h"
 
 namespace gnash {
@@ -115,7 +115,7 @@ public:
 
 };
 
-std::ostream& operator<<(std::ostream& os, const rgba& r);
+DSOTEXPORT std::ostream& operator<<(std::ostream& os, const rgba& r);
 
 /// Create an RGBA value from a hex string (e.g. FF0000)
 //

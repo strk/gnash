@@ -165,7 +165,7 @@ SWFCxForm getWorldCxForm(const DisplayObject& d);
 /// dynamic DisplayObjects, but tags are not always stored. They are not
 /// stored in most InteractiveObjects because most properties can be
 /// overridden during SWF execution.
-class DisplayObject : public GcResource, boost::noncopyable
+class DSOTEXPORT DisplayObject : public GcResource, boost::noncopyable
 {
 public:
 

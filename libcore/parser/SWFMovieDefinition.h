@@ -27,13 +27,6 @@
 #include "gnashconfig.h" // for USE_SWFTREE
 #endif
 
-#include "movie_definition.h" // for inheritance
-#include "DefinitionTag.h" // for boost::intrusive_ptr visibility of dtor
-#include "StringPredicates.h" 
-#include "SWFRect.h"
-#include "GnashNumeric.h"
-#include "GnashAlgorithm.h"
-
 #include <boost/intrusive_ptr.hpp>
 #include <vector>
 #include <map>
@@ -44,6 +37,14 @@
 #include <boost/thread/condition.hpp>
 #include <boost/thread/barrier.hpp>
 #include <boost/scoped_ptr.hpp>
+
+#include "movie_definition.h" // for inheritance
+#include "DefinitionTag.h" // for boost::intrusive_ptr visibility of dtor
+#include "StringPredicates.h" 
+#include "SWFRect.h"
+#include "GnashNumeric.h"
+#include "GnashAlgorithm.h"
+#include "dsodefs.h" // for DSOTEXPORT
 
 // Forward declarations
 namespace gnash {
@@ -132,7 +133,7 @@ public:
     //
     /// replaces any existing DisplayObject with the same id
     ///
-    void addDisplayObject(int id, boost::intrusive_ptr<SWF::DefinitionTag> c);
+    DSOTEXPORT void addDisplayObject(int id, boost::intrusive_ptr<SWF::DefinitionTag> c);
       
     /// Return an iterator to the first dictionary element
     CharacterIterator begin() { return _map.begin(); }
@@ -161,7 +162,7 @@ private:
 /// It cannot be played directly, and does not hold
 /// current state; for that you need to call createMovie()
 /// to get a movie instance 
-class SWFMovieDefinition : public movie_definition
+class DSOTEXPORT SWFMovieDefinition : public movie_definition
 {
 public:
 
@@ -171,7 +172,7 @@ public:
     ///                          parsing.
     SWFMovieDefinition(const RunResources& runResources);
 
-    ~SWFMovieDefinition();
+    DSOTEXPORT ~SWFMovieDefinition();
 
     /// Return total number of frames advertised for the SWFMovie.
     size_t get_frame_count() const {
@@ -237,28 +238,28 @@ public:
         return m_file_length;
     }
 
-    virtual void importResources(boost::intrusive_ptr<movie_definition> source,
+    DSOTEXPORT virtual void importResources(boost::intrusive_ptr<movie_definition> source,
             const Imports& imports);
 
     virtual void addDisplayObject(boost::uint16_t id, SWF::DefinitionTag* c);
 
     /// Return a DisplayObject from the dictionary
-    SWF::DefinitionTag* getDefinitionTag(boost::uint16_t id) const;
+    DSOTEXPORT SWF::DefinitionTag* getDefinitionTag(boost::uint16_t id) const;
 
     // See dox in movie_definition
     //
     // locks _namedFramesMutex
-    bool get_labeled_frame(const std::string& label, size_t& frame_number)
+    DSOTEXPORT bool get_labeled_frame(const std::string& label, size_t& frame_number)
         const;
 
-    void add_font(int font_id, boost::intrusive_ptr<Font> f);
+    DSOTEXPORT void add_font(int font_id, boost::intrusive_ptr<Font> f);
 
-    Font* get_font(int font_id) const;
+    DSOTEXPORT Font* get_font(int font_id) const;
 
     Font* get_font(const std::string& name, bool bold, bool italic) const;
 
     // See dox in movie_definition.h
-    CachedBitmap* getBitmap(int DisplayObject_id) const;
+    DSOTEXPORT CachedBitmap* getBitmap(int DisplayObject_id) const;
 
     // See dox in movie_definition.h
     void addBitmap(int DisplayObject_id, boost::intrusive_ptr<CachedBitmap> im);
@@ -290,11 +291,11 @@ public:
     //
     // locks _namedFramesMutex and _frames_loaded_mutex
     //
-    void add_frame_name(const std::string& name);
+    DSOTEXPORT void add_frame_name(const std::string& name);
 
     /// Set an input object for later loading DefineBits
     /// images (JPEG images without the table info).
-    void set_jpeg_loader(std::auto_ptr<image::JpegInput> j_in);
+    DSOTEXPORT void set_jpeg_loader(std::auto_ptr<image::JpegInput> j_in);
 
     // See dox in movie_definition.h
     image::JpegInput* get_jpeg_loader() const {
@@ -507,7 +508,7 @@ private:
     /// NOTE: this method locks _frames_loaded_mutex
     ///
     /// @return the new value of _frames_loaded
-    virtual void incrementLoadedFrames();
+    DSOTEXPORT virtual void incrementLoadedFrames();
 
     /// Set number of bytes loaded from input stream
     //

@@ -20,8 +20,6 @@
 #ifndef GNASH_DLIST_H
 #define GNASH_DLIST_H
 
-#include "snappingrange.h"
-
 #include <string>
 #include <list>
 #include <iosfwd>
@@ -31,6 +29,10 @@
 #include <algorithm>
 #include "log.h"
 #endif
+
+#include "snappingrange.h"
+#include "dsodefs.h" // for DSOTEXPORT
+
 
 // GNASH_PARANOIA_LEVEL:
 // 0 : (not unimplemented)
@@ -93,7 +95,7 @@ public:
 	///
 	/// @param depth 
 	///	depth at which the new DisplayObject is placed.
-    void placeDisplayObject(DisplayObject* ch, int depth);
+    DSOTEXPORT void placeDisplayObject(DisplayObject* ch, int depth);
 
 	/// \brief
 	/// Replace the old DisplayObject at the specified depth with
@@ -219,7 +221,7 @@ public:
 	void omit_display();
 
 	/// May return NULL.
-	DisplayObject* getDisplayObjectAtDepth(int depth) const;
+	DSOTEXPORT DisplayObject* getDisplayObjectAtDepth(int depth) const;
 
 	/// If there are multiples, returns the *first* match only!
 	//
@@ -232,7 +234,7 @@ public:
 	/// @param caseless
 	///     Wheter comparison must be case-insensitive.
 	///
-	DisplayObject* getDisplayObjectByName(string_table& st,
+	DSOTEXPORT DisplayObject* getDisplayObjectByName(string_table& st,
             const ObjectURI& uri, bool caseless) const;
 
 	/// \brief 
@@ -389,7 +391,7 @@ DisplayList::visitAll(V& visitor) const
 	}
 }
 
-std::ostream& operator<< (std::ostream&, const DisplayList&);
+DSOTEXPORT std::ostream& operator<< (std::ostream&, const DisplayList&);
 
 } // namespace gnash
 

@@ -19,12 +19,12 @@
 #ifndef GNASH_INTERACTIVE_DISPLAY_OBJECT_H
 #define GNASH_INTERACTIVE_DISPLAY_OBJECT_H
 
+#include <vector>
+#include <cassert>
+
 #include "DisplayObject.h" // for inheritance
 #include "log.h"
 #include "as_object.h" // for getRoot()
-
-#include <vector>
-#include <cassert>
 
 namespace gnash {
     class StaticText;

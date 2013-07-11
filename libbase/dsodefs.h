@@ -57,4 +57,10 @@
 #endif
 #endif
 
+#ifdef USE_TESTSUITE
+# define DSOTEXPORT DSOEXPORT
+#else
+# define DSOTEXPORT 
+#endif
+
 #endif // DSODEFS_H

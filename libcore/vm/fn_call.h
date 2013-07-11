@@ -25,6 +25,7 @@
 #include <ostream>
 #include <algorithm>
 
+#include "utility.h" // for typeName
 #include "as_object.h"
 #include "as_value.h"
 #include "VM.h"

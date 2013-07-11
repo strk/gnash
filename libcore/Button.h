@@ -29,6 +29,7 @@
 
 #include "InteractiveObject.h" 
 #include "GnashKey.h"
+#include "dsodefs.h"
 
 // Forward declarations.
 namespace gnash {
@@ -40,7 +41,7 @@ namespace gnash {
 namespace gnash {
 
 /// Button implements Flash buttons.
-class Button : public InteractiveObject
+class DSOTEXPORT Button : public InteractiveObject
 {
 public:
 

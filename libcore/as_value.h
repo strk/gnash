@@ -19,9 +19,6 @@
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
 
-#include "dsodefs.h"
-#include "CharacterProxy.h"
-
 #include <limits>
 #include <string>
 #include <boost/variant.hpp>
@@ -30,7 +27,10 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/cstdint.hpp>
 
-#include "utility.h" // UNUSED
+#include "utility.h" // for UNUSED
+#include "dsodefs.h" // for DSOTEXPORT
+#include "CharacterProxy.h"
+
 
 // Forward declarations
 namespace gnash {
@@ -231,7 +231,7 @@ public:
     ///                     for lower versions.
     //
     /// TODO: drop the default argument.
-    std::string to_string(int version = 7) const;
+    DSOTEXPORT std::string to_string(int version = 7) const;
     
     /// Get a number representation for this value
     //
@@ -241,7 +241,7 @@ public:
     /// Conversion to boolean.
     //
     /// This function performs conversion if necessary.
-    bool to_bool(int version) const;
+    DSOTEXPORT bool to_bool(int version) const;
     
     /// Return value as an object, converting primitive values as needed.
     //
@@ -368,7 +368,7 @@ public:
     //
     /// Strict equality is defined as the two values being of the
     /// same type and the same value.
-    bool strictly_equals(const as_value& v) const;
+    DSOTEXPORT bool strictly_equals(const as_value& v) const;
     
     /// Return true if this value is abstractly equal to the given one
     //
@@ -482,7 +482,7 @@ private:
 };
 
 /// Stream operator.
-std::ostream& operator<<(std::ostream& os, const as_value& v);
+DSOTEXPORT std::ostream& operator<<(std::ostream& os, const as_value& v);
 
 /// Convert numeric value to string value, following ECMA-262 specification
 //

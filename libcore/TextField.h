@@ -53,7 +53,7 @@ wstring;
 namespace gnash {
 
 /// An instance of a DefineEditTextTag 
-class TextField : public InteractiveObject
+class DSOTEXPORT TextField : public InteractiveObject
 {
 
 public:

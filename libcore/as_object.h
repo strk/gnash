@@ -35,6 +35,7 @@
 #include "PropFlags.h"
 #include "Relay.h"
 #include "ObjectURI.h"
+#include "dsodefs.h" // for DSOTEXPORT
 
 // Forward declarations
 namespace gnash {
@@ -167,7 +168,7 @@ public:
     /// @param  global  A reference to the Global object the new
     ///                 object ultimately belongs to. The created object
     ///                 uses the resources of the Global object.
-    explicit as_object(const Global_as& global);
+    explicit DSOTEXPORT as_object(const Global_as& global);
 
     /// The as_object dtor does nothing special.
     virtual ~as_object() {}
@@ -446,7 +447,7 @@ public:
     ///                 - (false, false) : property not found
     ///                 - (true, false) : property protected from deletion
     ///                 - (true, true) : property successfully deleted
-    std::pair<bool, bool> delProperty(const ObjectURI& uri);
+    DSOTEXPORT std::pair<bool, bool> delProperty(const ObjectURI& uri);
 
     /// Get this object's own named property, if existing.
     //
@@ -855,7 +856,7 @@ hasOwnProperty(as_object& o, const ObjectURI& uri)
     return (o.getOwnProperty(uri));
 }
 
-as_object* getObjectWithPrototype(Global_as& gl, const ObjectURI& c);
+DSOTEXPORT as_object* getObjectWithPrototype(Global_as& gl, const ObjectURI& c);
 
 /// Check whether the object is an instance of a known type.
 //
@@ -902,13 +903,13 @@ typedef std::vector<std::pair<ObjectURI, as_value> > SortedPropertyList;
 SortedPropertyList enumerateProperties(as_object& o);
 
 /// Get the VM from an as_object.
-VM& getVM(const as_object& o);
+DSOTEXPORT VM& getVM(const as_object& o);
 
 /// Get the movie_root from an as_object.
-movie_root& getRoot(const as_object& o);
+DSOTEXPORT movie_root& getRoot(const as_object& o);
 
 /// Get the string_table from an as_object.
-string_table& getStringTable(const as_object& o);
+DSOTEXPORT string_table& getStringTable(const as_object& o);
 
 /// Get the RunResources from an as_object.
 const RunResources& getRunResources(const as_object& o);
@@ -917,7 +918,7 @@ const RunResources& getRunResources(const as_object& o);
 int getSWFVersion(const as_object& o);
 
 /// Get the Global object from an as_object.
-Global_as& getGlobal(const as_object& o);
+DSOTEXPORT Global_as& getGlobal(const as_object& o);
 
 /// Return whether property matching is caseless
 inline bool caseless(const as_object& o) {

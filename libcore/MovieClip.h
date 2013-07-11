@@ -81,7 +81,7 @@ namespace gnash {
 /// (Movie) containing either the definition or the code from
 /// which the MovieClip was created. The _url member and SWF version are
 /// dependent on the _swf. Exports are also sought in this Movie.
-class MovieClip : public DisplayObjectContainer 
+class DSOTEXPORT MovieClip : public DisplayObjectContainer 
 {
 public:
 

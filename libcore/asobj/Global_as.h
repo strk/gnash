@@ -33,6 +33,7 @@
 #include "fn_call.h"
 #include "log.h"
 #include "ClassHierarchy.h"
+#include "dsodefs.h" // for DSOTEXPORT
 
 // Forward declarations
 namespace gnash {
@@ -96,7 +97,7 @@ private:
 
 };
 
-as_object* createObject(const Global_as& gl);
+DSOTEXPORT as_object* createObject(const Global_as& gl);
     
 
 /// Register a built-in object

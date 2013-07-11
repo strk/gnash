@@ -154,7 +154,7 @@ public:
 	/// Return NULL if there's no DisplayObject with that name in
 	/// the sprite's display list.
 	///
-	const DisplayObject* findDisplayItemByName(const MovieClip& mc,
+	DSOTEXPORT const DisplayObject* findDisplayItemByName(const MovieClip& mc,
 			const std::string& name);
 
 	/// Find a DisplayObject on the stage by full target name.

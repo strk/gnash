@@ -41,6 +41,8 @@
 #include "namedStrings.h"
 #include "ObjectURI.h"
 #include "ConstantPool.h"
+#include "dsodefs.h"
+#include "utility.h" // for UNUSED
 
 // Forward declarations
 namespace gnash {
@@ -408,7 +410,7 @@ bool toBool(const as_value& v, const VM& vm);
 /// @param val  The value to return as a double
 /// @param vm   The VM to use for the conversion.
 /// @return     The double value of the passed as_value.
-double toNumber(const as_value& v, const VM& vm);
+DSOTEXPORT double toNumber(const as_value& v, const VM& vm);
 
 /// Convert an as_value to an object
 //

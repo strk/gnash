@@ -28,6 +28,7 @@
 #include "PropFlags.h"
 #include "as_value.h"
 #include "ObjectURI.h"
+#include "dsodefs.h" // for DSOTEXPORT
 
 namespace gnash {
     typedef as_value (*as_c_function_ptr)(const fn_call& fn);
@@ -342,7 +343,7 @@ public:
 	/// 	properties.
 	/// @return the value of this property
 	///
-	as_value getValue(const as_object& this_ptr) const;
+	DSOTEXPORT as_value getValue(const as_object& this_ptr) const;
 
 	/// Get internal cached value of this property
 	//

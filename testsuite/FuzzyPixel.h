@@ -24,6 +24,7 @@
 #include "Range2d.h"
 #include "GnashKey.h" // for namespace key
 #include "RGBA.h" // for rgba class (composition)
+#include "dsodefs.h" // for DSOTEXPORT
 
 #include <cmath>
 #include <ostream> 

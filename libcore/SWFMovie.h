@@ -22,12 +22,13 @@
 #ifndef GNASH_SWF_MOVIE_H
 #define GNASH_SWF_MOVIE_H
 
-#include "Movie.h" // for inheritance
-#include "SWFMovieDefinition.h" // for dtor visibility by smart ptr
-
 #include <boost/intrusive_ptr.hpp>
 #include <string>
 #include <map>
+
+#include "Movie.h" // for inheritance
+#include "SWFMovieDefinition.h" // for dtor visibility by smart ptr
+#include "dsodefs.h" // for DSOTEXPORT
 
 // Forward declarations
 namespace gnash {
@@ -54,7 +55,7 @@ class SWFMovie : public Movie
 
 public:
 
-	SWFMovie(as_object* object, const SWFMovieDefinition* def,
+	DSOTEXPORT SWFMovie(as_object* object, const SWFMovieDefinition* def,
             DisplayObject* parent);
 
 	virtual ~SWFMovie() {}

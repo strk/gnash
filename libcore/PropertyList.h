@@ -33,6 +33,7 @@
 #include <algorithm>
 
 #include "Property.h" // for templated functions
+#include "dsodefs.h" // for DSOTEXPORT
 
 // Forward declaration
 namespace gnash {
@@ -129,7 +130,7 @@ public:
     /// Construct the PropertyList 
     //
     /// @param obj      The as_object to which this PropertyList belongs.
-    PropertyList(as_object& obj);
+    DSOTEXPORT PropertyList(as_object& obj);
 
     /// Visit properties 
     //
@@ -184,7 +185,7 @@ public:
     ///    Flags to associate to the property if a new one is created.
     /// @return true if the value was successfully set, false
     ///         otherwise (found a read-only property, most likely).
-    bool setValue(const ObjectURI& uri, const as_value& value,
+    DSOTEXPORT bool setValue(const ObjectURI& uri, const as_value& value,
             const PropFlags& flagsIfMissing = 0);
 
     /// Get a property if it exists.
@@ -193,7 +194,7 @@ public:
     /// @return     A Property or 0, if no such property exists.
     ///             All Property objects are owned by this PropertyList. Do
     ///             not delete them.
-    Property* getProperty(const ObjectURI& uri) const;
+    DSOTEXPORT Property* getProperty(const ObjectURI& uri) const;
 
     /// Delete a Property, if existing and not protected from deletion.
     //
@@ -206,7 +207,7 @@ public:
     ///                     - (false, false) : property not found
     ///                     - (true, false) : property protected from deletion
     ///                     - (true, true) : property successfully deleted
-    std::pair<bool,bool> delProperty(const ObjectURI& uri);
+    DSOTEXPORT std::pair<bool,bool> delProperty(const ObjectURI& uri);
 
     /// Add a getter/setter property, if not already existing
     //
@@ -266,7 +267,7 @@ public:
     /// @param uri      Name of the property. 
     /// @param setTrue  The set of flags to set
     /// @param setFalse The set of flags to clear
-    void setFlags(const ObjectURI& uri, int setTrue, int setFalse);
+    DSOTEXPORT void setFlags(const ObjectURI& uri, int setTrue, int setFalse);
 
     /// Set the flags of all properties.
     //
