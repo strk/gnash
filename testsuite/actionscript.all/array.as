@@ -324,6 +324,24 @@ trysortarray.sort( testCmpBogus6 );
 check_equals ( trysortarray.length, 4 );
 xcheck_equals ( trysortarray.toString(), "2,3,4,1" );
 
+// This comparator is total nonsense, but there are people using this to
+// randomize their array, and we must oblige by not aborting. (See #39385.)
+function randomComparator(a, b) {
+   return Math.random() < 0.5 ? -1 : 1;
+}
+
+var indexedarray = new Array(10,9,8,3,2,1,0);
+indexedarray = indexedarray.sort(randomComparator, Array.RETURNINDEXEDARRAY);
+
+check_equals ( indexedarray.length, 7 );
+
+var firstRandom = indexedarray.toString();
+indexedarray = indexedarray.sort(randomComparator, Array.RETURNINDEXEDARRAY);
+var secondRandom = indexedarray.toString();
+
+// I suppose it is theoretically possible that these are the same. But it
+// seems very unlikely.
+check(firstRandom != secondRandom);
 
 //-----------------------------------------------------
 // Test non-integer and insane indices.
@@ -1795,11 +1813,11 @@ check_equals(ar.__proto__, "string");
 //
 
 #if OUTPUT_VERSION < 6
- check_totals(550);
+ check_totals(552);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(634);
+  check_totals(636);
 # else
-  check_totals(644);
+  check_totals(646);
 # endif
 #endif
