@@ -161,7 +161,103 @@ private:
     size_t _i;
 };
 
-        
+
+namespace mergesort {
+
+// AS Array.sort() allows the user to pass a scripted comparator.
+//
+// ISO/IEC 14882:2003 states that comparators used in the standard's sorting
+// functions must meet the strict weak ordering model. If this requirement is
+// not met, bad things happen (see #39385).
+//
+// We cannot guarantee that scripted comparators meet any particular ordering
+// model. In fact, some people use Array.sort() to randomize an array. We must
+// therefore have a sort implementation which is safe to use with a
+// nonconforming comparator.
+//
+// The following is an implementation of merge sort. I chose merge sort because
+// it is reasonably fast, efficient, simple and it is used by Spidermonkey for
+// the same purpose as ours. I am using in-place merge, which of course trades
+// memory efficiency for CPU time (just like std::sort). Whether this is a good
+// tradeoff in this case, remains to be seen.
+
+/// 'Safe' version of std::inplace_merge: even with a comparator that does not
+/// adhere to the strict weak ordering model, this implementation is
+/// memory-safe and free from infinite loops.
+// 
+/// Merges the two already-sorted ranges (@begin, @middle] and (@middle, @end] into the
+/// sorted range (begin, end]. @compare is used for determining order.
+template<typename IterType, typename ComparatorType>
+void
+inplaceMerge(IterType begin, IterType middle, const IterType& end, ComparatorType compare)
+{
+    typedef typename std::iterator_traits<IterType>::value_type value_type;
+
+    // Let's assume compare is std::less, for example.
+    //
+    // We walk through the first range, looking for an element which is
+    // greater or equal to the first value of the second range, the
+    // next-high value (NHV). If we find one, then we move the range of
+    // the values in the second range which are less than NHV one place to
+    // the left, and we copy NHV into the vacant space immediately to the
+    // right.
+    //     +--<--+                        -<-+   
+    //     |     | <- <-  (2nd it.)       |  |<-|<-|   (3rd it.)    
+    // [2, 6, 7  3, 4, 5]    ->    [2, 3, 7, 4, 5, 6]     ->    [2,3,4,5,6,7]
+    //     |     |     |                  |  |     |                   |
+    //     |  middle   |                  middle   |                middle
+    //     +---->------+                  +--->----+
+    while(begin != middle ) {
+        if (compare(*middle, *begin)) {
+            value_type next_high = *begin;
+            *begin = *middle;
+
+            // Find the first element that is not less than next_high. Then, shift all
+            // elements before that element one position to the left, and copy
+            // next_high into the vacant spot.
+            IterType it = std::find_if(middle, end, !boost::bind<bool>(compare, _1, next_high));
+            std::copy(boost::next(middle), it, middle);
+            *(--it) = next_high;
+        }
+        ++begin;
+    }
+}
+
+/// Merge-sort the range delineated by (@begin, end] using comparator @compare.
+template<typename IterType, typename ComparatorType>
+void mergeSort(IterType begin, IterType end, ComparatorType compare)
+{
+    typedef typename std::iterator_traits<IterType>::difference_type diff_type;
+
+    diff_type distance = std::distance(begin, end);
+    if(distance < 2) {
+        return;
+    }
+
+    IterType middle = begin;
+    std::advance(middle, distance / 2);
+
+    mergeSort(begin, middle, compare);
+    mergeSort(middle, end, compare);
+    inplaceMerge(begin, middle, end, compare);
+}
+
+
+} // namespace mergesort
+
+template <typename IterType, typename ComparatorType>
+void
+SafeSort(IterType begin, IterType end, ComparatorType compare)
+{
+    std::sort(begin, end, compare);
+}
+
+class as_value_custom;
+
+template <typename IterType>
+void
+SafeSort(IterType begin, IterType end, const as_value_custom& compare);
+
 /// \brief
 /// Attempt to sort the array using given values comparator, avc.
 /// If two or more elements in the array are equal, as determined
@@ -270,7 +366,7 @@ as_value sortIndexed(as_object& array, AVCMP avc, AVEQ ave)
 
     getIndexedElements(array, v);
 
-    std::sort(v.begin(), v.end(), avc);
+    SafeSort(v.begin(), v.end(), avc);
 
     if (std::adjacent_find(v.begin(), v.end(), ave) != v.end()) {
         return as_value(0.0);
@@ -294,7 +390,7 @@ sortIndexed(as_object& array, AVCMP avc)
 {
     std::vector<indexed_as_value> v;
     getIndexedElements(array, v);
-    std::sort(v.begin(), v.end(), avc);
+    SafeSort(v.begin(), v.end(), avc);
     as_object* o = getGlobal(array).createArray();
     pushIndices(*o, v);
     return o;
@@ -737,6 +833,12 @@ flag_preprocess(boost::uint8_t flgs, bool* douniq, bool* doindex)
     return flgs;
 }
 
+template <typename IterType>
+void
+SafeSort(IterType begin, IterType end, const as_value_custom& compare)
+{
+    mergesort::mergeSort(begin, end, compare);
+}
 
 class GetKeys
 {
