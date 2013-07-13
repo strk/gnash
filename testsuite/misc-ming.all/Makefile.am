@@ -148,6 +148,7 @@ check_PROGRAMS = \
 	callFunction_test \
 	duplicate_movie_clip_test \
 	duplicate_movie_clip_test2 \
+	empty_clip_action_test \
 	event_handler_scope_test \
 	masks_testrunner \
 	key_event_test \
@@ -237,6 +238,7 @@ check_SCRIPTS = \
 	callFunction_testrunner \
 	duplicate_movie_clip_testrunner \
 	duplicate_movie_clip_test2runner \
+	empty_clip_action_testrunner \
 	event_handler_scope_testrunner \
 	matrix_testrunner \
 	static_vs_dynamic1_testrunner \
@@ -854,6 +856,19 @@ duplicate_movie_clip_test2.swf: duplicate_movie_clip_test2
 
 duplicate_movie_clip_test2runner: $(srcdir)/../generic-testrunner.sh duplicate_movie_clip_test2.swf
 	sh $(srcdir)/../generic-testrunner.sh -r5 $(top_builddir) duplicate_movie_clip_test2.swf > $@
+	chmod 755 $@
+
+
+empty_clip_action_test_SOURCES =	\
+	empty_clip_action_test.c	\
+	$(NULL)
+empty_clip_action_test_LDADD = libgnashmingutils.la
+
+empty_clip_action_test.swf: empty_clip_action_test
+	./empty_clip_action_test $(abs_mediadir)
+
+empty_clip_action_testrunner: $(srcdir)/../generic-testrunner.sh empty_clip_action_test.swf
+	sh $(srcdir)/../generic-testrunner.sh -r5 $(top_builddir) empty_clip_action_test.swf > $@
 	chmod 755 $@
 
 
@@ -1536,6 +1551,7 @@ TEST_CASES = \
 	callFunction_testrunner \
 	duplicate_movie_clip_testrunner \
 	duplicate_movie_clip_test2runner \
+	empty_clip_action_test \
 	event_handler_scope_testrunner \
 	masks_testrunner \
 	masks_test2runner \
