@@ -163,6 +163,14 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
                 );
                 break;
             }
+
+            if ( event_length == 0 ) {
+                IF_VERBOSE_MALFORMED_SWF(
+                log_swferror(_("swf_event::read(), "
+                    "event_length = 0 (empty). Skipping."));
+                );
+                continue;
+            }
     
             key::code ch = key::INVALID;
             
