@@ -1551,7 +1551,7 @@ TEST_CASES = \
 	callFunction_testrunner \
 	duplicate_movie_clip_testrunner \
 	duplicate_movie_clip_test2runner \
-	empty_clip_action_test \
+	empty_clip_action_testrunner \
 	event_handler_scope_testrunner \
 	masks_testrunner \
 	masks_test2runner \
