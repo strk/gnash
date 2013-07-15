@@ -269,7 +269,17 @@ GifInput::processRecord(GifRecordType record)
 void
 GifInput::read()
 {
+#if GIFLIB_MAJOR >= 5
+    int errorCode;
+    _gif = DGifOpen(_inStream.get(), &readData, &errorCode); 
+#else
     _gif = DGifOpen(_inStream.get(), &readData); 
+#endif
+
+    if ( ! _gif ) {
+        // TODO: decode errorCode if available
+        throw ParserException("Could not open input GIF stream");
+    }
 
     GifRecordType record;
 
