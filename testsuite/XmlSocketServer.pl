@@ -5,8 +5,13 @@ use Time::HiRes;
 
 $SIG{PIPE}='IGNORE';
 
-my $m=new IO::Socket::INET6(Listen=>1,LocalPort=>2229,Reuse=>1,Proto=>'tcp');
-my $O=new IO::Select($m);
+my $m;
+%socketArgs = (Listen=>1,LocalPort=>2229,Reuse=>1,Proto=>'tcp');
+$m = IO::Socket::INET6->new(%socketArgs)
+   or $m = IO::Socket::INET->new(%socketArgs)
+      or die ("Socket creation failed: $!\n");
+
+my $O = new IO::Select($m) or die ("Select failed: $!\n");
 
 $verbose = ( $ARGV[0] eq '-v' ) ? 1 : 0;
 
