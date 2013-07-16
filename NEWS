@@ -9,7 +9,7 @@ Improvements since 0.8.10 release are:
  * NPAPI Plugin stability fix (#36002).
  * Improved NetStream ActionScript class support.
  * Add support for IPv6 [TODO: affects Socket/XML, and what else?].
- * Fix build against recent Boost, FFMPEG and Giflib releases.
+ * Fix build against recent Boost and FFMPEG.
  * Fix support for GIFLIB-5.0 (#39482)
  * Fix regression in dynamic sound loading (#33760).
 
