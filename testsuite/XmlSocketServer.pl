@@ -1,11 +1,10 @@
 use IO::Socket;
 use IO::Select;
 use Time::HiRes;
-use IO::Socket::IP;
 
 $SIG{PIPE}='IGNORE';
 
-my $m=new IO::Socket::IP(Listen=>1,LocalPort=>2229,Reuse=>1,Proto=>'tcp',Family=>AF_INET6,V6Only=>0) or die("Can't bind!");
+my $m=new IO::Socket::INET(Listen=>1,LocalPort=>2229,Reuse=>1,Proto=>'tcp');
 my $O=new IO::Select($m);
 
 $verbose = ( $ARGV[0] eq '-v' ) ? 1 : 0;
