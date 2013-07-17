@@ -84,7 +84,7 @@ waitForLoad(MovieClip* from)
     // Wait for the movie to load
     // TODO: drop this test and use a self-containment instead
     do {
-	    usleep(500); // give it some time... 
+	    usleep(5000); // give it some time... 
 	    tester->advance(); // loads (should) happen on next advance
 	    coverart = getCoverArt();
     } while (coverart == from);
