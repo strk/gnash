@@ -2994,17 +2994,22 @@ ActionBitwiseXor(ActionExec& thread)
     env.drop(1);
 }
 
+inline boost::uint32_t
+saneShiftParam(boost::int32_t value)
+{
+    // NOTE: ISO-IEC 14882:2003 5.8.1: "The behavior is undefined if the right
+    // operand is negative, or greater than or equal to the length in bits of
+    // the promoted left operand."
+    boost::uint32_t rv = value;
+    return rv % 32;
+}
+
 void
 ActionShiftLeft(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
-    /// A left shift of more than or equal to the size in
-    /// bits of the left operand, or a negative shift, results
-    /// in undefined behaviour in C++.
-    boost::int32_t amount = toInt(env.top(0), getVM(env)) % 32;
-    if (amount < 0) amount += 32;
-    
+    boost::uint32_t amount = saneShiftParam(toInt(env.top(0), getVM(env)));
     boost::int32_t value = toInt(env.top(1), getVM(env));
 
     value = value << amount;
@@ -3018,8 +3023,7 @@ ActionShiftRight(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
-    // This is UB.
-    boost::uint32_t amount = toInt(env.top(0), getVM(env));
+    boost::uint32_t amount = saneShiftParam(toInt(env.top(0), getVM(env)));
     boost::int32_t value = toInt(env.top(1), getVM(env));
 
     value = value >> amount;
@@ -3033,11 +3037,10 @@ ActionShiftRight2(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
-    // This is UB
-    boost::uint32_t amount = toInt(env.top(0), getVM(env)); 
+    boost::uint32_t amount = saneShiftParam(toInt(env.top(0), getVM(env))); 
     boost::int32_t value = toInt(env.top(1), getVM(env));
 
-    value = boost::uint32_t(value) >> amount;
+    value = static_cast<boost::uint32_t>(value) >> amount;
 
     env.top(1) = value;
     env.drop(1);
