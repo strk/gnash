@@ -35,6 +35,7 @@
 #include <boost/cstdint.hpp>
 #include <limits>
 #include <boost/utility/enable_if.hpp>
+#include <boost/type_traits/is_floating_point.hpp>
 
 namespace gnash {
 
@@ -54,6 +55,14 @@ isFinite(double d)
     using namespace std;
     return (isfinite(d));
 #endif
+}
+
+template <typename T>
+inline
+typename boost::enable_if<boost::is_floating_point<T>, bool>::type
+isNaN(const T& num)
+{
+        return num != num;
 }
 
 inline double
@@ -92,7 +101,13 @@ twipsToPixels(int i)
 template<size_t Factor>
 boost::int32_t
 truncateWithFactor(double a)
-{ 
+{
+    // If a is NaN, then this function would return -NAN, which when cast to
+    // int32, converts to zero on x86*, but converts to -1 on ARM. The
+    // behaviour is undefined according to ISO-IEC 14882:2003 4.9.1.
+    if (isNaN(a)) {
+        return 0;
+    }
 
     const double factor = static_cast<double>(Factor);
 

@@ -23,13 +23,13 @@
 #include <string>
 #include <boost/variant.hpp>
 #include <iosfwd> // for inlined output operator
-#include <boost/type_traits/is_floating_point.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/cstdint.hpp>
 
 #include "utility.h" // for UNUSED
 #include "dsodefs.h" // for DSOTEXPORT
 #include "CharacterProxy.h"
+#include "GnashNumeric.h" // for isNaN
 
 
 // Forward declarations
@@ -51,17 +51,6 @@ namespace gnash {
 
 // NaN constant for use in as_value implementation
 static const double NaN = std::numeric_limits<double>::quiet_NaN();
-
-// The following template works just like its C counterpart, with added
-// type safety (i.e., they will only compile for floating point arguments).
-template <typename T>
-inline bool
-isNaN(const T& num, typename boost::enable_if<boost::is_floating_point<T> >::
-        type* dummy = 0)
-{
-	UNUSED(dummy);
-	return num != num;
-}
 
 template <typename T>
 inline bool
