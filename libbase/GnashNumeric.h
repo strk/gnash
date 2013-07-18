@@ -62,7 +62,7 @@ inline
 typename boost::enable_if<boost::is_floating_point<T>, bool>::type
 isNaN(const T& num)
 {
-        return num != num;
+    return num != num;
 }
 
 inline double
@@ -75,8 +75,8 @@ template <typename T>
 inline T
 clamp(T i, T min, T max)
 {
-	assert(min <= max);
-	return std::max<T>(min, std::min<T>(i, max));
+    assert(min <= max);
+    return std::max<T>(min, std::min<T>(i, max));
 }
 
 template<typename T>
