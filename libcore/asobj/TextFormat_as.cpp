@@ -34,6 +34,8 @@
 #include "Array_as.h"
 #include "fontlib.h"
 #include "Font.h"
+#include "movie_definition.h"
+#include "movie_root.h"
 
 
 namespace gnash {
@@ -582,12 +584,30 @@ textformat_getTextExtent(const fn_call& fn)
     // getTextExtent currently only takes account of device fonts we don't
     // need it.
 
-    Font* f = relay->font() ?
-        fontlib::get_font(*relay->font(), bold, italic) :
-        fontlib::get_default_font().get();
-    
+    Font* f = 0;
+    if (relay->font()) {
+        const std::string& name = *relay->font();
+        const movie_definition* md = getRoot(fn).getRootMovie().definition();
+
+        // Option 1. Name refers to an imported font ('asset') symbol.
+        boost::uint16_t fontId = md->exportID(name);
+        if (fontId != 0) {
+            f = md->get_font(fontId);
+        }
+
+        if (!f) {
+            // Option 2. Name refers to an embedded font.
+            f = md->get_font(name, bold, italic);
+            if (!f) {
+                 // Option 3. Name refers to a device font.
+                 f = fontlib::get_font(name, bold, italic);
+            }
+        }
+    } else {
+        f = fontlib::get_default_font().get();
+    }
     // Whether to use embedded fonts if required.
-    const bool em = false;
+    const bool em = true;
 
     /// Advance, descent, ascent given according to square of 1024.
     //
@@ -600,7 +620,7 @@ textformat_getTextExtent(const fn_call& fn)
     double height = s.empty() ? 0 : size;
     double width = 0;
     double curr = 0;
-    
+
     const double ascent = f->ascent(em) * scale;
     const double descent = f->descent(em) * scale;
 

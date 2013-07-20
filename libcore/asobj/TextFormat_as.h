@@ -186,7 +186,11 @@ private:
         /// 0xFF0000 is red, 0x00FF00 is green.
     boost::optional<rgba> _color;    
 
-    // The name of a font for text as a string.
+    /// a) The name of an imported font asset (not the font's name), or
+    /// b) the name of an embedded font, or
+    /// c) the name of a device font
+    ///
+    /// If no font is set, a default font will be used instead.
     boost::optional<std::string> _font;    
 
     /// An integer that indicates the indentation from the left
