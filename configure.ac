@@ -4029,7 +4029,7 @@ if test x"$npapi" = xyes; then
     PKG_ERR([No xulrunner development package is installed!])
     PKG_SUGGEST([Install it from http://releases.mozilla.org/pub/mozilla.org/xulrunner])
     DEB_INSTALL([xulrunner-dev])
-    DEB_INSTALL([firefox-dev])
+    DEB_ALTERNATIVE([firefox-dev])
     RPM_INSTALL([xulrunner-devel])
   fi
 else
