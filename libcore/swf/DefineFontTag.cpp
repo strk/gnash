@@ -285,7 +285,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
         in.ensureBytes(nGlyphs*2);
 
         for (size_t i = 0; i < nGlyphs; i++) {
-            // This is documented to be unsigned, but then we get negative
+            // This is documented to be signed, but then we get negative
             // advances for subpixel fonts because the advance overflows
             // int16_t.
             _glyphTable[i].advance = static_cast<float>(in.read_u16());
