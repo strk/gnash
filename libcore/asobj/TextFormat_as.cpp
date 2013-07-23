@@ -542,7 +542,6 @@ textformat_align(const fn_call& fn)
     return ret;
 }
 
-
 /// Return various dimensions of a theoretical run of text
 //
 /// The TextFormat's format values are used to calculate what the dimensions
@@ -573,12 +572,12 @@ textformat_getTextExtent(const fn_call& fn)
     bool limitWidth = (fn.nargs > 1);
     
     // Everything must be in twips here.
-    const double tfw = limitWidth ?
+    const int tfw = limitWidth ?
         pixelsToTwips(toNumber(fn.arg(1), getVM(fn)) - 4) : 0;
 
     const bool bold = relay->bold() ? *relay->bold() : false;
     const bool italic = relay->italic() ? *relay->italic() : false;
-    const double size = relay->size() ? *relay->size() : 240;
+    const int size = relay->size() ? *relay->size() : 240;
 
     // Note: currently leading is never defined for device fonts, and since
     // getTextExtent currently only takes account of device fonts we don't
@@ -615,14 +614,15 @@ textformat_getTextExtent(const fn_call& fn)
     /// 240 twips for a size 12.
     const double scale = size / static_cast<double>(f->unitsPerEM(em));
 
-    double width = 0;
-    double curr = 0;
+    int width = 0;
+    int curr = 0;
 
-    const double ascent = f->ascent(em) * scale;
-    const double descent = f->descent(em) * scale;
+    const int ascent = f->ascent(em) * scale;
+    const int descent = f->descent(em) * scale;
+    
     // If the text is empty, height is 0. Otherwise we start with the font
     // size.
-    double height = s.empty() ? 0 : ascent + descent;
+    int height = s.empty() ? 0 : ascent + descent;
 
     bool limitWidthSet = true;
     if (version < 8 && limitWidth) {
@@ -634,13 +634,16 @@ textformat_getTextExtent(const fn_call& fn)
             it != e; ++it) {
 
         const int index = f->get_glyph_index(*it, em);
-        double advance = f->get_advance(index, em) * scale;
+        int advance = f->get_advance(index, em) * scale;
         // Snap advance to the nearest pixel boundary.
-        advance = ((int)advance + 19) / 20 * 20;
+        advance = (advance + 19) / 20 * 20;
 
-        if (limitWidth && (curr + advance > tfw) && it != s.begin() ) {
-            curr = 0;
-            height += ascent + descent;
+        if (limitWidth && it != s.begin() ) {
+            bool wrap = version < 8 ? (curr + advance > tfw) : (curr + advance >= tfw);
+            if (wrap) {
+                curr = 0;
+                height += ascent + descent;
+            }
         }
         curr += advance;
         width = std::max(width, curr);
