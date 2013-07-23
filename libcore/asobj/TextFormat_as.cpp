@@ -615,14 +615,14 @@ textformat_getTextExtent(const fn_call& fn)
     /// 240 twips for a size 12.
     const double scale = size / static_cast<double>(f->unitsPerEM(em));
 
-    // If the text is empty, size is 0. Otherwise we start with the font
-    // size.
     double width = 0;
     double curr = 0;
 
     const double ascent = f->ascent(em) * scale;
     const double descent = f->descent(em) * scale;
-    double height = ascent + descent;
+    // If the text is empty, height is 0. Otherwise we start with the font
+    // size.
+    double height = s.empty() ? 0 : ascent + descent;
 
     bool limitWidthSet = true;
     if (version < 8 && limitWidth) {
