@@ -332,22 +332,45 @@ check(te.hasOwnProperty("textFieldHeight"));
 check(te.hasOwnProperty("width"));
 check(te.hasOwnProperty("height"));
 
-xcheck_equals(Math.round(te.textFieldWidth), 37);
+check_equals(Math.round(te.textFieldWidth), 37);
+check_equals(Math.round(te.width), 33);
 check_equals(Math.round(te.ascent), 11);
 
 #if OUTPUT_VERSION > 7
- xcheck_equals(Math.round(te.textFieldHeight), 18); 
+ check_equals(Math.round(te.textFieldHeight), 18); 
  check_equals(Math.round(te.descent), 3); 
 #else
- xcheck_equals(Math.round(te.textFieldHeight), 17); 
- xcheck_equals(Math.round(te.descent), 2); 
+ check_equals(Math.round(te.textFieldHeight), 17); 
+ check_equals(te.descent, 2); 
 #endif
+
+te = tf2.getTextExtent("a");
+check_equals(Math.round(te.width), 8); 
+te = tf2.getTextExtent("aa");
+check_equals(Math.round(te.width), 16); 
+te = tf2.getTextExtent("aaa");
+check_equals(Math.round(te.width), 24); 
 
 te = tf2.getTextExtent("Hello", 10);
 #if OUTPUT_VERSION > 7
- xcheck_equals(Math.round(te.textFieldHeight), 74);
+ check_equals(Math.round(te.textFieldHeight), 74);
 #else
- xcheck_equals(Math.round(te.textFieldHeight), 17);
+ check_equals(Math.round(te.textFieldHeight), 17);
+#endif
+
+#if OUTPUT_VERSION == 7
+ var wrappingPoint = 0;
+ for (var i:Number = 10; i < 30; i++) {
+     if (tf2.getTextExtent("Hello", i).height != 13) {
+        wrappingPoint = i;
+        break;
+     }
+ }
+
+ // Wrapping is enabled only if the wrapping value >= tfw of the first two
+ // letters. Doh.
+ check_equals(wrappingPoint, tf2.getTextExtent("He").textFieldWidth );
+ check_equals(tf2.getTextExtent("Hello", wrappingPoint).height, 27);
 #endif
 
 check_equals(te.textFieldWidth, 10);
@@ -355,16 +378,16 @@ check_equals(te.textFieldWidth, 10);
 #if OUTPUT_VERSION > 7
 check_equals(Math.round(te.width), 9);
 #else
-xcheck_equals(Math.round(te.width), 33);
+check_equals(Math.round(te.width), 33);
 #endif
 
 
 te = tf2.getTextExtent("Hello", 5);
 #if OUTPUT_VERSION < 8
- xcheck_equals(Math.round(te.textFieldHeight), 17);
- xcheck_equals(Math.round(te.descent), 2); 
+ check_equals(Math.round(te.textFieldHeight), 17);
+ check_equals(te.descent, 2); 
 #else
- xcheck_equals(Math.round(te.textFieldHeight), 74);
+ check_equals(Math.round(te.textFieldHeight), 74);
  check_equals(Math.round(te.descent), 3);
 #endif
 check_equals(te.textFieldWidth, 5);
@@ -374,59 +397,69 @@ check_equals(Math.round(te.ascent), 11);
 // Width of largest character in version 8?
 check_equals(Math.round(te.width), 9);
 #else
-xcheck_equals(Math.round(te.width), 33);
+check_equals(Math.round(te.width), 33);
 #endif
 
 
 te = tf2.getTextExtent("Longer sentence with more words.", 30);
 check_equals(te.textFieldWidth, 30);
-xcheck_equals(Math.round(te.width), 25);
+check_equals(Math.round(te.width), 25);
 #if OUTPUT_VERSION > 7
 xcheck_equals(te.height, 152.9);
 #else
 xcheck_equals(te.height, 152);
 #endif
 
+te = tf2.getTextExtent("Longersentencewithoneword", 30);
+check_equals(te.textFieldWidth, 30);
+#if OUTPUT_VERSION > 7
+xcheck_equals(te.height, 125.1);
+xcheck_equals(Math.round(te.width), 25);
+#else
+check_equals(te.width, 26);
+check_equals(te.height, 111);
+#endif
+
 te = tf2.getTextExtent("o");
-xcheck_equals(Math.round(te.textFieldWidth), 12);
+check_equals(Math.round(te.textFieldWidth), 12);
 check_equals(Math.round(te.ascent), 11);
 #if OUTPUT_VERSION < 8
- xcheck_equals(Math.round(te.textFieldHeight), 17); 
- xcheck_equals(Math.round(te.descent), 2); 
+ check_equals(Math.round(te.textFieldHeight), 17); 
+ check_equals(te.descent, 2); 
 #else
- xcheck_equals(Math.round(te.textFieldHeight), 18); 
+ check_equals(Math.round(te.textFieldHeight), 18); 
  check_equals(Math.round(te.descent), 3); 
 #endif
 
 te = tf2.getTextExtent("oo");
-xcheck_equals(Math.round(te.textFieldWidth), 20);
+check_equals(Math.round(te.textFieldWidth), 20);
 check_equals(Math.round(te.ascent), 11);
 #if OUTPUT_VERSION < 8
- xcheck_equals(Math.round(te.textFieldHeight), 17); 
- xcheck_equals(Math.round(te.descent), 2); 
+ check_equals(Math.round(te.textFieldHeight), 17); 
+ check_equals(te.descent, 2); 
 #else
- xcheck_equals(Math.round(te.textFieldHeight), 18); 
+ check_equals(Math.round(te.textFieldHeight), 18); 
  check_equals(Math.round(te.descent), 3); 
 #endif
 
 te = tf2.getTextExtent("ool");
-xcheck_equals(Math.round(te.textFieldWidth), 24);
+check_equals(Math.round(te.textFieldWidth), 24);
 check_equals(Math.round(te.ascent), 11);
 #if OUTPUT_VERSION < 8
- xcheck_equals(Math.round(te.textFieldHeight), 17); 
- xcheck_equals(Math.round(te.descent), 2); 
+ check_equals(Math.round(te.textFieldHeight), 17); 
+ check_equals(te.descent, 2); 
 #else
- xcheck_equals(Math.round(te.textFieldHeight), 18); 
+ check_equals(Math.round(te.textFieldHeight), 18); 
  check_equals(Math.round(te.descent), 3); 
 #endif
 
 tf2.size = 20;
 te = tf2.getTextExtent("ool");
-xcheck_equals(Math.round(te.textFieldHeight), 27);
-xcheck_equals(Math.round(te.textFieldWidth), 36);
+check_equals(Math.round(te.textFieldHeight), 27);
+check_equals(Math.round(te.textFieldWidth), 36);
 #if OUTPUT_VERSION < 8
- xcheck_equals(Math.round(te.ascent), 18); 
- xcheck_equals(Math.round(te.descent), 4); 
+ check_equals(te.ascent, 18); 
+ check_equals(te.descent, 4); 
 #else
  check_equals(Math.round(te.ascent), 19); 
  check_equals(Math.round(te.descent), 5);
@@ -437,7 +470,7 @@ xcheck_equals(Math.round(te.textFieldWidth), 36);
 #if OUTPUT_VERSION < 7
     check_totals(122);
 #elif OUTPUT_VERSION == 7
-    check_totals(159);
+    check_totals(168);
 #else 
-    check_totals(159);
+    check_totals(166);
 #endif
