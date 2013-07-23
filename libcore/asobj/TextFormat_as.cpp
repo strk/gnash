@@ -570,11 +570,11 @@ textformat_getTextExtent(const fn_call& fn)
     const int version = getSWFVersion(fn);
     const std::string& s = fn.arg(0).to_string(version);
 
-    const bool limitWidth = (fn.nargs > 1);
+    bool limitWidth = (fn.nargs > 1);
     
     // Everything must be in twips here.
     const double tfw = limitWidth ?
-        pixelsToTwips(toNumber(fn.arg(1), getVM(fn))) : 0;
+        pixelsToTwips(toNumber(fn.arg(1), getVM(fn)) - 4) : 0;
 
     const bool bold = relay->bold() ? *relay->bold() : false;
     const bool italic = relay->italic() ? *relay->italic() : false;
@@ -617,40 +617,66 @@ textformat_getTextExtent(const fn_call& fn)
 
     // If the text is empty, size is 0. Otherwise we start with the font
     // size.
-    double height = s.empty() ? 0 : size;
     double width = 0;
     double curr = 0;
 
     const double ascent = f->ascent(em) * scale;
     const double descent = f->descent(em) * scale;
+    double height = ascent + descent;
+
+    bool limitWidthSet = true;
+    if (version < 8 && limitWidth) {
+        limitWidth = false;
+        limitWidthSet = false;
+    }
 
     for (std::string::const_iterator it = s.begin(), e = s.end();
             it != e; ++it) {
 
         const int index = f->get_glyph_index(*it, em);
-        const double advance = f->get_advance(index, em) * scale;
-        if (limitWidth && (curr + advance > tfw)) {
+        double advance = f->get_advance(index, em) * scale;
+        // Snap advance to the nearest pixel boundary.
+        advance = ((int)advance + 19) / 20 * 20;
+
+        if (limitWidth && (curr + advance > tfw) && it != s.begin() ) {
             curr = 0;
-            height += size;
+            height += ascent + descent;
         }
         curr += advance;
         width = std::max(width, curr);
 
+        if (!limitWidthSet) {
+            // For v7, wrapping is enabled only if the limit param is greater
+            // than or equal to the width of the first two letters (plus the
+            // 4-pixel padding, which has been subtracted from tfw).
+            if (std::distance(s.begin(), it) == 1) {
+               limitWidth = (tfw >= width);
+               limitWidthSet = true;
+            }
+        }
     }
 
     Global_as& gl = getGlobal(fn);
     as_object* obj = new as_object(gl);
 
-    obj->init_member("textFieldHeight", twipsToPixels(height) + 4);
     obj->init_member("textFieldWidth",
-            limitWidth ? twipsToPixels(tfw) : twipsToPixels(width) + 4);
+            (fn.nargs > 1) ? twipsToPixels(tfw) + 4 : twipsToPixels(width) + 4);
     obj->init_member("width", twipsToPixels(width));
-    obj->init_member("height", twipsToPixels(height));
-    obj->init_member("ascent", twipsToPixels(ascent));
-    obj->init_member("descent", twipsToPixels(descent));
+
+    double ascentPixels = twipsToPixels(ascent);
+    double descentPixels = twipsToPixels(descent);
+    double heightPixels = twipsToPixels(height);
+    if (version < 8) {
+        ascentPixels = std::floor(ascentPixels);
+        descentPixels = std::floor(descentPixels);
+        heightPixels = std::floor(heightPixels);
+    }
+    obj->init_member("ascent", ascentPixels);
+    obj->init_member("descent", descentPixels);
+    obj->init_member("height", heightPixels);
+    obj->init_member("textFieldHeight", heightPixels + 4);
 
     return as_value(obj);
-
 }
 
 
