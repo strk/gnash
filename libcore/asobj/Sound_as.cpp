@@ -732,7 +732,7 @@ Sound_as::start(double secOff, int loops)
             inPoint = (secOff*44100);
         }
 
-        log_debug("Sound.start: secOff:%d", secOff);
+        log_debug("Sound.start: secOff:%d loops:%d", secOff, loops);
 
         _soundHandler->startSound(
                     soundId,
@@ -1019,9 +1019,8 @@ sound_start(const fn_call& fn)
         if (fn.nargs > 1) {
             loop = (int) toNumber(fn.arg(1), getVM(fn)) - 1;
 
-            // -1 means infinite playing of sound
-            // sanity check
-            loop = loop < 0 ? -1 : loop;
+            // Negative values count as playing once (aka looping 0 times)
+            loop = std::max(0, toInt(fn.arg(1), getVM(fn)) - 1);
         }
     }
     so->start(secondOffset, loop);

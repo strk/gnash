@@ -139,7 +139,7 @@ public:
     ///
     std::auto_ptr<EmbedSoundInst> createInstance(media::MediaHandler& mh,
             unsigned int inPoint, unsigned int outPoint,
-            const SoundEnvelopes* envelopes, unsigned int loopCount);
+            const SoundEnvelopes* envelopes, int loopCount);
 
     /// Drop all active sounds
     //

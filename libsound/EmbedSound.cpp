@@ -59,7 +59,7 @@ EmbedSound::eraseActiveSound(Instances::iterator i)
 std::auto_ptr<EmbedSoundInst>
 EmbedSound::createInstance(media::MediaHandler& mh, unsigned int inPoint,
         unsigned int outPoint, const SoundEnvelopes* envelopes,
-        unsigned int loopCount)
+        int loopCount)
 {
     std::auto_ptr<EmbedSoundInst> ret(
         new EmbedSoundInst(*this, mh, inPoint, outPoint, envelopes, loopCount));
