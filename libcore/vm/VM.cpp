@@ -464,7 +464,14 @@ toInt(const as_value& v, const VM& vm)
 {
     const double d = v.to_number(vm.getSWFVersion());
 
-    if (!isFinite(d)) return 0;
+    if (!isFinite(d) || isNaN(d)) {
+        return 0;
+    }
+
+    typedef std::numeric_limits<boost::int32_t> limit;
+    if (d >= limit::min() && d <= limit::max()) {
+        return d;
+    }
 
     if (d < 0) {   
         return - static_cast<boost::uint32_t>(std::fmod(-d, 4294967296.0));
