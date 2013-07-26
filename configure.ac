@@ -1059,7 +1059,7 @@ if test x"${build_fb}" = xyes -o x"${build_fb}" = xauto; then
   build_fb_agg=yes
 fi
 dnl AGG support for the framebuffer requires the rawfb device
-if test x"${build_fb_agg}" = xyes -o x"${build_agg}" = xyes; then
+if test x"${build_fb_agg}" = xyes -a x"${build_agg}" = xyes; then
   build_rawfb_device=yes
   device_list="RawFB"
   ndevice=1
