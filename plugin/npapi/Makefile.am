@@ -78,7 +78,7 @@ libgnashplugin_la_SOURCES  = plugin.cpp \
 
 libgnashplugin_la_LIBADD   = \
 	$(GLIB_LIBS) \
-	-lboost_iostreams \
+	$(BOOST_PLUGIN_LIBS) \
 	$(NULL)
 
 # Scriptable plugin support
