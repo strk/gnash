@@ -32,14 +32,15 @@
 
 namespace gnash {
 
+struct gl_errors_t {
+     GLenum val;
+     const char *str;
+};
+
 // Returns a string representation of an OpenGL error
 static const char *gl_get_error_string(GLenum error)
 {
-    static const struct {
-        GLenum val;
-        const char *str;
-    }
-    gl_errors[] = {
+    gl_errors_t gl_errors[] = {
         { GL_NO_ERROR,          "no error" },
         { GL_INVALID_ENUM,      "invalid enumerant" },
         { GL_INVALID_VALUE,     "invalid value" },
@@ -50,13 +51,12 @@ static const char *gl_get_error_string(GLenum error)
 #ifdef GL_INVALID_FRAMEBUFFER_OPERATION_EXT
         { GL_INVALID_FRAMEBUFFER_OPERATION_EXT, "invalid framebuffer operation" },
 #endif
-        { ~0, NULL }
     };
 
-    int i;
-    for (i = 0; gl_errors[i].str; i++) {
-        if (gl_errors[i].val == error)
-            return gl_errors[i].str;
+    for (gl_errors_t *it = boost::begin(gl_errors), *end = boost::end(gl_errors);
+         it != end; ++it) {
+        if (it->val == error)
+            return it->str;
     }
     return "unknown";
 }
