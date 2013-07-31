@@ -185,16 +185,13 @@ public:
     /// All paths with a higher index in the list belong to the same 
     /// shape unless they have m_new_shape==true on their own.
     /// Sub-shapes affect the order in which outlines and shapes are rendered.
-    bool m_new_shape;
     
     /// Default constructor
     //
     /// @param newShape
     ///    True if this path starts a new subshape
     ///
-    Path(bool newShape = false)
-        : 
-        m_new_shape(newShape)
+    Path()
     {
         reset(0, 0, 0, 0, 0);
     }
@@ -205,8 +202,7 @@ public:
         m_fill1(from.m_fill1),
         m_line(from.m_line),
         ap(from.ap),
-        m_edges(from.m_edges),
-        m_new_shape(from.m_new_shape)                
+        m_edges(from.m_edges)
     {
     }
     
@@ -233,10 +229,7 @@ public:
     /// @param newShape
     ///    True if this path starts a new subshape
     Path(boost::int32_t ax, boost::int32_t ay, 
-            unsigned fill0, unsigned fill1, unsigned line, 
-            bool newShape)
-        :
-        m_new_shape(newShape)
+            unsigned fill0, unsigned fill1, unsigned line)
     {
         reset(ax, ay, fill0, fill1, line);
     }
@@ -462,18 +455,6 @@ public:
         {
             (*it).transform(mat);
         }
-    }        
-
-    /// Set this path as the start of a new (sub)shape
-    void setNewShape() 
-    { 
-            m_new_shape=true; 
-    }
-
-    /// Return true if this path starts a new (sub)shape
-    bool getNewShape() const 
-    { 
-        return m_new_shape; 
     }
 
     /// Return true if this path contains no edges
@@ -556,13 +537,6 @@ public:
     {
         return m_edges[n];
     }
-
-    /// Returns true if this path begins a new subshape. <-- VERIFYME
-    bool isNewShape() const
-    {
-        return m_new_shape;
-    }
-
 }; // end of class Path
 
 namespace geometry
