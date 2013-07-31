@@ -138,7 +138,6 @@ private:
 
 } // anonymous namespace
 
-
 ShapeRecord::ShapeRecord(SWFStream& in, SWF::TagType tag, movie_definition& m,
         const RunResources& r)
 {
@@ -153,60 +152,73 @@ ShapeRecord::~ShapeRecord()
 {
 }
 
-ShapeRecord::ShapeRecord(const ShapeRecord& other)
-    :
-    _fillStyles(other._fillStyles),
-    _lineStyles(other._lineStyles),
-    _paths(other._paths),
-    _bounds(other._bounds)
-{
-}
-    
-ShapeRecord&
-ShapeRecord::operator=(const ShapeRecord& other)
-{
-    _fillStyles = other._fillStyles;
-    _lineStyles = other._lineStyles;
-    _paths = other._paths;
-    _bounds = other._bounds;
-    return *this;
-}
-
 void
 ShapeRecord::clear()
 {
-    _fillStyles.clear();
-    _lineStyles.clear();
-    _paths.clear();
     _bounds.set_null();
+    _subshapes.clear();
 }
 
 void
-ShapeRecord::addFillStyle(const FillStyle& fs)
+Subshape::addFillStyle(const FillStyle& fs)
 {
     _fillStyles.push_back(fs);
 }
 
+
+/// Find the bounds of this subhape, and return them in a rectangle.
+SWFRect
+Subshape::computeBounds(int swfVersion) const
+{
+    SWFRect bounds;
+
+    for (unsigned int i = 0; i < _paths.size(); i++) {
+        const Path& p = _paths[i];
+
+        unsigned thickness = 0;
+        if ( p.m_line ) {
+            // For glyph shapes m_line is allowed to be 1
+            // while no defined line styles are allowed.
+            if (lineStyles().empty()) {
+                // This is either a Glyph, for which m_line==1 is valid
+                // or a bug in the parser, which we have no way to
+                // check at this time
+                assert(p.m_line == 1);
+            }
+            else
+            {
+                thickness = lineStyles()[p.m_line-1].getThickness();
+            }
+        }
+        p.expandBounds(bounds, thickness, swfVersion);
+    }
+
+    return bounds;
+}
+
 void
-ShapeRecord::setLerp(const ShapeRecord& a, const ShapeRecord& b,
+ShapeRecord::setLerp(const ShapeRecord& aa, const ShapeRecord& bb,
         const double ratio)
 {
+	assert(_subshapes.size() == 1);
 
     // Update current bounds.
-    _bounds.set_lerp(a.getBounds(), b.getBounds(), ratio);
+    _bounds.set_lerp(aa.getBounds(), bb.getBounds(), ratio);
+    const Subshape& a = aa.subshapes().front();
+    const Subshape& b = bb.subshapes().front();
 
     // fill styles
     const FillStyles::const_iterator fs1 = a.fillStyles().begin();
     const FillStyles::const_iterator fs2 = b.fillStyles().begin();
 
-    std::for_each(_fillStyles.begin(), _fillStyles.end(),
+    std::for_each(_subshapes.front().fillStyles().begin(), _subshapes.front().fillStyles().end(),
             Lerp<FillStyles>(fs1, fs2, ratio));
 
     // line styles
     const LineStyles::const_iterator ls1 = a.lineStyles().begin();
     const LineStyles::const_iterator ls2 = b.lineStyles().begin();
 
-    std::for_each(_lineStyles.begin(), _lineStyles.end(),
+    std::for_each(_subshapes.front().lineStyles().begin(), _subshapes.front().lineStyles().end(),
             Lerp<LineStyles>(ls1, ls2, ratio));
 
     // This is used for cases in which number
@@ -218,8 +230,8 @@ ShapeRecord::setLerp(const ShapeRecord& a, const ShapeRecord& b,
     // shape
     const Paths& paths1 = a.paths();
     const Paths& paths2 = b.paths();
-    for (size_t i = 0, k = 0, n = 0; i < _paths.size(); i++) {
-        Path& p = _paths[i];
+    for (size_t i = 0, k = 0, n = 0; i < _subshapes.front().paths().size(); i++) {
+        Path& p = _subshapes.front().paths()[i];
         const Path& p1 = i < paths1.size() ? paths1[i] : empty_path;
         const Path& p2 = n < paths2.size() ? paths2[n] : empty_path;
 
@@ -251,7 +263,6 @@ ShapeRecord::setLerp(const ShapeRecord& a, const ShapeRecord& b,
             }
         }
     }
-
 }
 
 void
@@ -265,6 +276,14 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                             tag == SWF::DEFINESHAPE3 ||
                             tag == SWF::DEFINESHAPE4 ||
                             tag == SWF::DEFINESHAPE4_);
+
+    Subshape subshape;
+    if (!_subshapes.empty()) {
+    	// This is a little naughty. In case we're reading DEFINEMORPH, we'll
+    	// have been provided with styles, which are now copied....
+    	subshape = _subshapes.front();
+    	_subshapes.clear();
+    }
 
     if (styleInfo) {
         _bounds = readRect(in);
@@ -283,8 +302,8 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
             LOG_ONCE(log_unimpl("DEFINESHAPE4 edge boundaries and scales"));
         }
     
-        readFillStyles(_fillStyles, in, tag, m, r);
-        readLineStyles(_lineStyles, in, tag, m, r);
+        readFillStyles(subshape.fillStyles(), in, tag, m, r);
+        readLineStyles(subshape.lineStyles(), in, tag, m, r);
     }
 
     if (tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2 ) {
@@ -350,15 +369,17 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
             if (flags == SHAPE_END) {  
                 // Store the current path if any.
                 if (! current_path.empty()) {
-                    _paths.push_back(current_path);
+                    subshape.paths().push_back(current_path);
                     current_path.m_edges.resize(0);
+                    _subshapes.push_back(subshape);
+                    subshape.clear();
                 }
                 break;
             }
             if (flags & SHAPE_MOVE) {  
                 // Store the current path if any, and prepare a fresh one.
                 if (! current_path.empty()) {
-                    _paths.push_back(current_path);
+                    subshape.paths().push_back(current_path);
                     current_path.m_edges.resize(0);
                 }
                 in.ensureBits(5);
@@ -383,7 +404,7 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
             if ((flags & SHAPE_FILLSTYLE0_CHANGE) && num_fill_bits > 0) {
                 // FillStyle_0_change = 1;
                 if (! current_path.empty()) {
-                    _paths.push_back(current_path);
+                    subshape.paths().push_back(current_path);
                     current_path.m_edges.resize(0);
                     current_path.ap.x = x;
                     current_path.ap.y = y;
@@ -405,11 +426,11 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                     }
                 } else {
                     // 1-based index
-                    if ( style > _fillStyles.size() ) {
+                    if ( style > subshape.fillStyles().size() ) {
                         IF_VERBOSE_MALFORMED_SWF(
                              log_swferror(_("Invalid fill style %d in "
                                      "fillStyle0Change record - %d defined. "
-                                     "Set to 0."), style, _fillStyles.size());
+                                     "Set to 0."), style, subshape.fillStyles().size());
                         );
                         style = 0;
                     }
@@ -426,7 +447,7 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
             if ((flags & SHAPE_FILLSTYLE1_CHANGE) && num_fill_bits > 0) {
                 // FillStyle_1_change = 1;
                 if (! current_path.empty()) {
-                    _paths.push_back(current_path);
+                    subshape.paths().push_back(current_path);
                     current_path.m_edges.resize(0);
                     current_path.ap.x = x;
                     current_path.ap.y = y;
@@ -448,11 +469,11 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                     }
                 } else {
                     // 1-based index
-                    if ( style > _fillStyles.size() ) {
+                    if ( style > subshape.fillStyles().size() ) {
                         IF_VERBOSE_MALFORMED_SWF(
                             log_swferror(_("Invalid fill style %d in "
                                     "fillStyle1Change record - %d defined. "
-                                    "Set to 0."), style, _fillStyles.size());
+                                    "Set to 0."), style, subshape.fillStyles().size());
                         );
                         style = 0;
                     }
@@ -468,7 +489,7 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
             if ((flags & SHAPE_LINESTYLE_CHANGE) && num_line_bits > 0) {
                 // line_style_change = 1;
                 if (! current_path.empty()) {
-                    _paths.push_back(current_path);
+                    subshape.paths().push_back(current_path);
                     current_path.m_edges.resize(0);
                     current_path.ap.x = x;
                     current_path.ap.y = y;
@@ -489,11 +510,11 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                     }
                 } else {
                     // 1-based index
-                    if (style > _lineStyles.size()) {
+                    if (style > subshape.lineStyles().size()) {
                         IF_VERBOSE_MALFORMED_SWF(
                             log_swferror(_("Invalid fill style %d in "
                                     "lineStyleChange record - %d defined. "
-                                    "Set to 0."), style, _lineStyles.size());
+                                    "Set to 0."), style, subshape.lineStyles().size());
                         );
                         style = 0;
                     }
@@ -520,20 +541,15 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
     
                 // Store the current path if any.
                 if (! current_path.empty()) {
-                    _paths.push_back(current_path);
+                    subshape.paths().push_back(current_path);
                     current_path.clear();
                 }
     
-                // Tack on an empty path signalling a new shape.
-                // @@ need better understanding of whether this is correct??!?!!
-                // @@ i.e., we should just start a whole new shape here, right?
-                _paths.push_back(Path());
-                _paths.back().m_new_shape = true;
+                _subshapes.push_back(subshape);
+                subshape.clear();
     
-                fill_base = _fillStyles.size();
-                line_base = _lineStyles.size();
-                readFillStyles(_fillStyles, in, tag, m, r);
-                readLineStyles(_lineStyles, in, tag, m, r);
+                readFillStyles(subshape.fillStyles(), in, tag, m, r);
+                readLineStyles(subshape.lineStyles(), in, tag, m, r);
     
                 in.ensureBits(8);
                 num_fill_bits = in.read_uint(4);
@@ -605,7 +621,12 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
     if (!styleInfo) {
         // TODO: performance would be improved by computing
         //       the bounds as edges are parsed.
-        computeBounds(_bounds, _paths, _lineStyles, m.get_version());
+    	_bounds.set_null();
+    	for (Subshapes::const_iterator it = _subshapes.begin(),
+    			end = _subshapes.end(); it != end; ++it) {
+            SWFRect bounds = it->computeBounds(m.get_version());
+            _bounds.expand_to_rect(bounds);
+    	}
     }
 
 #ifdef GNASH_DEBUG_SHAPE_BOUNDS
@@ -680,34 +701,6 @@ readLineStyles(ShapeRecord::LineStyles& styles, SWFStream& in,
     }
 }
 
-// Find the bounds of this shape, and store them in the given rectangle.
-void
-computeBounds(SWFRect& bounds, const ShapeRecord::Paths& paths,
-        const ShapeRecord::LineStyles& lineStyles, int swfVersion)
-{
-    bounds.set_null();
-
-    for (unsigned int i = 0; i < paths.size(); i++) {
-        const Path& p = paths[i];
-
-        unsigned thickness = 0;
-        if ( p.m_line ) {
-            // For glyph shapes m_line is allowed to be 1
-            // while no defined line styles are allowed.
-            if (lineStyles.empty()) {
-                // This is either a Glyph, for which m_line==1 is valid
-                // or a bug in the parser, which we have no way to
-                // check at this time
-                assert(p.m_line == 1);
-            }
-            else
-            {
-                thickness = lineStyles[p.m_line-1].getThickness();
-            }
-        }
-        p.expandBounds(bounds, thickness, swfVersion);
-    }
-}
 
 
 } // anonymous namespace
@@ -717,9 +710,14 @@ operator<<(std::ostream& o, const ShapeRecord& sh)
 {
     o << boost::format("Shape Record: bounds %1%") % sh.getBounds();
 
-    const ShapeRecord::FillStyles& fills = sh.fillStyles();
-    std::copy(fills.begin(), fills.end(),
-            std::ostream_iterator<FillStyle>(o, ","));
+
+    for (ShapeRecord::Subshapes::const_iterator it = sh.subshapes().begin(),
+         end = sh.subshapes().end(); it != end; ++it) {
+
+        const ShapeRecord::FillStyles& fills = it->fillStyles();
+        std::copy(fills.begin(), fills.end(),
+                std::ostream_iterator<FillStyle>(o, ","));
+	}
 
     return o;
 }

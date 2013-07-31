@@ -22,6 +22,7 @@
 
 #include "Geometry.h"
 #include "LineStyle.h"
+#include "FillStyle.h"
 #include "SWFRect.h"
 
 #include <vector>
@@ -30,11 +31,77 @@
 namespace gnash {
     class movie_definition;
     class RunResources;
-    class FillStyle;
 }
 
 namespace gnash {
 namespace SWF {
+
+
+
+class Subshape {
+
+public:
+    typedef std::vector<FillStyle> FillStyles;
+    typedef std::vector<LineStyle> LineStyles;
+    typedef std::vector<Path> Paths;
+
+    const FillStyles& fillStyles() const {
+        return _fillStyles;
+    }
+
+    FillStyles& fillStyles() {
+        return _fillStyles;
+    }
+
+    const LineStyles& lineStyles() const {
+        return _lineStyles;
+    }
+
+    LineStyles& lineStyles() {
+        return _lineStyles;
+    }
+
+    const Paths& paths() const {
+        return _paths;
+    }
+
+    Paths& paths() {
+        return _paths;
+    }
+
+    /// For DynamicShape
+    //
+    /// TODO: rewrite DynamicShape to push paths when they're
+    /// finished and drop this.
+    Path& currentPath() {
+        return _paths.back();
+    }
+
+    void addFillStyle(const FillStyle& fs);
+
+    void addPath(const Path& path) {
+        _paths.push_back(path);
+    }
+
+    void addLineStyle(const LineStyle& ls) {
+        _lineStyles.push_back(ls);
+    }
+
+    void clear() {
+    	_fillStyles.clear();
+    	_lineStyles.clear();
+    	_paths.clear();
+    }
+
+    SWFRect computeBounds(int swfVersion) const;
+
+private:
+    FillStyles _fillStyles;
+    LineStyles _lineStyles;
+    Paths _paths;
+};
+
+
 
 /// Holds information needed to draw a shape.
 //
@@ -49,13 +116,20 @@ namespace SWF {
 //
 /// ShapeRecord objects are not ref-counted, so they may be stack-allocated
 /// or used in smart pointers.
+//
+/// A shape can have sub-shapes. This can happen when there are multiple
+/// layers of the same frame count. Flash combines them to one single shape.
+/// The problem with sub-shapes is, that outlines can be hidden by other
+/// layers so they must be rendered separately. In order to be sure outlines
+/// are show correctly, draw the subshapes contained in the ShapeRecord in
+/// sequence.
 class ShapeRecord
 {
 public:
-
-    typedef std::vector<FillStyle> FillStyles;
-    typedef std::vector<LineStyle> LineStyles;
-    typedef std::vector<Path> Paths;
+    typedef Subshape::FillStyles FillStyles;
+    typedef Subshape::LineStyles LineStyles;
+    typedef Subshape::Paths Paths;
+    typedef std::vector<Subshape> Subshapes;
 
     /// Construct a ShapeRecord.
     //
@@ -71,11 +145,6 @@ public:
     ShapeRecord(SWFStream& in, SWF::TagType tag, movie_definition& m,
             const RunResources& r);
 
-    /// Copy constructor
-    ShapeRecord(const ShapeRecord& other);
-    
-    /// Assignment operator
-    ShapeRecord& operator=(const ShapeRecord& other);
 
     ~ShapeRecord();
 
@@ -86,28 +155,16 @@ public:
     void read(SWFStream& in, SWF::TagType tag, movie_definition& m,
             const RunResources& r);
 
-    const FillStyles& fillStyles() const {
-        return _fillStyles;
-    }
-    
-    const LineStyles& lineStyles() const {
-        return _lineStyles;
+    const Subshapes& subshapes() const {
+    	return _subshapes;
     }
 
-    const Paths& paths() const {
-        return _paths;
+    void addSubshape(const Subshape& subshape) {
+    	_subshapes.push_back(subshape);
     }
 
     const SWFRect& getBounds() const {
         return _bounds;
-    }
-
-    /// For DynamicShape
-    //
-    /// TODO: rewrite DynamicShape to push paths when they're
-    /// finished and drop this.
-    Path& currentPath() {
-        return _paths.back();
     }
 
     /// Set to the lerp of two ShapeRecords.
@@ -119,18 +176,20 @@ public:
     /// Reset all shape data.
     void clear();
 
-    void addFillStyle(const FillStyle& fs);
-
-    void addPath(const Path& path) {
-        _paths.push_back(path);
-    }
-
-    void addLineStyle(const LineStyle& ls) {
-        _lineStyles.push_back(ls);
-    }
-
     void setBounds(const SWFRect& bounds) {
         _bounds = bounds;
+    }
+
+    bool pointTest(boost::int32_t x, boost::int32_t y,
+                   const SWFMatrix& wm) const {
+        for (SWF::ShapeRecord::Subshapes::const_iterator it = _subshapes.begin(),
+             end = _subshapes.end(); it != end; ++it) {
+
+            if (geometry::pointTest(it->paths(), it->lineStyles(), x, y, wm)) {
+        	    return true;
+            }
+        }
+        return false;
     }
 
 private:
@@ -144,12 +203,9 @@ private:
         SHAPE_LINESTYLE_CHANGE = 0x08,
         SHAPE_HAS_NEW_STYLES = 0x10
     };
-    
-    FillStyles _fillStyles;
-    LineStyles _lineStyles;
-    Paths _paths;
-    SWFRect _bounds;
 
+    SWFRect _bounds;
+    Subshapes _subshapes;
 };
 
 std::ostream& operator<<(std::ostream& o, const ShapeRecord& sh);
