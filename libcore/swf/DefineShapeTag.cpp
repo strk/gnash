@@ -73,7 +73,7 @@ bool
 DefineShapeTag::pointTestLocal(boost::int32_t x, boost::int32_t y, 
      const SWFMatrix& wm) const
 {
-    return geometry::pointTest(_shape.paths(), _shape.lineStyles(), x, y, wm);
+    return _shape.pointTest(x, y, wm);
 }
 
 

@@ -55,8 +55,7 @@ MorphShape::pointInShape(boost::int32_t x, boost::int32_t y) const
     //       shape).
     if (!_shape.getBounds().point_test(lp.x, lp.y)) return false;
 
-    return geometry::pointTest(_shape.paths(), _shape.lineStyles(),
-            lp.x, lp.y, wm);
+    return _shape.pointTest(lp.x, lp.y, wm);
 }
 
 void  

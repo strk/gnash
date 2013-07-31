@@ -148,8 +148,7 @@ public:
             const SWFMatrix& wm) const
 	{
 		finalize();
-		return geometry::pointTest(_shape.paths(), _shape.lineStyles(), x, y,
-                wm);
+		return _shape.pointTest(x, y, wm);
 	}
 
     const SWF::ShapeRecord& shapeRecord() const {
@@ -182,6 +181,8 @@ private:
 	/// If newShape is true the new shape will start a new subshape.
 	void startNewPath(bool newShape);
 
+
+
 	Path* _currpath;
 
 	size_t _currfill;
@@ -195,6 +196,8 @@ private:
 	boost::int32_t  _y;
 
 	mutable bool _changed;
+
+	mutable SWF::Subshape _currsubshape;
 
     /// The actual SWF::ShapeRecord wrapped by this class.
     //

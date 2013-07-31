@@ -106,25 +106,31 @@ DefineMorphShapeTag::read(SWFStream& in, TagType tag, movie_definition& md,
     }
 
     in.ensureBytes(4);
-    // Offset. What is this for?
+    // Spec: Indicates offset to the second Shape.
     static_cast<void>(in.read_u32());
 
     // Next line will throw ParserException on malformed SWF
     const boost::uint16_t fillCount = in.read_variable_count();
     
+    SWF::Subshape subshape1;
+    SWF::Subshape subshape2;
+
     for (size_t i = 0; i < fillCount; ++i) {
         OptionalFillPair fp = readFills(in, tag, md, true);
-        _shape1.addFillStyle(fp.first);
-        _shape2.addFillStyle(*fp.second);
+        subshape1.addFillStyle(fp.first);
+        subshape2.addFillStyle(*fp.second);
     }
 
     const boost::uint16_t lineCount = in.read_variable_count();
     LineStyle ls1, ls2;
     for (size_t i = 0; i < lineCount; ++i) {
         ls1.read_morph(in, tag, md, r, &ls2);
-        _shape1.addLineStyle(ls1);
-        _shape2.addLineStyle(ls2);
+        subshape1.addLineStyle(ls1);
+        subshape2.addLineStyle(ls2);
     }
+
+    _shape1.addSubshape(subshape1);
+    _shape2.addSubshape(subshape2);
 
     _shape1.read(in, tag, md, r);
     in.align();
@@ -139,9 +145,8 @@ DefineMorphShapeTag::read(SWFStream& in, TagType tag, movie_definition& md,
     // Starting bounds are the same as shape1
     _bounds = bounds1;
 
-    assert(_shape1.fillStyles().size() == _shape2.fillStyles().size());
-    assert(_shape1.lineStyles().size() == _shape2.lineStyles().size());
-
+    assert(_shape1.subshapes().size() == _shape2.subshapes().size() == 1);
+    assert(_shape1.subshapes().size() == _shape2.subshapes().size() == 1);
 }
 
 } // namespace SWF

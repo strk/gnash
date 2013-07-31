@@ -90,13 +90,14 @@ Bitmap::construct(as_object* /*init*/)
 
     const size_t fillLeft = _shape.addFillStyle(fill);
 
-    Path bmpath(w, h, fillLeft, 0, 0, false);
+    Path bmpath(w, h, fillLeft, 0, 0);
     bmpath.drawLineTo(w, 0);
     bmpath.drawLineTo(0, 0);
     bmpath.drawLineTo(0, h);
     bmpath.drawLineTo(w, h);
 
     _shape.add_path(bmpath);
+    _shape.setBounds(SWFRect(0, 0, w, h));
     _shape.finalize();
 
     set_invalidated();

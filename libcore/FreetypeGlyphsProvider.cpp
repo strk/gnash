@@ -99,14 +99,15 @@ public:
     {
         /// A default fill style is solid white.
         FillStyle f = SolidFill(rgba());
-        _shape.addFillStyle(f);
-        _shape.addPath(Path(_x, _y, 1, 0, 0, true));
-        _currPath = &_shape.currentPath();
+        _subshape.addFillStyle(f);
+        _subshape.addPath(Path(_x, _y, 1, 0, 0));
+        _currPath = &_subshape.currentPath();
     }
 
     void finish() 
     {
         _currPath->close();
+        _shape.addSubshape(_subshape);
     }
 
     ~OutlineWalker() {}
@@ -158,8 +159,8 @@ private:
         _x = static_cast<boost::int32_t>(to->x * _scale);
         _y = - static_cast<boost::int32_t>(to->y * _scale);
         _currPath->close();
-        _shape.addPath(Path(_x, _y, 1, 0, 0, false));
-        _currPath = &_shape.currentPath();
+        _subshape.addPath(Path(_x, _y, 1, 0, 0));
+        _currPath = &_subshape.currentPath();
         return 0;
     }
 
@@ -227,6 +228,7 @@ private:
         _shape.setBounds(bounds);
     }
 
+    SWF::Subshape _subshape;
     SWF::ShapeRecord& _shape;
 
     const float _scale;

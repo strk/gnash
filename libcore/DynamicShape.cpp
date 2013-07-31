@@ -41,6 +41,7 @@ DynamicShape::clear()
 	_shape.clear();
 	_currpath = 0; 
 	_currfill = _currline = 0; 
+	_currsubshape.clear();
 	// TODO: worth setting _changed=true ? 
 }
 
@@ -53,8 +54,9 @@ DynamicShape::display(Renderer& renderer, const Transform& xform) const
 void
 DynamicShape::add_path(const Path& pth)
 {
-	_shape.addPath(pth);
-	_currpath = &_shape.currentPath();
+	_currsubshape.addPath(pth);
+	_currpath = &_currsubshape.currentPath();
+	_changed = true;
 }
 
 void
@@ -80,6 +82,11 @@ DynamicShape::endFill()
 		_y = _currpath->ap.y;
 	}
 
+	if (_currline) {
+		_shape.addSubshape(_currsubshape);
+		_currsubshape.paths().clear(); // Retain style info
+	}
+
 	// Remove reference to the "current" path, as
 	// next drawing will happen on a different one
 	_currpath = 0;
@@ -93,12 +100,13 @@ DynamicShape::beginFill(const FillStyle& f)
 	// End previous fill
 	endFill();
 
+
 	_currfill = addFillStyle(f);
 
 	// TODO: how to know wheter the fill should be set
 	//       as *left* or *right* fill ?
 	//       A quick test shows that *left* always work fine !
-	Path newPath(_x, _y, _currfill, 0, _currline, true); 
+	Path newPath(_x, _y, _currfill, 0, _currline);
 	add_path(newPath);
 }
 
@@ -112,12 +120,18 @@ DynamicShape::startNewPath(bool newShape)
 		_currpath->close();
 	}
 
+	if (newShape) {
+		_shape.addSubshape(_currsubshape);
+		_currsubshape.paths().clear(); // Retain style info
+	}
+
+
 	// The DrawingApiTest.swf file shows we should not
 	// end the current fill when starting a new path.
 
 	// A quick test shows that *left* always work fine !
 	// More than that, using a *right* fill seems to break the tests !
-	Path newPath(_x, _y, _currfill, 0, _currline, newShape);
+	Path newPath(_x, _y, _currfill, 0, _currline);
 	add_path(newPath);
 }
 
@@ -130,10 +144,15 @@ DynamicShape::finalize() const
 	// Close any pending filled path (_currpath should be last path)
 	if ( _currpath && _currfill)
 	{
-		assert(!_shape.paths().empty());
-		assert(_currpath == &(_shape.paths().back()));
+		assert(!_currsubshape.paths().empty());
+		assert(_currpath == &(_currsubshape.paths().back()));
 		_currpath->close();
 	}
+
+	// This function being const seems to be at odds with its purpose...
+	_shape.addSubshape(_currsubshape);
+
+	_currsubshape.clear();
 
 	// TODO: check consistency of fills and such !
 
@@ -176,7 +195,7 @@ DynamicShape::moveTo(boost::int32_t x, boost::int32_t y)
 void
 DynamicShape::lineTo(boost::int32_t x, boost::int32_t y, int swfVersion)
 {
-	if (!_currpath) startNewPath(true); 
+	if (!_currpath) startNewPath(false);
 	assert(_currpath);
 
 	_currpath->drawLineTo(x, y);
@@ -185,7 +204,7 @@ DynamicShape::lineTo(boost::int32_t x, boost::int32_t y, int swfVersion)
     SWFRect bounds = _shape.getBounds();
 
 	unsigned thickness = _currline ? 
-        _shape.lineStyles().back().getThickness() : 0;
+        _currsubshape.lineStyles().back().getThickness() : 0;
 
 	if (_currpath->size() == 1) {
 		_currpath->expandBounds(bounds, thickness, swfVersion);
@@ -208,7 +227,7 @@ void
 DynamicShape::curveTo(boost::int32_t cx, boost::int32_t cy, 
                       boost::int32_t ax, boost::int32_t ay, int swfVersion)
 {
-	if (!_currpath) startNewPath(true); 
+	if (!_currpath) startNewPath(false);
 	assert(_currpath);
 
 	_currpath->drawCurveTo(cx, cy, ax, ay);
@@ -216,7 +235,7 @@ DynamicShape::curveTo(boost::int32_t cx, boost::int32_t cy,
     SWFRect bounds = _shape.getBounds();
 
 	unsigned thickness = _currline ? 
-        _shape.lineStyles().back().getThickness() : 0;
+        _currsubshape.lineStyles().back().getThickness() : 0;
 
 	if (_currpath->size() == 1) {
 		_currpath->expandBounds(bounds, thickness, swfVersion);
@@ -241,15 +260,15 @@ DynamicShape::curveTo(boost::int32_t cx, boost::int32_t cy,
 size_t
 DynamicShape::addFillStyle(const FillStyle& stl)
 {
-    _shape.addFillStyle(stl);
-    return _shape.fillStyles().size();
+    _currsubshape.addFillStyle(stl);
+    return _currsubshape.fillStyles().size();
 }
 
 size_t
 DynamicShape::add_line_style(const LineStyle& stl)
 {
-    _shape.addLineStyle(stl);
-    return _shape.lineStyles().size();
+    _currsubshape.addLineStyle(stl);
+    return _currsubshape.lineStyles().size();
 }
 	
 }	// end namespace gnash
