@@ -161,17 +161,6 @@ pointTest(const std::vector<Path>& paths,
         float next_pen_y = pth.ap.y;
         float pen_x, pen_y;
 
-        if (pth.m_new_shape)
-        {
-            if (( even_odd && (counter % 2) != 0) ||
-                 (!even_odd && (counter != 0)) )
-            {
-                // the point is inside the previous subshape, so exit now
-                return true;
-            }
-
-            counter=0;
-        }
         if (pth.empty()) continue;
 
         // If the path has a line style, check for strokes there
