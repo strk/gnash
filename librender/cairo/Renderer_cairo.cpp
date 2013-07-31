@@ -950,31 +950,6 @@ Renderer_cairo::draw_subshape(const PathVec& path_vec, const SWFMatrix& mat,
     draw_outlines(path_vec, line_styles, cx, mat);
 }
 
-
-std::vector<PathVec::const_iterator>
-Renderer_cairo::find_subshapes(const PathVec& path_vec)
-{
-    std::vector<PathVec::const_iterator> subshapes;
-    
-    PathVec::const_iterator it = path_vec.begin();
-    PathVec::const_iterator end = path_vec.end();
-    
-    subshapes.push_back(it);
-    ++it;
-
-    for (;it != end; ++it) {
-        const Path& cur_path = *it;
-  
-        if (cur_path.m_new_shape) {
-            subshapes.push_back(it); 
-        }  
-    } 
-  
-    subshapes.push_back(end);
-    
-    return subshapes;
-}
-
 void
 Renderer_cairo::draw_mask(const PathVec& path_vec)
 {    
@@ -1011,40 +986,23 @@ Renderer_cairo::apply_matrix_to_paths(std::vector<Path>& paths,
 void
 Renderer_cairo::drawShape(const SWF::ShapeRecord& shape, const Transform& xform)
 {
-    const PathVec& path_vec = shape.paths();
-    
-    if (!path_vec.size()) {
-        return;    
-    }
-    
     cairo_set_fill_rule(_cr, CAIRO_FILL_RULE_EVEN_ODD); // TODO: Move to init
-        
-    if (_drawing_mask) {      
-        PathVec scaled_path_vec = path_vec;
-        
-        apply_matrix_to_paths(scaled_path_vec, xform.matrix);
-        draw_mask(scaled_path_vec); 
-        return;
-    }
     
     CairoScopeMatrix mat_transformer(_cr, xform.matrix);
 
-    std::vector<PathVec::const_iterator> subshapes = find_subshapes(path_vec);
-    
-    const std::vector<FillStyle>& FillStyles = shape.fillStyles();
-    const std::vector<LineStyle>& line_styles = shape.lineStyles();
+    for (SWF::ShapeRecord::Subshapes::const_iterator it = shape.subshapes().begin(),
+         end = shape.subshapes().end(); it != end; ++it) {
 
-    for (size_t i = 0; i < subshapes.size()-1; ++i) {
-        PathVec subshape_paths;
+        if (_drawing_mask) {      
+            PathVec scaled_path_vec = it->paths();
         
-        if (subshapes[i] != subshapes[i+1]) {
-            subshape_paths = PathVec(subshapes[i], subshapes[i+1]);
-        } else {
-            subshape_paths.push_back(*subshapes[i]);
+            apply_matrix_to_paths(scaled_path_vec, xform.matrix);
+            draw_mask(scaled_path_vec); 
+            continue;
         }
-        
-        draw_subshape(subshape_paths, xform.matrix, xform.colorTransform,
-                FillStyles, line_styles);
+
+        draw_subshape(it->paths(), xform.matrix, xform.colorTransform,
+                it->fillStyles(), it->lineStyles());
     }
 }
   
@@ -1052,14 +1010,18 @@ void
 Renderer_cairo::drawGlyph(const SWF::ShapeRecord& rec, const rgba& color,
                           const SWFMatrix& mat)
 {
+    if (rec.subshapes().empty() || rec.getBounds().is_null()) {
+        return;
+    }
+
     SWFCxForm dummy_cx;
     std::vector<FillStyle> glyph_fs;
     
     FillStyle coloring = FillStyle(SolidFill(color));
     
     glyph_fs.push_back(coloring);
-    
-    const PathVec& path_vec = rec.paths();
+
+    const PathVec& path_vec = rec.subshapes().front().paths();
     
     std::vector<LineStyle> dummy_ls;
     

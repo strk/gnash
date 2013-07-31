@@ -116,6 +116,7 @@ AGG resources
 #include <climits>
 #include <boost/scoped_array.hpp>
 #include <boost/bind.hpp>
+
 #include <agg_rendering_buffer.h>
 #include <agg_renderer_base.h>
 #include <agg_pixfmt_gray.h>
@@ -1022,6 +1023,8 @@ public:
   void drawGlyph(const SWF::ShapeRecord& shape, const rgba& color,
           const SWFMatrix& mat) 
   {
+    if (shape.subshapes().empty()) return;
+    assert(shape.subshapes().size() == 1);
     
     // select relevant clipping bounds
     if (shape.getBounds().is_null()) {
@@ -1032,7 +1035,7 @@ public:
     if (_clipbounds_selected.empty()) return; 
       
     GnashPaths paths;
-    apply_matrix_to_path(shape.paths(), paths, mat);
+    apply_matrix_to_path(shape.subshapes().front().paths(), paths, mat);
 
     // If it's a mask, we don't need the rest.
     if (m_drawing_mask) {
@@ -1050,7 +1053,7 @@ public:
     StyleHandler sh;
     build_agg_styles(sh, v, mat, SWFCxForm());
     
-    draw_shape(-1, paths, agg_paths, sh, false);
+    draw_shape(paths, agg_paths, sh, false);
     
     // NOTE: Do not use even-odd filling rule for glyphs!
     
@@ -1118,18 +1121,22 @@ public:
         if (!bounds_in_clipping_area(cur_bounds.getRange()))
         {
             return; // no need to draw
-        }        
-        
-        const SWF::ShapeRecord::FillStyles& fillStyles = shape.fillStyles();
-        const SWF::ShapeRecord::LineStyles& lineStyles = shape.lineStyles();
-        const SWF::ShapeRecord::Paths& paths = shape.paths();
-        
-        // select ranges
-        select_clipbounds(shape.getBounds(), xform.matrix);
+        }
 
-        // render the DisplayObject's shape.
-        drawShape(fillStyles, lineStyles, paths, xform.matrix,
-                xform.colorTransform);
+        for (SWF::ShapeRecord::Subshapes::const_iterator it = shape.subshapes().begin(),
+             end = shape.subshapes().end(); it != end; ++it ) {
+
+            const SWF::ShapeRecord::FillStyles& fillStyles = it->fillStyles();
+            const SWF::ShapeRecord::LineStyles& lineStyles = it->lineStyles();
+            const SWF::ShapeRecord::Paths& paths = it->paths();
+
+            // select ranges
+            select_clipbounds(shape.getBounds(), xform.matrix);
+
+            // render the DisplayObject's subshape.
+            drawShape(fillStyles, lineStyles, paths, xform.matrix,
+                      xform.colorTransform);
+        }
     }
 
     void drawShape(const std::vector<FillStyle>& FillStyles,
@@ -1145,7 +1152,7 @@ public:
         if (!have_shape && !have_outline) {
             // Early return for invisible character.
             return; 
-        }        
+        }
 
         GnashPaths paths;
         apply_matrix_to_path(objpaths, paths, mat);
@@ -1185,19 +1192,14 @@ public:
         StyleHandler sh;
         if (have_shape) build_agg_styles(sh, FillStyles, mat, cx);
 
-        // We need to separate sub-shapes during rendering. 
-        const unsigned int subshape_count = count_sub_shapes(paths);
 
-        for (unsigned int subshape=0; subshape<subshape_count; ++subshape)
-        {
             if (have_shape) {
-                draw_shape(subshape, paths, agg_paths, sh, true);        
+                draw_shape(paths, agg_paths, sh, true);        
             }
             if (have_outline)            {
-                draw_outlines(subshape, paths, agg_paths_rounded,
+                draw_outlines(paths, agg_paths_rounded,
                         line_styles, cx, mat);
             }
-        }
 
         // Clear selected clipbounds to ease debugging 
         _clipbounds_selected.clear();
@@ -1223,26 +1225,6 @@ public:
         std::for_each(paths_out.begin(), paths_out.end(), 
                 boost::bind(&Path::transform, _1, mat));
     } 
-
-
-  /// A shape can have sub-shapes. This can happen when there are multiple
-  /// layers of the same frame count. Flash combines them to one single shape.
-  /// The problem with sub-shapes is, that outlines can be hidden by other
-  /// layers so they must be rendered separately. 
-  unsigned int count_sub_shapes(const GnashPaths &path_in)
-  {
-    unsigned int sscount=1;
-    const size_t pcnt = path_in.size();
-    
-    for (size_t pno=0; pno<pcnt; ++pno) {
-      const Path& this_path = path_in[pno];
-      
-      if (this_path.m_new_shape)
-        sscount++;
-    }
-    
-    return sscount;
-  }
 
   // Version of buildPaths that uses rounded coordinates (pixel hinting)
   // for line styles that want it.  
@@ -1431,7 +1413,7 @@ public:
   /// @param subshape_id
   ///    Defines which subshape to draw. -1 means all subshapes.
   ///
-  void draw_shape(int subshape_id, const GnashPaths &paths,
+  void draw_shape(const GnashPaths &paths,
     const AggPaths& agg_paths,  
     StyleHandler& sh, bool even_odd) {
     
@@ -1443,7 +1425,7 @@ public:
       
       scanline_type sl;
       
-      draw_shape_impl<scanline_type> (subshape_id, paths, agg_paths, 
+      draw_shape_impl<scanline_type> (paths, agg_paths, 
         sh, even_odd, sl);
         
     } else {
@@ -1454,7 +1436,7 @@ public:
       
       scanline_type sl(_alphaMasks.back().getMask());
       
-      draw_shape_impl<scanline_type> (subshape_id, paths, agg_paths, 
+      draw_shape_impl<scanline_type> (paths, agg_paths, 
         sh, even_odd, sl);
         
     }
@@ -1465,7 +1447,7 @@ public:
   /// one with and one without an alpha mask. This makes drawing without masks
   /// much faster.  
   template <class scanline_type>
-  void draw_shape_impl(int subshape_id, const GnashPaths &paths,
+  void draw_shape_impl(const GnashPaths &paths,
     const AggPaths& agg_paths,
     StyleHandler& sh, bool even_odd, scanline_type& sl) {
     /*
@@ -1507,8 +1489,6 @@ public:
       
       applyClipBox<ras_type> (rasc, *bounds);
       
-      int current_subshape=0;
-        
       // push paths to AGG
       const size_t pcount = paths.size();
   
@@ -1519,19 +1499,11 @@ public:
           const_cast<agg::path_storage&>(agg_paths[pno]);
         
         agg::conv_curve<agg::path_storage> curve(this_path_agg);        
-        
-        if (this_path_gnash.m_new_shape) ++current_subshape;
-          
-        if ((subshape_id >= 0) && (current_subshape!=subshape_id)) {
-          // Skip this path as it is not part of the requested sub-shape.
-          continue;
-        }
-        
+
         if ((this_path_gnash.m_fill0==0) && (this_path_gnash.m_fill1==0)) {
           // Skip this path as it contains no fill style
           continue;
         } 
-                
         
         // Tell the rasterizer which styles the following path will use.
         // The good thing is, that it already supports two fill styles out of
@@ -1543,7 +1515,7 @@ public:
         rasc.add_path(curve);
       
       }
-              
+
       agg::render_scanlines_compound_layered(rasc, sl, rbase, alloc, sh);
     }
     
@@ -1651,7 +1623,7 @@ public:
 
 
   /// Just like draw_shapes() except that it draws an outline.
-  void draw_outlines(int subshape_id, const GnashPaths &paths,
+  void draw_outlines(const GnashPaths &paths,
     const AggPaths& agg_paths,
     const std::vector<LineStyle> &line_styles, const SWFCxForm& cx,
     const SWFMatrix& linestyle_matrix) {
@@ -1664,7 +1636,7 @@ public:
       
       scanline_type sl;
       
-      draw_outlines_impl<scanline_type> (subshape_id, paths, agg_paths, 
+      draw_outlines_impl<scanline_type> (paths, agg_paths, 
         line_styles, cx, linestyle_matrix, sl);
         
     } else {
@@ -1675,7 +1647,7 @@ public:
       
       scanline_type sl(_alphaMasks.back().getMask());
       
-      draw_outlines_impl<scanline_type> (subshape_id, paths, agg_paths,
+      draw_outlines_impl<scanline_type> (paths, agg_paths,
         line_styles, cx, linestyle_matrix, sl);
         
     }
@@ -1685,7 +1657,7 @@ public:
 
   /// Template for draw_outlines(), see draw_shapes_impl().
   template <class scanline_type>
-  void draw_outlines_impl(int subshape_id, const GnashPaths &paths,
+  void draw_outlines_impl(const GnashPaths &paths,
     const AggPaths& agg_paths,
     const std::vector<LineStyle> &line_styles, const SWFCxForm& cx, 
     const SWFMatrix& linestyle_matrix, scanline_type& sl) {
@@ -1722,22 +1694,12 @@ public:
           
       applyClipBox<ras_type> (ras, *bounds);
       
-      int current_subshape=0;
-
       for (size_t pno=0, pcount=paths.size(); pno<pcount; ++pno) {
 
         const Path& this_path_gnash = paths[pno];
 
         agg::path_storage &this_path_agg = 
           const_cast<agg::path_storage&>(agg_paths[pno]);
-        
-        if (this_path_gnash.m_new_shape)
-          ++current_subshape;
-          
-        if ((subshape_id>=0) && (current_subshape!=subshape_id)) {
-          // Skip this path as it is not part of the requested sub-shape.
-          continue;
-        }
         
         if (this_path_gnash.m_line==0) {
           // Skip this path as it contains no line style
@@ -1747,7 +1709,7 @@ public:
         agg::conv_curve< agg::path_storage > curve(this_path_agg); // to render curves
         agg::conv_stroke< agg::conv_curve < agg::path_storage > > 
           stroke(curve);  // to get an outline
-        
+
         const LineStyle& lstyle = line_styles[this_path_gnash.m_line-1];
           
         int thickness = lstyle.getThickness();

@@ -1256,7 +1256,7 @@ public:
     float prev_cx = cur_end.cp.x;
     float prev_cy = cur_end.cp.y;        
                 
-    Path newpath(cur_end.ap.x, cur_end.ap.y, cur_path.m_fill1, cur_path.m_fill0, cur_path.m_line, cur_path.m_new_shape);
+    Path newpath(cur_end.ap.x, cur_end.ap.y, cur_path.m_fill1, cur_path.m_fill0, cur_path.m_line);
     
     float prev_ax = cur_end.ap.x;
     float prev_ay = cur_end.ap.y; 
@@ -1629,32 +1629,6 @@ public:
   }
   
   
-  std::vector<PathVec::const_iterator>
-  find_subshapes(const PathVec& path_vec)
-  {
-    std::vector<PathVec::const_iterator> subshapes;
-    
-    PathVec::const_iterator it = path_vec.begin(),
-                            end = path_vec.end();
-    
-    subshapes.push_back(it);
-    ++it;
-
-    for (;it != end; ++it) {
-      const Path& cur_path = *it;
-    
-      if (cur_path.m_new_shape) {
-        subshapes.push_back(it); 
-      } 
-    }
-
-    if (subshapes.back() != end) {
-      subshapes.push_back(end);
-    }
-    
-    return subshapes;
-  }
-  
   /// Takes a path and translates it using the given SWFMatrix.
   void
   apply_matrix_to_paths(std::vector<Path>& paths, const SWFMatrix& mat)
@@ -1749,54 +1723,48 @@ public:
 
   virtual void drawShape(const SWF::ShapeRecord& shape, const Transform& xform)
   {
-  
-    const PathVec& path_vec = shape.paths();
-
-    if (!path_vec.size()) {
-      // No paths. Nothing to draw...
-      return;
+    if (shape.subshapes().empty()) {
+        return;
     }
-    
-    if (_drawing_mask) {
-      PathVec scaled_path_vec = path_vec;
-      
-      apply_matrix_to_paths(scaled_path_vec, xform.matrix);
-      draw_mask(scaled_path_vec); 
-      return;
-    }    
-    
-    bool have_shape, have_outline;
-    
-    analyze_paths(path_vec, have_shape, have_outline);
-    
-    if (!have_shape && !have_outline) {
-      return; // invisible character
-    }    
     
     oglScopeMatrix scope_mat(xform.matrix);
 
-    std::vector<PathVec::const_iterator> subshapes = find_subshapes(path_vec);
+    for (SWF::ShapeRecord::Subshapes::const_iterator it = shape.subshapes().begin(),
+         end = shape.subshapes().end(); it != end; ++it) {
+        const PathVec& path_vec = it->paths();
+
+        if (!path_vec.size()) {
+            // No paths. Nothing to draw...
+            return;
+        }
     
-    const std::vector<FillStyle>& FillStyles = shape.fillStyles();
-    const std::vector<LineStyle>& line_styles = shape.lineStyles();
+        if (_drawing_mask) {
+            PathVec scaled_path_vec = path_vec;
+      
+            apply_matrix_to_paths(scaled_path_vec, xform.matrix);
+            draw_mask(scaled_path_vec); 
+            continue;
+        }    
     
-    for (size_t i = 0; i < subshapes.size()-1; ++i) {
-      PathVec subshape_paths;
-      
-      if (subshapes[i] != subshapes[i+1]) {
-        subshape_paths = PathVec(subshapes[i], subshapes[i+1]);
-      } else {
-        subshape_paths.push_back(*subshapes[i]);
-      }
-      
-      draw_subshape(subshape_paths, xform.matrix, xform.colorTransform,
-              FillStyles, line_styles);
+        bool have_shape, have_outline;
+    
+        analyze_paths(path_vec, have_shape, have_outline);
+    
+        if (!have_shape && !have_outline) {
+            continue; // invisible character
+        }  
+
+        draw_subshape(it->paths(), xform.matrix, xform.colorTransform,
+                      it->fillStyles(), it->lineStyles());
     }
   }
 
   virtual void drawGlyph(const SWF::ShapeRecord& rec, const rgba& c,
          const SWFMatrix& mat)
   {
+    if (rec.subshapes().empty()) {
+        return;
+    }
     if (_drawing_mask) abort();
     SWFCxForm dummy_cx;
     std::vector<FillStyle> glyph_fs;
@@ -1809,7 +1777,7 @@ public:
     
     oglScopeMatrix scope_mat(mat);
     
-    draw_subshape(rec.paths(), mat, dummy_cx, glyph_fs, dummy_ls);
+    draw_subshape(rec.subshapes().front().paths(), mat, dummy_cx, glyph_fs, dummy_ls);
   }
 
   virtual void set_scale(float xscale, float yscale) {
