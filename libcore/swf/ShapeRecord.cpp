@@ -265,6 +265,28 @@ ShapeRecord::setLerp(const ShapeRecord& aa, const ShapeRecord& bb,
     }
 }
 
+unsigned
+ShapeRecord::readStyleChange(SWFStream& in, size_t num_style_bits, size_t numStyles)
+{
+    if (!num_style_bits) {
+    	return 0;
+    }
+
+    in.ensureBits(num_style_bits);
+    unsigned style = in.read_uint(num_style_bits);
+
+    if ( style > numStyles ) {
+        IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("Invalid fill style %1% in "
+                           "style change record - %2% defined. "
+                           "Set to 0."), style, numStyles);
+        );
+        style = 0;
+    }
+
+    return style;
+}
+
 void
 ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
         const RunResources& r)
@@ -351,7 +373,6 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
     // At the moment we just store each edge with
     // the full necessary info to render it, which
     // is simple but not optimally efficient.
-    int fill_base = 0;
     int line_base = 0;
     int   x = 0, y = 0;
     Path  current_path;
@@ -409,33 +430,10 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                     current_path.ap.x = x;
                     current_path.ap.y = y;
                 }
-                in.ensureBits(num_fill_bits);
-                unsigned style = in.read_uint(num_fill_bits);
-                if (style > 0) {
-                    style += fill_base;
-                }
-    
-                if (tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2) {
-                    if ( style > 1 ) {         // 0:hide 1:renderer
-                        IF_VERBOSE_MALFORMED_SWF(
-                             log_swferror(_("Invalid fill style %d in "
-                                     "fillStyle0Change record for font tag "
-                                     "(0 or 1 valid). Set to 0."), style);
-                        );
-                        style = 0;
-                    }
-                } else {
-                    // 1-based index
-                    if ( style > subshape.fillStyles().size() ) {
-                        IF_VERBOSE_MALFORMED_SWF(
-                             log_swferror(_("Invalid fill style %d in "
-                                     "fillStyle0Change record - %d defined. "
-                                     "Set to 0."), style, subshape.fillStyles().size());
-                        );
-                        style = 0;
-                    }
-                }
-    
+
+                unsigned style = readStyleChange(in, num_fill_bits,
+                    (tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2) ? 1 : subshape.fillStyles().size());
+
                 current_path.setLeftFill(style);
 #if SHAPE_LOG
                 IF_VERBOSE_PARSE(
@@ -452,32 +450,9 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                     current_path.ap.x = x;
                     current_path.ap.y = y;
                 }
-                in.ensureBits(num_fill_bits);
-                unsigned style = in.read_uint(num_fill_bits);
-                if (style > 0) {
-                    style += fill_base;
-                }
-    
-                if (tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2) {
-                    if ( style > 1 ) {          // 0:hide 1:renderer
-                        IF_VERBOSE_MALFORMED_SWF(
-                             log_swferror(_("Invalid fill style %d in "
-                                     "fillStyle1Change record for font tag "
-                                     "(0 or 1 valid). Set to 0."), style);
-                        );
-                        style = 0;
-                    }
-                } else {
-                    // 1-based index
-                    if ( style > subshape.fillStyles().size() ) {
-                        IF_VERBOSE_MALFORMED_SWF(
-                            log_swferror(_("Invalid fill style %d in "
-                                    "fillStyle1Change record - %d defined. "
-                                    "Set to 0."), style, subshape.fillStyles().size());
-                        );
-                        style = 0;
-                    }
-                }
+                unsigned style = readStyleChange(in, num_fill_bits,
+                    (tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2) ? 1 : subshape.fillStyles().size());
+
                 current_path.setRightFill(style);
 #if SHAPE_LOG
                 IF_VERBOSE_PARSE (
@@ -494,31 +469,9 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                     current_path.ap.x = x;
                     current_path.ap.y = y;
                 }
-                in.ensureBits(num_line_bits);
-                unsigned style = in.read_uint(num_line_bits);
-                if (style > 0) {
-                    style += line_base;
-                }
-                if (tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2) {
-                    if ( style > 1 ) {         // 0:hide 1:renderer
-                        IF_VERBOSE_MALFORMED_SWF(
-                            log_swferror(_("Invalid line style %d in "
-                                    "lineStyleChange record for font tag "
-                                    "(0 or 1 valid). Set to 0."), style);
-                        );
-                        style = 0;
-                    }
-                } else {
-                    // 1-based index
-                    if (style > subshape.lineStyles().size()) {
-                        IF_VERBOSE_MALFORMED_SWF(
-                            log_swferror(_("Invalid fill style %d in "
-                                    "lineStyleChange record - %d defined. "
-                                    "Set to 0."), style, subshape.lineStyles().size());
-                        );
-                        style = 0;
-                    }
-                }
+                unsigned style = readStyleChange(in, num_line_bits,
+                    (tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2) ? 1 : subshape.lineStyles().size());
+
                 current_path.setLineStyle(style);
 #if SHAPE_LOG
                 IF_VERBOSE_PARSE(

@@ -194,6 +194,8 @@ public:
 
 private:
 
+    unsigned readStyleChange(SWFStream& in, size_t num_fill_bits, size_t numStyles);
+
     /// Shape record flags for use in parsing.
     enum ShapeRecordFlags {
         SHAPE_END = 0x00,
