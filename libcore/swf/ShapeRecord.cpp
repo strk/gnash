@@ -373,7 +373,6 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
     // At the moment we just store each edge with
     // the full necessary info to render it, which
     // is simple but not optimally efficient.
-    int line_base = 0;
     int   x = 0, y = 0;
     Path  current_path;
 
@@ -511,10 +510,11 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
         } else {
             // EDGERECORD
             in.ensureBits(1);
-            bool edge_flag = in.read_bit();
-            if (edge_flag == 0) {
+            bool straight_edge = in.read_bit();
+            int num_bits = 2 + in.read_uint(4);
+            if (!straight_edge) {
                 in.ensureBits(4);
-                int num_bits = 2 + in.read_uint(4);
+
                 // curved edge
                 in.ensureBits(4 * num_bits);
                 int cx = x + in.read_sint(num_bits);
@@ -528,14 +528,13 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                             "%d %d - %d %d - %d %d"), x, y, cx, cy, ax, ay);
                 );
 #endif
-                current_path.m_edges.push_back(Edge(cx, cy, ax, ay));
+                current_path.drawCurveTo(cx, cy, ax, ay);
                 x = ax;
                 y = ay;
             } else {
                 // straight edge
                 in.ensureBits(5);
-                int num_bits = 2 + in.read_uint(4);
-                bool  line_flag = in.read_bit();
+                bool line_flag = in.read_bit();
                 int dx = 0, dy = 0;
                 if (line_flag)
                 {
@@ -546,7 +545,7 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                 } else {
                     in.ensureBits(1);
                     bool vert_flag = in.read_bit();
-                    if (vert_flag == 0) {
+                    if (!vert_flag) {
                         // Horizontal line.
                         in.ensureBits(num_bits);
                         dx = in.read_sint(num_bits);
@@ -563,8 +562,8 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                              "%d %d - %d %d"), x, y, x + dx, y + dy);
                 );
 #endif
-                current_path.m_edges.push_back(Edge(x + dx, y + dy,
-                            x + dx, y + dy));
+                current_path.drawLineTo(x + dx, y + dy);
+
                 x += dx;
                 y += dy;
             }
