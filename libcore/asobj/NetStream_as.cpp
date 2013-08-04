@@ -560,11 +560,9 @@ NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
         return video; 
     }
 
-#if MEDIA_CONFIG == none
     boost::uint64_t nextTimestamp;
     bool parsingComplete = _parser->parsingCompleted();
     if (!_parser->nextVideoFrameTimestamp(nextTimestamp)) {
-#endif
         
 #ifdef GNASH_DEBUG_DECODING
         log_debug(_("getDecodedVideoFrame(%d): "
