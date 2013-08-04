@@ -96,7 +96,7 @@ dump_file(const char* url, ostream& os)
 			os << buf[i];
 		}
 	}
-
+	fclose(f);
 }
 
 int
