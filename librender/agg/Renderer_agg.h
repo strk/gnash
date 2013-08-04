@@ -30,7 +30,7 @@ class Renderer_agg_base : public Renderer
 {
 private:
     
-    unsigned char *_testBuffer; // buffer used by initTestBuffer() only
+    unsigned char *_testBuffer, *_testBufferTmp; // buffers used by initTestBuffer() only
     
 public:
     
@@ -50,7 +50,14 @@ public:
     virtual bool initTestBuffer(unsigned width, unsigned height) {
         int size = width * height * getBytesPerPixel();
         
-        _testBuffer = static_cast<unsigned char *>(realloc(_testBuffer, size));
+        _testBufferTmp = static_cast<unsigned char *>(realloc(_testBuffer, size));
+        if (_testBufferTmp == NULL) {
+            log_error(_("Memory reallocation error"));
+            return false;
+        } else {
+            _testBuffer = _testBufferTmp;
+        }
+
         memset(_testBuffer, 0, size);
         printf("Renderer Test memory at: %p\n", _testBuffer);
         
