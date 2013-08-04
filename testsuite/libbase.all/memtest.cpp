@@ -117,7 +117,7 @@ main (int /*argc*/, char** /*argv*/) {
     }
 
     sv.push_back("Aloha");
-    delete x;
+    delete[] x;
     mem.addStats(__LINE__);             // take a sample
     diff = mem.diffStats();
 //    cerr << "Second string allocated: " << diff << endl;
@@ -192,7 +192,7 @@ long *
 test_noleak()
 {
     long *x = test_leak();
-    delete x;
+    delete[] x;
 
     return 0;
 }
