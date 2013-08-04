@@ -89,7 +89,10 @@ main(int argc, char** argv)
   mo = newSWFMovie();
   SWFMovie_setDimension(mo, 320, 96);
 
-  if (mo == NULL) return -1;
+  if (mo == NULL) {
+    fclose(flv);
+    return -1;
+  }
 
   SWFMovie_setRate(mo, 5);
 
