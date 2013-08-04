@@ -136,6 +136,9 @@ private:
     void playHook();
 
     DrawBounds _drawbounds;
+
+    /// argc provided to QApplication.
+    int _numArgs;
  
     /// The main application, which should destroy everything
     /// left on closing.

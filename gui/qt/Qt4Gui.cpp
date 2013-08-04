@@ -81,6 +81,7 @@ namespace gnash
 Qt4Gui::Qt4Gui(unsigned long xid, float scale, bool loop, RunResources& r)
     :
     Gui(xid, scale, loop, r),
+    _numArgs(0),
     _interval(0),
     _advanceTimer(0)
 {
@@ -103,9 +104,8 @@ bool
 Qt4Gui::init(int /*argc*/, char ** /*argv*/[])
 {
     char** r = NULL;
-    int* i = new int(0);
 
-    _application.reset(new QApplication(*i, r));
+    _application.reset(new QApplication(_numArgs, r));
     _window.reset(new QMainWindow());
     _embedWidget = new EmbedWidget(*this);
     _drawingWidget = _embedWidget->drawingWidget();
