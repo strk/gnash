@@ -375,7 +375,7 @@ FBGui::run()
 //  GNASH_REPORT_FUNCTION;
 
 #ifdef USE_TSLIB
-    int ts_loop_count;
+    int ts_loop_count = 0;
 #endif
 
     VirtualClock& timer = getClock();
