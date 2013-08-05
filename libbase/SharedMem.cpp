@@ -163,10 +163,16 @@ SharedMem::attach()
     // anyway for fun.
     const int semval = ::semctl(_semid, 0, GETVAL, s);
 
-    if (semval != 1) {
-        log_error(_("Need semaphore value of 1 for locking. Cannot attach shared memory!"));
-        return false;
-    }
+    switch(semval) {
+        case 1: // the value we want
+            break;
+        case -1:
+            log_error(_("semctl() failed: %1%"), strerror(errno));
+        default:
+            log_error(_("Need semaphore value of 1 for locking; obtained %1%."
+                        "Cannot attach shared memory!"), semval);
+            return false;
+    };
 
     Lock lock(*this);
 
