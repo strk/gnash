@@ -172,7 +172,7 @@ DirectFBDevice::initDevice(int argc, char *argv[])
     }
     
     if ((result == _layer->GetScreen(_layer, &_screen)) == DR_OK) {
-	log_error(_("GetScreen(): %s"_, getErrorString(result));
+	log_error(_("GetScreen(): %s"), getErrorString(result));
     }
     
     DFBSurfacePixelFormat format;
