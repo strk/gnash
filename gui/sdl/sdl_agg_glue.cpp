@@ -185,11 +185,14 @@ SdlAggGlue::render()
 void
 SdlAggGlue::render(int minx, int miny, int maxx, int maxy)
 {
-	// Update only the invalidated rectangle
-	SDL_Rect clip = { minx, miny, maxx - minx, maxy - miny };
-	SDL_SetClipRect(_screen, &clip);
-	SDL_BlitSurface(_sdl_surface, 0, _screen, 0);
-	SDL_UpdateRect(_screen, clip.x, clip.y, clip.w, clip.h);
+    // Update only the invalidated rectangle
+    SDL_Rect clip = { static_cast<Sint16>(minx),
+        static_cast<Sint16>(miny),
+        static_cast<Uint16>(maxx - minx),
+        static_cast<Uint16>(maxy - miny)};
+    SDL_SetClipRect(_screen, &clip);
+    SDL_BlitSurface(_sdl_surface, 0, _screen, 0);
+    SDL_UpdateRect(_screen, clip.x, clip.y, clip.w, clip.h);
 }
 
 } // namespace gnash
