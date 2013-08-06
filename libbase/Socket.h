@@ -123,9 +123,6 @@ public:
 
 private:
 
-    // Return the string representation of the IPV4 or IPV6 number
-    boost::shared_array<char> getIPString(struct addrinfo *ai);
-	
     /// Fill the cache.
     void fillCache();
 

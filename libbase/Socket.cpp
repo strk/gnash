@@ -148,8 +148,7 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
 
     // This is used for ::connect()
     struct sockaddr *saddr = 0;
-    
-#ifdef HAVE_IPV6
+
     int code = 0;
     struct addrinfo req, *ans;
     std::memset(&req, 0, sizeof(struct addrinfo));
@@ -163,7 +162,8 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     // this causes our XMLSocketTester test case to fail since not
     // all build slaves have the same entry for localhost in their
     // hosts file.
-    code = getaddrinfo(hostname.c_str(), 0, &req, &ans);
+    std::string portNo = boost::lexical_cast<std::string>(port);
+    code = getaddrinfo(hostname.c_str(), portNo.c_str(), &req, &ans);
     if (code != 0) {
         if (code == EAI_NONAME) {
             std::string localhost;
@@ -197,12 +197,10 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
                     clientservice, sizeof(clientservice),
                     NI_NUMERICHOST);
         
-        boost::shared_array<char> straddr = getIPString(ot);
-        
         if (ot->ai_family == AF_INET6) {
-            log_debug("%s has IPV6 address of: %s", hostname, straddr.get());
+            log_debug("%s has IPV6 address of: %s", hostname, clienthost);
         } else if (ot->ai_family == AF_INET) {
-            log_debug("%s has IPV4 address of: %s", hostname, straddr.get());
+            log_debug("%s has IPV4 address of: %s", hostname, clienthost);
         } else {
             log_error("%s has no IP address!", hostname);
         }
@@ -226,39 +224,8 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
         }
     }
 
-    // cache the data we need later
-    struct sockaddr_in6 *addr6 = reinterpret_cast<struct sockaddr_in6 *>(it->ai_addr);
-    // When NULL is passed to getaddrinfo(), the port isn't set in
-    // the returned data, so we do it here.
-    addr6->sin6_port = htons(port);
     saddr = it->ai_addr;
     const int addrlen = it->ai_addrlen;
-
-#else
-    struct sockaddr_in addr;
-    std::memset(&addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(port);
-    addr.sin_addr.s_addr = ::inet_addr(hostname.c_str());
-    if (addr.sin_addr.s_addr == INADDR_NONE) {
-        struct hostent* host = ::gethostbyname(hostname.c_str());
-        if (!host || !host->h_addr) {
-            return false;
-        }
-        addr.sin_addr = *reinterpret_cast<in_addr*>(host->h_addr);
-        _socket = ::socket(addr.sin_family, SOCK_STREAM, IPPROTO_TCP);        
-
-        if (_socket < 0) {
-            const int err = errno;
-            log_error(_("Socket creation failed: %s"), std::strerror(err));
-            _socket = 0;
-            return false;
-        }
-    }
-    // cache the data we need later
-    const int addrlen = sizeof(struct sockaddr);
-    saddr = reinterpret_cast<struct sockaddr *>(&addr);
-#endif
 
 #ifndef _WIN32
     // Set non-blocking.
@@ -268,9 +235,7 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
 
     // Attempt connection
     int ret = ::connect(_socket, saddr, addrlen);
-#ifdef HAVE_IPV6
     freeaddrinfo(ans);          // free the response data
-#endif
     if (ret < 0) {
         const int err = errno;
 #ifndef _WIN32
@@ -303,29 +268,6 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     assert(_socket);
     
     return true;
-}
-
-// Return the string representation of the IPV4 or IPV6 number
-boost::shared_array<char>
-Socket::getIPString(struct addrinfo *ai)
-{
-    boost::shared_array<char> straddr(new char[INET6_ADDRSTRLEN]);
-    std::memset(straddr.get(), 0, INET6_ADDRSTRLEN);    
-    if (ai->ai_family == AF_INET6) {
-        struct sockaddr_in6 *sock6 = reinterpret_cast<struct sockaddr_in6 *>(ai->ai_addr);
-        struct in6_addr sin6_addr = sock6->sin6_addr;
-        ::inet_ntop(AF_INET6, &sin6_addr, straddr.get(), INET6_ADDRSTRLEN);
-//        log_debug("IPV6 address: %s", straddr.get());
-    } else if (ai->ai_family == AF_INET) {
-        struct sockaddr_in *sock = reinterpret_cast<struct sockaddr_in *>(ai->ai_addr);
-        struct in_addr sin_addr = sock->sin_addr;
-        ::inet_ntop(AF_INET, &sin_addr, straddr.get(), INET_ADDRSTRLEN);
-//        log_debug("IPV4 address: %s", straddr);
-    } else {
-        log_error("no IP address in addrinfo!");
-    }
-    
-    return straddr;
 }
 
 void
