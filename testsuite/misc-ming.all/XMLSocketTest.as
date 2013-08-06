@@ -80,7 +80,7 @@ function test1()
   myXML.onClose = handleDisconnect;
   receivedArray = new Array();
 
-  ret = myXML.connect("localhost.localdomain", 2229);
+  ret = myXML.connect("localhost", 2229);
   check_equals(ret, true);
 }
 
@@ -119,7 +119,7 @@ function test2()
   o.onData = function() { fail("instance onData called"); };
   o.onClose = function() { fail("instance onClose called"); };
 
-  ret = o.connect("localhost.localdomain", 2229);
+  ret = o.connect("localhost", 2229);
   xcheck_equals(ret, true);
   nextTest();
 }

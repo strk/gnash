@@ -155,34 +155,12 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     req.ai_family = AF_UNSPEC;  // Allow IPv4 or IPv6
     req.ai_socktype = SOCK_STREAM;
 
-    // getaddrinfo() is sensitive to how localhost is defined in
-    // /etc/hosts. Whatever hostname is, needs to match the entry in
-    // the hosts file. Localhost is usually only used for debug and
-    // and testing, all other hostnames are fully qualified. Anyway,
-    // this causes our XMLSocketTester test case to fail since not
-    // all build slaves have the same entry for localhost in their
-    // hosts file.
     std::string portNo = boost::lexical_cast<std::string>(port);
     code = getaddrinfo(hostname.c_str(), portNo.c_str(), &req, &ans);
     if (code != 0) {
-        if (code == EAI_NONAME) {
-            std::string localhost;
-            if (hostname == "localhost") {
-                localhost = "localhost.localdomain";
-            } else if (hostname == "localhost.localdomain") {
-                localhost = "localhost";                
-            }
-            if ((code = getaddrinfo(localhost.c_str(), 0, &req, &ans)) != 0) {
-                log_error(_("getaddrinfo() failed again with code: #%d - %s\n"),
-                          code, gai_strerror(code));
-                return false;
-            }
-            log_error(_("getaddrinfo() needed to change localhost, check your /etc/hosts file!"));
-        } else {
-            log_error(_("getaddrinfo() failed with code: #%d - %s\n"),
-                      code, gai_strerror(code));
-            return false;
-        }
+        log_error(_("getaddrinfo() failed with code: #%d - %s\n"),
+                 code, gai_strerror(code));
+        return false;
     }
 
     // display all the IP numbers
