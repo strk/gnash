@@ -190,11 +190,9 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     while (ot) {
         char clienthost   [NI_MAXHOST];
         std::memset(&clienthost, 0, NI_MAXHOST);
-        char clientservice[NI_MAXSERV];
-        std::memset(&clientservice, 0, NI_MAXSERV);
         getnameinfo(ot->ai_addr, ot->ai_addrlen,
                     clienthost, sizeof(clienthost),
-                    clientservice, sizeof(clientservice),
+                    NULL, 0,
                     NI_NUMERICHOST);
         
         if (ot->ai_family == AF_INET6) {
