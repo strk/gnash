@@ -23,7 +23,7 @@
     <listitem>
       <para>
 	<option>--enable-media</option> permits a media handler to be
-	selected.  The default is Gstreamer. 
+	selected.  The default is auto.
       </para>
     </listitem>
   </itemizedlist>
@@ -79,8 +79,25 @@
 	</row>
 
 	<row>
-	  <entry><option>--enable-gui=gtk|sdl|kde|fltk|fb|hildon|alp</option></entry>
-	  <entry><para>Select the Graphic User Interface to use (choose one).</para>
+	  <entry>
+	    <option>
+	      <programlisting>
+--enable-gui=&lt;gui&gt;[,&lt;gui&gt;]...
+
+      gui can be: aos4
+		  aqua
+		  dump
+		  fb
+		  fltk
+		  gtk
+		  haiku
+		  qt3
+		  qt4
+		  sdl
+	      </programlisting>
+	    </option>
+	  </entry>
+	  <entry><para>Select the Graphic User Interface to build.</para>
 	  <variablelist>
 	    <varlistentry>
 	      <term>GTK</term>
@@ -88,23 +105,6 @@
 		<para>
 		  The GTK+ toolkit, which is the default GUI.
 		  Said to interwork particularly well with firefox.
-		</para>
-	      </listitem>
-	    </varlistentry>
-	    <varlistentry>
-	      <term>Hildon</term>
-	      <listitem>
-		<para>
-		  The Hildon toolkist is based on GTK+, and is use by
-		  some mobile devices.
-		</para>
-	      </listitem>
-	    </varlistentry>
-	    <varlistentry>
-	      <term>ALP</term>
-	      <listitem>
-		<para>
-		  The ALP "Hiker" GUI is used for the Access Linux platform.
 		</para>
 	      </listitem>
 	    </varlistentry>
@@ -119,7 +119,7 @@
 	      </listitem>
 	    </varlistentry>
 	    <varlistentry>
-	      <term>KDE</term>
+	      <term>QT</term>
 	      <listitem>
 		<para>
 		  An interface adapted to the KDE Desktop Environment.
@@ -153,21 +153,34 @@
 	  </entry>
 	</row>
 	<row>
-	  <entry><option>--enable-media=ffmpeg|gst|none</option>
+	  <entry>
+	    <option>
+	      <programlisting>
+--enable-media=&lt;handler&gt;[,&lt;handler&gt;]...
+
+      handler can be: ffmpeg
+		      gst
+		      none
+	      </programlisting>
+	    </option>
 	  </entry>
-	  <entry>  <para>
-	    Select the specified media decoder and sound engine.
-	    FFmpeg uses the SDL sound engine; GST uses its own.
-	    <option>GST</option> is the default decoder.
+	  <entry>
+	  <para>
+	    Select the specified media decoders.
+	    Both ffmpeg and gst use SDL sound engine.
 	  </para>
 	  <para>
-	    You should only select one media decoder.
+	    If option is not given and required dependencies are
+	    present, it will build both ffmpeg and gst media
+	    handlers. Runtime default will be the first in
+	    alphabetical order i.e. ffmpeg.
+	    See <option>MediaHandler</option> gnashrc option.
 	  </para></entry>
 	</row>
 	<row>
 	  <entry>
-	    <option>--disable-nsapi</option>
-	    <option>--enable-nsapi</option>
+	    <para><option>--disable-npapi</option></para>
+	    <para><option>--enable-npapi</option></para>
 	  </entry>
 	  <entry>Force disable/enable building the NPAPI plugin.
 	  By default the Mozilla plugin is built if the GTK gui 
@@ -178,8 +191,8 @@
 	</row>
 	<row>
 	  <entry>
-	    <option>--disable-kparts</option>
-	    <option>--enable-kparts</option>
+	    <para><option>--disable-kparts</option></para>
+	    <para><option>--enable-kparts</option></para>
 	  </entry>
 	  <entry>Force disable/enable building the KPARTS plugin. By default the
 	  KDE plugin is built if the kde gui is selected. 
@@ -197,7 +210,16 @@
 	  <entry>Disable build of both kparts and npapi plugins</entry>
 	</row>
 	<row>
-	  <entry><option>--enable-renderer=opengl|cairo|agg</option>
+	  <entry>
+	    <option>
+	      <programlisting>
+--enable-renderer=&lt;renderer&gt;[,&lt;renderer&gt;]...
+
+      renderer can be: agg
+		       cairo
+		       opengl
+	      </programlisting>
+	    </option>
 	  </entry>
 	  <entry>Enable support for a graphics backend. Currently
 	  only <option>opengl</option> and

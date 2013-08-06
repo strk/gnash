@@ -762,7 +762,7 @@ build_media_ffmpeg=auto
 build_media_none=no
 AC_ARG_ENABLE(media,
   AC_HELP_STRING([--enable-media=handler],
-    [Enable media handling support using the specified handler: gst, ffmpeg or none (no sound) [[gst]] ]),
+    [Enable media handling support using the specified handlers: ffmpeg gst none(no sound) (default=auto) ]),
   
     if test -n ${enableval}; then
       enableval=`echo ${enableval} | tr '\054' ' ' `
