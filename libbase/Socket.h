@@ -23,7 +23,6 @@
 
 #include "dsodefs.h"
 #include <boost/cstdint.hpp>
-#include <boost/shared_array.hpp>
 #include "IOChannel.h"
 
 namespace gnash {

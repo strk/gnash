@@ -24,16 +24,13 @@
 
 #include "Socket.h"
 
-#include <cstring>
 #include <cerrno>
 #include <csignal>
 #include <boost/lexical_cast.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/shared_array.hpp>
-            
+
 #include "GnashSystemNetHeaders.h"
 #include "GnashSystemFDHeaders.h"
-#include "URL.h"
 #include "log.h"
 #include "utility.h"
 #include "GnashAlgorithm.h"
