@@ -37,10 +37,7 @@
 #include "log.h"
 #include "utility.h"
 #include "GnashAlgorithm.h"
-
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
+#include "GnashSystemNetHeaders.h"
 
 namespace gnash {
 

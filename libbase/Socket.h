@@ -25,9 +25,6 @@
 #include <boost/cstdint.hpp>
 #include <boost/shared_array.hpp>
 #include "IOChannel.h"
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
 
 namespace gnash {
     class URL;
