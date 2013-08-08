@@ -4224,7 +4224,7 @@ yast_err="`cat $yast_err`"
 yast_war="`cat $yast_war`"
 yast_rec="`cat $yast_rec`"
 
-if test x"${linux}" -a x"${android}" = xno; then
+if test x"${android}" != xyes; then
   # Pipe stderr to /dev/null since Fedora complains when target isn't there.
   if test x`which apt-get 2>/dev/null` != x; then
     if test x"$deb_err" != x -o x"$deb_war" != x -o x"$deb_rec" != x; then
