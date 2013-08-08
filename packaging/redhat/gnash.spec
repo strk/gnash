@@ -33,6 +33,7 @@ BuildRequires:  kdelibs-devel >= 4.0, kdebase-devel >= 4.0, qt-devel >= 4.0
 %endif
 # these are needed for the various renderers, which now all get built
 BuildRequires:  libXt-devel agg-devel libstdc++
+BuildRequires:  jemalloc-devel
 
 # The default Gnash package only includes the GTK parts, the rest
 # is in gnash-common.

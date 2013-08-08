@@ -93,11 +93,7 @@ libgnashbase_la_SOURCES = \
 
 if JEMALLOC
 libgnashbase_la_SOURCES += \
-	jemalloc.c \
-	jemalloc.h \
-	jemalloc_gnash.h \
-	jemalloc_rb.h \
-	jemalloc_types.h \
+	jemalloc_gnash.c \
 	$(NULL)
 endif
 
@@ -164,6 +160,7 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	$(BOOST_CFLAGS) \
 	$(OPENGL_CFLAGS) \
 	$(LTDL_CFLAGS) \
+	$(JEMALLOC_CFLAGS) \
 	-I$(top_srcdir)/librender \
 	$(NULL)
 
@@ -180,6 +177,7 @@ libgnashbase_la_LIBADD = \
 	$(EGL_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(LTDL_LIBS) \
+	$(JEMALLOC_LIBS) \
 	$(NULL)
 
 if ANDROID
@@ -194,10 +192,6 @@ inst_HEADERS = \
 	accumulator.h \
 	SimpleBuffer.h \
 	GnashNumeric.h \
-	jemalloc_gnash.h \
-	jemalloc_types.h \
-	jemalloc_rb.h \
-	jemalloc.h \
 	GnashSleep.h \
 	gmemory.h \
 	SharedMem.h \

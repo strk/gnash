@@ -36,7 +36,8 @@ Build-Depends: dpkg-dev (>= 1.13.19),
 	       libavutil-dev,
 	       libswscale-dev,
 	       lsb-release,
-	       xulrunner-dev | firefox-dev
+	       xulrunner-dev | firefox-dev,
+	       libjemalloc-dev
 # OpenGL packages are disabled for now
 # libgl1-mesa-dev, libglu1-mesa-dev, libgtkglext1-dev, libqt4-opengl-dev, 
 Standards-Version: 3.8.4

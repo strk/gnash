@@ -1362,7 +1362,7 @@ extensions_support=yes
 nextensions=0
 AC_ARG_ENABLE(extensions,
   AC_HELP_STRING([--enable-extensions=], [Specify which extensions to build (default: none)])
-  AC_HELP_STRING([--disable-extensions], [Disable support for extensions entirely]),
+AC_HELP_STRING([--disable-extensions], [Disable support for extensions entirely]),
   if test -n ${enableval}; then
     if test "x${enableval}" != "xno"; then
       extlist="${enableval}"
@@ -1555,7 +1555,8 @@ fi
 # This seems like a good idea, as both the other player and
 # Mozilla/Firefox both recently switched to using jemalloc.
 AC_ARG_ENABLE(jemalloc,
-  AC_HELP_STRING([--enable-jemalloc],[Enable jemalloc instead of system malloc]),
+  AC_HELP_STRING([--enable-jemalloc],[Enable jemalloc instead of system malloc])
+AC_HELP_STRING([--disable-jemalloc],[Disable jemalloc]),
 [case "${enableval}" in
   yes) jemalloc=yes ;;
   no)  jemalloc=no ;;
@@ -1598,7 +1599,12 @@ AC_SEARCH_LIBS([mallinfo], [c malloc],
                )
 
 AM_CONDITIONAL([HAVE_MALLINFO], test x$mallinfo = xyes)
-AM_CONDITIONAL(JEMALLOC, test x$jemalloc = xyes)
+ 
+if test x"${jemalloc}" = x"yes"; then
+  GNASH_PKG_FIND(jemalloc, [jemalloc.h], [jemalloc memory management], mallctl)
+fi
+
+AM_CONDITIONAL(JEMALLOC, test x"${has_jemalloc}" = xyes)
 
 AC_SEARCH_LIBS([getaddrinfo], [c])
 
@@ -3203,8 +3209,14 @@ AC_DEFUN([PKG_ALTERNATIVE],
 
 echo "Configurable options are:"
 
+if test x"${jemalloc}" = x"yes"; then
+  echo "        JEMALLOC Memory management enabled (default)."
+else
+  echo "        JEMALLOC Memory management disabled."
+fi
+
 if test x"${pthreads}" = x"yes"; then
-  echo "        POSIX Threads support enabled (default)"
+  echo "        POSIX Threads support enabled (default)."
 else
   if test x"${build_haiku}" = x"yes"; then
      echo "        POSIX Thread support built into C library."
@@ -3246,6 +3258,20 @@ fi
 
 echo ""
 echo "Configured paths for ${build} are:"
+
+if test x"${jemalloc}" = x"yes"; then
+  if test x"${has_jemalloc}" = xyes; then
+    echo "        JEMALLOC flags are: ${JEMALLOC_CFLAGS}"
+    echo "        JEMALLOC libs are: ${JEMALLOC_LIBS}"
+  else
+    PKG_ERR([No jemalloc development package installed!])
+    PKG_SUGGEST([Install a jemalloc development environment from
+    http://www.canonware.com/jemalloc/])
+    DEB_INSTALL([libjemalloc-dev])
+    RPM_INSTALL([jemalloc-devel])
+    PKG_ALTERNATIVE([or specify --disable-jemalloc])
+  fi
+fi
 
 dnl Dump QT3 options is the user specified a QTOPIA3 or KDE3 GUI
 if test x"${build_kde3}" = xyes -o x"${build_qtopia3}" = xyes; then
