@@ -141,41 +141,35 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     }
 
     // This is used for ::connect()
-    struct sockaddr *saddr = 0;
 
-    int code = 0;
-    struct addrinfo req, *ans;
-    std::memset(&req, 0, sizeof(struct addrinfo));
+    addrinfo req = addrinfo(), *ans = 0;
+    
     req.ai_family = AF_UNSPEC;  // Allow IPv4 or IPv6
     req.ai_socktype = SOCK_STREAM;
 
     std::string portNo = boost::lexical_cast<std::string>(port);
-    code = getaddrinfo(hostname.c_str(), portNo.c_str(), &req, &ans);
+    int code = getaddrinfo(hostname.c_str(), portNo.c_str(), &req, &ans);
     if (code != 0) {
-        log_error(_("getaddrinfo() failed with code: #%d - %s\n"),
+        log_error(_("getaddrinfo() failed with code: #%d - %s"),
                  code, gai_strerror(code));
         return false;
     }
 
     // display all the IP numbers
-    struct addrinfo *ot = ans;
-    while (ot) {
-        char clienthost   [NI_MAXHOST];
-        std::memset(&clienthost, 0, NI_MAXHOST);
-        getnameinfo(ot->ai_addr, ot->ai_addrlen,
-                    clienthost, sizeof(clienthost),
-                    NULL, 0,
-                    NI_NUMERICHOST);
-        
-        if (ot->ai_family == AF_INET6) {
-            log_debug("%s has IPV6 address of: %s", hostname, clienthost);
-        } else if (ot->ai_family == AF_INET) {
-            log_debug("%s has IPV4 address of: %s", hostname, clienthost);
-        } else {
-            log_error("%s has no IP address!", hostname);
+    if (LogFile::getDefaultInstance().getVerbosity() != 0) {
+        for(struct addrinfo* ot = ans; ot; ot = ot->ai_next) {
+
+            char clienthost [INET6_ADDRSTRLEN] = {};
+            code = getnameinfo(ot->ai_addr, ot->ai_addrlen,
+                               clienthost, sizeof(clienthost),
+                               NULL, 0, NI_NUMERICHOST);
+
+            if (code != 0) {
+                log_error(_("getnameinfo() failed: %1%"), gai_strerror(code));
+            } else {
+                log_debug("%s has address of: %s", hostname, clienthost);
+            }
         }
-        
-        ot = ot->ai_next;
     }
 
     // Multiple IPV$ and IPV6 numbers may be returned, so we try them all if
@@ -194,9 +188,6 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
         }
     }
 
-    saddr = it->ai_addr;
-    const int addrlen = it->ai_addrlen;
-
 #ifndef _WIN32
     // Set non-blocking.
     const int flag = ::fcntl(_socket, F_GETFL, 0);
@@ -204,7 +195,7 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
 #endif
 
     // Attempt connection
-    int ret = ::connect(_socket, saddr, addrlen);
+    int ret = ::connect(_socket, it->ai_addr, it->ai_addrlen);
     freeaddrinfo(ans);          // free the response data
     if (ret < 0) {
         const int err = errno;

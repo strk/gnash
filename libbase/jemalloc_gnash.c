@@ -48,14 +48,9 @@ struct mallinfo {
 struct mallinfo
 mallinfo(void)
 {
-    struct mallinfo mi;
-    size_t len;
+    struct mallinfo mi = {};
 
-    /* clear all fields */
-    mi.arena = mi.ordblks = mi.smblks = mi.hblks = mi.hblkhd = mi.usmblks =
-        mi.fsmblks = mi.uordblks = mi.fordblks = mi.keepcost = 0;
-
-    len = sizeof(mi.arena);
+    size_t len = sizeof(mi.arena);
     mallctl("stats.mapped", &mi.arena, &len, NULL, 0);
     len = sizeof(mi.uordblks);
     mallctl("stats.allocated", &mi.uordblks, &len, NULL, 0);
