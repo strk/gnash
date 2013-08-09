@@ -354,7 +354,7 @@ as_value
 getHeight(DisplayObject& o)
 {
     SWFRect bounds = o.getBounds();
-    const SWFMatrix m = getMatrix(o);
+    const SWFMatrix& m = getMatrix(o);
     m.transform(bounds);
     return twipsToPixels(bounds.height());      
 }
@@ -1109,7 +1109,7 @@ setY(DisplayObject& o, const as_value& val)
 as_value
 getY(DisplayObject& o)
 {
-    const SWFMatrix m = getMatrix(o);
+    const SWFMatrix& m = getMatrix(o);
     return twipsToPixels(m.get_y_translation());
 }
 
@@ -1140,7 +1140,7 @@ setX(DisplayObject& o, const as_value& val)
 as_value
 getX(DisplayObject& o)
 {
-    const SWFMatrix m = getMatrix(o);
+    const SWFMatrix& m = getMatrix(o);
     return twipsToPixels(m.get_x_translation());
 }
 
@@ -1548,12 +1548,12 @@ doSet(const ObjectURI& uri, DisplayObject& o, const as_value& val)
 {
     string_table& st = getStringTable(*getObject(&o));
 
-    const GetterSetter gs = getGetterSetterByURI(uri, st);
+    const GetterSetter& gs = getGetterSetterByURI(uri, st);
      
     // not found (all props have getters)
     if (!gs.first) return false;
 
-    const Setter s = gs.second;
+    const Setter& s = gs.second;
 
     // read-only (TODO: aserror ?)
     if (!s) return true;
