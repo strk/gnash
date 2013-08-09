@@ -1563,33 +1563,6 @@ AC_HELP_STRING([--disable-jemalloc],[Disable jemalloc]),
   *)   AC_MSG_ERROR([bad value ${enableval} for --enable-jemalloc option]) ;;
 esac],jemalloc=yes)
 
-AC_CHECK_SIZEOF([void *], [4])
-
-if test "x${ac_cv_sizeof_void_p}" != x4 -a x"${ac_cv_sizeof_void_p}" != x8; then
-  dnl jemalloc doesn't support unusual pointer sizes
-  jemalloc=no
-fi
-
-dnl There is some weird stuff going on with NetBSD and jemalloc, so don't 
-dnl build it for now.
-if test x"${netbsd}" = x"yes" -o x"${windows}" = x"yes" -o x"${freebsd}" = x"yes" -o x"${haiku}" = x"yes" -o x"${gnu}" = x"yes"; then
-  jemalloc=no
-fi
-dnl If the compiler doesn't have local thread storage enabled, don't try to
-dnl use jemalloc.
-if test x"${jemalloc}" = x"yes"; then
-  AC_TRY_COMPILE([], [
-    extern __thread int global_i; ],
-    has_local_thread_storage=yes
-  )
-  if test x"${has_local_thread_storage}" = x"yes"; then
-    AC_DEFINE([HAVE_LOCAL_THREAD_STORAGE], [1], [Has __thread (local thread storage) support])
-    AC_DEFINE([USE_JEMALLOC], [], [Use jemalloc instead of system malloc])
-  else
-    jemalloc=no
-  fi
-fi
-
 dnl We can search libs for mallinfo to decide whether we have it or not.
 dnl This is added to the linker flags when it's found. Usually it's -lc, but
 dnl on OpenSolaris it's -lmalloc, so this fixes the build.
