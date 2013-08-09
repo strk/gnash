@@ -17,6 +17,7 @@
  *
  */ 
 
+#include <stddef.h>
 #include <jemalloc.h>
 
 #ifdef HAVE_CONFIG_H
@@ -45,10 +46,12 @@ struct mallinfo {
     int keepcost; /* top-most, releasable space UNUSED */
 };
 
+struct mallinfo mallinfo (void);
+
 struct mallinfo
 mallinfo(void)
 {
-    struct mallinfo mi = {};
+    struct mallinfo mi = {0,};
 
     size_t len = sizeof(mi.arena);
     mallctl("stats.mapped", &mi.arena, &len, NULL, 0);
