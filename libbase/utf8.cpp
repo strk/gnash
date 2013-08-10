@@ -344,8 +344,8 @@ guessEncoding(const std::string &str, int &length, std::vector<int>& offsets)
             was_even = !was_odd;
         }
     
-        it++;
-        index++;    
+        ++it;
+        ++index;    
     }
     offsets.push_back(index); // [length - 1] = index;
     
