@@ -1695,7 +1695,7 @@ movie_root::executeTimers()
 
     // Don't do anything if we have no timers, just return so we don't
     // waste cpu cycles.
-    if (_intervalTimers.size() == 0) {
+    if (_intervalTimers.empty()) {
         return;
     }
 
