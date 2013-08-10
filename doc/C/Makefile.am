@@ -230,8 +230,8 @@ endif
 if ENABLE_TEXI
 	-if test x$(DB2X_TEXI) != x; then \
 	  out=`echo $* | sed -e 's:gnash:gnash_:'`; \
-	  $(DB2X_TEXI) --encoding=us-ascii//TRANSLIT --string-param directory-description="Gnash" --string-param output-file=$${out} $<; \
-	  $(MAKEINFO) --force $${out}.texi; \
+	  $(DB2X_TEXI) --info --encoding=us-ascii//TRANSLIT --string-param
+directory-description="Gnash" --string-param output-file=$${out} $<; \
 	else \
 	  basefile="$*"; \
           $(DB2X_XSLTPROC) -s texi $< --output $${basefile}.txml; \
@@ -241,11 +241,7 @@ if ENABLE_TEXI
 endif
 
 .texi.info:
-if ENABLE_TEXI
-	-$(MAKEINFO) --force $<
-else	
-	touch $@;
-endif
+	touch $@
 
 .man-xml.1:
 if ENABLE_MAN
