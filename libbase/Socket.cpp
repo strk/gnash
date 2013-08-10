@@ -188,6 +188,12 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
         }
     }
 
+    if (!it) {
+        log_error(_("Socket creation attempt(s) failed: giving up."));
+        freeaddrinfo(ans);
+        return false;
+    }
+
 #ifndef _WIN32
     // Set non-blocking.
     const int flag = ::fcntl(_socket, F_GETFL, 0);
@@ -234,17 +240,9 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
 void
 Socket::fillCache()
 {
-
     // Read position is always _pos + _size wrapped.
     const size_t cacheSize = arraySize(_cache);
     size_t start = (_pos + _size) % cacheSize;
-
-    // Try to fill the whole remaining buffer.
-    const size_t completeRead = cacheSize - _size;
-    
-    // End is start + read size, wrapped.
-    size_t end = (start + completeRead) % cacheSize;
-    if (end == 0) end = cacheSize;
 
     char* startpos = _cache + start;
 
@@ -345,8 +343,6 @@ std::streamsize
 Socket::write(const void* src, std::streamsize num)
 {
     if (bad()) return 0;
-
-    int bytesSent = 0;
     int toWrite = num;
 
     const char* buf = static_cast<const char*>(src);
@@ -368,7 +364,7 @@ Socket::write(const void* src, std::streamsize num)
     // a return of -1 from ::send.
 
     while (toWrite > 0) {
-        bytesSent = ::send(_socket, buf, toWrite, 0);
+        int bytesSent = ::send(_socket, buf, toWrite, 0);
         if (bytesSent < 0) {
             const int err = errno;
             log_error(_("Socket send error %s"), std::strerror(err));
