@@ -155,7 +155,7 @@ public:
 	}
 
 	/// Checks if the stream contains X bits
-	bool gotBits(boost::uint32_t nbits)
+	bool gotBits(boost::uint32_t nbits) const
 	{
 		boost::uint32_t gotbits = 8-usedBits +8*(end-ptr-1);
 		if (gotbits > nbits) return true;
