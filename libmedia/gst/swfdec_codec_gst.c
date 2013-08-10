@@ -112,8 +112,8 @@ swfdec_gst_feature_filter_parser (GstPluginFeature *feature, gpointer caps)
     return swfdec_gst_feature_filter (feature, caps, "Parser", FALSE);
 }
 
-
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-qual"
 static int
 swfdec_gst_compare_features (gconstpointer a_, gconstpointer b_)
 {
@@ -127,6 +127,7 @@ swfdec_gst_compare_features (gconstpointer a_, gconstpointer b_)
 
   return strcmp (gst_plugin_feature_get_name (a), gst_plugin_feature_get_name (b));
 }
+#pragma GCC diagnostic pop
 
 static GstElementFactory *
 _swfdec_gst_get_factory (GstCaps *caps, GstPluginFeatureFilter filter)
@@ -356,6 +357,8 @@ swfdec_gst_decoder_finish (SwfdecGstDecoder *dec)
   }
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-qual"
 gboolean
 swfdec_gst_decoder_push (SwfdecGstDecoder *dec, GstBuffer *buffer)
 {
@@ -382,6 +385,7 @@ swfdec_gst_decoder_push (SwfdecGstDecoder *dec, GstBuffer *buffer)
   SWFDEC_ERROR ("error %d pushing data", (int) ret);
   return FALSE;
 }
+#pragma GCC diagnostic pop
 
 void
 swfdec_gst_decoder_push_eos (SwfdecGstDecoder *dec)
