@@ -382,8 +382,6 @@ RTMP::readSocket(boost::uint8_t* buffer, int n)
         sendBytesReceived(this);
         log_debug("Sent bytes received");
     }
-
-    buffer += bytesRead;
     return bytesRead;
 }
 
