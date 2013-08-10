@@ -649,8 +649,6 @@ VideoInputGst::getSelectedCaps(gint dev_select)
     GstMessage *message;
     
     GnashWebcam *data_struct = _vidVect[dev_select];
-    GstElement *element;
-    element = data_struct->getElementPtr();
     
     if (dev_select < 0 ||
             static_cast<size_t>(dev_select) >= _vidVect.size()) {
@@ -1540,10 +1538,9 @@ VideoInputGst::play()
 
     GstStateChangeReturn state;
     GstBus *bus;
-    gint ret;
     //setup bus to watch pipeline for messages
     bus = gst_pipeline_get_bus (GST_PIPELINE (webcam->_pipeline));
-    ret = gst_bus_add_watch (bus, bus_call, webcam);
+    gst_bus_add_watch (bus, bus_call, webcam);
     gst_object_unref (bus);
     
     state = gst_element_set_state (webcam->_pipeline, GST_STATE_PLAYING);
