@@ -117,6 +117,9 @@ AGG resources
 #include <boost/scoped_array.hpp>
 #include <boost/bind.hpp>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wsign-compare"
 #include <agg_rendering_buffer.h>
 #include <agg_renderer_base.h>
 #include <agg_pixfmt_gray.h>
@@ -139,6 +142,7 @@ AGG resources
 #include <agg_renderer_primitives.h>
 #include <agg_image_accessors.h>
 #include <agg_alpha_mask_u8.h>
+#pragma GCC diagnostic pop
 
 #include "Renderer_agg_style.h"
 

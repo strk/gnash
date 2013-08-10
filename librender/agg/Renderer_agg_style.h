@@ -25,6 +25,8 @@
 
 #include <vector>
 #include <boost/ptr_container/ptr_vector.hpp>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #include <agg_gradient_lut.h>
 #include <agg_color_rgba.h>
 #include <agg_color_gray.h>
@@ -37,6 +39,7 @@
 #include <agg_span_image_filter_rgba.h>
 #include <agg_pixfmt_rgb.h>
 #include <agg_pixfmt_rgba.h>
+#pragma GCC diagnostic pop
 #include <iostream>
 
 #include "LinearRGB.h"
