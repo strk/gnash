@@ -118,7 +118,7 @@ public:
         // As long as we can work out the SWFCode from the
         // gnash::key::code it's all right.
         int i = 0;
-        while (key::codeMap[i][key::SWF] != SWFkey && i < key::KEYCOUNT) i++;
+        while (i < key::KEYCOUNT && key::codeMap[i][key::SWF] != SWFkey) i++;
 
         if (i == key::KEYCOUNT) _keyCode = key::INVALID;
         else _keyCode = static_cast<key::code>(i);
