@@ -20,6 +20,8 @@
 #include "gnashconfig.h"
 #endif
 
+#include "gst/GlibDeprecated.h"
+
 #include "rc.h"
 #ifdef HAVE_GST_GST_H
 #include "gst/gst.h"

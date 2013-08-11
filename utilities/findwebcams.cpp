@@ -20,6 +20,8 @@
 #include "gnashconfig.h"
 #endif
 
+#include "gst/GlibDeprecated.h"
+
 #include <vector>
 #include <string>
 #include <iostream>
