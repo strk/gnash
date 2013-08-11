@@ -438,7 +438,7 @@ fileio_gets(const fn_call& fn)
     assert(ptr);    
     char buf[BUFSIZE];
     memset(buf, 0, BUFSIZE);
-    string str = ::gets(buf);
+    string str = ::fgets(buf, BUFSIZE, stdin);
     return as_value(buf);
 }
 
