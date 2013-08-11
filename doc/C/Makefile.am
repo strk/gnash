@@ -230,7 +230,7 @@ endif
 if ENABLE_TEXI
 	-if test x$(DB2X_TEXI) != x; then \
 	  out=`echo $* | sed -e 's:gnash:gnash_:'`; \
-	  $(DB2X_TEXI) --info --encoding=us-ascii//TRANSLIT --string-param
+	  $(DB2X_TEXI) --info --encoding=us-ascii//TRANSLIT --string-param \
 directory-description="Gnash" --string-param output-file=$${out} $<; \
 	else \
 	  basefile="$*"; \
