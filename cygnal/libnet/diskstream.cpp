@@ -584,7 +584,9 @@ DiskStream::writeToDisk(const std::string &filespec, boost::uint8_t *data, size_
         log_error(strerror(errno));
     }
     log_debug(_("Writing data (%d bytes) to disk: \"%s\""), size, filespec);
-    ::write(fd, data, size);
+    if(::write(fd, data, size) < 0) {
+        log_error(strerror(errno));
+    };
     ::close(fd);
 
     return true;
