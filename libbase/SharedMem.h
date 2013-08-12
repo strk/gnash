@@ -105,6 +105,10 @@ private:
     /// @return     true if successful, false if not.
     DSOEXPORT bool unlock() const;
 
+    /// Obtain a semaphore.
+    /// @return true on success; false otherwise.
+    bool getSemaphore();
+
     iterator _addr;
 
     const size_t _size;

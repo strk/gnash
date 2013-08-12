@@ -35,6 +35,7 @@
 #endif
 
 #include "log.h"
+#include "GnashSleep.h"
 
 #if (defined(HAVE_SHMGET)) 
 # define ENABLE_SHARED_MEM 1
@@ -105,6 +106,76 @@ SharedMem::unlock() const
 }
 
 bool
+SharedMem::getSemaphore()
+{
+#ifndef __amigaos4__
+    // Struct for semctl
+    union semun {
+        int val;
+        struct semid_ds* buf;
+        unsigned short* array;
+    };
+#endif
+
+    semun s;
+
+    // We employ the textbook solution to the race condition during creation
+    // and initialization of the semaphore: Create the semaphore with IPC_EXCL
+    // so that for the first process, creation will succeed, but for any
+    // concurrent process it will fail with EEXIST. Then, once the first
+    // process is finished initializing the semaphore, semop is called (in our
+    // case by calling lock()) which modifies semid_ds::otime, and the
+    // concurrent process knows it can proceed with using the semaphore
+    // (provided it obtains a lock.)
+    _semid = ::semget(_shmkey, 1, IPC_CREAT | IPC_EXCL | 0600);
+        
+    if (_semid >= 0) {
+        // Initialize semval.
+        s.val = 1;
+        int ret = ::semctl(_semid, 0, SETVAL, s);
+        if (ret < 0) {
+            log_error(_("Failed to set semaphore value: %1%"), strerror(errno));
+            return false;
+        }
+        // The first semop is executed immediately after this function returns.
+    } else if (errno == EEXIST) {
+        _semid = semget(_shmkey, 1, 0600);
+        if (_semid < 0) {
+            log_error(_("Failed to obtain nonexclusive semaphore for shared "
+                        "memory: %1%"), strerror(errno));
+            return false;
+        }
+
+        // Wait until semid_ds::sem_otime changes.
+        semid_ds buf = semid_ds();
+        s.buf = &buf;
+        const int maxRetries = 10;
+        time_t uSecondsWait = 100; // 0.1ms
+        bool ok = false;
+
+        for(int i = 0; i < maxRetries; i++) {
+            semctl(_semid, 0, IPC_STAT, s);
+            if (buf.sem_otime != 0) {
+                ok = true;
+                break;
+            } else {
+                gnashSleep(uSecondsWait);
+            }
+        }
+
+        if (!ok) {
+            log_error(_("Timed out waiting for semaphore initialization."));
+            return false;
+        }
+    } else {
+        log_error(_("Failed creating semaphore: %1%"), strerror(errno));
+        return false;
+    }
+
+    return true;
+}
+
+bool
 SharedMem::attach()
 {
 #if !ENABLE_SHARED_MEM
@@ -125,55 +196,14 @@ SharedMem::attach()
     log_debug("Using shared memory key %s",
             boost::io::group(std::hex, std::showbase, _shmkey));
 
-    // First get semaphore.
-    
-    // Check if it exists already.
-    _semid = ::semget(_shmkey, 1, 0600);
-
-#ifndef __amigaos4__
-    // Struct for semctl
-    union semun {
-        int val;
-        struct semi_ds* buf;
-        unsigned short* array;
-    };
-#endif
-
-    semun s;
-
-    // If it does not exist, create it and set its value to 1.
-    if (_semid < 0) {
-
-        _semid = ::semget(_shmkey, 1, IPC_CREAT | 0600);
-        
-        if (_semid < 0) {
-            log_error(_("Failed to get semaphore for shared memory!"));
-            return false;
-        }    
-
-        s.val = 1;
-        const int ret = ::semctl(_semid, 0, SETVAL, s);
-        if (ret < 0) {
-            log_error(_("Failed to set semaphore value"));
-            return false;
-        }
+    if (!getSemaphore()) {
+        return false;
     }
+
+    // Note that at this point semval is of indeterminate value: for the
+    // process that created the semaphore, the value is 1, but for another
+    // process the value would depend on whether there is an existing lock.
     
-    // The 4th argument is neither necessary nor used, but we pass it
-    // anyway for fun.
-    const int semval = ::semctl(_semid, 0, GETVAL, s);
-
-    switch(semval) {
-        case 1: // the value we want
-            break;
-        case -1:
-            log_error(_("semctl() failed: %1%"), strerror(errno));
-        default:
-            log_error(_("Need semaphore value of 1 for locking; obtained %1%."
-                        "Cannot attach shared memory!"), semval);
-            return false;
-    };
-
     Lock lock(*this);
 
     // Then attach shared memory. See if it exists.
