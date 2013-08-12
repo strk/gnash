@@ -84,7 +84,6 @@ using std::vector;
 ///	This is the main namespace for Gnash and it's libraries.
 namespace gnash {
 
-static const char *DEFAULTPROTO = "tcp";
 static const short DEFAULTPORT  = RTMP_PORT;
 
 #ifndef INADDR_NONE
@@ -159,7 +158,7 @@ Network::createServer(std::string hostname, short port)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    int             on, type;
+    int             on;
     int             retries = 0;
 
     if (_listenfd >= 2) {
@@ -562,7 +561,6 @@ Network::createClient(const string &hostname, short port)
     struct timeval      tval;
     int                 ret;
     int                 retries;
-    struct protoent     *proto;
 
 //    assert( ! connected() );
     if (connected()) {
