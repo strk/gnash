@@ -403,7 +403,7 @@ Handler::findStream(const std::string &filespec)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    for (int i; i < _streams; i++) {
+    for (int i = 0; i < _streams; i++) {
 	if (_diskstreams[i]->getFilespec() == filespec) {
 	    return _diskstreams[i];
 	}
