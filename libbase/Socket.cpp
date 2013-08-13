@@ -35,6 +35,7 @@
 #include "utility.h"
 #include "GnashAlgorithm.h"
 #include "GnashSystemNetHeaders.h"
+#include "GnashScopedPtr.h"
 
 namespace gnash {
 
@@ -122,6 +123,28 @@ Socket::close()
     _error = false;
 }
 
+namespace {
+
+addrinfo* getAddrInfo(const std::string& hostname, boost::uint16_t port)
+{
+    addrinfo req = addrinfo(), *ans = 0;
+    
+    req.ai_family = AF_UNSPEC;  // Allow IPv4 or IPv6
+    req.ai_socktype = SOCK_STREAM;
+
+    std::string portNo = boost::lexical_cast<std::string>(port);
+    int code = getaddrinfo(hostname.c_str(), portNo.c_str(), &req, &ans);
+    if (code != 0) {
+        log_error(_("getaddrinfo() failed with code: #%d - %s"),
+                 code, gai_strerror(code));
+        return 0;
+    }
+
+    return ans;
+}
+  
+}
+
 bool
 Socket::connect(const std::string& hostname, boost::uint16_t port)
 {
@@ -141,26 +164,14 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     }
 
     // This is used for ::connect()
-
-    addrinfo req = addrinfo(), *ans = 0;
-    
-    req.ai_family = AF_UNSPEC;  // Allow IPv4 or IPv6
-    req.ai_socktype = SOCK_STREAM;
-
-    std::string portNo = boost::lexical_cast<std::string>(port);
-    int code = getaddrinfo(hostname.c_str(), portNo.c_str(), &req, &ans);
-    if (code != 0) {
-        log_error(_("getaddrinfo() failed with code: #%d - %s"),
-                 code, gai_strerror(code));
-        return false;
-    }
+    ScopedPtr<addrinfo> ans(getAddrInfo(hostname, port), freeaddrinfo);
 
     // display all the IP numbers
     if (LogFile::getDefaultInstance().getVerbosity() != 0) {
-        for(struct addrinfo* ot = ans; ot; ot = ot->ai_next) {
+        for(const addrinfo* ot = ans.get(); ot; ot = ot->ai_next) {
 
             char clienthost [INET6_ADDRSTRLEN] = {};
-            code = getnameinfo(ot->ai_addr, ot->ai_addrlen,
+            int code = getnameinfo(ot->ai_addr, ot->ai_addrlen,
                                clienthost, sizeof(clienthost),
                                NULL, 0, NI_NUMERICHOST);
 
@@ -174,7 +185,7 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
 
     // Multiple IPV$ and IPV6 numbers may be returned, so we try them all if
     // required
-    struct addrinfo *it = ans;
+    const addrinfo *it = ans.get();
     while (it) {
         _socket = ::socket(it->ai_family, it->ai_socktype, it->ai_protocol);
         if (_socket < 0) {
@@ -190,7 +201,6 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
 
     if (!it) {
         log_error(_("Socket creation attempt(s) failed: giving up."));
-        freeaddrinfo(ans);
         return false;
     }
 
@@ -202,7 +212,6 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
 
     // Attempt connection
     int ret = ::connect(_socket, it->ai_addr, it->ai_addrlen);
-    freeaddrinfo(ans);          // free the response data
     if (ret < 0) {
         const int err = errno;
 #ifndef _WIN32
