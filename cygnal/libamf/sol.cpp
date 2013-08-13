@@ -51,10 +51,10 @@ using gnash::log_error;
 // Object Name  - variable (the name of the object as an AMF encoded string)
 // Padding      - 4 bytes
 // After this is a series of AMF objects
-const short SOL_MAGIC = 0x00bf;	// is in big-endian format, this is the first
+const boost::uint16_t SOL_MAGIC = 0x00bf;	// is in big-endian format, this is the first
 				// two bytes. of the .sol file.
 //char *SOL_FILETYPE = "TCSO";
-const short SOL_BLOCK_MARK = 0x0004;
+const boost::uint16_t SOL_BLOCK_MARK = 0x0004;
 
 /// \define ENSUREBYTES
 ///
@@ -149,6 +149,15 @@ SOL::formatHeader(const std::string &name)
     return formatHeader(name, _filesize);
 }
 
+template <typename T>
+void
+appendSwapped(std::vector<boost::uint8_t>& container, T val)
+{
+    boost::uint8_t *ptr = 
+        static_cast<boost::uint8_t*>(swapBytes(&val, sizeof(val)));
+    container.insert(container.end(), ptr, ptr+sizeof(val));
+}
+
 /// \brief Create the file header.
 ///
 /// @param name The name of the SharedObject for this file.
@@ -160,67 +169,40 @@ bool
 SOL::formatHeader(const std::string &name, int filesize)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint32_t i;
 
     // First we add the magic number. All SOL data is in big-endian format,
     // so we swap it first.
-    boost::uint16_t swapped = SOL_MAGIC;
-    swapped = htons(swapped);
-    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(&swapped);
-    for (i=0; i<sizeof(boost::uint16_t); i++) {
-        _header.push_back(ptr[i]);
-    }
+    appendSwapped(_header, SOL_MAGIC);
 
     // Next is the file size to be created. We adjust it as the filesize
     // includes the padding in the header, the mystery bytes, and the
     // padding, plus the length of the name itself.
     filesize += name.size() + 16;
     boost::uint32_t len = filesize;
-    len = htonl(len);
-    ptr = reinterpret_cast<boost::uint8_t *>(&len);
-    for (i=0; i<sizeof(boost::uint32_t); i++) {
-        _header.push_back(ptr[i]);
-    }
+    appendSwapped(_header, len);
 
     // Then the mystery block, but as the value never seems to every change,
     // we just built it the same way it always is.
     // first is the TCSO, we have no idea what this stands for.
-//    ptr = reinterpret_cast<uint8_t *>(const_cast<uint8_t *>("TCSO");
-	ptr = (boost::uint8_t *)"TCSO";
-    for (i=0; i<sizeof(boost::uint32_t); i++) {
-        _header.push_back(ptr[i]);
-    }
+    const char magic[] = "TCSO";
+    _header.insert(_header.end(), boost::begin(magic), boost::end(magic));
+
     // then the 0x0004 bytes, also a mystery
-    swapped = SOL_BLOCK_MARK;
-    swapped = htons(swapped);
-    ptr = reinterpret_cast<boost::uint8_t *>(&swapped);
-    for (i=0; i<sizeof(boost::uint16_t); i++) {
-        _header.push_back(ptr[i]);
-    }
+    appendSwapped(_header, SOL_BLOCK_MARK);
     // finally a bunch of zeros to pad things for this field
-    for (i=0; i<sizeof(boost::uint32_t); i++) {
-        _header.push_back('\0');
-    }
+    _header.insert(_header.end(), '\0', sizeof(boost::uint32_t));
 
     // Encode the name. This is not a string object, which has a type field
     // one byte field precedding the length as a file type of AMF::STRING.
     //  First the length in two bytes
-    swapped = name.size();
-    swapped = htons(swapped);
-    ptr = reinterpret_cast<boost::uint8_t *>(&swapped);
-    for (i=0; i<sizeof(boost::uint16_t); i++) {
-        _header.push_back(ptr[i]);
-    }
+    boost::uint16_t size = name.size();
+    appendSwapped(_header, size);
+
     // then the string itself
-    ptr = (boost::uint8_t *)name.c_str();
-    for (i=0; i<name.size(); i++) {
-        _header.push_back(ptr[i]);
-    }
+    _header.insert(_header.end(), name.begin(), name.end());
     
     // finally a bunch of zeros to pad things at the end of the header
-    for (i=0; i<sizeof(boost::uint32_t); i++) {
-        _header.push_back('\0');
-    }
+    _header.insert(_header.end(), '\0', sizeof(boost::uint32_t));
 
 #if 0
     unsigned char *hexint;
