@@ -34,7 +34,7 @@ namespace gnash {
 /// ScopedPtr is similar to C++11's unique_ptr, but the deleter is not part of
 /// the type.
 template <typename T>
-class ScopedPtr : public boost::noncopyable
+class ScopedPtr : private boost::noncopyable
 {
 private:
     typedef boost::function<void(T* x)> DeleterT;
