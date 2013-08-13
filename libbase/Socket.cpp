@@ -165,6 +165,9 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
 
     // This is used for ::connect()
     ScopedPtr<addrinfo> ans(getAddrInfo(hostname, port), freeaddrinfo);
+    if (!ans.get()) {
+        return false;
+    }
 
     // display all the IP numbers
     if (LogFile::getDefaultInstance().getVerbosity() != 0) {
