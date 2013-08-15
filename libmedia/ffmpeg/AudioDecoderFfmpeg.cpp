@@ -535,13 +535,14 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
     int tmp = avcodec_decode_audio4(_audioCodecCtx, frm, &got_frm, &pkt);
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
+    const char* fmtname = av_get_sample_fmt_name(_audioCodecCtx->sample_fmt);
     log_debug(" decodeFrame | frm->nb_samples: %d | &got_frm: %d | "
         "returned %d | inputSize: %d",
         frm->nb_samples, got_frm, tmp, inputSize);
 #endif
 
+    int plane_size;
     if (tmp >= 0 && got_frm) {
-        int ch, plane_size;
         int planar = av_sample_fmt_is_planar(_audioCodecCtx->sample_fmt);
         int data_size = av_samples_get_buffer_size( &plane_size,
             _audioCodecCtx->channels, frm->nb_samples,
@@ -554,6 +555,8 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 
         memcpy(outPtr, frm->extended_data[0], plane_size);
 
+#if !(defined(HAVE_SWRESAMPLE_H) || defined(HAVE_AVRESAMPLE_H))
+        int ch;
         if (planar && _audioCodecCtx->channels > 1) {
             uint8_t *out = ((uint8_t *)outPtr) + plane_size;
             for (ch = 1; ch < _audioCodecCtx->channels; ch++) {
@@ -561,12 +564,13 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
                 out += plane_size;
             }
         }
+#endif
+
         outSize = data_size;
 #ifdef GNASH_DEBUG_AUDIO_DECODING
-        log_debug(" decodeFrame | planar: %d | _audioCodecCtx->sample_fmt: %d | "
-            "av_get_sample_fmt_name: %s | outSize: %d",
-            planar, _audioCodecCtx->sample_fmt,
-            av_get_sample_fmt_name(_audioCodecCtx->sample_fmt), outSize);
+        log_debug(" decodeFrame | fmt: %d | fmt_name: %s | planar: %d | "
+            "plane_size: %d | outSize: %d",
+            _audioCodecCtx->sample_fmt, fmtname, planar, plane_size, outSize);
 #endif
     } else {
         if (tmp < 0)
@@ -600,25 +604,27 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
         boost::uint8_t* resampledOutput = new boost::uint8_t[resampledFrameSize]; 
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
-        log_debug("Calling the resampler; resampleFactor:%d; "
-            "ouput to 44100hz, 2channels, %dbytes; "
-            "input is %dhz, %dchannels, %dbytes, %dsamples",
-            resampleFactor,
-            resampledFrameSize, _audioCodecCtx->sample_rate,
-            _audioCodecCtx->channels, outSize, inSamples);
+        log_debug(" decodeFrame | Calling the resampler, resampleFactor: %d | "
+            "in %d hz %d ch %d bytes %d samples, %s fmt", resampleFactor,
+            _audioCodecCtx->sample_rate, _audioCodecCtx->channels, outSize,
+            inSamples, fmtname);
+        log_debug(" decodeFrame | out 44100 hz 2 ch %d bytes",
+            resampledFrameSize);
 #endif
 
-        int outSamples = _resampler.resample(outPtr, // input
-            reinterpret_cast<boost::int16_t*>(resampledOutput), // output
-            inSamples); // input..
+        int outSamples = _resampler.resample(frm->extended_data, // input
+            plane_size, // input
+            frm->nb_samples, // input
+            &resampledOutput); // output
+
+        // make sure to set outPtr *after* we use it as input to the resampler
+        outPtr = reinterpret_cast<boost::int16_t*>(resampledOutput);
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
         log_debug("resampler returned %d samples ", outSamples);
 #endif
 
-        // make sure to set outPtr *after* we use it as input to the resampler
-        outPtr = reinterpret_cast<boost::int16_t*>(resampledOutput);
-
+        av_freep(&frm);
         av_free(output);
 
         if (expectedMaxOutSamples < outSamples) {

@@ -319,6 +319,46 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
      ffmpeg_version_check=
   fi
 
+  AC_MSG_CHECKING([for libavutil/opt.h])
+  have_ffmpeg_libavutil=no
+  if test -f "${ffmpeg_top_incl}/libavutil/opt.h"; then
+    have_ffmpeg_libavutil=yes
+    AC_DEFINE(HAVE_LIBAVUTIL_OPT_H, 1, [Define if libavutil/opt.h is found])
+  fi
+  AC_MSG_RESULT($have_ffmpeg_libavutil)
+
+  AC_MSG_CHECKING([for swresample.h])
+  have_ffmpeg_swresample=no
+  if test -f "${ffmpeg_top_incl}/ffmpeg/swresample.h"; then
+    have_ffmpeg_swresample=yes
+    AC_DEFINE(HAVE_FFMPEG_SWRESAMPLE_H, 1, [Define if swresample.h is found])
+  fi
+  if test -f "${ffmpeg_top_incl}/libswresample/swresample.h"; then
+    have_ffmpeg_swresample=yes
+    AC_DEFINE(HAVE_LIBSWRESAMPLE_SWRESAMPLE_H, 1, [Define if swresample.h is found])
+  fi
+  if test -f "${ffmpeg_top_incl}/swresample.h"; then
+    have_ffmpeg_swresample=yes
+    AC_DEFINE(HAVE_SWRESAMPLE_H, 1, [Define if swresample.h is found])
+  fi
+  AC_MSG_RESULT($have_ffmpeg_swresample)
+
+  AC_MSG_CHECKING([for avresample.h])
+  have_libav_avresample=no
+  if test -f "${ffmpeg_top_incl}/libav/avresample.h"; then
+    have_libav_avresample=yes
+    AC_DEFINE(HAVE_LIBAV_AVRESAMPLE_H, 1, [Define if avresample.h is found])
+  fi
+  if test -f "${ffmpeg_top_incl}/libavresample/avresample.h"; then
+    have_libav_avresample=yes
+    AC_DEFINE(HAVE_LIBAVRESAMPLE_AVRESAMPLE_H, 1, [Define if avresample.h is found])
+  fi
+  if test -f "${ffmpeg_top_incl}/avresample.h"; then
+    have_libav_avresample=yes
+    AC_DEFINE(HAVE_AVRESAMPLE_H, 1, [Define if avresample.h is found])
+  fi
+  AC_MSG_RESULT($have_libav_avresample)
+
   AC_MSG_CHECKING([for libavcodec/vaapi.h])
   have_ffmpeg_vaapi="no"
   if test -f "${ffmpeg_top_incl}/ffmpeg/vaapi.h"; then
@@ -624,6 +664,51 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
       ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libsws}"
     fi
     dnl End of SWSCALE library looking }
+
+    dnl Look for the {SW,AV}RESAMPLE libraries {
+    dnl
+    AC_MSG_CHECKING([for libswresample library])
+    if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
+      $PKG_CONFIG --exists libswresample  && libswresample=`$PKG_CONFIG --libs-only-l libswresample`
+    else
+      libswresample=""
+    fi
+    if test x"${libswresample}" = x; then
+      if test -f ${top_lib_dir}/libswresample.a -o -f ${top_lib_dir}/libswresample.${shlibext}; then
+        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lswresample"
+        AC_MSG_RESULT(yes)
+      else
+        AC_MSG_RESULT(no)
+        if test x${cross_compiling} = xno; then
+          AC_CHECK_LIB(swresample, swresample, [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lswresample"])
+        fi
+      fi
+    else
+      AC_MSG_RESULT(${libswresample})
+      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libswresample}"
+    fi
+
+    AC_MSG_CHECKING([for libavresample library])
+    if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
+      $PKG_CONFIG --exists libavresample  && libavresample=`$PKG_CONFIG --libs-only-l libavresample`
+    else
+      libavresample=""
+    fi
+    if test x"${libavresample}" = x; then
+      if test -f ${top_lib_dir}/libavresample.a -o -f ${top_lib_dir}/libavresample.${shlibext}; then
+        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavresample"
+        AC_MSG_RESULT(yes)
+      else
+        AC_MSG_RESULT(no)
+        if test x${cross_compiling} = xno; then
+          AC_CHECK_LIB(avresample, avresample, [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavresample"])
+        fi
+      fi
+    else
+      AC_MSG_RESULT(${libavresample})
+      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libavresample}"
+    fi
+    dnl End of {SW,AV}RESAMPLE libraries looking }
 
   fi
   dnl End of all optional library tests }

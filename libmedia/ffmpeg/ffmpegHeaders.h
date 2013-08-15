@@ -100,4 +100,50 @@ extern "C" {
 #define CODECID CodecID
 #endif
 
+#ifdef HAVE_SWRESAMPLE_H
+extern "C" {
+#include <swresample.h>
+}
+#endif
+
+#ifdef HAVE_FFMPEG_SWRESAMPLE_H
+extern "C" {
+#include <ffmpeg/swresample.h>
+}
+#define HAVE_SWRESAMPLE_H 1
+#endif
+
+#ifdef HAVE_LIBSWRESAMPLE_SWRESAMPLE_H
+extern "C" {
+#include <libswresample/swresample.h>
+}
+#define HAVE_SWRESAMPLE_H 1
+#endif
+
+#ifdef HAVE_AVRESAMPLE_H
+extern "C" {
+#include <avresample.h>
+}
+#endif
+
+#ifdef HAVE_LIBAV_AVRESAMPLE_H
+extern "C" {
+#include <libav/avresample.h>
+}
+#define HAVE_AVRESAMPLE_H 1
+#endif
+
+#ifdef HAVE_LIBAVRESAMPLE_AVRESAMPLE_H
+extern "C" {
+#include <libavresample/avresample.h>
+}
+#define HAVE_AVRESAMPLE_H 1
+#endif
+
+#ifdef HAVE_LIBAVUTIL_OPT_H
+extern "C" {
+#include <libavutil/opt.h>
+}
+#endif
+
 #endif // GNASH_MEDIA_FFMPEG_HEADERS_H
