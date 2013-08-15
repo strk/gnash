@@ -497,23 +497,15 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 
     assert(inputSize);
 
-    const size_t bufsize = MAX_AUDIO_FRAME_SIZE;
+    size_t outSize = MAX_AUDIO_FRAME_SIZE;
 
     // TODO: make this a private member, to reuse (see NetStreamFfmpeg in 0.8.3)
-    boost::uint8_t* output;
-
-    output = reinterpret_cast<boost::uint8_t*>(av_malloc(bufsize));
-    if (!output) {
+    boost::int16_t* outPtr = reinterpret_cast<boost::int16_t*>(av_malloc(outSize));
+    if (!outPtr) {
         log_error(_("failed to allocate audio buffer."));
         outputSize = 0;
         return NULL;
     }
-
-    boost::int16_t* outPtr = reinterpret_cast<boost::int16_t*>(output);
-
-    // We initialize output size to the full size
-    // then decoding will eventually reduce it
-    int outSize = bufsize; 
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
     log_debug("AudioDecoderFfmpeg: about to decode %d bytes; "
@@ -535,18 +527,18 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
     int tmp = avcodec_decode_audio4(_audioCodecCtx, frm, &got_frm, &pkt);
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
+    const char* fmtname = av_get_sample_fmt_name(_audioCodecCtx->sample_fmt);
     log_debug(" decodeFrame | frm->nb_samples: %d | &got_frm: %d | "
         "returned %d | inputSize: %d",
         frm->nb_samples, got_frm, tmp, inputSize);
 #endif
 
+    int plane_size;
     if (tmp >= 0 && got_frm) {
-        int ch, plane_size;
-        int planar = av_sample_fmt_is_planar(_audioCodecCtx->sample_fmt);
         int data_size = av_samples_get_buffer_size( &plane_size,
             _audioCodecCtx->channels, frm->nb_samples,
             _audioCodecCtx->sample_fmt, 1);
-        if (outSize < data_size) {
+        if (static_cast<int>(outSize) < data_size) {
             log_error(_("output buffer size is too small for the current frame "
                 "(%d < %d)"), outSize, data_size);
             return NULL;
@@ -554,19 +546,22 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 
         memcpy(outPtr, frm->extended_data[0], plane_size);
 
+#if !(defined(HAVE_SWRESAMPLE_H) || defined(HAVE_AVRESAMPLE_H))
+        int planar = av_sample_fmt_is_planar(_audioCodecCtx->sample_fmt);
         if (planar && _audioCodecCtx->channels > 1) {
             uint8_t *out = ((uint8_t *)outPtr) + plane_size;
-            for (ch = 1; ch < _audioCodecCtx->channels; ch++) {
+            for (int ch = 1; ch < _audioCodecCtx->channels; ch++) {
                 memcpy(out, frm->extended_data[ch], plane_size);
                 out += plane_size;
             }
         }
+#endif
+
         outSize = data_size;
 #ifdef GNASH_DEBUG_AUDIO_DECODING
-        log_debug(" decodeFrame | planar: %d | _audioCodecCtx->sample_fmt: %d | "
-            "av_get_sample_fmt_name: %s | outSize: %d",
-            planar, _audioCodecCtx->sample_fmt,
-            av_get_sample_fmt_name(_audioCodecCtx->sample_fmt), outSize);
+        log_debug(" decodeFrame | fmt: %d | fmt_name: %s | planar: %d | "
+            "plane_size: %d | outSize: %d",
+            _audioCodecCtx->sample_fmt, fmtname, planar, plane_size, outSize);
 #endif
     } else {
         if (tmp < 0)
@@ -577,7 +572,6 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
         log_error(_("Upgrading ffmpeg/libavcodec might fix this issue."));
         outputSize = 0;
         av_freep(&frm);
-        av_free(output);
         return NULL;
     }
 
@@ -600,26 +594,27 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
         boost::uint8_t* resampledOutput = new boost::uint8_t[resampledFrameSize]; 
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
-        log_debug("Calling the resampler; resampleFactor:%d; "
-            "ouput to 44100hz, 2channels, %dbytes; "
-            "input is %dhz, %dchannels, %dbytes, %dsamples",
-            resampleFactor,
-            resampledFrameSize, _audioCodecCtx->sample_rate,
-            _audioCodecCtx->channels, outSize, inSamples);
+        log_debug(" decodeFrame | Calling the resampler, resampleFactor: %d | "
+            "in %d hz %d ch %d bytes %d samples, %s fmt", resampleFactor,
+            _audioCodecCtx->sample_rate, _audioCodecCtx->channels, outSize,
+            inSamples, fmtname);
+        log_debug(" decodeFrame | out 44100 hz 2 ch %d bytes",
+            resampledFrameSize);
 #endif
 
-        int outSamples = _resampler.resample(outPtr, // input
-            reinterpret_cast<boost::int16_t*>(resampledOutput), // output
-            inSamples); // input..
+        int outSamples = _resampler.resample(frm->extended_data, // input
+            plane_size, // input
+            frm->nb_samples, // input
+            &resampledOutput); // output
+
+        // make sure to set outPtr *after* we use it as input to the resampler
+        outPtr = reinterpret_cast<boost::int16_t*>(resampledOutput);
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
         log_debug("resampler returned %d samples ", outSamples);
 #endif
 
-        // make sure to set outPtr *after* we use it as input to the resampler
-        outPtr = reinterpret_cast<boost::int16_t*>(resampledOutput);
-
-        av_free(output);
+        av_freep(&frm);
 
         if (expectedMaxOutSamples < outSamples) {
             log_error(_(" --- Computation of resampled samples (%d) < then the actual returned samples (%d)"),
@@ -646,10 +641,9 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
     }
     else {
         boost::uint8_t* newOutput = new boost::uint8_t[outSize];
-        std::memcpy(newOutput, output, outSize);
+        std::memcpy(newOutput, outPtr, outSize);
         outPtr = reinterpret_cast<boost::int16_t*>(newOutput);
         av_freep(&frm);
-        av_free(output);
     }
 
     outputSize = outSize;

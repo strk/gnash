@@ -56,21 +56,29 @@ public:
 	/// @param input
 	/// A pointer to the audio data that needs resampling
 	///
-	/// @param output
-	/// A pointer to where the resampled output should be placed
+	/// @param plane_size
+	/// Input plane/line size
 	///
 	/// @param samples
 	/// Number of samples in the audio
 	///
+	/// @param output
+	/// A pointer to where the resampled output should be placed
+	///
 	/// @return the number of samples in the output data.
 	///
-	DSOEXPORT int resample(
-		boost::int16_t* input, boost::int16_t* output, int samples
-	);
+	DSOEXPORT int resample(boost::uint8_t** input, int plane_size,
+		int samples, boost::uint8_t** output);
 
 private:
-	// The container of the resample format information.
-	ReSampleContext* _context;
+    // The container of the resample format information.
+#ifdef HAVE_SWRESAMPLE_H
+    SwrContext* _context;
+#elif HAVE_AVRESAMPLE_H
+    AVAudioResampleContext* _context;
+#else
+    ReSampleContext* _context;
+#endif
 };
 
 } // gnash.media.ffmpeg namespace 

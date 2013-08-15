@@ -281,6 +281,21 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
     # ffmpeg_version_check=ok # this is NOT ok, why would it be ?! 
   fi
 
+dnl Check if installed ffmpeg/libav already switched aac decoding from S16 to
+dnl float planar format (FLTP). If recent enough, we'll recommend to install
+dnl a dedicate resampling library to get aac properly decoded.
+dnl Commit in question (3d3cf6745e2a5dc9c377244454c3186d75b177fa) corresponds
+dnl to libavcodec ffmpeg version 54.77.100 / libav version 54.33.0.
+dnl | ffmpeg | 1.0 (54.59.100) S16 | 1.1 (54.86.100) FLTP |
+dnl | libav  | 0.8 (53.35.0)   S16 | 9   (54.35.0)   FLTP |
+
+  if test ${ffmpeg_major_version} -ge 55 -o \
+    \( ${ffmpeg_major_version} -eq 54 -a ${ffmpeg_micro_version} -eq 0 \) -o \
+    \( ${ffmpeg_major_version} -eq 54 -a ${ffmpeg_minor_version} -ge 77 -a \
+    ${ffmpeg_micro_version} -ge 100 \); then
+      ffmpeg_aac_float_planar=yes
+  fi
+
   LIBAVCODEC_IDENT=${ffmpeg_version}
   FFMPEG_CFLAGS="-D__STDC_CONSTANT_MACROS ${ac_cv_path_ffmpeg_incl}"
 
@@ -318,6 +333,46 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
      AC_MSG_WARN([Cannot find swscale.h, required for ffmpeg versions >= 52.0.0 (detected version: $ffmpeg_version)])
      ffmpeg_version_check=
   fi
+
+  AC_MSG_CHECKING([for libavutil/opt.h])
+  have_ffmpeg_libavutil=no
+  if test -f "${ffmpeg_top_incl}/libavutil/opt.h"; then
+    have_ffmpeg_libavutil=yes
+    AC_DEFINE(HAVE_LIBAVUTIL_OPT_H, 1, [Define if libavutil/opt.h is found])
+  fi
+  AC_MSG_RESULT($have_ffmpeg_libavutil)
+
+  AC_MSG_CHECKING([for swresample.h])
+  have_ffmpeg_swresample=no
+  if test -f "${ffmpeg_top_incl}/ffmpeg/swresample.h"; then
+    have_ffmpeg_swresample=yes
+    AC_DEFINE(HAVE_FFMPEG_SWRESAMPLE_H, 1, [Define if swresample.h is found])
+  fi
+  if test -f "${ffmpeg_top_incl}/libswresample/swresample.h"; then
+    have_ffmpeg_swresample=yes
+    AC_DEFINE(HAVE_LIBSWRESAMPLE_SWRESAMPLE_H, 1, [Define if swresample.h is found])
+  fi
+  if test -f "${ffmpeg_top_incl}/swresample.h"; then
+    have_ffmpeg_swresample=yes
+    AC_DEFINE(HAVE_SWRESAMPLE_H, 1, [Define if swresample.h is found])
+  fi
+  AC_MSG_RESULT($have_ffmpeg_swresample)
+
+  AC_MSG_CHECKING([for avresample.h])
+  have_libav_avresample=no
+  if test -f "${ffmpeg_top_incl}/libav/avresample.h"; then
+    have_libav_avresample=yes
+    AC_DEFINE(HAVE_LIBAV_AVRESAMPLE_H, 1, [Define if avresample.h is found])
+  fi
+  if test -f "${ffmpeg_top_incl}/libavresample/avresample.h"; then
+    have_libav_avresample=yes
+    AC_DEFINE(HAVE_LIBAVRESAMPLE_AVRESAMPLE_H, 1, [Define if avresample.h is found])
+  fi
+  if test -f "${ffmpeg_top_incl}/avresample.h"; then
+    have_libav_avresample=yes
+    AC_DEFINE(HAVE_AVRESAMPLE_H, 1, [Define if avresample.h is found])
+  fi
+  AC_MSG_RESULT($have_libav_avresample)
 
   AC_MSG_CHECKING([for libavcodec/vaapi.h])
   have_ffmpeg_vaapi="no"
@@ -624,6 +679,51 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
       ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libsws}"
     fi
     dnl End of SWSCALE library looking }
+
+    dnl Look for the {SW,AV}RESAMPLE libraries {
+    dnl
+    AC_MSG_CHECKING([for libswresample library])
+    if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
+      $PKG_CONFIG --exists libswresample  && libswresample=`$PKG_CONFIG --libs-only-l libswresample`
+    else
+      libswresample=""
+    fi
+    if test x"${libswresample}" = x; then
+      if test -f ${top_lib_dir}/libswresample.a -o -f ${top_lib_dir}/libswresample.${shlibext}; then
+        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lswresample"
+        AC_MSG_RESULT(yes)
+      else
+        AC_MSG_RESULT(no)
+        if test x${cross_compiling} = xno; then
+          AC_CHECK_LIB(swresample, swresample, [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lswresample"])
+        fi
+      fi
+    else
+      AC_MSG_RESULT(${libswresample})
+      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libswresample}"
+    fi
+
+    AC_MSG_CHECKING([for libavresample library])
+    if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
+      $PKG_CONFIG --exists libavresample  && libavresample=`$PKG_CONFIG --libs-only-l libavresample`
+    else
+      libavresample=""
+    fi
+    if test x"${libavresample}" = x; then
+      if test -f ${top_lib_dir}/libavresample.a -o -f ${top_lib_dir}/libavresample.${shlibext}; then
+        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavresample"
+        AC_MSG_RESULT(yes)
+      else
+        AC_MSG_RESULT(no)
+        if test x${cross_compiling} = xno; then
+          AC_CHECK_LIB(avresample, avresample, [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavresample"])
+        fi
+      fi
+    else
+      AC_MSG_RESULT(${libavresample})
+      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libavresample}"
+    fi
+    dnl End of {SW,AV}RESAMPLE libraries looking }
 
   fi
   dnl End of all optional library tests }

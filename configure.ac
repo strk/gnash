@@ -3571,6 +3571,23 @@ if test x"${build_media_ffmpeg}" = x"yes"; then
     DEB_INSTALL([libswscale-dev])
     PKG_ALTERNATIVE(or reconfigure with --enable-media=gst)
   fi
+
+  if test x"${have_ffmpeg_libavutil}" = "xno"; then
+    PKG_ERR([No libavutil development package installed!])
+    PKG_SUGGEST([You can install libavutil from http://ffmpeg.org])
+    DEB_INSTALL([libavutil-dev])
+    PKG_ALTERNATIVE(or reconfigure with --enable-media=gst)
+  fi
+
+  if test x"${ffmpeg_aac_float_planar}" = "xyes" -a \
+    x"${have_ffmpeg_swresample}" = "xno" -a \
+    x"${have_libav_avresample}" = "xno"; then
+      PKG_REC([Please install libswresample/libavresample development package. If you don't, Gnash will be unable to resample some formats (e.g. AAC on youtube)])
+      PKG_SUGGEST([You can install libavresample from http://libav.org])
+      PKG_SUGGEST([You can install libswresample from http://ffmpeg.org])
+      DEB_INSTALL([libavresample-dev])
+      PKG_ALTERNATIVE(or reconfigure with --enable-media=gst)
+  fi
 fi
 
 if test x$build_cairo = xyes; then
