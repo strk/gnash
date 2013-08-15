@@ -30,12 +30,6 @@
 
 //#define GNASH_DEBUG_AUDIO_DECODING
 
-#if LIBAVCODEC_VERSION_MAJOR >= 53
-#define AVCODEC_DECODE_AUDIO avcodec_decode_audio3
-#else
-#define AVCODEC_DECODE_AUDIO avcodec_decode_audio2
-#endif
-
 #define MAX_AUDIO_FRAME_SIZE 192000
 
 namespace gnash {
@@ -523,45 +517,66 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
     log_debug("AudioDecoderFfmpeg: about to decode %d bytes; "
-        "ctx->channels:%d, avctx->frame_size:%d",
+        "ctx->channels:%d, ctx->frame_size:%d",
         inputSize, _audioCodecCtx->channels, _audioCodecCtx->frame_size);
 #endif
 
     // older ffmpeg versions didn't accept a const input..
-#if LIBAVCODEC_VERSION_MAJOR >= 53
     AVPacket pkt;
+    int got_frm = 0;
     av_init_packet(&pkt);
-    pkt.data = (uint8_t*) input;
+    pkt.data = const_cast<uint8_t*>(input);
     pkt.size = inputSize;
-#endif
-    int tmp = AVCODEC_DECODE_AUDIO(_audioCodecCtx, outPtr, &outSize,
-#if LIBAVCODEC_VERSION_MAJOR >= 53
-                                   &pkt);
-#else
-                                   input, inputSize);
-#endif
-
-#ifdef GNASH_DEBUG_AUDIO_DECODING
-    log_debug(" avcodec_decode_audio[2](ctx, bufptr, %d, input, %d) "
-            "returned %d; set frame_size=%d",
-            bufsize, inputSize, tmp, outSize);
-#endif
-
-    if (tmp < 0) {
-        log_error(_("avcodec_decode_audio returned %d. Upgrading "
-                    "ffmpeg/libavcodec might fix this issue."), tmp);
-        outputSize = 0;
-
-        av_free(output);
+    AVFrame *frm = avcodec_alloc_frame();
+    if (!frm) {
+        log_error(_("failed to allocate frame."));
         return NULL;
     }
+    int tmp = avcodec_decode_audio4(_audioCodecCtx, frm, &got_frm, &pkt);
 
-    if (outSize < 2) {
-        log_error(_("outputSize:%d after decoding %d bytes of input audio "
-                    "data. Upgrading ffmpeg/libavcodec might fix this issue."),
-                    outputSize, inputSize);
+#ifdef GNASH_DEBUG_AUDIO_DECODING
+    log_debug(" decodeFrame | frm->nb_samples: %d | &got_frm: %d | "
+        "returned %d | inputSize: %d",
+        frm->nb_samples, got_frm, tmp, inputSize);
+#endif
+
+    if (tmp >= 0 && got_frm) {
+        int ch, plane_size;
+        int planar = av_sample_fmt_is_planar(_audioCodecCtx->sample_fmt);
+        int data_size = av_samples_get_buffer_size( &plane_size,
+            _audioCodecCtx->channels, frm->nb_samples,
+            _audioCodecCtx->sample_fmt, 1);
+        if (outSize < data_size) {
+            log_error(_("output buffer size is too small for the current frame "
+                "(%d < %d)"), outSize, data_size);
+            return NULL;
+        }
+
+        memcpy(outPtr, frm->extended_data[0], plane_size);
+
+        if (planar && _audioCodecCtx->channels > 1) {
+            uint8_t *out = ((uint8_t *)outPtr) + plane_size;
+            for (ch = 1; ch < _audioCodecCtx->channels; ch++) {
+                memcpy(out, frm->extended_data[ch], plane_size);
+                out += plane_size;
+            }
+        }
+        outSize = data_size;
+#ifdef GNASH_DEBUG_AUDIO_DECODING
+        log_debug(" decodeFrame | planar: %d | _audioCodecCtx->sample_fmt: %d | "
+            "av_get_sample_fmt_name: %s | outSize: %d",
+            planar, _audioCodecCtx->sample_fmt,
+            av_get_sample_fmt_name(_audioCodecCtx->sample_fmt), outSize);
+#endif
+    } else {
+        if (tmp < 0)
+            log_error(_("avcodec_decode_audio returned %d."), tmp);
+        if (outSize < 2)
+            log_error(_("outputSize:%d after decoding %d bytes of input audio "
+                "data."), outputSize, inputSize);
+        log_error(_("Upgrading ffmpeg/libavcodec might fix this issue."));
         outputSize = 0;
-
+        av_freep(&frm);
         av_free(output);
         return NULL;
     }
@@ -633,6 +648,7 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
         boost::uint8_t* newOutput = new boost::uint8_t[outSize];
         std::memcpy(newOutput, output, outSize);
         outPtr = reinterpret_cast<boost::int16_t*>(newOutput);
+        av_freep(&frm);
         av_free(output);
     }
 
