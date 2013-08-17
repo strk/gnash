@@ -47,6 +47,7 @@ libgnashmedia_la_SOURCES += \
 	gst/AudioDecoderGst.h \
 	gst/AudioInputGst.cpp \
 	gst/AudioInputGst.h \
+	gst/GlibDeprecated.h \
 	gst/GstUtil.cpp \
 	gst/GstUtil.h \
 	gst/MediaHandlerGst.cpp \

@@ -46,6 +46,7 @@ libgnashbase_la_SOURCES = \
 	GnashImageJpeg.cpp \
 	GnashImageJpeg.h \
 	GnashNumeric.h \
+	GnashScopedPtr.h \
 	GnashSleep.h \
 	GnashSystemFDHeaders.h \
 	GnashSystemIOHeaders.h \
@@ -199,6 +200,7 @@ inst_HEADERS = \
 	tu_file.h \
 	IOChannel.h \
 	Socket.h \
+	GnashScopedPtr.h \
 	GnashSystemFDHeaders.h \
 	GnashSystemNetHeaders.h \
 	GnashSystemIOHeaders.h \
