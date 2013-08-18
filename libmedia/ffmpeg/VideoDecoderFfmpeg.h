@@ -70,7 +70,7 @@ private:
     //
     /// @return CODEC_ID_NONE for unsupported flash codecs
     ///
-    static CodecID flashToFfmpegCodec(videoCodecType format);
+    static CODECID flashToFfmpegCodec(videoCodecType format);
 
     /// \brief converts an video frame from (almost) any type to RGB24.
     ///
@@ -84,7 +84,7 @@ private:
     std::auto_ptr<image::GnashImage> frameToImage(AVCodecContext* srcCtx,
             const AVFrame& srcFrame);
 
-    void init(enum CodecID format, int width, int height,
+    void init(enum CODECID format, int width, int height,
             boost::uint8_t* extradata=0, int extradataSize=0);
 
     std::auto_ptr<image::GnashImage> decode(const boost::uint8_t* input,

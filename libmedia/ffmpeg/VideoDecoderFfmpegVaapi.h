@@ -62,14 +62,14 @@ class VaapiContextFfmpeg : public vaapi_context {
     boost::shared_ptr<VaapiContext> _context;
 
 public:
-    VaapiContextFfmpeg(enum CodecID codec_id);
+    VaapiContextFfmpeg(enum CODECID codec_id);
 
     bool initDecoder(unsigned int width, unsigned int height);
 
     VaapiSurfaceFfmpeg *getSurface()
         { return new VaapiSurfaceFfmpeg(_context->acquireSurface(), _context); }
 
-    static VaapiContextFfmpeg *create(enum CodecID codec_id);
+    static VaapiContextFfmpeg *create(enum CODECID codec_id);
 };
     
 } // gnash.media.ffmpeg namespace 

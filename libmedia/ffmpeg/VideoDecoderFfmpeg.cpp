@@ -117,7 +117,7 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg(videoCodecType format, int width, int hei
     _videoCodec(NULL)
 {
 
-    CodecID codec_id = flashToFfmpegCodec(format);
+    CODECID codec_id = flashToFfmpegCodec(format);
     init(codec_id, width, height);
 
 }
@@ -127,13 +127,13 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg(const VideoInfo& info)
     _videoCodec(NULL)
 {
 
-    CodecID codec_id = CODEC_ID_NONE;
+    CODECID codec_id = CODEC_ID_NONE;
 
     if ( info.type == CODEC_TYPE_FLASH )
     {
         codec_id = flashToFfmpegCodec(static_cast<videoCodecType>(info.codec));
     }
-    else codec_id = static_cast<CodecID>(info.codec);
+    else codec_id = static_cast<CODECID>(info.codec);
 
     // This would cause nasty segfaults.
     if (codec_id == CODEC_ID_NONE)
@@ -167,7 +167,7 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg(const VideoInfo& info)
 }
 
 void
-VideoDecoderFfmpeg::init(enum CodecID codecId, int /*width*/, int /*height*/,
+VideoDecoderFfmpeg::init(enum CODECID codecId, int /*width*/, int /*height*/,
         boost::uint8_t* extradata, int extradataSize)
 {
     // Init the avdecoder-decoder
@@ -422,7 +422,7 @@ VideoDecoderFfmpeg::peek()
 }
 
 /* public static */
-enum CodecID
+enum CODECID
 VideoDecoderFfmpeg::flashToFfmpegCodec(videoCodecType format)
 {
         // Find the decoder and init the parser

@@ -31,7 +31,7 @@ namespace media {
 namespace ffmpeg {
 
 /// Translates FFmpeg Codec ID to VAProfile
-static VAProfile get_profile(enum CodecID codec_id)
+static VAProfile get_profile(enum CODECID codec_id)
 {
     static const int mpeg2_profiles[] =
         { VAProfileMPEG2Main, VAProfileMPEG2Simple, -1 };
@@ -94,7 +94,7 @@ void vaapi_set_surface(AVFrame *pic, VaapiSurfaceFfmpeg *surface)
     }
 }
 
-VaapiContextFfmpeg::VaapiContextFfmpeg(enum CodecID codec_id)
+VaapiContextFfmpeg::VaapiContextFfmpeg(enum CODECID codec_id)
     : _context(new VaapiContext(get_profile(codec_id), VAEntrypointVLD))
 {
     // FFmpeg's vaapi_context must be zero-initialized
@@ -115,7 +115,7 @@ bool VaapiContextFfmpeg::initDecoder(unsigned int width, unsigned int height)
     return true;
 }
 
-VaapiContextFfmpeg *VaapiContextFfmpeg::create(enum CodecID codec_id)
+VaapiContextFfmpeg *VaapiContextFfmpeg::create(enum CODECID codec_id)
 {
     if (!vaapi_is_enabled())
         return NULL;

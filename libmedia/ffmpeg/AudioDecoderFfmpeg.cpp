@@ -90,7 +90,7 @@ void AudioDecoderFfmpeg::setup(SoundInfo& info)
 #endif
     avcodec_register_all();// change this to only register need codec?
 
-    enum CodecID codec_id;
+    enum CODECID codec_id;
 
     switch(info.getFormat()) {
         case AUDIO_CODEC_RAW:
@@ -189,11 +189,11 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 #endif
     avcodec_register_all();// change this to only register need codec?
 
-    enum CodecID codec_id = CODEC_ID_NONE;
+    enum CODECID codec_id = CODEC_ID_NONE;
 
     if (info.type == CODEC_TYPE_CUSTOM)
     {
-        codec_id = static_cast<CodecID>(info.codec);
+        codec_id = static_cast<CODECID>(info.codec);
     }
     else if (info.type == CODEC_TYPE_FLASH)
     {
