@@ -36,6 +36,8 @@
 #define AVCODEC_DECODE_AUDIO avcodec_decode_audio2
 #endif
 
+#define MAX_AUDIO_FRAME_SIZE 192000
+
 namespace gnash {
 namespace media {
 namespace ffmpeg {
@@ -347,7 +349,7 @@ AudioDecoderFfmpeg::decode(const boost::uint8_t* input,
 {
     //GNASH_REPORT_FUNCTION;
 
-    size_t retCapacity = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+    size_t retCapacity = MAX_AUDIO_FRAME_SIZE;
     boost::uint8_t* retBuf = new boost::uint8_t[retCapacity];
     int retBufSize = 0;
 
@@ -501,7 +503,7 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 
     assert(inputSize);
 
-    const size_t bufsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+    const size_t bufsize = MAX_AUDIO_FRAME_SIZE;
 
     // TODO: make this a private member, to reuse (see NetStreamFfmpeg in 0.8.3)
     boost::uint8_t* output;
@@ -666,7 +668,8 @@ AudioDecoderFfmpeg::parseInput(const boost::uint8_t* input,
         // democratic value for a chunk to decode...
         // @todo this might be constrained by codec id, check that !
 
-        // NOTE: AVCODEC_MAX_AUDIO_FRAME_SIZE resulted bigger
+        // NOTE: AVCODEC_MAX_AUDIO_FRAME_SIZE (192000, deprecated replaced with
+        //       MAX_AUDIO_FRAME_SIZE) resulted bigger
         //       than avcodec_decode_audio could handle, resulting
         //       in eventSoundTest1.swf regression.
         //static const unsigned int maxFrameSize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
