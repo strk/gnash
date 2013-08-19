@@ -371,7 +371,7 @@ VideoDecoderFfmpeg::decode(const boost::uint8_t* input,
 #if LIBAVCODEC_VERSION_MAJOR >= 53
     AVPacket pkt;
     av_init_packet(&pkt);
-    pkt.data = (uint8_t*) input;
+    pkt.data = const_cast<uint8_t*>(input);
     pkt.size = input_size;
     avcodec_decode_video2(_videoCodecCtx->getContext(), frame, &bytes,
             &pkt);
