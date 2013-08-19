@@ -162,7 +162,8 @@ VideoConverterFfmpeg::convert(const ImgBuf& src)
 #endif
 
 
-    AVPicture srcpicture = {{src.data, 0, 0, 0}, {src.stride[0], 0, 0, 0}};
+    AVPicture srcpicture = {{src.data, 0, 0, 0},
+        {static_cast<int>(src.stride[0]), 0, 0, 0}};
     
     
     int bufsize = avpicture_get_size(dst_pixFmt, width, height);
