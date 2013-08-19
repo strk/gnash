@@ -75,6 +75,9 @@ enum codecType
 /// Video codec ids as defined in flash
 enum videoCodecType
 {
+        /// No video codec
+        NO_VIDEO_CODEC = 0,
+
 	/// H263/SVQ3 video codec
 	VIDEO_CODEC_H263 = 2,
 

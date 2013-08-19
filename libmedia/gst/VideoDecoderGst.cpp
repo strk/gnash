@@ -93,7 +93,7 @@ VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type,
       caps = gst_caps_new_simple ("video/x-flash-screen",
                                       NULL);
       break;
-    case 0:
+    case NO_VIDEO_CODEC:
       throw MediaException(_("Video codec is zero.  Streaming video expected later."));
       break;
     default:
