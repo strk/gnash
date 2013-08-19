@@ -69,7 +69,7 @@ IOChannel::read_float32()
         boost::uint32_t    i;
     } u;
 
-    BOOST_STATIC_ASSERT(sizeof(u) == sizeof(u.i));
+    BOOST_STATIC_ASSERT(sizeof(u) == sizeof(u.i)) __attribute__((unused));
     
     u.i = read_le32();
     return u.f;

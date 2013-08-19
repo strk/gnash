@@ -622,7 +622,8 @@ inflateWrapper(SWFStream& in, void* buffer, size_t buffer_bytes)
             chunkSize = availableBytes;
         }
     
-        BOOST_STATIC_ASSERT(sizeof(char) == sizeof(boost::uint8_t));
+        BOOST_STATIC_ASSERT(sizeof(char) == sizeof(boost::uint8_t))
+            __attribute__((unused));
 
         // Fill the buffer    
         in.read(reinterpret_cast<char*>(buf), chunkSize);
