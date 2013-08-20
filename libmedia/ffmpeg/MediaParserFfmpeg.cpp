@@ -498,7 +498,7 @@ MediaParserFfmpeg::initializeParser()
 #else
         boost::uint64_t duration = _videoStream->duration;
 #endif
-        if (duration == AV_NOPTS_VALUE) {
+        if (duration == static_cast<uint64_t>(AV_NOPTS_VALUE)) {
             log_error(_("Duration of video stream unknown"));
             duration=0; // TODO: guess!
         } else {
@@ -527,7 +527,7 @@ MediaParserFfmpeg::initializeParser()
 #else
         boost::uint64_t duration = _audioStream->duration;
 #endif
-        if (duration == AV_NOPTS_VALUE) {
+        if (duration == static_cast<uint64_t>(AV_NOPTS_VALUE)) {
             log_error(_("Duration of audio stream unknown to ffmpeg"));
             duration=0; // TODO: guess!
         } 
