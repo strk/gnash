@@ -53,9 +53,13 @@ namespace {
     void clear_vaapi_context(AVCodecContext* avctx);
     void reset_context(AVCodecContext* avctx, VaapiContextFfmpeg* vactx = 0);
     PixelFormat get_format(AVCodecContext* avctx, const PixelFormat* fmt);
+#if LIBAVCODEC_VERSION_MAJOR >= 55
+    int get_buffer(AVCodecContext* avctx, AVFrame* pic, int flags);
+#else
     int get_buffer(AVCodecContext* avctx, AVFrame* pic);
     int reget_buffer(AVCodecContext* avctx, AVFrame* pic);
-    void release_buffer(AVCodecContext *avctx, AVFrame *pic);
+    void release_buffer(AVCodecContext* avctx, AVFrame* pic);
+#endif
 }
 
 #ifdef HAVE_SWSCALE_H
@@ -198,9 +202,13 @@ VideoDecoderFfmpeg::init(enum CODECID codecId, int /*width*/, int /*height*/,
     ctx->extradata_size = extradataSize;
 
     ctx->get_format     = get_format;
+#if LIBAVCODEC_VERSION_MAJOR >= 55
+    ctx->get_buffer2    = get_buffer;
+#else
     ctx->get_buffer     = get_buffer;
     ctx->reget_buffer   = reget_buffer;
     ctx->release_buffer = release_buffer;
+#endif
 
 #ifdef HAVE_VA_VA_H
     if (vaapi_is_enabled()) {
@@ -525,10 +533,18 @@ get_format(AVCodecContext* avctx, const PixelFormat* fmt)
 
 /// AVCodecContext.get_buffer() implementation
 int
+#if LIBAVCODEC_VERSION_MAJOR >= 55
+get_buffer(AVCodecContext* avctx, AVFrame* pic, int flags)
+#else
 get_buffer(AVCodecContext* avctx, AVFrame* pic)
+#endif
 {
     VaapiContextFfmpeg* const vactx = get_vaapi_context(avctx);
+#if LIBAVCODEC_VERSION_MAJOR >= 55
+    if (!vactx) return avcodec_default_get_buffer2(avctx, pic, flags);
+#else
     if (!vactx) return avcodec_default_get_buffer(avctx, pic);
+#endif
 
 #ifdef HAVE_VA_VA_H
     if (!vactx->initDecoder(avctx->width, avctx->height)) return -1;
@@ -551,6 +567,7 @@ get_buffer(AVCodecContext* avctx, AVFrame* pic)
     return -1;
 }
 
+#if LIBAVCODEC_VERSION_MAJOR < 55
 /// AVCodecContext.reget_buffer() implementation
 int
 reget_buffer(AVCodecContext* avctx, AVFrame* pic)
@@ -582,6 +599,7 @@ release_buffer(AVCodecContext *avctx, AVFrame *pic)
     pic->data[3] = NULL;
 #endif
 }
+#endif
 
 }
 
