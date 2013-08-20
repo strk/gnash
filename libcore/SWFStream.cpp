@@ -312,7 +312,7 @@ double SWFStream::read_d64()
     const unsigned short dataLength = 8;
     double d = 0;
 
-    BOOST_STATIC_ASSERT(sizeof(double) == dataLength);
+    BOOST_STATIC_ASSERT(sizeof(double) == dataLength) __attribute__((unused));
 
     // Should align:
     if (read(reinterpret_cast<char*>(&d), dataLength) < dataLength)
