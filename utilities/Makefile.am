@@ -43,6 +43,7 @@ AM_LDFLAGS = \
 	$(LIBINTL) \
 	$(LIBADD_DL) \
 	$(PTHREAD_LIBS) \
+	$(BOOST_LIBS) \
 	$(GNASH_LIBS) \
 	$(NULL)
 
