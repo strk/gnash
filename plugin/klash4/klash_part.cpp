@@ -101,7 +101,6 @@ KDE_NO_CDTOR_EXPORT KlashPart::KlashPart (QWidget * wparent,
    m_fullscreen (false),
    m_started_emited (false) {
     //kdDebug () << "KlashPart(" << this << ")::KlashPart ()" << endl;
-    bool show_fullscreen = false;
     setComponentData (*KlashFactory::instance ());
     KAction *playact = new KAction(this);
     playact->setText(i18n("P&lay"));
@@ -138,7 +137,7 @@ KDE_NO_CDTOR_EXPORT KlashPart::KlashPart (QWidget * wparent,
             } else if (name == QString::fromLatin1("src")) {
                 m_src_url = value;
             } else if (name == QString::fromLatin1 ("fullscreenmode")) {
-                show_fullscreen = getBoolValue (value);
+                m_fullscreen = getBoolValue (value);
             } else if (name == QString::fromLatin1 ("autostart")) {
                 bool ok;
                 m_autostart = value.toInt (&ok);
