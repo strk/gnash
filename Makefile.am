@@ -46,7 +46,6 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--with-plugins-install=prefix \
 	--enable-extensions=all \
 	--enable-gui=all \
-	--enable-device=all \
 	--enable-renderer=all \
 	--enable-python \
 	--enable-cygnal
@@ -55,6 +54,8 @@ DISTCHECK_CONFIGURE_FLAGS = \
 # primarily a Linux only thing.
 if LINUX
 DISTCHECK_CONFIGURE_FLAGS += --enable-device=all
+else
+DISTCHECK_CONFIGURE_FLAGS += --disable-jemalloc
 endif
 
 if CYGNAL
