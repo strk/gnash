@@ -128,8 +128,6 @@ public:
     void rememberVideoFrame(EncodedVideoFrame* frame);
 
 private:
-    bool foundAllStreams();
-
     void link_to_fakesink(GstPad* pad);
 
     static void cb_typefound (GstElement *typefind, guint probability,

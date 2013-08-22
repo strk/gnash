@@ -229,11 +229,6 @@ MediaParserGst::rememberVideoFrame(EncodedVideoFrame* frame)
 ///   demuxer has signaled "no more pads", or when the first video and
 ///   audio streams have been found.
 
-bool MediaParserGst::foundAllStreams()
-{
-    return _demux_probe_ended || (_videoInfo.get() && _audioInfo.get());
-}
-
 static void
 print_caps(GstCaps* caps)
 {
