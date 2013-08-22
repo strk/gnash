@@ -30,8 +30,6 @@
 
 //#define GNASH_DEBUG_AUDIO_DECODING
 
-#define MAX_AUDIO_FRAME_SIZE 192000
-
 namespace gnash {
 namespace media {
 namespace ffmpeg {

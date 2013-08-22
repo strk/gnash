@@ -38,6 +38,8 @@
 #endif
 #endif
 
+#define MAX_AUDIO_FRAME_SIZE 192000
+
 #ifdef HAVE_FFMPEG_AVCODEC_H
 extern "C" {
 # include <ffmpeg/avcodec.h>
