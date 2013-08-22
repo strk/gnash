@@ -29,6 +29,12 @@ extern "C" {
 #include <libavcodec/vaapi.h>
 }
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(55,18,102)
+#define CODECID AVCodecID
+#else
+#define CODECID CodecID
+#endif
+
 namespace gnash {
 namespace media {
 namespace ffmpeg {
