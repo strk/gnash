@@ -30,8 +30,6 @@
 #include <fstream>
 
 #define PUSHBUF_SIZE 1024
-//#define MIN_PROBE_SIZE (PUSHBUF_SIZE * 3)
-#define MIN_PROBE_SIZE 0
 
 // #define GNASH_DEBUG_DATAFLOW
 
@@ -71,24 +69,6 @@ MediaParserGst::MediaParserGst(std::auto_ptr<IOChannel> stream)
     if (!gst_element_set_state (_bin, GST_STATE_PLAYING) == GST_STATE_CHANGE_SUCCESS) {
         throw GnashException(_("MediaParserGst could not change element state"));
     }
-    
-    SimpleTimer timer;
-
-    size_t counter = 0;
-    while (!probingConditionsMet(timer) && !_stream->eof() && !_stream->bad()) {
-
-        if (!pushGstBuffer()) {
-            ++counter;
-        }
-    }
-
-    log_debug(_("Needed %d dead iterations to detect audio type."), counter);
-    
-#if 0
-    if (! (_videoInfo.get() || _audioInfo.get()) ) {
-        throw MediaException(_("MediaParserGst failed to detect any stream types."));    
-    }
-#endif
     
     if (!gst_element_set_state (_bin, GST_STATE_PLAYING) == GST_STATE_CHANGE_SUCCESS) {
         throw MediaException(_("MediaParserGst could not change element state"));
@@ -252,17 +232,6 @@ MediaParserGst::rememberVideoFrame(EncodedVideoFrame* frame)
 bool MediaParserGst::foundAllStreams()
 {
     return _demux_probe_ended || (_videoInfo.get() && _audioInfo.get());
-}
-
-/// The idea here is that probingConditionsMet will return false, unless:
-/// a) all data types in the stream were found. 
-/// b) The timer (currently for 1 second) has expired, if and only if we
-///    succeeded in pushing MIN_PROBE_SIZE bytes into the bin. This should
-///    protect low-bandwidth cases from stopping the probe early.
-
-bool MediaParserGst::probingConditionsMet(const SimpleTimer& timer)
-{
-    return foundAllStreams() || (timer.expired() && getBytesLoaded() >= MIN_PROBE_SIZE);
 }
 
 static void

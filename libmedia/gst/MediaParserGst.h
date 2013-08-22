@@ -130,8 +130,6 @@ public:
 private:
     bool foundAllStreams();
 
-    bool probingConditionsMet(const SimpleTimer& timer);    
-    
     void link_to_fakesink(GstPad* pad);
 
     static void cb_typefound (GstElement *typefind, guint probability,
