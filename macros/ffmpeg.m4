@@ -255,27 +255,14 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
     AC_MSG_RESULT($ffmpeg_version ($ffmpeg_num_version))
 
 
-dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfound=no])
-  
-    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 512800; then
-      AC_MSG_WARN([Wrong ffmpeg/libavcodec version! 51.28.0 or greater required, $ffmpeg_version detected.])
+dnl  minimum supported libavcodec version = Debian stable one = currently Wheezy 7.0 53.35.00
+
+    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 533500; then
+      AC_MSG_WARN([Wrong ffmpeg/libavcodec version! 53.35.0 or greater required, $ffmpeg_version detected.])
     else
       ffmpeg_version_check=ok
     fi
 
-    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 514900; then
-      dnl 51.49.0 or higher required
-      AC_MSG_WARN([This version of ffmpeg/libavcodec ($ffmpeg_version) is not able to play VP6A encoded video: 51.49.0 or higher required!])
-    else
-      AC_DEFINE(FFMPEG_VP6A, 1, [Define if ffmpeg can play VP6A.])
-    fi
-
-    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 514600; then
-      dnl 51.46.0 (r10741) or higher required for CODEC_ID_NELLYMOSER
-      AC_MSG_WARN([This version of ffmpeg/libavcodec ($ffmpeg_version) is not able to decode NELLYMOSER encoded audio: 51.46.0 (r10741) or higher required!])
-    else
-      AC_DEFINE(FFMPEG_NELLYMOSER, 1, [Define if ffmpeg can decode NELLYMOSER audio])
-    fi
   else
     AC_MSG_WARN([Could not check ffmpeg version (can't find avcodec.h file)])
     # ffmpeg_version_check=ok # this is NOT ok, why would it be ?! 
