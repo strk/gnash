@@ -44,7 +44,7 @@ MediaHandlerFfmpeg::description() const
     std::ostringstream ss;
     const boost::uint32_t ver = avcodec_version();
     ss << "FFmpeg (avcodec version: " << (ver >> 16) << "."
-                      << (ver & 0xff00 >> 8)  << "."
+                      << ((ver & 0xff00) >> 8)  << "."
                       << (ver & 0xff) << ")";
     return ss.str();
 }
