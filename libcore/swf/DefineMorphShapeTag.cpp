@@ -145,8 +145,8 @@ DefineMorphShapeTag::read(SWFStream& in, TagType tag, movie_definition& md,
     // Starting bounds are the same as shape1
     _bounds = bounds1;
 
-    assert(_shape1.subshapes().size() == _shape2.subshapes().size() == 1);
-    assert(_shape1.subshapes().size() == _shape2.subshapes().size() == 1);
+    assert((_shape1.subshapes().size() == _shape2.subshapes().size()) &&
+        (_shape2.subshapes().size() == 1));
 }
 
 } // namespace SWF
