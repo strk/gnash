@@ -19,6 +19,7 @@
 //
 
 #include "AudioResamplerFfmpeg.h"
+#include "utility.h"
 #include "log.h"
 
 #include <cmath>
@@ -95,6 +96,7 @@ AudioResamplerFfmpeg::resample(boost::uint8_t** input, int plane_size,
         output, 0, MAX_AUDIO_FRAME_SIZE,
         input, plane_size, samples);
 #else
+    UNUSED( plane_size );
     return audio_resample(_context, reinterpret_cast<short*>(*output),
         reinterpret_cast<short*>(*input), samples); 
 #endif
