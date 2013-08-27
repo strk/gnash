@@ -1017,8 +1017,6 @@ sound_start(const fn_call& fn)
         secondOffset = toNumber(fn.arg(0), getVM(fn));
 
         if (fn.nargs > 1) {
-            loop = (int) toNumber(fn.arg(1), getVM(fn)) - 1;
-
             // Negative values count as playing once (aka looping 0 times)
             loop = std::max(0, toInt(fn.arg(1), getVM(fn)) - 1);
         }
