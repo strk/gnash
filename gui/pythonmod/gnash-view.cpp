@@ -37,6 +37,7 @@
 #include "VirtualClock.h"
 #include "SystemClock.h"
 #include "DisplayObject.h"
+#include "Movie.h"
 #include "Global_as.h"
 #include "NamingPolicy.h"
 #include "StreamProvider.h"
