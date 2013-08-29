@@ -61,6 +61,7 @@
 #include "NullSoundHandler.h"
 #include "as_environment.h"
 #include "as_value.h"
+#include "Movie.h"
 
 namespace gnash {
 

@@ -20,7 +20,6 @@
 #define GNASH_MOVIE_LOADER_H
 
 #include <boost/intrusive_ptr.hpp>
-#include <list>
 #include <string>
 #include <boost/ptr_container/ptr_list.hpp>
 #include <boost/noncopyable.hpp>

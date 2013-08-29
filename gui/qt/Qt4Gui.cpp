@@ -67,6 +67,7 @@
 #include "Qt4Gui.moc"
 #include "Renderer.h"
 #include "RunResources.h" 
+#include "GnashException.h"
 
 // Macro for using gettext strings where Qt expects QStrings
 #define _q(Str) QString::fromUtf8(_(Str))

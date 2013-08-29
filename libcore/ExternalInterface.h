@@ -23,7 +23,6 @@
 
 #include <string>
 #include <vector>
-#include <map>
 #include <set>
 #include <boost/shared_ptr.hpp>
 

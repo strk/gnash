@@ -19,7 +19,6 @@
 #ifndef GNASH_ASHANDLERS_H
 #define GNASH_ASHANDLERS_H
 
-#include <string>
 #include <vector>
 
 #include "SWF.h"

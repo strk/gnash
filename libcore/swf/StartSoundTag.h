@@ -20,7 +20,6 @@
 #define GNASH_SWF_STARTSOUND_TAG_H
 
 #include "ControlTag.h" // for inheritance
-#include "sound_handler.h" // for sound_envelope (composition)
 #include "SWF.h" // for TagType definition
 #include "SoundInfoRecord.h"
 

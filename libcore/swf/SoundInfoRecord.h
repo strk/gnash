@@ -21,7 +21,7 @@
 #ifndef GNASH_SWF_SOUNDINFO_H
 #define GNASH_SWF_SOUNDINFO_H
 
-#include "sound_handler.h" // sound::SoundEnvelopes
+#include "SoundEnvelope.h" // sound::SoundEnvelopes
 
 #include <limits>
 

@@ -26,9 +26,7 @@
 
 #include "dsodefs.h"
 #include "MediaParser.h" // for inheritance
-#include "SimpleBuffer.h" 
 
-#include <set>
 #include <memory>
 #include <map>
 

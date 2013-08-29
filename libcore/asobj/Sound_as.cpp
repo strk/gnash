@@ -33,6 +33,7 @@
 #include "RunResources.h"
 #include "log.h"
 #include "sound_handler.h"
+#include "MediaParser.h"
 #include "AudioDecoder.h"
 #include "MediaHandler.h"
 #include "sound_definition.h"

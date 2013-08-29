@@ -48,6 +48,8 @@
 #include "AMFConverter.h"
 #include "AMF.h"
 #include "SoundUtils.h"
+#include "VideoDecoder.h"
+#include "AudioDecoder.h"
 
 // Define the following macro to have status notification handling debugged
 //#define GNASH_DEBUG_STATUS

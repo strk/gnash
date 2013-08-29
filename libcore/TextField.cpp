@@ -60,6 +60,7 @@
 #include "Renderer.h"
 #include "Transform.h"
 #include "ObjectURI.h"
+#include "Movie.h"
 
 // Text fields have a fixed 2 pixel padding for each side (regardless of border)
 #define PADDING_TWIPS 40 

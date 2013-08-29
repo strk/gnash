@@ -28,6 +28,7 @@
 #include "movie_root.h"
 #include "RunResources.h"
 #include "Transform.h"
+#include "BitmapMovieDefinition.h"
 
 namespace gnash {
 

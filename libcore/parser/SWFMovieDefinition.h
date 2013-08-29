@@ -43,7 +43,6 @@
 #include "StringPredicates.h" 
 #include "SWFRect.h"
 #include "GnashNumeric.h"
-#include "GnashAlgorithm.h"
 #include "dsodefs.h" // for DSOTEXPORT
 
 // Forward declarations

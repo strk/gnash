@@ -27,7 +27,6 @@
 #endif
 
 #include <vector>
-#include <list>
 #include <map>
 #include <string>
 #include <boost/ptr_container/ptr_list.hpp>

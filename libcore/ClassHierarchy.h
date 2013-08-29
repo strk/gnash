@@ -26,7 +26,6 @@
 
 #include <string>
 #include <vector>
-#include <iosfwd>
 
 #include "ObjectURI.h"
 

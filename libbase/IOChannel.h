@@ -23,7 +23,6 @@
 
 #include <string>
 #include <boost/cstdint.hpp> // for boost int types
-#include <iosfwd>
 
 #include "dsodefs.h" // DSOEXPORT
 #include "GnashException.h" // for IOException inheritance

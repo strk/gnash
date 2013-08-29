@@ -25,15 +25,12 @@
 #endif
 
 #include <map>
-#include <vector>
 #include <memory> 
-#include <locale>
-#include <boost/cstdint.hpp> 
-#include <boost/random.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/array.hpp>
+#include <boost/cstdint.hpp> 
+#include <boost/random/mersenne_twister.hpp>  // for mt11213b
+#include <boost/noncopyable.hpp>
 
-#include "GC.h"
 #include "string_table.h"
 #include "SafeStack.h"
 #include "CallStack.h"
@@ -46,15 +43,13 @@
 
 // Forward declarations
 namespace gnash {
-	class Global_as;
-	class VM;
-	class fn_call;
-	class movie_root;
-	class NativeFunction;
+    class Global_as;
+    class fn_call;
+    class movie_root;
+    class NativeFunction;
     class SharedObjectLibrary;
-	class as_value;
-	class as_object;
-	class VirtualClock;
+    class as_object;
+    class VirtualClock;
     class UserFunction;
 }
 

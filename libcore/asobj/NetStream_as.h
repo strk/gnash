@@ -29,24 +29,32 @@
 #include <string>
 #include <boost/ptr_container/ptr_deque.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/thread/mutex.hpp>
 
-#include "MediaParser.h"
 #include "PlayHead.h" // for composition
-#include "VideoDecoder.h" // for visibility of dtor
-#include "AudioDecoder.h" // for visibility of dtor
-#include "VirtualClock.h"
 #include "Relay.h" // for ActiveRelay inheritance
+#include <memory>
 
 // Forward declarations
 namespace gnash {
+    class InterruptableVirtualClock;
+    class as_object;
     class CharacterProxy;
     class IOChannel;
     class NetConnection_as;
     class as_function;
     class DisplayObject;
     struct ObjectURI;
+    namespace image {
+        class GnashImage;
+    }
     namespace media {
         class MediaHandler;
+        class AudioDecoder;
+        class AudioInfo;
+        class MediaParser;
+        class VideoDecoder;
+        class VideoInfo;
     }
     namespace sound {
         class sound_handler;

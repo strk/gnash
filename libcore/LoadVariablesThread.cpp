@@ -22,6 +22,7 @@
 #include "log.h"
 #include "GnashException.h"
 #include "utf8.h"
+#include "StreamProvider.h"
 
 #include <string>
 #include <boost/scoped_array.hpp>

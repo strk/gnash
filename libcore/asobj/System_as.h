@@ -20,10 +20,6 @@
 #ifndef GNASH_ASOBJ3_SYSTEM_H
 #define GNASH_ASOBJ3_SYSTEM_H
 
-#include <string>
-#include <vector>
-
-
 namespace gnash {
 
 // Forward declarations

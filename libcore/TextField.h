@@ -25,10 +25,10 @@
 #include <vector>
 
 #include "InteractiveObject.h" // for inheritance
-#include "LineStyle.h" // for LineStyle
 #include "snappingrange.h"
 #include "SWFRect.h" // for inlines
 #include "GnashKey.h"
+#include "RGBA.h" // for rgba
 
 // Forward declarations
 namespace gnash {

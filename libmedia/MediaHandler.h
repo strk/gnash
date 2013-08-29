@@ -21,14 +21,12 @@
 #ifndef GNASH_MEDIAHANDLER_H
 #define GNASH_MEDIAHANDLER_H
 
-#include "MediaParser.h" // for videoCodecType and audioCodecType enums
 #include "dsodefs.h" // DSOEXPORT
 #include "VideoConverter.h"
 #include "GnashFactory.h"
 
 #include <vector>
 #include <memory>
-#include <map>
 #include <string>
 
 // Forward declarations
@@ -42,6 +40,7 @@ namespace gnash {
         class VideoInput;
         class AudioInput;
         class MediaHandler;
+        class MediaParser;
     }
 }
 

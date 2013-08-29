@@ -28,8 +28,12 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/bind.hpp> 
 
-#include "StreamProvider.h" // for inlines
 #include "URL.h" // for inlines
+
+namespace gnash {
+    class StreamProvider;
+    class IOChannel;
+}
 
 namespace gnash {
 

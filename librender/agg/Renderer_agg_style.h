@@ -40,7 +40,6 @@
 #include <agg_pixfmt_rgb.h>
 #include <agg_pixfmt_rgba.h>
 #pragma GCC diagnostic pop
-#include <iostream>
 
 #include "LinearRGB.h"
 #include "Renderer_agg_bitmap.h"

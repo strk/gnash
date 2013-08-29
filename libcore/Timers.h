@@ -22,7 +22,6 @@
 #include "dsodefs.h"
 #include "fn_call.h"
 
-#include <string>
 #include <limits>
 
 // Forward declarations

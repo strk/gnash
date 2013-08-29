@@ -36,7 +36,7 @@
 #include "Font.h"
 #include "movie_definition.h"
 #include "movie_root.h"
-
+#include "Movie.h"
 
 namespace gnash {
 

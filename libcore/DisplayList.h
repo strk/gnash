@@ -20,7 +20,6 @@
 #ifndef GNASH_DLIST_H
 #define GNASH_DLIST_H
 
-#include <string>
 #include <list>
 #include <iosfwd>
 #if GNASH_PARANOIA_LEVEL > 1 && !defined(NDEBUG)

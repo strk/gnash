@@ -19,18 +19,13 @@
 #ifndef GNASH_SWF_VIDEOFRAMETAG_H
 #define GNASH_SWF_VIDEOFRAMETAG_H
 
-#include "DefinitionTag.h"
-#include "movie_definition.h"
 #include "SWF.h"
-#include "SWFRect.h" // for composition
-#include "ControlTag.h"
-#include "VideoDecoder.h"
-
-#include <memory> // for auto_ptr
 
 namespace gnash {
     // Forward declarations
     class SWFStream;
+    class RunResources;
+    class movie_definition;
 }
 
 namespace gnash {

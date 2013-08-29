@@ -25,7 +25,6 @@
 #include <boost/cstdint.hpp> 
 
 #include "dsodefs.h" // for DSOTEXPORT
-#include "SWF.h"
 
 namespace gnash {
 

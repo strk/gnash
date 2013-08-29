@@ -54,6 +54,7 @@
 #include "StreamProvider.h"
 #include "RunResources.h"
 #include "HostInterface.h"
+#include "Movie.h"
 
 #ifdef RENDERER_AGG
 #include "Renderer.h"

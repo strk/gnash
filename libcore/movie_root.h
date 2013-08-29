@@ -81,10 +81,9 @@
 #include <boost/optional.hpp>
 
 #include "dsodefs.h" // DSOEXPORT
+#include "DragState.h"
 #include "MouseButtonState.h" // for composition
-#include "DragState.h" // for composition
 #include "GnashKey.h" // key::code
-#include "Movie.h"
 #include "GnashEnums.h" 
 #include "MovieClip.h"
 #include "SimpleBuffer.h" // for LoadCallback
@@ -119,6 +118,7 @@ namespace gnash {
     class RunResources;
     class Button;
     class VM;
+    class Movie;
 }
 
 namespace gnash {

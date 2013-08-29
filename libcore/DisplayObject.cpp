@@ -31,6 +31,9 @@
 
 #include "movie_root.h"
 #include "MovieClip.h"
+#include "Movie.h"
+#include "DisplayObject.h"
+#include "Object.h"
 #include "VM.h" 
 #include "fn_call.h"
 #include "GnashException.h" 

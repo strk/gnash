@@ -38,6 +38,7 @@
 #include "RunResources.h"
 #include "StreamProvider.h"
 #include "ScreenShotter.h"
+#include "Movie.h"
 
 #ifdef GNASH_FPS_DEBUG
 #include "ClockTime.h"
