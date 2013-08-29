@@ -25,6 +25,7 @@
 #include "Property.h"
 #include "PropertyList.h"
 #include "MovieClip.h"
+#include "Movie.h"
 #include "DisplayObject.h"
 #include "RGBA.h"
 #include "movie_root.h"
