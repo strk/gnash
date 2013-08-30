@@ -25,9 +25,6 @@
 #include <boost/cstdint.hpp> // For C99 int types
 
 #include "LiveSound.h" 
-#include "AudioDecoder.h" 
-#include "SoundEnvelope.h"
-#include "SimpleBuffer.h" 
 #include "StreamingSoundData.h" 
 #include "sound_handler.h" 
 

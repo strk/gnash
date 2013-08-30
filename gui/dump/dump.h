@@ -25,13 +25,18 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 #include "gui.h" // for inheritance
-#include "sound_handler.h" // for dtor visibility
 #include "ManualClock.h"
 
 #include <string>
 #include <fstream>
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
+
+namespace gnash {
+    namespace sound {
+        class sound_handler;
+    }
+}
 
 namespace gnash {
 

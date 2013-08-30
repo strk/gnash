@@ -31,6 +31,7 @@
 #include "StreamingSound.h"
 #include "StreamingSoundData.h"
 #include "SimpleBuffer.h"
+#include "MediaHandler.h"
 
 // Debug create_sound/delete_sound/playSound/stop_sound, loops
 //#define GNASH_DEBUG_SOUNDS_MANAGEMENT

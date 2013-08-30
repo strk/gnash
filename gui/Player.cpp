@@ -56,6 +56,7 @@
 #include "GnashSystemIOHeaders.h" // for write() 
 #include "log.h"
 #include "HostInterface.h"
+#include "RunResources.h"
 
 using namespace gnash;
 

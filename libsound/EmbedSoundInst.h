@@ -25,10 +25,8 @@
 #include <boost/cstdint.hpp> // For C99 int types
 
 #include "LiveSound.h"
-#include "AudioDecoder.h" 
 #include "SoundEnvelope.h" 
 #include "EmbedSound.h" 
-#include "sound_handler.h" 
 
 // Forward declarations
 namespace gnash {

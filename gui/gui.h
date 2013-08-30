@@ -25,16 +25,12 @@
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/function.hpp>
 #include <string>
 #include <map>
 #include <utility>
 
-#include "SWFRect.h"  // for composition
 #include "snappingrange.h"  // for InvalidatedRanges
-#include "ScreenShotter.h"
 #include "GnashKey.h"
-#include "Renderer.h" 
 #include "VirtualClock.h"
 #include "SystemClock.h"
 #include "GnashEnums.h" 
@@ -71,6 +67,11 @@ namespace gnash {
     class RunResources;
     class movie_root;
     class movie_definition;
+    class Renderer;
+    class SWFRect;
+}
+namespace boost {
+    template <typename Signature> class function;
 }
 
 namespace gnash {

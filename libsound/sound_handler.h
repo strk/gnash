@@ -31,13 +31,13 @@
 #include <boost/scoped_ptr.hpp>
 
 #include "dsodefs.h" // for DSOEXPORT
-#include "MediaHandler.h" // for inlined ctor
 #include "SoundEnvelope.h" // for SoundEnvelopes typedef
 #include "AuxStream.h" // for aux_streamer_ptr typedef
-#include "WAVWriter.h" // for dtor visibility 
+#include "WAVWriter.h"
 
 namespace gnash {
     namespace media {
+        class MediaHandler;
         class SoundInfo;
     }
     namespace sound {

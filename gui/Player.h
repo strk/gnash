@@ -24,22 +24,27 @@
 #include "gnashconfig.h"
 #endif
 
+#include "HostInterface.h"              // for HostInterface, FsCallback, etc
+#include "StringPredicates.h"           // for StringNoCaseLessThan
+#include "movie_definition.h"
+
 #include <boost/intrusive_ptr.hpp>
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <map>
 #include <memory>
 
-#include "sound_handler.h"
-#include "MediaHandler.h" 
-#include "gui.h"
-#include "movie_definition.h" 
-#include "movie_root.h"
-#include "RunResources.h"
-
 // Forward declarations
 namespace gnash {
     class MovieClip;
+    class RunResources;
+    class Gui;
+    namespace media {
+        class MediaHandler;
+    }
+    namespace sound {
+        class sound_handler;
+    }
 }
 
 namespace gnash {

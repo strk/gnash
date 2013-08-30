@@ -27,12 +27,12 @@
 #include "InputStream.h" 
 #include "AudioDecoder.h" 
 #include "SimpleBuffer.h" 
-#include "SoundInfo.h"
 
 // Forward declarations
 namespace gnash {
     namespace media {
         class MediaHandler;
+        class SoundInfo;
     }
 }
 

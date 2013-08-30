@@ -24,7 +24,6 @@
 
 #include "sound_handler.h" // for inheritance
 
-#include <set> // for composition (InputStreams)
 #include <SDL_audio.h>
 #include <boost/thread/mutex.hpp>
 

@@ -22,7 +22,6 @@
 
 #include <vector>
 #include <memory> // for auto_ptr (composition)
-#include <set> // for composition (_soundInstances)
 #include <cassert>
 #include <boost/thread/mutex.hpp>
 #include <boost/scoped_ptr.hpp>

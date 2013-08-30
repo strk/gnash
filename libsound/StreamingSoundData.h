@@ -21,19 +21,17 @@
 #define SOUND_STREAMING_SOUND_DATA_H
 
 #include <vector>
-#include <map> 
 #include <memory> 
-#include <set> 
 #include <cassert>
 #include <boost/thread/mutex.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 
-#include "SimpleBuffer.h" 
 #include "SoundInfo.h" 
 
 // Forward declarations
 namespace gnash {
+    class SimpleBuffer;
     namespace sound {
         class InputStream;
         class StreamingSound;
