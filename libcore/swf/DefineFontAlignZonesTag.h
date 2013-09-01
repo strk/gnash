@@ -51,12 +51,7 @@ private:
     /// Construct a DefineFoneAlignZonesTag
     //
     /// This should only be called from the loader() function.
-	DefineFontAlignZonesTag(movie_definition& m, SWFStream& in);
-
-	unsigned short _font2_id_ref;
-
-	unsigned _csm_table_int;
-
+    DefineFontAlignZonesTag(movie_definition& m, SWFStream& in);
 };
 
 } // namespace gnash::SWF

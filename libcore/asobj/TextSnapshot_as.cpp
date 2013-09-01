@@ -79,7 +79,7 @@ public:
 
 protected:
 
-    virtual void setReachable() const;
+    virtual void setReachable();
 
 private:
 
@@ -221,7 +221,7 @@ TextSnapshot_as::getSelected(size_t start, size_t end) const
 }
 
 void
-TextSnapshot_as::setReachable() const
+TextSnapshot_as::setReachable()
 {
     std::for_each(_textFields.begin(), _textFields.end(), setTextReachable);
 }

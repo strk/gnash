@@ -40,8 +40,6 @@ namespace {
         SWF::TagType tag, movie_definition& md, const RunResources& /*r*/);
     void readLineStyles(ShapeRecord::LineStyles& styles, SWFStream& in,
         SWF::TagType tag, movie_definition& md, const RunResources& /*r*/);
-    void computeBounds(SWFRect& bounds, const ShapeRecord::Paths& paths,
-        const ShapeRecord::LineStyles& lineStyles, int swfVersion);
 }
 
 // Functors for path and style manipulation.

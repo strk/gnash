@@ -117,9 +117,6 @@ private:
 	/// Current format of the sound (MP3, raw, etc).
 	audioCodecType _format;
 
-	/// The size of the undecoded data
-	unsigned long _dataSize;
-
 	/// Stereo or not
 	bool _stereo;
 

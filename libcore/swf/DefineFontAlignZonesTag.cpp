@@ -33,8 +33,6 @@ namespace SWF {
 
 DefineFontAlignZonesTag::DefineFontAlignZonesTag(movie_definition& /*m*/,
 	SWFStream& /*in*/)
-    :
-    _csm_table_int(2)
 {
 }
 

@@ -39,7 +39,7 @@ class KAboutData;
 class KlashPart;
 class KInstance;
 class KProcess;
-class JSCommandEntry;
+struct JSCommandEntry;
 class KlashView;
 
 /*
