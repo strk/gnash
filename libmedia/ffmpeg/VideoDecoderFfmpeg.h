@@ -27,7 +27,6 @@
 #include <vector>
 #include <memory>
 #include "dsodefs.h" //For DSOEXPORT
-#include "log.h"
 #include "VideoDecoder.h"
 #include "MediaParser.h" // for videoCodecType enum
 #include "ffmpegHeaders.h"
