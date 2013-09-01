@@ -83,7 +83,6 @@ public:
     // Constructor.
     explicit rw_source_IOChannel(boost::shared_ptr<IOChannel> in)
         :
-        _ownSourceStream(false),
         m_in_stream(in),
         m_start_of_file(true)
     {
@@ -203,8 +202,6 @@ private:
         m_pub.next_input_byte = NULL;
     }
 
-    const bool _ownSourceStream;
-    
     // Source stream
     boost::shared_ptr<IOChannel> m_in_stream;
     bool m_start_of_file;
