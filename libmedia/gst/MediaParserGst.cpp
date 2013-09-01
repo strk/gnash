@@ -66,11 +66,11 @@ MediaParserGst::MediaParserGst(std::auto_ptr<IOChannel> stream)
     _srcpad = swfdec_gst_connect_srcpad (typefind, srccaps);
     gst_caps_unref(srccaps);
 
-    if (!gst_element_set_state (_bin, GST_STATE_PLAYING) == GST_STATE_CHANGE_SUCCESS) {
+    if (gst_element_set_state (_bin, GST_STATE_PLAYING) != GST_STATE_CHANGE_SUCCESS) {
         throw GnashException(_("MediaParserGst could not change element state"));
     }
     
-    if (!gst_element_set_state (_bin, GST_STATE_PLAYING) == GST_STATE_CHANGE_SUCCESS) {
+    if (gst_element_set_state (_bin, GST_STATE_PLAYING) != GST_STATE_CHANGE_SUCCESS) {
         throw MediaException(_("MediaParserGst could not change element state"));
     }
 
@@ -278,7 +278,7 @@ MediaParserGst::link_to_fakesink(GstPad* pad)
         throw MediaException(_("MediaParserGst: couln't link fakesink"));
     }
     
-    if (!gst_element_set_state (_bin, GST_STATE_PLAYING) == GST_STATE_CHANGE_SUCCESS) {
+    if (gst_element_set_state (_bin, GST_STATE_PLAYING) != GST_STATE_CHANGE_SUCCESS) {
         throw GnashException(_("MediaParserGst could not change element state"));
     }
 }
@@ -334,7 +334,7 @@ MediaParserGst::cb_typefound(GstElement* typefind, guint /*probability*/,
     g_signal_connect(demuxer, "no-more-pads", 
             G_CALLBACK(MediaParserGst::cb_no_more_pads), parser);
     
-    if (!gst_element_set_state(parser->_bin, GST_STATE_PLAYING) ==
+    if (gst_element_set_state(parser->_bin, GST_STATE_PLAYING) !=
             GST_STATE_CHANGE_SUCCESS) {
         throw GnashException(_("MediaParserGst could not change "
                     "element state"));
@@ -489,7 +489,7 @@ void MediaParserGst::cb_pad_added(GstElement* /* element */, GstPad* new_pad,
         gst_object_unref(GST_OBJECT(final_pad));
     } 
     
-    if (!gst_element_set_state (parser->_bin, GST_STATE_PLAYING) == GST_STATE_CHANGE_SUCCESS) {
+    if (gst_element_set_state (parser->_bin, GST_STATE_PLAYING) != GST_STATE_CHANGE_SUCCESS) {
         throw GnashException(_("MediaParserGst could not change element state"));
     }
 }
