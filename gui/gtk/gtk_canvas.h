@@ -57,10 +57,11 @@ void gnash_canvas_setup (GnashCanvas *canvas, std::string &hwaccel,
 
 void gnash_canvas_before_rendering (GnashCanvas *canvas, gnash::movie_root* stage);
 
+G_END_DECLS
+
 /// Get the Renderer for this canvas
 boost::shared_ptr<gnash::Renderer> gnash_canvas_get_renderer(GnashCanvas *canvas);
 
-G_END_DECLS
 
 #endif
 
