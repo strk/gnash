@@ -20,13 +20,13 @@
 #ifndef SOUND_EMBEDSOUNDINST_H
 #define SOUND_EMBEDSOUNDINST_H
 
-#include <memory>
 #include <cassert>
 #include <boost/cstdint.hpp> // For C99 int types
+#include <limits>
 
+#include "EmbedSound.h"
 #include "LiveSound.h"
 #include "SoundEnvelope.h" 
-#include "EmbedSound.h" 
 
 // Forward declarations
 namespace gnash {
