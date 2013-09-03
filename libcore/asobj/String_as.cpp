@@ -579,7 +579,7 @@ string_charCodeAt(const fn_call& fn)
         }
     )
 
-    size_t index = static_cast<size_t>(toNumber(fn.arg(0), getVM(fn)));
+    size_t index = static_cast<size_t>(toInt(fn.arg(0), getVM(fn)));
 
     if (index >= wstr.length()) {
         as_value rv;
