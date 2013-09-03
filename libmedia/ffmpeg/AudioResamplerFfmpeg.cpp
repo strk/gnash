@@ -66,7 +66,8 @@ AudioResamplerFfmpeg::init(AVCodecContext* ctx) {
                 16, 10, 0, 0.8);
 #endif
 #if defined(HAVE_SWRESAMPLE_H) || defined(HAVE_AVRESAMPLE_H)
-            av_opt_set_int(_context, "in_channel_layout", ctx->channel_layout, 0);
+            av_opt_set_int(_context, "in_channel_layout",
+                av_get_default_channel_layout(ctx->channels), 0);
             av_opt_set_int(_context, "out_channel_layout", AV_CH_LAYOUT_STEREO, 0);
             av_opt_set_int(_context, "in_sample_rate", ctx->sample_rate, 0);
             av_opt_set_int(_context, "out_sample_rate", 44100, 0);
