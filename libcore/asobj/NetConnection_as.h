@@ -111,6 +111,10 @@ public:
 
 private:
 
+    bool isRTMP();
+
+    void createStream(as_object* asCallback);
+
     /// Extend the URL to be used for playing
     void addToURL(const std::string& url);
 

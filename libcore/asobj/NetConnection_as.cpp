@@ -283,18 +283,33 @@ public:
     virtual void call(as_object* asCallback, const std::string& methodName,
             const std::vector<as_value>& args)
     {
-        SimpleBuffer buf;
-        amf::Writer aw(buf);
-        aw.writeString(methodName);
-        const size_t id = asCallback ? callNo() : 0;
-        aw.writeNumber(id);
 
-        for (size_t i = 0; i < args.size(); ++i) {
-            args[i].writeAMF0(aw);
+        if(methodName == "play") {
+            SimpleBuffer buf;
+            amf::Writer aw(buf);
+            aw.writeString("play");
+            aw.writeNumber(0);
+            aw.writeNull();
+            for (size_t i = 0; i < args.size(); ++i) {
+               args[i].writeAMF0(aw);
+            }
+           // TODO Use the play method and the streamId from createStream
+           _rtmp.call(buf);
         }
-        _rtmp.call(buf);
-        if (asCallback) {
-            pushCallback(id, asCallback);
+        else {
+            SimpleBuffer buf;
+            amf::Writer aw(buf);
+            aw.writeString(methodName);
+            const size_t id = asCallback ? callNo() : 0;
+            aw.writeNumber(id);
+
+            for (size_t i = 0; i < args.size(); ++i) {
+               args[i].writeAMF0(aw);
+            }
+           _rtmp.call(buf);
+            if (asCallback) {
+                pushCallback(id, asCallback);
+            }
         }
     }
 
@@ -476,6 +491,20 @@ NetConnection_as::connect()
 }
 
 
+bool 
+NetConnection_as::isRTMP () {
+
+    const RunResources& r = getRunResources(owner());
+    URL url(_uri, r.streamProvider().baseURL());
+    if (url.protocol() == "rtmp") {
+    
+         return true;
+    } else {
+     
+         return false;
+    }
+}
+
 bool
 NetConnection_as::connect(const std::string& uri)
 {
@@ -576,23 +605,59 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
     startAdvanceTimer();
 }
 
+void
+NetConnection_as::createStream(as_object* asCallback) {
+    
+    if (! this -> isRTMP()) {
+        return;
+    } 
+
+    if (!_currentConnection.get()) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("NetConnection.call: can't call while not connected"));
+        );
+        return;
+    }
+   
+    std::string methodName = "createStream"; 
+    _currentConnection -> call(asCallback, methodName,
+		    std::vector<as_value>());
+
+    startAdvanceTimer();
+}
+
 std::auto_ptr<IOChannel>
 NetConnection_as::getStream(const std::string& name)
 {
     const RunResources& ri = getRunResources(owner());
 
     const StreamProvider& streamProvider = ri.streamProvider();
-
-    // Construct URL with base URL (assuming not connected to RTMP server..)
-    // TODO: For RTMP return the named stream from an existing RTMP connection.
-    // If name is a full or relative URL passed from NetStream.play(), it
-    // must be constructed against the base URL, not the NetConnection uri,
-    // which should always be null in this case.
+    
     const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-
-    URL url(name, streamProvider.baseURL());
-
-    return streamProvider.getStream(url, rcfile.saveStreamingMedia());
+    
+    if(isRTMP())
+    {
+        // Handling RTMP connections separately. Correcting the url
+        // TODO: For RTMP return the named stream from an existing RTMP connection.
+        as_object *obj = &owner(); // Use the callBack of the object to get the streamId
+        createStream(obj);//Create Stream called
+        // USe streamId in the call of play
+        std::vector<as_value> args;
+        args.push_back(name); // TODO Add args[1] to be the return from createStream 
+        _currentConnection->call(obj, "play", args);
+        std::string rtmpUrl = _uri + "/" + name;
+        URL url(rtmpUrl, streamProvider.baseURL());
+        return streamProvider.getStream(url, rcfile.saveStreamingMedia());
+    }
+    else 
+    { 
+        // Construct URL with base URL (assuming not connected to RTMP server..)
+        // If name is a full or relative URL passed from NetStream.play(), it
+        // must be constructed against the base URL, not the NetConnection uri,
+        // which should always be null in this case.
+        URL url(name, streamProvider.baseURL());
+        return streamProvider.getStream(url, rcfile.saveStreamingMedia());
+    }
 
 }
 
@@ -1216,7 +1281,7 @@ HTTPConnection::call(as_object* asCallback, const std::string& methodName,
         pushCallback(callID, asCallback);
     }
 }
-
+ 
 void
 RTMPConnection::handleInvoke(const boost::uint8_t* payload,
         const boost::uint8_t* end)
