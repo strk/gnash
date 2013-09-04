@@ -476,6 +476,20 @@ NetConnection_as::connect()
 }
 
 
+bool 
+NetConnection_as::isRTMP () {
+
+    const RunResources& r = getRunResources(owner());
+    URL url(_uri, r.streamProvider().baseURL());
+    if (url.protocol() == "rtmp") {
+    
+         return true;
+    } else {
+     
+         return false;
+    }
+}
+
 bool
 NetConnection_as::connect(const std::string& uri)
 {
@@ -576,6 +590,27 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
     startAdvanceTimer();
 }
 
+void
+NetConnection_as::createStream(as_object* asCallback) {
+    
+    if (! this -> isRTMP()) {
+        return;
+    } 
+
+    if (!_currentConnection.get()) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("NetConnection.call: can't call while not connected"));
+        );
+        return;
+    }
+   
+    std::string methodName = "createStream"; 
+    _currentConnection -> call(asCallback, methodName,
+		    std::vector<as_value>());
+
+    startAdvanceTimer();
+}
+
 std::auto_ptr<IOChannel>
 NetConnection_as::getStream(const std::string& name)
 {
@@ -588,11 +623,22 @@ NetConnection_as::getStream(const std::string& name)
     // If name is a full or relative URL passed from NetStream.play(), it
     // must be constructed against the base URL, not the NetConnection uri,
     // which should always be null in this case.
+    //  Handling RTMP connections separately. Correcting the url
+    
+    
     const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-
-    URL url(name, streamProvider.baseURL());
-
-    return streamProvider.getStream(url, rcfile.saveStreamingMedia());
+    
+    if(isRTMP())
+    {
+       std::string rtmpUrl = _uri + "/" + name;
+       URL url(rtmpUrl, streamProvider.baseURL());
+       return streamProvider.getStream(url, rcfile.saveStreamingMedia());
+    }
+    else 
+    { 
+       URL url(name, streamProvider.baseURL());
+       return streamProvider.getStream(url, rcfile.saveStreamingMedia());
+    }
 
 }
 

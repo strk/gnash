@@ -1588,6 +1588,7 @@ netstream_new(const fn_call& fn)
 
         NetConnection_as* nc;
         if (isNativeType(toObject(fn.arg(0), getVM(fn)), nc)) {
+            nc->createStream(obj);
             ns->setNetCon(nc);
             if ( nc->isConnected() ) {
                 // TODO: initialize only once ?
@@ -1642,7 +1643,8 @@ as_value
 netstream_play(const fn_call& fn)
 {
     NetStream_as* ns = ensure<ThisIsNative<NetStream_as> >(fn);
-
+    
+  
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("NetStream_as play needs args"));
@@ -1656,6 +1658,16 @@ netstream_play(const fn_call& fn)
                 fn.arg(0));
         );
         return as_value();
+    }
+    
+    NetConnection_as *nc = ns -> getNetCon();
+    if (nc -> isRTMP()) {
+        std::vector<as_value> args;
+	args = std::vector<as_value>(fn.getArgs().begin(),
+		fn.getArgs().end());
+	std::string methodName = "play";
+	nc -> call (fn.this_ptr, methodName,
+		args);
     }
 
     ns->play(fn.arg(0).to_string());

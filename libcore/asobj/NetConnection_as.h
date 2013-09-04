@@ -71,6 +71,7 @@ public:
     void call(as_object* asCallback, const std::string& methodName,
             const std::vector<as_value>& args);
 
+    void createStream(as_object* asCallback);
     /// Process the close() method.
     void close();
 
@@ -93,6 +94,8 @@ public:
     bool isConnected() const {
         return _isConnected;
     }
+
+    bool isRTMP();
 
     void setURI(const std::string& uri);
 

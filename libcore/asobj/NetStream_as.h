@@ -251,7 +251,13 @@ public:
     
     /// Returns the current framerate in frames per second.
     double getCurrentFPS()  { return 0; }
-
+    
+    /// Get Net connected
+    //  Returns the netconnection object
+    NetConnection_as* getNetCon() {
+         return _netCon;
+    }
+    
     /// Sets the NetConnection needed to access external files
     //
     /// @param nc
