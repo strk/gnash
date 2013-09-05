@@ -48,6 +48,7 @@
 #include "AMFConverter.h"
 #include "AMF.h"
 #include "SoundUtils.h"
+#include "RTMP.h"
 #include "VideoDecoder.h"
 #include "AudioDecoder.h"
 
@@ -1663,11 +1664,21 @@ netstream_play(const fn_call& fn)
     NetConnection_as *nc = ns -> getNetCon();
     if (nc -> isRTMP()) {
         std::vector<as_value> args;
-	args = std::vector<as_value>(fn.getArgs().begin(),
-		fn.getArgs().end());
-	std::string methodName = "play";
-	nc -> call (fn.this_ptr, methodName,
-		args);
+	
+        SimpleBuffer buf;
+        rtmp::RTMP rtmpObj;
+        args = std::vector<as_value>(fn.getArgs().begin(),
+ 		fn.getArgs().end());
+        amf::Writer aw(buf);
+        aw.writeString("play");
+        aw.writeNumber(0);
+        aw.writeNull();
+        for (size_t i = 0; i < args.size(); ++i) 
+        {
+            args[i].writeAMF0(aw);
+        }
+        // TODO Use the play method and the streamId from createStream
+        rtmpObj.call(buf);
     }
 
     ns->play(fn.arg(0).to_string());

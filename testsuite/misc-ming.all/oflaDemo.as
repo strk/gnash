@@ -28,6 +28,7 @@ endOfTest = function()
 {
     totals(17);
     trace("ENDOFTEST");
+    play();
 };
 
 // -P FlashVars='hostname=localhost,rtmptport5080=rtmpport=1935'
@@ -40,7 +41,7 @@ if (rtmpport == undefined) {
 }
 
 function checkAfter (netStream) {
-    trace("Time :" + netStream.time);
+    note("Time :" + netStream.time);
     check(netStream.bufferLength > 0);
     check_equals(netStream.bufferTime, '3');
     xcheck(netStream.decodedFrames > 0);
@@ -66,14 +67,10 @@ test1 = function(netStream) {
     check_equals(typeof(netStream.currentFps), 'number');
     check_equals(typeof(netStream.time), 'number');
 
-    netStream.play("avatar-vp6");
+    netStream.play("square");
     netStream.setBufferTime(3);
-    netStream.onStatus = function(object) {
-        trace(object.code);
-        trace(object.level);
-        if(object.code == "NetStream.Play.Start") {
-            funcId = setInterval(checkAfter, 1000, netStream);
-        }
+    netStream.onMetaData = function(object) {
+        funcId = setInterval(checkAfter, 1000, netStream);
     };
 };
 
