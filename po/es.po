@@ -9467,7 +9467,7 @@ msgstr ""
 
 #: cygnal/libnet/statistics.cpp:119
 #, c-format
-msgid "%d bytes were transfered in %s seconds"
+msgid "%d bytes were transferred in %s seconds"
 msgstr ""
 
 #: cygnal/libnet/rtmp_client.cpp:152

@@ -116,7 +116,7 @@ Statistics::dump() {
 //             stats->getCodec() <= VP7) {
 //             log_debug (_("Stream codec is: %s"), codec_names[stats->getCodec()]);
 //         }
-        log_debug (_("%d bytes were transfered in %s seconds"),
+        log_debug (_("%d bytes were transferred in %s seconds"),
 		 stats->getBytes(),
                  to_simple_string(stats->getTimeSpan()).c_str());
     }

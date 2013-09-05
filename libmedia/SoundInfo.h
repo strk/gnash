@@ -27,7 +27,7 @@ namespace media {
 /// Class containing information about an embedded sound definition
 //
 /// Is created by the parser while
-/// parsing, and ownership is then transfered to EmbeddedSound. When the parser is
+/// parsing, and ownership is then transferred to EmbeddedSound. When the parser is
 /// parsing streams, it will ask the soundhandler for this to know what properties
 /// the stream has.
 ///
