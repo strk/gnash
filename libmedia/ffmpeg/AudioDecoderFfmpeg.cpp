@@ -499,7 +499,7 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
     size_t outSize = MAX_AUDIO_FRAME_SIZE;
 
     // TODO: make this a private member, to reuse (see NetStreamFfmpeg in 0.8.3)
-    gnash::ScopedPtr<boost::int16_t> output( reinterpret_cast<boost::int16_t*>(av_malloc(outSize)), av_free );
+    ScopedPtr<boost::int16_t> output( reinterpret_cast<boost::int16_t*>(av_malloc(outSize)), av_free );
     if (!output.get()) {
         log_error(_("failed to allocate audio buffer."));
         outputSize = 0;
@@ -521,12 +521,12 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
     av_init_packet(&pkt);
     pkt.data = const_cast<uint8_t*>(input);
     pkt.size = inputSize;
-    AVFrame *frm = avcodec_alloc_frame();
-    if (!frm) {
+    ScopedPtr<AVFrame> frm ( avcodec_alloc_frame(), av_free );
+    if (!frm.get()) {
         log_error(_("failed to allocate frame."));
         return NULL;
     }
-    int tmp = avcodec_decode_audio4(_audioCodecCtx, frm, &got_frm, &pkt);
+    int tmp = avcodec_decode_audio4(_audioCodecCtx, frm.get(), &got_frm, &pkt);
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
     const char* fmtname = av_get_sample_fmt_name(_audioCodecCtx->sample_fmt);
@@ -573,7 +573,6 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
                 "data."), outputSize, inputSize);
         log_error(_("Upgrading ffmpeg/libavcodec might fix this issue."));
         outputSize = 0;
-        av_freep(&frm);
         return NULL;
     }
 
@@ -616,8 +615,6 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
         log_debug("resampler returned %d samples ", outSamples);
 #endif
 
-        av_freep(&frm);
-
         if (expectedMaxOutSamples < outSamples) {
             log_error(_(" --- Computation of resampled samples (%d) < then the actual returned samples (%d)"),
                 expectedMaxOutSamples, outSamples);
@@ -645,7 +642,6 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
         boost::uint8_t* newOutput = new boost::uint8_t[outSize];
         std::memcpy(newOutput, outPtr, outSize);
         outPtr = reinterpret_cast<boost::int16_t*>(newOutput);
-        av_freep(&frm);
     }
 
     outputSize = outSize;
