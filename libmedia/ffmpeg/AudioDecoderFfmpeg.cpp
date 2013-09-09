@@ -505,6 +505,9 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
         return NULL;
     }
 
+    boost::int16_t* output = outPtr;
+
+
 #ifdef GNASH_DEBUG_AUDIO_DECODING
     log_debug("AudioDecoderFfmpeg: about to decode %d bytes; "
         "ctx->channels:%d, ctx->frame_size:%d",
@@ -520,6 +523,7 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
     AVFrame *frm = avcodec_alloc_frame();
     if (!frm) {
         log_error(_("failed to allocate frame."));
+        av_free(output);
         return NULL;
     }
     int tmp = avcodec_decode_audio4(_audioCodecCtx, frm, &got_frm, &pkt);
@@ -539,6 +543,7 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
         if (static_cast<int>(outSize) < data_size) {
             log_error(_("output buffer size is too small for the current frame "
                 "(%d < %d)"), outSize, data_size);
+            av_free(output);
             return NULL;
         }
 
@@ -570,6 +575,7 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
         log_error(_("Upgrading ffmpeg/libavcodec might fix this issue."));
         outputSize = 0;
         av_freep(&frm);
+        av_free(output);
         return NULL;
     }
 
@@ -645,6 +651,7 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
     }
 
     outputSize = outSize;
+    av_free(output);
     return reinterpret_cast<uint8_t*>(outPtr);
 }
 
