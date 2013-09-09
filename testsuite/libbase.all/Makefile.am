@@ -83,12 +83,12 @@ NoSeekFileTest_LDADD = $(LDADD)
 URLTest_SOURCES = URLTest.cpp
 URLTest_CPPFLAGS =  $(AM_CPPFLAGS) \
 	'-DBUILDDIR="$(abs_builddir)"'
-URLTest_LDADD = $(LDADD)
+URLTest_LDADD = $(LDADD) -lboost_system
 
 RcTest_SOURCES = RcTest.cpp
 RcTest_CPPFLAGS =  $(AM_CPPFLAGS) \
 	-DSRCDIR="$(srcdir)"
-RcTest_LDADD = $(LDADD)
+RcTest_LDADD = $(LDADD) -lboost_system
 
 IntTypesTest_SOURCES = IntTypesTest.cpp
 IntTypesTest_CPPFLAGS =  $(AM_CPPFLAGS) \
