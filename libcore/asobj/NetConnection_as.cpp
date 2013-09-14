@@ -281,22 +281,36 @@ public:
     }
 
     virtual void call(as_object* asCallback, const std::string& methodName,
-            const std::vector<as_value>& args)
-    {
-        SimpleBuffer buf;
-        amf::Writer aw(buf);
-        aw.writeString(methodName);
-        const size_t id = asCallback ? callNo() : 0;
-        aw.writeNumber(id);
+            const std::vector<as_value>& args) {
 
-        for (size_t i = 0; i < args.size(); ++i) {
-            args[i].writeAMF0(aw);
-        }
-        _rtmp.call(buf);
-        if (asCallback) {
-            pushCallback(id, asCallback);
-        }
-    }
+        if(methodName == "play") {
+            SimpleBuffer buf;
+            amf::Writer aw(buf);
+            aw.writeString("play");
+            aw.writeNumber(0);
+            aw.writeNull();
+            for (size_t i = 0; i < args.size(); ++i) {
+               args[i].writeAMF0(aw);
+            }
+           // TODO Use the play method and the streamId from createStream
+           _rtmp.call(buf);
+	} else {
+            SimpleBuffer buf;
+            amf::Writer aw(buf);
+            aw.writeString(methodName);
+            const size_t id = asCallback ? callNo() : 0;
+            aw.writeNumber(id);
+
+            for (size_t i = 0; i < args.size(); ++i) {
+               args[i].writeAMF0(aw);
+            }
+           _rtmp.call(buf);
+           if (asCallback) {
+              pushCallback(id, asCallback);
+           }
+	}
+
+    }   
 
     bool hasPendingCalls() const {
         return false;
@@ -384,7 +398,6 @@ public:
 private:
 
     void handleInvoke(const boost::uint8_t* payload, const boost::uint8_t* end);
-
     rtmp::RTMP _rtmp;
     bool _connectionComplete;
     const URL _url;
@@ -630,9 +643,15 @@ NetConnection_as::getStream(const std::string& name)
     
     if(isRTMP())
     {
-       std::string rtmpUrl = _uri + "/" + name;
-       URL url(rtmpUrl, streamProvider.baseURL());
-       return streamProvider.getStream(url, rcfile.saveStreamingMedia());
+        as_object *obj = &owner(); // Use the callBack of the object to get the streamId
+        createStream(obj);//Create Stream called
+        // USe streamId in the call of play
+        std::vector<as_value> args;
+        args.push_back(name); // TODO Add args[1] to be the return from createStream 
+	_currentConnection->call(obj, "play", args);
+        std::string rtmpUrl = _uri + "/" + name;
+        URL url(rtmpUrl, streamProvider.baseURL());
+        return streamProvider.getStream(url, rcfile.saveStreamingMedia());
     }
     else 
     { 
@@ -1262,7 +1281,7 @@ HTTPConnection::call(as_object* asCallback, const std::string& methodName,
         pushCallback(callID, asCallback);
     }
 }
-
+ 
 void
 RTMPConnection::handleInvoke(const boost::uint8_t* payload,
         const boost::uint8_t* end)

@@ -48,7 +48,6 @@
 #include "AMFConverter.h"
 #include "AMF.h"
 #include "SoundUtils.h"
-#include "RTMP.h"
 #include "VideoDecoder.h"
 #include "AudioDecoder.h"
 
@@ -1589,7 +1588,6 @@ netstream_new(const fn_call& fn)
 
         NetConnection_as* nc;
         if (isNativeType(toObject(fn.arg(0), getVM(fn)), nc)) {
-            nc->createStream(obj);
             ns->setNetCon(nc);
             if ( nc->isConnected() ) {
                 // TODO: initialize only once ?
@@ -1644,7 +1642,6 @@ as_value
 netstream_play(const fn_call& fn)
 {
     NetStream_as* ns = ensure<ThisIsNative<NetStream_as> >(fn);
-    
   
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1661,26 +1658,6 @@ netstream_play(const fn_call& fn)
         return as_value();
     }
     
-    NetConnection_as *nc = ns -> getNetCon();
-    if (nc -> isRTMP()) {
-        std::vector<as_value> args;
-	
-        SimpleBuffer buf;
-        rtmp::RTMP rtmpObj;
-        args = std::vector<as_value>(fn.getArgs().begin(),
- 		fn.getArgs().end());
-        amf::Writer aw(buf);
-        aw.writeString("play");
-        aw.writeNumber(0);
-        aw.writeNull();
-        for (size_t i = 0; i < args.size(); ++i) 
-        {
-            args[i].writeAMF0(aw);
-        }
-        // TODO Use the play method and the streamId from createStream
-        rtmpObj.call(buf);
-    }
-
     ns->play(fn.arg(0).to_string());
 
     return as_value();
