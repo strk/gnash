@@ -2303,6 +2303,8 @@ dnl Find freetype and fontconfig
 GNASH_PATH_FREETYPE2
 GNASH_PKG_FIND(fontconfig, [fontconfig/fontconfig.h], [fontconfig library], FcFontMatch)
 
+GNASH_PATH_CURL
+
 if test x$cross_compiling = xno; then
   AC_PATH_MING
 fi
@@ -2371,10 +2373,13 @@ if test x$cross_compiling = xno; then
              no) RED5_HOST="" ;;
             yes) RED5_HOST="www.gnashdev.org" ;;
               *) RED5_HOST="${enableval}";;
-           esac])
+           esac
+               if test x"$RED5_HOST" != x -a x"$curl_rtmp_support" != x; then
+                 RED5_TESTING=yes
+             fi])
   AC_SUBST(RED5_HOST)
 fi
-AM_CONDITIONAL(ENABLE_RED5_TESTING, [ test x"$RED5_HOST" != x ])
+AM_CONDITIONAL(ENABLE_RED5_TESTING, [ test x"$RED5_TESTING" != x ])
 
 if test x$cross_compiling = xno; then
   AC_ARG_ENABLE([rtmpy_testing],
@@ -2676,8 +2681,6 @@ AM_CONDITIONAL(ENABLE_FOP, [ test x"$FOP" != x -a x"$docbook_styles" != x ])
 AM_CONDITIONAL(ENABLE_XMLTEX, [ test x"$PDFXMLTEX" != x -a x"$XSLTPROC" != x -a x"$docbook_styles" != x ])
 AM_CONDITIONAL(ENABLE_MAN, [ test x"$DB2X_MAN" != x -o x"$DB2X_MANXML" != x ])
 AM_CONDITIONAL(HAVE_AGG, [test x"${AGG_LIBS}" != x])
-
-GNASH_PATH_CURL
 
 dnl Define winsock if we're on windows. We could do something complicated,
 dnl but since AC_EXEEXT does it for us, we'll do this the easy way.
@@ -3701,7 +3704,11 @@ if test x"$CURL_LIBS" != x; then
   else
     echo "        CURL flags are: default include path"
   fi
-    echo "        CURL libs are: $CURL_LIBS"
+  echo "        CURL libs are: $CURL_LIBS"
+  if test -z "$curl_rtmp_support"; then
+    PKG_REC([CURL library present but built without RTMP protocol support.])
+    PKG_SUGGEST([If you install it with RTMP protocol support, Gnash will be able to play RTMP streaming.])
+  fi
 else
   PKG_REC([If you install the CURL library, Gnash will be able to display remote content (streaming from URLs) using CURL.])
   PKG_SUGGEST([Install libcurl from http://curl.haxx.se/libcurl])
@@ -3910,7 +3917,7 @@ if test x"$testsuite" = x"yes"; then
       echo "        HTTP testsuite dir is $HTTP_TESTSUITE"
     fi
 
-    if test x"$RED5_HOST" != x; then
+    if test x"$RED5_TESTING" != x; then
       echo "        RED5 testing host is $RED5_HOST"
     fi
   fi

@@ -134,6 +134,11 @@ AC_DEFUN([GNASH_PATH_CURL],
 
   if test -n "$CURL_LIBS"; then
     AC_DEFINE(USE_CURL, [1], [Define this if you want to enable curl usage])
+    if test x"${curlconfig}" != "x"; then
+      if test x"`${curlconfig} --protocols|grep RTMP`" != x; then
+        curl_rtmp_support=yes
+      fi
+    fi
   fi
 
   AC_SUBST(CURL_CFLAGS)
