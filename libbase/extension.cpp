@@ -122,19 +122,16 @@ bool
 Extension::initModule(const std::string& module, as_object &where)
 {
 
-    SharedLib *sl;
-    std::string symbol(module);
+    log_security(_("Initializing module: \"%s\" from %s"), module, _pluginsdir);
+    
+    SharedLib *sl = _plugins[module];
 
-    log_security(_("Initializing module: \"%s\" from %s"), symbol, _pluginsdir);
+    if (sl == 0) {
+        sl = _plugins[module] = new SharedLib(_pluginsdir + "/" + module);
+        if ( ! sl->openLib() ) return false;
+    } 
     
-    if (_plugins[module] == 0) {
-        sl = new SharedLib(_pluginsdir + "/" + module);
-        sl->openLib();
-        _plugins[module] = sl;
-    } else {
-        sl = _plugins[module];
-    }
-    
+    std::string symbol(module);
     symbol.append("_class_init");
     
     SharedLib::initentry *symptr = sl->getInitEntry(symbol);
@@ -154,17 +151,14 @@ Extension::initModuleWithFunc(const std::string& module,
 {
 //    GNASH_REPORT_FUNCTION;
 
-    SharedLib *sl;
-
     log_security(_("Initializing module: \"%s\""), module);
 
-    if (_plugins[module] == 0) {
-        sl = new SharedLib(module);
-        sl->openLib();
-        _plugins[module] = sl;
-    } else {
-        sl = _plugins[module];
-    }
+    SharedLib *sl = _plugins[module];
+
+    if (sl == 0) {
+        sl = _plugins[module] = new SharedLib(module);
+        if ( ! sl->openLib() ) return false;
+    } 
 
     SharedLib::initentry *symptr = sl->getInitEntry(func);
 
