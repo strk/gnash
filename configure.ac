@@ -4081,6 +4081,13 @@ else
     RPM_INSTALL([libtool-ltdl-devel])
   fi
 fi
+
+if test x"$enable_visibility" != xno; then
+  if test x"${extensions_support}" != xno; then
+    PKG_ERR([Extensions not supported with ELF visibility activated.])
+    PKG_SUGGEST([Use --disable-extensions or --disable-visibility.])
+  fi
+fi
  
 if test x"$python" = x"yes"; then
   if test x"$has_python" = x"yes"; then
