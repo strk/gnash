@@ -29,7 +29,6 @@
 #include "DisplayList.h" 
 #include "InteractiveObject.h"
 #include "log.h"
-#include "dsodefs.h" // for DSOEXPORT
 
 namespace gnash {
 
