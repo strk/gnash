@@ -80,28 +80,28 @@ AC_DEFUN([GNASH_PATH_BOOST],
     gnash_boost_topdir=/usr/include/boost
     dirs="`ls -dr $i/boost* 2>/dev/null | xargs`"
     for u in ${dirs}; do
-    	if test -n "$u" -a -d "$u" -a x"$u" != x"/usr/include/boost"; then
-      	gnash_boost_topdir="`(cd $u; pwd)`"
-      	gnash_boost_subdir="`dirname ${gnash_boost_topdir}`"
-      	gnash_boost_version="`echo ${gnash_boost_topdir} | sed -e 's:.*boost-::'`"
-      	dnl Fix for packaging systems not adding extra fluff to the path-name.
-     	  for k in ${boost_headers}; do
-       		if test ! -f ${gnash_boost_topdir}/boost/$k; then
-        	  if test ! -f ${gnash_boost_subdir}/boost/$k; then
-		    	    missing_headers="${missing_headers} $k"
-	        	else
-	  	      	gnash_boost_topdir=${gnash_boost_subdir}
-	        	fi
-        	fi
-      	done
-      if test x"${missing_headers}" = x ; then
-        ac_cv_path_boost_incl="-I${gnash_boost_topdir}"
-        AC_MSG_RESULT(${ac_cv_path_boost_incl})
-        break
-      else
-        AC_MSG_RESULT([headers missing])
-        AC_MSG_WARN([You need to install ${missing_headers}])
-      fi
+      if test -n "$u" -a -d "$u" -a x"$u" != x"/usr/include/boost"; then
+        gnash_boost_topdir="`(cd $u; pwd)`"
+        gnash_boost_subdir="`dirname ${gnash_boost_topdir}`"
+        gnash_boost_version="`echo ${gnash_boost_topdir} | sed -e 's:.*boost-::'`"
+        dnl Fix for packaging systems not adding extra fluff to the path-name.
+        for k in ${boost_headers}; do
+          if test ! -f ${gnash_boost_topdir}/boost/$k; then
+            if test ! -f ${gnash_boost_subdir}/boost/$k; then
+              missing_headers="${missing_headers} $k"
+            else
+              gnash_boost_topdir=${gnash_boost_subdir}
+            fi
+          fi
+        done
+        if test x"${missing_headers}" = x ; then
+          ac_cv_path_boost_incl="-I${gnash_boost_topdir}"
+          AC_MSG_RESULT(${ac_cv_path_boost_incl})
+          break
+        else
+          AC_MSG_RESULT([headers missing])
+          AC_MSG_WARN([You need to install ${missing_headers}])
+        fi
     fi
     done
   done
