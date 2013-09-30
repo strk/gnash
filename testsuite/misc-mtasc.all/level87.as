@@ -25,52 +25,52 @@
 
 class Level87
 {
-	static function main(mc)
-	{
-		mc.createEmptyMovieClip("ch", 1);
-		with(mc.ch)
-		{
-			lineStyle(1, 0x00000);
-			beginFill(0xFFFF00, 80);
-			var x=220;
-			var y=170;
-			var width=100;
-			var height=100;
-			moveTo(x, y);
-			lineTo(x+width, y);
-			lineTo(x+width, y+height);
-			lineTo(x, y+height);
-			lineTo(x, y);
-			endFill();
-		};
+  static function main(mc)
+  {
+    mc.createEmptyMovieClip("ch", 1);
+    with(mc.ch)
+    {
+      lineStyle(1, 0x00000);
+      beginFill(0xFFFF00, 80);
+      var x=220;
+      var y=170;
+      var width=100;
+      var height=100;
+      moveTo(x, y);
+      lineTo(x+width, y);
+      lineTo(x+width, y+height);
+      lineTo(x, y+height);
+      lineTo(x, y);
+      endFill();
+    };
 
-                check_equals(mc._currentframe, 1);
+    check_equals(mc._currentframe, 1);
 
-                // Check our depth
-		check_equals(mc.getDepth(), -16297);
+    // Check our depth
+    check_equals(mc.getDepth(), -16297);
 
-                // The ""+ is there to force conversion to a string
-                check_equals(""+mc, "_level87");
+    // The ""+ is there to force conversion to a string
+    check_equals(""+mc, "_level87");
 
-		if (_level0.level87loaded )
-		{
-                	check(_level0.frameno >= 3);
+    if (_level0.level87loaded )
+    {
+      check(_level0.frameno >= 3);
 
-                	check_equals(typeof(_level5), 'undefined');
-			return;
-		}
+      check_equals(typeof(_level5), 'undefined');
+      return;
+    }
 
-		_level0.level87loaded = true;
+    _level0.level87loaded = true;
 
-               	check(_level0.frameno >= 2);
+    check(_level0.frameno >= 2);
 
-		// This one fails because gnash is executing code
-		// in level99 before code in the first load of level87,
-		// probably because it is *loading* level99 before level87,
-		// which is in the order loads are requested rather then
-		// reverse of it as it's common...
-                check_equals(_level5._currentframe, 1);
+    // This one fails because gnash is executing code
+    // in level99 before code in the first load of level87,
+    // probably because it is *loading* level99 before level87,
+    // which is in the order loads are requested rather then
+    // reverse of it as it's common...
+    check_equals(_level5._currentframe, 1);
 
-		_level87.loadMovie("level87.swf");
-	}
+    _level87.loadMovie("level87.swf");
+  }
 }

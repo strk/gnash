@@ -25,62 +25,62 @@
 
 class Level5
 {
-	static function main(mc)
-	{
-                check_equals(mc._currentframe, 1);
+  static function main(mc)
+  {
+    check_equals(mc._currentframe, 1);
 
-                check(_level0.frameno >= 1);
+    check(_level0.frameno >= 1);
 
-                // Check our depth
-		check_equals(mc.getDepth(), -16379);
+    // Check our depth
+    check_equals(mc.getDepth(), -16379);
 
-                // The ""+ is there to force conversion to a string
-                check_equals(""+mc, "_level5");
+    // The ""+ is there to force conversion to a string
+    check_equals(""+mc, "_level5");
 
-                // Mc level is _level0 ? why ? 
-                check_equals(mc._level, _level0);
+    // Mc level is _level0 ? why ? 
+    check_equals(mc._level, _level0);
 
-                // check that we can acess back to _level0
-                check_equals(_level0.testvar, 1239);
+    // check that we can acess back to _level0
+    check_equals(_level0.testvar, 1239);
 
-                // check that we can modify vars on our own level
-                check_equals(_level5.testvar, undefined);
-                _level5.testvar = 6789;
-                check_equals(_level5.testvar, 6789);
+    // check that we can modify vars on our own level
+    check_equals(_level5.testvar, undefined);
+    _level5.testvar = 6789;
+    check_equals(_level5.testvar, 6789);
 
-                // check that we can modify vars on _level0
-                check_equals(_level0.testvar2, undefined);
-                _level0.testvar2 = true;
-                check_equals(_level0.testvar2, true);
+    // check that we can modify vars on _level0
+    check_equals(_level0.testvar2, undefined);
+    _level0.testvar2 = true;
+    check_equals(_level0.testvar2, true);
 
-		_level5.onUnload = function()
-		{
-			check(false); // should not be executed
-			note("Unloading "+this);
-		}
+    _level5.onUnload = function()
+    {
+      check(false); // should not be executed
+      note("Unloading "+this);
+    }
 
-		mc.createEmptyMovieClip("ch", 1);
-		with(mc.ch)
-		{
-			lineStyle(1, 0x00000);
-			beginFill(0xFF0000, 80);
-			var x=200;
-			var y=200;
-			var width=100;
-			var height=100;
-			moveTo(x, y);
-			lineTo(x+width, y);
-			lineTo(x+width, y+height);
-			lineTo(x, y+height);
-			lineTo(x, y);
-			endFill();
-		};
+    mc.createEmptyMovieClip("ch", 1);
+    with(mc.ch)
+    {
+      lineStyle(1, 0x00000);
+      beginFill(0xFF0000, 80);
+      var x=200;
+      var y=200;
+      var width=100;
+      var height=100;
+      moveTo(x, y);
+      lineTo(x+width, y);
+      lineTo(x+width, y+height);
+      lineTo(x, y+height);
+      lineTo(x, y);
+      endFill();
+    };
 
-                check_equals(mc.ch._target, "_level5/ch");
+    check_equals(mc.ch._target, "_level5/ch");
 
-                // load yet another swf
-                getURL("level99.swf","_level"+99);
+    // load yet another swf
+    getURL("level99.swf","_level"+99);
 
-		getURL("level87.swf", "_level87");
-	}
+    getURL("level87.swf", "_level87");
+  }
 }

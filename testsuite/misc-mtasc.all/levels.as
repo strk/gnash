@@ -25,28 +25,28 @@
 
 class LevelsMain
 {
-	static function main(mc)
-	{
-                // create a var that other swfs can test
-                _level0.testvar = 1239;
+  static function main(mc)
+  {
+    // create a var that other swfs can test
+    _level0.testvar = 1239;
 
-                var test = new LevelsMain();
-                test.run();
+    var test = new LevelsMain();
+    test.run();
 
-                // Check our depth
-		check_equals(mc.getDepth(), -16384);
+    // Check our depth
+    check_equals(mc.getDepth(), -16384);
 
-                // The ""+ is there to force conversion to a string
-                check_equals(""+mc, "_level0");
+    // The ""+ is there to force conversion to a string
+    check_equals(""+mc, "_level0");
 
-		mc.onEnterFrame = function ()
-		{
-			this.frameno++;
-		}
-	}
+    mc.onEnterFrame = function ()
+    {
+      this.frameno++;
+    }
+  }
 
-        function run() {
-            trace("main class running");
-            getURL("level5.swf","_level"+5);
-        }
+  function run() {
+    trace("main class running");
+    getURL("level5.swf","_level"+5);
+  }
 }
