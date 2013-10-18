@@ -50,6 +50,7 @@
 #include "MediaHandler.h"
 #include "utility.h"
 #include "accumulator.h"
+#include "GnashFileUtilities.h"
 
 using std::endl;
 using std::cout;
@@ -75,6 +76,7 @@ namespace {
     void setupFlashVars(gnash::Player& p,
         const std::vector<std::string>& params);
     void setupFDs(gnash::Player& p, const std::string& fds);
+    void setupCookiesIn(gnash::Player& p, const std::string& cookiesIn);
 
     void usage_gui_keys(std::ostream& os);
     void usage(std::ostream& os, const po::options_description& opts);
@@ -221,6 +223,18 @@ setupFDs(gnash::Player& p, const std::string& fds)
         std::exit(EXIT_FAILURE);
     }
     p.setControlFD(controlfd);
+}
+
+void
+setupCookiesIn(gnash::Player& p, const std::string& cookiesIn) {
+    struct stat cstat;
+    if ((stat(cookiesIn.c_str(), &cstat) == -1) ||
+        ((cstat.st_mode & S_IFMT) != S_IFREG)) {
+        std::cerr << boost::format(_("Cookiefile %s does not exist or is not a"
+            " regular file\n")) % cookiesIn;
+        std::exit(EXIT_FAILURE);
+    }
+    p.setCookiesIn(cookiesIn);
 }
 
 void
@@ -423,6 +437,10 @@ getSupportedOptions(gnash::Player& p)
         (string(_("Filedescriptor to use for external communications"))
         + string(" <fd>:<fd>")
         ).c_str())
+
+    ("cookie-file,C", po::value<string>()
+        ->notifier(boost::bind(&setupCookiesIn, boost::ref(p), _1)),
+        _("Cookiefile to use"))
 
     ("max-advances", po::value<size_t>()
         ->notifier(boost::bind(&Player::setMaxAdvances, &p, _1)),

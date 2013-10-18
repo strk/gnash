@@ -35,6 +35,8 @@
 
 #include <iostream> // std::cerr
 
+std::string gnash::NetworkAdapter::CookiesIn;
+
 #ifndef USE_CURL
 
 namespace gnash {
@@ -181,16 +183,16 @@ private:
 
     /// Import cookies, if requested
     //
-    /// This method will lookup GNASH_COOKIES_IN
-    /// in the environment, and if existing, will
-    /// parse the file sending each line to a fake
-    /// easy handle created ad-hoc
+    /// This method will look up CookiesIn variable and will parse cookiefile
+    /// sending each line to a fake easy handle created ad-hoc.
+    /// For backward compatibility, GNASH_COOKIES_IN environment variable
+    /// will be looked up as well.
     ///
     void importCookies();
 
     /// Export cookies, if requested
     //
-    /// This method will lookup GNASH_COOKIES_OUT
+    /// This method will look up GNASH_COOKIES_OUT
     /// in the environment, and if existing, will
     /// create the file writing any cookie currently
     /// in the jar
@@ -1219,8 +1221,17 @@ CurlStreamFile::size() const
 void
 CurlSession::importCookies()
 {
-    const char* cookiesIn = std::getenv("GNASH_COOKIES_IN");
-    if ( ! cookiesIn ) return; // nothing to do
+    std::string cookiesIn = NetworkAdapter::getCookiesIn();
+
+    if (cookiesIn.empty()) {
+        // GNASH_COOKIES_IN envvar backward compatibility
+        const char* cookiesInEnv = std::getenv("GNASH_COOKIES_IN");
+        if (cookiesInEnv) {
+            cookiesIn = cookiesInEnv;
+        } else {
+            return; // nothing to do
+        }
+    }
 
     ////////////////////////////////////////////////////////////////
     //
@@ -1251,7 +1262,7 @@ CurlSession::importCookies()
     }
 
     // Configure the fake handle to read cookies from the specified file
-    ccode = curl_easy_setopt(fakeHandle, CURLOPT_COOKIEFILE, cookiesIn);
+    ccode = curl_easy_setopt(fakeHandle, CURLOPT_COOKIEFILE, cookiesIn.c_str());
     if ( ccode != CURLE_OK ) {
         throw GnashException(curl_easy_strerror(ccode));
     }

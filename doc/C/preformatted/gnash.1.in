@@ -113,6 +113,11 @@ Set file descriptors to use for external communications. x is
 use by the player to send commands to the plugin, y is used
 by the plugin to send commands to the standalone player.
 .TP 
+-C file, --cookie-file file
+Set cookiefile path. Cookiefile contains HTTP cookies to send to
+the server. Primary use for this switch is for the NPAPI plugin
+to pass received HTTP cookies to the standalone player.
+.TP
 --max-advances num
 Exit after specified number of frame advances.
 .TP 

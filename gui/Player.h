@@ -27,6 +27,7 @@
 #include "HostInterface.h"              // for HostInterface, FsCallback, etc
 #include "StringPredicates.h"           // for StringNoCaseLessThan
 #include "movie_definition.h"
+#include "NetworkAdapter.h"             // for setCookiesIn
 
 #include <boost/intrusive_ptr.hpp>
 #include <string>
@@ -158,6 +159,10 @@ public:
     
     int getControlFD() const {
         return _controlfd;
+    }
+
+    void setCookiesIn(const std::string& filename) {
+        NetworkAdapter::setCookiesIn(filename);
     }
 
     void setStartFullscreen(bool x) {

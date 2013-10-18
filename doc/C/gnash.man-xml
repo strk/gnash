@@ -312,8 +312,20 @@ gnash [option]... [URL]
     <listitem>
       <para>
 	Set file descriptors to use for external communications. x is
-	use by the player to send commands to the plugin, y is used
+	used by the player to send commands to the plugin, y is used
 	by the plugin to send commands to the standalone player.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-C file</term>
+    <term>--cookie-file file</term>
+    <listitem>
+      <para>
+        Set cookiefile path. Cookiefile contains HTTP cookies to send to
+        the server. Primary use for this switch is for the NPAPI plugin
+        to pass received HTTP cookies to the standalone player.
       </para>
     </listitem>
   </varlistentry>

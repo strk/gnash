@@ -320,6 +320,16 @@
 	  </row>
 	  <row>
 	    <entry>
+	      <option>-C, --cookie-file</option> <replaceable>&lt;file&gt;</replaceable>
+	    </entry>
+	    <entry>
+              Set cookiefile path. Cookiefile contains HTTP cookies to send to
+              the server. Primary use for this switch is for the NPAPI plugin
+              to pass received HTTP cookies to the standalone player.
+	    </entry>
+	  </row>
+	  <row>
+	    <entry>
 	      <option>--max-advances</option> <replaceable>&lt;num&gt;</replaceable>
 	    </entry>
 	    <entry>

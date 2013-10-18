@@ -89,7 +89,26 @@ public:
         return (names.find(headerName) == names.end());
     }
 
+    /// \brief
+    /// Set CookiesIn variable to cookiefile path.
+    //
+    /// @param cookiesin      Cookiefile path
+    static void setCookiesIn(const std::string& cookiesin) {
+        NetworkAdapter::CookiesIn = cookiesin;
+    }
+
+    /// \brief
+    /// Get CookiesIn variable, cookiefile path.
+    //
+    /// Returns the cookiefile path.
+    static const std::string& getCookiesIn() {
+        return NetworkAdapter::CookiesIn;
+    }
+
 private:
+    /// \brief
+    /// Variable to pass cookiefile path from command line to curl.
+    static std::string CookiesIn;
 
     static const ReservedNames& reservedNames();
 

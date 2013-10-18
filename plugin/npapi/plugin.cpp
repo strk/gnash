@@ -125,6 +125,7 @@ extern NPPluginFuncs NPPFuncs;
 
 namespace gnash {
 NPBool plugInitialized = FALSE;
+std::string cookiefile;
 }
 
 /// \brief Return the MIME Type description for this plugin.
@@ -139,6 +140,8 @@ NPP_GetMIMEDescription(void)
 
 static bool waitforgdb = false;
 static bool createSaLauncher = false;
+
+static std::map<int, std::string> cookiemap;
 
 static const char* getPluginDescription();
 
@@ -517,6 +520,23 @@ nsPluginInstance::~nsPluginInstance()
 	     cleanup_childpid(pid);
         } else {
             gnash::log_debug("Child process exited with status %d", status);
+        }
+
+        // Remove cookiefile if writelauncher not set
+        const char* options = std::getenv("GNASH_OPTIONS");
+        if ((!options || !strstr(options, "writelauncher")) &&
+            (!cookiefile.empty())) {
+            std::map<int, std::string>::iterator it = cookiemap.find(_childpid);
+            if (it != cookiemap.end()) {
+                if (remove(it->second.c_str())) {
+                    gnash::log_error("Cookiefile %s removal failed [pid %d]",
+                        it->second, _childpid);
+                } else {
+                    gnash::log_debug("Cookiefile %s removed [pid %d]",
+                        it->second, _childpid);
+                }
+                cookiemap.erase(it);
+            }
         }
     }
     _childpid = 0;
@@ -1009,14 +1029,14 @@ create_standalone_launcher(const std::string& page_url, const std::string& swf_u
     }
 
     saLauncher << "#!/bin/sh" << std::endl
-               << "export GNASH_COOKIES_IN="
-               << std::getenv("GNASH_COOKIES_IN") << std::endl
                << getGnashExecutable() << " ";
 
     if (!page_url.empty()) {
         saLauncher << "-U '" << page_url << "' ";
     }
-
+    if (!cookiefile.empty()) {
+        saLauncher << "-C " << cookiefile << " ";
+    }
     for (std::map<std::string,std::string>::const_iterator it = params.begin(),
         itEnd = params.end(); it != itEnd; ++it) {
         const std::string& nam = it->first; 
@@ -1129,20 +1149,22 @@ nsPluginInstance::setupCookies(const std::string& pageurl)
 
     if (ncookie.empty()) {
         gnash::log_debug("No stored Cookie for %s", url);
+        cookiefile.clear();
         return;
     }
 
     gnash::log_debug("The Cookie for %s is %s", url, ncookie);
-    char cookiename[] = "/tmp/gnash-cookies.XXXXXX";
-    boost::iostreams::file_descriptor_sink fdsink = getfdsink(cookiename);
+    char mkstemplate[] = "/tmp/gnash-cookie.XXXXXX";
+    boost::iostreams::file_descriptor_sink fdsink = getfdsink(mkstemplate);
 #if BOOST_VERSION >= 104400
     if (fdsink.handle() == -1) {
-        gnash::log_error("Failed to create sink: %s", cookiename);
+        gnash::log_error("Failed to create sink: %s", mkstemplate);
         return;
     }
 #endif
+    cookiefile = mkstemplate;
     boost::iostreams::stream<boost::iostreams::file_descriptor_sink>
-        cookiefile (fdsink);
+        cookiestream (fdsink);
 
     // Firefox provides cookies in the following format:
     //
@@ -1158,17 +1180,12 @@ nsPluginInstance::setupCookies(const std::string& pageurl)
     tokenizer tok(ncookie, char_sep(";"));
 
     for (tokenizer::iterator it=tok.begin(); it != tok.end(); ++it) {
-        cookiefile << "Set-Cookie: " << *it << std::endl;
+        cookiestream << "Set-Cookie: " << *it << std::endl;
     }
  
-    cookiefile.close();
+    cookiestream.close();
     fdsink.close();
-  
-    if (setenv("GNASH_COOKIES_IN", cookiename, 1) < 0) {
-        gnash::log_error(
-            "Couldn't set environment variable GNASH_COOKIES_IN to %s",
-            ncookie);
-    }
+    gnash::log_debug("Cookiefile is %s", cookiefile);
 }
 
 void
@@ -1260,6 +1277,9 @@ nsPluginInstance::getCmdLine(int hostfd, int controlfd)
     if ((hostfd > 0) && (controlfd)) {
         pars << " -F " << hostfd            // Socket to send commands to
              << ":"    << controlfd;        // Socket determining lifespan
+    }
+    if (!cookiefile.empty()) {
+        pars << " -C " << cookiefile;
     }
     std::string pars_str = pars.str();
     typedef boost::char_separator<char> char_sep;
@@ -1418,6 +1438,12 @@ nsPluginInstance::startProc()
         } else {
             gnash::log_debug("Forked successfully, child process PID is %d",
                              _childpid);
+        }
+
+        if (!cookiefile.empty()) {
+            cookiemap.insert(std::make_pair(_childpid, cookiefile));
+            gnash::log_debug("Pid %d associated with cookiefile %s",
+                _childpid, cookiefile);
         }
 
         setupIOChannel(c2p_pipe[0], (GIOFunc)handlePlayerRequestsWrapper,

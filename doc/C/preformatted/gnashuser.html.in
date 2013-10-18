@@ -253,6 +253,12 @@
 	      Primary use for this switch is for the NPAPI plugin to properly
 	      support javascript and target windows in geturl requests.
 	    </td></tr><tr><td align="left">
+	      <code class="option">-C, --cookie-file</code> <em class="replaceable"><code>&lt;file&gt;</code></em>
+	    </td><td align="left">
+              Set cookiefile path. Cookiefile contains HTTP cookies to send to
+              the server. Primary use for this switch is for the NPAPI plugin
+              to pass received HTTP cookies to the standalone player.
+	    </td></tr><tr><td align="left">
 	      <code class="option">--max-advances</code> <em class="replaceable"><code>&lt;num&gt;</code></em>
 	    </td><td align="left">
           Exit after the specified number of frame advances.
