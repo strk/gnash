@@ -29,7 +29,6 @@ libgnashbase_la_SOURCES = \
 	BitsReader.h \
 	ClockTime.cpp \
 	ClockTime.h \
-	curl_adapter.cpp \
 	dsodefs.h \
 	GC.cpp \
 	GC.h \
@@ -58,6 +57,7 @@ libgnashbase_la_SOURCES = \
 	memory.cpp \
 	NamingPolicy.cpp \
 	NamingPolicy.h \
+	NetworkAdapter.cpp \
 	NetworkAdapter.h \
 	noseek_fd_adapter.cpp \
 	noseek_fd_adapter.h \
