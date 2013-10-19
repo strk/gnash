@@ -47,6 +47,14 @@ cygnal/testsuite/cygnal.all/cygnalrc
 deb-copy-stamp
 doc/C/*.html
 doc/C/*.info
+doc/C/cygnal.1
+doc/C/findmicrophones.1
+doc/C/findwebcams.1
+doc/C/flvdumper.1
+doc/C/gnash.1
+doc/C/gprocessor.1
+doc/C/rtmpget.1
+doc/C/soldumper.1
 doc/Doxyfile
 gnashconfig.h
 gnashconfig.h.in
