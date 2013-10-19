@@ -50,7 +50,7 @@
 #include "ManualClock.h"
 #include "StringPredicates.h"
 #include "IOChannel.h" // for proper dtor call
-#include "GnashSleep.h" // for usleep comptibility.
+#include "GnashSleep.h" // for usleep compatibility.
 #include "StreamProvider.h"
 #include "RunResources.h"
 #include "HostInterface.h"
