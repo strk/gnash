@@ -2352,10 +2352,9 @@ AM_CONDITIONAL(ENABLE_SWFDEC_TESTSUITE, [ test x"$SWFDEC_TESTSUITE" != x ])
 
 if test x$cross_compiling = xno; then
   AC_ARG_ENABLE([http_testsuite],
-      dnl # TODO: find out how to add [quotes] around '=<baseurl>'
-	  AC_HELP_STRING([--enable-http-testsuite=<baseurl>],
-		  [Enable http based testsuite (default url is http://www.gnashdev.org/testcases)]),
-	      [case "${enableval}" in
+      AC_HELP_STRING([--enable-http-testsuite@<:@=URL@:>@],
+          [Enable http based testsuite (default url is http://www.gnashdev.org/testcases)]),
+          [case "${enableval}" in
              no) HTTP_TESTSUITE="" ;;
             yes) HTTP_TESTSUITE="http://www.gnashdev.org/testcases" ;;
               *) HTTP_TESTSUITE="${enableval}";;
@@ -2366,10 +2365,9 @@ AM_CONDITIONAL(ENABLE_HTTP_TESTSUITE, [ test x"$HTTP_TESTSUITE" != x ])
 
 if test x$cross_compiling = xno; then
   AC_ARG_ENABLE([red5_testing],
-      dnl # TODO: find out how to add [quotes] around '=<baseurl>'
-	  AC_HELP_STRING([--enable-red5-testing=<host>],
-		  [Enable red5 based testing (default host is www.gnashdev.org)]),
-	      [case "${enableval}" in
+      AC_HELP_STRING([--enable-red5-testing@<:@=HOST@:>@],
+          [Enable red5 based testing (default host is www.gnashdev.org)]),
+          [case "${enableval}" in
              no) RED5_HOST="" ;;
             yes) RED5_HOST="www.gnashdev.org" ;;
               *) RED5_HOST="${enableval}";;
@@ -2383,10 +2381,9 @@ AM_CONDITIONAL(ENABLE_RED5_TESTING, [ test x"$RED5_TESTING" != x ])
 
 if test x$cross_compiling = xno; then
   AC_ARG_ENABLE([rtmpy_testing],
-      dnl # TODO: find out how to add [quotes] around '=<baseurl>'
-	  AC_HELP_STRING([--enable-rtmpy-testing=<host>],
-		  [Enable rtmpy based testing (default host is www.gnashdev.org)]),
-	      [case "${enableval}" in
+      AC_HELP_STRING([--enable-rtmpy-testing@<:@=HOST@:>@],
+          [Enable rtmpy based testing (default host is www.gnashdev.org)]),
+          [case "${enableval}" in
              no) RTMPY_HOST="" ;;
             yes) RTMPY_HOST="www.gnashdev.org" ;;
               *) RTMPY_HOST="${enableval}";;
