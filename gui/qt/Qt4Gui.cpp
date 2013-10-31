@@ -507,7 +507,7 @@ Qt4Gui::showProperties()
         if (newDepth == 0) {
             // Insert top level entries directly into the tree widget.
             items.append(item);
-            stack.empty();
+            stack.clear();
         } else {
             // The position to insert the new row.
             QTreeWidgetItem* parent = NULL;
