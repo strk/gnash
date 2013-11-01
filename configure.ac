@@ -4048,6 +4048,7 @@ if test x"$npapi" = xyes; then
     DEB_INSTALL([xulrunner-dev])
     DEB_ALTERNATIVE([firefox-dev])
     RPM_INSTALL([xulrunner-devel])
+    PKG_ALTERNATIVE([or specify --disable-npapi])
   fi
 else
   echo "        NPAPI plugin is disabled"
