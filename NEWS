@@ -12,6 +12,7 @@ Improvements since 0.8.10 release are:
  * Fix build against recent Boost and FFMPEG.
  * Fix support for GIFLIB-5.0 (#39482)
  * Fix regression in dynamic sound loading (#33760).
+ * Fix infinite loop in GC mark phase for XML object (bug #40440)
 
 Gnash 0.8.10
 2012/02/04

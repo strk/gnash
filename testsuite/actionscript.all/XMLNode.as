@@ -411,8 +411,15 @@ check_equals(xn.toString(), "");
 //       if the test was successful or not...
 x = new XML('<t></t>'); x.appendChild(new XML('<t></t>'));
 var x2 = new XML('<t></t>'); x2.appendChild(x); delete x2;
+
 // many allocations force GC run
 for (var i=0; i<256; ++i) x = {};
 
+// Test infinite loop: https://savannah.gnu.org/bugs/index.php?40440
+// will crash when affected
+xl1 = new XML('<t></t>');
+xl2 = new XML('<t></t>');
+xl1.appendChild(xl2);
+xl2.appendChild(xl1);
 
 check_totals(182);

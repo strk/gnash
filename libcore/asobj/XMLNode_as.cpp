@@ -83,7 +83,8 @@ XMLNode_as::XMLNode_as(Global_as& gl)
     _parent(0),
     _attributes(new as_object(gl)),
     _childNodes(0),
-    _type(Element)
+    _type(Element),
+    _gcMarkInProgress(false)
 {
 }
 
@@ -96,7 +97,8 @@ XMLNode_as::XMLNode_as(const XMLNode_as& tpl, bool deep)
     _childNodes(0),
     _name(tpl._name),
     _value(tpl._value),
-    _type(tpl._type)
+    _type(tpl._type),
+    _gcMarkInProgress(false)
 {
     // only clone children if in deep mode
     if (deep) {
@@ -475,6 +477,10 @@ XMLNode_as::setReachable()
     // If there is a parent, make sure its object is reachable. This goes
     // up towards the root node of tree without marking the XMLNode
     // resources (which would cause infinite recursion).
+    if ( _gcMarkInProgress ) return;
+
+    GCMarkGuard markGuard(this);
+
     if (_parent && _parent->_object) _parent->_object->setReachable();
 
 	// Mark children
@@ -487,7 +493,6 @@ XMLNode_as::setReachable()
     if (_object) _object->setReachable();
 
     if (_childNodes) _childNodes->setReachable();
-
 }
 
 void
