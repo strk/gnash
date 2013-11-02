@@ -177,7 +177,7 @@ Video::getVideoFrame()
 		_lastDecodedVideoFrameNum = current_frame;
 
 #ifdef DEBUG_EMBEDDED_VIDEO_DECODING
-		log_debug("  decoding embedded frames from %d to %d"
+		log_debug("  decoding embedded frames from %d to %d "
                           "for Video object %s", from_frame,
                           current_frame, getTarget());
 #endif
