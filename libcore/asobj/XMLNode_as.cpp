@@ -115,7 +115,12 @@ XMLNode_as::~XMLNode_as()
     // In practice it is quite likely that the child will be garbage-collected
     // before the parent. See Savannah bug #39404.
     if (_parent ) {
-        _parent->removeChild(this);
+        // NOTE: do not removeChild as it makes too much
+        //       noise including calls to string_table
+        //       (due to updateChildNodes)
+        // See https://savannah.gnu.org/bugs/?40439
+        _parent->_children.remove(this);
+        _parent = 0; 
     }
 
     clearChildren();
