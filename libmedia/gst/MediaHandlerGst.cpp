@@ -86,12 +86,12 @@ MediaHandlerGst::createVideoDecoder(const VideoInfo& info)
 
         ExtraInfoGst* extrainfo = dynamic_cast<ExtraInfoGst*>(info.extra.get());
 
-	if (!extrainfo) {
+        if (!extrainfo) {
             log_error(_("Wrong arguments given to GST VideoDecoder"));
             return std::auto_ptr<VideoDecoder>();
         }
         return std::auto_ptr<VideoDecoder>(
-			new VideoDecoderGst(extrainfo->caps));
+            new VideoDecoderGst(extrainfo->caps));
     }
     videoCodecType format = static_cast<videoCodecType>(info.codec);
     int width = info.width;
@@ -103,7 +103,7 @@ MediaHandlerGst::createVideoDecoder(const VideoInfo& info)
     ExtraVideoInfoFlv* extrainfo = dynamic_cast<ExtraVideoInfoFlv*>(info.extra.get());
     if (extrainfo) {
         extradata = extrainfo->data.get();
-                datasize = extrainfo->size;
+        datasize = extrainfo->size;
     }
 
     std::auto_ptr<VideoDecoder> ret( new VideoDecoderGst(format, width, height, extradata, datasize) );
