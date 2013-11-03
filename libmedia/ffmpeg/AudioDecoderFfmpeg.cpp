@@ -392,35 +392,14 @@ AudioDecoderFfmpeg::decode(const boost::uint8_t* input,
 
         if ( ! framesize )
         {
-            // If nothing is consumed, this will fail. It can happen if a
-            // block is passed to the decoder when nothing can be 
-            // parsed from the block. This is probably a malformed SWF.
-            //assert(decodedBytes == inputSize);
-
-            // NOTE: If this happens the caller sent us
-            //       a block of data which is not composed
-            //       by complete audio frames.
-            //       Could be due to an error in the caller
-            //       code, or to a malformed SWF...
-            //       At time of writing this (2008-11-01)
-            //       it is most likely an error in caller
-            //       code (streaming sound/event sound)
-            //       so we log an ERROR rather then a
-            //       MALFORMED input. You can uncomment the
-            //       abort below to check who is the caller 
-            //       with gdb. When callers are checked,
-            //       we may turn this into a MALFORMED
-            //       kind of error (DEFINESOUND, SOUNDSTREAMBLOCK
-            //       or FLV AudioTag not containing full audio frames)
-            //
-
-            log_error(_("AudioDecoderFfmpeg: "
+            // See https://savannah.gnu.org/bugs/?25456
+            // for a live testcase
+            log_debug("AudioDecoderFfmpeg: "
                       "could not find a complete frame in "
-                      "the last %d bytes of input"
-                        " (malformed SWF or FLV?)"),
-                      consumed);
-            //abort();
-            continue;
+                      "the last %d bytes of a %d bytes block"
+                        " (nothing should be lost)",
+                      consumed, inputSize);
+            break; 
         }
 
 
