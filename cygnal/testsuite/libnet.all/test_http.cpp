@@ -151,7 +151,7 @@ tests()
     const char *data = "Keep-Alive";
     http.formatConnection(data);
 //    cerr << "FIXME: " << http.getHeader() << endl;
-    regcomp (&regex_pat, "Connection: [A-za-z-]*",
+    regcomp (&regex_pat, "Connection: [A-Za-z-]*",
              REG_NOSUB|REG_NEWLINE);
     if (regexec (&regex_pat, reinterpret_cast<const char*>(http.getHeader()), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatConnection()");
@@ -179,7 +179,7 @@ tests()
     data = "localhost:4080";
     http.formatHost(data);
 //    cerr << "FIXME: " << http.getHeader() << endl;
-    regcomp (&regex_pat, "Host: [A-za-z-]*:[0-9]*.*$",
+    regcomp (&regex_pat, "Host: [A-Za-z-]*:[0-9]*.*$",
              REG_NOSUB|REG_NEWLINE);
     if (regexec (&regex_pat, reinterpret_cast<const char*>(http.getHeader()), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatHost()");
