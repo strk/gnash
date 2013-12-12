@@ -31,6 +31,7 @@ AM_CPPFLAGS = \
             -I$(top_srcdir)/libcore/vm \
             -I$(top_srcdir)/libcore/asobj \
             $(BOOST_CFLAGS) \
+            $(PTHREAD_CFLAGS) \
             $(MYSQL_CFLAGS) \
 	    $(NULL)
 

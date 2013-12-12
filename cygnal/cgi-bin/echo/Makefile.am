@@ -38,7 +38,8 @@ INCLUDES = \
 	-I$(top_srcdir)/cygnal \
         -I$(top_srcdir)/cygnal/libamf \
 	-I$(top_srcdir)/cygnal/libnet \
-	$(BOOST_CFLAGS)
+	$(BOOST_CFLAGS) \
+	$(PTHREAD_CFLAGS)
 
 echo_la_SOURCES = echo.cpp echo.h
 echo_la_LDFLAGS = -module -avoid-version -no-undefined

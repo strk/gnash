@@ -38,7 +38,8 @@ INCLUDES = \
 	-I$(top_srcdir)/cygnal \
         -I$(top_srcdir)/cygnal/libamf \
 	-I$(top_srcdir)/cygnal/libnet \
-	$(BOOST_CFLAGS)
+	$(BOOST_CFLAGS) \
+	$(PTHREAD_CFLAGS)
 
 oflaDemo_la_SOURCES = oflaDemo.cpp oflaDemo.h
 oflaDemo_la_LDFLAGS = -module -avoid-version -no-undefined

@@ -32,6 +32,7 @@ AM_CPPFLAGS = \
 	    -I$(top_srcdir)/libcore/asobj \
 	    -I$(top_srcdir)/cygnal/libnet \
 	    $(BOOST_CFLAGS) \
+	    $(PTHREAD_CFLAGS) \
 	    $(NULL)
 
 lirc_la_SOURCES = lirc_ext.cpp lirc_ext.h
