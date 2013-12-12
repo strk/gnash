@@ -90,7 +90,6 @@ static gboolean button_release_event_cb(GtkWidget *widget, GdkEventButton *event
 static gboolean motion_notify_event_cb(GtkWidget *widget, GdkEventMotion *event, gpointer data);
 
 static gnash::key::code gdk_to_gnash_key(guint key);
-static int gdk_to_gnash_modifier(int state);
 static gboolean gnash_view_advance_movie(GnashView *view);
 static void gnash_view_display(GnashView *view);
 static void gnash_view_load_movie(GnashView *view, const gchar *path);
@@ -583,6 +582,8 @@ gdk_to_gnash_key(guint key)
     return c;
 }
 
+#if 0 // UNUSED
+ static int gdk_to_gnash_modifier(int state); 
 static int
 gdk_to_gnash_modifier(int state)
 {
@@ -600,4 +601,5 @@ gdk_to_gnash_modifier(int state)
 
     return modifier;
 }
+#endif
 
