@@ -28,6 +28,10 @@
 #include <boost/scoped_array.hpp>
 #include <algorithm>
 
+#ifdef SOLARIS_HOST
+# include <sys/filio.h> // for FIONREAD
+#endif
+
 #include "GnashSystemNetHeaders.h"
 #include "GnashSystemFDHeaders.h"
 
