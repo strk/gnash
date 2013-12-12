@@ -82,7 +82,7 @@ GtkOvgGlue::init(int /*argc*/, char ** /*argv*/[])
     boost::shared_array<renderer::GnashDevice::dtype_t> devs = probeDevices();
     if (devs) {
         int i = 0;
-        while (devs[i] != renderer::GnashDevice::NODEV) {
+        while (devs[i] != renderer::GnashDevice::GNASH_NODEV) {
             switch (devs[i++]) {
               case renderer::GnashDevice::EGL:
                   log_debug(_("Probing found an EGL display device"));
@@ -100,7 +100,7 @@ GtkOvgGlue::init(int /*argc*/, char ** /*argv*/[])
                   log_debug(_("Probing found a DirectFB display device"));
                   dfb = true;
                   break;
-              case renderer::GnashDevice::NODEV:
+              case renderer::GnashDevice::GNASH_NODEV:
               default:
                   log_error(_("No display devices found by probing!"));
                   break;

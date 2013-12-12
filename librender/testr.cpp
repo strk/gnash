@@ -321,7 +321,7 @@ test_device(Renderer *renderer, const std::string &type)
     }
     // Be default, there should be no device associated with this
     // renderer yet.
-    if (renderer->getDevice() == GnashDevice::NODEV) {
+    if (renderer->getDevice() == GnashDevice::GNASH_NODEV) {
         runtest.pass("Renderer::getDevice()");
     } else {
         runtest.fail("Renderer::getDevice()");

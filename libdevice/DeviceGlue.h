@@ -65,7 +65,7 @@ public:
         boost::shared_array<renderer::GnashDevice::dtype_t> devs
             (new renderer::GnashDevice::dtype_t[total]);
         // terminate the list so it can easily be walked through later.
-        devs[--total] = renderer::GnashDevice::NODEV;
+        devs[--total] = renderer::GnashDevice::GNASH_NODEV;
 #ifdef BUILD_X11_DEVICE
         devs[--total] = renderer::GnashDevice::X11;
 #endif
@@ -90,7 +90,7 @@ public:
         if (_device) {
             return _device->getType();
         }
-        return renderer::GnashDevice::NODEV;
+        return renderer::GnashDevice::GNASH_NODEV;
     }
     
     /// Set the display device for later use. After this is called,
