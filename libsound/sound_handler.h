@@ -358,8 +358,8 @@ public:
     ///     callback.
     ///
     /// @return an InputStream pointer, for passing to unplugInputStream.
-    ///         Callers do not own the InputStream, and should NOT realy
-    ///         on it to be point to allocated memory! It is meant to be used
+    ///         Callers do not own the InputStream, and should NOT rely
+    ///         on it to point to allocated memory! It is meant to be used
     ///         as an identifier for the newly created mixer channel.
     ///
     /// @todo change to plugInputStream(InputStream* str),
