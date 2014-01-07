@@ -322,8 +322,6 @@ checkFileType(SWFStream& in)
         return GNASH_FILETYPE_GIF;
     }
     return GNASH_FILETYPE_JPEG;  
-
-    assert(in.tell() == start);
 }
 
 
