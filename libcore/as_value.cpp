@@ -1043,7 +1043,10 @@ operator<<(std::ostream& o, const as_value& v)
             return o << "[null]";
         case as_value::BOOLEAN:
         {
-            return o << "[bool:" << std::boolalpha << v.getBool() << "]";
+            ios::fmtflags f(o.flags());
+            o << "[bool:" << std::boolalpha << v.getBool() << "]";
+            o.flags(f);
+            return o;
         }
         case as_value::OBJECT:
         {

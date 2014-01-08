@@ -152,10 +152,12 @@ dumpTagBytes(SWFStream& in, std::ostream& os)
         }
         
         // Stream once as hex
+        ios::fmtflags f(os.flags());
         os << std::left << std::setw(3 * rowlength) << hexify(buf, got, false);
         
         // and once as ASCII
         os << "| " << hexify(buf, got, true) << std::endl;
+        os.flags(f);
 
         toRead -= got;
     }

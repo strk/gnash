@@ -257,9 +257,11 @@ HTTPServer::processGetRequest(Handler *hand, int fd, cygnal::Buffer *buf)
 	struct timespec end;
 	clock_gettime (CLOCK_REALTIME, &end);
 	double time = (end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1e9);
+	ios::fmtflags f(cerr.flags());
 	cerr << "File " << _filespec
 	     << " transferred " << filesize << " bytes in: " << fixed
 	     << time << " seconds for net fd #" << fd << endl;
+	cerr.flags(f);
 #endif
     }
     

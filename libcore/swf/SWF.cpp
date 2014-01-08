@@ -405,7 +405,10 @@ operator<<(std::ostream& os, const abc_action_type& opcode)
         case ABC_ACTION_SWEEP: return os << "SWEEP";
         case ABC_ACTION_CODEGENOP: return os << "CODEGENOP";
         case ABC_ACTION_VERIFYOP: return os << "VERIFYOP";
-        default: return os << "UNKNOWN " << std::hex << +opcode;
+        default:
+            ios::fmtflags f(os.flags());
+            os << "UNKNOWN " << std::hex << +opcode;
+            os.flags(f);
     }
 }
 
