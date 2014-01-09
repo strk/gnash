@@ -30,14 +30,16 @@ class Renderer_agg_base : public Renderer
 {
 private:
     
-    unsigned char *_testBuffer, *_testBufferTmp; // buffers used by initTestBuffer() only
+    unsigned char *_testBuffer; // used by initTestBuffer() for testing
     
 public:
     
     Renderer_agg_base() : _testBuffer(0) { }  
     
     // virtual classes should have virtual destructors
-    virtual ~Renderer_agg_base() {}
+    virtual ~Renderer_agg_base() {
+        if ( _testBuffer ) free(_testBuffer);
+    }
     
     // these methods need to be accessed from outside:
     virtual void init_buffer(unsigned char *mem, int size, int x, int y,
@@ -50,12 +52,12 @@ public:
     virtual bool initTestBuffer(unsigned width, unsigned height) {
         int size = width * height * getBytesPerPixel();
         
-        _testBufferTmp = static_cast<unsigned char *>(realloc(_testBuffer, size));
-        if (_testBufferTmp == NULL) {
+        unsigned char *tmp = static_cast<unsigned char *>(realloc(_testBuffer, size));
+        if (tmp == NULL) {
             log_error(_("Memory reallocation error"));
             return false;
         } else {
-            _testBuffer = _testBufferTmp;
+            _testBuffer = tmp;
         }
 
         memset(_testBuffer, 0, size);
@@ -64,7 +66,7 @@ public:
         init_buffer(_testBuffer, size, width, height, width * getBytesPerPixel());
         
         return true;
-    }    
+    }
 };
 
 /// Create a render handler 
