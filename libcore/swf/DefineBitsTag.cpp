@@ -297,10 +297,6 @@ readDefineBitsJpeg(SWFStream& /*in*/, movie_definition& m)
 FileType
 checkFileType(SWFStream& in)
 {
-#ifndef NDEBUG
-    const size_t start = in.tell();
-#endif
-
     const size_t bytes = 3;
     char buf[bytes];
 
