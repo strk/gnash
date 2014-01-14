@@ -385,6 +385,7 @@ compile_actions(const char* fmt, ...)
 	tmp[BUFFER_SIZE-1] = '\0';
 
 	ac = compileSWFActionCode(tmp);
+	va_end (ap);
 	return ac;
 }
 
