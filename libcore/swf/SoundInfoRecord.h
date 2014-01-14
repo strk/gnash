@@ -39,7 +39,13 @@ struct SoundInfoRecord
     /// This SoundInfoRecord is not valid until read() has been called.
     SoundInfoRecord()
         :
+        noMultiple(false),
+        hasEnvelope(false),
+        hasLoops(false),
+        hasOutPoint(false),
+        hasInPoint(false),
         loopCount(0),
+        stopPlayback(false),
         inPoint(0),
         outPoint(std::numeric_limits<unsigned int>::max())
     {}
