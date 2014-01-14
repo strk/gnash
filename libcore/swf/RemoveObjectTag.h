@@ -46,7 +46,8 @@ public:
 
 	RemoveObjectTag()
 		:
-		DisplayListTag(-1)
+		DisplayListTag(-1),
+		_id(0)
 	{}
 
 	/// Read SWF::REMOVEOBJECT or SWF::REMOVEOBJECT2 
