@@ -185,7 +185,7 @@ lists are stored at http://mail.gnu.org/pipermail/:
       announced here. To subscribe, go to
       http://mail.gnu.org/mailman/listinfo/gnash and register. Volume is
       typically very low.
-    * gnash-commit@gnu.org is where summaries of changes commited to
+    * gnash-commit@gnu.org is where summaries of changes committed to
       the git repository are automatically posted. Register at
       http://mail.gnu.org/mailman/listinfo/gnash-commit to be informed of
       these changes as they happen. Volume may be high.
