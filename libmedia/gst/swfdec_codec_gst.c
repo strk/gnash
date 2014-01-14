@@ -308,11 +308,13 @@ swfdec_gst_decoder_init (SwfdecGstDecoder *dec, GstCaps *srccaps, GstCaps *sinkc
     GstElement *next = gst_element_factory_make (name, NULL);
     if (next == NULL) {
       SWFDEC_ERROR ("failed to create '%s' element", name);
+      va_end (args);
       return FALSE;
     }
     gst_bin_add (GST_BIN (dec->bin), next);
     if (!gst_element_link (decoder, next)) {
       SWFDEC_ERROR ("failed to link '%s' element to decoder", name);
+      va_end (args);
       return FALSE;
     }
     decoder = next;
