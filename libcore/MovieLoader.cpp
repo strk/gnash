@@ -45,6 +45,7 @@ namespace gnash {
 
 MovieLoader::MovieLoader(movie_root& mr)
     :
+    _killed(false),
     _movieRoot(mr),
     _thread(0),
     _barrier(2) // main and loader thread
