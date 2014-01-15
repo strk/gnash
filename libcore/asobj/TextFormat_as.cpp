@@ -406,6 +406,7 @@ textformat_new(const fn_call& fn)
 	{
 	    default:
 	        log_error(_("Too many args (%d) passed to TextFormat"), args);
+	        /* Fall through */
 	    case 13:
 	        tf->leadingSet(pixelsToTwips(toInt(fn.arg(12), getVM(fn))));
 	    case 12:

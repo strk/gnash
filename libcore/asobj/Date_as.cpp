@@ -463,6 +463,7 @@ date_new(const fn_call& fn)
                 log_aserror(_("Date constructor called with more than 7 "
                         "arguments"));
                 )
+                /* Fall through */
             case 7:
                 // fractions of milliseconds are ignored
                 gt.millisecond = toInt(fn.arg(6), getVM(fn));
@@ -1250,6 +1251,7 @@ date_UTC(const fn_call& fn) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("Date.UTC was called with more than 7 arguments"));
             )
+            /* Fall through */
         case 7:
             // millisecs is double, but fractions of millisecs are ignored.
             gt.millisecond = toInt(fn.arg(6), getVM(fn));

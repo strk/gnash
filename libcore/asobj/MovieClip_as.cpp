@@ -1118,6 +1118,7 @@ movieclip_getURL(const fn_call& fn)
                     "dropped"), os.str());
             );
         }
+            /* Fall through */
         case 3:
             // This argument has already been handled.
         case 2:

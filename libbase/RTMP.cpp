@@ -845,16 +845,20 @@ HandShaker::call()
         case 0:
             if (!stage0()) return;
             _stage = 1;
+            /* Fall through */
         case 1:
             if (!stage1()) return;
             _stage = 2;
+            /* Fall through */
         case 2:
             if (!stage2()) return;
             _stage = 3;
+            /* Fall through */
         case 3:
             if (!stage3()) return;
             log_debug("Handshake completed");
             _complete = true;
+	    break;
     }
 }
 
