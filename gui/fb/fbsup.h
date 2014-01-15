@@ -151,11 +151,11 @@ public:
 
     // Information for System.capabilities to be reimplemented in
     // each gui.
-    double getPixelAspectRatio() { return 0; }
+    double getPixelAspectRatio() const { return 0; }
     int getScreenResX() { return 0; }
     int getScreenResY() { return 0; }
-    double getScreenDPI() { return 0; }
-    std::string getScreenColor() { return ""; }
+    double getScreenDPI() const { return 0; }
+    std::string getScreenColor() const { return ""; }
 
     // For the framebuffer, these are mostly just stubs.
 
