@@ -709,6 +709,7 @@ FBGui::enable_terminal()
     if (ioctl(fd, VT_ACTIVATE, _original_vt)) {
         log_error(_("Could not activate VT number %d"), _original_vt);
         close(_fd);
+        _fd = -1;
         close(fd);
         return false;
     }
