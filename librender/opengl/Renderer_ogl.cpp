@@ -804,7 +804,7 @@ public:
 
       // Look for a texture with the same dimensions and type
       std::list< boost::shared_ptr<GnashTexture> >::iterator it;
-      for (it = _cached_textures.begin(); it != _cached_textures.end(); it++) {
+      for (it = _cached_textures.begin(); it != _cached_textures.end(); ++it) {
           if ((*it)->width() == frame->width() &&
               (*it)->height() == frame->height() &&
               (*it)->internal_format() == frameFormat.internal_format() &&

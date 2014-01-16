@@ -1336,7 +1336,7 @@ RTMPServer::sendToClient(std::vector<int> &fds, boost::uint8_t *data,
     size_t ret = 0;
     
     std::vector<int>::iterator it;
-    for (it=fds.begin(); it< fds.end(); it++) {
+    for (it=fds.begin(); it< fds.end(); ++it) {
 	ret = writeNet(data, size);
     }
     

@@ -165,7 +165,7 @@ CQue::remove(boost::shared_ptr<cygnal::Buffer> begin, boost::shared_ptr<cygnal::
     deque<boost::shared_ptr<cygnal::Buffer> >::iterator stop;
     boost::mutex::scoped_lock lock(_mutex);
     boost::shared_ptr<cygnal::Buffer> ptr;
-    for (it = _que.begin(); it != _que.end(); it++) {
+    for (it = _que.begin(); it != _que.end(); ++it) {
 	ptr = *(it);
 	if (ptr->reference() == begin->reference()) {
 	    start = it;
@@ -190,7 +190,7 @@ CQue::remove(boost::shared_ptr<cygnal::Buffer> element)
 	if (ptr->reference() == element->reference()) {
 	    it = _que.erase(it);
 	} else {
-	    it++;
+	    ++it;
 	}
     }
 }
@@ -265,7 +265,7 @@ CQue::dump()
     boost::mutex::scoped_lock lock(_mutex);
     std::cerr << std::endl << "CQue \"" << _name << "\" has "<< _que.size()
               << " buffers." << std::endl;
-    for (it = _que.begin(); it != _que.end(); it++) {
+    for (it = _que.begin(); it != _que.end(); ++it) {
 	boost::shared_ptr<cygnal::Buffer> ptr = *(it);
         ptr->dump();
     }

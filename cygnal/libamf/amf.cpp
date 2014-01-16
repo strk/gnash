@@ -189,7 +189,7 @@ AMF::encodeObject(const cygnal::Element &data)
     if (data.propertySize() > 0) {
 	std::vector<boost::shared_ptr<cygnal::Element> >::const_iterator ait;
 	std::vector<boost::shared_ptr<cygnal::Element> > props = data.getProperties();
-	for (ait = props.begin(); ait != props.end(); ait++) {
+	for (ait = props.begin(); ait != props.end(); ++ait) {
 	    boost::shared_ptr<cygnal::Element> el = (*(ait));
 	    boost::shared_ptr<cygnal::Buffer> item = AMF::encodeElement(el);
 	    if (item) {
@@ -348,7 +348,7 @@ AMF::encodeTypedObject(const cygnal::Element &data)
     if (data.propertySize() > 0) {
 	std::vector<boost::shared_ptr<cygnal::Element> >::const_iterator ait;
 	std::vector<boost::shared_ptr<cygnal::Element> > props = data.getProperties();
-	for (ait = props.begin(); ait != props.end(); ait++) {
+	for (ait = props.begin(); ait != props.end(); ++ait) {
 	    boost::shared_ptr<cygnal::Element> el = (*(ait));
 	    boost::shared_ptr<cygnal::Buffer> item = AMF::encodeElement(el);
 	    if (item) {
@@ -442,7 +442,7 @@ AMF::encodeECMAArray(const cygnal::Element &data)
 	boost::shared_ptr<cygnal::Buffer> item;
 	std::vector<boost::shared_ptr<cygnal::Element> >::const_iterator ait;    
 	std::vector<boost::shared_ptr<cygnal::Element> > props = data.getProperties();
-	for (ait = props.begin(); ait != props.end(); ait++) {
+	for (ait = props.begin(); ait != props.end(); ++ait) {
 	    boost::shared_ptr<cygnal::Element> el = (*(ait));
 	    if (sparse) {
 		sparse = false;
@@ -548,7 +548,7 @@ AMF::encodeStrictArray(const cygnal::Element &data)
 	std::vector<boost::shared_ptr<cygnal::Element> > props = data.getProperties();
 	bool sparse = false;
 	size_t counter = 0;
-	for (ait = props.begin(); ait != props.end(); ait++) {
+	for (ait = props.begin(); ait != props.end(); ++ait) {
 	    counter++;
 	    boost::shared_ptr<cygnal::Element> el = (*(ait));
 #if 0

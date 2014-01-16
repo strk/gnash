@@ -555,7 +555,7 @@ RTMP::dump()
     cerr << "RTMP packet contains " << _properties.size() << " variables." 
          << std::endl;
     AMFProperties::iterator it;
-    for (it = _properties.begin(); it != _properties.end(); it++) {
+    for (it = _properties.begin(); it != _properties.end(); ++it) {
 //	const char *name = it->first;
 	cygnal::Element el = it->second;
 	el.dump();

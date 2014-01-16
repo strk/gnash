@@ -431,7 +431,7 @@ nsPluginInstance::threadMain(void)
 
     VariableMap vars;
     gnash::URL::parse_querystring(url.querystring(), vars);
-    for (VariableMap::iterator i = vars.begin(), ie = vars.end(); i != ie; i++) {
+    for (VariableMap::iterator i = vars.begin(), ie = vars.end(); i != ie; ++i) {
         _flashVars[i->first] = i->second;
     }
 

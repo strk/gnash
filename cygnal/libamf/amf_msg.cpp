@@ -256,7 +256,7 @@ AMF_msg::encodeAMFPacket()
     // Now encode all the messages
 
     std::vector<boost::shared_ptr<AMF_msg::amf_message_t> >::iterator it;
-    for (it = _messages.begin(); it != _messages.end(); it++) {
+    for (it = _messages.begin(); it != _messages.end(); ++it) {
         boost::shared_ptr<AMF_msg::amf_message_t> msg = (*(it));
 
         boost::shared_ptr<cygnal::Buffer> buf2 = encodeMsgHeader(msg->header.target,
@@ -323,7 +323,7 @@ AMF_msg::dump()
 //    GNASH_REPORT_FUNCTION;
     cout << "AMF Packet has " << _messages.size() << " messages." << endl;
     std::vector<boost::shared_ptr<AMF_msg::amf_message_t> >::iterator it;
-    for (it = _messages.begin(); it != _messages.end(); it++) {
+    for (it = _messages.begin(); it != _messages.end(); ++it) {
         boost::shared_ptr<AMF_msg::amf_message_t> msg = (*(it));
         AMF_msg::dump(msg->header);
         msg->data->dump();

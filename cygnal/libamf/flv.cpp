@@ -312,7 +312,7 @@ Flv::findProperty(const std::string &name)
     if (_properties.size() > 0) {
 	std::vector<boost::shared_ptr<cygnal::Element> >::iterator ait;
 //	cerr << "# of Properties in object: " << _properties.size() << endl;
-	for (ait = _properties.begin(); ait != _properties.end(); ait++) {
+	for (ait = _properties.begin(); ait != _properties.end(); ++ait) {
 	    boost::shared_ptr<cygnal::Element> el = (*(ait));
 	    if (el->getName() == name) {
 		return el;
@@ -332,7 +332,7 @@ Flv::dump()
 	std::vector<boost::shared_ptr<cygnal::Element> >::iterator ait;
 	std::cerr << "# of Properties in object: " << _properties.size()
 	          << std::endl;
-	for (ait = _properties.begin(); ait != _properties.end(); ait++) {
+	for (ait = _properties.begin(); ait != _properties.end(); ++ait) {
 	    boost::shared_ptr<cygnal::Element> el = (*(ait));
             // an onMetaData packet of an FLV stream only contains number or
             // boolean bydefault

@@ -227,7 +227,7 @@ Cache::stats(bool xml) const
     }
     
     map<std::string, boost::shared_ptr<DiskStream> >::const_iterator data;
-    for (data = _files.begin(); data != _files.end(); data++) {
+    for (data = _files.begin(); data != _files.end(); ++data) {
 	const struct timespec *last = data->second->getLastAccessTime();
 	time = ((now.tv_sec - last->tv_sec) + ((now.tv_nsec - last->tv_nsec)/1e9));
 	if (xml) {
@@ -261,20 +261,20 @@ Cache::dump(std::ostream& os) const
     // Dump all the pathnames
     os << "Pathname cache has " << _pathnames.size() << " files." << endl;
     map<string, string>::const_iterator name;
-    for (name = _pathnames.begin(); name != _pathnames.end(); name++) {
+    for (name = _pathnames.begin(); name != _pathnames.end(); ++name) {
         os << "Full path for \"" << name->first << "\" is: " << name->second << endl;
     }
 
     // Dump the responses
     os << "Responses cache has " << _responses.size() << " files." << endl;
-    for (name = _responses.begin(); name != _responses.end(); name++) {
+    for (name = _responses.begin(); name != _responses.end(); ++name) {
         os << "Response for \"" << name->first << "\" is: " << name->second << endl;
     }
     
     os << "DiskStream cache has " << _files.size() << " files." << endl;
     
     map<std::string, boost::shared_ptr<DiskStream> >::const_iterator data;
-    for (data = _files.begin(); data != _files.end(); data++) {
+    for (data = _files.begin(); data != _files.end(); ++data) {
         boost::shared_ptr<DiskStream> filedata = data->second;
         os << "file info for \"" << data->first << "\" is: " << endl;
         filedata->dump();

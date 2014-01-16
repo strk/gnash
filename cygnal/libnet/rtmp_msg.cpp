@@ -129,13 +129,13 @@ RTMPMsg::checkStatus(boost::shared_ptr<cygnal::Element>  /* el */)
 	vector<boost::shared_ptr<cygnal::Element> >::iterator pit;
 	vector<boost::shared_ptr<cygnal::Element> >::iterator cit;
 //	cerr << "# of Properties in object" << _amfobjs.size() << endl;
-	for (pit = _amfobjs.begin(); pit != _amfobjs.end(); pit++) {
+	for (pit = _amfobjs.begin(); pit != _amfobjs.end(); ++pit) {
 	    boost::shared_ptr<cygnal::Element> el = (*(pit));
 	    std::vector<boost::shared_ptr<cygnal::Element> > props = el->getProperties();
 //  	    printf("FIXME2: %d, %s:%s\n", props.size(),
 //  		   props[2]->getName(), props[2]->to_string());
 	    if (el->getType() == Element::OBJECT_AMF0) {
-		for (cit = props.begin(); cit != props.end(); cit++) {
+		for (cit = props.begin(); cit != props.end(); ++cit) {
 		    boost::shared_ptr<cygnal::Element> child = (*(cit));
 //		    child->dump();
 		    std::string name = child->getName();
@@ -189,7 +189,7 @@ RTMPMsg::findProperty(const std::string &name)
     if (_amfobjs.size() > 0) {
 	vector<boost::shared_ptr<Element> >::iterator ait;
 //	cerr << "# of Properties in object: " << _properties.size() << endl;
-	for (ait = _amfobjs.begin(); ait != _amfobjs.end(); ait++) {
+	for (ait = _amfobjs.begin(); ait != _amfobjs.end(); ++ait) {
 	    boost::shared_ptr<cygnal::Element> el = (*(ait));
 	    boost::shared_ptr<cygnal::Element> prop = el->findProperty(name);
 	    if (prop) {
@@ -217,7 +217,7 @@ RTMPMsg::dump()
 
     vector<boost::shared_ptr<cygnal::Element> >::iterator ait;
     cerr << "# of Elements in file: " << _amfobjs.size() << endl;
-    for (ait = _amfobjs.begin(); ait != _amfobjs.end(); ait++) {
+    for (ait = _amfobjs.begin(); ait != _amfobjs.end(); ++ait) {
 	boost::shared_ptr<cygnal::Element> el = (*(ait));
         el->dump();
     }

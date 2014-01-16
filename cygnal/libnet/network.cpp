@@ -1282,7 +1282,7 @@ Network::erasePollFD(int fd)
     boost::mutex::scoped_lock lock(_poll_mutex);
     if (_pollfds.size() > 0) {
 	vector<struct pollfd>::iterator it;
-	for (it=_pollfds.begin(); it<_pollfds.end(); it++) {
+	for (it=_pollfds.begin(); it<_pollfds.end(); ++it) {
 	    if ((*it).fd == fd) {
 		_pollfds.erase(it);
 		break;

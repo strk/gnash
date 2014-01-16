@@ -67,7 +67,7 @@ void dump_callbacks(map<string, as_value> &calls)
 //    GNASH_REPORT_FUNCTION;
     map<string, as_value>::const_iterator it;
     dbglogfile << "# of callbacks is: " << calls.size() << endl;
-    for (it=calls.begin(); it != calls.end(); it++) {
+    for (it=calls.begin(); it != calls.end(); ++it) {
 	string name = (*it).first;
 	as_value as = (*it).second;
 	dbglogfile << "Event \"" << name.c_str() << "\" has AS function" << as.to_string() << endl;

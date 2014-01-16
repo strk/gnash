@@ -243,7 +243,7 @@ SOL::writeFile(const std::string &filespec, const std::string &name)
 	return false;
     }
 
-    for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
+    for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ++ita) {
         boost::shared_ptr<cygnal::Element> el = (*(ita));
 	size += el->getNameSize() + el->getDataSize() + 7;
     }
@@ -254,7 +254,7 @@ SOL::writeFile(const std::string &filespec, const std::string &name)
     ptr = body.get();
     char* endPtr = ptr+size+20; // that's the amount we allocated..
 
-    for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
+    for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ++ita) {
         boost::shared_ptr<Element> el = (*(ita));
         boost::shared_ptr<cygnal::Buffer> var = amf_obj.encodeProperty(el); 
         //  boost::uint8_t *var = amf_obj.encodeProperty(el, outsize); 
@@ -310,7 +310,7 @@ SOL::writeFile(const std::string &filespec, const std::string &name)
     memset(head.get(), 0, len);
     ptr = head.get();
     formatHeader(name);
-    for (it = _header.begin(); it != _header.end(); it++) {
+    for (it = _header.begin(); it != _header.end(); ++it) {
         *ptr++ = (*(it));
     }
     
@@ -445,7 +445,7 @@ SOL::updateSO(boost::shared_ptr<cygnal::Element> &newel)
 {
 //    GNASH_REPORT_FUNCTION;
     vector<boost::shared_ptr<cygnal::Element> >::iterator ita; 
-    for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
+    for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ++ita) {
         boost::shared_ptr<cygnal::Element> oldel = (*(ita));
 	if (oldel == newel) {
 	    oldel = newel;
@@ -475,7 +475,7 @@ SOL::dump()
     cerr << "The file name is: " << _filespec << endl;
     cerr << "The size of the file is: " << _filesize << endl;
     cerr << "The name of the object is: " << _objname << endl;
-    for (it = _amfobjs.begin(); it != _amfobjs.end(); it++) {
+    for (it = _amfobjs.begin(); it != _amfobjs.end(); ++it) {
 	boost::shared_ptr<cygnal::Element> el = (*(it));
         cerr << el->getName() << ": ";
         if (el->getType() == Element::STRING_AMF0) {

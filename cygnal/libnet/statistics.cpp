@@ -107,7 +107,7 @@ Statistics::dump() {
     boost::mutex::scoped_lock lock(io_mutex);
     std::list<NetStats *>::iterator it;
 
-    for (it = _netstats.begin(); it != _netstats.end(); it++) {
+    for (it = _netstats.begin(); it != _netstats.end(); ++it) {
         NetStats *stats = (*it);
         if (stats->getFileType() <= VIDEO) {
             log_debug (_("Stream type is: %s"), filetype_names[stats->getFileType()]);

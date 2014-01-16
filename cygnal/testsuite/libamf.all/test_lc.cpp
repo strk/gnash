@@ -191,7 +191,7 @@ test_listen()
     if (listeners->size() == 0) {
         cout << "Nobody is listening" << endl;
     } else {
-        for (it=listeners->begin(); it!=listeners->end(); it++) {
+        for (it=listeners->begin(); it!=listeners->end(); ++it) {
             string str = *it;
 	    if ((str[0] != ':') || (dbglogfile.getVerbosity() > 0)) {
 		cout << " Listeners: " << str << endl;
@@ -333,7 +333,7 @@ test_read()
     if (listeners->size() == 0) {
         cout << "Nobody is listening" << endl;
     } else {
-        for (it=listeners->begin(); it!=listeners->end(); it++) {
+        for (it=listeners->begin(); it!=listeners->end(); ++it) {
             string str = *it;
 	    if ((str[0] != ':') || (dbglogfile.getVerbosity() > 0)) {
 		cout << " Listeners: " << str << endl;
@@ -355,7 +355,7 @@ test_read()
     if (listeners->empty()) {
         cout << "Nobody is listening" << endl;
     } else {
-        for (it=listeners->begin(); it!=listeners->end(); it++) {
+        for (it=listeners->begin(); it!=listeners->end(); ++it) {
             string str = *it;
 	    if ((str[0] != ':') || (dbglogfile.getVerbosity() > 0)) {
 		cout << " Listeners: " << str << endl;

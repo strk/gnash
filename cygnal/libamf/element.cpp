@@ -968,7 +968,7 @@ Element::makeObject(std::vector<boost::shared_ptr<Element> > &data)
 //    GNASH_REPORT_FUNCTION;
     _type = Element::OBJECT_AMF0;
     std::vector<boost::shared_ptr<Element> >::const_iterator ait;
-    for (ait = data.begin(); ait != data.end(); ait++) {
+    for (ait = data.begin(); ait != data.end(); ++ait) {
 	boost::shared_ptr<Element> el = (*(ait));
 	addProperty(el);
 //	el->dump(os);
@@ -1556,7 +1556,7 @@ Element::dump(std::ostream& os) const
     if (_properties.size() > 0) {
 	std::vector<boost::shared_ptr<Element> >::const_iterator ait;
 	os << "# of Properties in object: " << _properties.size() << std::endl;
-	for (ait = _properties.begin(); ait != _properties.end(); ait++) {
+	for (ait = _properties.begin(); ait != _properties.end(); ++ait) {
 	    const boost::shared_ptr<Element> el = (*(ait));
 	    el->dump(os);
 	}
@@ -1575,7 +1575,7 @@ Element::findProperty(const std::string &name)
     if (_properties.size() > 0) {
 	std::vector<boost::shared_ptr<Element> >::iterator ait;
 //	cerr << "# of Properties in object: " << _properties.size() << endl;
-	for (ait = _properties.begin(); ait != _properties.end(); ait++) {
+	for (ait = _properties.begin(); ait != _properties.end(); ++ait) {
 	    boost::shared_ptr<Element> el = (*(ait));
 	    if (el->getName() == name) {
 		return el;

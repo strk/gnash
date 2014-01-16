@@ -615,7 +615,7 @@ LcShm::send(const string&  name , const string&  domainname ,
 // Put this value into the header if necessary.
       int message_size=0;
       if (data.size()!=0){	
-		   for(iter = data.begin(); iter != data.end(); iter++){
+		   for(iter = data.begin(); iter != data.end(); ++iter){
 			    boost::shared_ptr<Buffer> buf = AMF::encodeElement(*iter);									
 				message_size+=buf->size();
 			}
@@ -659,7 +659,7 @@ LcShm::send(const string&  name , const string&  domainname ,
 
   	log_debug(_(" ***** The size of the data is %s *****"),data.size() ); 
       if (data.size()==0){	    	  
-		   for(iter = data.begin(); iter != data.end(); iter++){
+		   for(iter = data.begin(); iter != data.end(); ++iter){
 				// temporary buf for element
 				boost::shared_ptr<Buffer> buf = AMF::encodeElement(*iter);		
 				memcpy(ptr, buf->begin(), buf->size() );
@@ -789,7 +789,7 @@ LcShm::dump()
     cerr << "Domain Allowed:\t\t" << ((_object.domain) ? "true" : "false") << endl;
     vector<boost::shared_ptr<Element> >::iterator ait;
     cerr << "# of Elements in file: " << _amfobjs.size() << endl;
-    for (ait = _amfobjs.begin(); ait != _amfobjs.end(); ait++) {
+    for (ait = _amfobjs.begin(); ait != _amfobjs.end(); ++ait) {
 	boost::shared_ptr<Element> el = (*(ait));
         el->dump();
     }
@@ -797,7 +797,7 @@ LcShm::dump()
     vector<string>::const_iterator lit;
     auto_ptr< vector<string> > listeners ( listListeners() );
     cerr << "# of Listeners in file: " << listeners->size() << endl;
-    for (lit=listeners->begin(); lit!=listeners->end(); lit++) {
+    for (lit=listeners->begin(); lit!=listeners->end(); ++lit) {
         string str = *lit;
         if (str[0] != ':') {
             cerr << "Listeners:\t" << str << endl;
