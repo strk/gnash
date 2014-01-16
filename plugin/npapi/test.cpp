@@ -439,7 +439,7 @@ NPN_GetProperty(NPP, NPObject* , NPIdentifier name,
     std::map<NPIdentifier, NPVariant *>::iterator it;
     it = _properties.find(name);
     if (it == _properties.end()) return false;
-    value = it->second;
+    *value = it->second;
     return true;
 }
 
