@@ -136,6 +136,7 @@ testsuite/misc-ming.all/static_vs_dynamic1
 testsuite/misc-ming.all/static_vs_dynamic2
 testsuite/misc-ming.all/*.swf
 testsuite/misc-ming.all/XMLSocketTester
+testsuite/misc-ming.all/sound/*.swf
 testsuite/misc-mtasc.all/pp_*.as
 testsuite/misc-mtasc.all/*.swf
 testsuite/misc-swfc.all/pp_*.sc
@@ -155,4 +156,5 @@ utilities/flvdumper
 utilities/gprocessor
 utilities/rtmpget
 utilities/soldumper
+extensions/fileio/test
 extensions/fileio/test.swf
