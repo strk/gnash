@@ -133,10 +133,10 @@ if test ${total_fail} -gt 0 || test ${total_xpass} -gt 0; then
 			echo
 			echo "Non time-related failures follow:"
 			grep -vf $timing ${timing}.tmp
-			rm -f ${timing}.tmp
-			exit 1
 		fi
 	fi
+	rm -f ${timing}.tmp
+	exit 1
 else
 	exit 0
 fi
