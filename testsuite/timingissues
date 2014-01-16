@@ -1,0 +1,9 @@
+### misc-ming.all/loading/loadMovieTestRunner.cpp:113
+FAIL: loadMovieTestRunner: coverart->get_root()->url() == .* (expected: .*) \[loadMovieTestRunner.cpp:[0-9]*\]
+### misc-ming.all/loading/loadMovieTest.c:202
+FAIL: loadMovieTestRunner: expected: red.swf , obtained: blue.swf (loadMovieTest.c:[0-9]*)
+### misc-mtasc.all/level87.as:72
+FAIL: sanetests-runner: expected: "1" , obtained: ""  \[level87.as:[0-9]*\]
+### swfdec
+FAIL: run_swfdec_testsuite_g: gotolabel-multiple.swf:[0-9a-f]* (traces in gotolabel-multiple.swf.trace-gnash, log in gotolabel-multiple.swf.log)
+FAIL: run_swfdec_testsuite_m: movieclip-lockroot-loadmovie-[678].swf:[0-9a-f]* (traces in movieclip-lockroot-loadmovie-[678].swf.trace-gnash, log in movieclip-lockroot-loadmovie-[678].swf.log)

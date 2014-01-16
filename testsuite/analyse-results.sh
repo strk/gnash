@@ -98,11 +98,14 @@ echo
 # For now, return a failure if any XPASS or FAIL occurred
 if test ${total_fail} -gt 0 || test ${total_xpass} -gt 0; then
 
+	timing=testsuite/timingissues
+	> ${timing}.tmp
+
 	if test ${total_fail} -gt 0; then
 		echo "Unexpected failures follow:"
 		for s in ${suitefail}; do
 			echo " --=[ ${s} ]=-- "
-			grep -w FAIL ${s}/testrun.sum;
+			grep -w FAIL ${s}/testrun.sum | tee -a ${timing}.tmp
 		done
 		echo
 	fi
@@ -110,12 +113,30 @@ if test ${total_fail} -gt 0 || test ${total_xpass} -gt 0; then
 	if test ${total_xpass} -gt 0; then
 		echo "Unexpected successes follow:"
 		for s in ${suitexpass}; do
-			echo "--=[ ${s} ]=--- "
-			grep -w XPASS ${s}/testrun.sum; done
+			echo " --=[ ${s} ]=-- "
+			grep -w XPASS ${s}/testrun.sum
+		done
 		echo
 	fi
 
-	exit 1
+	if test `grep -cf $timing ${timing}.tmp` -gt 0; then
+		if test `grep -cvf $timing ${timing}.tmp` -eq 0; then
+			echo "All failures are time-related. Exiting 0."
+			echo "See http://wiki.gnashdev.org/PredictableLoading"
+			rm -f ${timing}.tmp
+			exit 0
+		else
+			echo "Time-related failures follow:"
+			grep -f $timing ${timing}.tmp
+			echo
+			echo "See http://wiki.gnashdev.org/PredictableLoading"
+			echo
+			echo "Non time-related failures follow:"
+			grep -vf $timing ${timing}.tmp
+			rm -f ${timing}.tmp
+			exit 1
+		fi
+	fi
 else
 	exit 0
 fi

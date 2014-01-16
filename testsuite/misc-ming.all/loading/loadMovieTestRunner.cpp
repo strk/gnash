@@ -109,6 +109,8 @@ clickCycle(MovieClip* coverart)
 
 	tester->pressMouseButton();
 
+	// TODO: fix predictability
+	// see http://wiki.gnashdev.org/PredictableLoading
 	coverart = waitForLoad(coverart);
 	check_equals(coverart->get_root()->url(), redURL.str());
 

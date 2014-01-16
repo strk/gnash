@@ -64,6 +64,9 @@ class Level87
 
     check(_level0.frameno >= 2);
 
+    // TODO: fix predictability
+    // see http://wiki.gnashdev.org/PredictableLoading
+    //
     // This one fails because gnash is executing code
     // in level99 before code in the first load of level87,
     // probably because it is *loading* level99 before level87,
