@@ -585,6 +585,7 @@ FBGui::disable_terminal()
     if (ioctl(fd, VT_GETSTATE, &vts) == -1) {
         log_error(_("Could not get current VT state"));
         close(_fd);
+        _fd = -1;
         close(fd);
         return false;
     }
