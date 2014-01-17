@@ -24,8 +24,9 @@ file = new FileIO();
 // test stdio first
 
 buf = "Hello World!\n";
+fname = "/tmp/gnash_fileio_ext_test";
 
-if (file.fopen("/tmp/x", "w+")) {
+if (file.fopen(fname, "w+")) {
     pass("FileIO::open()");
 } else {
     fail("FileIO::open()");
@@ -111,5 +112,11 @@ if (file.puts(buf)) {
 // }
 //trace(b);
 
+var ret = file.unlink(fname);
+if ( true === ret ) {
+  pass("FileIO::unlink()");
+} else {
+  fail("FileIO::unlink(" + fname + ") returned " + ret);
+}
 
 totals();
