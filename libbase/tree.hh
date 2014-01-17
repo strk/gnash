@@ -9,7 +9,7 @@
 // version 2 applies. Special permission to use tree.hh under
 // the LGPL for other projects can be requested from the author.
 
-/** \mainpage tree.hh
+/** \page tree.hh
     \author   Kasper Peeters
     \version  2.81
     \date     23-Aug-2011
@@ -2780,7 +2780,3 @@ typename tree<T, tree_node_allocator>::leaf_iterator& tree<T, tree_node_allocato
    }
 
 #endif
-
-// Local variables:
-// default-tab-width: 3
-// End:
