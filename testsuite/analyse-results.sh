@@ -123,6 +123,7 @@ if test ${total_fail} -gt 0 || test ${total_xpass} -gt 0; then
 		if test `grep -cvf $timing ${timing}.tmp` -eq 0; then
 			echo "All failures are time-related. Exiting 0."
 			echo "See http://wiki.gnashdev.org/PredictableLoading"
+			echo
 			rm -f ${timing}.tmp
 			exit 0
 		else
@@ -133,6 +134,7 @@ if test ${total_fail} -gt 0 || test ${total_xpass} -gt 0; then
 			echo
 			echo "Non time-related failures follow:"
 			grep -vf $timing ${timing}.tmp
+			echo
 		fi
 	fi
 	rm -f ${timing}.tmp
