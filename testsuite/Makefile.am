@@ -105,6 +105,7 @@ EXTRA_DIST = check.h \
 	generic-testrunner.sh \
 	gst_install_plugins_helper.sh \
 	simultaneous-testrunner.sh \
+	timingissues \
 	XmlSocketServer.pl \
 	dejagnu.h
 
