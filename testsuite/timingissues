@@ -1,6 +1,6 @@
 ### misc-ming.all/loading/loadMovieTestRunner.cpp:113
 FAIL: loadMovieTestRunner: coverart->get_root()->url() == .* (expected: .*) \[loadMovieTestRunner.cpp:[0-9]*\]
-FAIL: loadMovieTestRunner: expected: red.swf , obtained: blue.swf (loadMovieTest.c:[0-9]*)
+FAIL: loadMovieTestRunner: expected: \(red.swf\|blue.swf\|green.jpg\) , obtained: \(red.swf\|blue.swf\|green.jpg\) (loadMovieTest.c:[0-9]*)
 ### misc-ming.all - network tests
 FAIL: XMLSocketTester: consistency check: last trace from run of test  (.*) doesn't match pattern (ENDOFTEST)
 FAIL: rtmpytest-runner: consistency check: last trace from run of test rtmpytest.swf (Connecting to rtmp://www.gnashdev.org:9984/rtmpyecho) doesn't match pattern (ENDOFTEST)
