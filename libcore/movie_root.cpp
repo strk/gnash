@@ -1626,7 +1626,11 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         MovieClip *mc = getLevel(0);
         int loaded = mc->get_bytes_loaded();
         int total = mc->get_bytes_total();
-        as_value val((loaded/total) * 100);
+        int percent = 0;
+        if (total > 0) { /* avoid division by zero */
+          percent = 100 * loaded / total;
+        }
+        as_value val(percent);
         // PercentLoaded sends the percentage
         ss << ExternalInterface::toXML(val);    
     } else if (invoke->name == "Play") {
