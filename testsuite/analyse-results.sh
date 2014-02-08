@@ -98,7 +98,7 @@ echo
 # For now, return a failure if any XPASS or FAIL occurred
 if test ${total_fail} -gt 0 || test ${total_xpass} -gt 0; then
 
-	timing=testsuite/timingissues
+	timing=$(dirname $0)/testsuite/timingissues
 	> ${timing}.tmp
 
 	if test ${total_fail} -gt 0; then
