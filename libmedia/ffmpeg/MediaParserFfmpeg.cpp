@@ -492,7 +492,7 @@ MediaParserFfmpeg::initializeParser()
         boost::uint16_t width = _videoStream->codec->width;
         boost::uint16_t height = _videoStream->codec->height;
         boost::uint16_t frameRate = static_cast<boost::uint16_t>(
-                as_double(_videoStream->r_frame_rate));
+                as_double(_videoStream->avg_frame_rate));
 #if !defined(HAVE_LIBAVFORMAT_AVFORMAT_H) && !defined(HAVE_FFMPEG_AVCODEC_H)
         boost::uint64_t duration = _videoStream->codec_info_duration;
 #else

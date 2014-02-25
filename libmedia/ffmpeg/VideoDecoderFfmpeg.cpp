@@ -131,7 +131,7 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg(const VideoInfo& info)
     _videoCodec(NULL)
 {
 
-    CODECID codec_id = CODEC_ID_NONE;
+    CODECID codec_id = AV_CODEC_ID_NONE;
 
     if ( info.type == CODEC_TYPE_FLASH )
     {
@@ -140,7 +140,7 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg(const VideoInfo& info)
     else codec_id = static_cast<CODECID>(info.codec);
 
     // This would cause nasty segfaults.
-    if (codec_id == CODEC_ID_NONE)
+    if (codec_id == AV_CODEC_ID_NONE)
     {
         boost::format msg = boost::format(_("Cannot find suitable "
                 "decoder for flash codec %d")) % info.codec;
@@ -266,7 +266,7 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
     const int height = srcCtx->height;
 
 #ifdef FFMPEG_VP6A
-    PixelFormat pixFmt = (srcCtx->codec->id == CODEC_ID_VP6A) ?
+    PixelFormat pixFmt = (srcCtx->codec->id == AV_CODEC_ID_VP6A) ?
         PIX_FMT_RGBA : PIX_FMT_RGB24;
 #else 
     PixelFormat pixFmt = PIX_FMT_RGB24;
@@ -368,7 +368,7 @@ VideoDecoderFfmpeg::decode(const boost::uint8_t* input,
 
     std::auto_ptr<image::GnashImage> ret;
 
-    AVFrame* frame = avcodec_alloc_frame();
+    AVFrame* frame = FRAMEALLOC();
     if ( ! frame ) {
         log_error(_("Out of memory while allocating avcodec frame"));
         return ret;
@@ -436,23 +436,23 @@ VideoDecoderFfmpeg::flashToFfmpegCodec(videoCodecType format)
         // Find the decoder and init the parser
         switch(format) {
                 case VIDEO_CODEC_H264:
-                         return CODEC_ID_H264;
+                         return AV_CODEC_ID_H264;
                 case VIDEO_CODEC_H263:
-			 // CODEC_ID_H263I didn't work with Lavc51.50.0
+			 // AV_CODEC_ID_H263I didn't work with Lavc51.50.0
 			 // and NetStream-SquareTest.swf
-                         return CODEC_ID_FLV1;
+                         return AV_CODEC_ID_FLV1;
                 case VIDEO_CODEC_VP6:
-                        return CODEC_ID_VP6F;
+                        return AV_CODEC_ID_VP6F;
 #ifdef FFMPEG_VP6A
                 case VIDEO_CODEC_VP6A:
-	                return CODEC_ID_VP6A;
+	                return AV_CODEC_ID_VP6A;
 #endif
                 case VIDEO_CODEC_SCREENVIDEO:
-                        return CODEC_ID_FLASHSV;
+                        return AV_CODEC_ID_FLASHSV;
                 default:
                         log_error(_("Unsupported video codec %d"),
                                 static_cast<int>(format));
-                        return CODEC_ID_NONE;
+                        return AV_CODEC_ID_NONE;
         }
 }
 

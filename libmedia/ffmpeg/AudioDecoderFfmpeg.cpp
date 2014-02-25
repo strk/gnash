@@ -89,17 +89,17 @@ void AudioDecoderFfmpeg::setup(SoundInfo& info)
 
     switch(info.getFormat()) {
         case AUDIO_CODEC_RAW:
-            codec_id = CODEC_ID_PCM_U16LE;
+            codec_id = AV_CODEC_ID_PCM_U16LE;
             break;
         case AUDIO_CODEC_ADPCM:
-            codec_id = CODEC_ID_ADPCM_SWF;
+            codec_id = AV_CODEC_ID_ADPCM_SWF;
             break;
         case AUDIO_CODEC_MP3:
-            codec_id = CODEC_ID_MP3;
+            codec_id = AV_CODEC_ID_MP3;
             _needsParsing=true;
             break;
         case AUDIO_CODEC_AAC:
-            codec_id = CODEC_ID_AAC;
+            codec_id = AV_CODEC_ID_AAC;
             _needsParsing=true;
             break;
         default:
@@ -157,10 +157,10 @@ void AudioDecoderFfmpeg::setup(SoundInfo& info)
     /// @todo do this only if !_needsParsing ?
     switch (_audioCodecCtx->codec->id)
     {
-            case CODEC_ID_MP3:
+            case AV_CODEC_ID_MP3:
                 break;
 
-            case CODEC_ID_PCM_U16LE:
+            case AV_CODEC_ID_PCM_U16LE:
                 _audioCodecCtx->channels = (info.isStereo() ? 2 : 1);
                 _audioCodecCtx->sample_rate = info.getSampleRate();
                 _audioCodecCtx->sample_fmt = AV_SAMPLE_FMT_S16; // ?! arbitrary ?
@@ -184,7 +184,7 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 #endif
     avcodec_register_all();// change this to only register need codec?
 
-    enum CODECID codec_id = CODEC_ID_NONE;
+    enum CODECID codec_id = AV_CODEC_ID_NONE;
 
     if (info.type == CODEC_TYPE_CUSTOM)
     {
@@ -198,22 +198,22 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
             case AUDIO_CODEC_UNCOMPRESSED:
             case AUDIO_CODEC_RAW:
                 if (info.sampleSize == 2) {
-                    codec_id = CODEC_ID_PCM_S16LE;
+                    codec_id = AV_CODEC_ID_PCM_S16LE;
                 } else {
-                    codec_id = CODEC_ID_PCM_S8;
+                    codec_id = AV_CODEC_ID_PCM_S8;
                 }
                 break;
 
             case AUDIO_CODEC_ADPCM:
-                codec_id = CODEC_ID_ADPCM_SWF;
+                codec_id = AV_CODEC_ID_ADPCM_SWF;
                 break;
 
             case AUDIO_CODEC_MP3:
-                codec_id = CODEC_ID_MP3;
+                codec_id = AV_CODEC_ID_MP3;
                 break;
 
             case AUDIO_CODEC_AAC:
-                codec_id = CODEC_ID_AAC;
+                codec_id = AV_CODEC_ID_AAC;
                 break;
 
 #ifdef FFMPEG_NELLYMOSER
@@ -221,7 +221,7 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
             //       (but probably not Ffmpeg's fault, he said)
             //       I'd like to take a look at the testcase --strk
             case AUDIO_CODEC_NELLYMOSER:
-                codec_id = CODEC_ID_NELLYMOSER;
+                codec_id = AV_CODEC_ID_NELLYMOSER;
                 break;
 #endif
 
@@ -292,15 +292,15 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
     //       some of the variables
     switch (codec_id)
     {
-            case CODEC_ID_MP3:
+            case AV_CODEC_ID_MP3:
                 break;
 
-            case CODEC_ID_PCM_S8:
+            case AV_CODEC_ID_PCM_S8:
                 // Either FFMPEG or the parser are getting this wrong.
                 _audioCodecCtx->sample_rate = info.sampleRate / 2;
                 _audioCodecCtx->channels = (info.stereo ? 2 : 1);
                 break;
-            case CODEC_ID_PCM_S16LE:
+            case AV_CODEC_ID_PCM_S16LE:
                 _audioCodecCtx->channels = (info.stereo ? 2 : 1);
                 _audioCodecCtx->sample_rate = info.sampleRate;
                 break;
@@ -500,7 +500,7 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
     av_init_packet(&pkt);
     pkt.data = const_cast<uint8_t*>(input);
     pkt.size = inputSize;
-    ScopedPtr<AVFrame> frm ( avcodec_alloc_frame(), av_free );
+    ScopedPtr<AVFrame> frm ( FRAMEALLOC(), av_free );
     if (!frm.get()) {
         log_error(_("failed to allocate frame."));
         return NULL;
