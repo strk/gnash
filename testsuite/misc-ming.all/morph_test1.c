@@ -95,7 +95,14 @@ main(int argc, char** argv)
      it = SWFMovie_add(mo, (SWFBlock)morph);
      SWFDisplayItem_setRatio(it, ratio);
      SWFMovie_nextFrame(mo);     
-  }  
+  }
+
+  /* Test for #39989 by adding an empty morph shape. */
+  morph = newSWFMorphShape();
+  startShape = SWFMorph_getShape1(morph);
+  endShape = SWFMorph_getShape2(morph);
+  it = SWFMovie_add(mo, (SWFBlock)morph);
+  SWFMovie_nextFrame(mo);
   
   //Output movie
   puts("Saving " OUTPUT_FILENAME );
