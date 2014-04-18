@@ -11,4 +11,4 @@ FAIL: sanetests-runner: expected: "1" , obtained: ""  \[level87.as:[0-9]*\]
 ### swfdec
 FAIL: run_swfdec_testsuite_g: gotolabel-multiple.swf:[0-9a-f]* (traces in gotolabel-multiple.swf.trace-gnash, log in gotolabel-multiple.swf.log)
 FAIL: run_swfdec_testsuite_m: movieclip-lockroot-loadmovie-[678].swf:[0-9a-f]* (traces in movieclip-lockroot-loadmovie-[678].swf.trace-gnash, log in movieclip-lockroot-loadmovie-[678].swf.log)
-FAIL: run_swfdec_testsuite_m: movieclip-version-8.swf:[0-9a-f]* (traces in movieclip-version-8.swf.trace-gnash, log in movieclip-version-8.swf.log)
+FAIL: run_swfdec_testsuite_m: movieclip-version-[678].swf:[0-9a-f]* (traces in movieclip-version-[678].swf.trace-gnash, log in movieclip-version-[678].swf.log)
