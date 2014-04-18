@@ -2288,13 +2288,13 @@ if test x"$testsuite" = x"yes"; then
   GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
 fi
 
-GNASH_PKG_FIND(speex, [speex.h], [speex audio codec], speex_decode_int)
+GNASH_PKG_FIND(speex, [speex/speex.h], [speex audio codec], speex_decode_int)
 AM_CONDITIONAL(HAVE_SPEEX, [ test x$has_speex = xyes ])
 if test x$has_speex = xyes ; then
   AC_DEFINE([DECODING_SPEEX], [1], [Speex codec available])
 fi
 
-GNASH_PKG_FIND(speexdsp, [speex_resampler.h], [speex DSP utilities], speex_resampler_process_int)
+GNASH_PKG_FIND(speexdsp, [speex/speex_resampler.h], [speex DSP utilities], speex_resampler_process_int)
 if test x$has_speexdsp = xyes ; then
   AC_DEFINE([RESAMPLING_SPEEX], [1], [Speex resampler available])
 fi
