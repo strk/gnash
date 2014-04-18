@@ -276,9 +276,6 @@ a.onEnterFrame = function()
 {
 	if ( ++frameno > 8 )
 	{
-                // #40315: test that we don't crash without a line style.
-                this.b.lineTo(10, 20);
-
 		//this.clear();
 		frameno = 0;
 		ret = delete this.onEnterFrame;
@@ -290,6 +287,8 @@ a.onEnterFrame = function()
 	}
 	else
 	{
+                // #40315: test that we don't crash without a line style.
+                this.b.lineTo(10, 20);
 
 		this.b.clear();
 		this.b.lineStyle(2, 0xFF0000);
