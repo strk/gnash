@@ -5,7 +5,7 @@ FAIL: loadMovieTestRunner: expected: \(red.swf\|blue.swf\|green.jpg\) , obtained
 FAIL: XMLSocketTester: consistency check: last trace from run of test  (.*) doesn't match pattern (ENDOFTEST)
 FAIL: rtmpytest-runner: consistency check: last trace from run of test rtmpytest.swf (Connecting to rtmp://www.gnashdev.org:9984/rtmpyecho) doesn't match pattern (ENDOFTEST)
 FAIL: oflaDemo-runner: Tests run 34 (expected 17) [undefined]
-FAIL: LCTestRunner: consistency check: last trace from run of test  (.*) doesn't match pattern (ENDOFTEST)
+## FAIL: LCTestRunner: consistency check: last trace from run of test  (.*) doesn't match pattern (ENDOFTEST)
 ### misc-mtasc.all/level87.as:72
 FAIL: sanetests-runner: expected: "1" , obtained: ""  \[level87.as:[0-9]*\]
 ### swfdec
