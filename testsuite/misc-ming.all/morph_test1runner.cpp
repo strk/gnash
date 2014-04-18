@@ -50,7 +50,7 @@ main(int /*argc*/, char** /*argv*/)
 
   MovieClip* root = tester.getRootMovie();
   assert(root);
-  check_equals(root->get_frame_count(), 7);
+  check_equals(root->get_frame_count(), 8);
   
   // FRAME 2 
   tester.advance(); 
