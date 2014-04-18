@@ -28,7 +28,7 @@
 # ifndef HAVE_func
 #  define dummystr(x) # x
 #  define dummyestr(x) dummystr(x)
-#  define __FUNCTION__ __FILE__":"dummyestr(__LINE__)
+#  define __FUNCTION__ __FILE__ ":" dummyestr(__LINE__)
 # else
 #  define __FUNCTION__ __func__	
 # endif
