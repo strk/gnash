@@ -152,7 +152,7 @@ DynamicShape::finalize() const
 	// This function being const seems to be at odds with its purpose...
 	_shape.addSubshape(_currsubshape);
 
-	_currsubshape.clear();
+	_currsubshape.paths().clear(); // Retain style info
 
 	// TODO: check consistency of fills and such !
 

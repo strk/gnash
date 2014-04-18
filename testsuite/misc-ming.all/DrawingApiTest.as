@@ -287,6 +287,9 @@ a.onEnterFrame = function()
 	}
 	else
 	{
+                // #40315: test that we don't crash without a line style.
+                this.b.lineTo(10, 20);
+
 		this.b.clear();
 		this.b.lineStyle(2, 0xFF0000);
 		this.b.beginFill(0xFFFF00, 100);
