@@ -409,13 +409,17 @@ EventDevice::check()
                 _input_data.rz = ev->value;
                 break;
             case REL_HWHEEL:
-                log_debug(_("REL_HWHEEL: %d"), ev->value);
+                log_unimpl(_("REL_HWHEEL: %d"), ev->value);
+                break;
             case REL_DIAL:
-                log_debug(_("REL_DIAL: %d"), ev->value);
+                log_unimpl(_("REL_DIAL: %d"), ev->value);
+                break;
             case REL_WHEEL:
-                log_debug(_("REL_WHEEL: %d"), ev->value);
+                log_unimpl(_("REL_WHEEL: %d"), ev->value);
+                break;
             case REL_MISC:
-                log_debug(_("REL_MISC: %d"), ev->value);
+                log_unimpl(_("REL_MISC: %d"), ev->value);
+                break;
             default:
                 log_unimpl(_("Relative move event %d from Input Event Device"),
                            ev->value);
