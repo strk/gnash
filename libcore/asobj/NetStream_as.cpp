@@ -673,10 +673,6 @@ NetStream_as::decodeNextAudioFrame()
 {
     assert (_parser.get());
 
-    // TODO: make the buffer cursored later ?
-    BufferedAudioStreamer::CursoredBuffer* raw =
-        new BufferedAudioStreamer::CursoredBuffer();
-
 #ifdef USE_MEDIA
     std::auto_ptr<media::EncodedAudioFrame> frame = _parser->nextAudioFrame(); 
     if (!frame.get()) {
@@ -687,6 +683,10 @@ NetStream_as::decodeNextAudioFrame()
 #endif
         return 0;
     }
+
+    // TODO: make the buffer cursored later ?
+    BufferedAudioStreamer::CursoredBuffer* raw =
+        new BufferedAudioStreamer::CursoredBuffer();
 
     raw->m_data = _audioDecoder->decode(*frame, raw->m_size);
 
