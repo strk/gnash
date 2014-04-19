@@ -1,0 +1,1286 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+msgid ""
+msgstr ""
+"Project-Id-Version: gnash VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-01-01 09:28-0700\n"
+"PO-Revision-Date: 2014-04-19 22:52+0200\n"
+"Last-Translator: Petter Reinholdtsen <pere@hungry.com>\n"
+"Language-Team: Norwegian Bokmål <i18n-no@lister.ping.uio.no>\n"
+"Language: nb\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Pootle 2.0.5\n"
+
+#: libcore/movie_root.cpp:1676 gui/Player.cpp:713
+#, c-format
+msgid "Could not write to user-provided host requests fd %d: %s"
+msgstr ""
+
+#: libdevice/egl/eglDevice.cpp:209 libdevice/egl/eglDevice.cpp:544
+#: gui/gtk/gtk_glue_ovg.cpp:383
+#, c-format
+msgid "eglGetConfigs() failed to retrieve the number of configs (error %s)"
+msgstr ""
+
+#: libdevice/egl/eglDevice.cpp:214 libdevice/egl/eglDevice.cpp:549
+#: gui/gtk/gtk_glue_ovg.cpp:388
+msgid "No EGLconfigs found\n"
+msgstr "Fant ikke EGLconfigs\n"
+
+#: libdevice/egl/eglDevice.cpp:556 gui/gtk/gtk_glue_ovg.cpp:395
+msgid "Out of memory\n"
+msgstr "Fritt for minne\n"
+
+#: libdevice/egl/eglDevice.cpp:561 gui/gtk/gtk_glue_ovg.cpp:400
+#, c-format
+msgid "eglGetConfigs() failed to retrive the configs (error %s)"
+msgstr ""
+
+#: utilities/processor.cpp:456 utilities/processor.cpp:459
+#: gui/pythonmod/gnash-view.cpp:438 gui/pythonmod/gnash-view.cpp:441
+#, c-format
+msgid "%s appended to local sandboxes"
+msgstr "$s lagt til lokale sandkasser"
+
+#: gui/fb/fb.cpp:229
+#, c-format
+msgid "No renderer! %s not supported."
+msgstr ""
+
+#: gui/fb/fb.cpp:240
+msgid "Found no accessible User mode input event device"
+msgstr ""
+
+#: gui/fb/fb.cpp:249
+msgid "Found no accessible input event devices"
+msgstr ""
+
+#: gui/fb/fb.cpp:262
+msgid "WARNING: Mouse support may conflict with the input event support."
+msgstr ""
+
+#: gui/fb/fb.cpp:276
+msgid "Enabling Touchscreen support."
+msgstr ""
+
+#: gui/fb/fb.cpp:281
+msgid "WARNING: Babbage Tablet support disabled as it conflicts with TSlib"
+msgstr ""
+
+#: gui/fb/fb.cpp:283
+msgid "Enabling Babbage Touchscreen support"
+msgstr ""
+
+#: gui/fb/fb.cpp:288
+msgid "Enabling Power Button support"
+msgstr ""
+
+#: gui/fb/fb.cpp:368
+#, c-format
+msgid "Movie Frame Rate is %d, adjusting delay to %dms"
+msgstr ""
+
+#: gui/fb/fb.cpp:462
+msgid "This GUI does not yet support menus"
+msgstr ""
+
+#: gui/fb/fb.cpp:468
+msgid "This GUI does not yet support a mouse pointer"
+msgstr "Dette grafiske grensesnittet støtter ennå ikke en muspeker"
+
+#: gui/fb/fb.cpp:539
+msgid "Could not detect controlling TTY"
+msgstr "Klarte ikke oppdage kontrollerende TTY"
+
+#: gui/fb/fb.cpp:548 gui/fb/fb.cpp:585 gui/fb/fb.cpp:619 gui/fb/fb.cpp:670
+#, c-format
+msgid "Could not open %s"
+msgstr "Kunne ikke åpne %s"
+
+#: gui/fb/fb.cpp:554
+msgid "Could not get current VT state"
+msgstr ""
+
+#: gui/fb/fb.cpp:565
+msgid "Could not request a new VT"
+msgstr ""
+
+#: gui/fb/fb.cpp:579 gui/fb/fb.cpp:613 gui/fb/fb.cpp:664
+#, c-format
+msgid "Could not find device for VT number %d"
+msgstr ""
+
+#: gui/fb/fb.cpp:590 gui/fb/fb.cpp:675
+#, c-format
+msgid "Could not activate VT number %d"
+msgstr ""
+
+#: gui/fb/fb.cpp:596 gui/fb/fb.cpp:681
+#, c-format
+msgid "Error waiting for VT %d becoming active"
+msgstr ""
+
+#: gui/fb/fb.cpp:627
+#, c-format
+msgid "Could not attach controlling terminal (%s)"
+msgstr ""
+
+#: gui/fb/fb.cpp:635
+msgid "Could not query current keyboard mode on VT"
+msgstr ""
+
+#: gui/fb/fb.cpp:639
+msgid "Could not switch to graphics mode on new VT"
+msgstr ""
+
+#: gui/fb/fb.cpp:690
+msgid "Could not restore keyboard mode"
+msgstr ""
+
+#: gui/fb/fb_glue_ovg.cpp:73 gui/gtk/gtk_glue_ovg.cpp:88
+msgid "Probing found an EGL display device"
+msgstr ""
+
+#: gui/fb/fb_glue_ovg.cpp:77 gui/gtk/gtk_glue_ovg.cpp:92
+msgid "Probing found a raw Framebuffer display device"
+msgstr ""
+
+#: gui/fb/fb_glue_ovg.cpp:81 gui/gtk/gtk_glue_ovg.cpp:96
+msgid "Probing found an X11 display device"
+msgstr ""
+
+#: gui/fb/fb_glue_ovg.cpp:85 gui/gtk/gtk_glue_ovg.cpp:100
+msgid "Probing found a DirectFB display device"
+msgstr ""
+
+#: gui/fb/fb_glue_ovg.cpp:90 gui/gtk/gtk_glue_ovg.cpp:105
+msgid "No display devices found by probing!"
+msgstr ""
+
+#: gui/fb/fb_glue_ovg.cpp:156
+msgid "Could not create OpenVG renderer"
+msgstr ""
+
+#: gui/fb/fb_glue_ovg.cpp:168 gui/fb/fb_glue_agg.cpp:76
+msgid "No renderer set!"
+msgstr ""
+
+#: gui/fb/fb_glue_gles1.cpp:98
+msgid "EGL: getDisplay ok"
+msgstr ""
+
+#: gui/fb/fb_glue_gles1.cpp:104
+msgid "EGL: initialize ok"
+msgstr ""
+
+#: gui/fb/fb_glue_gles1.cpp:111
+msgid "EGL: config ok"
+msgstr ""
+
+#: gui/fb/fb_glue_gles1.cpp:118
+msgid "EGL: surface ok"
+msgstr ""
+
+#: gui/fb/fb_glue_gles1.cpp:124
+msgid "EGL: context ok"
+msgstr ""
+
+#: gui/fb/fb_glue_gles1.cpp:130
+msgid "EGL: current ok"
+msgstr ""
+
+#: gui/fb/fb_glue_agg.cpp:87
+#, c-format
+msgid "No renderer set in %s!"
+msgstr ""
+
+#: gui/fb/fb_glue_agg.cpp:130
+msgid "failed to create a render handler for AGG!"
+msgstr ""
+
+#: gui/fb/fb_glue_agg.cpp:151
+msgid "No Device layer initialized yet!"
+msgstr ""
+
+#: gui/fb/fb_glue_agg.cpp:182
+msgid "The pixel format of your framebuffer could not be detected."
+msgstr ""
+
+#: gui/fb/fb_glue_agg.cpp:191
+msgid "Double buffering disabled"
+msgstr ""
+
+#: gui/fb/fb_glue_agg.cpp:194
+msgid "Double buffering enabled"
+msgstr ""
+
+#: gui/fb/fb_glue_agg.cpp:221
+#, c-format
+msgid "No Drawbounds set in %s!"
+msgstr ""
+
+#: gui/gnash.cpp:125
+#, c-format
+msgid "Error parsing options: %s\n"
+msgstr ""
+
+#: gui/gnash.cpp:166
+msgid "Error: no input file was specified. Exiting.\n"
+msgstr ""
+
+#: gui/gnash.cpp:212
+msgid "Invalid host communication filedescriptor %1%\n"
+msgstr ""
+
+#: gui/gnash.cpp:219
+msgid "Invalid control communication filedescriptor %1%\n"
+msgstr ""
+
+#: gui/gnash.cpp:251
+msgid "ERROR: -r must be followed by 0, 1, 2 or 3 "
+msgstr ""
+
+#: gui/gnash.cpp:267
+msgid "Debugging options"
+msgstr "Feilsøkingsvalg"
+
+#: gui/gnash.cpp:273
+msgid "Produce verbose output"
+msgstr ""
+
+#: gui/gnash.cpp:280
+msgid "Produce the disk based debug log"
+msgstr ""
+
+#: gui/gnash.cpp:285
+msgid "Be (very) verbose about action execution"
+msgstr ""
+
+#: gui/gnash.cpp:291
+msgid "Be (very) verbose about parsing"
+msgstr ""
+
+#: gui/gnash.cpp:297
+msgid "Print FPS every num seconds"
+msgstr ""
+
+#: gui/gnash.cpp:320
+msgid "Options"
+msgstr "Valg"
+
+#: gui/gnash.cpp:325
+msgid "Print this help and exit"
+msgstr ""
+
+#: gui/gnash.cpp:328
+msgid "Print version information and exit"
+msgstr ""
+
+#: gui/gnash.cpp:333
+msgid "Scale the movie by the specified factor"
+msgstr ""
+
+#: gui/gnash.cpp:337
+msgid "Number of milliseconds to delay in main loop"
+msgstr ""
+
+#: gui/gnash.cpp:341
+msgid "Audio dump file (wave format)"
+msgstr ""
+
+#: gui/gnash.cpp:346
+msgid "Hardware Video Accelerator to use"
+msgstr ""
+
+#: gui/gnash.cpp:351
+msgid "X11 Window ID for display"
+msgstr ""
+
+#: gui/gnash.cpp:355
+msgid "Set window width"
+msgstr "Sett vindusbredde"
+
+#: gui/gnash.cpp:359
+msgid "Set window height"
+msgstr "Sett vindushøyde"
+
+#: gui/gnash.cpp:363
+msgid "Set window x position"
+msgstr "Sett x-posisjon for vindu"
+
+#: gui/gnash.cpp:367
+msgid "Set window y position"
+msgstr "Sett y-posisjon for vindu"
+
+#: gui/gnash.cpp:372
+msgid "Exit when/if movie reaches the last frame"
+msgstr ""
+
+#: gui/gnash.cpp:378
+msgid "disable rendering and sound"
+msgstr ""
+
+#: gui/gnash.cpp:380
+msgid "enable rendering, disable sound"
+msgstr ""
+
+#: gui/gnash.cpp:382
+msgid "enable sound, disable rendering"
+msgstr ""
+
+#: gui/gnash.cpp:384
+msgid "enable rendering and sound"
+msgstr ""
+
+#: gui/gnash.cpp:392
+msgid "The media handler to use"
+msgstr ""
+
+#: gui/gnash.cpp:400
+msgid "The renderer to use"
+msgstr ""
+
+#: gui/gnash.cpp:406
+msgid "Exit after the specified number of seconds"
+msgstr ""
+
+#: gui/gnash.cpp:409
+msgid "Set \"real\" URL of the movie"
+msgstr ""
+
+#: gui/gnash.cpp:413
+msgid "Set \"base\" URL for resolving relative URLs"
+msgstr "Sett «utgangs»-URL for å løse relative URL-er"
+
+#: gui/gnash.cpp:418
+msgid "Set parameter (e.g. \"FlashVars=A=1&b=2\")"
+msgstr ""
+
+#: gui/gnash.cpp:422
+msgid "Filedescriptor to use for external communications"
+msgstr ""
+
+#: gui/gnash.cpp:428
+msgid "Exit after specified number of frame advances"
+msgstr ""
+
+#: gui/gnash.cpp:432
+msgid "Start in fullscreen mode"
+msgstr ""
+
+#: gui/gnash.cpp:437
+msgid "Start without displaying the menu bar"
+msgstr ""
+
+#: gui/gnash.cpp:442
+msgid "List of frames to save as screenshots"
+msgstr ""
+
+#: gui/gnash.cpp:446
+msgid "Filename pattern for screenshot images"
+msgstr ""
+
+#: gui/gnash.cpp:450
+msgid "Quality for screenshot output (not all formats)"
+msgstr ""
+
+#: gui/gnash.cpp:453
+msgid "Input files"
+msgstr ""
+
+#: gui/gnash.cpp:464
+msgid "Dump options"
+msgstr ""
+
+#: gui/gnash.cpp:469
+msgid "Video dump file (raw format) and optional video FPS (@<num>)"
+msgstr ""
+
+#: gui/gnash.cpp:471
+msgid "Number of milliseconds to sleep between advances"
+msgstr ""
+
+#: gui/gnash.cpp:473
+msgid "Trigger expression to start dumping"
+msgstr ""
+
+#: gui/gnash.cpp:485
+msgid "Keys:\n"
+msgstr "Nøkler:\n"
+
+#: gui/gnash.cpp:487
+msgid "Quit\n"
+msgstr "Avslutt\n"
+
+#: gui/gnash.cpp:489
+msgid "Toggle fullscreen\n"
+msgstr ""
+
+#: gui/gnash.cpp:491
+msgid "Toggle pause\n"
+msgstr ""
+
+#: gui/gnash.cpp:493
+msgid "Restart the movie\n"
+msgstr "Start filmen på nytt\n"
+
+#: gui/gnash.cpp:495
+msgid "Take a screenshot\n"
+msgstr "Ta et øyeblikksbilde\n"
+
+#: gui/gnash.cpp:497
+msgid "Force immediate redraw\n"
+msgstr ""
+
+#: gui/gnash.cpp:503
+msgid "Usage: gnash [options] movie_file.swf\n"
+msgstr "Bruk: gnash [valg] film_fil.swf\n"
+
+#: gui/gnash.cpp:504
+msgid "Plays a SWF (Shockwave Flash) movie\n"
+msgstr ""
+
+#: gui/gnash.cpp:521
+msgid ""
+"Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free Software "
+"Foundation, Inc.\n"
+"Gnash comes with NO WARRANTY, to the extent permitted by law.\n"
+"You may redistribute copies of Gnash under the terms of the GNU General\n"
+"Public License.  For more information, see the file named COPYING.\n"
+"\n"
+msgstr ""
+
+#: gui/gnash.cpp:532
+msgid "Build options "
+msgstr ""
+
+#: gui/gnash.cpp:533
+msgid "   Renderers: "
+msgstr ""
+
+#: gui/gnash.cpp:534
+msgid "   Hardware Acceleration: "
+msgstr ""
+
+#: gui/gnash.cpp:535
+msgid "   GUI: "
+msgstr ""
+
+#: gui/gnash.cpp:536
+msgid "   Media handlers: "
+msgstr ""
+
+#: gui/gnash.cpp:538
+msgid "   Configured with: "
+msgstr ""
+
+#: gui/gnash.cpp:539
+msgid "   CXXFLAGS: "
+msgstr ""
+
+#: gui/fltk/fltk_glue_agg.cpp:50
+msgid "Could not create AGG renderer with pixelformat RGB24"
+msgstr ""
+
+#: gui/dump/dump.cpp:117
+msgid "Ignoring request to display in X11 window"
+msgstr ""
+
+#: gui/dump/dump.cpp:128 gui/haiku/haiku.cpp:384
+msgid "# FATAL:  No filename given with -D argument."
+msgstr ""
+
+#: gui/dump/dump.cpp:144
+msgid "# FATAL:  No sleep ms value given with -S argument."
+msgstr ""
+
+#: gui/dump/dump.cpp:155
+msgid "# FATAL:  No trigger value given with -T argument.\n"
+msgstr ""
+
+#: gui/dump/dump.cpp:352
+#, c-format
+msgid "Unable to write file '%s'."
+msgstr ""
+
+#: gui/ScreenShotter.cpp:99
+#, c-format
+msgid "Failed to open screenshot file \"%s\"!"
+msgstr ""
+
+#: gui/haiku/haiku.cpp:141
+msgid "spawn_thread failed"
+msgstr ""
+
+#: gui/haiku/haiku.cpp:144
+msgid "resume_thread failed"
+msgstr ""
+
+#: gui/haiku/haiku.cpp:157
+#, c-format
+msgid "pulses thread returned %d"
+msgstr ""
+
+#: gui/haiku/haiku.cpp:248
+msgid "send_data failed"
+msgstr ""
+
+#: gui/haiku/haiku_agg_glue.cpp:290 gui/aos4/aos4_agg_glue.cpp:116
+#: gui/sdl/sdl_agg_glue.cpp:78
+#, c-format
+msgid "AGG's bit depth must be 16, 24 or 32 bits, not %d."
+msgstr ""
+
+#: gui/haiku/haiku_agg_glue.cpp:297 gui/gtk/gtk_glue_agg.cpp:96
+#, c-format
+msgid "Could not create AGG renderer with pixelformat %s"
+msgstr ""
+
+#: gui/haiku/haiku_agg_glue.cpp:416 gui/sdl/sdl_agg_glue.cpp:132
+#, c-format
+msgid "SDL-AGG: %i byte offscreen buffer allocated"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:120
+msgid "Cairo renderer not supported!"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:128
+msgid "OpenGL renderer not supported!"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:136
+msgid "AGG renderer not supported!"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:467 gui/gtk/gtk.cpp:1708
+msgid "Movie properties"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:486 gui/gtk/gtk.cpp:1778
+msgid "Variable"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:487 gui/gtk/gtk.cpp:1790
+msgid "Value"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:588
+msgid "Properties"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:592 gui/qt/kde.cpp:424
+msgid "Quit Gnash"
+msgstr "Avslutt Gnash"
+
+#: gui/qt/Qt4Gui.cpp:599
+msgid "Preferences"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:604 gui/gtk/gtk.cpp:2119
+msgid "Play"
+msgstr "Spill av"
+
+#: gui/qt/Qt4Gui.cpp:608 gui/gtk/gtk.cpp:2130
+msgid "Pause"
+msgstr "Pause"
+
+#: gui/qt/Qt4Gui.cpp:612 gui/gtk/gtk.cpp:2140
+msgid "Stop"
+msgstr "Stopp"
+
+#: gui/qt/Qt4Gui.cpp:616
+msgid "Restart"
+msgstr "Start på nytt"
+
+#: gui/qt/Qt4Gui.cpp:621 gui/qt/kde.cpp:423
+msgid "Refresh"
+msgstr "Frisk opp"
+
+#: gui/qt/Qt4Gui.cpp:625
+msgid "Fullscreen"
+msgstr "Fullskjerm"
+
+#: gui/qt/Qt4Gui.cpp:640
+msgid "File"
+msgstr "Fil"
+
+#: gui/qt/Qt4Gui.cpp:645
+msgid "Edit"
+msgstr "Rediger"
+
+#: gui/qt/Qt4Gui.cpp:649
+msgid "Movie Control"
+msgstr "Filmkontroll"
+
+#: gui/qt/Qt4Gui.cpp:656
+msgid "View"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:738
+msgid "Click to Play"
+msgstr "Trykk for å spille av"
+
+#: gui/qt/Qt4Gui.cpp:770 gui/gtk/gtk.cpp:1239
+msgid "Gnash preferences"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:785
+msgid "Logging"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:788 gui/gtk/gtk.cpp:1310
+msgid "<b>Logging options</b>"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:791
+msgid "Verbosity level"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:809
+msgid "Log to file"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:816
+msgid "Log parser output"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:820
+msgid "Log SWF actions"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:824
+msgid "Log malformed SWF errors"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:829
+msgid "Log ActionScript coding errors"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:836
+msgid "Security"
+msgstr "Sikkerhet"
+
+#: gui/qt/Qt4Gui.cpp:839 gui/gtk/gtk.cpp:1393
+msgid "<b>Network connections</b>"
+msgstr "<b>Nettverksforbindelser</b>"
+
+#: gui/qt/Qt4Gui.cpp:842
+msgid "Connect only to local host"
+msgstr "Koble kun til lokal vert"
+
+#: gui/qt/Qt4Gui.cpp:847
+msgid "Connect only to local domain"
+msgstr "Koble kun til lokalt domene"
+
+#: gui/qt/Qt4Gui.cpp:852
+msgid "Disable SSL verification"
+msgstr "Slå av SSL-bekreftelse"
+
+#: gui/qt/Qt4Gui.cpp:857 gui/gtk/gtk.cpp:1438
+msgid "<b>Privacy</b>"
+msgstr "<b>Privatliv</b>"
+
+#: gui/qt/Qt4Gui.cpp:860 gui/gtk/gtk.cpp:1442
+msgid "Shared objects directory:"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:866
+msgid "Do not write Shared Object files"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:872
+msgid "Only access local Shared Object files"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:877
+msgid "Disable Local Connection object"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:884
+msgid "Network"
+msgstr "Nettverk"
+
+#: gui/qt/Qt4Gui.cpp:887 gui/gtk/gtk.cpp:1278
+msgid "<b>Network preferences</b>"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:890
+msgid "Network timeout in seconds"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:902
+msgid "Media"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:905 gui/gtk/gtk.cpp:1488
+msgid "<b>Sound</b>"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:908
+msgid "Use sound handler"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:912 gui/gtk/gtk.cpp:1507
+msgid "Save media streams to disk"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:918 gui/gtk/gtk.cpp:1516
+msgid "Save dynamically loaded media to disk"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:922 gui/gtk/gtk.cpp:1524
+msgid "Saved media directory:"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:931
+msgid "Player"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:934 gui/gtk/gtk.cpp:1550
+msgid "<b>Player description</b>"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:937 gui/gtk/gtk.cpp:1558
+msgid "Player version:"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:943 gui/gtk/gtk.cpp:1574
+msgid "Operating system:"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:948 gui/qt/Qt4Gui.cpp:1021
+msgid "<Autodetect>"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:954 gui/gtk/gtk.cpp:1594
+msgid "URL opener:"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:961 gui/gtk/gtk.cpp:1606
+msgid "<b>Performance</b>"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:964 gui/gtk/gtk.cpp:1620
+msgid "Max size of movie library:"
+msgstr ""
+
+#: gui/qt/Qt4Gui.cpp:973
+msgid "Start Gnash in pause mode"
+msgstr ""
+
+#: gui/qt/Qt4GlueAgg.cpp:115
+msgid "Could not create AGG renderer with pixelformat ABGR32"
+msgstr ""
+
+#: gui/qt/kde_glue_agg.cpp:156
+msgid "Could not create AGG renderer with pixelformat BGRA32"
+msgstr ""
+
+#: gui/qt/kde.cpp:413
+msgid "Play Movie"
+msgstr ""
+
+#: gui/qt/kde.cpp:414
+msgid "Pause Movie"
+msgstr ""
+
+#: gui/qt/kde.cpp:415
+msgid "Stop Movie"
+msgstr ""
+
+#: gui/qt/kde.cpp:416 gui/gtk/gtk.cpp:2152
+msgid "Restart Movie"
+msgstr ""
+
+#: gui/qt/kde.cpp:418
+msgid "Step Forward"
+msgstr ""
+
+#: gui/qt/kde.cpp:419
+msgid "Step Backward"
+msgstr ""
+
+#: gui/qt/kde.cpp:420
+msgid "Jump Forward"
+msgstr ""
+
+#: gui/qt/kde.cpp:421
+msgid "Jump Backward"
+msgstr ""
+
+#: gui/pythonmod/gnash-view.cpp:220 gui/Player.cpp:288
+#, c-format
+msgid "Could not create sound handler: %s. Will continue without sound."
+msgstr ""
+
+#: gui/pythonmod/gnash-view.cpp:223 gui/Player.cpp:283
+msgid "Sound requested but no sound support compiled in"
+msgstr ""
+
+#: gui/aos4/aos4.cpp:70
+#, c-format
+msgid "Exception: %s on file %s line %d"
+msgstr ""
+
+#: gui/aos4/aos4.cpp:266 gui/gtk/gtk.cpp:2591
+#, c-format
+msgid ""
+"Attempting to open file %s.\n"
+"NOTE: the file open functionality is not yet implemented!"
+msgstr ""
+
+#: gui/aos4/aos4.cpp:274
+msgid "Cannot open File Requester!\n"
+msgstr ""
+
+#: gui/aos4/aos4.cpp:609
+msgid "error creating RenderHandler!\n"
+msgstr ""
+
+#: gui/aos4/aos4_cairo_glue.cpp:124
+#, c-format
+msgid "Cairo's bit depth must be 16, 24 or 32 bits, not %d."
+msgstr ""
+
+#: gui/aos4/aos4_cairo_glue.cpp:212 gui/aos4/aos4_agg_glue.cpp:216
+msgid "Cannot layout Menu!!\n"
+msgstr ""
+
+#: gui/aos4/aos4_cairo_glue.cpp:216 gui/aos4/aos4_agg_glue.cpp:220
+msgid "Cannot create Menu!!\n"
+msgstr ""
+
+#: gui/aos4/aos4_cairo_glue.cpp:219 gui/aos4/aos4_agg_glue.cpp:223
+msgid "Cannot get Visual Info!!\n"
+msgstr ""
+
+#: gui/aos4/aos4_cairo_glue.cpp:222 gui/aos4/aos4_agg_glue.cpp:226
+msgid "Cannot get WB Screen pointer!!\n"
+msgstr ""
+
+#: gui/aos4/aos4_cairo_glue.cpp:259 gui/aos4/aos4_agg_glue.cpp:264
+msgid "prepDrawingArea() failed.\n"
+msgstr ""
+
+#: gui/aos4/aos4_agg_glue.cpp:277
+#, c-format
+msgid "AOS4-AGG: %i byte offscreen buffer allocated"
+msgstr ""
+
+#: gui/sdl/sdl_agg_glue.cpp:95
+msgid "SDL_SetVideoMode() failed for SdlAggGlue."
+msgstr ""
+
+#: gui/gui.cpp:193
+msgid "Clipboard not yet supported in this GUI"
+msgstr ""
+
+#: gui/gui.cpp:199 gui/gui.cpp:211
+msgid "Fullscreen not yet supported in this GUI"
+msgstr ""
+
+#: gui/gui.cpp:205
+msgid "Window resize not yet supported in this GUI"
+msgstr ""
+
+#: gui/gui.cpp:229 gui/gui.cpp:242
+msgid "Menu show/hide not yet supported in this GUI"
+msgstr ""
+
+#: gui/gui.cpp:235
+msgid "Mouse show/hide not yet supported in this GUI"
+msgstr ""
+
+#: gui/gui.cpp:282
+msgid "Can't update stage matrix till VM is initialized"
+msgstr ""
+
+#: gui/gui.cpp:334
+#, c-format
+msgid "Invalid scaleMode %d"
+msgstr ""
+
+#: gui/gui.cpp:374
+#, c-format
+msgid "Invalid horizontal align %d"
+msgstr ""
+
+#: gui/gui.cpp:405
+#, c-format
+msgid "Invalid vertical align %d"
+msgstr ""
+
+#: gui/gui.cpp:900
+msgid "Gui is in stop mode, won't start application"
+msgstr ""
+
+#: gui/gui.cpp:1261
+#, c-format
+msgid "This gui didn't override 'yesno', assuming 'yes' answer to question: %s"
+msgstr ""
+
+#: gui/gui.cpp:1270
+msgid "Gui::setQuality called before a movie_root was available"
+msgstr ""
+
+#: gui/gui.cpp:1280
+msgid "Gui::getQuality called before a movie_root was available"
+msgstr ""
+
+#: gui/Player.cpp:131
+msgid "GUI ExternalInterface.Pan event"
+msgstr ""
+
+#: gui/Player.cpp:143
+msgid "GUI ExternalInterface.SetZoomRect event"
+msgstr ""
+
+#: gui/Player.cpp:151
+msgid "GUI ExternalInterface.Zoom event"
+msgstr ""
+
+#: gui/Player.cpp:169
+#, c-format
+msgid "Unhandled callback %s with arguments %s"
+msgstr ""
+
+#: gui/Player.cpp:434
+msgid "Non-existent media handler %1% specified"
+msgstr ""
+
+#: gui/Player.cpp:545
+#, c-format
+msgid "Movie Frame Rate is %d, adjusting delay"
+msgstr ""
+
+#: gui/Player.cpp:682
+msgid "Got unexpected argument type for message %1%"
+msgstr ""
+
+#: gui/Player.cpp:717
+#, c-format
+msgid ""
+"Could only write %d bytes over %d required to user-provided host requests fd "
+"%d"
+msgstr ""
+
+#: gui/Player.cpp:773
+#, c-format
+msgid "FsCommand exec called with argument %s"
+msgstr ""
+
+#: gui/Player.cpp:790
+#, c-format
+msgid "FsCommand trapallkeys called with argument %s"
+msgstr ""
+
+#: gui/Player.cpp:796
+#, c-format
+msgid "FsCommand '%s(%s)' not handled internally"
+msgstr ""
+
+#: gui/gtk/gtk_glue_cairo.cpp:223
+msgid "Cairo: failed to create a rendering buffer!"
+msgstr ""
+
+#: gui/gtk/gtk_glue_ovg.cpp:182
+msgid "Could not create OPENVG renderer"
+msgstr ""
+
+#: gui/gtk/gtk_glue_ovg.cpp:265 gui/gtk/gtk_glue_ovg.cpp:282
+msgid "No off screen buffer!"
+msgstr ""
+
+#: gui/gtk/gtk_glue_agg_vaapi.cpp:163
+msgid "WARNING: failed to create VA-API display."
+msgstr ""
+
+#: gui/gtk/gtk_glue_agg_vaapi.cpp:204
+#, c-format
+msgid ""
+"GTK-AGG: Unknown RGB format %s reported by VA-API.Please report this to the "
+"gnash-dev mailing list."
+msgstr ""
+
+#: gui/gtk/gtk_glue_agg_vaapi.cpp:231 gui/gtk/gtk_glue_agg_vaapi.cpp:289
+msgid "failed to map VA-API image."
+msgstr ""
+
+#: gui/gtk/gtk_glue_agg_vaapi.cpp:237
+msgid "failed to associate VA-API subpicture."
+msgstr ""
+
+#: gui/gtk/gtk_glue_agg_vaapi.cpp:371
+#, c-format
+msgid "failed to setup video window for surface 0x%08x."
+msgstr ""
+
+#: gui/gtk/gtk_glue_agg_vaapi.cpp:378
+#, c-format
+msgid "failed to associate subpicture to surface 0x%08x."
+msgstr ""
+
+#: gui/gtk/gtk.cpp:159
+msgid "Failed to initialize X threading support\n"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:202
+msgid "This system lacks a hardware OpenGL driver!"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:223
+msgid "Click to play"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:612
+#, c-format
+msgid "Advance interval timer set to %d ms (~ %d FPS)"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:686
+msgid "Sound"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1274
+msgid "_Network"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1286
+msgid "Network timeout in seconds (0 for no timeout):"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1305
+msgid "_Logging"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1314
+msgid "Verbosity level:"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1327
+msgid "Log to _file"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1333
+msgid "Logfile name:"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1346
+msgid "Log _parser output"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1354
+msgid "Log SWF _actions"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1362
+msgid "Log malformed SWF _errors"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1370
+msgid "Log ActionScript _coding errors"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1386
+msgid "_Security"
+msgstr "_Sikkerhet"
+
+#: gui/gtk/gtk.cpp:1399
+msgid "Connect only to local _host"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1406
+msgid "Connect only to local _domain"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1413
+msgid "Disable SSL _verification"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1420
+msgid "_Whitelist"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1429
+msgid "_Blacklist"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1454
+msgid "Do _not write Shared Object files"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1461
+msgid "Only _access local Shared Object files"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1468
+msgid "Disable Local _Connection object"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1482
+msgid "_Media"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1493
+msgid "Use sound _handler"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1501
+msgid "<b>Media Streams</b>"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1544
+msgid "_Player"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1584
+msgid "<i>If blank, Gnash will detect your OS</i>"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1637
+msgid "Max scripts execution time (in seconds):"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1656
+msgid "Max scripts recursion limit (stack depth):"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1672
+msgid "Lock script limits so that SWF tags can't override"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1684
+msgid "Start _Gnash in pause mode"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1843
+msgid ""
+"This program is free software; you can redistribute it and/or modify\n"
+"it under the terms of the GNU General Public License as published by\n"
+"the Free Software Foundation; either version 3 of the License, or\n"
+"(at your option) any later version.\n"
+"\n"
+"This program is distributed in the hope that it will be useful,\n"
+"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+"GNU General Public License for more details.\n"
+"You should have received a copy of the GNU General Public License\n"
+"along with this program; if not, write to the Free Software\n"
+"Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301\n"
+"USA or visit http://www.gnu.org/licenses/."
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1859
+msgid "Gnash is the GNU SWF Player based on GameSWF."
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1860
+msgid ""
+"\n"
+"Renderer: "
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1862
+msgid ""
+"\n"
+"Hardware Acceleration: "
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1864
+msgid ""
+"\n"
+"GUI: "
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1866
+msgid ""
+"\n"
+"Media: "
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1896
+msgid "translator-credits"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:1923
+msgid "_File"
+msgstr "_Fil"
+
+#: gui/gtk/gtk.cpp:1976
+msgid "_Edit"
+msgstr "_Rediger"
+
+#: gui/gtk/gtk.cpp:1996
+msgid "_Help"
+msgstr "_Hjelp"
+
+#: gui/gtk/gtk.cpp:2016
+msgid "_View"
+msgstr "_Vis"
+
+#: gui/gtk/gtk.cpp:2024
+msgid "Redraw"
+msgstr "Tegn på nytt"
+
+#: gui/gtk/gtk.cpp:2034 gui/gtk/gtk.cpp:2039
+msgid "Toggle fullscreen"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:2048
+msgid "Show updated ranges"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:2067
+msgid "_Quality"
+msgstr "_Kvalitet"
+
+#: gui/gtk/gtk.cpp:2077
+msgid "Low"
+msgstr "Lav"
+
+#: gui/gtk/gtk.cpp:2083
+msgid "Medium"
+msgstr "Medium"
+
+#: gui/gtk/gtk.cpp:2089
+msgid "High"
+msgstr "Høy"
+
+#: gui/gtk/gtk.cpp:2095
+msgid "Best"
+msgstr "Best"
+
+#: gui/gtk/gtk.cpp:2108
+msgid "Movie _Control"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:2275 gui/gtk/gtk.cpp:2276
+#, c-format
+msgid "Couldn't find pixmap file: %s"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:2282
+#, c-format
+msgid "Failed to load pixbuf file: %s: %s"
+msgstr ""
+
+#: gui/gtk/gtk.cpp:2608 gui/gtk/gtk.cpp:2621
+msgid "Open file"
+msgstr "Åpne fil"
+
+#: gui/gtk/gtk_glue_gtkglext.cpp:72
+msgid ""
+"Cannot find the double-buffered visual.\n"
+"Trying single-buffered visual."
+msgstr ""
+
+#: gui/gtk/gtk_glue_gtkglext.cpp:78
+msgid "No appropriate OpenGL-capable visual found."
+msgstr ""
