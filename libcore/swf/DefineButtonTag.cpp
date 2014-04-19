@@ -263,14 +263,11 @@ DefineButtonTag::hasKeyPressHandler() const
 ButtonAction::ButtonAction(SWFStream& in, TagType t, unsigned long endPos,
         movie_definition& mdef)
     :
-    _actions(mdef)
+    _actions(mdef),
+    _conditions(OVER_DOWN_TO_OVER_UP)
 {
     // Read condition flags.
-    if (t == SWF::DEFINEBUTTON) {
-        _conditions = OVER_DOWN_TO_OVER_UP;
-    }
-    else {
-        
+    if (t != SWF::DEFINEBUTTON) {
         assert(t == SWF::DEFINEBUTTON2);
 
         if ( in.tell()+2 > endPos ) 
