@@ -294,7 +294,7 @@ NS_PluginInitialize()
         gnash::log_error("WARNING: NPAPI plugin could not find user home dir");
     }
 
-    char *gnashrc = std::getenv("GNASHRC");
+    const char *gnashrc = std::getenv("GNASHRC");
     if ( gnashrc ) {
         newGnashRc.append(":");
         newGnashRc.append(gnashrc);
