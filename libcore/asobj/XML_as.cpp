@@ -311,10 +311,6 @@ XML_as::parseTag(XMLNode_as*& node, xml_iterator& it,
 
     if (!closing) {
 
-        XMLNode_as* childNode = new XMLNode_as(_global);
-        childNode->nodeNameSet(tagName);
-        childNode->nodeTypeSet(Element);
-
         // Skip to the end of any whitespace after the tag name
         it = endName;
 
@@ -322,6 +318,10 @@ XML_as::parseTag(XMLNode_as*& node, xml_iterator& it,
             _status = XML_UNTERMINATED_ELEMENT;
            return;
         }
+
+        XMLNode_as* childNode = new XMLNode_as(_global);
+        childNode->nodeNameSet(tagName);
+        childNode->nodeTypeSet(Element);
 
         // Parse any attributes in an opening tag only, stopping at "/>" or
         // '>'
@@ -343,7 +343,10 @@ XML_as::parseTag(XMLNode_as*& node, xml_iterator& it,
         }
         
         // Do nothing more if there was an error in attributes parsing.
-        if (_status != XML_OK) return;
+        if (_status != XML_OK) {
+            delete childNode;
+            return;
+        }
 
         // testsuite/swfdec/xml-id-map.as tests that the node is appended
         // first.
