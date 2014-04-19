@@ -19,7 +19,6 @@
 
 #include "WAVWriter.h"
 
-#include <cstring> // for strncpy
 #include <boost/cstdint.hpp>
 #include <fstream> // for composition (file_stream)
 #include <iostream> 
@@ -100,9 +99,10 @@ WAVWriter::write_wave_header(std::ofstream& outfile)
   CHUNK_HDR chk;
  
   // setup wav header
-  std::strncpy(wav.rID, "RIFF", 4);
-  std::strncpy(wav.wID, "WAVE", 4);
-  std::strncpy(wav.fId, "fmt ", 4);
+  // CID 1149094
+  std::memcpy(wav.rID, "RIFF", 4);
+  std::memcpy(wav.wID, "WAVE", 4);
+  std::memcpy(wav.fId, "fmt ", 4);
  
   wav.nBitsPerSample = 16;
   wav.nSamplesPerSec = 44100;
@@ -117,7 +117,7 @@ WAVWriter::write_wave_header(std::ofstream& outfile)
   wav.nBlockAlign = 2 * wav.nBitsPerSample / 8;
 
   // setup chunk header
-  std::strncpy(chk.dId, "data", 4);
+  std::memcpy(chk.dId, "data", 4);
   chk.dLen = 0;
  
   /* write riff/wav header */
