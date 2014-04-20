@@ -294,6 +294,7 @@ LogFile::LogFile()
     :
     _verbose(0),
     _actiondump(false),
+    _network(false),
     _parserdump(false),
     _state(CLOSED),
     _stamp(true),
