@@ -50,12 +50,13 @@ all: $(gmofiles)
 
 if HAS_GETTEXT
 
-gnash.pot: 
+SRCS = $(shell find $(patsubst %,../%,$(dirs)) -name '*.cpp')
+gnash.pot: $(SRCS)
 	cd $(top_srcdir); \
 	pwd; \
 	rm -f po/POTFILES; \
-	for i in `find $(dirs) -name '*.cpp'`; do \
-	  echo "$$i" >> po/POTFILES;\
+	for i in $(SRCS); do \
+	  echo "$$i" |sed 's%../%%' >> $@;\
 	done; \
 	$(XGETTEXT) --language=C++ --files-from=po/POTFILES \
 	  -o po/gnash.pot \
@@ -65,7 +66,6 @@ gnash.pot:
 	rm -f po/POTFILES
 
 update-po: 
-	rm -f $(srcdir)/gnash.pot # force rebuild of this
 	$(MAKE) gnash.pot
 	for i in $(pofiles); do \
 	  echo "Merging $$i..." ; \
