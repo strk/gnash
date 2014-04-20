@@ -50,10 +50,10 @@ using namespace std;
 TestState runtest;
 
 static void
-dump_buffer(const char* label, char* buf, size_t size, ostream& os)
+dump_buffer(const char* label, char* buf, ssize_t size, ostream& os)
 {
 	os << label << ":" << endl;
-	for (size_t i=0; i<size; i++) {
+	for (ssize_t i=0; i<size; i++) {
 		os << '[' << buf[i] << ']';
 	}
 
@@ -73,8 +73,8 @@ compare_reads(gnash::IOChannel* reader, int fd, const char* first, const char* s
 
 	for(;;)
 	{
-		size_t sz1 = reader->read(buf, CHUNK_SIZE);
-		size_t sz2 = read(fd, buf2, CHUNK_SIZE);
+		ssize_t sz1 = reader->read(buf, CHUNK_SIZE);
+		ssize_t sz2 = read(fd, buf2, CHUNK_SIZE);
 
 		if ( sz1 != sz2 )
 		{
@@ -87,7 +87,7 @@ compare_reads(gnash::IOChannel* reader, int fd, const char* first, const char* s
 			return false;
 		}
 
-		if ( sz1 == 0 ) {
+		if ( sz1 <= 0 ) {
 			break;
 		}
 
