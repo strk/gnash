@@ -4,12 +4,12 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 msgid ""
 msgstr ""
-"Project-Id-Version: gnash VERSION\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-01-01 09:28-0700\n"
-"PO-Revision-Date: 2014-04-19 22:52+0200\n"
-"Last-Translator: Petter Reinholdtsen <pere@hungry.com>\n"
-"Language-Team: Norwegian Bokmål <i18n-no@lister.ping.uio.no>\n"
+"PO-Revision-Date: 2014-04-20 15:13+0200\n"
+"Last-Translator: pere <pere@hungry.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: nb\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -436,7 +436,7 @@ msgstr "Ta et øyeblikksbilde\n"
 
 #: gui/gnash.cpp:497
 msgid "Force immediate redraw\n"
-msgstr ""
+msgstr "Tving tegning på nytt øyeblikkelig\n"
 
 #: gui/gnash.cpp:503
 msgid "Usage: gnash [options] movie_file.swf\n"
@@ -455,10 +455,16 @@ msgid ""
 "Public License.  For more information, see the file named COPYING.\n"
 "\n"
 msgstr ""
+"Opphavsrettsbeskyttet (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free "
+"Software Foundation, Inc.\n"
+"Gnash kommer helt UTEN GARANTI i den utstrekning tillat i loven.\n"
+"Du kan spre kopier av Gnash i henhold til vilkårene til lisensen GNU\n"
+"General Public License.  For mer informasjon, se filen ved navn COPYING.\n"
+"\n"
 
 #: gui/gnash.cpp:532
 msgid "Build options "
-msgstr ""
+msgstr "Byggevalg "
 
 #: gui/gnash.cpp:533
 msgid "   Renderers: "
@@ -507,25 +513,25 @@ msgstr ""
 #: gui/dump/dump.cpp:352
 #, c-format
 msgid "Unable to write file '%s'."
-msgstr ""
+msgstr "Klarte ikke skrive til fil «%s»."
 
 #: gui/ScreenShotter.cpp:99
 #, c-format
 msgid "Failed to open screenshot file \"%s\"!"
-msgstr ""
+msgstr "Ute av stand til å åpne øyeblikksbildefil «%s»!"
 
 #: gui/haiku/haiku.cpp:141
 msgid "spawn_thread failed"
-msgstr ""
+msgstr "spawn_thread feilet"
 
 #: gui/haiku/haiku.cpp:144
 msgid "resume_thread failed"
-msgstr ""
+msgstr "resume_thread feilet"
 
 #: gui/haiku/haiku.cpp:157
 #, c-format
 msgid "pulses thread returned %d"
-msgstr ""
+msgstr "pulses-tråd returnerte %d"
 
 #: gui/haiku/haiku.cpp:248
 msgid "send_data failed"
@@ -549,31 +555,31 @@ msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:120
 msgid "Cairo renderer not supported!"
-msgstr ""
+msgstr "Cairo-rendreren støttes ikke!"
 
 #: gui/qt/Qt4Gui.cpp:128
 msgid "OpenGL renderer not supported!"
-msgstr ""
+msgstr "OpenGL-rendreren støttes ikke!"
 
 #: gui/qt/Qt4Gui.cpp:136
 msgid "AGG renderer not supported!"
-msgstr ""
+msgstr "AGG-rendreren støttes ikke!"
 
 #: gui/qt/Qt4Gui.cpp:467 gui/gtk/gtk.cpp:1708
 msgid "Movie properties"
-msgstr ""
+msgstr "Filmegenskaper"
 
 #: gui/qt/Qt4Gui.cpp:486 gui/gtk/gtk.cpp:1778
 msgid "Variable"
-msgstr ""
+msgstr "Variabel"
 
 #: gui/qt/Qt4Gui.cpp:487 gui/gtk/gtk.cpp:1790
 msgid "Value"
-msgstr ""
+msgstr "Verdi"
 
 #: gui/qt/Qt4Gui.cpp:588
 msgid "Properties"
-msgstr ""
+msgstr "Egenskaper"
 
 #: gui/qt/Qt4Gui.cpp:592 gui/qt/kde.cpp:424
 msgid "Quit Gnash"
@@ -581,7 +587,7 @@ msgstr "Avslutt Gnash"
 
 #: gui/qt/Qt4Gui.cpp:599
 msgid "Preferences"
-msgstr ""
+msgstr "Innstillinger"
 
 #: gui/qt/Qt4Gui.cpp:604 gui/gtk/gtk.cpp:2119
 msgid "Play"
@@ -621,7 +627,7 @@ msgstr "Filmkontroll"
 
 #: gui/qt/Qt4Gui.cpp:656
 msgid "View"
-msgstr ""
+msgstr "Vis"
 
 #: gui/qt/Qt4Gui.cpp:738
 msgid "Click to Play"
@@ -629,15 +635,15 @@ msgstr "Trykk for å spille av"
 
 #: gui/qt/Qt4Gui.cpp:770 gui/gtk/gtk.cpp:1239
 msgid "Gnash preferences"
-msgstr ""
+msgstr "Gnash-innstillinger"
 
 #: gui/qt/Qt4Gui.cpp:785
 msgid "Logging"
-msgstr ""
+msgstr "Logging"
 
 #: gui/qt/Qt4Gui.cpp:788 gui/gtk/gtk.cpp:1310
 msgid "<b>Logging options</b>"
-msgstr ""
+msgstr "<b>Loggingsinnstillinger</b>"
 
 #: gui/qt/Qt4Gui.cpp:791
 msgid "Verbosity level"
@@ -645,7 +651,7 @@ msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:809
 msgid "Log to file"
-msgstr ""
+msgstr "Logg til fil"
 
 #: gui/qt/Qt4Gui.cpp:816
 msgid "Log parser output"
@@ -709,7 +715,7 @@ msgstr "Nettverk"
 
 #: gui/qt/Qt4Gui.cpp:887 gui/gtk/gtk.cpp:1278
 msgid "<b>Network preferences</b>"
-msgstr ""
+msgstr "<b>Nettverksinnstillinger</b>"
 
 #: gui/qt/Qt4Gui.cpp:890
 msgid "Network timeout in seconds"
@@ -721,7 +727,7 @@ msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:905 gui/gtk/gtk.cpp:1488
 msgid "<b>Sound</b>"
-msgstr ""
+msgstr "<b>Lyd</b>"
 
 #: gui/qt/Qt4Gui.cpp:908
 msgid "Use sound handler"
@@ -741,19 +747,19 @@ msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:931
 msgid "Player"
-msgstr ""
+msgstr "Avspiller"
 
 #: gui/qt/Qt4Gui.cpp:934 gui/gtk/gtk.cpp:1550
 msgid "<b>Player description</b>"
-msgstr ""
+msgstr "<b>Avspillerbeskrivelse</b>"
 
 #: gui/qt/Qt4Gui.cpp:937 gui/gtk/gtk.cpp:1558
 msgid "Player version:"
-msgstr ""
+msgstr "Avspillerversjon:"
 
 #: gui/qt/Qt4Gui.cpp:943 gui/gtk/gtk.cpp:1574
 msgid "Operating system:"
-msgstr ""
+msgstr "Operativsystem:"
 
 #: gui/qt/Qt4Gui.cpp:948 gui/qt/Qt4Gui.cpp:1021
 msgid "<Autodetect>"
@@ -761,19 +767,19 @@ msgstr ""
 
 #: gui/qt/Qt4Gui.cpp:954 gui/gtk/gtk.cpp:1594
 msgid "URL opener:"
-msgstr ""
+msgstr "URL-åpner:"
 
 #: gui/qt/Qt4Gui.cpp:961 gui/gtk/gtk.cpp:1606
 msgid "<b>Performance</b>"
-msgstr ""
+msgstr "<b>Ytelse</b>"
 
 #: gui/qt/Qt4Gui.cpp:964 gui/gtk/gtk.cpp:1620
 msgid "Max size of movie library:"
-msgstr ""
+msgstr "Maksimal størrelse på filmbiblioteket:"
 
 #: gui/qt/Qt4Gui.cpp:973
 msgid "Start Gnash in pause mode"
-msgstr ""
+msgstr "Start Gnash i pausemodus"
 
 #: gui/qt/Qt4GlueAgg.cpp:115
 msgid "Could not create AGG renderer with pixelformat ABGR32"
@@ -785,11 +791,11 @@ msgstr ""
 
 #: gui/qt/kde.cpp:413
 msgid "Play Movie"
-msgstr ""
+msgstr "Spill film"
 
 #: gui/qt/kde.cpp:414
 msgid "Pause Movie"
-msgstr ""
+msgstr "Pause film"
 
 #: gui/qt/kde.cpp:415
 msgid "Stop Movie"
