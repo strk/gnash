@@ -341,45 +341,40 @@ SharedObject_as::flush(int space) const
     }
 
     if (rcfile.getSOLReadOnly()) {
-        log_security(_("Attempting to write object %s when it's SOL "
-                       "Read Only is set! Refusing..."), filespec);
-        return false;
-    }
-
-    // Open file
-    std::ofstream ofs(filespec.c_str(), std::ios::binary);
-    if (!ofs) {
-        log_error(_("SharedObject::flush(): Failed opening file '%s' in "
-                    "binary mode"), filespec.c_str());
+        log_security(_("Refusing attempt to write object %s while SOLreadonly "
+                       "is set!"), filespec);
         return false;
     }
 
     // Encode data part.
     SimpleBuffer buf;
     if (!encodeData(_name, *_data, buf)) {
-        std::remove(filespec.c_str());
         return true;
     }
 
     // Encode header part.
     SimpleBuffer header;
     encodeHeader(buf.size(), header);
-    
-    // Write header
-    ofs.write(reinterpret_cast<const char*>(header.data()), header.size());
+
+    std::ofstream ofs(filespec.c_str(), std::ios::binary);
     if (!ofs) {
-        log_error(_("Error writing SOL header"));
+        log_error(_("SharedObject::flush(): Failed opening file '%s' in binary"
+                    " mode"), filespec);
         return false;
     }
 
-    // Write AMF data
-    ofs.write(reinterpret_cast<const char*>(buf.data()), buf.size());
-    if (!ofs) {
-        log_error(_("Error writing %d bytes to output file %s"),
-                buf.size(), filespec.c_str());
+    bool success = ofs.write(reinterpret_cast<const char*>(header.data()), header.size())
+                   && ofs.write(reinterpret_cast<const char*>(buf.data()), buf.size());
+    ofs.close();
+
+    if (!success) {
+        log_error(_("Error writing AMF data to output file %s"), filespec);
+        if (std::remove(filespec.c_str()) != 0) {
+            log_error(_("Error removing SOL output file %s: %s"), filespec,
+                      strerror(errno));
+        }
         return false;
     }
-    ofs.close();
 
     log_security(_("SharedObject '%s' written to filesystem."), filespec);
     return true;
