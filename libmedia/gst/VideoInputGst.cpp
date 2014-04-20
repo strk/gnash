@@ -1621,6 +1621,7 @@ GnashWebcamPrivate::GnashWebcamPrivate() {
     _videoEnc = NULL;
     
     _pipelineIsPlaying = false;
+    _webcamDevice = NULL;
        
     _currentFormat = NULL;
     _eosTimeoutId = 0;
