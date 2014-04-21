@@ -22,7 +22,7 @@
 #define GNASH_IOCHANNEL_H
 
 #include <string>
-#include <iostream> // for std::streamsize
+#include <ios> // for std::streamsize
 #include <boost/cstdint.hpp> // for boost int types
 
 #include "dsodefs.h" // DSOEXPORT
