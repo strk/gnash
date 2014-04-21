@@ -480,6 +480,9 @@ movie_root::dropLevel(int depth)
     }
 
     // TOCHECK: safe to erase here ?
+
+    // Ignoring return value of unload(), because the only way to handle
+    // an unload failure is to call destroy, which is done anyway.
     (void)mo->unload();
     mo->destroy();
     _movies.erase(it);
