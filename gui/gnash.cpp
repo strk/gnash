@@ -1,7 +1,7 @@
 // gnash.cpp:  Main routine for top-level SWF player, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010,
-//   2011 Free Software Foundation, Inc
+//   2011, 2014 Free Software Foundation, Inc
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -100,7 +100,7 @@ main(int argc, char *argv[])
 
     // Enable native language support, i.e. internationalization
 #ifdef ENABLE_NLS
-    std::setlocale (LC_ALL, "");
+    setlocale (LC_ALL, "");
     bindtextdomain (PACKAGE, LOCALEDIR);
     textdomain (PACKAGE);
 #endif
