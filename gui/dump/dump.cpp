@@ -120,7 +120,7 @@ DumpGui::init(int argc, char **argv[])
 
     optind = 0;
     opterr = 0;
-    char c;
+    int c;
     while ((c = getopt(argc, *argv, "D:S:T:")) != -1) {
         if (c == 'D') {
             // Terminate if no filename is given.
