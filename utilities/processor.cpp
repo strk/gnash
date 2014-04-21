@@ -1,6 +1,6 @@
 // processor.cpp:  Flash movie processor (gprocessor command), for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014
 //   Free Software Foundation, Inc
 // 
 // This program is free software; you can redistribute it and/or modify
@@ -224,7 +224,7 @@ main(int argc, char *argv[])
 
     // Enable native language support, i.e. internationalization
 #ifdef ENABLE_NLS
-    std::setlocale (LC_ALL, "");
+    setlocale (LC_ALL, "");
     bindtextdomain (PACKAGE, LOCALEDIR);
     textdomain (PACKAGE);
 #endif
