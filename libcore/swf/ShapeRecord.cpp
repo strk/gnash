@@ -198,7 +198,9 @@ void
 ShapeRecord::setLerp(const ShapeRecord& aa, const ShapeRecord& bb,
         const double ratio)
 {
-	assert(_subshapes.size() == 1);
+    if (_subshapes.empty()) {
+       return;
+    }
 
     // Update current bounds.
     _bounds.set_lerp(aa.getBounds(), bb.getBounds(), ratio);

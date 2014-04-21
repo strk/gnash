@@ -83,5 +83,9 @@ main(int /*argc*/, char** /*argv*/)
   tester.advance(); 
   // fill color: 0.0*red + 1.0*green
   check_pixel(750, 550, 50, rgba(0,255,0,255), 2); // morph ratio = 1.0
+
+  // Frame 8
+  tester.advance();
+  // #39989. Nothing to check: empty morph shape.
 }
 
