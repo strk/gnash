@@ -22,6 +22,8 @@ AUTOMAKE_OPTIONS = dejagnu
 LDADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/librender/libgnashrender.la \
+	$(CROSS_LDFLAGS) \
+	$(BOOST_LIBS) \
 	$(LIBINTL) \
 	$(AGG_LIBS) \
 	$(OPENVG_LIBS) \
@@ -83,12 +85,12 @@ NoSeekFileTest_LDADD = $(LDADD)
 URLTest_SOURCES = URLTest.cpp
 URLTest_CPPFLAGS =  $(AM_CPPFLAGS) \
 	'-DBUILDDIR="$(abs_builddir)"'
-URLTest_LDADD = $(LDADD) -lboost_system
+URLTest_LDADD = $(LDADD)
 
 RcTest_SOURCES = RcTest.cpp
 RcTest_CPPFLAGS =  $(AM_CPPFLAGS) \
 	-DSRCDIR="$(srcdir)"
-RcTest_LDADD = $(LDADD) -lboost_system
+RcTest_LDADD = $(LDADD)
 
 IntTypesTest_SOURCES = IntTypesTest.cpp
 IntTypesTest_CPPFLAGS =  $(AM_CPPFLAGS) \
