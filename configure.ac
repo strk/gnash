@@ -1,5 +1,5 @@
 dnl  
-dnl  Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
+dnl  Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014
 dnl  Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
