@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-01-01 09:28-0700\n"
-"PO-Revision-Date: 2014-04-20 15:13+0200\n"
-"Last-Translator: pere <pere@hungry.com>\n"
+"PO-Revision-Date: 2014-04-20 15:41+0200\n"
+"Last-Translator: Petter <pere@hungry.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: nb\n"
 "MIME-Version: 1.0\n"
@@ -799,27 +799,27 @@ msgstr "Pause film"
 
 #: gui/qt/kde.cpp:415
 msgid "Stop Movie"
-msgstr ""
+msgstr "Stopp film"
 
 #: gui/qt/kde.cpp:416 gui/gtk/gtk.cpp:2152
 msgid "Restart Movie"
-msgstr ""
+msgstr "Start film på nytt"
 
 #: gui/qt/kde.cpp:418
 msgid "Step Forward"
-msgstr ""
+msgstr "Steg forover"
 
 #: gui/qt/kde.cpp:419
 msgid "Step Backward"
-msgstr ""
+msgstr "Steg bakover"
 
 #: gui/qt/kde.cpp:420
 msgid "Jump Forward"
-msgstr ""
+msgstr "Hopp forover"
 
 #: gui/qt/kde.cpp:421
 msgid "Jump Backward"
-msgstr ""
+msgstr "Hopp bakover"
 
 #: gui/pythonmod/gnash-view.cpp:220 gui/Player.cpp:288
 #, c-format
@@ -833,7 +833,7 @@ msgstr ""
 #: gui/aos4/aos4.cpp:70
 #, c-format
 msgid "Exception: %s on file %s line %d"
-msgstr ""
+msgstr "Unntak: %s i fil %s linje %d"
 
 #: gui/aos4/aos4.cpp:266 gui/gtk/gtk.cpp:2591
 #, c-format
