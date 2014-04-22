@@ -2881,14 +2881,17 @@ AC_ARG_ENABLE([harden],
   [harden=yes]
 )
 
-if test x"$harden" = x"yes" -a x"${host_cpu}" != mips -a x"${android}" != xyes; then
+if test x"$harden" = x"yes" -a x"${host_cpu}" != x"mips" -a x"${android}" != xyes; then
     CPPFLAGS="${CPPFLAGS} -D_FORTIFY_SOURCE=2"
     CFLAGS="${CFLAGS} -fPIE -fstack-protector --param ssp-buffer-size=4 -Wformat -Werror=format-security"
     CXXFLAGS="${CXXFLAGS} -fPIE -fstack-protector --param ssp-buffer-size=4 -Wformat -Werror=format-security"
-    if test x"$darwin" = x"yes"; then
+
+    if test x"$with_gnu_ld" = x"yes"; then
+      LDFLAGS="${LDFLAGS} -fPIE -pie -Wl,-z,relro -Wl,-z,now"
+    elif test x"$darwin" = x"yes"; then
       LDFLAGS="${LDFLAGS} -fPIE -pie"
     else
-      LDFLAGS="${LDFLAGS} -fPIE -pie -Wl,-z,relro -Wl,-z,now"
+      LDFLAGS="${LDFLAGS}"
     fi
 fi
 
