@@ -1,12 +1,6 @@
 #!/bin/sh
 
-
-# case "$1" in
-#     totals)
-# 	totals ;;
-#     *)
-# 	exit ;;
-# esac
+mode=$1
 
 total_fail=0;
 total_pass=0;
@@ -98,6 +92,7 @@ echo
 # For now, return a failure if any XPASS or FAIL occurred
 if test ${total_fail} -gt 0 || test ${total_xpass} -gt 0; then
 
+	rc=1
 	timing=$(dirname $0)/timingissues
 	> ${timing}.tmp
 
@@ -124,8 +119,7 @@ if test ${total_fail} -gt 0 || test ${total_xpass} -gt 0; then
 			echo "All failures are time-related. Exiting 0."
 			echo "See http://wiki.gnashdev.org/PredictableLoading"
 			echo
-			rm -f ${timing}.tmp
-			exit 0
+			rc=0
 		else
 			echo "Time-related failures follow:"
 			grep -f $timing ${timing}.tmp
@@ -137,8 +131,32 @@ if test ${total_fail} -gt 0 || test ${total_xpass} -gt 0; then
 			echo
 		fi
 	fi
+
+	if [ "$mode" = "verbose" ]; then
+		if test ${total_fail} -gt 0; then
+			echo "Verbose mode enabled. Displaying following files:"
+			echo
+			swfdecfail=$(sed -n 's/^.*in \(.*.trace-gnash\).*in \(.*.log\).*$/\1\n\2/p' ${timing}.tmp)
+			for log in $swfdecfail; do
+				echo " testsuite/swfdec/$log"
+				logfiles="${logfiles} testsuite/swfdec/$log"
+			done
+			for s in ${suitefail}; do
+				echo " ${s}/testrun.log"
+				logfiles="${logfiles} ${s}/testrun.log"
+			done
+			echo
+			for logfile in ${logfiles}; do
+				echo "= = = = = = = [ ${logfile} file - BEGIN ] = = = = = = ="
+				cat ${logfile}
+				echo "= = = = = = = [ ${logfile} file - END   ] = = = = = = ="
+				echo
+			done
+		fi
+	fi
+
 	rm -f ${timing}.tmp
-	exit 1
+	exit $rc
 else
 	exit 0
 fi

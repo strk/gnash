@@ -489,7 +489,7 @@ check-local:
 	$(MAKE) anal
 
 anal testreport checksum:
-	$(srcdir)/testsuite/analyse-results.sh
+	$(srcdir)/testsuite/analyse-results.sh $(MODE)
 endif
 
 .PHONY : dumpconfig \
