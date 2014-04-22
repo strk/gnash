@@ -4,10 +4,11 @@ FAIL: loadMovieTestRunner: expected: \(red.swf\|blue.swf\|green.jpg\) , obtained
 ### misc-ming.all - network tests
 FAIL: XMLSocketTester: consistency check: last trace from run of test  (.*) doesn't match pattern (ENDOFTEST)
 FAIL: rtmpytest-runner: consistency check: last trace from run of test rtmpytest.swf (Connecting to rtmp://www.gnashdev.org:9984/rtmpyecho) doesn't match pattern (ENDOFTEST)
-FAIL: oflaDemo-runner: Tests run 34 (expected 17) [undefined]
+FAIL: oflaDemo-runner: Tests run 34 (expected 17) \[undefined\]
 ## FAIL: LCTestRunner: consistency check: last trace from run of test  (.*) doesn't match pattern (ENDOFTEST)
-### misc-mtasc.all/level87.as:72
-FAIL: sanetests-runner: expected: "1" , obtained: ""  \[level87.as:[0-9]*\]
+### misc-mtasc.all
+FAIL: sanetests-runner: expected: "undefined" , obtained: "movieclip"  \[level87.as:59\]
+FAIL: sanetests-runner: expected: "1" , obtained: ""  \[level87.as:72\]
 ### swfdec
 FAIL: run_swfdec_testsuite_g: gotolabel-multiple.swf:[0-9a-f]* (traces in gotolabel-multiple.swf.trace-gnash, log in gotolabel-multiple.swf.log)
 FAIL: run_swfdec_testsuite_m: movieclip-lockroot-loadmovie-[678].swf:[0-9a-f]* (traces in movieclip-lockroot-loadmovie-[678].swf.trace-gnash, log in movieclip-lockroot-loadmovie-[678].swf.log)
