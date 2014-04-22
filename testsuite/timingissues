@@ -8,6 +8,7 @@ FAIL: oflaDemo-runner: Tests run 34 (expected 17) \[undefined\]
 ## FAIL: LCTestRunner: consistency check: last trace from run of test  (.*) doesn't match pattern (ENDOFTEST)
 ### misc-mtasc.all
 FAIL: sanetests-runner: expected: "undefined" , obtained: "movieclip"  \[level87.as:59\]
+FAIL: sanetests-runner: expected: "1" , obtained: ""  \[level87.as:75\]
 FAIL: sanetests-runner: expected: "1" , obtained: ""  \[level87.as:72\]
 ### swfdec
 FAIL: run_swfdec_testsuite_g: gotolabel-multiple.swf:[0-9a-f]* (traces in gotolabel-multiple.swf.trace-gnash, log in gotolabel-multiple.swf.log)
