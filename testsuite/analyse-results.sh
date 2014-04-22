@@ -131,22 +131,31 @@ if test ${total_fail} -gt 0 || test ${total_xpass} -gt 0; then
 			echo
 		fi
 	fi
-	rm -f ${timing}.tmp
 
 	if [ "$mode" = "verbose" ]; then
 		if test ${total_fail} -gt 0; then
-			echo "Verbose mode enabled. Displaying testrun.log files."
+			echo "Verbose mode enabled. Displaying following files:"
 			echo
+			swfdecfail=$(sed -n 's/^.*in \(.*.trace-gnash\).*in \(.*.log\).*$/\1\n\2/p' ${timing}.tmp)
+			for log in $swfdecfail; do
+				echo " testsuite/swfdec/$log"
+				logfiles="${logfiles} testsuite/swfdec/$log"
+			done
 			for s in ${suitefail}; do
-				testrun=${s}/testrun.log
-				echo "= = = = = = = [ ${testrun} file - BEGIN ] = = = = = = ="
-				cat ${testrun}
-				echo "= = = = = = = [ ${testrun} file - END   ] = = = = = = ="
+				echo " ${s}/testrun.log"
+				logfiles="${logfiles} ${s}/testrun.log"
+			done
+			echo
+			for logfile in ${logfiles}; do
+				echo "= = = = = = = [ ${logfile} file - BEGIN ] = = = = = = ="
+				cat ${logfile}
+				echo "= = = = = = = [ ${logfile} file - END   ] = = = = = = ="
 				echo
 			done
 		fi
 	fi
 
+	rm -f ${timing}.tmp
 	exit $rc
 else
 	exit 0
