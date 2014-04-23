@@ -108,7 +108,7 @@ public:
 private:
     /// \brief
     /// Variable to pass cookiefile path from command line to curl.
-    static std::string CookiesIn;
+    static DSOEXPORT std::string CookiesIn;
 
     static const ReservedNames& reservedNames();
 
