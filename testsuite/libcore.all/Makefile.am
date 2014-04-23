@@ -39,7 +39,6 @@ AM_CPPFLAGS = \
 check_PROGRAMS = \
 	StreamTest \
 	BitsReaderTest \
-	PointTest \
 	MatrixTest \
 	EdgeTest \
 	PropertyListTest \
