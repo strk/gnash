@@ -67,6 +67,7 @@ main(int /*argc*/, char** /*argv*/)
     boost::int32_t  dist = 0;
     dist = p1.distance(p2);
     check_equals(dist, 0x8000000);
+    return 0;
 }
 
 

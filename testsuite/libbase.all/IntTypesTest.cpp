@@ -43,5 +43,6 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals (sizeof(boost::int32_t), 4);
 	check_equals (sizeof(boost::int64_t), 8);
 
+	return 0;
 }
 

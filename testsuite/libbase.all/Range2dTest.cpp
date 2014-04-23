@@ -333,6 +333,6 @@ main(int /*argc*/, char** /*argv*/)
 	check( ! fIntRange1.contains(Range2d<int>(8, 8, 10, 11)) );
 	check( ! fIntRange1.contains(Range2d<int>(8, 8, 11, 11)) );
 	
-
+	return 0;
 }
 

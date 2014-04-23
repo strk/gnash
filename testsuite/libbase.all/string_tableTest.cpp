@@ -57,5 +57,5 @@ main(int /*argc*/, char** /*argv*/)
     check(!equal(st, st.find("AbAb"), st.find("abaB"), false));
     check(!equal(st, st.find("AbAb"), st.find("ABAB"), false));
 
-
+    return 0;
 }

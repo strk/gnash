@@ -225,5 +225,6 @@ main(int /*argc*/, char** /*argv*/)
 	finSnap4.add(Range2d<int>(40,273, 108,287));
 
 	check(finSnap3.contains(finSnap4));
+	return 0;
 }
 

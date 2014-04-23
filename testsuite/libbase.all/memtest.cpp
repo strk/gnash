@@ -174,6 +174,7 @@ main (int /*argc*/, char** /*argv*/) {
 #else
     runtest.untested("No support for mallinfo()");
 #endif // end of HAVE_MALLINFO
+    return 0;
 }
 
 // Allocate memory and forget to clean it up.

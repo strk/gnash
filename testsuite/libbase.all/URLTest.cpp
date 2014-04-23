@@ -340,5 +340,7 @@ main(int /*argc*/, char** /*argv*/)
     check_equals (v66.anchor(), "");
     
 	// TODO: Samba paths
+
+    return 0;
 }
 
