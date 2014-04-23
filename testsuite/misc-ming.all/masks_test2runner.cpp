@@ -72,4 +72,5 @@ main(int /*argc*/, char** /*argv*/)
   tester.advance(); 
   check_pixel(105, 105, 210, red, 2); 
   check_pixel(220, 220, 10, white, 2); 
+  return 0;
 }

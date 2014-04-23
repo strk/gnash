@@ -62,5 +62,6 @@ main(int /*argc*/, char** /*argv*/)
     check_equals(tester.soundsStarted(), 3);
     check_equals(tester.soundsStopped(), 3);
 
+    return 0;
 }
 

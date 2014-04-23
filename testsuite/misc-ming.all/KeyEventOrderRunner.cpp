@@ -78,4 +78,5 @@ main(int /*argc*/, char** /*argv*/)
   tester.advance();
   check_equals(root->get_current_frame(), 5);
   
+  return 0;
 }

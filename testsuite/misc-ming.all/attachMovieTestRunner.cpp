@@ -160,5 +160,6 @@ main(int /*argc*/, char** /*argv*/)
 	getObject(root)->get_member(mousedown, &tmp);
 	check_equals(toNumber(tmp, vm), 5);
 
+	return 0;
 }
 

@@ -122,5 +122,7 @@ main(int /*argc*/, char** /*argv*/)
 	check(eot.to_bool(8));
 
 	// TODO: use check_pixel for checking bacground colors
+
+	return 0;
 }
 

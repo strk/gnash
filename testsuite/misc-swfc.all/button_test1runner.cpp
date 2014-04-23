@@ -161,5 +161,6 @@ main(int /*argc*/, char** /*argv*/)
         
 	//cerr << "EOT is " << eot.to_debug_string() << endl;
 	check(eot.to_bool(8));
+	return 0;
 }
 

@@ -98,6 +98,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester.click();
 	//tester.advance(); // mouse event handler should drive the movie
 	check_equals(root->get_current_frame(), 3);
+	return 0;
 }
 
 

@@ -54,5 +54,6 @@ main(int /*argc*/, char** /*argv*/)
 		tester.advance();
 
 	// TODO: use check_pixel for checking bacground colors
+	return 0;
 }
 

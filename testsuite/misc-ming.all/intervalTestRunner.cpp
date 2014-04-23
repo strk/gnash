@@ -139,5 +139,6 @@ main(int /*argc*/, char** /*argv*/)
 	getObject(root)->get_member(testCompleted, &tmp);
 	check_equals(toNumber(tmp, vm), 1);
 
+	return 0;
 }
 

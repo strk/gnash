@@ -121,6 +121,7 @@ main(int argc, char *argv[])
         runtest.fail("VaapiDevice::getDepth()");
     }    
     
+    return 0;    
 }
 
 // Local Variables:

@@ -119,6 +119,7 @@ main(int argc, char *argv[])
         runtest.fail("X11Device::getBlueSize()");
     }    
 #endif
+    return 0;    
 }
 
 // Local Variables:

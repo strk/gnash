@@ -167,5 +167,6 @@ main(int /*argc*/, char** /*argv*/)
     check_pixel(500, 460, 1, white, 2);
     check_pixel(460, 500, 1, white, 2);
 
+    return 0;
 }
 

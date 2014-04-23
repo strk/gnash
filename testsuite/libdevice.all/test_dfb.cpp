@@ -139,6 +139,7 @@ main(int argc, char *argv[])
     std::cerr << "----------------------" << std::endl;
 #endif
 
+    return 0;
 }
 
 // Local Variables:

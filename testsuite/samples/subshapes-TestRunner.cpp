@@ -115,5 +115,6 @@ main(int /*argc*/, char** /*argv*/)
 	check_pixel(bbExtT.x, bbExtT.y, 2, white, 1);
 	check_pixel(bbExtL.x, bbExtL.y, 2, white, 1);
 
+	return 0;
 }
 

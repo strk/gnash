@@ -184,6 +184,7 @@ main(int argc, char *argv[])
         *(fbp + location + 2) = 200; /* A lot of red */
         *(fbp + location + 3) = 0; /* No transparency */
     }
+    return 0;
 }
 
 // Local Variables:

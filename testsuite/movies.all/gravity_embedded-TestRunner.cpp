@@ -153,5 +153,6 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(round(toNumber(tmp, vm)), 52);
 
 
+	return 0;
 }
 

@@ -104,5 +104,6 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(slides->get_current_frame(), 11);
 	check_equals(root->get_current_frame(), 4);
 
+	return 0;
 }
 

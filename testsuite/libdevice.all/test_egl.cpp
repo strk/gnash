@@ -91,6 +91,7 @@ main(int argc, char *argv[])
 #endif
     
 #endif
+    return 0;
 }
 
 void

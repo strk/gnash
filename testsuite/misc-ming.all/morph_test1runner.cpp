@@ -87,5 +87,6 @@ main(int /*argc*/, char** /*argv*/)
   // Frame 8
   tester.advance();
   // #39989. Nothing to check: empty morph shape.
+  return 0;
 }
 

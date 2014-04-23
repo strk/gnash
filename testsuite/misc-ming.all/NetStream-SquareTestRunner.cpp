@@ -101,5 +101,6 @@ main(int /*argc*/, char** /*argv*/)
 		&eot);
 	check(endOfTestFound);
 
+	return 0;
 }
 

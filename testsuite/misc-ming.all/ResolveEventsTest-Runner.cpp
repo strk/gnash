@@ -79,5 +79,6 @@ main(int /*argc*/, char** /*argv*/)
     check_equals(root->getPlayState(), MovieClip::PLAYSTATE_STOP);
 	check_equals(root->get_current_frame(), 6);
 
+    return 0;
 }
 

@@ -233,5 +233,6 @@ main(int /*argc*/, char** /*argv*/)
 	check_pixel(434, 291, 2, yellow, 1);
 	check_equals(string(text->get_text_value()), msg_empty);
 
+	return 0;
 }
 

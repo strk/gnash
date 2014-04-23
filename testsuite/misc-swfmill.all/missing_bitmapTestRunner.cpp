@@ -70,5 +70,6 @@ main(int /*argc*/, char** /*argv*/)
 
 	tester.advance();
 
+	return 0;
 }
 

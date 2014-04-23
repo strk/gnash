@@ -137,5 +137,6 @@ main(int /*argc*/, char** /*argv*/)
 	check_pixel(lr6.x, lr7.y, 8, white, 1);
 
 
+	return 0;
 }
 

@@ -381,5 +381,6 @@ main(int /*argc*/, char** /*argv*/)
 	check( invalidated.contains(248, 331) );
 	check_pixel(248,331, 2, dark_green, 2);
 	check( tester.isMouseOverMouseEntity() ) // mask still sensible to mouse
+	return 0;
 }
 

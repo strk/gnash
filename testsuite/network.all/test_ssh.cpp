@@ -169,6 +169,7 @@ main(int argc, char *argv[])
     }
 
     test_channels();
+    return 0;
 }
 
 static void test_client()

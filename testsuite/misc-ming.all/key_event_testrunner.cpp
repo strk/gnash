@@ -191,4 +191,5 @@ main(int /*argc*/, char** /*argv*/)
 
   // reached frame23, test finished
   check_equals(root->get_current_frame(), 23);
+  return 0;
 }

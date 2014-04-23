@@ -63,5 +63,6 @@ main(int /*argc*/, char** /*argv*/)
     tester.click();
     tester.click();
     tester.click();
+    return 0;
 }
 

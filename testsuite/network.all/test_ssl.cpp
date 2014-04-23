@@ -172,6 +172,7 @@ main(int argc, char *argv[])
 	test_client();
     }
 #endif
+    return 0;
 }
 
 #ifdef USE_SSL

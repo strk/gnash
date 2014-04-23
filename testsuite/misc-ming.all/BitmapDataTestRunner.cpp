@@ -195,5 +195,6 @@ main(int /*argc*/, char** /*argv*/)
     tester.click();
     tester.advance();
 
+    return 0;
 }
 

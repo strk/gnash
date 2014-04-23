@@ -106,5 +106,6 @@ main(int /*argc*/, char** /*argv*/)
 
 	tester.movePointerTo(240, 5);
 	check(tester.isMouseOverMouseEntity());
+	return 0;
 }
 

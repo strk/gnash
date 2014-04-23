@@ -85,5 +85,6 @@ main(int /*argc*/, char** /*argv*/)
 	check_pixel(600, 400, 50, red, tol);
 	check_pixel(600, 60, 50, red, tol);
 	check_pixel(320, 240, 50, red, tol);
+	return 0;
 }
 
