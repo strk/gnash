@@ -95,4 +95,5 @@ int main()
     check_equals(+b, 0);
     check_equals(+g, 117);
     check_equals(+a, 0);
+    return 0;
 }

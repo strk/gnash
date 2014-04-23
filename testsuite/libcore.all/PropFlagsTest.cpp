@@ -99,5 +99,6 @@ main(int /*argc*/, char** /*argv*/)
     check(i3.get_visible(7));
     check(i3.get_visible(8));
     check(i3.get_visible(9));
+    return 0;
 }
 

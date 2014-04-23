@@ -120,5 +120,6 @@ main(int /*argc*/, char** /*argv*/)
 	st.push(100);
 	check_equals(st.value(0), 100);
 	check_equals(st.top(0), 100);
+	return 0;
 }
 

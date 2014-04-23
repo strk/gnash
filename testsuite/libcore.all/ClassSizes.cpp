@@ -90,5 +90,6 @@ main(int /*argc*/, char** /*argv*/)
 {
     std::cout << "Gnash class sizes:\n";
     BOOST_PP_SEQ_FOR_EACH(SIZE, _, TYPES)
+    return 0;
 }
 

@@ -278,5 +278,6 @@ main(int /*argc*/, char** /*argv*/)
     m1_inverse.concatenate(m1);
     // the result is expected to be an identity SWFMatrix. 
     check_equals(m1_inverse, identity);
+    return 0;
 }
 

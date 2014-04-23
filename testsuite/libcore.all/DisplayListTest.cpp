@@ -91,6 +91,6 @@ main(int /*argc*/, char** /*argv*/)
     dlist2.placeDisplayObject(ch2, 1);
     dlist2.placeDisplayObject(ch1, 2);
     
-    
+    return 0;
 }
 

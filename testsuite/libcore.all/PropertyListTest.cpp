@@ -202,5 +202,6 @@ main(int /*argc*/, char** /*argv*/)
 		check_equals(props.size(), 3);
 
 	}
+	return 0;
 }
 

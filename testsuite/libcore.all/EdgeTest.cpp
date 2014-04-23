@@ -103,5 +103,6 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(Edge::pointOnCurve(A, C, B, 0.5), point(27.5, 10));
 	check_equals(std::sqrt((float)Edge::squareDistancePtCurve(A, C, B, B, 1)), 0);
 	check_equals(std::sqrt((float)Edge::squareDistancePtCurve(A, C, B, A, 0)), 0);
+	return 0;
 }
 

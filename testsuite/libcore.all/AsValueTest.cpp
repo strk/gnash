@@ -118,6 +118,7 @@ main(int argc, char *argv[])
     test_isnan();
     test_conversion();
    
+    return 0;
 }
 
 void
