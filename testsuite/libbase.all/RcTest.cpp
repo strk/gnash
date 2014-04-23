@@ -213,7 +213,7 @@ main (int /*argc*/, char** /*argv*/) {
         runtest.fail ("rc.getWhiteList() doesn't have elements");        
     }
 
-    if (rc.getLCShmKey() == (key_t)0xdd3adabd) {
+    if (rc.getLCShmKey() == static_cast<key_t>(0xdd3adabd)) {
         runtest.pass ("rc.getLCShmKey() == 0xabcd1234");
     } else {
         runtest.fail ("rc.getLCShmKey() != 0xabcd1234");
