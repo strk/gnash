@@ -430,11 +430,6 @@ private:
     ///     _vidVect
     int _devSelection;
     
-    /// \var VideoInputGst::_numdevs
-    /// \brief An integer value containing the number of devices attached
-    ///       to the machine.
-    gint _numdevs;
-    
     /// \var VideoInputGst::_globalWebcam
     /// \brief Convienient pointer to the selected device's GnashWebcamPrivate
     ///       class structure.
