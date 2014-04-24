@@ -204,7 +204,7 @@ public:
 
 	/// Set the Range2d to the WORLD value
 	//
-	/// This is implemented using the minimun and maximun
+	/// This is implemented using the minimum and maximum
 	/// values of the parameter type.
 	///
 	/// See RangeType::worldRange
