@@ -75,5 +75,6 @@ trymain(int /*argc*/, char** /*argv*/)
         check_equals(tester.streamingSound(), true);
     }
 
+    return EXIT_SUCCESS;
 }
 

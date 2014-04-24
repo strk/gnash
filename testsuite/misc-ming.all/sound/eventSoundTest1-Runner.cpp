@@ -133,5 +133,6 @@ trymain(int /*argc*/, char** /*argv*/)
         getObject(root)->get_member(getURI(vm, "endoftest"), &eot);
     check(endOfTestFound);
 
+    return EXIT_SUCCESS;
 }
 

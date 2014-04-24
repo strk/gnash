@@ -88,5 +88,6 @@ trymain(int /*argc*/, char** /*argv*/)
         check_equals(tester.soundsStopped(), 1);
     }
 
+    return EXIT_SUCCESS;
 }
 
