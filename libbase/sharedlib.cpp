@@ -58,6 +58,9 @@ lt_dlhandle lt_dlopenext       (const char *filename);
 namespace gnash {
 
 SharedLib::SharedLib(const std::string& filespec)
+#ifdef HAVE_LTDL
+  : _dlhandle(NULL)
+#endif
 {
     _filespec = filespec;
     scoped_lock lock(_libMutex);

@@ -68,7 +68,9 @@ private:
 
     bool closeLib();
 
+#ifdef HAVE_LTDL
     lt_dlhandle _dlhandle;
+#endif
     std::string _filespec;
     boost::mutex _libMutex;    
 };
