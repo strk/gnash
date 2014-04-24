@@ -35,8 +35,9 @@ using namespace gnash;
 using namespace std;
 using namespace gnash::geometry;
 
+TRYMAIN(_runtest);
 int
-main(int /*argc*/, char** /*argv*/)
+trymain(int /*argc*/, char** /*argv*/)
 {
 	typedef gnash::geometry::SnappingRanges2d<int> Ranges;
 	typedef gnash::geometry::Range2d<int> Bounds;

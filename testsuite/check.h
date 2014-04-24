@@ -117,4 +117,15 @@ TestState _runtest;
 		} \
 	}
 
+int trymain(int argc, char *argv[]);
+#define TRYMAIN(runtest) \
+int main(int argc, char *argv[]) { \
+  try { \
+      return trymain(argc, argv);  \
+  } catch (std::exception const&  ex) { \
+    (runtest).fail(std::string("caugh unexcepcted exception: ") + ex.what()); \
+    return 1; \
+  } \
+}
+
 #endif // _CHECK_H_

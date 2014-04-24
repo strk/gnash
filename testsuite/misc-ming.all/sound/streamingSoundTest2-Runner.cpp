@@ -38,8 +38,9 @@
 using namespace gnash;
 using namespace std;
 
+TRYMAIN(_runtest);
 int
-main(int /*argc*/, char** /*argv*/)
+trymain(int /*argc*/, char** /*argv*/)
 {
     string filename = string(TGTDIR) + string("/") + string(INPUT_FILENAME);
 

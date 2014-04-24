@@ -39,8 +39,9 @@ using namespace gnash;
 using std::string;
 using ::round;
 
+TRYMAIN(_runtest);
 int
-main(int /*argc*/, char** /*argv*/)
+trymain(int /*argc*/, char** /*argv*/)
 {
 	string filename = string(SRCDIR) + string("/") + string(INPUT_FILENAME);
 	MovieTester tester(filename);
