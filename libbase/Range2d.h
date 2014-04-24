@@ -183,6 +183,8 @@ public:
 	{
 		_xmin = std::numeric_limits<T>::max();
 		_xmax = std::numeric_limits<T>::min();
+		_ymin = 0;
+		_ymax = 0;
 		return *this;
 	}
 
@@ -215,6 +217,8 @@ public:
 	{
 		_xmin = std::numeric_limits<T>::min();
 		_xmax = std::numeric_limits<T>::max();
+		_ymin = 0;
+		_ymax = 0;
 		return *this;
 	}
 
