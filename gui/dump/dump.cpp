@@ -91,8 +91,10 @@ DumpGui::DumpGui(unsigned long xid, float scale, bool loop, RunResources& r)
     _pixelformat("BGRA32"),
     _fileOutput(),
     _fileOutputFPS(0), // dump at every heart-beat by default
+    _fileOutputAdvance(0),
     _lastVideoFrameDump(0), // this will be computed
     _sleepUS(0),
+    _videoDumpFPS(0),
     _started(false),
     _startTime(0)
 {
