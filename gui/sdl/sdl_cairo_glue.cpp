@@ -27,6 +27,12 @@ namespace gnash
 {
 
 SdlCairoGlue::SdlCairoGlue()
+: _cairo_surface(NULL)
+  , _cairo_handle(NULL)
+  , _sdl_surface(NULL)
+  , _render_image(NULL)
+  , _screen(NULL)
+  , _renderer(NULL)
 {
 //    GNASH_REPORT_FUNCTION;
 }
