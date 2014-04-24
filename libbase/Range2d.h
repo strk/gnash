@@ -513,7 +513,9 @@ public:
 	{
 		if ( isNull() || isWorld() || amount==0 ) return *this;
 
-		// NOTE: triggers a compiler warning when T is an unsigned type
+		// NOTE: this trigger a compiler warning when T is an
+		//       unsigned type (Coverity CID 1154656 -
+		//       logically dead code)
 		if ( amount < 0 ) return shrinkBy(-amount);
 
 		T newxmin = _xmin - amount;
@@ -564,8 +566,9 @@ public:
 	{
 		if ( isNull() || isWorld() || amount==0 ) return *this;
 
-		// NOTE: whith will likely trigger a compiler
-		//       warning when T is an unsigned type
+		// NOTE: this trigger a compiler warning when T is an
+		//       unsigned type (Coverity CID 1154655 -
+		//       logically dead code)
 		if ( amount < 0 ) return growBy(-amount);
 
 		// Turn this range into the NULL range
