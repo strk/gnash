@@ -69,7 +69,13 @@ StreamProvider::getStream(const URL& url, bool namedCacheFile) const
             //       Note also that the FB gui will use stdin
             //       for key events.
             //
-			FILE *newin = fdopen(dup(0), "rb");
+			int fd = dup(0);
+			if (0 > fd) {
+				log_error(_("Could not stdin (filename -): %2%"),
+				          std::strerror(errno));
+				return stream;
+			}
+			FILE *newin = fdopen(fd, "rb");
 
 			// Close on destruction.
 			stream = makeFileChannel(newin, true);
