@@ -1,6 +1,6 @@
 dnl  
 dnl  Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010,
-dnl  2011 Free Software Foundation, Inc.
+dnl  2011, 2014 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
@@ -97,10 +97,10 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
 
   dnl If the path hasn't been specified, go look for it.
   if test x"${ac_cv_path_$1_incl}" = x; then
-    AC_CHECK_HEADER($2, [ac_cv_path_$1_incl=""; found_$1_incl="yes"], [
-      AC_CHECK_HEADER($1/$2, [ac_cv_path_$1_incl="-I${additional_includedir}/$1"; found_$1_incl="yes"], [
-        AC_CHECK_HEADER($name/$2, [ac_cv_path_$1_incl="-I${additional_includedir}/$name"; found_$1_incl="yes"], [
-          AC_CHECK_HEADER($2, [ac_cv_path_$1_incl="-I${additional_includedir}/$2"; found_$1_incl="yes"], [
+    AC_CHECK_HEADER(${additional_includedir}/$2, [ac_cv_path_$1_incl=""; found_$1_incl="yes"], [
+      AC_CHECK_HEADER(${additional_includedir}/$1/$2, [ac_cv_path_$1_incl="-I${additional_includedir}/$1"; found_$1_incl="yes"], [
+        AC_CHECK_HEADER(${additional_includedir}/$name/$2, [ac_cv_path_$1_incl="-I${additional_includedir}/$name"; found_$1_incl="yes"], [
+          AC_CHECK_HEADER(${additional_includedir}/$2, [ac_cv_path_$1_incl="-I${additional_includedir}/$2"; found_$1_incl="yes"], [
           if test x"${ac_cv_path_$1_incl}" = x; then
             for i in $incllist; do
               if test -f $i/$name; then
@@ -108,7 +108,7 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
                 if test x"$i" != x"${additional_includedir}"; then
                   ac_cv_path_$1_incl="-I$i"
                 else
-                  ac_cv_path_$1_incl=""
+                  ac_cv_path_$1_incl="-I${additional_includedir}"
                 fi
                 break
               else
