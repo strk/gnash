@@ -83,8 +83,23 @@ Qt4Gui::Qt4Gui(unsigned long xid, float scale, bool loop, RunResources& r)
     :
     Gui(xid, scale, loop, r),
     _numArgs(0),
+    _embedWidget(NULL),
+    _drawingWidget(NULL),
     _interval(0),
     _advanceTimer(0)
+    , fileMenu(NULL)
+    , propertiesAction(NULL)
+    , quitAction(NULL)
+    , editMenu(NULL)
+    , preferencesAction(NULL)
+    , movieControlMenu(NULL)
+    , playAction(NULL)
+    , pauseAction(NULL)
+    , stopAction(NULL)
+    , restartAction(NULL)
+    , viewMenu(NULL)
+    , refreshAction(NULL)
+    , fullscreenAction(NULL)
 {
 }
 
