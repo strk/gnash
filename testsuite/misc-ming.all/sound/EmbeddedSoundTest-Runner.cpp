@@ -62,6 +62,6 @@ main(int /*argc*/, char** /*argv*/)
     }
     as_value eot;
     xcheck(getObject(root)->get_member(getURI(vm, "finished"), &eot));
-
+    return 0;
 }
 

@@ -66,6 +66,6 @@ main(int /*argc*/, char** /*argv*/)
         tester.advance();
         check_equals(tester.streamingSound(), true);
     }
-
+    return 0;
 }
 

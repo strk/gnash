@@ -51,6 +51,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester.restart();
 	testAll(tester);
 
+	return 0;
 }
 
 

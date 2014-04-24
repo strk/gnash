@@ -213,5 +213,6 @@ main(int /*argc*/, char** /*argv*/)
 		check_equals(eot.to_bool(8), true);
 	}
 
+	return 0;
 }
 

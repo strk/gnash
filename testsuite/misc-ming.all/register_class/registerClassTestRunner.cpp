@@ -109,5 +109,6 @@ main(int /*argc*/, char** /*argv*/)
 
 	tester.advance();
 	check_equals(root->get_current_frame(), 5); // we should be in stop mode
+	return 0;
 }
 
