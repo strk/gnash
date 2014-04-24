@@ -781,7 +781,6 @@ namespace Qt4GuiPrefs {
 PreferencesDialog::PreferencesDialog(QWidget* parent)
     :
     QDialog(parent),
-    _lcTraceToggle(NULL),
     _rcfile(RcInitFile::getDefaultInstance())
 {
     setWindowTitle(_q("Gnash preferences"));
