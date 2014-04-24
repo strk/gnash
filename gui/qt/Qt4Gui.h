@@ -222,7 +222,6 @@ private:
     QCheckBox* _actionDumpToggle;
     QCheckBox* _malformedSWFToggle;
     QCheckBox* _ASCodingErrorToggle;
-    QCheckBox* _lcTraceToggle;
 
     // Security tab widgets
     QCheckBox* _localHostToggle;

@@ -563,19 +563,17 @@ FBGui::disable_terminal()
     
     char* tty = find_accessible_tty(0);
 
-    log_debug("Disabling terminal %s", tty);
-    
-    int fd;
-  
     if (!tty) {
-        log_error(_("Could not detect controlling TTY"));
+        log_error(_("Could not detect controlling TTY when trying to disable terminal"));
         return false;
     }
+    
+    log_debug("Disabling terminal %s", tty);
     
     // Detect the currently active virtual terminal (so we can switch back to
     // it later)
     
-    fd = open(tty, O_RDWR);
+    int fd = open(tty, O_RDWR);
     if (fd < 0) {
         log_error(_("Could not open %s"), tty);
         return false;
@@ -694,12 +692,13 @@ FBGui::enable_terminal()
     // log_debug("Restoring terminal...");
 
     char* tty = find_accessible_tty(_own_vt);
-    log_debug("Enabling terminal %s", tty);
 
     if (!tty) {
-        log_error(_("Could not find device for VT number %d"), _own_vt);
+        log_error(_("Could not find device for VT number %d when enabling terminal"), _own_vt);
         return false;
     }
+
+    log_debug("Enabling terminal %s", tty);
 
     int fd = open(tty, O_RDWR);
     if (fd < 0) {
