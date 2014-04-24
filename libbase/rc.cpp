@@ -303,7 +303,7 @@ RcInitFile::expandPath (std::string& path)
             else { 
                 struct passwd *password = getpwuid(getuid());
                     const char *pwdhome = password->pw_dir;
-                    if (home) {
+                    if (pwdhome) {
                         path.replace(0, 1, pwdhome);
                     }
                    //If all that fails, leave path alone
