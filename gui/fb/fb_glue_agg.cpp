@@ -45,16 +45,16 @@ namespace gui {
 //---------------------------------------------
 FBAggGlue::FBAggGlue()
     : _fd(-1),
-      _varinfo(),
-      _fixinfo()
+      _fixinfo(),
+      _varinfo()
 {
 //    GNASH_REPORT_FUNCTION;
 }
 
 FBAggGlue::FBAggGlue(int fd)
     : _fd(fd),
-      _varinfo(),
-      _fixinfo()
+      _fixinfo(),
+      _varinfo()
 {
 //    GNASH_REPORT_FUNCTION;    
 }
