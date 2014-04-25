@@ -20,6 +20,7 @@
 
 #include "GnashTexture.h"
 #include <GL/gl.h>
+#include <GL/glu.h>
 
 #define GL_DEBUG 0
 
@@ -37,37 +38,13 @@ struct gl_errors_t {
      const char *str;
 };
 
-// Returns a string representation of an OpenGL error
-static const char *gl_get_error_string(GLenum error)
-{
-    gl_errors_t gl_errors[] = {
-        { GL_NO_ERROR,          "no error" },
-        { GL_INVALID_ENUM,      "invalid enumerant" },
-        { GL_INVALID_VALUE,     "invalid value" },
-        { GL_INVALID_OPERATION, "invalid operation" },
-        { GL_STACK_OVERFLOW,    "stack overflow" },
-        { GL_STACK_UNDERFLOW,   "stack underflow" },
-        { GL_OUT_OF_MEMORY,     "out of memory" },
-#ifdef GL_INVALID_FRAMEBUFFER_OPERATION_EXT
-        { GL_INVALID_FRAMEBUFFER_OPERATION_EXT, "invalid framebuffer operation" },
-#endif
-    };
-
-    for (gl_errors_t *it = boost::begin(gl_errors), *end = boost::end(gl_errors);
-         it != end; ++it) {
-        if (it->val == error)
-            return it->str;
-    }
-    return "unknown";
-}
-
 static inline bool gl_do_check_error(int report)
 {
     GLenum error;
     bool is_error = false;
     while ((error = glGetError()) != GL_NO_ERROR) {
         if (report)
-            log_error(_("glError: %s caught\n"), gl_get_error_string(error));
+            log_error(_("glError: %s caught\n"), gluErrorString(error));
         is_error = true;
     }
     return is_error;

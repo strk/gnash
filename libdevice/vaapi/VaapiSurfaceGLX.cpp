@@ -19,43 +19,15 @@
 
 #include <va/va_glx.h>
 #include <va/va_x11.h>
+#include <GL/glu.h>
 
 #include "log.h"
 #include "VaapiSurfaceGLX.h"
 #include "VaapiGlobalContext.h"
 #include "vaapi_utils.h"
 
+
 namespace gnash {
-
-// Returns a string representation of an OpenGL error
-static const char *gl_get_error_string(GLenum error)
-{
-    static const struct {
-        GLenum val;
-        const char *str;
-    }
-    gl_errors[] = {
-        { GL_NO_ERROR,          "no error" },
-        { GL_INVALID_ENUM,      "invalid enumerant" },
-        { GL_INVALID_VALUE,     "invalid value" },
-        { GL_INVALID_OPERATION, "invalid operation" },
-        { GL_STACK_OVERFLOW,    "stack overflow" },
-        { GL_STACK_UNDERFLOW,   "stack underflow" },
-        { GL_OUT_OF_MEMORY,     "out of memory" },
-#ifdef GL_INVALID_FRAMEBUFFER_OPERATION_EXT
-        { GL_INVALID_FRAMEBUFFER_OPERATION_EXT, "invalid framebuffer operation" },
-#endif
-        { ~0, NULL }
-    };
-
-    int i;
-    for (i = 0; gl_errors[i].str; i++) {
-        if (gl_errors[i].val == error) {
-            return gl_errors[i].str;
-        }
-    }
-    return "unknown";
-}
 
 static inline bool gl_do_check_error(int report)
 {
@@ -63,7 +35,7 @@ static inline bool gl_do_check_error(int report)
     bool is_error = false;
     while ((error = glGetError()) != GL_NO_ERROR) {
         if (report) {
-            vaapi_dprintf("glError: %s caught\n", gl_get_error_string(error));
+            vaapi_dprintf("glError: %s caught\n", gluErrorString(error));
         }
         is_error = true;
     }
