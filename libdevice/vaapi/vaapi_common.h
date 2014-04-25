@@ -25,6 +25,10 @@
 #endif
 
 #include <va/va.h>
+#if VA_CHECK_VERSION(0,34,0)
+#include <va/va_compat.h>
+#endif
+
 #include <memory>
 #include <stdint.h>
 #include <boost/cstdint.hpp>
