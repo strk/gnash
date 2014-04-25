@@ -497,9 +497,6 @@ RTMP::readPacketHeader(RTMPPacket& packet)
         return false;
     }
 
-    // nSize is predicted size - 1. Add what we've read already.
-    int hSize = nSize + (header - hbuf);
-
     if (nSize >= 3) {
 
         const boost::uint32_t timestamp = decodeInt24(header);
@@ -542,8 +539,6 @@ RTMP::readPacketHeader(RTMPPacket& packet)
               return false;
             }
           hr._timestamp = amf::readNetworkLong(header+nSize);
-          hSize += 4;
-        
     }
         
     const size_t bufSize = hr.dataSize + RTMPHeader::headerSize;
