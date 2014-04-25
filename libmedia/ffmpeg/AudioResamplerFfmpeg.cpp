@@ -88,6 +88,7 @@ AudioResamplerFfmpeg::init(AVCodecContext* ctx) {
 int
 AudioResamplerFfmpeg::resample(boost::uint8_t** input, int plane_size,
     int samples, boost::uint8_t** output) {
+    UNUSED( plane_size );
 #ifdef HAVE_SWRESAMPLE_H
     return swr_convert(_context,
         output, MAX_AUDIO_FRAME_SIZE,
@@ -97,7 +98,6 @@ AudioResamplerFfmpeg::resample(boost::uint8_t** input, int plane_size,
         output, 0, MAX_AUDIO_FRAME_SIZE,
         input, plane_size, samples);
 #else
-    UNUSED( plane_size );
     return audio_resample(_context, reinterpret_cast<short*>(*output),
         reinterpret_cast<short*>(*input), samples); 
 #endif
