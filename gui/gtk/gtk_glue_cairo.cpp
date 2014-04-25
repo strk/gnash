@@ -31,6 +31,7 @@ namespace gnash
 GtkCairoGlue::GtkCairoGlue()
   : _cairo_handle(0),
     _cairo_offscreen(0),
+    _renderer(0),
     _image(0)
 {
     GNASH_REPORT_FUNCTION;
