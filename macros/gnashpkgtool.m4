@@ -25,7 +25,7 @@ dnl   - always run AC_CHECK_HEADERS and AC_CHECK_LIB so that config.h end
 dnl     up with correct information about what's available and what not
 dnl     and every provided info is verified before acceptance.
 dnl
-dnl   - Document the interface of the macro!
+dnl   - Document the interface of the macro !!
 dnl
 
 AC_DEFUN([GNASH_PKG_INCLUDES],
@@ -91,21 +91,17 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
     fi
   fi
 
- AC_LIB_WITH_FINAL_PREFIX([
- 	eval additional_includedir=\"$includedir\"
- ])
-
   dnl If the path hasn't been specified, go look for it.
   if test x"${ac_cv_path_$1_incl}" = x; then
     AC_CHECK_HEADER($2, [ac_cv_path_$1_incl=""; found_$1_incl="yes"], [
-      AC_CHECK_HEADER($1/$2, [ac_cv_path_$1_incl="-I${additional_includedir}/$1"; found_$1_incl="yes"], [
-        AC_CHECK_HEADER($name/$2, [ac_cv_path_$1_incl="-I${additional_includedir}/$name"; found_$1_incl="yes"], [
-          AC_CHECK_HEADER($2, [ac_cv_path_$1_incl="-I${additional_includedir}/$2"; found_$1_incl="yes"], [
+      AC_CHECK_HEADER($1/$2, [ac_cv_path_$1_incl="-I/usr/include/$1"; found_$1_incl="yes"], [
+        AC_CHECK_HEADER($name/$2, [ac_cv_path_$1_incl="-I/usr/include/$name"; found_$1_incl="yes"], [
+          AC_CHECK_HEADER($2, [ac_cv_path_$1_incl="-I/usr/include/$2"; found_$1_incl="yes"], [
           if test x"${ac_cv_path_$1_incl}" = x; then
             for i in $incllist; do
               if test -f $i/$name; then
                 found_$1_incl="yes"
-                if test x"$i" != x"${additional_includedir}"; then
+                if test x"$i" != x"/usr/include"; then
                   ac_cv_path_$1_incl="-I$i"
                 else
                   ac_cv_path_$1_incl=""
@@ -139,7 +135,7 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
       dnl do this automatically. AC_CHECK_HEADERS (not the final S) would do it.
       AC_DEFINE([HAVE_]UPHEADER, 1, [Define if you have the $2 header])
       AC_MSG_RESULT(${ac_cv_path_$1_incl})
-      if test x"${ac_cv_path_$1_incl}" != x -a x"${ac_cv_path_$1_incl}" != x"-I${additional_includedir}"; then
+      if test x"${ac_cv_path_$1_incl}" != x -a x"${ac_cv_path_$1_incl}" != x"-I/usr/include"; then
         UP[]_CFLAGS="${ac_cv_path_$1_incl}"        
       else
         UP[]_CFLAGS=""
