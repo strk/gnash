@@ -119,9 +119,8 @@ UinputDevice::init()
     }
 #else
 #if 1 // USE_ABSOLUTE_POINTER
-    struct uinput_user_dev uidev;
+    uinput_user_dev uidev = uinput_user_dev();
 
-    memset(&uidev, 0, sizeof(uidev));
     snprintf(uidev.name, UINPUT_MAX_NAME_SIZE, "uinput");
     uidev.id.bustype = BUS_USB;
     // uidev.id.vendor  = 0x1;
@@ -192,9 +191,8 @@ UinputDevice::moveTo(int x, int y)
 {
     // GNASH_REPORT_FUNCTION;
 
-    struct input_event ev;
+    input_event ev = input_event();
     
-    memset(&ev, 0, sizeof(ev));
     gettimeofday(&ev.time, NULL);
     ev.type = EV_ABS;
     ev.code = ABS_X;

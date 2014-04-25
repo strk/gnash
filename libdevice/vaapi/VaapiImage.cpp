@@ -33,11 +33,11 @@ VaapiImage::VaapiImage(unsigned int     width,
                        unsigned int     height,
                        VaapiImageFormat format)
     : _format(format)
+    , _image()
     , _image_data(NULL)
 {
     log_debug(_("VaapiImage::VaapiImage(): format '%s'\n"), string_of_FOURCC(format));
 
-    memset(&_image, 0, sizeof(_image));
     _image.image_id = VA_INVALID_ID;
 
     if (!create(width, height)) {

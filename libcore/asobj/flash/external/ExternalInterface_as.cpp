@@ -320,8 +320,7 @@ externalinterface_available(const fn_call& fn)
       {
           const RunResources& r = m.runResources();
           const std::string& baseurl = r.streamProvider().baseURL().str();
-          char hostname[MAXHOSTNAMELEN];
-          std::memset(hostname, 0, MAXHOSTNAMELEN);
+          char hostname[MAXHOSTNAMELEN] = {};
           
           if (::gethostname(hostname, MAXHOSTNAMELEN) != 0) {
               mode = false;

@@ -399,8 +399,7 @@ MediaParserFfmpeg::initializeParser()
 
 #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(52,107,0)
     // Otherwise av_open_input_stream will reallocate the context.
-    AVFormatParameters ap;
-    std::memset(&ap, 0, sizeof ap);
+    AVFormatParameters ap = AVFormatParameters();
     ap.prealloced_context = 1;
 
     if (av_open_input_stream(&_formatCtx, &_byteIOCxt, "", _inputFmt, &ap) < 0)
