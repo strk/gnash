@@ -235,7 +235,7 @@ if test x"${$1}" = x"yes" -a x"${found_$1_incl}" = "xyes"; then
           if test ! x"$i" = x"${additional_libdir}"; then
             ac_cv_path_$1_lib="-L$i -l$1 $5"
           else
-            ac_cv_path_$1_lib="-L${additional_libdir} -l$1 $5"
+            ac_cv_path_$1_lib="-l$1 $5"
           fi
           break
         fi
@@ -244,7 +244,7 @@ if test x"${$1}" = x"yes" -a x"${found_$1_incl}" = "xyes"; then
           if test ! x"$i" = x"${additional_libdir}"; then
             ac_cv_path_$1_lib="-L$i -l$name $5"
           else
-            ac_cv_path_$1_lib="-L${additional_libdir} -l$name $5"
+            ac_cv_path_$1_lib="-l$name $5"
           fi
         break
         fi
