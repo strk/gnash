@@ -91,9 +91,9 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
     fi
   fi
 
-  AC_LIB_WITH_FINAL_PREFIX([
-    eval additional_includedir=\"$includedir\"
-  ])
+ AC_LIB_WITH_FINAL_PREFIX([
+ 	eval additional_includedir=\"$includedir\"
+ ])
 
   dnl If the path hasn't been specified, go look for it.
   if test x"${ac_cv_path_$1_incl}" = x; then
@@ -221,10 +221,6 @@ if test x"${$1}" = x"yes" -a x"${found_$1_incl}" = "xyes"; then
   if test x"${ac_manual}" != xyes -a x"${ac_cv_path_$1_lib}" = x; then
 	ac_manual=yes
   fi  
-
-  AC_LIB_WITH_FINAL_PREFIX([
-    eval additional_libdir=\"$libdir\"
-  ])
   
   if test x"${ac_cv_path_$1_lib}" = x; then
     ac_save_LIBS=$LIBS
@@ -232,7 +228,7 @@ if test x"${$1}" = x"yes" -a x"${found_$1_incl}" = "xyes"; then
     for i in $libslist; do
       if test -f $i/lib$1.a -o -f $i/lib$1.${shlibext}; then
         if test -f "$i/lib$1.a" -o -f "$i/lib$1.${shlibext}"; then
-          if test ! x"$i" = x"${additional_libdir}"; then
+          if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
             ac_cv_path_$1_lib="-L$i -l$1 $5"
           else
             ac_cv_path_$1_lib="-l$1 $5"
@@ -241,7 +237,7 @@ if test x"${$1}" = x"yes" -a x"${found_$1_incl}" = "xyes"; then
         fi
       else
         if test -f "$i/lib$name.a" -o -f "$i/lib$name.${shlibext}"; then
-          if test ! x"$i" = x"${additional_libdir}"; then
+          if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
             ac_cv_path_$1_lib="-L$i -l$name $5"
           else
             ac_cv_path_$1_lib="-l$name $5"
