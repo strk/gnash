@@ -22,7 +22,6 @@
 #define GNASH_GNASHTEXTURE_H
 
 #include "GnashImage.h"
-#include <boost/shared_ptr.hpp>
 
 namespace gnash {
 
