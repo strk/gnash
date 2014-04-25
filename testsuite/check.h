@@ -123,7 +123,7 @@ int main(int argc, char *argv[]) { \
   try { \
       return trymain(argc, argv);  \
   } catch (std::exception const&  ex) { \
-    (runtest).fail(std::string("caugh unexcepcted exception: ") + ex.what()); \
+    (runtest).fail(std::string("caught unexpected exception: ") + ex.what()); \
     return 1; \
   } \
 }
