@@ -95,10 +95,9 @@ void vaapi_set_surface(AVFrame *pic, VaapiSurfaceFfmpeg *surface)
 }
 
 VaapiContextFfmpeg::VaapiContextFfmpeg(enum CODECID codec_id)
-    : _context(new VaapiContext(get_profile(codec_id), VAEntrypointVLD))
+    : vaapi_context(), // FFmpeg's vaapi_context must be zero-initialized
+      _context(new VaapiContext(get_profile(codec_id), VAEntrypointVLD))
 {
-    // FFmpeg's vaapi_context must be zero-initialized
-    memset(this, 0, sizeof(struct vaapi_context));
 }
 
 bool VaapiContextFfmpeg::initDecoder(unsigned int width, unsigned int height)
