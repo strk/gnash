@@ -43,11 +43,10 @@ EventDevice::EventDevice()
        keyb_lctrl(false),
        keyb_rctrl(false),
        keyb_lalt(false),
-       keyb_ralt(false)
+       keyb_ralt(false),
+       _device_info()
 {
     // GNASH_REPORT_FUNCTION;
-
-    memset(&_device_info, 0, sizeof(struct input_id));
 }
 
 bool

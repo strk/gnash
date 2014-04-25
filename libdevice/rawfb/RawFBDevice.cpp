@@ -53,12 +53,11 @@ RawFBDevice::RawFBDevice()
 
 RawFBDevice::RawFBDevice(int /* vid */)
     : _fd(0),
-      _fbmem(0)
+      _fbmem(0),
+      _cmap()
 {
     // GNASH_REPORT_FUNCTION;
 
-    memset(&_cmap, 0, sizeof(struct fb_cmap));
-    
     if (!initDevice(0, 0)) {
         log_error(_("Couldn't initialize RAWFB device!"));
     }
@@ -66,11 +65,10 @@ RawFBDevice::RawFBDevice(int /* vid */)
 
 RawFBDevice::RawFBDevice(int /* argc */ , char ** /* argv */)
     : _fd(0),
-      _fbmem(0)
+      _fbmem(0),
+      _cmap()
 {
     // GNASH_REPORT_FUNCTION;
-
-    memset(&_cmap, 0, sizeof(struct fb_cmap));    
 }
 
 void

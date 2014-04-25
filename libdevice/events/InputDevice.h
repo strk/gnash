@@ -221,7 +221,7 @@ public:
     
 private:
     // Keyboard SHIFT/CTRL/ALT states (left + right)
-     bool keyb_lshift, keyb_rshift, keyb_lctrl, keyb_rctrl, keyb_lalt, keyb_ralt;
+    bool keyb_lshift, keyb_rshift, keyb_lctrl, keyb_rctrl, keyb_lalt, keyb_ralt;
     struct input_id _device_info;
 };
 

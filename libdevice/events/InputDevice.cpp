@@ -31,21 +31,21 @@ namespace gnash {
 InputDevice::InputDevice()
     : _type(InputDevice::UNKNOWN),
       _fd(-1),
+      _input_data(),
       _screen_width(0),
       _screen_height(0)
 {
     // GNASH_REPORT_FUNCTION;
-    memset(&_input_data, 0, sizeof(InputDevice::input_data_t));
 }
 
 InputDevice::InputDevice(int x, int y)
     : _type(InputDevice::UNKNOWN),
       _fd(-1),
+      _input_data(),
       _screen_width(x),
       _screen_height(y)
 {
     // GNASH_REPORT_FUNCTION;
-    memset(&_input_data, 0, sizeof(InputDevice::input_data_t));
 }
 
 InputDevice::~InputDevice()

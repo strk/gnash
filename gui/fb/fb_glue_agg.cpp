@@ -44,19 +44,19 @@ namespace gui {
 
 //---------------------------------------------
 FBAggGlue::FBAggGlue()
-    : _fd(-1)
+    : _fd(-1),
+      _varinfo(),
+      _fixinfo()
 {
 //    GNASH_REPORT_FUNCTION;
-    memset(&_varinfo, 0, sizeof(fb_var_screeninfo));
-    memset(&_fixinfo, 0, sizeof(fb_fix_screeninfo));
 }
 
 FBAggGlue::FBAggGlue(int fd)
-    : _fd(fd)
+    : _fd(fd),
+      _varinfo(),
+      _fixinfo()
 {
 //    GNASH_REPORT_FUNCTION;    
-    memset(&_varinfo, 0, sizeof(fb_var_screeninfo));
-    memset(&_fixinfo, 0, sizeof(fb_fix_screeninfo));
 }
 
 FBAggGlue::~FBAggGlue()
