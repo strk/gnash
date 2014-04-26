@@ -106,8 +106,9 @@ struct ByteReader : public IOChannel
 	
 };
 
+TRYMAIN(_runtest);
 int
-main(int /*argc*/, char** /*argv*/)
+trymain(int /*argc*/, char** /*argv*/)
 {
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity(1);

@@ -55,8 +55,9 @@ getVal(PropertyList& p, const ObjectURI& k, as_value& val, as_object& obj)
     return false;
 }
 
+TRYMAIN(_runtest);
 int
-main(int /*argc*/, char** /*argv*/)
+trymain(int /*argc*/, char** /*argv*/)
 {
 	cout << "sizeof(Property): " << sizeof(Property) << endl;
 	cout << "sizeof(PropertyList): " << sizeof(PropertyList) << endl;

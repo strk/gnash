@@ -75,8 +75,9 @@ struct ByteReader
 
 };
 
+TRYMAIN(_runtest);
 int
-main(int /*argc*/, char** /*argv*/)
+trymain(int /*argc*/, char** /*argv*/)
 {
 	ByteReader in(0xAA);
 

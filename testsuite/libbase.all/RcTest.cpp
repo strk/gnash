@@ -42,9 +42,8 @@
 
 #ifdef HAVE_DEJAGNU_H
 #include "dejagnu.h"
-#else
-#include "check.h"
 #endif
+#include "check.h"
 
 using namespace std;
 using namespace gnash;
@@ -62,8 +61,9 @@ bool nodelay = false;           // FIXME: this flag gets set based on
 
 TestState runtest;
 
+TRYMAIN(runtest);
 int
-main (int /*argc*/, char** /*argv*/) {
+trymain (int /*argc*/, char** /*argv*/) {
     RcInitFile& rc = RcInitFile::getDefaultInstance();
 
     gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();

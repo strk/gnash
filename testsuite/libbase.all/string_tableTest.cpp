@@ -33,8 +33,10 @@
 
 #include "utility.h"
 using namespace gnash;
+
+TRYMAIN(_runtest);
 int
-main(int /*argc*/, char** /*argv*/)
+trymain(int /*argc*/, char** /*argv*/)
 {
 	string_table st;
 	

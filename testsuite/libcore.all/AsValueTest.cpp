@@ -27,6 +27,7 @@
 #include "ManualClock.h"
 #include "movie_definition.h"
 #include "dejagnu.h"
+#include "check.h"
 #include "as_value.h"
 #include "StreamProvider.h"
 #include "as_object.h"
@@ -60,8 +61,9 @@ TestState runtest;
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
+TRYMAIN(_runtest);
 int
-main(int argc, char *argv[])
+trymain(int argc, char *argv[])
 {    const Arg_parser::Option opts[] =
         {
             { 'h', "help",          Arg_parser::no  },

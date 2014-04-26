@@ -37,8 +37,9 @@ using namespace gnash;
 using std::cout;
 using std::endl;
 
+TRYMAIN(_runtest);
 int
-main(int /*argc*/, char** /*argv*/)
+trymain(int /*argc*/, char** /*argv*/)
 {
 	SafeStack<int> st;
 

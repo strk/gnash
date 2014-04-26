@@ -68,8 +68,9 @@ inscribedRect(int x, int y, int radius)
 	return ret;
 }
 
+TRYMAIN(_runtest);
 int
-main(int /*argc*/, char** /*argv*/)
+trymain(int /*argc*/, char** /*argv*/)
 {
     std::string filename = 
         std::string(TGTDIR) + "/" + std::string(INPUT_FILENAME);

@@ -22,9 +22,8 @@
 
 #ifdef HAVE_DEJAGNU_H
 #include "dejagnu.h"
-#else
-#include "check.h"
 #endif
+#include "check.h"
 
 #include "noseek_fd_adapter.h"
 #include "IOChannel.h"
@@ -128,8 +127,9 @@ compare_reads(gnash::IOChannel* reader, int fd, const char* first, const char* s
 
 }
 
+TRYMAIN(_runtest);
 int
-main(int /*argc*/, char** /*argv*/)
+trymain(int /*argc*/, char** /*argv*/)
 {
 	const char* input = INPUT; // Should be the path to this file
 	const char* cachename = "NoSeekFileTestCache";
