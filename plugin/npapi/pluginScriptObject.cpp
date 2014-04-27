@@ -20,18 +20,8 @@
 #include "gnashconfig.h"
 #endif
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
 #include <map>
 #include <string>
-#include <fcntl.h>
-#include <cstring>
-#include <cstdlib>
-#include <cstdio>
-#include <cerrno>
-#include <sys/types.h>
-#include <unistd.h>
 #if defined(HAVE_WINSOCK_H) && !defined(__OS2__)
 # include <winsock2.h>
 # include <windows.h>
@@ -39,13 +29,9 @@
 # include <io.h>
 # include <ws2tcpip.h>
 #else
-# include <sys/un.h>
 # include <sys/ioctl.h>
 # include <unistd.h>
-# include <sys/select.h>
-# include <netinet/in.h>
-# include <arpa/inet.h>
-# include <sys/socket.h>
+# include <poll.h>
 #endif
 #include "npapi.h"
 #include "npruntime.h"
@@ -703,8 +689,6 @@ GnashPluginScriptObject::readPlayer()
 std::string
 GnashPluginScriptObject::readPlayer(int fd)
 {
-//    log_debug(__PRETTY_FUNCTION__);
-
     std::string empty;
 
     if (fd <= 0) {
@@ -714,31 +698,33 @@ GnashPluginScriptObject::readPlayer(int fd)
 
     // Wait for some data from the player
     int bytes = 0;
-    fd_set fdset;
-    FD_ZERO(&fdset);
-    FD_SET(fd, &fdset);
-    struct timeval tval;
-    tval.tv_sec = 2;
-    tval.tv_usec = 0;
-    // log_debug("Waiting for data... ");
-    if (select(fd+1, &fdset, NULL, NULL, &tval)) {
-        // log_debug("There is data in the network");
-#ifndef _WIN32
-        ioctl(fd, FIONREAD, &bytes);
-#else
-        ioctlSocket(fd, FIONREAD, &bytes);
-#endif
-    }
+
+    pollfd pfds[1] = { pollfd() };
+    pfds[0].fd = fd;
+    pfds[0].events = POLLIN;
+
+    int rv = poll(pfds, 1 /* arraySize */, 1000 /* ms */);
 
     // No data yet
-    if (bytes == 0) {
+    if (rv <= 0) {
         return empty;
     }
 
+#ifndef _WIN32
+    ioctl(fd, FIONREAD, &bytes);
+#else
+    ioctlSocket(fd, FIONREAD, &bytes);
+#endif
+
     log_debug("There are %d bytes in the network buffer", bytes);
+
+    if (bytes <= 0) {
+        return empty;
+    }
 
     std::string buf(bytes, '\0');
 
+    // FIXME: writing into string data buffers is an undefined operation.
     int ret = ::read(fd, &buf[0], bytes);
     if (ret <= 0) {
         return empty;
