@@ -27,7 +27,6 @@
 #include "ManualClock.h"
 #include "movie_definition.h"
 #include "dejagnu.h"
-#include "check.h"
 #include "as_value.h"
 #include "StreamProvider.h"
 #include "as_object.h"
@@ -48,6 +47,8 @@
 #include <log.h>
 #include <iostream>
 #include <string>
+
+#include "check.h"
 
 using namespace gnash;
 using namespace std;
