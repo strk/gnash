@@ -174,10 +174,12 @@ DumpGui::init(int argc, char **argv[])
     _renderer.reset(create_Renderer_agg(_pixelformat.c_str()));
     _runResources.setRenderer(_renderer);
 
+#ifdef USE_SOUND
     sound::sound_handler* mixer = _runResources.soundHandler();
     media::MediaHandler* mh = _runResources.mediaHandler();
     _soundHandler.reset(new sound::NullSoundHandler(mh, mixer));
     _runResources.setSoundHandler(_soundHandler);
+#endif
 
     // We know what type of renderer it is.
     _agg_renderer = static_cast<Renderer_agg_base*>(_renderer.get());
@@ -308,6 +310,7 @@ DumpGui::writeFrame()
 void
 DumpGui::writeSamples()
 {
+#ifdef USE_SOUND
     sound::sound_handler* sh = _runResources.soundHandler();
 
     unsigned int ms = _clock.elapsed() - _startTime;
@@ -336,6 +339,7 @@ DumpGui::writeSamples()
         sh->fetchSamples(samples, n);
         toFetch -= n;
     }
+#endif
 
 }
 

@@ -47,12 +47,18 @@ INCLUDES = \
 pkgpyexec_LTLIBRARIES = gnash.la
 
 GNASH_LIBS = \
-	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/librender/libgnashrender.la \
-	$(top_builddir)/libsound/libgnashsound.la \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(RENDERER_LIBS)
+
+if BUILD_LIBMEDIA
+GNASH_LIBS += $(top_builddir)/libmedia/libgnashmedia.la
+endif
+if BUILD_LIBSOUND
+GNASH_LIBS += $(top_builddir)/libsound/libgnashsound.la
+endif
+
+GNASH_LIBS += $(RENDERER_LIBS)
 
 gnash_la_LDFLAGS = -module -avoid-version initgnash -export-dynamic #-no-undefined
 gnash_la_LIBADD = \
