@@ -436,9 +436,11 @@ bool
 play_movie(const std::string& filename, const RunResources& runResources)
 {
 
+#if USE_SOUND
     sound::sound_handler* sh = runResources.soundHandler();
     sh->reset();
     SamplesFetcher sFetcher(*sh);
+#endif
 
     boost::intrusive_ptr<gnash::movie_definition> md;
 
@@ -530,7 +532,9 @@ play_movie(const std::string& filename, const RunResources& runResources)
             //printf("advancing clock by %lu\n", clockAdvance);
             cl.advance(clockAdvance);
             m.advance();
+#if USE_SOUND
             sFetcher.fetch(cl.elapsed());
+#endif
 
             if ( quitrequested ) 
             {
