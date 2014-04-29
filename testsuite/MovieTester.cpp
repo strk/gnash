@@ -634,7 +634,7 @@ MovieTester::initTestingSoundHandlers()
 void
 MovieTester::initTestingMediaHandlers()
 {
-#ifdef USE_SOUND
+#ifdef USE_MEDIA
     // TODO: allow selection.
     _mediaHandler.reset(media::MediaFactory::instance().get(""));
 #endif

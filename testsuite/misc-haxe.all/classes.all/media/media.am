@@ -37,7 +37,9 @@ MEDIA_TESTS_V9 += media/SoundMixer_as.swf
 
 MEDIA_TESTS_V9 += media/SoundTransform_as.swf
 
+if BUILD_LIBSOUND
 MEDIA_TESTS_V6 += media/Sound_as.swf
+endif
 
 MEDIA_TESTS_V6 += media/Video_as.swf
 
@@ -51,5 +53,8 @@ EXTRA_DIST += media/Camera_as.hx \
 	media/SoundLoaderContext_as.hx \
 	media/SoundMixer_as.hx \
 	media/SoundTransform_as.hx \
-	media/Sound_as.hx \
 	media/Video_as.hx
+
+if BUILD_LIBSOUND
+EXTRA_DIST += media/Sound_as.hx
+endif

@@ -22,7 +22,6 @@ AUTOMAKE_OPTIONS = dejagnu
 # These will get executed and parsed for test output
 SANE_SCTESTS = \
 	hello.sc \
-	sound.sc \
 	soft_reference_test1.sc \
 	movieclip_destruction_test1.sc \
 	movieclip_destruction_test2.sc \
@@ -42,6 +41,10 @@ SANE_SCTESTS = \
 	stackscope.sc \
 	$(NULL)
 
+if BUILD_LIBSOUND
+SANE_SCTESTS += sound.sc
+endif
+
 # These ones are the ones for which consistency check fail 
 BOGO_SCTESTS = \
 	$(NULL)
@@ -50,8 +53,11 @@ BOGO_SCTESTS = \
 INTERACTIVE_SCTESTS = \
 	button_test1.sc \
 	button_test2.sc  \
-	sound_stop.sc  \
 	$(NULL)
+
+if BUILD_LIBSOUND
+INTERACTIVE_SCTESTS += sound_stop.sc
+endif
 
 AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)		\
@@ -81,10 +87,11 @@ AUXMOVIES = \
 
 EXTRA_DIST = $(SANE_SCTESTS) $(BOGO_SCTESTS) $(AUXMOVIES) $(INTERACTIVE_SCTESTS) check.sc Dejagnu.sc hello.sc
 
-check_PROGRAMS = \
-	button_test1runner \
-	sound_stop_runner \
-	$(NULL)
+check_PROGRAMS = button_test1runner
+
+if BUILD_LIBSOUND
+check_PROGRAMS += sound_stop_runner
+endif
 
 abs_mediadir = $(abs_top_srcdir)/testsuite/media 
 

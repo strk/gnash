@@ -32,7 +32,11 @@ CLEANFILES =  \
 DISTCLEANFILES = XMLSocketTester
 
 SUBDIRS = . loop loading displaylist_depths action_order register_class \
-          init_action sound
+          init_action
+
+if BUILD_LIBSOUND
+SUBDIRS += sound
+endif
 
 EXTRA_DIST = \
 	DragDropTest.as \

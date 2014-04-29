@@ -42,69 +42,71 @@ TRYMAIN(_runtest);
 int
 trymain(int /*argc*/, char** /*argv*/)
 {
-	string filename = string(SRCDIR) + string("/") + string(INPUT_FILENAME);
-	MovieTester tester(filename);
+    string filename = string(SRCDIR) + string("/") + string(INPUT_FILENAME);
+    MovieTester tester(filename);
 
-	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-	dbglogfile.setVerbosity(1);
+    gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+    dbglogfile.setVerbosity(1);
 
-	const MovieClip* root = tester.getRootMovie();
-	assert(root);
+    const MovieClip* root = tester.getRootMovie();
+    assert(root);
 
-	check_equals(root->get_frame_count(), 10);
-	check_equals(root->get_current_frame(), 0);
+    check_equals(root->get_frame_count(), 10);
+    check_equals(root->get_current_frame(), 0);
 
-	const MovieClip* slides = dynamic_cast<const MovieClip*>(
-		tester.findDisplayItemByTarget("_level0.slides"));
-	check(slides);
+    const MovieClip* slides = dynamic_cast<const MovieClip*>(
+        tester.findDisplayItemByTarget("_level0.slides"));
+    check(slides);
 
-	const Button* button = dynamic_cast<const Button*>(
-		tester.findDisplayItemByTarget("_level0.b1"));
-	check(button);
+    const Button* button = dynamic_cast<const Button*>(
+        tester.findDisplayItemByTarget("_level0.b1"));
+    check(button);
 
-	tester.advance(); 
-	check_equals(root->get_current_frame(), 1);
-	check_equals(slides->get_current_frame(), 0);
+    tester.advance();
+    check_equals(root->get_current_frame(), 1);
+    check_equals(slides->get_current_frame(), 0);
 
-	// Not much happens w/out clicking on the play button
-	for (int i=0; i<10; ++i) tester.advance(); 
-	check_equals(root->get_current_frame(), 1);
-	check_equals(slides->get_current_frame(), 0);
+    // Not much happens w/out clicking on the play button
+    for (int i=0; i<10; ++i) tester.advance();
+    check_equals(root->get_current_frame(), 1);
+    check_equals(slides->get_current_frame(), 0);
 
-	// Should start now
-	tester.movePointerTo(395, 301); tester.click();
-	check_equals(root->get_current_frame(), 1);
-	check_equals(slides->get_current_frame(), 0);
+    // Should start now
+    tester.movePointerTo(395, 301); tester.click();
+    check_equals(root->get_current_frame(), 1);
+    check_equals(slides->get_current_frame(), 0);
 
-	for (unsigned int i=0; i<3; ++i) {
-		std::stringstream s; s << "iteration " << i;
-		tester.advance(); 
-		check_equals_label(s.str(), root->get_current_frame(), 2+i);
-		check_equals_label(s.str(), slides->get_current_frame(), 0);
-	}
+    for (unsigned int i=0; i<3; ++i) {
+        std::stringstream s; s << "iteration " << i;
+        tester.advance();
+        check_equals_label(s.str(), root->get_current_frame(), 2+i);
+        check_equals_label(s.str(), slides->get_current_frame(), 0);
+    }
 
+#if USE_SOUND
     // Tweak initial offset (dunno based on what really)
     tester.advanceClock(1000);
-    tester.advance(false); 
-	check_equals(root->get_current_frame(), 4);
-	check_equals(slides->get_current_frame(), 0);
+    tester.advance(false);
+    check_equals(root->get_current_frame(), 4);
+    check_equals(slides->get_current_frame(), 0);
 
-	for (unsigned int i=0; i<12; ++i) {
+    for (unsigned int i=0; i<12; ++i) {
         tester.advanceClock(1000);
-        tester.advance(false); 
-		std::stringstream s; s << "i" << i;
-	    check_equals_label(s.str(), slides->get_current_frame(), i);
+        tester.advance(false);
+        std::stringstream s; s << "i" << i;
+        check_equals_label(s.str(), slides->get_current_frame(), i);
         // TODO: check invalidated bounds!
     }
 
-	check_equals(slides->get_current_frame(), 11);
-	check_equals(root->get_current_frame(), 4);
+    check_equals(slides->get_current_frame(), 11);
+    check_equals(root->get_current_frame(), 4);
 
     // It's stuck there
-	for (int i=0; i<10; ++i) tester.advance(); 
-	check_equals(slides->get_current_frame(), 11);
-	check_equals(root->get_current_frame(), 4);
+    for (int i=0; i<10; ++i) tester.advance();
+    check_equals(slides->get_current_frame(), 11);
+    check_equals(root->get_current_frame(), 4);
+#endif // USE_SOUND
 
-	return 0;
+    return 0;
 }
 

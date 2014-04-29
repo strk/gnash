@@ -110,7 +110,6 @@ ASTESTS =			\
 	Random.as		\
 	Selection.as		\
 	SharedObject.as		\
-	Sound.as		\
 	Stage.as		\
 	String.as		\
 	System.as		\
@@ -138,6 +137,10 @@ ASTESTS =			\
 	Rectangle.as		\
 	argstest.as		\
 	$(NULL)
+
+if BUILD_LIBSOUND
+ASTESTS += Sound.as
+endif
 
 if HAVE_PERL
 if ENABLE_HAXE

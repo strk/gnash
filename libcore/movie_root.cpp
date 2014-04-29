@@ -857,9 +857,9 @@ movie_root::advance()
 
     bool advanced = false;
 
-#ifdef USE_SOUND
     try {
         
+#ifdef USE_SOUND
         sound::sound_handler* s = _runResources.soundHandler();
 
         if (s && _timelineSound) {
@@ -928,6 +928,7 @@ movie_root::advance()
             }
         }
         else {
+#endif  // USE_SOUND
             // Driven by frame rate
             const size_t elapsed = now - _lastMovieAdvancement;
             if (elapsed >= _movieAdvancementDelay) {
@@ -935,7 +936,9 @@ movie_root::advance()
                 advanceMovie();
                 _lastMovieAdvancement = now;
             }
+#ifdef USE_SOUND
         }
+#endif  // USE_SOUND
         
         // Always do this.
         executeAdvanceCallbacks();
@@ -952,7 +955,6 @@ movie_root::advance()
         log_error(_("Buffer overread during advance: %s"), e.what());
         clear(_actionQueue);
     }
-#endif  // USE_SOUND
     
     return advanced;
 }
