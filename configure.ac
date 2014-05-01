@@ -2143,6 +2143,11 @@ if test x$ipc_key = xno; then
   )
 fi
 
+dnl If sysv semaphores functs are stubs (e.g. on Hurd),
+dnl disable LocalConnection tests
+AC_CHECK_FUNCS(semget, semget=yes)
+AM_CONDITIONAL(HAVE_SEMGET, test x${semget} = xyes)
+
 AC_CACHE_CHECK([for finite], ac_cv_finite,
  [AC_TRY_COMPILE([
    #include <math.h>

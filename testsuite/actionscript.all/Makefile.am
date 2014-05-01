@@ -128,7 +128,6 @@ ASTESTS =			\
 	XMLSocket.as	\
 	rtmp.as 		\
 	XMLNode.as		\
-	LocalConnection.as	\
 	enumerate.as	\
 	case.as			\
 	caseconv.as			\
@@ -140,6 +139,10 @@ ASTESTS =			\
 
 if BUILD_LIBSOUND
 ASTESTS += Sound.as
+endif
+
+if HAVE_SEMGET
+ASTESTS += LocalConnection.as
 endif
 
 if HAVE_PERL

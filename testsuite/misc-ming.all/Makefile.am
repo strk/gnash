@@ -224,7 +224,6 @@ check_SCRIPTS = \
 	EmbeddedFontTestRunner \
 	TextSnapshotTest-Runner \
 	XMLSocketTester \
-	LCTestRunner \
 	timeline_var_test-Runner \
 	place_object_testrunner \
 	place_object_test2runner \
@@ -300,6 +299,9 @@ check_PROGRAMS += \
 	$(NULL)
 endif
 
+if HAVE_SEMGET
+check_PROGRAMS += LCTestRunner
+endif
 
 # This is so check.as finds revno.h
 MAKESWF_FLAGS = -I$(top_builddir)
@@ -1554,7 +1556,6 @@ TEST_CASES = \
 	consecutive_goto_frame_testrunner \
 	multi_doactions_and_goto_frame_testrunner \
 	XMLSocketTester \
-	LCTestRunner \
 	DrawingApiTestRunner \
 	TextSnapshotTest-Runner \
 	reverse_execute_PlaceObject2_test1runner \
@@ -1634,6 +1635,10 @@ TEST_CASES += \
 	ButtonEventsTest-Runner \
 	KeyEventOrderRunner \
 	$(NULL)
+endif
+
+if HAVE_SEMGET
+TEST_CASES += LCTestRunner
 endif
 
 TEST_ENV = GNASH_GC_TRIGGER_THRESHOLD=0

@@ -35,7 +35,9 @@ NET_TESTS_V9 += net/IDynamicPropertyOutput_as.swf
 
 NET_TESTS_V9 += net/IDynamicPropertyWriter_as.swf
 
+if HAVE_SEMGET
 NET_TESTS_V6 += net/LocalConnection_as.swf
+endif
 
 NET_TESTS_V7 += net/NetConnection_as.swf
 
