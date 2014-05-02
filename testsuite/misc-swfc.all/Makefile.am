@@ -72,6 +72,7 @@ AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)/libcore/parser  \
         -I$(top_srcdir)/testsuite \
 	$(BOOST_CFLAGS) \
+	$(PTHREAD_CFLAGS) \
 	$(NULL)
 
 GNASH_LIBS = \

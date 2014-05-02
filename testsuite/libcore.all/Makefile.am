@@ -34,6 +34,7 @@ AM_CPPFLAGS = \
         -I$(top_srcdir)/libcore/vm  \
 	$(FFMPEG_CFLAGS) \
 	$(BOOST_CFLAGS) \
+	$(PTHREAD_CFLAGS) \
 	$(NULL)
 
 check_PROGRAMS = \
