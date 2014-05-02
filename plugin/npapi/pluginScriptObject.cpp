@@ -703,7 +703,7 @@ GnashPluginScriptObject::readPlayer(int fd)
     pfds[0].fd = fd;
     pfds[0].events = POLLIN;
 
-    int rv = poll(pfds, 1 /* arraySize */, 1000 /* ms */);
+    int rv = poll(pfds, 1 /* arraySize */, 2000 /* ms */);
 
     // No data yet
     if (rv <= 0) {
