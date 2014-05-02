@@ -38,6 +38,7 @@ AM_CPPFLAGS = \
         -I$(top_srcdir)/testsuite \
         $(OPENGL_CFLAGS) \
         $(BOOST_CFLAGS) \
+	$(PTHREAD_CFLAGS) \
         $(FFMPEG_CFLAGS) \
         $(NULL)
 

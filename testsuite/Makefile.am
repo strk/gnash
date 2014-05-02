@@ -161,6 +161,7 @@ libtestsuite_la_CXXFLAGS = \
 	-I$(top_srcdir)/libcore/parser  \
 	-I$(top_srcdir)/libcore/vm  \
 	$(BOOST_CFLAGS) \
+	$(PTHREAD_CFLAGS) \
 	$(CAIRO_CFLAGS) \
 	$(CROSS_CXXFLAGS) \
 	$(NULL)
