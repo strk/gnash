@@ -301,7 +301,7 @@ check_PROGRAMS += \
 endif
 
 if HAVE_SEMGET
-check_PROGRAMS += LCTestRunner
+check_SCRIPTS += LCTestRunner
 endif
 
 # This is so check.as finds revno.h
