@@ -711,11 +711,14 @@ GnashPluginScriptObject::readPlayer(int fd)
     }
 
 #ifndef _WIN32
-    ioctl(fd, FIONREAD, &bytes);
+    rv = ioctl(fd, FIONREAD, &bytes);
 #else
-    ioctlSocket(fd, FIONREAD, &bytes);
+    rv = ioctlSocket(fd, FIONREAD, &bytes);
 #endif
-
+    if (rv < 0) {
+        log_error("FIONREAD ioctl failed, unable to get network buffer length");
+        return empty;
+    }
     log_debug("There are %d bytes in the network buffer", bytes);
 
     if (bytes <= 0) {
