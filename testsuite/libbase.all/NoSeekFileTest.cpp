@@ -137,6 +137,10 @@ trymain(int /*argc*/, char** /*argv*/)
 	int fd = open(input, O_RDONLY);
 	int raw = open(input, O_RDONLY);
 
+	if (fd < 0 || raw < 0) {
+	    runtest.fail("Unable to open input file");
+	}
+
 	dup2(fd, 0);
 	close(fd);
 
