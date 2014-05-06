@@ -138,6 +138,7 @@ trymain(int /*argc*/, char** /*argv*/)
 	int raw = open(input, O_RDONLY);
 
 	dup2(fd, 0);
+	close(fd);
 
 	gnash::IOChannel* reader = gnash::noseek_fd_adapter::make_stream(0, cachename);
 	assert(reader);
@@ -153,6 +154,7 @@ trymain(int /*argc*/, char** /*argv*/)
     std::auto_ptr<gnash::IOChannel> orig = gnash::makeFileChannel(f, false);
 	lseek(raw, 0, SEEK_SET);
 	compare_reads(orig.get(), raw, "cache", "raw");
+	close(raw);
 
 
     if (sizeof(size_t) != sizeof(std::streamoff)) {
