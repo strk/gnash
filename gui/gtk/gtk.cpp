@@ -778,9 +778,9 @@ GtkGui::makeTreeModel(std::auto_ptr<movie_root::InfoTree> treepointer)
     GtkTreeStore *model = gtk_tree_store_new (NUM_COLUMNS,
                          G_TYPE_STRING, G_TYPE_STRING);
     
-    GtkTreeIter iter;
-    GtkTreeIter child_iter;
-    GtkTreeIter parent_iter;
+    GtkTreeIter iter = {0, 0, 0, 0};
+    GtkTreeIter child_iter = {0, 0, 0, 0};
+    GtkTreeIter parent_iter = {0, 0, 0, 0};
 
     // Depth within the *GTK* tree.
     int depth = 0;    
