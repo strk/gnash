@@ -1419,6 +1419,12 @@ nsPluginInstance::startProc()
     
     // If we are the parent and fork() worked, childpid is a positive integer.
     if (_childpid > 0) {
+        // Close the child's end of the pipes.
+        ret = close(p2c_controlpipe[0]);
+        if (ret == -1) {
+            gnash::log_error("p2c_controlpipe[0] close() failed: %s",
+                             strerror(errno));
+        }
         
         // we want to write to p2c pipe, so close read-fd0
         ret = close (p2c_pipe[0]);
