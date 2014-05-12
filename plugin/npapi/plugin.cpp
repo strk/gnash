@@ -1420,31 +1420,17 @@ nsPluginInstance::startProc()
     // If we are the parent and fork() worked, childpid is a positive integer.
     if (_childpid > 0) {
         // Close the child's end of the pipes.
-        ret = close(p2c_controlpipe[0]);
-        if (ret == -1) {
-            gnash::log_error("p2c_controlpipe[0] close() failed: %s",
-                             strerror(errno));
-        }
-        
-        // we want to write to p2c pipe, so close read-fd0
-        ret = close (p2c_pipe[0]);
-        if (ret == -1) {
+        int fdstoclose[] = {p2c_controlpipe[0], p2c_pipe[0], c2p_pipe[1]};
+        int num_failed = std::count_if(fdstoclose, fdstoclose+3, close);
+
+        if (num_failed > 0) {
             // this is not really a fatal error, so continue best as we can
-            gnash::log_error("p2c_pipe[0] close() failed: %s",
-                             strerror(errno));
+            gnash::log_error("%d fds failed to close: %s (error ignored).",
+                             num_failed, strerror(errno));
         }
-        
-        // we want to read from c2p pipe, so close read-fd1
-        ret = close (c2p_pipe[1]);
-        if (ret == -1) {
-            // this is not really a fatal error, so continue best as we can
-            gnash::log_error("c2p_pipe[1] close() failed: %s",
-                             strerror(errno));
-            gnash::log_debug("Forked successfully but with ignorable errors.");
-        } else {
-            gnash::log_debug("Forked successfully, child process PID is %d",
-                             _childpid);
-        }
+
+        gnash::log_debug("Forked successfully, child process PID is %d",
+                         _childpid);
 
         if (!cookiefile.empty()) {
             cookiemap.insert(std::make_pair(_childpid, cookiefile));
