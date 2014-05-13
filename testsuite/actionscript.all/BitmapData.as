@@ -637,6 +637,14 @@ dest.copyPixels(source, new Rect(-50, -50, 100, 100), new Point(0, 0));
  check_equals(dest.getPixel(52, 10), 0xff0000);
  check_equals(dest.getPixel(10, 52), 0xff0000);
 
+// null copypixel argument: should be the same as Point(0,0)
+dest = new flash.display.BitmapData(100, 100, false, 0xff0000);
+dest.copyPixels(source, new Rect(-50, -50, 100, 100), null);
+ check_equals(dest.getPixel(10, 10), 0xff0000);
+ check_equals(dest.getPixel(52, 52), 0x0000ff);
+ check_equals(dest.getPixel(52, 10), 0xff0000);
+ check_equals(dest.getPixel(10, 52), 0xff0000);
+
 dest = new flash.display.BitmapData(100, 100, false, 0xff0000);
 dest.copyPixels(source, new Rect(0, 0, 100, 100), new Point(50, 50));
  check_equals(dest.getPixel(10, 10), 0xff0000);
@@ -1146,6 +1154,6 @@ flash.display.BitmapData.prototype = e;
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(406);
+totals(410);
 
 #endif // OUTPUT_VERSION >= 8

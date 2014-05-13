@@ -933,24 +933,29 @@ bitmapdata_copyPixels(const fn_call& fn)
     rect->get_member(NSV::PROP_X, &x);
     rect->get_member(NSV::PROP_Y, &y);
     rect->get_member(NSV::PROP_WIDTH, &w);
-    rect->get_member(NSV::PROP_HEIGHT, &h);    
+    rect->get_member(NSV::PROP_HEIGHT, &h);
+
+    int destX = 0;
+    int destY = 0;
     
+    // Find true source rect and true dest rect.
     as_object* destpoint = toObject(fn.arg(2), getVM(fn));
-    as_value px, py;
+    if (destpoint) {
+        as_value px, py;
     
-    destpoint->get_member(NSV::PROP_X, &px);
-    destpoint->get_member(NSV::PROP_Y, &py);
+        destpoint->get_member(NSV::PROP_X, &px);
+        destpoint->get_member(NSV::PROP_Y, &py);
+
+        destX = toInt(px, getVM(fn));
+        destY = toInt(py, getVM(fn));
+    }
 
     // TODO: remaining arguments.
 
-    // Find true source rect and true dest rect.
     int sourceX = toInt(x, getVM(fn));
     int sourceY = toInt(y, getVM(fn));
     int sourceW = toInt(w, getVM(fn));
     int sourceH = toInt(h, getVM(fn));
-
-    int destX = toInt(px, getVM(fn));
-    int destY = toInt(py, getVM(fn));
 
     // Any part of the source rect that is not in the image (i.e.
     // above or left) is concatenated to the destination offset.
