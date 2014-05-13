@@ -43,10 +43,12 @@ namespace {
     /// in the "removed" depth zone
     DisplayList::iterator beginNonRemoved(DisplayList::container_type& c);
 
-	/// Return an constant iterator to the first element of the
+#if GNASH_PARANOIA_LEVEL > 1 && !defined(NDEBUG)
+    /// Return an constant iterator to the first element of the
     /// container NOT in the "removed" depth zone
     DisplayList::const_iterator beginNonRemoved(
             const DisplayList::container_type& c);
+#endif
 
     /// Return the first element in the DisplayList whose depth exceeds
     /// 65535 (-16384).
@@ -943,6 +945,7 @@ beginNonRemoved(DisplayList::container_type& c)
             boost::bind(std::not2(DepthLessThan()), _1, depth));
 }
 
+#if GNASH_PARANOIA_LEVEL > 1 && !defined(NDEBUG)
 DisplayList::const_iterator
 beginNonRemoved(const DisplayList::container_type& c)
 {
@@ -953,6 +956,7 @@ beginNonRemoved(const DisplayList::container_type& c)
     return std::find_if(c.begin(), c.end(), 
             boost::bind(std::not2(DepthLessThan()), _1, depth));
 }
+#endif
 
 DisplayList::iterator
 dlistTagsEffectiveZoneEnd(DisplayList::container_type& c)

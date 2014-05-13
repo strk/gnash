@@ -35,11 +35,14 @@
 namespace gnash {
 
 namespace {
+#if 0
+    // Not yet implemented.
     as_value filereference_addListener(const fn_call& fn);
+    as_value filereference_removeListener(const fn_call& fn);
+#endif
     as_value filereference_browse(const fn_call& fn);
     as_value filereference_cancel(const fn_call& fn);
     as_value filereference_download(const fn_call& fn);
-    as_value filereference_removeListener(const fn_call& fn);
     as_value filereference_upload(const fn_call& fn);
     as_value filereference_creationDate(const fn_call& fn);
     as_value filereference_creator(const fn_call& fn);
