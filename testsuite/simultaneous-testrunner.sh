@@ -57,9 +57,9 @@ outlog1=${top_builddir}/testoutlog.\$$
 outlog2=${top_builddir}/testoutlog2.\$$
 
 echo "Running first process"
-${top_builddir}/gui/gnash -v -r0 ${t1} -t ${timeout} | tee \${outlog1} &
+${top_builddir}/gui/gnash -vvv -r0 ${t1} -t ${timeout} | tee \${outlog1} &
 echo "Running second process"
-${top_builddir}/gui/gnash -v -r0 ${t2} -t ${timeout} | tee \${outlog2} &
+${top_builddir}/gui/gnash -vvv -r0 ${t2} -t ${timeout} | tee \${outlog2} &
 wait
 
 for log in \${outlog1} \${outlog2}; do
