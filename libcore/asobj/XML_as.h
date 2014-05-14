@@ -120,7 +120,7 @@ public:
     ///
     void parseXML(const std::string& xml);
 
-    ParseStatus status() const {
+    int status() const {
         return _status;
     }
 
@@ -177,7 +177,8 @@ private:
     //  1 if successfully loaded
     LoadStatus _loaded;
 
-    ParseStatus _status;	
+    // Nominally used to store ParseStatus, but can be any int value.
+    int _status;
  
     std::string _docTypeDecl;
 
