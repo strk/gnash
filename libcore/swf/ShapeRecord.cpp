@@ -404,17 +404,22 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
                 }
                 in.ensureBits(5);
                 int num_move_bits = in.read_uint(5);
-                in.ensureBits(2 * num_move_bits);
-                int move_x = in.read_sint(num_move_bits);
-                int move_y = in.read_sint(num_move_bits);
+                if (num_move_bits > 0) {
+                    in.ensureBits(2 * num_move_bits);
+                    int move_x = in.read_sint(num_move_bits);
+                    int move_y = in.read_sint(num_move_bits);
     
-                x = move_x;
-                y = move_y;
+                    x = move_x;
+                    y = move_y;
     
-                // Set the beginning of the path.
-                current_path.ap.x = x;
-                current_path.ap.y = y;
-    
+                    // Set the beginning of the path.
+                    current_path.ap.x = x;
+                    current_path.ap.y = y;
+                } else {
+                    IF_VERBOSE_MALFORMED_SWF(
+                        log_swferror(_("Shape move-to missing destination"));
+                    );
+                }
 #if SHAPE_LOG
                 IF_VERBOSE_PARSE(
                     log_parse(_("  Shape read: moveto %d %d"), x, y);

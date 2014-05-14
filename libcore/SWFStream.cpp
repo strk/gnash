@@ -191,7 +191,7 @@ unsigned SWFStream::read_uint(unsigned short bitcount)
 int
 SWFStream::read_sint(unsigned short bitcount)
 {
-    //assert(bitcount <= 32); // already asserted in read_uint
+    assert(bitcount > 0);
 
     boost::int32_t value = boost::int32_t(read_uint(bitcount));
 
