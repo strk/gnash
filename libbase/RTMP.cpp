@@ -58,11 +58,7 @@ namespace {
     boost::int32_t decodeInt32LE(const boost::uint8_t* c);
     int encodeInt32LE(boost::uint8_t *output, int nVal);
     unsigned int decodeInt24(const boost::uint8_t* c);
-    boost::uint8_t* encodeInt16(boost::uint8_t *output, boost::uint8_t *outend,
-            short nVal);
     boost::uint8_t* encodeInt24(boost::uint8_t *output, boost::uint8_t *outend,
-            int nVal);
-    boost::uint8_t* encodeInt32(boost::uint8_t *output, boost::uint8_t *outend,
             int nVal);
 
     static const int packetSize[] = { 12, 8, 4, 1 };
@@ -1148,16 +1144,6 @@ decodeInt24(const boost::uint8_t *c)
 }
 
 boost::uint8_t*
-encodeInt16(boost::uint8_t *output, boost::uint8_t *outend, short nVal)
-{
-    if (output+2 > outend) return NULL;
-  
-    output[1] = nVal & 0xff;
-    output[0] = nVal >> 8;
-    return output + 2;
-}
-
-boost::uint8_t*
 encodeInt24(boost::uint8_t *output, boost::uint8_t *outend, int nVal)
 {
     if (output + 3 > outend) return NULL;
@@ -1166,18 +1152,6 @@ encodeInt24(boost::uint8_t *output, boost::uint8_t *outend, int nVal)
     output[1] = nVal >> 8;
     output[0] = nVal >> 16;
     return output+3;
-}
-
-boost::uint8_t*
-encodeInt32(boost::uint8_t *output, boost::uint8_t *outend, int nVal)
-{
-    if (output+4 > outend) return NULL;
-
-    output[3] = nVal & 0xff;
-    output[2] = nVal >> 8;
-    output[1] = nVal >> 16;
-    output[0] = nVal >> 24;
-    return output + 4;
 }
 
 boost::uint32_t
