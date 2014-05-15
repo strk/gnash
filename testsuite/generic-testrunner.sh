@@ -62,7 +62,7 @@ for t in ${testfiles}; do
 	outlog=${top_builddir}/testoutlog.\$$
 	echo "NOTE: Running test \${t}"
 	( 
-		exec > \${outlog}
+		exec > \${outlog} 2>&1
 		${top_builddir}/utilities/gprocessor -d${delay} -r${runs} -f${advances} -v \${t} || echo "FAILED: gprocessor returned an error while playing '\${t}'"
 	)
 	cat \${outlog}
