@@ -58,9 +58,11 @@ readSWFMatrix(SWFStream& in)
     if (has_scale) {
         in.ensureBits(5);
         const boost::uint8_t scale_nbits = in.read_uint(5);
-        in.ensureBits(scale_nbits * 2);
-        sx = in.read_sint(scale_nbits);
-        sy = in.read_sint(scale_nbits);
+        if (scale_nbits) {
+            in.ensureBits(scale_nbits * 2);
+            sx = in.read_sint(scale_nbits);
+            sy = in.read_sint(scale_nbits);
+        }
     }
 
     in.ensureBits(1);
@@ -69,11 +71,12 @@ readSWFMatrix(SWFStream& in)
     boost::int32_t shy = 0;
     if (has_rotate) {
         in.ensureBits(5);
-        int rotate_nbits = in.read_uint(5);
-
-        in.ensureBits(rotate_nbits * 2);
-        shx = in.read_sint(rotate_nbits);
-        shy = in.read_sint(rotate_nbits);
+        unsigned int rotate_nbits = in.read_uint(5);
+        if (rotate_nbits) {
+            in.ensureBits(rotate_nbits * 2);
+            shx = in.read_sint(rotate_nbits);
+            shy = in.read_sint(rotate_nbits);
+        }
     }
 
     in.ensureBits(5);
@@ -129,12 +132,16 @@ readRect(SWFStream& in)
     in.align();
     in.ensureBits(5);
     const int nbits = in.read_uint(5);
-    in.ensureBits(nbits*4);
+
+    int minx = 0, maxx = 0, miny = 0, maxy = 0;
     
-    const int minx = in.read_sint(nbits);
-    const int maxx = in.read_sint(nbits);
-    const int miny = in.read_sint(nbits);
-    const int maxy = in.read_sint(nbits);
+    if (nbits > 0) {
+       in.ensureBits(nbits*4);
+       minx = in.read_sint(nbits);
+       maxx = in.read_sint(nbits);
+       miny = in.read_sint(nbits);
+       maxy = in.read_sint(nbits);
+    }
 
     // Check if this SWFRect is valid.
     if (maxx < minx || maxy < miny) {
