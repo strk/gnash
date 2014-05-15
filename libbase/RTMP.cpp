@@ -1157,14 +1157,21 @@ encodeInt24(boost::uint8_t *output, boost::uint8_t *outend, int nVal)
 boost::uint32_t
 getUptime()
 {
+    // This function returns the uptime in milliseconds, which necessarily
+    // overflows uint32_t after ~50 days. Because the result is used for
+    // timestamping this is not a big problem, assuming a single RTMP session
+    // won't last that long. We ensure the overflow happens in a manner
+    // avoiding undefined behaviour.
+    const boost::uint32_t max = std::numeric_limits<boost::uint32_t>::max();
+
 #if !defined(_WIN32) && !defined(__amigaos4__)
     struct tms t;
-    return times(&t) * 1000 / sysconf(_SC_CLK_TCK);
+    return (times(&t) * (1000ULL /  sysconf(_SC_CLK_TCK))) % max;
 #elif defined(__amigaos4__)
     struct tms t;
-    return times(&t) * 1000 / 50;
+    return (times(&t) * (1000ULL / 50)) % max;
 #else
-    return std::clock() * 100 / CLOCKS_PER_SEC;   
+    return (std::clock() * (100ULL / CLOCKS_PER_SEC) % max;
 #endif
 }
 
