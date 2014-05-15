@@ -1358,7 +1358,7 @@ ext_lirc=no
 ext_dbus=no
 ext_all=no
 extensions_list=
-extensions_support=yes
+extensions_support=no
 nextensions=0
 AC_ARG_ENABLE(extensions,
   AC_HELP_STRING([--enable-extensions=], [Specify which extensions to build (default: none)])
@@ -1367,11 +1367,10 @@ AC_HELP_STRING([--disable-extensions], [Disable support for extensions entirely]
     if test "x${enableval}" != "xno"; then
       extlist="${enableval}"
       enableval=`echo ${enableval} | tr '\054' ' ' `
-      AC_DEFINE([USE_EXTENSIONS], [1], [Specify that extension support is enabled.])
+      extensions_support=yes
     else
       extlist=""
       enableval=""
-      extensions_support=no
     fi
   fi
   nextensions=0
@@ -1450,8 +1449,6 @@ AM_CONDITIONAL(BUILD_GTK_EXT, [ test x$ext_gtk = xyes ])
 AM_CONDITIONAL(BUILD_LIRC_EXT, [ test x$ext_lirc = xyes ])
 AM_CONDITIONAL(BUILD_DBUS_EXT, [ test x$ext_dbus = xyes ])
 AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n "$extensions_list"])
-
-AM_CONDITIONAL(ENABLE_EXTENSIONS, [ test "x${extensions_support}" != "xno" ])
 
 dnl --------------------------------------------------------
 dnl Libtool
@@ -1687,11 +1684,17 @@ dnl --------------------------------------------------------
 AC_ARG_ENABLE(cygnal,
   AC_HELP_STRING([--enable-cygnal], [Enable building of the Cygnal server]),
 [case "${enableval}" in
-  yes) cygnal=yes ;;
+  yes) cygnal=yes
+       extensions_support=yes ;;
   no)  cygnal=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for enable-cygnal option]) ;;
 esac],cygnal=no)
 AM_CONDITIONAL(CYGNAL, test x$cygnal = xyes)
+
+if test x$extensions_support = xyes; then
+    AC_DEFINE([USE_EXTENSIONS], [1], [Specify that extension support is enabled.])
+fi
+AM_CONDITIONAL(ENABLE_EXTENSIONS, [ test "x${extensions_support}" != "xno" ])
 
 dnl --------------------------------------------------------
 dnl Build the cgibins server if specified.
@@ -2694,8 +2697,15 @@ dnl ****************************************
 dnl *** Check for ELF visibility support ***
 dnl ****************************************
 
+dnl Enable visibility by default, disabled if extensions are enabled
 AC_ARG_ENABLE([visibility],
-  AC_HELP_STRING([--enable-visibility], [Use ELF visibility attributes]), [], [enable_visibility=no])
+  AC_HELP_STRING([--enable-visibility], [Use ELF visibility attributes])
+AC_HELP_STRING([--disable-visibility], [Disable ELF visibility]), [], [
+    if test x"$extensions_support" != x"no"; then
+      enable_visibility=no
+    else
+      enable_visibility=yes
+    fi])
 
 if test x"$enable_visibility" != x"no"; then
   dnl Check whether the compiler supports the visibility attribute
