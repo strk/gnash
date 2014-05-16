@@ -766,6 +766,9 @@ date_setTime(const fn_call& fn)
 // if an additional extra parameter is passed, switch to working in UTC
 // instead. Apart from the bottom-level conversions they are identical.
 
+// If the Date object has been set to NaN previously (see date_setTime()),
+// then all functions that set Date components are no-ops.
+
 void
 gnashTimeToDate(GnashTime& gt, Date_as& date, bool utc)
 {
@@ -839,15 +842,15 @@ date_setfullyear(const fn_call& fn)
     else if (rogue_date_args(fn, 3) != 0.0) {
         date->setTimeValue(NaN);
     }
-    else {
+    else if (!isNaN(date->getTimeValue())) {
         GnashTime gt;
         dateToGnashTime(*date, gt, utc);
         gt.year = toInt(fn.arg(0), getVM(fn)) - 1900;
         if (fn.nargs >= 2) gt.month = toInt(fn.arg(1), getVM(fn));
         if (fn.nargs >= 3) gt.monthday = toInt(fn.arg(2), getVM(fn));
         gnashTimeToDate(gt, *date, utc);
-  }
-  return as_value(date->getTimeValue());
+    }
+    return as_value(date->getTimeValue());
 }
 
 /// \brief Date.setYear(year[,month[,day]])
@@ -879,7 +882,7 @@ date_setYear(const fn_call& fn)
     else if (rogue_date_args(fn, 3) != 0.0) {
         date->setTimeValue(NaN);
     }
-    else {
+    else if (!isNaN(date->getTimeValue())) {
         GnashTime gt;
 
         dateToGnashTime(*date, gt, false);
@@ -934,7 +937,7 @@ date_setmonth(const fn_call& fn)
     else if (rogue_date_args(fn, 2) != 0.0) {
         date->setTimeValue(NaN);
     }
-    else {
+    else if (!isNaN(date->getTimeValue())) {
 
         GnashTime gt;
 
@@ -986,7 +989,7 @@ date_setDate(const fn_call& fn)
       date->setTimeValue(NaN);  // Is what FlashPlayer sets
   } else if (rogue_date_args(fn, 1) != 0.0) {
       date->setTimeValue(NaN);
-  } else {
+  } else if (!isNaN(date->getTimeValue())) {
     GnashTime gt;
 
     dateToGnashTime(*date, gt, utc);
@@ -1030,7 +1033,7 @@ date_setHours(const fn_call& fn)
     else if (rogue_date_args(fn, 4) != 0.0) {
         date->setTimeValue(NaN);
     }
-    else {
+    else if (!isNaN(date->getTimeValue())) {
       
         GnashTime gt;
 
@@ -1076,7 +1079,7 @@ date_setMinutes(const fn_call& fn)
     else if (rogue_date_args(fn, 3) != 0.0) {
         date->setTimeValue(NaN);
     }
-    else {
+    else if (!isNaN(date->getTimeValue())) {
         GnashTime gt;
 
         dateToGnashTime(*date, gt, utc);
@@ -1116,7 +1119,7 @@ date_setSeconds(const fn_call& fn)
     else if (rogue_date_args(fn, 2) != 0.0) {
         date->setTimeValue(NaN);
     }
-    else {
+    else if (!isNaN(date->getTimeValue())) {
         // We *could* set seconds [and milliseconds] without breaking the
         // structure out and reasembling it. We do it the same way as the
         // rest for simplicity and in case anyone's date routines ever
@@ -1154,7 +1157,7 @@ date_setMilliseconds(const fn_call& fn)
     else if (rogue_date_args(fn, 1) != 0.0) {
         date->setTimeValue(NaN);
     }
-    else {
+    else if (!isNaN(date->getTimeValue())) {
     
         GnashTime gt;
 

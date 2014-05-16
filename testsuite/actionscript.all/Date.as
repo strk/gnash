@@ -692,16 +692,17 @@ check_equals(typeof(foo), 'string');
  check_equals(foo.substring(0, 7), 'foo 950');
 #endif
 
-var o = new Date();
-o.setUTCMilliseconds(); // sets o's date to NaN
+{
+    var o = new Date();
+    o.setUTCMilliseconds(); // sets o's date to NaN
 
-ASSetPropFlags(o.__proto__, null, 0, 1);
-for (prop in o) {
-   if (prop.substr(0, 3) == "set" && prop != "setTime") {
-      trace("Testing " + prop + "(1)");
-      o[prop](1);
-      xcheck_equals(o.valueOf().toString(), "NaN");
-   }
+    ASSetPropFlags(o.__proto__, null, 0, 1);
+    for (prop in o) {
+        if (prop.substr(0, 3) == "set" && prop != "setTime") {
+            o[prop](1,2,3,4);
+            check_equals(o.valueOf().toString(), "NaN");
+        }
+    }
 }
 
 #if OUTPUT_VERSION == 5
