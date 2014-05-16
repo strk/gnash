@@ -1162,16 +1162,15 @@ getUptime()
     // timestamping this is not a big problem, assuming a single RTMP session
     // won't last that long. We ensure the overflow happens in a manner
     // avoiding undefined behaviour.
-    const boost::uint32_t max = std::numeric_limits<boost::uint32_t>::max();
 
 #if !defined(_WIN32) && !defined(__amigaos4__)
     struct tms t;
-    return (times(&t) * (1000ULL /  sysconf(_SC_CLK_TCK))) % max;
+    return times(&t) * (1000UL /  sysconf(_SC_CLK_TCK));
 #elif defined(__amigaos4__)
     struct tms t;
-    return (times(&t) * (1000ULL / 50)) % max;
+    return times(&t) * (1000UL / 50);
 #else
-    return (std::clock() * (100ULL / CLOCKS_PER_SEC) % max;
+    return std::clock() * (100UL / CLOCKS_PER_SEC);
 #endif
 }
 
