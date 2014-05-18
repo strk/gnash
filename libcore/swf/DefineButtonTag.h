@@ -98,7 +98,7 @@ public:
     /// A ButtonRecord is invalid if it refers to a DisplayObject
     /// which has not been defined.
     bool valid() const {
-        return (_definitionTag);
+        return _definitionTag.get();
     }
 
 private:
