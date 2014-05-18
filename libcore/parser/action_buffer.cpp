@@ -574,7 +574,7 @@ convert_double_wacky(const void *p)
         } c;
     } u;
 
-    BOOST_STATIC_ASSERT(sizeof(u) == sizeof(u.i)) __attribute__((unused));
+    BOOST_STATIC_ASSERT(sizeof(u) == sizeof(u.i));
 
     // Detect endianness of doubles by storing a value that is
     // exactly representable and that has different values in the

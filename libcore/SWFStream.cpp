@@ -197,7 +197,7 @@ SWFStream::read_sint(unsigned short bitcount)
 
     // Sign extend...
     if (value & (1 << (bitcount - 1))) {
-        value |= -1 << bitcount;
+        value |= static_cast<boost::uint32_t>(-1) << bitcount;
     }
 
 //        IF_DEBUG(log_debug("SWFStream::read_sint(%d) == %d\n", bitcount, value)));
@@ -312,7 +312,7 @@ double SWFStream::read_d64()
     const unsigned short dataLength = 8;
     double d = 0;
 
-    BOOST_STATIC_ASSERT(sizeof(double) == dataLength) __attribute__((unused));
+    BOOST_STATIC_ASSERT(sizeof(double) == dataLength);
 
     // Should align:
     if (read(reinterpret_cast<char*>(&d), dataLength) < dataLength)
