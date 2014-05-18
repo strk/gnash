@@ -30,6 +30,7 @@ dnl Figure out development tool stuff
 dnl --------------------------------------------------------
 
 AC_PROG_CXX
+AX_CXX_COMPILE_STDCXX_11(noext, mandatory)
 AC_PROG_CC
 AM_PROG_CC_C_O
 AC_EXEEXT
