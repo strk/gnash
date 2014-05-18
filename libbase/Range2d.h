@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <cassert> // for inlines
 #include <cmath> // for floor / ceil
+#include <boost/cstdint.hpp>
 
 namespace gnash {
 
@@ -50,6 +51,13 @@ enum RangeKind {
 	///
 	worldRange
 };
+
+namespace detail {
+    template <typename U> struct Promote { typedef U type; };
+    template <> struct Promote<float> { typedef double type; };
+    template <> struct Promote<int> { typedef boost::int64_t type; };
+    template <> struct Promote<unsigned int> { typedef boost::uint64_t type; };
+}
 
 /// 2d Range template class
 //
@@ -627,16 +635,19 @@ public:
 		assert ( isFinite() );
 		return _ymax;
 	}
-	
-	/// Get area (width*height)
-    ///  
-	T getArea() const {
-        assert ( !isWorld() );
-        if ( isNull() ) return 0;
-        return (_xmax - _xmin) * (_ymax - _ymin);
-        // this implementation is for float types, see specialization below
-        // for ints... 
-    } 
+
+
+        /// Get area (width*height)
+        //
+        typename detail::Promote<T>::type
+        getArea() const {
+            assert ( !isWorld() );
+            if ( isNull() ) return 0;
+            return static_cast<typename detail::Promote<T>::type>(_xmax - _xmin)
+                   * (_ymax - _ymin);
+            // this implementation is for float types, see specialization below
+            // for ints...
+        }
 
 	/// Expand this range to include the given Range2d
 	//
@@ -823,23 +834,27 @@ Range2d<unsigned int>::roundMax(float max) const
 //
 /// Add one.
 ///
-template<> inline int
+template<> inline
+detail::Promote<int>::type
 Range2d<int>::getArea() const
 {
     assert ( !isWorld() );
     if ( isNull() ) return 0;
-    return (_xmax - _xmin + 1) * (_ymax - _ymin + 1);
+    return static_cast<detail::Promote<int>::type>(_xmax - _xmin + 1) *
+               (_ymax - _ymin + 1);
 }
 
 /// Specialization of area value for unsigned int type.
 //
 /// Add one.
 ///
-template<> inline unsigned int
+template<> inline
+detail::Promote<unsigned int>::type
 Range2d<unsigned int>::getArea() const
 {
     assert ( isFinite() );
-    return (_xmax - _xmin + 1) * (_ymax - _ymin + 1);
+    return static_cast<detail::Promote<unsigned int>::type>(_xmax - _xmin + 1) *
+              (_ymax - _ymin + 1);
 }
 
 
