@@ -192,6 +192,7 @@ class TestState {
       xpassed = 0;
       xfailed = 0;
       unresolve = 0;
+      laststate = FAILED;
     }
 
   ~TestState (void) { totals(); }
