@@ -88,6 +88,8 @@ MovieTester::MovieTester(const std::string& url)
     :
     _forceRedraw(true),
     _samplesFetched(0)
+    , _x(0)
+    , _y(0)
 {
     
 #ifdef USE_MEDIA
