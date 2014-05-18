@@ -49,6 +49,7 @@ Memory::Memory()
       _info(0),
       _size(DATALOG_SIZE),
       _index(0)
+    , _checkpoint()
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -56,6 +57,7 @@ Memory::Memory()
 
 Memory::Memory(size_t size) 
     : _collecting(false)
+    , _checkpoint()
 {
 //    GNASH_REPORT_FUNCTION;
     _size = size;
