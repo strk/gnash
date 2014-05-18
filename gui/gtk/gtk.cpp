@@ -584,6 +584,7 @@ GtkGui::grabFocus()
 void
 GtkGui::quitUI() 
 {
+    stopAdvanceTimer();
     gtk_widget_destroy(_window);
     gtk_main_quit();
 }
