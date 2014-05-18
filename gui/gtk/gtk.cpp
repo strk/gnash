@@ -585,6 +585,9 @@ void
 GtkGui::quitUI() 
 {
     stopAdvanceTimer();
+    // Unregister the callback registered by setTimeout, if any. This also
+    // removes other callbacks, but we're about to go away anyway.
+    while (g_source_remove_by_user_data(this)) {}
     gtk_widget_destroy(_window);
     gtk_main_quit();
 }
