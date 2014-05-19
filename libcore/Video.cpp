@@ -20,7 +20,7 @@
 
 #include "Video.h"
 
-#include <boost/bind.hpp>
+#include <functional>
 #include <cassert>
 
 #include "DefineVideoStreamTag.h"
@@ -183,8 +183,8 @@ Video::getVideoFrame()
 #endif
 
         const size_t frames = m_def->visitSlice(
-                boost::bind(boost::mem_fn(&media::VideoDecoder::push),
-                    _decoder.get(), _1),
+                std::bind(boost::mem_fn(&media::VideoDecoder::push),
+                    _decoder.get(), std::placeholders::_1),
                 from_frame, current_frame);
 
         if (!frames) return _lastDecodedVideoFrame.get();

@@ -21,7 +21,7 @@
 #include "MediaParser.h" // for EncodedAudioFrame
 #include "log.h"
 
-#include <boost/bind.hpp>
+#include <functional>
 #include <boost/checked_delete.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/cstdint.hpp> // For C99 int types

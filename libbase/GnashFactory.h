@@ -91,7 +91,7 @@ public:
         Init();
         static_cast<void>(dummy);
         std::transform(_handlers.begin(), _handlers.end(), i,
-                boost::bind(&Handlers::value_type::first, _1));
+                std::bind(&Handlers::value_type::first, std::placeholders::_1));
     }
 
     /// Return a Handler identified by a name.

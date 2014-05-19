@@ -21,7 +21,7 @@
 #define GNASH_SOUND_UTILS_H
 
 #include <algorithm>
-#include <boost/bind.hpp>
+#include <functional>
 #include <boost/cstdint.hpp>
 
 #include "SoundInfo.h"
@@ -39,7 +39,7 @@ inline void
 adjustVolume(T* start, T* end, float volume)
 {
     std::transform(start, end, start,
-            boost::bind(std::multiplies<float>(), volume, _1));
+        [volume](const T& volsource) { return volume * volsource; });
 }
 
 /// Convert SWF-specified number of samples to output number of samples

@@ -33,7 +33,7 @@
 #include "Method.h"
 #include "abc_function.h"
 
-#include <boost/bind.hpp>
+#include <functional>
 
 namespace gnash {
 namespace abc {
@@ -80,10 +80,10 @@ void
 Class::initTraits(AbcBlock& bl)
 {
     std::for_each(_instanceTraits.begin(), _instanceTraits.end(),
-            boost::bind(&Trait::finalize, _1, &bl));
+            std::bind(&Trait::finalize, _1, &bl));
 
     std::for_each(_staticTraits.begin(), _staticTraits.end(),
-            boost::bind(&Trait::finalize, _1, &bl));
+            std::bind(&Trait::finalize, _1, &bl));
 }
 
 bool

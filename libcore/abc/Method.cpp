@@ -28,7 +28,7 @@
 #include "VM.h"
 #include "namedStrings.h"
 
-#include <boost/bind.hpp>
+#include <functional>
 
 namespace gnash {
 namespace abc {
@@ -82,7 +82,7 @@ void
 Method::initTraits(AbcBlock& bl)
 {
     std::for_each(_traits.begin(), _traits.end(),
-            boost::bind(&Trait::finalize, _1, &bl));
+            std::bind(&Trait::finalize, _1, &bl));
 }
 
 void

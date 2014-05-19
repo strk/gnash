@@ -23,6 +23,7 @@
 #include "gnashconfig.h"
 #endif
 
+#include <memory>
 #include <string>
 #include <vector>
 #include <map>

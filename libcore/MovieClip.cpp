@@ -28,7 +28,7 @@
 #include <string>
 #include <algorithm> // for std::swap
 #include <boost/algorithm/string/case_conv.hpp>
-#include <boost/bind.hpp>
+#include <functional>
 
 #include "log.h" 
 #include "movie_definition.h"

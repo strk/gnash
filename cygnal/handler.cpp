@@ -24,7 +24,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/shared_array.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/bind.hpp>
+#include <functional>
 #include <algorithm>
 #include <string>
 #include <deque>

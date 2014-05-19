@@ -22,7 +22,7 @@
 
 #include <boost/variant.hpp>
 #include <cassert>
-#include <boost/bind.hpp>
+#include <functional>
 #include <typeinfo>
 
 #include "PropFlags.h"
@@ -148,8 +148,9 @@ public:
 
 	/// Set the cache value (for user-defined getter-setters)
 	void setCache(const as_value& v) {
-        boost::apply_visitor(boost::bind(SetUnderlying(), _1, v), _getset);
-    }
+            boost::apply_visitor(
+                std::bind(SetUnderlying(), std::placeholders::_1, v), _getset);
+        }
 
 	/// Get the cache value (for user-defined getter-setters)
 	as_value getCache() const {

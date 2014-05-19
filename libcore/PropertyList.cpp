@@ -25,7 +25,7 @@
 #include "PropertyList.h"
 
 #include <utility> 
-#include <boost/bind.hpp> 
+#include <functional> 
 #include <boost/tuple/tuple.hpp>
 
 #include "Property.h" 

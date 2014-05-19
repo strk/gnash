@@ -32,7 +32,7 @@
 #include "Machine.h"
 #include "Global_as.h"
 
-#include <boost/bind.hpp>
+#include <functional>
 
 namespace gnash {
 
@@ -334,19 +334,19 @@ AbcBlock::prepare(Machine* mach)
     // scripts have Global as a target object (prototype), so for now we
     // will do that.
     std::for_each(_scripts.begin(), _scripts.end(),
-            boost::bind(&abc::Class::setPrototype, _1, mach->global()));
+            std::bind(&abc::Class::setPrototype, _1, mach->global()));
  
     std::for_each(_methods.begin(), _methods.end(),
-            boost::bind(&Method::initPrototype, _1, mach));
+            std::bind(&Method::initPrototype, _1, mach));
     
     // TODO: Remove this, initialize traits only when needed; possibly 
     // consruct them on parsing without the need for a finalize method.
     std::for_each(_methods.begin(), _methods.end(),
-            boost::bind(&abc::Method::initTraits, _1, *this));
+            std::bind(&abc::Method::initTraits, _1, *this));
     std::for_each(_classes.begin(), _classes.end(),
-            boost::bind(&abc::Class::initTraits, _1, *this));
+            std::bind(&abc::Class::initTraits, _1, *this));
     std::for_each(_scripts.begin(), _scripts.end(),
-            boost::bind(&abc::Class::initTraits, _1, *this));
+            std::bind(&abc::Class::initTraits, _1, *this));
 
 }
 

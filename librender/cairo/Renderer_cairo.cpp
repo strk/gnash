@@ -42,7 +42,7 @@
 #include <cairo/cairo.h>
 #include <boost/scoped_array.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/bind.hpp>
+#include <functional>
 
 #include "Renderer.h"
 #include "GnashImage.h"
@@ -980,7 +980,8 @@ Renderer_cairo::apply_matrix_to_paths(std::vector<Path>& paths,
                                       const SWFMatrix& mat)
 {  
     std::for_each(paths.begin(), paths.end(),
-                  boost::bind(&Path::transform, _1, boost::ref(mat)));
+                  std::bind(&Path::transform, std::placeholders::_1,
+                            std::ref(mat)));
 }
   
 void

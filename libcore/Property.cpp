@@ -19,7 +19,7 @@
 #include "Property.h"
 
 #include <boost/variant.hpp>
-#include <boost/bind.hpp>
+#include <functional>
 
 #include "VM.h"
 #include "as_function.h"
@@ -171,7 +171,8 @@ Property::setValue(as_object& this_ptr, const as_value& value) const
 void
 Property::setCache(const as_value& value)
 {
-    boost::apply_visitor(boost::bind(SetCache(), _1, value), _bound);
+    boost::apply_visitor(std::bind(SetCache(), std::placeholders::_1, value),
+                         _bound);
 }
 
 } // namespace gnash

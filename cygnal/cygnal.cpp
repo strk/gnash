@@ -89,7 +89,7 @@ extern "C"{
 #include <boost/date_time/time_zone_base.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread.hpp>
-#include <boost/bind.hpp>
+#include <functional>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/tss.hpp>
@@ -536,7 +536,7 @@ main(int argc, char *argv[])
     if (admin) {
 	Network::thread_params_t admin_data;
 	admin_data.port = gnash::ADMIN_PORT;
-	boost::thread admin_thread(boost::bind(&admin_handler, &admin_data));
+	boost::thread admin_thread(std::bind(&admin_handler, &admin_data));
     }
 
 //    Cvm cvm;
@@ -566,7 +566,7 @@ main(int argc, char *argv[])
 	http_data->port = port_offset + gnash::HTTP_PORT;
         http_data->hostname = hostname;
 	if (crcfile.getThreadingFlag()) {
-	    boost::thread http_thread(boost::bind(&connection_handler, http_data));
+	    boost::thread http_thread(std::bind(&connection_handler, http_data));
 	} else {
 	    connection_handler(http_data);
 	}
@@ -584,7 +584,7 @@ main(int argc, char *argv[])
 	rtmp_data->port = port_offset + gnash::RTMP_PORT;
         rtmp_data->hostname = hostname;
 	if (crcfile.getThreadingFlag()) {
-	    boost::thread rtmp_thread(boost::bind(&connection_handler, rtmp_data));
+	    boost::thread rtmp_thread(std::bind(&connection_handler, rtmp_data));
 	} else {
 	    connection_handler(rtmp_data);
 	}
@@ -888,9 +888,9 @@ connection_handler(Network::thread_params_t *args)
 		// If in multi-threaded mode (the default), start a thread
 		// with a connection_handler for each port we're interested
 		// in. Each port of could have a different protocol.
-		boost::bind(event_handler, hargs);
+		std::bind(event_handler, hargs);
 		if (crcfile.getThreadingFlag() == true) {
-		    boost::thread event_thread(boost::bind(&event_handler, hargs));
+		    boost::thread event_thread(std::bind(&event_handler, hargs));
 		} else {
 		    event_handler(hargs);
 		    // We're done, close this network connection
@@ -960,7 +960,7 @@ connection_handler(Network::thread_params_t *args)
 		    // with a connection_handler for each port we're interested
 		    // in. Each port of course has a different protocol.
 		    if (crcfile.getThreadingFlag() == true) {
-			boost::thread event_thread(boost::bind(&event_handler, args));
+			boost::thread event_thread(std::bind(&event_handler, args));
 		    } else {
 			event_handler(args);
 			// We're done, close this network connection

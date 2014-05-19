@@ -19,7 +19,7 @@
 
 #include "ClassHierarchy.h"
 
-#include <boost/bind.hpp>
+#include <functional>
 
 #include "as_object.h"
 #include "PropFlags.h"
@@ -126,7 +126,8 @@ ClassHierarchy::declareAll(const NativeClasses& classes)
     bool(ClassHierarchy::*nf)(const NativeClass& f) =
         &ClassHierarchy::declareClass;
 
-    std::for_each(classes.begin(), classes.end(), boost::bind(nf, this, _1));
+    std::for_each(classes.begin(), classes.end(), std::bind(nf, this,
+        std::placeholders::_1));
 }
 
 } // end of namespace gnash

@@ -25,7 +25,7 @@
 #include <algorithm>
 #include <stack>
 #include <cassert>
-#include <boost/bind.hpp>
+#include <functional>
 #include <boost/format.hpp>
 
 #include "log.h"
@@ -183,7 +183,8 @@ DisplayList::placeDisplayObject(DisplayObject* ch, int depth)
 
     container_type::iterator it =
         std::find_if( _charsByDepth.begin(), _charsByDepth.end(),
-                boost::bind(std::not2(DepthLessThan()), _1, depth));
+                std::bind(std::not2(DepthLessThan()), std::placeholders::_1,
+                     depth));
 
     if (it == _charsByDepth.end() || (*it)->get_depth() != depth) {
         // add the new char
@@ -220,7 +221,8 @@ DisplayList::add(DisplayObject* ch, bool replace)
 
     container_type::iterator it =
         std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
-                boost::bind(std::not2(DepthLessThan()), _1, depth));
+                std::bind(std::not2(DepthLessThan()), std::placeholders::_1,
+                     depth));
 
     if (it == _charsByDepth.end() || (*it)->get_depth() != depth) {
         _charsByDepth.insert(it, ch);
@@ -244,7 +246,7 @@ DisplayList::replaceDisplayObject(DisplayObject* ch, int depth,
 
     container_type::iterator it =
         std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
-            boost::bind(std::not2(DepthLessThan()), _1, depth));
+            std::bind(std::not2(DepthLessThan()), std::placeholders::_1, depth));
 
     if (it == _charsByDepth.end() || (*it)->get_depth() != depth) {
         _charsByDepth.insert(it, ch);
@@ -345,7 +347,7 @@ DisplayList::removeDisplayObject(int depth)
     // TODO: optimize to take by-depth order into account
     container_type::iterator it = 
         std::find_if( _charsByDepth.begin(), _charsByDepth.end(),
-            boost::bind(DepthEquals(), _1, depth));
+            std::bind(DepthEquals(), std::placeholders::_1, depth));
 
     if (it != _charsByDepth.end()) {
         // Make a copy (before erasing)
@@ -400,7 +402,8 @@ DisplayList::swapDepths(DisplayObject* ch1, int newdepth)
     // upper bound ...
     container_type::iterator it2 =
         std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
-            boost::bind(std::not2(DepthLessThan()), _1, newdepth));
+            std::bind(std::not2(DepthLessThan()), std::placeholders::_1,
+                newdepth));
 
     if (it1 == _charsByDepth.end()) {
         log_error(_("First argument to DisplayList::swapDepth() "
@@ -459,7 +462,8 @@ DisplayList::insertDisplayObject(DisplayObject* obj, int index)
     // Find the first index greater than or equal to the required index
     container_type::iterator it =
         std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
-            boost::bind(std::not2(DepthLessThan()), _1, index));
+            std::bind(std::not2(DepthLessThan()), std::placeholders::_1,
+                index));
         
     // Insert the DisplayObject before that position
     _charsByDepth.insert(it, obj);
@@ -851,7 +855,8 @@ DisplayList::mergeDisplayList(DisplayList& newList, DisplayObject& o)
         if (chNew->unloaded()) {
             iterator it =
                 std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
-                    boost::bind(std::not2(DepthLessThan()), _1, depthNew));
+                    std::bind(std::not2(DepthLessThan()), std::placeholders::_1,
+                        depthNew));
             
             o.set_invalidated();
             _charsByDepth.insert(it, *itNew);
@@ -906,7 +911,8 @@ DisplayList::reinsertRemovedCharacter(DisplayObject* ch)
     // TODO: optimize this by searching from the end(lowest depth).
     container_type::iterator it =
         std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
-                boost::bind(std::not2(DepthLessThan()), _1, newDepth));
+                std::bind(std::not2(DepthLessThan()), std::placeholders::_1,
+                    newDepth));
 
     _charsByDepth.insert(it, ch);
 
@@ -942,7 +948,8 @@ beginNonRemoved(DisplayList::container_type& c)
         DisplayObject::staticDepthOffset;
     
     return std::find_if(c.begin(), c.end(),
-            boost::bind(std::not2(DepthLessThan()), _1, depth));
+            std::bind(std::not2(DepthLessThan()), std::placeholders::_1,
+                depth));
 }
 
 #if GNASH_PARANOIA_LEVEL > 1 && !defined(NDEBUG)
@@ -954,7 +961,8 @@ beginNonRemoved(const DisplayList::container_type& c)
         DisplayObject::staticDepthOffset;
 
     return std::find_if(c.begin(), c.end(), 
-            boost::bind(std::not2(DepthLessThan()), _1, depth));
+            std::bind(std::not2(DepthLessThan()), std::placeholders::_1,
+                depth));
 }
 #endif
 
@@ -962,7 +970,7 @@ DisplayList::iterator
 dlistTagsEffectiveZoneEnd(DisplayList::container_type& c)
 {
     return std::find_if(c.begin(), c.end(), 
-            boost::bind(DepthGreaterThan(), _1,
+            std::bind(DepthGreaterThan(), std::placeholders::_1,
                 0xffff + DisplayObject::staticDepthOffset));
 }
 

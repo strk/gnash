@@ -29,7 +29,7 @@
 #include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index/key_extractors.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/bind.hpp>
+#include <functional>
 #include <algorithm>
 
 #include "Property.h" // for templated functions

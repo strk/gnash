@@ -38,7 +38,7 @@
 #include "Renderer_DirectFB.h"
 
 #include <boost/utility.hpp>
-#include <boost/bind.hpp>
+#include <functional>
 
 // Defined to 1 to disable (slow) anti-aliasing with the accumulation buffer
 #define NO_ANTIALIASING 1

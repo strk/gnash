@@ -21,7 +21,7 @@
 
 #include "MediaParser.h"
 
-#include <boost/bind.hpp>
+#include <functional>
 
 #include "log.h"
 #include "GnashSleep.h" // for usleep.
@@ -53,7 +53,7 @@ MediaParser::startParserThread()
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	log_debug("Starting MediaParser thread");
 	_parserThread.reset(new boost::thread(
-                boost::bind(parserLoopStarter, this)));
+                std::bind(parserLoopStarter, this)));
 	_parserThreadStartBarrier.wait();
 #endif
 }

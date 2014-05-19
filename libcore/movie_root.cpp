@@ -30,7 +30,7 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/ptr_container/ptr_deque.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
-#include <boost/bind.hpp>
+#include <functional>
 
 #include "GnashSystemIOHeaders.h" // write()
 #include "log.h"
@@ -1542,8 +1542,9 @@ movie_root::executeAdvanceCallbacks()
 
         std::transform(_objectCallbacks.begin(), _objectCallbacks.end(),
             std::back_inserter(currentCallbacks),
-            boost::bind(CreatePointer<as_object>(),
-                boost::bind(std::mem_fun(&ActiveRelay::owner), _1)));
+            std::bind(CreatePointer<as_object>(),
+                std::bind(std::mem_fun(&ActiveRelay::owner),
+                    std::placeholders::_1)));
 
         std::for_each(currentCallbacks.begin(), currentCallbacks.end(),
                 ExecuteCallback());

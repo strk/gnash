@@ -32,7 +32,6 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/function.hpp>
-#include <boost/bind.hpp>
 #include <algorithm>
 #include <cstdlib>
 #include <utility>
@@ -173,7 +172,7 @@ main(int argc, char *argv[])
     // We only expect GnashExceptions here. No others should be thrown!
     try {
         std::for_each(infiles.begin(), infiles.end(),
-                boost::bind(&playFile, boost::ref(player), argc, argv, _1));
+                std::bind(&playFile, std::ref(player), argc, argv, std::placeholders::_1));
     }
     catch (const gnash::GnashException& ex) {
         std::cerr << "Error: " << ex.what() << "\n";
@@ -283,31 +282,31 @@ getDebuggingOptions(gnash::Player& p)
     desc.add_options()
 
     ("verbose,v", accumulator<int>()
-        ->notifier(boost::bind(&LogFile::setVerbosity, &dbglogfile, _1)),
+        ->notifier(std::bind((void(LogFile::*)(int))&LogFile::setVerbosity, &dbglogfile, std::placeholders::_1)),
         _("Produce verbose output"))
 
     // NB: if we use a bool_switch(), the default will be false. TODO:
     // make a sensible process for handling command-line and rcfile options.
     ("writelog,w", po::value<bool>()
         ->zero_tokens()
-        ->notifier(boost::bind(&RcInitFile::useWriteLog, &rcfile, _1)),
+        ->notifier(std::bind((void(RcInitFile::*)(bool))&RcInitFile::useWriteLog, &rcfile, std::placeholders::_1)),
         _("Produce the disk based debug log"))
 
 #if VERBOSE_ACTION
     ("verbose-actions,a", po::bool_switch()
-        ->notifier(boost::bind(&LogFile::setActionDump, &dbglogfile, _1)),
+        ->notifier(std::bind(&LogFile::setActionDump, &dbglogfile, std::placeholders::_1)),
         _("Be (very) verbose about action execution"))
 #endif
 
 #if VERBOSE_PARSE
     ("verbose-parsing,p", po::bool_switch()
-        ->notifier(boost::bind(&LogFile::setParserDump, &dbglogfile, _1)),
+        ->notifier(std::bind(&LogFile::setParserDump, &dbglogfile, std::placeholders::_1)),
         _("Be (very) verbose about parsing"))
 #endif
 
 #ifdef GNASH_FPS_DEBUG
     ("debug-fps,f", po::value<float>()
-        ->notifier(boost::bind(&Player::setFpsPrintTime, &p, _1)),
+        ->notifier(std::bind(&Player::setFpsPrintTime, &p, std::placeholders::_1)),
         _("Print FPS every num seconds"))
 #endif 
 
@@ -343,52 +342,52 @@ getSupportedOptions(gnash::Player& p)
         _("Print version information and exit"))
 
     ("scale,s", po::value<float>()
-        ->notifier(boost::bind(&Player::setScale, &p,
-                boost::bind(gnash::clamp<float>, _1, 0.01f, 100.f))),
+        ->notifier(std::bind(&Player::setScale, &p,
+                std::bind(gnash::clamp<float>, std::placeholders::_1, 0.01f, 100.f))),
         _("Scale the movie by the specified factor"))
 
     ("delay,d", po::value<int>()
-        ->notifier(boost::bind(&Player::setDelay, &p, _1)),
+        ->notifier(std::bind(&Player::setDelay, &p, std::placeholders::_1)),
         _("Number of milliseconds to delay in main loop"))
 
     ("audio-dump,A", po::value<string>()
-        ->notifier(boost::bind(&Player::setAudioDumpfile, &p, _1)),
+        ->notifier(std::bind(&Player::setAudioDumpfile, &p, std::placeholders::_1)),
         _("Audio dump file (wave format)"))
 
     ("hwaccel", po::value<string>()
         ->default_value("none")
-        ->notifier(boost::bind(&Player::setHWAccel, &p, _1)),
+        ->notifier(std::bind(&Player::setHWAccel, &p, std::placeholders::_1)),
         (string(_("Hardware Video Accelerator to use"))
         + string("\nnone|vaapi")). c_str()) 
 
     ("xid,x", po::value<long>()
-        ->notifier(boost::bind(&Player::setWindowId, &p, _1)),
+        ->notifier(std::bind(&Player::setWindowId, &p, std::placeholders::_1)),
         _("X11 Window ID for display"))
 
     ("width,j", po::value<int>()
-        ->notifier(boost::bind(&Player::setWidth, &p, _1)),
+        ->notifier(std::bind(&Player::setWidth, &p, std::placeholders::_1)),
         _("Set window width"))
 
     ("height,k", po::value<int>()
-        ->notifier(boost::bind(&Player::setHeight, &p, _1)),
+        ->notifier(std::bind(&Player::setHeight, &p, std::placeholders::_1)),
         _("Set window height"))
 
     ("x-pos,X", po::value<int>()
-        ->notifier(boost::bind(&Player::setXPosition, &p, _1)),
+        ->notifier(std::bind(&Player::setXPosition, &p, std::placeholders::_1)),
         _("Set window x position"))
 
     ("y-pos,Y", po::value<int>()
-        ->notifier(boost::bind(&Player::setYPosition, &p, _1)),
+        ->notifier(std::bind(&Player::setYPosition, &p, std::placeholders::_1)),
         _("Set window y position"))
 
     ("once,1", po::bool_switch()
-        ->notifier(boost::bind(&Player::setDoLoop, &p,
-                boost::bind(std::logical_not<bool>(), _1))),
+        ->notifier(std::bind(&Player::setDoLoop, &p,
+                std::bind(std::logical_not<bool>(), std::placeholders::_1))),
         _("Exit when/if movie reaches the last frame"))
 
     ("render-mode,r", po::value<int>()
         ->default_value(3)
-        ->notifier(boost::bind(&setupSoundAndRendering, boost::ref(p), _1)),
+        ->notifier(std::bind(&setupSoundAndRendering, std::ref(p), std::placeholders::_1)),
         (string("0 ")
         + string(_("disable rendering and sound")) 
         + string("\n1 ")
@@ -403,7 +402,7 @@ getSupportedOptions(gnash::Player& p)
         ->default_value(rcfile.getMediaHandler().empty() ?
             ( handlers.empty() ? "" : handlers.front() )
                                                  : rcfile.getMediaHandler() )
-        ->notifier(boost::bind(&Player::setMedia, &p, _1)),
+        ->notifier(std::bind(&Player::setMedia, &p, std::placeholders::_1)),
         (string(_("The media handler to use"))
          + string("\n") + boost::join(handlers, "|")
         ).c_str())
@@ -411,61 +410,61 @@ getSupportedOptions(gnash::Player& p)
     ("renderer,R", po::value<string>()
         ->default_value(rcfile.getRenderer().empty() ? renderers.front()
                                                      : rcfile.getRenderer())
-        ->notifier(boost::bind(&Player::setRenderer, &p, _1)),
+        ->notifier(std::bind(&Player::setRenderer, &p, std::placeholders::_1)),
         (string(_("The renderer to use"))
         + string("\n") + boost::join(renderers, "|")
         ).c_str())
 
     ("timeout,t", po::value<float>()
-        ->notifier(boost::bind(&Player::setExitTimeout, &p, _1)),
+        ->notifier(std::bind(&Player::setExitTimeout, &p, std::placeholders::_1)),
         _("Exit after the specified number of seconds"))
 
     ("real-url,u", po::value<string>(&url),
         _("Set \"real\" URL of the movie"))
 
     ("base-url,U", po::value<string>()
-        ->notifier(boost::bind(&Player::setBaseUrl, &p, _1)),
+        ->notifier(std::bind(&Player::setBaseUrl, &p, std::placeholders::_1)),
         _("Set \"base\" URL for resolving relative URLs"))
 
     ("param,P", po::value<std::vector<std::string> >()
         ->composing()
-        ->notifier(boost::bind(&setupFlashVars, boost::ref(p), _1)),
+        ->notifier(std::bind(&setupFlashVars, std::ref(p), std::placeholders::_1)),
         _("Set parameter (e.g. \"FlashVars=A=1&b=2\")"))
 
     ("fd,F", po::value<string>()
-        ->notifier(boost::bind(&setupFDs, boost::ref(p), _1)),
+        ->notifier(std::bind(&setupFDs, std::ref(p), std::placeholders::_1)),
         (string(_("Filedescriptor to use for external communications"))
         + string(" <fd>:<fd>")
         ).c_str())
 
     ("cookie-file,C", po::value<string>()
-        ->notifier(boost::bind(&setupCookiesIn, boost::ref(p), _1)),
+        ->notifier(std::bind(&setupCookiesIn, std::ref(p), std::placeholders::_1)),
         _("Cookiefile to use"))
 
     ("max-advances", po::value<size_t>()
-        ->notifier(boost::bind(&Player::setMaxAdvances, &p, _1)),
+        ->notifier(std::bind(&Player::setMaxAdvances, &p, std::placeholders::_1)),
         _("Exit after specified number of frame advances"))
 
     ("fullscreen", po::bool_switch()
-        ->notifier(boost::bind(&Player::setStartFullscreen, &p, _1)),
+        ->notifier(std::bind(&Player::setStartFullscreen, &p, std::placeholders::_1)),
         _("Start in fullscreen mode"))
 
     // TODO: move to GUIs actually implementing this
     ("hide-menubar", po::bool_switch()
-        ->notifier(boost::bind(&Player::hideMenu, &p, _1)),
+        ->notifier(std::bind(&Player::hideMenu, &p, std::placeholders::_1)),
         _("Start without displaying the menu bar"))
 
     // TODO: do this in ScreenShotter class.
     ("screenshot", po::value<string>()
-        ->notifier(boost::bind(&Player::setScreenShots, &p, _1)),
+        ->notifier(std::bind(&Player::setScreenShots, &p, std::placeholders::_1)),
         _("List of frames to save as screenshots"))
 
     ("screenshot-file", po::value<string>()
-        ->notifier(boost::bind(&Player::setScreenShotFile, &p, _1)),
+        ->notifier(std::bind(&Player::setScreenShotFile, &p, std::placeholders::_1)),
         _("Filename pattern for screenshot images"))
 
     ("screenshot-quality", po::value<size_t>()
-        ->notifier(boost::bind(&Player::setScreenShotQuality, &p, _1)),
+        ->notifier(std::bind(&Player::setScreenShotQuality, &p, std::placeholders::_1)),
         _("Quality for screenshot output (not all formats)"))
 
     ("input-file", po::value<std::vector<std::string> >(&infiles),

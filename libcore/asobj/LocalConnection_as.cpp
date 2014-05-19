@@ -23,7 +23,7 @@
 #include <cstring>
 #include <boost/cstdint.hpp> // for boost::?int??_t
 #include <boost/assign/list_of.hpp>
-#include <boost/bind.hpp>
+#include <functional>
 
 #include "GnashSystemIOHeaders.h"
 
@@ -669,7 +669,7 @@ validFunctionName(const std::string& func)
 
     const ReservedNames::const_iterator it =
         std::find_if(reserved.begin(), reserved.end(),
-                boost::bind(StringNoCaseEqual(), _1, func));
+                std::bind(StringNoCaseEqual(), std::placeholders::_1, func));
         
     return (it == reserved.end());
 }

@@ -573,7 +573,7 @@ FLVParser::fetchMetaTags(OrderedMetaTags& tags, boost::uint64_t ts)
 
         // Copy the first value into the return container.
         std::transform(_metaTags.begin(), it, std::back_inserter(tags),
-                boost::bind(&MetaTags::value_type::second, _1));
+            [](const MetaTags::value_type& pair) { return pair.second; });
 
         _metaTags.erase(_metaTags.begin(), it);
 	}

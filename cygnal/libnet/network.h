@@ -132,7 +132,7 @@ public:
 	RTMPS,
 	DTN
     } protocols_supported_e;
-    // This is used to pass parameters to a thread using boost::bind
+    // This is used to pass parameters to a thread using std::bind
     typedef struct {
 	int tid;
 	int port;

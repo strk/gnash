@@ -19,7 +19,7 @@
 
 #include "XMLNode_as.h"
 
-#include <boost/bind.hpp>
+#include <functional>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -319,7 +319,7 @@ XMLNode_as::getPrefixForNamespace(const std::string& ns, std::string& prefix)
         if (!attrs.empty())
         {
             it = std::find_if(attrs.begin(), attrs.end(), 
-                        boost::bind(namespaceMatches, _1, ns));
+                        std::bind(namespaceMatches, std::placeholders::_1, ns));
             if (it != attrs.end()) break;
         }
         node = node->getParent();
@@ -359,7 +359,7 @@ XMLNode_as::getNamespaceForPrefix(const std::string& prefix, std::string& ns)
         if (!attrs.empty()) {
 
             it = std::find_if(attrs.begin(), attrs.end(), 
-                        boost::bind(prefixMatches, _1, prefix));
+                        std::bind(prefixMatches, std::placeholders::_1, prefix));
             if (it != attrs.end()) break;
         }
         node = node->getParent();

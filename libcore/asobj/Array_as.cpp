@@ -215,7 +215,9 @@ inplaceMerge(IterType begin, IterType middle, const IterType& end, ComparatorTyp
             // Find the first element that is not less than next_high. Then, shift all
             // elements before that element one position to the left, and copy
             // next_high into the vacant spot.
-            IterType it = std::find_if(middle, end, !boost::bind<bool>(compare, _1, next_high));
+            IterType it = std::find_if(middle, end, 
+                [&](const value_type& v) { return !compare(v, next_high); });
+
             std::copy(boost::next(middle), it, middle);
             *(--it) = next_high;
         }

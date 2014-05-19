@@ -26,7 +26,7 @@
 
 #include <utility>
 #include <boost/assign/list_of.hpp>
-#include <boost/bind.hpp>
+#include <functional>
 #include <boost/logic/tribool.hpp>
 
 #include "movie_root.h"
@@ -308,7 +308,7 @@ DisplayObject::blendMode(const fn_call& fn)
 
     const BlendModeMap& bmm = getBlendModeMap();
     BlendModeMap::const_iterator it = std::find_if(bmm.begin(), bmm.end(),
-            boost::bind(blendModeMatches, _1, mode));
+            std::bind(blendModeMatches, std::placeholders::_1, mode));
 
     if (it != bmm.end()) {
         ch->setBlendMode(it->first);

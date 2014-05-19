@@ -56,7 +56,7 @@
 #include "swf/ShapeRecord.h"
 
 #include <boost/utility.hpp>
-#include <boost/bind.hpp>
+#include <functional>
 
 #include "Renderer_gles1.h"
 #include "GnashDevice.h"

@@ -22,7 +22,7 @@
 #define GNASH_ALGORITHM_H
 
 #include <algorithm>
-#include <boost/bind.hpp>
+#include <functional>
 
 namespace gnash {
 
@@ -74,8 +74,8 @@ foreachSecond(T begin, T end, U op)
 {
     typedef typename std::iterator_traits<T>::value_type value_type;
 
-    std::for_each(begin, end, boost::bind(op,
-                boost::bind(&value_type::second, _1)));
+    std::for_each(begin, end, std::bind(op,
+                std::bind(&value_type::second, std::placeholders::_1)));
 }
 
 } // namespace gnash

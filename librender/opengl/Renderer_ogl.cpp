@@ -24,7 +24,7 @@
 #include "Renderer_ogl.h"
 
 #include <boost/utility.hpp>
-#include <boost/bind.hpp>
+#include <functional>
 #include <list>
 #include <cstring>
 #include <cmath>
@@ -692,7 +692,7 @@ void
 for_each(C& container, R (T::*pmf)(const A&),const A& arg)
 {
     std::for_each(container.begin(), container.end(),
-                  boost::bind(pmf, _1, boost::ref(arg)));
+                  std::bind(pmf, _1, std::ref(arg)));
 }
 
 
@@ -1184,7 +1184,7 @@ public:
 
     // Call add_paths for each mask.
     std::for_each(_masks.begin(), _masks.end(),
-      boost::bind(&Renderer_ogl::add_paths, this, _1));    
+      std::bind(&Renderer_ogl::add_paths, this, _1));
           
     glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
     glStencilFunc(GL_EQUAL, _masks.size(), _masks.size());
@@ -1634,7 +1634,7 @@ public:
   apply_matrix_to_paths(std::vector<Path>& paths, const SWFMatrix& mat)
   {  
     std::for_each(paths.begin(), paths.end(),
-                  boost::bind(&Path::transform, _1, boost::ref(mat)));
+                  std::bind(&Path::transform, _1, std::ref(mat)));
                   
     //for_each(paths, &path::transform, mat);
   }  

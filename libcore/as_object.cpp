@@ -558,8 +558,9 @@ as_object::executeTriggers(Property* prop, const ObjectURI& uri,
     const as_value& newVal = trig.call(curVal, val, *this);
     
     // This is a particularly clear and concise way of removing dead triggers.
-    EraseIf(*_trigs, boost::bind(boost::mem_fn(&Trigger::dead), 
-             boost::bind(&TriggerContainer::value_type::second, _1)));
+    EraseIf(*_trigs, std::bind(boost::mem_fn(&Trigger::dead),
+             std::bind(&TriggerContainer::value_type::second,
+             std::placeholders::_1)));
                     
     // The trigger call could have deleted the property,
     // so we check for its existence again, and do NOT put

@@ -24,7 +24,7 @@
 
 #include "Button.h"
 
-#include <boost/bind.hpp>
+#include <functional>
 #include <utility>
 #include <functional>
 
@@ -577,7 +577,7 @@ Button::getActiveCharacters(ConstDisplayObjects& list) const
     // DisplayObjects.
     std::remove_copy_if(_stateCharacters.begin(), _stateCharacters.end(),
             std::back_inserter(list),
-            boost::bind(&isCharacterNull, _1, false));
+            std::bind(&isCharacterNull, std::placeholders::_1, false));
 
 }
 
@@ -591,7 +591,7 @@ Button::getActiveCharacters(DisplayObjects& list, bool includeUnloaded)
     // DisplayObjects, optionally including unloaded DisplayObjects.
     std::remove_copy_if(_stateCharacters.begin(), _stateCharacters.end(),
             std::back_inserter(list),
-            boost::bind(&isCharacterNull, _1, includeUnloaded));
+            std::bind(&isCharacterNull, std::placeholders::_1, includeUnloaded));
     
 }
 
@@ -738,8 +738,8 @@ Button::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
     DisplayObjects actChars;
     getActiveCharacters(actChars);
     std::for_each(actChars.begin(), actChars.end(),
-            boost::bind(&DisplayObject::add_invalidated_bounds, _1,
-                boost::ref(ranges), force || invalidated())
+            std::bind(&DisplayObject::add_invalidated_bounds, std::placeholders::_1,
+                std::ref(ranges), force || invalidated())
     );
 }
 
@@ -967,7 +967,7 @@ Button::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
             os.str()));
 
     std::for_each(actChars.begin(), actChars.end(),
-            boost::bind(&DisplayObject::getMovieInfo, _1, tr, localIter)); 
+            std::bind(&DisplayObject::getMovieInfo, std::placeholders::_1, tr, localIter));
 
     return selfIt;
 

@@ -37,7 +37,7 @@
 #include <utility>
 #include <map>
 #include <boost/assign/list_of.hpp>
-#include <boost/bind.hpp>
+#include <functional>
 #include <boost/tuple/tuple.hpp>
 
 #include "utf8.h"
@@ -2265,7 +2265,8 @@ TextField::setTextColor(const rgba& col)
         set_invalidated();
         _textColor = col;
         std::for_each(_displayRecords.begin(), _displayRecords.end(),
-                boost::bind(&SWF::TextRecord::setColor, _1, _textColor));
+                std::bind(&SWF::TextRecord::setColor, std::placeholders::_1,
+                    _textColor));
     }
 }
 

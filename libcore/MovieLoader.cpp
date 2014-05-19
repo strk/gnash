@@ -20,7 +20,7 @@
 #include "MovieLoader.h"
 
 #include <memory> 
-#include <boost/bind.hpp>
+#include <functional>
 #include <algorithm>
 
 #include "log.h"
@@ -88,7 +88,8 @@ MovieLoader::processRequests()
         // Find first non-completed request (the others we'll wait)
         Requests::iterator endIt = _requests.end();
         Requests::iterator it = find_if(_requests.begin(), endIt,
-                                        boost::bind(&Request::pending, _1));
+                                        std::bind(&Request::pending,
+                                                  std::placeholders::_1));
 
         if (it == endIt) {
 
@@ -358,7 +359,8 @@ MovieLoader::processCompletedRequests()
 
         Requests::iterator endIt = _requests.end();
         Requests::iterator it = find_if(_requests.begin(), endIt,
-                                        boost::bind(&Request::completed, _1));
+                                        std::bind(&Request::completed,
+                                                  std::placeholders::_1));
 
         // Releases scoped lock.
         if (it == endIt) break;
@@ -454,7 +456,7 @@ MovieLoader::loadMovie(const std::string& urlstr,
     // Start or wake up the loader thread 
     if (!_thread.get()) {
         _killed=false;
-        _thread.reset(new boost::thread(boost::bind(
+        _thread.reset(new boost::thread(std::bind(
                         &MovieLoader::processRequests, this)));
 	    _barrier.wait(); // let execution start before proceeding
     }

@@ -20,7 +20,7 @@
 #include <boost/utility.hpp>
 #include "PathParser.h"
 #include <map>
-#include <boost/bind.hpp>
+#include <functional>
 #include "log.h"
 
 namespace gnash
@@ -127,8 +127,8 @@ PathParser::append(const UnivocalPath& append_path)
 
   if (append_path._fill_type == UnivocalPath::FILL_LEFT) {
 
-    std::for_each(edges.begin(), edges.end(), boost::bind(&PathParser::line_to,
-                                                          this, _1));
+    std::for_each(edges.begin(), edges.end(), std::bind(&PathParser::line_to,
+        this, std::placeholders::_1));
   } else {
 
     for (std::vector<Edge>::const_reverse_iterator prev = edges.rbegin(),

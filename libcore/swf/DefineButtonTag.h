@@ -258,8 +258,8 @@ public:
     template<class E>
     void visitKeyCodes(E& f) const {
         std::for_each(_buttonActions.begin(), _buttonActions.end(),
-            boost::bind(f, boost::bind(
-                    boost::mem_fn(&ButtonAction::getKeyCode), _1)));
+            std::bind(f, std::bind(
+                    boost::mem_fn(&ButtonAction::getKeyCode), std::placeholders::_1)));
     }
     
 private:

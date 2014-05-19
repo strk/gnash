@@ -115,7 +115,7 @@ AGG resources
 #include <math.h> // We use round()!
 #include <climits>
 #include <boost/scoped_array.hpp>
-#include <boost/bind.hpp>
+#include <functional>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -1227,7 +1227,8 @@ public:
 
         /// Transform all the paths using the matrix.
         std::for_each(paths_out.begin(), paths_out.end(), 
-                boost::bind(&Path::transform, _1, mat));
+                std::bind(&Path::transform, std::placeholders::_1,
+		    std::ref(mat)));
     } 
 
   // Version of buildPaths that uses rounded coordinates (pixel hinting)

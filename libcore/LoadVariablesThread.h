@@ -25,7 +25,7 @@
 #include <map>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/bind.hpp> 
+#include <functional> 
 
 #include "URL.h" // for inlines
 
@@ -89,7 +89,7 @@ public:
 		assert(!_thread.get());
 		assert(_stream.get());
 		_thread.reset(new boost::thread(
-                boost::bind(LoadVariablesThread::execLoadingThread, this)));
+                std::bind(LoadVariablesThread::execLoadingThread, this)));
 	}
 
 	/// Cancel a download in progress

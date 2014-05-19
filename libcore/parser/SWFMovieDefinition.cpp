@@ -24,7 +24,7 @@
 
 #include "SWFMovieDefinition.h"
 
-#include <boost/bind.hpp>
+#include <functional>
 #include <boost/version.hpp>
 #include <boost/thread.hpp>
 #include <iomanip>
@@ -134,8 +134,8 @@ SWFMovieLoader::start()
     // Those tests do seem a bit redundant, though...
     boost::mutex::scoped_lock lock(_mutex);
 
-    _thread.reset(new boost::thread(boost::bind(
-                    execute, boost::ref(*this), &_movie_def)));
+    _thread.reset(new boost::thread(std::bind(
+                    execute, std::ref(*this), &_movie_def)));
 
     _barrier.wait(); // let execution start befor returning
 
