@@ -276,7 +276,7 @@ private:
 	CallStack _callStack;
 
 	/// Library of SharedObjects. Owned by the VM.
-    std::auto_ptr<SharedObjectLibrary> _shLib;
+    std::unique_ptr<SharedObjectLibrary> _shLib;
 
     RNG _rng;
 

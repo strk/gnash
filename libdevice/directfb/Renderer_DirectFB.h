@@ -50,7 +50,7 @@ public:
     ~Renderer_DirectFB();
         
     void init(float x, float y);
-    CachedBitmap *createCachedBitmap(std::auto_ptr<image::GnashImage> im);
+    CachedBitmap *createCachedBitmap(std::unique_ptr<image::GnashImage> im);
 
     void world_to_pixel(int& x, int& y, float world_x, float world_y);
     gnash::geometry::Range2d<int> world_to_pixel(const gnash::SWFRect& wb);

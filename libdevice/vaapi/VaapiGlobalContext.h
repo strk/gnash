@@ -31,7 +31,7 @@ namespace gnash {
 
 /// VA API global context
 class DSOEXPORT VaapiGlobalContext {
-    std::auto_ptr<VaapiDisplay> _display;
+    std::unique_ptr<VaapiDisplay> _display;
     std::vector<VAProfile>      _profiles;
     std::vector<VAImageFormat>  _image_formats;
     std::vector<VAImageFormat>  _subpicture_formats;
@@ -39,7 +39,7 @@ class DSOEXPORT VaapiGlobalContext {
     bool init();
 
 public:
-    VaapiGlobalContext(std::auto_ptr<VaapiDisplay> display);
+    VaapiGlobalContext(std::unique_ptr<VaapiDisplay> display);
     ~VaapiGlobalContext();
 
     /// Get the unique global VA context

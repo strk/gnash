@@ -57,8 +57,8 @@ public:
     /// @param base         The base URL, used to resolve URLs.
     /// @param np           A policy to decide the name of cached files.
 	StreamProvider(const URL& original, const URL& base,
-            std::auto_ptr<NamingPolicy> np =
-            std::auto_ptr<NamingPolicy>(new NamingPolicy));
+            std::unique_ptr<NamingPolicy> np =
+            std::unique_ptr<NamingPolicy>(new NamingPolicy));
 
 	virtual ~StreamProvider() {}
 
@@ -66,7 +66,7 @@ public:
 	//
 	/// On error NULL is returned
 	/// Derive from this for a CachingStreamProvider
-	virtual std::auto_ptr<IOChannel> getStream(const URL& url,
+	virtual std::unique_ptr<IOChannel> getStream(const URL& url,
             bool namedCacheFile = false) const;
 
 	/// Get a stream from the response of a POST operation
@@ -78,10 +78,10 @@ public:
 	///
 	/// @param url      The url to post to.
 	/// @param postdata Post data in url-encoded form.
-	virtual std::auto_ptr<IOChannel> getStream(const URL& url,
+	virtual std::unique_ptr<IOChannel> getStream(const URL& url,
             const std::string& postdata, bool namedCacheFile = false) const;
 	
-	virtual std::auto_ptr<IOChannel> getStream(const URL& url,
+	virtual std::unique_ptr<IOChannel> getStream(const URL& url,
             const std::string& postdata,
             const NetworkAdapter::RequestHeaders& headers,
             bool namedCacheFile = false) const;
@@ -90,8 +90,8 @@ public:
     //
     /// This is only used when cache file naming is requested in getStream()
     /// This StreamProvider owns the NamingPolicy instance.
-    void setNamingPolicy(std::auto_ptr<NamingPolicy> np) {
-        _namingPolicy = np;
+    void setNamingPolicy(std::unique_ptr<NamingPolicy> np) {
+        _namingPolicy = std::move(np);
     }
 
     /// Return the currently selected policy for converting URL to filename
@@ -121,7 +121,7 @@ public:
 private:
 
     /// The current naming policy for cache files.
-    std::auto_ptr<NamingPolicy> _namingPolicy;
+    std::unique_ptr<NamingPolicy> _namingPolicy;
 
     const URL _base;
 

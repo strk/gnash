@@ -49,20 +49,20 @@ MediaHandlerFfmpeg::description() const
     return ss.str();
 }
 
-std::auto_ptr<MediaParser>
-MediaHandlerFfmpeg::createMediaParser(std::auto_ptr<IOChannel> stream)
+std::unique_ptr<MediaParser>
+MediaHandlerFfmpeg::createMediaParser(std::unique_ptr<IOChannel> stream)
 {
-	std::auto_ptr<MediaParser> parser;
+    std::unique_ptr<MediaParser> parser;
 
     try {
         if (isFLV(*stream))
         {
-            parser.reset(new FLVParser(stream));
+            parser.reset(new FLVParser(std::move(stream)));
         }
         else
         {
-			parser.reset(new MediaParserFfmpeg(stream));
-		}
+            parser.reset(new MediaParserFfmpeg(std::move(stream)));
+        }
     }
     catch (GnashException& ex)
     {
@@ -71,21 +71,21 @@ MediaHandlerFfmpeg::createMediaParser(std::auto_ptr<IOChannel> stream)
         assert(!parser.get());
     }
 
-	return parser;
+    return parser;
 }
 
-std::auto_ptr<VideoDecoder>
+std::unique_ptr<VideoDecoder>
 MediaHandlerFfmpeg::createVideoDecoder(const VideoInfo& info)
 {
-	std::auto_ptr<VideoDecoder> ret(new VideoDecoderFfmpeg(info));
+	std::unique_ptr<VideoDecoder> ret(new VideoDecoderFfmpeg(info));
 	return ret;
 }
 
-std::auto_ptr<VideoConverter>
+std::unique_ptr<VideoConverter>
 MediaHandlerFfmpeg::createVideoConverter(ImgBuf::Type4CC srcFormat,
                                          ImgBuf::Type4CC dstFormat)
 {
-    std::auto_ptr<VideoConverter> converter;
+    std::unique_ptr<VideoConverter> converter;
 
     try
     {
@@ -101,11 +101,11 @@ MediaHandlerFfmpeg::createVideoConverter(ImgBuf::Type4CC srcFormat,
 }
 
 
-std::auto_ptr<AudioDecoder>
+std::unique_ptr<AudioDecoder>
 MediaHandlerFfmpeg::createAudioDecoder(const AudioInfo& info)
 {
 
-	std::auto_ptr<AudioDecoder> ret;
+	std::unique_ptr<AudioDecoder> ret;
 
     try {
         ret.reset(new AudioDecoderFfmpeg(info));

@@ -120,7 +120,7 @@ private:
     void setup() const;    
     void upload(boost::uint8_t* data, size_t width, size_t height) const;
     
-    mutable std::auto_ptr<GnashImage> _img;
+    mutable std::unique_ptr<GnashImage> _img;
     GLenum _pixel_format;
     GLenum _ogl_img_type;
     mutable bool _ogl_accessible;  
@@ -139,7 +139,7 @@ public:
     ~Renderer_gles1();
         
     void init(float x, float y);
-    CachedBitmap *createCachedBitmap(std::auto_ptr<image::GnashImage> im);
+    CachedBitmap *createCachedBitmap(std::unique_ptr<image::GnashImage> im);
 
     void world_to_pixel(int& x, int& y, float world_x, float world_y) const;
     gnash::geometry::Range2d<int> world_to_pixel(const gnash::SWFRect& wb) const;

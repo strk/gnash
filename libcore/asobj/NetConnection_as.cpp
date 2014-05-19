@@ -97,9 +97,9 @@ public:
     /// Get an stream by name
     //
     /// @param name     Stream identifier
-    virtual std::auto_ptr<IOChannel> getStream(const std::string& /*name*/) {
+    virtual std::unique_ptr<IOChannel> getStream(const std::string& /*name*/) {
         log_unimpl("%s doesn't support fetching streams", typeName(*this));
-        return std::auto_ptr<IOChannel>(0);
+        return std::unique_ptr<IOChannel>();
     }
 
     /// Process pending traffic, out or in bound
@@ -626,7 +626,7 @@ NetConnection_as::createStream(as_object* asCallback) {
     startAdvanceTimer();
 }
 
-std::auto_ptr<IOChannel>
+std::unique_ptr<IOChannel>
 NetConnection_as::getStream(const std::string& name)
 {
     const RunResources& ri = getRunResources(owner());

@@ -749,7 +749,7 @@ private:
     /// We'll only allocate Textfield variables map if
     /// we need them (ie: anyone calls set_textfield_variable)
     ///
-    std::auto_ptr<TextFieldIndex> _text_variables;
+    std::unique_ptr<TextFieldIndex> _text_variables;
 
     std::string _droptarget;
 

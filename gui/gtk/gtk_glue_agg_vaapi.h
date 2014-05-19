@@ -71,7 +71,7 @@ private:
     unsigned int                        _vaapi_image_width;
     unsigned int                        _vaapi_image_height;
     boost::shared_ptr<VaapiSubpicture>  _vaapi_subpicture;
-    std::auto_ptr<VaapiSurface>         _vaapi_surface;
+    std::unique_ptr<VaapiSurface>         _vaapi_surface;
     unsigned int                        _window_width;
     unsigned int                        _window_height;
     bool                                _window_is_setup;

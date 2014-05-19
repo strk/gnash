@@ -60,7 +60,7 @@
 struct _GnashCanvas
 {
     GtkDrawingArea base_instance;
-    std::auto_ptr<gnash::GtkGlue> glue;
+    std::unique_ptr<gnash::GtkGlue> glue;
     boost::shared_ptr<gnash::Renderer> renderer;
 };
 

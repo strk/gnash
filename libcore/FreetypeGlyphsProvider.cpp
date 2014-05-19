@@ -24,7 +24,7 @@
 #include "FreetypeGlyphsProvider.h"
 
 #include <string>
-#include <memory> // for auto_ptr
+#include <memory> // for unique_ptr
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
@@ -371,11 +371,11 @@ FreetypeGlyphsProvider::getFontFilename(const std::string &name,
 
 #ifdef USE_FREETYPE 
 // static
-std::auto_ptr<FreetypeGlyphsProvider>
+std::unique_ptr<FreetypeGlyphsProvider>
 FreetypeGlyphsProvider::createFace(const std::string& name, bool bold, bool italic)
 {
 
-    std::auto_ptr<FreetypeGlyphsProvider> ret;
+    std::unique_ptr<FreetypeGlyphsProvider> ret;
 
     try { 
         ret.reset(new FreetypeGlyphsProvider(name, bold, italic));
@@ -389,11 +389,11 @@ FreetypeGlyphsProvider::createFace(const std::string& name, bool bold, bool ital
 
 }
 #else // ndef USE_FREETYPE 
-std::auto_ptr<FreetypeGlyphsProvider>
+std::unique_ptr<FreetypeGlyphsProvider>
 FreetypeGlyphsProvider::createFace(const std::string&, bool, bool)
 {
     log_error(_("Freetype not supported"));
-    return std::auto_ptr<FreetypeGlyphsProvider>(NULL);
+    return std::unique_ptr<FreetypeGlyphsProvider>(NULL);
 }
 #endif 
 	
@@ -480,10 +480,10 @@ FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string&, bool, bool)
 #endif // ndef USE_FREETYPE 
 
 #ifdef USE_FREETYPE
-std::auto_ptr<SWF::ShapeRecord>
+std::unique_ptr<SWF::ShapeRecord>
 FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 {
-    std::auto_ptr<SWF::ShapeRecord> glyph;
+    std::unique_ptr<SWF::ShapeRecord> glyph;
 
     FT_Error error = FT_Load_Char(_face, code, FT_LOAD_NO_BITMAP | 
                                                 FT_LOAD_NO_SCALE);
@@ -548,7 +548,7 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 }
 #else // ndef(USE_FREETYPE)
 
-std::auto_ptr<SWF::ShapeRecord>
+std::unique_ptr<SWF::ShapeRecord>
 FreetypeGlyphsProvider::getGlyph(boost::uint16_t, float& advance)
 {
     abort(); // should never be called... 

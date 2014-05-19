@@ -113,7 +113,7 @@ public:
     /// Set the time in milliseconds after which the programme should exit.
     virtual void setTimeout(unsigned int timeout) = 0;
 
-    void setScreenShotter(std::auto_ptr<ScreenShotter> ss);
+    void setScreenShotter(std::unique_ptr<ScreenShotter> ss);
 
     /// \brief
     /// Create and display our window.
@@ -383,7 +383,7 @@ public:
 
 #ifdef USE_SWFTREE
     /// Return a tree containing information about the movie playing.
-    std::auto_ptr<movie_root::InfoTree> getMovieInfo() const;
+    std::unique_ptr<movie_root::InfoTree> getMovieInfo() const;
 #endif
 
     typedef std::map<std::string, std::string> VariableMap;
@@ -614,18 +614,18 @@ private:
 
 /// Named constructors
 namespace gui {
-  std::auto_ptr<Gui> createFBGui(unsigned long xid, float scale, bool loop, RunResources& r);
+  std::unique_ptr<Gui> createFBGui(unsigned long xid, float scale, bool loop, RunResources& r);
 }
-std::auto_ptr<Gui> createGTKGui(unsigned long xid, float scale, bool loop, RunResources& r);
-std::auto_ptr<Gui> createKDEGui(unsigned long xid, float scale, bool loop, RunResources& r);
-std::auto_ptr<Gui> createQt4Gui(unsigned long xid, float scale, bool loop, RunResources& r);
-std::auto_ptr<Gui> createSDLGui(unsigned long xid, float scale, bool loop, RunResources& r);
-std::auto_ptr<Gui> createFLTKGui(unsigned long xid, float scale, bool loop, RunResources& r);
-std::auto_ptr<Gui> createAQUAGui(unsigned long xid, float scale, bool loop, RunResources& r);
-std::auto_ptr<Gui> createRISCOSGui(unsigned long xid, float scale, bool loop, RunResources& r);
-std::auto_ptr<Gui> createAOS4Gui(unsigned long xid, float scale, bool loop, RunResources& r);
-std::auto_ptr<Gui> createHaikuGui(unsigned long xid, float scale, bool loop, RunResources& r);
-std::auto_ptr<Gui> createDumpGui(unsigned long xid, float scale, bool loop, RunResources& r);
+std::unique_ptr<Gui> createGTKGui(unsigned long xid, float scale, bool loop, RunResources& r);
+std::unique_ptr<Gui> createKDEGui(unsigned long xid, float scale, bool loop, RunResources& r);
+std::unique_ptr<Gui> createQt4Gui(unsigned long xid, float scale, bool loop, RunResources& r);
+std::unique_ptr<Gui> createSDLGui(unsigned long xid, float scale, bool loop, RunResources& r);
+std::unique_ptr<Gui> createFLTKGui(unsigned long xid, float scale, bool loop, RunResources& r);
+std::unique_ptr<Gui> createAQUAGui(unsigned long xid, float scale, bool loop, RunResources& r);
+std::unique_ptr<Gui> createRISCOSGui(unsigned long xid, float scale, bool loop, RunResources& r);
+std::unique_ptr<Gui> createAOS4Gui(unsigned long xid, float scale, bool loop, RunResources& r);
+std::unique_ptr<Gui> createHaikuGui(unsigned long xid, float scale, bool loop, RunResources& r);
+std::unique_ptr<Gui> createDumpGui(unsigned long xid, float scale, bool loop, RunResources& r);
 
  
 } // end of gnash namespace

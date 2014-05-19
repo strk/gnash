@@ -47,7 +47,7 @@ MovieLoader::MovieLoader(movie_root& mr)
     :
     _killed(false),
     _movieRoot(mr),
-    _thread(0),
+    _thread(),
     _barrier(2) // main and loader thread
 {
 }
@@ -320,12 +320,12 @@ MovieLoader::processCompletedRequest(const Request& r)
         // frame, we'll queue the
         // onLoadInit call next, so it happens after the former.
         //
-        std::auto_ptr<ExecutableCode> code(
+        std::unique_ptr<ExecutableCode> code(
                 new DelayedFunctionCall(targetDO, handler,
                     NSV::PROP_BROADCAST_MESSAGE, 
                     "onLoadInit", getObject(targetDO)));
 
-        getRoot(*handler).pushAction(code, movie_root::PRIORITY_DOACTION);
+        getRoot(*handler).pushAction(std::move(code), movie_root::PRIORITY_DOACTION);
     }
 
     return true;

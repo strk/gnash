@@ -55,12 +55,12 @@ namespace SWF {
 namespace {
     void inflateWrapper(SWFStream& in, void* buffer, size_t buffer_bytes);
 
-    std::auto_ptr<image::GnashImage> readDefineBitsJpeg(SWFStream& in,
+    std::unique_ptr<image::GnashImage> readDefineBitsJpeg(SWFStream& in,
             movie_definition& m);
-    std::auto_ptr<image::GnashImage> readDefineBitsJpeg2(SWFStream& in);
+    std::unique_ptr<image::GnashImage> readDefineBitsJpeg2(SWFStream& in);
     /// DefineBitsJpeg3, also DefineBitsJpeg4!
-    std::auto_ptr<image::GnashImage> readDefineBitsJpeg3(SWFStream& in, TagType tag);
-    std::auto_ptr<image::GnashImage> readLossless(SWFStream& in, TagType tag);
+    std::unique_ptr<image::GnashImage> readDefineBitsJpeg3(SWFStream& in, TagType tag);
+    std::unique_ptr<image::GnashImage> readLossless(SWFStream& in, TagType tag);
 
 }
 
@@ -133,9 +133,9 @@ class StreamAdapter : public IOChannel
 public:
 
     /// Get an IOChannel from a gnash::SWFStream
-    static std::auto_ptr<IOChannel> getFile(SWFStream& str,
+    static std::unique_ptr<IOChannel> getFile(SWFStream& str,
             unsigned long endPos) {
-        std::auto_ptr<IOChannel> ret(new StreamAdapter(str, endPos));
+        std::unique_ptr<IOChannel> ret(new StreamAdapter(str, endPos));
         return ret;
     }
 };
@@ -166,7 +166,7 @@ jpeg_tables_loader(SWFStream& in, TagType tag, movie_definition& m,
                 currPos);
     }
 
-    std::auto_ptr<image::JpegInput> input;
+    std::unique_ptr<image::JpegInput> input;
 
     try {
         // NOTE: we cannot limit input SWFStream here as the same jpeg::input
@@ -191,7 +191,7 @@ jpeg_tables_loader(SWFStream& in, TagType tag, movie_definition& m,
     }
 
     log_debug("Setting jpeg loader to %p", (void*)input.get());
-    m.set_jpeg_loader(input);
+    m.set_jpeg_loader(std::move(input));
 }
 
 void
@@ -209,7 +209,7 @@ DefineBitsTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         return;
     }
 
-    std::auto_ptr<image::GnashImage> im;
+    std::unique_ptr<image::GnashImage> im;
 
     switch (tag) {
         case SWF::DEFINEBITS:
@@ -244,7 +244,7 @@ DefineBitsTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         );
         return;
     }    
-    boost::intrusive_ptr<CachedBitmap> bi = renderer->createCachedBitmap(im);
+    boost::intrusive_ptr<CachedBitmap> bi = renderer->createCachedBitmap(std::move(im));
 
     IF_VERBOSE_PARSE(
         log_parse(_("Adding bitmap id %1%"), id);
@@ -257,10 +257,10 @@ namespace {
 
 // A JPEG image without included tables; those should be in an
 // existing image::JpegInput object stored in the movie.
-std::auto_ptr<image::GnashImage>
+std::unique_ptr<image::GnashImage>
 readDefineBitsJpeg(SWFStream& /*in*/, movie_definition& m)
 {
-    std::auto_ptr<image::GnashImage> im;
+    std::unique_ptr<image::GnashImage> im;
 
     // Read the image data.
     image::JpegInput* j_in = m.get_jpeg_loader();
@@ -321,21 +321,21 @@ checkFileType(SWFStream& in)
 }
 
 
-std::auto_ptr<image::GnashImage>
+std::unique_ptr<image::GnashImage>
 readDefineBitsJpeg2(SWFStream& in)
 {
     const FileType ft = checkFileType(in);
 
     // Read the image data.
-    boost::shared_ptr<IOChannel> ad(StreamAdapter::getFile(in,
+    std::unique_ptr<IOChannel> ad(StreamAdapter::getFile(in,
                 in.get_tag_end_position()).release());
 
-    return image::Input::readImageData(ad, ft);
+    return image::Input::readImageData(std::move(ad), ft);
 }
 
 
 /// Parse a DefineBitsJpeg3 or 4 tag.
-std::auto_ptr<image::GnashImage>
+std::unique_ptr<image::GnashImage>
 readDefineBitsJpeg3(SWFStream& in, TagType tag)
 {
     in.ensureBytes(4);
@@ -356,9 +356,9 @@ readDefineBitsJpeg3(SWFStream& in, TagType tag)
     if (ft != GNASH_FILETYPE_JPEG) {
         log_debug("TESTING: non-JPEG data in DefineBitsJpeg3");
         // Read the image data.
-        boost::shared_ptr<IOChannel> ad(StreamAdapter::getFile(in,
+        std::unique_ptr<IOChannel> ad(StreamAdapter::getFile(in,
                     in.get_tag_end_position()).release());
-        return image::Input::readImageData(ad, ft);
+        return image::Input::readImageData(std::move(ad), ft);
     }
 
     // We assume it's a JPEG with alpha data.
@@ -366,16 +366,16 @@ readDefineBitsJpeg3(SWFStream& in, TagType tag)
 
 #ifndef HAVE_ZLIB_H
     log_error(_("gnash is not linked to zlib -- can't load jpeg3 image data"));
-    return std::auto_ptr<image::GnashImage>();
+    return std::unique_ptr<image::GnashImage>();
 #else
 
     // Read rgb data.
-    boost::shared_ptr<IOChannel> ad(StreamAdapter::getFile(in,
+    std::unique_ptr<IOChannel> ad(StreamAdapter::getFile(in,
                 alpha_position).release());
-    std::auto_ptr<image::ImageRGBA> im = image::Input::readSWFJpeg3(ad);
+    std::unique_ptr<image::ImageRGBA> im = image::Input::readSWFJpeg3(std::move(ad));
     
     /// Failure to read the jpeg.
-    if (!im.get()) return std::auto_ptr<image::GnashImage>();
+    if (!im.get()) return std::unique_ptr<image::GnashImage>();
 
     // Read alpha channel.
     in.seek(alpha_position);
@@ -394,11 +394,11 @@ readDefineBitsJpeg3(SWFStream& in, TagType tag)
     image::mergeAlpha(*im, buffer.get(), bufferLength);
 
 #endif
-    return static_cast<std::auto_ptr<image::GnashImage> >(im);
+    return std::move(im);
 }
 
 
-std::auto_ptr<image::GnashImage>
+std::unique_ptr<image::GnashImage>
 readLossless(SWFStream& in, TagType tag)
 {
     assert(tag == SWF::DEFINELOSSLESS || tag == SWF::DEFINELOSSLESS2);
@@ -414,7 +414,7 @@ readLossless(SWFStream& in, TagType tag)
                 "w = %d, h = %d"), tag, +bitmap_format, width, height);
     );
 
-    std::auto_ptr<image::GnashImage> image;  
+    std::unique_ptr<image::GnashImage> image;  
     if (!width || !height) {
          IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("Bitmap has a height or width of 0"));
@@ -475,7 +475,7 @@ readLossless(SWFStream& in, TagType tag)
 
         default:
             log_error(_("Unknown bitmap format. Ignoring"));
-            return std::auto_ptr<image::GnashImage>();
+            return std::unique_ptr<image::GnashImage>();
     }
 
     const size_t pitch = (width * bytes_per_pixel + 3) &~ 3;

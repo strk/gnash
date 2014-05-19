@@ -27,7 +27,7 @@
 
 #include <vector>
 #include <string>
-#include <memory> // for auto_ptr
+#include <memory> // for unique_ptr
 
 
 namespace gnash

@@ -174,9 +174,9 @@ MediaParserFfmpeg::parseVideoFrame(AVPacket& packet)
 	size_t allocSize = packet.size*2;
 	boost::uint8_t* data = new boost::uint8_t[allocSize];
 	std::copy(packet.data, packet.data+packet.size, data);
-	std::auto_ptr<EncodedVideoFrame> frame(new EncodedVideoFrame(data, packet.size, 0, timestamp));
+	std::unique_ptr<EncodedVideoFrame> frame(new EncodedVideoFrame(data, packet.size, 0, timestamp));
 
-	pushEncodedVideoFrame(frame);
+	pushEncodedVideoFrame(std::move(frame));
 
 	return true;
 #endif
@@ -215,7 +215,7 @@ MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
 	boost::uint64_t timestamp = static_cast<boost::uint64_t>(dts * as_double(_audioStream->time_base) * 1000.0); 
     //log_debug("On getting audio frame with timestamp %d, duration is %d", timestamp, _audioStream->duration);
 
-	std::auto_ptr<EncodedAudioFrame> frame ( new EncodedAudioFrame );
+	std::unique_ptr<EncodedAudioFrame> frame ( new EncodedAudioFrame );
 
 	// TODO: FIXME: *2 is an hack to avoid libavcodec reading past end of allocated space
 	//       we might do proper padding or (better) avoid the copy as a whole by making
@@ -228,7 +228,7 @@ MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
 	frame->dataSize = packet.size;
 	frame->timestamp = timestamp;
 
-	pushEncodedAudioFrame(frame); 
+	pushEncodedAudioFrame(std::move(frame)); 
 
 	return true;
 }
@@ -320,9 +320,9 @@ MediaParserFfmpeg::getBytesLoaded() const
 	return _lastParsedPosition;
 }
 
-MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<IOChannel> stream)
+MediaParserFfmpeg::MediaParserFfmpeg(std::unique_ptr<IOChannel> stream)
 	:
-	MediaParser(stream),
+	MediaParser(std::move(stream)),
 	_nextVideoFrame(0),
 	_nextAudioFrame(0),
 	_inputFmt(0),

@@ -995,7 +995,7 @@ global_setInterval(const fn_call& fn)
 		args += fn.arg(i);
 	}
 
-	std::auto_ptr<Timer> timer;
+	std::unique_ptr<Timer> timer;
 	if (as_func) {
 		timer.reset(new Timer(*as_func, ms, fn.this_ptr, args));
 	}
@@ -1006,7 +1006,7 @@ global_setInterval(const fn_call& fn)
 	movie_root& root = getRoot(fn);
 
     // TODO: check what should happen to overflows.
-	const int id = root.addIntervalTimer(timer);
+	const int id = root.addIntervalTimer(std::move(timer));
 	return as_value(id);
 }
 
@@ -1065,7 +1065,7 @@ global_setTimeout(const fn_call& fn)
 		args += fn.arg(i);
 	}
 
-	std::auto_ptr<Timer> timer;
+	std::unique_ptr<Timer> timer;
 	if (as_func) {
 		timer.reset(new Timer(*as_func, ms, fn.this_ptr, args, true));
 	}
@@ -1076,7 +1076,7 @@ global_setTimeout(const fn_call& fn)
 	movie_root& root = getRoot(fn);
 
     // TODO: check what should happen to overflows.
-	const int id = root.addIntervalTimer(timer);
+	const int id = root.addIntervalTimer(std::move(timer));
 	return as_value(id);
 }
   

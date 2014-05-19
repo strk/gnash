@@ -38,8 +38,8 @@ namespace media {
 namespace gst {
 
 
-MediaParserGst::MediaParserGst(std::auto_ptr<IOChannel> stream)
-    : MediaParser(stream),
+MediaParserGst::MediaParserGst(std::unique_ptr<IOChannel> stream)
+    : MediaParser(std::move(stream)),
       _bin(NULL),
       _srcpad(NULL),
       _audiosink(NULL),
@@ -197,13 +197,13 @@ MediaParserGst::emitEncodedFrames()
 
     while (!_enc_audio_frames.empty()) {
         EncodedAudioFrame* frame = _enc_audio_frames.front();
-        pushEncodedAudioFrame(std::auto_ptr<EncodedAudioFrame>(frame));
+        pushEncodedAudioFrame(std::unique_ptr<EncodedAudioFrame>(frame));
        _enc_audio_frames.pop_front();
     }
     
     while (!_enc_video_frames.empty()) {
         EncodedVideoFrame* frame = _enc_video_frames.front();
-        pushEncodedVideoFrame(std::auto_ptr<EncodedVideoFrame>(frame));
+        pushEncodedVideoFrame(std::unique_ptr<EncodedVideoFrame>(frame));
        _enc_video_frames.pop_front();
     }
 

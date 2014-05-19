@@ -35,11 +35,11 @@ namespace sound {
 
 
 size_t
-StreamingSoundData::append(std::auto_ptr<SimpleBuffer> data,
+StreamingSoundData::append(std::unique_ptr<SimpleBuffer> data,
         size_t sampleCount, int seekSamples)
 {
     assert(data.get());
-    _buffers.push_back(data);
+    _buffers.push_back(data.release());
     _blockData.push_back(BlockData(sampleCount, seekSamples));
     assert(_blockData.size() == _buffers.size());
     return _buffers.size() - 1;
@@ -74,10 +74,10 @@ StreamingSoundData::eraseActiveSound(Instances::iterator i)
     return _soundInstances.erase(i);
 }
 
-std::auto_ptr<StreamingSound>
+std::unique_ptr<StreamingSound>
 StreamingSoundData::createInstance(media::MediaHandler& mh, unsigned long block)
 {
-    std::auto_ptr<StreamingSound> ret(new StreamingSound(*this, mh, block));
+    std::unique_ptr<StreamingSound> ret(new StreamingSound(*this, mh, block));
 
     boost::mutex::scoped_lock lock(_soundInstancesMutex);
 

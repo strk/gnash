@@ -32,12 +32,12 @@
 namespace gnash {
 
 #ifdef GUI_HAIKU
-std::auto_ptr<Gui> createHaikuGui(unsigned long windowid, float scale, bool do_loop, RunResources& r)
+std::unique_ptr<Gui> createHaikuGui(unsigned long windowid, float scale, bool do_loop, RunResources& r)
 {
-    return std::auto_ptr<Gui>(new HaikuGui(windowid, scale, do_loop, r));
+    return std::unique_ptr<Gui>(new HaikuGui(windowid, scale, do_loop, r));
 }
 #else // ! GUI_HAIKU
-std::auto_ptr<Gui> createHaikuGui(unsigned long , float, bool, RunResourcesfloat , bool , unsigned int )
+std::unique_ptr<Gui> createHaikuGui(unsigned long , float, bool, RunResourcesfloat , bool , unsigned int )
 {
     throw GnashException("Support for Haiku gui was not compiled in");
 }

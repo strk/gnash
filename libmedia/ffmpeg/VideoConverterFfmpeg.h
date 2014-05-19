@@ -35,12 +35,12 @@ public:
     
     ~VideoConverterFfmpeg();
 
-    std::auto_ptr<ImgBuf> convert(const ImgBuf& src);
+    std::unique_ptr<ImgBuf> convert(const ImgBuf& src);
   
 private:
 
 #if HAVE_SWSCALE_H
-    std::auto_ptr<SwsContextWrapper> _swsContext;
+    std::unique_ptr<SwsContextWrapper> _swsContext;
 #endif
 };
 

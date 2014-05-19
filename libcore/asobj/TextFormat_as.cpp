@@ -398,7 +398,7 @@ textformat_new(const fn_call& fn)
 
     as_object* obj = ensure<ValidThis>(fn);
 
-    std::auto_ptr<TextFormat_as> tf(new TextFormat_as);
+    std::unique_ptr<TextFormat_as> tf(new TextFormat_as);
 
 	const size_t args = fn.nargs;
 	

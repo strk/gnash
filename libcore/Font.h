@@ -94,7 +94,7 @@ public:
     // This table maps from Unicode DisplayObject number to glyph index.
     typedef std::map<boost::uint16_t, int> CodeTable;
 
-    Font(std::auto_ptr<SWF::DefineFontTag> ft);
+    Font(std::unique_ptr<SWF::DefineFontTag> ft);
 
     /// Create a device-font only font, using the given name to find it
     //
@@ -233,7 +233,7 @@ public:
         /// Construct default textured glyph
         //
         /// Takes ownership of the SWF::ShapeRecord.
-        GlyphInfo(std::auto_ptr<SWF::ShapeRecord> glyph, float advance);
+        GlyphInfo(std::unique_ptr<SWF::ShapeRecord> glyph, float advance);
 
         GlyphInfo(const GlyphInfo& o);
 
@@ -264,7 +264,7 @@ public:
     /// Add a CodeTable to the font.
     //
     /// This is used by SWF::DefineFontInfoTag
-    void setCodeTable(std::auto_ptr<CodeTable> table);
+    void setCodeTable(std::unique_ptr<CodeTable> table);
 
     /// Retrieve the number of embedded glyphs in this font.
     GlyphInfoRecords::size_type glyphCount() const;
@@ -322,7 +322,7 @@ private:
     typedef std::map<kerning_pair, float> kernings_table;
     kernings_table m_kerning_pairs;
 
-    mutable std::auto_ptr<FreetypeGlyphsProvider> _ftProvider;
+    mutable std::unique_ptr<FreetypeGlyphsProvider> _ftProvider;
 
 };
 

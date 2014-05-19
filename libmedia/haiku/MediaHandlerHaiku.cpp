@@ -40,10 +40,10 @@ namespace media {
 namespace haiku {
 
 
-std::auto_ptr<MediaParser>
-MediaHandlerHaiku::createMediaParser(std::auto_ptr<IOChannel> stream)
+std::unique_ptr<MediaParser>
+MediaHandlerHaiku::createMediaParser(std::unique_ptr<IOChannel> stream)
 {
-	std::auto_ptr<MediaParser> parser;
+	std::unique_ptr<MediaParser> parser;
 
     try {
         if (isFLV(*stream))
@@ -65,18 +65,18 @@ MediaHandlerHaiku::createMediaParser(std::auto_ptr<IOChannel> stream)
 	return parser;
 }
 
-std::auto_ptr<VideoDecoder>
+std::unique_ptr<VideoDecoder>
 MediaHandlerHaiku::createVideoDecoder(const VideoInfo& info)
 {
-	std::auto_ptr<VideoDecoder> ret(new VideoDecoderHaiku(info));
+	std::unique_ptr<VideoDecoder> ret(new VideoDecoderHaiku(info));
 	return ret;
 }
 
-std::auto_ptr<VideoConverter>
+std::unique_ptr<VideoConverter>
 MediaHandlerHaiku::createVideoConverter(ImgBuf::Type4CC srcFormat,
                                          ImgBuf::Type4CC dstFormat)
 {
-    std::auto_ptr<VideoConverter> converter;
+    std::unique_ptr<VideoConverter> converter;
 
     try
     {
@@ -92,10 +92,10 @@ MediaHandlerHaiku::createVideoConverter(ImgBuf::Type4CC srcFormat,
 }
 
 
-std::auto_ptr<AudioDecoder>
+std::unique_ptr<AudioDecoder>
 MediaHandlerHaiku::createAudioDecoder(const AudioInfo& info)
 {
-	std::auto_ptr<AudioDecoder> ret;
+	std::unique_ptr<AudioDecoder> ret;
 
     try
     {

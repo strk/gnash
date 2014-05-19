@@ -141,20 +141,20 @@ SDL_sound_handler::createStreamingSound(const media::SoundInfo& sinfo)
 }
 
 int
-SDL_sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,
+SDL_sound_handler::create_sound(std::unique_ptr<SimpleBuffer> data,
                                 const media::SoundInfo& sinfo)
 {
     boost::mutex::scoped_lock lock(_mutex);
-    return sound_handler::create_sound(data, sinfo);
+    return sound_handler::create_sound(std::move(data), sinfo);
 }
 
 sound_handler::StreamBlockId
-SDL_sound_handler::addSoundBlock(std::auto_ptr<SimpleBuffer> buf,
+SDL_sound_handler::addSoundBlock(std::unique_ptr<SimpleBuffer> buf,
         size_t sampleCount, int seekSamples, int handle)
 {
 
     boost::mutex::scoped_lock lock(_mutex);
-    return sound_handler::addSoundBlock(buf, sampleCount, seekSamples, handle);
+    return sound_handler::addSoundBlock(std::move(buf), sampleCount, seekSamples, handle);
 }
 
 
@@ -295,11 +295,11 @@ SDL_sound_handler::mix(boost::int16_t* outSamples, boost::int16_t* inSamples,
 }
 
 void
-SDL_sound_handler::plugInputStream(std::auto_ptr<InputStream> newStreamer)
+SDL_sound_handler::plugInputStream(std::unique_ptr<InputStream> newStreamer)
 {
     boost::mutex::scoped_lock lock(_mutex);
 
-    sound_handler::plugInputStream(newStreamer);
+    sound_handler::plugInputStream(std::move(newStreamer));
 
     { // TODO: this whole block should only be executed when adding
       // the first stream. 

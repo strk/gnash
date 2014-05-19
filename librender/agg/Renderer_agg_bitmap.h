@@ -32,7 +32,7 @@ class agg_bitmap_info : public CachedBitmap
 {
 public:
   
-    agg_bitmap_info(std::auto_ptr<image::GnashImage> im)
+    agg_bitmap_info(std::unique_ptr<image::GnashImage> im)
         :
         _image(im.release()),
         _bpp(_image->type() == image::TYPE_RGB ? 24 : 32)

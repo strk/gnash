@@ -60,7 +60,7 @@ class DSOEXPORT VaapiContext {
     std::queue<VaapiSurfaceSP>          _surfaces;
     unsigned int                        _picture_width;
     unsigned int                        _picture_height;
-    std::auto_ptr<VaapiContextData>     _user_data;
+    std::unique_ptr<VaapiContextData>     _user_data;
 
     bool construct();
     void destruct();
@@ -84,7 +84,7 @@ public:
     void releaseSurface(boost::shared_ptr<VaapiSurface> surface);
 
     /// Set user data
-    void setData(std::auto_ptr<VaapiContextData> user_data) { _user_data = user_data; }
+    void setData(std::unique_ptr<VaapiContextData> user_data) { _user_data = user_data; }
 
     /// Get user data
     VaapiContextData *getData() const { return _user_data.get(); }

@@ -37,7 +37,7 @@
 using namespace gnash;
 using namespace std;
 
-std::auto_ptr<MovieTester> tester;
+std::unique_ptr<MovieTester> tester;
 MovieClip* root;
 
 MovieClip*

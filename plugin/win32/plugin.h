@@ -101,7 +101,7 @@ private:
     HBITMAP     _bmp;
     unsigned char* _memaddr;
 
-    std::auto_ptr<gnash::media::sound_handler> _sound_handler;
+    std::unique_ptr<gnash::media::sound_handler> _sound_handler;
     gnash::Renderer* _Renderer;
 
     // Mouse state.

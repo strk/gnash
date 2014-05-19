@@ -93,6 +93,7 @@
 #include "VM.h"
 #include "HostInterface.h"
 #include "log.h"
+#include "IOChannel.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -153,7 +154,7 @@ public:
     
     class LoadCallback {
     public:
-        LoadCallback(boost::shared_ptr<IOChannel> s, as_object* o)
+        LoadCallback(std::shared_ptr<IOChannel> s, as_object* o)
             :
             _stream(s),
             _obj(o)
@@ -161,7 +162,7 @@ public:
         bool processLoad();
         void setReachable() const;
     private:
-        boost::shared_ptr<IOChannel> _stream;
+        std::shared_ptr<IOChannel> _stream;
         SimpleBuffer _buf;
         as_object* _obj;
     };
@@ -319,7 +320,7 @@ public:
     /// @return An integer indentifying the timer
     ///         for subsequent call to clear_interval_timer.
     ///         It will NEVER be zero.
-    boost::uint32_t addIntervalTimer(std::auto_ptr<Timer> timer);
+    boost::uint32_t addIntervalTimer(std::unique_ptr<Timer> timer);
 
     /// Register an object for loading data to.
     //
@@ -337,7 +338,7 @@ public:
     //
     /// It may be possible for this function to handle all connections if
     /// it also takes a callback function to call on each advance.
-    void addLoadableObject(as_object* obj, std::auto_ptr<IOChannel> str);
+    void addLoadableObject(as_object* obj, std::unique_ptr<IOChannel> str);
 
     void addAdvanceCallback(ActiveRelay* obj);
 
@@ -550,7 +551,7 @@ public:
         ActionQueue;
 
     /// Push an executable code to the ActionQueue
-    void pushAction(std::auto_ptr<ExecutableCode> code, size_t lvl);
+    void pushAction(std::unique_ptr<ExecutableCode> code, size_t lvl);
 
     /// Push an executable code to the ActionQueue
     void pushAction(const action_buffer& buf, DisplayObject* target);

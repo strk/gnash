@@ -441,13 +441,13 @@ JpegInput::errorOccurred(const char* msg)
 // Create and read a new image, using a input object that
 // already has tables loaded.  The IJG documentation describes
 // this as "abbreviated" format.
-std::auto_ptr<GnashImage>
+std::unique_ptr<GnashImage>
 JpegInput::readSWFJpeg2WithTables(JpegInput& loader)
 {
 
     loader.read();
 
-    std::auto_ptr<GnashImage> im(
+    std::unique_ptr<GnashImage> im(
             new ImageRGB(loader.getWidth(), loader.getHeight()));
 
     for (size_t y = 0, height = loader.getHeight(); y < height; y++) {
@@ -619,11 +619,11 @@ JpegOutput::writeImageRGBA(const unsigned char* rgbaData)
     writeImageRGB(data.get());
 }
 
-std::auto_ptr<Output>
+std::unique_ptr<Output>
 JpegOutput::create(boost::shared_ptr<IOChannel> o, size_t width, size_t height,
         int quality)
 {
-    std::auto_ptr<Output> outChannel(new JpegOutput(o, width, height, quality));
+    std::unique_ptr<Output> outChannel(new JpegOutput(o, width, height, quality));
     return outChannel;
 }
 

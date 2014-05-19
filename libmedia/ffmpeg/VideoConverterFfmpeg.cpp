@@ -130,10 +130,10 @@ VideoConverterFfmpeg::~VideoConverterFfmpeg()
 }
 
 
-std::auto_ptr<ImgBuf>
+std::unique_ptr<ImgBuf>
 VideoConverterFfmpeg::convert(const ImgBuf& src)
 {
-    std::auto_ptr<ImgBuf> ret;    
+    std::unique_ptr<ImgBuf> ret;    
     
     const int width = src.width;
     const int height = src.height;

@@ -23,7 +23,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include <memory> // for auto_ptr
+#include <memory> // for unique_ptr
 #include "as_object.h"
 
 #include <cstdio>
@@ -68,7 +68,7 @@ extern "C" {
     /// Return an  instance
 }
 
-std::auto_ptr<as_object> init_gtkext_instance();
+std::unique_ptr<as_object> init_gtkext_instance();
 
 } // end of gnash namespace
 

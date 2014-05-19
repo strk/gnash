@@ -103,13 +103,13 @@ NetStream_as::NetStream_as(as_object* owner)
     _netCon(0),
     _bufferTime(100), 
     _imageframe(),
-    _parser(NULL),
+    _parser(),
     _inputPos(0),
     _invalidatedVideoCharacter(0),
     _decoding_state(DEC_NONE),
-    _videoDecoder(0),
+    _videoDecoder(),
     _videoInfoKnown(false),
-    _audioDecoder(0),
+    _audioDecoder(),
     _audioInfoKnown(false),
 
     // Playback clock starts in 'stop' mode
@@ -201,12 +201,12 @@ NetStream_as::bufferLength()
 #endif  // USE_MEDIA
 }
 
-std::auto_ptr<image::GnashImage>
+std::unique_ptr<image::GnashImage>
 NetStream_as::get_video()
 {
     boost::mutex::scoped_lock lock(image_mutex);
 
-    return _imageframe;    
+    return std::move(_imageframe);
 }
 
 void
@@ -504,7 +504,7 @@ NetStream_as::startPlayback()
             "parse NetStream input")) );
         return false;
     }
-    _parser = _mediaHandler->createMediaParser(_inputStream);
+    _parser = std::move(_mediaHandler->createMediaParser(std::move(_inputStream)));
     assert(!_inputStream.get());
 
     if (!_parser.get()) {
@@ -548,12 +548,12 @@ NetStream_as::startPlayback()
 }
 
 
-std::auto_ptr<image::GnashImage> 
+std::unique_ptr<image::GnashImage> 
 NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
 {
     assert(_videoDecoder.get());
     
-    std::auto_ptr<image::GnashImage> video;
+    std::unique_ptr<image::GnashImage> video;
 
 #ifdef USE_MEDIA
     assert(_parser.get());
@@ -631,10 +631,10 @@ NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
     return video;
 }
 
-std::auto_ptr<image::GnashImage> 
+std::unique_ptr<image::GnashImage> 
 NetStream_as::decodeNextVideoFrame()
 {
-    std::auto_ptr<image::GnashImage> video;
+    std::unique_ptr<image::GnashImage> video;
 
 #ifdef USE_MEDIA
     if (!_parser.get()) {
@@ -642,7 +642,7 @@ NetStream_as::decodeNextVideoFrame()
         return video; 
     }
 
-    std::auto_ptr<media::EncodedVideoFrame> frame = _parser->nextVideoFrame(); 
+    std::unique_ptr<media::EncodedVideoFrame> frame = _parser->nextVideoFrame(); 
     if (!frame.get()) {
 #ifdef GNASH_DEBUG_DECODING
         log_debug(_("%p.decodeNextVideoFrame(): "
@@ -674,7 +674,7 @@ NetStream_as::decodeNextAudioFrame()
     assert (_parser.get());
 
 #ifdef USE_MEDIA
-    std::auto_ptr<media::EncodedAudioFrame> frame = _parser->nextAudioFrame(); 
+    std::unique_ptr<media::EncodedAudioFrame> frame = _parser->nextAudioFrame(); 
     if (!frame.get()) {
 #ifdef GNASH_DEBUG_DECODING
         log_debug(_("%p.decodeNextAudioFrame: "
@@ -1141,7 +1141,7 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
 #endif 
 
     // Get next decoded video frame from parser, will have the lowest timestamp
-    std::auto_ptr<image::GnashImage> video = getDecodedVideoFrame(curPos);
+    std::unique_ptr<image::GnashImage> video = getDecodedVideoFrame(curPos);
 
     // to be decoded or we're out of data
     if (!video.get())
@@ -1171,7 +1171,7 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
     }
     else
     {
-        _imageframe = video; // ownership transferred
+        _imageframe = std::move(video); // ownership transferred
         assert(!video.get());
         // A frame is ready for pickup
         if ( _invalidatedVideoCharacter )

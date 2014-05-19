@@ -123,14 +123,14 @@ private:
 	boost::int32_t _lastDecodedVideoFrameNum;
 
 	/// Last decoded frame 
-	std::auto_ptr<image::GnashImage> _lastDecodedVideoFrame;
+	std::unique_ptr<image::GnashImage> _lastDecodedVideoFrame;
 
     /// The decoder used to decode the video frames for embedded streams
     //
     /// For dynamically loaded videos NetStream takes care of decoding
     /// see the _ns property
     ///
-    std::auto_ptr<media::VideoDecoder> _decoder;
+    std::unique_ptr<media::VideoDecoder> _decoder;
 
     /// Whether to request smoothing when the video is scaled
     bool _smoothing;

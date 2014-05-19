@@ -43,7 +43,7 @@ public:
 	//
 	/// Can throw a GnashException if input format couldn't be detected
 	///
-	MediaParserHaiku(std::auto_ptr<IOChannel> stream);
+	MediaParserHaiku(std::shared_ptr<IOChannel> stream);
 
 	~MediaParserHaiku();
 

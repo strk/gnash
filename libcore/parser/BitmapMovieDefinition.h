@@ -58,7 +58,7 @@ public:
 	///  - image->size() bytes (for get_bytes_loaded()/get_bytes_total())
 	///  - provided url
 	///
-	BitmapMovieDefinition(std::auto_ptr<image::GnashImage> image,
+	BitmapMovieDefinition(std::unique_ptr<image::GnashImage> image,
             Renderer* renderer, const std::string& url);
 
     virtual DisplayObject* createDisplayObject(Global_as&, DisplayObject*)

@@ -26,7 +26,7 @@
 
 #include "Qt4Glue.h"
 
-#include <memory>        // for auto_ptr
+#include <memory>        // for unique_ptr
 #include <QImage>
 #include <boost/scoped_array.hpp>
 #include <QPainter>
@@ -58,8 +58,8 @@ class Qt4CairoGlue : public Qt4Glue
     int _height;
     boost::scoped_array<unsigned char> _offscreenbuf;
     Renderer* _renderer; // We don't own this pointer.
-    std::auto_ptr<QImage> _image;
-    std::auto_ptr<QPainter> _painter;
+    std::unique_ptr<QImage> _image;
+    std::unique_ptr<QPainter> _painter;
 
     cairo_t         *_cairo_handle;
     cairo_surface_t *_cairo_surface;

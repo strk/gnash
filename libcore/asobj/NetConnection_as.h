@@ -104,7 +104,7 @@ public:
     void notifyStatus(StatusCode code);
 
     /// Get an stream by name
-    std::auto_ptr<IOChannel> getStream(const std::string& name);
+    std::unique_ptr<IOChannel> getStream(const std::string& name);
 
     /// Mark responders associated with remoting calls
     void markReachableResources() const;
@@ -129,7 +129,7 @@ private:
     Connections _oldConnections;
 
     /// The current conceptual network connection.
-    std::auto_ptr<Connection> _currentConnection; 
+    std::unique_ptr<Connection> _currentConnection; 
 
     /// the url prefix optionally passed to connect()
     std::string _uri;

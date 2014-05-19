@@ -155,7 +155,7 @@ trymain(int /*argc*/, char** /*argv*/)
 
 
     FILE* f = std::fopen(cachename, "r");
-    std::auto_ptr<gnash::IOChannel> orig = gnash::makeFileChannel(f, false);
+    std::unique_ptr<gnash::IOChannel> orig = gnash::makeFileChannel(f, false);
 	lseek(raw, 0, SEEK_SET);
 	compare_reads(orig.get(), raw, "cache", "raw");
 	close(raw);

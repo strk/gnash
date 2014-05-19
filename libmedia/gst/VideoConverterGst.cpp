@@ -122,10 +122,10 @@ VideoConverterGst::~VideoConverterGst()
     }
 }
 
-std::auto_ptr<ImgBuf>
+std::unique_ptr<ImgBuf>
 VideoConverterGst::convert(const ImgBuf& src)
 {
-    std::auto_ptr<ImgBuf> ret;
+    std::unique_ptr<ImgBuf> ret;
     
     if (!init(src)) {
         return ret;  

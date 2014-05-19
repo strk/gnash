@@ -25,7 +25,7 @@ namespace gnash {
 // Stubs, in case client doesn't want to link to zlib.
 namespace zlib_adapter
 {
-    std::auto_ptr<IOChannel> make_inflater(std::auto_ptr<IOChannel> /*in*/) {
+    std::unique_ptr<IOChannel> make_inflater(std::unique_ptr<IOChannel> /*in*/) {
         std::abort(); 
     }
 }
@@ -43,7 +43,7 @@ class InflaterIOChannel : public IOChannel
 public:
 
     /// Constructor.
-    InflaterIOChannel(std::auto_ptr<IOChannel> in);
+    InflaterIOChannel(std::unique_ptr<IOChannel> in);
 
     ~InflaterIOChannel() {
         rewind_unused_bytes();
@@ -81,7 +81,7 @@ private:
 
     static const int ZBUF_SIZE = 4096;
 
-    std::auto_ptr<IOChannel> m_in;
+    std::unique_ptr<IOChannel> m_in;
 
     // position of the input stream where we started inflating.
     std::streampos m_initial_stream_pos;
@@ -291,9 +291,9 @@ InflaterIOChannel::seek(std::streampos pos)
     return true; 
 }
 
-InflaterIOChannel::InflaterIOChannel(std::auto_ptr<IOChannel> in)
+InflaterIOChannel::InflaterIOChannel(std::unique_ptr<IOChannel> in)
     :
-    m_in(in),
+    m_in(std::move(in)),
     m_initial_stream_pos(m_in->tell()),
     m_zstream(),
     m_logical_stream_pos(m_initial_stream_pos),
@@ -310,10 +310,10 @@ InflaterIOChannel::InflaterIOChannel(std::auto_ptr<IOChannel> in)
     }
 }
 
-std::auto_ptr<IOChannel> make_inflater(std::auto_ptr<IOChannel> in)
+std::unique_ptr<IOChannel> make_inflater(std::unique_ptr<IOChannel> in)
 {
     assert(in.get());
-    return std::auto_ptr<IOChannel>(new InflaterIOChannel(in));
+    return std::unique_ptr<IOChannel>(new InflaterIOChannel(std::move(in)));
 }
 
 }

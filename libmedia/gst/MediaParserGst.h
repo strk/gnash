@@ -109,7 +109,7 @@ public:
     //
     /// Can throw a MediaException if input format couldn't be detected
     ///
-    MediaParserGst(std::auto_ptr<IOChannel> stream);
+    MediaParserGst(std::unique_ptr<IOChannel> stream);
 
     ~MediaParserGst();
 

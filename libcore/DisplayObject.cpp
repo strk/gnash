@@ -433,10 +433,10 @@ DisplayObject::add_event_handler(const event_id& id, const action_buffer& code)
     _event_handlers[id].push_back(&code);
 }
 
-std::auto_ptr<ExecutableCode>
+std::unique_ptr<ExecutableCode>
 DisplayObject::get_event_handler(const event_id& id) const
 {
-    std::auto_ptr<ExecutableCode> handler;
+    std::unique_ptr<ExecutableCode> handler;
 
     Events::const_iterator it = _event_handlers.find(id);
     if ( it == _event_handlers.end() ) return handler;

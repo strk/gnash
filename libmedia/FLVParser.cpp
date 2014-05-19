@@ -41,9 +41,9 @@ const size_t FLVParser::paddingBytes;
 const boost::uint16_t FLVParser::FLVAudioTag::flv_audio_rates [] = 
     { 5500, 11000, 22050, 44100 };
 
-FLVParser::FLVParser(std::auto_ptr<IOChannel> lt)
+FLVParser::FLVParser(std::unique_ptr<IOChannel> lt)
 	:
-	MediaParser(lt),
+	MediaParser(std::move(lt)),
 	_lastParsedPosition(0),
 	_nextPosToIndex(0),
 	_nextAudioFrame(0),
@@ -161,10 +161,10 @@ FLVParser::indexVideoTag(const FLVTag& tag, const FLVVideoTag& videotag, boost::
 }
 
 
-std::auto_ptr<EncodedAudioFrame>
+std::unique_ptr<EncodedAudioFrame>
 FLVParser::parseAudioTag(const FLVTag& flvtag, const FLVAudioTag& audiotag, boost::uint32_t thisTagPos)
 {
-	std::auto_ptr<EncodedAudioFrame> frame;
+	std::unique_ptr<EncodedAudioFrame> frame;
 
 	if ( ! _audio ) {
 		log_error(_("Unexpected audio tag found at offset %d FLV stream "
@@ -218,7 +218,7 @@ FLVParser::parseAudioTag(const FLVTag& flvtag, const FLVAudioTag& audiotag, boos
 	return frame;
 }
 
-std::auto_ptr<EncodedVideoFrame>
+std::unique_ptr<EncodedVideoFrame>
 FLVParser::parseVideoTag(const FLVTag& flvtag, const FLVVideoTag& videotag, boost::uint32_t thisTagPos)
 {
 	if ( ! _video ) {
@@ -258,7 +258,7 @@ FLVParser::parseVideoTag(const FLVTag& flvtag, const FLVVideoTag& videotag, boos
 			break;
 	}
 
-	std::auto_ptr<EncodedVideoFrame> frame = readVideoFrame(bodyLength-1,
+	std::unique_ptr<EncodedVideoFrame> frame = readVideoFrame(bodyLength-1,
             flvtag.timestamp);
 	if ( ! frame.get() ) {
             log_error(_("could not read video frame?"));
@@ -377,7 +377,7 @@ FLVParser::parseNextTag(bool index_only)
 		}
 
 
-		std::auto_ptr<EncodedAudioFrame> frame = 
+		std::unique_ptr<EncodedAudioFrame> frame = 
             parseAudioTag(flvtag, audiotag, thisTagPos);
 		if (!frame.get()) {
 			return false;
@@ -388,7 +388,7 @@ FLVParser::parseNextTag(bool index_only)
 		// the _qMutex...
 		// We've done using the stream for this tag parsing anyway
 		streamLock.unlock();
-		pushEncodedAudioFrame(frame);
+		pushEncodedAudioFrame(std::move(frame));
 	}
 	else if (flvtag.type == FLV_VIDEO_TAG)
 	{
@@ -401,7 +401,7 @@ FLVParser::parseNextTag(bool index_only)
 			}
 		}
 
-		std::auto_ptr<EncodedVideoFrame> frame = 
+		std::unique_ptr<EncodedVideoFrame> frame = 
             parseVideoTag(flvtag, videotag, thisTagPos);
 		if (!frame.get()) {
 			return false;
@@ -412,7 +412,7 @@ FLVParser::parseNextTag(bool index_only)
 		// might block us waiting for buffers flush
 		// the _qMutex...
 		streamLock.unlock();
-		pushEncodedVideoFrame(frame);
+		pushEncodedVideoFrame(std::move(frame));
 
 	}
 	else if (flvtag.type == FLV_META_TAG)
@@ -425,7 +425,7 @@ FLVParser::parseNextTag(bool index_only)
                     static_cast<int>(chunk[11]));
 		}
 		// Extract information from the meta tag
-		std::auto_ptr<SimpleBuffer> metaTag(new SimpleBuffer(
+		std::unique_ptr<SimpleBuffer> metaTag(new SimpleBuffer(
                     flvtag.body_size-1));
 		size_t actuallyRead = _stream->read(metaTag->data(),
                 flvtag.body_size - 1);
@@ -447,7 +447,7 @@ FLVParser::parseNextTag(bool index_only)
 		}
 
 		boost::mutex::scoped_lock lock(_metaTagsMutex);
-		_metaTags.insert(std::make_pair(flvtag.timestamp, MetaTags::mapped_type(metaTag)));
+		_metaTags.insert(std::make_pair(flvtag.timestamp, std::move(metaTag)));
 	}
 	else
 	{
@@ -516,11 +516,11 @@ FLVParser::getBytesLoaded() const
 
 // would be called by parser thread
 /*private*/
-std::auto_ptr<EncodedAudioFrame>
+std::unique_ptr<EncodedAudioFrame>
 FLVParser::readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 {
 
-	std::auto_ptr<EncodedAudioFrame> frame(new EncodedAudioFrame);
+	std::unique_ptr<EncodedAudioFrame> frame(new EncodedAudioFrame);
     
     const size_t bufSize = dataSize + paddingBytes;
 
@@ -543,10 +543,10 @@ FLVParser::readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 
 // would be called by parser thread
 /*private*/
-std::auto_ptr<EncodedVideoFrame>
+std::unique_ptr<EncodedVideoFrame>
 FLVParser::readVideoFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 {
-	std::auto_ptr<EncodedVideoFrame> frame;
+	std::unique_ptr<EncodedVideoFrame> frame;
 
     const size_t bufSize = dataSize + paddingBytes;
 

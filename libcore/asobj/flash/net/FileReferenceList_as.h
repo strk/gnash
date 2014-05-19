@@ -32,7 +32,7 @@ struct ObjectURI;
 void filereferencelist_class_init(as_object& where, const ObjectURI& uri);
 
 /// Return a FileReferenceList instance (in case the core lib needs it)
-//std::auto_ptr<as_object> init_FileReferenceList_instance();
+//std::unique_ptr<as_object> init_FileReferenceList_instance();
 
 } // end of gnash namespace
 

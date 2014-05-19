@@ -101,8 +101,8 @@ public:
     /// Convert a (video) image from one colorspace to another.
     //
     /// @param src the image to convert
-    /// @return the converted image or a NULL auto_ptr if an error occurred.
-    virtual std::auto_ptr<ImgBuf> convert(const ImgBuf& src) = 0;
+    /// @return the converted image or a NULL unique_ptr if an error occurred.
+    virtual std::unique_ptr<ImgBuf> convert(const ImgBuf& src) = 0;
   
 protected:
     ImgBuf::Type4CC  _src_fmt;

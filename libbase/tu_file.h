@@ -25,7 +25,7 @@ namespace gnash {
 /// @param fp A C stream
 ///
 /// @param close Whether the C stream should be automatically closed.
-DSOEXPORT std::auto_ptr<IOChannel> makeFileChannel(FILE* fp, bool close);
+DSOEXPORT std::unique_ptr<IOChannel> makeFileChannel(FILE* fp, bool close);
 
 /// \brief
 /// Creates an IOChannel by opening the given file in the given mode.
@@ -36,7 +36,7 @@ DSOEXPORT std::auto_ptr<IOChannel> makeFileChannel(FILE* fp, bool close);
 /// std::fopen)
 ///
 /// @return An IOChannel or NULL if the file could not be opened.
-DSOEXPORT std::auto_ptr<IOChannel> makeFileChannel(const char* filepath, const char* mode);
+DSOEXPORT std::unique_ptr<IOChannel> makeFileChannel(const char* filepath, const char* mode);
 
 } // namespace gnash
 #endif 

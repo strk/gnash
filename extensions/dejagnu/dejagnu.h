@@ -34,7 +34,7 @@ extern "C" {
     /// Return an  instance
 }
 
-std::auto_ptr<as_object> init_dejagnu_instance();
+std::unique_ptr<as_object> init_dejagnu_instance();
 
 } // end of gnash namespace
 

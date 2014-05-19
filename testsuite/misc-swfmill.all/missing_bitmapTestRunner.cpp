@@ -40,7 +40,7 @@ int
 trymain(int /*argc*/, char** /*argv*/)
 {
 	string filename = string(TGTDIR) + string("/") + string(INPUT_FILENAME);
-	auto_ptr<MovieTester> t;
+	unique_ptr<MovieTester> t;
 
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity(1);

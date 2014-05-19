@@ -54,10 +54,10 @@ MediaHandler::isFLV(IOChannel& stream)
     return true;
 }
 
-std::auto_ptr<MediaParser>
-MediaHandler::createMediaParser(std::auto_ptr<IOChannel> stream)
+std::unique_ptr<MediaParser>
+MediaHandler::createMediaParser(std::unique_ptr<IOChannel> stream)
 {
-    std::auto_ptr<MediaParser> parser;
+    std::unique_ptr<MediaParser> parser;
 
     try {
         if (!isFLV(*stream))
@@ -72,13 +72,13 @@ MediaHandler::createMediaParser(std::auto_ptr<IOChannel> stream)
         return parser;
     }
 
-    parser.reset( new FLVParser(stream) );
+    parser.reset( new FLVParser(std::move(stream)) );
     assert(!stream.get()); // TODO: when ownership will be transferred...
 
     return parser;
 }
 
-std::auto_ptr<AudioDecoder>
+std::unique_ptr<AudioDecoder>
 MediaHandler::createFlashAudioDecoder(const AudioInfo& info)
 {
     assert (info.type == CODEC_TYPE_FLASH );
@@ -90,14 +90,14 @@ MediaHandler::createFlashAudioDecoder(const AudioInfo& info)
         case media::AUDIO_CODEC_RAW:
         case media::AUDIO_CODEC_UNCOMPRESSED:
         {
-            std::auto_ptr<AudioDecoder> ret(new AudioDecoderSimple(info));
+            std::unique_ptr<AudioDecoder> ret(new AudioDecoderSimple(info));
             return ret;
         }
 
 #ifdef DECODING_SPEEX
         case AUDIO_CODEC_SPEEX:
         {
-            std::auto_ptr<AudioDecoder> ret(new AudioDecoderSpeex);
+            std::unique_ptr<AudioDecoder> ret(new AudioDecoderSpeex);
             return ret;
         }
 #endif

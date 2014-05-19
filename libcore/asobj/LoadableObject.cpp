@@ -342,7 +342,7 @@ loadableobject_sendAndLoad(const fn_call& fn)
 
     URL url(urlstr, ri.streamProvider().baseURL());
 
-    std::auto_ptr<IOChannel> str;
+    std::unique_ptr<IOChannel> str;
 
     if (post) {
         as_value customHeaders;
@@ -401,7 +401,7 @@ loadableobject_sendAndLoad(const fn_call& fn)
     /// All objects get a loaded member, set to false.
     target->set_member(NSV::PROP_LOADED, false);
 
-    mr.addLoadableObject(target, str);
+    mr.addLoadableObject(target, std::move(str));
     return as_value(true);
 }
 
@@ -437,10 +437,10 @@ loadableobject_load(const fn_call& fn)
     URL url(urlstr, ri.streamProvider().baseURL());
 
     // Checks whether access is allowed.
-    std::auto_ptr<IOChannel> str(ri.streamProvider().getStream(url));
+    std::unique_ptr<IOChannel> str(ri.streamProvider().getStream(url));
 
     movie_root& mr = getRoot(fn);
-    mr.addLoadableObject(obj, str);
+    mr.addLoadableObject(obj, std::move(str));
 
     obj->set_member(NSV::PROP_uBYTES_LOADED, 0.0);
     obj->set_member(NSV::PROP_uBYTES_TOTAL, as_value());

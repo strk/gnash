@@ -768,7 +768,7 @@ GtkGui::createWindow(const char *title, int width, int height,
 
 // This creates a GtkTree model for displaying movie info.
 GtkTreeModel*
-GtkGui::makeTreeModel(std::auto_ptr<movie_root::InfoTree> treepointer)
+GtkGui::makeTreeModel(const std::unique_ptr<movie_root::InfoTree>& treepointer)
 {
 
     const movie_root::InfoTree& info = *treepointer;
@@ -1728,7 +1728,7 @@ GtkGui::showPropertiesDialog()
 
 #ifdef USE_SWFTREE
 
-    std::auto_ptr<movie_root::InfoTree> infoptr = getMovieInfo();
+    std::unique_ptr<movie_root::InfoTree> infoptr = getMovieInfo();
 
     GtkWidget *scrollwindow1 = gtk_scrolled_window_new(0, 0);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollwindow1),

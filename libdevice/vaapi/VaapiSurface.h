@@ -66,7 +66,7 @@ public:
 /// VA surface abstraction
 class DSOEXPORT VaapiSurface
 {
-    std::auto_ptr<VaapiSurfaceImplBase> _impl;
+    std::unique_ptr<VaapiSurfaceImplBase> _impl;
     std::vector< boost::shared_ptr<VaapiSubpicture> > _subpictures;
 
     friend class VaapiContext;

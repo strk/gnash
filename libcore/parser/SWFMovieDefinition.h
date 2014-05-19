@@ -90,7 +90,7 @@ private:
     SWFMovieDefinition& _movie_def;
 
     mutable boost::mutex _mutex;
-    std::auto_ptr<boost::thread> _thread;
+    std::unique_ptr<boost::thread> _thread;
 
     // Barrier to ensure that _thread
     // is initialized before the loader thread
@@ -294,7 +294,7 @@ public:
 
     /// Set an input object for later loading DefineBits
     /// images (JPEG images without the table info).
-    DSOTEXPORT void set_jpeg_loader(std::auto_ptr<image::JpegInput> j_in);
+    DSOTEXPORT void set_jpeg_loader(std::unique_ptr<image::JpegInput> j_in);
 
     // See dox in movie_definition.h
     image::JpegInput* get_jpeg_loader() const {
@@ -322,7 +322,7 @@ public:
     /// @param in the IOChannel from which to read SWF
     /// @param url the url associated with the input
     /// @return false if SWF header could not be parsed
-    bool readHeader(std::auto_ptr<IOChannel> in, const std::string& url);
+    bool readHeader(std::unique_ptr<IOChannel> in, const std::string& url);
 
     /// Complete load of the SWF file
     //
@@ -485,14 +485,14 @@ private:
 
     boost::uint32_t m_file_length;
 
-    std::auto_ptr<image::JpegInput> m_jpeg_in;
+    std::unique_ptr<image::JpegInput> m_jpeg_in;
 
     std::string _url;
 
     /// Non transferable stream.
     boost::scoped_ptr<SWFStream> _str;
 
-    std::auto_ptr<IOChannel> _in;
+    std::unique_ptr<IOChannel> _in;
 
     /// swf end position (as read from header)
     size_t _swf_end_pos;

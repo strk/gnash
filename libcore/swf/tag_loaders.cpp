@@ -204,7 +204,7 @@ define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
         media::MediaHandler* mh = r.mediaHandler();
         if (mh) allocSize += mh->getInputPaddingSize();
 
-        std::auto_ptr<SimpleBuffer> data(new SimpleBuffer(allocSize));
+        std::unique_ptr<SimpleBuffer> data(new SimpleBuffer(allocSize));
 
         // dataLength is already calculated from the end of the tag, which
         // should be inside the end of the file. TODO: check that this is 
@@ -224,7 +224,7 @@ define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
 
         // Stores the sounddata in the soundhandler, and the ID returned
         // can be used to starting, stopping and deleting that sound
-        const int handler_id = handler->create_sound(data, sinfo);
+        const int handler_id = handler->create_sound(std::move(data), sinfo);
 
         if (handler_id >= 0) {
             sound_sample* sam = new sound_sample(handler_id, r);

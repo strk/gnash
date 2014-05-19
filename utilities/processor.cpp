@@ -452,9 +452,9 @@ play_movie(const std::string& filename, const RunResources& runResources)
     {
       if (filename == "-")
       {
-         std::auto_ptr<IOChannel> in (
+         std::unique_ptr<IOChannel> in (
                  noseek_fd_adapter::make_stream(fileno(stdin)) );
-         md = MovieFactory::makeMovie(in, filename, runResources, false);
+         md = MovieFactory::makeMovie(std::move(in), filename, runResources, false);
       }
       else
       {

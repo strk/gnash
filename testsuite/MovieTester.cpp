@@ -52,7 +52,7 @@
 
 #include <cstdio>
 #include <string>
-#include <memory> // for auto_ptr
+#include <memory> // for unique_ptr
 #include <cmath> // for ceil
 #include <iostream>
 #include <boost/shared_ptr.hpp>
@@ -117,10 +117,10 @@ MovieTester::MovieTester(const std::string& url)
     _runResources->setStreamProvider(sp);
 
     if ( url == "-" ) {
-	std::auto_ptr<IOChannel> in (
+	std::unique_ptr<IOChannel> in (
 		noseek_fd_adapter::make_stream(fileno(stdin))
 				     );
-		_movie_def = MovieFactory::makeMovie(in, url, *_runResources, false);
+		_movie_def = MovieFactory::makeMovie(std::move(in), url, *_runResources, false);
 	} else {
 	URL urlObj(url);
 	if ( urlObj.protocol() == "file" ) {

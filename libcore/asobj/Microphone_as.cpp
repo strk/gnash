@@ -144,7 +144,7 @@ class Microphone_as : public Relay
 
 public:
 
-    Microphone_as(std::auto_ptr<media::AudioInput> input)
+    Microphone_as(std::unique_ptr<media::AudioInput> input)
         :
         _input(input.release())
     {
@@ -253,7 +253,7 @@ microphone_get(const fn_call& fn)
                     "object"));
         return as_value();
     }
-    std::auto_ptr<media::AudioInput> input(handler->getAudioInput(0));
+    std::unique_ptr<media::AudioInput> input(handler->getAudioInput(0));
 
     if (!input.get()) {
         // TODO: what should happen if the index is not available?
@@ -268,7 +268,7 @@ microphone_get(const fn_call& fn)
     attachMicrophoneInterface(*mic_obj);
     attachMicrophoneProperties(*mic_obj);
 
-    mic_obj->setRelay(new Microphone_as(input));
+    mic_obj->setRelay(new Microphone_as(std::move(input)));
 
     return as_value(mic_obj);
 }

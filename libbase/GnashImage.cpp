@@ -183,7 +183,7 @@ Output::writeImageData(FileType type,
     
     quality = clamp<int>(quality, 0, 100);    
 
-    std::auto_ptr<Output> outChannel;
+    std::unique_ptr<Output> outChannel;
 
     switch (type) {
 #ifdef USE_PNG
@@ -213,11 +213,11 @@ Output::writeImageData(FileType type,
 }
 
 // See GnashEnums.h for file types.
-std::auto_ptr<GnashImage>
+std::unique_ptr<GnashImage>
 Input::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
 {
-    std::auto_ptr<GnashImage> im;
-    std::auto_ptr<Input> inChannel;
+    std::unique_ptr<GnashImage> im;
+    std::unique_ptr<Input> inChannel;
 
     switch (type) {
 #ifdef USE_PNG
@@ -281,14 +281,14 @@ Input::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
 
 // For reading SWF JPEG3-style image data, like ordinary JPEG, 
 // but stores the data in ImageRGBA format.
-std::auto_ptr<ImageRGBA>
+std::unique_ptr<ImageRGBA>
 Input::readSWFJpeg3(boost::shared_ptr<IOChannel> in)
 {
 
-    std::auto_ptr<ImageRGBA> im;
+    std::unique_ptr<ImageRGBA> im;
 
     // Calling with headerBytes as 0 has a special effect...
-    std::auto_ptr<JpegInput> j_in(
+    std::unique_ptr<JpegInput> j_in(
             JpegInput::createSWFJpeg2HeaderOnly(in, 0));
 
     // If this isn't true, we should have thrown.

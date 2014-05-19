@@ -68,7 +68,7 @@ public:
     ///                      padded (see MediaHandler::getInputPaddingBytes())
     /// @param sampleCount   The number of samples when decoded.
     /// @param seekSamples   Where to start playing from at a particular frame.
-    size_t append(std::auto_ptr<SimpleBuffer> data, size_t sampleCount,
+    size_t append(std::unique_ptr<SimpleBuffer> data, size_t sampleCount,
             int seekSamples);
 
     /// Do we have any data?
@@ -125,7 +125,7 @@ public:
     ///                         This refers to a specific StreamSoundBlock.
     ///                         @see gnash::swf::StreamSoundBlockTag
     /// Locks the _soundInstancesMutex when pushing to it
-    std::auto_ptr<StreamingSound> createInstance(media::MediaHandler& mh,
+    std::unique_ptr<StreamingSound> createInstance(media::MediaHandler& mh,
             unsigned long blockOffset);
 
     /// Drop all active sounds

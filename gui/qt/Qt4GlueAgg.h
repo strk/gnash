@@ -56,8 +56,8 @@ class Qt4AggGlue : public Qt4Glue
     int _height;
     boost::scoped_array<unsigned char> _offscreenbuf;
     Renderer* _renderer; // We don't own this pointer.
-    std::auto_ptr<QImage> _image;
-    std::auto_ptr<QPainter> _painter;
+    std::unique_ptr<QImage> _image;
+    std::unique_ptr<QPainter> _painter;
 };
 
 

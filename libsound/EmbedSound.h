@@ -21,7 +21,7 @@
 #define SOUND_EMBEDSOUND_H
 
 #include <vector>
-#include <memory> // for auto_ptr (composition)
+#include <memory> // for unique_ptr (composition)
 #include <cassert>
 #include <boost/thread/mutex.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -59,7 +59,7 @@ public:
     /// @param data The encoded sound data.
     /// @param info encoding info
     /// @param volume initial volume (0..100). Optional, defaults to 100.
-    EmbedSound(std::auto_ptr<SimpleBuffer> data, const media::SoundInfo& info,
+    EmbedSound(std::unique_ptr<SimpleBuffer> data, const media::SoundInfo& info,
             int volume);
 
     ~EmbedSound();
@@ -136,7 +136,7 @@ public:
     ///     @todo document if every loop starts at secsOffset !
     /// Locks the _soundInstancesMutex when pushing to it
     ///
-    std::auto_ptr<EmbedSoundInst> createInstance(media::MediaHandler& mh,
+    std::unique_ptr<EmbedSoundInst> createInstance(media::MediaHandler& mh,
             unsigned int inPoint, unsigned int outPoint,
             const SoundEnvelopes* envelopes, int loopCount);
 

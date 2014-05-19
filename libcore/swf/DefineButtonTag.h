@@ -214,7 +214,7 @@ public:
 
     /// Add a DefineButtonSoundTag to the button. This should not be
     /// done twice, so check hasSound() first.
-    void addSoundTag(std::auto_ptr<SWF::DefineButtonSoundTag> soundTag) {
+    void addSoundTag(std::unique_ptr<SWF::DefineButtonSoundTag> soundTag) {
         // Do not replace a sound tag.
         assert(!_soundTag.get());
         _soundTag.reset(soundTag.release());

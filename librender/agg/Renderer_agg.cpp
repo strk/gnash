@@ -687,9 +687,9 @@ public:
     // Given an image, returns a pointer to a bitmap_info class
     // that can later be passed to FillStyleX_bitmap(), to set a
     // bitmap fill style.
-    gnash::CachedBitmap* createCachedBitmap(std::auto_ptr<image::GnashImage> im)
+    gnash::CachedBitmap* createCachedBitmap(std::unique_ptr<image::GnashImage> im)
     {        
-        return new agg_bitmap_info(im);
+        return new agg_bitmap_info(std::move(im));
     }
 
     virtual void renderToImage(boost::shared_ptr<IOChannel> io,
@@ -874,7 +874,7 @@ public:
  
     virtual Renderer* startInternalRender(image::GnashImage& im) {
     
-        std::auto_ptr<Renderer_agg_base> in;
+        std::unique_ptr<Renderer_agg_base> in;
     
         switch (im.type()) {
             case image::TYPE_RGB:
@@ -2022,7 +2022,7 @@ private:  // private variables
 
     agg::rendering_buffer m_rbuf;  
 
-    std::auto_ptr<PixelFormat> m_pixf;
+    std::unique_ptr<PixelFormat> m_pixf;
 
     /// clipping rectangle
     ClipBounds _clipbounds;

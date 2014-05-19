@@ -32,7 +32,7 @@
 namespace gnash {
 namespace sound {
 
-EmbedSound::EmbedSound(std::auto_ptr<SimpleBuffer> data,
+EmbedSound::EmbedSound(std::unique_ptr<SimpleBuffer> data,
         const media::SoundInfo& info, int nVolume)
     :
     soundinfo(info),
@@ -56,12 +56,12 @@ EmbedSound::eraseActiveSound(Instances::iterator i)
     return _soundInstances.erase(i);
 }
 
-std::auto_ptr<EmbedSoundInst>
+std::unique_ptr<EmbedSoundInst>
 EmbedSound::createInstance(media::MediaHandler& mh, unsigned int inPoint,
         unsigned int outPoint, const SoundEnvelopes* envelopes,
         int loopCount)
 {
-    std::auto_ptr<EmbedSoundInst> ret(
+    std::unique_ptr<EmbedSoundInst> ret(
         new EmbedSoundInst(*this, mh, inPoint, outPoint, envelopes, loopCount));
 
     boost::mutex::scoped_lock lock(_soundInstancesMutex);

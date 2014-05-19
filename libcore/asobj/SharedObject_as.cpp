@@ -1001,7 +1001,7 @@ createSharedObject(Global_as& gl)
     fn_call::Args args;
     as_object* o = constructInstance(*ctor, env, args);
 
-    std::auto_ptr<SharedObject_as> sh(new SharedObject_as(*o));
+    std::unique_ptr<SharedObject_as> sh(new SharedObject_as(*o));
     o->setRelay(sh.release());
 
     // We know what it is...

@@ -127,7 +127,7 @@ public:
       WRAP_CLAMP
     };
 
-    bitmap_info_ogl(std::auto_ptr<image::GnashImage> image, GLenum pixelformat,
+    bitmap_info_ogl(std::unique_ptr<image::GnashImage> image, GLenum pixelformat,
                     bool ogl_accessible);
 
     ~bitmap_info_ogl();
@@ -540,7 +540,7 @@ bool isEven(const size_t& n)
   return n % 2 == 0;
 }
 
-bitmap_info_ogl::bitmap_info_ogl(std::auto_ptr<image::GnashImage> image,
+bitmap_info_ogl::bitmap_info_ogl(std::unique_ptr<image::GnashImage> image,
         GLenum pixelformat, bool ogl_accessible)
 :
   _img(image.release()),
@@ -760,12 +760,12 @@ public:
 #endif
   }    
 
-  virtual CachedBitmap* createCachedBitmap(std::auto_ptr<image::GnashImage> im)
+  virtual CachedBitmap* createCachedBitmap(std::unique_ptr<image::GnashImage> im)
   {
       switch (im->type()) {
           case image::TYPE_RGB:
           {
-              std::auto_ptr<image::GnashImage> rgba(
+              std::unique_ptr<image::GnashImage> rgba(
                       new image::ImageRGBA(im->width(), im->height()));
 
               image::GnashImage::iterator it = rgba->begin();
@@ -1842,7 +1842,7 @@ private:
   std::list< boost::shared_ptr<GnashTexture> > _cached_textures;
   
 #ifdef OSMESA_TESTING
-  std::auto_ptr<OSRenderMesa> _offscreen;
+  std::unique_ptr<OSRenderMesa> _offscreen;
 #endif
 }; // class Renderer_ogl
   
@@ -1908,7 +1908,7 @@ sampleGradient(const GradientFill& fill, boost::uint8_t ratio)
 const CachedBitmap*
 createGradientBitmap(const GradientFill& gf, Renderer& renderer)
 {
-    std::auto_ptr<image::ImageRGBA> im;
+    std::unique_ptr<image::ImageRGBA> im;
 
     switch (gf.type())
     {
@@ -1951,7 +1951,7 @@ createGradientBitmap(const GradientFill& gf, Renderer& renderer)
     }
 
     const CachedBitmap* bi = renderer.createCachedBitmap(
-                    static_cast<std::auto_ptr<image::GnashImage> >(im));
+                    static_cast<std::unique_ptr<image::GnashImage> >(im));
 
     return bi;
 }

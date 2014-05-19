@@ -298,10 +298,10 @@ public:
 
     /// Returns the video frame closest to current cursor. See time().
     //
-    /// @return a image containing the video frame, a NULL auto_ptr if
+    /// @return a image containing the video frame, a NULL unique_ptr if
     /// none were ready
     ///
-    std::auto_ptr<image::GnashImage> get_video();
+    std::unique_ptr<image::GnashImage> get_video();
     
     /// Register the DisplayObject to invalidate on video updates
     void setInvalidatedVideo(DisplayObject* ch)
@@ -431,7 +431,7 @@ private:
     //
     /// @return 0 on EOF or error, a decoded video otherwise
     ///
-    std::auto_ptr<image::GnashImage> decodeNextVideoFrame();
+    std::unique_ptr<image::GnashImage> decodeNextVideoFrame();
 
     /// Decode next audio frame fetching it MediaParser cursor
     //
@@ -454,7 +454,7 @@ private:
     /// 3. next element in cursor has timestamp > tx
     /// 4. there was an error decoding
     ///
-    std::auto_ptr<image::GnashImage> getDecodedVideoFrame(boost::uint32_t ts);
+    std::unique_ptr<image::GnashImage> getDecodedVideoFrame(boost::uint32_t ts);
 
     DecodingState decodingStatus(DecodingState newstate = DEC_NONE);
 
@@ -512,13 +512,13 @@ private:
     boost::mutex image_mutex;
 
     // The image/videoframe which is given to the renderer
-    std::auto_ptr<image::GnashImage> _imageframe;
+    std::unique_ptr<image::GnashImage> _imageframe;
 
     // The video URL
     std::string url;
 
     // The input media parser
-    std::auto_ptr<media::MediaParser> _parser;
+    std::unique_ptr<media::MediaParser> _parser;
 
     // The position in the inputfile, only used when not playing a FLV
     long _inputPos;
@@ -533,13 +533,13 @@ private:
     boost::mutex _state_mutex;
     
     /// Video decoder
-    std::auto_ptr<media::VideoDecoder> _videoDecoder;
+    std::unique_ptr<media::VideoDecoder> _videoDecoder;
 
     /// True if video info are known
     bool _videoInfoKnown;
 
     /// Audio decoder
-    std::auto_ptr<media::AudioDecoder> _audioDecoder;
+    std::unique_ptr<media::AudioDecoder> _audioDecoder;
 
     /// True if an audio info are known
     bool _audioInfoKnown;
@@ -561,7 +561,7 @@ private:
     /// This should just be a temporary variable, transferred
     /// to MediaParser constructor.
     ///
-    std::auto_ptr<IOChannel> _inputStream;
+    std::unique_ptr<IOChannel> _inputStream;
 
     /// The buffered audio streamer
     BufferedAudioStreamer _audioStreamer;

@@ -83,7 +83,7 @@ public:
     /// @return A smart pointer to a vector of Listener names.
     ///
     /// @remarks This is only used for debugging
-    std::auto_ptr< std::vector<std::string> > listListeners();
+    std::unique_ptr< std::vector<std::string> > listListeners();
 
     /// \brief Set the base address for the block of Listeners.
     ///

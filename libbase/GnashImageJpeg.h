@@ -118,9 +118,9 @@ public:
     /// Create a JpegInput and transfer ownership to the caller.
     //
     /// @param in   The IOChannel to read JPEG data from.
-    static std::auto_ptr<Input> create(boost::shared_ptr<IOChannel> in)
+    static std::unique_ptr<Input> create(boost::shared_ptr<IOChannel> in)
     {
-        std::auto_ptr<Input> ret(new JpegInput(in));
+        std::unique_ptr<Input> ret(new JpegInput(in));
         // might throw an exception (I guess)
         if (ret.get()) ret->read();
         return ret;
@@ -133,7 +133,7 @@ public:
     /// @param loader   The JpegInput object to use for reading the
     ///                 data. This should have been constructed with
     ///                 createSWFJpeg2HeaderOnly().
-    DSOEXPORT static std::auto_ptr<GnashImage> readSWFJpeg2WithTables(
+    DSOEXPORT static std::unique_ptr<GnashImage> readSWFJpeg2WithTables(
             JpegInput& loader);
 
     /// Create a JPEG 'loader' object by reading a JPEG header.
@@ -142,10 +142,10 @@ public:
     //
     /// @param in               The channel to read JPEG header data from.
     /// @param maxHeaderBytes   The maximum number of bytes to read.
-    static std::auto_ptr<JpegInput> createSWFJpeg2HeaderOnly(
+    static std::unique_ptr<JpegInput> createSWFJpeg2HeaderOnly(
             boost::shared_ptr<IOChannel> in, unsigned int maxHeaderBytes)
     {
-        std::auto_ptr<JpegInput> ret (new JpegInput(in));
+        std::unique_ptr<JpegInput> ret (new JpegInput(in));
         // might throw an exception
         if (ret.get()) ret->readHeader(maxHeaderBytes);
         return ret;
@@ -197,7 +197,7 @@ public:
     /// @param width    The width of the resulting image
     /// @param height   The height of the resulting image.
     /// @param quality  The quality of the created image, from 1-100.
-    static std::auto_ptr<Output> create(boost::shared_ptr<IOChannel> out,
+    static std::unique_ptr<Output> create(boost::shared_ptr<IOChannel> out,
             size_t width, size_t height, int quality);
     
 private:

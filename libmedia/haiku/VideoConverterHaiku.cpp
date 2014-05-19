@@ -41,7 +41,7 @@ VideoConverterHaiku::~VideoConverterHaiku()
     QQ(2);
 }
 
-std::auto_ptr<ImgBuf>
+std::unique_ptr<ImgBuf>
 VideoConverterHaiku::convert(const ImgBuf& src)
 {
     QQ(2);

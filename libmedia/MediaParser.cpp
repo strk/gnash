@@ -33,13 +33,13 @@
 namespace gnash {
 namespace media {
 
-MediaParser::MediaParser(std::auto_ptr<IOChannel> stream)
+MediaParser::MediaParser(std::unique_ptr<IOChannel> stream)
 	:
 	_parsingComplete(false),
 	_bytesLoaded(0),
-	_stream(stream),
+	_stream(std::move(stream)),
 	_bufferTime(100), // 100 ms 
-	_parserThread(0),
+	_parserThread(),
 	_parserThreadStartBarrier(2),
 	_parserThreadKillRequested(false),
 	_seekRequest(false)
@@ -196,7 +196,7 @@ MediaParser::nextVideoFrameTimestamp(boost::uint64_t& ts) const
 	return true;
 }
 
-std::auto_ptr<EncodedVideoFrame>
+std::unique_ptr<EncodedVideoFrame>
 MediaParser::nextVideoFrame()
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
@@ -208,7 +208,7 @@ MediaParser::nextVideoFrame()
 	}
 #endif
 
-	std::auto_ptr<EncodedVideoFrame> ret;
+	std::unique_ptr<EncodedVideoFrame> ret;
 	if (_videoFrames.empty()) return ret;
 	ret.reset(_videoFrames.front());
 	_videoFrames.pop_front();
@@ -219,7 +219,7 @@ MediaParser::nextVideoFrame()
 	return ret;
 }
 
-std::auto_ptr<EncodedAudioFrame>
+std::unique_ptr<EncodedAudioFrame>
 MediaParser::nextAudioFrame()
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
@@ -231,7 +231,7 @@ MediaParser::nextAudioFrame()
 	}
 #endif
 
-	std::auto_ptr<EncodedAudioFrame> ret;
+	std::unique_ptr<EncodedAudioFrame> ret;
 	if (_audioFrames.empty()) return ret;
 	ret.reset(_audioFrames.front());
 	_audioFrames.pop_front();
@@ -324,7 +324,7 @@ MediaParser::clearBuffers()
 }
 
 void
-MediaParser::pushEncodedAudioFrame(std::auto_ptr<EncodedAudioFrame> frame)
+MediaParser::pushEncodedAudioFrame(std::unique_ptr<EncodedAudioFrame> frame)
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	boost::mutex::scoped_lock lock(_qMutex);
@@ -364,7 +364,7 @@ MediaParser::pushEncodedAudioFrame(std::auto_ptr<EncodedAudioFrame> frame)
 }
 
 void
-MediaParser::pushEncodedVideoFrame(std::auto_ptr<EncodedVideoFrame> frame)
+MediaParser::pushEncodedVideoFrame(std::unique_ptr<EncodedVideoFrame> frame)
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	boost::mutex::scoped_lock lock(_qMutex);

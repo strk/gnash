@@ -154,7 +154,7 @@ private:
 
 #ifdef USE_SWFTREE
     // Create a tree model for displaying movie info
-    GtkTreeModel* makeTreeModel(std::auto_ptr<movie_root::InfoTree> tree);
+    GtkTreeModel* makeTreeModel(const std::unique_ptr<movie_root::InfoTree>& tree);
 #endif
 
     void stopHook();

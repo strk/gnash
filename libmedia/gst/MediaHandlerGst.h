@@ -45,16 +45,16 @@ public:
 
     virtual std::string description() const;
 
-	virtual std::auto_ptr<MediaParser>
-        createMediaParser(std::auto_ptr<IOChannel> stream);
+	virtual std::unique_ptr<MediaParser>
+        createMediaParser(std::unique_ptr<IOChannel> stream);
 
-	virtual std::auto_ptr<VideoDecoder>
+	virtual std::unique_ptr<VideoDecoder>
         createVideoDecoder(const VideoInfo& info);
 
-	virtual std::auto_ptr<AudioDecoder>
+	virtual std::unique_ptr<AudioDecoder>
         createAudioDecoder(const AudioInfo& info);
 	
-	virtual std::auto_ptr<VideoConverter>
+	virtual std::unique_ptr<VideoConverter>
         createVideoConverter(ImgBuf::Type4CC srcFormat,
                 ImgBuf::Type4CC dstFormat);
     

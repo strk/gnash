@@ -187,7 +187,7 @@ test_listen()
     
     Listener list(reinterpret_cast<uint8_t *>(shmaddr));
     vector<string>::const_iterator it;
-    auto_ptr< vector<string> > listeners ( list.listListeners() );
+    unique_ptr< vector<string> > listeners ( list.listListeners() );
     if (listeners->size() == 0) {
         cout << "Nobody is listening" << endl;
     } else {
@@ -329,7 +329,7 @@ test_read()
     
     Listener list(reinterpret_cast<uint8_t *>(shmaddr));
     vector<string>::const_iterator it;
-    auto_ptr< vector<string> > listeners ( list.listListeners() );
+    unique_ptr< vector<string> > listeners ( list.listListeners() );
     if (listeners->size() == 0) {
         cout << "Nobody is listening" << endl;
     } else {
@@ -596,7 +596,7 @@ int main(int /*argc*/, char **/* argv[]*/)
     addListener(str1);
     
     vector<string>::const_iterator it;
-    auto_ptr< vector<string> > listeners ( listListeners() );
+    unique_ptr< vector<string> > listeners ( listListeners() );
     if (listeners->empty()) {
         log_debug("Nobody is listening");
     } else {

@@ -39,7 +39,7 @@ DefineEditTextTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     in.ensureBytes(2);
     const boost::uint16_t id = in.read_u16();
 
-    std::auto_ptr<DefineEditTextTag> editText(new DefineEditTextTag(in, m, id));
+    std::unique_ptr<DefineEditTextTag> editText(new DefineEditTextTag(in, m, id));
 
     m.addDisplayObject(id, editText.release());
 }

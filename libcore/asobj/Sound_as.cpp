@@ -24,7 +24,6 @@
 #include "Sound_as.h"
 
 #include <string>
-#include <boost/scoped_ptr.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/cstdint.hpp>
@@ -183,7 +182,7 @@ private:
 
     void markReachableResources() const;
 
-    boost::scoped_ptr<CharacterProxy> _attachedCharacter;
+    std::unique_ptr<CharacterProxy> _attachedCharacter;
     int soundId;
     bool externalSound;
     bool isStreaming;
@@ -192,9 +191,9 @@ private:
 
     media::MediaHandler* _mediaHandler;
 
-    boost::scoped_ptr<media::MediaParser> _mediaParser;
+    std::unique_ptr<media::MediaParser> _mediaParser;
 
-    boost::scoped_ptr<media::AudioDecoder> _audioDecoder;
+    std::unique_ptr<media::AudioDecoder> _audioDecoder;
 
     /// Number of milliseconds into the sound to start it
     //
@@ -258,7 +257,7 @@ private:
 Sound_as::Sound_as(as_object* owner) 
     :
     ActiveRelay(owner),
-    _attachedCharacter(0),
+    _attachedCharacter(),
     soundId(-1),
     externalSound(false),
     isStreaming(false),
@@ -268,7 +267,7 @@ Sound_as::Sound_as(as_object* owner)
     _leftOverData(),
     _leftOverPtr(0),
     _leftOverSize(0),
-    _inputStream(0),
+    _inputStream(nullptr),
     remainingLoops(0),
     _soundCompleted(false),
     _soundLoaded(false)
@@ -280,7 +279,7 @@ Sound_as::~Sound_as()
     // Just in case...
     if (_inputStream && _soundHandler) {
         _soundHandler->unplugInputStream(_inputStream);
-        _inputStream=0;
+        _inputStream=nullptr;
     }
 
 }
@@ -586,7 +585,7 @@ Sound_as::loadSound(const std::string& file, bool streaming)
     const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
     const StreamProvider& streamProvider = rr.streamProvider();
-    std::auto_ptr<IOChannel> inputStream(streamProvider.getStream(url,
+    std::unique_ptr<IOChannel> inputStream(streamProvider.getStream(url,
                 rcfile.saveStreamingMedia()));
 
     if (!inputStream.get()) {
@@ -599,7 +598,7 @@ Sound_as::loadSound(const std::string& file, bool streaming)
     externalSound = true;
     isStreaming = streaming;
 
-    _mediaParser.reset(_mediaHandler->createMediaParser(inputStream).release());
+    _mediaParser = std::move(_mediaHandler->createMediaParser(std::move(inputStream)));
     if (!_mediaParser) {
         log_error(_("Unable to create parser for Sound at %s"), url);
         // not necessarely correct, the stream might have been found...
@@ -841,7 +840,7 @@ Sound_as::getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF)
     while (len) {
         if ( ! _leftOverData ) {
             bool parsingComplete = _mediaParser->parsingCompleted(); // check *before* calling nextAudioFrame
-            std::auto_ptr<media::EncodedAudioFrame> frame = _mediaParser->nextAudioFrame();
+            std::unique_ptr<media::EncodedAudioFrame> frame = _mediaParser->nextAudioFrame();
             if ( ! frame.get() ) {
                 // just wait some more if parsing isn't complete yet
                 if ( ! parsingComplete ) {

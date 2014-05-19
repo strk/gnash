@@ -83,7 +83,7 @@ Renderer_DirectFB::init(float x, float y)
 }
 
 CachedBitmap *
-Renderer_DirectFB::createCachedBitmap(std::auto_ptr<gnash::image::GnashImage>)
+Renderer_DirectFB::createCachedBitmap(std::unique_ptr<gnash::image::GnashImage>)
 {
 
 }

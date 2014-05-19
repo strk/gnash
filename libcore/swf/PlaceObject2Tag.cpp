@@ -182,10 +182,10 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
             }
     
             // Read the actions for event(s)
-            // auto_ptr here prevents leaks on malformed swf
-            std::auto_ptr<action_buffer> action(new action_buffer(_movie_def));
+            // unique_ptr here prevents leaks on malformed swf
+            std::unique_ptr<action_buffer> action(new action_buffer(_movie_def));
             action->read(in, in.tell() + event_length);
-            _actionBuffers.push_back(action); 
+            _actionBuffers.push_back(action.release()); 
     
             // If there is no end tag, action_buffer appends a null-terminator,
             // and fails this check. As action_buffer should check bounds, we
@@ -241,13 +241,13 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
 
                     const event_id id(s_code_bits[i], (i == 17 ? ch : key::INVALID));
 
-                    std::auto_ptr<swf_event> ev(new swf_event(id, thisAction));
+                    std::unique_ptr<swf_event> ev(new swf_event(id, thisAction));
 
                     IF_VERBOSE_PARSE(
                         log_parse("---- actions for event %s", ev->event());
                     );
     
-                    _eventHandlers.push_back(ev);
+                    _eventHandlers.push_back(ev.release());
                 }
             }
         }

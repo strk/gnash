@@ -153,7 +153,7 @@ class Camera_as: public Relay
 {
 public:
 
-    Camera_as(std::auto_ptr<media::VideoInput> input)
+    Camera_as(std::unique_ptr<media::VideoInput> input)
         :
         _input(input.release()),
         _loopback(false)
@@ -259,7 +259,7 @@ camera_get(const fn_call& fn)
         log_error(_("No MediaHandler exists! Cannot create a Camera object"));
         return as_value();
     }
-    std::auto_ptr<media::VideoInput> input(handler->getVideoInput(0));
+    std::unique_ptr<media::VideoInput> input(handler->getVideoInput(0));
 
     if (!input.get()) {
         // TODO: what should happen if the index is not available?
@@ -280,7 +280,7 @@ camera_get(const fn_call& fn)
     attachCameraInterface(*cam_obj);
     attachCameraProperties(*cam_obj);
 
-    cam_obj->setRelay(new Camera_as(input));
+    cam_obj->setRelay(new Camera_as(std::move(input)));
 
     return as_value(cam_obj); 
 }

@@ -23,7 +23,6 @@
 
 #include <string>
 #include <map>
-#include <boost/scoped_ptr.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/bind.hpp> 
@@ -196,9 +195,9 @@ private:
 
 	size_t _bytesTotal;
 
-    boost::scoped_ptr<IOChannel> _stream;
+        std::unique_ptr<IOChannel> _stream;
 
-    boost::scoped_ptr<boost::thread> _thread;
+        std::unique_ptr<boost::thread> _thread;
 
 	ValuesMap _vals;
 

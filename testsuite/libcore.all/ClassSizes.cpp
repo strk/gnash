@@ -73,7 +73,7 @@ using namespace gnash::SWF;
 // Add types in brackets to this macro to have their size printed.
 #define TYPES \
 (int) (float) (long) (double) \
-(Property*) (auto_ptr<Property>) (scoped_ptr<Property>) \
+(Property*) (unique_ptr<Property>) (scoped_ptr<Property>) \
 (boost::shared_ptr<Property>) (intrusive_ptr<as_object>) (GcResource) \
 (rgba) (SWFMatrix) (SWFRect) (LineStyle) (FillStyle) (SWFCxForm) \
 (as_value) \

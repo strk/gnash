@@ -32,12 +32,12 @@
 namespace gnash {
 
 #ifdef GUI_FLTK
-std::auto_ptr<Gui> createFLTKGui(unsigned long windowid, float scale, bool do_loop, RunResources& r)
+std::unique_ptr<Gui> createFLTKGui(unsigned long windowid, float scale, bool do_loop, RunResources& r)
 {
-	return std::auto_ptr<Gui>(new FltkGui(windowid, scale, do_loop, r));
+	return std::unique_ptr<Gui>(new FltkGui(windowid, scale, do_loop, r));
 }
 #else // ! GUI_FLTK
-std::auto_ptr<Gui> createFLTKGui(unsigned long , float, bool, RunResourcesfloat , bool , unsigned int )
+std::unique_ptr<Gui> createFLTKGui(unsigned long , float, bool, RunResourcesfloat , bool , unsigned int )
 {
 	throw GnashException("Support for FLTK gui was not compiled in");
 }

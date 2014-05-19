@@ -153,8 +153,8 @@ Mkit_sound_handler::reset()
 }
 
 int
-Mkit_sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,
-                                std::auto_ptr<media::SoundInfo> sinfo)
+Mkit_sound_handler::create_sound(std::unique_ptr<SimpleBuffer> data,
+                                std::unique_ptr<media::SoundInfo> sinfo)
 {
     boost::mutex::scoped_lock lock(_mutex);
     return sound_handler::create_sound(data, sinfo);
@@ -294,7 +294,7 @@ Mkit_sound_handler::mix(boost::int16_t* outSamples, boost::int16_t* inSamples, u
 }
 
 void
-Mkit_sound_handler::plugInputStream(std::auto_ptr<InputStream> newStreamer)
+Mkit_sound_handler::plugInputStream(std::unique_ptr<InputStream> newStreamer)
 {
     boost::mutex::scoped_lock lock(_mutex);
 

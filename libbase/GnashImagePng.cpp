@@ -402,19 +402,19 @@ PngOutput::writeImageRGB(const unsigned char* rgbData)
 
 } // unnamed namespace
 
-std::auto_ptr<Input>
+std::unique_ptr<Input>
 createPngInput(boost::shared_ptr<IOChannel> in)
 {
-    std::auto_ptr<Input> ret(new PngInput(in));
+    std::unique_ptr<Input> ret(new PngInput(in));
     ret->read();
     return ret;
 }
 
-std::auto_ptr<Output>
+std::unique_ptr<Output>
 createPngOutput(boost::shared_ptr<IOChannel> o, size_t width,
                        size_t height, int quality)
 {
-    std::auto_ptr<Output> outChannel(new PngOutput(o, width, height, quality));
+    std::unique_ptr<Output> outChannel(new PngOutput(o, width, height, quality));
     return outChannel;
 }
 

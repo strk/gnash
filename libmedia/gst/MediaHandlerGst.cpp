@@ -53,20 +53,20 @@ MediaHandlerGst::description() const
     return s.str();
 }
 
-std::auto_ptr<MediaParser>
-MediaHandlerGst::createMediaParser(std::auto_ptr<IOChannel> stream)
+std::unique_ptr<MediaParser>
+MediaHandlerGst::createMediaParser(std::unique_ptr<IOChannel> stream)
 {
-    std::auto_ptr<MediaParser> parser;
+    std::unique_ptr<MediaParser> parser;
 
     try
     {
         if (isFLV(*stream))
         {
-            parser.reset(new FLVParser(stream));
+            parser.reset(new FLVParser(std::move(stream)));
         }
         else
         {
-            parser.reset(new MediaParserGst(stream));
+            parser.reset(new MediaParserGst(std::move(stream)));
         }
     }
     catch (GnashException& ex)
@@ -79,7 +79,7 @@ MediaHandlerGst::createMediaParser(std::auto_ptr<IOChannel> stream)
     return parser;
 }
 
-std::auto_ptr<VideoDecoder>
+std::unique_ptr<VideoDecoder>
 MediaHandlerGst::createVideoDecoder(const VideoInfo& info)
 {
     if (info.type != CODEC_TYPE_FLASH) {
@@ -88,9 +88,9 @@ MediaHandlerGst::createVideoDecoder(const VideoInfo& info)
 
         if (!extrainfo) {
             log_error(_("Wrong arguments given to GST VideoDecoder"));
-            return std::auto_ptr<VideoDecoder>();
+            return std::unique_ptr<VideoDecoder>();
         }
-        return std::auto_ptr<VideoDecoder>(
+        return std::unique_ptr<VideoDecoder>(
             new VideoDecoderGst(extrainfo->caps));
     }
     videoCodecType format = static_cast<videoCodecType>(info.codec);
@@ -106,14 +106,14 @@ MediaHandlerGst::createVideoDecoder(const VideoInfo& info)
         datasize = extrainfo->size;
     }
 
-    std::auto_ptr<VideoDecoder> ret( new VideoDecoderGst(format, width, height, extradata, datasize) );
+    std::unique_ptr<VideoDecoder> ret( new VideoDecoderGst(format, width, height, extradata, datasize) );
     return ret;
 }
 
-std::auto_ptr<AudioDecoder>
+std::unique_ptr<AudioDecoder>
 MediaHandlerGst::createAudioDecoder(const AudioInfo& info)
 {
-    std::auto_ptr<AudioDecoder> ret;
+    std::unique_ptr<AudioDecoder> ret;
 
 #ifdef DECODING_SPEEX
     if (info.codec == AUDIO_CODEC_SPEEX) {
@@ -145,10 +145,10 @@ MediaHandlerGst::createAudioDecoder(const AudioInfo& info)
     return ret;
 }
 
-std::auto_ptr<VideoConverter>
+std::unique_ptr<VideoConverter>
 MediaHandlerGst::createVideoConverter(ImgBuf::Type4CC srcFormat, ImgBuf::Type4CC dstFormat)
 {
-    std::auto_ptr<VideoConverter> converter;
+    std::unique_ptr<VideoConverter> converter;
 
     try
     {

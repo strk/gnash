@@ -62,13 +62,13 @@ struct _GnashView {
     //
     /// This must be kept alive for the entire lifetime of the movie_root
     /// (currently: of the Gui).
-    std::auto_ptr<gnash::RunResources> run_info;
+    std::unique_ptr<gnash::RunResources> run_info;
 
     boost::intrusive_ptr<gnash::movie_definition> movie_definition;
     gnash::Movie* movie;
-    std::auto_ptr<gnash::movie_root> stage;
-    std::auto_ptr<gnash::SystemClock> system_clock;
-    std::auto_ptr<gnash::InterruptableVirtualClock> virtual_clock;
+    std::unique_ptr<gnash::movie_root> stage;
+    std::unique_ptr<gnash::SystemClock> system_clock;
+    std::unique_ptr<gnash::InterruptableVirtualClock> virtual_clock;
 };
 
 G_DEFINE_TYPE(GnashView, gnash_view, GTK_TYPE_BIN)
@@ -422,9 +422,9 @@ gnash_view_load_movie(GnashView *view, const gchar *uri)
     view->run_info.reset(new gnash::RunResources());
     view->run_info->setSoundHandler(view->sound_handler);
 
-    std::auto_ptr<gnash::NamingPolicy> np(new gnash::IncrementalRename(url));
+    std::unique_ptr<gnash::NamingPolicy> np(new gnash::IncrementalRename(url));
     boost::shared_ptr<gnash::StreamProvider> sp(
-	    new gnash::StreamProvider(url, url, np));
+	    new gnash::StreamProvider(url, url, std::move(np)));
     view->run_info->setStreamProvider(sp);
 
     gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();

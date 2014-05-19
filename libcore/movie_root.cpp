@@ -812,7 +812,7 @@ movie_root::doMouseDrag()
 }
 
 boost::uint32_t
-movie_root::addIntervalTimer(std::auto_ptr<Timer> timer)
+movie_root::addIntervalTimer(std::unique_ptr<Timer> timer)
 {
     assert(timer.get());
     assert(testInvariant());
@@ -821,8 +821,7 @@ movie_root::addIntervalTimer(std::auto_ptr<Timer> timer)
 
     assert(_intervalTimers.find(id) == _intervalTimers.end());
 
-    boost::shared_ptr<Timer> t(timer);
-    _intervalTimers.insert(std::make_pair(id, t));
+    _intervalTimers.insert(std::make_pair(id, std::move(timer)));
 
     return id;
 }
@@ -1404,7 +1403,7 @@ movie_root::processActionQueue(size_t lvl)
     // and a final call to .clear() 
     while (!q.empty()) {
 
-        std::auto_ptr<ExecutableCode> code(q.pop_front().release());
+        const std::unique_ptr<ExecutableCode> code(q.pop_front().release());
         code->execute();
 
         size_t minLevel = minPopulatedPriorityQueue();
@@ -1454,9 +1453,9 @@ movie_root::flushHigherPriorityActionQueues()
 }
 
 void
-movie_root::addLoadableObject(as_object* obj, std::auto_ptr<IOChannel> str)
+movie_root::addLoadableObject(as_object* obj, std::unique_ptr<IOChannel> str)
 {
-    boost::shared_ptr<IOChannel> io(str.release());
+    std::shared_ptr<IOChannel> io(str.release());
     _loadCallbacks.push_back(LoadCallback(io, obj));
 }
 
@@ -1499,10 +1498,10 @@ movie_root::removeQueuedConstructor(MovieClip* target)
 }
 
 void
-movie_root::pushAction(std::auto_ptr<ExecutableCode> code, size_t lvl)
+movie_root::pushAction(std::unique_ptr<ExecutableCode> code, size_t lvl)
 {
     assert(lvl < PRIORITY_SIZE);
-    _actionQueue[lvl].push_back(code);
+    _actionQueue[lvl].push_back(code.release());
 }
 
 void
@@ -1513,9 +1512,9 @@ movie_root::pushAction(const action_buffer& buf, DisplayObject* target)
             target->getTargetPath());
 #endif
 
-    std::auto_ptr<ExecutableCode> code(new GlobalCode(buf, target));
+    std::unique_ptr<ExecutableCode> code(new GlobalCode(buf, target));
 
-    _actionQueue[PRIORITY_DOACTION].push_back(code);
+    _actionQueue[PRIORITY_DOACTION].push_back(code.release());
 }
 
 void

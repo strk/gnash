@@ -77,7 +77,7 @@ ensurePadding(SimpleBuffer& data, media::MediaHandler* m)
 } // anonymous namespace
 
 sound_handler::StreamBlockId
-sound_handler::addSoundBlock(std::auto_ptr<SimpleBuffer> data,
+sound_handler::addSoundBlock(std::unique_ptr<SimpleBuffer> data,
         size_t sampleCount, int seekSamples, int handle)
 {
     if (!validHandle(_streamingSounds, handle)) {
@@ -96,7 +96,7 @@ sound_handler::addSoundBlock(std::auto_ptr<SimpleBuffer> data,
     assert(data.get());
     ensurePadding(*data, _mediaHandler);
 
-    return sounddata->append(data, sampleCount, seekSamples);
+    return sounddata->append(std::move(data), sampleCount, seekSamples);
 }
 
 void
@@ -388,7 +388,7 @@ sound_handler::get_duration(int handle) const
 int
 sound_handler::createStreamingSound(const media::SoundInfo& sinfo)
 {
-    std::auto_ptr<StreamingSoundData> sounddata(
+    std::unique_ptr<StreamingSoundData> sounddata(
             new StreamingSoundData(sinfo, 100));
 
     int sound_id = _streamingSounds.size();
@@ -399,7 +399,7 @@ sound_handler::createStreamingSound(const media::SoundInfo& sinfo)
 }
 
 int
-sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,
+sound_handler::create_sound(std::unique_ptr<SimpleBuffer> data,
                             const media::SoundInfo& sinfo)
 {
     if (data.get()) {
@@ -408,7 +408,7 @@ sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,
     else {
         log_debug("Event sound with no data!");
     }
-    std::auto_ptr<EmbedSound> sounddata(new EmbedSound(data, sinfo, 100));
+    std::unique_ptr<EmbedSound> sounddata(new EmbedSound(std::move(data), sinfo, 100));
 
     int sound_id = _sounds.size();
 
@@ -447,9 +447,9 @@ sound_handler::playStream(int soundId, StreamBlockId blockId)
     if (s.isPlaying() || s.empty()) return;
 
     try {
-        std::auto_ptr<InputStream> is(
+        std::unique_ptr<InputStream> is(
                 s.createInstance(*_mediaHandler, blockId));
-        plugInputStream(is);
+        plugInputStream(std::move(is));
     }
     catch (const MediaException& e) {
         log_error(_("Could not start streaming sound: %s"), e.what());
@@ -537,10 +537,10 @@ sound_handler::startSound(int handle, int loops, const SoundEnvelopes* env,
     try {
         // Make an InputStream for this sound and plug it into  
         // the set of InputStream channels
-        std::auto_ptr<InputStream> sound(
+        std::unique_ptr<InputStream> sound(
                 sounddata.createInstance(*_mediaHandler, inPoint, outPoint,
                     env, loops));
-        plugInputStream(sound);
+        plugInputStream(std::move(sound));
     }
     catch (const MediaException& e) {
         log_error(_("Could not start event sound: %s"), e.what());
@@ -549,7 +549,7 @@ sound_handler::startSound(int handle, int loops, const SoundEnvelopes* env,
 }
 
 void
-sound_handler::plugInputStream(std::auto_ptr<InputStream> newStreamer)
+sound_handler::plugInputStream(std::unique_ptr<InputStream> newStreamer)
 {
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
     InputStream* newStream = newStreamer.get(); // for debugging
@@ -768,11 +768,11 @@ sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
     assert(owner);
     assert(ptr);
 
-    std::auto_ptr<InputStream> newStreamer ( new AuxStream(ptr, owner) );
+    std::unique_ptr<InputStream> newStreamer ( new AuxStream(ptr, owner) );
 
     InputStream* ret = newStreamer.get();
 
-    plugInputStream(newStreamer);
+    plugInputStream(std::move(newStreamer));
 
     return ret;
 }

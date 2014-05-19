@@ -45,7 +45,7 @@ public:
 
     std::string description() const { return "Cairo"; }
 
-    CachedBitmap* createCachedBitmap(std::auto_ptr<image::GnashImage> im);
+    CachedBitmap* createCachedBitmap(std::unique_ptr<image::GnashImage> im);
 
     void drawVideoFrame(image::GnashImage* baseframe, const Transform& xform,
                                 const SWFRect* bounds, bool smooth);

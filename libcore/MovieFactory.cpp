@@ -44,11 +44,11 @@ namespace {
     FileType getFileType(IOChannel& in);
 
     boost::intrusive_ptr<SWFMovieDefinition> createSWFMovie(
-            std::auto_ptr<IOChannel> in, const std::string& url,
+            std::unique_ptr<IOChannel> in, const std::string& url,
             const RunResources& runResources, bool startLoaderThread);
 
     boost::intrusive_ptr<BitmapMovieDefinition> createBitmapMovie(
-            std::auto_ptr<IOChannel> in, const std::string& url,
+            std::unique_ptr<IOChannel> in, const std::string& url,
             const RunResources& r, FileType type);
 
     boost::intrusive_ptr<movie_definition> createNonLibraryMovie(
@@ -60,7 +60,7 @@ namespace {
 MovieLibrary MovieFactory::movieLibrary;
 
 boost::intrusive_ptr<movie_definition>
-MovieFactory::makeMovie(std::auto_ptr<IOChannel> in, const std::string& url,
+MovieFactory::makeMovie(std::unique_ptr<IOChannel> in, const std::string& url,
         const RunResources& runResources, bool startLoaderThread)
 {
     boost::intrusive_ptr<movie_definition> ret;
@@ -81,13 +81,13 @@ MovieFactory::makeMovie(std::auto_ptr<IOChannel> in, const std::string& url,
                            "image, for which we don't yet have the "
                            "concept of a 'loading thread'"));
             }
-            ret = createBitmapMovie(in, url, runResources, type);
+            ret = createBitmapMovie(std::move(in), url, runResources, type);
             break;
         }
 
 
         case GNASH_FILETYPE_SWF:
-            ret = createSWFMovie(in, url, runResources, startLoaderThread);
+            ret = createSWFMovie(std::move(in), url, runResources, startLoaderThread);
             break;
 
         case GNASH_FILETYPE_FLV:
@@ -235,7 +235,7 @@ getFileType(IOChannel& in)
 // Create a SWFMovieDefinition from an SWF stream
 // NOTE: this method assumes this *is* an SWF stream
 boost::intrusive_ptr<SWFMovieDefinition>
-createSWFMovie(std::auto_ptr<IOChannel> in, const std::string& url,
+createSWFMovie(std::unique_ptr<IOChannel> in, const std::string& url,
         const RunResources& runResources, bool startLoaderThread)
 {
 
@@ -243,7 +243,7 @@ createSWFMovie(std::auto_ptr<IOChannel> in, const std::string& url,
 
     const std::string& absURL = URL(url).str();
 
-    if (!m->readHeader(in, absURL)) return 0;
+    if (!m->readHeader(std::move(in), absURL)) return 0;
     if (startLoaderThread && !m->completeLoad()) return 0;
 
     return m;
@@ -254,7 +254,7 @@ createSWFMovie(std::auto_ptr<IOChannel> in, const std::string& url,
 // FileType type
 // TODO: The pp won't display PNGs for SWF7 or below.
 boost::intrusive_ptr<BitmapMovieDefinition>
-createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url,
+createBitmapMovie(std::unique_ptr<IOChannel> in, const std::string& url,
         const RunResources& r, FileType type)
 {
     assert (in.get());
@@ -263,11 +263,11 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url,
 
     // readImageData takes a shared pointer because JPEG streams sometimes need
     // to transfer ownership.
-    boost::shared_ptr<IOChannel> imageData(in.release());
+    std::unique_ptr<IOChannel> imageData(in.release());
 
     try {
-        std::auto_ptr<image::GnashImage> im(
-                image::Input::readImageData(imageData, type));
+        std::unique_ptr<image::GnashImage> im(
+                std::move(image::Input::readImageData(std::move(imageData), type)));
 
         if (!im.get()) {
             log_error(_("Can't read image file from %s"), url);
@@ -275,7 +275,7 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url,
         }
 
         Renderer* renderer = r.renderer();
-        ret = new BitmapMovieDefinition(im, renderer, url);
+        ret = new BitmapMovieDefinition(std::move(im), renderer, url);
         return ret;
 
     }
@@ -294,7 +294,7 @@ createNonLibraryMovie(const URL& url, const RunResources& runResources,
   
     boost::intrusive_ptr<movie_definition> ret;
   
-    std::auto_ptr<IOChannel> in;
+    std::unique_ptr<IOChannel> in;
   
     const StreamProvider& streamProvider = runResources.streamProvider();
   
@@ -316,7 +316,7 @@ createNonLibraryMovie(const URL& url, const RunResources& runResources,
     }
   
     const std::string& movie_url = reset_url ? reset_url : url.str();
-    ret = MovieFactory::makeMovie(in, movie_url, runResources,
+    ret = MovieFactory::makeMovie(std::move(in), movie_url, runResources,
             startLoaderThread);
   
     return ret;

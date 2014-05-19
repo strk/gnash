@@ -21,7 +21,7 @@
 #define GNASH_FREETYPE_H
 
 #include <string>
-#include <memory> // for auto_ptr
+#include <memory> // for unique_ptr
 #include <boost/thread/mutex.hpp>
 #include <boost/cstdint.hpp>
 
@@ -70,10 +70,10 @@ public:
     ///    Whether to use an italic version of the font
     ///
     /// @return a rasterizer bound to the given font name,
-    ///         or a NULL auto_ptr if the given truetype font
+    ///         or a NULL unique_ptr if the given truetype font
     ///         could not be found.
     ///
-    static std::auto_ptr<FreetypeGlyphsProvider> createFace(
+    static std::unique_ptr<FreetypeGlyphsProvider> createFace(
             const std::string& name, bool bold, bool italic);
 
     /// Destructor
@@ -101,7 +101,7 @@ public:
     ///         or a NULL pointer if the given DisplayObject code
     ///         doesn't exist in this font.
     ///
-    std::auto_ptr<SWF::ShapeRecord> getGlyph(boost::uint16_t code,
+    std::unique_ptr<SWF::ShapeRecord> getGlyph(boost::uint16_t code,
             float& advance);
 
     /// Return the font's ascender in terms of its EM own square.

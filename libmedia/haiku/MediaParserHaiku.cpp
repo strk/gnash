@@ -36,7 +36,7 @@ namespace gnash {
 namespace media {
 namespace haiku {
 
-MediaParserHaiku::MediaParserHaiku(std::auto_ptr<IOChannel> stream)
+MediaParserHaiku::MediaParserHaiku(std::unique_ptr<IOChannel> stream)
     : MediaParser(stream)
 {
     QQ(2);

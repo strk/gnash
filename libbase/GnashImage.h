@@ -308,7 +308,7 @@ public:
     /// \brief
     /// For reading SWF JPEG3-style image data, like ordinary JPEG, 
     /// but stores the data in ImageRGBA format.
-    DSOEXPORT static std::auto_ptr<ImageRGBA> readSWFJpeg3(
+    DSOEXPORT static std::unique_ptr<ImageRGBA> readSWFJpeg3(
             boost::shared_ptr<gnash::IOChannel> in);
 
     /// Read image data from an IOChannel into an GnashImage.
@@ -317,8 +317,8 @@ public:
     /// @param type The type of image to read.
     /// @return     An GnashImage with the read image data. If type
     ///             is an unsupported FileType or image reading fails,
-    ///             a NULL auto_ptr is returned.
-    DSOEXPORT static std::auto_ptr<GnashImage> readImageData(
+    ///             a NULL unique_ptr is returned.
+    DSOEXPORT static std::unique_ptr<GnashImage> readImageData(
             boost::shared_ptr<gnash::IOChannel> in, FileType type);
 
 protected:

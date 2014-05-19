@@ -31,7 +31,7 @@ namespace gnash {
 /// VA/GLX surface abstraction
 class DSOEXPORT VaapiSurfaceGLX 
 {
-    std::auto_ptr<VaapiSurfaceImplBase> _impl;
+    std::unique_ptr<VaapiSurfaceImplBase> _impl;
 
 public:
     VaapiSurfaceGLX(GLenum target, GLuint texture);

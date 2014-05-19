@@ -29,8 +29,8 @@ namespace zlib_adapter
     /// new stream.
     //
     ///
-    DSOEXPORT std::auto_ptr<IOChannel>
-        make_inflater(std::auto_ptr<IOChannel> in);
+    DSOEXPORT std::unique_ptr<IOChannel>
+        make_inflater(std::unique_ptr<IOChannel> in);
 
 } // namespace gnash.zlib_adapter
 } // namespace gnash

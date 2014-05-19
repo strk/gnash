@@ -333,10 +333,10 @@ vm_main(int argc, char *argv[])
 
 
 #ifdef USE_FFMPEG
-    std::auto_ptr<media::MediaHandler> handler(
+    std::unique_ptr<media::MediaHandler> handler(
             new gnash::media::ffmpeg::MediaHandlerFfmpeg() );
 #elif defined(USE_GST)
-    std::auto_ptr<media::MediaHandler> handler(
+    std::unique_ptr<media::MediaHandler> handler(
             new gnash::media::gst::MediaHandlerGst() );
 #else
     std::cerr << "Neither SOUND_SDL nor SOUND_GST defined" << std::endl;
@@ -394,7 +394,7 @@ play_movie(const std::string& filename, const RunResources& runResources)
 
     try {
       if (filename == "-") {
-         std::auto_ptr<IOChannel> in (
+         std::unique_ptr<IOChannel> in (
                  noseek_fd_adapter::make_stream(fileno(stdin)) );
          md = gnash::MovieFactory::makeMovie(in, filename, runResources, false);
       } else {

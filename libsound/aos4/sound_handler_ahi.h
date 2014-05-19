@@ -104,7 +104,7 @@ public:
     ~AOS4_sound_handler();
 
     // See dox in sound_handler.h
-    virtual int create_sound(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<media::SoundInfo> sinfo);
+    virtual int create_sound(std::unique_ptr<SimpleBuffer> data, std::unique_ptr<media::SoundInfo> sinfo);
 
     // See dox in sound_handler.h
     // overridden to serialize access to the data buffer slot
@@ -162,7 +162,7 @@ public:
 
     // See dox in sound_handler.h
     // Overridden to unpause SDL audio
-    void plugInputStream(std::auto_ptr<InputStream> in);
+    void plugInputStream(std::unique_ptr<InputStream> in);
 
     // See dox in sound_handler.h
     void fetchSamples(boost::int16_t* to, unsigned int nSamples);

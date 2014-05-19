@@ -84,8 +84,8 @@ public:
     /// NOTE: the default implementation returns an FLVParser for FLV input
     ///       or 0 for others.
     ///
-    virtual std::auto_ptr<MediaParser>
-        createMediaParser(std::auto_ptr<IOChannel> stream);
+    virtual std::unique_ptr<MediaParser>
+        createMediaParser(std::unique_ptr<IOChannel> stream);
 
     /// Create a VideoDecoder for decoding what's specified in the VideoInfo
     //
@@ -93,7 +93,7 @@ public:
     ///             the image stream correctly.
     /// @return     Will always return a valid VideoDecoder or throw a
     ///             gnash::MediaException if a fatal error occurs.
-    virtual std::auto_ptr<VideoDecoder>
+    virtual std::unique_ptr<VideoDecoder>
         createVideoDecoder(const VideoInfo& info)=0;
 
     /// Create an AudioDecoder for decoding what's specified in the AudioInfo
@@ -102,7 +102,7 @@ public:
     ///             the sound correctly.
     /// @return     Will always return a valid AudioDecoder or throw a
     ///             gnash::MediaException if a fatal error occurs.
-    virtual std::auto_ptr<AudioDecoder>
+    virtual std::unique_ptr<AudioDecoder>
         createAudioDecoder(const AudioInfo& info)=0;
 
     /// Create an VideoConverter for converting between color spaces.
@@ -110,9 +110,9 @@ public:
     /// @param srcFormat The source image color space
     /// @param dstFormat The destination image color space
     ///
-    /// @return A valid VideoConverter or a NULL auto_ptr if a fatal error
+    /// @return A valid VideoConverter or a NULL unique_ptr if a fatal error
     ///         occurs.
-    virtual std::auto_ptr<VideoConverter>
+    virtual std::unique_ptr<VideoConverter>
         createVideoConverter(ImgBuf::Type4CC srcFormat,
                 ImgBuf::Type4CC dstFormat)=0;
 
@@ -159,7 +159,7 @@ protected:
     ///     for info.type to be media::CODEC_TYPE_FLASH (caller should check
     ///     that before calling this).
     ///
-    std::auto_ptr<AudioDecoder> createFlashAudioDecoder(const AudioInfo& info);
+    std::unique_ptr<AudioDecoder> createFlashAudioDecoder(const AudioInfo& info);
 
     /// Return true if input stream is an FLV
     //

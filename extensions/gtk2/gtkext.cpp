@@ -165,7 +165,7 @@ void
 GtkExt::window_new()
 {
     GNASH_REPORT_FUNCTION;
-//    std::auto_ptr<Gui> ggg = player.getGuiHandle();
+//    std::unique_ptr<Gui> ggg = player.getGuiHandle();
 //    player.getGuiHandle();
 //    gui.getWindow();
     _window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -335,10 +335,10 @@ as_value gtkext_main(const fn_call& fn)
     return as_value();
 }
 
-std::auto_ptr<as_object>
+std::unique_ptr<as_object>
 init_gtkext_instance()
 {
-    return std::auto_ptr<as_object>(new GtkExt());
+    return std::unique_ptr<as_object>(new GtkExt());
 }
 
 extern "C" {

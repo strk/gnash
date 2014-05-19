@@ -1001,7 +1001,7 @@ Gui::advanceMovie(bool doDisplay)
 }
 
 void
-Gui::setScreenShotter(std::auto_ptr<ScreenShotter> ss)
+Gui::setScreenShotter(std::unique_ptr<ScreenShotter> ss)
 {
     _screenShotter.reset(ss.release());
 }
@@ -1062,10 +1062,10 @@ Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 
 #ifdef USE_SWFTREE
 
-std::auto_ptr<movie_root::InfoTree>
+std::unique_ptr<movie_root::InfoTree>
 Gui::getMovieInfo() const
 {
-    std::auto_ptr<movie_root::InfoTree> tr;
+    std::unique_ptr<movie_root::InfoTree> tr;
 
     if (!_stage) {
         return tr;

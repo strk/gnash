@@ -581,7 +581,7 @@ xmlnode_new(const fn_call& fn)
         return as_value();
     }
 
-    std::auto_ptr<XMLNode_as> xml(new XMLNode_as(getGlobal(fn)));
+    std::unique_ptr<XMLNode_as> xml(new XMLNode_as(getGlobal(fn)));
     xml->nodeTypeSet(XMLNode_as::NodeType(toInt(fn.arg(0), getVM(fn))));
 
     if (fn.nargs > 1) {

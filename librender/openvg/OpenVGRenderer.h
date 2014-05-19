@@ -81,7 +81,7 @@ public:
     ~Renderer_ovg();
         
     void init(float x, float y);
-    CachedBitmap *createCachedBitmap(std::auto_ptr<image::GnashImage> im);
+    CachedBitmap *createCachedBitmap(std::unique_ptr<image::GnashImage> im);
 
     void drawVideoFrame(gnash::image::GnashImage*, const gnash::Transform&,
                         const gnash::SWFRect*, bool);

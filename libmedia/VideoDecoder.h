@@ -58,9 +58,9 @@ public:
   
   /// Pop a decoded frame from the decoder. THIS METHOD MAY BLOCK.
   //
-  /// @return The decoded video frame, or a NULL-containing auto_ptr if an
+  /// @return The decoded video frame, or a NULL-containing unique_ptr if an
   ///         error occurred.
-  virtual std::auto_ptr<image::GnashImage> pop() = 0;
+  virtual std::unique_ptr<image::GnashImage> pop() = 0;
   
   /// \brief
   /// Check whether a decoded frame is ready to be popped.

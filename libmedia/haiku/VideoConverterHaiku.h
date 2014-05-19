@@ -37,7 +37,7 @@ public:
     
     ~VideoConverterHaiku();
   
-    std::auto_ptr<ImgBuf> convert(const ImgBuf& src);
+    std::unique_ptr<ImgBuf> convert(const ImgBuf& src);
 };
 
 } // gnash.media.haiku namespace

@@ -542,8 +542,8 @@ MovieClip::getDisplayObjectAtDepth(int depth)
 void
 MovieClip::queueEvent(const event_id& id, int lvl)
 {
-    std::auto_ptr<ExecutableCode> event(new QueuedEvent(this, id));
-    stage().pushAction(event, lvl);
+    std::unique_ptr<ExecutableCode> event(new QueuedEvent(this, id));
+    stage().pushAction(std::move(event), lvl);
 }
 
 /// This handles special properties of MovieClip.
@@ -738,7 +738,7 @@ MovieClip::notifyEvent(const event_id& id)
     }
 
     // Dispatch static event handlers (defined in PlaceObject tags).
-    std::auto_ptr<ExecutableCode> code(get_event_handler(id));
+    std::unique_ptr<ExecutableCode> code(get_event_handler(id));
     if (code.get()) {
         // Dispatch.
         code->execute();
@@ -987,9 +987,9 @@ MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
                     "in frame %2% of MovieClip %3%",
                 cid, _currentFrame, getTarget());
 #endif
-        std::auto_ptr<ExecutableCode> code(new GlobalCode(a, this));
+        std::unique_ptr<ExecutableCode> code(new GlobalCode(a, this));
 
-        stage().pushAction(code, movie_root::PRIORITY_INIT);
+        stage().pushAction(std::move(code), movie_root::PRIORITY_INIT);
     }
     else {
 #ifdef GNASH_DEBUG
@@ -1759,8 +1759,8 @@ MovieClip::construct(as_object* initObj)
                 getTarget());
 #endif
 
-        std::auto_ptr<ExecutableCode> code(new ConstructEvent(this));
-        stage().pushAction(code, movie_root::PRIORITY_CONSTRUCT);
+        std::unique_ptr<ExecutableCode> code(new ConstructEvent(this));
+        stage().pushAction(std::move(code), movie_root::PRIORITY_CONSTRUCT);
 
     }
     else {

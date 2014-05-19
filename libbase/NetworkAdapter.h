@@ -47,7 +47,7 @@ public:
     /// from an url.
     //
     /// @param url      The url to fetch data from.
-    DSOEXPORT static std::auto_ptr<IOChannel> makeStream(
+    DSOEXPORT static std::unique_ptr<IOChannel> makeStream(
             const std::string& url, const std::string& cachefile);
 
     /// \brief
@@ -58,7 +58,7 @@ public:
     ///
     /// @param url      The url to post to.
     /// @param postdata The url-encoded post data
-    DSOEXPORT static std::auto_ptr<IOChannel> makeStream(
+    DSOEXPORT static std::unique_ptr<IOChannel> makeStream(
             const std::string& url, const std::string& postdata,
             const std::string& cachefile);
 
@@ -71,7 +71,7 @@ public:
     /// @param url      The url to post to.
     /// @param postdata The url-encoded post data
     /// @param headers  A RequestHeaders map of custom headers to send.
-    DSOEXPORT static std::auto_ptr<IOChannel> makeStream(const std::string& url,
+    DSOEXPORT static std::unique_ptr<IOChannel> makeStream(const std::string& url,
            const std::string& postdata, const RequestHeaders& headers,
            const std::string& cachefile);
 

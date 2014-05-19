@@ -138,11 +138,11 @@ namespace gui {
 
 int terminate_request = false;  // global scope to avoid GUI access
 
-std::auto_ptr<Gui> createFBGui(unsigned long windowid, float scale,
+std::unique_ptr<Gui> createFBGui(unsigned long windowid, float scale,
                                bool do_loop, RunResources& r)
 {
     // GNASH_REPORT_FUNCTION;
-    return std::auto_ptr<Gui>(new FBGui(windowid, scale, do_loop, r));
+    return std::unique_ptr<Gui>(new FBGui(windowid, scale, do_loop, r));
 }
 
 /// Called on CTRL-C and alike

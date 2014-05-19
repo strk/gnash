@@ -32,12 +32,12 @@
 namespace gnash {
 
 #ifdef GUI_SDL
-std::auto_ptr<Gui> createSDLGui(unsigned long windowid, float scale, bool do_loop, RunResources& r)
+std::unique_ptr<Gui> createSDLGui(unsigned long windowid, float scale, bool do_loop, RunResources& r)
 {
-	return std::auto_ptr<Gui>(new SDLGui(windowid, scale, do_loop, r));
+	return std::unique_ptr<Gui>(new SDLGui(windowid, scale, do_loop, r));
 }
 #else // ! GUI_SDL
-std::auto_ptr<Gui> createSDLGui(unsigned long , float, bool, RunResourcesfloat , bool , unsigned int )
+std::unique_ptr<Gui> createSDLGui(unsigned long , float, bool, RunResourcesfloat , bool , unsigned int )
 {
 	throw GnashException("Support for SDL gui was not compiled in");
 }

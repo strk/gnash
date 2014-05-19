@@ -39,9 +39,9 @@ namespace image {
 /// Create a PngInput and transfer ownership to the caller.
 //
 /// @param in   The IOChannel to read PNG data from.
-std::auto_ptr<Input> createPngInput(boost::shared_ptr<IOChannel> in);
+std::unique_ptr<Input> createPngInput(boost::shared_ptr<IOChannel> in);
 
-std::auto_ptr<Output> createPngOutput(boost::shared_ptr<IOChannel> out,
+std::unique_ptr<Output> createPngOutput(boost::shared_ptr<IOChannel> out,
         size_t width, size_t height, int quality);
 
 } // namespace image

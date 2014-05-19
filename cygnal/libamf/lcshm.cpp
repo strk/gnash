@@ -299,11 +299,11 @@ Listener::removeListener(const string &name)
 /// @return A smart pointer to a vector of Listener names.
 ///
 /// @remarks This is only used for debugging
-std::auto_ptr< vector<string> >
+std::unique_ptr< vector<string> >
 Listener::listListeners()
 {
 //    GNASH_REPORT_FUNCTION;    
-    std::auto_ptr< vector<string> > listeners ( new vector<string> );
+    std::unique_ptr< vector<string> > listeners ( new vector<string> );
     if (_baseaddr != 0) {
         boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
         
@@ -795,7 +795,7 @@ LcShm::dump()
     }
 
     vector<string>::const_iterator lit;
-    auto_ptr< vector<string> > listeners ( listListeners() );
+    unique_ptr< vector<string> > listeners ( listListeners() );
     cerr << "# of Listeners in file: " << listeners->size() << endl;
     for (lit=listeners->begin(); lit!=listeners->end(); ++lit) {
         string str = *lit;

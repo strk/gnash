@@ -53,7 +53,7 @@
 #endif
 
 #include <string>
-#include <memory> // for auto_ptr
+#include <memory> // for unique_ptr
 #include <vector> // for PlayList typedef
 #include <boost/intrusive_ptr.hpp>
 #include <boost/cstdint.hpp>
@@ -291,9 +291,9 @@ public:
 	///
 	/// The default implementation is a no-op. Actually, an implicit op
 	/// *is* performed, and it is deleting the jpeg::input instance since
-	/// it is passed in an auto_ptr...
+	/// it is passed in an unique_ptr...
 	///
-	virtual void set_jpeg_loader(std::auto_ptr<image::JpegInput> /*j_in*/)
+	virtual void set_jpeg_loader(std::unique_ptr<image::JpegInput> /*j_in*/)
 	{
 	}
 

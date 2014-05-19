@@ -94,12 +94,12 @@ public:
     virtual int createStreamingSound(const media::SoundInfo& sinfo);
 
     // See dox in sound_handler.h
-    virtual int create_sound(std::auto_ptr<SimpleBuffer> data,
+    virtual int create_sound(std::unique_ptr<SimpleBuffer> data,
             const media::SoundInfo& sinfo);
 
     // See dox in sound_handler.h
     // overridden to serialize access to the data buffer slot
-    virtual StreamBlockId addSoundBlock(std::auto_ptr<SimpleBuffer> buf,
+    virtual StreamBlockId addSoundBlock(std::unique_ptr<SimpleBuffer> buf,
            size_t sample_count, int seekSamples, int streamId);
 
     // See dox in sound_handler.h
@@ -156,7 +156,7 @@ public:
     
     // See dox in sound_handler.h
     // Overridden to unpause SDL audio
-    void plugInputStream(std::auto_ptr<InputStream> in);
+    void plugInputStream(std::unique_ptr<InputStream> in);
 
     // Overidden to provide thread safety.
     void unplugInputStream(InputStream* id);

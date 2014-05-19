@@ -123,8 +123,8 @@ Video::getVideoFrame()
 	// If this is a video from a NetStream_as object, retrieve a video
     // frame from there.
 	if (_ns) {
-		std::auto_ptr<image::GnashImage> tmp = _ns->get_video();
-		if (tmp.get()) _lastDecodedVideoFrame = tmp;
+		std::unique_ptr<image::GnashImage> tmp = _ns->get_video();
+		if (tmp.get()) _lastDecodedVideoFrame = std::move(tmp);
 	}
 
 	// If this is a video from a VideoFrame tag, retrieve a video frame

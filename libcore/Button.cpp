@@ -559,9 +559,9 @@ Button::mouseEvent(const event_id& event)
     _def->forEachTrigger(event, xec);
 
     // check for built-in event handler.
-    std::auto_ptr<ExecutableCode> code (get_event_handler(event));
+    std::unique_ptr<ExecutableCode> code (get_event_handler(event));
     if (code.get()) {
-        mr.pushAction(code, movie_root::PRIORITY_DOACTION);
+        mr.pushAction(std::move(code), movie_root::PRIORITY_DOACTION);
     }
 
     sendEvent(*getObject(this), get_environment(), event.functionURI());

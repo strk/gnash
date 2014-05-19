@@ -59,7 +59,7 @@ Font::GlyphInfo::GlyphInfo()
     advance(0)
 {}
 
-Font::GlyphInfo::GlyphInfo(std::auto_ptr<SWF::ShapeRecord> glyph,
+Font::GlyphInfo::GlyphInfo(std::unique_ptr<SWF::ShapeRecord> glyph,
         float advance)
     :
     glyph(glyph.release()),
@@ -73,7 +73,7 @@ Font::GlyphInfo::GlyphInfo(const GlyphInfo& o)
 {}
 
 
-Font::Font(std::auto_ptr<SWF::DefineFontTag> ft)
+Font::Font(std::unique_ptr<SWF::DefineFontTag> ft)
     :
     _fontTag(ft.release()),
     _name(_fontTag->name()),
@@ -160,7 +160,7 @@ Font::setFlags(boost::uint8_t flags)
 
 
 void
-Font::setCodeTable(std::auto_ptr<CodeTable> table)
+Font::setCodeTable(std::unique_ptr<CodeTable> table)
 {
     if (_embeddedCodeTable) {
         IF_VERBOSE_MALFORMED_SWF(
@@ -292,7 +292,7 @@ Font::add_os_glyph(boost::uint16_t code)
     float advance;
 
     // Get the vectorial glyph
-    std::auto_ptr<SWF::ShapeRecord> sh = ft->getGlyph(code, advance);
+    std::unique_ptr<SWF::ShapeRecord> sh = ft->getGlyph(code, advance);
 
     if (!sh.get()) {
         log_error(_("Could not create shape "
@@ -307,7 +307,7 @@ Font::add_os_glyph(boost::uint16_t code)
     // Add the new glyph id
     _deviceCodeTable[code] = newOffset;
 
-    _deviceGlyphTable.push_back(GlyphInfo(sh, advance));
+    _deviceGlyphTable.push_back(GlyphInfo(std::move(sh), advance));
 
     return newOffset;
 }

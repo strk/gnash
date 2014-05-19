@@ -75,9 +75,9 @@ DefineButtonSoundTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         return;
     }
 
-    std::auto_ptr<DefineButtonSoundTag> bs(
+    std::unique_ptr<DefineButtonSoundTag> bs(
             new DefineButtonSoundTag(in, m));
-    button->addSoundTag(bs);
+    button->addSoundTag(std::move(bs));
 }
 
 

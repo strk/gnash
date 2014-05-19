@@ -32,7 +32,7 @@
 
 namespace gnash {
 
-VaapiGlobalContext::VaapiGlobalContext(std::auto_ptr<VaapiDisplay> display)
+VaapiGlobalContext::VaapiGlobalContext(std::unique_ptr<VaapiDisplay> display)
     : _display(display)
 {
     GNASH_REPORT_FUNCTION;
@@ -131,10 +131,10 @@ VaapiGlobalContext *VaapiGlobalContext::get()
 {
     LOG_ONCE(GNASH_REPORT_FUNCTION);
 
-    static std::auto_ptr<VaapiGlobalContext> vaapi_global_context;
+    static std::unique_ptr<VaapiGlobalContext> vaapi_global_context;
 
     if (!vaapi_global_context.get()) {
-        std::auto_ptr<VaapiDisplay> dpy;
+        std::unique_ptr<VaapiDisplay> dpy;
         /* XXX: this won't work with multiple renders built-in */
         try {
 #if HAVE_VA_VA_GLX_H

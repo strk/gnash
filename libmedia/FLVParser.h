@@ -51,7 +51,7 @@ public:
     /// @param datasize
     ///     Video header data size
     ///
-    /// @todo take a SimpleBuffer by auto_ptr
+    /// @todo take a SimpleBuffer by unique_ptr
     ///
     ExtraVideoInfoFlv(boost::uint8_t* extradata, size_t datasize)
         :
@@ -83,7 +83,7 @@ public:
     /// @param datasize
     ///     Audio header data size
     ///
-    /// @todo take a SimpleBuffer by auto_ptr
+    /// @todo take a SimpleBuffer by unique_ptr
     ///
     ExtraAudioInfoFlv(boost::uint8_t* extradata, size_t datasize)
         :
@@ -120,7 +120,7 @@ public:
 	/// 	IOChannel to use for input.
 	/// 	Ownership transferred.
 	///
-	FLVParser(std::auto_ptr<IOChannel> lt);
+	FLVParser(std::unique_ptr<IOChannel> lt);
 
 	/// Kills the parser...
 	~FLVParser();
@@ -233,10 +233,10 @@ private:
 	///
 	bool parseNextTag(bool index_only);
 
-	std::auto_ptr<EncodedAudioFrame> parseAudioTag(const FLVTag& flvtag,
+	std::unique_ptr<EncodedAudioFrame> parseAudioTag(const FLVTag& flvtag,
             const FLVAudioTag& audiotag, boost::uint32_t thisTagPos);
 	
-    std::auto_ptr<EncodedVideoFrame> parseVideoTag(const FLVTag& flvtag,
+    std::unique_ptr<EncodedVideoFrame> parseVideoTag(const FLVTag& flvtag,
             const FLVVideoTag& videotag, boost::uint32_t thisTagPos);
 
 	void indexAudioTag(const FLVTag& tag, boost::uint32_t thisTagPos);
@@ -279,10 +279,10 @@ private:
 	/// Audio stream is present
 	bool _video;
 
-	std::auto_ptr<EncodedAudioFrame>
+	std::unique_ptr<EncodedAudioFrame>
         readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp);
 
-	std::auto_ptr<EncodedVideoFrame>
+	std::unique_ptr<EncodedVideoFrame>
         readVideoFrame(boost::uint32_t dataSize, boost::uint32_t timestamp);
 
 	/// Position in input stream for each cue point

@@ -29,7 +29,7 @@
 #include "Range2d.h"
 #include "GnashKey.h"
 #include "sound_handler.h" // for creating the "test" sound handlers
-#include "Renderer.h" // for dtor visibility by auto_ptr
+#include "Renderer.h" // for dtor visibility by unique_ptr
 #include "Movie.h" 
 #include "ManualClock.h" // for composition
 #include "RunResources.h" // For initialization.
@@ -37,7 +37,7 @@
 
 #include <boost/intrusive_ptr.hpp>
 #include <vector>
-#include <memory> // for auto_ptr
+#include <memory> // for unique_ptr
 #include <string> 
 #include <boost/shared_ptr.hpp>
 #include <cmath>
@@ -364,7 +364,7 @@ private:
 
     boost::shared_ptr<media::MediaHandler> _mediaHandler;
 
-    std::auto_ptr<RunResources> _runResources;
+    std::unique_ptr<RunResources> _runResources;
 	/// Current pointer position - X ordinate
 	int _x;
 

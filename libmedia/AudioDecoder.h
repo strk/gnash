@@ -60,7 +60,7 @@ public:
 	/// @return a pointer to the decoded data, or NULL if decoding fails.
 	///     The caller owns the decoded data, which was allocated with new [].
 	///
-	/// @todo return a SimpleBuffer by auto_ptr
+	/// @todo return a SimpleBuffer by unique_ptr
 	///
 	virtual boost::uint8_t* decode(const boost::uint8_t* input,
         boost::uint32_t inputSize, boost::uint32_t& outputSize,
@@ -77,7 +77,7 @@ public:
 	/// @return a pointer to the decoded data, or NULL if decoding fails.
 	///     The caller owns the decoded data, which was allocated with new [].
 	///
-	/// @todo return a SimpleBuffer by auto_ptr
+	/// @todo return a SimpleBuffer by unique_ptr
 	///
 	virtual boost::uint8_t* decode(const EncodedAudioFrame& input,
 	                               boost::uint32_t& outputSize);

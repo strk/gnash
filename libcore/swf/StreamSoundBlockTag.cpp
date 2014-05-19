@@ -104,7 +104,7 @@ StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     const size_t padding = mh ? mh->getInputPaddingSize() : 0;
 
     // Reserve padding too.
-    std::auto_ptr<SimpleBuffer> buf(new SimpleBuffer(dataLength + padding));
+    std::unique_ptr<SimpleBuffer> buf(new SimpleBuffer(dataLength + padding));
     buf->resize(dataLength);
 
     const unsigned int bytesRead = in.read((char*)buf->data(), dataLength);
@@ -120,7 +120,7 @@ StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     // not on the size of the data. Currently the sound_handler ignores
     // sampleCount completely.
     sound::sound_handler::StreamBlockId blockId =
-        handler->addSoundBlock(buf, sampleCount, seekSamples, sId);
+        handler->addSoundBlock(std::move(buf), sampleCount, seekSamples, sId);
 
     boost::intrusive_ptr<ControlTag> s(new StreamSoundBlockTag(sId, blockId));
 

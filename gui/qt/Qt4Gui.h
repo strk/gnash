@@ -142,7 +142,7 @@ private:
  
     /// The main application, which should destroy everything
     /// left on closing.
-    std::auto_ptr<QApplication>  _application;
+    std::unique_ptr<QApplication>  _application;
     
     /// The widget that is used for embedding between processes.
     EmbedWidget* _embedWidget;
@@ -154,10 +154,10 @@ private:
     DrawingWidget* _drawingWidget;
     
     /// Takes care of painting onto the widget.
-    std::auto_ptr<Qt4Glue> _glue;
+    std::unique_ptr<Qt4Glue> _glue;
     
     /// The main application window.
-    std::auto_ptr<QMainWindow> _window;
+    std::unique_ptr<QMainWindow> _window;
 
     /// A map for Qt::Key values that don't easily
     /// map onto Gnash ones.

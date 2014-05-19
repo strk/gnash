@@ -32,12 +32,12 @@
 namespace gnash {
 
 #ifdef GUI_AOS4
-std::auto_ptr<Gui> createAOS4Gui(unsigned long windowid, float scale, bool do_loop, RunResources& r)
+std::unique_ptr<Gui> createAOS4Gui(unsigned long windowid, float scale, bool do_loop, RunResources& r)
 {
-	return std::auto_ptr<Gui>(new AOS4Gui(windowid, scale, do_loop, r));
+	return std::unique_ptr<Gui>(new AOS4Gui(windowid, scale, do_loop, r));
 }
 #else // ! GUI_AOS4
-std::auto_ptr<Gui> createAOS4Gui(unsigned long , float, bool, RunResourcesfloat , bool , unsigned int )
+std::unique_ptr<Gui> createAOS4Gui(unsigned long , float, bool, RunResourcesfloat , bool , unsigned int )
 {
 	throw GnashException("Support for AOS4 gui was not compiled in");
 }

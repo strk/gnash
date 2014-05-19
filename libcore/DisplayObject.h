@@ -439,7 +439,7 @@ public:
     ///       to properly fetch any user-defined event handler, which 
     ///       are the ones attached to a DisplayObject with ActionScript code.
     ///
-    std::auto_ptr<ExecutableCode> get_event_handler(const event_id& id) const;
+    std::unique_ptr<ExecutableCode> get_event_handler(const event_id& id) const;
 
     /// Set a built-in function handler for the given event
     //

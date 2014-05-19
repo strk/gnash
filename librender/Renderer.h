@@ -221,7 +221,7 @@ public:
     /// that can later be passed to FillStyleX_bitmap(), to set a
     /// bitmap fill style.
     virtual CachedBitmap *
-        createCachedBitmap(std::auto_ptr<image::GnashImage> im) = 0;
+        createCachedBitmap(std::unique_ptr<image::GnashImage> im) = 0;
 
 
     /// ==================================================================
@@ -315,7 +315,7 @@ public:
     /// @param type     The type of image output required (PNG, JPEG, GIF).
     ///                 Note that not all FileTypes are images: rendering
     ///                 to an FLV will not work.
-    virtual void renderToImage(boost::shared_ptr<IOChannel> /*io*/,
+    virtual void renderToImage(std::unique_ptr<IOChannel> /*io*/,
         FileType /*type*/, int /*quality*/) const {
 
         log_debug(_("Rendering to image not implemented for this "

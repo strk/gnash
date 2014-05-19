@@ -298,7 +298,7 @@ Renderer_ovg::~Renderer_ovg()
 // bitmap fill style. We only cache the GnashImage here, as a
 // VGImage can't be created yet until the renderer is initialized.
 CachedBitmap *
-Renderer_ovg::createCachedBitmap(std::auto_ptr<image::GnashImage> im)
+Renderer_ovg::createCachedBitmap(std::unique_ptr<image::GnashImage> im)
 {
     // GNASH_REPORT_FUNCTION;
 

@@ -240,18 +240,18 @@ tu_file::close()
     std::fclose(_data);
 }
 
-std::auto_ptr<IOChannel>
+std::unique_ptr<IOChannel>
 makeFileChannel(FILE* fp, bool close)
 {
-    std::auto_ptr<IOChannel> ret(new tu_file(fp, close));
+    std::unique_ptr<IOChannel> ret(new tu_file(fp, close));
     return ret;
 }
 
-std::auto_ptr<IOChannel>
+std::unique_ptr<IOChannel>
 makeFileChannel(const char* filepath, const char* mode)
 {
 	FILE* fp = fopen(filepath, mode);
-	if ( fp == 0 ) { return std::auto_ptr<IOChannel>(0); }
+	if ( fp == 0 ) { return std::unique_ptr<IOChannel>(); }
 
 	return makeFileChannel(fp, true);
 }

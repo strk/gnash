@@ -24,7 +24,7 @@
 #include "tu_file.h"
 #include "IOChannel.h"
 
-#include <memory>               // for auto_ptr
+#include <memory>               // for unique_ptr
 #include <cstdio>
 #include <iostream>
 #include <cassert>
@@ -38,7 +38,7 @@ const char* post = NULL;
 static void
 dump_curl(const char* url, ostream& os)
 {
-	std::auto_ptr<gnash::IOChannel> reader;
+	std::unique_ptr<gnash::IOChannel> reader;
 	if ( post )
 	{
 		reader.reset( gnash::NetworkAdapter::make_stream(url, post) );
@@ -64,7 +64,7 @@ dump_curl(const char* url, ostream& os)
 static void
 dump_tu_file(const char* url, ostream& os)
 {
-    std::auto_ptr<IOChannel> reader = makeFileChannel(url, true);
+    std::unique_ptr<IOChannel> reader = makeFileChannel(url, true);
 	assert(reader);
 	if (reader->bad()) return;
 

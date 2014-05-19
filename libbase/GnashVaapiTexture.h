@@ -31,7 +31,7 @@ class VaapiSurfaceGLX;
 
 /// OpenGL texture abstraction
 class DSOEXPORT GnashVaapiTexture : public GnashTexture {
-    std::auto_ptr<VaapiSurfaceGLX> _surface;
+    std::unique_ptr<VaapiSurfaceGLX> _surface;
 
 public:
     GnashVaapiTexture(unsigned int width, unsigned int height, 

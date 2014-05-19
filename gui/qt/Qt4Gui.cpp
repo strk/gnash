@@ -493,7 +493,7 @@ Qt4Gui::showProperties()
             SIGNAL(clicked()), SLOT(close()));
 
 #ifdef USE_SWFTREE
-    std::auto_ptr<movie_root::InfoTree> infoptr = getMovieInfo();
+    std::unique_ptr<movie_root::InfoTree> infoptr = getMovieInfo();
     const movie_root::InfoTree& info = *infoptr;
 
     QTreeWidget *tree = new QTreeWidget();
@@ -678,7 +678,7 @@ Qt4Gui::setupMenus()
 void
 Qt4Gui::createMainMenu()
 {
-    std::auto_ptr<QMenuBar> mainMenu(new QMenuBar);
+    std::unique_ptr<QMenuBar> mainMenu(new QMenuBar);
 
     // Set up the menu bar.
     mainMenu->addMenu(fileMenu);

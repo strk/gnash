@@ -96,10 +96,10 @@ VideoFrameTag::loader(SWFStream& in, SWF::TagType tag, movie_definition& m,
 
     using namespace media;
 
-    std::auto_ptr<EncodedVideoFrame> frame(
+    std::unique_ptr<EncodedVideoFrame> frame(
             new EncodedVideoFrame(buffer, dataLength, frameNum));
 
-    vs->addVideoFrameTag(frame);
+    vs->addVideoFrameTag(std::move(frame));
 }
 
 } // namespace SWF

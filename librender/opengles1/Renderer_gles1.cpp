@@ -108,7 +108,7 @@ Renderer_gles1::init(float /* x */, float /* y */)
 }
 
 CachedBitmap *
-Renderer_gles1::createCachedBitmap(std::auto_ptr<gnash::image::GnashImage>)
+Renderer_gles1::createCachedBitmap(std::unique_ptr<gnash::image::GnashImage>)
 {
     GNASH_REPORT_FUNCTION;
 

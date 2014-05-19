@@ -24,7 +24,7 @@
 #include "Movie.h" // for createMovie
 #include "snappingrange.h" // for InvalidatedRanges typedef (don't like it)
 
-#include <memory> // for auto_ptr
+#include <memory> // for unique_ptr
 
 // Forward declarations
 namespace gnash {

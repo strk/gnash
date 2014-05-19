@@ -46,8 +46,8 @@ DefineFontTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     in.ensureBytes(2);
     const boost::uint16_t fontID = in.read_u16();
 
-    std::auto_ptr<DefineFontTag> ft(new DefineFontTag(in, m, tag, r));
-    boost::intrusive_ptr<Font> f(new Font(ft));
+    std::unique_ptr<DefineFontTag> ft(new DefineFontTag(in, m, tag, r));
+    boost::intrusive_ptr<Font> f(new Font(std::move(ft)));
 
     m.add_font(fontID, f);
 }
@@ -268,7 +268,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
         return;
     }
 
-    std::auto_ptr<Font::CodeTable> table(new Font::CodeTable);
+    std::unique_ptr<Font::CodeTable> table(new Font::CodeTable);
 
     readCodeTable(in, *table, wideCodes, _glyphTable.size());
     _codeTable.reset(table.release());
@@ -360,13 +360,13 @@ DefineFontInfoTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 
     const bool wideCodes = flags & (1 << 0);
 
-    std::auto_ptr<Font::CodeTable> table(new Font::CodeTable);
+    std::unique_ptr<Font::CodeTable> table(new Font::CodeTable);
 
     DefineFontTag::readCodeTable(in, *table, wideCodes, f->glyphCount());
 
     f->setName(name);
     f->setFlags(flags);
-    f->setCodeTable(table);
+    f->setCodeTable(std::move(table));
 }
 
 

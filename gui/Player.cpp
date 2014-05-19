@@ -335,9 +335,9 @@ Player::load_movie()
 
     try {
         if (_infile == "-") {
-            std::auto_ptr<IOChannel> in (
+            std::unique_ptr<IOChannel> in (
                 noseek_fd_adapter::make_stream(fileno(stdin)));
-            md = MovieFactory::makeMovie(in, _url, *_runResources, false);
+            md = MovieFactory::makeMovie(std::move(in), _url, *_runResources, false);
         }
         else {
             URL url(_infile);
@@ -416,10 +416,10 @@ Player::run(int argc, char* argv[], const std::string& infile,
     addDefaultLoaders(*loaders);
     _runResources->setTagLoaders(loaders);
 
-    std::auto_ptr<NamingPolicy> np(new IncrementalRename(_baseurl));
+    std::unique_ptr<NamingPolicy> np(new IncrementalRename(_baseurl));
 
     /// The StreamProvider uses the actual URL of the loaded movie.
-    boost::shared_ptr<StreamProvider> sp(new StreamProvider(_url, baseURL, np));
+    boost::shared_ptr<StreamProvider> sp(new StreamProvider(_url, baseURL, std::move(np)));
     _runResources->setStreamProvider(sp);
 
     // Set the Hardware video decoding resources. none, vaapi, omap
@@ -649,11 +649,11 @@ Player::run(int argc, char* argv[], const std::string& infile,
         }
         if (!last && v.empty()) return;
         
-        std::auto_ptr<ScreenShotter> ss(new ScreenShotter(_screenshotFile,
+        std::unique_ptr<ScreenShotter> ss(new ScreenShotter(_screenshotFile,
                                                           _screenshotQuality));
         if (last) ss->lastFrame();
         ss->setFrames(v);
-        _gui->setScreenShotter(ss);
+        _gui->setScreenShotter(std::move(ss));
     }
 
     _gui->run();
@@ -803,7 +803,7 @@ Player::CallbacksHandler::notify(const std::string& command,
 
 
 // private
-std::auto_ptr<Gui>
+std::unique_ptr<Gui>
 Player::getGui()
 {
 #ifdef GUI_GTK
@@ -850,7 +850,7 @@ Player::getGui()
     return createDumpGui(_windowID, _scale, _doLoop, *_runResources);
 #endif
 
-    return std::auto_ptr<Gui>(new NullGui(_doLoop, *_runResources));
+    return std::unique_ptr<Gui>(new NullGui(_doLoop, *_runResources));
 }
 
 Player::~Player()

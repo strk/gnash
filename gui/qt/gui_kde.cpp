@@ -32,12 +32,12 @@
 namespace gnash {
 
 #ifdef GUI_KDE3
-std::auto_ptr<Gui> createKDEGui(unsigned long windowid, float scale, bool do_loop, RunResources& r)
+std::unique_ptr<Gui> createKDEGui(unsigned long windowid, float scale, bool do_loop, RunResources& r)
 {
-	return std::auto_ptr<Gui>(new KdeGui(windowid, scale, do_loop, r));
+	return std::unique_ptr<Gui>(new KdeGui(windowid, scale, do_loop, r));
 }
 #else // ! GUI_KDE3
-std::auto_ptr<Gui> createKDEGui(unsigned long , float, bool, RunResourcesfloat , bool , unsigned int )
+std::unique_ptr<Gui> createKDEGui(unsigned long , float, bool, RunResourcesfloat , bool , unsigned int )
 {
 	throw GnashException("Support for KDE gui was not compiled in");
 }

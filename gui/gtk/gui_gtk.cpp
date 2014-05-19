@@ -33,12 +33,12 @@
 namespace gnash {
 
 #ifdef GUI_GTK
-std::auto_ptr<Gui> createGTKGui(unsigned long windowid, float scale, bool do_loop, RunResources& r)
+std::unique_ptr<Gui> createGTKGui(unsigned long windowid, float scale, bool do_loop, RunResources& r)
 {
-	return std::auto_ptr<Gui>(new GtkGui(windowid, scale, do_loop, r));
+	return std::unique_ptr<Gui>(new GtkGui(windowid, scale, do_loop, r));
 }
 #else // ! GUI_GTK
-std::auto_ptr<Gui> createGTKGui(unsigned long , float, bool, RunResourcesfloat , bool , unsigned int )
+std::unique_ptr<Gui> createGTKGui(unsigned long , float, bool, RunResourcesfloat , bool , unsigned int )
 {
 	throw GnashException("Support for GTK gui was not compiled in");
 }

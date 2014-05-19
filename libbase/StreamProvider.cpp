@@ -27,6 +27,7 @@
 #include "log.h"
 #include "rc.h" // for rcfile
 #include "NamingPolicy.h"
+#include "IOChannel.h"
 
 #include <cerrno>
 #include <cstring> // for strerror
@@ -39,9 +40,9 @@
 namespace gnash {
 
 StreamProvider::StreamProvider(const URL& orig, const URL& base,
-        std::auto_ptr<NamingPolicy> np)
+        std::unique_ptr<NamingPolicy> np)
     :
-    _namingPolicy(np),
+    _namingPolicy(std::move(np)),
     _base(base),
     _original(orig)
 {
@@ -53,11 +54,14 @@ StreamProvider::allow(const URL& url) const
     return URLAccessManager::allow(url, _original);
 }
 
-std::auto_ptr<IOChannel>
+struct dummy : public IOChannel
+{
+};
+
+std::unique_ptr<IOChannel>
 StreamProvider::getStream(const URL& url, bool namedCacheFile) const
 {
-
-    std::auto_ptr<IOChannel> stream;
+    std::unique_ptr<IOChannel> stream;
 
 	if (url.protocol() == "file") {
 
@@ -73,12 +77,12 @@ StreamProvider::getStream(const URL& url, bool namedCacheFile) const
 			if (0 > fd) {
 				log_error(_("Could not stdin (filename -): %2%"),
 				          std::strerror(errno));
-				return stream;
+				return nullptr;
 			}
 			FILE *newin = fdopen(fd, "rb");
 
 			// Close on destruction.
-			stream = makeFileChannel(newin, true);
+			stream = std::move(makeFileChannel(newin, true));
 			return stream;
 		}
 		else {
@@ -92,22 +96,22 @@ StreamProvider::getStream(const URL& url, bool namedCacheFile) const
 				return stream;
 			}
 			// Close on destruction
-			stream = makeFileChannel(newin, true);
+			stream = std::move(makeFileChannel(newin, true));
 			return stream;
 		}
 	}
 	else {
 		if (allow(url)) {
-			stream = NetworkAdapter::makeStream(url.str(), 
-                    namedCacheFile ? namingPolicy()(url) : "");
+			stream = std::move(NetworkAdapter::makeStream(url.str(), 
+                    namedCacheFile ? namingPolicy()(url) : ""));
 		}
 
-        // Will return 0 auto_ptr if not allowed.
+        // Will return 0 unique_ptr if not allowed.
 		return stream;
 	}
 }
 
-std::auto_ptr<IOChannel>
+std::unique_ptr<IOChannel>
 StreamProvider::getStream(const URL& url, const std::string& postdata,
         const NetworkAdapter::RequestHeaders& headers, bool namedCacheFile)
         const
@@ -125,16 +129,16 @@ StreamProvider::getStream(const URL& url, const std::string& postdata,
                     namedCacheFile ? namingPolicy()(url) : "");
 	}
 
-	return std::auto_ptr<IOChannel>();
+	return std::unique_ptr<IOChannel>();
 
 }
 
-std::auto_ptr<IOChannel>
+std::unique_ptr<IOChannel>
 StreamProvider::getStream(const URL& url, const std::string& postdata,
        bool namedCacheFile) const
 {
 
-    std::auto_ptr<IOChannel> stream;
+    std::unique_ptr<IOChannel> stream;
 
 	if (url.protocol() == "file") {
         if (!postdata.empty()) {    
@@ -165,7 +169,7 @@ StreamProvider::getStream(const URL& url, const std::string& postdata,
 			stream = NetworkAdapter::makeStream(url.str(), postdata,
                     namedCacheFile ? namingPolicy()(url) : "");
 		}
-        // Will return 0 auto_ptr if not allowed.
+        // Will return 0 unique_ptr if not allowed.
 		return stream;		
 
 	}

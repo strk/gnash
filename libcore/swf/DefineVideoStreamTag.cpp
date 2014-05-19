@@ -60,7 +60,7 @@ DefineVideoStreamTag::loader(SWFStream& in, SWF::TagType tag,
     in.ensureBytes(2);
     boost::uint16_t id = in.read_u16();
 
-    std::auto_ptr<DefineVideoStreamTag> vs(new DefineVideoStreamTag(in, id));
+    std::unique_ptr<DefineVideoStreamTag> vs(new DefineVideoStreamTag(in, id));
 
     m.addDisplayObject(id, vs.release());
 
@@ -106,10 +106,10 @@ DefineVideoStreamTag::read(SWFStream& in)
 
 void
 DefineVideoStreamTag::addVideoFrameTag(
-        std::auto_ptr<media::EncodedVideoFrame> frame)
+        std::unique_ptr<media::EncodedVideoFrame> frame)
 {
 	boost::mutex::scoped_lock lock(_video_mutex);
-    _video_frames.push_back(frame);
+    _video_frames.push_back(frame.release());
 }
 
 DisplayObject*

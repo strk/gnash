@@ -304,10 +304,10 @@ GifInput::read()
 
 } // unnamed namespace
 
-std::auto_ptr<Input>
+std::unique_ptr<Input>
 createGifInput(boost::shared_ptr<IOChannel> in)
 {
-    std::auto_ptr<Input> ret(new GifInput(in));
+    std::unique_ptr<Input> ret(new GifInput(in));
     ret->read();
     return ret;
 }

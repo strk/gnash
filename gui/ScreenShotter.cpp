@@ -92,8 +92,8 @@ ScreenShotter::saveImage(const Renderer& r, const std::string& id) const
     
     FILE* f = std::fopen(outfile.c_str(), "wb");
     if (f) {
-        boost::shared_ptr<IOChannel> t(makeFileChannel(f, true));
-        r.renderToImage(t, _type, _quality);
+        std::unique_ptr<IOChannel> t(makeFileChannel(f, true));
+        r.renderToImage(std::move(t), _type, _quality);
     }
     else {
         log_error(_("Failed to open screenshot file \"%s\"!"), outfile);

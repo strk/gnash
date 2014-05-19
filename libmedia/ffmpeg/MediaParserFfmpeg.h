@@ -80,7 +80,7 @@ public:
 	//
 	/// Can throw a GnashException if input format couldn't be detected
 	///
-	MediaParserFfmpeg(std::auto_ptr<IOChannel> stream);
+	MediaParserFfmpeg(std::unique_ptr<IOChannel> stream);
 
 	~MediaParserFfmpeg();
 

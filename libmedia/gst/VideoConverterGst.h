@@ -38,7 +38,7 @@ public:
     
     ~VideoConverterGst();
   
-    std::auto_ptr<ImgBuf> convert(const ImgBuf& src);
+    std::unique_ptr<ImgBuf> convert(const ImgBuf& src);
     
     bool init(const ImgBuf& src);
   

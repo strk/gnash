@@ -102,8 +102,8 @@ public:
     void resize(int width, int height);
     void quitUI();
  private:
-    std::auto_ptr<QApplication>  _qapp;
-    std::auto_ptr<qwidget>       _qwidget;
+    std::unique_ptr<QApplication>  _qapp;
+    std::unique_ptr<qwidget>       _qwidget;
     GLUE                         _glue;    
 
     gnash::key::code qtToGnashKey(QKeyEvent *event);

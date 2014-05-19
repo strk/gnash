@@ -376,7 +376,7 @@ test_renderer(Renderer *renderer, const std::string &type)
 #endif
     
     image::GnashImage *frame1 = new image::ImageRGBA(10, 12);
-    std::auto_ptr<image::GnashImage> im1(frame1);
+    std::unique_ptr<image::GnashImage> im1(frame1);
     CachedBitmap *cb = renderer->createCachedBitmap(im1);
     if (cb) {
         image::GnashImage &gi = cb->image();
@@ -472,7 +472,7 @@ test_renderer(Renderer *renderer, const std::string &type)
 //   drawglyph.stop();
 
 #if 0
-    boost::shared_ptr<IOChannel> io;
+    std::unique_ptr<IOChannel> io;
     FileType ftype;
     Timer renderi("renderToImage");
     renderer->renderToImage(io, ftype);
@@ -482,7 +482,7 @@ test_renderer(Renderer *renderer, const std::string &type)
 
     CachedBitmap *bitmap = 0;
     image::GnashImage *frame2 = new image::ImageRGBA(10, 10);
-    std::auto_ptr<image::GnashImage> im(frame2);
+    std::unique_ptr<image::GnashImage> im(frame2);
     Timer cbit("createCachedBitmap");
     bitmap = renderer->createCachedBitmap(im);
     cbit.stop();
@@ -600,7 +600,7 @@ test_iterators(Renderer *renderer, const std::string &type)
     image::GnashImage *frame = new image::ImageRGBA(10, 10);
     // gnash::GnashVaapiImage *foo = static_cast<gnash::GnashVaapiImage *>(frame);
     // gnash::GnashVaapiImageProxy *bar = new gnash::GnashVaapiImageProxy(foo, a.x, a.y, c.x - a.x, c.y - a.y);
-    std::auto_ptr<image::GnashImage> rgba(frame);
+    std::unique_ptr<image::GnashImage> rgba(frame);
 //    image.reset(new gnash::GnashVaapiImageProxy(foo, a.x, a.y, c.x - a.x, c.y - a.y));
 
     renderer->addRenderImage(image);
@@ -638,7 +638,7 @@ test_iterators(Renderer *renderer, const std::string &type)
 #if 0
 FIXME:
  add tests for
-Renderer_ovg::createBitmapInfo(std::auto_ptr<GnashImage> im)
+Renderer_ovg::createBitmapInfo(std::unique_ptr<GnashImage> im)
 #endif
 
 // Local Variables:

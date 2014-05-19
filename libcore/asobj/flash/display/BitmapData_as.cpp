@@ -597,7 +597,7 @@ private:
 } // anonymous namespace
 
 BitmapData_as::BitmapData_as(as_object* owner,
-        std::auto_ptr<image::GnashImage> im)
+        std::unique_ptr<image::GnashImage> im)
     :
     _owner(owner),
     _cachedBitmap(0)
@@ -607,7 +607,7 @@ BitmapData_as::BitmapData_as(as_object* owner,
     
     // If there is a renderer, cache the image there, otherwise we store it.
     Renderer* r = getRunResources(*_owner).renderer();
-    if (r) _cachedBitmap = r->createCachedBitmap(im);
+    if (r) _cachedBitmap = r->createCachedBitmap(std::move(im));
     else _image.reset(im.release());
 }
     
@@ -728,7 +728,7 @@ bitmapdata_clone(const fn_call& fn)
     const size_t width = bm->width();
     const size_t height = bm->height();
 
-    std::auto_ptr<image::GnashImage> im;
+    std::unique_ptr<image::GnashImage> im;
     if (bm->transparent()) {
         im.reset(new image::ImageRGBA(width, height));
     }
@@ -746,7 +746,7 @@ bitmapdata_clone(const fn_call& fn)
         ret->set_member(NSV::PROP_uuPROTOuu, proto);
     }
 
-    ret->setRelay(new BitmapData_as(ret, im));
+    ret->setRelay(new BitmapData_as(ret, std::move(im)));
 
     return as_value(ret);
 }
@@ -1617,7 +1617,7 @@ bitmapdata_loadBitmap(const fn_call& fn)
         return as_value();
     }
  
-    std::auto_ptr<image::GnashImage> newImage;
+    std::unique_ptr<image::GnashImage> newImage;
     if (im.type() == image::TYPE_RGBA) {
         newImage.reset(new image::ImageRGBA(width, height));
     }
@@ -1631,7 +1631,7 @@ bitmapdata_loadBitmap(const fn_call& fn)
     ret->set_member(NSV::PROP_uuPROTOuu, getMember(*ptr, NSV::PROP_PROTOTYPE));
     
     newImage->update(im.begin());
-    ret->setRelay(new BitmapData_as(ret, newImage));
+    ret->setRelay(new BitmapData_as(ret, std::move(newImage)));
 
     return as_value(ret);
 }
@@ -1675,7 +1675,7 @@ bitmapdata_ctor(const fn_call& fn)
         throw ActionTypeError();
     }
 
-    std::auto_ptr<image::GnashImage> im;
+    std::unique_ptr<image::GnashImage> im;
     if (transparent) {
         im.reset(new image::ImageRGBA(width, height));
     }
@@ -1691,7 +1691,7 @@ bitmapdata_ctor(const fn_call& fn)
     std::fill(image::begin<image::ARGB>(*im), image::end<image::ARGB>(*im),
             fillColor);
 
-    ptr->setRelay(new BitmapData_as(ptr, im));
+    ptr->setRelay(new BitmapData_as(ptr, std::move(im)));
 
     return as_value(); 
 }

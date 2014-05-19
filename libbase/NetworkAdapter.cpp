@@ -43,16 +43,16 @@ namespace gnash {
 
 // Stub for warning about access when no libcurl is defined.
 
-std::auto_ptr<IOChannel>
+std::unique_ptr<IOChannel>
 NetworkAdapter::makeStream(const std::string& /*url*/, 
         const std::string& /*cachefile*/)
 {
     log_error(_("libcurl is not available, but "
                 "Gnash has attempted to use the curl adapter"));
-    return std::auto_ptr<IOChannel>();
+    return std::unique_ptr<IOChannel>();
 }
 
-std::auto_ptr<IOChannel>
+std::unique_ptr<IOChannel>
 NetworkAdapter::makeStream(const std::string& url,
         const std::string& /*postdata*/,
         const std::string& cachefile)
@@ -60,7 +60,7 @@ NetworkAdapter::makeStream(const std::string& url,
     return makeStream(url, cachefile);
 }
 
-std::auto_ptr<IOChannel>
+std::unique_ptr<IOChannel>
 NetworkAdapter::makeStream(const std::string& url,
            const std::string& /*postdata*/,
             const RequestHeaders& /*headers*/,
@@ -1337,14 +1337,14 @@ CurlSession::exportCookies()
 // Exported interfaces
 //-------------------------------------------
 
-std::auto_ptr<IOChannel>
+std::unique_ptr<IOChannel>
 NetworkAdapter::makeStream(const std::string& url, const std::string& cachefile)
 {
 #ifdef GNASH_CURL_VERBOSE
     log_debug("making curl stream for %s", url);
 #endif
 
-    std::auto_ptr<IOChannel> stream;
+    std::unique_ptr<IOChannel> stream;
 
     try {
         stream.reset(new CurlStreamFile(url, cachefile));
@@ -1355,7 +1355,7 @@ NetworkAdapter::makeStream(const std::string& url, const std::string& cachefile)
     return stream;
 }
 
-std::auto_ptr<IOChannel>
+std::unique_ptr<IOChannel>
 NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
         const std::string& cachefile)
 {
@@ -1363,7 +1363,7 @@ NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
     log_debug("making curl stream for %s", url);
 #endif
 
-    std::auto_ptr<IOChannel> stream;
+    std::unique_ptr<IOChannel> stream;
 
     try {
         stream.reset(new CurlStreamFile(url, postdata, cachefile));
@@ -1374,12 +1374,12 @@ NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
     return stream;
 }
 
-std::auto_ptr<IOChannel>
+std::unique_ptr<IOChannel>
 NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
         const RequestHeaders& headers, const std::string& cachefile)
 {
 
-    std::auto_ptr<IOChannel> stream;
+    std::unique_ptr<IOChannel> stream;
 
     try {
         stream.reset(new CurlStreamFile(url, postdata, headers, cachefile));

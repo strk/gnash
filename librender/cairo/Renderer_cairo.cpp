@@ -461,7 +461,7 @@ Renderer_cairo::~Renderer_cairo()
 }
 
 CachedBitmap*
-Renderer_cairo::createCachedBitmap(std::auto_ptr<image::GnashImage> im) 
+Renderer_cairo::createCachedBitmap(std::unique_ptr<image::GnashImage> im) 
 {
     int buf_size = im->width() * im->height() * 4;
     boost::uint8_t* buffer = new boost::uint8_t[buf_size];

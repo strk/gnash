@@ -87,7 +87,7 @@ public:
 			in.read_string(name);
 		}
 
-        std::auto_ptr<abc::AbcBlock> block(new abc::AbcBlock());
+        std::unique_ptr<abc::AbcBlock> block(new abc::AbcBlock());
 		if (!block->read(in)) {
             log_error("ABC parsing error while processing DoABCTag. This "
                     "tag will never be executed");

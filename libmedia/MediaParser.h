@@ -277,7 +277,7 @@ public:
     //
     /// Could be ExtraVideoInfoFlv or a media-handler specific info
     ///
-	std::auto_ptr<ExtraInfo> extra;
+	std::unique_ptr<ExtraInfo> extra;
 };
 
 /// Information about a video stream 
@@ -352,7 +352,7 @@ public:
     //
     /// Could be ExtraAudioInfoFlv or a media-handler specific info
     ///
-	std::auto_ptr<ExtraInfo> extra;
+	std::unique_ptr<ExtraInfo> extra;
 };
 
 DSOEXPORT std::ostream& operator << (std::ostream& os, const VideoInfo& vi);
@@ -407,7 +407,7 @@ public:
 	unsigned frameNum() const { return _frameNum; }
 
 	// FIXME: should have better encapsulation for this sort of stuff.
-	std::auto_ptr<EncodedExtraData> extradata;
+	std::unique_ptr<EncodedExtraData> extradata;
 private:
 
 	boost::uint32_t _size;
@@ -425,7 +425,7 @@ public:
 	boost::uint64_t timestamp;
 
 	// FIXME: should have better encapsulation for this sort of stuff.
-	std::auto_ptr<EncodedExtraData> extradata;
+	std::unique_ptr<EncodedExtraData> extradata;
 };
 
 /// The MediaParser class provides cursor-based access to encoded %media frames 
@@ -443,11 +443,12 @@ public:
     /// A container for executable MetaTags contained in media streams.
     //
     /// Presently only known in FLV.
-    typedef std::multimap<boost::uint64_t, boost::shared_ptr<SimpleBuffer> >
+    typedef std::multimap<boost::uint64_t, std::shared_ptr<SimpleBuffer> >
         MetaTags;
     
     typedef std::vector<MetaTags::mapped_type> OrderedMetaTags;
-        MediaParser(std::auto_ptr<IOChannel> stream);
+
+        MediaParser(std::unique_ptr<IOChannel> stream);
 
 	// Classes with virtual methods (virtual classes)
 	// must have a virtual destructor, or the destructors
@@ -527,7 +528,7 @@ public:
 	/// you can check with parsingCompleted() to know wheter this is due to 
 	/// EOF reached.
 	///
-	DSOEXPORT std::auto_ptr<EncodedVideoFrame> nextVideoFrame();
+	DSOEXPORT std::unique_ptr<EncodedVideoFrame> nextVideoFrame();
 
 	/// Get timestamp of the audio frame which would be returned on nextAudioFrame
 	//
@@ -545,7 +546,7 @@ public:
 	/// you can check with parsingCompleted() to know wheter this is due to 
 	/// EOF reached.
 	///
-	DSOEXPORT std::auto_ptr<EncodedAudioFrame> nextAudioFrame();
+	DSOEXPORT std::unique_ptr<EncodedAudioFrame> nextAudioFrame();
 
 	/// Returns a VideoInfo class about the videostream
 	//
@@ -621,10 +622,10 @@ protected:
 	/// Subclasses *must* set the following variables: @{ 
 
 	/// Info about the video stream (if any)
-	std::auto_ptr<VideoInfo> _videoInfo;
+	std::unique_ptr<VideoInfo> _videoInfo;
 
 	/// Info about the audio stream (if any)
-	std::auto_ptr<AudioInfo> _audioInfo;
+	std::unique_ptr<AudioInfo> _audioInfo;
 
 	/// Whether the parsing is complete or not
 	bool _parsingComplete;
@@ -653,16 +654,16 @@ protected:
 	//
 	/// Will wait on a condition if buffer is full or parsing was completed
 	///
-	void pushEncodedAudioFrame(std::auto_ptr<EncodedAudioFrame> frame);
+	void pushEncodedAudioFrame(std::unique_ptr<EncodedAudioFrame> frame);
 
 	/// Push an encoded video frame to buffer.
 	//
 	/// Will wait on a condition if buffer is full or parsing was completed
 	///
-	void pushEncodedVideoFrame(std::auto_ptr<EncodedVideoFrame> frame);
+	void pushEncodedVideoFrame(std::unique_ptr<EncodedVideoFrame> frame);
 
 	/// The stream used to access the file
-	std::auto_ptr<IOChannel> _stream;
+	std::unique_ptr<IOChannel> _stream;
 	mutable boost::mutex _streamMutex;
 
 	static void parserLoopStarter(MediaParser* mp)
@@ -689,7 +690,7 @@ protected:
 	boost::uint64_t _bufferTime;
 	mutable boost::mutex _bufferTimeMutex;
 
-	std::auto_ptr<boost::thread> _parserThread;
+	std::unique_ptr<boost::thread> _parserThread;
 	boost::barrier _parserThreadStartBarrier;
 	mutable boost::mutex _parserThreadKillRequestMutex;
 	bool _parserThreadKillRequested;

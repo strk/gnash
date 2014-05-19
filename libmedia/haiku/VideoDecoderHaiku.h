@@ -47,7 +47,7 @@ public:
 
     void push(const EncodedVideoFrame& buffer);
 
-    std::auto_ptr<GnashImage> pop();
+    std::unique_ptr<GnashImage> pop();
   
     bool peek();
 

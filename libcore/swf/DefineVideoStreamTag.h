@@ -153,7 +153,7 @@ public:
         return (upper - lower);
     }
     
-    void addVideoFrameTag(std::auto_ptr<media::EncodedVideoFrame> frame);
+    void addVideoFrameTag(std::unique_ptr<media::EncodedVideoFrame> frame);
 
 private:
 
@@ -213,7 +213,7 @@ private:
 	//
 	/// TODO: drop _width/_height/m_codec_id leaving all in this member
     /// instead ?
-	std::auto_ptr<media::VideoInfo> _videoInfo;
+	std::unique_ptr<media::VideoInfo> _videoInfo;
 
 };
 

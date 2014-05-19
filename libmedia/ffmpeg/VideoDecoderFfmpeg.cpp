@@ -255,7 +255,7 @@ VideoDecoderFfmpeg::height() const
     return _videoCodecCtx->getContext()->height;
 }
 
-std::auto_ptr<image::GnashImage>
+std::unique_ptr<image::GnashImage>
 VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
                                  const AVFrame& srcFrameRef)
 {
@@ -272,7 +272,7 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
     PixelFormat pixFmt = PIX_FMT_RGB24;
 #endif 
 
-    std::auto_ptr<image::GnashImage> im;
+    std::unique_ptr<image::GnashImage> im;
 
 #ifdef HAVE_VA_VA_H
     VaapiContextFfmpeg * const vactx = get_vaapi_context(srcCtx);
@@ -358,7 +358,7 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
 
 }
 
-std::auto_ptr<image::GnashImage>
+std::unique_ptr<image::GnashImage>
 VideoDecoderFfmpeg::decode(const boost::uint8_t* input,
         boost::uint32_t input_size)
 {
@@ -366,7 +366,7 @@ VideoDecoderFfmpeg::decode(const boost::uint8_t* input,
     // do anything anyway.
     assert(_videoCodecCtx.get());
 
-    std::auto_ptr<image::GnashImage> ret;
+    std::unique_ptr<image::GnashImage> ret;
 
     AVFrame* frame = FRAMEALLOC();
     if ( ! frame ) {
@@ -408,10 +408,10 @@ VideoDecoderFfmpeg::push(const EncodedVideoFrame& buffer)
     _video_frames.push_back(&buffer);
 }
 
-std::auto_ptr<image::GnashImage>
+std::unique_ptr<image::GnashImage>
 VideoDecoderFfmpeg::pop()
 {
-    std::auto_ptr<image::GnashImage> ret;
+    std::unique_ptr<image::GnashImage> ret;
 
     for (std::vector<const EncodedVideoFrame*>::iterator it =
              _video_frames.begin(), end = _video_frames.end(); it != end; ++it) {

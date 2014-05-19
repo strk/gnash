@@ -59,10 +59,10 @@ VideoDecoderHaiku::push(const EncodedVideoFrame& frame)
 }
   
 
-std::auto_ptr<GnashImage>
+std::unique_ptr<GnashImage>
 VideoDecoderHaiku::pop()
 {
-    std::auto_ptr<GnashImage> ret;
+    std::unique_ptr<GnashImage> ret;
     ret.reset(new ImageRGB(100, 100));
     boost::uint8_t *d =
         new boost::uint8_t[100*100*4];

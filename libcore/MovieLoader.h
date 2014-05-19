@@ -204,7 +204,7 @@ private:
     /// needed for some facilities like find_character_by_target
     movie_root& _movieRoot;
 
-    std::auto_ptr<boost::thread> _thread;
+    std::unique_ptr<boost::thread> _thread;
 
 	// Barrier to ensure that _thread
 	// is initialized before the loader thread

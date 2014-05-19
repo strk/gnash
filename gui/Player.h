@@ -250,7 +250,7 @@ private:
         const Player& _player;
     };
     
-    std::auto_ptr<CallbacksHandler> _callbacksHandler;
+    std::shared_ptr<CallbacksHandler> _callbacksHandler;
     
     void init();
     
@@ -281,7 +281,7 @@ private:
     //
     /// Uses the USE_<guiname> macros to find out which one
     ///
-    std::auto_ptr<Gui> getGui();
+    std::unique_ptr<Gui> getGui();
     
     void setFlashVars(const std::string& varstr);
 
@@ -327,10 +327,10 @@ private:
     //
     /// This must be kept alive for the entire lifetime of the movie_root
     /// (currently: of the Gui).
-    std::auto_ptr<RunResources> _runResources;
+    std::shared_ptr<RunResources> _runResources;
     
     /// This must be initialized after _runResources
-    std::auto_ptr<Gui> _gui;
+    std::shared_ptr<Gui> _gui;
     
     std::string         _url;
     

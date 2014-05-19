@@ -56,7 +56,7 @@ class KdeAggGlue : public KdeGlue
     Renderer* _renderer; // We don't own this pointer.
     geometry::Range2d<int> _validbounds;
     std::vector< geometry::Range2d<int> > _drawbounds;
-    std::auto_ptr<QImage> _qimage;
+    std::unique_ptr<QImage> _qimage;
 };
 
 

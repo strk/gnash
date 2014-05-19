@@ -118,7 +118,7 @@ public:
     /// @param sinfo        A SoundInfo object containing info about
     ///                     samplerate, samplecount, stereo etc.
     /// @return             handle for later identification.
-    virtual int create_sound(std::auto_ptr<SimpleBuffer> data,
+    virtual int create_sound(std::unique_ptr<SimpleBuffer> data,
             const media::SoundInfo& sinfo);
         
     /// Remove scheduled requests to play the specified sound buffer slot
@@ -244,7 +244,7 @@ public:
     ///                     to add data to
     /// @return             a handler for the new block for use in playStream()
     /// @throw              SoundException on error
-    virtual StreamBlockId addSoundBlock(std::auto_ptr<SimpleBuffer> data,
+    virtual StreamBlockId addSoundBlock(std::unique_ptr<SimpleBuffer> data,
                size_t sampleCount, int seekSamples, int streamId);
 
     /// Returns a SoundInfo object for the sound with the given id.
@@ -473,7 +473,7 @@ protected:
     /// @param in
     ///     The InputStream to plug, ownership transferred
     ///
-    virtual void plugInputStream(std::auto_ptr<InputStream> in);
+    virtual void plugInputStream(std::unique_ptr<InputStream> in);
 
     /// Unplug all input streams
     virtual void unplugAllInputStreams();

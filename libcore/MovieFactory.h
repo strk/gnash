@@ -111,7 +111,7 @@ public:
     /// is initialized. Initializing the VirtualMachine requires a target
     /// SWF version, which can be found in the SWF header.
     static DSOEXPORT boost::intrusive_ptr<movie_definition> makeMovie(
-            std::auto_ptr<IOChannel> in, const std::string& url,
+            std::unique_ptr<IOChannel> in, const std::string& url,
             const RunResources& runResources, bool startLoaderThread);
 
     /// Clear the MovieFactory resources

@@ -85,7 +85,7 @@ DefineButtonTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         log_parse(_("  DefineButton loader: character id = %d"), id);
     );
 
-    std::auto_ptr<DefineButtonTag> bt(new DefineButtonTag(in, m, tag, id));
+    std::unique_ptr<DefineButtonTag> bt(new DefineButtonTag(in, m, tag, id));
 
     m.addDisplayObject(id, bt.release());
 }
@@ -102,7 +102,7 @@ DefineButton2Tag::loader(SWFStream& in, TagType tag, movie_definition& m,
         log_parse(_("  DefineButton2 loader: chararacter id = %d"), id);
     );
 
-    std::auto_ptr<DefineButtonTag> bt(new DefineButtonTag(in, m, tag, id));
+    std::unique_ptr<DefineButtonTag> bt(new DefineButtonTag(in, m, tag, id));
 
     m.addDisplayObject(id, bt.release());
 }

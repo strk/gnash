@@ -73,7 +73,7 @@ namespace gnash
 SWFMovieLoader::SWFMovieLoader(SWFMovieDefinition& md)
     :
     _movie_def(md),
-    _thread(NULL),
+    _thread(),
     _barrier(2) // us and the main thread..
 {
 }
@@ -157,7 +157,7 @@ SWFMovieDefinition::SWFMovieDefinition(const RunResources& runResources)
     _bytes_loaded(0),
     m_loading_sound_stream(-1),
     m_file_length(0),
-    m_jpeg_in(0),
+    m_jpeg_in(),
     _swf_end_pos(0),
     _loader(*this),
     _loadingCanceled(false),
@@ -261,11 +261,11 @@ SWFMovieDefinition::add_sound_sample(int id, sound_sample* sam)
 
 // Read header and assign url
 bool
-SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
+SWFMovieDefinition::readHeader(std::unique_ptr<IOChannel> in,
         const std::string& url)
 {
 
-    _in = in;
+    _in = std::move(in);
 
     // we only read a movie once
     assert(!_str.get());
@@ -302,7 +302,7 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
         );
 
         // Uncompress the input as we read it.
-        _in = zlib_adapter::make_inflater(_in);
+        _in = std::move(zlib_adapter::make_inflater(std::move(_in)));
 #endif
     }
 
@@ -593,7 +593,7 @@ SWFMovieDefinition::get_labeled_frame(const std::string& label,
 }
 
 void
-SWFMovieDefinition::set_jpeg_loader(std::auto_ptr<image::JpegInput> j_in)
+SWFMovieDefinition::set_jpeg_loader(std::unique_ptr<image::JpegInput> j_in)
 {
     if (m_jpeg_in.get()) {
         /// There should be only one JPEGTABLES tag in an SWF (see: 
@@ -606,7 +606,7 @@ SWFMovieDefinition::set_jpeg_loader(std::auto_ptr<image::JpegInput> j_in)
                     "resetting JPEG loader"));
         return;
     }
-    m_jpeg_in = j_in;
+    m_jpeg_in = std::move(j_in);
 }
 
 boost::uint16_t

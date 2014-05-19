@@ -301,7 +301,7 @@ GtkAggVaapiGlue::getVideoWindow(boost::shared_ptr<VaapiSurface> surface,
         return NULL;
 
     if (!context->getData()) {
-        std::auto_ptr<VaapiContextData> contextData;
+        std::unique_ptr<VaapiContextData> contextData;
         contextData.reset(new VaapiVideoWindow(parent_window, rect));
         if (!contextData.get())
             return NULL;
