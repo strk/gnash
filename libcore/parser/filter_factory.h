@@ -20,6 +20,7 @@
 #define GNASH_FILTER_FACTORY_H
 
 #include <vector>
+#include <memory>
 
 namespace gnash {
     class SWFStream;
