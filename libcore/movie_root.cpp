@@ -821,7 +821,9 @@ movie_root::addIntervalTimer(std::unique_ptr<Timer> timer)
 
     assert(_intervalTimers.find(id) == _intervalTimers.end());
 
-    _intervalTimers.insert(std::make_pair(id, std::move(timer)));
+    boost::shared_ptr<Timer> addTimer(timer.release());
+
+    _intervalTimers.insert(std::make_pair(id, addTimer));
 
     return id;
 }
