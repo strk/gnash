@@ -21,6 +21,7 @@
 #ifndef GNASH_EXTERNALINTERFACE_H
 #define GNASH_EXTERNALINTERFACE_H
 
+#include <memory>
 #include <string>
 #include <vector>
 #include <set>
