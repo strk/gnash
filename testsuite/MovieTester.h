@@ -39,7 +39,6 @@
 #include <vector>
 #include <memory> // for unique_ptr
 #include <string> 
-#include <boost/shared_ptr.hpp>
 #include <cmath>
 
 #define check_pixel(x, y, radius, color, tolerance) \

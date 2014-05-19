@@ -29,7 +29,6 @@
 #include <cstdio>
 
 #include <boost/cstdint.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/detail/endian.hpp>
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/uniform_int.hpp>

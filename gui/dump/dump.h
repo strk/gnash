@@ -30,7 +30,6 @@
 #include <string>
 #include <fstream>
 #include <boost/scoped_array.hpp>
-#include <boost/shared_ptr.hpp>
 
 namespace gnash {
     namespace sound {

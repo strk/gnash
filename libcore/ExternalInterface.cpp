@@ -24,7 +24,6 @@
 #include <vector>
 #include <sstream>
 #include <boost/algorithm/string/erase.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/scoped_array.hpp>
 #include <algorithm>
 

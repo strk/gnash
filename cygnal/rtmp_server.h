@@ -21,7 +21,6 @@
 
 #include <vector>
 #include <boost/cstdint.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/array.hpp>
 #include <string>
 #include <map>

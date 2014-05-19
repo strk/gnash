@@ -24,7 +24,6 @@
 #endif
 
 #include <boost/scoped_array.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/cstdint.hpp>
 #include <vector>
 

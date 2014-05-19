@@ -26,7 +26,6 @@
 
 #include <string>
 #include <boost/scoped_ptr.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/cstdint.hpp>
 #include <memory>
 #include <vector>

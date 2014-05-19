@@ -27,7 +27,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <ctime>
-#include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 
 #if !defined(_MSC_VER)

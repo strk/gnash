@@ -26,7 +26,6 @@
 #include "element.h"
 #include "amfutf8.h"
 
-#include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
 #include <map>

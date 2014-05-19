@@ -45,7 +45,6 @@
 # include <io.h>
 #endif
 
-#include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/thread/mutex.hpp>

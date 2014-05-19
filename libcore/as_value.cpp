@@ -20,7 +20,6 @@
 
 #include "as_value.h"
 
-#include <boost/shared_ptr.hpp>
 #include <cmath> 
 #include <cctype> 
 #include <boost/lexical_cast.hpp>

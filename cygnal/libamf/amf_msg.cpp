@@ -27,7 +27,6 @@
 #include "network.h"
 #include "GnashSystemNetHeaders.h"
 
-#include <boost/shared_ptr.hpp>
 #include <string>
 #include <boost/cstdint.hpp> // For C99 int types
 

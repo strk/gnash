@@ -28,7 +28,6 @@
 #include <vector>
 #include <cerrno>
 #include <boost/detail/endian.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/format.hpp>
 
 #if ! (defined(_WIN32) || defined(WIN32))

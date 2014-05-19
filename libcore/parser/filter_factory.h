@@ -20,7 +20,6 @@
 #define GNASH_FILTER_FACTORY_H
 
 #include <vector>
-#include <boost/shared_ptr.hpp>
 
 namespace gnash {
     class SWFStream;

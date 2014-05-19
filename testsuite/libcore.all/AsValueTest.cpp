@@ -39,7 +39,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <iostream>
-#include <boost/shared_ptr.hpp>
 
 #include <sys/types.h>
 #include <sys/stat.h>

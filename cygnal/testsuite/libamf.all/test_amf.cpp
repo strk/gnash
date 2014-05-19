@@ -31,7 +31,6 @@
 #include <log.h>
 #include <iostream>
 #include <string>
-#include <boost/shared_ptr.hpp>
 #include "GnashException.h"
 #include "check.h"
 //#include "dejagnu.h"

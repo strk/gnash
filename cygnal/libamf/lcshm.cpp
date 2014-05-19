@@ -22,7 +22,6 @@
 #include <string>
 #include <cstring>
 #include <boost/cstdint.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include "log.h"
 #include "buffer.h"

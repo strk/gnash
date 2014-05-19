@@ -19,7 +19,6 @@
 
 #include "LocalConnection_as.h"
 
-#include <boost/shared_ptr.hpp>
 #include <cerrno>
 #include <cstring>
 #include <boost/cstdint.hpp> // for boost::?int??_t

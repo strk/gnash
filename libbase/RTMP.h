@@ -20,7 +20,6 @@
 #define GNASH_RTMP_H
 
 #include <boost/cstdint.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <deque>
 #include <map>

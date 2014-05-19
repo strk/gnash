@@ -23,7 +23,6 @@
 #include "GnashFileUtilities.h"
 #include "GnashSystemNetHeaders.h"
 
-#include <boost/shared_ptr.hpp>
 #include <dirent.h>
 #include <iostream>
 #include <cstdarg>

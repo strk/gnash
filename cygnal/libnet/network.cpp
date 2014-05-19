@@ -22,7 +22,6 @@
 #endif
 
 #include <boost/thread/mutex.hpp>
-#include <boost/shared_ptr.hpp>
 #include <vector>
 
 #include "utility.h"

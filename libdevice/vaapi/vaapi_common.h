@@ -32,7 +32,6 @@
 #include <memory>
 #include <stdint.h>
 #include <boost/cstdint.hpp>
-#include <boost/shared_ptr.hpp>
 #include "dsodefs.h"
 
 #endif // GNASH_VAAPI_COMMON_H

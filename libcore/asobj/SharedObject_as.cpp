@@ -25,7 +25,6 @@
 #include "SharedObject_as.h"
 
 #include <boost/scoped_array.hpp>
-#include <boost/shared_ptr.hpp>
 #include <cstdio>
 
 #include "movie_root.h"

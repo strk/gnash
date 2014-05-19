@@ -24,7 +24,6 @@
 #include <cstring>
 #include <iostream> // for output operator
 #include <boost/cstdint.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 
 //#include "network.h"

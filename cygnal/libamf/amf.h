@@ -30,7 +30,6 @@
 #include <string>
 #include <cstring>
 #include <boost/cstdint.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include "element.h"
 #include "dsodefs.h"

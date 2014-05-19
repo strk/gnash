@@ -24,7 +24,6 @@
 #include <sys/mman.h>
 #include <cstring>
 #include <boost/cstdint.hpp>
-#include <boost/shared_ptr.hpp>
 #include <fcntl.h>
 
 #include "log.h"

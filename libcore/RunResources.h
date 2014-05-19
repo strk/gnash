@@ -22,7 +22,6 @@
 #define GNASH_RUN_INFO_H
 
 #include <string>
-#include <boost/shared_ptr.hpp>
 #include "StreamProvider.h"
 #include "Renderer.h"
 #include "sound_handler.h"

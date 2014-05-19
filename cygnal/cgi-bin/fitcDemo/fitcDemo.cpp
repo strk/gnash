@@ -24,7 +24,6 @@
 #include <log.h>
 #include <iostream>
 #include <string>
-#include <boost/shared_ptr.hpp>
 
 // Gnash headers
 #include "amf.h"

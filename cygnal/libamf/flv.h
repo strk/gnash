@@ -23,7 +23,6 @@
 #include <string>
 #include <cstring>
 #include <boost/cstdint.hpp>    // for boost::?int??_t
-#include <boost/shared_ptr.hpp>
 
 //#include "buffer.h"
 #include "element.h"

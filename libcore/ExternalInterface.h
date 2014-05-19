@@ -24,7 +24,6 @@
 #include <string>
 #include <vector>
 #include <set>
-#include <boost/shared_ptr.hpp>
 
 #include "dsodefs.h" /* For DSOEXPORT */
 

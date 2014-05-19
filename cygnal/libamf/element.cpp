@@ -22,7 +22,6 @@
 #include <vector>
 #include <cmath>
 #include <climits>
-#include <boost/shared_ptr.hpp>
 #include <boost/cstdint.hpp> // for boost::?int??_t
 
 #include "buffer.h"

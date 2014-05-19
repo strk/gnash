@@ -21,7 +21,6 @@
 #define GNASH_MEDIAPARSER_H
 
 #include <boost/scoped_array.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/barrier.hpp>

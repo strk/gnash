@@ -51,7 +51,6 @@ extern "C"{
 #endif
 }
 
-#include <boost/shared_ptr.hpp>
 
 // classes internal to Gnash
 #include "network.h"

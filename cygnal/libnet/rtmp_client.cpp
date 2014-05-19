@@ -31,7 +31,6 @@
 #	include <netinet/in.h>
 #endif
 
-#include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include "log.h"
 #include "rc.h"

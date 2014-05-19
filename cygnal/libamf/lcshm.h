@@ -20,7 +20,6 @@
 #define __LCSHM_H__
 
 #include <boost/cstdint.hpp>
-#include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
 

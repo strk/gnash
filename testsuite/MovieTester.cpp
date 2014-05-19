@@ -55,7 +55,6 @@
 #include <memory> // for unique_ptr
 #include <cmath> // for ceil
 #include <iostream>
-#include <boost/shared_ptr.hpp>
 
 //#define SHOW_INVALIDATED_BOUNDS_ON_ADVANCE 1
 

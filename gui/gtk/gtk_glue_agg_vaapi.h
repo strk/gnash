@@ -25,7 +25,6 @@
 
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
-#include <boost/shared_ptr.hpp>
 #include <boost/scoped_array.hpp>
 #include <memory>
 #include "vaapi/VaapiImageFormat.h"

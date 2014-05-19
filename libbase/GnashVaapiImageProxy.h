@@ -21,7 +21,6 @@
 #ifndef GNASH_GNASHVAAPIIMAGEPROXY_H
 #define GNASH_GNASHVAAPIIMAGEPROXY_H
 
-#include <boost/shared_ptr.hpp>
 
 namespace gnash {
 

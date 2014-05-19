@@ -22,7 +22,6 @@
 
 #include <string>
 #include <gtk/gtkdrawingarea.h>
-#include <boost/shared_ptr.hpp>
 
 // Forward declarations.
 namespace gnash {

@@ -24,7 +24,6 @@
 
 #include <memory> 
 #include <boost/scoped_array.hpp>
-#include <boost/shared_ptr.hpp>
 #include <algorithm>
 #include <cassert>
 

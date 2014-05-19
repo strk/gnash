@@ -24,7 +24,6 @@
 #include <string>
 #include <list>
 #include <memory>
-#include <boost/shared_ptr.hpp>
 
 #include "Relay.h"
 

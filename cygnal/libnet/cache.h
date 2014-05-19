@@ -26,7 +26,6 @@
 #include <string>
 #include <map> 
 #include <iostream>
-#include <boost/shared_ptr.hpp>
 
 #include "statistics.h"
 #include "diskstream.h"

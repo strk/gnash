@@ -22,7 +22,6 @@
 #define GNASH_IMAGE_PNG_H
 
 #include <memory>
-#include <boost/shared_ptr.hpp>
 
 // Forward declarations
 namespace gnash {

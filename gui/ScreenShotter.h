@@ -21,7 +21,6 @@
 
 #include <vector>
 #include <string>
-#include <boost/shared_ptr.hpp>
 #include <set>
 #include <algorithm>
 #include <boost/lexical_cast.hpp>
