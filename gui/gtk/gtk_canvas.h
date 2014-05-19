@@ -20,6 +20,7 @@
 #ifndef GNASH_GTK_CANVAS_H
 #define GNASH_GTK_CANVAS_H
 
+#include <memory>
 #include <string>
 #include <gtk/gtkdrawingarea.h>
 
