@@ -237,7 +237,7 @@ public:
 
         GlyphInfo(const GlyphInfo& o);
 
-        boost::shared_ptr<SWF::ShapeRecord> glyph;
+        std::shared_ptr<SWF::ShapeRecord> glyph;
 
         float advance;
     };
@@ -314,7 +314,7 @@ private:
     /// It is a shared_ptr to avoid changing an original
     /// DefineFont2Tag, while allowing this class to take ownership
     /// of CodeTables from a DefineFontInfo tag.
-    boost::shared_ptr<const CodeTable> _embeddedCodeTable; 
+    std::shared_ptr<const CodeTable> _embeddedCodeTable;
 
     /// Code to index table for device glyphs
     CodeTable _deviceCodeTable; 

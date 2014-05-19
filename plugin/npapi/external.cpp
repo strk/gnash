@@ -200,10 +200,10 @@ ExternalInterface::makeObject (std::map<std::string, std::string> &args)
 //              <number>135.78</number>
 //      </arguments>
 // </invoke>
-boost::shared_ptr<ExternalInterface::invoke_t>
+std::shared_ptr<ExternalInterface::invoke_t>
 ExternalInterface::parseInvoke(const std::string &xml)
 {
-    boost::shared_ptr<ExternalInterface::invoke_t> invoke;
+    std::shared_ptr<ExternalInterface::invoke_t> invoke;
     if (xml.empty()) {
         return invoke;
     }

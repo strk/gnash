@@ -39,7 +39,7 @@ namespace image {
 /// Create a GifInput and transfer ownership to the caller.
 //
 /// @param in   The IOChannel to read GIF data from.
-std::unique_ptr<Input> createGifInput(boost::shared_ptr<IOChannel> in);
+std::unique_ptr<Input> createGifInput(std::shared_ptr<IOChannel> in);
 
 } // namespace image
 } // namespace gnash

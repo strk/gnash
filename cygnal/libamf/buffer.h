@@ -156,7 +156,7 @@ public:
     /// 
     /// @return A reference to a Buffer.
     Buffer &operator=(Buffer &buf);
-    Buffer &operator=(boost::shared_ptr<Buffer> buf);
+    Buffer &operator=(std::shared_ptr<Buffer> buf);
     /// \brief Copy a string into the buffer.
     ///		This overwrites all data, and resets the seek ptr.
     ///
@@ -225,7 +225,7 @@ public:
     /// 
     /// @return A reference to a Buffer.
     Buffer &operator+=(Buffer &buf);
-    Buffer &operator+=(boost::shared_ptr<Buffer> buf);
+    Buffer &operator+=(std::shared_ptr<Buffer> buf);
 
     /// \brief Append a string to existing data in the buffer.
     ///

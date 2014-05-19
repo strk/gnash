@@ -105,7 +105,7 @@ trymain(int argc, char *argv[])
 
     const URL url("");
     runResources.setStreamProvider(
-            boost::shared_ptr<StreamProvider>(new StreamProvider(url, url)));
+            std::shared_ptr<StreamProvider>(new StreamProvider(url, url)));
 
     // Create a bogus movie with swf version 7 support
     movie_definition* md = new DummyMovieDefinition(runResources, 7);

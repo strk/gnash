@@ -354,7 +354,7 @@ private:
 #endif
 
     // The header, tag, and onMetaData from the FLV file.
-    boost::shared_ptr<cygnal::Flv>    _flv;
+    std::shared_ptr<cygnal::Flv>    _flv;
 };
 
 /// \brief Dump to the specified output stream.

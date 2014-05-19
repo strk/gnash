@@ -69,41 +69,41 @@ class DSOEXPORT AMF_msg {
     } message_header_t;
     typedef struct {
         message_header_t header;
-        boost::shared_ptr<cygnal::Element> data;
+        std::shared_ptr<cygnal::Element> data;
     } amf_message_t;
 
-    size_t addMessage(boost::shared_ptr<amf_message_t> msg)
+    size_t addMessage(std::shared_ptr<amf_message_t> msg)
     {
         _messages.push_back(msg); return _messages.size();
     };
-    boost::shared_ptr<amf_message_t> &getMessage(int x) { return _messages[x]; };
+    std::shared_ptr<amf_message_t> &getMessage(int x) { return _messages[x]; };
     size_t messageCount() { return _messages.size(); };
     
     // These methods create the raw data of the AMF packet from Elements
-    static boost::shared_ptr<cygnal::Buffer> encodeContextHeader(context_header_t *head);
-    static boost::shared_ptr<cygnal::Buffer> encodeContextHeader(boost::uint16_t version,
+    static std::shared_ptr<cygnal::Buffer> encodeContextHeader(context_header_t *head);
+    static std::shared_ptr<cygnal::Buffer> encodeContextHeader(boost::uint16_t version,
 							      boost::uint16_t headers,
 							      boost::uint16_t messages);
 
-    static boost::shared_ptr<cygnal::Buffer> encodeMsgHeader(message_header_t *head);
-    static boost::shared_ptr<cygnal::Buffer> encodeMsgHeader(const std::string &target,
+    static std::shared_ptr<cygnal::Buffer> encodeMsgHeader(message_header_t *head);
+    static std::shared_ptr<cygnal::Buffer> encodeMsgHeader(const std::string &target,
                                           const std::string &response, size_t size);
     
     // These methods parse the raw data of the AMF packet into data structures
-    static boost::shared_ptr<context_header_t> parseContextHeader(cygnal::Buffer &data);
-    static boost::shared_ptr<context_header_t> parseContextHeader(boost::uint8_t *data, size_t size);
+    static std::shared_ptr<context_header_t> parseContextHeader(cygnal::Buffer &data);
+    static std::shared_ptr<context_header_t> parseContextHeader(boost::uint8_t *data, size_t size);
     
-    static boost::shared_ptr<message_header_t> parseMessageHeader(cygnal::Buffer &data);
-    static boost::shared_ptr<message_header_t> parseMessageHeader(boost::uint8_t *data, size_t size);
+    static std::shared_ptr<message_header_t> parseMessageHeader(cygnal::Buffer &data);
+    static std::shared_ptr<message_header_t> parseMessageHeader(boost::uint8_t *data, size_t size);
 
     // These methods parse the entire packet. which consists of multiple messages
-    boost::shared_ptr<context_header_t> parseAMFPacket(cygnal::Buffer &buf);
-    boost::shared_ptr<context_header_t> parseAMFPacket(boost::uint8_t *data,
+    std::shared_ptr<context_header_t> parseAMFPacket(cygnal::Buffer &buf);
+    std::shared_ptr<context_header_t> parseAMFPacket(boost::uint8_t *data,
 						       size_t size);
 
     // This methods create an entire packet from multiple messages, already parsed in
-    boost::shared_ptr<cygnal::Buffer> encodeAMFPacket();
-    boost::shared_ptr<cygnal::Buffer> encodeAMFPacket(const std::string &target,
+    std::shared_ptr<cygnal::Buffer> encodeAMFPacket();
+    std::shared_ptr<cygnal::Buffer> encodeAMFPacket(const std::string &target,
 				     const std::string &response, size_t size);
     
     static void dump(context_header_t &data);
@@ -111,7 +111,7 @@ class DSOEXPORT AMF_msg {
     void dump();
     
 private:
-    std::vector<boost::shared_ptr<amf_message_t> > _messages;
+    std::vector<std::shared_ptr<amf_message_t> > _messages;
 //     context_header_t    _context_header;
 };
 

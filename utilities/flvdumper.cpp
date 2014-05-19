@@ -186,20 +186,20 @@ main(int argc, char *argv[])
     Flv flv; 
     struct stat st;
 
-//    boost::shared_ptr<Flv::flv_header_t> head;
+//    std::shared_ptr<Flv::flv_header_t> head;
     Flv::previous_size_t   previous = 0;
-    boost::shared_ptr<Flv::flv_tag_t> tag;
+    std::shared_ptr<Flv::flv_tag_t> tag;
     
     // Make sure it's an FLV file
     if (stat(filespec.c_str(), &st) == 0) {
 	try {
             // Open the binary file
 	    ifstream ifs(filespec.c_str(), ios::binary);
-	    boost::shared_ptr<cygnal::Buffer> buf(new Buffer);
+	    std::shared_ptr<cygnal::Buffer> buf(new Buffer);
             // Read just the initial 9 byte header
 	    ifs.read(reinterpret_cast<char *>(buf->reference()), sizeof(Flv::flv_header_t));
 	    log_debug("header is: %s",  hexify(buf->reference(), 9, false));
-	    boost::shared_ptr<Flv::flv_header_t> head = flv.decodeHeader(buf);
+	    std::shared_ptr<Flv::flv_header_t> head = flv.decodeHeader(buf);
 	    if (head == 0) {
 		log_error("Couldn't decode the header! %s",  hexify(buf->reference(), 9, false));
 		exit(EXIT_FAILURE);
@@ -259,7 +259,7 @@ main(int argc, char *argv[])
 		   {
 		       if (all) {
 			   cerr << "FLV Tag type is: Audio" << endl;
- 			   boost::shared_ptr<Flv::flv_audio_t> data = flv.decodeAudioData(*(buf->reference() + sizeof(Flv::flv_tag_t)));
+ 			   std::shared_ptr<Flv::flv_audio_t> data = flv.decodeAudioData(*(buf->reference() + sizeof(Flv::flv_tag_t)));
  			   cout << "\tSound Type is: "   << type_strs[data->type] << endl;
  			   cout << "\tSound Size is: "   << size_strs[data->size] << endl;
  			   cout << "\tSound Rate is: "   << rate_strs[data->rate] << endl;
@@ -271,7 +271,7 @@ main(int argc, char *argv[])
 		   {
 		       if (all) {
 			   cout << "FLV Tag type is: Video" << endl;
- 			   boost::shared_ptr<Flv::flv_video_t> data = flv.decodeVideoData(*(buf->reference() + sizeof(Flv::flv_tag_t)));
+ 			   std::shared_ptr<Flv::flv_video_t> data = flv.decodeVideoData(*(buf->reference() + sizeof(Flv::flv_tag_t)));
  			   cout << "\tCodec ID is: "   << codec_strs[data->codecID] << endl;
  			   cout << "\tFrame Type is: " << frame_strs[data->type] << endl;
 		       }
@@ -281,7 +281,7 @@ main(int argc, char *argv[])
  		       if (meta || all) {
  			   cout << "FLV Tag type is: MetaData" << endl;
  		       }
-		       boost::shared_ptr<cygnal::Element> metadata = flv.decodeMetaData(buf->reference(), bodysize);
+		       std::shared_ptr<cygnal::Element> metadata = flv.decodeMetaData(buf->reference(), bodysize);
 		       if (meta && metadata) {
 			   metadata->dump();
 		       }

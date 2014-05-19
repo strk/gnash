@@ -104,7 +104,7 @@ public:
     // Accessors
     ssh_channel getChannel() { return _channel; };
     ssh_session getSession() { return _session; };
-    boost::shared_ptr<cygnal::Buffer> &getBuffer()  { return _buffer; };
+    std::shared_ptr<cygnal::Buffer> &getBuffer()  { return _buffer; };
 
     // Dump internal data to the screen for debugging
     void dump();
@@ -120,13 +120,13 @@ public:
     transport_type_t	_transporttype;
     int			_state;
 #if 0
-    boost::shared_ptr<ssh_session> _session;
-    boost::shared_ptr<SSH_OPTIONS> _options;
+    std::shared_ptr<ssh_session> _session;
+    std::shared_ptr<SSH_OPTIONS> _options;
 #else
     ssh_session _session;
     ssh_channel	_channel;
 #endif
-    boost::shared_ptr<cygnal::Buffer> _buffer;
+    std::shared_ptr<cygnal::Buffer> _buffer;
 };
     
 } // end of gnash namespace

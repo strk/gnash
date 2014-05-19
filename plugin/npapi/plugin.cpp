@@ -821,7 +821,7 @@ nsPluginInstance::processPlayerRequest()
          
         // Extract a message from the packet
         std::string msg = packet.substr(0, pos + term.size());
-        boost::shared_ptr<plugin::ExternalInterface::invoke_t> invoke =
+        std::shared_ptr<plugin::ExternalInterface::invoke_t> invoke =
             plugin::ExternalInterface::parseInvoke(msg);
 
         // drop the parsed message from the packet
@@ -1073,7 +1073,7 @@ nsPluginInstance::getDocumentProp(const std::string& propname) const
         return rv;
     }
 
-    boost::shared_ptr<NPObject> window_obj(windowobj, NPN_ReleaseObject);
+    std::shared_ptr<NPObject> window_obj(windowobj, NPN_ReleaseObject);
   
     NPIdentifier doc_id = NPN_GetStringIdentifier("document");
 
@@ -1082,7 +1082,7 @@ nsPluginInstance::getDocumentProp(const std::string& propname) const
         return rv;
     }
 
-    boost::shared_ptr<NPVariant> doc_var(&docvar, NPN_ReleaseVariantValue);
+    std::shared_ptr<NPVariant> doc_var(&docvar, NPN_ReleaseVariantValue);
 
     if (!NPVARIANT_IS_OBJECT(docvar)) {
         return rv;
@@ -1097,7 +1097,7 @@ nsPluginInstance::getDocumentProp(const std::string& propname) const
         return rv;
     }
 
-    boost::shared_ptr<NPVariant> prop_var(&propvar, NPN_ReleaseVariantValue);
+    std::shared_ptr<NPVariant> prop_var(&propvar, NPN_ReleaseVariantValue);
 
     if (!NPVARIANT_IS_STRING(propvar)) {
         return rv;

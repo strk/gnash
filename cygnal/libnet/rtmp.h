@@ -267,7 +267,7 @@ public:
 // 	rtmp_status_e status;
 // 	std::string   method;
 // 	double        streamid;
-// 	std::vector<boost::shared_ptr<cygnal::Element> > objs;
+// 	std::vector<std::shared_ptr<cygnal::Element> > objs;
 //     } rtmp_msg_t;
     typedef enum {
         RTMP_ERR_UNDEF,
@@ -323,14 +323,14 @@ public:
     virtual ~RTMP();
 
     // Decode
-    boost::shared_ptr<rtmp_head_t> decodeHeader(boost::uint8_t *header);
-    boost::shared_ptr<rtmp_head_t> decodeHeader(cygnal::Buffer &data);
+    std::shared_ptr<rtmp_head_t> decodeHeader(boost::uint8_t *header);
+    std::shared_ptr<rtmp_head_t> decodeHeader(cygnal::Buffer &data);
     
-    boost::shared_ptr<cygnal::Buffer> encodeHeader(int amf_index,
+    std::shared_ptr<cygnal::Buffer> encodeHeader(int amf_index,
 					rtmp_headersize_e head_size,
 					size_t total_size, content_types_e type,
 					RTMPMsg::rtmp_source_e routing);
-    boost::shared_ptr<cygnal::Buffer> encodeHeader(int amf_index,
+    std::shared_ptr<cygnal::Buffer> encodeHeader(int amf_index,
 						rtmp_headersize_e head_size);
     
     void addProperty(cygnal::Element &el);
@@ -349,49 +349,49 @@ public:
     int getMysteryWord()        { return _mystery_word; };
 
     // Decode an RTMP message
-    boost::shared_ptr<RTMPMsg> decodeMsgBody(boost::uint8_t *data, size_t size);
-    boost::shared_ptr<RTMPMsg> decodeMsgBody(cygnal::Buffer &buf);
+    std::shared_ptr<RTMPMsg> decodeMsgBody(boost::uint8_t *data, size_t size);
+    std::shared_ptr<RTMPMsg> decodeMsgBody(cygnal::Buffer &buf);
     
-    virtual boost::shared_ptr<rtmp_ping_t> decodePing(boost::uint8_t *data);
-    boost::shared_ptr<rtmp_ping_t> decodePing(cygnal::Buffer &buf);
+    virtual std::shared_ptr<rtmp_ping_t> decodePing(boost::uint8_t *data);
+    std::shared_ptr<rtmp_ping_t> decodePing(cygnal::Buffer &buf);
     
-    virtual boost::shared_ptr<user_event_t> decodeUserControl(boost::uint8_t *data);
-    boost::shared_ptr<user_event_t> decodeUserControl(cygnal::Buffer &buf);
-    virtual boost::shared_ptr<cygnal::Buffer> encodeUserControl(user_control_e, boost::uint32_t data);
+    virtual std::shared_ptr<user_event_t> decodeUserControl(boost::uint8_t *data);
+    std::shared_ptr<user_event_t> decodeUserControl(cygnal::Buffer &buf);
+    virtual std::shared_ptr<cygnal::Buffer> encodeUserControl(user_control_e, boost::uint32_t data);
     
     
     // These are handlers for the various types
-    virtual boost::shared_ptr<cygnal::Buffer> encodeChunkSize(int size);
+    virtual std::shared_ptr<cygnal::Buffer> encodeChunkSize(int size);
     virtual void decodeChunkSize();
 
-    virtual boost::shared_ptr<cygnal::Buffer> encodeBytesRead();
+    virtual std::shared_ptr<cygnal::Buffer> encodeBytesRead();
     virtual void decodeBytesRead();
-    virtual boost::shared_ptr<cygnal::Buffer> encodeServer();
+    virtual std::shared_ptr<cygnal::Buffer> encodeServer();
     virtual void decodeServer();
     
-    virtual boost::shared_ptr<cygnal::Buffer> encodeClient();
+    virtual std::shared_ptr<cygnal::Buffer> encodeClient();
     virtual void decodeClient();
     
-    virtual boost::shared_ptr<cygnal::Buffer> encodeAudioData();
+    virtual std::shared_ptr<cygnal::Buffer> encodeAudioData();
     virtual void decodeAudioData();
     
-    virtual boost::shared_ptr<cygnal::Buffer> encodeVideoData();
+    virtual std::shared_ptr<cygnal::Buffer> encodeVideoData();
     virtual void decodeVideoData();
     
-    virtual boost::shared_ptr<cygnal::Buffer> encodeNotify();
+    virtual std::shared_ptr<cygnal::Buffer> encodeNotify();
     virtual void decodeNotify();
     
-    virtual boost::shared_ptr<cygnal::Buffer> encodeSharedObj();
+    virtual std::shared_ptr<cygnal::Buffer> encodeSharedObj();
     virtual void decodeSharedObj();
     
-    virtual boost::shared_ptr<cygnal::Buffer> encodeInvoke();
+    virtual std::shared_ptr<cygnal::Buffer> encodeInvoke();
     virtual void decodeInvoke();
 
     // Receive a message, which is a series of AMF elements, seperated
     // by a one byte header at regular byte intervals. (128 bytes for
     // video data by default). Each message may contain multiple packets.
-    boost::shared_ptr<cygnal::Buffer> recvMsg();
-    boost::shared_ptr<cygnal::Buffer> recvMsg(int fd);
+    std::shared_ptr<cygnal::Buffer> recvMsg();
+    std::shared_ptr<cygnal::Buffer> recvMsg(int fd);
 
     // Send a message, usually a single ActionScript object. This message
     // may be broken down into a series of packets on a regular byte
@@ -422,8 +422,8 @@ public:
     // but RTMP uses a weird scheme of a standard header, and then every chunksize
     // bytes another 1 byte RTMP header. The header itself is not part of the byte
     // count.
-    boost::shared_ptr<queues_t> split(cygnal::Buffer &buf);
-    boost::shared_ptr<queues_t> split(boost::uint8_t *data, size_t size);
+    std::shared_ptr<queues_t> split(cygnal::Buffer &buf);
+    std::shared_ptr<queues_t> split(boost::uint8_t *data, size_t size);
 
     CQue &operator[] (size_t x) { return _queues[x]; }
 

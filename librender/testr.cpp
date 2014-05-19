@@ -618,7 +618,7 @@ test_iterators(Renderer *renderer, const std::string &type)
     }
     
 #if 0
-    typedef boost::shared_ptr<GnashVaapiImageProxy> RenderImage;
+    typedef std::shared_ptr<GnashVaapiImageProxy> RenderImage;
     typedef std::vector<RenderImage> RenderImages;
 
     // Get first render image

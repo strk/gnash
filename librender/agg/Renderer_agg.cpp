@@ -692,7 +692,7 @@ public:
         return new agg_bitmap_info(std::move(im));
     }
 
-    virtual void renderToImage(boost::shared_ptr<IOChannel> io,
+    virtual void renderToImage(std::shared_ptr<IOChannel> io,
             FileType type, int quality) const
     {
         image::ImageRGBA im(xres, yres);

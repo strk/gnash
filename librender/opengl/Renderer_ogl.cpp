@@ -782,9 +782,9 @@ public:
       }
   }
 
-  boost::shared_ptr<GnashTexture> getCachedTexture(image::GnashImage *frame)
+  std::shared_ptr<GnashTexture> getCachedTexture(image::GnashImage *frame)
   {
-      boost::shared_ptr<GnashTexture> texture;
+      std::shared_ptr<GnashTexture> texture;
       GnashTextureFormat frameFormat(frame->type());
       unsigned int frameFlags;
 
@@ -803,7 +803,7 @@ public:
       }
 
       // Look for a texture with the same dimensions and type
-      std::list< boost::shared_ptr<GnashTexture> >::iterator it;
+      std::list< std::shared_ptr<GnashTexture> >::iterator it;
       for (it = _cached_textures.begin(); it != _cached_textures.end(); ++it) {
           if ((*it)->width() == frame->width() &&
               (*it)->height() == frame->height() &&
@@ -871,7 +871,7 @@ public:
 
     glEndList();
 
-    boost::shared_ptr<GnashTexture> texture = getCachedTexture(frame);
+    std::shared_ptr<GnashTexture> texture = getCachedTexture(frame);
     if (!texture.get())
         return;
 
@@ -908,7 +908,7 @@ public:
   }
 
 private:  
-  void reallyDrawVideoFrame(boost::shared_ptr<GnashTexture> texture, const SWFMatrix* m, const SWFRect* bounds)
+  void reallyDrawVideoFrame(std::shared_ptr<GnashTexture> texture, const SWFMatrix* m, const SWFRect* bounds)
   {
     glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);
     glPushMatrix();
@@ -1838,8 +1838,8 @@ private:
   bool _drawing_mask;
   
   std::vector<boost::uint8_t> _render_indices;
-  std::vector< boost::shared_ptr<GnashTexture> > _render_textures;
-  std::list< boost::shared_ptr<GnashTexture> > _cached_textures;
+  std::vector< std::shared_ptr<GnashTexture> > _render_textures;
+  std::list< std::shared_ptr<GnashTexture> > _cached_textures;
   
 #ifdef OSMESA_TESTING
   std::unique_ptr<OSRenderMesa> _offscreen;

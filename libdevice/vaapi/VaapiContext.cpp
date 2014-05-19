@@ -236,9 +236,9 @@ bool VaapiContext::initDecoder(unsigned int width, unsigned int height)
 }
 
 /// Get a free surface
-boost::shared_ptr<VaapiSurface> VaapiContext::acquireSurface()
+std::shared_ptr<VaapiSurface> VaapiContext::acquireSurface()
 {
-    boost::shared_ptr<VaapiSurface> surface = _surfaces.front();
+    std::shared_ptr<VaapiSurface> surface = _surfaces.front();
     _surfaces.pop();
     log_debug("VaapiContext::acquireSurface(): surface 0x%08x\n", surface->get());
 
@@ -246,7 +246,7 @@ boost::shared_ptr<VaapiSurface> VaapiContext::acquireSurface()
 }
 
 /// Release surface
-void VaapiContext::releaseSurface(boost::shared_ptr<VaapiSurface> surface)
+void VaapiContext::releaseSurface(std::shared_ptr<VaapiSurface> surface)
 {
     log_debug("VaapiContext::releaseSurface(): surface 0x%08x\n", surface->get());
     _surfaces.push(surface);

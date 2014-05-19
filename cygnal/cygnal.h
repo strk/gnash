@@ -59,28 +59,28 @@ public:
 
     void probePeers();
     void probePeers(peer_t &peer);
-    void probePeers(boost::shared_ptr<peer_t> peer);
-    void probePeers(std::vector<boost::shared_ptr<peer_t> > &peers);
+    void probePeers(std::shared_ptr<peer_t> peer);
+    void probePeers(std::vector<std::shared_ptr<peer_t> > &peers);
 
-    void addHandler(const std::string &path, boost::shared_ptr<Handler> x) {
+    void addHandler(const std::string &path, std::shared_ptr<Handler> x) {
  	_handlers[path] = x;
     };
 
-    boost::shared_ptr<Handler> findHandler(const std::string &path);
+    std::shared_ptr<Handler> findHandler(const std::string &path);
     void removeHandler(const std::string &path);
 
-    std::vector<boost::shared_ptr<peer_t> > & getActive() { return _active_peers; };
+    std::vector<std::shared_ptr<peer_t> > & getActive() { return _active_peers; };
 
     void dump();
 
 private:
-    void addPeer(boost::shared_ptr<peer_t> x) {
+    void addPeer(std::shared_ptr<peer_t> x) {
  	_peers.push_back(x);
     };
 
-    std::vector<boost::shared_ptr<peer_t> > _peers;
-    std::vector<boost::shared_ptr<peer_t> > _active_peers;
-    std::map<std::string, boost::shared_ptr<Handler> > _handlers;
+    std::vector<std::shared_ptr<peer_t> > _peers;
+    std::vector<std::shared_ptr<peer_t> > _active_peers;
+    std::map<std::string, std::shared_ptr<Handler> > _handlers;
     boost::mutex _mutex;
 };
 

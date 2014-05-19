@@ -208,7 +208,7 @@ public:
     /// @param nbytes The number of bytes to try to read.
     ///
     /// @return The number of bytes read.
-    boost::shared_ptr<cygnal::Buffer> readNet();
+    std::shared_ptr<cygnal::Buffer> readNet();
     int readNet(cygnal::Buffer &buffer);
     int readNet(int fd, cygnal::Buffer &buffer);
     int readNet(int fd, cygnal::Buffer *buffer);
@@ -245,7 +245,7 @@ public:
     /// @param limit The max number of file descriptors to wait for.
     ///
     /// @return A vector of the file descriptors that have activity.
-    boost::shared_ptr<std::vector<struct pollfd> > waitForNetData(int limit, struct pollfd *fds);
+    std::shared_ptr<std::vector<struct pollfd> > waitForNetData(int limit, struct pollfd *fds);
     fd_set waitForNetData(int limit, fd_set data);
     fd_set waitForNetData(std::vector<int> &data);
 	
@@ -333,7 +333,7 @@ public:
     
  protected:
     // Return the string representation of the IPV4 or IPV6 number
-    boost::shared_ptr<char> getIPString(struct addrinfo *ai);
+    std::shared_ptr<char> getIPString(struct addrinfo *ai);
 
     in_addr_t   _ipaddr;
     int         _sockfd;	// the file descriptor used for reading and writing

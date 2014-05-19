@@ -267,7 +267,7 @@ public:
     /// @param in   The stream to read data from. Ownership is shared
     ///             between caller and Input, so it is freed
     ///             automatically when the last owner is destroyed.
-    Input(boost::shared_ptr<IOChannel> in)
+    Input(std::shared_ptr<IOChannel> in)
         :
         _inStream(in),
         _type(GNASH_IMAGE_INVALID)
@@ -309,7 +309,7 @@ public:
     /// For reading SWF JPEG3-style image data, like ordinary JPEG, 
     /// but stores the data in ImageRGBA format.
     DSOEXPORT static std::unique_ptr<ImageRGBA> readSWFJpeg3(
-            boost::shared_ptr<gnash::IOChannel> in);
+            std::shared_ptr<gnash::IOChannel> in);
 
     /// Read image data from an IOChannel into an GnashImage.
     //
@@ -319,11 +319,11 @@ public:
     ///             is an unsupported FileType or image reading fails,
     ///             a NULL unique_ptr is returned.
     DSOEXPORT static std::unique_ptr<GnashImage> readImageData(
-            boost::shared_ptr<gnash::IOChannel> in, FileType type);
+            std::shared_ptr<gnash::IOChannel> in, FileType type);
 
 protected:
 
-    boost::shared_ptr<IOChannel> _inStream;
+    std::shared_ptr<IOChannel> _inStream;
 
     ImageType _type;
 
@@ -341,7 +341,7 @@ public:
     ///                 is shared.
     /// @param width    The width of the resulting image
     /// @param height   The height of the resulting image.
-    Output(boost::shared_ptr<IOChannel> out, size_t width, size_t height)
+    Output(std::shared_ptr<IOChannel> out, size_t width, size_t height)
         :
         _width(width),
         _height(height),
@@ -373,7 +373,7 @@ public:
     ///                 maxium value. The quality is not used for all
     ///                 formats.
     DSOEXPORT static void writeImageData(FileType type,
-            boost::shared_ptr<gnash::IOChannel> out, const GnashImage& image,
+            std::shared_ptr<gnash::IOChannel> out, const GnashImage& image,
             int quality);
 
 protected:
@@ -382,7 +382,7 @@ protected:
 
     const size_t _height;
     
-    boost::shared_ptr<IOChannel> _outStream;
+    std::shared_ptr<IOChannel> _outStream;
 
 };
 

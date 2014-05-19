@@ -54,16 +54,16 @@ public:
     ~demoService();
 
     /// return the list of FLV files we've found
-    std::vector<boost::shared_ptr<filestats_t> > &getListOfAvailableFiles(const std::string &path);
+    std::vector<std::shared_ptr<filestats_t> > &getListOfAvailableFiles(const std::string &path);
 
     /// return the list of FLV files we've found of the specified type
-    std::vector<boost::shared_ptr<filestats_t> > &getListOfAvailableFiles(const std::string &path,
+    std::vector<std::shared_ptr<filestats_t> > &getListOfAvailableFiles(const std::string &path,
 									  const std::string &type);
-    std::vector<boost::shared_ptr<filestats_t> > &getFileStats() { return _stats; };
+    std::vector<std::shared_ptr<filestats_t> > &getFileStats() { return _stats; };
     
 private:
     std::string				_path;
-    std::vector<boost::shared_ptr<filestats_t> >	_stats;
+    std::vector<std::shared_ptr<filestats_t> >	_stats;
 };
     
 class OflaDemoTest : public cygnal::RTMPServer
@@ -73,38 +73,38 @@ public:
     ~OflaDemoTest ();
   
     // Parse an OflaDemo Request message coming from the Red5 oflaDemo_test.
-    std::vector<boost::shared_ptr<cygnal::Element > > parseOflaDemoRequest(cygnal::Buffer &buf)
+    std::vector<std::shared_ptr<cygnal::Element > > parseOflaDemoRequest(cygnal::Buffer &buf)
         { return parseOflaDemoRequest(buf.reference(), buf.size()); };
-    std::vector<boost::shared_ptr<cygnal::Element > > parseOflaDemoRequest(boost::uint8_t *buf, size_t size);
+    std::vector<std::shared_ptr<cygnal::Element > > parseOflaDemoRequest(boost::uint8_t *buf, size_t size);
     
     // format a response to the 'oflaDemo' test used for testing Gnash.
-    boost::shared_ptr<cygnal::Buffer> formatOflaDemoResponse(double num, cygnal::Element &el);
-    boost::shared_ptr<cygnal::Buffer> formatOflaDemoResponse(double num, cygnal::Buffer &data);
-    boost::shared_ptr<cygnal::Buffer> formatOflaDemoResponse(double num, boost::uint8_t *data, size_t size);
+    std::shared_ptr<cygnal::Buffer> formatOflaDemoResponse(double num, cygnal::Element &el);
+    std::shared_ptr<cygnal::Buffer> formatOflaDemoResponse(double num, cygnal::Buffer &data);
+    std::shared_ptr<cygnal::Buffer> formatOflaDemoResponse(double num, boost::uint8_t *data, size_t size);
 
-    boost::shared_ptr<cygnal::Buffer> getResponse() { return _response; };
-    void setResponse(boost::shared_ptr<cygnal::Buffer> &x) { _response = x; };
+    std::shared_ptr<cygnal::Buffer> getResponse() { return _response; };
+    void setResponse(std::shared_ptr<cygnal::Buffer> &x) { _response = x; };
     
     void setNetConnection(gnash::RTMPMsg *msg) { _netconnect.reset(msg); };
-    void setNetConnection(boost::shared_ptr<gnash::RTMPMsg> msg) { _netconnect = msg; };
-    boost::shared_ptr<gnash::RTMPMsg> getNetConnection() { return _netconnect;};
+    void setNetConnection(std::shared_ptr<gnash::RTMPMsg> msg) { _netconnect = msg; };
+    std::shared_ptr<gnash::RTMPMsg> getNetConnection() { return _netconnect;};
 
     /// \var _netconnect
     ///    This store the data from the NetConnection ActionScript
     ///    object we get as the final part of the handshake process
     ///    that is used to set up the connection. This has all the
     ///    file paths and other information needed by the server.
-    boost::shared_ptr<gnash::RTMPMsg>	_netconnect;
+    std::shared_ptr<gnash::RTMPMsg>	_netconnect;
 private:
-    boost::shared_ptr<cygnal::Buffer> _response;
-    boost::shared_ptr<Handler::cygnal_init_t> _info;
+    std::shared_ptr<cygnal::Buffer> _response;
+    std::shared_ptr<Handler::cygnal_init_t> _info;
 }; 
 
 // the standard API
 extern "C" {
-    boost::shared_ptr<Handler::cygnal_init_t>oflaDemo_init_func(boost::shared_ptr<gnash::RTMPMsg> &msg);
+    std::shared_ptr<Handler::cygnal_init_t>oflaDemo_init_func(std::shared_ptr<gnash::RTMPMsg> &msg);
     
-    boost::shared_ptr<cygnal::Buffer> oflaDemo_read_func();
+    std::shared_ptr<cygnal::Buffer> oflaDemo_read_func();
     size_t oflaDemo_write_func(boost::uint8_t *data, size_t size);
 }
 

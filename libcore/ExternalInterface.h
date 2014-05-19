@@ -57,9 +57,9 @@ struct DSOEXPORT ExternalInterface
     static std::vector<as_value> parseArguments(const std::string &xml);
 
     // Parse the XML Invoke message.
-    static boost::shared_ptr<invoke_t> parseInvoke(const std::string &str);
+    static std::shared_ptr<invoke_t> parseInvoke(const std::string &str);
     // Check for data from the browser and parse it.
-    DSOEXPORT static boost::shared_ptr<invoke_t> ExternalEventCheck(int fd);
+    DSOEXPORT static std::shared_ptr<invoke_t> ExternalEventCheck(int fd);
 
     // These methods are for constructing Invoke messages.
     // Create an Invoke message for the standalone Gnash

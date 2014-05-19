@@ -49,16 +49,16 @@ public:
     http_method_e processClientRequest(int fd);
     http_method_e processClientRequest(Handler *hand, int fd, cygnal::Buffer *buf);
     cygnal::Buffer &processGetRequest(Handler *hand, int fd, cygnal::Buffer *buf);
-    boost::shared_ptr<cygnal::Buffer> processPostRequest(int fd, cygnal::Buffer *buf);
-    boost::shared_ptr<cygnal::Buffer> processPutRequest(int fd, cygnal::Buffer *buf);
-    boost::shared_ptr<cygnal::Buffer> processDeleteRequest(int fd, cygnal::Buffer *buf);
-    boost::shared_ptr<cygnal::Buffer> processConnectRequest(int fd, cygnal::Buffer *buf);
-    boost::shared_ptr<cygnal::Buffer> processOptionsRequest(int fd, cygnal::Buffer *buf);
-    boost::shared_ptr<cygnal::Buffer> processHeadRequest(int fd, cygnal::Buffer *buf);
-    boost::shared_ptr<cygnal::Buffer> processTraceRequest(int fd, cygnal::Buffer *buf);
+    std::shared_ptr<cygnal::Buffer> processPostRequest(int fd, cygnal::Buffer *buf);
+    std::shared_ptr<cygnal::Buffer> processPutRequest(int fd, cygnal::Buffer *buf);
+    std::shared_ptr<cygnal::Buffer> processDeleteRequest(int fd, cygnal::Buffer *buf);
+    std::shared_ptr<cygnal::Buffer> processConnectRequest(int fd, cygnal::Buffer *buf);
+    std::shared_ptr<cygnal::Buffer> processOptionsRequest(int fd, cygnal::Buffer *buf);
+    std::shared_ptr<cygnal::Buffer> processHeadRequest(int fd, cygnal::Buffer *buf);
+    std::shared_ptr<cygnal::Buffer> processTraceRequest(int fd, cygnal::Buffer *buf);
 
     // Handle the response for the request.
-    boost::shared_ptr<cygnal::Buffer> formatServerReply(http_status_e code);
+    std::shared_ptr<cygnal::Buffer> formatServerReply(http_status_e code);
     cygnal::Buffer &formatGetReply(gnash::DiskStream::filetype_e type, size_t size, http_status_e code); 
     cygnal::Buffer &formatGetReply(size_t size, http_status_e code); 
     cygnal::Buffer &formatGetReply(http_status_e code); 
@@ -87,8 +87,8 @@ public:
     
 #if 0
     // Parse an Echo Request message coming from the Red5 echo_test.
-    std::vector<boost::shared_ptr<cygnal::Element > > parseEchoRequest(gnash::cygnal::Buffer &buf) { return parseEchoRequest(buf.reference(), buf.size()); };
-    std::vector<boost::shared_ptr<cygnal::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
+    std::vector<std::shared_ptr<cygnal::Element > > parseEchoRequest(gnash::cygnal::Buffer &buf) { return parseEchoRequest(buf.reference(), buf.size()); };
+    std::vector<std::shared_ptr<cygnal::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
     
     // format a response to the 'echo' test used for testing Gnash.
     gnash::cygnal::Buffer &formatEchoResponse(const std::string &num, cygnal::Element &el);
@@ -97,12 +97,12 @@ public:
 #endif
 
     bool http_handler(Handler *hand, int netfd, cygnal::Buffer *buf);
-    boost::shared_ptr<gnash::DiskStream> getDiskStream() { return _diskstream; };
+    std::shared_ptr<gnash::DiskStream> getDiskStream() { return _diskstream; };
 
     void dump();    
 private:
     cygnal::Buffer _buf;
-    boost::shared_ptr<gnash::DiskStream> _diskstream;
+    std::shared_ptr<gnash::DiskStream> _diskstream;
 };
 
 } // end of gnash namespace

@@ -93,7 +93,7 @@ InputDevice::addData(bool pressed, key::code key, int modifier, int x, int y)
 {
     // GNASH_REPORT_FUNCTION;
     
-    boost::shared_ptr<input_data_t> _newdata(new input_data_t);
+    std::shared_ptr<input_data_t> _newdata(new input_data_t);
     _newdata->pressed = pressed;
     _newdata->key = key;
     _newdata->modifier = modifier;
@@ -187,15 +187,15 @@ InputDevice::convertAbsCoords(int x, int y, int width, int height)
     return coords;
 }
 
-std::vector<boost::shared_ptr<InputDevice> > 
+std::vector<std::shared_ptr<InputDevice> >
 InputDevice::scanForDevices()
 {
     // GNASH_REPORT_FUNCTION;
     
-    std::vector<boost::shared_ptr<InputDevice> > devices;
+    std::vector<std::shared_ptr<InputDevice> > devices;
     
-    std::vector<boost::shared_ptr<InputDevice> > id;
-    std::vector<boost::shared_ptr<InputDevice> >::iterator it;
+    std::vector<std::shared_ptr<InputDevice> > id;
+    std::vector<std::shared_ptr<InputDevice> >::iterator it;
 #ifdef USE_INPUT_EVENTS
     id = EventDevice::scanForDevices();
     for (it=id.begin(); it!=id.end(); ++it) {

@@ -58,7 +58,7 @@ public:
     void configure(GtkWidget *const widget, GdkEventConfigure *const event);
 
 private:
-    VaapiVideoWindow *getVideoWindow(boost::shared_ptr<VaapiSurface> surface,
+    VaapiVideoWindow *getVideoWindow(std::shared_ptr<VaapiSurface> surface,
                                      GdkWindow *parent_window,
                                      VaapiRectangle const & rect);
 
@@ -67,10 +67,10 @@ private:
 private:
     Renderer_agg_base                  *_agg_renderer;
     VaapiImageFormat                    _vaapi_image_format;
-    boost::shared_ptr<VaapiImage>       _vaapi_image;
+    std::shared_ptr<VaapiImage>       _vaapi_image;
     unsigned int                        _vaapi_image_width;
     unsigned int                        _vaapi_image_height;
-    boost::shared_ptr<VaapiSubpicture>  _vaapi_subpicture;
+    std::shared_ptr<VaapiSubpicture>  _vaapi_subpicture;
     std::unique_ptr<VaapiSurface>         _vaapi_surface;
     unsigned int                        _window_width;
     unsigned int                        _window_height;

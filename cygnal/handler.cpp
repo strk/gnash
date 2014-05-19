@@ -107,7 +107,7 @@ Handler::addClient(int fd, Network::protocols_supported_e proto)
 	  break;
       case Network::HTTP:
       {
-	  boost::shared_ptr<HTTPServer> http(new HTTPServer);
+	  std::shared_ptr<HTTPServer> http(new HTTPServer);
 	  _http[fd] = http;
 	  break;
       }
@@ -115,7 +115,7 @@ Handler::addClient(int fd, Network::protocols_supported_e proto)
 	  break;
       case Network::RTMP:
       {
-	  boost::shared_ptr<RTMPServer> rtmp(new RTMPServer);
+	  std::shared_ptr<RTMPServer> rtmp(new RTMPServer);
 	  _rtmp[fd] = rtmp;
 	  break;
       }
@@ -265,7 +265,7 @@ Handler::removeClient(int x)
 }
 
 void 
-Handler::setPlugin(boost::shared_ptr<Handler::cygnal_init_t> &/* init */)
+Handler::setPlugin(std::shared_ptr<Handler::cygnal_init_t> &/* init */)
 {
 //    GNASH_REPORT_FUNCTION;
 //     _plugin.reset(init.get());
@@ -279,7 +279,7 @@ Handler::setPlugin(Handler::cygnal_io_read_t /* read_ptr */, Handler::cygnal_io_
     _plugin.reset(new Handler::cygnal_init_t);
 }
 
-boost::shared_ptr<Handler::cygnal_init_t>
+std::shared_ptr<Handler::cygnal_init_t>
 Handler::initModule(const std::string& str)
 {
     // GNASH_REPORT_FUNCTION;
@@ -318,7 +318,7 @@ Handler::initModule(const std::string& str)
     if (!init_symptr) {
 	log_network(_("No %s symbol in plugin"), symbol);
     } else {
-	boost::shared_ptr<cygnal_init_t> info = init_symptr(_netconnect);
+	std::shared_ptr<cygnal_init_t> info = init_symptr(_netconnect);
 	log_network(_("Initialized Plugin: \"%s\": %s"), info->version,
 		    info->description);
     }
@@ -369,12 +369,12 @@ Handler::writeToPlugin(boost::uint8_t *data, size_t size)
     return ret;
 }
 
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 Handler::readFromPlugin()
 {
     // GNASH_REPORT_FUNCTION;
 
-    boost::shared_ptr<cygnal::Buffer> buf;
+    std::shared_ptr<cygnal::Buffer> buf;
     if (_plugin) {
 	buf = _plugin->read_func();
     }
@@ -398,7 +398,7 @@ Handler::initialized()
 }
 
 // Find a stream in the vector or Disk Streams
-boost::shared_ptr<gnash::DiskStream>
+std::shared_ptr<gnash::DiskStream>
 Handler::findStream(const std::string &filespec)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -454,7 +454,7 @@ Handler::playStream(const std::string &filespec)
 {
     GNASH_REPORT_FUNCTION;
 
-    boost::shared_ptr<gnash::DiskStream> ds = _diskstreams[_streams];
+    std::shared_ptr<gnash::DiskStream> ds = _diskstreams[_streams];
 
     string fullpath = crcfile.getDocumentRoot();
     fullpath += "/";
@@ -599,7 +599,7 @@ Handler::dump()
 
     cerr << "Currently there are " << dec <<_diskstreams.size() << " DiskStreams."
 	 << endl;
-    map<int, boost::shared_ptr<DiskStream> >::iterator it;
+    map<int, std::shared_ptr<DiskStream> >::iterator it;
     for (it = _diskstreams.begin(); it != _diskstreams.end(); ++it) {
 	if (it->second) {
 	    cerr << "DiskStream for fd #" << dec << it->first << endl;

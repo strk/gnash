@@ -512,14 +512,14 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
     if (_filetype == FILETYPE_FLV) {
 	// FIXME: for now, assume all media files are in FLV format
 	_flv.reset(new cygnal::Flv);
-	boost::shared_ptr<cygnal::Flv::flv_header_t> head = _flv->decodeHeader(ptr);
+	std::shared_ptr<cygnal::Flv::flv_header_t> head = _flv->decodeHeader(ptr);
 	ptr += sizeof(cygnal::Flv::flv_header_t);
 	ptr += sizeof(cygnal::Flv::previous_size_t);
-	boost::shared_ptr<cygnal::Flv::flv_tag_t> tag  = _flv->decodeTagHeader(ptr);
+	std::shared_ptr<cygnal::Flv::flv_tag_t> tag  = _flv->decodeTagHeader(ptr);
 	ptr += sizeof(cygnal::Flv::flv_tag_t);
 	size_t bodysize = _flv->convert24(tag->bodysize);	    
 	if (tag->type == cygnal::Flv::TAG_METADATA) {
-	    boost::shared_ptr<cygnal::Element> metadata = _flv->decodeMetaData(ptr, bodysize);
+	    std::shared_ptr<cygnal::Element> metadata = _flv->decodeMetaData(ptr, bodysize);
 	    if (metadata) {
 		metadata->dump();
 	    }

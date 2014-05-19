@@ -40,7 +40,7 @@ static boost::uint64_t get_ticks_usec(void)
 #endif
 }
 
-GnashVaapiImage::GnashVaapiImage(boost::shared_ptr<VaapiSurface> surface,
+GnashVaapiImage::GnashVaapiImage(std::shared_ptr<VaapiSurface> surface,
         image::ImageType type)
     :
     image::GnashImage(NULL, surface->width(), surface->height(), type,
@@ -58,7 +58,7 @@ GnashVaapiImage::~GnashVaapiImage()
           _surface->get());
 }
 
-void GnashVaapiImage::update(boost::shared_ptr<VaapiSurface> surface)
+void GnashVaapiImage::update(std::shared_ptr<VaapiSurface> surface)
 {
     _surface = surface;
     _creation_time = get_ticks_usec();

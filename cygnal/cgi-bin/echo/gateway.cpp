@@ -49,11 +49,11 @@ static GatewayTest gateway;
 extern "C" {
     
     // the standard API
-    boost::shared_ptr<Handler::cygnal_init_t>
-    gateway_init_func(boost::shared_ptr<gnash::RTMPMsg> &msg)
+    std::shared_ptr<Handler::cygnal_init_t>
+    gateway_init_func(std::shared_ptr<gnash::RTMPMsg> &msg)
     {
 	GNASH_REPORT_FUNCTION;
-        boost::shared_ptr<Handler::cygnal_init_t> init(new Handler::cygnal_init_t);
+        std::shared_ptr<Handler::cygnal_init_t> init(new Handler::cygnal_init_t);
         
         init->version = "Gateway Test 0.1 (Gnash)";
         init->description = "gateway RTMPT test for Cygnal.\n"
@@ -62,7 +62,7 @@ extern "C" {
         return init;
     }
 
-    boost::shared_ptr<amf::Buffer> gateway_read_func()
+    std::shared_ptr<amf::Buffer> gateway_read_func()
     {
 // 	GNASH_REPORT_FUNCTION;
 	
@@ -166,8 +166,8 @@ main(int argc, char *argv[])
     }
     
     // Wait for data, and when we get it, process it.
-    boost::shared_ptr<amf::Buffer> content;
-    vector<boost::shared_ptr<amf::Element> > headers;
+    std::shared_ptr<amf::Buffer> content;
+    vector<std::shared_ptr<amf::Element> > headers;
     net.setTimeout(10);
     do {
         netfd = net.newConnection(false, fd);
@@ -177,7 +177,7 @@ main(int argc, char *argv[])
         }
         // See if we have any messages waiting
         if (infile.empty()) {
-            boost::shared_ptr<amf::Buffer> content = net.readNet();
+            std::shared_ptr<amf::Buffer> content = net.readNet();
             if (!content) {
                 done = true;
                 break;
@@ -194,7 +194,7 @@ main(int argc, char *argv[])
             break;
         }
         
-  	//boost::shared_ptr<amf::Element> &el0 = headers[0];
+  	//std::shared_ptr<amf::Element> &el0 = headers[0];
 	
         if (!done) {
             if (headers.size() >= 4) {
@@ -236,12 +236,12 @@ GatewayTest::~GatewayTest()
 
 // Parse an Echo Request message coming from the Red5 echo_test. This
 // method should only be used for testing purposes.
-vector<boost::shared_ptr<amf::Element > >
+vector<std::shared_ptr<amf::Element > >
 GatewayTest::parseEchoRequest(boost::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    vector<boost::shared_ptr<amf::Element > > headers;
+    vector<std::shared_ptr<amf::Element > > headers;
 	
     // skip past the header bytes, we don't care about them.
     boost::uint8_t *tmpptr = data + 6;
@@ -252,7 +252,7 @@ GatewayTest::parseEchoRequest(boost::uint8_t *data, size_t size)
 
     // Get the first name, which is a raw string, and not preceded by
     // a type byte.
-    boost::shared_ptr<amf::Element > el1(new amf::Element);
+    std::shared_ptr<amf::Element > el1(new amf::Element);
     
     // If the length of the name field is corrupted, then we get out of
     // range quick, and corrupt memory. This is a bit of a hack, but
@@ -271,7 +271,7 @@ GatewayTest::parseEchoRequest(boost::uint8_t *data, size_t size)
     // a type byte.
     length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
     tmpptr += sizeof(boost::uint16_t);
-    boost::shared_ptr<amf::Element > el2(new amf::Element);
+    std::shared_ptr<amf::Element > el2(new amf::Element);
 
 //     std::string name2(reinterpret_cast<const char *>(tmpptr), length);
 //     el2->setName(name2.c_str(), name2.size());
@@ -291,11 +291,11 @@ GatewayTest::parseEchoRequest(boost::uint8_t *data, size_t size)
     // Get the last two pieces of data, which are both AMF encoded
     // with a type byte.
     amf::AMF amf;
-    boost::shared_ptr<amf::Element> el3 = amf.extractAMF(tmpptr, tmpptr + size);
+    std::shared_ptr<amf::Element> el3 = amf.extractAMF(tmpptr, tmpptr + size);
     headers.push_back(el3);
     tmpptr += amf.totalsize();
     
-    boost::shared_ptr<amf::Element> el4 = amf.extractAMF(tmpptr, tmpptr + size);
+    std::shared_ptr<amf::Element> el4 = amf.extractAMF(tmpptr, tmpptr + size);
     headers.push_back(el4);
 
      return headers;
@@ -308,7 +308,7 @@ amf::Buffer &
 GatewayTest::formatEchoResponse(const std::string &num, amf::Element &el)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<amf::Buffer> data;
+    std::shared_ptr<amf::Buffer> data;
 
     amf::Element nel;
     if (el.getType() == amf::Element::TYPED_OBJECT_AMF0) {
@@ -319,7 +319,7 @@ GatewayTest::formatEchoResponse(const std::string &num, amf::Element &el)
 	    // FIXME: see about using std::reverse() instead.
 	    for (int i=el.propertySize()-1; i>=0; i--) {
 // 	    for (int i=0 ; i<el.propertySize(); i++) {
-		boost::shared_ptr<amf::Element> child = el.getProperty(i);
+		std::shared_ptr<amf::Element> child = el.getProperty(i);
 		nel.addProperty(child);
 	    }
 	    data = nel.encode();
@@ -370,11 +370,11 @@ GatewayTest::formatEchoResponse(const std::string &num, boost::uint8_t *data, si
     // the request, a slash followed by a number like "/2".
     string result = num;
     result += "/onResult";
-    boost::shared_ptr<amf::Buffer> res = amf::AMF::encodeString(result);
+    std::shared_ptr<amf::Buffer> res = amf::AMF::encodeString(result);
     _buffer.append(res->begin()+1, res->size()-1);
 
     // Add the null data item
-    boost::shared_ptr<amf::Buffer> null = amf::AMF::encodeString("null");
+    std::shared_ptr<amf::Buffer> null = amf::AMF::encodeString("null");
     _buffer.append(null->begin()+1, null->size()-1);
 
     // Add the other binary blob

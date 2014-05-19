@@ -24,8 +24,8 @@
 
 namespace gnash {
 
-VaapiSurfaceProxy::VaapiSurfaceProxy(boost::shared_ptr<VaapiSurface> surface,
-                                     boost::shared_ptr<VaapiContext> context)
+VaapiSurfaceProxy::VaapiSurfaceProxy(std::shared_ptr<VaapiSurface> surface,
+                                     std::shared_ptr<VaapiContext> context)
     : _context(context), _surface(surface)
 {
     log_debug(_("VaapiSurfaceProxy::VaapiSurfaceProxy(): surface 0x%08x\n"), _surface->get());

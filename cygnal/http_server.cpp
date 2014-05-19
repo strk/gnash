@@ -145,7 +145,7 @@ HTTPServer::processClientRequest(Handler *hand, int fd, cygnal::Buffer *buf)
     string url = _docroot + _filespec;
     
     // See if the file is in the cache and already opened.
-    boost::shared_ptr<DiskStream> filestream(cache.findFile(_filespec));
+    std::shared_ptr<DiskStream> filestream(cache.findFile(_filespec));
     if (filestream) {
 	log_debug("FIXME: found filestream %s in cache!", _filespec);
 	filestream->dump();
@@ -202,7 +202,7 @@ HTTPServer::processGetRequest(Handler *hand, int fd, cygnal::Buffer *buf)
     
     string url = _docroot + _filespec;
 
-    boost::shared_ptr<DiskStream> ds = hand->getDiskStream(fd);
+    std::shared_ptr<DiskStream> ds = hand->getDiskStream(fd);
     if (ds) {
 	_diskstream = ds;
     }
@@ -271,14 +271,14 @@ HTTPServer::processGetRequest(Handler *hand, int fd, cygnal::Buffer *buf)
 // A POST request asks sends a data from the client to the server. After processing
 // the header like we normally do, we then read the amount of bytes specified by
 // the "content-length" field, and then write that data to disk, or decode the amf.
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 HTTPServer::processPostRequest(int fd, cygnal::Buffer * /* bufFIXME */)
 {
     GNASH_REPORT_FUNCTION;
 
 //    cerr << "QUE1 = " << _que.size() << endl;
 
-    boost::shared_ptr<cygnal::Buffer> buf;
+    std::shared_ptr<cygnal::Buffer> buf;
     
     if (_que.size() == 0) {
 	return buf;
@@ -295,7 +295,7 @@ HTTPServer::processPostRequest(int fd, cygnal::Buffer * /* bufFIXME */)
     clearHeader();
     boost::uint8_t *data = processHeaderFields(buf.get());
     size_t length = strtol(getField("content-length").c_str(), NULL, 0);
-    boost::shared_ptr<cygnal::Buffer> content(new cygnal::Buffer(length));
+    std::shared_ptr<cygnal::Buffer> content(new cygnal::Buffer(length));
     int ret = 0;
     if (buf->allocated() - (data - buf->reference()) ) {
 //	cerr << "Don't need to read more data: have " << buf->allocated() << " bytes" << endl;
@@ -321,7 +321,7 @@ HTTPServer::processPostRequest(int fd, cygnal::Buffer * /* bufFIXME */)
 	log_debug("Got AMF data in POST");
 #if 0
 	amf::AMF amf;
-	boost::shared_ptr<cygnal::Element> el = amf.extractAMF(content.reference(), content.end());
+	std::shared_ptr<cygnal::Element> el = amf.extractAMF(content.reference(), content.end());
 	el->dump();		// FIXME: do something intelligent
 				// with this Element
 #endif
@@ -342,13 +342,13 @@ HTTPServer::processPostRequest(int fd, cygnal::Buffer * /* bufFIXME */)
   	cgis.startCGI(_filespec, true, CGIBIN_PORT);
  	cgis.createClient("localhost", CGIBIN_PORT);
 	cgis.writeNet(*content);
-	boost::shared_ptr<cygnal::Buffer> reply = cgis.readNet();
+	std::shared_ptr<cygnal::Buffer> reply = cgis.readNet();
 	
 	writeNet(fd, *reply);
 //	cgis.stopCGI(_filespec);
 #else
-	vector<boost::shared_ptr<cygnal::Element> > headers = parseEchoRequest(*content);
-  	//boost::shared_ptr<cygnal::Element> &el0 = headers[0];
+	vector<std::shared_ptr<cygnal::Element> > headers = parseEchoRequest(*content);
+  	//std::shared_ptr<cygnal::Element> &el0 = headers[0];
 
 	if (headers.size() >= 4) {
 	    if (headers[3]) {
@@ -367,61 +367,61 @@ HTTPServer::processPostRequest(int fd, cygnal::Buffer * /* bufFIXME */)
     return buf;
 }
 
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 HTTPServer::processPutRequest(int /* fd */, cygnal::Buffer */* buf */)
 {
-    boost::shared_ptr<cygnal::Buffer> buf;
+    std::shared_ptr<cygnal::Buffer> buf;
 //    GNASH_REPORT_FUNCTION;
     log_unimpl(_("PUT request"));
 
     return buf;
 }
 
-boost::shared_ptr<cygnal::Buffer> 
+std::shared_ptr<cygnal::Buffer>
 HTTPServer::processDeleteRequest(int /* fd */, cygnal::Buffer */* buf */)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<cygnal::Buffer> buf;
+    std::shared_ptr<cygnal::Buffer> buf;
     log_unimpl(_("DELETE request"));
     
     return buf;
 }
 
-boost::shared_ptr<cygnal::Buffer> 
+std::shared_ptr<cygnal::Buffer>
 HTTPServer::processConnectRequest(int /* fd */, cygnal::Buffer */* buf */)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<cygnal::Buffer> buf;
+    std::shared_ptr<cygnal::Buffer> buf;
     log_unimpl(_("CONNECT request"));
 
     return buf;
 }
 
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 HTTPServer::processOptionsRequest(int /* fd */, cygnal::Buffer */* buf */)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<cygnal::Buffer> buf;
+    std::shared_ptr<cygnal::Buffer> buf;
     log_unimpl(_("OPTIONS request"));
 
     return buf;
 }
 
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 HTTPServer::processHeadRequest(int /* fd */, cygnal::Buffer */* buf */)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<cygnal::Buffer> buf;
+    std::shared_ptr<cygnal::Buffer> buf;
     log_unimpl(_("HEAD request"));
     
     return buf;
 }
 
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 HTTPServer::processTraceRequest(int /* fd */, cygnal::Buffer */* buf */)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<cygnal::Buffer> buf;
+    std::shared_ptr<cygnal::Buffer> buf;
     log_unimpl(_("TRACE request"));
     
     return buf;
@@ -512,7 +512,7 @@ HTTPServer::formatPostReply(rtmpt_cmd_e /* code */)
 
 #if 0
     formatHeader(_filesize, code);
-    boost::shared_ptr<cygnal::Buffer> buf = new cygnal::Buffer;
+    std::shared_ptr<cygnal::Buffer> buf = new cygnal::Buffer;
     if (_header.str().size()) {
 	buf->resize(_header.str().size());
 	string str = _header.str();
@@ -533,12 +533,12 @@ HTTPServer::formatPostReply(rtmpt_cmd_e /* code */)
 #ifndef USE_CGIBIN
 // Parse an Echo Request message coming from the Red5 echo_test. This
 // method should only be used for testing purposes.
-vector<boost::shared_ptr<cygnal::Element > >
+vector<std::shared_ptr<cygnal::Element > >
 HTTPServer::parseEchoRequest(boost::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    vector<boost::shared_ptr<cygnal::Element > > headers;
+    vector<std::shared_ptr<cygnal::Element > > headers;
 	
     // skip past the header bytes, we don't care about them.
     boost::uint8_t *tmpptr = data + 6;
@@ -549,7 +549,7 @@ HTTPServer::parseEchoRequest(boost::uint8_t *data, size_t size)
 
     // Get the first name, which is a raw string, and not preceded by
     // a type byte.
-    boost::shared_ptr<cygnal::Element > el1(new cygnal::Element);
+    std::shared_ptr<cygnal::Element > el1(new cygnal::Element);
     
     // If the length of the name field is corrupted, then we get out of
     // range quick, and corrupt memory. This is a bit of a hack, but
@@ -568,7 +568,7 @@ HTTPServer::parseEchoRequest(boost::uint8_t *data, size_t size)
     // a type byte.
     length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
     tmpptr += sizeof(boost::uint16_t);
-    boost::shared_ptr<cygnal::Element > el2(new cygnal::Element);
+    std::shared_ptr<cygnal::Element > el2(new cygnal::Element);
 
 //     std::string name2(reinterpret_cast<const char *>(tmpptr), length);
 //     el2->setName(name2.c_str(), name2.size());
@@ -588,11 +588,11 @@ HTTPServer::parseEchoRequest(boost::uint8_t *data, size_t size)
     // Get the last two pieces of data, which are both AMF encoded
     // with a type byte.
     amf::AMF amf;
-    boost::shared_ptr<cygnal::Element> el3 = amf.extractAMF(tmpptr, tmpptr + size);
+    std::shared_ptr<cygnal::Element> el3 = amf.extractAMF(tmpptr, tmpptr + size);
     headers.push_back(el3);
     tmpptr += amf.totalsize();
     
-    boost::shared_ptr<cygnal::Element> el4 = amf.extractAMF(tmpptr, tmpptr + size);
+    std::shared_ptr<cygnal::Element> el4 = amf.extractAMF(tmpptr, tmpptr + size);
     headers.push_back(el4);
 
      return headers;
@@ -605,7 +605,7 @@ cygnal::Buffer &
 HTTPServer::formatEchoResponse(const std::string &num, cygnal::Element &el)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<cygnal::Buffer> data;
+    std::shared_ptr<cygnal::Buffer> data;
 
     cygnal::Element nel;
     if (el.getType() == cygnal::Element::TYPED_OBJECT_AMF0) {
@@ -616,7 +616,7 @@ HTTPServer::formatEchoResponse(const std::string &num, cygnal::Element &el)
 	    // FIXME: see about using std::reverse() instead.
 	    for (int i=el.propertySize()-1; i>=0; i--) {
 // 	    for (int i=0 ; i<el.propertySize(); i++) {
-		boost::shared_ptr<cygnal::Element> child = el.getProperty(i);
+		std::shared_ptr<cygnal::Element> child = el.getProperty(i);
 		nel.addProperty(child);
 	    }
 	    data = nel.encode();
@@ -667,11 +667,11 @@ HTTPServer::formatEchoResponse(const std::string &num, boost::uint8_t *data, siz
     // the request, a slash followed by a number like "/2".
     string result = num;
     result += "/onResult";
-    boost::shared_ptr<cygnal::Buffer> res = amf::AMF::encodeString(result);
+    std::shared_ptr<cygnal::Buffer> res = amf::AMF::encodeString(result);
     _buffer.append(res->begin()+1, res->size()-1);
 
     // Add the null data item
-    boost::shared_ptr<cygnal::Buffer> null = amf::AMF::encodeString("null");
+    std::shared_ptr<cygnal::Buffer> null = amf::AMF::encodeString("null");
     _buffer.append(null->begin()+1, null->size()-1);
 
     // Add the other binary blob
@@ -1006,7 +1006,7 @@ HTTPServer::http_handler(Handler *hand, int netfd, cygnal::Buffer *buf)
 
     // Handler *hand = reinterpret_cast<Handler *>(args->handler);
     // cygnal::Buffer *buf = args->buffer;
-    // boost::shared_ptr<HTTPServer> www(new HTTPServer); // = hand->getHTTPHandler    (args->netfd);
+    // std::shared_ptr<HTTPServer> www(new HTTPServer); // = hand->getHTTPHandler    (args->netfd);
     
     string url, parameters;
     // by default, only look once unless changed later

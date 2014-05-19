@@ -310,7 +310,7 @@ EventDevice::check()
     switch (ev->type) {
       case EV_SYN:
       {
-          boost::shared_ptr<InputDevice::input_data_t> _newdata(new InputDevice::input_data_t);
+          std::shared_ptr<InputDevice::input_data_t> _newdata(new InputDevice::input_data_t);
 #if 0
           std::copy(_input_data.begin(), _input_data.end(), _newdata.begin());
 #else
@@ -675,7 +675,7 @@ EventDevice::scancode_to_gnash_key(int code, bool shift)
 }
 
 // This looks in the input event devices
-std::vector<boost::shared_ptr<InputDevice> > 
+std::vector<std::shared_ptr<InputDevice> >
 EventDevice::scanForDevices()
 {
     // GNASH_REPORT_FUNCTION;
@@ -683,7 +683,7 @@ EventDevice::scanForDevices()
     struct stat st;
 
     int total = 0;
-    std::vector<boost::shared_ptr<InputDevice> > devices;
+    std::vector<std::shared_ptr<InputDevice> > devices;
     
     // The default path for input event devices.
     char *filespec = strdup("/dev/input/eventX");
@@ -726,8 +726,8 @@ EventDevice::scanForDevices()
                   device_info.vendor, device_info.product,
                   device_info.version);
         close(fd);
-        boost::shared_ptr<InputDevice> dev;
-        dev = boost::shared_ptr<InputDevice>(new EventDevice());
+        std::shared_ptr<InputDevice> dev;
+        dev = std::shared_ptr<InputDevice>(new EventDevice());
         // The Uinput device has no product, vendor, or version data.
         if ((device_info.vendor + device_info.product + device_info.version) > 0) {
             if (dev->init(filespec, DEFAULT_BUFFER_SIZE)) {

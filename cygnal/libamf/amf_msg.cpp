@@ -40,13 +40,13 @@ using std::endl;
 namespace cygnal
 {
 
-boost::shared_ptr<cygnal::Buffer> 
+std::shared_ptr<cygnal::Buffer>
 AMF_msg::encodeContextHeader(boost::uint16_t version, boost::uint16_t headers,
 			     boost::uint16_t messages)
 {
 //    GNASH_REPORT_FUNCTION;
     size_t size = sizeof(AMF_msg::context_header_t);
-    boost::shared_ptr<cygnal::Buffer> buf (new cygnal::Buffer(size));
+    std::shared_ptr<cygnal::Buffer> buf (new cygnal::Buffer(size));
 
     // use a short as a temporary, as it turns out htons() returns a 32bit int
     // instead when compiling with -O2. This forces appending bytes to get the
@@ -61,7 +61,7 @@ AMF_msg::encodeContextHeader(boost::uint16_t version, boost::uint16_t headers,
     return buf;
 }
 
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 AMF_msg::encodeContextHeader(AMF_msg::context_header_t *head)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -72,14 +72,14 @@ AMF_msg::encodeContextHeader(AMF_msg::context_header_t *head)
 //  00 06 67 65 74 77 61 79                <- getway, message #1
 //  00 04 2f 32 32 39                      <- /229, operation name
 //  00 00 00 0e				   <- byte length of message
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 AMF_msg::encodeMsgHeader(AMF_msg::message_header_t *head)
 {
 //    GNASH_REPORT_FUNCTION;
     // The size of the buffer are the two strings, their lenght fields, and the integer.
 //     size_t size = head->target.size() + head->response.size() + sizeof(boost::uint32_t)
 //         + (sizeof(boost::uint16_t) * 2);
-    boost::shared_ptr<cygnal::Buffer> buf (new cygnal::Buffer(sizeof(AMF_msg::message_header_t)));
+    std::shared_ptr<cygnal::Buffer> buf (new cygnal::Buffer(sizeof(AMF_msg::message_header_t)));
 
     // Encode the target URI, which usually looks something like ."getway"
     boost::uint16_t length = head->target.size();    
@@ -98,18 +98,18 @@ AMF_msg::encodeMsgHeader(AMF_msg::message_header_t *head)
 }
 
 // These methods parse the raw data of the AMF packet
-boost::shared_ptr<AMF_msg::context_header_t>
+std::shared_ptr<AMF_msg::context_header_t>
 AMF_msg::parseContextHeader(cygnal::Buffer &data)
 {
 //    GNASH_REPORT_FUNCTION;
     return parseContextHeader(data.reference(), data.size());
 }
 
-boost::shared_ptr<AMF_msg::context_header_t>
+std::shared_ptr<AMF_msg::context_header_t>
 AMF_msg::parseContextHeader(boost::uint8_t *data, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<AMF_msg::context_header_t> msg (new AMF_msg::context_header_t);
+    std::shared_ptr<AMF_msg::context_header_t> msg (new AMF_msg::context_header_t);
 
     boost::uint16_t tmpnum = *reinterpret_cast<boost::uint16_t *>(data);
     msg->version  = tmpnum;
@@ -121,20 +121,20 @@ AMF_msg::parseContextHeader(boost::uint8_t *data, size_t /* size */)
     return msg;
 }
 
-boost::shared_ptr<AMF_msg::message_header_t>
+std::shared_ptr<AMF_msg::message_header_t>
 AMF_msg::parseMessageHeader(cygnal::Buffer &data)
 {
 //    GNASH_REPORT_FUNCTION;
     return parseMessageHeader(data.reference(), data.size());
 }
 
-boost::shared_ptr<AMF_msg::message_header_t>
+std::shared_ptr<AMF_msg::message_header_t>
 AMF_msg::parseMessageHeader(boost::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     AMF amf;
     boost::uint8_t *tmpptr = data;
-    boost::shared_ptr<AMF_msg::message_header_t> msg (new AMF_msg::message_header_t);
+    std::shared_ptr<AMF_msg::message_header_t> msg (new AMF_msg::message_header_t);
 
     // The target is a standard length->bytes field
     boost::uint16_t length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
@@ -190,20 +190,20 @@ AMF_msg::parseMessageHeader(boost::uint8_t *data, size_t size)
     return msg;
 }
 
-boost::shared_ptr<AMF_msg::context_header_t>
+std::shared_ptr<AMF_msg::context_header_t>
 AMF_msg::parseAMFPacket(cygnal::Buffer &data)
 {
 //    GNASH_REPORT_FUNCTION;
     return parseAMFPacket(data.reference(), data.size());
 }
 
-boost::shared_ptr<AMF_msg::context_header_t>
+std::shared_ptr<AMF_msg::context_header_t>
 AMF_msg::parseAMFPacket(boost::uint8_t *data, size_t size)
 {
     GNASH_REPORT_FUNCTION;
 //    _messages.push_back();
     boost::uint8_t *ptr = data + sizeof(AMF_msg::context_header_t);
-    boost::shared_ptr<context_header_t> header = AMF_msg::parseContextHeader(data, size);
+    std::shared_ptr<context_header_t> header = AMF_msg::parseContextHeader(data, size);
 
 //     log_debug("%s: %s", __PRETTY_FUNCTION__, hexify(data, size, true));
     
@@ -211,13 +211,13 @@ AMF_msg::parseAMFPacket(boost::uint8_t *data, size_t size)
     /// Read all the messages from the AMF packet
     try {
         for (int i=0; i<header->messages; i++) {
-            boost::shared_ptr<AMF_msg::amf_message_t> msgpkt(new AMF_msg::amf_message_t);
-            boost::shared_ptr<AMF_msg::message_header_t> msghead = AMF_msg::parseMessageHeader(ptr, size);
+            std::shared_ptr<AMF_msg::amf_message_t> msgpkt(new AMF_msg::amf_message_t);
+            std::shared_ptr<AMF_msg::message_header_t> msghead = AMF_msg::parseMessageHeader(ptr, size);
             if (msghead) {
                 ptr += msghead->target.size() + msghead->response.size()
                     + (sizeof(boost::uint16_t) * 2)
                     + (sizeof(boost::uint32_t));
-                boost::shared_ptr<cygnal::Element> el = amf.extractAMF(ptr, ptr+size);
+                std::shared_ptr<cygnal::Element> el = amf.extractAMF(ptr, ptr+size);
                 msgpkt->header.target = msghead->target;
                 msgpkt->header.response = msghead->response;
                 msgpkt->header.size = msghead->size;
@@ -234,7 +234,7 @@ AMF_msg::parseAMFPacket(boost::uint8_t *data, size_t size)
     return header;
 }
 
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 AMF_msg::encodeAMFPacket(const std::string & /* target */,
                          const std::string & /*response */, size_t /* size */)
 {
@@ -243,29 +243,29 @@ AMF_msg::encodeAMFPacket(const std::string & /* target */,
     return encodeAMFPacket();
 }
 
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 AMF_msg::encodeAMFPacket()
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer);
+    std::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer);
 
     // Encode the packet header
-    boost::shared_ptr<cygnal::Buffer> buf1 = encodeContextHeader(0, 0, _messages.size());
+    std::shared_ptr<cygnal::Buffer> buf1 = encodeContextHeader(0, 0, _messages.size());
     *buf = buf1;
 
     // Now encode all the messages
 
-    std::vector<boost::shared_ptr<AMF_msg::amf_message_t> >::iterator it;
+    std::vector<std::shared_ptr<AMF_msg::amf_message_t> >::iterator it;
     for (it = _messages.begin(); it != _messages.end(); ++it) {
-        boost::shared_ptr<AMF_msg::amf_message_t> msg = (*(it));
+        std::shared_ptr<AMF_msg::amf_message_t> msg = (*(it));
 
-        boost::shared_ptr<cygnal::Buffer> buf2 = encodeMsgHeader(msg->header.target,
+        std::shared_ptr<cygnal::Buffer> buf2 = encodeMsgHeader(msg->header.target,
 							     msg->header.response,
 							     msg->header.size);
 
 // 	AMF_msg::dump(msg->header);
 // 	msg->data->dump();
-        boost::shared_ptr<cygnal::Buffer> buf3 = msg->data->encode();
+        std::shared_ptr<cygnal::Buffer> buf3 = msg->data->encode();
 	*buf += buf2;
 	*buf += buf3;
     }
@@ -273,7 +273,7 @@ AMF_msg::encodeAMFPacket()
     return buf;
 }
 
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 AMF_msg::encodeMsgHeader(const std::string &target,
                          const std::string &response, size_t size)
 {
@@ -282,7 +282,7 @@ AMF_msg::encodeMsgHeader(const std::string &target,
     total += response.size() + sizeof(boost::uint16_t);
     total += sizeof(boost::uint32_t);
     
-    boost::shared_ptr<cygnal::Buffer> buf (new cygnal::Buffer(total));
+    std::shared_ptr<cygnal::Buffer> buf (new cygnal::Buffer(total));
     boost::uint16_t length = target.size();
     swapBytes(&length, sizeof(boost::uint16_t));
     *buf += length;
@@ -322,9 +322,9 @@ AMF_msg::dump()
 {
 //    GNASH_REPORT_FUNCTION;
     cout << "AMF Packet has " << _messages.size() << " messages." << endl;
-    std::vector<boost::shared_ptr<AMF_msg::amf_message_t> >::iterator it;
+    std::vector<std::shared_ptr<AMF_msg::amf_message_t> >::iterator it;
     for (it = _messages.begin(); it != _messages.end(); ++it) {
-        boost::shared_ptr<AMF_msg::amf_message_t> msg = (*(it));
+        std::shared_ptr<AMF_msg::amf_message_t> msg = (*(it));
         AMF_msg::dump(msg->header);
         msg->data->dump();
     }

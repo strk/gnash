@@ -75,7 +75,7 @@ class GtkOvgGlue : public GtkGlue
     unsigned int        _width;
     unsigned int        _height;
 
-    boost::shared_ptr<renderer::openvg::Renderer_ovg>  _renderer;    
+    std::shared_ptr<renderer::openvg::Renderer_ovg>  _renderer;
 };
 
 } // namespace gui

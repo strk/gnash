@@ -53,7 +53,7 @@ CQue::~CQue()
     que_t::iterator it;
     boost::mutex::scoped_lock lock(_mutex);
 //     for (it = _que.begin(); it != _que.end(); it++) {
-// 	boost::shared_ptr<cygnal::Buffer> ptr = *(it);
+// 	std::shared_ptr<cygnal::Buffer> ptr = *(it);
 // 	if (ptr->size()) {	// FIXME: we probably want to delete ptr anyway,
 // 	    delete ptr;		// but if we do, this will core dump.
 // 	}
@@ -94,7 +94,7 @@ CQue::size()
 }
 
 bool
-CQue::push(boost::shared_ptr<cygnal::Buffer> data)
+CQue::push(std::shared_ptr<cygnal::Buffer> data)
 {
 //     GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_mutex);
@@ -111,18 +111,18 @@ bool
 CQue::push(boost::uint8_t *data, int nbytes)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer);
+    std::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer);
     std::copy(data, data + nbytes, buf->reference());
     return push(buf);
 }
 
 
 // Pop the first date element off the FIFO
-boost::shared_ptr<cygnal::Buffer> 
+std::shared_ptr<cygnal::Buffer>
 CQue::pop()
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<cygnal::Buffer> buf;
+    std::shared_ptr<cygnal::Buffer> buf;
     boost::mutex::scoped_lock lock(_mutex);
     if (_que.size()) {
         buf = _que.front();
@@ -135,7 +135,7 @@ CQue::pop()
 }
 
 // Peek at the first data element without removing it
-boost::shared_ptr<cygnal::Buffer> 
+std::shared_ptr<cygnal::Buffer>
 CQue::peek()
 {
 //    GNASH_REPORT_FUNCTION;
@@ -143,7 +143,7 @@ CQue::peek()
     if (_que.size()) {
         return _que.front();
     }
-    return boost::shared_ptr<cygnal::Buffer>();
+    return std::shared_ptr<cygnal::Buffer>();
 }
 
 // Return the size of the queues
@@ -157,14 +157,14 @@ CQue::clear()
 
 // Remove a range of elements
 void
-CQue::remove(boost::shared_ptr<cygnal::Buffer> begin, boost::shared_ptr<cygnal::Buffer> end)
+CQue::remove(std::shared_ptr<cygnal::Buffer> begin, std::shared_ptr<cygnal::Buffer> end)
 {
     GNASH_REPORT_FUNCTION;
-    deque<boost::shared_ptr<cygnal::Buffer> >::iterator it;
-    deque<boost::shared_ptr<cygnal::Buffer> >::iterator start;
-    deque<boost::shared_ptr<cygnal::Buffer> >::iterator stop;
+    deque<std::shared_ptr<cygnal::Buffer> >::iterator it;
+    deque<std::shared_ptr<cygnal::Buffer> >::iterator start;
+    deque<std::shared_ptr<cygnal::Buffer> >::iterator stop;
     boost::mutex::scoped_lock lock(_mutex);
-    boost::shared_ptr<cygnal::Buffer> ptr;
+    std::shared_ptr<cygnal::Buffer> ptr;
     for (it = _que.begin(); it != _que.end(); ++it) {
 	ptr = *(it);
 	if (ptr->reference() == begin->reference()) {
@@ -180,13 +180,13 @@ CQue::remove(boost::shared_ptr<cygnal::Buffer> begin, boost::shared_ptr<cygnal::
 
 // Remove an element
 void
-CQue::remove(boost::shared_ptr<cygnal::Buffer> element)
+CQue::remove(std::shared_ptr<cygnal::Buffer> element)
 {
     GNASH_REPORT_FUNCTION;
-    deque<boost::shared_ptr<cygnal::Buffer> >::iterator it;
+    deque<std::shared_ptr<cygnal::Buffer> >::iterator it;
     boost::mutex::scoped_lock lock(_mutex);
     for (it = _que.begin(); it != _que.end(); ) {
-	boost::shared_ptr<cygnal::Buffer> ptr = *(it);
+	std::shared_ptr<cygnal::Buffer> ptr = *(it);
 	if (ptr->reference() == element->reference()) {
 	    it = _que.erase(it);
 	} else {
@@ -197,7 +197,7 @@ CQue::remove(boost::shared_ptr<cygnal::Buffer> element)
 
 // Merge sucessive buffers into one single larger buffer. This is for some
 // protocols, than have very long headers.
-boost::shared_ptr<cygnal::Buffer> 
+std::shared_ptr<cygnal::Buffer>
 CQue::merge()
 {
 //     GNASH_REPORT_FUNCTION;
@@ -205,8 +205,8 @@ CQue::merge()
     return merge(_que.front());
 }
 
-boost::shared_ptr<cygnal::Buffer> 
-CQue::merge(boost::shared_ptr<cygnal::Buffer> start)
+std::shared_ptr<cygnal::Buffer>
+CQue::merge(std::shared_ptr<cygnal::Buffer> start)
 {
 //     GNASH_REPORT_FUNCTION;
     // Find iterator to first element to merge
@@ -232,7 +232,7 @@ CQue::merge(boost::shared_ptr<cygnal::Buffer> start)
 //     log_debug("%s: Final Totalsize is %s", __PRETTY_FUNCTION__, totalsize);
     
     // Merge all elements in a single buffer. We have totalsize now.
-    boost::shared_ptr<cygnal::Buffer> newbuf(new cygnal::Buffer(totalsize));
+    std::shared_ptr<cygnal::Buffer> newbuf(new cygnal::Buffer(totalsize));
     for (que_t::iterator i=from; i!=to; ++i) {
 //  	log_debug("%s: copying %d bytes, space left is %d, totalsize is %d", __PRETTY_FUNCTION__,
 //  		  (*i)->allocated(), newbuf->spaceLeft(), totalsize);
@@ -261,12 +261,12 @@ void
 CQue::dump()
 {
 //    GNASH_REPORT_FUNCTION;
-    deque<boost::shared_ptr<cygnal::Buffer> >::iterator it;
+    deque<std::shared_ptr<cygnal::Buffer> >::iterator it;
     boost::mutex::scoped_lock lock(_mutex);
     std::cerr << std::endl << "CQue \"" << _name << "\" has "<< _que.size()
               << " buffers." << std::endl;
     for (it = _que.begin(); it != _que.end(); ++it) {
-	boost::shared_ptr<cygnal::Buffer> ptr = *(it);
+	std::shared_ptr<cygnal::Buffer> ptr = *(it);
         ptr->dump();
     }
 #ifdef USE_STATS_QUEUE

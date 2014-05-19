@@ -58,7 +58,7 @@ public:
     /// @param in   The stream to read GIF data from. Ownership is shared
     ///             between caller and GifInput, so it is freed
     ///             automatically when the last owner is destroyed.
-    GifInput(boost::shared_ptr<IOChannel> in);
+    GifInput(std::shared_ptr<IOChannel> in);
     
     ~GifInput();
 
@@ -110,7 +110,7 @@ private:
 };
 
 
-GifInput::GifInput(boost::shared_ptr<IOChannel> in)
+GifInput::GifInput(std::shared_ptr<IOChannel> in)
     :
     Input(in),
     _gif(0),
@@ -305,7 +305,7 @@ GifInput::read()
 } // unnamed namespace
 
 std::unique_ptr<Input>
-createGifInput(boost::shared_ptr<IOChannel> in)
+createGifInput(std::shared_ptr<IOChannel> in)
 {
     std::unique_ptr<Input> ret(new GifInput(in));
     ret->read();

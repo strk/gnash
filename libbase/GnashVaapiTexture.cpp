@@ -39,7 +39,7 @@ GnashVaapiTexture::~GnashVaapiTexture()
 {
 }
 
-void GnashVaapiTexture::update(boost::shared_ptr<VaapiSurface> surface)
+void GnashVaapiTexture::update(std::shared_ptr<VaapiSurface> surface)
 {
     _surface->update(surface);
 }

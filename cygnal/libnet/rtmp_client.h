@@ -45,18 +45,18 @@ public:
 
     bool handShakeWait();
 //    bool handShakeResponse();
-    boost::shared_ptr<cygnal::Buffer> clientFinish();
-    DSOEXPORT  boost::shared_ptr<cygnal::Buffer> clientFinish(cygnal::Buffer &data);
-    DSOEXPORT boost::shared_ptr<cygnal::Buffer> handShakeRequest();
+    std::shared_ptr<cygnal::Buffer> clientFinish();
+    DSOEXPORT  std::shared_ptr<cygnal::Buffer> clientFinish(cygnal::Buffer &data);
+    DSOEXPORT std::shared_ptr<cygnal::Buffer> handShakeRequest();
     
     // These are used for creating the primary objects
     // Create the initial object sent to the server, which
     // is NetConnection::connect()
-    DSOEXPORT boost::shared_ptr<cygnal::Buffer> encodeConnect();
-    DSOEXPORT boost::shared_ptr<cygnal::Buffer> encodeConnect(const char *uri);
-    DSOEXPORT boost::shared_ptr<cygnal::Buffer> encodeConnect(const char *uri, double audioCodecs, double videoCodecs,
+    DSOEXPORT std::shared_ptr<cygnal::Buffer> encodeConnect();
+    DSOEXPORT std::shared_ptr<cygnal::Buffer> encodeConnect(const char *uri);
+    DSOEXPORT std::shared_ptr<cygnal::Buffer> encodeConnect(const char *uri, double audioCodecs, double videoCodecs,
 		   double videoFunction);
-    DSOEXPORT boost::shared_ptr<cygnal::Buffer> encodeConnect(const char *app,
+    DSOEXPORT std::shared_ptr<cygnal::Buffer> encodeConnect(const char *app,
 		   const char *swfUrl, const char *tcUrl,
                    double audioCodecs, double videoCodecs, double videoFunction,
                     const char *pageUrl);
@@ -64,20 +64,20 @@ public:
     DSOEXPORT bool connectToServer(const std::string &url);
 
     // Create the second object sent to the server, which is NetStream():;NetStream()
-    DSOEXPORT boost::shared_ptr<cygnal::Buffer> encodeStream(double id);
-    boost::shared_ptr<cygnal::Buffer> encodeStreamOp(double id, rtmp_op_e op, bool flag);
-    boost::shared_ptr<cygnal::Buffer> encodeStreamOp(double id, rtmp_op_e op, bool flag, double pos);
-    DSOEXPORT boost::shared_ptr<cygnal::Buffer> encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string &name);
-    boost::shared_ptr<cygnal::Buffer> encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string &name, double pos);
+    DSOEXPORT std::shared_ptr<cygnal::Buffer> encodeStream(double id);
+    std::shared_ptr<cygnal::Buffer> encodeStreamOp(double id, rtmp_op_e op, bool flag);
+    std::shared_ptr<cygnal::Buffer> encodeStreamOp(double id, rtmp_op_e op, bool flag, double pos);
+    DSOEXPORT std::shared_ptr<cygnal::Buffer> encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string &name);
+    std::shared_ptr<cygnal::Buffer> encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string &name, double pos);
 
     bool isConnected() { return _connected; };
 
     std::string &getPath() { return _path; };
     void setPath(std::string &x) { _path = x; };
 
-    DSOEXPORT boost::shared_ptr<cygnal::Buffer> encodeEchoRequest(const std::string &method, double id, cygnal::Element &el);
+    DSOEXPORT std::shared_ptr<cygnal::Buffer> encodeEchoRequest(const std::string &method, double id, cygnal::Element &el);
 
-    typedef std::deque<boost::shared_ptr<RTMPMsg> > msgque_t;
+    typedef std::deque<std::shared_ptr<RTMPMsg> > msgque_t;
     msgque_t recvResponse();
 
     void dump();

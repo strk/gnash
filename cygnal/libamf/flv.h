@@ -167,15 +167,15 @@ class DSOEXPORT Flv {
     /// @param type The data type for the header
     ///
     /// @return a smart pointer to a Buffer containing the data in big endian format.
-    boost::shared_ptr<cygnal::Buffer> encodeHeader(boost::uint8_t type);
+    std::shared_ptr<cygnal::Buffer> encodeHeader(boost::uint8_t type);
     
     /// \brief Decode a Buffer into a header
     ///
     /// @param buf a smart pointer to a Buffer containing the data.
     ///
     /// @return a smart pointer to data structure that contains the data.
-    boost::shared_ptr<flv_header_t> decodeHeader(boost::shared_ptr<cygnal::Buffer> buf) { return decodeHeader(buf->reference()); };
-    boost::shared_ptr<flv_header_t> decodeHeader(boost::uint8_t *data);
+    std::shared_ptr<flv_header_t> decodeHeader(std::shared_ptr<cygnal::Buffer> buf) { return decodeHeader(buf->reference()); };
+    std::shared_ptr<flv_header_t> decodeHeader(boost::uint8_t *data);
 
     /// \brief Decode a MetaData object.
     ///		This is after the header, but before all the other tags usually
@@ -183,7 +183,7 @@ class DSOEXPORT Flv {
     /// @param buf a smart pointer to a Buffer containing the data.
     ///
     /// @return a smart pointer to an Element that contains the data.
-    boost::shared_ptr<cygnal::Element> decodeMetaData(boost::shared_ptr<cygnal::Buffer> buf);
+    std::shared_ptr<cygnal::Element> decodeMetaData(std::shared_ptr<cygnal::Buffer> buf);
 
     /// \brief Decode a MetaData object.
     ///		This is after the header, but before all the other tags usually
@@ -193,29 +193,29 @@ class DSOEXPORT Flv {
     /// @param size The size of the data in bytes
     ///
     /// @return a smart pointer to an Element that contains the data.
-    boost::shared_ptr<cygnal::Element> decodeMetaData(boost::uint8_t *data, size_t size);
+    std::shared_ptr<cygnal::Element> decodeMetaData(boost::uint8_t *data, size_t size);
 
     /// \brief Decode an Audio object.
     ///
     /// @param flags The data to deserialize.
     /// 
     /// @return a smart pointer to an audio data structure that contains the data.
-    boost::shared_ptr<flv_audio_t> decodeAudioData(boost::uint8_t flags);
+    std::shared_ptr<flv_audio_t> decodeAudioData(boost::uint8_t flags);
 
     /// \brief Decode an Video object.
     ///
     /// @param flags The data to deserialize.
     /// 
     /// @return a smart pointer to an video data structure that contains the data.
-    boost::shared_ptr<flv_video_t> decodeVideoData(boost::uint8_t flags);
+    std::shared_ptr<flv_video_t> decodeVideoData(boost::uint8_t flags);
     
     /// \brief Decode an MetaData object.
     ///
     /// @param flags The data to deserialize.
     /// 
     /// @return a smart pointer to an video data structure that contains the data.
-    boost::shared_ptr<flv_tag_t> decodeTagHeader(boost::shared_ptr<cygnal::Buffer> &buf) { return decodeTagHeader(buf->reference()); };
-    boost::shared_ptr<flv_tag_t> decodeTagHeader(boost::uint8_t *data);
+    std::shared_ptr<flv_tag_t> decodeTagHeader(std::shared_ptr<cygnal::Buffer> &buf) { return decodeTagHeader(buf->reference()); };
+    std::shared_ptr<flv_tag_t> decodeTagHeader(boost::uint8_t *data);
 
     /// \brief Find the named property for this Object.
     ///
@@ -223,14 +223,14 @@ class DSOEXPORT Flv {
     ///		search for.
     ///
     /// @return A smart pointer to the Element for this property.    
-    boost::shared_ptr<cygnal::Element> findProperty(const std::string &name);
+    std::shared_ptr<cygnal::Element> findProperty(const std::string &name);
 
     /// \brief Set all the properties from an array of Element classes.
     ///
     /// @param array
     ///
     /// @return nothing
-    void setProperties(std::vector<boost::shared_ptr<cygnal::Element> > array)
+    void setProperties(std::vector<std::shared_ptr<cygnal::Element> > array)
 			{ _properties = array; };
 
     /// \brief Convert a 24 bit integer to a 32 bit one so we can use it.
@@ -258,12 +258,12 @@ class DSOEXPORT Flv {
     /// \var Flv::_properties
     ///		The array of properties for this Flv file, which is
     ///		populated by the data from the first onMetaTag block.
-    std::vector<boost::shared_ptr<cygnal::Element> > _properties;
+    std::vector<std::shared_ptr<cygnal::Element> > _properties;
 
     /// \var _metadata
     ///         The data contained in the first onMetaData tag from
     ///         the FLV file.
-    boost::shared_ptr<cygnal::Element> _metadata;
+    std::shared_ptr<cygnal::Element> _metadata;
     
 }; // end of class definition
 

@@ -53,7 +53,7 @@ public:
     /// Set the StreamProvider.
     //
     /// This can probably be changed during a run without ill effects.
-    void setStreamProvider(boost::shared_ptr<StreamProvider> sp) {
+    void setStreamProvider(std::shared_ptr<StreamProvider> sp) {
         _streamProvider = sp;
     }
 
@@ -75,7 +75,7 @@ public:
     //
     /// This is cached in various places, so changing it during a run will
     /// lead to unexpected behaviour.
-    void setSoundHandler(boost::shared_ptr<sound::sound_handler> s) {
+    void setSoundHandler(std::shared_ptr<sound::sound_handler> s) {
         _soundHandler = s;
     } 
 
@@ -87,7 +87,7 @@ public:
         return _soundHandler.get();
     }
 
-    void setMediaHandler(boost::shared_ptr<media::MediaHandler> s) {
+    void setMediaHandler(std::shared_ptr<media::MediaHandler> s) {
         _mediaHandler = s;
     }
 
@@ -95,7 +95,7 @@ public:
         return _mediaHandler.get();
     }
 
-    void setRenderer(boost::shared_ptr<Renderer> r) {
+    void setRenderer(std::shared_ptr<Renderer> r) {
         _renderer = r;
     }
 
@@ -108,7 +108,7 @@ public:
     /// This must be present before parsing.
     /// It is a pointer to const so that the same table can be shared between
     /// simultaneous runs if desired.
-    void setTagLoaders(boost::shared_ptr<const SWF::TagLoadersTable> loaders) {
+    void setTagLoaders(std::shared_ptr<const SWF::TagLoadersTable> loaders) {
         _tagLoaders = loaders;
     }
 
@@ -134,15 +134,15 @@ public:
 
 private:
 
-    boost::shared_ptr<StreamProvider> _streamProvider;
+    std::shared_ptr<StreamProvider> _streamProvider;
 
-    boost::shared_ptr<sound::sound_handler> _soundHandler;
+    std::shared_ptr<sound::sound_handler> _soundHandler;
     
-    boost::shared_ptr<media::MediaHandler> _mediaHandler;
+    std::shared_ptr<media::MediaHandler> _mediaHandler;
 
-    boost::shared_ptr<Renderer> _renderer;
+    std::shared_ptr<Renderer> _renderer;
 
-    boost::shared_ptr<const SWF::TagLoadersTable> _tagLoaders;
+    std::shared_ptr<const SWF::TagLoadersTable> _tagLoaders;
 
     /// Whether to ue HW video decoding support, no value means disabled.
     /// The only currently supported values are: none or vaapi.

@@ -109,7 +109,7 @@ FltkCairoGlue::initBuffer(int width, int height)
 
     if (firstTime) {
       //set_Renderer(_renderer);
-      _runResources.setRenderer(boost::shared_ptr<Renderer>(_renderer));
+      _runResources.setRenderer(std::shared_ptr<Renderer>(_renderer));
       firstTime = false;
     }
 

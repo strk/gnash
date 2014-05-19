@@ -133,20 +133,20 @@ public:
     /// @param el A smart pointer to the Element to add to the .sol file.
     ///
     /// @return nothing.
-    void addObj(boost::shared_ptr<Element> el);
+    void addObj(std::shared_ptr<Element> el);
 
     /// \brief Return a reference to the elements in this object
     ///
     /// @return A smart pointer to the array of properities for this
     ///		.sol file.
-    std::vector<boost::shared_ptr<cygnal::Element> > &getElements() { return _amfobjs; }
+    std::vector<std::shared_ptr<cygnal::Element> > &getElements() { return _amfobjs; }
 
     /// \brief Get an element referenced by index in the array
     ///
     /// @param size The index of the property to retrieve.
     ///
     /// @return A smart pointer to the element at the specified location.
-    boost::shared_ptr<Element> getElement(size_t size)
+    std::shared_ptr<Element> getElement(size_t size)
     {
         assert(size<_amfobjs.size());
         return _amfobjs[size];
@@ -180,8 +180,8 @@ public:
     ///		in the .sol file.
     const std::string &getObjectName() const { return _objname; };
         
-    bool updateSO(boost::shared_ptr<cygnal::Element> &el);
-    bool updateSO(int index, boost::shared_ptr<cygnal::Element> &el);
+    bool updateSO(std::shared_ptr<cygnal::Element> &el);
+    bool updateSO(int index, std::shared_ptr<cygnal::Element> &el);
     
     ///  \brief Dump the internal data of this class in a human readable form.
     ///
@@ -212,7 +212,7 @@ public:
  protected:
     /// \var SOL::_amfobjs
     ///		The array of elements in this SharedObject.
-    std::vector<boost::shared_ptr<Element> > _amfobjs;
+    std::vector<std::shared_ptr<Element> > _amfobjs;
     
   };
 

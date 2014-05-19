@@ -44,8 +44,8 @@ class VaapiSurfaceFfmpeg : public VaapiSurfaceProxy {
     unsigned int _pic_num;
 
 public:
-    VaapiSurfaceFfmpeg(boost::shared_ptr<VaapiSurface> surface,
-                       boost::shared_ptr<VaapiContext> context)
+    VaapiSurfaceFfmpeg(std::shared_ptr<VaapiSurface> surface,
+                       std::shared_ptr<VaapiContext> context)
         : VaapiSurfaceProxy(surface, context), _pic_num(0)
         { }
 
@@ -65,7 +65,7 @@ static inline VaapiSurfaceFfmpeg *vaapi_get_surface(const AVFrame *pic)
 
 /// VA context implementation for FFmpeg
 class VaapiContextFfmpeg : public vaapi_context {
-    boost::shared_ptr<VaapiContext> _context;
+    std::shared_ptr<VaapiContext> _context;
 
 public:
     VaapiContextFfmpeg(enum CODECID codec_id);

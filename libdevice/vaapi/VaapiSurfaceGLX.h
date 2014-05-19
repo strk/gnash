@@ -46,7 +46,7 @@ public:
     unsigned int height() const { return _impl->height(); }
 
     /// Update VA/GLX surface from VA surface
-    bool update(boost::shared_ptr<VaapiSurface> surface);
+    bool update(std::shared_ptr<VaapiSurface> surface);
 };
 
 } // gnash namespace

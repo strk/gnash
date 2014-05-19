@@ -305,7 +305,7 @@ Cygnal::loadPeersFile(const std::string &filespec)
         }
 
 	// Create a new peer item
-	boost::shared_ptr<peer_t> peer(new Cygnal::peer_t);
+	std::shared_ptr<peer_t> peer(new Cygnal::peer_t);
 	peer->hostname = host;
 	peer->port = strtol(portstr.c_str(), NULL, 0) & 0xffff;
 
@@ -350,14 +350,14 @@ Cygnal::probePeers(peer_t &peer)
 }
 
 void
-Cygnal::probePeers(std::vector<boost::shared_ptr<peer_t> > &peers)
+Cygnal::probePeers(std::vector<std::shared_ptr<peer_t> > &peers)
 {
 //     GNASH_REPORT_FUNCTION;
 
 // 	createClient();
-    std::vector<boost::shared_ptr<Cygnal::peer_t> >::iterator it;
+    std::vector<std::shared_ptr<Cygnal::peer_t> >::iterator it;
     for (it = peers.begin(); it != peers.end(); ++it) {
-	boost::shared_ptr<Cygnal::peer_t> peer = *it;
+	std::shared_ptr<Cygnal::peer_t> peer = *it;
 	probePeers(*peer);
 	if (peer->connected) {
 	    log_network(_("%s is active on fd #%d."), peer->hostname,
@@ -371,7 +371,7 @@ void
 Cygnal::removeHandler(const std::string &path)
 {
 //     GNASH_REPORT_FUNCTION;
-    map<std::string, boost::shared_ptr<Handler> >::iterator it;
+    map<std::string, std::shared_ptr<Handler> >::iterator it;
     it = _handlers.find(path);
     if (it != _handlers.end()) {
 	boost::mutex::scoped_lock lock(_mutex);
@@ -379,12 +379,12 @@ Cygnal::removeHandler(const std::string &path)
     }
 }
 
-boost::shared_ptr<Handler>
+std::shared_ptr<Handler>
 Cygnal::findHandler(const std::string &path)
 {
 //     GNASH_REPORT_FUNCTION;
-    map<std::string, boost::shared_ptr<Handler> >::iterator it;
-    boost::shared_ptr<Handler> hand;
+    map<std::string, std::shared_ptr<Handler> >::iterator it;
+    std::shared_ptr<Handler> hand;
     it = _handlers.find(path);
     if (it != _handlers.end()) {
 	hand = (*it).second;
@@ -396,7 +396,7 @@ Cygnal::findHandler(const std::string &path)
 void
 Cygnal::dump()
 {
-    std::vector<boost::shared_ptr<Cygnal::peer_t> >::iterator it;
+    std::vector<std::shared_ptr<Cygnal::peer_t> >::iterator it;
     for (it = _peers.begin(); it != _peers.end(); ++it) {
 	cerr << "Remote Peer: " << (*it)->hostname
 	     << ":" << (*it)->port << endl;
@@ -846,11 +846,11 @@ connection_handler(Network::thread_params_t *args)
 	    hargs->protocol = args->protocol;
 	    hargs->netfd = args->netfd;
 #if 0
-	    boost::shared_ptr<Handler> hand = cyg.findHandler(path);
+	    std::shared_ptr<Handler> hand = cyg.findHandler(path);
 	    HTTPServer *http = new HTTPServer;
 	    hargs.entry = http;
 	    http->setDocRoot(crcfile.getDocumentRoot());
-	    boost::shared_ptr<cygnal::Buffer> buf(http->peekChunk());
+	    std::shared_ptr<cygnal::Buffer> buf(http->peekChunk());
 	    http->processHeaderFields(*buf);
 	    string hostname, path;
 	    string::size_type pos = http->getField("host").find(":", 0);
@@ -912,7 +912,7 @@ connection_handler(Network::thread_params_t *args)
 	    rargs->protocol = args->protocol;
 	    rargs->netfd = args->netfd;
 	    RTMPServer *rtmp = new RTMPServer;
-	    boost::shared_ptr<cygnal::Element> tcurl = 
+	    std::shared_ptr<cygnal::Element> tcurl =
 		rtmp->processClientHandShake(args->netfd);
 	    if (!tcurl) {
 // 		    log_error("Couldn't read the tcUrl variable!");
@@ -921,7 +921,7 @@ connection_handler(Network::thread_params_t *args)
 	    }
 	    URL url(tcurl->to_string());
 	    string key = url.hostname() + url.path();
-	    boost::shared_ptr<Handler> hand = cyg.findHandler(url.path());
+	    std::shared_ptr<Handler> hand = cyg.findHandler(url.path());
 	    if (!hand) {
 		log_network(_("Creating new %s Handler for: %s for fd %#d"),
 			    proto_str[args->protocol], key, args->netfd);
@@ -929,8 +929,8 @@ connection_handler(Network::thread_params_t *args)
 		cyg.addHandler(key, hand);
 		rargs->entry = rtmp;
 		hand->setNetConnection(rtmp->getNetConnection());
-		std::vector<boost::shared_ptr<Cygnal::peer_t> >::iterator it;
-		std::vector<boost::shared_ptr<Cygnal::peer_t> > active = cyg.getActive();
+		std::vector<std::shared_ptr<Cygnal::peer_t> >::iterator it;
+		std::vector<std::shared_ptr<Cygnal::peer_t> > active = cyg.getActive();
 		for (it = active.begin(); it < active.end(); ++it) {
 		    Cygnal::peer_t *peer = (*it).get();
 		    hand->addRemote(peer->fd);
@@ -952,7 +952,7 @@ connection_handler(Network::thread_params_t *args)
 		    cgiroot = PLUGINSDIR;
 		}
 		hand->scanDir(cgiroot);
-		boost::shared_ptr<Handler::cygnal_init_t> init = 
+		std::shared_ptr<Handler::cygnal_init_t> init =
 		    hand->initModule(url.path());
 		
 		// this is where the real work gets done.
@@ -1045,7 +1045,7 @@ event_handler(Network::thread_params_t *args)
 	    // hand->dump();
 	}
 #if 0
-	boost::shared_ptr<DiskStream> filestream(cache.findFile(args->filespec));
+	std::shared_ptr<DiskStream> filestream(cache.findFile(args->filespec));
 	if (filestream) {
 	    filestream->dump();
 	}
@@ -1053,7 +1053,7 @@ event_handler(Network::thread_params_t *args)
 //      	cache.dump();
 #endif
 	//hand->dump();
-	boost::shared_ptr<DiskStream> ds;
+	std::shared_ptr<DiskStream> ds;
 	for (int i=1; i <= hand->getActiveDiskStreams(); i++) {
 	    ds = hand->getDiskStream(i);
 	    if (ds) {
@@ -1090,7 +1090,7 @@ event_handler(Network::thread_params_t *args)
 		  {
 		      largs.netfd = i;
 		      // largs.filespec = fullpath;
-		      boost::shared_ptr<HTTPServer> &http = hand->getHTTPHandler(i);
+		      std::shared_ptr<HTTPServer> &http = hand->getHTTPHandler(i);
 		      if (!http->http_handler(hand, args->netfd, args->buffer)) {
 			  log_network(_("Done with HTTP connection for fd #%d, CGI %s"), i, args->filespec);
 			  net.closeNet(args->netfd);
@@ -1114,7 +1114,7 @@ event_handler(Network::thread_params_t *args)
 		  {
 		      net.setTimeout(timeout);
 		      args->netfd = i;
-		      boost::shared_ptr<HTTPServer> &http = hand->getHTTPHandler(i);
+		      std::shared_ptr<HTTPServer> &http = hand->getHTTPHandler(i);
 		      // args->filespec = path;
 		      if (!http->http_handler(hand, args->netfd, args->buffer)) {
 			  log_network(_("Done with HTTP connection for fd #%d, CGI %s"), i, largs.filespec);
@@ -1126,7 +1126,7 @@ event_handler(Network::thread_params_t *args)
 		  {
 		      args->netfd = i;
 		      // args->filespec = path;
-		      boost::shared_ptr<HTTPServer> &http = hand->getHTTPHandler(i);
+		      std::shared_ptr<HTTPServer> &http = hand->getHTTPHandler(i);
 		      if (!http->http_handler(hand, args->netfd, args->buffer)) {
 			  log_network(_("Done with HTTP connection for fd #%d, CGI %s"), i, args->filespec);
 			  return;

@@ -91,7 +91,7 @@ public:
     /// @param in   The stream to read PNG data from. Ownership is shared
     ///             between caller and JpegInput, so it is freed
     ///             automatically when the last owner is destroyed.
-    PngInput(boost::shared_ptr<IOChannel> in)
+    PngInput(std::shared_ptr<IOChannel> in)
         :
         Input(in),
         _pngPtr(0),
@@ -155,7 +155,7 @@ public:
     /// @param out      The IOChannel used for output. Must be kept alive
     ///                 throughout
     /// @param quality Unused in PNG output
-    PngOutput(boost::shared_ptr<IOChannel> out, size_t width,
+    PngOutput(std::shared_ptr<IOChannel> out, size_t width,
             size_t height, int quality);
     
     ~PngOutput();
@@ -318,7 +318,7 @@ PngInput::read()
 /// PNG output
 ///
 
-PngOutput::PngOutput(boost::shared_ptr<IOChannel> out, size_t width,
+PngOutput::PngOutput(std::shared_ptr<IOChannel> out, size_t width,
         size_t height, int /*quality*/)
     :
     Output(out, width, height),
@@ -403,7 +403,7 @@ PngOutput::writeImageRGB(const unsigned char* rgbData)
 } // unnamed namespace
 
 std::unique_ptr<Input>
-createPngInput(boost::shared_ptr<IOChannel> in)
+createPngInput(std::shared_ptr<IOChannel> in)
 {
     std::unique_ptr<Input> ret(new PngInput(in));
     ret->read();
@@ -411,7 +411,7 @@ createPngInput(boost::shared_ptr<IOChannel> in)
 }
 
 std::unique_ptr<Output>
-createPngOutput(boost::shared_ptr<IOChannel> o, size_t width,
+createPngOutput(std::shared_ptr<IOChannel> o, size_t width,
                        size_t height, int quality)
 {
     std::unique_ptr<Output> outChannel(new PngOutput(o, width, height, quality));

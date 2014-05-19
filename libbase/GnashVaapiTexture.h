@@ -44,7 +44,7 @@ public:
     /// unexpected things will happen.
     ///
     /// @param surface VA surface to copy data from.
-    void update(boost::shared_ptr<VaapiSurface> surface);
+    void update(std::shared_ptr<VaapiSurface> surface);
 };
 
 } // gnash namespace

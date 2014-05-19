@@ -55,8 +55,8 @@ struct _GnashView {
     const gchar *uri;
     guint advance_timer;
 
-    boost::shared_ptr<gnash::media::MediaHandler> media_handler;
-    boost::shared_ptr<gnash::sound::sound_handler> sound_handler;
+    std::shared_ptr<gnash::media::MediaHandler> media_handler;
+    std::shared_ptr<gnash::sound::sound_handler> sound_handler;
 
     /// Handlers (for sound etc) for a libcore run.
     //
@@ -257,7 +257,7 @@ gnash_view_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
     if( view->stage.get() != NULL) {
     	view->stage->setDimensions(allocation->width, allocation->height);
 
-        boost::shared_ptr<gnash::Renderer> renderer = gnash_canvas_get_renderer(view->canvas);
+        std::shared_ptr<gnash::Renderer> renderer = gnash_canvas_get_renderer(view->canvas);
         float xscale = allocation->width / view->movie_definition->get_width_pixels();
         float yscale = allocation->height / view->movie_definition->get_height_pixels();
 		renderer->set_scale(xscale, yscale);
@@ -423,7 +423,7 @@ gnash_view_load_movie(GnashView *view, const gchar *uri)
     view->run_info->setSoundHandler(view->sound_handler);
 
     std::unique_ptr<gnash::NamingPolicy> np(new gnash::IncrementalRename(url));
-    boost::shared_ptr<gnash::StreamProvider> sp(
+    std::shared_ptr<gnash::StreamProvider> sp(
 	    new gnash::StreamProvider(url, url, std::move(np)));
     view->run_info->setStreamProvider(sp);
 
@@ -497,7 +497,7 @@ gnash_view_display(GnashView *view)
     gnash::InvalidatedRanges changed_ranges;
     changed_ranges.setWorld();
 
-    boost::shared_ptr<gnash::Renderer> renderer = gnash_canvas_get_renderer(view->canvas);
+    std::shared_ptr<gnash::Renderer> renderer = gnash_canvas_get_renderer(view->canvas);
     renderer->set_invalidated_regions(changed_ranges);
     gdk_window_invalidate_rect(GTK_WIDGET(view->canvas)->window, NULL, false);
 

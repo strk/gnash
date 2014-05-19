@@ -79,7 +79,7 @@ public:
     /// @return     shared ownership of the tag's Font::CodeTable. This
     ///             may be NULL, which can be checked first with
     ///             hasCodeTable().
-    boost::shared_ptr<const Font::CodeTable> getCodeTable() const {
+    std::shared_ptr<const Font::CodeTable> getCodeTable() const {
         return _codeTable;
     }
 
@@ -150,7 +150,7 @@ private:
 	typedef std::map<kerning_pair, boost::int16_t> KerningTable;
 	KerningTable _kerningPairs;
 
-    boost::shared_ptr<const Font::CodeTable> _codeTable;
+    std::shared_ptr<const Font::CodeTable> _codeTable;
 };
 
 

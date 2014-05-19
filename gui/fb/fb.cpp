@@ -273,7 +273,7 @@ FBGui::init(int argc, char *** argv)
     // Initialize all the input devices
 
     // Look for Mice that use the PS/2 mouse protocol
-    std::vector<boost::shared_ptr<InputDevice> > possibles
+    std::vector<std::shared_ptr<InputDevice> > possibles
         = InputDevice::scanForDevices();
     if (possibles.empty()) {
         log_error(_("Found no accessible input event devices"));
@@ -281,7 +281,7 @@ FBGui::init(int argc, char *** argv)
         log_debug("Found %d input event devices.", possibles.size());
     }
     
-    std::vector<boost::shared_ptr<InputDevice> >::iterator it;
+    std::vector<std::shared_ptr<InputDevice> >::iterator it;
     for (it=possibles.begin(); it!=possibles.end(); ++it) {
         // Set the screen size, which is used for calculating absolute
         // mouse locations from relative ones.
@@ -739,11 +739,11 @@ FBGui::checkForData()
 {
     // GNASH_REPORT_FUNCTION;
 
-    std::vector<boost::shared_ptr<InputDevice> >::iterator it;
+    std::vector<std::shared_ptr<InputDevice> >::iterator it;
 
     for (it=_inputs.begin(); it!=_inputs.end(); ++it) {
         (*it)->check();
-        boost::shared_ptr<InputDevice::input_data_t> ie = (*it)->popData();
+        std::shared_ptr<InputDevice::input_data_t> ie = (*it)->popData();
         if (ie) {            
             // notifyMouseMove(ie->x, ie->y);
 #if 0

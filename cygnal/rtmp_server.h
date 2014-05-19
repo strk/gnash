@@ -56,35 +56,35 @@ public:
     ///     INVOKE operation of ::connect(). serverFinish() is
     ///     actually used to extract the AMF data from the packet, and
     ///     handShakeResponse() is used to construct the response packet.
-    boost::shared_ptr<cygnal::Element> processClientHandShake(int fd);
+    std::shared_ptr<cygnal::Element> processClientHandShake(int fd);
 
     bool packetSend(cygnal::Buffer &buf);
     bool packetRead(cygnal::Buffer &buf);
     
     // These are handlers for the various types
-    boost::shared_ptr<cygnal::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status);
-    boost::shared_ptr<cygnal::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename);
-    boost::shared_ptr<cygnal::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double &transid);
-    boost::shared_ptr<cygnal::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, double &transid);
-    boost::shared_ptr<cygnal::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double &transid, double &clientid);
+    std::shared_ptr<cygnal::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status);
+    std::shared_ptr<cygnal::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename);
+    std::shared_ptr<cygnal::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double &transid);
+    std::shared_ptr<cygnal::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, double &transid);
+    std::shared_ptr<cygnal::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double &transid, double &clientid);
 
     // Encode a Ping for the client
-    boost::shared_ptr<cygnal::Buffer> encodePing(rtmp_ping_e type, boost::uint32_t milliseconds);
-    boost::shared_ptr<cygnal::Buffer> encodePing(rtmp_ping_e type);
-    // boost::shared_ptr<cygnal::Buffer> encodeUser(user_control_e type, boost::uint32_t milliseconds);
-    boost::shared_ptr<cygnal::Buffer> encodeAudio(boost::uint8_t *data, size_t size);
-    boost::shared_ptr<cygnal::Buffer> encodeVideo(boost::uint8_t *data, size_t size);
+    std::shared_ptr<cygnal::Buffer> encodePing(rtmp_ping_e type, boost::uint32_t milliseconds);
+    std::shared_ptr<cygnal::Buffer> encodePing(rtmp_ping_e type);
+    // std::shared_ptr<cygnal::Buffer> encodeUser(user_control_e type, boost::uint32_t milliseconds);
+    std::shared_ptr<cygnal::Buffer> encodeAudio(boost::uint8_t *data, size_t size);
+    std::shared_ptr<cygnal::Buffer> encodeVideo(boost::uint8_t *data, size_t size);
 
     // Encode a onBWDone message for the client
-    boost::shared_ptr<cygnal::Buffer> encodeBWDone(double id);
+    std::shared_ptr<cygnal::Buffer> encodeBWDone(double id);
 
     // Parse an Echo Request message coming from the Red5 echo_test.
-    std::vector<boost::shared_ptr<cygnal::Element > > parseEchoRequest(cygnal::Buffer &buf) { return parseEchoRequest(buf.reference(), buf.size()); };
-    std::vector<boost::shared_ptr<cygnal::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
+    std::vector<std::shared_ptr<cygnal::Element > > parseEchoRequest(cygnal::Buffer &buf) { return parseEchoRequest(buf.reference(), buf.size()); };
+    std::vector<std::shared_ptr<cygnal::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
     // format a response to the 'echo' test used for testing Gnash.
-    boost::shared_ptr<cygnal::Buffer> formatEchoResponse(double num, cygnal::Element &el);
-    boost::shared_ptr<cygnal::Buffer> formatEchoResponse(double num, cygnal::Buffer &data);
-    boost::shared_ptr<cygnal::Buffer> formatEchoResponse(double num, boost::uint8_t *data, size_t size);    
+    std::shared_ptr<cygnal::Buffer> formatEchoResponse(double num, cygnal::Element &el);
+    std::shared_ptr<cygnal::Buffer> formatEchoResponse(double num, cygnal::Buffer &data);
+    std::shared_ptr<cygnal::Buffer> formatEchoResponse(double num, boost::uint8_t *data, size_t size);
     void addReference(boost::uint16_t index, cygnal::Element &el) { _references[index] = el; };
     cygnal::Element &getReference(boost::uint16_t index) { return _references[index]; };
 
@@ -108,8 +108,8 @@ public:
     size_t sendToClient(std::vector<int> &fds,cygnal::Buffer &data);
 
     void setNetConnection(gnash::RTMPMsg *msg) { _netconnect.reset(msg); };
-    void setNetConnection(boost::shared_ptr<gnash::RTMPMsg> msg) { _netconnect = msg; };
-    boost::shared_ptr<gnash::RTMPMsg> getNetConnection() { return _netconnect;};
+    void setNetConnection(std::shared_ptr<gnash::RTMPMsg> msg) { _netconnect = msg; };
+    std::shared_ptr<gnash::RTMPMsg> getNetConnection() { return _netconnect;};
     void dump();
 
 private:
@@ -117,7 +117,7 @@ private:
     ///     This is only called by processClientHandshake() to compare
     ///     the handshakes to make sure they match, and to extract the
     ///     initial AMF data from packet.
-    boost::shared_ptr<cygnal::Buffer> serverFinish(int fd,
+    std::shared_ptr<cygnal::Buffer> serverFinish(int fd,
 			cygnal::Buffer &handshake1, cygnal::Buffer &handshake2);
     /// \method handShakeResponse
     ///     This is only called by processClientHandshake() to
@@ -146,7 +146,7 @@ private:
     ///    object we get as the final part of the handshake process
     ///    that is used to set up the connection. This has all the
     ///    file paths and other information needed by the server.
-    boost::shared_ptr<gnash::RTMPMsg>	_netconnect;
+    std::shared_ptr<gnash::RTMPMsg>	_netconnect;
 };
 
 // This is the thread for all incoming RTMP connections

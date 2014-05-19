@@ -137,8 +137,8 @@ public:
     bool checkGeneralFields(cygnal::Buffer &buf);
 
 //     // Parse an Echo Request message coming from the Red5 echo_test.
-    std::vector<boost::shared_ptr<cygnal::Element > > parseEchoRequest(cygnal::Buffer &buf) { return parseEchoRequest(buf.reference(), buf.size()); };
-    std::vector<boost::shared_ptr<cygnal::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
+    std::vector<std::shared_ptr<cygnal::Element > > parseEchoRequest(cygnal::Buffer &buf) { return parseEchoRequest(buf.reference(), buf.size()); };
+    std::vector<std::shared_ptr<cygnal::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
     
     // Convert the Content-Length field to a number we can use
     size_t getContentLength();
@@ -155,13 +155,13 @@ public:
     std::map<std::string, std::string> &getFields() { return _fields; };
 
     // Get an array of values for header field 'name'.
-    boost::shared_ptr<std::vector<std::string> > getFieldItem(const std::string &name);
+    std::shared_ptr<std::vector<std::string> > getFieldItem(const std::string &name);
 
     // Client side parsing of response message codes
-    boost::shared_ptr<http_response_t> parseStatus(const std::string &line);
+    std::shared_ptr<http_response_t> parseStatus(const std::string &line);
 
     // Handle the response for the request.
-    boost::shared_ptr<cygnal::Buffer> formatServerReply(http_status_e code);
+    std::shared_ptr<cygnal::Buffer> formatServerReply(http_status_e code);
     cygnal::Buffer &formatGetReply(DiskStream::filetype_e type, size_t size, http_status_e code); 
     cygnal::Buffer &formatGetReply(size_t size, http_status_e code); 
     cygnal::Buffer &formatGetReply(http_status_e code); 
@@ -275,7 +275,7 @@ public:
     int sendMsg();
     int sendMsg(int fd);
     int sendMsg(const boost::uint8_t *data, size_t size);
-    int sendMsg(boost::shared_ptr<cygnal::Buffer> &buf)
+    int sendMsg(std::shared_ptr<cygnal::Buffer> &buf)
 	{ return sendMsg(buf->reference(), buf->size()); };
     int sendMsg(std::stringstream &sstr)
 	{ return sendMsg(reinterpret_cast<const boost::uint8_t *>(sstr.str().c_str()), sstr.str().size()); };
@@ -298,13 +298,13 @@ public:
     std::string &getDocRoot() { return _docroot; };
     
     // Pop the first date element off the que
-    boost::shared_ptr<cygnal::Buffer> DSOEXPORT popChunk() { return _que.pop(); };
+    std::shared_ptr<cygnal::Buffer> DSOEXPORT popChunk() { return _que.pop(); };
     // Peek at the first date element witjhout removing it from the que
-    boost::shared_ptr<cygnal::Buffer> DSOEXPORT peekChunk() { return _que.peek(); };
+    std::shared_ptr<cygnal::Buffer> DSOEXPORT peekChunk() { return _que.peek(); };
     // Get the number of elements in the que
     size_t DSOEXPORT sizeChunks() { return _que.size(); };
 
-    boost::shared_ptr<cygnal::Buffer> DSOEXPORT mergeChunks() { return _que.merge(); };
+    std::shared_ptr<cygnal::Buffer> DSOEXPORT mergeChunks() { return _que.merge(); };
 
     http_method_e getOperation() { return _cmd; };
     

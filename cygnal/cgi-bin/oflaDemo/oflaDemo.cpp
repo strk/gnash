@@ -105,12 +105,12 @@ static OflaDemoTest oflaDemo;
 extern "C" {
     
     // the standard API
-    boost::shared_ptr<Handler::cygnal_init_t>
-    oflaDemo_init_func(boost::shared_ptr<gnash::RTMPMsg> &msg)
+    std::shared_ptr<Handler::cygnal_init_t>
+    oflaDemo_init_func(std::shared_ptr<gnash::RTMPMsg> &msg)
     {
 	GNASH_REPORT_FUNCTION;
         
-        boost::shared_ptr<Handler::cygnal_init_t> init(new Handler::cygnal_init_t);
+        std::shared_ptr<Handler::cygnal_init_t> init(new Handler::cygnal_init_t);
         if (msg) {
             oflaDemo.setNetConnection(msg);
         } else {
@@ -124,11 +124,11 @@ extern "C" {
         return init;
     }
 
-    boost::shared_ptr<cygnal::Buffer> oflaDemo_read_func()
+    std::shared_ptr<cygnal::Buffer> oflaDemo_read_func()
     {
 // 	GNASH_REPORT_FUNCTION;
 	
-	boost::shared_ptr<cygnal::Buffer> buf = oflaDemo.getResponse();
+	std::shared_ptr<cygnal::Buffer> buf = oflaDemo.getResponse();
 // 	log_network("%s", hexify(data, safe, true));
 
         return buf;
@@ -140,20 +140,20 @@ extern "C" {
     {
 // 	GNASH_REPORT_FUNCTION;
 
-	boost::shared_ptr<cygnal::Buffer> buf = oflaDemo.getResponse();
+	std::shared_ptr<cygnal::Buffer> buf = oflaDemo.getResponse();
 
-        vector<boost::shared_ptr<cygnal::Element> > request =
+        vector<std::shared_ptr<cygnal::Element> > request =
 	    oflaDemo.parseOflaDemoRequest(data, size);
         
         if (request.empty()) {
             // Send the packet to notify the client that the
             // NetConnection::connect() was sucessful. After the client
             // receives this, the handhsake is completed.
-            boost::shared_ptr<cygnal::Buffer> error =
+            std::shared_ptr<cygnal::Buffer> error =
                 oflaDemo.encodeResult(RTMPMsg::NC_CALL_FAILED);
             // This builds the full header,which is required as the first part
             // of the packet.
-            boost::shared_ptr<cygnal::Buffer> head = oflaDemo.encodeHeader(0x3,
+            std::shared_ptr<cygnal::Buffer> head = oflaDemo.encodeHeader(0x3,
                                           RTMP::HEADER_12, error->allocated(),
                                           RTMP::INVOKE, RTMPMsg::FROM_SERVER);
             boost::scoped_ptr<cygnal::Buffer> response(new cygnal::Buffer(
@@ -250,7 +250,7 @@ main(int argc, char *argv[])
     // This is the main message processing loop for rtmp. All message received require
     // a response.
     do {
-        boost::shared_ptr<cygnal::Buffer> bufptr(new cygnal::Buffer);
+        std::shared_ptr<cygnal::Buffer> bufptr(new cygnal::Buffer);
         if (infile.empty()) {
             net.readNet(netfd, *bufptr);
         } else {
@@ -262,10 +262,10 @@ main(int argc, char *argv[])
             }
         }
         
-        vector<boost::shared_ptr<cygnal::Element> > request = net.parseOflaDemoRequest(
+        vector<std::shared_ptr<cygnal::Element> > request = net.parseOflaDemoRequest(
             bufptr->reference(), bufptr->allocated());
         if (request[3]) {
-            boost::shared_ptr<cygnal::Buffer> result = net.formatOflaDemoResponse(request[1]->to_number(), *request[3]);
+            std::shared_ptr<cygnal::Buffer> result = net.formatOflaDemoResponse(request[1]->to_number(), *request[3]);
             if (net.writeNet(netfd, *result)) {
                 log_debug("Sent oflaDemo test response response to client.");
             }
@@ -286,14 +286,14 @@ demoService::~demoService()
 //    GNASH_REPORT_FUNCTION;
 }
 
-std::vector<boost::shared_ptr<demoService::filestats_t> > &
+std::vector<std::shared_ptr<demoService::filestats_t> > &
 demoService::getListOfAvailableFiles(const std::string &path)
 {
 //    GNASH_REPORT_FUNCTION;
     return getListOfAvailableFiles(path, ".flv");
 }
 
-std::vector<boost::shared_ptr<demoService::filestats_t> > &
+std::vector<std::shared_ptr<demoService::filestats_t> > &
 demoService::getListOfAvailableFiles(const std::string &path,
 				    const std::string &type)
 {
@@ -342,7 +342,7 @@ demoService::getListOfAvailableFiles(const std::string &path,
                 filespec += name;
                 struct stat st;
                 if (stat(filespec.c_str(), &st) == 0) {
-                    boost::shared_ptr<demoService::filestats_t> stats(new filestats_t);
+                    std::shared_ptr<demoService::filestats_t> stats(new filestats_t);
                     stats->name = name;
                     stringstream ss;
                         ss << st.st_size;
@@ -385,16 +385,16 @@ OflaDemoTest::~OflaDemoTest()
 
 // Parse an OflaDemo Request message coming from the Red5 oflaDemo_test. This
 // method should only be used for testing purposes.
-vector<boost::shared_ptr<cygnal::Element > >
+vector<std::shared_ptr<cygnal::Element > >
 OflaDemoTest::parseOflaDemoRequest(boost::uint8_t *ptr, size_t size)
 {
     GNASH_REPORT_FUNCTION;
 
     demoService demo;
     cygnal::AMF amf;
-    vector<boost::shared_ptr<cygnal::Element > > headers;
+    vector<std::shared_ptr<cygnal::Element > > headers;
 
-    boost::shared_ptr<cygnal::Element> el1 = amf.extractAMF(ptr, ptr+size);
+    std::shared_ptr<cygnal::Element> el1 = amf.extractAMF(ptr, ptr+size);
     if (!el1) {
         log_error("No AMF data in message!");
         return headers;
@@ -405,7 +405,7 @@ OflaDemoTest::parseOflaDemoRequest(boost::uint8_t *ptr, size_t size)
     headers.push_back(el1);
 
     // The second element is a number
-    boost::shared_ptr<cygnal::Element> el2 = amf.extractAMF(ptr, ptr+size);
+    std::shared_ptr<cygnal::Element> el2 = amf.extractAMF(ptr, ptr+size);
     if (!el2) {
         log_error("No AMF data in message!");
         return headers;
@@ -416,11 +416,11 @@ OflaDemoTest::parseOflaDemoRequest(boost::uint8_t *ptr, size_t size)
     if (method == "demoService.getListOfAvailableFLVs") {
         // Get the path from the NetConnection object we recieved from the
         // client at the end of the handshake process.
-        boost::shared_ptr<cygnal::Element> version;
-        boost::shared_ptr<cygnal::Element> tcurl;
-        boost::shared_ptr<cygnal::Element> swfurl;
+        std::shared_ptr<cygnal::Element> version;
+        std::shared_ptr<cygnal::Element> tcurl;
+        std::shared_ptr<cygnal::Element> swfurl;
         
-        boost::shared_ptr<gnash::RTMPMsg> msg = getNetConnection();
+        std::shared_ptr<gnash::RTMPMsg> msg = getNetConnection();
         if (msg) {
             version  = msg->findProperty("flashVer");
             if (version) {
@@ -446,32 +446,32 @@ OflaDemoTest::parseOflaDemoRequest(boost::uint8_t *ptr, size_t size)
             std::string key = docroot + "/";
             key += url.hostname() + url.path();
             demo.getListOfAvailableFiles(key);
-            std::vector<boost::shared_ptr<demoService::filestats_t> > &mediafiles = demo.getFileStats(); 
+            std::vector<std::shared_ptr<demoService::filestats_t> > &mediafiles = demo.getFileStats();
             // std::vector<demoService::filestats_t> mediafiles = demo.getListOfAvailableFiles(key); 
-            std::vector<boost::shared_ptr<demoService::filestats_t> >::iterator it;
+            std::vector<std::shared_ptr<demoService::filestats_t> >::iterator it;
             // Make the top level object
             Element toparr;
             toparr.makeECMAArray();
             
             size_t total_size = 0;
-            vector<boost::shared_ptr<cygnal::Buffer> > buffers;
+            vector<std::shared_ptr<cygnal::Buffer> > buffers;
             for (it=mediafiles.begin(); it<mediafiles.end(); ++it) {
-                vector<boost::shared_ptr<cygnal::Element> > data;
+                vector<std::shared_ptr<cygnal::Element> > data;
                 
-                boost::shared_ptr<demoService::filestats_t> file = *it;
-                boost::shared_ptr<cygnal::Element> obj(new cygnal::Element);
+                std::shared_ptr<demoService::filestats_t> file = *it;
+                std::shared_ptr<cygnal::Element> obj(new cygnal::Element);
                 obj->makeECMAArray();
                 obj->setName(file->name);
                 
-                boost::shared_ptr<cygnal::Element> modified(new cygnal::Element);
+                std::shared_ptr<cygnal::Element> modified(new cygnal::Element);
                 modified->makeString("lastModified", file->last);
                 obj->addProperty(modified);
 
-                boost::shared_ptr<cygnal::Element> name(new cygnal::Element);
+                std::shared_ptr<cygnal::Element> name(new cygnal::Element);
                 name->makeString("name", file->name);
                 obj->addProperty(name);
 
-                boost::shared_ptr<cygnal::Element> size(new cygnal::Element);
+                std::shared_ptr<cygnal::Element> size(new cygnal::Element);
                 size->makeString("size", file->size);
                 obj->addProperty(size);
 
@@ -479,31 +479,31 @@ OflaDemoTest::parseOflaDemoRequest(boost::uint8_t *ptr, size_t size)
                 toparr.addProperty(obj);
             }
             
-            boost::shared_ptr<cygnal::Buffer> topenc = toparr.encode();
+            std::shared_ptr<cygnal::Buffer> topenc = toparr.encode();
             total_size += topenc->allocated();
             
             // Start with the method name for the INVOKE
             cygnal::Element method;
             method.makeString("_result");
-            boost::shared_ptr<cygnal::Buffer> methodenc  = method.encode();
+            std::shared_ptr<cygnal::Buffer> methodenc  = method.encode();
             total_size += methodenc->allocated();
             
             // Add the stream ID
             cygnal::Element sid;
             sid.makeNumber(2); // FIXME: needs a real value!
-            boost::shared_ptr<cygnal::Buffer> sidenc  = sid.encode();
+            std::shared_ptr<cygnal::Buffer> sidenc  = sid.encode();
             total_size += sidenc->allocated();
 
             // There there is always a NULL object to start the data
             Element null;
             null.makeNull();
-            boost::shared_ptr<cygnal::Buffer> encnull  = null.encode();
+            std::shared_ptr<cygnal::Buffer> encnull  = null.encode();
             total_size += encnull->allocated();
 
-            boost::shared_ptr<cygnal::Buffer> result(new cygnal::Buffer(total_size+cygnal::AMF_HEADER_SIZE+RTMP_MAX_HEADER_SIZE+10));            
+            std::shared_ptr<cygnal::Buffer> result(new cygnal::Buffer(total_size+cygnal::AMF_HEADER_SIZE+RTMP_MAX_HEADER_SIZE+10));
             _response.reset(new cygnal::Buffer(total_size+cygnal::AMF_HEADER_SIZE+RTMP_MAX_HEADER_SIZE+10));
 #if 0
-            boost::shared_ptr<cygnal::Buffer> head = encodeHeader(0x3,
+            std::shared_ptr<cygnal::Buffer> head = encodeHeader(0x3,
 			    RTMP::HEADER_8, total_size,
 			    RTMP::INVOKE, RTMPMsg::FROM_SERVER);
             *result = head;
@@ -515,11 +515,11 @@ OflaDemoTest::parseOflaDemoRequest(boost::uint8_t *ptr, size_t size)
 
 #if 0
             // Followed by all the encoded objects and properties
-            vector<boost::shared_ptr<cygnal::Buffer> >::iterator rit;
+            vector<std::shared_ptr<cygnal::Buffer> >::iterator rit;
             for (rit=buffers.begin(); rit<buffers.end(); ++rit) {
-                boost::shared_ptr<cygnal::Buffer> buf = *rit;
+                std::shared_ptr<cygnal::Buffer> buf = *rit;
                 *_response += buf;
-                std::vector<boost::shared_ptr<cygnal::Element> > data1;
+                std::vector<std::shared_ptr<cygnal::Element> > data1;
             }
 #endif
         }
@@ -534,11 +534,11 @@ OflaDemoTest::parseOflaDemoRequest(boost::uint8_t *ptr, size_t size)
 // is only used for testing by developers. The format appears to be
 // a string '_result', followed by the number of the test, and then two
 // NULL objects.
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 OflaDemoTest::formatOflaDemoResponse(double num, cygnal::Element &el)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<cygnal::Buffer> data = cygnal::AMF::encodeElement(el);
+    std::shared_ptr<cygnal::Buffer> data = cygnal::AMF::encodeElement(el);
     if (data) {
 	return formatOflaDemoResponse(num, data->reference(), data->allocated());
     } else {
@@ -549,14 +549,14 @@ OflaDemoTest::formatOflaDemoResponse(double num, cygnal::Element &el)
     return data;
 }
 
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 OflaDemoTest::formatOflaDemoResponse(double num, cygnal::Buffer &data)
 {
 //    GNASH_REPORT_FUNCTION;
     return formatOflaDemoResponse(num, data.reference(), data.allocated());
 }
 
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 OflaDemoTest::formatOflaDemoResponse(double num, boost::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -571,11 +571,11 @@ OflaDemoTest::formatOflaDemoResponse(double num, boost::uint8_t *data, size_t si
     Element null;
     null.makeNull();
 
-    boost::shared_ptr<cygnal::Buffer> encoflaDemo = oflaDemo.encode();
-    boost::shared_ptr<cygnal::Buffer> encidx  = index.encode();   
-    boost::shared_ptr<cygnal::Buffer> encnull  = null.encode();   
+    std::shared_ptr<cygnal::Buffer> encoflaDemo = oflaDemo.encode();
+    std::shared_ptr<cygnal::Buffer> encidx  = index.encode();
+    std::shared_ptr<cygnal::Buffer> encnull  = null.encode();
 
-    boost::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer(encoflaDemo->size()
+    std::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer(encoflaDemo->size()
 						       + encidx->size()
 						       + encnull->size() + size));
 

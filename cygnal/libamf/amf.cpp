@@ -135,14 +135,14 @@ swapBytes(void *word, size_t size)
 /// @param num A double value to serialize.
 ///
 /// @return a binary AMF packet in big endian format
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 AMF::encodeNumber(double indata)
 {
 //    GNASH_REPORT_FUNCTION;
     double num;
     // Encode the data as a 64 bit, big-endian, numeric value
     // only one additional byte for the type
-    boost::shared_ptr<Buffer> buf(new Buffer(AMF0_NUMBER_SIZE + 1));
+    std::shared_ptr<Buffer> buf(new Buffer(AMF0_NUMBER_SIZE + 1));
     *buf = Element::NUMBER_AMF0;
     num = indata;
     swapBytes(&num, AMF0_NUMBER_SIZE);
@@ -156,12 +156,12 @@ AMF::encodeNumber(double indata)
 /// @param flag The boolean value to serialize.
 ///
 /// @return a binary AMF packet in big endian format
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 AMF::encodeBoolean(bool flag)
 {
 //    GNASH_REPORT_FUNCTION;
     // Encode a boolean value. 0 for false, 1 for true
-    boost::shared_ptr<Buffer> buf(new Buffer(2));
+    std::shared_ptr<Buffer> buf(new Buffer(2));
     *buf = Element::BOOLEAN_AMF0; 
     *buf += static_cast<boost::uint8_t>(flag);
     
@@ -171,14 +171,14 @@ AMF::encodeBoolean(bool flag)
 /// \brief Encode the end of an object to it's serialized representation.
 ///
 /// @return a binary AMF packet in big endian format
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 AMF::encodeObject(const cygnal::Element &data)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::uint32_t length;
     length = data.propertySize();
     gnash::log_debug(_("Encoded data size has %d properties"), length);
-    boost::shared_ptr<cygnal::Buffer> buf;
+    std::shared_ptr<cygnal::Buffer> buf;
     if (length) {
 	buf.reset(new cygnal::Buffer);
     } else {
@@ -187,11 +187,11 @@ AMF::encodeObject(const cygnal::Element &data)
     
     *buf = Element::OBJECT_AMF0;
     if (data.propertySize() > 0) {
-	std::vector<boost::shared_ptr<cygnal::Element> >::const_iterator ait;
-	std::vector<boost::shared_ptr<cygnal::Element> > props = data.getProperties();
+	std::vector<std::shared_ptr<cygnal::Element> >::const_iterator ait;
+	std::vector<std::shared_ptr<cygnal::Element> > props = data.getProperties();
 	for (ait = props.begin(); ait != props.end(); ++ait) {
-	    boost::shared_ptr<cygnal::Element> el = (*(ait));
-	    boost::shared_ptr<cygnal::Buffer> item = AMF::encodeElement(el);
+	    std::shared_ptr<cygnal::Element> el = (*(ait));
+	    std::shared_ptr<cygnal::Buffer> item = AMF::encodeElement(el);
 	    if (item) {
 		*buf += item;
 		item.reset();
@@ -213,11 +213,11 @@ AMF::encodeObject(const cygnal::Element &data)
 /// \brief Encode the end of an object to it's serialized representation.
 ///
 /// @return a binary AMF packet in big endian format
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 AMF::encodeObjectEnd()
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<Buffer> buf(new Buffer(1));
+    std::shared_ptr<Buffer> buf(new Buffer(1));
     *buf += TERMINATOR;
 
     return buf;
@@ -226,11 +226,11 @@ AMF::encodeObjectEnd()
 /// \brief Encode an "Undefined" object to it's serialized representation.
 ///
 /// @return a binary AMF packet in big endian format
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 AMF::encodeUndefined()
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<Buffer> buf(new Buffer(1));
+    std::shared_ptr<Buffer> buf(new Buffer(1));
     *buf = Element::UNDEFINED_AMF0;
     
     return buf;
@@ -239,11 +239,11 @@ AMF::encodeUndefined()
 /// \brief Encode a "Unsupported" object to it's serialized representation.
 ///
 /// @return a binary AMF packet in big endian format
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 AMF::encodeUnsupported()
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<Buffer> buf(new Buffer(1));
+    std::shared_ptr<Buffer> buf(new Buffer(1));
     *buf = Element::UNSUPPORTED_AMF0;
     
     return buf;
@@ -254,12 +254,12 @@ AMF::encodeUnsupported()
 /// @param data A pointer to the raw bytes that becomes the data.
 /// 
 /// @return a binary AMF packet in big endian format
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 AMF::encodeDate(const boost::uint8_t *date)
 {
 //    GNASH_REPORT_FUNCTION;
-//    boost::shared_ptr<Buffer> buf;
-    boost::shared_ptr<Buffer> buf;
+//    std::shared_ptr<Buffer> buf;
+    std::shared_ptr<Buffer> buf;
     if (date != 0) {
 	buf.reset(new Buffer(AMF0_NUMBER_SIZE+1));
 	*buf = Element::DATE_AMF0;
@@ -274,12 +274,12 @@ AMF::encodeDate(const boost::uint8_t *date)
 ///		A NULL object is often used as a placeholder in RTMP.
 ///
 /// @return a binary AMF packet in big endian format
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 AMF::encodeNull()
 {
 //    GNASH_REPORT_FUNCTION;
 
-    boost::shared_ptr<Buffer> buf(new Buffer(1));
+    std::shared_ptr<Buffer> buf(new Buffer(1));
     *buf = Element::NULL_AMF0;
     
     return buf;
@@ -292,11 +292,11 @@ AMF::encodeNull()
 /// @param nbytes The number of bytes to serialize.
 ///
 /// @return a binary AMF packet in big endian format
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 AMF::encodeXMLObject(const boost::uint8_t * /*data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<Buffer> buf;
+    std::shared_ptr<Buffer> buf;
     gnash::log_unimpl(_("XML AMF objects not supported yet"));
     buf.reset();
     return buf;
@@ -309,7 +309,7 @@ AMF::encodeXMLObject(const boost::uint8_t * /*data */, size_t /* size */)
 /// @param size The number of bytes to serialize.
 ///
 /// @return a binary AMF packet in big endian format
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 AMF::encodeTypedObject(const cygnal::Element &data)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -317,7 +317,7 @@ AMF::encodeTypedObject(const cygnal::Element &data)
     size_t size = 0;
     boost::uint32_t props;
     props = data.propertySize();
-    boost::shared_ptr<cygnal::Buffer> buf;
+    std::shared_ptr<cygnal::Buffer> buf;
     //    log_debug("Encoded data size has %d properties", props);
     if (props) {
 	// Calculate the total size of the output buffer
@@ -346,11 +346,11 @@ AMF::encodeTypedObject(const cygnal::Element &data)
     }
     
     if (data.propertySize() > 0) {
-	std::vector<boost::shared_ptr<cygnal::Element> >::const_iterator ait;
-	std::vector<boost::shared_ptr<cygnal::Element> > props = data.getProperties();
+	std::vector<std::shared_ptr<cygnal::Element> >::const_iterator ait;
+	std::vector<std::shared_ptr<cygnal::Element> > props = data.getProperties();
 	for (ait = props.begin(); ait != props.end(); ++ait) {
-	    boost::shared_ptr<cygnal::Element> el = (*(ait));
-	    boost::shared_ptr<cygnal::Buffer> item = AMF::encodeElement(el);
+	    std::shared_ptr<cygnal::Element> el = (*(ait));
+	    std::shared_ptr<cygnal::Buffer> item = AMF::encodeElement(el);
 	    if (item) {
 		*buf += item;
 		item.reset();
@@ -376,12 +376,12 @@ AMF::encodeTypedObject(const cygnal::Element &data)
 /// @param size The number of bytes to serialize.
 ///
 /// @return a binary AMF packet in big endian format (header,data)
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 AMF::encodeReference(boost::uint16_t index)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::uint16_t num = index;
-    boost::shared_ptr<cygnal::Buffer> buf(new Buffer(3));
+    std::shared_ptr<cygnal::Buffer> buf(new Buffer(3));
     *buf = Element::REFERENCE_AMF0;
     swapBytes(&num, sizeof(boost::uint16_t));
     *buf += num;
@@ -396,11 +396,11 @@ AMF::encodeReference(boost::uint16_t index)
 /// @param size The number of bytes to serialize.
 ///
 /// @return a binary AMF packet in big endian format (header,data)
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 AMF::encodeMovieClip(const boost::uint8_t * /*data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<Buffer> buf;
+    std::shared_ptr<Buffer> buf;
     gnash::log_unimpl(_("Movie Clip AMF objects not supported yet"));
     
     return buf;
@@ -415,7 +415,7 @@ AMF::encodeMovieClip(const boost::uint8_t * /*data */, size_t /* size */)
 /// @param size The number of bytes to serialize.
 ///
 /// @return a binary AMF packet in big endian format
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 AMF::encodeECMAArray(const cygnal::Element &data)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -425,7 +425,7 @@ AMF::encodeECMAArray(const cygnal::Element &data)
 
     length = data.propertySize();
     //    log_debug("Encoded data size has %d properties", length);
-    boost::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer);
+    std::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer);
     if (length == 0) {
 	// an undefined array is only 5 bytes, 1 for the type and
 	// 4 for the length.
@@ -439,11 +439,11 @@ AMF::encodeECMAArray(const cygnal::Element &data)
     // At lest for red5, it seems to encode from the last item to the
     // first, so we do the same for now.
     if (data.propertySize() > 0) {
-	boost::shared_ptr<cygnal::Buffer> item;
-	std::vector<boost::shared_ptr<cygnal::Element> >::const_iterator ait;    
-	std::vector<boost::shared_ptr<cygnal::Element> > props = data.getProperties();
+	std::shared_ptr<cygnal::Buffer> item;
+	std::vector<std::shared_ptr<cygnal::Element> >::const_iterator ait;
+	std::vector<std::shared_ptr<cygnal::Element> > props = data.getProperties();
 	for (ait = props.begin(); ait != props.end(); ++ait) {
-	    boost::shared_ptr<cygnal::Element> el = (*(ait));
+	    std::shared_ptr<cygnal::Element> el = (*(ait));
 	    if (sparse) {
 		sparse = false;
 // 		char num[12];
@@ -468,7 +468,7 @@ AMF::encodeECMAArray(const cygnal::Element &data)
 #if 0
     double count = data.propertySize();
     cygnal::Element ellen("length", count);
-    boost::shared_ptr<cygnal::Buffer> buflen = ellen.encode();
+    std::shared_ptr<cygnal::Buffer> buflen = ellen.encode();
     *buf += buflen;
 #endif
     
@@ -487,11 +487,11 @@ AMF::encodeECMAArray(const cygnal::Element &data)
 /// @param size The number of bytes to serialize.
 ///
 /// @return a binary AMF packet in big endian format
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 AMF::encodeLongString(const boost::uint8_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<Buffer> buf;
+    std::shared_ptr<Buffer> buf;
     gnash::log_unimpl(_("Long String AMF objects not supported yet"));
     
     return buf;
@@ -504,11 +504,11 @@ AMF::encodeLongString(const boost::uint8_t * /* data */, size_t /* size */)
 /// @param size The number of bytes to serialize.
 ///
 /// @return a binary AMF packet in big endian format
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 AMF::encodeRecordSet(const boost::uint8_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<Buffer> buf;
+    std::shared_ptr<Buffer> buf;
     gnash::log_unimpl(_("Reecord Set AMF objects not supported yet"));
     
     return buf;
@@ -523,14 +523,14 @@ AMF::encodeRecordSet(const boost::uint8_t * /* data */, size_t /* size */)
 /// @param size The number of bytes to serialize.
 ///
 /// @return a binary AMF packet in big endian format (header,data)
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 AMF::encodeStrictArray(const cygnal::Element &data)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::uint32_t items;
     items = data.propertySize();
     //    log_debug("Encoded data size has %d properties", items);
-    boost::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer);
+    std::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer);
     if (items) {
 	buf.reset(new cygnal::Buffer);
     } else {
@@ -544,13 +544,13 @@ AMF::encodeStrictArray(const cygnal::Element &data)
     *buf += items;
 
     if (data.propertySize() > 0) {
-	std::vector<boost::shared_ptr<cygnal::Element> >::const_iterator ait;    
-	std::vector<boost::shared_ptr<cygnal::Element> > props = data.getProperties();
+	std::vector<std::shared_ptr<cygnal::Element> >::const_iterator ait;
+	std::vector<std::shared_ptr<cygnal::Element> > props = data.getProperties();
 	bool sparse = false;
 	size_t counter = 0;
 	for (ait = props.begin(); ait != props.end(); ++ait) {
 	    counter++;
-	    boost::shared_ptr<cygnal::Element> el = (*(ait));
+	    std::shared_ptr<cygnal::Element> el = (*(ait));
 #if 0
 	    // FIXME: Red5's echo tests like to turn strict array's into ecma
 	    // arrays, but we shouldn't do that in the core.
@@ -582,7 +582,7 @@ AMF::encodeStrictArray(const cygnal::Element &data)
 		    cygnal::Element ellen("length", nodes);
 		    *buf += AMF::encodeElement(ellen);
 		} else {
-		    boost::shared_ptr<cygnal::Buffer> item = AMF::encodeElement(el);
+		    std::shared_ptr<cygnal::Buffer> item = AMF::encodeElement(el);
 		    if (item) {
 			*buf += item;
 			item.reset();
@@ -604,7 +604,7 @@ AMF::encodeStrictArray(const cygnal::Element &data)
 /// @param str a string value
 ///
 /// @return a binary AMF packet in big endian format
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 AMF::encodeString(const std::string &str)
 {
     boost::uint8_t *ptr = const_cast<boost::uint8_t *>(reinterpret_cast<const boost::uint8_t *>(str.c_str()));
@@ -618,11 +618,11 @@ AMF::encodeString(const std::string &str)
 /// @param size The size of the data in bytes
 ///
 /// @return a binary AMF packet in big endian format
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 AMF::encodeString(boost::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<Buffer>buf(new Buffer(size + AMF_HEADER_SIZE));
+    std::shared_ptr<Buffer>buf(new Buffer(size + AMF_HEADER_SIZE));
     *buf = Element::STRING_AMF0;
     // when a string is stored in an element, we add a NULL terminator so
     // it can be printed by to_string() efficiently. The NULL terminator
@@ -641,13 +641,13 @@ AMF::encodeString(boost::uint8_t *data, size_t size)
 ///	A NULL String is a string with no associated data.
 ///
 /// @return a binary AMF packet in big endian format
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 AMF::encodeNullString()
 {
 //    GNASH_REPORT_FUNCTION;
     boost::uint16_t length;
     
-    boost::shared_ptr<Buffer> buf(new Buffer(AMF_HEADER_SIZE));
+    std::shared_ptr<Buffer> buf(new Buffer(AMF_HEADER_SIZE));
     *buf = Element::STRING_AMF0;
     // when a string is stored in an element, we add a NULL terminator so
     // it can be printed by to_string() efficiently. The NULL terminator
@@ -682,17 +682,17 @@ AMF::encodeNullString()
 /// @param el A smart pointer to the Element to encode.
 ///
 /// @return a binary AMF packet in big endian format
-boost::shared_ptr<Buffer>
-AMF::encodeElement(boost::shared_ptr<cygnal::Element> el)
+std::shared_ptr<Buffer>
+AMF::encodeElement(std::shared_ptr<cygnal::Element> el)
 {
     return encodeElement(*el);
 }
 
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 AMF::encodeElement(const cygnal::Element& el)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<Buffer> buf;
+    std::shared_ptr<Buffer> buf;
     // Encode the element's data
     switch (el.getType()) {
       case Element::NOTYPE:
@@ -700,14 +700,14 @@ AMF::encodeElement(const cygnal::Element& el)
 	  break;
       case Element::NUMBER_AMF0:
       {
-  //	  boost::shared_ptr<Buffer> encnum = AMF::encodeNumber(el.to_number());
+  //	  std::shared_ptr<Buffer> encnum = AMF::encodeNumber(el.to_number());
   //	  *buf += encnum;
 	  buf = AMF::encodeNumber(el.to_number());
           break;
       }
       case Element::BOOLEAN_AMF0:
       {
-// 	  boost::shared_ptr<Buffer> encbool = AMF::encodeBoolean(el.to_bool());
+// 	  std::shared_ptr<Buffer> encbool = AMF::encodeBoolean(el.to_bool());
 // 	  *buf += encodeBoolean(el.to_bool());
 // 	  *buf += encbool;
 	  buf = AMF::encodeBoolean(el.to_bool());
@@ -715,7 +715,7 @@ AMF::encodeElement(const cygnal::Element& el)
       }
       case Element::STRING_AMF0:
       {
-  //	  boost::shared_ptr<Buffer> encstr = AMF::encodeString(el.to_string());
+  //	  std::shared_ptr<Buffer> encstr = AMF::encodeString(el.to_string());
 	  //	  *buf += encstr;
 	  if (el.getDataSize() == 0) {
 	      buf = encodeNullString();
@@ -755,7 +755,7 @@ AMF::encodeElement(const cygnal::Element& el)
       }
       case Element::DATE_AMF0:
       {
-  //	  boost::shared_ptr<Buffer> encdate = AMF::encodeNumber(el.to_number());
+  //	  std::shared_ptr<Buffer> encdate = AMF::encodeNumber(el.to_number());
 	  buf = AMF::encodeDate(el.to_reference());
           break;
       }
@@ -789,7 +789,7 @@ AMF::encodeElement(const cygnal::Element& el)
     };
 
     // If the name field is set, it's a property, followed by the data
-    boost::shared_ptr<Buffer> bigbuf;
+    std::shared_ptr<Buffer> bigbuf;
     if (el.getName() && (el.getType() != Element::TYPED_OBJECT_AMF0)) {
 	if (buf) {
 	    bigbuf.reset(new cygnal::Buffer(el.getNameSize() + sizeof(boost::uint16_t) + buf->size()));
@@ -821,15 +821,15 @@ AMF::encodeElement(const cygnal::Element& el)
 /// @param el A smart pointer to the Element to encode.
 ///
 /// @return a binary AMF packet in big endian format
-boost::shared_ptr<Buffer>
-AMF::encodeProperty(boost::shared_ptr<cygnal::Element> el)
+std::shared_ptr<Buffer>
+AMF::encodeProperty(std::shared_ptr<cygnal::Element> el)
 {
 //    GNASH_REPORT_FUNCTION;
     size_t outsize;
     
     outsize = el->getNameSize() + el->getDataSize() + AMF_PROP_HEADER_SIZE;
 
-    boost::shared_ptr<Buffer> buf(new Buffer(outsize));
+    std::shared_ptr<Buffer> buf(new Buffer(outsize));
     _totalsize += outsize;
 
     // Add the length of the string for the name of the property
@@ -879,8 +879,8 @@ AMF::encodeProperty(boost::shared_ptr<cygnal::Element> el)
 /// @return A smart ptr to an Element.
 ///
 /// @remarks May throw a ParserException
-boost::shared_ptr<cygnal::Element> 
-AMF::extractAMF(boost::shared_ptr<Buffer> buf)
+std::shared_ptr<cygnal::Element>
+AMF::extractAMF(std::shared_ptr<Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::uint8_t* start = buf->reference();
@@ -900,14 +900,14 @@ AMF::extractAMF(boost::shared_ptr<Buffer> buf)
 /// @return A smart ptr to an Element.
 ///
 /// @remarks May throw a ParserException
-boost::shared_ptr<cygnal::Element> 
+std::shared_ptr<cygnal::Element>
 AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
 {
 //    GNASH_REPORT_FUNCTION;
 
     boost::uint8_t *tmpptr = in;
     boost::uint16_t length;
-    boost::shared_ptr<cygnal::Element> el(new Element);
+    std::shared_ptr<cygnal::Element> el(new Element);
 
     if (in == 0) {
         gnash::log_error(_("AMF body input data is NULL"));
@@ -1002,7 +1002,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
                     tmpptr++;
                     break;
                 }
-                boost::shared_ptr<cygnal::Element> child =
+                std::shared_ptr<cygnal::Element> child =
                     amf_obj.extractProperty(tmpptr, tooFar); 
                 if (child == 0) {
                     // skip past zero length string (2 bytes), null
@@ -1050,7 +1050,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
                     tmpptr++;
                     break;
                 }
-                boost::shared_ptr<cygnal::Element> child =
+                std::shared_ptr<cygnal::Element> child =
                     amf_obj.extractProperty(tmpptr, tooFar); 
                 if (child == 0) {
                     // skip past zero length string (2 bytes),
@@ -1071,7 +1071,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
   
             tmpptr += sizeof(boost::uint32_t);
             while (items--) {
-                boost::shared_ptr<cygnal::Element> child =
+                std::shared_ptr<cygnal::Element> child =
                     amf_obj.extractProperty(tmpptr, tooFar); 
                 if (child == 0) {
                     break;
@@ -1095,7 +1095,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
             // Skip past the length field to get to the start of the data
             tmpptr += sizeof(boost::uint32_t);
             while (items) {
-                boost::shared_ptr<cygnal::Element> child =
+                std::shared_ptr<cygnal::Element> child =
                     amf_obj.extractAMF(tmpptr, tooFar); 
                 if (child == 0) {
                     break;
@@ -1152,7 +1152,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
                     tmpptr++;
                     break;
                 }
-                boost::shared_ptr<cygnal::Element> child =
+                std::shared_ptr<cygnal::Element> child =
                     amf_obj.extractProperty(tmpptr, tooFar); 
                 if (child == 0) {
                     break;
@@ -1187,8 +1187,8 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
 /// @return A smart ptr to an Element.
 ///
 /// @remarks May throw a ParserException
-boost::shared_ptr<cygnal::Element> 
-AMF::extractProperty(boost::shared_ptr<Buffer> buf)
+std::shared_ptr<cygnal::Element>
+AMF::extractProperty(std::shared_ptr<Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -1210,14 +1210,14 @@ AMF::extractProperty(boost::shared_ptr<Buffer> buf)
 /// @return A smart ptr to an Element.
 ///
 /// @remarks May throw a ParserException
-boost::shared_ptr<cygnal::Element> 
+std::shared_ptr<cygnal::Element>
 AMF::extractProperty(boost::uint8_t *in, boost::uint8_t* tooFar)
 {
 //    GNASH_REPORT_FUNCTION;
     
     boost::uint8_t *tmpptr = in;
     boost::uint16_t length;
-    boost::shared_ptr<cygnal::Element> el;
+    std::shared_ptr<cygnal::Element> el;
 
     length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
     // go past the length bytes, which leaves us pointing at the raw data

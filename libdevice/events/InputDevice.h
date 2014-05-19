@@ -124,16 +124,16 @@ public:
     virtual bool init(const std::string &filespec, size_t size) = 0;
     virtual bool check() = 0;
 
-    static DSOEXPORT std::vector<boost::shared_ptr<InputDevice> > scanForDevices();
+    static DSOEXPORT std::vector<std::shared_ptr<InputDevice> > scanForDevices();
     
     InputDevice::devicetype_e getType() { return _type; };
     void setType(InputDevice::devicetype_e x) { _type = x; };
 
     // Read data into the Device input buffer.
     boost::shared_array<boost::uint8_t> readData(size_t size);
-    boost::shared_ptr<input_data_t> popData()
+    std::shared_ptr<input_data_t> popData()
     {
-        boost::shared_ptr<InputDevice::input_data_t> input;
+        std::shared_ptr<InputDevice::input_data_t> input;
         if (_data.size()) {
             // std::cerr << "FIXME: " <<_data.size() << std::endl;
             input = _data.front();
@@ -161,7 +161,7 @@ protected:
     input_data_t        _input_data;
     // These hold the data queue
     boost::scoped_array<boost::uint8_t> _buffer;
-    std::queue<boost::shared_ptr<input_data_t> > _data;
+    std::queue<std::shared_ptr<input_data_t> > _data;
     int                 _screen_width;
     int                 _screen_height;    
 };
@@ -176,7 +176,7 @@ public:
     bool init(const std::string &filespec, size_t size);
     bool check();
 
-    static std::vector<boost::shared_ptr<InputDevice> > scanForDevices();
+    static std::vector<std::shared_ptr<InputDevice> > scanForDevices();
     
     /// Sends a command to the mouse and waits for the response
     bool command(unsigned char cmd, unsigned char *buf, int count);
@@ -198,7 +198,7 @@ public:
 
     void apply_ts_calibration(float* cx, float* cy, int rawx, int rawy);
     
-    static std::vector<boost::shared_ptr<InputDevice> > scanForDevices();
+    static std::vector<std::shared_ptr<InputDevice> > scanForDevices();
 private:
     // Although the value is only set when using a touchscreen, it takes up little
     // memory to initialize a pointer to avoid lots of messy ifdefs.
@@ -217,7 +217,7 @@ public:
     gnash::key::code scancode_to_gnash_key(int code, bool shift);
 
     // This looks for all the input event devices.
-    static std::vector<boost::shared_ptr<InputDevice> > scanForDevices();
+    static std::vector<std::shared_ptr<InputDevice> > scanForDevices();
     
 private:
     // Keyboard SHIFT/CTRL/ALT states (left + right)

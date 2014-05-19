@@ -91,7 +91,7 @@ public:
     /// This typedef is only used for the io function that must be
     /// supported by the plugin.
     typedef size_t (*cygnal_io_write_t)(boost::uint8_t *data, size_t size);
-    typedef boost::shared_ptr<cygnal::Buffer> (*cygnal_io_read_t)();
+    typedef std::shared_ptr<cygnal::Buffer> (*cygnal_io_read_t)();
     typedef struct {
 	std::string version;
 	std::string description;
@@ -104,7 +104,7 @@ public:
     
     /// This typedef is only used for the init function optionally
     /// supported by the plugin.
-    typedef boost::shared_ptr<cygnal_init_t>(*cygnal_io_init_t)(boost::shared_ptr<gnash::RTMPMsg> &msg);
+    typedef std::shared_ptr<cygnal_init_t>(*cygnal_io_init_t)(std::shared_ptr<gnash::RTMPMsg> &msg);
 
     DSOEXPORT Handler();
     ~Handler();
@@ -121,14 +121,14 @@ public:
     // Check the status of active disk streams, which is one less than
     // default as the Streams IDs start at 1.
     int getActiveDiskStreams() { return _diskstreams.size(); }
-    // int removeDiskStream(boost::shared_ptr<DiskStream> x);
+    // int removeDiskStream(std::shared_ptr<DiskStream> x);
     
     // Operate on a disk streaming inprogress
-    boost::shared_ptr<gnash::DiskStream> getDiskStream(int x) { return _diskstreams[x]; }
-    void setDiskStream(int x, boost::shared_ptr<gnash::DiskStream> y) { _diskstreams[x] = y; }
+    std::shared_ptr<gnash::DiskStream> getDiskStream(int x) { return _diskstreams[x]; }
+    void setDiskStream(int x, std::shared_ptr<gnash::DiskStream> y) { _diskstreams[x] = y; }
 
     /// Add a SharedObject
-    void addSOL(boost::shared_ptr<cygnal::Element> x) {
+    void addSOL(std::shared_ptr<cygnal::Element> x) {
 	_sol.push_back(x);
     };
 
@@ -162,19 +162,19 @@ public:
     ///     Add a remote machine to the list for input messages.
     size_t addRemote(int x) { _remote.push_back(x); return _remote.size(); };
 
-    void setPlugin(boost::shared_ptr<Handler::cygnal_init_t> &init);
+    void setPlugin(std::shared_ptr<Handler::cygnal_init_t> &init);
     void setPlugin(Handler::cygnal_io_read_t read_ptr, Handler::cygnal_io_write_t write_ptr );
 
     /// Initialize the named module within Cygnal
     //
-    boost::shared_ptr<cygnal_init_t> initModule(const std::string& module);
+    std::shared_ptr<cygnal_init_t> initModule(const std::string& module);
 
     /// \method initialized
     ///     See if any of the cgi-bins has been loaded.
     bool initialized();
 
     /// This method reads raw data from a plugin.
-    boost::shared_ptr<cygnal::Buffer> readFromPlugin();
+    std::shared_ptr<cygnal::Buffer> readFromPlugin();
 
     /// This method writes raw data to a plugin.
     size_t writeToPlugin(cygnal::Buffer &buf) {
@@ -208,7 +208,7 @@ public:
     int pauseStream(double transid);
 
     // Find a stream in the vector or Disk Streams
-    boost::shared_ptr<gnash::DiskStream> findStream(const std::string &filespec);
+    std::shared_ptr<gnash::DiskStream> findStream(const std::string &filespec);
 
     // Pause the RTMP stream
     int togglePause(double);
@@ -231,13 +231,13 @@ public:
     // and shouldn't really be done here, but we're trying not to
     // break things while refactoring.
     void setNetConnection(gnash::RTMPMsg *msg) { _netconnect.reset(msg); };
-    void setNetConnection(boost::shared_ptr<gnash::RTMPMsg> msg) { _netconnect = msg; };
-    boost::shared_ptr<gnash::RTMPMsg> getNetConnection() { return _netconnect;};
+    void setNetConnection(std::shared_ptr<gnash::RTMPMsg> msg) { _netconnect = msg; };
+    std::shared_ptr<gnash::RTMPMsg> getNetConnection() { return _netconnect;};
 #endif
     
 #if 1
-    boost::shared_ptr<HTTPServer> &getHTTPHandler(int fd)  { return _http[fd]; };
-    boost::shared_ptr<RTMPServer> getRTMPHandler(int fd)  { return _rtmp[fd]; };
+    std::shared_ptr<HTTPServer> &getHTTPHandler(int fd)  { return _http[fd]; };
+    std::shared_ptr<RTMPServer> getRTMPHandler(int fd)  { return _rtmp[fd]; };
 #endif
     
     // Parse the first nessages when starting a new message handler,
@@ -265,14 +265,14 @@ protected:
     ///   This is all the opened disk based files that are currently
     ///   being streamed by the server.
     //    boost::shared_array<gnash::DiskStream> _diskstreams;
-    std::map<int, boost::shared_ptr<gnash::DiskStream> > _diskstreams;
+    std::map<int, std::shared_ptr<gnash::DiskStream> > _diskstreams;
     /// \var _protocol
     ///    this is the map of which protocol is being used by which
     ///    file descriptor.
     std::map<int, gnash::Network::protocols_supported_e> _protocol;
 #if 1
-    std::map<int, boost::shared_ptr<HTTPServer> > _http;
-    std::map<int, boost::shared_ptr<RTMPServer> > _rtmp;
+    std::map<int, std::shared_ptr<HTTPServer> > _http;
+    std::map<int, std::shared_ptr<RTMPServer> > _rtmp;
 #endif
     /// \var _clients
     ///	    is the array of all clients connected to this server for
@@ -286,16 +286,16 @@ protected:
     /// \var _local
     ///    These are local process we're responsible for
     ///    starting and stopping.
-    boost::shared_ptr<cygnal::Proc>	_local;
+    std::shared_ptr<cygnal::Proc>	_local;
     /// \var _plugins
     ///	    is for the dynamically loaded applications
-    boost::shared_ptr<cygnal_init_t>	_plugin;
+    std::shared_ptr<cygnal_init_t>	_plugin;
     /// \var _file
     ///	    is for disk based files
-    std::vector<boost::shared_ptr<gnash::DiskStream> > _files;
+    std::vector<std::shared_ptr<gnash::DiskStream> > _files;
     /// \var _sol
     ///	    is for remote SharedObjects
-    std::vector<boost::shared_ptr<cygnal::Element> > _sol;
+    std::vector<std::shared_ptr<cygnal::Element> > _sol;
     ///var _bodysize;
     ///     is to store the body size of the previous packet for this
     ///     channel. 4 and 1 byte heades don't use the length field,
@@ -317,7 +317,7 @@ protected:
     ///    object we get as the final part of the handshake process
     ///    that is used to set up the connection. This has all the
     ///    file paths and other information needed by the server.
-    boost::shared_ptr<gnash::RTMPMsg>	_netconnect;
+    std::shared_ptr<gnash::RTMPMsg>	_netconnect;
 #endif
 
     std::map<int, std::string> _keys;
@@ -325,7 +325,7 @@ private:
     boost::mutex			_mutex;
     
 // Remote Shared Objects. References are an index into this vector.
-//    std::map<std::string, boost::shared_ptr<handler_t> > _handlers;
+//    std::map<std::string, std::shared_ptr<handler_t> > _handlers;
 };
 
 } // end of gnash namespace

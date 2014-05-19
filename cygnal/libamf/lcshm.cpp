@@ -386,7 +386,7 @@ LcShm::parseHeader(boost::uint8_t *data, boost::uint8_t* tooFar)
     ptr += LC_HEADER_SIZE;
     
     AMF amf;
-    boost::shared_ptr<Element> el = amf.extractAMF(ptr, tooFar);
+    std::shared_ptr<Element> el = amf.extractAMF(ptr, tooFar);
     if (el == 0) {
         log_debug(_("Didn't extract an element from the byte stream!"));
         return 0;
@@ -465,17 +465,17 @@ LcShm::formatHeader(const std::string &con, const std::string &host, bool /* dom
 //  Make sure it is always right. Probably wrong.
 
     // Which is then always followed by 3 AMF objects.
-    boost::shared_ptr<cygnal::Buffer> buf1 = AMF::encodeString(con);
+    std::shared_ptr<cygnal::Buffer> buf1 = AMF::encodeString(con);
     memcpy(ptr_FH, buf1->begin(), buf1->size());
     ptr_FH += buf1->size();
 
     const std::string protocol="localhost";
 	// This could equal to the domain name.
-    boost::shared_ptr<cygnal::Buffer> buf2 = AMF::encodeString(protocol);
+    std::shared_ptr<cygnal::Buffer> buf2 = AMF::encodeString(protocol);
     memcpy(ptr_FH, buf2->begin(), buf2->size());
     ptr_FH += buf2->size();
 
-    boost::shared_ptr<cygnal::Buffer> buf3 = AMF::encodeString(host);
+    std::shared_ptr<cygnal::Buffer> buf3 = AMF::encodeString(host);
     memcpy(ptr_FH, buf3->begin(), buf3->size());
     ptr_FH += buf3->size();
     
@@ -528,7 +528,7 @@ LcShm::connect(const string& names)
     _baseaddr = baseAddress;
     parseHeader(baseAddress, tooFar);
 //	log_debug("Base address in 'connect' is: 0x%x, 0x%x",(unsigned int) SharedMem::begin(), (unsigned int) _baseaddr);
-//  vector<boost::shared_ptr<Element> > ellist = parseBody(ptr);
+//  vector<std::shared_ptr<Element> > ellist = parseBody(ptr);
 //  log_debug("Base address is: 0x%x, 0x%x",
 //               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
 
@@ -567,7 +567,7 @@ LcShm::connect(key_t key)
     Listener::setBaseAddress(baseAddress);
     _baseaddr = baseAddress;
     parseHeader(baseAddress, tooFar);
-//    vector<boost::shared_ptr<Element> > ellist = parseBody(ptr);
+//    vector<std::shared_ptr<Element> > ellist = parseBody(ptr);
 //     log_debug("Base address is: 0x%x, 0x%x",
 //               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
     
@@ -616,7 +616,7 @@ LcShm::send(const string&  name , const string&  domainname ,
       int message_size=0;
       if (data.size()!=0){	
 		   for(iter = data.begin(); iter != data.end(); ++iter){
-			    boost::shared_ptr<Buffer> buf = AMF::encodeElement(*iter);									
+			    std::shared_ptr<Buffer> buf = AMF::encodeElement(*iter);
 				message_size+=buf->size();
 			}
 	}	
@@ -642,16 +642,16 @@ LcShm::send(const string&  name , const string&  domainname ,
 //  Make sure it is right later.
 
     // Which is then always followed by 3 AMF objects.
-    boost::shared_ptr<cygnal::Buffer> buf1 = AMF::encodeString(name);
+    std::shared_ptr<cygnal::Buffer> buf1 = AMF::encodeString(name);
     memcpy(ptr, buf1->begin(), buf1->size());
     ptr += buf1->size();
 	
     const std::string protocol="localhostf";
-    boost::shared_ptr<cygnal::Buffer> buf2 = AMF::encodeString(protocol);
+    std::shared_ptr<cygnal::Buffer> buf2 = AMF::encodeString(protocol);
     memcpy(ptr, buf2->begin(), buf2->size());
     ptr += buf2->size();
 
-    boost::shared_ptr<cygnal::Buffer> buf3 = AMF::encodeString(domainname);
+    std::shared_ptr<cygnal::Buffer> buf3 = AMF::encodeString(domainname);
     memcpy(ptr, buf3->begin(), buf3->size());
     ptr += buf3->size();
 	
@@ -661,7 +661,7 @@ LcShm::send(const string&  name , const string&  domainname ,
       if (data.size()==0){	    	  
 		   for(iter = data.begin(); iter != data.end(); ++iter){
 				// temporary buf for element
-				boost::shared_ptr<Buffer> buf = AMF::encodeElement(*iter);		
+				std::shared_ptr<Buffer> buf = AMF::encodeElement(*iter);
 				memcpy(ptr, buf->begin(), buf->size() );
 				ptr+= buf->size();		
 			}
@@ -748,7 +748,7 @@ LcShm::send(const string&  name , const string&  domainname ,
 ///
 /// @return nothing.
 /// We may only need a connection name for the receive function.
-///void recv(std::string &name, std::string &dataname, boost::shared_ptr<cygnal::Element> data)
+///void recv(std::string &name, std::string &dataname, std::shared_ptr<cygnal::Element> data)
 //{
 	 //GNASH_REPORT_FUNCTION;
 
@@ -765,7 +765,7 @@ LcShm::send(const string&  name , const string&  domainname ,
 ///         boost::uint8_t *parseHeader(boost::uint8_t *data, boost::uint8_t* tooFar);
 ///         	This should be easy if parseHeader function has been finished.
 ///  3: Parse the body of the shared memory
-/// 	    std::vector<boost::shared_ptr<cygnal::Element> > parseBody(boost::uint8_t *data);
+/// 	    std::vector<std::shared_ptr<cygnal::Element> > parseBody(boost::uint8_t *data);
 ///         	This should be easy if parseHeader function has been finished.
 ///  4: The listened should implement these commands somehow automatically .
 ///         Handler?
@@ -787,10 +787,10 @@ LcShm::dump()
     cerr << "Connection Name:\t" << _object.connection_name << endl;
     cerr << "Hostname Name:\t\t" << _object.hostname << endl;
     cerr << "Domain Allowed:\t\t" << ((_object.domain) ? "true" : "false") << endl;
-    vector<boost::shared_ptr<Element> >::iterator ait;
+    vector<std::shared_ptr<Element> >::iterator ait;
     cerr << "# of Elements in file: " << _amfobjs.size() << endl;
     for (ait = _amfobjs.begin(); ait != _amfobjs.end(); ++ait) {
-	boost::shared_ptr<Element> el = (*(ait));
+	std::shared_ptr<Element> el = (*(ait));
         el->dump();
     }
 

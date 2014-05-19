@@ -126,7 +126,7 @@ bool AquaGui::init(int argc, char **argv[]) /* Self-explainatory */
     _renderer.reset(_glue.createRenderHandler());
     if(!_renderer)return false;
 
-	_runResources.setRenderer(boost::shared_ptr<Renderer>(_renderer));
+	_runResources.setRenderer(std::shared_ptr<Renderer>(_renderer));
     return true;
 
 }

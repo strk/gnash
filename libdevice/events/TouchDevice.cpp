@@ -267,14 +267,14 @@ TouchDevice::apply_ts_calibration(float* cx, float* cy, int rawx, int rawy)
     *cy = d * rawx + e * rawy + f;
 }
 
-std::vector<boost::shared_ptr<InputDevice> >
+std::vector<std::shared_ptr<InputDevice> >
 TouchDevice::scanForDevices()
 {
     // GNASH_REPORT_FUNCTION;
 
     struct stat st;
 
-    std::vector<boost::shared_ptr<InputDevice> > devices;
+    std::vector<std::shared_ptr<InputDevice> > devices;
 
     // Debug strings to make output more readable
     const char *debug[] = {
@@ -317,8 +317,8 @@ TouchDevice::scanForDevices()
             close(fd);
             log_debug("Found a %s device for touchscreen input using %s",
                       debug[touch[i].type], touch[i].filespec);
-            boost::shared_ptr<InputDevice> dev
-                = boost::shared_ptr<InputDevice>(new TouchDevice());
+            std::shared_ptr<InputDevice> dev
+                = std::shared_ptr<InputDevice>(new TouchDevice());
             if (dev->init(touch[i].filespec, DEFAULT_BUFFER_SIZE)) {
                 devices.push_back(dev);
             }

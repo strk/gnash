@@ -67,7 +67,7 @@ main(int argc, char *argv[])
     sigaction (SIGALRM, &act, NULL);
 
     bool loop = false;
-    std::vector<boost::shared_ptr<InputDevice> > inputs
+    std::vector<std::shared_ptr<InputDevice> > inputs
         = InputDevice::scanForDevices();
     cerr << "Found " << inputs.size() << " input devices" << endl;
     if (inputs.empty()) {
@@ -77,11 +77,11 @@ main(int argc, char *argv[])
         loop = true;
     }    
     
-    std::vector<boost::shared_ptr<InputDevice> >::iterator it;
+    std::vector<std::shared_ptr<InputDevice> >::iterator it;
     
     // check input devices
     for (it = inputs.begin(); it != inputs.end(); ++it) {
-        boost::shared_ptr<InputDevice> id = *it;
+        std::shared_ptr<InputDevice> id = *it;
         cerr << "Found " << id->id() << " device" << endl;
         if (id->init()) {
             runtest.pass("InputDevice::init()");
@@ -96,13 +96,13 @@ main(int argc, char *argv[])
     
     // This loops endlessly at the frame rate
     while (loop) {  
-        std::vector<boost::shared_ptr<InputDevice> >::iterator it;
+        std::vector<std::shared_ptr<InputDevice> >::iterator it;
         // // check input devices
         for (it = inputs.begin(); it != inputs.end(); ++it) {
-            boost::shared_ptr<InputDevice> id = *it;
+            std::shared_ptr<InputDevice> id = *it;
             if (id->check()) {
                 // FIXME: process the input data
-                boost::shared_ptr<InputDevice::input_data_t> ie = id->popData();
+                std::shared_ptr<InputDevice::input_data_t> ie = id->popData();
 #if 0
                 if (ie) {
                     cerr << "Got data: " << ie->pressed;

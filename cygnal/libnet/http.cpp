@@ -236,12 +236,12 @@ HTTP::processHeaderFields(cygnal::Buffer *buf)
 
 // // Parse an Echo Request message coming from the Red5 echo_test. This
 // // method should only be used for testing purposes.
-// vector<boost::shared_ptr<cygnal::Element > >
+// vector<std::shared_ptr<cygnal::Element > >
 // HTTP::parseEchoRequest(boost::uint8_t *data, size_t size)
 // {
 // //    GNASH_REPORT_FUNCTION;
     
-//     vector<boost::shared_ptr<cygnal::Element > > headers;
+//     vector<std::shared_ptr<cygnal::Element > > headers;
 	
 //     // skip past the header bytes, we don't care about them.
 //     boost::uint8_t *tmpptr = data + 6;
@@ -252,7 +252,7 @@ HTTP::processHeaderFields(cygnal::Buffer *buf)
 
 //     // Get the first name, which is a raw string, and not preceded by
 //     // a type byte.
-//     boost::shared_ptr<cygnal::Element > el1(new cygnal::Element);
+//     std::shared_ptr<cygnal::Element > el1(new cygnal::Element);
     
 //     // If the length of the name field is corrupted, then we get out of
 //     // range quick, and corrupt memory. This is a bit of a hack, but
@@ -271,7 +271,7 @@ HTTP::processHeaderFields(cygnal::Buffer *buf)
 //     // a type byte.
 //     length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
 //     tmpptr += sizeof(boost::uint16_t);
-//     boost::shared_ptr<cygnal::Element > el2(new cygnal::Element);
+//     std::shared_ptr<cygnal::Element > el2(new cygnal::Element);
 
 // //     std::string name2(reinterpret_cast<const char *>(tmpptr), length);
 // //     el2->setName(name2.c_str(), name2.size());
@@ -291,11 +291,11 @@ HTTP::processHeaderFields(cygnal::Buffer *buf)
 //     // Get the last two pieces of data, which are both AMF encoded
 //     // with a type byte.
 //     amf::AMF amf;
-//     boost::shared_ptr<cygnal::Element> el3 = amf.extractAMF(tmpptr, tmpptr + size);
+//     std::shared_ptr<cygnal::Element> el3 = amf.extractAMF(tmpptr, tmpptr + size);
 //     headers.push_back(el3);
 //     tmpptr += amf.totalsize();
     
-//     boost::shared_ptr<cygnal::Element> el4 = amf.extractAMF(tmpptr, tmpptr + size);
+//     std::shared_ptr<cygnal::Element> el4 = amf.extractAMF(tmpptr, tmpptr + size);
 //     headers.push_back(el4);
 
 //      return headers;
@@ -308,7 +308,7 @@ HTTP::processHeaderFields(cygnal::Buffer *buf)
 // HTTP::formatEchoResponse(const std::string &num, cygnal::Element &el)
 // {
 // //    GNASH_REPORT_FUNCTION;
-//     boost::shared_ptr<cygnal::Buffer> data;
+//     std::shared_ptr<cygnal::Buffer> data;
 
 //     cygnal::Element nel;
 //     if (el.getType() == cygnal::Element::TYPED_OBJECT_AMF0) {
@@ -319,7 +319,7 @@ HTTP::processHeaderFields(cygnal::Buffer *buf)
 // 	    // FIXME: see about using std::reverse() instead.
 // 	    for (int i=el.propertySize()-1; i>=0; i--) {
 // // 	    for (int i=0 ; i<el.propertySize(); i++) {
-// 		boost::shared_ptr<cygnal::Element> child = el.getProperty(i);
+// 		std::shared_ptr<cygnal::Element> child = el.getProperty(i);
 // 		nel.addProperty(child);
 // 	    }
 // 	    data = nel.encode();
@@ -335,12 +335,12 @@ HTTP::processHeaderFields(cygnal::Buffer *buf)
 
 #if 0				// FIXME:
 // Client side parsing of response message codes
-boost::shared_ptr<HTTP::http_response_t> 
+std::shared_ptr<HTTP::http_response_t>
 HTTP::parseStatus(const std::string &line)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    boost::shared_ptr<http_response_t> status;
+    std::shared_ptr<http_response_t> status;
     // The respnse is a number followed by the error message.
     string::size_type pos = line.find(" ", 0);
     if (pos != string::npos) {
@@ -358,7 +358,7 @@ HTTP::processClientRequest(int fd)
 //    GNASH_REPORT_FUNCTION;
     bool result = false;
     
-    boost::shared_ptr<cygnal::Buffer> buf(_que.peek());
+    std::shared_ptr<cygnal::Buffer> buf(_que.peek());
     if (buf) {
 	_cmd = extractCommand(buf->reference());
 	switch (_cmd) {
@@ -413,7 +413,7 @@ HTTP::processGetRequest(int fd)
 	return false;
     }
     
-    boost::shared_ptr<cygnal::Buffer> buf(_que.pop());
+    std::shared_ptr<cygnal::Buffer> buf(_que.pop());
 //    cerr << "YYYYYYY: " << (char *)buf->reference() << endl;
 //    cerr << hexify(buf->reference(), buf->allocated(), false) << endl;
     
@@ -428,7 +428,7 @@ HTTP::processGetRequest(int fd)
 
     string url = _docroot + _filespec;
     // See if the file is in the cache and already opened.
-    boost::shared_ptr<DiskStream> filestream(cache.findFile(url));
+    std::shared_ptr<DiskStream> filestream(cache.findFile(url));
     if (filestream) {
 	log_network(_("FIXME: found file in cache!"));
     } else {
@@ -516,7 +516,7 @@ HTTP::processPostRequest(int fd)
 	return false;
     }
     
-    boost::shared_ptr<cygnal::Buffer> buf(_que.pop());
+    std::shared_ptr<cygnal::Buffer> buf(_que.pop());
     if (buf == 0) {
 	log_debug(_("Que empty, net connection dropped for fd #%d"), getFileFd());
 	return false;
@@ -526,7 +526,7 @@ HTTP::processPostRequest(int fd)
     clearHeader();
     boost::uint8_t *data = processHeaderFields(*buf);
     size_t length = strtol(getField("content-length").c_str(), NULL, 0);
-    boost::shared_ptr<cygnal::Buffer> content(new cygnal::Buffer(length));
+    std::shared_ptr<cygnal::Buffer> content(new cygnal::Buffer(length));
     int ret = 0;
     if (buf->allocated() - (data - buf->reference()) ) {
 //	cerr << "Don't need to read more data: have " << buf->allocated() << " bytes" << endl;
@@ -549,7 +549,7 @@ HTTP::processPostRequest(int fd)
 	log_debug(_("Got AMF data in POST"));
 #if 0
 	amf::AMF amf;
-	boost::shared_ptr<cygnal::Element> el = amf.extractAMF(content.reference(), content.end());
+	std::shared_ptr<cygnal::Element> el = amf.extractAMF(content.reference(), content.end());
 	el->dump();		// FIXME: do something intelligent
 				// with this Element
 #endif
@@ -564,10 +564,10 @@ HTTP::processPostRequest(int fd)
 	log_debug(_("Got CGI echo request in POST"));
 //	cerr << "FIXME 2: " << hexify(content->reference(), content->allocated(), true) << endl;
 
-	vector<boost::shared_ptr<cygnal::Element> > headers = parseEchoRequest(*content);
-  	//boost::shared_ptr<cygnal::Element> &el0 = headers[0];
-  	//boost::shared_ptr<cygnal::Element> &el1 = headers[1];
-  	//boost::shared_ptr<cygnal::Element> &el3 = headers[3];
+	vector<std::shared_ptr<cygnal::Element> > headers = parseEchoRequest(*content);
+  	//std::shared_ptr<cygnal::Element> &el0 = headers[0];
+  	//std::shared_ptr<cygnal::Element> &el1 = headers[1];
+  	//std::shared_ptr<cygnal::Element> &el3 = headers[3];
 	
     if (headers.size() >= 4) {
 	    if (headers[3]) {
@@ -732,11 +732,11 @@ HTTP::checkGeneralFields(cygnal::Buffer & /* buf */)
     return false;
 }
 
-boost::shared_ptr<std::vector<std::string> >
+std::shared_ptr<std::vector<std::string> >
 HTTP::getFieldItem(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<std::vector<std::string> > ptr(new std::vector<std::string>);
+    std::shared_ptr<std::vector<std::string> > ptr(new std::vector<std::string>);
     Tok t(_fields[name], Sep(", "));
     for (Tok::iterator i = t.begin(), e = t.end(); i != e; ++i) {
 	ptr->push_back(*i);
@@ -1169,11 +1169,11 @@ HTTP::formatEchoResponse(const std::string &num, boost::uint8_t *data, size_t si
     // the request, a slash followed by a number like "/2".
     string result = num;
     result += "/onResult";
-    boost::shared_ptr<cygnal::Buffer> res = cygnal::AMF::encodeString(result);
+    std::shared_ptr<cygnal::Buffer> res = cygnal::AMF::encodeString(result);
     _buffer.append(res->begin()+1, res->size()-1);
 
     // Add the null data item
-    boost::shared_ptr<cygnal::Buffer> null = cygnal::AMF::encodeString("null");
+    std::shared_ptr<cygnal::Buffer> null = cygnal::AMF::encodeString("null");
     _buffer.append(null->begin()+1, null->size()-1);
 
     // Add the other binary blob
@@ -1375,7 +1375,7 @@ HTTP::recvChunked(boost::uint8_t *data, size_t size)
     // line number. There is supposed to be a ';' before the \r\n, as this
     // field can have other attributes, but the OpenStreetMap server doesn't
     // use the semi-colon, as it's optional, and rarely used anyway.
-    boost::shared_ptr<cygnal::Buffer> buf;
+    std::shared_ptr<cygnal::Buffer> buf;
     boost::uint8_t *start = std::find(data, data+size, '\r') + 2;
     if (start != data+size) {
 	// extract the total size of the chunk
@@ -1503,7 +1503,7 @@ HTTP::recvMsg(int fd, size_t size)
     Network net;
 
     do {
-	boost::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer(size));
+	std::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer(size));
 	ret = net.readNet(fd, *buf, 5);
 //	cerr << __PRETTY_FUNCTION__ << ret << " : " << (char *)buf->reference() << endl;
 

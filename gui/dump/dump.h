@@ -103,7 +103,7 @@ private:
     std::ofstream _fileStream;         /* stream for output file */
     void init_dumpfile();               /* convenience method to create dump file */
 
-    boost::shared_ptr<sound::sound_handler> _soundHandler;
+    std::shared_ptr<sound::sound_handler> _soundHandler;
 
     ManualClock _clock;
 

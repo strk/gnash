@@ -154,19 +154,19 @@ test (void)
         runtest.fail("addResponse()/findResponse()");
     }
 
-    boost::shared_ptr<DiskStream> file1(new DiskStream);
+    std::shared_ptr<DiskStream> file1(new DiskStream);
     create_file("outbuf1.raw", 100);
     file1->open("outbuf1.raw");
 
-    boost::shared_ptr<DiskStream> file2(new DiskStream);
+    std::shared_ptr<DiskStream> file2(new DiskStream);
     create_file("outbuf2.raw", 200);
     file1->open("outbuf2.raw");
 
-    boost::shared_ptr<DiskStream> file3(new DiskStream);
+    std::shared_ptr<DiskStream> file3(new DiskStream);
     create_file("outbuf3.raw", 300);
     file1->open("outbuf3.raw");
 
-    boost::shared_ptr<DiskStream> file4(new DiskStream);
+    std::shared_ptr<DiskStream> file4(new DiskStream);
     create_file("outbuf4.raw", 400);
     file1->open("outbuf4.raw");
 
@@ -175,8 +175,8 @@ test (void)
     cache.addFile("barfoo", file3);
     cache.addFile("foobar", file4);
 
-    boost::shared_ptr<DiskStream> ds1 = cache.findFile("foo");
-    boost::shared_ptr<DiskStream> ds2 = cache.findFile("bar");
+    std::shared_ptr<DiskStream> ds1 = cache.findFile("foo");
+    std::shared_ptr<DiskStream> ds2 = cache.findFile("bar");
     if (ds1 && ds2) {
         if ((ds1->getFileSize() == file1->getFileSize())
             && (ds2->getFileSize() == file2->getFileSize())) {
@@ -239,19 +239,19 @@ test_remove(void)
         runtest.fail("Cache::removeResponse()");
     }
 
-    boost::shared_ptr<DiskStream> file1(new DiskStream);
+    std::shared_ptr<DiskStream> file1(new DiskStream);
     create_file("outbuf1.raw", 100);
     file1->open("outbuf1.raw");
 
-    boost::shared_ptr<DiskStream> file2(new DiskStream);
+    std::shared_ptr<DiskStream> file2(new DiskStream);
     create_file("outbuf2.raw", 200);
     file2->open("outbuf2.raw");
 
-    boost::shared_ptr<DiskStream> file3(new DiskStream);
+    std::shared_ptr<DiskStream> file3(new DiskStream);
     create_file("outbuf3.raw", 300);
     file3->open("outbuf3.raw");
 
-    boost::shared_ptr<DiskStream> file4(new DiskStream);
+    std::shared_ptr<DiskStream> file4(new DiskStream);
     create_file("outbuf4.raw", 400);
     file4->open("outbuf4.raw");
 
@@ -261,8 +261,8 @@ test_remove(void)
     cache.addFile("foobar", file4);
     cache.removeFile("barfoo");
 
-    boost::shared_ptr<DiskStream> ds1 = cache.findFile("foo");
-    boost::shared_ptr<DiskStream> ds2 = cache.findFile("bar");
+    std::shared_ptr<DiskStream> ds1 = cache.findFile("foo");
+    std::shared_ptr<DiskStream> ds2 = cache.findFile("bar");
     if (ds1 && ds2) {
         if ((cache.findFile("foo")->getFileSize() == file1->getFileSize())
             && (cache.findFile("barfoo") == 0)
@@ -307,7 +307,7 @@ test_errors (void)
         runtest.fail("Cache::findResponse()");
     }
 
-    boost::shared_ptr<DiskStream> file1(new DiskStream);
+    std::shared_ptr<DiskStream> file1(new DiskStream);
 //    create_file("outbuf1.raw", 100);   it's created aleady in test().
     file1->open("outbuf1.raw");
 

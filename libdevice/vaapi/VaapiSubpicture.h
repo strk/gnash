@@ -34,7 +34,7 @@ class VaapiImage;
 /// VA subpicture abstraction
 class DSOEXPORT VaapiSubpicture
 {
-    boost::shared_ptr<VaapiImage>       _image;
+    std::shared_ptr<VaapiImage>       _image;
     VASubpictureID                      _subpicture;
 
     /// Create VA subpicture
@@ -44,7 +44,7 @@ class DSOEXPORT VaapiSubpicture
     void destroy();
 
 public:
-    VaapiSubpicture(boost::shared_ptr<VaapiImage> image);
+    VaapiSubpicture(std::shared_ptr<VaapiImage> image);
     ~VaapiSubpicture();
 
     /// Return VA subpicture id

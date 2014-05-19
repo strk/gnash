@@ -217,7 +217,7 @@ struct RTMPPacket
     //
     /// This always includes at least the header. Storage for the message
     /// payload is added as necessary.
-    boost::shared_ptr<SimpleBuffer> buffer;
+    std::shared_ptr<SimpleBuffer> buffer;
 
     size_t bytesRead;
 };
@@ -413,9 +413,9 @@ struct DSOEXPORT RTMP
     /// TODO: this returns the whole RTMP message, which is ugly. And it
     /// only returns one at time, and can return a null pointer. We need
     /// a better way to retrieve the messages.
-    boost::shared_ptr<SimpleBuffer> getMessage() {
-        if (_messageQueue.empty()) return boost::shared_ptr<SimpleBuffer>();
-        boost::shared_ptr<SimpleBuffer> b = _messageQueue.front();
+    std::shared_ptr<SimpleBuffer> getMessage() {
+        if (_messageQueue.empty()) return std::shared_ptr<SimpleBuffer>();
+        std::shared_ptr<SimpleBuffer> b = _messageQueue.front();
         _messageQueue.pop_front();
         return b;
     }
@@ -425,9 +425,9 @@ struct DSOEXPORT RTMP
     /// TODO: this returns the whole RTMP message, which is ugly. And it
     /// only returns one at time, and can return a null pointer. We need
     /// a better way to retrieve the frames.
-    boost::shared_ptr<SimpleBuffer> getFLVFrame() {
-        if (_flvQueue.empty()) return boost::shared_ptr<SimpleBuffer>();
-        boost::shared_ptr<SimpleBuffer> b = _flvQueue.front();
+    std::shared_ptr<SimpleBuffer> getFLVFrame() {
+        if (_flvQueue.empty()) return std::shared_ptr<SimpleBuffer>();
+        std::shared_ptr<SimpleBuffer> b = _flvQueue.front();
         _flvQueue.pop_front();
         return b;
     }
@@ -513,8 +513,8 @@ private:
     /// A set of channels for sending packets.
     ChannelSet _outChannels;
     
-    std::deque<boost::shared_ptr<SimpleBuffer> > _messageQueue;
-    std::deque<boost::shared_ptr<SimpleBuffer> > _flvQueue;
+    std::deque<std::shared_ptr<SimpleBuffer> > _messageQueue;
+    std::deque<std::shared_ptr<SimpleBuffer> > _flvQueue;
 
     /// Stored server bandwidth (reported by server).
     boost::uint32_t _serverBandwidth;

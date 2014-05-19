@@ -60,7 +60,7 @@ void gnash_canvas_before_rendering (GnashCanvas *canvas, gnash::movie_root* stag
 G_END_DECLS
 
 /// Get the Renderer for this canvas
-boost::shared_ptr<gnash::Renderer> gnash_canvas_get_renderer(GnashCanvas *canvas);
+std::shared_ptr<gnash::Renderer> gnash_canvas_get_renderer(GnashCanvas *canvas);
 
 
 #endif

@@ -514,7 +514,7 @@ main(int argc, char** argv)
         }
 
         /// Retrieve messages.
-        boost::shared_ptr<SimpleBuffer> b = r.getMessage();
+        std::shared_ptr<SimpleBuffer> b = r.getMessage();
         while (b.get()) {
             handleInvoke(r, nc, b->data() + rtmp::RTMPHeader::headerSize,
                     b->data() + b->size());
@@ -522,7 +522,7 @@ main(int argc, char** argv)
         }
 
         /// Retrieve video packets.
-        boost::shared_ptr<SimpleBuffer> f = r.getFLVFrame();
+        std::shared_ptr<SimpleBuffer> f = r.getFLVFrame();
         while (f.get()) {
             if (flv) {
                 const char* start = reinterpret_cast<const char*>(

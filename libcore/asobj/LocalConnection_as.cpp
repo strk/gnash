@@ -226,7 +226,7 @@ public:
 
     void connect(const std::string& name);
 
-    void send(boost::shared_ptr<ConnectionData> d)
+    void send(std::shared_ptr<ConnectionData> d)
     {
         assert(d.get());
         VM& vm = getVM(owner());
@@ -250,7 +250,7 @@ private:
 
     SharedMem _shm;
 
-    std::deque<boost::shared_ptr<ConnectionData> > _queue;
+    std::deque<std::shared_ptr<ConnectionData> > _queue;
 
     // The timestamp of our last write to the shared memory.
     boost::uint32_t _lastTime;
@@ -378,7 +378,7 @@ LocalConnection_as::update()
     }
 
     // Get the first buffer.
-    boost::shared_ptr<ConnectionData> cd = _queue.front();
+    std::shared_ptr<ConnectionData> cd = _queue.front();
     _queue.pop_front();
 
     // If the correct listener isn't there, iterate until we find one or
@@ -615,7 +615,7 @@ localconnection_send(const fn_call& fn)
         return as_value(false);
     }
     
-    boost::shared_ptr<ConnectionData> cd(new ConnectionData());
+    std::shared_ptr<ConnectionData> cd(new ConnectionData());
 
     SimpleBuffer& buf = cd->data;
 

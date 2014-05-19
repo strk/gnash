@@ -49,7 +49,7 @@ public:
 
 /// VA context abstraction
 class DSOEXPORT VaapiContext {
-    typedef boost::shared_ptr<VaapiSurface> VaapiSurfaceSP;
+    typedef std::shared_ptr<VaapiSurface> VaapiSurfaceSP;
     
     VADisplay                           _display;
     VAConfigID                          _config;
@@ -78,10 +78,10 @@ public:
     VAContextID get() const { return _context; }
 
     /// Get a free surface
-    boost::shared_ptr<VaapiSurface> acquireSurface();
+    std::shared_ptr<VaapiSurface> acquireSurface();
 
     /// Release surface
-    void releaseSurface(boost::shared_ptr<VaapiSurface> surface);
+    void releaseSurface(std::shared_ptr<VaapiSurface> surface);
 
     /// Set user data
     void setData(std::unique_ptr<VaapiContextData> user_data) { _user_data = user_data; }

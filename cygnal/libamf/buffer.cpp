@@ -384,7 +384,7 @@ Buffer::operator+=(boost::uint32_t length)
 /// 
 /// @return A reference to a Buffer.
 Buffer &
-Buffer::operator+=(boost::shared_ptr<Buffer> buf)
+Buffer::operator+=(std::shared_ptr<Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
     append(buf->reference(), buf->allocated());
@@ -524,7 +524,7 @@ Buffer::operator=(boost::uint8_t *data)
 /// 
 /// @return A reference to a Buffer.
 Buffer &
-Buffer::operator=(boost::shared_ptr<Buffer> buf)
+Buffer::operator=(std::shared_ptr<Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
     copy(buf->reference(), buf->size());

@@ -92,9 +92,9 @@ public:
     RTMPMsg();
     ~RTMPMsg();
     
-    void addObject(boost::shared_ptr<cygnal::Element> el) { _amfobjs.push_back(el); };
+    void addObject(std::shared_ptr<cygnal::Element> el) { _amfobjs.push_back(el); };
     size_t size() { return _amfobjs.size(); };
-    std::vector<boost::shared_ptr<cygnal::Element> > getElements() { return _amfobjs; };
+    std::vector<std::shared_ptr<cygnal::Element> > getElements() { return _amfobjs; };
 
     void setMethodName(const std::string &name) { _method = name; } ;
     std::string &getMethodName()         { return _method; };
@@ -102,15 +102,15 @@ public:
     void setTransactionID(double num)         { _transid = num; };
     double getTransactionID()	         { return _transid; };
 
-    rtmp_status_e checkStatus(boost::shared_ptr<cygnal::Element> el);
+    rtmp_status_e checkStatus(std::shared_ptr<cygnal::Element> el);
     void setStatus(rtmp_status_e st)     { _status = st; };
     rtmp_status_e getStatus()	         { return _status; };
 
     void setChannel(boost::uint8_t num) { _channel = num; };
     boost::uint8_t getChannel()         { return _channel; } ;
 
-    boost::shared_ptr<cygnal::Element> operator[](size_t x);
-    boost::shared_ptr<cygnal::Element> at(size_t x) { return _amfobjs[x]; };
+    std::shared_ptr<cygnal::Element> operator[](size_t x);
+    std::shared_ptr<cygnal::Element> at(size_t x) { return _amfobjs[x]; };
 
     /// \brief Find the named property for this Object.
     ///
@@ -118,7 +118,7 @@ public:
     ///		search for.
     ///
     /// @return A smart pointer to the Element for this property.
-    DSOEXPORT boost::shared_ptr<cygnal::Element> findProperty(const std::string &name);
+    DSOEXPORT std::shared_ptr<cygnal::Element> findProperty(const std::string &name);
 
 //    void setHeaderData(RTMP::rtmp_head_t &qhead);
 			
@@ -130,7 +130,7 @@ public:
     rtmp_status_e	  _status;
     std::string           _method;
     double                _transid;
-    std::vector<boost::shared_ptr<cygnal::Element> > _amfobjs;
+    std::vector<std::shared_ptr<cygnal::Element> > _amfobjs;
     boost::uint8_t       _channel;
 };
 

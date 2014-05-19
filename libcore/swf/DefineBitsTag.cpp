@@ -176,7 +176,7 @@ jpeg_tables_loader(SWFStream& in, TagType tag, movie_definition& m,
         // Anyway the actual reads are limited to currently opened tag as 
         // of gnash::SWFStream::read(), so this is not a problem.
         //
-        boost::shared_ptr<IOChannel> ad(StreamAdapter::getFile(in,
+        std::shared_ptr<IOChannel> ad(StreamAdapter::getFile(in,
                     std::numeric_limits<std::streamsize>::max()).release());
         //  transfer ownership to the image::JpegInput
         input = image::JpegInput::createSWFJpeg2HeaderOnly(ad, jpegHeaderSize);

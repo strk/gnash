@@ -43,9 +43,9 @@ public:
     ~GatewayTest ();
 
     // Parse an Echo Request message coming from the Red5 echo_test.
-    std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(amf::Buffer &buf)
+    std::vector<std::shared_ptr<amf::Element > > parseEchoRequest(amf::Buffer &buf)
         { return parseEchoRequest(buf.reference(), buf.size()); };
-    std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
+    std::vector<std::shared_ptr<amf::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
 
     // format a response to the 'echo' test used for testing Gnash.
     amf::Buffer &formatEchoResponse(const std::string &num, amf::Element &el);

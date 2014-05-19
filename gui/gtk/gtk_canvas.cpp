@@ -61,7 +61,7 @@ struct _GnashCanvas
 {
     GtkDrawingArea base_instance;
     std::unique_ptr<gnash::GtkGlue> glue;
-    boost::shared_ptr<gnash::Renderer> renderer;
+    std::shared_ptr<gnash::Renderer> renderer;
 };
 
 G_DEFINE_TYPE(GnashCanvas, gnash_canvas, GTK_TYPE_DRAWING_AREA)
@@ -323,7 +323,7 @@ gnash_canvas_before_rendering(GnashCanvas *canvas, gnash::movie_root* stage)
     canvas->glue->beforeRendering(stage);
 }
 
-boost::shared_ptr<gnash::Renderer>
+std::shared_ptr<gnash::Renderer>
 gnash_canvas_get_renderer(GnashCanvas *canvas)
 {
     return canvas->renderer;

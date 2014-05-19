@@ -630,7 +630,7 @@ AOS4Gui::createWindow(const char *title, int width, int height, int xPosition, i
     _glue.prepDrawingArea(_width, _height);
 
     //set_Renderer(_renderer);
-	_runResources.setRenderer(boost::shared_ptr<Renderer>(_renderer));
+	_runResources.setRenderer(std::shared_ptr<Renderer>(_renderer));
 
 	struct Window *_window = _glue.getWindow();
 

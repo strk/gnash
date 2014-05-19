@@ -502,7 +502,7 @@ protected:
     unsigned int _interval;
 
     /// The handler which is called to update the client area of our window.
-    boost::shared_ptr<Renderer> _renderer;
+    std::shared_ptr<Renderer> _renderer;
 
     /// Signals that the next frame must be re-rendered completely because the
     /// window size did change.

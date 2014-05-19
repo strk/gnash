@@ -97,7 +97,7 @@ Cache::addResponse(const std::string &name, const std::string &response)
 }
 
 void
-Cache::addFile(const std::string &name, boost::shared_ptr<DiskStream> &file)
+Cache::addFile(const std::string &name, std::shared_ptr<DiskStream> &file)
 {
     // GNASH_REPORT_FUNCTION;
 
@@ -140,7 +140,7 @@ Cache::findResponse(const std::string &name)
     return _responses[name];
 }
 
-boost::shared_ptr<DiskStream> &
+std::shared_ptr<DiskStream> &
 Cache::findFile(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -150,7 +150,7 @@ Cache::findFile(const std::string &name)
 #ifdef USE_STATS_CACHE
     clock_gettime (CLOCK_REALTIME, &_last_access);
     _file_lookups++;
-    map<string, boost::shared_ptr<DiskStream> >::const_iterator it;
+    map<string, std::shared_ptr<DiskStream> >::const_iterator it;
     it = _files.find(name);
     if (it != _files.end()) {
         _file_hits++;
@@ -226,7 +226,7 @@ Cache::stats(bool xml) const
 	text << "	File hits from cache: " << _file_hits << endl;
     }
     
-    map<std::string, boost::shared_ptr<DiskStream> >::const_iterator data;
+    map<std::string, std::shared_ptr<DiskStream> >::const_iterator data;
     for (data = _files.begin(); data != _files.end(); ++data) {
 	const struct timespec *last = data->second->getLastAccessTime();
 	time = ((now.tv_sec - last->tv_sec) + ((now.tv_nsec - last->tv_nsec)/1e9));
@@ -273,9 +273,9 @@ Cache::dump(std::ostream& os) const
     
     os << "DiskStream cache has " << _files.size() << " files." << endl;
     
-    map<std::string, boost::shared_ptr<DiskStream> >::const_iterator data;
+    map<std::string, std::shared_ptr<DiskStream> >::const_iterator data;
     for (data = _files.begin(); data != _files.end(); ++data) {
-        boost::shared_ptr<DiskStream> filedata = data->second;
+        std::shared_ptr<DiskStream> filedata = data->second;
         os << "file info for \"" << data->first << "\" is: " << endl;
         filedata->dump();
         os << "-----------------------------" << endl;

@@ -28,7 +28,7 @@
 
 namespace gnash {
 
-VaapiSubpicture::VaapiSubpicture(boost::shared_ptr<VaapiImage> image)
+VaapiSubpicture::VaapiSubpicture(std::shared_ptr<VaapiImage> image)
     : _image(image)
     , _subpicture(VA_INVALID_ID)
 {

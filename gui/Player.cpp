@@ -412,14 +412,14 @@ Player::run(int argc, char* argv[], const std::string& infile,
     /// The RunResources should be populated before parsing.
     _runResources.reset(new RunResources());
 
-    boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
+    std::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
     addDefaultLoaders(*loaders);
     _runResources->setTagLoaders(loaders);
 
     std::unique_ptr<NamingPolicy> np(new IncrementalRename(_baseurl));
 
     /// The StreamProvider uses the actual URL of the loaded movie.
-    boost::shared_ptr<StreamProvider> sp(new StreamProvider(_url, baseURL, std::move(np)));
+    std::shared_ptr<StreamProvider> sp(new StreamProvider(_url, baseURL, std::move(np)));
     _runResources->setStreamProvider(sp);
 
     // Set the Hardware video decoding resources. none, vaapi, omap

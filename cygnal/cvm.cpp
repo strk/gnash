@@ -344,7 +344,7 @@ vm_main(int argc, char *argv[])
 #endif
     gnash::media::MediaHandler::set(handler);
 
-    boost::shared_ptr<sound::sound_handler> soundHandler(
+    std::shared_ptr<sound::sound_handler> soundHandler(
             new sound::NullSoundHandler());
 
     std::vector<movie_data>	data;

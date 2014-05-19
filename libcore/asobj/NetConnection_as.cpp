@@ -258,10 +258,10 @@ private:
     const URL _url;
 
     /// The queue of sent requests.
-    std::vector<boost::shared_ptr<HTTPRequest> > _requestQueue;
+    std::vector<std::shared_ptr<HTTPRequest> > _requestQueue;
 
     /// The current request.
-    boost::shared_ptr<HTTPRequest> _currentRequest;
+    std::shared_ptr<HTTPRequest> _currentRequest;
     
 };
 
@@ -380,7 +380,7 @@ public:
 
         }
         
-        boost::shared_ptr<SimpleBuffer> b = _rtmp.getMessage();
+        std::shared_ptr<SimpleBuffer> b = _rtmp.getMessage();
 
         if (b && !_nc.isConnected()) {
             _nc.setConnected();
@@ -568,7 +568,7 @@ NetConnection_as::close()
 
     /// Queue the current call queue if it has pending calls
     if (_currentConnection.get() && _currentConnection->hasPendingCalls()) {
-        boost::shared_ptr<Connection> c(_currentConnection.release());
+        std::shared_ptr<Connection> c(_currentConnection.release());
         _oldConnections.push_back(c);
     }
 
@@ -1096,7 +1096,7 @@ HTTPConnection::advance()
     }
 
     // Process all replies and clear finished requests.
-    for (std::vector<boost::shared_ptr<HTTPRequest> >::iterator i = 
+    for (std::vector<std::shared_ptr<HTTPRequest> >::iterator i =
             _requestQueue.begin(); i != _requestQueue.end();) {
         if (!(*i)->process(_nc)) i = _requestQueue.erase(i);
         else ++i;

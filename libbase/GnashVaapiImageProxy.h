@@ -33,10 +33,10 @@ class VaapiSurface;
 /// XXX: call it GnashRenderedVaapiImage instead?
 class DSOEXPORT GnashVaapiImageProxy
 {
-    /* XXX: Should Renderers use boost::shared_ptr<> we could simple
+    /* XXX: Should Renderers use std::shared_ptr<> we could simple
        derive from a GnashImageProxy base that would itself contain a
        shared pointer to the image */
-    boost::shared_ptr<VaapiSurface> _surface;
+    std::shared_ptr<VaapiSurface> _surface;
 
     /// X-position of the rendered image, in pixels
     const int _x;
@@ -63,7 +63,7 @@ public:
     /// Get access to the underlying surface
     //
     /// @return     A pointer to the VA surface.
-    boost::shared_ptr<VaapiSurface> surface() const
+    std::shared_ptr<VaapiSurface> surface() const
         { return _surface; }
 
     /// Get the rendered image's x position

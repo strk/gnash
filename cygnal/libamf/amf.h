@@ -135,7 +135,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeString(const std::string &str);
+    static std::shared_ptr<Buffer> encodeString(const std::string &str);
     
     /// Encode an array of ASCII bytes to its serialized representation.
     // 
@@ -145,7 +145,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeString(boost::uint8_t *data,
+    static std::shared_ptr<Buffer> encodeString(boost::uint8_t *data,
 						  size_t size);
 
     /// Encode a String object to its serialized representation.
@@ -154,7 +154,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeNullString();
+    static std::shared_ptr<Buffer> encodeNullString();
 
     /// Encode a Boolean object to its serialized representation.
     //
@@ -162,13 +162,13 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeBoolean(bool flag);
+    static std::shared_ptr<Buffer> encodeBoolean(bool flag);
 
     /// Encode an "Undefined" object to its serialized representation.
     //
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeUndefined();
+    static std::shared_ptr<Buffer> encodeUndefined();
 
     /// Encode a NULL object to its serialized representation.
     //
@@ -176,13 +176,13 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeNull();
+    static std::shared_ptr<Buffer> encodeNull();
 
     /// Encode a "Unsupported" object to its serialized representation.
     //
     /// @return a binary AMF packet in big endian format
     ///
-    static  boost::shared_ptr<Buffer> encodeUnsupported();
+    static  std::shared_ptr<Buffer> encodeUnsupported();
 
     /// Encode an XML object to its serialized representation.
     //
@@ -192,7 +192,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeXMLObject(const boost::uint8_t *data,
+    static std::shared_ptr<Buffer> encodeXMLObject(const boost::uint8_t *data,
 						     size_t nbytes);
 
     /// Encode a Typed Object to its serialized representation.
@@ -203,7 +203,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeTypedObject(const cygnal::Element &data);
+    static std::shared_ptr<Buffer> encodeTypedObject(const cygnal::Element &data);
 
     /// Encode a Reference to an object to its serialized representation.
     //
@@ -213,7 +213,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::shared_ptr<Buffer> encodeReference(boost::uint16_t index);
+    static std::shared_ptr<Buffer> encodeReference(boost::uint16_t index);
 
     /// Encode a Movie Clip (swf data) to its serialized representation.
     //
@@ -223,7 +223,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::shared_ptr<Buffer> encodeMovieClip(const boost::uint8_t *data,
+    static std::shared_ptr<Buffer> encodeMovieClip(const boost::uint8_t *data,
 						     size_t size);
 
     /// Encode an ECMA Array to its serialized representation.
@@ -237,7 +237,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeECMAArray(const cygnal::Element &data);
+    static std::shared_ptr<Buffer> encodeECMAArray(const cygnal::Element &data);
 
     /// Encode a Long String to its serialized representation.
     //
@@ -247,7 +247,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeLongString(const boost::uint8_t *data,
+    static std::shared_ptr<Buffer> encodeLongString(const boost::uint8_t *data,
 						      size_t size);
 
     /// Encode a Record Set to its serialized representation.
@@ -258,7 +258,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeRecordSet(const boost::uint8_t *data,
+    static std::shared_ptr<Buffer> encodeRecordSet(const boost::uint8_t *data,
 						     size_t size);
 
     /// Encode a Date to its serialized representation.
@@ -267,7 +267,7 @@ public:
     /// 
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeDate(const boost::uint8_t *data);
+    static std::shared_ptr<Buffer> encodeDate(const boost::uint8_t *data);
 
     /// Encode a Strict Array to its serialized representation.
     //
@@ -280,7 +280,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::shared_ptr<Buffer> encodeStrictArray(const cygnal::Element &data);
+    static std::shared_ptr<Buffer> encodeStrictArray(const cygnal::Element &data);
     
     /// Encode an object to its serialized representation.
     //
@@ -288,13 +288,13 @@ public:
     /// 
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeObject(const cygnal::Element &data);
+    static std::shared_ptr<Buffer> encodeObject(const cygnal::Element &data);
 
     /// Encode the end of an object to its serialized representation.
     //
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeObjectEnd();
+    static std::shared_ptr<Buffer> encodeObjectEnd();
 
     /// Encode a 64 bit number to its serialized representation.
     //
@@ -302,7 +302,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeNumber(double num);
+    static std::shared_ptr<Buffer> encodeNumber(double num);
 
     /// Encode an Element to its serialized representation.
     //
@@ -310,7 +310,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeElement(boost::shared_ptr<cygnal::Element> el);
+    static std::shared_ptr<Buffer> encodeElement(std::shared_ptr<cygnal::Element> el);
 
     /// Encode an Element to its serialized representation.
     //
@@ -318,7 +318,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeElement(const cygnal::Element& el);
+    static std::shared_ptr<Buffer> encodeElement(const cygnal::Element& el);
 
     /// Encode a variable to its serialized representation.
     //
@@ -326,7 +326,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    boost::shared_ptr<Buffer> encodeProperty(boost::shared_ptr<cygnal::Element> el);
+    std::shared_ptr<Buffer> encodeProperty(std::shared_ptr<cygnal::Element> el);
 
     /// @} end of encoding methods 
 
@@ -358,7 +358,7 @@ public:
     ///
     /// @remarks May throw a ParserException
     ///
-    boost::shared_ptr<cygnal::Element> extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar);
+    std::shared_ptr<cygnal::Element> extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar);
 
     /// Extract an AMF object from an array of raw bytes.
     //
@@ -368,7 +368,7 @@ public:
     ///
     /// @remarks May throw a ParserException
     ///
-    boost::shared_ptr<cygnal::Element> extractAMF(boost::shared_ptr<Buffer> buf);
+    std::shared_ptr<cygnal::Element> extractAMF(std::shared_ptr<Buffer> buf);
     
     /// Extract a Property.
     //
@@ -385,7 +385,7 @@ public:
     ///
     /// @remarks May throw a ParserException
     ///
-    boost::shared_ptr<cygnal::Element> extractProperty(boost::uint8_t *in, boost::uint8_t* tooFar);
+    std::shared_ptr<cygnal::Element> extractProperty(boost::uint8_t *in, boost::uint8_t* tooFar);
 
     /// Extract a Property.
     //
@@ -399,7 +399,7 @@ public:
     ///
     /// @remarks May throw a ParserException
     ///
-    boost::shared_ptr<cygnal::Element> extractProperty(boost::shared_ptr<Buffer> buf);
+    std::shared_ptr<cygnal::Element> extractProperty(std::shared_ptr<Buffer> buf);
 
     /// @} end of decoding methods 
 

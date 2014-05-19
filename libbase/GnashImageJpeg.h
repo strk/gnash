@@ -68,7 +68,7 @@ public:
     /// @param in   The stream to read JPEG data from. Ownership is shared
     ///             between caller and JpegInput, so it is freed
     ///             automatically when the last owner is destroyed.
-    DSOEXPORT JpegInput(boost::shared_ptr<IOChannel> in);
+    DSOEXPORT JpegInput(std::shared_ptr<IOChannel> in);
 
     /// Read the JPEG header information only.
     //
@@ -118,7 +118,7 @@ public:
     /// Create a JpegInput and transfer ownership to the caller.
     //
     /// @param in   The IOChannel to read JPEG data from.
-    static std::unique_ptr<Input> create(boost::shared_ptr<IOChannel> in)
+    static std::unique_ptr<Input> create(std::shared_ptr<IOChannel> in)
     {
         std::unique_ptr<Input> ret(new JpegInput(in));
         // might throw an exception (I guess)
@@ -143,7 +143,7 @@ public:
     /// @param in               The channel to read JPEG header data from.
     /// @param maxHeaderBytes   The maximum number of bytes to read.
     static std::unique_ptr<JpegInput> createSWFJpeg2HeaderOnly(
-            boost::shared_ptr<IOChannel> in, unsigned int maxHeaderBytes)
+            std::shared_ptr<IOChannel> in, unsigned int maxHeaderBytes)
     {
         std::unique_ptr<JpegInput> ret (new JpegInput(in));
         // might throw an exception
@@ -174,7 +174,7 @@ public:
     /// @param width    The width of the resulting image
     /// @param height   The height of the resulting image.
     /// @param quality  The quality of the created image, from 1-100.
-    JpegOutput(boost::shared_ptr<IOChannel> out, size_t width,
+    JpegOutput(std::shared_ptr<IOChannel> out, size_t width,
             size_t height, int quality);
     
     ~JpegOutput();
@@ -197,7 +197,7 @@ public:
     /// @param width    The width of the resulting image
     /// @param height   The height of the resulting image.
     /// @param quality  The quality of the created image, from 1-100.
-    static std::unique_ptr<Output> create(boost::shared_ptr<IOChannel> out,
+    static std::unique_ptr<Output> create(std::shared_ptr<IOChannel> out,
             size_t width, size_t height, int quality);
     
 private:

@@ -46,14 +46,14 @@ MouseDevice::~MouseDevice()
     // GNASH_REPORT_FUNCTION;
 }
 
-std::vector<boost::shared_ptr<InputDevice> >
+std::vector<std::shared_ptr<InputDevice> >
 MouseDevice::scanForDevices()
 {
     // GNASH_REPORT_FUNCTION;
 
     struct stat st;
 
-    std::vector<boost::shared_ptr<InputDevice> > devices;
+    std::vector<std::shared_ptr<InputDevice> > devices;
 
     // Look for these files for mouse input
     struct mouse_types {
@@ -99,9 +99,9 @@ MouseDevice::scanForDevices()
             log_debug(_("Found a %s device for mouse input using %s"),
                       debug[mice[i].type], mice[i].filespec);
             
-            boost::shared_ptr<InputDevice> dev;
+            std::shared_ptr<InputDevice> dev;
 #if defined(USE_MOUSE_PS2) || defined(USE_MOUSE_ETT)
-            dev = boost::shared_ptr<InputDevice>(new MouseDevice());
+            dev = std::shared_ptr<InputDevice>(new MouseDevice());
             // The User Mode Mouse is write only, so we don't consider
             // it an input device.
             dev->setType(mice[i].type);

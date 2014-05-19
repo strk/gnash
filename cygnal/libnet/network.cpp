@@ -197,7 +197,7 @@ Network::createServer(std::string hostname, short port)
                     clientservice, sizeof(clientservice),
                     NI_NUMERICHOST);
         
-        boost::shared_ptr<char> straddr = getIPString(ot);
+        std::shared_ptr<char> straddr = getIPString(ot);
         
         if (ot->ai_family == AF_INET6) {
             log_debug("%s has IPV6 address of: %s", hostname, straddr.get());
@@ -220,7 +220,7 @@ Network::createServer(std::string hostname, short port)
             // Try the next IP number
             it = it->ai_next;
         } else {
-            boost::shared_ptr<char> straddr = getIPString(it);
+            std::shared_ptr<char> straddr = getIPString(it);
             log_debug("Socket created for %s", straddr); 
             break;
         }
@@ -600,7 +600,7 @@ Network::createClient(const string &hostname, short port)
                     clientservice, sizeof(clientservice),
                     NI_NUMERICHOST);
         
-        boost::shared_ptr<char> straddr = getIPString(ot);
+        std::shared_ptr<char> straddr = getIPString(ot);
         
         if (ot->ai_family == AF_INET6) {
             log_debug("%s has IPV6 address of: %s", hostname, straddr.get());
@@ -638,7 +638,7 @@ Network::createClient(const string &hostname, short port)
     struct sockaddr *saddr = it->ai_addr;
 
     const int addrlen = it->ai_addrlen;
-    boost::shared_ptr<char> straddr = getIPString(it);
+    std::shared_ptr<char> straddr = getIPString(it);
 
     freeaddrinfo(ans);          // free the response data
     
@@ -821,11 +821,11 @@ Network::closeConnection(int fd)
     return false;
 }
 
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 Network::readNet()
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<cygnal::Buffer> buffer(new cygnal::Buffer);
+    std::shared_ptr<cygnal::Buffer> buffer(new cygnal::Buffer);
     int ret = readNet(*buffer);
     if (ret > 0) {
 	buffer->resize(ret);
@@ -1319,12 +1319,12 @@ Network::getEntry(int fd)
     return _handlers[fd];
 }
 
-boost::shared_ptr<std::vector<struct pollfd> >
+std::shared_ptr<std::vector<struct pollfd> >
 Network::waitForNetData(int limit, struct pollfd *fds)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    boost::shared_ptr<vector<struct pollfd> > hits(new vector<struct pollfd>);
+    std::shared_ptr<vector<struct pollfd> > hits(new vector<struct pollfd>);
 
     log_debug(_("%s: waiting for %d fds"), __FUNCTION__, limit);
 
@@ -1673,10 +1673,10 @@ Network::sniffBytesReady(int fd)
 }
 
 // Return the string representation of the IPV4 or IPV6 number
-boost::shared_ptr<char>
+std::shared_ptr<char>
 Network::getIPString(struct addrinfo *ai)
 {
-    boost::shared_ptr<char> straddr(new char[INET6_ADDRSTRLEN]);
+    std::shared_ptr<char> straddr(new char[INET6_ADDRSTRLEN]);
     std::memset(straddr.get(), 0, INET6_ADDRSTRLEN);    
     if (ai->ai_family == AF_INET6) {
         struct sockaddr_in6 *sock6 = reinterpret_cast<struct sockaddr_in6 *>(ai->ai_addr);

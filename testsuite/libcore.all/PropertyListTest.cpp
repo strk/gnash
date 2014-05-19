@@ -69,7 +69,7 @@ trymain(int /*argc*/, char** /*argv*/)
     RunResources runResources;
     const URL url("");
     runResources.setStreamProvider(
-            boost::shared_ptr<StreamProvider>(new StreamProvider(url, url)));
+            std::shared_ptr<StreamProvider>(new StreamProvider(url, url)));
 	
     boost::intrusive_ptr<movie_definition> md5(
             new DummyMovieDefinition(runResources, 5));

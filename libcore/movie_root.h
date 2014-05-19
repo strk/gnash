@@ -1000,7 +1000,7 @@ private:
 
     LoadCallbacks _loadCallbacks;
     
-    typedef std::map<boost::uint32_t, boost::shared_ptr<Timer> > TimerMap;
+    typedef std::map<boost::uint32_t, std::shared_ptr<Timer> > TimerMap;
 
     TimerMap _intervalTimers;
 

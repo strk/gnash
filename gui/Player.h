@@ -319,9 +319,9 @@ private:
     /// @todo   This is hairy, and the core should be sorted out so that
     ///         sound_sample knows about its sound::sound_handler without
     ///         needing a RunResources.
-    boost::shared_ptr<sound::sound_handler> _soundHandler;
+    std::shared_ptr<sound::sound_handler> _soundHandler;
     
-    boost::shared_ptr<media::MediaHandler> _mediaHandler;
+    std::shared_ptr<media::MediaHandler> _mediaHandler;
     
     /// Handlers (for sound etc) for a libcore run.
     //

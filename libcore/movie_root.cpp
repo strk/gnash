@@ -821,7 +821,7 @@ movie_root::addIntervalTimer(std::unique_ptr<Timer> timer)
 
     assert(_intervalTimers.find(id) == _intervalTimers.end());
 
-    boost::shared_ptr<Timer> addTimer(timer.release());
+    std::shared_ptr<Timer> addTimer(timer.release());
 
     _intervalTimers.insert(std::make_pair(id, addTimer));
 
@@ -1558,7 +1558,7 @@ movie_root::executeAdvanceCallbacks()
     // application. If it is set, we have to check the socket connection
     // for XML messages.
     if (_controlfd > 0) {
-    boost::shared_ptr<ExternalInterface::invoke_t> invoke = 
+    std::shared_ptr<ExternalInterface::invoke_t> invoke =
         ExternalInterface::ExternalEventCheck(_controlfd);
         if (invoke) {
             if (processInvoke(invoke.get()) == false) {
@@ -1711,7 +1711,7 @@ movie_root::executeTimers()
 
     unsigned long now = _vm.getTime();
 
-    typedef std::multimap<unsigned int, boost::shared_ptr<Timer> >
+    typedef std::multimap<unsigned int, std::shared_ptr<Timer> >
         ExpiredTimers;
 
     ExpiredTimers expiredTimers;
@@ -1722,7 +1722,7 @@ movie_root::executeTimers()
         TimerMap::iterator nextIterator = it;
         ++nextIterator;
 
-        boost::shared_ptr<Timer> timer(it->second);
+        std::shared_ptr<Timer> timer(it->second);
 
         if (timer->cleared()) {
             // this timer was cleared, erase it

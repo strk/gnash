@@ -182,7 +182,7 @@ public:
     ///
     /// @return A reference to this Element.
     Element &operator=(Element &el);
-//    Element &operator=(boost::shared_ptr<Element>);
+//    Element &operator=(std::shared_ptr<Element>);
 
     /// \brief Make this Element be the same as a double.
     ///		This sets both the data type and the value.
@@ -254,7 +254,7 @@ public:
     /// @param buf A smart pointer to a Buffer class.
     ///
     /// @return A reference to this Element.
-    Element &makeNumber(boost::shared_ptr<cygnal::Buffer> buf); 
+    Element &makeNumber(std::shared_ptr<cygnal::Buffer> buf);
 
     /// \brief Make this Element with a double value.
     ///		The size isn't needed as a double is always the same size.
@@ -350,7 +350,7 @@ public:
     /// @param data A smart pointer to an Element to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeObject(std::vector<boost::shared_ptr<cygnal::Element> > &data);
+    Element &makeObject(std::vector<std::shared_ptr<cygnal::Element> > &data);
     
     /// \brief Make this Element a Property with an Object as the value.
     ///
@@ -359,7 +359,7 @@ public:
     /// @param data A smart pointer to an Element to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeObject(const std::string &name, std::vector<boost::shared_ptr<cygnal::Element> > &data);
+    Element &makeObject(const std::string &name, std::vector<std::shared_ptr<cygnal::Element> > &data);
     
     /// \brief Make this Element as an XML Object data type.
     ///		This is like a string object, but the type is different.
@@ -407,7 +407,7 @@ public:
     /// @param data A smart pointer to a vector of Elements to use as the vaule.
     ///
     /// @return A reference to this Element.
-    Element &makeECMAArray(std::vector<boost::shared_ptr<cygnal::Element> > &data);
+    Element &makeECMAArray(std::vector<std::shared_ptr<cygnal::Element> > &data);
 
     /// \brief Make this Element a Property with an ECMA Array as the value.
     ///
@@ -416,7 +416,7 @@ public:
     /// @param data A smart pointer to a vector of Elements to use as the vaule.
     ///
     /// @return A reference to this Element.
-    Element &makeECMAArray(const std::string &name, std::vector<boost::shared_ptr<cygnal::Element> > &data);
+    Element &makeECMAArray(const std::string &name, std::vector<std::shared_ptr<cygnal::Element> > &data);
 
     /// \brief Make this Element a Property with an Strict Array as the value.
     ///		This is an array of a single AMF type. These are stored
@@ -441,7 +441,7 @@ public:
     /// @param data A smart pointer to a vector of Elements to use as the vaule.
     ///
     /// @return A reference to this Element.
-    Element &makeStrictArray(std::vector<boost::shared_ptr<cygnal::Element> > &data);
+    Element &makeStrictArray(std::vector<std::shared_ptr<cygnal::Element> > &data);
 
     /// \brief Make this Element a Property with an Strict Array as the value.
     ///
@@ -450,7 +450,7 @@ public:
     /// @param data A smart pointer to a vector of Elements to use as the vaule.
     ///
     /// @return A reference to this Element.
-    Element &makeStrictArray(const std::string &name, std::vector<boost::shared_ptr<cygnal::Element> > &data);
+    Element &makeStrictArray(const std::string &name, std::vector<std::shared_ptr<cygnal::Element> > &data);
 
     /// \brief Make this Element a Property with an Typed Object as the value.
     ///
@@ -573,7 +573,7 @@ public:
     /// @param buf A smart pointer to an Element.
     ///
     /// @return A boolean true if the Elements are indentical.
-    bool operator==(boost::shared_ptr<cygnal::Element> );
+    bool operator==(std::shared_ptr<cygnal::Element> );
     
     /// \brief Test equivalance against a boolean value
     ///		This compares all the data and the data type in the
@@ -592,7 +592,7 @@ public:
     ///		the array to get.
     ///
     /// @return A smart pointer to the Element or property.
-    boost::shared_ptr<cygnal::Element> operator[](size_t index);
+    std::shared_ptr<cygnal::Element> operator[](size_t index);
 
     /// \brief Get the size in bytes of the Element's data.
     ///		All data in an Element is stored in a Buffer class.
@@ -688,21 +688,21 @@ public:
     ///		search for.
     ///
     /// @return A smart pointer to the Element for this property.
-    boost::shared_ptr<Element> findProperty(const std::string &name);
+    std::shared_ptr<Element> findProperty(const std::string &name);
 
     /// \brief Find the property at this index for this Object.
     ///
     /// @param index The index of the property in the array of data.
     ///
     /// @return A smart pointer to the Element for this property.
-    boost::shared_ptr<Element> getProperty(size_t index) const { return _properties[index]; };
+    std::shared_ptr<Element> getProperty(size_t index) const { return _properties[index]; };
 
     /// \brief Add a Property to the array of properties for this object.
     ///
     /// @param el A smart pointer to the Element for this Property.
     ///
     /// @return nothing.
-    void addProperty(boost::shared_ptr<Element> el) { _properties.push_back(el); };
+    void addProperty(std::shared_ptr<Element> el) { _properties.push_back(el); };
 
     void clearProperties() { return _properties.clear(); };
 
@@ -712,7 +712,7 @@ public:
     ///
     /// @remarks This does not remove the Element from array of
     ///		properties.
-    boost::shared_ptr<Element> popProperty()
+    std::shared_ptr<Element> popProperty()
 			{ return _properties.front(); };
 
     /// \brief Get the count of properties for this Element.
@@ -730,8 +730,8 @@ public:
     ///		formatting onStatus response packets.
     ///
     /// @return a smart pointer to a Buffer class.
-    boost::shared_ptr<Buffer> encode();
-    boost::shared_ptr<Buffer> encode(bool notobject);
+    std::shared_ptr<Buffer> encode();
+    std::shared_ptr<Buffer> encode(bool notobject);
 
     /// \brief Get the array of properties for this Element.
     ///
@@ -739,7 +739,7 @@ public:
     ///
     /// @remarks This is only intended to be used for testing and
     ///		debugging purposes.
-    std::vector<boost::shared_ptr<Element> > getProperties() const
+    std::vector<std::shared_ptr<Element> > getProperties() const
 			{ return _properties; };
 
     size_t calculateSize();
@@ -770,7 +770,7 @@ private:
     /// \var _buffer
     ///		A smart pointer to the Buffer used to hold the data
     ///		for this Element.
-    boost::shared_ptr<cygnal::Buffer> _buffer;
+    std::shared_ptr<cygnal::Buffer> _buffer;
 
     /// \var _type
     ///		The AMF0 data type of this Element.
@@ -779,7 +779,7 @@ private:
     /// \var _properties
     ///		The vector of properties stored for this Element if
     ///		it's a top level object.
-    std::vector<boost::shared_ptr<Element> > _properties;
+    std::vector<std::shared_ptr<Element> > _properties;
 };                              // end of class definition
 
 

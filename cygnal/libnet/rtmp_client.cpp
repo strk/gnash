@@ -46,7 +46,7 @@
 #include "GnashSleep.h"
 #include "URL.h"
 
-typedef boost::shared_ptr<cygnal::Element> ElementSharedPtr;
+typedef std::shared_ptr<cygnal::Element> ElementSharedPtr;
 
 namespace gnash
 {
@@ -79,7 +79,7 @@ RTMPClient::~RTMPClient()
 
 // Make the NetConnection object that is used to connect to the
 // server.
-boost::shared_ptr<cygnal::Buffer> 
+std::shared_ptr<cygnal::Buffer>
 RTMPClient::encodeConnect()
 {
 //     GNASH_REPORT_FUNCTION;
@@ -87,7 +87,7 @@ RTMPClient::encodeConnect()
     return encodeConnect(_path.c_str());
 }
 
-boost::shared_ptr<cygnal::Buffer> 
+std::shared_ptr<cygnal::Buffer>
 RTMPClient::encodeConnect(const char *uri)
 {
 //     GNASH_REPORT_FUNCTION;
@@ -97,7 +97,7 @@ RTMPClient::encodeConnect(const char *uri)
 			 RTMPClient::SEEK);
 }
 
-boost::shared_ptr<cygnal::Buffer> 
+std::shared_ptr<cygnal::Buffer>
 RTMPClient::encodeConnect(const char *uri,
 			  double audioCodecs, double videoCodecs,
 			  double videoFunction)
@@ -166,7 +166,7 @@ RTMPClient::encodeConnect(const char *uri,
 			 pageUrl.c_str());
 }
 
-boost::shared_ptr<cygnal::Buffer> 
+std::shared_ptr<cygnal::Buffer>
 RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl,
                           double audioCodecs, double videoCodecs, double videoFunction,
                           const char *pageUrl)
@@ -247,11 +247,11 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
 //                                      RTMP::INVOKE, RTMP::FROM_CLIENT);
 //     const char *rtmpStr = "03 00 00 04 00 01 1f 14 00 00 00 00";
 //     Buffer *rtmpBuf = hex2mem(rtmpStr);
-    boost::shared_ptr<cygnal::Buffer> conobj = connect->encode();
-    boost::shared_ptr<cygnal::Buffer> numobj = connum->encode();
-    boost::shared_ptr<cygnal::Buffer> encobj = obj->encode();
+    std::shared_ptr<cygnal::Buffer> conobj = connect->encode();
+    std::shared_ptr<cygnal::Buffer> numobj = connum->encode();
+    std::shared_ptr<cygnal::Buffer> encobj = obj->encode();
 
-    boost::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer(conobj->size() + numobj->size() + encobj->size()));
+    std::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer(conobj->size() + numobj->size() + encobj->size()));
     *buf += conobj;
     *buf += numobj;
     *buf += encobj;
@@ -278,7 +278,7 @@ RTMPClient::connectToServer(const std::string &url)
 	// to be on the end of the second block of handshake data.
 	// We build this here so we can get the total encoded
 	// size of the object.
-	boost::shared_ptr<cygnal::Buffer> ncbuf = encodeConnect();
+	std::shared_ptr<cygnal::Buffer> ncbuf = encodeConnect();
 
 	// As at this point we don't have an RTMP connection,
 	// we can't use the regular sendMsg(), that handles the RTMP
@@ -302,13 +302,13 @@ RTMPClient::connectToServer(const std::string &url)
 	    }
 	} while (nbytes < ncbuf->allocated());
 
-	boost::shared_ptr<cygnal::Buffer> head = encodeHeader(0x3,
+	std::shared_ptr<cygnal::Buffer> head = encodeHeader(0x3,
 			    RTMP::HEADER_12, ncbuf->allocated(),
 			    RTMP::INVOKE, RTMPMsg::FROM_CLIENT);
 
 	// Build the first handshake packet, and send it to the
 	// server.
-	boost::shared_ptr<cygnal::Buffer> handshake1 = handShakeRequest();
+	std::shared_ptr<cygnal::Buffer> handshake1 = handShakeRequest();
 	if (!handshake1) {
 	    log_error(_("RTMP handshake request failed"));
 	    return false;
@@ -338,13 +338,13 @@ RTMPClient::connectToServer(const std::string &url)
 	}
 	
 	// give the server time to process our NetConnection::connect() request	
-	boost::shared_ptr<cygnal::Buffer> response;
-	boost::shared_ptr<RTMP::rtmp_head_t> rthead;
-	boost::shared_ptr<RTMP::queues_t> que;
+	std::shared_ptr<cygnal::Buffer> response;
+	std::shared_ptr<RTMP::rtmp_head_t> rthead;
+	std::shared_ptr<RTMP::queues_t> que;
 	
 	RTMPClient::msgque_t msgque = recvResponse();
 	while (msgque.size()) {
-	    boost::shared_ptr<RTMPMsg> msg = msgque.front();
+	    std::shared_ptr<RTMPMsg> msg = msgque.front();
 	    msgque.pop_front();
 	    if (msg->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
 		log_network(_("Sent NetConnection Connect message successfully"));
@@ -358,29 +358,29 @@ RTMPClient::connectToServer(const std::string &url)
     return true;
 }
     
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 RTMPClient::encodeEchoRequest(const std::string &method, double id, cygnal::Element &el)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<cygnal::Element> str(new cygnal::Element);
+    std::shared_ptr<cygnal::Element> str(new cygnal::Element);
     str->makeString(method);
-    boost::shared_ptr<cygnal::Buffer> strobj = str->encode();
+    std::shared_ptr<cygnal::Buffer> strobj = str->encode();
 
     // Encod ethe stream ID
-    boost::shared_ptr<cygnal::Element>  num(new cygnal::Element);
+    std::shared_ptr<cygnal::Element>  num(new cygnal::Element);
     num->makeNumber(id);
-    boost::shared_ptr<cygnal::Buffer> numobj = num->encode();
+    std::shared_ptr<cygnal::Buffer> numobj = num->encode();
 
     // Set the NULL object element that follows the stream ID
-    boost::shared_ptr<cygnal::Element> null(new cygnal::Element);
+    std::shared_ptr<cygnal::Element> null(new cygnal::Element);
     null->makeNull();
-    boost::shared_ptr<cygnal::Buffer> nullobj = null->encode();
+    std::shared_ptr<cygnal::Buffer> nullobj = null->encode();
 
-    boost::shared_ptr<cygnal::Buffer> elobj = el.encode();
+    std::shared_ptr<cygnal::Buffer> elobj = el.encode();
 
     size_t totalsize = strobj->size() + numobj->size() + nullobj->size() + elobj->size();
 
-    boost::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer(totalsize));
+    std::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer(totalsize));
     
     *buf += strobj;
     *buf += numobj;
@@ -393,7 +393,7 @@ RTMPClient::encodeEchoRequest(const std::string &method, double id, cygnal::Elem
 // 43 00 1a 21 00 00 19 14 02 00 0c 63 72 65 61 74  C..!.......creat
 // 65 53 74 72 65 61 6d 00 40 08 00 00 00 00 00 00  eStream.@.......
 // 05                                                    .               
-boost::shared_ptr<cygnal::Buffer> 
+std::shared_ptr<cygnal::Buffer>
 RTMPClient::encodeStream(double id)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -401,22 +401,22 @@ RTMPClient::encodeStream(double id)
     struct timespec now;
     clock_gettime (CLOCK_REALTIME, &now);
 
-    boost::shared_ptr<cygnal::Element> str(new cygnal::Element);
+    std::shared_ptr<cygnal::Element> str(new cygnal::Element);
     str->makeString("createStream");
-    boost::shared_ptr<cygnal::Buffer> strobj = str->encode();
+    std::shared_ptr<cygnal::Buffer> strobj = str->encode();
   
-    boost::shared_ptr<cygnal::Element>  num(new cygnal::Element);
+    std::shared_ptr<cygnal::Element>  num(new cygnal::Element);
     num->makeNumber(id);
-    boost::shared_ptr<cygnal::Buffer> numobj = num->encode();
+    std::shared_ptr<cygnal::Buffer> numobj = num->encode();
 
     // Set the NULL object element that follows the stream ID
-    boost::shared_ptr<cygnal::Element> null(new cygnal::Element);
+    std::shared_ptr<cygnal::Element> null(new cygnal::Element);
     null->makeNull();
-    boost::shared_ptr<cygnal::Buffer> nullobj = null->encode();    
+    std::shared_ptr<cygnal::Buffer> nullobj = null->encode();
 
     size_t totalsize = strobj->size() + numobj->size() + nullobj->size();
 
-    boost::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer(totalsize));
+    std::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer(totalsize));
 
     *buf += strobj;
     *buf += numobj;
@@ -431,21 +431,21 @@ RTMPClient::encodeStream(double id)
 // 6f 6e 32 5f 66 6c 61 73 68 38 5f 77 5f 61 75 64  on2_flash8_w_aud
 // 69 6f 2e 66 6c 76 c2 00 03 00 00 00 01 00 00 27  io.flv.........'
 // 10
-boost::shared_ptr<cygnal::Buffer> 
+std::shared_ptr<cygnal::Buffer>
 RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag)
 {
 //    GNASH_REPORT_FUNCTION;
     return encodeStreamOp(id, op, flag, "", 0);
 }    
 
-boost::shared_ptr<cygnal::Buffer> 
+std::shared_ptr<cygnal::Buffer>
 RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, double pos)
 {
 //    GNASH_REPORT_FUNCTION;
     return encodeStreamOp(id, op, flag, "", pos);
 }    
 
-boost::shared_ptr<cygnal::Buffer> 
+std::shared_ptr<cygnal::Buffer>
 RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -458,7 +458,7 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
 // A pause packet is the operation name "pause", followed by the stream ID,
 // then a NULL object, a boolean (always true from what I can tell), and then
 // a location, which appears to always be 0.
-boost::shared_ptr<cygnal::Buffer> 
+std::shared_ptr<cygnal::Buffer>
 RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string &name, double pos)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -482,25 +482,25 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
 	  str.makeString("seek");
 	  break;
       default:
-	  boost::shared_ptr<cygnal::Buffer> foo;
+	  std::shared_ptr<cygnal::Buffer> foo;
 	  return foo;
     };
 
-    boost::shared_ptr<cygnal::Buffer> strobj = str.encode();
+    std::shared_ptr<cygnal::Buffer> strobj = str.encode();
 
     // Set the stream ID, which follows the command
     cygnal::Element strid;
     strid.makeNumber(id);
-    boost::shared_ptr<cygnal::Buffer> stridobj = strid.encode();
+    std::shared_ptr<cygnal::Buffer> stridobj = strid.encode();
 
     // Set the NULL object element that follows the stream ID
     cygnal::Element null;
     null.makeNull();
-    boost::shared_ptr<cygnal::Buffer> nullobj = null.encode();    
+    std::shared_ptr<cygnal::Buffer> nullobj = null.encode();
 
     // Set the BOOLEAN object element that is the last field in the packet
     // (SEEK and PLAY don't use the boolean flag)
-    boost::shared_ptr<cygnal::Buffer> boolobj;
+    std::shared_ptr<cygnal::Buffer> boolobj;
     if ((op != STREAM_SEEK) && (op != STREAM_PLAY)) {
         cygnal::Element boolean;
         boolean.makeBoolean(flag);
@@ -508,7 +508,7 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
     }
 
     // The seek command also may have an optional location to seek to
-    boost::shared_ptr<cygnal::Buffer> posobj;
+    std::shared_ptr<cygnal::Buffer> posobj;
     if ((op == STREAM_PAUSE) || (op == STREAM_SEEK)) {
         cygnal::Element seek;
         seek.makeNumber(pos);
@@ -518,7 +518,7 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
     // The play command has an optional field, which is the name of the file
     // used for the stream. A Play command without this name set play an
     // existing stream that is already open.
-    boost::shared_ptr<cygnal::Buffer> fileobj; 
+    std::shared_ptr<cygnal::Buffer> fileobj;
     if (!name.empty()) {
         cygnal::Element filespec;
         filespec.makeString(name);
@@ -533,7 +533,7 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
     if ( fileobj ) pktsize += fileobj->size();
     if ( posobj ) pktsize += posobj->size();
 
-    boost::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer(pktsize));    
+    std::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer(pktsize));
     *buf += strobj;
     *buf += stridobj;
     *buf += nullobj;
@@ -546,14 +546,14 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
 
 // A request for a handshake is initiated by sending a byte with a
 // value of 0x3, followed by a message body of unknown format.
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 RTMPClient::handShakeRequest()
 {
     GNASH_REPORT_FUNCTION;
     boost::uint32_t zero = 0;
 
     // Make a buffer to hold the handshake data.
-    boost::shared_ptr<cygnal::Buffer> handshake(new cygnal::Buffer(RTMP_HANDSHAKE_SIZE+1));
+    std::shared_ptr<cygnal::Buffer> handshake(new cygnal::Buffer(RTMP_HANDSHAKE_SIZE+1));
     if (!handshake) {
 	return handshake;
     }
@@ -584,7 +584,7 @@ RTMPClient::handShakeRequest()
 // The client finishes the handshake process by sending the second
 // data block we get from the server as the response
 
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 RTMPClient::clientFinish()
 {
 //     GNASH_REPORT_FUNCTION;
@@ -593,7 +593,7 @@ RTMPClient::clientFinish()
     return clientFinish(data);
 }
 
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 RTMPClient::clientFinish(cygnal::Buffer &data)
 {
     GNASH_REPORT_FUNCTION;
@@ -607,7 +607,7 @@ RTMPClient::clientFinish(cygnal::Buffer &data)
     // The handhake for this phase is twice the size of the initial handshake
     // we sent previously, plus one byte for the RTMP version header.
     int max_size = (RTMP_HANDSHAKE_SIZE*2) + 1;
-    boost::shared_ptr<cygnal::Buffer> handshake1(new cygnal::Buffer(
+    std::shared_ptr<cygnal::Buffer> handshake1(new cygnal::Buffer(
 			      max_size + data.allocated()));
     do {
 	ret = readNet(handshake1->end(), max_size - offset);
@@ -656,7 +656,7 @@ RTMPClient::clientFinish(cygnal::Buffer &data)
 #endif
 
     // Make a new buffer big enough to hold the handshake, data, and header byte
-    boost::shared_ptr<cygnal::Buffer> handshake2(new cygnal::Buffer(
+    std::shared_ptr<cygnal::Buffer> handshake2(new cygnal::Buffer(
 			     RTMP_HANDSHAKE_SIZE + data.allocated()));
     
     // Copy the timestamp from the message we just received.
@@ -724,7 +724,7 @@ RTMPClient::recvResponse()
     
     // Read the responses back from the server.  This is usually a series of system
     // messages on channel 2, and the response message on channel 3 from our request.
-    boost::shared_ptr<cygnal::Buffer> response = recvMsg();
+    std::shared_ptr<cygnal::Buffer> response = recvMsg();
     if (!response) {
 	log_error(_("Got no response from the RTMP server"));
 	return msgque;
@@ -740,8 +740,8 @@ RTMPClient::recvResponse()
 
     // The response packet contains multiple messages for multiple channels, so we
     // we have to split the Buffer into seperate messages on a chunksize boundary.
-    boost::shared_ptr<RTMP::rtmp_head_t> rthead;
-    boost::shared_ptr<RTMP::queues_t> que = split(pktstart, response->allocated()-1);
+    std::shared_ptr<RTMP::rtmp_head_t> rthead;
+    std::shared_ptr<RTMP::queues_t> que = split(pktstart, response->allocated()-1);
 
     // If we got no responses, something obviously went wrong.
     if (!que->size()) {
@@ -760,7 +760,7 @@ RTMPClient::recvResponse()
 
 	while (channel_q->size()) {
 	    // Get the first message in the channel queue
-	    boost::shared_ptr<cygnal::Buffer> ptr = channel_q->pop();
+	    std::shared_ptr<cygnal::Buffer> ptr = channel_q->pop();
   	    ptr->dump();
 	    if (ptr) {		// If there is legit data
 		rthead = decodeHeader(ptr->reference());
@@ -785,7 +785,7 @@ RTMPClient::recvResponse()
 		      break;
 		  case RTMP::USER:
 		  {
-		      boost::shared_ptr<RTMP::rtmp_ping_t> ping = decodePing(ptr->reference() + rthead->head_size);
+		      std::shared_ptr<RTMP::rtmp_ping_t> ping = decodePing(ptr->reference() + rthead->head_size);
 		      log_network(_("Got a Ping type %s"), ping_str[ping->type]);
 		      break;
 		  }
@@ -800,7 +800,7 @@ RTMPClient::recvResponse()
 		      break;
 		  case RTMP::AUDIO_DATA:
 		  {
-		      boost::shared_ptr<RTMPMsg> msg = decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
+		      std::shared_ptr<RTMPMsg> msg = decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
 		      if (msg) {
 			  msgque.push_back(msg);
 		      }
@@ -808,7 +808,7 @@ RTMPClient::recvResponse()
 		  }
 		  case RTMP::VIDEO_DATA:
 		  {
-		      boost::shared_ptr<RTMPMsg> msg = decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
+		      std::shared_ptr<RTMPMsg> msg = decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
 		      if (msg) {
 			  msgque.push_back(msg);
 		      }
@@ -831,7 +831,7 @@ RTMPClient::recvResponse()
 		      break;
 		  case RTMP::INVOKE:
 		  {
-		      boost::shared_ptr<RTMPMsg> msg = decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
+		      std::shared_ptr<RTMPMsg> msg = decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
 		      if (msg) {
 			  msgque.push_back(msg);
 		      }

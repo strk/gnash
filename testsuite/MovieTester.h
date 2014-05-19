@@ -77,7 +77,7 @@ class TestingRenderer
 
 public:
 
-	TestingRenderer(boost::shared_ptr<Renderer> renderer,
+	TestingRenderer(std::shared_ptr<Renderer> renderer,
             const std::string& name)
 		:
 		_name(name),
@@ -87,12 +87,12 @@ public:
 	const std::string& getName() const { return _name; }
 
 	/// Return the underlying render handler
-    boost::shared_ptr<Renderer> getRenderer() const { return _renderer; }
+    std::shared_ptr<Renderer> getRenderer() const { return _renderer; }
 
 private:
 
 	std::string _name;
-    boost::shared_ptr<Renderer> _renderer;
+    std::shared_ptr<Renderer> _renderer;
 };
 
 /// An utility class for testing movie playback
@@ -348,21 +348,21 @@ private:
 	/// @param invalidated
 	///	The invalidated ranges as computed by the core lib.
 	///
-	void render(boost::shared_ptr<Renderer> renderer,
+	void render(std::shared_ptr<Renderer> renderer,
             InvalidatedRanges& invalidated);
 
 	/// Add a testing renderer to the list, initializing it with current
     //viewport size
-	void addTestingRenderer(boost::shared_ptr<Renderer> h,
+	void addTestingRenderer(std::shared_ptr<Renderer> h,
             const std::string& name);
 
 	gnash::movie_root* _movie_root;
 
 	boost::intrusive_ptr<gnash::movie_definition> _movie_def;
 
-    boost::shared_ptr<sound::sound_handler> _sound_handler;
+    std::shared_ptr<sound::sound_handler> _sound_handler;
 
-    boost::shared_ptr<media::MediaHandler> _mediaHandler;
+    std::shared_ptr<media::MediaHandler> _mediaHandler;
 
     std::unique_ptr<RunResources> _runResources;
 	/// Current pointer position - X ordinate

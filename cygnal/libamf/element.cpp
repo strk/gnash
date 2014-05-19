@@ -431,7 +431,7 @@ Element::calculateSize(cygnal::Element &el) const
     // More complex messages have child elements, either properties or
     // the items in an array, If we have children, count up their size too.
     // Calculate the total size of the message
-    std::vector<boost::shared_ptr<cygnal::Element> > props = el.getProperties();
+    std::vector<std::shared_ptr<cygnal::Element> > props = el.getProperties();
     for (size_t i=0; i<props.size(); i++) {
 	outsize += props[i]->getDataSize();
 	if (props[i]->getNameSize()) {
@@ -450,7 +450,7 @@ Element::calculateSize(cygnal::Element &el) const
 ///	properties into raw binary data in big endoan format.
 ///
 /// @return a smart pointer to a Buffer class.
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 Element::encode()
 {
 //    GNASH_REPORT_FUNCTION;
@@ -458,12 +458,12 @@ Element::encode()
     return encode(false);
 }
 
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 Element::encode(bool notobject)
 {
 //    GNASH_REPORT_FUNCTION;
     size_t size = 0;
-    boost::shared_ptr<Buffer> buf;
+    std::shared_ptr<Buffer> buf;
 
     if (_type == Element::OBJECT_AMF0) {
 	// Calculate the total size of the output buffer
@@ -493,7 +493,7 @@ Element::encode(bool notobject)
 	}
 
 	for (size_t i=0; i<_properties.size(); i++) {
-	    boost::shared_ptr<Buffer> partial = AMF::encodeElement(_properties[i]);
+	    std::shared_ptr<Buffer> partial = AMF::encodeElement(_properties[i]);
 //	    log_debug("Encoded partial size for is %d", partial->size());
 // 	    _properties[i]->dump();
 // 	    partial->dump();
@@ -525,7 +525,7 @@ Element::encode(bool notobject)
 ///		the array to get.
 ///
 /// @return A smart pointer to the Element or property.
-boost::shared_ptr<Element>
+std::shared_ptr<Element>
 Element::operator[](size_t index)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -533,7 +533,7 @@ Element::operator[](size_t index)
 	return _properties[index];
     }
     
-    boost::shared_ptr<Element> el; 
+    std::shared_ptr<Element> el;
     return el;
 }
 
@@ -711,7 +711,7 @@ Element::makeString(const string &name, const string &str)
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeNumber(boost::shared_ptr<cygnal::Buffer> buf)
+Element::makeNumber(std::shared_ptr<cygnal::Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
     return makeNumber(buf->reference());
@@ -947,7 +947,7 @@ Element::makeObject(const std::string &name)
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeObject(const std::string &name, std::vector<boost::shared_ptr<Element> > &data)
+Element::makeObject(const std::string &name, std::vector<std::shared_ptr<Element> > &data)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = OBJECT_AMF0;
@@ -963,13 +963,13 @@ Element::makeObject(const std::string &name, std::vector<boost::shared_ptr<Eleme
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeObject(std::vector<boost::shared_ptr<Element> > &data)
+Element::makeObject(std::vector<std::shared_ptr<Element> > &data)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::OBJECT_AMF0;
-    std::vector<boost::shared_ptr<Element> >::const_iterator ait;
+    std::vector<std::shared_ptr<Element> >::const_iterator ait;
     for (ait = data.begin(); ait != data.end(); ++ait) {
-	boost::shared_ptr<Element> el = (*(ait));
+	std::shared_ptr<Element> el = (*(ait));
 	addProperty(el);
 //	el->dump(os);
     }
@@ -1189,7 +1189,7 @@ Element::makeECMAArray(const std::string &name)
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeECMAArray(const std::string &name, std::vector<boost::shared_ptr<cygnal::Element> > &data)
+Element::makeECMAArray(const std::string &name, std::vector<std::shared_ptr<cygnal::Element> > &data)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::ECMA_ARRAY_AMF0;
@@ -1206,7 +1206,7 @@ Element::makeECMAArray(const std::string &name, std::vector<boost::shared_ptr<cy
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeECMAArray(std::vector<boost::shared_ptr<cygnal::Element> > &data)
+Element::makeECMAArray(std::vector<std::shared_ptr<cygnal::Element> > &data)
 {
 //    GNASH_REPORT_FUNCTION;
     makeObject(data);
@@ -1252,7 +1252,7 @@ Element::makeStrictArray(const std::string &name)
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeStrictArray(const std::string &name, std::vector<boost::shared_ptr<cygnal::Element> > &data)
+Element::makeStrictArray(const std::string &name, std::vector<std::shared_ptr<cygnal::Element> > &data)
 {
 //    GNASH_REPORT_FUNCTION;
     makeObject(name, data);
@@ -1268,7 +1268,7 @@ Element::makeStrictArray(const std::string &name, std::vector<boost::shared_ptr<
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeStrictArray(std::vector<boost::shared_ptr<cygnal::Element> > &data)
+Element::makeStrictArray(std::vector<std::shared_ptr<cygnal::Element> > &data)
 {
 //    GNASH_REPORT_FUNCTION;
     makeObject(data);
@@ -1554,10 +1554,10 @@ Element::dump(std::ostream& os) const
     }
 
     if (_properties.size() > 0) {
-	std::vector<boost::shared_ptr<Element> >::const_iterator ait;
+	std::vector<std::shared_ptr<Element> >::const_iterator ait;
 	os << "# of Properties in object: " << _properties.size() << std::endl;
 	for (ait = _properties.begin(); ait != _properties.end(); ++ait) {
-	    const boost::shared_ptr<Element> el = (*(ait));
+	    const std::shared_ptr<Element> el = (*(ait));
 	    el->dump(os);
 	}
     }
@@ -1569,21 +1569,21 @@ Element::dump(std::ostream& os) const
 ///	search for.
 ///
 /// @return A smart pointer to the Element for this property.
-boost::shared_ptr<cygnal::Element> 
+std::shared_ptr<cygnal::Element>
 Element::findProperty(const std::string &name)
 {
     if (_properties.size() > 0) {
-	std::vector<boost::shared_ptr<Element> >::iterator ait;
+	std::vector<std::shared_ptr<Element> >::iterator ait;
 //	cerr << "# of Properties in object: " << _properties.size() << endl;
 	for (ait = _properties.begin(); ait != _properties.end(); ++ait) {
-	    boost::shared_ptr<Element> el = (*(ait));
+	    std::shared_ptr<Element> el = (*(ait));
 	    if (el->getName() == name) {
 		return el;
 	    }
 //	    el->dump();
 	}
     }
-    boost::shared_ptr<Element> el;
+    std::shared_ptr<Element> el;
     return el;
 }
 

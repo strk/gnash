@@ -146,7 +146,7 @@ public:
     VaapiSurfaceGLXImpl(GLenum target, GLuint texture);
     ~VaapiSurfaceGLXImpl();
 
-    bool update(boost::shared_ptr<VaapiSurface> surface);
+    bool update(std::shared_ptr<VaapiSurface> surface);
 };
 
 VaapiSurfaceGLXImpl::VaapiSurfaceGLXImpl(GLenum target, GLuint texture)
@@ -201,7 +201,7 @@ VaapiSurfaceGLXImpl::~VaapiSurfaceGLXImpl()
     reset(0);
 }
 
-bool VaapiSurfaceGLXImpl::update(boost::shared_ptr<VaapiSurface> surface)
+bool VaapiSurfaceGLXImpl::update(std::shared_ptr<VaapiSurface> surface)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -233,7 +233,7 @@ VaapiSurfaceGLX::VaapiSurfaceGLX(GLenum target, GLuint texture)
 {
 }
 
-bool VaapiSurfaceGLX::update(boost::shared_ptr<VaapiSurface> surface)
+bool VaapiSurfaceGLX::update(std::shared_ptr<VaapiSurface> surface)
 {
     log_debug(_("VaapiSurfaceGLX::update(): from surface 0x%08x\n"), surface->get());
 

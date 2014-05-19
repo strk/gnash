@@ -292,7 +292,7 @@ GtkAggVaapiGlue::beforeRendering(movie_root* stage)
 }
 
 VaapiVideoWindow *
-GtkAggVaapiGlue::getVideoWindow(boost::shared_ptr<VaapiSurface> surface,
+GtkAggVaapiGlue::getVideoWindow(std::shared_ptr<VaapiSurface> surface,
                                 GdkWindow *parent_window,
                                 VaapiRectangle const & rect)
 {
@@ -349,7 +349,7 @@ GtkAggVaapiGlue::render()
 
      if (first_img != last_img) {
          for (img = first_img; img != last_img; ++img) {
-             boost::shared_ptr<VaapiSurface> surface = (*img)->surface();
+             std::shared_ptr<VaapiSurface> surface = (*img)->surface();
 
              VaapiRectangle src_rect;
              src_rect.x      = (*img)->x();
@@ -393,7 +393,7 @@ GtkAggVaapiGlue::render()
          }
 
          for (img = first_img; img != last_img; ++img) {
-             boost::shared_ptr<VaapiSurface> surface = (*img)->surface();
+             std::shared_ptr<VaapiSurface> surface = (*img)->surface();
 
              status = vaSyncSurface(gvactx->display(), surface->get());
              if (!vaapi_check_status(status, "vaSyncSurface() video"))

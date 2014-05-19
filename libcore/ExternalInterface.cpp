@@ -140,12 +140,12 @@ ExternalInterface::_toXML(const as_value &val)
     return ss.str();
 }
 
-boost::shared_ptr<ExternalInterface::invoke_t>
+std::shared_ptr<ExternalInterface::invoke_t>
 ExternalInterface::ExternalEventCheck(int fd)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    boost::shared_ptr<ExternalInterface::invoke_t> error;
+    std::shared_ptr<ExternalInterface::invoke_t> error;
 
     if (fd > 0) {
         int bytes = 0;
@@ -177,10 +177,10 @@ ExternalInterface::ExternalEventCheck(int fd)
 //      </arguments>
 // </invoke>
 //
-boost::shared_ptr<ExternalInterface::invoke_t>
+std::shared_ptr<ExternalInterface::invoke_t>
 ExternalInterface::parseInvoke(const std::string &xml)
 {
-    boost::shared_ptr<ExternalInterface::invoke_t> invoke;
+    std::shared_ptr<ExternalInterface::invoke_t> invoke;
     if (xml.empty()) {
         return invoke;
     }

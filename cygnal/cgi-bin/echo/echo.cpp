@@ -51,11 +51,11 @@ static EchoTest echo;
 extern "C" {
     
     // the standard API
-    boost::shared_ptr<Handler::cygnal_init_t>
-    echo_init_func(boost::shared_ptr<gnash::RTMPMsg> &msg)
+    std::shared_ptr<Handler::cygnal_init_t>
+    echo_init_func(std::shared_ptr<gnash::RTMPMsg> &msg)
     {
 	GNASH_REPORT_FUNCTION;
-        boost::shared_ptr<Handler::cygnal_init_t> init(new Handler::cygnal_init_t);
+        std::shared_ptr<Handler::cygnal_init_t> init(new Handler::cygnal_init_t);
         
         if (msg) {
             echo.setNetConnection(msg);
@@ -70,11 +70,11 @@ extern "C" {
         return init;
     }
 
-    boost::shared_ptr<cygnal::Buffer> echo_read_func()
+    std::shared_ptr<cygnal::Buffer> echo_read_func()
     {
 // 	GNASH_REPORT_FUNCTION;
 	
-	boost::shared_ptr<cygnal::Buffer> buf = echo.getResponse();
+	std::shared_ptr<cygnal::Buffer> buf = echo.getResponse();
 
 // 	log_network("%s", hexify(data, safe, true));
 
@@ -87,9 +87,9 @@ extern "C" {
     {
 // 	GNASH_REPORT_FUNCTION;
 
-	boost::shared_ptr<cygnal::Buffer> buf = echo.getResponse();
+	std::shared_ptr<cygnal::Buffer> buf = echo.getResponse();
 
-        vector<boost::shared_ptr<cygnal::Element> > request =
+        vector<std::shared_ptr<cygnal::Element> > request =
 	    echo.parseEchoRequest(data, size);
         if (request[3]) {
             buf = echo.formatEchoResponse(request[1]->to_number(), *request[3]);
@@ -178,7 +178,7 @@ main(int argc, char *argv[])
     // This is the main message processing loop for rtmp. All message received require
     // a response.
     do {
-        boost::shared_ptr<cygnal::Buffer> bufptr(new cygnal::Buffer);
+        std::shared_ptr<cygnal::Buffer> bufptr(new cygnal::Buffer);
         if (infile.empty()) {
             net.readNet(netfd, *bufptr);
         } else {
@@ -190,10 +190,10 @@ main(int argc, char *argv[])
             }
         }
         
-        vector<boost::shared_ptr<cygnal::Element> > request = net.parseEchoRequest(
+        vector<std::shared_ptr<cygnal::Element> > request = net.parseEchoRequest(
             bufptr->reference(), bufptr->allocated());
         if (request[3]) {
-            boost::shared_ptr<cygnal::Buffer> result = net.formatEchoResponse(request[1]->to_number(), *request[3]);
+            std::shared_ptr<cygnal::Buffer> result = net.formatEchoResponse(request[1]->to_number(), *request[3]);
             if (net.writeNet(netfd, *result)) {
                 log_debug("Sent echo test response response to client.");
             }
@@ -216,31 +216,31 @@ EchoTest::~EchoTest()
 
 // Parse an Echo Request message coming from the Red5 echo_test. This
 // method should only be used for testing purposes.
-vector<boost::shared_ptr<cygnal::Element > >
+vector<std::shared_ptr<cygnal::Element > >
 EchoTest::parseEchoRequest(boost::uint8_t *ptr, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
 
     cygnal::AMF amf;
-    vector<boost::shared_ptr<cygnal::Element > > headers;
+    vector<std::shared_ptr<cygnal::Element > > headers;
 
     // The first element is the name of the test, 'echo'
-    boost::shared_ptr<cygnal::Element> el1 = amf.extractAMF(ptr, ptr+size);
+    std::shared_ptr<cygnal::Element> el1 = amf.extractAMF(ptr, ptr+size);
     ptr += amf.totalsize();
     headers.push_back(el1);
 
     // The second element is the number of the test,
-    boost::shared_ptr<cygnal::Element> el2 = amf.extractAMF(ptr, ptr+size);
+    std::shared_ptr<cygnal::Element> el2 = amf.extractAMF(ptr, ptr+size);
     ptr += amf.totalsize();
     headers.push_back(el2);
 
     // This one has always been a NULL object from my tests
-    boost::shared_ptr<cygnal::Element> el3 = amf.extractAMF(ptr, ptr+size);
+    std::shared_ptr<cygnal::Element> el3 = amf.extractAMF(ptr, ptr+size);
     ptr += amf.totalsize();
     headers.push_back(el3);
 
     // This one has always been an NULL or Undefined object from my tests
-    boost::shared_ptr<cygnal::Element> el4 = amf.extractAMF(ptr, ptr+size);
+    std::shared_ptr<cygnal::Element> el4 = amf.extractAMF(ptr, ptr+size);
     if (!el4) {
 	log_error("Couldn't reliably extract the echo data!");
     }
@@ -254,11 +254,11 @@ EchoTest::parseEchoRequest(boost::uint8_t *ptr, size_t size)
 // is only used for testing by developers. The format appears to be
 // a string '_result', followed by the number of the test, and then two
 // NULL objects.
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 EchoTest::formatEchoResponse(double num, cygnal::Element &el)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<cygnal::Buffer> data = cygnal::AMF::encodeElement(el);
+    std::shared_ptr<cygnal::Buffer> data = cygnal::AMF::encodeElement(el);
     if (data) {
 	return formatEchoResponse(num, data->reference(), data->allocated());
     } else {
@@ -269,14 +269,14 @@ EchoTest::formatEchoResponse(double num, cygnal::Element &el)
     return data;
 }
 
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 EchoTest::formatEchoResponse(double num, cygnal::Buffer &data)
 {
 //    GNASH_REPORT_FUNCTION;
     return formatEchoResponse(num, data.reference(), data.allocated());
 }
 
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 EchoTest::formatEchoResponse(double num, boost::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -291,11 +291,11 @@ EchoTest::formatEchoResponse(double num, boost::uint8_t *data, size_t size)
     Element null;
     null.makeNull();
 
-    boost::shared_ptr<cygnal::Buffer> encecho = echo.encode();
-    boost::shared_ptr<cygnal::Buffer> encidx  = index.encode();   
-    boost::shared_ptr<cygnal::Buffer> encnull  = null.encode();   
+    std::shared_ptr<cygnal::Buffer> encecho = echo.encode();
+    std::shared_ptr<cygnal::Buffer> encidx  = index.encode();
+    std::shared_ptr<cygnal::Buffer> encnull  = null.encode();
 
-    boost::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer(encecho->size()
+    std::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer(encecho->size()
 						       + encidx->size()
 						       + encnull->size() + size));
 

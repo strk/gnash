@@ -81,7 +81,7 @@ public:
     jpeg_source_mgr    m_pub;        /* public fields */
 
     // Constructor.
-    explicit rw_source_IOChannel(boost::shared_ptr<IOChannel> in)
+    explicit rw_source_IOChannel(std::shared_ptr<IOChannel> in)
         :
         m_in_stream(in),
         m_start_of_file(true)
@@ -181,7 +181,7 @@ public:
     ///     Stream to read from. Ownership always shared with caller.
     ///
     static void setup(jpeg_decompress_struct* cinfo,
-            boost::shared_ptr<IOChannel> instream)
+            std::shared_ptr<IOChannel> instream)
     {
         rw_source_IOChannel* source = new rw_source_IOChannel(instream);
         cinfo->src = (jpeg_source_mgr*)source;
@@ -203,7 +203,7 @@ private:
     }
 
     // Source stream
-    boost::shared_ptr<IOChannel> m_in_stream;
+    std::shared_ptr<IOChannel> m_in_stream;
     bool m_start_of_file;
     JOCTET m_buffer[IO_BUF_SIZE];
 
@@ -211,7 +211,7 @@ private:
 
 } // unnamed namespace
 
-JpegInput::JpegInput(boost::shared_ptr<IOChannel> in)
+JpegInput::JpegInput(std::shared_ptr<IOChannel> in)
     :
     Input(in),
     _errorOccurred(0),
@@ -560,7 +560,7 @@ private:
 };
 
 
-JpegOutput::JpegOutput(boost::shared_ptr<IOChannel> out, size_t width,
+JpegOutput::JpegOutput(std::shared_ptr<IOChannel> out, size_t width,
         size_t height, int quality)
     :
     Output(out, width, height)
@@ -620,7 +620,7 @@ JpegOutput::writeImageRGBA(const unsigned char* rgbaData)
 }
 
 std::unique_ptr<Output>
-JpegOutput::create(boost::shared_ptr<IOChannel> o, size_t width, size_t height,
+JpegOutput::create(std::shared_ptr<IOChannel> o, size_t width, size_t height,
         int quality)
 {
     std::unique_ptr<Output> outChannel(new JpegOutput(o, width, height, quality));

@@ -348,7 +348,7 @@ public:
     /// ==================================================================
 
     ///@{
-    typedef boost::shared_ptr<GnashVaapiImageProxy> RenderImage;
+    typedef std::shared_ptr<GnashVaapiImageProxy> RenderImage;
     typedef std::vector<RenderImage> RenderImages;
 
     // Get first render image
@@ -447,7 +447,7 @@ public:
         return false; // avoid compiler warning        
     }
 
-    void addRenderImage(boost::shared_ptr<GnashVaapiImageProxy> image) {
+    void addRenderImage(std::shared_ptr<GnashVaapiImageProxy> image) {
         _render_images.push_back(image);
     }
     

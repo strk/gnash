@@ -54,13 +54,13 @@ static FitcDemoTest fitcDemo;
 	
 extern "C" {
     
-    boost::shared_ptr<Handler::cygnal_init_t>
+    std::shared_ptr<Handler::cygnal_init_t>
     fitcDemo_class_init()
     {
 	GNASH_REPORT_FUNCTION;
         // the standard API
         
-        boost::shared_ptr<Handler::cygnal_init_t> init(new Handler::cygnal_init_t);
+        std::shared_ptr<Handler::cygnal_init_t> init(new Handler::cygnal_init_t);
 //     init.read_func = read_func;
 //     init.write_func = write_func;
         
@@ -72,7 +72,7 @@ extern "C" {
 // 	GNASH_REPORT_FUNCTION;
 	
 	size_t safe = 0;
-	boost::shared_ptr<amf::Buffer> buf = fitcDemo.getResponse();
+	std::shared_ptr<amf::Buffer> buf = fitcDemo.getResponse();
 
 	if (size < buf->allocated()) {
 	    safe = buf->allocated();
@@ -92,9 +92,9 @@ extern "C" {
     {
 // 	GNASH_REPORT_FUNCTION;
 
-	boost::shared_ptr<amf::Buffer> buf = fitcDemo.getResponse();
+	std::shared_ptr<amf::Buffer> buf = fitcDemo.getResponse();
 
-        vector<boost::shared_ptr<amf::Element> > request =
+        vector<std::shared_ptr<amf::Element> > request =
 	    fitcDemo.parseFitcDemoRequest(data, size);
         if (request[3]) {
             buf = fitcDemo.formatFitcDemoResponse(request[1]->to_number(), *request[3]);
@@ -183,7 +183,7 @@ main(int argc, char *argv[])
     // This is the main message processing loop for rtmp. All message received require
     // a response.
     do {
-        boost::shared_ptr<amf::Buffer> bufptr(new amf::Buffer);
+        std::shared_ptr<amf::Buffer> bufptr(new amf::Buffer);
         if (infile.empty()) {
             net.readNet(netfd, *bufptr);
         } else {
@@ -195,10 +195,10 @@ main(int argc, char *argv[])
             }
         }
         
-        vector<boost::shared_ptr<amf::Element> > request = net.parseFitcDemoRequest(
+        vector<std::shared_ptr<amf::Element> > request = net.parseFitcDemoRequest(
             bufptr->reference(), bufptr->allocated());
         if (request[3]) {
-            boost::shared_ptr<amf::Buffer> result = net.formatFitcDemoResponse(request[1]->to_number(), *request[3]);
+            std::shared_ptr<amf::Buffer> result = net.formatFitcDemoResponse(request[1]->to_number(), *request[3]);
             if (net.writeNet(netfd, *result)) {
                 log_debug("Sent fitcDemo test response response to client.");
             }
@@ -221,31 +221,31 @@ FitcDemoTest::~FitcDemoTest()
 
 // Parse an FitcDemo Request message coming from the Red5 fitcDemo_test. This
 // method should only be used for testing purposes.
-vector<boost::shared_ptr<amf::Element > >
+vector<std::shared_ptr<amf::Element > >
 FitcDemoTest::parseFitcDemoRequest(boost::uint8_t *ptr, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
 
     AMF amf;
-    vector<boost::shared_ptr<amf::Element > > headers;
+    vector<std::shared_ptr<amf::Element > > headers;
 
     // The first element is the name of the test, 'fitcDemo'
-    boost::shared_ptr<amf::Element> el1 = amf.extractAMF(ptr, ptr+size);
+    std::shared_ptr<amf::Element> el1 = amf.extractAMF(ptr, ptr+size);
     ptr += amf.totalsize();
     headers.push_back(el1);
 
     // The second element is the number of the test,
-    boost::shared_ptr<amf::Element> el2 = amf.extractAMF(ptr, ptr+size);
+    std::shared_ptr<amf::Element> el2 = amf.extractAMF(ptr, ptr+size);
     ptr += amf.totalsize();
     headers.push_back(el2);
 
     // This one has always been a NULL object from my tests
-    boost::shared_ptr<amf::Element> el3 = amf.extractAMF(ptr, ptr+size);
+    std::shared_ptr<amf::Element> el3 = amf.extractAMF(ptr, ptr+size);
     ptr += amf.totalsize();
     headers.push_back(el3);
 
     // This one has always been an NULL or Undefined object from my tests
-    boost::shared_ptr<amf::Element> el4 = amf.extractAMF(ptr, ptr+size);
+    std::shared_ptr<amf::Element> el4 = amf.extractAMF(ptr, ptr+size);
     if (!el4) {
 	log_error("Couldn't reliably extract the fitcDemo data!");
     }
@@ -259,11 +259,11 @@ FitcDemoTest::parseFitcDemoRequest(boost::uint8_t *ptr, size_t size)
 // is only used for testing by developers. The format appears to be
 // a string '_result', followed by the number of the test, and then two
 // NULL objects.
-boost::shared_ptr<amf::Buffer>
+std::shared_ptr<amf::Buffer>
 FitcDemoTest::formatFitcDemoResponse(double num, amf::Element &el)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<amf::Buffer> data = amf::AMF::encodeElement(el);
+    std::shared_ptr<amf::Buffer> data = amf::AMF::encodeElement(el);
     if (data) {
 	return formatFitcDemoResponse(num, data->reference(), data->allocated());
     } else {
@@ -274,14 +274,14 @@ FitcDemoTest::formatFitcDemoResponse(double num, amf::Element &el)
     return data;
 }
 
-boost::shared_ptr<amf::Buffer>
+std::shared_ptr<amf::Buffer>
 FitcDemoTest::formatFitcDemoResponse(double num, amf::Buffer &data)
 {
 //    GNASH_REPORT_FUNCTION;
     return formatFitcDemoResponse(num, data.reference(), data.allocated());
 }
 
-boost::shared_ptr<amf::Buffer>
+std::shared_ptr<amf::Buffer>
 FitcDemoTest::formatFitcDemoResponse(double num, boost::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -296,11 +296,11 @@ FitcDemoTest::formatFitcDemoResponse(double num, boost::uint8_t *data, size_t si
     Element null;
     null.makeNull();
 
-    boost::shared_ptr<amf::Buffer> encfitcDemo = fitcDemo.encode();
-    boost::shared_ptr<amf::Buffer> encidx  = index.encode();   
-    boost::shared_ptr<amf::Buffer> encnull  = null.encode();   
+    std::shared_ptr<amf::Buffer> encfitcDemo = fitcDemo.encode();
+    std::shared_ptr<amf::Buffer> encidx  = index.encode();
+    std::shared_ptr<amf::Buffer> encnull  = null.encode();
 
-    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer(encfitcDemo->size()
+    std::shared_ptr<amf::Buffer> buf(new amf::Buffer(encfitcDemo->size()
 						       + encidx->size()
 						       + encnull->size() + size));
 

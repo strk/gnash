@@ -31,19 +31,19 @@ class VaapiImage;
 
 /// VA surface proxy used to release surface to context
 class DSOEXPORT VaapiSurfaceProxy {
-    boost::shared_ptr<VaapiContext> _context;
-    boost::shared_ptr<VaapiSurface> _surface;
+    std::shared_ptr<VaapiContext> _context;
+    std::shared_ptr<VaapiSurface> _surface;
 
 public:
-    VaapiSurfaceProxy(boost::shared_ptr<VaapiSurface> surface,
-                      boost::shared_ptr<VaapiContext> context);
+    VaapiSurfaceProxy(std::shared_ptr<VaapiSurface> surface,
+                      std::shared_ptr<VaapiContext> context);
     ~VaapiSurfaceProxy();
 
     /// Return VA surface
-    boost::shared_ptr<VaapiSurface> get() const { return _surface; }
+    std::shared_ptr<VaapiSurface> get() const { return _surface; }
 
     /// Return VA context
-    boost::shared_ptr<VaapiContext> getContext() const  { return _context; }
+    std::shared_ptr<VaapiContext> getContext() const  { return _context; }
 };
 
 } // gnash namespace

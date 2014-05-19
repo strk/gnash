@@ -141,14 +141,14 @@ void VaapiSurface::clear()
 }
 
 // Compare two subpictures
-static inline bool operator== (boost::shared_ptr<VaapiSubpicture> const &a,
-                               boost::shared_ptr<VaapiSubpicture> const &b)
+static inline bool operator== (std::shared_ptr<VaapiSubpicture> const &a,
+                               std::shared_ptr<VaapiSubpicture> const &b)
 {
     return a->get() == b->get();
 }
 
 // Associate subpicture to the surface
-bool VaapiSurface::associateSubpicture(boost::shared_ptr<VaapiSubpicture> subpicture,
+bool VaapiSurface::associateSubpicture(std::shared_ptr<VaapiSubpicture> subpicture,
                                        VaapiRectangle const & src_rect,
                                        VaapiRectangle const & dst_rect)
 {
@@ -177,9 +177,9 @@ bool VaapiSurface::associateSubpicture(boost::shared_ptr<VaapiSubpicture> subpic
 }
 
 // Deassociate subpicture from the surface
-bool VaapiSurface::deassociateSubpicture(boost::shared_ptr<VaapiSubpicture> subpicture)
+bool VaapiSurface::deassociateSubpicture(std::shared_ptr<VaapiSubpicture> subpicture)
 {
-    std::vector< boost::shared_ptr<VaapiSubpicture> >::iterator it;
+    std::vector< std::shared_ptr<VaapiSubpicture> >::iterator it;
     it = std::find(_subpictures.begin(), _subpictures.end(), subpicture);
     if (it == _subpictures.end()) {
         return false;

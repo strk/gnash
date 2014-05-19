@@ -29,7 +29,7 @@ namespace gnash {
 
 namespace gnash {
 
-typedef std::vector<boost::shared_ptr<BitmapFilter> > Filters;
+typedef std::vector<std::shared_ptr<BitmapFilter> > Filters;
 
 class filter_factory
 {

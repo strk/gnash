@@ -196,12 +196,12 @@ private:
     size_t      _timeout;       // timeout period for the event loop
     bool        _fullscreen;
 
-    boost::shared_ptr<FBGlue>   _glue;
+    std::shared_ptr<FBGlue>   _glue;
 
     /// This is the array of functioning input devices.
-    std::vector<boost::shared_ptr<InputDevice> > _inputs;
+    std::vector<std::shared_ptr<InputDevice> > _inputs;
 
-    boost::shared_ptr<Renderer> _renderer;
+    std::shared_ptr<Renderer> _renderer;
 #ifdef HAVE_LINUX_UINPUT_H
     UinputDevice                _uinput;
 #endif

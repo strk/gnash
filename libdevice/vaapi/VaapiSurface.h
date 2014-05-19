@@ -67,7 +67,7 @@ public:
 class DSOEXPORT VaapiSurface
 {
     std::unique_ptr<VaapiSurfaceImplBase> _impl;
-    std::vector< boost::shared_ptr<VaapiSubpicture> > _subpictures;
+    std::vector< std::shared_ptr<VaapiSubpicture> > _subpictures;
 
     friend class VaapiContext;
     VaapiContext *_context;
@@ -94,12 +94,12 @@ public:
     void clear();
 
     /// Associate subpicture to the surface
-    bool associateSubpicture(boost::shared_ptr<VaapiSubpicture> subpicture,
+    bool associateSubpicture(std::shared_ptr<VaapiSubpicture> subpicture,
                              VaapiRectangle const & src_rect,
                              VaapiRectangle const & dst_rect);
 
     /// Deassociate subpicture from the surface
-    bool deassociateSubpicture(boost::shared_ptr<VaapiSubpicture> subpicture);
+    bool deassociateSubpicture(std::shared_ptr<VaapiSubpicture> subpicture);
 };
 
 } // gnash namespace

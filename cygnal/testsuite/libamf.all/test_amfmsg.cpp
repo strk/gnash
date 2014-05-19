@@ -152,12 +152,12 @@ test_encoding()
 //  00 00 00 0e				   <- byte length of message
 //     0a 00 00 00 01			   <- array, 1 item
 //        00 41 70 43 ac e0 00 00 00
-    boost::shared_ptr<Buffer> buf1(new Buffer("00 00 00 00 00 03 00 06 67 65 74 77 61 79 00 04 2f 32 32 39 00 00 00 0e 0a 00 00 00 01 00 41 70 43 87 20 00 00 00 00 06 67 65 74 77 61 79 00 04 2f 32 33 30 00 00 00 0e 0a 00 00 00 01 00 41 70 43 ba 00 00 00 00 00 06 67 65 74 77 61 79 00 04 2f 32 33 31 00 00 00 0e 0a 00 00 00 01 00 41 70 43 ac e0 00 00 00"));
+    std::shared_ptr<Buffer> buf1(new Buffer("00 00 00 00 00 03 00 06 67 65 74 77 61 79 00 04 2f 32 32 39 00 00 00 0e 0a 00 00 00 01 00 41 70 43 87 20 00 00 00 00 06 67 65 74 77 61 79 00 04 2f 32 33 30 00 00 00 0e 0a 00 00 00 01 00 41 70 43 ba 00 00 00 00 00 06 67 65 74 77 61 79 00 04 2f 32 33 31 00 00 00 0e 0a 00 00 00 01 00 41 70 43 ac e0 00 00 00"));
     double num = *(reinterpret_cast<double *>(buf1->reference()));
     swapBytes(&num, cygnal::AMF0_NUMBER_SIZE); // we always encode in big endian format
 
     AMF_msg amsg;
-    boost::shared_ptr<AMF_msg::context_header_t> head1 =
+    std::shared_ptr<AMF_msg::context_header_t> head1 =
         amsg.parseAMFPacket(buf1->reference(), buf1->size());
 
 //    amsg.dump(*head1);
@@ -180,43 +180,43 @@ test_encoding()
     // Build a new message packet from scratch and make sure it matches the real one
     AMF_msg top;
     
-    boost::shared_ptr<cygnal::Element> getway1(new Element);
+    std::shared_ptr<cygnal::Element> getway1(new Element);
     getway1->makeStrictArray();
-    boost::shared_ptr<cygnal::Element> data1(new Element);
+    std::shared_ptr<cygnal::Element> data1(new Element);
     data1->makeNumber(dub1);
     getway1->addProperty(data1);
-    boost::shared_ptr<AMF_msg::amf_message_t> msg1(new AMF_msg::amf_message_t);
+    std::shared_ptr<AMF_msg::amf_message_t> msg1(new AMF_msg::amf_message_t);
     msg1->header.target = "getway";
     msg1->header.response = "/229";
     msg1->header.size = 14;
     msg1->data = getway1;
     top.addMessage(msg1);
     
-    boost::shared_ptr<cygnal::Element> getway2(new Element);
+    std::shared_ptr<cygnal::Element> getway2(new Element);
     getway2->makeStrictArray();
-    boost::shared_ptr<cygnal::Element> data2(new Element);
+    std::shared_ptr<cygnal::Element> data2(new Element);
     data2->makeNumber(dub2);
     getway2->addProperty(data2);
-    boost::shared_ptr<AMF_msg::amf_message_t> msg2(new AMF_msg::amf_message_t);
+    std::shared_ptr<AMF_msg::amf_message_t> msg2(new AMF_msg::amf_message_t);
     msg2->header.target = "getway";
     msg2->header.response = "/230";
     msg2->header.size = 14;
     msg2->data = getway2;
     top.addMessage(msg2);
     
-    boost::shared_ptr<cygnal::Element> getway3(new Element);
+    std::shared_ptr<cygnal::Element> getway3(new Element);
     getway3->makeStrictArray();
-    boost::shared_ptr<cygnal::Element> data3(new Element);
+    std::shared_ptr<cygnal::Element> data3(new Element);
     data3->makeNumber(dub3);
     getway3->addProperty(data3);
-    boost::shared_ptr<AMF_msg::amf_message_t> msg3(new AMF_msg::amf_message_t);
+    std::shared_ptr<AMF_msg::amf_message_t> msg3(new AMF_msg::amf_message_t);
     msg3->header.target = "getway";
     msg3->header.response = "/231";
     msg3->header.size = 14;
     msg3->data = getway3;
     top.addMessage(msg3);
 
-    boost::shared_ptr<cygnal::Buffer> buf2 = top.encodeMsgHeader("getway", "/229", 14);
+    std::shared_ptr<cygnal::Buffer> buf2 = top.encodeMsgHeader("getway", "/229", 14);
     boost::uint8_t *ptr1 = buf1->reference() + sizeof(AMF_msg::context_header_t);
 
 
@@ -226,7 +226,7 @@ test_encoding()
         runtest.fail("AMF_msg::encodeMsgHeader()");
     }
     
-    boost::shared_ptr<cygnal::Buffer> buf3 = top.encodeAMFPacket();
+    std::shared_ptr<cygnal::Buffer> buf3 = top.encodeAMFPacket();
     if (memcmp(buf1->reference(), buf3->reference(), buf3->allocated()) == 0) {
         runtest.pass("AMF_msg::encodeAMFPacket()");
     } else {

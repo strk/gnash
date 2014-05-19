@@ -95,7 +95,7 @@ filter_factory::read(SWFStream& in, bool read_multiple, Filters* store)
         }
 
         // Protect against exceptions and such by storing before we read.
-        boost::shared_ptr<BitmapFilter> p(the_filter);
+        std::shared_ptr<BitmapFilter> p(the_filter);
         if (!p->read(in))
         {
             IF_VERBOSE_MALFORMED_SWF(

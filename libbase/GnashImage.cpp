@@ -175,7 +175,7 @@ mergeAlpha(ImageRGBA& im, GnashImage::const_iterator alphaData,
 // Write the given image to the given out stream, in jpeg format.
 void
 Output::writeImageData(FileType type,
-    boost::shared_ptr<IOChannel> out, const GnashImage& image, int quality)
+    std::shared_ptr<IOChannel> out, const GnashImage& image, int quality)
 {
     
     const size_t width = image.width();
@@ -214,7 +214,7 @@ Output::writeImageData(FileType type,
 
 // See GnashEnums.h for file types.
 std::unique_ptr<GnashImage>
-Input::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
+Input::readImageData(std::shared_ptr<IOChannel> in, FileType type)
 {
     std::unique_ptr<GnashImage> im;
     std::unique_ptr<Input> inChannel;
@@ -282,7 +282,7 @@ Input::readImageData(boost::shared_ptr<IOChannel> in, FileType type)
 // For reading SWF JPEG3-style image data, like ordinary JPEG, 
 // but stores the data in ImageRGBA format.
 std::unique_ptr<ImageRGBA>
-Input::readSWFJpeg3(boost::shared_ptr<IOChannel> in)
+Input::readSWFJpeg3(std::shared_ptr<IOChannel> in)
 {
 
     std::unique_ptr<ImageRGBA> im;

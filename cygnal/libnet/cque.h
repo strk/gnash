@@ -36,7 +36,7 @@ namespace gnash
 
 class CQue {
 public:
-    typedef std::deque<boost::shared_ptr<cygnal::Buffer> > que_t;
+    typedef std::deque<std::shared_ptr<cygnal::Buffer> > que_t;
 #ifdef USE_STATS_QUEUE
     typedef struct {
 	struct timespec start;
@@ -50,11 +50,11 @@ public:
     ~CQue();
     // Push data onto the que
     bool push(boost::uint8_t *data, int nbytes);
-    bool push(boost::shared_ptr<cygnal::Buffer> data);
+    bool push(std::shared_ptr<cygnal::Buffer> data);
     // Pop the first date element off the que
-    boost::shared_ptr<cygnal::Buffer> DSOEXPORT pop();
+    std::shared_ptr<cygnal::Buffer> DSOEXPORT pop();
     // Peek at the first date element witjhout removing it from the que
-    boost::shared_ptr<cygnal::Buffer> DSOEXPORT peek();
+    std::shared_ptr<cygnal::Buffer> DSOEXPORT peek();
     // Get the number of elements in the que
     size_t DSOEXPORT size();
     // Wait for a condition variable to trigger
@@ -64,16 +64,16 @@ public:
     // Empty the que of all data. 
     void clear();
     // Remove a range of elements
-    void remove(boost::shared_ptr<cygnal::Buffer> begin, boost::shared_ptr<cygnal::Buffer> end);
+    void remove(std::shared_ptr<cygnal::Buffer> begin, std::shared_ptr<cygnal::Buffer> end);
 //     // Remove an element
-//    void remove(boost::shared_ptr<cygnal::Buffer> it);
-    void remove(boost::shared_ptr<cygnal::Buffer> it);
+//    void remove(std::shared_ptr<cygnal::Buffer> it);
+    void remove(std::shared_ptr<cygnal::Buffer> it);
     // Merge sucessive buffers into one single larger buffer. This is for some
     // protocols, than have very long headers.
-    boost::shared_ptr<cygnal::Buffer> DSOEXPORT merge(boost::shared_ptr<cygnal::Buffer> begin);
-    boost::shared_ptr<cygnal::Buffer> DSOEXPORT merge();
+    std::shared_ptr<cygnal::Buffer> DSOEXPORT merge(std::shared_ptr<cygnal::Buffer> begin);
+    std::shared_ptr<cygnal::Buffer> DSOEXPORT merge();
 
-    boost::shared_ptr<cygnal::Buffer> operator[] (int index) { return _que[index]; };
+    std::shared_ptr<cygnal::Buffer> operator[] (int index) { return _que[index]; };
     
     // Dump the data to the terminal
     void dump();

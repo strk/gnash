@@ -192,7 +192,7 @@ test_que()
 {
     Handler que;
 
-    boost::shared_ptr<amf::Buffer> buf(new Buffer);
+    std::shared_ptr<amf::Buffer> buf(new Buffer);
 //     boost::uint8_t *test = new uint8_t[6];
 //     memcpy(test, "hell", 4);
 
@@ -200,9 +200,9 @@ test_que()
     // which is the one where data flows from the network to the queue.
     que.push(buf);
     if ((que.size() == 1) && (que.outsize() == 0)) {
-        runtest.pass ("Handler::push(boost::shared_ptr<amf::Buffer> )");
+        runtest.pass ("Handler::push(std::shared_ptr<amf::Buffer> )");
     } else {
-        runtest.fail ("Handler::push(boost::shared_ptr<amf::Buffer> )");
+        runtest.fail ("Handler::push(std::shared_ptr<amf::Buffer> )");
     }
     
     // Push one buffer on the outgoing fifo. The default is the incoming fifo,
@@ -210,20 +210,20 @@ test_que()
     // we can explicitly specufy which queue we write to, we test that here.
     que.pushout(buf);
     if ((que.size() == 1) && (que.outsize() == 1)) {
-        runtest.pass ("Handler::pushout(boost::shared_ptr<amf::Buffer> )");
+        runtest.pass ("Handler::pushout(std::shared_ptr<amf::Buffer> )");
     } else {
-        runtest.fail ("Handler::pushout(boost::shared_ptr<amf::Buffer> )");
+        runtest.fail ("Handler::pushout(std::shared_ptr<amf::Buffer> )");
     }
 
     // Test pushin. When dumpimg, the second address should be different than the first,
     // as well as the size. The outgoing queue should be uneffected.
-    boost::shared_ptr<amf::Buffer> buf1(new Buffer);
+    std::shared_ptr<amf::Buffer> buf1(new Buffer);
     buf1->resize(112);
     que.pushin(buf1);
     if ((que.size() == 2) && (que.outsize() == 1)) {
-        runtest.pass ("Handler::pushin(boost::shared_ptr<amf::Buffer> )");
+        runtest.pass ("Handler::pushin(std::shared_ptr<amf::Buffer> )");
     } else {
-        runtest.fail ("Handler::pushin(boost::shared_ptr<amf::Buffer> )");
+        runtest.fail ("Handler::pushin(std::shared_ptr<amf::Buffer> )");
     }
 
     // Nuke the array
@@ -241,14 +241,14 @@ test_que()
     }
 
     que.push(buf);
-    boost::shared_ptr<amf::Buffer> buf2 = que.peek();
+    std::shared_ptr<amf::Buffer> buf2 = que.peek();
     if ((buf2 == buf) && (que.size() == 1)) {
         runtest.pass ("Handler::peek()");
     } else {
         runtest.fail ("Handler::peek()");
     }
 
-    boost::shared_ptr<amf::Buffer> buf3 = que.peek();
+    std::shared_ptr<amf::Buffer> buf3 = que.peek();
      if ((buf3 == buf) && (que.size() == 1)) {
          runtest.pass ("Handler::pop()");
      } else {

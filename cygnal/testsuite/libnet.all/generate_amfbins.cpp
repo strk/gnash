@@ -114,21 +114,21 @@ main(int argc, char *argv[])
     }
 
 #if 0
-    std::vector<boost::shared_ptr<amf::Element> > data1;
+    std::vector<std::shared_ptr<amf::Element> > data1;
 
     const char *str1 = "property one";
-    boost::shared_ptr<amf::Element> prop1(new Element(str1));
+    std::shared_ptr<amf::Element> prop1(new Element(str1));
     data1.push_back(prop1);
 
     string str2 = "property two";
-    boost::shared_ptr<amf::Element> prop2(new Element(str2));
+    std::shared_ptr<amf::Element> prop2(new Element(str2));
     data1.push_back(prop2);
 
-    boost::shared_ptr<amf::Element> prop3(new Element("property three"));
+    std::shared_ptr<amf::Element> prop3(new Element("property three"));
     data1.push_back(prop3);
 
     double num = 123.456;
-    boost::shared_ptr<amf::Element> prop4(new Element(num));
+    std::shared_ptr<amf::Element> prop4(new Element(num));
     data1.push_back(prop4);
     
     Element top;
@@ -178,46 +178,46 @@ main(int argc, char *argv[])
     string str = "Guten Tag";
 
     Element elnum1(dub);
-    boost::shared_ptr<Buffer> bnum1 = cygnal::AMF::encodeElement(elnum1);
+    std::shared_ptr<Buffer> bnum1 = cygnal::AMF::encodeElement(elnum1);
     int fd = ::open("amf0-number.bin" ,O_WRONLY|O_CREAT, S_IRWXU);
     ::write(fd, bnum1->reference(), bnum1->allocated()); ::close(fd);
 
     flag = true;
     Element elbool1(flag);
-    boost::shared_ptr<Buffer> bbool1 = cygnal::AMF::encodeElement(elbool1);
+    std::shared_ptr<Buffer> bbool1 = cygnal::AMF::encodeElement(elbool1);
     fd = ::open("amf0-boolean.bin" ,O_WRONLY|O_CREAT, S_IRWXU);
     ::write(fd, bbool1->reference(), bbool1->allocated()); ::close(fd);
     
     Element elstr1(str);
-    boost::shared_ptr<Buffer> bstr1 = cygnal::AMF::encodeElement(elstr1);
+    std::shared_ptr<Buffer> bstr1 = cygnal::AMF::encodeElement(elstr1);
     fd = ::open("amf0-string.bin" ,O_WRONLY|O_CREAT, S_IRWXU);
     ::write(fd, bstr1->reference(), bstr1->allocated()); ::close(fd);
 
     Element el3;
     el3.clear();
     el3.makeNull();
-    boost::shared_ptr<Buffer> bel3 = cygnal::AMF::encodeElement(el3);
+    std::shared_ptr<Buffer> bel3 = cygnal::AMF::encodeElement(el3);
     fd = ::open("amf0-null-object.bin" ,O_WRONLY|O_CREAT, S_IRWXU);
     ::write(fd, bel3->reference(), bel3->allocated()); ::close(fd);
 
 
     Element el4;
     el4.makeUndefined();
-    boost::shared_ptr<Buffer> bel4 = cygnal::AMF::encodeElement(el4);
+    std::shared_ptr<Buffer> bel4 = cygnal::AMF::encodeElement(el4);
     fd = ::open("amf0-undefined-object.bin" ,O_WRONLY|O_CREAT, S_IRWXU);
     ::write(fd, bel4->reference(), bel4->allocated()); ::close(fd);
 
     Element el6;
     el6.clear();
     el6.makeNullString();
-    boost::shared_ptr<Buffer> bel6 = cygnal::AMF::encodeElement(el6);
+    std::shared_ptr<Buffer> bel6 = cygnal::AMF::encodeElement(el6);
     fd = ::open("amf0-null-string.bin" ,O_WRONLY|O_CREAT, S_IRWXU);
     ::write(fd, bel6->reference(), bel6->allocated()); ::close(fd);    
 
     Element el15;
     el15.clear();
     el15.makeUnsupported();
-    boost::shared_ptr<Buffer> bel15 = cygnal::AMF::encodeElement(el15);
+    std::shared_ptr<Buffer> bel15 = cygnal::AMF::encodeElement(el15);
     fd = ::open("amf0-unsupported-object.bin" ,O_WRONLY|O_CREAT, S_IRWXU);
     ::write(fd, bel15->reference(), bel15->allocated()); ::close(fd);
 

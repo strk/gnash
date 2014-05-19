@@ -40,7 +40,7 @@ class Shape : public DisplayObject
 
 public:
 
-    Shape(movie_root& mr, as_object* object, boost::shared_ptr<DynamicShape> sh,
+    Shape(movie_root& mr, as_object* object, std::shared_ptr<DynamicShape> sh,
             DisplayObject* parent)
         :
         DisplayObject(mr, object, parent),
@@ -70,7 +70,7 @@ private:
 	
     const boost::intrusive_ptr<const SWF::DefineShapeTag> _def;
 
-    boost::shared_ptr<DynamicShape> _shape;
+    std::shared_ptr<DynamicShape> _shape;
 
 };
 

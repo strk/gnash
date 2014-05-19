@@ -281,7 +281,7 @@ main(int , char **)
 
     // Parse an invoke message
     xml = "<invoke name=\"barbyfoo\" returntype=\"xml\"><arguments><string>barfoo</string><number>135.78</number></arguments></invoke>";
-    boost::shared_ptr<plugin::ExternalInterface::invoke_t> invoke ( plugin::ExternalInterface::parseInvoke(xml) );
+    std::shared_ptr<plugin::ExternalInterface::invoke_t> invoke ( plugin::ExternalInterface::parseInvoke(xml) );
     str = NPStringToString(NPVARIANT_TO_STRING(invoke->args[0].get()));
     if ((invoke->name == "barbyfoo") && (invoke->type == "xml")
         && (NPVARIANT_IS_STRING(invoke->args[0].get()))

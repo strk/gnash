@@ -332,20 +332,20 @@ main(int argc, char *argv[])
     }
 
 #ifdef USE_MEDIA
-    boost::shared_ptr<gnash::media::MediaHandler> mediaHandler;
+    std::shared_ptr<gnash::media::MediaHandler> mediaHandler;
     std::string mh = rcfile.getMediaHandler();
     mediaHandler.reset(media::MediaFactory::instance().get(mh));
 #endif
 #if defined(USE_SOUND) && defined(USE_MEDIA)
-    boost::shared_ptr<sound::sound_handler> soundHandler;
+    std::shared_ptr<sound::sound_handler> soundHandler;
     soundHandler.reset(new sound::NullSoundHandler(mediaHandler.get()));
 #endif
 
-    boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
+    std::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
     addDefaultLoaders(*loaders);
 
 #ifdef RENDERER_AGG
-    boost::shared_ptr<Renderer_agg_base> r(create_Renderer_agg("RGBA32"));
+    std::shared_ptr<Renderer_agg_base> r(create_Renderer_agg("RGBA32"));
 
     // Yes, this leaks. On some systems (e.g. Debian Lenny) the data is
     // evidently accessed after main() returns. Rather than bothering to
@@ -368,7 +368,7 @@ main(int argc, char *argv[])
         runResources.setMediaHandler(mediaHandler);
 #endif
         runResources.setTagLoaders(loaders);
-        boost::shared_ptr<StreamProvider> sp(new StreamProvider(*i, *i));
+        std::shared_ptr<StreamProvider> sp(new StreamProvider(*i, *i));
         runResources.setStreamProvider(sp);
 
 #ifdef RENDERER_AGG

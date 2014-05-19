@@ -91,7 +91,7 @@ RTMPServer::~RTMPServer()
 }
 
 
-boost::shared_ptr<cygnal::Element>
+std::shared_ptr<cygnal::Element>
 RTMPServer::processClientHandShake(int fd)
 {
     GNASH_REPORT_FUNCTION;
@@ -109,16 +109,16 @@ RTMPServer::processClientHandShake(int fd)
     // These store the information we need from the initial
     /// NetConnection object.
     boost::scoped_ptr<cygnal::Element> nc;
-    boost::shared_ptr<cygnal::Buffer>  pkt;
-    boost::shared_ptr<cygnal::Element> tcurl;
-    boost::shared_ptr<cygnal::Element> swfurl;
-    boost::shared_ptr<cygnal::Element> encoding;
+    std::shared_ptr<cygnal::Buffer>  pkt;
+    std::shared_ptr<cygnal::Element> tcurl;
+    std::shared_ptr<cygnal::Element> swfurl;
+    std::shared_ptr<cygnal::Element> encoding;
 
 //     RTMP::rtmp_headersize_e response_head_size = RTMP::HEADER_12;
     
     // Read the handshake bytes sent by the client when requesting
     // a connection.
-    boost::shared_ptr<cygnal::Buffer> handshake1 = RTMP::recvMsg(fd);
+    std::shared_ptr<cygnal::Buffer> handshake1 = RTMP::recvMsg(fd);
     // See if we have data in the handshake, we should have 1537 bytes
     if (!handshake1) {
 	log_error(_("Failed to read the handshake from the client."));
@@ -133,7 +133,7 @@ RTMPServer::processClientHandShake(int fd)
     
     // Read the response from the client from the handshale reponse we
     // just sent.
-    boost::shared_ptr<cygnal::Buffer> handshake2 = RTMP::recvMsg(fd);
+    std::shared_ptr<cygnal::Buffer> handshake2 = RTMP::recvMsg(fd);
     // See if we have data in the handshake, we should have 1536 bytes
     if (handshake2 == 0) {
 	log_error(_("failed to read the handshake from the client."));
@@ -154,7 +154,7 @@ RTMPServer::processClientHandShake(int fd)
     // the packet is a raw RTMP message. Since the header can be a
     // variety of sizes, and this effects the data size, we need to
     // decode that first.
-    boost::shared_ptr<RTMP::rtmp_head_t> qhead = RTMP::decodeHeader(pkt->reference());
+    std::shared_ptr<RTMP::rtmp_head_t> qhead = RTMP::decodeHeader(pkt->reference());
 
     if (!qhead) {
 	log_error(_("RTMP header had parsing error!"));
@@ -226,7 +226,7 @@ RTMPServer::processClientHandShake(int fd)
     // causes Async I/O errors in the client.
     if (!encoding) {
 	// Send a onBWDone to the client to start the new NetConnection,
-	boost::shared_ptr<cygnal::Buffer> bwdone = encodeBWDone(2.0);
+	std::shared_ptr<cygnal::Buffer> bwdone = encodeBWDone(2.0);
 	if (RTMP::sendMsg(fd, qhead->channel, RTMP::HEADER_8,
 			  bwdone->size(), RTMP::INVOKE, RTMPMsg::FROM_SERVER, *bwdone)) {
 	    log_network("Sent onBWDone to client");
@@ -238,7 +238,7 @@ RTMPServer::processClientHandShake(int fd)
     }
     
     // Send a Set Client Window Size to the client
-    boost::shared_ptr<cygnal::Buffer> winsize(new cygnal::Buffer(sizeof(boost::uint32_t)));
+    std::shared_ptr<cygnal::Buffer> winsize(new cygnal::Buffer(sizeof(boost::uint32_t)));
     boost::uint32_t swapped = 0x20000;
     swapBytes(&swapped, sizeof(boost::uint32_t));
     *winsize += swapped;
@@ -252,7 +252,7 @@ RTMPServer::processClientHandShake(int fd)
     }
 
     // Send a ping to the client to reset the new NetConnection,
-    boost::shared_ptr<cygnal::Buffer> ping_reset =
+    std::shared_ptr<cygnal::Buffer> ping_reset =
 	encodePing(RTMP::PING_RESET, 0);
     if (RTMP::sendMsg(fd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_8,
 		      ping_reset->size(), RTMP::USER, RTMPMsg::FROM_SERVER, *ping_reset)) {
@@ -266,7 +266,7 @@ RTMPServer::processClientHandShake(int fd)
     // Send the packet to notify the client that the
     // NetConnection::connect() was sucessful. After the client
     // receives this, the handhsake is completed.
-    boost::shared_ptr<cygnal::Buffer> response =
+    std::shared_ptr<cygnal::Buffer> response =
 	encodeResult(RTMPMsg::NC_CONNECT_SUCCESS);
     if (RTMP::sendMsg(fd, 3, RTMP::HEADER_8, response->allocated(),
 		      RTMP::INVOKE, RTMPMsg::FROM_SERVER, *response)) {
@@ -341,11 +341,11 @@ RTMPServer::handShakeResponse(int fd, cygnal::Buffer &handshake)
     return true;    
 }
 
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 RTMPServer::serverFinish(int fd, cygnal::Buffer &handshake1, cygnal::Buffer &handshake2)
 {
     GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<cygnal::Buffer> buf;
+    std::shared_ptr<cygnal::Buffer> buf;
 
     // sanity check our input data. We do this seperately as an empty
     // buffer means data wasn't read correctly from the network. We
@@ -458,12 +458,12 @@ RTMPServer::packetRead(cygnal::Buffer &buf)
     boost::uint8_t* tooFar = ptr+300+sizeof(int); // FIXME:
     
     AMF amf_obj;
-    boost::shared_ptr<cygnal::Element> el1 = amf_obj.extractAMF(ptr, tooFar);
+    std::shared_ptr<cygnal::Element> el1 = amf_obj.extractAMF(ptr, tooFar);
     ptr += amf_obj.totalsize();
-    boost::shared_ptr<cygnal::Element> el2 = amf_obj.extractAMF(ptr, tooFar);
+    std::shared_ptr<cygnal::Element> el2 = amf_obj.extractAMF(ptr, tooFar);
 
     int size = 0;
-    boost::shared_ptr<cygnal::Element> el;
+    std::shared_ptr<cygnal::Element> el;
     while ( size < static_cast<boost::uint16_t>(_header.bodysize) - 24 ) {
 	if (ptr) {
 	    el = amf_obj.extractProperty(ptr, tooFar);
@@ -489,7 +489,7 @@ RTMPServer::packetRead(cygnal::Buffer &buf)
     log_network("Reading AMF packets till we're done...");
     // buf->dump();
     while (ptr < end) {
-	boost::shared_ptr<cygnal::Element> el(new cygnal::Element);
+	std::shared_ptr<cygnal::Element> el(new cygnal::Element);
 	ptr = amf.extractProperty(el, ptr);
 	addProperty(el);
 	// el->dump();
@@ -504,7 +504,7 @@ RTMPServer::packetRead(cygnal::Buffer &buf)
 	buf = _que->merge(buf);
     }
     while ((ptr - buf->begin()) < static_cast<int>(actual_size)) {
-	boost::shared_ptr<cygnal::Element> el(new cygnal::Element);
+	std::shared_ptr<cygnal::Element> el(new cygnal::Element);
 	if (ptr) {
 	    ptr = amf.extractProperty(el, ptr);
 	    addProperty(el);
@@ -525,7 +525,7 @@ RTMPServer::packetRead(cygnal::Buffer &buf)
 	  break;
       case USER:
       {
-	  boost::shared_ptr<rtmp_ping_t> ping = decodePing(ptr);
+	  std::shared_ptr<rtmp_ping_t> ping = decodePing(ptr);
 	  switch (ping->type) {
 	    case PING_CLEAR:
 		break;
@@ -603,14 +603,14 @@ RTMPServer::packetRead(cygnal::Buffer &buf)
 //
 // _result(double ClientStream, NULL, double ServerStream)
 // These are handlers for the various types
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
 {
 //    GNASH_REPORT_FUNCTION;
     return encodeResult(status, _filespec, _streamid);
 }
     
-boost::shared_ptr<cygnal::Buffer> 
+std::shared_ptr<cygnal::Buffer>
 RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -618,14 +618,14 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
     return encodeResult(status, filename, _streamid, clientid);
 }
 
-boost::shared_ptr<cygnal::Buffer> 
+std::shared_ptr<cygnal::Buffer>
 RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double &clientid)
 {
 //    GNASH_REPORT_FUNCTION;
     return encodeResult(status, filename, _streamid, clientid);
 }
 
-boost::shared_ptr<cygnal::Buffer> 
+std::shared_ptr<cygnal::Buffer>
 RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, double &transid)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -633,7 +633,7 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, double &transid)
     return encodeResult(status, "", transid, clientid);
 }
 
-boost::shared_ptr<cygnal::Buffer> 
+std::shared_ptr<cygnal::Buffer>
 RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double &transid, double &clientid)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -674,15 +674,15 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
       {
 // 	  errstr = new Element;
 // 	  errstr->makeString("error");
-	  boost::shared_ptr<cygnal::Element> level(new Element);
+	  std::shared_ptr<cygnal::Element> level(new Element);
 	  level->makeString("level", "error");
 	  top.addProperty(level);
 
-	  boost::shared_ptr<cygnal::Element> description(new Element);
+	  std::shared_ptr<cygnal::Element> description(new Element);
 	  description->makeString("description", "Connection Failed.");
 	  top.addProperty(description);
 	  
-	  boost::shared_ptr<cygnal::Element> code(new Element);
+	  std::shared_ptr<cygnal::Element> code(new Element);
 	  code->makeString("code", "Connection.Connect.Failed");
 	  top.addProperty(code);
       }
@@ -692,29 +692,29 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
 // 	  delete str;
 // 	  str = new Element;
 // 	  str->makeString("error");
-	  boost::shared_ptr<cygnal::Element> level(new Element);
+	  std::shared_ptr<cygnal::Element> level(new Element);
 	  level->makeString("level", "error");
 	  top.addProperty(level);
 
-	  boost::shared_ptr<cygnal::Element> description(new Element);
+	  std::shared_ptr<cygnal::Element> description(new Element);
 	  description->makeString("description", "Connection Rejected.");
 	  top.addProperty(description);
 	  
-	  boost::shared_ptr<cygnal::Element> code(new Element);
+	  std::shared_ptr<cygnal::Element> code(new Element);
 	  code->makeString("code", "NetConnection.Connect.Rejected");
 	  top.addProperty(code);
       }
       case RTMPMsg::NC_CONNECT_SUCCESS:
       {
-	  boost::shared_ptr<cygnal::Element> level(new Element);
+	  std::shared_ptr<cygnal::Element> level(new Element);
 	  level->makeString("level", "status");
 	  top.addProperty(level);
 	  
-	  boost::shared_ptr<cygnal::Element> code(new Element);
+	  std::shared_ptr<cygnal::Element> code(new Element);
 	  code->makeString("code", "NetConnection.Connect.Success");
 	  top.addProperty(code);
 
-	  boost::shared_ptr<cygnal::Element> description(new Element);
+	  std::shared_ptr<cygnal::Element> description(new Element);
 	  description->makeString("description", "Connection succeeded.");
 	  top.addProperty(description);
       }
@@ -732,15 +732,15 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
       {
 	  str->makeString("onStatus");
 
-	  boost::shared_ptr<cygnal::Element> level(new Element);
+	  std::shared_ptr<cygnal::Element> level(new Element);
 	  level->makeString("level", "status");
 	  top.addProperty(level);
 
-	  boost::shared_ptr<cygnal::Element> code(new Element);
+	  std::shared_ptr<cygnal::Element> code(new Element);
 	  code->makeString("code", "NetStream.Pause.Notify");
 	  top.addProperty(code);
 
-	  boost::shared_ptr<cygnal::Element> description(new Element);
+	  std::shared_ptr<cygnal::Element> description(new Element);
 	  string field = "Pausing ";
 	  if (!filename.empty()) {
 	      field += filename;
@@ -748,11 +748,11 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
 	  description->makeString("description", field);
 	  top.addProperty(description);
 	  
-	  boost::shared_ptr<cygnal::Element> details(new Element);
+	  std::shared_ptr<cygnal::Element> details(new Element);
 	  details->makeString("details", filename);
 	  top.addProperty(details);
   
-	  boost::shared_ptr<cygnal::Element> cid(new Element);
+	  std::shared_ptr<cygnal::Element> cid(new Element);
 	  cid->makeNumber("clientid", clientid);
 	  top.addProperty(cid);
 
@@ -771,15 +771,15 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
       {
 	  str->makeString("onStatus");
 //	  "clientid"
-	  boost::shared_ptr<cygnal::Element> level(new Element);
+	  std::shared_ptr<cygnal::Element> level(new Element);
 	  level->makeString("level", "status");
 	  top.addProperty(level);
 
-	  boost::shared_ptr<cygnal::Element> code(new Element);
+	  std::shared_ptr<cygnal::Element> code(new Element);
 	  code->makeString("code", "NetStream.Play.Reset");
 	  top.addProperty(code);
 
-	  boost::shared_ptr<cygnal::Element> description(new Element);
+	  std::shared_ptr<cygnal::Element> description(new Element);
 	  string field = "Playing and resetting ";
 	  if (!filename.empty()) {
 	      field += filename;
@@ -787,11 +787,11 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
 	  description->makeString("description", field);
 	  top.addProperty(description);
 	  
-	  boost::shared_ptr<cygnal::Element> details(new Element);
+	  std::shared_ptr<cygnal::Element> details(new Element);
 	  details->makeString("details", filename);
 	  top.addProperty(details);
 	  
-	  boost::shared_ptr<cygnal::Element> cid(new Element);
+	  std::shared_ptr<cygnal::Element> cid(new Element);
 #ifdef CLIENT_ID_NUMERIC
 	  double clientid = createClientID();
 	  cid->makeNumber("clientid", clientid);
@@ -813,15 +813,15 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
       {
 	  str->makeString("onStatus");
 
-	  boost::shared_ptr<cygnal::Element> level(new Element);
+	  std::shared_ptr<cygnal::Element> level(new Element);
 	  level->makeString("level", "status");
 	  top.addProperty(level);
 
-	  boost::shared_ptr<cygnal::Element> code(new Element);
+	  std::shared_ptr<cygnal::Element> code(new Element);
 	  code->makeString("code", "NetStream.Play.Start");
 	  top.addProperty(code);
 
-	  boost::shared_ptr<cygnal::Element> description(new Element);
+	  std::shared_ptr<cygnal::Element> description(new Element);
 	  string field = "Started playing ";
 	  if (!filename.empty()) {
 	      field += filename;
@@ -829,11 +829,11 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
 	  description->makeString("description", field);
 	  top.addProperty(description);
 	  
-	  boost::shared_ptr<cygnal::Element> details(new Element);
+	  std::shared_ptr<cygnal::Element> details(new Element);
 	  details->makeString("details", filename);
 	  top.addProperty(details);
   
-	  boost::shared_ptr<cygnal::Element> cid(new Element);
+	  std::shared_ptr<cygnal::Element> cid(new Element);
 #ifdef CLIENT_ID_NUMERIC
 	  double clientid = createClientID();
 	  cid->makeNumber("clientid", clientid);
@@ -854,15 +854,15 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
       case RTMPMsg::NS_PLAY_STOP:
       case RTMPMsg::NS_PLAY_STREAMNOTFOUND:
       {
-	  boost::shared_ptr<cygnal::Element> level(new Element);
+	  std::shared_ptr<cygnal::Element> level(new Element);
 	  level->makeString("level", "error");
 	  top.addProperty(level);
 
-	  boost::shared_ptr<cygnal::Element> description(new Element);
+	  std::shared_ptr<cygnal::Element> description(new Element);
 	  description->makeString("description", "NetStream.Play.StreamNotFound.");
 	  top.addProperty(description);
 	  
-	  boost::shared_ptr<cygnal::Element> code(new Element);
+	  std::shared_ptr<cygnal::Element> code(new Element);
 	  code->makeString("code", "NetStream.Play.StreamNotFound");
 	  top.addProperty(code);
 	  break;
@@ -898,7 +898,7 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
 	  // Don't encode as an object, just the properties
 	  notobject = true;
 
-	  boost::shared_ptr<cygnal::Element> id2(new Element);
+	  std::shared_ptr<cygnal::Element> id2(new Element);
 	  
 	  double sid = createStreamID();
 	  id2->makeNumber(sid);
@@ -912,11 +912,11 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
 	  break;
     };
     
-    boost::shared_ptr<cygnal::Buffer> strbuf = str->encode();
-    boost::shared_ptr<cygnal::Buffer> numbuf = number->encode();
-    boost::shared_ptr<cygnal::Buffer> topbuf = top.encode(notobject);
+    std::shared_ptr<cygnal::Buffer> strbuf = str->encode();
+    std::shared_ptr<cygnal::Buffer> numbuf = number->encode();
+    std::shared_ptr<cygnal::Buffer> topbuf = top.encode(notobject);
 
-    boost::shared_ptr<cygnal::Buffer> buf(new Buffer(strbuf->size() + numbuf->size() + topbuf->size()));
+    std::shared_ptr<cygnal::Buffer> buf(new Buffer(strbuf->size() + numbuf->size() + topbuf->size()));
     *buf += strbuf;
     *buf += numbuf;
     boost::uint8_t byte = static_cast<boost::uint8_t>(RTMP::WINDOW_SIZE & 0x000000ff);
@@ -948,20 +948,20 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
 // A RTMP Ping packet looks like this: "02 00 00 00 00 00 06 04 00 00 00 00 00 00 00 00 00 0",
 // which is the Ping type byte, followed by two shorts that are the parameters. Only the first
 // two paramters are required.
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 RTMPServer::encodePing(rtmp_ping_e type)
 {
 //    GNASH_REPORT_FUNCTION;
     return encodePing(type, 0);
 }
 
-boost::shared_ptr<Buffer>
+std::shared_ptr<Buffer>
 RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
 {
 //    GNASH_REPORT_FUNCTION;
 
     // An encoded ping message 
-    boost::shared_ptr<cygnal::Buffer> buf(new Buffer(sizeof(boost::uint16_t) * 3));
+    std::shared_ptr<cygnal::Buffer> buf(new Buffer(sizeof(boost::uint16_t) * 3));
 //    boost::uint8_t *ptr = buf->reference();
 
     // Set the type of this ping message
@@ -1017,7 +1017,7 @@ RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
 }
 
 // Encode a onBWDone message for the client. These are of a fixed size.
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 RTMPServer::encodeBWDone(double id)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -1032,11 +1032,11 @@ RTMPServer::encodeBWDone(double id)
     Element null;
     null.makeNull();
 
-    boost::shared_ptr<cygnal::Buffer> enccmd  = cmd.encode();
-    boost::shared_ptr<cygnal::Buffer> encnum  = num.encode();
-    boost::shared_ptr<cygnal::Buffer> encnull  = null.encode();
+    std::shared_ptr<cygnal::Buffer> enccmd  = cmd.encode();
+    std::shared_ptr<cygnal::Buffer> encnum  = num.encode();
+    std::shared_ptr<cygnal::Buffer> encnull  = null.encode();
 
-    boost::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer(enccmd->size()
+    std::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer(enccmd->size()
 						       + encnum->size()
 						       + encnull->size()));
 
@@ -1047,12 +1047,12 @@ RTMPServer::encodeBWDone(double id)
     return buf;
 }
 
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 RTMPServer::encodeAudio(boost::uint8_t *data, size_t size)
 {
     GNASH_REPORT_FUNCTION;
     
-    boost::shared_ptr<cygnal::Buffer> buf;
+    std::shared_ptr<cygnal::Buffer> buf;
     
     if (size) {
 	if (data) {
@@ -1064,12 +1064,12 @@ RTMPServer::encodeAudio(boost::uint8_t *data, size_t size)
     return buf;
 }
 
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 RTMPServer::encodeVideo(boost::uint8_t * /* data */, size_t /* size */)
 {
     GNASH_REPORT_FUNCTION;
 
-    boost::shared_ptr<cygnal::Buffer> buf;
+    std::shared_ptr<cygnal::Buffer> buf;
     
     return buf;
 }
@@ -1077,30 +1077,30 @@ RTMPServer::encodeVideo(boost::uint8_t * /* data */, size_t /* size */)
 #if 0
 // Parse an Echo Request message coming from the Red5 echo_test. This
 // method should only be used for testing purposes.
-vector<boost::shared_ptr<cygnal::Element > >
+vector<std::shared_ptr<cygnal::Element > >
 RTMPServer::parseEchoRequest(boost::uint8_t *ptr, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     AMF amf;
-    vector<boost::shared_ptr<cygnal::Element > > headers;
+    vector<std::shared_ptr<cygnal::Element > > headers;
 
     // The first element is the name of the test, 'echo'
-    boost::shared_ptr<cygnal::Element> el1 = amf.extractAMF(ptr, ptr+size);
+    std::shared_ptr<cygnal::Element> el1 = amf.extractAMF(ptr, ptr+size);
     ptr += amf.totalsize();
     headers.push_back(el1);
 
     // The second element is the number of the test,
-    boost::shared_ptr<cygnal::Element> el2 = amf.extractAMF(ptr, ptr+size);
+    std::shared_ptr<cygnal::Element> el2 = amf.extractAMF(ptr, ptr+size);
     ptr += amf.totalsize();
     headers.push_back(el2);
 
     // This one has always been a NULL object from my tests
-    boost::shared_ptr<cygnal::Element> el3 = amf.extractAMF(ptr, ptr+size);
+    std::shared_ptr<cygnal::Element> el3 = amf.extractAMF(ptr, ptr+size);
     ptr += amf.totalsize();
     headers.push_back(el3);
 
     // This one has always been an NULL or Undefined object from my tests
-    boost::shared_ptr<cygnal::Element> el4 = amf.extractAMF(ptr, ptr+size);
+    std::shared_ptr<cygnal::Element> el4 = amf.extractAMF(ptr, ptr+size);
     if (!el4) {
 	log_error(_("Couldn't reliably extract the echo data!"));
     }
@@ -1114,22 +1114,22 @@ RTMPServer::parseEchoRequest(boost::uint8_t *ptr, size_t size)
 // is only used for testing by developers. The format appears to be
 // a string '_result', followed by the number of the test, and then two
 // NULL objects.
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 RTMPServer::formatEchoResponse(double num, cygnal::Element &el)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<cygnal::Buffer> data = amf::AMF::encodeElement(el);
+    std::shared_ptr<cygnal::Buffer> data = amf::AMF::encodeElement(el);
     return formatEchoResponse(num, data->reference(), data->allocated());
 }
 
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 RTMPServer::formatEchoResponse(double num, cygnal::Buffer &data)
 {
 //    GNASH_REPORT_FUNCTION;
     return formatEchoResponse(num, data.reference(), data.allocated());
 }
 
-boost::shared_ptr<cygnal::Buffer>
+std::shared_ptr<cygnal::Buffer>
 RTMPServer::formatEchoResponse(double num, boost::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -1144,11 +1144,11 @@ RTMPServer::formatEchoResponse(double num, boost::uint8_t *data, size_t size)
     Element null;
     null.makeNull();
 
-    boost::shared_ptr<cygnal::Buffer> encecho = echo.encode();
-    boost::shared_ptr<cygnal::Buffer> encidx  = index.encode();   
-    boost::shared_ptr<cygnal::Buffer> encnull  = null.encode();   
+    std::shared_ptr<cygnal::Buffer> encecho = echo.encode();
+    std::shared_ptr<cygnal::Buffer> encidx  = index.encode();
+    std::shared_ptr<cygnal::Buffer> encnull  = null.encode();
 
-    boost::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer(encecho->size()
+    std::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer(encecho->size()
 						       + encidx->size()
 						       + encnull->size() + size));
 
@@ -1241,7 +1241,7 @@ RTMPServer::sendFile(int fd, const std::string &filespec)
 {
     GNASH_REPORT_FUNCTION;
     // See if the file is in the cache and already opened.
-    boost::shared_ptr<DiskStream> filestream(cache.findFile(filespec));
+    std::shared_ptr<DiskStream> filestream(cache.findFile(filespec));
     if (filestream) {
 	cerr << "FIXME: found file in cache!" << endl;
     } else {
@@ -1357,7 +1357,7 @@ rtmp_handler(Network::thread_params_t *args)
     string url, filespec;
     url = docroot;
     bool done = false;
-    boost::shared_ptr<RTMPMsg> body;
+    std::shared_ptr<RTMPMsg> body;
     // static bool initialize = true;
 //     bool sendfile = false;
     log_network("Starting RTMP Handler for fd #%d, cgi-bin is \"%s\"",
@@ -1371,10 +1371,10 @@ rtmp_handler(Network::thread_params_t *args)
     // Adjust the timeout
     rtmp->setTimeout(10);
     
-    boost::shared_ptr<cygnal::Buffer>  pkt;
-    boost::shared_ptr<cygnal::Element> tcurl;
-    boost::shared_ptr<cygnal::Element> swfurl;
-    boost::shared_ptr<cygnal::Buffer> response;
+    std::shared_ptr<cygnal::Buffer>  pkt;
+    std::shared_ptr<cygnal::Element> tcurl;
+    std::shared_ptr<cygnal::Element> swfurl;
+    std::shared_ptr<cygnal::Buffer> response;
 
     // Keep track of the network statistics
     // See if we have any messages waiting. After the initial connect, this is
@@ -1382,7 +1382,7 @@ rtmp_handler(Network::thread_params_t *args)
     
     // Adjust the timeout
     rtmp->setTimeout(30);
-//    boost::shared_ptr<cygnal::Buffer> buf;
+//    std::shared_ptr<cygnal::Buffer> buf;
 
     // If we have active disk streams, send those packets first.
     // 0 is a reserved stream, so we start with 1, as the reserved
@@ -1418,14 +1418,14 @@ rtmp_handler(Network::thread_params_t *args)
 	if (pkt != 0) {
 	    boost::uint8_t *tmpptr = 0;
 	    if (pkt->allocated()) {
-		boost::shared_ptr<RTMP::queues_t> que = rtmp->split(*pkt);
+		std::shared_ptr<RTMP::queues_t> que = rtmp->split(*pkt);
 		if (!que) {
 		    // FIXME: send _error result
 		    return false;
 		}
-		boost::shared_ptr<RTMP::rtmp_head_t> qhead;
+		std::shared_ptr<RTMP::rtmp_head_t> qhead;
 		for (size_t i=0; i<que->size(); i++) {
-		    boost::shared_ptr<cygnal::Buffer> bufptr = que->at(i)->pop();
+		    std::shared_ptr<cygnal::Buffer> bufptr = que->at(i)->pop();
 		    // que->at(i)->dump();
 		    if (bufptr) {
 			// bufptr->dump();
@@ -1437,7 +1437,7 @@ rtmp_handler(Network::thread_params_t *args)
 			tmpptr = bufptr->reference() + qhead->head_size;
 			if (qhead->channel == RTMP_SYSTEM_CHANNEL) {
 			    if (qhead->type == RTMP::USER) {
-				boost::shared_ptr<RTMP::user_event_t> user
+				std::shared_ptr<RTMP::user_event_t> user
 				    = rtmp->decodeUserControl(tmpptr);
 				switch (user->type) {
 				  case RTMP::STREAM_START:
@@ -1457,7 +1457,7 @@ rtmp_handler(Network::thread_params_t *args)
 				      break;
 				  case RTMP::STREAM_PING:
 				  {
-				      boost::shared_ptr<RTMP::rtmp_ping_t> ping
+				      std::shared_ptr<RTMP::rtmp_ping_t> ping
 					  = rtmp->decodePing(tmpptr);
 				      log_network("Processed Ping message from client, type %d",
 						  ping->type);
@@ -1547,8 +1547,8 @@ rtmp_handler(Network::thread_params_t *args)
 			      }
 			  } else if (body->getMethodName() == "play") {
 			      string filespec;
-			      boost::shared_ptr<gnash::RTMPMsg> nc = rtmp->getNetConnection();
-			      boost::shared_ptr<cygnal::Element> tcurl = nc->findProperty("tcUrl");
+			      std::shared_ptr<gnash::RTMPMsg> nc = rtmp->getNetConnection();
+			      std::shared_ptr<cygnal::Element> tcurl = nc->findProperty("tcUrl");
 			      URL url(tcurl->to_string());
 			      filespec += url.hostname() + url.path();
 			      filespec += '/';
@@ -1650,7 +1650,7 @@ rtmp_handler(Network::thread_params_t *args)
 			      log_error(_("Received an _error message from the client!"));
 			  } else {
 			      /* size_t ret = */ hand->writeToPlugin(tmpptr, qhead->bodysize);
-			      boost::shared_ptr<cygnal::Buffer> result = hand->readFromPlugin();
+			      std::shared_ptr<cygnal::Buffer> result = hand->readFromPlugin();
 			      if (result) {
 				  if (rtmp->sendMsg(args->netfd, qhead->channel,
 						    RTMP::HEADER_8, result->allocated(),
@@ -1675,7 +1675,7 @@ rtmp_handler(Network::thread_params_t *args)
 
 		    // size_t ret = hand->writeToPlugin(tmpptr, qhead->bodysize);
 #if 0
-		    boost::shared_ptr<cygnal::Buffer> result = hand->readFromPlugin();
+		    std::shared_ptr<cygnal::Buffer> result = hand->readFromPlugin();
  		    if (result) { // FIXME: this needs a real channel number
 			if (rtmp->sendMsg(args->netfd, 0x3, RTMP::HEADER_8, ret,
 					  RTMP::INVOKE, RTMPMsg::FROM_SERVER, *result)) {
@@ -1694,7 +1694,7 @@ rtmp_handler(Network::thread_params_t *args)
 		log_network("Never read any data from fd #%d", args->netfd);
 #if 0
 		// Send a ping to reset the new stream
-		boost::shared_ptr<cygnal::Buffer> ping_reset =
+		std::shared_ptr<cygnal::Buffer> ping_reset =
 		    rtmp->encodePing(RTMP::PING_CLEAR, 0);
 		if (rtmp->sendMsg(args->netfd, RTMP_SYSTEM_CHANNEL,
 			  RTMP::HEADER_12, ping_reset->size(),

@@ -107,12 +107,12 @@ MovieTester::MovieTester(const std::string& url)
     _runResources->setMediaHandler(_mediaHandler);
 #endif
     
-    boost::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
+    std::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
     addDefaultLoaders(*loaders);
     
     _runResources->setTagLoaders(loaders);
     
-    boost::shared_ptr<StreamProvider> sp(new StreamProvider(url, url));
+    std::shared_ptr<StreamProvider> sp(new StreamProvider(url, url));
 
     _runResources->setStreamProvider(sp);
 
@@ -172,7 +172,7 @@ MovieTester::MovieTester(const std::string& url)
 }
     
 void
-MovieTester::render(boost::shared_ptr<Renderer> h,
+MovieTester::render(std::shared_ptr<Renderer> h,
 		    InvalidatedRanges& invalidated_regions) 
 {
     
@@ -538,7 +538,7 @@ MovieTester::soundsStopped()
 void
 MovieTester::initTestingRenderers()
 {
-    boost::shared_ptr<Renderer> handler;
+    std::shared_ptr<Renderer> handler;
     
     // TODO: add support for testing multiple renderers
     // This is tricky as requires changes in the core lib
@@ -581,7 +581,7 @@ MovieTester::initTestingRenderers()
 }
 
 void
-MovieTester::addTestingRenderer(boost::shared_ptr<Renderer> h,
+MovieTester::addTestingRenderer(std::shared_ptr<Renderer> h,
         const std::string& name)
 {
     if ( ! h->initTestBuffer(_width, _height) )	{
