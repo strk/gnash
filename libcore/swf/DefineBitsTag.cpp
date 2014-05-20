@@ -26,7 +26,6 @@
 
 #include <limits>
 #include <cassert>
-#include <boost/static_assert.hpp>
 
 #include "IOChannel.h"
 #include "utility.h"
@@ -615,7 +614,8 @@ inflateWrapper(SWFStream& in, void* buffer, size_t buffer_bytes)
             chunkSize = availableBytes;
         }
     
-        BOOST_STATIC_ASSERT(sizeof(char) == sizeof(boost::uint8_t));
+        static_assert(sizeof(char) == sizeof(boost::uint8_t),
+            "char must be 1 byte");
 
         // Fill the buffer    
         in.read(reinterpret_cast<char*>(buf), chunkSize);

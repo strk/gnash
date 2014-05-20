@@ -22,7 +22,6 @@
 
 #include <string>
 #include <cstring> // for memcpy
-#include <boost/static_assert.hpp>
 
 #include "log.h"
 #include "SWFStream.h"
@@ -574,7 +573,7 @@ convert_double_wacky(const void *p)
         } c;
     } u;
 
-    BOOST_STATIC_ASSERT(sizeof(u) == sizeof(u.i));
+    static_assert(sizeof(u) == sizeof(u.i), "u must be 8 bytes");
 
     // Detect endianness of doubles by storing a value that is
     // exactly representable and that has different values in the

@@ -28,7 +28,6 @@
 
 #include <cstring>
 #include <climits>
-#include <boost/static_assert.hpp>
 
 //#define USE_TU_FILE_BYTESWAPPING 1
 
@@ -312,7 +311,7 @@ double SWFStream::read_d64()
     const unsigned short dataLength = 8;
     double d = 0;
 
-    BOOST_STATIC_ASSERT(sizeof(double) == dataLength);
+    static_assert(sizeof(double) == dataLength, "double must be 8 bytes");
 
     // Should align:
     if (read(reinterpret_cast<char*>(&d), dataLength) < dataLength)
