@@ -59,7 +59,8 @@ public:
         _bytesRead(0),
         _tagOpen(false),
         _endRead(0),
-        _nextTagEnd(0)
+        _nextTagEnd(0),
+        _tag(SWF::END) // Initialized to zero to have a well known value
 
     {
     }
