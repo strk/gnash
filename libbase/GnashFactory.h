@@ -29,8 +29,7 @@
 #include <string>
 #include <algorithm>
 #include <iterator>
-#include <boost/type_traits.hpp>
-#include <boost/utility/enable_if.hpp>
+#include <type_traits>
 
 #include "dsodefs.h"
 #include "GnashAlgorithm.h"
@@ -84,12 +83,12 @@ public:
     /// Dump the registered keys to the iterator.
     //
     /// Only usable with output iterators.
-    template<typename Iterator>
-    void listKeys(Iterator i, typename boost::enable_if<boost::is_same<
-              typename std::iterator_traits<Iterator>::iterator_category,
-              std::output_iterator_tag> >::type* dummy = 0) {
+    template<typename Iterator, typename std::enable_if<
+        std::is_same<typename std::iterator_traits<Iterator>::iterator_category,
+            std::output_iterator_tag>::value>::type = 0>
+    void
+    listKeys(Iterator i) {
         Init();
-        static_cast<void>(dummy);
         std::transform(_handlers.begin(), _handlers.end(), i,
                 std::bind(&Handlers::value_type::first, std::placeholders::_1));
     }

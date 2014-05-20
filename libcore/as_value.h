@@ -23,7 +23,7 @@
 #include <string>
 #include <boost/variant.hpp>
 #include <iosfwd> // for inlined output operator
-#include <boost/utility/enable_if.hpp>
+#include <type_traits>
 #include <boost/cstdint.hpp>
 
 #include "utility.h" // for UNUSED
@@ -150,7 +150,7 @@ public:
     
     /// Construct a primitive Boolean value
     template <typename T>
-    as_value(T val, typename boost::enable_if<boost::is_same<bool, T> >::type*
+    as_value(T val, typename std::enable_if<boost::is_same<bool, T>::value>::type*
              dummy = 0)
         :
         _type(BOOLEAN),

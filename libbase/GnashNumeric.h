@@ -34,8 +34,7 @@
 #include <algorithm>
 #include <boost/cstdint.hpp>
 #include <limits>
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_floating_point.hpp>
+#include <type_traits>
 
 namespace gnash {
 
@@ -59,7 +58,7 @@ isFinite(double d)
 
 template <typename T>
 inline
-typename boost::enable_if<boost::is_floating_point<T>, bool>::type
+typename std::enable_if<std::is_floating_point<T>::value, bool>::type
 isNaN(const T& num)
 {
     return num != num;
