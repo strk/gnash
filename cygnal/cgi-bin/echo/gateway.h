@@ -42,12 +42,12 @@ public:
     // Parse an Echo Request message coming from the Red5 echo_test.
     std::vector<std::shared_ptr<amf::Element > > parseEchoRequest(amf::Buffer &buf)
         { return parseEchoRequest(buf.reference(), buf.size()); };
-    std::vector<std::shared_ptr<amf::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
+    std::vector<std::shared_ptr<amf::Element > > parseEchoRequest(std::uint8_t *buf, size_t size);
 
     // format a response to the 'echo' test used for testing Gnash.
     amf::Buffer &formatEchoResponse(const std::string &num, amf::Element &el);
     amf::Buffer &formatEchoResponse(const std::string &num, amf::Buffer &data);
-    amf::Buffer &formatEchoResponse(const std::string &num, boost::uint8_t *data, size_t size);
+    amf::Buffer &formatEchoResponse(const std::string &num, std::uint8_t *data, size_t size);
 private:
 };
 

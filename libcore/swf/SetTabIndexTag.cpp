@@ -33,14 +33,14 @@ SetTabIndexTag::loader(SWFStream& in, TagType /*tag*/, movie_definition& /*md*/,
         const RunResources& /*r*/)
 {
     in.ensureBytes(2);
-    boost::uint16_t depth = in.read_u16();
+    std::uint16_t depth = in.read_u16();
 
     IF_VERBOSE_PARSE(
             log_parse("SetTabIndexTag: depth = %d", depth);
     );
 
     in.ensureBytes(2);
-    boost::uint16_t tab_index = in.read_u16();
+    std::uint16_t tab_index = in.read_u16();
     UNUSED(tab_index);
 
     LOG_ONCE( log_unimpl("SetTabIndexTag") );

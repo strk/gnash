@@ -28,7 +28,7 @@
 #include "dsodefs.h" // for DSOEXPORT
 
 #include <iosfwd> 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 // Forward declarations
 namespace gnash {
@@ -76,27 +76,27 @@ public:
         _ty(y)
     {}
 
-    boost::int32_t a() const {
+    std::int32_t a() const {
         return _a;
     }
 
-    boost::int32_t b() const {
+    std::int32_t b() const {
         return _b;
     }
 
-    boost::int32_t c() const {
+    std::int32_t c() const {
         return _c;
     }
 
-    boost::int32_t d() const {
+    std::int32_t d() const {
         return _d;
     }
 
-    boost::int32_t tx() const {
+    std::int32_t tx() const {
         return _tx;
     }
 
-    boost::int32_t ty() const {
+    std::int32_t ty() const {
         return _ty;
     }
 
@@ -159,7 +159,7 @@ public:
     void transform(geometry::Point2d& p) const;
 
     /// Transform the given point by our SWFMatrix.
-    void transform(boost::int32_t& x, boost::int32_t& y) const;
+    void transform(std::int32_t& x, std::int32_t& y) const;
     
     /// Transform point 'p' by our SWFMatrix. 
     //
@@ -171,7 +171,7 @@ public:
     //
     /// NULL and WORLD ranges are untouched.
     ///
-    void transform(geometry::Range2d<boost::int32_t>& r) const;
+    void transform(geometry::Range2d<std::int32_t>& r) const;
 
     void transform(SWFRect& r) const;
     
@@ -203,25 +203,25 @@ public:
 private: 
 
     /// Return the determinant of this SWFMatrix in 32.32 fixed point format.
-    boost::int64_t  determinant() const;
+    std::int64_t  determinant() const;
 
     /// Xscale, 16.16 fixed point. xx in swfdec. 'a' in AS Matrix.
-    boost::int32_t _a; 
+    std::int32_t _a;
 
     /// Xshear, 16.16 fixed point. yx in swfdec. 'b' in AS Matrix.
-    boost::int32_t _b;
+    std::int32_t _b;
 
     /// Yshear, 16.16 fixed point. xy in swfdec. 'c' in AS Matrix.
-    boost::int32_t _c;
+    std::int32_t _c;
 
     /// Yscale, 16.16 fixed point. yy in swfdec. 'd' in AS Matrix.
-    boost::int32_t _d; 
+    std::int32_t _d;
 
     /// Xtranslation, TWIPS. x0 in swfdec. '_tx' in AS Matrix.
-    boost::int32_t _tx; 
+    std::int32_t _tx;
 
     /// Ytranslation, TWIPS. y0 in swfdec. '_ty' in AS Matrix.
-    boost::int32_t _ty; 
+    std::int32_t _ty;
              
 
 }; //end of SWFMatrix

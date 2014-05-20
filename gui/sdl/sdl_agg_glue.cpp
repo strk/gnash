@@ -83,7 +83,7 @@ SdlAggGlue::createRenderHandler(int bpp)
 
 
 bool
-SdlAggGlue::prepDrawingArea(int width, int height, boost::uint32_t sdl_flags)
+SdlAggGlue::prepDrawingArea(int width, int height, std::uint32_t sdl_flags)
 {
     int depth_bytes = _bpp / 8;  // TODO: <Udo> is this correct? Gives 1 for 15 bit modes!
 
@@ -98,7 +98,7 @@ SdlAggGlue::prepDrawingArea(int width, int height, boost::uint32_t sdl_flags)
 
     int stride = width * depth_bytes;
 
-    boost::uint32_t rmask, gmask, bmask, amask;
+    std::uint32_t rmask, gmask, bmask, amask;
 
     switch(_bpp) {
       case 32: // RGBA32

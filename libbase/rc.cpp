@@ -25,7 +25,7 @@
 
 #include "rc.h"
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <limits>
 #include <cstdlib> // getenv
 #include <string>

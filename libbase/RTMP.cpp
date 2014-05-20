@@ -45,7 +45,7 @@ namespace {
 
     bool sendBytesReceived(RTMP* r);
 
-    void handleMetadata(RTMP& r, const boost::uint8_t *payload,
+    void handleMetadata(RTMP& r, const std::uint8_t *payload,
             unsigned int len);
     void handleChangeChunkSize(RTMP& r, const RTMPPacket& packet);
     void handleControl(RTMP& r, const RTMPPacket& packet);
@@ -53,12 +53,12 @@ namespace {
     void handleClientBW(RTMP& r, const RTMPPacket& packet);
     
     void setupInvokePacket(RTMPPacket& packet);
-    boost::uint32_t getUptime();
+    std::uint32_t getUptime();
 
-    boost::int32_t decodeInt32LE(const boost::uint8_t* c);
-    int encodeInt32LE(boost::uint8_t *output, int nVal);
-    unsigned int decodeInt24(const boost::uint8_t* c);
-    boost::uint8_t* encodeInt24(boost::uint8_t *output, boost::uint8_t *outend,
+    std::int32_t decodeInt32LE(const std::uint8_t* c);
+    int encodeInt32LE(std::uint8_t *output, int nVal);
+    unsigned int decodeInt24(const std::uint8_t* c);
+    std::uint8_t* encodeInt24(std::uint8_t *output, std::uint8_t *outend,
             int nVal);
 
     static const int packetSize[] = { 12, 8, 4, 1 };
@@ -72,7 +72,7 @@ namespace {
 /// TODO: do this properly (it's currently not very random).
 struct RandomByte
 {
-    boost::uint8_t operator()() const {
+    std::uint8_t operator()() const {
         return std::rand() % 256;
     }
 };
@@ -111,8 +111,8 @@ private:
     bool stage3();
 
     Socket _socket;
-    std::vector<boost::uint8_t> _sendBuf;
-    std::vector<boost::uint8_t> _recvBuf;
+    std::vector<std::uint8_t> _sendBuf;
+    std::vector<std::uint8_t> _recvBuf;
     bool _error;
     bool _complete;
     size_t _stage;
@@ -205,10 +205,10 @@ RTMP::connect(const URL& url)
     const std::string& p = url.port();
 
     // Default port.
-    boost::uint16_t port = 1935;
+    std::uint16_t port = 1935;
     if (!p.empty()) {
         try {
-            port = boost::lexical_cast<boost::uint16_t>(p);
+            port = boost::lexical_cast<std::uint16_t>(p);
         }
         catch (const boost::bad_lexical_cast&) {}
     }
@@ -356,7 +356,7 @@ RTMP::handlePacket(const RTMPPacket& packet)
 }
 
 int
-RTMP::readSocket(boost::uint8_t* buffer, int n)
+RTMP::readSocket(std::uint8_t* buffer, int n)
 {
 
     assert(n >= 0);
@@ -427,8 +427,8 @@ RTMP::readPacketHeader(RTMPPacket& packet)
       
     RTMPHeader& hr = packet.header;
 
-    boost::uint8_t hbuf[RTMPHeader::headerSize] = { 0 };
-    boost::uint8_t* header = hbuf;
+    std::uint8_t hbuf[RTMPHeader::headerSize] = { 0 };
+    std::uint8_t* header = hbuf;
   
     // The first read may fail, but otherwise we expect a complete header.
     if (readSocket(hbuf, 1) == 0) {
@@ -461,7 +461,7 @@ RTMP::readPacketHeader(RTMPPacket& packet)
              return false;
         }
       
-        const boost::uint32_t tmp = (hbuf[2] << 8) + hbuf[1];
+        const std::uint32_t tmp = (hbuf[2] << 8) + hbuf[1];
         hr.channel = tmp + 64;
         log_debug("%s, channel: %0x", __FUNCTION__, hr.channel);
         header += 2;
@@ -495,7 +495,7 @@ RTMP::readPacketHeader(RTMPPacket& packet)
 
     if (nSize >= 3) {
 
-        const boost::uint32_t timestamp = decodeInt24(header);
+        const std::uint32_t timestamp = decodeInt24(header);
 
         // Make our packet timestamp absolute. If the value is 0xffffff,
         // the absolute value comes later.
@@ -587,7 +587,7 @@ RTMP::sendPacket(RTMPPacket& packet)
     hr.dataSize = payloadSize(packet);
 
     // This is the timestamp for our message.
-    const boost::uint32_t uptime = getUptime();
+    const std::uint32_t uptime = getUptime();
     
     // Look at the previous packet on the channel.
     bool prev = hasPacket(CHANNELS_OUT, hr.channel);
@@ -610,7 +610,7 @@ RTMP::sendPacket(RTMPPacket& packet)
 
         const RTMPPacket& prevPacket = getPacket(CHANNELS_OUT, hr.channel);
         const RTMPHeader& oldh = prevPacket.header;
-        const boost::uint32_t prevTimestamp = oldh._timestamp;
+        const std::uint32_t prevTimestamp = oldh._timestamp;
 
         // If this timestamp is later than the other and the difference fits
         // in 3 bytes, encode a relative one.
@@ -644,10 +644,10 @@ RTMP::sendPacket(RTMPPacket& packet)
     int nSize = packetSize[hr.headerType];
   
     int hSize = nSize;
-    boost::uint8_t* header;
-    boost::uint8_t* hptr;
-    boost::uint8_t* hend;
-    boost::uint8_t c;
+    std::uint8_t* header;
+    std::uint8_t* hptr;
+    std::uint8_t* hend;
+    std::uint8_t c;
 
     // If there is a payload, the same buffer is used to write the header.
     // Otherwise a separate buffer is used. But as we write them separately
@@ -691,7 +691,7 @@ RTMP::sendPacket(RTMPPacket& packet)
 
     if (hr.headerType == RTMP_PACKET_SIZE_LARGE && hr._timestamp >= 0xffffff) {
         // Signify that the extended timestamp field is present.
-        const boost::uint32_t t = 0xffffff;
+        const std::uint32_t t = 0xffffff;
         hptr = encodeInt24(hptr, hend, t);
     }
     else if (hr.headerType != RTMP_PACKET_SIZE_MINIMUM) { 
@@ -717,7 +717,7 @@ RTMP::sendPacket(RTMPPacket& packet)
     }
 
     nSize = hr.dataSize;
-    boost::uint8_t *buffer = payloadData(packet);
+    std::uint8_t *buffer = payloadData(packet);
     int nChunkSize = _outChunkSize;
 
     std::string hx = hexify(header, payloadEnd(packet) - header, false);
@@ -767,8 +767,8 @@ RTMP::sendPacket(RTMPPacket& packet)
     /* we invoked a remote method */
     if (hr.packetType == PACKET_TYPE_INVOKE) {
         assert(payloadData(packet)[0] == amf::STRING_AMF0);
-        const boost::uint8_t* pos = payloadData(packet) + 1;
-        const boost::uint8_t* end = payloadEnd(packet);
+        const std::uint8_t* pos = payloadData(packet) + 1;
+        const std::uint8_t* end = payloadEnd(packet);
         const std::string& s = amf::readString(pos, end);
         log_debug("Calling remote method %s", s);
     }
@@ -814,9 +814,9 @@ HandShaker::HandShaker(Socket& s)
     _sendBuf[0] = 0x03;
     
     // TODO: do this properly.
-    boost::uint32_t uptime = htonl(getUptime());
+    std::uint32_t uptime = htonl(getUptime());
 
-    boost::uint8_t* ourSig = &_sendBuf.front() + 1;
+    std::uint8_t* ourSig = &_sendBuf.front() + 1;
     std::memcpy(ourSig, &uptime, 4);
     std::fill_n(ourSig + 4, 4, 0);
 
@@ -893,10 +893,10 @@ HandShaker::stage1()
 	        _recvBuf[0], _sendBuf[0]);
     }
     
-    const boost::uint8_t* serverSig = &_recvBuf.front() + 1;
+    const std::uint8_t* serverSig = &_recvBuf.front() + 1;
 
     // decode server response
-    boost::uint32_t suptime;
+    std::uint32_t suptime;
     std::memcpy(&suptime, serverSig, 4);
     suptime = ntohl(suptime);
 
@@ -936,8 +936,8 @@ HandShaker::stage3()
     
     assert(got == sigSize);
 
-    const boost::uint8_t* serverSig = &_recvBuf.front();
-    const boost::uint8_t* ourSig = &_sendBuf.front() + 1;
+    const std::uint8_t* serverSig = &_recvBuf.front();
+    const std::uint8_t* ourSig = &_sendBuf.front() + 1;
 
     const bool match = std::equal(serverSig, serverSig + sigSize, ourSig);
 
@@ -1009,7 +1009,7 @@ sendBytesReceived(RTMP* r)
 
 
 void
-handleMetadata(RTMP& /*r*/, const boost::uint8_t* /* payload*/, 
+handleMetadata(RTMP& /*r*/, const std::uint8_t* /* payload*/,
         unsigned int /*len*/)
 {
     return;
@@ -1086,7 +1086,7 @@ handleControl(RTMP& r, const RTMPPacket& packet)
 void
 handleServerBW(RTMP& r, const RTMPPacket& packet)
 {
-    const boost::uint32_t bw = amf::readNetworkLong(payloadData(packet));
+    const std::uint32_t bw = amf::readNetworkLong(payloadData(packet));
     log_debug("Server bandwidth is %s", bw);
     r.setServerBandwidth(bw);
 }
@@ -1094,7 +1094,7 @@ handleServerBW(RTMP& r, const RTMPPacket& packet)
 void
 handleClientBW(RTMP& r, const RTMPPacket& packet)
 {
-    const boost::uint32_t bw = amf::readNetworkLong(payloadData(packet));
+    const std::uint32_t bw = amf::readNetworkLong(payloadData(packet));
 
     r.setBandwidth(bw);
 
@@ -1106,14 +1106,14 @@ handleClientBW(RTMP& r, const RTMPPacket& packet)
 
 
 
-boost::int32_t
-decodeInt32LE(const boost::uint8_t* c)
+std::int32_t
+decodeInt32LE(const std::uint8_t* c)
 {
     return (c[3] << 24) | (c[2] << 16) | (c[1] << 8) | c[0];
 }
 
 int
-encodeInt32LE(boost::uint8_t *output, int nVal)
+encodeInt32LE(std::uint8_t *output, int nVal)
 {
     output[0] = nVal;
     nVal >>= 8;
@@ -1136,15 +1136,15 @@ setupInvokePacket(RTMPPacket& packet)
 }
 
 unsigned int
-decodeInt24(const boost::uint8_t *c)
+decodeInt24(const std::uint8_t *c)
 {
     unsigned int val;
     val = (c[0] << 16) | (c[1] << 8) | c[2];
     return val;
 }
 
-boost::uint8_t*
-encodeInt24(boost::uint8_t *output, boost::uint8_t *outend, int nVal)
+std::uint8_t*
+encodeInt24(std::uint8_t *output, std::uint8_t *outend, int nVal)
 {
     if (output + 3 > outend) return NULL;
 
@@ -1154,7 +1154,7 @@ encodeInt24(boost::uint8_t *output, boost::uint8_t *outend, int nVal)
     return output+3;
 }
 
-boost::uint32_t
+std::uint32_t
 getUptime()
 {
     // This function returns the uptime in milliseconds, which necessarily

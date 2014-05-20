@@ -20,7 +20,7 @@
 
 #include "ASConversions.h"
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <cmath>
 #include <limits>
 
@@ -38,7 +38,7 @@ namespace gnash {
 
 namespace {
     // Handle overflows from AS ColorTransform double.
-    inline boost::int16_t truncateDouble(double d);
+    inline std::int16_t truncateDouble(double d);
 }
 
 SWFMatrix
@@ -64,18 +64,18 @@ toSWFMatrix(as_object& m)
     }
 
     // Convert input matrix to SWFMatrix.
-    const boost::int32_t a = truncateWithFactor<65536>(
+    const std::int32_t a = truncateWithFactor<65536>(
             toNumber(getMember(m, NSV::PROP_A), vm));
-    const boost::int32_t b = truncateWithFactor<65536>(
+    const std::int32_t b = truncateWithFactor<65536>(
             toNumber(getMember(m, NSV::PROP_B), vm));
-    const boost::int32_t c = truncateWithFactor<65536>(
+    const std::int32_t c = truncateWithFactor<65536>(
             toNumber(getMember(m, NSV::PROP_C), vm));
-    const boost::int32_t d = truncateWithFactor<65536>(
+    const std::int32_t d = truncateWithFactor<65536>(
             toNumber(getMember(m, NSV::PROP_D), vm));
 
-    const boost::int32_t tx = pixelsToTwips(
+    const std::int32_t tx = pixelsToTwips(
             toNumber(getMember(m, NSV::PROP_TX), vm));
-    const boost::int32_t ty = pixelsToTwips(
+    const std::int32_t ty = pixelsToTwips(
             toNumber(getMember(m, NSV::PROP_TY), vm));
     return SWFMatrix(a, b, c, d, tx, ty);
 
@@ -99,16 +99,16 @@ toCxForm(const ColorTransform_as& tr)
 
 namespace {
 
-inline boost::int16_t
+inline std::int16_t
 truncateDouble(double d)
 {
 
-    if (d > std::numeric_limits<boost::int16_t>::max() ||
-        d < std::numeric_limits<boost::int16_t>::min())
+    if (d > std::numeric_limits<std::int16_t>::max() ||
+        d < std::numeric_limits<std::int16_t>::min())
     {
-       return std::numeric_limits<boost::int16_t>::min();
+       return std::numeric_limits<std::int16_t>::min();
     }
-    return static_cast<boost::int16_t>(d);
+    return static_cast<std::int16_t>(d);
 }
 
 }

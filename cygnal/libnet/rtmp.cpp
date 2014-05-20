@@ -166,7 +166,7 @@ const char *response_str[] = {
 };
 
 int
-RTMP::headerSize(boost::uint8_t header)
+RTMP::headerSize(std::uint8_t header)
 {
     // GNASH_REPORT_FUNCTION;    
     int headersize = header & RTMP_HEADSIZE_MASK;
@@ -260,12 +260,12 @@ RTMP::decodeHeader(cygnal::Buffer &buf)
 }
 
 std::shared_ptr<RTMP::rtmp_head_t>
-RTMP::decodeHeader(boost::uint8_t *in)
+RTMP::decodeHeader(std::uint8_t *in)
 {
     // GNASH_REPORT_FUNCTION;
 
     std::shared_ptr<RTMP::rtmp_head_t> head(new RTMP::rtmp_head_t);
-    boost::uint8_t *tmpptr = in;
+    std::uint8_t *tmpptr = in;
 
     head->channel = *tmpptr & RTMP_INDEX_MASK;
     // log_network (_("The AMF channel index is %d"), head->channel);
@@ -331,7 +331,7 @@ RTMP::decodeHeader(boost::uint8_t *in)
     }
 
     if (head->head_size >= 8) {
-	boost::uint8_t byte = *tmpptr;
+	std::uint8_t byte = *tmpptr;
         head->type = (content_types_e)byte;
 	_type[head->channel] = head->type;
         tmpptr++;
@@ -379,7 +379,7 @@ RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size)
 //    GNASH_REPORT_FUNCTION;
     std::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer(1));
     buf->clear();
-    boost::uint8_t *ptr = buf->reference();
+    std::uint8_t *ptr = buf->reference();
     
     // Make the channel index & header size byte
     *ptr = head_size & RTMP_HEADSIZE_MASK;  
@@ -411,7 +411,7 @@ RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size,
 	  buf.reset(new cygnal::Buffer(12));
 	  break;
     }
-    boost::uint8_t *ptr = buf->reference();
+    std::uint8_t *ptr = buf->reference();
     
     // Make the channel index & header size byte
 //    *ptr = head_size & RTMP_HEADSIZE_MASK;
@@ -441,13 +441,13 @@ RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size,
 	if (head_size == HEADER_12 && type != RTMP::USER) {
 	    if (type != RTMP::AUDIO_DATA && type != RTMP::VIDEO_DATA) {
 		// log_network(_("The routing is: 0x%x"), routing);
-		boost::uint32_t swapped = htonl(routing);
+		std::uint32_t swapped = htonl(routing);
 		memcpy(ptr, &swapped, 4);
 	    } else {
 		// FIXME: I have no idea why these two empty messages
 		// don't handle the routing field for 12 byte headers
 		// the same as all the other types.
-		boost::uint8_t swapped = 0x1;
+		std::uint8_t swapped = 0x1;
 		*ptr = swapped;
 	    }
 	    ptr += 4;
@@ -470,8 +470,8 @@ RTMP::packetRead(cygnal::Buffer &buf)
 
 //    int packetsize = 0;
     size_t amf_index, headersize;
-    boost::uint8_t *ptr = buf.reference();
-    boost::uint8_t *tooFar = ptr+buf.size();
+    std::uint8_t *ptr = buf.reference();
+    std::uint8_t *tooFar = ptr+buf.size();
     AMF amf;
 
     ptr += 1;			// skip past the RTMP header byte
@@ -492,9 +492,9 @@ RTMP::packetRead(cygnal::Buffer &buf)
      }
 
 #if 1
-    boost::uint8_t *end = buf.remove(0xc3);
+    std::uint8_t *end = buf.remove(0xc3);
 #else
-    boost::uint8_t *end = buf.find(0xc3);
+    std::uint8_t *end = buf.find(0xc3);
     log_network(_("END is %x"), (void *)end);
     *end = '*';
 #endif
@@ -591,28 +591,28 @@ RTMP::dump()
 // system channel 2 
 // 02 00 00 00 00 00 06 04 00 00 00 00 00 00 00 00 00 00
 std::shared_ptr<RTMP::rtmp_ping_t>
-RTMP::decodePing(boost::uint8_t *data)
+RTMP::decodePing(std::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(data);
+    std::uint8_t *ptr = reinterpret_cast<std::uint8_t *>(data);
     std::shared_ptr<rtmp_ping_t> ping(new rtmp_ping_t);
 
     // All the data fields in a ping message are 2 bytes long.
-    boost::uint16_t type = ntohs(*reinterpret_cast<boost::uint16_t *>(ptr));
+    std::uint16_t type = ntohs(*reinterpret_cast<std::uint16_t *>(ptr));
     ping->type = static_cast<rtmp_ping_e>(type);
-    ptr += sizeof(boost::uint16_t);
+    ptr += sizeof(std::uint16_t);
 
-    ping->target = ntohs(*reinterpret_cast<boost::uint16_t *>(ptr));
-    ptr += sizeof(boost::uint16_t);
+    ping->target = ntohs(*reinterpret_cast<std::uint16_t *>(ptr));
+    ptr += sizeof(std::uint16_t);
     
-    ping->param1 = ntohs(*reinterpret_cast<boost::uint16_t *>(ptr));
-    ptr += sizeof(boost::uint16_t);
+    ping->param1 = ntohs(*reinterpret_cast<std::uint16_t *>(ptr));
+    ptr += sizeof(std::uint16_t);
     
-//     ping->param2 = ntohs(*reinterpret_cast<boost::uint16_t *>(ptr));
-//     ptr += sizeof(boost::uint16_t);
+//     ping->param2 = ntohs(*reinterpret_cast<std::uint16_t *>(ptr));
+//     ptr += sizeof(std::uint16_t);
 
-//    ping->param3 = ntohs(*reinterpret_cast<boost::uint16_t *>(ptr));
+//    ping->param3 = ntohs(*reinterpret_cast<std::uint16_t *>(ptr));
     ping->param3 = 0;
 
     return ping;    
@@ -632,19 +632,19 @@ RTMP::decodeUserControl(cygnal::Buffer &buf)
 }
 
 std::shared_ptr<RTMP::user_event_t>
-RTMP::decodeUserControl(boost::uint8_t *data)
+RTMP::decodeUserControl(std::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(data);
+    std::uint8_t *ptr = reinterpret_cast<std::uint8_t *>(data);
     std::shared_ptr<user_event_t> user(new RTMP::user_event_t);
 
-    boost::uint16_t type = ntohs(*reinterpret_cast<boost::uint16_t *>(ptr));
-    boost::uint16_t eventid = static_cast<user_control_e>(type);
-    ptr += sizeof(boost::uint16_t);
+    std::uint16_t type = ntohs(*reinterpret_cast<std::uint16_t *>(ptr));
+    std::uint16_t eventid = static_cast<user_control_e>(type);
+    ptr += sizeof(std::uint16_t);
 
-    boost::uint32_t param1 = ntohl(*reinterpret_cast<boost::uint32_t *>(ptr));
-    ptr += sizeof(boost::uint32_t);
+    std::uint32_t param1 = ntohl(*reinterpret_cast<std::uint32_t *>(ptr));
+    ptr += sizeof(std::uint32_t);
 
     user->type = static_cast<user_control_e>(type);
     user->param1 = param1;
@@ -660,8 +660,8 @@ RTMP::decodeUserControl(boost::uint8_t *data)
       case STREAM_NODATA:
       case STREAM_BUFFER:
       {
-	  boost::uint32_t param2 = ntohl(*reinterpret_cast<boost::uint32_t *>(ptr));
-	  ptr += sizeof(boost::uint32_t);
+	  std::uint32_t param2 = ntohl(*reinterpret_cast<std::uint32_t *>(ptr));
+	  ptr += sizeof(std::uint32_t);
 	  user->param2 = param2;
 	  break;
       }
@@ -682,20 +682,20 @@ RTMP::decodeUserControl(boost::uint8_t *data)
 // Stream Start -
 //   02 00 00 00 00 00 06 04 00 00 00 00   00 00 00 00 00 01
 std::shared_ptr<cygnal::Buffer>
-RTMP::encodeUserControl(user_control_e eventid, boost::uint32_t data)
+RTMP::encodeUserControl(user_control_e eventid, std::uint32_t data)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    boost::uint32_t swapped = 0;
+    std::uint32_t swapped = 0;
     std::shared_ptr<cygnal::Buffer> buf;
     if (eventid == STREAM_BUFFER) {
-	buf.reset(new cygnal::Buffer(sizeof(boost::uint16_t) * 5));
+	buf.reset(new cygnal::Buffer(sizeof(std::uint16_t) * 5));
     } else {
-	buf.reset(new cygnal::Buffer(sizeof(boost::uint16_t) * 3));
+	buf.reset(new cygnal::Buffer(sizeof(std::uint16_t) * 3));
     }
 
     // Set the type of this ping message
-    boost::uint16_t typefield = htons(eventid);
+    std::uint16_t typefield = htons(eventid);
     *buf = typefield;
     
     // All events have only 4 bytes of data, except Set Buffer, which
@@ -707,17 +707,17 @@ RTMP::encodeUserControl(user_control_e eventid, boost::uint32_t data)
       case STREAM_EOF:
       case STREAM_NODATA:
 	  swapped = data;
-	  cygnal::swapBytes(&swapped, sizeof(boost::uint32_t));
+	  cygnal::swapBytes(&swapped, sizeof(std::uint32_t));
 	  *buf += swapped;
 	  break;
       case STREAM_BUFFER:
-	  buf.reset(new cygnal::Buffer(sizeof(boost::uint16_t) * 5));
+	  buf.reset(new cygnal::Buffer(sizeof(std::uint16_t) * 5));
 	  break;
       case STREAM_LIVE:
       case STREAM_PING:
       case STREAM_PONG:
 	  swapped = data;
-	  cygnal::swapBytes(&swapped, sizeof(boost::uint32_t));
+	  cygnal::swapBytes(&swapped, sizeof(std::uint32_t));
 	  *buf += swapped;
 	  break;
       default:
@@ -728,12 +728,12 @@ RTMP::encodeUserControl(user_control_e eventid, boost::uint32_t data)
 }
 
 std::shared_ptr<RTMPMsg>
-RTMP::decodeMsgBody(boost::uint8_t *data, size_t size)
+RTMP::decodeMsgBody(std::uint8_t *data, size_t size)
 {
 //     GNASH_REPORT_FUNCTION;
     cygnal::AMF amf_obj;
-    boost::uint8_t *ptr = data;
-    boost::uint8_t* tooFar = data + size;
+    std::uint8_t *ptr = data;
+    std::uint8_t* tooFar = data + size;
     bool status = false;
     std::shared_ptr<RTMPMsg> msg(new RTMPMsg);
 
@@ -809,8 +809,8 @@ RTMP::encodeChunkSize(int size)
 {
     GNASH_REPORT_FUNCTION;
 
-    boost::uint32_t swapped = htonl(size);
-    std::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer(sizeof(boost::uint32_t)));
+    std::uint32_t swapped = htonl(size);
+    std::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer(sizeof(std::uint32_t)));
     *buf += swapped;
 
     return buf;
@@ -820,7 +820,7 @@ void
 RTMP::decodeChunkSize()
 {
     GNASH_REPORT_FUNCTION;
-    // _chunksize[rthead->channel] = ntohl(*reinterpret_cast<boost::uint32_t *>(ptr + rthead->head_size));
+    // _chunksize[rthead->channel] = ntohl(*reinterpret_cast<std::uint32_t *>(ptr + rthead->head_size));
     // log_network("Setting packet chunk size to %d.", _chunksize);
     log_unimpl(__PRETTY_FUNCTION__);
 }
@@ -970,7 +970,7 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 bool
 RTMP::sendMsg(int channel, rtmp_headersize_e head_size,
 	      size_t total_size, content_types_e type,
-	      RTMPMsg::rtmp_source_e routing, boost::uint8_t *data, size_t size)
+	      RTMPMsg::rtmp_source_e routing, std::uint8_t *data, size_t size)
 {
 //  GNASH_REPORT_FUNCTION;
     return sendMsg(getFileFd(), channel, head_size, total_size, type, routing, data, size);
@@ -979,7 +979,7 @@ RTMP::sendMsg(int channel, rtmp_headersize_e head_size,
 bool
 RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 	      size_t total_size, content_types_e type,
-	      RTMPMsg::rtmp_source_e routing, boost::uint8_t *data, size_t size)
+	      RTMPMsg::rtmp_source_e routing, std::uint8_t *data, size_t size)
 {
 // GNASH_REPORT_FUNCTION;
     int ret = 0;
@@ -1012,7 +1012,7 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
     std::shared_ptr<cygnal::Buffer> cont_head = encodeHeader(channel, RTMP::HEADER_1);
 #else
     std::shared_ptr<cygnal::Buffer> cont_head(new cygnal::Buffer(1));
-    boost::uint8_t foo = 0xc3;
+    std::uint8_t foo = 0xc3;
     *cont_head = foo;
 #endif
     
@@ -1112,7 +1112,7 @@ RTMP::sendRecvMsg(cygnal::Buffer &bufin)
     RTMP::rtmp_head_t *rthead = 0;
     RTMPMsg *msg = 0;
     std::shared_ptr<cygnal::Buffer> buf;
-    boost::uint8_t *ptr = 0;
+    std::uint8_t *ptr = 0;
 
 
     buf = recvMsg(1);	// use a 1 second timeout
@@ -1144,7 +1144,7 @@ RTMP::sendRecvMsg(cygnal::Buffer &bufin)
 	    switch (rthead->type) {
 	      case CHUNK_SIZE:
 		  log_networ(_("Got CHUNK_SIZE packet!!!"));
-		  _chunksize[rthead->channel] = ntohl(*reinterpret_cast<boost::uint32_t *>(ptr + rthead->head_size));
+		  _chunksize[rthead->channel] = ntohl(*reinterpret_cast<std::uint32_t *>(ptr + rthead->head_size));
 		  log_network(_("Setting packet chunk size to %d."), _chunksize);
 //		  decodeChunkSize();
 		  break;
@@ -1320,7 +1320,7 @@ RTMP::split(cygnal::Buffer &buf)
 }
 
 std::shared_ptr<RTMP::queues_t>
-RTMP::split(boost::uint8_t *data, size_t size)
+RTMP::split(std::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -1331,7 +1331,7 @@ RTMP::split(boost::uint8_t *data, size_t size)
     std::shared_ptr<RTMP::queues_t> channels(new RTMP::queues_t);
 	
     // split the buffer at the chunksize boundary
-    boost::uint8_t *ptr = 0;
+    std::uint8_t *ptr = 0;
     std::shared_ptr<rtmp_head_t> rthead(new rtmp_head_t);
     size_t pktsize = 0;
     //size_t nbytes = 0;

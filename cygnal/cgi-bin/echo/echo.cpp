@@ -82,7 +82,7 @@ extern "C" {
 //         GNASH_REPORT_RETURN;
     }
 
-    size_t echo_write_func(boost::uint8_t *data, size_t size)
+    size_t echo_write_func(std::uint8_t *data, size_t size)
     {
 // 	GNASH_REPORT_FUNCTION;
 
@@ -216,7 +216,7 @@ EchoTest::~EchoTest()
 // Parse an Echo Request message coming from the Red5 echo_test. This
 // method should only be used for testing purposes.
 vector<std::shared_ptr<cygnal::Element > >
-EchoTest::parseEchoRequest(boost::uint8_t *ptr, size_t size)
+EchoTest::parseEchoRequest(std::uint8_t *ptr, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -276,7 +276,7 @@ EchoTest::formatEchoResponse(double num, cygnal::Buffer &data)
 }
 
 std::shared_ptr<cygnal::Buffer>
-EchoTest::formatEchoResponse(double num, boost::uint8_t *data, size_t size)
+EchoTest::formatEchoResponse(double num, std::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
 

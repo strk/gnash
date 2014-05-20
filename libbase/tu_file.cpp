@@ -34,13 +34,13 @@ public:
     /// TODO: define what happens when the stream
     ///       is in error condition.
     ///
-    boost::uint32_t read_le32() 
+    std::uint32_t read_le32()
     {
-	    // read_byte() is boost::uint8_t, so no masks with 0xff are required.
-	    boost::uint32_t result = static_cast<boost::uint32_t>(read_byte());
-	    result |= static_cast<boost::uint32_t>(read_byte()) << 8;
-	    result |= static_cast<boost::uint32_t>(read_byte()) << 16;
-	    result |= static_cast<boost::uint32_t>(read_byte()) << 24;
+	    // read_byte() is std::uint8_t, so no masks with 0xff are required.
+	    std::uint32_t result = static_cast<std::uint32_t>(read_byte());
+	    result |= static_cast<std::uint32_t>(read_byte()) << 8;
+	    result |= static_cast<std::uint32_t>(read_byte()) << 16;
+	    result |= static_cast<std::uint32_t>(read_byte()) << 24;
 	    return(result);
     }
 	
@@ -49,10 +49,10 @@ public:
     /// TODO: define what happens when the stream
     ///       is in error condition, see bad().
     ///
-    boost::uint16_t read_le16()
+    std::uint16_t read_le16()
     {
-	    boost::uint16_t result = static_cast<boost::uint16_t>(read_byte());
-	    result |= static_cast<boost::uint16_t>(read_byte()) << 8;
+	    std::uint16_t result = static_cast<std::uint16_t>(read_byte());
+	    result |= static_cast<std::uint16_t>(read_byte()) << 8;
 	    return(result);
     }
     
@@ -61,8 +61,8 @@ public:
     /// TODO: define what happens when the stream
     ///       is in error condition, see bad().
     ///
-    boost::uint8_t read_byte() {
-        boost::uint8_t u;
+    std::uint8_t read_byte() {
+        std::uint8_t u;
         read(&u, 1);
         return u;
     }

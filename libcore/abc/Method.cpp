@@ -60,8 +60,8 @@ Method::print_body()
 			return;
 		}
 		std::stringstream ss("Method Body:");
-		for(boost::uint32_t i = 0; i < _bodyLength ; ++i) {
-			const boost::uint8_t opcode = _body->read_as3op();
+		for(std::uint32_t i = 0; i < _bodyLength ; ++i) {
+			const std::uint8_t opcode = _body->read_as3op();
 			ss << "0x" << std::uppercase << std::hex << (opcode | 0x0) << " ";
 		}
 		_body->seekTo(0);
@@ -93,7 +93,7 @@ Method::setReturnType(Class* /*type*/)
 
 bool
 Method::addValue(string_table::key name, Namespace *ns,
-        boost::uint32_t slotId, Class *type, as_value& val, bool isconst)
+        std::uint32_t slotId, Class *type, as_value& val, bool isconst)
 {
     Global_as* g = VM::get().getGlobal();
 	if (val.is_object()) {
@@ -160,13 +160,13 @@ Method::addSetter(string_table::key name, Namespace *ns, Method *method)
 
 bool
 Method::addMemberScript(string_table::key name, Namespace *ns,
-	boost::uint32_t slotId, Class *type)
+	std::uint32_t slotId, Class *type)
 {
 	return addSlot(name, ns, slotId, type);
 }
 
 bool
-Method::addSlot(string_table::key name, Namespace* ns, boost::uint32_t slotId,
+Method::addSlot(string_table::key name, Namespace* ns, std::uint32_t slotId,
 	Class* /*type*/)
 {
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
@@ -178,7 +178,7 @@ Method::addSlot(string_table::key name, Namespace* ns, boost::uint32_t slotId,
 
 bool
 Method::addSlotFunction(string_table::key name, Namespace *ns,
-	boost::uint32_t slotId, Method *method)
+	std::uint32_t slotId, Method *method)
 {
 	Class a;
 	a.setName(NSV::CLASS_FUNCTION);

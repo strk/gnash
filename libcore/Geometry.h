@@ -55,8 +55,8 @@ public:
         ap(0, 0)
     {}
     
-    Edge(boost::int32_t cx, boost::int32_t cy, boost::int32_t ax,
-            boost::int32_t ay)
+    Edge(std::int32_t cx, std::int32_t cy, std::int32_t ax,
+            std::int32_t ay)
         :
         cp(cx, cy),
         ap(ax, ay)
@@ -90,16 +90,16 @@ public:
     static double
     squareDistancePtSeg(const point& p, const point& A, const point& B)
     {
-        boost::int32_t dx = B.x - A.x;
-        boost::int32_t dy = B.y - A.y;
+        std::int32_t dx = B.x - A.x;
+        std::int32_t dy = B.y - A.y;
 
         if ( dx == 0 && dy == 0 ) 
         {
             return p.squareDistance(A);
         }
 
-        boost::int32_t pdx = p.x - A.x;
-        boost::int32_t pdy = p.y - A.y;
+        std::int32_t pdx = p.x - A.x;
+        std::int32_t pdy = p.y - A.y;
 
         double u = (static_cast<double>(pdx) * dx + static_cast<double>(pdy) * dy ) /
             (static_cast<double>(dx)*dx + static_cast<double>(dy)*dy );
@@ -152,7 +152,7 @@ public:
     /// @param p The point we want to compute distance from 
     /// @param t the step factor between 0 and 1
     ///
-    static boost::int64_t squareDistancePtCurve(const point& A,
+    static std::int64_t squareDistancePtCurve(const point& A,
                          const point& C,
                          const point& B,
                          const point& p, float t)
@@ -228,7 +228,7 @@ public:
     ///
     /// @param newShape
     ///    True if this path starts a new subshape
-    Path(boost::int32_t ax, boost::int32_t ay, 
+    Path(std::int32_t ax, std::int32_t ay,
             unsigned fill0, unsigned fill1, unsigned line)
     {
         reset(ax, ay, fill0, fill1, line);
@@ -251,7 +251,7 @@ public:
     /// @param line
     ///    Line style index for right fill
     ///
-    void reset(boost::int32_t ax, boost::int32_t ay, 
+    void reset(std::int32_t ax, std::int32_t ay,
             unsigned fill0, unsigned fill1, unsigned line)
     // Reset all our members to the given values, and clear our edge list.
     {
@@ -328,7 +328,7 @@ public:
     ///    Y coordinate in TWIPS
     ///
     void 
-    drawLineTo(boost::int32_t dx, boost::int32_t dy)
+    drawLineTo(std::int32_t dx, std::int32_t dy)
     {
         m_edges.push_back(Edge(dx, dy, dx, dy)); 
     }
@@ -351,7 +351,7 @@ public:
     ///    Anchor point's Y ordinate.
     ///
     void 
-    drawCurveTo(boost::int32_t cdx, boost::int32_t cdy, boost::int32_t adx, boost::int32_t ady)
+    drawCurveTo(std::int32_t cdx, std::int32_t cdy, std::int32_t adx, std::int32_t ady)
     {
         m_edges.push_back(Edge(cdx, cdy, adx, ady)); 
     }
@@ -543,8 +543,8 @@ namespace geometry
 {
 
 bool pointTest(const std::vector<Path>& paths,
-    const std::vector<LineStyle>& lineStyles, boost::int32_t x,
-    boost::int32_t y, const SWFMatrix& wm);
+    const std::vector<LineStyle>& lineStyles, std::int32_t x,
+    std::int32_t y, const SWFMatrix& wm);
 
 } // namespace geometry
 

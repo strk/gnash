@@ -23,7 +23,7 @@
 #include <vector>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <memory>
-#include <boost/cstdint.hpp> 
+#include <cstdint>
 #include <memory>
 
 #include "DefinitionTag.h"
@@ -119,7 +119,7 @@ private:
     /// associated with button records.
     //
     /// Currently unused by Gnash.
-    boost::uint8_t _blendMode;
+    std::uint8_t _blendMode;
 
     bool _hitTest;
     bool _down;
@@ -186,7 +186,7 @@ private:
         KEYPRESS = 0xFE00  // highest 7 bits
     };
 
-    boost::uint16_t _conditions;
+    std::uint16_t _conditions;
 
 };
 
@@ -277,7 +277,7 @@ private:
     //
     /// This can only be constructed using a loader() function.
     DefineButtonTag(SWFStream& in, movie_definition& m, TagType tag, 
-            boost::uint16_t id);
+            std::uint16_t id);
 
     /// Read a DEFINEBUTTON tag
     void readDefineButtonTag(SWFStream& in, movie_definition& m);

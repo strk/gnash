@@ -30,7 +30,7 @@
 #include <string>
 #include <vector>
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include "element.h"
 #include "dsodefs.h"
@@ -57,9 +57,9 @@ class DSOEXPORT AMF_msg {
         AMF3 = 0x11
     } amf_version_e;
     typedef struct {
-        boost::uint16_t version;
-        boost::uint16_t headers;
-        boost::uint16_t messages;
+        std::uint16_t version;
+        std::uint16_t headers;
+        std::uint16_t messages;
     } context_header_t;
     typedef struct {
         std::string     target;
@@ -80,9 +80,9 @@ class DSOEXPORT AMF_msg {
     
     // These methods create the raw data of the AMF packet from Elements
     static std::shared_ptr<cygnal::Buffer> encodeContextHeader(context_header_t *head);
-    static std::shared_ptr<cygnal::Buffer> encodeContextHeader(boost::uint16_t version,
-							      boost::uint16_t headers,
-							      boost::uint16_t messages);
+    static std::shared_ptr<cygnal::Buffer> encodeContextHeader(std::uint16_t version,
+							      std::uint16_t headers,
+							      std::uint16_t messages);
 
     static std::shared_ptr<cygnal::Buffer> encodeMsgHeader(message_header_t *head);
     static std::shared_ptr<cygnal::Buffer> encodeMsgHeader(const std::string &target,
@@ -90,14 +90,14 @@ class DSOEXPORT AMF_msg {
     
     // These methods parse the raw data of the AMF packet into data structures
     static std::shared_ptr<context_header_t> parseContextHeader(cygnal::Buffer &data);
-    static std::shared_ptr<context_header_t> parseContextHeader(boost::uint8_t *data, size_t size);
+    static std::shared_ptr<context_header_t> parseContextHeader(std::uint8_t *data, size_t size);
     
     static std::shared_ptr<message_header_t> parseMessageHeader(cygnal::Buffer &data);
-    static std::shared_ptr<message_header_t> parseMessageHeader(boost::uint8_t *data, size_t size);
+    static std::shared_ptr<message_header_t> parseMessageHeader(std::uint8_t *data, size_t size);
 
     // These methods parse the entire packet. which consists of multiple messages
     std::shared_ptr<context_header_t> parseAMFPacket(cygnal::Buffer &buf);
-    std::shared_ptr<context_header_t> parseAMFPacket(boost::uint8_t *data,
+    std::shared_ptr<context_header_t> parseAMFPacket(std::uint8_t *data,
 						       size_t size);
 
     // This methods create an entire packet from multiple messages, already parsed in

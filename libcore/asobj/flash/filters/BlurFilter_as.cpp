@@ -92,7 +92,7 @@ blurfilter_quality(const fn_call& fn)
     if (fn.nargs == 0) {
 		return as_value(ptr->m_quality );
     }
-    boost::uint8_t sp_quality = toNumber(fn.arg(0), getVM(fn));
+    std::uint8_t sp_quality = toNumber(fn.arg(0), getVM(fn));
     ptr->m_quality = sp_quality;
     return as_value();
 }

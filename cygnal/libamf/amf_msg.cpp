@@ -28,7 +28,7 @@
 #include "GnashSystemNetHeaders.h"
 
 #include <string>
-#include <boost/cstdint.hpp> // For C99 int types
+#include <cstdint> // For C99 int types
 
 using gnash::GnashException;
 using gnash::log_error;
@@ -40,8 +40,8 @@ namespace cygnal
 {
 
 std::shared_ptr<cygnal::Buffer>
-AMF_msg::encodeContextHeader(boost::uint16_t version, boost::uint16_t headers,
-			     boost::uint16_t messages)
+AMF_msg::encodeContextHeader(std::uint16_t version, std::uint16_t headers,
+			     std::uint16_t messages)
 {
 //    GNASH_REPORT_FUNCTION;
     size_t size = sizeof(AMF_msg::context_header_t);
@@ -50,7 +50,7 @@ AMF_msg::encodeContextHeader(boost::uint16_t version, boost::uint16_t headers,
     // use a short as a temporary, as it turns out htons() returns a 32bit int
     // instead when compiling with -O2. This forces appending bytes to get the
     // right size.
-    boost::uint16_t swapped = htons(version);
+    std::uint16_t swapped = htons(version);
     *buf = swapped;
     swapped = htons(headers);
     *buf += swapped;
@@ -76,12 +76,12 @@ AMF_msg::encodeMsgHeader(AMF_msg::message_header_t *head)
 {
 //    GNASH_REPORT_FUNCTION;
     // The size of the buffer are the two strings, their lenght fields, and the integer.
-//     size_t size = head->target.size() + head->response.size() + sizeof(boost::uint32_t)
-//         + (sizeof(boost::uint16_t) * 2);
+//     size_t size = head->target.size() + head->response.size() + sizeof(std::uint32_t)
+//         + (sizeof(std::uint16_t) * 2);
     std::shared_ptr<cygnal::Buffer> buf (new cygnal::Buffer(sizeof(AMF_msg::message_header_t)));
 
     // Encode the target URI, which usually looks something like ."getway"
-    boost::uint16_t length = head->target.size();    
+    std::uint16_t length = head->target.size();
     *buf = length;
     *buf += head->target;
 
@@ -91,7 +91,7 @@ AMF_msg::encodeMsgHeader(AMF_msg::message_header_t *head)
     *buf += head->target;
 
     // Encode the size of the encoded message
-    *buf += static_cast<boost::uint32_t>(head->size);
+    *buf += static_cast<std::uint32_t>(head->size);
     
     return buf;
 }
@@ -105,16 +105,16 @@ AMF_msg::parseContextHeader(cygnal::Buffer &data)
 }
 
 std::shared_ptr<AMF_msg::context_header_t>
-AMF_msg::parseContextHeader(boost::uint8_t *data, size_t /* size */)
+AMF_msg::parseContextHeader(std::uint8_t *data, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     std::shared_ptr<AMF_msg::context_header_t> msg (new AMF_msg::context_header_t);
 
-    boost::uint16_t tmpnum = *reinterpret_cast<boost::uint16_t *>(data);
+    std::uint16_t tmpnum = *reinterpret_cast<std::uint16_t *>(data);
     msg->version  = tmpnum;
-    tmpnum = *reinterpret_cast<boost::uint16_t *>(data + sizeof(boost::uint16_t));
+    tmpnum = *reinterpret_cast<std::uint16_t *>(data + sizeof(std::uint16_t));
     msg->headers   = ntohs(tmpnum);
-    tmpnum = *reinterpret_cast<boost::uint16_t *>(data + sizeof(boost::uint32_t));
+    tmpnum = *reinterpret_cast<std::uint16_t *>(data + sizeof(std::uint32_t));
     msg->messages = ntohs(tmpnum);
 
     return msg;
@@ -128,21 +128,21 @@ AMF_msg::parseMessageHeader(cygnal::Buffer &data)
 }
 
 std::shared_ptr<AMF_msg::message_header_t>
-AMF_msg::parseMessageHeader(boost::uint8_t *data, size_t size)
+AMF_msg::parseMessageHeader(std::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     AMF amf;
-    boost::uint8_t *tmpptr = data;
+    std::uint8_t *tmpptr = data;
     std::shared_ptr<AMF_msg::message_header_t> msg (new AMF_msg::message_header_t);
 
     // The target is a standard length->bytes field
-    boost::uint16_t length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
+    std::uint16_t length = ntohs((*(std::uint16_t *)tmpptr) & 0xffff);
     if (length == 0) {
         boost::format msg("Length of string shouldn't be zero! amf_msg.cpp::%1%(): %2%");
         msg % __FUNCTION__ % __LINE__;
         throw GnashException(msg.str());
     }
-    tmpptr += sizeof(boost::uint16_t);
+    tmpptr += sizeof(std::uint16_t);
     std::string str1(reinterpret_cast<const char *>(tmpptr), length);
     msg->target = str1;
     if ((tmpptr - data) > static_cast<int>(size)) {
@@ -154,13 +154,13 @@ AMF_msg::parseMessageHeader(boost::uint8_t *data, size_t size)
     }
     
     // The response is a standard length->bytes field
-    length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
+    length = ntohs((*(std::uint16_t *)tmpptr) & 0xffff);
     if (length == 0) {
         boost::format msg("Length of string shouldn't be zero! amf_msg.cpp::%1%(): %2%");
         msg % __FUNCTION__ % __LINE__;
         throw GnashException(msg.str());
     }
-    tmpptr += sizeof(boost::uint16_t);
+    tmpptr += sizeof(std::uint16_t);
     std::string str2(reinterpret_cast<const char *>(tmpptr), length);
     msg->response = str2;
     tmpptr += length;
@@ -171,7 +171,7 @@ AMF_msg::parseMessageHeader(boost::uint8_t *data, size_t size)
     }    
 
     // The length is a 4 word integer
-    msg->size = ntohl((*(boost::uint32_t *)tmpptr));
+    msg->size = ntohl((*(std::uint32_t *)tmpptr));
 
     if (msg->target.empty()) {
         log_error(_("AMF Message \'target\' field missing!"));
@@ -197,11 +197,11 @@ AMF_msg::parseAMFPacket(cygnal::Buffer &data)
 }
 
 std::shared_ptr<AMF_msg::context_header_t>
-AMF_msg::parseAMFPacket(boost::uint8_t *data, size_t size)
+AMF_msg::parseAMFPacket(std::uint8_t *data, size_t size)
 {
     GNASH_REPORT_FUNCTION;
 //    _messages.push_back();
-    boost::uint8_t *ptr = data + sizeof(AMF_msg::context_header_t);
+    std::uint8_t *ptr = data + sizeof(AMF_msg::context_header_t);
     std::shared_ptr<context_header_t> header = AMF_msg::parseContextHeader(data, size);
 
 //     log_debug("%s: %s", __PRETTY_FUNCTION__, hexify(data, size, true));
@@ -214,8 +214,8 @@ AMF_msg::parseAMFPacket(boost::uint8_t *data, size_t size)
             std::shared_ptr<AMF_msg::message_header_t> msghead = AMF_msg::parseMessageHeader(ptr, size);
             if (msghead) {
                 ptr += msghead->target.size() + msghead->response.size()
-                    + (sizeof(boost::uint16_t) * 2)
-                    + (sizeof(boost::uint32_t));
+                    + (sizeof(std::uint16_t) * 2)
+                    + (sizeof(std::uint32_t));
                 std::shared_ptr<cygnal::Element> el = amf.extractAMF(ptr, ptr+size);
                 msgpkt->header.target = msghead->target;
                 msgpkt->header.response = msghead->response;
@@ -277,22 +277,22 @@ AMF_msg::encodeMsgHeader(const std::string &target,
                          const std::string &response, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
-    size_t total = target.size() + sizeof(boost::uint16_t);
-    total += response.size() + sizeof(boost::uint16_t);
-    total += sizeof(boost::uint32_t);
+    size_t total = target.size() + sizeof(std::uint16_t);
+    total += response.size() + sizeof(std::uint16_t);
+    total += sizeof(std::uint32_t);
     
     std::shared_ptr<cygnal::Buffer> buf (new cygnal::Buffer(total));
-    boost::uint16_t length = target.size();
-    swapBytes(&length, sizeof(boost::uint16_t));
+    std::uint16_t length = target.size();
+    swapBytes(&length, sizeof(std::uint16_t));
     *buf += length;
     *buf += target;
 
     length = response.size();
-    swapBytes(&length, sizeof(boost::uint16_t));
+    swapBytes(&length, sizeof(std::uint16_t));
     *buf += length;
     *buf += response;
 
-    boost::uint32_t swapped = htonl(size);
+    std::uint32_t swapped = htonl(size);
     *buf += swapped;
     
     return buf;

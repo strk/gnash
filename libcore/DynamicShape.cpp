@@ -160,7 +160,7 @@ DynamicShape::finalize() const
 }
 
 void
-DynamicShape::lineStyle(boost::uint16_t thickness, const rgba& color,
+DynamicShape::lineStyle(std::uint16_t thickness, const rgba& color,
 	bool vScale, bool hScale, bool pixelHinting, bool noClose,
 	CapStyle startCapStyle, CapStyle endCapStyle,
 	JoinStyle joinStyle, float miterLimitFactor)
@@ -181,7 +181,7 @@ DynamicShape::resetLineStyle()
 }
 
 void
-DynamicShape::moveTo(boost::int32_t x, boost::int32_t y)
+DynamicShape::moveTo(std::int32_t x, std::int32_t y)
 {
     // It was manually tested that a moveTo, even
     // when moving to the same point of current cursor,
@@ -193,7 +193,7 @@ DynamicShape::moveTo(boost::int32_t x, boost::int32_t y)
 }
 
 void
-DynamicShape::lineTo(boost::int32_t x, boost::int32_t y, int swfVersion)
+DynamicShape::lineTo(std::int32_t x, std::int32_t y, int swfVersion)
 {
 	if (!_currpath) startNewPath(false);
 	assert(_currpath);
@@ -224,8 +224,8 @@ DynamicShape::lineTo(boost::int32_t x, boost::int32_t y, int swfVersion)
 }
 
 void
-DynamicShape::curveTo(boost::int32_t cx, boost::int32_t cy, 
-                      boost::int32_t ax, boost::int32_t ay, int swfVersion)
+DynamicShape::curveTo(std::int32_t cx, std::int32_t cy,
+                      std::int32_t ax, std::int32_t ay, int swfVersion)
 {
 	if (!_currpath) startNewPath(false);
 	assert(_currpath);

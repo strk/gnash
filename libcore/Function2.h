@@ -79,15 +79,15 @@ public:
 	virtual ~Function2() {}
 
     /// Return the number of registers to allocate for this function.
-    virtual boost::uint8_t registers() const {
+    virtual std::uint8_t registers() const {
         return _registerCount;
     }
 
-	void setRegisterCount(boost::uint8_t ct) {
+	void setRegisterCount(std::uint8_t ct) {
         _registerCount = ct;
     }
 
-	void setFlags(boost::uint16_t flags) {
+	void setFlags(std::uint16_t flags) {
         _function2Flags = flags;
     }
 
@@ -97,10 +97,10 @@ public:
 private:
 
     /// The number of registers required.
-	boost::uint8_t _registerCount;
+	std::uint8_t _registerCount;
 
 	/// Used to control implicit arg register assignments
-	boost::uint16_t	_function2Flags;
+	std::uint16_t	_function2Flags;
 
 };
 

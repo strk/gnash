@@ -106,9 +106,9 @@ public:
         return m_has_flags2 & (HAS_CHARACTER_MASK | MOVE_MASK);
     } 
 
-    boost::uint16_t getRatio() const { return _ratio; }
+    std::uint16_t getRatio() const { return _ratio; }
     int getClipDepth() const { return m_clip_depth; }
-    boost::uint16_t getID() const { return _id; }
+    std::uint16_t getID() const { return _id; }
     const std::string& getName() const { return m_name; }
     const SWFMatrix& getMatrix() const { return m_matrix; }
     const SWFCxForm& getCxform() const { return m_color_transform; }
@@ -144,7 +144,7 @@ public:
     //
     /// This is stored as a uint8_t to allow for future expansion of
     /// blend modes.
-    boost::uint8_t getBlendMode() const {
+    std::uint8_t getBlendMode() const {
         return _blendMode;
     }
 
@@ -162,16 +162,16 @@ private:
     // read SWF::PLACEOBJECT3
     void readPlaceObject3(SWFStream& in);
 
-    boost::uint8_t m_has_flags2;
-    boost::uint8_t m_has_flags3;
-    boost::uint16_t _id;
+    std::uint8_t m_has_flags2;
+    std::uint8_t m_has_flags3;
+    std::uint16_t _id;
     SWFCxForm  m_color_transform;
     SWFMatrix  m_matrix;
-    boost::uint16_t _ratio;
+    std::uint16_t _ratio;
     std::string m_name;
     int     m_clip_depth;
     
-    boost::uint8_t _blendMode;
+    std::uint8_t _blendMode;
 
     /// NOTE: getPlaceType() is dependent on the enum values.
     enum PlaceType

@@ -20,7 +20,7 @@
 #define GNASH_SWF_SOUNDSTREAMHEAD_TAG_H
 
 
-#include <boost/cstdint.hpp> 
+#include <cstdint>
  
 #include "SWF.h"
 

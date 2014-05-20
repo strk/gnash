@@ -110,7 +110,7 @@ public:
     //
     /// @param SWFKey   The SWF code matched to the event. This
     ///                 must be converted to a unique gnash::key::code.
-    void setKeyCode(boost::uint8_t SWFkey)
+    void setKeyCode(std::uint8_t SWFkey)
     {
         // Lookup the SWFcode in the gnash::key::code table.
         // Some are not unique (keypad numbers are the

@@ -29,7 +29,7 @@
 
 #include <string>
 #include <cstring>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include "element.h"
 #include "dsodefs.h"
@@ -47,7 +47,7 @@ const size_t AMF0_NUMBER_SIZE = 0x08;
 /// \brief The header size in bytes of an common AMF object.
 ///	The size of an AMF header is a type field (1 byte), followed by a
 ///	length field. (short)
-const boost::uint8_t AMF_HEADER_SIZE = 3;
+const std::uint8_t AMF_HEADER_SIZE = 3;
 
 /// \brief  The header size of a property.
 ///	A property is a little different. It always assumes the the
@@ -55,20 +55,20 @@ const boost::uint8_t AMF_HEADER_SIZE = 3;
 ///	type byte like a regular AMF object and length is used for the
 ///	data. So a property object header is then only 5 bytes instead
 ///	of the 6 that one assumes would be used.
-const boost::uint8_t AMF_PROP_HEADER_SIZE = 5;
+const std::uint8_t AMF_PROP_HEADER_SIZE = 5;
 
 /// AMF version 0 is supported by default
-const boost::uint8_t AMF_VERSION = 0;
+const std::uint8_t AMF_VERSION = 0;
 
 /// For terminating sequences, a byte with value 0x09 is used.
-const boost::uint8_t TERMINATOR = 0x09;
+const std::uint8_t TERMINATOR = 0x09;
 
 /// \brief The maximum size for a string.
 /// As if there is a parsing error, we'll often see the symptom of the length
 /// for the following value is bogus. Although the length field is a short, it
 /// seems silly to assume we'll ever see a string 65,000 characters long. Still,
 /// it makes sense to make this an adjustable thing.
-const boost::uint16_t SANE_STR_SIZE = 65535;
+const std::uint16_t SANE_STR_SIZE = 65535;
 
 /// Binary representation of an ActionScript object.
 //
@@ -144,7 +144,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static std::shared_ptr<Buffer> encodeString(boost::uint8_t *data,
+    static std::shared_ptr<Buffer> encodeString(std::uint8_t *data,
 						  size_t size);
 
     /// Encode a String object to its serialized representation.
@@ -191,7 +191,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static std::shared_ptr<Buffer> encodeXMLObject(const boost::uint8_t *data,
+    static std::shared_ptr<Buffer> encodeXMLObject(const std::uint8_t *data,
 						     size_t nbytes);
 
     /// Encode a Typed Object to its serialized representation.
@@ -212,7 +212,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static std::shared_ptr<Buffer> encodeReference(boost::uint16_t index);
+    static std::shared_ptr<Buffer> encodeReference(std::uint16_t index);
 
     /// Encode a Movie Clip (swf data) to its serialized representation.
     //
@@ -222,7 +222,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static std::shared_ptr<Buffer> encodeMovieClip(const boost::uint8_t *data,
+    static std::shared_ptr<Buffer> encodeMovieClip(const std::uint8_t *data,
 						     size_t size);
 
     /// Encode an ECMA Array to its serialized representation.
@@ -246,7 +246,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static std::shared_ptr<Buffer> encodeLongString(const boost::uint8_t *data,
+    static std::shared_ptr<Buffer> encodeLongString(const std::uint8_t *data,
 						      size_t size);
 
     /// Encode a Record Set to its serialized representation.
@@ -257,7 +257,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static std::shared_ptr<Buffer> encodeRecordSet(const boost::uint8_t *data,
+    static std::shared_ptr<Buffer> encodeRecordSet(const std::uint8_t *data,
 						     size_t size);
 
     /// Encode a Date to its serialized representation.
@@ -266,7 +266,7 @@ public:
     /// 
     /// @return a binary AMF packet in big endian format
     ///
-    static std::shared_ptr<Buffer> encodeDate(const boost::uint8_t *data);
+    static std::shared_ptr<Buffer> encodeDate(const std::uint8_t *data);
 
     /// Encode a Strict Array to its serialized representation.
     //
@@ -341,7 +341,7 @@ public:
     ///
     /// @return The data type from the header
     ///
-    static Element::amf0_type_e extractElementHeader(boost::uint8_t *in)
+    static Element::amf0_type_e extractElementHeader(std::uint8_t *in)
                          { return *(reinterpret_cast<Element::amf0_type_e *>(in)); };
 
     /// Extract an AMF object from an array of raw bytes.
@@ -357,7 +357,7 @@ public:
     ///
     /// @remarks May throw a ParserException
     ///
-    std::shared_ptr<cygnal::Element> extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar);
+    std::shared_ptr<cygnal::Element> extractAMF(std::uint8_t *in, std::uint8_t* tooFar);
 
     /// Extract an AMF object from an array of raw bytes.
     //
@@ -384,7 +384,7 @@ public:
     ///
     /// @remarks May throw a ParserException
     ///
-    std::shared_ptr<cygnal::Element> extractProperty(boost::uint8_t *in, boost::uint8_t* tooFar);
+    std::shared_ptr<cygnal::Element> extractProperty(std::uint8_t *in, std::uint8_t* tooFar);
 
     /// Extract a Property.
     //

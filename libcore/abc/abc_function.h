@@ -49,7 +49,7 @@ public:
         return _methodInfo->getBody();
     }
 
-	boost::uint32_t getMaxRegisters() const {
+	std::uint32_t getMaxRegisters() const {
         return _methodInfo->getMaxRegisters();
     }
 

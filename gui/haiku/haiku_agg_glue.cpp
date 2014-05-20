@@ -326,7 +326,7 @@ HaikuAggGlue::ViewNeeded()
 }
 
 bool
-HaikuAggGlue::prepDrawingArea(int width, int height, boost::uint32_t sdl_flags)
+HaikuAggGlue::prepDrawingArea(int width, int height, std::uint32_t sdl_flags)
 {
     (void) sdl_flags;
 
@@ -340,7 +340,7 @@ HaikuAggGlue::prepDrawingArea(int width, int height, boost::uint32_t sdl_flags)
 
     assert(_bpp % 8 == 0);
 
-    boost::uint32_t rmask, gmask, bmask, amask;
+    std::uint32_t rmask, gmask, bmask, amask;
 
     switch(_bpp) {
         case 32: // RGBA32

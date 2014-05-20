@@ -19,7 +19,7 @@
 #ifndef GNASH_SOL_H
 #define GNASH_SOL_H
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <cassert>
 #include <string>
 #include <vector>
@@ -70,7 +70,7 @@ public:
     ///		.sol file data.
     ///
     /// @return true if this succeeded. false if it doesn't.
-    bool extractHeader(const std::vector<boost::uint8_t> &data);
+    bool extractHeader(const std::vector<std::uint8_t> &data);
 
     /// \brief Extract the header from the file.
     ///
@@ -85,7 +85,7 @@ public:
     ///		.sol file data.
     ///
     /// @return true if this succeeded. false if it doesn't.
-    bool formatHeader(const std::vector<boost::uint8_t> &data);
+    bool formatHeader(const std::vector<std::uint8_t> &data);
 
     /// \brief Create the file header.
     ///
@@ -127,7 +127,7 @@ public:
     /// \brief Get the stored copy of the header
     ///
     /// @return A vector of raw bytes that is a binary form of the header.
-    std::vector<boost::uint8_t> getHeader() { return _header; };
+    std::vector<std::uint8_t> getHeader() { return _header; };
 
     /// \brief Add the AMF objects that are the data of the file
     //
@@ -192,11 +192,11 @@ public:
  private:
     /// \var SOL::_header
     ///		A stored copy of the SOL file header.
-    std::vector<boost::uint8_t> _header;
+    std::vector<std::uint8_t> _header;
 
     /// \var SOL::_data
     ///		The vector that contains the raw dats for this .sol file.
-    std::vector<boost::uint8_t> _data;
+    std::vector<std::uint8_t> _data;
 
     /// \var SOL::_objname
     ///		The name of the SharedObject in the .sol file.

@@ -19,7 +19,7 @@
 
 #include "WAVWriter.h"
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <fstream> // for composition (file_stream)
 #include <iostream> 
 
@@ -35,23 +35,23 @@ namespace { // anonymous
 // http://ftp.iptel.org/pub/sems/doc/full/current/wav__hdr_8c-source.html
 struct WAV_HDR {
      char rID[4];            // 'RIFF'
-     boost::uint32_t rLen;        
+     std::uint32_t rLen;
      char wID[4];            // 'WAVE'
      char fId[4];            // 'fmt '
-     boost::uint32_t pcm_header_len;   // varies...
-     boost::int16_t wFormatTag;
-     boost::int16_t nChannels;      // 1,2 for stereo data is (l,r) pairs
-     boost::uint32_t nSamplesPerSec;
-     boost::uint32_t nAvgBytesPerSec;
-     boost::int16_t nBlockAlign;      
-     boost::int16_t nBitsPerSample;
+     std::uint32_t pcm_header_len;   // varies...
+     std::int16_t wFormatTag;
+     std::int16_t nChannels;      // 1,2 for stereo data is (l,r) pairs
+     std::uint32_t nSamplesPerSec;
+     std::uint32_t nAvgBytesPerSec;
+     std::int16_t nBlockAlign;
+     std::int16_t nBitsPerSample;
 };
 
 // Chunk of wave file
 // http://ftp.iptel.org/pub/sems/doc/full/current/wav__hdr_8c-source.html
 struct CHUNK_HDR{
     char dId[4];            // 'data' or 'fact'
-    boost::uint32_t dLen;
+    std::uint32_t dLen;
 };
 
 } // end of anonymous namespace
@@ -80,10 +80,10 @@ WAVWriter::~WAVWriter()
 
 /* public */
 void
-WAVWriter::pushSamples(boost::int16_t* from, unsigned int nSamples)
+WAVWriter::pushSamples(std::int16_t* from, unsigned int nSamples)
 {
     // NOTE: if muted, the samples will be silent already
-        boost::uint8_t* stream = reinterpret_cast<boost::uint8_t*>(from);
+        std::uint8_t* stream = reinterpret_cast<std::uint8_t*>(from);
         unsigned int len = nSamples*2;
         file_stream.write((char*) stream, len);
 

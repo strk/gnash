@@ -23,7 +23,7 @@
 #endif
 
 #include <memory>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <vector>
 #include <queue>
 #include <linux/input.h>
@@ -127,7 +127,7 @@ public:
     void setType(InputDevice::devicetype_e x) { _type = x; };
 
     // Read data into the Device input buffer.
-    std::unique_ptr<boost::uint8_t[]> readData(size_t size);
+    std::unique_ptr<std::uint8_t[]> readData(size_t size);
     std::shared_ptr<input_data_t> popData()
     {
         std::shared_ptr<InputDevice::input_data_t> input;
@@ -157,7 +157,7 @@ protected:
     int                 _fd;
     input_data_t        _input_data;
     // These hold the data queue
-    std::unique_ptr<boost::uint8_t[]> _buffer;
+    std::unique_ptr<std::uint8_t[]> _buffer;
     std::queue<std::shared_ptr<input_data_t> > _data;
     int                 _screen_width;
     int                 _screen_height;    

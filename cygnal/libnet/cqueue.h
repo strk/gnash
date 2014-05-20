@@ -22,7 +22,7 @@
 #define __CQUEUE_H__ 1
 
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/thread/mutex.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -40,21 +40,21 @@ public:
     ~CQueue();
 
     // Push bytes on the FIFO
-    bool push(boost::uint8_t *data, int nbytes);
-    bool push(std::vector<boost::uint8_t> *data);
+    bool push(std::uint8_t *data, int nbytes);
+    bool push(std::vector<std::uint8_t> *data);
     // Pop the first date element off the FIFO
     std::vector<uint8_t> *pop();
     // Peek at the first data element without removing it
     std::vector<uint8_t> *peek();
-//     void memcpy(boost::uint8_t *data, size_t size,
-//                  std::vector<boost::uint8_t> *ptr);
-//     void memcpy(std::vector<boost::uint8_t> *ptr,
-//                  boost::uint8_t *data, size_t size);
+//     void memcpy(std::uint8_t *data, size_t size,
+//                  std::vector<std::uint8_t> *ptr);
+//     void memcpy(std::vector<std::uint8_t> *ptr,
+//                  std::uint8_t *data, size_t size);
     size_t size() { return _queue.size(); };
     // Dump internal data.
     void dump();
 private:
-    std::vector<std::vector<boost::uint8_t> *> _queue;
+    std::vector<std::vector<std::uint8_t> *> _queue;
 };
 
 

@@ -27,18 +27,18 @@
 
 namespace gnash {
 
-const boost::int32_t SWFRect::rectNull;
-const boost::int32_t SWFRect::rectMax;
+const std::int32_t SWFRect::rectNull;
+const std::int32_t SWFRect::rectMax;
 
 
 // Set ourself to bound a rectangle that has been transformed by m.  
 void
 SWFRect::enclose_transformed_rect(const SWFMatrix& m, const SWFRect& r)
 {   
-    boost::int32_t  x1 = r.get_x_min();
-    boost::int32_t  y1 = r.get_y_min();
-    boost::int32_t  x2 = r.get_x_max();
-    boost::int32_t  y2 = r.get_y_max();
+    std::int32_t  x1 = r.get_x_min();
+    std::int32_t  y1 = r.get_y_min();
+    std::int32_t  x2 = r.get_x_max();
+    std::int32_t  y2 = r.get_y_max();
 
     point  p0(x1, y1);
     point  p1(x2, y1);
@@ -81,10 +81,10 @@ SWFRect::expand_to_transformed_rect(const SWFMatrix& m, const SWFRect& r)
          return;
     }
 
-    const boost::int32_t x1 = r.get_x_min();
-    const boost::int32_t y1 = r.get_y_min();
-    const boost::int32_t x2 = r.get_x_max();
-    const boost::int32_t y2 = r.get_y_max();
+    const std::int32_t x1 = r.get_x_min();
+    const std::int32_t y1 = r.get_y_min();
+    const std::int32_t x2 = r.get_x_max();
+    const std::int32_t y2 = r.get_y_max();
 
     point p0(x1, y1);
     point p1(x2, y1);
@@ -124,8 +124,8 @@ void
 SWFRect::clamp(point& p) const
 {
     assert( !is_null() );
-    p.x = gnash::clamp<boost::int32_t>(p.x, _xMin, _xMax);
-    p.y = gnash::clamp<boost::int32_t>(p.y, _yMin, _yMax);
+    p.x = gnash::clamp<std::int32_t>(p.x, _xMin, _xMax);
+    p.y = gnash::clamp<std::int32_t>(p.y, _yMin, _yMax);
 }
 
 std::string

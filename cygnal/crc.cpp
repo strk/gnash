@@ -34,7 +34,7 @@
 #include <sys/types.h>
 #include "GnashSystemIOHeaders.h" // for getuid()
 #include <sys/stat.h>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include <cctype>  // for toupper
 #include <string>

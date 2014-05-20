@@ -356,7 +356,7 @@ Handler::initModule(const std::string& str)
 }
 
 size_t
-Handler::writeToPlugin(boost::uint8_t *data, size_t size)
+Handler::writeToPlugin(std::uint8_t *data, size_t size)
 {
     // GNASH_REPORT_FUNCTION;
     size_t ret = 0;

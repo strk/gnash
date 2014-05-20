@@ -51,7 +51,7 @@ class SWFMovie : public Movie
 {
 
     /// A container to track known characters and whether they are initialized.
-    typedef std::map<boost::uint16_t, bool> Characters;
+    typedef std::map<std::uint16_t, bool> Characters;
 
 public:
 
@@ -117,7 +117,7 @@ public:
     /// If a duplicated character is added, it will not be marked
     /// uninitialized, as SWF::DoInitAction tags are only executed once
     /// for each id.
-    void addCharacter(boost::uint16_t id);
+    void addCharacter(std::uint16_t id);
 
     /// Attempt to mark a character as initialized.
     //
@@ -130,7 +130,7 @@ public:
     ///                or has not yet been placed on stage).
     ///             2. The character has already been initialized.
     ///             true if the character was marked initialized.
-	bool initializeCharacter(boost::uint16_t id);
+	bool initializeCharacter(std::uint16_t id);
 
     const movie_definition* definition() const {
         return _def.get();

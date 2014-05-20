@@ -39,14 +39,14 @@ StaticText::getStaticText(std::vector<const SWF::TextRecord*>& to,
 }
 
 void
-StaticText::setSelectionColor(boost::uint32_t color)
+StaticText::setSelectionColor(std::uint32_t color)
 {
     // Drop any alpha value
     _selectionColor.parseRGB(color & 0xffffff);
 }
 
 bool
-StaticText::pointInShape(boost::int32_t x, boost::int32_t y) const
+StaticText::pointInShape(std::int32_t x, std::int32_t y) const
 {
     // TODO: check actual point in shape, as tested 
     //       in misc-ming.all/DefineTextTest.swf

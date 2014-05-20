@@ -61,7 +61,7 @@ public:
 	~AudioDecoderSimple();
 
     // See dox in AudioDecoder.h
-	boost::uint8_t* decode(const boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes);
+	std::uint8_t* decode(const std::uint8_t* input, std::uint32_t inputSize, std::uint32_t& outputSize, std::uint32_t& decodedBytes);
 
 private:
 
@@ -75,10 +75,10 @@ private:
 	audioCodecType _codec;
 
 	// samplerate
-	boost::uint16_t _sampleRate;
+	std::uint16_t _sampleRate;
 
 	// sampleCount
-	boost::uint32_t _sampleCount;
+	std::uint32_t _sampleCount;
 
 	// stereo
 	bool _stereo;

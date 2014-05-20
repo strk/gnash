@@ -20,7 +20,7 @@
 
 #include "DefineFontAlignZonesTag.h"
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include "RunResources.h"
 #include "Font.h"
@@ -45,7 +45,7 @@ DefineFontAlignZonesTag::loader(SWFStream& in, TagType tag,
 	in.ensureBytes(2);
 
     // must reference a valid DEFINEFONT3 tag
-    const boost::uint16_t ref = in.read_u16(); 
+    const std::uint16_t ref = in.read_u16();
 	Font* referencedFont = m.get_font(ref);
 	if (!referencedFont) {
 		IF_VERBOSE_MALFORMED_SWF(
@@ -58,10 +58,10 @@ DefineFontAlignZonesTag::loader(SWFStream& in, TagType tag,
 
 	in.ensureBytes(1);
     // 2bits are cms table, 6bits are reserved
-	const boost::uint8_t flags = in.read_u8();
+	const std::uint8_t flags = in.read_u8();
 
     // What is this?
-	const boost::uint16_t csm_table_int = flags >> 6;
+	const std::uint16_t csm_table_int = flags >> 6;
 
 	// TODO:
     // The first thing to to is test what this does. According to some
@@ -84,8 +84,8 @@ DefineFontAlignZonesTag::loader(SWFStream& in, TagType tag,
         
         for (size_t j = 0; j != 2; ++j) {
             in.ensureBytes(4);
-            const boost::uint16_t zone_position = in.read_u16();
-            const boost::uint16_t zone_size = in.read_u16();
+            const std::uint16_t zone_position = in.read_u16();
+            const std::uint16_t zone_size = in.read_u16();
 
             IF_VERBOSE_PARSE(
                 log_parse("Zone position: %s, size: %s", zone_position,
@@ -95,7 +95,7 @@ DefineFontAlignZonesTag::loader(SWFStream& in, TagType tag,
         
         in.ensureBytes(1);
         // What is this?
-        const boost::uint8_t u = in.read_u8();
+        const std::uint8_t u = in.read_u8();
         const bool zone_x = u & 0x01;
         const bool zone_y = (u >> 1) & 0x01;
 

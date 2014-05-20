@@ -31,7 +31,7 @@
 #include <vector>
 #include <cmath>
 #include <climits>
-#include <boost/cstdint.hpp> 
+#include <cstdint>
 
 using gnash::log_debug;
 using gnash::log_error;
@@ -61,27 +61,27 @@ Flv::~Flv()
 
 // Encode the data into a Buffer
 std::shared_ptr<cygnal::Buffer>
-Flv::encodeHeader(boost::uint8_t type)
+Flv::encodeHeader(std::uint8_t type)
 {
 //    GNASH_REPORT_FUNCTION;
     std::shared_ptr<cygnal::Buffer> buf(new Buffer(sizeof(Flv::flv_header_t)));
     buf->clear();
     
-    boost::uint8_t version = 0x1;
+    std::uint8_t version = 0x1;
     *buf = "FLV";
     *buf += version;
 
     *buf += type;
 
-    boost::uint32_t size = htonl(0x9);
-    buf->append((boost::uint8_t *)&size, sizeof(boost::uint32_t));
+    std::uint32_t size = htonl(0x9);
+    buf->append((std::uint8_t *)&size, sizeof(std::uint32_t));
 
     return buf;
 }
 
 // Decode a Buffer into a header
 std::shared_ptr<Flv::flv_header_t>
-Flv::decodeHeader(boost::uint8_t *data)
+Flv::decodeHeader(std::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     std::shared_ptr<flv_header_t> header(new flv_header_t);
@@ -112,9 +112,9 @@ Flv::decodeHeader(boost::uint8_t *data)
     // Be lazy, as head_size is an array of 4 bytes, and not an integer in the data
     // structure. This is to get around possible padding done to the data structure
     // done by some compilers.
-    boost::uint32_t size = *(reinterpret_cast<boost::uint32_t *>(header->head_size));
+    std::uint32_t size = *(reinterpret_cast<std::uint32_t *>(header->head_size));
     // The header size is big endian
-    swapBytes(header->head_size, sizeof(boost::uint32_t));
+    swapBytes(header->head_size, sizeof(std::uint32_t));
     
     // The header size is always 9, guess it could change some day in the far future, so
     // we should use it.
@@ -134,12 +134,12 @@ Flv::decodeMetaData(std::shared_ptr<cygnal::Buffer> buf)
 }
 
 std::shared_ptr<cygnal::Element>
-Flv::decodeMetaData(boost::uint8_t *buf, size_t size)
+Flv::decodeMetaData(std::uint8_t *buf, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     AMF amf;
-    boost::uint8_t *ptr = buf;
-    boost::uint8_t *tooFar = ptr + size;
+    std::uint8_t *ptr = buf;
+    std::uint8_t *tooFar = ptr + size;
     
     // Extract the onMetaData object name
     // In disk files, I always see the 0x2 type field for
@@ -149,13 +149,13 @@ Flv::decodeMetaData(boost::uint8_t *buf, size_t size)
 	ptr++;
     }
     
-    boost::uint16_t length;
-    length = ntohs((*(boost::uint16_t *)ptr) & 0xffff);
+    std::uint16_t length;
+    length = ntohs((*(std::uint16_t *)ptr) & 0xffff);
     if (length >= SANE_STR_SIZE) {
 	log_error(_("%d bytes for a string is over the safe limit of %d"),
 		  length, SANE_STR_SIZE);
     }
-    ptr += sizeof(boost::uint16_t);
+    ptr += sizeof(std::uint16_t);
     std::string name(reinterpret_cast<const char *>(ptr), length);
     ptr += length;
     
@@ -170,7 +170,7 @@ Flv::decodeMetaData(boost::uint8_t *buf, size_t size)
 }
 
 std::shared_ptr<Flv::flv_audio_t>
-Flv::decodeAudioData(boost::uint8_t byte)
+Flv::decodeAudioData(std::uint8_t byte)
 {
 //    GNASH_REPORT_FUNCTION;
     std::shared_ptr<flv_audio_t> audio(new flv_audio_t);
@@ -229,7 +229,7 @@ Flv::decodeAudioData(boost::uint8_t byte)
 }
 
 std::shared_ptr<Flv::flv_video_t>
-Flv::decodeVideoData(boost::uint8_t byte)
+Flv::decodeVideoData(std::uint8_t byte)
 {
 //    GNASH_REPORT_FUNCTION;
     std::shared_ptr<flv_video_t> video(new flv_video_t);
@@ -270,16 +270,16 @@ Flv::decodeVideoData(boost::uint8_t byte)
 }
 
 // Convert a 24 bit integer to a 32 bit one so we can use it.
-boost::uint32_t
-Flv::convert24(boost::uint8_t *num)
+std::uint32_t
+Flv::convert24(std::uint8_t *num)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint32_t bodysize = 0;
+    std::uint32_t bodysize = 0;
 
 #ifdef BOOST_BIG_ENDIAN
-    bodysize = *(reinterpret_cast<boost::uint32_t *>(num)) >> 8;
+    bodysize = *(reinterpret_cast<std::uint32_t *>(num)) >> 8;
 #else
-    bodysize = *(reinterpret_cast<boost::uint32_t *>(num)) << 8;
+    bodysize = *(reinterpret_cast<std::uint32_t *>(num)) << 8;
     bodysize = ntohl(bodysize);
 #endif
     
@@ -288,7 +288,7 @@ Flv::convert24(boost::uint8_t *num)
 
 // Decode the tag header
 std::shared_ptr<Flv::flv_tag_t>
-Flv::decodeTagHeader(boost::uint8_t *buf)
+Flv::decodeTagHeader(std::uint8_t *buf)
 {
 //    GNASH_REPORT_FUNCTION;
     flv_tag_t *data = reinterpret_cast<flv_tag_t *>(buf);

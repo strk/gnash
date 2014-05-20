@@ -23,7 +23,7 @@
 #endif
 
 #include <sys/types.h>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <iostream>
@@ -163,7 +163,7 @@ DiskStream::DiskStream(const string &str)
 #endif
 }
 
-DiskStream::DiskStream(const string &str, boost::uint8_t *data, size_t size)
+DiskStream::DiskStream(const string &str, std::uint8_t *data, size_t size)
     : _state(DiskStream::NO_STATE),
       _filefd(0),
       _netfd(0),
@@ -197,7 +197,7 @@ DiskStream::DiskStream(const string &str, boost::uint8_t *data, size_t size)
 #endif
 #endif
 
-    _dataptr = new boost::uint8_t[size];
+    _dataptr = new std::uint8_t[size];
     // Note that this is a copy operation, which may effect performance. We do this for now
     // incase the top level pointer gets deleted. This should really be using
     // boost::scoped_array, but we don't want that complexity till this code stabalizes.
@@ -245,7 +245,7 @@ DiskStream::DiskStream(const string &str, cygnal::Buffer &buf)
 #endif
 #endif
 
-    _dataptr = new boost::uint8_t[buf.size()];
+    _dataptr = new std::uint8_t[buf.size()];
     // Note that this is a copy operation, which may effect performance. We do this for now
     // incase the top level pointer gets deleted. This should really be using
     // boost::scoped_array, but we don't want that complexity till this code stabalizes.
@@ -388,7 +388,7 @@ DiskStream::close()
 ///
 /// @return A real pointer to the location of the data at the
 ///	location pointed to by the offset.
-boost::uint8_t *
+std::uint8_t *
 DiskStream::loadToMem(off_t offset)
 {
     // GNASH_REPORT_FUNCTION;
@@ -396,7 +396,7 @@ DiskStream::loadToMem(off_t offset)
     return loadToMem(_filesize, offset);
 }
 
-boost::uint8_t *
+std::uint8_t *
 DiskStream::loadToMem(size_t filesize, off_t offset)
 {
     GNASH_REPORT_FUNCTION;
@@ -443,7 +443,7 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
 	return _dataptr + offset;
     }
     
-    boost::uint8_t *dataptr = 0;
+    std::uint8_t *dataptr = 0;
     
     if (_filefd) {
 	/// If the data pointer is legit, then we need to unmap that page
@@ -478,14 +478,14 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
 	HANDLE handle = CreateFileMapping((HANDLE)_get_osfhandle(_filefd), NULL,
 					  PAGE_WRITECOPY, 0, 0, NULL);
 	if (handle != NULL) {
-	    dataptr = static_cast<boost::uint8_t *>(MapViewOfFile(handle, FILE_MAP_COPY, 0, offset, page));
+	    dataptr = static_cast<std::uint8_t *>(MapViewOfFile(handle, FILE_MAP_COPY, 0, offset, page));
 	    CloseHandle(handle);
 
 	}
 #elif defined(__amigaos4__)
-	dataptr = static_cast<boost::uint8_t *>(malloc(loadsize));
+	dataptr = static_cast<std::uint8_t *>(malloc(loadsize));
 #else
-	dataptr = static_cast<boost::uint8_t *>(mmap(0, loadsize,
+	dataptr = static_cast<std::uint8_t *>(mmap(0, loadsize,
 						     PROT_READ, MAP_SHARED,
 						     _filefd, page));
 #endif
@@ -508,7 +508,7 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
 	_offset = 0;
     }
 
-    boost::uint8_t *ptr = dataptr;
+    std::uint8_t *ptr = dataptr;
     if (_filetype == FILETYPE_FLV) {
 	// FIXME: for now, assume all media files are in FLV format
 	_flv.reset(new cygnal::Flv);
@@ -575,7 +575,7 @@ DiskStream::writeToDisk(const std::string &filespec, cygnal::Buffer &data)
 }
 
 bool
-DiskStream::writeToDisk(const std::string &filespec, boost::uint8_t *data, size_t size)
+DiskStream::writeToDisk(const std::string &filespec, std::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -666,7 +666,7 @@ DiskStream::open(const string &filespec, int netfd, Statistics &statistics)
 	_filefd = ::open(_filespec.c_str(), O_RDONLY);
 	log_debug (_("Opening file %s (fd #%d), %lld bytes in size."),
 		   _filespec, _filefd,
-		   (boost::int64_t) _filesize);
+		   (std::int64_t) _filesize);
 	_state = OPEN;
 	_filetype = determineFileType(filespec);
 	loadToMem(0); // load the first page into memory
@@ -891,7 +891,7 @@ DiskStream::pause()
 ///	seek to.
 ///
 /// @return A real pointer to the location of the data seeked to.
-boost::uint8_t *
+std::uint8_t *
 DiskStream::seek(off_t offset)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -1044,7 +1044,7 @@ DiskStream::determineFileType(const string &filespec)
 }
 
 DiskStream::filetype_e 
-DiskStream::determineFileType( boost::uint8_t *data)
+DiskStream::determineFileType( std::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
 

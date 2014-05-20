@@ -111,8 +111,8 @@ action_buffer::readConstantPool(size_t start_pc, size_t stop_pc) const
     ConstantPool& pool = _pools[start_pc];
 
     size_t i = start_pc;
-    const boost::uint16_t length = read_uint16(i + 1);
-    const boost::uint16_t count = read_uint16(i + 3); 
+    const std::uint16_t length = read_uint16(i + 1);
+    const std::uint16_t count = read_uint16(i + 3);
     i += 2;
     
     assert(start_pc + 3 + length == stop_pc);
@@ -300,8 +300,8 @@ disasm_instruction(const unsigned char* instruction_data,
 
                         case 7:
                         {
-                            // boost::int32_t
-                            boost::int32_t val = instruction_data[3 + i]
+                            // std::int32_t
+                            std::int32_t val = instruction_data[3 + i]
                             | (instruction_data[3 + i + 1] << 8)
                             | (instruction_data[3 + i + 2] << 16)
                             | (instruction_data[3 + i + 3] << 24);
@@ -372,17 +372,17 @@ disasm_instruction(const unsigned char* instruction_data,
                 if (i + 6 > length) break;
                 ++i;
                        
-                boost::uint16_t argCount = instruction_data[3 + i] | (instruction_data[3 + i + 1] << 8);
+                std::uint16_t argCount = instruction_data[3 + i] | (instruction_data[3 + i + 1] << 8);
                 i += 2;
                 
-                boost::uint8_t registerCount = instruction_data[3 + i];
+                std::uint8_t registerCount = instruction_data[3 + i];
                 i++;
 
                 ss << "\tname = '" << functionName << "'"
                        << " arg count = " << argCount
                        << " register count = " << static_cast<int>(registerCount);
                 
-                const boost::uint16_t flags =
+                const std::uint16_t flags =
                     (instruction_data[3 + i]) |
                     (instruction_data[3 + i + 1] << 8);
 
@@ -504,16 +504,16 @@ convert_float_little(const void *p)
     // Hairy union for endian detection and munging
     union {
         float f;
-        boost::uint32_t i;
+        std::uint32_t i;
         struct {    // for endian detection
-            boost::uint16_t s0;
-            boost::uint16_t s1;
+            std::uint16_t s0;
+            std::uint16_t s1;
         } s;
         struct {    // for byte-swapping
-            boost::uint8_t c0;
-            boost::uint8_t c1;
-            boost::uint8_t c2;
-            boost::uint8_t c3;
+            std::uint8_t c0;
+            std::uint8_t c1;
+            std::uint8_t c2;
+            std::uint8_t c3;
         } c;
     } u;
 
@@ -525,7 +525,7 @@ convert_float_little(const void *p)
             break;
         case 0x3f80:    // big-endian host
         {
-            const boost::uint8_t *cp = static_cast<const boost::uint8_t*>(p);
+            const std::uint8_t *cp = static_cast<const std::uint8_t*>(p);
             u.c.c0 = cp[3];
             u.c.c1 = cp[2];
             u.c.c2 = cp[1];
@@ -547,29 +547,29 @@ convert_float_little(const void *p)
 double
 convert_double_wacky(const void *p)
 {
-    const boost::uint8_t *cp = static_cast<const boost::uint8_t*>(p);
+    const std::uint8_t *cp = static_cast<const std::uint8_t*>(p);
     union {
         double d;
-        boost::uint64_t i;
+        std::uint64_t i;
         struct {
-            boost::uint32_t l0;
-            boost::uint32_t l1;
+            std::uint32_t l0;
+            std::uint32_t l1;
         } l;
         struct {
-            boost::uint16_t s0;
-            boost::uint16_t s1;
-            boost::uint16_t s2;
-            boost::uint16_t s3;
+            std::uint16_t s0;
+            std::uint16_t s1;
+            std::uint16_t s2;
+            std::uint16_t s3;
         } s;
         struct {
-            boost::uint8_t c0;
-            boost::uint8_t c1;
-            boost::uint8_t c2;
-            boost::uint8_t c3;
-            boost::uint8_t c4;
-            boost::uint8_t c5;
-            boost::uint8_t c6;
-            boost::uint8_t c7;
+            std::uint8_t c0;
+            std::uint8_t c1;
+            std::uint8_t c2;
+            std::uint8_t c3;
+            std::uint8_t c4;
+            std::uint8_t c5;
+            std::uint8_t c6;
+            std::uint8_t c7;
         } c;
     } u;
 

@@ -27,7 +27,7 @@
 #include <map>
 #include <memory> 
 #include <boost/array.hpp>
-#include <boost/cstdint.hpp> 
+#include <cstdint>
 #include <boost/random/mersenne_twister.hpp>  // for mt11213b
 #include <boost/noncopyable.hpp>
 
@@ -425,7 +425,7 @@ as_object* toObject(const as_value& v, VM& vm);
 /// @param val  The value to return as an int.
 /// @param vm   The VM to use for the conversion.
 /// @return     The integer value of the passed as_value.
-boost::int32_t toInt(const as_value& val, const VM& vm);
+std::int32_t toInt(const as_value& val, const VM& vm);
 
 /// Force type to number.
 //

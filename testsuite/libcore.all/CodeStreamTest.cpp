@@ -45,7 +45,7 @@ main(int /*argc*/, char** /*argv*/)
 	CodeStream* stream = new CodeStream(std::string(data,10));
 	
 	//Test read_as30p()
-	boost::uint8_t opcode;
+	std::uint8_t opcode;
 	int i = 0;
 	while(opcode = stream->read_as3op()){
 		check_equals(opcode,data[i]);
@@ -80,11 +80,11 @@ main(int /*argc*/, char** /*argv*/)
 	char newData[6] = {0x5,0xC5,0x0,0x0,0x1,0x2}; 
 	CodeStream* streamA = new CodeStream(std::string(newData,6));
 	
-	boost::uint8_t byteA = streamA->read_u8(); 
+	std::uint8_t byteA = streamA->read_u8();
 	check_equals(byteA,newData[0]);
 	
 	//Test read_S24.
-	boost::int32_t byteB = streamA->read_S24();
+	std::int32_t byteB = streamA->read_S24();
 	check_equals(byteB,197);
 
 	

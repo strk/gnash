@@ -259,7 +259,7 @@ class ShapeContainerFinder
 {
 public:
 
-    ShapeContainerFinder(boost::int32_t x, boost::int32_t y)
+    ShapeContainerFinder(std::int32_t x, std::int32_t y)
         :
         _found(false),
         _x(x),
@@ -278,8 +278,8 @@ public:
 
 private:
     bool _found;
-    const boost::int32_t _x;
-    const boost::int32_t _y;
+    const std::int32_t _x;
+    const std::int32_t _y;
 };
 
 /// Find the first visible DisplayObject whose shape contain the point
@@ -290,7 +290,7 @@ class VisibleShapeContainerFinder
 {
 public:
 
-    VisibleShapeContainerFinder(boost::int32_t x, boost::int32_t y)
+    VisibleShapeContainerFinder(std::int32_t x, std::int32_t y)
         :
         _found(false),
         _x(x),
@@ -310,8 +310,8 @@ public:
 
 private:
     bool _found;
-    const boost::int32_t _x;
-    const boost::int32_t _y;
+    const std::int32_t _x;
+    const std::int32_t _y;
 };
 
 /// Find the first hitable DisplayObject whose shape contain the point 
@@ -321,7 +321,7 @@ private:
 class HitableShapeContainerFinder
 { 
 public: 
-    HitableShapeContainerFinder(boost::int32_t x, boost::int32_t y) 
+    HitableShapeContainerFinder(std::int32_t x, std::int32_t y)
         : 
         _found(false), 
         _x(x), 
@@ -344,10 +344,10 @@ private:
     bool _found; 
 
     // x position in twips.
-    const boost::int32_t _x;
+    const std::int32_t _x;
     
     // y position in twips.
-    const boost::int32_t _y;
+    const std::int32_t _y;
 }; 
 
 /// A DisplayList visitor used to compute its overall bounds.
@@ -384,7 +384,7 @@ struct ReachableMarker
 class DropTargetFinder
 {
 public:
-    DropTargetFinder(boost::int32_t x, boost::int32_t y, DisplayObject* dragging)
+    DropTargetFinder(std::int32_t x, std::int32_t y, DisplayObject* dragging)
         :
         _highestHiddenDepth(std::numeric_limits<int>::min()),
         _x(x),
@@ -464,8 +464,8 @@ private:
     ///
     int _highestHiddenDepth;
 
-    boost::int32_t _x;
-    boost::int32_t _y;
+    std::int32_t _x;
+    std::int32_t _y;
     DisplayObject* _dragging;
     mutable const DisplayObject* _dropch;
 
@@ -1266,7 +1266,7 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     }
 
     if (tag->hasBlendMode()) {
-        boost::uint8_t bm = tag->getBlendMode();
+        std::uint8_t bm = tag->getBlendMode();
         ch->setBlendMode(static_cast<DisplayObject::BlendMode>(bm));
     }
 
@@ -1293,7 +1293,7 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
 void 
 MovieClip::move_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist)
 {    
-    boost::uint16_t ratio = tag->getRatio();
+    std::uint16_t ratio = tag->getRatio();
     // clip_depth is not used in MOVE tag(at least no related tests). 
     dlist.moveDisplayObject(
         tag->getDepth(), 
@@ -1311,7 +1311,7 @@ MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
     assert(_def);
     assert(tag != NULL);
 
-    const boost::uint16_t id = tag->getID();
+    const std::uint16_t id = tag->getID();
 
     SWF::DefinitionTag* cdef = _def->getDefinitionTag(id);
     if (!cdef) {
@@ -1414,7 +1414,7 @@ MovieClip::handleFocus()
 }
 
 bool
-MovieClip::pointInShape(boost::int32_t x, boost::int32_t y) const
+MovieClip::pointInShape(std::int32_t x, std::int32_t y) const
 {
     ShapeContainerFinder finder(x, y);
     _displayList.visitBackward(finder);
@@ -1423,7 +1423,7 @@ MovieClip::pointInShape(boost::int32_t x, boost::int32_t y) const
 }
 
 bool
-MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
+MovieClip::pointInVisibleShape(std::int32_t x, std::int32_t y) const
 {
     if (! visible()) return false;
     if (isDynamicMask() && ! mouseEnabled()) {
@@ -1450,7 +1450,7 @@ MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
 }
 
 inline bool
-MovieClip::hitTestDrawable(boost::int32_t x, boost::int32_t y) const
+MovieClip::hitTestDrawable(std::int32_t x, std::int32_t y) const
 {
     const SWFMatrix wm = getWorldMatrix(*this).invert();
     point lp(x, y);
@@ -1460,7 +1460,7 @@ MovieClip::hitTestDrawable(boost::int32_t x, boost::int32_t y) const
 }
 
 bool
-MovieClip::pointInHitableShape(boost::int32_t x, boost::int32_t y) const
+MovieClip::pointInHitableShape(std::int32_t x, std::int32_t y) const
 {
     if (isDynamicMask() && !mouseEnabled()) return false;
 
@@ -1475,7 +1475,7 @@ MovieClip::pointInHitableShape(boost::int32_t x, boost::int32_t y) const
 }
 
 InteractiveObject*
-MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
+MovieClip::topmostMouseEntity(std::int32_t x, std::int32_t y)
 {
     if (!visible()) return 0;
 
@@ -1511,7 +1511,7 @@ MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 }
 
 const DisplayObject*
-MovieClip::findDropTarget(boost::int32_t x, boost::int32_t y,
+MovieClip::findDropTarget(std::int32_t x, std::int32_t y,
         DisplayObject* dragging) const
 {
     if (this == dragging) return 0; // not here...

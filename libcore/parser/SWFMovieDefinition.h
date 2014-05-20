@@ -240,10 +240,10 @@ public:
     DSOTEXPORT virtual void importResources(boost::intrusive_ptr<movie_definition> source,
             const Imports& imports);
 
-    virtual void addDisplayObject(boost::uint16_t id, SWF::DefinitionTag* c);
+    virtual void addDisplayObject(std::uint16_t id, SWF::DefinitionTag* c);
 
     /// Return a DisplayObject from the dictionary
-    DSOTEXPORT SWF::DefinitionTag* getDefinitionTag(boost::uint16_t id) const;
+    DSOTEXPORT SWF::DefinitionTag* getDefinitionTag(std::uint16_t id) const;
 
     // See dox in movie_definition
     //
@@ -372,7 +372,7 @@ public:
     /// @return         The id corresponding to the passed symbol. 0 is not a
     ///                 valid id and signifies that the symbol was not (yet)
     ///                 exported.
-    boost::uint16_t exportID(const std::string& symbol) const;
+    std::uint16_t exportID(const std::string& symbol) const;
     
     /// Register a symbol to refer to a character id
     //
@@ -381,7 +381,7 @@ public:
     /// @param id       The id of the character to map to the symbol. NB: this
     ///                 must never be 0!
     /// @param symbol   The symbol to map to the id.
-    void registerExport(const std::string& symbol, boost::uint16_t id);
+    void registerExport(const std::string& symbol, std::uint16_t id);
 
     
 #ifdef USE_SWFTREE
@@ -433,7 +433,7 @@ private:
     mutable boost::mutex _namedFramesMutex;
 
     /// Allow mapping symbol to id case insensitively.
-    typedef std::map<std::string, boost::uint16_t,
+    typedef std::map<std::string, std::uint16_t,
             StringNoCaseLessThan> Exports;
 
     /// A map of symbol to character id.
@@ -483,7 +483,7 @@ private:
 
     int m_loading_sound_stream;
 
-    boost::uint32_t m_file_length;
+    std::uint32_t m_file_length;
 
     std::unique_ptr<image::JpegInput> m_jpeg_in;
 

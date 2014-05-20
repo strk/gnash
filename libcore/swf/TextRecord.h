@@ -134,7 +134,7 @@ public:
         return _font.get();
     }
 
-    void setTextHeight(boost::uint16_t height) {
+    void setTextHeight(std::uint16_t height) {
         _textHeight = height;
     }
 
@@ -147,7 +147,7 @@ public:
         return width;
 	}
 
-    boost::uint16_t textHeight() const {
+    std::uint16_t textHeight() const {
         return _textHeight;
     }
 
@@ -201,7 +201,7 @@ private:
     rgba _color;
 
     /// The height of the text in TWIPS.
-    boost::uint16_t _textHeight;
+    std::uint16_t _textHeight;
 
     /// Whether the TextRecord has an x offset.
     bool _hasXOffset;

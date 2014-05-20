@@ -21,7 +21,7 @@
 
 #include <cerrno>
 #include <cstring>
-#include <boost/cstdint.hpp> // for boost::?int??_t
+#include <cstdint> // for boost::?int??_t
 #include <boost/assign/list_of.hpp>
 #include <functional>
 
@@ -140,7 +140,7 @@ namespace {
     bool findListener(const std::string& name, SharedMem& mem);
     void getMarker(SharedMem::iterator& i, SharedMem::iterator end);
     void markRead(SharedMem& m);
-    inline boost::uint32_t getTimestamp(const VM& vm);
+    inline std::uint32_t getTimestamp(const VM& vm);
 
     /// Read the AMF data and invoke the function.
     void executeAMFFunction(as_object& owner, amf::Reader& rd);
@@ -148,14 +148,14 @@ namespace {
     struct ConnectionData
     {
         std::string name;
-        boost::uint32_t ts;
+        std::uint32_t ts;
         SimpleBuffer data; 
     };
 }
 
 
 void
-writeLong(boost::uint8_t*& ptr, boost::uint32_t i)
+writeLong(std::uint8_t*& ptr, std::uint32_t i)
 {
     *ptr = i & 0xff;
     ++ptr;
@@ -167,9 +167,9 @@ writeLong(boost::uint8_t*& ptr, boost::uint32_t i)
     ++ptr;
 }
 
-inline boost::uint32_t
-readLong(const boost::uint8_t* buf) {
-	boost::uint32_t s = buf[0] | buf[1] << 8 | buf[2] << 16 | buf[3] << 24;
+inline std::uint32_t
+readLong(const std::uint8_t* buf) {
+	std::uint32_t s = buf[0] | buf[1] << 8 | buf[2] << 16 | buf[3] << 24;
 	return s;
 }
 
@@ -252,7 +252,7 @@ private:
     std::deque<std::shared_ptr<ConnectionData> > _queue;
 
     // The timestamp of our last write to the shared memory.
-    boost::uint32_t _lastTime;
+    std::uint32_t _lastTime;
 
 };
 
@@ -302,8 +302,8 @@ LocalConnection_as::update()
 
     // These are not network byte order by default, but not sure about 
     // host byte order.
-    const boost::uint32_t timestamp = readLong(ptr + 8);
-    const boost::uint32_t size = readLong(ptr + 12);
+    const std::uint32_t timestamp = readLong(ptr + 8);
+    const std::uint32_t size = readLong(ptr + 12);
 
     // As long as there is a timestamp in the shared memory, we mustn't
     // write anything.
@@ -317,10 +317,10 @@ LocalConnection_as::update()
     if (timestamp) {
 
         // Start after 16-byte header.
-        const boost::uint8_t* b = ptr + 16;
+        const std::uint8_t* b = ptr + 16;
 
         // End at reported size of AMF sequence.
-        const boost::uint8_t* end = b + size;
+        const std::uint8_t* end = b + size;
 
         amf::Reader rd(b, end, getGlobal(owner()));
         as_value a;
@@ -340,7 +340,7 @@ LocalConnection_as::update()
             const size_t timeout = 4 * 1000;
 
             VM& vm = getVM(owner());
-            const boost::uint32_t timeNow = getTimestamp(vm);
+            const std::uint32_t timeNow = getTimestamp(vm);
 
             if (timeNow - timestamp > timeout) {
                 log_debug("Data %s expired at %s. Removing its target "
@@ -915,7 +915,7 @@ markRead(SharedMem& m)
 /// Version 10 fails if it recieves a value outside the signed 32-bit int
 /// range, so we surmise that there is an undocumented conversion to signed
 /// in that player. We make sure the value never exceeds 0x7fffffff.
-inline boost::uint32_t
+inline std::uint32_t
 getTimestamp(const VM& vm)
 {
     return vm.getTime() & 0x7fffffff;

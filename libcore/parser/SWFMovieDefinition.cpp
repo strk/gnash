@@ -173,7 +173,7 @@ SWFMovieDefinition::~SWFMovieDefinition()
 }
 
 void
-SWFMovieDefinition::addDisplayObject(boost::uint16_t id, SWF::DefinitionTag* c)
+SWFMovieDefinition::addDisplayObject(std::uint16_t id, SWF::DefinitionTag* c)
 {
     assert(c);
     boost::mutex::scoped_lock lock(_dictionaryMutex);
@@ -182,7 +182,7 @@ SWFMovieDefinition::addDisplayObject(boost::uint16_t id, SWF::DefinitionTag* c)
 }
 
 SWF::DefinitionTag*
-SWFMovieDefinition::getDefinitionTag(boost::uint16_t id) const
+SWFMovieDefinition::getDefinitionTag(std::uint16_t id) const
 {
     boost::mutex::scoped_lock lock(_dictionaryMutex);
     boost::intrusive_ptr<SWF::DefinitionTag> ch = 
@@ -272,8 +272,8 @@ SWFMovieDefinition::readHeader(std::unique_ptr<IOChannel> in,
 
     _url = url.empty() ? "<anonymous>" : url;
 
-    boost::uint32_t file_start_pos = _in->tell();
-    boost::uint32_t header = _in->read_le32();
+    std::uint32_t file_start_pos = _in->tell();
+    std::uint32_t header = _in->read_le32();
     m_file_length = _in->read_le32();
     _swf_end_pos = file_start_pos + m_file_length;
 
@@ -324,7 +324,7 @@ SWFMovieDefinition::readHeader(std::unique_ptr<IOChannel> in,
     _str->ensureBytes(2 + 2); // frame rate, frame count.
     m_frame_rate = _str->read_u16() / 256.0f;
     if (!m_frame_rate) {
-        m_frame_rate = std::numeric_limits<boost::uint16_t>::max();
+        m_frame_rate = std::numeric_limits<std::uint16_t>::max();
     }
 
     m_frame_count = _str->read_u16();
@@ -560,7 +560,7 @@ SWFMovieDefinition::incrementLoadedFrames()
 
 void
 SWFMovieDefinition::registerExport(const std::string& symbol,
-        boost::uint16_t id)
+        std::uint16_t id)
 {
     assert(id);
 
@@ -609,7 +609,7 @@ SWFMovieDefinition::set_jpeg_loader(std::unique_ptr<image::JpegInput> j_in)
     m_jpeg_in = std::move(j_in);
 }
 
-boost::uint16_t
+std::uint16_t
 SWFMovieDefinition::exportID(const std::string& symbol) const
 {
     boost::mutex::scoped_lock lock(_exportedResourcesMutex);
@@ -648,7 +648,7 @@ SWFMovieDefinition::importResources(
         log_debug("%s importing %s from %s", get_url(), symbolName,
                 source->get_url());
 #endif
-        boost::uint16_t targetID;
+        std::uint16_t targetID;
 
         while(!(targetID = source->exportID(symbolName))) {
             

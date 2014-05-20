@@ -18,7 +18,7 @@
 //
 
 #include <boost/thread/mutex.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/array.hpp>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -108,7 +108,7 @@ SSHClient::sshRead(cygnal::Buffer &buf)
 }
 
 int
-SSHClient::sshRead(boost::uint8_t *buf, size_t size)
+SSHClient::sshRead(std::uint8_t *buf, size_t size)
 {
     GNASH_REPORT_FUNCTION;
     
@@ -130,7 +130,7 @@ SSHClient::sshWrite(cygnal::Buffer &buf)
 }
 
 int
-SSHClient::sshWrite(const boost::uint8_t *buf, size_t size)
+SSHClient::sshWrite(const std::uint8_t *buf, size_t size)
 {
     GNASH_REPORT_FUNCTION;
     

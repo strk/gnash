@@ -79,17 +79,17 @@ rotationY(const SWFMatrix& m)
     return std::atan2(-c, d);
 }
 
-inline boost::int32_t
+inline std::int32_t
 toFixed16(double a)
 {
     return truncateWithFactor<65536>(a);
 }
 
-inline boost::int32_t
-multiplyFixed16(boost::int32_t a, boost::int32_t b)
+inline std::int32_t
+multiplyFixed16(std::int32_t a, std::int32_t b)
 {
-    return (static_cast<boost::int64_t>(a) *
-            static_cast<boost::int64_t>(b) + 0x8000) >> 16;
+    return (static_cast<std::int64_t>(a) *
+            static_cast<std::int64_t>(b) + 0x8000) >> 16;
 
 }
 
@@ -98,28 +98,28 @@ multiplyFixed16(boost::int32_t a, boost::int32_t b)
 void
 SWFMatrix::transform(geometry::Point2d& p) const
 {
-    boost::int32_t t0 = multiplyFixed16(_a, p.x) + multiplyFixed16(_c, p.y) + _tx;
-    boost::int32_t t1 = multiplyFixed16(_b, p.x) + multiplyFixed16(_d, p.y) + _ty;
+    std::int32_t t0 = multiplyFixed16(_a, p.x) + multiplyFixed16(_c, p.y) + _tx;
+    std::int32_t t1 = multiplyFixed16(_b, p.x) + multiplyFixed16(_d, p.y) + _ty;
     p.x = t0;
     p.y = t1;
 }
 
 void
-SWFMatrix::transform(boost::int32_t& x, boost::int32_t& y) const
+SWFMatrix::transform(std::int32_t& x, std::int32_t& y) const
 {
-    const boost::int32_t t0 = multiplyFixed16(_a, x) + multiplyFixed16(_c, y) + _tx;
-    const boost::int32_t t1 = multiplyFixed16(_b,x) + multiplyFixed16(_d,  y) + _ty;
+    const std::int32_t t0 = multiplyFixed16(_a, x) + multiplyFixed16(_c, y) + _tx;
+    const std::int32_t t1 = multiplyFixed16(_b,x) + multiplyFixed16(_d,  y) + _ty;
     x = t0;
     y = t1;
 }
 
 void
-SWFMatrix::transform(geometry::Range2d<boost::int32_t>& r) const
+SWFMatrix::transform(geometry::Range2d<std::int32_t>& r) const
 {
-    const boost::int32_t xmin = r.getMinX();
-    const boost::int32_t xmax = r.getMaxX();
-    const boost::int32_t ymin = r.getMinY();
-    const boost::int32_t ymax = r.getMaxY();
+    const std::int32_t xmin = r.getMinX();
+    const std::int32_t xmax = r.getMaxX();
+    const std::int32_t ymin = r.getMinY();
+    const std::int32_t ymax = r.getMaxY();
 
     point p0(xmin, ymin);
     point p1(xmin, ymax);
@@ -262,10 +262,10 @@ SWFMatrix::transform(SWFRect& r) const
 {
     if (r.is_null()) return;
 
-    const boost::int32_t x1 = r.get_x_min();
-    const boost::int32_t y1 = r.get_y_min();
-    const boost::int32_t x2 = r.get_x_max();
-    const boost::int32_t y2 = r.get_y_max();
+    const std::int32_t x1 = r.get_x_min();
+    const std::int32_t y1 = r.get_y_min();
+    const std::int32_t x2 = r.get_x_max();
+    const std::int32_t y2 = r.get_y_max();
 
     point p0(x1, y1);
     point p1(x2, y1);
@@ -287,7 +287,7 @@ SWFMatrix::transform(SWFRect& r) const
 SWFMatrix&
 SWFMatrix::invert()
 {
-    const boost::int64_t det = determinant();
+    const std::int64_t det = determinant();
 
     if (det == 0) {
         set_identity();
@@ -296,12 +296,12 @@ SWFMatrix::invert()
 
     const double dn = 65536.0 * 65536.0 / det;
     
-    const boost::int32_t t0 = (boost::int32_t)(d() * dn);
-    _d = (boost::int32_t)(a() * dn);
-    _c = (boost::int32_t)(-c() * dn);
-    _b = (boost::int32_t)(-b() * dn);
+    const std::int32_t t0 = (std::int32_t)(d() * dn);
+    _d = (std::int32_t)(a() * dn);
+    _c = (std::int32_t)(-c() * dn);
+    _b = (std::int32_t)(-b() * dn);
 
-    const boost::int32_t t4 = -(multiplyFixed16(_tx, t0) + multiplyFixed16(_ty, _c));
+    const std::int32_t t4 = -(multiplyFixed16(_tx, t0) + multiplyFixed16(_ty, _c));
     _ty = -(multiplyFixed16(_tx, _b) + multiplyFixed16(_ty, _d));
 
     _a = t0;
@@ -333,7 +333,7 @@ SWFMatrix::get_rotation() const
 }
 
 // private
-boost::int64_t
+std::int64_t
 SWFMatrix::determinant() const
 {
     // | _a	_c	_tx |
@@ -343,7 +343,7 @@ SWFMatrix::determinant() const
     // Det(T) = ( (_a * _d * 1 ) + (_c * _ty * 0) + (_tx * _b *  0) ) -
     //          ( (0  * _d * _tx) + (0  * _ty * _a) + (1 * _c * _b) )
     //        = _a * _d - _b * _c
-    return (boost::int64_t)a() * d() - (boost::int64_t)b() * c();
+    return (std::int64_t)a() * d() - (std::int64_t)b() * c();
 }
 
 std::ostream&

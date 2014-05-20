@@ -36,7 +36,7 @@
 namespace gnash {
 namespace SWF {
 
-DefineVideoStreamTag::DefineVideoStreamTag(SWFStream& in, boost::uint16_t id)
+DefineVideoStreamTag::DefineVideoStreamTag(SWFStream& in, std::uint16_t id)
 	:
     DefinitionTag(id),
 	_width(0),
@@ -57,7 +57,7 @@ DefineVideoStreamTag::loader(SWFStream& in, SWF::TagType tag,
     assert(tag == SWF::DEFINEVIDEOSTREAM); // 60
     
     in.ensureBytes(2);
-    boost::uint16_t id = in.read_u16();
+    std::uint16_t id = in.read_u16();
 
     std::unique_ptr<DefineVideoStreamTag> vs(new DefineVideoStreamTag(in, id));
 

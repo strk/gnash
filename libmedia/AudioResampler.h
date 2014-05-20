@@ -21,7 +21,7 @@
 #ifndef __GNASH_UTIL_H
 #define __GNASH_UTIL_H
 
-#include <boost/cstdint.hpp> // for boost::int16_t
+#include <cstdint> // for std::int16_t
 
 namespace gnash {
 namespace media {
@@ -64,7 +64,7 @@ public:
 	///
 	/// @param m_stereo
 	/// Do we want the output data to be in stereo (output)?
-	static void convert_raw_data(boost::int16_t** adjusted_data,
+	static void convert_raw_data(std::int16_t** adjusted_data,
 		  int* adjusted_size, void* data, int sample_count,
 		  int sample_size, int sample_rate, bool stereo,
 		  int m_sample_rate, bool m_stereo);

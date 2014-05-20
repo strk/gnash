@@ -32,7 +32,7 @@
 #include <cassert>
 #include <cmath>
 #include <algorithm>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <limits>
 #include <type_traits>
 
@@ -98,7 +98,7 @@ twipsToPixels(int i)
 }
 
 template<size_t Factor>
-boost::int32_t
+std::int32_t
 truncateWithFactor(double a)
 {
     // If a is NaN, then this function would return -NAN, which when cast to
@@ -118,11 +118,11 @@ truncateWithFactor(double a)
     // extremely rare, using this safe version has no implications for
     // performance under normal circumstances.
     static const double upperUnsignedLimit =
-                std::numeric_limits<boost::uint32_t>::max() + 1.0;
+                std::numeric_limits<std::uint32_t>::max() + 1.0;
     static const double upperSignedLimit =
-                std::numeric_limits<boost::int32_t>::max() / factor;
+                std::numeric_limits<std::int32_t>::max() / factor;
     static const double lowerSignedLimit =
-                std::numeric_limits<boost::int32_t>::min() / factor;
+                std::numeric_limits<std::int32_t>::min() / factor;
 
     if (a >= lowerSignedLimit && a <= upperSignedLimit) {
         return a * Factor;
@@ -130,15 +130,15 @@ truncateWithFactor(double a)
 
     // This slow truncation happens only in very unlikely cases.
     return a >= 0 ?
-        static_cast<boost::uint32_t>(
+        static_cast<std::uint32_t>(
                 std::fmod(a * factor, upperUnsignedLimit))
         : 
-        -static_cast<boost::uint32_t>(
+        -static_cast<std::uint32_t>(
                 std::fmod(-a * factor, upperUnsignedLimit));
 }
 
 // truncate when overflow occurs.
-inline boost::int32_t
+inline std::int32_t
 pixelsToTwips(double a)
 {
     return truncateWithFactor<20>(a);

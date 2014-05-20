@@ -94,13 +94,13 @@ public:
     /// This makes the character known to ActionScript for initialization.
     /// Exported characters must both be in the definition's list of exports
     /// and added with this function before they are available.
-    virtual void addCharacter(boost::uint16_t /*id*/) {}
+    virtual void addCharacter(std::uint16_t /*id*/) {}
 
     /// Attempt to mark a character as initialized.
     //
     /// The default is to return false. Only a SWFMovie can have a list of
     /// characters.
-	virtual bool initializeCharacter(boost::uint16_t /*id*/) {
+	virtual bool initializeCharacter(std::uint16_t /*id*/) {
         return false;
     }
 

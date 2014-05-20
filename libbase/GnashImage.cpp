@@ -49,7 +49,7 @@ namespace {
 
         assert(channels > 0);
 
-        boost::uint32_t maxSize = std::numeric_limits<boost::int32_t>::max();
+        std::uint32_t maxSize = std::numeric_limits<std::int32_t>::max();
         if (width >= maxSize || height >= maxSize) return false;
 
         maxSize /= channels;

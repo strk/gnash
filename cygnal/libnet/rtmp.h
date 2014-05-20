@@ -20,7 +20,7 @@
 #define GNASH_LIBNET_RTMP_H
 
 #include <deque>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <memory>
 #include <boost/lexical_cast.hpp>
 #include <string>
@@ -69,7 +69,7 @@ namespace gnash
 const int  RTMP_HANDSHAKE_VERSION_SIZE = 1;
 /// \var RTMP_VERSION
 ///     The RTMP version number for now is always a 3.
-const boost::uint8_t RTMP_VERSION = 0x3;
+const std::uint8_t RTMP_VERSION = 0x3;
 /// \var
 ///    This is the total size of an RTMP packet, not including the
 ///    version field.
@@ -128,9 +128,9 @@ const char TERMINATOR = 0x09;
 // The third and fourth bytes form an integer value that specifies the
 // number of headers.
 typedef struct {
-    boost::uint8_t version;
-    boost::uint8_t source;
-    boost::uint32_t  count;
+    std::uint8_t version;
+    std::uint8_t source;
+    std::uint32_t  count;
 } amfpacket_t;
 
 typedef enum {
@@ -242,15 +242,15 @@ public:
     } rtmp_op_e;
     typedef struct {
 	rtmp_ping_e type;	// the type of the ping message
-	boost::uint16_t target; // all Ping message data fields
-	boost::uint16_t param1; // are 2 bytes long
-	boost::uint16_t param2;
-	boost::uint16_t param3;
+	std::uint16_t target; // all Ping message data fields
+	std::uint16_t param1; // are 2 bytes long
+	std::uint16_t param2;
+	std::uint16_t param3;
     } rtmp_ping_t;
     typedef struct {
 	user_control_e type;
-	boost::uint32_t param1;
-	boost::uint32_t param2;	// only used by 
+	std::uint32_t param1;
+	std::uint32_t param2;	// only used by
     } user_event_t;
     typedef enum {
         RTMP_STATE_HANDSHAKE_SEND,
@@ -295,8 +295,8 @@ public:
 	content_types_e type;
     } rtmp_head_t;
     typedef struct {
-	boost::uint32_t uptime;
-	boost::uint8_t version[4];
+	std::uint32_t uptime;
+	std::uint8_t version[4];
     } rtmp_handshake_head_t;
     typedef enum {
         HEADER_12 = 0x0,
@@ -314,7 +314,7 @@ public:
 //     typedef struct {
 //         amf::amfutf8_t target;
 //         amf::amfutf8_t response;
-// 	boost::uint32_t length;
+// 	std::uint32_t length;
 //         void *data;
 //     } rtmp_body_t;
     
@@ -322,7 +322,7 @@ public:
     virtual ~RTMP();
 
     // Decode
-    std::shared_ptr<rtmp_head_t> decodeHeader(boost::uint8_t *header);
+    std::shared_ptr<rtmp_head_t> decodeHeader(std::uint8_t *header);
     std::shared_ptr<rtmp_head_t> decodeHeader(cygnal::Buffer &data);
     
     std::shared_ptr<cygnal::Buffer> encodeHeader(int amf_index,
@@ -337,7 +337,7 @@ public:
     void addProperty(std::string &name, cygnal::Element &el);
     cygnal::Element &getProperty(const std::string &name);
 //     void setHandler(Handler *hand) { _handler = hand; };
-    int headerSize(boost::uint8_t header);
+    int headerSize(std::uint8_t header);
 
     rtmp_head_t *getHeader()    { return &_header; };
     int getHeaderSize()         { return _header.head_size; }; 
@@ -348,15 +348,15 @@ public:
     int getMysteryWord()        { return _mystery_word; };
 
     // Decode an RTMP message
-    std::shared_ptr<RTMPMsg> decodeMsgBody(boost::uint8_t *data, size_t size);
+    std::shared_ptr<RTMPMsg> decodeMsgBody(std::uint8_t *data, size_t size);
     std::shared_ptr<RTMPMsg> decodeMsgBody(cygnal::Buffer &buf);
     
-    virtual std::shared_ptr<rtmp_ping_t> decodePing(boost::uint8_t *data);
+    virtual std::shared_ptr<rtmp_ping_t> decodePing(std::uint8_t *data);
     std::shared_ptr<rtmp_ping_t> decodePing(cygnal::Buffer &buf);
     
-    virtual std::shared_ptr<user_event_t> decodeUserControl(boost::uint8_t *data);
+    virtual std::shared_ptr<user_event_t> decodeUserControl(std::uint8_t *data);
     std::shared_ptr<user_event_t> decodeUserControl(cygnal::Buffer &buf);
-    virtual std::shared_ptr<cygnal::Buffer> encodeUserControl(user_control_e, boost::uint32_t data);
+    virtual std::shared_ptr<cygnal::Buffer> encodeUserControl(user_control_e, std::uint32_t data);
     
     
     // These are handlers for the various types
@@ -405,10 +405,10 @@ public:
 	      RTMPMsg::rtmp_source_e routing, cygnal::Buffer &data);
     bool sendMsg(int channel, rtmp_headersize_e head_size,
 		 size_t total_size, content_types_e type,
-		 RTMPMsg::rtmp_source_e routing, boost::uint8_t *data, size_t size);
+		 RTMPMsg::rtmp_source_e routing, std::uint8_t *data, size_t size);
     bool sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 		 size_t total_size, content_types_e type,
-		 RTMPMsg::rtmp_source_e routing, boost::uint8_t *data, size_t size);
+		 RTMPMsg::rtmp_source_e routing, std::uint8_t *data, size_t size);
     
 #if 0
     // Send a Msg, and expect a response back of some kind.
@@ -422,7 +422,7 @@ public:
     // bytes another 1 byte RTMP header. The header itself is not part of the byte
     // count.
     std::shared_ptr<queues_t> split(cygnal::Buffer &buf);
-    std::shared_ptr<queues_t> split(boost::uint8_t *data, size_t size);
+    std::shared_ptr<queues_t> split(std::uint8_t *data, size_t size);
 
     CQue &operator[] (size_t x) { return _queues[x]; }
 
@@ -430,10 +430,10 @@ public:
     ///    The time on most systems these days is a 64 bit long, but swf
     ///    is old, so it only uses a 32 bit integer instead. We know casting
     ///    looses precision, but that's just the way it is in RTMP.
-    boost::uint32_t getTime() {
+    std::uint32_t getTime() {
 	time_t t;
 	time(&t);
-	return boost::lexical_cast<boost::uint32_t>(t);
+	return boost::lexical_cast<std::uint32_t>(t);
     };
 
     void dump();

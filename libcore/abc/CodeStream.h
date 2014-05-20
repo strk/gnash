@@ -22,7 +22,7 @@
 
 #include <string>
 #include <boost/utility.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <istream>
 #include <sstream>
 
@@ -45,10 +45,10 @@ public:
 	}
 
 /// Read a variable length encoded 32 bit unsigned integer
-boost::uint32_t read_V32();
+std::uint32_t read_V32();
 
 /// Read an opcode for ActionScript 3
-boost::uint8_t read_as3op();
+std::uint8_t read_as3op();
 
 /// Change the current position by a relative value.
 void seekBy(int change);
@@ -57,13 +57,13 @@ void seekBy(int change);
 void seekTo(unsigned int set);
 
 ///Read a signed 24 bit interger.
-boost::int32_t read_S24();
+std::int32_t read_S24();
 
 /// Read a signed 8-bit character.
 int8_t read_s8();
 
 /// Read an unsigned 8-bit character.
-boost::uint8_t read_u8();
+std::uint8_t read_u8();
 
 /// Same as read_V32(), but doesn't bother with the arithmetic for
 /// calculating the value.

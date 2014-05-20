@@ -47,7 +47,7 @@ CQueue::~CQueue()
 
 #if 0
 void
-memcpy(boost::uint8_t *data, size_t size,
+memcpy(std::uint8_t *data, size_t size,
                  vector<uint8_t> *ptr)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -70,7 +70,7 @@ bool
 CQueue::push(uint8_t *data, int nbytes)
 {
 //    GNASH_REPORT_FUNCTION;
-    vector<boost::uint8_t> *ptr = new vector<boost::uint8_t>;
+    vector<std::uint8_t> *ptr = new vector<std::uint8_t>;
     ptr->reserve(nbytes);
     std::copy(data, data + nbytes, ptr->begin());
     _queue.push_back(ptr);

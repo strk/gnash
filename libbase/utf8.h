@@ -22,7 +22,7 @@
 #define UTF8_H
 
 #include <string>
-#include <boost/cstdint.hpp> // for C99 int types
+#include <cstdint> // for C99 int types
 #include <vector>
 
 #include "dsodefs.h" // For DSOEXPORT
@@ -98,18 +98,18 @@ namespace utf8 {
     /// as output.  Advances string iterator past the character
     /// returned, unless the returned character is '\0', in which
     /// case the iterator does not advance.
-    DSOEXPORT boost::uint32_t decodeNextUnicodeCharacter(std::string::const_iterator& it,
+    DSOEXPORT std::uint32_t decodeNextUnicodeCharacter(std::string::const_iterator& it,
                                                      const std::string::const_iterator& e);
 
     /// \brief Encodes the given wide character into a canonical
     /// string, theoretically up to 6 chars in length.
-    DSOEXPORT std::string encodeUnicodeCharacter(boost::uint32_t ucs_character);
+    DSOEXPORT std::string encodeUnicodeCharacter(std::uint32_t ucs_character);
     
     /// Encodes the given wide character into an at least 8-bit character.
     //
     /// Allows storage of Latin1 (ISO-8859-1) characters. This
     /// is the format of SWF5 and below.
-    DSOEXPORT std::string encodeLatin1Character(boost::uint32_t ucsCharacter);
+    DSOEXPORT std::string encodeLatin1Character(std::uint32_t ucsCharacter);
 
     enum TextEncoding {
         encUNSPECIFIED,

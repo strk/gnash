@@ -23,7 +23,7 @@
 #include "dsodefs.h" //DSOEXPORT
 #include "AudioInput.h"
 
-#include <boost/cstdint.hpp> // for C99 int types
+#include <cstdint> // for C99 int types
 #include <string>
 
 namespace gnash {

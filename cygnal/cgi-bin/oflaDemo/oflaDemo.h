@@ -72,12 +72,12 @@ public:
     // Parse an OflaDemo Request message coming from the Red5 oflaDemo_test.
     std::vector<std::shared_ptr<cygnal::Element > > parseOflaDemoRequest(cygnal::Buffer &buf)
         { return parseOflaDemoRequest(buf.reference(), buf.size()); };
-    std::vector<std::shared_ptr<cygnal::Element > > parseOflaDemoRequest(boost::uint8_t *buf, size_t size);
+    std::vector<std::shared_ptr<cygnal::Element > > parseOflaDemoRequest(std::uint8_t *buf, size_t size);
     
     // format a response to the 'oflaDemo' test used for testing Gnash.
     std::shared_ptr<cygnal::Buffer> formatOflaDemoResponse(double num, cygnal::Element &el);
     std::shared_ptr<cygnal::Buffer> formatOflaDemoResponse(double num, cygnal::Buffer &data);
-    std::shared_ptr<cygnal::Buffer> formatOflaDemoResponse(double num, boost::uint8_t *data, size_t size);
+    std::shared_ptr<cygnal::Buffer> formatOflaDemoResponse(double num, std::uint8_t *data, size_t size);
 
     std::shared_ptr<cygnal::Buffer> getResponse() { return _response; };
     void setResponse(std::shared_ptr<cygnal::Buffer> &x) { _response = x; };
@@ -102,7 +102,7 @@ extern "C" {
     std::shared_ptr<Handler::cygnal_init_t>oflaDemo_init_func(std::shared_ptr<gnash::RTMPMsg> &msg);
     
     std::shared_ptr<cygnal::Buffer> oflaDemo_read_func();
-    size_t oflaDemo_write_func(boost::uint8_t *data, size_t size);
+    size_t oflaDemo_write_func(std::uint8_t *data, size_t size);
 }
 
 } // end of cygnal namespace

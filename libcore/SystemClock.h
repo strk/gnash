@@ -22,7 +22,7 @@
 
 #include "VirtualClock.h" // for inheritance
 
-#include <boost/cstdint.hpp> // for boost::uint64_t typedef
+#include <cstdint> // for std::uint64_t typedef
 #include "dsodefs.h"
 
 namespace gnash
@@ -49,7 +49,7 @@ public:
 private:
 
     /// System time at time of start
-    boost::uint64_t _startTime;
+    std::uint64_t _startTime;
 };
 
 

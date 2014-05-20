@@ -208,7 +208,7 @@ void AudioDecoderGst::setup(GstCaps* srccaps)
 static void
 buf_add(gpointer buf, gpointer data)
 {
-    boost::uint32_t* total = (boost::uint32_t*) data;
+    std::uint32_t* total = (std::uint32_t*) data;
 
     GstBuffer* buffer = (GstBuffer*) buf;
     *total += GST_BUFFER_SIZE(buffer);
@@ -216,8 +216,8 @@ buf_add(gpointer buf, gpointer data)
 
 
 /* private */
-boost::uint8_t* 
-AudioDecoderGst::pullBuffers(boost::uint32_t&  outputSize)
+std::uint8_t*
+AudioDecoderGst::pullBuffers(std::uint32_t&  outputSize)
 {
     outputSize = 0;
     
@@ -228,9 +228,9 @@ AudioDecoderGst::pullBuffers(boost::uint32_t&  outputSize)
         return 0;   
     }
     
-    boost::uint8_t* rbuf = new boost::uint8_t[outputSize];
+    std::uint8_t* rbuf = new std::uint8_t[outputSize];
     
-    boost::uint8_t* ptr = rbuf;
+    std::uint8_t* ptr = rbuf;
     
     while (true) {
     
@@ -248,10 +248,10 @@ AudioDecoderGst::pullBuffers(boost::uint32_t&  outputSize)
     return rbuf;    
 }
 
-boost::uint8_t*
-AudioDecoderGst::decode(const boost::uint8_t* input, boost::uint32_t inputSize,
-                        boost::uint32_t& outputSize,
-                        boost::uint32_t& decodedData)
+std::uint8_t*
+AudioDecoderGst::decode(const std::uint8_t* input, std::uint32_t inputSize,
+                        std::uint32_t& outputSize,
+                        std::uint32_t& decodedData)
 {
     outputSize = decodedData = 0;
 
@@ -269,8 +269,8 @@ AudioDecoderGst::decode(const boost::uint8_t* input, boost::uint32_t inputSize,
     return pullBuffers(outputSize);
 }
 
-boost::uint8_t*
-AudioDecoderGst::decode(const EncodedAudioFrame& ef, boost::uint32_t& outputSize)
+std::uint8_t*
+AudioDecoderGst::decode(const EncodedAudioFrame& ef, std::uint32_t& outputSize)
 {
     outputSize = 0;
     

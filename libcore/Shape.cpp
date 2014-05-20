@@ -24,7 +24,7 @@
 namespace gnash {
 
 bool
-Shape::pointInShape(boost::int32_t x, boost::int32_t y) const
+Shape::pointInShape(std::int32_t x, std::int32_t y) const
 {
     SWFMatrix wm = getWorldMatrix(*this);
     wm.invert();

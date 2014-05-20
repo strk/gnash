@@ -66,7 +66,7 @@ public:
     /// @param endCapStyle
     /// @param joinStyle
     /// @param miterLimitFactor
-    LineStyle(boost::uint16_t width, const rgba& color,
+    LineStyle(std::uint16_t width, const rgba& color,
             bool scaleThicknessVertically=true,
             bool scaleThicknessHorizontally=true,
             bool pixelHinting=false,
@@ -106,7 +106,7 @@ public:
             const RunResources& r, LineStyle *pOther);
 
     /// Return thickness of the line, in TWIPS
-    boost::uint16_t getThickness() const {
+    std::uint16_t getThickness() const {
         return m_width;
     }
 
@@ -166,7 +166,7 @@ public:
 private:
     
     /// Width in twips.
-    boost::uint16_t m_width;
+    std::uint16_t m_width;
 
     rgba m_color;
 

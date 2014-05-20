@@ -60,7 +60,7 @@ public:
     VGPaint getFillPaint() const { return _vgpaint; }
     int getWidth() { return _image->width(); }
     int getHeight() { return _image->height(); }
-    boost::uint8_t *getData() const { return _image->begin(); }
+    std::uint8_t *getData() const { return _image->begin(); }
 
     OpenVGBitmap *createRadialBitmap(float x0, float y0, float x1, float y1,
                                      float radial, const SWFCxForm& cx,

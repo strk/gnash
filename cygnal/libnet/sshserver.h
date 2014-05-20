@@ -21,7 +21,7 @@
 
 #include <string>
 #include <boost/array.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <sstream>
 
 extern "C" {

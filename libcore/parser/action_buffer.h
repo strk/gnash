@@ -23,7 +23,7 @@
 #include <vector> 
 #include <map> 
 #include <boost/noncopyable.hpp>
-#include <boost/cstdint.hpp> 
+#include <cstdint>
 
 #include "GnashException.h"
 #include "ConstantPool.h"
@@ -64,7 +64,7 @@ public:
 
 	size_t size() const { return m_buffer.size(); }
 
-	boost::uint8_t operator[] (size_t off) const
+	std::uint8_t operator[] (size_t off) const
 	{
 		if (off >= m_buffer.size()) {
 		    throw ActionParserException (_("Attempt to read outside "
@@ -102,33 +102,33 @@ public:
 	//
 	/// Useful to hide complexity of underlying buffer access.
 	///
-	boost::int16_t read_int16(size_t pc) const
+	std::int16_t read_int16(size_t pc) const
 	{
 	    if (pc + 1 >= m_buffer.size()) {
 	        throw ActionParserException(_("Attempt to read outside action buffer limits"));
 	    }
-		boost::int16_t ret = (m_buffer[pc] | (m_buffer[pc + 1] << 8));
+		std::int16_t ret = (m_buffer[pc] | (m_buffer[pc + 1] << 8));
 		return ret;
 	}
 
 	/// Get an unsigned short integer value from given offset
     /// read_int16 should check buffer boundaries.
-	boost::uint16_t read_uint16(size_t pc) const
+	std::uint16_t read_uint16(size_t pc) const
 	{
-		return static_cast<boost::uint16_t>(read_int16(pc));
+		return static_cast<std::uint16_t>(read_int16(pc));
 	}
 
 	/// Read a 32-bit integer starting at given offset.
 	//
 	/// Useful to hide complexity of underlying buffer access.
 	///
-	boost::int32_t read_int32(size_t pc) const
+	std::int32_t read_int32(size_t pc) const
 	{
 		if (pc + 3 >= m_buffer.size()) {
 	        throw ActionParserException(_("Attempt to read outside action buffer limits"));
 	    }
 	    
-		boost::int32_t	val = m_buffer[pc]
+		std::int32_t	val = m_buffer[pc]
 		      | (m_buffer[pc + 1] << 8)
 		      | (m_buffer[pc + 2] << 16)
 		      | (m_buffer[pc + 3] << 24);
@@ -189,7 +189,7 @@ public:
 private:
 
 	/// the code itself, as read from the SWF
-	std::vector<boost::uint8_t> m_buffer;
+	std::vector<std::uint8_t> m_buffer;
 
 	/// The set of ConstantPools found in this action_buffer
 	typedef std::map<size_t, ConstantPool> PoolsMap;

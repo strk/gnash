@@ -66,7 +66,7 @@ extern "C" {
         return init;
     }
 
-    size_t fitcDemo_read_func(boost::uint8_t *data, size_t size)
+    size_t fitcDemo_read_func(std::uint8_t *data, size_t size)
     {
 // 	GNASH_REPORT_FUNCTION;
 	
@@ -87,7 +87,7 @@ extern "C" {
 //         GNASH_REPORT_RETURN;
     }
 
-    size_t fitcDemo_write_func(boost::uint8_t *data, size_t size)
+    size_t fitcDemo_write_func(std::uint8_t *data, size_t size)
     {
 // 	GNASH_REPORT_FUNCTION;
 
@@ -221,7 +221,7 @@ FitcDemoTest::~FitcDemoTest()
 // Parse an FitcDemo Request message coming from the Red5 fitcDemo_test. This
 // method should only be used for testing purposes.
 vector<std::shared_ptr<amf::Element > >
-FitcDemoTest::parseFitcDemoRequest(boost::uint8_t *ptr, size_t size)
+FitcDemoTest::parseFitcDemoRequest(std::uint8_t *ptr, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -281,7 +281,7 @@ FitcDemoTest::formatFitcDemoResponse(double num, amf::Buffer &data)
 }
 
 std::shared_ptr<amf::Buffer>
-FitcDemoTest::formatFitcDemoResponse(double num, boost::uint8_t *data, size_t size)
+FitcDemoTest::formatFitcDemoResponse(double num, std::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
 

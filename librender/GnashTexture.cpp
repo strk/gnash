@@ -204,7 +204,7 @@ void GnashTexture::release()
 }
 
 // Update texture with data
-void GnashTexture::update(const boost::uint8_t *data)
+void GnashTexture::update(const std::uint8_t *data)
 {
     D(bug("GnashTexture::update(): data %p, size %dx%d\n", data, _width, _height));
 

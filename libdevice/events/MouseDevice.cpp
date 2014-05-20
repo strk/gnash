@@ -238,7 +238,7 @@ MouseDevice::check()
     // GNASH_REPORT_FUNCTION;
 
     int xmove, ymove, btn;
-    std::unique_ptr<boost::uint8_t[]> buf;
+    std::unique_ptr<std::uint8_t[]> buf;
     if (_type == InputDevice::TOUCHMOUSE) {
         // The eTurboTouch has a 4 byte packet
         buf = readData(4);

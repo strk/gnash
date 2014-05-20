@@ -25,7 +25,7 @@
 #include "log.h"
 #include "GnashException.h"
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <cerrno>
 #include <string>
 #include <vector>
@@ -49,10 +49,10 @@ using gnash::log_error;
 // Object Name  - variable (the name of the object as an AMF encoded string)
 // Padding      - 4 bytes
 // After this is a series of AMF objects
-const boost::uint16_t SOL_MAGIC = 0x00bf;	// is in big-endian format, this is the first
+const std::uint16_t SOL_MAGIC = 0x00bf;	// is in big-endian format, this is the first
 				// two bytes. of the .sol file.
 //char *SOL_FILETYPE = "TCSO";
-const boost::uint16_t SOL_BLOCK_MARK = 0x0004;
+const std::uint16_t SOL_BLOCK_MARK = 0x0004;
 
 /// \define ENSUREBYTES
 ///
@@ -149,10 +149,10 @@ SOL::formatHeader(const std::string &name)
 
 template <typename T>
 void
-appendSwapped(std::vector<boost::uint8_t>& container, T val)
+appendSwapped(std::vector<std::uint8_t>& container, T val)
 {
-    boost::uint8_t *ptr = 
-        static_cast<boost::uint8_t*>(swapBytes(&val, sizeof(val)));
+    std::uint8_t *ptr =
+        static_cast<std::uint8_t*>(swapBytes(&val, sizeof(val)));
     container.insert(container.end(), ptr, ptr+sizeof(val));
 }
 
@@ -176,7 +176,7 @@ SOL::formatHeader(const std::string &name, int filesize)
     // includes the padding in the header, the mystery bytes, and the
     // padding, plus the length of the name itself.
     filesize += name.size() + 16;
-    boost::uint32_t len = filesize;
+    std::uint32_t len = filesize;
     appendSwapped(_header, len);
 
     // Then the mystery block, but as the value never seems to every change,
@@ -188,19 +188,19 @@ SOL::formatHeader(const std::string &name, int filesize)
     // then the 0x0004 bytes, also a mystery
     appendSwapped(_header, SOL_BLOCK_MARK);
     // finally a bunch of zeros to pad things for this field
-    _header.insert(_header.end(), '\0', sizeof(boost::uint32_t));
+    _header.insert(_header.end(), '\0', sizeof(std::uint32_t));
 
     // Encode the name. This is not a string object, which has a type field
     // one byte field precedding the length as a file type of AMF::STRING.
     //  First the length in two bytes
-    boost::uint16_t size = name.size();
+    std::uint16_t size = name.size();
     appendSwapped(_header, size);
 
     // then the string itself
     _header.insert(_header.end(), name.begin(), name.end());
     
     // finally a bunch of zeros to pad things at the end of the header
-    _header.insert(_header.end(), '\0', sizeof(boost::uint32_t));
+    _header.insert(_header.end(), '\0', sizeof(std::uint32_t));
 
 #if 0
     unsigned char *hexint;
@@ -231,7 +231,7 @@ SOL::writeFile(const std::string &filespec, const std::string &name)
         return false;
     }
     
-    vector<boost::uint8_t>::iterator it;
+    vector<std::uint8_t>::iterator it;
     vector<std::shared_ptr<cygnal::Element> >::iterator ita;
     AMF amf_obj;
     char *ptr;
@@ -255,7 +255,7 @@ SOL::writeFile(const std::string &filespec, const std::string &name)
     for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ++ita) {
         std::shared_ptr<Element> el = (*(ita));
         std::shared_ptr<cygnal::Buffer> var = amf_obj.encodeProperty(el);
-        //  boost::uint8_t *var = amf_obj.encodeProperty(el, outsize); 
+        //  std::uint8_t *var = amf_obj.encodeProperty(el, outsize);
         if (!var) {
             continue;
         }
@@ -303,7 +303,7 @@ SOL::writeFile(const std::string &filespec, const std::string &name)
     }
     
     _filesize = ptr - body.get();
-	int len = name.size() + sizeof(boost::uint16_t) + 16;
+	int len = name.size() + sizeof(std::uint16_t) + 16;
     std::unique_ptr<char[]> head ( new char[len + 4] );
     memset(head.get(), 0, len);
     ptr = head.get();
@@ -340,7 +340,7 @@ SOL::readFile(const std::string &filespec)
 {
 //    GNASH_REPORT_FUNCTION;
     struct stat st;
-    boost::uint16_t size;
+    std::uint16_t size;
     size_t bodysize;
 
     // Make sure it's an SOL file
@@ -348,16 +348,16 @@ SOL::readFile(const std::string &filespec)
 
 	try {
 
-        boost::uint8_t *ptr = 0;
+        std::uint8_t *ptr = 0;
 
 	    std::ifstream ifs(filespec.c_str(), std::ios::binary);
 
         _filesize = st.st_size;
-        std::unique_ptr<boost::uint8_t[]> buf(
-                new boost::uint8_t[_filesize + sizeof(int)]);
+        std::unique_ptr<std::uint8_t[]> buf(
+                new std::uint8_t[_filesize + sizeof(int)]);
 
 	    ptr = buf.get();
-	    boost::uint8_t* tooFar = buf.get() + _filesize;
+	    std::uint8_t* tooFar = buf.get() + _filesize;
 	    
 	    bodysize = st.st_size - 6;
 	    _filespec = filespec;
@@ -371,7 +371,7 @@ SOL::readFile(const std::string &filespec)
 	    ptr += 2;
 	    
 	    // extract the file size
-	    boost::uint32_t length = *(reinterpret_cast<boost::uint32_t *>(ptr));
+	    std::uint32_t length = *(reinterpret_cast<std::uint32_t *>(ptr));
 	    length = ntohl(length);
 	    ptr += 4;
 	    
@@ -399,7 +399,7 @@ SOL::readFile(const std::string &filespec)
 	    
 	    // 2 bytes for the length of the object name, but it's also 
         // null terminated
-	    size = *(reinterpret_cast<boost::uint16_t *>(ptr));
+	    size = *(reinterpret_cast<std::uint16_t *>(ptr));
 	    size = ntohs(size);
 	    ptr += 2;
 	    

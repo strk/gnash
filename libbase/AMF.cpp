@@ -47,7 +47,7 @@ namespace {
 }
 
 bool
-readBoolean(const boost::uint8_t*& pos, const boost::uint8_t* _end)
+readBoolean(const std::uint8_t*& pos, const std::uint8_t* _end)
 {
     if (pos == _end) {
         throw AMFException("Read past _end of buffer for boolean type");
@@ -62,7 +62,7 @@ readBoolean(const boost::uint8_t*& pos, const boost::uint8_t* _end)
 }
 
 double
-readNumber(const boost::uint8_t*& pos, const boost::uint8_t* end)
+readNumber(const std::uint8_t*& pos, const std::uint8_t* end)
 {
 
     if (end - pos < 8) {
@@ -84,13 +84,13 @@ readNumber(const boost::uint8_t*& pos, const boost::uint8_t* end)
 }
 
 std::string
-readString(const boost::uint8_t*& pos, const boost::uint8_t* end)
+readString(const std::uint8_t*& pos, const std::uint8_t* end)
 {
     if (end - pos < 2) {
         throw AMFException(_("Read past _end of buffer for string length"));
     }
 
-    const boost::uint16_t si = readNetworkShort(pos);
+    const std::uint16_t si = readNetworkShort(pos);
     pos += 2;
 
     if (end - pos < si) {
@@ -106,15 +106,15 @@ readString(const boost::uint8_t*& pos, const boost::uint8_t* end)
 }
 
 std::string
-readLongString(const boost::uint8_t*& pos, const boost::uint8_t* end)
+readLongString(const std::uint8_t*& pos, const std::uint8_t* end)
 {
     if (end - pos < 4) {
         throw AMFException("Read past _end of buffer for long string length");
     }
 
-    const boost::uint32_t si = readNetworkLong(pos);
+    const std::uint32_t si = readNetworkLong(pos);
     pos += 4;
-    if (static_cast<boost::uint32_t>(end - pos) < si) {
+    if (static_cast<std::uint32_t>(end - pos) < si) {
         throw AMFException("Read past _end of buffer for long string type");
     }
 
@@ -185,10 +185,10 @@ void
 swapBytes(void* word, size_t size)
 {
     union {
-        boost::uint16_t s;
+        std::uint16_t s;
         struct {
-             boost::uint8_t c0;
-             boost::uint8_t c1;
+             std::uint8_t c0;
+             std::uint8_t c1;
         } c;
     } u;
        
@@ -200,7 +200,7 @@ swapBytes(void* word, size_t size)
 
     // Little-endian machine: byte-swap the word
     // A conveniently-typed pointer to the source data
-    boost::uint8_t *x = static_cast<boost::uint8_t *>(word);
+    std::uint8_t *x = static_cast<std::uint8_t *>(word);
 
     // Handles odd as well as even counts of bytes
     std::reverse(x, x + size);

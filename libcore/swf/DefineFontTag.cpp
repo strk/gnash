@@ -44,7 +44,7 @@ DefineFontTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     assert(tag == DEFINEFONT || tag == DEFINEFONT2 || tag == DEFINEFONT3);
 
     in.ensureBytes(2);
-    const boost::uint16_t fontID = in.read_u16();
+    const std::uint16_t fontID = in.read_u16();
 
     std::unique_ptr<DefineFontTag> ft(new DefineFontTag(in, m, tag, r));
     boost::intrusive_ptr<Font> f(new Font(std::move(ft)));
@@ -66,9 +66,9 @@ DefineFontTag::readCodeTable(SWFStream& in, Font::CodeTable& table,
 
     if (wideCodes) {
         in.ensureBytes(2 * glyphCount);
-        // Code table is made of boost::uint16_t's.
+        // Code table is made of std::uint16_t's.
         for (size_t i=0; i < glyphCount; ++i) {
-            const boost::uint16_t code = in.read_u16();
+            const std::uint16_t code = in.read_u16();
             table.insert(std::make_pair(code, i));
         }
     }
@@ -76,7 +76,7 @@ DefineFontTag::readCodeTable(SWFStream& in, Font::CodeTable& table,
         // Code table is made of bytes.
         in.ensureBytes(1 * glyphCount);
         for (size_t i = 0; i < glyphCount; ++i) {
-            const boost::uint8_t code = in.read_u8();
+            const std::uint8_t code = in.read_u8();
             table.insert(std::make_pair(code, i));
         }
     }
@@ -192,7 +192,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
     in.read_string_with_length(_name);
 
     in.ensureBytes(2); 
-    const boost::uint16_t glyph_count = in.read_u16();
+    const std::uint16_t glyph_count = in.read_u16();
 
     IF_VERBOSE_PARSE (
         log_parse(" has_layout = %d", has_layout);
@@ -212,14 +212,14 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
     // Read the glyph offsets.  Offsets
     // are measured from the start of the
     // offset table. Make sure wide offsets fit into elements
-    std::vector<boost::uint32_t> offsets;
+    std::vector<std::uint32_t> offsets;
     int	font_code_offset;
 
     if (wide_offsets) {
         // 32-bit offsets.
         in.ensureBytes(4*glyph_count + 4); 
         for (size_t i = 0; i < glyph_count; ++i) {
-            const boost::uint32_t off = in.read_u32();	
+            const std::uint32_t off = in.read_u32();
             IF_VERBOSE_PARSE (
                 log_parse(_("Glyph %d at offset %u"), i, off);
             );
@@ -231,7 +231,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
         // 16-bit offsets.
         in.ensureBytes(2*glyph_count + 2); 
         for (size_t i = 0; i < glyph_count; ++i) {
-            const boost::uint16_t off = in.read_u16();	
+            const std::uint16_t off = in.read_u16();
             IF_VERBOSE_PARSE(
                 log_parse(_("Glyph %d at offset %u"), i, off);
             );
@@ -297,12 +297,12 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
 
         // Kerning pairs.
         in.ensureBytes(2);
-        const boost::uint16_t kerning_count = in.read_u16();
+        const std::uint16_t kerning_count = in.read_u16();
 
         in.ensureBytes(kerning_count * (wideCodes ? 6 : 4));
 
         for (int i = 0; i < kerning_count; ++i) {
-            boost::uint16_t	char0, char1;
+            std::uint16_t	char0, char1;
             if (wideCodes) {
                 char0 = in.read_u16();
                 char1 = in.read_u16();
@@ -311,7 +311,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
                 char0 = in.read_u8();
                 char1 = in.read_u8();
             }
-            const boost::int16_t adjustment = in.read_s16();
+            const std::int16_t adjustment = in.read_s16();
 
             kerning_pair k;
             k.m_char0 = char0;
@@ -335,7 +335,7 @@ DefineFontInfoTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     assert(tag == DEFINEFONTINFO || tag == DEFINEFONTINFO2); 
 
     in.ensureBytes(2);
-    const boost::uint16_t fontID = in.read_u16();
+    const std::uint16_t fontID = in.read_u16();
 
     Font* f = m.get_font(fontID);
     if (!f) {
@@ -355,7 +355,7 @@ DefineFontInfoTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     in.read_string_with_length(name);
 
     in.ensureBytes(1);
-    const boost::uint8_t flags = in.read_u8();
+    const std::uint8_t flags = in.read_u8();
 
     const bool wideCodes = flags & (1 << 0);
 

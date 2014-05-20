@@ -63,7 +63,7 @@ private:
     mutable boost::mutex _mutedMutex;
 
     // See dox in sound_handler.h
-    void mix(boost::int16_t* outSamples, boost::int16_t* inSamples,
+    void mix(std::int16_t* outSamples, std::int16_t* inSamples,
                 unsigned int nSamples, float volume);
 
 
@@ -162,7 +162,7 @@ public:
     void unplugInputStream(InputStream* id);
 
     // See dox in sound_handler.h
-    void fetchSamples(boost::int16_t* to, unsigned int nSamples);
+    void fetchSamples(std::int16_t* to, unsigned int nSamples);
 };
 
 } // gnash.sound namespace 

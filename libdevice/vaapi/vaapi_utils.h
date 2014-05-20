@@ -37,7 +37,7 @@ void DSOEXPORT vaapi_dprintf(const char *format, ...);
 bool DSOEXPORT vaapi_check_status(VAStatus status, const char *msg);
 
 /// Return a string representation of a FOURCC
-DSOEXPORT const char* string_of_FOURCC(boost::uint32_t fourcc);
+DSOEXPORT const char* string_of_FOURCC(std::uint32_t fourcc);
 
 /// Return a string representation of a VAProfile
 DSOEXPORT const char* string_of_VAProfile(VAProfile profile);

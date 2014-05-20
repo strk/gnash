@@ -44,7 +44,7 @@ namespace {
 
     void attachColorInterface(as_object& o);
     inline void parseColorTransProp(as_object& obj, const ObjectURI& key,
-            boost::int16_t& target, bool scale);
+            std::int16_t& target, bool scale);
     inline MovieClip* getTarget(as_object* obj, const fn_call& fn);
 }
 
@@ -110,7 +110,7 @@ color_getrgb(const fn_call& fn)
     const int g = trans.gb;
     const int b = trans.bb;
 
-    const boost::int32_t rgb = (r<<16) | (g<<8) | b;
+    const std::int32_t rgb = (r<<16) | (g<<8) | b;
 
 	return as_value(rgb);
 }
@@ -158,16 +158,16 @@ color_setrgb(const fn_call& fn)
     MovieClip* sp = getTarget(obj, fn);
     if (!sp) return as_value();
 
-	boost::int32_t color = toInt(fn.arg(0), getVM(fn));
+	std::int32_t color = toInt(fn.arg(0), getVM(fn));
 
 	const int r = (color & 0xff0000) >> 16;
 	const int g = (color & 0x00ff00) >> 8;
 	const int b = (color & 0x0000ff);
 
 	SWFCxForm newTrans = getCxForm(*sp);
-	newTrans.rb = static_cast<boost::int16_t>(r);
-	newTrans.gb = static_cast<boost::int16_t>(g);
-	newTrans.bb = static_cast<boost::int16_t>(b);
+	newTrans.rb = static_cast<std::int16_t>(r);
+	newTrans.gb = static_cast<std::int16_t>(g);
+	newTrans.bb = static_cast<std::int16_t>(b);
 	newTrans.ra = 0;
 	newTrans.ga = 0;
 	newTrans.ba = 0;
@@ -250,7 +250,7 @@ color_ctor(const fn_call& fn)
 }
 
 inline void
-parseColorTransProp(as_object& obj, const ObjectURI& key, boost::int16_t&
+parseColorTransProp(as_object& obj, const ObjectURI& key, std::int16_t&
         target, bool scale)
 {
 	as_value tmp;
@@ -258,10 +258,10 @@ parseColorTransProp(as_object& obj, const ObjectURI& key, boost::int16_t&
     
 	const double d = toNumber(tmp, getVM(obj));
 	if (scale) {   
-        target = static_cast<boost::int16_t>(d * 2.56);
+        target = static_cast<std::int16_t>(d * 2.56);
     }
 	else {
-        target = static_cast<boost::int16_t>(d);
+        target = static_cast<std::int16_t>(d);
     }
 }
 

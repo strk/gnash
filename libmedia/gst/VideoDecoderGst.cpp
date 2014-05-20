@@ -53,7 +53,7 @@ VideoDecoderGst::height() const
 // TODO: either use width and height or remove them!
 VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type,
         int /*width*/, int /*height*/,
-        const boost::uint8_t* extradata, size_t extradatasize)
+        const std::uint8_t* extradata, size_t extradatasize)
     :
     _width(0),
     _height(0)
@@ -177,7 +177,7 @@ VideoDecoderGst::push(const EncodedVideoFrame& frame)
     } else {
         buffer = gst_buffer_new();
 
-        GST_BUFFER_DATA(buffer) = const_cast<boost::uint8_t*>(frame.data());
+        GST_BUFFER_DATA(buffer) = const_cast<std::uint8_t*>(frame.data());
         GST_BUFFER_SIZE(buffer) = frame.dataSize();
         GST_BUFFER_OFFSET(buffer) = frame.frameNum();
         GST_BUFFER_TIMESTAMP(buffer) = GST_CLOCK_TIME_NONE;

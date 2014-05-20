@@ -141,7 +141,7 @@ test_headers()
     if (notest) {
         runtest.untested("Decoded FLV header");
     } else {
-        boost::uint32_t size = *(reinterpret_cast<boost::uint32_t *>(head->head_size));
+        std::uint32_t size = *(reinterpret_cast<std::uint32_t *>(head->head_size));
         if ((memcmp(head->sig, "FLV", 3) == 0)
             && (head->version == 1)
             && (size == 9)) {
@@ -165,7 +165,7 @@ test_headers()
     // Test converting 3 byte "integers" to a real 4 byte one. The
     // 0xf on each end should be ignore to be correct.
     std::shared_ptr<cygnal::Buffer> hex2(new Buffer("0f 00 00 a4 0f"));
-    boost::uint32_t num = flv.convert24(hex2->reference()+1);
+    std::uint32_t num = flv.convert24(hex2->reference()+1);
     if (num == 0xa4) {
         runtest.pass("Flv::convert24()");
     } else {

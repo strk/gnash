@@ -524,8 +524,8 @@ string_fromCharCode(const fn_call& fn)
         for (unsigned int i = 0; i < fn.nargs; i++)
         {
             // Maximum 65535, as with all DisplayObject codes.
-            const boost::uint16_t c = 
-                static_cast<boost::uint16_t>(toInt(fn.arg(i), getVM(fn)));
+            const std::uint16_t c =
+                static_cast<std::uint16_t>(toInt(fn.arg(i), getVM(fn)));
             
             // If more than 255, push 'overflow' byte.
             if (c > 255) {
@@ -544,8 +544,8 @@ string_fromCharCode(const fn_call& fn)
 
     for (unsigned int i = 0; i < fn.nargs; i++)
     {
-        const boost::uint16_t c = 
-            static_cast<boost::uint16_t>(toInt(fn.arg(i), getVM(fn)));
+        const std::uint16_t c =
+            static_cast<std::uint16_t>(toInt(fn.arg(i), getVM(fn)));
         if (c == 0) break;
         wstr.push_back(c);
     }
@@ -607,7 +607,7 @@ string_charAt(const fn_call& fn)
 
     std::string::const_iterator it = str.begin(), e = str.end();
 
-    while (boost::uint32_t code = utf8::decodeNextUnicodeCharacter(it, e))
+    while (std::uint32_t code = utf8::decodeNextUnicodeCharacter(it, e))
     {
         if (currentIndex == index)
         {

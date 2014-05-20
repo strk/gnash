@@ -24,7 +24,7 @@
 #define GNASH_AMF_H
 
 #include <string>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include "dsodefs.h"
 #include "GnashException.h"
@@ -82,8 +82,8 @@ public:
 /// be determined from the buffer.
 //
 /// This function will throw an AMFException if it encounters ill-formed AMF.
-DSOEXPORT double readNumber(const boost::uint8_t*& pos,
-        const boost::uint8_t* end);
+DSOEXPORT double readNumber(const std::uint8_t*& pos,
+        const std::uint8_t* end);
 
 /// Read a boolean value from the buffer.
 //
@@ -91,8 +91,8 @@ DSOEXPORT double readNumber(const boost::uint8_t*& pos,
 /// be determined from the buffer.
 //
 /// This function will throw an AMFException if it encounters ill-formed AMF.
-DSOEXPORT bool readBoolean(const boost::uint8_t*& pos,
-        const boost::uint8_t* end);
+DSOEXPORT bool readBoolean(const std::uint8_t*& pos,
+        const std::uint8_t* end);
 
 /// Read a string value from the buffer.
 //
@@ -100,8 +100,8 @@ DSOEXPORT bool readBoolean(const boost::uint8_t*& pos,
 /// be determined from the buffer.
 //
 /// This function will throw an AMFException if it encounters ill-formed AMF.
-DSOEXPORT std::string readString(const boost::uint8_t*& pos,
-        const boost::uint8_t* end);
+DSOEXPORT std::string readString(const std::uint8_t*& pos,
+        const std::uint8_t* end);
 
 /// Read a long string value from the buffer.
 //
@@ -109,26 +109,26 @@ DSOEXPORT std::string readString(const boost::uint8_t*& pos,
 /// be determined from the buffer.
 //
 /// This function will throw an AMFException if it encounters ill-formed AMF.
-DSOEXPORT std::string readLongString(const boost::uint8_t*& pos,
-        const boost::uint8_t* end);
+DSOEXPORT std::string readLongString(const std::uint8_t*& pos,
+        const std::uint8_t* end);
 
 /// Read an unsigned 16-bit value in network byte order.
 //
 /// You must ensure that the buffer contains at least 2 bytes!
-inline boost::uint16_t
-readNetworkShort(const boost::uint8_t* buf)
+inline std::uint16_t
+readNetworkShort(const std::uint8_t* buf)
 {
-    const boost::uint16_t s = buf[0] << 8 | buf[1];
+    const std::uint16_t s = buf[0] << 8 | buf[1];
     return s;
 }
 
 /// Read an unsigned 32-bit value in network byte order.
 //
 /// You must ensure that the buffer contains at least 4 bytes!
-inline boost::uint32_t
-readNetworkLong(const boost::uint8_t* buf)
+inline std::uint32_t
+readNetworkLong(const std::uint8_t* buf)
 {
-    const boost::uint32_t s = buf[0] << 24 | buf[1] << 16 |
+    const std::uint32_t s = buf[0] << 24 | buf[1] << 16 |
                               buf[2] << 8 | buf[3];
     return s;
 }

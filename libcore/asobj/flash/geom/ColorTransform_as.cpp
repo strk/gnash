@@ -322,20 +322,20 @@ colortransform_rgb(const fn_call& fn)
     if (!fn.nargs)
     {
         // Getter
-        boost::uint32_t r = static_cast<boost::uint32_t>(
+        std::uint32_t r = static_cast<std::uint32_t>(
                 std::fmod(relay->getRedOffset(), 4294967296.0));
-        boost::uint32_t g = static_cast<boost::uint32_t>(
+        std::uint32_t g = static_cast<std::uint32_t>(
                 std::fmod(relay->getGreenOffset(), 4294967296.0));
-        boost::uint32_t b = static_cast<boost::uint32_t>(
+        std::uint32_t b = static_cast<std::uint32_t>(
                 std::fmod(relay->getBlueOffset(), 4294967296.0));
-        boost::uint32_t rgb = (r << 16) + (g << 8) + b;
+        std::uint32_t rgb = (r << 16) + (g << 8) + b;
 
         return as_value(rgb);
     }
 
     // Setter
 
-    boost::uint32_t rgb = toInt(fn.arg(0), getVM(fn));
+    std::uint32_t rgb = toInt(fn.arg(0), getVM(fn));
     relay->setRedOffset((rgb & 0xFF0000) >> 16);
     relay->setGreenOffset((rgb & 0x00FF00) >> 8);
     relay->setBlueOffset(rgb & 0x0000FF);

@@ -249,9 +249,9 @@ TextField::show_cursor(Renderer& renderer, const SWFMatrix& mat)
     if (_textRecords.empty()) {
         return;
     }
-    boost::uint16_t x;
-    boost::uint16_t y;
-    boost::uint16_t h;
+    std::uint16_t x;
+    std::uint16_t y;
+    std::uint16_t h;
     size_t i = cursorRecord();
     SWF::TextRecord record = _textRecords[i];
 
@@ -305,10 +305,10 @@ TextField::display(Renderer& renderer, const Transform& base)
 
     if ((drawBorder || drawBackground) && !_bounds.is_null()) {
 
-        boost::int32_t xmin = _bounds.get_x_min();
-        boost::int32_t xmax = _bounds.get_x_max();
-        boost::int32_t ymin = _bounds.get_y_min();
-        boost::int32_t ymax = _bounds.get_y_max();
+        std::int32_t xmin = _bounds.get_x_min();
+        std::int32_t xmax = _bounds.get_x_max();
+        std::int32_t ymin = _bounds.get_y_min();
+        std::int32_t ymax = _bounds.get_y_max();
 
         const std::vector<point> coords = boost::assign::list_of
             (point(xmin, ymin))
@@ -739,7 +739,7 @@ TextField::mouseEvent(const event_id& ev)
 		case event_id::PRESS:
 		{
 			movie_root& root = stage();
-            boost::int32_t x_mouse, y_mouse;
+            std::int32_t x_mouse, y_mouse;
             boost::tie(x_mouse, y_mouse) = root.mousePosition();
 			
 			SWFMatrix m = getMatrix(*this);
@@ -772,7 +772,7 @@ TextField::mouseEvent(const event_id& ev)
 }
 
 InteractiveObject*
-TextField::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
+TextField::topmostMouseEntity(std::int32_t x, std::int32_t y)
 {
     if (!visible()) return 0;
     
@@ -957,7 +957,7 @@ TextField::setFont(boost::intrusive_ptr<const Font> newfont)
 
 
 void
-TextField::insertTab(SWF::TextRecord& rec, boost::int32_t& x, float scale)
+TextField::insertTab(SWF::TextRecord& rec, std::int32_t& x, float scale)
 {
      // tab (ASCII HT)
     const int space = 32;
@@ -1047,16 +1047,16 @@ TextField::format_text()
         return;
     }
 
-    boost::uint16_t fontHeight = getFontHeight();
+    std::uint16_t fontHeight = getFontHeight();
     const float scale = fontHeight /
         static_cast<float>(_font->unitsPerEM(_embedFonts));
 
     // TODO: work out how leading affects things.
     const float fontLeading = 0;
 
-    const boost::uint16_t leftMargin = getLeftMargin();
-    const boost::uint16_t indent = getIndent();
-    const boost::uint16_t blockIndent = getBlockIndent();
+    const std::uint16_t leftMargin = getLeftMargin();
+    const std::uint16_t indent = getIndent();
+    const std::uint16_t blockIndent = getBlockIndent();
     const bool underlined = getUnderlined();
 
     /// Remember the current bounds for autosize.
@@ -1103,8 +1103,8 @@ TextField::format_text()
         rec.addGlyph(ge, 4);
     }
 
-    boost::int32_t x = static_cast<boost::int32_t>(rec.xOffset());
-    boost::int32_t y = static_cast<boost::int32_t>(rec.yOffset());
+    std::int32_t x = static_cast<std::int32_t>(rec.xOffset());
+    std::int32_t y = static_cast<std::int32_t>(rec.yOffset());
 
     // Start the bbox at the upper-left corner of the first glyph.
     //reset_bounding_box(x, y + fontHeight); 
@@ -1164,7 +1164,7 @@ TextField::format_text()
 void
 TextField::scrollLines()
 {
-    boost::uint16_t fontHeight = getFontHeight();
+    std::uint16_t fontHeight = getFontHeight();
     const float fontLeading = 0;
 
     _linesindisplay = _bounds.height() / (fontHeight + fontLeading + PADDING_TWIPS);
@@ -1204,7 +1204,7 @@ TextField::scrollLines()
 }
 
 void
-TextField::newLine(boost::int32_t& x, boost::int32_t& y, 
+TextField::newLine(std::int32_t& x, std::int32_t& y,
 				   SWF::TextRecord& rec, int& last_space_glyph,
 				LineStarts::value_type& last_line_start_record, float div)
 {
@@ -1292,8 +1292,8 @@ TextField::newLine(boost::int32_t& x, boost::int32_t& y,
 
 void
 TextField::handleChar(std::wstring::const_iterator& it,
-        const std::wstring::const_iterator& e, boost::int32_t& x,
-        boost::int32_t& y, SWF::TextRecord& rec, int& last_code,
+        const std::wstring::const_iterator& e, std::int32_t& x,
+        std::int32_t& y, SWF::TextRecord& rec, int& last_code,
         int& last_space_glyph, LineStarts::value_type& last_line_start_record)
 {
     LineStarts::iterator linestartit = _line_starts.begin();
@@ -1307,7 +1307,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
     const float leading = 0;
     const float fontLeading = 0;
     
-    boost::uint32_t code = 0;
+    std::uint32_t code = 0;
     while (it != e)
     {
         code = *it++;
@@ -1435,7 +1435,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                         }
                         else if (s == "FONT") {
                             //font
-                            boost::uint16_t originalsize = _fontHeight;
+                            std::uint16_t originalsize = _fontHeight;
                             attloc = attributes.find("COLOR");
                             if (attloc != attributes.end()) {
                                 std::string hexval(attloc->second);
@@ -1557,11 +1557,11 @@ TextField::handleChar(std::wstring::const_iterator& it,
                         else if (s == "TEXTFORMAT") {
                             log_debug("in textformat");
                             //textformat
-                            boost::uint16_t originalblockindent = getBlockIndent();
-                            boost::uint16_t originalindent = getIndent();
-                            boost::uint16_t originalleading = getLeading();
-                            boost::uint16_t originalleftmargin = getLeftMargin();
-                            boost::uint16_t originalrightmargin = getRightMargin();
+                            std::uint16_t originalblockindent = getBlockIndent();
+                            std::uint16_t originalindent = getIndent();
+                            std::uint16_t originalleading = getLeading();
+                            std::uint16_t originalleftmargin = getLeftMargin();
+                            std::uint16_t originalrightmargin = getRightMargin();
                             std::vector<int> originaltabstops = getTabStops();
                             attloc = attributes.find("BLOCKINDENT");
                             if (attloc != attributes.end()) {
@@ -1693,7 +1693,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                 // being chosen. Flash can currently only handle 16-bit
                 // values.
                 int index = rec.getFont()->get_glyph_index(
-                        static_cast<boost::uint16_t>(code), _embedFonts);
+                        static_cast<std::uint16_t>(code), _embedFonts);
 
                 IF_VERBOSE_MALFORMED_SWF (
                     if (index == -1)
@@ -1777,7 +1777,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                     }
 
                     int index = rec.getFont()->get_glyph_index(
-                            static_cast<boost::uint16_t>(code), _embedFonts);
+                            static_cast<std::uint16_t>(code), _embedFonts);
                     x += scale * rec.getFont()->get_advance(index, _embedFonts);
 
                 }
@@ -2189,7 +2189,7 @@ TextField::set_variable_name(const std::string& newname)
 }
 
 bool
-TextField::pointInShape(boost::int32_t x, boost::int32_t y) const
+TextField::pointInShape(std::int32_t x, std::int32_t y) const
 {
     const SWFMatrix wm = getWorldMatrix(*this).invert();
     point lp(x, y);
@@ -2291,7 +2291,7 @@ TextField::setWordWrap(bool wrap)
 }
 
 void
-TextField::setLeading(boost::int16_t h)
+TextField::setLeading(std::int16_t h)
 {
     if (_leading != h) {
         set_invalidated();
@@ -2365,7 +2365,7 @@ TextField::setAlignment(TextAlignment h)
 }
 
 void
-TextField::setIndent(boost::uint16_t h)
+TextField::setIndent(std::uint16_t h)
 {
     if (_indent != h) {
         set_invalidated();
@@ -2374,7 +2374,7 @@ TextField::setIndent(boost::uint16_t h)
 }
 
 void
-TextField::setBlockIndent(boost::uint16_t h)
+TextField::setBlockIndent(std::uint16_t h)
 {
     if (_blockIndent != h) {
         set_invalidated();
@@ -2383,7 +2383,7 @@ TextField::setBlockIndent(boost::uint16_t h)
 }
 
 void
-TextField::setRightMargin(boost::uint16_t h)
+TextField::setRightMargin(std::uint16_t h)
 {
     if (_rightMargin != h) {
         set_invalidated();
@@ -2392,7 +2392,7 @@ TextField::setRightMargin(boost::uint16_t h)
 }
 
 void
-TextField::setLeftMargin(boost::uint16_t h)
+TextField::setLeftMargin(std::uint16_t h)
 {
     if (_leftMargin != h) {
         set_invalidated();
@@ -2401,7 +2401,7 @@ TextField::setLeftMargin(boost::uint16_t h)
 }
 
 void
-TextField::setFontHeight(boost::uint16_t h)
+TextField::setFontHeight(std::uint16_t h)
 {
     if (_fontHeight != h) {
         set_invalidated();

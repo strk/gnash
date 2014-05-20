@@ -35,10 +35,10 @@ WallClockTimer::restart()
     startTimer = clocktime::getTicks();
 }
 
-boost::uint32_t
+std::uint32_t
 WallClockTimer::elapsed() const
 {
-    boost::uint64_t currTime = clocktime::getTicks();
+    std::uint64_t currTime = clocktime::getTicks();
     
     // be aware of time glitches
     if ( currTime <= startTimer ) return 0;

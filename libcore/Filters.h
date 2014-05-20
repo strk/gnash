@@ -20,7 +20,7 @@
 #ifndef GNASH_FILTERS_H
 #define GNASH_FILTERS_H
 
-#include <boost/cstdint.hpp> 
+#include <cstdint>
 #include <vector>
 
 namespace gnash {
@@ -72,10 +72,10 @@ public:
         m_knockout(false)
     {}
 
-    BevelFilter(float distance, float angle, boost::uint32_t hcolor,
-        boost::uint8_t halpha, boost::uint32_t scolor, boost::uint8_t salpha,
+    BevelFilter(float distance, float angle, std::uint32_t hcolor,
+        std::uint8_t halpha, std::uint32_t scolor, std::uint8_t salpha,
         float blurX, float blurY, float strength,
-        boost::uint8_t quality, bevel_type type, bool knockout) :
+        std::uint8_t quality, bevel_type type, bool knockout) :
         m_distance(distance), m_angle(angle), m_highlightColor(hcolor),
         m_highlightAlpha(halpha), m_shadowColor(scolor), m_shadowAlpha(salpha),
         m_blurX(blurX), m_blurY(blurY), m_strength(strength),
@@ -84,14 +84,14 @@ public:
 
     float m_distance; // Distance of the filter in pixels.
     float m_angle; // Angle of the filter.
-    boost::uint32_t m_highlightColor; // Color of the highlight.
-    boost::uint8_t m_highlightAlpha; // Alpha of the highlight.
-    boost::uint32_t m_shadowColor; // RGB color.
-    boost::uint8_t m_shadowAlpha; // Alpha strength, as a percentage(?)
+    std::uint32_t m_highlightColor; // Color of the highlight.
+    std::uint8_t m_highlightAlpha; // Alpha of the highlight.
+    std::uint32_t m_shadowColor; // RGB color.
+    std::uint8_t m_shadowAlpha; // Alpha strength, as a percentage(?)
     float m_blurX; // horizontal blur
     float m_blurY; // vertical blur
     float m_strength; // How strong is the filter.
-    boost::uint8_t m_quality; // How many times to apply the filter.
+    std::uint8_t m_quality; // How many times to apply the filter.
     bevel_type m_type; // The type of filter. (Rendered as string in AS)
     bool m_knockout; // If true, render only the filter effect.
 };
@@ -109,13 +109,13 @@ public:
         m_blurX(0.0f), m_blurY(0.0f), m_quality(0)
     {}
 
-    BlurFilter(float blurX, float blurY, boost::uint8_t quality) :
+    BlurFilter(float blurX, float blurY, std::uint8_t quality) :
         m_blurX(blurX), m_blurY(blurY), m_quality(quality)
     {}
 
     float m_blurX; // How much horizontal blur.
     float m_blurY; // How much vertical blur.
-    boost::uint8_t m_quality; // How many passes to take.
+    std::uint8_t m_quality; // How many passes to take.
 };
 
 // A color SWFMatrix effect filter.
@@ -162,10 +162,10 @@ public:
         _alpha()
     {}
 
-    ConvolutionFilter(boost::uint8_t matrixX, boost::uint8_t matrixY, 
+    ConvolutionFilter(std::uint8_t matrixX, std::uint8_t matrixY,
         const std::vector<float>& _matrix, float divisor, float bias,
-        bool preserveAlpha, bool clamp, boost::uint32_t color,
-        boost::uint8_t alpha)
+        bool preserveAlpha, bool clamp, std::uint32_t color,
+        std::uint8_t alpha)
         :
         _matrixX(matrixX),
         _matrixY(matrixY),
@@ -179,15 +179,15 @@ public:
     {}
 
 protected:
-    boost::uint8_t _matrixX; // Number of columns
-    boost::uint8_t _matrixY; // Number of rows
+    std::uint8_t _matrixX; // Number of columns
+    std::uint8_t _matrixY; // Number of rows
     std::vector<float> _matrix; // The convolution matrix
     float _divisor;
     float _bias;
     bool _preserveAlpha; // If true, don't convolute the alpha channel
     bool _clamp; // Whether or not to clamp
-    boost::uint32_t _color; // For off-image pixels
-    boost::uint8_t _alpha; // For off-image pixels
+    std::uint32_t _color; // For off-image pixels
+    std::uint8_t _alpha; // For off-image pixels
 };
 
 // A drop shadow effect filter.
@@ -205,9 +205,9 @@ public:
         m_inner(false), m_knockout(false), m_hideObject(false)
     {}
 
-    DropShadowFilter(float distance, float angle, boost::uint32_t color,
-        boost::uint8_t alpha, float blurX, float blurY, float strength,
-        boost::uint8_t quality, bool inner, bool knockout, bool hideObject) :
+    DropShadowFilter(float distance, float angle, std::uint32_t color,
+        std::uint8_t alpha, float blurX, float blurY, float strength,
+        std::uint8_t quality, bool inner, bool knockout, bool hideObject) :
         m_distance(distance), m_angle(angle), m_color(color),
         m_alpha(alpha), m_blurX(blurX), m_blurY(blurY), m_strength(strength),
         m_quality(quality), m_inner(inner), m_knockout(knockout),
@@ -216,12 +216,12 @@ public:
 
     float m_distance; // Distance of the filter in pixels.
     float m_angle; // Angle of the filter.
-    boost::uint32_t m_color; // RGB color.
-    boost::uint8_t m_alpha; // Alpha strength, as a percentage(?)
+    std::uint32_t m_color; // RGB color.
+    std::uint8_t m_alpha; // Alpha strength, as a percentage(?)
     float m_blurX; // horizontal blur
     float m_blurY; // vertical blur
     float m_strength; // How strong is the filter.
-    boost::uint8_t m_quality; // How many times to apply the filter.
+    std::uint8_t m_quality; // How many times to apply the filter.
     bool m_inner; // Is this an inner shadow?
     bool m_knockout; // If true, render only the filter effect.
     bool m_hideObject; // Does this hide the object?
@@ -243,20 +243,20 @@ public:
         m_inner(false), m_knockout(false)
     {}
 
-    GlowFilter(boost::uint32_t color,
-        boost::uint8_t alpha, float blurX, float blurY, float strength,
-        boost::uint8_t quality, bool inner, bool knockout) :
+    GlowFilter(std::uint32_t color,
+        std::uint8_t alpha, float blurX, float blurY, float strength,
+        std::uint8_t quality, bool inner, bool knockout) :
         m_color(color),
         m_alpha(alpha), m_blurX(blurX), m_blurY(blurY), m_strength(strength),
         m_quality(quality), m_inner(inner), m_knockout(knockout)
     {}
 
-    boost::uint32_t m_color; // RGB color.
-    boost::uint8_t m_alpha; // Alpha strength, as a percentage(?)
+    std::uint32_t m_color; // RGB color.
+    std::uint8_t m_alpha; // Alpha strength, as a percentage(?)
     float m_blurX; // horizontal blur
     float m_blurY; // vertical blur
     float m_strength; // How strong is the filter.
-    boost::uint8_t m_quality; // How many times to apply the filter.
+    std::uint8_t m_quality; // How many times to apply the filter.
     bool m_inner; // Is this an inner shadow?
     bool m_knockout; // If true, render only the filter effect.
 };
@@ -285,11 +285,11 @@ public:
     {}
 
     GradientBevelFilter(float distance, float angle,
-        std::vector<boost::uint32_t> colors,
-        std::vector<boost::uint8_t> alphas,
-        std::vector<boost::uint8_t> ratios,
+        std::vector<std::uint32_t> colors,
+        std::vector<std::uint8_t> alphas,
+        std::vector<std::uint8_t> ratios,
         float blurX, float blurY, float strength,
-        boost::uint8_t quality, glow_types type, bool knockout) :
+        std::uint8_t quality, glow_types type, bool knockout) :
         m_distance(distance), m_angle(angle),
         m_colors(colors), m_alphas(alphas), m_ratios(ratios),
         m_blurX(blurX), m_blurY(blurY), m_strength(strength),
@@ -298,13 +298,13 @@ public:
 
     float m_distance; // Distance of the filter in pixels.
     float m_angle; // Angle of the filter.
-    std::vector<boost::uint32_t> m_colors; // Colors of the gradients.
-    std::vector<boost::uint8_t> m_alphas; // Alphas of the gradients.
-    std::vector<boost::uint8_t> m_ratios; // Ratios of the gradients.
+    std::vector<std::uint32_t> m_colors; // Colors of the gradients.
+    std::vector<std::uint8_t> m_alphas; // Alphas of the gradients.
+    std::vector<std::uint8_t> m_ratios; // Ratios of the gradients.
     float m_blurX; // horizontal blur
     float m_blurY; // vertical blur
     float m_strength; // How strong is the filter.
-    boost::uint8_t m_quality; // How many times to apply the filter.
+    std::uint8_t m_quality; // How many times to apply the filter.
     glow_types m_type; // What type of effect.
     bool m_knockout; // If true, render only the filter effect.
 };
@@ -332,11 +332,11 @@ public:
     {}
 
     GradientGlowFilter(float distance, float angle,
-        std::vector<boost::uint32_t> colors,
-        std::vector<boost::uint8_t> alphas,
-        std::vector<boost::uint8_t> ratios,
+        std::vector<std::uint32_t> colors,
+        std::vector<std::uint8_t> alphas,
+        std::vector<std::uint8_t> ratios,
         float blurX, float blurY, float strength,
-        boost::uint8_t quality, glow_types type, bool knockout) :
+        std::uint8_t quality, glow_types type, bool knockout) :
         m_distance(distance), m_angle(angle), m_colors(colors), m_alphas(alphas),
         m_ratios(ratios), m_blurX(blurX), m_blurY(blurY), m_strength(strength),
         m_quality(quality), m_type(type), m_knockout(knockout)
@@ -344,13 +344,13 @@ public:
 
     float m_distance; // Distance of the filter in pixels.
     float m_angle; // Angle of the filter.
-    std::vector<boost::uint32_t> m_colors; // Colors of the gradients.
-    std::vector<boost::uint8_t> m_alphas; // Alphas of the gradients.
-    std::vector<boost::uint8_t> m_ratios; // Ratios of the gradients.
+    std::vector<std::uint32_t> m_colors; // Colors of the gradients.
+    std::vector<std::uint8_t> m_alphas; // Alphas of the gradients.
+    std::vector<std::uint8_t> m_ratios; // Ratios of the gradients.
     float m_blurX; // horizontal blur
     float m_blurY; // vertical blur
     float m_strength; // How strong is the filter.
-    boost::uint8_t m_quality; // How many times to apply the filter.
+    std::uint8_t m_quality; // How many times to apply the filter.
     glow_types m_type; // What type of effect.
     bool m_knockout; // If true, render only the filter effect.
 };

@@ -107,10 +107,10 @@ class DSOEXPORT RawFBDevice : public GnashDevice
     void createWindow(const char *name, int x, int y, int width, int height);
 
     // Get the memory from the real framebuffer
-    boost::uint8_t *getFBMemory() { return _fbmem; };
+    std::uint8_t *getFBMemory() { return _fbmem; };
 
     // // Get the memory from an offscreen buffer to support Double Buffering
-    boost::uint8_t *getOffscreenBuffer() { return _offscreen_buffer.get(); };
+    std::uint8_t *getOffscreenBuffer() { return _offscreen_buffer.get(); };
 
     size_t getStride() { return _fixinfo.line_length; };
     size_t getFBMemSize() { return _fixinfo.smem_len; };
@@ -147,9 +147,9 @@ protected:
     std::string                         _filespec;
     struct fb_fix_screeninfo            _fixinfo;
     struct fb_var_screeninfo            _varinfo;
-    boost::uint8_t                     *_fbmem;
+    std::uint8_t                     *_fbmem;
     
-    std::unique_ptr<boost::uint8_t>     _offscreen_buffer;
+    std::unique_ptr<std::uint8_t>     _offscreen_buffer;
     struct fb_cmap                      _cmap;       // the colormap
 };
 

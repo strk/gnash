@@ -159,7 +159,7 @@ Writer::writeObject(as_object* obj)
             writePlainNumber(_buf, d);
 
             // This should be timezone
-            boost::uint16_t tz = 0; 
+            std::uint16_t tz = 0;
             _buf.appendNetworkShort(tz);
 
             return true;
@@ -290,7 +290,7 @@ Writer::writeNull()
 }
 
 void
-Writer::writeData(const boost::uint8_t* data, size_t length)
+Writer::writeData(const std::uint8_t* data, size_t length)
 {
     _buf.append(data, length);
 }
@@ -407,7 +407,7 @@ Reader::readStrictArray()
         throw AMFException(_("Read past _end of buffer for strict array length"));
     }
 
-    const boost::uint32_t li = readNetworkLong(_pos);
+    const std::uint32_t li = readNetworkLong(_pos);
     _pos += 4;
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
@@ -442,7 +442,7 @@ Reader::readArray()
         throw AMFException(_("Read past _end of buffer for array length"));
     }
 
-    const boost::uint32_t li = readNetworkLong(_pos);
+    const std::uint32_t li = readNetworkLong(_pos);
     _pos += 4;
     
     as_object* array = _global.createArray();
@@ -469,7 +469,7 @@ Reader::readArray()
                         "block"));
             break;
         }
-        const boost::uint16_t strlen = readNetworkShort(_pos);
+        const std::uint16_t strlen = readNetworkShort(_pos);
         _pos += 2; 
 
         // _end of ECMA_ARRAY is signalled by an empty string
@@ -556,7 +556,7 @@ Reader::readReference()
     if (_end - _pos < 2) {
         throw AMFException("Read past _end of buffer for reference index");
     }
-    const boost::uint16_t si = readNetworkShort(_pos);
+    const std::uint16_t si = readNetworkShort(_pos);
     _pos += 2;
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
@@ -592,7 +592,7 @@ Reader::readDate()
             throw AMFException("premature _end of input reading "
                         "timezone from Date type");
         }
-        const boost::uint16_t tz = readNetworkShort(_pos);
+        const std::uint16_t tz = readNetworkShort(_pos);
         if (tz != 0) {
             log_error(_("Date type encoded timezone info %1%, even though "
                 "this field should not be used."), tz);

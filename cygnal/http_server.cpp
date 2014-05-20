@@ -290,7 +290,7 @@ HTTPServer::processPostRequest(int fd, cygnal::Buffer * /* bufFIXME */)
 //    cerr << __FUNCTION__ << buf->allocated() << " : " << hexify(buf->reference(), buf->allocated(), true) << endl;
     
     clearHeader();
-    boost::uint8_t *data = processHeaderFields(buf.get());
+    std::uint8_t *data = processHeaderFields(buf.get());
     size_t length = strtol(getField("content-length").c_str(), NULL, 0);
     std::shared_ptr<cygnal::Buffer> content(new cygnal::Buffer(length));
     int ret = 0;
@@ -478,7 +478,7 @@ HTTPServer::formatGetReply(size_t size, http_status_e code)
     formatHeader(size, code);
     
 //    int ret = Network::writeNet(_header.str());    
-//    boost::uint8_t *ptr = (boost::uint8_t *)_body.str().c_str();
+//    std::uint8_t *ptr = (std::uint8_t *)_body.str().c_str();
 //     buf->copy(ptr, _body.str().size());
 //    _handler->dump();
 
@@ -531,18 +531,18 @@ HTTPServer::formatPostReply(rtmpt_cmd_e /* code */)
 // Parse an Echo Request message coming from the Red5 echo_test. This
 // method should only be used for testing purposes.
 vector<std::shared_ptr<cygnal::Element > >
-HTTPServer::parseEchoRequest(boost::uint8_t *data, size_t size)
+HTTPServer::parseEchoRequest(std::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     
     vector<std::shared_ptr<cygnal::Element > > headers;
 	
     // skip past the header bytes, we don't care about them.
-    boost::uint8_t *tmpptr = data + 6;
+    std::uint8_t *tmpptr = data + 6;
     
-    boost::uint16_t length;
-    length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
-    tmpptr += sizeof(boost::uint16_t);
+    std::uint16_t length;
+    length = ntohs((*(std::uint16_t *)tmpptr) & 0xffff);
+    tmpptr += sizeof(std::uint16_t);
 
     // Get the first name, which is a raw string, and not preceded by
     // a type byte.
@@ -551,7 +551,7 @@ HTTPServer::parseEchoRequest(boost::uint8_t *data, size_t size)
     // If the length of the name field is corrupted, then we get out of
     // range quick, and corrupt memory. This is a bit of a hack, but
     // reduces memory errors caused by some of the corrupted tes cases.
-    boost::uint8_t *endstr = std::find(tmpptr, tmpptr+length, '\0');
+    std::uint8_t *endstr = std::find(tmpptr, tmpptr+length, '\0');
     if (endstr != tmpptr+length) {
 	log_debug("Caught corrupted string! length was %d, null at %d",
 		  length,  endstr-tmpptr);
@@ -563,8 +563,8 @@ HTTPServer::parseEchoRequest(boost::uint8_t *data, size_t size)
     
     // Get the second name, which is a raw string, and not preceded by
     // a type byte.
-    length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
-    tmpptr += sizeof(boost::uint16_t);
+    length = ntohs((*(std::uint16_t *)tmpptr) & 0xffff);
+    tmpptr += sizeof(std::uint16_t);
     std::shared_ptr<cygnal::Element > el2(new cygnal::Element);
 
 //     std::string name2(reinterpret_cast<const char *>(tmpptr), length);
@@ -635,11 +635,11 @@ HTTPServer::formatEchoResponse(const std::string &num, cygnal::Buffer &data)
 }
 
 cygnal::Buffer &
-HTTPServer::formatEchoResponse(const std::string &num, boost::uint8_t *data, size_t size)
+HTTPServer::formatEchoResponse(const std::string &num, std::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    //boost::uint8_t *tmpptr  = data;
+    //std::uint8_t *tmpptr  = data;
     
     // FIXME: temporary hacks while debugging
     cygnal::Buffer fixme("00 00 00 00 00 01");
@@ -707,7 +707,7 @@ HTTPServer::formatEchoResponse(const std::string &num, boost::uint8_t *data, siz
 /// <index>
 ///    is a consecutive number that seems to be used to detect missing packages
 HTTP::rtmpt_cmd_e
-HTTP::extractRTMPT(boost::uint8_t *data)
+HTTP::extractRTMPT(std::uint8_t *data)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -776,7 +776,7 @@ HTTP::extractRTMPT(boost::uint8_t *data)
 /// <index>
 ///    is a consecutive number that seems to be used to detect missing packages
 HTTPServer::rtmpt_cmd_e
-HTTPServer::extractRTMPT(boost::uint8_t *data)
+HTTPServer::extractRTMPT(std::uint8_t *data)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -831,7 +831,7 @@ HTTPServer::extractRTMPT(boost::uint8_t *data)
 
 #if 0
 HTTPServer::http_method_e
-HTTPServer::extractCommand(boost::uint8_t *data)
+HTTPServer::extractCommand(std::uint8_t *data)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -864,9 +864,9 @@ HTTPServer::extractCommand(boost::uint8_t *data)
     // For valid requests, the second argument, delimited by spaces
     // is the filespec of the file being requested or transmitted.
     if (cmd != HTTP::HTTP_NONE) {
-	boost::uint8_t *start = std::find(data, data+7, ' ') + 1;
-	boost::uint8_t *end   = std::find(start + 2, data+PATH_MAX, ' ');
-	boost::uint8_t *params = std::find(start, end, '?');
+	std::uint8_t *start = std::find(data, data+7, ' ') + 1;
+	std::uint8_t *end   = std::find(start + 2, data+PATH_MAX, ' ');
+	std::uint8_t *params = std::find(start, end, '?');
 	if (params != end) {
 	    _params = std::string(params+1, end);
 	    _filespec = std::string(start, params);
@@ -890,7 +890,7 @@ HTTPServer::extractCommand(boost::uint8_t *data)
     return cmd;
 }
 
-boost::uint8_t *
+std::uint8_t *
 HTTPServer::processHeaderFields(cygnal::Buffer &buf)
 {
   //    GNASH_REPORT_FUNCTION;
@@ -943,8 +943,8 @@ HTTPServer::processHeaderFields(cygnal::Buffer &buf)
 	    
 //	    cerr << "FIXME: " << (void *)i << " : " << dec <<  end << endl;
 	} else {
-	    const boost::uint8_t *cmd = reinterpret_cast<const boost::uint8_t *>(i->c_str());
-	    if (extractCommand(const_cast<boost::uint8_t *>(cmd)) == HTTP::HTTP_NONE) {
+	    const std::uint8_t *cmd = reinterpret_cast<const std::uint8_t *>(i->c_str());
+	    if (extractCommand(const_cast<std::uint8_t *>(cmd)) == HTTP::HTTP_NONE) {
 		break;
 #if 1
 	    } else {
@@ -1058,11 +1058,11 @@ HTTPServer::http_handler(Handler *hand, int netfd, cygnal::Buffer *buf)
 	cerr << "FIXME no cache hit for: " << www.getFilespec() << endl;
 //	    www.clearHeader();
 // 	    cygnal::Buffer &ss = www.formatHeader(filestream->getFileSize(), HTTP::LIFE_IS_GOOD);
-// 	    www.writeNet(args->netfd, (boost::uint8_t *)www.getHeader().c_str(), www.getHeader().size());
+// 	    www.writeNet(args->netfd, (std::uint8_t *)www.getHeader().c_str(), www.getHeader().size());
 // 	    cache.addResponse(www.getFilespec(), www.getHeader());
     } else {
 	cerr << "FIXME cache hit on: " << www.getFilespec() << endl;
-	www.writeNet(args->netfd, (boost::uint8_t *)response.c_str(), response.size());
+	www.writeNet(args->netfd, (std::uint8_t *)response.c_str(), response.size());
     }	
 #endif
     

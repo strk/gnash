@@ -41,7 +41,7 @@ rgba
 colorFromHexString(const std::string& color)
 {
     std::stringstream ss(color);
-    boost::uint32_t hexnumber;
+    std::uint32_t hexnumber;
     
     if (!(ss >> std::hex >> hexnumber)) {
 	    log_error(_("Failed to convert string to RGBA value! This is a "

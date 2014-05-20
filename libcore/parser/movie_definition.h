@@ -56,7 +56,7 @@
 #include <memory> // for unique_ptr
 #include <vector> // for PlayList typedef
 #include <boost/intrusive_ptr.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include "DefinitionTag.h"
 #include "log.h"
@@ -193,7 +193,7 @@ public:
 	///
 	/// @return NULL if no DisplayObject with the given ID is found
 	///         (this is the default)
-	virtual DefinitionTag* getDefinitionTag(boost::uint16_t /*id*/) const
+	virtual DefinitionTag* getDefinitionTag(std::uint16_t /*id*/) const
 	{
 		return NULL;
 	}
@@ -230,7 +230,7 @@ public:
     //
 	/// This method is here to be called by DEFINE tags loaders.
 	/// The default implementation does nothing.
-	virtual void addDisplayObject(boost::uint16_t /*id*/, DefinitionTag* /*c*/)
+	virtual void addDisplayObject(std::uint16_t /*id*/, DefinitionTag* /*c*/)
 	{
 	}
 
@@ -387,13 +387,13 @@ public:
     /// Register a symbol to refer to a character id
     //
     /// The default implementation does nothing.
-    virtual void registerExport(const std::string&, boost::uint16_t) {}
+    virtual void registerExport(const std::string&, std::uint16_t) {}
     
     /// Get the id that corresponds to a symbol.
     //
     /// @return         The id corresponding to the passed symbol. The default
     ///                 implementation returns 0, as it has no export table.
-    virtual boost::uint16_t exportID(const std::string& /*symbol*/) const {
+    virtual std::uint16_t exportID(const std::string& /*symbol*/) const {
         return 0;
     }
 
@@ -458,7 +458,7 @@ public:
 #endif
 protected:
 
-    movie_definition(boost::uint16_t id = 0)
+    movie_definition(std::uint16_t id = 0)
         :
         DefinitionTag(id)
     {}

@@ -79,7 +79,7 @@ public:
         _flags = kind;
     }
 
-    boost::uint8_t flags() const {
+    std::uint8_t flags() const {
         return _flags;
     }
 
@@ -126,7 +126,7 @@ private:
 		FLAG_NSSET = 0x10
 	};
 
-    boost::uint8_t _flags;
+    std::uint8_t _flags;
 
     std::vector<Namespace*>* _namespaceSet;
 

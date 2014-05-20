@@ -268,7 +268,7 @@ create_sound_handler_aos4(media::MediaHandler* m)
 }
 
 void
-AOS4_sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
+AOS4_sound_handler::fetchSamples(std::int16_t* to, unsigned int nSamples)
 {
 	if (!_closing)
 	{
@@ -329,9 +329,9 @@ AOS4_sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
 }
 
 void 
-AOS4_sound_handler::MixAudio (boost::uint8_t *dst, const boost::uint8_t *src, boost::uint32_t len, int volume)
+AOS4_sound_handler::MixAudio (std::uint8_t *dst, const std::uint8_t *src, std::uint32_t len, int volume)
 {
-	boost::uint16_t format;
+	std::uint16_t format;
 
 	if ( volume == 0 ) 
 	{
@@ -345,7 +345,7 @@ AOS4_sound_handler::MixAudio (boost::uint8_t *dst, const boost::uint8_t *src, bo
 	{
 		case AHIST_S16S:
 		{
-			boost::int16_t src1, src2;
+			std::int16_t src1, src2;
 			int dst_sample;
 			const int max_audioval = ((1<<(16-1))-1);
 			const int min_audioval = -(1<<(16-1));
@@ -379,14 +379,14 @@ AOS4_sound_handler::MixAudio (boost::uint8_t *dst, const boost::uint8_t *src, bo
 }
 
 void
-AOS4_sound_handler::mix(boost::int16_t* outSamples, boost::int16_t* inSamples, unsigned int nSamples, float volume)
+AOS4_sound_handler::mix(std::int16_t* outSamples, std::int16_t* inSamples, unsigned int nSamples, float volume)
 {
 	if (!_closing)
 	{
 	    unsigned int nBytes = nSamples*2;
 
-	    boost::uint8_t *out = reinterpret_cast<boost::uint8_t*>(outSamples);
-    	boost::uint8_t* in = reinterpret_cast<boost::uint8_t*>(inSamples);
+	    std::uint8_t *out = reinterpret_cast<std::uint8_t*>(outSamples);
+    	std::uint8_t* in = reinterpret_cast<std::uint8_t*>(inSamples);
 
 	    MixAudio(out, in, nBytes, static_cast<int>(MIX_MAXVOLUME*volume));
 	}
@@ -528,7 +528,7 @@ AOS4_sound_handler::audioTask()
 	unsigned long clockAdvance = 40;
 	unsigned int nSamples = (441*clockAdvance) / 10;
 	unsigned int toFetch = nSamples*2;
-	boost::int16_t samples[AHI_BUF_SIZE];
+	std::int16_t samples[AHI_BUF_SIZE];
 
 	_closing = false;
 
@@ -628,7 +628,7 @@ AOS4_sound_handler::audioTask()
 				while (toFetch && !_closing)
 				{
 					unsigned int n = std::min(toFetch, AHI_BUF_SIZE);
-					if (!_closing) fetchSamples((boost::int16_t*)&samples, n);
+					if (!_closing) fetchSamples((std::int16_t*)&samples, n);
 					toFetch -= n;
 				}
 				toFetch = nSamples*2;

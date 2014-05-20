@@ -85,7 +85,7 @@ SWFMovie::advance()
 SWF::DefinitionTag*
 SWFMovie::exportedCharacter(const std::string& symbol)
 {
-    const boost::uint16_t id = _def->exportID(symbol);
+    const std::uint16_t id = _def->exportID(symbol);
     if (!id) return 0;
     Characters::iterator it = _characters.find(id);
     if (it == _characters.end()) return 0;
@@ -93,7 +93,7 @@ SWFMovie::exportedCharacter(const std::string& symbol)
 }
 
 void
-SWFMovie::addCharacter(boost::uint16_t id)
+SWFMovie::addCharacter(std::uint16_t id)
 {
     // If a character is already known, we don't want to mark it uninitialized
     // again.
@@ -101,7 +101,7 @@ SWFMovie::addCharacter(boost::uint16_t id)
 }
 
 bool
-SWFMovie::initializeCharacter(boost::uint16_t cid)
+SWFMovie::initializeCharacter(std::uint16_t cid)
 {
     Characters::iterator it = _characters.find(cid);
     if (it == _characters.end()) {

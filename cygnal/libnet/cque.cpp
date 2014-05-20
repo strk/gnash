@@ -108,7 +108,7 @@ CQue::push(std::shared_ptr<cygnal::Buffer> data)
 
 // Push data
 bool
-CQue::push(boost::uint8_t *data, int nbytes)
+CQue::push(std::uint8_t *data, int nbytes)
 {
 //    GNASH_REPORT_FUNCTION;
     std::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer);

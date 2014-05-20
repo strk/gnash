@@ -43,7 +43,7 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
     _glyphs.clear();
 
     in.ensureBytes(1);
-    boost::uint8_t flags = in.read_u8();
+    std::uint8_t flags = in.read_u8();
         
     if (!flags)
     {
@@ -62,7 +62,7 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
     if (hasFont)
     {
         in.ensureBytes(2);
-        boost::uint16_t fontID = in.read_u16();
+        std::uint16_t fontID = in.read_u16();
 
         _font = m.get_font(fontID);
         if (!_font)
@@ -119,7 +119,7 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
     }
 
     in.ensureBytes(1);
-    boost::uint8_t glyphCount = in.read_u8();
+    std::uint8_t glyphCount = in.read_u8();
     if (!glyphCount) return false;
 
     IF_VERBOSE_PARSE(
@@ -208,7 +208,7 @@ TextRecord::displayRecords(Renderer& renderer, const Transform& xform,
         if (rec.hasYOffset()) y = rec.yOffset();
 
         // Save for the underline, if any
-        const boost::int16_t startX = x; 
+        const std::int16_t startX = x;
 
         rgba textColor = cx.transform(rec.color());
 
@@ -276,13 +276,13 @@ TextRecord::displayRecords(Renderer& renderer, const Transform& xform,
             // This will only be known if a glyph was actually found,
             // or would be the size of the empty box (arbitrary size)
             //
-            boost::int16_t endX = static_cast<boost::int16_t>(x); 
+            std::int16_t endX = static_cast<std::int16_t>(x);
 
             // The underline is made to be some pixels below the baseline (0)
             // and scaled so it's further as font size increases.
             //
             // 1/4 the EM square offset far from baseline 
-            boost::int16_t posY = int(y+int((unitsPerEM/4)*scale));
+            std::int16_t posY = int(y+int((unitsPerEM/4)*scale));
 
             const std::vector<point> underline = boost::assign::list_of
                 (point(startX, posY))

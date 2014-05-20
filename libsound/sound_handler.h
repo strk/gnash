@@ -412,7 +412,7 @@ public:
     ///           to give interpretation of what comes back (how many
     ///           bytes per channel, which format).
     ///
-    virtual void fetchSamples(boost::int16_t* to, unsigned int nSamples);
+    virtual void fetchSamples(std::int16_t* to, unsigned int nSamples);
 
     /// Mix nSamples from inSamples to outSamples, with given volume
     //
@@ -439,7 +439,7 @@ public:
     ///       Maybe, a Mixer instance should be created, initialized
     ///       with number of channels, at each fetching.
     ///
-    virtual void mix(boost::int16_t* outSamples, boost::int16_t* inSamples,
+    virtual void mix(std::int16_t* outSamples, std::int16_t* inSamples,
                 unsigned int nSamples, float volume) = 0;
 
     /// Request to dump audio to the given filename

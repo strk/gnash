@@ -25,7 +25,7 @@
 
 #include <string>
 #include <memory> // for unique_ptr
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/format.hpp>
 
 #include "GnashException.h"
@@ -156,8 +156,8 @@ private:
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
         log_debug("moveTo: %ld,%ld", to->x, to->y);
 #endif
-        _x = static_cast<boost::int32_t>(to->x * _scale);
-        _y = - static_cast<boost::int32_t>(to->y * _scale);
+        _x = static_cast<std::int32_t>(to->x * _scale);
+        _y = - static_cast<std::int32_t>(to->y * _scale);
         _currPath->close();
         _subshape.addPath(Path(_x, _y, 1, 0, 0));
         _currPath = &_subshape.currentPath();
@@ -169,8 +169,8 @@ private:
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
         log_debug("lineTo: %ld,%ld", to->x, to->y);
 #endif
-        _x = static_cast<boost::int32_t>(to->x * _scale);
-        _y = - static_cast<boost::int32_t>(to->y * _scale);
+        _x = static_cast<std::int32_t>(to->x * _scale);
+        _y = - static_cast<std::int32_t>(to->y * _scale);
         _currPath->drawLineTo(_x, _y);
         expandBounds(_x, _y);
         return 0;
@@ -181,10 +181,10 @@ private:
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
         log_debug("conicTo: %ld,%ld %ld,%ld", ctrl->x, ctrl->y, to->x, to->y);
 #endif
-        boost::int32_t x1 = static_cast<boost::int32_t>(ctrl->x * _scale);
-        boost::int32_t y1 = static_cast<boost::int32_t>(ctrl->y * _scale);
-        _x = static_cast<boost::int32_t>(to->x * _scale);
-        _y = - static_cast<boost::int32_t>(to->y * _scale);
+        std::int32_t x1 = static_cast<std::int32_t>(ctrl->x * _scale);
+        std::int32_t y1 = static_cast<std::int32_t>(ctrl->y * _scale);
+        _x = static_cast<std::int32_t>(to->x * _scale);
+        _y = - static_cast<std::int32_t>(to->y * _scale);
         _currPath->drawCurveTo(x1, -y1, _x, _y);
         expandBounds(x1, -y1, _x, _y);
         return 0;
@@ -199,10 +199,10 @@ private:
 #endif
         float x = ctrl1->x + ( (ctrl2->x - ctrl1->x) * 0.5 );
         float y = ctrl1->y + ( (ctrl2->y - ctrl1->y) * 0.5 );
-        boost::int32_t x1 = static_cast<boost::int32_t>(x * _scale);
-        boost::int32_t y1 = static_cast<boost::int32_t>(y * _scale);
-        _x = static_cast<boost::int32_t>(to->x * _scale);
-        _y = - static_cast<boost::int32_t>(to->y * _scale);
+        std::int32_t x1 = static_cast<std::int32_t>(x * _scale);
+        std::int32_t y1 = static_cast<std::int32_t>(y * _scale);
+        _x = static_cast<std::int32_t>(to->x * _scale);
+        _y = - static_cast<std::int32_t>(to->y * _scale);
         
         _currPath->drawCurveTo(x1, -y1, _x, _y);
         expandBounds(x1, -y1, _x, _y);
@@ -235,7 +235,7 @@ private:
 
     Path* _currPath;
 
-    boost::int32_t _x, _y;
+    std::int32_t _x, _y;
 
 };
 
@@ -481,7 +481,7 @@ FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string&, bool, bool)
 
 #ifdef USE_FREETYPE
 std::unique_ptr<SWF::ShapeRecord>
-FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
+FreetypeGlyphsProvider::getGlyph(std::uint16_t code, float& advance)
 {
     std::unique_ptr<SWF::ShapeRecord> glyph;
 
@@ -549,7 +549,7 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 #else // ndef(USE_FREETYPE)
 
 std::unique_ptr<SWF::ShapeRecord>
-FreetypeGlyphsProvider::getGlyph(boost::uint16_t, float& advance)
+FreetypeGlyphsProvider::getGlyph(std::uint16_t, float& advance)
 {
     abort(); // should never be called... 
 }

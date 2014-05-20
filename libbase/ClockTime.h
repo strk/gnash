@@ -21,19 +21,19 @@
 #ifndef GNASH_TIME_H
 #define GNASH_TIME_H
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include "dsodefs.h"
 
 namespace gnash {
 
 namespace clocktime {
     /// Wall clock timer, returns current POSIX time in milliseconds.
-	DSOEXPORT boost::uint64_t getTicks();
+	DSOEXPORT std::uint64_t getTicks();
 
 	/// Returns the offset between actual clock time and UTC.
 	/// It relies on the system's time zone settings, so
 	/// cannot be regarded as reliable.
-	DSOEXPORT boost::int32_t getTimeZoneOffset(double time);
+	DSOEXPORT std::int32_t getTimeZoneOffset(double time);
 
 } // namespace clocktime
 } // namespace gnash

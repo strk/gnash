@@ -171,7 +171,7 @@ VideoConverterFfmpeg::convert(const ImgBuf& src)
         return ret;
     }
 
-    boost::uint8_t* dstbuffer = new boost::uint8_t[bufsize];
+    std::uint8_t* dstbuffer = new std::uint8_t[bufsize];
 
     AVPicture dstpicture;
     avpicture_fill(&dstpicture, dstbuffer, dst_pixFmt, width, height);

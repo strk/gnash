@@ -135,7 +135,7 @@ public:
 
 //     // Parse an Echo Request message coming from the Red5 echo_test.
     std::vector<std::shared_ptr<cygnal::Element > > parseEchoRequest(cygnal::Buffer &buf) { return parseEchoRequest(buf.reference(), buf.size()); };
-    std::vector<std::shared_ptr<cygnal::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
+    std::vector<std::shared_ptr<cygnal::Element > > parseEchoRequest(std::uint8_t *buf, size_t size);
     
     // Convert the Content-Length field to a number we can use
     size_t getContentLength();
@@ -143,7 +143,7 @@ public:
     // process all the header fields in the Buffer, storing them internally
     // in _fields. The address returned is the address where the Content data
     // starts, and is "Content-Length" bytes long, of "Content-Type" data.
-    boost::uint8_t *processHeaderFields(cygnal::Buffer *buf);
+    std::uint8_t *processHeaderFields(cygnal::Buffer *buf);
     
     // Get the field for header 'name' that was stored by processHeaderFields()
     std::string &getField(const std::string &name) { return _fields[name]; };
@@ -193,7 +193,7 @@ public:
     // format a response to the 'echo' test used for testing Gnash.
     cygnal::Buffer &formatEchoResponse(const std::string &num, cygnal::Element &el);
     cygnal::Buffer &formatEchoResponse(const std::string &num, cygnal::Buffer &data);
-    cygnal::Buffer &formatEchoResponse(const std::string &num, boost::uint8_t *data, size_t size);
+    cygnal::Buffer &formatEchoResponse(const std::string &num, std::uint8_t *data, size_t size);
 
     cygnal::Buffer &formatMethod(const std::string &data)
  	{return formatCommon("Method: " + data); };
@@ -207,7 +207,7 @@ public:
     cygnal::Buffer &formatKeepAlive(const std::string &data)
  	{return formatCommon("Keep-Alive: " + data); };
     cygnal::Buffer &formatContentLength();
-    cygnal::Buffer &formatContentLength(boost::uint32_t filesize);
+    cygnal::Buffer &formatContentLength(std::uint32_t filesize);
     cygnal::Buffer &formatContentType();
     cygnal::Buffer &formatContentType(DiskStream::filetype_e type);
     cygnal::Buffer &formatHost(const std::string &data)
@@ -235,7 +235,7 @@ public:
 //     cygnal::Buffer &formatErrorResponse(http_status_e err);
     
     // Return the header that's been built up.
-    boost::uint8_t *getHeader() { return _buffer.reference(); };
+    std::uint8_t *getHeader() { return _buffer.reference(); };
 
     // Return the header that's been built up.
     cygnal::Buffer &getBuffer() { return _buffer; };
@@ -257,7 +257,7 @@ public:
     int recvMsg(int fd);
     int recvMsg(int fd, size_t size);
 
-    size_t recvChunked(boost::uint8_t *data, size_t size);
+    size_t recvChunked(std::uint8_t *data, size_t size);
     
     /// \brief Send a message to the other end of the network connection.
     ///
@@ -271,11 +271,11 @@ public:
     /// @return The number of bytes sent
     int sendMsg();
     int sendMsg(int fd);
-    int sendMsg(const boost::uint8_t *data, size_t size);
+    int sendMsg(const std::uint8_t *data, size_t size);
     int sendMsg(std::shared_ptr<cygnal::Buffer> &buf)
 	{ return sendMsg(buf->reference(), buf->size()); };
     int sendMsg(std::stringstream &sstr)
-	{ return sendMsg(reinterpret_cast<const boost::uint8_t *>(sstr.str().c_str()), sstr.str().size()); };
+	{ return sendMsg(reinterpret_cast<const std::uint8_t *>(sstr.str().c_str()), sstr.str().size()); };
     
     // These accessors are used mostly just for debugging.
     bool keepAlive() { return _keepalive; }
@@ -308,7 +308,7 @@ public:
 protected:
     // Examine the beginning of the data for an HTTP request command
     // like GET or POST, etc...
-    http_method_e extractCommand(boost::uint8_t *data);
+    http_method_e extractCommand(std::uint8_t *data);
     http_method_e extractCommand(cygnal::Buffer &data)
 	{ return extractCommand(data.reference()); };    
 
@@ -322,7 +322,7 @@ protected:
     DiskStream::filetype_e  _filetype;
     std::string		_filespec;
     std::string		_params;
-    boost::uint32_t     _filesize;
+    std::uint32_t     _filesize;
     std::map<int, struct status_codes *> _status_codes;
     
     std::map<std::string, std::string> _fields;

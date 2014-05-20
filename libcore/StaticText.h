@@ -85,13 +85,13 @@ public:
         return _selectedText;
     }
 
-    void setSelectionColor(boost::uint32_t color);
+    void setSelectionColor(std::uint32_t color);
 
     virtual SWFRect getBounds() const {
         return _def->bounds();
     }
 
-    virtual bool pointInShape(boost::int32_t x, boost::int32_t y) const;
+    virtual bool pointInShape(std::int32_t x, std::int32_t y) const;
 
     const rgba& selectionColor() const {
         return _selectionColor;

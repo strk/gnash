@@ -217,7 +217,7 @@ RawFBDevice::attachWindow(GnashDevice::native_window_t window)
     // of the opened device. EGL wants the descriptor here too, so
     // this way we work in a similar manner.
     if (window) {
-        _fbmem = reinterpret_cast<boost::uint8_t *>(mmap(0, _fixinfo.smem_len,
+        _fbmem = reinterpret_cast<std::uint8_t *>(mmap(0, _fixinfo.smem_len,
                                         PROT_READ|PROT_WRITE, MAP_SHARED,
                                         window, 0));
     }
@@ -230,7 +230,7 @@ RawFBDevice::attachWindow(GnashDevice::native_window_t window)
     
     if (!isSingleBuffered()) {
         // Create an offscreen buffer the same size as the Framebuffer
-        _offscreen_buffer.reset(new boost::uint8_t[_fixinfo.smem_len]);
+        _offscreen_buffer.reset(new std::uint8_t[_fixinfo.smem_len]);
         memset(_offscreen_buffer.get(), 0, _fixinfo.smem_len);
     }
     

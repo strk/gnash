@@ -27,7 +27,7 @@
 
 #include <boost/intrusive_ptr.hpp>
 #include <string>
-#include <boost/cstdint.hpp> // for boost::uint16_t and friends
+#include <cstdint> // for std::uint16_t and friends
  
 
 // Forward declarations
@@ -93,23 +93,23 @@ public:
 	}
 
 	/// Get right margin in twips
-	boost::uint16_t rightMargin() const {
+	std::uint16_t rightMargin() const {
 		return _rightMargin;
 	}
 
 	/// Get left margin in twips
-	boost::uint16_t leftMargin() const {
+	std::uint16_t leftMargin() const {
 		return _leftMargin;
 	}
 
 	/// Get indentation in  twips
-	boost::uint16_t indent() const {
+	std::uint16_t indent() const {
 		return _indent;
 	}
 
 	/// Get height of font  in twips.
 	// @@ what if has_font is false ??
-	boost::uint16_t textHeight() const {
+	std::uint16_t textHeight() const {
 		return _textHeight;
 	}
 
@@ -122,7 +122,7 @@ public:
 	/// Get extra space between lines (in twips).
 	//
 	/// This is in addition to default font line spacing.
-	boost::uint16_t leading() const {
+	std::uint16_t leading() const {
 		return _leading;
 	}
 
@@ -190,7 +190,7 @@ private:
     /// Construct a DefineEditTextTag.
     //
     /// This should only be used from the loader() function.
-	DefineEditTextTag(SWFStream& in, movie_definition& m, boost::uint16_t id);
+	DefineEditTextTag(SWFStream& in, movie_definition& m, std::uint16_t id);
 
     /// Read a tag from the SWFStream.
     void read(SWFStream& in, movie_definition& m);
@@ -261,7 +261,7 @@ private:
     // TODO: initialize to a meaningful value (see MovieClip::add_textfield)
     //       and make sure get_font_height is not called for rendering purposes
     //       (instead call a method of TextField) (?)
-	boost::uint16_t _textHeight;
+	std::uint16_t _textHeight;
 
 	/// Text color
 	rgba _color;
@@ -275,18 +275,18 @@ private:
     TextField::TextAlignment _alignment;
 	
 	/// extra space between box's left border and text (in twips)
-	boost::uint16_t _leftMargin;
+	std::uint16_t _leftMargin;
 
 	/// extra space between box's right border and text (in twips)
-	boost::uint16_t _rightMargin;
+	std::uint16_t _rightMargin;
 
 	/// how much to indent the first line of multiline text (in twips)
-	boost::uint16_t	_indent;
+	std::uint16_t	_indent;
 
 	/// \brief
 	/// Extra space between lines
 	/// (in addition to default font line spacing)
-	boost::uint16_t	_leading;
+	std::uint16_t	_leading;
 
 	/// The default text to be displayed
 	std::string	_defaultText;

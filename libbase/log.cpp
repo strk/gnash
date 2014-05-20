@@ -90,7 +90,7 @@ namespace {
     LogFile& dbglogfile = LogFile::getDefaultInstance();
 
     struct Timestamp {
-        boost::uint64_t startTicks;
+        std::uint64_t startTicks;
         std::map<int, int> threadMap;
         Timestamp() : startTicks(clocktime::getTicks()) {}
     };
@@ -104,7 +104,7 @@ namespace {
             // TODO: notify actual thread id for index
         }
 
-        boost::uint64_t diff = clocktime::getTicks() - t.startTicks;
+        std::uint64_t diff = clocktime::getTicks() - t.startTicks;
         // should we split in seconds/ms ?
         o << getpid() << ":" << htid << "] " << diff;
 

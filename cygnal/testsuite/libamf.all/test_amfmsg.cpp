@@ -216,7 +216,7 @@ test_encoding()
     top.addMessage(msg3);
 
     std::shared_ptr<cygnal::Buffer> buf2 = top.encodeMsgHeader("getway", "/229", 14);
-    boost::uint8_t *ptr1 = buf1->reference() + sizeof(AMF_msg::context_header_t);
+    std::uint8_t *ptr1 = buf1->reference() + sizeof(AMF_msg::context_header_t);
 
 
     if (memcmp(ptr1, buf2->reference(), buf2->size()) == 0) {

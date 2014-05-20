@@ -20,7 +20,7 @@
 #define HAIKU_AGG_GLUE_H
 
 #include <vector>
-#include <boost/cstdint.hpp> // for boost::?int??_t 
+#include <cstdint> // for boost::?int??_t
 #include <Renderer.h>
 
 #include <SupportDefs.h>
@@ -56,8 +56,8 @@ class HaikuAggGlue
     void setInvalidatedRegions(const InvalidatedRanges& ranges);
     void ViewNoMore();
     void ViewNeeded();
-    bool prepDrawingArea(int width, int height, boost::uint32_t sdl_flags);
-    boost::uint32_t maskFlags(boost::uint32_t sdl_flags);
+    bool prepDrawingArea(int width, int height, std::uint32_t sdl_flags);
+    std::uint32_t maskFlags(std::uint32_t sdl_flags);
     void render();
     void render(int minx, int miny, int maxx, int maxy);
     void Shown();

@@ -102,7 +102,7 @@ namespace {
     //
     /// Note: calls pixelAt(), so do not use this more than necessary!
     void setPixel32(const BitmapData_as& bd, size_t x, size_t y,
-            boost::uint32_t color);
+            std::uint32_t color);
 
     /// Set the RGB values at (x, y) to the RGB components of a colour.
     //
@@ -110,9 +110,9 @@ namespace {
     //
     /// Note: calls pixelAt(), so do not use this more than necessary!
     void setPixel(const BitmapData_as& bd, size_t x, size_t y,
-            boost::uint32_t color);
+            std::uint32_t color);
 
-    boost::uint32_t getPixel(const BitmapData_as& bd, size_t x, size_t y);
+    std::uint32_t getPixel(const BitmapData_as& bd, size_t x, size_t y);
 
     /// Get the overlapping part of a rectangle and a Bitmap
     //
@@ -126,13 +126,13 @@ namespace {
     /// @param h    The height of the rectangle.
     void adjustRect(int& x, int& y, int& w, int& h, const BitmapData_as& b);
 
-    boost::uint32_t setChannel(boost::uint32_t targ, boost::uint8_t bitmask,
-            boost::uint8_t value);
+    std::uint32_t setChannel(std::uint32_t targ, std::uint8_t bitmask,
+            std::uint8_t value);
 
-    boost::uint8_t getChannel(boost::uint32_t src, boost::uint8_t bitmask);
+    std::uint8_t getChannel(std::uint32_t src, std::uint8_t bitmask);
 
     void floodFill(const BitmapData_as& bd, size_t startx, size_t starty,
-            boost::uint32_t old, boost::uint32_t fill);
+            std::uint32_t old, std::uint32_t fill);
 
     /// Fill a rectangle of the BitmapData_as
     //
@@ -145,9 +145,9 @@ namespace {
     /// @param h        The height of the rectangle.
     /// @param color    The ARGB colour to fill with.
     void fillRect(const BitmapData_as& bd, int x, int y, int w, int h,
-            boost::uint32_t color);
+            std::uint32_t color);
 
-    inline bool oneBitSet(boost::uint8_t mask) {
+    inline bool oneBitSet(std::uint8_t mask) {
         return mask == (mask & -mask);
     }
 }
@@ -202,7 +202,7 @@ private:
 template<typename NoiseGenerator>
 struct NoiseAdapter
 {
-    NoiseAdapter(NoiseGenerator& n, boost::uint8_t bitmask, bool grey)
+    NoiseAdapter(NoiseGenerator& n, std::uint8_t bitmask, bool grey)
         :
         _gen(n),
         _bitmask(bitmask),
@@ -210,14 +210,14 @@ struct NoiseAdapter
     {}
 
     /// Generate a 32-bit ARGB noise value.
-    boost::uint32_t operator()() {
+    std::uint32_t operator()() {
 
         if (_greyscale) {
-            boost::uint8_t val = _gen();
+            std::uint8_t val = _gen();
             return 0xff000000 | val | val << 8 | val << 16;
         }
 
-        boost::uint32_t ret = 0xff000000;
+        std::uint32_t ret = 0xff000000;
 
         if (_bitmask & BitmapData_as::CHANNEL_RED) {
             ret |= (_gen() << 16);
@@ -230,7 +230,7 @@ struct NoiseAdapter
         }
         if (_bitmask & BitmapData_as::CHANNEL_ALPHA) {
             // Alpha is 0xff by default.
-            const boost::uint8_t rd = _gen();
+            const std::uint8_t rd = _gen();
             ret &= (~rd) << 24;
         }
         return ret;
@@ -238,7 +238,7 @@ struct NoiseAdapter
 
 private:
     NoiseGenerator& _gen;
-    const boost::uint8_t _bitmask;
+    const std::uint8_t _bitmask;
     const bool _greyscale;
 };
 
@@ -252,26 +252,26 @@ struct CopyChannel
     typedef boost::tuple<Iterator, Iterator> iterator_tuple;
     typedef boost::zip_iterator<iterator_tuple> iterator_type;
 
-    CopyChannel(bool multiple, boost::uint8_t srcchans,
-            boost::uint8_t destchans)
+    CopyChannel(bool multiple, std::uint8_t srcchans,
+            std::uint8_t destchans)
         :
         _multiple(multiple),
         _srcchans(srcchans),
         _destchans(destchans)
     {}
 
-    boost::uint32_t operator()(typename iterator_type::value_type p) const {
+    std::uint32_t operator()(typename iterator_type::value_type p) const {
         // If multiple source channels, we set the destination channel
         // to black. Else to the value of the requested channel.
-        const boost::uint8_t val = _multiple ?
+        const std::uint8_t val = _multiple ?
             0 : getChannel(boost::get<0>(p), _srcchans);
         return setChannel(boost::get<1>(p), _destchans, val);
     }
 
 private:
     const bool _multiple;
-    const boost::uint8_t _srcchans;
-    const boost::uint8_t _destchans;
+    const std::uint8_t _srcchans;
+    const std::uint8_t _destchans;
 
 };
 
@@ -295,8 +295,8 @@ void normalize(T& a, T& b)
 /// @tparam B       The size of the permutation table.
 /// @tparam Offset  An offset for generating non-identical patterns with the
 ///                 same Perlin noise generator.
-template<typename T, boost::uint32_t Size = 0x100,
-    boost::uint32_t Offset = 1327>
+template<typename T, std::uint32_t Size = 0x100,
+    std::uint32_t Offset = 1327>
 struct PerlinNoise
 {
     typedef T value_type;
@@ -310,7 +310,7 @@ struct PerlinNoise
         init(seed);
     }
 
-    boost::uint32_t size() const {
+    std::uint32_t size() const {
         return Size;
     }
 
@@ -430,9 +430,9 @@ private:
 /// Store offsets.
 struct Vector
 {
-    Vector(boost::int32_t x, boost::int32_t y) : x(x), y(y) {}
-    boost::int32_t x;
-    boost::int32_t y;
+    Vector(std::int32_t x, std::int32_t y) : x(x), y(y) {}
+    std::int32_t x;
+    std::int32_t y;
 };
 
 /// Transform negative offsets into positive ones
@@ -802,11 +802,11 @@ bitmapdata_copyChannel(const fn_call& fn)
     // is negative (currently it is truncated and made positive.
 
     // The source channel mask
-    const boost::uint8_t srcchans = 
+    const std::uint8_t srcchans =
         std::abs(toInt(fn.arg(3), getVM(fn))) & 15;
 
     // The destination channel mask
-    const boost::uint8_t destchans = 
+    const std::uint8_t destchans =
         std::abs(toInt(fn.arg(4), getVM(fn))) & 15;
 
     // If more than one destination channel is specified,
@@ -1142,7 +1142,7 @@ bitmapdata_fillRect(const fn_call& fn)
     obj->get_member(NSV::PROP_WIDTH, &w);
     obj->get_member(NSV::PROP_HEIGHT, &h);    
 
-    const boost::uint32_t color = toInt(fn.arg(1), getVM(fn));
+    const std::uint32_t color = toInt(fn.arg(1), getVM(fn));
        
     fillRect(*ptr, toInt(x, getVM(fn)), toInt(y, getVM(fn)),
             toInt(w, getVM(fn)), toInt(h, getVM(fn)), color);
@@ -1175,8 +1175,8 @@ bitmapdata_floodFill(const fn_call& fn)
         return as_value();
     }
 
-    const boost::uint32_t fill = toInt(fn.arg(2), getVM(fn));
-    const boost::uint32_t old = *pixelAt(*ptr, x, y);
+    const std::uint32_t fill = toInt(fn.arg(2), getVM(fn));
+    const std::uint32_t old = *pixelAt(*ptr, x, y);
 
     // This checks whether the colours are the same.
     floodFill(*ptr, x, y, old, fill);
@@ -1223,7 +1223,7 @@ bitmapdata_getPixel(const fn_call& fn)
 
     // Note: x and y are converted to size_t, so negative values becomre
     // very large and are also outside the image. This is perfectly legal!
-    return static_cast<boost::int32_t>(getPixel(*ptr, x, y) & 0xffffff);
+    return static_cast<std::int32_t>(getPixel(*ptr, x, y) & 0xffffff);
 }
 
 as_value
@@ -1247,7 +1247,7 @@ bitmapdata_getPixel32(const fn_call& fn)
     
     // Note: x and y are converted to size_t, so negative values becomre
     // very large and are also outside the image. This is perfectly legal!
-    return static_cast<boost::int32_t>(getPixel(*ptr, x, y));
+    return static_cast<std::int32_t>(getPixel(*ptr, x, y));
 }
 
 
@@ -1281,13 +1281,13 @@ bitmapdata_noise(const fn_call& fn)
     }
     const int seed = toInt(fn.arg(0), getVM(fn));
 
-    const boost::uint8_t low = fn.nargs > 1 ?
+    const std::uint8_t low = fn.nargs > 1 ?
         clamp(toInt(fn.arg(1), getVM(fn)), 0, 255) : 0;
 
-    const boost::uint8_t high = fn.nargs > 2 ?
+    const std::uint8_t high = fn.nargs > 2 ?
         clamp<int>(toInt(fn.arg(2), getVM(fn)), low, 255) : 255;
 
-    const boost::uint8_t chans = fn.nargs > 3 ?
+    const std::uint8_t chans = fn.nargs > 3 ?
         std::abs(toInt(fn.arg(3), getVM(fn))) & 15 :
             BitmapData_as::CHANNEL_RED |
             BitmapData_as::CHANNEL_GREEN |
@@ -1343,7 +1343,7 @@ bitmapdata_perlinNoise(const fn_call& fn)
         toBool(fn.arg(5), getVM(fn)) : false;
 
     // Which channels to use.
-    const boost::uint8_t channels = fn.nargs > 6 ?
+    const std::uint8_t channels = fn.nargs > 6 ?
         clamp<int>(toInt(fn.arg(6), getVM(fn)), 0, 255) :
             BitmapData_as::CHANNEL_RED |
             BitmapData_as::CHANNEL_GREEN |
@@ -1391,7 +1391,7 @@ bitmapdata_perlinNoise(const fn_call& fn)
         const size_t x = pixel % width;
         const size_t y = pixel / width;
 
-        boost::uint8_t rv = 0;
+        std::uint8_t rv = 0;
 
         if (greyscale || channels & BitmapData_as::CHANNEL_RED) {
             // Create one noise channel.
@@ -1399,7 +1399,7 @@ bitmapdata_perlinNoise(const fn_call& fn)
             rv = clamp(r, 0.0, 255.0);
         }
 
-        boost::uint8_t av = 0xff;
+        std::uint8_t av = 0xff;
 
         // It's just a waste of time if the BitmapData has no alpha.
         if (transparent && channels & BitmapData_as::CHANNEL_ALPHA) {
@@ -1418,8 +1418,8 @@ bitmapdata_perlinNoise(const fn_call& fn)
         // Otherwise create data for the other channels too by using the
         // PerlinNoise object's pattern offset (this is cheaper than using a
         // separate generator)
-        boost::uint8_t gv = 0;
-        boost::uint8_t bv = 0;
+        std::uint8_t gv = 0;
+        std::uint8_t bv = 0;
 
         if (channels & BitmapData_as::CHANNEL_GREEN) {
             const double g = pa(x, y, 1);
@@ -1472,7 +1472,7 @@ bitmapdata_setPixel(const fn_call& fn)
     }
 
     // Ignore any transparency here.
-    const boost::uint32_t color = toInt(fn.arg(2), getVM(fn));
+    const std::uint32_t color = toInt(fn.arg(2), getVM(fn));
 
     setPixel(*ptr, x, y, color);
 
@@ -1496,7 +1496,7 @@ bitmapdata_setPixel32(const fn_call& fn)
     }
 
     // TODO: multiply.
-    const boost::uint32_t color = toInt(fn.arg(2), getVM(fn));
+    const std::uint32_t color = toInt(fn.arg(2), getVM(fn));
 
     setPixel32(*ptr, x, y, color);
 
@@ -1604,7 +1604,7 @@ bitmapdata_loadBitmap(const fn_call& fn)
 
     const movie_definition* def = root->definition();
 
-    const boost::uint16_t id = def->exportID(linkage);
+    const std::uint16_t id = def->exportID(linkage);
     CachedBitmap* bit = def->getBitmap(id);
 
     if (!bit) return as_value();
@@ -1664,7 +1664,7 @@ bitmapdata_ctor(const fn_call& fn)
     const size_t width = toInt(fn.arg(0), getVM(fn));
     const size_t height = toInt(fn.arg(1), getVM(fn));
     const bool transparent = fn.nargs > 2 ? toBool(fn.arg(2), getVM(fn)) : true;
-    boost::uint32_t fillColor =
+    std::uint32_t fillColor =
         fn.nargs > 3 ? toInt(fn.arg(3), getVM(fn)) : 0xffffffff;
     
     if (width > 2880 || height > 2880 || width < 1 || height < 1) {
@@ -1753,7 +1753,7 @@ pixelAt(const BitmapData_as& bd, size_t x, size_t y)
     return (bd.begin() + y * width + x);
 }
 
-boost::uint32_t
+std::uint32_t
 getPixel(const BitmapData_as& bd, size_t x, size_t y)
 {
     if (x >= bd.width() || y >= bd.height()) return 0;
@@ -1761,18 +1761,18 @@ getPixel(const BitmapData_as& bd, size_t x, size_t y)
 }
 
 void
-setPixel(const BitmapData_as& bd, size_t x, size_t y, boost::uint32_t color) 
+setPixel(const BitmapData_as& bd, size_t x, size_t y, std::uint32_t color)
 {
     if (bd.disposed()) return;
     if (x >= bd.width() || y >= bd.height()) return;
 
     BitmapData_as::iterator it = pixelAt(bd, x, y);
-    const boost::uint32_t val = *it;
+    const std::uint32_t val = *it;
     *it = (color & 0xffffff) | (val & 0xff000000);
 }
 
 void
-setPixel32(const BitmapData_as& bd, size_t x, size_t y, boost::uint32_t color) 
+setPixel32(const BitmapData_as& bd, size_t x, size_t y, std::uint32_t color)
 {
     if (bd.disposed()) return;
     if (x >= bd.width() || y >= bd.height()) return;
@@ -1783,7 +1783,7 @@ setPixel32(const BitmapData_as& bd, size_t x, size_t y, boost::uint32_t color)
 
 void
 fillRect(const BitmapData_as& bd, int x, int y, int w, int h,
-        boost::uint32_t color)
+        std::uint32_t color)
 {
     adjustRect(x, y, w, h, bd);
 
@@ -1809,7 +1809,7 @@ fillRect(const BitmapData_as& bd, int x, int y, int w, int h,
 
 void
 floodFill(const BitmapData_as& bd, size_t startx, size_t starty,
-        boost::uint32_t old, boost::uint32_t fill)
+        std::uint32_t old, std::uint32_t fill)
 {
     const size_t width = bd.width();
     const size_t height = bd.height();
@@ -1924,8 +1924,8 @@ adjustRect(int& x, int& y, int& w, int& h, const BitmapData_as& b)
 }
 
 
-boost::uint8_t
-getChannel(boost::uint32_t src, boost::uint8_t bitmask)
+std::uint8_t
+getChannel(std::uint32_t src, std::uint8_t bitmask)
 {
     if (bitmask & BitmapData_as::CHANNEL_RED) {
         // Red
@@ -1946,11 +1946,11 @@ getChannel(boost::uint32_t src, boost::uint8_t bitmask)
     return 0;
 }
 
-boost::uint32_t
-setChannel(boost::uint32_t targ, boost::uint8_t bitmask, boost::uint8_t value)
+std::uint32_t
+setChannel(std::uint32_t targ, std::uint8_t bitmask, std::uint8_t value)
 {
-    boost::uint32_t bytemask = 0;
-    boost::uint32_t valmask = 0;
+    std::uint32_t bytemask = 0;
+    std::uint32_t valmask = 0;
     if (bitmask & BitmapData_as::CHANNEL_RED) {
         // Red
         bytemask = 0xff0000;

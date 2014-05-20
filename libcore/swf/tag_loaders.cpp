@@ -48,7 +48,7 @@ namespace SWF {
 // Anonymous namespace
 namespace {
 
-const boost::uint32_t samplerates[] = { 5512, 11025, 22050, 44100 };
+const std::uint32_t samplerates[] = { 5512, 11025, 22050, 44100 };
 
 } 
 
@@ -101,7 +101,7 @@ sprite_loader(SWFStream& in, TagType tag, movie_definition& m,
     assert(tag == SWF::DEFINESPRITE); // 39 - DefineSprite
 
     in.ensureBytes(2);
-    const boost::uint16_t id = in.read_u16();
+    const std::uint16_t id = in.read_u16();
 
     IF_VERBOSE_PARSE(
         log_parse(_("  sprite:  char id = %d"), id);
@@ -156,13 +156,13 @@ define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
 
     in.ensureBytes(2+4+1+4); // DisplayObject id + flags + sample count
 
-    const boost::uint16_t id = in.read_u16();
+    const std::uint16_t id = in.read_u16();
 
 #ifdef USE_SOUND
     media::audioCodecType format = static_cast<media::audioCodecType>(
             in.read_uint(4));
 
-    boost::uint8_t sample_rate_in = in.read_uint(2);
+    std::uint8_t sample_rate_in = in.read_uint(2);
 
     if (sample_rate_in >= arraySize(samplerates)) {
         IF_VERBOSE_MALFORMED_SWF(
@@ -171,14 +171,14 @@ define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
         );
         sample_rate_in = 0;
     }
-    const boost::uint32_t sample_rate = samplerates[sample_rate_in];
+    const std::uint32_t sample_rate = samplerates[sample_rate_in];
 
     const bool sample_16bit = in.read_bit(); 
     const bool stereo = in.read_bit(); 
 
-    const boost::uint32_t sample_count = in.read_u32();
+    const std::uint32_t sample_count = in.read_u32();
 
-    boost::int16_t delaySeek = 0;
+    std::int16_t delaySeek = 0;
 
     if (format == media::AUDIO_CODEC_MP3) {
         in.ensureBytes(2);
@@ -346,21 +346,21 @@ serialnumber_loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
 
     in.ensureBytes(26);
 
-    const boost::uint32_t id = in.read_u32();
-    const boost::uint32_t edition = in.read_u32();
-    const boost::uint8_t major = in.read_u8();
-    const boost::uint8_t minor = in.read_u8();
+    const std::uint32_t id = in.read_u32();
+    const std::uint32_t edition = in.read_u32();
+    const std::uint8_t major = in.read_u8();
+    const std::uint8_t minor = in.read_u8();
 
-    const boost::uint32_t buildL = in.read_u32();
-    const boost::uint32_t buildH = in.read_u32();
-    const boost::uint64_t build =
-        (static_cast<boost::uint64_t>(buildH) << 32) + buildL;
+    const std::uint32_t buildL = in.read_u32();
+    const std::uint32_t buildH = in.read_u32();
+    const std::uint64_t build =
+        (static_cast<std::uint64_t>(buildH) << 32) + buildL;
 
-    const boost::uint32_t timestampL = in.read_u32();
-    const boost::uint32_t timestampH = in.read_u32();
+    const std::uint32_t timestampL = in.read_u32();
+    const std::uint32_t timestampH = in.read_u32();
     // This timestamp is number of milliseconds since 1 Jan 1970 (epoch)
-    boost::uint64_t timestamp = 
-        (static_cast<boost::uint64_t>(timestampH) << 32) + timestampL;
+    std::uint64_t timestamp =
+        (static_cast<std::uint64_t>(timestampH) << 32) + timestampL;
 
     std::stringstream ss;
     ss << "SERIALNUMBER: Version " << id << "." << edition 
@@ -380,9 +380,9 @@ reflex_loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
     assert(tag == SWF::REFLEX); // 777
 
     in.ensureBytes(3);
-    const boost::uint8_t first = in.read_u8();
-    const boost::uint8_t second = in.read_u8();
-    const boost::uint8_t third = in.read_u8();
+    const std::uint8_t first = in.read_u8();
+    const std::uint8_t second = in.read_u8();
+    const std::uint8_t third = in.read_u8();
 
     IF_VERBOSE_PARSE(
         log_parse(_("  reflex = \"%c%c%c\""), first, second, third);

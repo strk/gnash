@@ -28,7 +28,7 @@
 #include <cstdlib>
 #include <cstdio>
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/detail/endian.hpp>
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/uniform_int.hpp>
@@ -168,7 +168,7 @@ RTMPServer::processClientHandShake(int fd)
     }
 
     // Get the actual start of the data
-    boost::uint8_t *ptr = pkt->reference() + qhead->head_size;
+    std::uint8_t *ptr = pkt->reference() + qhead->head_size;
 
     // See if we have enough data to go past the chunksize, which is
     // probable. If so, all chunks are the default size of 128, the
@@ -237,9 +237,9 @@ RTMPServer::processClientHandShake(int fd)
     }
     
     // Send a Set Client Window Size to the client
-    std::shared_ptr<cygnal::Buffer> winsize(new cygnal::Buffer(sizeof(boost::uint32_t)));
-    boost::uint32_t swapped = 0x20000;
-    swapBytes(&swapped, sizeof(boost::uint32_t));
+    std::shared_ptr<cygnal::Buffer> winsize(new cygnal::Buffer(sizeof(std::uint32_t)));
+    std::uint32_t swapped = 0x20000;
+    swapBytes(&swapped, sizeof(std::uint32_t));
     *winsize += swapped;
     if (RTMP::sendMsg(fd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_12,
 		      winsize->size(), RTMP::WINDOW_SIZE, RTMPMsg::FROM_CLIENT, *winsize)) {
@@ -288,7 +288,7 @@ RTMPServer::handShakeResponse(int fd, cygnal::Buffer &handshake)
 {
     GNASH_REPORT_FUNCTION;
 
-    // boost::uint8_t byte;
+    // std::uint8_t byte;
     // byte = RTMP_VERSION;
 
     // the response handshake is twice the size of the one we just
@@ -297,7 +297,7 @@ RTMPServer::handShakeResponse(int fd, cygnal::Buffer &handshake)
 					 + RTMP_HANDSHAKE_VERSION_SIZE));
     zeros->clear();		// set entire buffer to zeros
 
-    boost::uint8_t *ptr = zeros->reference();
+    std::uint8_t *ptr = zeros->reference();
 
     // the first byte of the handshake response is the RTMP version
     // number.
@@ -313,13 +313,13 @@ RTMPServer::handShakeResponse(int fd, cygnal::Buffer &handshake)
     // timestamp, followed by another field that appears to be another
     // timestamp or version number, which is probably ignored.
     // the first field of the header is the timestamp
-    boost::uint32_t timestamp;
+    std::uint32_t timestamp;
     // Get the timestamp of when this message was read
     timestamp = RTMP::getTime();
     *zeros += timestamp;
 
     // the second field is always zero
-    boost::uint32_t pad = 0;
+    std::uint32_t pad = 0;
     *zeros += pad;
 
     // the data starts after the vesion and header bytes
@@ -361,13 +361,13 @@ RTMPServer::serverFinish(int fd, cygnal::Buffer &handshake1, cygnal::Buffer &han
 
     // the first field of the header is the timestamp of the original
     // packet sent by this server.
-    boost::uint32_t timestamp1 = *reinterpret_cast<boost::uint32_t *>
+    std::uint32_t timestamp1 = *reinterpret_cast<std::uint32_t *>
 	(handshake1.reference() + RTMP_HANDSHAKE_VERSION_SIZE);
 
     // the second field of the header is the timestamp of the previous
     // packet sent by this server.
-    boost::uint32_t timestamp2 = *reinterpret_cast<boost::uint32_t *>
-	(handshake1.reference() + RTMP_HANDSHAKE_VERSION_SIZE + sizeof(boost::uint32_t));
+    std::uint32_t timestamp2 = *reinterpret_cast<std::uint32_t *>
+	(handshake1.reference() + RTMP_HANDSHAKE_VERSION_SIZE + sizeof(std::uint32_t));
 
     log_network("The timestamp delta is %d", timestamp2 - timestamp1);
 
@@ -397,7 +397,7 @@ RTMPServer::serverFinish(int fd, cygnal::Buffer &handshake1, cygnal::Buffer &han
 		    amf_size, fd);
 	buf.reset(new Buffer(amf_size));
 	// populate the buffer with the AMF data
-	boost::uint8_t *ptr = handshake2.reference() + RTMP_HANDSHAKE_SIZE;
+	std::uint8_t *ptr = handshake2.reference() + RTMP_HANDSHAKE_SIZE;
 	buf->copy(ptr, amf_size);
     }
     
@@ -417,8 +417,8 @@ RTMPServer::packetRead(cygnal::Buffer &buf)
 {
     GNASH_REPORT_FUNCTION;
 
-    boost::uint8_t amf_index, headersize;
-    boost::uint8_t *ptr = buf.reference();
+    std::uint8_t amf_index, headersize;
+    std::uint8_t *ptr = buf.reference();
     AMF amf;
     
     if (ptr == 0) {
@@ -445,16 +445,16 @@ RTMPServer::packetRead(cygnal::Buffer &buf)
 //     }
 
 // #if 1
-//     boost::uint8_t *end = buf->remove(0xc3);
+//     std::uint8_t *end = buf->remove(0xc3);
 // #else
-//     boost::uint8_t *end = buf->find(0xc3);
+//     std::uint8_t *end = buf->find(0xc3);
 //     log_network("END is %x", (void *)end);
 //     *end = '*';
 // #endif
     decodeHeader(ptr);
     ptr += headersize;
 
-    boost::uint8_t* tooFar = ptr+300+sizeof(int); // FIXME:
+    std::uint8_t* tooFar = ptr+300+sizeof(int); // FIXME:
     
     AMF amf_obj;
     std::shared_ptr<cygnal::Element> el1 = amf_obj.extractAMF(ptr, tooFar);
@@ -463,7 +463,7 @@ RTMPServer::packetRead(cygnal::Buffer &buf)
 
     int size = 0;
     std::shared_ptr<cygnal::Element> el;
-    while ( size < static_cast<boost::uint16_t>(_header.bodysize) - 24 ) {
+    while ( size < static_cast<std::uint16_t>(_header.bodysize) - 24 ) {
 	if (ptr) {
 	    el = amf_obj.extractProperty(ptr, tooFar);
 	    if (el != 0) {
@@ -637,9 +637,9 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
 {
 //    GNASH_REPORT_FUNCTION;
 //    Buffer *buf = new Buffer;
-//     boost::uint8_t *ptr = buf->reference();
+//     std::uint8_t *ptr = buf->reference();
 //     buf->clear();		// default everything to zeros, real data gets optionally added.
-//    ptr += sizeof(boost::uint16_t); // go past the first short
+//    ptr += sizeof(std::uint16_t); // go past the first short
 //     const char *capabilities = 0;
 //     const char *description = 0;
 //     const char *code = 0;
@@ -918,7 +918,7 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
     std::shared_ptr<cygnal::Buffer> buf(new Buffer(strbuf->size() + numbuf->size() + topbuf->size()));
     *buf += strbuf;
     *buf += numbuf;
-    boost::uint8_t byte = static_cast<boost::uint8_t>(RTMP::WINDOW_SIZE & 0x000000ff);
+    std::uint8_t byte = static_cast<std::uint8_t>(RTMP::WINDOW_SIZE & 0x000000ff);
     *buf += byte;
     *buf += topbuf;
 
@@ -955,22 +955,22 @@ RTMPServer::encodePing(rtmp_ping_e type)
 }
 
 std::shared_ptr<Buffer>
-RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
+RTMPServer::encodePing(rtmp_ping_e type, std::uint32_t milliseconds)
 {
 //    GNASH_REPORT_FUNCTION;
 
     // An encoded ping message 
-    std::shared_ptr<cygnal::Buffer> buf(new Buffer(sizeof(boost::uint16_t) * 3));
-//    boost::uint8_t *ptr = buf->reference();
+    std::shared_ptr<cygnal::Buffer> buf(new Buffer(sizeof(std::uint16_t) * 3));
+//    std::uint8_t *ptr = buf->reference();
 
     // Set the type of this ping message
-    boost::uint16_t typefield = htons(type);
+    std::uint16_t typefield = htons(type);
     *buf = typefield;
     
 //     // go past the first short, which is the type field
-//    ptr += sizeof(boost::uint16_t);
+//    ptr += sizeof(std::uint16_t);
 
-    boost::uint32_t swapped = 0;
+    std::uint32_t swapped = 0;
     switch (type) {
         // These two don't appear to have any paramaters
       case PING_CLEAR:
@@ -979,16 +979,16 @@ RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
 	  // the third parameter is the buffer time in milliseconds
       case PING_TIME:
       {
-//	  ptr += sizeof(boost::uint16_t); // go past the second short
+//	  ptr += sizeof(std::uint16_t); // go past the second short
 	  swapped = milliseconds;
-	  swapBytes(&swapped, sizeof(boost::uint32_t));
+	  swapBytes(&swapped, sizeof(std::uint32_t));
 	  *buf += swapped;
 	  break;
       }
       // reset doesn't have any parameters but zeros
       case PING_RESET:
       {
-	  boost::uint16_t zero = 0;
+	  std::uint16_t zero = 0;
 	  *buf += zero;
 	  *buf += zero;
 	  break;
@@ -999,7 +999,7 @@ RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
       {
 //	  swapped = htonl(milliseconds);
 	  swapped = milliseconds;
-	  swapBytes(&swapped, sizeof(boost::uint32_t));
+	  swapBytes(&swapped, sizeof(std::uint32_t));
 	  *buf += swapped;
 	  break;
       }
@@ -1047,7 +1047,7 @@ RTMPServer::encodeBWDone(double id)
 }
 
 std::shared_ptr<cygnal::Buffer>
-RTMPServer::encodeAudio(boost::uint8_t *data, size_t size)
+RTMPServer::encodeAudio(std::uint8_t *data, size_t size)
 {
     GNASH_REPORT_FUNCTION;
     
@@ -1064,7 +1064,7 @@ RTMPServer::encodeAudio(boost::uint8_t *data, size_t size)
 }
 
 std::shared_ptr<cygnal::Buffer>
-RTMPServer::encodeVideo(boost::uint8_t * /* data */, size_t /* size */)
+RTMPServer::encodeVideo(std::uint8_t * /* data */, size_t /* size */)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -1077,7 +1077,7 @@ RTMPServer::encodeVideo(boost::uint8_t * /* data */, size_t /* size */)
 // Parse an Echo Request message coming from the Red5 echo_test. This
 // method should only be used for testing purposes.
 vector<std::shared_ptr<cygnal::Element > >
-RTMPServer::parseEchoRequest(boost::uint8_t *ptr, size_t size)
+RTMPServer::parseEchoRequest(std::uint8_t *ptr, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     AMF amf;
@@ -1129,7 +1129,7 @@ RTMPServer::formatEchoResponse(double num, cygnal::Buffer &data)
 }
 
 std::shared_ptr<cygnal::Buffer>
-RTMPServer::formatEchoResponse(double num, boost::uint8_t *data, size_t size)
+RTMPServer::formatEchoResponse(double num, std::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -1196,8 +1196,8 @@ RTMPServer::createClientID()
 #else
     char letters[] =
 	"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    boost::uint64_t random_time_bits = 0;
-    boost::uint64_t value = 0;
+    std::uint64_t random_time_bits = 0;
+    std::uint64_t value = 0;
 # ifdef HAVE_GETTIMEOFDAY
     timeval tv;
     gettimeofday(&tv, NULL);
@@ -1206,7 +1206,7 @@ RTMPServer::createClientID()
     random_time_bits = time(NULL);
 # endif
     value += random_time_bits ^ getpid();
-    boost::uint64_t v = value; 
+    std::uint64_t v = value;
     id = letters[v % 62];
     v /= 62;
     id += letters[v % 62];
@@ -1328,7 +1328,7 @@ RTMPServer::sendToClient(std::vector<int> &fds, cygnal::Buffer &data)
 }
 
 size_t
-RTMPServer::sendToClient(std::vector<int> &fds, boost::uint8_t *data,
+RTMPServer::sendToClient(std::vector<int> &fds, std::uint8_t *data,
 		      size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -1390,7 +1390,7 @@ rtmp_handler(Network::thread_params_t *args)
     for (int i=1; i <= hand->getActiveDiskStreams(); i++) {
 	hand->getDiskStream(i)->dump();
 	if (hand->getDiskStream(i)->getState() == DiskStream::PLAY) {
-	    boost::uint8_t *ptr = hand->getDiskStream(i)->get();
+	    std::uint8_t *ptr = hand->getDiskStream(i)->get();
 	    if (ptr) {
 		if (rtmp->sendMsg(hand->getClient(i), 8,
 			RTMP::HEADER_8, 4096,
@@ -1415,7 +1415,7 @@ rtmp_handler(Network::thread_params_t *args)
 	}
 	
 	if (pkt != 0) {
-	    boost::uint8_t *tmpptr = 0;
+	    std::uint8_t *tmpptr = 0;
 	    if (pkt->allocated()) {
 		std::shared_ptr<RTMP::queues_t> que = rtmp->split(*pkt);
 		if (!que) {
@@ -1617,7 +1617,7 @@ rtmp_handler(Network::thread_params_t *args)
 					*response)) {
 			      }			      
 			      int active_stream = hand->getActiveDiskStreams();
-			      boost::uint8_t *ptr = hand->getDiskStream(active_stream)->get();
+			      std::uint8_t *ptr = hand->getDiskStream(active_stream)->get();
 			      if (ptr) {
 				  log_network("Sending %s to client",
 					      hand->getDiskStream(active_stream)->getFilespec());

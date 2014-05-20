@@ -21,7 +21,7 @@
 #include "EmbedSound.h"
 
 #include <vector>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include "EmbedSoundInst.h" 
 #include "SoundInfo.h"

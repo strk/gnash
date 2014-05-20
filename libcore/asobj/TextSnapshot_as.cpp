@@ -59,10 +59,10 @@ public:
     ///                 AS return values.
     TextSnapshot_as(const MovieClip* mc);
 
-    std::string getText(boost::int32_t start, boost::int32_t end,
+    std::string getText(std::int32_t start, std::int32_t end,
             bool nl) const;
 
-    boost::int32_t findText(boost::int32_t start, const std::string& text,
+    std::int32_t findText(std::int32_t start, const std::string& text,
             bool ignoreCase) const;
 
     bool valid() const { return _valid; }
@@ -356,13 +356,13 @@ TextSnapshot_as::makeString(std::string& to, bool newline, bool selectedOnly,
 }
 
 std::string
-TextSnapshot_as::getText(boost::int32_t start, boost::int32_t end, bool nl)
+TextSnapshot_as::getText(std::int32_t start, std::int32_t end, bool nl)
     const
 {
 
     // Start is always moved to between 0 and len - 1.
-    start = std::max<boost::int32_t>(start, 0);
-    start = std::min<boost::int32_t>(start, _count - 1);
+    start = std::max<std::int32_t>(start, 0);
+    start = std::min<std::int32_t>(start, _count - 1);
 
     // End is always moved to between start and end. We don't really care
     // about the end of the string.
@@ -384,8 +384,8 @@ TextSnapshot_as::getSelectedText(bool newline) const
     return sel;
 }
 
-boost::int32_t
-TextSnapshot_as::findText(boost::int32_t start, const std::string& text,
+std::int32_t
+TextSnapshot_as::findText(std::int32_t start, const std::string& text,
         bool ignoreCase) const
 {
 
@@ -496,9 +496,9 @@ textsnapshot_getTextRunInfo(const fn_call& fn)
         return as_value();
     }
 
-    const size_t start = std::max<boost::int32_t>(0,
+    const size_t start = std::max<std::int32_t>(0,
             toInt(fn.arg(0), getVM(fn)));
-    const size_t end = std::max<boost::int32_t>(start + 1,
+    const size_t end = std::max<std::int32_t>(start + 1,
             toInt(fn.arg(1), getVM(fn)));
 
     Global_as& gl = getGlobal(fn);
@@ -523,7 +523,7 @@ textsnapshot_findText(const fn_call& fn)
         return as_value();
     }
 
-    boost::int32_t start = toInt(fn.arg(0), getVM(fn));
+    std::int32_t start = toInt(fn.arg(0), getVM(fn));
     const std::string& text = fn.arg(1).to_string();
 
     /// Yes, the pp is case-insensitive by default. We don't write
@@ -562,9 +562,9 @@ textsnapshot_getSelected(const fn_call& fn)
         return as_value();
     }
 
-    const size_t start = std::max<boost::int32_t>(0,
+    const size_t start = std::max<std::int32_t>(0,
             toInt(fn.arg(0), getVM(fn)));
-    const size_t end = std::max<boost::int32_t>(start + 1,
+    const size_t end = std::max<std::int32_t>(start + 1,
             toInt(fn.arg(1), getVM(fn)));
 
     return as_value(ts->getSelected(start, end));
@@ -603,8 +603,8 @@ textsnapshot_getText(const fn_call& fn)
         return as_value();
     }
 
-    const boost::int32_t start = toInt(fn.arg(0), getVM(fn));
-    const boost::int32_t end = toInt(fn.arg(1), getVM(fn));
+    const std::int32_t start = toInt(fn.arg(0), getVM(fn));
+    const std::int32_t end = toInt(fn.arg(1), getVM(fn));
 
     const bool newline = (fn.nargs > 2) ? toBool(fn.arg(2), getVM(fn)) : false;
 
@@ -648,9 +648,9 @@ textsnapshot_setSelected(const fn_call& fn)
         return as_value();
     }
 
-    const size_t start = std::max<boost::int32_t>(0,
+    const size_t start = std::max<std::int32_t>(0,
             toInt(fn.arg(0), getVM(fn)));
-    const size_t end = std::max<boost::int32_t>(start,
+    const size_t end = std::max<std::int32_t>(start,
             toInt(fn.arg(1), getVM(fn)));
 
     const bool selected = (fn.nargs > 2) ? toBool(fn.arg(2), getVM(fn)) : true;

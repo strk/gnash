@@ -167,7 +167,7 @@ public:
         }
 
         // This is SOL specific.
-        boost::uint8_t end(0);
+        std::uint8_t end(0);
         _writer.writeData(&end, 1);
         ++_count;
         return true;
@@ -899,9 +899,9 @@ readSOL(VM& vm, const std::string& filespec)
         return data;
     }
 
-    std::unique_ptr<boost::uint8_t[]> sbuf(new boost::uint8_t[size]);
-    const boost::uint8_t *buf = sbuf.get();
-    const boost::uint8_t *end = buf + size;
+    std::unique_ptr<std::uint8_t[]> sbuf(new std::uint8_t[size]);
+    const std::uint8_t *buf = sbuf.get();
+    const std::uint8_t *end = buf + size;
 
     try {
         std::ifstream ifs(filespec.c_str(), std::ios::binary);
@@ -912,7 +912,7 @@ readSOL(VM& vm, const std::string& filespec)
         buf += 16; // skip const-length headers
 
         // skip past name   TODO add sanity check
-        buf += ntohs(*(reinterpret_cast<const boost::uint16_t*>(buf)));
+        buf += ntohs(*(reinterpret_cast<const std::uint16_t*>(buf)));
         buf += 2;
         
         buf += 4; // skip past padding
@@ -936,8 +936,8 @@ readSOL(VM& vm, const std::string& filespec)
                 break;
             }
 
-            const boost::uint16_t len = 
-                ntohs(*(reinterpret_cast<const boost::uint16_t*>(buf)));
+            const std::uint16_t len =
+                ntohs(*(reinterpret_cast<const std::uint16_t*>(buf)));
             buf += 2;
 
             if (!len) {
@@ -1012,7 +1012,7 @@ createSharedObject(Global_as& gl)
 void
 encodeHeader(const size_t size, SimpleBuffer& buf)
 {
-    const boost::uint8_t header[] = { 0x00, 0xbf };
+    const std::uint8_t header[] = { 0x00, 0xbf };
     
     // Initial header byters
     buf.append(header, arraySize(header));
@@ -1026,19 +1026,19 @@ bool
 encodeData(const std::string& name, as_object& data, SimpleBuffer& buf)
 {
     // Write the remaining header-like information.
-    const boost::uint8_t magic[] = { 'T', 'C', 'S', 'O',
+    const std::uint8_t magic[] = { 'T', 'C', 'S', 'O',
         0x00, 0x04, 0x00, 0x00, 0x00, 0x00 };
 
     // Magic SharedObject bytes.
     buf.append(magic, arraySize(magic)); 
 
     // SharedObject name
-    const boost::uint16_t len = name.length();
+    const std::uint16_t len = name.length();
     buf.appendNetworkShort(len);
     buf.append(name.c_str(), len);
 
     // Padding
-    const boost::uint8_t padding[] = { 0, 0, 0, 0 };
+    const std::uint8_t padding[] = { 0, 0, 0, 0 };
     buf.append(padding, arraySize(padding));
     
     // see http://osflash.org/documentation/amf/envelopes/sharedobject

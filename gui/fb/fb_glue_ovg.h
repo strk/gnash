@@ -23,7 +23,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include "openvg/OpenVGRenderer.h"
 #include "fbsup.h"
 #include "fb_glue.h"

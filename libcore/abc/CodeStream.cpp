@@ -23,13 +23,13 @@
 namespace gnash {
 
 /// Read a variable length encoded 32 bit unsigned integer
-boost::uint32_t
+std::uint32_t
 CodeStream::read_V32()
 {
 	char data;
 
 	read(&data,1);
-	boost::uint32_t result = data;
+	std::uint32_t result = data;
 	if (!(result & 0x00000080))	return result;
 
 	read(&data,1);
@@ -50,7 +50,7 @@ CodeStream::read_V32()
 }
 
 /// Read an opcode for ActionScript 3
-boost::uint8_t
+std::uint8_t
 CodeStream::read_as3op()
 {
 	char data;
@@ -59,7 +59,7 @@ CodeStream::read_as3op()
 		return 0;
 	}
 	else{
-		return static_cast<boost::uint8_t> (data);
+		return static_cast<std::uint8_t> (data);
 	}
 }
 
@@ -78,7 +78,7 @@ CodeStream::seekTo(unsigned int set)
 }
 
 //TODO: Is there a better way to read a 24 bit signed int?
-boost::int32_t
+std::int32_t
 CodeStream::read_S24()
 {
 	char buffer[3];
@@ -90,7 +90,7 @@ CodeStream::read_S24()
 	       	result |= -1 << 24;
    	}
 
-	return static_cast<boost::int32_t>(result);
+	return static_cast<std::int32_t>(result);
 }
 	
 /// Read a signed 8-bit character.
@@ -103,12 +103,12 @@ CodeStream::read_s8()
 }
 
 /// Read an unsigned 8-bit character.
-boost::uint8_t
+std::uint8_t
 CodeStream::read_u8()
 {
 	char data;
 	read(&data,1);
-	return static_cast<boost::uint8_t> (data);
+	return static_cast<std::uint8_t> (data);
 }
 
 /// Same as read_V32(), but doesn't bother with the arithmetic for

@@ -19,7 +19,7 @@
 #ifndef GNASH_RTMP_H
 #define GNASH_RTMP_H
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <memory>
 #include <deque>
 #include <map>
@@ -171,10 +171,10 @@ struct RTMPHeader
     //
     /// This is encoded either as in the 3-byte relative timestamp field or the
     /// 4 byte extended (absolute) timestamp field.
-    boost::uint32_t _timestamp;
+    std::uint32_t _timestamp;
 
     /// This seems to be used for NetStream.play.
-    boost::uint32_t _streamID;
+    std::uint32_t _streamID;
 
     size_t channel;
 
@@ -258,7 +258,7 @@ payloadSize(const RTMPPacket& p)
 }
 
 /// Access the payload data section of the buffer.
-inline boost::uint8_t*
+inline std::uint8_t*
 payloadData(RTMPPacket& p)
 {
     assert(hasPayload(p));
@@ -267,7 +267,7 @@ payloadData(RTMPPacket& p)
 }
 
 /// Access the payload data section of the buffer.
-inline const boost::uint8_t*
+inline const std::uint8_t*
 payloadData(const RTMPPacket& p)
 {
     assert(hasPayload(p));
@@ -280,7 +280,7 @@ payloadData(const RTMPPacket& p)
 /// Note that this is only valid for packets we create, and for packets
 /// we have fully read. Stored packets that have not yet received all data
 /// have allocated space that has not yet been written.
-inline const boost::uint8_t*
+inline const std::uint8_t*
 payloadEnd(const RTMPPacket& p)
 {
     assert(hasPayload(p));
@@ -435,7 +435,7 @@ struct DSOEXPORT RTMP
     void handlePacket(const RTMPPacket& packet);
     
     /// Read from the socket.
-    int readSocket(boost::uint8_t* dst, int num);
+    int readSocket(std::uint8_t* dst, int num);
 
     /// Send an RTMPPacket on the connection.
     bool sendPacket(RTMPPacket& packet);
@@ -443,28 +443,28 @@ struct DSOEXPORT RTMP
     /// Store the server bandwidth
     //
     /// Not sure why we need this.
-    void setServerBandwidth(boost::uint32_t bw) {
+    void setServerBandwidth(std::uint32_t bw) {
         _serverBandwidth = bw;
     }
 
     /// Get the stored server bandwidth.
-    boost::uint32_t serverBandwidth() const {
+    std::uint32_t serverBandwidth() const {
         return _serverBandwidth;
     }
 
     /// Store our bandwidth
-    void setBandwidth(boost::uint32_t bw) {
+    void setBandwidth(std::uint32_t bw) {
         _bandwidth = bw;
     }
 
     /// Get our bandwidth.
-    boost::uint32_t bandwidth() const {
+    std::uint32_t bandwidth() const {
         return _bandwidth;
     }
 
     int _inChunkSize;
     int m_mediaChannel;
-    boost::uint8_t m_nClientBW2;
+    std::uint8_t m_nClientBW2;
     size_t _bytesIn;
     size_t _bytesInSent;
 
@@ -516,10 +516,10 @@ private:
     std::deque<std::shared_ptr<SimpleBuffer> > _flvQueue;
 
     /// Stored server bandwidth (reported by server).
-    boost::uint32_t _serverBandwidth;
+    std::uint32_t _serverBandwidth;
 
     /// Stored client bandwidth (ours), reported by server.
-    boost::uint32_t _bandwidth;
+    std::uint32_t _bandwidth;
 
     /// Chunk size for sending.
     size_t _outChunkSize;

@@ -79,7 +79,7 @@ private:
     browser_e           _browser;
     ostype_e            _os;
     std::list<NetStats *> _netstats;
-    boost::uint32_t     _msg_count;
+    std::uint32_t     _msg_count;
     std::vector<std::string> _filespec;
 };
  

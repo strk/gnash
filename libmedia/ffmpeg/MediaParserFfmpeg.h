@@ -43,13 +43,13 @@ namespace ffmpeg {
 class ExtraAudioInfoFfmpeg : public AudioInfo::ExtraInfo
 {
 public:
-	ExtraAudioInfoFfmpeg(boost::uint8_t* nData, size_t nDataSize)
+	ExtraAudioInfoFfmpeg(std::uint8_t* nData, size_t nDataSize)
 		:
 		data(nData),
 		dataSize(nDataSize)
 	{
 	}
-	boost::uint8_t* data;
+	std::uint8_t* data;
 	size_t dataSize;
 };
 
@@ -60,13 +60,13 @@ public:
 class ExtraVideoInfoFfmpeg : public VideoInfo::ExtraInfo
 {
 public:
-	ExtraVideoInfoFfmpeg(boost::uint8_t* nData, size_t nDataSize)
+	ExtraVideoInfoFfmpeg(std::uint8_t* nData, size_t nDataSize)
 		:
 		data(nData),
 		dataSize(nDataSize)
 	{
 	}
-	boost::uint8_t* data;
+	std::uint8_t* data;
 	size_t dataSize;
 };
 
@@ -84,13 +84,13 @@ public:
 	~MediaParserFfmpeg();
 
 	// See dox in MediaParser.h
-	virtual bool seek(boost::uint32_t&);
+	virtual bool seek(std::uint32_t&);
 
 	// See dox in MediaParser.h
 	virtual bool parseNextChunk();
 
 	// See dox in MediaParser.h
-	virtual boost::uint64_t getBytesLoaded() const;
+	virtual std::uint64_t getBytesLoaded() const;
 
     virtual boost::optional<Id3Info> getId3Info() const;
 
@@ -107,16 +107,16 @@ private:
 	bool parseNextFrame();
 
 	/// Input chunk reader, to be called by ffmpeg parser
-	int readPacket(boost::uint8_t* buf, int buf_size);
+	int readPacket(std::uint8_t* buf, int buf_size);
 
 	/// ffmpeg callback function
-	static int readPacketWrapper(void* opaque, boost::uint8_t* buf, int buf_size);
+	static int readPacketWrapper(void* opaque, std::uint8_t* buf, int buf_size);
 
 	/// Input stream seeker, to be called by ffmpeg parser
-	boost::int64_t seekMedia(boost::int64_t offset, int whence);
+	std::int64_t seekMedia(std::int64_t offset, int whence);
 
 	/// ffmpeg callback function
-	static boost::int64_t seekMediaWrapper(void *opaque, boost::int64_t offset, int whence);
+	static std::int64_t seekMediaWrapper(void *opaque, std::int64_t offset, int whence);
 
 	/// Read some of the input to figure an AVInputFormat
 	AVInputFormat* probeStream();
@@ -157,13 +157,13 @@ private:
 	std::unique_ptr<unsigned char[]> _byteIOBuffer;
 
 	/// The last parsed position, for getBytesLoaded
-	boost::uint64_t _lastParsedPosition;
+	std::uint64_t _lastParsedPosition;
 
 	/// Return sample size from SampleFormat
 	//
 	/// TODO: move somewhere in ffmpeg utils..
 	///
-	boost::uint16_t SampleFormatToSampleSize(AVSampleFormat fmt);
+	std::uint16_t SampleFormatToSampleSize(AVSampleFormat fmt);
 
 	/// Make an EncodedVideoFrame from an AVPacket and push to buffer
 	//

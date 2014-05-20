@@ -188,8 +188,8 @@ test_encoding()
     {
         bool flag = true;
         std::shared_ptr<Buffer> buf2(new Buffer("01 01"));
-        boost::uint16_t sht = *(boost::uint16_t *)buf2->reference();
-        swapBytes(&sht, sizeof(boost::uint16_t)); // we always encode in big endian format
+        std::uint16_t sht = *(std::uint16_t *)buf2->reference();
+        swapBytes(&sht, sizeof(std::uint16_t)); // we always encode in big endian format
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
         if (memdebug) {
             mem->addStats(__LINE__);             // take a sample
@@ -207,7 +207,7 @@ test_encoding()
         // which are finally only one byte apiece.
         if ((*encbool->reference() == Element::BOOLEAN_AMF0) &&
             (encbool->size() == 2) &&
-            (memcmp(buf2->reference(), encbool->reference(), sizeof(boost::uint16_t)) == 0)) {
+            (memcmp(buf2->reference(), encbool->reference(), sizeof(std::uint16_t)) == 0)) {
             runtest.pass("Encoded cygnal::AMF Boolean");
         } else {
             runtest.fail("Encoded cygnal::AMF Boolean");
@@ -255,7 +255,7 @@ test_encoding()
             mem->addStats(__LINE__);             // take a sample
         }
 #endif
-        boost::uint16_t len = *(boost::uint16_t *)(buf->reference() + 1);
+        std::uint16_t len = *(std::uint16_t *)(buf->reference() + 1);
 
         // A NULL String cygnal::AMF object has just 3 bytes, the type, and a two byte length, which is zero.
         check_equals(*buf->reference(), Element::STRING_AMF0);
@@ -265,7 +265,7 @@ test_encoding()
         Element el;
         el.makeNullString();
         buf = cygnal::AMF::encodeElement(el);
-        len = *(boost::uint16_t *)(buf->reference() + 1);
+        len = *(std::uint16_t *)(buf->reference() + 1);
 
         // A NULL String cygnal::AMF object has just 3 bytes, the type, and a two byte length, which is zero.
         check_equals(*buf->reference(), Element::STRING_AMF0);
@@ -275,7 +275,7 @@ test_encoding()
 
     cygnal::AMF amf;
     Element el1;
-    boost::uint16_t index = 1;
+    std::uint16_t index = 1;
     el1.makeReference(index);
     if (el1.to_short() == 1) {
         runtest.pass("Made Reference");

@@ -23,7 +23,7 @@
 # include "gnashconfig.h"
 #endif
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #if defined (WIN32)
 // Include for HANDLE
@@ -46,7 +46,7 @@ class SharedMem
 {
 public:
 
-    typedef boost::uint8_t* iterator;
+    typedef std::uint8_t* iterator;
 
     /// The beginning of the SharedMem section.
     //

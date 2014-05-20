@@ -163,7 +163,7 @@ main(int argc, char *argv[])
     long location = 0;
     int line_length = rfb.getStride();
 
-    boost::uint8_t *fbp = 0;
+    std::uint8_t *fbp = 0;
     fbp = rfb.getFBMemory();
 
     if (fbp > 0) {

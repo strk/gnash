@@ -47,13 +47,13 @@ public:
 	~MediaParserHaiku();
 
 	// See dox in MediaParser.h
-	virtual bool seek(boost::uint32_t&);
+	virtual bool seek(std::uint32_t&);
 
 	// See dox in MediaParser.h
 	virtual bool parseNextChunk();
 
 	// See dox in MediaParser.h
-	virtual boost::uint64_t getBytesLoaded() const;
+	virtual std::uint64_t getBytesLoaded() const;
 };
 
 

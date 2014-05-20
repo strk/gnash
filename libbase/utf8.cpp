@@ -23,7 +23,7 @@
 #include "utf8.h"
 
 #include <limits>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <string>
 #include <vector>
 #include <cstdlib>
@@ -32,7 +32,7 @@ namespace gnash {
 namespace utf8 {
 
 namespace {
-    const boost::uint32_t invalid = std::numeric_limits<boost::uint32_t>::max();
+    const std::uint32_t invalid = std::numeric_limits<std::uint32_t>::max();
 }
 
 std::wstring
@@ -44,7 +44,7 @@ decodeCanonicalString(const std::string& str, int version)
     std::string::const_iterator it = str.begin(), e = str.end();
     
     if (version > 5) {
-        while (boost::uint32_t code = decodeNextUnicodeCharacter(it, e)) {
+        while (std::uint32_t code = decodeNextUnicodeCharacter(it, e)) {
             if (code == invalid) {
                 continue;        
             }
@@ -81,7 +81,7 @@ encodeCanonicalString(const std::wstring& wstr, int version)
 }
 
 std::string
-encodeLatin1Character(boost::uint32_t ucsCharacter)
+encodeLatin1Character(std::uint32_t ucsCharacter)
 {
     std::string text;
     text.push_back(static_cast<unsigned char>(ucsCharacter));
@@ -89,11 +89,11 @@ encodeLatin1Character(boost::uint32_t ucsCharacter)
 }
 
 
-boost::uint32_t
+std::uint32_t
 decodeNextUnicodeCharacter(std::string::const_iterator& it,
                              const std::string::const_iterator& e)
 {
-    boost::uint32_t uc;
+    std::uint32_t uc;
 
     // Security considerations:
     //
@@ -123,7 +123,7 @@ decodeNextUnicodeCharacter(std::string::const_iterator& it,
     if (it == e || *it == 0) return 0;    // End of buffer.  Do not advance.
 
     // Conventional 7-bit ASCII; return and increment iterator:
-    if ((*it & 0x80) == 0) return static_cast<boost::uint32_t>(*it++);
+    if ((*it & 0x80) == 0) return static_cast<std::uint32_t>(*it++);
 
     // Multi-byte sequences
     if ((*it & 0xE0) == 0xC0) {
@@ -162,7 +162,7 @@ decodeNextUnicodeCharacter(std::string::const_iterator& it,
 // TODO: buffer as std::string; index (iterator); 
 
 std::string
-encodeUnicodeCharacter(boost::uint32_t ucs_character)
+encodeUnicodeCharacter(std::uint32_t ucs_character)
 {
 
     std::string text;
@@ -295,7 +295,7 @@ guessEncoding(const std::string &str, int &length, std::vector<int>& offsets)
         offsets.push_back(it - str.begin()); // current position
 
         // Advances the iterator to point to the next 
-        boost::uint32_t c = utf8::decodeNextUnicodeCharacter(it, e);
+        std::uint32_t c = utf8::decodeNextUnicodeCharacter(it, e);
 
         if (c == utf8::invalid) {
             is_sought = false;

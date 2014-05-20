@@ -22,7 +22,7 @@
 #endif
 
 #include <boost/thread/mutex.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/array.hpp>
 #include <sys/types.h>
 #include <sys/stat.h>

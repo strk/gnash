@@ -74,8 +74,8 @@ private:
 
     }
     
-    boost::uint16_t _recursionLimit;
-    boost::uint16_t _timeoutLimit;
+    std::uint16_t _recursionLimit;
+    std::uint16_t _timeoutLimit;
 };
 
 } // namespace gnash::SWF

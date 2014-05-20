@@ -380,7 +380,7 @@ Button::display(Renderer& renderer, const Transform& base)
 // Return the topmost entity that the given point covers.  NULL if none.
 // I.e. check against ourself.
 InteractiveObject*
-Button::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
+Button::topmostMouseEntity(std::int32_t x, std::int32_t y)
 {
     if (!visible() || !isEnabled())
     {
@@ -765,7 +765,7 @@ Button::getBounds() const
 }
 
 bool
-Button::pointInShape(boost::int32_t x, boost::int32_t y) const
+Button::pointInShape(std::int32_t x, std::int32_t y) const
 {
     typedef std::vector<const DisplayObject*> Chars;
     Chars actChars;

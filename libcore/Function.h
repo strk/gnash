@@ -95,7 +95,7 @@ public:
     /// Get the number of registers required for function execution.
     //
     /// For ordinary Functions this is always 0.
-    virtual boost::uint8_t registers() const {
+    virtual std::uint8_t registers() const {
         return 0;
     }
 
@@ -109,7 +109,7 @@ public:
     //
     /// @param reg      The register for the argument.
     /// @param name     The name of the argument.
-	void add_arg(boost::uint8_t reg, const ObjectURI& name) {
+	void add_arg(std::uint8_t reg, const ObjectURI& name) {
         _args.push_back(Argument(reg, name));
 	}
 
@@ -130,8 +130,8 @@ protected:
 	
     struct Argument
 	{
-        Argument(boost::uint8_t r, const ObjectURI& n) : reg(r), name(n) {}
-        boost::uint8_t reg;
+        Argument(std::uint8_t r, const ObjectURI& n) : reg(r), name(n) {}
+        std::uint8_t reg;
         ObjectURI name;
 	};
 

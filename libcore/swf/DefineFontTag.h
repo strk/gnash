@@ -34,7 +34,7 @@
 #include "Font.h"
 #include <map>
 #include <string>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 // Forward declarations
 namespace gnash {
@@ -93,21 +93,21 @@ public:
     /// The font leading value
     //
     /// This is documented to be int16_t, but may be uint16_t like advance.
-    boost::int16_t leading() const {
+    std::int16_t leading() const {
         return _leading;
     }
 
     /// The font ascent value
     //
     /// This is documented to be int16_t, but may be uint16_t like advance.
-    boost::int16_t ascent() const {
+    std::int16_t ascent() const {
         return _ascent;
     }
 
     /// The font descent value
     //
     /// This is documented to be int16_t, but may be uint16_t like advance.
-    boost::int16_t descent() const {
+    std::int16_t descent() const {
         return _descent;
     }
 
@@ -141,11 +141,11 @@ private:
 	bool _italic;
 	bool _bold;
 
-    boost::int16_t _ascent;
-    boost::int16_t _descent;
-    boost::int16_t _leading;
+    std::int16_t _ascent;
+    std::int16_t _descent;
+    std::int16_t _leading;
 
-	typedef std::map<kerning_pair, boost::int16_t> KerningTable;
+	typedef std::map<kerning_pair, std::int16_t> KerningTable;
 	KerningTable _kerningPairs;
 
     std::shared_ptr<const Font::CodeTable> _codeTable;

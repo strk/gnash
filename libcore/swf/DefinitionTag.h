@@ -21,7 +21,7 @@
 
 
 #include <boost/noncopyable.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include "ControlTag.h"
 #include "dsodefs.h" // for DSOTEXPORT
@@ -74,17 +74,17 @@ public:
     /// The immutable id of the DefinitionTag.
     //
     /// @return     the id of the DefinitionTag as parsed from a SWF.
-    boost::uint16_t id() const {
+    std::uint16_t id() const {
         return _id;
     }
 
 protected:
 
-    DefinitionTag(boost::uint16_t id) : _id(id) {}
+    DefinitionTag(std::uint16_t id) : _id(id) {}
 
 private:
 
-    const boost::uint16_t _id;
+    const std::uint16_t _id;
 	
 };
 

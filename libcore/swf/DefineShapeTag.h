@@ -53,13 +53,13 @@ public:
     /// a matrix is given to allow computing proper line
     /// thickness based on display scale.
     ///
-    bool pointTestLocal(boost::int32_t x, boost::int32_t y, 
+    bool pointTestLocal(std::int32_t x, std::int32_t y,
             const SWFMatrix& wm) const;
 
 private:
 
     DefineShapeTag(SWFStream& in, TagType tag, movie_definition& m,
-            const RunResources& r, boost::uint16_t id);
+            const RunResources& r, std::uint16_t id);
 
     /// The actual shape data is stored in this record.
     const ShapeRecord _shape;

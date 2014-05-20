@@ -22,7 +22,7 @@
 #define GNASH_ASOBJ_BITMAPDATA_H
 
 #include <list>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <memory>
 #include <cassert>
 #include <boost/intrusive_ptr.hpp>

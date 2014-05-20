@@ -32,7 +32,7 @@
 #endif
 
 #include <sys/types.h>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include <cctype>  // for toupper
 #include <string>

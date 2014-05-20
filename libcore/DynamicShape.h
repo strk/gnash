@@ -53,16 +53,16 @@ public:
 	void clear();
 
 	/// Move pen to given coordinates
-	void moveTo(boost::int32_t x, boost::int32_t y);
+	void moveTo(std::int32_t x, std::int32_t y);
 
 	/// Draw a straight line from current position to given one
-	void lineTo(boost::int32_t x, boost::int32_t y, int swfVersion);
+	void lineTo(std::int32_t x, std::int32_t y, int swfVersion);
 
 	/// \brief
 	/// Draw a curve from current position to given one
 	/// using given control points.
-	void curveTo(boost::int32_t cx, boost::int32_t cy, 
-                 boost::int32_t ax, boost::int32_t ay, int swfVersion);
+	void curveTo(std::int32_t cx, std::int32_t cy,
+                 std::int32_t ax, std::int32_t ay, int swfVersion);
 
 	/// Start drawing with a solid fill
 	void beginFill(const FillStyle& f);
@@ -92,7 +92,7 @@ public:
 	/// @param endCapStyle
 	/// @param joinStyle
 	/// @param miterLimitFactor
-	void lineStyle(boost::uint16_t thickness, const rgba& color,
+	void lineStyle(std::uint16_t thickness, const rgba& color,
 		bool vScale=true, bool hScale=true,
 		bool pixelHinting=false,
 		bool noClose=false,
@@ -143,7 +143,7 @@ public:
 	//       would result in a triangle and a stroke, which should fail the last hitTest(2,8).
 	//
 	//
-	bool pointTestLocal(boost::int32_t x, boost::int32_t y,
+	bool pointTestLocal(std::int32_t x, std::int32_t y,
             const SWFMatrix& wm) const
 	{
 		finalize();
@@ -189,10 +189,10 @@ private:
 	size_t _currline;
 
 	// Current pen X position
-	boost::int32_t  _x;
+	std::int32_t  _x;
 
 	// Current pen Y position
-	boost::int32_t  _y;
+	std::int32_t  _y;
 
 	mutable bool _changed;
 

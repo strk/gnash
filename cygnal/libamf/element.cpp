@@ -22,7 +22,7 @@
 #include <vector>
 #include <cmath>
 #include <climits>
-#include <boost/cstdint.hpp> // for boost::?int??_t
+#include <cstdint> // for boost::?int??_t
 
 #include "buffer.h"
 #include "log.h"
@@ -249,12 +249,12 @@ Element::to_number() const
 /// \brief Cast the data in this Element to a short value.
 ///
 /// @return short value.
-boost::uint16_t
+std::uint16_t
 Element::to_short() const
 {
 //    GNASH_REPORT_FUNCTION;
     if (_buffer) {
-	return *(reinterpret_cast<boost::uint16_t *>(_buffer->reference()));
+	return *(reinterpret_cast<std::uint16_t *>(_buffer->reference()));
     }
 //    return ::nan("NaN");
     return -1;
@@ -263,12 +263,12 @@ Element::to_short() const
 /// \brief Cast the data in this Element to a short value.
 ///
 /// @return short value.
-boost::uint32_t
+std::uint32_t
 Element::to_integer() const
 {
 //    GNASH_REPORT_FUNCTION;
     if (_buffer) {
-	return *(reinterpret_cast<boost::uint32_t *>(_buffer->reference()));
+	return *(reinterpret_cast<std::uint32_t *>(_buffer->reference()));
     }
 //    return ::nan("NaN");
     return -1;
@@ -306,7 +306,7 @@ Element::to_bool() const
 /// \brief Cast the data in this Element to an real pointer to data.
 ///
 /// @return A real pointer to the base address of the raw data in memory.
-boost::uint8_t *
+std::uint8_t *
 Element::to_reference()
 {
 //    GNASH_REPORT_FUNCTION;
@@ -316,7 +316,7 @@ Element::to_reference()
     return 0;
 }
 
-const boost::uint8_t *
+const std::uint8_t *
 Element::to_reference() const
 {
 //    GNASH_REPORT_FUNCTION;
@@ -412,7 +412,7 @@ Element::calculateSize(cygnal::Element &el) const
     // If thr name is set, it's a property, so the length is
     // prefixed to the name string.
     if (el.getNameSize()) {
-	outsize += el.getNameSize() + sizeof(boost::uint16_t);
+	outsize += el.getNameSize() + sizeof(std::uint16_t);
     }
     // If there is any data, then the size of the data plus the header
     // of the type and the length is next.
@@ -423,7 +423,7 @@ Element::calculateSize(cygnal::Element &el) const
     // If an array has no data, it's undefined, so has a length of zero.
     if (el.getType() == Element::STRICT_ARRAY_AMF0) {
 	if (el.getDataSize() == 0) {
-	    outsize = sizeof(boost::uint32_t) + 1;
+	    outsize = sizeof(std::uint32_t) + 1;
 	}
     }
     
@@ -482,12 +482,12 @@ Element::encode(bool notobject)
 	}
 	if (_name > static_cast<char *>(0)) {
 	    size_t length = getNameSize();
-	    boost::uint16_t enclength = length;
+	    std::uint16_t enclength = length;
 	    swapBytes(&enclength, 2);
 	    *buf += enclength;
 	    string str = _name;
 	    *buf += str;
-	    boost::uint8_t byte = static_cast<boost::uint8_t>(0x5);
+	    std::uint8_t byte = static_cast<std::uint8_t>(0x5);
 	    *buf += byte;
 	}
 
@@ -505,7 +505,7 @@ Element::encode(bool notobject)
 	}
 //	log_debug("FIXME: Terminating object");
 	if (!notobject) {
-	    boost::uint8_t pad = 0;
+	    std::uint8_t pad = 0;
 	    *buf += pad;
 	    *buf += pad;
 	    *buf += TERMINATOR;
@@ -606,7 +606,7 @@ Element::operator=(bool flag)
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeString(boost::uint8_t *data, size_t size)
+Element::makeString(std::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::STRING_AMF0;
@@ -649,7 +649,7 @@ Element::makeNullString()
 //    GNASH_REPORT_FUNCTION;
     _type = Element::STRING_AMF0;
     try {
-	check_buffer(sizeof(boost::uint8_t));
+	check_buffer(sizeof(std::uint8_t));
     } catch (std::exception& e) {
 	log_error("%s", e.what());
 	return *this;
@@ -671,7 +671,7 @@ Element::makeString(const char *str, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::STRING_AMF0;
-    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(const_cast<char *>(str));
+    std::uint8_t *ptr = reinterpret_cast<std::uint8_t *>(const_cast<char *>(str));
     return makeString(ptr, size);
 }
 
@@ -723,7 +723,7 @@ Element::makeNumber(std::shared_ptr<cygnal::Buffer> buf)
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeNumber(boost::uint8_t *data)
+Element::makeNumber(std::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     double num = *reinterpret_cast<const double*>(data);
@@ -777,10 +777,10 @@ Element::makeNumber(const string &name, double num)
     return makeNumber(num);
 }
 
-/// \overload Element::makeNumber(const std::string &name, boost::uint8_t *data);
+/// \overload Element::makeNumber(const std::string &name, std::uint8_t *data);
 ///		The size isn't needed as a double is always the same size.
 Element &
-Element::makeNumber(const std::string &name, boost::uint8_t *data)
+Element::makeNumber(const std::string &name, std::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     if (name.size()) {
@@ -844,7 +844,7 @@ Element::makeBoolean(const string &name, bool flag)
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeBoolean(boost::uint8_t *data)
+Element::makeBoolean(std::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     bool flag = *reinterpret_cast<const bool*>(data);
@@ -987,7 +987,7 @@ Element::makeXMLObject()
     return *this;
 }
 Element &
-Element::makeXMLObject(boost::uint8_t * /*data*/)
+Element::makeXMLObject(std::uint8_t * /*data*/)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::XML_OBJECT_AMF0;
@@ -1070,7 +1070,7 @@ Element::makeTypedObject()
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeTypedObject(boost::uint8_t */*data*/)
+Element::makeTypedObject(std::uint8_t */*data*/)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::TYPED_OBJECT_AMF0;
@@ -1091,12 +1091,12 @@ Element::makeReference()
 }
 
 Element &
-Element::makeReference(boost::uint16_t index)
+Element::makeReference(std::uint16_t index)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::REFERENCE_AMF0;
-    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(&index);
-    return makeReference(ptr, sizeof(boost::uint16_t));
+    std::uint8_t *ptr = reinterpret_cast<std::uint8_t *>(&index);
+    return makeReference(ptr, sizeof(std::uint16_t));
     
     return *this;
 }
@@ -1109,7 +1109,7 @@ Element::makeReference(boost::uint16_t index)
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeReference(boost::uint8_t *indata, size_t size)
+Element::makeReference(std::uint8_t *indata, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::REFERENCE_AMF0;
@@ -1143,7 +1143,7 @@ Element::makeMovieClip()
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeMovieClip(boost::uint8_t *indata, size_t size)
+Element::makeMovieClip(std::uint8_t *indata, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::MOVIECLIP_AMF0;
@@ -1294,7 +1294,7 @@ Element::makeUnsupported()
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeUnsupported(boost::uint8_t *data)
+Element::makeUnsupported(std::uint8_t *data)
 {
     UNUSED(data);
     _type = Element::UNSUPPORTED_AMF0;
@@ -1320,7 +1320,7 @@ Element::makeLongString()
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeLongString(boost::uint8_t *indata)
+Element::makeLongString(std::uint8_t *indata)
 {
     UNUSED(indata);
     _type = Element::LONG_STRING_AMF0;
@@ -1340,7 +1340,7 @@ Element::makeRecordSet()
     return *this;
 }
 Element &
-Element::makeRecordSet(boost::uint8_t *data)
+Element::makeRecordSet(std::uint8_t *data)
 {
     UNUSED(data);
     _type = Element::RECORD_SET_AMF0;
@@ -1362,7 +1362,7 @@ Element::makeDate()
 }
 
 Element &
-Element::makeDate(boost::uint8_t *date)
+Element::makeDate(std::uint8_t *date)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -1376,7 +1376,7 @@ Element &
 Element::makeDate(double date)
 {
 //    GNASH_REPORT_FUNCTION;
-    //boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(&date);
+    //std::uint8_t *ptr = reinterpret_cast<std::uint8_t *>(&date);
     _type = Element::DATE_AMF0;
     try {
 	check_buffer(AMF0_NUMBER_SIZE);
@@ -1433,7 +1433,7 @@ void
 Element::setName(const char *name, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(const_cast<char *>(name));
+    std::uint8_t *ptr = reinterpret_cast<std::uint8_t *>(const_cast<char *>(name));
     return setName(ptr, size);
 }
 
@@ -1448,7 +1448,7 @@ Element::setName(const char *name, size_t size)
 ///
 /// @remarks This adds a NULL string terminator so the name can be printed.
 void
-Element::setName(boost::uint8_t *name, size_t size)
+Element::setName(std::uint8_t *name, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     if ((size > 0) && (name != 0)) {

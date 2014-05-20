@@ -363,7 +363,7 @@ test_read()
         }
     }
 
-//    boost::uint8_t *ptr = lc.parseHeader(reinterpret_cast<boost::uint8_t *>(shmaddr));
+//    std::uint8_t *ptr = lc.parseHeader(reinterpret_cast<std::uint8_t *>(shmaddr));
 //    vector<cygnal::Element *> ellist = lc.parseBody(ptr);
 //    cout << "# of AMF Elements in file: " << ellist.size() << endl;
 //    lc.dump();
@@ -397,7 +397,7 @@ test_write()
         runtest.fail("gain set");
     }
 
-    boost::uint8_t *foo = amf_obj.encodeVariable(el); 
+    std::uint8_t *foo = amf_obj.encodeVariable(el);
     char *ptr = (char *)amf_obj.extractVariable(&newel, foo);
     if ((el.name == newel.name) &&
         (el.length == newel.length) &&

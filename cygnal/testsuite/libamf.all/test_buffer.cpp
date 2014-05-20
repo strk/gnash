@@ -29,7 +29,7 @@
 #include <fstream>
 #include <cstring>
 #include <vector>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include "dejagnu.h"
 #include "log.h"
@@ -255,15 +255,15 @@ test_copy()
          runtest.fail ("Buffer::operator=(const char *)");
     }
 
-    boost::uint16_t length = 12;
+    std::uint16_t length = 12;
     Buffer buf3;
     buf3 = length;
     Network::byte_t *ptr3 = buf3.reference();
-    boost::uint16_t newlen = *(reinterpret_cast<boost::uint16_t *>(ptr3));
+    std::uint16_t newlen = *(reinterpret_cast<std::uint16_t *>(ptr3));
     if (length == newlen) {
-         runtest.pass ("Buffer::operator=(boost::uint16_t)");
+         runtest.pass ("Buffer::operator=(std::uint16_t)");
     } else {
-         runtest.fail ("Buffer::operator=(boost::uint16_t)");
+         runtest.fail ("Buffer::operator=(std::uint16_t)");
     }
 
     double num = 1.2345;
@@ -423,20 +423,20 @@ test_append()
         runtest.fail ("Buffer::operator+=(const string &)");
     }
 
-    boost::uint16_t length = 1047;
+    std::uint16_t length = 1047;
     Buffer buf7(70);
     buf7.copy(data1, 10);
     buf7 += length;
-    if (memcmp(buf7.reference() + 10, &length, sizeof(boost::uint16_t)) == 0) {
-        runtest.pass ("Buffer::operator+=(boost::uint16_t)");
+    if (memcmp(buf7.reference() + 10, &length, sizeof(std::uint16_t)) == 0) {
+        runtest.pass ("Buffer::operator+=(std::uint16_t)");
     } else {
-        runtest.fail ("Buffer::operator+=(boost::uint16_t)");
+        runtest.fail ("Buffer::operator+=(std::uint16_t)");
     }
 
     buf7 += buf6;
-    // Network::byte_t *ptr1 = buf7.reference() + 10 + sizeof(boost::uint16_t);
+    // Network::byte_t *ptr1 = buf7.reference() + 10 + sizeof(std::uint16_t);
     // Network::byte_t *ptr2 = buf6.reference();
-    if (memcmp(buf7.reference() + 10 + sizeof(boost::uint16_t), buf6.reference(), 30) == 0) {
+    if (memcmp(buf7.reference() + 10 + sizeof(std::uint16_t), buf6.reference(), 30) == 0) {
         runtest.pass ("Buffer::operator+=(Buffer &)");
     } else {
         runtest.fail ("Buffer::operator+=(Buffer &)");
@@ -613,7 +613,7 @@ test_operators()
     buf1.clear();
     buf2.clear();
 
-    boost::uint8_t *ptr1 = buf1.reference();
+    std::uint8_t *ptr1 = buf1.reference();
     for (size_t i=1; i< buf1.size(); i++) {
         ptr1[i] = i;
     }
@@ -638,7 +638,7 @@ test_operators()
 
     Buffer *buf3, *buf4;
     buf3 = new Buffer;
-    boost::uint8_t *ptr2 = buf3->reference();
+    std::uint8_t *ptr2 = buf3->reference();
     for (size_t i=1; i< buf3->size(); i++) {
         ptr2[i] = i + 'a';
     }
@@ -662,7 +662,7 @@ test_operators()
     
     Buffer buf5(10);
     buf5.clear();
-    boost::uint8_t *ptr3 = buf5.reference();
+    std::uint8_t *ptr3 = buf5.reference();
     buf5 += 'a';
     buf5 += 'b';
     buf5 += 'c';

@@ -21,7 +21,7 @@
 #include "StreamingSoundData.h"
 
 #include <vector>
-#include <boost/cstdint.hpp> 
+#include <cstdint>
 
 #include "SoundInfo.h"
 #include "MediaHandler.h" 

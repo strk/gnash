@@ -135,7 +135,7 @@ extern "C" {
 //         GNASH_REPORT_RETURN;
     }
 
-    size_t oflaDemo_write_func(boost::uint8_t *data, size_t size)
+    size_t oflaDemo_write_func(std::uint8_t *data, size_t size)
     {
 // 	GNASH_REPORT_FUNCTION;
 
@@ -385,7 +385,7 @@ OflaDemoTest::~OflaDemoTest()
 // Parse an OflaDemo Request message coming from the Red5 oflaDemo_test. This
 // method should only be used for testing purposes.
 vector<std::shared_ptr<cygnal::Element > >
-OflaDemoTest::parseOflaDemoRequest(boost::uint8_t *ptr, size_t size)
+OflaDemoTest::parseOflaDemoRequest(std::uint8_t *ptr, size_t size)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -556,7 +556,7 @@ OflaDemoTest::formatOflaDemoResponse(double num, cygnal::Buffer &data)
 }
 
 std::shared_ptr<cygnal::Buffer>
-OflaDemoTest::formatOflaDemoResponse(double num, boost::uint8_t *data, size_t size)
+OflaDemoTest::formatOflaDemoResponse(double num, std::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
 

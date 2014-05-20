@@ -19,7 +19,7 @@
 #ifndef GNASH_SWF_STREAMSOUNDBLOCK_TAG_H
 #define GNASH_SWF_STREAMSOUNDBLOCK_TAG_H
 
-#include <boost/cstdint.hpp> 
+#include <cstdint>
 
 #include "ControlTag.h" // for inheritance
 #include "SWF.h" // for TagType definition
@@ -66,7 +66,7 @@ private:
     /// @param blockId      identifier of the stream block to play.
     ///
     /// This should only be constructed using the loader() function.
-    StreamSoundBlockTag(boost::uint16_t streamId,
+    StreamSoundBlockTag(std::uint16_t streamId,
                         sound::sound_handler::StreamBlockId blockId)
         :
         _handler_id(streamId),
@@ -74,7 +74,7 @@ private:
     {}
 
     /// Id of the stream this tag should play
-    const boost::uint16_t _handler_id;
+    const std::uint16_t _handler_id;
 
     /// Offset in the stream buffer to play
     const sound::sound_handler::StreamBlockId _blockId;

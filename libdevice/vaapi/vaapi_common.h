@@ -31,7 +31,7 @@
 
 #include <memory>
 #include <stdint.h>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include "dsodefs.h"
 
 #endif // GNASH_VAAPI_COMMON_H

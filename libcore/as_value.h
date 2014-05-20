@@ -24,7 +24,7 @@
 #include <boost/variant.hpp>
 #include <iosfwd> // for inlined output operator
 #include <type_traits>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include "utility.h" // for UNUSED
 #include "dsodefs.h" // for DSOTEXPORT

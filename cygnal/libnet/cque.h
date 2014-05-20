@@ -20,7 +20,7 @@
 #define __CQUE_H__
 
 #include <string>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 #include <deque>
@@ -49,7 +49,7 @@ public:
     CQue(const std::string &str) { _name = str; };
     ~CQue();
     // Push data onto the que
-    bool push(boost::uint8_t *data, int nbytes);
+    bool push(std::uint8_t *data, int nbytes);
     bool push(std::shared_ptr<cygnal::Buffer> data);
     // Pop the first date element off the que
     std::shared_ptr<cygnal::Buffer> DSOEXPORT pop();

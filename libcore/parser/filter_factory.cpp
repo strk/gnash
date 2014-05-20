@@ -145,7 +145,7 @@ bool BlurFilter::read(SWFStream& in)
     m_blurX = in.read_ufixed();
     m_blurY = in.read_ufixed();
 
-    m_quality = static_cast<boost::uint8_t> (in.read_uint(5));
+    m_quality = static_cast<std::uint8_t> (in.read_uint(5));
 
     static_cast<void> (in.read_uint(3)); // Throw these away.
 
@@ -225,7 +225,7 @@ bool GradientGlowFilter::read(SWFStream& in)
 {
     in.ensureBytes(1);
 
-    boost::uint8_t count = in.read_u8(); // How many colorings.
+    std::uint8_t count = in.read_u8(); // How many colorings.
 
     m_colors.reserve(count);
     m_alphas.reserve(count);
@@ -259,7 +259,7 @@ bool GradientGlowFilter::read(SWFStream& in)
 
     m_type = outer ? (inner ? FULL_GLOW : OUTER_GLOW) : INNER_GLOW;
 
-    m_quality = static_cast<boost::uint8_t> (in.read_uint(4));
+    m_quality = static_cast<std::uint8_t> (in.read_uint(4));
 
     IF_VERBOSE_PARSE(
         log_parse(_("   GradientGlowFilter "));
@@ -336,7 +336,7 @@ bool ColorMatrixFilter::read(SWFStream& in)
 bool GradientBevelFilter::read(SWFStream& in)
 {
     in.ensureBytes(1);
-    boost::uint8_t count = in.read_u8(); // How many colorings.
+    std::uint8_t count = in.read_u8(); // How many colorings.
 
     in.ensureBytes(count*5 + 8 + 8 + 2 + 1);
 
@@ -369,7 +369,7 @@ bool GradientBevelFilter::read(SWFStream& in)
 
     m_type = outer ? (inner ? FULL_BEVEL : OUTER_BEVEL) : INNER_BEVEL;
 
-    m_quality = static_cast<boost::uint8_t> (in.read_uint(4));
+    m_quality = static_cast<std::uint8_t> (in.read_uint(4));
 
     IF_VERBOSE_PARSE(
         log_parse(_("   GradientBevelFilter "));

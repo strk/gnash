@@ -45,7 +45,7 @@ public:
         assert(tag == SWF::DEFINEFONTNAME);
 
         in.ensureBytes(2);
-        boost::uint16_t fontID = in.read_u16();
+        std::uint16_t fontID = in.read_u16();
 
         Font* f = m.get_font(fontID);
         if (!f)

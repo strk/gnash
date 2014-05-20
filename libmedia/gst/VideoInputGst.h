@@ -21,7 +21,7 @@
 #define GNASH_VIDEOINPUTGST_H
 
 #include <vector>
-#include <boost/cstdint.hpp> // for C99 int types
+#include <cstdint> // for C99 int types
 #include "VideoInput.h"
 #include "gst/gst.h"
 

@@ -658,11 +658,11 @@ xml_status(const fn_call& fn)
 
     const double status = toNumber(fn.arg(0), getVM(fn));
     if (isNaN(status) ||
-            status > std::numeric_limits<boost::int32_t>::max() ||
-            status < std::numeric_limits<boost::int32_t>::min()) {
+            status > std::numeric_limits<std::int32_t>::max() ||
+            status < std::numeric_limits<std::int32_t>::min()) {
 
         ptr->setStatus(static_cast<XML_as::ParseStatus>(
-                    std::numeric_limits<boost::int32_t>::min()));
+                    std::numeric_limits<std::int32_t>::min()));
     }
     else ptr->setStatus(static_cast<XML_as::ParseStatus>(int(status)));
     return as_value();

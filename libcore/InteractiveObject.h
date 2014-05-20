@@ -112,8 +112,8 @@ public:
     /// @param y
     ///     Y ordinate of the pointer, in parent's coordiante space.
     ///
-    virtual InteractiveObject* topmostMouseEntity(boost::int32_t /*x*/,
-            boost::int32_t /*y*/) = 0;
+    virtual InteractiveObject* topmostMouseEntity(std::int32_t /*x*/,
+            std::int32_t /*y*/) = 0;
 
     /// Called whenever a mouse event affects this InteractiveObject.
     //
@@ -129,7 +129,7 @@ public:
     /// override and invokes pointInBounds().
     ///
     ///
-    virtual bool pointInShape(boost::int32_t x, boost::int32_t y) const
+    virtual bool pointInShape(std::int32_t x, std::int32_t y) const
     {
         log_error("Character %s did not override pointInShape() - "
                 "using pointInBounds() instead", typeid(*this).name());

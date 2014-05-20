@@ -19,7 +19,7 @@
 #ifndef __CYGNAL_H__
 #define __CYGNAL_H__
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/thread.hpp>
 #include <vector>
 #include <string>

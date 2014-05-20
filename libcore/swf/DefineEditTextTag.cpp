@@ -37,7 +37,7 @@ DefineEditTextTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 	assert(tag == SWF::DEFINEEDITTEXT); // 37
 
     in.ensureBytes(2);
-    const boost::uint16_t id = in.read_u16();
+    const std::uint16_t id = in.read_u16();
 
     std::unique_ptr<DefineEditTextTag> editText(new DefineEditTextTag(in, m, id));
 
@@ -176,7 +176,7 @@ DefineEditTextTag::read(SWFStream& in, movie_definition& m)
 }
 
 DefineEditTextTag::DefineEditTextTag(SWFStream& in, movie_definition& m,
-        boost::uint16_t id)
+        std::uint16_t id)
     :
     DefinitionTag(id),
 	_hasText(true),

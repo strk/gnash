@@ -757,7 +757,7 @@ global_assetnative(const fn_call& fn)
 
     const std::string& props = fn.arg(2).to_string();
     const int minor =
-        fn.nargs > 3 ? std::max<boost::int32_t>(toInt(fn.arg(3), getVM(fn)), 0) : 0;
+        fn.nargs > 3 ? std::max<std::int32_t>(toInt(fn.arg(3), getVM(fn)), 0) : 0;
 
     std::string::const_iterator pos = props.begin();
 
@@ -826,7 +826,7 @@ global_assetnativeaccessor(const fn_call& fn)
 
     const std::string& props = fn.arg(2).to_string();
     const int minor =
-        fn.nargs > 3 ? std::max<boost::int32_t>(toInt(fn.arg(3), getVM(fn)), 0) : 0;
+        fn.nargs > 3 ? std::max<std::int32_t>(toInt(fn.arg(3), getVM(fn)), 0) : 0;
 
     std::string::const_iterator pos = props.begin();
 
@@ -1090,7 +1090,7 @@ global_clearInterval(const fn_call& fn)
         return as_value();
     }
 
-    const boost::uint32_t id = toInt(fn.arg(0), getVM(fn));
+    const std::uint32_t id = toInt(fn.arg(0), getVM(fn));
 
 	movie_root& root = getRoot(fn);
 	return as_value(root.clearIntervalTimer(id));

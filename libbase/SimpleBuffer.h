@@ -20,7 +20,7 @@
 #define GNASH_SIMPLEBUFFER_H
 
 
-#include <boost/cstdint.hpp> // for boost::uint8_t
+#include <cstdint> // for std::uint8_t
 #include <algorithm> // for std::copy
 #include <memory>
 #include <cassert>
@@ -53,7 +53,7 @@ public:
 	{
 		if ( _capacity )
 		{
-			_data.reset(new boost::uint8_t[_capacity]);
+			_data.reset(new std::uint8_t[_capacity]);
 		}
 	}
 
@@ -70,7 +70,7 @@ public:
 	{
 		if ( _size )
 		{
-			_data.reset(new boost::uint8_t[_size]);
+			_data.reset(new std::uint8_t[_size]);
 			std::copy(b.data(), b.data()+b.size(), _data.get());
 		}
 	}
@@ -99,10 +99,10 @@ public:
 	size_t capacity() const { return _capacity; }
 
 	/// Get a pointer to start of data. May be NULL if size==0.
-	boost::uint8_t* data() { return _data.get(); }
+	std::uint8_t* data() { return _data.get(); }
 
 	/// Get a pointer to start of data. May be NULL if size==0.
-	const boost::uint8_t* data() const { return _data.get(); }
+	const std::uint8_t* data() const { return _data.get(); }
 
 	/// Resize the buffer
 	void resize(size_t newSize)
@@ -119,10 +119,10 @@ public:
 		// TODO: use smalles power of 2 bigger then newCapacity
 		_capacity = std::max(newCapacity, _capacity*2);
 
-		std::unique_ptr<boost::uint8_t[]> tmp;
+		std::unique_ptr<std::uint8_t[]> tmp;
 		tmp.swap(_data);
 		
-		_data.reset(new boost::uint8_t[_capacity]);
+		_data.reset(new std::uint8_t[_capacity]);
 
 		if ( tmp.get() )
 		{
@@ -143,8 +143,8 @@ public:
 	///
 	void append(const void* inData, size_t size)
 	{
-		const boost::uint8_t* newData = 
-            reinterpret_cast<const boost::uint8_t*>(inData);
+		const std::uint8_t* newData =
+            reinterpret_cast<const std::uint8_t*>(inData);
 		size_t curSize = _size;
 		resize(curSize+size);
 		std::copy(newData, newData+size, _data.get()+curSize);
@@ -158,7 +158,7 @@ public:
 	/// @param b
 	///	Byte to append.
 	///
-	void appendByte(const boost::uint8_t b)
+	void appendByte(const std::uint8_t b)
 	{
 		resize(_size + 1);
 		_data[_size - 1] = b;
@@ -172,7 +172,7 @@ public:
 	///	Short to append. Will be appended in network order. ie
 	///  with high order byte first.
 	///
-	void appendNetworkShort(const boost::uint16_t s)
+	void appendNetworkShort(const std::uint16_t s)
 	{
 		resize(_size + 2);
 		_data[_size - 2] = s >> 8;
@@ -187,7 +187,7 @@ public:
 	///	Long to append. Will be appended in network order. ie
 	///  with high order bytes first.
 	///
-	void appendNetworkLong(const boost::uint32_t l)
+	void appendNetworkLong(const std::uint32_t l)
 	{
 		resize(_size + 4);
 		_data[_size - 4] = l >> 24;
@@ -207,7 +207,7 @@ public:
 	void append(const SimpleBuffer& buf)
 	{
 		size_t incomingDataSize = buf.size();
-		const boost::uint8_t* incomingData = buf.data();
+		const std::uint8_t* incomingData = buf.data();
 		append(incomingData, incomingDataSize);
 	}
 
@@ -215,7 +215,7 @@ private:
 	size_t _size;
 	size_t _capacity;
 
-	std::unique_ptr<boost::uint8_t[]> _data;
+	std::unique_ptr<std::uint8_t[]> _data;
 };
 
 

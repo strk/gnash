@@ -75,7 +75,7 @@ public:
     /// Writes a 32-bit unsigned value in ARGB byte order to the image
     //
     /// Take note of the different byte order!
-    const ARGB& operator=(boost::uint32_t pixel) const {
+    const ARGB& operator=(std::uint32_t pixel) const {
         switch (_t) {
             case TYPE_RGBA:
                 // alpha
@@ -91,8 +91,8 @@ public:
     }
     
     /// Convert to uint32_t in ARGB order
-    operator boost::uint32_t() const {
-        boost::uint32_t ret = 0xff000000;
+    operator std::uint32_t() const {
+        std::uint32_t ret = 0xff000000;
         switch (_t) {
             case TYPE_RGBA:
                 // alpha

@@ -22,14 +22,14 @@
 
 #include "InputStream.h" // for inheritance
 
-#include <boost/cstdint.hpp> // For C99 int types
+#include <cstdint> // For C99 int types
 
 namespace gnash {
 namespace sound {
 
 /// @see sound_handler::attach_aux_streamer
 typedef unsigned int (*aux_streamer_ptr)(void *udata,
-        boost::int16_t* samples, unsigned int nSamples, bool& eof);
+        std::int16_t* samples, unsigned int nSamples, bool& eof);
 
 class AuxStream : public InputStream {
 public:
@@ -42,7 +42,7 @@ public:
     {}
 
     // See dox in InputStream.h
-    unsigned int fetchSamples(boost::int16_t* to, unsigned int nSamples)
+    unsigned int fetchSamples(std::int16_t* to, unsigned int nSamples)
     {
         unsigned int wrote = _cb(_cbArg, to, nSamples, _eof);
         _samplesFetched += wrote;

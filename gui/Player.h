@@ -267,7 +267,7 @@ private:
     /// @return always the len parameter value (silent stream never ends 
     ///         and is always available)
     ///
-    static unsigned int silentStream(void* udata, boost::int16_t* stream,
+    static unsigned int silentStream(void* udata, std::int16_t* stream,
                      unsigned int len, bool& atEOF);
     
     void init_sound();

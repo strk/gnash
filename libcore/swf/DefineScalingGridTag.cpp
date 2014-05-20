@@ -36,7 +36,7 @@ DefineScalingGridTag::loader(SWFStream& in, TagType /*tag*/,
         movie_definition& /*md*/, const RunResources& /*r*/)
 {
     in.ensureBytes(2);
-    const boost::uint16_t id = in.read_u16();
+    const std::uint16_t id = in.read_u16();
 
     IF_VERBOSE_PARSE(
         log_parse("DefineScalingGridTag: id = %d", id);

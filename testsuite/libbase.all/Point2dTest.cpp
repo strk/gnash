@@ -49,7 +49,7 @@ main(int /*argc*/, char** /*argv*/)
     check_equals(p.x, 999999);
     check_equals(p.y, 1000000);
 
-    boost::int64_t square_dist = 0;
+    std::int64_t square_dist = 0;
     
     square_dist = Point2d::squareDistance(p1, p2);
     check_equals(square_dist, 10 * 10);
@@ -64,7 +64,7 @@ main(int /*argc*/, char** /*argv*/)
     square_dist = p1.squareDistance(p2);
     check_equals(square_dist, 1.0 * 0x8000000 * 0x8000000);
 
-    boost::int32_t  dist = 0;
+    std::int32_t  dist = 0;
     dist = p1.distance(p2);
     check_equals(dist, 0x8000000);
     return 0;

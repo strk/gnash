@@ -153,7 +153,7 @@ bool VaapiImage::unmap()
 }
 
 // Get pixels for the specified plane
-boost::uint8_t *VaapiImage::getPlane(int plane) const
+std::uint8_t *VaapiImage::getPlane(int plane) const
 {
     if (!isMapped()) {
         throw VaapiException("VaapiImage::getPixels(): unmapped image");

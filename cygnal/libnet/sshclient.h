@@ -21,7 +21,7 @@
 
 #include <string>
 #include <boost/array.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <sstream>
 
 extern "C" {
@@ -54,12 +54,12 @@ public:
 
     // Read bytes from the already opened SSH connection
     int sshRead(cygnal::Buffer &buf);
-    int sshRead(boost::uint8_t *buf, size_t length);
+    int sshRead(std::uint8_t *buf, size_t length);
     int sshRead(std::string &buf);
 
     // Write bytes to the already opened SSH connection
     int sshWrite(cygnal::Buffer &buf);
-    int sshWrite(const boost::uint8_t *buf, size_t length);
+    int sshWrite(const std::uint8_t *buf, size_t length);
     int sshWrite(std::string &buf);
 
     // Shutdown the Context for this connection

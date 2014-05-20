@@ -305,7 +305,7 @@ object_registerClass(const fn_call& fn)
     const movie_definition* def = relRoot->definition();
     
     // We only care about definitions, not other exportable resources.
-    const boost::uint16_t id = def->exportID(symbolid);
+    const std::uint16_t id = def->exportID(symbolid);
     SWF::DefinitionTag* d = def->getDefinitionTag(id);
 
     if (!d) {

@@ -63,7 +63,7 @@ public:
         return _def ? _def->bounds() : _shape->getBounds();
     }
     
-    virtual bool pointInShape(boost::int32_t x, boost::int32_t y) const;
+    virtual bool pointInShape(std::int32_t x, std::int32_t y) const;
 
 private:
 	

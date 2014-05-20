@@ -584,7 +584,7 @@ struct as_value_num_nocase_eq : public as_value_lt
 // Note:
 // SORT_UNIQUE and SORT_RETURN_INDEX must first be stripped from the flag
 as_cmp_fn
-get_basic_cmp(boost::uint8_t flags, const fn_call& fn)
+get_basic_cmp(std::uint8_t flags, const fn_call& fn)
 {
     as_cmp_fn f;
 
@@ -641,7 +641,7 @@ get_basic_cmp(boost::uint8_t flags, const fn_call& fn)
 // Note:
 // SORT_UNIQUE and SORT_RETURN_INDEX must first be stripped from the flag
 as_cmp_fn
-get_basic_eq(boost::uint8_t flags, const fn_call& fn)
+get_basic_eq(std::uint8_t flags, const fn_call& fn)
 {
     as_cmp_fn f;
     flags &= ~(SORT_DESCENDING);
@@ -826,8 +826,8 @@ private:
 
 // Convenience function to strip SORT_UNIQUE and SORT_RETURN_INDEX from sort
 // flag. Presence of flags recorded in douniq and doindex.
-inline boost::uint8_t
-flag_preprocess(boost::uint8_t flgs, bool* douniq, bool* doindex)
+inline std::uint8_t
+flag_preprocess(std::uint8_t flgs, bool* douniq, bool* doindex)
 {
     *douniq = (flgs & SORT_UNIQUE);
     *doindex = (flgs & SORT_RETURN_INDEX);
@@ -868,7 +868,7 @@ private:
 class GetMultiFlags
 {
 public:
-    GetMultiFlags(std::vector<boost::uint8_t>& v, const fn_call& fn)
+    GetMultiFlags(std::vector<std::uint8_t>& v, const fn_call& fn)
         :
         _v(v),
         _i(0),
@@ -879,15 +879,15 @@ public:
     void operator()(const as_value& val) {
         // extract SORT_UNIQUE and SORT_RETURN_INDEX from first flag
         if (!_i) {
-            boost::uint8_t flag =
-                static_cast<boost::uint8_t>(toNumber(val, getVM(_fn)));
+            std::uint8_t flag =
+                static_cast<std::uint8_t>(toNumber(val, getVM(_fn)));
             flag = flag_preprocess(flag, &_uniq, &_index);
             _v.push_back(flag);
             ++_i;
             return;
         }
-        boost::uint8_t flag = 
-                static_cast<boost::uint8_t>(toNumber(val, getVM(_fn)));
+        std::uint8_t flag =
+                static_cast<std::uint8_t>(toNumber(val, getVM(_fn)));
         flag &= ~(SORT_RETURN_INDEX);
         flag &= ~(SORT_UNIQUE);
         _v.push_back(flag);
@@ -897,7 +897,7 @@ public:
     bool index() const { return _index; }
 
 private:
-    std::vector<boost::uint8_t>& _v;
+    std::vector<std::uint8_t>& _v;
     size_t _i;
     bool _uniq;
     bool _index;
@@ -1120,10 +1120,10 @@ array_sort(const fn_call& fn)
     
     if (fn.arg(0).is_undefined()) return as_value();
 
-    boost::uint8_t flags = 0;
+    std::uint8_t flags = 0;
 
     if (fn.nargs == 1 && fn.arg(0).is_number()) {
-        flags = static_cast<boost::uint8_t>(toNumber(fn.arg(0), getVM(fn)));
+        flags = static_cast<std::uint8_t>(toNumber(fn.arg(0), getVM(fn)));
     }
     else if (fn.arg(0).is_function()) {
         // Get comparison function
@@ -1134,7 +1134,7 @@ array_sort(const fn_call& fn)
         bool (*icmp)(int);
     
         if (fn.nargs == 2 && fn.arg(1).is_number()) {
-            flags=static_cast<boost::uint8_t>(toNumber(fn.arg(1), getVM(fn)));
+            flags=static_cast<std::uint8_t>(toNumber(fn.arg(1), getVM(fn)));
         }
 
         if (flags & SORT_DESCENDING) icmp = &int_lt_or_eq;
@@ -1182,7 +1182,7 @@ array_sortOn(const fn_call& fn)
     as_object* array = ensure<ValidThis>(fn);
 
     bool do_unique = false, do_index = false;
-    boost::uint8_t flags = 0;
+    std::uint8_t flags = 0;
 
     const int version = getSWFVersion(fn);
     VM& vm = getVM(fn);
@@ -1196,7 +1196,7 @@ array_sortOn(const fn_call& fn)
             getURI(vm, fn.arg(0).to_string(version));
 
         if (fn.nargs > 1 && fn.arg(1).is_number()) {
-            flags = static_cast<boost::uint8_t>(toNumber(fn.arg(1), getVM(fn)));
+            flags = static_cast<std::uint8_t>(toNumber(fn.arg(1), getVM(fn)));
             flags = flag_preprocess(flags, &do_unique, &do_index);
         }
 
@@ -1249,13 +1249,13 @@ array_sortOn(const fn_call& fn)
             // Only an array will do for this case.
             if (farray->array() && arrayLength(*farray) == optnum) {
 
-                std::vector<boost::uint8_t> flgs;
+                std::vector<std::uint8_t> flgs;
                 GetMultiFlags mf(flgs, fn);
                 foreachArray(*farray, mf);
                 do_unique = mf.unique();
                 do_index = mf.index();
                 
-                std::vector<boost::uint8_t>::const_iterator it = 
+                std::vector<std::uint8_t>::const_iterator it =
                     flgs.begin();
 
                 while (it != flgs.end()) {
@@ -1275,8 +1275,8 @@ array_sortOn(const fn_call& fn)
         }
         // case: sortOn(["prop1", "prop2"], Array.FLAG)
         else {
-            boost::uint8_t flags = 
-                static_cast<boost::uint8_t>(toInt(fn.arg(1), getVM(fn)));
+            std::uint8_t flags =
+                static_cast<std::uint8_t>(toInt(fn.arg(1), getVM(fn)));
             flags = flag_preprocess(flags, &do_unique, &do_index);
             as_cmp_fn c = get_basic_cmp(flags, fn);
 

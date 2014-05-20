@@ -54,7 +54,7 @@ PlayHead::setState(PlaybackStatus newState)
         // if we go from PAUSED to PLAYING, reset
         // _clockOffset to yank current position
         // when querying clock source *now*
-        boost::uint64_t now = _clockSource->elapsed();
+        std::uint64_t now = _clockSource->elapsed();
         _clockOffset = ( now - _position );
 
         // check if we did the right thing
@@ -101,7 +101,7 @@ PlayHead::advanceIfConsumed()
     }
 
     // Advance position
-    boost::uint64_t now = _clockSource->elapsed();
+    std::uint64_t now = _clockSource->elapsed();
     _position = now-_clockOffset;
 
     // Reset consumers state
@@ -109,9 +109,9 @@ PlayHead::advanceIfConsumed()
 }
 
 void
-PlayHead::seekTo(boost::uint64_t position)
+PlayHead::seekTo(std::uint64_t position)
 {
-    boost::uint64_t now = _clockSource->elapsed();
+    std::uint64_t now = _clockSource->elapsed();
     _position = position;
 
     _clockOffset = ( now - _position );

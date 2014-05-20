@@ -65,7 +65,7 @@ public:
 	{}
 
 	TryBlock(size_t cur_off, size_t try_size, size_t catch_size,
-		size_t finally_size, boost::uint8_t register_index)
+		size_t finally_size, std::uint8_t register_index)
 		:
 		_catchOffset(cur_off + try_size),
 		_finallyOffset(cur_off + try_size + catch_size),

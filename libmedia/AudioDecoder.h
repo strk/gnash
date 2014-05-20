@@ -20,7 +20,7 @@
 #ifndef GNASH_AUDIODECODER_H
 #define GNASH_AUDIODECODER_H
 
-#include <boost/cstdint.hpp> // for C99 int types
+#include <cstdint> // for C99 int types
 
 // Forward declarations
 namespace gnash {
@@ -62,9 +62,9 @@ public:
 	///
 	/// @todo return a SimpleBuffer by unique_ptr
 	///
-	virtual boost::uint8_t* decode(const boost::uint8_t* input,
-        boost::uint32_t inputSize, boost::uint32_t& outputSize,
-        boost::uint32_t& decodedData);
+	virtual std::uint8_t* decode(const std::uint8_t* input,
+        std::uint32_t inputSize, std::uint32_t& outputSize,
+        std::uint32_t& decodedData);
 
 	/// Decodes an EncodedAudioFrame and returns a pointer to the decoded data
 	//
@@ -79,20 +79,20 @@ public:
 	///
 	/// @todo return a SimpleBuffer by unique_ptr
 	///
-	virtual boost::uint8_t* decode(const EncodedAudioFrame& input,
-	                               boost::uint32_t& outputSize);
+	virtual std::uint8_t* decode(const EncodedAudioFrame& input,
+	                               std::uint32_t& outputSize);
 
 };
 
-inline boost::uint8_t*
-AudioDecoder::decode(const boost::uint8_t*, boost::uint32_t, boost::uint32_t&,
-        boost::uint32_t&)
+inline std::uint8_t*
+AudioDecoder::decode(const std::uint8_t*, std::uint32_t, std::uint32_t&,
+        std::uint32_t&)
 {
     return 0;
 }
 
-inline boost::uint8_t*
-AudioDecoder::decode(const EncodedAudioFrame&, boost::uint32_t&)
+inline std::uint8_t*
+AudioDecoder::decode(const EncodedAudioFrame&, std::uint32_t&)
 {
     return 0;
 }

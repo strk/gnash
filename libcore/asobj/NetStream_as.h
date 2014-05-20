@@ -103,16 +103,16 @@ public:
         }
 
         /// Number of samples left in buffer starting from cursor
-        boost::uint32_t m_size;
+        std::uint32_t m_size;
 
         /// Actual data
         //
         /// The data must be allocated with new []
         /// as will be delete []'d by the dtor
-        boost::uint8_t* m_data;
+        std::uint8_t* m_data;
 
         /// Cursor into the data
-        boost::uint8_t* m_ptr;
+        std::uint8_t* m_ptr;
     };
 
     typedef boost::ptr_deque<CursoredBuffer> AudioQueue;
@@ -151,11 +151,11 @@ public:
     void detachAuxStreamer();
 
     /// Fetch samples from the audio queue
-    unsigned int fetch(boost::int16_t* samples, unsigned int nSamples,
+    unsigned int fetch(std::int16_t* samples, unsigned int nSamples,
                     bool& eof);
 
     /// Fetch samples from the audio queue
-    static unsigned int fetchWrapper(void* owner, boost::int16_t* samples,
+    static unsigned int fetchWrapper(void* owner, std::int16_t* samples,
                     unsigned int nSamples, bool& eof);
 
     /// Push a buffer to the audio queue
@@ -235,13 +235,13 @@ public:
     ///     Defines in seconds where to seek to
     ///     @todo take milliseconds !!
     ///
-    void seek(boost::uint32_t pos);
+    void seek(std::uint32_t pos);
 
     /// Tells where the playhead currently is
     //
     /// @return The time in milliseconds of the current playhead position
     ///
-    boost::int32_t time();
+    std::int32_t time();
 
     /// Called at the heart-beat frequency. Used to process queued status messages
     /// and (re)start after a buffering pause. In NetStreamFfmpeg it is also
@@ -270,14 +270,14 @@ public:
     /// @param time
     /// The time in milliseconds that should be buffered.
     ///
-    void setBufferTime(boost::uint32_t time);
+    void setBufferTime(std::uint32_t time);
 
     /// Returns what the buffer time has been set to. (100 milliseconds
     /// is default)
     //
     /// @return The size of the buffer in milliseconds.
     ///
-    boost::uint32_t bufferTime() { return _bufferTime; }
+    std::uint32_t bufferTime() { return _bufferTime; }
 
     /// Returns the number of bytes of the media file that have been buffered.
     long bytesLoaded();
@@ -318,7 +318,7 @@ public:
     /// It might be invoked by a separate thread (neither main,
     /// nor decoder thread).
     ///
-    static unsigned int audio_streamer(void *udata, boost::int16_t* samples,
+    static unsigned int audio_streamer(void *udata, std::int16_t* samples,
             unsigned int nSamples, bool& eof);
 
 private:
@@ -442,7 +442,7 @@ private:
     /// \brief
     /// Decode input audio frames with timestamp <= ts
     /// and push them to the output audio queue
-    void pushDecodedAudioFrames(boost::uint32_t ts);
+    void pushDecodedAudioFrames(std::uint32_t ts);
 
     /// Decode input frames up to the one with timestamp <= ts.
     //
@@ -454,7 +454,7 @@ private:
     /// 3. next element in cursor has timestamp > tx
     /// 4. there was an error decoding
     ///
-    std::unique_ptr<image::GnashImage> getDecodedVideoFrame(boost::uint32_t ts);
+    std::unique_ptr<image::GnashImage> getDecodedVideoFrame(std::uint32_t ts);
 
     DecodingState decodingStatus(DecodingState newstate = DEC_NONE);
 
@@ -506,7 +506,7 @@ private:
     std::unique_ptr<CharacterProxy> _audioController;
     
     // The size of the buffer in milliseconds
-    boost::uint32_t _bufferTime;
+    std::uint32_t _bufferTime;
 
     // Mutex to insure we don't corrupt the image
     boost::mutex image_mutex;

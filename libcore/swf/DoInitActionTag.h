@@ -72,7 +72,7 @@ public:
         }
         
         in.ensureBytes(2);
-        const boost::uint16_t cid = in.read_u16();
+        const std::uint16_t cid = in.read_u16();
 
         IF_VERBOSE_PARSE(
             log_parse(_("  tag %d: do_init_action_loader"), tag);

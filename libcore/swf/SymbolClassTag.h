@@ -65,11 +65,11 @@ public:
         }
 		
         in.ensureBytes(2);
-		boost::uint16_t num_symbols = in.read_u16();
+		std::uint16_t num_symbols = in.read_u16();
 		log_debug("There are %u symbols.", num_symbols);
 		for (unsigned int i = 0; i < num_symbols; ++i) {
 			in.ensureBytes(2);
-			boost::uint16_t id = in.read_u16();
+			std::uint16_t id = in.read_u16();
 			std::string name;
 			in.read_string(name);
 			IF_VERBOSE_PARSE(

@@ -22,7 +22,7 @@
 
 #include <memory>
 #include <cassert>
-#include <boost/cstdint.hpp> // For C99 int types
+#include <cstdint> // For C99 int types
 
 #include "InputStream.h" 
 #include "AudioDecoder.h" 
@@ -58,9 +58,9 @@ protected:
             size_t inPoint);
 
     // Pointer handling and checking functions
-    const boost::int16_t* getDecodedData(unsigned long int pos) const {
+    const std::int16_t* getDecodedData(unsigned long int pos) const {
         assert(pos < _decodedData.size());
-        return reinterpret_cast<const boost::int16_t*>(
+        return reinterpret_cast<const std::int16_t*>(
                 _decodedData.data() + pos);
     }
 
@@ -96,7 +96,7 @@ protected:
         return *_decoder;
     }
 
-    void appendDecodedData(boost::uint8_t* data, unsigned int size) {
+    void appendDecodedData(std::uint8_t* data, unsigned int size) {
         _decodedData.append(data, size);
         delete [] data;
     }
@@ -128,7 +128,7 @@ private:
     }
 
     // See dox in sound_handler.h (InputStream)
-    unsigned int fetchSamples(boost::int16_t* to, unsigned int nSamples);
+    unsigned int fetchSamples(std::int16_t* to, unsigned int nSamples);
 
     void createDecoder(media::MediaHandler& mediaHandler,
             const media::SoundInfo& info);

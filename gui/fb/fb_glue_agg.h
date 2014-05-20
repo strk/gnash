@@ -23,7 +23,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include "Renderer.h"
 #include "fbsup.h"

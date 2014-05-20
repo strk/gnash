@@ -38,7 +38,7 @@ namespace media {
 
 
 const size_t FLVParser::paddingBytes;
-const boost::uint16_t FLVParser::FLVAudioTag::flv_audio_rates [] = 
+const std::uint16_t FLVParser::FLVAudioTag::flv_audio_rates [] =
     { 5500, 11000, 22050, 44100 };
 
 FLVParser::FLVParser(std::unique_ptr<IOChannel> lt)
@@ -66,7 +66,7 @@ FLVParser::~FLVParser()
 
 // would be called by main thread
 bool
-FLVParser::seek(boost::uint32_t& time)
+FLVParser::seek(std::uint32_t& time)
 {
 
 	boost::mutex::scoped_lock streamLock(_streamMutex);
@@ -128,7 +128,7 @@ FLVParser::parseNextChunk()
 
 // would be called by parser thread
 void
-FLVParser::indexAudioTag(const FLVTag& tag, boost::uint32_t thisTagPos)
+FLVParser::indexAudioTag(const FLVTag& tag, std::uint32_t thisTagPos)
 {
 	if ( _videoInfo.get()) {
 		// if we have video we let that drive cue points
@@ -147,7 +147,7 @@ FLVParser::indexAudioTag(const FLVTag& tag, boost::uint32_t thisTagPos)
 }
 
 void
-FLVParser::indexVideoTag(const FLVTag& tag, const FLVVideoTag& videotag, boost::uint32_t thisTagPos)
+FLVParser::indexVideoTag(const FLVTag& tag, const FLVVideoTag& videotag, std::uint32_t thisTagPos)
 {
 	if ( videotag.frametype != FLV_VIDEO_KEYFRAME ) {
 		return;
@@ -160,7 +160,7 @@ FLVParser::indexVideoTag(const FLVTag& tag, const FLVVideoTag& videotag, boost::
 
 
 std::unique_ptr<EncodedAudioFrame>
-FLVParser::parseAudioTag(const FLVTag& flvtag, const FLVAudioTag& audiotag, boost::uint32_t thisTagPos)
+FLVParser::parseAudioTag(const FLVTag& flvtag, const FLVAudioTag& audiotag, std::uint32_t thisTagPos)
 {
 	std::unique_ptr<EncodedAudioFrame> frame;
 
@@ -172,10 +172,10 @@ FLVParser::parseAudioTag(const FLVTag& flvtag, const FLVAudioTag& audiotag, boos
 	}
 
 	bool header = false;
-	boost::uint32_t bodyLength = flvtag.body_size;
+	std::uint32_t bodyLength = flvtag.body_size;
 
 	if (audiotag.codec == AUDIO_CODEC_AAC) {
-		boost::uint8_t packettype = _stream->read_byte();
+		std::uint8_t packettype = _stream->read_byte();
 		header = (packettype == 0);
 		--bodyLength;
 	}
@@ -199,7 +199,7 @@ FLVParser::parseAudioTag(const FLVTag& flvtag, const FLVAudioTag& audiotag, boos
             // never smaller.
             const size_t bufSize = frame->dataSize + paddingBytes;
 
-            boost::uint8_t* data = new boost::uint8_t[bufSize];
+            std::uint8_t* data = new std::uint8_t[bufSize];
 
             std::copy(frame->data.get(), frame->data.get() + bufSize, data);
 
@@ -217,7 +217,7 @@ FLVParser::parseAudioTag(const FLVTag& flvtag, const FLVAudioTag& audiotag, boos
 }
 
 std::unique_ptr<EncodedVideoFrame>
-FLVParser::parseVideoTag(const FLVTag& flvtag, const FLVVideoTag& videotag, boost::uint32_t thisTagPos)
+FLVParser::parseVideoTag(const FLVTag& flvtag, const FLVVideoTag& videotag, std::uint32_t thisTagPos)
 {
 	if ( ! _video ) {
 		log_error(_("Unexpected video tag found at offset %d of FLV stream "
@@ -227,7 +227,7 @@ FLVParser::parseVideoTag(const FLVTag& flvtag, const FLVVideoTag& videotag, boos
 	}
 
 	bool header = false;
-	boost::uint32_t bodyLength = flvtag.body_size;
+	std::uint32_t bodyLength = flvtag.body_size;
 
 	switch(videotag.codec) {
 		case VIDEO_CODEC_VP6:
@@ -239,14 +239,14 @@ FLVParser::parseVideoTag(const FLVTag& flvtag, const FLVVideoTag& videotag, boos
 		}
 		case VIDEO_CODEC_H264:
 		{
-			boost::uint8_t packettype = _stream->read_byte();
+			std::uint8_t packettype = _stream->read_byte();
 			IF_VERBOSE_PARSE( log_debug(_("AVC packet type: %d"),
                         (unsigned)packettype) );
 
 			header = (packettype == 0);
 
 			// 24-bits value for composition time offset ignored for now.
-			boost::uint8_t tmp[3];
+			std::uint8_t tmp[3];
 			_stream->read(tmp, 3);
 	
 			bodyLength -= 4;
@@ -274,7 +274,7 @@ FLVParser::parseVideoTag(const FLVTag& flvtag, const FLVVideoTag& videotag, boos
             // never smaller.
             const size_t bufSize = frame->dataSize() + paddingBytes;
 
-            boost::uint8_t* data = new boost::uint8_t[bufSize];
+            std::uint8_t* data = new std::uint8_t[bufSize];
 
             std::copy(frame->data(), frame->data() + bufSize, data);
 			_videoInfo->extra.reset( 
@@ -306,7 +306,7 @@ FLVParser::parseNextTag(bool index_only)
 		_seekRequest = false;
 	}
 
-	boost::uint64_t& position = index_only ? _nextPosToIndex : _lastParsedPosition;
+	std::uint64_t& position = index_only ? _nextPosToIndex : _lastParsedPosition;
 	bool& completed = index_only ? _indexingCompleted : _parsingComplete;
 
 	//log_debug("parseNextTag: _lastParsedPosition:%d, _nextPosToIndex:%d, index_only:%d", _lastParsedPosition, _nextPosToIndex, index_only);
@@ -326,7 +326,7 @@ FLVParser::parseNextTag(bool index_only)
 	//log_debug("FLVParser::parseNextTag seeked to %d", thisTagPos+4);
 
 	// Read the tag info
-	boost::uint8_t chunk[12];
+	std::uint8_t chunk[12];
 	int actuallyRead = _stream->read(chunk, 12);
 	if ( actuallyRead < 12 )
 	{
@@ -437,7 +437,7 @@ FLVParser::parseNextTag(bool index_only)
 		}
 		metaTag->resize(actuallyRead);
 
-		boost::uint32_t terminus = getUInt24(metaTag->data() +
+		std::uint32_t terminus = getUInt24(metaTag->data() +
                 actuallyRead - 3);
 
         if (terminus != 9) {
@@ -455,7 +455,7 @@ FLVParser::parseNextTag(bool index_only)
 	}
 
 	_stream->read(chunk, 4);
-	boost::uint32_t prevtagsize = chunk[0] << 24 | chunk[1] << 16 |
+	std::uint32_t prevtagsize = chunk[0] << 24 | chunk[1] << 16 |
         chunk[2] << 8 | chunk[3];
 	if (prevtagsize != flvtag.body_size + 11) {
 		log_error(_("Corrupt FLV: previous tag size record (%1%) unexpected "
@@ -473,7 +473,7 @@ FLVParser::parseHeader()
 
 	// We only use 5 bytes of the header, because the last 4 bytes represent
     // an integer which is always 1.
-	boost::uint8_t header[9];
+	std::uint8_t header[9];
 	if ( _stream->read(header, 9) != 9 )
 	{
             log_error(_("FLVParser::parseHeader: couldn't read 9 bytes of header"));
@@ -486,7 +486,7 @@ FLVParser::parseHeader()
 		return false;
 	}
 
-	const boost::uint8_t version = header[3];
+	const std::uint8_t version = header[3];
 
 	// Parse the audio+video bitmask
 	_audio = header[4]&(1<<2);
@@ -498,14 +498,14 @@ FLVParser::parseHeader()
 	return true;
 }
 
-inline boost::uint32_t
-FLVParser::getUInt24(boost::uint8_t* in)
+inline std::uint32_t
+FLVParser::getUInt24(std::uint8_t* in)
 {
 	// The bits are in big endian order
 	return (in[0] << 16) | (in[1] << 8) | in[2];
 }
 
-boost::uint64_t
+std::uint64_t
 FLVParser::getBytesLoaded() const
 {
 	boost::mutex::scoped_lock lock(_bytesLoadedMutex);
@@ -515,14 +515,14 @@ FLVParser::getBytesLoaded() const
 // would be called by parser thread
 /*private*/
 std::unique_ptr<EncodedAudioFrame>
-FLVParser::readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
+FLVParser::readAudioFrame(std::uint32_t dataSize, std::uint32_t timestamp)
 {
 
 	std::unique_ptr<EncodedAudioFrame> frame(new EncodedAudioFrame);
     
     const size_t bufSize = dataSize + paddingBytes;
 
-    boost::uint8_t* data = new boost::uint8_t[bufSize];
+    std::uint8_t* data = new std::uint8_t[bufSize];
 	const size_t bytesRead = _stream->read(data, dataSize);
 
     std::fill(data + bytesRead, data + bufSize, 0);
@@ -542,13 +542,13 @@ FLVParser::readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 // would be called by parser thread
 /*private*/
 std::unique_ptr<EncodedVideoFrame>
-FLVParser::readVideoFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
+FLVParser::readVideoFrame(std::uint32_t dataSize, std::uint32_t timestamp)
 {
 	std::unique_ptr<EncodedVideoFrame> frame;
 
     const size_t bufSize = dataSize + paddingBytes;
 
-	boost::uint8_t* data = new boost::uint8_t[bufSize];
+	std::uint8_t* data = new std::uint8_t[bufSize];
 	const size_t bytesRead = _stream->read(data, dataSize);
 
     std::fill(data + bytesRead, data + bufSize, 0);
@@ -563,7 +563,7 @@ FLVParser::readVideoFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 
 
 void
-FLVParser::fetchMetaTags(OrderedMetaTags& tags, boost::uint64_t ts)
+FLVParser::fetchMetaTags(OrderedMetaTags& tags, std::uint64_t ts)
 {
 	boost::mutex::scoped_lock lock(_metaTagsMutex);
 	if (!_metaTags.empty()) {

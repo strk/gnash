@@ -91,7 +91,7 @@ test_amf()
     int fd, ret;
     double num;
     Element el;
-    boost::uint8_t *ptr;
+    std::uint8_t *ptr;
     
     char *buf[AMF_NUMBER_SIZE+1];
     memset(buf, 0, AMF_NUMBER_SIZE+1);
@@ -102,7 +102,7 @@ test_amf()
     close(fd);
 
 //    num = amf_obj.extractNumber(buf);
-    ptr = amf_obj.extractVariable(&el, reinterpret_cast<boost::uint8_t *>(buf));
+    ptr = amf_obj.extractVariable(&el, reinterpret_cast<std::uint8_t *>(buf));
     
     if (el.getType() == Element::NUMBER) {
         runtest.pass("Extracted Number AMF object");

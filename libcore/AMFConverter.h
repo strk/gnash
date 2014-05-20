@@ -92,7 +92,7 @@ public:
     bool writePropertyName(const std::string& name);
 
     /// Write custom data for special cases.
-    void writeData(const boost::uint8_t* data, size_t length);
+    void writeData(const std::uint8_t* data, size_t length);
 
 private:
 
@@ -132,7 +132,7 @@ public:
     ///                 ensure that pos is not greater than end on every read.
     /// @param end      The end of the buffer.
     /// @param gl       A global reference for creating objects when necessary.
-    Reader(const boost::uint8_t*& pos, const boost::uint8_t* end, Global_as& gl)
+    Reader(const std::uint8_t*& pos, const std::uint8_t* end, Global_as& gl)
         :
         _pos(pos),
         _end(end),
@@ -172,10 +172,10 @@ private:
     std::vector<as_object*> _objectRefs;
 
     /// The current position in the buffer.
-    const boost::uint8_t*& _pos;
+    const std::uint8_t*& _pos;
 
     /// The end of the buffer.
-    const boost::uint8_t* const _end;
+    const std::uint8_t* const _end;
 
     /// For creating objects if necessary.
     Global_as& _global;

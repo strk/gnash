@@ -17,7 +17,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include "ClockTime.h"
 #include "log.h"
 
@@ -43,7 +43,7 @@ extern long timezone;   // for tzset()/long timezone;
 
 namespace gnash {
 
-boost::uint64_t
+std::uint64_t
 clocktime::getTicks()
 {
     // This needs to return milliseconds. Does it?
@@ -57,7 +57,7 @@ clocktime::getTicks()
 
 namespace gnash {
 
-boost::uint64_t
+std::uint64_t
 clocktime::getTicks()
 {
 
@@ -65,12 +65,12 @@ clocktime::getTicks()
     
     gettimeofday(&tv, 0);
 
-    boost::uint64_t result = static_cast<boost::uint64_t>(tv.tv_sec) * 1000000L;
+    std::uint64_t result = static_cast<std::uint64_t>(tv.tv_sec) * 1000000L;
 
     // Time Unit: microsecond
     result += tv.tv_usec;
 
-    return static_cast<boost::uint64_t>(result / 1000.0);
+    return static_cast<std::uint64_t>(result / 1000.0);
 }
 
 }
@@ -95,7 +95,7 @@ namespace gnash {
 /// It also gets things wrong for very high or low time values, when the
 /// localtime implementation fills the gmtoff element with 53 minutes (on
 /// at least one machine, anyway).
-boost::int32_t
+std::int32_t
 clocktime::getTimeZoneOffset(double time)
 {
     

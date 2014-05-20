@@ -19,7 +19,7 @@
 
 #include "sound_handler.h"
 
-#include <boost/cstdint.hpp> // For C99 int types
+#include <cstdint> // For C99 int types
 #include <vector> 
 #include <cmath> 
 
@@ -44,7 +44,7 @@ namespace sound {
 namespace {
 
 unsigned int
-silentStream(void*, boost::int16_t* stream, unsigned int len, bool& atEOF)
+silentStream(void*, std::int16_t* stream, unsigned int len, bool& atEOF)
 {
     std::fill(stream, stream + len, 0);
     atEOF=false;
@@ -371,8 +371,8 @@ sound_handler::get_duration(int handle) const
 
     const EmbedSound* sounddata = _sounds[handle];
 
-    const boost::uint32_t sampleCount = sounddata->soundinfo.getSampleCount();
-    const boost::uint32_t sampleRate = sounddata->soundinfo.getSampleRate();
+    const std::uint32_t sampleCount = sounddata->soundinfo.getSampleCount();
+    const std::uint32_t sampleRate = sounddata->soundinfo.getSampleRate();
 
     // Return the sound duration in milliseconds
     if (sampleCount > 0 && sampleRate > 0) {
@@ -583,7 +583,7 @@ sound_handler::unplugAllInputStreams()
 }
 
 void
-sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
+sound_handler::fetchSamples(std::int16_t* to, unsigned int nSamples)
 {
     if (isPaused()) return; // should we write wav file anyway ?
 
@@ -595,7 +595,7 @@ sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
     if (!_inputStreams.empty()) {
 
         // A buffer to fetch InputStream samples into
-        std::unique_ptr<boost::int16_t[]> buf(new boost::int16_t[nSamples]);
+        std::unique_ptr<std::int16_t[]> buf(new std::int16_t[nSamples]);
 
 #ifdef GNASH_DEBUG_SAMPLES_FETCHING 
         log_debug("Fetching %d samples from each of %d input streams", nSamples, _inputStreams.size());

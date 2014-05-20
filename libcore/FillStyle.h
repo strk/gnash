@@ -40,14 +40,14 @@ namespace gnash {
 class GradientRecord
 {
 public:
-    GradientRecord(boost::uint8_t ratio, const rgba& color)
+    GradientRecord(std::uint8_t ratio, const rgba& color)
         :
         ratio(ratio),
         color(color)
     { }
     
     //data:
-    boost::uint8_t ratio;
+    std::uint8_t ratio;
     rgba color;
 };
 
@@ -94,7 +94,7 @@ public:
             SmoothingPolicy pol);
 
     /// Construct a static BitmapFill using a SWF tag.
-    BitmapFill(SWF::FillType t, movie_definition* md, boost::uint16_t id,
+    BitmapFill(SWF::FillType t, movie_definition* md, std::uint16_t id,
             const SWFMatrix& m);
 
     /// Destructor
@@ -146,7 +146,7 @@ private:
     movie_definition* _md;
 
     // The id of the tag containing the bitmap
-    boost::uint16_t _id;
+    std::uint16_t _id;
 };
 
 /// A GradientFill

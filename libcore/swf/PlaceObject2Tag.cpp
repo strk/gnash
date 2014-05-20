@@ -99,7 +99,7 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
     const int movie_version = _movie_def.get_version();
 
     in.ensureBytes(2);
-    boost::uint16_t reserved = in.read_u16();
+    std::uint16_t reserved = in.read_u16();
     IF_VERBOSE_MALFORMED_SWF(
         if (reserved != 0) {
             log_swferror(_("Reserved field in PlaceObject actions == "
@@ -107,7 +107,7 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
         }
     );
     
-    boost::uint32_t all_event_flags;
+    std::uint32_t all_event_flags;
 
     // The logical 'or' of all the following handlers.
     if (movie_version >= 6) {
@@ -136,7 +136,7 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
             // Read event.
             in.align();
     
-            boost::uint32_t flags;
+            std::uint32_t flags;
             if (movie_version >= 6) {
                 in.ensureBytes(4);
                 flags = in.read_u32();
@@ -152,7 +152,7 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
             }
     
             in.ensureBytes(4);
-            boost::uint32_t event_length = in.read_u32();
+            std::uint32_t event_length = in.read_u32();
             if (in.get_tag_end_position() - in.tell() <  event_length) {
                 IF_VERBOSE_MALFORMED_SWF(
                 log_swferror(_("swf_event::read(), "
@@ -398,7 +398,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
         LOG_ONCE(log_unimpl("Blend mode in PlaceObject tag"));
     }
 
-    boost::uint8_t bitmask = 0;
+    std::uint8_t bitmask = 0;
     if (hasBitmapCaching()) {
         // cacheAsBitmap is a boolean value, so the flag itself ought to be
         // enough. Alexis' SWF reference is unsure about this, but suggests

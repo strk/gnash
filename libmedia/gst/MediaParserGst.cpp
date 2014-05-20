@@ -105,7 +105,7 @@ MediaParserGst::~MediaParserGst()
 }
 
 bool
-MediaParserGst::seek(boost::uint32_t& milliseconds)
+MediaParserGst::seek(std::uint32_t& milliseconds)
 {
     return gst_element_seek_simple(_bin, GST_FORMAT_TIME, 
               GstSeekFlags(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT),
@@ -148,7 +148,7 @@ MediaParserGst::parseNextChunk()
 
 }
 
-boost::uint64_t
+std::uint64_t
 MediaParserGst::getBytesLoaded() const
 {
     boost::mutex::scoped_lock lock(_bytesLoadedMutex);

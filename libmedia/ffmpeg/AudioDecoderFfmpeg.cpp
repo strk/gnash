@@ -334,15 +334,15 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 
 }
 
-boost::uint8_t*
-AudioDecoderFfmpeg::decode(const boost::uint8_t* input,
-        boost::uint32_t inputSize, boost::uint32_t&
-        outputSize, boost::uint32_t& decodedBytes)
+std::uint8_t*
+AudioDecoderFfmpeg::decode(const std::uint8_t* input,
+        std::uint32_t inputSize, std::uint32_t&
+        outputSize, std::uint32_t& decodedBytes)
 {
     //GNASH_REPORT_FUNCTION;
 
     size_t retCapacity = MAX_AUDIO_FRAME_SIZE;
-    boost::uint8_t* retBuf = new boost::uint8_t[retCapacity];
+    std::uint8_t* retBuf = new std::uint8_t[retCapacity];
     int retBufSize = 0;
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
@@ -352,7 +352,7 @@ AudioDecoderFfmpeg::decode(const boost::uint8_t* input,
     decodedBytes = 0; // nothing decoded yet
     while (decodedBytes < inputSize)
     {
-        const boost::uint8_t* frame=0; // parsed frame (pointer into input)
+        const std::uint8_t* frame=0; // parsed frame (pointer into input)
         int framesize; // parsed frame size
 
         int consumed = parseInput(input+decodedBytes,
@@ -404,8 +404,8 @@ AudioDecoderFfmpeg::decode(const boost::uint8_t* input,
 
         // Now, decode the frame. We use the ::decodeFrame specialized function
         // here so resampling is done appropriately
-        boost::uint32_t outSize = 0;
-        std::unique_ptr<boost::uint8_t[]> outBuf(
+        std::uint32_t outSize = 0;
+        std::unique_ptr<std::uint8_t[]> outBuf(
                 decodeFrame(frame, framesize, outSize));
 
         if (!outBuf)
@@ -436,7 +436,7 @@ AudioDecoderFfmpeg::decode(const boost::uint8_t* input,
                     retBufSize+(unsigned)outSize, retCapacity);
 #endif 
 
-            boost::uint8_t* tmp = retBuf;
+            std::uint8_t* tmp = retBuf;
             retCapacity = std::max(retBufSize+static_cast<size_t>(outSize),
                     retCapacity * 2);
 
@@ -445,7 +445,7 @@ AudioDecoderFfmpeg::decode(const boost::uint8_t* input,
                     retCapacity);
 #endif // GNASH_DEBUG_AUDIO_DECODING
 
-            retBuf = new boost::uint8_t[retCapacity];
+            retBuf = new std::uint8_t[retCapacity];
             if ( retBufSize ) std::copy(tmp, tmp+retBufSize, retBuf);
             delete [] tmp;
         }
@@ -459,16 +459,16 @@ AudioDecoderFfmpeg::decode(const boost::uint8_t* input,
 
 }
 
-boost::uint8_t*
+std::uint8_t*
 AudioDecoderFfmpeg::decode(const EncodedAudioFrame& ef,
-        boost::uint32_t& outputSize)
+        std::uint32_t& outputSize)
 {
     return decodeFrame(ef.data.get(), ef.dataSize, outputSize);
 }
 
-boost::uint8_t*
-AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
-        boost::uint32_t inputSize, boost::uint32_t& outputSize)
+std::uint8_t*
+AudioDecoderFfmpeg::decodeFrame(const std::uint8_t* input,
+        std::uint32_t inputSize, std::uint32_t& outputSize)
 {
     //GNASH_REPORT_FUNCTION;
 
@@ -477,15 +477,15 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
     size_t outSize = MAX_AUDIO_FRAME_SIZE;
 
     // TODO: make this a private member, to reuse (see NetStreamFfmpeg in 0.8.3)
-    std::unique_ptr<boost::int16_t, decltype(av_free)*> output(
-        reinterpret_cast<boost::int16_t*>(av_malloc(outSize)), av_free );
+    std::unique_ptr<std::int16_t, decltype(av_free)*> output(
+        reinterpret_cast<std::int16_t*>(av_malloc(outSize)), av_free );
     if (!output.get()) {
         log_error(_("failed to allocate audio buffer."));
         outputSize = 0;
         return NULL;
     }
 
-    boost::int16_t* outPtr = output.get();
+    std::int16_t* outPtr = output.get();
 
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
@@ -571,7 +571,7 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
         int resampledFrameSize = expectedMaxOutSamples*2*2;
 
         // Allocate just the required amount of bytes
-        boost::uint8_t* resampledOutput = new boost::uint8_t[resampledFrameSize]; 
+        std::uint8_t* resampledOutput = new std::uint8_t[resampledFrameSize];
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
         log_debug(" decodeFrame | Calling the resampler, resampleFactor: %d | "
@@ -588,7 +588,7 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
             &resampledOutput); // output
 
         // make sure to set outPtr *after* we use it as input to the resampler
-        outPtr = reinterpret_cast<boost::int16_t*>(resampledOutput);
+        outPtr = reinterpret_cast<std::int16_t*>(resampledOutput);
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
         log_debug("resampler returned %d samples ", outSamples);
@@ -618,9 +618,9 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 
     }
     else {
-        boost::uint8_t* newOutput = new boost::uint8_t[outSize];
+        std::uint8_t* newOutput = new std::uint8_t[outSize];
         std::memcpy(newOutput, outPtr, outSize);
-        outPtr = reinterpret_cast<boost::int16_t*>(newOutput);
+        outPtr = reinterpret_cast<std::int16_t*>(newOutput);
     }
 
     outputSize = outSize;
@@ -628,9 +628,9 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 }
 
 int
-AudioDecoderFfmpeg::parseInput(const boost::uint8_t* input,
-        boost::uint32_t inputSize,
-        boost::uint8_t const ** outFrame, int* outFrameSize)
+AudioDecoderFfmpeg::parseInput(const std::uint8_t* input,
+        std::uint32_t inputSize,
+        std::uint8_t const ** outFrame, int* outFrameSize)
 {
     if ( _needsParsing )
     {
@@ -641,7 +641,7 @@ AudioDecoderFfmpeg::parseInput(const boost::uint8_t* input,
 #endif
                     // as of 2008-10-28 SVN, ffmpeg doesn't
                     // accept a pointer to pointer to const..
-                    const_cast<boost::uint8_t**>(outFrame),
+                    const_cast<std::uint8_t**>(outFrame),
                     outFrameSize,
                     input, inputSize,
 #if LIBAVCODEC_VERSION_MAJOR >= 53

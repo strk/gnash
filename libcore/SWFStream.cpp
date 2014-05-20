@@ -117,7 +117,7 @@ unsigned SWFStream::read_uint(unsigned short bitcount)
     {
         typedef unsigned char byte;
 
-        boost::uint32_t value = 0;
+        std::uint32_t value = 0;
 
         if (m_unused_bits) // Consume all the unused bits.
         {
@@ -192,11 +192,11 @@ SWFStream::read_sint(unsigned short bitcount)
 {
     assert(bitcount > 0);
 
-    boost::int32_t value = boost::int32_t(read_uint(bitcount));
+    std::int32_t value = std::int32_t(read_uint(bitcount));
 
     // Sign extend...
     if (value & (1 << (bitcount - 1))) {
-        value |= static_cast<boost::uint32_t>(-1) << bitcount;
+        value |= static_cast<std::uint32_t>(-1) << bitcount;
     }
 
 //        IF_DEBUG(log_debug("SWFStream::read_sint(%d) == %d\n", bitcount, value)));
@@ -246,16 +246,16 @@ convert_float_little(const void *p)
     // Hairy union for endian detection and munging
     union {
         float    f;
-        boost::uint32_t i;
+        std::uint32_t i;
         struct {    // for endian detection
-            boost::uint16_t s0;
-            boost::uint16_t s1;
+            std::uint16_t s0;
+            std::uint16_t s1;
         } s;
         struct {    // for byte-swapping
-            boost::uint8_t c0;
-            boost::uint8_t c1;
-            boost::uint8_t c2;
-            boost::uint8_t c3;
+            std::uint8_t c0;
+            std::uint8_t c1;
+            std::uint8_t c2;
+            std::uint8_t c3;
         } c;
     } u;
 
@@ -266,7 +266,7 @@ convert_float_little(const void *p)
         break;
     case 0x3f80:    // big-endian host
         {
-        const boost::uint8_t *cp = (const boost::uint8_t *) p;
+        const std::uint8_t *cp = (const std::uint8_t *) p;
         u.c.c0 = cp[3];
         u.c.c1 = cp[2];
         u.c.c2 = cp[1];
@@ -316,20 +316,20 @@ double SWFStream::read_d64()
 
 }
 
-boost::uint8_t    SWFStream::read_u8()
+std::uint8_t    SWFStream::read_u8()
 {
     align();
     return m_input->read_byte();
 }
 
-boost::int8_t
+std::int8_t
 SWFStream::read_s8()
 {
     // read_u8 will align
     return read_u8();
 }
 
-boost::uint16_t SWFStream::read_u16()
+std::uint16_t SWFStream::read_u16()
 {
 #ifdef USE_TU_FILE_BYTESWAPPING 
     align();
@@ -345,26 +345,26 @@ boost::uint16_t SWFStream::read_u16()
         throw ParserException(_("Unexpected end of stream while reading"));
     }
     
-    boost::uint32_t result = buf[0];
+    std::uint32_t result = buf[0];
     result |= (buf[1] << 8);
 
     return result;
 #endif
 }
 
-boost::int16_t SWFStream::read_s16()
+std::int16_t SWFStream::read_s16()
 {
     // read_u16 will align
     return read_u16();
 }
 
-boost::uint32_t    SWFStream::read_u32()
+std::uint32_t    SWFStream::read_u32()
 {
 #ifdef USE_TU_FILE_BYTESWAPPING 
     align();
     return m_input->read_le32();
 #else
-    using boost::uint32_t;
+    using std::uint32_t;
 
     const unsigned short dataLength = 4;
 
@@ -385,7 +385,7 @@ boost::uint32_t    SWFStream::read_u32()
 #endif
 }
 
-boost::int32_t    SWFStream::read_s32()
+std::int32_t    SWFStream::read_s32()
 {
     // read_u32 will align
     return read_u32();

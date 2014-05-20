@@ -36,7 +36,7 @@
 #include <fstream>
 #include <cstring>
 #include <vector>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #ifdef HAVE_POLL
 # include <sys/poll.h>
@@ -193,7 +193,7 @@ test_que()
     Handler que;
 
     std::shared_ptr<amf::Buffer> buf(new Buffer);
-//     boost::uint8_t *test = new uint8_t[6];
+//     std::uint8_t *test = new uint8_t[6];
 //     memcpy(test, "hell", 4);
 
     // Push one buffer on the fifo. The default is the incoming fifo,
@@ -235,7 +235,7 @@ test_que()
     }
 
     // populate the buffer
-    boost::uint8_t *ptr = buf->reference();
+    std::uint8_t *ptr = buf->reference();
     for (size_t i=1; i< buf->size(); i++) {
         ptr[i] = i;
     }

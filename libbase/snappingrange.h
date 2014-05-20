@@ -26,7 +26,7 @@
 #include <iterator>
 #include <algorithm>
 #include <ostream>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 namespace gnash {
 
@@ -652,7 +652,7 @@ inline bool snaptest(const geometry::Range2d<T>& range1,
 } // namespace geometry
 
 /// Standard snapping 2d ranges type for invalidated bounds calculation    
-typedef geometry::SnappingRanges2d<boost::int32_t> InvalidatedRanges;
+typedef geometry::SnappingRanges2d<std::int32_t> InvalidatedRanges;
 
 } //namespace gnash
 

@@ -42,7 +42,7 @@ public:
     //
     /// Only Function2 functions require local registers; for all others
     /// the value should be 0.
-    virtual boost::uint8_t registers() const = 0;
+    virtual std::uint8_t registers() const = 0;
 
 protected:
 

@@ -52,7 +52,7 @@ DefineShapeTag::loader(SWFStream& in, TagType tag, movie_definition& m,
            tag == DEFINESHAPE4_);
 
     in.ensureBytes(2);
-    const boost::uint16_t id = in.read_u16();
+    const std::uint16_t id = in.read_u16();
 
     IF_VERBOSE_PARSE(
         log_parse(_("DefineShapeTag(%s): id = %d"), tag, id);
@@ -70,7 +70,7 @@ DefineShapeTag::createDisplayObject(Global_as& gl, DisplayObject* parent) const
 }
     
 bool
-DefineShapeTag::pointTestLocal(boost::int32_t x, boost::int32_t y, 
+DefineShapeTag::pointTestLocal(std::int32_t x, std::int32_t y,
      const SWFMatrix& wm) const
 {
     return _shape.pointTest(x, y, wm);
@@ -78,7 +78,7 @@ DefineShapeTag::pointTestLocal(boost::int32_t x, boost::int32_t y,
 
 
 DefineShapeTag::DefineShapeTag(SWFStream& in, TagType tag,
-        movie_definition& m, const RunResources& r, boost::uint16_t id)
+        movie_definition& m, const RunResources& r, std::uint16_t id)
     :
     DefinitionTag(id),
     _shape(in, tag, m, r)

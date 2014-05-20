@@ -108,7 +108,7 @@ sprite_definition::get_labeled_frame(const std::string& label,
 }
 
 sprite_definition::sprite_definition(movie_definition& m, SWFStream& in, 
-        const RunResources& runResources, boost::uint16_t id)
+        const RunResources& runResources, std::uint16_t id)
 	:
     movie_definition(id),
 	m_movie_def(m),

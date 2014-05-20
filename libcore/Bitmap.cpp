@@ -105,7 +105,7 @@ Bitmap::construct(as_object* /*init*/)
 }
 
 bool
-Bitmap::pointInShape(boost::int32_t  x, boost::int32_t  y) const
+Bitmap::pointInShape(std::int32_t  x, std::int32_t  y) const
 {
     return pointInBounds(x, y);
 }

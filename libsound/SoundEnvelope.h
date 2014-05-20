@@ -20,7 +20,7 @@
 #ifndef SOUND_SOUNDENVELOPE_H
 #define SOUND_SOUNDENVELOPE_H
 
-#include <boost/cstdint.hpp> // For C99 int types
+#include <cstdint> // For C99 int types
 #include <vector> // for SoundEnvelopes typedef
 
 
@@ -47,13 +47,13 @@ public:
     /// with a sample rate of 5.5K is given as position 8 in
     /// the envelope. 
     ///
-    boost::uint32_t m_mark44;
+    std::uint32_t m_mark44;
 
     /// Volume for the left channel (0..32768)
-    boost::uint16_t m_level0;
+    std::uint16_t m_level0;
 
     /// Volume for the right channel (0..32768)
-    boost::uint16_t m_level1;
+    std::uint16_t m_level1;
 };
 
 /// A vector of SoundEnvelope objects

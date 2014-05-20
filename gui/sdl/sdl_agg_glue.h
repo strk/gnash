@@ -20,7 +20,7 @@
 
 #include <vector>
 #include <SDL.h>
-#include <boost/cstdint.hpp> // for boost::?int??_t 
+#include <cstdint> // for boost::?int??_t
 
 namespace gnash
 {
@@ -34,8 +34,8 @@ class SdlAggGlue : public SdlGlue
     bool init(int argc, char **argv[]);
     Renderer* createRenderHandler(int depth);
     void setInvalidatedRegions(const InvalidatedRanges& ranges);
-    bool prepDrawingArea(int width, int height, boost::uint32_t sdl_flags);
-    boost::uint32_t maskFlags(boost::uint32_t sdl_flags);
+    bool prepDrawingArea(int width, int height, std::uint32_t sdl_flags);
+    std::uint32_t maskFlags(std::uint32_t sdl_flags);
     void render();
     void render(int minx, int miny, int maxx, int maxy);
   private:

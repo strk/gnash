@@ -70,7 +70,7 @@ Proc::getDefaultInstance()
 
 
 bool
-Proc::startCGI(const string &filespec, boost::uint16_t port)
+Proc::startCGI(const string &filespec, std::uint16_t port)
 {
 //    GNASH_REPORT_FUNCTION;
     return startCGI(filespec, false, port);
@@ -91,7 +91,7 @@ Proc::startCGI(const string &filespec, bool outflag)
 }
 
 bool
-Proc::startCGI(const string &filespec, bool outflag, boost::uint16_t port)
+Proc::startCGI(const string &filespec, bool outflag, std::uint16_t port)
 {
 //    GNASH_REPORT_FUNCTION;
     struct stat procstats;
@@ -236,7 +236,7 @@ Proc::getOutput(const string &filespec)
 }
 
 bool
-Proc::connectCGI (const string &host, boost::uint16_t port)
+Proc::connectCGI (const string &host, std::uint16_t port)
 {
 //    GNASH_REPORT_FUNCTION;
     return createClient(host, port);

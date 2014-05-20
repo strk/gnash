@@ -476,10 +476,10 @@ Gui::notifyMouseMove(int ux, int uy)
     if ( _stopped ) return;
     
     // A stage pseudopixel is user pixel / _xscale wide
-    boost::int32_t x = (ux-_xoffset) / _xscale;
+    std::int32_t x = (ux-_xoffset) / _xscale;
     
     // A stage pseudopixel is user pixel / _xscale high
-    boost::int32_t y = (uy-_yoffset) / _yscale;
+    std::int32_t y = (uy-_yoffset) / _yscale;
     
 #ifdef DEBUG_MOUSE_COORDINATES
     log_debug("mouse @ %d,%d", x, y);
@@ -1176,11 +1176,11 @@ Gui::fpsCounterTick()
       return;
   }
 
-  boost::uint64_t current_timer = clocktime::getTicks();
+  std::uint64_t current_timer = clocktime::getTicks();
 
   // TODO: keep fps_timer_interval in milliseconds to avoid the multiplication
   //       at each fpsCounterTick call...
-  boost::uint64_t interval_ms = (boost::uint64_t)(fps_timer_interval * 1000.0);
+  std::uint64_t interval_ms = (std::uint64_t)(fps_timer_interval * 1000.0);
 
   if (fps_counter_total==1) {
     fps_timer = current_timer;

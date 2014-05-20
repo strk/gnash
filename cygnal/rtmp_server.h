@@ -20,7 +20,7 @@
 #define _RTMP_SERVER_H_
 
 #include <vector>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/array.hpp>
 #include <string>
 #include <map>
@@ -68,24 +68,24 @@ public:
     std::shared_ptr<cygnal::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double &transid, double &clientid);
 
     // Encode a Ping for the client
-    std::shared_ptr<cygnal::Buffer> encodePing(rtmp_ping_e type, boost::uint32_t milliseconds);
+    std::shared_ptr<cygnal::Buffer> encodePing(rtmp_ping_e type, std::uint32_t milliseconds);
     std::shared_ptr<cygnal::Buffer> encodePing(rtmp_ping_e type);
-    // std::shared_ptr<cygnal::Buffer> encodeUser(user_control_e type, boost::uint32_t milliseconds);
-    std::shared_ptr<cygnal::Buffer> encodeAudio(boost::uint8_t *data, size_t size);
-    std::shared_ptr<cygnal::Buffer> encodeVideo(boost::uint8_t *data, size_t size);
+    // std::shared_ptr<cygnal::Buffer> encodeUser(user_control_e type, std::uint32_t milliseconds);
+    std::shared_ptr<cygnal::Buffer> encodeAudio(std::uint8_t *data, size_t size);
+    std::shared_ptr<cygnal::Buffer> encodeVideo(std::uint8_t *data, size_t size);
 
     // Encode a onBWDone message for the client
     std::shared_ptr<cygnal::Buffer> encodeBWDone(double id);
 
     // Parse an Echo Request message coming from the Red5 echo_test.
     std::vector<std::shared_ptr<cygnal::Element > > parseEchoRequest(cygnal::Buffer &buf) { return parseEchoRequest(buf.reference(), buf.size()); };
-    std::vector<std::shared_ptr<cygnal::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
+    std::vector<std::shared_ptr<cygnal::Element > > parseEchoRequest(std::uint8_t *buf, size_t size);
     // format a response to the 'echo' test used for testing Gnash.
     std::shared_ptr<cygnal::Buffer> formatEchoResponse(double num, cygnal::Element &el);
     std::shared_ptr<cygnal::Buffer> formatEchoResponse(double num, cygnal::Buffer &data);
-    std::shared_ptr<cygnal::Buffer> formatEchoResponse(double num, boost::uint8_t *data, size_t size);
-    void addReference(boost::uint16_t index, cygnal::Element &el) { _references[index] = el; };
-    cygnal::Element &getReference(boost::uint16_t index) { return _references[index]; };
+    std::shared_ptr<cygnal::Buffer> formatEchoResponse(double num, std::uint8_t *data, size_t size);
+    void addReference(std::uint16_t index, cygnal::Element &el) { _references[index] = el; };
+    cygnal::Element &getReference(std::uint16_t index) { return _references[index]; };
 
     bool sendFile(int fd, const std::string &filespec);
 
@@ -102,7 +102,7 @@ public:
     void setStreamID(double id) { _streamid = id; };
     double getStreamID() { return _streamid; };
 
-    size_t sendToClient(std::vector<int> &fds, boost::uint8_t *data,
+    size_t sendToClient(std::vector<int> &fds, std::uint8_t *data,
 			size_t size);
     size_t sendToClient(std::vector<int> &fds,cygnal::Buffer &data);
 
@@ -132,8 +132,8 @@ private:
     gnash::DiskStream::filetype_e  _filetype;
     std::string		_docroot;
     std::string		_filespec;
-    boost::uint32_t     _filesize;
-    std::map<boost::uint16_t, cygnal::Element> _references;
+    std::uint32_t     _filesize;
+    std::map<std::uint16_t, cygnal::Element> _references;
 #ifdef CLIENT_ID_NUMERIC
     std::array<double>	_clientids;
 #else

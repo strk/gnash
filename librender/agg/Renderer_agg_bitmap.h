@@ -21,7 +21,7 @@
 
 #include <memory>
 #include <memory>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include "GnashImage.h"
 #include "CachedBitmap.h"
@@ -56,7 +56,7 @@ public:
     int get_height() const { return _image->height();  }  
     int get_bpp() const { return _bpp; }  
     int get_rowlen() const { return _image->stride(); }  
-    boost::uint8_t* get_data() const { return _image->begin(); }
+    std::uint8_t* get_data() const { return _image->begin(); }
     
 private:
   

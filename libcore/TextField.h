@@ -128,7 +128,7 @@ public:
 	//
 	/// @param x x-coordinate
 	/// @param y y-coordinate
-	InteractiveObject* topmostMouseEntity(boost::int32_t x, boost::int32_t y);
+	InteractiveObject* topmostMouseEntity(std::int32_t x, std::int32_t y);
 
     /// Return the version of the SWF this was parsed from.
     //
@@ -219,7 +219,7 @@ public:
 	}
 
 	// See dox in DisplayObject.h
-	bool pointInShape(boost::int32_t x, boost::int32_t y) const;
+	bool pointInShape(std::int32_t x, std::int32_t y) const;
 
 	/// Return true if the 'background' should be drawn
 	bool getDrawBackground() const;
@@ -277,7 +277,7 @@ public:
 	}
 
     /// Get the current maxChars setting of the TextField
-    boost::int32_t maxChars() const {
+    std::int32_t maxChars() const {
         return _maxChars;
     }
 
@@ -285,7 +285,7 @@ public:
 	//
 	/// @param max The maximum number of characters that can be
 	/// 	input by the user (Does not restrict Scripts)
-    void maxChars(boost::int32_t max) {
+    void maxChars(std::int32_t max) {
         _maxChars = max;
     }
 
@@ -446,40 +446,40 @@ public:
 	const Font* getFont() { return _font.get(); }
 
 	
-	boost::uint16_t getFontHeight() const
+	std::uint16_t getFontHeight() const
 	{
 		return _fontHeight;
 	}
 
-	void setFontHeight(boost::uint16_t h);
+	void setFontHeight(std::uint16_t h);
 
-	boost::uint16_t getLeftMargin() const
+	std::uint16_t getLeftMargin() const
 	{
 		return _leftMargin;
 	}
 
-	void setLeftMargin(boost::uint16_t h);
+	void setLeftMargin(std::uint16_t h);
 
-	boost::uint16_t getRightMargin() const
+	std::uint16_t getRightMargin() const
 	{
 		return _rightMargin;
 	}
 
-	void setRightMargin(boost::uint16_t h);
+	void setRightMargin(std::uint16_t h);
 
-	boost::uint16_t getIndent() const
+	std::uint16_t getIndent() const
 	{
 		return _indent;
 	}
 
-	void setIndent(boost::uint16_t h);
+	void setIndent(std::uint16_t h);
 
-	boost::uint16_t getBlockIndent() const
+	std::uint16_t getBlockIndent() const
 	{
 		return _blockIndent;
 	}
 
-	void setBlockIndent(boost::uint16_t h);
+	void setBlockIndent(std::uint16_t h);
 
 	TextAlignment getAlignment() const
 	{
@@ -488,12 +488,12 @@ public:
 
 	void setAlignment(TextAlignment h);
 
-	boost::int16_t getLeading() const
+	std::int16_t getLeading() const
 	{
 		return _leading;
 	}
 
-	void setLeading(boost::int16_t h);
+	void setLeading(std::int16_t h);
 
 	bool getUnderlined() const
 	{
@@ -608,7 +608,7 @@ private:
 
 	void updateHtmlText(const std::wstring& s);
 
-    void insertTab(SWF::TextRecord& rec, boost::int32_t& x, float scale);
+    void insertTab(SWF::TextRecord& rec, std::int32_t& x, float scale);
 
 	/// What happens when setFocus() is called on this TextField.
     //
@@ -623,7 +623,7 @@ private:
 	void onChanged();
 
 	/// Reset our text bounding box to the given point.
-	void reset_bounding_box(boost::int32_t x, boost::int32_t y)
+	void reset_bounding_box(std::int32_t x, std::int32_t y)
 	{
 		m_text_bounding_box.set_to_point(x, y);
 	}
@@ -637,14 +637,14 @@ private:
 	
 	/// Handles a new line, this will be called several times, so this
 	/// will hopefully make code cleaner
-	void newLine(boost::int32_t& x, boost::int32_t& y, 
+	void newLine(std::int32_t& x, std::int32_t& y,
 				 SWF::TextRecord& rec, int& last_space_glyph,
 				 LineStarts::value_type& last_line_start_record, float div);
 					
 	/// De-reference and do appropriate action for character iterator
 	void handleChar(std::wstring::const_iterator& it,
-            const std::wstring::const_iterator& e, boost::int32_t& x,
-            boost::int32_t& y, SWF::TextRecord& rec, int& last_code,
+            const std::wstring::const_iterator& e, std::int32_t& x,
+            std::int32_t& y, SWF::TextRecord& rec, int& last_code,
 		    int& last_space_glyph,
             LineStarts::value_type& last_line_start_record);
 	
@@ -782,18 +782,18 @@ private:
     /// never be less than the first.
     std::pair<size_t, size_t> _selection;
 
-    boost::int16_t _leading;
-	boost::uint16_t _indent;
+    std::int16_t _leading;
+	std::uint16_t _indent;
 
 	/// Indentation for every line (including the ones created by
 	/// effect of a word-wrap.
-	boost::uint16_t _blockIndent;
+	std::uint16_t _blockIndent;
 
-	boost::uint16_t _leftMargin;
+	std::uint16_t _leftMargin;
 
-	boost::uint16_t _rightMargin;
+	std::uint16_t _rightMargin;
 
-	boost::uint16_t _fontHeight;
+	std::uint16_t _fontHeight;
 
 	/// This flag will be true as soon as the TextField
 	/// is assigned a text value. Only way to be false is

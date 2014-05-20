@@ -18,7 +18,7 @@
 //
 
 #include <algorithm>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include "log.h"
 #include "VaapiSurface.h"
@@ -111,14 +111,14 @@ void VaapiSurface::clear()
     }
 
     // 0x10 is the black level for Y
-    boost::uint8_t *Y = background.getPlane(0);
+    std::uint8_t *Y = background.getPlane(0);
     unsigned int i, stride = background.getPitch(0);
     for (i = 0; i < background.height(); i++, Y += stride) {
         memset(Y, 0x10, stride);
     }
 
     // 0x80 is the black level for Cb and Cr
-    boost::uint8_t *UV = background.getPlane(1);
+    std::uint8_t *UV = background.getPlane(1);
     stride = background.getPitch(1);
     for (i = 0; i < background.height()/2; i++, UV += stride) {
         memset(UV, 0x80, stride);

@@ -89,15 +89,15 @@ namespace {
     // A time struct to contain the broken-down time.
     struct GnashTime
     {
-        boost::int32_t millisecond;
-        boost::int32_t second;
-        boost::int32_t minute;
-        boost::int32_t hour;
-        boost::int32_t monthday;
-        boost::int32_t weekday;
-        boost::int32_t month;
-        boost::int32_t year;
-        boost::int32_t timeZoneOffset;
+        std::int32_t millisecond;
+        std::int32_t second;
+        std::int32_t minute;
+        std::int32_t hour;
+        std::int32_t monthday;
+        std::int32_t weekday;
+        std::int32_t month;
+        std::int32_t year;
+        std::int32_t timeZoneOffset;
     };
 
     static const int daysInMonth[2][12] = {
@@ -281,15 +281,15 @@ namespace {
 
 // Helpers for calendar algorithms
 inline bool
-isLeapYear(boost::int32_t year)
+isLeapYear(std::int32_t year)
 {
     return !((year + 1900) % 400) ||
             ( !((year + 1900) % 4) && ((year + 1900) % 100));
 }
 
 
-inline boost::int32_t
-countLeapYears(boost::int32_t year)
+inline std::int32_t
+countLeapYears(std::int32_t year)
 {
     return year / 4 - year / 100 + year / 400;
 }
@@ -517,7 +517,7 @@ bool invalidDate(double timeValue)
 /// @param timeValue    The time value to break into elements.
 /// @param adjustment   Adjust the result by this amount (used for full year).
 template<typename T>
-inline as_value timeElement(T dateFunc, boost::int32_t GnashTime::* element,
+inline as_value timeElement(T dateFunc, std::int32_t GnashTime::* element,
         double timeValue, int adjustment = 0)
 {
     if (invalidDate(timeValue)) return as_value();
@@ -1269,7 +1269,7 @@ date_UTC(const fn_call& fn) {
         case 2:   // these last two are always performed
             gt.month = toInt(fn.arg(1), getVM(fn));
             {
-                boost::int32_t year = 0;
+                std::int32_t year = 0;
                 truncateDouble(year, toNumber(fn.arg(0), getVM(fn)));
                 if (year < 100) gt.year = year;
                 else gt.year = year - 1900;
@@ -1369,13 +1369,13 @@ makeTimeValue(GnashTime& t)
     // Now work out the years from 1970 in days.
 
     // Use a temporary 1970-based year for clarity.
-    const boost::int32_t ouryear = t.year - 70;
+    const std::int32_t ouryear = t.year - 70;
     
     // Count the leap years between 1970-1-1 and the beginning of our year.
     // 1970 - 1972: no leap years
     // 1970 - 1968: one leap year
     // Adding one less than the required year gives this behaviour.
-    boost::int32_t day = countLeapYears(ouryear + 1969) - countLeapYears(1970);
+    std::int32_t day = countLeapYears(ouryear + 1969) - countLeapYears(1970);
     day += ouryear * 365;
 
     /// The year 0 was a leap year, but countLeapYears won't calculate it.
@@ -1404,10 +1404,10 @@ makeTimeValue(GnashTime& t)
 // The brute force way of converting days into years since the epoch.
 // This also reduces the number of days accurately. Its disadvantage is,
 // of course, that it iterates; its advantage that it's always correct.
-boost::int32_t
-getYearBruteForce(boost::int32_t& days)
+std::int32_t
+getYearBruteForce(std::int32_t& days)
 {
-    boost::int32_t year = 1970;
+    std::int32_t year = 1970;
 
     // Handle 400-year blocks - which always have the same
     // number of days (14097) - to cut down on iterations.
@@ -1451,11 +1451,11 @@ fillGnashTime(double t, GnashTime& gt)
     // Get the sub-day part of the time, if any and reduce time
     // to number of complete days.
     // This is a safe cast.
-    boost::int32_t remainder = 
-        static_cast<boost::int32_t>(std::fmod(time, 86400.0));
+    std::int32_t remainder =
+        static_cast<std::int32_t>(std::fmod(time, 86400.0));
 
     // This could overflow.
-    boost::int32_t days;
+    std::int32_t days;
     truncateDouble(days, time / 86400.0); // complete days
    
     gt.second = remainder % 60;

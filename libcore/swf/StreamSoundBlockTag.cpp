@@ -20,7 +20,7 @@
 #include "StreamSoundBlockTag.h"
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include "utility.h"
 #include "sound_handler.h" 
@@ -82,8 +82,8 @@ StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 
     media::audioCodecType format = sinfo->getFormat();
 
-    boost::uint16_t sampleCount;
-    boost::int16_t seekSamples = 0;
+    std::uint16_t sampleCount;
+    std::int16_t seekSamples = 0;
 
     // MP3 format blocks have additional info
     if (format == media::AUDIO_CODEC_MP3) {

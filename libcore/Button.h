@@ -94,8 +94,8 @@ public:
     /// Return the topmost entity that the given point covers. NULL if none.
     //
     /// I.e. check against ourself.
-    virtual InteractiveObject* topmostMouseEntity(boost::int32_t x,
-            boost::int32_t y);
+    virtual InteractiveObject* topmostMouseEntity(std::int32_t x,
+            std::int32_t y);
     
     /// Called whenever a mouse event affects this Button.
     virtual void mouseEvent(const event_id& event);
@@ -108,7 +108,7 @@ public:
     virtual SWFRect getBounds() const;
     
     // See dox in DisplayObject.h
-    bool pointInShape(boost::int32_t x, boost::int32_t y) const;
+    bool pointInShape(std::int32_t x, std::int32_t y) const;
 
     bool isEnabled();
 

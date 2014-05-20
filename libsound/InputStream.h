@@ -21,7 +21,7 @@
 #ifndef SOUND_INPUTSTREAM_H
 #define SOUND_INPUTSTREAM_H
 
-#include <boost/cstdint.hpp> // For C99 int types
+#include <cstdint> // For C99 int types
 
 namespace gnash {
 namespace sound {
@@ -68,7 +68,7 @@ public:
     ///     if unable to process this and further requests due to internal
     ///     errors (not if it just happens to complete its source)
     ///
-    virtual unsigned int fetchSamples(boost::int16_t* to, unsigned int nSamples)=0;
+    virtual unsigned int fetchSamples(std::int16_t* to, unsigned int nSamples)=0;
 
     /// Return number of samples fetched from this stream
     //

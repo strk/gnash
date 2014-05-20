@@ -419,7 +419,7 @@ struct SamplesFetcher {
 
         //log_debug("SamplesFetcher::fetch(%d) fetching %d samples", ms, toFetch);
 
-        boost::int16_t samples[1024];
+        std::int16_t samples[1024];
         while (toFetch) {
             unsigned int n = std::min(toFetch, 1024u);
             _sh.fetchSamples(samples, n);

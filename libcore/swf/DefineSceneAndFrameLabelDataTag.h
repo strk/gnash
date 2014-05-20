@@ -77,22 +77,22 @@ private:
 
     void read(SWFStream& in) {
         
-        boost::uint32_t scenes = in.read_V32();
+        std::uint32_t scenes = in.read_V32();
 
         IF_VERBOSE_PARSE(log_parse("Scene count: %d", scenes));
 
         for (size_t i = 0; i < scenes; ++i) {
-            boost::uint32_t offset = in.read_V32();
+            std::uint32_t offset = in.read_V32();
             std::string name;
             in.read_string(name);
             IF_VERBOSE_PARSE(log_parse("Offset %d name: %s", offset, name));
             _scenes[offset] = name;
         }
 
-        boost::uint32_t labels = in.read_V32();
+        std::uint32_t labels = in.read_V32();
 
         for (size_t i = 0; i < labels; ++i) {
-            boost::uint32_t num = in.read_V32();
+            std::uint32_t num = in.read_V32();
             std::string label;
             in.read_string(label);
             IF_VERBOSE_PARSE(log_parse("Frame %d label: %s", num, label));
@@ -101,8 +101,8 @@ private:
 
     }
 
-    std::map<boost::uint32_t, std::string> _scenes;
-    std::map<boost::uint32_t, std::string> _frames;
+    std::map<std::uint32_t, std::string> _scenes;
+    std::map<std::uint32_t, std::string> _frames;
 
 };
 

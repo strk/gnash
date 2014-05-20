@@ -38,8 +38,8 @@ class SdlCairoGlue : public SdlGlue
     bool init(int argc, char **argv[]);
     Renderer* createRenderHandler( int depth);
     void setInvalidatedRegions(const InvalidatedRanges& ranges);
-    bool prepDrawingArea(int width, int height, boost::uint32_t sdl_flags);
-    boost::uint32_t maskFlags(boost::uint32_t sdl_flags);
+    bool prepDrawingArea(int width, int height, std::uint32_t sdl_flags);
+    std::uint32_t maskFlags(std::uint32_t sdl_flags);
     void render();
   private:
     cairo_surface_t *_cairo_surface;

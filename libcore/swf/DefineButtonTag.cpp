@@ -48,7 +48,7 @@ namespace {
 }
 
 DefineButtonTag::DefineButtonTag(SWFStream& in, movie_definition& m,
-        TagType tag, boost::uint16_t id)
+        TagType tag, std::uint16_t id)
     :
     DefinitionTag(id),
     _trackAsMenu(false),
@@ -78,7 +78,7 @@ DefineButtonTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 {
     assert(tag == DEFINEBUTTON);
     in.ensureBytes(2);
-    const boost::uint16_t id = in.read_u16();
+    const std::uint16_t id = in.read_u16();
 
     IF_VERBOSE_PARSE(
         log_parse(_("  DefineButton loader: character id = %d"), id);
@@ -95,7 +95,7 @@ DefineButton2Tag::loader(SWFStream& in, TagType tag, movie_definition& m,
 {
     assert(tag == DEFINEBUTTON2);
     in.ensureBytes(2);
-    const boost::uint16_t id = in.read_u16();
+    const std::uint16_t id = in.read_u16();
 
     IF_VERBOSE_PARSE(
         log_parse(_("  DefineButton2 loader: chararacter id = %d"), id);
@@ -151,7 +151,7 @@ DefineButtonTag::readDefineButton2Tag(SWFStream& in, movie_definition& m)
 
     // Read the menu flag
     // (this is a single bit, the first 7 bits are reserved)
-    const boost::uint8_t flags = in.read_u8();
+    const std::uint8_t flags = in.read_u8();
     _trackAsMenu = flags & (1 << 0);
     if (_trackAsMenu) {
         LOG_ONCE(log_unimpl("DefineButton2: trackAsMenu"));
@@ -362,7 +362,7 @@ ButtonRecord::read(SWFStream& in, TagType t,
     }
 
     in.ensureBytes(1);
-    boost::uint8_t flags = in.read_u8();
+    std::uint8_t flags = in.read_u8();
     if (!flags) return false;
 
     // Upper 4 bits are:
@@ -382,7 +382,7 @@ ButtonRecord::read(SWFStream& in, TagType t,
         return false;
     }
     in.ensureBytes(2);
-    const boost::uint16_t id = in.read_u16();
+    const std::uint16_t id = in.read_u16();
 
     // Get DisplayObject definition now (safer)
     _definitionTag = m.getDefinitionTag(id);

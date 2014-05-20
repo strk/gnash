@@ -125,7 +125,7 @@ bevelfilter_highlightColor(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_highlightColor );
     }
-    boost::uint32_t sp_highlightColor = toNumber(fn.arg(0), getVM(fn));
+    std::uint32_t sp_highlightColor = toNumber(fn.arg(0), getVM(fn));
     ptr->m_highlightColor = sp_highlightColor;
     return as_value();
 }
@@ -137,7 +137,7 @@ bevelfilter_highlightAlpha(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_highlightAlpha );
     }
-    boost::uint8_t sp_highlightAlpha = toNumber(fn.arg(0), getVM(fn));
+    std::uint8_t sp_highlightAlpha = toNumber(fn.arg(0), getVM(fn));
     ptr->m_highlightAlpha = sp_highlightAlpha;
     return as_value();
 }
@@ -149,7 +149,7 @@ bevelfilter_shadowColor(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_shadowColor );
     }
-    boost::uint32_t sp_shadowColor = toNumber(fn.arg(0), getVM(fn));
+    std::uint32_t sp_shadowColor = toNumber(fn.arg(0), getVM(fn));
     ptr->m_shadowColor = sp_shadowColor;
     return as_value();
 }
@@ -161,7 +161,7 @@ bevelfilter_shadowAlpha(const fn_call& fn)
     if (fn.nargs == 0) {
         return as_value(ptr->m_shadowAlpha );
     }
-    boost::uint8_t sp_shadowAlpha = toNumber(fn.arg(0), getVM(fn));
+    std::uint8_t sp_shadowAlpha = toNumber(fn.arg(0), getVM(fn));
     ptr->m_shadowAlpha = sp_shadowAlpha;
     return as_value();
 }
@@ -209,7 +209,7 @@ bevelfilter_quality(const fn_call& fn)
     if (fn.nargs == 0) {
 		return as_value(ptr->m_quality );
     }
-    boost::uint8_t sp_quality = toNumber(fn.arg(0), getVM(fn));
+    std::uint8_t sp_quality = toNumber(fn.arg(0), getVM(fn));
     ptr->m_quality = sp_quality;
     return as_value();
 }

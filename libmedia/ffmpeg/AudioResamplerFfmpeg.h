@@ -25,7 +25,7 @@
 
 #include "ffmpegHeaders.h"
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 namespace gnash {
 namespace media {
@@ -67,8 +67,8 @@ public:
 	///
 	/// @return the number of samples in the output data.
 	///
-	DSOEXPORT int resample(boost::uint8_t** input, int plane_size,
-		int samples, boost::uint8_t** output);
+	DSOEXPORT int resample(std::uint8_t** input, int plane_size,
+		int samples, std::uint8_t** output);
 
 private:
     // The container of the resample format information.

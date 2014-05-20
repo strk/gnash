@@ -67,7 +67,7 @@ SdlOglGlue::setInvalidatedRegions(const InvalidatedRanges& /*ranges*/)
 }
 
 bool
-SdlOglGlue::prepDrawingArea(int width, int height, boost::uint32_t sdl_flags)
+SdlOglGlue::prepDrawingArea(int width, int height, std::uint32_t sdl_flags)
 {
     if (_bpp == 16) {
       // 16-bit color, surface creation is likely to succeed.

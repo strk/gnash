@@ -146,8 +146,8 @@ LineStyle::read(SWFStream& in, SWF::TagType t, movie_definition& md,
             in.ensureBytes(2+2);
             m_width = in.read_u16();
 
-            const boost::uint8_t flags1 = in.read_u8();
-            const boost::uint8_t flags2 = in.read_u8();
+            const std::uint8_t flags1 = in.read_u8();
+            const std::uint8_t flags2 = in.read_u8();
 
             _startCapStyle = (CapStyle)((flags1 & 0xC0) >> 6);
             _joinStyle = (JoinStyle)((flags1 & 0x30) >> 4);
@@ -178,7 +178,7 @@ LineStyle::read(SWFStream& in, SWF::TagType t, movie_definition& md,
 void
 LineStyle::set_lerp(const LineStyle& ls1, const LineStyle& ls2, float ratio)
 {
-    m_width = static_cast<boost::uint16_t>(
+    m_width = static_cast<std::uint16_t>(
         frnd(lerp<float>(ls1.getThickness(), ls2.getThickness(), ratio)));
     m_color = lerp(ls1.get_color(), ls2.get_color(), ratio);
     if ( ls1._scaleVertically != ls2._scaleVertically )

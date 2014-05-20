@@ -25,7 +25,7 @@
 
 #include <string>
 #include <boost/array.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <sstream>
 
 #ifdef HAVE_OPENSSL_SSL_H
@@ -57,12 +57,12 @@ public:
 
     // Read bytes from the already opened SSL connection
     int sslRead(cygnal::Buffer &buf);
-    int sslRead(boost::uint8_t *buf, size_t length);
+    int sslRead(std::uint8_t *buf, size_t length);
     int sslRead(std::string &buf);
 
     // Write bytes to the already opened SSL connection
     int sslWrite(cygnal::Buffer &buf);
-    int sslWrite(const boost::uint8_t *buf, size_t length);
+    int sslWrite(const std::uint8_t *buf, size_t length);
     int sslWrite(std::string &buf);
 
     // Setup the Context for this connection

@@ -51,20 +51,20 @@ AudioDecoderHaiku::~AudioDecoderHaiku()
     QQ(2);
 }
 
-boost::uint8_t*
-AudioDecoderHaiku::decode(const boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes)
+std::uint8_t*
+AudioDecoderHaiku::decode(const std::uint8_t* input, std::uint32_t inputSize, std::uint32_t& outputSize, std::uint32_t& decodedBytes)
 {
     (void) input;
     (void) parse;
-    boost::uint8_t *t;
+    std::uint8_t *t;
     outputSize = 2048;
     decodedBytes = inputSize;
-    t = new boost::uint8_t[outputSize];
+    t = new std::uint8_t[outputSize];
 
-    boost::uint16_t *data =
-        reinterpret_cast<boost::uint16_t*>(t);
+    std::uint16_t *data =
+        reinterpret_cast<std::uint16_t*>(t);
 
-    for (size_t i = 0; i < outputSize / sizeof(boost::uint16_t); ++i)
+    for (size_t i = 0; i < outputSize / sizeof(std::uint16_t); ++i)
     {
         data[i] = 1000 * sin(i/10.);
     }
@@ -73,8 +73,8 @@ AudioDecoderHaiku::decode(const boost::uint8_t* input, boost::uint32_t inputSize
     return t;
 }
 
-boost::uint8_t*
-AudioDecoderHaiku::decode(const EncodedAudioFrame& af, boost::uint32_t& outputSize)
+std::uint8_t*
+AudioDecoderHaiku::decode(const EncodedAudioFrame& af, std::uint32_t& outputSize)
 {
     QQ(2);
     return NULL;

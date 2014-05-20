@@ -58,7 +58,7 @@ MediaParser::startParserThread()
 #endif
 }
 
-boost::uint64_t
+std::uint64_t
 MediaParser::getBufferLength() const
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
@@ -84,7 +84,7 @@ MediaParser::getId3Info() const
     return boost::optional<Id3Info>();
 }
 
-boost::uint64_t
+std::uint64_t
 MediaParser::getBufferLengthNoLock() const
 {
 	bool hasVideo = _videoInfo.get();
@@ -103,7 +103,7 @@ MediaParser::getBufferLengthNoLock() const
     return 0;
 }
 
-boost::uint64_t
+std::uint64_t
 MediaParser::videoBufferLength() const
 {
 	if (_videoFrames.empty()) return 0;
@@ -115,7 +115,7 @@ MediaParser::videoBufferLength() const
 	return _videoFrames.back()->timestamp() - _videoFrames.front()->timestamp(); 
 }
 
-boost::uint64_t
+std::uint64_t
 MediaParser::audioBufferLength() const
 {
 	if (_audioFrames.empty()) return 0;
@@ -145,7 +145,7 @@ MediaParser::peekNextVideoFrame() const
 }
 
 bool
-MediaParser::nextFrameTimestamp(boost::uint64_t& ts) const
+MediaParser::nextFrameTimestamp(std::uint64_t& ts) const
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
     boost::mutex::scoped_lock lock(_qMutex);
@@ -185,7 +185,7 @@ MediaParser::nextFrameTimestamp(boost::uint64_t& ts) const
 }
 
 bool
-MediaParser::nextVideoFrameTimestamp(boost::uint64_t& ts) const
+MediaParser::nextVideoFrameTimestamp(std::uint64_t& ts) const
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	boost::mutex::scoped_lock lock(_qMutex);
@@ -243,7 +243,7 @@ MediaParser::nextAudioFrame()
 }
 
 bool
-MediaParser::nextAudioFrameTimestamp(boost::uint64_t& ts) const
+MediaParser::nextAudioFrameTimestamp(std::uint64_t& ts) const
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	boost::mutex::scoped_lock lock(_qMutex);
@@ -424,8 +424,8 @@ bool
 MediaParser::bufferFull() const
 {
 	// Callers are expected to hold a lock on _qMutex
-	boost::uint64_t bl = getBufferLengthNoLock();
-	boost::uint64_t bt = getBufferTime();
+	std::uint64_t bl = getBufferLengthNoLock();
+	std::uint64_t bt = getBufferTime();
 #ifdef GNASH_DEBUG_MEDIAPARSER
 	log_debug("MediaParser::bufferFull: %d/%d", bl, bt);
 #endif // GNASH_DEBUG_MEDIAPARSER
@@ -452,7 +452,7 @@ MediaParser::parserLoop()
 
 
 void
-MediaParser::fetchMetaTags(OrderedMetaTags& /*tags*/, boost::uint64_t /*ts*/)
+MediaParser::fetchMetaTags(OrderedMetaTags& /*tags*/, std::uint64_t /*ts*/)
 {
 }
 

@@ -48,7 +48,7 @@ MediaParserHaiku::~MediaParserHaiku()
 }
 
 bool
-MediaParserHaiku::seek(boost::uint32_t&)
+MediaParserHaiku::seek(std::uint32_t&)
 {
     QQ(2);
 }
@@ -59,7 +59,7 @@ MediaParserHaiku::parseNextChunk()
     QQ(2);
 }
 
-boost::uint64_t
+std::uint64_t
 MediaParserHaiku::getBytesLoaded() const
 {
     QQ(2);

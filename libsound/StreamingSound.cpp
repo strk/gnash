@@ -77,21 +77,21 @@ StreamingSound::decodeNextBlock()
 
     // If we didn't decode all of a block, do so now. Not sure if this
     // can happen.
-    const boost::uint32_t inputSize = block.size() - _positionInBlock; 
+    const std::uint32_t inputSize = block.size() - _positionInBlock;
 
-    boost::uint32_t consumed = 0;
+    std::uint32_t consumed = 0;
 
     // Empty blocks serve to synchronize, so don't decode but carry on.
     if (inputSize) {
-        boost::uint32_t decodedDataSize = 0;
-        const boost::uint8_t* input = block.data() + _positionInBlock;
-        boost::uint8_t* decodedData = decoder().decode(input, inputSize,
+        std::uint32_t decodedDataSize = 0;
+        const std::uint8_t* input = block.data() + _positionInBlock;
+        std::uint8_t* decodedData = decoder().decode(input, inputSize,
                 decodedDataSize, consumed);
 
         assert(!(decodedDataSize % 2));
 
-        boost::int16_t* samples = 
-            reinterpret_cast<boost::int16_t*>(decodedData);
+        std::int16_t* samples =
+            reinterpret_cast<std::int16_t*>(decodedData);
         unsigned int nSamples = decodedDataSize / 2;
 
         if (_soundDef.volume != 100) {

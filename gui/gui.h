@@ -546,10 +546,10 @@ private:
     float _yscale;
 
     /// Window pixel X offset of stage origin
-    boost::int32_t _xoffset;
+    std::int32_t _xoffset;
 
     /// Window pixel Y offset of stage origin
-    boost::int32_t _yoffset;
+    std::int32_t _yoffset;
 
     bool display(movie_root* m);
     
@@ -562,7 +562,7 @@ private:
     // the number of calls to movie_advance()
     unsigned int fps_counter_total;
 
-    boost::uint64_t fps_timer, fps_start_timer;     
+    std::uint64_t fps_timer, fps_start_timer;
 
     ///	The time, in seconds, between prints (which also resets the fps counter).
     //

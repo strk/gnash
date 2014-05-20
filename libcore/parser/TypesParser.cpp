@@ -53,11 +53,11 @@ readSWFMatrix(SWFStream& in)
     in.ensureBits(1);
     const bool has_scale = in.read_bit(); 
 
-    boost::int32_t sx = 65536;
-    boost::int32_t sy = 65536;
+    std::int32_t sx = 65536;
+    std::int32_t sy = 65536;
     if (has_scale) {
         in.ensureBits(5);
-        const boost::uint8_t scale_nbits = in.read_uint(5);
+        const std::uint8_t scale_nbits = in.read_uint(5);
         if (scale_nbits) {
             in.ensureBits(scale_nbits * 2);
             sx = in.read_sint(scale_nbits);
@@ -67,8 +67,8 @@ readSWFMatrix(SWFStream& in)
 
     in.ensureBits(1);
     const bool has_rotate = in.read_bit();
-    boost::int32_t shx = 0;
-    boost::int32_t shy = 0;
+    std::int32_t shx = 0;
+    std::int32_t shy = 0;
     if (has_rotate) {
         in.ensureBits(5);
         unsigned int rotate_nbits = in.read_uint(5);
@@ -80,9 +80,9 @@ readSWFMatrix(SWFStream& in)
     }
 
     in.ensureBits(5);
-    const boost::uint8_t translate_nbits = in.read_uint(5);
-    boost::int32_t tx = 0;
-    boost::int32_t ty = 0;
+    const std::uint8_t translate_nbits = in.read_uint(5);
+    std::int32_t tx = 0;
+    std::int32_t ty = 0;
     if (translate_nbits) {
         in.ensureBits(translate_nbits * 2);
         tx = in.read_sint(translate_nbits);
@@ -95,10 +95,10 @@ rgba
 readRGBA(SWFStream& in)
 {
     in.ensureBytes(4);
-    const boost::uint8_t r = in.read_u8();
-    const boost::uint8_t g = in.read_u8();
-    const boost::uint8_t b = in.read_u8();
-    const boost::uint8_t a = in.read_u8();
+    const std::uint8_t r = in.read_u8();
+    const std::uint8_t g = in.read_u8();
+    const std::uint8_t b = in.read_u8();
+    const std::uint8_t a = in.read_u8();
     return rgba(r, g, b, a);
 }
 
@@ -106,10 +106,10 @@ rgba
 readRGB(SWFStream& in)
 {
     in.ensureBytes(3);
-    const boost::uint8_t r = in.read_u8();
-    const boost::uint8_t g = in.read_u8();
-    const boost::uint8_t b = in.read_u8();
-    const boost::uint8_t a = 0xff;
+    const std::uint8_t r = in.read_u8();
+    const std::uint8_t g = in.read_u8();
+    const std::uint8_t b = in.read_u8();
+    const std::uint8_t a = 0xff;
     return rgba(r, g, b, a);
 }
 
@@ -207,9 +207,9 @@ readFills(SWFStream& in, SWF::TagType t, movie_definition& md, bool readMorph)
             }
             
             in.ensureBytes(1);
-            const boost::uint8_t grad_props = in.read_u8();
+            const std::uint8_t grad_props = in.read_u8();
             
-            const boost::uint8_t num_gradients = grad_props & 0xF;
+            const std::uint8_t num_gradients = grad_props & 0xF;
             IF_VERBOSE_PARSE(
                 log_parse(_("  gradients count: %d"), +num_gradients);
             );
@@ -324,10 +324,10 @@ readCxFormRGB(SWFStream& in)
     in.align();
 
     in.ensureBits(6);
-    const boost::uint8_t field =  in.read_uint(6);
+    const std::uint8_t field =  in.read_uint(6);
     const bool has_add = field & (1 << 5);
     const bool has_mult = field & (1 << 4);
-    const boost::uint8_t nbits = field & 0x0f;
+    const std::uint8_t nbits = field & 0x0f;
     const size_t reads = has_mult + has_add; // 0, 1 or 2
 
     SWFCxForm ret;
@@ -356,10 +356,10 @@ readCxFormRGBA(SWFStream& in)
     in.align();
 
     in.ensureBits(6);
-    const boost::uint8_t field =  in.read_uint(6);
+    const std::uint8_t field =  in.read_uint(6);
     const bool has_add = field & (1 << 5);
     const bool has_mult = field & (1 << 4);
-    const boost::uint8_t nbits = field & 0x0f;
+    const std::uint8_t nbits = field & 0x0f;
     const size_t reads = has_mult + has_add; // 0, 1 or 2
 
     SWFCxForm ret;
@@ -423,7 +423,7 @@ readBitmapFill(SWFStream& in, SWF::FillType type, movie_definition& md,
 {
 
     in.ensureBytes(2);
-    const boost::uint16_t id = in.read_u16();
+    const std::uint16_t id = in.read_u16();
 
     SWFMatrix m = readSWFMatrix(in).invert();
 
@@ -442,7 +442,7 @@ GradientRecord
 readGradientRecord(SWFStream& in, SWF::TagType tag)
 {
     in.ensureBytes(1);
-    const boost::uint8_t ratio = in.read_u8();
+    const std::uint8_t ratio = in.read_u8();
 
     switch (tag) {
         case SWF::DEFINESHAPE:

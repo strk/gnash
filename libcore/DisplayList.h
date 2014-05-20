@@ -161,7 +161,7 @@ public:
 	/// The new ratio value to assign to the DisplayObject at the given depth.
 	/// If NULL the original ratio will be kept.
 	void moveDisplayObject(int depth, const SWFCxForm* color_xform,
-            const SWFMatrix* mat, boost::uint16_t* ratio);
+            const SWFMatrix* mat, std::uint16_t* ratio);
 
 	/// Removes the object at the specified depth.
 	//

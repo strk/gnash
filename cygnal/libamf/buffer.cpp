@@ -20,7 +20,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <iostream>
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/mersenne_twister.hpp>
@@ -43,8 +43,8 @@ namespace cygnal
 /// @param digit The digit as a hex value
 ///
 /// @return The byte as a decimal value.
-boost::uint8_t
-Buffer::hex2digit (boost::uint8_t digit)
+std::uint8_t
+Buffer::hex2digit (std::uint8_t digit)
 {  
     if (digit == 0)
         return 0;
@@ -73,10 +73,10 @@ Buffer::hex2mem(const std::string &str)
 //    GNASH_REPORT_FUNCTION;
     size_t count = str.size();
     size_t size = (count/3) + 4;
-    boost::uint8_t ch = 0;
+    std::uint8_t ch = 0;
     
-    boost::uint8_t *ptr = const_cast<boost::uint8_t *>(reinterpret_cast<const boost::uint8_t *>(str.c_str()));
-    boost::uint8_t *end = ptr + count;
+    std::uint8_t *ptr = const_cast<std::uint8_t *>(reinterpret_cast<const std::uint8_t *>(str.c_str()));
+    std::uint8_t *end = ptr + count;
 
     init(size);
     
@@ -126,7 +126,7 @@ Buffer::init(size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     if (!_data) {
-	_data.reset(new boost::uint8_t[size]);
+	_data.reset(new std::uint8_t[size]);
 	_seekptr = _data.get();
     }
     _seekptr = _data.get();
@@ -195,7 +195,7 @@ Buffer::~Buffer()
 ///		
 /// @return A reference to a Buffer.
 Buffer &
-Buffer::copy(boost::uint8_t *data, size_t nbytes)
+Buffer::copy(std::uint8_t *data, size_t nbytes)
 {    
 //    GNASH_REPORT_FUNCTION;
     if (_data) {
@@ -221,7 +221,7 @@ Buffer::copy(boost::uint8_t *data, size_t nbytes)
 ///		
 /// @return A reference to a Buffer.
 Buffer &
-Buffer::append(boost::uint8_t *data, size_t nbytes)
+Buffer::append(std::uint8_t *data, size_t nbytes)
 {
 //    GNASH_REPORT_FUNCTION;
     if (_data) {
@@ -262,7 +262,7 @@ Buffer &
 Buffer::operator+=(cygnal::Element::amf0_type_e type)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint8_t nb = static_cast<boost::uint8_t>(type);
+    std::uint8_t nb = static_cast<std::uint8_t>(type);
     
     return operator+=(nb);
 }
@@ -276,7 +276,7 @@ Buffer &
 Buffer::operator+=(char byte)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint8_t nb = static_cast<boost::uint8_t>(byte);
+    std::uint8_t nb = static_cast<std::uint8_t>(byte);
     return operator+=(nb);
 }
 
@@ -289,7 +289,7 @@ Buffer &
 Buffer::operator+=(bool flag)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint8_t nb = static_cast<boost::uint8_t>(flag);
+    std::uint8_t nb = static_cast<std::uint8_t>(flag);
     return operator+=(nb);
 }
 
@@ -299,12 +299,12 @@ Buffer::operator+=(bool flag)
 /// 
 /// @return A reference to a Buffer.
 Buffer &
-Buffer::operator+=(boost::uint8_t byte)
+Buffer::operator+=(std::uint8_t byte)
 {
 //    GNASH_REPORT_FUNCTION;
     if ((_seekptr + 1) <= (_data.get() + _nbytes)) {
 	*_seekptr = byte;
-	_seekptr += sizeof(boost::uint8_t);
+	_seekptr += sizeof(std::uint8_t);
     }
     return *this;
 }
@@ -319,7 +319,7 @@ Buffer &
 Buffer::operator+=(const char *str)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint8_t *ptr = const_cast<boost::uint8_t *>(reinterpret_cast<const boost::uint8_t *>(str));
+    std::uint8_t *ptr = const_cast<std::uint8_t *>(reinterpret_cast<const std::uint8_t *>(str));
     return append(ptr, strlen(str));
     
 }
@@ -334,7 +334,7 @@ Buffer &
 Buffer::operator+=(const std::string &str)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint8_t *ptr = const_cast<boost::uint8_t *>(reinterpret_cast<const boost::uint8_t *>(str.c_str()));
+    std::uint8_t *ptr = const_cast<std::uint8_t *>(reinterpret_cast<const std::uint8_t *>(str.c_str()));
     return append(ptr, str.size());
     
 }
@@ -348,7 +348,7 @@ Buffer &
 Buffer::operator+=(double num)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(&num);
+    std::uint8_t *ptr = reinterpret_cast<std::uint8_t *>(&num);
     return append(ptr, AMF0_NUMBER_SIZE);
 }
 
@@ -358,11 +358,11 @@ Buffer::operator+=(double num)
 /// 
 /// @return A reference to a Buffer.
 Buffer &
-Buffer::operator+=(boost::uint16_t length)
+Buffer::operator+=(std::uint16_t length)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(&length);
-    return append(ptr, sizeof(boost::uint16_t));
+    std::uint8_t *ptr = reinterpret_cast<std::uint8_t *>(&length);
+    return append(ptr, sizeof(std::uint16_t));
 }
 
 /// \brief Append an integer to existing data in the buffer.
@@ -371,11 +371,11 @@ Buffer::operator+=(boost::uint16_t length)
 /// 
 /// @return A reference to a Buffer.
 Buffer &
-Buffer::operator+=(boost::uint32_t length)
+Buffer::operator+=(std::uint32_t length)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(&length);
-    return append(ptr, sizeof(boost::uint32_t));
+    std::uint8_t *ptr = reinterpret_cast<std::uint8_t *>(&length);
+    return append(ptr, sizeof(std::uint32_t));
 }
 
 /// \brief Append a Buffer class to existing data in the buffer.
@@ -419,7 +419,7 @@ Buffer &
 Buffer::operator=(const std::string &str)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint8_t *ptr = const_cast<boost::uint8_t *>(reinterpret_cast<const boost::uint8_t *>(str.c_str()));
+    std::uint8_t *ptr = const_cast<std::uint8_t *>(reinterpret_cast<const std::uint8_t *>(str.c_str()));
     return copy(ptr, str.size());
 }
 
@@ -427,7 +427,7 @@ Buffer &
 Buffer::operator=(const char *str)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint8_t *ptr = const_cast<boost::uint8_t *>(reinterpret_cast<const boost::uint8_t *>(str));
+    std::uint8_t *ptr = const_cast<std::uint8_t *>(reinterpret_cast<const std::uint8_t *>(str));
     return copy(ptr, strlen(str));
 }
 
@@ -441,7 +441,7 @@ Buffer &
 Buffer::operator=(double num)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(&num);
+    std::uint8_t *ptr = reinterpret_cast<std::uint8_t *>(&num);
     return copy(ptr, AMF0_NUMBER_SIZE);
 }
 
@@ -452,11 +452,11 @@ Buffer::operator=(double num)
 /// 
 /// @return A reference to a Buffer.
 Buffer &
-Buffer::operator=(boost::uint16_t length)
+Buffer::operator=(std::uint16_t length)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(&length);
-    return copy(ptr, sizeof(boost::uint16_t));
+    std::uint8_t *ptr = reinterpret_cast<std::uint8_t *>(&length);
+    return copy(ptr, sizeof(std::uint16_t));
 }
 
 /// \brief Copy a AMF0 type into the buffer.
@@ -468,7 +468,7 @@ Buffer::operator=(boost::uint16_t length)
 Buffer &
 Buffer::operator=(cygnal::Element::amf0_type_e type)
 {
-    boost::uint8_t nb = static_cast<boost::uint8_t>(type);
+    std::uint8_t nb = static_cast<std::uint8_t>(type);
     return operator=(nb);
 }
 
@@ -481,7 +481,7 @@ Buffer::operator=(cygnal::Element::amf0_type_e type)
 Buffer &
 Buffer::operator=(bool flag)
 {
-    boost::uint8_t nb = static_cast<boost::uint8_t>(flag);
+    std::uint8_t nb = static_cast<std::uint8_t>(flag);
     return operator=(nb);
 }
 
@@ -492,7 +492,7 @@ Buffer::operator=(bool flag)
 /// 
 /// @return A reference to a Buffer.
 Buffer &
-Buffer::operator=(boost::uint8_t byte)
+Buffer::operator=(std::uint8_t byte)
 {
 //    GNASH__FUNCTION;
    
@@ -506,7 +506,7 @@ Buffer::operator=(boost::uint8_t byte)
 /// 
 /// @return A reference to a Buffer.
 Buffer &
-Buffer::operator=(boost::uint8_t *data)
+Buffer::operator=(std::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     if (data) {
@@ -559,11 +559,11 @@ Buffer::operator==(Buffer &buf)
 /// @param byte The byte to remove from the buffer.
 ///
 /// @return A real pointer to the base address of the buffer.
-boost::uint8_t *
-Buffer::remove(boost::uint8_t c)
+std::uint8_t *
+Buffer::remove(std::uint8_t c)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint8_t *start = std::find(begin(), end(), c);
+    std::uint8_t *start = std::find(begin(), end(), c);
 
 //    log_debug("Byte is at %x", (void *)start);
     
@@ -587,7 +587,7 @@ Buffer::remove(boost::uint8_t c)
 ///		Buffer
 ///
 /// @return A real pointer to the base address of the Buffer.
-boost::uint8_t *
+std::uint8_t *
 Buffer::remove(int start)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -611,7 +611,7 @@ Buffer::remove(int start)
 /// @param range The amount of bytes to remove from the Buffer.
 ///
 /// @return A real pointer to the base address of the Buffer.
-boost::uint8_t *
+std::uint8_t *
 Buffer::remove(int start, int range)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -665,7 +665,7 @@ Buffer &
 Buffer::resize(size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
-    std::unique_ptr<boost::uint8_t[]> tmp;
+    std::unique_ptr<std::uint8_t[]> tmp;
 
     // If there is no size, don't do anything
     if (size == 0) {
@@ -675,7 +675,7 @@ Buffer::resize(size_t size)
     // If we don't have any data yet in this buffer, resizing is cheap, as
     // we don't havce to copy any data.
     if (_seekptr == _data.get()) {
-	_data.reset(new boost::uint8_t[size]);
+	_data.reset(new std::uint8_t[size]);
 	_nbytes= size;
 	return *this;
     }
@@ -711,7 +711,7 @@ Buffer::resize(size_t size)
 	    gnash::log_error(_("cygnal::Buffer::resize(%d): Truncating data (%d bytes) while resizing!"), size, used - size);
 	    used = size;
 	}
-	boost::uint8_t *newptr = new boost::uint8_t[size];
+	std::uint8_t *newptr = new std::uint8_t[size];
 	std::copy(_data.get(), _data.get() + used, newptr);
 	_data.reset(newptr);
 	

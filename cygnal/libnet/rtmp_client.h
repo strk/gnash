@@ -19,7 +19,7 @@
 #define _RTMP_CLIENT_H_
 
 #include <deque>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <string>
 #include <time.h>
 

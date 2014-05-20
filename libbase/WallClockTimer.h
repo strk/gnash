@@ -23,7 +23,7 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 namespace gnash {
 
@@ -39,14 +39,14 @@ public:
 	/// \brief
 	/// Return time elapsed in milliseconds since construction
 	/// or last call to ::restart()
-	boost::uint32_t elapsed() const;
+	std::uint32_t elapsed() const;
 
 	/// Restart the timer
 	void restart();
 
 private:
 
-	boost::uint64_t startTimer;
+	std::uint64_t startTimer;
 
 };
 

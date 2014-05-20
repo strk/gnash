@@ -20,7 +20,7 @@
 
 #include "CSMTextSettingsTag.h"
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include "utility.h"
 #include "RunResources.h"
@@ -52,7 +52,7 @@ CSMTextSettingsTag::loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
 
     in.ensureBytes(2 + 1 + 4 + 4 + 1);
 
-    boost::uint16_t textID = in.read_u16();
+    std::uint16_t textID = in.read_u16();
     
     // Should be either 1 or 0. TODO: what if it's something else?
     bool flashType = in.read_uint(2); 
@@ -60,10 +60,10 @@ CSMTextSettingsTag::loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
     // 0: no grid fitting.
     // 1: Pixel grid fit (only for left-aligned dynamic text)
     // 2: Sub-pixel grid fit.
-    boost::uint8_t gridFit = in.read_uint(3);
+    std::uint8_t gridFit = in.read_uint(3);
 
     // Should be 0:
-    boost::uint8_t reserved = in.read_uint(3);
+    std::uint8_t reserved = in.read_uint(3);
     UNUSED(reserved);
 
     float thickness = in.read_long_float();

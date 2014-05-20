@@ -56,24 +56,24 @@ SWFCxForm::transform(const rgba& in) const
 
 // transform the given color with our SWFCxForm.
 void
-SWFCxForm::transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& b,
-        boost::uint8_t& a) const
+SWFCxForm::transform(std::uint8_t& r, std::uint8_t& g, std::uint8_t& b,
+        std::uint8_t& a) const
 {
     // force conversion to int16 first, kind of optimization.
-    boost::int16_t rt = r;
-    boost::int16_t gt = g;
-    boost::int16_t bt = b;
-    boost::int16_t at = a;
+    std::int16_t rt = r;
+    std::int16_t gt = g;
+    std::int16_t bt = b;
+    std::int16_t at = a;
     
     rt = (rt * ra >> 8) + rb;
     gt = (gt * ga >> 8) + gb;
     bt = (bt * ba >> 8) + bb;
     at = (at * aa >> 8) + ab;
 
-    r = clamp<boost::int16_t>(rt, 0, 255);
-    g = clamp<boost::int16_t>(gt, 0, 255);
-    b = clamp<boost::int16_t>(bt, 0, 255);
-    a = clamp<boost::int16_t>(at, 0, 255);
+    r = clamp<std::int16_t>(rt, 0, 255);
+    g = clamp<std::int16_t>(gt, 0, 255);
+    b = clamp<std::int16_t>(bt, 0, 255);
+    a = clamp<std::int16_t>(at, 0, 255);
 }
 
 std::ostream&

@@ -1256,12 +1256,12 @@ setAlpha(DisplayObject& o, const as_value& val)
     SWFCxForm cx = getCxForm(o);
 
     // Overflows are *not* truncated, but set to -32768.
-    if (newAlpha > std::numeric_limits<boost::int16_t>::max() ||
-        newAlpha < std::numeric_limits<boost::int16_t>::min()) {
-        cx.aa = std::numeric_limits<boost::int16_t>::min();
+    if (newAlpha > std::numeric_limits<std::int16_t>::max() ||
+        newAlpha < std::numeric_limits<std::int16_t>::min()) {
+        cx.aa = std::numeric_limits<std::int16_t>::min();
     }
     else {
-        cx.aa = static_cast<boost::int16_t>(newAlpha);
+        cx.aa = static_cast<std::int16_t>(newAlpha);
     }
 
     o.setCxForm(cx);
@@ -1273,7 +1273,7 @@ as_value
 getMouseX(DisplayObject& o)
 {
     // Local coord of mouse IN PIXELS.
-    boost::int32_t x, y;
+    std::int32_t x, y;
     boost::tie(x, y) = getRoot(*getObject(&o)).mousePosition();
 
     SWFMatrix m = getWorldMatrix(o);
@@ -1287,7 +1287,7 @@ as_value
 getMouseY(DisplayObject& o)
 {
     // Local coord of mouse IN PIXELS.
-    boost::int32_t x, y;
+    std::int32_t x, y;
     boost::tie(x, y) = getRoot(*getObject(&o)).mousePosition();
 
     SWFMatrix m = getWorldMatrix(o);

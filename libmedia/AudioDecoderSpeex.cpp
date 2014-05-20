@@ -23,7 +23,7 @@
 
 #include <functional>
 #include <boost/checked_delete.hpp>
-#include <boost/cstdint.hpp> // For C99 int types
+#include <cstdint> // For C99 int types
 
 #ifdef RESAMPLING_SPEEX
 # include <boost/rational.hpp>
@@ -58,11 +58,11 @@ AudioDecoderSpeex::AudioDecoderSpeex()
     speex_resampler_get_ratio (_resampler, &num, &den);
     assert(num && den);
 
-    boost::rational<boost::uint32_t> numsamples(den, num);
+    boost::rational<std::uint32_t> numsamples(den, num);
 
     numsamples *= _speex_framesize * 2 /* convert to stereo */;
 
-    _target_frame_size = boost::rational_cast<boost::uint32_t>(numsamples);
+    _target_frame_size = boost::rational_cast<std::uint32_t>(numsamples);
 #endif
 }
 AudioDecoderSpeex::~AudioDecoderSpeex()
@@ -78,25 +78,25 @@ AudioDecoderSpeex::~AudioDecoderSpeex()
 
 struct DecodedFrame : boost::noncopyable
 {
-    DecodedFrame(boost::int16_t* newdata, size_t datasize)
+    DecodedFrame(std::int16_t* newdata, size_t datasize)
     : data(newdata),
       size(datasize)
     {}
 
-    std::unique_ptr<boost::int16_t[]> data;
+    std::unique_ptr<std::int16_t[]> data;
     size_t size;
 };
 
-boost::uint8_t*
+std::uint8_t*
 AudioDecoderSpeex::decode(const EncodedAudioFrame& input,
-    boost::uint32_t& outputSize)
+    std::uint32_t& outputSize)
 {
     speex_bits_read_from(&_speex_bits, reinterpret_cast<char*>(input.data.get()),
                          input.dataSize);
 
     std::vector<DecodedFrame*> decoded_frames;
 
-    boost::uint32_t total_size = 0;
+    std::uint32_t total_size = 0;
 
     while (speex_bits_remaining(&_speex_bits)) {
 
@@ -112,11 +112,11 @@ AudioDecoderSpeex::decode(const EncodedAudioFrame& input,
         }
 
         
-        boost::int16_t* conv_data = 0;
+        std::int16_t* conv_data = 0;
 
 #ifdef RESAMPLING_SPEEX
 		spx_uint32_t conv_size = 0;
-        conv_data = new boost::int16_t[_target_frame_size];
+        conv_data = new std::int16_t[_target_frame_size];
         memset(conv_data, 0, _target_frame_size * 2);
 
         spx_uint32_t in_size = _speex_framesize;
@@ -138,19 +138,19 @@ AudioDecoderSpeex::decode(const EncodedAudioFrame& input,
         conv_size *= 2;
 
         // Now, duplicate all the samples so we get a stereo sound.
-        for (boost::uint32_t i = 0; i < conv_size; i += 2) {
+        for (std::uint32_t i = 0; i < conv_size; i += 2) {
             conv_data[i+1] = conv_data[i];
         }
 
         // Our interface requires returning the audio size in bytes.
-        conv_size *= sizeof(boost::int16_t);
+        conv_size *= sizeof(std::int16_t);
 #else
         int outsize = 0;
         AudioResampler::convert_raw_data(&conv_data, &outsize, output.get(), 
             _speex_framesize /* sample count*/, 2 /* sample size */,
             16000, false /* stereo */, 44100 /* new rate */,
             true /* convert to stereo */);
-        boost::uint32_t conv_size = outsize;
+        std::uint32_t conv_size = outsize;
 #endif
         total_size += conv_size;
 
@@ -161,8 +161,8 @@ AudioDecoderSpeex::decode(const EncodedAudioFrame& input,
 
     // We have to jump through hoops because decode() requires as much
     // data to be returned as possible.
-    boost::uint8_t* rv = new boost::uint8_t[total_size];
-    boost::uint8_t* ptr = rv;
+    std::uint8_t* rv = new std::uint8_t[total_size];
+    std::uint8_t* ptr = rv;
 
     for (std::vector<DecodedFrame*>::iterator it = decoded_frames.begin(),
          end = decoded_frames.end(); it != end; ++it) {

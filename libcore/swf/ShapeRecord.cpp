@@ -334,7 +334,7 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m,
     
     // Use read_u8 to force alignment.
     in.ensureBytes(1);
-    boost::uint8_t num_bits = in.read_u8();
+    std::uint8_t num_bits = in.read_u8();
     int num_fill_bits = (num_bits & 0xF0) >> 4;
     int num_line_bits = (num_bits & 0x0F);
     
@@ -608,7 +608,7 @@ readFillStyles(ShapeRecord::FillStyles& styles, SWFStream& in,
          SWF::TagType tag, movie_definition& m, const RunResources& /*r*/)
 {
     in.ensureBytes(1);
-    boost::uint16_t fillcount = in.read_u8();
+    std::uint16_t fillcount = in.read_u8();
     if (tag != SWF::DEFINESHAPE) {
         if (fillcount == 0xff) {
             in.ensureBytes(2);
@@ -622,7 +622,7 @@ readFillStyles(ShapeRecord::FillStyles& styles, SWFStream& in,
 
     // Read the styles.
     styles.reserve(styles.size() + fillcount);
-    for (boost::uint16_t i = 0; i < fillcount; ++i) {
+    for (std::uint16_t i = 0; i < fillcount; ++i) {
         OptionalFillPair fp = readFills(in, tag, m, false);
         styles.push_back(fp.first);
         IF_VERBOSE_PARSE(

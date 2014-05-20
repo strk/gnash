@@ -22,7 +22,7 @@
 #define GNASH_RGBA_H
 
 #include <string>
-#include <boost/cstdint.hpp> 
+#include <cstdint>
 
 #include "dsodefs.h" // for DSOTEXPORT
 
@@ -53,8 +53,8 @@ public:
     /// @param g Green
     /// @param b Blue
     /// @param a Alpha (transparency)
-    rgba(boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, 
-            boost::uint8_t a)
+    rgba(std::uint8_t r, std::uint8_t g, std::uint8_t b,
+            std::uint8_t a)
         :
         m_r(r),
         m_g(g),
@@ -70,10 +70,10 @@ public:
     ///
     /// This function is meant to be used to
     /// parse ActionScript colors in numeric format.
-    void parseRGB(boost::uint32_t rgbCol) {
-        m_r = static_cast<boost::uint8_t>(rgbCol >> 16);
-        m_g = static_cast<boost::uint8_t>(rgbCol >> 8);
-        m_b = static_cast<boost::uint8_t>(rgbCol);
+    void parseRGB(std::uint32_t rgbCol) {
+        m_r = static_cast<std::uint8_t>(rgbCol >> 16);
+        m_g = static_cast<std::uint8_t>(rgbCol >> 8);
+        m_b = static_cast<std::uint8_t>(rgbCol);
     }
 
     /// Return a 32-bit unsigned integer as four packed R,G,B bytes.
@@ -83,7 +83,7 @@ public:
     ///
     /// This function is meant to be used to output ActionScript colors
     /// in numeric format.
-    boost::uint32_t toRGB() const {
+    std::uint32_t toRGB() const {
         return (m_r << 16) + (m_g << 8) + m_b;
     }
 
@@ -93,7 +93,7 @@ public:
     ///
     /// This function is meant to be used to output ActionScript colors
     /// in numeric format.
-    boost::uint32_t toRGBA() const {
+    std::uint32_t toRGBA() const {
         return toRGB() + (m_a << 24);
     }
 
@@ -110,7 +110,7 @@ public:
         return !(*this == o);
     }
 
-    boost::uint8_t m_r, m_g, m_b, m_a;
+    std::uint8_t m_r, m_g, m_b, m_a;
 
 };
 

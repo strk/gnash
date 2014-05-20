@@ -58,47 +58,47 @@ public:
 
 	Method();
 
-    boost::uint32_t methodID() const {
+    std::uint32_t methodID() const {
         return _methodID;
     }
 
-    void setMethodID(boost::uint32_t m) {
+    void setMethodID(std::uint32_t m) {
         _methodID = m;
     }
 
 	void initPrototype(Machine* machine);
 
-	boost::uint32_t getMaxRegisters() { return _maxRegisters;}
+	std::uint32_t getMaxRegisters() { return _maxRegisters;}
 
-	void setMaxRegisters(boost::uint32_t maxRegisters) { 
+	void setMaxRegisters(std::uint32_t maxRegisters) {
         _maxRegisters = maxRegisters;
     }
 
-	boost::uint32_t getBodyLength(){ return _bodyLength;}
+	std::uint32_t getBodyLength(){ return _bodyLength;}
 
-	void setBodyLength(boost::uint32_t length){ _bodyLength = length;}
+	void setBodyLength(std::uint32_t length){ _bodyLength = length;}
 
-    void setMaxStack(boost::uint32_t max) {
+    void setMaxStack(std::uint32_t max) {
         _maxStack = max;
     }
  
-    boost::uint32_t maxStack() const {
+    std::uint32_t maxStack() const {
         return _maxStack;
     }
 
-    void setMaxScope(boost::uint32_t max) {
+    void setMaxScope(std::uint32_t max) {
         _maxScope = max;
     }
  
-    boost::uint32_t maxScope() const {
+    std::uint32_t maxScope() const {
         return _maxScope;
     }
     
-    void setScopeDepth(boost::uint32_t depth) {
+    void setScopeDepth(std::uint32_t depth) {
         _scopeDepth = depth;
     }
  
-    boost::uint32_t scopeDepth() const {
+    std::uint32_t scopeDepth() const {
         return _scopeDepth;
     }
 
@@ -137,10 +137,10 @@ public:
 	void setBody(CodeStream *b) { _body = b; }
 
 	bool addValue(string_table::key name, Namespace *ns,
-            boost::uint32_t slotID, Class *type, as_value& val, bool isconst);
+            std::uint32_t slotID, Class *type, as_value& val, bool isconst);
 
 	bool addSlot(string_table::key name, Namespace *ns,
-            boost::uint32_t slotID, Class *type);
+            std::uint32_t slotID, Class *type);
 
 	bool addMethod(string_table::key name, Namespace *ns, Method *method);
 
@@ -149,10 +149,10 @@ public:
 	bool addSetter(string_table::key name, Namespace *ns, Method *method);
 
 	bool addMemberScript(string_table::key name, Namespace *ns,
-		boost::uint32_t slotID, Class *type);
+		std::uint32_t slotID, Class *type);
 	
 	bool addSlotFunction(string_table::key name, Namespace *ns,
-		boost::uint32_t slotID, Method *method);
+		std::uint32_t slotID, Method *method);
 
 	/// \brief
 	/// Set the owner of this method.
@@ -275,23 +275,23 @@ private:
     
     std::vector<Trait> _traits;
 	
-    boost::uint32_t _methodID;
+    std::uint32_t _methodID;
 
     abc_function* _prototype;
 	int _minArguments;
 	int _maxArguments;
-	boost::uint32_t _bodyLength;
+	std::uint32_t _bodyLength;
 	bool _isNative;
 	ArgumentList _arguments;
 	std::list<as_value> _optionalArguments;
 	as_function* _implementation;
 	unsigned char _flags;
 	CodeStream* _body;
-	boost::uint32_t _maxRegisters;
+	std::uint32_t _maxRegisters;
 
-    boost::uint32_t _scopeDepth;
-    boost::uint32_t _maxScope;
-    boost::uint32_t _maxStack;
+    std::uint32_t _scopeDepth;
+    std::uint32_t _maxScope;
+    std::uint32_t _maxStack;
 
     bool _needsActivation;
 

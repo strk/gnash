@@ -21,7 +21,7 @@
 
 #include <cmath>
 #include <algorithm>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include "log.h"
 #include "LineStyle.h"
@@ -123,8 +123,8 @@ int curve_x_crossings(const T x0, const T y0, const T x1, const T y1,
 
 bool
 pointTest(const std::vector<Path>& paths,
-        const std::vector<LineStyle>& lineStyles, boost::int32_t x,
-        boost::int32_t y, const SWFMatrix& wm)
+        const std::vector<LineStyle>& lineStyles, std::int32_t x,
+        std::int32_t y, const SWFMatrix& wm)
 {
 
     /*

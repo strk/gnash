@@ -87,12 +87,12 @@ private:
         if (t == SWF::IMPORTASSETS2) {
             in.ensureBytes(2);
             import_version = in.read_uint(8);
-            boost::uint8_t reserved = in.read_uint(8);
+            std::uint8_t reserved = in.read_uint(8);
             UNUSED(reserved);
         }
 
         in.ensureBytes(2);
-        const boost::uint16_t count = in.read_u16();
+        const std::uint16_t count = in.read_u16();
 
         IF_VERBOSE_PARSE(
             log_parse(_("  import: version = %u, source_url = %s (%s), "
@@ -130,7 +130,7 @@ private:
         for (size_t i = 0; i < count; ++i)
         {
             in.ensureBytes(2);
-            const boost::uint16_t id = in.read_u16();
+            const std::uint16_t id = in.read_u16();
 
             // We don't consider 0 valid.
             if (!id) continue;

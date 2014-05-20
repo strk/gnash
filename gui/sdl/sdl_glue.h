@@ -18,7 +18,7 @@
 
 #include "gui.h"
 
-#include <boost/cstdint.hpp> // for boost::?int??_t 
+#include <cstdint> // for boost::?int??_t
 
 namespace gnash {
 
@@ -29,7 +29,7 @@ class SdlGlue
     virtual bool init(int argc, char **argv[]) = 0;
     
     virtual void setInvalidatedRegions(const InvalidatedRanges& ranges) = 0;
-    virtual bool prepDrawingArea(int width, int height, boost::uint32_t sdl_flags) = 0;
+    virtual bool prepDrawingArea(int width, int height, std::uint32_t sdl_flags) = 0;
     virtual Renderer* createRenderHandler(int depth) = 0;
     virtual void render() = 0;
   protected:

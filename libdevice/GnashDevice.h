@@ -24,7 +24,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include "log.h"
 
 /// @note This file is the base class for all low level rendering and display
@@ -113,10 +113,10 @@ struct GnashDevice
     // These are only used for the Framebuffer
 
     /// Get the memory from the real framebuffer
-    virtual boost::uint8_t *getFBMemory() { return 0; };
+    virtual std::uint8_t *getFBMemory() { return 0; };
     
     /// Get the memory from an offscreen buffer to support Double Buffering
-    virtual boost::uint8_t *getOffscreenBuffer() { return 0; };
+    virtual std::uint8_t *getOffscreenBuffer() { return 0; };
 
     virtual size_t getFBMemSize() { return 0; };
 

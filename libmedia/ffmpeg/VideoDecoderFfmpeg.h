@@ -84,10 +84,10 @@ private:
             const AVFrame& srcFrame);
 
     void init(enum CODECID format, int width, int height,
-            boost::uint8_t* extradata=0, int extradataSize=0);
+            std::uint8_t* extradata=0, int extradataSize=0);
 
-    std::unique_ptr<image::GnashImage> decode(const boost::uint8_t* input,
-            boost::uint32_t input_size);
+    std::unique_ptr<image::GnashImage> decode(const std::uint8_t* input,
+            std::uint32_t input_size);
 
     std::unique_ptr<image::GnashImage> decode(const EncodedVideoFrame* vf)
     {

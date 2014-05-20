@@ -75,7 +75,7 @@ public:
     }
 
     /// Return a pointer to the underlying buffer
-    const boost::uint8_t* data() const {
+    const std::uint8_t* data() const {
         return _buf->data();
     }
 
@@ -84,7 +84,7 @@ public:
     /// @param pos The offset value.
     ///     An assertion will fail if pos > size()
     ///
-    const boost::uint8_t* data(size_t pos) const {
+    const std::uint8_t* data(size_t pos) const {
         assert(pos < _buf->size());
         return _buf->data()+pos;
     }

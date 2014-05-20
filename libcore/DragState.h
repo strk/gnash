@@ -53,13 +53,13 @@ public:
     /// at time of drag start.
     /// Coordinates are in stage space (twips)
     ///
-    void setOffset(boost::int32_t x, boost::int32_t y) {
+    void setOffset(std::int32_t x, std::int32_t y) {
         _xoffset = x;
         _yoffset = y;
     }
 
-    boost::int32_t xOffset() const { return _xoffset; }
-    boost::int32_t yOffset() const { return _yoffset; }
+    std::int32_t xOffset() const { return _xoffset; }
+    std::int32_t yOffset() const { return _yoffset; }
 
     bool hasBounds() const {
         return (_bounds);
@@ -120,8 +120,8 @@ private:
     /// at time of drag start. These are used for non
     /// lock-centered dragging.
     /// Coordinates are in stage space (TWIPS)
-    boost::int32_t _xoffset;
-    boost::int32_t _yoffset;
+    std::int32_t _xoffset;
+    std::int32_t _yoffset;
 
 };
 

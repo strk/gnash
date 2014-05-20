@@ -45,7 +45,7 @@ DefineTextTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     assert(tag == DEFINETEXT);
 
     in.ensureBytes(2);
-    const boost::uint16_t id = in.read_u16();
+    const std::uint16_t id = in.read_u16();
 
     std::unique_ptr<DefineTextTag> t(new DefineTextTag(in, m, tag, id));
     IF_VERBOSE_PARSE(
@@ -86,7 +86,7 @@ DefineText2Tag::loader(SWFStream& in, TagType tag, movie_definition& m,
     assert(tag == DEFINETEXT2);
 
     in.ensureBytes(2);
-    const boost::uint16_t id = in.read_u16();
+    const std::uint16_t id = in.read_u16();
 
     std::unique_ptr<DefineTextTag> t(new DefineTextTag(in, m, tag, id));
     IF_VERBOSE_PARSE(

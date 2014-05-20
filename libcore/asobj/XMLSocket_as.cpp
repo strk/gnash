@@ -78,7 +78,7 @@ public:
     /// @return         false if the connection is not allowed, otherwise true.
     ///                 Note that a return of true does not mean a successful
     ///                 connection.
-    bool connect(const std::string& host, boost::uint16_t port);
+    bool connect(const std::string& host, std::uint16_t port);
 
     /// Send a string with a null-terminator to the socket.
     //
@@ -160,7 +160,7 @@ XMLSocket_as::update()
 
 
 bool
-XMLSocket_as::connect(const std::string& host, boost::uint16_t port)
+XMLSocket_as::connect(const std::string& host, std::uint16_t port)
 {
 
     if (!URLAccessManager::allowXMLSocket(host, port)) {
@@ -330,7 +330,7 @@ xmlsocket_connect(const fn_call& fn)
     // TODO: find out.
     // Other ports and hosts are checked against security policy before
     // acceptance or rejection.
-    if (port > std::numeric_limits<boost::uint16_t>::max()) {
+    if (port > std::numeric_limits<std::uint16_t>::max()) {
         return as_value(false);
     }
     

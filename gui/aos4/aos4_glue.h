@@ -18,7 +18,7 @@
 #ifndef __AOS4_GLUE_H__
 #define __AOS4_GLUE_H__
 
-#include <boost/cstdint.hpp> // for boost::?int??_t 
+#include <cstdint> // for boost::?int??_t
 
 #include "Renderer.h"
 

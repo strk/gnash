@@ -20,7 +20,7 @@
 #define GNASH_AS_PROP_FLAGS_H
 
 #include <ostream>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 namespace gnash {
 
@@ -76,7 +76,7 @@ public:
 	}
 
 	/// Constructor, from numerical value
-	PropFlags(boost::uint16_t flags)
+	PropFlags(std::uint16_t flags)
 		:
         _flags(flags)
 	{
@@ -117,7 +117,7 @@ public:
 	}
 
 	/// accessor to the numerical flags value
-    boost::uint16_t get_flags() const { return _flags; }
+    std::uint16_t get_flags() const { return _flags; }
 
 	/// set the numerical flags value (return the new value )
 	/// If unlocked is false, you cannot un-protect from over-write,
@@ -127,7 +127,7 @@ public:
 	/// @param setTrue  the set of flags to set
 	/// @param setFalse the set of flags to clear
 	/// @return         true on success, false on failure (is protected)
-	bool set_flags(boost::uint16_t setTrue, boost::uint16_t setFalse = 0) {
+	bool set_flags(std::uint16_t setTrue, std::uint16_t setFalse = 0) {
 		_flags &= ~setFalse;
 		_flags |= setTrue;
 		return true;
@@ -136,7 +136,7 @@ public:
 private:
 
 	/// Numeric flags
-    boost::uint16_t _flags;
+    std::uint16_t _flags;
 
 };
 

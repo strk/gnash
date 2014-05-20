@@ -372,10 +372,10 @@ motion_notify_event_cb(GtkWidget */*widget*/, GdkEventMotion *event, gpointer da
     float yscale = widget->allocation.height / view->movie_definition->get_height_pixels();
 
 	// A stage pseudopixel is user pixel / _xscale wide
-	boost::int32_t x = event->x / xscale;
+	std::int32_t x = event->x / xscale;
 
 	// A stage pseudopixel is user pixel / _yscale high
-	boost::int32_t y = event->y / yscale;
+	std::int32_t y = event->y / yscale;
 
 	if ( view->stage->mouseMoved(x, y) )
 	{

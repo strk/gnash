@@ -177,7 +177,7 @@ SDLGui::createWindow(const char *title, int width, int height,
     _width = width;
     _height = height;
 
-    boost::uint32_t sdl_flags = 0;
+    std::uint32_t sdl_flags = 0;
 
     if (!_core_trap) {
         sdl_flags |= SDL_INIT_NOPARACHUTE;

@@ -579,7 +579,7 @@ movie_root::setDimensions(size_t w, size_t h)
 }
 
 bool
-movie_root::mouseMoved(boost::int32_t x, boost::int32_t y)
+movie_root::mouseMoved(std::int32_t x, std::int32_t y)
 {
     assert(testInvariant());
 
@@ -664,8 +664,8 @@ movie_root::mouseWheel(int delta)
         getBuiltinObject(*this, getURI(_vm, NSV::CLASS_MOUSE));
     if (!mouseObj) return false;
     
-    const boost::int32_t x = pixelsToTwips(_mouseX);
-    const boost::int32_t y = pixelsToTwips(_mouseY);
+    const std::int32_t x = pixelsToTwips(_mouseX);
+    const std::int32_t y = pixelsToTwips(_mouseY);
 
     DisplayObject* i = getTopmostMouseEntity(x, y);
 
@@ -695,8 +695,8 @@ movie_root::fire_mouse_event()
 {
     assert(testInvariant());
 
-    boost::int32_t x = pixelsToTwips(_mouseX);
-    boost::int32_t y = pixelsToTwips(_mouseY);
+    std::int32_t x = pixelsToTwips(_mouseX);
+    std::int32_t y = pixelsToTwips(_mouseY);
 
     // Generate a mouse event
     _mouseButtonState.topmostEntity = getTopmostMouseEntity(x, y);
@@ -734,7 +734,7 @@ movie_root::fire_mouse_event()
     return need_redraw;
 }
 
-std::pair<boost::int32_t, boost::int32_t>
+std::pair<std::int32_t, std::int32_t>
 movie_root::mousePosition() const
 {
     assert(testInvariant());
@@ -758,8 +758,8 @@ movie_root::setDragState(const DragState& st)
         // Get current mouse coordinates
         const point world_mouse(pixelsToTwips(_mouseX), pixelsToTwips(_mouseY));
 
-        boost::int32_t xoffset = world_mouse.x - world_origin.x;
-        boost::int32_t yoffset = world_mouse.y - world_origin.y;
+        std::int32_t xoffset = world_mouse.x - world_origin.x;
+        std::int32_t yoffset = world_mouse.y - world_origin.y;
 
         _dragState->setOffset(xoffset, yoffset);
     }
@@ -811,7 +811,7 @@ movie_root::doMouseDrag()
     dragChar->setMatrix(local);
 }
 
-boost::uint32_t
+std::uint32_t
 movie_root::addIntervalTimer(std::unique_ptr<Timer> timer)
 {
     assert(timer.get());
@@ -829,7 +829,7 @@ movie_root::addIntervalTimer(std::unique_ptr<Timer> timer)
 }
     
 bool
-movie_root::clearIntervalTimer(boost::uint32_t x)
+movie_root::clearIntervalTimer(std::uint32_t x)
 {
     TimerMap::iterator it = _intervalTimers.find(x);
     if (it == _intervalTimers.end()) {
@@ -1160,8 +1160,8 @@ movie_root::getDraggingCharacter() const
 const DisplayObject*
 movie_root::getEntityUnderPointer() const
 {
-    const boost::int32_t x = pixelsToTwips(_mouseX);
-    const boost::int32_t y = pixelsToTwips(_mouseY);
+    const std::int32_t x = pixelsToTwips(_mouseX);
+    const std::int32_t y = pixelsToTwips(_mouseY);
     return findDropTarget(x, y, getDraggingCharacter()); 
 }
 
@@ -1805,7 +1805,7 @@ movie_root::markReachableResources() const
 }
 
 InteractiveObject*
-movie_root::getTopmostMouseEntity(boost::int32_t x, boost::int32_t y) const
+movie_root::getTopmostMouseEntity(std::int32_t x, std::int32_t y) const
 {
     for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend();
             i != e; ++i)
@@ -1818,7 +1818,7 @@ movie_root::getTopmostMouseEntity(boost::int32_t x, boost::int32_t y) const
 }
 
 const DisplayObject *
-movie_root::findDropTarget(boost::int32_t x, boost::int32_t y,
+movie_root::findDropTarget(std::int32_t x, std::int32_t y,
         DisplayObject* dragging) const
 {
     for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend();
@@ -2094,7 +2094,7 @@ movie_root::set_background_color(const rgba& color)
 void
 movie_root::set_background_alpha(float alpha)
 {
-    const boost::uint8_t newAlpha = clamp<int>(frnd(alpha * 255.0f), 0, 255);
+    const std::uint8_t newAlpha = clamp<int>(frnd(alpha * 255.0f), 0, 255);
 
     if (m_background_color.m_a != newAlpha) {
         setInvalidated();
@@ -2246,7 +2246,7 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
 }
 
 void
-movie_root::setScriptLimits(boost::uint16_t recursion, boost::uint16_t timeout)
+movie_root::setScriptLimits(std::uint16_t recursion, std::uint16_t timeout)
 {
     if ( recursion == _recursionLimit && _timeoutLimit == timeout ) {
         // avoid the debug log...
@@ -2408,7 +2408,7 @@ movie_root::LoadCallback::processLoad()
     }
 
     const size_t chunksize = 65535;
-    boost::uint8_t chunk[chunksize];
+    std::uint8_t chunk[chunksize];
 
     size_t actuallyRead = _stream->readNonBlocking(chunk, chunksize);
 

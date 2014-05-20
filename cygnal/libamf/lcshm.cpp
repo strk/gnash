@@ -21,7 +21,7 @@
 #include <vector>
 #include <string>
 #include <cstring>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include "log.h"
 #include "buffer.h"
@@ -107,7 +107,7 @@ LcShm::LcShm()
 /// \brief Construct an initialized shared memory segment.
 ///
 /// @param addr The address to use for the memory segment.
-LcShm::LcShm(boost::uint8_t *addr)
+LcShm::LcShm(std::uint8_t *addr)
     :
     SharedMem(64528)
 {
@@ -145,7 +145,7 @@ Listener::Listener()
 ///
 /// @param baseaddr The address to use for the block of
 ///     Listeners.
-Listener::Listener(boost::uint8_t *x)
+Listener::Listener(std::uint8_t *x)
 {
 //    GNASH_REPORT_FUNCTION;
     _baseaddr = x;
@@ -168,7 +168,7 @@ Listener::findListener(const string &name)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
+    std::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
     char *item = reinterpret_cast<char *>(addr);
     // Walk through the list to the end
     while (*item != 0) {
@@ -194,7 +194,7 @@ Listener::addListener(const string &name)
 {
     GNASH_REPORT_FUNCTION;
 
-    boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
+    std::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
     char *item = reinterpret_cast<char *>(addr);
 
 	 if (findListener(name)) {
@@ -252,7 +252,7 @@ Listener::removeListener(const string &name)
 {
     GNASH_REPORT_FUNCTION;
 
-    boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
+    std::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
 
     int len = 0;
 	int dest= 0;	
@@ -304,7 +304,7 @@ Listener::listListeners()
 //    GNASH_REPORT_FUNCTION;    
     std::unique_ptr< vector<string> > listeners ( new vector<string> );
     if (_baseaddr != 0) {
-        boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
+        std::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
         
         const char *item = reinterpret_cast<const char *>(addr);
         while (*item != 0) {
@@ -361,11 +361,11 @@ LcShm::close()
 /// @return A real pointer to the data after the headers has been parsed.
 ///
 /// @remarks May throw a ParserException
-boost::uint8_t *
-LcShm::parseHeader(boost::uint8_t *data, boost::uint8_t* tooFar)
+std::uint8_t *
+LcShm::parseHeader(std::uint8_t *data, std::uint8_t* tooFar)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint8_t *ptr = data;
+    std::uint8_t *ptr = data;
 
     if (data == 0) {
         log_debug(_("No data pointer to parse!"));
@@ -432,22 +432,22 @@ LcShm::parseHeader(boost::uint8_t *data, boost::uint8_t* tooFar)
 /// @param domain The domain the hostname is in.
 ///
 /// @return A real pointer to a header for a memory segment.
-boost::uint8_t *
+std::uint8_t *
 LcShm::formatHeader(const std::string &con, const std::string &host, bool /* domain */ )
 {
 //  GNASH_REPORT_FUNCTION;
-//  boost::uint8_t *ptr = data + LC_HEADER_SIZE;
+//  std::uint8_t *ptr = data + LC_HEADER_SIZE;
     int size = con.size() + host.size() + 9;
 
 //    Buffer *buf;
     
 //    Si:
 //    Assign the value of header and ptr directly.
-//    boost::uint8_t *header = new boost::uint8_t[size + 1];
-//    boost::uint8_t *ptr = header;
+//    std::uint8_t *header = new std::uint8_t[size + 1];
+//    std::uint8_t *ptr = header;
 
-    boost::uint8_t *header    = Listener::getBaseAddress();
-    boost::uint8_t *ptr_FH    = Listener::getBaseAddress();
+    std::uint8_t *header    = Listener::getBaseAddress();
+    std::uint8_t *ptr_FH    = Listener::getBaseAddress();
 //	log_debug("Base address in 'formatHeader' is: 0x%x, 0x%x",(unsigned int) header, (unsigned int) ptr_FH);
 
     // This is the initial 16 bytes of the header
@@ -520,9 +520,9 @@ LcShm::connect(const string& names)
         return false; 
     }
     
-	boost::uint8_t* baseAddress = reinterpret_cast<boost::uint8_t *>(SharedMem::begin());
+	std::uint8_t* baseAddress = reinterpret_cast<std::uint8_t *>(SharedMem::begin());
 	
-	boost::uint8_t* tooFar = SharedMem::end();
+	std::uint8_t* tooFar = SharedMem::end();
     Listener::setBaseAddress(baseAddress);
     _baseaddr = baseAddress;
     parseHeader(baseAddress, tooFar);
@@ -561,8 +561,8 @@ LcShm::connect(key_t key)
         return false; 
     }
     
-	boost::uint8_t* baseAddress = reinterpret_cast<boost::uint8_t *>(SharedMem::begin());
-	boost::uint8_t* tooFar = SharedMem::end();
+	std::uint8_t* baseAddress = reinterpret_cast<std::uint8_t *>(SharedMem::begin());
+	std::uint8_t* tooFar = SharedMem::end();
     Listener::setBaseAddress(baseAddress);
     _baseaddr = baseAddress;
     parseHeader(baseAddress, tooFar);
@@ -601,8 +601,8 @@ LcShm::send(const string&  name , const string&  domainname ,
 	if (!Listener::getBaseAddress()) return;
 
     //The base address
-     boost::uint8_t *baseptr = Listener::getBaseAddress();  	   
-     boost::uint8_t *ptr = baseptr;     
+     std::uint8_t *baseptr = Listener::getBaseAddress();
+     std::uint8_t *ptr = baseptr;
 
 // Compute the time
 // Please check before use.
@@ -669,7 +669,7 @@ LcShm::send(const string&  name , const string&  domainname ,
 // Update the connection name
 	   
 #if 0
-//     boost::uint8_t *tmp = AMF::encodeElement(name.c_str());
+//     std::uint8_t *tmp = AMF::encodeElement(name.c_str());
 //     memcpy(ptr, tmp, name.size());
 //     ptr +=  name.size() + AMF_HEADER_SIZE;
 //     delete[] tmp;
@@ -679,7 +679,7 @@ LcShm::send(const string&  name , const string&  domainname ,
 //     ptr +=  domainname.size() + AMF_HEADER_SIZE;
 
 //    ptr += LC_HEADER_SIZE;
-//    boost::uint8_t *x = ptr;    // just for debugging from gdb. temporary
+//    std::uint8_t *x = ptr;    // just for debugging from gdb. temporary
 
     // This is the initial 16 bytes of the header
     memset(ptr, 0, LC_HEADER_SIZE + 200);
@@ -712,8 +712,8 @@ LcShm::send(const string&  name , const string&  domainname ,
     
 //     ptr += AMF_BOOLEAN_SIZE;
     
-    vector<boost::uint8_t> *vec = AMF::encodeElement(data);
-    vector<boost::uint8_t>::iterator vit;
+    vector<std::uint8_t> *vec = AMF::encodeElement(data);
+    vector<std::uint8_t>::iterator vit;
     // Can't do a memcpy with a std::vector
 //    log_debug("Number of bytes in the vector: %x", vec->size());
     for (vit = vec->begin(); vit != vec->end(); vit++) {
@@ -761,10 +761,10 @@ LcShm::send(const string&  name , const string&  domainname ,
 ///         if findListener()
 ///         	Make sure the object is the listener for certain connection name
 ///  2: Parse the header
-///         boost::uint8_t *parseHeader(boost::uint8_t *data, boost::uint8_t* tooFar);
+///         std::uint8_t *parseHeader(std::uint8_t *data, std::uint8_t* tooFar);
 ///         	This should be easy if parseHeader function has been finished.
 ///  3: Parse the body of the shared memory
-/// 	    std::vector<std::shared_ptr<cygnal::Element> > parseBody(boost::uint8_t *data);
+/// 	    std::vector<std::shared_ptr<cygnal::Element> > parseBody(std::uint8_t *data);
 ///         	This should be easy if parseHeader function has been finished.
 ///  4: The listened should implement these commands somehow automatically .
 ///         Handler?

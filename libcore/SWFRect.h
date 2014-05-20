@@ -23,7 +23,7 @@
 #include <string>
 #include <cassert> 
 #include <ostream> 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include "dsodefs.h"
 #include "Range2d.h"
@@ -46,8 +46,8 @@ class SWFRect
 
 public:
 
-    static const boost::int32_t rectNull = 0x80000000;
-    static const boost::int32_t rectMax = 0x7fffffff;
+    static const std::int32_t rectNull = 0x80000000;
+    static const std::int32_t rectMax = 0x7fffffff;
     
     /// Ouput operator
     friend std::ostream& operator<< (std::ostream& os, const SWFRect& SWFRect);
@@ -100,47 +100,47 @@ public:
     }
 
     /// Return width of this rectangle in TWIPS
-    boost::int32_t width() const
+    std::int32_t width() const
     {
         return _xMax - _xMin;
     }
 
     /// Return height of this rectangle in TWIPS
-    boost::int32_t height() const
+    std::int32_t height() const
     {
         return _yMax - _yMin;
     }
 
     /// Get the x coordinate of the left-up corner.
-    boost::int32_t get_x_min() const
+    std::int32_t get_x_min() const
     {
         assert(!is_null());
         return _xMin;
     }
 
     /// Get the x coordinate of the right-down corner.
-    boost::int32_t get_x_max() const
+    std::int32_t get_x_max() const
     {
         assert(!is_null());
         return _xMax;
     }
 
     /// Get the y coordinate of the left-up corner.
-    boost::int32_t get_y_min() const
+    std::int32_t get_y_min() const
     {
         assert(!is_null());
         return _yMin;
     }
 
     /// Get the y coordinate of the right-down corner.
-    boost::int32_t get_y_max() const
+    std::int32_t get_y_max() const
     {
         assert(!is_null());
         return _yMax;
     }
     
     /// Return true if the given point is inside this SWFRect.
-    bool point_test(boost::int32_t x, boost::int32_t y) const
+    bool point_test(std::int32_t x, std::int32_t y) const
     {
         if (is_null()) return false;
         
@@ -151,15 +151,15 @@ public:
     }
 
     /// Set ourself to bound the given point
-    void set_to_point(boost::int32_t x, boost::int32_t y)
+    void set_to_point(std::int32_t x, std::int32_t y)
     {
         _xMin = _xMax = x;
         _yMin = _yMax = y;
     }
 
     
-    void set_to_rect(boost::int32_t x1, boost::int32_t y1, boost::int32_t x2,
-            boost::int32_t y2)
+    void set_to_rect(std::int32_t x1, std::int32_t y1, std::int32_t x2,
+            std::int32_t y2)
     {
         _xMin = x1;
         _yMin = y1;
@@ -168,7 +168,7 @@ public:
     }
     
     /// Expand this rectangle to enclose the given point.
-    void expand_to_point(boost::int32_t x, boost::int32_t y)
+    void expand_to_point(std::int32_t x, std::int32_t y)
     {
         if (is_null()) {
             set_to_point(x, y);
@@ -183,8 +183,8 @@ public:
     void enclose_transformed_rect(const SWFMatrix& m, const SWFRect& r);
     
     /// Expand this rectangle to enclose the given circle.
-    void expand_to_circle(boost::int32_t x, boost::int32_t y,
-            boost::int32_t radius)
+    void expand_to_circle(std::int32_t x, std::int32_t y,
+            std::int32_t radius)
     {
         // I know it's easy to make code work for minus radius.
         // would do that untill I see the requirement for a SWF RECTANGLE.
@@ -219,20 +219,20 @@ public:
 
     /// Construct and return a Range2d object.
     // TODO: deprecate this.
-    geometry::Range2d<boost::int32_t> getRange() const
+    geometry::Range2d<std::int32_t> getRange() const
     {
         if (is_null())
         {
            // Range2d has a differnt idea about what is a null SWFRect.
-           return geometry::Range2d<boost::int32_t>(geometry::nullRange); 
+           return geometry::Range2d<std::int32_t>(geometry::nullRange);
         }
         else if( is_world() ) 
         {
-            return geometry::Range2d<boost::int32_t>(geometry::worldRange);
+            return geometry::Range2d<std::int32_t>(geometry::worldRange);
         }
         else
         {
-            return geometry::Range2d<boost::int32_t>(_xMin, _yMin,
+            return geometry::Range2d<std::int32_t>(_xMin, _yMin,
                     _xMax, _yMax);
         }
     }
@@ -243,7 +243,7 @@ public:
 private:
 
     // make ourself to enclose the given point.
-    void expand_to(boost::int32_t x, boost::int32_t y)
+    void expand_to(std::int32_t x, std::int32_t y)
     {
         _xMin = std::min(_xMin, x);
         _yMin = std::min(_yMin, y);
@@ -251,10 +251,10 @@ private:
         _yMax = std::max(_yMax, y);
     }
 
-    boost::int32_t _xMin; // TWIPS
-    boost::int32_t _yMin; // TWIPS
-    boost::int32_t _xMax; // TWIPS
-    boost::int32_t _yMax; // TWIPS
+    std::int32_t _xMin; // TWIPS
+    std::int32_t _yMin; // TWIPS
+    std::int32_t _xMax; // TWIPS
+    std::int32_t _yMax; // TWIPS
 };
 
 

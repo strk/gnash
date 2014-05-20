@@ -22,7 +22,7 @@
 #define GNASH_SOCKET_H
 
 #include "dsodefs.h"
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include "IOChannel.h"
 
 namespace gnash {
@@ -56,7 +56,7 @@ public:
     /// @return         false if the connection fails. In this case, the
     ///                 Socket is still in a closed state and is ready for
     ///                 a new connection attempt. Otherwise true.
-    bool connect(const std::string& hostname, boost::uint16_t port);
+    bool connect(const std::string& hostname, std::uint16_t port);
 
     /// Close the Socket.
     //

@@ -23,7 +23,7 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <cstring>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <fcntl.h>
 
 #include "log.h"
@@ -187,7 +187,7 @@ FBAggGlue::createRenderHandler()
     assert(agg_handler != NULL);
 
     // Get the memory buffer to have AGG render into.
-    boost::uint8_t *mem = 0;
+    std::uint8_t *mem = 0;
     if (rawfb->isSingleBuffered()) {
         log_debug(_("Double buffering disabled"));
         mem = rawfb->getFBMemory();

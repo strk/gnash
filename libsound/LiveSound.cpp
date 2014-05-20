@@ -51,7 +51,7 @@ LiveSound::createDecoder(media::MediaHandler& mh, const media::SoundInfo& si)
 }
 
 unsigned int 
-LiveSound::fetchSamples(boost::int16_t* to, unsigned int nSamples)
+LiveSound::fetchSamples(std::int16_t* to, unsigned int nSamples)
 {
     unsigned int fetchedSamples = 0;
 
@@ -59,7 +59,7 @@ LiveSound::fetchSamples(boost::int16_t* to, unsigned int nSamples)
         unsigned int availableSamples = decodedSamplesAhead();
 
         if (availableSamples) {
-            const boost::int16_t* data = getDecodedData(_playbackPosition);
+            const std::int16_t* data = getDecodedData(_playbackPosition);
 
             if (availableSamples >= nSamples) {
                 std::copy(data, data + nSamples, to);

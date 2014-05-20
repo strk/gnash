@@ -23,7 +23,7 @@
 
 #include <string>
 #include <ios> // for std::streamsize
-#include <boost/cstdint.hpp> // for boost int types
+#include <cstdint> // for boost int types
 
 #include "dsodefs.h" // DSOEXPORT
 #include "GnashException.h" // for IOException inheritance
@@ -50,19 +50,19 @@ public:
     //
     /// Throw IOException on error
     ///
-    boost::uint32_t read_le32();
+    std::uint32_t read_le32();
 
     /// Read a 16-bit word from a little-endian stream.
     //
     /// Throw IOException on error
     ///
-    boost::uint16_t read_le16();
+    std::uint16_t read_le16();
 
     /// Read a single byte from the stream
     //
     /// Throw IOException on error
     ///
-    boost::uint8_t read_byte();
+    std::uint8_t read_byte();
     
     /// Read the given number of bytes from the stream
     //

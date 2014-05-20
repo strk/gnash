@@ -259,7 +259,7 @@ DumpGui::run()
         }
     }
 
-    const boost::uint32_t total_time = _clock.elapsed() - _startTime;
+    const std::uint32_t total_time = _clock.elapsed() - _startTime;
 
     std::cout << "TIME=" << total_time << std::endl;
     std::cout << "FPS_ACTUAL=" << _fileOutputFPS << std::endl;
@@ -330,7 +330,7 @@ DumpGui::writeSamples()
     // And update _samplesFetched..
     _samplesFetched += toFetch;
 
-    boost::int16_t samples[1024];
+    std::int16_t samples[1024];
     while (toFetch) {
         unsigned int n = std::min(toFetch, 1024u);
         // Fetching samples should trigger writing to file

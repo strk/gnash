@@ -44,12 +44,12 @@ public:
     // Parse an FitcDemo Request message coming from the Red5 fitcDemo_test.
     std::vector<std::shared_ptr<amf::Element > > parseFitcDemoRequest(amf::Buffer &buf)
         { return parseFitcDemoRequest(buf.reference(), buf.size()); };
-    std::vector<std::shared_ptr<amf::Element > > parseFitcDemoRequest(boost::uint8_t *buf, size_t size);
+    std::vector<std::shared_ptr<amf::Element > > parseFitcDemoRequest(std::uint8_t *buf, size_t size);
     
     // format a response to the 'fitcDemo' test used for testing Gnash.
     std::shared_ptr<amf::Buffer> formatFitcDemoResponse(double num, amf::Element &el);
     std::shared_ptr<amf::Buffer> formatFitcDemoResponse(double num, amf::Buffer &data);
-    std::shared_ptr<amf::Buffer> formatFitcDemoResponse(double num, boost::uint8_t *data, size_t size);
+    std::shared_ptr<amf::Buffer> formatFitcDemoResponse(double num, std::uint8_t *data, size_t size);
 
     std::shared_ptr<amf::Buffer> getResponse() { return _response; };
     void setResponse(std::shared_ptr<amf::Buffer> &x) { _response = x; };
@@ -61,8 +61,8 @@ private:
 extern "C" {
     std::shared_ptr<Handler::cygnal_init_t> fitcDemo_class_init();
     // the standard API
-    size_t fitcDemo_read_func(boost::uint8_t *data, size_t size);
-    size_t fitcDemo_write_func(boost::uint8_t *data, size_t size);
+    size_t fitcDemo_read_func(std::uint8_t *data, size_t size);
+    size_t fitcDemo_write_func(std::uint8_t *data, size_t size);
 }
 
 } // end of cygnal namespace

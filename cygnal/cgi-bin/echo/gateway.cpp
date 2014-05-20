@@ -68,7 +68,7 @@ extern "C" {
 //      GNASH_REPORT_RETURN;
     }
 
-    size_t gateway_write_func(boost::uint8_t *data, size_t size)
+    size_t gateway_write_func(std::uint8_t *data, size_t size)
     {
 // 	GNASH_REPORT_FUNCTION;
 
@@ -236,18 +236,18 @@ GatewayTest::~GatewayTest()
 // Parse an Echo Request message coming from the Red5 echo_test. This
 // method should only be used for testing purposes.
 vector<std::shared_ptr<amf::Element > >
-GatewayTest::parseEchoRequest(boost::uint8_t *data, size_t size)
+GatewayTest::parseEchoRequest(std::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     
     vector<std::shared_ptr<amf::Element > > headers;
 	
     // skip past the header bytes, we don't care about them.
-    boost::uint8_t *tmpptr = data + 6;
+    std::uint8_t *tmpptr = data + 6;
     
-    boost::uint16_t length;
-    length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
-    tmpptr += sizeof(boost::uint16_t);
+    std::uint16_t length;
+    length = ntohs((*(std::uint16_t *)tmpptr) & 0xffff);
+    tmpptr += sizeof(std::uint16_t);
 
     // Get the first name, which is a raw string, and not preceded by
     // a type byte.
@@ -256,7 +256,7 @@ GatewayTest::parseEchoRequest(boost::uint8_t *data, size_t size)
     // If the length of the name field is corrupted, then we get out of
     // range quick, and corrupt memory. This is a bit of a hack, but
     // reduces memory errors caused by some of the corrupted tes cases.
-    boost::uint8_t *endstr = std::find(tmpptr, tmpptr+length, '\0');
+    std::uint8_t *endstr = std::find(tmpptr, tmpptr+length, '\0');
     if (endstr != tmpptr+length) {
 	log_debug("Caught corrupted string! length was %d, null at %d",
 		  length,  endstr-tmpptr);
@@ -268,8 +268,8 @@ GatewayTest::parseEchoRequest(boost::uint8_t *data, size_t size)
     
     // Get the second name, which is a raw string, and not preceded by
     // a type byte.
-    length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
-    tmpptr += sizeof(boost::uint16_t);
+    length = ntohs((*(std::uint16_t *)tmpptr) & 0xffff);
+    tmpptr += sizeof(std::uint16_t);
     std::shared_ptr<amf::Element > el2(new amf::Element);
 
 //     std::string name2(reinterpret_cast<const char *>(tmpptr), length);
@@ -340,11 +340,11 @@ GatewayTest::formatEchoResponse(const std::string &num, amf::Buffer &data)
 }
 
 amf::Buffer &
-GatewayTest::formatEchoResponse(const std::string &num, boost::uint8_t *data, size_t size)
+GatewayTest::formatEchoResponse(const std::string &num, std::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    //boost::uint8_t *tmpptr  = data;
+    //std::uint8_t *tmpptr  = data;
     
     // FIXME: temporary hacks while debugging
     amf::Buffer fixme("00 00 00 00 00 01");

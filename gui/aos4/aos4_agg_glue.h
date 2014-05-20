@@ -29,7 +29,7 @@
 #include <proto/dos.h>
 #include <proto/gadtools.h>
 
-#include <boost/cstdint.hpp> // for boost::?int??_t 
+#include <cstdint> // for boost::?int??_t
 #include <vector>
 
 namespace gnash

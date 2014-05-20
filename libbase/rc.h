@@ -25,7 +25,7 @@
 #include <vector>
 #include <iosfwd>
 #include <sstream>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/tokenizer.hpp>
 
 #include "StringPredicates.h"
@@ -34,7 +34,7 @@
 #include <sys/shm.h>
 #else
 #ifdef _WIN32
-  typedef boost::uint32_t key_t;
+  typedef std::uint32_t key_t;
 #endif // _WIN32
 #endif // _WIN32 and __HAIKU__
 
@@ -442,10 +442,10 @@ protected:
     typedef boost::tokenizer< Sep > Tok;
 
     /// The timer delay
-    boost::uint32_t  _delay;
+    std::uint32_t  _delay;
 
     /// Max number of movie clips to store in the library      
-    boost::uint32_t  _movieLibraryLimit;   
+    std::uint32_t  _movieLibraryLimit;
 
     /// Enable debugging of this class
     bool _debug;
@@ -454,7 +454,7 @@ protected:
     bool _debugger;
 
     /// Level of debugging output
-    boost::uint32_t  _verbosity;
+    std::uint32_t  _verbosity;
 
     /// Command format to use to open urls
     //
@@ -562,7 +562,7 @@ protected:
     
     /// Shared memory segment key (can be set for
     /// compatibility with other players.)
-    boost::uint32_t _lcshmkey;
+    std::uint32_t _lcshmkey;
     
     /// Whether the player should respond to fscommands
     /// (showmenu, quit etc)

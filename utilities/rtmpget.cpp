@@ -27,7 +27,7 @@
 #include "GnashSleep.h"
 #include "URL.h"
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <iomanip>
 #include <map>
 #include <algorithm>
@@ -182,8 +182,8 @@ writeFLVHeader(std::ostream& o)
 }
 
 
-bool handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
-        const boost::uint8_t* end);
+bool handleInvoke(rtmp::RTMP& r, FakeNC& nc, const std::uint8_t* payload,
+        const std::uint8_t* end);
 
 /// These functions create an RTMP call buffer and send it. They mimic
 /// NetConnection.call() methods and replies to server calls.
@@ -538,8 +538,8 @@ main(int argc, char** argv)
 }
 
 bool
-handleInvoke(rtmp::RTMP& r, FakeNC& nc, const boost::uint8_t* payload,
-        const boost::uint8_t* end)
+handleInvoke(rtmp::RTMP& r, FakeNC& nc, const std::uint8_t* payload,
+        const std::uint8_t* end)
 {
     assert(payload != end);
 

@@ -212,7 +212,7 @@ main(int argc, char *argv[])
 	    }
 	    
 	    cout << "FLV Version: " << int(head->version) << " (should always be 1)" << endl;
-	    boost::uint32_t headsize = flv.convert24(head->head_size);
+	    std::uint32_t headsize = flv.convert24(head->head_size);
 	    if (all) {
 		cout << "FLV Header size: " << headsize << " (should always be 9)" << endl;
 	    }

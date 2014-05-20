@@ -36,7 +36,7 @@ DefineButtonCxformTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     assert(tag == SWF::DEFINEBUTTONCXFORM);
 
     in.ensureBytes(2);
-    const boost::uint16_t buttonID = in.read_u16();
+    const std::uint16_t buttonID = in.read_u16();
 
     IF_VERBOSE_PARSE (
         log_parse("DefineButtonCxformTag: ButtonId=%d", buttonID);

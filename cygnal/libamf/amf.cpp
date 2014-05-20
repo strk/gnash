@@ -29,7 +29,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 namespace cygnal
 {
@@ -101,10 +101,10 @@ void *
 swapBytes(void *word, size_t size)
 {
     union {
-	boost::uint16_t s;
+	std::uint16_t s;
 	struct {
-	    boost::uint8_t c0;
-	    boost::uint8_t c1;
+	    std::uint8_t c0;
+	    std::uint8_t c1;
 	} c;
     } u;
 	   
@@ -117,7 +117,7 @@ swapBytes(void *word, size_t size)
     // Little-endian machine: byte-swap the word
 
     // A conveniently-typed pointer to the source data
-    boost::uint8_t *x = static_cast<boost::uint8_t *>(word);
+    std::uint8_t *x = static_cast<std::uint8_t *>(word);
 
     /// Handle odd as well as even counts of bytes
     std::reverse(x, x+size);
@@ -162,7 +162,7 @@ AMF::encodeBoolean(bool flag)
     // Encode a boolean value. 0 for false, 1 for true
     std::shared_ptr<Buffer> buf(new Buffer(2));
     *buf = Element::BOOLEAN_AMF0; 
-    *buf += static_cast<boost::uint8_t>(flag);
+    *buf += static_cast<std::uint8_t>(flag);
     
     return buf;
 }
@@ -174,7 +174,7 @@ std::shared_ptr<Buffer>
 AMF::encodeObject(const cygnal::Element &data)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint32_t length;
+    std::uint32_t length;
     length = data.propertySize();
     gnash::log_debug(_("Encoded data size has %d properties"), length);
     std::shared_ptr<cygnal::Buffer> buf;
@@ -254,7 +254,7 @@ AMF::encodeUnsupported()
 /// 
 /// @return a binary AMF packet in big endian format
 std::shared_ptr<Buffer>
-AMF::encodeDate(const boost::uint8_t *date)
+AMF::encodeDate(const std::uint8_t *date)
 {
 //    GNASH_REPORT_FUNCTION;
 //    std::shared_ptr<Buffer> buf;
@@ -292,7 +292,7 @@ AMF::encodeNull()
 ///
 /// @return a binary AMF packet in big endian format
 std::shared_ptr<Buffer>
-AMF::encodeXMLObject(const boost::uint8_t * /*data */, size_t /* size */)
+AMF::encodeXMLObject(const std::uint8_t * /*data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     std::shared_ptr<Buffer> buf;
@@ -314,7 +314,7 @@ AMF::encodeTypedObject(const cygnal::Element &data)
 //    GNASH_REPORT_FUNCTION;
 
     size_t size = 0;
-    boost::uint32_t props;
+    std::uint32_t props;
     props = data.propertySize();
     std::shared_ptr<cygnal::Buffer> buf;
     //    log_debug("Encoded data size has %d properties", props);
@@ -333,7 +333,7 @@ AMF::encodeTypedObject(const cygnal::Element &data)
     *buf = Element::TYPED_OBJECT_AMF0;
 
     size_t length = data.getNameSize();
-    boost::uint16_t enclength = length;
+    std::uint16_t enclength = length;
     swapBytes(&enclength, 2);
     *buf += enclength;
 
@@ -376,13 +376,13 @@ AMF::encodeTypedObject(const cygnal::Element &data)
 ///
 /// @return a binary AMF packet in big endian format (header,data)
 std::shared_ptr<Buffer>
-AMF::encodeReference(boost::uint16_t index)
+AMF::encodeReference(std::uint16_t index)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint16_t num = index;
+    std::uint16_t num = index;
     std::shared_ptr<cygnal::Buffer> buf(new Buffer(3));
     *buf = Element::REFERENCE_AMF0;
-    swapBytes(&num, sizeof(boost::uint16_t));
+    swapBytes(&num, sizeof(std::uint16_t));
     *buf += num;
     
     return buf;
@@ -396,7 +396,7 @@ AMF::encodeReference(boost::uint16_t index)
 ///
 /// @return a binary AMF packet in big endian format (header,data)
 std::shared_ptr<Buffer>
-AMF::encodeMovieClip(const boost::uint8_t * /*data */, size_t /* size */)
+AMF::encodeMovieClip(const std::uint8_t * /*data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     std::shared_ptr<Buffer> buf;
@@ -418,7 +418,7 @@ std::shared_ptr<Buffer>
 AMF::encodeECMAArray(const cygnal::Element &data)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint32_t length;
+    std::uint32_t length;
     bool sparse = false;
     //size_t counter = 0;
 
@@ -432,7 +432,7 @@ AMF::encodeECMAArray(const cygnal::Element &data)
     }
     *buf = Element::ECMA_ARRAY_AMF0;
     length = 0;
-    swapBytes(&length, sizeof(boost::uint32_t));
+    swapBytes(&length, sizeof(std::uint32_t));
     *buf += length;
 
     // At lest for red5, it seems to encode from the last item to the
@@ -487,7 +487,7 @@ AMF::encodeECMAArray(const cygnal::Element &data)
 ///
 /// @return a binary AMF packet in big endian format
 std::shared_ptr<Buffer>
-AMF::encodeLongString(const boost::uint8_t * /* data */, size_t /* size */)
+AMF::encodeLongString(const std::uint8_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     std::shared_ptr<Buffer> buf;
@@ -504,7 +504,7 @@ AMF::encodeLongString(const boost::uint8_t * /* data */, size_t /* size */)
 ///
 /// @return a binary AMF packet in big endian format
 std::shared_ptr<Buffer>
-AMF::encodeRecordSet(const boost::uint8_t * /* data */, size_t /* size */)
+AMF::encodeRecordSet(const std::uint8_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     std::shared_ptr<Buffer> buf;
@@ -526,7 +526,7 @@ std::shared_ptr<Buffer>
 AMF::encodeStrictArray(const cygnal::Element &data)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint32_t items;
+    std::uint32_t items;
     items = data.propertySize();
     //    log_debug("Encoded data size has %d properties", items);
     std::shared_ptr<cygnal::Buffer> buf(new cygnal::Buffer);
@@ -539,7 +539,7 @@ AMF::encodeStrictArray(const cygnal::Element &data)
 	//	buf.reset(new cygnal::Buffer(5));
     }
     *buf = Element::STRICT_ARRAY_AMF0;
-    swapBytes(&items, sizeof(boost::uint32_t));
+    swapBytes(&items, sizeof(std::uint32_t));
     *buf += items;
 
     if (data.propertySize() > 0) {
@@ -562,10 +562,10 @@ AMF::encodeStrictArray(const cygnal::Element &data)
 		    // When returning an ECMA array for a sparsely populated
 		    // array, Red5 adds one more to the count to be 1 based,
 		    // instead of zero based.
-		    boost::uint32_t moreitems = data.propertySize() + 1;
-		    swapBytes(&moreitems, sizeof(boost::uint32_t));
-		    boost::uint8_t *ptr = buf->reference() + 1;
-		    memcpy(ptr, &moreitems, sizeof(boost::uint32_t));
+		    std::uint32_t moreitems = data.propertySize() + 1;
+		    swapBytes(&moreitems, sizeof(std::uint32_t));
+		    std::uint8_t *ptr = buf->reference() + 1;
+		    memcpy(ptr, &moreitems, sizeof(std::uint32_t));
 		    sparse = true;
 		}
 		continue;
@@ -606,7 +606,7 @@ AMF::encodeStrictArray(const cygnal::Element &data)
 std::shared_ptr<Buffer>
 AMF::encodeString(const std::string &str)
 {
-    boost::uint8_t *ptr = const_cast<boost::uint8_t *>(reinterpret_cast<const boost::uint8_t *>(str.c_str()));
+    std::uint8_t *ptr = const_cast<std::uint8_t *>(reinterpret_cast<const std::uint8_t *>(str.c_str()));
     return encodeString(ptr, str.size());
 }
 
@@ -618,7 +618,7 @@ AMF::encodeString(const std::string &str)
 ///
 /// @return a binary AMF packet in big endian format
 std::shared_ptr<Buffer>
-AMF::encodeString(boost::uint8_t *data, size_t size)
+AMF::encodeString(std::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     std::shared_ptr<Buffer>buf(new Buffer(size + AMF_HEADER_SIZE));
@@ -627,7 +627,7 @@ AMF::encodeString(boost::uint8_t *data, size_t size)
     // it can be printed by to_string() efficiently. The NULL terminator
     // doesn't get written when encoding a string as it has a byte count
     // instead.
-    boost::uint16_t length = size;
+    std::uint16_t length = size;
 //    log_debug("Encoded data size is going to be %d", length);
     swapBytes(&length, 2);
     *buf += length;
@@ -644,7 +644,7 @@ std::shared_ptr<Buffer>
 AMF::encodeNullString()
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint16_t length;
+    std::uint16_t length;
     
     std::shared_ptr<Buffer> buf(new Buffer(AMF_HEADER_SIZE));
     *buf = Element::STRING_AMF0;
@@ -791,14 +791,14 @@ AMF::encodeElement(const cygnal::Element& el)
     std::shared_ptr<Buffer> bigbuf;
     if (el.getName() && (el.getType() != Element::TYPED_OBJECT_AMF0)) {
 	if (buf) {
-	    bigbuf.reset(new cygnal::Buffer(el.getNameSize() + sizeof(boost::uint16_t) + buf->size()));
+	    bigbuf.reset(new cygnal::Buffer(el.getNameSize() + sizeof(std::uint16_t) + buf->size()));
 	} else {
-	    bigbuf.reset(new cygnal::Buffer(el.getNameSize() + sizeof(boost::uint16_t)));
+	    bigbuf.reset(new cygnal::Buffer(el.getNameSize() + sizeof(std::uint16_t)));
 	}
 	
 	// Add the length of the string for the name of the variable
 	size_t length = el.getNameSize();
-	boost::uint16_t enclength = length;
+	std::uint16_t enclength = length;
 	swapBytes(&enclength, 2);
 	*bigbuf = enclength;
 	// Now the name itself
@@ -833,7 +833,7 @@ AMF::encodeProperty(std::shared_ptr<cygnal::Element> el)
 
     // Add the length of the string for the name of the property
     size_t length = el->getNameSize();
-    boost::uint16_t enclength = length;
+    std::uint16_t enclength = length;
     swapBytes(&enclength, 2);
     *buf = enclength;
 
@@ -882,8 +882,8 @@ std::shared_ptr<cygnal::Element>
 AMF::extractAMF(std::shared_ptr<Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint8_t* start = buf->reference();
-    boost::uint8_t* tooFar = start+buf->size();
+    std::uint8_t* start = buf->reference();
+    std::uint8_t* tooFar = start+buf->size();
     
     return extractAMF(start, tooFar);
 }
@@ -900,12 +900,12 @@ AMF::extractAMF(std::shared_ptr<Buffer> buf)
 ///
 /// @remarks May throw a ParserException
 std::shared_ptr<cygnal::Element>
-AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
+AMF::extractAMF(std::uint8_t *in, std::uint8_t* tooFar)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    boost::uint8_t *tmpptr = in;
-    boost::uint16_t length;
+    std::uint8_t *tmpptr = in;
+    std::uint16_t length;
     std::shared_ptr<cygnal::Element> el(new Element);
 
     if (in == 0) {
@@ -913,7 +913,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
         return el;
     }
 
-    std::map<boost::uint16_t, cygnal::Element> references;
+    std::map<std::uint16_t, cygnal::Element> references;
     
     // All elements look like this:
     // the first two bytes is the length of name of the element
@@ -971,8 +971,8 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
             break;
         case Element::STRING_AMF0:
             // get the length of the name
-            length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
-            tmpptr += sizeof(boost::uint16_t);
+            length = ntohs((*(std::uint16_t *)tmpptr) & 0xffff);
+            tmpptr += sizeof(std::uint16_t);
             if (length >= SANE_STR_SIZE) {
                 gnash::log_error(_("%d bytes for a string is over the safe "
                                    "limit of %d, line %d"), length,
@@ -1027,8 +1027,8 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
             break;
         case Element::REFERENCE_AMF0:
         {
-            length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
-            tmpptr += sizeof(boost::uint16_t);
+            length = ntohs((*(std::uint16_t *)tmpptr) & 0xffff);
+            tmpptr += sizeof(std::uint16_t);
             el->makeReference(length);
             // FIXME: connect reference Element to the object
             // pointed to by the index.
@@ -1041,7 +1041,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
         case Element::ECMA_ARRAY_AMF0:
         {
             el->makeECMAArray();
-            tmpptr += sizeof(boost::uint32_t);
+            tmpptr += sizeof(std::uint32_t);
 #if 1
             while (tmpptr < tooFar) { // FIXME: was tooFar - AMF_HEADER_SIZE)
                 if (*tmpptr+3 == TERMINATOR) {
@@ -1065,10 +1065,10 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
             break;
 #else
             // get the number of elements in the array
-            boost::uint32_t items = 
-                ntohl((*(boost::uint32_t *)tmpptr) & 0xffffffff);
+            std::uint32_t items =
+                ntohl((*(std::uint32_t *)tmpptr) & 0xffffffff);
   
-            tmpptr += sizeof(boost::uint32_t);
+            tmpptr += sizeof(std::uint32_t);
             while (items--) {
                 std::shared_ptr<cygnal::Element> child =
                     amf_obj.extractProperty(tmpptr, tooFar); 
@@ -1090,9 +1090,9 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
         {
             el->makeStrictArray();
             // get the number of numbers in the array
-            boost::uint32_t items = ntohl((*(boost::uint32_t *)tmpptr));
+            std::uint32_t items = ntohl((*(std::uint32_t *)tmpptr));
             // Skip past the length field to get to the start of the data
-            tmpptr += sizeof(boost::uint32_t);
+            tmpptr += sizeof(std::uint32_t);
             while (items) {
                 std::shared_ptr<cygnal::Element> child =
                     amf_obj.extractAMF(tmpptr, tooFar); 
@@ -1132,8 +1132,8 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
         {
             el->makeTypedObject();
             
-            length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
-            tmpptr += sizeof(boost::uint16_t);
+            length = ntohs((*(std::uint16_t *)tmpptr) & 0xffff);
+            tmpptr += sizeof(std::uint16_t);
             if (length > 0) {
                 std::string name(reinterpret_cast<const char*>(tmpptr), length);
                 //log_debug("Typed object name is: %s", el->getName());
@@ -1191,8 +1191,8 @@ AMF::extractProperty(std::shared_ptr<Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    boost::uint8_t* start = buf->reference();
-    boost::uint8_t* tooFar = start+buf->size();
+    std::uint8_t* start = buf->reference();
+    std::uint8_t* tooFar = start+buf->size();
     return extractProperty(start, tooFar);
 }
 
@@ -1210,17 +1210,17 @@ AMF::extractProperty(std::shared_ptr<Buffer> buf)
 ///
 /// @remarks May throw a ParserException
 std::shared_ptr<cygnal::Element>
-AMF::extractProperty(boost::uint8_t *in, boost::uint8_t* tooFar)
+AMF::extractProperty(std::uint8_t *in, std::uint8_t* tooFar)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    boost::uint8_t *tmpptr = in;
-    boost::uint16_t length;
+    std::uint8_t *tmpptr = in;
+    std::uint16_t length;
     std::shared_ptr<cygnal::Element> el;
 
-    length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
+    length = ntohs((*(std::uint16_t *)tmpptr) & 0xffff);
     // go past the length bytes, which leaves us pointing at the raw data
-    tmpptr += sizeof(boost::uint16_t);
+    tmpptr += sizeof(std::uint16_t);
 
     // sanity check the length of the data. The length is usually only zero if
     // we've gone all the way to the end of the object.

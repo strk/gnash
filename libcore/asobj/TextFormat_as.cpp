@@ -72,7 +72,7 @@ struct
 PixelsToTwips : SetBase
 {
     PixelsToTwips(const fn_call& fn) : SetBase(fn) {}
-    boost::int32_t operator()(const as_value& val) const {
+    std::int32_t operator()(const as_value& val) const {
         return pixelsToTwips(toNumber(val, getVM(fn())));
     }
 };
@@ -256,11 +256,11 @@ registerTextFormatNative(as_object& o)
             110, 2);
     
     vm.registerNative(
-            Get<const TextFormat_as, boost::uint16_t,
+            Get<const TextFormat_as, std::uint16_t,
             &TextFormat_as::size, TwipsToPixels>::get,
             110, 3);
     vm.registerNative(
-            Set<TextFormat_as, boost::uint16_t, &TextFormat_as::sizeSet,
+            Set<TextFormat_as, std::uint16_t, &TextFormat_as::sizeSet,
             PixelsToTwips>::set, 
             110, 4);
     
@@ -311,47 +311,47 @@ registerTextFormatNative(as_object& o)
     vm.registerNative(textformat_align, 110, 18);
 
     vm.registerNative(
-            Get<const TextFormat_as, boost::uint16_t,
+            Get<const TextFormat_as, std::uint16_t,
             &TextFormat_as::leftMargin, TwipsToPixels>::get,
             110, 19);
     vm.registerNative(
-            Set<TextFormat_as, boost::uint16_t, &TextFormat_as::leftMarginSet,
+            Set<TextFormat_as, std::uint16_t, &TextFormat_as::leftMarginSet,
             PositiveTwips>::set, 
             110, 20);
 
     vm.registerNative(
-            Get<const TextFormat_as, boost::uint16_t,
+            Get<const TextFormat_as, std::uint16_t,
             &TextFormat_as::rightMargin, TwipsToPixels>::get,
             110, 21);
     vm.registerNative(
-            Set<TextFormat_as, boost::uint16_t, &TextFormat_as::rightMarginSet,
+            Set<TextFormat_as, std::uint16_t, &TextFormat_as::rightMarginSet,
             PositiveTwips>::set, 
             110, 22);
 
     vm.registerNative(
-            Get<const TextFormat_as, boost::uint16_t,
+            Get<const TextFormat_as, std::uint16_t,
             &TextFormat_as::indent,
             TwipsToPixels>::get, 110, 23);
     vm.registerNative(
-            Set<TextFormat_as, boost::uint16_t, &TextFormat_as::indentSet,
+            Set<TextFormat_as, std::uint16_t, &TextFormat_as::indentSet,
             PositiveTwips>::set, 
             110, 24);
     
     vm.registerNative(
-            Get<const TextFormat_as, boost::uint16_t,
+            Get<const TextFormat_as, std::uint16_t,
             &TextFormat_as::leading,
             TwipsToPixels>::get, 110, 25);
     vm.registerNative(
-            Set<TextFormat_as, boost::uint16_t, &TextFormat_as::leadingSet,
+            Set<TextFormat_as, std::uint16_t, &TextFormat_as::leadingSet,
             PositiveTwips>::set, 
             110, 26);
 
     vm.registerNative(
-            Get<const TextFormat_as, boost::uint32_t,
+            Get<const TextFormat_as, std::uint32_t,
             &TextFormat_as::blockIndent,
             TwipsToPixels>::get, 110, 27);
     vm.registerNative(
-            Set<TextFormat_as, boost::uint32_t, &TextFormat_as::blockIndentSet,
+            Set<TextFormat_as, std::uint32_t, &TextFormat_as::blockIndentSet,
             PositiveTwips>::set,
             110, 28);
 
@@ -590,7 +590,7 @@ textformat_getTextExtent(const fn_call& fn)
         const movie_definition* md = getRoot(fn).getRootMovie().definition();
 
         // Option 1. Name refers to an imported font ('asset') symbol.
-        boost::uint16_t fontId = md->exportID(name);
+        std::uint16_t fontId = md->exportID(name);
         if (fontId != 0) {
             f = md->get_font(fontId);
         }

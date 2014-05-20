@@ -20,7 +20,7 @@
 #define GNASH_VIDEOINPUTHAIKU_H
 
 #include <vector>
-#include <boost/cstdint.hpp> // for C99 int types
+#include <cstdint> // for C99 int types
 #include "VideoInput.h"
 
 namespace gnash {

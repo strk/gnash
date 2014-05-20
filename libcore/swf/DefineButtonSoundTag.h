@@ -43,7 +43,7 @@ public:
 
 	struct ButtonSound
 	{
-		boost::uint16_t soundID;
+		std::uint16_t soundID;
 		sound_sample* sample;
 		SoundInfoRecord soundInfo;
 

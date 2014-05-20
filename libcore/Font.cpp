@@ -44,7 +44,7 @@ class CodeLookup
 public:
     CodeLookup(const int glyph) : _glyph(glyph) {}
 
-    bool operator()(const std::pair<const boost::uint16_t, int>& p) const {
+    bool operator()(const std::pair<const std::uint16_t, int>& p) const {
         return p.second == _glyph;
     }
 
@@ -148,7 +148,7 @@ Font::glyphCount() const
 
 
 void
-Font::setFlags(boost::uint8_t flags)
+Font::setFlags(std::uint8_t flags)
 {
     _shiftJISChars = flags & (1 << 6);
     _unicodeChars = flags & (1 << 5);
@@ -183,7 +183,7 @@ Font::setName(const std::string& name)
 }
 
 
-boost::uint16_t
+std::uint16_t
 Font::codeTableLookup(int glyph, bool embedded) const
 {
     const CodeTable& ctable = (embedded && _embeddedCodeTable) ? 
@@ -205,7 +205,7 @@ Font::codeTableLookup(int glyph, bool embedded) const
 }
 
 int
-Font::get_glyph_index(boost::uint16_t code, bool embedded) const
+Font::get_glyph_index(std::uint16_t code, bool embedded) const
 {
     const CodeTable& ctable = (embedded && _embeddedCodeTable) ? 
         *_embeddedCodeTable : _deviceCodeTable;
@@ -281,7 +281,7 @@ Font::unitsPerEM(bool embed) const
 }
 
 int
-Font::add_os_glyph(boost::uint16_t code)
+Font::add_os_glyph(std::uint16_t code)
 {
     FreetypeGlyphsProvider* ft = ftProvider();
     if (!ft) return -1;

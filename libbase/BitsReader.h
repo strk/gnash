@@ -26,7 +26,7 @@
 #include "log.h"
 
 #include <cassert>
-#include <boost/cstdint.hpp> // for boost::uint32_t used in this file
+#include <cstdint> // for std::uint32_t used in this file
 
 namespace gnash {
 
@@ -97,43 +97,43 @@ public:
 	/// Reads a bit-packed little-endian signed integer
 	/// from the stream.  The given bitcount determines the
 	/// number of bits to read.
-	boost::int32_t read_sint(unsigned short bitcount);
+	std::int32_t read_sint(unsigned short bitcount);
 
 	/// Read a byte as an unsigned int (aligned)
-	boost::uint8_t  read_u8()
+	std::uint8_t  read_u8()
 	{
 		align();
 		return *ptr++;
 	}
 
 	/// Read one bytes as a signed int (aligned)
-    boost::int8_t read_s8()
+    std::int8_t read_s8()
 	{
-		return static_cast<boost::int8_t>(read_u8());
+		return static_cast<std::int8_t>(read_u8());
 	}
 
 	/// Read two bytes as an unsigned int (aligned)
-	boost::uint16_t read_u16()
+	std::uint16_t read_u16()
 	{
 		align();
 		assert(ptr+2 < end);
-		boost::uint16_t result = *ptr++;
+		std::uint16_t result = *ptr++;
 		result |= *ptr++ << 8;
 		return result ;
 	}
 
 	/// Read two bytes as a signed int (aligned)
-	boost::int16_t	read_s16()
+	std::int16_t	read_s16()
 	{
-		return static_cast<boost::int16_t>(read_u16());
+		return static_cast<std::int16_t>(read_u16());
 	}
 
 	/// Read four bytes as an unsigned int (aligned)
-	boost::uint32_t read_u32()
+	std::uint32_t read_u32()
 	{
 		align();
 		assert(ptr+4 < end);
-		boost::uint32_t result = *ptr++;
+		std::uint32_t result = *ptr++;
 		result |= *ptr++ << 8;
 		result |= *ptr++ << 16;
 		result |= *ptr++ << 24;
@@ -141,9 +141,9 @@ public:
 	}
 
 	/// Read four bytes as an signed int (aligned)
-	boost::int32_t read_s32()
+	std::int32_t read_s32()
 	{
-		return static_cast<boost::int32_t>(read_u32());
+		return static_cast<std::int32_t>(read_u32());
 	}
 
 	/// \brief
@@ -155,9 +155,9 @@ public:
 	}
 
 	/// Checks if the stream contains X bits
-	bool gotBits(boost::uint32_t nbits) const
+	bool gotBits(std::uint32_t nbits) const
 	{
-		boost::uint32_t gotbits = 8-usedBits +8*(end-ptr-1);
+		std::uint32_t gotbits = 8-usedBits +8*(end-ptr-1);
 		if (gotbits > nbits) return true;
 		else return false;
 	}

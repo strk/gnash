@@ -109,7 +109,7 @@ public:
     /// (or derivative thereof) or unexpected things will happen. 
     ///
     /// @param data buffer to copy data from.
-    void update(const boost::uint8_t *data);
+    void update(const std::uint8_t *data);
 };
 
 } // gnash namespace

@@ -46,10 +46,10 @@ int main()
     check_equals(c.gb, 0);
     check_equals(c.ab, 0);
     
-    boost::uint8_t r = 0;
-    boost::uint8_t b = 0;
-    boost::uint8_t g = 0;
-    boost::uint8_t a = 0;
+    std::uint8_t r = 0;
+    std::uint8_t b = 0;
+    std::uint8_t g = 0;
+    std::uint8_t a = 0;
 
     c.transform(r, b, g, a);
     check_equals(r, 0);

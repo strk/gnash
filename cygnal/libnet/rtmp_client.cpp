@@ -296,7 +296,7 @@ RTMPClient::connectToServer(const std::string &url)
 	    newbuf->append(ncbuf->reference() + nbytes, chunk);
  	    nbytes  += chunk;
 	    if (chunk == static_cast<size_t>(RTMP_VIDEO_PACKET_SIZE)) {
-		boost::uint8_t headone = 0xc3;
+		std::uint8_t headone = 0xc3;
 		*newbuf += headone;
 	    }
 	} while (nbytes < ncbuf->allocated());
@@ -549,7 +549,7 @@ std::shared_ptr<cygnal::Buffer>
 RTMPClient::handShakeRequest()
 {
     GNASH_REPORT_FUNCTION;
-    boost::uint32_t zero = 0;
+    std::uint32_t zero = 0;
 
     // Make a buffer to hold the handshake data.
     std::shared_ptr<cygnal::Buffer> handshake(new cygnal::Buffer(RTMP_HANDSHAKE_SIZE+1));
@@ -568,7 +568,7 @@ RTMPClient::handShakeRequest()
 
     // The handshake contains random data after the initial header
     for (int i=0; i<RTMP_RANDOM_SIZE; i++) {
-	boost::uint8_t pad = i^256;
+	std::uint8_t pad = i^256;
         *handshake += pad;
     }
     
@@ -638,7 +638,7 @@ RTMPClient::clientFinish(cygnal::Buffer &data)
 		  handshake1->allocated());
     }    
 
-    _handshake_header.uptime = ntohl(*reinterpret_cast<boost::uint32_t *>
+    _handshake_header.uptime = ntohl(*reinterpret_cast<std::uint32_t *>
 				     (handshake1->reference() + 1));
 
     log_network(_("RTMP Handshake header: Uptime: %u"),
@@ -659,25 +659,25 @@ RTMPClient::clientFinish(cygnal::Buffer &data)
 			     RTMP_HANDSHAKE_SIZE + data.allocated()));
     
     // Copy the timestamp from the message we just received.
-    handshake2->copy(handshake1->reference()+1, sizeof(boost::uint32_t));
+    handshake2->copy(handshake1->reference()+1, sizeof(std::uint32_t));
 
 #if 1
     // The next timestamp is the one we just received bumped up a tiny bit.
     // I have no clue if this is correct, but fom hex dumps the previous
     // timestamp should be the baseline, and this is just that time plus
     // whatever it took to get the message. The 7 is a bit randomly chosen.
-    boost::uint32_t tt = htonl(_handshake_header.uptime + 7);
+    std::uint32_t tt = htonl(_handshake_header.uptime + 7);
 #else
     // Get the uptime for the header
     // yes, we loose precision here but it's only a 4 byte field
     time_t t;
     time(&t);
-    boost::uint32_t tt = t;
+    std::uint32_t tt = t;
 #endif
     *handshake2 += tt;
 
     // Add the handshake data
-    boost::uint8_t *start = handshake1->reference() + RTMP_HANDSHAKE_SIZE
+    std::uint8_t *start = handshake1->reference() + RTMP_HANDSHAKE_SIZE
 	+ 1 + 8;
     handshake2->append(start, RTMP_RANDOM_SIZE);
     // Add the NetConnection::connect() packet
@@ -731,7 +731,7 @@ RTMPClient::recvResponse()
 
     // when doing remoting calls I don't see this problem with an empty packet from Red5,
     // but when I do streaming, it's always there, so we need to remove it.
-    boost::uint8_t *pktstart = response->reference();
+    std::uint8_t *pktstart = response->reference();
     if (*pktstart == 0xff) {
 	log_network(_("Got empty packet in buffer."));
 	pktstart++;

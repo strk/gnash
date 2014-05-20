@@ -25,7 +25,7 @@
 
 #include <string>
 #include <boost/thread/mutex.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/optional.hpp>
 
 #include "RunResources.h"
@@ -197,17 +197,17 @@ private:
     /// Number of milliseconds into the sound to start it
     //
     /// This is set by start()
-    boost::uint64_t _startTime;
+    std::uint64_t _startTime;
 
-    std::unique_ptr<boost::uint8_t[]> _leftOverData;
-    boost::uint8_t* _leftOverPtr;
-    boost::uint32_t _leftOverSize;
+    std::unique_ptr<std::uint8_t[]> _leftOverData;
+    std::uint8_t* _leftOverPtr;
+    std::uint32_t _leftOverSize;
 
     /// This is a sound_handler::aux_streamer_ptr type.
-    static unsigned int getAudioWrapper(void *owner, boost::int16_t* samples,
+    static unsigned int getAudioWrapper(void *owner, std::int16_t* samples,
             unsigned int nSamples, bool& etEOF);
 
-    unsigned int getAudio(boost::int16_t* samples, unsigned int nSamples,
+    unsigned int getAudio(std::int16_t* samples, unsigned int nSamples,
             bool& atEOF);
 
     /// The aux streamer for sound handler
@@ -612,7 +612,7 @@ Sound_as::loadSound(const std::string& file, bool streaming)
     } else {
         // If this is an event sound, we must not limit buffering (parsing),
         // because onLoad will not be called until we have finished doing so.
-        _mediaParser->setBufferTime(std::numeric_limits<boost::uint64_t>::max());
+        _mediaParser->setBufferTime(std::numeric_limits<std::uint64_t>::max());
     }
 
     startProbeTimer();
@@ -710,7 +710,7 @@ Sound_as::start(double secOff, int loops)
         // Always seek as we might be called during or after some playing...
         {
             _startTime = secOff * 1000;
-            boost::uint32_t seekms = boost::uint32_t(secOff * 1000);
+            std::uint32_t seekms = std::uint32_t(secOff * 1000);
             // TODO: boost::mutex::scoped_lock parserLock(_parserMutex);
             bool seeked = _mediaParser->seek(seekms); // well, we try...
             log_debug("Seeked MediaParser to %d, returned: %d", seekms, seeked);
@@ -816,7 +816,7 @@ Sound_as::getPosition() const
     }
 
     if (_mediaParser) {
-        boost::uint64_t ts;
+        std::uint64_t ts;
         if ( _mediaParser->nextAudioFrameTimestamp(ts) ) {
             return ts;
         }
@@ -828,9 +828,9 @@ Sound_as::getPosition() const
 
 
 unsigned int
-Sound_as::getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF)
+Sound_as::getAudio(std::int16_t* samples, unsigned int nSamples, bool& atEOF)
 {
-    boost::uint8_t* stream = reinterpret_cast<boost::uint8_t*>(samples);
+    std::uint8_t* stream = reinterpret_cast<std::uint8_t*>(samples);
     int len = nSamples*2;
 
 #ifdef USE_SOUND
@@ -910,7 +910,7 @@ Sound_as::getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF)
 
 // audio callback is running in sound handler thread
 unsigned int
-Sound_as::getAudioWrapper(void* owner, boost::int16_t* samples,
+Sound_as::getAudioWrapper(void* owner, std::int16_t* samples,
         unsigned int nSamples, bool& atEOF)
 {
     Sound_as* so = static_cast<Sound_as*>(owner);
@@ -1041,7 +1041,7 @@ sound_stop(const fn_call& fn)
         const movie_definition* def = fn.callerDef;
         assert(def);
 
-        const boost::uint16_t id = def->exportID(name);
+        const std::uint16_t id = def->exportID(name);
         if (!id) {
             IF_VERBOSE_MALFORMED_SWF(
                 log_swferror(_("No such export '%s'"),
@@ -1096,7 +1096,7 @@ sound_attachsound(const fn_call& fn)
     assert(def);
 
 
-    const boost::uint16_t id = def->exportID(name);
+    const std::uint16_t id = def->exportID(name);
     if (!id) {
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("No such export '%s'"),

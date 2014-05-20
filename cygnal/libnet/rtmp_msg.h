@@ -19,7 +19,7 @@
 #ifndef _RTMPMSG_H_
 #define _RTMPMSG_H_
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -106,8 +106,8 @@ public:
     void setStatus(rtmp_status_e st)     { _status = st; };
     rtmp_status_e getStatus()	         { return _status; };
 
-    void setChannel(boost::uint8_t num) { _channel = num; };
-    boost::uint8_t getChannel()         { return _channel; } ;
+    void setChannel(std::uint8_t num) { _channel = num; };
+    std::uint8_t getChannel()         { return _channel; } ;
 
     std::shared_ptr<cygnal::Element> operator[](size_t x);
     std::shared_ptr<cygnal::Element> at(size_t x) { return _amfobjs[x]; };
@@ -131,7 +131,7 @@ public:
     std::string           _method;
     double                _transid;
     std::vector<std::shared_ptr<cygnal::Element> > _amfobjs;
-    boost::uint8_t       _channel;
+    std::uint8_t       _channel;
 };
 
 } // end of gnash namespace

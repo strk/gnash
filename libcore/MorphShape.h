@@ -57,7 +57,7 @@ public:
 
     virtual SWFRect getBounds() const;
     
-    virtual bool pointInShape(boost::int32_t  x, boost::int32_t  y) const;
+    virtual bool pointInShape(std::int32_t  x, std::int32_t  y) const;
  
     const SWF::ShapeRecord& shape() const {
         return _shape;

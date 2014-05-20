@@ -25,7 +25,7 @@
 
 #include "DefineMorphShapeTag.h"
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include "TypesParser.h"
 #include "MorphShape.h"
@@ -47,7 +47,7 @@ DefineMorphShapeTag::loader(SWFStream& in, TagType tag, movie_definition& md,
         const RunResources& r)
 {
     in.ensureBytes(2);
-    const boost::uint16_t id = in.read_u16();
+    const std::uint16_t id = in.read_u16();
 
     IF_VERBOSE_PARSE(
             log_parse("DefineMorphShapeTag: id = %d", id);
@@ -58,7 +58,7 @@ DefineMorphShapeTag::loader(SWFStream& in, TagType tag, movie_definition& md,
 }
 
 DefineMorphShapeTag::DefineMorphShapeTag(SWFStream& in, TagType tag,
-        movie_definition& md, const RunResources& r, boost::uint16_t id)
+        movie_definition& md, const RunResources& r, std::uint16_t id)
     :
     DefinitionTag(id)
 {
@@ -110,7 +110,7 @@ DefineMorphShapeTag::read(SWFStream& in, TagType tag, movie_definition& md,
     static_cast<void>(in.read_u32());
 
     // Next line will throw ParserException on malformed SWF
-    const boost::uint16_t fillCount = in.read_variable_count();
+    const std::uint16_t fillCount = in.read_variable_count();
     
     SWF::Subshape subshape1;
     SWF::Subshape subshape2;
@@ -121,7 +121,7 @@ DefineMorphShapeTag::read(SWFStream& in, TagType tag, movie_definition& md,
         subshape2.addFillStyle(*fp.second);
     }
 
-    const boost::uint16_t lineCount = in.read_variable_count();
+    const std::uint16_t lineCount = in.read_variable_count();
     LineStyle ls1, ls2;
     for (size_t i = 0; i < lineCount; ++i) {
         ls1.read_morph(in, tag, md, r, &ls2);

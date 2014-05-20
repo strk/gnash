@@ -237,7 +237,7 @@ create_sound_handler_sdl(media::MediaHandler* m)
 }
 
 void
-SDL_sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
+SDL_sound_handler::fetchSamples(std::int16_t* to, unsigned int nSamples)
 {
     boost::mutex::scoped_lock lock(_mutex);
     sound_handler::fetchSamples(to, nSamples);
@@ -268,7 +268,7 @@ SDL_sound_handler::sdl_audio_callback(void *udata, Uint8 *buf, int bufLenIn)
     }
 
     unsigned int bufLen = static_cast<unsigned int>(bufLenIn);
-    boost::int16_t* samples = reinterpret_cast<boost::int16_t*>(buf);
+    std::int16_t* samples = reinterpret_cast<std::int16_t*>(buf);
 
     // 16 bit per sample, 2 channels == 4 bytes per fetch ?
     assert(!(bufLen%4));
@@ -283,7 +283,7 @@ SDL_sound_handler::sdl_audio_callback(void *udata, Uint8 *buf, int bufLenIn)
 }
 
 void
-SDL_sound_handler::mix(boost::int16_t* outSamples, boost::int16_t* inSamples,
+SDL_sound_handler::mix(std::int16_t* outSamples, std::int16_t* inSamples,
             unsigned int nSamples, float volume)
 {
     Uint8* out = reinterpret_cast<Uint8*>(outSamples);

@@ -35,7 +35,7 @@ unsigned BitsReader::read_uint(unsigned short bitcount)
 {
 	assert(bitcount <= 32);
 
-	boost::uint32_t value = 0;
+	std::uint32_t value = 0;
 
 	unsigned short bits_needed = bitcount;
 	do
@@ -85,9 +85,9 @@ unsigned BitsReader::read_uint(unsigned short bitcount)
 }
 
 
-boost::int32_t BitsReader::read_sint(unsigned short bitcount)
+std::int32_t BitsReader::read_sint(unsigned short bitcount)
 {
-	boost::int32_t	value = boost::int32_t(read_uint(bitcount));
+	std::int32_t	value = std::int32_t(read_uint(bitcount));
 
 	// Sign extend...
 	if (value & (1 << (bitcount - 1))) 

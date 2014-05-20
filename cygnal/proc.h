@@ -45,15 +45,15 @@ public:
     // This starts the process running via the usual fork() & exec()
     bool startCGI (void);
     bool startCGI (const std::string &filespec);
-    bool startCGI (const std::string &filespec, boost::uint16_t port);
+    bool startCGI (const std::string &filespec, std::uint16_t port);
     bool startCGI (const std::string &filespec, bool output);
-    bool startCGI (const std::string &filespec, bool output, boost::uint16_t port);
+    bool startCGI (const std::string &filespec, bool output, std::uint16_t port);
 
     void setDocroot(const std::string &path) { _docroot = path; } ;
     std::string &getDocroot() { return _docroot; };
     
     // This opens a network connection to the process
-    bool connectCGI (const std::string &host, boost::uint16_t port);
+    bool connectCGI (const std::string &host, std::uint16_t port);
 
     // This finds the process
     int findCGI (const std::string &filespec);

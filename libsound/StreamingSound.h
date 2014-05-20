@@ -22,7 +22,7 @@
 
 #include <memory>
 #include <cassert>
-#include <boost/cstdint.hpp> // For C99 int types
+#include <cstdint> // For C99 int types
 
 #include "LiveSound.h" 
 #include "StreamingSoundData.h" 

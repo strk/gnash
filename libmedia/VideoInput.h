@@ -20,7 +20,7 @@
 #ifndef GNASH_VIDEOINPUT_H
 #define GNASH_VIDEOINPUT_H
 
-#include <boost/cstdint.hpp> // for C99 int types
+#include <cstdint> // for C99 int types
 #include <string>
 
 #include "dsodefs.h" //DSOEXPORT

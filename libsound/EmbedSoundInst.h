@@ -21,7 +21,7 @@
 #define SOUND_EMBEDSOUNDINST_H
 
 #include <cassert>
-#include <boost/cstdint.hpp> // For C99 int types
+#include <cstdint> // For C99 int types
 #include <limits>
 
 #include "EmbedSound.h"
@@ -104,7 +104,7 @@ private:
     ///
     /// @param env
     ///     SoundEnvelopes to apply.
-    void applyEnvelopes(boost::int16_t* samples, unsigned int nSamples,
+    void applyEnvelopes(std::int16_t* samples, unsigned int nSamples,
             unsigned int firstSampleNum, const SoundEnvelopes& env);
 
     bool reachedCustomEnd() const;
@@ -135,7 +135,7 @@ private:
     const SoundEnvelopes* envelopes;
 
     /// Index of current envelope.
-    boost::uint32_t current_env;
+    std::uint32_t current_env;
 
     /// The encoded data
     //

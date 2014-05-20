@@ -66,12 +66,12 @@ namespace {
 
 // Converts from RGB image to 32-bit pixels in CAIRO_FORMAT_RGB24 format
 static void
-rgb_to_cairo_rgb24(boost::uint8_t* dst, const image::GnashImage* im)
+rgb_to_cairo_rgb24(std::uint8_t* dst, const image::GnashImage* im)
 {
-    boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
+    std::uint32_t* dst32 = reinterpret_cast<std::uint32_t*>(dst);
     for (size_t y = 0;  y < im->height();  y++)
     {
-        const boost::uint8_t* src = scanline(*im, y);
+        const std::uint8_t* src = scanline(*im, y);
         for (size_t x = 0;  x < im->width();  x++, src += 3) {
             *dst32++ = (src[0] << 16) | (src[1] << 8) | src[2];
         }
@@ -80,15 +80,15 @@ rgb_to_cairo_rgb24(boost::uint8_t* dst, const image::GnashImage* im)
 
 // Converts from RGBA image to 32-bit pixels in CAIRO_FORMAT_ARGB32 format
 static void
-rgba_to_cairo_argb(boost::uint8_t* dst, const image::GnashImage* im)
+rgba_to_cairo_argb(std::uint8_t* dst, const image::GnashImage* im)
 {
-    boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
+    std::uint32_t* dst32 = reinterpret_cast<std::uint32_t*>(dst);
     for (size_t y = 0;  y < im->height();  y++)
     {
-        const boost::uint8_t* src = scanline(*im, y);
+        const std::uint8_t* src = scanline(*im, y);
         for (size_t x = 0;  x < im->width();  x++, src += 4)
         {
-            const boost::uint8_t& r = src[0],
+            const std::uint8_t& r = src[0],
                                   g = src[1],
                                   b = src[2],
                                   a = src[3];
@@ -105,7 +105,7 @@ rgba_to_cairo_argb(boost::uint8_t* dst, const image::GnashImage* im)
 class bitmap_info_cairo : public CachedBitmap, boost::noncopyable
 {
   public:
-    bitmap_info_cairo(boost::uint8_t* data, int width, int height,
+    bitmap_info_cairo(std::uint8_t* data, int width, int height,
                            size_t bpp, cairo_format_t format)
         :
         _data(data),
@@ -150,8 +150,8 @@ class bitmap_info_cairo : public CachedBitmap, boost::noncopyable
 
         // We assume that cairo uses machine-endian order, as that's what
         // the existing conversion functions do.
-        boost::uint32_t* start =
-            reinterpret_cast<boost::uint32_t*>(_data.get());
+        std::uint32_t* start =
+            reinterpret_cast<std::uint32_t*>(_data.get());
         const size_t sz = _width * _height;
         std::copy(start, start + sz, image::begin<image::ARGB>(*_image));
         return *_image;
@@ -207,7 +207,7 @@ class bitmap_info_cairo : public CachedBitmap, boost::noncopyable
    
   private:
     mutable std::unique_ptr<image::GnashImage> _image;
-    std::unique_ptr<boost::uint8_t[]> _data;
+    std::unique_ptr<std::uint8_t[]> _data;
     int _width;
     int _height;
     size_t _bytes_per_pixel;
@@ -463,7 +463,7 @@ CachedBitmap*
 Renderer_cairo::createCachedBitmap(std::unique_ptr<image::GnashImage> im) 
 {
     int buf_size = im->width() * im->height() * 4;
-    boost::uint8_t* buffer = new boost::uint8_t[buf_size];
+    std::uint8_t* buffer = new std::uint8_t[buf_size];
 
     switch (im->type())
     {
@@ -528,7 +528,7 @@ Renderer_cairo::drawVideoFrame(image::GnashImage* baseframe, const Transform& xf
     size_t buf_size = w * h * 4;
     
     if (_video_bufsize < buf_size) {
-        _video_buffer.reset(new boost::uint8_t[buf_size]);
+        _video_buffer.reset(new std::uint8_t[buf_size]);
         _video_bufsize = buf_size;
     }    
     
@@ -560,7 +560,7 @@ Renderer_cairo::drawVideoFrame(image::GnashImage* baseframe, const Transform& xf
     cairo_save(_cr);
     cairo_set_source(_cr, pattern);
     
-    geometry::Range2d<boost::int32_t> range = bounds->getRange();
+    geometry::Range2d<std::int32_t> range = bounds->getRange();
     xform.matrix.transform(range);
   
     cairo_rectangle(_cr, range.getMinX(), range.getMinY(), range.width(),
@@ -633,7 +633,7 @@ Renderer_cairo::begin_display(const rgba& bg_color,
 
 
     for (size_t rno=0; rno < _invalidated_ranges.size(); rno++) {
-        const geometry::Range2d<boost::int32_t>& range =
+        const geometry::Range2d<std::int32_t>& range =
             _invalidated_ranges.getRange(rno);
         if (range.isNull()) {
             continue;

@@ -37,7 +37,7 @@ MorphShape::MorphShape(movie_root& mr, as_object* object,
 }
 
 bool
-MorphShape::pointInShape(boost::int32_t x, boost::int32_t y) const
+MorphShape::pointInShape(std::int32_t x, std::int32_t y) const
 {
     const SWFMatrix wm = getWorldMatrix(*this).invert();
     point lp(x, y);

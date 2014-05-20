@@ -40,7 +40,7 @@ class DSOEXPORT VideoDecoderHaiku : public VideoDecoder
 {
 public:
     //VideoDecoderGst(videoCodecType codec_type, int width, int height,
-    //                const boost::uint8_t* extradata, size_t extradatasize);
+    //                const std::uint8_t* extradata, size_t extradatasize);
     //VideoDecoderGst(GstCaps* caps);
     VideoDecoderHaiku(const VideoInfo& info);
     ~VideoDecoderHaiku();

@@ -27,7 +27,7 @@
 #include <cerrno>
 #include <csignal>
 #include <boost/lexical_cast.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include "GnashSystemNetHeaders.h"
 #include "GnashSystemFDHeaders.h"
@@ -124,7 +124,7 @@ Socket::close()
 
 namespace {
 
-addrinfo* getAddrInfo(const std::string& hostname, boost::uint16_t port)
+addrinfo* getAddrInfo(const std::string& hostname, std::uint16_t port)
 {
     addrinfo req = addrinfo(), *ans = 0;
     
@@ -145,7 +145,7 @@ addrinfo* getAddrInfo(const std::string& hostname, boost::uint16_t port)
 }
 
 bool
-Socket::connect(const std::string& hostname, boost::uint16_t port)
+Socket::connect(const std::string& hostname, std::uint16_t port)
 {
     // We use _socket here because connected() or _connected might not
     // be true if a connection attempt is underway but not completed.

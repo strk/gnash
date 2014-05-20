@@ -21,7 +21,7 @@
 #define GNASH_VIDEOCONVERTER_H
 
 #include <boost/noncopyable.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/array.hpp>
 #include <memory>
 
@@ -42,10 +42,10 @@ namespace media {
 
 struct ImgBuf : public boost::noncopyable
 {
-    typedef boost::uint32_t Type4CC;
+    typedef std::uint32_t Type4CC;
     typedef void (*FreeFunc)(void*);
 
-    ImgBuf(Type4CC t, boost::uint8_t* dataptr, size_t datasize, size_t w,
+    ImgBuf(Type4CC t, std::uint8_t* dataptr, size_t datasize, size_t w,
            size_t h)
     : type(t),
       data(dataptr),
@@ -62,7 +62,7 @@ struct ImgBuf : public boost::noncopyable
     
     static void array_delete(void* voidptr)
     {
-        boost::uint8_t* ptr = static_cast<boost::uint8_t*>(voidptr);
+        std::uint8_t* ptr = static_cast<std::uint8_t*>(voidptr);
         delete [] ptr;
     }
     
@@ -71,7 +71,7 @@ struct ImgBuf : public boost::noncopyable
     }
 
     Type4CC type;
-    boost::uint8_t* data;
+    std::uint8_t* data;
 
     size_t size; // in bytes
     size_t width; // in pixels

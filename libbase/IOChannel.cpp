@@ -24,22 +24,22 @@
 namespace gnash
 {
 
-boost::uint32_t
+std::uint32_t
 IOChannel::read_le32() 
 {
-    // read_byte() is boost::uint8_t, so no masks with 0xff are required.
-    boost::uint32_t result = static_cast<boost::uint32_t>(read_byte());
-    result |= static_cast<boost::uint32_t>(read_byte()) << 8;
-    result |= static_cast<boost::uint32_t>(read_byte()) << 16;
-    result |= static_cast<boost::uint32_t>(read_byte()) << 24;
+    // read_byte() is std::uint8_t, so no masks with 0xff are required.
+    std::uint32_t result = static_cast<std::uint32_t>(read_byte());
+    result |= static_cast<std::uint32_t>(read_byte()) << 8;
+    result |= static_cast<std::uint32_t>(read_byte()) << 16;
+    result |= static_cast<std::uint32_t>(read_byte()) << 24;
     return(result);
 }
 
-boost::uint16_t
+std::uint16_t
 IOChannel::read_le16()
 {
-    boost::uint16_t result = static_cast<boost::uint16_t>(read_byte());
-    result |= static_cast<boost::uint16_t>(read_byte()) << 8;
+    std::uint16_t result = static_cast<std::uint16_t>(read_byte());
+    result |= static_cast<std::uint16_t>(read_byte()) << 8;
     return(result);
 }
 
@@ -59,10 +59,10 @@ IOChannel::read_string(char* dst, int max_length)
     return -1;
 }
 
-boost::uint8_t
+std::uint8_t
 IOChannel::read_byte()
 {
-    boost::uint8_t u;
+    std::uint8_t u;
     if ( read(&u, 1) == -1 )
     {
         throw IOException("Could not read a single byte from input");

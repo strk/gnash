@@ -197,7 +197,7 @@ DefineBitsTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         const RunResources& r)
 {
     in.ensureBytes(2);
-    const boost::uint16_t id = in.read_u16();
+    const std::uint16_t id = in.read_u16();
 
     if (m.getBitmap(id)) {
         IF_VERBOSE_MALFORMED_SWF(
@@ -337,7 +337,7 @@ std::unique_ptr<image::GnashImage>
 readDefineBitsJpeg3(SWFStream& in, TagType tag)
 {
     in.ensureBytes(4);
-    const boost::uint32_t jpeg_size = in.read_u32();
+    const std::uint32_t jpeg_size = in.read_u32();
 
     if (tag == DEFINEBITSJPEG4) {
         in.ensureBytes(2);
@@ -360,7 +360,7 @@ readDefineBitsJpeg3(SWFStream& in, TagType tag)
     }
 
     // We assume it's a JPEG with alpha data.
-    const boost::uint32_t alpha_position = in.tell() + jpeg_size;
+    const std::uint32_t alpha_position = in.tell() + jpeg_size;
 
 #ifndef HAVE_ZLIB_H
     log_error(_("gnash is not linked to zlib -- can't load jpeg3 image data"));
@@ -382,7 +382,7 @@ readDefineBitsJpeg3(SWFStream& in, TagType tag)
     const size_t imHeight = im->height();
     const size_t bufferLength = imWidth * imHeight;
 
-    std::unique_ptr<boost::uint8_t[]> buffer(new boost::uint8_t[bufferLength]);
+    std::unique_ptr<std::uint8_t[]> buffer(new std::uint8_t[bufferLength]);
 
     inflateWrapper(in, buffer.get(), bufferLength);
 
@@ -403,9 +403,9 @@ readLossless(SWFStream& in, TagType tag)
     in.ensureBytes(2 + 2 + 1); // the initial header 
 
     // 3 == 8 bit, 4 == 16 bit, 5 == 32 bit
-    const boost::uint8_t bitmap_format = in.read_u8();
-    const boost::uint16_t width = in.read_u16();
-    const boost::uint16_t height = in.read_u16();
+    const std::uint8_t bitmap_format = in.read_u8();
+    const std::uint16_t width = in.read_u16();
+    const std::uint16_t height = in.read_u16();
 
     IF_VERBOSE_PARSE(
         log_parse(_("  defbitslossless2: tag = %d, fmt = %d, "
@@ -478,7 +478,7 @@ readLossless(SWFStream& in, TagType tag)
 
     const size_t pitch = (width * bytes_per_pixel + 3) &~ 3;
     const size_t bufSize = colorTableSize * channels + pitch * height;
-    std::unique_ptr<boost::uint8_t[]> buffer(new boost::uint8_t[bufSize]);
+    std::unique_ptr<std::uint8_t[]> buffer(new std::uint8_t[bufSize]);
 
     inflateWrapper(in, buffer.get(), bufSize);
     assert(in.tell() <= in.get_tag_end_position());
@@ -488,15 +488,15 @@ readLossless(SWFStream& in, TagType tag)
         case 3:
         {
             // 8-bit data, preceded by a palette.
-            boost::uint8_t* colorTable = buffer.get();
+            std::uint8_t* colorTable = buffer.get();
 
             for (size_t j = 0; j < height; ++j) {
-                boost::uint8_t* inRow = buffer.get() + 
+                std::uint8_t* inRow = buffer.get() +
                     colorTableSize * channels + j * pitch;
 
-                boost::uint8_t* outRow = scanline(*image, j);
+                std::uint8_t* outRow = scanline(*image, j);
                 for (size_t i = 0; i < width; ++i) {
-                    boost::uint8_t pixel = inRow[i * bytes_per_pixel];
+                    std::uint8_t pixel = inRow[i * bytes_per_pixel];
                     outRow[i * channels + 0] = colorTable[pixel * channels + 0];
                     outRow[i * channels + 1] = colorTable[pixel * channels + 1];
                     outRow[i * channels + 2] = colorTable[pixel * channels + 2];
@@ -514,10 +514,10 @@ readLossless(SWFStream& in, TagType tag)
 
             for (size_t j = 0; j < height; ++j) {
 
-                boost::uint8_t* inRow = buffer.get() + j * pitch;
-                boost::uint8_t* outRow = scanline(*image, j);
+                std::uint8_t* inRow = buffer.get() + j * pitch;
+                std::uint8_t* outRow = scanline(*image, j);
                 for (size_t i = 0; i < width; ++i) {
-                    const boost::uint16_t pix = ( inRow[i * 2]     << 8 )
+                    const std::uint16_t pix = ( inRow[i * 2]     << 8 )
                                               | ( inRow[i * 2 + 1]      ) ;
                     const double g = 255.0/31.0; // gamma correction
 
@@ -538,8 +538,8 @@ readLossless(SWFStream& in, TagType tag)
         case 5:
             // Need to re-arrange ARGB into RGB or RGBA.
             for (size_t j = 0; j < height; ++j) {
-                boost::uint8_t* inRow = buffer.get() + j * pitch;
-                boost::uint8_t* outRow = scanline(*image, j);
+                std::uint8_t* inRow = buffer.get() + j * pitch;
+                std::uint8_t* outRow = scanline(*image, j);
                 const int inChannels = 4;
 
                 for (size_t i = 0; i < width; ++i) {
@@ -594,7 +594,7 @@ inflateWrapper(SWFStream& in, void* buffer, size_t buffer_bytes)
 
     const size_t CHUNKSIZE = 256;
 
-    boost::uint8_t buf[CHUNKSIZE];
+    std::uint8_t buf[CHUNKSIZE];
     unsigned long endTagPos = in.get_tag_end_position();
 
     for (;;) {
@@ -614,7 +614,7 @@ inflateWrapper(SWFStream& in, void* buffer, size_t buffer_bytes)
             chunkSize = availableBytes;
         }
     
-        static_assert(sizeof(char) == sizeof(boost::uint8_t),
+        static_assert(sizeof(char) == sizeof(std::uint8_t),
             "char must be 1 byte");
 
         // Fill the buffer    

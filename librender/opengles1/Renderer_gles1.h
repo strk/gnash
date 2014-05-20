@@ -118,7 +118,7 @@ public:
 private:
     inline bool ogl_accessible() const;
     void setup() const;    
-    void upload(boost::uint8_t* data, size_t width, size_t height) const;
+    void upload(std::uint8_t* data, size_t width, size_t height) const;
     
     mutable std::unique_ptr<GnashImage> _img;
     GLenum _pixel_format;

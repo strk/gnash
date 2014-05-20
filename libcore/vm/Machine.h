@@ -300,11 +300,11 @@ private:
 
 	void get_args(size_t argc, FunctionArgs<as_value>& args);
 	
-	void load_function(CodeStream* stream, boost::uint32_t maxRegisters);
+	void load_function(CodeStream* stream, std::uint32_t maxRegisters);
 
 	void executeCodeblock(CodeStream* stream);
 
-	void clearRegisters(boost::uint32_t maxRegsiters);
+	void clearRegisters(std::uint32_t maxRegsiters);
 
 	const as_value& getRegister(int index){
 		log_abc("Getting value at a register %d ", index);
@@ -340,7 +340,7 @@ private:
 		return _scopeStack.pop();
 	}
 
-	as_object* get_scope_stack(boost::uint8_t depth) const {
+	as_object* get_scope_stack(std::uint8_t depth) const {
 		log_abc("Getting value from scope stack %u from the bottom.",
                 depth | 0x0);
 		return _scopeStack.value(depth);

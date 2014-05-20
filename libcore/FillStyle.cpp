@@ -113,7 +113,7 @@ BitmapFill::BitmapFill(Type t, const CachedBitmap* bi, const SWFMatrix& m,
 }
     
 BitmapFill::BitmapFill(SWF::FillType t, movie_definition* md,
-        boost::uint16_t id, const SWFMatrix& m)
+        std::uint16_t id, const SWFMatrix& m)
     :
     _type(),
     _smoothingPolicy(),

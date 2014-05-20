@@ -23,7 +23,7 @@
 
 #include <string>
 #include <iosfwd>
-#include <boost/cstdint.hpp> 
+#include <cstdint>
 
 namespace gnash {
 	class rgba;
@@ -50,14 +50,14 @@ public:
     {
     }
 
-    boost::int16_t ra; // RedMultTerm,   8.8 fixed point
-    boost::int16_t ga; // GreenMultTerm  8.8 fixed point
-    boost::int16_t ba; // BlueMultTerm   8.8 fixed point
-    boost::int16_t aa; // AlphaMultTerm  8.8 fixed point
-    boost::int16_t rb; // RedAddTerm,    16 bit integer(no fraction)
-    boost::int16_t gb; // GreenAddTerm   16 bit integer(no fraction)
-    boost::int16_t bb; // BlueAddTerm    16 bit integer(no fraction)
-    boost::int16_t ab; // AlphaAddTerm   16 bit integer(no fraction)
+    std::int16_t ra; // RedMultTerm,   8.8 fixed point
+    std::int16_t ga; // GreenMultTerm  8.8 fixed point
+    std::int16_t ba; // BlueMultTerm   8.8 fixed point
+    std::int16_t aa; // AlphaMultTerm  8.8 fixed point
+    std::int16_t rb; // RedAddTerm,    16 bit integer(no fraction)
+    std::int16_t gb; // GreenAddTerm   16 bit integer(no fraction)
+    std::int16_t bb; // BlueAddTerm    16 bit integer(no fraction)
+    std::int16_t ab; // AlphaAddTerm   16 bit integer(no fraction)
     
     /// Concatenate SWFCxForm c onto ours. 
     //
@@ -70,8 +70,8 @@ public:
     rgba transform(const rgba& in) const;
     
     /// Transform the given color.
-    void transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& b,
-            boost::uint8_t& a) const;    
+    void transform(std::uint8_t& r, std::uint8_t& g, std::uint8_t& b,
+            std::uint8_t& a) const;
     
 };
 

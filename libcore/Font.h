@@ -26,7 +26,7 @@
 
 #include <string>
 #include <memory>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <memory>
 #include <vector>
 #include <map>
@@ -50,8 +50,8 @@ namespace gnash {
 class kerning_pair
 {
 public:
-    boost::uint16_t m_char0;
-    boost::uint16_t m_char1;
+    std::uint16_t m_char0;
+    std::uint16_t m_char1;
 
     bool operator==(const kerning_pair& k) const
     {
@@ -91,7 +91,7 @@ class Font : public ref_counted
 public:
 
     // This table maps from Unicode DisplayObject number to glyph index.
-    typedef std::map<boost::uint16_t, int> CodeTable;
+    typedef std::map<std::uint16_t, int> CodeTable;
 
     Font(std::unique_ptr<SWF::DefineFontTag> ft);
 
@@ -109,7 +109,7 @@ public:
 
     ~Font();
 
-    boost::uint16_t codeTableLookup(int glyph, bool embedded) const;
+    std::uint16_t codeTableLookup(int glyph, bool embedded) const;
 
     /// Return true if this font matches given name and flags
     //
@@ -158,7 +158,7 @@ public:
     ///         positive index to use in subsequent calls to other
     ///         glyph-index-based methods.
     ///
-    int get_glyph_index(boost::uint16_t code, bool embedded) const;
+    int get_glyph_index(std::uint16_t code, bool embedded) const;
 
     /// Return the advance value for the given glyph index
     //
@@ -258,7 +258,7 @@ public:
     /// Set the language and encoding flags of the font.
     //
     /// This is used by SWF::DefineFontInfoTag
-    void setFlags(boost::uint8_t flags);
+    void setFlags(std::uint8_t flags);
 
     /// Add a CodeTable to the font.
     //
@@ -284,7 +284,7 @@ private:
     ///
     /// @return index of the newly added glyph, or -1 on error.
     ///
-    int add_os_glyph(boost::uint16_t code);
+    int add_os_glyph(std::uint16_t code);
 
     /// If we were constructed from a definition, this is not NULL.
     std::unique_ptr<SWF::DefineFontTag> _fontTag;

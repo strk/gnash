@@ -84,7 +84,7 @@ namespace {
     /// @param target         the target window or _level1 to _level10
     /// @param method       0:NONE, 1:GET, 2:POST
     void commonGetURL(as_environment& env, as_value target,
-            const std::string& url, boost::uint8_t method);
+            const std::string& url, std::uint8_t method);
     
     /// Common code for SetTarget and SetTargetExpression
     ///
@@ -621,7 +621,7 @@ ActionWaitForFrame(ActionExec& thread)
     // skip the specified number of actions.
     //
     unsigned int framenum = code.read_int16(thread.getCurrentPC()+3);
-    boost::uint8_t skip = code[thread.getCurrentPC()+5];
+    std::uint8_t skip = code[thread.getCurrentPC()+5];
 
     DisplayObject* target = env.target();
     MovieClip* target_sprite = target ? target->to_movie() : 0;
@@ -1102,7 +1102,7 @@ ActionDuplicateClip(ActionExec& thread)
         DisplayObject::staticDepthOffset;
   
     // This also checks for overflow, as both numbers are expressible as
-    // boost::int32_t.
+    // std::int32_t.
     if (depth < DisplayObject::lowerAccessibleBound ||
       depth > DisplayObject::upperAccessibleBound) {
 
@@ -1114,7 +1114,7 @@ ActionDuplicateClip(ActionExec& thread)
         return;
     }
   
-    boost::int32_t depthValue = static_cast<boost::int32_t>(depth);
+    std::int32_t depthValue = static_cast<std::int32_t>(depth);
     
     const std::string& newname = env.top(1).to_string();
     const std::string& path = env.top(2).to_string();
@@ -1214,10 +1214,10 @@ ActionStartDragMovie(ActionExec& thread)
     // it should actually convert to false!
     if (toNumber(env.top(2), getVM(env))) {
 
-        boost::int32_t y1 = pixelsToTwips(toNumber(env.top(3), getVM(env)));
-        boost::int32_t x1 = pixelsToTwips(toNumber(env.top(4), getVM(env)));
-        boost::int32_t y0 = pixelsToTwips(toNumber(env.top(5), getVM(env)));
-        boost::int32_t x0 = pixelsToTwips(toNumber(env.top(6), getVM(env)));
+        std::int32_t y1 = pixelsToTwips(toNumber(env.top(3), getVM(env)));
+        std::int32_t x1 = pixelsToTwips(toNumber(env.top(4), getVM(env)));
+        std::int32_t y0 = pixelsToTwips(toNumber(env.top(5), getVM(env)));
+        std::int32_t x0 = pixelsToTwips(toNumber(env.top(6), getVM(env)));
 
         // check for swapped values
         if (y1 < y0) {
@@ -1504,7 +1504,7 @@ ActionChr(ActionExec& thread)
     as_environment& env = thread.env;
     
     // This is UB:
-    const boost::uint16_t c = toInt(env.top(0), getVM(env));
+    const std::uint16_t c = toInt(env.top(0), getVM(env));
 
     // If the argument to chr() is '0', we return
     // nothing, not NULL
@@ -1628,7 +1628,7 @@ ActionMbOrd(ActionExec& thread)
     
     std::string::const_iterator it = s.begin(), e = s.end();
     
-    boost::uint32_t out = utf8::decodeNextUnicodeCharacter(it, e);
+    std::uint32_t out = utf8::decodeNextUnicodeCharacter(it, e);
     
     /// Always valid, or can it be undefined?
     env.top(0).set_double(out);
@@ -1650,7 +1650,7 @@ ActionMbChr(ActionExec& thread)
     }
 
     // This is UB
-    const boost::uint16_t i = toInt(env.top(0), getVM(env));
+    const std::uint16_t i = toInt(env.top(0), getVM(env));
     
     std::string out = utf8::encodeUnicodeCharacter(i);
     
@@ -1683,7 +1683,7 @@ ActionWaitForFrameExpression(ActionExec& thread)
     const action_buffer& code = thread.code;
 
     // how many actions to skip if frame has not been loaded
-    const boost::uint8_t skip = code[thread.getCurrentPC() + 3];
+    const std::uint8_t skip = code[thread.getCurrentPC() + 3];
 
     // env.top(0) contains frame specification,
     // evaluated as for ActionGotoExpression
@@ -1775,14 +1775,14 @@ ActionPushData(ActionExec& thread)
     const action_buffer& code = thread.code;
 
     const size_t pc = thread.getCurrentPC();
-    const boost::uint16_t length = code.read_uint16(pc + 1);
+    const std::uint16_t length = code.read_uint16(pc + 1);
 
     //---------------
     size_t i = pc;
     size_t count = 0;
     while (i - pc < length) {
 
-        const boost::uint8_t type = code[3 + i];
+        const std::uint8_t type = code[3 + i];
         ++i;
 
         switch (type)
@@ -1859,7 +1859,7 @@ ActionPushData(ActionExec& thread)
 
             case pushInt32: // 7
             {
-                const boost::int32_t val = code.read_int32(i + 3);
+                const std::int32_t val = code.read_int32(i + 3);
                 i += 4;
                 env.push(val);
                 break;
@@ -1867,7 +1867,7 @@ ActionPushData(ActionExec& thread)
 
             case pushDict8: // 8
             {
-                const boost::uint8_t id = code[3 + i];
+                const std::uint8_t id = code[3 + i];
                 ++i;
                 pushConstant(thread, id);    
                 break;
@@ -1875,7 +1875,7 @@ ActionPushData(ActionExec& thread)
 
             case pushDict16: // 9
             {
-                const boost::uint16_t id = code.read_int16(i + 3);
+                const std::uint16_t id = code.read_int16(i + 3);
                 i += 2;
                 pushConstant(thread, id);    
                 break;
@@ -1894,7 +1894,7 @@ ActionPushData(ActionExec& thread)
 void
 ActionBranchAlways(ActionExec& thread)
 {
-    boost::int16_t offset = thread.code.read_int16(thread.getCurrentPC()+3);
+    std::int16_t offset = thread.code.read_int16(thread.getCurrentPC()+3);
     thread.adjustNextPC(offset);
     // @@ TODO range checks
 }
@@ -1910,7 +1910,7 @@ ActionGetUrl2(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_GETURL2));
 #endif
 
-    const boost::uint8_t method = code[thread.getCurrentPC() + 3];
+    const std::uint8_t method = code[thread.getCurrentPC() + 3];
 
     as_value url_val = env.top(1);
     if (url_val.is_undefined()) {
@@ -1937,7 +1937,7 @@ ActionBranchIfTrue(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_BRANCHIFTRUE));
 #endif
 
-    boost::int16_t offset = code.read_int16(pc+3);
+    std::int16_t offset = code.read_int16(pc+3);
 
     const bool test = toBool(env.pop(), getVM(env));
     if (test) {
@@ -2994,13 +2994,13 @@ ActionBitwiseXor(ActionExec& thread)
     env.drop(1);
 }
 
-inline boost::uint32_t
-saneShiftParam(boost::int32_t value)
+inline std::uint32_t
+saneShiftParam(std::int32_t value)
 {
     // NOTE: ISO-IEC 14882:2003 5.8.1: "The behavior is undefined if the right
     // operand is negative, or greater than or equal to the length in bits of
     // the promoted left operand."
-    boost::uint32_t rv = value;
+    std::uint32_t rv = value;
     return rv % 32;
 }
 
@@ -3009,8 +3009,8 @@ ActionShiftLeft(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
-    boost::uint32_t amount = saneShiftParam(toInt(env.top(0), getVM(env)));
-    boost::int32_t value = toInt(env.top(1), getVM(env));
+    std::uint32_t amount = saneShiftParam(toInt(env.top(0), getVM(env)));
+    std::int32_t value = toInt(env.top(1), getVM(env));
 
     value = value << amount;
 
@@ -3023,8 +3023,8 @@ ActionShiftRight(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
-    boost::uint32_t amount = saneShiftParam(toInt(env.top(0), getVM(env)));
-    boost::int32_t value = toInt(env.top(1), getVM(env));
+    std::uint32_t amount = saneShiftParam(toInt(env.top(0), getVM(env)));
+    std::int32_t value = toInt(env.top(1), getVM(env));
 
     value = value >> amount;
 
@@ -3037,10 +3037,10 @@ ActionShiftRight2(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
-    boost::uint32_t amount = saneShiftParam(toInt(env.top(0), getVM(env))); 
-    boost::int32_t value = toInt(env.top(1), getVM(env));
+    std::uint32_t amount = saneShiftParam(toInt(env.top(0), getVM(env)));
+    std::int32_t value = toInt(env.top(1), getVM(env));
 
-    value = static_cast<boost::uint32_t>(value) >> amount;
+    value = static_cast<std::uint32_t>(value) >> amount;
 
     env.top(1) = value;
     env.drop(1);
@@ -3157,24 +3157,24 @@ ActionDefineFunction2(ActionExec& thread)
     i += name.length() + 1; // add NULL-termination
 
     // Get number of arguments.
-    const boost::uint16_t nargs = code.read_uint16(i);
+    const std::uint16_t nargs = code.read_uint16(i);
     i += 2;
 
     // Get the count of local registers used by this function.
-    const boost::uint8_t register_count = code[i];
+    const std::uint8_t register_count = code[i];
     ++i;
 
     func->setRegisterCount(register_count);
 
     // Flags, for controlling register assignment of implicit args.
-    const boost::uint16_t flags = code.read_uint16(i);
+    const std::uint16_t flags = code.read_uint16(i);
     i += 2;
 
     func->setFlags(flags);
 
     // Get the register assignments and names of the arguments.
     for (size_t n = 0; n < nargs; ++n) {
-        boost::uint8_t arg_register = code[i];
+        std::uint8_t arg_register = code[i];
         ++i;
 
         // @@ security: watch out for possible missing terminator here!
@@ -3185,7 +3185,7 @@ ActionDefineFunction2(ActionExec& thread)
     }
 
     // Get the length of the actual function code.
-    boost::uint16_t code_size = code.read_int16(i);
+    std::uint16_t code_size = code.read_int16(i);
 
     // Check code_size value consistency
     const size_t actionbuf_size = thread.code.size();
@@ -3241,20 +3241,20 @@ ActionTry(ActionExec& thread)
 
     size_t i = thread.getCurrentPC() + 3; // skip tag id and length
 
-    boost::uint8_t flags = code[i];
+    std::uint8_t flags = code[i];
     ++i;
 
     bool doCatch = flags & 1;
     bool doFinally = flags & (1<<1);
     bool catchInRegister = flags&(1<<2);
-    boost::uint8_t reserved = flags&0xE0;
+    std::uint8_t reserved = flags&0xE0;
 
-    boost::uint16_t trySize = code.read_uint16(i); i += 2;
-    boost::uint16_t catchSize = code.read_uint16(i); i += 2;
-    boost::uint16_t finallySize = code.read_uint16(i); i += 2;
+    std::uint16_t trySize = code.read_uint16(i); i += 2;
+    std::uint16_t catchSize = code.read_uint16(i); i += 2;
+    std::uint16_t finallySize = code.read_uint16(i); i += 2;
 
     const char* catchName = NULL;
-    boost::uint8_t catchRegister = 0;
+    std::uint8_t catchRegister = 0;
 
     if (!doFinally) finallySize = 0;
     if (!doCatch) catchSize = 0;
@@ -3351,7 +3351,7 @@ ActionDefineFunction(ActionExec& thread)
 
 #ifndef NDEBUG
     // TODO: check effects of the following 'length' 
-    boost::int16_t length = code.read_int16(thread.getCurrentPC()+1);
+    std::int16_t length = code.read_int16(thread.getCurrentPC()+1);
     assert( length >= 0 );
 #endif
 
@@ -3396,7 +3396,7 @@ ActionDefineFunction(ActionExec& thread)
     }
 
     // Get the length of the actual function code.
-    const boost::uint16_t code_size = code.read_uint16(i);
+    const std::uint16_t code_size = code.read_uint16(i);
 
     func->setLength(code_size);
 
@@ -3497,7 +3497,7 @@ construct_object(as_function* ctor_as_func, as_environment& env,
 /// @param target        the target window, or _level1..10
 void
 commonGetURL(as_environment& env, as_value target,
-        const std::string& url, boost::uint8_t method)
+        const std::string& url, std::uint8_t method)
 {
     if (url.empty()) {
         log_error(_("Bogus empty GetUrl URL in SWF file, skipping"));

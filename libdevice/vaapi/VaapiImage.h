@@ -41,7 +41,7 @@ class DSOEXPORT VaapiImage
 {
     VaapiImageFormat    _format;
     VAImage             _image;
-    boost::uint8_t *    _image_data;
+    std::uint8_t *    _image_data;
 
     /// Create VA image
     bool create(unsigned int width, unsigned int height);
@@ -80,7 +80,7 @@ public:
     unsigned int getPlaneCount() const { return _image.num_planes; }
 
     /// Get pixels for the specified plane
-    boost::uint8_t *getPlane(int plane) const;
+    std::uint8_t *getPlane(int plane) const;
 
     /// Get scanline pitch for the specified plane
     unsigned int getPitch(int plane) const;

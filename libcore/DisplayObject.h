@@ -28,7 +28,7 @@
 #include <map>
 #include <string>
 #include <cassert>
-#include <boost/cstdint.hpp> // For C99 int types
+#include <cstdint> // For C99 int types
 #include <boost/noncopyable.hpp>
 #include <boost/logic/tribool.hpp>
 
@@ -357,9 +357,9 @@ public:
         }
     }
 
-    boost::uint16_t get_ratio() const { return _ratio; }
+    std::uint16_t get_ratio() const { return _ratio; }
 
-    void set_ratio(boost::uint16_t r) {
+    void set_ratio(std::uint16_t r) {
         if (r != _ratio) set_invalidated(); 
         _ratio = r;       
     }
@@ -485,7 +485,7 @@ public:
     /// @param y        Point y coordinate in world space
     /// @return         Whether (x, y) is within the DisplayObject's bounds.
     ///                 This ignores _root's transform. 
-    bool pointInBounds(boost::int32_t x, boost::int32_t y) const
+    bool pointInBounds(std::int32_t x, std::int32_t y) const
     {
         SWFRect bounds = getBounds();
         const SWFMatrix wm = getWorldMatrix(*this, false);
@@ -498,7 +498,7 @@ public:
     /// @param x        Point x coordinate in world space
     /// @param y        Point y coordinate in world space
     /// @return         Whether (x, y) is within the DisplayObject's bounds.
-	virtual bool pointInShape(boost::int32_t  x, boost::int32_t  y) const = 0;
+	virtual bool pointInShape(std::int32_t  x, std::int32_t  y) const = 0;
 
     /// true if the given point falls in this DisplayObject's visible shape
     //
@@ -512,7 +512,7 @@ public:
     /// DisplayObject has childs it must take into account the case
     /// in which some childs are visible and some are not.
     ///
-    virtual bool pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
+    virtual bool pointInVisibleShape(std::int32_t x, std::int32_t y) const
     {
         if (!visible()) return false;
         if (isDynamicMask() || isMaskLayer()) return false;
@@ -634,8 +634,8 @@ public:
 	/// DisplayObjects are not a mouse entity by default.
     //
     /// Override this function for InteractiveObjects.
-	virtual InteractiveObject* topmostMouseEntity(boost::int32_t, 
-            boost::int32_t) {
+	virtual InteractiveObject* topmostMouseEntity(std::int32_t,
+            std::int32_t) {
         return 0;
     }
 	
@@ -643,8 +643,8 @@ public:
     /// point and is not the DisplayObject being dragged or any of its childs.
     //
     /// Point coordinates in global twips.
-    virtual const DisplayObject* findDropTarget(boost::int32_t x, 
-            boost::int32_t y, DisplayObject* dragging) const
+    virtual const DisplayObject* findDropTarget(std::int32_t x,
+            std::int32_t y, DisplayObject* dragging) const
     {
         if (this != dragging && visible() && pointInVisibleShape(x, y)) {
             return this;
@@ -1049,7 +1049,7 @@ private:
     double _xscale, _yscale, _rotation;
 
     /// The depth of this DisplayObject.
-    boost::int32_t _depth;
+    std::int32_t _depth;
 
     boost::tribool _focusRect;
 
@@ -1063,7 +1063,7 @@ private:
     ///
     int _volume;
 
-    boost::uint16_t _ratio;
+    std::uint16_t _ratio;
     int m_clip_depth;
 
     /// The DisplayObject masking this instance (if any)

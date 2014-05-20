@@ -20,7 +20,7 @@
 #define __HANDLER_H__ 1
 
 #include <map>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/thread/mutex.hpp>
 #include <memory>
 //#include <boost/thread/condition.hpp>
@@ -88,7 +88,7 @@ public:
     } pub_stream_e;
     /// This typedef is only used for the io function that must be
     /// supported by the plugin.
-    typedef size_t (*cygnal_io_write_t)(boost::uint8_t *data, size_t size);
+    typedef size_t (*cygnal_io_write_t)(std::uint8_t *data, size_t size);
     typedef std::shared_ptr<cygnal::Buffer> (*cygnal_io_read_t)();
     typedef struct {
 	std::string version;
@@ -177,7 +177,7 @@ public:
     /// This method writes raw data to a plugin.
     size_t writeToPlugin(cygnal::Buffer &buf) {
 	return writeToPlugin(buf.begin(), buf.allocated()); };
-    size_t writeToPlugin(boost::uint8_t *data, size_t size);
+    size_t writeToPlugin(std::uint8_t *data, size_t size);
 
     // These methods handle control of the file streaming, and are
     // used by both HTTP and RTMP*

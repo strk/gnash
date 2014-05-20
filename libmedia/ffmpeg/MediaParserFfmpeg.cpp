@@ -46,15 +46,15 @@ inline double as_double(AVRational time) {
 
 
 int
-MediaParserFfmpeg::readPacketWrapper(void* opaque, boost::uint8_t* buf,
+MediaParserFfmpeg::readPacketWrapper(void* opaque, std::uint8_t* buf,
         int buf_size)
 {
 	MediaParserFfmpeg* p = static_cast<MediaParserFfmpeg*>(opaque);
 	return p->readPacket(buf, buf_size);
 }
 
-boost::int64_t
-MediaParserFfmpeg::seekMediaWrapper(void *opaque, boost::int64_t offset, int whence)
+std::int64_t
+MediaParserFfmpeg::seekMediaWrapper(void *opaque, std::int64_t offset, int whence)
 {
 	MediaParserFfmpeg* p = static_cast<MediaParserFfmpeg*>(opaque);
 	return p->seekMedia(offset, whence);
@@ -66,7 +66,7 @@ MediaParserFfmpeg::probeStream()
     const size_t probeSize = 4096;
     const size_t bufSize = probeSize + FF_INPUT_BUFFER_PADDING_SIZE;
 
-	std::unique_ptr<boost::uint8_t[]> buffer(new boost::uint8_t[bufSize]);
+	std::unique_ptr<std::uint8_t[]> buffer(new std::uint8_t[bufSize]);
 
 	assert(_stream->tell() == static_cast<std::streampos>(0));
 	size_t actuallyRead = _stream->read(buffer.get(), probeSize);
@@ -92,7 +92,7 @@ MediaParserFfmpeg::probeStream()
 }
 
 bool
-MediaParserFfmpeg::seek(boost::uint32_t& pos)
+MediaParserFfmpeg::seek(std::uint32_t& pos)
 {
     // lock the stream while reading from it, so actionscript
     // won't mess with the parser on seek  or on getBytesLoaded
@@ -158,7 +158,7 @@ MediaParserFfmpeg::parseVideoFrame(AVPacket& packet)
 	//    pkt->pts can be AV_NOPTS_VALUE if the video format has B frames,
 	//    so it is better to rely on pkt->dts if you do not decompress the payload.
 	//
-	boost::uint64_t timestamp = static_cast<boost::uint64_t>(packet.dts * as_double(_videoStream->time_base) * 1000.0); 
+	std::uint64_t timestamp = static_cast<std::uint64_t>(packet.dts * as_double(_videoStream->time_base) * 1000.0);
 
 #if 0
 	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
@@ -172,7 +172,7 @@ MediaParserFfmpeg::parseVideoFrame(AVPacket& packet)
 	//       we might do proper padding or (better) avoid the copy as a whole by making
 	//       EncodedVideoFrame virtual.
 	size_t allocSize = packet.size*2;
-	boost::uint8_t* data = new boost::uint8_t[allocSize];
+	std::uint8_t* data = new std::uint8_t[allocSize];
 	std::copy(packet.data, packet.data+packet.size, data);
 	std::unique_ptr<EncodedVideoFrame> frame(new EncodedVideoFrame(data, packet.size, 0, timestamp));
 
@@ -197,8 +197,8 @@ MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
 	//    so it is better to rely on pkt->dts if you do not decompress the payload.
 	//
 
-	boost::uint64_t dts = packet.dts;
-    if ( dts == static_cast<boost::uint64_t>(AV_NOPTS_VALUE) ) {
+	std::uint64_t dts = packet.dts;
+    if ( dts == static_cast<std::uint64_t>(AV_NOPTS_VALUE) ) {
         // We'll take 'nopts' value as zero.
         // Would likely be better to make it use timestamp
         // of previous frame, if any.
@@ -212,7 +212,7 @@ MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
                              "timestamp has no value, taking as zero")));
         dts = 0;
     }
-	boost::uint64_t timestamp = static_cast<boost::uint64_t>(dts * as_double(_audioStream->time_base) * 1000.0); 
+	std::uint64_t timestamp = static_cast<std::uint64_t>(dts * as_double(_audioStream->time_base) * 1000.0);
     //log_debug("On getting audio frame with timestamp %d, duration is %d", timestamp, _audioStream->duration);
 
 	std::unique_ptr<EncodedAudioFrame> frame ( new EncodedAudioFrame );
@@ -221,7 +221,7 @@ MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
 	//       we might do proper padding or (better) avoid the copy as a whole by making
 	//       EncodedVideoFrame virtual.
 	size_t allocSize = packet.size*2;
-	boost::uint8_t* data = new boost::uint8_t[allocSize];
+	std::uint8_t* data = new std::uint8_t[allocSize];
 	std::copy(packet.data, packet.data+packet.size, data);
 
 	frame->data.reset(data); 
@@ -260,7 +260,7 @@ MediaParserFfmpeg::parseNextFrame()
   	int rc = av_read_frame(_formatCtx, &packet);
 
 	// Update _lastParsedPosition, even in case of error..
-	boost::uint64_t curPos = _stream->tell();
+	std::uint64_t curPos = _stream->tell();
 	if ( curPos > _lastParsedPosition )
 	{
 		_lastParsedPosition = curPos;
@@ -314,7 +314,7 @@ MediaParserFfmpeg::parseNextChunk()
 	return true;
 }
 
-boost::uint64_t
+std::uint64_t
 MediaParserFfmpeg::getBytesLoaded() const
 {
 	return _lastParsedPosition;
@@ -486,16 +486,16 @@ MediaParserFfmpeg::initializeParser()
     // Create VideoInfo
     if ( _videoStream) {
         const int codec = static_cast<int>(_videoStream->codec->codec_id); 
-        boost::uint16_t width = _videoStream->codec->width;
-        boost::uint16_t height = _videoStream->codec->height;
-        boost::uint16_t frameRate = static_cast<boost::uint16_t>(
+        std::uint16_t width = _videoStream->codec->width;
+        std::uint16_t height = _videoStream->codec->height;
+        std::uint16_t frameRate = static_cast<std::uint16_t>(
                 as_double(_videoStream->avg_frame_rate));
 #if !defined(HAVE_LIBAVFORMAT_AVFORMAT_H) && !defined(HAVE_FFMPEG_AVCODEC_H)
-        boost::uint64_t duration = _videoStream->codec_info_duration;
+        std::uint64_t duration = _videoStream->codec_info_duration;
 #else
-        boost::uint64_t duration = _videoStream->duration;
+        std::uint64_t duration = _videoStream->duration;
 #endif
-        if (duration == static_cast<boost::uint64_t>(AV_NOPTS_VALUE)) {
+        if (duration == static_cast<std::uint64_t>(AV_NOPTS_VALUE)) {
             log_error(_("Duration of video stream unknown"));
             duration=0; // TODO: guess!
         } else {
@@ -516,15 +516,15 @@ MediaParserFfmpeg::initializeParser()
     if (_audioStream) {
 
         const int codec = static_cast<int>(_audioStream->codec->codec_id); 
-        boost::uint16_t sampleRate = _audioStream->codec->sample_rate;
-        boost::uint16_t sampleSize = SampleFormatToSampleSize(_audioStream->codec->sample_fmt);
+        std::uint16_t sampleRate = _audioStream->codec->sample_rate;
+        std::uint16_t sampleSize = SampleFormatToSampleSize(_audioStream->codec->sample_fmt);
         bool stereo = (_audioStream->codec->channels == 2);
 #if !defined(HAVE_LIBAVFORMAT_AVFORMAT_H) && !defined(HAVE_FFMPEG_AVCODEC_H)
-        boost::uint64_t duration = _audioStream->codec_info_duration;
+        std::uint64_t duration = _audioStream->codec_info_duration;
 #else
-        boost::uint64_t duration = _audioStream->duration;
+        std::uint64_t duration = _audioStream->duration;
 #endif
-        if (duration == static_cast<boost::uint64_t>(AV_NOPTS_VALUE)) {
+        if (duration == static_cast<std::uint64_t>(AV_NOPTS_VALUE)) {
             log_error(_("Duration of audio stream unknown to ffmpeg"));
             duration=0; // TODO: guess!
         } 
@@ -570,7 +570,7 @@ MediaParserFfmpeg::~MediaParserFfmpeg()
 // b) Even if we don't crash and burn, the FFMPEG parser is left in an
 //    undefined state.
 int 
-MediaParserFfmpeg::readPacket(boost::uint8_t* buf, int buf_size)
+MediaParserFfmpeg::readPacket(std::uint8_t* buf, int buf_size)
 {
 	//GNASH_REPORT_FUNCTION;
 	//log_debug("readPacket(%d)", buf_size);
@@ -592,8 +592,8 @@ MediaParserFfmpeg::getId3Info() const
 // a) The behaviour of C++ exceptions passed into C code is undefined.
 // b) Even if we don't crash and burn, the FFMPEG parser is left in an
 //    undefined state.
-boost::int64_t 
-MediaParserFfmpeg::seekMedia(boost::int64_t offset, int whence)
+std::int64_t
+MediaParserFfmpeg::seekMedia(std::int64_t offset, int whence)
 {
 	//GNASH_REPORT_FUNCTION;
 	//log_debug("::seekMedia(%1%, %2%)", offset, whence);
@@ -640,7 +640,7 @@ MediaParserFfmpeg::seekMedia(boost::int64_t offset, int whence)
 	return _stream->tell(); 
 }
 
-boost::uint16_t
+std::uint16_t
 MediaParserFfmpeg::SampleFormatToSampleSize(AVSampleFormat fmt)
 {
 #if LIBAVUTIL_VERSION_INT > AV_VERSION_INT(51,4,0)

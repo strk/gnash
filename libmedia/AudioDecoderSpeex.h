@@ -43,8 +43,8 @@ public:
     AudioDecoderSpeex();
     ~AudioDecoderSpeex();
 
-    boost::uint8_t* decode(const EncodedAudioFrame& input,
-        boost::uint32_t& outputSize);
+    std::uint8_t* decode(const EncodedAudioFrame& input,
+        std::uint32_t& outputSize);
 
 private:
 
@@ -55,7 +55,7 @@ private:
 #ifdef RESAMPLING_SPEEX
     SpeexResamplerState* _resampler;
     /// Number of samples in a resampled 44kHz stereo frame.
-    boost::uint32_t _target_frame_size;
+    std::uint32_t _target_frame_size;
 #endif
 };
 

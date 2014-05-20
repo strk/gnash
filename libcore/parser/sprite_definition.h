@@ -22,7 +22,7 @@
 #define GNASH_SPRITE_DEFINITION_H
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <string>
 #include <map>
 #include "movie_definition.h" // for inheritance
@@ -65,7 +65,7 @@ public:
 	///	to be already positioned right before the frame count
 	///
 	sprite_definition(movie_definition& m, SWFStream& in,
-            const RunResources& runResources, boost::uint16_t id);
+            const RunResources& runResources, std::uint16_t id);
 
 	/// Destructor, releases playlist data
 	~sprite_definition();
@@ -176,11 +176,11 @@ public:
 		return _loadingSoundStream;
 	}
 
-    virtual boost::uint16_t exportID(const std::string& symbol) const {
+    virtual std::uint16_t exportID(const std::string& symbol) const {
         return m_movie_def.exportID(symbol);
     }
     
-    virtual void registerExport(const std::string& s, boost::uint16_t id) {
+    virtual void registerExport(const std::string& s, std::uint16_t id) {
         m_movie_def.registerExport(s, id);
     }
 
@@ -188,13 +188,13 @@ public:
 	/// Get a SWF::DefinitionTag from this Sprite's root movie
 	/// CharacterDictionary.
 	///
-	virtual SWF::DefinitionTag*	getDefinitionTag(boost::uint16_t id) const
+	virtual SWF::DefinitionTag*	getDefinitionTag(std::uint16_t id) const
 	{
 	    return m_movie_def.getDefinitionTag(id);
 	}
 
 	/// Delegate call to associated root movie
-	virtual void addDisplayObject(boost::uint16_t id, SWF::DefinitionTag* c)
+	virtual void addDisplayObject(std::uint16_t id, SWF::DefinitionTag* c)
 	{
 		m_movie_def.addDisplayObject(id, c);
 	}

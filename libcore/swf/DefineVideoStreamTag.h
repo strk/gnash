@@ -114,7 +114,7 @@ public:
     /// @tparam t       A visitor that should accept a const
     ///                 media::EncodedVideoFrame.
     template<typename T>
-    size_t visitSlice(const T& t, boost::uint32_t from, boost::uint32_t to) const {
+    size_t visitSlice(const T& t, std::uint32_t from, std::uint32_t to) const {
 
         boost::mutex::scoped_lock lock(_video_mutex);
 
@@ -140,26 +140,26 @@ private:
     ///       constructor, as that's the one which will eventually get passed
     ///       the id.
     /// NOTE: What dynamically created definitions?
-	DefineVideoStreamTag(SWFStream& in, boost::uint16_t id);
+	DefineVideoStreamTag(SWFStream& in, std::uint16_t id);
 
 	void read(SWFStream& in);
 
 	/// Reserved flags read from DEFINEVIDEOSTREAM tag
-	boost::uint8_t m_reserved_flags;
+	std::uint8_t m_reserved_flags;
 
 	/// Flags read from DEFINEVIDEOSTREAM tag
-	boost::uint8_t m_deblocking_flags;
+	std::uint8_t m_deblocking_flags;
 
 	/// Smoothing flag, as read from DEFINEVIDEOSTREAM tag
 	bool m_smoothing_flags;
 
 	/// Frame in which the DEFINEVIDEOSTREAM was found
-	//boost::uint16_t m_start_frame;
+	//std::uint16_t m_start_frame;
 
 	/// Number of frames in the embedded video, as reported
 	/// by the DEFINEVIDEOSTREAM tag
 	///
-	boost::uint16_t m_num_frames;
+	std::uint16_t m_num_frames;
 
 	/// Codec ID as read from DEFINEVIDEOSTREAM tag
 	//
@@ -180,10 +180,10 @@ private:
 	EmbeddedFrames _video_frames;
 
 	/// Width of the video
-	boost::uint32_t _width;
+	std::uint32_t _width;
 
 	/// Height of the video
-	boost::uint32_t _height;
+	std::uint32_t _height;
 
 	/// Info about embedded video
 	//

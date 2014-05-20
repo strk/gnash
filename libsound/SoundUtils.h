@@ -22,7 +22,7 @@
 
 #include <algorithm>
 #include <functional>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include "SoundInfo.h"
 

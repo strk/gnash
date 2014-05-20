@@ -90,7 +90,7 @@ public:
     DSOEXPORT DiskStream();
     DSOEXPORT DiskStream(const std::string &filespec);
     DSOEXPORT DiskStream(const std::string &filespec, cygnal::Buffer &buf);
-    DSOEXPORT DiskStream(const std::string &filespec, boost::uint8_t *data, size_t size);
+    DSOEXPORT DiskStream(const std::string &filespec, std::uint8_t *data, size_t size);
     DSOEXPORT DiskStream(const std::string &filespec, int netfd);
     DSOEXPORT ~DiskStream();
 
@@ -160,7 +160,7 @@ public:
     ///		seek to.
     ///
     /// @return A real pointer to the location of the data seeked to.
-    boost::uint8_t * seek(off_t offset);
+    std::uint8_t * seek(off_t offset);
     
     /// \brief Upload a file into a sandbox.
     ///		The sandbox is an area where uploaded files can get
@@ -186,9 +186,9 @@ public:
     ///
     /// @return A real pointer to the location of the data at the
     ///		location pointed to by the offset.
-    DSOEXPORT boost::uint8_t *loadToMem(size_t filesize, off_t offset);
-    DSOEXPORT boost::uint8_t *loadToMem(off_t offset);
-    DSOEXPORT boost::uint8_t *loadToMem() { return loadToMem(_offset); };
+    DSOEXPORT std::uint8_t *loadToMem(size_t filesize, off_t offset);
+    DSOEXPORT std::uint8_t *loadToMem(off_t offset);
+    DSOEXPORT std::uint8_t *loadToMem() { return loadToMem(_offset); };
 
     /// \brief Write the data in memory to disk
     ///
@@ -200,7 +200,7 @@ public:
     /// @param size The amount of data in bytes to be written
     ///
     /// @return true if the operation suceeded, false if it failed.
-    DSOEXPORT bool writeToDisk(const std::string &filespec, boost::uint8_t *data, size_t size);
+    DSOEXPORT bool writeToDisk(const std::string &filespec, std::uint8_t *data, size_t size);
     DSOEXPORT bool writeToDisk(const std::string &filespec, cygnal::Buffer &data);
     DSOEXPORT bool writeToDisk(const std::string &filespec);
     DSOEXPORT bool writeToDisk();
@@ -239,7 +239,7 @@ public:
     ///
     /// @return A real pointer to the base address data in the file, but after
     /// the header bytes.
-    boost::uint8_t *get() { return _dataptr; };
+    std::uint8_t *get() { return _dataptr; };
     bool fullyPopulated();
 //    bool fullyPopulated() { return ((_seekptr - _filesize) == _dataptr); };
     
@@ -304,7 +304,7 @@ private:
 
     /// \var DiskStream::_dataptr
     ///		The base address of the memory page.
-    boost::uint8_t *_dataptr;
+    std::uint8_t *_dataptr;
 
     /// \var DiskStream::_max_memload
     ///		The maximum amount of data to load into memory
@@ -313,7 +313,7 @@ private:
     /// \var DiskStream::_seekptr
     ///		The current location within the current memory page where
     ///		the data ends, which is in increments of the empry page size.
-    boost::uint8_t *_seekptr;
+    std::uint8_t *_seekptr;
 
     /// \var DiskStream::_filesize
     ///		The size of the disk file to stream.
@@ -334,7 +334,7 @@ private:
     ///
     /// @return an AMF filetype
     filetype_e determineFileType();
-    filetype_e determineFileType( boost::uint8_t *data);
+    filetype_e determineFileType( std::uint8_t *data);
     filetype_e determineFileType(const std::string &filespec);
 
     // Get the file stats, so we know how to set the

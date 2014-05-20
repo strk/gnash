@@ -76,7 +76,7 @@ private:
     //
     /// This should only be constructed using the loader() functions.
 	DefineTextTag(SWFStream& in, movie_definition& m, TagType tag,
-            boost::uint16_t id)
+            std::uint16_t id)
         :
         DefinitionTag(id)
     {

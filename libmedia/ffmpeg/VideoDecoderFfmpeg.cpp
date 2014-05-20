@@ -146,7 +146,7 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg(const VideoInfo& info)
         throw MediaException(msg.str());
     }
 
-    boost::uint8_t* extradata=0;
+    std::uint8_t* extradata=0;
     int extradataSize=0;
     if (info.extra.get())
     {
@@ -171,7 +171,7 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg(const VideoInfo& info)
 
 void
 VideoDecoderFfmpeg::init(enum CODECID codecId, int /*width*/, int /*height*/,
-        boost::uint8_t* extradata, int extradataSize)
+        std::uint8_t* extradata, int extradataSize)
 {
     // Init the avdecoder-decoder
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(52,6,2)
@@ -358,8 +358,8 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
 }
 
 std::unique_ptr<image::GnashImage>
-VideoDecoderFfmpeg::decode(const boost::uint8_t* input,
-        boost::uint32_t input_size)
+VideoDecoderFfmpeg::decode(const std::uint8_t* input,
+        std::uint32_t input_size)
 {
     // This object shouldn't exist if there's no codec, as it can'
     // do anything anyway.

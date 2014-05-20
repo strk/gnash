@@ -31,18 +31,18 @@ namespace gnash {
 class asException
 {
 public:
-	void setStart(boost::uint32_t i) { _start = i; }
-	void setEnd(boost::uint32_t i) { mEnd = i; }
-	void setCatch(boost::uint32_t i) { mCatch = i; }
+	void setStart(std::uint32_t i) { _start = i; }
+	void setEnd(std::uint32_t i) { mEnd = i; }
+	void setCatch(std::uint32_t i) { mCatch = i; }
 	void catchAny() { mCatchAny = true; }
 	void setCatchType(abc::Class* p) { mCatchType = p; }
 	void setNamespace(abc::Namespace* n) { _namespace = n; }
 	void setName(string_table::key name) { _name = name; }
 
 private:
-	boost::uint32_t _start;
-	boost::uint32_t mEnd;
-	boost::uint32_t mCatch;
+	std::uint32_t _start;
+	std::uint32_t mEnd;
+	std::uint32_t mCatch;
 	bool mCatchAny;
 	abc::Class *mCatchType;
     abc::Namespace *_namespace;

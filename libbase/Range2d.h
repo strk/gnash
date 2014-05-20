@@ -28,7 +28,7 @@
 #include <algorithm>
 #include <cassert> // for inlines
 #include <cmath> // for floor / ceil
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 namespace gnash {
 
@@ -55,8 +55,8 @@ enum RangeKind {
 namespace detail {
     template <typename U> struct Promote { typedef U type; };
     template <> struct Promote<float> { typedef double type; };
-    template <> struct Promote<int> { typedef boost::int64_t type; };
-    template <> struct Promote<unsigned int> { typedef boost::uint64_t type; };
+    template <> struct Promote<int> { typedef std::int64_t type; };
+    template <> struct Promote<unsigned int> { typedef std::uint64_t type; };
 }
 
 /// 2d Range template class

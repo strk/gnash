@@ -70,8 +70,8 @@ namespace {
         getStatusCodeInfo(NetConnection_as::StatusCode code);
 
     /// Parse and send any invoke messages from an HTTP connection.
-    void handleAMFInvoke(amf::Reader& rd, const boost::uint8_t*& b,
-            const boost::uint8_t* end, as_object& owner);
+    void handleAMFInvoke(amf::Reader& rd, const std::uint8_t*& b,
+            const std::uint8_t* end, as_object& owner);
 
     void replyBWCheck(rtmp::RTMP& r, double txn);
 
@@ -201,8 +201,8 @@ private:
     /// Handle replies to server functions we invoked with a callback.
     //
     /// This needs access to the stored callbacks.
-    void handleAMFReplies(amf::Reader& rd, const boost::uint8_t*& b,
-            const boost::uint8_t* end);
+    void handleAMFReplies(amf::Reader& rd, const std::uint8_t*& b,
+            const std::uint8_t* end);
 
     Connection& _handler;
 
@@ -397,7 +397,7 @@ public:
 
 private:
 
-    void handleInvoke(const boost::uint8_t* payload, const boost::uint8_t* end);
+    void handleInvoke(const std::uint8_t* payload, const std::uint8_t* end);
 
     rtmp::RTMP _rtmp;
     bool _connectionComplete;
@@ -928,11 +928,11 @@ getStatusCodeInfo(NetConnection_as::StatusCode code)
 }
 
 void
-handleAMFInvoke(amf::Reader& rd, const boost::uint8_t*& b,
-        const boost::uint8_t* end, as_object& owner)
+handleAMFInvoke(amf::Reader& rd, const std::uint8_t*& b,
+        const std::uint8_t* end, as_object& owner)
 {
 
-    const boost::uint16_t invokecount = amf::readNetworkShort(b);
+    const std::uint16_t invokecount = amf::readNetworkShort(b);
     b += 2; 
 
     if (!invokecount) return;
@@ -941,7 +941,7 @@ handleAMFInvoke(amf::Reader& rd, const boost::uint8_t*& b,
         if (b + 2 > end) {
             throw amf::AMFException("Invoke buffer too short");
         }
-        const boost::uint16_t namelength = amf::readNetworkShort(b);
+        const std::uint16_t namelength = amf::readNetworkShort(b);
         b += 2;
         if (b + namelength > end) {
             throw amf::AMFException("Invoke buffer too short");
@@ -977,10 +977,10 @@ handleAMFInvoke(amf::Reader& rd, const boost::uint8_t*& b,
 //
 /// Note that fatal errors will throw an amf::AMFException.
 void
-HTTPRequest::handleAMFReplies(amf::Reader& rd, const boost::uint8_t*& b,
-        const boost::uint8_t* end)
+HTTPRequest::handleAMFReplies(amf::Reader& rd, const std::uint8_t*& b,
+        const std::uint8_t* end)
 {
-    const boost::uint16_t numreplies = amf::readNetworkShort(b);
+    const std::uint16_t numreplies = amf::readNetworkShort(b);
     b += 2; // number of replies
 
     // TODO: test if this value is relevant at all.
@@ -996,7 +996,7 @@ HTTPRequest::handleAMFReplies(amf::Reader& rd, const boost::uint8_t*& b,
 
         if (b + 2 > end) return;
 
-        const boost::uint16_t replylength = amf::readNetworkShort(b);
+        const std::uint16_t replylength = amf::readNetworkShort(b);
         b += 2; 
 
         if (replylength < 4 || b + replylength > end) {
@@ -1027,7 +1027,7 @@ HTTPRequest::handleAMFReplies(amf::Reader& rd, const boost::uint8_t*& b,
 
         // parse past unused string in header
         if (b + 2 > end) return;
-        const boost::uint16_t unusedlength = amf::readNetworkShort(b);
+        const std::uint16_t unusedlength = amf::readNetworkShort(b);
 
         b += 2; 
         if (b + unusedlength > end) return;
@@ -1112,7 +1112,7 @@ HTTPRequest::send(const URL& url, NetConnection_as& nc)
     log_debug("creating connection");
 
     // Fill in header
-    (reinterpret_cast<boost::uint16_t*>(_data.data() + 4))[0] = htons(_calls);
+    (reinterpret_cast<std::uint16_t*>(_data.data() + 4))[0] = htons(_calls);
     std::string postdata(reinterpret_cast<char*>(_data.data()), _data.size());
 
 #ifdef GNASH_DEBUG_REMOTING
@@ -1199,8 +1199,8 @@ HTTPRequest::process(NetConnection_as& nc)
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("hit eof");
 #endif
-        const boost::uint8_t *b = _reply.data();
-        const boost::uint8_t *end = _reply.data() + _reply.size();
+        const std::uint8_t *b = _reply.data();
+        const std::uint8_t *end = _reply.data() + _reply.size();
         
         amf::Reader rd(b, end, getGlobal(nc.owner()));
         
@@ -1282,8 +1282,8 @@ HTTPConnection::call(as_object* asCallback, const std::string& methodName,
 }
  
 void
-RTMPConnection::handleInvoke(const boost::uint8_t* payload,
-        const boost::uint8_t* end)
+RTMPConnection::handleInvoke(const std::uint8_t* payload,
+        const std::uint8_t* end)
 {
     // TODO: clean up the logic in this function to reduce duplication.
 

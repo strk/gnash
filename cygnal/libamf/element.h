@@ -23,7 +23,7 @@
 #include <string>
 #include <cstring>
 #include <iostream> // for output operator
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <memory>
 
 //#include "network.h"
@@ -221,8 +221,8 @@ public:
     ///
     /// @return A reference to this Element.
     Element &makeString(const char *str, size_t size);
-    /// \overload Element::makeString(boost::uint8_t *data, size_t size)
-    Element &makeString(boost::uint8_t *data, size_t size);
+    /// \overload Element::makeString(std::uint8_t *data, size_t size)
+    Element &makeString(std::uint8_t *data, size_t size);
 
     /// \brief Make this Element with an ASCII string value.
     ///
@@ -261,7 +261,7 @@ public:
     /// @param str The double to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeNumber(boost::uint8_t *data);
+    Element &makeNumber(std::uint8_t *data);
     
     /// \brief Make this Element a Property with a double value
     ///
@@ -269,9 +269,9 @@ public:
     ///
     /// @param num The double to use as the value of the property.
     Element &makeNumber(const std::string &name, double num) ;
-    /// \overload Element::makeNumber(const std::string &name, boost::uint8_t *data);
+    /// \overload Element::makeNumber(const std::string &name, std::uint8_t *data);
     ///		The size isn't needed as a double is always the same size.
-    Element &makeNumber(const std::string &name, boost::uint8_t *data);
+    Element &makeNumber(const std::string &name, std::uint8_t *data);
 
     /// \brief Make this Element with a boolean value.
     ///		The size isn't needed as a boolean is always the same size.
@@ -279,7 +279,7 @@ public:
     /// @param data A real pointer to the boolean use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeBoolean(boost::uint8_t *data);
+    Element &makeBoolean(std::uint8_t *data);
 
     /// \brief Make this Element with a boolean value.
     ///
@@ -383,7 +383,7 @@ public:
     ///
     /// @return A reference to this Element.
     Element &makeXMLObject(const std::string &name, const std::string &data);
-    Element &makeXMLObject(boost::uint8_t *data);
+    Element &makeXMLObject(std::uint8_t *data);
 
     /// \brief Make this Element a Property with an ECMA Array as the value.
     ///		This is a mixed array of any AMF types. These are stored
@@ -466,13 +466,13 @@ public:
     /// @param size The number of bytes to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeTypedObject(boost::uint8_t *data);
+    Element &makeTypedObject(std::uint8_t *data);
     
     /// \brief Make this Element a Property with an Object Reference as the value.
     ///
     /// @return A reference to this Element.
     Element &makeReference();
-    Element &makeReference(boost::uint16_t index);
+    Element &makeReference(std::uint16_t index);
 
     /// \brief Make this Element a Property with an Object Reference as the value.
     ///
@@ -481,7 +481,7 @@ public:
     /// @param size The number of bytes to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeReference(boost::uint8_t *data, size_t size);
+    Element &makeReference(std::uint8_t *data, size_t size);
     
     /// \brief Make this Element a Property with a Movie Clip (SWF data) as the value.
     ///
@@ -495,7 +495,7 @@ public:
     /// @param size The number of bytes to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeMovieClip(boost::uint8_t *data, size_t size);
+    Element &makeMovieClip(std::uint8_t *data, size_t size);
 
     /// \brief Make this Element a Property with a UTF8 String as the value.
     ///
@@ -509,7 +509,7 @@ public:
     /// @param size The number of bytes to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeLongString(boost::uint8_t *data);
+    Element &makeLongString(std::uint8_t *data);
     
     /// \brief Make this Element a Property with a Record Set as the value.
     ///
@@ -523,7 +523,7 @@ public:
     /// @param size The number of bytes to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeRecordSet(boost::uint8_t *data);
+    Element &makeRecordSet(std::uint8_t *data);
     
     /// \brief Make this Element a Property with a Date as the value.
     ///
@@ -535,7 +535,7 @@ public:
     /// @param data A real pointer to the raw data to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeDate(boost::uint8_t *data);
+    Element &makeDate(std::uint8_t *data);
     Element &makeDate(double data);
     
     /// \brief Make this Element a Property with an Unsupported value.
@@ -550,7 +550,7 @@ public:
     /// @param size The number of bytes to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeUnsupported(boost::uint8_t *data);
+    Element &makeUnsupported(std::uint8_t *data);
     
     /// \brief Test equivalance against another Element.
     ///		This compares all the data and the data type in the
@@ -625,12 +625,12 @@ public:
     /// \brief Cast the data in this Element to a short (2 bytes) value.
     ///
     /// @return short (2 bytes) value.
-    boost::uint16_t to_short() const;
+    std::uint16_t to_short() const;
 
     /// \brief Cast the data in this Element to an integer (4 bytes) value.
     ///
     /// @return integer (4 bytes) value.
-    boost::uint32_t to_integer() const;
+    std::uint32_t to_integer() const;
 
     /// \brief Cast the data in this Element to an ASCII string value.
     ///
@@ -640,8 +640,8 @@ public:
     /// \brief Cast the data in this Element to an real pointer to data.
     ///
     /// @return A real pointer to the base address of the raw data in memory.
-    boost::uint8_t *to_reference();
-    const boost::uint8_t *to_reference() const;
+    std::uint8_t *to_reference();
+    const std::uint8_t *to_reference() const;
 
     // Manipulate the name of a property
 
@@ -677,7 +677,7 @@ public:
     /// @return nothing.
     ///
     /// @remarks This add a NULL string terminator so the name can be printed.
-    void setName(boost::uint8_t *name, size_t size);
+    void setName(std::uint8_t *name, size_t size);
 
     // Manipulate the children Elements of an object
 

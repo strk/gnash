@@ -405,9 +405,9 @@ test_renderer(Renderer *renderer, const std::string &type)
     /// @vertex_count the number of x-y coordinates (vertices).
     /// @color the color to be used to draw the line strip.
     /// @mat the SWFMatrix to be used to transform the vertices.
-    boost::uint16_t x = 10;
-    boost::uint16_t y = 10;
-    boost::uint16_t h = 10;
+    std::uint16_t x = 10;
+    std::uint16_t y = 10;
+    std::uint16_t h = 10;
     std::vector<point> box = boost::assign::list_of
         (point(x, y))
         (point(x, y + h));

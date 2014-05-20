@@ -364,7 +364,7 @@ class BitmapStyle : public AggStyle
 {
 public:
     
-  BitmapStyle(int width, int height, int rowlen, boost::uint8_t* data, 
+  BitmapStyle(int width, int height, int rowlen, std::uint8_t* data,
     const SWFMatrix& mat, const SWFCxForm& cx)
     :
     AggStyle(false),

@@ -21,7 +21,7 @@
 #define GNASH_VIDEOINPUTFFMPEG_H
 
 #include <vector>
-#include <boost/cstdint.hpp> // for C99 int types
+#include <cstdint> // for C99 int types
 #include <vector>
 #include "VideoInput.h"
 

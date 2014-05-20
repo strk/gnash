@@ -94,7 +94,7 @@ public:
     }
 
 private:
-    boost::uint64_t _start_time;
+    std::uint64_t _start_time;
 };
 
 
@@ -113,13 +113,13 @@ public:
     ~MediaParserGst();
 
     // See dox in MediaParser.h
-    bool seek(boost::uint32_t&);
+    bool seek(std::uint32_t&);
 
     // See dox in MediaParser.h
     bool parseNextChunk();
 
     // See dox in MediaParser.h
-    virtual boost::uint64_t getBytesLoaded() const;
+    virtual std::uint64_t getBytesLoaded() const;
 
     virtual boost::optional<Id3Info> getId3Info() const;
 

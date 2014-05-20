@@ -19,7 +19,7 @@
 #ifndef __LCSHM_H__
 #define __LCSHM_H__
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -49,7 +49,7 @@ public:
     ///
     /// @param baseaddr The address to use for the block of
     ///		Listeners.
-    Listener(boost::uint8_t *baseaddr);
+    Listener(std::uint8_t *baseaddr);
 
     /// \brief Delete the Listener block
     ~Listener();
@@ -89,13 +89,13 @@ public:
     /// @param addr The address for the block of Listeners.
     ///
     /// @return nothing.
-    void setBaseAddress(boost::uint8_t *addr) { _baseaddr = addr; };
+    void setBaseAddress(std::uint8_t *addr) { _baseaddr = addr; };
 
     /// \brief Set the base address for the block of Listeners.
     ///
     /// @return A real pointer to the base address of the block of
     ///		Listeners in the memory segment.
-    boost::uint8_t *getBaseAddress() { return _baseaddr; };
+    std::uint8_t *getBaseAddress() { return _baseaddr; };
     
 protected:
     /// \var LcShm::_name
@@ -104,7 +104,7 @@ protected:
 
     /// \var LcShm::_baseaddr
     ///		The base address of the block of Listeners.
-    boost::uint8_t *_baseaddr;
+    std::uint8_t *_baseaddr;
     
 //    std::vector<std::string> _listeners;
 };
@@ -116,11 +116,11 @@ public:
     /// \struct LcShm::lc_header_t
     ///		Hold the data in the memory segment's header.
     typedef struct {
-		boost::uint32_t unknown1;
-		boost::uint32_t unknown2;
-		boost::uint32_t timestamp;	// number of milliseconds that have
+		std::uint32_t unknown1;
+		std::uint32_t unknown2;
+		std::uint32_t timestamp;	// number of milliseconds that have
 				// elapsed since the system was started
-		boost::uint32_t length;
+		std::uint32_t length;
     } lc_header_t;
     /// \struct LcShm::lc_message_t
     ///		Hold the data for a single message in the memory segment.
@@ -149,7 +149,7 @@ public:
     /// \brief Construct an initialized shared memory segment.
     ///
     /// @param baseaddr The address to use for the memory segment.
-    LcShm(boost::uint8_t *baseaddr);
+    LcShm(std::uint8_t *baseaddr);
     
     /// \brief Construct an initialized shared memory segment.
     ///
@@ -210,7 +210,7 @@ public:
     ///
     /// @return A vector of smart pointers to the AMF0 Elements in
     ///		this memopry segment.
-    std::vector<std::shared_ptr<cygnal::Element> > parseBody(boost::uint8_t *data);
+    std::vector<std::shared_ptr<cygnal::Element> > parseBody(std::uint8_t *data);
 
     /// \brief Parse the header of the memory segment.
     ///
@@ -222,7 +222,7 @@ public:
     /// @return A real pointer to the data after the headers has been parsed.
     ///
     /// @remarks May throw a ParserException 
-    boost::uint8_t *parseHeader(boost::uint8_t *data, boost::uint8_t* tooFar);
+    std::uint8_t *parseHeader(std::uint8_t *data, std::uint8_t* tooFar);
 
     /// \brief Format the header for the memory segment.
     ///
@@ -233,7 +233,7 @@ public:
     /// @param domain The domain the hostname is in.
     ///
     /// @return A real pointer to a header for a memory segment.
-    boost::uint8_t *formatHeader(const std::string &con, const std::string &host, bool domain);
+    std::uint8_t *formatHeader(const std::string &con, const std::string &host, bool domain);
 
     /// \brief Set the name for this connection to the memory segment.
     ///
@@ -269,7 +269,7 @@ public:
     /// @param addr The address to use for opening the memory segment.
     ///
     /// @return nothing.
-    void setBaseAddr(boost::uint8_t *addr) { _baseaddr = addr; };
+    void setBaseAddr(std::uint8_t *addr) { _baseaddr = addr; };
 
     ///  \brief Dump the internal data of this class in a human readable form.
     /// @remarks This should only be used for debugging purposes.
@@ -283,7 +283,7 @@ public:
 private:
     /// \var LcShm::_baseaddr.
     ///		The base address of the memory segment.
-    boost::uint8_t *_baseaddr;
+    std::uint8_t *_baseaddr;
 
     /// \var LcShm::_header
     ///		A stored copy of the header for the memory segment.

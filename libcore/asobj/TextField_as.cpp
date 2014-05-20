@@ -315,7 +315,7 @@ textfield_backgroundColor(const fn_call& fn)
     }
     else {
         rgba newColor;
-        newColor.parseRGB(static_cast<boost::uint32_t>(toInt(fn.arg(0), getVM(fn))));
+        newColor.parseRGB(static_cast<std::uint32_t>(toInt(fn.arg(0), getVM(fn))));
         ptr->setBackgroundColor(newColor);
     }
 
@@ -332,7 +332,7 @@ textfield_borderColor(const fn_call& fn)
     }
     else {
         rgba newColor;
-        newColor.parseRGB(static_cast<boost::uint32_t>(toNumber(fn.arg(0), getVM(fn))));
+        newColor.parseRGB(static_cast<std::uint32_t>(toNumber(fn.arg(0), getVM(fn))));
         ptr->setBorderColor(newColor);
     }
 
@@ -352,7 +352,7 @@ textfield_textColor(const fn_call& fn)
 
     // Setter
     rgba newColor;
-    newColor.parseRGB(static_cast<boost::uint32_t>(toNumber(fn.arg(0), getVM(fn))));
+    newColor.parseRGB(static_cast<std::uint32_t>(toNumber(fn.arg(0), getVM(fn))));
     ptr->setTextColor(newColor);
 
     return as_value();
@@ -833,7 +833,7 @@ textfield_maxChars(const fn_call& fn)
 
     if (!fn.nargs)
     {
-        boost::int32_t maxChars = text->maxChars();
+        std::int32_t maxChars = text->maxChars();
         if (maxChars == 0)
         {
             as_value null;

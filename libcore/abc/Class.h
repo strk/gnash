@@ -111,11 +111,11 @@ public:
 	void dump();
 
 	bool addValue(string_table::key name, Namespace *ns,
-            boost::uint32_t slotID, Class *type, as_value& val,
+            std::uint32_t slotID, Class *type, as_value& val,
             bool isconst, bool isstatic);
 
 	bool addSlot(string_table::key name, Namespace *ns,
-            boost::uint32_t slotID, Class *type, bool isstatic);
+            std::uint32_t slotID, Class *type, bool isstatic);
 
 	bool addMethod(string_table::key name, Namespace *ns, Method *method,
 		bool isstatic);
@@ -127,11 +127,11 @@ public:
 		bool isstatic);
 
 	bool addMemberScript(string_table::key name, Namespace *ns,
-		boost::uint32_t slotID, Class *type, bool isstatic);
+		std::uint32_t slotID, Class *type, bool isstatic);
 
 	// TODO: Figure out how this differs from addMethod
 	bool addSlotFunction(string_table::key name, Namespace *ns,
-		boost::uint32_t slotID, Method *method, bool isstatic);
+		std::uint32_t slotID, Method *method, bool isstatic);
 
 	/// Is the class final?
 	bool isFinal() const { return _final; }

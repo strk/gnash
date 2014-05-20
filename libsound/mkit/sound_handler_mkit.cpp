@@ -107,7 +107,7 @@ Mkit_sound_handler::FillNextBuffer(void *cookie, void *buffer, size_t size,
 
     size_t numSamples =
         size / sizeof(uint16);
-    boost::int16_t *data = (boost::int16_t*) buffer;
+    std::int16_t *data = (std::int16_t*) buffer;
 
     Mkit_sound_handler *that =
         reinterpret_cast<Mkit_sound_handler*>(cookie);
@@ -116,7 +116,7 @@ Mkit_sound_handler::FillNextBuffer(void *cookie, void *buffer, size_t size,
 }
 
 void
-Mkit_sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
+Mkit_sound_handler::fetchSamples(std::int16_t* to, unsigned int nSamples)
 {
     boost::mutex::scoped_lock lock(_mutex);
     sound_handler::fetchSamples(to, nSamples);
@@ -125,7 +125,7 @@ Mkit_sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
     if (file_stream)
     {
         // NOTE: if muted, the samples will be silent already
-        boost::uint8_t* stream = reinterpret_cast<boost::uint8_t*>(to);
+        std::uint8_t* stream = reinterpret_cast<std::uint8_t*>(to);
         unsigned int len = nSamples*2;
         file_stream.write((char*) stream, len);
 
@@ -229,9 +229,9 @@ Mkit_sound_handler::tell(int soundHandle)
 }
 
 void 
-Mkit_sound_handler::MixAudio (boost::uint8_t *dst, const boost::uint8_t *src, boost::uint32_t len, int volume)
+Mkit_sound_handler::MixAudio (std::uint8_t *dst, const std::uint8_t *src, std::uint32_t len, int volume)
 {
-    //boost::uint16_t format;
+    //std::uint16_t format;
 
     if ( volume == 0 ) 
     {
@@ -245,7 +245,7 @@ Mkit_sound_handler::MixAudio (boost::uint8_t *dst, const boost::uint8_t *src, bo
     {
         //case AHIST_S16S:
         {
-            boost::int16_t src1, src2;
+            std::int16_t src1, src2;
             int dst_sample;
             const int max_audioval = ((1<<(16-1))-1);
             const int min_audioval = -(1<<(16-1));
@@ -279,14 +279,14 @@ Mkit_sound_handler::MixAudio (boost::uint8_t *dst, const boost::uint8_t *src, bo
 }
 
 void
-Mkit_sound_handler::mix(boost::int16_t* outSamples, boost::int16_t* inSamples, unsigned int nSamples, float volume)
+Mkit_sound_handler::mix(std::int16_t* outSamples, std::int16_t* inSamples, unsigned int nSamples, float volume)
 {
     //if (!_closing)
     {
         unsigned int nBytes = nSamples*2;
 
-        boost::uint8_t *out = reinterpret_cast<boost::uint8_t*>(outSamples);
-        boost::uint8_t* in = reinterpret_cast<boost::uint8_t*>(inSamples);
+        std::uint8_t *out = reinterpret_cast<std::uint8_t*>(outSamples);
+        std::uint8_t* in = reinterpret_cast<std::uint8_t*>(inSamples);
 
         MixAudio(out, in, nBytes, MIX_MAXVOLUME*volume);
     }

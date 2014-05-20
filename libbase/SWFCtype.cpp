@@ -23,14 +23,14 @@
 #include <locale>
 #include <boost/assign/list_of.hpp>
 #include <map>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include "log.h"
 
 namespace gnash {
 
 namespace {
-    typedef std::map<boost::uint16_t, boost::uint16_t> CharMap;
+    typedef std::map<std::uint16_t, std::uint16_t> CharMap;
     const CharMap& lowerMap();
     const CharMap& upperMap();
 }

@@ -61,10 +61,10 @@ class Mkit_sound_handler : public sound_handler
     mutable boost::mutex _mutedMutex;
 
     // See dox in sound_handler.h
-    void mix(boost::int16_t* outSamples, boost::int16_t* inSamples,
+    void mix(std::int16_t* outSamples, std::int16_t* inSamples,
                 unsigned int nSamples, float volume);
 
-    void MixAudio (boost::uint8_t *dst, const boost::uint8_t *src, boost::uint32_t len, int volume);
+    void MixAudio (std::uint8_t *dst, const std::uint8_t *src, std::uint32_t len, int volume);
 
 public:
     Mkit_sound_handler(media::MediaHandler* m);
@@ -133,7 +133,7 @@ public:
     void plugInputStream(std::unique_ptr<InputStream> in);
 
     // See dox in sound_handler.h
-    void fetchSamples(boost::int16_t* to, unsigned int nSamples);
+    void fetchSamples(std::int16_t* to, unsigned int nSamples);
 };
 
 } // gnash.sound namespace 

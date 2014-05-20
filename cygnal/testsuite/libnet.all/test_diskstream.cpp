@@ -123,8 +123,8 @@ test()
     ds1.open("outbuf.raw");
 
     // ptr should be the base address of the memory plus the offset
-    boost::uint8_t *ptr = ds1.loadToMem(48);
-//    boost::uint8_t *dsptr = ds1.get(); // cache the initial base address
+    std::uint8_t *ptr = ds1.loadToMem(48);
+//    std::uint8_t *dsptr = ds1.get(); // cache the initial base address
     
     if ((ds1.get() == MAP_FAILED) || (ds1.get() == 0)) {
         runtest.unresolved("loadToMem(48)");

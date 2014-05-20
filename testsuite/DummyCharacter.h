@@ -59,7 +59,7 @@ public:
 
     virtual void mouseEvent(const event_id&) {}
 
-    InteractiveObject* topmostMouseEntity(boost::int32_t, boost::int32_t)
+    InteractiveObject* topmostMouseEntity(std::int32_t, std::int32_t)
     {
         return 0;
     }

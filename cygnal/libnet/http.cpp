@@ -136,7 +136,7 @@ HTTP::operator = (HTTP& /*obj*/)
 }
 
 
-boost::uint8_t *
+std::uint8_t *
 HTTP::processHeaderFields(cygnal::Buffer *buf)
 {
   //    GNASH_REPORT_FUNCTION;
@@ -188,8 +188,8 @@ HTTP::processHeaderFields(cygnal::Buffer *buf)
 	    
 //	    cerr << "FIXME: " << (void *)i << " : " << dec <<  end << endl;
 	} else {
-	    const boost::uint8_t *cmd = reinterpret_cast<const boost::uint8_t *>(i->c_str());
-	    if (extractCommand(const_cast<boost::uint8_t *>(cmd)) == HTTP::HTTP_NONE) {
+	    const std::uint8_t *cmd = reinterpret_cast<const std::uint8_t *>(i->c_str());
+	    if (extractCommand(const_cast<std::uint8_t *>(cmd)) == HTTP::HTTP_NONE) {
 		break;
 #if 1
 	    } else {
@@ -234,18 +234,18 @@ HTTP::processHeaderFields(cygnal::Buffer *buf)
 // // Parse an Echo Request message coming from the Red5 echo_test. This
 // // method should only be used for testing purposes.
 // vector<std::shared_ptr<cygnal::Element > >
-// HTTP::parseEchoRequest(boost::uint8_t *data, size_t size)
+// HTTP::parseEchoRequest(std::uint8_t *data, size_t size)
 // {
 // //    GNASH_REPORT_FUNCTION;
     
 //     vector<std::shared_ptr<cygnal::Element > > headers;
 	
 //     // skip past the header bytes, we don't care about them.
-//     boost::uint8_t *tmpptr = data + 6;
+//     std::uint8_t *tmpptr = data + 6;
     
-//     boost::uint16_t length;
-//     length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
-//     tmpptr += sizeof(boost::uint16_t);
+//     std::uint16_t length;
+//     length = ntohs((*(std::uint16_t *)tmpptr) & 0xffff);
+//     tmpptr += sizeof(std::uint16_t);
 
 //     // Get the first name, which is a raw string, and not preceded by
 //     // a type byte.
@@ -254,7 +254,7 @@ HTTP::processHeaderFields(cygnal::Buffer *buf)
 //     // If the length of the name field is corrupted, then we get out of
 //     // range quick, and corrupt memory. This is a bit of a hack, but
 //     // reduces memory errors caused by some of the corrupted tes cases.
-//     boost::uint8_t *endstr = std::find(tmpptr, tmpptr+length, '\0');
+//     std::uint8_t *endstr = std::find(tmpptr, tmpptr+length, '\0');
 //     if (endstr != tmpptr+length) {
 // 	log_debug("Caught corrupted string! length was %d, null at %d",
 // 		  length,  endstr-tmpptr);
@@ -266,8 +266,8 @@ HTTP::processHeaderFields(cygnal::Buffer *buf)
     
 //     // Get the second name, which is a raw string, and not preceded by
 //     // a type byte.
-//     length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
-//     tmpptr += sizeof(boost::uint16_t);
+//     length = ntohs((*(std::uint16_t *)tmpptr) & 0xffff);
+//     tmpptr += sizeof(std::uint16_t);
 //     std::shared_ptr<cygnal::Element > el2(new cygnal::Element);
 
 // //     std::string name2(reinterpret_cast<const char *>(tmpptr), length);
@@ -397,7 +397,7 @@ HTTP::processGetRequest(int fd)
 {
     GNASH_REPORT_FUNCTION;
 
-//     boost::uint8_t buffer[readsize+1];
+//     std::uint8_t buffer[readsize+1];
 //     const char *ptr = reinterpret_cast<const char *>(buffer);
 //     memset(buffer, 0, readsize+1);
     
@@ -521,7 +521,7 @@ HTTP::processPostRequest(int fd)
 //    cerr << __FUNCTION__ << buf->allocated() << " : " << hexify(buf->reference(), buf->allocated(), true) << endl;
     
     clearHeader();
-    boost::uint8_t *data = processHeaderFields(*buf);
+    std::uint8_t *data = processHeaderFields(*buf);
     size_t length = strtol(getField("content-length").c_str(), NULL, 0);
     std::shared_ptr<cygnal::Buffer> content(new cygnal::Buffer(length));
     int ret = 0;
@@ -1018,7 +1018,7 @@ HTTP::formatContentLength()
 }
 
 cygnal::Buffer &
-HTTP::formatContentLength(boost::uint32_t filesize)
+HTTP::formatContentLength(std::uint32_t filesize)
 {
 //    GNASH_REPORT_FUNCTION;
 //    _header << "Content-Length: " << filesize << "\r\n";
@@ -1137,11 +1137,11 @@ HTTP::formatEchoResponse(const std::string &num, cygnal::Buffer &data)
 }
 
 cygnal::Buffer &
-HTTP::formatEchoResponse(const std::string &num, boost::uint8_t *data, size_t size)
+HTTP::formatEchoResponse(const std::string &num, std::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    //boost::uint8_t *tmpptr  = data;
+    //std::uint8_t *tmpptr  = data;
     
     // FIXME: temporary hacks while debugging
     cygnal::Buffer fixme("00 00 00 00 00 01");
@@ -1248,7 +1248,7 @@ HTTP::formatRequest(const string &url, http_method_e cmd)
 
 
 HTTP::http_method_e
-HTTP::extractCommand(boost::uint8_t *data)
+HTTP::extractCommand(std::uint8_t *data)
 {
     // GNASH_REPORT_FUNCTION;
 
@@ -1283,9 +1283,9 @@ HTTP::extractCommand(boost::uint8_t *data)
     // For valid requests, the second argument, delimited by spaces
     // is the filespec of the file being requested or transmitted.
     if (cmd != HTTP::HTTP_NONE) {
-	boost::uint8_t *start = std::find(data, data+7, ' ') + 1;
-	boost::uint8_t *end   = std::find(start + 2, data+PATH_MAX, ' ');
-	boost::uint8_t *params = std::find(start, end, '?');
+	std::uint8_t *start = std::find(data, data+7, ' ') + 1;
+	std::uint8_t *end   = std::find(start + 2, data+PATH_MAX, ' ');
+	std::uint8_t *params = std::find(start, end, '?');
 	if (params != end) {
 	    _params = std::string(params+1, end);
 	    _filespec = std::string(start, params);
@@ -1346,7 +1346,7 @@ HTTP::sendMsg(int /* fd */)
 ///
 /// @return The number of bytes sent
 int DSOEXPORT
-HTTP::sendMsg(const boost::uint8_t *data, size_t size)
+HTTP::sendMsg(const std::uint8_t *data, size_t size)
 {
     GNASH_REPORT_FUNCTION;
 //    _header
@@ -1355,7 +1355,7 @@ HTTP::sendMsg(const boost::uint8_t *data, size_t size)
 }
 
 size_t
-HTTP::recvChunked(boost::uint8_t *data, size_t size)
+HTTP::recvChunked(std::uint8_t *data, size_t size)
 {
 //     GNASH_REPORT_FUNCTION;
     bool done = false;
@@ -1373,7 +1373,7 @@ HTTP::recvChunked(boost::uint8_t *data, size_t size)
     // field can have other attributes, but the OpenStreetMap server doesn't
     // use the semi-colon, as it's optional, and rarely used anyway.
     std::shared_ptr<cygnal::Buffer> buf;
-    boost::uint8_t *start = std::find(data, data+size, '\r') + 2;
+    std::uint8_t *start = std::find(data, data+size, '\r') + 2;
     if (start != data+size) {
 	// extract the total size of the chunk
 	std::string bytes(data, start-2);

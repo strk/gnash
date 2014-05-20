@@ -26,7 +26,7 @@
 
 #include <functional>
 #include <algorithm>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/thread/mutex.hpp>
 
 #include "RunResources.h"
@@ -185,7 +185,7 @@ NetStream_as::setStatus(StatusCode status)
 }
 
 void
-NetStream_as::setBufferTime(boost::uint32_t time)
+NetStream_as::setBufferTime(std::uint32_t time)
 {
     // The argument is in milliseconds,
     _bufferTime = time;
@@ -549,7 +549,7 @@ NetStream_as::startPlayback()
 
 
 std::unique_ptr<image::GnashImage> 
-NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
+NetStream_as::getDecodedVideoFrame(std::uint32_t ts)
 {
     assert(_videoDecoder.get());
     
@@ -562,7 +562,7 @@ NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
         return video; 
     }
 
-    boost::uint64_t nextTimestamp;
+    std::uint64_t nextTimestamp;
     bool parsingComplete = _parser->parsingCompleted();
     if (!_parser->nextVideoFrameTimestamp(nextTimestamp)) {
         
@@ -699,8 +699,8 @@ NetStream_as::decodeNextAudioFrame()
                 // NOTE: adjust_volume assumes samples 
                 // are 16 bits in size, and signed.
                 // Size is still given in bytes..
-                boost::int16_t* const start =
-                    reinterpret_cast<boost::int16_t*>(raw->m_data);
+                std::int16_t* const start =
+                    reinterpret_cast<std::int16_t*>(raw->m_data);
                 sound::adjustVolume(start, start + raw->m_size / 2, vol / 100.0);
             }
         }
@@ -721,7 +721,7 @@ NetStream_as::decodeNextAudioFrame()
 }
 
 void
-NetStream_as::seek(boost::uint32_t posSeconds)
+NetStream_as::seek(std::uint32_t posSeconds)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -733,7 +733,7 @@ NetStream_as::seek(boost::uint32_t posSeconds)
     }
 
     // Don't ask me why, but NetStream_as::seek() takes seconds...
-    boost::uint32_t pos = posSeconds*1000;
+    std::uint32_t pos = posSeconds*1000;
 
     // We'll pause the clock source and mark decoders as buffering.
     // In this way, next advance won't find the source time to 
@@ -744,7 +744,7 @@ NetStream_as::seek(boost::uint32_t posSeconds)
     _playbackClock->pause();
 
     // Seek to new position
-    boost::uint32_t newpos = pos;
+    std::uint32_t newpos = pos;
     if ( ! _parser->seek(newpos) )
     {
 #ifdef GNASH_DEBUG_STATUS
@@ -792,9 +792,9 @@ NetStream_as::refreshAudioBuffer()
 #ifdef GNASH_DEBUG_DECODING
     // bufferLength() would lock the mutex (which we already hold),
     // so this is to avoid that.
-    boost::uint32_t parserTime = _parser->getBufferLength();
-    boost::uint32_t playHeadTime = time();
-    boost::uint32_t bufferLen = 
+    std::uint32_t parserTime = _parser->getBufferLength();
+    std::uint32_t playHeadTime = time();
+    std::uint32_t bufferLen =
         parserTime > playHeadTime ? parserTime-playHeadTime : 0;
 #endif
 
@@ -818,7 +818,7 @@ NetStream_as::refreshAudioBuffer()
     }
 
     // Calculate the current time
-    boost::uint64_t curPos = _playHead.getPosition();
+    std::uint64_t curPos = _playHead.getPosition();
 
 #ifdef GNASH_DEBUG_DECODING
     log_debug(_("%p.refreshAudioBuffer: currentPosition=%d, playHeadState=%d, bufferLength=%d, bufferTime=%d"),
@@ -833,7 +833,7 @@ NetStream_as::refreshAudioBuffer()
 }
 
 void
-NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
+NetStream_as::pushDecodedAudioFrames(std::uint32_t ts)
 {
     assert(_parser.get());
     
@@ -884,7 +884,7 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
 
     bool consumed = false;
 
-    boost::uint64_t nextTimestamp;
+    std::uint64_t nextTimestamp;
     while (1) {
 
         // FIXME: use services of BufferedAudioStreamer for this
@@ -1107,7 +1107,7 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
     }
 
 #ifdef GNASH_DEBUG_DECODING
-    boost::uint32_t bufferLen = bufferLength();
+    std::uint32_t bufferLen = bufferLength();
 #endif
 
     if ( ! alsoIfPaused && _playHead.getState() == PlayHead::PLAY_PAUSED )
@@ -1132,7 +1132,7 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
     }
 
     // Calculate the current time
-    boost::uint64_t curPos = _playHead.getPosition();
+    std::uint64_t curPos = _playHead.getPosition();
 
 #ifdef GNASH_DEBUG_DECODING
     log_debug(_("%p.refreshVideoFrame: currentPosition=%d, playHeadState=%d, "
@@ -1293,10 +1293,10 @@ NetStream_as::update()
     // If playhead position needs to be updated
     // is set to Set playhead to first available frame, if any
     // TODO: use another flag to signify 'initialization-needed'
-    boost::uint64_t curPosition = _playHead.getPosition();
+    std::uint64_t curPosition = _playHead.getPosition();
     if ( curPosition == 0 )
     {
-        boost::uint64_t firstFrameTimestamp;
+        std::uint64_t firstFrameTimestamp;
         if ( _parser->nextFrameTimestamp(firstFrameTimestamp) )
         {
              _playHead.seekTo(firstFrameTimestamp);
@@ -1345,7 +1345,7 @@ NetStream_as::update()
 
         if ( emptyAudioQueue )
         {
-            boost::uint64_t nextTimestamp;
+            std::uint64_t nextTimestamp;
             if ( _parser->nextAudioFrameTimestamp(nextTimestamp) )
             {
                 log_debug(_("Moving NetStream playhead "
@@ -1372,7 +1372,7 @@ NetStream_as::update()
 #endif  // USE_MEDIA
 }
 
-boost::int32_t
+std::int32_t
 NetStream_as::time()
 {
     return _playHead.getPosition();
@@ -1481,7 +1481,7 @@ BufferedAudioStreamer::detachAuxStreamer()
 
 // audio callback, possibly running in a separate thread
 unsigned int
-BufferedAudioStreamer::fetchWrapper(void *owner, boost::int16_t* samples,
+BufferedAudioStreamer::fetchWrapper(void *owner, std::int16_t* samples,
         unsigned int nSamples, bool& eof)
 {
     BufferedAudioStreamer* streamer =
@@ -1500,11 +1500,11 @@ BufferedAudioStreamer::BufferedAudioStreamer(sound::sound_handler* handler)
 }
 
 unsigned int
-BufferedAudioStreamer::fetch(boost::int16_t* samples, unsigned int nSamples, bool& eof)
+BufferedAudioStreamer::fetch(std::int16_t* samples, unsigned int nSamples, bool& eof)
 {
     //GNASH_REPORT_FUNCTION;
 
-    boost::uint8_t* stream = reinterpret_cast<boost::uint8_t*>(samples);
+    std::uint8_t* stream = reinterpret_cast<std::uint8_t*>(samples);
     int len = nSamples*2;
 
     boost::mutex::scoped_lock lock(_audioQueueMutex);
@@ -1667,9 +1667,9 @@ as_value
 netstream_seek(const fn_call& fn)
 {
     NetStream_as* ns = ensure<ThisIsNative<NetStream_as> >(fn);
-    boost::uint32_t time = 0;
+    std::uint32_t time = 0;
     if (fn.nargs > 0) {
-        time = static_cast<boost::uint32_t>(toNumber(fn.arg(0), getVM(fn)));
+        time = static_cast<std::uint32_t>(toNumber(fn.arg(0), getVM(fn)));
     }
     ns->seek(time);
 
@@ -1690,7 +1690,7 @@ netstream_setbuffertime(const fn_call& fn)
 
     // TODO: don't allow a limit < 100 
 
-    ns->setBufferTime(boost::uint32_t(time * 1000));
+    ns->setBufferTime(std::uint32_t(time * 1000));
 
     return as_value();
 }
@@ -1888,8 +1888,8 @@ attachPrototypeProperties(as_object& o)
 void
 executeTag(const SimpleBuffer& _buffer, as_object& thisPtr)
 {
-	const boost::uint8_t* ptr = _buffer.data();
-	const boost::uint8_t* endptr = ptr + _buffer.size();
+	const std::uint8_t* ptr = _buffer.data();
+	const std::uint8_t* endptr = ptr + _buffer.size();
 
     std::string funcName;
 

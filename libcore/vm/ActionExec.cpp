@@ -216,7 +216,7 @@ ActionExec::operator()()
             }
 
             // Get the opcode.
-            boost::uint8_t action_id = code[pc];
+            std::uint8_t action_id = code[pc];
 
             IF_VERBOSE_ACTION (
                 log_action(_("PC:%d - EX: %s"), pc, code.disasm(pc));
@@ -231,7 +231,7 @@ ActionExec::operator()()
             else {
                 // action with extra data
                 // Note this converts from int to uint!
-                boost::uint16_t length(code.read_int16(pc + 1));
+                std::uint16_t length(code.read_int16(pc + 1));
 
                 next_pc = pc + length + 3;
                 if (next_pc > stop_pc) {
@@ -571,7 +571,7 @@ ActionExec::skip_actions(size_t offset)
         }
 
         // Get the opcode.
-        const boost::uint8_t action_id = code[next_pc];
+        const std::uint8_t action_id = code[next_pc];
 
         // Set default next_pc offset, control flow action handlers
         // will be able to reset it.
@@ -581,7 +581,7 @@ ActionExec::skip_actions(size_t offset)
         }
         else {
             // action with extra data
-            const boost::int16_t length = code.read_int16(next_pc + 1);
+            const std::int16_t length = code.read_int16(next_pc + 1);
             assert(length >= 0);
             next_pc += length + 3;
         }
@@ -684,7 +684,7 @@ ActionExec::dumpActions(size_t from, size_t to, std::ostream& os)
     size_t lpc = from;
     while (lpc < to) {
         // Get the opcode.
-        const boost::uint8_t action_id = code[lpc];
+        const std::uint8_t action_id = code[lpc];
 
         os << " PC:" << lpc << " - EX: " <<  code.disasm(lpc) << std::endl;
 
@@ -696,7 +696,7 @@ ActionExec::dumpActions(size_t from, size_t to, std::ostream& os)
         } 
         else {
             // action with extra data
-            const boost::int16_t length = code.read_int16(lpc + 1);
+            const std::int16_t length = code.read_int16(lpc + 1);
             assert(length >= 0);
             lpc += length + 3;
         }

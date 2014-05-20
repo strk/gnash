@@ -22,13 +22,13 @@
 
 #include "ClockTime.h" // for getting system time
 
-#include <boost/cstdint.hpp> // for boost::uint64_t typedef
+#include <cstdint> // for std::uint64_t typedef
 
 namespace gnash {
 
 namespace {
 
-boost::uint64_t
+std::uint64_t
 fetchSystemTime() 
 {
     // ClockTime::getTicks always returns milliseconds

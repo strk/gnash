@@ -25,7 +25,7 @@
 #define GNASH_GNASHIMAGE_H
 
 #include <boost/noncopyable.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <memory> 
 
 #include "GnashEnums.h"
@@ -78,7 +78,7 @@ class DSOEXPORT GnashImage : boost::noncopyable
 {
 public:
 
-    typedef boost::uint8_t value_type;
+    typedef std::uint8_t value_type;
     typedef std::unique_ptr<value_type[]> container_type;
     typedef value_type* iterator;
     typedef const value_type* const_iterator;
@@ -184,7 +184,7 @@ protected:
 
     /// Construct an empty GnashImage
     //
-    /// Note: there is an arbitrary limit of boost::int32_t::max bytes for the
+    /// Note: there is an arbitrary limit of std::int32_t::max bytes for the
     /// total size of the bitmap constructed with this constructor.
     //
     /// @param width    The width of the image in pixels.

@@ -46,7 +46,7 @@
 #endif
 
 #include <memory>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/thread/mutex.hpp>
 #include <vector>
 #include <cassert>
@@ -144,7 +144,7 @@ public:
         std::string hostname;
 	protocols_supported_e protocol;
     } thread_params_t;
-    typedef boost::uint8_t byte_t;
+    typedef std::uint8_t byte_t;
     typedef bool entry_t (thread_params_t *);
 
     Network();

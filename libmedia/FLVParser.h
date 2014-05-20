@@ -53,7 +53,7 @@ public:
     ///
     /// @todo take a SimpleBuffer by unique_ptr
     ///
-    ExtraVideoInfoFlv(boost::uint8_t* extradata, size_t datasize)
+    ExtraVideoInfoFlv(std::uint8_t* extradata, size_t datasize)
         :
         data(extradata),
         size(datasize)
@@ -61,7 +61,7 @@ public:
     }
 
     /// Video stream header
-    std::unique_ptr<boost::uint8_t[]> data;
+    std::unique_ptr<std::uint8_t[]> data;
 
     /// Video stream header size
     size_t size;
@@ -85,7 +85,7 @@ public:
     ///
     /// @todo take a SimpleBuffer by unique_ptr
     ///
-    ExtraAudioInfoFlv(boost::uint8_t* extradata, size_t datasize)
+    ExtraAudioInfoFlv(std::uint8_t* extradata, size_t datasize)
         :
         data(extradata),
         size(datasize)
@@ -93,7 +93,7 @@ public:
     }
 
     /// Audio stream header
-    std::unique_ptr<boost::uint8_t[]> data;
+    std::unique_ptr<std::uint8_t[]> data;
 
     /// Audio stream header size
     size_t size;
@@ -126,13 +126,13 @@ public:
 	~FLVParser();
 
 	// see dox in MediaParser.h
-	virtual bool seek(boost::uint32_t&);
+	virtual bool seek(std::uint32_t&);
 
 	// see dox in MediaParser.h
 	virtual bool parseNextChunk();
 
 	// see dox in MediaParser.h
-	boost::uint64_t getBytesLoaded() const;
+	std::uint64_t getBytesLoaded() const;
 
 	// see dox in MediaParser.h
 	bool indexingCompleted() const
@@ -152,7 +152,7 @@ public:
     ///             timestamp order. Ownership of the data is shared. It
     ///             is destroyed automatically along with the last owner.
     //
-    virtual void fetchMetaTags(OrderedMetaTags& tags, boost::uint64_t ts);
+    virtual void fetchMetaTags(OrderedMetaTags& tags, std::uint64_t ts);
 
 private:
 
@@ -165,7 +165,7 @@ private:
 
 	struct FLVTag : public boost::noncopyable
 	{
-		FLVTag(boost::uint8_t* stream)
+		FLVTag(std::uint8_t* stream)
 		    :
             type(stream[0]),
             body_size(getUInt24(stream+1)),
@@ -173,14 +173,14 @@ private:
 		{}
 
 		/// Equals tagType
-		boost::uint8_t type;
-		boost::uint32_t body_size;
-		boost::uint32_t timestamp;
+		std::uint8_t type;
+		std::uint32_t body_size;
+		std::uint32_t timestamp;
 	};
 
 	struct FLVAudioTag : public boost::noncopyable
 	{
-		FLVAudioTag(const boost::uint8_t& byte)
+		FLVAudioTag(const std::uint8_t& byte)
 		    :
             codec( (byte & 0xf0) >> 4 ),
 		    samplerate( flv_audio_rates[(byte & 0x0C) >> 2] ),
@@ -190,18 +190,18 @@ private:
 		}
 
 		/// Equals audioCodecType
-		boost::uint8_t codec;
+		std::uint8_t codec;
 
-		boost::uint16_t samplerate;
+		std::uint16_t samplerate;
 
 		/// Size of each sample, in bytes
-		boost::uint8_t samplesize;
+		std::uint8_t samplesize;
 
 		bool stereo;
 
     private:
 	
-        static const boost::uint16_t flv_audio_rates[];
+        static const std::uint16_t flv_audio_rates[];
 	
     };
 
@@ -214,16 +214,16 @@ private:
 
 	struct FLVVideoTag : public boost::noncopyable
 	{
-		FLVVideoTag(const boost::uint8_t& byte)
+		FLVVideoTag(const std::uint8_t& byte)
             :
             frametype( (byte & 0xf0) >> 4 ),
 		    codec( byte & 0x0f )
 		{}
 
 		/// Equals frameType
-		boost::uint8_t frametype;
+		std::uint8_t frametype;
 		/// Equals videoCodecType
-		boost::uint8_t codec;
+		std::uint8_t codec;
 	};
 
 	/// Parses next tag from the file
@@ -234,15 +234,15 @@ private:
 	bool parseNextTag(bool index_only);
 
 	std::unique_ptr<EncodedAudioFrame> parseAudioTag(const FLVTag& flvtag,
-            const FLVAudioTag& audiotag, boost::uint32_t thisTagPos);
+            const FLVAudioTag& audiotag, std::uint32_t thisTagPos);
 	
     std::unique_ptr<EncodedVideoFrame> parseVideoTag(const FLVTag& flvtag,
-            const FLVVideoTag& videotag, boost::uint32_t thisTagPos);
+            const FLVVideoTag& videotag, std::uint32_t thisTagPos);
 
-	void indexAudioTag(const FLVTag& tag, boost::uint32_t thisTagPos);
+	void indexAudioTag(const FLVTag& tag, std::uint32_t thisTagPos);
 	
     void indexVideoTag(const FLVTag& tag, const FLVVideoTag& videotag,
-            boost::uint32_t thisTagPos);
+            std::uint32_t thisTagPos);
 
 	/// Parses the header of the file
 	bool parseHeader();
@@ -250,14 +250,14 @@ private:
 	/// Reads three bytes in FLV (big endian) byte order.
 	/// @param in Pointer to read 3 bytes from.
 	/// @return 24-bit integer.
-	static boost::uint32_t getUInt24(boost::uint8_t* in);
+	static std::uint32_t getUInt24(std::uint8_t* in);
 
 	/// The position where the parsing should continue from.
 	/// Will be reset on seek, and will be protected by the _streamMutex
-	boost::uint64_t _lastParsedPosition;
+	std::uint64_t _lastParsedPosition;
 
 	/// Position of next tag to index
-	boost::uint64_t _nextPosToIndex;
+	std::uint64_t _nextPosToIndex;
 
 	/// Audio stream is present
 	bool _audio;
@@ -266,15 +266,15 @@ private:
 	bool _video;
 
 	std::unique_ptr<EncodedAudioFrame>
-        readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp);
+        readAudioFrame(std::uint32_t dataSize, std::uint32_t timestamp);
 
 	std::unique_ptr<EncodedVideoFrame>
-        readVideoFrame(boost::uint32_t dataSize, boost::uint32_t timestamp);
+        readVideoFrame(std::uint32_t dataSize, std::uint32_t timestamp);
 
 	/// Position in input stream for each cue point
 	/// first: timestamp
 	/// second: position in input stream
-	typedef std::map<boost::uint64_t, long> CuePointsMap;
+	typedef std::map<std::uint64_t, long> CuePointsMap;
 	CuePointsMap _cuePoints;
 
 	bool _indexingCompleted;

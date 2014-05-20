@@ -21,7 +21,7 @@
 #ifndef GNASH_PLAYHEAD_H
 #define GNASH_PLAYHEAD_H
 
-#include <boost/cstdint.hpp> // For C99 int types
+#include <cstdint> // For C99 int types
 
 // Forward declarations
 namespace gnash {
@@ -74,7 +74,7 @@ public:
     }
 
     /// Get current playhead position (milliseconds)
-    boost::uint64_t getPosition() const { return _position; }
+    std::uint64_t getPosition() const { return _position; }
 
     /// Get current playback state
     PlaybackStatus getState() const { return _state; }
@@ -121,7 +121,7 @@ public:
     /// - isAudioConsumed() == false
     /// - getPosition() == position
     ///
-    void seekTo(boost::uint64_t position);
+    void seekTo(std::uint64_t position);
 
     /// Advance position if all available consumers consumed the current one
     //
@@ -146,7 +146,7 @@ private:
     };
 
     /// Current playhead position
-    boost::uint64_t _position;
+    std::uint64_t _position;
 
     /// Current playback state
     PlaybackStatus _state;
@@ -166,7 +166,7 @@ private:
     /// to get current position
     //
     /// The offset will be 
-    boost::uint64_t _clockOffset; 
+    std::uint64_t _clockOffset;
 
 };
 

@@ -268,7 +268,7 @@ public:
     ///
     /// TODO: take twips (or float pixels), or we won't be able to
     ///       support sub-pixel accuracy in collision detection.
-    DSOEXPORT bool mouseMoved(boost::int32_t x, boost::int32_t y);
+    DSOEXPORT bool mouseMoved(std::int32_t x, std::int32_t y);
 
     /// Inform the Stage that a mouse click has occurred.
     //
@@ -294,7 +294,7 @@ public:
     /// Use this to retrieve the last state of the mouse.
     //
     /// Coordinates are in PIXELS, NOT TWIPS.
-    std::pair<boost::int32_t, boost::int32_t> mousePosition() const;
+    std::pair<std::int32_t, std::int32_t> mousePosition() const;
 
     void setDragState(const DragState& st);
 
@@ -320,7 +320,7 @@ public:
     /// @return An integer indentifying the timer
     ///         for subsequent call to clear_interval_timer.
     ///         It will NEVER be zero.
-    boost::uint32_t addIntervalTimer(std::unique_ptr<Timer> timer);
+    std::uint32_t addIntervalTimer(std::unique_ptr<Timer> timer);
 
     /// Register an object for loading data to.
     //
@@ -347,7 +347,7 @@ public:
     /// Remove timer identified by given integer
     //
     /// @return true on success, false on error (no such timer)
-    bool clearIntervalTimer(boost::uint32_t x);
+    bool clearIntervalTimer(std::uint32_t x);
 
     void set_background_color(const rgba& color);
 
@@ -763,17 +763,17 @@ public:
     ///             The default value for this (i.e. when no
     ///             ScriptLimits tag is present) is documented to be
     ///             15 to 20 seconds, depending on platform.
-    void setScriptLimits(boost::uint16_t recursion, boost::uint16_t timeout);
+    void setScriptLimits(std::uint16_t recursion, std::uint16_t timeout);
     
     /// Get the current global recursion limit for this movie: it can
     /// be changed by loaded movies.
-    boost::uint16_t getRecursionLimit() const {
+    std::uint16_t getRecursionLimit() const {
         return _recursionLimit;
     }
 
     /// Get the current global script timeout limit for this movie: it
     /// can be changed by loaded movies.
-    boost::uint16_t getTimeoutLimit() const
+    std::uint16_t getTimeoutLimit() const
     {
         return _timeoutLimit;
     }
@@ -898,8 +898,8 @@ private:
     /// @param y
     ///     Y ordinate of the pointer, in world coordiante space (twips).
     ///
-    InteractiveObject* getTopmostMouseEntity(boost::int32_t x,
-            boost::int32_t y) const;
+    InteractiveObject* getTopmostMouseEntity(std::int32_t x,
+            std::int32_t y) const;
 
     /// Delete DisplayObjects removed from the stage
     /// from the display lists
@@ -944,7 +944,7 @@ private:
         return (_processingActionLevel < PRIORITY_SIZE);
     }
 
-    const DisplayObject* findDropTarget(boost::int32_t x, boost::int32_t y,
+    const DisplayObject* findDropTarget(std::int32_t x, std::int32_t y,
             DisplayObject* dragging) const;
 
     void handleActionLimitHit(const std::string& ref);
@@ -989,8 +989,8 @@ private:
     rgba m_background_color;
     bool m_background_color_set;
 
-    boost::int32_t _mouseX;
-    boost::int32_t _mouseY;
+    std::int32_t _mouseX;
+    std::int32_t _mouseY;
 
     MouseButtonState  _mouseButtonState;
 
@@ -1000,7 +1000,7 @@ private:
 
     LoadCallbacks _loadCallbacks;
     
-    typedef std::map<boost::uint32_t, std::shared_ptr<Timer> > TimerMap;
+    typedef std::map<std::uint32_t, std::shared_ptr<Timer> > TimerMap;
 
     TimerMap _intervalTimers;
 
@@ -1069,10 +1069,10 @@ private:
     DisplayState _displayState;
     
     // Maximum number of recursions set in the ScriptLimits tag.
-    boost::uint16_t _recursionLimit;
+    std::uint16_t _recursionLimit;
 
     // Timeout in seconds for script execution, set in the ScriptLimits tag.
-    boost::uint16_t _timeoutLimit;
+    std::uint16_t _timeoutLimit;
 
     // delay between movie advancement, in milliseconds
     size_t _movieAdvancementDelay;

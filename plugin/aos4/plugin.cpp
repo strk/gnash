@@ -66,7 +66,7 @@
   Compatible Shockwave Flash "FLASH_VERSION
 
 #include <cstdarg>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <fstream>
 
 #include "plugin.h"
@@ -344,7 +344,7 @@ nsPluginInstance::shut(void)
 
 NPError
 nsPluginInstance::NewStream(NPMIMEType type, NPStream *stream,
-        NPBool seekable, boost::uint16_t *stype)
+        NPBool seekable, std::uint16_t *stype)
 {
     DBG("nsPluginInstance::NewStream\n");
     DBG("stream->url: %s\n", stream->url);

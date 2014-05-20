@@ -49,13 +49,13 @@ public:
 
     ~AudioDecoderGst();
 
-    boost::uint8_t* decode(const boost::uint8_t* input, boost::uint32_t inputSize,
-                           boost::uint32_t& outputSize, boost::uint32_t& decodedData);
-    boost::uint8_t* decode(const EncodedAudioFrame& ef, boost::uint32_t& outputSize);
+    std::uint8_t* decode(const std::uint8_t* input, std::uint32_t inputSize,
+                           std::uint32_t& outputSize, std::uint32_t& decodedData);
+    std::uint8_t* decode(const EncodedAudioFrame& ef, std::uint32_t& outputSize);
 
 private:
 
-    boost::uint8_t* pullBuffers(boost::uint32_t&  outputSize);
+    std::uint8_t* pullBuffers(std::uint32_t&  outputSize);
 
     void setup(GstCaps* caps);
 

@@ -55,7 +55,7 @@ public:
         Movie* mov = m->get_root();
         for (Exports::const_iterator it = _exports.begin(), e = _exports.end();
                 it != e; ++it) {
-            const boost::uint16_t id = mov->definition()->exportID(*it);
+            const std::uint16_t id = mov->definition()->exportID(*it);
 
             // We exported it, so we assume it is known.
             assert(id);
@@ -73,7 +73,7 @@ private:
     void read(SWFStream& in, movie_definition& m) {
         
         in.ensureBytes(2);
-        const boost::uint16_t count = in.read_u16();
+        const std::uint16_t count = in.read_u16();
 
         IF_VERBOSE_PARSE(
             log_parse(_("  export: count = %d"), count);
@@ -82,7 +82,7 @@ private:
         // Read the exports.
         for (size_t i = 0; i < count; ++i) {
             in.ensureBytes(2);
-            const boost::uint16_t id = in.read_u16();
+            const std::uint16_t id = in.read_u16();
 
             if (!id) continue;
 

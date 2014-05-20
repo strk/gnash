@@ -281,10 +281,10 @@ MovieTester::advanceClock(unsigned long ms_current)
 	
         log_debug("advanceClock(%d) needs to fetch %d samples", ms, toFetch);
 	
-        boost::int16_t samples[1024];
+        std::int16_t samples[1024];
         while (toFetch) {
             unsigned int n = std::min(toFetch, 1024u);
-            _sound_handler->fetchSamples((boost::int16_t*)&samples, n);
+            _sound_handler->fetchSamples((std::int16_t*)&samples, n);
             toFetch -= n;
         }
     }

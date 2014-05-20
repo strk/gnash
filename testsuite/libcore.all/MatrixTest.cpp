@@ -64,14 +64,14 @@ main(int /*argc*/, char** /*argv*/)
     // Note: If any of the following tests fails, your boost library
     // is bogus or hasn't been installed properly.
     // 
-    check_equals(sizeof(boost::int8_t),   1);
-    check_equals(sizeof(boost::uint8_t),  1);
-    check_equals(sizeof(boost::int16_t),  2);
-    check_equals(sizeof(boost::uint16_t), 2);
-    check_equals(sizeof(boost::int32_t),  4);
-    check_equals(sizeof(boost::uint32_t), 4);
-    check_equals(sizeof(boost::int64_t),  8);
-    check_equals(sizeof(boost::uint64_t), 8);
+    check_equals(sizeof(std::int8_t),   1);
+    check_equals(sizeof(std::uint8_t),  1);
+    check_equals(sizeof(std::int16_t),  2);
+    check_equals(sizeof(std::uint16_t), 2);
+    check_equals(sizeof(std::int32_t),  4);
+    check_equals(sizeof(std::uint32_t), 4);
+    check_equals(sizeof(std::int64_t),  8);
+    check_equals(sizeof(std::uint64_t), 8);
 
     // 
     //  Test identity SWFMatrix.

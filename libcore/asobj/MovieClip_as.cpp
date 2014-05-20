@@ -476,7 +476,7 @@ movieclip_attachMovie(const fn_call& fn)
     const double depth = toNumber(fn.arg(2), getVM(fn));
     
     // This also checks for overflow, as both numbers are expressible as
-    // boost::int32_t.
+    // std::int32_t.
     if (depth < DisplayObject::lowerAccessibleBound ||
             depth > DisplayObject::upperAccessibleBound)
     {
@@ -487,7 +487,7 @@ movieclip_attachMovie(const fn_call& fn)
         return as_value();
     }
     
-    boost::int32_t depthValue = static_cast<boost::int32_t>(depth);
+    std::int32_t depthValue = static_cast<std::int32_t>(depth);
 
     Global_as& gl = getGlobal(fn);
     DisplayObject* newch = exported_movie->createDisplayObject(gl, movieclip);
@@ -724,7 +724,7 @@ movieclip_duplicateMovieClip(const fn_call& fn)
     const double depth = toNumber(fn.arg(1), getVM(fn));
     
     // This also checks for overflow, as both numbers are expressible as
-    // boost::int32_t.
+    // std::int32_t.
     if (depth < DisplayObject::lowerAccessibleBound ||
             depth > DisplayObject::upperAccessibleBound)
     {
@@ -735,7 +735,7 @@ movieclip_duplicateMovieClip(const fn_call& fn)
         return as_value();
     }
     
-    boost::int32_t depthValue = static_cast<boost::int32_t>(depth);
+    std::int32_t depthValue = static_cast<std::int32_t>(depth);
 
     MovieClip* ch;
 
@@ -1013,17 +1013,17 @@ movieclip_hitTest(const fn_call& fn)
 
         case 2: // x, y
         {
-            boost::int32_t x = pixelsToTwips(toNumber(fn.arg(0), getVM(fn)));
-            boost::int32_t y = pixelsToTwips(toNumber(fn.arg(1), getVM(fn)));
+            std::int32_t x = pixelsToTwips(toNumber(fn.arg(0), getVM(fn)));
+            std::int32_t y = pixelsToTwips(toNumber(fn.arg(1), getVM(fn)));
 
             return movieclip->pointInBounds(x, y);
         }
 
         case 3: // x, y, shapeFlag
         {
-             const boost::int32_t x = pixelsToTwips(toNumber(fn.arg(0),
+             const std::int32_t x = pixelsToTwips(toNumber(fn.arg(0),
                          getVM(fn)));
-             const boost::int32_t y = pixelsToTwips(toNumber(fn.arg(1),
+             const std::int32_t y = pixelsToTwips(toNumber(fn.arg(1),
                          getVM(fn)));
              const bool shapeFlag = toBool(fn.arg(2), getVM(fn));
 
@@ -1287,8 +1287,8 @@ movieclip_globalToLocal(const fn_call& fn)
     }
 
     as_value tmp;
-    boost::int32_t    x = 0;
-    boost::int32_t    y = 0;
+    std::int32_t    x = 0;
+    std::int32_t    y = 0;
 
     if ( ! obj->get_member(NSV::PROP_X, &tmp) )
     {
@@ -1348,8 +1348,8 @@ movieclip_localToGlobal(const fn_call& fn)
     }
 
     as_value tmp;
-    boost::int32_t x = 0;
-    boost::int32_t y = 0;
+    std::int32_t x = 0;
+    std::int32_t y = 0;
 
     if (!obj->get_member(NSV::PROP_X, &tmp)) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1499,11 +1499,11 @@ movieclip_lineStyle(const fn_call& fn)
         return as_value();
     }
 
-    boost::uint8_t r = 0;
-    boost::uint8_t g = 0;
-    boost::uint8_t b = 0;
-    boost::uint8_t a = 255;
-    boost::uint16_t thickness = 0;
+    std::uint8_t r = 0;
+    std::uint8_t g = 0;
+    std::uint8_t b = 0;
+    std::uint8_t a = 255;
+    std::uint16_t thickness = 0;
     bool scaleThicknessVertically = true;
     bool scaleThicknessHorizontally = true;
     bool pixelHinting = false;
@@ -1594,20 +1594,20 @@ movieclip_lineStyle(const fn_call& fn)
         {
             const float alphaval = clamp<float>(toNumber(fn.arg(2), getVM(fn)),
                                      0, 100);
-            a = boost::uint8_t(255 * (alphaval / 100));
+            a = std::uint8_t(255 * (alphaval / 100));
         }
         case 2:
         {
             // See pollock.swf for eventual regressions.
             // It sets color to a random number from
             // 0 to 160000000 (about 10 times more then the max).
-            boost::uint32_t rgbval = toInt(fn.arg(1), getVM(fn));
-            r = boost::uint8_t((rgbval & 0xFF0000) >> 16);
-            g = boost::uint8_t((rgbval & 0x00FF00) >> 8);
-            b = boost::uint8_t((rgbval & 0x0000FF) );
+            std::uint32_t rgbval = toInt(fn.arg(1), getVM(fn));
+            r = std::uint8_t((rgbval & 0xFF0000) >> 16);
+            g = std::uint8_t((rgbval & 0x00FF00) >> 8);
+            b = std::uint8_t((rgbval & 0x0000FF) );
         }
         case 1:
-            thickness = boost::uint16_t(pixelsToTwips(clamp<float>(
+            thickness = std::uint16_t(pixelsToTwips(clamp<float>(
                             toNumber(fn.arg(0), getVM(fn)), 0, 255)));
             break;
     }
@@ -1675,13 +1675,13 @@ movieclip_beginFill(const fn_call& fn)
     }
 
     // 2^24 is the max here
-    const boost::uint32_t rgbval =
+    const std::uint32_t rgbval =
         clamp<float>(toNumber(fn.arg(0), getVM(fn)), 0, 16777216);
 
-    const boost::uint8_t r = (rgbval & 0xFF0000) >> 16;
-    const boost::uint8_t g = (rgbval & 0x00FF00) >> 8;
-    const boost::uint8_t b = rgbval & 0x0000FF;
-    boost::uint8_t a = 255;
+    const std::uint8_t r = (rgbval & 0xFF0000) >> 16;
+    const std::uint8_t g = (rgbval & 0x00FF00) >> 8;
+    const std::uint8_t b = rgbval & 0x0000FF;
+    std::uint8_t a = 255;
 
     if (fn.nargs > 1) {
         a = 255 * clamp<int>(toInt(fn.arg(1), getVM(fn)), 0, 100) / 100;
@@ -1807,13 +1807,13 @@ movieclip_beginGradientFill(const fn_call& fn)
         const ObjectURI& key = getURI(vm, boost::lexical_cast<std::string>(i));
 
         as_value colVal = getMember(*colors, key);
-        boost::uint32_t col = colVal.is_number() ? toInt(colVal, getVM(fn)) : 0;
+        std::uint32_t col = colVal.is_number() ? toInt(colVal, getVM(fn)) : 0;
 
         /// Alpha is the range 0..100.
         as_value alpVal = getMember(*alphas, key);
         const double a = alpVal.is_number() ?
             clamp<double>(toNumber(alpVal, getVM(fn)), 0, 100) : 0;
-        const boost::uint8_t alp = 0xff * (a / 100);
+        const std::uint8_t alp = 0xff * (a / 100);
 
         // Ratio is the range 0..255, but a ratio may never be smaller than
         // the previous value. The pp adjusts it to be greater than the
@@ -1824,12 +1824,12 @@ movieclip_beginGradientFill(const fn_call& fn)
         // steps of 1 appear to be adjusted.
         const int step = 2;
         const as_value& ratVal = getMember(*ratios, key);
-        const boost::uint32_t minRatio =
+        const std::uint32_t minRatio =
             gradients.empty() ? 0 :
-            std::min<boost::uint32_t>(gradients[i - 1].ratio + step, 0xff);
+            std::min<std::uint32_t>(gradients[i - 1].ratio + step, 0xff);
 
-        boost::uint8_t rat = ratVal.is_number() ? 
-            clamp<boost::uint32_t>(toInt(ratVal, getVM(fn)), minRatio, 0xff)
+        std::uint8_t rat = ratVal.is_number() ?
+            clamp<std::uint32_t>(toInt(ratVal, getVM(fn)), minRatio, 0xff)
             : minRatio;
 
         // The renderer may expect successively larger ratios; failure to

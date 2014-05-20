@@ -23,7 +23,7 @@
 #include <string> // for use within map 
 #include <cassert> // for inlines
 #include <utility> // for std::pair
-#include <boost/cstdint.hpp> 
+#include <cstdint>
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/sequenced_index.hpp>

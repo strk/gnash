@@ -139,7 +139,7 @@ Video::getVideoFrame()
             return _lastDecodedVideoFrame.get();
         }
 
-        const boost::uint16_t current_frame = get_ratio(); 
+        const std::uint16_t current_frame = get_ratio();
 
 #ifdef DEBUG_EMBEDDED_VIDEO_DECODING
         log_debug("Video instance %s need display video frame (ratio) %d",
@@ -160,7 +160,7 @@ Video::getVideoFrame()
         // TODO: find a better way than using -1 to show that no
         // frames have been decoded yet.
         assert(_lastDecodedVideoFrameNum >= -1);
-        boost::uint16_t from_frame = _lastDecodedVideoFrameNum + 1;
+        std::uint16_t from_frame = _lastDecodedVideoFrameNum + 1;
 
 		// If current frame is smaller then last decoded frame
 		// we restart decoding from scratch

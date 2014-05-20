@@ -58,7 +58,7 @@ bool vaapi_check_status(VAStatus status, const char *msg)
 }
 
 /// Return a string representation of a FOURCC
-const char *string_of_FOURCC(boost::uint32_t fourcc)
+const char *string_of_FOURCC(std::uint32_t fourcc)
 {
     static int buf;
     static char str[2][5]; // XXX: 2 buffers should be enough for most purposes

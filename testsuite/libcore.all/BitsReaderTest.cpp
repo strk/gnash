@@ -245,10 +245,10 @@ trymain(int /*argc*/, char** /*argv*/)
 
 	/// bits: 10011001 10011001 (0x999999)
 
-	boost::int16_t s16 = s.read_s16(); check_equals(s16, (boost::int16_t)0x9999);
-	boost::uint16_t u16 = s.read_u16(); check_equals(u16, (boost::uint16_t)0x9999);
-	boost::int32_t s32 = s.read_s32(); check_equals(s32, (boost::int32_t)0x99999999);
-	boost::uint32_t u32 = s.read_u32(); check_equals(u32, (boost::uint32_t)0x99999999);
+	std::int16_t s16 = s.read_s16(); check_equals(s16, (std::int16_t)0x9999);
+	std::uint16_t u16 = s.read_u16(); check_equals(u16, (std::uint16_t)0x9999);
+	std::int32_t s32 = s.read_s32(); check_equals(s32, (std::int32_t)0x99999999);
+	std::uint32_t u32 = s.read_u32(); check_equals(u32, (std::uint32_t)0x99999999);
 
 	/// bits: 10011001 10011001 10011001 10011001 (0x99999999)
 	///       -

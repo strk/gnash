@@ -133,7 +133,7 @@ VideoConverterGst::convert(const ImgBuf& src)
 
     GstBuffer* buffer = gst_buffer_new();
 
-    GST_BUFFER_DATA(buffer) = const_cast<boost::uint8_t*>(src.data);
+    GST_BUFFER_DATA(buffer) = const_cast<std::uint8_t*>(src.data);
     GST_BUFFER_SIZE(buffer) = src.size;
     GST_BUFFER_FLAG_SET(buffer, GST_BUFFER_FLAG_READONLY);
 

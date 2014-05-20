@@ -467,7 +467,7 @@ test_system()
         runtest.fail("Encoded RTMP Ping Clear message");
     }
 
-    boost::uint32_t time = *(reinterpret_cast<boost::uint32_t *>(buf2->reference() + 2));
+    std::uint32_t time = *(reinterpret_cast<std::uint32_t *>(buf2->reference() + 2));
     std::shared_ptr<cygnal::Buffer> enc2 = server.encodePing(RTMP::PING_CLIENT, htonl(time));
 //     cerr << hexify(buf2->begin(), buf2->size(), false) << endl;
 //     cerr << hexify(enc2->begin(), enc2->size(), false) << endl;

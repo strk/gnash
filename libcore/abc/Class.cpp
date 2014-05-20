@@ -40,7 +40,7 @@ namespace abc {
 
 bool
 Class::addValue(string_table::key name, Namespace *ns,
-        boost::uint32_t slotId, Class *type, as_value& val, bool isconst,
+        std::uint32_t slotId, Class *type, as_value& val, bool isconst,
         bool isstatic)
 {
     Global_as* g = VM::get().getGlobal();
@@ -88,14 +88,14 @@ Class::initTraits(AbcBlock& bl)
 
 bool
 Class::addMemberScript(string_table::key name, Namespace *ns,
-	boost::uint32_t slotId, Class *type, bool isstatic)
+	std::uint32_t slotId, Class *type, bool isstatic)
 {
 	return addSlot(name, ns, slotId, type, isstatic);
 }
 
 bool
 Class::addSlotFunction(string_table::key name, Namespace *ns,
-	boost::uint32_t slotId, Method *method, bool isstatic)
+	std::uint32_t slotId, Method *method, bool isstatic)
 {
 	Class a;
 	a.setName(NSV::CLASS_FUNCTION);
@@ -105,7 +105,7 @@ Class::addSlotFunction(string_table::key name, Namespace *ns,
 
 bool
 Class::addSlot(string_table::key name, Namespace* ns,
-        boost::uint32_t slotId, Class* /*type*/, bool /*isstatic*/)
+        std::uint32_t slotId, Class* /*type*/, bool /*isstatic*/)
 {
 	string_table::key nsname = ns ? ns->getURI() : 0;
 
@@ -172,7 +172,7 @@ Class::addSetter(string_table::key name, Namespace *ns, Method *method,
 
 #if 0 // TODO
 bool
-Class::addValue(string_table::key name, Namespace *ns, boost::uint32_t slotId,
+Class::addValue(string_table::key name, Namespace *ns, std::uint32_t slotId,
 	Class *type, as_value& val, bool isconst, bool isstatic,
 	ClassHierarchy *CH)
 {
@@ -185,7 +185,7 @@ Class::addValue(string_table::key name, Namespace *ns, boost::uint32_t slotId,
 }
 
 bool
-Class::addSlot(string_table::key name, Namespace *ns, boost::uint32_t slotId,
+Class::addSlot(string_table::key name, Namespace *ns, std::uint32_t slotId,
 	Class *type, bool isstatic, ClassHierarchy *CH)
 {
 	asBoundValue *bv = CH->newBoundValue();
@@ -207,7 +207,7 @@ Class::addMethod(string_table::key name, Namespace *ns, Method *method,
 
 bool
 Class::addMemberScript(string_table::key name, Namespace *ns,
-	boost::uint32_t slotId, Class *type, bool isstatic)
+	std::uint32_t slotId, Class *type, bool isstatic)
 {
 	if (!isstatic)
 		return addBinding(name, asBinding(ns, type, slotId, isstatic));
@@ -217,7 +217,7 @@ Class::addMemberScript(string_table::key name, Namespace *ns,
 // TODO: Figure out how this differs from addMethod
 bool
 Class::addSlotFunction(string_table::key name, Namespace *ns,
-	boost::uint32_t slotId, Method *method, bool isstatic)
+	std::uint32_t slotId, Method *method, bool isstatic)
 {
 	if (!isstatic)
 		return addBinding(name, asBinding(ns, method, slotId, isstatic));

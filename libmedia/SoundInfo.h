@@ -65,9 +65,9 @@ public:
 	///     and by 2 (two channels) to find number of output
 	///     samples to skip or fill.
 	///
-	SoundInfo(audioCodecType format, bool stereo, boost::uint32_t sampleRate,
-            boost::uint32_t sampleCount, bool is16bit,
-            boost::int16_t delaySeek=0)
+	SoundInfo(audioCodecType format, bool stereo, std::uint32_t sampleRate,
+            std::uint32_t sampleCount, bool is16bit,
+            std::int16_t delaySeek=0)
 	    :
         _format(format),
 		_stereo(stereo),
@@ -106,7 +106,7 @@ public:
 	// 
 	/// The number is to be considered in pre-resampling units.
 	///
-	boost::int16_t getDelaySeek() const { return _delaySeek; }
+	std::int16_t getDelaySeek() const { return _delaySeek; }
 
 	/// Returns the 16bit status of the sound
 	//
@@ -121,13 +121,13 @@ private:
 	bool _stereo;
 
 	/// Sample rate, one of 5512, 11025, 22050, 44100
-	boost::uint32_t _sampleRate;
+	std::uint32_t _sampleRate;
 
 	/// Number of samples
-	boost::uint32_t _sampleCount;
+	std::uint32_t _sampleCount;
 
 	/// Number of samples to seek forward or delay.
-	boost::int16_t _delaySeek;
+	std::int16_t _delaySeek;
 
 	/// Is the audio in 16bit format (samplesize == 2)? else it 
 	/// is 8bit (samplesize == 1). Used for streams when decoding adpcm.

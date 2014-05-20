@@ -23,7 +23,7 @@
 #include <string>
 #include <memory> // for unique_ptr
 #include <boost/thread/mutex.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #ifdef USE_FREETYPE 
 # include <ft2build.h>
@@ -101,7 +101,7 @@ public:
     ///         or a NULL pointer if the given DisplayObject code
     ///         doesn't exist in this font.
     ///
-    std::unique_ptr<SWF::ShapeRecord> getGlyph(boost::uint16_t code,
+    std::unique_ptr<SWF::ShapeRecord> getGlyph(std::uint16_t code,
             float& advance);
 
     /// Return the font's ascender in terms of its EM own square.

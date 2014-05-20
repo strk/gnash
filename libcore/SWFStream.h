@@ -27,7 +27,7 @@
 #include <string>
 #include <sstream>
 #include <vector> // for composition
-#include <boost/cstdint.hpp> // for boost::?int??_t 
+#include <cstdint> // for boost::?int??_t
 
 // Define the following macro if you want to want Gnash parser
 // to assume the underlying SWF is well-formed. It would make
@@ -148,38 +148,38 @@ public:
 	//
 	/// aligned read
 	///
-	boost::uint8_t  read_u8();
+	std::uint8_t  read_u8();
 
 	/// Read a aligned signed 8-bit value from the stream.		
 	//
 	/// aligned read
 	///
-    boost::int8_t read_s8();
+    std::int8_t read_s8();
 
 	/// Read a aligned unsigned 16-bit value from the stream.		
 	//
 	/// aligned read
 	///
-	boost::uint16_t read_u16();
+	std::uint16_t read_u16();
 
 	/// Read a aligned signed 16-bit value from the stream.		
 	//
 	/// aligned read
 	///
-	boost::int16_t  read_s16();
+	std::int16_t  read_s16();
 
 	/// Read a aligned unsigned 32-bit value from the stream.		
 	//
 	/// aligned read
 	///
-	boost::uint32_t read_u32();
+	std::uint32_t read_u32();
 
 	/// \brief
 	/// Read a aligned signed 32-bit value from the stream.		
 	//
 	/// aligned read
 	///
-	boost::int32_t  read_s32();
+	std::int32_t  read_s32();
 
 	/// \brief
 	/// Read a variable length unsigned 32-bit value from the stream.
@@ -188,10 +188,10 @@ public:
 	//
 	/// aligned read
 	///
-	boost::uint32_t read_V32()
+	std::uint32_t read_V32()
 	{
         ensureBytes(1);
-		boost::uint32_t res = read_u8();
+		std::uint32_t res = read_u8();
 		if (!(res & 0x00000080)) return res;
         
         ensureBytes(1);
@@ -415,8 +415,8 @@ public:
 private:
 
 	IOChannel*	m_input;
-	boost::uint8_t	m_current_byte;
-	boost::uint8_t	m_unused_bits;
+	std::uint8_t	m_current_byte;
+	std::uint8_t	m_unused_bits;
 
 	typedef std::pair<unsigned long,unsigned long> TagBoundaries;
 	// position of start and end of tag

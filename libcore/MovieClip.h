@@ -146,16 +146,16 @@ public:
     virtual SWFRect getBounds() const;
 
     // See dox in DisplayObject.h
-    virtual bool pointInShape(boost::int32_t x, boost::int32_t y) const;
+    virtual bool pointInShape(std::int32_t x, std::int32_t y) const;
 
     // See dox in DisplayObject.h
-    virtual bool pointInVisibleShape(boost::int32_t x, boost::int32_t y) const;
+    virtual bool pointInVisibleShape(std::int32_t x, std::int32_t y) const;
 
     /// return true if the given point is located in a(this) hitable sprite.
     ///
     /// all sprites except mouse-insensitive dynamic masks are hitable.
     /// _visible property is ignored for hitable DisplayObjects.
-    virtual bool pointInHitableShape(boost::int32_t x, boost::int32_t y) const;
+    virtual bool pointInHitableShape(std::int32_t x, std::int32_t y) const;
 
     /// Return 0-based index to current frame
     size_t get_current_frame() const
@@ -220,11 +220,11 @@ public:
     /// Return the topmost entity that the given point
     /// covers that can receive mouse events.  NULL if
     /// none.  Coords are in parent's frame.
-    virtual InteractiveObject* topmostMouseEntity(boost::int32_t x,
-            boost::int32_t y);
+    virtual InteractiveObject* topmostMouseEntity(std::int32_t x,
+            std::int32_t y);
 
     // see dox in DisplayObject.h
-    const DisplayObject* findDropTarget(boost::int32_t x, boost::int32_t y,
+    const DisplayObject* findDropTarget(std::int32_t x, std::int32_t y,
             DisplayObject* dragging) const;
 
     void setDropTarget(const std::string& tgt) {
@@ -673,7 +673,7 @@ private:
     /// This is possible because the drawable does not have its own
     /// transform, so we can use our own. The points are expressed in
     /// world space.
-    bool hitTestDrawable(boost::int32_t x, boost::int32_t y) const;
+    bool hitTestDrawable(std::int32_t x, std::int32_t y) const;
 
     /// Advance to a previous frame.
     //

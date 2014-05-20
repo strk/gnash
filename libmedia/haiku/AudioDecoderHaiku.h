@@ -54,16 +54,16 @@ public:
 	~AudioDecoderHaiku();
 
     // See dox in AudioDecoder.h
-	boost::uint8_t* decode(const boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes);
+	std::uint8_t* decode(const std::uint8_t* input, std::uint32_t inputSize, std::uint32_t& outputSize, std::uint32_t& decodedBytes);
 
-	boost::uint8_t* decode(const EncodedAudioFrame& af, boost::uint32_t& outputSize);
+	std::uint8_t* decode(const EncodedAudioFrame& af, std::uint32_t& outputSize);
 
 private:
 //
 //	void setup(const AudioInfo& info);
 //	void setup(SoundInfo& info);
 //
-//	boost::uint8_t* decodeFrame(const boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize);
+//	std::uint8_t* decodeFrame(const std::uint8_t* input, std::uint32_t inputSize, std::uint32_t& outputSize);
 //
 //	AVCodec* _audioCodec;
 //	AVCodecContext* _audioCodecCtx;
@@ -93,8 +93,8 @@ private:
 //    ///
 //    /// @return number of input bytes parsed, or -1 on error
 //    ///
-//    int parseInput(const boost::uint8_t* input, boost::uint32_t inputSize,
-//            boost::uint8_t const ** outFrame, int* outFrameSize);
+//    int parseInput(const std::uint8_t* input, std::uint32_t inputSize,
+//            std::uint8_t const ** outFrame, int* outFrameSize);
 };
 	
 } // gnash.media.haiku namespace 

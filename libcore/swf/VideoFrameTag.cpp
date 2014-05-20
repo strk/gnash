@@ -38,7 +38,7 @@ VideoFrameTag::loader(SWFStream& in, SWF::TagType tag, movie_definition& m,
     assert(tag == SWF::VIDEOFRAME);
 
     in.ensureBytes(2);
-    boost::uint16_t id = in.read_u16();
+    std::uint16_t id = in.read_u16();
     DefinitionTag* chdef = m.getDefinitionTag(id);
 
     if (!chdef)
@@ -80,7 +80,7 @@ VideoFrameTag::loader(SWFStream& in, SWF::TagType tag, movie_definition& m,
     const unsigned int dataLength = in.get_tag_end_position() - in.tell();
 
     // FIXME: catch bad_alloc
-    boost::uint8_t* buffer = new boost::uint8_t[dataLength + padding]; 
+    std::uint8_t* buffer = new std::uint8_t[dataLength + padding];
 
     const size_t bytesRead = in.read(reinterpret_cast<char*>(buffer),
                                      dataLength);

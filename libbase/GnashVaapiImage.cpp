@@ -27,16 +27,16 @@
 namespace gnash {
 
 /// Get current value of microsecond timer
-static boost::uint64_t get_ticks_usec(void)
+static std::uint64_t get_ticks_usec(void)
 {
 #ifdef HAVE_CLOCK_GETTIME
     struct timespec t;
     clock_gettime(CLOCK_REALTIME, &t);
-    return (boost::uint64_t)t.tv_sec * 1000000 + t.tv_nsec / 1000;
+    return (std::uint64_t)t.tv_sec * 1000000 + t.tv_nsec / 1000;
 #else
     struct timeval t;
     gettimeofday(&t, NULL);
-    return (boost::uint64_t)t.tv_sec * 1000000 + t.tv_usec;
+    return (std::uint64_t)t.tv_sec * 1000000 + t.tv_usec;
 #endif
 }
 
@@ -64,7 +64,7 @@ void GnashVaapiImage::update(std::shared_ptr<VaapiSurface> surface)
     _creation_time = get_ticks_usec();
 }
 
-void GnashVaapiImage::update(boost::uint8_t* data)
+void GnashVaapiImage::update(std::uint8_t* data)
 {
     log_debug(_("GnashVaapi::update(): data %p\n"), data);
 
@@ -80,7 +80,7 @@ void GnashVaapiImage::update(const image::GnashImage& from)
 
     switch (from.location()) {
         case image::GNASH_IMAGE_CPU:
-            this->update(const_cast<boost::uint8_t*>(from.begin()));
+            this->update(const_cast<std::uint8_t*>(from.begin()));
             break;
         case image::GNASH_IMAGE_GPU:
             this->update(static_cast<const GnashVaapiImage&>(from).surface());
@@ -111,7 +111,7 @@ GnashVaapiImage::begin()
 {
     log_debug(_("GnashVaapiImage::data(): surface 0x%08x\n"), _surface->get());
     log_debug(_("  -> %u usec from creation\n"),
-              (boost::uint32_t)(get_ticks_usec() - _creation_time));
+              (std::uint32_t)(get_ticks_usec() - _creation_time));
 
     if (!transfer()) {
         return NULL;
@@ -127,7 +127,7 @@ GnashVaapiImage::begin() const
     log_debug(_("GnashVaapiImage::data() const: surface 0x%08x\n"),
 	      _surface->get());
     log_debug(_("  -> %u usec from creation\n"),
-          (boost::uint32_t)(get_ticks_usec() - _creation_time));
+          (std::uint32_t)(get_ticks_usec() - _creation_time));
 
     /* XXX: awful hack... */
     if (!const_cast<GnashVaapiImage *>(this)->transfer()) {

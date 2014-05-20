@@ -97,7 +97,7 @@ public:
 	/// @param a
 	///	The alpha value.
 	///
-	FuzzyPixel(boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a)
+	FuzzyPixel(std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a)
 		:
 		_col(r, g, b, a),
 		_tol(0)

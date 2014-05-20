@@ -55,7 +55,7 @@ public:
 
 	~Video();
 
-	virtual bool pointInShape(boost::int32_t x, boost::int32_t y) const
+	virtual bool pointInShape(std::int32_t x, std::int32_t y) const
 	{
 		// video DisplayObject shape is always a rectangle..
 		return pointInBounds(x, y);
@@ -120,7 +120,7 @@ private:
 	bool _embeddedStream;
 
 	/// Last decoded frame number
-	boost::int32_t _lastDecodedVideoFrameNum;
+	std::int32_t _lastDecodedVideoFrameNum;
 
 	/// Last decoded frame 
 	std::unique_ptr<image::GnashImage> _lastDecodedVideoFrame;

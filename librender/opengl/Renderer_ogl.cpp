@@ -162,7 +162,7 @@ public:
 private:
     inline bool ogl_accessible() const;
     void setup() const;    
-    void upload(boost::uint8_t* data, size_t width, size_t height) const;
+    void upload(std::uint8_t* data, size_t width, size_t height) const;
     
     mutable std::unique_ptr<image::GnashImage> _img;
     mutable std::unique_ptr<image::GnashImage> _cache;
@@ -223,7 +223,7 @@ public:
   OSRenderMesa(size_t width, size_t height)
     : _width(width),
       _height(height),
-      _buffer(new boost::uint8_t[width * height * 3]), 
+      _buffer(new std::uint8_t[width * height * 3]),
 #if OSMESA_MAJOR_VERSION * 100 + OSMESA_MINOR_VERSION >= 305
       _context(OSMesaCreateContextExt(OSMESA_RGB, 0, 2, 0, NULL))
 #else
@@ -279,7 +279,7 @@ public:
 private:
   size_t _width;
   size_t _height;
-  std::unique_ptr<boost::uint8_t[]> _buffer;
+  std::unique_ptr<std::uint8_t[]> _buffer;
   OSMesaContext _context;  
 };
 
@@ -357,7 +357,7 @@ class
 PointSerializer
 {
 public:
-    PointSerializer(std::vector<boost::int16_t>& dest)
+    PointSerializer(std::vector<std::int16_t>& dest)
         :
         _dest(dest)
     {}
@@ -368,7 +368,7 @@ public:
         _dest.push_back(p.y);
     }
 private:
-    std::vector<boost::int16_t>& _dest;
+    std::vector<std::int16_t>& _dest;
 };
 
 }
@@ -596,8 +596,8 @@ bitmap_info_ogl::setup() const
             while (h < _img->height()) { h <<= 1; }
         }
     
-        std::unique_ptr<boost::uint8_t[]> resized_data(
-                new boost::uint8_t[w * h * _img->channels()]);
+        std::unique_ptr<std::uint8_t[]> resized_data(
+                new std::uint8_t[w * h * _img->channels()]);
         // Q: Would mipmapping these textures aid in performance?
     
         GLint rv = gluScaleImage(_pixel_format, _img->width(),
@@ -615,7 +615,7 @@ bitmap_info_ogl::setup() const
 }
 
 void
-bitmap_info_ogl::upload(boost::uint8_t* data, size_t width, size_t height) const
+bitmap_info_ogl::upload(std::uint8_t* data, size_t width, size_t height) const
 {
   glTexParameteri(_ogl_img_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   
@@ -1088,7 +1088,7 @@ public:
 
     glColor3ub(color.m_r, color.m_g, color.m_b);
 
-    std::vector<boost::int16_t> pointList;
+    std::vector<std::int16_t> pointList;
     pointList.reserve(numPoints * 2);
     std::for_each(coords.begin(), coords.end(), PointSerializer(pointList));
 
@@ -1099,7 +1099,7 @@ public:
 
     // Draw a dot on the beginning and end coordinates to round lines.
     // glVertexPointer: skip all but the first and last coordinates in the line.
-    glVertexPointer(2, GL_SHORT, (sizeof(boost::int16_t) * 2) *
+    glVertexPointer(2, GL_SHORT, (sizeof(std::int16_t) * 2) *
             (numPoints - 1), &pointList.front());
     glEnable(GL_POINT_SMOOTH); // Draw a round (antialiased) point.
     glDrawArrays(GL_POINTS, 0, 2);
@@ -1838,7 +1838,7 @@ private:
   std::vector<PathVec> _masks;
   bool _drawing_mask;
   
-  std::vector<boost::uint8_t> _render_indices;
+  std::vector<std::uint8_t> _render_indices;
   std::vector< std::shared_ptr<GnashTexture> > _render_textures;
   std::list< std::shared_ptr<GnashTexture> > _cached_textures;
   
@@ -1862,7 +1862,7 @@ namespace {
 // TODO: this function is rubbish and shouldn't survive a rewritten OGL
 // renderer.
 rgba
-sampleGradient(const GradientFill& fill, boost::uint8_t ratio)
+sampleGradient(const GradientFill& fill, std::uint8_t ratio)
 {
 
     // By specs, first gradient should *always* be 0, 

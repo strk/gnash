@@ -241,7 +241,7 @@ VM::pushCallFrame(UserFunction& func)
     // TODO: override from gnashrc.
     
     // A stack size of 0 is apparently legitimate.
-    const boost::uint16_t recursionLimit = getRoot().getRecursionLimit();
+    const std::uint16_t recursionLimit = getRoot().getRecursionLimit();
 
     // Don't proceed if local call frames would reach the recursion limit.
     if (_callStack.size() + 1 >= recursionLimit) {
@@ -459,7 +459,7 @@ toObject(const as_value& v, VM& vm)
     return v.to_object(vm);
 }
 
-boost::int32_t
+std::int32_t
 toInt(const as_value& v, const VM& vm)
 {
     const double d = v.to_number(vm.getSWFVersion());
@@ -468,16 +468,16 @@ toInt(const as_value& v, const VM& vm)
         return 0;
     }
 
-    typedef std::numeric_limits<boost::int32_t> limit;
+    typedef std::numeric_limits<std::int32_t> limit;
     if (d >= limit::min() && d <= limit::max()) {
         return d;
     }
 
     if (d < 0) {   
-        return - static_cast<boost::uint32_t>(std::fmod(-d, 4294967296.0));
+        return - static_cast<std::uint32_t>(std::fmod(-d, 4294967296.0));
     }
     
-    return static_cast<boost::uint32_t>(std::fmod(d, 4294967296.0));
+    return static_cast<std::uint32_t>(std::fmod(d, 4294967296.0));
 }
 
 /// Force type to number.

@@ -23,7 +23,7 @@
 #include "SWF.h" // for TagType definition
 #include "SoundInfoRecord.h"
 
-#include <boost/cstdint.hpp> // for boost::uint16_t and friends
+#include <cstdint> // for std::uint16_t and friends
  
 
 // Forward declarations
@@ -51,7 +51,7 @@ class StartSoundTag : public ControlTag
 	/// This one is the latter, probably so with the intention of avoiding
 	/// a lookup at every execution...
 	///
-	boost::uint16_t	m_handler_id;
+	std::uint16_t	m_handler_id;
 
 	/// Create a StartSoundTag for starting the given sound sample
 	//

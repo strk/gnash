@@ -21,7 +21,7 @@
 #define GNASH_SOUND_WAVWRITER_H
 
 #include <fstream> // for composition (file_stream)
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include "dsodefs.h"
 
@@ -54,7 +54,7 @@ public:
     ///           to give interpretation of what comes back (how many
     ///           bytes per channel, which format).
     ///
-    void pushSamples(boost::int16_t* from, unsigned int nSamples);
+    void pushSamples(std::int16_t* from, unsigned int nSamples);
 
 private:
 

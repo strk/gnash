@@ -337,7 +337,7 @@ public:
         _pixf(_rbuf),
         _rbase(_pixf),
         _amask(_rbuf),
-        _buffer(new boost::uint8_t[width * height]())
+        _buffer(new std::uint8_t[width * height]())
     {
         _rbuf.attach(_buffer.get(), width, height, width);
     }
@@ -386,7 +386,7 @@ private:
     Mask _amask;
     
     // in-memory buffer
-    std::unique_ptr<boost::uint8_t[]> _buffer;
+    std::unique_ptr<std::uint8_t[]> _buffer;
     
 };
 
@@ -2047,10 +2047,10 @@ private:  // private variables
 bool is_little_endian_host() {
 
   union {
-    boost::uint16_t word;
+    std::uint16_t word;
     struct {
-      boost::uint8_t b1;
-      boost::uint8_t b2;
+      std::uint8_t b1;
+      std::uint8_t b2;
     } s;
   } u;
     

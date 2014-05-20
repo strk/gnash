@@ -131,9 +131,9 @@ private:
 
 	bool _hasValue;
 	Kind _kind;
-	boost::uint32_t _slotID;
-	boost::uint32_t _typeIndex;
-	boost::uint32_t _classInfoIndex;
+	std::uint32_t _slotID;
+	std::uint32_t _typeIndex;
+	std::uint32_t _classInfoIndex;
 	as_value _value;
 
 	URI _name;
@@ -272,7 +272,7 @@ public:
         return _scripts;
     }
 
-    boost::uint32_t uIntegerPoolAt(size_t i) const {
+    std::uint32_t uIntegerPoolAt(size_t i) const {
         checkBounds(i, _uIntegerPool);
         return _uIntegerPool[i];
     }
@@ -282,7 +282,7 @@ public:
         return _stringPool[i];
     }
 
-    boost::int32_t integerPoolAt(size_t i) const {
+    std::int32_t integerPoolAt(size_t i) const {
         checkBounds(i, _integerPool);
         return _integerPool[i];
     }
@@ -318,7 +318,7 @@ private:
 	
     friend class abc::Trait;
 
-	bool pool_value(boost::uint32_t index, PoolConstant type, as_value &v);
+	bool pool_value(std::uint32_t index, PoolConstant type, as_value &v);
 
 	bool read_version();
 	bool read_integer_constants();
@@ -335,18 +335,18 @@ private:
 	bool read_scripts();
 	bool read_method_bodies();
 
-	void check_multiname_name(boost::uint32_t name);
+	void check_multiname_name(std::uint32_t name);
 
-	void check_multiname_namespace(boost::uint32_t ns);
+	void check_multiname_namespace(std::uint32_t ns);
 
-	void check_multiname_namespaceset(boost::uint32_t nsset);
+	void check_multiname_namespaceset(std::uint32_t nsset);
 
 	void setMultinameNames(MultiName *n, abc::URI ABCName);
 
 	void setNamespaceURI(Namespace *ns, abc::URI ABCName);
 
-	std::vector<boost::int32_t> _integerPool;
-	std::vector<boost::uint32_t> _uIntegerPool;
+	std::vector<std::int32_t> _integerPool;
+	std::vector<std::uint32_t> _uIntegerPool;
 	std::vector<double> _doublePool;
 	std::vector<std::string> _stringPool;
 	std::vector<Namespace*> _namespacePool;
@@ -362,7 +362,7 @@ private:
 	abc::Class *mTheObject;
 	ClassHierarchy *mCH;
 
-	boost::uint32_t mVersion;
+	std::uint32_t mVersion;
 
 
 };

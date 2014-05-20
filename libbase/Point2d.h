@@ -26,7 +26,7 @@
 
 #include <ostream>
 #include <cmath>    // for sqrt()
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 namespace gnash {
 namespace geometry { 
@@ -40,10 +40,10 @@ class Point2d
 public:
 
 	/// The x coordinate
-	boost::int32_t  x;  // TWIPS
+	std::int32_t  x;  // TWIPS
 
 	/// The y coordinate
-	boost::int32_t  y;  // TWIPS
+	std::int32_t  y;  // TWIPS
 
 	/// Construct a Point2d with default x and y coordinates
 	Point2d()
@@ -53,7 +53,7 @@ public:
 	}
 
 	/// Construct a Point2d with given x and y ordinates
-	Point2d(boost::int32_t cx, boost::int32_t cy)
+	Point2d(std::int32_t cx, std::int32_t cy)
 		:
 		x(cx), y(cy)
 	{
@@ -67,8 +67,8 @@ public:
 	///
 	Point2d(const Point2d& p0, const Point2d& p1, float t)
 		:
-		x( p0.x + (boost::int32_t)((p1.x - p0.x) * t)),
-		y( p0.y + (boost::int32_t)((p1.y - p0.y) * t))
+		x( p0.x + (std::int32_t)((p1.x - p0.x) * t)),
+		y( p0.y + (std::int32_t)((p1.y - p0.y) * t))
 	{
 	}
 
@@ -76,7 +76,7 @@ public:
 	//
 	/// @return a reference to this instance
 	///
-	Point2d& setTo(const boost::int32_t cx, const boost::int32_t cy)
+	Point2d& setTo(const std::int32_t cx, const std::int32_t cy)
 	{
 		x = cx;  
         y = cy;
@@ -93,31 +93,31 @@ public:
 	///
 	Point2d& setTo(const Point2d& p0, const Point2d& p1, float t)
 	{
-		x = p0.x + (boost::int32_t)((p1.x - p0.x) * t);
-		y = p0.y + (boost::int32_t)((p1.y - p0.y) * t);
+		x = p0.x + (std::int32_t)((p1.x - p0.x) * t);
+		y = p0.y + (std::int32_t)((p1.y - p0.y) * t);
 		return *this;
 	}
 
 	/// Return square distance between two given points.
 	static
-	boost::int64_t squareDistance(const Point2d& p0, const Point2d& p1)
+	std::int64_t squareDistance(const Point2d& p0, const Point2d& p1)
 	{
-		boost::int64_t hside = p1.x - p0.x;
-		boost::int64_t vside = p1.y - p0.y;
+		std::int64_t hside = p1.x - p0.x;
+		std::int64_t vside = p1.y - p0.y;
 
 		return hside*hside + vside*vside;
 	}
 
 	/// Return square distance between this and the given point
-	boost::int64_t squareDistance(const Point2d& p) const
+	std::int64_t squareDistance(const Point2d& p) const
 	{
 		return squareDistance(*this, p);
 	}
 
 	/// Return distance between this and the given point
-	boost::int32_t distance(const Point2d& p) const
+	std::int32_t distance(const Point2d& p) const
 	{
-	    return (boost::int32_t)( std::sqrt( static_cast<double>(squareDistance(p)) ) );
+	    return (std::int32_t)( std::sqrt( static_cast<double>(squareDistance(p)) ) );
 	}
 
 	bool operator== (const Point2d& p) const

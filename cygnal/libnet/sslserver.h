@@ -24,7 +24,7 @@
 #endif
 
 #include <boost/array.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <sstream>
 
 #ifdef HAVE_OPENSSL_SSL_H

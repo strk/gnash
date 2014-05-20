@@ -108,12 +108,12 @@ InputDevice::addData(bool pressed, key::code key, int modifier, int x, int y)
 }
 
 // Read data into the Device input buffer.
-std::unique_ptr<boost::uint8_t[]>
+std::unique_ptr<std::uint8_t[]>
 InputDevice::readData(size_t size)
 {
     // GNASH_REPORT_FUNCTION;
 
-    std::unique_ptr<boost::uint8_t[]> inbuf;
+    std::unique_ptr<std::uint8_t[]> inbuf;
 
     if (_fd < 0) {
         return inbuf;   // no mouse available
@@ -137,7 +137,7 @@ InputDevice::readData(size_t size)
         return inbuf;
     }
     
-    inbuf.reset(new boost::uint8_t[size]);
+    inbuf.reset(new std::uint8_t[size]);
     ret = ::read(_fd, inbuf.get(), size);
     if (ret > 0) {
         // log_debug(_("Read %d bytes, %s"), ret, hexify(inbuf.get(), ret, false));

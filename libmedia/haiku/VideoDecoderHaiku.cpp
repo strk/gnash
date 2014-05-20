@@ -64,12 +64,12 @@ VideoDecoderHaiku::pop()
 {
     std::unique_ptr<GnashImage> ret;
     ret.reset(new ImageRGB(100, 100));
-    boost::uint8_t *d =
-        new boost::uint8_t[100*100*4];
+    std::uint8_t *d =
+        new std::uint8_t[100*100*4];
     for (int i = 0; i < 100*100*4; ++i)
     {
-        d[i] *= 1 - (boost::uint8_t) 2*(rand()%2);
-        d[i] += (boost::uint8_t) rand()/64;
+        d[i] *= 1 - (std::uint8_t) 2*(rand()%2);
+        d[i] += (std::uint8_t) rand()/64;
     }
     ret->update(d);
     delete [] d;

@@ -22,7 +22,7 @@
 #endif
 
 #include <boost/thread/mutex.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/array.hpp>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -124,7 +124,7 @@ SSLClient::sslRead(cygnal::Buffer &buf)
 }
 
 int
-SSLClient::sslRead(boost::uint8_t *buf, size_t size)
+SSLClient::sslRead(std::uint8_t *buf, size_t size)
 {
     GNASH_REPORT_FUNCTION;
     
@@ -148,7 +148,7 @@ SSLClient::sslWrite(cygnal::Buffer &buf)
 }
 
 int
-SSLClient::sslWrite(const boost::uint8_t *buf, size_t length)
+SSLClient::sslWrite(const std::uint8_t *buf, size_t length)
 {
     GNASH_REPORT_FUNCTION;
     

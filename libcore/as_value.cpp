@@ -87,12 +87,12 @@ enum Base
 /// @param base     The base (8 or 16) to use.
 /// @param s        The string to parse.
 /// @return         The converted number.
-boost::int32_t
+std::int32_t
 parsePositiveInt(const std::string& s, Base base, bool whole = true)
 {
 
     std::istringstream is(s);
-    boost::uint32_t target;
+    std::uint32_t target;
 
     switch (base)
     {

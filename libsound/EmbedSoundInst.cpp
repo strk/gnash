@@ -96,9 +96,9 @@ EmbedSoundInst::decodeNextBlock()
     // to decode not to bother further streamlining it
     // See https://savannah.gnu.org/bugs/?25456 for a testcase
     // showing the benefit of chunked decoding.
-    const boost::uint32_t chunkSize = 65535;
+    const std::uint32_t chunkSize = 65535;
 
-    boost::uint32_t inputSize = _soundDef.size() - decodingPosition;
+    std::uint32_t inputSize = _soundDef.size() - decodingPosition;
     if ( inputSize > chunkSize ) inputSize = chunkSize;
 
 #ifdef GNASH_DEBUG_SOUNDS_DECODING
@@ -106,11 +106,11 @@ EmbedSoundInst::decodeNextBlock()
 #endif
 
     assert(inputSize);
-    const boost::uint8_t* input = _soundDef.data(decodingPosition);
+    const std::uint8_t* input = _soundDef.data(decodingPosition);
 
-    boost::uint32_t consumed = 0;
-    boost::uint32_t decodedDataSize = 0;
-    boost::uint8_t* decodedData = decoder().decode(input, inputSize,
+    std::uint32_t consumed = 0;
+    std::uint32_t decodedDataSize = 0;
+    std::uint8_t* decodedData = decoder().decode(input, inputSize,
             decodedDataSize, consumed);
 
     decodingPosition += consumed;
@@ -118,7 +118,7 @@ EmbedSoundInst::decodeNextBlock()
     assert(!(decodedDataSize%2));
 
     // @todo I hope there are no alignment issues in this cast from int8_t* to int16_t* !
-    boost::int16_t* samples = reinterpret_cast<boost::int16_t*>(decodedData);
+    std::int16_t* samples = reinterpret_cast<std::int16_t*>(decodedData);
     unsigned int nSamples = decodedDataSize/2;
 
 #ifdef GNASH_DEBUG_MIXING
@@ -148,7 +148,7 @@ EmbedSoundInst::decodeNextBlock()
 }
 
 void
-EmbedSoundInst::applyEnvelopes(boost::int16_t* samples, unsigned int nSamples,
+EmbedSoundInst::applyEnvelopes(std::int16_t* samples, unsigned int nSamples,
         unsigned int firstSampleOffset, const SoundEnvelopes& env)
 {
 
@@ -168,7 +168,7 @@ EmbedSoundInst::applyEnvelopes(boost::int16_t* samples, unsigned int nSamples,
     assert(env[current_env].m_mark44 < firstSampleOffset+nSamples);
 
     // Get next envelope position (absolute samples offset)
-    boost::uint32_t next_env_pos = 0;
+    std::uint32_t next_env_pos = 0;
     if (current_env == (env.size() - 1)) {
         // If there is no "next envelope" then set the next envelope
         // start point to be unreachable

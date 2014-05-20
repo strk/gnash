@@ -23,7 +23,7 @@
 #define GNASH_TEXTFORMAT_H
 
 #include <vector>
-#include <boost/cstdint.hpp> 
+#include <cstdint>
 #include <string>
 #include <boost/optional.hpp>
 
@@ -76,7 +76,7 @@ public:
     }
 
     /// Indentation from left margin to the first character in the paragraph
-    const boost::optional<boost::uint16_t>& indent() const { return _indent; }
+    const boost::optional<std::uint16_t>& indent() const { return _indent; }
     
     /// Paragraph alignment
     const boost::optional<TextField::TextAlignment>& align() const { return _align; }
@@ -91,24 +91,24 @@ public:
     const boost::optional<std::string>& url() const { return _url; }
 
     /// The block indent.
-    const boost::optional<boost::uint32_t>& blockIndent() const {
+    const boost::optional<std::uint32_t>& blockIndent() const {
         return _blockIndent;
     }
 
     /// Return a number that indicates the amount of leading vertical
     /// space between lines.
-    const boost::optional<boost::uint16_t>& leading() const { return _leading; }
+    const boost::optional<std::uint16_t>& leading() const { return _leading; }
 
     /// Indicates the left margin of the paragraph, in points.
-    const boost::optional<boost::uint16_t>& leftMargin() const { return _leftMargin; }
+    const boost::optional<std::uint16_t>& leftMargin() const { return _leftMargin; }
 
     /// Indicates the right margin of the paragraph in twips
-    const boost::optional<boost::uint16_t>& rightMargin() const {
+    const boost::optional<std::uint16_t>& rightMargin() const {
         return _rightMargin;
     }
 
     /// Return a float that indicates the point size in twips.
-    const boost::optional<boost::uint16_t>& size() const { return _pointSize; }
+    const boost::optional<std::uint16_t>& size() const { return _pointSize; }
 
     /// Setters
 
@@ -126,7 +126,7 @@ public:
 
     void colorSet(const boost::optional<rgba>& x) { _color = x; }
 
-    void indentSet(const boost::optional<boost::uint16_t>& x) { _indent = x; }
+    void indentSet(const boost::optional<std::uint16_t>& x) { _indent = x; }
 
     void fontSet(const boost::optional<std::string>& font) { _font=font; }
     
@@ -134,19 +134,19 @@ public:
     
     void alignSet(const std::string& align);
     
-    void blockIndentSet(const boost::optional<boost::uint32_t>& x) {
+    void blockIndentSet(const boost::optional<std::uint32_t>& x) {
         _blockIndent = x;
     }
     
-    void leadingSet(const boost::optional<boost::uint16_t>& x) { _leading = x; }
+    void leadingSet(const boost::optional<std::uint16_t>& x) { _leading = x; }
 
-    void leftMarginSet(const boost::optional<boost::uint16_t>& x) { _leftMargin = x; }
+    void leftMarginSet(const boost::optional<std::uint16_t>& x) { _leftMargin = x; }
 
-    void rightMarginSet(const boost::optional<boost::uint16_t>& x) {
+    void rightMarginSet(const boost::optional<std::uint16_t>& x) {
         _rightMargin = x;
     }
 
-    void sizeSet(const boost::optional<boost::uint16_t>& x) { _pointSize = x; }
+    void sizeSet(const boost::optional<std::uint16_t>& x) { _pointSize = x; }
 
     void tabStopsSet(const std::vector<int>& tabStops) { _tabStops = tabStops; }
 
@@ -178,7 +178,7 @@ private:
     boost::optional<TextField::TextAlignment> _align;
 
     // 
-    boost::optional<boost::uint32_t> _blockIndent;
+    boost::optional<std::uint32_t> _blockIndent;
 
     /// The color of text using this text format.
     //
@@ -195,20 +195,20 @@ private:
 
     /// An integer that indicates the indentation from the left
     /// margin to the first DisplayObject in the paragraph (twips)
-    boost::optional<boost::uint16_t> _indent;
+    boost::optional<std::uint16_t> _indent;
 
     /// A number that indicates the amount of leading vertical
     /// space between lines (twips)
-    boost::optional<boost::uint16_t> _leading;
+    boost::optional<std::uint16_t> _leading;
 
     /// Indicates the left margin of the paragraph, in points (twips)
-    boost::optional<boost::uint16_t> _leftMargin;
+    boost::optional<std::uint16_t> _leftMargin;
 
     /// Indicates the right margin of the paragraph, in points (twips).
-    boost::optional<boost::uint16_t> _rightMargin;
+    boost::optional<std::uint16_t> _rightMargin;
 
     /// Point size in twips.
-    boost::optional<boost::uint16_t> _pointSize;
+    boost::optional<std::uint16_t> _pointSize;
 
     ///
     boost::optional<std::vector<int> > _tabStops;

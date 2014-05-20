@@ -18,7 +18,7 @@
 
 #include "SoundStreamHeadTag.h"
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <memory>
 
 #include "SWF.h"
@@ -54,9 +54,9 @@ SoundStreamHeadTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     // These are all unused by current implementation
     int reserved = in.read_uint(4); UNUSED(reserved);
 
-    const boost::uint32_t samplerates[] = { 5512, 11025, 22050, 44100 };
+    const std::uint32_t samplerates[] = { 5512, 11025, 22050, 44100 };
 
-    boost::uint8_t pbSoundRate = in.read_uint(2);
+    std::uint8_t pbSoundRate = in.read_uint(2);
     if (pbSoundRate >= arraySize(samplerates)) {
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror("SOUNDSTREAMHEAD: playback sound rate %d (expected "
@@ -64,14 +64,14 @@ SoundStreamHeadTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         );
         pbSoundRate = 0;
     }
-    const boost::uint32_t playbackSoundRate = samplerates[pbSoundRate];
+    const std::uint32_t playbackSoundRate = samplerates[pbSoundRate];
     const bool playbackSound16bit = in.read_bit();
     const bool playbackSoundStereo = in.read_bit();
 
     // These are the used ones
     media::audioCodecType format =
         static_cast<media::audioCodecType>(in.read_uint(4)); // TODO: check input !
-    boost::uint8_t stSoundRate = in.read_uint(2);
+    std::uint8_t stSoundRate = in.read_uint(2);
 
     if (stSoundRate >= arraySize(samplerates)) {
         IF_VERBOSE_MALFORMED_SWF(
@@ -80,7 +80,7 @@ SoundStreamHeadTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         );
         stSoundRate=0;
     }
-    const boost::uint32_t streamSoundRate = samplerates[stSoundRate];
+    const std::uint32_t streamSoundRate = samplerates[stSoundRate];
     const bool streamSound16bit = in.read_bit(); 
     const bool streamSoundStereo = in.read_bit(); 
 
@@ -112,7 +112,7 @@ SoundStreamHeadTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     }
 
     // 2 bytes here
-    const boost::uint16_t sampleCount = in.read_u16();
+    const std::uint16_t sampleCount = in.read_u16();
 
     if (!sampleCount) {
         // this seems common too, we'd need to reproduce with a custom
@@ -123,7 +123,7 @@ SoundStreamHeadTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         );
     }
 
-    boost::int16_t latency = 0;
+    std::int16_t latency = 0;
     if (format == media::AUDIO_CODEC_MP3) {
         try {
             in.ensureBytes(2);

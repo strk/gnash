@@ -46,7 +46,7 @@ public:
     {}
 
     // If a _mixer was given, let it do the mixing!
-    void mix(boost::int16_t* outSamples, boost::int16_t* inSamples,
+    void mix(std::int16_t* outSamples, std::int16_t* inSamples,
                 unsigned int nSamples, float volume)
     {
         if ( _mixer ) _mixer->mix(outSamples, inSamples, nSamples, volume);

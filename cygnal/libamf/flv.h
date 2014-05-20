@@ -22,7 +22,7 @@
 #include <vector>
 #include <string>
 #include <cstring>
-#include <boost/cstdint.hpp>    // for boost::?int??_t
+#include <cstdint>    // for boost::?int??_t
 
 //#include "buffer.h"
 #include "element.h"
@@ -39,7 +39,7 @@ namespace cygnal
 const size_t FLV_HEADER_SIZE = 0x9;
 
 /// \brief The maximum value that can be held in a 32 bit word.
-const boost::uint32_t FLV_MAX_LENGTH = 0xffffff;
+const std::uint32_t FLV_MAX_LENGTH = 0xffffff;
 
 /// \class Flv
 ///	This class abstracts an FLV file into something usable by Gnash.
@@ -47,7 +47,7 @@ class DSOEXPORT Flv {
   public:
     /// \typedef previous_size_t
     ///		This is the size in bytes of the previous MetaTag.
-    typedef boost::uint32_t previous_size_t;
+    typedef std::uint32_t previous_size_t;
     /// \enum Flv::flv_type_e
     ///		The two flv file types
     typedef enum {
@@ -143,19 +143,19 @@ class DSOEXPORT Flv {
     
     /// \struct Flv::flv_header_t.
     typedef struct {
-        boost::uint8_t  sig[3];      // always "FLV"
-        boost::uint8_t  version;     // version, always seems to be 1
-        boost::uint8_t  type;        // Bitmask: 0x4 for audio, 0x1 for video
-        boost::uint8_t  head_size[4];// size of header, always seems to be 9
+        std::uint8_t  sig[3];      // always "FLV"
+        std::uint8_t  version;     // version, always seems to be 1
+        std::uint8_t  type;        // Bitmask: 0x4 for audio, 0x1 for video
+        std::uint8_t  head_size[4];// size of header, always seems to be 9
     } flv_header_t;
 
     /// \struct Flv::flv_tag_t.
     typedef struct {
-        boost::uint8_t  type;         // the type. audio, video, or meta
-        boost::uint8_t  bodysize[3];  // body size (tag size - sizeof(flv_tag_t))
-        boost::uint8_t  timestamp[3]; // timestamp in milliseconds
-        boost::uint8_t  extended;     // extended timestamp
-        boost::uint8_t  streamid[3];  // always 0
+        std::uint8_t  type;         // the type. audio, video, or meta
+        std::uint8_t  bodysize[3];  // body size (tag size - sizeof(flv_tag_t))
+        std::uint8_t  timestamp[3]; // timestamp in milliseconds
+        std::uint8_t  extended;     // extended timestamp
+        std::uint8_t  streamid[3];  // always 0
     } flv_tag_t;
     
     Flv();
@@ -166,7 +166,7 @@ class DSOEXPORT Flv {
     /// @param type The data type for the header
     ///
     /// @return a smart pointer to a Buffer containing the data in big endian format.
-    std::shared_ptr<cygnal::Buffer> encodeHeader(boost::uint8_t type);
+    std::shared_ptr<cygnal::Buffer> encodeHeader(std::uint8_t type);
     
     /// \brief Decode a Buffer into a header
     ///
@@ -174,7 +174,7 @@ class DSOEXPORT Flv {
     ///
     /// @return a smart pointer to data structure that contains the data.
     std::shared_ptr<flv_header_t> decodeHeader(std::shared_ptr<cygnal::Buffer> buf) { return decodeHeader(buf->reference()); };
-    std::shared_ptr<flv_header_t> decodeHeader(boost::uint8_t *data);
+    std::shared_ptr<flv_header_t> decodeHeader(std::uint8_t *data);
 
     /// \brief Decode a MetaData object.
     ///		This is after the header, but before all the other tags usually
@@ -192,21 +192,21 @@ class DSOEXPORT Flv {
     /// @param size The size of the data in bytes
     ///
     /// @return a smart pointer to an Element that contains the data.
-    std::shared_ptr<cygnal::Element> decodeMetaData(boost::uint8_t *data, size_t size);
+    std::shared_ptr<cygnal::Element> decodeMetaData(std::uint8_t *data, size_t size);
 
     /// \brief Decode an Audio object.
     ///
     /// @param flags The data to deserialize.
     /// 
     /// @return a smart pointer to an audio data structure that contains the data.
-    std::shared_ptr<flv_audio_t> decodeAudioData(boost::uint8_t flags);
+    std::shared_ptr<flv_audio_t> decodeAudioData(std::uint8_t flags);
 
     /// \brief Decode an Video object.
     ///
     /// @param flags The data to deserialize.
     /// 
     /// @return a smart pointer to an video data structure that contains the data.
-    std::shared_ptr<flv_video_t> decodeVideoData(boost::uint8_t flags);
+    std::shared_ptr<flv_video_t> decodeVideoData(std::uint8_t flags);
     
     /// \brief Decode an MetaData object.
     ///
@@ -214,7 +214,7 @@ class DSOEXPORT Flv {
     /// 
     /// @return a smart pointer to an video data structure that contains the data.
     std::shared_ptr<flv_tag_t> decodeTagHeader(std::shared_ptr<cygnal::Buffer> &buf) { return decodeTagHeader(buf->reference()); };
-    std::shared_ptr<flv_tag_t> decodeTagHeader(boost::uint8_t *data);
+    std::shared_ptr<flv_tag_t> decodeTagHeader(std::uint8_t *data);
 
     /// \brief Find the named property for this Object.
     ///
@@ -235,7 +235,7 @@ class DSOEXPORT Flv {
     /// \brief Convert a 24 bit integer to a 32 bit one so we can use it.
     ///
     /// @return An unsigned 32 bit integer
-    boost::uint32_t convert24(boost::uint8_t *);
+    std::uint32_t convert24(std::uint8_t *);
     
     /// \brief Dump the internal data of this class in a human readable form.
     /// @remarks This should only be used for debugging purposes.
@@ -246,7 +246,7 @@ class DSOEXPORT Flv {
     ///		A stored copy of the Flv file header.
     flv_header_t                _header;
     
-//    boost::uint32_t             _previous_tag_size;
+//    std::uint32_t             _previous_tag_size;
     /// \var Flv::_tag
     ///		A stored copy of the main onMetaTag data. Althought
     ///		there may be more than one MetaTag in an FLV, I've

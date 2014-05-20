@@ -229,9 +229,9 @@ public:
     /// @param typei
     ///     Changes interpretation of the codeci parameter.
     ///
-	AudioInfo(int codeci, boost::uint16_t sampleRatei,
-            boost::uint16_t sampleSizei, bool stereoi,
-            boost::uint64_t durationi, codecType typei)
+	AudioInfo(int codeci, std::uint16_t sampleRatei,
+            std::uint16_t sampleSizei, bool stereoi,
+            std::uint64_t durationi, codecType typei)
 		:
         codec(codeci),
 		sampleRate(sampleRatei),
@@ -250,14 +250,14 @@ public:
 	///
 	int codec;
 
-	boost::uint16_t sampleRate;
+	std::uint16_t sampleRate;
 
 	/// Size of each sample, in bytes
-	boost::uint16_t sampleSize;
+	std::uint16_t sampleSize;
 
 	bool stereo;
 
-	boost::uint64_t duration;
+	std::uint64_t duration;
 
 	codecType type;
 
@@ -316,8 +316,8 @@ public:
     /// @param typei
     ///     Changes interpretation of the codeci parameter.
     ///     
-	VideoInfo(int codeci, boost::uint16_t widthi, boost::uint16_t heighti,
-            boost::uint16_t frameRatei, boost::uint64_t durationi,
+	VideoInfo(int codeci, std::uint16_t widthi, std::uint16_t heighti,
+            std::uint16_t frameRatei, std::uint64_t durationi,
             codecType typei)
 		:
         codec(codeci),
@@ -330,10 +330,10 @@ public:
 	}
 
 	int codec;
-	boost::uint16_t width;
-	boost::uint16_t height;
-	boost::uint16_t frameRate;
-	boost::uint64_t duration;
+	std::uint16_t width;
+	std::uint16_t height;
+	std::uint16_t frameRate;
+	std::uint64_t duration;
 	codecType type;
 
 	/// Extra info about a video stream
@@ -382,9 +382,9 @@ public:
 	/// @param timestamp
 	///     Presentation timestamp, in milliseconds.
 	///
-	EncodedVideoFrame(boost::uint8_t* data, boost::uint32_t size,
+	EncodedVideoFrame(std::uint8_t* data, std::uint32_t size,
 			unsigned int frameNum,
-			boost::uint64_t timestamp=0)
+			std::uint64_t timestamp=0)
 		:
 		_size(size),
 		_data(data),
@@ -393,13 +393,13 @@ public:
 	{}
 
 	/// Return pointer to actual data. Ownership retained by this class.
-	const boost::uint8_t* data() const { return _data.get(); }
+	const std::uint8_t* data() const { return _data.get(); }
 
 	/// Return size of data buffer.
-	boost::uint32_t dataSize() const { return _size; }
+	std::uint32_t dataSize() const { return _size; }
 
 	/// Return video frame presentation timestamp
-	boost::uint64_t timestamp() const { return _timestamp; }
+	std::uint64_t timestamp() const { return _timestamp; }
 
 	/// Return video frame number
 	unsigned frameNum() const { return _frameNum; }
@@ -408,19 +408,19 @@ public:
 	std::unique_ptr<EncodedExtraData> extradata;
 private:
 
-	boost::uint32_t _size;
-	std::unique_ptr<boost::uint8_t[]> _data;
+	std::uint32_t _size;
+	std::unique_ptr<std::uint8_t[]> _data;
 	unsigned int _frameNum;
-	boost::uint64_t _timestamp;
+	std::uint64_t _timestamp;
 };
 
 /// An encoded audio frame
 class EncodedAudioFrame
 {
 public:
-	boost::uint32_t dataSize;
-	std::unique_ptr<boost::uint8_t[]> data;
-	boost::uint64_t timestamp;
+	std::uint32_t dataSize;
+	std::unique_ptr<std::uint8_t[]> data;
+	std::uint64_t timestamp;
 
 	// FIXME: should have better encapsulation for this sort of stuff.
 	std::unique_ptr<EncodedExtraData> extradata;
@@ -441,7 +441,7 @@ public:
     /// A container for executable MetaTags contained in media streams.
     //
     /// Presently only known in FLV.
-    typedef std::multimap<boost::uint64_t, std::shared_ptr<SimpleBuffer> >
+    typedef std::multimap<std::uint64_t, std::shared_ptr<SimpleBuffer> >
         MetaTags;
     
     typedef std::vector<MetaTags::mapped_type> OrderedMetaTags;
@@ -465,7 +465,7 @@ public:
 	/// 
 	/// @return true if the seek was valid, false otherwise.
 	///
-	virtual bool seek(boost::uint32_t& time)=0;
+	virtual bool seek(std::uint32_t& time)=0;
 
 	/// Returns mininum length of available buffers in milliseconds
 	//
@@ -476,7 +476,7 @@ public:
 	/// frames and let NetSTream::bufferLength() use that with playhead
 	/// time to find out...
 	///
-	DSOEXPORT boost::uint64_t getBufferLength() const;
+	DSOEXPORT std::uint64_t getBufferLength() const;
 
 	/// Return true if both audio and video buffers are empty
 	//
@@ -484,7 +484,7 @@ public:
 	DSOEXPORT bool isBufferEmpty() const;
 
 	/// Return the time we want the parser thread to maintain in the buffer
-	DSOEXPORT boost::uint64_t getBufferTime() const
+	DSOEXPORT std::uint64_t getBufferTime() const
 	{
 		boost::mutex::scoped_lock lock(_bufferTimeMutex);
 		return _bufferTime;
@@ -495,7 +495,7 @@ public:
 	/// @param t
 	///	Number of milliseconds to keep in the buffers.
 	///
-	DSOEXPORT void setBufferTime(boost::uint64_t t)
+	DSOEXPORT void setBufferTime(std::uint64_t t)
 	{
 		boost::mutex::scoped_lock lock(_bufferTimeMutex);
 		_bufferTime=t;
@@ -508,7 +508,7 @@ public:
 	///
 	/// NOTE: locks _qMutex
 	///
-	DSOEXPORT bool nextFrameTimestamp(boost::uint64_t& ts) const;
+	DSOEXPORT bool nextFrameTimestamp(std::uint64_t& ts) const;
 
 	/// Get timestamp of the video frame which would be returned on nextVideoFrame
 	//
@@ -517,7 +517,7 @@ public:
 	///
 	/// NOTE: locks _qMutex
 	///
-	DSOEXPORT bool nextVideoFrameTimestamp(boost::uint64_t& ts) const;
+	DSOEXPORT bool nextVideoFrameTimestamp(std::uint64_t& ts) const;
 
 	/// Returns the next video frame in the parsed buffer, advancing video cursor.
 	//
@@ -535,7 +535,7 @@ public:
 	///
 	/// NOTE: locks _qMutex
 	///
-	DSOEXPORT bool nextAudioFrameTimestamp(boost::uint64_t& ts) const;
+	DSOEXPORT bool nextAudioFrameTimestamp(std::uint64_t& ts) const;
 
 	/// Returns the next audio frame in the parsed buffer, advancing audio cursor.
 	//
@@ -580,10 +580,10 @@ public:
 	virtual bool indexingCompleted() const { return true; }
 
 	/// Return number of bytes parsed so far
-	virtual boost::uint64_t getBytesLoaded() const { return 0; }
+	virtual std::uint64_t getBytesLoaded() const { return 0; }
 
 	/// Return total number of bytes in input
-	boost::uint64_t getBytesTotal() const
+	std::uint64_t getBytesTotal() const
 	{
 		return _stream->size();
 	}
@@ -608,7 +608,7 @@ public:
     //
     /// Metadata is currently only parsed from FLV streams. The default
     /// is a no-op.
-    virtual void fetchMetaTags(OrderedMetaTags& tags, boost::uint64_t ts);
+    virtual void fetchMetaTags(OrderedMetaTags& tags, std::uint64_t ts);
 
     /// Get ID3 data from the parsed stream if it exists.
     //
@@ -629,7 +629,7 @@ protected:
 	bool _parsingComplete;
 
 	/// Number of bytes loaded
-	boost::uint64_t _bytesLoaded;
+	std::uint64_t _bytesLoaded;
 
 	/// }@
 
@@ -685,7 +685,7 @@ protected:
 		return _parserThreadKillRequested;
 	}
 
-	boost::uint64_t _bufferTime;
+	std::uint64_t _bufferTime;
 	mutable boost::mutex _bufferTimeMutex;
 
 	std::unique_ptr<boost::thread> _parserThread;
@@ -765,13 +765,13 @@ private:
 	}
 
 	/// Return diff between timestamp of last and first audio frame
-	boost::uint64_t audioBufferLength() const;
+	std::uint64_t audioBufferLength() const;
 
 	/// Return diff between timestamp of last and first video frame
-	boost::uint64_t videoBufferLength() const;
+	std::uint64_t videoBufferLength() const;
 
 	/// A getBufferLength method not locking the _qMutex (expected to be locked by caller already).
-	boost::uint64_t getBufferLengthNoLock() const;
+	std::uint64_t getBufferLengthNoLock() const;
 	
 };
 
