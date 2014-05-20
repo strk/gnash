@@ -83,11 +83,11 @@ public:
     /// Dump the registered keys to the iterator.
     //
     /// Only usable with output iterators.
-    template<typename Iterator, typename std::enable_if<
-        std::is_same<typename std::iterator_traits<Iterator>::iterator_category,
-            std::output_iterator_tag>::value>::type = 0>
+    template<typename Iterator>
     void
-    listKeys(Iterator i) {
+    listKeys(Iterator i, typename std::enable_if<
+        std::is_same<typename std::iterator_traits<Iterator>::iterator_category,
+           std::output_iterator_tag>::value>::type* = 0) {
         Init();
         std::transform(_handlers.begin(), _handlers.end(), i,
                 std::bind(&Handlers::value_type::first, std::placeholders::_1));
