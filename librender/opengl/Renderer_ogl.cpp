@@ -692,7 +692,7 @@ void
 for_each(C& container, R (T::*pmf)(const A&),const A& arg)
 {
     std::for_each(container.begin(), container.end(),
-                  std::bind(pmf, _1, std::ref(arg)));
+                  std::bind(pmf, std::placeholders::_1, std::ref(arg)));
 }
 
 
@@ -773,10 +773,10 @@ public:
                   *it++ = *(im->begin() + i);
                   if (!(i % 3)) *it++ = 0xff;
               }
-              im = rgba;
+              im = std::move(rgba);
           }
           case image::TYPE_RGBA:
-                return new bitmap_info_ogl(im, GL_RGBA, ogl_accessible());
+                return new bitmap_info_ogl(std::move(im), GL_RGBA, ogl_accessible());
           default:
                 std::abort();
       }
@@ -1184,7 +1184,7 @@ public:
 
     // Call add_paths for each mask.
     std::for_each(_masks.begin(), _masks.end(),
-      std::bind(&Renderer_ogl::add_paths, this, _1));
+      std::bind(&Renderer_ogl::add_paths, this, std::placeholders::_1));
           
     glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
     glStencilFunc(GL_EQUAL, _masks.size(), _masks.size());
@@ -1634,7 +1634,8 @@ public:
   apply_matrix_to_paths(std::vector<Path>& paths, const SWFMatrix& mat)
   {  
     std::for_each(paths.begin(), paths.end(),
-                  std::bind(&Path::transform, _1, std::ref(mat)));
+                  std::bind(&Path::transform, std::placeholders::_1,
+                  std::ref(mat)));
                   
     //for_each(paths, &path::transform, mat);
   }  
@@ -1951,7 +1952,7 @@ createGradientBitmap(const GradientFill& gf, Renderer& renderer)
     }
 
     const CachedBitmap* bi = renderer.createCachedBitmap(
-                    static_cast<std::unique_ptr<image::GnashImage> >(im));
+                    static_cast<std::unique_ptr<image::GnashImage> >(std::move(im)));
 
     return bi;
 }
