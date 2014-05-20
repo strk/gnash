@@ -218,6 +218,7 @@ namespace SWF {
 
 ActionHandler::ActionHandler()
     :
+    _type(ACTION_END), // initialized to zero to have well known value
     _callback(ActionUnsupported),
     _arg_format(ARG_NONE)
 {
