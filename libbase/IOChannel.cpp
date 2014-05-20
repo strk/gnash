@@ -21,8 +21,6 @@
 
 #include "IOChannel.h"
 
-#include <boost/static_assert.hpp>
-
 namespace gnash
 {
 
@@ -59,20 +57,6 @@ IOChannel::read_string(char* dst, int max_length)
     dst[max_length - 1] = '\0';    // force termination.
     
     return -1;
-}
-
-float
-IOChannel::read_float32()
-{
-    union {
-        float    f;
-        boost::uint32_t    i;
-    } u;
-
-    BOOST_STATIC_ASSERT(sizeof(u) == sizeof(u.i));
-    
-    u.i = read_le32();
-    return u.f;
 }
 
 boost::uint8_t
