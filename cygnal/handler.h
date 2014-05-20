@@ -262,7 +262,6 @@ protected:
     /// \var _diskstreams
     ///   This is all the opened disk based files that are currently
     ///   being streamed by the server.
-    //    boost::shared_array<gnash::DiskStream> _diskstreams;
     std::map<int, std::shared_ptr<gnash::DiskStream> > _diskstreams;
     /// \var _protocol
     ///    this is the map of which protocol is being used by which

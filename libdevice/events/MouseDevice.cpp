@@ -24,7 +24,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <boost/shared_array.hpp>
 
 #include "GnashSleep.h"
 #include "log.h"
@@ -239,7 +238,7 @@ MouseDevice::check()
     // GNASH_REPORT_FUNCTION;
 
     int xmove, ymove, btn;
-    boost::shared_array<boost::uint8_t> buf;
+    std::unique_ptr<boost::uint8_t[]> buf;
     if (_type == InputDevice::TOUCHMOUSE) {
         // The eTurboTouch has a 4 byte packet
         buf = readData(4);
@@ -339,7 +338,7 @@ MouseDevice::check()
         if (_input_data.y < 0) {
             _input_data.y = 0;
         }
-        boost::shared_array<int> coords =
+        std::unique_ptr<int[]> coords =
             InputDevice::convertAbsCoords(_input_data.x, _input_data.y,
                                           _screen_width, _screen_height);
         // MouseDevice::convertCoordinates(_input_data.x, _input_data.y,

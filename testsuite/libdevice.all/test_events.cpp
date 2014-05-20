@@ -109,7 +109,7 @@ main(int argc, char *argv[])
                     cerr << ", " << ie->key << ", " << ie->modifier;
                     cerr << ", " << ie->x << ", " << ie->y << endl;
                     // Range check and convert the position
-                    boost::shared_array<int> coords =
+                    std::unique_ptr<int[]> coords =
                         MouseDevice::convertCoordinates(ie->x, ie->y, 1024, 768);
                     cerr << "X = " << coords[0] << endl;
                     cerr << "Y = " << coords[1] << endl;

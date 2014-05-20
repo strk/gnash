@@ -313,7 +313,7 @@ test_device(Renderer *renderer, const std::string &type)
     cout << endl << "Testing " << type << " Device" << endl;
 
 #if 0
-    boost::shared_array<renderer::GnashDevice::dtype_t> devs = renderer->probeDevices();
+    std::unique_ptr<renderer::GnashDevice::dtype_t[]> devs = renderer->probeDevices();
     if (devs) {
         runtest.pass("Renderer::probeDevices()");
     } else {

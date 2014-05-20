@@ -108,12 +108,12 @@ InputDevice::addData(bool pressed, key::code key, int modifier, int x, int y)
 }
 
 // Read data into the Device input buffer.
-boost::shared_array<boost::uint8_t>
+std::unique_ptr<boost::uint8_t[]>
 InputDevice::readData(size_t size)
 {
     // GNASH_REPORT_FUNCTION;
 
-    boost::shared_array<boost::uint8_t> inbuf;
+    std::unique_ptr<boost::uint8_t[]> inbuf;
 
     if (_fd < 0) {
         return inbuf;   // no mouse available
@@ -175,11 +175,11 @@ InputDevice::dump() const
 // The Babbage touchscreen gives is relative coordinates, but they don't
 // match the actual screen resolution. So we convert the coordinates
 // to a new absolute location.
-boost::shared_array<int>
+std::unique_ptr<int[]>
 InputDevice::convertAbsCoords(int x, int y, int width, int height)
 {
     // GNASH_REPORT_FUNCTION;
-    boost::shared_array<int> coords(new int[2]);
+    std::unique_ptr<int[]> coords(new int[2]);
 
     coords[0] = int((x/256) * width);
     coords[1] = int((y/256) * height);

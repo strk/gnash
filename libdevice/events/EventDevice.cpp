@@ -261,7 +261,7 @@ EventDevice::check()
     }
 
     // Try to read something from the device
-    boost::shared_array<boost::uint8_t> buf = readData(sizeof( struct input_event));
+    std::unique_ptr<boost::uint8_t[]> buf = readData(sizeof( struct input_event));
     // time,type,code,value
     if (!buf) {
         return false;

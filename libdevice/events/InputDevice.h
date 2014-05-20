@@ -22,7 +22,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/shared_array.hpp>
 #include <memory>
 #include <boost/cstdint.hpp>
 #include <vector>
@@ -128,7 +127,7 @@ public:
     void setType(InputDevice::devicetype_e x) { _type = x; };
 
     // Read data into the Device input buffer.
-    boost::shared_array<boost::uint8_t> readData(size_t size);
+    std::unique_ptr<boost::uint8_t[]> readData(size_t size);
     std::shared_ptr<input_data_t> popData()
     {
         std::shared_ptr<InputDevice::input_data_t> input;
@@ -140,7 +139,7 @@ public:
         return input;
     }
 
-    static DSOEXPORT boost::shared_array<int> convertAbsCoords(int x, int y,
+    static DSOEXPORT std::unique_ptr<int[]> convertAbsCoords(int x, int y,
                                                      int width, int height);
 
     void setScreenSize(int x, int y)

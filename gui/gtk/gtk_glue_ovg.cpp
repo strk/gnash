@@ -79,7 +79,7 @@ GtkOvgGlue::init(int /*argc*/, char ** /*argv*/[])
     bool x11 = false;
     
     // Probe to see what display devices we have that could be used.
-    boost::shared_array<renderer::GnashDevice::dtype_t> devs = probeDevices();
+    std::unique_ptr<renderer::GnashDevice::dtype_t[]> devs = probeDevices();
     if (devs) {
         int i = 0;
         while (devs[i] != renderer::GnashDevice::GNASH_NODEV) {

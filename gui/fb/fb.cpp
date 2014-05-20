@@ -755,7 +755,7 @@ FBGui::checkForData()
 #endif
             // Range check and convert the position from relative to
             // absolute
-            boost::shared_array<int> coords =
+            std::unique_ptr<int[]> coords =
                 InputDevice::convertAbsCoords(ie->x, ie->y,
                                               getStage()->getStageWidth(),
                                               getStage()->getStageHeight());

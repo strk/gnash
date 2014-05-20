@@ -128,7 +128,7 @@ TouchDevice::check()
             // arguments are a range, so hardcoding them is safe for
             // now. In the future more conversion may be done, making this
             // then be incorrect.
-            boost::shared_array<int> coords =
+            std::unique_ptr<int[]> coords =
                 InputDevice::convertAbsCoords(event.x, event.y,
                                                 _screen_width, _screen_height);
             log_debug(_("Touched x: %d, y: %d"), event.x , event.y);

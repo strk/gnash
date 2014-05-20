@@ -24,7 +24,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <boost/shared_array.hpp>
 
 #include "GnashSleep.h"
 #include "log.h"

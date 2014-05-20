@@ -24,7 +24,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/shared_array.hpp>
 #include <memory>
 
 #include "GnashDevice.h"
@@ -45,7 +44,7 @@ public:
     /// available.
     ///
     /// @return a list of devices
-    boost::shared_array<renderer::GnashDevice::dtype_t> probeDevices() {
+    std::unique_ptr<renderer::GnashDevice::dtype_t[]> probeDevices() {
         GNASH_REPORT_FUNCTION;
         
         size_t total = 0;
@@ -62,7 +61,7 @@ public:
         total++;
 #endif
         total++;                // add one more for the list terminator
-        boost::shared_array<renderer::GnashDevice::dtype_t> devs
+        std::unique_ptr<renderer::GnashDevice::dtype_t[]> devs
             (new renderer::GnashDevice::dtype_t[total]);
         // terminate the list so it can easily be walked through later.
         devs[--total] = renderer::GnashDevice::GNASH_NODEV;
