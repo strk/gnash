@@ -147,7 +147,7 @@ Global_as::Global_as(VM& vm)
 #ifdef USE_EXTENSIONS
     _et(new Extension()),
 #endif
-    _classes(this, _et.get()),
+    _classes(this),
     _objectProto(new as_object(*this))
 {
 }

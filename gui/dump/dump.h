@@ -107,8 +107,6 @@ private:
 
     unsigned long _sleepUS; // micro-seconds sleep between iterations
 
-    unsigned int _videoDumpFPS;
-
     std::string _startTrigger;
 
     bool _started;

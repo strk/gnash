@@ -135,13 +135,11 @@ private:
 
     std::string _name;
     bool _subpixelFont;
-	bool _hasLayout;
 	bool _unicodeChars;
 	bool _shiftJISChars;
 	bool _ansiChars;
 	bool _italic;
 	bool _bold;
-	bool _wideCodes;
 
     boost::int16_t _ascent;
     boost::int16_t _descent;

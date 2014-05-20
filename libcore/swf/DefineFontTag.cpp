@@ -92,7 +92,6 @@ DefineFontTag::DefineFontTag(SWFStream& in, movie_definition& m, TagType tag,
     _ansiChars(true),
     _italic(false),
     _bold(false),
-    _wideCodes(false),
     _ascent(0),
     _descent(0),
     _leading(0)

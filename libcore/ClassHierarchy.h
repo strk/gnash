@@ -89,10 +89,9 @@ public:
     /// \brief
 	/// Construct the declaration object. Later set the global and
 	/// extension objects using setGlobal and setExtension
-	ClassHierarchy(as_object* global, Extension* e)
+	ClassHierarchy(as_object* global)
         :
-		mGlobal(global),
-        mExtension(e)
+		mGlobal(global)
 	{}
 
 	/// \brief
@@ -117,7 +116,6 @@ public:
 
 private:
 	as_object* mGlobal;
-	Extension* mExtension;
 };
 
 } 

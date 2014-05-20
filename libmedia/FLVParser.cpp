@@ -46,8 +46,6 @@ FLVParser::FLVParser(std::unique_ptr<IOChannel> lt)
 	MediaParser(std::move(lt)),
 	_lastParsedPosition(0),
 	_nextPosToIndex(0),
-	_nextAudioFrame(0),
-	_nextVideoFrame(0),
 	_audio(false),
 	_video(false),
 	_cuePoints(),

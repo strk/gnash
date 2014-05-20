@@ -259,20 +259,6 @@ private:
 	/// Position of next tag to index
 	boost::uint64_t _nextPosToIndex;
 
-	/// Audio frame cursor position 
-	//
-	/// This is the video frame number that will
-	/// be referenced by nextVideoFrame and nextVideoFrameTimestamp
-	///
-	size_t _nextAudioFrame;
-
-	/// Video frame cursor position 
-	//
-	/// This is the video frame number that will
-	/// be referenced by nextVideoFrame and nextVideoFrameTimestamp
-	///
-	size_t _nextVideoFrame;
-
 	/// Audio stream is present
 	bool _audio;
 

@@ -93,7 +93,6 @@ DumpGui::DumpGui(unsigned long xid, float scale, bool loop, RunResources& r)
     _fileOutputAdvance(0),
     _lastVideoFrameDump(0), // this will be computed
     _sleepUS(0),
-    _videoDumpFPS(0),
     _started(false),
     _startTime(0)
 {

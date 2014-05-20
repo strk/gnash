@@ -323,8 +323,6 @@ MediaParserFfmpeg::getBytesLoaded() const
 MediaParserFfmpeg::MediaParserFfmpeg(std::unique_ptr<IOChannel> stream)
 	:
 	MediaParser(std::move(stream)),
-	_nextVideoFrame(0),
-	_nextAudioFrame(0),
 	_inputFmt(0),
 	_formatCtx(0),
 	_videoStreamIndex(-1),

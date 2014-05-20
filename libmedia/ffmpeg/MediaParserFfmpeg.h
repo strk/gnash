@@ -100,20 +100,6 @@ private:
 	/// creating VideoInfo and AudioInfo objects
 	void initializeParser();
 
-	/// Video frame cursor position 
-	//
-	/// This is the video frame number that will
-	/// be referenced by nextVideoFrame and nextVideoFrameTimestamp
-	///
-	size_t _nextVideoFrame;
-
-	/// Audio frame cursor position 
-	//
-	/// This is the video frame number that will
-	/// be referenced by nextVideoFrame and nextVideoFrameTimestamp
-	///
-	size_t _nextAudioFrame;
-
 	/// Parse next media frame
 	//
 	/// @return false on error or eof, true otherwise
