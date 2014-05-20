@@ -238,13 +238,6 @@ float    SWFStream::read_short_sfixed()
     return read_s16() / 256.0f;
 }
 
-/// Read a 16bit (1:sign 5:exp 10:mantissa) floating point value
-float    SWFStream::read_short_float()
-{
-    // read_s16 will align
-    return static_cast<float> ( read_s16() );
-}
-
 // Read a little-endian 32-bit float from p
 // and return it as a host-endian float.
 static float

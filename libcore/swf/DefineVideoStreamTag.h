@@ -39,29 +39,6 @@ namespace gnash {
 
 namespace gnash {
 
-/// Class used to store data for the undecoded embedded video frames.
-/// Contains the data, the data size and the type of the frame
-class VideoData
-{
-public:
-	VideoData(boost::shared_array<boost::uint8_t> data, boost::uint32_t size,
-            media::videoFrameType ft)
-		:
-		videoData(data),
-		dataSize(size),
-		frameType(ft)
-	{
-	}
-
-	~VideoData()
-	{
-	}
-
-	boost::shared_array<boost::uint8_t> videoData;
-	boost::uint32_t dataSize;
-	media::videoFrameType frameType;
-};
-
 namespace SWF {
 
 class DefineVideoStreamTag : public DefinitionTag
