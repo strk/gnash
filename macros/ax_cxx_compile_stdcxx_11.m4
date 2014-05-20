@@ -43,12 +43,15 @@ m4_define([_AX_CXX_COMPILE_STDCXX_11_testbody], [[
       static_assert(sizeof(int) <= sizeof(T), "not big enough");
     };
 
+#if 0
+    // The override keyword is not supported until GCC-4.7.
     struct Base {
     virtual void f() {}
     };
     struct Child : public Base {
     virtual void f() override {}
     };
+#endif
 
     typedef check<check<bool>> right_angle_brackets;
 
