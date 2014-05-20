@@ -39,7 +39,9 @@ public:
     DragState(DisplayObject* d, bool lock)
         :
         _displayObject(d),
-        _lock_centered(lock)
+        _lock_centered(lock),
+        _xoffset(0),
+        _yoffset(0)
     {
     }
 
