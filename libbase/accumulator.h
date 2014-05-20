@@ -22,7 +22,7 @@
 
 #include <boost/program_options/value_semantic.hpp>
 #include <boost/any.hpp>
-#include <boost/function.hpp>
+#include <functional>
 #include <vector>
 #include <string>
 
@@ -35,7 +35,7 @@ public:
     accumulator_type() : _interval(1), _default(0) {}
 
     /// Set the notifier function.
-    accumulator_type* notifier(boost::function1<void, const T&> f) {
+    accumulator_type* notifier(std::function<void(const T&)> f) {
         _notifier = f;
         return this;
     }
@@ -93,7 +93,7 @@ public:
     virtual ~accumulator_type() {}
 
 private:
-    boost::function1<void, const T&> _notifier;
+    std::function<void(const T&)> _notifier;
     T _interval;
     T _default;
 };

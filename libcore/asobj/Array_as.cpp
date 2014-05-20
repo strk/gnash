@@ -23,6 +23,7 @@
 #include <string>
 #include <algorithm>
 #include <cmath>
+#include <functional>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -63,7 +64,7 @@ namespace {
 
     struct indexed_as_value;
 
-    typedef boost::function2<bool, const as_value&, const as_value&> as_cmp_fn;
+    typedef std::function<bool(const as_value&, const as_value&)> as_cmp_fn;
 
     void attachArrayInterface(as_object& proto);
     void attachArrayStatics(as_object& proto);

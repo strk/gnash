@@ -28,6 +28,7 @@
 #include <string>
 #include <map>
 #include <utility>
+#include <functional>
 
 #include "snappingrange.h"  // for InvalidatedRanges
 #include "GnashKey.h"
@@ -536,7 +537,7 @@ private:
 
     struct Display;
 
-    std::map<int /* fd */, boost::function<void ()> > _fd_callbacks;
+    std::map<int /* fd */, std::function<void ()> > _fd_callbacks;
 
     /// Width of a window pixel, in stage pseudopixel units.
     float _xscale;
