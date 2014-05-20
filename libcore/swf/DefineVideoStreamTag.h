@@ -19,7 +19,6 @@
 #ifndef GNASH_SWF_DEFINEVIDEOSTREAMTAG_H
 #define GNASH_SWF_DEFINEVIDEOSTREAMTAG_H
 
-#include <boost/shared_array.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <memory> 

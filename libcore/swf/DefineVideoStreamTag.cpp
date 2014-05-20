@@ -18,7 +18,6 @@
 
 #include "DefineVideoStreamTag.h"
 
-#include <boost/shared_array.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <memory> 

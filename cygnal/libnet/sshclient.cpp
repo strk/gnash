@@ -18,7 +18,6 @@
 //
 
 #include <boost/thread/mutex.hpp>
-#include <boost/shared_array.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/array.hpp>
 #include <sys/types.h>

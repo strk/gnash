@@ -22,7 +22,6 @@
 #include <map>
 #include <boost/cstdint.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/shared_array.hpp>
 #include <memory>
 //#include <boost/thread/condition.hpp>
 

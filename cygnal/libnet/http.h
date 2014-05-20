@@ -23,7 +23,6 @@
 #include <string>
 #include <map>
 #include <vector>
-#include <boost/shared_array.hpp>
 #include <sstream>
 
 #ifdef HAVE_CONFIG_H

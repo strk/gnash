@@ -20,7 +20,6 @@
 #define _FITCDEMO_H_
 
 #include <vector>
-#include <boost/shared_array.hpp>
 #include <sstream>
 
 // gnash headers

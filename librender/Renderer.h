@@ -146,8 +146,6 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 
-#include "boost/shared_array.hpp"
-#include "boost/scoped_ptr.hpp"
 #include "GnashEnums.h" 
 #include "Range2d.h"
 #include "Point2d.h"
