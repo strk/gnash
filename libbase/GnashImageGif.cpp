@@ -22,7 +22,6 @@
 
 #include <sstream>
 #include <algorithm>
-#include <boost/scoped_array.hpp>
 
 extern "C" {
 #include <gif_lib.h>
@@ -103,10 +102,10 @@ private:
     // A counter for keeping track of the last row copied.
     size_t _currentRow;
     
-    typedef boost::scoped_array<GifPixelType> PixelRow;
+    typedef std::unique_ptr<GifPixelType[]> PixelRow;
 
     // A 2-dimensional scoped array holding the unpacked pixel data.
-    boost::scoped_array<PixelRow> _gifData;
+    std::unique_ptr<PixelRow[]> _gifData;
 };
 
 

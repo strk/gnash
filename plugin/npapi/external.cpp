@@ -21,7 +21,7 @@
 #endif
 
 #include <boost/algorithm/string/erase.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 
 #include <string>
 #include <sstream>

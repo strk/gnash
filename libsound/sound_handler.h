@@ -23,12 +23,11 @@
 #include "gnashconfig.h"
 #endif
 
+#include <limits>
+#include <memory>
+#include <set>
 #include <string>
 #include <vector>
-#include <memory>
-#include <limits>
-#include <set>
-#include <boost/scoped_ptr.hpp>
 
 #include "dsodefs.h" // for DSOEXPORT
 #include "SoundEnvelope.h" // for SoundEnvelopes typedef
@@ -535,7 +534,7 @@ private:
     /// Unplug any completed input stream
     void unplugCompletedInputStreams();
 
-    boost::scoped_ptr<WAVWriter> _wavWriter;
+    std::unique_ptr<WAVWriter> _wavWriter;
 
 };
 

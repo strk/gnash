@@ -23,7 +23,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/shared_array.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 //#include <boost/thread/condition.hpp>
 
 #include <vector>

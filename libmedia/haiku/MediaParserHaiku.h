@@ -22,7 +22,6 @@
 
 #include "MediaParser.h" // for inheritance
 
-#include <boost/scoped_array.hpp>
 #include <memory>
 
 // Forward declaration

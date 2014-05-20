@@ -24,7 +24,6 @@
 #include "Sound_as.h"
 
 #include <string>
-#include <boost/scoped_array.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/optional.hpp>
@@ -200,7 +199,7 @@ private:
     /// This is set by start()
     boost::uint64_t _startTime;
 
-    boost::scoped_array<boost::uint8_t> _leftOverData;
+    std::unique_ptr<boost::uint8_t[]> _leftOverData;
     boost::uint8_t* _leftOverPtr;
     boost::uint32_t _leftOverSize;
 

@@ -285,7 +285,7 @@ RTMPClient::connectToServer(const std::string &url)
 	// always one by, so we just add it by hand. It doesn't matter
 	// as long as the channel number matches the one used to
 	// create the initial RTMP packet header.
-	boost::scoped_ptr<cygnal::Buffer> newbuf(new cygnal::Buffer(ncbuf->size() + 5));
+	std::unique_ptr<cygnal::Buffer> newbuf(new cygnal::Buffer(ncbuf->size() + 5));
 	size_t nbytes = 0;
 	size_t chunk = RTMP_VIDEO_PACKET_SIZE;
 	do {
@@ -313,7 +313,7 @@ RTMPClient::connectToServer(const std::string &url)
 	    return false;
 	}
 	
-	boost::scoped_ptr<cygnal::Buffer> handshake2(new cygnal::Buffer
+	std::unique_ptr<cygnal::Buffer> handshake2(new cygnal::Buffer
 		  ((RTMP_HANDSHAKE_SIZE * 2) + newbuf->allocated()
 		   + RTMP_MAX_HEADER_SIZE));
 

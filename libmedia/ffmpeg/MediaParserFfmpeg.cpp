@@ -66,7 +66,7 @@ MediaParserFfmpeg::probeStream()
     const size_t probeSize = 4096;
     const size_t bufSize = probeSize + FF_INPUT_BUFFER_PADDING_SIZE;
 
-	boost::scoped_array<boost::uint8_t> buffer(new boost::uint8_t[bufSize]);
+	std::unique_ptr<boost::uint8_t[]> buffer(new boost::uint8_t[bufSize]);
 
 	assert(_stream->tell() == static_cast<std::streampos>(0));
 	size_t actuallyRead = _stream->read(buffer.get(), probeSize);

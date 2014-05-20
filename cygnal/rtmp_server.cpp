@@ -107,7 +107,7 @@ RTMPServer::processClientHandShake(int fd)
     
     // These store the information we need from the initial
     /// NetConnection object.
-    boost::scoped_ptr<cygnal::Element> nc;
+    std::unique_ptr<cygnal::Element> nc;
     std::shared_ptr<cygnal::Buffer>  pkt;
     std::shared_ptr<cygnal::Element> tcurl;
     std::shared_ptr<cygnal::Element> swfurl;
@@ -179,7 +179,7 @@ RTMPServer::processClientHandShake(int fd)
     // now build a copy of the data but skip over the RTMP header
     // bytes every chunk size biundary. All RTMP headers at this stage
     // are 1 byte ones.
-    boost::scoped_ptr<cygnal::Buffer> newptr(new cygnal::Buffer(qhead->bodysize));
+    std::unique_ptr<cygnal::Buffer> newptr(new cygnal::Buffer(qhead->bodysize));
     if (qhead->bodysize > RTMP_VIDEO_PACKET_SIZE) {
 	log_network("De chunkifying the NetConnection packet.");
 	int nbytes = 0;
@@ -293,7 +293,7 @@ RTMPServer::handShakeResponse(int fd, cygnal::Buffer &handshake)
 
     // the response handshake is twice the size of the one we just
     // received for a total of 3072 bytes, plus room for the version.
-    boost::scoped_ptr<cygnal::Buffer> zeros(new cygnal::Buffer(RTMP_HANDSHAKE_SIZE*2
+    std::unique_ptr<cygnal::Buffer> zeros(new cygnal::Buffer(RTMP_HANDSHAKE_SIZE*2
 					 + RTMP_HANDSHAKE_VERSION_SIZE));
     zeros->clear();		// set entire buffer to zeros
 

@@ -24,7 +24,6 @@
 
 #include "SharedObject_as.h"
 
-#include <boost/scoped_array.hpp>
 #include <cstdio>
 
 #include "movie_root.h"
@@ -900,7 +899,7 @@ readSOL(VM& vm, const std::string& filespec)
         return data;
     }
 
-    boost::scoped_array<boost::uint8_t> sbuf(new boost::uint8_t[size]);
+    std::unique_ptr<boost::uint8_t[]> sbuf(new boost::uint8_t[size]);
     const boost::uint8_t *buf = sbuf.get();
     const boost::uint8_t *end = buf + size;
 

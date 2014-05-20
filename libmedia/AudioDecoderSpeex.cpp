@@ -23,7 +23,6 @@
 
 #include <functional>
 #include <boost/checked_delete.hpp>
-#include <boost/scoped_array.hpp>
 #include <boost/cstdint.hpp> // For C99 int types
 
 #ifdef RESAMPLING_SPEEX
@@ -84,7 +83,7 @@ struct DecodedFrame : boost::noncopyable
       size(datasize)
     {}
 
-    boost::scoped_array<boost::int16_t> data;
+    std::unique_ptr<boost::int16_t[]> data;
     size_t size;
 };
 
@@ -101,7 +100,7 @@ AudioDecoderSpeex::decode(const EncodedAudioFrame& input,
 
     while (speex_bits_remaining(&_speex_bits)) {
 
-        boost::scoped_array<short> output( new short[_speex_framesize] );
+        std::unique_ptr<short[]> output( new short[_speex_framesize] );
 
         int rv = speex_decode_int(_speex_dec_state, &_speex_bits, output.get());
         if (rv != 0) {

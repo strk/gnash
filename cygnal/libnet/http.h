@@ -24,7 +24,6 @@
 #include <map>
 #include <vector>
 #include <boost/shared_array.hpp>
-#include <boost/scoped_array.hpp>
 #include <sstream>
 
 #ifdef HAVE_CONFIG_H

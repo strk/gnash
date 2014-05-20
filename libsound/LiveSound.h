@@ -20,7 +20,7 @@
 #ifndef SOUND_LIVESOUND_H
 #define SOUND_LIVESOUND_H
 
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <cassert>
 #include <boost/cstdint.hpp> // For C99 int types
 
@@ -143,7 +143,7 @@ private:
     /// Number of samples fetched so far.
     unsigned long _samplesFetched;
 
-    boost::scoped_ptr<media::AudioDecoder> _decoder;
+    std::unique_ptr<media::AudioDecoder> _decoder;
 
     /// The decoded buffer
     SimpleBuffer _decodedData;

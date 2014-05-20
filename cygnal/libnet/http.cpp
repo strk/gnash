@@ -20,7 +20,6 @@
 
 #include <boost/thread/mutex.hpp>
 #include <boost/shared_array.hpp>
-#include <boost/scoped_array.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>

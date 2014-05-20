@@ -23,7 +23,6 @@
 #include <string>
 #include <vector>
 #include <boost/shared_array.hpp>
-#include <boost/scoped_array.hpp>
 #include <sstream>
 
 #include "amf.h"

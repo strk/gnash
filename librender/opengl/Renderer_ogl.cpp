@@ -28,7 +28,7 @@
 #include <list>
 #include <cstring>
 #include <cmath>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 
 #include "swf/ShapeRecord.h"
 #include "GnashEnums.h"
@@ -164,8 +164,8 @@ private:
     void setup() const;    
     void upload(boost::uint8_t* data, size_t width, size_t height) const;
     
-    mutable boost::scoped_ptr<image::GnashImage> _img;
-    mutable boost::scoped_ptr<image::GnashImage> _cache;
+    mutable std::unique_ptr<image::GnashImage> _img;
+    mutable std::unique_ptr<image::GnashImage> _cache;
     GLenum _pixel_format;
     GLenum _ogl_img_type;
     mutable bool _ogl_accessible;  
@@ -279,7 +279,7 @@ public:
 private:
   size_t _width;
   size_t _height;
-  boost::scoped_array<boost::uint8_t> _buffer;
+  std::unique_ptr<boost::uint8_t[]> _buffer;
   OSMesaContext _context;  
 };
 
@@ -596,7 +596,7 @@ bitmap_info_ogl::setup() const
             while (h < _img->height()) { h <<= 1; }
         }
     
-        boost::scoped_array<boost::uint8_t> resized_data(
+        std::unique_ptr<boost::uint8_t[]> resized_data(
                 new boost::uint8_t[w * h * _img->channels()]);
         // Q: Would mipmapping these textures aid in performance?
     

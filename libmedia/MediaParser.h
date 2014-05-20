@@ -20,7 +20,6 @@
 #ifndef GNASH_MEDIAPARSER_H
 #define GNASH_MEDIAPARSER_H
 
-#include <boost/scoped_array.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/barrier.hpp>
@@ -410,7 +409,7 @@ public:
 private:
 
 	boost::uint32_t _size;
-	boost::scoped_array<boost::uint8_t> _data;
+	std::unique_ptr<boost::uint8_t[]> _data;
 	unsigned int _frameNum;
 	boost::uint64_t _timestamp;
 };
@@ -420,7 +419,7 @@ class EncodedAudioFrame
 {
 public:
 	boost::uint32_t dataSize;
-	boost::scoped_array<boost::uint8_t> data;
+	std::unique_ptr<boost::uint8_t[]> data;
 	boost::uint64_t timestamp;
 
 	// FIXME: should have better encapsulation for this sort of stuff.

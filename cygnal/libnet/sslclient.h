@@ -26,7 +26,6 @@
 #include <string>
 #include <boost/array.hpp>
 #include <boost/shared_array.hpp>
-#include <boost/scoped_array.hpp>
 #include <boost/cstdint.hpp>
 #include <sstream>
 
@@ -108,10 +107,10 @@ public:
 
     void dump();
  protected:
-    boost::scoped_ptr<SSL> _ssl;
-    boost::scoped_ptr<SSL_CTX> _ctx;
-    boost::scoped_ptr<BIO> _bio;
-    boost::scoped_ptr<BIO> _bio_error;
+    std::unique_ptr<SSL> _ssl;
+    std::unique_ptr<SSL_CTX> _ctx;
+    std::unique_ptr<BIO> _bio;
+    std::unique_ptr<BIO> _bio_error;
     std::string		_hostname;
     std::string		_calist;
     std::string		_keyfile;

@@ -665,7 +665,7 @@ Buffer &
 Buffer::resize(size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::scoped_array<boost::uint8_t> tmp;
+    std::unique_ptr<boost::uint8_t[]> tmp;
 
     // If there is no size, don't do anything
     if (size == 0) {

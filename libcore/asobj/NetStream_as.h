@@ -28,7 +28,7 @@
 #include <boost/intrusive_ptr.hpp>
 #include <string>
 #include <boost/ptr_container/ptr_deque.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <boost/thread/mutex.hpp>
 
 #include "PlayHead.h" // for composition
@@ -503,7 +503,7 @@ private:
 
     NetConnection_as* _netCon;
 
-    boost::scoped_ptr<CharacterProxy> _audioController;
+    std::unique_ptr<CharacterProxy> _audioController;
     
     // The size of the buffer in milliseconds
     boost::uint32_t _bufferTime;
@@ -545,7 +545,7 @@ private:
     bool _audioInfoKnown;
 
     /// Virtual clock used as playback clock source
-    boost::scoped_ptr<InterruptableVirtualClock> _playbackClock;
+    std::unique_ptr<InterruptableVirtualClock> _playbackClock;
 
     /// Playback control device 
     PlayHead _playHead;

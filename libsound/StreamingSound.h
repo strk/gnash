@@ -20,7 +20,7 @@
 #ifndef SOUND_STREAMINGSOUND_H
 #define SOUND_STREAMINGSOUND_H
 
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <cassert>
 #include <boost/cstdint.hpp> // For C99 int types
 

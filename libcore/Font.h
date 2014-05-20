@@ -25,7 +25,7 @@
 #define GNASH_FONT_H
 
 #include <string>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <boost/cstdint.hpp>
 #include <memory>
 #include <vector>
@@ -287,7 +287,7 @@ private:
     int add_os_glyph(boost::uint16_t code);
 
     /// If we were constructed from a definition, this is not NULL.
-    boost::scoped_ptr<SWF::DefineFontTag> _fontTag;
+    std::unique_ptr<SWF::DefineFontTag> _fontTag;
 
     // Device glyphs
     GlyphInfoRecords _deviceGlyphTable;

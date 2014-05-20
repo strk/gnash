@@ -22,7 +22,7 @@
 
 #include <boost/cstdint.hpp> // for boost::uint8_t
 #include <algorithm> // for std::copy
-#include <boost/scoped_array.hpp>
+#include <memory>
 #include <cassert>
 
 
@@ -119,7 +119,7 @@ public:
 		// TODO: use smalles power of 2 bigger then newCapacity
 		_capacity = std::max(newCapacity, _capacity*2);
 
-		boost::scoped_array<boost::uint8_t> tmp;
+		std::unique_ptr<boost::uint8_t[]> tmp;
 		tmp.swap(_data);
 		
 		_data.reset(new boost::uint8_t[_capacity]);
@@ -215,7 +215,7 @@ private:
 	size_t _size;
 	size_t _capacity;
 
-	boost::scoped_array<boost::uint8_t> _data;
+	std::unique_ptr<boost::uint8_t[]> _data;
 };
 
 

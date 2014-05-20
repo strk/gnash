@@ -32,7 +32,6 @@
 
 //#include <cmath>
 #include <vector>
-#include <boost/scoped_array.hpp>
 
 #include <proto/dos.h>
 #include <proto/exec.h>

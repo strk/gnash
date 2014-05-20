@@ -26,7 +26,6 @@
 
 #include <string>
 #include <vector>
-#include <boost/scoped_array.hpp>
 #include <boost/random.hpp>
 #include <boost/lexical_cast.hpp>
 #include <algorithm> 

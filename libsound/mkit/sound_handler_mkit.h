@@ -24,7 +24,7 @@
 
 #include <set> // for composition (InputStreams)
 #include <boost/thread/mutex.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 
 #include <SoundPlayer.h>
 
@@ -43,7 +43,7 @@ namespace sound {
 /// Mkit media kit based sound_handler
 class Mkit_sound_handler : public sound_handler
 {
-    boost::scoped_ptr<BSoundPlayer> _soundplayer;
+    std::unique_ptr<BSoundPlayer> _soundplayer;
 
     /// play buffer handler function
     static void FillNextBuffer(void *cookie, void *buffer, size_t size,

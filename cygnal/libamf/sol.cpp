@@ -25,7 +25,6 @@
 #include "log.h"
 #include "GnashException.h"
 
-#include <boost/scoped_array.hpp>
 #include <boost/cstdint.hpp>
 #include <cerrno>
 #include <string>
@@ -248,7 +247,7 @@ SOL::writeFile(const std::string &filespec, const std::string &name)
     }
     _filesize = size;
     
-    boost::scoped_array<char> body ( new char[size + 20] );
+    std::unique_ptr<char[]> body ( new char[size + 20] );
     std::fill_n(body.get(), size, 0);
     ptr = body.get();
     char* endPtr = ptr+size+20; // that's the amount we allocated..
@@ -305,7 +304,7 @@ SOL::writeFile(const std::string &filespec, const std::string &name)
     
     _filesize = ptr - body.get();
 	int len = name.size() + sizeof(boost::uint16_t) + 16;
-    boost::scoped_array<char> head ( new char[len + 4] );
+    std::unique_ptr<char[]> head ( new char[len + 4] );
     memset(head.get(), 0, len);
     ptr = head.get();
     formatHeader(name);
@@ -354,7 +353,7 @@ SOL::readFile(const std::string &filespec)
 	    std::ifstream ifs(filespec.c_str(), std::ios::binary);
 
         _filesize = st.st_size;
-        boost::scoped_array<boost::uint8_t> buf(
+        std::unique_ptr<boost::uint8_t[]> buf(
                 new boost::uint8_t[_filesize + sizeof(int)]);
 
 	    ptr = buf.get();

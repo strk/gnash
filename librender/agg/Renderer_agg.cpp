@@ -114,7 +114,6 @@ AGG resources
 #include <cmath>
 #include <math.h> // We use round()!
 #include <climits>
-#include <boost/scoped_array.hpp>
 #include <functional>
 
 #pragma GCC diagnostic push
@@ -387,7 +386,7 @@ private:
     Mask _amask;
     
     // in-memory buffer
-    boost::scoped_array<boost::uint8_t> _buffer;
+    std::unique_ptr<boost::uint8_t[]> _buffer;
     
 };
 
@@ -2010,10 +2009,10 @@ private:  // private variables
     typedef agg::renderer_base<PixelFormat> renderer_base;
 
     // renderer base
-    boost::scoped_ptr<renderer_base> m_rbase;
+    std::unique_ptr<renderer_base> m_rbase;
  
     // An external renderer.   
-    boost::scoped_ptr<Renderer> _external;
+    std::unique_ptr<Renderer> _external;
 
     int xres;
     int yres;

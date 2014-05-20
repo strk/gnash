@@ -27,7 +27,7 @@
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/facilities/empty.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 
 #include "as_object.h" 
 #include "fn_call.h"
@@ -89,7 +89,7 @@ protected:
 private:
 
     void loadExtensions();
-    boost::scoped_ptr<Extension> _et;
+    std::unique_ptr<Extension> _et;
 
     ClassHierarchy _classes;
     

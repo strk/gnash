@@ -24,7 +24,7 @@
 #include <memory> 
 #include <cassert>
 #include <boost/thread/mutex.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <boost/ptr_container/ptr_vector.hpp>
 
 #include "SoundInfo.h" 

@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <iostream>
 
 #include "Geometry.h"
@@ -170,7 +170,7 @@ OpenVGBitmap::createRadialBitmap(float cx, float cy, float fx, float fy,
 
     // Color Ramp is the same as for linear gradient
     size_t entries = records.size() * 5;
-    boost::scoped_array<VGfloat> ramps(new VGfloat[entries]);
+    std::unique_ptr<VGfloat[]> ramps(new VGfloat[entries]);
     
     int j = 0;
     for (size_t i=0; i!= records.size(); ++i) {
@@ -235,7 +235,7 @@ OpenVGBitmap::createLinearBitmap(float x0, float y0, float x1, float y1,
     // function will generate an error if the number of values
     // submitted is not a multiple of 5 (zero is acceptable)
     size_t entries = records.size() * 5;
-    boost::scoped_array<VGfloat> ramps(new VGfloat[entries]);    
+    std::unique_ptr<VGfloat[]> ramps(new VGfloat[entries]);    
     int j = 0;
     for (size_t i=0; i!= records.size(); ++i) {
         std::cerr << "The record ratio is: " << records[i].ratio/255.0f;

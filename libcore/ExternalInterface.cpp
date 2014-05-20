@@ -24,7 +24,6 @@
 #include <vector>
 #include <sstream>
 #include <boost/algorithm/string/erase.hpp>
-#include <boost/scoped_array.hpp>
 #include <algorithm>
 
 #ifdef SOLARIS_HOST
@@ -153,7 +152,7 @@ ExternalInterface::ExternalEventCheck(int fd)
             return error;
         }
         log_debug("There are %d bytes in the network buffer", bytes);
-        boost::scoped_array<char> buffer(new char[bytes + 1]);
+        std::unique_ptr<char[]> buffer(new char[bytes + 1]);
         // Since we know how bytes are in the network buffer, allocate
         // some memory to read the data.
         // terminate incase we want to treat the data like a string.

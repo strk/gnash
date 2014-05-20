@@ -22,7 +22,7 @@
 
 #include <vector>
 #include <boost/ptr_container/ptr_vector.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <boost/cstdint.hpp> 
 #include <memory>
 
@@ -279,7 +279,7 @@ private:
     /// Read a DEFINEBUTTON2 tag
     void readDefineButton2Tag(SWFStream& in, movie_definition& m);
 
-    boost::scoped_ptr<SWF::DefineButtonSoundTag> _soundTag;
+    std::unique_ptr<SWF::DefineButtonSoundTag> _soundTag;
 
     ButtonRecords _buttonRecords;
 

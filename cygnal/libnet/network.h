@@ -45,7 +45,7 @@
 # include <io.h>
 #endif
 
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <boost/cstdint.hpp>
 #include <boost/thread/mutex.hpp>
 #include <vector>
@@ -355,10 +355,10 @@ public:
     boost::mutex	_poll_mutex;
     boost::mutex	_net_mutex;
 #ifdef USE_SSL
-    boost::scoped_ptr<SSLClient> _ssl;
+    std::unique_ptr<SSLClient> _ssl;
 #endif
 #ifdef USE_SSH
-    boost::scoped_ptr<SSHClient> _ssh;
+    std::unique_ptr<SSHClient> _ssh;
 #endif
 };
 

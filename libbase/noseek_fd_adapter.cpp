@@ -18,7 +18,6 @@
 
 #include "noseek_fd_adapter.h"
 
-#include <boost/scoped_array.hpp>
 #include <cerrno>
 #include <cstdio>
 #include <string>

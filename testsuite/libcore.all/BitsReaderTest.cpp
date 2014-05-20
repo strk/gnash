@@ -40,7 +40,6 @@
 #include <fcntl.h>
 #include <string.h>
 #include <sstream>
-#include <boost/scoped_array.hpp>
 
 using namespace std;
 using namespace gnash;
@@ -81,7 +80,7 @@ trymain(int /*argc*/, char** /*argv*/)
 {
 	ByteReader in(0xAA);
 
-	boost::scoped_array<unsigned char> buf(new unsigned char[1024]);
+	std::unique_ptr<unsigned char[]> buf(new unsigned char[1024]);
 
 	in.read(buf.get(), 1024);
 

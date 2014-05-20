@@ -28,7 +28,6 @@
 #include "GnashException.h" // for SoundException
 
 #include <vector>
-#include <boost/scoped_array.hpp>
 
 #include <SoundPlayer.h>
 

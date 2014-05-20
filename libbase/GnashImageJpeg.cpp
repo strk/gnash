@@ -608,7 +608,7 @@ JpegOutput::writeImageRGBA(const unsigned char* rgbaData)
     const size_t components = 3;
     const size_t size = _width * _height;
 
-    boost::scoped_array<unsigned char> data(
+    std::unique_ptr<unsigned char[]> data(
             new unsigned char[size * components]);
 
     for (size_t pixel = 0; pixel < size; ++pixel) {

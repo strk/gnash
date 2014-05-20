@@ -40,8 +40,7 @@
 #include <cmath>
 #include <math.h> // Non standard rint()
 #include <cairo/cairo.h>
-#include <boost/scoped_array.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <functional>
 
 #include "Renderer.h"
@@ -207,8 +206,8 @@ class bitmap_info_cairo : public CachedBitmap, boost::noncopyable
     }
    
   private:
-    mutable boost::scoped_ptr<image::GnashImage> _image;
-    boost::scoped_array<boost::uint8_t> _data;
+    mutable std::unique_ptr<image::GnashImage> _image;
+    std::unique_ptr<boost::uint8_t[]> _data;
     int _width;
     int _height;
     size_t _bytes_per_pixel;

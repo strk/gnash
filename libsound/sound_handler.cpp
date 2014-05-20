@@ -22,7 +22,6 @@
 #include <boost/cstdint.hpp> // For C99 int types
 #include <vector> 
 #include <cmath> 
-#include <boost/scoped_array.hpp>
 
 #include "EmbedSound.h" // for use
 #include "InputStream.h" // for use
@@ -596,7 +595,7 @@ sound_handler::fetchSamples(boost::int16_t* to, unsigned int nSamples)
     if (!_inputStreams.empty()) {
 
         // A buffer to fetch InputStream samples into
-        boost::scoped_array<boost::int16_t> buf(new boost::int16_t[nSamples]);
+        std::unique_ptr<boost::int16_t[]> buf(new boost::int16_t[nSamples]);
 
 #ifdef GNASH_DEBUG_SAMPLES_FETCHING 
         log_debug("Fetching %d samples from each of %d input streams", nSamples, _inputStreams.size());

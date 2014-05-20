@@ -28,7 +28,6 @@
 
 #include "log.h"
 
-#include <boost/scoped_array.hpp>
 #include <algorithm> // for std::swap
 
 namespace gnash {

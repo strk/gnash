@@ -28,7 +28,6 @@
 
 #include <memory>        // for unique_ptr
 #include <QImage>
-#include <boost/scoped_array.hpp>
 #include <QPainter>
 #include "snappingrange.h"
 
@@ -56,7 +55,7 @@ class Qt4CairoGlue : public Qt4Glue
   private:
     int _width;
     int _height;
-    boost::scoped_array<unsigned char> _offscreenbuf;
+    std::unique_ptr<unsigned char[]> _offscreenbuf;
     Renderer* _renderer; // We don't own this pointer.
     std::unique_ptr<QImage> _image;
     std::unique_ptr<QPainter> _painter;

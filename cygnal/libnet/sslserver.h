@@ -25,7 +25,6 @@
 
 #include <boost/array.hpp>
 #include <boost/shared_array.hpp>
-#include <boost/scoped_array.hpp>
 #include <boost/cstdint.hpp>
 #include <sstream>
 

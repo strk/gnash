@@ -20,7 +20,7 @@
 #define GNASH_RTMP_H
 
 #include <boost/cstdint.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <deque>
 #include <map>
 
@@ -524,7 +524,7 @@ private:
     /// Chunk size for sending.
     size_t _outChunkSize;
 
-    boost::scoped_ptr<HandShaker> _handShaker;
+    std::unique_ptr<HandShaker> _handShaker;
 
     bool _connected;
 
@@ -534,7 +534,7 @@ private:
     //
     /// This is not the same as a non-ready packet. It applies only to packets
     /// waiting for payload data.
-    boost::scoped_ptr<RTMPPacket> _incompletePacket;
+    std::unique_ptr<RTMPPacket> _incompletePacket;
 
 };
 

@@ -21,7 +21,6 @@
 #define BACKEND_RENDER_HANDLER_CAIRO_H
 
 #include <vector>
-#include <boost/scoped_array.hpp>
 #include <cairo/cairo.h>
 #include "Renderer.h"
 #include "Geometry.h"
@@ -127,7 +126,7 @@ public:
 private:
     /// The cairo context.
     cairo_t* _cr;
-    boost::scoped_array<boost::uint8_t> _video_buffer;
+    std::unique_ptr<boost::uint8_t[]> _video_buffer;
     std::vector<PathVec> _masks;
     size_t _video_bufsize;
     bool _drawing_mask;

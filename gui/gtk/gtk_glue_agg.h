@@ -25,7 +25,6 @@
 
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
-#include <boost/scoped_array.hpp>
 
 namespace gnash
 {

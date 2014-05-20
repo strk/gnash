@@ -51,7 +51,6 @@ DefineButtonTag::DefineButtonTag(SWFStream& in, movie_definition& m,
         TagType tag, boost::uint16_t id)
     :
     DefinitionTag(id),
-    _soundTag(0),
     _trackAsMenu(false),
     _movieDef(m)
 {

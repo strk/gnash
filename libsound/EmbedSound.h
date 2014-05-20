@@ -24,7 +24,7 @@
 #include <memory> // for unique_ptr (composition)
 #include <cassert>
 #include <boost/thread/mutex.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 
 #include "SimpleBuffer.h" // for composition
 #include "SoundInfo.h" // for composition
@@ -176,7 +176,7 @@ public:
 private:
 
     /// The undecoded data
-    boost::scoped_ptr<SimpleBuffer> _buf;
+    std::unique_ptr<SimpleBuffer> _buf;
 
     /// Playing instances of this sound definition
     //

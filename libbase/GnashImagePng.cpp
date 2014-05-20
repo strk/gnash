@@ -25,7 +25,6 @@
 #include "GnashImagePng.h"
 
 #include <sstream>
-#include <boost/scoped_array.hpp>
 
 extern "C" {
 #ifdef HAVE_PNG_H
@@ -96,8 +95,6 @@ public:
         Input(in),
         _pngPtr(0),
         _infoPtr(0),
-        _rowPtrs(0),
-        _pixelData(0),
         _currentRow(0)
     {
         init();
@@ -130,8 +127,8 @@ private:
     // State needed for input.
     png_structp _pngPtr;
     png_infop _infoPtr;
-    boost::scoped_array<png_bytep> _rowPtrs;
-    boost::scoped_array<png_byte> _pixelData;
+    std::unique_ptr<png_bytep[]> _rowPtrs;
+    std::unique_ptr<png_byte[]> _pixelData;
    
     // A counter for keeping track of the last row copied.
     size_t _currentRow;
@@ -356,7 +353,7 @@ PngOutput::writeImageRGBA(const unsigned char* rgbaData)
 {
     png_set_write_fn(_pngPtr, _outStream.get(), &writeData, &flushData);
 
-    boost::scoped_array<const png_byte*> rows(new const png_byte*[_height]);
+    std::unique_ptr<const png_byte*[]> rows(new const png_byte*[_height]);
 
     // RGBA
     const size_t components = 4;
@@ -381,7 +378,7 @@ PngOutput::writeImageRGB(const unsigned char* rgbData)
 {
     png_set_write_fn(_pngPtr, _outStream.get(), &writeData, &flushData);
 
-    boost::scoped_array<const png_byte*> rows(new const png_byte*[_height]);
+    std::unique_ptr<const png_byte*[]> rows(new const png_byte*[_height]);
 
     // RGB
     const size_t components = 3;

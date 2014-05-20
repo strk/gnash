@@ -24,7 +24,7 @@
 #endif
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <string>
 #include <map>
 #include <utility>
@@ -602,7 +602,7 @@ private:
     InterruptableVirtualClock _virtualClock;
     
     /// Checked on each advance for screenshot activity if it exists.
-    boost::scoped_ptr<ScreenShotter> _screenShotter;
+    std::unique_ptr<ScreenShotter> _screenShotter;
 
 #ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS 
     int _xpointer;

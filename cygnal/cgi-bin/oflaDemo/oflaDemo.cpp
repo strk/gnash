@@ -27,7 +27,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <ctime>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 
 #if !defined(_MSC_VER)
 # include <unistd.h>
@@ -155,7 +155,7 @@ extern "C" {
             std::shared_ptr<cygnal::Buffer> head = oflaDemo.encodeHeader(0x3,
                                           RTMP::HEADER_12, error->allocated(),
                                           RTMP::INVOKE, RTMPMsg::FROM_SERVER);
-            boost::scoped_ptr<cygnal::Buffer> response(new cygnal::Buffer(
+            std::unique_ptr<cygnal::Buffer> response(new cygnal::Buffer(
                                    error->allocated() + head->allocated()));
             *response = head;
             *response += error;

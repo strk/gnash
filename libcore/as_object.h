@@ -27,7 +27,7 @@
 #include <vector>
 #include <cmath>
 #include <utility> 
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <boost/noncopyable.hpp>
 
 #include "GC.h" // for inheritance from GcResource (to complete)
@@ -707,7 +707,7 @@ private:
     //
     /// This is owned by the as_object and destroyed when the as_object's
     /// destructor is called.
-    boost::scoped_ptr<Relay> _relay;
+    std::unique_ptr<Relay> _relay;
 
     /// The VM containing this object.
     VM& _vm;
@@ -722,7 +722,7 @@ private:
     std::vector<as_object*> _interfaces;
 
     typedef std::map<ObjectURI, Trigger, ObjectURI::LessThan> TriggerContainer;
-    boost::scoped_ptr<TriggerContainer> _trigs;
+    std::unique_ptr<TriggerContainer> _trigs;
 };
 
 /// Send a system event

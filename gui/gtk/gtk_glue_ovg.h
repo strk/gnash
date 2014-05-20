@@ -25,8 +25,7 @@
 
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
-#include <boost/scoped_array.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include "openvg/OpenVGRenderer.h"
 
 #ifdef HAVE_VG_OPENVG_H

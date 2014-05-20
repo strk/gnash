@@ -76,7 +76,7 @@ public:
                                      CachedBitmap *bitmap, VGPaint paint);
     
 private:
-    boost::scoped_ptr<image::GnashImage> _image;
+    std::unique_ptr<image::GnashImage> _image;
     VGImageFormat   _pixel_format;
     VGImage         _vgimage;
     VGPaint         _vgpaint;

@@ -25,7 +25,7 @@
 #endif
 
 #include <boost/shared_array.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 
 #include "GnashDevice.h"
 
@@ -137,7 +137,7 @@ public:
     }
 
 protected:
-    boost::scoped_ptr<renderer::GnashDevice> _device;
+    std::unique_ptr<renderer::GnashDevice> _device;
 };
     
 } // namespace gnash

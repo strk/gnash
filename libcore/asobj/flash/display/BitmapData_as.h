@@ -23,7 +23,7 @@
 
 #include <list>
 #include <boost/cstdint.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <cassert>
 #include <boost/intrusive_ptr.hpp>
 #include <memory>
@@ -166,7 +166,7 @@ private:
 
     boost::intrusive_ptr<CachedBitmap> _cachedBitmap;
 
-    boost::scoped_ptr<image::GnashImage> _image;
+    std::unique_ptr<image::GnashImage> _image;
 
     std::list<DisplayObject*> _attachedObjects;
 

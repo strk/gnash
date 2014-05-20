@@ -24,7 +24,7 @@
 #include <cstring>
 #include <iostream> // for output operator
 #include <boost/cstdint.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 
 //#include "network.h"
 #include "dsodefs.h" // DSOEXPORT

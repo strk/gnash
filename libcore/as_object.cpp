@@ -282,7 +282,6 @@ as_object::as_object(const Global_as& gl)
     GcResource(getRoot(gl).gc()),
     _displayObject(0),
     _array(false),
-    _relay(0),
     _vm(getVM(gl)),
     _members(*this)
 {
@@ -293,7 +292,6 @@ as_object::as_object(VM& vm)
     GcResource(vm.getRoot().gc()),
     _displayObject(0),
     _array(false),
-    _relay(0),
     _vm(vm),
     _members(*this)
 {

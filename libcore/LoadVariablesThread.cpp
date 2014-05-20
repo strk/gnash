@@ -25,7 +25,6 @@
 #include "StreamProvider.h"
 
 #include <string>
-#include <boost/scoped_array.hpp>
 
 //#define DEBUG_LOAD_VARIABLES 1
 
@@ -49,7 +48,7 @@ LoadVariablesThread::completeLoad()
 	std::string toparse;
 
 	const size_t chunkSize = 1024;
-	boost::scoped_array<char> buf(new char[chunkSize]);
+	std::unique_ptr<char[]> buf(new char[chunkSize]);
 	unsigned int parsedLines = 0;
 	// TODO: use read_string ?
 	while ( size_t bytesRead = _stream->read(buf.get(), chunkSize) )

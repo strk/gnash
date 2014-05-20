@@ -26,7 +26,7 @@
 
 #include <string>
 #include <utility>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/mem_fn.hpp>
@@ -217,7 +217,7 @@ private:
     size_t _calls;
 
     /// A single HTTP request.
-    boost::scoped_ptr<IOChannel> _connection;
+    std::unique_ptr<IOChannel> _connection;
     
     /// Headers to be sent with this request.
     NetworkAdapter::RequestHeaders _headers;

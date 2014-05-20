@@ -56,7 +56,6 @@
 #include <cmath>
 #include <string>
 #include <memory>
-#include <boost/scoped_ptr.hpp>
 
 #include "check.h"
 

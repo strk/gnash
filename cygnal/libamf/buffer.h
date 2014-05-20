@@ -25,7 +25,6 @@
 
 #include <vector>
 #include <boost/cstdint.hpp>
-#include <boost/scoped_array.hpp>
 #include <iostream> // for output operator
 #include <string>
 
@@ -405,7 +404,7 @@ public:
     /// \var _data
     ///	\brief This is the container of the actual data in this
     ///		Buffer.
-    boost::scoped_array<boost::uint8_t> _data;
+    std::unique_ptr<boost::uint8_t[]> _data;
     
     /// \var _nbytes
     ///	\brief This is the total allocated size of the Buffer.

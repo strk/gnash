@@ -28,7 +28,6 @@
 #include <algorithm>
 #include <cerrno>
 #include <boost/tokenizer.hpp>
-#include <boost/scoped_array.hpp>
 #include <cctype>
 
 // This is for getcwd(2) 
@@ -155,7 +154,7 @@ URL::URL(const std::string& absolute_url)
         // When does it get silly?
         const size_t maxSize = 4096; 
         
-        boost::scoped_array<char> buf; 
+        std::unique_ptr<char[]> buf; 
         char* dir = 0;
         size_t bufSize = 0;
         

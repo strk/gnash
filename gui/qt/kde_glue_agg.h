@@ -29,7 +29,6 @@
 #include "kde_glue.h"
 #include <vector>
 #include <memory>
-#include <boost/scoped_array.hpp>
 
 
 namespace gnash
@@ -52,7 +51,7 @@ class KdeAggGlue : public KdeGlue
   private:
     int _width;
     int _height;
-    boost::scoped_array<unsigned char> _offscreenbuf;
+    std::unique_ptr<unsigned char[]> _offscreenbuf;
     Renderer* _renderer; // We don't own this pointer.
     geometry::Range2d<int> _validbounds;
     std::vector< geometry::Range2d<int> > _drawbounds;

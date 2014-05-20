@@ -26,7 +26,6 @@
 
 #include <boost/noncopyable.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/scoped_array.hpp>
 #include <memory> 
 
 #include "GnashEnums.h"
@@ -80,7 +79,7 @@ class DSOEXPORT GnashImage : boost::noncopyable
 public:
 
     typedef boost::uint8_t value_type;
-    typedef boost::scoped_array<value_type> container_type;
+    typedef std::unique_ptr<value_type[]> container_type;
     typedef value_type* iterator;
     typedef const value_type* const_iterator;
 

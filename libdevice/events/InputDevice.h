@@ -22,9 +22,8 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/scoped_array.hpp>
 #include <boost/shared_array.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <boost/cstdint.hpp>
 #include <vector>
 #include <queue>
@@ -159,7 +158,7 @@ protected:
     int                 _fd;
     input_data_t        _input_data;
     // These hold the data queue
-    boost::scoped_array<boost::uint8_t> _buffer;
+    std::unique_ptr<boost::uint8_t[]> _buffer;
     std::queue<std::shared_ptr<input_data_t> > _data;
     int                 _screen_width;
     int                 _screen_height;    

@@ -23,7 +23,6 @@
 #include "GnashImage.h"
 
 #include <memory> 
-#include <boost/scoped_array.hpp>
 #include <algorithm>
 #include <cassert>
 
@@ -306,7 +305,7 @@ Input::readSWFJpeg3(std::shared_ptr<IOChannel> in)
             j_in->readScanline(scanline(*im, y));
         }
     } else {
-        boost::scoped_array<GnashImage::value_type> line(
+        std::unique_ptr<GnashImage::value_type[]> line(
             new GnashImage::value_type[3 * width]);
 
         for (size_t y = 0; y < height; ++y) {

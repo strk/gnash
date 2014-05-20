@@ -26,7 +26,6 @@
 
 #include "Qt4Glue.h"
 
-#include <boost/scoped_array.hpp>
 #include "snappingrange.h"
 
 class QRect;

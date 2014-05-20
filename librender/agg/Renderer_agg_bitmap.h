@@ -19,7 +19,7 @@
 #ifndef BACKEND_RENDER_HANDLER_AGG_BITMAP_H
 #define BACKEND_RENDER_HANDLER_AGG_BITMAP_H
 
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <memory>
 #include <boost/cstdint.hpp>
 
@@ -60,7 +60,7 @@ public:
     
 private:
   
-    boost::scoped_ptr<image::GnashImage> _image;
+    std::unique_ptr<image::GnashImage> _image;
   
     int _bpp;
       

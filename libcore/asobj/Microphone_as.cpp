@@ -21,7 +21,6 @@
 #include "Microphone_as.h"
 
 #include <algorithm>
-#include <boost/scoped_ptr.hpp>
 #include <memory>
 
 #include "as_object.h" // for inheritance
@@ -226,7 +225,7 @@ public:
     }
 
 private:
-    boost::scoped_ptr<media::AudioInput> _input;
+    std::unique_ptr<media::AudioInput> _input;
 
 };
 

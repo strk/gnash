@@ -20,7 +20,6 @@
 #ifndef GNASH_MEDIAPARSER_FFMPEG_H
 #define GNASH_MEDIAPARSER_FFMPEG_H
 
-#include <boost/scoped_array.hpp>
 #include <memory>
 #include <boost/optional.hpp>
 
@@ -169,7 +168,7 @@ private:
 	///
 	static const size_t byteIOBufferSize = 1024;
 
-	boost::scoped_array<unsigned char> _byteIOBuffer;
+	std::unique_ptr<unsigned char[]> _byteIOBuffer;
 
 	/// The last parsed position, for getBytesLoaded
 	boost::uint64_t _lastParsedPosition;

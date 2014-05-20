@@ -36,7 +36,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/barrier.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 
 #include "movie_definition.h" // for inheritance
 #include "DefinitionTag.h" // for boost::intrusive_ptr visibility of dtor
@@ -490,7 +490,7 @@ private:
     std::string _url;
 
     /// Non transferable stream.
-    boost::scoped_ptr<SWFStream> _str;
+    std::unique_ptr<SWFStream> _str;
 
     std::unique_ptr<IOChannel> _in;
 

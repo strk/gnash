@@ -76,7 +76,7 @@ public:
     virtual void beforeRendering(movie_root *) {};
 
 protected:
-    boost::scoped_ptr<Renderer> _renderer;
+    std::unique_ptr<Renderer> _renderer;
 };
 
 } // end of namespace gui

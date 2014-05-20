@@ -21,7 +21,6 @@
 #define GNASH_MEDIAPARSER_GST_H
 
 #include <deque>
-#include <boost/scoped_array.hpp>
 #include <memory>
 #include <queue>
 #include <gst/gst.h>

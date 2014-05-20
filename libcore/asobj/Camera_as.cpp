@@ -20,7 +20,7 @@
 #include "Camera_as.h"
 
 #include <sstream>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <memory>
 
 #include "as_object.h" // for inheritance
@@ -229,7 +229,7 @@ public:
 
 private:
 
-    boost::scoped_ptr<media::VideoInput> _input;
+    std::unique_ptr<media::VideoInput> _input;
 
     // TODO: see whether this should be handled in the VideoInput class
     bool _loopback;

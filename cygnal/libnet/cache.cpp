@@ -24,7 +24,6 @@
 
 #include <boost/thread/mutex.hpp>
 #include <boost/shared_array.hpp>
-#include <boost/scoped_array.hpp>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string>

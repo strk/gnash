@@ -24,8 +24,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/scoped_array.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 
 #ifdef HAVE_DIRECTFB_H
 # include <directfb/directfb.h>

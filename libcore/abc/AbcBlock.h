@@ -29,7 +29,6 @@
 
 #include <vector>
 #include <string>
-#include <boost/scoped_array.hpp>
 #include <stdexcept>
 
 namespace gnash {

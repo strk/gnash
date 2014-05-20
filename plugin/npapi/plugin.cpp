@@ -22,7 +22,6 @@
 #endif
 
 #include <boost/format.hpp>
-#include <boost/scoped_array.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/find.hpp>
 #define BOOST_IOSTREAMS_USE_DEPRECATED
@@ -934,7 +933,7 @@ nsPluginInstance::processPlayerRequest()
         if (!invoke->name.empty() && !invoke->args.empty()) {
             //Convert the as_value argument to NPVariant
             const size_t count = invoke->args.size() - 1;
-            boost::scoped_array<NPVariant> args(new NPVariant[count]);
+            std::unique_ptr<NPVariant[]> args(new NPVariant[count]);
             //Skip the first argument
             for (size_t i = 0; i < count; ++i) {
                 invoke->args[i+1].copy(args[i]);

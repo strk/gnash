@@ -24,7 +24,6 @@
 
 #include "VideoDecoderFfmpeg.h"
 
-#include <boost/scoped_array.hpp>
 #include <boost/format.hpp>
 #include <algorithm>
 

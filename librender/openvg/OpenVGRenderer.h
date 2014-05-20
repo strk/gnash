@@ -32,8 +32,7 @@
 #include <EGL/egl.h>
 #include <vector>
 #include <list>
-#include <boost/scoped_array.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 
 #include "Geometry.h"
 #include "Renderer.h"

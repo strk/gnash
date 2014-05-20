@@ -24,8 +24,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/scoped_array.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
@@ -150,7 +149,7 @@ protected:
     struct fb_var_screeninfo            _varinfo;
     boost::uint8_t                     *_fbmem;
     
-    boost::scoped_ptr<boost::uint8_t>   _offscreen_buffer;
+    std::unique_ptr<boost::uint8_t>     _offscreen_buffer;
     struct fb_cmap                      _cmap;       // the colormap
 };
 

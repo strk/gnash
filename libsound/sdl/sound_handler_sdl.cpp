@@ -31,7 +31,6 @@
 #include "GnashException.h" // for SoundException
 
 #include <vector>
-#include <boost/scoped_array.hpp>
 #include <SDL.h>
 
 // Define this to get debugging call about pausing/unpausing audio

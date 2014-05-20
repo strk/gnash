@@ -34,7 +34,7 @@
 #include "statistics.h"
 #include "getclocktime.hpp"
 #include "dsodefs.h"
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 
 /// \namespace gnash
 ///	This is the main namespace for Gnash and it's libraries.

@@ -27,7 +27,6 @@
 #include <limits>
 #include <cassert>
 #include <boost/static_assert.hpp>
-#include <boost/scoped_array.hpp>
 
 #include "IOChannel.h"
 #include "utility.h"
@@ -384,7 +383,7 @@ readDefineBitsJpeg3(SWFStream& in, TagType tag)
     const size_t imHeight = im->height();
     const size_t bufferLength = imWidth * imHeight;
 
-    boost::scoped_array<boost::uint8_t> buffer(new boost::uint8_t[bufferLength]);
+    std::unique_ptr<boost::uint8_t[]> buffer(new boost::uint8_t[bufferLength]);
 
     inflateWrapper(in, buffer.get(), bufferLength);
 
@@ -480,7 +479,7 @@ readLossless(SWFStream& in, TagType tag)
 
     const size_t pitch = (width * bytes_per_pixel + 3) &~ 3;
     const size_t bufSize = colorTableSize * channels + pitch * height;
-    boost::scoped_array<boost::uint8_t> buffer(new boost::uint8_t[bufSize]);
+    std::unique_ptr<boost::uint8_t[]> buffer(new boost::uint8_t[bufSize]);
 
     inflateWrapper(in, buffer.get(), bufSize);
     assert(in.tell() <= in.get_tag_end_position());

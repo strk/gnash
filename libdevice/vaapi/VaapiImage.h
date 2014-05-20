@@ -20,7 +20,6 @@
 #ifndef GNASH_VAAPIIMAGE_H
 #define GNASH_VAAPIIMAGE_H
 
-#include <boost/scoped_array.hpp>
 #include <memory>
 
 #include "dsodefs.h"

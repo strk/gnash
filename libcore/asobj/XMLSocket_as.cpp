@@ -21,8 +21,7 @@
 #include "XMLSocket_as.h"
 
 #include <boost/thread.hpp>
-#include <boost/scoped_array.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <string>
 
 #include "namedStrings.h"
@@ -193,7 +192,7 @@ XMLSocket_as::checkForIncomingData()
     std::vector<std::string> msgs;
     
     const int bufSize = 10000;
-    boost::scoped_array<char> buf(new char[bufSize]);
+    std::unique_ptr<char[]> buf(new char[bufSize]);
 
     const size_t bytesRead = _socket.readNonBlocking(buf.get(), bufSize - 1);
 

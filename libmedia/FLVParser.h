@@ -61,7 +61,7 @@ public:
     }
 
     /// Video stream header
-    boost::scoped_array<boost::uint8_t> data;
+    std::unique_ptr<boost::uint8_t[]> data;
 
     /// Video stream header size
     size_t size;
@@ -93,7 +93,7 @@ public:
     }
 
     /// Audio stream header
-    boost::scoped_array<boost::uint8_t> data;
+    std::unique_ptr<boost::uint8_t[]> data;
 
     /// Audio stream header size
     size_t size;

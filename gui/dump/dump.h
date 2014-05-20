@@ -29,7 +29,6 @@
 
 #include <string>
 #include <fstream>
-#include <boost/scoped_array.hpp>
 
 namespace gnash {
     namespace sound {
@@ -84,7 +83,7 @@ private:
     // is destroyed on reset and when it goes out of scope (including on
     // stack unwinding after an exception), so there is no need to delete
     // it.
-    boost::scoped_array<unsigned char> _offscreenbuf;
+    std::unique_ptr<unsigned char[]> _offscreenbuf;
 
     int _offscreenbuf_size;             /* size of window (bytes) */
 

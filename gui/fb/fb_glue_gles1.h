@@ -50,7 +50,7 @@
 # include "egl/eglDevice.h"
 #endif
 
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 
 #include "fbsup.h"
 
@@ -89,7 +89,7 @@ protected:
     int         _fd;
 
 private:
-    boost::scoped_ptr<Renderer> _renderer;
+    std::unique_ptr<Renderer> _renderer;
     EGLDisplay  _display;
     EGLConfig   _config;
     EGLContext  _context;
