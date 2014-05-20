@@ -110,15 +110,6 @@ public:
     ///
     int    read_string(char* dst, int max_length);
     
-    /// Read a 32-bit float from a little-endian stream.
-    //
-    /// NOTE: this currently relies on host FP format being the
-        ///       same as the Flash one (presumably IEEE 754).
-    ///
-    /// Throw IOException on error
-    ///
-    float read_float32();
-
     /// Return current stream position
     //
     /// Throw IOException on error
