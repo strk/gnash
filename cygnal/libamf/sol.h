@@ -20,6 +20,7 @@
 #define GNASH_SOL_H
 
 #include <boost/cstdint.hpp>
+#include <cassert>
 #include <string>
 #include <vector>
 
