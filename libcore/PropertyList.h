@@ -295,7 +295,7 @@ public:
     /// compiler to optimize it.
     void setReachable() const {
         std::for_each(_props.begin(), _props.end(),
-                boost::mem_fn(&Property::setReachable));
+                std::mem_fn(&Property::setReachable));
     }
 
 private:

@@ -259,7 +259,7 @@ public:
     void visitKeyCodes(E& f) const {
         std::for_each(_buttonActions.begin(), _buttonActions.end(),
             std::bind(f, std::bind(
-                    boost::mem_fn(&ButtonAction::getKeyCode), std::placeholders::_1)));
+                    std::mem_fn(&ButtonAction::getKeyCode), std::placeholders::_1)));
     }
     
 private:

@@ -924,7 +924,7 @@ DisplayList::removeUnloaded()
 {
     testInvariant();
 
-    _charsByDepth.remove_if(boost::mem_fn(&DisplayObject::unloaded));
+    _charsByDepth.remove_if(std::mem_fn(&DisplayObject::unloaded));
 
     testInvariant();
 }

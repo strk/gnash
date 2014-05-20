@@ -183,7 +183,7 @@ Video::getVideoFrame()
 #endif
 
         const size_t frames = m_def->visitSlice(
-                std::bind(boost::mem_fn(&media::VideoDecoder::push),
+                std::bind(std::mem_fn(&media::VideoDecoder::push),
                     _decoder.get(), std::placeholders::_1),
                 from_frame, current_frame);
 

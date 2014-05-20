@@ -494,7 +494,7 @@ MovieLoader::setReachable() const
 #endif
 
     std::for_each(_requests.begin(), _requests.end(),
-            boost::mem_fn(&Request::setReachable));
+            std::mem_fn(&Request::setReachable));
 
 #ifdef GNASH_DEBUG_LOCKING
     log_debug("setReachable: lock on requests: release");

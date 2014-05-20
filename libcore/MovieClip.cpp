@@ -1595,7 +1595,7 @@ MovieClip::cleanup_textfield_variables()
     {
         TextFields& v=i->second;
         TextFields::iterator lastValid = std::remove_if(v.begin(), v.end(),
-                    boost::mem_fn(&DisplayObject::unloaded));
+                    std::mem_fn(&DisplayObject::unloaded));
         v.erase(lastValid, v.end());
     }
 }
@@ -2034,7 +2034,7 @@ MovieClip::markOwnResources() const
 
             const TextFields& tfs=i->second;
             std::for_each(tfs.begin(), tfs.end(), 
-                        boost::mem_fn(&DisplayObject::setReachable));
+                        std::mem_fn(&DisplayObject::setReachable));
         }
     }
 

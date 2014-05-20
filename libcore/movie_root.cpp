@@ -126,7 +126,7 @@ void
 clear(movie_root::ActionQueue& aq)
 {
     std::for_each(aq.begin(), aq.end(), 
-            boost::mem_fn(&movie_root::ActionQueue::value_type::clear));
+            std::mem_fn(&movie_root::ActionQueue::value_type::clear));
 }
 
 } // anonymous namespace

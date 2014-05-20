@@ -490,7 +490,7 @@ XMLNode_as::setReachable()
 
 	// Mark children
     std::for_each(_children.begin(), _children.end(),
-            boost::mem_fn(&XMLNode_as::setReachable));
+            std::mem_fn(&XMLNode_as::setReachable));
 
 	// Mark attributes object
 	if (_attributes) _attributes->setReachable();

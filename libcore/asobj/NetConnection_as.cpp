@@ -29,7 +29,6 @@
 #include <memory>
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/mem_fn.hpp>
 #include <iomanip>
 
 #include "GnashSystemNetHeaders.h"
@@ -433,7 +432,7 @@ NetConnection_as::markReachableResources() const
 {
     owner().setReachable();
     std::for_each(_oldConnections.begin(), _oldConnections.end(),
-            boost::mem_fn(&Connection::setReachable));
+            std::mem_fn(&Connection::setReachable));
     if (_currentConnection.get()) _currentConnection->setReachable();
 }
 

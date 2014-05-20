@@ -251,7 +251,7 @@ bool
 DefineButtonTag::hasKeyPressHandler() const
 {
     return std::find_if(_buttonActions.begin(), _buttonActions.end(),
-            boost::mem_fn(&ButtonAction::triggeredByKeyPress)) !=
+            std::mem_fn(&ButtonAction::triggeredByKeyPress)) !=
             _buttonActions.end();
 }
 
