@@ -56,7 +56,13 @@ public:
 
     ButtonRecord()
         :
-        _definitionTag(0)
+        _blendMode(0),
+        _hitTest(false),
+        _down(false),
+        _over(false),
+        _up(false),
+        _definitionTag(0),
+        _buttonLayer(0)
     {
     }
 
