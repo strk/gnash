@@ -215,6 +215,7 @@ JpegInput::JpegInput(std::shared_ptr<IOChannel> in)
     :
     Input(in),
     _errorOccurred(0),
+    _jmpBuf(),
     _compressorOpened(false)
 {
     setup_jpeg_err(&m_jerr);
