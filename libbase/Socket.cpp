@@ -35,7 +35,6 @@
 #include "utility.h"
 #include "GnashAlgorithm.h"
 #include "GnashSystemNetHeaders.h"
-#include "GnashScopedPtr.h"
 
 namespace gnash {
 
@@ -164,8 +163,10 @@ Socket::connect(const std::string& hostname, boost::uint16_t port)
     }
 
     // This is used for ::connect()
-    ScopedPtr<addrinfo> ans(getAddrInfo(hostname, port), freeaddrinfo);
-    if (!ans.get()) {
+    std::unique_ptr<addrinfo, decltype(freeaddrinfo)*> ans(getAddrInfo(hostname, port), 
+        freeaddrinfo);
+
+    if (!ans) {
         return false;
     }
 

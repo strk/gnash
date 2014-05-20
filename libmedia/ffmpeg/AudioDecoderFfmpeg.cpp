@@ -27,7 +27,6 @@
 #include "FLVParser.h"
 #include "SoundInfo.h"
 #include "MediaParser.h" // for AudioInfo
-#include "GnashScopedPtr.h"
 
 //#define GNASH_DEBUG_AUDIO_DECODING
 
@@ -478,7 +477,8 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
     size_t outSize = MAX_AUDIO_FRAME_SIZE;
 
     // TODO: make this a private member, to reuse (see NetStreamFfmpeg in 0.8.3)
-    ScopedPtr<boost::int16_t> output( reinterpret_cast<boost::int16_t*>(av_malloc(outSize)), av_free );
+    std::unique_ptr<boost::int16_t, decltype(av_free)*> output(
+        reinterpret_cast<boost::int16_t*>(av_malloc(outSize)), av_free );
     if (!output.get()) {
         log_error(_("failed to allocate audio buffer."));
         outputSize = 0;
@@ -500,7 +500,7 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
     av_init_packet(&pkt);
     pkt.data = const_cast<uint8_t*>(input);
     pkt.size = inputSize;
-    ScopedPtr<AVFrame> frm ( FRAMEALLOC(), av_free );
+    std::unique_ptr<AVFrame, decltype(av_free)*> frm ( FRAMEALLOC(), av_free );
     if (!frm.get()) {
         log_error(_("failed to allocate frame."));
         return NULL;
