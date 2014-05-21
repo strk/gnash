@@ -46,9 +46,7 @@ namespace gnash {
 MovieLoader::MovieLoader(movie_root& mr)
     :
     _killed(false),
-    _movieRoot(mr),
-    _thread(),
-    _barrier(2) // main and loader thread
+    _movieRoot(mr)
 {
 }
 
@@ -57,9 +55,6 @@ MovieLoader::MovieLoader(movie_root& mr)
 void
 MovieLoader::processRequests()
 {
-	// let _thread assignment happen before going on
-    _barrier.wait();
-
 #ifdef GNASH_DEBUG_LOADMOVIE_REQUESTS_PROCESSING
     log_debug("Starting movie loader thread");
 #endif
@@ -458,7 +453,6 @@ MovieLoader::loadMovie(const std::string& urlstr,
         _killed=false;
         _thread.reset(new boost::thread(std::bind(
                         &MovieLoader::processRequests, this)));
-	    _barrier.wait(); // let execution start before proceeding
     }
     else {
         log_debug("loadMovie: waking up existing thread");

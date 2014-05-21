@@ -25,7 +25,6 @@
 #include <boost/noncopyable.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition.hpp>
-#include <boost/thread/barrier.hpp>
 
 #include "URL.h"
 #include "MovieClip.h" 
@@ -205,12 +204,6 @@ private:
     movie_root& _movieRoot;
 
     std::unique_ptr<boost::thread> _thread;
-
-	// Barrier to ensure that _thread
-	// is initialized before the loader thread
-	// continues execution
-	boost::barrier _barrier;
-
 };
 
 } // namespace gnash
