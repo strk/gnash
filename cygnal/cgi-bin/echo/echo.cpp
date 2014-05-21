@@ -47,8 +47,6 @@ static bool netdebug = false;
 
 static EchoTest echo;
 	
-extern "C" {
-    
     // the standard API
     std::shared_ptr<Handler::cygnal_init_t>
     echo_init_func(std::shared_ptr<gnash::RTMPMsg> &msg)
@@ -102,8 +100,6 @@ extern "C" {
 //         GNASH_REPORT_RETURN;
     }
     
-} // end of extern C
-
 int
 main(int argc, char *argv[])
 {

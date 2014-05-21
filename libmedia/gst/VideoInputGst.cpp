@@ -1037,7 +1037,7 @@ VideoInputGst::webcamChangeSourceBin()
         
         //check here to make sure the fps value is supported (only valid for
         //non test sources)
-        if (! strcmp(webcam->_webcamDevice->getGstreamerSrc(), "videotestsrc") == 0) {
+        if (strcmp(webcam->_webcamDevice->getGstreamerSrc(), "videotestsrc") == 0) {
             int newFps = _fps;
             if (checkForSupportedFramerate(webcam, newFps)) {
                 log_debug("checkforsupportedfr returned true");

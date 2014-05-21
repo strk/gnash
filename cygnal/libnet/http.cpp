@@ -69,8 +69,10 @@ namespace gnash
 
 // extern map<int, Handler *> handlers;
 
+#if 0
 // FIXME, this seems too small to me.  --gnu
 static const int readsize = 1024;
+#endif
 
 static Cache& cache = Cache::getDefaultInstance();
 

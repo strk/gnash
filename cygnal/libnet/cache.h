@@ -82,10 +82,6 @@ private:
     ///		The cache of Distream handles to often played files.
     std::map<std::string, std::shared_ptr<DiskStream> > _files;
 
-    /// \var Cache::_max_size
-    ///		The maximum amount of memory the cache is allowed to use.
-    size_t _max_size;
-
     /// \brief Cache file statistics variables are defined here.
 #ifdef USE_STATS_CACHE
     struct timespec _last_access;
@@ -96,11 +92,6 @@ private:
     long	_file_lookups;
     long	_file_hits;
 #endif
-    /// \var Cache::_pagesize
-    ///		The memory page size.
-    size_t	_pagesize;    
-
-cygnal::AMF::filetype_e  _filetype; // FIXME: this shouldn't be here still
 };
 
 /// \brief Dump to the specified output stream.

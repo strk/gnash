@@ -53,10 +53,12 @@ using gnash::log_error;
 namespace cygnal
 {
 
+#if 0
 // The maximum 
 // although a bool is one byte, it appears to be a short in AMF,
 // plus the type byte.
 const int AMF_BOOLEAN_SIZE = 3;
+#endif
 
 /// \var LC_HEADER_SIZE
 ///     The header size for a memory segment.

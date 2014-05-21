@@ -44,16 +44,14 @@ namespace gnash
 {
 
 Cache::Cache() 
-    : _max_size(0),
 #ifdef USE_STATS_CACHE
-      _pathname_lookups(0),
+    : _pathname_lookups(0),
       _pathname_hits(0),
       _response_lookups(0),
       _response_hits(0),
       _file_lookups(0),
-      _file_hits(0),
+      _file_hits(0)
 #endif
-      _pagesize(0)
 {
 //    GNASH_REPORT_FUNCTION;
     log_error(_("using this constructor is only allowed for testing purposes."));

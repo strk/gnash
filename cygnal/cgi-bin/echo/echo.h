@@ -71,12 +71,10 @@ private:
 };  
 
 // the standard API
-extern "C" {
     std::shared_ptr<Handler::cygnal_init_t>echo_init_func(std::shared_ptr<gnash::RTMPMsg> &msg);
     
     std::shared_ptr<cygnal::Buffer> echo_read_func();
     size_t echo_write_func(std::uint8_t *data, size_t size);
-}
 
 } // end of cygnal namespace
 #endif  // end of __ECHO_H__

@@ -338,11 +338,9 @@ get_cairo_pattern(const FillStyle& style, const SWFCxForm& cx)
 class CairoPathRunner : public PathParser
 {
 public:
-  CairoPathRunner(Renderer_cairo& renderer,
-                  const std::vector<Path>& paths,
+  CairoPathRunner(const std::vector<Path>& paths,
                   const std::vector<FillStyle>& FillStyles, cairo_t* context)
   : PathParser(paths, FillStyles.size()),
-    _renderer(renderer),
     _cr(context),
     _pattern(nullptr),
     _FillStyles(FillStyles)
@@ -409,7 +407,6 @@ public:
   }
 
 private:
-  Renderer_cairo& _renderer;
   cairo_t* _cr;
   cairo_pattern_t* _pattern;
   const std::vector<FillStyle>& _FillStyles;
@@ -943,7 +940,7 @@ Renderer_cairo::draw_subshape(const PathVec& path_vec, const SWFMatrix& mat,
                               const std::vector<FillStyle>& FillStyles,
                               const std::vector<LineStyle>& line_styles)
 { 
-    CairoPathRunner runner(*this, path_vec, FillStyles, _cr);
+    CairoPathRunner runner(path_vec, FillStyles, _cr);
     runner.run(cx, mat);
 
     draw_outlines(path_vec, line_styles, cx, mat);

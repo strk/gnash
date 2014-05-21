@@ -47,8 +47,6 @@ class Qt4OglGlue : public Qt4Glue
     void render(const QRect& updateRect);
 
   private:
-    int _width;
-    int _height;
     Renderer* _renderer; // We don't own this pointer.
 };
 
