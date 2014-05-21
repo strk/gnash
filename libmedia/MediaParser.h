@@ -22,7 +22,6 @@
 
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition.hpp>
-#include <boost/thread/barrier.hpp>
 #include <memory>
 #include <deque>
 #include <map>
@@ -689,7 +688,6 @@ protected:
 	mutable boost::mutex _bufferTimeMutex;
 
 	std::unique_ptr<boost::thread> _parserThread;
-	boost::barrier _parserThreadStartBarrier;
 	mutable boost::mutex _parserThreadKillRequestMutex;
 	bool _parserThreadKillRequested;
 	boost::condition _parserThreadWakeup;

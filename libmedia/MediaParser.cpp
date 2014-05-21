@@ -40,7 +40,6 @@ MediaParser::MediaParser(std::unique_ptr<IOChannel> stream)
 	_stream(std::move(stream)),
 	_bufferTime(100), // 100 ms 
 	_parserThread(),
-	_parserThreadStartBarrier(2),
 	_parserThreadKillRequested(false),
 	_seekRequest(false)
 {
@@ -54,7 +53,6 @@ MediaParser::startParserThread()
 	log_debug("Starting MediaParser thread");
 	_parserThread.reset(new boost::thread(
                 std::bind(parserLoopStarter, this)));
-	_parserThreadStartBarrier.wait();
 #endif
 }
 
@@ -435,7 +433,6 @@ MediaParser::bufferFull() const
 void
 MediaParser::parserLoop()
 {
-	_parserThreadStartBarrier.wait();
 	while (!parserThreadKillRequested())
 	{
 		parseNextChunk();
